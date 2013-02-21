@@ -3,12 +3,6 @@
 
 namespace spine {
 
-BaseRegionAttachment::BaseRegionAttachment () {
-}
-
-BaseRegionAttachment::~BaseRegionAttachment () {
-}
-
 void BaseRegionAttachment::updateOffset () {
 	float localX2 = width / 2;
 	float localY2 = height / 2;

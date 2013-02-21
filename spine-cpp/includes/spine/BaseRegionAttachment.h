@@ -11,9 +11,6 @@ class BaseRegionAttachment: public Attachment {
 public:
 	float offset[8];
 
-	BaseRegionAttachment ();
-	~BaseRegionAttachment ();
-
 	void updateOffset ();
 
 	virtual void updateWorldVertices (Bone *bone) = 0;

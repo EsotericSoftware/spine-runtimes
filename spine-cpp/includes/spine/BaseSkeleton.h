@@ -24,7 +24,7 @@ public:
 	bool flipX, flipY;
 
 	BaseSkeleton (SkeletonData *data);
-	~BaseSkeleton ();
+	virtual ~BaseSkeleton ();
 
 	void updateWorldTransform ();
 

@@ -14,6 +14,7 @@ public:
 	float scale;
 
 	BaseSkeletonJson (BaseAttachmentLoader *attachmentLoader);
+	virtual ~BaseSkeletonJson ();
 
 	SkeletonData* readSkeletonData (const char *begin, const char *end) const;
 	SkeletonData* readSkeletonData (const std::string &json) const;

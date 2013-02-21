@@ -38,7 +38,7 @@ public:
 	float *curves; // dfx, dfy, ddfx, ddfy, dddfx, dddfy, ...
 
 	CurveTimeline (int keyframeCount);
-	~CurveTimeline ();
+	virtual ~CurveTimeline ();
 
 	void setLinear (int keyframeIndex);
 
@@ -61,7 +61,7 @@ public:
 	int boneIndex;
 
 	RotateTimeline (int keyframeCount);
-	~RotateTimeline ();
+	virtual ~RotateTimeline ();
 
 	virtual float getDuration () = 0;
 	virtual int getKeyframeCount () = 0;
@@ -79,7 +79,7 @@ public:
 	int boneIndex;
 
 	TranslateTimeline (int keyframeCount);
-	~TranslateTimeline ();
+	virtual ~TranslateTimeline ();
 
 	virtual float getDuration () = 0;
 	virtual int getKeyframeCount () = 0;
@@ -108,7 +108,7 @@ public:
 	int slotIndex;
 
 	ColorTimeline (int keyframeCount);
-	~ColorTimeline ();
+	virtual ~ColorTimeline ();
 
 	virtual float getDuration () = 0;
 	virtual int getKeyframeCount () = 0;
@@ -127,7 +127,7 @@ public:
 	int slotIndex;
 
 	AttachmentTimeline (int keyframeCount);
-	~AttachmentTimeline ();
+	virtual ~AttachmentTimeline ();
 
 	virtual float getDuration () = 0;
 	virtual int getKeyframeCount () = 0;

@@ -20,6 +20,9 @@ BaseSkeletonJson::BaseSkeletonJson (BaseAttachmentLoader *attachmentLoader) :
 				scale(1) {
 }
 
+BaseSkeletonJson::~BaseSkeletonJson () {
+}
+
 float toColor (const string &value, int index) {
 	if (value.size() != 8) throw runtime_error("Error parsing color, length must be 8: " + value);
 	char *p;
