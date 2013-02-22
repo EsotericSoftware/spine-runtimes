@@ -6,9 +6,10 @@
 
 namespace spine {
 
-class Skeleton: public BaseSkeleton, private sf::Drawable {
+class Skeleton: public BaseSkeleton, public sf::Drawable {
 public:
 	sf::VertexArray vertexArray;
+	sf::Texture *texture;
 
 	Skeleton (SkeletonData *skeletonData);
 

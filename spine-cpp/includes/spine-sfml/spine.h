@@ -10,7 +10,10 @@
 #include <spine/Slot.h>
 #include <spine/Bone.h>
 
-#include <spine-sfml/SkeletonJson.h>
 #include <spine-sfml/RegionAttachment.h>
+#include <spine-sfml/Atlas.h>
+#include <spine-sfml/AtlasAttachmentLoader.h>
+#include <spine-sfml/SkeletonJson.h>
+#include <spine-sfml/Skeleton.h>
 
 #endif /* SF_SPINE_H_ */

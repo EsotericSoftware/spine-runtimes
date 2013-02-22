@@ -14,7 +14,7 @@ public:
 	virtual ~BaseAttachmentLoader () {
 	}
 
-	virtual Attachment* newAttachment (AttachmentType type) = 0;
+	virtual Attachment* newAttachment (AttachmentType type, const std::string &name) = 0;
 };
 
 } /* namespace spine */

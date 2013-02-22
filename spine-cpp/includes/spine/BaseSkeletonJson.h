@@ -16,9 +16,10 @@ public:
 	BaseSkeletonJson (BaseAttachmentLoader *attachmentLoader);
 	virtual ~BaseSkeletonJson ();
 
-	SkeletonData* readSkeletonData (const char *begin, const char *end) const;
-	SkeletonData* readSkeletonData (const std::string &json) const;
+	SkeletonData* readSkeletonData (std::ifstream &file) const;
 	SkeletonData* readSkeletonData (std::istream &file) const;
+	SkeletonData* readSkeletonData (const std::string &json) const;
+	SkeletonData* readSkeletonData (const char *begin, const char *end) const;
 };
 
 } /* namespace spine */

@@ -5,9 +5,12 @@
 
 namespace spine {
 
+class Atlas;
+
 class SkeletonJson: public BaseSkeletonJson {
 public:
-	SkeletonJson ();
+	SkeletonJson (Atlas *atlas);
+	SkeletonJson (BaseAttachmentLoader *attachmentLoader);
 };
 
 } /* namespace spine */

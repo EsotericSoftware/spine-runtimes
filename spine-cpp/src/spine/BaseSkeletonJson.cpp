@@ -1,5 +1,5 @@
 #include <cstdlib>
-#include <cstdio>
+#include <fstream>
 #include <stdexcept>
 #include <json/json.h>
 #include <spine/BaseSkeletonJson.h>
@@ -31,9 +31,14 @@ float toColor (const string &value, int index) {
 	return color / (float)255;
 }
 
-SkeletonData* BaseSkeletonJson::readSkeletonData (std::istream &file) const {
+SkeletonData* BaseSkeletonJson::readSkeletonData (std::ifstream &file) const {
+	if (!file.is_open()) throw runtime_error("Skeleton file is not open.");
+	return readSkeletonData((std::istream&)file);
+}
+
+SkeletonData* BaseSkeletonJson::readSkeletonData (std::istream &input) const {
 	string json;
-	std::getline(file, json, (char)EOF);
+	std::getline(input, json, (char)EOF);
 	return readSkeletonData(json);
 }
 
@@ -133,8 +138,8 @@ SkeletonData* BaseSkeletonJson::readSkeletonData (const char *begin, const char 
 					else
 						throw runtime_error("Unknown attachment type: " + typeString + " (" + attachmentName + ")");
 
-					Attachment* attachment = attachmentLoader->newAttachment(type);
-					attachment->name = attachmentMap.get("name", attachmentName).asString();
+					Attachment* attachment = attachmentLoader->newAttachment(type,
+							attachmentMap.get("name", attachmentName).asString());
 					attachment->x = attachmentMap.get("x", 0).asDouble() * scale;
 					attachment->y = attachmentMap.get("y", 0).asDouble() * scale;
 					attachment->scaleX = attachmentMap.get("scaleX", 1).asDouble();

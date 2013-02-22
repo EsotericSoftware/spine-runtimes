@@ -1,9 +1,14 @@
 #include <spine-sfml/SkeletonJson.h>
-#include "AttachmentLoader.h"
+#include <spine-sfml/AtlasAttachmentLoader.h>
 
 namespace spine {
 
-SkeletonJson::SkeletonJson () : BaseSkeletonJson(new AttachmentLoader()) {
+SkeletonJson::SkeletonJson (BaseAttachmentLoader *attachmentLoader) :
+				BaseSkeletonJson(attachmentLoader) {
+}
+
+SkeletonJson::SkeletonJson (Atlas *atlas) :
+				BaseSkeletonJson(new AtlasAttachmentLoader(atlas)) {
 }
 
 } /* namespace spine */

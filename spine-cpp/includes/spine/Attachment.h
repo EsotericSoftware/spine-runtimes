@@ -6,6 +6,7 @@
 namespace spine {
 
 class BaseSkeleton;
+class Slot;
 
 class Attachment {
 public:
@@ -15,7 +16,7 @@ public:
 	virtual ~Attachment () {
 	}
 
-	virtual void draw (const BaseSkeleton *skeleton) = 0;
+	virtual void draw (Slot *slot) = 0;
 };
 
 } /* namespace spine */

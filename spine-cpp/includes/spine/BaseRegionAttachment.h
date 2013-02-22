@@ -6,6 +6,7 @@
 namespace spine {
 
 class Bone;
+class Slot;
 
 class BaseRegionAttachment: public Attachment {
 public:

@@ -1,9 +1,9 @@
 #include <cstdio>
-#include <iostream>
+#include <fstream>
 #include <algorithm>
 #include <cctype>
 #include <stdexcept>
-#include <spine/AtlasData.h>
+#include <spine/BaseAtlas.h>
 
 using std::string;
 using std::runtime_error;
@@ -65,35 +65,45 @@ static string formatNames[] = {"Alpha", "Intensity", "LuminanceAlpha", "RGB565",
 static string textureFilterNames[] = {"Nearest", "Linear", "MipMap", "MipMapNearestNearest", "MipMapLinearNearest",
 		"MipMapNearestLinear", "MipMapLinearLinear"};
 
-AtlasData::AtlasData (std::istream &file) {
+//
+
+BaseAtlas::~BaseAtlas () {
+	for (int i = 0, n = pages.size(); i < n; i++)
+		delete pages[i];
+	for (int i = 0, n = regions.size(); i < n; i++)
+		delete regions[i];
+}
+
+void BaseAtlas::load (std::ifstream &file) {
+	if (!file.is_open()) throw runtime_error("Atlas file is not open.");
+	load((std::istream&)file);
+}
+
+void BaseAtlas::load (std::istream &input) {
 	string text;
-	std::getline(file, text, (char)EOF);
+	std::getline(input, text, (char)EOF);
 	const char *begin = text.c_str();
 	const char *end = begin + text.length();
-	init(begin, end);
+	load(begin, end);
 }
 
-AtlasData::AtlasData (const string &text) {
+void BaseAtlas::load (const string &text) {
 	const char *begin = text.c_str();
 	const char *end = begin + text.length();
-	init(begin, end);
+	load(begin, end);
 }
 
-AtlasData::AtlasData (const char *begin, const char *end) {
-	init(begin, end);
-}
-
-void AtlasData::init (const char *current, const char *end) {
+void BaseAtlas::load (const char *current, const char *end) {
 	string value;
 	string tuple[4];
-	AtlasPage *page;
+	BaseAtlasPage *page;
 	while (current != end) {
 		readLine(current, end, value);
 		trim(value);
 		if (value.length() == 0) {
 			page = 0;
 		} else if (!page) {
-			page = new AtlasPage();
+			page = newAtlasPage(value);
 			pages.push_back(page);
 			page->name = value;
 			page->format = static_cast<Format>(indexOf(formatNames, 7, readValue(current, end, value)));
@@ -114,10 +124,9 @@ void AtlasData::init (const char *current, const char *end) {
 				page->vWrap = repeat;
 			}
 		} else {
-			AtlasRegion *region = new AtlasRegion();
+			BaseAtlasRegion *region = newAtlasRegion(page);
 			regions.push_back(region);
 			region->name = value;
-			region->page = page;
 
 			region->rotate = readValue(current, end, value) == "true";
 
@@ -159,11 +168,17 @@ void AtlasData::init (const char *current, const char *end) {
 	}
 }
 
-AtlasData::~AtlasData () {
-	for (int i = 0, n = pages.size(); i < n; i++)
-		delete pages[i];
+BaseAtlasRegion* BaseAtlas::findRegion (const std::string &name) {
 	for (int i = 0, n = regions.size(); i < n; i++)
-		delete regions[i];
+		if (regions[i]->name == name) return regions[i];
+	return 0;
+}
+
+//
+
+BaseAtlasRegion::~BaseAtlasRegion () {
+	if (splits) delete splits;
+	if (pads) delete pads;
 }
 
 } /* namespace spine */

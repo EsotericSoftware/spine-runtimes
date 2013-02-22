@@ -1,3 +1,4 @@
+#include <iostream>
 #include <spine/BaseSkeleton.h>
 #include <spine/SkeletonData.h>
 #include <spine/SlotData.h>
@@ -17,7 +18,10 @@ BaseSkeleton::BaseSkeleton (SkeletonData *data) :
 				r(1),
 				g(1),
 				b(1),
-				a(1) {
+				a(1),
+				time(0),
+				flipX(false),
+				flipY(false) {
 	if (!data) throw invalid_argument("data cannot be null.");
 
 	int boneCount = data->bones.size();

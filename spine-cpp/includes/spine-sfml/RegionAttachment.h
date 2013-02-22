@@ -3,20 +3,22 @@
 
 #include <spine/BaseRegionAttachment.h>
 #include <SFML/Graphics/Vertex.hpp>
+#include <SFML/Graphics/Texture.hpp>
 
 namespace spine {
 
 class Bone;
+class AtlasRegion;
 
 class RegionAttachment: public BaseRegionAttachment {
 public:
 	sf::Vertex vertices[4];
+	sf::Texture *texture;
 
-	RegionAttachment ();
+	RegionAttachment (AtlasRegion *region);
 
 	virtual void updateWorldVertices (Bone *bone);
-
-	virtual void draw (const BaseSkeleton *skeleton);
+	virtual void draw (Slot *slot);
 };
 
 } /* namespace spine */
