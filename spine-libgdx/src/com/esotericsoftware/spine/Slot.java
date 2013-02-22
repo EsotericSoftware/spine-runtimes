@@ -26,6 +26,7 @@ public class Slot {
 		this.skeleton = skeleton;
 		this.bone = bone;
 		color = new Color(1, 1, 1, 1);
+		setToBindPose();
 	}
 
 	/** Copy constructor. */
@@ -84,7 +85,7 @@ public class Slot {
 	}
 
 	public void setToBindPose () {
-		setToBindPose(skeleton.slots.indexOf(this, true));
+		setToBindPose(skeleton.data.slots.indexOf(data, true));
 	}
 
 	public String toString () {

@@ -226,12 +226,12 @@ public class SkeletonJson {
 			for (Entry<String, ?> entry : slotsMap.entries()) {
 				String slotName = entry.key;
 				int slotIndex = skeletonData.findSlotIndex(slotName);
-				OrderedMap<?, ?> propertyMap = (OrderedMap)entry.value;
+				OrderedMap<?, ?> timelineMap = (OrderedMap)entry.value;
 
-				for (Entry propertyEntry : propertyMap.entries()) {
-					Array<OrderedMap> values = (Array)propertyEntry.value;
-					String timelineType = (String)propertyEntry.key;
-					if (timelineType.equals(TIMELINE_COLOR)) {
+				for (Entry timelineEntry : timelineMap.entries()) {
+					Array<OrderedMap> values = (Array)timelineEntry.value;
+					String timelineName = (String)timelineEntry.key;
+					if (timelineName.equals(TIMELINE_COLOR)) {
 						ColorTimeline timeline = new ColorTimeline(values.size);
 						timeline.setSlotIndex(slotIndex);
 
@@ -246,7 +246,7 @@ public class SkeletonJson {
 						timelines.add(timeline);
 						duration = Math.max(duration, timeline.getDuration());
 
-					} else if (timelineType.equals(TIMELINE_ATTACHMENT)) {
+					} else if (timelineName.equals(TIMELINE_ATTACHMENT)) {
 						AttachmentTimeline timeline = new AttachmentTimeline(values.size);
 						timeline.setSlotIndex(slotIndex);
 
@@ -259,7 +259,7 @@ public class SkeletonJson {
 						duration = Math.max(duration, timeline.getDuration());
 
 					} else
-						throw new RuntimeException("Invalid timeline type for a slot: " + timelineType + " (" + slotName + ")");
+						throw new RuntimeException("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
 				}
 			}
 		}

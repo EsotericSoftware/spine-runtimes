@@ -8,10 +8,12 @@ namespace spine {
 Bone::Bone (BoneData *data) :
 				data(data),
 				parent(0),
-				scaleX(1),
-				scaleY(1) {
+				x(data->x),
+				y(data->y),
+				rotation(data->rotation),
+				scaleX(data->scaleX),
+				scaleY(data->scaleY) {
 	if (!data) throw std::invalid_argument("data cannot be null.");
-	setToBindPose();
 }
 
 void Bone::setToBindPose () {
@@ -48,6 +50,10 @@ void Bone::updateWorldTransform (bool flipX, bool flipY) {
 		m01 = -m01;
 	}
 	if (flipY) {
+		m10 = -m10;
+		m11 = -m11;
+	}
+	if (data->flipY) {
 		m10 = -m10;
 		m11 = -m11;
 	}

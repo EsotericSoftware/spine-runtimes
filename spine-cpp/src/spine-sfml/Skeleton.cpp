@@ -17,7 +17,6 @@ Skeleton::Skeleton (SkeletonData *skeletonData) :
 				BaseSkeleton(skeletonData),
 				vertexArray(Quads, skeletonData->bones.size() * 4),
 				texture(0) {
-	flipY = true; // BOZO - Flip in loader for animation?
 }
 
 void Skeleton::draw (RenderTarget& target, RenderStates states) const {

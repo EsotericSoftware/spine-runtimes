@@ -13,6 +13,8 @@ public:
 	float x, y, scaleX, scaleY, rotation, width, height;
 	float offset[8];
 
+	BaseRegionAttachment ();
+
 	void updateOffset ();
 
 	virtual void updateWorldVertices (Bone *bone) = 0;

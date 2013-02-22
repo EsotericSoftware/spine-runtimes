@@ -133,7 +133,8 @@ public:
 	virtual int getKeyframeCount ();
 	virtual void apply (BaseSkeleton *skeleton, float time, float alpha);
 
-	void setKeyframe (int keyframeIndex, float time, std::string *attachmentName);
+	/** @param attachmentName Pass an empty string to clear the image for a slot. */
+	void setKeyframe (int keyframeIndex, float time, const std::string &attachmentName);
 };
 
 } /* namespace spine */

@@ -104,7 +104,7 @@ float CurveTimeline::getCurvePercent (int keyframeIndex, float percent) {
 //
 
 /** @param target After the first and before the last entry. */
-int binarySearch (float *values, int valuesLength, float target, int step) {
+static int binarySearch (float *values, int valuesLength, float target, int step) {
 	int low = 0;
 	int high = valuesLength / step - 2;
 	if (high == 0) return step;
@@ -120,15 +120,15 @@ int binarySearch (float *values, int valuesLength, float target, int step) {
 	return 0;
 }
 
-int linearSearch (float *values, int valuesLength, float target, int step) {
-	for (int i = 0, last = valuesLength - step; i <= last; i += step) {
-		if (values[i] <= target) continue;
-		return i;
-	}
-	return -1;
-}
-
-//
+/*
+ static int linearSearch (float *values, int valuesLength, float target, int step) {
+ for (int i = 0, last = valuesLength - step; i <= last; i += step) {
+ if (values[i] <= target) continue;
+ return i;
+ }
+ return -1;
+ }
+ */
 
 static const int ROTATE_LAST_FRAME_TIME = -2;
 static const int ROTATE_FRAME_VALUE = 1;
@@ -138,6 +138,7 @@ RotateTimeline::RotateTimeline (int keyframeCount) :
 				framesLength(keyframeCount * 2),
 				frames(new float[framesLength]),
 				boneIndex(0) {
+	memset(frames, 0, sizeof(float) * framesLength);
 }
 
 RotateTimeline::~RotateTimeline () {
@@ -174,7 +175,7 @@ void RotateTimeline::apply (BaseSkeleton *skeleton, float time, float alpha) {
 	}
 
 	// Interpolate between the last frame and the current frame.
-	int frameIndex = linearSearch(frames, framesLength, time, 2);
+	int frameIndex = binarySearch(frames, framesLength, time, 2);
 	float lastFrameValue = frames[frameIndex - 1];
 	float frameTime = frames[frameIndex];
 	float percent = 1 - (time - frameTime) / (frames[frameIndex + ROTATE_LAST_FRAME_TIME] - frameTime);
@@ -208,6 +209,7 @@ TranslateTimeline::TranslateTimeline (int keyframeCount) :
 				framesLength(keyframeCount * 3),
 				frames(new float[framesLength]),
 				boneIndex(0) {
+	memset(frames, 0, sizeof(float) * framesLength);
 }
 
 TranslateTimeline::~TranslateTimeline () {
@@ -260,7 +262,6 @@ void TranslateTimeline::apply (BaseSkeleton *skeleton, float time, float alpha) 
 
 ScaleTimeline::ScaleTimeline (int keyframeCount) :
 				TranslateTimeline(keyframeCount) {
-	frames = new float[framesLength];
 }
 
 void ScaleTimeline::apply (BaseSkeleton *skeleton, float time, float alpha) {
@@ -304,6 +305,7 @@ ColorTimeline::ColorTimeline (int keyframeCount) :
 				framesLength(keyframeCount * 5),
 				frames(new float[framesLength]),
 				slotIndex(0) {
+	memset(frames, 0, sizeof(float) * framesLength);
 }
 
 ColorTimeline::~ColorTimeline () {
@@ -379,6 +381,8 @@ AttachmentTimeline::AttachmentTimeline (int keyframeCount) :
 				frames(new float[keyframeCount]),
 				attachmentNames(new string*[keyframeCount]),
 				slotIndex(0) {
+	memset(frames, 0, sizeof(float) * keyframeCount);
+	memset(attachmentNames, 0, sizeof(string*) * keyframeCount);
 }
 
 AttachmentTimeline::~AttachmentTimeline () {
@@ -397,10 +401,10 @@ int AttachmentTimeline::getKeyframeCount () {
 	return framesLength;
 }
 
-void AttachmentTimeline::setKeyframe (int keyframeIndex, float time, string *attachmentName) {
+void AttachmentTimeline::setKeyframe (int keyframeIndex, float time, const string &attachmentName) {
 	frames[keyframeIndex] = time;
 	if (attachmentNames[keyframeIndex]) delete attachmentNames[keyframeIndex];
-	attachmentNames[keyframeIndex] = attachmentName ? new string(*attachmentName) : 0;
+	attachmentNames[keyframeIndex] = attachmentName.length() == 0 ? 0 : new string(attachmentName);
 }
 
 void AttachmentTimeline::apply (BaseSkeleton *skeleton, float time, float alpha) {

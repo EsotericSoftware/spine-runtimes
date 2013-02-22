@@ -13,6 +13,7 @@ class BaseSkeletonJson {
 public:
 	BaseAttachmentLoader *attachmentLoader;
 	float scale;
+	bool flipY;
 
 	BaseSkeletonJson (BaseAttachmentLoader *attachmentLoader);
 	virtual ~BaseSkeletonJson ();

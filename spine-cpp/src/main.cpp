@@ -21,6 +21,8 @@ int main () {
 		Animation *animation = skeletonJson.readAnimation(animationFile, skeletonData);
 
 		Skeleton *skeleton = new Skeleton(skeletonData);
+		skeleton->flipX = false;
+		skeleton->flipY = false;
 		skeleton->setToBindPose();
 		skeleton->getRootBone()->x = 200;
 		skeleton->getRootBone()->y = 420;
@@ -42,9 +44,6 @@ int main () {
 			deltaClock.restart();
 			animationTime += delta;
 
-			skeleton->setToBindPose();
-			skeleton->getRootBone()->x = 200;
-			skeleton->getRootBone()->y = 420;
 			animation->apply(skeleton, animationTime, true);
 			skeleton->updateWorldTransform();
 		}

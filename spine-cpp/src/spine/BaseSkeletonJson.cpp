@@ -30,7 +30,8 @@ static float toColor (const string &value, int index) {
 
 BaseSkeletonJson::BaseSkeletonJson (BaseAttachmentLoader *attachmentLoader) :
 				attachmentLoader(attachmentLoader),
-				scale(1) {
+				scale(1),
+				flipY(false) {
 }
 
 BaseSkeletonJson::~BaseSkeletonJson () {
@@ -88,12 +89,13 @@ SkeletonData* BaseSkeletonJson::readSkeletonData (const char *begin, const char 
 		boneData->rotation = boneMap.get("rotation", 0).asDouble();
 		boneData->scaleX = boneMap.get("scaleX", 1).asDouble();
 		boneData->scaleY = boneMap.get("scaleY", 1).asDouble();
+		boneData->flipY = flipY;
 
 		skeletonData->bones.push_back(boneData);
 	}
 
-	if (root.isMember("slots")) {
-		Json::Value slots = root["slots"];
+	Json::Value slots = root["slots"];
+	if (!slots.isNull()) {
 		skeletonData->slots.reserve(slots.size());
 		for (int i = 0; i < slots.size(); ++i) {
 			Json::Value slotMap = slots[i];
@@ -194,6 +196,15 @@ Animation* BaseSkeletonJson::readAnimation (const string &json, const SkeletonDa
 	return readAnimation(begin, end, skeletonData);
 }
 
+static void readCurve (CurveTimeline *timeline, int keyframeIndex, const Json::Value &valueMap) {
+	Json::Value curve = valueMap["curve"];
+	if (curve.isNull()) return;
+	if (curve.isString() && curve.asString() == "stepped")
+		timeline->setStepped(keyframeIndex);
+	else if (curve.isArray())
+		timeline->setCurve(keyframeIndex, curve[0u].asDouble(), curve[1u].asDouble(), curve[2u].asDouble(), curve[3u].asDouble());
+}
+
 Animation* BaseSkeletonJson::readAnimation (const char *begin, const char *end, const SkeletonData *skeletonData) const {
 	if (!begin) throw invalid_argument("begin cannot be null.");
 	if (!end) throw invalid_argument("end cannot be null.");
@@ -236,8 +247,7 @@ Animation* BaseSkeletonJson::readAnimation (const char *begin, const char *end, 
 
 					float time = valueMap["time"].asDouble();
 					timeline->setKeyframe(keyframeIndex, time, valueMap["angle"].asDouble());
-					// BOZO
-					// readCurve(timeline, keyframeIndex, valueMap);
+					readCurve(timeline, keyframeIndex, valueMap);
 					keyframeIndex++;
 				}
 				timelines.push_back(timeline);
@@ -263,7 +273,7 @@ Animation* BaseSkeletonJson::readAnimation (const char *begin, const char *end, 
 							valueMap["time"].asDouble(), //
 							valueMap.get("x", 0).asDouble() * timelineScale, //
 							valueMap.get("y", 0).asDouble() * timelineScale);
-					// readCurve(timeline, keyframeIndex, valueMap);
+					readCurve(timeline, keyframeIndex, valueMap);
 					keyframeIndex++;
 				}
 				timelines.push_back(timeline);
@@ -271,6 +281,58 @@ Animation* BaseSkeletonJson::readAnimation (const char *begin, const char *end, 
 
 			} else {
 				throw runtime_error("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
+			}
+		}
+	}
+
+	Json::Value slots = root["slots"];
+	if (!slots.isNull()) {
+		vector<string> slotNames = slots.getMemberNames();
+		for (int i = 0; i < slotNames.size(); i++) {
+			string slotName = slotNames[i];
+			int slotIndex = skeletonData->findSlotIndex(slotName);
+			if (slotIndex == -1) throw runtime_error("Slot not found: " + slotName);
+
+			Json::Value timelineMap = slots[slotName];
+			vector<string> timelineNames = timelineMap.getMemberNames();
+			for (int i = 0; i < timelineNames.size(); i++) {
+				string timelineName = timelineNames[i];
+				Json::Value values = timelineMap[timelineName];
+
+				if (timelineName == TIMELINE_COLOR) {
+					ColorTimeline *timeline = new ColorTimeline(values.size());
+					timeline->slotIndex = slotIndex;
+
+					int keyframeIndex = 0;
+					for (int i = 0; i < values.size(); i++) {
+						Json::Value valueMap = values[i];
+
+						string s = valueMap["color"].asString();
+						timeline->setKeyframe(keyframeIndex, valueMap["time"].asDouble(), //
+								toColor(s, 0), toColor(s, 1), toColor(s, 2), toColor(s, 3));
+						readCurve(timeline, keyframeIndex, valueMap);
+						keyframeIndex++;
+					}
+					timelines.push_back(timeline);
+					if (timeline->getDuration() > duration) duration = timeline->getDuration();
+
+				} else if (timelineName == TIMELINE_ATTACHMENT) {
+					AttachmentTimeline *timeline = new AttachmentTimeline(values.size());
+					timeline->slotIndex = slotIndex;
+
+					int keyframeIndex = 0;
+					for (int i = 0; i < values.size(); i++) {
+						Json::Value valueMap = values[i];
+
+						Json::Value name = valueMap["name"];
+						timeline->setKeyframe(keyframeIndex++, valueMap["time"].asDouble(), name.isNull() ? "" : name.asString());
+					}
+					timelines.push_back(timeline);
+					if (timeline->getDuration() > duration) duration = timeline->getDuration();
+
+				} else {
+					throw runtime_error("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
+				}
 			}
 		}
 	}
