@@ -5,8 +5,9 @@
 
 namespace spine {
 
-class SkeletonData;
 class BaseAttachmentLoader;
+class SkeletonData;
+class Animation;
 
 class BaseSkeletonJson {
 public:
@@ -20,6 +21,11 @@ public:
 	SkeletonData* readSkeletonData (std::istream &file) const;
 	SkeletonData* readSkeletonData (const std::string &json) const;
 	SkeletonData* readSkeletonData (const char *begin, const char *end) const;
+
+	Animation* readAnimation (std::ifstream &file, const SkeletonData *skeletonData) const;
+	Animation* readAnimation (std::istream &file, const SkeletonData *skeletonData) const;
+	Animation* readAnimation (const std::string &json, const SkeletonData *skeletonData) const;
+	Animation* readAnimation (const char *begin, const char *end, const SkeletonData *skeletonData) const;
 };
 
 } /* namespace spine */

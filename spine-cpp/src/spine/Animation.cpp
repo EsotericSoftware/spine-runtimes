@@ -1,3 +1,7 @@
+#include <cstring>
+#include <iostream>
+#include <stdexcept>
+#include <math.h>
 #include <spine/Animation.h>
 #include <spine/Bone.h>
 #include <spine/Slot.h>
@@ -14,6 +18,15 @@ Animation::Animation (const vector<Timeline*> &timelines, float duration) :
 				duration(duration) {
 }
 
+void Animation::apply (BaseSkeleton *skeleton, float time, bool loop) {
+	if (!skeleton) throw std::invalid_argument("skeleton cannot be null.");
+
+	if (loop && duration) time = fmodf(time, duration);
+
+	for (int i = 0, n = timelines.size(); i < n; i++)
+		timelines[i]->apply(skeleton, time, 1);
+}
+
 //
 
 static const float LINEAR = 0;
@@ -22,6 +35,7 @@ static const int BEZIER_SEGMENTS = 10;
 
 CurveTimeline::CurveTimeline (int keyframeCount) :
 				curves(new float[(keyframeCount - 1) * 6]) {
+	memset(curves, 0, sizeof(float) * (keyframeCount - 1) * 6);
 }
 
 CurveTimeline::~CurveTimeline () {
@@ -122,7 +136,8 @@ static const int ROTATE_FRAME_VALUE = 1;
 RotateTimeline::RotateTimeline (int keyframeCount) :
 				CurveTimeline(keyframeCount),
 				framesLength(keyframeCount * 2),
-				frames(new float[framesLength]) {
+				frames(new float[framesLength]),
+				boneIndex(0) {
 }
 
 RotateTimeline::~RotateTimeline () {
@@ -159,7 +174,7 @@ void RotateTimeline::apply (BaseSkeleton *skeleton, float time, float alpha) {
 	}
 
 	// Interpolate between the last frame and the current frame.
-	int frameIndex = binarySearch(frames, framesLength, time, 2);
+	int frameIndex = linearSearch(frames, framesLength, time, 2);
 	float lastFrameValue = frames[frameIndex - 1];
 	float frameTime = frames[frameIndex];
 	float percent = 1 - (time - frameTime) / (frames[frameIndex + ROTATE_LAST_FRAME_TIME] - frameTime);
@@ -191,7 +206,8 @@ static const int TRANSLATE_FRAME_Y = 2;
 TranslateTimeline::TranslateTimeline (int keyframeCount) :
 				CurveTimeline(keyframeCount),
 				framesLength(keyframeCount * 3),
-				frames(new float[framesLength]) {
+				frames(new float[framesLength]),
+				boneIndex(0) {
 }
 
 TranslateTimeline::~TranslateTimeline () {
@@ -286,7 +302,8 @@ static const int COLOR_FRAME_A = 4;
 ColorTimeline::ColorTimeline (int keyframeCount) :
 				CurveTimeline(keyframeCount),
 				framesLength(keyframeCount * 5),
-				frames(new float[framesLength]) {
+				frames(new float[framesLength]),
+				slotIndex(0) {
 }
 
 ColorTimeline::~ColorTimeline () {
@@ -360,7 +377,8 @@ void ColorTimeline::apply (BaseSkeleton *skeleton, float time, float alpha) {
 AttachmentTimeline::AttachmentTimeline (int keyframeCount) :
 				framesLength(keyframeCount),
 				frames(new float[keyframeCount]),
-				attachmentNames(new string*[keyframeCount]) {
+				attachmentNames(new string*[keyframeCount]),
+				slotIndex(0) {
 }
 
 AttachmentTimeline::~AttachmentTimeline () {

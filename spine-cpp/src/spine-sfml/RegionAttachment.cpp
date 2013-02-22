@@ -9,8 +9,7 @@
 namespace spine {
 
 RegionAttachment::RegionAttachment (AtlasRegion *region) {
-	texture = region->page->texture;
-	sf::Vector2u size = texture->getSize();
+	texture = region->page->texture; // BOZO - Resolve attachment as late as possible?
 	int u = region->x;
 	int u2 = u + region->width;
 	int v = region->y;

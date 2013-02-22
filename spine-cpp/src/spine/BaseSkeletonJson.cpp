@@ -4,16 +4,29 @@
 #include <json/json.h>
 #include <spine/BaseSkeletonJson.h>
 #include <spine/BaseAttachmentLoader.h>
+#include <spine/BaseRegionAttachment.h>
 #include <spine/SkeletonData.h>
 #include <spine/BoneData.h>
 #include <spine/SlotData.h>
 #include <spine/Skin.h>
+#include <spine/Animation.h>
 
 using std::string;
 using std::vector;
 using std::runtime_error;
+using std::invalid_argument;
 
 namespace spine {
+
+static float toColor (const string &value, int index) {
+	if (value.size() != 8) throw runtime_error("Error parsing color, length must be 8: " + value);
+	char *p;
+	int color = strtoul(value.substr(index * 2, 2).c_str(), &p, 16);
+	if (*p != 0) throw runtime_error("Error parsing color: " + value + ", invalid hex value: " + value.substr(index * 2, 2));
+	return color / (float)255;
+}
+
+//
 
 BaseSkeletonJson::BaseSkeletonJson (BaseAttachmentLoader *attachmentLoader) :
 				attachmentLoader(attachmentLoader),
@@ -23,20 +36,16 @@ BaseSkeletonJson::BaseSkeletonJson (BaseAttachmentLoader *attachmentLoader) :
 BaseSkeletonJson::~BaseSkeletonJson () {
 }
 
-float toColor (const string &value, int index) {
-	if (value.size() != 8) throw runtime_error("Error parsing color, length must be 8: " + value);
-	char *p;
-	int color = strtoul(value.substr(index * 2, 2).c_str(), &p, 16);
-	if (*p != 0) throw runtime_error("Error parsing color: " + value + ", invalid hex value: " + value.substr(index * 2, 2));
-	return color / (float)255;
-}
-
 SkeletonData* BaseSkeletonJson::readSkeletonData (std::ifstream &file) const {
+	if (!file) throw invalid_argument("file cannot be null.");
 	if (!file.is_open()) throw runtime_error("Skeleton file is not open.");
+
 	return readSkeletonData((std::istream&)file);
 }
 
 SkeletonData* BaseSkeletonJson::readSkeletonData (std::istream &input) const {
+	if (!input) throw invalid_argument("input cannot be null.");
+
 	string json;
 	std::getline(input, json, (char)EOF);
 	return readSkeletonData(json);
@@ -49,6 +58,9 @@ SkeletonData* BaseSkeletonJson::readSkeletonData (const string &json) const {
 }
 
 SkeletonData* BaseSkeletonJson::readSkeletonData (const char *begin, const char *end) const {
+	if (!begin) throw invalid_argument("begin cannot be null.");
+	if (!end) throw invalid_argument("end cannot be null.");
+
 	static string const ATTACHMENT_REGION = "region";
 	static string const ATTACHMENT_REGION_SEQUENCE = "regionSequence";
 
@@ -140,13 +152,17 @@ SkeletonData* BaseSkeletonJson::readSkeletonData (const char *begin, const char 
 
 					Attachment* attachment = attachmentLoader->newAttachment(type,
 							attachmentMap.get("name", attachmentName).asString());
-					attachment->x = attachmentMap.get("x", 0).asDouble() * scale;
-					attachment->y = attachmentMap.get("y", 0).asDouble() * scale;
-					attachment->scaleX = attachmentMap.get("scaleX", 1).asDouble();
-					attachment->scaleY = attachmentMap.get("scaleY", 1).asDouble();
-					attachment->rotation = attachmentMap.get("rotation", 0).asDouble();
-					attachment->width = attachmentMap.get("width", 32).asDouble() * scale;
-					attachment->height = attachmentMap.get("height", 32).asDouble() * scale;
+
+					if (type == region || type == regionSequence) {
+						BaseRegionAttachment *regionAttachment = reinterpret_cast<BaseRegionAttachment*>(attachment);
+						regionAttachment->x = attachmentMap.get("x", 0).asDouble() * scale;
+						regionAttachment->y = attachmentMap.get("y", 0).asDouble() * scale;
+						regionAttachment->scaleX = attachmentMap.get("scaleX", 1).asDouble();
+						regionAttachment->scaleY = attachmentMap.get("scaleY", 1).asDouble();
+						regionAttachment->rotation = attachmentMap.get("rotation", 0).asDouble();
+						regionAttachment->width = attachmentMap.get("width", 32).asDouble() * scale;
+						regionAttachment->height = attachmentMap.get("height", 32).asDouble() * scale;
+					}
 
 					skin->addAttachment(slotIndex, attachmentName, attachment);
 				}
@@ -155,6 +171,112 @@ SkeletonData* BaseSkeletonJson::readSkeletonData (const char *begin, const char 
 	}
 
 	return skeletonData;
+}
+
+Animation* BaseSkeletonJson::readAnimation (std::ifstream &file, const SkeletonData *skeletonData) const {
+	if (!file) throw invalid_argument("file cannot be null.");
+	if (!file.is_open()) throw runtime_error("Animation file is not open.");
+
+	return readAnimation((std::istream&)file, skeletonData);
+}
+
+Animation* BaseSkeletonJson::readAnimation (std::istream &input, const SkeletonData *skeletonData) const {
+	if (!input) throw invalid_argument("input cannot be null.");
+
+	string json;
+	std::getline(input, json, (char)EOF);
+	return readAnimation(json, skeletonData);
+}
+
+Animation* BaseSkeletonJson::readAnimation (const string &json, const SkeletonData *skeletonData) const {
+	const char *begin = json.c_str();
+	const char *end = begin + json.length();
+	return readAnimation(begin, end, skeletonData);
+}
+
+Animation* BaseSkeletonJson::readAnimation (const char *begin, const char *end, const SkeletonData *skeletonData) const {
+	if (!begin) throw invalid_argument("begin cannot be null.");
+	if (!end) throw invalid_argument("end cannot be null.");
+	if (!skeletonData) throw invalid_argument("skeletonData cannot be null.");
+
+	static string const TIMELINE_SCALE = "scale";
+	static string const TIMELINE_ROTATE = "rotate";
+	static string const TIMELINE_TRANSLATE = "translate";
+	static string const TIMELINE_ATTACHMENT = "attachment";
+	static string const TIMELINE_COLOR = "color";
+
+	vector<Timeline*> timelines;
+	float duration = 0;
+
+	Json::Value root;
+	Json::Reader reader;
+	if (!reader.parse(begin, end, root))
+		throw runtime_error("Error parsing animation JSON.\n" + reader.getFormatedErrorMessages());
+
+	Json::Value bones = root["bones"];
+	vector<string> boneNames = bones.getMemberNames();
+	for (int i = 0; i < boneNames.size(); i++) {
+		string boneName = boneNames[i];
+		int boneIndex = skeletonData->findBoneIndex(boneName);
+		if (boneIndex == -1) throw runtime_error("Bone not found: " + boneName);
+
+		Json::Value timelineMap = bones[boneName];
+		vector<string> timelineNames = timelineMap.getMemberNames();
+		for (int i = 0; i < timelineNames.size(); i++) {
+			string timelineName = timelineNames[i];
+			Json::Value values = timelineMap[timelineName];
+
+			if (timelineName == TIMELINE_ROTATE) {
+				RotateTimeline *timeline = new RotateTimeline(values.size());
+				timeline->boneIndex = boneIndex;
+
+				int keyframeIndex = 0;
+				for (int i = 0; i < values.size(); i++) {
+					Json::Value valueMap = values[i];
+
+					float time = valueMap["time"].asDouble();
+					timeline->setKeyframe(keyframeIndex, time, valueMap["angle"].asDouble());
+					// BOZO
+					// readCurve(timeline, keyframeIndex, valueMap);
+					keyframeIndex++;
+				}
+				timelines.push_back(timeline);
+				if (timeline->getDuration() > duration) duration = timeline->getDuration();
+
+			} else if (timelineName == TIMELINE_TRANSLATE || timelineName == TIMELINE_SCALE) {
+				TranslateTimeline *timeline;
+				float timelineScale = 1;
+				if (timelineName == TIMELINE_SCALE)
+					timeline = new ScaleTimeline(values.size());
+				else {
+					timeline = new TranslateTimeline(values.size());
+					timelineScale = scale;
+				}
+				timeline->boneIndex = boneIndex;
+
+				int keyframeIndex = 0;
+				for (int i = 0; i < values.size(); i++) {
+					Json::Value valueMap = values[i];
+
+					float time = valueMap["time"].asDouble();
+					timeline->setKeyframe(keyframeIndex, //
+							valueMap["time"].asDouble(), //
+							valueMap.get("x", 0).asDouble() * timelineScale, //
+							valueMap.get("y", 0).asDouble() * timelineScale);
+					// readCurve(timeline, keyframeIndex, valueMap);
+					keyframeIndex++;
+				}
+				timelines.push_back(timeline);
+				if (timeline->getDuration() > duration) duration = timeline->getDuration();
+
+			} else {
+				throw runtime_error("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
+			}
+		}
+	}
+
+	Animation *animation = new Animation(timelines, duration);
+	return animation;
 }
 
 } /* namespace spine */

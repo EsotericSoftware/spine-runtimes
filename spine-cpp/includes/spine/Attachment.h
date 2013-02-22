@@ -11,7 +11,6 @@ class Slot;
 class Attachment {
 public:
 	std::string name;
-	float x, y, scaleX, scaleY, rotation, width, height;
 
 	virtual ~Attachment () {
 	}

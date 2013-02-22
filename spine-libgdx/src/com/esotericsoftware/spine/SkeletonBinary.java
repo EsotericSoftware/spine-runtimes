@@ -149,13 +149,17 @@ public class SkeletonBinary {
 			throw new SerializationException("Unknown attachment type: " + type + " (" + name + ")");
 		}
 
-		attachment.setX(input.readFloat() * scale);
-		attachment.setY(input.readFloat() * scale);
-		attachment.setScaleX(input.readFloat());
-		attachment.setScaleY(input.readFloat());
-		attachment.setRotation(input.readFloat());
-		attachment.setWidth(input.readFloat() * scale);
-		attachment.setHeight(input.readFloat() * scale);
+		if (attachment instanceof RegionAttachment) {
+			RegionAttachment regionAttachment = (RegionAttachment)attachment;
+			regionAttachment.setX(input.readFloat() * scale);
+			regionAttachment.setY(input.readFloat() * scale);
+			regionAttachment.setScaleX(input.readFloat());
+			regionAttachment.setScaleY(input.readFloat());
+			regionAttachment.setRotation(input.readFloat());
+			regionAttachment.setWidth(input.readFloat() * scale);
+			regionAttachment.setHeight(input.readFloat() * scale);
+		}
+		
 		return attachment;
 	}
 

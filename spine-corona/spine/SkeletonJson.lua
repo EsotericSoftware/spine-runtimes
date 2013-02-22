@@ -140,12 +140,12 @@ function SkeletonJson.new (attachmentResolver)
 		if not root then error("Invalid JSON: " .. jsonText, 2) end
 
 		local bonesMap = root["bones"]
-		for boneName,propertyMap in pairs(bonesMap) do
+		for boneName,timelineMap in pairs(bonesMap) do
 			local boneIndex = skeletonData:findBoneIndex(boneName)
 			if boneIndex == -1 then error("Bone not found: " .. boneName) end
 
-			for timelineType,values in pairs(propertyMap) do
-				if timelineType == TIMELINE_ROTATE then
+			for timelineName,values in pairs(timelineMap) do
+				if timelineName == TIMELINE_ROTATE then
 					local timeline = Animation.RotateTimeline.new()
 					timeline.boneIndex = boneIndex
 
@@ -159,10 +159,10 @@ function SkeletonJson.new (attachmentResolver)
 					table.insert(timelines, timeline)
 					duration = math.max(duration, timeline:getDuration())
 
-				elseif timelineType == TIMELINE_TRANSLATE or timelineType == TIMELINE_SCALE then
+				elseif timelineName == TIMELINE_TRANSLATE or timelineName == TIMELINE_SCALE then
 					local timeline
 					local timelineScale = 1
-					if timelineType == TIMELINE_SCALE then
+					if timelineName == TIMELINE_SCALE then
 						timeline = Animation.ScaleTimeline.new()
 					else
 						timeline = Animation.TranslateTimeline.new()
@@ -183,18 +183,18 @@ function SkeletonJson.new (attachmentResolver)
 					duration = math.max(duration, timeline:getDuration())
 
 				else
-					error("Invalid timeline type for a bone: " .. timelineType .. " (" .. boneName .. ")")
+					error("Invalid timeline type for a bone: " .. timelineName .. " (" .. boneName .. ")")
 				end
 			end
 		end
 
 		local slotsMap = root["slots"]
 		if slotsMap then
-			for slotName,propertyMap in pairs(slotsMap) do
+			for slotName,timelineMap in pairs(slotsMap) do
 				local slotIndex = skeletonData:findSlotIndex(slotName)
 
-				for timelineType,values in pairs(propertyMap) do
-					if timelineType == TIMELINE_COLOR then
+				for timelineName,values in pairs(timelineMap) do
+					if timelineName == TIMELINE_COLOR then
 						local timeline = Animation.ColorTimeline.new()
 						timeline.slotIndex = slotIndex
 
@@ -215,7 +215,7 @@ function SkeletonJson.new (attachmentResolver)
 						table.insert(timelines, timeline)
 						duration = math.max(duration, timeline:getDuration())
 
-					elseif timelineType == TIMELINE_ATTACHMENT then
+					elseif timelineName == TIMELINE_ATTACHMENT then
 						local timeline = Animation.AttachmentTimeline.new()
 						timeline.slotName = slotName
 
@@ -231,7 +231,7 @@ function SkeletonJson.new (attachmentResolver)
 						duration = math.max(duration, timeline:getDuration())
 
 					else
-						error("Invalid frame type for a slot: " .. timelineType .. " (" .. slotName .. ")")
+						error("Invalid frame type for a slot: " .. timelineName .. " (" .. slotName .. ")")
 					end
 				end
 			end

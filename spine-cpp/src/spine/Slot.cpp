@@ -12,7 +12,8 @@ Slot::Slot (SlotData *data, BaseSkeleton *skeleton, Bone *bone) :
 				g(1),
 				b(1),
 				a(1),
-				attachment(0) {
+				attachment(0),
+				attachmentTime(0) {
 	if (!data) throw std::invalid_argument("data cannot be null.");
 	if (!skeleton) throw std::invalid_argument("skeleton cannot be null.");
 	if (!bone) throw std::invalid_argument("bone cannot be null.");

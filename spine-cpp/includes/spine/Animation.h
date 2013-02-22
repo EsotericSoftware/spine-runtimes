@@ -15,6 +15,8 @@ public:
 	float duration;
 
 	Animation (const std::vector<Timeline*> &timelines, float duration);
+
+	void apply (BaseSkeleton *skeleton, float time, bool loop);
 };
 
 //
@@ -63,9 +65,9 @@ public:
 	RotateTimeline (int keyframeCount);
 	virtual ~RotateTimeline ();
 
-	virtual float getDuration () = 0;
-	virtual int getKeyframeCount () = 0;
-	virtual void apply (BaseSkeleton *skeleton, float time, float alpha) = 0;
+	virtual float getDuration ();
+	virtual int getKeyframeCount ();
+	virtual void apply (BaseSkeleton *skeleton, float time, float alpha);
 
 	void setKeyframe (int keyframeIndex, float time, float value);
 };
@@ -81,9 +83,9 @@ public:
 	TranslateTimeline (int keyframeCount);
 	virtual ~TranslateTimeline ();
 
-	virtual float getDuration () = 0;
-	virtual int getKeyframeCount () = 0;
-	virtual void apply (BaseSkeleton *skeleton, float time, float alpha) = 0;
+	virtual float getDuration ();
+	virtual int getKeyframeCount ();
+	virtual void apply (BaseSkeleton *skeleton, float time, float alpha);
 
 	void setKeyframe (int keyframeIndex, float time, float x, float y);
 };
@@ -94,9 +96,7 @@ class ScaleTimeline: public TranslateTimeline {
 public:
 	ScaleTimeline (int keyframeCount);
 
-	virtual float getDuration () = 0;
-	virtual int getKeyframeCount () = 0;
-	virtual void apply (BaseSkeleton *skeleton, float time, float alpha) = 0;
+	virtual void apply (BaseSkeleton *skeleton, float time, float alpha);
 };
 
 //
@@ -110,9 +110,9 @@ public:
 	ColorTimeline (int keyframeCount);
 	virtual ~ColorTimeline ();
 
-	virtual float getDuration () = 0;
-	virtual int getKeyframeCount () = 0;
-	virtual void apply (BaseSkeleton *skeleton, float time, float alpha) = 0;
+	virtual float getDuration ();
+	virtual int getKeyframeCount ();
+	virtual void apply (BaseSkeleton *skeleton, float time, float alpha);
 
 	void setKeyframe (int keyframeIndex, float time, float r, float g, float b, float a);
 };
@@ -129,9 +129,9 @@ public:
 	AttachmentTimeline (int keyframeCount);
 	virtual ~AttachmentTimeline ();
 
-	virtual float getDuration () = 0;
-	virtual int getKeyframeCount () = 0;
-	virtual void apply (BaseSkeleton *skeleton, float time, float alpha) = 0;
+	virtual float getDuration ();
+	virtual int getKeyframeCount ();
+	virtual void apply (BaseSkeleton *skeleton, float time, float alpha);
 
 	void setKeyframe (int keyframeIndex, float time, std::string *attachmentName);
 };

@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.NumberUtils;
 /** Attachment that displays a texture region. */
 public class RegionAttachment extends Attachment {
 	private TextureRegion region;
+	private float x, y, scaleX, scaleY, rotation, width, height;
 	private final float[] vertices = new float[20];
 	private final float[] offset = new float[8];
 
@@ -149,5 +150,61 @@ public class RegionAttachment extends Attachment {
 
 	public float[] getWorldVertices () {
 		return vertices;
+	}
+
+	public float getX () {
+		return x;
+	}
+
+	public void setX (float x) {
+		this.x = x;
+	}
+
+	public float getY () {
+		return y;
+	}
+
+	public void setY (float y) {
+		this.y = y;
+	}
+
+	public float getScaleX () {
+		return scaleX;
+	}
+
+	public void setScaleX (float scaleX) {
+		this.scaleX = scaleX;
+	}
+
+	public float getScaleY () {
+		return scaleY;
+	}
+
+	public void setScaleY (float scaleY) {
+		this.scaleY = scaleY;
+	}
+
+	public float getRotation () {
+		return rotation;
+	}
+
+	public void setRotation (float rotation) {
+		this.rotation = rotation;
+	}
+
+	public float getWidth () {
+		return width;
+	}
+
+	public void setWidth (float width) {
+		this.width = width;
+	}
+
+	public float getHeight () {
+		return height;
+	}
+
+	public void setHeight (float height) {
+		this.height = height;
 	}
 }

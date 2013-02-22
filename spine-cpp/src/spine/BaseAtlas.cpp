@@ -7,6 +7,7 @@
 
 using std::string;
 using std::runtime_error;
+using std::invalid_argument;
 
 namespace spine {
 
@@ -75,11 +76,15 @@ BaseAtlas::~BaseAtlas () {
 }
 
 void BaseAtlas::load (std::ifstream &file) {
+	if (!file) throw invalid_argument("file cannot be null.");
 	if (!file.is_open()) throw runtime_error("Atlas file is not open.");
+
 	load((std::istream&)file);
 }
 
 void BaseAtlas::load (std::istream &input) {
+	if (!input) throw invalid_argument("input cannot be null.");
+
 	string text;
 	std::getline(input, text, (char)EOF);
 	const char *begin = text.c_str();
@@ -94,6 +99,9 @@ void BaseAtlas::load (const string &text) {
 }
 
 void BaseAtlas::load (const char *current, const char *end) {
+	if (!current) throw invalid_argument("current cannot be null.");
+	if (!end) throw invalid_argument("end cannot be null.");
+
 	string value;
 	string tuple[4];
 	BaseAtlasPage *page;

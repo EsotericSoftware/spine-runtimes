@@ -35,9 +35,9 @@ public class Animation {
 
 		if (loop && duration != 0) time %= duration;
 
-		Array<Timeline> timeline = this.timelines;
-		for (int i = 0, n = timeline.size; i < n; i++)
-			timeline.get(i).apply(skeleton, time, 1);
+		Array<Timeline> timelines = this.timelines;
+		for (int i = 0, n = timelines.size; i < n; i++)
+			timelines.get(i).apply(skeleton, time, 1);
 	}
 
 	/** Poses the skeleton at the specified time for this animation mixed with the current pose.
@@ -47,9 +47,9 @@ public class Animation {
 
 		if (loop && duration != 0) time %= duration;
 
-		Array<Timeline> timeline = this.timelines;
-		for (int i = 0, n = timeline.size; i < n; i++)
-			timeline.get(i).apply(skeleton, time, alpha);
+		Array<Timeline> timelines = this.timelines;
+		for (int i = 0, n = timelines.size; i < n; i++)
+			timelines.get(i).apply(skeleton, time, alpha);
 	}
 
 	/** @param target After the first and before the last entry. */

@@ -140,13 +140,17 @@ public class SkeletonJson {
 		} else
 			throw new SerializationException("Unknown attachment type: " + type + " (" + name + ")");
 
-		attachment.setX(getFloat(map, "x", 0) * scale);
-		attachment.setY(getFloat(map, "y", 0) * scale);
-		attachment.setScaleX(getFloat(map, "scaleX", 1));
-		attachment.setScaleY(getFloat(map, "scaleY", 1));
-		attachment.setRotation(getFloat(map, "rotation", 0));
-		attachment.setWidth(getFloat(map, "width", 32) * scale);
-		attachment.setHeight(getFloat(map, "height", 32) * scale);
+		if (attachment instanceof RegionAttachment) {
+			RegionAttachment regionAttachment = (RegionAttachment)attachment;
+			regionAttachment.setX(getFloat(map, "x", 0) * scale);
+			regionAttachment.setY(getFloat(map, "y", 0) * scale);
+			regionAttachment.setScaleX(getFloat(map, "scaleX", 1));
+			regionAttachment.setScaleY(getFloat(map, "scaleY", 1));
+			regionAttachment.setRotation(getFloat(map, "rotation", 0));
+			regionAttachment.setWidth(getFloat(map, "width", 32) * scale);
+			regionAttachment.setHeight(getFloat(map, "height", 32) * scale);
+		}
+
 		return attachment;
 	}
 
@@ -170,12 +174,12 @@ public class SkeletonJson {
 			String boneName = entry.key;
 			int boneIndex = skeletonData.findBoneIndex(boneName);
 			if (boneIndex == -1) throw new SerializationException("Bone not found: " + boneName);
-			OrderedMap<?, ?> propertyMap = (OrderedMap)entry.value;
 
-			for (Entry propertyEntry : propertyMap.entries()) {
-				Array<OrderedMap> values = (Array)propertyEntry.value;
-				String timelineType = (String)propertyEntry.key;
-				if (timelineType.equals(TIMELINE_ROTATE)) {
+			OrderedMap<?, ?> timelineMap = (OrderedMap)entry.value;
+			for (Entry timelineEntry : timelineMap.entries()) {
+				Array<OrderedMap> values = (Array)timelineEntry.value;
+				String timelineName = (String)timelineEntry.key;
+				if (timelineName.equals(TIMELINE_ROTATE)) {
 					RotateTimeline timeline = new RotateTimeline(values.size);
 					timeline.setBoneIndex(boneIndex);
 
@@ -189,10 +193,10 @@ public class SkeletonJson {
 					timelines.add(timeline);
 					duration = Math.max(duration, timeline.getDuration());
 
-				} else if (timelineType.equals(TIMELINE_TRANSLATE) || timelineType.equals(TIMELINE_SCALE)) {
+				} else if (timelineName.equals(TIMELINE_TRANSLATE) || timelineName.equals(TIMELINE_SCALE)) {
 					TranslateTimeline timeline;
 					float timelineScale = 1;
-					if (timelineType.equals(TIMELINE_SCALE))
+					if (timelineName.equals(TIMELINE_SCALE))
 						timeline = new ScaleTimeline(values.size);
 					else {
 						timeline = new TranslateTimeline(values.size);
@@ -213,7 +217,7 @@ public class SkeletonJson {
 					duration = Math.max(duration, timeline.getDuration());
 
 				} else
-					throw new RuntimeException("Invalid timeline type for a bone: " + timelineType + " (" + boneName + ")");
+					throw new RuntimeException("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
 			}
 		}
 

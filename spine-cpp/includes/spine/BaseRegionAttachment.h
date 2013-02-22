@@ -10,6 +10,7 @@ class Slot;
 
 class BaseRegionAttachment: public Attachment {
 public:
+	float x, y, scaleX, scaleY, rotation, width, height;
 	float offset[8];
 
 	void updateOffset ();
