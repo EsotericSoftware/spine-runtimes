@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <spine/BaseSkeleton.h>
+#include <spine/AtlasData.h>
 #include <spine-sfml/spine.h>
 #include <SFML/Graphics.hpp>
 
@@ -25,6 +26,9 @@ int main () {
 	}
 	cout << flush;
 
+	ifstream file2("../uiskin.atlas");
+	new AtlasData(file2);
+
 	sf::RenderWindow window(sf::VideoMode(640, 480), "Spine SFML");
 	window.setFramerateLimit(60);
 
@@ -32,7 +36,7 @@ int main () {
 	shape.setFillColor(sf::Color::Green);
 
 	sf::Event event;
-	while (window.isOpen()) {
+	while (window.isOpen() && false) {
 		while (window.pollEvent(event))
 			if (event.type == sf::Event::Closed) window.close();
 		window.clear();
