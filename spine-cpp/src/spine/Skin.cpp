@@ -8,6 +8,13 @@ Skin::Skin (const std::string &name) :
 				name(name) {
 }
 
+Skin::~Skin()
+{
+	for (std::map<Key, Attachment*>::iterator iter = attachments.begin(); iter != attachments.end(); ++iter) {
+    delete iter->second;
+  }
+}
+
 void Skin::addAttachment (int slotIndex, const std::string &name, Attachment *attachment) {
 	Key key = {slotIndex, name};
 	attachments[key] = attachment;

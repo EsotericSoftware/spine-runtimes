@@ -35,6 +35,8 @@ BaseSkeletonJson::BaseSkeletonJson (BaseAttachmentLoader *attachmentLoader) :
 }
 
 BaseSkeletonJson::~BaseSkeletonJson () {
+  if (attachmentLoader)
+    delete attachmentLoader;
 }
 
 SkeletonData* BaseSkeletonJson::readSkeletonData (std::ifstream &file) const {

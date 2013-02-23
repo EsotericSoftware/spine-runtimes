@@ -18,6 +18,14 @@ Animation::Animation (const vector<Timeline*> &timelines, float duration) :
 				duration(duration) {
 }
 
+Animation::~Animation()
+{
+  for (std::vector<Timeline*>::iterator iter = timelines.begin(); iter != timelines.end(); ++iter)
+  {
+    delete *iter;
+  }
+}
+
 void Animation::apply (BaseSkeleton *skeleton, float time, bool loop) {
 	if (!skeleton) throw std::invalid_argument("skeleton cannot be null.");
 
