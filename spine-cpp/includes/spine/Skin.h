@@ -31,6 +31,7 @@ public:
 	std::string name;
 
 	Skin (const std::string &name);
+  ~Skin();
 
 	void addAttachment (int slotIndex, const std::string &name, Attachment *attachment);
 

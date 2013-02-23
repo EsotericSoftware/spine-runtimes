@@ -71,6 +71,7 @@ public:
 	int *splits;
 	int *pads;
 
+  BaseAtlasRegion() : splits(0), pads(0) {}
 	virtual ~BaseAtlasRegion ();
 };
 
