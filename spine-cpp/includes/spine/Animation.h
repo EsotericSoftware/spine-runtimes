@@ -15,6 +15,7 @@ public:
 	float duration;
 
 	Animation (const std::vector<Timeline*> &timelines, float duration);
+  ~Animation();
 
 	void apply (BaseSkeleton *skeleton, float time, bool loop);
 };
