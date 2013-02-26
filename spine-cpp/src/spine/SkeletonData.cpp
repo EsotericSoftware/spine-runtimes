@@ -21,31 +21,31 @@ SkeletonData::~SkeletonData () {
 }
 
 BoneData* SkeletonData::findBone (const string &boneName) const {
-	for (int i = 0; i < bones.size(); i++)
+	for (unsigned int i = 0; i < bones.size(); i++)
 		if (bones[i]->name == boneName) return bones[i];
 	return 0;
 }
 
 int SkeletonData::findBoneIndex (const string &boneName) const {
-	for (int i = 0; i < bones.size(); i++)
+	for (unsigned int i = 0; i < bones.size(); i++)
 		if (bones[i]->name == boneName) return i;
 	return -1;
 }
 
 SlotData* SkeletonData::findSlot (const string &slotName) const {
-	for (int i = 0; i < slots.size(); i++)
+	for (unsigned int i = 0; i < slots.size(); i++)
 		if (slots[i]->name == slotName) return slots[i];
 	return 0;
 }
 
 int SkeletonData::findSlotIndex (const string &slotName) const {
-	for (int i = 0; i < slots.size(); i++)
+	for (unsigned int i = 0; i < slots.size(); i++)
 		if (slots[i]->name == slotName) return i;
 	return -1;
 }
 
 Skin* SkeletonData::findSkin (const string &skinName) {
-	for (int i = 0; i < skins.size(); i++)
+	for (unsigned int i = 0; i < skins.size(); i++)
 		if (skins[i]->name == skinName) return skins[i];
 	return 0;
 }

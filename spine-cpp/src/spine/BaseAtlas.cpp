@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <fstream>
 #include <algorithm>
+#include <functional>
 #include <cctype>
 #include <stdexcept>
 #include <spine/BaseAtlas.h>
@@ -168,8 +169,8 @@ void BaseAtlas::load (const char *current, const char *end) {
 			region->originalHeight = atoi(tuple[1].c_str());
 
 			readTuple(current, end, value, tuple);
-			region->offsetX = atoi(tuple[0].c_str());
-			region->offsetY = atoi(tuple[1].c_str());
+			region->offsetX = (float)atoi(tuple[0].c_str());
+			region->offsetY = (float)atoi(tuple[1].c_str());
 
 			region->index = atoi(readValue(current, end, value).c_str());
 		}
