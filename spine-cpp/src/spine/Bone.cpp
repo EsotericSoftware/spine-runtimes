@@ -3,6 +3,11 @@
 #include <spine/Bone.h>
 #include <spine/BoneData.h>
 
+
+#ifndef M_PI // fix for windows removing precious information
+#define M_PI 3.14159265358979323846
+#endif
+
 namespace spine {
 
 Bone::Bone (BoneData *data) :
@@ -38,7 +43,7 @@ void Bone::updateWorldTransform (bool flipX, bool flipY) {
 		worldScaleY = scaleY;
 		worldRotation = rotation;
 	}
-	float radians = worldRotation * M_PI / 180;
+	float radians = (float)(worldRotation * M_PI / 180);
 	float cos = cosf(radians);
 	float sin = sinf(radians);
 	m00 = cos * worldScaleX;

@@ -1,6 +1,10 @@
 #include <math.h>
 #include <spine/BaseRegionAttachment.h>
 
+#ifndef M_PI // fix for windows removing precious information
+#define M_PI 3.14159265358979323846
+#endif
+
 namespace spine {
 
 BaseRegionAttachment::BaseRegionAttachment () :
@@ -22,7 +26,7 @@ void BaseRegionAttachment::updateOffset () {
 	localY *= scaleY;
 	localX2 *= scaleX;
 	localY2 *= scaleY;
-	float radians = rotation * M_PI / 180;
+	float radians = (float)(rotation * M_PI / 180);
 	float cos = cosf(radians);
 	float sin = sinf(radians);
 	float localXCos = localX * cos + x;
