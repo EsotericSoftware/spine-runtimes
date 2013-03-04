@@ -23,7 +23,8 @@ void Skeleton::draw (RenderTarget& target, RenderStates states) const {
 	const_cast<Skeleton*>(this)->vertexArray.clear();
 	for (int i = 0, n = slots.size(); i < n; i++)
 		if (slots[i]->attachment) slots[i]->attachment->draw(slots[i]);
-	target.draw(vertexArray, texture);
+	states.texture = texture;
+	target.draw(vertexArray, states);
 }
 
 } /* namespace spine */
