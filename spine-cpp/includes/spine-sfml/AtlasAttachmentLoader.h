@@ -14,8 +14,7 @@ public:
 	AtlasAttachmentLoader (Atlas *atlas);
 
 	virtual Attachment* newAttachment (AttachmentType type, const std::string &name);
-}
-;
+};
 
 } /* namespace spine */
 #endif /* SPINE_ATLASATTACHMENTLOADER_H_ */

@@ -1,14 +1,11 @@
 
 package com.esotericsoftware.spine;
 
-import com.esotericsoftware.spine.Skin.Key;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap.Entry;
 
 public class Skeleton {
 	final SkeletonData data;
@@ -101,11 +98,7 @@ public class Skeleton {
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder.get(i);
 			Attachment attachment = slot.attachment;
-			if (attachment != null) {
-				if (!attachment.resolved) data.attachmentResolver.resolve(attachment);
-				attachment.updateOffset();
-				attachment.draw(batch, slot);
-			}
+			if (attachment != null) attachment.draw(batch, slot);
 		}
 	}
 
@@ -234,11 +227,16 @@ public class Skeleton {
 	/** @param attachmentName May be null. */
 	public void setAttachment (String slotName, String attachmentName) {
 		if (slotName == null) throw new IllegalArgumentException("slotName cannot be null.");
-		if (attachmentName == null) throw new IllegalArgumentException("attachmentName cannot be null.");
 		for (int i = 0, n = slots.size; i < n; i++) {
 			Slot slot = slots.get(i);
 			if (slot.data.name.equals(slotName)) {
-				slot.setAttachment(getAttachment(i, attachmentName));
+				Attachment attachment = null;
+				if (attachmentName != null) {
+					attachment = getAttachment(i, attachmentName);
+					if (attachment == null)
+						throw new IllegalArgumentException("Attachment not found: " + attachmentName + ", for slot: " + slotName);
+				}
+				slot.setAttachment(attachment);
 				return;
 			}
 		}

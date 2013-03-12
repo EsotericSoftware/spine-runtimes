@@ -41,9 +41,6 @@
 ],
 "skins": {
 	"default": {
-		"template": {
-			"spineboy": { "y": 167.82, "width": 145, "height": 341 }
-		},
 		"left shoulder": {
 			"left-shoulder": { "x": 23.74, "y": 0.11, "rotation": 62.01, "width": 34, "height": 53 }
 		},

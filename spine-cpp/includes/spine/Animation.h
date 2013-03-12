@@ -18,6 +18,7 @@ public:
   ~Animation();
 
 	void apply (BaseSkeleton *skeleton, float time, bool loop);
+	void mix (BaseSkeleton *skeleton, float time, bool loop, float alpha);
 };
 
 //

@@ -27,7 +27,7 @@ public:
 
 private:
 	virtual BaseAtlasPage* newAtlasPage (std::string name) = 0;
-	virtual BaseAtlasRegion* newAtlasRegion (BaseAtlasPage*) = 0;
+	virtual BaseAtlasRegion* newAtlasRegion (BaseAtlasPage *page) = 0;
 };
 
 //

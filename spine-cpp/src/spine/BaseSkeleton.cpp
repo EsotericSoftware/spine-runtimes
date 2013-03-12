@@ -45,6 +45,7 @@ BaseSkeleton::BaseSkeleton (SkeletonData *data) :
 	drawOrder.reserve(slotCount);
 	for (int i = 0; i < slotCount; i++) {
 		SlotData *slotData = data->slots[i];
+		// Find bone for the slotData's boneData.
 		Bone *bone;
 		for (int ii = 0; ii < boneCount; ii++) {
 			if (data->bones[ii] == slotData->boneData) {

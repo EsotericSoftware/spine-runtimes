@@ -11,7 +11,7 @@ import com.esotericsoftware.spine.Animation.TranslateTimeline;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.RegionSequenceAttachment;
 import com.esotericsoftware.spine.attachments.RegionSequenceAttachment.Mode;
-import com.esotericsoftware.spine.attachments.TextureAtlasAttachmentResolver;
+import com.esotericsoftware.spine.attachments.TextureAtlasAttachmentLoader;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -29,22 +29,19 @@ public class SkeletonBinary {
 	static public final int TIMELINE_ATTACHMENT = 3;
 	static public final int TIMELINE_COLOR = 4;
 
-	static public final int ATTACHMENT_REGION = 0;
-	static public final int ATTACHMENT_REGION_SEQUENCE = 1;
-
 	static public final int CURVE_LINEAR = 0;
 	static public final int CURVE_STEPPED = 1;
 	static public final int CURVE_BEZIER = 2;
 
-	private final AttachmentResolver attachmentResolver;
+	private final AttachmentLoader attachmentLoader;
 	private float scale = 1;
 
 	public SkeletonBinary (TextureAtlas atlas) {
-		attachmentResolver = new TextureAtlasAttachmentResolver(atlas);
+		attachmentLoader = new TextureAtlasAttachmentLoader(atlas);
 	}
 
-	public SkeletonBinary (AttachmentResolver attachmentResolver) {
-		this.attachmentResolver = attachmentResolver;
+	public SkeletonBinary (AttachmentLoader attachmentLoader) {
+		this.attachmentLoader = attachmentLoader;
 	}
 
 	public float getScale () {
@@ -59,7 +56,7 @@ public class SkeletonBinary {
 	public SkeletonData readSkeletonData (FileHandle file) {
 		if (file == null) throw new IllegalArgumentException("file cannot be null.");
 
-		SkeletonData skeletonData = new SkeletonData(attachmentResolver);
+		SkeletonData skeletonData = new SkeletonData();
 		DataInput input = new DataInput(file.read(512));
 		try {
 			// Bones.
@@ -134,19 +131,13 @@ public class SkeletonBinary {
 		String name = input.readString();
 		if (name == null) name = attachmentName;
 
-		Attachment attachment;
-		int type = input.readByte();
-		switch (type) {
-		case ATTACHMENT_REGION:
-			attachment = new RegionAttachment(name);
-			break;
-		case ATTACHMENT_REGION_SEQUENCE:
-			float fps = input.readFloat();
-			Mode mode = Mode.values()[input.readInt(true)];
-			attachment = new RegionSequenceAttachment(name, 1 / fps, mode);
-			break;
-		default:
-			throw new SerializationException("Unknown attachment type: " + type + " (" + name + ")");
+		AttachmentType type = AttachmentType.values()[input.readByte()];
+		Attachment attachment = attachmentLoader.newAttachment(type, name);
+
+		if (attachment instanceof RegionSequenceAttachment) {
+			RegionSequenceAttachment regionSequenceAttachment = (RegionSequenceAttachment)attachment;
+			regionSequenceAttachment.setFrameTime(1 / input.readFloat());
+			regionSequenceAttachment.setMode(Mode.values()[input.readInt(true)]);
 		}
 
 		if (attachment instanceof RegionAttachment) {
@@ -158,8 +149,9 @@ public class SkeletonBinary {
 			regionAttachment.setRotation(input.readFloat());
 			regionAttachment.setWidth(input.readFloat() * scale);
 			regionAttachment.setHeight(input.readFloat() * scale);
+			regionAttachment.updateOffset();
 		}
-		
+
 		return attachment;
 	}
 

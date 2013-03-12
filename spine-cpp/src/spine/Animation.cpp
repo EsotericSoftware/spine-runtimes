@@ -35,6 +35,15 @@ void Animation::apply (BaseSkeleton *skeleton, float time, bool loop) {
 		timelines[i]->apply(skeleton, time, 1);
 }
 
+void Animation::mix (BaseSkeleton *skeleton, float time, bool loop, float alpha) {
+	if (!skeleton) throw std::invalid_argument("skeleton cannot be null.");
+
+	if (loop && duration) time = fmodf(time, duration);
+
+	for (int i = 0, n = timelines.size(); i < n; i++)
+		timelines[i]->apply(skeleton, time, alpha);
+}
+
 //
 
 static const float LINEAR = 0;

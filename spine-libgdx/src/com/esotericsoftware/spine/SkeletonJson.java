@@ -8,10 +8,10 @@ import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 import com.esotericsoftware.spine.Animation.TranslateTimeline;
+import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.RegionSequenceAttachment;
 import com.esotericsoftware.spine.attachments.RegionSequenceAttachment.Mode;
-import com.esotericsoftware.spine.attachments.RegionAttachment;
-import com.esotericsoftware.spine.attachments.TextureAtlasAttachmentResolver;
+import com.esotericsoftware.spine.attachments.TextureAtlasAttachmentLoader;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -29,19 +29,16 @@ public class SkeletonJson {
 	static public final String TIMELINE_ATTACHMENT = "attachment";
 	static public final String TIMELINE_COLOR = "color";
 
-	static public final String ATTACHMENT_REGION = "region";
-	static public final String ATTACHMENT_REGION_SEQUENCE = "regionSequence";
-
 	private final Json json = new Json();
-	private final AttachmentResolver attachmentResolver;
+	private final AttachmentLoader attachmentLoader;
 	private float scale = 1;
 
 	public SkeletonJson (TextureAtlas atlas) {
-		attachmentResolver = new TextureAtlasAttachmentResolver(atlas);
+		attachmentLoader = new TextureAtlasAttachmentLoader(atlas);
 	}
 
-	public SkeletonJson (AttachmentResolver attachmentResolver) {
-		this.attachmentResolver = attachmentResolver;
+	public SkeletonJson (AttachmentLoader attachmentLoader) {
+		this.attachmentLoader = attachmentLoader;
 	}
 
 	public float getScale () {
@@ -56,7 +53,7 @@ public class SkeletonJson {
 	public SkeletonData readSkeletonData (FileHandle file) {
 		if (file == null) throw new IllegalArgumentException("file cannot be null.");
 
-		SkeletonData skeletonData = new SkeletonData(attachmentResolver);
+		SkeletonData skeletonData = new SkeletonData();
 
 		OrderedMap<String, ?> root = json.fromJson(OrderedMap.class, file);
 
@@ -122,23 +119,20 @@ public class SkeletonJson {
 
 	private Attachment readAttachment (String name, OrderedMap map) {
 		name = (String)map.get("name", name);
-		Attachment attachment;
-		String type = (String)map.get("type");
-		if (type == null) type = ATTACHMENT_REGION;
-		if (type.equals(ATTACHMENT_REGION)) {
-			attachment = new RegionAttachment(name);
 
-		} else if (type.equals(ATTACHMENT_REGION_SEQUENCE)) {
+		AttachmentType type = AttachmentType.valueOf((String)map.get("type", AttachmentType.region.name()));
+		Attachment attachment = attachmentLoader.newAttachment(type, name);
+
+		if (attachment instanceof RegionSequenceAttachment) {
+			RegionSequenceAttachment regionSequenceAttachment = (RegionSequenceAttachment)attachment;
+
 			Float fps = (Float)map.get("fps");
 			if (fps == null) throw new SerializationException("Region sequence attachment missing fps: " + name);
+			regionSequenceAttachment.setFrameTime(fps);
 
 			String modeString = (String)map.get("mode");
-			Mode mode = modeString == null ? Mode.forward : Mode.valueOf(modeString);
-
-			attachment = new RegionSequenceAttachment(name, 1 / fps, mode);
-
-		} else
-			throw new SerializationException("Unknown attachment type: " + type + " (" + name + ")");
+			regionSequenceAttachment.setMode(modeString == null ? Mode.forward : Mode.valueOf(modeString));
+		}
 
 		if (attachment instanceof RegionAttachment) {
 			RegionAttachment regionAttachment = (RegionAttachment)attachment;
@@ -149,6 +143,7 @@ public class SkeletonJson {
 			regionAttachment.setRotation(getFloat(map, "rotation", 0));
 			regionAttachment.setWidth(getFloat(map, "width", 32) * scale);
 			regionAttachment.setHeight(getFloat(map, "height", 32) * scale);
+			regionAttachment.updateOffset();
 		}
 
 		return attachment;

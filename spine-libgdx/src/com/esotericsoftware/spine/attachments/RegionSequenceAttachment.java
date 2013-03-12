@@ -9,17 +9,12 @@ import com.badlogic.gdx.math.MathUtils;
 
 /** Attachment that displays various texture regions over time. */
 public class RegionSequenceAttachment extends RegionAttachment {
-	private final Mode mode;
+	private Mode mode;
 	private float frameTime;
 	private TextureRegion[] regions;
 
-	/** @param frameTime Time in seconds each frame is shown. */
-	public RegionSequenceAttachment (String name, float frameTime, Mode mode) {
+	public RegionSequenceAttachment (String name) {
 		super(name);
-		if (mode == null) throw new IllegalArgumentException("mode cannot be null.");
-
-		this.frameTime = frameTime;
-		this.mode = mode;
 	}
 
 	public void draw (SpriteBatch batch, Slot slot) {
@@ -60,6 +55,15 @@ public class RegionSequenceAttachment extends RegionAttachment {
 
 	public void setRegions (TextureRegion[] regions) {
 		this.regions = regions;
+	}
+
+	/** Sets the time in seconds each frame is shown. */
+	public void setFrameTime (float frameTime) {
+		this.frameTime = frameTime;
+	}
+
+	public void setMode (Mode mode) {
+		this.mode = mode;
 	}
 
 	static public enum Mode {

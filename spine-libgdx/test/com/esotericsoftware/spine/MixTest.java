@@ -3,10 +3,8 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.backends.jglfw.JglfwApplication;
+import com.badlogic.gdx.backends.jglfw.JglfwApplicationConfiguration;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -115,10 +113,10 @@ public class MixTest extends ApplicationAdapter {
 	}
 
 	public static void main (String[] args) throws Exception {
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		JglfwApplicationConfiguration config = new JglfwApplicationConfiguration();
 		config.title = "Mix Test";
 		config.width = 640;
 		config.height = 480;
-		new LwjglApplication(new MixTest(), config);
+		new JglfwApplication(new MixTest(), config);
 	}
 }

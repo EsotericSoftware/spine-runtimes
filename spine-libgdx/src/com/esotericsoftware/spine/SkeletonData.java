@@ -8,22 +8,12 @@ public class SkeletonData {
 	final Array<SlotData> slots = new Array(); // Bind pose draw order.
 	final Array<Skin> skins = new Array();
 	Skin defaultSkin;
-	final AttachmentResolver attachmentResolver;
-
-	public SkeletonData (AttachmentResolver attachmentResolver) {
-		if (attachmentResolver == null) throw new IllegalArgumentException("attachmentResolver cannot be null.");
-		this.attachmentResolver = attachmentResolver;
-	}
 
 	public void clear () {
 		bones.clear();
 		slots.clear();
 		skins.clear();
 		defaultSkin = null;
-	}
-
-	public AttachmentResolver getAttachmentResolver () {
-		return attachmentResolver;
 	}
 
 	// --- Bones.
