@@ -105,7 +105,7 @@ void BaseAtlas::load (const char *current, const char *end) {
 
 	string value;
 	string tuple[4];
-	BaseAtlasPage *page;
+	BaseAtlasPage *page = NULL;
 	while (current != end) {
 		readLine(current, end, value);
 		trim(value);

@@ -8,6 +8,10 @@ namespace spine {
 
 class AtlasPage: public BaseAtlasPage {
 public:
+	~AtlasPage(){
+		delete texture;
+	}
+
 	sf::Texture *texture;
 };
 
