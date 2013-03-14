@@ -21,8 +21,9 @@ namespace spine {
 static float toColor (const string &value, int index) {
 	if (value.size() != 8) throw runtime_error("Error parsing color, length must be 8: " + value);
 	char *p;
-	int color = strtoul(value.substr(index * 2, 2).c_str(), &p, 16);
-	if (*p != 0) throw runtime_error("Error parsing color: " + value + ", invalid hex value: " + value.substr(index * 2, 2));
+	string tmp = value.substr(index * 2, 2);
+	int color = strtoul(tmp.c_str(), &p, 16);
+	if (*p != 0) throw runtime_error("Error parsing color: " + value + ", invalid hex value: " + tmp);
 	return color / (float)255;
 }
 
