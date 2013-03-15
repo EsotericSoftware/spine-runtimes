@@ -105,7 +105,7 @@ void BaseAtlas::load (const char *current, const char *end) {
 
 	string value;
 	string tuple[4];
-	BaseAtlasPage *page = NULL;
+	BaseAtlasPage *page = 0;
 	while (current != end) {
 		readLine(current, end, value);
 		trim(value);
@@ -184,6 +184,11 @@ BaseAtlasRegion* BaseAtlas::findRegion (const std::string &name) {
 }
 
 //
+
+BaseAtlasRegion::BaseAtlasRegion () :
+				splits(0),
+				pads(0) {
+}
 
 BaseAtlasRegion::~BaseAtlasRegion () {
 	if (splits) delete splits;

@@ -1,9 +1,9 @@
 #ifndef SPINE_BASEATTACHMENTLOADER_H_
 #define SPINE_BASEATTACHMENTLOADER_H_
 
-#include <spine/Attachment.h>
-
 namespace spine {
+
+class Attachment;
 
 enum AttachmentType {
 	region, regionSequence

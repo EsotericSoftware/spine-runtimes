@@ -114,10 +114,6 @@ public class SkeletonTest extends ApplicationAdapter {
 	}
 
 	public static void main (String[] args) throws Exception {
-        LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.title = "Skeleton Test";
-		config.width = 640;
-		config.height = 480;
-		new LwjglApplication(new SkeletonTest(), config);
+		new LwjglApplication(new SkeletonTest());
 	}
 }

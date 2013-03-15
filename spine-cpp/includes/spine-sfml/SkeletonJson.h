@@ -10,6 +10,7 @@ class Atlas;
 class SkeletonJson: public BaseSkeletonJson {
 public:
 	SkeletonJson (Atlas *atlas);
+	/** The SkeletonJson owns the attachmentLoader */
 	SkeletonJson (BaseAttachmentLoader *attachmentLoader);
 };
 

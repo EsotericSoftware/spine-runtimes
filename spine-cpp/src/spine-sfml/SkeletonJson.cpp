@@ -5,12 +5,12 @@ namespace spine {
 
 SkeletonJson::SkeletonJson (BaseAttachmentLoader *attachmentLoader) :
 				BaseSkeletonJson(attachmentLoader) {
-	flipY = true;
+	yDown = true;
 }
 
 SkeletonJson::SkeletonJson (Atlas *atlas) :
 				BaseSkeletonJson(new AtlasAttachmentLoader(atlas)) {
-	flipY = true;
+	yDown = true;
 }
 
 } /* namespace spine */

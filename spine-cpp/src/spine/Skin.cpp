@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <spine/Attachment.h>
 #include <spine/Skin.h>
 #include <spine/BaseSkeleton.h>
 #include <spine/Slot.h>
@@ -8,14 +10,13 @@ Skin::Skin (const std::string &name) :
 				name(name) {
 }
 
-Skin::~Skin()
-{
-	for (std::map<Key, Attachment*>::iterator iter = attachments.begin(); iter != attachments.end(); ++iter) {
-    delete iter->second;
-  }
+Skin::~Skin () {
+	for (std::map<Key, Attachment*>::iterator iter = attachments.begin(); iter != attachments.end(); iter++)
+		delete iter->second;
 }
 
 void Skin::addAttachment (int slotIndex, const std::string &name, Attachment *attachment) {
+	if (!attachment) throw std::invalid_argument("attachment cannot be null.");
 	Key key = {slotIndex, name};
 	attachments[key] = attachment;
 }
@@ -26,7 +27,6 @@ Attachment* Skin::getAttachment (int slotIndex, const std::string &name) {
 	return 0;
 }
 
-/** Attach all attachments from this skin if the corresponding attachment from the old skin is currently attached. */
 void Skin::attachAll (BaseSkeleton *skeleton, Skin *oldSkin) {
 	for (std::map<Key, Attachment*>::iterator iter = attachments.begin(); iter != attachments.end(); iter++) {
 		const Key key = iter->first;

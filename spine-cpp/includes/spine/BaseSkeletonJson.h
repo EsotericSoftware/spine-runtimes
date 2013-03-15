@@ -13,8 +13,9 @@ class BaseSkeletonJson {
 public:
 	BaseAttachmentLoader *attachmentLoader;
 	float scale;
-	bool flipY;
+	bool yDown;
 
+	/** The BaseSkeletonJson owns the attachmentLoader. */
 	BaseSkeletonJson (BaseAttachmentLoader *attachmentLoader);
 	virtual ~BaseSkeletonJson ();
 

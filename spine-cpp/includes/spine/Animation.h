@@ -15,10 +15,10 @@ public:
 	float duration;
 
 	Animation (const std::vector<Timeline*> &timelines, float duration);
-  ~Animation();
+	~Animation ();
 
-	void apply (BaseSkeleton *skeleton, float time, bool loop);
-	void mix (BaseSkeleton *skeleton, float time, bool loop, float alpha);
+	void apply (BaseSkeleton *skeleton, float time, bool loop) const;
+	void mix (BaseSkeleton *skeleton, float time, bool loop, float alpha) const;
 };
 
 //
@@ -28,11 +28,11 @@ public:
 	virtual ~Timeline () {
 	}
 
-	virtual float getDuration () = 0;
+	virtual float getDuration () const = 0;
 
-	virtual int getKeyframeCount () = 0;
+	virtual int getKeyframeCount () const = 0;
 
-	virtual void apply (BaseSkeleton *skeleton, float time, float alpha) = 0;
+	virtual void apply (BaseSkeleton *skeleton, float time, float alpha) const = 0;
 };
 
 //
@@ -53,7 +53,7 @@ public:
 	 * the difference between the keyframe's values. */
 	void setCurve (int keyframeIndex, float cx1, float cy1, float cx2, float cy2);
 
-	float getCurvePercent (int keyframeIndex, float percent);
+	float getCurvePercent (int keyframeIndex, float percent) const;
 };
 
 //
@@ -67,9 +67,9 @@ public:
 	RotateTimeline (int keyframeCount);
 	virtual ~RotateTimeline ();
 
-	virtual float getDuration ();
-	virtual int getKeyframeCount ();
-	virtual void apply (BaseSkeleton *skeleton, float time, float alpha);
+	virtual float getDuration () const;
+	virtual int getKeyframeCount () const;
+	virtual void apply (BaseSkeleton *skeleton, float time, float alpha) const;
 
 	void setKeyframe (int keyframeIndex, float time, float value);
 };
@@ -85,9 +85,9 @@ public:
 	TranslateTimeline (int keyframeCount);
 	virtual ~TranslateTimeline ();
 
-	virtual float getDuration ();
-	virtual int getKeyframeCount ();
-	virtual void apply (BaseSkeleton *skeleton, float time, float alpha);
+	virtual float getDuration () const;
+	virtual int getKeyframeCount () const;
+	virtual void apply (BaseSkeleton *skeleton, float time, float alpha) const;
 
 	void setKeyframe (int keyframeIndex, float time, float x, float y);
 };
@@ -98,7 +98,7 @@ class ScaleTimeline: public TranslateTimeline {
 public:
 	ScaleTimeline (int keyframeCount);
 
-	virtual void apply (BaseSkeleton *skeleton, float time, float alpha);
+	virtual void apply (BaseSkeleton *skeleton, float time, float alpha) const;
 };
 
 //
@@ -112,9 +112,9 @@ public:
 	ColorTimeline (int keyframeCount);
 	virtual ~ColorTimeline ();
 
-	virtual float getDuration ();
-	virtual int getKeyframeCount ();
-	virtual void apply (BaseSkeleton *skeleton, float time, float alpha);
+	virtual float getDuration () const;
+	virtual int getKeyframeCount () const;
+	virtual void apply (BaseSkeleton *skeleton, float time, float alpha) const;
 
 	void setKeyframe (int keyframeIndex, float time, float r, float g, float b, float a);
 };
@@ -131,12 +131,13 @@ public:
 	AttachmentTimeline (int keyframeCount);
 	virtual ~AttachmentTimeline ();
 
-	virtual float getDuration ();
-	virtual int getKeyframeCount ();
-	virtual void apply (BaseSkeleton *skeleton, float time, float alpha);
+	virtual float getDuration () const;
+	virtual int getKeyframeCount () const;
+	virtual void apply (BaseSkeleton *skeleton, float time, float alpha) const;
 
-	/** @param attachmentName Pass an empty string to clear the image for a slot. */
-	void setKeyframe (int keyframeIndex, float time, const std::string &attachmentName);
+	/** The AttachmentTimeline owns the attachmentName.
+	 * @param attachmentName May be null to clear the image for a slot. */
+	void setKeyframe (int keyframeIndex, float time, std::string *attachmentName);
 };
 
 } /* namespace spine */

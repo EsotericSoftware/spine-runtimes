@@ -3,11 +3,11 @@
 
 #include <string>
 #include <map>
-#include <spine/Attachment.h>
 
 namespace spine {
 
 class BaseSkeleton;
+class Attachment;
 
 class Skin {
 	friend class BaseSkeleton;
@@ -31,8 +31,9 @@ public:
 	std::string name;
 
 	Skin (const std::string &name);
-  ~Skin();
+	~Skin ();
 
+	/** The Skin owns the attachment. */
 	void addAttachment (int slotIndex, const std::string &name, Attachment *attachment);
 
 	Attachment* getAttachment (int slotIndex, const std::string &name);

@@ -113,10 +113,6 @@ public class MixTest extends ApplicationAdapter {
 	}
 
 	public static void main (String[] args) throws Exception {
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.title = "Mix Test";
-		config.width = 640;
-		config.height = 480;
-		new LwjglApplication(new MixTest(), config);
+		new LwjglApplication(new MixTest());
 	}
 }

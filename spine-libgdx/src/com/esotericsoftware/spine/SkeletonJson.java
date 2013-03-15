@@ -103,7 +103,7 @@ public class SkeletonJson {
 					int slotIndex = skeletonData.findSlotIndex(slotEntry.key);
 					for (Entry<String, OrderedMap> attachmentEntry : ((OrderedMap<String, OrderedMap>)slotEntry.value).entries()) {
 						Attachment attachment = readAttachment(attachmentEntry.key, attachmentEntry.value);
-						skin.addAttachment(slotIndex, attachmentEntry.key, attachment);
+						if (attachment != null) skin.addAttachment(slotIndex, attachmentEntry.key, attachment);
 					}
 				}
 				skeletonData.addSkin(skin);

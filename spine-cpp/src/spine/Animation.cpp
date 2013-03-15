@@ -18,26 +18,19 @@ Animation::Animation (const vector<Timeline*> &timelines, float duration) :
 				duration(duration) {
 }
 
-Animation::~Animation()
-{
-  for (std::vector<Timeline*>::iterator iter = timelines.begin(); iter != timelines.end(); ++iter)
-  {
-    delete *iter;
-  }
+Animation::~Animation () {
+	for (int i = 0, n = timelines.size(); i < n; i++)
+		delete timelines[i];
 }
 
-void Animation::apply (BaseSkeleton *skeleton, float time, bool loop) {
-	if (!skeleton) throw std::invalid_argument("skeleton cannot be null.");
-
+void Animation::apply (BaseSkeleton *skeleton, float time, bool loop) const {
 	if (loop && duration) time = fmodf(time, duration);
 
 	for (int i = 0, n = timelines.size(); i < n; i++)
 		timelines[i]->apply(skeleton, time, 1);
 }
 
-void Animation::mix (BaseSkeleton *skeleton, float time, bool loop, float alpha) {
-	if (!skeleton) throw std::invalid_argument("skeleton cannot be null.");
-
+void Animation::mix (BaseSkeleton *skeleton, float time, bool loop, float alpha) const {
 	if (loop && duration) time = fmodf(time, duration);
 
 	for (int i = 0, n = timelines.size(); i < n; i++)
@@ -88,7 +81,7 @@ void CurveTimeline::setCurve (int keyframeIndex, float cx1, float cy1, float cx2
 	curves[i + 5] = tmp2y * pre5;
 }
 
-float CurveTimeline::getCurvePercent (int keyframeIndex, float percent) {
+float CurveTimeline::getCurvePercent (int keyframeIndex, float percent) const {
 	int curveIndex = keyframeIndex * 6;
 	float dfx = curves[curveIndex];
 	if (dfx == LINEAR) return percent;
@@ -162,11 +155,11 @@ RotateTimeline::~RotateTimeline () {
 	delete[] frames;
 }
 
-float RotateTimeline::getDuration () {
+float RotateTimeline::getDuration () const {
 	return frames[framesLength - 2];
 }
 
-int RotateTimeline::getKeyframeCount () {
+int RotateTimeline::getKeyframeCount () const {
 	return framesLength / 2;
 }
 
@@ -176,7 +169,7 @@ void RotateTimeline::setKeyframe (int keyframeIndex, float time, float value) {
 	frames[keyframeIndex + 1] = value;
 }
 
-void RotateTimeline::apply (BaseSkeleton *skeleton, float time, float alpha) {
+void RotateTimeline::apply (BaseSkeleton *skeleton, float time, float alpha) const {
 	if (time < frames[0]) return; // Time is before first frame.
 
 	Bone *bone = skeleton->bones[boneIndex];
@@ -233,11 +226,11 @@ TranslateTimeline::~TranslateTimeline () {
 	delete[] frames;
 }
 
-float TranslateTimeline::getDuration () {
+float TranslateTimeline::getDuration () const {
 	return frames[framesLength - 3];
 }
 
-int TranslateTimeline::getKeyframeCount () {
+int TranslateTimeline::getKeyframeCount () const {
 	return framesLength / 3;
 }
 
@@ -248,7 +241,7 @@ void TranslateTimeline::setKeyframe (int keyframeIndex, float time, float x, flo
 	frames[keyframeIndex + 2] = y;
 }
 
-void TranslateTimeline::apply (BaseSkeleton *skeleton, float time, float alpha) {
+void TranslateTimeline::apply (BaseSkeleton *skeleton, float time, float alpha) const {
 	if (time < frames[0]) return; // Time is before first frame.
 
 	Bone *bone = skeleton->bones[boneIndex];
@@ -281,7 +274,7 @@ ScaleTimeline::ScaleTimeline (int keyframeCount) :
 				TranslateTimeline(keyframeCount) {
 }
 
-void ScaleTimeline::apply (BaseSkeleton *skeleton, float time, float alpha) {
+void ScaleTimeline::apply (BaseSkeleton *skeleton, float time, float alpha) const {
 	if (time < frames[0]) return; // Time is before first frame.
 
 	Bone *bone = skeleton->bones[boneIndex];
@@ -329,11 +322,11 @@ ColorTimeline::~ColorTimeline () {
 	delete[] frames;
 }
 
-float ColorTimeline::getDuration () {
+float ColorTimeline::getDuration () const {
 	return frames[framesLength - 5];
 }
 
-int ColorTimeline::getKeyframeCount () {
+int ColorTimeline::getKeyframeCount () const {
 	return framesLength / 5;
 }
 
@@ -346,7 +339,7 @@ void ColorTimeline::setKeyframe (int keyframeIndex, float time, float r, float g
 	frames[keyframeIndex + 4] = a;
 }
 
-void ColorTimeline::apply (BaseSkeleton *skeleton, float time, float alpha) {
+void ColorTimeline::apply (BaseSkeleton *skeleton, float time, float alpha) const {
 	if (time < frames[0]) return; // Time is before first frame.
 
 	Slot *slot = skeleton->slots[slotIndex];
@@ -410,21 +403,21 @@ AttachmentTimeline::~AttachmentTimeline () {
 	delete[] attachmentNames;
 }
 
-float AttachmentTimeline::getDuration () {
+float AttachmentTimeline::getDuration () const {
 	return frames[framesLength - 1];
 }
 
-int AttachmentTimeline::getKeyframeCount () {
+int AttachmentTimeline::getKeyframeCount () const {
 	return framesLength;
 }
 
-void AttachmentTimeline::setKeyframe (int keyframeIndex, float time, const string &attachmentName) {
+void AttachmentTimeline::setKeyframe (int keyframeIndex, float time, string *attachmentName) {
 	frames[keyframeIndex] = time;
 	if (attachmentNames[keyframeIndex]) delete attachmentNames[keyframeIndex];
-	attachmentNames[keyframeIndex] = attachmentName.length() == 0 ? 0 : new string(attachmentName);
+	attachmentNames[keyframeIndex] = attachmentName;
 }
 
-void AttachmentTimeline::apply (BaseSkeleton *skeleton, float time, float alpha) {
+void AttachmentTimeline::apply (BaseSkeleton *skeleton, float time, float alpha) const {
 	if (time < frames[0]) return; // Time is before first frame.
 
 	int frameIndex;

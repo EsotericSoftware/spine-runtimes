@@ -9,7 +9,7 @@
 namespace spine {
 
 RegionAttachment::RegionAttachment (AtlasRegion *region) {
-	texture = region->page->texture; // BOZO - Resolve attachment as late as possible?
+	texture = region->page->texture;
 	int u = region->x;
 	int u2 = u + region->width;
 	int v = region->y;
@@ -59,9 +59,9 @@ void RegionAttachment::draw (Slot *slot) {
 	vertices[3].color.b = b;
 	vertices[3].color.a = a;
 
-	updateOffset(); // BOZO - Move to resolve()?
 	updateWorldVertices(slot->bone);
 
+	// SMFL doesn't handle batching for us, so we'll just force a single texture per skeleton.
 	skeleton->texture = texture;
 	skeleton->vertexArray.append(vertices[0]);
 	skeleton->vertexArray.append(vertices[1]);

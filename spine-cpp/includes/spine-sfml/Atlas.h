@@ -8,9 +8,7 @@ namespace spine {
 
 class AtlasPage: public BaseAtlasPage {
 public:
-	~AtlasPage(){
-		delete texture;
-	}
+	~AtlasPage ();
 
 	sf::Texture *texture;
 };
@@ -34,7 +32,7 @@ public:
 	AtlasRegion* findRegion (const std::string &name);
 
 private:
-	virtual BaseAtlasPage* newAtlasPage (std::string name);
+	virtual BaseAtlasPage* newAtlasPage (const std::string &name);
 	virtual BaseAtlasRegion* newAtlasRegion (BaseAtlasPage* page);
 };
 

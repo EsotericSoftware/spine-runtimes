@@ -47,7 +47,7 @@ function Slot.new (slotData, skeleton, bone)
 		self:setAttachment(attachment)
 	end
 
-	self:setColor(255, 255, 255, 255)
+	self:setToBindPose()
 
 	return self
 end

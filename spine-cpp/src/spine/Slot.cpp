@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
 #include <spine/BaseSkeleton.h>
@@ -6,6 +7,7 @@
 namespace spine {
 
 Slot::Slot (SlotData *data, BaseSkeleton *skeleton, Bone *bone) :
+				attachmentTime(0),
 				data(data),
 				skeleton(skeleton),
 				bone(bone),
@@ -13,8 +15,7 @@ Slot::Slot (SlotData *data, BaseSkeleton *skeleton, Bone *bone) :
 				g(1),
 				b(1),
 				a(1),
-				attachment(0),
-				attachmentTime(0) {
+				attachment(0) {
 	if (!data) throw std::invalid_argument("data cannot be null.");
 	if (!skeleton) throw std::invalid_argument("skeleton cannot be null.");
 	if (!bone) throw std::invalid_argument("bone cannot be null.");

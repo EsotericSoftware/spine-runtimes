@@ -25,6 +25,7 @@ public:
 
 	Slot (SlotData *data, BaseSkeleton *skeleton, Bone *bone);
 
+	/** @param attachment May be null. */
 	void setAttachment (Attachment *attachment);
 
 	void setAttachmentTime (float time);

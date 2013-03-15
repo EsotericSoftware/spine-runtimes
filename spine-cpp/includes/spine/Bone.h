@@ -8,6 +8,7 @@ class BoneData;
 class Bone {
 public:
 	BoneData *data;
+	/** May be null. */
 	Bone *parent;
 	float x, y;
 	float rotation;
