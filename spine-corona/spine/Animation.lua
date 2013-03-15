@@ -138,6 +138,7 @@ function Animation.RotateTimeline.new ()
 
 	local self = Animation.CurveTimeline.new()
 	self.frames = {}
+	self.boneIndex = -1
 
 	function self:getDuration ()
 		return self.frames[#self.frames - 1]
@@ -207,6 +208,7 @@ function Animation.TranslateTimeline.new ()
 
 	local self = Animation.CurveTimeline.new()
 	self.frames = {}
+	self.boneIndex = -1
 
 	function self:getDuration ()
 		return self.frames[#self.frames - 2]
@@ -297,6 +299,7 @@ function Animation.ColorTimeline.new ()
 
 	local self = Animation.CurveTimeline.new()
 	self.frames = {}
+	self.slotIndex = -1
 
 	function self:getDuration ()
 		return self.frames[#self.frames - 4]
@@ -360,6 +363,7 @@ function Animation.AttachmentTimeline.new ()
 	local self = Animation.CurveTimeline.new()
 	self.frames = {}
 	self.attachmentNames = {}
+	self.slotName = nil
 
 	function self:getDuration ()
 		return self.frames[#self.frames]
