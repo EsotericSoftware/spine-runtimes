@@ -3,6 +3,12 @@
 
 namespace spine {
 
+AtlasPage::~AtlasPage () {
+	delete texture;
+}
+
+//
+
 Atlas::Atlas (std::ifstream &file) {
 	load(file);
 }
@@ -19,7 +25,7 @@ Atlas::Atlas (const char *begin, const char *end) {
 	load(begin, end);
 }
 
-BaseAtlasPage* Atlas::newAtlasPage (std::string name) {
+BaseAtlasPage* Atlas::newAtlasPage (const std::string &name) {
 	AtlasPage *page = new AtlasPage();
 	page->texture = new sf::Texture();
 	page->texture->loadFromFile(name);

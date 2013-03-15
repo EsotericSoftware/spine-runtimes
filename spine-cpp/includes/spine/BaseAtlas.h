@@ -4,7 +4,6 @@
 #include <istream>
 #include <string>
 #include <vector>
-#include <map>
 
 namespace spine {
 
@@ -26,7 +25,7 @@ public:
 	virtual BaseAtlasRegion* findRegion (const std::string &name);
 
 private:
-	virtual BaseAtlasPage* newAtlasPage (std::string name) = 0;
+	virtual BaseAtlasPage* newAtlasPage (const std::string &name) = 0;
 	virtual BaseAtlasRegion* newAtlasRegion (BaseAtlasPage *page) = 0;
 };
 
@@ -71,7 +70,7 @@ public:
 	int *splits;
 	int *pads;
 
-  BaseAtlasRegion() : splits(0), pads(0) {}
+	BaseAtlasRegion ();
 	virtual ~BaseAtlasRegion ();
 };
 

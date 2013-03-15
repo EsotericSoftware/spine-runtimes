@@ -13,7 +13,7 @@ public:
 	float x, y;
 	float rotation;
 	float scaleX, scaleY;
-	float flipY;
+	float yDown;
 
 	BoneData (const std::string &name) :
 					name(name),
@@ -24,7 +24,7 @@ public:
 					rotation(0),
 					scaleX(1),
 					scaleY(1),
-					flipY(false) {
+					yDown(false) {
 	}
 };
 

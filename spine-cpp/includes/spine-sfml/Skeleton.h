@@ -9,7 +9,7 @@ namespace spine {
 class Skeleton: public BaseSkeleton, public sf::Drawable {
 public:
 	sf::VertexArray vertexArray;
-	sf::Texture *texture; // BOZO - This is ugly. Support multiple textures?
+	sf::Texture *texture; // This is a bit ugly and means all region attachments must use the same textures.
 
 	Skeleton (SkeletonData *skeletonData);
 

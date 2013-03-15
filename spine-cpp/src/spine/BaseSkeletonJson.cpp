@@ -32,12 +32,12 @@ static float toColor (const string &value, int index) {
 BaseSkeletonJson::BaseSkeletonJson (BaseAttachmentLoader *attachmentLoader) :
 				attachmentLoader(attachmentLoader),
 				scale(1),
-				flipY(false) {
+				yDown(false) {
+	if (!attachmentLoader) throw invalid_argument("attachmentLoader cannot be null.");
 }
 
 BaseSkeletonJson::~BaseSkeletonJson () {
-  if (attachmentLoader)
-    delete attachmentLoader;
+	delete attachmentLoader;
 }
 
 SkeletonData* BaseSkeletonJson::readSkeletonData (std::ifstream &file) const {
@@ -76,7 +76,7 @@ SkeletonData* BaseSkeletonJson::readSkeletonData (const char *begin, const char 
 
 	Json::Value bones = root["bones"];
 	skeletonData->bones.reserve(bones.size());
-	for (unsigned int i = 0; i < bones.size(); ++i) {
+	for (int i = 0, n = bones.size(); i < n; ++i) {
 		Json::Value boneMap = bones[i];
 		string boneName = boneMap["name"].asString();
 
@@ -92,7 +92,7 @@ SkeletonData* BaseSkeletonJson::readSkeletonData (const char *begin, const char 
 		boneData->rotation = (float)(boneMap.get("rotation", 0).asDouble());
 		boneData->scaleX = (float)(boneMap.get("scaleX", 1).asDouble());
 		boneData->scaleY = (float)(boneMap.get("scaleY", 1).asDouble());
-		boneData->flipY = flipY;
+		boneData->yDown = yDown;
 
 		skeletonData->bones.push_back(boneData);
 	}
@@ -100,7 +100,7 @@ SkeletonData* BaseSkeletonJson::readSkeletonData (const char *begin, const char 
 	Json::Value slots = root["slots"];
 	if (!slots.isNull()) {
 		skeletonData->slots.reserve(slots.size());
-		for (unsigned int i = 0; i < slots.size(); ++i) {
+		for (int i = 0, n = slots.size(); i < n; ++i) {
 			Json::Value slotMap = slots[i];
 			string slotName = slotMap["name"].asString();
 
@@ -128,7 +128,7 @@ SkeletonData* BaseSkeletonJson::readSkeletonData (const char *begin, const char 
 		Json::Value skinsMap = root["skins"];
 		vector<string> skinNames = skinsMap.getMemberNames();
 		skeletonData->skins.reserve(skinNames.size());
-		for (unsigned int i = 0; i < skinNames.size(); i++) {
+		for (int i = 0, n = skinNames.size(); i < n; i++) {
 			string skinName = skinNames[i];
 			Skin *skin = new Skin(skinName);
 			skeletonData->skins.push_back(skin);
@@ -136,13 +136,13 @@ SkeletonData* BaseSkeletonJson::readSkeletonData (const char *begin, const char 
 
 			Json::Value slotMap = skinsMap[skinName];
 			vector<string> slotNames = slotMap.getMemberNames();
-			for (unsigned int i = 0; i < slotNames.size(); i++) {
+			for (int i = 0, n = slotNames.size(); i < n; i++) {
 				string slotName = slotNames[i];
 				int slotIndex = skeletonData->findSlotIndex(slotName);
 
 				Json::Value attachmentsMap = slotMap[slotName];
 				vector<string> attachmentNames = attachmentsMap.getMemberNames();
-				for (unsigned int i = 0; i < attachmentNames.size(); i++) {
+				for (int i = 0, n = attachmentNames.size(); i < n; i++) {
 					string attachmentName = attachmentNames[i];
 					Json::Value attachmentMap = attachmentsMap[attachmentName];
 
@@ -167,6 +167,7 @@ SkeletonData* BaseSkeletonJson::readSkeletonData (const char *begin, const char 
 						regionAttachment->rotation = (float)(attachmentMap.get("rotation", 0).asDouble());
 						regionAttachment->width = (float)(attachmentMap.get("width", 32).asDouble() * scale);
 						regionAttachment->height = (float)(attachmentMap.get("height", 32).asDouble() * scale);
+						regionAttachment->updateOffset();
 					}
 
 					skin->addAttachment(slotIndex, attachmentName, attachment);
@@ -205,7 +206,8 @@ static void readCurve (CurveTimeline *timeline, int keyframeIndex, const Json::V
 	if (curve.isString() && curve.asString() == "stepped")
 		timeline->setStepped(keyframeIndex);
 	else if (curve.isArray())
-		timeline->setCurve(keyframeIndex, (float)curve[0u].asDouble(), (float)curve[1u].asDouble(), (float)curve[2u].asDouble(), (float)curve[3u].asDouble());
+		timeline->setCurve(keyframeIndex, (float)curve[0u].asDouble(), (float)curve[1u].asDouble(), (float)curve[2u].asDouble(),
+				(float)curve[3u].asDouble());
 }
 
 Animation* BaseSkeletonJson::readAnimation (const char *begin, const char *end, const SkeletonData *skeletonData) const {
@@ -229,14 +231,14 @@ Animation* BaseSkeletonJson::readAnimation (const char *begin, const char *end, 
 
 	Json::Value bones = root["bones"];
 	vector<string> boneNames = bones.getMemberNames();
-	for (unsigned int i = 0; i < boneNames.size(); i++) {
+	for (int i = 0, n = boneNames.size(); i < n; i++) {
 		string boneName = boneNames[i];
 		int boneIndex = skeletonData->findBoneIndex(boneName);
 		if (boneIndex == -1) throw runtime_error("Bone not found: " + boneName);
 
 		Json::Value timelineMap = bones[boneName];
 		vector<string> timelineNames = timelineMap.getMemberNames();
-		for (unsigned int i = 0; i < timelineNames.size(); i++) {
+		for (int i = 0, n = timelineNames.size(); i < n; i++) {
 			string timelineName = timelineNames[i];
 			Json::Value values = timelineMap[timelineName];
 
@@ -245,7 +247,7 @@ Animation* BaseSkeletonJson::readAnimation (const char *begin, const char *end, 
 				timeline->boneIndex = boneIndex;
 
 				int keyframeIndex = 0;
-				for (unsigned int i = 0; i < values.size(); i++) {
+				for (int i = 0, n = values.size(); i < n; i++) {
 					Json::Value valueMap = values[i];
 
 					float time = (float)valueMap["time"].asDouble();
@@ -268,10 +270,9 @@ Animation* BaseSkeletonJson::readAnimation (const char *begin, const char *end, 
 				timeline->boneIndex = boneIndex;
 
 				int keyframeIndex = 0;
-				for (unsigned int i = 0; i < values.size(); i++) {
+				for (int i = 0, n = values.size(); i < n; i++) {
 					Json::Value valueMap = values[i];
 
-					float time = (float)valueMap["time"].asDouble();
 					timeline->setKeyframe(keyframeIndex, //
 							(float)valueMap["time"].asDouble(), //
 							(float)valueMap.get("x", 0).asDouble() * timelineScale, //
@@ -291,14 +292,14 @@ Animation* BaseSkeletonJson::readAnimation (const char *begin, const char *end, 
 	Json::Value slots = root["slots"];
 	if (!slots.isNull()) {
 		vector<string> slotNames = slots.getMemberNames();
-		for (unsigned int i = 0; i < slotNames.size(); i++) {
+		for (int i = 0, n = slotNames.size(); i < n; i++) {
 			string slotName = slotNames[i];
 			int slotIndex = skeletonData->findSlotIndex(slotName);
 			if (slotIndex == -1) throw runtime_error("Slot not found: " + slotName);
 
 			Json::Value timelineMap = slots[slotName];
 			vector<string> timelineNames = timelineMap.getMemberNames();
-			for (unsigned int i = 0; i < timelineNames.size(); i++) {
+			for (int i = 0, n = timelineNames.size(); i < n; i++) {
 				string timelineName = timelineNames[i];
 				Json::Value values = timelineMap[timelineName];
 
@@ -307,7 +308,7 @@ Animation* BaseSkeletonJson::readAnimation (const char *begin, const char *end, 
 					timeline->slotIndex = slotIndex;
 
 					int keyframeIndex = 0;
-					for (unsigned int i = 0; i < values.size(); i++) {
+					for (int i = 0, n = values.size(); i < n; i++) {
 						Json::Value valueMap = values[i];
 
 						string s = valueMap["color"].asString();
@@ -324,11 +325,12 @@ Animation* BaseSkeletonJson::readAnimation (const char *begin, const char *end, 
 					timeline->slotIndex = slotIndex;
 
 					int keyframeIndex = 0;
-					for (unsigned int i = 0; i < values.size(); i++) {
+					for (int i = 0, n = values.size(); i < n; i++) {
 						Json::Value valueMap = values[i];
 
-						Json::Value name = valueMap["name"];
-						timeline->setKeyframe(keyframeIndex++, (float)valueMap["time"].asDouble(), name.isNull() ? "" : name.asString());
+						Json::Value nameValue = valueMap["name"];
+						timeline->setKeyframe(keyframeIndex++, (float)valueMap["time"].asDouble(),
+								nameValue.isNull() ? 0 : new string(nameValue.asString()));
 					}
 					timelines.push_back(timeline);
 					if (timeline->getDuration() > duration) duration = timeline->getDuration();

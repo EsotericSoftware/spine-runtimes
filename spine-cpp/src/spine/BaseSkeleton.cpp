@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include <iostream>
 #include <spine/BaseSkeleton.h>
 #include <spine/SkeletonData.h>
@@ -92,25 +93,25 @@ Bone* BaseSkeleton::getRootBone () const {
 }
 
 Bone* BaseSkeleton::findBone (const string &boneName) const {
-	for (unsigned int i = 0; i < bones.size(); i++)
+	for (int i = 0, n = bones.size(); i < n; i++)
 		if (data->bones[i]->name == boneName) return bones[i];
 	return 0;
 }
 
 int BaseSkeleton::findBoneIndex (const string &boneName) const {
-	for (unsigned int i = 0; i < bones.size(); i++)
+	for (int i = 0, n = bones.size(); i < n; i++)
 		if (data->bones[i]->name == boneName) return i;
 	return -1;
 }
 
 Slot* BaseSkeleton::findSlot (const string &slotName) const {
-	for (unsigned int i = 0; i < slots.size(); i++)
+	for (int i = 0, n = slots.size(); i < n; i++)
 		if (data->slots[i]->name == slotName) return slots[i];
 	return 0;
 }
 
 int BaseSkeleton::findSlotIndex (const string &slotName) const {
-	for (unsigned int i = 0; i < slots.size(); i++)
+	for (int i = 0, n = slots.size(); i < n; i++)
 		if (data->slots[i]->name == slotName) return i;
 	return -1;
 }
@@ -126,11 +127,11 @@ void BaseSkeleton::setSkin (Skin *newSkin) {
 	skin = newSkin;
 }
 
-Attachment* BaseSkeleton::getAttachment (const string &slotName, const string &attachmentName) {
+Attachment* BaseSkeleton::getAttachment (const string &slotName, const string &attachmentName) const {
 	return getAttachment(data->findSlotIndex(slotName), attachmentName);
 }
 
-Attachment* BaseSkeleton::getAttachment (int slotIndex, const string &attachmentName) {
+Attachment* BaseSkeleton::getAttachment (int slotIndex, const string &attachmentName) const {
 	if (data->defaultSkin) {
 		Attachment *attachment = data->defaultSkin->getAttachment(slotIndex, attachmentName);
 		if (attachment) return attachment;

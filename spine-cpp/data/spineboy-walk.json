@@ -274,27 +274,5 @@
 			{ "time": 1.0666, "angle": 3.6 }
 		]
 	}
-},
-"slots": {
-	"torso": {
-		"attachment": [
-			{ "time": 0.4333, "name": null },
-			{ "time": 0.8, "name": "torso" }
-		]
-	},
-	"head": {
-		"color": [
-			{ "time": 0.1666, "color": "ffffffff" },
-			{ "time": 0.9333, "color": "ff0f00c1" }
-		]
-	},
-	"eyes": {
-		"attachment": [
-			{ "time": 0.2, "name": "eyes-closed" },
-			{ "time": 0.3, "name": "eyes" },
-			{ "time": 0.7, "name": "eyes-closed" },
-			{ "time": 0.8333, "name": "eyes" }
-		]
-	}
 }
 }

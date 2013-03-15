@@ -58,7 +58,7 @@ void Bone::updateWorldTransform (bool flipX, bool flipY) {
 		m10 = -m10;
 		m11 = -m11;
 	}
-	if (data->flipY) {
+	if (data->yDown) {
 		m10 = -m10;
 		m11 = -m11;
 	}

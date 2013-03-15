@@ -23,6 +23,7 @@ public:
 	float time;
 	bool flipX, flipY;
 
+	/** The BaseSkeleton owns the SkeletonData. */
 	BaseSkeleton (SkeletonData *data);
 	virtual ~BaseSkeleton ();
 
@@ -40,10 +41,11 @@ public:
 	int findSlotIndex (const std::string &slotName) const;
 
 	void setSkin (const std::string &skinName);
-	void setSkin (Skin *newSkin);
+	/** @param skin May be null. */
+	void setSkin (Skin *skin);
 
-	Attachment* getAttachment (const std::string &slotName, const std::string &attachmentName);
-	Attachment* getAttachment (int slotIndex, const std::string &attachmentName);
+	Attachment* getAttachment (const std::string &slotName, const std::string &attachmentName) const;
+	Attachment* getAttachment (int slotIndex, const std::string &attachmentName) const;
 	void setAttachment (const std::string &slotName, const std::string &attachmentName);
 };
 

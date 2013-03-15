@@ -2,7 +2,6 @@
 #define SPINE_SLOTDATA_H_
 
 #include <string>
-#include <stdexcept>
 
 namespace spine {
 
@@ -15,23 +14,8 @@ public:
 	float r, g, b, a;
 	std::string *attachmentName;
 
-	SlotData (const std::string &name, BoneData *boneData) :
-					name(name),
-					boneData(boneData),
-					r(1),
-					g(1),
-					b(1),
-					a(1),
-					attachmentName(0) {
-		if (!boneData) throw std::invalid_argument("boneData cannot be null.");
-	}
-
-	~SlotData () {
-		if (attachmentName) {
-			delete attachmentName;
-			attachmentName = 0;
-		}
-	}
+	SlotData (const std::string &name, BoneData *boneData);
+	~SlotData ();
 };
 
 } /* namespace spine */

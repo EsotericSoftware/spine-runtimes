@@ -12,9 +12,13 @@ class Skin;
 
 class SkeletonData {
 public:
+	/** The SkeletonData owns the bones. */
 	std::vector<BoneData*> bones;
+	/** The SkeletonData owns the slots. */
 	std::vector<SlotData*> slots;
+	/** The SkeletonData owns the skins. */
 	std::vector<Skin*> skins;
+	/** May be null. */
 	Skin *defaultSkin;
 
 	SkeletonData ();
@@ -26,7 +30,7 @@ public:
 	SlotData* findSlot (const std::string &slotName) const;
 	int findSlotIndex (const std::string &slotName) const;
 
-	Skin* findSkin (const std::string &skinName);
+	Skin* findSkin (const std::string &skinName) const;
 };
 
 } /* namespace spine */
