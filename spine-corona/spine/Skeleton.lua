@@ -143,11 +143,11 @@ function Skeleton.new (skeletonData, group)
 		if not attachmentName then error("attachmentName cannot be nil.", 2) end
 		local slotIndex = self.data:findSlotIndex(slotName)
 		if slotIndex == -1 then error("Slot not found: " .. slotName, 2) end
+		if self.skin then return self.skin:getAttachment(slotIndex, attachmentName) end
 		if self.data.defaultSkin then
 			local attachment = self.data.defaultSkin:getAttachment(slotIndex, attachmentName)
 			if attachment then return attachment end
 		end
-		if self.skin then return self.skin:getAttachment(slotIndex, attachmentName) end
 		return nil
 	end
 

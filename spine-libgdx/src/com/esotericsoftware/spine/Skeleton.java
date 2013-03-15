@@ -216,11 +216,11 @@ public class Skeleton {
 	/** @return May be null. */
 	public Attachment getAttachment (int slotIndex, String attachmentName) {
 		if (attachmentName == null) throw new IllegalArgumentException("attachmentName cannot be null.");
+		if (skin != null) return skin.getAttachment(slotIndex, attachmentName);
 		if (data.defaultSkin != null) {
 			Attachment attachment = data.defaultSkin.getAttachment(slotIndex, attachmentName);
 			if (attachment != null) return attachment;
 		}
-		if (skin != null) return skin.getAttachment(slotIndex, attachmentName);
 		return null;
 	}
 

@@ -132,11 +132,11 @@ Attachment* BaseSkeleton::getAttachment (const string &slotName, const string &a
 }
 
 Attachment* BaseSkeleton::getAttachment (int slotIndex, const string &attachmentName) const {
+	if (skin) return skin->getAttachment(slotIndex, attachmentName);
 	if (data->defaultSkin) {
 		Attachment *attachment = data->defaultSkin->getAttachment(slotIndex, attachmentName);
 		if (attachment) return attachment;
 	}
-	if (skin) return skin->getAttachment(slotIndex, attachmentName);
 	return 0;
 }
 
