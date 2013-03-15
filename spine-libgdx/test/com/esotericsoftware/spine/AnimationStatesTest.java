@@ -69,9 +69,6 @@ public class AnimationStatesTest extends ApplicationAdapter {
 
 	public static void main (String[] args) throws Exception {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.title = "AnimationStates - Spine";
-		config.width = 640;
-		config.height = 480;
-		new LwjglApplication(new AnimationStatesTest(), config);
+		new LwjglApplication(new AnimationStatesTest());
 	}
 }
