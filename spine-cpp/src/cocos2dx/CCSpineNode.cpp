@@ -57,6 +57,7 @@ void CCSpineNode::playAnimation(const char* fileName, bool loop)
     
     std::ifstream animationFile(FULL_PATH(fileName));
     m_animation = m_skeletonJson->readAnimation(animationFile, m_skeleton->data);
+    m_skeleton->setToBindPose();
 
     m_animTimer = 0.0f;
     m_loop = loop;
