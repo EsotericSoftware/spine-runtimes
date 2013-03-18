@@ -75,6 +75,7 @@ public class MixTest extends ApplicationAdapter {
 		batch.begin();
 		batch.setColor(Color.GRAY);
 
+		// This shows how to manage state manually. See AnimationStatesTest.
 		if (time > total) {
 			// restart
 			time = 0;

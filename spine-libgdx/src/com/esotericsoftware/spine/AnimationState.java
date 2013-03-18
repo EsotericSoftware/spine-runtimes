@@ -1,22 +1,17 @@
 
 package com.esotericsoftware.spine;
 
-import com.esotericsoftware.spine.Animation;
-import com.esotericsoftware.spine.Skeleton;
-
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.ObjectMap;
 
+/** Stores mixing times between animations and automatically mixes them as animations change. */
 public class AnimationState {
-	Animation current;
-	float currentTime;
-	boolean currentLoop;
-	Animation previous;
-	float previousTime;
-	boolean previousLoop;
+	Animation current, previous;
+	float currentTime, previousTime;
+	boolean currentLoop, previousLoop;
 	float mixTime, mixDuration;
-	Key tempKey = new Key();
-	ObjectMap<Key, Float> animationToMixTime = new ObjectMap();
+	final ObjectMap<Key, Float> animationToMixTime = new ObjectMap();
+	final Key tempKey = new Key();
 
 	public void apply (Skeleton skeleton) {
 		if (current == null) return;
@@ -36,6 +31,7 @@ public class AnimationState {
 		mixTime += delta;
 	}
 
+	/** Set the mixing duration between two animations. */
 	public void setMixing (Animation from, Animation to, float duration) {
 		if (from == null) throw new IllegalArgumentException("from cannot be null.");
 		if (to == null) throw new IllegalArgumentException("to cannot be null.");
@@ -45,10 +41,13 @@ public class AnimationState {
 		animationToMixTime.put(key, duration);
 	}
 
+	/** Set the current animation. */
 	public void setAnimation (Animation animation, boolean loop) {
 		setAnimation(animation, loop, 0);
 	}
 
+	/** Set the current animation.
+	 * @param time The time within the animation to start. */
 	public void setAnimation (Animation animation, boolean loop, float time) {
 		previous = null;
 		if (animation != null && current != null) {
@@ -70,6 +69,7 @@ public class AnimationState {
 		return current;
 	}
 
+	/** Returns the time within the current animation. */
 	public float getTime () {
 		return currentTime;
 	}
