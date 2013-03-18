@@ -15,19 +15,6 @@ function Skeleton.new (skeletonData, group)
 	self.drawOrder = {}
 	self.images = {}
 
-	for i,boneData in ipairs(skeletonData.bones) do
-		local parent
-		if boneData.parent then parent = self.bones[utils.indexOf(skeletonData.bones, boneData.parent)] end
-		table.insert(self.bones, Bone.new(boneData, parent))
-	end
-
-	for i,slotData in ipairs(skeletonData.slots) do
-		local bone = self.bones[utils.indexOf(skeletonData.bones, slotData.boneData)]
-		local slot = Slot.new(slotData, self, bone)
-		table.insert(self.slots, slot)
-		table.insert(self.drawOrder, slot)
-	end
-
 	function self:updateWorldTransform ()
 		for i,bone in ipairs(self.bones) do
 			bone:updateWorldTransform(self.flipX, self.flipY)
@@ -165,6 +152,19 @@ function Skeleton.new (skeletonData, group)
 
 	function self:update (delta)
 		self.time = self.time + delta
+	end
+
+	for i,boneData in ipairs(skeletonData.bones) do
+		local parent
+		if boneData.parent then parent = self.bones[utils.indexOf(skeletonData.bones, boneData.parent)] end
+		table.insert(self.bones, Bone.new(boneData, parent))
+	end
+
+	for i,slotData in ipairs(skeletonData.slots) do
+		local bone = self.bones[utils.indexOf(skeletonData.bones, slotData.boneData)]
+		local slot = Slot.new(slotData, self, bone)
+		table.insert(self.slots, slot)
+		table.insert(self.drawOrder, slot)
 	end
 
 	return self
