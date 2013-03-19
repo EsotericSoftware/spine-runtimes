@@ -12,6 +12,22 @@
 
 #define FULL_PATH(a) CCFileUtils::sharedFileUtils()->fullPathFromRelativePath(a)
 
+CCSpineNode::CCSpineNode()
+{
+    m_skeletonJson = 0;
+    m_skeleton = 0;
+    m_animation = 0;
+    m_animTimer = 0;
+    m_loop = true;
+}
+
+CCSpineNode::~CCSpineNode()
+{
+    CC_SAFE_DELETE(m_animation);
+    CC_SAFE_DELETE(m_skeleton);
+    CC_SAFE_DELETE(m_skeletonJson);
+}
+
 
 CCSpineNode* CCSpineNode::createWithFileNames(const char* skeletonFileName, const char* atlasFileName)
 {
@@ -39,11 +55,7 @@ bool CCSpineNode::initWithFiles(const char* skeletonFileName, const char* atlasF
     m_skeleton = new Skeleton(skeletonData);
     m_skeleton->setToBindPose();
     m_skeleton->updateWorldTransform();
-    
-    m_animTimer = 0.0f;
-    m_animation = 0;
-    m_loop = true;
-    
+        
     setShaderProgram(CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
     
     scheduleUpdate();
@@ -53,6 +65,10 @@ bool CCSpineNode::initWithFiles(const char* skeletonFileName, const char* atlasF
 
 void CCSpineNode::playAnimation(const char* fileName, bool loop)
 {
+    if (m_animName == fileName
+        && !isCurrAnimOver())
+        return;
+    
     CC_SAFE_DELETE(m_animation);
     
     std::ifstream animationFile(FULL_PATH(fileName));
@@ -80,6 +96,23 @@ void CCSpineNode::draw()
    
     if (m_skeleton)
         m_skeleton->draw();
-    
+
     CCNode::draw();
+}
+
+void CCSpineNode::setFlipX(bool flip)
+{
+    if (m_skeleton)
+        m_skeleton->flipX = flip;
+}
+
+void CCSpineNode::setFlipY(bool flip)
+{
+    if (m_skeleton)
+        m_skeleton->flipY = flip;
+}
+
+bool CCSpineNode::isCurrAnimOver() const
+{
+    return !m_loop && m_animation && m_animation->duration <= m_animTimer;
 }
