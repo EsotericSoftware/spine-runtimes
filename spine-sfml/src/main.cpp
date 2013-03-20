@@ -24,7 +24,7 @@ int main () {
 		skeleton->flipX = false;
 		skeleton->flipY = false;
 		skeleton->setToBindPose();
-		skeleton->getRootBone()->x = 200;
+		skeleton->getRootBone()->x = 320;
 		skeleton->getRootBone()->y = 420;
 		skeleton->updateWorldTransform();
 

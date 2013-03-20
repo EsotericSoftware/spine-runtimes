@@ -7,7 +7,7 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.mingw.exe.debug.804921154" moduleId="org.eclipse.cdt.core.settings" name="Debug">
 				<externalSettings>
 					<externalSetting>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="includePath" name="/spine-cpp/includes"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/spine-cpp/include"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/spine-cpp/Debug"/>
 						<entry flags="" kind="libraryFile" name="spine-cpp" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
@@ -33,7 +33,7 @@
 								<option id="gnu.cpp.compiler.mingw.exe.debug.option.optimization.level.1284147695" name="Optimization Level" superClass="gnu.cpp.compiler.mingw.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.mingw.exe.debug.option.debugging.level.1570084302" name="Debug Level" superClass="gnu.cpp.compiler.mingw.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.934414518" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/includes}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.warnings.allwarn.2053349441" name="All warnings (-Wall)" superClass="gnu.cpp.compiler.option.warnings.allwarn" value="true" valueType="boolean"/>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1463772359" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def"/>
@@ -47,8 +47,8 @@
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug.913061526" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug.1697744244" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug">
-								<option id="gnu.cpp.link.option.paths.1569606245" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths"/>
-								<option id="gnu.cpp.link.option.libs.43946887" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs"/>
+								<option id="gnu.cpp.link.option.paths.1569606245" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths"/>
+								<option id="gnu.cpp.link.option.libs.43946887" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.241907813" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -137,10 +137,10 @@
 	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.debug.804921154;cdt.managedbuild.config.gnu.mingw.exe.debug.804921154.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.exe.debug.1111247076;cdt.managedbuild.tool.gnu.cpp.compiler.input.1445618618">
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.release.165980790;cdt.managedbuild.config.gnu.mingw.exe.release.165980790.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.exe.release.1002197508;cdt.managedbuild.tool.gnu.cpp.compiler.input.708689179">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.release.165980790;cdt.managedbuild.config.gnu.mingw.exe.release.165980790.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.exe.release.1002197508;cdt.managedbuild.tool.gnu.cpp.compiler.input.708689179">
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.debug.804921154;cdt.managedbuild.config.gnu.mingw.exe.debug.804921154.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.exe.debug.1111247076;cdt.managedbuild.tool.gnu.cpp.compiler.input.1445618618">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.release.165980790;cdt.managedbuild.config.gnu.mingw.exe.release.165980790.;cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.release.1909158038;cdt.managedbuild.tool.gnu.c.compiler.input.448919077">
