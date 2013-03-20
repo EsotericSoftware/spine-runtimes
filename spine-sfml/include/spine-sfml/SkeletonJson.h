@@ -1,5 +1,5 @@
-#ifndef SKELETONJSON_H_
-#define SKELETONJSON_H_
+#ifndef SPINE_SKELETONJSON_H_
+#define SPINE_SKELETONJSON_H_
 
 #include <spine/BaseSkeletonJson.h>
 
@@ -15,4 +15,4 @@ public:
 };
 
 } /* namespace spine */
-#endif /* SKELETONJSON_H_ */
+#endif /* SPINE_SKELETONJSON_H_ */

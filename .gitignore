@@ -1,4 +1,5 @@
 spine-cpp/Debug/*
+spine-sfml/Debug/*
 spine-libgdx/bin/*
 spine-libgdx/libs/*
 target

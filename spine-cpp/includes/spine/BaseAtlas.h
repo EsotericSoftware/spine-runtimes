@@ -1,5 +1,5 @@
-#ifndef SPINE_BASEATLASDATA_H_
-#define SPINE_BASEATLASDATA_H_
+#ifndef SPINE_BASEATLAS_H_
+#define SPINE_BASEATLAS_H_
 
 #include <istream>
 #include <string>
@@ -75,4 +75,4 @@ public:
 };
 
 } /* namespace spine */
-#endif /* SPINE_BASEATLASDATA_H_ */
+#endif /* SPINE_BASEATLAS_H_ */
