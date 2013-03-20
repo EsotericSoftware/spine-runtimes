@@ -26,7 +26,7 @@
 local utils = require "spine.utils"
 local Bone = require "spine.Bone"
 local Slot = require "spine.Slot"
-local AttachmentResolver = require "spine.AttachmentResolver"
+local AttachmentLoader = require "spine.AttachmentLoader"
 
 local Skeleton = {}
 function Skeleton.new (skeletonData, group)
@@ -45,15 +45,27 @@ function Skeleton.new (skeletonData, group)
 		end
 
 		for i,slot in ipairs(self.drawOrder) do
-			if slot.attachment then
-				local image = self.images[slot.attachment]
-				if not image then image = self.data.attachmentResolver:resolve(self, slot.attachment) end
-				if image ~= AttachmentResolver.failed then
-					image.x = slot.bone.worldX + slot.attachment.x * slot.bone.m00 + slot.attachment.y * slot.bone.m01
-					image.y = -(slot.bone.worldY + slot.attachment.x * slot.bone.m10 + slot.attachment.y * slot.bone.m11)
-					image.rotation = -(slot.bone.worldRotation + slot.attachment.rotation)
-					image.xScale = slot.bone.worldScaleX + slot.attachment.scaleX - 1
-					image.yScale = slot.bone.worldScaleY + slot.attachment.scaleY - 1
+			local attachment = slot.attachment
+			if attachment then
+				local image = self.images[attachment]
+				if not image then
+					image = self.data.attachmentLoader:createImage(attachment)
+					if image then
+						image:setReferencePoint(display.CenterReferencePoint);
+						image.width = attachment.width
+						image.height = attachment.height
+					else
+						print("Error creating image: " .. attachment.name)
+						image = AttachmentLoader.failed
+					end
+					self.images[attachment] = image
+				end
+				if image ~= AttachmentLoader.failed then
+					image.x = slot.bone.worldX + attachment.x * slot.bone.m00 + attachment.y * slot.bone.m01
+					image.y = -(slot.bone.worldY + attachment.x * slot.bone.m10 + attachment.y * slot.bone.m11)
+					image.rotation = -(slot.bone.worldRotation + attachment.rotation)
+					image.xScale = slot.bone.worldScaleX + attachment.scaleX - 1
+					image.yScale = slot.bone.worldScaleY + attachment.scaleY - 1
 					if self.flipX then
 						image.xScale = -image.xScale
 						image.rotation = -image.rotation

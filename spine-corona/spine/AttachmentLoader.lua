@@ -23,26 +23,20 @@
  -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ------------------------------------------------------------------------------
 
-local AttachmentResolver = {
-	failed = {}
-}
-function AttachmentResolver.new ()
-	local self = {
-		images = {}
-	}
+local RegionAttachment = require "spine.RegionAttachment"
 
-	function self:resolve (skeleton, attachment)
-		local image = self:createImage(attachment)
-		if image then
-			image:setReferencePoint(display.CenterReferencePoint);
-			image.width = attachment.width
-			image.height = attachment.height
-		else
-			print("Error creating image: " .. attachment.name)
-			image = AttachmentResolver.failed
+local AttachmentLoader = {
+	failed = {},
+	ATTACHMENT_REGION = "region"
+}
+function AttachmentLoader.new ()
+	local self = {}
+
+	function self:newAttachment (type, name)
+		if type == AttachmentLoader.ATTACHMENT_REGION then
+			return RegionAttachment.new(name)
 		end
-		skeleton.images[attachment] = image
-		return image
+		error("Unknown attachment type: " .. type .. " (" + name + ")")
 	end
 
 	function self:createImage (attachment)
@@ -51,4 +45,4 @@ function AttachmentResolver.new ()
 
 	return self
 end
-return AttachmentResolver
+return AttachmentLoader

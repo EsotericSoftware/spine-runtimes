@@ -1,13 +1,15 @@
 
 local spine = require "spine.spine"
 
--- Optional attachment resolver customizes where images are loaded. Eg, could use an image sheet.
-local attachmentResolver = spine.AttachmentResolver.new()
-function attachmentResolver:createImage (attachment)
+-- Using your own attachment loader is optional. It can customizes the path where images are 
+-- loaded. To load from a texture atlas, use an image sheet. It also creates instances of
+-- all attachments, which can be used for customization.
+local attachmentLoader = spine.AttachmentLoader.new()
+function attachmentLoader:createImage (attachment)
 	return display.newImage("data/" .. attachment.name .. ".png")
 end
 
-local json = spine.SkeletonJson.new(attachmentResolver)
+local json = spine.SkeletonJson.new(attachmentLoader)
 json.scale = 1
 local skeletonData = json:readSkeletonDataFile("data/spineboy-skeleton.json")
 local walkAnimation = json:readAnimationFile(skeletonData, "data/spineboy-walk.json")

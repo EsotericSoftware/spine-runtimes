@@ -24,11 +24,11 @@
  ------------------------------------------------------------------------------
 
 local SkeletonData = {}
-function SkeletonData.new (attachmentResolver)
-	if not attachmentResolver then error("attachmentResolver cannot be nil", 2) end
+function SkeletonData.new (attachmentLoader)
+	if not attachmentLoader then error("attachmentLoader cannot be nil", 2) end
 
 	local self = {
-		attachmentResolver = attachmentResolver,
+		attachmentLoader = attachmentLoader,
 		bones = {},
 		slots = {},
 		skins = {}

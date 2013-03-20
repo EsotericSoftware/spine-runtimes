@@ -35,7 +35,7 @@ spine.RegionAttachment = require "spine.RegionAttachment"
 spine.Skeleton = require "spine.Skeleton"
 spine.Bone = require "spine.Bone"
 spine.Slot = require "spine.Slot"
-spine.AttachmentResolver = require "spine.AttachmentResolver"
+spine.AttachmentLoader = require "spine.AttachmentLoader"
 spine.Animation = require "spine.Animation"
 
 return spine

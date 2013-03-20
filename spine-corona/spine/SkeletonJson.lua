@@ -28,8 +28,7 @@ local SkeletonData = require "spine.SkeletonData"
 local BoneData = require "spine.BoneData"
 local SlotData = require "spine.SlotData"
 local Skin = require "spine.Skin"
-local RegionAttachment = require "spine.RegionAttachment"
-local AttachmentResolver = require "spine.AttachmentResolver"
+local AttachmentLoader = require "spine.AttachmentLoader"
 local Animation = require "spine.Animation"
 local json = require "json"
 
@@ -39,15 +38,12 @@ local TIMELINE_TRANSLATE = "translate"
 local TIMELINE_ATTACHMENT = "attachment"
 local TIMELINE_COLOR = "color"
 
-local ATTACHMENT_REGION = "region"
-local ATTACHMENT_ANIMATED_REGION = "animatedRegion"
-
 local SkeletonJson = {}
-function SkeletonJson.new (attachmentResolver)
-	if not attachmentResolver then attachmentResolver = AttachmentResolver.new() end
+function SkeletonJson.new (attachmentLoader)
+	if not attachmentLoader then attachmentLoader = AttachmentLoader.new() end
 
 	local self = {
-		attachmentResolver = attachmentResolver,
+		attachmentLoader = attachmentLoader,
 		scale = 1
 	}
 
@@ -58,7 +54,7 @@ function SkeletonJson.new (attachmentResolver)
 	local readAttachment
 
 	function self:readSkeletonData (jsonText)
-		local skeletonData = SkeletonData.new(self.attachmentResolver)
+		local skeletonData = SkeletonData.new(self.attachmentLoader)
 
 		local root = json.decode(jsonText)
 		if not root then error("Invalid JSON: " .. jsonText, 2) end
@@ -116,7 +112,9 @@ function SkeletonJson.new (attachmentResolver)
 					local slotIndex = skeletonData:findSlotIndex(slotName)
 					for attachmentName,attachmentMap in pairs(slotMap) do
 						local attachment = readAttachment(attachmentName, attachmentMap, self.scale)
-						skin:addAttachment(slotIndex, attachmentName, attachment)
+						if attachment then
+							skin:addAttachment(slotIndex, attachmentName, attachment)
+						end
 					end
 				end
 				if skin.name == "default" then
@@ -133,12 +131,9 @@ function SkeletonJson.new (attachmentResolver)
 	readAttachment = function (name, map, scale)
 		name = map["name"] or name
 		local attachment
-		local type = map["type"] or ATTACHMENT_REGION
-		if type == ATTACHMENT_REGION then
-			attachment = RegionAttachment.new(name)
-		else
-			error("Unknown attachment type: " .. type .. " (" + name + ")")
-		end
+		local type = map["type"] or AttachmentLoader.ATTACHMENT_REGION
+		attachment = attachmentLoader:newAttachment(type, name)
+		if not attachment then return nil end
 
 		attachment.x = (map["x"] or 0) * scale
 		attachment.y = (map["y"] or 0) * scale
