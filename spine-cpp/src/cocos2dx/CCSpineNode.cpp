@@ -97,8 +97,6 @@ void CCSpineNode::draw()
    
     if (m_skeleton)
         m_skeleton->draw();
-
-    CCNode::draw();
 }
 
 void CCSpineNode::setFlipX(bool flip)
