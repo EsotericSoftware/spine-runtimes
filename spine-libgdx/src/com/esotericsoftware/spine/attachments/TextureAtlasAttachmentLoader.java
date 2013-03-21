@@ -47,7 +47,7 @@ public class TextureAtlasAttachmentLoader implements AttachmentLoader {
 			attachment = new RegionAttachment(name);
 			break;
 		case regionSequence:
-			attachment = new RegionAttachment(name);
+			attachment = new RegionSequenceAttachment(name);
 			break;
 		default:
 			throw new IllegalArgumentException("Unknown attachment type: " + type);
