@@ -75,6 +75,7 @@ void CCSpineNode::playAnimation(const char* fileName, bool loop)
     m_animation = m_skeletonJson->readAnimation(animationFile, m_skeleton->data);
     m_skeleton->setToBindPose();
 
+	m_animName = fileName;
     m_animTimer = 0.0f;
     m_loop = loop;
 }
