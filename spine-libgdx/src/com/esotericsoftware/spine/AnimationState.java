@@ -27,7 +27,7 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.math.MathUtils;
 
-/** Stores mixing times between animations and automatically mixes them as animations change. */
+/** Automatically mixes between animations as they change. */
 public class AnimationState {
 	private final AnimationStateData data;
 	Animation current, previous;
