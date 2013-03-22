@@ -27,7 +27,7 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.math.MathUtils;
 
-/** Automatically mixes between animations as they change. */
+/** Stores state for an animation and automatically mixes between animations. */
 public class AnimationState {
 	private final AnimationStateData data;
 	Animation current, previous;
@@ -86,6 +86,10 @@ public class AnimationState {
 	/** Returns the time within the current animation. */
 	public float getTime () {
 		return currentTime;
+	}
+
+	public void setTime (float time) {
+		currentTime = time;
 	}
 
 	public AnimationStateData getData () {
