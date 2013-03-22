@@ -54,10 +54,11 @@ public class AnimationStateTest extends ApplicationAdapter {
 		walkAnimation = json.readAnimation(Gdx.files.internal("spineboy-walk.json"), skeletonData);
 		jumpAnimation = json.readAnimation(Gdx.files.internal("spineboy-jump.json"), skeletonData);
 
-		state = new AnimationState();
-		// Define mixing from one animation to another.
-		state.setMixing(walkAnimation, jumpAnimation, 0.4f);
-		// Set current animation.
+		// Define mixing between animations.
+		AnimationStateData mixing = new AnimationStateData();
+		mixing.setMixing(walkAnimation, jumpAnimation, 0.4f);
+
+		state = new AnimationState(mixing);
 		state.setAnimation(walkAnimation, true);
 
 		skeleton = new Skeleton(skeletonData);
@@ -70,7 +71,7 @@ public class AnimationStateTest extends ApplicationAdapter {
 	}
 
 	public void render () {
-		state.update(Gdx.graphics.getDeltaTime());
+		state.update(Gdx.graphics.getDeltaTime() / 3);
 
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		batch.begin();

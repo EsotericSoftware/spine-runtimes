@@ -1,7 +1,7 @@
 
 goblins.png
 format: RGBA8888
-filter: Nearest,Nearest
+filter: Linear,Linear
 repeat: none
 goblin/spear
   rotate: false
