@@ -1,0 +1,224 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="includes">
+      <UniqueIdentifier>{1b06b916-430b-4dc1-b260-c280a58e0d17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="includes\spine">
+      <UniqueIdentifier>{e7aa2d8d-104e-4c2c-a383-2709ccc2ebf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="includes\json">
+      <UniqueIdentifier>{c5903be8-3874-4598-afb8-502a53a1bbac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="includes\spine-cocos2dx">
+      <UniqueIdentifier>{29fcfe1f-7289-4597-a8fc-82ab7431ba7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{79f098e3-3dd1-47bb-a0a7-1a861d7da7ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\spine">
+      <UniqueIdentifier>{036946b8-8d3d-448b-b494-10ee7bbdf1ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\json">
+      <UniqueIdentifier>{44d6db46-e6b8-40ea-b950-8d75550614ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\spine-cocos2dx">
+      <UniqueIdentifier>{373e4aa7-5d88-40c4-877d-431185461bfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="example">
+      <UniqueIdentifier>{ef769de4-53ac-449d-92e6-e67ec8d7414e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\spine-cocos2dx\Atlas.h">
+      <Filter>includes\spine-cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\spine-cocos2dx\AtlasAttachmentLoader.h">
+      <Filter>includes\spine-cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\spine-cocos2dx\RegionAttachment.h">
+      <Filter>includes\spine-cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\spine-cocos2dx\Skeleton.h">
+      <Filter>includes\spine-cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\spine-cocos2dx\SkeletonJson.h">
+      <Filter>includes\spine-cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\spine-cocos2dx\spine.h">
+      <Filter>includes\spine-cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\example\AppDelegate.h">
+      <Filter>example</Filter>
+    </ClInclude>
+    <ClInclude Include="..\example\ExampleScene.h">
+      <Filter>example</Filter>
+    </ClInclude>
+    <ClInclude Include="main.h">
+      <Filter>example</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\spine-cocos2dx\CCSkeleton.h">
+      <Filter>includes\spine-cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\json\value.h">
+      <Filter>includes\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\json\writer.h">
+      <Filter>includes\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\json\autolink.h">
+      <Filter>includes\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\json\config.h">
+      <Filter>includes\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\json\features.h">
+      <Filter>includes\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\json\forwards.h">
+      <Filter>includes\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\json\json.h">
+      <Filter>includes\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\json\reader.h">
+      <Filter>includes\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\spine\BaseAtlas.h">
+      <Filter>includes\spine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\spine\BaseAttachmentLoader.h">
+      <Filter>includes\spine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\spine\BaseRegionAttachment.h">
+      <Filter>includes\spine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\spine\BaseSkeleton.h">
+      <Filter>includes\spine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\spine\BaseSkeletonJson.h">
+      <Filter>includes\spine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\spine\Bone.h">
+      <Filter>includes\spine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\spine\BoneData.h">
+      <Filter>includes\spine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\spine\SkeletonData.h">
+      <Filter>includes\spine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\spine\Skin.h">
+      <Filter>includes\spine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\spine\Slot.h">
+      <Filter>includes\spine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\spine\SlotData.h">
+      <Filter>includes\spine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\spine\Animation.h">
+      <Filter>includes\spine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\spine\AnimationState.h">
+      <Filter>includes\spine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\spine\AnimationStateData.h">
+      <Filter>includes\spine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\include\spine\Attachment.h">
+      <Filter>includes\spine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-cpp\src\json\json_batchallocator.h">
+      <Filter>src\json</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\spine-cocos2dx\Atlas.cpp">
+      <Filter>src\spine-cocos2dx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\spine-cocos2dx\AtlasAttachmentLoader.cpp">
+      <Filter>src\spine-cocos2dx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\spine-cocos2dx\RegionAttachment.cpp">
+      <Filter>src\spine-cocos2dx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\spine-cocos2dx\Skeleton.cpp">
+      <Filter>src\spine-cocos2dx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\spine-cocos2dx\SkeletonJson.cpp">
+      <Filter>src\spine-cocos2dx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\example\AppDelegate.cpp">
+      <Filter>example</Filter>
+    </ClCompile>
+    <ClCompile Include="..\example\ExampleScene.cpp">
+      <Filter>example</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>example</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\spine-cocos2dx\CCSkeleton.cpp">
+      <Filter>src\spine-cocos2dx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\spine-cpp\src\json\json_reader.cpp">
+      <Filter>src\json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\spine-cpp\src\json\json_value.cpp">
+      <Filter>src\json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\spine-cpp\src\json\json_writer.cpp">
+      <Filter>src\json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\spine-cpp\src\spine\Animation.cpp">
+      <Filter>src\spine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\spine-cpp\src\spine\AnimationState.cpp">
+      <Filter>src\spine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\spine-cpp\src\spine\AnimationStateData.cpp">
+      <Filter>src\spine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\spine-cpp\src\spine\BaseAtlas.cpp">
+      <Filter>src\spine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\spine-cpp\src\spine\BaseRegionAttachment.cpp">
+      <Filter>src\spine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\spine-cpp\src\spine\BaseSkeleton.cpp">
+      <Filter>src\spine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\spine-cpp\src\spine\BaseSkeletonJson.cpp">
+      <Filter>src\spine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\spine-cpp\src\spine\Bone.cpp">
+      <Filter>src\spine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\spine-cpp\src\spine\BoneData.cpp">
+      <Filter>src\spine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\spine-cpp\src\spine\SkeletonData.cpp">
+      <Filter>src\spine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\spine-cpp\src\spine\Skin.cpp">
+      <Filter>src\spine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\spine-cpp\src\spine\Slot.cpp">
+      <Filter>src\spine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\spine-cpp\src\spine\SlotData.cpp">
+      <Filter>src\spine</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\spine-cpp\src\json\json_internalarray.inl">
+      <Filter>src\json</Filter>
+    </None>
+    <None Include="..\..\..\spine-cpp\src\json\json_internalmap.inl">
+      <Filter>src\json</Filter>
+    </None>
+    <None Include="..\..\..\spine-cpp\src\json\json_valueiterator.inl">
+      <Filter>src\json</Filter>
+    </None>
+  </ItemGroup>
+</Project>
