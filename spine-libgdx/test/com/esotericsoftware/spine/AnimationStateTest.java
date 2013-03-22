@@ -76,6 +76,7 @@ public class AnimationStateTest extends ApplicationAdapter {
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		batch.begin();
 
+		System.out.println(skeleton);
 		state.apply(skeleton);
 		// After one second, change the current animation. Mixing is done by AnimationState for you.
 		if (state.getTime() > 1 && state.getAnimation() == walkAnimation) state.setAnimation(jumpAnimation, false);

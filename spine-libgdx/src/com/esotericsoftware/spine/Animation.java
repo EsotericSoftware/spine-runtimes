@@ -30,6 +30,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 
 public class Animation {
+	private String name;
 	private final Array<Timeline> timelines;
 	private float duration;
 
@@ -74,6 +75,20 @@ public class Animation {
 		Array<Timeline> timelines = this.timelines;
 		for (int i = 0, n = timelines.size; i < n; i++)
 			timelines.get(i).apply(skeleton, time, alpha);
+	}
+
+	/** @return May be null. */
+	public String getName () {
+		return name;
+	}
+
+	/** @param name May be null. */
+	public void setName (String name) {
+		this.name = name;
+	}
+
+	public String toString () {
+		return name != null ? name : super.toString();
 	}
 
 	/** @param target After the first and before the last entry. */

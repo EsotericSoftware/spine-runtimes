@@ -95,4 +95,8 @@ public class AnimationState {
 	public AnimationStateData getData () {
 		return data;
 	}
+
+	public String toString () {
+		return (current != null && current.getName() != null) ? current.getName() : super.toString();
+	}
 }

@@ -78,6 +78,7 @@ public class SkeletonJson {
 		if (file == null) throw new IllegalArgumentException("file cannot be null.");
 
 		SkeletonData skeletonData = new SkeletonData();
+		skeletonData.setName(file.nameWithoutExtension());
 
 		OrderedMap<String, ?> root = json.fromJson(OrderedMap.class, file);
 
@@ -284,7 +285,9 @@ public class SkeletonJson {
 		}
 
 		timelines.shrink();
-		return new Animation(timelines, duration);
+		Animation animation = new Animation(timelines, duration);
+		animation.setName(file.nameWithoutExtension());
+		return animation;
 	}
 
 	private void readCurve (CurveTimeline timeline, int keyframeIndex, OrderedMap valueMap) {

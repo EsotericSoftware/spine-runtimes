@@ -298,4 +298,8 @@ public class Skeleton {
 	public void update (float delta) {
 		time += delta;
 	}
+
+	public String toString () {
+		return data.name != null ? data.name : super.toString();
+	}
 }

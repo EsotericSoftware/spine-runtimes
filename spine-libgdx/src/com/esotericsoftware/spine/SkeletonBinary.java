@@ -81,6 +81,8 @@ public class SkeletonBinary {
 		if (file == null) throw new IllegalArgumentException("file cannot be null.");
 
 		SkeletonData skeletonData = new SkeletonData();
+		skeletonData.setName(file.nameWithoutExtension());
+
 		DataInput input = new DataInput(file.read(512));
 		try {
 			// Bones.
@@ -274,7 +276,9 @@ public class SkeletonBinary {
 		}
 
 		timelines.shrink();
-		return new Animation(timelines, duration);
+		Animation animation = new Animation(timelines, duration);
+		animation.setName(file.nameWithoutExtension());
+		return animation;
 	}
 
 	private void readCurve (DataInput input, int keyframeIndex, CurveTimeline timeline) throws IOException {

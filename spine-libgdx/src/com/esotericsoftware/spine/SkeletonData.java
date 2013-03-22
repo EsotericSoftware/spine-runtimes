@@ -28,6 +28,7 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.utils.Array;
 
 public class SkeletonData {
+	String name;
 	final Array<BoneData> bones = new Array(); // Ordered parents first.
 	final Array<SlotData> slots = new Array(); // Bind pose draw order.
 	final Array<Skin> skins = new Array();
@@ -130,5 +131,21 @@ public class SkeletonData {
 	/** Returns all skins, including the default skin. */
 	public Array<Skin> getSkins () {
 		return skins;
+	}
+
+	// ---
+
+	/** @return May be null. */
+	public String getName () {
+		return name;
+	}
+
+	/** @param name May be null. */
+	public void setName (String name) {
+		this.name = name;
+	}
+
+	public String toString () {
+		return name != null ? name : super.toString();
 	}
 }
