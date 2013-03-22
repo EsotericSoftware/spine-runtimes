@@ -32,6 +32,8 @@
 #include <spine/Skin.h>
 #include <spine/Attachment.h>
 #include <spine/Animation.h>
+#include <spine/AnimationStateData.h>
+#include <spine/AnimationState.h>
 #include <spine/Slot.h>
 #include <spine/Bone.h>
 

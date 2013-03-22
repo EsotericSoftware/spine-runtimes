@@ -176,4 +176,8 @@ void BaseSkeleton::setAttachment (const string &slotName, const string &attachme
 	throw invalid_argument("Slot not found: " + slotName);
 }
 
+void BaseSkeleton::update (float deltaTime) {
+	time += deltaTime;
+}
+
 } /* namespace spine */

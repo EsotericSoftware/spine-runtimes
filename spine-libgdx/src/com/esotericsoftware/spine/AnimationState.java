@@ -39,22 +39,24 @@ public class AnimationState {
 		this.data = data;
 	}
 
-	public void apply (Skeleton skeleton) {
-		if (current == null) return;
-		if (previous != null) {
-			previous.apply(skeleton, previousTime, previousLoop);
-			float alpha = MathUtils.clamp(mixTime / mixDuration, 0, 1);
-			current.mix(skeleton, currentTime, currentLoop, alpha);
-			if (alpha == 1) previous = null;
-		} else {
-			current.apply(skeleton, currentTime, currentLoop);
-		}
-	}
-
 	public void update (float delta) {
 		currentTime += delta;
 		previousTime += delta;
 		mixTime += delta;
+	}
+
+	public void apply (Skeleton skeleton) {
+		if (current == null) return;
+		if (previous != null) {
+			previous.apply(skeleton, previousTime, previousLoop);
+			float alpha = mixTime / mixDuration;
+			if (alpha >= 1) {
+				alpha = 1;
+				previous = null;
+			}
+			current.mix(skeleton, currentTime, currentLoop, alpha);
+		} else
+			current.apply(skeleton, currentTime, currentLoop);
 	}
 
 	/** Set the current animation. */

@@ -34,7 +34,7 @@ namespace spine {
 class Skeleton: public BaseSkeleton, public sf::Drawable {
 public:
 	sf::VertexArray vertexArray;
-	sf::Texture *texture; // This is a bit ugly and means all region attachments must use the same textures.
+	sf::Texture *texture; // All region attachments must use the same texture.
 
 	Skeleton (SkeletonData *skeletonData);
 

@@ -65,6 +65,11 @@ BaseSkeletonJson::~BaseSkeletonJson () {
 	delete attachmentLoader;
 }
 
+SkeletonData* BaseSkeletonJson::readSkeletonDataFile (const string &path) const {
+	std::ifstream file(path.c_str());
+	return readSkeletonData(file);
+}
+
 SkeletonData* BaseSkeletonJson::readSkeletonData (std::ifstream &file) const {
 	if (!file) throw invalid_argument("file cannot be null.");
 	if (!file.is_open()) throw runtime_error("Skeleton file is not open.");
@@ -202,6 +207,11 @@ SkeletonData* BaseSkeletonJson::readSkeletonData (const char *begin, const char 
 	}
 
 	return skeletonData;
+}
+
+Animation* BaseSkeletonJson::readAnimationFile (const string &path, const SkeletonData *skeletonData) const {
+	std::ifstream file(path.c_str());
+	return readAnimation(file, skeletonData);
 }
 
 Animation* BaseSkeletonJson::readAnimation (std::ifstream &file, const SkeletonData *skeletonData) const {

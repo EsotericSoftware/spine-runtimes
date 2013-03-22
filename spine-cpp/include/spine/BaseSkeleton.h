@@ -72,6 +72,8 @@ public:
 	Attachment* getAttachment (const std::string &slotName, const std::string &attachmentName) const;
 	Attachment* getAttachment (int slotIndex, const std::string &attachmentName) const;
 	void setAttachment (const std::string &slotName, const std::string &attachmentName);
+
+	void update (float deltaTime);
 };
 
 } /* namespace spine */

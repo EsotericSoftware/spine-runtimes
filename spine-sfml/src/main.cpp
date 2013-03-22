@@ -37,13 +37,9 @@ int main () {
 		ifstream atlasFile("../data/spineboy.atlas");
 		Atlas *atlas = new Atlas(atlasFile);
 
-		SkeletonJson skeletonJson(atlas);
-
-		ifstream skeletonFile("../data/spineboy-skeleton.json");
-		SkeletonData *skeletonData = skeletonJson.readSkeletonData(skeletonFile);
-
-		ifstream animationFile("../data/spineboy-walk.json");
-		Animation *animation = skeletonJson.readAnimation(animationFile, skeletonData);
+		SkeletonJson json(atlas);
+		SkeletonData *skeletonData = json.readSkeletonDataFile("../data/spineboy-skeleton.json");
+		Animation *animation = json.readAnimationFile("../data/spineboy-walk.json", skeletonData);
 
 		Skeleton *skeleton = new Skeleton(skeletonData);
 		skeleton->flipX = false;

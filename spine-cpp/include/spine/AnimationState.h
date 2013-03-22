@@ -53,7 +53,7 @@ public:
 	void apply (BaseSkeleton *skeleton);
 
 	void setAnimation (Animation *newAnimation, bool loop, float time);
-	void setAnimation (Animation *animation, bool loop);
+	void setAnimation (Animation *animation, bool loop = false);
 };
 
 } /* namespace spine */
