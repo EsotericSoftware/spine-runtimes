@@ -23,25 +23,62 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#ifndef SPINE_BONEDATA_H_
-#define SPINE_BONEDATA_H_
-
-#include <string>
+#include <stdexcept>
+#include <spine/AnimationState.h>
+#include <spine/AnimationStateData.h>
+#include <spine/Animation.h>
+#include <spine/BaseSkeleton.h>
 
 namespace spine {
 
-class BoneData {
-public:
-	std::string name;
-	BoneData* parent;
-	float length;
-	float x, y;
-	float rotation;
-	float scaleX, scaleY;
-	float yDown;
+AnimationState::AnimationState (AnimationStateData *data) :
+				previous(0),
+				previousTime(0),
+				previousLoop(false),
+				mixTime(0),
+				mixDuration(0),
+				data(data),
+				animation(0),
+				time(0),
+				loop(0) {
+}
 
-	BoneData (const std::string &name);
-};
+void AnimationState::update (float delta) {
+	time += delta;
+	previousTime += delta;
+	mixTime += delta;
+}
+
+void AnimationState::apply (BaseSkeleton *skeleton) {
+	if (!animation) return;
+	if (previous) {
+		previous->apply(skeleton, previousTime, previousLoop);
+		float alpha = mixTime / mixDuration;
+		if (alpha >= 1) {
+			alpha = 1;
+			previous = 0;
+		}
+		animation->mix(skeleton, time, loop, alpha);
+	} else
+		animation->apply(skeleton, time, loop);
+}
+
+void AnimationState::setAnimation (Animation *animation, bool loop) {
+	setAnimation(animation, loop, 0);
+}
+
+void AnimationState::setAnimation (Animation *newAnimation, bool loop, float time) {
+	previous = 0;
+	if (newAnimation && animation && data) {
+		mixDuration = data->getMixing(animation, newAnimation);
+		if (mixDuration > 0) {
+			mixTime = 0;
+			previous = animation;
+		}
+	}
+	animation = newAnimation;
+	this->loop = loop;
+	this->time = time;
+}
 
 } /* namespace spine */
-#endif /* SPINE_BONEDATA_H_ */

@@ -211,6 +211,17 @@ BaseAtlasRegion* BaseAtlas::findRegion (const std::string &name) {
 //
 
 BaseAtlasRegion::BaseAtlasRegion () :
+				x(0),
+				y(0),
+				width(0),
+				height(0),
+				offsetX(0),
+				offsetY(0),
+				originalWidth(0),
+				originalHeight(0),
+				index(0),
+				rotate(false),
+				flip(false),
 				splits(0),
 				pads(0) {
 }

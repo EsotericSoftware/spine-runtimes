@@ -42,7 +42,7 @@ public:
 	Animation (const std::vector<Timeline*> &timelines, float duration);
 	~Animation ();
 
-	void apply (BaseSkeleton *skeleton, float time, bool loop) const;
+	void apply (BaseSkeleton *skeleton, float time, bool loop = false) const;
 	void mix (BaseSkeleton *skeleton, float time, bool loop, float alpha) const;
 };
 
@@ -57,7 +57,7 @@ public:
 
 	virtual int getKeyframeCount () const = 0;
 
-	virtual void apply (BaseSkeleton *skeleton, float time, float alpha) const = 0;
+	virtual void apply (BaseSkeleton *skeleton, float time, float alpha = 1) const = 0;
 };
 
 //
@@ -94,7 +94,7 @@ public:
 
 	virtual float getDuration () const;
 	virtual int getKeyframeCount () const;
-	virtual void apply (BaseSkeleton *skeleton, float time, float alpha) const;
+	virtual void apply (BaseSkeleton *skeleton, float time, float alpha = 1) const;
 
 	void setKeyframe (int keyframeIndex, float time, float value);
 };
@@ -112,7 +112,7 @@ public:
 
 	virtual float getDuration () const;
 	virtual int getKeyframeCount () const;
-	virtual void apply (BaseSkeleton *skeleton, float time, float alpha) const;
+	virtual void apply (BaseSkeleton *skeleton, float time, float alpha = 1) const;
 
 	void setKeyframe (int keyframeIndex, float time, float x, float y);
 };
@@ -123,7 +123,7 @@ class ScaleTimeline: public TranslateTimeline {
 public:
 	ScaleTimeline (int keyframeCount);
 
-	virtual void apply (BaseSkeleton *skeleton, float time, float alpha) const;
+	virtual void apply (BaseSkeleton *skeleton, float time, float alpha = 1) const;
 };
 
 //
@@ -139,7 +139,7 @@ public:
 
 	virtual float getDuration () const;
 	virtual int getKeyframeCount () const;
-	virtual void apply (BaseSkeleton *skeleton, float time, float alpha) const;
+	virtual void apply (BaseSkeleton *skeleton, float time, float alpha = 1) const;
 
 	void setKeyframe (int keyframeIndex, float time, float r, float g, float b, float a);
 };
@@ -158,7 +158,7 @@ public:
 
 	virtual float getDuration () const;
 	virtual int getKeyframeCount () const;
-	virtual void apply (BaseSkeleton *skeleton, float time, float alpha) const;
+	virtual void apply (BaseSkeleton *skeleton, float time, float alpha = 1) const;
 
 	/** The AttachmentTimeline owns the attachmentName.
 	 * @param attachmentName May be null to clear the image for a slot. */

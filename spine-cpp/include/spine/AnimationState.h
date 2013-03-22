@@ -23,25 +23,38 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#ifndef SPINE_BONEDATA_H_
-#define SPINE_BONEDATA_H_
+#ifndef SPINE_ANIMATIONSTATE_H_
+#define SPINE_ANIMATIONSTATE_H_
 
-#include <string>
+#include <map>
 
 namespace spine {
 
-class BoneData {
-public:
-	std::string name;
-	BoneData* parent;
-	float length;
-	float x, y;
-	float rotation;
-	float scaleX, scaleY;
-	float yDown;
+class Animation;
+class AnimationStateData;
+class BaseSkeleton;
 
-	BoneData (const std::string &name);
+class AnimationState {
+private:
+	Animation *previous;
+	float previousTime;
+	bool previousLoop;
+	float mixTime, mixDuration;
+
+public:
+	AnimationStateData *data;
+	Animation *animation;
+	float time;
+	bool loop;
+
+	AnimationState (AnimationStateData *data = 0);
+
+	void update (float delta);
+	void apply (BaseSkeleton *skeleton);
+
+	void setAnimation (Animation *newAnimation, bool loop, float time);
+	void setAnimation (Animation *animation, bool loop);
 };
 
 } /* namespace spine */
-#endif /* SPINE_BONEDATA_H_ */
+#endif /* SPINE_ANIMATIONSTATE_H_ */

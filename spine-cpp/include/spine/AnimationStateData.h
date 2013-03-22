@@ -23,25 +23,24 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#ifndef SPINE_BONEDATA_H_
-#define SPINE_BONEDATA_H_
+#ifndef SPINE_ANIMATIONSTATEDATA_H_
+#define SPINE_ANIMATIONSTATEDATA_H_
 
-#include <string>
+#include <map>
 
 namespace spine {
 
-class BoneData {
-public:
-	std::string name;
-	BoneData* parent;
-	float length;
-	float x, y;
-	float rotation;
-	float scaleX, scaleY;
-	float yDown;
+class Animation;
 
-	BoneData (const std::string &name);
+class AnimationStateData {
+private:
+	std::map<std::pair<Animation*, Animation*>, float> animationToMixTime;
+
+public:
+	/** Set the mixing duration between two animations. */
+	void setMixing (Animation *from, Animation *to, float duration);
+	float getMixing (Animation *from, Animation *to);
 };
 
 } /* namespace spine */
-#endif /* SPINE_BONEDATA_H_ */
+#endif /* SPINE_ANIMATIONSTATEDATA_H_ */

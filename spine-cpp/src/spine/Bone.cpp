@@ -41,7 +41,16 @@ Bone::Bone (BoneData *data) :
 				y(data->y),
 				rotation(data->rotation),
 				scaleX(data->scaleX),
-				scaleY(data->scaleY) {
+				scaleY(data->scaleY),
+				m00(0),
+				m01(0),
+				worldX(0),
+				m10(0),
+				m11(0),
+				worldY(0),
+				worldRotation(0),
+				worldScaleX(0),
+				worldScaleY(0) {
 	if (!data) throw std::invalid_argument("data cannot be null.");
 }
 

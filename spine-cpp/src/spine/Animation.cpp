@@ -52,7 +52,7 @@ void Animation::apply (BaseSkeleton *skeleton, float time, bool loop) const {
 	if (loop && duration) time = fmodf(time, duration);
 
 	for (int i = 0, n = timelines.size(); i < n; i++)
-		timelines[i]->apply(skeleton, time, 1);
+		timelines[i]->apply(skeleton, time);
 }
 
 void Animation::mix (BaseSkeleton *skeleton, float time, bool loop, float alpha) const {

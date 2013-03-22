@@ -53,7 +53,7 @@ Attachment* Skin::getAttachment (int slotIndex, const std::string &name) {
 }
 
 void Skin::attachAll (BaseSkeleton *skeleton, Skin *oldSkin) {
-	for (std::map<Key, Attachment*>::iterator iter = attachments.begin(); iter != attachments.end(); iter++) {
+	for (std::map<Key, Attachment*>::iterator iter = oldSkin->attachments.begin(); iter != oldSkin->attachments.end(); iter++) {
 		const Key key = iter->first;
 		Slot *slot = skeleton->slots[key.slotIndex];
 		if (slot->attachment == iter->second) {

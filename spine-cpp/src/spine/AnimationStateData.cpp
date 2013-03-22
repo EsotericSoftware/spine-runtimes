@@ -23,25 +23,28 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#ifndef SPINE_BONEDATA_H_
-#define SPINE_BONEDATA_H_
+#include <stdexcept>
+#include <spine/AnimationStateData.h>
+#include <spine/Animation.h>
 
-#include <string>
+using std::invalid_argument;
+using std::make_pair;
+using std::pair;
 
 namespace spine {
 
-class BoneData {
-public:
-	std::string name;
-	BoneData* parent;
-	float length;
-	float x, y;
-	float rotation;
-	float scaleX, scaleY;
-	float yDown;
+void AnimationStateData::setMixing (Animation *from, Animation *to, float duration) {
+	if (!from) throw invalid_argument("from cannot be null.");
+	if (!to) throw invalid_argument("to cannot be null.");
+	animationToMixTime[make_pair(from, to)] = duration;
+}
 
-	BoneData (const std::string &name);
-};
+float AnimationStateData::getMixing (Animation *from, Animation *to) {
+	if (!from) throw invalid_argument("from cannot be null.");
+	if (!to) throw invalid_argument("to cannot be null.");
+	pair<Animation*, Animation*> key = make_pair(from, to);
+	if (animationToMixTime.find(key) != animationToMixTime.end()) return animationToMixTime[key];
+	return 0;
+}
 
 } /* namespace spine */
-#endif /* SPINE_BONEDATA_H_ */
