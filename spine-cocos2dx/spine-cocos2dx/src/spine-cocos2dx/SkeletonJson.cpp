@@ -24,7 +24,12 @@
  ******************************************************************************/
 
 #include <spine-cocos2dx/SkeletonJson.h>
+#include <stdexcept>
 #include <spine-cocos2dx/AtlasAttachmentLoader.h>
+#include "platform/CCFileUtils.h"
+
+using cocos2d::CCFileUtils;
+using std::runtime_error;
 
 namespace spine {
 
@@ -34,6 +39,22 @@ SkeletonJson::SkeletonJson (BaseAttachmentLoader *attachmentLoader) :
 
 SkeletonJson::SkeletonJson (Atlas *atlas) :
 				BaseSkeletonJson(new AtlasAttachmentLoader(atlas)) {
+}
+
+SkeletonData* SkeletonJson::readSkeletonDataFile (const std::string &path) const {
+	unsigned long size;
+	char* data = reinterpret_cast<char*>(CCFileUtils::sharedFileUtils()->getFileData(
+		CCFileUtils::sharedFileUtils()->fullPathForFilename(path.c_str()).c_str(), "r", &size));
+	if (!data) throw runtime_error("Error reading skeleton file: " + path);
+	return readSkeletonData(data, data + size);
+}
+
+Animation* SkeletonJson::readAnimationFile (const std::string &path, const SkeletonData *skeletonData) const {
+	unsigned long size;
+	char* data = reinterpret_cast<char*>(CCFileUtils::sharedFileUtils()->getFileData(
+		CCFileUtils::sharedFileUtils()->fullPathForFilename(path.c_str()).c_str(), "r", &size));
+	if (!data) throw runtime_error("Error reading animation file: " + path);
+	return readAnimation(data, data + size, skeletonData);
 }
 
 } /* namespace spine */

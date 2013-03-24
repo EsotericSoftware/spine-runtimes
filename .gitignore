@@ -3,3 +3,9 @@ spine-sfml/Debug/*
 spine-libgdx/bin/*
 spine-libgdx/libs/*
 target
+*Debug.win32*
+*.sdf
+*.opensdf
+*.user
+*.suo
+spine-cocos2dx/cocos2dx

@@ -24,6 +24,7 @@
  ******************************************************************************/
 
 #include <spine-cocos2dx/Atlas.h>
+#include <stdexcept>
 
 USING_NS_CC;
 
@@ -36,16 +37,12 @@ AtlasPage::~AtlasPage () {
 
 //
 
-Atlas::Atlas (std::ifstream &file) {
-	load(file);
-}
-
-Atlas::Atlas (std::istream &input) {
-	load(input);
-}
-
-Atlas::Atlas (const std::string &text) {
-	load(text);
+Atlas::Atlas (const std::string &path) {
+	unsigned long size;
+	char* data = reinterpret_cast<char*>(CCFileUtils::sharedFileUtils()->getFileData(
+		CCFileUtils::sharedFileUtils()->fullPathForFilename(path.c_str()).c_str(), "r", &size));
+	if (!data) throw std::runtime_error("Error reading atlas file: " + path);
+	load(data, data + size);
 }
 
 Atlas::Atlas (const char *begin, const char *end) {
