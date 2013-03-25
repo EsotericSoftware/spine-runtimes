@@ -65,16 +65,10 @@ BaseSkeletonJson::~BaseSkeletonJson () {
 	delete attachmentLoader;
 }
 
-SkeletonData* BaseSkeletonJson::readSkeletonDataFile (const string &path) const {
+SkeletonData* BaseSkeletonJson::readSkeletonData (const string &path) const {
 	std::ifstream file(path.c_str());
+	if (!file) throw std::invalid_argument("Error reading skeleton file: " + path);
 	return readSkeletonData(file);
-}
-
-SkeletonData* BaseSkeletonJson::readSkeletonData (std::ifstream &file) const {
-	if (!file) throw invalid_argument("file cannot be null.");
-	if (!file.is_open()) throw runtime_error("Skeleton file is not open.");
-
-	return readSkeletonData((std::istream&)file);
 }
 
 SkeletonData* BaseSkeletonJson::readSkeletonData (std::istream &input) const {
@@ -82,10 +76,6 @@ SkeletonData* BaseSkeletonJson::readSkeletonData (std::istream &input) const {
 
 	string json;
 	std::getline(input, json, (char)EOF);
-	return readSkeletonData(json);
-}
-
-SkeletonData* BaseSkeletonJson::readSkeletonData (const string &json) const {
 	const char *begin = json.c_str();
 	const char *end = begin + json.length();
 	return readSkeletonData(begin, end);
@@ -209,16 +199,10 @@ SkeletonData* BaseSkeletonJson::readSkeletonData (const char *begin, const char 
 	return skeletonData;
 }
 
-Animation* BaseSkeletonJson::readAnimationFile (const string &path, const SkeletonData *skeletonData) const {
+Animation* BaseSkeletonJson::readAnimation (const string &path, const SkeletonData *skeletonData) const {
 	std::ifstream file(path.c_str());
+	if (!file) throw std::invalid_argument("Error reading animation file: " + path);
 	return readAnimation(file, skeletonData);
-}
-
-Animation* BaseSkeletonJson::readAnimation (std::ifstream &file, const SkeletonData *skeletonData) const {
-	if (!file) throw invalid_argument("file cannot be null.");
-	if (!file.is_open()) throw runtime_error("Animation file is not open.");
-
-	return readAnimation((std::istream&)file, skeletonData);
 }
 
 Animation* BaseSkeletonJson::readAnimation (std::istream &input, const SkeletonData *skeletonData) const {
@@ -226,10 +210,6 @@ Animation* BaseSkeletonJson::readAnimation (std::istream &input, const SkeletonD
 
 	string json;
 	std::getline(input, json, (char)EOF);
-	return readAnimation(json, skeletonData);
-}
-
-Animation* BaseSkeletonJson::readAnimation (const string &json, const SkeletonData *skeletonData) const {
 	const char *begin = json.c_str();
 	const char *end = begin + json.length();
 	return readAnimation(begin, end, skeletonData);

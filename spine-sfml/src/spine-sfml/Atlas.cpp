@@ -25,8 +25,6 @@
 
 #include <SFML/Graphics/Texture.hpp>
 #include <spine-sfml/Atlas.h>
-#include <iostream>
-#include <fstream>
 
 namespace spine {
 
@@ -36,17 +34,12 @@ AtlasPage::~AtlasPage () {
 
 //
 
-Atlas::Atlas (std::ifstream &file) {
-	load(file);
+Atlas::Atlas (const std::string &path) {
+	load(path);
 }
 
 Atlas::Atlas (std::istream &input) {
 	load(input);
-}
-
-Atlas::Atlas (const std::string &path) {
-	std::ifstream file("../data/spineboy.atlas");
-	load(file);
 }
 
 Atlas::Atlas (const char *begin, const char *end) {

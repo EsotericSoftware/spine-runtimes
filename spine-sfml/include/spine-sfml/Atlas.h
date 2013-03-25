@@ -49,9 +49,8 @@ public:
 
 class Atlas: public BaseAtlas {
 public:
-	Atlas (std::ifstream &file);
-	Atlas (std::istream &input);
 	Atlas (const std::string &path);
+	Atlas (std::istream &input);
 	Atlas (const char *begin, const char *end);
 
 	AtlasRegion* findRegion (const std::string &name);

@@ -45,6 +45,10 @@ Atlas::Atlas (const std::string &path) {
 	load(data, data + size);
 }
 
+Atlas::Atlas (std::istream &input) {
+	load(input);
+}
+
 Atlas::Atlas (const char *begin, const char *end) {
 	load(begin, end);
 }

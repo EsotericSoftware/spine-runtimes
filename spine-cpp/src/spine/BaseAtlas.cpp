@@ -101,11 +101,10 @@ BaseAtlas::~BaseAtlas () {
 		delete regions[i];
 }
 
-void BaseAtlas::load (std::ifstream &file) {
-	if (!file) throw invalid_argument("file cannot be null.");
-	if (!file.is_open()) throw runtime_error("Atlas file is not open.");
-
-	load((std::istream&)file);
+void BaseAtlas::load (const std::string &path) {
+	std::ifstream file(path.c_str());
+	if (!file) throw std::invalid_argument("Error reading atlas file: " + path);
+	load(file);
 }
 
 void BaseAtlas::load (std::istream &input) {
@@ -113,12 +112,6 @@ void BaseAtlas::load (std::istream &input) {
 
 	string text;
 	std::getline(input, text, (char)EOF);
-	const char *begin = text.c_str();
-	const char *end = begin + text.length();
-	load(begin, end);
-}
-
-void BaseAtlas::load (const string &text) {
 	const char *begin = text.c_str();
 	const char *end = begin + text.length();
 	load(begin, end);

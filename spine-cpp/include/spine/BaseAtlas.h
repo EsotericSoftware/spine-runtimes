@@ -40,14 +40,14 @@ public:
 	std::vector<BaseAtlasPage*> pages;
 	std::vector<BaseAtlasRegion*> regions;
 
+	virtual BaseAtlasRegion* findRegion (const std::string &name);
+
+protected:
 	virtual ~BaseAtlas ();
 
-	void load (std::ifstream &file);
 	void load (std::istream &input);
-	void load (const std::string &text);
+	void load (const std::string &path);
 	void load (const char *begin, const char *end);
-
-	virtual BaseAtlasRegion* findRegion (const std::string &name);
 
 private:
 	virtual BaseAtlasPage* newAtlasPage (const std::string &name) = 0;

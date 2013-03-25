@@ -44,16 +44,12 @@ public:
 	BaseSkeletonJson (BaseAttachmentLoader *attachmentLoader);
 	virtual ~BaseSkeletonJson ();
 
-	SkeletonData* readSkeletonDataFile (const std::string &path) const;
-	SkeletonData* readSkeletonData (std::ifstream &file) const;
-	SkeletonData* readSkeletonData (std::istream &file) const;
-	SkeletonData* readSkeletonData (const std::string &json) const;
+	SkeletonData* readSkeletonData (const std::string &path) const;
+	SkeletonData* readSkeletonData (std::istream &input) const;
 	SkeletonData* readSkeletonData (const char *begin, const char *end) const;
 
-	Animation* readAnimationFile (const std::string &path, const SkeletonData *skeletonData) const;
-	Animation* readAnimation (std::ifstream &file, const SkeletonData *skeletonData) const;
-	Animation* readAnimation (std::istream &file, const SkeletonData *skeletonData) const;
-	Animation* readAnimation (const std::string &json, const SkeletonData *skeletonData) const;
+	Animation* readAnimation (const std::string &path, const SkeletonData *skeletonData) const;
+	Animation* readAnimation (std::istream &input, const SkeletonData *skeletonData) const;
 	Animation* readAnimation (const char *begin, const char *end, const SkeletonData *skeletonData) const;
 };
 

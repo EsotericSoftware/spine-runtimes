@@ -19,8 +19,8 @@ bool ExampleScene::init() {
 
 	Atlas *atlas = new Atlas("../data/spineboy.atlas");
 	SkeletonJson json(atlas);
-	SkeletonData *skeletonData = json.readSkeletonDataFile("../data/spineboy-skeleton.json");
-	Animation *animation = json.readAnimationFile("../data/spineboy-walk.json", skeletonData);
+	SkeletonData *skeletonData = json.readSkeletonData("../data/spineboy-skeleton.json");
+	Animation *animation = json.readAnimation("../data/spineboy-walk.json", skeletonData);
 
 	CCSkeleton* skeletonNode = new CCSkeleton(skeletonData);
 	skeletonNode->state->setAnimation(animation, true);

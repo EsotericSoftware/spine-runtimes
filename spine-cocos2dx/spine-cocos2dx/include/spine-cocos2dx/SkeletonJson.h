@@ -38,8 +38,8 @@ public:
 	/** The SkeletonJson owns the attachmentLoader. */
 	SkeletonJson (BaseAttachmentLoader *attachmentLoader);
 
-	SkeletonData* readSkeletonDataFile (const std::string &path) const;
-	Animation* readAnimationFile (const std::string &path, const SkeletonData *skeletonData) const;
+	SkeletonData* readSkeletonData (const std::string &path) const;
+	Animation* readAnimation (const std::string &path, const SkeletonData *skeletonData) const;
 };
 
 } /* namespace spine */
