@@ -17,10 +17,10 @@ CCScene* ExampleScene::scene() {
 bool ExampleScene::init() {
 	if (!CCLayer::init()) return false;
 
-	Atlas *atlas = new Atlas("data/spineboy.atlas");
+	Atlas *atlas = new Atlas("spineboy.txt");
 	SkeletonJson json(atlas);
-	SkeletonData *skeletonData = json.readSkeletonDataFile("data/spineboy-skeleton.json");
-	Animation *animation = json.readAnimationFile("data/spineboy-walk.json", skeletonData);
+	SkeletonData *skeletonData = json.readSkeletonDataFile("spineboy-skeleton.json");
+	Animation *animation = json.readAnimationFile("spineboy-walk.json", skeletonData);
 
 	CCSkeleton* skeletonNode = new CCSkeleton(skeletonData);
 	skeletonNode->state->setAnimation(animation, true);

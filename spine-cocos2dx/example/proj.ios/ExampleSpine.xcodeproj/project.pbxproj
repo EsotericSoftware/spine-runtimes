@@ -11,6 +11,9 @@
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
+		2FC812261700449A00A93590 /* iphone in Resources */ = {isa = PBXBuildFile; fileRef = 2FC812241700449A00A93590 /* iphone */; };
+		2FC812271700449A00A93590 /* iphone-retina in Resources */ = {isa = PBXBuildFile; fileRef = 2FC812251700449A00A93590 /* iphone-retina */; };
+		2FC812291700479600A93590 /* common in Resources */ = {isa = PBXBuildFile; fileRef = 2FC812281700479600A93590 /* common */; };
 		2FEE8527170030A20013E4C9 /* AppDelegate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FEE8522170030A20013E4C9 /* AppDelegate.cpp */; };
 		2FEE8528170030A20013E4C9 /* ExampleScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FEE8525170030A20013E4C9 /* ExampleScene.cpp */; };
 		2FEE85931700331D0013E4C9 /* Atlas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FEE858D1700331D0013E4C9 /* Atlas.cpp */; };
@@ -38,7 +41,6 @@
 		2FEE85D6170033410013E4C9 /* Skin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FEE85C9170033410013E4C9 /* Skin.cpp */; };
 		2FEE85D7170033410013E4C9 /* Slot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FEE85CA170033410013E4C9 /* Slot.cpp */; };
 		2FEE85D8170033410013E4C9 /* SlotData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FEE85CB170033410013E4C9 /* SlotData.cpp */; };
-		2FEE85DE170033BC0013E4C9 /* data in Resources */ = {isa = PBXBuildFile; fileRef = 2FEE85DD170033BC0013E4C9 /* data */; };
 		BF1373EF128A898400D9F789 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF492D4B1289302400A09262 /* OpenGLES.framework */; };
 		BF1373F0128A899500D9F789 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BF492C21128924A800A09262 /* libxml2.dylib */; };
 		BF1373F1128A899E00D9F789 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = BF492B6912891AC600A09262 /* libz.dylib */; };
@@ -78,6 +80,9 @@
 		1D6058910D05DD3D006BFB54 /* ExampleSpine.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleSpine.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		288765A40DF7441C002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		2FC812241700449A00A93590 /* iphone */ = {isa = PBXFileReference; lastKnownFileType = folder; path = iphone; sourceTree = "<group>"; };
+		2FC812251700449A00A93590 /* iphone-retina */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "iphone-retina"; sourceTree = "<group>"; };
+		2FC812281700479600A93590 /* common */ = {isa = PBXFileReference; lastKnownFileType = folder; path = common; sourceTree = "<group>"; };
 		2FEE8522170030A20013E4C9 /* AppDelegate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AppDelegate.cpp; sourceTree = "<group>"; };
 		2FEE8523170030A20013E4C9 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		2FEE8524170030A20013E4C9 /* AppMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppMacros.h; sourceTree = "<group>"; };
@@ -139,7 +144,6 @@
 		2FEE85C9170033410013E4C9 /* Skin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Skin.cpp; path = "../../../spine-cpp/src/spine/Skin.cpp"; sourceTree = "<group>"; };
 		2FEE85CA170033410013E4C9 /* Slot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Slot.cpp; path = "../../../spine-cpp/src/spine/Slot.cpp"; sourceTree = "<group>"; };
 		2FEE85CB170033410013E4C9 /* SlotData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SlotData.cpp; path = "../../../spine-cpp/src/spine/SlotData.cpp"; sourceTree = "<group>"; };
-		2FEE85DD170033BC0013E4C9 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = data; sourceTree = "<group>"; };
 		781C33B11547F06B00633F88 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		781C33B31547F06B00633F88 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		781C33B51547F06B00633F88 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
@@ -324,7 +328,9 @@
 		784521C214EBA449009D533B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				2FEE85DD170033BC0013E4C9 /* data */,
+				2FC812281700479600A93590 /* common */,
+				2FC812241700449A00A93590 /* iphone */,
+				2FC812251700449A00A93590 /* iphone-retina */,
 				D4EF94ED15BD319D00D803EB /* Icon-144.png */,
 				D4EF94EB15BD319B00D803EB /* Icon-72.png */,
 				D4EF94E915BD319500D803EB /* Icon-114.png */,
@@ -442,7 +448,9 @@
 				2FEE85B91700333C0013E4C9 /* json_internalarray.inl in Resources */,
 				2FEE85BA1700333C0013E4C9 /* json_internalmap.inl in Resources */,
 				2FEE85BD1700333C0013E4C9 /* json_valueiterator.inl in Resources */,
-				2FEE85DE170033BC0013E4C9 /* data in Resources */,
+				2FC812261700449A00A93590 /* iphone in Resources */,
+				2FC812271700449A00A93590 /* iphone-retina in Resources */,
+				2FC812291700479600A93590 /* common in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

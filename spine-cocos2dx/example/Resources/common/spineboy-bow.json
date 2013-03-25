@@ -1,0 +1,204 @@
+{
+"bones": {
+	"torso": {
+		"rotate": [
+			{
+				"time": 0,
+				"angle": -16.96,
+				"curve": [ 0.356, 0.01, 0.827, 0.82 ]
+			},
+			{
+				"time": 0.7333,
+				"angle": -33.3,
+				"curve": [ 0.137, 0.2, 0.652, 0.86 ]
+			},
+			{ "time": 1.6, "angle": -8.18 },
+			{ "time": 2.3333, "angle": 1.82 }
+		],
+		"translate": [
+			{ "time": 0, "x": 0, "y": 0 }
+		]
+	},
+	"neck": {
+		"rotate": [
+			{ "time": 0, "angle": 10.71 },
+			{
+				"time": 0.7333,
+				"angle": -12.37,
+				"curve": [ 0.137, 0.2, 0.652, 0.86 ]
+			},
+			{ "time": 2.3333, "angle": 12.74 }
+		],
+		"translate": [
+			{ "time": 0, "x": 0, "y": 0 },
+			{
+				"time": 0.7333,
+				"x": -1.67,
+				"y": -3.3,
+				"curve": [ 0.137, 0.2, 0.652, 0.86 ]
+			},
+			{ "time": 2.3333, "x": -1.04, "y": -0.38 }
+		]
+	},
+	"head": {
+		"rotate": [
+			{ "time": 0, "angle": 12.63 },
+			{
+				"time": 0.7333,
+				"angle": 10.39,
+				"curve": [ 0.137, 0.2, 0.652, 0.86 ]
+			},
+			{ "time": 2.3333, "angle": -11.41 }
+		],
+		"translate": [
+			{ "time": 0, "x": 0, "y": 0 },
+			{ "time": 0.7333, "x": -0.85, "y": -5.38 },
+			{ "time": 2.3333, "x": 1.02, "y": 4.99 }
+		]
+	},
+	"right shoulder": {
+		"rotate": [
+			{ "time": 0, "angle": -7.36 },
+			{ "time": 0.7333, "angle": -229.15 },
+			{ "time": 1.9666, "angle": -12.04 },
+			{ "time": 2.5666, "angle": -39.4 }
+		],
+		"translate": [
+			{ "time": 0, "x": 0, "y": 0 },
+			{ "time": 0.7333, "x": -3.78, "y": -8.32 },
+			{
+				"time": 1.2666,
+				"x": -2.26,
+				"y": 1.26,
+				"curve": [ 0.08, 0.08, 0.75, 1 ]
+			},
+			{ "time": 1.9666, "x": -5.25, "y": 7.6 },
+			{ "time": 2.5666, "x": -5.58, "y": 13.32 }
+		]
+	},
+	"right arm": {
+		"rotate": [
+			{ "time": 0, "angle": 6.19 },
+			{ "time": 0.7333, "angle": 19.54 },
+			{
+				"time": 1.2666,
+				"angle": 90.5,
+				"curve": [ 0.08, 0.08, 0.75, 1 ]
+			},
+			{ "time": 1.9666, "angle": 124.15 },
+			{ "time": 2.5666, "angle": 133.59 }
+		],
+		"translate": [
+			{ "time": 0, "x": 0, "y": 0 }
+		]
+	},
+	"left shoulder": {
+		"rotate": [
+			{ "time": 0, "angle": -21.47 },
+			{ "time": 0.7333, "angle": 94.34 },
+			{
+				"time": 1.4333,
+				"angle": 60.17,
+				"curve": [ 0.08, 0.08, 0.75, 1 ]
+			},
+			{ "time": 1.8666, "angle": 78.57 },
+			{ "time": 2.3333, "angle": 68.5 }
+		],
+		"translate": [
+			{ "time": 0, "x": 0, "y": 0 },
+			{ "time": 0.7333, "x": -8.29, "y": 5.93 },
+			{ "time": 1.8666, "x": -4.3, "y": -5.12 }
+		]
+	},
+	"left arm": {
+		"rotate": [
+			{ "time": 0, "angle": 56.2 },
+			{ "time": 0.7333, "angle": -28.44 },
+			{
+				"time": 1.2666,
+				"angle": -10.8,
+				"curve": [ 0.08, 0.08, 0.75, 1 ]
+			},
+			{ "time": 1.8666, "angle": -43.07 }
+		],
+		"translate": [
+			{ "time": 0, "x": 0, "y": 0 },
+			{ "time": 1.8666, "x": 2.71, "y": 0.13 }
+		]
+	},
+	"right hand": {
+		"rotate": [
+			{ "time": 0, "angle": 0 },
+			{ "time": 0.7333, "angle": -18.22 },
+			{
+				"time": 1.2666,
+				"angle": -33.49,
+				"curve": [ 0.08, 0.08, 0.75, 1 ]
+			},
+			{ "time": 1.9666, "angle": -3.98 },
+			{ "time": 2.5666, "angle": 1.45 }
+		],
+		"translate": [
+			{ "time": 0, "x": 0, "y": 0 }
+		]
+	},
+	"left hand": {
+		"rotate": [
+			{ "time": 0, "angle": 0 },
+			{ "time": 0.7333, "angle": -30.39 },
+			{ "time": 1.9666, "angle": -11.61 }
+		],
+		"translate": [
+			{ "time": 0, "x": 0, "y": 0 },
+			{ "time": 1.8666, "x": 2.71, "y": -0.04 }
+		]
+	},
+	"hip": {
+		"translate": [
+			{ "time": 0, "x": 0, "y": 0 }
+		]
+	},
+	"left upper leg": {
+		"translate": [
+			{ "time": 0, "x": 0, "y": 0 }
+		]
+	},
+	"left lower leg": {
+		"translate": [
+			{ "time": 0, "x": 0, "y": 0 }
+		]
+	},
+	"left foot": {
+		"translate": [
+			{ "time": 0, "x": 0, "y": 0 }
+		]
+	},
+	"right upper leg": {
+		"translate": [
+			{ "time": 0, "x": 0, "y": 0 }
+		]
+	},
+	"right lower leg": {
+		"translate": [
+			{ "time": 0, "x": 0, "y": 0 }
+		]
+	},
+	"right foot": {
+		"translate": [
+			{ "time": 0, "x": 0, "y": 0 }
+		]
+	}
+},
+"slots": {
+	"left hand item": {
+		"attachment": [
+			{ "time": 0, "name": "bow" }
+		]
+	},
+	"left hand": {
+		"attachment": [
+			{ "time": 0, "name": null }
+		]
+	}
+}
+}
