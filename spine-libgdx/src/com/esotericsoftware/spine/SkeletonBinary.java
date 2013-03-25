@@ -57,6 +57,8 @@ public class SkeletonBinary {
 	static public final int CURVE_STEPPED = 1;
 	static public final int CURVE_BEZIER = 2;
 
+	static private final Color tempColor = new Color();
+
 	private final AttachmentLoader attachmentLoader;
 	private float scale = 1;
 
@@ -208,7 +210,7 @@ public class SkeletonBinary {
 							if (keyframeIndex < keyCount - 1) readCurve(input, keyframeIndex, timeline);
 						}
 						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getDuration());
+						duration = Math.max(duration, timeline.getKeyframes()[keyCount * 2 - 2]);
 						break;
 					}
 					case TIMELINE_TRANSLATE:
@@ -228,7 +230,7 @@ public class SkeletonBinary {
 							if (keyframeIndex < keyCount - 1) readCurve(input, keyframeIndex, timeline);
 						}
 						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getDuration());
+						duration = Math.max(duration, timeline.getKeyframes()[keyCount * 3 - 3]);
 						break;
 					default:
 						throw new RuntimeException("Invalid timeline type for a bone: " + timelineType + " (" + boneName + ")");
@@ -250,12 +252,12 @@ public class SkeletonBinary {
 						timeline.setSlotIndex(slotIndex);
 						for (int keyframeIndex = 0; keyframeIndex < keyCount; keyframeIndex++) {
 							float time = input.readFloat();
-							Color.rgba8888ToColor(Color.tmp, input.readInt());
-							timeline.setKeyframe(keyframeIndex, time, Color.tmp.r, Color.tmp.g, Color.tmp.b, Color.tmp.a);
+							Color.rgba8888ToColor(tempColor, input.readInt());
+							timeline.setKeyframe(keyframeIndex, time, tempColor.r, tempColor.g, tempColor.b, tempColor.a);
 							if (keyframeIndex < keyCount - 1) readCurve(input, keyframeIndex, timeline);
 						}
 						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getDuration());
+						duration = Math.max(duration, timeline.getKeyframes()[keyCount * 5 - 5]);
 						break;
 					}
 					case TIMELINE_ATTACHMENT:
@@ -264,7 +266,7 @@ public class SkeletonBinary {
 						for (int keyframeIndex = 0; keyframeIndex < keyCount; keyframeIndex++)
 							timeline.setKeyframe(keyframeIndex, input.readFloat(), input.readString());
 						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getDuration());
+						duration = Math.max(duration, timeline.getKeyframes()[keyCount - 1]);
 						break;
 					default:
 						throw new RuntimeException("Invalid timeline type for a slot: " + timelineType + " (" + slotName + ")");

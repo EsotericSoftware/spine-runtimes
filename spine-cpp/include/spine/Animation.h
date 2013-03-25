@@ -53,10 +53,6 @@ public:
 	virtual ~Timeline () {
 	}
 
-	virtual float getDuration () const = 0;
-
-	virtual int getKeyframeCount () const = 0;
-
 	virtual void apply (BaseSkeleton *skeleton, float time, float alpha = 1) const = 0;
 };
 
@@ -92,8 +88,6 @@ public:
 	RotateTimeline (int keyframeCount);
 	virtual ~RotateTimeline ();
 
-	virtual float getDuration () const;
-	virtual int getKeyframeCount () const;
 	virtual void apply (BaseSkeleton *skeleton, float time, float alpha = 1) const;
 
 	void setKeyframe (int keyframeIndex, float time, float value);
@@ -110,8 +104,6 @@ public:
 	TranslateTimeline (int keyframeCount);
 	virtual ~TranslateTimeline ();
 
-	virtual float getDuration () const;
-	virtual int getKeyframeCount () const;
 	virtual void apply (BaseSkeleton *skeleton, float time, float alpha = 1) const;
 
 	void setKeyframe (int keyframeIndex, float time, float x, float y);
@@ -137,8 +129,6 @@ public:
 	ColorTimeline (int keyframeCount);
 	virtual ~ColorTimeline ();
 
-	virtual float getDuration () const;
-	virtual int getKeyframeCount () const;
 	virtual void apply (BaseSkeleton *skeleton, float time, float alpha = 1) const;
 
 	void setKeyframe (int keyframeIndex, float time, float r, float g, float b, float a);
@@ -156,8 +146,6 @@ public:
 	AttachmentTimeline (int keyframeCount);
 	virtual ~AttachmentTimeline ();
 
-	virtual float getDuration () const;
-	virtual int getKeyframeCount () const;
 	virtual void apply (BaseSkeleton *skeleton, float time, float alpha = 1) const;
 
 	/** The AttachmentTimeline owns the attachmentName.

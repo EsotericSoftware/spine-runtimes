@@ -23,11 +23,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
+#include <spine/BaseSkeletonJson.h>
 #include <cstdlib>
 #include <fstream>
 #include <stdexcept>
+#include <algorithm>
 #include <json/json.h>
-#include <spine/BaseSkeletonJson.h>
 #include <spine/BaseAttachmentLoader.h>
 #include <spine/BaseRegionAttachment.h>
 #include <spine/SkeletonData.h>
@@ -38,6 +39,7 @@
 
 using std::string;
 using std::vector;
+using std::max;
 using std::runtime_error;
 using std::invalid_argument;
 
@@ -271,7 +273,7 @@ Animation* BaseSkeletonJson::readAnimation (const char *begin, const char *end, 
 					keyframeIndex++;
 				}
 				timelines.push_back(timeline);
-				if (timeline->getDuration() > duration) duration = timeline->getDuration();
+				duration = max(duration, timeline->frames[values.size() * 2 - 2]);
 
 			} else if (timelineName == TIMELINE_TRANSLATE || timelineName == TIMELINE_SCALE) {
 				TranslateTimeline *timeline;
@@ -296,7 +298,7 @@ Animation* BaseSkeletonJson::readAnimation (const char *begin, const char *end, 
 					keyframeIndex++;
 				}
 				timelines.push_back(timeline);
-				if (timeline->getDuration() > duration) duration = timeline->getDuration();
+				duration = max(duration, timeline->frames[values.size() * 3 - 3]);
 
 			} else {
 				throw runtime_error("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
@@ -333,7 +335,7 @@ Animation* BaseSkeletonJson::readAnimation (const char *begin, const char *end, 
 						keyframeIndex++;
 					}
 					timelines.push_back(timeline);
-					if (timeline->getDuration() > duration) duration = timeline->getDuration();
+					duration = max(duration, timeline->frames[values.size() * 5 - 5]);
 
 				} else if (timelineName == TIMELINE_ATTACHMENT) {
 					AttachmentTimeline *timeline = new AttachmentTimeline(values.size());
@@ -348,7 +350,7 @@ Animation* BaseSkeletonJson::readAnimation (const char *begin, const char *end, 
 								nameValue.isNull() ? 0 : new string(nameValue.asString()));
 					}
 					timelines.push_back(timeline);
-					if (timeline->getDuration() > duration) duration = timeline->getDuration();
+					duration = max(duration, timeline->frames[values.size() - 1]);
 
 				} else {
 					throw runtime_error("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");

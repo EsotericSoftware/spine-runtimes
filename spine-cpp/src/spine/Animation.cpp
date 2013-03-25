@@ -180,14 +180,6 @@ RotateTimeline::~RotateTimeline () {
 	delete[] frames;
 }
 
-float RotateTimeline::getDuration () const {
-	return frames[framesLength - 2];
-}
-
-int RotateTimeline::getKeyframeCount () const {
-	return framesLength / 2;
-}
-
 void RotateTimeline::setKeyframe (int keyframeIndex, float time, float value) {
 	keyframeIndex *= 2;
 	frames[keyframeIndex] = time;
@@ -249,14 +241,6 @@ TranslateTimeline::TranslateTimeline (int keyframeCount) :
 
 TranslateTimeline::~TranslateTimeline () {
 	delete[] frames;
-}
-
-float TranslateTimeline::getDuration () const {
-	return frames[framesLength - 3];
-}
-
-int TranslateTimeline::getKeyframeCount () const {
-	return framesLength / 3;
 }
 
 void TranslateTimeline::setKeyframe (int keyframeIndex, float time, float x, float y) {
@@ -347,14 +331,6 @@ ColorTimeline::~ColorTimeline () {
 	delete[] frames;
 }
 
-float ColorTimeline::getDuration () const {
-	return frames[framesLength - 5];
-}
-
-int ColorTimeline::getKeyframeCount () const {
-	return framesLength / 5;
-}
-
 void ColorTimeline::setKeyframe (int keyframeIndex, float time, float r, float g, float b, float a) {
 	keyframeIndex *= 5;
 	frames[keyframeIndex] = time;
@@ -426,14 +402,6 @@ AttachmentTimeline::~AttachmentTimeline () {
 	for (int i = 0; i < framesLength; i++)
 		if (attachmentNames[i]) delete attachmentNames[i];
 	delete[] attachmentNames;
-}
-
-float AttachmentTimeline::getDuration () const {
-	return frames[framesLength - 1];
-}
-
-int AttachmentTimeline::getKeyframeCount () const {
-	return framesLength;
 }
 
 void AttachmentTimeline::setKeyframe (int keyframeIndex, float time, string *attachmentName) {

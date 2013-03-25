@@ -44,8 +44,7 @@ public class Animation {
 		return timelines;
 	}
 
-	/** Returns the duration of the animation in seconds. Defaults to the max {@link Timeline#getDuration() duration} of the
-	 * timelines. */
+	/** Returns the duration of the animation in seconds. */
 	public float getDuration () {
 		return duration;
 	}
@@ -115,13 +114,7 @@ public class Animation {
 		return -1;
 	}
 
-	/** The keyframes for a single animation timeline. */
 	static public interface Timeline {
-		/** Returns the time in seconds of the last keyframe. */
-		public float getDuration ();
-
-		public int getKeyframeCount ();
-
 		/** Sets the value(s) for the specified time. */
 		public void apply (Skeleton skeleton, float time, float alpha);
 	}
@@ -136,6 +129,10 @@ public class Animation {
 
 		public CurveTimeline (int keyframeCount) {
 			curves = new float[(keyframeCount - 1) * 6];
+		}
+
+		public int getKeyframeCount () {
+			return curves.length / 6 + 1;
 		}
 
 		public void setLinear (int keyframeIndex) {
@@ -215,14 +212,6 @@ public class Animation {
 			frames = new float[keyframeCount * 2];
 		}
 
-		public float getDuration () {
-			return frames[frames.length - 2];
-		}
-
-		public int getKeyframeCount () {
-			return frames.length / 2;
-		}
-
 		public void setBoneIndex (int boneIndex) {
 			this.boneIndex = boneIndex;
 		}
@@ -290,14 +279,6 @@ public class Animation {
 		public TranslateTimeline (int keyframeCount) {
 			super(keyframeCount);
 			frames = new float[keyframeCount * 3];
-		}
-
-		public float getDuration () {
-			return frames[frames.length - 3];
-		}
-
-		public int getKeyframeCount () {
-			return frames.length / 3;
 		}
 
 		public void setBoneIndex (int boneIndex) {
@@ -391,14 +372,6 @@ public class Animation {
 			frames = new float[keyframeCount * 5];
 		}
 
-		public float getDuration () {
-			return frames[frames.length - 5];
-		}
-
-		public int getKeyframeCount () {
-			return frames.length / 5;
-		}
-
 		public void setSlotIndex (int slotIndex) {
 			this.slotIndex = slotIndex;
 		}
@@ -466,10 +439,6 @@ public class Animation {
 		public AttachmentTimeline (int keyframeCount) {
 			frames = new float[keyframeCount];
 			attachmentNames = new String[keyframeCount];
-		}
-
-		public float getDuration () {
-			return frames[frames.length - 1];
 		}
 
 		public int getKeyframeCount () {

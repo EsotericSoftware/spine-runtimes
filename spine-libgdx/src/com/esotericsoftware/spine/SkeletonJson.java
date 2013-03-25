@@ -211,7 +211,7 @@ public class SkeletonJson {
 						keyframeIndex++;
 					}
 					timelines.add(timeline);
-					duration = Math.max(duration, timeline.getDuration());
+					duration = Math.max(duration, timeline.getKeyframes()[timeline.getKeyframeCount() * 2 - 2]);
 
 				} else if (timelineName.equals(TIMELINE_TRANSLATE) || timelineName.equals(TIMELINE_SCALE)) {
 					TranslateTimeline timeline;
@@ -234,7 +234,7 @@ public class SkeletonJson {
 						keyframeIndex++;
 					}
 					timelines.add(timeline);
-					duration = Math.max(duration, timeline.getDuration());
+					duration = Math.max(duration, timeline.getKeyframes()[timeline.getKeyframeCount() * 3 - 3]);
 
 				} else
 					throw new RuntimeException("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
@@ -264,7 +264,7 @@ public class SkeletonJson {
 							keyframeIndex++;
 						}
 						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getDuration());
+						duration = Math.max(duration, timeline.getKeyframes()[timeline.getKeyframeCount() * 5 - 5]);
 
 					} else if (timelineName.equals(TIMELINE_ATTACHMENT)) {
 						AttachmentTimeline timeline = new AttachmentTimeline(values.size);
@@ -276,7 +276,7 @@ public class SkeletonJson {
 							timeline.setKeyframe(keyframeIndex++, time, (String)valueMap.get("name"));
 						}
 						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getDuration());
+						duration = Math.max(duration, timeline.getKeyframes()[timeline.getKeyframeCount() - 1]);
 
 					} else
 						throw new RuntimeException("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
