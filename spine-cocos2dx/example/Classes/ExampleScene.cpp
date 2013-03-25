@@ -1,7 +1,6 @@
 #include "ExampleScene.h"
 #include <iostream>
 #include <fstream>
-#include <spine-cocos2dx/spine.h>
 
 using namespace cocos2d;
 using namespace spine;
@@ -9,21 +8,20 @@ using namespace std;
 
 CCScene* ExampleScene::scene () {
 	CCScene *scene = CCScene::create();
-	ExampleScene *layer = ExampleScene::create();
-	scene->addChild(layer);
+	scene->addChild(ExampleScene::create());
 	return scene;
 }
 
 bool ExampleScene::init () {
 	if (!CCLayer::init()) return false;
 
-	Atlas *atlas = new Atlas("spineboy.txt");
+	atlas = new Atlas("spineboy.txt");
 	SkeletonJson json(atlas);
 	json.scale = 0.5;
-	SkeletonData *skeletonData = json.readSkeletonData("spineboy-skeleton.json");
-	Animation *animation = json.readAnimation("spineboy-walk.json", skeletonData);
+	skeletonData = json.readSkeletonData("spineboy-skeleton.json");
+	animation = json.readAnimation("spineboy-walk.json", skeletonData);
 
-	CCSkeleton* skeletonNode = new CCSkeleton(skeletonData);
+	CCSkeleton* skeletonNode = CCSkeleton::create(skeletonData);
 	skeletonNode->state->setAnimation(animation, true);
 	skeletonNode->debug = true;
 
@@ -32,4 +30,10 @@ bool ExampleScene::init () {
 	addChild(skeletonNode);
 
 	return true;
+}
+
+ExampleScene::~ExampleScene () {
+	delete atlas;
+	delete skeletonData;
+	delete animation;
 }

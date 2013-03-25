@@ -37,6 +37,12 @@
 using namespace spine;
 USING_NS_CC;
 
+CCSkeleton* CCSkeleton::create (SkeletonData* skeletonData) {
+	CCSkeleton* skeleton = new CCSkeleton(skeletonData);
+	skeleton->autorelease();
+	return skeleton;
+}
+
 CCSkeleton::CCSkeleton (SkeletonData *skeletonData, AnimationStateData *stateData) :
 				debug(false) {
 	if (!skeletonData) throw std::invalid_argument("skeletonData cannot be null.");

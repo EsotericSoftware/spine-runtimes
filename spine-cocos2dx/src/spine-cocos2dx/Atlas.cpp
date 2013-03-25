@@ -56,6 +56,7 @@ Atlas::Atlas (const char *begin, const char *end) {
 BaseAtlasPage* Atlas::newAtlasPage (const std::string &name) {
 	AtlasPage *page = new AtlasPage();
 	page->texture = CCTextureCache::sharedTextureCache()->addImage(name.c_str());
+	page->texture->retain();
 	page->atlas = CCTextureAtlas::createWithTexture(page->texture, 4);
 	page->atlas->retain();
 	return page;
