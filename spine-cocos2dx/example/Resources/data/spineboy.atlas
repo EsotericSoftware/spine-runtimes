@@ -1,5 +1,5 @@
 
-../data/spineboy.png
+data/spineboy.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
