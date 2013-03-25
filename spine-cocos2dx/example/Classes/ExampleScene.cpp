@@ -19,6 +19,7 @@ bool ExampleScene::init() {
 
 	Atlas *atlas = new Atlas("spineboy.txt");
 	SkeletonJson json(atlas);
+  json.scale = 0.5;
 	SkeletonData *skeletonData = json.readSkeletonDataFile("spineboy-skeleton.json");
 	Animation *animation = json.readAnimationFile("spineboy-walk.json", skeletonData);
 
