@@ -34,9 +34,7 @@ using namespace spine;
 int main () {
 
 	try {
-		ifstream atlasFile("../data/spineboy.atlas");
-		Atlas *atlas = new Atlas(atlasFile);
-
+		Atlas *atlas = new Atlas("../data/spineboy.atlas");
 		SkeletonJson json(atlas);
 		SkeletonData *skeletonData = json.readSkeletonDataFile("../data/spineboy-skeleton.json");
 		Animation *animation = json.readAnimationFile("../data/spineboy-walk.json", skeletonData);
