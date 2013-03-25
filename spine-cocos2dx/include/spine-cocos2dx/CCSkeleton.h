@@ -41,7 +41,7 @@ public:
 	AnimationState *state;
 	bool debug;
 
-	static CCSkeleton* CCSkeleton::create (SkeletonData* skeletonData);
+	static CCSkeleton* create (SkeletonData* skeletonData);
 	CCSkeleton (SkeletonData *skeletonData, AnimationStateData *stateData = 0);
 	virtual ~CCSkeleton ();
 

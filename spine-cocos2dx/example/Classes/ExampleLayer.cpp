@@ -1,4 +1,4 @@
-#include "ExampleScene.h"
+#include "ExampleLayer.h"
 #include <iostream>
 #include <fstream>
 
@@ -6,13 +6,13 @@ using namespace cocos2d;
 using namespace spine;
 using namespace std;
 
-CCScene* ExampleScene::scene () {
+CCScene* ExampleLayer::scene () {
 	CCScene *scene = CCScene::create();
-	scene->addChild(ExampleScene::create());
+	scene->addChild(ExampleLayer::create());
 	return scene;
 }
 
-bool ExampleScene::init () {
+bool ExampleLayer::init () {
 	if (!CCLayer::init()) return false;
 
 	atlas = new Atlas("spineboy.txt");
@@ -32,7 +32,7 @@ bool ExampleScene::init () {
 	return true;
 }
 
-ExampleScene::~ExampleScene () {
+ExampleLayer::~ExampleLayer () {
 	delete atlas;
 	delete skeletonData;
 	delete animation;

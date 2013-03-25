@@ -14,7 +14,7 @@
 		2FC812271700449A00A93590 /* iphone-retina in Resources */ = {isa = PBXBuildFile; fileRef = 2FC812251700449A00A93590 /* iphone-retina */; };
 		2FC812291700479600A93590 /* common in Resources */ = {isa = PBXBuildFile; fileRef = 2FC812281700479600A93590 /* common */; };
 		2FEE8527170030A20013E4C9 /* AppDelegate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FEE8522170030A20013E4C9 /* AppDelegate.cpp */; };
-		2FEE8528170030A20013E4C9 /* ExampleScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FEE8525170030A20013E4C9 /* ExampleScene.cpp */; };
+		2FEE8528170030A20013E4C9 /* ExampleLayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FEE8525170030A20013E4C9 /* ExampleLayer.cpp */; };
 		2FEE85931700331D0013E4C9 /* Atlas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FEE858D1700331D0013E4C9 /* Atlas.cpp */; };
 		2FEE85941700331D0013E4C9 /* AtlasAttachmentLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FEE858E1700331D0013E4C9 /* AtlasAttachmentLoader.cpp */; };
 		2FEE85951700331D0013E4C9 /* CCSkeleton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FEE858F1700331D0013E4C9 /* CCSkeleton.cpp */; };
@@ -78,8 +78,8 @@
 		2FEE8522170030A20013E4C9 /* AppDelegate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AppDelegate.cpp; sourceTree = "<group>"; };
 		2FEE8523170030A20013E4C9 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		2FEE8524170030A20013E4C9 /* AppMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppMacros.h; sourceTree = "<group>"; };
-		2FEE8525170030A20013E4C9 /* ExampleScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ExampleScene.cpp; sourceTree = "<group>"; };
-		2FEE8526170030A20013E4C9 /* ExampleScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExampleScene.h; sourceTree = "<group>"; };
+		2FEE8525170030A20013E4C9 /* ExampleLayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ExampleLayer.cpp; sourceTree = "<group>"; };
+		2FEE8526170030A20013E4C9 /* ExampleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExampleLayer.h; sourceTree = "<group>"; };
 		2FEE8586170033180013E4C9 /* Atlas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Atlas.h; path = "../../include/spine-cocos2dx/Atlas.h"; sourceTree = "<group>"; };
 		2FEE8587170033180013E4C9 /* AtlasAttachmentLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AtlasAttachmentLoader.h; path = "../../include/spine-cocos2dx/AtlasAttachmentLoader.h"; sourceTree = "<group>"; };
 		2FEE8588170033180013E4C9 /* CCSkeleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCSkeleton.h; path = "../../include/spine-cocos2dx/CCSkeleton.h"; sourceTree = "<group>"; };
@@ -343,8 +343,8 @@
 				2FEE8522170030A20013E4C9 /* AppDelegate.cpp */,
 				2FEE8523170030A20013E4C9 /* AppDelegate.h */,
 				2FEE8524170030A20013E4C9 /* AppMacros.h */,
-				2FEE8525170030A20013E4C9 /* ExampleScene.cpp */,
-				2FEE8526170030A20013E4C9 /* ExampleScene.h */,
+				2FEE8525170030A20013E4C9 /* ExampleLayer.cpp */,
+				2FEE8526170030A20013E4C9 /* ExampleLayer.h */,
 			);
 			name = Classes;
 			path = ../Classes;
@@ -457,7 +457,7 @@
 				BF4DE6AD138BB89600CF907D /* RootViewController.mm in Sources */,
 				D4ABB4B313B4395300552E6E /* main.mm in Sources */,
 				2FEE8527170030A20013E4C9 /* AppDelegate.cpp in Sources */,
-				2FEE8528170030A20013E4C9 /* ExampleScene.cpp in Sources */,
+				2FEE8528170030A20013E4C9 /* ExampleLayer.cpp in Sources */,
 				2FEE85931700331D0013E4C9 /* Atlas.cpp in Sources */,
 				2FEE85941700331D0013E4C9 /* AtlasAttachmentLoader.cpp in Sources */,
 				2FEE85951700331D0013E4C9 /* CCSkeleton.cpp in Sources */,

@@ -3,14 +3,13 @@
 #include <vector>
 #include <string>
 
-#include "ExampleScene.h"
+#include "ExampleLayer.h"
 #include "AppMacros.h"
 
 USING_NS_CC;
 using namespace std;
 
 AppDelegate::AppDelegate () {
-
 }
 
 AppDelegate::~AppDelegate () {
@@ -58,8 +57,7 @@ bool AppDelegate::applicationDidFinishLaunching () {
 
 	director->setDisplayStats(true);
 	director->setAnimationInterval(1.0 / 60);
-	CCScene *pScene = ExampleScene::scene();
-	director->runWithScene(pScene);
+	director->runWithScene(ExampleLayer::scene());
 
 	return true;
 }

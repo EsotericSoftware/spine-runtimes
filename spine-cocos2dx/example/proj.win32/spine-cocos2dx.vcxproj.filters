@@ -24,9 +24,6 @@
     <ClInclude Include="main.h">
       <Filter>win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\ExampleScene.h">
-      <Filter>Classes</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\AppDelegate.h">
       <Filter>Classes</Filter>
     </ClInclude>
@@ -126,13 +123,13 @@
     <ClInclude Include="..\..\include\spine-cocos2dx\RegionAttachment.h">
       <Filter>Classes\spine-cocos2dx</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\ExampleLayer.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\ExampleScene.cpp">
-      <Filter>Classes</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\AppDelegate.cpp">
       <Filter>Classes</Filter>
@@ -202,6 +199,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\spine-cocos2dx\CCSkeleton.cpp">
       <Filter>Classes\spine-cocos2dx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\ExampleLayer.cpp">
+      <Filter>Classes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

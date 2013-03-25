@@ -156,7 +156,7 @@
     <ClInclude Include="..\..\include\spine-cocos2dx\spine.h" />
     <ClInclude Include="..\Classes\AppDelegate.h" />
     <ClInclude Include="..\Classes\AppMacros.h" />
-    <ClInclude Include="..\Classes\ExampleScene.h" />
+    <ClInclude Include="..\Classes\ExampleLayer.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
@@ -183,7 +183,7 @@
     <ClCompile Include="..\..\src\spine-cocos2dx\Skeleton.cpp" />
     <ClCompile Include="..\..\src\spine-cocos2dx\SkeletonJson.cpp" />
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
-    <ClCompile Include="..\Classes\ExampleScene.cpp" />
+    <ClCompile Include="..\Classes\ExampleLayer.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>

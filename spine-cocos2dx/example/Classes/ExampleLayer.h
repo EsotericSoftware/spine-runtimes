@@ -1,10 +1,10 @@
-#ifndef _EXAMPLESCENE_H_
-#define _EXAMPLESCENE_H_
+#ifndef _EXAMPLELAYER_H_
+#define _EXAMPLELAYER_H_
 
 #include "cocos2d.h"
 #include <spine-cocos2dx/spine.h>
 
-class ExampleScene: public cocos2d::CCLayer {
+class ExampleLayer: public cocos2d::CCLayer {
 private:
 	spine::Atlas *atlas;
 	spine::SkeletonData *skeletonData;
@@ -12,11 +12,11 @@ private:
 
 public:
 	static cocos2d::CCScene* scene ();
-	~ExampleScene ();
+	~ExampleLayer ();
 
 	virtual bool init ();
 
-	CREATE_FUNC (ExampleScene);
+	CREATE_FUNC (ExampleLayer);
 };
 
-#endif // _EXAMPLESCENE_H_
+#endif // _EXAMPLELAYER_H_
