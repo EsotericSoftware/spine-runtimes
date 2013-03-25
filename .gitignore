@@ -9,3 +9,5 @@ target
 *.user
 *.suo
 spine-cocos2dx/cocos2dx
+*.swp
+.DS_Store
