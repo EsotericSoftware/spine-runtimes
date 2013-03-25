@@ -3,13 +3,13 @@
 
 #include "cocos2d.h"
 
-class ExampleScene : public cocos2d::CCLayer {
+class ExampleScene: public cocos2d::CCLayer {
 public:
-	static cocos2d::CCScene* scene();
+	static cocos2d::CCScene* scene ();
 
-	virtual bool init();
+	virtual bool init ();
 
-	CREATE_FUNC(ExampleScene);
+	CREATE_FUNC (ExampleScene);
 };
 
-#endif // SPINE_EXAMPLESCENE_H_
+#endif // _EXAMPLESCENE_H_

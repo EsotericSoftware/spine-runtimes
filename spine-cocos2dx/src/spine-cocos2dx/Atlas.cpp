@@ -39,8 +39,8 @@ AtlasPage::~AtlasPage () {
 
 Atlas::Atlas (const std::string &path) {
 	unsigned long size;
-	char* data = reinterpret_cast<char*>(CCFileUtils::sharedFileUtils()->getFileData(
-		CCFileUtils::sharedFileUtils()->fullPathForFilename(path.c_str()).c_str(), "r", &size));
+	char *data = reinterpret_cast<char*>(CCFileUtils::sharedFileUtils()->getFileData(
+			CCFileUtils::sharedFileUtils()->fullPathForFilename(path.c_str()).c_str(), "r", &size));
 	if (!data) throw std::runtime_error("Error reading atlas file: " + path);
 	load(data, data + size);
 }

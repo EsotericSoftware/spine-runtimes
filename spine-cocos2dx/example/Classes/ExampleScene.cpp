@@ -7,19 +7,19 @@ using namespace cocos2d;
 using namespace spine;
 using namespace std;
 
-CCScene* ExampleScene::scene() {
+CCScene* ExampleScene::scene () {
 	CCScene *scene = CCScene::create();
 	ExampleScene *layer = ExampleScene::create();
 	scene->addChild(layer);
 	return scene;
 }
 
-bool ExampleScene::init() {
+bool ExampleScene::init () {
 	if (!CCLayer::init()) return false;
 
 	Atlas *atlas = new Atlas("spineboy.txt");
 	SkeletonJson json(atlas);
-  json.scale = 0.5;
+	json.scale = 0.5;
 	SkeletonData *skeletonData = json.readSkeletonData("spineboy-skeleton.json");
 	Animation *animation = json.readAnimation("spineboy-walk.json", skeletonData);
 
