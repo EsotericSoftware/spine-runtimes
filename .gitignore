@@ -3,11 +3,12 @@ spine-sfml/Debug/*
 spine-libgdx/bin/*
 spine-libgdx/libs/*
 target
-*Debug.win32*
+*Debug.win32
 *.sdf
 *.opensdf
 *.user
 *.suo
-spine-cocos2dx/cocos2dx
+spine-cocos2dx/
+!spine-cocos2dx/Place cocos2dx here.txt
 *.swp
 .DS_Store
