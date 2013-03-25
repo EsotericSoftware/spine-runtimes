@@ -8,7 +8,7 @@ target
 *.opensdf
 *.user
 *.suo
-spine-cocos2dx/
-!spine-cocos2dx/Place cocos2dx here.txt
+spine-cocos2dx/cocos2dx/
+!spine-cocos2dx/cocos2dx/Place cocos2dx here.txt
 *.swp
 .DS_Store
