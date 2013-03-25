@@ -39,6 +39,7 @@ class CCSkeleton: public cocos2d::CCNode {
 public:
 	Skeleton *skeleton;
 	AnimationState *state;
+	bool debug;
 
 	CCSkeleton (SkeletonData *skeletonData, AnimationStateData *stateData = 0);
 	virtual ~CCSkeleton ();

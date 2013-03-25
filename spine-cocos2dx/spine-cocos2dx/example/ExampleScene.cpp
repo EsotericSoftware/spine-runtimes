@@ -24,9 +24,10 @@ bool ExampleScene::init() {
 
 	CCSkeleton* skeletonNode = new CCSkeleton(skeletonData);
 	skeletonNode->state->setAnimation(animation, true);
+	skeletonNode->debug = true;
 
-	CCSize winSize = CCDirector::sharedDirector()->getWinSize();
-	skeletonNode->setPosition(ccp(winSize.width / 2, 20));
+	CCSize windowSize = CCDirector::sharedDirector()->getWinSize();
+	skeletonNode->setPosition(ccp(windowSize.width / 2, 20));
 	addChild(skeletonNode);
 
 	return true;
