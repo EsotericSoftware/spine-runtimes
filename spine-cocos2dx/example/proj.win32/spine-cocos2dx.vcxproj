@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{B8BF9E81-35FD-4582-BA1C-B85FA365BABB}</ProjectGuid>
+    <ProjectGuid>{DB4C84B9-AC6D-46A1-B7E6-A77FE4515ACF}</ProjectGuid>
     <RootNamespace>spine</RootNamespace>
     <Keyword>Win32Proj</Keyword>
     <ProjectName>spine-cocos2dx</ProjectName>
@@ -66,7 +66,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\cocos2dx;$(ProjectDir)..\..\cocos2dx\include;$(ProjectDir)..\..\cocos2dx\kazmath\include;$(ProjectDir)..\..\cocos2dx\platform\win32;$(ProjectDir)..\..\cocos2dx\platform\third_party\win32\OGLES;$(ProjectDir)..\include;$(ProjectDir)..\..\..\spine-cpp\include;$(ProjectDir)..\..\..\spine-cpp\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\cocos2dx;$(ProjectDir)..\..\..\..\cocos2dx\include;$(ProjectDir)..\..\..\..\cocos2dx\kazmath\include;$(ProjectDir)..\..\..\..\cocos2dx\platform\win32;$(ProjectDir)..\..\..\..\cocos2dx\platform\third_party\win32\OGLES;$(ProjectDir)..\Classes;$(ProjectDir)..\..\include;$(ProjectDir)..\..\..\spine-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;COCOS2D_DEBUG=1;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -147,15 +147,16 @@
     <ClInclude Include="..\..\..\spine-cpp\include\spine\Slot.h" />
     <ClInclude Include="..\..\..\spine-cpp\include\spine\SlotData.h" />
     <ClInclude Include="..\..\..\spine-cpp\src\json\json_batchallocator.h" />
-    <ClInclude Include="..\example\AppDelegate.h" />
-    <ClInclude Include="..\example\ExampleScene.h" />
-    <ClInclude Include="..\include\spine-cocos2dx\Atlas.h" />
-    <ClInclude Include="..\include\spine-cocos2dx\AtlasAttachmentLoader.h" />
-    <ClInclude Include="..\include\spine-cocos2dx\CCSkeleton.h" />
-    <ClInclude Include="..\include\spine-cocos2dx\RegionAttachment.h" />
-    <ClInclude Include="..\include\spine-cocos2dx\Skeleton.h" />
-    <ClInclude Include="..\include\spine-cocos2dx\SkeletonJson.h" />
-    <ClInclude Include="..\include\spine-cocos2dx\spine.h" />
+    <ClInclude Include="..\..\include\spine-cocos2dx\Atlas.h" />
+    <ClInclude Include="..\..\include\spine-cocos2dx\AtlasAttachmentLoader.h" />
+    <ClInclude Include="..\..\include\spine-cocos2dx\CCSkeleton.h" />
+    <ClInclude Include="..\..\include\spine-cocos2dx\RegionAttachment.h" />
+    <ClInclude Include="..\..\include\spine-cocos2dx\Skeleton.h" />
+    <ClInclude Include="..\..\include\spine-cocos2dx\SkeletonJson.h" />
+    <ClInclude Include="..\..\include\spine-cocos2dx\spine.h" />
+    <ClInclude Include="..\Classes\AppDelegate.h" />
+    <ClInclude Include="..\Classes\AppMacros.h" />
+    <ClInclude Include="..\Classes\ExampleScene.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
@@ -175,14 +176,14 @@
     <ClCompile Include="..\..\..\spine-cpp\src\spine\Skin.cpp" />
     <ClCompile Include="..\..\..\spine-cpp\src\spine\Slot.cpp" />
     <ClCompile Include="..\..\..\spine-cpp\src\spine\SlotData.cpp" />
-    <ClCompile Include="..\example\AppDelegate.cpp" />
-    <ClCompile Include="..\example\ExampleScene.cpp" />
-    <ClCompile Include="..\src\spine-cocos2dx\Atlas.cpp" />
-    <ClCompile Include="..\src\spine-cocos2dx\AtlasAttachmentLoader.cpp" />
-    <ClCompile Include="..\src\spine-cocos2dx\CCSkeleton.cpp" />
-    <ClCompile Include="..\src\spine-cocos2dx\RegionAttachment.cpp" />
-    <ClCompile Include="..\src\spine-cocos2dx\Skeleton.cpp" />
-    <ClCompile Include="..\src\spine-cocos2dx\SkeletonJson.cpp" />
+    <ClCompile Include="..\..\src\spine-cocos2dx\Atlas.cpp" />
+    <ClCompile Include="..\..\src\spine-cocos2dx\AtlasAttachmentLoader.cpp" />
+    <ClCompile Include="..\..\src\spine-cocos2dx\CCSkeleton.cpp" />
+    <ClCompile Include="..\..\src\spine-cocos2dx\RegionAttachment.cpp" />
+    <ClCompile Include="..\..\src\spine-cocos2dx\Skeleton.cpp" />
+    <ClCompile Include="..\..\src\spine-cocos2dx\SkeletonJson.cpp" />
+    <ClCompile Include="..\Classes\AppDelegate.cpp" />
+    <ClCompile Include="..\Classes\ExampleScene.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
