@@ -524,11 +524,10 @@
 				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
 					"\"$(SDKROOT)/usr/include/libxml2/\"",
-					"\"$(SRCROOT)/../../../../cocos2dx/include\"",
-					"\"$(SRCROOT)/../../../../cocos2dx\"",
-					"\"$(SRCROOT)/../../../../cocos2dx/platform/ios\"",
-					"\"$(SRCROOT)/../../../../cocos2dx/kazmath/include\"",
-					"$(SRCROOT)/../../../../external/chipmunk/include/chipmunk",
+					"\"$(SRCROOT)/../../cocos2dx/include\"",
+					"\"$(SRCROOT)/../../cocos2dx\"",
+					"\"$(SRCROOT)/../../cocos2dx/platform/ios\"",
+					"\"$(SRCROOT)/../../cocos2dx/kazmath/include\"",
 					"\"$(SRCROOT)/../../../spine-cpp/include\"",
 					"\"$(SRCROOT)/../../../spine-cocos2dx/include\"",
 				);
@@ -565,7 +564,6 @@
 					"\"$(SRCROOT)/../../../../cocos2dx\"",
 					"\"$(SRCROOT)/../../../../cocos2dx/platform/ios\"",
 					"\"$(SRCROOT)/../../../../cocos2dx/kazmath/include\"",
-					"$(SRCROOT)/../../../../external/chipmunk/include/chipmunk",
 					"\"$(SRCROOT)/../../../spine-cpp/include\"",
 					"\"$(SRCROOT)/../../../spine-cocos2dx/include\"",
 				);
