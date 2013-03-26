@@ -12,3 +12,4 @@ spine-cocos2dx/cocos2dx/
 *.swp
 .DS_Store
 xcuserdata
+spine-cocos2dx/example/proj.ios/ExampleSpine.xcodeproj/project.xcworkspace/xcuserdata/*
