@@ -67,7 +67,7 @@ void CCSkeleton::update (float deltaTime) {
 
 void CCSkeleton::draw () {
 	CC_NODE_DRAW_SETUP();
-	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	ccGLBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 	skeleton->draw();
 
 	if (debug) {
