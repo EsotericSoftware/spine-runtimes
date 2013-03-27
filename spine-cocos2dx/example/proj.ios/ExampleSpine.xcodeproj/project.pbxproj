@@ -215,15 +215,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		2FEE852B170030EC0013E4C9 /* spine */ = {
-			isa = PBXGroup;
-			children = (
-				2FEE8585170033120013E4C9 /* spine-cocos2dx */,
-				2FEE85841700330E0013E4C9 /* spine-cpp */,
-			);
-			name = spine;
-			sourceTree = "<group>";
-		};
 		2FEE85841700330E0013E4C9 /* spine-cpp */ = {
 			isa = PBXGroup;
 			children = (
@@ -339,7 +330,8 @@
 		BF23D4E2143315EB00657E08 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				2FEE852B170030EC0013E4C9 /* spine */,
+				2FEE85841700330E0013E4C9 /* spine-cpp */,
+				2FEE8585170033120013E4C9 /* spine-cocos2dx */,
 				2FEE8522170030A20013E4C9 /* AppDelegate.cpp */,
 				2FEE8523170030A20013E4C9 /* AppDelegate.h */,
 				2FEE8524170030A20013E4C9 /* AppMacros.h */,

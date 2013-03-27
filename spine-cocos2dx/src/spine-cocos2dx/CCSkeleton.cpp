@@ -44,10 +44,19 @@ CCSkeleton* CCSkeleton::create (SkeletonData* skeletonData) {
 }
 
 CCSkeleton::CCSkeleton (SkeletonData *skeletonData, AnimationStateData *stateData) :
+				opacity(255),
+				opacityModifyRGB(false),
 				debug(false) {
 	if (!skeletonData) throw std::invalid_argument("skeletonData cannot be null.");
 	skeleton = new Skeleton(skeletonData);
 	state = new AnimationState(stateData);
+
+	color.r = 255;
+	color.g = 255;
+	color.b = 255;
+	colorUnmodified = color;
+	blendFunc.src = CC_BLEND_SRC;
+	blendFunc.dst = CC_BLEND_DST;
 
 	setShaderProgram(CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
 	scheduleUpdate();
@@ -67,7 +76,12 @@ void CCSkeleton::update (float deltaTime) {
 
 void CCSkeleton::draw () {
 	CC_NODE_DRAW_SETUP();
-	ccGLBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+	ccGLBlendFunc(blendFunc.src, blendFunc.dst);
+	skeleton->r = color.r / (float)255;
+	skeleton->g = color.g / (float)255;
+	skeleton->b = color.b / (float)255;
+	skeleton->a = opacity / (float)255;
 	skeleton->draw();
 
 	if (debug) {
@@ -102,4 +116,50 @@ void CCSkeleton::draw () {
 			if (i == 0) ccDrawColor4B(0, 255, 0, 255);
 		}
 	}
+}
+
+// CCSkeleton - RGBA protocol
+
+const ccColor3B& CCSkeleton::getColor () {
+	if (opacityModifyRGB) return colorUnmodified;
+	return color;
+}
+
+void CCSkeleton::setColor (const ccColor3B& color) {
+    this->color = colorUnmodified = color;
+    if (opacityModifyRGB) {
+        this->color.r = color.r * opacity / 255;
+        this->color.g = color.g * opacity / 255;
+        this->color.b = color.b * opacity / 255;
+    }    
+}
+
+GLubyte CCSkeleton::getOpacity () {
+    return opacity;
+}
+
+void CCSkeleton::setOpacity (GLubyte opacity) {
+    this->opacity = opacity;
+    // Special opacity for premultiplied textures.
+    if (opacityModifyRGB) this->setColor(colorUnmodified);
+}
+
+void CCSkeleton::setOpacityModifyRGB (bool isOpacityModifyRGB) {
+    ccColor3B oldColor = this->getColor();
+    opacityModifyRGB = isOpacityModifyRGB;
+    this->setColor(oldColor);
+}
+
+bool CCSkeleton::isOpacityModifyRGB () {
+    return opacityModifyRGB;
+}
+
+// CCBlendProtocol
+
+ccBlendFunc CCSkeleton::getBlendFunc () {
+    return blendFunc;
+}
+
+void CCSkeleton::setBlendFunc (ccBlendFunc blendFunc) {
+    this->blendFunc = blendFunc;
 }
