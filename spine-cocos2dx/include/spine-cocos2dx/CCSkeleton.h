@@ -35,7 +35,7 @@ class Skeleton;
 class AnimationState;
 class AnimationStateData;
 
-class CCSkeleton: public cocos2d::CCNode, public cocos2d::CCRGBAProtocol, public cocos2d::CCBlendProtocol {
+class CCSkeleton: public cocos2d::CCNodeRGBA, public cocos2d::CCBlendProtocol {
 public:
 	Skeleton *skeleton;
 	AnimationState *state;
@@ -47,14 +47,6 @@ public:
 
 	virtual void update (float deltaTime);
 	virtual void draw ();
-
-	// CCRGBAProtocol
-	CC_PROPERTY_PASS_BY_REF(cocos2d::ccColor3B, color, Color);
-	cocos2d::ccColor3B colorUnmodified;
-	CC_PROPERTY(GLubyte, opacity, Opacity);
-	bool opacityModifyRGB;
-	bool isOpacityModifyRGB ();
-	void setOpacityModifyRGB (bool isOpacityModifyRGB);
 
 	// CCBlendProtocol
 	CC_PROPERTY(cocos2d::ccBlendFunc, blendFunc, BlendFunc);
