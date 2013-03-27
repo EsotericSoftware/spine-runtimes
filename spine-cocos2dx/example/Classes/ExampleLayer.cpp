@@ -24,6 +24,12 @@ bool ExampleLayer::init () {
 	CCSkeleton* skeletonNode = CCSkeleton::create(skeletonData);
 	skeletonNode->state->setAnimation(animation, true);
 	skeletonNode->debug = true;
+  
+  CCAction* fade = CCRepeatForever::create(CCSequence::create(CCFadeOut::create(1),
+                                                              CCFadeIn::create(1),
+                                                              CCDelayTime::create(5),
+                                                              NULL));
+  skeletonNode->runAction(fade);
 
 	CCSize windowSize = CCDirector::sharedDirector()->getWinSize();
 	skeletonNode->setPosition(ccp(windowSize.width / 2, 20));
