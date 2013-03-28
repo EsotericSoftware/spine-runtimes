@@ -11,7 +11,7 @@ void Skeleton_init (Skeleton* this, SkeletonData* data) {
 		BoneData* boneData = this->data->bones[i];
 		Bone* parent = 0;
 		if (boneData->parent) {
-			// Find parent bone.
+			/* Find parent bone. */
 			for (ii = 0; ii < this->boneCount; ++ii) {
 				if (data->bones[ii] == boneData->parent) {
 					parent = this->bones[ii];
@@ -27,7 +27,7 @@ void Skeleton_init (Skeleton* this, SkeletonData* data) {
 	for (i = 0; i < this->slotCount; ++i) {
 		SlotData *slotData = data->slots[i];
 
-		// Find bone for the slotData's boneData.
+		/* Find bone for the slotData's boneData. */
 		Bone *bone;
 		for (ii = 0; ii < this->boneCount; ++ii) {
 			if (data->bones[ii] == slotData->boneData) {
@@ -51,9 +51,9 @@ void Skeleton_dispose (Skeleton* this) {
 		Bone_dispose(this->bones[i]);
 	FREE(this->bones)
 
+	FREE(this->slots)
 	for (i = 0; i < this->slotCount; ++i)
 		Slot_dispose(this->slots[i]);
-	FREE(this->slots)
 
 	FREE(this->drawOrder)
 
@@ -125,8 +125,8 @@ int Skeleton_setSkinByName (Skeleton* this, const char* skinName) {
 
 void Skeleton_setSkin (Skeleton* this, Skin* newSkin) {
 	if (this->skin && newSkin) {
-		// Attach each attachment in the new skin if the corresponding attachment in the old skin is currently attached.
-		const SkinEntry *entry = this->skin->entryList;
+		/* Attach each attachment in the new skin if the corresponding attachment in the old skin is currently attached. */
+		const SkinEntry *entry = this->skin->entries;
 		while (entry) {
 			Slot *slot = this->slots[entry->slotIndex];
 			if (slot->attachment == entry->attachment) {

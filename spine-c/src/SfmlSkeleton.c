@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 void SfmlSkeleton_dispose (Skeleton* skeleton) {
-	// SfmlSkeleton* this = (SfmlSkeleton*)skeleton;
+	/* SfmlSkeleton* this = (SfmlSkeleton*)skeleton; */
 }
 
 Skeleton* Skeleton_create (SkeletonData* data) {

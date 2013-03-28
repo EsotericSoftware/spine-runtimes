@@ -42,10 +42,10 @@ static float toColor (const char* value, int index) {
 }
 
 SkeletonData* SkeletonJson_readSkeletonDataFile (const char* path) {
-	char* data = readFile(path);
+	const char* data = readFile(path);
 	if (!data) return SkeletonJson_setError(0, "Unable to read file: ", path);
 	SkeletonData* skeletonData = SkeletonJson_readSkeletonData(data);
-	free(data);
+	FREE(data)
 	return skeletonData;
 }
 

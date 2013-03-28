@@ -1,6 +1,7 @@
 #ifndef SPINE_SPINE_H_
 #define SPINE_SPINE_H_
 
+#include <spine/Atlas.h>
 #include <spine/Attachment.h>
 #include <spine/Bone.h>
 #include <spine/BoneData.h>

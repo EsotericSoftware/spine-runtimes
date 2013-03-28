@@ -24,7 +24,7 @@ struct Skeleton {
 	Skin* const skin;
 	float r, g, b, a;
 	float time;
-	int flipX, flipY;
+	int/*bool*/flipX, flipY;
 
 	void (*_dispose) (Skeleton* skeleton);
 };
@@ -57,11 +57,11 @@ void Skeleton_setSkin (Skeleton* skeleton, Skin* skin);
 /** Returns 0 if the slot or attachment could not be found. */
 Attachment* Skeleton_getAttachmentForSlotName (const Skeleton* skeleton, const char* slotName, const char* attachmentName);
 /** Returns 0 if the slot or attachment could not be found. */
-Attachment* Skeleton_getAttachmentForSlotIndex (const Skeleton* this, int slotIndex, const char* attachmentName);
+Attachment* Skeleton_getAttachmentForSlotIndex (const Skeleton* skeleton, int slotIndex, const char* attachmentName);
 /** Returns 0 if the slot or attachment could not be found. */
 int Skeleton_setAttachment (Skeleton* skeleton, const char* slotName, const char* attachmentName);
 
-void Skeleton_update (Skeleton* this, float deltaTime);
+void Skeleton_update (Skeleton* skeleton, float deltaTime);
 
 #ifdef __cplusplus
 }

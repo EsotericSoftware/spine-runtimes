@@ -18,7 +18,7 @@ struct SkinEntry {
 
 typedef struct {
 	const char* const name;
-	const SkinEntry* const entryList;
+	const SkinEntry* const entries;
 } Skin;
 
 Skin* Skin_create (const char* name);

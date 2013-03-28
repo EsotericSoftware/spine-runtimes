@@ -4,24 +4,27 @@
 
 #include <spine/spine.h>
 #include "SfmlSkeleton.h"
+#include "SfmlRegionAttachment.h"
 #include "spine/cJSON.h"
 
+Attachment* loadAttachment (AttachmentType type, const char* name) {
+	return (Attachment*)SfmlRegionAttachment_create(name);
+}
+
 int main (void) {
-	//BoneData *boneData = BoneData_create("meow");
+	Attachment_setAttachmentLoader(loadAttachment);
 
-	//printf("name: %s\n", boneData->name);
-	//printf("length struct: %f\n", boneData->length);
-
-	//SkeletonData* data =
 	SkeletonJson_readSkeletonDataFile("data/spineboy-skeleton.json");
-	printf("error: %s\n", SkeletonJson_getError());
+	if (SkeletonJson_getError()) printf("error: %s\n", SkeletonJson_getError());
 
 	SkeletonData *skeletonData = SkeletonData_create();
 	Skeleton* skeleton = Skeleton_create(skeletonData);
-	//Skeleton_something(skeleton);
 	printf("meow? %d\n", ((SfmlSkeleton*)skeleton)->meow);
 	Skeleton_dispose(skeleton);
 	printf("meow? %d\n", ((SfmlSkeleton*)skeleton)->meow);
+
+	Atlas* atlas = Atlas_readAtlasFile("data/spineboy.atlas");
+	printf("%s %d", atlas->regions->name, atlas->regions->y);
 
 	return 0;
 }

@@ -15,7 +15,7 @@ struct RegionAttachment {
 	float offset[8];
 };
 
-void RegionAttachment_init (RegionAttachment* this, const char* name);
+void RegionAttachment_init (RegionAttachment* attachment, const char* name);
 void RegionAttachment_dispose (RegionAttachment* attachment);
 
 void RegionAttachment_updateOffset (RegionAttachment* attachment);

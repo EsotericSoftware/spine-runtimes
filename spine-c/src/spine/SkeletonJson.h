@@ -14,7 +14,7 @@ void SkeletonJson_setScale (float scale);
 SkeletonData* SkeletonJson_readSkeletonData (const char* json);
 SkeletonData* SkeletonJson_readSkeletonDataFile (const char* path);
 
-// Animation* readAnimation (char* json, const SkeletonData *skeletonData) const;
+/* Animation* readAnimation (char* json, const SkeletonData *skeletonData) const; */
 
 const char* SkeletonJson_getError ();
 

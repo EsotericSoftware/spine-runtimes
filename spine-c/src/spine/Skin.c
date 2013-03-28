@@ -16,7 +16,7 @@ void SkinEntry_dispose (SkinEntry* entry) {
 	FREE(entry)
 }
 
-//
+/**/
 
 Skin* Skin_create (const char* name) {
 	Skin* this = calloc(1, sizeof(Skin));
@@ -25,14 +25,14 @@ Skin* Skin_create (const char* name) {
 }
 
 void Skin_dispose (Skin* this) {
-	SkinEntry_dispose((SkinEntry*)this->entryList);
+	SkinEntry_dispose((SkinEntry*)this->entries);
 	FREE(this->name)
 	FREE(this)
 }
 
 void Skin_addAttachment (Skin* this, int slotIndex, const char* name, Attachment* attachment) {
 	SkinEntry* newEntry = SkinEntry_create(slotIndex, name, attachment);
-	SkinEntry* entry = (SkinEntry*)this->entryList;
+	SkinEntry* entry = (SkinEntry*)this->entries;
 	if (!entry)
 		entry = newEntry;
 	else {
@@ -43,7 +43,7 @@ void Skin_addAttachment (Skin* this, int slotIndex, const char* name, Attachment
 }
 
 Attachment* Skin_getAttachment (const Skin* this, int slotIndex, const char* name) {
-	const SkinEntry* entry = this->entryList;
+	const SkinEntry* entry = this->entries;
 	while (entry) {
 		if (entry->slotIndex == slotIndex && strcmp(entry->name, name) == 0) return entry->attachment;
 		entry = entry->next;

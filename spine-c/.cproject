@@ -35,6 +35,7 @@
 								<option id="gnu.c.compiler.option.include.paths.2051361089" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
 								</option>
+								<option id="gnu.c.compiler.option.misc.other.1829716988" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -std=c89" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.603555848" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug.1030541714" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug"/>

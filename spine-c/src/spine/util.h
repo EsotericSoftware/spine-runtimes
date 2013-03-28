@@ -1,9 +1,8 @@
 #ifndef SPINE_UTIL_H_
 #define SPINE_UTIL_H_
 
-#include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
+#include <string.h>
 
 /** Used to cast away const on an lvalue. */
 #define CAST(TYPE,VALUE) *(TYPE*)&VALUE
@@ -12,6 +11,6 @@
 
 #define FREE(E) free((void*)E);
 
-char* readFile (const char* path);
+const char* readFile (const char* path);
 
 #endif /* SPINE_UTIL_H_ */
