@@ -51,9 +51,9 @@ void Skeleton_dispose (Skeleton* this) {
 		Bone_dispose(this->bones[i]);
 	FREE(this->bones)
 
-	FREE(this->slots)
 	for (i = 0; i < this->slotCount; ++i)
 		Slot_dispose(this->slots[i]);
+	FREE(this->slots)
 
 	FREE(this->drawOrder)
 
