@@ -57,7 +57,7 @@ Atlas* Atlas_readAtlas (const char* data);
 Atlas* Atlas_readAtlasFile (const char* path);
 void Atlas_dispose (Atlas* atlas);
 
-AtlasRegion* Atlas_findRegion (Atlas* atlas, const char* name);
+AtlasRegion* Atlas_findRegion (const Atlas* atlas, const char* name);
 
 #ifdef __cplusplus
 }

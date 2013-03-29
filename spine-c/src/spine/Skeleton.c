@@ -1,7 +1,7 @@
 #include <spine/Skeleton.h>
 #include <spine/util.h>
 
-void Skeleton_init (Skeleton* this, SkeletonData* data) {
+void _Skeleton_init (Skeleton* this, SkeletonData* data) {
 	CAST(SkeletonData*, this->data) = data;
 
 	this->boneCount = this->data->boneCount;
@@ -51,9 +51,9 @@ void Skeleton_dispose (Skeleton* this) {
 		Bone_dispose(this->bones[i]);
 	FREE(this->bones)
 
-	FREE(this->slots)
 	for (i = 0; i < this->slotCount; ++i)
 		Slot_dispose(this->slots[i]);
+	FREE(this->slots)
 
 	FREE(this->drawOrder)
 

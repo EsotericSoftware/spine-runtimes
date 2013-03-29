@@ -7,11 +7,25 @@ AtlasPage* AtlasPage_create () {
 	return this;
 }
 
+void AtlasPage_dispose (AtlasPage* this) {
+	if (this->next) AtlasPage_dispose(this->next);
+	FREE(this->name);
+	FREE(this);
+}
+
 /**/
 
 AtlasRegion* AtlasRegion_create () {
 	AtlasRegion* this = calloc(1, sizeof(AtlasRegion));
 	return this;
+}
+
+void AtlasRegion_dispose (AtlasRegion* this) {
+	if (this->next) AtlasRegion_dispose(this->next);
+	FREE(this->name);
+	FREE(this->splits);
+	FREE(this->pads);
+	FREE(this);
 }
 
 /**/
@@ -80,7 +94,7 @@ static int readTuple (Str tuple[]) {
 	readLine(0, &str);
 	if (!beginPast(&str, ':')) return 0;
 	int i = 0;
-	for (i = 0; i < 3; i++) {
+	for (i = 0; i < 3; ++i) {
 		tuple[i].begin = str.begin;
 		if (!beginPast(&str, ',')) {
 			if (i == 0) return 0;
@@ -224,9 +238,16 @@ Atlas* Atlas_readAtlasFile (const char* path) {
 }
 
 void Atlas_dispose (Atlas* this) {
+	if (this->pages) AtlasPage_dispose(this->pages);
+	if (this->regions) AtlasRegion_dispose(this->regions);
 	FREE(this)
 }
 
-AtlasRegion* Atlas_findRegion (Atlas* atlas, const char* name) {
+AtlasRegion* Atlas_findRegion (const Atlas* this, const char* name) {
+	AtlasRegion* region = this->regions;
+	while (region) {
+		if (strcmp(region->name, name) == 0) return region;
+		region = region->next;
+	}
 	return 0;
 }

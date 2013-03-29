@@ -13,6 +13,7 @@ typedef enum {
 typedef struct Attachment Attachment;
 struct Attachment {
 	const char* const name;
+
 	void (*_dispose) (Attachment* attachment);
 };
 

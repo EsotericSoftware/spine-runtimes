@@ -29,7 +29,6 @@ struct Skeleton {
 	void (*_dispose) (Skeleton* skeleton);
 };
 
-void Skeleton_init (Skeleton* skeleton, SkeletonData* data);
 void Skeleton_dispose (Skeleton* skeleton);
 
 void Skeleton_updateWorldTransform (const Skeleton* skeleton);

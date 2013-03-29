@@ -44,12 +44,12 @@ void Bone_updateWorldTransform (Bone* this, int flipX, int flipY) {
 		CAST(float, this->worldRotation) = this->rotation;
 	}
 	float radians = (float)(this->worldRotation * 3.1415926535897932385 / 180);
-	float cos = cosf(radians);
-	float sin = sinf(radians);
-	CAST(float, this->m00) = cos * this->worldScaleX;
-	CAST(float, this->m10) = sin * this->worldScaleX;
-	CAST(float, this->m01) = -sin * this->worldScaleY;
-	CAST(float, this->m11) = cos * this->worldScaleY;
+	float cosine = cos(radians);
+	float sine = sin(radians);
+	CAST(float, this->m00) = cosine * this->worldScaleX;
+	CAST(float, this->m10) = sine * this->worldScaleX;
+	CAST(float, this->m01) = -sine * this->worldScaleY;
+	CAST(float, this->m11) = cosine * this->worldScaleY;
 	if (flipX) {
 		CAST(float, this->m00) = -this->m00;
 		CAST(float, this->m01) = -this->m01;

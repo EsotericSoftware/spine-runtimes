@@ -2,14 +2,10 @@
 #include <math.h>
 #include <spine/util.h>
 
-void RegionAttachment_init (RegionAttachment* this, const char* name) {
+void _RegionAttachment_init (RegionAttachment* this, const char* name) {
 	Attachment_init(&this->super, name);
 	this->scaleX = 1;
 	this->scaleY = 1;
-}
-
-void RegionAttachment_dispose (RegionAttachment* this) {
-	Attachment_dispose(&this->super);
 }
 
 void RegionAttachment_updateOffset (RegionAttachment* this) {
