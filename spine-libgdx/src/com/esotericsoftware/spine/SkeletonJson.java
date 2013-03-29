@@ -35,7 +35,7 @@ import com.esotericsoftware.spine.Animation.TranslateTimeline;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.RegionSequenceAttachment;
 import com.esotericsoftware.spine.attachments.RegionSequenceAttachment.Mode;
-import com.esotericsoftware.spine.attachments.TextureAtlasAttachmentLoader;
+import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -58,7 +58,7 @@ public class SkeletonJson {
 	private float scale = 1;
 
 	public SkeletonJson (TextureAtlas atlas) {
-		attachmentLoader = new TextureAtlasAttachmentLoader(atlas);
+		attachmentLoader = new AtlasAttachmentLoader(atlas);
 	}
 
 	public SkeletonJson (AttachmentLoader attachmentLoader) {

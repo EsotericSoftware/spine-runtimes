@@ -35,7 +35,7 @@ import com.esotericsoftware.spine.Animation.TranslateTimeline;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.RegionSequenceAttachment;
 import com.esotericsoftware.spine.attachments.RegionSequenceAttachment.Mode;
-import com.esotericsoftware.spine.attachments.TextureAtlasAttachmentLoader;
+import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -63,7 +63,7 @@ public class SkeletonBinary {
 	private float scale = 1;
 
 	public SkeletonBinary (TextureAtlas atlas) {
-		attachmentLoader = new TextureAtlasAttachmentLoader(atlas);
+		attachmentLoader = new AtlasAttachmentLoader(atlas);
 	}
 
 	public SkeletonBinary (AttachmentLoader attachmentLoader) {

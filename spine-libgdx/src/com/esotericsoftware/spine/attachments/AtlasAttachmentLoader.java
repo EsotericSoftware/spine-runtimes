@@ -32,10 +32,10 @@ import com.esotericsoftware.spine.AttachmentType;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 
-public class TextureAtlasAttachmentLoader implements AttachmentLoader {
+public class AtlasAttachmentLoader implements AttachmentLoader {
 	private TextureAtlas atlas;
 
-	public TextureAtlasAttachmentLoader (TextureAtlas atlas) {
+	public AtlasAttachmentLoader (TextureAtlas atlas) {
 		if (atlas == null) throw new IllegalArgumentException("atlas cannot be null.");
 		this.atlas = atlas;
 	}
