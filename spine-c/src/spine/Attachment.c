@@ -1,22 +1,16 @@
 #include <spine/Attachment.h>
 #include <spine/util.h>
 
-static AttachmentLoader loader;
-
-void Attachment_setAttachmentLoader (AttachmentLoader value) {
-	loader = value;
-}
-
-AttachmentLoader Attachment_getAttachmentLoader () {
-	return loader;
-}
-
-void Attachment_init (Attachment* this, const char* name) {
+void _Attachment_init (Attachment* this, const char* name, int type) {
 	MALLOC_STR(this->name, name);
+	this->type = type;
+}
+
+void _Attachment_deinit (Attachment* this) {
+	FREE(this->name)
+	FREE(this)
 }
 
 void Attachment_dispose (Attachment* this) {
 	this->_dispose(this);
-	FREE(this->name)
-	FREE(this)
 }

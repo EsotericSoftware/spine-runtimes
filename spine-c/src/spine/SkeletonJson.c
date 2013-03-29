@@ -1,31 +1,45 @@
 #include <spine/SkeletonJson.h>
 #include <math.h>
+#include <stdio.h>
 #include <spine/util.h>
 #include <spine/cJSON.h>
 #include <spine/RegionAttachment.h>
+#include <spine/AtlasAttachmentLoader.h>
 
-#include <stdio.h>
+typedef struct {
+	SkeletonJson json;
+	int ownsLoader;
+} Private;
 
-static float scale;
-static const char* error;
-
-void SkeletonJson_setScale (float value) {
-	scale = value;
+SkeletonJson* SkeletonJson_createWithLoader (AttachmentLoader* attachmentLoader) {
+	SkeletonJson* this = calloc(1, sizeof(Private));
+	this->scale = 1;
+	this->attachmentLoader = attachmentLoader;
+	return this;
 }
 
-void* SkeletonJson_setError (cJSON* root, const char* value1, const char* value2) {
-	FREE(error)
+SkeletonJson* SkeletonJson_create (Atlas* atlas) {
+	AtlasAttachmentLoader* attachmentLoader = AtlasAttachmentLoader_create(atlas);
+	Private* this = (Private*)SkeletonJson_createWithLoader(&attachmentLoader->super);
+	this->ownsLoader = 1;
+	return &this->json;
+}
+
+void SkeletonJson_dispose (SkeletonJson* this) {
+	if (((Private*)this)->ownsLoader) AttachmentLoader_dispose(this->attachmentLoader);
+	FREE(this->error)
+	FREE(this)
+}
+
+void* _SkeletonJson_setError (SkeletonJson* this, cJSON* root, const char* value1, const char* value2) {
+	FREE(this->error)
 	char message[256];
 	strcpy(message, value1);
 	int length = strlen(value1);
 	if (value2) strncat(message + length, value2, 256 - length);
-	MALLOC_STR(error, message)
+	MALLOC_STR(this->error, message)
 	if (root) cJSON_dispose(root);
 	return 0;
-}
-
-const char* SkeletonJson_getError () {
-	return error;
 }
 
 static float toColor (const char* value, int index) {
@@ -41,20 +55,20 @@ static float toColor (const char* value, int index) {
 	return color / (float)255;
 }
 
-SkeletonData* SkeletonJson_readSkeletonDataFile (const char* path) {
+SkeletonData* SkeletonJson_readSkeletonDataFile (SkeletonJson* this, const char* path) {
 	const char* data = readFile(path);
-	if (!data) return SkeletonJson_setError(0, "Unable to read file: ", path);
-	SkeletonData* skeletonData = SkeletonJson_readSkeletonData(data);
+	if (!data) return _SkeletonJson_setError(this, 0, "Unable to read file: ", path);
+	SkeletonData* skeletonData = SkeletonJson_readSkeletonData(this, data);
 	FREE(data)
 	return skeletonData;
 }
 
-SkeletonData* SkeletonJson_readSkeletonData (const char* json) {
-	FREE(error)
-	error = 0;
+SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* this, const char* json) {
+	FREE(this->error)
+	CAST(char*, this->error) = 0;
 
 	cJSON* root = cJSON_Parse(json);
-	if (!root) return SkeletonJson_setError(0, "Invalid JSON: ", cJSON_GetErrorPtr());
+	if (!root) return _SkeletonJson_setError(this, 0, "Invalid JSON: ", cJSON_GetErrorPtr());
 
 	SkeletonData* skeletonData = SkeletonData_create();
 	int i, ii, iii;
@@ -71,13 +85,13 @@ SkeletonData* SkeletonJson_readSkeletonData (const char* json) {
 		const char* parentName = cJSON_GetObjectString(boneMap, "parent", 0);
 		if (parentName) {
 			parent = SkeletonData_findBone(skeletonData, parentName);
-			if (!parent) return SkeletonJson_setError(root, "Parent bone not found: ", parentName);
+			if (!parent) return _SkeletonJson_setError(this, root, "Parent bone not found: ", parentName);
 		}
 
 		BoneData* boneData = BoneData_create(boneName, parent);
-		boneData->length = cJSON_GetObjectFloat(boneMap, "parent", 0) * scale;
-		boneData->x = cJSON_GetObjectFloat(boneMap, "x", 0) * scale;
-		boneData->y = cJSON_GetObjectFloat(boneMap, "y", 0) * scale;
+		boneData->length = cJSON_GetObjectFloat(boneMap, "parent", 0) * this->scale;
+		boneData->x = cJSON_GetObjectFloat(boneMap, "x", 0) * this->scale;
+		boneData->y = cJSON_GetObjectFloat(boneMap, "y", 0) * this->scale;
 		boneData->rotation = cJSON_GetObjectFloat(boneMap, "rotation", 0);
 		boneData->scaleX = cJSON_GetObjectFloat(boneMap, "scaleX", 1);
 		boneData->scaleY = cJSON_GetObjectFloat(boneMap, "scaleY", 1);
@@ -97,7 +111,7 @@ SkeletonData* SkeletonJson_readSkeletonData (const char* json) {
 
 			const char* boneName = cJSON_GetObjectString(slotMap, "bone", 0);
 			BoneData* boneData = SkeletonData_findBone(skeletonData, boneName);
-			if (!boneData) return SkeletonJson_setError(root, "Slot bone not found: ", boneName);
+			if (!boneData) return _SkeletonJson_setError(this, root, "Slot bone not found: ", boneName);
 
 			SlotData* slotData = SlotData_create(slotName, boneData);
 
@@ -138,7 +152,8 @@ SkeletonData* SkeletonJson_readSkeletonData (const char* json) {
 				int attachmentCount = cJSON_GetArraySize(attachmentsMap);
 				for (iii = 0; iii < attachmentCount; ++iii) {
 					cJSON* attachmentMap = cJSON_GetArrayItem(attachmentsMap, iii);
-					const char* attachmentName = attachmentMap->name;
+					const char* skinAttachmentName = attachmentMap->name;
+					const char* attachmentName = cJSON_GetObjectString(attachmentMap, "name", skinAttachmentName);
 
 					const char* typeString = cJSON_GetObjectString(attachmentMap, "type", "region");
 					AttachmentType type;
@@ -147,24 +162,25 @@ SkeletonData* SkeletonJson_readSkeletonData (const char* json) {
 					else if (strcmp(typeString, "regionSequence") == 0)
 						type = ATTACHMENT_REGION_SEQUENCE;
 					else
-						return SkeletonJson_setError(root, "Unknown attachment type: ", typeString);
+						return _SkeletonJson_setError(this, root, "Unknown attachment type: ", typeString);
 
-					Attachment* attachment = Attachment_getAttachmentLoader()(type,
-							cJSON_GetObjectString(attachmentMap, "name", attachmentName));
+					Attachment* attachment = AttachmentLoader_newAttachment(this->attachmentLoader, type, attachmentName);
+					if (!attachment && this->attachmentLoader->error1)
+						return _SkeletonJson_setError(this, root, this->attachmentLoader->error1, this->attachmentLoader->error2);
 
-					if (type == ATTACHMENT_REGION || type == ATTACHMENT_REGION_SEQUENCE) {
+					if (attachment->type == ATTACHMENT_REGION || attachment->type == ATTACHMENT_REGION_SEQUENCE) {
 						RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
-						regionAttachment->x = cJSON_GetObjectFloat(attachmentMap, "x", 0) * scale;
-						regionAttachment->y = cJSON_GetObjectFloat(attachmentMap, "y", 0) * scale;
+						regionAttachment->x = cJSON_GetObjectFloat(attachmentMap, "x", 0) * this->scale;
+						regionAttachment->y = cJSON_GetObjectFloat(attachmentMap, "y", 0) * this->scale;
 						regionAttachment->scaleX = cJSON_GetObjectFloat(attachmentMap, "scaleX", 1);
 						regionAttachment->scaleY = cJSON_GetObjectFloat(attachmentMap, "scaleY", 1);
 						regionAttachment->rotation = cJSON_GetObjectFloat(attachmentMap, "rotation", 0);
-						regionAttachment->width = cJSON_GetObjectFloat(attachmentMap, "width", 32) * scale;
-						regionAttachment->height = cJSON_GetObjectFloat(attachmentMap, "height", 32) * scale;
+						regionAttachment->width = cJSON_GetObjectFloat(attachmentMap, "width", 32) * this->scale;
+						regionAttachment->height = cJSON_GetObjectFloat(attachmentMap, "height", 32) * this->scale;
 						RegionAttachment_updateOffset(regionAttachment);
 					}
 
-					Skin_addAttachment(skin, slotIndex, attachmentName, attachment);
+					Skin_addAttachment(skin, slotIndex, skinAttachmentName, attachment);
 				}
 			}
 		}

@@ -31,7 +31,14 @@ struct AtlasPage {
 	AtlasFilter minFilter, magFilter;
 	AtlasWrap uWrap, vWrap;
 	AtlasPage* next;
+
+	void (*_dispose) (AtlasPage* page);
 };
+
+AtlasPage* AtlasPage_create (const char* name);
+void AtlasPage_dispose(AtlasPage * this);
+
+/**/
 
 typedef struct AtlasRegion AtlasRegion;
 struct AtlasRegion {
@@ -47,6 +54,11 @@ struct AtlasRegion {
 	AtlasPage* page;
 	AtlasRegion* next;
 };
+
+AtlasRegion* AtlasRegion_create ();
+void AtlasRegion_dispose(AtlasRegion * this);
+
+/**/
 
 typedef struct {
 	AtlasPage* pages;

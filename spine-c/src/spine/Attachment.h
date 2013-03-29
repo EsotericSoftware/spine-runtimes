@@ -13,16 +13,11 @@ typedef enum {
 typedef struct Attachment Attachment;
 struct Attachment {
 	const char* const name;
+	int type;
 
 	void (*_dispose) (Attachment* attachment);
 };
 
-typedef Attachment* (*AttachmentLoader) (AttachmentType type, const char* name);
-
-void Attachment_setAttachmentLoader (AttachmentLoader loader);
-AttachmentLoader Attachment_getAttachmentLoader ();
-
-void Attachment_init (Attachment* attachment, const char* name);
 void Attachment_dispose (Attachment* attachment);
 
 #ifdef __cplusplus

@@ -18,7 +18,7 @@ typedef struct {
 SlotData* SlotData_create (const char* name, BoneData* boneData);
 void SlotData_dispose (SlotData* slotData);
 
-/** @param attachmentName May be zero. */
+/* @param attachmentName May be zero. */
 void SlotData_setAttachmentName (SlotData* slotData, const char* attachmentName);
 
 #ifdef __cplusplus

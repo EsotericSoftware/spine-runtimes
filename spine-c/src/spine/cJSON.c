@@ -48,9 +48,7 @@ static int cJSON_strcasecmp (const char* s1, const char* s2) {
 
 /* Internal constructor. */
 static cJSON *cJSON_create_Item (void) {
-	cJSON* node = (cJSON*)malloc(sizeof(cJSON));
-	if (node) memset(node, 0, sizeof(cJSON));
-	return node;
+	return (cJSON*)calloc(1, sizeof(cJSON));
 }
 
 /* Delete a cJSON structure. */

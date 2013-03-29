@@ -1,4 +1,5 @@
 #include <spine/Animation.h>
+#include <math.h>
 #include <spine/util.h>
 
 Animation* Animation_create () {
@@ -14,13 +15,29 @@ void Animation_dispose (Animation* this) {
 	FREE(this)
 }
 
-void Animation_apply (const Animation* animation, Skeleton* skeleton, float time, int/*bool*/loop) {
+void Animation_apply (const Animation* this, Skeleton* skeleton, float time, int/*bool*/loop) {
+	if (loop && this->duration) time = fmod(time, this->duration);
+
+	int i, n = this->timelineCount;
+	for (i = 0; i < n; ++i)
+		Timeline_apply(this->timelines[i], skeleton, time, 1);
 }
 
-void Animation_mix (const Animation* animation, Skeleton* skeleton, float time, int/*bool*/loop, float alpha) {
+void Animation_mix (const Animation* this, Skeleton* skeleton, float time, int/*bool*/loop, float alpha) {
+	if (loop && this->duration) time = fmod(time, this->duration);
+
+	int i, n = this->timelineCount;
+	for (i = 0; i < n; ++i)
+		Timeline_apply(this->timelines[i], skeleton, time, alpha);
 }
 
 /**/
+
+void _Timeline_init (Timeline* timeline) {
+}
+
+void _Timeline_deinit (Timeline* timeline) {
+}
 
 void Timeline_dispose (Timeline* this) {
 	this->_dispose(this);
@@ -37,10 +54,12 @@ static const float CURVE_STEPPED = -1;
 static const int CURVE_SEGMENTS = 10;
 
 void _CurveTimeline_init (CurveTimeline* this, int frameCount) {
+	_Timeline_init(&this->super);
 	this->curves = calloc(1, sizeof(float) * (frameCount - 1) * 6);
 }
 
 void _CurveTimeline_deinit (CurveTimeline* this) {
+	_Timeline_deinit(&this->super);
 	FREE(this->curves)
 }
 
@@ -103,7 +122,7 @@ float CurveTimeline_getCurvePercent (CurveTimeline* this, int frameIndex, float 
 	return y + (1 - y) * (percent - x) / (1 - x); /* Last point is 1,1. */
 }
 
-/** @param target After the first and before the last entry. */
+/* @param target After the first and before the last entry. */
 static int binarySearch (float *values, int valuesLength, float target, int step) {
 	int low = 0;
 	int high = valuesLength / step - 2;
@@ -138,8 +157,10 @@ void _BaseTimeline_dispose (Timeline* timeline) {
 	FREE(this);
 }
 
+/* Many timelines have structure identical to struct BaseTimeline and extend CurveTimeline. **/
 struct BaseTimeline* _BaseTimeline_create (int frameCount, int frameSize) {
 	struct BaseTimeline* this = calloc(1, sizeof(struct BaseTimeline));
+	_CurveTimeline_init(&this->super, frameCount);
 	((Timeline*)this)->_dispose = _BaseTimeline_dispose;
 
 	CAST(int, this->frameCount) = frameCount;
@@ -193,7 +214,6 @@ void _RotateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float 
 RotateTimeline* RotateTimeline_create (int frameCount) {
 	RotateTimeline* this = _BaseTimeline_create(frameCount, 2);
 	((Timeline*)this)->_apply = _RotateTimeline_apply;
-	_CurveTimeline_init(&this->super, frameCount);
 	return this;
 }
 
@@ -239,7 +259,6 @@ void _TranslateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, flo
 TranslateTimeline* TranslateTimeline_create (int frameCount) {
 	TranslateTimeline* this = _BaseTimeline_create(frameCount, 3);
 	((Timeline*)this)->_apply = _TranslateTimeline_apply;
-	_CurveTimeline_init(&this->super, frameCount);
 	return this;
 }
 
@@ -281,7 +300,6 @@ void _ScaleTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float t
 ScaleTimeline* ScaleTimeline_create (int frameCount) {
 	ScaleTimeline* this = _BaseTimeline_create(frameCount, 3);
 	((Timeline*)this)->_apply = _ScaleTimeline_apply;
-	_CurveTimeline_init(&this->super, frameCount);
 	return this;
 }
 
@@ -343,7 +361,6 @@ void _ColorTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float t
 ColorTimeline* ColorTimeline_create (int frameCount) {
 	ColorTimeline* this = (ColorTimeline*)_BaseTimeline_create(frameCount, 5);
 	((Timeline*)this)->_apply = _ColorTimeline_apply;
-	_CurveTimeline_init(&this->super, frameCount);
 	return this;
 }
 
@@ -375,6 +392,7 @@ void _AttachmentTimeline_apply (const Timeline* timeline, Skeleton* skeleton, fl
 }
 
 void _AttachmentTimeline_dispose (Timeline* timeline) {
+	_Timeline_deinit(timeline);
 	AttachmentTimeline* this = (AttachmentTimeline*)timeline;
 
 	int i;
@@ -382,14 +400,19 @@ void _AttachmentTimeline_dispose (Timeline* timeline) {
 		FREE(this->attachmentNames[i])
 	FREE(this->attachmentNames)
 
-	_BaseTimeline_dispose(timeline);
+	FREE(this)
 }
 
 AttachmentTimeline* AttachmentTimeline_create (int frameCount) {
-	AttachmentTimeline* this = (AttachmentTimeline*)_BaseTimeline_create(frameCount, 1);
+	AttachmentTimeline* this = calloc(1, sizeof(AttachmentTimeline));
+	_Timeline_init(&this->super);
 	((Timeline*)this)->_dispose = _AttachmentTimeline_dispose;
 	((Timeline*)this)->_apply = _AttachmentTimeline_apply;
 	CAST(char*, this->attachmentNames) = calloc(1, sizeof(char*) * frameCount);
+
+	CAST(int, this->frameCount) = frameCount;
+	CAST(float*, this->frames) = calloc(1, sizeof(float) * frameCount);
+
 	return this;
 }
 

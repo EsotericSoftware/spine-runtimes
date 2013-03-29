@@ -2,21 +2,29 @@
 #define SPINE_SKELETONJSON_H_
 
 #include <spine/Attachment.h>
+#include <spine/AttachmentLoader.h>
 #include <spine/SkeletonData.h>
+#include <spine/Atlas.h>
 
 #ifdef __cplusplus
 namespace spine {
 extern "C" {
 #endif
 
-void SkeletonJson_setScale (float scale);
+typedef struct {
+	float scale;
+	AttachmentLoader* attachmentLoader;
+	const char* const error;
+} SkeletonJson;
 
-SkeletonData* SkeletonJson_readSkeletonData (const char* json);
-SkeletonData* SkeletonJson_readSkeletonDataFile (const char* path);
+SkeletonJson* SkeletonJson_createWithLoader (AttachmentLoader* attachmentLoader);
+SkeletonJson* SkeletonJson_create (Atlas* atlas);
+void SkeletonJson_dispose (SkeletonJson* skeletonJson);
 
-/* Animation* readAnimation (char* json, const SkeletonData *skeletonData) const; */
+SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* skeletonJson, const char* json);
+SkeletonData* SkeletonJson_readSkeletonDataFile (SkeletonJson* skeletonJson, const char* path);
 
-const char* SkeletonJson_getError ();
+/* Animation* SkeletonJson_readAnimation (SkeletonJson* skeletonJson, char* json, const SkeletonData *skeletonData); */
 
 #ifdef __cplusplus
 }

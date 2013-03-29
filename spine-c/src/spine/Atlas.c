@@ -1,16 +1,19 @@
 #include <spine/Atlas.h>
 #include <ctype.h>
 #include <spine/util.h>
+#include <spine/extension.h>
 
-AtlasPage* AtlasPage_create () {
-	AtlasPage* this = calloc(1, sizeof(AtlasPage));
-	return this;
+void _AtlasPage_init (AtlasPage* this, const char* name) {
+	this->name = name; /* name is guaranteed to be memory we allocated. */
+}
+
+void _AtlasPage_deinit (AtlasPage* this) {
+	FREE(this->name);
 }
 
 void AtlasPage_dispose (AtlasPage* this) {
-	if (this->next) AtlasPage_dispose(this->next);
-	FREE(this->name);
-	FREE(this);
+	if (this->next) AtlasPage_dispose(this->next); /* BOZO - Don't dispose all in the list. */
+	this->_dispose(this);
 }
 
 /**/
@@ -45,7 +48,7 @@ static void trim (Str* str) {
 	str->end++;
 }
 
-/** Tokenize string without modification. Returns 0 on failure. */
+/* Tokenize string without modification. Returns 0 on failure. */
 static int readLine (const char* data, Str* str) {
 	static const char* nextStart;
 	if (data) {
@@ -67,7 +70,7 @@ static int readLine (const char* data, Str* str) {
 	return 1;
 }
 
-/** Moves str->begin past the first occurence of c. Returns 0 on failure. */
+/* Moves str->begin past the first occurence of c. Returns 0 on failure. */
 static int beginPast (Str* str, char c) {
 	const char* begin = str->begin;
 	while (1) {
@@ -88,7 +91,7 @@ static int readValue (Str* str) {
 	return 1;
 }
 
-/** Returns the number of tuple values read (2, 4, or 0 for failure). */
+/* Returns the number of tuple values read (2, 4, or 0 for failure). */
 static int readTuple (Str tuple[]) {
 	Str str;
 	readLine(0, &str);
@@ -150,14 +153,12 @@ Atlas* Atlas_readAtlas (const char* data) {
 		if (str.end - str.begin == 0) {
 			page = 0;
 		} else if (!page) {
-			page = AtlasPage_create();
+			page = AtlasPage_create(mallocString(&str));
 			if (lastPage)
 				lastPage->next = page;
 			else
 				this->pages = page;
 			lastPage = page;
-
-			page->name = mallocString(&str);
 
 			if (!readValue(&str)) return 0;
 			page->format = (AtlasFormat)indexOf(formatNames, 7, &str);

@@ -43,7 +43,7 @@ typedef struct {
 void CurveTimeline_setLinear (CurveTimeline* timeline, int frameIndex);
 void CurveTimeline_setStepped (CurveTimeline* timeline, int frameIndex);
 
-/** Sets the control handle positions for an interpolation bezier curve used to transition from this keyframe to the next.
+/* Sets the control handle positions for an interpolation bezier curve used to transition from this keyframe to the next.
  * cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of
  * the difference between the keyframe's values. */
 void CurveTimeline_setCurve (CurveTimeline* timeline, int frameIndex, float cx1, float cy1, float cx2, float cy2);
@@ -103,7 +103,7 @@ typedef struct {
 
 AttachmentTimeline* AttachmentTimeline_create (int frameCount);
 
-/** @param attachmentName May be 0. */
+/* @param attachmentName May be 0. */
 void AttachmentTimeline_setFrame (AttachmentTimeline* timeline, int frameIndex, float time, const char* attachmentName);
 
 #ifdef __cplusplus

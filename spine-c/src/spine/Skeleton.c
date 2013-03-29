@@ -43,9 +43,7 @@ void _Skeleton_init (Skeleton* this, SkeletonData* data) {
 	memcpy(this->drawOrder, this->slots, sizeof(Slot*) * this->slotCount);
 }
 
-void Skeleton_dispose (Skeleton* this) {
-	if (this->_dispose) this->_dispose(this);
-
+void _Skeleton_deinit (Skeleton* this) {
 	int i;
 	for (i = 0; i < this->boneCount; ++i)
 		Bone_dispose(this->bones[i]);
@@ -56,8 +54,10 @@ void Skeleton_dispose (Skeleton* this) {
 	FREE(this->slots)
 
 	FREE(this->drawOrder)
+}
 
-	FREE(this)
+void Skeleton_dispose (Skeleton* this) {
+	this->_dispose(this);
 }
 
 void Skeleton_updateWorldTransform (const Skeleton* this) {

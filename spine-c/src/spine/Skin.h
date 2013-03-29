@@ -24,9 +24,9 @@ typedef struct {
 Skin* Skin_create (const char* name);
 void Skin_dispose (Skin* skin);
 
-/** The Skin owns the attachment. */
+/* The Skin owns the attachment. */
 void Skin_addAttachment (Skin* skin, int slotIndex, const char* name, Attachment* attachment);
-/** May return null. */
+/* May return null. */
 Attachment* Skin_getAttachment (const Skin* skin, int slotIndex, const char* name);
 
 #ifdef __cplusplus

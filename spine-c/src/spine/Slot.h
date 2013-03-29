@@ -23,7 +23,7 @@ typedef struct {
 Slot* Slot_create (SlotData* data, struct Skeleton* skeleton, Bone* bone);
 void Slot_dispose (Slot* slot);
 
-/** @param attachment May be null. */
+/* @param attachment May be null. */
 void Slot_setAttachment (Slot* slot, Attachment* attachment);
 
 void Slot_setAttachmentTime (Slot* slot, float time);

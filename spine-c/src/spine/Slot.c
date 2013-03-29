@@ -24,7 +24,7 @@ void Slot_dispose (Slot* this) {
 	FREE(this);
 }
 
-/** @param attachment May be null. */
+/* @param attachment May be null. */
 void Slot_setAttachment (Slot* this, Attachment* attachment) {
 	CAST(Attachment*, this->attachment) = attachment;
 	((Private*)this)->attachmentTime = this->skeleton->time;

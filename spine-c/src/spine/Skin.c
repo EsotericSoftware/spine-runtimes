@@ -34,7 +34,7 @@ void Skin_addAttachment (Skin* this, int slotIndex, const char* name, Attachment
 	SkinEntry* newEntry = _SkinEntry_create(slotIndex, name, attachment);
 	SkinEntry* entry = (SkinEntry*)this->entries;
 	if (!entry)
-		entry = newEntry;
+		CAST(SkinEntry*, this->entries) = newEntry;
 	else {
 		while (entry->next)
 			entry = (SkinEntry*)entry->next;

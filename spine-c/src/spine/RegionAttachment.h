@@ -2,6 +2,7 @@
 #define SPINE_REGIONATTACHMENT_H_
 
 #include <spine/Attachment.h>
+#include <spine/Atlas.h>
 
 #ifdef __cplusplus
 namespace spine {
@@ -16,6 +17,8 @@ struct RegionAttachment {
 };
 
 void RegionAttachment_updateOffset (RegionAttachment* attachment);
+
+RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region);
 
 #ifdef __cplusplus
 }
