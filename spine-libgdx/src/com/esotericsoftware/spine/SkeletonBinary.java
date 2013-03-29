@@ -206,11 +206,11 @@ public class SkeletonBinary {
 						RotateTimeline timeline = new RotateTimeline(keyCount);
 						timeline.setBoneIndex(boneIndex);
 						for (int keyframeIndex = 0; keyframeIndex < keyCount; keyframeIndex++) {
-							timeline.setKeyframe(keyframeIndex, input.readFloat(), input.readFloat());
+							timeline.setFrame(keyframeIndex, input.readFloat(), input.readFloat());
 							if (keyframeIndex < keyCount - 1) readCurve(input, keyframeIndex, timeline);
 						}
 						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getKeyframes()[keyCount * 2 - 2]);
+						duration = Math.max(duration, timeline.getFrames()[keyCount * 2 - 2]);
 						break;
 					}
 					case TIMELINE_TRANSLATE:
@@ -225,12 +225,12 @@ public class SkeletonBinary {
 						}
 						timeline.setBoneIndex(boneIndex);
 						for (int keyframeIndex = 0; keyframeIndex < keyCount; keyframeIndex++) {
-							timeline.setKeyframe(keyframeIndex, input.readFloat(), input.readFloat() * timelineScale, input.readFloat()
+							timeline.setFrame(keyframeIndex, input.readFloat(), input.readFloat() * timelineScale, input.readFloat()
 								* timelineScale);
 							if (keyframeIndex < keyCount - 1) readCurve(input, keyframeIndex, timeline);
 						}
 						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getKeyframes()[keyCount * 3 - 3]);
+						duration = Math.max(duration, timeline.getFrames()[keyCount * 3 - 3]);
 						break;
 					default:
 						throw new RuntimeException("Invalid timeline type for a bone: " + timelineType + " (" + boneName + ")");
@@ -253,20 +253,20 @@ public class SkeletonBinary {
 						for (int keyframeIndex = 0; keyframeIndex < keyCount; keyframeIndex++) {
 							float time = input.readFloat();
 							Color.rgba8888ToColor(tempColor, input.readInt());
-							timeline.setKeyframe(keyframeIndex, time, tempColor.r, tempColor.g, tempColor.b, tempColor.a);
+							timeline.setFrame(keyframeIndex, time, tempColor.r, tempColor.g, tempColor.b, tempColor.a);
 							if (keyframeIndex < keyCount - 1) readCurve(input, keyframeIndex, timeline);
 						}
 						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getKeyframes()[keyCount * 5 - 5]);
+						duration = Math.max(duration, timeline.getFrames()[keyCount * 5 - 5]);
 						break;
 					}
 					case TIMELINE_ATTACHMENT:
 						AttachmentTimeline timeline = new AttachmentTimeline(keyCount);
 						timeline.setSlotIndex(slotIndex);
 						for (int keyframeIndex = 0; keyframeIndex < keyCount; keyframeIndex++)
-							timeline.setKeyframe(keyframeIndex, input.readFloat(), input.readString());
+							timeline.setFrame(keyframeIndex, input.readFloat(), input.readString());
 						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getKeyframes()[keyCount - 1]);
+						duration = Math.max(duration, timeline.getFrames()[keyCount - 1]);
 						break;
 					default:
 						throw new RuntimeException("Invalid timeline type for a slot: " + timelineType + " (" + slotName + ")");

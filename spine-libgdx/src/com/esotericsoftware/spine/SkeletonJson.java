@@ -206,12 +206,12 @@ public class SkeletonJson {
 					int keyframeIndex = 0;
 					for (OrderedMap valueMap : values) {
 						float time = (Float)valueMap.get("time");
-						timeline.setKeyframe(keyframeIndex, time, (Float)valueMap.get("angle"));
+						timeline.setFrame(keyframeIndex, time, (Float)valueMap.get("angle"));
 						readCurve(timeline, keyframeIndex, valueMap);
 						keyframeIndex++;
 					}
 					timelines.add(timeline);
-					duration = Math.max(duration, timeline.getKeyframes()[timeline.getKeyframeCount() * 2 - 2]);
+					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 2 - 2]);
 
 				} else if (timelineName.equals(TIMELINE_TRANSLATE) || timelineName.equals(TIMELINE_SCALE)) {
 					TranslateTimeline timeline;
@@ -228,13 +228,13 @@ public class SkeletonJson {
 					for (OrderedMap valueMap : values) {
 						float time = (Float)valueMap.get("time");
 						Float x = (Float)valueMap.get("x"), y = (Float)valueMap.get("y");
-						timeline.setKeyframe(keyframeIndex, time, x == null ? 0 : (x * timelineScale), y == null ? 0
+						timeline.setFrame(keyframeIndex, time, x == null ? 0 : (x * timelineScale), y == null ? 0
 							: (y * timelineScale));
 						readCurve(timeline, keyframeIndex, valueMap);
 						keyframeIndex++;
 					}
 					timelines.add(timeline);
-					duration = Math.max(duration, timeline.getKeyframes()[timeline.getKeyframeCount() * 3 - 3]);
+					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 3 - 3]);
 
 				} else
 					throw new RuntimeException("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
@@ -259,12 +259,12 @@ public class SkeletonJson {
 						for (OrderedMap valueMap : values) {
 							float time = (Float)valueMap.get("time");
 							Color color = Color.valueOf((String)valueMap.get("color"));
-							timeline.setKeyframe(keyframeIndex, time, color.r, color.g, color.b, color.a);
+							timeline.setFrame(keyframeIndex, time, color.r, color.g, color.b, color.a);
 							readCurve(timeline, keyframeIndex, valueMap);
 							keyframeIndex++;
 						}
 						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getKeyframes()[timeline.getKeyframeCount() * 5 - 5]);
+						duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 5 - 5]);
 
 					} else if (timelineName.equals(TIMELINE_ATTACHMENT)) {
 						AttachmentTimeline timeline = new AttachmentTimeline(values.size);
@@ -273,10 +273,10 @@ public class SkeletonJson {
 						int keyframeIndex = 0;
 						for (OrderedMap valueMap : values) {
 							float time = (Float)valueMap.get("time");
-							timeline.setKeyframe(keyframeIndex++, time, (String)valueMap.get("name"));
+							timeline.setFrame(keyframeIndex++, time, (String)valueMap.get("name"));
 						}
 						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getKeyframes()[timeline.getKeyframeCount() - 1]);
+						duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() - 1]);
 
 					} else
 						throw new RuntimeException("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
