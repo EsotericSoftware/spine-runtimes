@@ -53,7 +53,7 @@ float CurveTimeline_getCurvePercent (CurveTimeline* timeline, int frameIndex, fl
 
 typedef struct BaseTimeline {
 	CurveTimeline super;
-	int const frameCount;
+	int const framesLength;
 	float* const frames; /* time, angle, ... for rotate. time, x, y, ... for translate and scale. */
 	int boneIndex;
 } RotateTimeline;
@@ -82,7 +82,7 @@ void ScaleTimeline_setFrame (ScaleTimeline* timeline, int frameIndex, float time
 
 typedef struct {
 	CurveTimeline super;
-	int const frameCount;
+	int const framesLength;
 	float* const frames; /* time, r, g, b, a, ... */
 	int slotIndex;
 } ColorTimeline;
@@ -95,7 +95,7 @@ void ColorTimeline_setFrame (ColorTimeline* timeline, int frameIndex, float time
 
 typedef struct {
 	Timeline super;
-	int const frameCount;
+	int const framesLength;
 	float* const frames; /* time, ... */
 	int slotIndex;
 	const char** const attachmentNames;

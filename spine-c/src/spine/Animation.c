@@ -165,8 +165,8 @@ struct BaseTimeline* _BaseTimeline_create (int frameCount, int frameSize) {
 	_CurveTimeline_init(&self->super, frameCount);
 	((Timeline*)self)->_dispose = _BaseTimeline_dispose;
 
-	CAST(int, self->frameCount) = frameCount;
-	CAST(float*, self->frames) = CALLOC(float, frameCount * frameSize)
+	CAST(int, self->framesLength) = frameCount * frameSize;
+	CAST(float*, self->frames) = CALLOC(float, self->framesLength)
 
 	return self;
 }
@@ -183,8 +183,8 @@ void _RotateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float 
 
 	Bone *bone = skeleton->bones[self->boneIndex];
 
-	if (time >= self->frames[self->frameCount - 2]) { /* Time is after last frame. */
-		float amount = bone->data->rotation + self->frames[self->frameCount - 1] - bone->rotation;
+	if (time >= self->frames[self->framesLength - 2]) { /* Time is after last frame. */
+		float amount = bone->data->rotation + self->frames[self->framesLength - 1] - bone->rotation;
 		while (amount > 180)
 			amount -= 360;
 		while (amount < -180)
@@ -194,7 +194,7 @@ void _RotateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float 
 	}
 
 	/* Interpolate between the last frame and the current frame. */
-	int frameIndex = binarySearch(self->frames, self->frameCount, time, 2);
+	int frameIndex = binarySearch(self->frames, self->framesLength, time, 2);
 	float lastFrameValue = self->frames[frameIndex - 1];
 	float frameTime = self->frames[frameIndex];
 	float percent = 1 - (time - frameTime) / (self->frames[frameIndex + ROTATE_LAST_FRAME_TIME] - frameTime);
@@ -238,14 +238,14 @@ void _TranslateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, flo
 
 	Bone *bone = skeleton->bones[self->boneIndex];
 
-	if (time >= self->frames[self->frameCount - 3]) { /* Time is after last frame. */
-		bone->x += (bone->data->x + self->frames[self->frameCount - 2] - bone->x) * alpha;
-		bone->y += (bone->data->y + self->frames[self->frameCount - 1] - bone->y) * alpha;
+	if (time >= self->frames[self->framesLength - 3]) { /* Time is after last frame. */
+		bone->x += (bone->data->x + self->frames[self->framesLength - 2] - bone->x) * alpha;
+		bone->y += (bone->data->y + self->frames[self->framesLength - 1] - bone->y) * alpha;
 		return;
 	}
 
 	/* Interpolate between the last frame and the current frame. */
-	int frameIndex = binarySearch(self->frames, self->frameCount, time, 3);
+	int frameIndex = binarySearch(self->frames, self->framesLength, time, 3);
 	float lastFrameX = self->frames[frameIndex - 2];
 	float lastFrameY = self->frames[frameIndex - 1];
 	float frameTime = self->frames[frameIndex];
@@ -279,14 +279,14 @@ void _ScaleTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float t
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
 	Bone *bone = skeleton->bones[self->boneIndex];
-	if (time >= self->frames[self->frameCount - 3]) { /* Time is after last frame. */
-		bone->scaleX += (bone->data->scaleX - 1 + self->frames[self->frameCount - 2] - bone->scaleX) * alpha;
-		bone->scaleY += (bone->data->scaleY - 1 + self->frames[self->frameCount - 1] - bone->scaleY) * alpha;
+	if (time >= self->frames[self->framesLength - 3]) { /* Time is after last frame. */
+		bone->scaleX += (bone->data->scaleX - 1 + self->frames[self->framesLength - 2] - bone->scaleX) * alpha;
+		bone->scaleY += (bone->data->scaleY - 1 + self->frames[self->framesLength - 1] - bone->scaleY) * alpha;
 		return;
 	}
 
 	/* Interpolate between the last frame and the current frame. */
-	int frameIndex = binarySearch(self->frames, self->frameCount, time, 3);
+	int frameIndex = binarySearch(self->frames, self->framesLength, time, 3);
 	float lastFrameX = self->frames[frameIndex - 2];
 	float lastFrameY = self->frames[frameIndex - 1];
 	float frameTime = self->frames[frameIndex];
@@ -324,8 +324,8 @@ void _ColorTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float t
 
 	Slot *slot = skeleton->slots[self->slotIndex];
 
-	if (time >= self->frames[self->frameCount - 5]) { /* Time is after last frame. */
-		int i = self->frameCount - 1;
+	if (time >= self->frames[self->framesLength - 5]) { /* Time is after last frame. */
+		int i = self->framesLength - 1;
 		slot->r = self->frames[i - 3];
 		slot->g = self->frames[i - 2];
 		slot->b = self->frames[i - 1];
@@ -334,7 +334,7 @@ void _ColorTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float t
 	}
 
 	/* Interpolate between the last frame and the current frame. */
-	int frameIndex = binarySearch(self->frames, self->frameCount, time, 5);
+	int frameIndex = binarySearch(self->frames, self->framesLength, time, 5);
 	float lastFrameR = self->frames[frameIndex - 4];
 	float lastFrameG = self->frames[frameIndex - 3];
 	float lastFrameB = self->frames[frameIndex - 2];
@@ -383,10 +383,10 @@ void _AttachmentTimeline_apply (const Timeline* timeline, Skeleton* skeleton, fl
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
 	int frameIndex;
-	if (time >= self->frames[self->frameCount - 1]) /* Time is after last frame. */
-		frameIndex = self->frameCount - 1;
+	if (time >= self->frames[self->framesLength - 1]) /* Time is after last frame. */
+		frameIndex = self->framesLength - 1;
 	else
-		frameIndex = binarySearch(self->frames, self->frameCount, time, 1) - 1;
+		frameIndex = binarySearch(self->frames, self->framesLength, time, 1) - 1;
 
 	const char* attachmentName = self->attachmentNames[frameIndex];
 	Slot_setAttachment(skeleton->slots[self->slotIndex],
@@ -398,7 +398,7 @@ void _AttachmentTimeline_dispose (Timeline* timeline) {
 	AttachmentTimeline* self = (AttachmentTimeline*)timeline;
 
 	int i;
-	for (i = 0; i < self->frameCount; ++i)
+	for (i = 0; i < self->framesLength; ++i)
 		FREE(self->attachmentNames[i])
 	FREE(self->attachmentNames)
 
@@ -412,7 +412,7 @@ AttachmentTimeline* AttachmentTimeline_create (int frameCount) {
 	((Timeline*)self)->_apply = _AttachmentTimeline_apply;
 	CAST(char**, self->attachmentNames) = CALLOC(char*, frameCount)
 
-	CAST(int, self->frameCount) = frameCount;
+	CAST(int, self->framesLength) = frameCount;
 	CAST(float*, self->frames) = CALLOC(float, frameCount)
 
 	return self;

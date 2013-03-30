@@ -57,25 +57,25 @@ typedef struct Json {
 } Json;
 
 /* Supply a block of JSON, and this returns a Json object you can interrogate. Call Json_dispose when finished. */
-extern Json* Json_create (const char* value);
+Json* Json_create (const char* value);
 
 /* Delete a Json entity and all subentities. */
-extern void Json_dispose (Json* json);
+void Json_dispose (Json* json);
 
 /* Returns the number of items in an array (or object). */
-extern int Json_getSize (Json* json);
+int Json_getSize (Json* json);
 
 /* Retrieve item number "item" from array "array". Returns NULL if unsuccessful. */
-extern Json* Json_getItemAt (Json* json, int item);
+Json* Json_getItemAt (Json* json, int item);
 
 /* Get item "string" from object. Case insensitive. */
-extern Json* Json_getItem (Json* json, const char* string);
-extern const char* Json_getString (Json* json, const char* name, const char* defaultValue);
-extern float Json_getFloat (Json* json, const char* name, float defaultValue);
-extern int Json_getInt (Json* json, const char* name, int defaultValue);
+Json* Json_getItem (Json* json, const char* string);
+const char* Json_getString (Json* json, const char* name, const char* defaultValue);
+float Json_getFloat (Json* json, const char* name, float defaultValue);
+int Json_getInt (Json* json, const char* name, int defaultValue);
 
 /* For analysing failed parses. This returns a pointer to the parse error. You'll probably need to look a few chars back to make sense of it. Defined when Json_create() returns 0. 0 when Json_create() succeeds. */
-extern const char* Json_getError (void);
+const char* Json_getError (void);
 
 #ifdef __cplusplus
 }

@@ -41,6 +41,11 @@ void _Skeleton_init (Skeleton* self, SkeletonData* data) {
 
 	self->drawOrder = MALLOC(Slot*, self->slotCount)
 	memcpy(self->drawOrder, self->slots, sizeof(Slot*) * self->slotCount);
+
+	self->r = 1;
+	self->g = 1;
+	self->b = 1;
+	self->a = 1;
 }
 
 void _Skeleton_deinit (Skeleton* self) {

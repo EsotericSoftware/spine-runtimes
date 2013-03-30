@@ -6,6 +6,8 @@ namespace spine {
 extern "C" {
 #endif
 
+struct Slot;
+
 typedef enum {
 	ATTACHMENT_REGION, ATTACHMENT_REGION_SEQUENCE
 } AttachmentType;
@@ -15,10 +17,13 @@ struct Attachment {
 	const char* const name;
 	int type;
 
+	void (*_draw) (Attachment* attachment, struct Slot* slot);
 	void (*_dispose) (Attachment* attachment);
 };
 
 void Attachment_dispose (Attachment* attachment);
+
+void Attachment_draw (Attachment* attachment, struct Slot* slot);
 
 #ifdef __cplusplus
 }

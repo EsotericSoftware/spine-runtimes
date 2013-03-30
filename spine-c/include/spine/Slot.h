@@ -12,7 +12,7 @@ extern "C" {
 
 struct Skeleton;
 
-typedef struct {
+typedef struct Slot {
 	SlotData* const data;
 	struct Skeleton* const skeleton;
 	Bone* const bone;

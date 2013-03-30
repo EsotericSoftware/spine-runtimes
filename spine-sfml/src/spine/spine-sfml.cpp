@@ -49,6 +49,8 @@ void _SfmlSkeleton_dispose (Skeleton* skeleton) {
 }
 
 Skeleton* Skeleton_create (SkeletonData* data) {
+	Bone_setYDown(1);
+
 	SfmlSkeleton* self = CALLOC(SfmlSkeleton, 1)
 	_Skeleton_init(&self->super, data);
 	self->super._dispose = _SfmlSkeleton_dispose;
@@ -63,15 +65,14 @@ SkeletonDrawable& Skeleton_getDrawable (const Skeleton* self) {
 	return *((SfmlSkeleton*)self)->drawable;
 }
 
-SkeletonDrawable::SkeletonDrawable (Skeleton* self) {
-	skeleton = (SfmlSkeleton*)self;
+SkeletonDrawable::SkeletonDrawable (Skeleton* self) :
+				skeleton((SfmlSkeleton*)self) {
 }
 
 void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 	skeleton->vertexArray->clear();
 	for (int i = 0; i < skeleton->super.slotCount; ++i)
-		if (skeleton->super.slots[i]->attachment) ; //skeleton->slots[i]->attachment->draw(slots[i]);
-	// BOZO - Draw the slots!
+		if (skeleton->super.slots[i]->attachment) Attachment_draw(skeleton->super.slots[i]->attachment, skeleton->super.slots[i]);
 	states.texture = skeleton->texture;
 	target.draw(*skeleton->vertexArray, states);
 }
@@ -83,40 +84,8 @@ void _SfmlRegionAttachment_dispose (Attachment* self) {
 	FREE(self)
 }
 
-RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region) {
-	SfmlRegionAttachment* self = CALLOC(SfmlRegionAttachment, 1)
-	_RegionAttachment_init(&self->super, name);
-	self->super.super._dispose = _SfmlRegionAttachment_dispose;
-
-	self->texture = ((SfmlAtlasPage*)region->page)->texture;
-	int u = region->x;
-	int u2 = u + region->width;
-	int v = region->y;
-	int v2 = v + region->height;
-	if (region->rotate) {
-		self->vertices[1].texCoords.x = u;
-		self->vertices[1].texCoords.y = v2;
-		self->vertices[2].texCoords.x = u;
-		self->vertices[2].texCoords.y = v;
-		self->vertices[3].texCoords.x = u2;
-		self->vertices[3].texCoords.y = v;
-		self->vertices[0].texCoords.x = u2;
-		self->vertices[0].texCoords.y = v2;
-	} else {
-		self->vertices[0].texCoords.x = u;
-		self->vertices[0].texCoords.y = v2;
-		self->vertices[1].texCoords.x = u;
-		self->vertices[1].texCoords.y = v;
-		self->vertices[2].texCoords.x = u2;
-		self->vertices[2].texCoords.y = v;
-		self->vertices[3].texCoords.x = u2;
-		self->vertices[3].texCoords.y = v2;
-	}
-
-	return &self->super;
-}
-
-void _RegionAttachment_draw (SfmlRegionAttachment* self, Slot* slot) {
+void _SfmlRegionAttachment_draw (Attachment* attachment, Slot* slot) {
+	SfmlRegionAttachment* self = (SfmlRegionAttachment*)attachment;
 	SfmlSkeleton* skeleton = (SfmlSkeleton*)slot->skeleton;
 	Uint8 r = skeleton->super.r * slot->r * 255;
 	Uint8 g = skeleton->super.g * slot->g * 255;
@@ -157,6 +126,40 @@ void _RegionAttachment_draw (SfmlRegionAttachment* self, Slot* slot) {
 	skeleton->vertexArray->append(vertices[1]);
 	skeleton->vertexArray->append(vertices[2]);
 	skeleton->vertexArray->append(vertices[3]);
+}
+
+RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region) {
+	SfmlRegionAttachment* self = CALLOC(SfmlRegionAttachment, 1)
+	_RegionAttachment_init(&self->super, name);
+	self->super.super._dispose = _SfmlRegionAttachment_dispose;
+	self->super.super._draw = _SfmlRegionAttachment_draw;
+
+	self->texture = ((SfmlAtlasPage*)region->page)->texture;
+	int u = region->x;
+	int u2 = u + region->width;
+	int v = region->y;
+	int v2 = v + region->height;
+	if (region->rotate) {
+		self->vertices[1].texCoords.x = u;
+		self->vertices[1].texCoords.y = v2;
+		self->vertices[2].texCoords.x = u;
+		self->vertices[2].texCoords.y = v;
+		self->vertices[3].texCoords.x = u2;
+		self->vertices[3].texCoords.y = v;
+		self->vertices[0].texCoords.x = u2;
+		self->vertices[0].texCoords.y = v2;
+	} else {
+		self->vertices[0].texCoords.x = u;
+		self->vertices[0].texCoords.y = v2;
+		self->vertices[1].texCoords.x = u;
+		self->vertices[1].texCoords.y = v;
+		self->vertices[2].texCoords.x = u2;
+		self->vertices[2].texCoords.y = v;
+		self->vertices[3].texCoords.x = u2;
+		self->vertices[3].texCoords.y = v2;
+	}
+
+	return &self->super;
 }
 
 }
