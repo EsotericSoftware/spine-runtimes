@@ -30,9 +30,10 @@
 								<option id="gnu.cpp.compiler.mingw.exe.debug.option.optimization.level.1284147695" name="Optimization Level" superClass="gnu.cpp.compiler.mingw.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.mingw.exe.debug.option.debugging.level.1570084302" name="Debug Level" superClass="gnu.cpp.compiler.mingw.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.934414518" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;C:\Users\Nate\Desktop\SFML-2.0-rc\include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/spine-c/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/spine-sfml/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/spine-c/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/spine-c/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Users\Nate\Desktop\SFML-2.0-rc\include&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.warnings.allwarn.2053349441" name="All warnings (-Wall)" superClass="gnu.cpp.compiler.option.warnings.allwarn" value="true" valueType="boolean"/>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1463772359" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def"/>

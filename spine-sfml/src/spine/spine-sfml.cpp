@@ -1,3 +1,4 @@
+#include <spine/spine-sfml.h>
 #include <spine/spine.h>
 #include <spine/extension.h>
 #include <spine/util.h>
@@ -16,11 +17,6 @@ using sf::Vertex;
 using sf::VertexArray;
 
 namespace spine {
-
-typedef struct {
-	AtlasPage super;
-	Texture *texture;
-} SfmlAtlasPage;
 
 void _SfmlAtlasPage_dispose (AtlasPage* page) {
 	SfmlAtlasPage* self = (SfmlAtlasPage*)page;
@@ -42,14 +38,13 @@ AtlasPage* AtlasPage_create (const char* name) {
 
 /**/
 
-typedef struct {
-	Skeleton super;
-	VertexArray* vertexArray;
-	Texture* texture; // All region attachments must use the same texture.
-} SfmlSkeleton;
+void _SfmlSkeleton_dispose (Skeleton* skeleton) {
+	SfmlSkeleton* self = (SfmlSkeleton*)skeleton;
+	_Skeleton_deinit(&self->super);
 
-void _SfmlSkeleton_dispose (Skeleton* self) {
-	_Skeleton_deinit(self);
+	delete self->vertexArray;
+	delete self->drawable;
+
 	FREE(self)
 }
 
@@ -58,18 +53,30 @@ Skeleton* Skeleton_create (SkeletonData* data) {
 	_Skeleton_init(&self->super, data);
 	self->super._dispose = _SfmlSkeleton_dispose;
 
+	self->drawable = new SkeletonDrawable(&self->super);
 	self->vertexArray = new VertexArray(Quads, data->boneCount * 4);
 
 	return &self->super;
 }
 
-/**/
+SkeletonDrawable& Skeleton_getDrawable (const Skeleton* self) {
+	return *((SfmlSkeleton*)self)->drawable;
+}
 
-typedef struct {
-	RegionAttachment super;
-	Vertex vertices[4];
-	Texture *texture;
-} SfmlRegionAttachment;
+SkeletonDrawable::SkeletonDrawable (Skeleton* self) {
+	skeleton = (SfmlSkeleton*)self;
+}
+
+void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
+	skeleton->vertexArray->clear();
+	for (int i = 0; i < skeleton->super.slotCount; ++i)
+		if (skeleton->super.slots[i]->attachment) ; //skeleton->slots[i]->attachment->draw(slots[i]);
+	// BOZO - Draw the slots!
+	states.texture = skeleton->texture;
+	target.draw(*skeleton->vertexArray, states);
+}
+
+/**/
 
 void _SfmlRegionAttachment_dispose (Attachment* self) {
 	_RegionAttachment_deinit((RegionAttachment*)self);
@@ -109,7 +116,7 @@ RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region
 	return &self->super;
 }
 
-void _RegionAttachment_draw (SfmlRegionAttachment* self, Slot *slot) {
+void _RegionAttachment_draw (SfmlRegionAttachment* self, Slot* slot) {
 	SfmlSkeleton* skeleton = (SfmlSkeleton*)slot->skeleton;
 	Uint8 r = skeleton->super.r * slot->r * 255;
 	Uint8 g = skeleton->super.g * slot->g * 255;

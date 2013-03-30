@@ -24,7 +24,7 @@
  ******************************************************************************/
 
 #include <iostream>
-#include <spine/spine.h>
+#include <spine/spine-sfml.h>
 #include <SFML/Graphics.hpp>
 
 using namespace std;
@@ -56,7 +56,7 @@ int main () {
 			while (window.pollEvent(event))
 				if (event.type == sf::Event::Closed) window.close();
 			window.clear();
-			//window.draw(*skeleton);
+			window.draw(Skeleton_getDrawable(skeleton));
 			window.display();
 
 			float delta = deltaClock.getElapsedTime().asSeconds();
