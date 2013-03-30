@@ -3,7 +3,6 @@
 	<name>spine-sfml</name>
 	<comment></comment>
 	<projects>
-		<project>spine-cpp</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -25,4 +24,11 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>spine-c src</name>
+			<type>2</type>
+			<locationURI>PARENT-1-PROJECT_LOC/spine-c/src</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

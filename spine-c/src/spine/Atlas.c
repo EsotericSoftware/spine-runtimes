@@ -3,32 +3,32 @@
 #include <spine/util.h>
 #include <spine/extension.h>
 
-void _AtlasPage_init (AtlasPage* this, const char* name) {
-	this->name = name; /* name is guaranteed to be memory we allocated. */
+void _AtlasPage_init (AtlasPage* self, const char* name) {
+	self->name = name; /* name is guaranteed to be memory we allocated. */
 }
 
-void _AtlasPage_deinit (AtlasPage* this) {
-	FREE(this->name);
+void _AtlasPage_deinit (AtlasPage* self) {
+	FREE(self->name);
 }
 
-void AtlasPage_dispose (AtlasPage* this) {
-	if (this->next) AtlasPage_dispose(this->next); /* BOZO - Don't dispose all in the list. */
-	this->_dispose(this);
+void AtlasPage_dispose (AtlasPage* self) {
+	if (self->next) AtlasPage_dispose(self->next); /* BOZO - Don't dispose all in the list. */
+	self->_dispose(self);
 }
 
 /**/
 
 AtlasRegion* AtlasRegion_create () {
-	AtlasRegion* this = calloc(1, sizeof(AtlasRegion));
-	return this;
+	AtlasRegion* self = CALLOC(AtlasRegion, 1)
+	return self;
 }
 
-void AtlasRegion_dispose (AtlasRegion* this) {
-	if (this->next) AtlasRegion_dispose(this->next);
-	FREE(this->name);
-	FREE(this->splits);
-	FREE(this->pads);
-	FREE(this);
+void AtlasRegion_dispose (AtlasRegion* self) {
+	if (self->next) AtlasRegion_dispose(self->next);
+	FREE(self->name);
+	FREE(self->splits);
+	FREE(self->pads);
+	FREE(self);
 }
 
 /**/
@@ -114,7 +114,7 @@ static int readTuple (Str tuple[]) {
 
 static char* mallocString (Str* str) {
 	int length = str->end - str->begin;
-	char* string = malloc(length + 1);
+	char* string = MALLOC(char, length + 1)
 	memcpy(string, str->begin, length);
 	string[length] = '\0';
 	return string;
@@ -128,7 +128,7 @@ static int indexOf (const char** array, int count, Str* str) {
 	return -1;
 }
 
-static int equals (Str* str, char* other) {
+static int equals (Str* str, const char* other) {
 	return strncmp(other, str->begin, str->end - str->begin) == 0;
 }
 
@@ -141,7 +141,7 @@ static const char* textureFilterNames[] = {"Nearest", "Linear", "MipMap", "MipMa
 		"MipMapNearestLinear", "MipMapLinearLinear"};
 
 Atlas* Atlas_readAtlas (const char* data) {
-	Atlas* this = calloc(1, sizeof(Atlas));
+	Atlas* self = CALLOC(Atlas, 1)
 
 	AtlasPage *page = 0;
 	AtlasPage *lastPage = 0;
@@ -157,7 +157,7 @@ Atlas* Atlas_readAtlas (const char* data) {
 			if (lastPage)
 				lastPage->next = page;
 			else
-				this->pages = page;
+				self->pages = page;
 			lastPage = page;
 
 			if (!readValue(&str)) return 0;
@@ -177,7 +177,7 @@ Atlas* Atlas_readAtlas (const char* data) {
 			if (lastRegion)
 				lastRegion->next = region;
 			else
-				this->regions = region;
+				self->regions = region;
 			lastRegion = region;
 
 			region->page = page;
@@ -197,7 +197,7 @@ Atlas* Atlas_readAtlas (const char* data) {
 			int count;
 			if (!(count = readTuple(tuple))) return 0;
 			if (count == 4) { /* split is optional */
-				region->splits = malloc(sizeof(int) * 4);
+				region->splits = MALLOC(int, 4)
 				region->splits[0] = toInt(tuple);
 				region->splits[1] = toInt(tuple + 1);
 				region->splits[2] = toInt(tuple + 2);
@@ -205,7 +205,7 @@ Atlas* Atlas_readAtlas (const char* data) {
 
 				if (!(count = readTuple(tuple))) return 0;
 				if (count == 4) { /* pad is optional, but only present with splits */
-					region->pads = malloc(sizeof(int) * 4);
+					region->pads = MALLOC(int, 4)
 					region->pads[0] = toInt(tuple);
 					region->pads[1] = toInt(tuple + 1);
 					region->pads[2] = toInt(tuple + 2);
@@ -227,7 +227,7 @@ Atlas* Atlas_readAtlas (const char* data) {
 		}
 	}
 
-	return this;
+	return self;
 }
 
 Atlas* Atlas_readAtlasFile (const char* path) {
@@ -238,14 +238,14 @@ Atlas* Atlas_readAtlasFile (const char* path) {
 	return atlas;
 }
 
-void Atlas_dispose (Atlas* this) {
-	if (this->pages) AtlasPage_dispose(this->pages);
-	if (this->regions) AtlasRegion_dispose(this->regions);
-	FREE(this)
+void Atlas_dispose (Atlas* self) {
+	if (self->pages) AtlasPage_dispose(self->pages);
+	if (self->regions) AtlasRegion_dispose(self->regions);
+	FREE(self)
 }
 
-AtlasRegion* Atlas_findRegion (const Atlas* this, const char* name) {
-	AtlasRegion* region = this->regions;
+AtlasRegion* Atlas_findRegion (const Atlas* self, const char* name) {
+	AtlasRegion* region = self->regions;
 	while (region) {
 		if (strcmp(region->name, name) == 0) return region;
 		region = region->next;

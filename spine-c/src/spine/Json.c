@@ -20,10 +20,10 @@
  THE SOFTWARE.
  */
 
-/* cJSON */
+/* Json */
 /* JSON parser in C. */
 
-#include <spine/cJSON.h>
+#include <spine/Json.h>
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
@@ -34,11 +34,11 @@
 
 static const char* ep;
 
-const char* cJSON_GetErrorPtr (void) {
+const char* Json_getError (void) {
 	return ep;
 }
 
-static int cJSON_strcasecmp (const char* s1, const char* s2) {
+static int Json_strcasecmp (const char* s1, const char* s2) {
 	if (!s1) return (s1 == s2) ? 0 : 1;
 	if (!s2) return 1;
 	for (; tolower(*s1) == tolower(*s2); ++s1, ++s2)
@@ -47,17 +47,17 @@ static int cJSON_strcasecmp (const char* s1, const char* s2) {
 }
 
 /* Internal constructor. */
-static cJSON *cJSON_create_Item (void) {
-	return (cJSON*)calloc(1, sizeof(cJSON));
+static Json *Json_create_Item (void) {
+	return (Json*)calloc(1, sizeof(Json));
 }
 
-/* Delete a cJSON structure. */
-void cJSON_dispose (cJSON *c) {
-	cJSON *next;
+/* Delete a Json structure. */
+void Json_dispose (Json *c) {
+	Json *next;
 	while (c) {
 		next = c->next;
-		if (!(c->type & cJSON_IsReference) && c->child) cJSON_dispose(c->child);
-		if (!(c->type & cJSON_IsReference) && c->valuestring) free((char*)c->valuestring);
+		if (c->child) Json_dispose(c->child);
+		if (c->valuestring) free((char*)c->valuestring);
 		if (c->name) free((char*)c->name);
 		free(c);
 		c = next;
@@ -65,7 +65,7 @@ void cJSON_dispose (cJSON *c) {
 }
 
 /* Parse the input text to generate a number, and populate the result into item. */
-static const char* parse_number (cJSON *item, const char* num) {
+static const char* parse_number (Json *item, const char* num) {
 	float n = 0, sign = 1, scale = 0;
 	int subscale = 0, signsubscale = 1;
 
@@ -95,13 +95,13 @@ static const char* parse_number (cJSON *item, const char* num) {
 
 	item->valuefloat = n;
 	item->valueint = (int)n;
-	item->type = cJSON_Number;
+	item->type = Json_Number;
 	return num;
 }
 
 /* Parse the input text into an unescaped cstring, and populate item. */
 static const unsigned char firstByteMark[7] = {0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC};
-static const char* parse_string (cJSON *item, const char* str) {
+static const char* parse_string (Json *item, const char* str) {
 	const char* ptr = str + 1;
 	char* ptr2;
 	char* out;
@@ -189,14 +189,14 @@ static const char* parse_string (cJSON *item, const char* str) {
 	*ptr2 = 0;
 	if (*ptr == '\"') ptr++;
 	item->valuestring = out;
-	item->type = cJSON_String;
+	item->type = Json_String;
 	return ptr;
 }
 
 /* Predeclare these prototypes. */
-static const char* parse_value (cJSON *item, const char* value);
-static const char* parse_array (cJSON *item, const char* value);
-static const char* parse_object (cJSON *item, const char* value);
+static const char* parse_value (Json *item, const char* value);
+static const char* parse_array (Json *item, const char* value);
+static const char* parse_object (Json *item, const char* value);
 
 /* Utility to jump whitespace and cr/lf */
 static const char* skip (const char* in) {
@@ -206,49 +206,34 @@ static const char* skip (const char* in) {
 }
 
 /* Parse an object - create a new root, and populate. */
-cJSON *cJSON_ParseWithOpts (const char* value, const char* *return_parse_end, int require_null_terminated) {
+Json *Json_create (const char* value) {
 	const char* end = 0;
-	cJSON *c = cJSON_create_Item();
+	Json *c = Json_create_Item();
 	ep = 0;
 	if (!c) return 0; /* memory fail */
 
 	end = parse_value(c, skip(value));
 	if (!end) {
-		cJSON_dispose(c);
+		Json_dispose(c);
 		return 0;
 	} /* parse failure. ep is set. */
 
-	/* if we require null-terminated JSON without appended garbage, skip and then check for a null terminator */
-	if (require_null_terminated) {
-		end = skip(end);
-		if (*end) {
-			cJSON_dispose(c);
-			ep = end;
-			return 0;
-		}
-	}
-	if (return_parse_end) *return_parse_end = end;
 	return c;
 }
 
-/* Default options for cJSON_Parse */
-cJSON *cJSON_Parse (const char* value) {
-	return cJSON_ParseWithOpts(value, 0, 0);
-}
-
 /* Parser core - when encountering text, process appropriately. */
-static const char* parse_value (cJSON *item, const char* value) {
+static const char* parse_value (Json *item, const char* value) {
 	if (!value) return 0; /* Fail on null. */
 	if (!strncmp(value, "null", 4)) {
-		item->type = cJSON_NULL;
+		item->type = Json_NULL;
 		return value + 4;
 	}
 	if (!strncmp(value, "false", 5)) {
-		item->type = cJSON_False;
+		item->type = Json_False;
 		return value + 5;
 	}
 	if (!strncmp(value, "true", 4)) {
-		item->type = cJSON_True;
+		item->type = Json_True;
 		item->valueint = 1;
 		return value + 4;
 	}
@@ -270,25 +255,25 @@ static const char* parse_value (cJSON *item, const char* value) {
 }
 
 /* Build an array from input text. */
-static const char* parse_array (cJSON *item, const char* value) {
-	cJSON *child;
+static const char* parse_array (Json *item, const char* value) {
+	Json *child;
 	if (*value != '[') {
 		ep = value;
 		return 0;
 	} /* not an array! */
 
-	item->type = cJSON_Array;
+	item->type = Json_Array;
 	value = skip(value + 1);
 	if (*value == ']') return value + 1; /* empty array. */
 
-	item->child = child = cJSON_create_Item();
+	item->child = child = Json_create_Item();
 	if (!item->child) return 0; /* memory fail */
 	value = skip(parse_value(child, skip(value))); /* skip any spacing, get the value. */
 	if (!value) return 0;
 
 	while (*value == ',') {
-		cJSON *new_item;
-		if (!(new_item = cJSON_create_Item())) return 0; /* memory fail */
+		Json *new_item;
+		if (!(new_item = Json_create_Item())) return 0; /* memory fail */
 		child->next = new_item;
 		new_item->prev = child;
 		child = new_item;
@@ -302,18 +287,18 @@ static const char* parse_array (cJSON *item, const char* value) {
 }
 
 /* Build an object from the text. */
-static const char* parse_object (cJSON *item, const char* value) {
-	cJSON *child;
+static const char* parse_object (Json *item, const char* value) {
+	Json *child;
 	if (*value != '{') {
 		ep = value;
 		return 0;
 	} /* not an object! */
 
-	item->type = cJSON_Object;
+	item->type = Json_Object;
 	value = skip(value + 1);
 	if (*value == '}') return value + 1; /* empty array. */
 
-	item->child = child = cJSON_create_Item();
+	item->child = child = Json_create_Item();
 	if (!item->child) return 0;
 	value = skip(parse_string(child, skip(value)));
 	if (!value) return 0;
@@ -327,8 +312,8 @@ static const char* parse_object (cJSON *item, const char* value) {
 	if (!value) return 0;
 
 	while (*value == ',') {
-		cJSON *new_item;
-		if (!(new_item = cJSON_create_Item())) return 0; /* memory fail */
+		Json *new_item;
+		if (!(new_item = Json_create_Item())) return 0; /* memory fail */
 		child->next = new_item;
 		new_item->prev = child;
 		child = new_item;
@@ -350,40 +335,40 @@ static const char* parse_object (cJSON *item, const char* value) {
 }
 
 /* Get Array size/item / object item. */
-int cJSON_GetArraySize (cJSON *array) {
-	cJSON *c = array->child;
+int Json_getSize (Json *array) {
+	Json *c = array->child;
 	int i = 0;
 	while (c)
 		i++, c = c->next;
 	return i;
 }
 
-cJSON *cJSON_GetArrayItem (cJSON *array, int item) {
-	cJSON *c = array->child;
+Json *Json_getItemAt (Json *array, int item) {
+	Json *c = array->child;
 	while (c && item > 0)
 		item--, c = c->next;
 	return c;
 }
 
-cJSON *cJSON_GetObjectItem (cJSON *object, const char* string) {
-	cJSON *c = object->child;
-	while (c && cJSON_strcasecmp(c->name, string))
+Json *Json_getItem (Json *object, const char* string) {
+	Json *c = object->child;
+	while (c && Json_strcasecmp(c->name, string))
 		c = c->next;
 	return c;
 }
 
-const char* cJSON_GetObjectString (cJSON* object, const char* name, const char* defaultValue) {
-	object = cJSON_GetObjectItem(object, name);
+const char* Json_getString (Json* object, const char* name, const char* defaultValue) {
+	object = Json_getItem(object, name);
 	if (object) return object->valuestring;
 	return defaultValue;
 }
 
-float cJSON_GetObjectFloat (cJSON* value, const char* name, float defaultValue) {
-	value = cJSON_GetObjectItem(value, name);
+float Json_getFloat (Json* value, const char* name, float defaultValue) {
+	value = Json_getItem(value, name);
 	return value ? value->valuefloat : defaultValue;
 }
 
-int cJSON_GetObjectInt (cJSON* value, const char* name, int defaultValue) {
-	value = cJSON_GetObjectItem(value, name);
+int Json_getInt (Json* value, const char* name, int defaultValue) {
+	value = Json_getItem(value, name);
 	return value ? value->valuefloat : defaultValue;
 }

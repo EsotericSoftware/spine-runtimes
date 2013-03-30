@@ -1,16 +1,16 @@
 #ifndef SPINE_EXTENSION_H_
 #define SPINE_EXTENSION_H_
 
-#ifdef __cplusplus
-namespace spine {
-extern "C" {
-#endif
-
 #include <spine/Skeleton.h>
 #include <spine/RegionAttachment.h>
 #include <spine/Animation.h>
 #include <spine/Atlas.h>
 #include <spine/AttachmentLoader.h>
+
+#ifdef __cplusplus
+namespace spine {
+extern "C" {
+#endif
 
 /* Methods that must be implemented: **/
 
@@ -42,7 +42,7 @@ void _AtlasPage_deinit (AtlasPage* page);
 
 void _AttachmentLoader_init (AttachmentLoader* loader);
 void _AttachmentLoader_deinit (AttachmentLoader* loader);
-void* _AttachmentLoader_setError (AttachmentLoader* loader, const char* error1, const char* error2);
+void _AttachmentLoader_setError (AttachmentLoader* loader, const char* error1, const char* error2);
 
 #ifdef __cplusplus
 }

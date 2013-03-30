@@ -5,6 +5,7 @@
 #include <spine/AttachmentLoader.h>
 #include <spine/SkeletonData.h>
 #include <spine/Atlas.h>
+#include <spine/Animation.h>
 
 #ifdef __cplusplus
 namespace spine {
@@ -24,7 +25,8 @@ void SkeletonJson_dispose (SkeletonJson* skeletonJson);
 SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* skeletonJson, const char* json);
 SkeletonData* SkeletonJson_readSkeletonDataFile (SkeletonJson* skeletonJson, const char* path);
 
-/* Animation* SkeletonJson_readAnimation (SkeletonJson* skeletonJson, char* json, const SkeletonData *skeletonData); */
+Animation* SkeletonJson_readAnimation (SkeletonJson* skeletonJson, const char* json, const SkeletonData *skeletonData);
+Animation* SkeletonJson_readAnimationFile (SkeletonJson* skeletonJson, const char* path, const SkeletonData *skeletonData);
 
 #ifdef __cplusplus
 }

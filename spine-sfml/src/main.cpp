@@ -24,7 +24,7 @@
  ******************************************************************************/
 
 #include <iostream>
-#include <spine-sfml/spine.h>
+#include <spine/spine.h>
 #include <SFML/Graphics.hpp>
 
 using namespace std;
@@ -33,18 +33,19 @@ using namespace spine;
 int main () {
 
 	try {
-		Atlas *atlas = new Atlas("../data/spineboy.atlas");
-		SkeletonJson json(atlas);
-		SkeletonData *skeletonData = json.readSkeletonData("../data/spineboy-skeleton.json");
-		Animation *animation = json.readAnimation("../data/spineboy-walk.json", skeletonData);
+		Atlas* atlas = Atlas_readAtlasFile("../data/spineboy.atlas");
+		SkeletonJson* json = SkeletonJson_create(atlas);
+		SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "../data/spineboy-skeleton.json");
+		Animation* animation = SkeletonJson_readAnimationFile(json, "../data/spineboy-walk.json", skeletonData);
+		SkeletonJson_dispose(json);
 
-		Skeleton *skeleton = new Skeleton(skeletonData);
+		Skeleton* skeleton = Skeleton_create(skeletonData);
 		skeleton->flipX = false;
 		skeleton->flipY = false;
-		skeleton->setToBindPose();
-		skeleton->getRootBone()->x = 320;
-		skeleton->getRootBone()->y = 420;
-		skeleton->updateWorldTransform();
+		Skeleton_setToBindPose(skeleton);
+		Skeleton_getRootBone(skeleton)->x = 320;
+		Skeleton_getRootBone(skeleton)->y = 420;
+		Skeleton_updateWorldTransform(skeleton);
 
 		sf::RenderWindow window(sf::VideoMode(640, 480), "Spine SFML");
 		window.setFramerateLimit(60);
@@ -55,16 +56,20 @@ int main () {
 			while (window.pollEvent(event))
 				if (event.type == sf::Event::Closed) window.close();
 			window.clear();
-			window.draw(*skeleton);
+			//window.draw(*skeleton);
 			window.display();
 
 			float delta = deltaClock.getElapsedTime().asSeconds();
 			deltaClock.restart();
 			animationTime += delta;
 
-			animation->apply(skeleton, animationTime, true);
-			skeleton->updateWorldTransform();
+			Animation_apply(animation, skeleton, animationTime, true);
+			Skeleton_updateWorldTransform(skeleton);
 		}
+
+		Skeleton_dispose(skeleton);
+		SkeletonData_dispose(skeletonData);
+		Atlas_dispose(atlas);
 	} catch (exception &ex) {
 		cout << ex.what() << endl << flush;
 	}

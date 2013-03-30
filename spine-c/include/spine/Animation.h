@@ -17,7 +17,7 @@ typedef struct {
 	float duration;
 } Animation;
 
-Animation* Animation_create ();
+Animation* Animation_create (int timelineCount);
 void Animation_dispose (Animation* animation);
 
 void Animation_apply (const Animation* animation, Skeleton* skeleton, float time, int/*bool*/loop);

@@ -1,134 +1,134 @@
 #include <spine/Skeleton.h>
 #include <spine/util.h>
 
-void _Skeleton_init (Skeleton* this, SkeletonData* data) {
-	CAST(SkeletonData*, this->data) = data;
+void _Skeleton_init (Skeleton* self, SkeletonData* data) {
+	CAST(SkeletonData*, self->data) = data;
 
-	this->boneCount = this->data->boneCount;
-	this->bones = malloc(sizeof(Bone*) * this->boneCount);
+	self->boneCount = self->data->boneCount;
+	self->bones = MALLOC(Bone*, self->boneCount)
 	int i, ii;
-	for (i = 0; i < this->boneCount; ++i) {
-		BoneData* boneData = this->data->bones[i];
+	for (i = 0; i < self->boneCount; ++i) {
+		BoneData* boneData = self->data->bones[i];
 		Bone* parent = 0;
 		if (boneData->parent) {
 			/* Find parent bone. */
-			for (ii = 0; ii < this->boneCount; ++ii) {
+			for (ii = 0; ii < self->boneCount; ++ii) {
 				if (data->bones[ii] == boneData->parent) {
-					parent = this->bones[ii];
+					parent = self->bones[ii];
 					break;
 				}
 			}
 		}
-		this->bones[i] = Bone_create(boneData, parent);
+		self->bones[i] = Bone_create(boneData, parent);
 	}
 
-	this->slotCount = data->slotCount;
-	this->slots = malloc(sizeof(Slot*) * this->slotCount);
-	for (i = 0; i < this->slotCount; ++i) {
+	self->slotCount = data->slotCount;
+	self->slots = MALLOC(Slot*, self->slotCount)
+	for (i = 0; i < self->slotCount; ++i) {
 		SlotData *slotData = data->slots[i];
 
 		/* Find bone for the slotData's boneData. */
 		Bone *bone;
-		for (ii = 0; ii < this->boneCount; ++ii) {
+		for (ii = 0; ii < self->boneCount; ++ii) {
 			if (data->bones[ii] == slotData->boneData) {
-				bone = this->bones[ii];
+				bone = self->bones[ii];
 				break;
 			}
 		}
 
-		this->slots[i] = Slot_create(slotData, this, bone);
+		self->slots[i] = Slot_create(slotData, self, bone);
 	}
 
-	this->drawOrder = malloc(sizeof(Slot*) * this->slotCount);
-	memcpy(this->drawOrder, this->slots, sizeof(Slot*) * this->slotCount);
+	self->drawOrder = MALLOC(Slot*, self->slotCount)
+	memcpy(self->drawOrder, self->slots, sizeof(Slot*) * self->slotCount);
 }
 
-void _Skeleton_deinit (Skeleton* this) {
+void _Skeleton_deinit (Skeleton* self) {
 	int i;
-	for (i = 0; i < this->boneCount; ++i)
-		Bone_dispose(this->bones[i]);
-	FREE(this->bones)
+	for (i = 0; i < self->boneCount; ++i)
+		Bone_dispose(self->bones[i]);
+	FREE(self->bones)
 
-	for (i = 0; i < this->slotCount; ++i)
-		Slot_dispose(this->slots[i]);
-	FREE(this->slots)
+	for (i = 0; i < self->slotCount; ++i)
+		Slot_dispose(self->slots[i]);
+	FREE(self->slots)
 
-	FREE(this->drawOrder)
+	FREE(self->drawOrder)
 }
 
-void Skeleton_dispose (Skeleton* this) {
-	this->_dispose(this);
+void Skeleton_dispose (Skeleton* self) {
+	self->_dispose(self);
 }
 
-void Skeleton_updateWorldTransform (const Skeleton* this) {
+void Skeleton_updateWorldTransform (const Skeleton* self) {
 	int i;
-	for (i = 0; i < this->boneCount; ++i)
-		Bone_updateWorldTransform(this->bones[i], this->flipX, this->flipY);
+	for (i = 0; i < self->boneCount; ++i)
+		Bone_updateWorldTransform(self->bones[i], self->flipX, self->flipY);
 }
 
-void Skeleton_setToBindPose (const Skeleton* this) {
-	Skeleton_setBonesToBindPose(this);
-	Skeleton_setSlotsToBindPose(this);
+void Skeleton_setToBindPose (const Skeleton* self) {
+	Skeleton_setBonesToBindPose(self);
+	Skeleton_setSlotsToBindPose(self);
 }
 
-void Skeleton_setBonesToBindPose (const Skeleton* this) {
+void Skeleton_setBonesToBindPose (const Skeleton* self) {
 	int i;
-	for (i = 0; i < this->boneCount; ++i)
-		Bone_setToBindPose(this->bones[i]);
+	for (i = 0; i < self->boneCount; ++i)
+		Bone_setToBindPose(self->bones[i]);
 }
 
-void Skeleton_setSlotsToBindPose (const Skeleton* this) {
+void Skeleton_setSlotsToBindPose (const Skeleton* self) {
 	int i;
-	for (i = 0; i < this->slotCount; ++i)
-		Slot_setToBindPose(this->slots[i]);
+	for (i = 0; i < self->slotCount; ++i)
+		Slot_setToBindPose(self->slots[i]);
 }
 
-Bone* Skeleton_getRootBone (const Skeleton* this) {
-	if (this->boneCount == 0) return 0;
-	return this->bones[0];
+Bone* Skeleton_getRootBone (const Skeleton* self) {
+	if (self->boneCount == 0) return 0;
+	return self->bones[0];
 }
 
-Bone* Skeleton_findBone (const Skeleton* this, const char* boneName) {
+Bone* Skeleton_findBone (const Skeleton* self, const char* boneName) {
 	int i;
-	for (i = 0; i < this->boneCount; ++i)
-		if (this->data->bones[i]->name == boneName) return this->bones[i];
+	for (i = 0; i < self->boneCount; ++i)
+		if (self->data->bones[i]->name == boneName) return self->bones[i];
 	return 0;
 }
 
-int Skeleton_findBoneIndex (const Skeleton* this, const char* boneName) {
+int Skeleton_findBoneIndex (const Skeleton* self, const char* boneName) {
 	int i;
-	for (i = 0; i < this->boneCount; ++i)
-		if (this->data->bones[i]->name == boneName) return i;
+	for (i = 0; i < self->boneCount; ++i)
+		if (self->data->bones[i]->name == boneName) return i;
 	return -1;
 }
 
-Slot* Skeleton_findSlot (const Skeleton* this, const char* slotName) {
+Slot* Skeleton_findSlot (const Skeleton* self, const char* slotName) {
 	int i;
-	for (i = 0; i < this->slotCount; ++i)
-		if (this->data->slots[i]->name == slotName) return this->slots[i];
+	for (i = 0; i < self->slotCount; ++i)
+		if (self->data->slots[i]->name == slotName) return self->slots[i];
 	return 0;
 }
 
-int Skeleton_findSlotIndex (const Skeleton* this, const char* slotName) {
+int Skeleton_findSlotIndex (const Skeleton* self, const char* slotName) {
 	int i;
-	for (i = 0; i < this->slotCount; ++i)
-		if (this->data->slots[i]->name == slotName) return i;
+	for (i = 0; i < self->slotCount; ++i)
+		if (self->data->slots[i]->name == slotName) return i;
 	return -1;
 }
 
-int Skeleton_setSkinByName (Skeleton* this, const char* skinName) {
-	Skin *skin = SkeletonData_findSkin(this->data, skinName);
+int Skeleton_setSkinByName (Skeleton* self, const char* skinName) {
+	Skin *skin = SkeletonData_findSkin(self->data, skinName);
 	if (!skin) return 0;
-	Skeleton_setSkin(this, skin);
+	Skeleton_setSkin(self, skin);
 	return 1;
 }
 
-void Skeleton_setSkin (Skeleton* this, Skin* newSkin) {
-	if (this->skin && newSkin) {
+void Skeleton_setSkin (Skeleton* self, Skin* newSkin) {
+	if (self->skin && newSkin) {
 		/* Attach each attachment in the new skin if the corresponding attachment in the old skin is currently attached. */
-		const SkinEntry *entry = this->skin->entries;
+		const SkinEntry *entry = self->skin->entries;
 		while (entry) {
-			Slot *slot = this->slots[entry->slotIndex];
+			Slot *slot = self->slots[entry->slotIndex];
 			if (slot->attachment == entry->attachment) {
 				Attachment *attachment = Skin_getAttachment(newSkin, entry->slotIndex, entry->name);
 				if (attachment) Slot_setAttachment(slot, attachment);
@@ -136,33 +136,33 @@ void Skeleton_setSkin (Skeleton* this, Skin* newSkin) {
 			entry = entry->next;
 		}
 	}
-	CAST(Skin*, this->skin) = newSkin;
+	CAST(Skin*, self->skin) = newSkin;
 }
 
-Attachment* Skeleton_getAttachmentForSlotName (const Skeleton* this, const char* slotName, const char* attachmentName) {
-	int slotIndex = SkeletonData_findSlotIndex(this->data, slotName);
-	return Skeleton_getAttachmentForSlotIndex(this, slotIndex, attachmentName);
+Attachment* Skeleton_getAttachmentForSlotName (const Skeleton* self, const char* slotName, const char* attachmentName) {
+	int slotIndex = SkeletonData_findSlotIndex(self->data, slotName);
+	return Skeleton_getAttachmentForSlotIndex(self, slotIndex, attachmentName);
 }
 
-Attachment* Skeleton_getAttachmentForSlotIndex (const Skeleton* this, int slotIndex, const char* attachmentName) {
+Attachment* Skeleton_getAttachmentForSlotIndex (const Skeleton* self, int slotIndex, const char* attachmentName) {
 	if (slotIndex == -1) return 0;
-	if (this->skin) {
-		Attachment *attachment = Skin_getAttachment(this->skin, slotIndex, attachmentName);
+	if (self->skin) {
+		Attachment *attachment = Skin_getAttachment(self->skin, slotIndex, attachmentName);
 		if (attachment) return attachment;
 	}
-	if (this->data->defaultSkin) {
-		Attachment *attachment = Skin_getAttachment(this->data->defaultSkin, slotIndex, attachmentName);
+	if (self->data->defaultSkin) {
+		Attachment *attachment = Skin_getAttachment(self->data->defaultSkin, slotIndex, attachmentName);
 		if (attachment) return attachment;
 	}
 	return 0;
 }
 
-int Skeleton_setAttachment (Skeleton* this, const char* slotName, const char* attachmentName) {
+int Skeleton_setAttachment (Skeleton* self, const char* slotName, const char* attachmentName) {
 	int i;
-	for (i = 0; i < this->slotCount; ++i) {
-		Slot *slot = this->slots[i];
+	for (i = 0; i < self->slotCount; ++i) {
+		Slot *slot = self->slots[i];
 		if (slot->data->name == slotName) {
-			Attachment* attachment = Skeleton_getAttachmentForSlotIndex(this, i, attachmentName);
+			Attachment* attachment = Skeleton_getAttachmentForSlotIndex(self, i, attachmentName);
 			if (!attachment) return 0;
 			Slot_setAttachment(slot, attachment);
 			return 1;
@@ -171,6 +171,6 @@ int Skeleton_setAttachment (Skeleton* this, const char* slotName, const char* at
 	return 0;
 }
 
-void Skeleton_update (Skeleton* this, float deltaTime) {
-	this->time += deltaTime;
+void Skeleton_update (Skeleton* self, float deltaTime) {
+	self->time += deltaTime;
 }

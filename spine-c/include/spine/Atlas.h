@@ -36,7 +36,7 @@ struct AtlasPage {
 };
 
 AtlasPage* AtlasPage_create (const char* name);
-void AtlasPage_dispose(AtlasPage * this);
+void AtlasPage_dispose (AtlasPage* page);
 
 /**/
 
@@ -56,7 +56,7 @@ struct AtlasRegion {
 };
 
 AtlasRegion* AtlasRegion_create ();
-void AtlasRegion_dispose(AtlasRegion * this);
+void AtlasRegion_dispose (AtlasRegion* region);
 
 /**/
 

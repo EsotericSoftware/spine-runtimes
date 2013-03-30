@@ -2,45 +2,45 @@
 #include <spine/util.h>
 
 SkeletonData* SkeletonData_create () {
-	SkeletonData* this = calloc(1, sizeof(SkeletonData));
-	return this;
+	SkeletonData* self = CALLOC(SkeletonData, 1)
+	return self;
 }
 
-void SkeletonData_dispose (SkeletonData* this) {
-	FREE(this)
+void SkeletonData_dispose (SkeletonData* self) {
+	FREE(self)
 }
 
-BoneData* SkeletonData_findBone (const SkeletonData* this, const char* boneName) {
+BoneData* SkeletonData_findBone (const SkeletonData* self, const char* boneName) {
 	int i;
-	for (i = 0; i < this->boneCount; ++i)
-		if (strcmp(this->bones[i]->name, boneName) == 0) return this->bones[i];
+	for (i = 0; i < self->boneCount; ++i)
+		if (strcmp(self->bones[i]->name, boneName) == 0) return self->bones[i];
 	return 0;
 }
 
-int SkeletonData_findBoneIndex (const SkeletonData* this, const char* boneName) {
+int SkeletonData_findBoneIndex (const SkeletonData* self, const char* boneName) {
 	int i;
-	for (i = 0; i < this->boneCount; ++i)
-		if (strcmp(this->bones[i]->name, boneName) == 0) return i;
+	for (i = 0; i < self->boneCount; ++i)
+		if (strcmp(self->bones[i]->name, boneName) == 0) return i;
 	return 0;
 }
 
-SlotData* SkeletonData_findSlot (const SkeletonData* this, const char* slotName) {
+SlotData* SkeletonData_findSlot (const SkeletonData* self, const char* slotName) {
 	int i;
-	for (i = 0; i < this->slotCount; ++i)
-		if (strcmp(this->slots[i]->name, slotName) == 0) return this->slots[i];
+	for (i = 0; i < self->slotCount; ++i)
+		if (strcmp(self->slots[i]->name, slotName) == 0) return self->slots[i];
 	return 0;
 }
 
-int SkeletonData_findSlotIndex (const SkeletonData* this, const char* slotName) {
+int SkeletonData_findSlotIndex (const SkeletonData* self, const char* slotName) {
 	int i;
-	for (i = 0; i < this->slotCount; ++i)
-		if (strcmp(this->slots[i]->name, slotName) == 0) return i;
+	for (i = 0; i < self->slotCount; ++i)
+		if (strcmp(self->slots[i]->name, slotName) == 0) return i;
 	return 0;
 }
 
-Skin* SkeletonData_findSkin (const SkeletonData* this, const char* skinName) {
+Skin* SkeletonData_findSkin (const SkeletonData* self, const char* skinName) {
 	int i;
-	for (i = 0; i < this->skinCount; ++i)
-		if (strcmp(this->skins[i]->name, skinName) == 0) return this->skins[i];
+	for (i = 0; i < self->skinCount; ++i)
+		if (strcmp(self->skins[i]->name, skinName) == 0) return self->skins[i];
 	return 0;
 }

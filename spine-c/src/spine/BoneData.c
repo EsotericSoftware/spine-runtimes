@@ -2,15 +2,15 @@
 #include <spine/util.h>
 
 BoneData* BoneData_create (const char* name, BoneData* parent) {
-	BoneData* this = calloc(1, sizeof(BoneData));
-	MALLOC_STR(this->name, name)
-	CAST(BoneData*, this->parent) = parent;
-	this->scaleX = 1;
-	this->scaleY = 1;
-	return this;
+	BoneData* self = CALLOC(BoneData, 1)
+	MALLOC_STR(self->name, name)
+	CAST(BoneData*, self->parent) = parent;
+	self->scaleX = 1;
+	self->scaleY = 1;
+	return self;
 }
 
-void BoneData_dispose (BoneData* this) {
-	FREE(this->name)
-	FREE(this)
+void BoneData_dispose (BoneData* self) {
+	FREE(self->name)
+	FREE(self)
 }

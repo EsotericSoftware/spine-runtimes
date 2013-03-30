@@ -3,30 +3,34 @@
 #include <spine/extension.h>
 #include <stdio.h>
 
-void _AtlasAttachmentLoader_dispose (AttachmentLoader* this) {
-	_AttachmentLoader_deinit(this);
+void _AtlasAttachmentLoader_dispose (AttachmentLoader* self) {
+	_AttachmentLoader_deinit(self);
 }
 
 Attachment* _AtlasAttachmentLoader_newAttachment (AttachmentLoader* loader, AttachmentType type, const char* name) {
-	AtlasAttachmentLoader* this = (AtlasAttachmentLoader*)loader;
+	AtlasAttachmentLoader* self = (AtlasAttachmentLoader*)loader;
 	switch (type) {
 	case ATTACHMENT_REGION: {
-		AtlasRegion* region = Atlas_findRegion(this->atlas, name);
-		if (!region) return _AttachmentLoader_setError(loader, "Region not found: ", name);
+		AtlasRegion* region = Atlas_findRegion(self->atlas, name);
+		if (!region) {
+			_AttachmentLoader_setError(loader, "Region not found: ", name);
+			return 0;
+		}
 		return (Attachment*)RegionAttachment_create(name, region);
 	}
 	default: {
 		char buffer[16];
 		sprintf((char*)loader->error2, "%d", type);
-		return _AttachmentLoader_setError(loader, "Unknown attachment type: ", buffer);
+		_AttachmentLoader_setError(loader, "Unknown attachment type: ", buffer);
+		return 0;
 	}
 	}
 }
 
 AtlasAttachmentLoader* AtlasAttachmentLoader_create (Atlas* atlas) {
-	AtlasAttachmentLoader* this = calloc(1, sizeof(AtlasAttachmentLoader));
-	this->atlas = atlas;
-	this->super._newAttachment = _AtlasAttachmentLoader_newAttachment;
-	this->super._dispose = _AtlasAttachmentLoader_dispose;
-	return this;
+	AtlasAttachmentLoader* self = CALLOC(AtlasAttachmentLoader, 1)
+	self->atlas = atlas;
+	self->super._newAttachment = _AtlasAttachmentLoader_newAttachment;
+	self->super._dispose = _AtlasAttachmentLoader_dispose;
+	return self;
 }

@@ -3,42 +3,42 @@
 #include <spine/util.h>
 #include <spine/extension.h>
 
-void _RegionAttachment_init (RegionAttachment* this, const char* name) {
-	this->scaleX = 1;
-	this->scaleY = 1;
-	_Attachment_init(&this->super, name, ATTACHMENT_REGION);
+void _RegionAttachment_init (RegionAttachment* self, const char* name) {
+	self->scaleX = 1;
+	self->scaleY = 1;
+	_Attachment_init(&self->super, name, ATTACHMENT_REGION);
 }
 
-void _RegionAttachment_deinit (RegionAttachment* this) {
-	_Attachment_deinit(&this->super);
+void _RegionAttachment_deinit (RegionAttachment* self) {
+	_Attachment_deinit(&self->super);
 }
 
-void RegionAttachment_updateOffset (RegionAttachment* this) {
-	float localX2 = this->width / 2;
-	float localY2 = this->height / 2;
+void RegionAttachment_updateOffset (RegionAttachment* self) {
+	float localX2 = self->width / 2;
+	float localY2 = self->height / 2;
 	float localX = -localX2;
 	float localY = -localY2;
-	localX *= this->scaleX;
-	localY *= this->scaleY;
-	localX2 *= this->scaleX;
-	localY2 *= this->scaleY;
-	float radians = (float)(this->rotation * 3.1415926535897932385 / 180);
-	float cosine = cos(radians);
-	float sine = sin(radians);
-	float localXCos = localX * cosine + this->x;
+	localX *= self->scaleX;
+	localY *= self->scaleY;
+	localX2 *= self->scaleX;
+	localY2 *= self->scaleY;
+	float radians = (float)(self->rotation * 3.1415926535897932385 / 180);
+	float cosine = cosf(radians);
+	float sine = sinf(radians);
+	float localXCos = localX * cosine + self->x;
 	float localXSin = localX * sine;
-	float localYCos = localY * cosine + this->y;
+	float localYCos = localY * cosine + self->y;
 	float localYSin = localY * sine;
-	float localX2Cos = localX2 * cosine + this->x;
+	float localX2Cos = localX2 * cosine + self->x;
 	float localX2Sin = localX2 * sine;
-	float localY2Cos = localY2 * cosine + this->y;
+	float localY2Cos = localY2 * cosine + self->y;
 	float localY2Sin = localY2 * sine;
-	this->offset[0] = localXCos - localYSin;
-	this->offset[1] = localYCos + localXSin;
-	this->offset[2] = localXCos - localY2Sin;
-	this->offset[3] = localY2Cos + localXSin;
-	this->offset[4] = localX2Cos - localY2Sin;
-	this->offset[5] = localY2Cos + localX2Sin;
-	this->offset[6] = localX2Cos - localYSin;
-	this->offset[7] = localYCos + localX2Sin;
+	self->offset[0] = localXCos - localYSin;
+	self->offset[1] = localYCos + localXSin;
+	self->offset[2] = localXCos - localY2Sin;
+	self->offset[3] = localY2Cos + localXSin;
+	self->offset[4] = localX2Cos - localY2Sin;
+	self->offset[5] = localY2Cos + localX2Sin;
+	self->offset[6] = localX2Cos - localYSin;
+	self->offset[7] = localYCos + localX2Sin;
 }

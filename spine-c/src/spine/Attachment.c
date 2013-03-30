@@ -1,16 +1,16 @@
 #include <spine/Attachment.h>
 #include <spine/util.h>
 
-void _Attachment_init (Attachment* this, const char* name, int type) {
-	MALLOC_STR(this->name, name);
-	this->type = type;
+void _Attachment_init (Attachment* self, const char* name, int type) {
+	MALLOC_STR(self->name, name);
+	self->type = type;
 }
 
-void _Attachment_deinit (Attachment* this) {
-	FREE(this->name)
-	FREE(this)
+void _Attachment_deinit (Attachment* self) {
+	FREE(self->name)
+	FREE(self)
 }
 
-void Attachment_dispose (Attachment* this) {
-	this->_dispose(this);
+void Attachment_dispose (Attachment* self) {
+	self->_dispose(self);
 }

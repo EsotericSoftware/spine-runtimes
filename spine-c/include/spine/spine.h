@@ -1,8 +1,11 @@
 #ifndef SPINE_SPINE_H_
 #define SPINE_SPINE_H_
 
+#include <spine/Animation.h>
 #include <spine/Atlas.h>
+#include <spine/AtlasAttachmentLoader.h>
 #include <spine/Attachment.h>
+#include <spine/AttachmentLoader.h>
 #include <spine/Bone.h>
 #include <spine/BoneData.h>
 #include <spine/RegionAttachment.h>
