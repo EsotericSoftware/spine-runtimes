@@ -21,7 +21,9 @@ namespace spine {
 void _SfmlAtlasPage_dispose (AtlasPage* page) {
 	SfmlAtlasPage* self = (SfmlAtlasPage*)page;
 	_AtlasPage_deinit(&self->super);
+
 	delete self->texture;
+
 	FREE(page)
 }
 

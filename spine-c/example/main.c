@@ -36,32 +36,6 @@ AtlasPage* AtlasPage_create (const char* name) {
 /**/
 
 typedef struct {
-	RegionAttachment super;
-	int extraData;
-} ExampleRegionAttachment;
-
-void _ExampleRegionAttachment_dispose (Attachment* attachment) {
-	ExampleRegionAttachment* self = (ExampleRegionAttachment*)attachment;
-	_RegionAttachment_deinit(&self->super);
-
-	self->extraData = 0;
-
-	FREE(self)
-}
-
-RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region) {
-	ExampleRegionAttachment* self = CALLOC(ExampleRegionAttachment, 1)
-	_RegionAttachment_init(&self->super, name);
-	self->super.super._dispose = _ExampleRegionAttachment_dispose;
-
-	self->extraData = 456;
-
-	return &self->super;
-}
-
-/**/
-
-typedef struct {
 	Skeleton super;
 	int extraData;
 } ExampleSkeleton;
@@ -81,6 +55,38 @@ Skeleton* Skeleton_create (SkeletonData* data) {
 	self->super._dispose = _ExampleSkeleton_dispose;
 
 	self->extraData = 789;
+
+	return &self->super;
+}
+
+/**/
+
+typedef struct {
+	RegionAttachment super;
+	int extraData;
+} ExampleRegionAttachment;
+
+void _ExampleRegionAttachment_dispose (Attachment* attachment) {
+	ExampleRegionAttachment* self = (ExampleRegionAttachment*)attachment;
+	_RegionAttachment_deinit(&self->super);
+
+	self->extraData = 0;
+
+	FREE(self)
+}
+
+void _ExampleRegionAttachment_draw (Attachment* attachment, Slot* slot) {
+	ExampleRegionAttachment* self = (ExampleRegionAttachment*)attachment;
+	// Draw or queue region for drawing.
+}
+
+RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region) {
+	ExampleRegionAttachment* self = CALLOC(ExampleRegionAttachment, 1)
+	_RegionAttachment_init(&self->super, name);
+	self->super.super._dispose = _ExampleRegionAttachment_dispose;
+	self->super.super._draw = _ExampleRegionAttachment_draw;
+
+	self->extraData = 456;
 
 	return &self->super;
 }
