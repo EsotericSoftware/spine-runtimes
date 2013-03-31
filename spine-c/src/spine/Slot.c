@@ -30,10 +30,10 @@
 typedef struct {
 	Slot slot;
 	float attachmentTime;
-} Internal;
+} SlotInternal;
 
 Slot* Slot_create (SlotData* data, Skeleton* skeleton, Bone* bone) {
-	Internal* internal = CALLOC(Internal, 1)
+	SlotInternal* internal = CALLOC(SlotInternal, 1)
 	Slot* self = &internal->slot;
 	CAST(SlotData*, self->data) = data;
 	CAST(Skeleton*, self->skeleton) = skeleton;
@@ -52,15 +52,15 @@ void Slot_dispose (Slot* self) {
 /* @param attachment May be null. */
 void Slot_setAttachment (Slot* self, Attachment* attachment) {
 	CAST(Attachment*, self->attachment) = attachment;
-	((Internal*)self)->attachmentTime = self->skeleton->time;
+	((SlotInternal*)self)->attachmentTime = self->skeleton->time;
 }
 
 void Slot_setAttachmentTime (Slot* self, float time) {
-	((Internal*)self)->attachmentTime = self->skeleton->time - time;
+	((SlotInternal*)self)->attachmentTime = self->skeleton->time - time;
 }
 
 float Slot_getAttachmentTime (const Slot* self) {
-	return self->skeleton->time - ((Internal*)self)->attachmentTime;
+	return self->skeleton->time - ((SlotInternal*)self)->attachmentTime;
 }
 
 void Slot_setToBindPose (Slot* self) {

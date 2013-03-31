@@ -119,7 +119,7 @@ void CurveTimeline_setCurve (CurveTimeline* self, int frameIndex, float cx1, flo
 	self->curves[i + 5] = tmp2y * pre5;
 }
 
-float CurveTimeline_getCurvePercent (CurveTimeline* self, int frameIndex, float percent) {
+float CurveTimeline_getCurvePercent (const CurveTimeline* self, int frameIndex, float percent) {
 	int curveIndex = frameIndex * 6;
 	float dfx = self->curves[curveIndex];
 	if (dfx == CURVE_LINEAR) return percent;

@@ -72,7 +72,7 @@ void CurveTimeline_setStepped (CurveTimeline* timeline, int frameIndex);
  * cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of
  * the difference between the keyframe's values. */
 void CurveTimeline_setCurve (CurveTimeline* timeline, int frameIndex, float cx1, float cy1, float cx2, float cy2);
-float CurveTimeline_getCurvePercent (CurveTimeline* timeline, int frameIndex, float percent);
+float CurveTimeline_getCurvePercent (const CurveTimeline* timeline, int frameIndex, float percent);
 
 /**/
 
