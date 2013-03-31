@@ -24,7 +24,8 @@
  ******************************************************************************/
 
 #include <spine/SkeletonData.h>
-#include <spine/util.h>
+#include <string.h>
+#include <spine/extension.h>
 
 SkeletonData* SkeletonData_new () {
 	return NEW(SkeletonData);

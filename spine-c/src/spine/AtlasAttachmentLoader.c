@@ -24,8 +24,9 @@
  ******************************************************************************/
 
 #include <spine/AtlasAttachmentLoader.h>
-#include <spine/extension.h>
 #include <stdio.h>
+#include <spine/extension.h>
+#include <spine/util.h>
 
 void _AtlasAttachmentLoader_free (AttachmentLoader* self) {
 	_AttachmentLoader_deinit(self);

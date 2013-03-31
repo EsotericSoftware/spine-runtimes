@@ -24,7 +24,7 @@
  ******************************************************************************/
 
 #include <spine/Slot.h>
-#include <spine/util.h>
+#include <spine/extension.h>
 #include <spine/Skeleton.h>
 
 typedef struct {

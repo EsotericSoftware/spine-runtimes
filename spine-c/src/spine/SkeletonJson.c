@@ -26,8 +26,9 @@
 #include <spine/SkeletonJson.h>
 #include <math.h>
 #include <stdio.h>
-#include <spine/util.h>
 #include <math.h>
+#include <spine/extension.h>
+#include <spine/util.h>
 #include <spine/Json.h>
 #include <spine/RegionAttachment.h>
 #include <spine/AtlasAttachmentLoader.h>

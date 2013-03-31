@@ -25,6 +25,7 @@
 
 #include <spine/AttachmentLoader.h>
 #include <spine/extension.h>
+#include <spine/util.h>
 
 void _AttachmentLoader_init (AttachmentLoader* self) {
 	CONST_CAST(_AttachmentLoaderVtable*, self->vtable) = NEW(_AttachmentLoaderVtable);

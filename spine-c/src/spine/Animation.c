@@ -26,6 +26,7 @@
 #include <spine/Animation.h>
 #include <math.h>
 #include <spine/extension.h>
+#include <spine/util.h>
 
 Animation* Animation_new (int timelineCount) {
 	Animation* self = NEW(Animation);
@@ -69,7 +70,7 @@ void _Timeline_deinit (Timeline* self) {
 }
 
 void Timeline_free (Timeline* self) {
-	VTABLE(Timeline, self) ->dispose(self);
+	VTABLE(Timeline, self) ->free(self);
 }
 
 void Timeline_apply (const Timeline* self, Skeleton* skeleton, float time, float alpha) {
@@ -190,7 +191,7 @@ void _BaseTimeline_free (Timeline* timeline) {
 struct BaseTimeline* _BaseTimeline_new (int frameCount, int frameSize) {
 	struct BaseTimeline* self = NEW(struct BaseTimeline);
 	_CurveTimeline_init(SUPER(self), frameCount);
-	VTABLE(Timeline, self) ->dispose = _BaseTimeline_free;
+	VTABLE(Timeline, self) ->free = _BaseTimeline_free;
 
 	CONST_CAST(int, self->framesLength) = frameCount * frameSize;
 	CONST_CAST(float*, self->frames) = CALLOC(float, self->framesLength);
@@ -435,7 +436,7 @@ void _AttachmentTimeline_free (Timeline* timeline) {
 AttachmentTimeline* AttachmentTimeline_new (int frameCount) {
 	AttachmentTimeline* self = NEW(AttachmentTimeline);
 	_Timeline_init(SUPER(self));
-	VTABLE(Timeline, self) ->dispose = _AttachmentTimeline_free;
+	VTABLE(Timeline, self) ->free = _AttachmentTimeline_free;
 	VTABLE(Timeline, self) ->apply = _AttachmentTimeline_apply;
 	CONST_CAST(char**, self->attachmentNames) = CALLOC(char*, frameCount);
 

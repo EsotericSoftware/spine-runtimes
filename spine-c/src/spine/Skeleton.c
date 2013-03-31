@@ -24,6 +24,7 @@
  ******************************************************************************/
 
 #include <spine/Skeleton.h>
+#include <string.h>
 #include <spine/extension.h>
 
 void _Skeleton_init (Skeleton* self, SkeletonData* data) {

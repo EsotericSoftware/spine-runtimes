@@ -26,6 +26,7 @@
 #include <spine/Atlas.h>
 #include <ctype.h>
 #include <spine/extension.h>
+#include <spine/util.h>
 
 void _AtlasPage_init (AtlasPage* self, const char* name) {
 	CONST_CAST(_AtlasPageVtable*, self->vtable) = NEW(_AtlasPageVtable);
