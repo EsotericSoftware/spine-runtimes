@@ -43,7 +43,7 @@ struct RegionAttachment {
 
 void RegionAttachment_updateOffset (RegionAttachment* attachment);
 
-RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region);
+RegionAttachment* RegionAttachment_new (const char* name, AtlasRegion* region);
 
 #ifdef __cplusplus
 }

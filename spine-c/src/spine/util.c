@@ -34,7 +34,7 @@ const char* readFile (const char* path) {
 	long length = ftell(file);
 	fseek(file, 0, SEEK_SET);
 
-	char* data = (char*)malloc(length + 1);
+	char* data = MALLOC(char, length + 1);
 	fread(data, 1, length, file);
 	fclose(file);
 	data[length] = '\0';

@@ -34,16 +34,33 @@ namespace spine {
 extern "C" {
 #endif
 
-/* Used to cast away const on an lvalue. */
-#define CAST(TYPE,VALUE) *(TYPE*)&VALUE
+/* All allocation uses these. */
+#define MALLOC(TYPE,COUNT) ((TYPE*)malloc(sizeof(TYPE) * COUNT))
+#define CALLOC(TYPE,COUNT) ((TYPE*)calloc(1, sizeof(TYPE) * COUNT))
+#define NEW(TYPE) CALLOC(TYPE,1)
 
-#define CALLOC(TYPE,COUNT) (TYPE*)calloc(1, sizeof(TYPE) * COUNT);
-#define MALLOC(TYPE,COUNT) (TYPE*)malloc(sizeof(TYPE) * COUNT);
+/* Casts away const. Can be used as an lvalue. Not type safe, use with care. */
+#define CONST_CAST(TYPE,VALUE) (*(TYPE*)&VALUE)
 
-#define MALLOC_STR(TO,FROM) strcpy(CAST(char*, TO) = (char*)malloc(strlen(FROM)), FROM);
+/* Gets the direct super class. Type safe. */
+#define SUPER(VALUE) (&VALUE->super)
 
-#define FREE(E) free((void*)E);
+/* Cast to a super class. Not type safe, use with care. */
+#define SUPER_CAST(TYPE,VALUE) ((TYPE*)VALUE)
 
+/* Cast to a sub class. Not type safe, use with care. */
+#define SUB_CAST(TYPE,VALUE) ((TYPE*)VALUE)
+
+/* Gets the vtable for the specified type. Can be used as an lvalue. */
+#define VTABLE(TYPE,VALUE) ((_##TYPE##Vtable*)((TYPE*)VALUE)->vtable)
+
+/* Allocates a new char[], assigns it to TO, and copies FROM to it. Can be used on const. */
+#define MALLOC_STR(TO,FROM) strcpy(CONST_CAST(char*, TO) = (char*)malloc(strlen(FROM)), FROM)
+
+/* Frees memory. Can be used on const. */
+#define FREE(VALUE) free((void*)VALUE)
+
+/* Read file at specific path to a new char[]. Return value must be freed. */
 const char* readFile (const char* path);
 
 #ifdef __cplusplus

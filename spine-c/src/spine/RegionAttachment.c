@@ -25,17 +25,16 @@
 
 #include <spine/RegionAttachment.h>
 #include <math.h>
-#include <spine/util.h>
 #include <spine/extension.h>
 
 void _RegionAttachment_init (RegionAttachment* self, const char* name) {
 	self->scaleX = 1;
 	self->scaleY = 1;
-	_Attachment_init(&self->super, name, ATTACHMENT_REGION);
+	_Attachment_init(SUPER(self), name, ATTACHMENT_REGION);
 }
 
 void _RegionAttachment_deinit (RegionAttachment* self) {
-	_Attachment_deinit(&self->super);
+	_Attachment_deinit(SUPER(self));
 }
 
 void RegionAttachment_updateOffset (RegionAttachment* self) {

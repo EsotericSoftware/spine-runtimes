@@ -46,8 +46,8 @@ typedef struct {
 	const SkinEntry* const entries;
 } Skin;
 
-Skin* Skin_create (const char* name);
-void Skin_dispose (Skin* skin);
+Skin* Skin_new (const char* name);
+void Skin_free (Skin* skin);
 
 /* The Skin owns the attachment. */
 void Skin_addAttachment (Skin* skin, int slotIndex, const char* name, Attachment* attachment);

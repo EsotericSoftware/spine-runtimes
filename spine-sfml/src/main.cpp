@@ -32,12 +32,12 @@ using namespace spine;
 
 int main () {
 	Atlas* atlas = Atlas_readAtlasFile("../data/spineboy.atlas");
-	SkeletonJson* json = SkeletonJson_create(atlas);
+	SkeletonJson* json = SkeletonJson_new(atlas);
 	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "../data/spineboy-skeleton.json");
 	Animation* animation = SkeletonJson_readAnimationFile(json, "../data/spineboy-walk.json", skeletonData);
-	SkeletonJson_dispose(json);
+	SkeletonJson_free(json);
 
-	Skeleton* skeleton = Skeleton_create(skeletonData);
+	Skeleton* skeleton = Skeleton_new(skeletonData);
 	skeleton->flipX = false;
 	skeleton->flipY = false;
 	Skeleton_setToBindPose(skeleton);
@@ -65,7 +65,7 @@ int main () {
 		Skeleton_updateWorldTransform(skeleton);
 	}
 
-	Skeleton_dispose(skeleton);
-	SkeletonData_dispose(skeletonData);
-	Atlas_dispose(atlas);
+	Skeleton_free(skeleton);
+	SkeletonData_free(skeletonData);
+	Atlas_free(atlas);
 }

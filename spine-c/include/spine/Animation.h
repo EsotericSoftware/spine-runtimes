@@ -42,8 +42,8 @@ typedef struct {
 	float duration;
 } Animation;
 
-Animation* Animation_create (int timelineCount);
-void Animation_dispose (Animation* animation);
+Animation* Animation_new (int timelineCount);
+void Animation_free (Animation* animation);
 
 void Animation_apply (const Animation* animation, Skeleton* skeleton, float time, int/*bool*/loop);
 void Animation_mix (const Animation* animation, Skeleton* skeleton, float time, int/*bool*/loop, float alpha);
@@ -51,11 +51,10 @@ void Animation_mix (const Animation* animation, Skeleton* skeleton, float time, 
 /**/
 
 struct Timeline {
-	void (*_apply) (const Timeline* timeline, Skeleton* skeleton, float time, float alpha);
-	void (*_dispose) (Timeline* timeline);
+	const void* const vtable;
 };
 
-void Timeline_dispose (Timeline* timeline);
+void Timeline_free (Timeline* timeline);
 void Timeline_apply (const Timeline* timeline, Skeleton* skeleton, float time, float alpha);
 
 /**/
@@ -83,7 +82,7 @@ typedef struct BaseTimeline {
 	int boneIndex;
 } RotateTimeline;
 
-RotateTimeline* RotateTimeline_create (int frameCount);
+RotateTimeline* RotateTimeline_new (int frameCount);
 
 void RotateTimeline_setFrame (RotateTimeline* timeline, int frameIndex, float time, float angle);
 
@@ -91,7 +90,7 @@ void RotateTimeline_setFrame (RotateTimeline* timeline, int frameIndex, float ti
 
 typedef struct BaseTimeline TranslateTimeline;
 
-TranslateTimeline* TranslateTimeline_create (int frameCount);
+TranslateTimeline* TranslateTimeline_new (int frameCount);
 
 void TranslateTimeline_setFrame (TranslateTimeline* timeline, int frameIndex, float time, float x, float y);
 
@@ -99,7 +98,7 @@ void TranslateTimeline_setFrame (TranslateTimeline* timeline, int frameIndex, fl
 
 typedef struct BaseTimeline ScaleTimeline;
 
-ScaleTimeline* ScaleTimeline_create (int frameCount);
+ScaleTimeline* ScaleTimeline_new (int frameCount);
 
 void ScaleTimeline_setFrame (ScaleTimeline* timeline, int frameIndex, float time, float x, float y);
 
@@ -112,7 +111,7 @@ typedef struct {
 	int slotIndex;
 } ColorTimeline;
 
-ColorTimeline* ColorTimeline_create (int frameCount);
+ColorTimeline* ColorTimeline_new (int frameCount);
 
 void ColorTimeline_setFrame (ColorTimeline* timeline, int frameIndex, float time, float r, float g, float b, float a);
 
@@ -126,7 +125,7 @@ typedef struct {
 	const char** const attachmentNames;
 } AttachmentTimeline;
 
-AttachmentTimeline* AttachmentTimeline_create (int frameCount);
+AttachmentTimeline* AttachmentTimeline_new (int frameCount);
 
 /* @param attachmentName May be 0. */
 void AttachmentTimeline_setFrame (AttachmentTimeline* timeline, int frameIndex, float time, const char* attachmentName);

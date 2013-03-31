@@ -47,8 +47,8 @@ typedef struct {
 	Skin* defaultSkin;
 } SkeletonData;
 
-SkeletonData* SkeletonData_create ();
-void SkeletonData_dispose (SkeletonData* skeletonData);
+SkeletonData* SkeletonData_new ();
+void SkeletonData_free (SkeletonData* skeletonData);
 
 BoneData* SkeletonData_findBone (const SkeletonData* skeletonData, const char* boneName);
 int SkeletonData_findBoneIndex (const SkeletonData* skeletonData, const char* boneName);

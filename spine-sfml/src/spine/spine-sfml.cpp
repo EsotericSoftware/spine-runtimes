@@ -26,7 +26,6 @@
 #include <spine/spine-sfml.h>
 #include <spine/spine.h>
 #include <spine/extension.h>
-#include <spine/util.h>
 #include <SFML/Graphics/Vertex.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -43,81 +42,82 @@ using sf::VertexArray;
 
 namespace spine {
 
-void _SfmlAtlasPage_dispose (AtlasPage* page) {
-	SfmlAtlasPage* self = (SfmlAtlasPage*)page;
-	_AtlasPage_deinit(&self->super);
+void _SfmlAtlasPage_free (AtlasPage* page) {
+	SfmlAtlasPage* self = SUB_CAST(SfmlAtlasPage, page);
+	_AtlasPage_deinit(SUPER(self));
 
 	delete self->texture;
 
-	FREE(page)
+	FREE(page);
 }
 
-AtlasPage* AtlasPage_create (const char* name) {
-	SfmlAtlasPage* self = CALLOC(SfmlAtlasPage, 1)
-	_AtlasPage_init(&self->super, name);
-	self->super._dispose = _SfmlAtlasPage_dispose;
+AtlasPage* AtlasPage_new (const char* name) {
+	SfmlAtlasPage* self = NEW(SfmlAtlasPage);
+	_AtlasPage_init(SUPER(self), name);
+	VTABLE(AtlasPage, self) ->free = _SfmlAtlasPage_free;
 
 	self->texture = new Texture();
 	self->texture->loadFromFile(name);
 
-	return &self->super;
+	return SUPER(self);
 }
 
 /**/
 
-void _SfmlSkeleton_dispose (Skeleton* skeleton) {
-	SfmlSkeleton* self = (SfmlSkeleton*)skeleton;
-	_Skeleton_deinit(&self->super);
+void _SfmlSkeleton_free (Skeleton* skeleton) {
+	SfmlSkeleton* self = SUB_CAST(SfmlSkeleton, skeleton);
+	_Skeleton_deinit(SUPER(self));
 
 	delete self->vertexArray;
 	delete self->drawable;
 
-	FREE(self)
+	FREE(self);
 }
 
-Skeleton* Skeleton_create (SkeletonData* data) {
+Skeleton* Skeleton_new (SkeletonData* data) {
 	Bone_setYDown(1);
 
-	SfmlSkeleton* self = CALLOC(SfmlSkeleton, 1)
-	_Skeleton_init(&self->super, data);
-	self->super._dispose = _SfmlSkeleton_dispose;
+	SfmlSkeleton* self = NEW(SfmlSkeleton);
+	_Skeleton_init(SUPER(self), data);
+	VTABLE(Skeleton, self) ->free = _SfmlSkeleton_free;
 
-	self->drawable = new SkeletonDrawable(&self->super);
+	self->drawable = new SkeletonDrawable(SUPER(self));
 	self->vertexArray = new VertexArray(Quads, data->boneCount * 4);
 
-	return &self->super;
+	return SUPER(self);
 }
 
 SkeletonDrawable& Skeleton_getDrawable (const Skeleton* self) {
-	return *((SfmlSkeleton*)self)->drawable;
+	return *SUB_CAST(SfmlSkeleton, self) ->drawable;
 }
 
 SkeletonDrawable::SkeletonDrawable (Skeleton* self) :
-				skeleton((SfmlSkeleton*)self) {
+				skeleton(SUB_CAST(SfmlSkeleton, self) ) {
 }
 
 void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 	skeleton->vertexArray->clear();
-	for (int i = 0; i < skeleton->super.slotCount; ++i)
-		if (skeleton->super.slots[i]->attachment) Attachment_draw(skeleton->super.slots[i]->attachment, skeleton->super.slots[i]);
+	for (int i = 0; i < SUPER(skeleton)->slotCount; ++i)
+		if (SUPER(skeleton)->slots[i]->attachment)
+			Attachment_draw(SUPER(skeleton)->slots[i]->attachment, SUPER(skeleton)->slots[i]);
 	states.texture = skeleton->texture;
 	target.draw(*skeleton->vertexArray, states);
 }
 
 /**/
 
-void _SfmlRegionAttachment_dispose (Attachment* self) {
-	_RegionAttachment_deinit((RegionAttachment*)self);
-	FREE(self)
+void _SfmlRegionAttachment_free (Attachment* self) {
+	_RegionAttachment_deinit(SUB_CAST(RegionAttachment, self) );
+	FREE(self);
 }
 
 void _SfmlRegionAttachment_draw (Attachment* attachment, Slot* slot) {
-	SfmlRegionAttachment* self = (SfmlRegionAttachment*)attachment;
+	SfmlRegionAttachment* self = SUB_CAST(SfmlRegionAttachment, attachment);
 	SfmlSkeleton* skeleton = (SfmlSkeleton*)slot->skeleton;
-	Uint8 r = skeleton->super.r * slot->r * 255;
-	Uint8 g = skeleton->super.g * slot->g * 255;
-	Uint8 b = skeleton->super.b * slot->b * 255;
-	Uint8 a = skeleton->super.a * slot->a * 255;
+	Uint8 r = SUPER(skeleton)->r * slot->r * 255;
+	Uint8 g = SUPER(skeleton)->g * slot->g * 255;
+	Uint8 b = SUPER(skeleton)->b * slot->b * 255;
+	Uint8 a = SUPER(skeleton)->a * slot->a * 255;
 	sf::Vertex* vertices = self->vertices;
 	vertices[0].color.r = r;
 	vertices[0].color.g = g;
@@ -136,7 +136,7 @@ void _SfmlRegionAttachment_draw (Attachment* attachment, Slot* slot) {
 	vertices[3].color.b = b;
 	vertices[3].color.a = a;
 
-	float* offset = self->super.offset;
+	float* offset = SUPER(self)->offset;
 	Bone* bone = slot->bone;
 	vertices[0].position.x = offset[0] * bone->m00 + offset[1] * bone->m01 + bone->worldX;
 	vertices[0].position.y = offset[0] * bone->m10 + offset[1] * bone->m11 + bone->worldY;
@@ -155,11 +155,11 @@ void _SfmlRegionAttachment_draw (Attachment* attachment, Slot* slot) {
 	skeleton->vertexArray->append(vertices[3]);
 }
 
-RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region) {
-	SfmlRegionAttachment* self = CALLOC(SfmlRegionAttachment, 1)
-	_RegionAttachment_init(&self->super, name);
-	self->super.super._dispose = _SfmlRegionAttachment_dispose;
-	self->super.super._draw = _SfmlRegionAttachment_draw;
+RegionAttachment* RegionAttachment_new (const char* name, AtlasRegion* region) {
+	SfmlRegionAttachment* self = NEW(SfmlRegionAttachment);
+	_RegionAttachment_init(SUPER(self), name);
+	VTABLE(Attachment, self) ->free = _SfmlRegionAttachment_free;
+	VTABLE(Attachment, self) ->draw = _SfmlRegionAttachment_draw;
 
 	self->texture = ((SfmlAtlasPage*)region->page)->texture;
 	int u = region->x;
@@ -186,7 +186,7 @@ RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region
 		self->vertices[3].texCoords.y = v2;
 	}
 
-	return &self->super;
+	return SUPER(self);
 }
 
 }

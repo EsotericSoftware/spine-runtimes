@@ -38,11 +38,10 @@ struct AttachmentLoader {
 	const char* error1;
 	const char* error2;
 
-	Attachment* (*_newAttachment) (AttachmentLoader* loader, AttachmentType type, const char* name);
-	void (*_dispose) (AttachmentLoader* loader);
+	const void* const vtable;
 };
 
-void AttachmentLoader_dispose (AttachmentLoader* loader);
+void AttachmentLoader_free (AttachmentLoader* loader);
 
 Attachment* AttachmentLoader_newAttachment (AttachmentLoader* loader, AttachmentType type, const char* name);
 

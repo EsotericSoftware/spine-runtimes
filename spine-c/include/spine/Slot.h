@@ -45,8 +45,8 @@ typedef struct Slot {
 	Attachment* const attachment;
 } Slot;
 
-Slot* Slot_create (SlotData* data, struct Skeleton* skeleton, Bone* bone);
-void Slot_dispose (Slot* slot);
+Slot* Slot_new (SlotData* data, struct Skeleton* skeleton, Bone* bone);
+void Slot_free (Slot* slot);
 
 /* @param attachment May be null. */
 void Slot_setAttachment (Slot* slot, Attachment* attachment);

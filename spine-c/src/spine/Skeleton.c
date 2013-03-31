@@ -24,13 +24,15 @@
  ******************************************************************************/
 
 #include <spine/Skeleton.h>
-#include <spine/util.h>
+#include <spine/extension.h>
 
 void _Skeleton_init (Skeleton* self, SkeletonData* data) {
-	CAST(SkeletonData*, self->data) = data;
+	CONST_CAST(SkeletonData*, self->data) = data;
+
+	CONST_CAST(_SkeletonVtable*, self->vtable) = NEW(_SkeletonVtable);
 
 	self->boneCount = self->data->boneCount;
-	self->bones = MALLOC(Bone*, self->boneCount)
+	self->bones = MALLOC(Bone*, self->boneCount);
 	int i, ii;
 	for (i = 0; i < self->boneCount; ++i) {
 		BoneData* boneData = self->data->bones[i];
@@ -44,11 +46,11 @@ void _Skeleton_init (Skeleton* self, SkeletonData* data) {
 				}
 			}
 		}
-		self->bones[i] = Bone_create(boneData, parent);
+		self->bones[i] = Bone_new(boneData, parent);
 	}
 
 	self->slotCount = data->slotCount;
-	self->slots = MALLOC(Slot*, self->slotCount)
+	self->slots = MALLOC(Slot*, self->slotCount);
 	for (i = 0; i < self->slotCount; ++i) {
 		SlotData *slotData = data->slots[i];
 
@@ -61,10 +63,10 @@ void _Skeleton_init (Skeleton* self, SkeletonData* data) {
 			}
 		}
 
-		self->slots[i] = Slot_create(slotData, self, bone);
+		self->slots[i] = Slot_new(slotData, self, bone);
 	}
 
-	self->drawOrder = MALLOC(Slot*, self->slotCount)
+	self->drawOrder = MALLOC(Slot*, self->slotCount);
 	memcpy(self->drawOrder, self->slots, sizeof(Slot*) * self->slotCount);
 
 	self->r = 1;
@@ -74,20 +76,22 @@ void _Skeleton_init (Skeleton* self, SkeletonData* data) {
 }
 
 void _Skeleton_deinit (Skeleton* self) {
+	FREE(self->vtable);
+
 	int i;
 	for (i = 0; i < self->boneCount; ++i)
-		Bone_dispose(self->bones[i]);
-	FREE(self->bones)
+		Bone_free(self->bones[i]);
+	FREE(self->bones);
 
 	for (i = 0; i < self->slotCount; ++i)
-		Slot_dispose(self->slots[i]);
-	FREE(self->slots)
+		Slot_free(self->slots[i]);
+	FREE(self->slots);
 
-	FREE(self->drawOrder)
+	FREE(self->drawOrder);
 }
 
-void Skeleton_dispose (Skeleton* self) {
-	self->_dispose(self);
+void Skeleton_free (Skeleton* self) {
+	VTABLE(Skeleton, self) ->free(self);
 }
 
 void Skeleton_updateWorldTransform (const Skeleton* self) {
@@ -166,7 +170,7 @@ void Skeleton_setSkin (Skeleton* self, Skin* newSkin) {
 			entry = entry->next;
 		}
 	}
-	CAST(Skin*, self->skin) = newSkin;
+	CONST_CAST(Skin*, self->skin) = newSkin;
 }
 
 Attachment* Skeleton_getAttachmentForSlotName (const Skeleton* self, const char* slotName, const char* attachmentName) {

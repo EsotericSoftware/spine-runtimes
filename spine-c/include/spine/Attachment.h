@@ -42,11 +42,10 @@ struct Attachment {
 	const char* const name;
 	int type;
 
-	void (*_draw) (Attachment* attachment, struct Slot* slot);
-	void (*_dispose) (Attachment* attachment);
+	const void* const vtable;
 };
 
-void Attachment_dispose (Attachment* attachment);
+void Attachment_free (Attachment* attachment);
 
 void Attachment_draw (Attachment* attachment, struct Slot* slot);
 

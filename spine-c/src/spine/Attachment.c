@@ -24,23 +24,25 @@
  ******************************************************************************/
 
 #include <spine/Attachment.h>
-#include <spine/util.h>
+#include <spine/extension.h>
 #include <spine/Slot.h>
 
-void _Attachment_init (Attachment* self, const char* name, int type) {
+void _Attachment_init (Attachment* self, const char* name, AttachmentType type) {
+	CONST_CAST(_AttachmentVtable*, self->vtable) = NEW(_AttachmentVtable);
 	MALLOC_STR(self->name, name);
 	self->type = type;
 }
 
 void _Attachment_deinit (Attachment* self) {
-	FREE(self->name)
-	FREE(self)
+	FREE(self->vtable);
+	FREE(self->name);
+	FREE(self);
 }
 
-void Attachment_dispose (Attachment* self) {
-	self->_dispose(self);
+void Attachment_free (Attachment* self) {
+	VTABLE(Attachment, self)->free(self);
 }
 
 void Attachment_draw (Attachment* self, Slot* slot) {
-	self->_draw(self, slot);
+	VTABLE(Attachment, self)->draw(self, slot);
 }

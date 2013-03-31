@@ -26,40 +26,40 @@
 #include <spine/Skin.h>
 #include <spine/util.h>
 
-SkinEntry* _SkinEntry_create (int slotIndex, const char* name, Attachment* attachment) {
-	SkinEntry* self = CALLOC(SkinEntry, 1)
+SkinEntry* _SkinEntry_new (int slotIndex, const char* name, Attachment* attachment) {
+	SkinEntry* self = NEW(SkinEntry);
 	self->slotIndex = slotIndex;
-	MALLOC_STR(self->name, name)
+	MALLOC_STR(self->name, name);
 	self->attachment = attachment;
 	return self;
 }
 
-void _SkinEntry_dispose (SkinEntry* self) {
-	if (self->next) _SkinEntry_dispose((SkinEntry*)self->next);
-	Attachment_dispose(self->attachment);
-	FREE(self->name)
-	FREE(self)
+void _SkinEntry_free (SkinEntry* self) {
+	if (self->next) _SkinEntry_free(CONST_CAST(SkinEntry*, self->next) );
+	Attachment_free(self->attachment);
+	FREE(self->name);
+	FREE(self);
 }
 
 /**/
 
-Skin* Skin_create (const char* name) {
-	Skin* self = CALLOC(Skin, 1)
-	MALLOC_STR(self->name, name)
+Skin* Skin_new (const char* name) {
+	Skin* self = NEW(Skin);
+	MALLOC_STR(self->name, name);
 	return self;
 }
 
-void Skin_dispose (Skin* self) {
-	_SkinEntry_dispose((SkinEntry*)self->entries);
-	FREE(self->name)
-	FREE(self)
+void Skin_free (Skin* self) {
+	_SkinEntry_free(CONST_CAST(SkinEntry*, self->entries) );
+	FREE(self->name);
+	FREE(self);
 }
 
 void Skin_addAttachment (Skin* self, int slotIndex, const char* name, Attachment* attachment) {
-	SkinEntry* newEntry = _SkinEntry_create(slotIndex, name, attachment);
-	SkinEntry* entry = (SkinEntry*)self->entries;
+	SkinEntry* newEntry = _SkinEntry_new(slotIndex, name, attachment);
+	SkinEntry* entry = CONST_CAST(SkinEntry*, self->entries);
 	if (!entry)
-		CAST(SkinEntry*, self->entries) = newEntry;
+		CONST_CAST(SkinEntry*, self->entries) = newEntry;
 	else {
 		while (entry->next)
 			entry = (SkinEntry*)entry->next;

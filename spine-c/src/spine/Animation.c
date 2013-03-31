@@ -25,21 +25,21 @@
 
 #include <spine/Animation.h>
 #include <math.h>
-#include <spine/util.h>
+#include <spine/extension.h>
 
-Animation* Animation_create (int timelineCount) {
-	Animation* self = CALLOC(Animation, 1);
+Animation* Animation_new (int timelineCount) {
+	Animation* self = NEW(Animation);
 	self->timelineCount = timelineCount;
-	self->timelines = MALLOC(Timeline*, timelineCount)
+	self->timelines = MALLOC(Timeline*, timelineCount);
 	return self;
 }
 
-void Animation_dispose (Animation* self) {
+void Animation_free (Animation* self) {
 	int i;
 	for (i = 0; i < self->timelineCount; ++i)
-		Timeline_dispose(self->timelines[i]);
-	FREE(self->timelines)
-	FREE(self)
+		Timeline_free(self->timelines[i]);
+	FREE(self->timelines);
+	FREE(self);
 }
 
 void Animation_apply (const Animation* self, Skeleton* skeleton, float time, int/*bool*/loop) {
@@ -60,18 +60,20 @@ void Animation_mix (const Animation* self, Skeleton* skeleton, float time, int/*
 
 /**/
 
-void _Timeline_init (Timeline* timeline) {
+void _Timeline_init (Timeline* self) {
+	CONST_CAST(_TimelineVtable*, self->vtable) = NEW(_TimelineVtable);
 }
 
-void _Timeline_deinit (Timeline* timeline) {
+void _Timeline_deinit (Timeline* self) {
+	FREE(self->vtable);
 }
 
-void Timeline_dispose (Timeline* self) {
-	self->_dispose(self);
+void Timeline_free (Timeline* self) {
+	VTABLE(Timeline, self) ->dispose(self);
 }
 
 void Timeline_apply (const Timeline* self, Skeleton* skeleton, float time, float alpha) {
-	self->_apply(self, skeleton, time, alpha);
+	VTABLE(Timeline, self) ->apply(self, skeleton, time, alpha);
 }
 
 /**/
@@ -81,13 +83,13 @@ static const float CURVE_STEPPED = -1;
 static const int CURVE_SEGMENTS = 10;
 
 void _CurveTimeline_init (CurveTimeline* self, int frameCount) {
-	_Timeline_init(&self->super);
-	self->curves = CALLOC(float, (frameCount - 1) * 6)
+	_Timeline_init(SUPER(self));
+	self->curves = CALLOC(float, (frameCount - 1) * 6);
 }
 
 void _CurveTimeline_deinit (CurveTimeline* self) {
-	_Timeline_deinit(&self->super);
-	FREE(self->curves)
+	_Timeline_deinit(SUPER(self));
+	FREE(self->curves);
 }
 
 void CurveTimeline_setLinear (CurveTimeline* self, int frameIndex) {
@@ -177,21 +179,21 @@ static int binarySearch (float *values, int valuesLength, float target, int step
 
 /**/
 
-void _BaseTimeline_dispose (Timeline* timeline) {
-	struct BaseTimeline* self = (struct BaseTimeline*)timeline;
-	_CurveTimeline_deinit(&self->super);
+void _BaseTimeline_free (Timeline* timeline) {
+	struct BaseTimeline* self = SUB_CAST(struct BaseTimeline, timeline);
+	_CurveTimeline_deinit(SUPER(self));
 	FREE(self->frames);
 	FREE(self);
 }
 
 /* Many timelines have structure identical to struct BaseTimeline and extend CurveTimeline. **/
-struct BaseTimeline* _BaseTimeline_create (int frameCount, int frameSize) {
-	struct BaseTimeline* self = CALLOC(struct BaseTimeline, 1)
-	_CurveTimeline_init(&self->super, frameCount);
-	((Timeline*)self)->_dispose = _BaseTimeline_dispose;
+struct BaseTimeline* _BaseTimeline_new (int frameCount, int frameSize) {
+	struct BaseTimeline* self = NEW(struct BaseTimeline);
+	_CurveTimeline_init(SUPER(self), frameCount);
+	VTABLE(Timeline, self) ->dispose = _BaseTimeline_free;
 
-	CAST(int, self->framesLength) = frameCount * frameSize;
-	CAST(float*, self->frames) = CALLOC(float, self->framesLength)
+	CONST_CAST(int, self->framesLength) = frameCount * frameSize;
+	CONST_CAST(float*, self->frames) = CALLOC(float, self->framesLength);
 
 	return self;
 }
@@ -202,7 +204,7 @@ static const int ROTATE_LAST_FRAME_TIME = -2;
 static const int ROTATE_FRAME_VALUE = 1;
 
 void _RotateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float time, float alpha) {
-	RotateTimeline* self = (RotateTimeline*)timeline;
+	RotateTimeline* self = SUB_CAST(RotateTimeline, timeline);
 
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
@@ -223,7 +225,7 @@ void _RotateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float 
 	float lastFrameValue = self->frames[frameIndex - 1];
 	float frameTime = self->frames[frameIndex];
 	float percent = 1 - (time - frameTime) / (self->frames[frameIndex + ROTATE_LAST_FRAME_TIME] - frameTime);
-	percent = CurveTimeline_getCurvePercent(&self->super, frameIndex / 2 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
+	percent = CurveTimeline_getCurvePercent(SUPER(self), frameIndex / 2 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
 	float amount = self->frames[frameIndex + ROTATE_FRAME_VALUE] - lastFrameValue;
 	while (amount > 180)
@@ -238,9 +240,9 @@ void _RotateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float 
 	bone->rotation += amount * alpha;
 }
 
-RotateTimeline* RotateTimeline_create (int frameCount) {
-	RotateTimeline* self = _BaseTimeline_create(frameCount, 2);
-	((Timeline*)self)->_apply = _RotateTimeline_apply;
+RotateTimeline* RotateTimeline_new (int frameCount) {
+	RotateTimeline* self = _BaseTimeline_new(frameCount, 2);
+	VTABLE(Timeline, self) ->apply = _RotateTimeline_apply;
 	return self;
 }
 
@@ -257,7 +259,7 @@ static const int TRANSLATE_FRAME_X = 1;
 static const int TRANSLATE_FRAME_Y = 2;
 
 void _TranslateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float time, float alpha) {
-	TranslateTimeline* self = (TranslateTimeline*)timeline;
+	TranslateTimeline* self = SUB_CAST(TranslateTimeline, timeline);
 
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
@@ -275,7 +277,7 @@ void _TranslateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, flo
 	float lastFrameY = self->frames[frameIndex - 1];
 	float frameTime = self->frames[frameIndex];
 	float percent = 1 - (time - frameTime) / (self->frames[frameIndex + TRANSLATE_LAST_FRAME_TIME] - frameTime);
-	percent = CurveTimeline_getCurvePercent(&self->super, frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
+	percent = CurveTimeline_getCurvePercent(SUPER(self), frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
 	bone->x += (bone->data->x + lastFrameX + (self->frames[frameIndex + TRANSLATE_FRAME_X] - lastFrameX) * percent - bone->x)
 			* alpha;
@@ -283,9 +285,9 @@ void _TranslateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, flo
 			* alpha;
 }
 
-TranslateTimeline* TranslateTimeline_create (int frameCount) {
-	TranslateTimeline* self = _BaseTimeline_create(frameCount, 3);
-	((Timeline*)self)->_apply = _TranslateTimeline_apply;
+TranslateTimeline* TranslateTimeline_new (int frameCount) {
+	TranslateTimeline* self = _BaseTimeline_new(frameCount, 3);
+	VTABLE(Timeline, self) ->apply = _TranslateTimeline_apply;
 	return self;
 }
 
@@ -299,7 +301,7 @@ void TranslateTimeline_setFrame (TranslateTimeline* self, int frameIndex, float 
 /**/
 
 void _ScaleTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float time, float alpha) {
-	ScaleTimeline* self = (ScaleTimeline*)timeline;
+	ScaleTimeline* self = SUB_CAST(ScaleTimeline, timeline);
 
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
@@ -316,7 +318,7 @@ void _ScaleTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float t
 	float lastFrameY = self->frames[frameIndex - 1];
 	float frameTime = self->frames[frameIndex];
 	float percent = 1 - (time - frameTime) / (self->frames[frameIndex + TRANSLATE_LAST_FRAME_TIME] - frameTime);
-	percent = CurveTimeline_getCurvePercent(&self->super, frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
+	percent = CurveTimeline_getCurvePercent(SUPER(self), frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
 	bone->scaleX += (bone->data->scaleX - 1 + lastFrameX + (self->frames[frameIndex + TRANSLATE_FRAME_X] - lastFrameX) * percent
 			- bone->scaleX) * alpha;
@@ -324,9 +326,9 @@ void _ScaleTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float t
 			- bone->scaleY) * alpha;
 }
 
-ScaleTimeline* ScaleTimeline_create (int frameCount) {
-	ScaleTimeline* self = _BaseTimeline_create(frameCount, 3);
-	((Timeline*)self)->_apply = _ScaleTimeline_apply;
+ScaleTimeline* ScaleTimeline_new (int frameCount) {
+	ScaleTimeline* self = _BaseTimeline_new(frameCount, 3);
+	VTABLE(Timeline, self) ->apply = _ScaleTimeline_apply;
 	return self;
 }
 
@@ -366,7 +368,7 @@ void _ColorTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float t
 	float lastFrameA = self->frames[frameIndex - 1];
 	float frameTime = self->frames[frameIndex];
 	float percent = 1 - (time - frameTime) / (self->frames[frameIndex + COLOR_LAST_FRAME_TIME] - frameTime);
-	percent = CurveTimeline_getCurvePercent(&self->super, frameIndex / 5 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
+	percent = CurveTimeline_getCurvePercent(SUPER(self), frameIndex / 5 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
 	float r = lastFrameR + (self->frames[frameIndex + COLOR_FRAME_R] - lastFrameR) * percent;
 	float g = lastFrameG + (self->frames[frameIndex + COLOR_FRAME_G] - lastFrameG) * percent;
@@ -385,9 +387,9 @@ void _ColorTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float t
 	}
 }
 
-ColorTimeline* ColorTimeline_create (int frameCount) {
-	ColorTimeline* self = (ColorTimeline*)_BaseTimeline_create(frameCount, 5);
-	((Timeline*)self)->_apply = _ColorTimeline_apply;
+ColorTimeline* ColorTimeline_new (int frameCount) {
+	ColorTimeline* self = (ColorTimeline*)_BaseTimeline_new(frameCount, 5);
+	VTABLE(Timeline, self) ->apply = _ColorTimeline_apply;
 	return self;
 }
 
@@ -418,36 +420,36 @@ void _AttachmentTimeline_apply (const Timeline* timeline, Skeleton* skeleton, fl
 			attachmentName ? Skeleton_getAttachmentForSlotIndex(skeleton, self->slotIndex, attachmentName) : 0);
 }
 
-void _AttachmentTimeline_dispose (Timeline* timeline) {
+void _AttachmentTimeline_free (Timeline* timeline) {
 	_Timeline_deinit(timeline);
 	AttachmentTimeline* self = (AttachmentTimeline*)timeline;
 
 	int i;
 	for (i = 0; i < self->framesLength; ++i)
-		FREE(self->attachmentNames[i])
-	FREE(self->attachmentNames)
+		FREE(self->attachmentNames[i]);
+	FREE(self->attachmentNames);
 
-	FREE(self)
+	FREE(self);
 }
 
-AttachmentTimeline* AttachmentTimeline_create (int frameCount) {
-	AttachmentTimeline* self = CALLOC(AttachmentTimeline, 1)
-	_Timeline_init(&self->super);
-	((Timeline*)self)->_dispose = _AttachmentTimeline_dispose;
-	((Timeline*)self)->_apply = _AttachmentTimeline_apply;
-	CAST(char**, self->attachmentNames) = CALLOC(char*, frameCount)
+AttachmentTimeline* AttachmentTimeline_new (int frameCount) {
+	AttachmentTimeline* self = NEW(AttachmentTimeline);
+	_Timeline_init(SUPER(self));
+	VTABLE(Timeline, self) ->dispose = _AttachmentTimeline_free;
+	VTABLE(Timeline, self) ->apply = _AttachmentTimeline_apply;
+	CONST_CAST(char**, self->attachmentNames) = CALLOC(char*, frameCount);
 
-	CAST(int, self->framesLength) = frameCount;
-	CAST(float*, self->frames) = CALLOC(float, frameCount)
+	CONST_CAST(int, self->framesLength) = frameCount;
+	CONST_CAST(float*, self->frames) = CALLOC(float, frameCount);
 
 	return self;
 }
 
 void AttachmentTimeline_setFrame (AttachmentTimeline* self, int frameIndex, float time, const char* attachmentName) {
 	self->frames[frameIndex] = time;
-	FREE(self->attachmentNames[frameIndex])
+	FREE(self->attachmentNames[frameIndex]);
 	if (attachmentName)
-		MALLOC_STR(self->attachmentNames[frameIndex], attachmentName)
+		MALLOC_STR(self->attachmentNames[frameIndex], attachmentName);
 	else
 		self->attachmentNames[frameIndex] = 0;
 }

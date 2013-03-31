@@ -28,16 +28,15 @@
 #include <spine/Skeleton.h>
 
 typedef struct {
-	Slot slot;
+	Slot super;
 	float attachmentTime;
-} SlotInternal;
+} _Internal;
 
-Slot* Slot_create (SlotData* data, Skeleton* skeleton, Bone* bone) {
-	SlotInternal* internal = CALLOC(SlotInternal, 1)
-	Slot* self = &internal->slot;
-	CAST(SlotData*, self->data) = data;
-	CAST(Skeleton*, self->skeleton) = skeleton;
-	CAST(Bone*, self->bone) = bone;
+Slot* Slot_new (SlotData* data, Skeleton* skeleton, Bone* bone) {
+	Slot* self = SUPER(NEW(_Internal));
+	CONST_CAST(SlotData*, self->data) = data;
+	CONST_CAST(Skeleton*, self->skeleton) = skeleton;
+	CONST_CAST(Bone*, self->bone) = bone;
 	self->r = 1;
 	self->g = 1;
 	self->b = 1;
@@ -45,22 +44,22 @@ Slot* Slot_create (SlotData* data, Skeleton* skeleton, Bone* bone) {
 	return self;
 }
 
-void Slot_dispose (Slot* self) {
+void Slot_free (Slot* self) {
 	FREE(self);
 }
 
 /* @param attachment May be null. */
 void Slot_setAttachment (Slot* self, Attachment* attachment) {
-	CAST(Attachment*, self->attachment) = attachment;
-	((SlotInternal*)self)->attachmentTime = self->skeleton->time;
+	CONST_CAST(Attachment*, self->attachment) = attachment;
+	SUB_CAST(_Internal, self) ->attachmentTime = self->skeleton->time;
 }
 
 void Slot_setAttachmentTime (Slot* self, float time) {
-	((SlotInternal*)self)->attachmentTime = self->skeleton->time - time;
+	SUB_CAST(_Internal, self) ->attachmentTime = self->skeleton->time - time;
 }
 
 float Slot_getAttachmentTime (const Slot* self) {
-	return self->skeleton->time - ((SlotInternal*)self)->attachmentTime;
+	return self->skeleton->time - SUB_CAST(_Internal, self) ->attachmentTime;
 }
 
 void Slot_setToBindPose (Slot* self) {

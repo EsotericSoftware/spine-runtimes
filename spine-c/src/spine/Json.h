@@ -25,8 +25,6 @@
 #ifndef SPINE_JSON_H_
 #define SPINE_JSON_H_
 
-#include <stdlib.h>
-
 #ifdef __cplusplus
 namespace spine {
 extern "C" {
@@ -56,11 +54,11 @@ typedef struct Json {
 	const char* name; /* The item's name string, if this item is the child of, or is in the list of subitems of an object. */
 } Json;
 
-/* Supply a block of JSON, and this returns a Json object you can interrogate. Call Json_dispose when finished. */
-Json* Json_create (const char* value);
+/* Supply a block of JSON, and this returns a Json object you can interrogate. Call Json_free when finished. */
+Json* Json_new (const char* value);
 
 /* Delete a Json entity and all subentities. */
-void Json_dispose (Json* json);
+void Json_free (Json* json);
 
 /* Returns the number of items in an array (or object). */
 int Json_getSize (Json* json);
@@ -74,7 +72,7 @@ const char* Json_getString (Json* json, const char* name, const char* defaultVal
 float Json_getFloat (Json* json, const char* name, float defaultValue);
 int Json_getInt (Json* json, const char* name, int defaultValue);
 
-/* For analysing failed parses. This returns a pointer to the parse error. You'll probably need to look a few chars back to make sense of it. Defined when Json_create() returns 0. 0 when Json_create() succeeds. */
+/* For analysing failed parses. This returns a pointer to the parse error. You'll probably need to look a few chars back to make sense of it. Defined when Json_new() returns 0. 0 when Json_new() succeeds. */
 const char* Json_getError (void);
 
 #ifdef __cplusplus

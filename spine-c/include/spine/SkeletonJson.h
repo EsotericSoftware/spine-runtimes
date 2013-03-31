@@ -43,9 +43,9 @@ typedef struct {
 	const char* const error;
 } SkeletonJson;
 
-SkeletonJson* SkeletonJson_createWithLoader (AttachmentLoader* attachmentLoader);
-SkeletonJson* SkeletonJson_create (Atlas* atlas);
-void SkeletonJson_dispose (SkeletonJson* skeletonJson);
+SkeletonJson* SkeletonJson_newWithLoader (AttachmentLoader* attachmentLoader);
+SkeletonJson* SkeletonJson_new (Atlas* atlas);
+void SkeletonJson_free (SkeletonJson* skeletonJson);
 
 SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* skeletonJson, const char* json);
 SkeletonData* SkeletonJson_readSkeletonDataFile (SkeletonJson* skeletonJson, const char* path);

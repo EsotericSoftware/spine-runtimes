@@ -39,7 +39,7 @@ typedef struct {
 	Atlas* atlas;
 } AtlasAttachmentLoader;
 
-AtlasAttachmentLoader* AtlasAttachmentLoader_create (Atlas* atlas);
+AtlasAttachmentLoader* AtlasAttachmentLoader_new (Atlas* atlas);
 
 #ifdef __cplusplus
 }

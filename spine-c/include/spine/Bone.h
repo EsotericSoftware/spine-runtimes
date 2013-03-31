@@ -50,8 +50,8 @@ struct Bone {
 void Bone_setYDown (int/*bool*/yDown);
 
 /* @param parent May be zero. */
-Bone* Bone_create (BoneData* data, Bone* parent);
-void Bone_dispose (Bone* bone);
+Bone* Bone_new (BoneData* data, Bone* parent);
+void Bone_free (Bone* bone);
 
 void Bone_setToBindPose (Bone* bone);
 

@@ -51,11 +51,11 @@ struct Skeleton {
 	float time;
 	int/*bool*/flipX, flipY;
 
-	void (*_dispose) (Skeleton* skeleton);
+	const void* const vtable;
 };
 
-Skeleton* Skeleton_create (SkeletonData* data);
-void Skeleton_dispose (Skeleton* skeleton);
+Skeleton* Skeleton_new (SkeletonData* data);
+void Skeleton_free (Skeleton* skeleton);
 
 void Skeleton_updateWorldTransform (const Skeleton* skeleton);
 

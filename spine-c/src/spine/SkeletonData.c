@@ -26,13 +26,12 @@
 #include <spine/SkeletonData.h>
 #include <spine/util.h>
 
-SkeletonData* SkeletonData_create () {
-	SkeletonData* self = CALLOC(SkeletonData, 1)
-	return self;
+SkeletonData* SkeletonData_new () {
+	return NEW(SkeletonData);
 }
 
-void SkeletonData_dispose (SkeletonData* self) {
-	FREE(self)
+void SkeletonData_free (SkeletonData* self) {
+	FREE(self);
 }
 
 BoneData* SkeletonData_findBone (const SkeletonData* self, const char* boneName) {

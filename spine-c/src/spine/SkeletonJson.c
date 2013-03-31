@@ -33,38 +33,38 @@
 #include <spine/AtlasAttachmentLoader.h>
 
 typedef struct {
-	SkeletonJson json;
+	SkeletonJson super;
 	int ownsLoader;
-} Internal;
+} _Internal;
 
-SkeletonJson* SkeletonJson_createWithLoader (AttachmentLoader* attachmentLoader) {
-	SkeletonJson* self = (SkeletonJson*)CALLOC(Internal, 1)
+SkeletonJson* SkeletonJson_newWithLoader (AttachmentLoader* attachmentLoader) {
+	SkeletonJson* self = SUPER(NEW(_Internal));
 	self->scale = 1;
 	self->attachmentLoader = attachmentLoader;
 	return self;
 }
 
-SkeletonJson* SkeletonJson_create (Atlas* atlas) {
-	AtlasAttachmentLoader* attachmentLoader = AtlasAttachmentLoader_create(atlas);
-	Internal* self = (Internal*)SkeletonJson_createWithLoader(&attachmentLoader->super);
-	self->ownsLoader = 1;
-	return &self->json;
+SkeletonJson* SkeletonJson_new (Atlas* atlas) {
+	AtlasAttachmentLoader* attachmentLoader = AtlasAttachmentLoader_new(atlas);
+	SkeletonJson* self = SkeletonJson_newWithLoader(SUPER(attachmentLoader));
+	SUB_CAST(_Internal, self) ->ownsLoader = 1;
+	return self;
 }
 
-void SkeletonJson_dispose (SkeletonJson* self) {
-	if (((Internal*)self)->ownsLoader) AttachmentLoader_dispose(self->attachmentLoader);
-	FREE(self->error)
-	FREE(self)
+void SkeletonJson_free (SkeletonJson* self) {
+	if (SUB_CAST(_Internal, self) ->ownsLoader) AttachmentLoader_free(self->attachmentLoader);
+	FREE(self->error);
+	FREE(self);
 }
 
 void _SkeletonJson_setError (SkeletonJson* self, Json* root, const char* value1, const char* value2) {
-	FREE(self->error)
+	FREE(self->error);
 	char message[256];
 	strcpy(message, value1);
 	int length = strlen(value1);
 	if (value2) strncat(message + length, value2, 256 - length);
-	MALLOC_STR(self->error, message)
-	if (root) Json_dispose(root);
+	MALLOC_STR(self->error, message);
+	if (root) Json_free(root);
 }
 
 static float toColor (const char* value, int index) {
@@ -81,32 +81,32 @@ static float toColor (const char* value, int index) {
 }
 
 SkeletonData* SkeletonJson_readSkeletonDataFile (SkeletonJson* self, const char* path) {
-	const char* data = readFile(path);
-	if (!data) {
+	const char* json = readFile(path);
+	if (!json) {
 		_SkeletonJson_setError(self, 0, "Unable to read skeleton file: ", path);
 		return 0;
 	}
-	SkeletonData* skeletonData = SkeletonJson_readSkeletonData(self, data);
-	FREE(data)
+	SkeletonData* skeletonData = SkeletonJson_readSkeletonData(self, json);
+	FREE(json);
 	return skeletonData;
 }
 
 SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* json) {
-	FREE(self->error)
-	CAST(char*, self->error) = 0;
+	FREE(self->error);
+	CONST_CAST(char*, self->error) = 0;
 
-	Json* root = Json_create(json);
+	Json* root = Json_new(json);
 	if (!root) {
 		_SkeletonJson_setError(self, 0, "Invalid skeleton JSON: ", Json_getError());
 		return 0;
 	}
 
-	SkeletonData* skeletonData = SkeletonData_create();
+	SkeletonData* skeletonData = SkeletonData_new();
 	int i, ii, iii;
 
 	Json* bones = Json_getItem(root, "bones");
 	int boneCount = Json_getSize(bones);
-	skeletonData->bones = MALLOC(BoneData*, boneCount)
+	skeletonData->bones = MALLOC(BoneData*, boneCount);
 	for (i = 0; i < boneCount; ++i) {
 		Json* boneMap = Json_getItemAt(bones, i);
 
@@ -117,13 +117,13 @@ SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* jso
 		if (parentName) {
 			parent = SkeletonData_findBone(skeletonData, parentName);
 			if (!parent) {
-				SkeletonData_dispose(skeletonData);
+				SkeletonData_free(skeletonData);
 				_SkeletonJson_setError(self, root, "Parent bone not found: ", parentName);
 				return 0;
 			}
 		}
 
-		BoneData* boneData = BoneData_create(boneName, parent);
+		BoneData* boneData = BoneData_new(boneName, parent);
 		boneData->length = Json_getFloat(boneMap, "parent", 0) * self->scale;
 		boneData->x = Json_getFloat(boneMap, "x", 0) * self->scale;
 		boneData->y = Json_getFloat(boneMap, "y", 0) * self->scale;
@@ -138,7 +138,7 @@ SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* jso
 	Json* slots = Json_getItem(root, "slots");
 	if (slots) {
 		int slotCount = Json_getSize(slots);
-		skeletonData->slots = MALLOC(SlotData*, slotCount)
+		skeletonData->slots = MALLOC(SlotData*, slotCount);
 		for (i = 0; i < slotCount; ++i) {
 			Json* slotMap = Json_getItemAt(slots, i);
 
@@ -147,12 +147,12 @@ SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* jso
 			const char* boneName = Json_getString(slotMap, "bone", 0);
 			BoneData* boneData = SkeletonData_findBone(skeletonData, boneName);
 			if (!boneData) {
-				SkeletonData_dispose(skeletonData);
+				SkeletonData_free(skeletonData);
 				_SkeletonJson_setError(self, root, "Slot bone not found: ", boneName);
 				return 0;
 			}
 
-			SlotData* slotData = SlotData_create(slotName, boneData);
+			SlotData* slotData = SlotData_new(slotName, boneData);
 
 			const char* color = Json_getString(slotMap, "color", 0);
 			if (color) {
@@ -173,11 +173,11 @@ SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* jso
 	Json* skinsMap = Json_getItem(root, "skins");
 	if (skinsMap) {
 		int skinCount = Json_getSize(skinsMap);
-		skeletonData->skins = MALLOC(Skin*, skinCount)
+		skeletonData->skins = MALLOC(Skin*, skinCount);
 		for (i = 0; i < skinCount; ++i) {
 			Json* slotMap = Json_getItemAt(skinsMap, i);
 			const char* skinName = slotMap->name;
-			Skin *skin = Skin_create(skinName);
+			Skin *skin = Skin_new(skinName);
 			skeletonData->skins[i] = skin;
 			skeletonData->skinCount++;
 			if (strcmp(skinName, "default") == 0) skeletonData->defaultSkin = skin;
@@ -201,14 +201,14 @@ SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* jso
 					else if (strcmp(typeString, "regionSequence") == 0)
 						type = ATTACHMENT_REGION_SEQUENCE;
 					else {
-						SkeletonData_dispose(skeletonData);
+						SkeletonData_free(skeletonData);
 						_SkeletonJson_setError(self, root, "Unknown attachment type: ", typeString);
 						return 0;
 					}
 
 					Attachment* attachment = AttachmentLoader_newAttachment(self->attachmentLoader, type, attachmentName);
 					if (!attachment && self->attachmentLoader->error1) {
-						SkeletonData_dispose(skeletonData);
+						SkeletonData_free(skeletonData);
 						_SkeletonJson_setError(self, root, self->attachmentLoader->error1, self->attachmentLoader->error2);
 						return 0;
 					}
@@ -231,7 +231,7 @@ SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* jso
 		}
 	}
 
-	Json_dispose(root);
+	Json_free(root);
 	return skeletonData;
 }
 
@@ -242,7 +242,7 @@ Animation* SkeletonJson_readAnimationFile (SkeletonJson* self, const char* path,
 		return 0;
 	}
 	Animation* animation = SkeletonJson_readAnimation(self, data, skeletonData);
-	FREE(data)
+	FREE(data);
 	return animation;
 }
 
@@ -258,10 +258,10 @@ static void readCurve (CurveTimeline* timeline, int frameIndex, Json* frame) {
 }
 
 Animation* SkeletonJson_readAnimation (SkeletonJson* self, const char* json, const SkeletonData *skeletonData) {
-	FREE(self->error)
-	CAST(char*, self->error) = 0;
+	FREE(self->error);
+	CONST_CAST(char*, self->error) = 0;
 
-	Json* root = Json_create(json);
+	Json* root = Json_new(json);
 	if (!root) {
 		_SkeletonJson_setError(self, 0, "Invalid animation JSON: ", Json_getError());
 		return 0;
@@ -279,7 +279,7 @@ Animation* SkeletonJson_readAnimation (SkeletonJson* self, const char* json, con
 		timelineCount += Json_getSize(Json_getItemAt(bones, i));
 	for (i = 0; i < slotCount; ++i)
 		timelineCount += Json_getSize(Json_getItemAt(slots, i));
-	Animation* animation = Animation_create(timelineCount);
+	Animation* animation = Animation_new(timelineCount);
 	animation->timelineCount = 0;
 
 	for (i = 0; i < boneCount; ++i) {
@@ -289,7 +289,7 @@ Animation* SkeletonJson_readAnimation (SkeletonJson* self, const char* json, con
 
 		int boneIndex = SkeletonData_findBoneIndex(skeletonData, boneName);
 		if (boneIndex == -1) {
-			Animation_dispose(animation);
+			Animation_free(animation);
 			_SkeletonJson_setError(self, root, "Bone not found: ", boneName);
 			return 0;
 		}
@@ -301,12 +301,12 @@ Animation* SkeletonJson_readAnimation (SkeletonJson* self, const char* json, con
 			const char* timelineType = timelineArray->name;
 
 			if (strcmp(timelineType, "rotate") == 0) {
-				RotateTimeline *timeline = RotateTimeline_create(frameCount);
+				RotateTimeline *timeline = RotateTimeline_new(frameCount);
 				timeline->boneIndex = boneIndex;
 				for (iii = 0; iii < frameCount; ++iii) {
 					Json* frame = Json_getItemAt(timelineArray, iii);
 					RotateTimeline_setFrame(timeline, iii, Json_getFloat(frame, "time", 0), Json_getFloat(frame, "angle", 0));
-					readCurve(&timeline->super, iii, frame);
+					readCurve(SUPER(timeline), iii, frame);
 				}
 				animation->timelines[animation->timelineCount++] = (Timeline*)timeline;
 				animation->duration = fmaxf(animation->duration, timeline->frames[frameCount * 2 - 2]);
@@ -314,19 +314,19 @@ Animation* SkeletonJson_readAnimation (SkeletonJson* self, const char* json, con
 			} else {
 				int isScale = strcmp(timelineType, "scale") == 0;
 				if (isScale || strcmp(timelineType, "translate") == 0) {
-					TranslateTimeline *timeline = isScale ? ScaleTimeline_create(frameCount) : TranslateTimeline_create(frameCount);
+					TranslateTimeline *timeline = isScale ? ScaleTimeline_new(frameCount) : TranslateTimeline_new(frameCount);
 					float scale = isScale ? 1 : self->scale;
 					timeline->boneIndex = boneIndex;
 					for (iii = 0; iii < frameCount; ++iii) {
 						Json* frame = Json_getItemAt(timelineArray, iii);
 						TranslateTimeline_setFrame(timeline, iii, Json_getFloat(frame, "time", 0), Json_getFloat(frame, "x", 0) * scale,
 								Json_getFloat(frame, "y", 0) * scale);
-						readCurve(&timeline->super, iii, frame);
+						readCurve(SUPER(timeline), iii, frame);
 					}
 					animation->timelines[animation->timelineCount++] = (Timeline*)timeline;
 					animation->duration = fmaxf(animation->duration, timeline->frames[frameCount * 3 - 3]);
 				} else {
-					Animation_dispose(animation);
+					Animation_free(animation);
 					_SkeletonJson_setError(self, 0, "Invalid timeline type for a bone: ", timelineType);
 					return 0;
 				}
@@ -341,7 +341,7 @@ Animation* SkeletonJson_readAnimation (SkeletonJson* self, const char* json, con
 
 			int slotIndex = SkeletonData_findSlotIndex(skeletonData, slotName);
 			if (slotIndex == -1) {
-				Animation_dispose(animation);
+				Animation_free(animation);
 				_SkeletonJson_setError(self, root, "Slot not found: ", slotName);
 				return 0;
 			}
@@ -353,20 +353,20 @@ Animation* SkeletonJson_readAnimation (SkeletonJson* self, const char* json, con
 				const char* timelineType = timelineArray->name;
 
 				if (strcmp(timelineType, "color") == 0) {
-					ColorTimeline *timeline = ColorTimeline_create(frameCount);
+					ColorTimeline *timeline = ColorTimeline_new(frameCount);
 					timeline->slotIndex = slotIndex;
 					for (iii = 0; iii < frameCount; ++iii) {
 						Json* frame = Json_getItemAt(timelineArray, iii);
 						const char* s = Json_getString(frame, "color", 0);
 						ColorTimeline_setFrame(timeline, iii, Json_getFloat(frame, "time", 0), toColor(s, 0), toColor(s, 1),
 								toColor(s, 2), toColor(s, 3));
-						readCurve(&timeline->super, iii, frame);
+						readCurve(SUPER(timeline), iii, frame);
 					}
 					animation->timelines[animation->timelineCount++] = (Timeline*)timeline;
 					animation->duration = fmaxf(animation->duration, timeline->frames[frameCount * 5 - 5]);
 
 				} else if (strcmp(timelineType, "attachment") == 0) {
-					AttachmentTimeline *timeline = AttachmentTimeline_create(frameCount);
+					AttachmentTimeline *timeline = AttachmentTimeline_new(frameCount);
 					timeline->slotIndex = slotIndex;
 					for (iii = 0; iii < frameCount; ++iii) {
 						Json* frame = Json_getItemAt(timelineArray, iii);
@@ -378,7 +378,7 @@ Animation* SkeletonJson_readAnimation (SkeletonJson* self, const char* json, con
 					animation->duration = fmaxf(animation->duration, timeline->frames[frameCount - 1]);
 
 				} else {
-					Animation_dispose(animation);
+					Animation_free(animation);
 					_SkeletonJson_setError(self, 0, "Invalid timeline type for a slot: ", timelineType);
 					return 0;
 				}

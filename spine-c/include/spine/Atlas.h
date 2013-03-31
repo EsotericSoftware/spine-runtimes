@@ -57,11 +57,11 @@ struct AtlasPage {
 	AtlasWrap uWrap, vWrap;
 	AtlasPage* next;
 
-	void (*_dispose) (AtlasPage* page);
+	const void* const vtable;
 };
 
-AtlasPage* AtlasPage_create (const char* name);
-void AtlasPage_dispose (AtlasPage* page);
+AtlasPage* AtlasPage_new (const char* name);
+void AtlasPage_free (AtlasPage* page);
 
 /**/
 
@@ -80,8 +80,8 @@ struct AtlasRegion {
 	AtlasRegion* next;
 };
 
-AtlasRegion* AtlasRegion_create ();
-void AtlasRegion_dispose (AtlasRegion* region);
+AtlasRegion* AtlasRegion_new ();
+void AtlasRegion_free (AtlasRegion* region);
 
 /**/
 
@@ -92,7 +92,7 @@ typedef struct {
 
 Atlas* Atlas_readAtlas (const char* data);
 Atlas* Atlas_readAtlasFile (const char* path);
-void Atlas_dispose (Atlas* atlas);
+void Atlas_free (Atlas* atlas);
 
 AtlasRegion* Atlas_findRegion (const Atlas* atlas, const char* name);
 

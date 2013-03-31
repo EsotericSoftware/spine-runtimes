@@ -31,39 +31,75 @@
 #include <spine/Animation.h>
 #include <spine/Atlas.h>
 #include <spine/AttachmentLoader.h>
+#include <spine/util.h>
 
 #ifdef __cplusplus
 namespace spine {
 extern "C" {
 #endif
 
-/* Methods that must be implemented: **/
+/* Public API that must be implemented: **/
 
-Skeleton* Skeleton_create (SkeletonData* data);
+Skeleton* Skeleton_new (SkeletonData* data);
 
-RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region);
+RegionAttachment* RegionAttachment_new (const char* name, AtlasRegion* region);
 
-AtlasPage* AtlasPage_create (const char* name);
+AtlasPage* AtlasPage_new (const char* name);
 
-/* Internal methods needed for extension: **/
+/* Internal API available for extension: **/
+
+typedef struct _SkeletonVtable {
+	void (*free) (Skeleton* skeleton);
+} _SkeletonVtable;
 
 void _Skeleton_init (Skeleton* skeleton, SkeletonData* data);
 void _Skeleton_deinit (Skeleton* skeleton);
 
+/**/
+
+typedef struct _AttachmentVtable {
+	void (*draw) (Attachment* attachment, struct Slot* slot);
+	void (*free) (Attachment* attachment);
+} _AttachmentVtable;
+
 void _Attachment_init (Attachment* attachment, const char* name, AttachmentType type);
 void _Attachment_deinit (Attachment* attachment);
+
+/**/
 
 void _RegionAttachment_init (RegionAttachment* attachment, const char* name);
 void _RegionAttachment_deinit (RegionAttachment* attachment);
 
+/**/
+
+typedef struct _TimelineVtable {
+	void (*apply) (const Timeline* timeline, Skeleton* skeleton, float time, float alpha);
+	void (*dispose) (Timeline* timeline);
+} _TimelineVtable;
+
 void _Timeline_init (Timeline* timeline);
 void _Timeline_deinit (Timeline* timeline);
+
+/**/
 
 void _CurveTimeline_init (CurveTimeline* timeline, int frameCount);
 void _CurveTimeline_deinit (CurveTimeline* timeline);
 
+/**/
+
+typedef struct _AtlasPageVtable {
+	void (*free) (AtlasPage* page);
+} _AtlasPageVtable;
+
 void _AtlasPage_init (AtlasPage* page, const char* name);
 void _AtlasPage_deinit (AtlasPage* page);
+
+/**/
+
+typedef struct _AttachmentLoaderVtable {
+	Attachment* (*newAttachment) (AttachmentLoader* loader, AttachmentType type, const char* name);
+	void (*free) (AttachmentLoader* loader);
+} _AttachmentLoaderVtable;
 
 void _AttachmentLoader_init (AttachmentLoader* loader);
 void _AttachmentLoader_deinit (AttachmentLoader* loader);
