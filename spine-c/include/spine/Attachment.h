@@ -40,7 +40,7 @@ typedef enum {
 typedef struct Attachment Attachment;
 struct Attachment {
 	const char* const name;
-	int type;
+	AttachmentType type;
 
 	const void* const vtable;
 };

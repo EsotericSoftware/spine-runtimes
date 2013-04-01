@@ -48,7 +48,7 @@ typedef struct Slot {
 Slot* Slot_new (SlotData* data, struct Skeleton* skeleton, Bone* bone);
 void Slot_free (Slot* slot);
 
-/* @param attachment May be null. */
+/* @param attachment May be 0 to clear the attachment for the slot. */
 void Slot_setAttachment (Slot* slot, Attachment* attachment);
 
 void Slot_setAttachmentTime (Slot* slot, float time);

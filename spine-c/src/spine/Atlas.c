@@ -39,7 +39,6 @@ void _AtlasPage_deinit (AtlasPage* self) {
 }
 
 void AtlasPage_free (AtlasPage* self) {
-	if (self->next) AtlasPage_free(self->next); /* BOZO - Don't dispose all in the list. */
 	VTABLE(AtlasPage, self) ->free(self);
 }
 
@@ -50,7 +49,6 @@ AtlasRegion* AtlasRegion_new () {
 }
 
 void AtlasRegion_free (AtlasRegion* self) {
-	if (self->next) AtlasRegion_free(self->next);
 	FREE(self->name);
 	FREE(self->splits);
 	FREE(self->pads);
@@ -162,6 +160,11 @@ static int toInt (Str* str) {
 	return strtol(str->begin, (char**)&str->end, 10);
 }
 
+static Atlas* abort (Atlas* self) {
+	Atlas_free(self);
+	return 0;
+}
+
 static const char* formatNames[] = {"Alpha", "Intensity", "LuminanceAlpha", "RGB565", "RGBA4444", "RGB888", "RGBA8888"};
 static const char* textureFilterNames[] = {"Nearest", "Linear", "MipMap", "MipMapNearestNearest", "MipMapLinearNearest",
 		"MipMapNearestLinear", "MipMapLinearLinear"};
@@ -186,14 +189,14 @@ Atlas* Atlas_readAtlas (const char* data) {
 				self->pages = page;
 			lastPage = page;
 
-			if (!readValue(&str)) return 0;
+			if (!readValue(&str)) return abort(self);
 			page->format = (AtlasFormat)indexOf(formatNames, 7, &str);
 
-			if (!readTuple(tuple)) return 0;
+			if (!readTuple(tuple)) return abort(self);
 			page->minFilter = (AtlasFilter)indexOf(textureFilterNames, 7, tuple);
 			page->magFilter = (AtlasFilter)indexOf(textureFilterNames, 7, tuple + 1);
 
-			if (!readValue(&str)) return 0;
+			if (!readValue(&str)) return abort(self);
 			if (!equals(&str, "none")) {
 				page->uWrap = *str.begin == 'x' ? ATLAS_REPEAT : (*str.begin == 'y' ? ATLAS_CLAMPTOEDGE : ATLAS_REPEAT);
 				page->vWrap = *str.begin == 'x' ? ATLAS_CLAMPTOEDGE : (*str.begin == 'y' ? ATLAS_REPEAT : ATLAS_REPEAT);
@@ -209,19 +212,19 @@ Atlas* Atlas_readAtlas (const char* data) {
 			region->page = page;
 			region->name = mallocString(&str);
 
-			if (!readValue(&str)) return 0;
+			if (!readValue(&str)) return abort(self);
 			region->rotate = equals(&str, "true");
 
-			if (readTuple(tuple) != 2) return 0;
+			if (readTuple(tuple) != 2) return abort(self);
 			region->x = toInt(tuple);
 			region->y = toInt(tuple + 1);
 
-			if (readTuple(tuple) != 2) return 0;
+			if (readTuple(tuple) != 2) return abort(self);
 			region->width = toInt(tuple);
 			region->height = toInt(tuple + 1);
 
 			int count;
-			if (!(count = readTuple(tuple))) return 0;
+			if (!(count = readTuple(tuple))) return abort(self);
 			if (count == 4) { /* split is optional */
 				region->splits = MALLOC(int, 4);
 				region->splits[0] = toInt(tuple);
@@ -229,7 +232,7 @@ Atlas* Atlas_readAtlas (const char* data) {
 				region->splits[2] = toInt(tuple + 2);
 				region->splits[3] = toInt(tuple + 3);
 
-				if (!(count = readTuple(tuple))) return 0;
+				if (!(count = readTuple(tuple))) return abort(self);
 				if (count == 4) { /* pad is optional, but only present with splits */
 					region->pads = MALLOC(int, 4);
 					region->pads[0] = toInt(tuple);
@@ -237,7 +240,7 @@ Atlas* Atlas_readAtlas (const char* data) {
 					region->pads[2] = toInt(tuple + 2);
 					region->pads[3] = toInt(tuple + 3);
 
-					if (!readTuple(tuple)) return 0;
+					if (!readTuple(tuple)) return abort(self);
 				}
 			}
 
@@ -248,7 +251,7 @@ Atlas* Atlas_readAtlas (const char* data) {
 			region->offsetX = (float)toInt(tuple);
 			region->offsetY = (float)toInt(tuple + 1);
 
-			if (!readValue(&str)) return 0;
+			if (!readValue(&str)) return abort(self);
 			region->index = toInt(&str);
 		}
 	}
@@ -265,8 +268,20 @@ Atlas* Atlas_readAtlasFile (const char* path) {
 }
 
 void Atlas_free (Atlas* self) {
-	if (self->pages) AtlasPage_free(self->pages);
-	if (self->regions) AtlasRegion_free(self->regions);
+	AtlasPage* page = self->pages;
+	while (page) {
+		AtlasPage* nextPage = page->next;
+		AtlasPage_free(page);
+		page = nextPage;
+	}
+
+	AtlasRegion* region = self->regions;
+	while (region) {
+		AtlasRegion* nextRegion = region->next;
+		AtlasRegion_free(region);
+		region = nextRegion;
+	}
+
 	FREE(self);
 }
 

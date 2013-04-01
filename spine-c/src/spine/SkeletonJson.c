@@ -208,10 +208,13 @@ SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* jso
 					}
 
 					Attachment* attachment = AttachmentLoader_newAttachment(self->attachmentLoader, type, attachmentName);
-					if (!attachment && self->attachmentLoader->error1) {
-						SkeletonData_free(skeletonData);
-						_SkeletonJson_setError(self, root, self->attachmentLoader->error1, self->attachmentLoader->error2);
-						return 0;
+					if (!attachment) {
+						if (self->attachmentLoader->error1) {
+							SkeletonData_free(skeletonData);
+							_SkeletonJson_setError(self, root, self->attachmentLoader->error1, self->attachmentLoader->error2);
+							return 0;
+						}
+						continue;
 					}
 
 					if (attachment->type == ATTACHMENT_REGION || attachment->type == ATTACHMENT_REGION_SEQUENCE) {

@@ -51,7 +51,7 @@ void Skin_free (Skin* skin);
 
 /* The Skin owns the attachment. */
 void Skin_addAttachment (Skin* skin, int slotIndex, const char* name, Attachment* attachment);
-/* May return null. */
+/* Returns 0 if the attachment was not found. */
 Attachment* Skin_getAttachment (const Skin* skin, int slotIndex, const char* name);
 
 #ifdef __cplusplus

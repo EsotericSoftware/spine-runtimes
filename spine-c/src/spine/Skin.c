@@ -36,7 +36,6 @@ SkinEntry* _SkinEntry_new (int slotIndex, const char* name, Attachment* attachme
 }
 
 void _SkinEntry_free (SkinEntry* self) {
-	if (self->next) _SkinEntry_free(CONST_CAST(SkinEntry*, self->next) );
 	Attachment_free(self->attachment);
 	FREE(self->name);
 	FREE(self);
@@ -51,7 +50,13 @@ Skin* Skin_new (const char* name) {
 }
 
 void Skin_free (Skin* self) {
-	_SkinEntry_free(CONST_CAST(SkinEntry*, self->entries) );
+	SkinEntry* entry = CONST_CAST(SkinEntry*, self->entries);
+	while (entry) {
+		SkinEntry* nextEtry = CONST_CAST(SkinEntry*, entry->next);
+		_SkinEntry_free(entry);
+		entry = nextEtry;
+	}
+
 	FREE(self->name);
 	FREE(self);
 }

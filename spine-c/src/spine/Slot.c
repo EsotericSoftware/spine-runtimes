@@ -48,7 +48,6 @@ void Slot_free (Slot* self) {
 	FREE(self);
 }
 
-/* @param attachment May be null. */
 void Slot_setAttachment (Slot* self, Attachment* attachment) {
 	CONST_CAST(Attachment*, self->attachment) = attachment;
 	SUB_CAST(_Internal, self) ->attachmentTime = self->skeleton->time;

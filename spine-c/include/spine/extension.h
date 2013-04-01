@@ -45,7 +45,7 @@
  expose a vtable.
 
  - The public API hides implementation details such as vtable structs and init/deinit functions. An internal API is exposed in
- extension.h to allow classes to be extended.
+ extension.h to allow classes to be extended. Internal structs and functions begin with underscore (_).
 
  - OOP in C tends to lose type safety. Macros are provided in extension.h to give more context about why a cast is being done.
  */
@@ -70,7 +70,7 @@
 /* Casts away const. Can be used as an lvalue. Not type safe, use with care. */
 #define CONST_CAST(TYPE,VALUE) (*(TYPE*)&VALUE)
 
-/* Gets the vtable for the specified type. Can be used as an lvalue. */
+/* Gets the vtable for the specified type. Not type safe, use with care. */
 #define VTABLE(TYPE,VALUE) ((_##TYPE##Vtable*)((TYPE*)VALUE)->vtable)
 
 /* Frees memory. Can be used on const. */

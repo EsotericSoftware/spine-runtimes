@@ -43,7 +43,7 @@ typedef struct {
 SlotData* SlotData_new (const char* name, BoneData* boneData);
 void SlotData_free (SlotData* slotData);
 
-/* @param attachmentName May be zero. */
+/* @param attachmentName May be 0 for no bind pose attachment. */
 void SlotData_setAttachmentName (SlotData* slotData, const char* attachmentName);
 
 #ifdef __cplusplus

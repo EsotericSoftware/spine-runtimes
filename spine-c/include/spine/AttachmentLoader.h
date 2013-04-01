@@ -43,6 +43,7 @@ struct AttachmentLoader {
 
 void AttachmentLoader_free (AttachmentLoader* loader);
 
+/* Returns 0 to not load an attachment. If 0 is returned and AttachmentLoader.error1 is set, an error occurred. */
 Attachment* AttachmentLoader_newAttachment (AttachmentLoader* loader, AttachmentType type, const char* name);
 
 #ifdef __cplusplus

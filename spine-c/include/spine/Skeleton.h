@@ -64,26 +64,26 @@ void Skeleton_setBonesToBindPose (const Skeleton* skeleton);
 void Skeleton_setSlotsToBindPose (const Skeleton* skeleton);
 
 Bone* Skeleton_getRootBone (const Skeleton* skeleton);
-/* Returns 0 if the bone could not be found. */
+/* Returns 0 if the bone was not found. */
 Bone* Skeleton_findBone (const Skeleton* skeleton, const char* boneName);
-/* Returns -1 if the bone could not be found. */
+/* Returns -1 if the bone was not found. */
 int Skeleton_findBoneIndex (const Skeleton* skeleton, const char* boneName);
 
-/* Returns 0 if the slot could not be found. */
+/* Returns 0 if the slot was not found. */
 Slot* Skeleton_findSlot (const Skeleton* skeleton, const char* slotName);
-/* Returns -1 if the slot could not be found. */
+/* Returns -1 if the slot was not found. */
 int Skeleton_findSlotIndex (const Skeleton* skeleton, const char* slotName);
 
-/* Returns 0 if the skin could not be found. */
+/* Returns 0 if the skin was not found. */
 int Skeleton_setSkinByName (Skeleton* skeleton, const char* skinName);
 /* @param skin May be 0.*/
 void Skeleton_setSkin (Skeleton* skeleton, Skin* skin);
 
-/* Returns 0 if the slot or attachment could not be found. */
+/* Returns 0 if the slot or attachment was not found. */
 Attachment* Skeleton_getAttachmentForSlotName (const Skeleton* skeleton, const char* slotName, const char* attachmentName);
-/* Returns 0 if the slot or attachment could not be found. */
+/* Returns 0 if the slot or attachment was not found. */
 Attachment* Skeleton_getAttachmentForSlotIndex (const Skeleton* skeleton, int slotIndex, const char* attachmentName);
-/* Returns 0 if the slot or attachment could not be found. */
+/* Returns 0 if the slot or attachment was not found. */
 int Skeleton_setAttachment (Skeleton* skeleton, const char* slotName, const char* attachmentName);
 
 void Skeleton_update (Skeleton* skeleton, float deltaTime);

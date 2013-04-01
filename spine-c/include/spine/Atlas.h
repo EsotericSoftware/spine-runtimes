@@ -32,17 +32,17 @@ extern "C" {
 #endif
 
 typedef enum {
-	ATLAS_ALPHA, ATLAS_INTENSITY, ATLAS_LUMINANCEALPHA, ATLAS_RGB565, ATLAS_RGBA4444, ATLAS_RGB888, ATLAS_RGBA8888
+	ATLAS_ALPHA, ATLAS_INTENSITY, ATLAS_LUMINANCE_ALPHA, ATLAS_RGB565, ATLAS_RGBA4444, ATLAS_RGB888, ATLAS_RGBA8888
 } AtlasFormat;
 
 typedef enum {
 	ATLAS_NEAREST,
 	ATLAS_LINEAR,
 	ATLAS_MIPMAP,
-	ATLAS_MIPMAPNEARESTNEAREST,
-	ATLAS_MIPMAPLINEARNEAREST,
-	ATLAS_MIPMAPNEARESTLINEAR,
-	ATLAS_MIPMAPLINEARLINEAR
+	ATLAS_MIPMAP_NEAREST_NEAREST,
+	ATLAS_MIPMAP_LINEAR_NEAREST,
+	ATLAS_MIPMAP_NEAREST_LINEAR,
+	ATLAS_MIPMAP_LINEAR_LINEAR
 } AtlasFilter;
 
 typedef enum {
@@ -94,6 +94,7 @@ Atlas* Atlas_readAtlas (const char* data);
 Atlas* Atlas_readAtlasFile (const char* path);
 void Atlas_free (Atlas* atlas);
 
+/* Returns 0 if the region was not found. */
 AtlasRegion* Atlas_findRegion (const Atlas* atlas, const char* name);
 
 #ifdef __cplusplus

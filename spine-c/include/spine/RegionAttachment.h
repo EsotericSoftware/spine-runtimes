@@ -41,9 +41,9 @@ struct RegionAttachment {
 	float offset[8];
 };
 
-void RegionAttachment_updateOffset (RegionAttachment* attachment);
-
 RegionAttachment* RegionAttachment_new (const char* name, AtlasRegion* region);
+
+void RegionAttachment_updateOffset (RegionAttachment* attachment);
 
 #ifdef __cplusplus
 }
