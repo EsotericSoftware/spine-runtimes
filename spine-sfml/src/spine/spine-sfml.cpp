@@ -63,13 +63,14 @@ AtlasPage* AtlasPage_new (const char* name) {
 
 /**/
 
-void _SfmlSkeleton_free (Skeleton* skeleton) {
-	SfmlSkeleton* self = SUB_CAST(SfmlSkeleton, skeleton);
-	_Skeleton_deinit(SUPER(self));
+void _SfmlSkeleton_free (Skeleton* self) {
+	_Skeleton_deinit(self);
 	FREE(self);
 }
 
-Skeleton* Skeleton_new (SkeletonData* data, SkeletonDrawable* drawable) {
+Skeleton* _SfmlSkeleton_new (SkeletonData* data, SkeletonDrawable* drawable) {
+	Bone_setYDown(1);
+
 	SfmlSkeleton* self = NEW(SfmlSkeleton);
 	_Skeleton_init(SUPER(self), data);
 	VTABLE(Skeleton, self) ->free = _SfmlSkeleton_free;
@@ -82,12 +83,12 @@ Skeleton* Skeleton_new (SkeletonData* data, SkeletonDrawable* drawable) {
 SkeletonDrawable::SkeletonDrawable (SkeletonData* skeletonData) :
 				vertexArray(new VertexArray(Quads, skeletonData->boneCount * 4)),
 				texture(0) {
-	Bone_setYDown(1);
-	skeleton = Skeleton_new(skeletonData, this);
+	skeleton = _SfmlSkeleton_new(skeletonData, this);
 }
 
 SkeletonDrawable::~SkeletonDrawable () {
 	delete vertexArray;
+	Skeleton_free(skeleton);
 }
 
 void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {

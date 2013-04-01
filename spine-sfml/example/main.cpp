@@ -66,7 +66,6 @@ int main () {
 		Skeleton_updateWorldTransform(skeleton);
 	}
 
-	Skeleton_free(skeleton);
 	SkeletonData_free(skeletonData);
 	Atlas_free(atlas);
 }
