@@ -23,26 +23,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#ifndef SPINE_UTIL_H_
-#define SPINE_UTIL_H_
-
-#include <string.h>
 #include <spine/extension.h>
+#include <stdio.h>
 
-#ifdef __cplusplus
-namespace spine {
-extern "C" {
-#endif
+char* _readFile (const char* path, int* length) {
+	FILE *file = fopen(path, "rb");
+	if (!file) return 0;
 
-/* Allocates a new char[], assigns it to TO, and copies FROM to it. Can be used on const. */
-#define MALLOC_STR(TO,FROM) strcpy(CONST_CAST(char*, TO) = (char*)malloc(strlen(FROM)), FROM)
+	fseek(file, 0, SEEK_END);
+	*length = ftell(file);
+	fseek(file, 0, SEEK_SET);
 
-/* Read file at specific path to a new char[]. Return value must be freed. */
-const char* readFile (const char* path);
+	char* data = MALLOC(char, *length);
+	fread(data, 1, *length, file);
+	fclose(file);
 
-#ifdef __cplusplus
+	return data;
 }
-}
-#endif
-
-#endif /* SPINE_UTIL_H_ */

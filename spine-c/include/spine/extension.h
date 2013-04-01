@@ -76,7 +76,11 @@
 /* Frees memory. Can be used on const. */
 #define FREE(VALUE) free((void*)VALUE)
 
+/* Allocates a new char[], assigns it to TO, and copies FROM to it. Can be used on const. */
+#define MALLOC_STR(TO,FROM) strcpy(CONST_CAST(char*, TO) = (char*)malloc(strlen(FROM)), FROM)
+
 #include <stdlib.h>
+#include <string.h>
 #include <spine/Skeleton.h>
 #include <spine/RegionAttachment.h>
 #include <spine/Animation.h>
@@ -89,18 +93,20 @@ extern "C" {
 #endif
 
 /*
- * Public API that must be implemented:
+ * Functions that must be implemented:
  */
-
-Skeleton* Skeleton_new (SkeletonData* data);
 
 RegionAttachment* RegionAttachment_new (const char* name, AtlasRegion* region);
 
 AtlasPage* AtlasPage_new (const char* name);
 
+char* _Util_readFile (const char* path, int* length);
+
 /*
  * Internal API available for extension:
  */
+
+char* _readFile (const char* path, int* length);
 
 typedef struct _SkeletonVtable {
 	void (*free) (Skeleton* skeleton);

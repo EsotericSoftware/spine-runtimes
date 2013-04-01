@@ -28,7 +28,6 @@
 #include <stdio.h>
 #include <math.h>
 #include <spine/extension.h>
-#include <spine/util.h>
 #include <spine/Json.h>
 #include <spine/RegionAttachment.h>
 #include <spine/AtlasAttachmentLoader.h>
@@ -82,7 +81,8 @@ static float toColor (const char* value, int index) {
 }
 
 SkeletonData* SkeletonJson_readSkeletonDataFile (SkeletonJson* self, const char* path) {
-	const char* json = readFile(path);
+	int length;
+	const char* json = _Util_readFile(path, &length);
 	if (!json) {
 		_SkeletonJson_setError(self, 0, "Unable to read skeleton file: ", path);
 		return 0;
@@ -240,13 +240,14 @@ SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* jso
 }
 
 Animation* SkeletonJson_readAnimationFile (SkeletonJson* self, const char* path, const SkeletonData *skeletonData) {
-	const char* data = readFile(path);
-	if (!data) {
+	int length;
+	const char* json = _Util_readFile(path, &length);
+	if (!json) {
 		_SkeletonJson_setError(self, 0, "Unable to read animation file: ", path);
 		return 0;
 	}
-	Animation* animation = SkeletonJson_readAnimation(self, data, skeletonData);
-	FREE(data);
+	Animation* animation = SkeletonJson_readAnimation(self, json, skeletonData);
+	FREE(json);
 	return animation;
 }
 

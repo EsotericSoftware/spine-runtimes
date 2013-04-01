@@ -25,7 +25,6 @@
 
 #include <spine/Attachment.h>
 #include <spine/extension.h>
-#include <spine/util.h>
 #include <spine/Slot.h>
 
 void _Attachment_init (Attachment* self, const char* name, AttachmentType type) {

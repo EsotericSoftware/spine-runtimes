@@ -25,7 +25,6 @@
 
 #include <spine/Skin.h>
 #include <spine/extension.h>
-#include <spine/util.h>
 
 SkinEntry* _SkinEntry_new (int slotIndex, const char* name, Attachment* attachment) {
 	SkinEntry* self = NEW(SkinEntry);

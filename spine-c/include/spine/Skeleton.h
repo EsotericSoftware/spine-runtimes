@@ -54,7 +54,6 @@ struct Skeleton {
 	const void* const vtable;
 };
 
-Skeleton* Skeleton_new (SkeletonData* data);
 void Skeleton_free (Skeleton* skeleton);
 
 void Skeleton_updateWorldTransform (const Skeleton* skeleton);

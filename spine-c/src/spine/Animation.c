@@ -26,7 +26,6 @@
 #include <spine/Animation.h>
 #include <math.h>
 #include <spine/extension.h>
-#include <spine/util.h>
 
 Animation* Animation_new (int timelineCount) {
 	Animation* self = NEW(Animation);

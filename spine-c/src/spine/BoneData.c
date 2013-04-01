@@ -25,7 +25,6 @@
 
 #include <spine/BoneData.h>
 #include <spine/extension.h>
-#include <spine/util.h>
 
 BoneData* BoneData_new (const char* name, BoneData* parent) {
 	BoneData* self = NEW(BoneData);

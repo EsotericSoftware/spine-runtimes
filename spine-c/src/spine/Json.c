@@ -27,7 +27,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <ctype.h>
-#include <spine/util.h>
+#include <spine/extension.h>
 
 static const char* ep;
 

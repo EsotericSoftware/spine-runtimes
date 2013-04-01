@@ -92,6 +92,12 @@ RegionAttachment* RegionAttachment_new (const char* name, AtlasRegion* region) {
 
 /**/
 
+char* _Util_readFile (const char* path, int* length) {
+	return _readFile(path, length);
+}
+
+/**/
+
 int main (void) {
 	Atlas* atlas = Atlas_readAtlasFile("data/spineboy.atlas");
 	printf("First region name: %s, x: %d, y: %d\n", atlas->regions->name, atlas->regions->x, atlas->regions->y);

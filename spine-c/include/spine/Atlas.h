@@ -90,7 +90,7 @@ typedef struct {
 	AtlasRegion* regions;
 } Atlas;
 
-Atlas* Atlas_readAtlas (const char* data);
+Atlas* Atlas_readAtlas (const char* data, unsigned long length);
 Atlas* Atlas_readAtlasFile (const char* path);
 void Atlas_free (Atlas* atlas);
 

@@ -25,7 +25,6 @@
 
 #include <spine/SlotData.h>
 #include <spine/extension.h>
-#include <spine/util.h>
 
 SlotData* SlotData_new (const char* name, BoneData* boneData) {
 	SlotData* self = NEW(SlotData);
