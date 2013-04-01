@@ -27,10 +27,14 @@
 #include <math.h>
 #include <stdio.h>
 #include <math.h>
+#include "Json.h"
 #include <spine/extension.h>
-#include <spine/Json.h>
 #include <spine/RegionAttachment.h>
 #include <spine/AtlasAttachmentLoader.h>
+
+#ifdef __cplusplus
+namespace spine {
+#endif
 
 typedef struct {
 	SkeletonJson super;
@@ -314,7 +318,8 @@ Animation* SkeletonJson_readAnimation (SkeletonJson* self, const char* json, con
 					readCurve(SUPER(timeline), iii, frame);
 				}
 				animation->timelines[animation->timelineCount++] = (Timeline*)timeline;
-				animation->duration = fmaxf(animation->duration, timeline->frames[frameCount * 2 - 2]);
+				float duration = timeline->frames[frameCount * 2 - 2];
+				if (duration > animation->duration) animation->duration = animation->duration;
 
 			} else {
 				int isScale = strcmp(timelineType, "scale") == 0;
@@ -329,7 +334,8 @@ Animation* SkeletonJson_readAnimation (SkeletonJson* self, const char* json, con
 						readCurve(SUPER(timeline), iii, frame);
 					}
 					animation->timelines[animation->timelineCount++] = (Timeline*)timeline;
-					animation->duration = fmaxf(animation->duration, timeline->frames[frameCount * 3 - 3]);
+					float duration = timeline->frames[frameCount * 3 - 3];
+				if (duration > animation->duration) animation->duration = animation->duration;
 				} else {
 					Animation_free(animation);
 					_SkeletonJson_setError(self, 0, "Invalid timeline type for a bone: ", timelineType);
@@ -368,7 +374,8 @@ Animation* SkeletonJson_readAnimation (SkeletonJson* self, const char* json, con
 						readCurve(SUPER(timeline), iii, frame);
 					}
 					animation->timelines[animation->timelineCount++] = (Timeline*)timeline;
-					animation->duration = fmaxf(animation->duration, timeline->frames[frameCount * 5 - 5]);
+					float duration = timeline->frames[frameCount * 5 - 5];
+				if (duration > animation->duration) animation->duration = animation->duration;
 
 				} else if (strcmp(timelineType, "attachment") == 0) {
 					AttachmentTimeline *timeline = AttachmentTimeline_new(frameCount);
@@ -380,7 +387,8 @@ Animation* SkeletonJson_readAnimation (SkeletonJson* self, const char* json, con
 								name->type == Json_NULL ? 0 : name->valuestring);
 					}
 					animation->timelines[animation->timelineCount++] = (Timeline*)timeline;
-					animation->duration = fmaxf(animation->duration, timeline->frames[frameCount - 1]);
+					float duration = timeline->frames[frameCount- 1];
+					if (duration > animation->duration) animation->duration = animation->duration;
 
 				} else {
 					Animation_free(animation);
@@ -393,3 +401,7 @@ Animation* SkeletonJson_readAnimation (SkeletonJson* self, const char* json, con
 
 	return animation;
 }
+
+#ifdef __cplusplus
+}
+#endif

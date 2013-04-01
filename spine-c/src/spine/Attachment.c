@@ -27,6 +27,10 @@
 #include <spine/extension.h>
 #include <spine/Slot.h>
 
+#ifdef __cplusplus
+namespace spine {
+#endif
+
 void _Attachment_init (Attachment* self, const char* name, AttachmentType type) {
 	CONST_CAST(_AttachmentVtable*, self->vtable) = NEW(_AttachmentVtable);
 	MALLOC_STR(self->name, name);
@@ -46,3 +50,7 @@ void Attachment_free (Attachment* self) {
 void Attachment_draw (Attachment* self, Slot* slot) {
 	VTABLE(Attachment, self)->draw(self, slot);
 }
+
+#ifdef __cplusplus
+}
+#endif

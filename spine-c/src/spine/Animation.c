@@ -27,6 +27,10 @@
 #include <math.h>
 #include <spine/extension.h>
 
+#ifdef __cplusplus
+namespace spine {
+#endif
+
 Animation* Animation_new (int timelineCount) {
 	Animation* self = NEW(Animation);
 	self->timelineCount = timelineCount;
@@ -453,3 +457,7 @@ void AttachmentTimeline_setFrame (AttachmentTimeline* self, int frameIndex, floa
 	else
 		self->attachmentNames[frameIndex] = 0;
 }
+
+#ifdef __cplusplus
+}
+#endif

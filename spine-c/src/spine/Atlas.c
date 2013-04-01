@@ -27,6 +27,10 @@
 #include <ctype.h>
 #include <spine/extension.h>
 
+#ifdef __cplusplus
+namespace spine {
+#endif
+
 void _AtlasPage_init (AtlasPage* self, const char* name) {
 	CONST_CAST(_AtlasPageVtable*, self->vtable) = NEW(_AtlasPageVtable);
 	self->name = name; /* name is guaranteed to be memory we allocated. */
@@ -295,3 +299,7 @@ AtlasRegion* Atlas_findRegion (const Atlas* self, const char* name) {
 	}
 	return 0;
 }
+
+#ifdef __cplusplus
+}
+#endif

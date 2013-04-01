@@ -26,6 +26,10 @@
 #include <spine/AttachmentLoader.h>
 #include <spine/extension.h>
 
+#ifdef __cplusplus
+namespace spine {
+#endif
+
 void _AttachmentLoader_init (AttachmentLoader* self) {
 	CONST_CAST(_AttachmentLoaderVtable*, self->vtable) = NEW(_AttachmentLoaderVtable);
 }
@@ -54,3 +58,7 @@ void _AttachmentLoader_setError (AttachmentLoader* self, const char* error1, con
 	MALLOC_STR(self->error1, error1);
 	MALLOC_STR(self->error2, error2);
 }
+
+#ifdef __cplusplus
+}
+#endif

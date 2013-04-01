@@ -27,6 +27,10 @@
 #include <math.h>
 #include <spine/extension.h>
 
+#ifdef __cplusplus
+namespace spine {
+#endif
+
 void _RegionAttachment_init (RegionAttachment* self, const char* name) {
 	self->scaleX = 1;
 	self->scaleY = 1;
@@ -66,3 +70,7 @@ void RegionAttachment_updateOffset (RegionAttachment* self) {
 	self->offset[6] = localX2Cos - localYSin;
 	self->offset[7] = localYCos + localX2Sin;
 }
+
+#ifdef __cplusplus
+}
+#endif

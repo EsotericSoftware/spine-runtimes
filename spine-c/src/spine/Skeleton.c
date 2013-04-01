@@ -27,6 +27,10 @@
 #include <string.h>
 #include <spine/extension.h>
 
+#ifdef __cplusplus
+namespace spine {
+#endif
+
 void _Skeleton_init (Skeleton* self, SkeletonData* data) {
 	CONST_CAST(SkeletonData*, self->data) = data;
 
@@ -209,3 +213,7 @@ int Skeleton_setAttachment (Skeleton* self, const char* slotName, const char* at
 void Skeleton_update (Skeleton* self, float deltaTime) {
 	self->time += deltaTime;
 }
+
+#ifdef __cplusplus
+}
+#endif

@@ -27,6 +27,10 @@
 #include <string.h>
 #include <spine/extension.h>
 
+#ifdef __cplusplus
+namespace spine {
+#endif
+
 SkeletonData* SkeletonData_new () {
 	return NEW(SkeletonData);
 }
@@ -69,3 +73,7 @@ Skin* SkeletonData_findSkin (const SkeletonData* self, const char* skinName) {
 		if (strcmp(self->skins[i]->name, skinName) == 0) return self->skins[i];
 	return 0;
 }
+
+#ifdef __cplusplus
+}
+#endif

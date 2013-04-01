@@ -26,6 +26,10 @@
 #include <spine/BoneData.h>
 #include <spine/extension.h>
 
+#ifdef __cplusplus
+namespace spine {
+#endif
+
 BoneData* BoneData_new (const char* name, BoneData* parent) {
 	BoneData* self = NEW(BoneData);
 	MALLOC_STR(self->name, name);
@@ -39,3 +43,7 @@ void BoneData_free (BoneData* self) {
 	FREE(self->name);
 	FREE(self);
 }
+
+#ifdef __cplusplus
+}
+#endif

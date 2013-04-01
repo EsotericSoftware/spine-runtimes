@@ -26,6 +26,10 @@
 #include <spine/Skin.h>
 #include <spine/extension.h>
 
+#ifdef __cplusplus
+namespace spine {
+#endif
+
 SkinEntry* _SkinEntry_new (int slotIndex, const char* name, Attachment* attachment) {
 	SkinEntry* self = NEW(SkinEntry);
 	self->slotIndex = slotIndex;
@@ -80,3 +84,7 @@ Attachment* Skin_getAttachment (const Skin* self, int slotIndex, const char* nam
 	}
 	return 0;
 }
+
+#ifdef __cplusplus
+}
+#endif

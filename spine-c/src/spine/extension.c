@@ -26,6 +26,10 @@
 #include <spine/extension.h>
 #include <stdio.h>
 
+#ifdef __cplusplus
+namespace spine {
+#endif
+
 char* _readFile (const char* path, int* length) {
 	FILE *file = fopen(path, "rb");
 	if (!file) return 0;
@@ -40,3 +44,7 @@ char* _readFile (const char* path, int* length) {
 
 	return data;
 }
+
+#ifdef __cplusplus
+}
+#endif

@@ -27,6 +27,10 @@
 #include <math.h>
 #include <spine/extension.h>
 
+#ifdef __cplusplus
+namespace spine {
+#endif
+
 static int yDown;
 
 void Bone_setYDown (int value) {
@@ -88,3 +92,7 @@ void Bone_updateWorldTransform (Bone* self, int flipX, int flipY) {
 		CONST_CAST(float, self->m11) = -self->m11;
 	}
 }
+
+#ifdef __cplusplus
+}
+#endif

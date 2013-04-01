@@ -27,6 +27,10 @@
 #include <stdio.h>
 #include <spine/extension.h>
 
+#ifdef __cplusplus
+namespace spine {
+#endif
+
 void _AtlasAttachmentLoader_free (AttachmentLoader* self) {
 	_AttachmentLoader_deinit(self);
 }
@@ -59,3 +63,7 @@ AtlasAttachmentLoader* AtlasAttachmentLoader_new (Atlas* atlas) {
 	VTABLE(AttachmentLoader, self) ->free = _AtlasAttachmentLoader_free;
 	return self;
 }
+
+#ifdef __cplusplus
+}
+#endif
