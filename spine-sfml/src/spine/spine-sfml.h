@@ -23,6 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
+#ifndef SPINE_SFML_H_
+#define SPINE_SFML_H_
+
 #include <spine/spine.h>
 #include <SFML/Graphics/Vertex.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
@@ -64,4 +67,6 @@ typedef struct {
 	sf::Texture* texture;
 } SfmlRegionAttachment;
 
-}
+
+} /* namespace spine */
+#endif /* SPINE_SFML_H_ */
