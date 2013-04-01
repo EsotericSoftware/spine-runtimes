@@ -37,7 +37,8 @@ int main () {
 	Animation* animation = SkeletonJson_readAnimationFile(json, "../data/spineboy-walk.json", skeletonData);
 	SkeletonJson_free(json);
 
-	Skeleton* skeleton = Skeleton_new(skeletonData);
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	Skeleton* skeleton = drawable->skeleton;
 	skeleton->flipX = false;
 	skeleton->flipY = false;
 	Skeleton_setToBindPose(skeleton);
@@ -54,7 +55,7 @@ int main () {
 		while (window.pollEvent(event))
 			if (event.type == sf::Event::Closed) window.close();
 		window.clear();
-		window.draw(Skeleton_getDrawable(skeleton));
+		window.draw(*drawable);
 		window.display();
 
 		float delta = deltaClock.getElapsedTime().asSeconds();

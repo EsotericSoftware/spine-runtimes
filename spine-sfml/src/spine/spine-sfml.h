@@ -43,21 +43,20 @@ class SkeletonDrawable;
 
 typedef struct {
 	Skeleton super;
-	sf::VertexArray* vertexArray;
-	sf::Texture* texture; // All region attachments must use the same texture.
-	SkeletonDrawable* drawable;
+	SkeletonDrawable* const drawable;
 } SfmlSkeleton;
 
 class SkeletonDrawable: public sf::Drawable {
 public:
-	SfmlSkeleton* skeleton;
+	Skeleton* skeleton;
+	sf::VertexArray* vertexArray;
+	sf::Texture* texture; // All region attachments must use the same texture.
 
-	SkeletonDrawable (Skeleton* skeleton);
+	SkeletonDrawable (SkeletonData* skeleton);
+	~SkeletonDrawable ();
 
 	virtual void draw (sf::RenderTarget& target, sf::RenderStates states) const;
 };
-
-SkeletonDrawable& Skeleton_getDrawable (const Skeleton* skeleton);
 
 /**/
 
@@ -66,7 +65,6 @@ typedef struct {
 	sf::Vertex vertices[4];
 	sf::Texture* texture;
 } SfmlRegionAttachment;
-
 
 } /* namespace spine */
 #endif /* SPINE_SFML_H_ */
