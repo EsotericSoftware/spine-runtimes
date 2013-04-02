@@ -23,6 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
+#ifndef SPINE_COCOS2DX_H_
+#define SPINE_COCOS2DX_H_
+
 #include <spine/spine.h>
 #include "cocos2d.h"
 
@@ -72,3 +75,5 @@ typedef struct {
 } Cocos2dxRegionAttachment;
 
 }
+
+#endif /* SPINE_COCOS2DX_H_ */
