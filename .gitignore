@@ -4,12 +4,19 @@ spine-sfml/Debug/*
 spine-libgdx/bin/*
 spine-libgdx/libs/*
 target
+
 *Debug.win32
 *.sdf
 *.opensdf
 *.suo
+
 spine-cocos2dx/cocos2dx/
 !spine-cocos2dx/cocos2dx/Place cocos2dx here.txt
 *.swp
 .DS_Store
 xcuserdata
+
+spine-cocos2d-iphone/libs/*
+!spine-cocos2d-iphone/libs/cocos2d/Place cocos2d here.txt
+!spine-cocos2d-iphone/libs/CocosDenshion/Place CocosDenshion here.txt
+!spine-cocos2d-iphone/libs/kazmath/Place kazmath here.txt
