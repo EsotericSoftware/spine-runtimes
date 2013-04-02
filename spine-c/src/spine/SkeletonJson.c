@@ -129,7 +129,7 @@ SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* jso
 		}
 
 		BoneData* boneData = BoneData_create(boneName, parent);
-		boneData->length = Json_getFloat(boneMap, "parent", 0) * self->scale;
+		boneData->length = Json_getFloat(boneMap, "length", 0) * self->scale;
 		boneData->x = Json_getFloat(boneMap, "x", 0) * self->scale;
 		boneData->y = Json_getFloat(boneMap, "y", 0) * self->scale;
 		boneData->rotation = Json_getFloat(boneMap, "rotation", 0);
