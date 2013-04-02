@@ -66,7 +66,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\cocos2dx;$(ProjectDir)..\..\cocos2dx\include;$(ProjectDir)..\..\cocos2dx\kazmath\include;$(ProjectDir)..\..\cocos2dx\platform\win32;$(ProjectDir)..\..\cocos2dx\platform\third_party\win32\OGLES;$(ProjectDir)..\Classes;$(ProjectDir)..\..\include;$(ProjectDir)..\..\..\spine-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\cocos2dx;$(ProjectDir)..\..\cocos2dx\include;$(ProjectDir)..\..\cocos2dx\kazmath\include;$(ProjectDir)..\..\cocos2dx\platform\win32;$(ProjectDir)..\..\cocos2dx\platform\third_party\win32\OGLES;$(ProjectDir)..\Classes;$(ProjectDir)..\..\src;$(ProjectDir)..\..\..\spine-c\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;COCOS2D_DEBUG=1;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -76,6 +76,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <DisableSpecificWarnings>4267;4251;4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;glew32.lib;libcocos2d.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -123,65 +124,51 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\spine-cpp\include\json\autolink.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\json\config.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\json\features.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\json\forwards.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\json\json.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\json\reader.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\json\value.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\json\writer.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\spine\Animation.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\spine\AnimationState.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\spine\AnimationStateData.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\spine\Attachment.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\spine\BaseAtlas.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\spine\BaseAttachmentLoader.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\spine\BaseRegionAttachment.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\spine\BaseSkeleton.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\spine\BaseSkeletonJson.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\spine\Bone.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\spine\BoneData.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\spine\SkeletonData.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\spine\Skin.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\spine\Slot.h" />
-    <ClInclude Include="..\..\..\spine-cpp\include\spine\SlotData.h" />
-    <ClInclude Include="..\..\..\spine-cpp\src\json\json_batchallocator.h" />
-    <ClInclude Include="..\..\include\spine-cocos2dx\Atlas.h" />
-    <ClInclude Include="..\..\include\spine-cocos2dx\AtlasAttachmentLoader.h" />
-    <ClInclude Include="..\..\include\spine-cocos2dx\CCSkeleton.h" />
-    <ClInclude Include="..\..\include\spine-cocos2dx\RegionAttachment.h" />
-    <ClInclude Include="..\..\include\spine-cocos2dx\Skeleton.h" />
-    <ClInclude Include="..\..\include\spine-cocos2dx\SkeletonJson.h" />
-    <ClInclude Include="..\..\include\spine-cocos2dx\spine.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\Animation.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\AnimationState.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\AnimationStateData.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\Atlas.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\AtlasAttachmentLoader.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\Attachment.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\AttachmentLoader.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\Bone.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\BoneData.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\extension.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\RegionAttachment.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\Skeleton.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\SkeletonData.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\SkeletonJson.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\Skin.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\Slot.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\SlotData.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\spine.h" />
+    <ClInclude Include="..\..\..\spine-c\src\spine\Json.h" />
+    <ClInclude Include="..\..\src\spine\spine-cocos2dx.h" />
     <ClInclude Include="..\Classes\AppDelegate.h" />
     <ClInclude Include="..\Classes\AppMacros.h" />
     <ClInclude Include="..\Classes\ExampleLayer.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\spine-cpp\src\json\json_reader.cpp" />
-    <ClCompile Include="..\..\..\spine-cpp\src\json\json_value.cpp" />
-    <ClCompile Include="..\..\..\spine-cpp\src\json\json_writer.cpp" />
-    <ClCompile Include="..\..\..\spine-cpp\src\spine\Animation.cpp" />
-    <ClCompile Include="..\..\..\spine-cpp\src\spine\AnimationState.cpp" />
-    <ClCompile Include="..\..\..\spine-cpp\src\spine\AnimationStateData.cpp" />
-    <ClCompile Include="..\..\..\spine-cpp\src\spine\BaseAtlas.cpp" />
-    <ClCompile Include="..\..\..\spine-cpp\src\spine\BaseRegionAttachment.cpp" />
-    <ClCompile Include="..\..\..\spine-cpp\src\spine\BaseSkeleton.cpp" />
-    <ClCompile Include="..\..\..\spine-cpp\src\spine\BaseSkeletonJson.cpp" />
-    <ClCompile Include="..\..\..\spine-cpp\src\spine\Bone.cpp" />
-    <ClCompile Include="..\..\..\spine-cpp\src\spine\BoneData.cpp" />
-    <ClCompile Include="..\..\..\spine-cpp\src\spine\SkeletonData.cpp" />
-    <ClCompile Include="..\..\..\spine-cpp\src\spine\Skin.cpp" />
-    <ClCompile Include="..\..\..\spine-cpp\src\spine\Slot.cpp" />
-    <ClCompile Include="..\..\..\spine-cpp\src\spine\SlotData.cpp" />
-    <ClCompile Include="..\..\src\spine-cocos2dx\Atlas.cpp" />
-    <ClCompile Include="..\..\src\spine-cocos2dx\AtlasAttachmentLoader.cpp" />
-    <ClCompile Include="..\..\src\spine-cocos2dx\CCSkeleton.cpp" />
-    <ClCompile Include="..\..\src\spine-cocos2dx\RegionAttachment.cpp" />
-    <ClCompile Include="..\..\src\spine-cocos2dx\Skeleton.cpp" />
-    <ClCompile Include="..\..\src\spine-cocos2dx\SkeletonJson.cpp" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\Animation.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\AnimationState.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\AnimationStateData.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\Atlas.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\AtlasAttachmentLoader.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\Attachment.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\AttachmentLoader.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\Bone.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\BoneData.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\extension.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\Json.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\RegionAttachment.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\Skeleton.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\SkeletonData.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\SkeletonJson.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\Skin.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\Slot.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\SlotData.c" />
+    <ClCompile Include="..\..\src\spine\spine-cocos2dx.cpp" />
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
     <ClCompile Include="..\Classes\ExampleLayer.cpp" />
     <ClCompile Include="main.cpp" />
@@ -190,11 +177,6 @@
     <ProjectReference Include="..\..\cocos2dx\proj.win32\cocos2d.vcxproj">
       <Project>{98a51ba8-fc3a-415b-ac8f-8c7bd464e93e}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\spine-cpp\src\json\json_internalarray.inl" />
-    <None Include="..\..\..\spine-cpp\src\json\json_internalmap.inl" />
-    <None Include="..\..\..\spine-cpp\src\json\json_valueiterator.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

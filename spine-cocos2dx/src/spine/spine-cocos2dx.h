@@ -23,27 +23,52 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include <stdexcept>
-#include <spine-cocos2dx/AtlasAttachmentLoader.h>
-#include <spine-cocos2dx/Atlas.h>
-#include <spine-cocos2dx/RegionAttachment.h>
+#include <spine/spine.h>
+#include "cocos2d.h"
 
 namespace spine {
 
-AtlasAttachmentLoader::AtlasAttachmentLoader (Atlas *atlas) :
-				atlas(atlas) {
-}
+typedef struct {
+	AtlasPage super;
+	cocos2d::CCTexture2D* texture;
+	cocos2d::CCTextureAtlas* atlas;
+} Cocos2dxAtlasPage;
 
-Attachment* AtlasAttachmentLoader::newAttachment (AttachmentType type, const std::string &name) {
-	switch (type) {
-	case region: {
-		AtlasRegion *region = atlas->findRegion(name);
-		if (!region) throw std::runtime_error("Atlas region not found: " + name);
-		return new RegionAttachment(region);
-	}
-	default:
-		throw std::runtime_error("Unknown attachment type: " + type);
-	}
-}
+/**/
 
-} /* namespace spine */
+class CCSkeleton;
+
+typedef struct {
+	Skeleton super;
+	CCSkeleton* node;
+} Cocos2dxSkeleton;
+
+class CCSkeleton: public cocos2d::CCNodeRGBA, public cocos2d::CCBlendProtocol {
+public:
+	Skeleton* skeleton;
+	AnimationState* state;
+	bool debugSlots;
+	bool debugBones;
+	cocos2d::CCTextureAtlas* atlas; // All region attachments for a skeleton must use the same texture.
+	unsigned int quadCount;
+
+	static CCSkeleton* create (SkeletonData* skeletonData);
+	CCSkeleton (SkeletonData* skeletonData, AnimationStateData* stateData = 0);
+	virtual ~CCSkeleton ();
+
+	virtual void update (float deltaTime);
+	virtual void draw ();
+
+	// CCBlendProtocol
+	CC_PROPERTY(cocos2d::ccBlendFunc, blendFunc, BlendFunc);
+};
+
+/**/
+
+typedef struct {
+	RegionAttachment super;
+	cocos2d::ccV3F_C4B_T2F_Quad quad;
+	cocos2d::CCTextureAtlas* atlas;
+} Cocos2dxRegionAttachment;
+
+}

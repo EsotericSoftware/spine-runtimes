@@ -2,7 +2,7 @@
 #define _EXAMPLELAYER_H_
 
 #include "cocos2d.h"
-#include <spine-cocos2dx/spine.h>
+#include <spine/spine-cocos2dx.h>
 
 class ExampleLayer: public cocos2d::CCLayer {
 private:
