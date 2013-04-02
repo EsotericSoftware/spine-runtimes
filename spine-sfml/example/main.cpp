@@ -66,6 +66,7 @@ int main () {
 		Skeleton_updateWorldTransform(skeleton);
 	}
 
+	Animation_dispose(animation);
 	SkeletonData_dispose(skeletonData);
 	Atlas_dispose(atlas);
 }
