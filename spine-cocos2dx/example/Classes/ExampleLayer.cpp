@@ -15,16 +15,24 @@ CCScene* ExampleLayer::scene () {
 bool ExampleLayer::init () {
 	if (!CCLayer::init()) return false;
 
+    // Load atlas, skeleton, and animations.
 	atlas = Atlas_readAtlasFile("spineboy.atlas");
 	SkeletonJson* json = SkeletonJson_create(atlas);
 	json->scale = 0.75;
 	skeletonData = SkeletonJson_readSkeletonDataFile(json, "spineboy-skeleton.json");
-	animation = SkeletonJson_readAnimationFile(json, "spineboy-walk.json", skeletonData);
+	walkAnimation = SkeletonJson_readAnimationFile(json, "spineboy-walk.json", skeletonData);
+	jumpAnimation = SkeletonJson_readAnimationFile(json, "spineboy-jump.json", skeletonData);
 	SkeletonJson_dispose(json);
 
-	CCSkeleton* skeletonNode = CCSkeleton::create(skeletonData);
+	// Configure mixing.
+	AnimationStateData* stateData = AnimationStateData_create();
+	AnimationStateData_setMix(stateData, walkAnimation, jumpAnimation, 0.4f);
+	AnimationStateData_setMix(stateData, jumpAnimation, walkAnimation, 0.4f);
+
+	skeletonNode = CCSkeleton::create(skeletonData, stateData);
 	Skeleton_setToBindPose(skeletonNode->skeleton);
-	AnimationState_setAnimation(skeletonNode->state, animation, true);
+	AnimationState_setAnimation(skeletonNode->state, walkAnimation, true);
+	skeletonNode->timeScale = 0.3f;
 	skeletonNode->debugBones = true;
 
 	skeletonNode->runAction(CCRepeatForever::create(CCSequence::create(CCFadeOut::create(1),
@@ -36,11 +44,23 @@ bool ExampleLayer::init () {
 	skeletonNode->setPosition(ccp(windowSize.width / 2, 20));
 	addChild(skeletonNode);
 
+	scheduleUpdate();
+
 	return true;
+}
+
+void ExampleLayer::update (float deltaTime) {
+    if (skeletonNode->state->animation == walkAnimation) {
+        if (skeletonNode->state->time > 2) AnimationState_setAnimation(skeletonNode->state, jumpAnimation, false);
+    } else {
+        if (skeletonNode->state->time > 1) AnimationState_setAnimation(skeletonNode->state, walkAnimation, true);
+    }
 }
 
 ExampleLayer::~ExampleLayer () {
 	SkeletonData_dispose(skeletonData);
-	Animation_dispose(animation);
+	Animation_dispose(walkAnimation);
+	Animation_dispose(jumpAnimation);
 	Atlas_dispose(atlas);
 }
+

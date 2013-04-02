@@ -69,8 +69,8 @@ Skeleton* _Cocos2dxSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 	return SUPER(self);
 }
 
-CCSkeleton* CCSkeleton::create (SkeletonData* skeletonData) {
-	CCSkeleton* node = new CCSkeleton(skeletonData);
+CCSkeleton* CCSkeleton::create (SkeletonData* skeletonData, AnimationStateData* stateData) {
+	CCSkeleton* node = new CCSkeleton(skeletonData, stateData);
 	node->autorelease();
 	return node;
 }
@@ -94,7 +94,7 @@ CCSkeleton::~CCSkeleton () {
 
 void CCSkeleton::update (float deltaTime) {
 	Skeleton_update(skeleton, deltaTime);
-	AnimationState_update(state, deltaTime);
+	AnimationState_update(state, deltaTime * timeScale);
 	AnimationState_apply(state, skeleton);
 	Skeleton_updateWorldTransform(skeleton);
 }

@@ -86,7 +86,7 @@ void AnimationState_setAnimation (AnimationState* self, Animation* newAnimation,
 	self->loop = loop;
 	self->time = 0;
 }
-    
+
 #ifdef __cplusplus
 }
 #endif

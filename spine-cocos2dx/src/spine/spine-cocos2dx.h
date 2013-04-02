@@ -50,12 +50,13 @@ class CCSkeleton: public cocos2d::CCNodeRGBA, public cocos2d::CCBlendProtocol {
 public:
 	Skeleton* skeleton;
 	AnimationState* state;
+	float timeScale;
 	bool debugSlots;
 	bool debugBones;
 	cocos2d::CCTextureAtlas* atlas; // All region attachments for a skeleton must use the same texture.
 	unsigned int quadCount;
 
-	static CCSkeleton* create (SkeletonData* skeletonData);
+	static CCSkeleton* create (SkeletonData* skeletonData, AnimationStateData* stateData = 0);
 	CCSkeleton (SkeletonData* skeletonData, AnimationStateData* stateData = 0);
 	virtual ~CCSkeleton ();
 
