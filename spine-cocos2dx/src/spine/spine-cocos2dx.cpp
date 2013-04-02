@@ -59,8 +59,6 @@ void _Cocos2dxSkeleton_dispose (Skeleton* self) {
 	FREE(self);
 }
 
-class CCSkeleton;
-
 Skeleton* _Cocos2dxSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 	Cocos2dxSkeleton* self = NEW(Cocos2dxSkeleton);
 	_Skeleton_init(SUPER(self), data);
