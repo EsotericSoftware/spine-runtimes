@@ -103,8 +103,6 @@ void CCSkeleton::update (float deltaTime) {
 	Skeleton_updateWorldTransform(skeleton);
 }
 
-#include <stdio.h>
-
 void CCSkeleton::draw () {
 	CC_NODE_DRAW_SETUP();
 
