@@ -1,7 +1,0 @@
-//
-// Prefix header for all source files of the 'cocos2d-mac' target in the 'cocos2d-mac' project
-//
-
-#ifdef __OBJC__
-    #import <Cocoa/Cocoa.h>
-#endif

@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:spine-cocos2d-iphone.xcodeproj">
+      location = "self:spine-cocos2d-iphone-mac.xcodeproj">
    </FileRef>
 </Workspace>

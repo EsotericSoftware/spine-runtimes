@@ -13,9 +13,7 @@
 		4319B51E16FF9B2600C1D7A9 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4319B51D16FF9B2600C1D7A9 /* AudioToolbox.framework */; };
 		4319B52016FF9B2600C1D7A9 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4319B51F16FF9B2600C1D7A9 /* AppKit.framework */; };
 		4319B52216FF9B2600C1D7A9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4319B52116FF9B2600C1D7A9 /* Foundation.framework */; };
-		4319B6C316FF9D1700C1D7A9 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4319B6BE16FF9D1700C1D7A9 /* AppDelegate.m */; };
 		4319B6C416FF9D1700C1D7A9 /* ExampleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4319B6C016FF9D1700C1D7A9 /* ExampleLayer.m */; };
-		4319B6C516FF9D1700C1D7A9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4319B6C116FF9D1700C1D7A9 /* main.m */; };
 		4319B7D616FF9D3A00C1D7A9 /* CCAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 4319B6C916FF9D3900C1D7A9 /* CCAction.m */; };
 		4319B7D716FF9D3A00C1D7A9 /* CCActionCamera.m in Sources */ = {isa = PBXBuildFile; fileRef = 4319B6CB16FF9D3900C1D7A9 /* CCActionCamera.m */; };
 		4319B7D816FF9D3A00C1D7A9 /* CCActionCatmullRom.m in Sources */ = {isa = PBXBuildFile; fileRef = 4319B6CD16FF9D3900C1D7A9 /* CCActionCatmullRom.m */; };
@@ -129,9 +127,6 @@
 		4319B84416FF9D3A00C1D7A9 /* LICENSE_cocos2d.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4319B7C816FF9D3900C1D7A9 /* LICENSE_cocos2d.txt */; };
 		4319B84516FF9D3A00C1D7A9 /* LICENSE_CocosDenshion.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4319B7C916FF9D3900C1D7A9 /* LICENSE_CocosDenshion.txt */; };
 		4319B84616FF9D3A00C1D7A9 /* LICENSE_Kazmath.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4319B7CA16FF9D3900C1D7A9 /* LICENSE_Kazmath.txt */; };
-		4319B84716FF9D3A00C1D7A9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4319B7CC16FF9D3900C1D7A9 /* InfoPlist.strings */; };
-		4319B84816FF9D3A00C1D7A9 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4319B7CE16FF9D3900C1D7A9 /* MainMenu.xib */; };
-		4319B84916FF9D3A00C1D7A9 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4319B7D016FF9D3900C1D7A9 /* icon.icns */; };
 		4319B84B16FF9D3A00C1D7A9 /* spineboy-skeleton.json in Resources */ = {isa = PBXBuildFile; fileRef = 4319B7D216FF9D3900C1D7A9 /* spineboy-skeleton.json */; };
 		4319B84C16FF9D3A00C1D7A9 /* spineboy-walk.json in Resources */ = {isa = PBXBuildFile; fileRef = 4319B7D316FF9D3900C1D7A9 /* spineboy-walk.json */; };
 		4319B84D16FF9D3A00C1D7A9 /* spineboy.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 4319B7D416FF9D3900C1D7A9 /* spineboy.atlas */; };
@@ -155,6 +150,11 @@
 		43BFBE1F170A804700ECBACB /* Skin.c in Sources */ = {isa = PBXBuildFile; fileRef = 43BFBDC3170A705100ECBACB /* Skin.c */; };
 		43BFBE20170A804700ECBACB /* Slot.c in Sources */ = {isa = PBXBuildFile; fileRef = 43BFBDC4170A705100ECBACB /* Slot.c */; };
 		43BFBE21170A804700ECBACB /* SlotData.c in Sources */ = {isa = PBXBuildFile; fileRef = 43BFBDC5170A705100ECBACB /* SlotData.c */; };
+		43C32A1B170B1295004A9460 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 43C32A11170B1295004A9460 /* AppDelegate.m */; };
+		43C32A1C170B1295004A9460 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 43C32A13170B1295004A9460 /* InfoPlist.strings */; };
+		43C32A1D170B1295004A9460 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 43C32A15170B1295004A9460 /* MainMenu.xib */; };
+		43C32A1E170B1295004A9460 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 43C32A17170B1295004A9460 /* icon.icns */; };
+		43C32A20170B1295004A9460 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 43C32A19170B1295004A9460 /* main.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -165,12 +165,8 @@
 		4319B51D16FF9B2600C1D7A9 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		4319B51F16FF9B2600C1D7A9 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		4319B52116FF9B2600C1D7A9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		4319B6BD16FF9D1700C1D7A9 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		4319B6BE16FF9D1700C1D7A9 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		4319B6BF16FF9D1700C1D7A9 /* ExampleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExampleLayer.h; sourceTree = "<group>"; };
 		4319B6C016FF9D1700C1D7A9 /* ExampleLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExampleLayer.m; sourceTree = "<group>"; };
-		4319B6C116FF9D1700C1D7A9 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		4319B6C216FF9D1700C1D7A9 /* Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Prefix.pch; sourceTree = "<group>"; };
 		4319B6C816FF9D3900C1D7A9 /* CCAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCAction.h; sourceTree = "<group>"; };
 		4319B6C916FF9D3900C1D7A9 /* CCAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCAction.m; sourceTree = "<group>"; };
 		4319B6CA16FF9D3900C1D7A9 /* CCActionCamera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCActionCamera.h; sourceTree = "<group>"; };
@@ -419,10 +415,6 @@
 		4319B7C816FF9D3900C1D7A9 /* LICENSE_cocos2d.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE_cocos2d.txt; sourceTree = "<group>"; };
 		4319B7C916FF9D3900C1D7A9 /* LICENSE_CocosDenshion.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE_CocosDenshion.txt; sourceTree = "<group>"; };
 		4319B7CA16FF9D3900C1D7A9 /* LICENSE_Kazmath.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE_Kazmath.txt; sourceTree = "<group>"; };
-		4319B7CD16FF9D3900C1D7A9 /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		4319B7CF16FF9D3900C1D7A9 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		4319B7D016FF9D3900C1D7A9 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = icon.icns; sourceTree = "<group>"; };
-		4319B7D116FF9D3900C1D7A9 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4319B7D216FF9D3900C1D7A9 /* spineboy-skeleton.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "spineboy-skeleton.json"; sourceTree = "<group>"; };
 		4319B7D316FF9D3900C1D7A9 /* spineboy-walk.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "spineboy-walk.json"; sourceTree = "<group>"; };
 		4319B7D416FF9D3900C1D7A9 /* spineboy.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spineboy.atlas; sourceTree = "<group>"; };
@@ -466,6 +458,14 @@
 		43BFBDC5170A705100ECBACB /* SlotData.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = SlotData.c; path = "../spine-c/src/spine/SlotData.c"; sourceTree = "<group>"; };
 		43BFBE0D170A778A00ECBACB /* spine-cocos2d-iphone.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "spine-cocos2d-iphone.m"; path = "src/spine/spine-cocos2d-iphone.m"; sourceTree = "<group>"; };
 		43BFBE0E170A778A00ECBACB /* spine-cocos2d-iphone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "spine-cocos2d-iphone.h"; path = "src/spine/spine-cocos2d-iphone.h"; sourceTree = "<group>"; };
+		43C32A10170B1295004A9460 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = "../Resources-mac/AppDelegate.h"; sourceTree = "<group>"; };
+		43C32A11170B1295004A9460 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = "../Resources-mac/AppDelegate.m"; sourceTree = "<group>"; };
+		43C32A14170B1295004A9460 /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = InfoPlist.strings; sourceTree = "<group>"; };
+		43C32A16170B1295004A9460 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = MainMenu.xib; sourceTree = "<group>"; };
+		43C32A17170B1295004A9460 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = icon.icns; path = "Resources-mac/icon.icns"; sourceTree = "<group>"; };
+		43C32A18170B1295004A9460 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = "Resources-mac/Info.plist"; sourceTree = "<group>"; };
+		43C32A19170B1295004A9460 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "../Resources-mac/main.m"; sourceTree = "<group>"; };
+		43C32A1A170B1295004A9460 /* Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Prefix.pch; path = "../Resources-mac/Prefix.pch"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -490,6 +490,7 @@
 			children = (
 				4319B6BC16FF9D1700C1D7A9 /* Classes */,
 				4319B7CB16FF9D3900C1D7A9 /* Resources */,
+				43C32A0F170B1282004A9460 /* Resources-mac */,
 				4319B6C616FF9D3900C1D7A9 /* libs */,
 				4319B51616FF9B2600C1D7A9 /* Frameworks */,
 				4319B51416FF9B2600C1D7A9 /* Products */,
@@ -522,12 +523,12 @@
 			children = (
 				4319B8921701168A00C1D7A9 /* spine-c */,
 				4319B8931701168F00C1D7A9 /* spine-cocos2d-iphone */,
-				4319B6BD16FF9D1700C1D7A9 /* AppDelegate.h */,
-				4319B6BE16FF9D1700C1D7A9 /* AppDelegate.m */,
 				4319B6BF16FF9D1700C1D7A9 /* ExampleLayer.h */,
 				4319B6C016FF9D1700C1D7A9 /* ExampleLayer.m */,
-				4319B6C116FF9D1700C1D7A9 /* main.m */,
-				4319B6C216FF9D1700C1D7A9 /* Prefix.pch */,
+				43C32A10170B1295004A9460 /* AppDelegate.h */,
+				43C32A11170B1295004A9460 /* AppDelegate.m */,
+				43C32A19170B1295004A9460 /* main.m */,
+				43C32A1A170B1295004A9460 /* Prefix.pch */,
 			);
 			name = Classes;
 			path = example;
@@ -887,10 +888,6 @@
 		4319B7CB16FF9D3900C1D7A9 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				4319B7CC16FF9D3900C1D7A9 /* InfoPlist.strings */,
-				4319B7CE16FF9D3900C1D7A9 /* MainMenu.xib */,
-				4319B7D016FF9D3900C1D7A9 /* icon.icns */,
-				4319B7D116FF9D3900C1D7A9 /* Info.plist */,
 				4319B7D216FF9D3900C1D7A9 /* spineboy-skeleton.json */,
 				4319B7D316FF9D3900C1D7A9 /* spineboy-walk.json */,
 				4319B7D416FF9D3900C1D7A9 /* spineboy.atlas */,
@@ -954,6 +951,26 @@
 			path = ..;
 			sourceTree = "<group>";
 		};
+		43C32A0F170B1282004A9460 /* Resources-mac */ = {
+			isa = PBXGroup;
+			children = (
+				43C32A12170B1295004A9460 /* English.lproj */,
+				43C32A17170B1295004A9460 /* icon.icns */,
+				43C32A18170B1295004A9460 /* Info.plist */,
+			);
+			name = "Resources-mac";
+			sourceTree = "<group>";
+		};
+		43C32A12170B1295004A9460 /* English.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				43C32A13170B1295004A9460 /* InfoPlist.strings */,
+				43C32A15170B1295004A9460 /* MainMenu.xib */,
+			);
+			name = English.lproj;
+			path = "Resources-mac/English.lproj";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -970,7 +987,7 @@
 			dependencies = (
 			);
 			name = SpineExample;
-			productName = "spine-cocos2d-iphone";
+			productName = "spine-cocos2d-iphone-mac";
 			productReference = 4319B51316FF9B2600C1D7A9 /* SpineExample.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -983,7 +1000,7 @@
 				LastUpgradeCheck = 0450;
 				ORGANIZATIONNAME = "Esoteric Software";
 			};
-			buildConfigurationList = 4319B50D16FF9B2600C1D7A9 /* Build configuration list for PBXProject "spine-cocos2d-iphone" */;
+			buildConfigurationList = 4319B50D16FF9B2600C1D7A9 /* Build configuration list for PBXProject "spine-cocos2d-iphone-mac" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -1012,13 +1029,13 @@
 				4319B84416FF9D3A00C1D7A9 /* LICENSE_cocos2d.txt in Resources */,
 				4319B84516FF9D3A00C1D7A9 /* LICENSE_CocosDenshion.txt in Resources */,
 				4319B84616FF9D3A00C1D7A9 /* LICENSE_Kazmath.txt in Resources */,
-				4319B84716FF9D3A00C1D7A9 /* InfoPlist.strings in Resources */,
-				4319B84816FF9D3A00C1D7A9 /* MainMenu.xib in Resources */,
-				4319B84916FF9D3A00C1D7A9 /* icon.icns in Resources */,
 				4319B84B16FF9D3A00C1D7A9 /* spineboy-skeleton.json in Resources */,
 				4319B84C16FF9D3A00C1D7A9 /* spineboy-walk.json in Resources */,
 				4319B84D16FF9D3A00C1D7A9 /* spineboy.atlas in Resources */,
 				4319B84E16FF9D3A00C1D7A9 /* spineboy.png in Resources */,
+				43C32A1C170B1295004A9460 /* InfoPlist.strings in Resources */,
+				43C32A1D170B1295004A9460 /* MainMenu.xib in Resources */,
+				43C32A1E170B1295004A9460 /* icon.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1047,9 +1064,7 @@
 				43BFBE1F170A804700ECBACB /* Skin.c in Sources */,
 				43BFBE20170A804700ECBACB /* Slot.c in Sources */,
 				43BFBE21170A804700ECBACB /* SlotData.c in Sources */,
-				4319B6C316FF9D1700C1D7A9 /* AppDelegate.m in Sources */,
 				4319B6C416FF9D1700C1D7A9 /* ExampleLayer.m in Sources */,
-				4319B6C516FF9D1700C1D7A9 /* main.m in Sources */,
 				4319B7D616FF9D3A00C1D7A9 /* CCAction.m in Sources */,
 				4319B7D716FF9D3A00C1D7A9 /* CCActionCamera.m in Sources */,
 				4319B7D816FF9D3A00C1D7A9 /* CCActionCatmullRom.m in Sources */,
@@ -1158,24 +1173,26 @@
 				4319B84216FF9D3A00C1D7A9 /* vec3.c in Sources */,
 				4319B84316FF9D3A00C1D7A9 /* vec4.c in Sources */,
 				43BFBE0F170A778A00ECBACB /* spine-cocos2d-iphone.m in Sources */,
+				43C32A1B170B1295004A9460 /* AppDelegate.m in Sources */,
+				43C32A20170B1295004A9460 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		4319B7CC16FF9D3900C1D7A9 /* InfoPlist.strings */ = {
+		43C32A13170B1295004A9460 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				4319B7CD16FF9D3900C1D7A9 /* English */,
+				43C32A14170B1295004A9460 /* English */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		4319B7CE16FF9D3900C1D7A9 /* MainMenu.xib */ = {
+		43C32A15170B1295004A9460 /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				4319B7CF16FF9D3900C1D7A9 /* English */,
+				43C32A16170B1295004A9460 /* English */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -1232,14 +1249,14 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = example/Prefix.pch;
+				GCC_PREFIX_HEADER = "Resources-mac/Prefix.pch";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				HEADER_SEARCH_PATHS = (
 					"\"libs/kazmath/include\"",
 					"\"src\"",
 					"\"../spine-c/include\"",
 				);
-				INFOPLIST_FILE = Resources/Info.plist;
+				INFOPLIST_FILE = "Resources-mac/Info.plist";
 				OTHER_LDFLAGS = (
 					"-lz",
 					"-lsqlite3",
@@ -1256,14 +1273,14 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = example/Prefix.pch;
+				GCC_PREFIX_HEADER = "Resources-mac/Prefix.pch";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				HEADER_SEARCH_PATHS = (
 					"\"libs/kazmath/include\"",
 					"\"src\"",
 					"\"../spine-c/include\"",
 				);
-				INFOPLIST_FILE = Resources/Info.plist;
+				INFOPLIST_FILE = "Resources-mac/Info.plist";
 				OTHER_LDFLAGS = (
 					"-lz",
 					"-lsqlite3",
@@ -1277,7 +1294,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		4319B50D16FF9B2600C1D7A9 /* Build configuration list for PBXProject "spine-cocos2d-iphone" */ = {
+		4319B50D16FF9B2600C1D7A9 /* Build configuration list for PBXProject "spine-cocos2d-iphone-mac" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4319B6AA16FF9B2B00C1D7A9 /* Debug */,

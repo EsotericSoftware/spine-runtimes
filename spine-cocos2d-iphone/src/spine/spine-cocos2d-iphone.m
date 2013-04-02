@@ -158,8 +158,8 @@ Skeleton* _Cocos2dSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 
 // CCBlendProtocol
 
-- (void) setBlendFunc:(ccBlendFunc)blendFunc {
-    self.blendFunc = blendFunc;
+- (void) setBlendFunc:(ccBlendFunc)func {
+    self.blendFunc = func;
 }
 
 - (ccBlendFunc) blendFunc {
