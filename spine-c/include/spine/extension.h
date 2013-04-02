@@ -33,13 +33,13 @@
 
  - Inheritance is done using a struct field named "super" as the first field, allowing the struct to be cast to its "super class".
 
- - Classes intended for inheritance provide init/deinit functions which subclasses must call in their new/free functions.
+ - Classes intended for inheritance provide init/deinit functions which subclasses must call in their create/dispose functions.
 
  - Polymorphism is done by a base class providing a "vtable" pointer to a struct containing function pointers. The public API
  delegates to the appropriate vtable function. Subclasses may change the vtable pointers.
 
- - Subclasses do not provide a free function, instead the base class' free function should be used, which will delegate to a free
- function in its vtable.
+ - Subclasses do not provide a dispose function, instead the base class' dispose function should be used, which will delegate to
+ a dispose function in its vtable.
 
  - Classes not designed for inheritance cannot be extended. They may use an internal subclass to hide private data and don't
  expose a vtable.
@@ -47,7 +47,7 @@
  - The public API hides implementation details such as vtable structs and init/deinit functions. An internal API is exposed in
  extension.h to allow classes to be extended. Internal structs and functions begin with underscore (_).
 
- - OOP in C tends to lose type safety. Macros are provided in extension.h to give more context about why a cast is being done.
+ - OOP in C tends to lose type safety. Macros are provided in extension.h to give context for why a cast is being done.
  */
 
 #ifndef SPINE_EXTENSION_H_
@@ -61,7 +61,7 @@
 /* Gets the direct super class. Type safe. */
 #define SUPER(VALUE) (&VALUE->super)
 
-/* Cast to a super class. Not type safe, use with care. */
+/* Cast to a super class. Not type safe, use with care. Prefer SUPER() where possible. */
 #define SUPER_CAST(TYPE,VALUE) ((TYPE*)VALUE)
 
 /* Cast to a sub class. Not type safe, use with care. */
@@ -77,7 +77,7 @@
 #define FREE(VALUE) free((void*)VALUE)
 
 /* Allocates a new char[], assigns it to TO, and copies FROM to it. Can be used on const. */
-#define MALLOC_STR(TO,FROM) strcpy(CONST_CAST(char*, TO) = (char*)malloc(strlen(FROM)), FROM)
+#define MALLOC_STR(TO,FROM) strcpy(CONST_CAST(char*, TO) = (char*)malloc(strlen(FROM) + 1), FROM)
 
 #include <stdlib.h>
 #include <string.h>
@@ -96,9 +96,9 @@ extern "C" {
  * Functions that must be implemented:
  */
 
-RegionAttachment* RegionAttachment_new (const char* name, AtlasRegion* region);
+RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region);
 
-AtlasPage* AtlasPage_new (const char* name);
+AtlasPage* AtlasPage_create (const char* name);
 
 char* _Util_readFile (const char* path, int* length);
 
@@ -109,61 +109,61 @@ char* _Util_readFile (const char* path, int* length);
 char* _readFile (const char* path, int* length);
 
 typedef struct _SkeletonVtable {
-	void (*free) (Skeleton* skeleton);
+	void (*dispose) (Skeleton* skeleton);
 } _SkeletonVtable;
 
-void _Skeleton_init (Skeleton* skeleton, SkeletonData* data);
-void _Skeleton_deinit (Skeleton* skeleton);
+void _Skeleton_init (Skeleton* self, SkeletonData* data);
+void _Skeleton_deinit (Skeleton* self);
 
 /**/
 
 typedef struct _AttachmentVtable {
-	void (*draw) (Attachment* attachment, struct Slot* slot);
-	void (*free) (Attachment* attachment);
+	void (*draw) (Attachment* self, struct Slot* slot);
+	void (*dispose) (Attachment* self);
 } _AttachmentVtable;
 
-void _Attachment_init (Attachment* attachment, const char* name, AttachmentType type);
-void _Attachment_deinit (Attachment* attachment);
+void _Attachment_init (Attachment* self, const char* name, AttachmentType type);
+void _Attachment_deinit (Attachment* self);
 
 /**/
 
-void _RegionAttachment_init (RegionAttachment* attachment, const char* name);
-void _RegionAttachment_deinit (RegionAttachment* attachment);
+void _RegionAttachment_init (RegionAttachment* self, const char* name);
+void _RegionAttachment_deinit (RegionAttachment* self);
 
 /**/
 
 typedef struct _TimelineVtable {
-	void (*apply) (const Timeline* timeline, Skeleton* skeleton, float time, float alpha);
-	void (*free) (Timeline* timeline);
+	void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha);
+	void (*dispose) (Timeline* self);
 } _TimelineVtable;
 
-void _Timeline_init (Timeline* timeline);
-void _Timeline_deinit (Timeline* timeline);
+void _Timeline_init (Timeline* self);
+void _Timeline_deinit (Timeline* self);
 
 /**/
 
-void _CurveTimeline_init (CurveTimeline* timeline, int frameCount);
-void _CurveTimeline_deinit (CurveTimeline* timeline);
+void _CurveTimeline_init (CurveTimeline* self, int frameCount);
+void _CurveTimeline_deinit (CurveTimeline* self);
 
 /**/
 
 typedef struct _AtlasPageVtable {
-	void (*free) (AtlasPage* page);
+	void (*dispose) (AtlasPage* self);
 } _AtlasPageVtable;
 
-void _AtlasPage_init (AtlasPage* page, const char* name);
-void _AtlasPage_deinit (AtlasPage* page);
+void _AtlasPage_init (AtlasPage* self, const char* name);
+void _AtlasPage_deinit (AtlasPage* self);
 
 /**/
 
 typedef struct _AttachmentLoaderVtable {
-	Attachment* (*newAttachment) (AttachmentLoader* loader, AttachmentType type, const char* name);
-	void (*free) (AttachmentLoader* loader);
+	Attachment* (*newAttachment) (AttachmentLoader* self, AttachmentType type, const char* name);
+	void (*dispose) (AttachmentLoader* self);
 } _AttachmentLoaderVtable;
 
-void _AttachmentLoader_init (AttachmentLoader* loader);
-void _AttachmentLoader_deinit (AttachmentLoader* loader);
-void _AttachmentLoader_setError (AttachmentLoader* loader, const char* error1, const char* error2);
+void _AttachmentLoader_init (AttachmentLoader* self);
+void _AttachmentLoader_deinit (AttachmentLoader* self);
+void _AttachmentLoader_setError (AttachmentLoader* self, const char* error1, const char* error2);
 
 #ifdef __cplusplus
 }

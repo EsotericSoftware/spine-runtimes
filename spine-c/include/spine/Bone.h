@@ -50,12 +50,12 @@ struct Bone {
 void Bone_setYDown (int/*bool*/yDown);
 
 /* @param parent May be 0. */
-Bone* Bone_new (BoneData* data, Bone* parent);
-void Bone_free (Bone* bone);
+Bone* Bone_create (BoneData* data, Bone* parent);
+void Bone_dispose (Bone* self);
 
-void Bone_setToBindPose (Bone* bone);
+void Bone_setToBindPose (Bone* self);
 
-void Bone_updateWorldTransform (Bone* bone, int/*bool*/flipX, int/*bool*/flipY);
+void Bone_updateWorldTransform (Bone* self, int/*bool*/flipX, int/*bool*/flipY);
 
 #ifdef __cplusplus
 }

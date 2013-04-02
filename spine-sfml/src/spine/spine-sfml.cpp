@@ -41,7 +41,7 @@ using sf::VertexArray;
 
 namespace spine {
 
-void _SfmlAtlasPage_free (AtlasPage* page) {
+void _SfmlAtlasPage_dispose (AtlasPage* page) {
 	SfmlAtlasPage* self = SUB_CAST(SfmlAtlasPage, page);
 	_AtlasPage_deinit(SUPER(self));
 
@@ -50,10 +50,10 @@ void _SfmlAtlasPage_free (AtlasPage* page) {
 	FREE(page);
 }
 
-AtlasPage* AtlasPage_new (const char* name) {
+AtlasPage* AtlasPage_create (const char* name) {
 	SfmlAtlasPage* self = NEW(SfmlAtlasPage);
 	_AtlasPage_init(SUPER(self), name);
-	VTABLE(AtlasPage, self) ->free = _SfmlAtlasPage_free;
+	VTABLE(AtlasPage, self) ->dispose = _SfmlAtlasPage_dispose;
 
 	self->texture = new Texture();
 	self->texture->loadFromFile(name);
@@ -63,17 +63,17 @@ AtlasPage* AtlasPage_new (const char* name) {
 
 /**/
 
-void _SfmlSkeleton_free (Skeleton* self) {
+void _SfmlSkeleton_dispose (Skeleton* self) {
 	_Skeleton_deinit(self);
 	FREE(self);
 }
 
-Skeleton* _SfmlSkeleton_new (SkeletonData* data, SkeletonDrawable* drawable) {
+Skeleton* _SfmlSkeleton_create (SkeletonData* data, SkeletonDrawable* drawable) {
 	Bone_setYDown(1);
 
 	SfmlSkeleton* self = NEW(SfmlSkeleton);
 	_Skeleton_init(SUPER(self), data);
-	VTABLE(Skeleton, self) ->free = _SfmlSkeleton_free;
+	VTABLE(Skeleton, self) ->dispose = _SfmlSkeleton_dispose;
 
 	CONST_CAST(SkeletonDrawable*, self->drawable) = drawable;
 
@@ -83,12 +83,12 @@ Skeleton* _SfmlSkeleton_new (SkeletonData* data, SkeletonDrawable* drawable) {
 SkeletonDrawable::SkeletonDrawable (SkeletonData* skeletonData) :
 				vertexArray(new VertexArray(Quads, skeletonData->boneCount * 4)),
 				texture(0) {
-	skeleton = _SfmlSkeleton_new(skeletonData, this);
+	skeleton = _SfmlSkeleton_create(skeletonData, this);
 }
 
 SkeletonDrawable::~SkeletonDrawable () {
 	delete vertexArray;
-	Skeleton_free(skeleton);
+	Skeleton_dispose(skeleton);
 }
 
 void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
@@ -101,7 +101,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 
 /**/
 
-void _SfmlRegionAttachment_free (Attachment* self) {
+void _SfmlRegionAttachment_dispose (Attachment* self) {
 	_RegionAttachment_deinit(SUB_CAST(RegionAttachment, self) );
 	FREE(self);
 }
@@ -150,10 +150,10 @@ void _SfmlRegionAttachment_draw (Attachment* attachment, Slot* slot) {
 	skeleton->drawable->vertexArray->append(vertices[3]);
 }
 
-RegionAttachment* RegionAttachment_new (const char* name, AtlasRegion* region) {
+RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region) {
 	SfmlRegionAttachment* self = NEW(SfmlRegionAttachment);
 	_RegionAttachment_init(SUPER(self), name);
-	VTABLE(Attachment, self) ->free = _SfmlRegionAttachment_free;
+	VTABLE(Attachment, self) ->dispose = _SfmlRegionAttachment_dispose;
 	VTABLE(Attachment, self) ->draw = _SfmlRegionAttachment_draw;
 
 	self->texture = ((SfmlAtlasPage*)region->page)->texture;

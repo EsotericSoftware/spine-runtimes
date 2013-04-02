@@ -31,7 +31,7 @@
 namespace spine {
 #endif
 
-void _AtlasAttachmentLoader_free (AttachmentLoader* self) {
+void _AtlasAttachmentLoader_dispose (AttachmentLoader* self) {
 	_AttachmentLoader_deinit(self);
 }
 
@@ -44,7 +44,7 @@ Attachment* _AtlasAttachmentLoader_newAttachment (AttachmentLoader* loader, Atta
 			_AttachmentLoader_setError(loader, "Region not found: ", name);
 			return 0;
 		}
-		return SUPER_CAST(Attachment, RegionAttachment_new(name, region)) ;
+		return SUPER_CAST(Attachment, RegionAttachment_create(name, region)) ;
 	}
 	default: {
 		char buffer[16];
@@ -55,12 +55,12 @@ Attachment* _AtlasAttachmentLoader_newAttachment (AttachmentLoader* loader, Atta
 	}
 }
 
-AtlasAttachmentLoader* AtlasAttachmentLoader_new (Atlas* atlas) {
+AtlasAttachmentLoader* AtlasAttachmentLoader_create (Atlas* atlas) {
 	AtlasAttachmentLoader* self = NEW(AtlasAttachmentLoader);
 	_AttachmentLoader_init(SUPER(self));
 	self->atlas = atlas;
 	VTABLE(AttachmentLoader, self) ->newAttachment = _AtlasAttachmentLoader_newAttachment;
-	VTABLE(AttachmentLoader, self) ->free = _AtlasAttachmentLoader_free;
+	VTABLE(AttachmentLoader, self) ->dispose = _AtlasAttachmentLoader_dispose;
 	return self;
 }
 

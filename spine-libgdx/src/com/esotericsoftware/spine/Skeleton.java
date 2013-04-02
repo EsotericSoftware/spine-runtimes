@@ -225,7 +225,7 @@ public class Skeleton {
 	}
 
 	/** Sets the skin used to look up attachments not found in the {@link SkeletonData#getDefaultSkin() default skin}. Attachments
-	 * from the new skin are attached if the corresponding attachment from the old skin is currently attached.
+	 * from the new skin are attached if the corresponding attachment from the old skin was attached.
 	 * @param newSkin May be null. */
 	public void setSkin (Skin newSkin) {
 		if (skin != null && newSkin != null) newSkin.attachAll(this, skin);

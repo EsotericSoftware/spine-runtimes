@@ -45,9 +45,9 @@ struct Attachment {
 	const void* const vtable;
 };
 
-void Attachment_free (Attachment* attachment);
+void Attachment_dispose (Attachment* self);
 
-void Attachment_draw (Attachment* attachment, struct Slot* slot);
+void Attachment_draw (Attachment* self, struct Slot* slot);
 
 #ifdef __cplusplus
 }

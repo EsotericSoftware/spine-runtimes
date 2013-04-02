@@ -37,7 +37,7 @@ void Bone_setYDown (int value) {
 	yDown = value;
 }
 
-Bone* Bone_new (BoneData* data, Bone* parent) {
+Bone* Bone_create (BoneData* data, Bone* parent) {
 	Bone* self = NEW(Bone);
 	CONST_CAST(BoneData*, self->data) = data;
 	CONST_CAST(Bone*, self->parent) = parent;
@@ -46,7 +46,7 @@ Bone* Bone_new (BoneData* data, Bone* parent) {
 	return self;
 }
 
-void Bone_free (Bone* self) {
+void Bone_dispose (Bone* self) {
 	FREE(self);
 }
 

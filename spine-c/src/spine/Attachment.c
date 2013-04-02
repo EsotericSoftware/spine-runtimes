@@ -43,8 +43,8 @@ void _Attachment_deinit (Attachment* self) {
 	FREE(self);
 }
 
-void Attachment_free (Attachment* self) {
-	VTABLE(Attachment, self)->free(self);
+void Attachment_dispose (Attachment* self) {
+	VTABLE(Attachment, self)->dispose(self);
 }
 
 void Attachment_draw (Attachment* self, Slot* slot) {

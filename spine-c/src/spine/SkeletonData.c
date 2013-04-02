@@ -31,11 +31,11 @@
 namespace spine {
 #endif
 
-SkeletonData* SkeletonData_new () {
+SkeletonData* SkeletonData_create () {
 	return NEW(SkeletonData);
 }
 
-void SkeletonData_free (SkeletonData* self) {
+void SkeletonData_dispose (SkeletonData* self) {
 	FREE(self);
 }
 

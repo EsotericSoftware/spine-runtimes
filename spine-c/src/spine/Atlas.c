@@ -41,17 +41,17 @@ void _AtlasPage_deinit (AtlasPage* self) {
 	FREE(self->name);
 }
 
-void AtlasPage_free (AtlasPage* self) {
-	VTABLE(AtlasPage, self) ->free(self);
+void AtlasPage_dispose (AtlasPage* self) {
+	VTABLE(AtlasPage, self) ->dispose(self);
 }
 
 /**/
 
-AtlasRegion* AtlasRegion_new () {
+AtlasRegion* AtlasRegion_create () {
 	return NEW(AtlasRegion) ;
 }
 
-void AtlasRegion_free (AtlasRegion* self) {
+void AtlasRegion_dispose (AtlasRegion* self) {
 	FREE(self->name);
 	FREE(self->splits);
 	FREE(self->pads);
@@ -164,7 +164,7 @@ static int toInt (Str* str) {
 }
 
 static Atlas* abortAtlas (Atlas* self) {
-	Atlas_free(self);
+	Atlas_dispose(self);
 	return 0;
 }
 
@@ -187,7 +187,7 @@ Atlas* Atlas_readAtlas (const char* begin, unsigned long length) {
 		if (str.end - str.begin == 0) {
 			page = 0;
 		} else if (!page) {
-			page = AtlasPage_new(mallocString(&str));
+			page = AtlasPage_create(mallocString(&str));
 			if (lastPage)
 				lastPage->next = page;
 			else
@@ -207,7 +207,7 @@ Atlas* Atlas_readAtlas (const char* begin, unsigned long length) {
 				page->vWrap = *str.begin == 'x' ? ATLAS_CLAMPTOEDGE : (*str.begin == 'y' ? ATLAS_REPEAT : ATLAS_REPEAT);
 			}
 		} else {
-			AtlasRegion *region = AtlasRegion_new();
+			AtlasRegion *region = AtlasRegion_create();
 			if (lastRegion)
 				lastRegion->next = region;
 			else
@@ -273,18 +273,18 @@ Atlas* Atlas_readAtlasFile (const char* path) {
 	return atlas;
 }
 
-void Atlas_free (Atlas* self) {
+void Atlas_dispose (Atlas* self) {
 	AtlasPage* page = self->pages;
 	while (page) {
 		AtlasPage* nextPage = page->next;
-		AtlasPage_free(page);
+		AtlasPage_dispose(page);
 		page = nextPage;
 	}
 
 	AtlasRegion* region = self->regions;
 	while (region) {
 		AtlasRegion* nextRegion = region->next;
-		AtlasRegion_free(region);
+		AtlasRegion_dispose(region);
 		region = nextRegion;
 	}
 

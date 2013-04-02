@@ -36,6 +36,7 @@ public class AnimationState {
 	float mixTime, mixDuration;
 
 	public AnimationState (AnimationStateData data) {
+		if (data == null) throw new IllegalArgumentException("data cannot be null.");
 		this.data = data;
 	}
 
@@ -69,7 +70,7 @@ public class AnimationState {
 	public void setAnimation (Animation animation, boolean loop, float time) {
 		previous = null;
 		if (animation != null && current != null) {
-			mixDuration = data.getMixing(current, animation);
+			mixDuration = data.getMix(current, animation);
 			if (mixDuration > 0) {
 				mixTime = 0;
 				previous = current;

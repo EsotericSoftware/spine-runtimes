@@ -51,7 +51,7 @@ void _Skeleton_init (Skeleton* self, SkeletonData* data) {
 				}
 			}
 		}
-		self->bones[i] = Bone_new(boneData, parent);
+		self->bones[i] = Bone_create(boneData, parent);
 	}
 
 	self->slotCount = data->slotCount;
@@ -68,7 +68,7 @@ void _Skeleton_init (Skeleton* self, SkeletonData* data) {
 			}
 		}
 
-		self->slots[i] = Slot_new(slotData, self, bone);
+		self->slots[i] = Slot_create(slotData, self, bone);
 	}
 
 	self->drawOrder = MALLOC(Slot*, self->slotCount);
@@ -85,18 +85,18 @@ void _Skeleton_deinit (Skeleton* self) {
 
 	int i;
 	for (i = 0; i < self->boneCount; ++i)
-		Bone_free(self->bones[i]);
+		Bone_dispose(self->bones[i]);
 	FREE(self->bones);
 
 	for (i = 0; i < self->slotCount; ++i)
-		Slot_free(self->slots[i]);
+		Slot_dispose(self->slots[i]);
 	FREE(self->slots);
 
 	FREE(self->drawOrder);
 }
 
-void Skeleton_free (Skeleton* self) {
-	VTABLE(Skeleton, self) ->free(self);
+void Skeleton_dispose (Skeleton* self) {
+	VTABLE(Skeleton, self) ->dispose(self);
 }
 
 void Skeleton_updateWorldTransform (const Skeleton* self) {
@@ -163,18 +163,7 @@ int Skeleton_setSkinByName (Skeleton* self, const char* skinName) {
 }
 
 void Skeleton_setSkin (Skeleton* self, Skin* newSkin) {
-	if (self->skin && newSkin) {
-		/* Attach each attachment in the new skin if the corresponding attachment in the old skin is currently attached. */
-		const SkinEntry *entry = self->skin->entries;
-		while (entry) {
-			Slot *slot = self->slots[entry->slotIndex];
-			if (slot->attachment == entry->attachment) {
-				Attachment *attachment = Skin_getAttachment(newSkin, entry->slotIndex, entry->name);
-				if (attachment) Slot_setAttachment(slot, attachment);
-			}
-			entry = entry->next;
-		}
-	}
+	if (self->skin && newSkin) Skin_attachAll(newSkin, self, self->skin);
 	CONST_CAST(Skin*, self->skin) = newSkin;
 }
 

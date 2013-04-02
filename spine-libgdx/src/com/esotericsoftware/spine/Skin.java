@@ -107,7 +107,7 @@ public class Skin {
 		}
 	}
 
-	/** Attach all attachments from this skin if the corresponding attachment from the old skin is currently attached. */
+	/** Attach each attachment in this skin if the corresponding attachment in the old skin is currently attached. */
 	void attachAll (Skeleton skeleton, Skin oldSkin) {
 		for (Entry<Key, Attachment> entry : oldSkin.attachments.entries()) {
 			int slotIndex = entry.key.slotIndex;

@@ -1,7 +1,7 @@
 /*
  Copyright (c) 2009 Dave Gamble
 
- Permission is hereby granted, free of charge, to any person obtaining a copy
+ Permission is hereby granted, dispose of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -48,19 +48,19 @@ static int Json_strcasecmp (const char* s1, const char* s2) {
 }
 
 /* Internal constructor. */
-static Json *Json_new_Item (void) {
+static Json *Json_new (void) {
 	return (Json*)CALLOC(Json, 1);
 }
 
 /* Delete a Json structure. */
-void Json_free (Json *c) {
+void Json_dispose (Json *c) {
 	Json *next;
 	while (c) {
 		next = c->next;
-		if (c->child) Json_free(c->child);
-		if (c->valuestring) free((char*)c->valuestring);
-		if (c->name) free((char*)c->name);
-		free(c);
+		if (c->child) Json_dispose(c->child);
+		if (c->valuestring) FREE(c->valuestring);
+		if (c->name) FREE(c->name);
+		FREE(c);
 		c = next;
 	}
 }
@@ -207,15 +207,15 @@ static const char* skip (const char* in) {
 }
 
 /* Parse an object - create a new root, and populate. */
-Json *Json_new (const char* value) {
+Json *Json_create (const char* value) {
 	const char* end = 0;
-	Json *c = Json_new_Item();
+	Json *c = Json_new();
 	ep = 0;
 	if (!c) return 0; /* memory fail */
 
 	end = parse_value(c, skip(value));
 	if (!end) {
-		Json_free(c);
+		Json_dispose(c);
 		return 0;
 	} /* parse failure. ep is set. */
 
@@ -267,14 +267,14 @@ static const char* parse_array (Json *item, const char* value) {
 	value = skip(value + 1);
 	if (*value == ']') return value + 1; /* empty array. */
 
-	item->child = child = Json_new_Item();
+	item->child = child = Json_new();
 	if (!item->child) return 0; /* memory fail */
 	value = skip(parse_value(child, skip(value))); /* skip any spacing, get the value. */
 	if (!value) return 0;
 
 	while (*value == ',') {
 		Json *new_item;
-		if (!(new_item = Json_new_Item())) return 0; /* memory fail */
+		if (!(new_item = Json_new())) return 0; /* memory fail */
 		child->next = new_item;
 		new_item->prev = child;
 		child = new_item;
@@ -299,7 +299,7 @@ static const char* parse_object (Json *item, const char* value) {
 	value = skip(value + 1);
 	if (*value == '}') return value + 1; /* empty array. */
 
-	item->child = child = Json_new_Item();
+	item->child = child = Json_new();
 	if (!item->child) return 0;
 	value = skip(parse_string(child, skip(value)));
 	if (!value) return 0;
@@ -314,7 +314,7 @@ static const char* parse_object (Json *item, const char* value) {
 
 	while (*value == ',') {
 		Json *new_item;
-		if (!(new_item = Json_new_Item())) return 0; /* memory fail */
+		if (!(new_item = Json_new())) return 0; /* memory fail */
 		child->next = new_item;
 		new_item->prev = child;
 		child = new_item;

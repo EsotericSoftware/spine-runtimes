@@ -30,33 +30,46 @@
 namespace spine {
 #endif
 
-SkinEntry* _SkinEntry_new (int slotIndex, const char* name, Attachment* attachment) {
-	SkinEntry* self = NEW(SkinEntry);
+typedef struct _Entry _Entry;
+struct _Entry {
+	int slotIndex;
+	const char* name;
+	Attachment* attachment;
+	_Entry* next;
+};
+
+_Entry* _Entry_create (int slotIndex, const char* name, Attachment* attachment) {
+	_Entry* self = NEW(_Entry);
 	self->slotIndex = slotIndex;
 	MALLOC_STR(self->name, name);
 	self->attachment = attachment;
 	return self;
 }
 
-void _SkinEntry_free (SkinEntry* self) {
-	Attachment_free(self->attachment);
+void _Entry_dispose (_Entry* self) {
+	Attachment_dispose(self->attachment);
 	FREE(self->name);
 	FREE(self);
 }
 
 /**/
 
-Skin* Skin_new (const char* name) {
+typedef struct {
+	Skin super;
+	_Entry* entries;
+} _Internal;
+
+Skin* Skin_create (const char* name) {
 	Skin* self = NEW(Skin);
 	MALLOC_STR(self->name, name);
 	return self;
 }
 
-void Skin_free (Skin* self) {
-	SkinEntry* entry = CONST_CAST(SkinEntry*, self->entries);
+void Skin_dispose (Skin* self) {
+	_Entry* entry = SUB_CAST(_Internal, self)->entries;
 	while (entry) {
-		SkinEntry* nextEtry = CONST_CAST(SkinEntry*, entry->next);
-		_SkinEntry_free(entry);
+		_Entry* nextEtry = entry->next;
+		_Entry_dispose(entry);
 		entry = nextEtry;
 	}
 
@@ -65,24 +78,30 @@ void Skin_free (Skin* self) {
 }
 
 void Skin_addAttachment (Skin* self, int slotIndex, const char* name, Attachment* attachment) {
-	SkinEntry* newEntry = _SkinEntry_new(slotIndex, name, attachment);
-	SkinEntry* entry = CONST_CAST(SkinEntry*, self->entries);
-	if (!entry)
-		CONST_CAST(SkinEntry*, self->entries) = newEntry;
-	else {
-		while (entry->next)
-			entry = (SkinEntry*)entry->next;
-		entry->next = newEntry;
-	}
+	_Entry* newEntry = _Entry_create(slotIndex, name, attachment);
+	newEntry->next = SUB_CAST(_Internal, self)->entries;
+	SUB_CAST(_Internal, self)->entries = newEntry;
 }
 
 Attachment* Skin_getAttachment (const Skin* self, int slotIndex, const char* name) {
-	const SkinEntry* entry = self->entries;
+	const _Entry* entry = SUB_CAST(_Internal, self) ->entries;
 	while (entry) {
 		if (entry->slotIndex == slotIndex && strcmp(entry->name, name) == 0) return entry->attachment;
 		entry = entry->next;
 	}
 	return 0;
+}
+
+void Skin_attachAll (const Skin* self, Skeleton* skeleton, const Skin* oldSkin) {
+	const _Entry *entry = SUB_CAST(_Internal, oldSkin) ->entries;
+	while (entry) {
+		Slot *slot = skeleton->slots[entry->slotIndex];
+		if (slot->attachment == entry->attachment) {
+			Attachment *attachment = Skin_getAttachment(self, entry->slotIndex, entry->name);
+			if (attachment) Slot_setAttachment(slot, attachment);
+		}
+		entry = entry->next;
+	}
 }
 
 #ifdef __cplusplus

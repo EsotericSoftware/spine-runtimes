@@ -43,15 +43,15 @@ typedef struct {
 	const char* const error;
 } SkeletonJson;
 
-SkeletonJson* SkeletonJson_newWithLoader (AttachmentLoader* attachmentLoader);
-SkeletonJson* SkeletonJson_new (Atlas* atlas);
-void SkeletonJson_free (SkeletonJson* skeletonJson);
+SkeletonJson* SkeletonJson_createWithLoader (AttachmentLoader* attachmentLoader);
+SkeletonJson* SkeletonJson_create (Atlas* atlas);
+void SkeletonJson_dispose (SkeletonJson* self);
 
-SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* skeletonJson, const char* json);
-SkeletonData* SkeletonJson_readSkeletonDataFile (SkeletonJson* skeletonJson, const char* path);
+SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* json);
+SkeletonData* SkeletonJson_readSkeletonDataFile (SkeletonJson* self, const char* path);
 
-Animation* SkeletonJson_readAnimation (SkeletonJson* skeletonJson, const char* json, const SkeletonData *skeletonData);
-Animation* SkeletonJson_readAnimationFile (SkeletonJson* skeletonJson, const char* path, const SkeletonData *skeletonData);
+Animation* SkeletonJson_readAnimation (SkeletonJson* self, const char* json, const SkeletonData *skeletonData);
+Animation* SkeletonJson_readAnimationFile (SkeletonJson* self, const char* path, const SkeletonData *skeletonData);
 
 #ifdef __cplusplus
 }

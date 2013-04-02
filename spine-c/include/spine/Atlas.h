@@ -60,8 +60,8 @@ struct AtlasPage {
 	const void* const vtable;
 };
 
-AtlasPage* AtlasPage_new (const char* name);
-void AtlasPage_free (AtlasPage* page);
+AtlasPage* AtlasPage_create (const char* name);
+void AtlasPage_dispose (AtlasPage* self);
 
 /**/
 
@@ -80,8 +80,8 @@ struct AtlasRegion {
 	AtlasRegion* next;
 };
 
-AtlasRegion* AtlasRegion_new ();
-void AtlasRegion_free (AtlasRegion* region);
+AtlasRegion* AtlasRegion_create ();
+void AtlasRegion_dispose (AtlasRegion* self);
 
 /**/
 
@@ -92,10 +92,10 @@ typedef struct {
 
 Atlas* Atlas_readAtlas (const char* data, unsigned long length);
 Atlas* Atlas_readAtlasFile (const char* path);
-void Atlas_free (Atlas* atlas);
+void Atlas_dispose (Atlas* atlas);
 
 /* Returns 0 if the region was not found. */
-AtlasRegion* Atlas_findRegion (const Atlas* atlas, const char* name);
+AtlasRegion* Atlas_findRegion (const Atlas* self, const char* name);
 
 #ifdef __cplusplus
 }

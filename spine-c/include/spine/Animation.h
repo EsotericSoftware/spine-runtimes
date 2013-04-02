@@ -42,11 +42,11 @@ typedef struct {
 	float duration;
 } Animation;
 
-Animation* Animation_new (int timelineCount);
-void Animation_free (Animation* animation);
+Animation* Animation_create (int timelineCount);
+void Animation_dispose (Animation* self);
 
-void Animation_apply (const Animation* animation, Skeleton* skeleton, float time, int/*bool*/loop);
-void Animation_mix (const Animation* animation, Skeleton* skeleton, float time, int/*bool*/loop, float alpha);
+void Animation_apply (const Animation* self, Skeleton* skeleton, float time, int/*bool*/loop);
+void Animation_mix (const Animation* self, Skeleton* skeleton, float time, int/*bool*/loop, float alpha);
 
 /**/
 
@@ -54,8 +54,8 @@ struct Timeline {
 	const void* const vtable;
 };
 
-void Timeline_free (Timeline* timeline);
-void Timeline_apply (const Timeline* timeline, Skeleton* skeleton, float time, float alpha);
+void Timeline_dispose (Timeline* self);
+void Timeline_apply (const Timeline* self, Skeleton* skeleton, float time, float alpha);
 
 /**/
 
@@ -64,14 +64,14 @@ typedef struct {
 	float* curves; /* dfx, dfy, ddfx, ddfy, dddfx, dddfy, ... */
 } CurveTimeline;
 
-void CurveTimeline_setLinear (CurveTimeline* timeline, int frameIndex);
-void CurveTimeline_setStepped (CurveTimeline* timeline, int frameIndex);
+void CurveTimeline_setLinear (CurveTimeline* self, int frameIndex);
+void CurveTimeline_setStepped (CurveTimeline* self, int frameIndex);
 
 /* Sets the control handle positions for an interpolation bezier curve used to transition from this keyframe to the next.
  * cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of
  * the difference between the keyframe's values. */
-void CurveTimeline_setCurve (CurveTimeline* timeline, int frameIndex, float cx1, float cy1, float cx2, float cy2);
-float CurveTimeline_getCurvePercent (const CurveTimeline* timeline, int frameIndex, float percent);
+void CurveTimeline_setCurve (CurveTimeline* self, int frameIndex, float cx1, float cy1, float cx2, float cy2);
+float CurveTimeline_getCurvePercent (const CurveTimeline* self, int frameIndex, float percent);
 
 /**/
 
@@ -82,25 +82,25 @@ typedef struct BaseTimeline {
 	int boneIndex;
 } RotateTimeline;
 
-RotateTimeline* RotateTimeline_new (int frameCount);
+RotateTimeline* RotateTimeline_create (int frameCount);
 
-void RotateTimeline_setFrame (RotateTimeline* timeline, int frameIndex, float time, float angle);
+void RotateTimeline_setFrame (RotateTimeline* self, int frameIndex, float time, float angle);
 
 /**/
 
 typedef struct BaseTimeline TranslateTimeline;
 
-TranslateTimeline* TranslateTimeline_new (int frameCount);
+TranslateTimeline* TranslateTimeline_create (int frameCount);
 
-void TranslateTimeline_setFrame (TranslateTimeline* timeline, int frameIndex, float time, float x, float y);
+void TranslateTimeline_setFrame (TranslateTimeline* self, int frameIndex, float time, float x, float y);
 
 /**/
 
 typedef struct BaseTimeline ScaleTimeline;
 
-ScaleTimeline* ScaleTimeline_new (int frameCount);
+ScaleTimeline* ScaleTimeline_create (int frameCount);
 
-void ScaleTimeline_setFrame (ScaleTimeline* timeline, int frameIndex, float time, float x, float y);
+void ScaleTimeline_setFrame (ScaleTimeline* self, int frameIndex, float time, float x, float y);
 
 /**/
 
@@ -111,9 +111,9 @@ typedef struct {
 	int slotIndex;
 } ColorTimeline;
 
-ColorTimeline* ColorTimeline_new (int frameCount);
+ColorTimeline* ColorTimeline_create (int frameCount);
 
-void ColorTimeline_setFrame (ColorTimeline* timeline, int frameIndex, float time, float r, float g, float b, float a);
+void ColorTimeline_setFrame (ColorTimeline* self, int frameIndex, float time, float r, float g, float b, float a);
 
 /**/
 
@@ -125,10 +125,10 @@ typedef struct {
 	const char** const attachmentNames;
 } AttachmentTimeline;
 
-AttachmentTimeline* AttachmentTimeline_new (int frameCount);
+AttachmentTimeline* AttachmentTimeline_create (int frameCount);
 
 /* @param attachmentName May be 0. */
-void AttachmentTimeline_setFrame (AttachmentTimeline* timeline, int frameIndex, float time, const char* attachmentName);
+void AttachmentTimeline_setFrame (AttachmentTimeline* self, int frameIndex, float time, const char* attachmentName);
 
 #ifdef __cplusplus
 }

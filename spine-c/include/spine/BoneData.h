@@ -41,8 +41,8 @@ struct BoneData {
 	float scaleX, scaleY;
 };
 
-BoneData* BoneData_new (const char* name, BoneData* parent);
-void BoneData_free (BoneData* boneData);
+BoneData* BoneData_create (const char* name, BoneData* parent);
+void BoneData_dispose (BoneData* self);
 
 #ifdef __cplusplus
 }

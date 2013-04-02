@@ -23,31 +23,30 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#ifndef SPINE_REGIONATTACHMENT_H_
-#define SPINE_REGIONATTACHMENT_H_
+#ifndef SPINE_ANIMATIONSTATEDATA_H_
+#define SPINE_ANIMATIONSTATEDATA_H_
 
-#include <spine/Attachment.h>
-#include <spine/Atlas.h>
+#include <spine/Animation.h>
 
 #ifdef __cplusplus
 namespace spine {
 extern "C" {
 #endif
 
-typedef struct RegionAttachment RegionAttachment;
-struct RegionAttachment {
-	Attachment super;
-	float x, y, scaleX, scaleY, rotation, width, height;
-	float offset[8];
-};
+typedef struct {
+	const void* const entries;
+} AnimationStateData;
 
-RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region);
+AnimationStateData* AnimationStateData_create ();
+void AnimationStateData_dispose (AnimationStateData* self);
 
-void RegionAttachment_updateOffset (RegionAttachment* self);
+void AnimationStateData_setMix (AnimationStateData* self, Animation* from, Animation* to, float duration);
+/* Returns 0 if there is no mixing between the animations. */
+float AnimationStateData_getMix (AnimationStateData* self, Animation* from, Animation* to);
 
 #ifdef __cplusplus
 }
 }
 #endif
 
-#endif /* SPINE_REGIONATTACHMENT_H_ */
+#endif /* SPINE_ANIMATIONSTATEDATA_H_ */

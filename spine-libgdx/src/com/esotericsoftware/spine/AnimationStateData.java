@@ -33,7 +33,7 @@ public class AnimationStateData {
 	final Key tempKey = new Key();
 
 	/** Set the mixing duration between two animations. */
-	public void setMixing (Animation from, Animation to, float duration) {
+	public void setMix (Animation from, Animation to, float duration) {
 		if (from == null) throw new IllegalArgumentException("from cannot be null.");
 		if (to == null) throw new IllegalArgumentException("to cannot be null.");
 		Key key = new Key();
@@ -42,7 +42,7 @@ public class AnimationStateData {
 		animationToMixTime.put(key, duration);
 	}
 
-	public float getMixing (Animation from, Animation to) {
+	public float getMix (Animation from, Animation to) {
 		tempKey.a1 = from;
 		tempKey.a2 = to;
 		Float time = animationToMixTime.get(tempKey);

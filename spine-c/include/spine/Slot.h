@@ -45,16 +45,16 @@ typedef struct Slot {
 	Attachment* const attachment;
 } Slot;
 
-Slot* Slot_new (SlotData* data, struct Skeleton* skeleton, Bone* bone);
-void Slot_free (Slot* slot);
+Slot* Slot_create (SlotData* data, struct Skeleton* skeleton, Bone* bone);
+void Slot_dispose (Slot* self);
 
 /* @param attachment May be 0 to clear the attachment for the slot. */
-void Slot_setAttachment (Slot* slot, Attachment* attachment);
+void Slot_setAttachment (Slot* self, Attachment* attachment);
 
-void Slot_setAttachmentTime (Slot* slot, float time);
-float Slot_getAttachmentTime (const Slot* slot);
+void Slot_setAttachmentTime (Slot* self, float time);
+float Slot_getAttachmentTime (const Slot* self);
 
-void Slot_setToBindPose (Slot* slot);
+void Slot_setToBindPose (Slot* self);
 
 #ifdef __cplusplus
 }

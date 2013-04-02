@@ -23,65 +23,66 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include <spine/Slot.h>
+#include <spine/AnimationState.h>
 #include <spine/extension.h>
-#include <spine/Skeleton.h>
 
 #ifdef __cplusplus
 namespace spine {
 #endif
 
 typedef struct {
-	Slot super;
-	float attachmentTime;
+	AnimationState super;
+	Animation *previous;
+	float previousTime;
+	int/*bool*/previousLoop;
+	float mixTime;
+	float mixDuration;
 } _Internal;
 
-Slot* Slot_create (SlotData* data, Skeleton* skeleton, Bone* bone) {
-	Slot* self = SUPER(NEW(_Internal));
-	CONST_CAST(SlotData*, self->data) = data;
-	CONST_CAST(Skeleton*, self->skeleton) = skeleton;
-	CONST_CAST(Bone*, self->bone) = bone;
-	self->r = 1;
-	self->g = 1;
-	self->b = 1;
-	self->a = 1;
+AnimationState* AnimationState_create (AnimationStateData* data) {
+	AnimationState* self = SUPER(NEW(_Internal));
+	CONST_CAST(AnimationStateData*, self->data) = data;
 	return self;
 }
 
-void Slot_dispose (Slot* self) {
+void AnimationState_dispose (AnimationState* self) {
 	FREE(self);
 }
 
-void Slot_setAttachment (Slot* self, Attachment* attachment) {
-	CONST_CAST(Attachment*, self->attachment) = attachment;
-	SUB_CAST(_Internal, self) ->attachmentTime = self->skeleton->time;
+void AnimationState_update (AnimationState* self, float delta) {
+	self->time += delta;
+	SUB_CAST(_Internal, self) ->previousTime += delta;
+	SUB_CAST(_Internal, self) ->mixTime += delta;
 }
 
-void Slot_setAttachmentTime (Slot* self, float time) {
-	SUB_CAST(_Internal, self) ->attachmentTime = self->skeleton->time - time;
+void AnimationState_apply (AnimationState* self, Skeleton* skeleton) {
+	if (!self->animation) return;
+	_Internal* internal = SUB_CAST(_Internal, self);
+	if (internal->previous) {
+		Animation_apply(internal->previous, skeleton, internal->previousTime, internal->previousLoop);
+		float alpha = internal->mixTime / internal->mixDuration;
+		if (alpha >= 1) {
+			alpha = 1;
+			internal->previous = 0;
+		}
+		Animation_mix(self->animation, skeleton, self->time, self->loop, alpha);
+	} else
+		Animation_apply(self->animation, skeleton, self->time, self->loop);
 }
 
-float Slot_getAttachmentTime (const Slot* self) {
-	return self->skeleton->time - SUB_CAST(_Internal, self) ->attachmentTime;
-}
-
-void Slot_setToBindPose (Slot* self) {
-	self->r = self->data->r;
-	self->g = self->data->g;
-	self->b = self->data->b;
-	self->a = self->data->a;
-
-	Attachment* attachment = 0;
-	if (self->data->attachmentName) {
-		int i;
-		for (i = 0; i < self->skeleton->data->slotCount; ++i) {
-			if (self->data == self->skeleton->data->slots[i]) {
-				attachment = Skeleton_getAttachmentForSlotIndex(self->skeleton, i, self->data->attachmentName);
-				break;
-			}
+void AnimationState_setAnimation (AnimationState* self, Animation* newAnimation, int/**/loop) {
+	_Internal* internal = SUB_CAST(_Internal, self);
+	internal->previous = 0;
+	if (newAnimation && self->animation && self->data) {
+		internal->mixDuration = AnimationStateData_getMix(self->data, self->animation, newAnimation);
+		if (internal->mixDuration > 0) {
+			internal->mixTime = 0;
+			internal->previous = self->animation;
 		}
 	}
-	Slot_setAttachment(self, attachment);
+	CONST_CAST(Animation*, self->animation) = newAnimation;
+	self->loop = loop;
+	self->time = 0;
 }
 
 #ifdef __cplusplus

@@ -32,10 +32,10 @@ using namespace spine;
 
 int main () {
 	Atlas* atlas = Atlas_readAtlasFile("../data/spineboy.atlas");
-	SkeletonJson* json = SkeletonJson_new(atlas);
+	SkeletonJson* json = SkeletonJson_create(atlas);
 	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "../data/spineboy-skeleton.json");
 	Animation* animation = SkeletonJson_readAnimationFile(json, "../data/spineboy-walk.json", skeletonData);
-	SkeletonJson_free(json);
+	SkeletonJson_dispose(json);
 
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	Skeleton* skeleton = drawable->skeleton;
@@ -66,6 +66,6 @@ int main () {
 		Skeleton_updateWorldTransform(skeleton);
 	}
 
-	SkeletonData_free(skeletonData);
-	Atlas_free(atlas);
+	SkeletonData_dispose(skeletonData);
+	Atlas_dispose(atlas);
 }

@@ -27,6 +27,8 @@
 #define SPINE_SPINE_H_
 
 #include <spine/Animation.h>
+#include <spine/AnimationState.h>
+#include <spine/AnimationStateData.h>
 #include <spine/Atlas.h>
 #include <spine/AtlasAttachmentLoader.h>
 #include <spine/Attachment.h>

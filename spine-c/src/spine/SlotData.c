@@ -30,7 +30,7 @@
 namespace spine {
 #endif
 
-SlotData* SlotData_new (const char* name, BoneData* boneData) {
+SlotData* SlotData_create (const char* name, BoneData* boneData) {
 	SlotData* self = NEW(SlotData);
 	MALLOC_STR(self->name, name);
 	CONST_CAST(BoneData*, self->boneData) = boneData;
@@ -41,7 +41,7 @@ SlotData* SlotData_new (const char* name, BoneData* boneData) {
 	return self;
 }
 
-void SlotData_free (SlotData* self) {
+void SlotData_dispose (SlotData* self) {
 	FREE(self->name);
 	FREE(self->attachmentName);
 	FREE(self);

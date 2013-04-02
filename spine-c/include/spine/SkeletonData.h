@@ -47,16 +47,16 @@ typedef struct {
 	Skin* defaultSkin;
 } SkeletonData;
 
-SkeletonData* SkeletonData_new ();
-void SkeletonData_free (SkeletonData* skeletonData);
+SkeletonData* SkeletonData_create ();
+void SkeletonData_dispose (SkeletonData* self);
 
-BoneData* SkeletonData_findBone (const SkeletonData* skeletonData, const char* boneName);
-int SkeletonData_findBoneIndex (const SkeletonData* skeletonData, const char* boneName);
+BoneData* SkeletonData_findBone (const SkeletonData* self, const char* boneName);
+int SkeletonData_findBoneIndex (const SkeletonData* self, const char* boneName);
 
-SlotData* SkeletonData_findSlot (const SkeletonData* skeletonData, const char* slotName);
-int SkeletonData_findSlotIndex (const SkeletonData* skeletonData, const char* slotName);
+SlotData* SkeletonData_findSlot (const SkeletonData* self, const char* slotName);
+int SkeletonData_findSlotIndex (const SkeletonData* self, const char* slotName);
 
-Skin* SkeletonData_findSkin (const SkeletonData* skeletonData, const char* skinName);
+Skin* SkeletonData_findSkin (const SkeletonData* self, const char* skinName);
 
 #ifdef __cplusplus
 }}

@@ -40,8 +40,8 @@ void _AttachmentLoader_deinit (AttachmentLoader* self) {
 	FREE(self->error2);
 }
 
-void AttachmentLoader_free (AttachmentLoader* self) {
-	VTABLE(AttachmentLoader, self) ->free(self);
+void AttachmentLoader_dispose (AttachmentLoader* self) {
+	VTABLE(AttachmentLoader, self) ->dispose(self);
 }
 
 Attachment* AttachmentLoader_newAttachment (AttachmentLoader* self, AttachmentType type, const char* name) {

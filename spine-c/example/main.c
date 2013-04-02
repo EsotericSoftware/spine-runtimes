@@ -13,7 +13,7 @@ typedef struct {
 	int extraData;
 } ExampleAtlasPage;
 
-void _ExampleAtlasPage_free (AtlasPage* page) {
+void _ExampleAtlasPage_dispose (AtlasPage* page) {
 	ExampleAtlasPage* self = SUB_CAST(ExampleAtlasPage, page);
 	_AtlasPage_deinit(SUPER(self));
 
@@ -22,10 +22,10 @@ void _ExampleAtlasPage_free (AtlasPage* page) {
 	FREE(self);
 }
 
-AtlasPage* AtlasPage_new (const char* name) {
+AtlasPage* AtlasPage_create (const char* name) {
 	ExampleAtlasPage* self = NEW(ExampleAtlasPage);
 	_AtlasPage_init(SUPER(self), name);
-	VTABLE(AtlasPage, self) ->free = _ExampleAtlasPage_free;
+	VTABLE(AtlasPage, self) ->dispose = _ExampleAtlasPage_dispose;
 
 	self->extraData = 123;
 
@@ -39,7 +39,7 @@ typedef struct {
 	int extraData;
 } ExampleSkeleton;
 
-void _ExampleSkeleton_free (Skeleton* skeleton) {
+void _ExampleSkeleton_dispose (Skeleton* skeleton) {
 	ExampleSkeleton* self = SUB_CAST(ExampleSkeleton, skeleton);
 	_Skeleton_deinit(SUPER(self));
 
@@ -48,10 +48,10 @@ void _ExampleSkeleton_free (Skeleton* skeleton) {
 	FREE(self);
 }
 
-Skeleton* Skeleton_new (SkeletonData* data) {
+Skeleton* Skeleton_create (SkeletonData* data) {
 	ExampleSkeleton* self = NEW(ExampleSkeleton);
 	_Skeleton_init(SUPER(self), data);
-	VTABLE(Skeleton, self) ->free = _ExampleSkeleton_free;
+	VTABLE(Skeleton, self) ->dispose = _ExampleSkeleton_dispose;
 
 	self->extraData = 789;
 
@@ -65,7 +65,7 @@ typedef struct {
 	int extraData;
 } ExampleRegionAttachment;
 
-void _ExampleRegionAttachment_free (Attachment* attachment) {
+void _ExampleRegionAttachment_dispose (Attachment* attachment) {
 	ExampleRegionAttachment* self = SUB_CAST(ExampleRegionAttachment, attachment);
 	_RegionAttachment_deinit(SUPER(self));
 
@@ -79,10 +79,10 @@ void _ExampleRegionAttachment_draw (Attachment* attachment, Slot* slot) {
 	// Draw or queue region for drawing.
 }
 
-RegionAttachment* RegionAttachment_new (const char* name, AtlasRegion* region) {
+RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region) {
 	ExampleRegionAttachment* self = NEW(ExampleRegionAttachment);
 	_RegionAttachment_init(SUPER(self), name);
-	VTABLE(Attachment, self) ->free = _ExampleRegionAttachment_free;
+	VTABLE(Attachment, self) ->dispose = _ExampleRegionAttachment_dispose;
 	VTABLE(Attachment, self) ->draw = _ExampleRegionAttachment_draw;
 
 	self->extraData = 456;
@@ -103,22 +103,22 @@ int main (void) {
 	printf("First region name: %s, x: %d, y: %d\n", atlas->regions->name, atlas->regions->x, atlas->regions->y);
 	printf("First page name: %s, extraData: %d\n", atlas->pages->name, ((ExampleAtlasPage*)atlas->pages)->extraData);
 
-	SkeletonJson* json = SkeletonJson_new(atlas);
+	SkeletonJson* json = SkeletonJson_create(atlas);
 	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/spineboy-skeleton.json");
 	if (!skeletonData) printf("Error: %s\n", json->error);
-	printf("Attachment extraData: %d\n", ((ExampleRegionAttachment*)skeletonData->defaultSkin->entries->attachment)->extraData);
+	printf("Default skin name: %s\n", skeletonData->defaultSkin->name);
 
-	Skeleton* skeleton = Skeleton_new(skeletonData);
+	Skeleton* skeleton = Skeleton_create(skeletonData);
 	printf("Skeleton extraData: %d\n", ((ExampleSkeleton*)skeleton)->extraData);
 
 	Animation* animation = SkeletonJson_readAnimationFile(json, "data/spineboy-walk.json", skeletonData);
 	if (!animation) printf("Error: %s\n", json->error);
 	printf("Animation timelineCount: %d\n", animation->timelineCount);
 
-	Skeleton_free(skeleton);
-	SkeletonData_free(skeletonData);
-	SkeletonJson_free(json);
-	Atlas_free(atlas);
+	Skeleton_dispose(skeleton);
+	SkeletonData_dispose(skeletonData);
+	SkeletonJson_dispose(json);
+	Atlas_dispose(atlas);
 
 	return 0;
 }

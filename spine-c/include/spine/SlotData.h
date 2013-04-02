@@ -40,11 +40,11 @@ typedef struct {
 	float r, g, b, a;
 } SlotData;
 
-SlotData* SlotData_new (const char* name, BoneData* boneData);
-void SlotData_free (SlotData* slotData);
+SlotData* SlotData_create (const char* name, BoneData* boneData);
+void SlotData_dispose (SlotData* self);
 
 /* @param attachmentName May be 0 for no bind pose attachment. */
-void SlotData_setAttachmentName (SlotData* slotData, const char* attachmentName);
+void SlotData_setAttachmentName (SlotData* self, const char* attachmentName);
 
 #ifdef __cplusplus
 }
