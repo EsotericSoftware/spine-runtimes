@@ -27,10 +27,10 @@ bool ExampleLayer::init () {
 	AnimationState_setAnimation(skeletonNode->state, animation, true);
 	skeletonNode->debugBones = true;
 
-	/*skeletonNode->runAction(CCRepeatForever::create(CCSequence::create(CCFadeOut::create(1),
+	skeletonNode->runAction(CCRepeatForever::create(CCSequence::create(CCFadeOut::create(1),
 		CCFadeIn::create(1),
 		CCDelayTime::create(5),
-		NULL)));*/
+		NULL)));
 
 	CCSize windowSize = CCDirector::sharedDirector()->getWinSize();
 	skeletonNode->setPosition(ccp(windowSize.width / 2, 20));
