@@ -44,7 +44,7 @@ typedef struct {
 	CCSkeleton* node;
 } Cocos2dSkeleton;
 
-@interface CCSkeleton : CCNodeRGBA {
+@interface CCSkeleton : CCNodeRGBA<CCBlendProtocol> {
 @public
 	Skeleton* skeleton;
 	AnimationState* state;
@@ -52,6 +52,7 @@ typedef struct {
 	bool debugBones;
 	CCTextureAtlas* atlas; // All region attachments for a skeleton must use the same texture.
 	unsigned int quadCount;
+    ccBlendFunc blendFunc;
 }
 
 + (CCSkeleton*) create:(SkeletonData*)skeletonData;
@@ -59,8 +60,6 @@ typedef struct {
 - init:(SkeletonData*)skeletonData;
 - init:(SkeletonData*)skeletonData stateData:(AnimationStateData*)stateData;
 
-// CCBlendProtocol
-//CC_PROPERTY(ccBlendFunc, blendFunc, BlendFunc);
 @end
 
 /**/

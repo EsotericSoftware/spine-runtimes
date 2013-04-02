@@ -83,8 +83,8 @@ Skeleton* _Cocos2dSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 	skeleton = _Cocos2dSkeleton_create(skeletonData, self);
 	state = AnimationState_create(stateData);
 
-	/*blendFunc.src = GL_ONE;
-	blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;*/
+	blendFunc.src = GL_ONE;
+	blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
 
 	[self setShaderProgram:[[CCShaderCache sharedShaderCache] programForKey:kCCShader_PositionTextureColor]];
 	[self scheduleUpdate];
@@ -108,7 +108,7 @@ Skeleton* _Cocos2dSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 - (void) draw {
 	CC_NODE_DRAW_SETUP();
 
-	//ccGLBlendFunc(blendFunc.src, blendFunc.dst);
+	ccGLBlendFunc(blendFunc.src, blendFunc.dst);
 	ccColor3B color = self.color;
 	skeleton->r = color.r / (float)255;
 	skeleton->g = color.g / (float)255;
@@ -157,15 +157,14 @@ Skeleton* _Cocos2dSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 }
 
 // CCBlendProtocol
-/*
-ccBlendFunc CCSkeleton::getBlendFunc () {
-    return blendFunc;
+
+- (void) setBlendFunc:(ccBlendFunc)blendFunc {
+    self.blendFunc = blendFunc;
 }
 
-void CCSkeleton::setBlendFunc (ccBlendFunc blendFunc) {
-    this->blendFunc = blendFunc;
+- (ccBlendFunc) blendFunc {
+    return blendFunc;
 }
-*/
 
 @end
 
