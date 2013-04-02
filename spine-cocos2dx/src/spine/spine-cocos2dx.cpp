@@ -263,7 +263,7 @@ RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region
 
 char* _Util_readFile (const char* path, int* length) {
 	unsigned long size;
-	char* data = reinterpret_cast<char*>(CCFileUtils::sharedFileUtils()->getFileData(
+    char* data = reinterpret_cast<char*>(CCFileUtils::sharedFileUtils()->getFileData(
 		CCFileUtils::sharedFileUtils()->fullPathForFilename(path).c_str(), "r", &size));
 	*length = size;
 	return data;
