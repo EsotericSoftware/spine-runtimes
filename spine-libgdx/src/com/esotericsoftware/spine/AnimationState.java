@@ -60,25 +60,22 @@ public class AnimationState {
 			current.apply(skeleton, currentTime, currentLoop);
 	}
 
-	/** Set the current animation. */
+	/** Set the current animation. The current animation time is set to 0.
+	 * @param animation May be null. */
 	public void setAnimation (Animation animation, boolean loop) {
-		setAnimation(animation, loop, 0);
-	}
-
-	/** Set the current animation.
-	 * @param time The time within the animation to start. */
-	public void setAnimation (Animation animation, boolean loop, float time) {
 		previous = null;
 		if (animation != null && current != null) {
 			mixDuration = data.getMix(current, animation);
 			if (mixDuration > 0) {
 				mixTime = 0;
 				previous = current;
+				previousTime = currentTime;
+				previousLoop = currentLoop;
 			}
 		}
 		current = animation;
 		currentLoop = loop;
-		currentTime = time;
+		currentTime = 0;
 	}
 
 	/** @return May be null. */
