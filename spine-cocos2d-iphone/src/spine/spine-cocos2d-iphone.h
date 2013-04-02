@@ -48,14 +48,17 @@ typedef struct {
 @public
 	Skeleton* skeleton;
 	AnimationState* state;
+    float timeScale;
 	bool debugSlots;
 	bool debugBones;
+
 	CCTextureAtlas* atlas; // All region attachments for a skeleton must use the same texture.
 	unsigned int quadCount;
     ccBlendFunc blendFunc;
 }
 
 + (CCSkeleton*) create:(SkeletonData*)skeletonData;
++ (CCSkeleton*) create:(SkeletonData*)skeletonData stateData:(AnimationStateData*)stateData;
 
 - init:(SkeletonData*)skeletonData;
 - init:(SkeletonData*)skeletonData stateData:(AnimationStateData*)stateData;

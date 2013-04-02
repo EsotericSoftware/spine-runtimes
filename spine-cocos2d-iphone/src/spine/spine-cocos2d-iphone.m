@@ -69,7 +69,11 @@ Skeleton* _Cocos2dSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 @implementation CCSkeleton
 
 + (CCSkeleton*) create:(SkeletonData*)skeletonData {
-	return [[[CCSkeleton alloc] init:skeletonData] autorelease];
+	return [CCSkeleton create:skeletonData stateData:0];
+}
+
++ (CCSkeleton*) create:(SkeletonData*)skeletonData stateData:(AnimationStateData*)stateData {
+	return [[[CCSkeleton alloc] init:skeletonData stateData:stateData] autorelease];
 }
 
 - (id) init:(SkeletonData*)skeletonData {
@@ -86,6 +90,8 @@ Skeleton* _Cocos2dSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 	blendFunc.src = GL_ONE;
 	blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
 
+    timeScale = 1;
+    
 	[self setShaderProgram:[[CCShaderCache sharedShaderCache] programForKey:kCCShader_PositionTextureColor]];
 	[self scheduleUpdate];
 
@@ -100,7 +106,7 @@ Skeleton* _Cocos2dSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 
 - (void) update:(ccTime)deltaTime {
 	Skeleton_update(skeleton, deltaTime);
-	AnimationState_update(state, deltaTime);
+	AnimationState_update(state, deltaTime * timeScale);
 	AnimationState_apply(state, skeleton);
 	Skeleton_updateWorldTransform(skeleton);
 }

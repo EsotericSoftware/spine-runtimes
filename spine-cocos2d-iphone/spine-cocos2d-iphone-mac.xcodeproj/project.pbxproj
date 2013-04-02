@@ -155,6 +155,7 @@
 		43C32A1D170B1295004A9460 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 43C32A15170B1295004A9460 /* MainMenu.xib */; };
 		43C32A1E170B1295004A9460 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 43C32A17170B1295004A9460 /* icon.icns */; };
 		43C32A20170B1295004A9460 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 43C32A19170B1295004A9460 /* main.m */; };
+		43C32A26170B3442004A9460 /* spineboy-jump.json in Resources */ = {isa = PBXBuildFile; fileRef = 43C32A25170B3442004A9460 /* spineboy-jump.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -466,6 +467,7 @@
 		43C32A18170B1295004A9460 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = "Resources-mac/Info.plist"; sourceTree = "<group>"; };
 		43C32A19170B1295004A9460 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "../Resources-mac/main.m"; sourceTree = "<group>"; };
 		43C32A1A170B1295004A9460 /* Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Prefix.pch; path = "../Resources-mac/Prefix.pch"; sourceTree = "<group>"; };
+		43C32A25170B3442004A9460 /* spineboy-jump.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "spineboy-jump.json"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -890,6 +892,7 @@
 			children = (
 				4319B7D216FF9D3900C1D7A9 /* spineboy-skeleton.json */,
 				4319B7D316FF9D3900C1D7A9 /* spineboy-walk.json */,
+				43C32A25170B3442004A9460 /* spineboy-jump.json */,
 				4319B7D416FF9D3900C1D7A9 /* spineboy.atlas */,
 				4319B7D516FF9D3900C1D7A9 /* spineboy.png */,
 			);
@@ -1036,6 +1039,7 @@
 				43C32A1C170B1295004A9460 /* InfoPlist.strings in Resources */,
 				43C32A1D170B1295004A9460 /* MainMenu.xib in Resources */,
 				43C32A1E170B1295004A9460 /* icon.icns in Resources */,
+				43C32A26170B3442004A9460 /* spineboy-jump.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

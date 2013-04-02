@@ -5,7 +5,9 @@
 @interface ExampleLayer : CCLayer {
 	Atlas *atlas;
 	SkeletonData *skeletonData;
-	Animation *animation;
+	Animation *walkAnimation;
+    Animation *jumpAnimation;
+    CCSkeleton* skeletonNode;
 }
 
 +(CCScene*) scene;
