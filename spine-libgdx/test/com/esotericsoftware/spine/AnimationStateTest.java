@@ -57,6 +57,7 @@ public class AnimationStateTest extends ApplicationAdapter {
 		// Define mixing between animations.
 		AnimationStateData mixing = new AnimationStateData();
 		mixing.setMix(walkAnimation, jumpAnimation, 0.4f);
+		mixing.setMix(jumpAnimation, walkAnimation, 0.4f);
 
 		state = new AnimationState(mixing);
 		state.setAnimation(walkAnimation, true);
@@ -77,8 +78,12 @@ public class AnimationStateTest extends ApplicationAdapter {
 		batch.begin();
 
 		state.apply(skeleton);
-		// After one second, change the current animation. Mixing is done by AnimationState for you.
-		if (state.getTime() > 1 && state.getAnimation() == walkAnimation) state.setAnimation(jumpAnimation, false);
+		if (state.getAnimation() == walkAnimation) {
+			// After one second, change the current animation. Mixing is done by AnimationState for you.
+			if (state.getTime() > 2) state.setAnimation(jumpAnimation, false);
+		} else {
+			if (state.getTime() > 1) state.setAnimation(walkAnimation, true);
+		}
 		skeleton.updateWorldTransform();
 		skeleton.draw(batch);
 
