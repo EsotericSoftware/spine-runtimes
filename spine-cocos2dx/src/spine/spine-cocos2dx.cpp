@@ -24,9 +24,7 @@
  ******************************************************************************/
 
 #include <spine/spine-cocos2dx.h>
-#include <spine/spine.h>
 #include <spine/extension.h>
-#include "cocos2d.h"
 
 USING_NS_CC;
 namespace spine {
