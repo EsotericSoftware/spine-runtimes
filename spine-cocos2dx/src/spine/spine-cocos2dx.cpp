@@ -83,6 +83,8 @@ CCSkeleton::CCSkeleton (SkeletonData *skeletonData, AnimationStateData *stateDat
 	blendFunc.src = GL_ONE;
 	blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
 
+	timeScale = 1;
+
 	setShaderProgram(CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
 	scheduleUpdate();
 }
