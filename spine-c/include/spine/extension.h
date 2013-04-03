@@ -98,7 +98,7 @@ extern "C" {
 
 RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region);
 
-AtlasPage* AtlasPage_create (const char* name);
+AtlasPage* AtlasPage_create (const char* name, const char* path);
 
 char* _Util_readFile (const char* path, int* length);
 

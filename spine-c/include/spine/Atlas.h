@@ -60,7 +60,7 @@ struct AtlasPage {
 	const void* const vtable;
 };
 
-AtlasPage* AtlasPage_create (const char* name);
+AtlasPage* AtlasPage_create (const char* name, const char* path);
 void AtlasPage_dispose (AtlasPage* self);
 
 /**/
@@ -90,7 +90,9 @@ typedef struct {
 	AtlasRegion* regions;
 } Atlas;
 
-Atlas* Atlas_readAtlas (const char* data, unsigned long length);
+/* Image files referenced in the atlas file will be prefixed dir. */
+Atlas* Atlas_readAtlas (const char* data, int length, const char* dir);
+/* Image files referenced in the atlas file will be prefixed with the directory containing the atlas file. */
 Atlas* Atlas_readAtlasFile (const char* path);
 void Atlas_dispose (Atlas* atlas);
 

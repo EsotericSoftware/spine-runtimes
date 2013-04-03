@@ -36,12 +36,12 @@ void _Cocos2dAtlasPage_dispose (AtlasPage* page) {
 	FREE(page);
 }
 
-AtlasPage* AtlasPage_create (const char* name) {
+AtlasPage* AtlasPage_create (const char* name, const char* path) {
 	Cocos2dAtlasPage* self = NEW(Cocos2dAtlasPage);
 	_AtlasPage_init(SUPER(self), name);
 	VTABLE(AtlasPage, self) ->dispose = _Cocos2dAtlasPage_dispose;
 
-	self->texture = [[CCTextureCache sharedTextureCache] addImage:@(name)];
+	self->texture = [[CCTextureCache sharedTextureCache] addImage:@(path)];
 	[self->texture retain];
 	self->atlas = [[CCTextureAtlas alloc] initWithTexture:self->texture capacity:4];
 	[self->atlas retain];

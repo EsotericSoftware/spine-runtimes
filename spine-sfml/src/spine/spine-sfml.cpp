@@ -50,13 +50,13 @@ void _SfmlAtlasPage_dispose (AtlasPage* page) {
 	FREE(page);
 }
 
-AtlasPage* AtlasPage_create (const char* name) {
+AtlasPage* AtlasPage_create (const char* name, const char* path) {
 	SfmlAtlasPage* self = NEW(SfmlAtlasPage);
 	_AtlasPage_init(SUPER(self), name);
 	VTABLE(AtlasPage, self) ->dispose = _SfmlAtlasPage_dispose;
 
 	self->texture = new Texture();
-	self->texture->loadFromFile(name);
+	self->texture->loadFromFile(path);
 
 	return SUPER(self);
 }

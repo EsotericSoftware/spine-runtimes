@@ -33,7 +33,7 @@ namespace spine {
 
 void _AtlasPage_init (AtlasPage* self, const char* name) {
 	CONST_CAST(_AtlasPageVtable*, self->vtable) = NEW(_AtlasPageVtable);
-	self->name = name; /* name is guaranteed to be memory we allocated. */
+	MALLOC_STR(self->name, name);
 }
 
 void _AtlasPage_deinit (AtlasPage* self) {
@@ -172,8 +172,10 @@ static const char* formatNames[] = {"Alpha", "Intensity", "LuminanceAlpha", "RGB
 static const char* textureFilterNames[] = {"Nearest", "Linear", "MipMap", "MipMapNearestNearest", "MipMapLinearNearest",
 		"MipMapNearestLinear", "MipMapLinearLinear"};
 
-Atlas* Atlas_readAtlas (const char* begin, unsigned long length) {
+Atlas* Atlas_readAtlas (const char* begin, int length, const char* dir) {
 	const char* end = begin + length;
+	int dirLength = strlen(dir);
+	int needsSlash = dirLength > 0 && dir[dirLength - 1] != '/' && dir[dirLength - 1] != '\\';
 
 	Atlas* self = NEW(Atlas);
 
@@ -187,12 +189,21 @@ Atlas* Atlas_readAtlas (const char* begin, unsigned long length) {
 		if (str.end - str.begin == 0) {
 			page = 0;
 		} else if (!page) {
-			page = AtlasPage_create(mallocString(&str));
+			char* name = mallocString(&str);
+			char* path = MALLOC(char, dirLength + needsSlash + strlen(name) + 1);
+			memcpy(path, dir, dirLength);
+			if (needsSlash) path[dirLength] = '/';
+			strcpy(path + dirLength + needsSlash, name);
+
+			page = AtlasPage_create(name, path);
 			if (lastPage)
 				lastPage->next = page;
 			else
 				self->pages = page;
 			lastPage = page;
+
+			FREE(name);
+			FREE(path);
 
 			if (!readValue(end, &str)) return abortAtlas(self);
 			page->format = (AtlasFormat)indexOf(formatNames, 7, &str);
@@ -265,11 +276,24 @@ Atlas* Atlas_readAtlas (const char* begin, unsigned long length) {
 }
 
 Atlas* Atlas_readAtlasFile (const char* path) {
+	Atlas* atlas = 0;
+
+	// Get directory from atlas path.
+	const char* lastForwardSlash = strrchr(path, '/');
+	const char* lastBackwardSlash = strrchr(path, '\\');
+	const char* lastSlash = lastForwardSlash > lastBackwardSlash ? lastForwardSlash : lastBackwardSlash;
+	if (lastSlash == path) lastSlash++; // Never drop starting slash.
+	int dirLength = lastSlash ? lastSlash - path : 0;
+	char* dir = MALLOC(char, dirLength + 1);
+	memcpy(dir, path, dirLength);
+	dir[dirLength] = '\0';
+
 	int length;
 	const char* data = _Util_readFile(path, &length);
-	if (!data) return 0;
-	Atlas* atlas = Atlas_readAtlas(data, length);
+	if (data) atlas = Atlas_readAtlas(data, length, dir);
+
 	FREE(data);
+	FREE(dir);
 	return atlas;
 }
 
