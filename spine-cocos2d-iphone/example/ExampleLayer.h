@@ -6,8 +6,8 @@
 	Atlas *atlas;
 	SkeletonData *skeletonData;
 	Animation *walkAnimation;
-    Animation *jumpAnimation;
-    CCSkeleton* skeletonNode;
+	Animation *jumpAnimation;
+	CCSkeleton* skeletonNode;
 }
 
 +(CCScene*) scene;
