@@ -41,10 +41,7 @@ Slot* Slot_create (SlotData* data, Skeleton* skeleton, Bone* bone) {
 	CONST_CAST(SlotData*, self->data) = data;
 	CONST_CAST(Skeleton*, self->skeleton) = skeleton;
 	CONST_CAST(Bone*, self->bone) = bone;
-	self->r = 1;
-	self->g = 1;
-	self->b = 1;
-	self->a = 1;
+	Slot_setToBindPose(self);
 	return self;
 }
 

@@ -41,8 +41,7 @@ Bone* Bone_create (BoneData* data, Bone* parent) {
 	Bone* self = NEW(Bone);
 	CONST_CAST(BoneData*, self->data) = data;
 	CONST_CAST(Bone*, self->parent) = parent;
-	self->scaleX = 1;
-	self->scaleY = 1;
+	Bone_setToBindPose(self);
 	return self;
 }
 

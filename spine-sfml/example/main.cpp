@@ -104,7 +104,7 @@ void goblins () {
 	skeleton->flipX = false;
 	skeleton->flipY = false;
 	Skeleton_setSkinByName(skeleton, "goblin");
-	Skeleton_setToBindPose(skeleton);
+	Skeleton_setSlotsToBindPose(skeleton);
 	Skeleton_setAttachment(skeleton, "left hand item", "dagger");
 
 	Skeleton_getRootBone(skeleton)->x = 320;
