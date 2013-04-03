@@ -130,28 +130,28 @@ Bone* Skeleton_getRootBone (const Skeleton* self) {
 Bone* Skeleton_findBone (const Skeleton* self, const char* boneName) {
 	int i;
 	for (i = 0; i < self->boneCount; ++i)
-		if (self->data->bones[i]->name == boneName) return self->bones[i];
+		if (strcmp(self->data->bones[i]->name, boneName) == 0) return self->bones[i];
 	return 0;
 }
 
 int Skeleton_findBoneIndex (const Skeleton* self, const char* boneName) {
 	int i;
 	for (i = 0; i < self->boneCount; ++i)
-		if (self->data->bones[i]->name == boneName) return i;
+		if (strcmp(self->data->bones[i]->name, boneName) == 0) return i;
 	return -1;
 }
 
 Slot* Skeleton_findSlot (const Skeleton* self, const char* slotName) {
 	int i;
 	for (i = 0; i < self->slotCount; ++i)
-		if (self->data->slots[i]->name == slotName) return self->slots[i];
+		if (strcmp(self->data->slots[i]->name, slotName) == 0) return self->slots[i];
 	return 0;
 }
 
 int Skeleton_findSlotIndex (const Skeleton* self, const char* slotName) {
 	int i;
 	for (i = 0; i < self->slotCount; ++i)
-		if (self->data->slots[i]->name == slotName) return i;
+		if (strcmp(self->data->slots[i]->name, slotName) == 0) return i;
 	return -1;
 }
 
@@ -189,7 +189,7 @@ int Skeleton_setAttachment (Skeleton* self, const char* slotName, const char* at
 	int i;
 	for (i = 0; i < self->slotCount; ++i) {
 		Slot *slot = self->slots[i];
-		if (slot->data->name == slotName) {
+		if (strcmp(slot->data->name, slotName) == 0) {
 			Attachment* attachment = Skeleton_getAttachmentForSlotIndex(self, i, attachmentName);
 			if (!attachment) return 0;
 			Slot_setAttachment(slot, attachment);
