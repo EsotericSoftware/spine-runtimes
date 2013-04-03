@@ -97,32 +97,8 @@ char* _Util_readFile (const char* path, int* length) {
 }
 
 /**/
-#include <spine/extension.h>
+
 int main (void) {
-	const char* path = "/moo.atlas";
-
-	char* lastForwardSlash = strrchr(path, '/');
-	char* lastBackwardSlash = strrchr(path, '\\');
-	char* lastSlash = lastForwardSlash > lastBackwardSlash ? lastForwardSlash : lastBackwardSlash;
-	if (lastSlash == path) lastSlash++; // Never drop starting slash.
-	int dirLength = lastSlash ? lastSlash - path : 0;
-	char* dir = MALLOC(char, dirLength + 1);
-	memcpy(dir, path, dirLength);
-	dir[dirLength] = '\0';
-
-	dirLength = strlen(dir);
-	int needsSlash = dirLength > 0 && dir[dirLength - 1] != '/' && dir[dirLength - 1] != '\\';
-	const char* name = "cow.png";
-	char* imagePath = MALLOC(char, dirLength + strlen(name) + needsSlash + 1);
-	memcpy(imagePath, dir, dirLength);
-	if (needsSlash) imagePath[dirLength] = '/';
-	strcpy(imagePath + dirLength + needsSlash, name);
-
-	printf("'%s'", imagePath);
-	return 0;
-
-	//const char* dir = MALLOC(char, strlen(path) - separator + 1);
-
 	Atlas* atlas = Atlas_readAtlasFile("data/spineboy.atlas");
 	printf("First region name: %s, x: %d, y: %d\n", atlas->regions->name, atlas->regions->x, atlas->regions->y);
 	printf("First page name: %s, extraData: %d\n", atlas->pages->name, ((ExampleAtlasPage*)atlas->pages)->extraData);
