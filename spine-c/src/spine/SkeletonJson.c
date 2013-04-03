@@ -345,7 +345,7 @@ Animation* SkeletonJson_readAnimation (SkeletonJson* self, const char* json, con
 		}
 	}
 
-	if (!slots) {
+	if (slots) {
 		for (i = 0; i < slotCount; ++i) {
 			Json* slotMap = Json_getItemAt(slots, i);
 			const char* slotName = slotMap->name;

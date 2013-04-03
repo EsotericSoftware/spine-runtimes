@@ -60,7 +60,7 @@ typedef struct {
 } _Internal;
 
 Skin* Skin_create (const char* name) {
-	Skin* self = NEW(Skin);
+	Skin* self = SUPER(NEW(_Internal));
 	MALLOC_STR(self->name, name);
 	return self;
 }

@@ -30,7 +30,8 @@
 using namespace std;
 using namespace spine;
 #include <stdio.h>
-int main () {
+
+void spineboy () {
 	// Load atlas, skeleton, and animations.
 	Atlas* atlas = Atlas_readAtlasFile("../data/spineboy.atlas");
 	SkeletonJson* json = SkeletonJson_create(atlas);
@@ -46,12 +47,16 @@ int main () {
 
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData, stateData);
 	drawable->timeScale = 0.5f;
+
 	Skeleton* skeleton = drawable->skeleton;
 	skeleton->flipX = false;
 	skeleton->flipY = false;
 	Skeleton_setToBindPose(skeleton);
+
 	Skeleton_getRootBone(skeleton)->x = 320;
 	Skeleton_getRootBone(skeleton)->y = 420;
+	Skeleton_updateWorldTransform(skeleton);
+
 	AnimationState_setAnimation(drawable->state, walkAnimation, true);
 
 	sf::RenderWindow window(sf::VideoMode(640, 480), "Spine SFML");
@@ -82,4 +87,56 @@ int main () {
 	Animation_dispose(jumpAnimation);
 	SkeletonData_dispose(skeletonData);
 	Atlas_dispose(atlas);
+}
+
+void goblins () {
+	// Load atlas, skeleton, and animations.
+	Atlas* atlas = Atlas_readAtlasFile("../data/goblins.atlas");
+	SkeletonJson* json = SkeletonJson_create(atlas);
+	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "../data/goblins-skeleton.json");
+	Animation* walkAnimation = SkeletonJson_readAnimationFile(json, "../data/goblins-walk.json", skeletonData);
+	SkeletonJson_dispose(json);
+
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+
+	Skeleton* skeleton = drawable->skeleton;
+	skeleton->flipX = false;
+	skeleton->flipY = false;
+	Skeleton_setSkinByName(skeleton, "goblin");
+	Skeleton_setToBindPose(skeleton);
+	Skeleton_setAttachment(skeleton, "left hand item", "dagger");
+
+	Skeleton_getRootBone(skeleton)->x = 320;
+	Skeleton_getRootBone(skeleton)->y = 420;
+	Skeleton_updateWorldTransform(skeleton);
+
+	AnimationState_setAnimation(drawable->state, walkAnimation, true);
+
+	sf::RenderWindow window(sf::VideoMode(640, 480), "Spine SFML");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		drawable->update(delta);
+
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
+
+	Animation_dispose(walkAnimation);
+	SkeletonData_dispose(skeletonData);
+	Atlas_dispose(atlas);
+}
+
+int main () {
+	spineboy();
+	goblins();
 }
