@@ -49,11 +49,15 @@ typedef struct {
 class SkeletonDrawable: public sf::Drawable {
 public:
 	Skeleton* skeleton;
+	AnimationState* state;
+	float timeScale;
 	sf::VertexArray* vertexArray;
 	sf::Texture* texture; // All region attachments must use the same texture.
 
-	SkeletonDrawable (SkeletonData* skeleton);
+	SkeletonDrawable (SkeletonData* skeleton, AnimationStateData* stateData = 0);
 	~SkeletonDrawable ();
+
+	void update (float deltaTime);
 
 	virtual void draw (sf::RenderTarget& target, sf::RenderStates states) const;
 };

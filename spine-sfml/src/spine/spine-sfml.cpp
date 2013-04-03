@@ -80,15 +80,25 @@ Skeleton* _SfmlSkeleton_create (SkeletonData* data, SkeletonDrawable* drawable) 
 	return SUPER(self);
 }
 
-SkeletonDrawable::SkeletonDrawable (SkeletonData* skeletonData) :
+SkeletonDrawable::SkeletonDrawable (SkeletonData* skeletonData, AnimationStateData* stateData) :
+				timeScale(1),
 				vertexArray(new VertexArray(Quads, skeletonData->boneCount * 4)),
 				texture(0) {
 	skeleton = _SfmlSkeleton_create(skeletonData, this);
+	state = AnimationState_create(stateData);
 }
 
 SkeletonDrawable::~SkeletonDrawable () {
 	delete vertexArray;
+	AnimationState_dispose(state);
 	Skeleton_dispose(skeleton);
+}
+
+void SkeletonDrawable::update (float deltaTime) {
+	Skeleton_update(skeleton, deltaTime);
+	AnimationState_update(state, deltaTime * timeScale);
+	AnimationState_apply(state, skeleton);
+	Skeleton_updateWorldTransform(skeleton);
 }
 
 void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {

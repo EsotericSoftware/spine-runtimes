@@ -29,44 +29,57 @@
 
 using namespace std;
 using namespace spine;
-
+#include <stdio.h>
 int main () {
+	// Load atlas, skeleton, and animations.
 	Atlas* atlas = Atlas_readAtlasFile("../data/spineboy.atlas");
 	SkeletonJson* json = SkeletonJson_create(atlas);
 	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "../data/spineboy-skeleton.json");
-	Animation* animation = SkeletonJson_readAnimationFile(json, "../data/spineboy-walk.json", skeletonData);
+	Animation* walkAnimation = SkeletonJson_readAnimationFile(json, "../data/spineboy-walk.json", skeletonData);
+	Animation* jumpAnimation = SkeletonJson_readAnimationFile(json, "../data/spineboy-jump.json", skeletonData);
 	SkeletonJson_dispose(json);
 
-	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	// Configure mixing.
+	AnimationStateData* stateData = AnimationStateData_create();
+	AnimationStateData_setMix(stateData, walkAnimation, jumpAnimation, 0.4f);
+	AnimationStateData_setMix(stateData, jumpAnimation, walkAnimation, 0.4f);
+
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData, stateData);
+	drawable->timeScale = 0.5f;
 	Skeleton* skeleton = drawable->skeleton;
 	skeleton->flipX = false;
 	skeleton->flipY = false;
 	Skeleton_setToBindPose(skeleton);
 	Skeleton_getRootBone(skeleton)->x = 320;
 	Skeleton_getRootBone(skeleton)->y = 420;
-	Skeleton_updateWorldTransform(skeleton);
+	AnimationState_setAnimation(drawable->state, walkAnimation, true);
 
 	sf::RenderWindow window(sf::VideoMode(640, 480), "Spine SFML");
 	window.setFramerateLimit(60);
 	sf::Event event;
 	sf::Clock deltaClock;
-	float animationTime = 0;
 	while (window.isOpen()) {
 		while (window.pollEvent(event))
 			if (event.type == sf::Event::Closed) window.close();
-		window.clear();
-		window.draw(*drawable);
-		window.display();
 
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
-		animationTime += delta;
 
-		Animation_apply(animation, skeleton, animationTime, true);
-		Skeleton_updateWorldTransform(skeleton);
+		if (drawable->state->animation == walkAnimation) {
+			if (drawable->state->time > 2) AnimationState_setAnimation(drawable->state, jumpAnimation, false);
+		} else {
+			if (drawable->state->time > 1) AnimationState_setAnimation(drawable->state, walkAnimation, true);
+		}
+
+		drawable->update(delta);
+
+		window.clear();
+		window.draw(*drawable);
+		window.display();
 	}
 
-	Animation_dispose(animation);
+	Animation_dispose(walkAnimation);
+	Animation_dispose(jumpAnimation);
 	SkeletonData_dispose(skeletonData);
 	Atlas_dispose(atlas);
 }
