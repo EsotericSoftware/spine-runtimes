@@ -68,30 +68,30 @@ Skeleton* _Cocos2dSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 
 @implementation CCSkeleton
 
-+ (CCSkeleton*) create:(const char*)skeletonDataFile atlas:(Atlas*)atlas {
++ (CCSkeleton*) create:(NSString*)skeletonDataFile atlas:(Atlas*)atlas {
 	return [CCSkeleton create:skeletonDataFile atlas:atlas scale:1];
 }
 
-+ (CCSkeleton*) create:(const char*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale {
++ (CCSkeleton*) create:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale {
 	SkeletonJson* json = SkeletonJson_create(atlas);
 	json->scale = scale;
-	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, skeletonDataFile);
+	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, [skeletonDataFile UTF8String]);
 	SkeletonJson_dispose(json);
 	CCSkeleton* node = skeletonData ? [CCSkeleton create:skeletonData] : 0;
 	node->ownsSkeleton = true;
 	return node;
 }
 
-+ (CCSkeleton*) create:(const char*)skeletonDataFile atlasFile:(const char*)atlasFile {
++ (CCSkeleton*) create:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile {
 	return [CCSkeleton create:skeletonDataFile atlasFile:atlasFile scale:1];
 }
 
-+ (CCSkeleton*) create:(const char*)skeletonDataFile atlasFile:(const char*)atlasFile scale:(float)scale {
-	Atlas* atlas = Atlas_readAtlasFile(atlasFile);
++ (CCSkeleton*) create:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile scale:(float)scale {
+	Atlas* atlas = Atlas_readAtlasFile([atlasFile UTF8String]);
 	if (!atlas) return 0;
 	SkeletonJson* json = SkeletonJson_create(atlas);
 	json->scale = scale;
-	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, skeletonDataFile);
+	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, [skeletonDataFile UTF8String]);
 	SkeletonJson_dispose(json);
 	if (!skeletonData) {
 		Atlas_dispose(atlas);
@@ -119,13 +119,13 @@ Skeleton* _Cocos2dSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 	self = [super init];
 	if (!self) return nil;
 
-	skeleton = _Cocos2dSkeleton_create(skeletonData, self);
+	CONST_CAST(Skeleton*, skeleton) = _Cocos2dSkeleton_create(skeletonData, self);
 
 	if (!stateData) {
 		stateData = AnimationStateData_create(skeletonData);
 		ownsStateData = true;
 	}
-	state = AnimationState_create(stateData);
+	CONST_CAST(AnimationState*, state) = AnimationState_create(stateData);
 
 	blendFunc.src = GL_ONE;
 	blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
@@ -143,14 +143,6 @@ Skeleton* _Cocos2dSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 	if (ownsStateData) AnimationStateData_dispose(state->data);
 	AnimationState_dispose(state);
     [super dealloc];
-}
-
-- (void) setMix:(const char*)fromName to:(const char*)toName duration:(float)duration {
-	AnimationStateData_setMixByName(state->data, fromName, toName, duration);
-}
-
-- (void) setAnimation:(const char*)animationName loop:(bool)loop {
-	AnimationState_setAnimationByName(state, animationName, loop);
 }
 
 - (void) update:(ccTime)deltaTime {
@@ -209,6 +201,57 @@ Skeleton* _Cocos2dSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 			if (i == 0) ccDrawColor4B(0, 255, 0, 255);
 		}
 	}
+}
+
+// Convenience methods:
+
+- (void) setMix:(NSString*)fromName to:(NSString*)toName duration:(float)duration {
+	AnimationStateData_setMixByName(state->data, [fromName UTF8String], [toName UTF8String], duration);
+}
+- (void) setAnimation:(NSString*)animationName loop:(bool)loop {
+	AnimationState_setAnimationByName(state, [animationName UTF8String], loop);
+}
+
+- (void) updateWorldTransform {
+	Skeleton_updateWorldTransform(skeleton);
+}
+
+- (void) setToBindPose {
+	Skeleton_setToBindPose(skeleton);
+}
+- (void) setBonesToBindPose {
+	Skeleton_setBonesToBindPose(skeleton);
+}
+- (void) setSlotsToBindPose {
+	Skeleton_setSlotsToBindPose(skeleton);
+}
+
+- (Bone*) findBone:(NSString*)boneName {
+	return Skeleton_findBone(skeleton, [boneName UTF8String]);
+}
+- (int) findBoneIndex:(NSString*)boneName {
+	return Skeleton_findBoneIndex(skeleton, [boneName UTF8String]);
+}
+
+- (Slot*) findSlot:(NSString*)slotName {
+	return Skeleton_findSlot(skeleton, [slotName UTF8String]);
+}
+- (int) findSlotIndex:(NSString*)slotName {
+	return Skeleton_findSlotIndex(skeleton, [slotName UTF8String]);
+}
+
+- (bool) setSkin:(NSString*)skinName {
+	return (bool)Skeleton_setSkinByName(skeleton, [skinName UTF8String]);
+}
+
+- (Attachment*) getAttachmentForSlotName:(NSString*)slotName attachmentName:(NSString*)attachmentName {
+	return Skeleton_getAttachmentForSlotName(skeleton, [slotName UTF8String], [attachmentName UTF8String]);
+}
+- (Attachment*) getAttachmentForSlotIndex:(int)slotIndex attachmentName:(NSString*)attachmentName {
+	return Skeleton_getAttachmentForSlotIndex(skeleton, slotIndex, [attachmentName UTF8String]);
+}
+- (bool) setAttachment:(NSString*)slotName attachmentName:(NSString*)attachmentName {
+	return (bool)Skeleton_setAttachment(skeleton, [slotName UTF8String], [attachmentName UTF8String]);
 }
 
 // CCBlendProtocol

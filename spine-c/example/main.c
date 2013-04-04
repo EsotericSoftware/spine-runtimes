@@ -2,7 +2,6 @@
  * with internal methods exposed to facilitate extension. */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <spine/spine.h>
 #include <spine/extension.h>
 

@@ -103,14 +103,14 @@ CCSkeleton* CCSkeleton::create (SkeletonData* skeletonData, AnimationStateData* 
 }
 
 CCSkeleton::CCSkeleton (SkeletonData *skeletonData, AnimationStateData *stateData) :
-				debugSlots(false), debugBones(false) {
-	skeleton = _Cocos2dxSkeleton_create(skeletonData, this);
+				skeleton(0), state(0), debugSlots(false), debugBones(false) {
+	CONST_CAST(Skeleton*, skeleton) = _Cocos2dxSkeleton_create(skeletonData, this);
 
 	if (!stateData) {
 		stateData = AnimationStateData_create(skeletonData);
 		ownsStateData = true;
 	}
-	state = AnimationState_create(stateData);
+	CONST_CAST(AnimationState*, state) = AnimationState_create(stateData);
 
 	blendFunc.src = GL_ONE;
 	blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
@@ -125,14 +125,6 @@ CCSkeleton::~CCSkeleton () {
 	Skeleton_dispose(skeleton);
 	if (ownsStateData) AnimationStateData_dispose(state->data);
 	AnimationState_dispose(state);
-}
-
-void CCSkeleton::setMix (const char* fromName, const char* toName, float duration) {
-	AnimationStateData_setMixByName(state->data, fromName, toName, duration);
-}
-
-void CCSkeleton::setAnimation (const char* animationName, bool loop) {
-	AnimationState_setAnimationByName(state, animationName, loop);
 }
 
 void CCSkeleton::update (float deltaTime) {
@@ -191,6 +183,58 @@ void CCSkeleton::draw () {
 			if (i == 0) ccDrawColor4B(0, 255, 0, 255);
 		}
 	}
+}
+
+// Convenience methods:
+
+void CCSkeleton::setMix (const char* fromName, const char* toName, float duration) {
+	AnimationStateData_setMixByName(state->data, fromName, toName, duration);
+}
+
+void CCSkeleton::setAnimation (const char* animationName, bool loop) {
+	AnimationState_setAnimationByName(state, animationName, loop);
+}
+
+void CCSkeleton::updateWorldTransform () {
+	Skeleton_updateWorldTransform(skeleton);
+}
+
+void CCSkeleton::setToBindPose () {
+	Skeleton_setToBindPose(skeleton);
+}
+void CCSkeleton::setBonesToBindPose () {
+	Skeleton_setBonesToBindPose(skeleton);
+}
+void CCSkeleton::setSlotsToBindPose () {
+	Skeleton_setSlotsToBindPose(skeleton);
+}
+
+Bone* CCSkeleton::findBone (const char* boneName) const {
+	return Skeleton_findBone(skeleton, boneName);
+}
+int CCSkeleton::findBoneIndex (const char* boneName) const {
+	return Skeleton_findBoneIndex(skeleton, boneName);
+}
+
+Slot* CCSkeleton::findSlot (const char* slotName) const {
+	return Skeleton_findSlot(skeleton, slotName);
+}
+int CCSkeleton::findSlotIndex (const char* slotName) const {
+	return Skeleton_findSlotIndex(skeleton, slotName);
+}
+
+bool CCSkeleton::setSkin (const char* skinName) {
+	return (bool)Skeleton_setSkinByName(skeleton, skinName);
+}
+
+Attachment* CCSkeleton::getAttachment (const char* slotName, const char* attachmentName) const {
+	return Skeleton_getAttachmentForSlotName(skeleton, slotName, attachmentName);
+}
+Attachment* CCSkeleton::getAttachment (int slotIndex, const char* attachmentName) const {
+	return Skeleton_getAttachmentForSlotIndex(skeleton, slotIndex, attachmentName);
+}
+bool CCSkeleton::setAttachment (const char* slotName, const char* attachmentName) {
+	return (bool)Skeleton_setAttachment(skeleton, slotName, attachmentName);
 }
 
 // CCBlendProtocol

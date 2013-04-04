@@ -200,4 +200,4 @@ char* _Util_readFile (const char* path, int* length) {
 	return _readFile(path, length);
 }
 
-}
+} /* namespace spine */

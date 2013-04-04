@@ -41,6 +41,7 @@ struct Skeleton {
 
 	int boneCount;
 	Bone** bones;
+	Bone* const root;
 
 	int slotCount;
 	Slot** slots;
@@ -62,7 +63,6 @@ void Skeleton_setToBindPose (const Skeleton* self);
 void Skeleton_setBonesToBindPose (const Skeleton* self);
 void Skeleton_setSlotsToBindPose (const Skeleton* self);
 
-Bone* Skeleton_getRootBone (const Skeleton* self);
 /* Returns 0 if the bone was not found. */
 Bone* Skeleton_findBone (const Skeleton* self, const char* boneName);
 /* Returns -1 if the bone was not found. */
@@ -77,7 +77,8 @@ int Skeleton_findSlotIndex (const Skeleton* self, const char* slotName);
  * attached if the corresponding attachment from the old skin was attached.
  * @param skin May be 0.*/
 void Skeleton_setSkin (Skeleton* self, Skin* skin);
-/* Returns 0 if the skin was not found. See Skeleton_setSkin. */
+/* Returns 0 if the skin was not found. See Skeleton_setSkin.
+ * @param skinName May be 0. */
 int Skeleton_setSkinByName (Skeleton* self, const char* skinName);
 
 /* Returns 0 if the slot or attachment was not found. */

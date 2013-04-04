@@ -13,10 +13,10 @@
 	self = [super init];
 	if (!self) return nil;
 
-	skeletonNode = [CCSkeleton create:"spineboy.json" atlasFile:"spineboy.atlas"];
-	[skeletonNode setMix:"walk" to:"jump" duration:0.4f];
-	[skeletonNode setMix:"jump" to:"walk" duration:0.4f];
-	[skeletonNode setAnimation:"walk" loop:true];
+	skeletonNode = [CCSkeleton create:@"spineboy.json" atlasFile:@"spineboy.atlas"];
+	[skeletonNode setMix:@"walk" to:@"jump" duration:0.4f];
+	[skeletonNode setMix:@"jump" to:@"walk" duration:0.4f];
+	[skeletonNode setAnimation:@"walk" loop:true];
 	skeletonNode->timeScale = 0.3f;
 	skeletonNode->debugBones = true;
 
@@ -31,9 +31,9 @@
 
 - (void) update:(ccTime)delta {
     if (strcmp(skeletonNode->state->animation->name, "walk") == 0) {
-        if (skeletonNode->state->time > 2) [skeletonNode setAnimation:"jump" loop:false];
+        if (skeletonNode->state->time > 2) [skeletonNode setAnimation:@"jump" loop:false];
     } else {
-        if (skeletonNode->state->time > 1) [skeletonNode setAnimation:"walk" loop:true];
+        if (skeletonNode->state->time > 1) [skeletonNode setAnimation:@"walk" loop:true];
     }
 }
 

@@ -53,6 +53,7 @@ void _Skeleton_init (Skeleton* self, SkeletonData* data) {
 		}
 		self->bones[i] = Bone_create(boneData, parent);
 	}
+	CONST_CAST(Bone*, self->root) = self->bones[0];
 
 	self->slotCount = data->slotCount;
 	self->slots = MALLOC(Slot*, self->slotCount);
@@ -122,11 +123,6 @@ void Skeleton_setSlotsToBindPose (const Skeleton* self) {
 		Slot_setToBindPose(self->slots[i]);
 }
 
-Bone* Skeleton_getRootBone (const Skeleton* self) {
-	if (self->boneCount == 0) return 0;
-	return self->bones[0];
-}
-
 Bone* Skeleton_findBone (const Skeleton* self, const char* boneName) {
 	int i;
 	for (i = 0; i < self->boneCount; ++i)
@@ -156,6 +152,10 @@ int Skeleton_findSlotIndex (const Skeleton* self, const char* slotName) {
 }
 
 int Skeleton_setSkinByName (Skeleton* self, const char* skinName) {
+	if (!skinName) {
+		Skeleton_setSkin(self, 0);
+		return 1;
+	}
 	Skin *skin = SkeletonData_findSkin(self->data, skinName);
 	if (!skin) return 0;
 	Skeleton_setSkin(self, skin);

@@ -51,22 +51,23 @@ typedef struct {
 	bool ownsStateData;
 
 @public
-	Skeleton* skeleton;
-	AnimationState* state;
-    float timeScale;
+	Skeleton* const skeleton;
+	AnimationState* const state;
+	float timeScale;
 	bool debugSlots;
 	bool debugBones;
 
 	CCTextureAtlas* atlas; // All region attachments for a skeleton must use the same texture.
 	unsigned int quadCount;
+
     ccBlendFunc blendFunc;
 }
 
-+ (CCSkeleton*) create:(const char*)skeletonDataFile atlas:(Atlas*)atlas;
-+ (CCSkeleton*) create:(const char*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale;
++ (CCSkeleton*) create:(NSString*)skeletonDataFile atlas:(Atlas*)atlas;
++ (CCSkeleton*) create:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale;
 
-+ (CCSkeleton*) create:(const char*)skeletonDataFile atlasFile:(const char*)atlasFile;
-+ (CCSkeleton*) create:(const char*)skeletonDataFile atlasFile:(const char*)atlasFile scale:(float)scale;
++ (CCSkeleton*) create:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile;
++ (CCSkeleton*) create:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile scale:(float)scale;
 
 + (CCSkeleton*) create:(SkeletonData*)skeletonData;
 + (CCSkeleton*) create:(SkeletonData*)skeletonData stateData:(AnimationStateData*)stateData;
@@ -74,8 +75,36 @@ typedef struct {
 - init:(SkeletonData*)skeletonData;
 - init:(SkeletonData*)skeletonData stateData:(AnimationStateData*)stateData;
 
-- (void) setMix:(const char*)fromName to:(const char*)toName duration:(float)duration;
-- (void) setAnimation:(const char*)animationName loop:(bool)loop;
+- (void) setMix:(NSString*)fromName to:(NSString*)toName duration:(float)duration;
+- (void) setAnimation:(NSString*)animationName loop:(bool)loop;
+
+- (void) updateWorldTransform;
+
+- (void) setToBindPose;
+- (void) setBonesToBindPose;
+- (void) setSlotsToBindPose;
+
+/* Returns 0 if the bone was not found. */
+- (Bone*) findBone:(NSString*)boneName;
+/* Returns -1 if the bone was not found. */
+- (int) findBoneIndex:(NSString*)boneName;
+
+/* Returns 0 if the slot was not found. */
+- (Slot*) findSlot:(NSString*)slotName;
+/* Returns -1 if the slot was not found. */
+- (int) findSlotIndex:(NSString*)slotName;
+
+/* Sets the skin used to look up attachments not found in the SkeletonData defaultSkin. Attachments from the new skin are
+ * attached if the corresponding attachment from the old skin was attached. Returns false if the skin was not found.
+ * @param skin May be 0.*/
+- (bool) setSkin:(NSString*)skinName;
+
+/* Returns 0 if the slot or attachment was not found. */
+- (Attachment*) getAttachmentForSlotName:(NSString*)slotName attachmentName:(NSString*)attachmentName;
+/* Returns 0 if the slot or attachment was not found. */
+- (Attachment*) getAttachmentForSlotIndex:(int)slotIndex attachmentName:(NSString*)attachmentName;
+/* Returns false if the slot or attachment was not found. */
+- (bool) setAttachment:(NSString*)slotName attachmentName:(NSString*)attachmentName;
 
 @end
 
