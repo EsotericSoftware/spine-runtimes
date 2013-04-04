@@ -104,14 +104,14 @@ int main (void) {
 	printf("First page name: %s, extraData: %d\n", atlas->pages->name, ((ExampleAtlasPage*)atlas->pages)->extraData);
 
 	SkeletonJson* json = SkeletonJson_create(atlas);
-	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/spineboy-skeleton.json");
+	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/spineboy.json");
 	if (!skeletonData) printf("Error: %s\n", json->error);
 	printf("Default skin name: %s\n", skeletonData->defaultSkin->name);
 
 	Skeleton* skeleton = Skeleton_create(skeletonData);
 	printf("Skeleton extraData: %d\n", ((ExampleSkeleton*)skeleton)->extraData);
 
-	Animation* animation = SkeletonJson_readAnimationFile(json, "data/spineboy-walk.json", skeletonData);
+	Animation* animation = SkeletonData_findAnimation(skeletonData, "walk");
 	if (!animation) printf("Error: %s\n", json->error);
 	printf("Animation timelineCount: %d\n", animation->timelineCount);
 

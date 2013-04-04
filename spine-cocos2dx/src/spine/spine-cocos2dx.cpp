@@ -69,6 +69,33 @@ Skeleton* _Cocos2dxSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 	return SUPER(self);
 }
 
+CCSkeleton* CCSkeleton::create (const char* skeletonDataFile, Atlas* atlas, float scale) {
+	SkeletonJson* json = SkeletonJson_create(atlas);
+	json->scale = scale;
+	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, skeletonDataFile);
+	SkeletonJson_dispose(json);
+	CCSkeleton* node = skeletonData ? create(skeletonData) : 0;
+	node->ownsSkeleton = true;
+	return node;
+}
+
+CCSkeleton* CCSkeleton::create (const char* skeletonDataFile, const char* atlasFile, float scale) {
+	Atlas* atlas = Atlas_readAtlasFile(atlasFile);
+	if (!atlas) return 0;
+	SkeletonJson* json = SkeletonJson_create(atlas);
+	json->scale = scale;
+	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, skeletonDataFile);
+	SkeletonJson_dispose(json);
+	if (!skeletonData) {
+		Atlas_dispose(atlas);
+		return 0;
+	}
+	CCSkeleton* node = create(skeletonData);
+	node->ownsSkeleton = true;
+	node->ownsAtlas = true;
+	return node;
+}
+
 CCSkeleton* CCSkeleton::create (SkeletonData* skeletonData, AnimationStateData* stateData) {
 	CCSkeleton* node = new CCSkeleton(skeletonData, stateData);
 	node->autorelease();
@@ -78,6 +105,11 @@ CCSkeleton* CCSkeleton::create (SkeletonData* skeletonData, AnimationStateData* 
 CCSkeleton::CCSkeleton (SkeletonData *skeletonData, AnimationStateData *stateData) :
 				debugSlots(false), debugBones(false) {
 	skeleton = _Cocos2dxSkeleton_create(skeletonData, this);
+
+	if (!stateData) {
+		stateData = AnimationStateData_create(skeletonData);
+		ownsStateData = true;
+	}
 	state = AnimationState_create(stateData);
 
 	blendFunc.src = GL_ONE;
@@ -91,7 +123,16 @@ CCSkeleton::CCSkeleton (SkeletonData *skeletonData, AnimationStateData *stateDat
 
 CCSkeleton::~CCSkeleton () {
 	Skeleton_dispose(skeleton);
+	if (ownsStateData) AnimationStateData_dispose(state->data);
 	AnimationState_dispose(state);
+}
+
+void CCSkeleton::setMix (const char* fromName, const char* toName, float duration) {
+	AnimationStateData_setMixByName(state->data, fromName, toName, duration);
+}
+
+void CCSkeleton::setAnimation (const char* animationName, bool loop) {
+	AnimationState_setAnimationByName(state, animationName, loop);
 }
 
 void CCSkeleton::update (float deltaTime) {

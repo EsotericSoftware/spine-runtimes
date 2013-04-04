@@ -127,10 +127,6 @@
 		4319B84416FF9D3A00C1D7A9 /* LICENSE_cocos2d.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4319B7C816FF9D3900C1D7A9 /* LICENSE_cocos2d.txt */; };
 		4319B84516FF9D3A00C1D7A9 /* LICENSE_CocosDenshion.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4319B7C916FF9D3900C1D7A9 /* LICENSE_CocosDenshion.txt */; };
 		4319B84616FF9D3A00C1D7A9 /* LICENSE_Kazmath.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4319B7CA16FF9D3900C1D7A9 /* LICENSE_Kazmath.txt */; };
-		4319B84B16FF9D3A00C1D7A9 /* spineboy-skeleton.json in Resources */ = {isa = PBXBuildFile; fileRef = 4319B7D216FF9D3900C1D7A9 /* spineboy-skeleton.json */; };
-		4319B84C16FF9D3A00C1D7A9 /* spineboy-walk.json in Resources */ = {isa = PBXBuildFile; fileRef = 4319B7D316FF9D3900C1D7A9 /* spineboy-walk.json */; };
-		4319B84D16FF9D3A00C1D7A9 /* spineboy.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 4319B7D416FF9D3900C1D7A9 /* spineboy.atlas */; };
-		4319B84E16FF9D3A00C1D7A9 /* spineboy.png in Resources */ = {isa = PBXBuildFile; fileRef = 4319B7D516FF9D3900C1D7A9 /* spineboy.png */; };
 		43BFBE0F170A778A00ECBACB /* spine-cocos2d-iphone.m in Sources */ = {isa = PBXBuildFile; fileRef = 43BFBE0D170A778A00ECBACB /* spine-cocos2d-iphone.m */; };
 		43BFBE10170A804700ECBACB /* Animation.c in Sources */ = {isa = PBXBuildFile; fileRef = 43BFBDB3170A705100ECBACB /* Animation.c */; };
 		43BFBE11170A804700ECBACB /* AnimationState.c in Sources */ = {isa = PBXBuildFile; fileRef = 43BFBDB4170A705100ECBACB /* AnimationState.c */; };
@@ -155,7 +151,12 @@
 		43C32A1D170B1295004A9460 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 43C32A15170B1295004A9460 /* MainMenu.xib */; };
 		43C32A1E170B1295004A9460 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 43C32A17170B1295004A9460 /* icon.icns */; };
 		43C32A20170B1295004A9460 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 43C32A19170B1295004A9460 /* main.m */; };
-		43C32A26170B3442004A9460 /* spineboy-jump.json in Resources */ = {isa = PBXBuildFile; fileRef = 43C32A25170B3442004A9460 /* spineboy-jump.json */; };
+		43C32A33170D0A4D004A9460 /* goblins.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 43C32A2D170D0A4D004A9460 /* goblins.atlas */; };
+		43C32A34170D0A4D004A9460 /* goblins.json in Resources */ = {isa = PBXBuildFile; fileRef = 43C32A2E170D0A4D004A9460 /* goblins.json */; };
+		43C32A35170D0A4D004A9460 /* goblins.png in Resources */ = {isa = PBXBuildFile; fileRef = 43C32A2F170D0A4D004A9460 /* goblins.png */; };
+		43C32A36170D0A4D004A9460 /* spineboy.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 43C32A30170D0A4D004A9460 /* spineboy.atlas */; };
+		43C32A37170D0A4D004A9460 /* spineboy.json in Resources */ = {isa = PBXBuildFile; fileRef = 43C32A31170D0A4D004A9460 /* spineboy.json */; };
+		43C32A38170D0A4D004A9460 /* spineboy.png in Resources */ = {isa = PBXBuildFile; fileRef = 43C32A32170D0A4D004A9460 /* spineboy.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -416,10 +417,6 @@
 		4319B7C816FF9D3900C1D7A9 /* LICENSE_cocos2d.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE_cocos2d.txt; sourceTree = "<group>"; };
 		4319B7C916FF9D3900C1D7A9 /* LICENSE_CocosDenshion.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE_CocosDenshion.txt; sourceTree = "<group>"; };
 		4319B7CA16FF9D3900C1D7A9 /* LICENSE_Kazmath.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE_Kazmath.txt; sourceTree = "<group>"; };
-		4319B7D216FF9D3900C1D7A9 /* spineboy-skeleton.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "spineboy-skeleton.json"; sourceTree = "<group>"; };
-		4319B7D316FF9D3900C1D7A9 /* spineboy-walk.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "spineboy-walk.json"; sourceTree = "<group>"; };
-		4319B7D416FF9D3900C1D7A9 /* spineboy.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spineboy.atlas; sourceTree = "<group>"; };
-		4319B7D516FF9D3900C1D7A9 /* spineboy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spineboy.png; sourceTree = "<group>"; };
 		43BFBDA1170A703E00ECBACB /* Animation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Animation.h; path = "../spine-c/include/spine/Animation.h"; sourceTree = "<group>"; };
 		43BFBDA2170A703E00ECBACB /* AnimationState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AnimationState.h; path = "../spine-c/include/spine/AnimationState.h"; sourceTree = "<group>"; };
 		43BFBDA3170A703E00ECBACB /* AnimationStateData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AnimationStateData.h; path = "../spine-c/include/spine/AnimationStateData.h"; sourceTree = "<group>"; };
@@ -467,7 +464,12 @@
 		43C32A18170B1295004A9460 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = "Resources-mac/Info.plist"; sourceTree = "<group>"; };
 		43C32A19170B1295004A9460 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "../Resources-mac/main.m"; sourceTree = "<group>"; };
 		43C32A1A170B1295004A9460 /* Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Prefix.pch; path = "../Resources-mac/Prefix.pch"; sourceTree = "<group>"; };
-		43C32A25170B3442004A9460 /* spineboy-jump.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "spineboy-jump.json"; sourceTree = "<group>"; };
+		43C32A2D170D0A4D004A9460 /* goblins.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = goblins.atlas; sourceTree = "<group>"; };
+		43C32A2E170D0A4D004A9460 /* goblins.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = goblins.json; sourceTree = "<group>"; };
+		43C32A2F170D0A4D004A9460 /* goblins.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = goblins.png; sourceTree = "<group>"; };
+		43C32A30170D0A4D004A9460 /* spineboy.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spineboy.atlas; sourceTree = "<group>"; };
+		43C32A31170D0A4D004A9460 /* spineboy.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = spineboy.json; sourceTree = "<group>"; };
+		43C32A32170D0A4D004A9460 /* spineboy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spineboy.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -890,11 +892,12 @@
 		4319B7CB16FF9D3900C1D7A9 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				4319B7D216FF9D3900C1D7A9 /* spineboy-skeleton.json */,
-				4319B7D316FF9D3900C1D7A9 /* spineboy-walk.json */,
-				43C32A25170B3442004A9460 /* spineboy-jump.json */,
-				4319B7D416FF9D3900C1D7A9 /* spineboy.atlas */,
-				4319B7D516FF9D3900C1D7A9 /* spineboy.png */,
+				43C32A2D170D0A4D004A9460 /* goblins.atlas */,
+				43C32A2E170D0A4D004A9460 /* goblins.json */,
+				43C32A2F170D0A4D004A9460 /* goblins.png */,
+				43C32A30170D0A4D004A9460 /* spineboy.atlas */,
+				43C32A31170D0A4D004A9460 /* spineboy.json */,
+				43C32A32170D0A4D004A9460 /* spineboy.png */,
 			);
 			path = Resources;
 			sourceTree = SOURCE_ROOT;
@@ -1032,14 +1035,15 @@
 				4319B84416FF9D3A00C1D7A9 /* LICENSE_cocos2d.txt in Resources */,
 				4319B84516FF9D3A00C1D7A9 /* LICENSE_CocosDenshion.txt in Resources */,
 				4319B84616FF9D3A00C1D7A9 /* LICENSE_Kazmath.txt in Resources */,
-				4319B84B16FF9D3A00C1D7A9 /* spineboy-skeleton.json in Resources */,
-				4319B84C16FF9D3A00C1D7A9 /* spineboy-walk.json in Resources */,
-				4319B84D16FF9D3A00C1D7A9 /* spineboy.atlas in Resources */,
-				4319B84E16FF9D3A00C1D7A9 /* spineboy.png in Resources */,
 				43C32A1C170B1295004A9460 /* InfoPlist.strings in Resources */,
 				43C32A1D170B1295004A9460 /* MainMenu.xib in Resources */,
 				43C32A1E170B1295004A9460 /* icon.icns in Resources */,
-				43C32A26170B3442004A9460 /* spineboy-jump.json in Resources */,
+				43C32A33170D0A4D004A9460 /* goblins.atlas in Resources */,
+				43C32A34170D0A4D004A9460 /* goblins.json in Resources */,
+				43C32A35170D0A4D004A9460 /* goblins.png in Resources */,
+				43C32A36170D0A4D004A9460 /* spineboy.atlas in Resources */,
+				43C32A37170D0A4D004A9460 /* spineboy.json in Resources */,
+				43C32A38170D0A4D004A9460 /* spineboy.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

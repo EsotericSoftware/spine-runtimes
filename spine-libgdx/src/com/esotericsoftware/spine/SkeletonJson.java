@@ -46,6 +46,8 @@ import com.badlogic.gdx.utils.ObjectMap.Entry;
 import com.badlogic.gdx.utils.OrderedMap;
 import com.badlogic.gdx.utils.SerializationException;
 
+import java.io.StringWriter;
+
 public class SkeletonJson {
 	static public final String TIMELINE_SCALE = "scale";
 	static public final String TIMELINE_ROTATE = "rotate";
@@ -136,9 +138,17 @@ public class SkeletonJson {
 			}
 		}
 
+		// Animations.
+		OrderedMap<String, OrderedMap> animationMap = (OrderedMap)root.get("animations");
+		if (animationMap != null) {
+			for (Entry<String, OrderedMap> entry : animationMap.entries())
+				readAnimation(entry.key, entry.value, skeletonData);
+		}
+
 		skeletonData.bones.shrink();
 		skeletonData.slots.shrink();
 		skeletonData.skins.shrink();
+		skeletonData.animations.shrink();
 		return skeletonData;
 	}
 
@@ -180,12 +190,7 @@ public class SkeletonJson {
 		return (Float)value;
 	}
 
-	public Animation readAnimation (FileHandle file, SkeletonData skeletonData) {
-		if (file == null) throw new IllegalArgumentException("file cannot be null.");
-		if (skeletonData == null) throw new IllegalArgumentException("skeletonData cannot be null.");
-
-		OrderedMap<String, ?> map = json.fromJson(OrderedMap.class, file);
-
+	private void readAnimation (String name, OrderedMap<String, ?> map, SkeletonData skeletonData) {
 		Array<Timeline> timelines = new Array();
 		float duration = 0;
 
@@ -228,8 +233,8 @@ public class SkeletonJson {
 					for (OrderedMap valueMap : values) {
 						float time = (Float)valueMap.get("time");
 						Float x = (Float)valueMap.get("x"), y = (Float)valueMap.get("y");
-						timeline.setFrame(keyframeIndex, time, x == null ? 0 : (x * timelineScale), y == null ? 0
-							: (y * timelineScale));
+						timeline
+							.setFrame(keyframeIndex, time, x == null ? 0 : (x * timelineScale), y == null ? 0 : (y * timelineScale));
 						readCurve(timeline, keyframeIndex, valueMap);
 						keyframeIndex++;
 					}
@@ -285,9 +290,7 @@ public class SkeletonJson {
 		}
 
 		timelines.shrink();
-		Animation animation = new Animation(timelines, duration);
-		animation.setName(file.nameWithoutExtension());
-		return animation;
+		skeletonData.addAnimation(new Animation(name, timelines, duration));
 	}
 
 	private void readCurve (CurveTimeline timeline, int keyframeIndex, OrderedMap valueMap) {

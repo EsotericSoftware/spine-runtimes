@@ -5,19 +5,17 @@
 USING_NS_CC;
 
 int APIENTRY _tWinMain(HINSTANCE hInstance,
-                       HINSTANCE hPrevInstance,
-                       LPTSTR    lpCmdLine,
-                       int       nCmdShow)
+					   HINSTANCE hPrevInstance,
+					   LPTSTR lpCmdLine,
+					   int nCmdShow)
 {
-    UNREFERENCED_PARAMETER(hPrevInstance);
-    UNREFERENCED_PARAMETER(lpCmdLine);
+	UNREFERENCED_PARAMETER(hPrevInstance);
+	UNREFERENCED_PARAMETER(lpCmdLine);
 
-    // create the application instance
-    AppDelegate app;
-    CCEGLView* eglView = CCEGLView::sharedOpenGLView();
-    eglView->setViewName("SpineExample");
-    eglView->setFrameSize(480, 320);
-    // So we need to invoke 'setFrameZoomFactor' (only valid on desktop(win32, mac, linux)) to make the window smaller.
-   // eglView->setFrameZoomFactor(0.4f);
-    return CCApplication::sharedApplication()->run();
+	// create the application instance
+	AppDelegate app;
+	CCEGLView* eglView = CCEGLView::sharedOpenGLView();
+	eglView->setViewName("SpineExample");
+	eglView->setFrameSize(960, 640);
+	return CCApplication::sharedApplication()->run();
 }

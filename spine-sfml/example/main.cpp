@@ -24,6 +24,7 @@
  ******************************************************************************/
 
 #include <iostream>
+#include <string.h>
 #include <spine/spine-sfml.h>
 #include <SFML/Graphics.hpp>
 
@@ -35,15 +36,13 @@ void spineboy () {
 	// Load atlas, skeleton, and animations.
 	Atlas* atlas = Atlas_readAtlasFile("../data/spineboy.atlas");
 	SkeletonJson* json = SkeletonJson_create(atlas);
-	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "../data/spineboy-skeleton.json");
-	Animation* walkAnimation = SkeletonJson_readAnimationFile(json, "../data/spineboy-walk.json", skeletonData);
-	Animation* jumpAnimation = SkeletonJson_readAnimationFile(json, "../data/spineboy-jump.json", skeletonData);
+	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "../data/spineboy.json");
 	SkeletonJson_dispose(json);
 
 	// Configure mixing.
-	AnimationStateData* stateData = AnimationStateData_create();
-	AnimationStateData_setMix(stateData, walkAnimation, jumpAnimation, 0.4f);
-	AnimationStateData_setMix(stateData, jumpAnimation, walkAnimation, 0.4f);
+	AnimationStateData* stateData = AnimationStateData_create(skeletonData);
+	AnimationStateData_setMixByName(stateData, "walk", "jump", 0.4f);
+	AnimationStateData_setMixByName(stateData, "jump", "walk", 0.4f);
 
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData, stateData);
 	drawable->timeScale = 0.5f;
@@ -57,7 +56,7 @@ void spineboy () {
 	Skeleton_getRootBone(skeleton)->y = 420;
 	Skeleton_updateWorldTransform(skeleton);
 
-	AnimationState_setAnimation(drawable->state, walkAnimation, true);
+	AnimationState_setAnimationByName(drawable->state, "walk", true);
 
 	sf::RenderWindow window(sf::VideoMode(640, 480), "Spine SFML");
 	window.setFramerateLimit(60);
@@ -70,10 +69,10 @@ void spineboy () {
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
-		if (drawable->state->animation == walkAnimation) {
-			if (drawable->state->time > 2) AnimationState_setAnimation(drawable->state, jumpAnimation, false);
+		if (strcmp(drawable->state->animation->name, "walk") == 0) {
+			if (drawable->state->time > 2) AnimationState_setAnimationByName(drawable->state, "jump", false);
 		} else {
-			if (drawable->state->time > 1) AnimationState_setAnimation(drawable->state, walkAnimation, true);
+			if (drawable->state->time > 1) AnimationState_setAnimationByName(drawable->state, "walk", true);
 		}
 
 		drawable->update(delta);
@@ -83,8 +82,6 @@ void spineboy () {
 		window.display();
 	}
 
-	Animation_dispose(walkAnimation);
-	Animation_dispose(jumpAnimation);
 	SkeletonData_dispose(skeletonData);
 	Atlas_dispose(atlas);
 }
@@ -93,8 +90,8 @@ void goblins () {
 	// Load atlas, skeleton, and animations.
 	Atlas* atlas = Atlas_readAtlasFile("../data/goblins.atlas");
 	SkeletonJson* json = SkeletonJson_create(atlas);
-	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "../data/goblins-skeleton.json");
-	Animation* walkAnimation = SkeletonJson_readAnimationFile(json, "../data/goblins-walk.json", skeletonData);
+	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "../data/goblins.json");
+	Animation* walkAnimation = SkeletonData_findAnimation(skeletonData, "walk");
 	SkeletonJson_dispose(json);
 
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
@@ -131,7 +128,6 @@ void goblins () {
 		window.display();
 	}
 
-	Animation_dispose(walkAnimation);
 	SkeletonData_dispose(skeletonData);
 	Atlas_dispose(atlas);
 }

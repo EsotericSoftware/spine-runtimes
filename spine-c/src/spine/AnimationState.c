@@ -70,6 +70,11 @@ void AnimationState_apply (AnimationState* self, Skeleton* skeleton) {
 		Animation_apply(self->animation, skeleton, self->time, self->loop);
 }
 
+void AnimationState_setAnimationByName (AnimationState* self, const char* animationName, int/**/loop) {
+	Animation* animation = SkeletonData_findAnimation(self->data->skeletonData, animationName);
+	AnimationState_setAnimation(self, animation, loop);
+}
+
 void AnimationState_setAnimation (AnimationState* self, Animation* newAnimation, int/**/loop) {
 	_Internal* internal = SUB_CAST(_Internal, self);
 	internal->previous = 0;

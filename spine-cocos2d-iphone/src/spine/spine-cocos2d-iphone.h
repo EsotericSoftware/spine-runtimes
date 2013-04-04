@@ -45,6 +45,11 @@ typedef struct {
 } Cocos2dSkeleton;
 
 @interface CCSkeleton : CCNodeRGBA<CCBlendProtocol> {
+@private
+	bool ownsAtlas;
+	bool ownsSkeleton;
+	bool ownsStateData;
+
 @public
 	Skeleton* skeleton;
 	AnimationState* state;
@@ -57,11 +62,20 @@ typedef struct {
     ccBlendFunc blendFunc;
 }
 
++ (CCSkeleton*) create:(const char*)skeletonDataFile atlas:(Atlas*)atlas;
++ (CCSkeleton*) create:(const char*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale;
+
++ (CCSkeleton*) create:(const char*)skeletonDataFile atlasFile:(const char*)atlasFile;
++ (CCSkeleton*) create:(const char*)skeletonDataFile atlasFile:(const char*)atlasFile scale:(float)scale;
+
 + (CCSkeleton*) create:(SkeletonData*)skeletonData;
 + (CCSkeleton*) create:(SkeletonData*)skeletonData stateData:(AnimationStateData*)stateData;
 
 - init:(SkeletonData*)skeletonData;
 - init:(SkeletonData*)skeletonData stateData:(AnimationStateData*)stateData;
+
+- (void) setMix:(const char*)fromName to:(const char*)toName duration:(float)duration;
+- (void) setAnimation:(const char*)animationName loop:(bool)loop;
 
 @end
 

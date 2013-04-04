@@ -50,9 +50,6 @@ void SkeletonJson_dispose (SkeletonJson* self);
 SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* json);
 SkeletonData* SkeletonJson_readSkeletonDataFile (SkeletonJson* self, const char* path);
 
-Animation* SkeletonJson_readAnimation (SkeletonJson* self, const char* json, const SkeletonData *skeletonData);
-Animation* SkeletonJson_readAnimationFile (SkeletonJson* self, const char* path, const SkeletonData *skeletonData);
-
 #ifdef __cplusplus
 }
 }

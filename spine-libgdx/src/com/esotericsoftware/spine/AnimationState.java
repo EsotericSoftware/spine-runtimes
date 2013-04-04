@@ -60,6 +60,13 @@ public class AnimationState {
 			current.apply(skeleton, currentTime, currentLoop);
 	}
 
+	/** @see #setAnimation(Animation, boolean) */
+	public void setAnimation (String animationName, boolean loop) {
+		Animation animation = data.getSkeletonData().findAnimation(animationName);
+		if (animation == null) throw new IllegalArgumentException("Animation not found: " + animationName);
+		setAnimation(animation, loop);
+	}
+
 	/** Set the current animation. The current animation time is set to 0.
 	 * @param animation May be null. */
 	public void setAnimation (Animation animation, boolean loop) {

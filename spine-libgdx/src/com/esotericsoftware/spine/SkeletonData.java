@@ -33,6 +33,7 @@ public class SkeletonData {
 	final Array<SlotData> slots = new Array(); // Bind pose draw order.
 	final Array<Skin> skins = new Array();
 	Skin defaultSkin;
+	final Array<Animation> animations = new Array();
 
 	public void clear () {
 		bones.clear();
@@ -131,6 +132,28 @@ public class SkeletonData {
 	/** Returns all skins, including the default skin. */
 	public Array<Skin> getSkins () {
 		return skins;
+	}
+
+	// --- Animations.
+
+	public void addAnimation (Animation animation) {
+		if (animation == null) throw new IllegalArgumentException("animation cannot be null.");
+		animations.add(animation);
+	}
+
+	public Array<Animation> getAnimations () {
+		return animations;
+	}
+
+	/** @return May be null. */
+	public Animation findAnimation (String animationName) {
+		if (animationName == null) throw new IllegalArgumentException("animationName cannot be null.");
+		Array<Animation> animations = this.animations;
+		for (int i = 0, n = animations.size; i < n; i++) {
+			Animation animation = animations.get(i);
+			if (animation.name.equals(animationName)) return animation;
+		}
+		return null;
 	}
 
 	// ---

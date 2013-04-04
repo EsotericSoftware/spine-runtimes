@@ -52,6 +52,8 @@ function SkeletonJson.new (attachmentLoader)
 	end
 
 	local readAttachment
+	local readAnimation
+	local readCurve
 
 	function self:readSkeletonData (jsonText)
 		local skeletonData = SkeletonData.new(self.attachmentLoader)
@@ -125,6 +127,13 @@ function SkeletonJson.new (attachmentLoader)
 			end
 		end
 
+		map = root["animations"]
+		if map then
+			for animationName,animationMap in pairs(map) do
+				readAnimation(animationName, animationMap, skeletonData)
+			end
+		end
+
 		return skeletonData
 	end
 
@@ -145,20 +154,11 @@ function SkeletonJson.new (attachmentLoader)
 		return attachment
 	end
 
-	function self:readAnimationFile (skeletonData, fileName, base)
-		return self:readAnimation(skeletonData, utils.readFile(fileName, base))
-	end
-
-	local readCurve
-	
-	function self:readAnimation (skeletonData, jsonText)
+	readAnimation = function (name, map, skeletonData)
 		local timelines = {}
 		local duration = 0
 
-		local root = json.decode(jsonText)
-		if not root then error("Invalid JSON: " .. jsonText, 2) end
-
-		local bonesMap = root["bones"]
+		local bonesMap = map["bones"]
 		for boneName,timelineMap in pairs(bonesMap) do
 			local boneIndex = skeletonData:findBoneIndex(boneName)
 			if boneIndex == -1 then error("Bone not found: " .. boneName) end
@@ -207,7 +207,7 @@ function SkeletonJson.new (attachmentLoader)
 			end
 		end
 
-		local slotsMap = root["slots"]
+		local slotsMap = map["slots"]
 		if slotsMap then
 			for slotName,timelineMap in pairs(slotsMap) do
 				local slotIndex = skeletonData:findSlotIndex(slotName)
@@ -256,7 +256,7 @@ function SkeletonJson.new (attachmentLoader)
 			end
 		end
 
-		return Animation.new(timelines, duration)
+		table.insert(skeletonData.animations, Animation.new(name, timelines, duration))
 	end
 
 	readCurve = function (timeline, keyframeIndex, valueMap)

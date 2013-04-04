@@ -40,7 +40,6 @@ void _Attachment_init (Attachment* self, const char* name, AttachmentType type) 
 void _Attachment_deinit (Attachment* self) {
 	FREE(self->vtable);
 	FREE(self->name);
-	FREE(self);
 }
 
 void Attachment_dispose (Attachment* self) {

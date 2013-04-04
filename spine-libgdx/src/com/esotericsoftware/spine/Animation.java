@@ -30,12 +30,14 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 
 public class Animation {
-	private String name;
+	final String name;
 	private final Array<Timeline> timelines;
 	private float duration;
 
-	public Animation (Array<Timeline> timelines, float duration) {
+	public Animation (String name, Array<Timeline> timelines, float duration) {
+		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		if (timelines == null) throw new IllegalArgumentException("timelines cannot be null.");
+		this.name = name;
 		this.timelines = timelines;
 		this.duration = duration;
 	}
@@ -76,18 +78,12 @@ public class Animation {
 			timelines.get(i).apply(skeleton, time, alpha);
 	}
 
-	/** @return May be null. */
 	public String getName () {
 		return name;
 	}
 
-	/** @param name May be null. */
-	public void setName (String name) {
-		this.name = name;
-	}
-
 	public String toString () {
-		return name != null ? name : super.toString();
+		return name;
 	}
 
 	/** @param target After the first and before the last entry. */

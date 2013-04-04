@@ -26,10 +26,11 @@
 local utils = require "spine.utils"
 
 local Animation = {}
-function Animation.new (timelines, duration)
+function Animation.new (name, timelines, duration)
 	if not timelines then error("timelines cannot be nil", 2) end
 
 	local self = {
+		name = name,
 		timelines = timelines,
 		duration = duration
 	}

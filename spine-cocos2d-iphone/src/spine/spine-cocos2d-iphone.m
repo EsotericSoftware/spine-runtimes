@@ -68,6 +68,41 @@ Skeleton* _Cocos2dSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 
 @implementation CCSkeleton
 
++ (CCSkeleton*) create:(const char*)skeletonDataFile atlas:(Atlas*)atlas {
+	return [CCSkeleton create:skeletonDataFile atlas:atlas scale:1];
+}
+
++ (CCSkeleton*) create:(const char*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale {
+	SkeletonJson* json = SkeletonJson_create(atlas);
+	json->scale = scale;
+	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, skeletonDataFile);
+	SkeletonJson_dispose(json);
+	CCSkeleton* node = skeletonData ? [CCSkeleton create:skeletonData] : 0;
+	node->ownsSkeleton = true;
+	return node;
+}
+
++ (CCSkeleton*) create:(const char*)skeletonDataFile atlasFile:(const char*)atlasFile {
+	return [CCSkeleton create:skeletonDataFile atlasFile:atlasFile scale:1];
+}
+
++ (CCSkeleton*) create:(const char*)skeletonDataFile atlasFile:(const char*)atlasFile scale:(float)scale {
+	Atlas* atlas = Atlas_readAtlasFile(atlasFile);
+	if (!atlas) return 0;
+	SkeletonJson* json = SkeletonJson_create(atlas);
+	json->scale = scale;
+	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, skeletonDataFile);
+	SkeletonJson_dispose(json);
+	if (!skeletonData) {
+		Atlas_dispose(atlas);
+		return 0;
+	}
+	CCSkeleton* node = [CCSkeleton create:skeletonData];
+	node->ownsSkeleton = true;
+	node->ownsAtlas = true;
+	return node;
+}
+
 + (CCSkeleton*) create:(SkeletonData*)skeletonData {
 	return [CCSkeleton create:skeletonData stateData:0];
 }
@@ -85,6 +120,11 @@ Skeleton* _Cocos2dSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 	if (!self) return nil;
 
 	skeleton = _Cocos2dSkeleton_create(skeletonData, self);
+
+	if (!stateData) {
+		stateData = AnimationStateData_create(skeletonData);
+		ownsStateData = true;
+	}
 	state = AnimationState_create(stateData);
 
 	blendFunc.src = GL_ONE;
@@ -100,8 +140,17 @@ Skeleton* _Cocos2dSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 
 - (void) dealloc {
 	Skeleton_dispose(skeleton);
+	if (ownsStateData) AnimationStateData_dispose(state->data);
 	AnimationState_dispose(state);
     [super dealloc];
+}
+
+- (void) setMix:(const char*)fromName to:(const char*)toName duration:(float)duration {
+	AnimationStateData_setMixByName(state->data, fromName, toName, duration);
+}
+
+- (void) setAnimation:(const char*)animationName loop:(bool)loop {
+	AnimationState_setAnimationByName(state, animationName, loop);
 }
 
 - (void) update:(ccTime)deltaTime {

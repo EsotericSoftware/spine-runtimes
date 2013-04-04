@@ -26,27 +26,27 @@
 #ifndef SPINE_ANIMATION_H_
 #define SPINE_ANIMATION_H_
 
-#include <spine/Skeleton.h>
-
 #ifdef __cplusplus
 namespace spine {
 extern "C" {
 #endif
 
 typedef struct Timeline Timeline;
+struct Skeleton;
 
 typedef struct {
+	const char* const name;
+	float duration;
+
 	int timelineCount;
 	Timeline** timelines;
-
-	float duration;
 } Animation;
 
-Animation* Animation_create (int timelineCount);
+Animation* Animation_create (const char* name, int timelineCount);
 void Animation_dispose (Animation* self);
 
-void Animation_apply (const Animation* self, Skeleton* skeleton, float time, int/*bool*/loop);
-void Animation_mix (const Animation* self, Skeleton* skeleton, float time, int/*bool*/loop, float alpha);
+void Animation_apply (const Animation* self, struct Skeleton* skeleton, float time, int/*bool*/loop);
+void Animation_mix (const Animation* self, struct Skeleton* skeleton, float time, int/*bool*/loop, float alpha);
 
 /**/
 
@@ -55,7 +55,7 @@ struct Timeline {
 };
 
 void Timeline_dispose (Timeline* self);
-void Timeline_apply (const Timeline* self, Skeleton* skeleton, float time, float alpha);
+void Timeline_apply (const Timeline* self, struct Skeleton* skeleton, float time, float alpha);
 
 /**/
 

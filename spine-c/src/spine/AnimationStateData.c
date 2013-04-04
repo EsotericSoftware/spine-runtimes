@@ -69,8 +69,10 @@ void _FromEntry_dispose (_FromEntry* self) {
 
 /**/
 
-AnimationStateData* AnimationStateData_create () {
-	return NEW(AnimationStateData);
+AnimationStateData* AnimationStateData_create (SkeletonData* skeletonData) {
+	AnimationStateData* self = NEW(AnimationStateData);
+	CONST_CAST(SkeletonData*, self->skeletonData) = skeletonData;
+	return self;
 }
 
 void AnimationStateData_dispose (AnimationStateData* self) {
@@ -88,6 +90,14 @@ void AnimationStateData_dispose (AnimationStateData* self) {
 	}
 
 	FREE(self);
+}
+
+void AnimationStateData_setMixByName (AnimationStateData* self, const char* fromName, const char* toName, float duration) {
+	Animation* from = SkeletonData_findAnimation(self->skeletonData, fromName);
+	if (!from) return;
+	Animation* to = SkeletonData_findAnimation(self->skeletonData, toName);
+	if (!to) return;
+	AnimationStateData_setMix(self, from, to, duration);
 }
 
 void AnimationStateData_setMix (AnimationStateData* self, Animation* from, Animation* to, float duration) {

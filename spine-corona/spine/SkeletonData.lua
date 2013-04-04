@@ -31,7 +31,8 @@ function SkeletonData.new (attachmentLoader)
 		attachmentLoader = attachmentLoader,
 		bones = {},
 		slots = {},
-		skins = {}
+		skins = {},
+		animations = {}
 	}
 
 	function self:findBone (boneName)
@@ -70,6 +71,14 @@ function SkeletonData.new (attachmentLoader)
 		if not skinName then error("skinName cannot be nil.", 2) end
 		for i,skin in ipairs(self.skins) do
 			if skin.name == skinName then return skin end
+		end
+		return nil
+	end
+
+	function self:findAnimation (animationName)
+		if not animationName then error("animationName cannot be nil.", 2) end
+		for i,animation in ipairs(self.animations) do
+			if animation.name == animationName then return animation end
 		end
 		return nil
 	end

@@ -36,6 +36,23 @@ SkeletonData* SkeletonData_create () {
 }
 
 void SkeletonData_dispose (SkeletonData* self) {
+	int i;
+	for (i = 0; i < self->boneCount; ++i)
+		BoneData_dispose(self->bones[i]);
+	FREE(self->bones);
+
+	for (i = 0; i < self->slotCount; ++i)
+		SlotData_dispose(self->slots[i]);
+	FREE(self->slots);
+
+	for (i = 0; i < self->skinCount; ++i)
+		Skin_dispose(self->skins[i]);
+	FREE(self->skins);
+
+	for (i = 0; i < self->animationCount; ++i)
+		Animation_dispose(self->animations[i]);
+	FREE(self->animations);
+
 	FREE(self);
 }
 
@@ -71,6 +88,13 @@ Skin* SkeletonData_findSkin (const SkeletonData* self, const char* skinName) {
 	int i;
 	for (i = 0; i < self->skinCount; ++i)
 		if (strcmp(self->skins[i]->name, skinName) == 0) return self->skins[i];
+	return 0;
+}
+
+Animation* SkeletonData_findAnimation (const SkeletonData* self, const char* animationName) {
+	int i;
+	for (i = 0; i < self->animationCount; ++i)
+		if (strcmp(self->animations[i]->name, animationName) == 0) return self->animations[i];
 	return 0;
 }
 

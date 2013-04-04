@@ -57,15 +57,13 @@ public class MixTest extends ApplicationAdapter {
 			SkeletonJson json = new SkeletonJson(atlas);
 			// json.setScale(2);
 			skeletonData = json.readSkeletonData(Gdx.files.internal(name + "-skeleton.json"));
-			walkAnimation = json.readAnimation(Gdx.files.internal(name + "-walk.json"), skeletonData);
-			jumpAnimation = json.readAnimation(Gdx.files.internal(name + "-jump.json"), skeletonData);
 		} else {
 			SkeletonBinary binary = new SkeletonBinary(atlas);
 			// binary.setScale(2);
 			skeletonData = binary.readSkeletonData(Gdx.files.internal(name + ".skel"));
-			walkAnimation = binary.readAnimation(Gdx.files.internal(name + "-walk.anim"), skeletonData);
-			jumpAnimation = binary.readAnimation(Gdx.files.internal(name + "-jump.anim"), skeletonData);
 		}
+		walkAnimation = skeletonData.findAnimation("walk");
+		jumpAnimation = skeletonData.findAnimation("jump");
 
 		skeleton = new Skeleton(skeletonData);
 		skeleton.setToBindPose();

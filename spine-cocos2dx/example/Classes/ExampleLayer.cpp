@@ -1,6 +1,7 @@
 #include "ExampleLayer.h"
 #include <iostream>
 #include <fstream>
+#include <string.h>
 
 using namespace cocos2d;
 using namespace spine;
@@ -15,23 +16,10 @@ CCScene* ExampleLayer::scene () {
 bool ExampleLayer::init () {
 	if (!CCLayer::init()) return false;
 
-    // Load atlas, skeleton, and animations.
-	atlas = Atlas_readAtlasFile("spineboy.atlas");
-	SkeletonJson* json = SkeletonJson_create(atlas);
-	json->scale = 0.75;
-	skeletonData = SkeletonJson_readSkeletonDataFile(json, "spineboy-skeleton.json");
-	walkAnimation = SkeletonJson_readAnimationFile(json, "spineboy-walk.json", skeletonData);
-	jumpAnimation = SkeletonJson_readAnimationFile(json, "spineboy-jump.json", skeletonData);
-	SkeletonJson_dispose(json);
-
-	// Configure mixing.
-	AnimationStateData* stateData = AnimationStateData_create();
-	AnimationStateData_setMix(stateData, walkAnimation, jumpAnimation, 0.4f);
-	AnimationStateData_setMix(stateData, jumpAnimation, walkAnimation, 0.4f);
-
-	skeletonNode = CCSkeleton::create(skeletonData, stateData);
-	Skeleton_setToBindPose(skeletonNode->skeleton);
-	AnimationState_setAnimation(skeletonNode->state, walkAnimation, true);
+	skeletonNode = CCSkeleton::create("spineboy.json", "spineboy.atlas");
+	skeletonNode->setMix("walk", "jump", 0.4f);
+	skeletonNode->setMix("jump", "walk", 0.4f);
+	skeletonNode->setAnimation("walk", true);
 	skeletonNode->timeScale = 0.3f;
 	skeletonNode->debugBones = true;
 
@@ -50,17 +38,9 @@ bool ExampleLayer::init () {
 }
 
 void ExampleLayer::update (float deltaTime) {
-    if (skeletonNode->state->animation == walkAnimation) {
-        if (skeletonNode->state->time > 2) AnimationState_setAnimation(skeletonNode->state, jumpAnimation, false);
+    if (strcmp(skeletonNode->state->animation->name, "walk") == 0) {
+        if (skeletonNode->state->time > 2) skeletonNode->setAnimation("jump", false);
     } else {
-        if (skeletonNode->state->time > 1) AnimationState_setAnimation(skeletonNode->state, walkAnimation, true);
+        if (skeletonNode->state->time > 1) skeletonNode->setAnimation("walk", true);
     }
 }
-
-ExampleLayer::~ExampleLayer () {
-	SkeletonData_dispose(skeletonData);
-	Animation_dispose(walkAnimation);
-	Animation_dispose(jumpAnimation);
-	Atlas_dispose(atlas);
-}
-

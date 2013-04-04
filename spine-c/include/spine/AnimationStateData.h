@@ -27,6 +27,7 @@
 #define SPINE_ANIMATIONSTATEDATA_H_
 
 #include <spine/Animation.h>
+#include <spine/SkeletonData.h>
 
 #ifdef __cplusplus
 namespace spine {
@@ -34,12 +35,14 @@ extern "C" {
 #endif
 
 typedef struct {
+	SkeletonData* const skeletonData;
 	const void* const entries;
 } AnimationStateData;
 
-AnimationStateData* AnimationStateData_create ();
+AnimationStateData* AnimationStateData_create (SkeletonData* skeletonData);
 void AnimationStateData_dispose (AnimationStateData* self);
 
+void AnimationStateData_setMixByName (AnimationStateData* self, const char* fromName, const char* toName, float duration);
 void AnimationStateData_setMix (AnimationStateData* self, Animation* from, Animation* to, float duration);
 /* Returns 0 if there is no mixing between the animations. */
 float AnimationStateData_getMix (AnimationStateData* self, Animation* from, Animation* to);

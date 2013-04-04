@@ -31,8 +31,9 @@
 namespace spine {
 #endif
 
-Animation* Animation_create (int timelineCount) {
+Animation* Animation_create (const char* name, int timelineCount) {
 	Animation* self = NEW(Animation);
+	MALLOC_STR(self->name, name);
 	self->timelineCount = timelineCount;
 	self->timelines = MALLOC(Timeline*, timelineCount);
 	return self;

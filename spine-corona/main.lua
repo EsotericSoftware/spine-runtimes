@@ -11,8 +11,8 @@ end
 
 local json = spine.SkeletonJson.new(attachmentLoader)
 json.scale = 1
-local skeletonData = json:readSkeletonDataFile("data/spineboy-skeleton.json")
-local walkAnimation = json:readAnimationFile(skeletonData, "data/spineboy-walk.json")
+local skeletonData = json:readSkeletonDataFile("data/spineboy.json")
+local walkAnimation = skeletonData:findAnimation("walk")
 
 -- Optional second parameter can be the group for the Skeleton to use. Eg, could be an image group.
 local skeleton = spine.Skeleton.new(skeletonData)

@@ -39,8 +39,6 @@ public class AnimationStateTest extends ApplicationAdapter {
 
 	TextureAtlas atlas;
 	Skeleton skeleton;
-	Animation walkAnimation;
-	Animation jumpAnimation;
 	Bone root;
 	AnimationState state;
 
@@ -51,16 +49,14 @@ public class AnimationStateTest extends ApplicationAdapter {
 		atlas = new TextureAtlas(Gdx.files.internal("spineboy.atlas"));
 		SkeletonJson json = new SkeletonJson(atlas);
 		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy-skeleton.json"));
-		walkAnimation = json.readAnimation(Gdx.files.internal("spineboy-walk.json"), skeletonData);
-		jumpAnimation = json.readAnimation(Gdx.files.internal("spineboy-jump.json"), skeletonData);
 
 		// Define mixing between animations.
-		AnimationStateData mixing = new AnimationStateData();
-		mixing.setMix(walkAnimation, jumpAnimation, 0.4f);
-		mixing.setMix(jumpAnimation, walkAnimation, 0.4f);
+		AnimationStateData stateData = new AnimationStateData(skeletonData);
+		stateData.setMix("walk", "jump", 0.4f);
+		stateData.setMix("jump", "walk", 0.4f);
 
-		state = new AnimationState(mixing);
-		state.setAnimation(walkAnimation, true);
+		state = new AnimationState(stateData);
+		state.setAnimation("walk", true);
 
 		skeleton = new Skeleton(skeletonData);
 
@@ -78,11 +74,11 @@ public class AnimationStateTest extends ApplicationAdapter {
 		batch.begin();
 
 		state.apply(skeleton);
-		if (state.getAnimation() == walkAnimation) {
+		if (state.getAnimation().getName().equals("walk")) {
 			// After one second, change the current animation. Mixing is done by AnimationState for you.
-			if (state.getTime() > 2) state.setAnimation(jumpAnimation, false);
+			if (state.getTime() > 2) state.setAnimation("jump", false);
 		} else {
-			if (state.getTime() > 1) state.setAnimation(walkAnimation, true);
+			if (state.getTime() > 1) state.setAnimation("walk", true);
 		}
 		skeleton.updateWorldTransform();
 		skeleton.draw(batch);

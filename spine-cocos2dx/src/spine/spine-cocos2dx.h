@@ -47,6 +47,11 @@ typedef struct {
 } Cocos2dxSkeleton;
 
 class CCSkeleton: public cocos2d::CCNodeRGBA, public cocos2d::CCBlendProtocol {
+private:
+	bool ownsAtlas;
+	bool ownsSkeleton;
+	bool ownsStateData;
+
 public:
 	Skeleton* skeleton;
 	AnimationState* state;
@@ -56,9 +61,15 @@ public:
 	cocos2d::CCTextureAtlas* atlas; // All region attachments for a skeleton must use the same texture.
 	unsigned int quadCount;
 
+	static CCSkeleton* create (const char* skeletonDataFile, Atlas* atlas, float scale = 1);
+	static CCSkeleton* create (const char* skeletonDataFile, const char* atlasFile, float scale = 1);
 	static CCSkeleton* create (SkeletonData* skeletonData, AnimationStateData* stateData = 0);
+
 	CCSkeleton (SkeletonData* skeletonData, AnimationStateData* stateData = 0);
 	virtual ~CCSkeleton ();
+
+	void setMix (const char* fromName, const char* toName, float duration);
+	void setAnimation (const char* animationName, bool loop);
 
 	virtual void update (float deltaTime);
 	virtual void draw ();
