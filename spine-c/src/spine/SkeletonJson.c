@@ -97,7 +97,7 @@ static void readCurve (CurveTimeline* timeline, int frameIndex, Json* frame) {
 
 static Animation* _SkeletonJson_readAnimation (SkeletonJson* self, Json* root, SkeletonData *skeletonData) {
 	Json* bones = Json_getItem(root, "bones");
-	int boneCount = Json_getSize(bones);
+	int boneCount = bones ? Json_getSize(bones) : 0;
 
 	Json* slots = Json_getItem(root, "slots");
 	int slotCount = slots ? Json_getSize(slots) : 0;
@@ -167,56 +167,54 @@ static Animation* _SkeletonJson_readAnimation (SkeletonJson* self, Json* root, S
 		}
 	}
 
-	if (slots) {
-		for (i = 0; i < slotCount; ++i) {
-			Json* slotMap = Json_getItemAt(slots, i);
-			const char* slotName = slotMap->name;
+	for (i = 0; i < slotCount; ++i) {
+		Json* slotMap = Json_getItemAt(slots, i);
+		const char* slotName = slotMap->name;
 
-			int slotIndex = SkeletonData_findSlotIndex(skeletonData, slotName);
-			if (slotIndex == -1) {
-				Animation_dispose(animation);
-				_SkeletonJson_setError(self, root, "Slot not found: ", slotName);
-				return 0;
-			}
+		int slotIndex = SkeletonData_findSlotIndex(skeletonData, slotName);
+		if (slotIndex == -1) {
+			Animation_dispose(animation);
+			_SkeletonJson_setError(self, root, "Slot not found: ", slotName);
+			return 0;
+		}
 
-			int timelineCount = Json_getSize(slotMap);
-			for (ii = 0; ii < timelineCount; ++ii) {
-				Json* timelineArray = Json_getItemAt(slotMap, ii);
-				int frameCount = Json_getSize(timelineArray);
-				const char* timelineType = timelineArray->name;
+		int timelineCount = Json_getSize(slotMap);
+		for (ii = 0; ii < timelineCount; ++ii) {
+			Json* timelineArray = Json_getItemAt(slotMap, ii);
+			int frameCount = Json_getSize(timelineArray);
+			const char* timelineType = timelineArray->name;
 
-				if (strcmp(timelineType, "color") == 0) {
-					ColorTimeline *timeline = ColorTimeline_create(frameCount);
-					timeline->slotIndex = slotIndex;
-					for (iii = 0; iii < frameCount; ++iii) {
-						Json* frame = Json_getItemAt(timelineArray, iii);
-						const char* s = Json_getString(frame, "color", 0);
-						ColorTimeline_setFrame(timeline, iii, Json_getFloat(frame, "time", 0), toColor(s, 0), toColor(s, 1),
-								toColor(s, 2), toColor(s, 3));
-						readCurve(SUPER(timeline), iii, frame);
-					}
-					animation->timelines[animation->timelineCount++] = (Timeline*)timeline;
-					float duration = timeline->frames[frameCount * 5 - 5];
-					if (duration > animation->duration) animation->duration = duration;
-
-				} else if (strcmp(timelineType, "attachment") == 0) {
-					AttachmentTimeline *timeline = AttachmentTimeline_create(frameCount);
-					timeline->slotIndex = slotIndex;
-					for (iii = 0; iii < frameCount; ++iii) {
-						Json* frame = Json_getItemAt(timelineArray, iii);
-						Json* name = Json_getItem(frame, "name");
-						AttachmentTimeline_setFrame(timeline, iii, Json_getFloat(frame, "time", 0),
-								name->type == Json_NULL ? 0 : name->valuestring);
-					}
-					animation->timelines[animation->timelineCount++] = (Timeline*)timeline;
-					float duration = timeline->frames[frameCount - 1];
-					if (duration > animation->duration) animation->duration = duration;
-
-				} else {
-					Animation_dispose(animation);
-					_SkeletonJson_setError(self, 0, "Invalid timeline type for a slot: ", timelineType);
-					return 0;
+			if (strcmp(timelineType, "color") == 0) {
+				ColorTimeline *timeline = ColorTimeline_create(frameCount);
+				timeline->slotIndex = slotIndex;
+				for (iii = 0; iii < frameCount; ++iii) {
+					Json* frame = Json_getItemAt(timelineArray, iii);
+					const char* s = Json_getString(frame, "color", 0);
+					ColorTimeline_setFrame(timeline, iii, Json_getFloat(frame, "time", 0), toColor(s, 0), toColor(s, 1), toColor(s, 2),
+							toColor(s, 3));
+					readCurve(SUPER(timeline), iii, frame);
 				}
+				animation->timelines[animation->timelineCount++] = (Timeline*)timeline;
+				float duration = timeline->frames[frameCount * 5 - 5];
+				if (duration > animation->duration) animation->duration = duration;
+
+			} else if (strcmp(timelineType, "attachment") == 0) {
+				AttachmentTimeline *timeline = AttachmentTimeline_create(frameCount);
+				timeline->slotIndex = slotIndex;
+				for (iii = 0; iii < frameCount; ++iii) {
+					Json* frame = Json_getItemAt(timelineArray, iii);
+					Json* name = Json_getItem(frame, "name");
+					AttachmentTimeline_setFrame(timeline, iii, Json_getFloat(frame, "time", 0),
+							name->type == Json_NULL ? 0 : name->valuestring);
+				}
+				animation->timelines[animation->timelineCount++] = (Timeline*)timeline;
+				float duration = timeline->frames[frameCount - 1];
+				if (duration > animation->duration) animation->duration = duration;
+
+			} else {
+				Animation_dispose(animation);
+				_SkeletonJson_setError(self, 0, "Invalid timeline type for a slot: ", timelineType);
+				return 0;
 			}
 		}
 	}
