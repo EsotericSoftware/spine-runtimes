@@ -29,6 +29,11 @@
 #include <spine/spine.h>
 #include "cocos2d.h"
 
+#ifdef __cplusplus
+namespace spine {
+extern "C" {
+#endif
+
 typedef struct {
 	AtlasPage super;
 	CCTexture2D* texture;
@@ -115,5 +120,10 @@ typedef struct {
 	ccV3F_C4B_T2F_Quad quad;
 	CCTextureAtlas* atlas;
 } Cocos2dRegionAttachment;
+
+#ifdef __cplusplus
+}
+}
+#endif
 
 #endif /* SPINE_COCOS2D_H_ */

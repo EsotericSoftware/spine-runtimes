@@ -26,6 +26,10 @@
 #include <spine/spine-cocos2d-iphone.h>
 #include <spine/extension.h>
 
+#ifdef __cplusplus
+namespace spine {
+#endif
+
 void _Cocos2dAtlasPage_dispose (AtlasPage* page) {
 	Cocos2dAtlasPage* self = SUB_CAST(Cocos2dAtlasPage, page);
 	_AtlasPage_deinit(SUPER(self));
@@ -373,3 +377,7 @@ RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region
 char* _Util_readFile (const char* path, int* length) {
 	return _readFile([[[CCFileUtils sharedFileUtils] fullPathForFilename:@(path)] UTF8String], length);
 }
+
+#ifdef __cplusplus
+}
+#endif
