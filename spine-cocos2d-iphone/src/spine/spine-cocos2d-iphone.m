@@ -73,9 +73,12 @@ Skeleton* _Cocos2dSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 }
 
 + (CCSkeleton*) create:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale {
+	NSAssert(skeletonDataFile, @"skeletonDataFile cannot be nil.");
+	NSAssert(atlas, @"atlas cannot be nil.");
 	SkeletonJson* json = SkeletonJson_create(atlas);
 	json->scale = scale;
 	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, [skeletonDataFile UTF8String]);
+	NSAssert(skeletonData, ([NSString stringWithFormat:@"Error reading skeleton data file: %@\nError: %s", skeletonDataFile, json->error]));
 	SkeletonJson_dispose(json);
 	CCSkeleton* node = skeletonData ? [CCSkeleton create:skeletonData] : 0;
 	node->ownsSkeleton = true;
@@ -87,11 +90,15 @@ Skeleton* _Cocos2dSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 }
 
 + (CCSkeleton*) create:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile scale:(float)scale {
+	NSAssert(skeletonDataFile, @"skeletonDataFile cannot be nil.");
+	NSAssert(atlasFile, @"atlasFile cannot be nil.");
 	Atlas* atlas = Atlas_readAtlasFile([atlasFile UTF8String]);
+	NSAssert(atlas, ([NSString stringWithFormat:@"Error reading atlas file: %@", atlasFile]));
 	if (!atlas) return 0;
 	SkeletonJson* json = SkeletonJson_create(atlas);
 	json->scale = scale;
 	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, [skeletonDataFile UTF8String]);
+	NSAssert(skeletonData, ([NSString stringWithFormat:@"Error reading skeleton data file: %@\nError: %s", skeletonDataFile, json->error]));
 	SkeletonJson_dispose(json);
 	if (!skeletonData) {
 		Atlas_dispose(atlas);
@@ -116,6 +123,8 @@ Skeleton* _Cocos2dSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 }
 
 - (id) init:(SkeletonData*)skeletonData stateData:(AnimationStateData*)stateData {
+	NSAssert(skeletonData, @"skeletonData cannot be nil.");
+
 	self = [super init];
 	if (!self) return nil;
 
