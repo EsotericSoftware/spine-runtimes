@@ -52,8 +52,8 @@ void spineboy () {
 	skeleton->flipY = false;
 	Skeleton_setToBindPose(skeleton);
 
-	Skeleton_getRootBone(skeleton)->x = 320;
-	Skeleton_getRootBone(skeleton)->y = 420;
+	skeleton->root->x = 320;
+	skeleton->root->y = 420;
 	Skeleton_updateWorldTransform(skeleton);
 
 	AnimationState_setAnimationByName(drawable->state, "walk", true);
@@ -104,8 +104,8 @@ void goblins () {
 	Skeleton_setSlotsToBindPose(skeleton);
 	Skeleton_setAttachment(skeleton, "left hand item", "dagger");
 
-	Skeleton_getRootBone(skeleton)->x = 320;
-	Skeleton_getRootBone(skeleton)->y = 420;
+	skeleton->root->x = 320;
+	skeleton->root->y = 420;
 	Skeleton_updateWorldTransform(skeleton);
 
 	AnimationState_setAnimation(drawable->state, walkAnimation, true);
