@@ -195,54 +195,56 @@ public class SkeletonJson {
 		float duration = 0;
 
 		OrderedMap<String, ?> bonesMap = (OrderedMap)map.get("bones");
-		for (Entry<String, ?> entry : bonesMap.entries()) {
-			String boneName = entry.key;
-			int boneIndex = skeletonData.findBoneIndex(boneName);
-			if (boneIndex == -1) throw new SerializationException("Bone not found: " + boneName);
+		if (bonesMap != null) {
+			for (Entry<String, ?> entry : bonesMap.entries()) {
+				String boneName = entry.key;
+				int boneIndex = skeletonData.findBoneIndex(boneName);
+				if (boneIndex == -1) throw new SerializationException("Bone not found: " + boneName);
 
-			OrderedMap<?, ?> timelineMap = (OrderedMap)entry.value;
-			for (Entry timelineEntry : timelineMap.entries()) {
-				Array<OrderedMap> values = (Array)timelineEntry.value;
-				String timelineName = (String)timelineEntry.key;
-				if (timelineName.equals(TIMELINE_ROTATE)) {
-					RotateTimeline timeline = new RotateTimeline(values.size);
-					timeline.setBoneIndex(boneIndex);
+				OrderedMap<?, ?> timelineMap = (OrderedMap)entry.value;
+				for (Entry timelineEntry : timelineMap.entries()) {
+					Array<OrderedMap> values = (Array)timelineEntry.value;
+					String timelineName = (String)timelineEntry.key;
+					if (timelineName.equals(TIMELINE_ROTATE)) {
+						RotateTimeline timeline = new RotateTimeline(values.size);
+						timeline.setBoneIndex(boneIndex);
 
-					int keyframeIndex = 0;
-					for (OrderedMap valueMap : values) {
-						float time = (Float)valueMap.get("time");
-						timeline.setFrame(keyframeIndex, time, (Float)valueMap.get("angle"));
-						readCurve(timeline, keyframeIndex, valueMap);
-						keyframeIndex++;
-					}
-					timelines.add(timeline);
-					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 2 - 2]);
+						int keyframeIndex = 0;
+						for (OrderedMap valueMap : values) {
+							float time = (Float)valueMap.get("time");
+							timeline.setFrame(keyframeIndex, time, (Float)valueMap.get("angle"));
+							readCurve(timeline, keyframeIndex, valueMap);
+							keyframeIndex++;
+						}
+						timelines.add(timeline);
+						duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 2 - 2]);
 
-				} else if (timelineName.equals(TIMELINE_TRANSLATE) || timelineName.equals(TIMELINE_SCALE)) {
-					TranslateTimeline timeline;
-					float timelineScale = 1;
-					if (timelineName.equals(TIMELINE_SCALE))
-						timeline = new ScaleTimeline(values.size);
-					else {
-						timeline = new TranslateTimeline(values.size);
-						timelineScale = scale;
-					}
-					timeline.setBoneIndex(boneIndex);
+					} else if (timelineName.equals(TIMELINE_TRANSLATE) || timelineName.equals(TIMELINE_SCALE)) {
+						TranslateTimeline timeline;
+						float timelineScale = 1;
+						if (timelineName.equals(TIMELINE_SCALE))
+							timeline = new ScaleTimeline(values.size);
+						else {
+							timeline = new TranslateTimeline(values.size);
+							timelineScale = scale;
+						}
+						timeline.setBoneIndex(boneIndex);
 
-					int keyframeIndex = 0;
-					for (OrderedMap valueMap : values) {
-						float time = (Float)valueMap.get("time");
-						Float x = (Float)valueMap.get("x"), y = (Float)valueMap.get("y");
-						timeline
-							.setFrame(keyframeIndex, time, x == null ? 0 : (x * timelineScale), y == null ? 0 : (y * timelineScale));
-						readCurve(timeline, keyframeIndex, valueMap);
-						keyframeIndex++;
-					}
-					timelines.add(timeline);
-					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 3 - 3]);
+						int keyframeIndex = 0;
+						for (OrderedMap valueMap : values) {
+							float time = (Float)valueMap.get("time");
+							Float x = (Float)valueMap.get("x"), y = (Float)valueMap.get("y");
+							timeline.setFrame(keyframeIndex, time, x == null ? 0 : (x * timelineScale), y == null ? 0
+								: (y * timelineScale));
+							readCurve(timeline, keyframeIndex, valueMap);
+							keyframeIndex++;
+						}
+						timelines.add(timeline);
+						duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 3 - 3]);
 
-				} else
-					throw new RuntimeException("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
+					} else
+						throw new RuntimeException("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
+				}
 			}
 		}
 
