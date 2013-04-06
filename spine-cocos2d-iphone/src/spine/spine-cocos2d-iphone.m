@@ -35,7 +35,7 @@ void _Cocos2dAtlasPage_dispose (AtlasPage* page) {
 	_AtlasPage_deinit(SUPER(self));
 
 	[self->texture release];
-	[self->atlas release];
+	[self->textureAtlas release];
 
 	FREE(page);
 }
@@ -47,8 +47,8 @@ AtlasPage* AtlasPage_create (const char* name, const char* path) {
 
 	self->texture = [[CCTextureCache sharedTextureCache] addImage:@(path)];
 	[self->texture retain];
-	self->atlas = [[CCTextureAtlas alloc] initWithTexture:self->texture capacity:4];
-	[self->atlas retain];
+	self->textureAtlas = [[CCTextureAtlas alloc] initWithTexture:self->texture capacity:4];
+	[self->textureAtlas retain];
 
 	return SUPER(self);
 }
@@ -114,11 +114,11 @@ void _Cocos2dRegionAttachment_draw (Attachment* attachment, Slot* slot) {
 	quad->br.vertices.y = offset[6] * slot->bone->m10 + offset[7] * slot->bone->m11 + slot->bone->worldY;
 
 	// Cocos2d doesn't handle batching for us, so we'll just force a single texture per skeleton.
-	skeleton->node->atlas = self->atlas;
-	if (self->atlas.capacity <= skeleton->node->quadCount) {
-		if (![self->atlas resizeCapacity:self->atlas.capacity * 2]) return;
+	skeleton->node->textureAtlas = self->textureAtlas;
+	if (self->textureAtlas.capacity <= skeleton->node->quadCount) {
+		if (![self->textureAtlas resizeCapacity:self->textureAtlas.capacity * 2]) return;
 	}
-	[self->atlas updateQuad:quad atIndex:skeleton->node->quadCount++];
+	[self->textureAtlas updateQuad:quad atIndex:skeleton->node->quadCount++];
 }
 
 RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region) {
@@ -128,7 +128,7 @@ RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region
 	VTABLE(Attachment, self) ->draw = _Cocos2dRegionAttachment_draw;
 
 	Cocos2dAtlasPage* page = SUB_CAST(Cocos2dAtlasPage, region->page);
-	self->atlas = page->atlas;
+	self->textureAtlas = page->textureAtlas;
 	CGSize size = page->texture.contentSizeInPixels;
 	float u = region->x / size.width;
 	float u2 = (region->x + region->width) / size.width;
@@ -216,6 +216,7 @@ char* _Util_readFile (const char* path, int* length) {
 	CCSkeleton* node = [CCSkeleton create:skeletonData];
 	node->ownsSkeleton = true;
 	node->ownsAtlas = true;
+	node->atlas = atlas;
 	return node;
 }
 
@@ -248,8 +249,8 @@ char* _Util_readFile (const char* path, int* length) {
 	blendFunc.src = GL_ONE;
 	blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
 
-    timeScale = 1;
-    
+	timeScale = 1;
+
 	[self setShaderProgram:[[CCShaderCache sharedShaderCache] programForKey:kCCShader_PositionTextureColor]];
 	[self scheduleUpdate];
 
@@ -257,10 +258,11 @@ char* _Util_readFile (const char* path, int* length) {
 }
 
 - (void) dealloc {
-	Skeleton_dispose(skeleton);
+	if (ownsSkeleton) Skeleton_dispose(skeleton);
 	if (ownsStateData) AnimationStateData_dispose(state->data);
+	if (ownsAtlas) Atlas_dispose(atlas);
 	AnimationState_dispose(state);
-    [super dealloc];
+	[super dealloc];
 }
 
 - (void) update:(ccTime)deltaTime {
@@ -283,7 +285,7 @@ char* _Util_readFile (const char* path, int* length) {
 	quadCount = 0;
 	for (int i = 0, n = skeleton->slotCount; i < n; i++)
 		if (skeleton->slots[i]->attachment) Attachment_draw(skeleton->slots[i]->attachment, skeleton->slots[i]);
-	if (atlas) [atlas drawNumberOfQuads:quadCount];
+	if (textureAtlas) [textureAtlas drawNumberOfQuads:quadCount];
 
 	if (debugSlots) {
 		// Slots.
@@ -375,11 +377,11 @@ char* _Util_readFile (const char* path, int* length) {
 // CCBlendProtocol
 
 - (void) setBlendFunc:(ccBlendFunc)func {
-    self.blendFunc = func;
+	self.blendFunc = func;
 }
 
 - (ccBlendFunc) blendFunc {
-    return blendFunc;
+	return blendFunc;
 }
 
 @end

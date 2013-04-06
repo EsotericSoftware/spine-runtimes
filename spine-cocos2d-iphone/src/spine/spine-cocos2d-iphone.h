@@ -29,6 +29,8 @@
 #include <spine/spine.h>
 #include "cocos2d.h"
 
+@class CCSkeleton;
+
 #ifdef __cplusplus
 namespace spine {
 extern "C" {
@@ -37,12 +39,10 @@ extern "C" {
 typedef struct {
 	AtlasPage super;
 	CCTexture2D* texture;
-	CCTextureAtlas* atlas;
+	CCTextureAtlas* textureAtlas;
 } Cocos2dAtlasPage;
 
 /**/
-
-@class CCSkeleton;
 
 typedef struct {
 	Skeleton super;
@@ -54,12 +54,13 @@ typedef struct {
 typedef struct {
 	RegionAttachment super;
 	ccV3F_C4B_T2F_Quad quad;
-	CCTextureAtlas* atlas;
+	CCTextureAtlas* textureAtlas;
 } Cocos2dRegionAttachment;
 
 #ifdef __cplusplus
 }
 }
+using namespace spine;
 #endif
 
 /**/
@@ -69,6 +70,7 @@ typedef struct {
 	bool ownsAtlas;
 	bool ownsSkeleton;
 	bool ownsStateData;
+	Atlas* atlas;
 
 @public
 	Skeleton* const skeleton;
@@ -77,7 +79,7 @@ typedef struct {
 	bool debugSlots;
 	bool debugBones;
 
-	CCTextureAtlas* atlas; // All region attachments for a skeleton must use the same texture.
+	CCTextureAtlas* textureAtlas; // All region attachments for a skeleton must use the same texture.
 	unsigned int quadCount;
 
     ccBlendFunc blendFunc;

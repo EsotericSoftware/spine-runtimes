@@ -25,7 +25,7 @@
 	[self addChild:skeletonNode];
 
 	[self scheduleUpdate];
-	
+
 	return self;
 }
 
