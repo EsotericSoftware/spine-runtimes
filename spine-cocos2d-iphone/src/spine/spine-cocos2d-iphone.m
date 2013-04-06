@@ -215,7 +215,6 @@ char* _Util_readFile (const char* path, int* length) {
 	}
 	CCSkeleton* node = [CCSkeleton create:skeletonData];
 	node->ownsSkeleton = true;
-	node->ownsAtlas = true;
 	node->atlas = atlas;
 	return node;
 }
@@ -260,7 +259,7 @@ char* _Util_readFile (const char* path, int* length) {
 - (void) dealloc {
 	if (ownsSkeleton) Skeleton_dispose(skeleton);
 	if (ownsStateData) AnimationStateData_dispose(state->data);
-	if (ownsAtlas) Atlas_dispose(atlas);
+	if (atlas) Atlas_dispose(atlas);
 	AnimationState_dispose(state);
 	[super dealloc];
 }

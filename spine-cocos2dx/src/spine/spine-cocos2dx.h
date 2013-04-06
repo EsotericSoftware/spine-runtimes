@@ -34,7 +34,7 @@ namespace spine {
 typedef struct {
 	AtlasPage super;
 	cocos2d::CCTexture2D* texture;
-	cocos2d::CCTextureAtlas* atlas;
+	cocos2d::CCTextureAtlas* textureAtlas;
 } Cocos2dxAtlasPage;
 
 /**/
@@ -48,9 +48,9 @@ typedef struct {
 
 class CCSkeleton: public cocos2d::CCNodeRGBA, public cocos2d::CCBlendProtocol {
 private:
-	bool ownsAtlas;
 	bool ownsSkeleton;
 	bool ownsStateData;
+	Atlas* atlas;
 
 public:
 	Skeleton* const skeleton;
@@ -59,7 +59,7 @@ public:
 	bool debugSlots;
 	bool debugBones;
 
-	cocos2d::CCTextureAtlas* atlas; // All region attachments for a skeleton must use the same texture.
+	cocos2d::CCTextureAtlas* textureAtlas; // All region attachments for a skeleton must use the same texture.
 	unsigned int quadCount;
 
 	static CCSkeleton* create (const char* skeletonDataFile, Atlas* atlas, float scale = 1);
@@ -112,7 +112,7 @@ public:
 typedef struct {
 	RegionAttachment super;
 	cocos2d::ccV3F_C4B_T2F_Quad quad;
-	cocos2d::CCTextureAtlas* atlas;
+	cocos2d::CCTextureAtlas* textureAtlas;
 } Cocos2dxRegionAttachment;
 
 }

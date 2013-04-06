@@ -67,7 +67,6 @@ using namespace spine;
 
 @interface CCSkeleton : CCNodeRGBA<CCBlendProtocol> {
 @private
-	bool ownsAtlas;
 	bool ownsSkeleton;
 	bool ownsStateData;
 	Atlas* atlas;

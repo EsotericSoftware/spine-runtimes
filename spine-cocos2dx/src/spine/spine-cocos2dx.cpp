@@ -34,7 +34,7 @@ void _Cocos2dxAtlasPage_dispose (AtlasPage* page) {
 	_AtlasPage_deinit(SUPER(self));
 
 	CC_SAFE_RELEASE_NULL(self->texture);
-	CC_SAFE_RELEASE_NULL(self->atlas);
+	CC_SAFE_RELEASE_NULL(self->textureAtlas);
 
 	FREE(page);
 }
@@ -46,8 +46,8 @@ AtlasPage* AtlasPage_create (const char* name, const char* path) {
 
 	self->texture = CCTextureCache::sharedTextureCache()->addImage(path);
 	self->texture->retain();
-	self->atlas = CCTextureAtlas::createWithTexture(self->texture, 4);
-	self->atlas->retain();
+	self->textureAtlas = CCTextureAtlas::createWithTexture(self->texture, 4);
+	self->textureAtlas->retain();
 
 	return SUPER(self);
 }
@@ -92,7 +92,7 @@ CCSkeleton* CCSkeleton::create (const char* skeletonDataFile, const char* atlasF
 	}
 	CCSkeleton* node = create(skeletonData);
 	node->ownsSkeleton = true;
-	node->ownsAtlas = true;
+	node->atlas = atlas;
 	return node;
 }
 
@@ -122,8 +122,9 @@ CCSkeleton::CCSkeleton (SkeletonData *skeletonData, AnimationStateData *stateDat
 }
 
 CCSkeleton::~CCSkeleton () {
-	Skeleton_dispose(skeleton);
+	if (ownsSkeleton) Skeleton_dispose(skeleton);
 	if (ownsStateData) AnimationStateData_dispose(state->data);
+	if (atlas) Atlas_dispose(atlas);
 	AnimationState_dispose(state);
 }
 
@@ -147,7 +148,7 @@ void CCSkeleton::draw () {
 	quadCount = 0;
 	for (int i = 0, n = skeleton->slotCount; i < n; i++)
 		if (skeleton->slots[i]->attachment) Attachment_draw(skeleton->slots[i]->attachment, skeleton->slots[i]);
-	if (atlas) atlas->drawNumberOfQuads(quadCount);
+	if (textureAtlas) textureAtlas->drawNumberOfQuads(quadCount);
 
 	if (debugSlots) {
 		// Slots.
@@ -224,7 +225,7 @@ int CCSkeleton::findSlotIndex (const char* slotName) const {
 }
 
 bool CCSkeleton::setSkin (const char* skinName) {
-	return (bool)Skeleton_setSkinByName(skeleton, skinName);
+	return Skeleton_setSkinByName(skeleton, skinName) ? true : false;
 }
 
 Attachment* CCSkeleton::getAttachment (const char* slotName, const char* attachmentName) const {
@@ -234,7 +235,7 @@ Attachment* CCSkeleton::getAttachment (int slotIndex, const char* attachmentName
 	return Skeleton_getAttachmentForSlotIndex(skeleton, slotIndex, attachmentName);
 }
 bool CCSkeleton::setAttachment (const char* slotName, const char* attachmentName) {
-	return (bool)Skeleton_setAttachment(skeleton, slotName, attachmentName);
+	return Skeleton_setAttachment(skeleton, slotName, attachmentName) ? true : false;
 }
 
 // CCBlendProtocol
@@ -291,11 +292,11 @@ void _Cocos2dxRegionAttachment_draw (Attachment* attachment, Slot* slot) {
 	quad->br.vertices.y = offset[6] * slot->bone->m10 + offset[7] * slot->bone->m11 + slot->bone->worldY;
 
 	// cocos2dx doesn't handle batching for us, so we'll just force a single texture per skeleton.
-	skeleton->node->atlas = self->atlas;
-	if (self->atlas->getCapacity() <= skeleton->node->quadCount) {
-		if (!self->atlas->resizeCapacity(self->atlas->getCapacity() * 2)) return;
+	skeleton->node->textureAtlas = self->textureAtlas;
+	if (self->textureAtlas->getCapacity() <= skeleton->node->quadCount) {
+		if (!self->textureAtlas->resizeCapacity(self->textureAtlas->getCapacity() * 2)) return;
 	}
-	self->atlas->updateQuad(quad, skeleton->node->quadCount++);
+	self->textureAtlas->updateQuad(quad, skeleton->node->quadCount++);
 }
 
 RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region) {
@@ -305,7 +306,7 @@ RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region
 	VTABLE(Attachment, self) ->draw = _Cocos2dxRegionAttachment_draw;
 
 	Cocos2dxAtlasPage* page = SUB_CAST(Cocos2dxAtlasPage, region->page);
-	self->atlas = page->atlas;
+	self->textureAtlas = page->textureAtlas;
 	const CCSize& size = page->texture->getContentSizeInPixels();
 	float u = region->x / size.width;
 	float u2 = (region->x + region->width) / size.width;
