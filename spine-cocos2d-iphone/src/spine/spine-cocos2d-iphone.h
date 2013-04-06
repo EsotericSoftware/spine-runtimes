@@ -49,6 +49,21 @@ typedef struct {
 	CCSkeleton* node;
 } Cocos2dSkeleton;
 
+/**/
+
+typedef struct {
+	RegionAttachment super;
+	ccV3F_C4B_T2F_Quad quad;
+	CCTextureAtlas* atlas;
+} Cocos2dRegionAttachment;
+
+#ifdef __cplusplus
+}
+}
+#endif
+
+/**/
+
 @interface CCSkeleton : CCNodeRGBA<CCBlendProtocol> {
 @private
 	bool ownsAtlas;
@@ -112,18 +127,5 @@ typedef struct {
 - (bool) setAttachment:(NSString*)slotName attachmentName:(NSString*)attachmentName;
 
 @end
-
-/**/
-
-typedef struct {
-	RegionAttachment super;
-	ccV3F_C4B_T2F_Quad quad;
-	CCTextureAtlas* atlas;
-} Cocos2dRegionAttachment;
-
-#ifdef __cplusplus
-}
-}
-#endif
 
 #endif /* SPINE_COCOS2D_H_ */

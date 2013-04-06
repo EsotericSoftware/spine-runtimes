@@ -70,6 +70,111 @@ Skeleton* _Cocos2dSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 	return SUPER(self);
 }
 
+/**/
+
+void _Cocos2dRegionAttachment_dispose (Attachment* self) {
+	_RegionAttachment_deinit(SUB_CAST(RegionAttachment, self) );
+	FREE(self);
+}
+
+void _Cocos2dRegionAttachment_draw (Attachment* attachment, Slot* slot) {
+	Cocos2dRegionAttachment* self = SUB_CAST(Cocos2dRegionAttachment, attachment);
+	Cocos2dSkeleton* skeleton = SUB_CAST(Cocos2dSkeleton, slot->skeleton);
+
+	GLubyte r = SUPER(skeleton)->r * slot->r * 255;
+	GLubyte g = SUPER(skeleton)->g * slot->g * 255;
+	GLubyte b = SUPER(skeleton)->b * slot->b * 255;
+	GLubyte a = SUPER(skeleton)->a * slot->a * 255;
+	ccV3F_C4B_T2F_Quad* quad = &self->quad;
+	quad->bl.colors.r = r;
+	quad->bl.colors.g = g;
+	quad->bl.colors.b = b;
+	quad->bl.colors.a = a;
+	quad->tl.colors.r = r;
+	quad->tl.colors.g = g;
+	quad->tl.colors.b = b;
+	quad->tl.colors.a = a;
+	quad->tr.colors.r = r;
+	quad->tr.colors.g = g;
+	quad->tr.colors.b = b;
+	quad->tr.colors.a = a;
+	quad->br.colors.r = r;
+	quad->br.colors.g = g;
+	quad->br.colors.b = b;
+	quad->br.colors.a = a;
+
+	float* offset = SUPER(self)->offset;
+	quad->bl.vertices.x = offset[0] * slot->bone->m00 + offset[1] * slot->bone->m01 + slot->bone->worldX;
+	quad->bl.vertices.y = offset[0] * slot->bone->m10 + offset[1] * slot->bone->m11 + slot->bone->worldY;
+	quad->tl.vertices.x = offset[2] * slot->bone->m00 + offset[3] * slot->bone->m01 + slot->bone->worldX;
+	quad->tl.vertices.y = offset[2] * slot->bone->m10 + offset[3] * slot->bone->m11 + slot->bone->worldY;
+	quad->tr.vertices.x = offset[4] * slot->bone->m00 + offset[5] * slot->bone->m01 + slot->bone->worldX;
+	quad->tr.vertices.y = offset[4] * slot->bone->m10 + offset[5] * slot->bone->m11 + slot->bone->worldY;
+	quad->br.vertices.x = offset[6] * slot->bone->m00 + offset[7] * slot->bone->m01 + slot->bone->worldX;
+	quad->br.vertices.y = offset[6] * slot->bone->m10 + offset[7] * slot->bone->m11 + slot->bone->worldY;
+
+	// Cocos2d doesn't handle batching for us, so we'll just force a single texture per skeleton.
+	skeleton->node->atlas = self->atlas;
+	if (self->atlas.capacity <= skeleton->node->quadCount) {
+		if (![self->atlas resizeCapacity:self->atlas.capacity * 2]) return;
+	}
+	[self->atlas updateQuad:quad atIndex:skeleton->node->quadCount++];
+}
+
+RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region) {
+	Cocos2dRegionAttachment* self = NEW(Cocos2dRegionAttachment);
+	_RegionAttachment_init(SUPER(self), name);
+	VTABLE(Attachment, self) ->dispose = _Cocos2dRegionAttachment_dispose;
+	VTABLE(Attachment, self) ->draw = _Cocos2dRegionAttachment_draw;
+
+	Cocos2dAtlasPage* page = SUB_CAST(Cocos2dAtlasPage, region->page);
+	self->atlas = page->atlas;
+	CGSize size = page->texture.contentSizeInPixels;
+	float u = region->x / size.width;
+	float u2 = (region->x + region->width) / size.width;
+	float v = region->y / size.height;
+	float v2 = (region->y + region->height) / size.height;
+	ccV3F_C4B_T2F_Quad* quad = &self->quad;
+	if (region->rotate) {
+		quad->tl.texCoords.u = u;
+		quad->tl.texCoords.v = v2;
+		quad->tr.texCoords.u = u;
+		quad->tr.texCoords.v = v;
+		quad->br.texCoords.u = u2;
+		quad->br.texCoords.v = v;
+		quad->bl.texCoords.u = u2;
+		quad->bl.texCoords.v = v2;
+	} else {
+		quad->bl.texCoords.u = u;
+		quad->bl.texCoords.v = v2;
+		quad->tl.texCoords.u = u;
+		quad->tl.texCoords.v = v;
+		quad->tr.texCoords.u = u2;
+		quad->tr.texCoords.v = v;
+		quad->br.texCoords.u = u2;
+		quad->br.texCoords.v = v2;
+	}
+
+	quad->bl.vertices.z = 0;
+	quad->tl.vertices.z = 0;
+	quad->tr.vertices.z = 0;
+	quad->br.vertices.z = 0;
+
+	return SUPER(self);
+}
+
+/**/
+
+char* _Util_readFile (const char* path, int* length) {
+	return _readFile([[[CCFileUtils sharedFileUtils] fullPathForFilename:@(path)] UTF8String], length);
+}
+
+#ifdef __cplusplus
+}
+#endif
+
+/**/
+
 @implementation CCSkeleton
 
 + (CCSkeleton*) create:(NSString*)skeletonDataFile atlas:(Atlas*)atlas {
@@ -278,106 +383,3 @@ Skeleton* _Cocos2dSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 }
 
 @end
-
-/**/
-
-void _Cocos2dRegionAttachment_dispose (Attachment* self) {
-	_RegionAttachment_deinit(SUB_CAST(RegionAttachment, self) );
-	FREE(self);
-}
-
-void _Cocos2dRegionAttachment_draw (Attachment* attachment, Slot* slot) {
-	Cocos2dRegionAttachment* self = SUB_CAST(Cocos2dRegionAttachment, attachment);
-	Cocos2dSkeleton* skeleton = SUB_CAST(Cocos2dSkeleton, slot->skeleton);
-
-	GLubyte r = SUPER(skeleton)->r * slot->r * 255;
-	GLubyte g = SUPER(skeleton)->g * slot->g * 255;
-	GLubyte b = SUPER(skeleton)->b * slot->b * 255;
-	GLubyte a = SUPER(skeleton)->a * slot->a * 255;
-	ccV3F_C4B_T2F_Quad* quad = &self->quad;
-	quad->bl.colors.r = r;
-	quad->bl.colors.g = g;
-	quad->bl.colors.b = b;
-	quad->bl.colors.a = a;
-	quad->tl.colors.r = r;
-	quad->tl.colors.g = g;
-	quad->tl.colors.b = b;
-	quad->tl.colors.a = a;
-	quad->tr.colors.r = r;
-	quad->tr.colors.g = g;
-	quad->tr.colors.b = b;
-	quad->tr.colors.a = a;
-	quad->br.colors.r = r;
-	quad->br.colors.g = g;
-	quad->br.colors.b = b;
-	quad->br.colors.a = a;
-
-	float* offset = SUPER(self)->offset;
-	quad->bl.vertices.x = offset[0] * slot->bone->m00 + offset[1] * slot->bone->m01 + slot->bone->worldX;
-	quad->bl.vertices.y = offset[0] * slot->bone->m10 + offset[1] * slot->bone->m11 + slot->bone->worldY;
-	quad->tl.vertices.x = offset[2] * slot->bone->m00 + offset[3] * slot->bone->m01 + slot->bone->worldX;
-	quad->tl.vertices.y = offset[2] * slot->bone->m10 + offset[3] * slot->bone->m11 + slot->bone->worldY;
-	quad->tr.vertices.x = offset[4] * slot->bone->m00 + offset[5] * slot->bone->m01 + slot->bone->worldX;
-	quad->tr.vertices.y = offset[4] * slot->bone->m10 + offset[5] * slot->bone->m11 + slot->bone->worldY;
-	quad->br.vertices.x = offset[6] * slot->bone->m00 + offset[7] * slot->bone->m01 + slot->bone->worldX;
-	quad->br.vertices.y = offset[6] * slot->bone->m10 + offset[7] * slot->bone->m11 + slot->bone->worldY;
-
-	// Cocos2d doesn't handle batching for us, so we'll just force a single texture per skeleton.
-	skeleton->node->atlas = self->atlas;
-	if (self->atlas.capacity <= skeleton->node->quadCount) {
-		if (![self->atlas resizeCapacity:self->atlas.capacity * 2]) return;
-	}
-	[self->atlas updateQuad:quad atIndex:skeleton->node->quadCount++];
-}
-
-RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region) {
-	Cocos2dRegionAttachment* self = NEW(Cocos2dRegionAttachment);
-	_RegionAttachment_init(SUPER(self), name);
-	VTABLE(Attachment, self) ->dispose = _Cocos2dRegionAttachment_dispose;
-	VTABLE(Attachment, self) ->draw = _Cocos2dRegionAttachment_draw;
-
-	Cocos2dAtlasPage* page = SUB_CAST(Cocos2dAtlasPage, region->page);
-	self->atlas = page->atlas;
-	CGSize size = page->texture.contentSizeInPixels;
-	float u = region->x / size.width;
-	float u2 = (region->x + region->width) / size.width;
-	float v = region->y / size.height;
-	float v2 = (region->y + region->height) / size.height;
-	ccV3F_C4B_T2F_Quad* quad = &self->quad;
-	if (region->rotate) {
-		quad->tl.texCoords.u = u;
-		quad->tl.texCoords.v = v2;
-		quad->tr.texCoords.u = u;
-		quad->tr.texCoords.v = v;
-		quad->br.texCoords.u = u2;
-		quad->br.texCoords.v = v;
-		quad->bl.texCoords.u = u2;
-		quad->bl.texCoords.v = v2;
-	} else {
-		quad->bl.texCoords.u = u;
-		quad->bl.texCoords.v = v2;
-		quad->tl.texCoords.u = u;
-		quad->tl.texCoords.v = v;
-		quad->tr.texCoords.u = u2;
-		quad->tr.texCoords.v = v;
-		quad->br.texCoords.u = u2;
-		quad->br.texCoords.v = v2;
-	}
-
-	quad->bl.vertices.z = 0;
-	quad->tl.vertices.z = 0;
-	quad->tr.vertices.z = 0;
-	quad->br.vertices.z = 0;
-
-	return SUPER(self);
-}
-
-/**/
-
-char* _Util_readFile (const char* path, int* length) {
-	return _readFile([[[CCFileUtils sharedFileUtils] fullPathForFilename:@(path)] UTF8String], length);
-}
-
-#ifdef __cplusplus
-}
-#endif
