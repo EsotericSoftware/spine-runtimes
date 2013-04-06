@@ -30,6 +30,12 @@
 namespace spine {
 #endif
 
+typedef struct {
+	AtlasPage super;
+	CCTexture2D* texture;
+	CCTextureAtlas* textureAtlas;
+} Cocos2dAtlasPage;
+
 void _Cocos2dAtlasPage_dispose (AtlasPage* page) {
 	Cocos2dAtlasPage* self = SUB_CAST(Cocos2dAtlasPage, page);
 	_AtlasPage_deinit(SUPER(self));
@@ -55,6 +61,11 @@ AtlasPage* AtlasPage_create (const char* name, const char* path) {
 
 /**/
 
+typedef struct {
+	Skeleton super;
+	CCSkeleton* node;
+} Cocos2dSkeleton;
+
 void _Cocos2dSkeleton_dispose (Skeleton* self) {
 	_Skeleton_deinit(self);
 	FREE(self);
@@ -71,6 +82,12 @@ Skeleton* _Cocos2dSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 }
 
 /**/
+
+typedef struct {
+	RegionAttachment super;
+	ccV3F_C4B_T2F_Quad quad;
+	CCTextureAtlas* textureAtlas;
+} Cocos2dRegionAttachment;
 
 void _Cocos2dRegionAttachment_dispose (Attachment* self) {
 	_RegionAttachment_deinit(SUB_CAST(RegionAttachment, self) );
@@ -161,6 +178,11 @@ RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region
 	quad->br.vertices.z = 0;
 
 	return SUPER(self);
+}
+
+ccV3F_C4B_T2F_Quad* RegionAttachment_getQuad (RegionAttachment* attachment) {
+	Cocos2dRegionAttachment* self = SUB_CAST(Cocos2dRegionAttachment, attachment);
+	return &self->quad;
 }
 
 /**/

@@ -29,33 +29,12 @@
 #include <spine/spine.h>
 #include "cocos2d.h"
 
-@class CCSkeleton;
-
 #ifdef __cplusplus
 namespace spine {
 extern "C" {
 #endif
 
-typedef struct {
-	AtlasPage super;
-	CCTexture2D* texture;
-	CCTextureAtlas* textureAtlas;
-} Cocos2dAtlasPage;
-
-/**/
-
-typedef struct {
-	Skeleton super;
-	CCSkeleton* node;
-} Cocos2dSkeleton;
-
-/**/
-
-typedef struct {
-	RegionAttachment super;
-	ccV3F_C4B_T2F_Quad quad;
-	CCTextureAtlas* textureAtlas;
-} Cocos2dRegionAttachment;
+ccV3F_C4B_T2F_Quad* RegionAttachment_getQuad (RegionAttachment* self);
 
 #ifdef __cplusplus
 }
