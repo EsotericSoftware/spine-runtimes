@@ -102,6 +102,7 @@ public:
 
 	virtual void update (float deltaTime);
 	virtual void draw ();
+	virtual cocos2d::CCRect boundingBox ();
 
 	// CCBlendProtocol
 	CC_PROPERTY(cocos2d::ccBlendFunc, blendFunc, BlendFunc);
@@ -114,6 +115,8 @@ typedef struct {
 	cocos2d::ccV3F_C4B_T2F_Quad quad;
 	cocos2d::CCTextureAtlas* textureAtlas;
 } Cocos2dxRegionAttachment;
+
+cocos2d::ccV3F_C4B_T2F_Quad* RegionAttachment_updateQuad (Attachment* self, Slot* slot);
 
 }
 

@@ -26,6 +26,10 @@
 
 	[self scheduleUpdate];
 
+#if __CC_PLATFORM_MAC
+	[self setMouseEnabled:YES];
+#endif
+
 	return self;
 }
 
@@ -36,5 +40,18 @@
         if (skeletonNode->state->time > 1) [skeletonNode setAnimation:@"walk" loop:true];
     }
 }
+
+#if __CC_PLATFORM_MAC
+- (BOOL) ccMouseDown:(NSEvent*)event {
+	CCDirector* director = [CCDirector sharedDirector];
+	NSPoint location =  [director convertEventToGL:event];
+	location.x -= [[director runningScene]position].x;
+	location.y -= [[director runningScene]position].y;
+	location.x -= skeletonNode.position.x;
+	location.y -= skeletonNode.position.y;
+	if (CGRectContainsPoint(skeletonNode.boundingBox, location)) NSLog(@"Clicked!");
+	return YES;
+}
+#endif
 
 @end

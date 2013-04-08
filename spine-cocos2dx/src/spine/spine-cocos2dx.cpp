@@ -27,6 +27,8 @@
 #include <spine/extension.h>
 
 USING_NS_CC;
+using std::min;
+using std::max;
 namespace spine {
 
 void _Cocos2dxAtlasPage_dispose (AtlasPage* page) {
@@ -186,6 +188,33 @@ void CCSkeleton::draw () {
 	}
 }
 
+CCRect CCSkeleton::boundingBox () {
+	float minX = FLT_MAX, minY = FLT_MAX, maxX = FLT_MIN, maxY = FLT_MIN;
+	for (int i = 0; i < skeleton->slotCount; ++i) {
+		Slot* slot = skeleton->slots[i];
+		Attachment* attachment = slot->attachment;
+		if (attachment->type != ATTACHMENT_REGION) continue;
+		Cocos2dxRegionAttachment* regionAttachment = SUB_CAST(Cocos2dxRegionAttachment, attachment);
+		minX = min(minX, regionAttachment->quad.bl.vertices.x);
+		minY = min(minY, regionAttachment->quad.bl.vertices.y);
+		maxX = max(maxX, regionAttachment->quad.bl.vertices.x);
+		maxY = max(maxY, regionAttachment->quad.bl.vertices.y);
+		minX = min(minX, regionAttachment->quad.br.vertices.x);
+		minY = min(minY, regionAttachment->quad.br.vertices.y);
+		maxX = max(maxX, regionAttachment->quad.br.vertices.x);
+		maxY = max(maxY, regionAttachment->quad.br.vertices.y);
+		minX = min(minX, regionAttachment->quad.tl.vertices.x);
+		minY = min(minY, regionAttachment->quad.tl.vertices.y);
+		maxX = max(maxX, regionAttachment->quad.tl.vertices.x);
+		maxY = max(maxY, regionAttachment->quad.tl.vertices.y);
+		minX = min(minX, regionAttachment->quad.tr.vertices.x);
+		minY = min(minY, regionAttachment->quad.tr.vertices.y);
+		maxX = max(maxX, regionAttachment->quad.tr.vertices.x);
+		maxY = max(maxY, regionAttachment->quad.tr.vertices.y);
+	}
+	return CCRectMake(minX, minY, maxX - minX, maxY - minY);
+}
+
 // Convenience methods:
 
 void CCSkeleton::setMix (const char* fromName, const char* toName, float duration) {
@@ -255,7 +284,7 @@ void _Cocos2dxRegionAttachment_dispose (Attachment* self) {
 	FREE(self);
 }
 
-void _Cocos2dxRegionAttachment_draw (Attachment* attachment, Slot* slot) {
+ccV3F_C4B_T2F_Quad* RegionAttachment_updateQuad (Attachment* attachment, Slot* slot) {
 	Cocos2dxRegionAttachment* self = SUB_CAST(Cocos2dxRegionAttachment, attachment);
 	Cocos2dxSkeleton* skeleton = SUB_CAST(Cocos2dxSkeleton, slot->skeleton);
 
@@ -291,12 +320,21 @@ void _Cocos2dxRegionAttachment_draw (Attachment* attachment, Slot* slot) {
 	quad->br.vertices.x = offset[6] * slot->bone->m00 + offset[7] * slot->bone->m01 + slot->bone->worldX;
 	quad->br.vertices.y = offset[6] * slot->bone->m10 + offset[7] * slot->bone->m11 + slot->bone->worldY;
 
-	// cocos2dx doesn't handle batching for us, so we'll just force a single texture per skeleton.
+	return quad;
+}
+
+void _Cocos2dxRegionAttachment_draw (Attachment* attachment, Slot* slot) {
+	RegionAttachment_updateQuad(attachment, slot);
+
+	Cocos2dxRegionAttachment* self = SUB_CAST(Cocos2dxRegionAttachment, attachment);
+	Cocos2dxSkeleton* skeleton = SUB_CAST(Cocos2dxSkeleton, slot->skeleton);
+
+	// cocos2dx doesn't handle batching for us, so we force a single texture per skeleton.
 	skeleton->node->textureAtlas = self->textureAtlas;
 	while (self->textureAtlas->getCapacity() <= skeleton->node->quadCount) {
 		if (!self->textureAtlas->resizeCapacity(self->textureAtlas->getCapacity() * 2)) return;
 	}
-	self->textureAtlas->updateQuad(quad, skeleton->node->quadCount++);
+	self->textureAtlas->updateQuad(&self->quad, skeleton->node->quadCount++);
 }
 
 RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region) {

@@ -34,6 +34,7 @@ namespace spine {
 extern "C" {
 #endif
 
+ccV3F_C4B_T2F_Quad* RegionAttachment_updateQuad (Attachment* self, Slot* slot);
 ccV3F_C4B_T2F_Quad* RegionAttachment_getQuad (RegionAttachment* self);
 
 #ifdef __cplusplus
