@@ -293,7 +293,7 @@ void _Cocos2dxRegionAttachment_draw (Attachment* attachment, Slot* slot) {
 
 	// cocos2dx doesn't handle batching for us, so we'll just force a single texture per skeleton.
 	skeleton->node->textureAtlas = self->textureAtlas;
-	if (self->textureAtlas->getCapacity() <= skeleton->node->quadCount) {
+	while (self->textureAtlas->getCapacity() <= skeleton->node->quadCount) {
 		if (!self->textureAtlas->resizeCapacity(self->textureAtlas->getCapacity() * 2)) return;
 	}
 	self->textureAtlas->updateQuad(quad, skeleton->node->quadCount++);
