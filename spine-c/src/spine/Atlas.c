@@ -86,9 +86,8 @@ static int readLine (const char* begin, const char* end, Str* str) {
 	str->begin = nextStart;
 
 	/* Find next delimiter. */
-	do {
+	while (nextStart != end && *nextStart != '\n')
 		nextStart++;
-	} while (nextStart != end && *nextStart != '\n');
 
 	str->end = nextStart;
 	trim(str);
