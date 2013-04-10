@@ -105,6 +105,7 @@ CCSkeleton* CCSkeleton::create (SkeletonData* skeletonData, AnimationStateData* 
 }
 
 CCSkeleton::CCSkeleton (SkeletonData *skeletonData, AnimationStateData *stateData) :
+				ownsSkeleton(false), ownsStateData(false), atlas(0),
 				skeleton(0), state(0), debugSlots(false), debugBones(false) {
 	CONST_CAST(Skeleton*, skeleton) = _Cocos2dxSkeleton_create(skeletonData, this);
 
