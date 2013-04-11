@@ -228,7 +228,7 @@ namespace Spine {
 					Dictionary<String, Object> timelineMap = (Dictionary<String, Object>)entry.Value;
 
 					foreach (KeyValuePair<String, Object> timelineEntry in timelineMap) {
-						List<Dictionary<String, Object>> values = (List<Dictionary<String, Object>>)timelineEntry.Value;
+						List<Object> values = (List<Object>)timelineEntry.Value;
 						String timelineName = (String)timelineEntry.Key;
 						if (timelineName.Equals(TIMELINE_COLOR)) {
 							ColorTimeline timeline = new ColorTimeline(values.Count);
