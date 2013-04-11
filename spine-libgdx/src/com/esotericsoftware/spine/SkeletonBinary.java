@@ -154,18 +154,18 @@ public class SkeletonBinary {
 			int attachmentCount = input.readInt(true);
 			for (int ii = 0; ii < attachmentCount; ii++) {
 				String name = input.readString();
-				skin.addAttachment(slotIndex, name, readAttachment(input, name));
+				skin.addAttachment(slotIndex, name, readAttachment(input, skin, name));
 			}
 		}
 		return skin;
 	}
 
-	private Attachment readAttachment (DataInput input, String attachmentName) throws IOException {
+	private Attachment readAttachment (DataInput input, Skin skin, String attachmentName) throws IOException {
 		String name = input.readString();
 		if (name == null) name = attachmentName;
 
 		AttachmentType type = AttachmentType.values()[input.readByte()];
-		Attachment attachment = attachmentLoader.newAttachment(type, name);
+		Attachment attachment = attachmentLoader.newAttachment(skin, type, name);
 
 		if (attachment instanceof RegionSequenceAttachment) {
 			RegionSequenceAttachment regionSequenceAttachment = (RegionSequenceAttachment)attachment;

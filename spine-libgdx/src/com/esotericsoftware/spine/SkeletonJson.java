@@ -129,7 +129,7 @@ public class SkeletonJson {
 				for (Entry<String, OrderedMap> slotEntry : ((OrderedMap<String, OrderedMap>)entry.value).entries()) {
 					int slotIndex = skeletonData.findSlotIndex(slotEntry.key);
 					for (Entry<String, OrderedMap> attachmentEntry : ((OrderedMap<String, OrderedMap>)slotEntry.value).entries()) {
-						Attachment attachment = readAttachment(attachmentEntry.key, attachmentEntry.value);
+						Attachment attachment = readAttachment(skin, attachmentEntry.key, attachmentEntry.value);
 						if (attachment != null) skin.addAttachment(slotIndex, attachmentEntry.key, attachment);
 					}
 				}
@@ -152,11 +152,11 @@ public class SkeletonJson {
 		return skeletonData;
 	}
 
-	private Attachment readAttachment (String name, OrderedMap map) {
+	private Attachment readAttachment (Skin skin, String name, OrderedMap map) {
 		name = (String)map.get("name", name);
 
 		AttachmentType type = AttachmentType.valueOf((String)map.get("type", AttachmentType.region.name()));
-		Attachment attachment = attachmentLoader.newAttachment(type, name);
+		Attachment attachment = attachmentLoader.newAttachment(skin, type, name);
 
 		if (attachment instanceof RegionSequenceAttachment) {
 			RegionSequenceAttachment regionSequenceAttachment = (RegionSequenceAttachment)attachment;

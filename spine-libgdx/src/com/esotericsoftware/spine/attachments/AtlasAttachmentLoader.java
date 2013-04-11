@@ -28,6 +28,7 @@ package com.esotericsoftware.spine.attachments;
 import com.esotericsoftware.spine.Attachment;
 import com.esotericsoftware.spine.AttachmentLoader;
 import com.esotericsoftware.spine.AttachmentType;
+import com.esotericsoftware.spine.Skin;
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
@@ -40,7 +41,7 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 		this.atlas = atlas;
 	}
 
-	public Attachment newAttachment (AttachmentType type, String name) {
+	public Attachment newAttachment (Skin skin, AttachmentType type, String name) {
 		Attachment attachment = null;
 		switch (type) {
 		case region:
