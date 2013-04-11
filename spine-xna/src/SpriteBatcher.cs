@@ -77,11 +77,6 @@ namespace Spine {
 	/// sent to the GPU). 
 	/// </summary>
 	public class SpriteBatcher {
-		/*
-		 * Note that this class is fundamental to high performance for SpriteBatch games. Please exercise
-		 * caution when making changes to this class.
-		 */
-
 		/// <summary>
 		/// Initialization size for the batch item list and queue.
 		/// </summary>
@@ -175,11 +170,6 @@ namespace Spine {
 			_vertexArray = new VertexPositionColorTexture[4 * numBatchItems];
 		}
 
-		/// <summary>
-		/// Sorts the batch items and then groups batch drawing into maximal allowed batch sets that do not
-		/// overflow the 16 bit array indices for vertices.
-		/// </summary>
-		/// <param name="sortMode">The type of depth sorting desired for the rendering.</param>
 		public void Draw (GraphicsDevice device) {
 			// nothing to do
 			if (_batchItemList.Count == 0)
@@ -225,8 +215,7 @@ namespace Spine {
 				}
 				// flush the remaining vertexArray data
 				FlushVertexArray(device, startIndex, index);
-				// Update our batch count to continue the process of culling down
-				// large batches
+				// Update our batch count to continue the process of culling down large batches
 				batchCount -= numBatchesToProcess;
 			}
 			_batchItemList.Clear();

@@ -88,7 +88,9 @@ namespace Spine {
 			time += gameTime.ElapsedGameTime.Milliseconds / 1000f;
 			animation.Apply(skeleton, time, true);
 			skeleton.UpdateWorldTransform();
+			skeletonRenderer.Begin();
 			skeletonRenderer.Draw(skeleton);
+			skeletonRenderer.End();
 
 			base.Draw(gameTime);
 		}
