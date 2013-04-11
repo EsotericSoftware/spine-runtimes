@@ -31,10 +31,12 @@
 namespace spine {
 #endif
 
-void _RegionAttachment_init (RegionAttachment* self, const char* name) {
+void _RegionAttachment_init (RegionAttachment* self, const char* name, //
+		void (*dispose) (Attachment* self), //
+		void (*draw) (Attachment* self, struct Slot* slot)) {
 	self->scaleX = 1;
 	self->scaleY = 1;
-	_Attachment_init(SUPER(self), name, ATTACHMENT_REGION);
+	_Attachment_init(SUPER(self), name, ATTACHMENT_REGION, dispose, draw);
 }
 
 void _RegionAttachment_deinit (RegionAttachment* self) {

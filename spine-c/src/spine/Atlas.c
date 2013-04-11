@@ -31,8 +31,14 @@
 namespace spine {
 #endif
 
-void _AtlasPage_init (AtlasPage* self, const char* name) {
+typedef struct _AtlasPageVtable {
+	void (*dispose) (AtlasPage* self);
+} _AtlasPageVtable;
+
+void _AtlasPage_init (AtlasPage* self, const char* name, //
+		void (*dispose) (AtlasPage* self)) {
 	CONST_CAST(_AtlasPageVtable*, self->vtable) = NEW(_AtlasPageVtable);
+	VTABLE(AtlasPage, self) ->dispose = dispose;
 	MALLOC_STR(self->name, name);
 }
 

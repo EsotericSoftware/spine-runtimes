@@ -23,8 +23,7 @@ void _ExampleAtlasPage_dispose (AtlasPage* page) {
 
 AtlasPage* AtlasPage_create (const char* name, const char* path) {
 	ExampleAtlasPage* self = NEW(ExampleAtlasPage);
-	_AtlasPage_init(SUPER(self), name);
-	VTABLE(AtlasPage, self) ->dispose = _ExampleAtlasPage_dispose;
+	_AtlasPage_init(SUPER(self), name, _ExampleAtlasPage_dispose);
 
 	self->extraData = 123;
 
@@ -49,8 +48,7 @@ void _ExampleSkeleton_dispose (Skeleton* skeleton) {
 
 Skeleton* Skeleton_create (SkeletonData* data) {
 	ExampleSkeleton* self = NEW(ExampleSkeleton);
-	_Skeleton_init(SUPER(self), data);
-	VTABLE(Skeleton, self) ->dispose = _ExampleSkeleton_dispose;
+	_Skeleton_init(SUPER(self), data, _ExampleSkeleton_dispose);
 
 	self->extraData = 789;
 
@@ -80,9 +78,7 @@ void _ExampleRegionAttachment_draw (Attachment* attachment, Slot* slot) {
 
 RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region) {
 	ExampleRegionAttachment* self = NEW(ExampleRegionAttachment);
-	_RegionAttachment_init(SUPER(self), name);
-	VTABLE(Attachment, self) ->dispose = _ExampleRegionAttachment_dispose;
-	VTABLE(Attachment, self) ->draw = _ExampleRegionAttachment_draw;
+	_RegionAttachment_init(SUPER(self), name, _ExampleRegionAttachment_dispose, _ExampleRegionAttachment_draw);
 
 	self->extraData = 456;
 

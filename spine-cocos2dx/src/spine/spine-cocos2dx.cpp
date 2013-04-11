@@ -43,8 +43,7 @@ void _Cocos2dxAtlasPage_dispose (AtlasPage* page) {
 
 AtlasPage* AtlasPage_create (const char* name, const char* path) {
 	Cocos2dxAtlasPage* self = NEW(Cocos2dxAtlasPage);
-	_AtlasPage_init(SUPER(self), name);
-	VTABLE(AtlasPage, self) ->dispose = _Cocos2dxAtlasPage_dispose;
+	_AtlasPage_init(SUPER(self), name, _Cocos2dxAtlasPage_dispose);
 
 	self->texture = CCTextureCache::sharedTextureCache()->addImage(path);
 	self->texture->retain();
@@ -63,8 +62,7 @@ void _Cocos2dxSkeleton_dispose (Skeleton* self) {
 
 Skeleton* _Cocos2dxSkeleton_create (SkeletonData* data, CCSkeleton* node) {
 	Cocos2dxSkeleton* self = NEW(Cocos2dxSkeleton);
-	_Skeleton_init(SUPER(self), data);
-	VTABLE(Skeleton, self) ->dispose = _Cocos2dxSkeleton_dispose;
+	_Skeleton_init(SUPER(self), data, _Cocos2dxSkeleton_dispose);
 
 	self->node = node;
 
@@ -340,9 +338,7 @@ void _Cocos2dxRegionAttachment_draw (Attachment* attachment, Slot* slot) {
 
 RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region) {
 	Cocos2dxRegionAttachment* self = NEW(Cocos2dxRegionAttachment);
-	_RegionAttachment_init(SUPER(self), name);
-	VTABLE(Attachment, self) ->dispose = _Cocos2dxRegionAttachment_dispose;
-	VTABLE(Attachment, self) ->draw = _Cocos2dxRegionAttachment_draw;
+	_RegionAttachment_init(SUPER(self), name, _Cocos2dxRegionAttachment_dispose, _Cocos2dxRegionAttachment_draw);
 
 	Cocos2dxAtlasPage* page = SUB_CAST(Cocos2dxAtlasPage, region->page);
 	self->textureAtlas = page->textureAtlas;

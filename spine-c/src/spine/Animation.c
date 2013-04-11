@@ -65,8 +65,17 @@ void Animation_mix (const Animation* self, Skeleton* skeleton, float time, int/*
 
 /**/
 
-void _Timeline_init (Timeline* self) {
+typedef struct _TimelineVtable {
+	void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha);
+	void (*dispose) (Timeline* self);
+} _TimelineVtable;
+
+void _Timeline_init (Timeline* self, //
+		void (*dispose) (Timeline* self), //
+		void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha)) {
 	CONST_CAST(_TimelineVtable*, self->vtable) = NEW(_TimelineVtable);
+	VTABLE(Timeline, self) ->dispose = dispose;
+	VTABLE(Timeline, self) ->apply = apply;
 }
 
 void _Timeline_deinit (Timeline* self) {
@@ -87,8 +96,10 @@ static const float CURVE_LINEAR = 0;
 static const float CURVE_STEPPED = -1;
 static const int CURVE_SEGMENTS = 10;
 
-void _CurveTimeline_init (CurveTimeline* self, int frameCount) {
-	_Timeline_init(SUPER(self));
+void _CurveTimeline_init (CurveTimeline* self, int frameCount, //
+		void (*dispose) (Timeline* self), //
+		void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha)) {
+	_Timeline_init(SUPER(self), dispose, apply);
 	self->curves = CALLOC(float, (frameCount - 1) * 6);
 }
 
@@ -192,10 +203,11 @@ void _BaseTimeline_dispose (Timeline* timeline) {
 }
 
 /* Many timelines have structure identical to struct BaseTimeline and extend CurveTimeline. **/
-struct BaseTimeline* _BaseTimeline_create (int frameCount, int frameSize) {
+struct BaseTimeline* _BaseTimeline_create (int frameCount, int frameSize, //
+		void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha)) {
+
 	struct BaseTimeline* self = NEW(struct BaseTimeline);
-	_CurveTimeline_init(SUPER(self), frameCount);
-	VTABLE(Timeline, self) ->dispose = _BaseTimeline_dispose;
+	_CurveTimeline_init(SUPER(self), frameCount, _BaseTimeline_dispose, apply);
 
 	CONST_CAST(int, self->framesLength) = frameCount * frameSize;
 	CONST_CAST(float*, self->frames) = CALLOC(float, self->framesLength);
@@ -246,9 +258,7 @@ void _RotateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float 
 }
 
 RotateTimeline* RotateTimeline_create (int frameCount) {
-	RotateTimeline* self = _BaseTimeline_create(frameCount, 2);
-	VTABLE(Timeline, self) ->apply = _RotateTimeline_apply;
-	return self;
+	return _BaseTimeline_create(frameCount, 2, _RotateTimeline_apply);
 }
 
 void RotateTimeline_setFrame (RotateTimeline* self, int frameIndex, float time, float angle) {
@@ -291,9 +301,7 @@ void _TranslateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, flo
 }
 
 TranslateTimeline* TranslateTimeline_create (int frameCount) {
-	TranslateTimeline* self = _BaseTimeline_create(frameCount, 3);
-	VTABLE(Timeline, self) ->apply = _TranslateTimeline_apply;
-	return self;
+	return _BaseTimeline_create(frameCount, 3, _TranslateTimeline_apply);
 }
 
 void TranslateTimeline_setFrame (TranslateTimeline* self, int frameIndex, float time, float x, float y) {
@@ -332,9 +340,7 @@ void _ScaleTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float t
 }
 
 ScaleTimeline* ScaleTimeline_create (int frameCount) {
-	ScaleTimeline* self = _BaseTimeline_create(frameCount, 3);
-	VTABLE(Timeline, self) ->apply = _ScaleTimeline_apply;
-	return self;
+	return _BaseTimeline_create(frameCount, 3, _ScaleTimeline_apply);
 }
 
 void ScaleTimeline_setFrame (ScaleTimeline* self, int frameIndex, float time, float x, float y) {
@@ -393,9 +399,7 @@ void _ColorTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float t
 }
 
 ColorTimeline* ColorTimeline_create (int frameCount) {
-	ColorTimeline* self = (ColorTimeline*)_BaseTimeline_create(frameCount, 5);
-	VTABLE(Timeline, self) ->apply = _ColorTimeline_apply;
-	return self;
+	return (ColorTimeline*)_BaseTimeline_create(frameCount, 5, _ColorTimeline_apply);
 }
 
 void ColorTimeline_setFrame (ColorTimeline* self, int frameIndex, float time, float r, float g, float b, float a) {
@@ -439,11 +443,9 @@ void _AttachmentTimeline_dispose (Timeline* timeline) {
 
 AttachmentTimeline* AttachmentTimeline_create (int frameCount) {
 	AttachmentTimeline* self = NEW(AttachmentTimeline);
-	_Timeline_init(SUPER(self));
-	VTABLE(Timeline, self) ->dispose = _AttachmentTimeline_dispose;
-	VTABLE(Timeline, self) ->apply = _AttachmentTimeline_apply;
-	CONST_CAST(char**, self->attachmentNames) = CALLOC(char*, frameCount);
+	_Timeline_init(SUPER(self), _AttachmentTimeline_dispose, _AttachmentTimeline_apply);
 
+	CONST_CAST(char**, self->attachmentNames) = CALLOC(char*, frameCount);
 	CONST_CAST(int, self->framesLength) = frameCount;
 	CONST_CAST(float*, self->frames) = CALLOC(float, frameCount);
 

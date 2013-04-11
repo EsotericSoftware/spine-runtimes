@@ -24,14 +24,24 @@
  ******************************************************************************/
 
 #include <spine/AttachmentLoader.h>
+#include <stdio.h>
 #include <spine/extension.h>
 
 #ifdef __cplusplus
 namespace spine {
 #endif
 
-void _AttachmentLoader_init (AttachmentLoader* self) {
+typedef struct _AttachmentLoaderVtable {
+	Attachment* (*newAttachment) (AttachmentLoader* self, AttachmentType type, const char* name);
+	void (*dispose) (AttachmentLoader* self);
+} _AttachmentLoaderVtable;
+
+void _AttachmentLoader_init (AttachmentLoader* self, //
+		void (*dispose) (AttachmentLoader* self), //
+		Attachment* (*newAttachment) (AttachmentLoader* self, AttachmentType type, const char* name)) {
 	CONST_CAST(_AttachmentLoaderVtable*, self->vtable) = NEW(_AttachmentLoaderVtable);
+	VTABLE(AttachmentLoader, self) ->dispose = dispose;
+	VTABLE(AttachmentLoader, self) ->newAttachment = newAttachment;
 }
 
 void _AttachmentLoader_deinit (AttachmentLoader* self) {
@@ -57,6 +67,12 @@ void _AttachmentLoader_setError (AttachmentLoader* self, const char* error1, con
 	FREE(self->error2);
 	MALLOC_STR(self->error1, error1);
 	MALLOC_STR(self->error2, error2);
+}
+
+void _AttachmentLoader_setUnknownTypeError (AttachmentLoader* self, AttachmentType type) {
+	char buffer[16];
+	sprintf(buffer, "%d", type);
+	_AttachmentLoader_setError(self, "Unknown attachment type: ", buffer);
 }
 
 #ifdef __cplusplus

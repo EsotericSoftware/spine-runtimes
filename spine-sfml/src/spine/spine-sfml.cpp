@@ -52,8 +52,7 @@ void _SfmlAtlasPage_dispose (AtlasPage* page) {
 
 AtlasPage* AtlasPage_create (const char* name, const char* path) {
 	SfmlAtlasPage* self = NEW(SfmlAtlasPage);
-	_AtlasPage_init(SUPER(self), name);
-	VTABLE(AtlasPage, self) ->dispose = _SfmlAtlasPage_dispose;
+	_AtlasPage_init(SUPER(self), name, _SfmlAtlasPage_dispose);
 
 	self->texture = new Texture();
 	self->texture->loadFromFile(path);
@@ -72,8 +71,7 @@ Skeleton* _SfmlSkeleton_create (SkeletonData* data, SkeletonDrawable* drawable) 
 	Bone_setYDown(1);
 
 	SfmlSkeleton* self = NEW(SfmlSkeleton);
-	_Skeleton_init(SUPER(self), data);
-	VTABLE(Skeleton, self) ->dispose = _SfmlSkeleton_dispose;
+	_Skeleton_init(SUPER(self), data, _SfmlSkeleton_dispose);
 
 	CONST_CAST(SkeletonDrawable*, self->drawable) = drawable;
 
@@ -162,9 +160,7 @@ void _SfmlRegionAttachment_draw (Attachment* attachment, Slot* slot) {
 
 RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region) {
 	SfmlRegionAttachment* self = NEW(SfmlRegionAttachment);
-	_RegionAttachment_init(SUPER(self), name);
-	VTABLE(Attachment, self) ->dispose = _SfmlRegionAttachment_dispose;
-	VTABLE(Attachment, self) ->draw = _SfmlRegionAttachment_draw;
+	_RegionAttachment_init(SUPER(self), name, _SfmlRegionAttachment_dispose, _SfmlRegionAttachment_draw);
 
 	self->texture = ((SfmlAtlasPage*)region->page)->texture;
 	int u = region->x;

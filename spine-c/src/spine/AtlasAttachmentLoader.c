@@ -24,7 +24,6 @@
  ******************************************************************************/
 
 #include <spine/AtlasAttachmentLoader.h>
-#include <stdio.h>
 #include <spine/extension.h>
 
 #ifdef __cplusplus
@@ -46,21 +45,16 @@ Attachment* _AtlasAttachmentLoader_newAttachment (AttachmentLoader* loader, Atta
 		}
 		return SUPER_CAST(Attachment, RegionAttachment_create(name, region)) ;
 	}
-	default: {
-		char buffer[16];
-		sprintf(buffer, "%d", type);
-		_AttachmentLoader_setError(loader, "Unknown attachment type: ", buffer);
+	default:
+		_AttachmentLoader_setUnknownTypeError(loader, type);
 		return 0;
-	}
 	}
 }
 
 AtlasAttachmentLoader* AtlasAttachmentLoader_create (Atlas* atlas) {
 	AtlasAttachmentLoader* self = NEW(AtlasAttachmentLoader);
-	_AttachmentLoader_init(SUPER(self));
+	_AttachmentLoader_init(SUPER(self), _AtlasAttachmentLoader_dispose, _AtlasAttachmentLoader_newAttachment);
 	self->atlas = atlas;
-	VTABLE(AttachmentLoader, self) ->newAttachment = _AtlasAttachmentLoader_newAttachment;
-	VTABLE(AttachmentLoader, self) ->dispose = _AtlasAttachmentLoader_dispose;
 	return self;
 }
 

@@ -31,10 +31,15 @@
 namespace spine {
 #endif
 
-void _Skeleton_init (Skeleton* self, SkeletonData* data) {
+typedef struct _SkeletonVtable {
+	void (*dispose) (Skeleton* skeleton);
+} _SkeletonVtable;
+
+void _Skeleton_init (Skeleton* self, SkeletonData* data, void (*dispose) (Skeleton* skeleton)) {
 	CONST_CAST(SkeletonData*, self->data) = data;
 
 	CONST_CAST(_SkeletonVtable*, self->vtable) = NEW(_SkeletonVtable);
+	VTABLE(Skeleton, self) ->dispose = dispose;
 
 	self->boneCount = self->data->boneCount;
 	self->bones = MALLOC(Bone*, self->boneCount);
