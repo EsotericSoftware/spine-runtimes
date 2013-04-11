@@ -34,7 +34,7 @@ void _AtlasAttachmentLoader_dispose (AttachmentLoader* self) {
 	_AttachmentLoader_deinit(self);
 }
 
-Attachment* _AtlasAttachmentLoader_newAttachment (AttachmentLoader* loader, AttachmentType type, const char* name) {
+Attachment* _AtlasAttachmentLoader_newAttachment (AttachmentLoader* loader, Skin* skin, AttachmentType type, const char* name) {
 	AtlasAttachmentLoader* self = SUB_CAST(AtlasAttachmentLoader, loader);
 	switch (type) {
 	case ATTACHMENT_REGION: {

@@ -150,7 +150,7 @@ void _AtlasPage_deinit (AtlasPage* self);
 
 void _AttachmentLoader_init (AttachmentLoader* self, //
 		void (*dispose) (AttachmentLoader* self), //
-		Attachment* (*newAttachment) (AttachmentLoader* self, AttachmentType type, const char* name));
+		Attachment* (*newAttachment) (AttachmentLoader* self, Skin* skin, AttachmentType type, const char* name));
 void _AttachmentLoader_deinit (AttachmentLoader* self);
 void _AttachmentLoader_setError (AttachmentLoader* self, const char* error1, const char* error2);
 void _AttachmentLoader_setUnknownTypeError (AttachmentLoader* self, AttachmentType type);

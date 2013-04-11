@@ -349,7 +349,7 @@ SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* jso
 						return 0;
 					}
 
-					Attachment* attachment = AttachmentLoader_newAttachment(self->attachmentLoader, type, attachmentName);
+					Attachment* attachment = AttachmentLoader_newAttachment(self->attachmentLoader, skin, type, attachmentName);
 					if (!attachment) {
 						if (self->attachmentLoader->error1) {
 							SkeletonData_dispose(skeletonData);

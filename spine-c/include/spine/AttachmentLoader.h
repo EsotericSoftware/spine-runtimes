@@ -27,6 +27,7 @@
 #define SPINE_ATTACHMENTLOADER_H_
 
 #include <spine/Attachment.h>
+#include <spine/Skin.h>
 
 #ifdef __cplusplus
 namespace spine {
@@ -44,7 +45,7 @@ struct AttachmentLoader {
 void AttachmentLoader_dispose (AttachmentLoader* self);
 
 /* Returns 0 to not load an attachment. If 0 is returned and AttachmentLoader.error1 is set, an error occurred. */
-Attachment* AttachmentLoader_newAttachment (AttachmentLoader* self, AttachmentType type, const char* name);
+Attachment* AttachmentLoader_newAttachment (AttachmentLoader* self, Skin* skin, AttachmentType type, const char* name);
 
 #ifdef __cplusplus
 }
