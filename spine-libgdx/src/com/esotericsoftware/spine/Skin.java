@@ -78,13 +78,25 @@ public class Skin {
 		return name;
 	}
 
+	/** Attach each attachment in this skin if the corresponding attachment in the old skin is currently attached. */
+	void attachAll (Skeleton skeleton, Skin oldSkin) {
+		for (Entry<Key, Attachment> entry : oldSkin.attachments.entries()) {
+			int slotIndex = entry.key.slotIndex;
+			Slot slot = skeleton.slots.get(slotIndex);
+			if (slot.attachment == entry.value) {
+				Attachment attachment = getAttachment(slotIndex, entry.key.name);
+				if (attachment != null) slot.setAttachment(attachment);
+			}
+		}
+	}
+
 	static class Key {
 		int slotIndex;
 		String name;
 		int hashCode;
 
 		public void set (int slotName, String name) {
-			if (name == null) throw new IllegalArgumentException("attachmentName cannot be null.");
+			if (name == null) throw new IllegalArgumentException("name cannot be null.");
 			this.slotIndex = slotName;
 			this.name = name;
 			hashCode = 31 * (31 + name.hashCode()) + slotIndex;
@@ -104,18 +116,6 @@ public class Skin {
 
 		public String toString () {
 			return slotIndex + ":" + name;
-		}
-	}
-
-	/** Attach each attachment in this skin if the corresponding attachment in the old skin is currently attached. */
-	void attachAll (Skeleton skeleton, Skin oldSkin) {
-		for (Entry<Key, Attachment> entry : oldSkin.attachments.entries()) {
-			int slotIndex = entry.key.slotIndex;
-			Slot slot = skeleton.slots.get(slotIndex);
-			if (slot.attachment == entry.value) {
-				Attachment attachment = getAttachment(slotIndex, entry.key.name);
-				if (attachment != null) slot.setAttachment(attachment);
-			}
 		}
 	}
 }

@@ -122,9 +122,9 @@ public class SkeletonJson {
 		}
 
 		// Skins.
-		OrderedMap<String, OrderedMap> slotMap = (OrderedMap)root.get("skins");
-		if (slotMap != null) {
-			for (Entry<String, OrderedMap> entry : slotMap.entries()) {
+		OrderedMap<String, OrderedMap> skinsMap = (OrderedMap)root.get("skins");
+		if (skinsMap != null) {
+			for (Entry<String, OrderedMap> entry : skinsMap.entries()) {
 				Skin skin = new Skin(entry.key);
 				for (Entry<String, OrderedMap> slotEntry : ((OrderedMap<String, OrderedMap>)entry.value).entries()) {
 					int slotIndex = skeletonData.findSlotIndex(slotEntry.key);
@@ -209,12 +209,12 @@ public class SkeletonJson {
 						RotateTimeline timeline = new RotateTimeline(values.size);
 						timeline.setBoneIndex(boneIndex);
 
-						int keyframeIndex = 0;
+						int frameIndex = 0;
 						for (OrderedMap valueMap : values) {
 							float time = (Float)valueMap.get("time");
-							timeline.setFrame(keyframeIndex, time, (Float)valueMap.get("angle"));
-							readCurve(timeline, keyframeIndex, valueMap);
-							keyframeIndex++;
+							timeline.setFrame(frameIndex, time, (Float)valueMap.get("angle"));
+							readCurve(timeline, frameIndex, valueMap);
+							frameIndex++;
 						}
 						timelines.add(timeline);
 						duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 2 - 2]);
@@ -230,14 +230,14 @@ public class SkeletonJson {
 						}
 						timeline.setBoneIndex(boneIndex);
 
-						int keyframeIndex = 0;
+						int frameIndex = 0;
 						for (OrderedMap valueMap : values) {
 							float time = (Float)valueMap.get("time");
 							Float x = (Float)valueMap.get("x"), y = (Float)valueMap.get("y");
-							timeline.setFrame(keyframeIndex, time, x == null ? 0 : (x * timelineScale), y == null ? 0
-								: (y * timelineScale));
-							readCurve(timeline, keyframeIndex, valueMap);
-							keyframeIndex++;
+							timeline
+								.setFrame(frameIndex, time, x == null ? 0 : (x * timelineScale), y == null ? 0 : (y * timelineScale));
+							readCurve(timeline, frameIndex, valueMap);
+							frameIndex++;
 						}
 						timelines.add(timeline);
 						duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 3 - 3]);
@@ -262,13 +262,13 @@ public class SkeletonJson {
 						ColorTimeline timeline = new ColorTimeline(values.size);
 						timeline.setSlotIndex(slotIndex);
 
-						int keyframeIndex = 0;
+						int frameIndex = 0;
 						for (OrderedMap valueMap : values) {
 							float time = (Float)valueMap.get("time");
 							Color color = Color.valueOf((String)valueMap.get("color"));
-							timeline.setFrame(keyframeIndex, time, color.r, color.g, color.b, color.a);
-							readCurve(timeline, keyframeIndex, valueMap);
-							keyframeIndex++;
+							timeline.setFrame(frameIndex, time, color.r, color.g, color.b, color.a);
+							readCurve(timeline, frameIndex, valueMap);
+							frameIndex++;
 						}
 						timelines.add(timeline);
 						duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 5 - 5]);
@@ -277,10 +277,10 @@ public class SkeletonJson {
 						AttachmentTimeline timeline = new AttachmentTimeline(values.size);
 						timeline.setSlotIndex(slotIndex);
 
-						int keyframeIndex = 0;
+						int frameIndex = 0;
 						for (OrderedMap valueMap : values) {
 							float time = (Float)valueMap.get("time");
-							timeline.setFrame(keyframeIndex++, time, (String)valueMap.get("name"));
+							timeline.setFrame(frameIndex++, time, (String)valueMap.get("name"));
 						}
 						timelines.add(timeline);
 						duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() - 1]);
@@ -295,14 +295,14 @@ public class SkeletonJson {
 		skeletonData.addAnimation(new Animation(name, timelines, duration));
 	}
 
-	private void readCurve (CurveTimeline timeline, int keyframeIndex, OrderedMap valueMap) {
+	private void readCurve (CurveTimeline timeline, int frameIndex, OrderedMap valueMap) {
 		Object curveObject = valueMap.get("curve");
 		if (curveObject == null) return;
 		if (curveObject.equals("stepped"))
-			timeline.setStepped(keyframeIndex);
+			timeline.setStepped(frameIndex);
 		else if (curveObject instanceof Array) {
 			Array curve = (Array)curveObject;
-			timeline.setCurve(keyframeIndex, (Float)curve.get(0), (Float)curve.get(1), (Float)curve.get(2), (Float)curve.get(3));
+			timeline.setCurve(frameIndex, (Float)curve.get(0), (Float)curve.get(1), (Float)curve.get(2), (Float)curve.get(3));
 		}
 	}
 }

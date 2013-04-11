@@ -251,6 +251,7 @@ public class Skeleton {
 	/** @param attachmentName May be null. */
 	public void setAttachment (String slotName, String attachmentName) {
 		if (slotName == null) throw new IllegalArgumentException("slotName cannot be null.");
+		Array<Slot> slots = this.slots;
 		for (int i = 0, n = slots.size; i < n; i++) {
 			Slot slot = slots.get(i);
 			if (slot.data.name.equals(slotName)) {

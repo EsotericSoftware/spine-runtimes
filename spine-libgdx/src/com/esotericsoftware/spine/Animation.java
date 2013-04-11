@@ -103,10 +103,8 @@ public class Animation {
 	}
 
 	static int linearSearch (float[] values, float target, int step) {
-		for (int i = 0, last = values.length - step; i <= last; i += step) {
-			if (values[i] <= target) continue;
-			return i;
-		}
+		for (int i = 0, last = values.length - step; i <= last; i += step)
+			if (values[i] > target) return i;
 		return -1;
 	}
 
@@ -116,7 +114,7 @@ public class Animation {
 	}
 
 	/** Base class for frames that use an interpolation bezier curve. */
-	static public abstract class CurveTimeline implements Timeline {
+	abstract static public class CurveTimeline implements Timeline {
 		static private final float LINEAR = 0;
 		static private final float STEPPED = -1;
 		static private final int BEZIER_SEGMENTS = 10;
@@ -220,11 +218,11 @@ public class Animation {
 			return frames;
 		}
 
-		/** Sets the time and value of the specified keyframe. */
-		public void setFrame (int frameIndex, float time, float value) {
+		/** Sets the time and angle of the specified keyframe. */
+		public void setFrame (int frameIndex, float time, float angle) {
 			frameIndex *= 2;
 			frames[frameIndex] = time;
-			frames[frameIndex + 1] = value;
+			frames[frameIndex + 1] = angle;
 		}
 
 		public void apply (Skeleton skeleton, float time, float alpha) {

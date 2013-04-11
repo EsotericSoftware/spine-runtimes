@@ -49,7 +49,7 @@ public class Slot {
 		this.data = data;
 		this.skeleton = skeleton;
 		this.bone = bone;
-		color = new Color(1, 1, 1, 1);
+		color = new Color();
 		setToBindPose();
 	}
 

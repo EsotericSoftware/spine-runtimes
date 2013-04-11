@@ -39,6 +39,7 @@ public class SkeletonData {
 		bones.clear();
 		slots.clear();
 		skins.clear();
+		animations.clear();
 		defaultSkin = null;
 	}
 

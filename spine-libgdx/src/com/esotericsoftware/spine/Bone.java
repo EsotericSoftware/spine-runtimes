@@ -35,7 +35,7 @@ public class Bone {
 	final Bone parent;
 	float x, y;
 	float rotation;
-	float scaleX = 1, scaleY = 1;
+	float scaleX, scaleY;
 
 	float m00, m01, worldX; // a b x
 	float m10, m11, worldY; // c d y
