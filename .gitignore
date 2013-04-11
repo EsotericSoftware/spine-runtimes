@@ -20,3 +20,12 @@ spine-cocos2d-iphone/libs/*
 !spine-cocos2d-iphone/libs/cocos2d/Place cocos2d here.txt
 !spine-cocos2d-iphone/libs/CocosDenshion/Place CocosDenshion here.txt
 !spine-cocos2d-iphone/libs/kazmath/Place kazmath here.txt
+
+*.user
+forums
+spine-csharp/bin
+spine-csharp/obj
+spine-xna/bin
+spine-xna/obj
+spine-xna/example/bin
+spine-xna/example/obj
