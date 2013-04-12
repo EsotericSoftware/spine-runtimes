@@ -43,7 +43,6 @@ namespace Spine {
 			effect = new BasicEffect(device);
 			effect.World = Matrix.Identity;
 			effect.View = Matrix.CreateLookAt(new Vector3(0.0f, 0.0f, 1.0f), Vector3.Zero, Vector3.Up);
-			effect.Projection = Matrix.CreateOrthographicOffCenter(0, device.Viewport.Width, device.Viewport.Height, 0, 1, 0);
 			effect.TextureEnabled = true;
 			effect.VertexColorEnabled = true;
 
@@ -56,6 +55,8 @@ namespace Spine {
 		public void Begin () {
 			device.RasterizerState = rasterizerState;
 			device.BlendState = BlendState.AlphaBlend;
+
+			effect.Projection = Matrix.CreateOrthographicOffCenter(0, device.Viewport.Width, device.Viewport.Height, 0, 1, 0);
 		}
 
 		public void End () {
