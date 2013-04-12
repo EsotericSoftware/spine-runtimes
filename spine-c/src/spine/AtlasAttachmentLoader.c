@@ -30,10 +30,6 @@
 namespace spine {
 #endif
 
-void _AtlasAttachmentLoader_dispose (AttachmentLoader* self) {
-	_AttachmentLoader_deinit(self);
-}
-
 Attachment* _AtlasAttachmentLoader_newAttachment (AttachmentLoader* loader, Skin* skin, AttachmentType type, const char* name) {
 	AtlasAttachmentLoader* self = SUB_CAST(AtlasAttachmentLoader, loader);
 	switch (type) {
@@ -53,7 +49,7 @@ Attachment* _AtlasAttachmentLoader_newAttachment (AttachmentLoader* loader, Skin
 
 AtlasAttachmentLoader* AtlasAttachmentLoader_create (Atlas* atlas) {
 	AtlasAttachmentLoader* self = NEW(AtlasAttachmentLoader);
-	_AttachmentLoader_init(SUPER(self), _AtlasAttachmentLoader_dispose, _AtlasAttachmentLoader_newAttachment);
+	_AttachmentLoader_init(SUPER(self), _AttachmentLoader_deinit, _AtlasAttachmentLoader_newAttachment);
 	self->atlas = atlas;
 	return self;
 }
