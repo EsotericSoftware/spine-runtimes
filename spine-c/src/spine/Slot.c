@@ -70,7 +70,7 @@ void Slot_setToBindPose (Slot* self) {
 
 	Attachment* attachment = 0;
 	if (self->data->attachmentName) {
-		// Find slot index.
+		/* Find slot index. */
 		int i;
 		for (i = 0; i < self->skeleton->data->slotCount; ++i) {
 			if (self->data == self->skeleton->data->slots[i]) {

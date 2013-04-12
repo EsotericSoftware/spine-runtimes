@@ -72,8 +72,8 @@ void _ExampleRegionAttachment_dispose (Attachment* attachment) {
 }
 
 void _ExampleRegionAttachment_draw (Attachment* attachment, Slot* slot) {
-	// ExampleRegionAttachment* self = (ExampleRegionAttachment*)attachment;
-	// Draw or queue region for drawing.
+	/*	ExampleRegionAttachment* self = (ExampleRegionAttachment*)attachment;
+	   Draw or queue region for drawing. */
 }
 
 RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region) {

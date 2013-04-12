@@ -108,48 +108,48 @@ char* _Util_readFile (const char* path, int* length);
 
 char* _readFile (const char* path, int* length);
 
-void _Skeleton_init (Skeleton* self, SkeletonData* data, //
+void _Skeleton_init (Skeleton* self, SkeletonData* data, /**/
 		void (*dispose) (Skeleton* skeleton));
 void _Skeleton_deinit (Skeleton* self);
 
 /**/
 
-void _Attachment_init (Attachment* self, const char* name, AttachmentType type, //
-		void (*dispose) (Attachment* self), //
+void _Attachment_init (Attachment* self, const char* name, AttachmentType type, /**/
+		void (*dispose) (Attachment* self), /**/
 		void (*draw) (Attachment* self, struct Slot* slot));
 void _Attachment_deinit (Attachment* self);
 
 /**/
 
-void _RegionAttachment_init (RegionAttachment* self, const char* name, //
-		void (*dispose) (Attachment* self), //
+void _RegionAttachment_init (RegionAttachment* self, const char* name, /**/
+		void (*dispose) (Attachment* self), /**/
 		void (*draw) (Attachment* self, struct Slot* slot));
 void _RegionAttachment_deinit (RegionAttachment* self);
 
 /**/
 
-void _Timeline_init (Timeline* self, //
-		void (*dispose) (Timeline* self), //
+void _Timeline_init (Timeline* self, /**/
+		void (*dispose) (Timeline* self), /**/
 		void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha));
 void _Timeline_deinit (Timeline* self);
 
 /**/
 
-void _CurveTimeline_init (CurveTimeline* self, int frameCount, //
-		void (*dispose) (Timeline* self), //
+void _CurveTimeline_init (CurveTimeline* self, int frameCount, /**/
+		void (*dispose) (Timeline* self), /**/
 		void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha));
 void _CurveTimeline_deinit (CurveTimeline* self);
 
 /**/
 
-void _AtlasPage_init (AtlasPage* self, const char* name, //
+void _AtlasPage_init (AtlasPage* self, const char* name, /**/
 		void (*dispose) (AtlasPage* self));
 void _AtlasPage_deinit (AtlasPage* self);
 
 /**/
 
-void _AttachmentLoader_init (AttachmentLoader* self, //
-		void (*dispose) (AttachmentLoader* self), //
+void _AttachmentLoader_init (AttachmentLoader* self, /**/
+		void (*dispose) (AttachmentLoader* self), /**/
 		Attachment* (*newAttachment) (AttachmentLoader* self, Skin* skin, AttachmentType type, const char* name));
 void _AttachmentLoader_deinit (AttachmentLoader* self);
 void _AttachmentLoader_setError (AttachmentLoader* self, const char* error1, const char* error2);

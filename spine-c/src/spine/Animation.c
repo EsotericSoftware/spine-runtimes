@@ -70,8 +70,8 @@ typedef struct _TimelineVtable {
 	void (*dispose) (Timeline* self);
 } _TimelineVtable;
 
-void _Timeline_init (Timeline* self, //
-		void (*dispose) (Timeline* self), //
+void _Timeline_init (Timeline* self, /**/
+		void (*dispose) (Timeline* self), /**/
 		void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha)) {
 	CONST_CAST(_TimelineVtable*, self->vtable) = NEW(_TimelineVtable);
 	VTABLE(Timeline, self) ->dispose = dispose;
@@ -96,8 +96,8 @@ static const float CURVE_LINEAR = 0;
 static const float CURVE_STEPPED = -1;
 static const int CURVE_SEGMENTS = 10;
 
-void _CurveTimeline_init (CurveTimeline* self, int frameCount, //
-		void (*dispose) (Timeline* self), //
+void _CurveTimeline_init (CurveTimeline* self, int frameCount, /**/
+		void (*dispose) (Timeline* self), /**/
 		void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha)) {
 	_Timeline_init(SUPER(self), dispose, apply);
 	self->curves = CALLOC(float, (frameCount - 1) * 6);
@@ -203,7 +203,7 @@ void _BaseTimeline_dispose (Timeline* timeline) {
 }
 
 /* Many timelines have structure identical to struct BaseTimeline and extend CurveTimeline. **/
-struct BaseTimeline* _BaseTimeline_create (int frameCount, int frameSize, //
+struct BaseTimeline* _BaseTimeline_create (int frameCount, int frameSize, /**/
 		void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha)) {
 
 	struct BaseTimeline* self = NEW(struct BaseTimeline);
