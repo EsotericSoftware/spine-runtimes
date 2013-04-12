@@ -30,6 +30,28 @@
 namespace spine {
 #endif
 
+static void* (*mallocFunc) (size_t size) = malloc;
+static void (*freeFunc) (void* ptr) = free;
+
+void* _malloc (size_t size) {
+	return mallocFunc(size);
+}
+void* _calloc (size_t num, size_t size) {
+	void* ptr = mallocFunc(size);
+	if (ptr) memset(ptr, 0, size);
+	return ptr;
+}
+void _free (void* ptr) {
+	freeFunc(ptr);
+}
+
+void _setMalloc (void* (*malloc) (size_t size)) {
+	mallocFunc = malloc;
+}
+void _setFree (void (*free) (void* ptr)) {
+	freeFunc = free;
+}
+
 char* _readFile (const char* path, int* length) {
 	FILE *file = fopen(path, "rb");
 	if (!file) return 0;
