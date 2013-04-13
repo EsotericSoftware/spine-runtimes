@@ -81,12 +81,10 @@ namespace Spine
         /// </summary>
         /// <param name="json">A JSON string.</param>
 		 /// <returns>An List&lt;object&gt;, a Dictionary&lt;string, object&gt;, a float, an integer,a string, null, true, or false</returns>
-        public static object Deserialize(string json) {
-            // save the string for debug information
+		 public static object Deserialize (TextReader json) {
             if (json == null) {
                 return null;
-            }
- 
+            } 
             return Parser.Parse(json);
         }
  
@@ -109,14 +107,14 @@ namespace Spine
                 NULL
             };
  
-            StringReader json;
+            TextReader json;
  
-            Parser(string jsonString) {
-                json = new StringReader(jsonString);
+            Parser(TextReader reader) {
+					json = reader;
             }
- 
-            public static object Parse(string jsonString) {
-                using (var instance = new Parser(jsonString)) {
+
+				public static object Parse (TextReader reader) {
+                using (var instance = new Parser(reader)) {
                     return instance.ParseValue();
                 }
             }
@@ -288,14 +286,6 @@ namespace Spine
  
             object ParseNumber() {
                 string number = NextWord;
-
-					 //NO!! always serialize to a float
-                //if (number.IndexOf('.') == -1) {
-                //    long parsedInt;
-                //    Int64.TryParse(number, out parsedInt);
-                //    return parsedInt;
-                //}
-
 					 float parsedFloat;
 					 float.TryParse(number, NumberStyles.Float, CultureInfo.InvariantCulture, out parsedFloat); 
 					 return parsedFloat;

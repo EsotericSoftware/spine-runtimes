@@ -34,6 +34,7 @@ namespace Spine {
 		SpriteBatcher batcher;
 		BasicEffect effect;
 		RasterizerState rasterizerState;
+		public BlendState BlendState { get; set; }
 
 		public SkeletonRenderer (GraphicsDevice device) {
 			this.device = device;
@@ -49,12 +50,14 @@ namespace Spine {
 			rasterizerState = new RasterizerState();
 			rasterizerState.CullMode = CullMode.None;
 
+			BlendState = BlendState.AlphaBlend;
+
 			Bone.yDown = true;
 		}
 
 		public void Begin () {
 			device.RasterizerState = rasterizerState;
-			device.BlendState = BlendState.AlphaBlend;
+			device.BlendState = BlendState;
 
 			effect.Projection = Matrix.CreateOrthographicOffCenter(0, device.Viewport.Width, device.Viewport.Height, 0, 1, 0);
 		}
@@ -71,13 +74,11 @@ namespace Spine {
 			for (int i = 0, n = drawOrder.Count; i < n; i++) {
 				Slot slot = drawOrder[i];
 				Attachment attachment = slot.Attachment;
-				if (attachment == null)
-					continue;
 				if (attachment is RegionAttachment) {
 					RegionAttachment regionAttachment = (RegionAttachment)attachment;
 
 					SpriteBatchItem item = batcher.CreateBatchItem();
-					item.Texture = ((XnaAtlasPage)regionAttachment.Region.Page).Texture;
+					item.Texture = (Texture2D)regionAttachment.Region.Atlas.Texture;
 
 					byte r = (byte)(slot.R * 255);
 					byte g = (byte)(slot.G * 255);

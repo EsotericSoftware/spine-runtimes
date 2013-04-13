@@ -27,9 +27,9 @@ using System;
 
 namespace Spine {
 	public class AtlasAttachmentLoader : AttachmentLoader {
-		private BaseAtlas atlas;
+		private Atlas atlas;
 
-		public AtlasAttachmentLoader (BaseAtlas atlas) {
+		public AtlasAttachmentLoader (Atlas atlas) {
 			if (atlas == null) throw new ArgumentNullException("atlas cannot be null.");
 			this.atlas = atlas;
 		}

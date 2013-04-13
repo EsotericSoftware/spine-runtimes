@@ -58,11 +58,13 @@ namespace Spine {
 
 		protected override void LoadContent () {
 			skeletonRenderer = new SkeletonRenderer(GraphicsDevice);
-			Atlas atlas = new Atlas(GraphicsDevice, "data/goblins.atlas");
+
+			Texture2D texture = Util.LoadTexture(GraphicsDevice, "data/goblins.png");
+			Atlas atlas = new Atlas("data/goblins.atlas", texture, texture.Width, texture.Height);
 			SkeletonJson json = new SkeletonJson(atlas);
-			skeleton = new Skeleton(json.readSkeletonData("goblins", File.ReadAllText("data/goblins.json")));
+			skeleton = new Skeleton(json.ReadSkeletonData("data/goblins.json"));
 			skeleton.SetSkin("goblingirl");
-			skeleton.SetSlotsToBindPose();
+			skeleton.SetSlotsToBindPose(); // Without this the skin attachments won't be attached. See SetSkin.
 			animation = skeleton.Data.FindAnimation("walk");
 
 			skeleton.RootBone.X = 320;

@@ -96,16 +96,18 @@ namespace Spine {
 			float localX = -localX2;
 			float localY = -localY2;
 			AtlasRegion region = Region;
-			if (region.Rotate) {
-				localX += region.OffsetX / region.OriginalWidth * height;
-				localY += region.OffsetY / region.OriginalHeight * width;
-				localX2 -= (region.OriginalWidth - region.OffsetX - region.Height) / region.OriginalWidth * width;
-				localY2 -= (region.OriginalHeight - region.OffsetY - region.Width) / region.OriginalHeight * height;
-			} else {
-				localX += region.OffsetX / region.OriginalWidth * width;
-				localY += region.OffsetY / region.OriginalHeight * height;
-				localX2 -= (region.OriginalWidth - region.OffsetX - region.Width) / region.OriginalWidth * width;
-				localY2 -= (region.OriginalHeight - region.OffsetY - region.Height) / region.OriginalHeight * height;
+			if (region != null) {
+				if (region.Rotate) {
+					localX += region.OffsetX / region.OriginalWidth * height;
+					localY += region.OffsetY / region.OriginalHeight * width;
+					localX2 -= (region.OriginalWidth - region.OffsetX - region.Height) / region.OriginalWidth * width;
+					localY2 -= (region.OriginalHeight - region.OffsetY - region.Width) / region.OriginalHeight * height;
+				} else {
+					localX += region.OffsetX / region.OriginalWidth * width;
+					localY += region.OffsetY / region.OriginalHeight * height;
+					localX2 -= (region.OriginalWidth - region.OffsetX - region.Width) / region.OriginalWidth * width;
+					localY2 -= (region.OriginalHeight - region.OffsetY - region.Height) / region.OriginalHeight * height;
+				}
 			}
 			float scaleX = ScaleX;
 			float scaleY = ScaleY;

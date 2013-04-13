@@ -41,7 +41,7 @@ namespace Spine {
 		private AttachmentLoader attachmentLoader;
 		public float Scale { get; set; }
 
-		public SkeletonJson (BaseAtlas atlas) {
+		public SkeletonJson (Atlas atlas) {
 			this.attachmentLoader = new AtlasAttachmentLoader(atlas);
 			Scale = 1;
 		}
@@ -51,14 +51,21 @@ namespace Spine {
 			Scale = 1;
 		}
 
-		public SkeletonData readSkeletonData (String name, String json) {
-			if (json == null)
+		public SkeletonData ReadSkeletonData (String path) {
+			using (Stream input = new FileStream(path, FileMode.Open, FileAccess.Read)) {
+				SkeletonData skeletonData = ReadSkeletonData(input);
+				skeletonData.Name = Path.GetFileNameWithoutExtension(path);
+				return skeletonData;
+			}
+		}
+
+		public SkeletonData ReadSkeletonData (Stream input) {
+			if (input == null)
 				throw new ArgumentNullException("json cannot be null.");
 
 			SkeletonData skeletonData = new SkeletonData();
-			skeletonData.Name = name;
 
-			var root = Json.Deserialize(json) as Dictionary<String, Object>;
+			var root = Json.Deserialize(new StreamReader(input)) as Dictionary<String, Object>;
 
 			// Bones.
 			foreach (Dictionary<String, Object> boneMap in (List<Object>)root["bones"]) {

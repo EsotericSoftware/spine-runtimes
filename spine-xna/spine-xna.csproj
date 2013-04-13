@@ -93,7 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\Atlas.cs" />
+    <Compile Include="src\Util.cs" />
     <Compile Include="src\SkeletonRenderer.cs" />
     <Compile Include="src\SpriteBatcher.cs" />
   </ItemGroup>
