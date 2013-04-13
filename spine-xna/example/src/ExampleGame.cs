@@ -58,9 +58,11 @@ namespace Spine {
 
 		protected override void LoadContent () {
 			skeletonRenderer = new SkeletonRenderer(GraphicsDevice);
-			Atlas atlas = new Atlas(GraphicsDevice, "data/spineboy.atlas");
+			Atlas atlas = new Atlas(GraphicsDevice, "data/goblins.atlas");
 			SkeletonJson json = new SkeletonJson(atlas);
-			skeleton = new Skeleton(json.readSkeletonData("spineboy", File.ReadAllText("data/spineboy.json")));
+			skeleton = new Skeleton(json.readSkeletonData("goblins", File.ReadAllText("data/goblins.json")));
+			skeleton.SetSkin("goblingirl");
+			skeleton.SetSlotsToBindPose();
 			animation = skeleton.Data.FindAnimation("walk");
 
 			skeleton.RootBone.X = 320;
