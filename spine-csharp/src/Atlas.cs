@@ -39,20 +39,20 @@ namespace Spine {
 		public Object Texture;
 
 		public Atlas (String path, Object texture, int textureWidth, int textureHeight) {
-			using (Stream input = new FileStream(path, FileMode.Open, FileAccess.Read)) {
+			using (StreamReader reader = new StreamReader(path)) {
 				try {
-					initialize(input, texture, textureWidth, textureHeight);
+					initialize(reader, texture, textureWidth, textureHeight);
 				} catch (Exception ex) {
 					throw new Exception("Error reading atlas file: " + path, ex);
 				}
 			}
 		}
 
-		public Atlas (Stream input, Object texture, int textureWidth, int textureHeight) {
-			initialize(input, texture, textureWidth, textureHeight);
+		public Atlas (TextReader reader, Object texture, int textureWidth, int textureHeight) {
+			initialize(reader, texture, textureWidth, textureHeight);
 		}
 
-		private void initialize (Stream input, Object texture, int textureWidth, int textureHeight) {
+		private void initialize (TextReader reader, Object texture, int textureWidth, int textureHeight) {
 			TextureWidth = textureWidth;
 			TextureHeight = textureHeight;
 			Texture = texture;
@@ -62,7 +62,6 @@ namespace Spine {
 			float invTexHeight = 1f / textureHeight;
 			String[] tuple = new String[4];
 
-			StreamReader reader = new StreamReader(input);
 			// Skip to first page entry.
 			while (true) {
 				String line = reader.ReadLine();
@@ -144,7 +143,7 @@ namespace Spine {
 			}
 		}
 
-		static String readValue (StreamReader reader) {
+		static String readValue (TextReader reader) {
 			String line = reader.ReadLine();
 			int colon = line.IndexOf(':');
 			if (colon == -1)
@@ -153,7 +152,7 @@ namespace Spine {
 		}
 
 		/** Returns the number of tuple values read (2 or 4). */
-		static int readTuple (StreamReader reader, String[] tuple) {
+		static int readTuple (TextReader reader, String[] tuple) {
 			String line = reader.ReadLine();
 			int colon = line.IndexOf(':');
 			if (colon == -1)

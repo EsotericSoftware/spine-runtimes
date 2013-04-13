@@ -52,20 +52,19 @@ namespace Spine {
 		}
 
 		public SkeletonData ReadSkeletonData (String path) {
-			using (Stream input = new FileStream(path, FileMode.Open, FileAccess.Read)) {
-				SkeletonData skeletonData = ReadSkeletonData(input);
+			using (StreamReader reader = new StreamReader(path)) {
+				SkeletonData skeletonData = ReadSkeletonData(reader);
 				skeletonData.Name = Path.GetFileNameWithoutExtension(path);
 				return skeletonData;
 			}
 		}
 
-		public SkeletonData ReadSkeletonData (Stream input) {
-			if (input == null)
-				throw new ArgumentNullException("json cannot be null.");
+		public SkeletonData ReadSkeletonData (TextReader reader) {
+			if (reader == null) throw new ArgumentNullException("reader cannot be null.");
 
 			SkeletonData skeletonData = new SkeletonData();
 
-			var root = Json.Deserialize(new StreamReader(input)) as Dictionary<String, Object>;
+			var root = Json.Deserialize(reader) as Dictionary<String, Object>;
 
 			// Bones.
 			foreach (Dictionary<String, Object> boneMap in (List<Object>)root["bones"]) {
