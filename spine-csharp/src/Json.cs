@@ -31,6 +31,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Globalization;
  
 namespace Spine
 {
@@ -296,7 +297,7 @@ namespace Spine
                 //}
 
 					 float parsedFloat;
-					 float.TryParse(number, out parsedFloat);
+					 float.TryParse(number, NumberStyles.Float, CultureInfo.InvariantCulture, out parsedFloat); 
 					 return parsedFloat;
             }
  

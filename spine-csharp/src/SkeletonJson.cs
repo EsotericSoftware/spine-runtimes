@@ -52,7 +52,8 @@ namespace Spine {
 		}
 
 		public SkeletonData readSkeletonData (String name, String json) {
-			if (json == null) throw new ArgumentNullException("json cannot be null.");
+			if (json == null)
+				throw new ArgumentNullException("json cannot be null.");
 
 			SkeletonData skeletonData = new SkeletonData();
 			skeletonData.Name = name;
@@ -64,7 +65,8 @@ namespace Spine {
 				BoneData parent = null;
 				if (boneMap.ContainsKey("parent")) {
 					parent = skeletonData.FindBone((String)boneMap["parent"]);
-					if (parent == null) throw new Exception("Parent bone not found: " + boneMap["parent"]);
+					if (parent == null)
+						throw new Exception("Parent bone not found: " + boneMap["parent"]);
 				}
 				BoneData boneData = new BoneData((String)boneMap["name"], parent);
 				boneData.Length = getFloat(boneMap, "length", 0) * Scale;
@@ -83,7 +85,8 @@ namespace Spine {
 					String slotName = (String)slotMap["name"];
 					String boneName = (String)slotMap["bone"];
 					BoneData boneData = skeletonData.FindBone(boneName);
-					if (boneData == null) throw new Exception("Slot bone not found: " + boneName);
+					if (boneData == null)
+						throw new Exception("Slot bone not found: " + boneName);
 					SlotData slotData = new SlotData(slotName, boneData);
 
 					if (slotMap.ContainsKey("color")) {
@@ -94,7 +97,8 @@ namespace Spine {
 						slotData.A = toColor(color, 3);
 					}
 
-					slotData.AttachmentName = (String)slotMap["attachment"];
+					if (slotMap.ContainsKey("attachment"))
+						slotData.AttachmentName = (String)slotMap["attachment"];
 
 					skeletonData.AddSlot(slotData);
 				}
@@ -113,7 +117,8 @@ namespace Spine {
 						}
 					}
 					skeletonData.AddSkin(skin);
-					if (skin.Name == "default") skeletonData.DefaultSkin = skin;
+					if (skin.Name == "default")
+						skeletonData.DefaultSkin = skin;
 				}
 			}
 
@@ -133,10 +138,12 @@ namespace Spine {
 		}
 
 		private Attachment readAttachment (String name, Dictionary<String, Object> map) {
-			if (map.ContainsKey("name")) name = (String)map["name"];
+			if (map.ContainsKey("name"))
+				name = (String)map["name"];
 
 			AttachmentType type = AttachmentType.region;
-			if (map.ContainsKey("type")) type = (AttachmentType)Enum.Parse(typeof(AttachmentType), (String)map["type"], false);
+			if (map.ContainsKey("type"))
+				type = (AttachmentType)Enum.Parse(typeof(AttachmentType), (String)map["type"], false);
 			Attachment attachment = attachmentLoader.NewAttachment(type, name);
 
 			if (attachment is RegionAttachment) {
@@ -155,12 +162,14 @@ namespace Spine {
 		}
 
 		private float getFloat (Dictionary<String, Object> map, String name, float defaultValue) {
-			if (!map.ContainsKey(name)) return (float)defaultValue;
+			if (!map.ContainsKey(name))
+				return (float)defaultValue;
 			return (float)map[name];
 		}
 
 		public static float toColor (String hexString, int colorIndex) {
-			if (hexString.Length != 8) throw new ArgumentException("Color hexidecimal length must be 8, recieved: " + hexString);
+			if (hexString.Length != 8)
+				throw new ArgumentException("Color hexidecimal length must be 8, recieved: " + hexString);
 			return Convert.ToInt32(hexString.Substring(colorIndex * 2, 2), 16) / (float)255;
 		}
 
@@ -172,7 +181,8 @@ namespace Spine {
 			foreach (KeyValuePair<String, Object> entry in bonesMap) {
 				String boneName = entry.Key;
 				int boneIndex = skeletonData.FindBoneIndex(boneName);
-				if (boneIndex == -1) throw new Exception("Bone not found: " + boneName);
+				if (boneIndex == -1)
+					throw new Exception("Bone not found: " + boneName);
 
 				Dictionary<String, Object> timelineMap = (Dictionary<String, Object>)entry.Value;
 				foreach (KeyValuePair<String, Object> timelineEntry in timelineMap) {
@@ -268,7 +278,8 @@ namespace Spine {
 		}
 
 		private void readCurve (CurveTimeline timeline, int frameIndex, Dictionary<String, Object> valueMap) {
-			if (!valueMap.ContainsKey("curve")) return;
+			if (!valueMap.ContainsKey("curve"))
+				return;
 			Object curveObject = valueMap["curve"];
 			if (curveObject.Equals("stepped"))
 				timeline.SetStepped(frameIndex);
