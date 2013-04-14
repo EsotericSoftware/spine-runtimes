@@ -62,13 +62,12 @@ namespace Spine {
 			float invTexHeight = 1f / textureHeight;
 			String[] tuple = new String[4];
 
-			// Skip to first page entry.
+			// Skip past first page name.
 			while (true) {
 				String line = reader.ReadLine();
-				if (line.Trim().Length == 0)
+				if (line.Trim().Length != 0)
 					break;
 			}
-			reader.ReadLine(); // Skip first page name.
 
 			Format = (Format)Enum.Parse(typeof(Format), readValue(reader), false);
 
