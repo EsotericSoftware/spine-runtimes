@@ -31,5 +31,8 @@ spine-xna/obj
 spine-xna/example/bin
 spine-xna/example/obj
 
-spine-unity/spine-csharp/*
-!spine-unity/spine-csharp/Place spine-csharp here.txt
+spine-unity/Assets/src/spine-csharp/*
+!spine-unity/Assets/src/spine-csharp/Place spine-csharp here.txt
+spine-unity/ProjectSettings
+spine-unity/Temp
+spine-unity/Library
