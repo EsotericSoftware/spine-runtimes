@@ -25,7 +25,11 @@ spine-cocos2d-iphone/libs/*
 forums
 spine-csharp/bin
 spine-csharp/obj
+
 spine-xna/bin
 spine-xna/obj
 spine-xna/example/bin
 spine-xna/example/obj
+
+spine-unity/spine-csharp/*
+!spine-unity/spine-csharp/Place spine-csharp here.txt
