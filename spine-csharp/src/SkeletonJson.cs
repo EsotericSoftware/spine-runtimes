@@ -65,6 +65,7 @@ namespace Spine {
 			SkeletonData skeletonData = new SkeletonData();
 
 			var root = Json.Deserialize(reader) as Dictionary<String, Object>;
+			if (root == null) throw new Exception("Invalid JSON.");
 
 			// Bones.
 			foreach (Dictionary<String, Object> boneMap in (List<Object>)root["bones"]) {

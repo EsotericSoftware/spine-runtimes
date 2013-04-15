@@ -44,9 +44,9 @@ namespace Spine {
 
 		/** @return May be null. */
 		public Attachment GetAttachment (int slotIndex, String name) {
-			KeyValuePair<int, String> key = new KeyValuePair<int, String>(slotIndex, name);
-			if (!attachments.ContainsKey(key)) return null;
-			return attachments[key];
+			Attachment attachment;
+			attachments.TryGetValue(new KeyValuePair<int, String>(slotIndex, name), out attachment);
+			return attachment;
 		}
 
 		public void FindNamesForSlot (int slotIndex, List<String> names) {
