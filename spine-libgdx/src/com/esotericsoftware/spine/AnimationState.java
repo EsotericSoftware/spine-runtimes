@@ -60,6 +60,11 @@ public class AnimationState {
 			current.apply(skeleton, currentTime, currentLoop);
 	}
 
+	public void clear () {
+		previous = null;
+		current = null;
+	}
+
 	/** @see #setAnimation(Animation, boolean) */
 	public void setAnimation (String animationName, boolean loop) {
 		Animation animation = data.getSkeletonData().findAnimation(animationName);

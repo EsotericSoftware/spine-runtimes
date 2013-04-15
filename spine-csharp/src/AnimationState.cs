@@ -59,6 +59,11 @@ namespace Spine {
 			Time = 0;
 		}
 
+		public void Clear () {
+			previous = null;
+			Animation = null;
+		}
+
 		override public String ToString () {
 			return (Animation != null && Animation.Name != null) ? Animation.Name : base.ToString();
 		}
