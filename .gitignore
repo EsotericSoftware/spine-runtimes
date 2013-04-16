@@ -36,3 +36,7 @@ spine-unity/Assets/src/spine-csharp/*
 spine-unity/ProjectSettings
 spine-unity/Temp
 spine-unity/Library
+*.userprefs
+*.pidb
+Assembly-*.csproj
+Assembly-*.pidb
