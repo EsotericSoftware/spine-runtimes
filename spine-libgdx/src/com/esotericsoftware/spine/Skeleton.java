@@ -25,6 +25,8 @@
 
 package com.esotericsoftware.spine;
 
+import com.esotericsoftware.spine.attachments.Attachment;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -115,37 +117,6 @@ public class Skeleton {
 		Array<Slot> slots = this.slots;
 		for (int i = 0, n = slots.size; i < n; i++)
 			slots.get(i).setToBindPose(i);
-	}
-
-	public void draw (SpriteBatch batch) {
-		Array<Slot> drawOrder = this.drawOrder;
-		for (int i = 0, n = drawOrder.size; i < n; i++) {
-			Slot slot = drawOrder.get(i);
-			Attachment attachment = slot.attachment;
-			if (attachment != null) attachment.draw(batch, slot);
-		}
-	}
-
-	public void drawDebug (ShapeRenderer renderer) {
-		renderer.setColor(Color.RED);
-		renderer.begin(ShapeType.Line);
-		for (int i = 0, n = bones.size; i < n; i++) {
-			Bone bone = bones.get(i);
-			if (bone.parent == null) continue;
-			float x = bone.data.length * bone.m00 + bone.worldX;
-			float y = bone.data.length * bone.m10 + bone.worldY;
-			renderer.line(bone.worldX, bone.worldY, x, y);
-		}
-		renderer.end();
-
-		renderer.setColor(Color.GREEN);
-		renderer.begin(ShapeType.Filled);
-		for (int i = 0, n = bones.size; i < n; i++) {
-			Bone bone = bones.get(i);
-			renderer.setColor(Color.GREEN);
-			renderer.circle(bone.worldX, bone.worldY, 3);
-		}
-		renderer.end();
 	}
 
 	public SkeletonData getData () {

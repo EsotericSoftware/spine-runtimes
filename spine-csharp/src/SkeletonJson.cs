@@ -119,7 +119,7 @@ namespace Spine {
 					foreach (KeyValuePair<String, Object> slotEntry in (Dictionary<String, Object>)entry.Value) {
 						int slotIndex = skeletonData.FindSlotIndex(slotEntry.Key);
 						foreach (KeyValuePair<String, Object> attachmentEntry in ((Dictionary<String, Object>)slotEntry.Value)) {
-							Attachment attachment = readAttachment(attachmentEntry.Key, (Dictionary<String, Object>)attachmentEntry.Value);
+							Attachment attachment = readAttachment(skin, attachmentEntry.Key, (Dictionary<String, Object>)attachmentEntry.Value);
 							skin.AddAttachment(slotIndex, attachmentEntry.Key, attachment);
 						}
 					}
@@ -144,14 +144,14 @@ namespace Spine {
 			return skeletonData;
 		}
 
-		private Attachment readAttachment (String name, Dictionary<String, Object> map) {
+		private Attachment readAttachment (Skin skin, String name, Dictionary<String, Object> map) {
 			if (map.ContainsKey("name"))
 				name = (String)map["name"];
 
 			AttachmentType type = AttachmentType.region;
 			if (map.ContainsKey("type"))
 				type = (AttachmentType)Enum.Parse(typeof(AttachmentType), (String)map["type"], false);
-			Attachment attachment = attachmentLoader.NewAttachment(type, name);
+			Attachment attachment = attachmentLoader.NewAttachment(skin, type, name);
 
 			if (attachment is RegionAttachment) {
 				RegionAttachment regionAttachment = (RegionAttachment)attachment;

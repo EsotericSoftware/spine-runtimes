@@ -23,7 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-package com.esotericsoftware.spine;
+package com.esotericsoftware.spine.attachments;
+
+import com.esotericsoftware.spine.Slot;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -34,8 +36,6 @@ abstract public class Attachment {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		this.name = name;
 	}
-
-	abstract public void draw (SpriteBatch batch, Slot slot);
 
 	public String getName () {
 		return name;

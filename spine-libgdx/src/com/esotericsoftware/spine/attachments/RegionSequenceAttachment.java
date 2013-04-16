@@ -41,8 +41,8 @@ public class RegionSequenceAttachment extends RegionAttachment {
 		super(name);
 	}
 
-	public void draw (SpriteBatch batch, Slot slot) {
-		if (regions == null) throw new IllegalStateException("RegionSequenceAttachment is not resolved: " + this);
+	public void updateVertices (Slot slot) {
+		if (regions == null) throw new IllegalStateException("Regions have not been set: " + this);
 
 		int frameIndex = (int)(slot.getAttachmentTime() / frameTime);
 		switch (mode) {
@@ -68,12 +68,12 @@ public class RegionSequenceAttachment extends RegionAttachment {
 			break;
 		}
 		setRegion(regions[frameIndex]);
-		super.draw(batch, slot);
+
+		super.updateVertices(slot);
 	}
 
-	/** May be null if the attachment is not resolved. */
 	public TextureRegion[] getRegions () {
-		if (regions == null) throw new IllegalStateException("RegionSequenceAttachment is not resolved: " + this);
+		if (regions == null) throw new IllegalStateException("Regions have not been set: " + this);
 		return regions;
 	}
 

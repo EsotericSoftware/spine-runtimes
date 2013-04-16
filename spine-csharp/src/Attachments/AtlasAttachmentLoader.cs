@@ -34,7 +34,7 @@ namespace Spine {
 			this.atlas = atlas;
 		}
 
-		public Attachment NewAttachment (AttachmentType type, String name) {
+		public Attachment NewAttachment (Skin skin, AttachmentType type, String name) {
 			switch (type) {
 			case AttachmentType.region:
 				AtlasRegion region = atlas.FindRegion(name);

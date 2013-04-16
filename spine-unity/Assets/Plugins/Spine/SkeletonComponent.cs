@@ -61,6 +61,7 @@ public class SkeletonComponent : MonoBehaviour {
 
 		skeleton = new Skeleton(skeletonDataAsset.GetSkeletonData(false));
 	}
+
 	public void Update () {
 		// Clear fields if missing information to render.
 		if (skeletonDataAsset == null || skeletonDataAsset.GetSkeletonData(false) == null) {
@@ -83,6 +84,7 @@ public class SkeletonComponent : MonoBehaviour {
 		state.Loop = loop;
 
 		// Apply animation.
+		skeleton.Update(Time.deltaTime * timeScale);
 		state.Update(Time.deltaTime * timeScale);
 		state.Apply(skeleton);
 		skeleton.UpdateWorldTransform();

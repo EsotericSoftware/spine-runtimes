@@ -38,7 +38,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 public class MixTest extends ApplicationAdapter {
 	SpriteBatch batch;
 	float time;
-	ShapeRenderer renderer;
+	SkeletonRenderer renderer;
+	SkeletonRendererDebug debugRenderer;
 
 	SkeletonData skeletonData;
 	Skeleton skeleton;
@@ -47,7 +48,8 @@ public class MixTest extends ApplicationAdapter {
 
 	public void create () {
 		batch = new SpriteBatch();
-		renderer = new ShapeRenderer();
+		renderer = new SkeletonRenderer();
+		debugRenderer = new SkeletonRendererDebug();
 
 		final String name = "spineboy";
 
@@ -56,7 +58,7 @@ public class MixTest extends ApplicationAdapter {
 		if (true) {
 			SkeletonJson json = new SkeletonJson(atlas);
 			// json.setScale(2);
-			skeletonData = json.readSkeletonData(Gdx.files.internal(name + "-skeleton.json"));
+			skeletonData = json.readSkeletonData(Gdx.files.internal(name + ".json"));
 		} else {
 			SkeletonBinary binary = new SkeletonBinary(atlas);
 			// binary.setScale(2);
@@ -94,8 +96,6 @@ public class MixTest extends ApplicationAdapter {
 		root.setX(root.getX() + speed * delta);
 
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-		batch.begin();
-		batch.setColor(Color.GRAY);
 
 		// This shows how to manage state manually. See AnimationStatesTest.
 		if (time > total) {
@@ -123,16 +123,17 @@ public class MixTest extends ApplicationAdapter {
 
 		skeleton.updateWorldTransform();
 		skeleton.update(Gdx.graphics.getDeltaTime());
-		skeleton.draw(batch);
 
+		batch.begin();
+		renderer.draw(batch, skeleton);
 		batch.end();
 
-		// skeleton.drawDebug(renderer);
+		debugRenderer.draw(batch, skeleton);
 	}
 
 	public void resize (int width, int height) {
 		batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
-		renderer.setProjectionMatrix(batch.getProjectionMatrix());
+		debugRenderer.getShapeRenderer().setProjectionMatrix(batch.getProjectionMatrix());
 	}
 
 	public static void main (String[] args) throws Exception {

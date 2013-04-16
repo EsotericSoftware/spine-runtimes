@@ -25,9 +25,6 @@
 
 package com.esotericsoftware.spine.attachments;
 
-import com.esotericsoftware.spine.Attachment;
-import com.esotericsoftware.spine.AttachmentLoader;
-import com.esotericsoftware.spine.AttachmentType;
 import com.esotericsoftware.spine.Skin;
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;

@@ -23,9 +23,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-package com.esotericsoftware.spine;
+package com.esotericsoftware.spine.attachments;
 
-public interface AttachmentLoader {
-	/** @return May be null to not load any attachment. */
-	public Attachment newAttachment (Skin skin, AttachmentType type, String name);
+public enum AttachmentType {
+	region, regionSequence
 }

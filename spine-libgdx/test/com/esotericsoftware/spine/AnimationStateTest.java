@@ -35,7 +35,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class AnimationStateTest extends ApplicationAdapter {
 	SpriteBatch batch;
-	ShapeRenderer renderer;
+	SkeletonRenderer renderer;
+	SkeletonRendererDebug debugRenderer;
 
 	TextureAtlas atlas;
 	Skeleton skeleton;
@@ -44,11 +45,12 @@ public class AnimationStateTest extends ApplicationAdapter {
 
 	public void create () {
 		batch = new SpriteBatch();
-		renderer = new ShapeRenderer();
+		renderer = new SkeletonRenderer();
+		debugRenderer = new SkeletonRendererDebug();
 
 		atlas = new TextureAtlas(Gdx.files.internal("spineboy.atlas"));
 		SkeletonJson json = new SkeletonJson(atlas);
-		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy-skeleton.json"));
+		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy.json"));
 
 		// Define mixing between animations.
 		AnimationStateData stateData = new AnimationStateData(skeletonData);
@@ -71,7 +73,6 @@ public class AnimationStateTest extends ApplicationAdapter {
 		state.update(Gdx.graphics.getDeltaTime() / 3);
 
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-		batch.begin();
 
 		state.apply(skeleton);
 		if (state.getAnimation().getName().equals("walk")) {
@@ -81,14 +82,17 @@ public class AnimationStateTest extends ApplicationAdapter {
 			if (state.getTime() > 1) state.setAnimation("walk", true);
 		}
 		skeleton.updateWorldTransform();
-		skeleton.draw(batch);
 
+		batch.begin();
+		renderer.draw(batch, skeleton);
 		batch.end();
+
+		debugRenderer.draw(batch, skeleton);
 	}
 
 	public void resize (int width, int height) {
 		batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
-		renderer.setProjectionMatrix(batch.getProjectionMatrix());
+		debugRenderer.getShapeRenderer().setProjectionMatrix(batch.getProjectionMatrix());
 	}
 
 	public void dispose () {

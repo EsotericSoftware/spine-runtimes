@@ -32,10 +32,13 @@ import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 import com.esotericsoftware.spine.Animation.TranslateTimeline;
+import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
+import com.esotericsoftware.spine.attachments.Attachment;
+import com.esotericsoftware.spine.attachments.AttachmentLoader;
+import com.esotericsoftware.spine.attachments.AttachmentType;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.RegionSequenceAttachment;
 import com.esotericsoftware.spine.attachments.RegionSequenceAttachment.Mode;
-import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -45,8 +48,6 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 import com.badlogic.gdx.utils.OrderedMap;
 import com.badlogic.gdx.utils.SerializationException;
-
-import java.io.StringWriter;
 
 public class SkeletonJson {
 	static public final String TIMELINE_SCALE = "scale";
@@ -161,7 +162,7 @@ public class SkeletonJson {
 		if (attachment instanceof RegionSequenceAttachment) {
 			RegionSequenceAttachment regionSequenceAttachment = (RegionSequenceAttachment)attachment;
 
-			Float fps = (Float)map.get("fps");
+			Float fps = getFloat(map, "fps");
 			if (fps == null) throw new SerializationException("Region sequence attachment missing fps: " + name);
 			regionSequenceAttachment.setFrameTime(fps);
 
@@ -187,6 +188,19 @@ public class SkeletonJson {
 	private float getFloat (OrderedMap map, String name, float defaultValue) {
 		Object value = map.get(name);
 		if (value == null) return defaultValue;
+		if (value instanceof Long) return (Long)value;
+		return (Float)value;
+	}
+
+	private float getFloat (OrderedMap map, String name) {
+		Object value = map.get(name);
+		if (value instanceof Long) return (Long)value;
+		return (Float)value;
+	}
+
+	private float getFloat (Array array, int index) {
+		Object value = array.get(index);
+		if (value instanceof Long) return (Long)value;
 		return (Float)value;
 	}
 
@@ -211,8 +225,8 @@ public class SkeletonJson {
 
 						int frameIndex = 0;
 						for (OrderedMap valueMap : values) {
-							float time = (Float)valueMap.get("time");
-							timeline.setFrame(frameIndex, time, (Float)valueMap.get("angle"));
+							float time = getFloat(valueMap, "time");
+							timeline.setFrame(frameIndex, time, getFloat(valueMap, "angle"));
 							readCurve(timeline, frameIndex, valueMap);
 							frameIndex++;
 						}
@@ -232,8 +246,8 @@ public class SkeletonJson {
 
 						int frameIndex = 0;
 						for (OrderedMap valueMap : values) {
-							float time = (Float)valueMap.get("time");
-							Float x = (Float)valueMap.get("x"), y = (Float)valueMap.get("y");
+							float time = getFloat(valueMap, "time");
+							Float x = getFloat(valueMap, "x"), y = getFloat(valueMap, "y");
 							timeline
 								.setFrame(frameIndex, time, x == null ? 0 : (x * timelineScale), y == null ? 0 : (y * timelineScale));
 							readCurve(timeline, frameIndex, valueMap);
@@ -264,7 +278,7 @@ public class SkeletonJson {
 
 						int frameIndex = 0;
 						for (OrderedMap valueMap : values) {
-							float time = (Float)valueMap.get("time");
+							float time = getFloat(valueMap, "time");
 							Color color = Color.valueOf((String)valueMap.get("color"));
 							timeline.setFrame(frameIndex, time, color.r, color.g, color.b, color.a);
 							readCurve(timeline, frameIndex, valueMap);
@@ -279,7 +293,7 @@ public class SkeletonJson {
 
 						int frameIndex = 0;
 						for (OrderedMap valueMap : values) {
-							float time = (Float)valueMap.get("time");
+							float time = getFloat(valueMap, "time");
 							timeline.setFrame(frameIndex++, time, (String)valueMap.get("name"));
 						}
 						timelines.add(timeline);
@@ -302,7 +316,7 @@ public class SkeletonJson {
 			timeline.setStepped(frameIndex);
 		else if (curveObject instanceof Array) {
 			Array curve = (Array)curveObject;
-			timeline.setCurve(frameIndex, (Float)curve.get(0), (Float)curve.get(1), (Float)curve.get(2), (Float)curve.get(3));
+			timeline.setCurve(frameIndex, getFloat(curve, 0), getFloat(curve, 1), getFloat(curve, 2), getFloat(curve, 3));
 		}
 	}
 }

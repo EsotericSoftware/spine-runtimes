@@ -25,7 +25,6 @@
 
 package com.esotericsoftware.spine.attachments;
 
-import com.esotericsoftware.spine.Attachment;
 import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.Slot;
 
@@ -128,13 +127,11 @@ public class RegionAttachment extends Attachment {
 	}
 
 	public TextureRegion getRegion () {
-		if (region == null) throw new IllegalStateException("RegionAttachment is not resolved: " + this);
+		if (region == null) throw new IllegalStateException("Region has not been set: " + this);
 		return region;
 	}
 
-	public void draw (SpriteBatch batch, Slot slot) {
-		if (region == null) throw new IllegalStateException("RegionAttachment is not resolved: " + this);
-
+	public void updateVertices (Slot slot) {
 		Color skeletonColor = slot.getSkeleton().getColor();
 		Color slotColor = slot.getColor();
 		float color = NumberUtils.intToFloatColor( //
@@ -148,14 +145,8 @@ public class RegionAttachment extends Attachment {
 		vertices[C3] = color;
 		vertices[C4] = color;
 
-		updateWorldVertices(slot.getBone());
-
-		batch.draw(region.getTexture(), vertices, 0, vertices.length);
-	}
-
-	public void updateWorldVertices (Bone bone) {
-		float[] vertices = this.vertices;
 		float[] offset = this.offset;
+		Bone bone = slot.getBone();
 		float x = bone.getWorldX();
 		float y = bone.getWorldY();
 		float m00 = bone.getM00();
@@ -172,7 +163,7 @@ public class RegionAttachment extends Attachment {
 		vertices[Y4] = offset[6] * m10 + offset[7] * m11 + y;
 	}
 
-	public float[] getWorldVertices () {
+	public float[] getVertices () {
 		return vertices;
 	}
 
