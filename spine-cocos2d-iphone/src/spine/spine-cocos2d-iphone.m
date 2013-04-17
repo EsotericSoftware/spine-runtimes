@@ -354,7 +354,7 @@ char* _Util_readFile (const char* path, int* length) {
 	for (int i = 0; i < skeleton->slotCount; ++i) {
 		Slot* slot = skeleton->slots[i];
 		Attachment* attachment = slot->attachment;
-		if (attachment && attachment->type != ATTACHMENT_REGION) continue;
+		if (!attachment || attachment->type != ATTACHMENT_REGION) continue;
 		Cocos2dRegionAttachment* regionAttachment = SUB_CAST(Cocos2dRegionAttachment, attachment);
 		minX = fmin(minX, regionAttachment->quad.bl.vertices.x);
 		minY = fmin(minY, regionAttachment->quad.bl.vertices.y);
