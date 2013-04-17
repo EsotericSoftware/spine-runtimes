@@ -189,28 +189,35 @@ void CCSkeleton::draw () {
 
 CCRect CCSkeleton::boundingBox () {
 	float minX = FLT_MAX, minY = FLT_MAX, maxX = FLT_MIN, maxY = FLT_MIN;
+	float scaleX = getScaleX();
+	float scaleY = getScaleY();
 	for (int i = 0; i < skeleton->slotCount; ++i) {
 		Slot* slot = skeleton->slots[i];
 		Attachment* attachment = slot->attachment;
 		if (!attachment || attachment->type != ATTACHMENT_REGION) continue;
 		Cocos2dxRegionAttachment* regionAttachment = SUB_CAST(Cocos2dxRegionAttachment, attachment);
-		minX = min(minX, regionAttachment->quad.bl.vertices.x);
-		minY = min(minY, regionAttachment->quad.bl.vertices.y);
-		maxX = max(maxX, regionAttachment->quad.bl.vertices.x);
-		maxY = max(maxY, regionAttachment->quad.bl.vertices.y);
-		minX = min(minX, regionAttachment->quad.br.vertices.x);
-		minY = min(minY, regionAttachment->quad.br.vertices.y);
-		maxX = max(maxX, regionAttachment->quad.br.vertices.x);
-		maxY = max(maxY, regionAttachment->quad.br.vertices.y);
-		minX = min(minX, regionAttachment->quad.tl.vertices.x);
-		minY = min(minY, regionAttachment->quad.tl.vertices.y);
-		maxX = max(maxX, regionAttachment->quad.tl.vertices.x);
-		maxY = max(maxY, regionAttachment->quad.tl.vertices.y);
-		minX = min(minX, regionAttachment->quad.tr.vertices.x);
-		minY = min(minY, regionAttachment->quad.tr.vertices.y);
-		maxX = max(maxX, regionAttachment->quad.tr.vertices.x);
-		maxY = max(maxY, regionAttachment->quad.tr.vertices.y);
+		minX = min(minX, regionAttachment->quad.bl.vertices.x * scaleX);
+		minY = min(minY, regionAttachment->quad.bl.vertices.y * scaleY);
+		maxX = max(maxX, regionAttachment->quad.bl.vertices.x * scaleX);
+		maxY = max(maxY, regionAttachment->quad.bl.vertices.y * scaleY);
+		minX = min(minX, regionAttachment->quad.br.vertices.x * scaleX);
+		minY = min(minY, regionAttachment->quad.br.vertices.y * scaleY);
+		maxX = max(maxX, regionAttachment->quad.br.vertices.x * scaleX);
+		maxY = max(maxY, regionAttachment->quad.br.vertices.y * scaleY);
+		minX = min(minX, regionAttachment->quad.tl.vertices.x * scaleX);
+		minY = min(minY, regionAttachment->quad.tl.vertices.y * scaleY);
+		maxX = max(maxX, regionAttachment->quad.tl.vertices.x * scaleX);
+		maxY = max(maxY, regionAttachment->quad.tl.vertices.y * scaleY);
+		minX = min(minX, regionAttachment->quad.tr.vertices.x * scaleX);
+		minY = min(minY, regionAttachment->quad.tr.vertices.y * scaleY);
+		maxX = max(maxX, regionAttachment->quad.tr.vertices.x * scaleX);
+		maxY = max(maxY, regionAttachment->quad.tr.vertices.y * scaleY);
 	}
+	CCPoint position = getPosition();
+	minX = position.x + minX;
+	minY = position.y + minY;
+	maxX = position.x + maxX;
+	maxY = position.y + maxY;
 	return CCRectMake(minX, minY, maxX - minX, maxY - minY);
 }
 

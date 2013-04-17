@@ -351,28 +351,34 @@ char* _Util_readFile (const char* path, int* length) {
 
 - (CGRect) boundingBox {
 	float minX = FLT_MAX, minY = FLT_MAX, maxX = FLT_MIN, maxY = FLT_MIN;
+	float scaleX = self.scaleX;
+	float scaleY = self.scaleY;
 	for (int i = 0; i < skeleton->slotCount; ++i) {
 		Slot* slot = skeleton->slots[i];
 		Attachment* attachment = slot->attachment;
 		if (!attachment || attachment->type != ATTACHMENT_REGION) continue;
 		Cocos2dRegionAttachment* regionAttachment = SUB_CAST(Cocos2dRegionAttachment, attachment);
-		minX = fmin(minX, regionAttachment->quad.bl.vertices.x);
-		minY = fmin(minY, regionAttachment->quad.bl.vertices.y);
-		maxX = fmax(maxX, regionAttachment->quad.bl.vertices.x);
-		maxY = fmax(maxY, regionAttachment->quad.bl.vertices.y);
-		minX = fmin(minX, regionAttachment->quad.br.vertices.x);
-		minY = fmin(minY, regionAttachment->quad.br.vertices.y);
-		maxX = fmax(maxX, regionAttachment->quad.br.vertices.x);
-		maxY = fmax(maxY, regionAttachment->quad.br.vertices.y);
-		minX = fmin(minX, regionAttachment->quad.tl.vertices.x);
-		minY = fmin(minY, regionAttachment->quad.tl.vertices.y);
-		maxX = fmax(maxX, regionAttachment->quad.tl.vertices.x);
-		maxY = fmax(maxY, regionAttachment->quad.tl.vertices.y);
-		minX = fmin(minX, regionAttachment->quad.tr.vertices.x);
-		minY = fmin(minY, regionAttachment->quad.tr.vertices.y);
-		maxX = fmax(maxX, regionAttachment->quad.tr.vertices.x);
-		maxY = fmax(maxY, regionAttachment->quad.tr.vertices.y);
+		minX = fmin(minX, regionAttachment->quad.bl.vertices.x * scaleX);
+		minY = fmin(minY, regionAttachment->quad.bl.vertices.y * scaleY);
+		maxX = fmax(maxX, regionAttachment->quad.bl.vertices.x * scaleX);
+		maxY = fmax(maxY, regionAttachment->quad.bl.vertices.y * scaleY);
+		minX = fmin(minX, regionAttachment->quad.br.vertices.x * scaleX);
+		minY = fmin(minY, regionAttachment->quad.br.vertices.y * scaleY);
+		maxX = fmax(maxX, regionAttachment->quad.br.vertices.x * scaleX);
+		maxY = fmax(maxY, regionAttachment->quad.br.vertices.y * scaleY);
+		minX = fmin(minX, regionAttachment->quad.tl.vertices.x * scaleX);
+		minY = fmin(minY, regionAttachment->quad.tl.vertices.y * scaleY);
+		maxX = fmax(maxX, regionAttachment->quad.tl.vertices.x * scaleX);
+		maxY = fmax(maxY, regionAttachment->quad.tl.vertices.y * scaleY);
+		minX = fmin(minX, regionAttachment->quad.tr.vertices.x * scaleX);
+		minY = fmin(minY, regionAttachment->quad.tr.vertices.y * scaleY);
+		maxX = fmax(maxX, regionAttachment->quad.tr.vertices.x * scaleX);
+		maxY = fmax(maxY, regionAttachment->quad.tr.vertices.y * scaleY);
 	}
+	minX = self.position.x + minX;
+	minY = self.position.y + minY;
+	maxX = self.position.x + maxX;
+	maxY = self.position.y + maxY;
 	return CGRectMake(minX, minY, maxX - minX, maxY - minY);
 }
 
