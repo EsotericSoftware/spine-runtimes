@@ -35,20 +35,15 @@ typedef struct _AtlasPageVtable {
 	void (*dispose) (AtlasPage* self);
 } _AtlasPageVtable;
 
-void _AtlasPage_init (AtlasPage* self, const char* name, /**/
-		void (*dispose) (AtlasPage* self)) {
-	CONST_CAST(_AtlasPageVtable*, self->vtable) = NEW(_AtlasPageVtable);
-	VTABLE(AtlasPage, self) ->dispose = dispose;
+AtlasPage* AtlasPage_create (const char* name) {
+	AtlasPage* self = NEW(AtlasPage);
 	MALLOC_STR(self->name, name);
-}
-
-void _AtlasPage_deinit (AtlasPage* self) {
-	FREE(self->vtable);
-	FREE(self->name);
+	return self;
 }
 
 void AtlasPage_dispose (AtlasPage* self) {
-	VTABLE(AtlasPage, self) ->dispose(self);
+	FREE(self->name);
+	_AtlasPage_disposeTexture(self);
 }
 
 /**/
@@ -200,15 +195,13 @@ Atlas* Atlas_readAtlas (const char* begin, int length, const char* dir) {
 			if (needsSlash) path[dirLength] = '/';
 			strcpy(path + dirLength + needsSlash, name);
 
-			page = AtlasPage_create(name, path);
+			page = AtlasPage_create(name);
+			FREE(name);
 			if (lastPage)
 				lastPage->next = page;
 			else
 				self->pages = page;
 			lastPage = page;
-
-			FREE(name);
-			FREE(path);
 
 			if (!readValue(end, &str)) return abortAtlas(self);
 			page->format = (AtlasFormat)indexOf(formatNames, 7, &str);
@@ -222,6 +215,9 @@ Atlas* Atlas_readAtlas (const char* begin, int length, const char* dir) {
 				page->uWrap = *str.begin == 'x' ? ATLAS_REPEAT : (*str.begin == 'y' ? ATLAS_CLAMPTOEDGE : ATLAS_REPEAT);
 				page->vWrap = *str.begin == 'x' ? ATLAS_CLAMPTOEDGE : (*str.begin == 'y' ? ATLAS_REPEAT : ATLAS_REPEAT);
 			}
+
+			_AtlasPage_createTexture(page, path);
+			FREE(path);
 		} else {
 			AtlasRegion *region = AtlasRegion_create();
 			if (lastRegion)
@@ -243,6 +239,11 @@ Atlas* Atlas_readAtlas (const char* begin, int length, const char* dir) {
 			if (readTuple(end, tuple) != 2) return abortAtlas(self);
 			region->width = toInt(tuple);
 			region->height = toInt(tuple + 1);
+
+			region->u = region->x / (float)page->width;
+			region->v = region->y / (float)page->height;
+			region->u2 = (region->x + region->width) / (float)page->width;
+			region->v2 = (region->y + region->height) / (float)page->height;
 
 			int count;
 			if (!(count = readTuple(end, tuple))) return abortAtlas(self);

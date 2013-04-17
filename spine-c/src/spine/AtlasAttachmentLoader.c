@@ -39,7 +39,9 @@ Attachment* _AtlasAttachmentLoader_newAttachment (AttachmentLoader* loader, Skin
 			_AttachmentLoader_setError(loader, "Region not found: ", name);
 			return 0;
 		}
-		return SUPER_CAST(Attachment, RegionAttachment_create(name, region)) ;
+		RegionAttachment* attachment = RegionAttachment_create(name);
+		attachment->region = region;
+		return SUPER(attachment);
 	}
 	default:
 		_AttachmentLoader_setUnknownTypeError(loader, type);

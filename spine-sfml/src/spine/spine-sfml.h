@@ -52,7 +52,6 @@ public:
 	AnimationState* state;
 	float timeScale;
 	sf::VertexArray* vertexArray;
-	sf::Texture* texture; // All region attachments must use the same texture.
 
 	SkeletonDrawable (SkeletonData* skeleton, AnimationStateData* stateData = 0);
 	~SkeletonDrawable ();

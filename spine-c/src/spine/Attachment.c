@@ -32,17 +32,14 @@ namespace spine {
 #endif
 
 typedef struct _AttachmentVtable {
-	void (*draw) (Attachment* self, struct Slot* slot);
 	void (*dispose) (Attachment* self);
 } _AttachmentVtable;
 
-void _Attachment_init (Attachment* self, const char* name, AttachmentType type, /**/
-		void (*dispose) (Attachment* self), /**/
-		void (*draw) (Attachment* self, struct Slot* slot)) {
+void _Attachment_init (Attachment* self, const char* name, AttachmentType type, //
+		void (*dispose) (Attachment* self)) {
 
 	CONST_CAST(_AttachmentVtable*, self->vtable) = NEW(_AttachmentVtable);
 	VTABLE(Attachment, self) ->dispose = dispose;
-	VTABLE(Attachment, self) ->draw = draw;
 
 	MALLOC_STR(self->name, name);
 	self->type = type;
@@ -55,10 +52,6 @@ void _Attachment_deinit (Attachment* self) {
 
 void Attachment_dispose (Attachment* self) {
 	VTABLE(Attachment, self) ->dispose(self);
-}
-
-void Attachment_draw (Attachment* self, Slot* slot) {
-	VTABLE(Attachment, self) ->draw(self, slot);
 }
 
 #ifdef __cplusplus

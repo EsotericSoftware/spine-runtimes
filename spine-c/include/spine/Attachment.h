@@ -47,8 +47,6 @@ struct Attachment {
 
 void Attachment_dispose (Attachment* self);
 
-void Attachment_draw (Attachment* self, struct Slot* slot);
-
 #ifdef __cplusplus
 }
 }

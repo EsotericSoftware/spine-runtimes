@@ -55,12 +55,14 @@ struct AtlasPage {
 	AtlasFormat format;
 	AtlasFilter minFilter, magFilter;
 	AtlasWrap uWrap, vWrap;
-	AtlasPage* next;
 
-	const void* const vtable;
+	void* texture;
+	int width, height;
+
+	AtlasPage* next;
 };
 
-AtlasPage* AtlasPage_create (const char* name, const char* path);
+AtlasPage* AtlasPage_create (const char* name);
 void AtlasPage_dispose (AtlasPage* self);
 
 /**/
@@ -69,6 +71,7 @@ typedef struct AtlasRegion AtlasRegion;
 struct AtlasRegion {
 	const char* name;
 	int x, y, width, height;
+	float u, v, u2, v2;
 	float offsetX, offsetY;
 	int originalWidth, originalHeight;
 	int index;
@@ -76,7 +79,9 @@ struct AtlasRegion {
 	int/*bool*/flip;
 	int* splits;
 	int* pads;
+
 	AtlasPage* page;
+
 	AtlasRegion* next;
 };
 
@@ -90,7 +95,7 @@ typedef struct {
 	AtlasRegion* regions;
 } Atlas;
 
-/* Image files referenced in the atlas file will be prefixed dir. */
+/* Image files referenced in the atlas file will be prefixed with dir. */
 Atlas* Atlas_readAtlas (const char* data, int length, const char* dir);
 /* Image files referenced in the atlas file will be prefixed with the directory containing the atlas file. */
 Atlas* Atlas_readAtlasFile (const char* path);

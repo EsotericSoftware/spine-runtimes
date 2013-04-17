@@ -31,58 +31,35 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 
-using sf::Quads;
-using sf::RenderTarget;
-using sf::RenderStates;
-using sf::Texture;
-using sf::Uint8;
-using sf::Vertex;
-using sf::VertexArray;
+using namespace sf;
 
 namespace spine {
 
-void _SfmlAtlasPage_dispose (AtlasPage* page) {
-	SfmlAtlasPage* self = SUB_CAST(SfmlAtlasPage, page);
-	_AtlasPage_deinit(SUPER(self));
-
-	delete self->texture;
-
-	FREE(page);
+void _AtlasPage_createTexture (AtlasPage* self, const char* path) {
+	Texture* texture = new Texture();
+	if (!texture->loadFromFile(path)) return;
+	self->texture = texture;
+	Vector2u size = texture->getSize();
+	self->width = size.x;
+	self->height = size.x;
 }
 
-AtlasPage* AtlasPage_create (const char* name, const char* path) {
-	SfmlAtlasPage* self = NEW(SfmlAtlasPage);
-	_AtlasPage_init(SUPER(self), name, _SfmlAtlasPage_dispose);
+void _AtlasPage_disposeTexture (AtlasPage* self) {
+	delete (Texture*)self->texture;
+}
 
-	self->texture = new Texture();
-	self->texture->loadFromFile(path);
-
-	return SUPER(self);
+char* _Util_readFile (const char* path, int* length) {
+	return _readFile(path, length);
 }
 
 /**/
 
-void _SfmlSkeleton_dispose (Skeleton* self) {
-	_Skeleton_deinit(self);
-	FREE(self);
-}
-
-Skeleton* _SfmlSkeleton_create (SkeletonData* data, SkeletonDrawable* drawable) {
-	Bone_setYDown(1);
-
-	SfmlSkeleton* self = NEW(SfmlSkeleton);
-	_Skeleton_init(SUPER(self), data, _SfmlSkeleton_dispose);
-
-	CONST_CAST(SkeletonDrawable*, self->drawable) = drawable;
-
-	return SUPER(self);
-}
-
 SkeletonDrawable::SkeletonDrawable (SkeletonData* skeletonData, AnimationStateData* stateData) :
 				timeScale(1),
-				vertexArray(new VertexArray(Quads, skeletonData->boneCount * 4)),
-				texture(0) {
-	skeleton = _SfmlSkeleton_create(skeletonData, this);
+				vertexArray(new VertexArray(Quads, skeletonData->boneCount * 4)) {
+	Bone_setYDown(true);
+
+	skeleton = Skeleton_create(skeletonData);
 	state = AnimationState_create(stateData);
 }
 
@@ -101,99 +78,77 @@ void SkeletonDrawable::update (float deltaTime) {
 
 void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 	vertexArray->clear();
-	for (int i = 0; i < skeleton->slotCount; ++i)
-		if (skeleton->slots[i]->attachment) Attachment_draw(skeleton->slots[i]->attachment, skeleton->slots[i]);
-	states.texture = texture;
-	target.draw(*vertexArray, states);
-}
+	for (int i = 0; i < skeleton->slotCount; ++i) {
+		Slot* slot = skeleton->slots[i];
+		Attachment* attachment = slot->attachment;
+		if (!attachment || attachment->type != ATTACHMENT_REGION) continue;
+		RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
+		RegionAttachment_updateVertices(regionAttachment, slot);
 
-/**/
+		Uint8 r = skeleton->r * slot->r * 255;
+		Uint8 g = skeleton->g * slot->g * 255;
+		Uint8 b = skeleton->b * slot->b * 255;
+		Uint8 a = skeleton->a * slot->a * 255;
 
-void _SfmlRegionAttachment_dispose (Attachment* self) {
-	_RegionAttachment_deinit(SUB_CAST(RegionAttachment, self) );
-	FREE(self);
-}
+		sf::Vertex vertices[4];
+		vertices[0].color.r = r;
+		vertices[0].color.g = g;
+		vertices[0].color.b = b;
+		vertices[0].color.a = a;
+		vertices[1].color.r = r;
+		vertices[1].color.g = g;
+		vertices[1].color.b = b;
+		vertices[1].color.a = a;
+		vertices[2].color.r = r;
+		vertices[2].color.g = g;
+		vertices[2].color.b = b;
+		vertices[2].color.a = a;
+		vertices[3].color.r = r;
+		vertices[3].color.g = g;
+		vertices[3].color.b = b;
+		vertices[3].color.a = a;
 
-void _SfmlRegionAttachment_draw (Attachment* attachment, Slot* slot) {
-	SfmlRegionAttachment* self = SUB_CAST(SfmlRegionAttachment, attachment);
-	SfmlSkeleton* skeleton = (SfmlSkeleton*)slot->skeleton;
-	Uint8 r = SUPER(skeleton)->r * slot->r * 255;
-	Uint8 g = SUPER(skeleton)->g * slot->g * 255;
-	Uint8 b = SUPER(skeleton)->b * slot->b * 255;
-	Uint8 a = SUPER(skeleton)->a * slot->a * 255;
-	sf::Vertex* vertices = self->vertices;
-	vertices[0].color.r = r;
-	vertices[0].color.g = g;
-	vertices[0].color.b = b;
-	vertices[0].color.a = a;
-	vertices[1].color.r = r;
-	vertices[1].color.g = g;
-	vertices[1].color.b = b;
-	vertices[1].color.a = a;
-	vertices[2].color.r = r;
-	vertices[2].color.g = g;
-	vertices[2].color.b = b;
-	vertices[2].color.a = a;
-	vertices[3].color.r = r;
-	vertices[3].color.g = g;
-	vertices[3].color.b = b;
-	vertices[3].color.a = a;
+		vertices[0].position.x = regionAttachment->vertices[VERTEX_X1];
+		vertices[0].position.y = regionAttachment->vertices[VERTEX_Y1];
+		vertices[1].position.x = regionAttachment->vertices[VERTEX_X2];
+		vertices[1].position.y = regionAttachment->vertices[VERTEX_Y2];
+		vertices[2].position.x = regionAttachment->vertices[VERTEX_X3];
+		vertices[2].position.y = regionAttachment->vertices[VERTEX_Y3];
+		vertices[3].position.x = regionAttachment->vertices[VERTEX_X4];
+		vertices[3].position.y = regionAttachment->vertices[VERTEX_Y4];
 
-	float* offset = SUPER(self)->offset;
-	Bone* bone = slot->bone;
-	vertices[0].position.x = offset[0] * bone->m00 + offset[1] * bone->m01 + bone->worldX;
-	vertices[0].position.y = offset[0] * bone->m10 + offset[1] * bone->m11 + bone->worldY;
-	vertices[1].position.x = offset[2] * bone->m00 + offset[3] * bone->m01 + bone->worldX;
-	vertices[1].position.y = offset[2] * bone->m10 + offset[3] * bone->m11 + bone->worldY;
-	vertices[2].position.x = offset[4] * bone->m00 + offset[5] * bone->m01 + bone->worldX;
-	vertices[2].position.y = offset[4] * bone->m10 + offset[5] * bone->m11 + bone->worldY;
-	vertices[3].position.x = offset[6] * bone->m00 + offset[7] * bone->m01 + bone->worldX;
-	vertices[3].position.y = offset[6] * bone->m10 + offset[7] * bone->m11 + bone->worldY;
+		int u = regionAttachment->region->x;
+		int u2 = u + regionAttachment->region->width;
+		int v = regionAttachment->region->y;
+		int v2 = v + regionAttachment->region->height;
+		if (regionAttachment->region->rotate) {
+			vertices[1].texCoords.x = u;
+			vertices[1].texCoords.y = v2;
+			vertices[2].texCoords.x = u;
+			vertices[2].texCoords.y = v;
+			vertices[3].texCoords.x = u2;
+			vertices[3].texCoords.y = v;
+			vertices[0].texCoords.x = u2;
+			vertices[0].texCoords.y = v2;
+		} else {
+			vertices[0].texCoords.x = u;
+			vertices[0].texCoords.y = v2;
+			vertices[1].texCoords.x = u;
+			vertices[1].texCoords.y = v;
+			vertices[2].texCoords.x = u2;
+			vertices[2].texCoords.y = v;
+			vertices[3].texCoords.x = u2;
+			vertices[3].texCoords.y = v2;
+		}
 
-	// SMFL doesn't handle batching for us, so we'll just force a single texture per skeleton.
-	skeleton->drawable->texture = self->texture;
-	skeleton->drawable->vertexArray->append(vertices[0]);
-	skeleton->drawable->vertexArray->append(vertices[1]);
-	skeleton->drawable->vertexArray->append(vertices[2]);
-	skeleton->drawable->vertexArray->append(vertices[3]);
-}
-
-RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region) {
-	SfmlRegionAttachment* self = NEW(SfmlRegionAttachment);
-	_RegionAttachment_init(SUPER(self), name, _SfmlRegionAttachment_dispose, _SfmlRegionAttachment_draw);
-
-	self->texture = ((SfmlAtlasPage*)region->page)->texture;
-	int u = region->x;
-	int u2 = u + region->width;
-	int v = region->y;
-	int v2 = v + region->height;
-	if (region->rotate) {
-		self->vertices[1].texCoords.x = u;
-		self->vertices[1].texCoords.y = v2;
-		self->vertices[2].texCoords.x = u;
-		self->vertices[2].texCoords.y = v;
-		self->vertices[3].texCoords.x = u2;
-		self->vertices[3].texCoords.y = v;
-		self->vertices[0].texCoords.x = u2;
-		self->vertices[0].texCoords.y = v2;
-	} else {
-		self->vertices[0].texCoords.x = u;
-		self->vertices[0].texCoords.y = v2;
-		self->vertices[1].texCoords.x = u;
-		self->vertices[1].texCoords.y = v;
-		self->vertices[2].texCoords.x = u2;
-		self->vertices[2].texCoords.y = v;
-		self->vertices[3].texCoords.x = u2;
-		self->vertices[3].texCoords.y = v2;
+		// SMFL doesn't handle batching for us, so we'll just force a single texture per skeleton.
+		states.texture = (Texture*)regionAttachment->region->page->texture;
+		vertexArray->append(vertices[0]);
+		vertexArray->append(vertices[1]);
+		vertexArray->append(vertices[2]);
+		vertexArray->append(vertices[3]);
 	}
-
-	return SUPER(self);
-}
-
-/**/
-
-char* _Util_readFile (const char* path, int* length) {
-	return _readFile(path, length);
+	target.draw(*vertexArray, states);
 }
 
 } /* namespace spine */

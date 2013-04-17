@@ -31,43 +31,85 @@ using std::min;
 using std::max;
 namespace spine {
 
-void _Cocos2dxAtlasPage_dispose (AtlasPage* page) {
-	Cocos2dxAtlasPage* self = SUB_CAST(Cocos2dxAtlasPage, page);
-	_AtlasPage_deinit(SUPER(self));
-
-	CC_SAFE_RELEASE_NULL(self->texture);
-	CC_SAFE_RELEASE_NULL(self->textureAtlas);
-
-	FREE(page);
+void _AtlasPage_createTexture (AtlasPage* self, const char* path) {
+	CCTexture2D* texture = CCTextureCache::sharedTextureCache()->addImage(path);
+	CCTextureAtlas* textureAtlas = CCTextureAtlas::createWithTexture(texture, 4);
+	textureAtlas->retain();
+	self->texture = textureAtlas;
+	self->width = texture->getPixelsWide();
+	self->height = texture->getPixelsHigh();
 }
 
-AtlasPage* AtlasPage_create (const char* name, const char* path) {
-	Cocos2dxAtlasPage* self = NEW(Cocos2dxAtlasPage);
-	_AtlasPage_init(SUPER(self), name, _Cocos2dxAtlasPage_dispose);
+void _AtlasPage_disposeTexture (AtlasPage* self) {
+	((CCTextureAtlas*)self->texture)->release();
+}
 
-	self->texture = CCTextureCache::sharedTextureCache()->addImage(path);
-	self->texture->retain();
-	self->textureAtlas = CCTextureAtlas::createWithTexture(self->texture, 4);
-	self->textureAtlas->retain();
-
-	return SUPER(self);
+char* _Util_readFile (const char* path, int* length) {
+	unsigned long size;
+    char* data = reinterpret_cast<char*>(CCFileUtils::sharedFileUtils()->getFileData(
+		CCFileUtils::sharedFileUtils()->fullPathForFilename(path).c_str(), "r", &size));
+	*length = size;
+	return data;
 }
 
 /**/
 
-void _Cocos2dxSkeleton_dispose (Skeleton* self) {
-	_Skeleton_deinit(self);
-	FREE(self);
+void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_T2F_Quad* quad) {
+	RegionAttachment_updateVertices(self, slot);
+
+	GLubyte r = slot->skeleton->r * slot->r * 255;
+	GLubyte g = slot->skeleton->g * slot->g * 255;
+	GLubyte b = slot->skeleton->b * slot->b * 255;
+	GLubyte a = slot->skeleton->a * slot->a * 255;
+	quad->bl.colors.r = r;
+	quad->bl.colors.g = g;
+	quad->bl.colors.b = b;
+	quad->bl.colors.a = a;
+	quad->tl.colors.r = r;
+	quad->tl.colors.g = g;
+	quad->tl.colors.b = b;
+	quad->tl.colors.a = a;
+	quad->tr.colors.r = r;
+	quad->tr.colors.g = g;
+	quad->tr.colors.b = b;
+	quad->tr.colors.a = a;
+	quad->br.colors.r = r;
+	quad->br.colors.g = g;
+	quad->br.colors.b = b;
+	quad->br.colors.a = a;
+
+	float* offset = self->offset;
+	quad->bl.vertices.x = offset[VERTEX_X1] * slot->bone->m00 + offset[VERTEX_Y1] * slot->bone->m01 + slot->bone->worldX;
+	quad->bl.vertices.y = offset[VERTEX_X1] * slot->bone->m10 + offset[VERTEX_Y1] * slot->bone->m11 + slot->bone->worldY;
+	quad->tl.vertices.x = offset[VERTEX_X2] * slot->bone->m00 + offset[VERTEX_Y2] * slot->bone->m01 + slot->bone->worldX;
+	quad->tl.vertices.y = offset[VERTEX_X2] * slot->bone->m10 + offset[VERTEX_Y2] * slot->bone->m11 + slot->bone->worldY;
+	quad->tr.vertices.x = offset[VERTEX_X3] * slot->bone->m00 + offset[VERTEX_Y3] * slot->bone->m01 + slot->bone->worldX;
+	quad->tr.vertices.y = offset[VERTEX_X3] * slot->bone->m10 + offset[VERTEX_Y3] * slot->bone->m11 + slot->bone->worldY;
+	quad->br.vertices.x = offset[VERTEX_X4] * slot->bone->m00 + offset[VERTEX_Y4] * slot->bone->m01 + slot->bone->worldX;
+	quad->br.vertices.y = offset[VERTEX_X4] * slot->bone->m10 + offset[VERTEX_Y4] * slot->bone->m11 + slot->bone->worldY;
+
+	if (self->region->rotate) {
+		quad->tl.texCoords.u = self->region->u;
+		quad->tl.texCoords.v = self->region->v2;
+		quad->tr.texCoords.u = self->region->u;
+		quad->tr.texCoords.v = self->region->v;
+		quad->br.texCoords.u = self->region->u2;
+		quad->br.texCoords.v = self->region->v;
+		quad->bl.texCoords.u = self->region->u2;
+		quad->bl.texCoords.v = self->region->v2;
+	} else {
+		quad->bl.texCoords.u = self->region->u;
+		quad->bl.texCoords.v = self->region->v2;
+		quad->tl.texCoords.u = self->region->u;
+		quad->tl.texCoords.v = self->region->v;
+		quad->tr.texCoords.u = self->region->u2;
+		quad->tr.texCoords.v = self->region->v;
+		quad->br.texCoords.u = self->region->u2;
+		quad->br.texCoords.v = self->region->v2;
+	}
 }
 
-Skeleton* _Cocos2dxSkeleton_create (SkeletonData* data, CCSkeleton* node) {
-	Cocos2dxSkeleton* self = NEW(Cocos2dxSkeleton);
-	_Skeleton_init(SUPER(self), data, _Cocos2dxSkeleton_dispose);
-
-	self->node = node;
-
-	return SUPER(self);
-}
+/**/
 
 CCSkeleton* CCSkeleton::create (const char* skeletonDataFile, Atlas* atlas, float scale) {
 	SkeletonJson* json = SkeletonJson_create(atlas);
@@ -105,7 +147,7 @@ CCSkeleton* CCSkeleton::create (SkeletonData* skeletonData, AnimationStateData* 
 CCSkeleton::CCSkeleton (SkeletonData *skeletonData, AnimationStateData *stateData) :
 				ownsSkeleton(false), ownsStateData(false), atlas(0),
 				skeleton(0), state(0), debugSlots(false), debugBones(false) {
-	CONST_CAST(Skeleton*, skeleton) = _Cocos2dxSkeleton_create(skeletonData, this);
+	CONST_CAST(Skeleton*, skeleton) = Skeleton_create(skeletonData);
 
 	if (!stateData) {
 		stateData = AnimationStateData_create(skeletonData);
@@ -146,23 +188,43 @@ void CCSkeleton::draw () {
 	skeleton->b = color.b / (float)255;
 	skeleton->a = getOpacity() / (float)255;
 
-	quadCount = 0;
-	for (int i = 0, n = skeleton->slotCount; i < n; i++)
-		if (skeleton->slots[i]->attachment) Attachment_draw(skeleton->slots[i]->attachment, skeleton->slots[i]);
-	if (textureAtlas) textureAtlas->drawNumberOfQuads(quadCount);
+	CCTextureAtlas* textureAtlas = 0;
+	int quadCount = 0;
+	for (int i = 0, n = skeleton->slotCount; i < n; i++) {
+		Slot* slot = skeleton->slots[i];
+		if (!slot->attachment || slot->attachment->type != ATTACHMENT_REGION) continue;
+		RegionAttachment* attachment = (RegionAttachment*)slot->attachment;
+		CCTextureAtlas* regionTextureAtlas = (CCTextureAtlas*)attachment->region->page->texture;
+		if (regionTextureAtlas != textureAtlas) {
+			if (textureAtlas) {
+				textureAtlas->drawNumberOfQuads(quadCount);
+				quadCount = 0;
+			}
+		}
+		textureAtlas = regionTextureAtlas;
+		if (textureAtlas->getCapacity() == quadCount && !textureAtlas->resizeCapacity(quadCount * 2)) return;
+		RegionAttachment_updateQuad(attachment, slot, &textureAtlas->getQuads()[quadCount++]);
+	}
+	if (textureAtlas) {
+		textureAtlas->drawNumberOfQuads(quadCount);
+		quadCount = 0;
+	}
 
 	if (debugSlots) {
 		// Slots.
 		ccDrawColor4B(0, 0, 255, 255);
 		glLineWidth(1);
 		CCPoint points[4];
+		ccV3F_C4B_T2F_Quad quad;
 		for (int i = 0, n = skeleton->slotCount; i < n; i++) {
-			if (!skeleton->slots[i]->attachment) continue;
-			ccV3F_C4B_T2F_Quad* quad = &((Cocos2dxRegionAttachment*)skeleton->slots[i]->attachment)->quad;
-			points[0] = ccp(quad->bl.vertices.x, quad->bl.vertices.y);
-			points[1] = ccp(quad->br.vertices.x, quad->br.vertices.y);
-			points[2] = ccp(quad->tr.vertices.x, quad->tr.vertices.y);
-			points[3] = ccp(quad->tl.vertices.x, quad->tl.vertices.y);
+			Slot* slot = skeleton->slots[i];
+			if (!slot->attachment || slot->attachment->type != ATTACHMENT_REGION) continue;
+			RegionAttachment* attachment = (RegionAttachment*)slot->attachment;
+			RegionAttachment_updateQuad(attachment, slot, &quad);
+			points[0] = ccp(quad.bl.vertices.x, quad.bl.vertices.y);
+			points[1] = ccp(quad.br.vertices.x, quad.br.vertices.y);
+			points[2] = ccp(quad.tr.vertices.x, quad.tr.vertices.y);
+			points[3] = ccp(quad.tl.vertices.x, quad.tl.vertices.y);
 			ccDrawPoly(points, 4, true);
 		}
 	}
@@ -191,27 +253,28 @@ CCRect CCSkeleton::boundingBox () {
 	float minX = FLT_MAX, minY = FLT_MAX, maxX = FLT_MIN, maxY = FLT_MIN;
 	float scaleX = getScaleX();
 	float scaleY = getScaleY();
+	ccV3F_C4B_T2F_Quad quad;
 	for (int i = 0; i < skeleton->slotCount; ++i) {
 		Slot* slot = skeleton->slots[i];
-		Attachment* attachment = slot->attachment;
-		if (!attachment || attachment->type != ATTACHMENT_REGION) continue;
-		Cocos2dxRegionAttachment* regionAttachment = SUB_CAST(Cocos2dxRegionAttachment, attachment);
-		minX = min(minX, regionAttachment->quad.bl.vertices.x * scaleX);
-		minY = min(minY, regionAttachment->quad.bl.vertices.y * scaleY);
-		maxX = max(maxX, regionAttachment->quad.bl.vertices.x * scaleX);
-		maxY = max(maxY, regionAttachment->quad.bl.vertices.y * scaleY);
-		minX = min(minX, regionAttachment->quad.br.vertices.x * scaleX);
-		minY = min(minY, regionAttachment->quad.br.vertices.y * scaleY);
-		maxX = max(maxX, regionAttachment->quad.br.vertices.x * scaleX);
-		maxY = max(maxY, regionAttachment->quad.br.vertices.y * scaleY);
-		minX = min(minX, regionAttachment->quad.tl.vertices.x * scaleX);
-		minY = min(minY, regionAttachment->quad.tl.vertices.y * scaleY);
-		maxX = max(maxX, regionAttachment->quad.tl.vertices.x * scaleX);
-		maxY = max(maxY, regionAttachment->quad.tl.vertices.y * scaleY);
-		minX = min(minX, regionAttachment->quad.tr.vertices.x * scaleX);
-		minY = min(minY, regionAttachment->quad.tr.vertices.y * scaleY);
-		maxX = max(maxX, regionAttachment->quad.tr.vertices.x * scaleX);
-		maxY = max(maxY, regionAttachment->quad.tr.vertices.y * scaleY);
+		if (!slot->attachment || slot->attachment->type != ATTACHMENT_REGION) continue;
+		RegionAttachment* attachment = (RegionAttachment*)slot->attachment;
+		RegionAttachment_updateQuad(attachment, slot, &quad);
+		minX = min(minX, quad.bl.vertices.x * scaleX);
+		minY = min(minY, quad.bl.vertices.y * scaleY);
+		maxX = max(maxX, quad.bl.vertices.x * scaleX);
+		maxY = max(maxY, quad.bl.vertices.y * scaleY);
+		minX = min(minX, quad.br.vertices.x * scaleX);
+		minY = min(minY, quad.br.vertices.y * scaleY);
+		maxX = max(maxX, quad.br.vertices.x * scaleX);
+		maxY = max(maxY, quad.br.vertices.y * scaleY);
+		minX = min(minX, quad.tl.vertices.x * scaleX);
+		minY = min(minY, quad.tl.vertices.y * scaleY);
+		maxX = max(maxX, quad.tl.vertices.x * scaleX);
+		maxY = max(maxY, quad.tl.vertices.y * scaleY);
+		minX = min(minX, quad.tr.vertices.x * scaleX);
+		minY = min(minY, quad.tr.vertices.y * scaleY);
+		maxX = max(maxX, quad.tr.vertices.x * scaleX);
+		maxY = max(maxY, quad.tr.vertices.y * scaleY);
 	}
 	CCPoint position = getPosition();
 	minX = position.x + minX;
@@ -281,116 +344,6 @@ ccBlendFunc CCSkeleton::getBlendFunc () {
 
 void CCSkeleton::setBlendFunc (ccBlendFunc blendFunc) {
     this->blendFunc = blendFunc;
-}
-
-/**/
-
-void _Cocos2dxRegionAttachment_dispose (Attachment* self) {
-	_RegionAttachment_deinit(SUB_CAST(RegionAttachment, self) );
-	FREE(self);
-}
-
-ccV3F_C4B_T2F_Quad* RegionAttachment_updateQuad (Attachment* attachment, Slot* slot) {
-	Cocos2dxRegionAttachment* self = SUB_CAST(Cocos2dxRegionAttachment, attachment);
-	Cocos2dxSkeleton* skeleton = SUB_CAST(Cocos2dxSkeleton, slot->skeleton);
-
-	GLubyte r = SUPER(skeleton)->r * slot->r * 255;
-	GLubyte g = SUPER(skeleton)->g * slot->g * 255;
-	GLubyte b = SUPER(skeleton)->b * slot->b * 255;
-	GLubyte a = SUPER(skeleton)->a * slot->a * 255;
-	ccV3F_C4B_T2F_Quad* quad = &self->quad;
-	quad->bl.colors.r = r;
-	quad->bl.colors.g = g;
-	quad->bl.colors.b = b;
-	quad->bl.colors.a = a;
-	quad->tl.colors.r = r;
-	quad->tl.colors.g = g;
-	quad->tl.colors.b = b;
-	quad->tl.colors.a = a;
-	quad->tr.colors.r = r;
-	quad->tr.colors.g = g;
-	quad->tr.colors.b = b;
-	quad->tr.colors.a = a;
-	quad->br.colors.r = r;
-	quad->br.colors.g = g;
-	quad->br.colors.b = b;
-	quad->br.colors.a = a;
-
-	float* offset = SUPER(self)->offset;
-	quad->bl.vertices.x = offset[0] * slot->bone->m00 + offset[1] * slot->bone->m01 + slot->bone->worldX;
-	quad->bl.vertices.y = offset[0] * slot->bone->m10 + offset[1] * slot->bone->m11 + slot->bone->worldY;
-	quad->tl.vertices.x = offset[2] * slot->bone->m00 + offset[3] * slot->bone->m01 + slot->bone->worldX;
-	quad->tl.vertices.y = offset[2] * slot->bone->m10 + offset[3] * slot->bone->m11 + slot->bone->worldY;
-	quad->tr.vertices.x = offset[4] * slot->bone->m00 + offset[5] * slot->bone->m01 + slot->bone->worldX;
-	quad->tr.vertices.y = offset[4] * slot->bone->m10 + offset[5] * slot->bone->m11 + slot->bone->worldY;
-	quad->br.vertices.x = offset[6] * slot->bone->m00 + offset[7] * slot->bone->m01 + slot->bone->worldX;
-	quad->br.vertices.y = offset[6] * slot->bone->m10 + offset[7] * slot->bone->m11 + slot->bone->worldY;
-
-	return quad;
-}
-
-void _Cocos2dxRegionAttachment_draw (Attachment* attachment, Slot* slot) {
-	RegionAttachment_updateQuad(attachment, slot);
-
-	Cocos2dxRegionAttachment* self = SUB_CAST(Cocos2dxRegionAttachment, attachment);
-	Cocos2dxSkeleton* skeleton = SUB_CAST(Cocos2dxSkeleton, slot->skeleton);
-
-	// cocos2dx doesn't handle batching for us, so we force a single texture per skeleton.
-	skeleton->node->textureAtlas = self->textureAtlas;
-	while (self->textureAtlas->getCapacity() <= skeleton->node->quadCount) {
-		if (!self->textureAtlas->resizeCapacity(self->textureAtlas->getCapacity() * 2)) return;
-	}
-	self->textureAtlas->updateQuad(&self->quad, skeleton->node->quadCount++);
-}
-
-RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region) {
-	Cocos2dxRegionAttachment* self = NEW(Cocos2dxRegionAttachment);
-	_RegionAttachment_init(SUPER(self), name, _Cocos2dxRegionAttachment_dispose, _Cocos2dxRegionAttachment_draw);
-
-	Cocos2dxAtlasPage* page = SUB_CAST(Cocos2dxAtlasPage, region->page);
-	self->textureAtlas = page->textureAtlas;
-	const CCSize& size = page->texture->getContentSizeInPixels();
-	float u = region->x / size.width;
-	float u2 = (region->x + region->width) / size.width;
-	float v = region->y / size.height;
-	float v2 = (region->y + region->height) / size.height;
-	ccV3F_C4B_T2F_Quad* quad = &self->quad;
-	if (region->rotate) {
-		quad->tl.texCoords.u = u;
-		quad->tl.texCoords.v = v2;
-		quad->tr.texCoords.u = u;
-		quad->tr.texCoords.v = v;
-		quad->br.texCoords.u = u2;
-		quad->br.texCoords.v = v;
-		quad->bl.texCoords.u = u2;
-		quad->bl.texCoords.v = v2;
-	} else {
-		quad->bl.texCoords.u = u;
-		quad->bl.texCoords.v = v2;
-		quad->tl.texCoords.u = u;
-		quad->tl.texCoords.v = v;
-		quad->tr.texCoords.u = u2;
-		quad->tr.texCoords.v = v;
-		quad->br.texCoords.u = u2;
-		quad->br.texCoords.v = v2;
-	}
-
-	quad->bl.vertices.z = 0;
-	quad->tl.vertices.z = 0;
-	quad->tr.vertices.z = 0;
-	quad->br.vertices.z = 0;
-
-	return SUPER(self);
-}
-
-/**/
-
-char* _Util_readFile (const char* path, int* length) {
-	unsigned long size;
-    char* data = reinterpret_cast<char*>(CCFileUtils::sharedFileUtils()->getFileData(
-		CCFileUtils::sharedFileUtils()->fullPathForFilename(path).c_str(), "r", &size));
-	*length = size;
-	return data;
 }
 
 }

@@ -7,85 +7,14 @@
 
 /**/
 
-typedef struct {
-	AtlasPage super;
-	int extraData;
-} ExampleAtlasPage;
-
-void _ExampleAtlasPage_dispose (AtlasPage* page) {
-	ExampleAtlasPage* self = SUB_CAST(ExampleAtlasPage, page);
-	_AtlasPage_deinit(SUPER(self));
-
-	self->extraData = 0;
-
-	FREE(self);
+void _AtlasPage_createTexture (AtlasPage* self, const char* path) {
+	self->texture = 0;
+	self->width = 123;
+	self->height = 456;
 }
 
-AtlasPage* AtlasPage_create (const char* name, const char* path) {
-	ExampleAtlasPage* self = NEW(ExampleAtlasPage);
-	_AtlasPage_init(SUPER(self), name, _ExampleAtlasPage_dispose);
-
-	self->extraData = 123;
-
-	return SUPER(self);
+void _AtlasPage_disposeTexture (AtlasPage* self) {
 }
-
-/**/
-
-typedef struct {
-	Skeleton super;
-	int extraData;
-} ExampleSkeleton;
-
-void _ExampleSkeleton_dispose (Skeleton* skeleton) {
-	ExampleSkeleton* self = SUB_CAST(ExampleSkeleton, skeleton);
-	_Skeleton_deinit(SUPER(self));
-
-	self->extraData = 0;
-
-	FREE(self);
-}
-
-Skeleton* Skeleton_create (SkeletonData* data) {
-	ExampleSkeleton* self = NEW(ExampleSkeleton);
-	_Skeleton_init(SUPER(self), data, _ExampleSkeleton_dispose);
-
-	self->extraData = 789;
-
-	return SUPER(self);
-}
-
-/**/
-
-typedef struct {
-	RegionAttachment super;
-	int extraData;
-} ExampleRegionAttachment;
-
-void _ExampleRegionAttachment_dispose (Attachment* attachment) {
-	ExampleRegionAttachment* self = SUB_CAST(ExampleRegionAttachment, attachment);
-	_RegionAttachment_deinit(SUPER(self));
-
-	self->extraData = 0;
-
-	FREE(self);
-}
-
-void _ExampleRegionAttachment_draw (Attachment* attachment, Slot* slot) {
-	/*	ExampleRegionAttachment* self = (ExampleRegionAttachment*)attachment;
-	   Draw or queue region for drawing. */
-}
-
-RegionAttachment* RegionAttachment_create (const char* name, AtlasRegion* region) {
-	ExampleRegionAttachment* self = NEW(ExampleRegionAttachment);
-	_RegionAttachment_init(SUPER(self), name, _ExampleRegionAttachment_dispose, _ExampleRegionAttachment_draw);
-
-	self->extraData = 456;
-
-	return SUPER(self);
-}
-
-/**/
 
 char* _Util_readFile (const char* path, int* length) {
 	return _readFile(path, length);
@@ -96,7 +25,7 @@ char* _Util_readFile (const char* path, int* length) {
 int main (void) {
 	Atlas* atlas = Atlas_readAtlasFile("data/spineboy.atlas");
 	printf("First region name: %s, x: %d, y: %d\n", atlas->regions->name, atlas->regions->x, atlas->regions->y);
-	printf("First page name: %s, extraData: %d\n", atlas->pages->name, ((ExampleAtlasPage*)atlas->pages)->extraData);
+	printf("First page name: %s, size: %d, %d\n", atlas->pages->name, atlas->pages->width, atlas->pages->height);
 
 	SkeletonJson* json = SkeletonJson_create(atlas);
 	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/spineboy.json");
@@ -104,7 +33,6 @@ int main (void) {
 	printf("Default skin name: %s\n", skeletonData->defaultSkin->name);
 
 	Skeleton* skeleton = Skeleton_create(skeletonData);
-	printf("Skeleton extraData: %d\n", ((ExampleSkeleton*)skeleton)->extraData);
 
 	Animation* animation = SkeletonData_findAnimation(skeletonData, "walk");
 	if (!animation) printf("Error: %s\n", json->error);

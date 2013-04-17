@@ -31,15 +31,9 @@
 namespace spine {
 #endif
 
-typedef struct _SkeletonVtable {
-	void (*dispose) (Skeleton* skeleton);
-} _SkeletonVtable;
-
-void _Skeleton_init (Skeleton* self, SkeletonData* data, void (*dispose) (Skeleton* skeleton)) {
+Skeleton* Skeleton_create (SkeletonData* data) {
+	Skeleton* self = NEW(Skeleton);
 	CONST_CAST(SkeletonData*, self->data) = data;
-
-	CONST_CAST(_SkeletonVtable*, self->vtable) = NEW(_SkeletonVtable);
-	VTABLE(Skeleton, self) ->dispose = dispose;
 
 	self->boneCount = self->data->boneCount;
 	self->bones = MALLOC(Bone*, self->boneCount);
@@ -84,11 +78,11 @@ void _Skeleton_init (Skeleton* self, SkeletonData* data, void (*dispose) (Skelet
 	self->g = 1;
 	self->b = 1;
 	self->a = 1;
+
+	return self;
 }
 
-void _Skeleton_deinit (Skeleton* self) {
-	FREE(self->vtable);
-
+void Skeleton_dispose (Skeleton* self) {
 	int i;
 	for (i = 0; i < self->boneCount; ++i)
 		Bone_dispose(self->bones[i]);
@@ -99,10 +93,6 @@ void _Skeleton_deinit (Skeleton* self) {
 	FREE(self->slots);
 
 	FREE(self->drawOrder);
-}
-
-void Skeleton_dispose (Skeleton* self) {
-	VTABLE(Skeleton, self) ->dispose(self);
 }
 
 void Skeleton_updateWorldTransform (const Skeleton* self) {

@@ -29,22 +29,6 @@
 #include <spine/spine.h>
 #include "cocos2d.h"
 
-#ifdef __cplusplus
-namespace spine {
-extern "C" {
-#endif
-
-ccV3F_C4B_T2F_Quad* RegionAttachment_updateQuad (Attachment* self, Slot* slot);
-ccV3F_C4B_T2F_Quad* RegionAttachment_getQuad (RegionAttachment* self);
-
-#ifdef __cplusplus
-}
-}
-using namespace spine;
-#endif
-
-/**/
-
 @interface CCSkeleton : CCNodeRGBA<CCBlendProtocol> {
 @private
 	bool ownsSkeleton;
@@ -57,9 +41,6 @@ using namespace spine;
 	float timeScale;
 	bool debugSlots;
 	bool debugBones;
-
-	CCTextureAtlas* textureAtlas; // All region attachments for a skeleton must use the same texture.
-	unsigned int quadCount;
 
     ccBlendFunc blendFunc;
 }
@@ -108,5 +89,20 @@ using namespace spine;
 - (bool) setAttachment:(NSString*)slotName attachmentName:(NSString*)attachmentName;
 
 @end
+
+/**/
+
+#ifdef __cplusplus
+namespace spine {
+extern "C" {
+#endif
+
+void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_T2F_Quad* quad);
+
+#ifdef __cplusplus
+}
+}
+using namespace spine;
+#endif
 
 #endif /* SPINE_COCOS2D_H_ */

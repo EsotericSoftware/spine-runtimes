@@ -31,16 +31,12 @@
 namespace spine {
 #endif
 
-void _RegionAttachment_init (RegionAttachment* self, const char* name, /**/
-		void (*dispose) (Attachment* self), /**/
-		void (*draw) (Attachment* self, struct Slot* slot)) {
+RegionAttachment* RegionAttachment_create (const char* name) {
+	RegionAttachment* self = NEW(RegionAttachment);
 	self->scaleX = 1;
 	self->scaleY = 1;
-	_Attachment_init(SUPER(self), name, ATTACHMENT_REGION, dispose, draw);
-}
-
-void _RegionAttachment_deinit (RegionAttachment* self) {
-	_Attachment_deinit(SUPER(self));
+	_Attachment_init(SUPER(self), name, ATTACHMENT_REGION, _Attachment_deinit);
+	return self;
 }
 
 void RegionAttachment_updateOffset (RegionAttachment* self) {
@@ -63,14 +59,27 @@ void RegionAttachment_updateOffset (RegionAttachment* self) {
 	float localX2Sin = localX2 * sine;
 	float localY2Cos = localY2 * cosine + self->y;
 	float localY2Sin = localY2 * sine;
-	self->offset[0] = localXCos - localYSin;
-	self->offset[1] = localYCos + localXSin;
-	self->offset[2] = localXCos - localY2Sin;
-	self->offset[3] = localY2Cos + localXSin;
-	self->offset[4] = localX2Cos - localY2Sin;
-	self->offset[5] = localY2Cos + localX2Sin;
-	self->offset[6] = localX2Cos - localYSin;
-	self->offset[7] = localYCos + localX2Sin;
+	self->offset[VERTEX_X1] = localXCos - localYSin;
+	self->offset[VERTEX_Y1] = localYCos + localXSin;
+	self->offset[VERTEX_X2] = localXCos - localY2Sin;
+	self->offset[VERTEX_Y2] = localY2Cos + localXSin;
+	self->offset[VERTEX_X3] = localX2Cos - localY2Sin;
+	self->offset[VERTEX_Y3] = localY2Cos + localX2Sin;
+	self->offset[VERTEX_X4] = localX2Cos - localYSin;
+	self->offset[VERTEX_Y4] = localYCos + localX2Sin;
+}
+
+void RegionAttachment_updateVertices (RegionAttachment* self, Slot* slot) {
+	float* offset = self->offset;
+	Bone* bone = slot->bone;
+	self->vertices[VERTEX_X1] = offset[VERTEX_X1] * bone->m00 + offset[VERTEX_Y1] * bone->m01 + bone->worldX;
+	self->vertices[VERTEX_Y1] = offset[VERTEX_X1] * bone->m10 + offset[VERTEX_Y1] * bone->m11 + bone->worldY;
+	self->vertices[VERTEX_X2] = offset[VERTEX_X2] * bone->m00 + offset[VERTEX_Y2] * bone->m01 + bone->worldX;
+	self->vertices[VERTEX_Y2] = offset[VERTEX_X2] * bone->m10 + offset[VERTEX_Y2] * bone->m11 + bone->worldY;
+	self->vertices[VERTEX_X3] = offset[VERTEX_X3] * bone->m00 + offset[VERTEX_Y3] * bone->m01 + bone->worldX;
+	self->vertices[VERTEX_Y3] = offset[VERTEX_X3] * bone->m10 + offset[VERTEX_Y3] * bone->m11 + bone->worldY;
+	self->vertices[VERTEX_X4] = offset[VERTEX_X4] * bone->m00 + offset[VERTEX_Y4] * bone->m01 + bone->worldX;
+	self->vertices[VERTEX_Y4] = offset[VERTEX_X4] * bone->m10 + offset[VERTEX_Y4] * bone->m11 + bone->worldY;
 }
 
 #ifdef __cplusplus
