@@ -28,125 +28,111 @@ using System.IO;
 
 namespace Spine {
 	public class Atlas {
-		public Format Format;
-		public TextureFilter MinFilter;
-		public TextureFilter MagFilter;
-		public TextureWrap UWrap;
-		public TextureWrap VWrap;
-		public int TextureWidth;
-		public int TextureHeight;
-		public List<AtlasRegion> Regions;
-		public Object Texture;
+		List<AtlasPage> pages = new List<AtlasPage>();
+		List<AtlasRegion> regions = new List<AtlasRegion>();
 
-		public Atlas (String path, Object texture, int textureWidth, int textureHeight) {
+		public Atlas (String path, TextureLoader textureLoader) {
 			using (StreamReader reader = new StreamReader(path)) {
 				try {
-					initialize(reader, texture, textureWidth, textureHeight);
+					Load(reader, Path.GetDirectoryName(path), textureLoader);
 				} catch (Exception ex) {
 					throw new Exception("Error reading atlas file: " + path, ex);
 				}
 			}
 		}
 
-		public Atlas (TextReader reader, Object texture, int textureWidth, int textureHeight) {
-			initialize(reader, texture, textureWidth, textureHeight);
+		public Atlas (TextReader reader, String dir, TextureLoader textureLoader) {
+			Load(reader, dir, textureLoader);
 		}
 
-		private void initialize (TextReader reader, Object texture, int textureWidth, int textureHeight) {
-			TextureWidth = textureWidth;
-			TextureHeight = textureHeight;
-			Texture = texture;
+		private void Load (TextReader reader, String imagesDir, TextureLoader textureLoader) {
+			if (textureLoader == null) throw new ArgumentNullException("textureLoader cannot be null.");
 
-			Regions = new List<AtlasRegion>();
-			float invTexWidth = 1f / textureWidth;
-			float invTexHeight = 1f / textureHeight;
 			String[] tuple = new String[4];
-
-			// Skip past first page name.
+			AtlasPage page = null;
 			while (true) {
 				String line = reader.ReadLine();
-				if (line.Trim().Length != 0)
-					break;
-			}
+				if (line == null) break;
+				if (line.Trim().Length == 0)
+					page = null;
+				else if (page == null) {
+					page = new AtlasPage();
+					page.name = line;
 
-			Format = (Format)Enum.Parse(typeof(Format), readValue(reader), false);
+					page.format = (Format)Enum.Parse(typeof(Format), readValue(reader), false);
 
-			readTuple(reader, tuple);
-			MinFilter = (TextureFilter)Enum.Parse(typeof(TextureFilter), tuple[0]);
-			MagFilter = (TextureFilter)Enum.Parse(typeof(TextureFilter), tuple[1]);
+					readTuple(reader, tuple);
+					page.minFilter = (TextureFilter)Enum.Parse(typeof(TextureFilter), tuple[0]);
+					page.magFilter = (TextureFilter)Enum.Parse(typeof(TextureFilter), tuple[1]);
 
-			String direction = readValue(reader);
-			UWrap = TextureWrap.ClampToEdge;
-			VWrap = TextureWrap.ClampToEdge;
-			if (direction == "x")
-				UWrap = TextureWrap.Repeat;
-			else if (direction == "y")
-				VWrap = TextureWrap.Repeat;
-			else if (direction == "xy")
-				UWrap = VWrap = TextureWrap.Repeat;
+					String direction = readValue(reader);
+					page.uWrap = TextureWrap.ClampToEdge;
+					page.vWrap = TextureWrap.ClampToEdge;
+					if (direction == "x")
+						page.uWrap = TextureWrap.Repeat;
+					else if (direction == "y")
+						page.vWrap = TextureWrap.Repeat;
+					else if (direction == "xy")
+						page.uWrap = page.vWrap = TextureWrap.Repeat;
 
-			while (true) {
-				String line = reader.ReadLine();
-				if (line == null || line.Trim().Length == 0) break;
+					textureLoader.Load(page, Path.Combine(imagesDir, line));
 
-				AtlasRegion region = new AtlasRegion();
-				region.Atlas = this;
-				region.Name = line;
+					pages.Add(page);
 
-				region.Rotate = Boolean.Parse(readValue(reader));
+				} else {
+					AtlasRegion region = new AtlasRegion();
+					region.name = line;
+					region.page = page;
 
-				readTuple(reader, tuple);
-				int x = int.Parse(tuple[0]);
-				int y = int.Parse(tuple[1]);
+					region.rotate = Boolean.Parse(readValue(reader));
 
-				readTuple(reader, tuple);
-				int width = int.Parse(tuple[0]);
-				int height = int.Parse(tuple[1]);
+					readTuple(reader, tuple);
+					int x = int.Parse(tuple[0]);
+					int y = int.Parse(tuple[1]);
 
-				region.U = x * invTexWidth;
-				region.V = y * invTexHeight;
-				region.U2 = (x + width) * invTexWidth;
-				region.V2 = (y + height) * invTexHeight;
-				region.Width = Math.Abs(width);
-				region.Height = Math.Abs(height);
+					readTuple(reader, tuple);
+					int width = int.Parse(tuple[0]);
+					int height = int.Parse(tuple[1]);
 
-				if (readTuple(reader, tuple) == 4) { // split is optional
-					region.Splits = new int[] {int.Parse(tuple[0]), int.Parse(tuple[1]),
+					region.u = x / (float)page.width;
+					region.v = y / (float)page.height;
+					region.u2 = (x + width) / (float)page.width;
+					region.v2 = (y + height) / (float)page.height;
+					region.x = x;
+					region.y = y;
+					region.width = Math.Abs(width);
+					region.height = Math.Abs(height);
+
+					if (readTuple(reader, tuple) == 4) { // split is optional
+						region.splits = new int[] {int.Parse(tuple[0]), int.Parse(tuple[1]),
 								int.Parse(tuple[2]), int.Parse(tuple[3])};
 
-					if (readTuple(reader, tuple) == 4) { // pad is optional, but only present with splits
-						region.Pads = new int[] {int.Parse(tuple[0]), int.Parse(tuple[1]),
+						if (readTuple(reader, tuple) == 4) { // pad is optional, but only present with splits
+							region.pads = new int[] {int.Parse(tuple[0]), int.Parse(tuple[1]),
 									int.Parse(tuple[2]), int.Parse(tuple[3])};
 
-						readTuple(reader, tuple);
+							readTuple(reader, tuple);
+						}
 					}
+
+					region.originalWidth = int.Parse(tuple[0]);
+					region.originalHeight = int.Parse(tuple[1]);
+
+					readTuple(reader, tuple);
+					region.offsetX = int.Parse(tuple[0]);
+					region.offsetY = int.Parse(tuple[1]);
+
+					region.index = int.Parse(readValue(reader));
+
+					regions.Add(region);
 				}
-
-				region.OriginalWidth = int.Parse(tuple[0]);
-				region.OriginalHeight = int.Parse(tuple[1]);
-
-				readTuple(reader, tuple);
-				region.OffsetX = int.Parse(tuple[0]);
-				region.OffsetY = int.Parse(tuple[1]);
-
-				region.Index = int.Parse(readValue(reader));
-
-				Regions.Add(region);
-			}
-
-			while (true) {
-				String line = reader.ReadLine();
-				if (line == null)
-					break;
-				if (line.Trim().Length != 0) throw new Exception("An atlas with multiple images is not supported.");
 			}
 		}
 
 		static String readValue (TextReader reader) {
 			String line = reader.ReadLine();
 			int colon = line.IndexOf(':');
-			if (colon == -1)
-				throw new Exception("Invalid line: " + line);
+			if (colon == -1) throw new Exception("Invalid line: " + line);
 			return line.Substring(colon + 1).Trim();
 		}
 
@@ -154,14 +140,12 @@ namespace Spine {
 		static int readTuple (TextReader reader, String[] tuple) {
 			String line = reader.ReadLine();
 			int colon = line.IndexOf(':');
-			if (colon == -1)
-				throw new Exception("Invalid line: " + line);
+			if (colon == -1) throw new Exception("Invalid line: " + line);
 			int i = 0, lastMatch = colon + 1;
-			for (i = 0; i < 3; i++) {
+			for (; i < 3; i++) {
 				int comma = line.IndexOf(',', lastMatch);
 				if (comma == -1) {
-					if (i == 0)
-						throw new Exception("Invalid line: " + line);
+					if (i == 0) throw new Exception("Invalid line: " + line);
 					break;
 				}
 				tuple[i] = line.Substring(lastMatch, comma - lastMatch).Trim();
@@ -175,9 +159,8 @@ namespace Spine {
 		 * should be cached rather than calling this method multiple times.
 		 * @return The region, or null. */
 		public AtlasRegion FindRegion (String name) {
-			for (int i = 0, n = Regions.Count; i < n; i++)
-				if (Regions[i].Name == name)
-					return Regions[i];
+			for (int i = 0, n = regions.Count; i < n; i++)
+				if (regions[i].name == name) return regions[i];
 			return null;
 		}
 	}
@@ -208,17 +191,31 @@ namespace Spine {
 		Repeat
 	}
 
+	public class AtlasPage {
+		public String name;
+		public Format format;
+		public TextureFilter minFilter;
+		public TextureFilter magFilter;
+		public TextureWrap uWrap;
+		public TextureWrap vWrap;
+		public Object texture;
+		public int width, height;
+	}
+
 	public class AtlasRegion {
-		public Atlas Atlas;
-		public float U, V;
-		public float U2, V2;
-		public int Width, Height;
-		public int Index;
-		public String Name;
-		public float OffsetX, OffsetY;
-		public int OriginalWidth, OriginalHeight;
-		public bool Rotate;
-		public int[] Splits;
-		public int[] Pads;
+		public AtlasPage page;
+		public String name;
+		public int x, y, width, height;
+		public float u, v, u2, v2;
+		public float offsetX, offsetY;
+		public int originalWidth, originalHeight;
+		public int index;
+		public bool rotate;
+		public int[] splits;
+		public int[] pads;
+	}
+
+	public interface TextureLoader {
+		void Load (AtlasPage page, String path);
 	}
 }

@@ -47,43 +47,12 @@ namespace Spine {
 
 		public float[] Offset { get; private set; }
 		public float[] Vertices { get; private set; }
-		public float[] UVs { get; private set; }
-
-		private AtlasRegion region;
-		public AtlasRegion Region {
-			get {
-				return region;
-			}
-			set {
-				region = value;
-				float[] uvs = UVs;
-				if (value.Rotate) {
-					uvs[X2] = value.U;
-					uvs[Y2] = value.V2;
-					uvs[X3] = value.U;
-					uvs[Y3] = value.V;
-					uvs[X4] = value.U2;
-					uvs[Y4] = value.V;
-					uvs[X1] = value.U2;
-					uvs[Y1] = value.V2;
-				} else {
-					uvs[X1] = value.U;
-					uvs[Y1] = value.V2;
-					uvs[X2] = value.U;
-					uvs[Y2] = value.V;
-					uvs[X3] = value.U2;
-					uvs[Y3] = value.V;
-					uvs[X4] = value.U2;
-					uvs[Y4] = value.V2;
-				}
-			}
-		}
+		public AtlasRegion Region { get; set; }
 
 		public RegionAttachment (string name)
 			: base(name) {
 			Offset = new float[8];
 			Vertices = new float[8];
-			UVs = new float[8];
 			ScaleX = 1;
 			ScaleY = 1;
 		}
@@ -97,16 +66,16 @@ namespace Spine {
 			float localY = -localY2;
 			AtlasRegion region = Region;
 			if (region != null) {
-				if (region.Rotate) {
-					localX += region.OffsetX / region.OriginalWidth * height;
-					localY += region.OffsetY / region.OriginalHeight * width;
-					localX2 -= (region.OriginalWidth - region.OffsetX - region.Height) / region.OriginalWidth * width;
-					localY2 -= (region.OriginalHeight - region.OffsetY - region.Width) / region.OriginalHeight * height;
+				if (region.rotate) {
+					localX += region.offsetX / region.originalWidth * height;
+					localY += region.offsetY / region.originalHeight * width;
+					localX2 -= (region.originalWidth - region.offsetX - region.height) / region.originalWidth * width;
+					localY2 -= (region.originalHeight - region.offsetY - region.width) / region.originalHeight * height;
 				} else {
-					localX += region.OffsetX / region.OriginalWidth * width;
-					localY += region.OffsetY / region.OriginalHeight * height;
-					localX2 -= (region.OriginalWidth - region.OffsetX - region.Width) / region.OriginalWidth * width;
-					localY2 -= (region.OriginalHeight - region.OffsetY - region.Height) / region.OriginalHeight * height;
+					localX += region.offsetX / region.originalWidth * width;
+					localY += region.offsetY / region.originalHeight * height;
+					localX2 -= (region.originalWidth - region.offsetX - region.width) / region.originalWidth * width;
+					localY2 -= (region.originalHeight - region.offsetY - region.height) / region.originalHeight * height;
 				}
 			}
 			float scaleX = ScaleX;

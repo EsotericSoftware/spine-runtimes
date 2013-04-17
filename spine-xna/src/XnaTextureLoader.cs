@@ -22,56 +22,24 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-using System;
+
+﻿using System;
 using System.IO;
-using UnityEngine;
-using Spine;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
-public class AtlasAsset : ScriptableObject {
-	public TextAsset atlasFile;
-	public Material material;
-	private Atlas atlas;
-
-	public void Clear () {
-		atlas = null;
-	}
-
-	/// <returns>The atlas or null if it could not be loaded.</returns>
-	public Atlas GetAtlas () {
-		if (atlasFile == null) {
-			Debug.LogWarning("Atlas file not set for atlas asset: " + name, this);
-			Clear();
-			return null;
+namespace Spine {
+	public class XnaTextureLoader : TextureLoader {
+		GraphicsDevice device;
+		public XnaTextureLoader (GraphicsDevice device) {
+			this.device = device;
 		}
 
-		if (material == null) {
-			Debug.LogWarning("Material not set for atlas asset: " + name, this);
-			Clear();
-			return null;
+		public void Load (AtlasPage page, String path) {
+			Texture2D texture = Util.LoadTexture(device, path);
+			page.texture = texture;
+			page.width = texture.Width;
+			page.height = texture.Height;
 		}
-
-		if (atlas != null)
-			return atlas;
-
-		try {
-			atlas = new Atlas(new StringReader(atlasFile.text), "", new SingleTextureLoader(material));
-			return atlas;
-		} catch (Exception) {
-			Debug.LogException(new Exception("Error reading atlas file for atlas asset: " + name), this);
-			return null;
-		}
-	}
-}
-
-public class SingleTextureLoader : TextureLoader {
-	Material material;
-	
-	public SingleTextureLoader (Material material) {
-		this.material = material;
-	}
-	
-	public void Load (AtlasPage page, String path) {
-		page.width = material.mainTexture.width;
-		page.height = material.mainTexture.height;
 	}
 }

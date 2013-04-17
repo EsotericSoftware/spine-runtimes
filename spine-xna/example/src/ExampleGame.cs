@@ -59,8 +59,7 @@ namespace Spine {
 		protected override void LoadContent () {
 			skeletonRenderer = new SkeletonRenderer(GraphicsDevice);
 
-			Texture2D texture = Util.LoadTexture(GraphicsDevice, "data/goblins.png");
-			Atlas atlas = new Atlas("data/goblins.atlas", texture, texture.Width, texture.Height);
+			Atlas atlas = new Atlas("data/goblins.atlas", new XnaTextureLoader(GraphicsDevice));
 			SkeletonJson json = new SkeletonJson(atlas);
 			skeleton = new Skeleton(json.ReadSkeletonData("data/goblins.json"));
 			skeleton.SetSkin("goblingirl");

@@ -47,6 +47,7 @@ namespace Spine {
 		}
 
 		public SkeletonJson (AttachmentLoader attachmentLoader) {
+			if (attachmentLoader == null) throw new ArgumentNullException("attachmentLoader cannot be null.");
 			this.attachmentLoader = attachmentLoader;
 			Scale = 1;
 		}

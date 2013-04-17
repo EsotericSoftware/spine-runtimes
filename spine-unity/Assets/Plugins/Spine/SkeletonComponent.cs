@@ -22,7 +22,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -122,12 +121,19 @@ public class SkeletonComponent : MonoBehaviour {
 				vertices[vertexIndex + 1] = new Vector3(regionVertices[RegionAttachment.X4], regionVertices[RegionAttachment.Y4], 0);
 				vertices[vertexIndex + 2] = new Vector3(regionVertices[RegionAttachment.X2], regionVertices[RegionAttachment.Y2], 0);
 				vertices[vertexIndex + 3] = new Vector3(regionVertices[RegionAttachment.X3], regionVertices[RegionAttachment.Y3], 0);
-
-				float[] regionUVs = regionAttachment.UVs;
-				uvs[vertexIndex] = new Vector2(regionUVs[RegionAttachment.X1], 1 - regionUVs[RegionAttachment.Y1]);
-				uvs[vertexIndex + 1] = new Vector2(regionUVs[RegionAttachment.X4], 1 - regionUVs[RegionAttachment.Y4]);
-				uvs[vertexIndex + 2] = new Vector2(regionUVs[RegionAttachment.X2], 1 - regionUVs[RegionAttachment.Y2]);
-				uvs[vertexIndex + 3] = new Vector2(regionUVs[RegionAttachment.X3], 1 - regionUVs[RegionAttachment.Y3]);
+				
+				AtlasRegion region = regionAttachment.Region;
+				if (region.rotate) {
+					uvs[vertexIndex + 1] = new Vector2(region.u, 1 - region.v2);
+					uvs[vertexIndex + 2] = new Vector2(region.u2, 1 - region.v2);
+					uvs[vertexIndex + 3] = new Vector2(region.u, 1 - region.v);
+					uvs[vertexIndex] = new Vector2(region.u2, 1 - region.v);
+				} else {
+					uvs[vertexIndex] = new Vector2(region.u, 1 - region.v2);
+					uvs[vertexIndex + 1] = new Vector2(region.u2, 1 - region.v2);
+					uvs[vertexIndex + 2] = new Vector2(region.u, 1 - region.v);
+					uvs[vertexIndex + 3] = new Vector2(region.u2, 1 - region.v);
+				}
 
 				int index = quadIndex * 6;
 				triangles[index] = vertexIndex;
