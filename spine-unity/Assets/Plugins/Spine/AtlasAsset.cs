@@ -74,4 +74,7 @@ public class SingleTextureLoader : TextureLoader {
 		page.width = material.mainTexture.width;
 		page.height = material.mainTexture.height;
 	}
+
+	public void Unload (object texture) {
+	}
 }

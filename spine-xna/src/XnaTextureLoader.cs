@@ -31,6 +31,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Spine {
 	public class XnaTextureLoader : TextureLoader {
 		GraphicsDevice device;
+
 		public XnaTextureLoader (GraphicsDevice device) {
 			this.device = device;
 		}
@@ -40,6 +41,10 @@ namespace Spine {
 			page.texture = texture;
 			page.width = texture.Width;
 			page.height = texture.Height;
+		}
+
+		public void Unload (Object texture) {
+			((Texture2D)texture).Dispose();
 		}
 	}
 }

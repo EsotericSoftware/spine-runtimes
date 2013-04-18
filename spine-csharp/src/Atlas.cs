@@ -30,6 +30,7 @@ namespace Spine {
 	public class Atlas {
 		List<AtlasPage> pages = new List<AtlasPage>();
 		List<AtlasRegion> regions = new List<AtlasRegion>();
+		TextureLoader textureLoader;
 
 		public Atlas (String path, TextureLoader textureLoader) {
 			using (StreamReader reader = new StreamReader(path)) {
@@ -47,6 +48,7 @@ namespace Spine {
 
 		private void Load (TextReader reader, String imagesDir, TextureLoader textureLoader) {
 			if (textureLoader == null) throw new ArgumentNullException("textureLoader cannot be null.");
+			this.textureLoader = textureLoader;
 
 			String[] tuple = new String[4];
 			AtlasPage page = null;
@@ -163,6 +165,11 @@ namespace Spine {
 				if (regions[i].name == name) return regions[i];
 			return null;
 		}
+
+		public void Dispose () {
+			for (int i = 0, n = pages.Count; i < n; i++)
+				textureLoader.Unload(pages[i].texture);
+		}
 	}
 
 	public enum Format {
@@ -217,5 +224,6 @@ namespace Spine {
 
 	public interface TextureLoader {
 		void Load (AtlasPage page, String path);
+		void Unload (Object texture);
 	}
 }
