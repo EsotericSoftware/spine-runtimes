@@ -44,6 +44,17 @@ void RegionAttachment_updateOffset (RegionAttachment* self) {
 	float localY2 = self->height / 2;
 	float localX = -localX2;
 	float localY = -localY2;
+	if (self->region->rotate) {
+		localX += self->region->offsetX / self->region->originalWidth * self->height;
+		localY += self->region->offsetY / self->region->originalHeight * self->width;
+		localX2 -= (self->region->originalWidth - self->region->offsetX - self->region->height) / self->region->originalWidth * self->width;
+		localY2 -= (self->region->originalHeight - self->region->offsetY - self->region->width) / self->region->originalHeight * self->height;
+	} else {
+		localX += self->region->offsetX / self->region->originalWidth * self->width;
+		localY += self->region->offsetY / self->region->originalHeight * self->height;
+		localX2 -= (self->region->originalWidth - self->region->offsetX - self->region->width) / self->region->originalWidth * self->width;
+		localY2 -= (self->region->originalHeight - self->region->offsetY - self->region->height) / self->region->originalHeight * self->height;
+	}
 	localX *= self->scaleX;
 	localY *= self->scaleY;
 	localX2 *= self->scaleX;
