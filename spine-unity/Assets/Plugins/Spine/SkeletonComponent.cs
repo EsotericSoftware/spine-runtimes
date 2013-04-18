@@ -74,7 +74,7 @@ public class SkeletonComponent : MonoBehaviour {
 
 		// Keep AnimationState in sync with animationName and loop fields.
 		if (animationName == null && state.Animation != null)
-			state.Clear();
+			state.ClearAnimation();
 		else if (state.Animation == null || animationName != state.Animation.Name) {
 			Spine.Animation animation = skeleton.Data.FindAnimation(animationName);
 			if (animation != null)

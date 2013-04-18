@@ -60,7 +60,7 @@ public class AnimationState {
 			current.apply(skeleton, currentTime, currentLoop);
 	}
 
-	public void clear () {
+	public void clearAnimation () {
 		previous = null;
 		current = null;
 	}

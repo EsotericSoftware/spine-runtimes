@@ -299,6 +299,10 @@ void CCSkeleton::setAnimation (const char* animationName, bool loop) {
 	AnimationState_setAnimationByName(state, animationName, loop);
 }
 
+void CCSkeleton::clearAnimation () {
+	AnimationState_clearAnimation(state);
+}
+
 void CCSkeleton::updateWorldTransform () {
 	Skeleton_updateWorldTransform(skeleton);
 }

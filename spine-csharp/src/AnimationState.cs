@@ -84,7 +84,7 @@ namespace Spine {
 			Time = 0;
 		}
 
-		public void Clear () {
+		public void ClearAnimation () {
 			previous = null;
 			Animation = null;
 		}

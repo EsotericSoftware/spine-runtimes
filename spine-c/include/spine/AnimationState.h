@@ -52,6 +52,7 @@ void AnimationState_apply (AnimationState* self, struct Skeleton* skeleton);
 void AnimationState_setAnimationByName (AnimationState* self, const char* animationName, int/**/loop);
 /* @param animation May be 0. */
 void AnimationState_setAnimation (AnimationState* self, Animation* animation, int/**/loop);
+void AnimationState_clearAnimation (AnimationState* self);
 
 #ifdef __cplusplus
 }

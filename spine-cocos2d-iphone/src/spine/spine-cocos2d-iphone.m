@@ -112,11 +112,11 @@ void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_
 
 @implementation CCSkeleton
 
-+ (CCSkeleton*) create:(NSString*)skeletonDataFile atlas:(Atlas*)atlas {
++ (id) create:(NSString*)skeletonDataFile atlas:(Atlas*)atlas {
 	return [CCSkeleton create:skeletonDataFile atlas:atlas scale:1];
 }
 
-+ (CCSkeleton*) create:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale {
++ (id) create:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale {
 	NSAssert(skeletonDataFile, @"skeletonDataFile cannot be nil.");
 	NSAssert(atlas, @"atlas cannot be nil.");
 
@@ -131,11 +131,11 @@ void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_
 	return node;
 }
 
-+ (CCSkeleton*) create:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile {
++ (id) create:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile {
 	return [CCSkeleton create:skeletonDataFile atlasFile:atlasFile scale:1];
 }
 
-+ (CCSkeleton*) create:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile scale:(float)scale {
++ (id) create:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile scale:(float)scale {
 	NSAssert(skeletonDataFile, @"skeletonDataFile cannot be nil.");
 	NSAssert(atlasFile, @"atlasFile cannot be nil.");
 
@@ -159,11 +159,11 @@ void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_
 	return node;
 }
 
-+ (CCSkeleton*) create:(SkeletonData*)skeletonData {
++ (id) create:(SkeletonData*)skeletonData {
 	return [CCSkeleton create:skeletonData stateData:0];
 }
 
-+ (CCSkeleton*) create:(SkeletonData*)skeletonData stateData:(AnimationStateData*)stateData {
++ (id) create:(SkeletonData*)skeletonData stateData:(AnimationStateData*)stateData {
 	return [[[CCSkeleton alloc] init:skeletonData stateData:stateData] autorelease];
 }
 
@@ -329,6 +329,9 @@ void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_
 }
 - (void) setAnimation:(NSString*)animationName loop:(bool)loop {
 	AnimationState_setAnimationByName(state, [animationName UTF8String], loop);
+}
+- (void) clearAnimation {
+	AnimationState_clearAnimation(state);
 }
 
 - (void) updateWorldTransform {

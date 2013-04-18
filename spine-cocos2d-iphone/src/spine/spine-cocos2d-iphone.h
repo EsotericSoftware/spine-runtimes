@@ -59,6 +59,7 @@
 
 - (void) setMix:(NSString*)fromName to:(NSString*)toName duration:(float)duration;
 - (void) setAnimation:(NSString*)animationName loop:(bool)loop;
+- (void) clearAnimation;
 
 - (void) updateWorldTransform;
 
