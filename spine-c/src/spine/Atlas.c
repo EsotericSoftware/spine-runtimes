@@ -31,10 +31,6 @@
 namespace spine {
 #endif
 
-typedef struct _AtlasPageVtable {
-	void (*dispose) (AtlasPage* self);
-} _AtlasPageVtable;
-
 AtlasPage* AtlasPage_create (const char* name) {
 	AtlasPage* self = NEW(AtlasPage);
 	MALLOC_STR(self->name, name);

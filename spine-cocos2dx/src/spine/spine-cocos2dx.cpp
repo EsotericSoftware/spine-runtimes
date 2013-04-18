@@ -78,15 +78,14 @@ void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_
 	quad->br.colors.b = b;
 	quad->br.colors.a = a;
 
-	float* offset = self->offset;
-	quad->bl.vertices.x = offset[VERTEX_X1] * slot->bone->m00 + offset[VERTEX_Y1] * slot->bone->m01 + slot->bone->worldX;
-	quad->bl.vertices.y = offset[VERTEX_X1] * slot->bone->m10 + offset[VERTEX_Y1] * slot->bone->m11 + slot->bone->worldY;
-	quad->tl.vertices.x = offset[VERTEX_X2] * slot->bone->m00 + offset[VERTEX_Y2] * slot->bone->m01 + slot->bone->worldX;
-	quad->tl.vertices.y = offset[VERTEX_X2] * slot->bone->m10 + offset[VERTEX_Y2] * slot->bone->m11 + slot->bone->worldY;
-	quad->tr.vertices.x = offset[VERTEX_X3] * slot->bone->m00 + offset[VERTEX_Y3] * slot->bone->m01 + slot->bone->worldX;
-	quad->tr.vertices.y = offset[VERTEX_X3] * slot->bone->m10 + offset[VERTEX_Y3] * slot->bone->m11 + slot->bone->worldY;
-	quad->br.vertices.x = offset[VERTEX_X4] * slot->bone->m00 + offset[VERTEX_Y4] * slot->bone->m01 + slot->bone->worldX;
-	quad->br.vertices.y = offset[VERTEX_X4] * slot->bone->m10 + offset[VERTEX_Y4] * slot->bone->m11 + slot->bone->worldY;
+	quad->bl.vertices.x = self->vertices[VERTEX_X1];
+	quad->bl.vertices.y = self->vertices[VERTEX_Y1];
+	quad->tl.vertices.x = self->vertices[VERTEX_X2];
+	quad->tl.vertices.y = self->vertices[VERTEX_Y2];
+	quad->tr.vertices.x = self->vertices[VERTEX_X3];
+	quad->tr.vertices.y = self->vertices[VERTEX_Y3];
+	quad->br.vertices.x = self->vertices[VERTEX_X4];
+	quad->br.vertices.y = self->vertices[VERTEX_Y4];
 
 	if (self->region->rotate) {
 		quad->tl.texCoords.u = self->region->u;
@@ -189,7 +188,11 @@ void CCSkeleton::draw () {
 	skeleton->a = getOpacity() / (float)255;
 
 	CCTextureAtlas* textureAtlas = 0;
-	int quadCount = 0;
+	ccV3F_C4B_T2F_Quad quad;
+	quad.tl.vertices.z = 0;
+	quad.tr.vertices.z = 0;
+	quad.bl.vertices.z = 0;
+	quad.br.vertices.z = 0;
 	for (int i = 0, n = skeleton->slotCount; i < n; i++) {
 		Slot* slot = skeleton->slots[i];
 		if (!slot->attachment || slot->attachment->type != ATTACHMENT_REGION) continue;
@@ -197,17 +200,19 @@ void CCSkeleton::draw () {
 		CCTextureAtlas* regionTextureAtlas = (CCTextureAtlas*)attachment->region->page->texture;
 		if (regionTextureAtlas != textureAtlas) {
 			if (textureAtlas) {
-				textureAtlas->drawNumberOfQuads(quadCount);
-				quadCount = 0;
+				textureAtlas->drawQuads();
+				textureAtlas->removeAllQuads();
 			}
 		}
 		textureAtlas = regionTextureAtlas;
-		if (textureAtlas->getCapacity() == quadCount && !textureAtlas->resizeCapacity(quadCount * 2)) return;
-		RegionAttachment_updateQuad(attachment, slot, &textureAtlas->getQuads()[quadCount++]);
+		if (textureAtlas->getCapacity() == textureAtlas->getTotalQuads() &&
+			!textureAtlas->resizeCapacity(textureAtlas->getCapacity() * 2)) return;
+		RegionAttachment_updateQuad(attachment, slot, &quad);
+		textureAtlas->updateQuad(&quad, textureAtlas->getTotalQuads());
 	}
 	if (textureAtlas) {
-		textureAtlas->drawNumberOfQuads(quadCount);
-		quadCount = 0;
+		textureAtlas->drawQuads();
+		textureAtlas->removeAllQuads();
 	}
 
 	if (debugSlots) {
