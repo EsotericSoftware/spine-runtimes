@@ -294,13 +294,14 @@ CCRect CCSkeleton::boundingBox () {
 void CCSkeleton::setMix (const char* fromName, const char* toName, float duration) {
 	AnimationStateData_setMixByName(state->data, fromName, toName, duration);
 }
-
 void CCSkeleton::setAnimation (const char* animationName, bool loop) {
 	AnimationState_setAnimationByName(state, animationName, loop);
 }
-
 void CCSkeleton::clearAnimation () {
 	AnimationState_clearAnimation(state);
+}
+bool CCSkeleton::isComplete () const {
+	return AnimationState_isComplete(state) != 0;
 }
 
 void CCSkeleton::updateWorldTransform () {

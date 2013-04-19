@@ -69,7 +69,7 @@ void spineboy () {
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
-		if (strcmp(drawable->state->animation->name, "walk") == 0) {
+		if (drawable->state->loop) {
 			if (drawable->state->time > 2) AnimationState_setAnimationByName(drawable->state, "jump", false);
 		} else {
 			if (drawable->state->time > 1) AnimationState_setAnimationByName(drawable->state, "walk", true);

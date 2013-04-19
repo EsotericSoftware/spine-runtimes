@@ -333,6 +333,9 @@ void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_
 - (void) clearAnimation {
 	AnimationState_clearAnimation(state);
 }
+- (void) isComplete {
+	return AnimationState_isComplete(state);
+}
 
 - (void) updateWorldTransform {
 	Skeleton_updateWorldTransform(skeleton);

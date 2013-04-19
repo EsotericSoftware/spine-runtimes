@@ -97,6 +97,10 @@ void AnimationState_clearAnimation (AnimationState* self) {
 	CONST_CAST(Animation*, self->animation) = 0;
 }
 
+int/*bool*/AnimationState_isComplete (AnimationState* self) {
+	return !self->animation || self->time >= self->animation->duration;
+}
+
 #ifdef __cplusplus
 }
 #endif

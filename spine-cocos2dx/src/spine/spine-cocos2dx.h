@@ -54,6 +54,7 @@ public:
 	void setMix (const char* fromName, const char* toName, float duration);
 	void setAnimation (const char* animationName, bool loop);
 	void clearAnimation ();
+	bool isComplete () const;
 
 	void updateWorldTransform ();
 

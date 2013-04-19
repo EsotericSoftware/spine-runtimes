@@ -89,6 +89,7 @@ public class SkeletonTest extends ApplicationAdapter {
 		skeleton = new Skeleton(skeletonData);
 		if (name.equals("goblins")) skeleton.setSkin("goblin");
 		skeleton.setToBindPose();
+		skeleton = new Skeleton(skeleton);
 
 		Bone root = skeleton.getRootBone();
 		root.x = 50;

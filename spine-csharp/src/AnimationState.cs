@@ -89,6 +89,11 @@ namespace Spine {
 			Animation = null;
 		}
 
+		/** Returns true if no animation is set or if the current time is greater than the animation duration, regardless of looping. */
+		public bool isComplete () {
+			return Animation == null || Time >= Animation.Duration;
+		}
+
 		override public String ToString () {
 			return (Animation != null && Animation.Name != null) ? Animation.Name : base.ToString();
 		}

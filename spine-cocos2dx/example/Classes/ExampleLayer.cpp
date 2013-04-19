@@ -63,7 +63,7 @@ bool ExampleLayer::init () {
 }
 
 void ExampleLayer::update (float deltaTime) {
-    if (strcmp(skeletonNode->state->animation->name, "walk") == 0) {
+    if (skeletonNode->state->loop) {
         if (skeletonNode->state->time > 2) skeletonNode->setAnimation("jump", false);
     } else {
         if (skeletonNode->state->time > 1) skeletonNode->setAnimation("walk", true);

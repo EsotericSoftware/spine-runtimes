@@ -54,6 +54,8 @@ void AnimationState_setAnimationByName (AnimationState* self, const char* animat
 void AnimationState_setAnimation (AnimationState* self, Animation* animation, int/**/loop);
 void AnimationState_clearAnimation (AnimationState* self);
 
+int/*bool*/AnimationState_isComplete (AnimationState* self);
+
 #ifdef __cplusplus
 }
 }
