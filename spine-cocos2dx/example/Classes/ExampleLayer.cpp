@@ -41,10 +41,10 @@ CCScene* ExampleLayer::scene () {
 bool ExampleLayer::init () {
 	if (!CCLayer::init()) return false;
 
-	skeletonNode = CCSkeleton::create("spineboy.json", "spineboy.atlas");
-	skeletonNode->setMix("walk", "jump", 0.4f);
-	skeletonNode->setMix("jump", "walk", 0.4f);
-	skeletonNode->setAnimation("walk", true);
+	skeletonNode = CCSkeleton::createWithFile("spineboy.json", "spineboy.atlas");
+	AnimationStateData_setMixByName(skeletonNode->state->data, "walk", "jump", 0.4f);
+	AnimationStateData_setMixByName(skeletonNode->state->data, "jump", "walk", 0.4f);
+	AnimationState_setAnimationByName(skeletonNode->state, "walk", true);
 	skeletonNode->timeScale = 0.3f;
 	skeletonNode->debugBones = true;
 
@@ -64,8 +64,8 @@ bool ExampleLayer::init () {
 
 void ExampleLayer::update (float deltaTime) {
     if (skeletonNode->state->loop) {
-        if (skeletonNode->state->time > 2) skeletonNode->setAnimation("jump", false);
+        if (skeletonNode->state->time > 2) AnimationState_setAnimationByName(skeletonNode->state, "jump", false);
     } else {
-        if (skeletonNode->state->time > 1) skeletonNode->setAnimation("walk", true);
+        if (skeletonNode->state->time > 1) AnimationState_setAnimationByName(skeletonNode->state, "walk", true);
     }
 }

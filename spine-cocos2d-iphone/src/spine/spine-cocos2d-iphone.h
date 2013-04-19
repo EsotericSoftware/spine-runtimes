@@ -45,50 +45,17 @@
     ccBlendFunc blendFunc;
 }
 
-+ (CCSkeleton*) create:(NSString*)skeletonDataFile atlas:(Atlas*)atlas;
-+ (CCSkeleton*) create:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale;
++ (CCSkeleton*) skeletonWithFile:(NSString*)skeletonDataFile atlas:(Atlas*)atlas;
++ (CCSkeleton*) skeletonWithFile:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale;
 
-+ (CCSkeleton*) create:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile;
-+ (CCSkeleton*) create:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile scale:(float)scale;
++ (CCSkeleton*) skeletonWithFile:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile;
++ (CCSkeleton*) skeletonWithFile:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile scale:(float)scale;
 
-+ (CCSkeleton*) create:(SkeletonData*)skeletonData;
-+ (CCSkeleton*) create:(SkeletonData*)skeletonData stateData:(AnimationStateData*)stateData;
++ (CCSkeleton*) skeletonWithData:(SkeletonData*)skeletonData;
++ (CCSkeleton*) skeletonWithData:(SkeletonData*)skeletonData stateData:(AnimationStateData*)stateData;
 
-- init:(SkeletonData*)skeletonData;
-- init:(SkeletonData*)skeletonData stateData:(AnimationStateData*)stateData;
-
-- (void) setMix:(NSString*)fromName to:(NSString*)toName duration:(float)duration;
-- (void) setAnimation:(NSString*)animationName loop:(bool)loop;
-- (void) clearAnimation;
-- (void) isComplete;
-
-- (void) updateWorldTransform;
-
-- (void) setToBindPose;
-- (void) setBonesToBindPose;
-- (void) setSlotsToBindPose;
-
-/* Returns 0 if the bone was not found. */
-- (Bone*) findBone:(NSString*)boneName;
-/* Returns -1 if the bone was not found. */
-- (int) findBoneIndex:(NSString*)boneName;
-
-/* Returns 0 if the slot was not found. */
-- (Slot*) findSlot:(NSString*)slotName;
-/* Returns -1 if the slot was not found. */
-- (int) findSlotIndex:(NSString*)slotName;
-
-/* Sets the skin used to look up attachments not found in the SkeletonData defaultSkin. Attachments from the new skin are
- * attached if the corresponding attachment from the old skin was attached. Returns false if the skin was not found.
- * @param skin May be 0.*/
-- (bool) setSkin:(NSString*)skinName;
-
-/* Returns 0 if the slot or attachment was not found. */
-- (Attachment*) getAttachmentForSlotName:(NSString*)slotName attachmentName:(NSString*)attachmentName;
-/* Returns 0 if the slot or attachment was not found. */
-- (Attachment*) getAttachmentForSlotIndex:(int)slotIndex attachmentName:(NSString*)attachmentName;
-/* Returns false if the slot or attachment was not found. */
-- (bool) setAttachment:(NSString*)slotName attachmentName:(NSString*)attachmentName;
+- initWithData:(SkeletonData*)skeletonData;
+- initWithData:(SkeletonData*)skeletonData stateData:(AnimationStateData*)stateData;
 
 @end
 

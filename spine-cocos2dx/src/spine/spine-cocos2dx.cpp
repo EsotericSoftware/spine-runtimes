@@ -110,17 +110,17 @@ void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_
 
 /**/
 
-CCSkeleton* CCSkeleton::create (const char* skeletonDataFile, Atlas* atlas, float scale) {
+CCSkeleton* CCSkeleton::createWithFile (const char* skeletonDataFile, Atlas* atlas, float scale) {
 	SkeletonJson* json = SkeletonJson_create(atlas);
 	json->scale = scale;
 	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, skeletonDataFile);
 	SkeletonJson_dispose(json);
-	CCSkeleton* node = skeletonData ? create(skeletonData) : 0;
+	CCSkeleton* node = skeletonData ? createWithData(skeletonData) : 0;
 	node->ownsSkeleton = true;
 	return node;
 }
 
-CCSkeleton* CCSkeleton::create (const char* skeletonDataFile, const char* atlasFile, float scale) {
+CCSkeleton* CCSkeleton::createWithFile (const char* skeletonDataFile, const char* atlasFile, float scale) {
 	Atlas* atlas = Atlas_readAtlasFile(atlasFile);
 	if (!atlas) return 0;
 	SkeletonJson* json = SkeletonJson_create(atlas);
@@ -131,13 +131,13 @@ CCSkeleton* CCSkeleton::create (const char* skeletonDataFile, const char* atlasF
 		Atlas_dispose(atlas);
 		return 0;
 	}
-	CCSkeleton* node = create(skeletonData);
+	CCSkeleton* node = createWithData(skeletonData);
 	node->ownsSkeleton = true;
 	node->atlas = atlas;
 	return node;
 }
 
-CCSkeleton* CCSkeleton::create (SkeletonData* skeletonData, AnimationStateData* stateData) {
+CCSkeleton* CCSkeleton::createWithData (SkeletonData* skeletonData, AnimationStateData* stateData) {
 	CCSkeleton* node = new CCSkeleton(skeletonData, stateData);
 	node->autorelease();
 	return node;
@@ -287,63 +287,6 @@ CCRect CCSkeleton::boundingBox () {
 	maxX = position.x + maxX;
 	maxY = position.y + maxY;
 	return CCRectMake(minX, minY, maxX - minX, maxY - minY);
-}
-
-// Convenience methods:
-
-void CCSkeleton::setMix (const char* fromName, const char* toName, float duration) {
-	AnimationStateData_setMixByName(state->data, fromName, toName, duration);
-}
-void CCSkeleton::setAnimation (const char* animationName, bool loop) {
-	AnimationState_setAnimationByName(state, animationName, loop);
-}
-void CCSkeleton::clearAnimation () {
-	AnimationState_clearAnimation(state);
-}
-bool CCSkeleton::isComplete () const {
-	return AnimationState_isComplete(state) != 0;
-}
-
-void CCSkeleton::updateWorldTransform () {
-	Skeleton_updateWorldTransform(skeleton);
-}
-
-void CCSkeleton::setToBindPose () {
-	Skeleton_setToBindPose(skeleton);
-}
-void CCSkeleton::setBonesToBindPose () {
-	Skeleton_setBonesToBindPose(skeleton);
-}
-void CCSkeleton::setSlotsToBindPose () {
-	Skeleton_setSlotsToBindPose(skeleton);
-}
-
-Bone* CCSkeleton::findBone (const char* boneName) const {
-	return Skeleton_findBone(skeleton, boneName);
-}
-int CCSkeleton::findBoneIndex (const char* boneName) const {
-	return Skeleton_findBoneIndex(skeleton, boneName);
-}
-
-Slot* CCSkeleton::findSlot (const char* slotName) const {
-	return Skeleton_findSlot(skeleton, slotName);
-}
-int CCSkeleton::findSlotIndex (const char* slotName) const {
-	return Skeleton_findSlotIndex(skeleton, slotName);
-}
-
-bool CCSkeleton::setSkin (const char* skinName) {
-	return Skeleton_setSkinByName(skeleton, skinName) ? true : false;
-}
-
-Attachment* CCSkeleton::getAttachment (const char* slotName, const char* attachmentName) const {
-	return Skeleton_getAttachmentForSlotName(skeleton, slotName, attachmentName);
-}
-Attachment* CCSkeleton::getAttachment (int slotIndex, const char* attachmentName) const {
-	return Skeleton_getAttachmentForSlotIndex(skeleton, slotIndex, attachmentName);
-}
-bool CCSkeleton::setAttachment (const char* slotName, const char* attachmentName) {
-	return Skeleton_setAttachment(skeleton, slotName, attachmentName) ? true : false;
 }
 
 // CCBlendProtocol

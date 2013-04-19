@@ -112,11 +112,11 @@ void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_
 
 @implementation CCSkeleton
 
-+ (id) create:(NSString*)skeletonDataFile atlas:(Atlas*)atlas {
-	return [CCSkeleton create:skeletonDataFile atlas:atlas scale:1];
++ (id) skeletonWithFile:(NSString*)skeletonDataFile atlas:(Atlas*)atlas {
+	return [CCSkeleton skeletonWithFile:skeletonDataFile atlas:atlas scale:1];
 }
 
-+ (id) create:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale {
++ (id) skeletonWithFile:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale {
 	NSAssert(skeletonDataFile, @"skeletonDataFile cannot be nil.");
 	NSAssert(atlas, @"atlas cannot be nil.");
 
@@ -126,16 +126,16 @@ void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_
 	NSAssert(skeletonData, ([NSString stringWithFormat:@"Error reading skeleton data file: %@\nError: %s", skeletonDataFile, json->error]));
 	SkeletonJson_dispose(json);
 
-	CCSkeleton* node = skeletonData ? [CCSkeleton create:skeletonData] : 0;
+	CCSkeleton* node = skeletonData ? [CCSkeleton skeletonWithData:skeletonData] : 0;
 	node->ownsSkeleton = true;
 	return node;
 }
 
-+ (id) create:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile {
-	return [CCSkeleton create:skeletonDataFile atlasFile:atlasFile scale:1];
++ (id) skeletonWithFile:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile {
+	return [CCSkeleton skeletonWithFile:skeletonDataFile atlasFile:atlasFile scale:1];
 }
 
-+ (id) create:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile scale:(float)scale {
++ (id) skeletonWithFile:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile scale:(float)scale {
 	NSAssert(skeletonDataFile, @"skeletonDataFile cannot be nil.");
 	NSAssert(atlasFile, @"atlasFile cannot be nil.");
 
@@ -153,25 +153,25 @@ void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_
 		return 0;
 	}
 
-	CCSkeleton* node = [CCSkeleton create:skeletonData];
+	CCSkeleton* node = [CCSkeleton skeletonWithData:skeletonData];
 	node->ownsSkeleton = true;
 	node->atlas = atlas;
 	return node;
 }
 
-+ (id) create:(SkeletonData*)skeletonData {
-	return [CCSkeleton create:skeletonData stateData:0];
++ (id) skeletonWithData:(SkeletonData*)skeletonData {
+	return [CCSkeleton skeletonWithData:skeletonData stateData:0];
 }
 
-+ (id) create:(SkeletonData*)skeletonData stateData:(AnimationStateData*)stateData {
-	return [[[CCSkeleton alloc] init:skeletonData stateData:stateData] autorelease];
++ (id) skeletonWithData:(SkeletonData*)skeletonData stateData:(AnimationStateData*)stateData {
+	return [[[CCSkeleton alloc] initWithData:skeletonData stateData:stateData] autorelease];
 }
 
-- (id) init:(SkeletonData*)skeletonData {
-	return [self init:skeletonData stateData:0];
+- (id) initWithData:(SkeletonData*)skeletonData {
+	return [self initWithData:skeletonData stateData:0];
 }
 
-- (id) init:(SkeletonData*)skeletonData stateData:(AnimationStateData*)stateData {
+- (id) initWithData:(SkeletonData*)skeletonData stateData:(AnimationStateData*)stateData {
 	NSAssert(skeletonData, @"skeletonData cannot be nil.");
 
 	self = [super init];
@@ -320,63 +320,6 @@ void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_
 	maxX = self.position.x + maxX;
 	maxY = self.position.y + maxY;
 	return CGRectMake(minX, minY, maxX - minX, maxY - minY);
-}
-
-// Convenience methods:
-
-- (void) setMix:(NSString*)fromName to:(NSString*)toName duration:(float)duration {
-	AnimationStateData_setMixByName(state->data, [fromName UTF8String], [toName UTF8String], duration);
-}
-- (void) setAnimation:(NSString*)animationName loop:(bool)loop {
-	AnimationState_setAnimationByName(state, [animationName UTF8String], loop);
-}
-- (void) clearAnimation {
-	AnimationState_clearAnimation(state);
-}
-- (void) isComplete {
-	return AnimationState_isComplete(state);
-}
-
-- (void) updateWorldTransform {
-	Skeleton_updateWorldTransform(skeleton);
-}
-
-- (void) setToBindPose {
-	Skeleton_setToBindPose(skeleton);
-}
-- (void) setBonesToBindPose {
-	Skeleton_setBonesToBindPose(skeleton);
-}
-- (void) setSlotsToBindPose {
-	Skeleton_setSlotsToBindPose(skeleton);
-}
-
-- (Bone*) findBone:(NSString*)boneName {
-	return Skeleton_findBone(skeleton, [boneName UTF8String]);
-}
-- (int) findBoneIndex:(NSString*)boneName {
-	return Skeleton_findBoneIndex(skeleton, [boneName UTF8String]);
-}
-
-- (Slot*) findSlot:(NSString*)slotName {
-	return Skeleton_findSlot(skeleton, [slotName UTF8String]);
-}
-- (int) findSlotIndex:(NSString*)slotName {
-	return Skeleton_findSlotIndex(skeleton, [slotName UTF8String]);
-}
-
-- (bool) setSkin:(NSString*)skinName {
-	return (bool)Skeleton_setSkinByName(skeleton, [skinName UTF8String]);
-}
-
-- (Attachment*) getAttachmentForSlotName:(NSString*)slotName attachmentName:(NSString*)attachmentName {
-	return Skeleton_getAttachmentForSlotName(skeleton, [slotName UTF8String], [attachmentName UTF8String]);
-}
-- (Attachment*) getAttachmentForSlotIndex:(int)slotIndex attachmentName:(NSString*)attachmentName {
-	return Skeleton_getAttachmentForSlotIndex(skeleton, slotIndex, [attachmentName UTF8String]);
-}
-- (bool) setAttachment:(NSString*)slotName attachmentName:(NSString*)attachmentName {
-	return (bool)Skeleton_setAttachment(skeleton, [slotName UTF8String], [attachmentName UTF8String]);
 }
 
 // CCBlendProtocol

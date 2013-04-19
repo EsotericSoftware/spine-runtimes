@@ -44,45 +44,12 @@ public:
 	bool debugSlots;
 	bool debugBones;
 
-	static CCSkeleton* create (const char* skeletonDataFile, Atlas* atlas, float scale = 1);
-	static CCSkeleton* create (const char* skeletonDataFile, const char* atlasFile, float scale = 1);
-	static CCSkeleton* create (SkeletonData* skeletonData, AnimationStateData* stateData = 0);
+	static CCSkeleton* createWithFile (const char* skeletonDataFile, Atlas* atlas, float scale = 1);
+	static CCSkeleton* createWithFile (const char* skeletonDataFile, const char* atlasFile, float scale = 1);
+	static CCSkeleton* createWithData (SkeletonData* skeletonData, AnimationStateData* stateData = 0);
 
 	CCSkeleton (SkeletonData* skeletonData, AnimationStateData* stateData = 0);
 	virtual ~CCSkeleton ();
-
-	void setMix (const char* fromName, const char* toName, float duration);
-	void setAnimation (const char* animationName, bool loop);
-	void clearAnimation ();
-	bool isComplete () const;
-
-	void updateWorldTransform ();
-
-	void setToBindPose ();
-	void setBonesToBindPose ();
-	void setSlotsToBindPose ();
-	
-	/* Returns 0 if the bone was not found. */
-	Bone* findBone (const char* boneName) const;
-	/* Returns -1 if the bone was not found. */
-	int findBoneIndex (const char* boneName) const;
-
-	/* Returns 0 if the slot was not found. */
-	Slot* findSlot (const char* slotName) const;
-	/* Returns -1 if the slot was not found. */
-	int findSlotIndex (const char* slotName) const;
-
-	/* Sets the skin used to look up attachments not found in the SkeletonData defaultSkin. Attachments from the new skin are
-	 * attached if the corresponding attachment from the old skin was attached. Returns false if the skin was not found.
-	 * @param skin May be 0.*/
-	bool setSkin (const char* skinName);
-
-	/* Returns 0 if the slot or attachment was not found. */
-	Attachment* getAttachment (const char* slotName, const char* attachmentName) const;
-	/* Returns 0 if the slot or attachment was not found. */
-	Attachment* getAttachment (int slotIndex, const char* attachmentName) const;
-	/* Returns false if the slot or attachment was not found. */
-	bool setAttachment (const char* slotName, const char* attachmentName);
 
 	virtual void update (float deltaTime);
 	virtual void draw ();
