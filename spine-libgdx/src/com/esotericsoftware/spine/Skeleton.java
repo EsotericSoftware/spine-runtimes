@@ -72,7 +72,7 @@ public class Skeleton {
 
 		bones = new Array(skeleton.bones.size);
 		for (Bone bone : skeleton.bones) {
-			Bone parent = bones.get(skeleton.bones.indexOf(bone.parent, true));
+			Bone parent = bone.parent == null ? null : bones.get(skeleton.bones.indexOf(bone.parent, true));
 			bones.add(new Bone(bone, parent));
 		}
 
