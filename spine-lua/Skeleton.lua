@@ -23,90 +23,24 @@
  -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ------------------------------------------------------------------------------
 
-local utils = require "spine.utils"
-local Bone = require "spine.Bone"
-local Slot = require "spine.Slot"
-local AttachmentLoader = require "spine.AttachmentLoader"
+local Bone = require "spine-lua.Bone"
+local Slot = require "spine-lua.Slot"
+local AttachmentLoader = require "spine-lua.AttachmentLoader"
 
 local Skeleton = {}
-function Skeleton.new (skeletonData, group)
+function Skeleton.new (skeletonData)
 	if not skeletonData then error("skeletonData cannot be nil", 2) end
 
-	local self = group or display.newGroup()
-	self.data = skeletonData
-	self.bones = {}
-	self.slots = {}
-	self.drawOrder = {}
-	self.images = {}
+	local self = {
+		data = skeletonData,
+		bones = {},
+		slots = {},
+		drawOrder = {}
+	}
 
 	function self:updateWorldTransform ()
 		for i,bone in ipairs(self.bones) do
 			bone:updateWorldTransform(self.flipX, self.flipY)
-		end
-
-		for i,slot in ipairs(self.drawOrder) do
-			local attachment = slot.attachment
-			if attachment then
-				local image = self.images[attachment]
-				if not image then
-					image = self.data.attachmentLoader:createImage(attachment)
-					if image then
-						image:setReferencePoint(display.CenterReferencePoint);
-						image.width = attachment.width
-						image.height = attachment.height
-					else
-						print("Error creating image: " .. attachment.name)
-						image = AttachmentLoader.failed
-					end
-					self.images[attachment] = image
-				end
-				if image ~= AttachmentLoader.failed then
-					image.x = slot.bone.worldX + attachment.x * slot.bone.m00 + attachment.y * slot.bone.m01
-					image.y = -(slot.bone.worldY + attachment.x * slot.bone.m10 + attachment.y * slot.bone.m11)
-					image.rotation = -(slot.bone.worldRotation + attachment.rotation)
-					image.xScale = slot.bone.worldScaleX + attachment.scaleX - 1
-					image.yScale = slot.bone.worldScaleY + attachment.scaleY - 1
-					if self.flipX then
-						image.xScale = -image.xScale
-						image.rotation = -image.rotation
-					end
-					if self.flipY then
-						image.yScale = -image.yScale
-						image.rotation = -image.rotation
-					end
-					image:setFillColor(slot.r, slot.g, slot.b, slot.a)
-					self:insert(image)
-				end
-			end
-		end
-
-		if self.debug then
-			for i,bone in ipairs(self.bones) do
-				if not bone.line then bone.line = display.newLine(0, 0, bone.data.length, 0) end
-				bone.line.x = bone.worldX
-				bone.line.y = -bone.worldY
-				bone.line.rotation = -bone.worldRotation
-				if self.flipX then
-					bone.line.xScale = -1
-					bone.line.rotation = -bone.line.rotation
-				else
-					bone.line.xScale = 1
-				end
-				if self.flipY then
-					bone.line.yScale = -1
-					bone.line.rotation = -bone.line.rotation
-				else
-					bone.line.yScale = 1
-				end
-				bone.line:setColor(255, 0, 0)
-				self:insert(bone.line)
-
-				if not bone.circle then bone.circle = display.newCircle(0, 0, 3) end
-				bone.circle.x = bone.worldX
-				bone.circle.y = -bone.worldY
-				bone.circle:setFillColor(0, 255, 0)
-				self:insert(bone.circle)
-			end
 		end
 	end
 
@@ -192,12 +126,12 @@ function Skeleton.new (skeletonData, group)
 
 	for i,boneData in ipairs(skeletonData.bones) do
 		local parent
-		if boneData.parent then parent = self.bones[utils.indexOf(skeletonData.bones, boneData.parent)] end
+		if boneData.parent then parent = self.bones[spine.utils.indexOf(skeletonData.bones, boneData.parent)] end
 		table.insert(self.bones, Bone.new(boneData, parent))
 	end
 
 	for i,slotData in ipairs(skeletonData.slots) do
-		local bone = self.bones[utils.indexOf(skeletonData.bones, slotData.boneData)]
+		local bone = self.bones[spine.utils.indexOf(skeletonData.bones, slotData.boneData)]
 		local slot = Slot.new(slotData, self, bone)
 		table.insert(self.slots, slot)
 		table.insert(self.drawOrder, slot)

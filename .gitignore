@@ -41,3 +41,6 @@ spine-unity/*.sln
 *.pidb
 Assembly-*.csproj
 Assembly-*.pidb
+
+spine-corona/spine-lua/
+!spine-corona/spine-lua/Place spine-lua here.txt

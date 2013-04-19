@@ -23,19 +23,22 @@
  -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ------------------------------------------------------------------------------
 
-local spine = {}
+local RegionAttachment = require "spine-lua.RegionAttachment"
 
-spine.utils = require "spine.utils"
-spine.SkeletonJson = require "spine.SkeletonJson"
-spine.SkeletonData = require "spine.SkeletonData"
-spine.BoneData = require "spine.BoneData"
-spine.SlotData = require "spine.SlotData"
-spine.Skin = require "spine.Skin"
-spine.RegionAttachment = require "spine.RegionAttachment"
-spine.Skeleton = require "spine.Skeleton"
-spine.Bone = require "spine.Bone"
-spine.Slot = require "spine.Slot"
-spine.AttachmentLoader = require "spine.AttachmentLoader"
-spine.Animation = require "spine.Animation"
+local AttachmentLoader = {
+	failed = {},
+	ATTACHMENT_REGION = "region"
+}
+function AttachmentLoader.new ()
+	local self = {}
 
-return spine
+	function self:newAttachment (type, name)
+		if type == AttachmentLoader.ATTACHMENT_REGION then
+			return RegionAttachment.new(name)
+		end
+		error("Unknown attachment type: " .. type .. " (" + name + ")")
+	end
+
+	return self
+end
+return AttachmentLoader

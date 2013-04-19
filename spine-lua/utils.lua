@@ -23,56 +23,59 @@
  -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ------------------------------------------------------------------------------
 
-local Bone = {}
-function Bone.new (data, parent)
-	if not data then error("data cannot be nil", 2) end
-	
-	local self = {
-		data = data,
-		parent = parent
-	}
+local utils = {}
 
-	function self:updateWorldTransform (flipX, flipY)
-		local parent = self.parent
-		if parent then
-			self.worldX = self.x * parent.m00 + self.y * parent.m01 + parent.worldX
-			self.worldY = self.x * parent.m10 + self.y * parent.m11 + parent.worldY
-			self.worldScaleX = parent.worldScaleX * self.scaleX
-			self.worldScaleY = parent.worldScaleY * self.scaleY
-			self.worldRotation = parent.worldRotation + self.rotation
-		else
-			self.worldX = self.x
-			self.worldY = self.y
-			self.worldScaleX = self.scaleX
-			self.worldScaleY = self.scaleY
-			self.worldRotation = self.rotation
+function tablePrint (tt, indent, done)
+	done = done or {}
+	indent = indent or 0
+	if type(tt) == "table" then
+		local sb = {}
+		for key, value in pairs (tt) do
+			table.insert(sb, string.rep (" ", indent)) -- indent it
+			if type (value) == "table" and not done [value] then
+				done [value] = true
+				table.insert(sb, "{\n");
+				table.insert(sb, tablePrint (value, indent + 2, done))
+				table.insert(sb, string.rep (" ", indent)) -- indent it
+				table.insert(sb, "}\n");
+			elseif "number" == type(key) then
+				table.insert(sb, string.format("\"%s\"\n", tostring(value)))
+			else
+				table.insert(sb, string.format(
+					"%s = \"%s\"\n", tostring (key), tostring(value)))
+			end
 		end
-		local radians = math.rad(self.worldRotation)
-		local cos = math.cos(radians)
-		local sin = math.sin(radians)
-		self.m00 = cos * self.worldScaleX
-		self.m10 = sin * self.worldScaleX
-		self.m01 = -sin * self.worldScaleY
-		self.m11 = cos * self.worldScaleY
-		if flipX then
-			self.m00 = -self.m00
-			self.m01 = -self.m01
-		end
-		if flipY then
-			self.m10 = -self.m10
-			self.m11 = -self.m11
-		end
+		return table.concat(sb)
+	else
+		return tt .. "\n"
 	end
-
-	function self:setToBindPose ()
-		local data = self.data
-		self.x = data.x
-		self.y = data.y
-		self.rotation = data.rotation
-		self.scaleX = data.scaleX
-		self.scaleY = data.scaleY
-	end
-	
-	return self
 end
-return Bone
+
+function utils.print (value)
+	if "nil" == type(value) then
+		print(tostring(nil))
+	elseif "table" == type(value) then
+		print(tablePrint(value))
+	elseif "string" == type(value) then
+		print(value)
+	else
+		print(tostring(value))
+	end
+end
+
+function utils.indexOf (haystack, needle)
+	for i,value in ipairs(haystack) do
+		if value == needle then return i end
+	end
+	return nil
+end
+
+function utils.copy (from, to)
+	if not to then to = {} end
+	for k,v in pairs(from) do
+		to[k] = v
+	end
+	return to
+end
+
+return utils

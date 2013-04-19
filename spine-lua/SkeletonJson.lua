@@ -23,14 +23,12 @@
  -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ------------------------------------------------------------------------------
 
-local utils = require "spine.utils"
-local SkeletonData = require "spine.SkeletonData"
-local BoneData = require "spine.BoneData"
-local SlotData = require "spine.SlotData"
-local Skin = require "spine.Skin"
-local AttachmentLoader = require "spine.AttachmentLoader"
-local Animation = require "spine.Animation"
-local json = require "json"
+local SkeletonData = require "spine-lua.SkeletonData"
+local BoneData = require "spine-lua.BoneData"
+local SlotData = require "spine-lua.SlotData"
+local Skin = require "spine-lua.Skin"
+local AttachmentLoader = require "spine-lua.AttachmentLoader"
+local Animation = require "spine-lua.Animation"
 
 local TIMELINE_SCALE = "scale"
 local TIMELINE_ROTATE = "rotate"
@@ -48,7 +46,7 @@ function SkeletonJson.new (attachmentLoader)
 	}
 
 	function self:readSkeletonDataFile (fileName, base)
-		return self:readSkeletonData(utils.readFile(fileName, base))
+		return self:readSkeletonData(spine.utils.readFile(fileName, base))
 	end
 
 	local readAttachment
@@ -58,7 +56,7 @@ function SkeletonJson.new (attachmentLoader)
 	function self:readSkeletonData (jsonText)
 		local skeletonData = SkeletonData.new(self.attachmentLoader)
 
-		local root = json.decode(jsonText)
+		local root = spine.utils.readJSON(jsonText)
 		if not root then error("Invalid JSON: " .. jsonText, 2) end
 
 		-- Bones.
@@ -127,6 +125,7 @@ function SkeletonJson.new (attachmentLoader)
 			end
 		end
 
+		-- Animations.
 		map = root["animations"]
 		if map then
 			for animationName,animationMap in pairs(map) do

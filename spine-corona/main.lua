@@ -1,21 +1,16 @@
 
-local spine = require "spine.spine"
+local spine = require "spine-corona.spine"
 
--- Using your own attachment loader is optional. It can customizes the path where images are 
--- loaded. To load from a texture atlas, use an image sheet. It also creates instances of
--- all attachments, which can be used for customization.
-local attachmentLoader = spine.AttachmentLoader.new()
-function attachmentLoader:createImage (attachment)
-	return display.newImage("data/" .. attachment.name .. ".png")
-end
-
-local json = spine.SkeletonJson.new(attachmentLoader)
+local json = spine.SkeletonJson.new()
 json.scale = 1
 local skeletonData = json:readSkeletonDataFile("data/spineboy.json")
 local walkAnimation = skeletonData:findAnimation("walk")
 
--- Optional second parameter can be the group for the Skeleton to use. Eg, could be an image group.
 local skeleton = spine.Skeleton.new(skeletonData)
+function skeleton:createImage (attachment)
+	-- Customize where images are loaded.
+	return display.newImage("data/" .. attachment.name .. ".png")
+end
 skeleton.x = 150
 skeleton.y = 325
 skeleton.flipX = false

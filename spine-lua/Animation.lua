@@ -23,8 +23,6 @@
  -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ------------------------------------------------------------------------------
 
-local utils = require "spine.utils"
-
 local Animation = {}
 function Animation.new (name, timelines, duration)
 	if not timelines then error("timelines cannot be nil", 2) end

@@ -23,61 +23,63 @@
  -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ------------------------------------------------------------------------------
 
-local utils = {}
+local SkeletonData = {}
+function SkeletonData.new ()
+	local self = {
+		bones = {},
+		slots = {},
+		skins = {},
+		animations = {}
+	}
 
-utils.readFile = function (fileName, base)
-	if not base then base = system.ResourceDirectory; end
-	local path = system.pathForFile(fileName, base)
-	local file = io.open(path, "r")
-	if not file then return nil; end
-	local contents = file:read("*a")
-	io.close(file)
-	return contents
-end
-
-function tablePrint (tt, indent, done)
-	done = done or {}
-	indent = indent or 0
-	if type(tt) == "table" then
-		local sb = {}
-		for key, value in pairs (tt) do
-			table.insert(sb, string.rep (" ", indent)) -- indent it
-			if type (value) == "table" and not done [value] then
-				done [value] = true
-				table.insert(sb, "{\n");
-				table.insert(sb, tablePrint (value, indent + 2, done))
-				table.insert(sb, string.rep (" ", indent)) -- indent it
-				table.insert(sb, "}\n");
-			elseif "number" == type(key) then
-				table.insert(sb, string.format("\"%s\"\n", tostring(value)))
-			else
-				table.insert(sb, string.format(
-					"%s = \"%s\"\n", tostring (key), tostring(value)))
-			end
+	function self:findBone (boneName)
+		if not boneName then error("boneName cannot be nil.", 2) end
+		for i,bone in ipairs(self.bones) do
+			if bone.name == boneName then return bone end
 		end
-		return table.concat(sb)
-	else
-		return tt .. "\n"
+		return nil
 	end
-end
 
-function utils.print (value)
-	if "nil" == type(value) then
-		print(tostring(nil))
-	elseif "table" == type(value) then
-		print(tablePrint(value))
-	elseif "string" == type(value) then
-		print(value)
-	else
-		print(tostring(value))
+	function self:findBoneIndex (boneName)
+		if not boneName then error("boneName cannot be nil.", 2) end
+		for i,bone in ipairs(self.bones) do
+			if bone.name == boneName then return i end
+		end
+		return -1
 	end
-end
 
-function utils.indexOf (haystack, needle)
-	for i,value in ipairs(haystack) do
-		if value == needle then return i end
+	function self:findSlot (slotName)
+		if not slotName then error("slotName cannot be nil.", 2) end
+		for i,slot in ipairs(self.slots) do
+			if slot.name == slotName then return slot end
+		end
+		return nil
 	end
-	return nil
-end
 
-return utils
+	function self:findSlotIndex (slotName)
+		if not slotName then error("slotName cannot be nil.", 2) end
+		for i,slot in ipairs(self.slots) do
+			if slot.name == slotName then return i end
+		end
+		return -1
+	end
+
+	function self:findSkin (skinName)
+		if not skinName then error("skinName cannot be nil.", 2) end
+		for i,skin in ipairs(self.skins) do
+			if skin.name == skinName then return skin end
+		end
+		return nil
+	end
+
+	function self:findAnimation (animationName)
+		if not animationName then error("animationName cannot be nil.", 2) end
+		for i,animation in ipairs(self.animations) do
+			if animation.name == animationName then return animation end
+		end
+		return nil
+	end
+
+	return self
+end
+return SkeletonData
