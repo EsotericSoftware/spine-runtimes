@@ -11,8 +11,8 @@ function skeleton:createImage (attachment)
 	-- Customize where images are loaded.
 	return love.graphics.newImage("data/" .. attachment.name .. ".png")
 end
-skeleton.x = 150
-skeleton.y = 325
+skeleton.x = love.graphics.getWidth() / 2
+skeleton.y = love.graphics.getHeight() / 2 + 150
 skeleton.flipX = false
 skeleton.flipY = false
 skeleton.debugBones = true -- Omit or set to false to not draw debug lines on top of the images.
