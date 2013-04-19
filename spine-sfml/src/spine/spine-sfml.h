@@ -32,20 +32,6 @@
 
 namespace spine {
 
-typedef struct {
-	AtlasPage super;
-	sf::Texture* texture;
-} SfmlAtlasPage;
-
-/**/
-
-class SkeletonDrawable;
-
-typedef struct {
-	Skeleton super;
-	SkeletonDrawable* const drawable;
-} SfmlSkeleton;
-
 class SkeletonDrawable: public sf::Drawable {
 public:
 	Skeleton* skeleton;
@@ -60,14 +46,6 @@ public:
 
 	virtual void draw (sf::RenderTarget& target, sf::RenderStates states) const;
 };
-
-/**/
-
-typedef struct {
-	RegionAttachment super;
-	sf::Vertex vertices[4];
-	sf::Texture* texture;
-} SfmlRegionAttachment;
 
 } /* namespace spine */
 #endif /* SPINE_SFML_H_ */
