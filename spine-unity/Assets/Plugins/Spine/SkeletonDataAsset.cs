@@ -22,7 +22,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -72,9 +71,9 @@ public class SkeletonDataAsset : ScriptableObject {
 		json.Scale = scale;
 		try {
 			skeletonData = json.ReadSkeletonData(new StringReader(skeletonJSON.text));
-		} catch (Exception) {
+		} catch (Exception ex) {
 			if (!quiet)
-				Debug.LogException(new Exception("Error reading skeleton JSON file for skeleton data asset: " + name), this);
+				Debug.LogException(new Exception("Error reading skeleton JSON file for skeleton data asset: " + name, ex), this);
 			return null;
 		}
 

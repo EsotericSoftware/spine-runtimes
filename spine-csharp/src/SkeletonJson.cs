@@ -77,12 +77,12 @@ namespace Spine {
 						throw new Exception("Parent bone not found: " + boneMap["parent"]);
 				}
 				BoneData boneData = new BoneData((String)boneMap["name"], parent);
-				boneData.Length = getFloat(boneMap, "length", 0) * Scale;
-				boneData.X = getFloat(boneMap, "x", 0) * Scale;
-				boneData.Y = getFloat(boneMap, "y", 0) * Scale;
-				boneData.Rotation = getFloat(boneMap, "rotation", 0);
-				boneData.ScaleX = getFloat(boneMap, "scaleX", 1);
-				boneData.ScaleY = getFloat(boneMap, "scaleY", 1);
+				boneData.Length = GetFloat(boneMap, "length", 0) * Scale;
+				boneData.X = GetFloat(boneMap, "x", 0) * Scale;
+				boneData.Y = GetFloat(boneMap, "y", 0) * Scale;
+				boneData.Rotation = GetFloat(boneMap, "rotation", 0);
+				boneData.ScaleX = GetFloat(boneMap, "scaleX", 1);
+				boneData.ScaleY = GetFloat(boneMap, "scaleY", 1);
 				skeletonData.AddBone(boneData);
 			}
 
@@ -99,10 +99,10 @@ namespace Spine {
 
 					if (slotMap.ContainsKey("color")) {
 						String color = (String)slotMap["color"];
-						slotData.R = toColor(color, 0);
-						slotData.G = toColor(color, 1);
-						slotData.B = toColor(color, 2);
-						slotData.A = toColor(color, 3);
+						slotData.R = ToColor(color, 0);
+						slotData.G = ToColor(color, 1);
+						slotData.B = ToColor(color, 2);
+						slotData.A = ToColor(color, 3);
 					}
 
 					if (slotMap.ContainsKey("attachment"))
@@ -120,7 +120,7 @@ namespace Spine {
 					foreach (KeyValuePair<String, Object> slotEntry in (Dictionary<String, Object>)entry.Value) {
 						int slotIndex = skeletonData.FindSlotIndex(slotEntry.Key);
 						foreach (KeyValuePair<String, Object> attachmentEntry in ((Dictionary<String, Object>)slotEntry.Value)) {
-							Attachment attachment = readAttachment(skin, attachmentEntry.Key, (Dictionary<String, Object>)attachmentEntry.Value);
+							Attachment attachment = ReadAttachment(skin, attachmentEntry.Key, (Dictionary<String, Object>)attachmentEntry.Value);
 							skin.AddAttachment(slotIndex, attachmentEntry.Key, attachment);
 						}
 					}
@@ -135,7 +135,7 @@ namespace Spine {
 			if (root.ContainsKey("animations")) {
 				Dictionary<String, Object> animationMap = (Dictionary<String, Object>)root["animations"];
 				foreach (KeyValuePair<String, Object> entry in animationMap)
-					readAnimation(entry.Key, (Dictionary<String, Object>)entry.Value, skeletonData);
+					ReadAnimation(entry.Key, (Dictionary<String, Object>)entry.Value, skeletonData);
 			}
 
 			skeletonData.Bones.TrimExcess();
@@ -145,7 +145,7 @@ namespace Spine {
 			return skeletonData;
 		}
 
-		private Attachment readAttachment (Skin skin, String name, Dictionary<String, Object> map) {
+		private Attachment ReadAttachment (Skin skin, String name, Dictionary<String, Object> map) {
 			if (map.ContainsKey("name"))
 				name = (String)map["name"];
 
@@ -156,32 +156,32 @@ namespace Spine {
 
 			if (attachment is RegionAttachment) {
 				RegionAttachment regionAttachment = (RegionAttachment)attachment;
-				regionAttachment.X = getFloat(map, "x", 0) * Scale;
-				regionAttachment.Y = getFloat(map, "y", 0) * Scale;
-				regionAttachment.ScaleX = getFloat(map, "scaleX", 1);
-				regionAttachment.ScaleY = getFloat(map, "scaleY", 1);
-				regionAttachment.Rotation = getFloat(map, "rotation", 0);
-				regionAttachment.Width = getFloat(map, "width", 32) * Scale;
-				regionAttachment.Height = getFloat(map, "height", 32) * Scale;
+				regionAttachment.X = GetFloat(map, "x", 0) * Scale;
+				regionAttachment.Y = GetFloat(map, "y", 0) * Scale;
+				regionAttachment.ScaleX = GetFloat(map, "scaleX", 1);
+				regionAttachment.ScaleY = GetFloat(map, "scaleY", 1);
+				regionAttachment.Rotation = GetFloat(map, "rotation", 0);
+				regionAttachment.Width = GetFloat(map, "width", 32) * Scale;
+				regionAttachment.Height = GetFloat(map, "height", 32) * Scale;
 				regionAttachment.UpdateOffset();
 			}
 
 			return attachment;
 		}
 
-		private float getFloat (Dictionary<String, Object> map, String name, float defaultValue) {
+		private float GetFloat (Dictionary<String, Object> map, String name, float defaultValue) {
 			if (!map.ContainsKey(name))
 				return (float)defaultValue;
 			return (float)map[name];
 		}
 
-		public static float toColor (String hexString, int colorIndex) {
+		public static float ToColor (String hexString, int colorIndex) {
 			if (hexString.Length != 8)
 				throw new ArgumentException("Color hexidecimal length must be 8, recieved: " + hexString);
 			return Convert.ToInt32(hexString.Substring(colorIndex * 2, 2), 16) / (float)255;
 		}
 
-		private void readAnimation (String name, Dictionary<String, Object> map, SkeletonData skeletonData) {
+		private void ReadAnimation (String name, Dictionary<String, Object> map, SkeletonData skeletonData) {
 			var timelines = new List<Timeline>();
 			float duration = 0;
 
@@ -204,7 +204,7 @@ namespace Spine {
 						foreach (Dictionary<String, Object> valueMap in values) {
 							float time = (float)valueMap["time"];
 							timeline.SetFrame(frameIndex, time, (float)valueMap["angle"]);
-							readCurve(timeline, frameIndex, valueMap);
+							ReadCurve(timeline, frameIndex, valueMap);
 							frameIndex++;
 						}
 						timelines.Add(timeline);
@@ -227,7 +227,7 @@ namespace Spine {
 							float x = valueMap.ContainsKey("x") ? (float)valueMap["x"] : 0;
 							float y = valueMap.ContainsKey("y") ? (float)valueMap["y"] : 0;
 							timeline.SetFrame(frameIndex, time, (float)x * timelineScale, (float)y * timelineScale);
-							readCurve(timeline, frameIndex, valueMap);
+							ReadCurve(timeline, frameIndex, valueMap);
 							frameIndex++;
 						}
 						timelines.Add(timeline);
@@ -256,8 +256,8 @@ namespace Spine {
 							foreach (Dictionary<String, Object> valueMap in values) {
 								float time = (float)valueMap["time"];
 								String c = (String)valueMap["color"];
-								timeline.setFrame(frameIndex, time, toColor(c, 0), toColor(c, 1), toColor(c, 2), toColor(c, 3));
-								readCurve(timeline, frameIndex, valueMap);
+								timeline.setFrame(frameIndex, time, ToColor(c, 0), ToColor(c, 1), ToColor(c, 2), ToColor(c, 3));
+								ReadCurve(timeline, frameIndex, valueMap);
 								frameIndex++;
 							}
 							timelines.Add(timeline);
@@ -285,14 +285,14 @@ namespace Spine {
 			skeletonData.AddAnimation(new Animation(name, timelines, duration));
 		}
 
-		private void readCurve (CurveTimeline timeline, int frameIndex, Dictionary<String, Object> valueMap) {
+		private void ReadCurve (CurveTimeline timeline, int frameIndex, Dictionary<String, Object> valueMap) {
 			if (!valueMap.ContainsKey("curve"))
 				return;
 			Object curveObject = valueMap["curve"];
 			if (curveObject.Equals("stepped"))
 				timeline.SetStepped(frameIndex);
-			else if (curveObject.GetType() == typeof(List<float>)) {
-				List<float> curve = (List<float>)curveObject;
+			else if (curveObject is List<Object>) {
+				List<Object> curve = (List<Object>)curveObject;
 				timeline.SetCurve(frameIndex, (float)curve[0], (float)curve[1], (float)curve[2], (float)curve[3]);
 			}
 		}

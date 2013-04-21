@@ -24,6 +24,7 @@
  ******************************************************************************/
 
 using System;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 using Spine;
@@ -31,15 +32,20 @@ using Spine;
 public class SpineEditor {
 	[MenuItem("Assets/Create/Spine Atlas")]
 	static public void CreateAtlas () {
-		CreateAsset<AtlasAsset>("Assets/New Spine Atlas");
+		CreateAsset<AtlasAsset>("New Spine Atlas");
 	}
 	
 	[MenuItem("Assets/Create/Spine Skeleton Data")]
 	static public void CreateSkeletonData () {
-		CreateAsset<SkeletonDataAsset>("Assets/New Spine Skeleton Data");
+		CreateAsset<SkeletonDataAsset>("New Spine Skeleton Data");
 	}
 	
 	static private void CreateAsset <T> (String path) where T : ScriptableObject {
+		try {
+			path = Path.GetDirectoryName(AssetDatabase.GetAssetPath(Selection.activeObject)) + "/" + path;
+		} catch (Exception) {
+			path = "Assets/" + path;
+		}
 		ScriptableObject asset = ScriptableObject.CreateInstance<T>();
 		AssetDatabase.CreateAsset(asset, path + ".asset");
 		AssetDatabase.SaveAssets();
