@@ -7,6 +7,8 @@ The Spine runtime for Unity comes with an example project which has "spineboy" w
 
 # Unity 3.5.7
 
+Note that you *must* delete the Unity 4 directory or Unity will crash.
+
 1. Delete the "Assets/examples/Unity 4" directory.
 1. Open the "Assets/examples/Unity 3.5/spineboy.unity" scene.
 
