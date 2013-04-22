@@ -56,8 +56,8 @@ public class AtlasAsset : ScriptableObject {
 		try {
 			atlas = new Atlas(new StringReader(atlasFile.text), "", new SingleTextureLoader(material));
 			return atlas;
-		} catch (Exception) {
-			Debug.LogException(new Exception("Error reading atlas file for atlas asset: " + name), this);
+		} catch (Exception ex) {
+			Debug.Log("Error reading atlas file for atlas asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, this);
 			return null;
 		}
 	}

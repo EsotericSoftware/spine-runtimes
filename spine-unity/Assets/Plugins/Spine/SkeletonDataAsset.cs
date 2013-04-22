@@ -73,13 +73,15 @@ public class SkeletonDataAsset : ScriptableObject {
 			skeletonData = json.ReadSkeletonData(new StringReader(skeletonJSON.text));
 		} catch (Exception ex) {
 			if (!quiet)
-				Debug.LogException(new Exception("Error reading skeleton JSON file for skeleton data asset: " + name, ex), this);
+				Debug.Log("Error reading skeleton JSON file for skeleton data asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, this);
 			return null;
 		}
 
 		stateData = new AnimationStateData(skeletonData);
-		for (int i = 0, n = fromAnimation.Length; i < n; i++)
+		for (int i = 0, n = fromAnimation.Length; i < n; i++) {
+			if (fromAnimation[i].Length == 0 || toAnimation[i].Length == 0) continue;
 			stateData.SetMix(fromAnimation[i], toAnimation[i], duration[i]);
+		}
 
 		return skeletonData;
 	}

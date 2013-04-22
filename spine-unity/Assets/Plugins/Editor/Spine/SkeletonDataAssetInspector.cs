@@ -78,19 +78,21 @@ public class SkeletonDataAssetInspector : Editor {
 				EditorGUILayout.BeginHorizontal();
 				EditorGUILayout.Space();
 				if (GUILayout.Button("Add Mix")) {
-					duration.InsertArrayElementAtIndex(fromAnimation.arraySize);
-					toAnimation.InsertArrayElementAtIndex(fromAnimation.arraySize);
-					fromAnimation.InsertArrayElementAtIndex(fromAnimation.arraySize);
+					duration.arraySize++;
+					toAnimation.arraySize++;
+					fromAnimation.arraySize++;
 				}
 				EditorGUILayout.Space();
 				EditorGUILayout.EndHorizontal();
 			}
 		}
 		
-		if (serializedObject.ApplyModifiedProperties() ||
-			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
-		) {
-			asset.Clear();
+		if (!Application.isPlaying) {
+			if (serializedObject.ApplyModifiedProperties() ||
+				(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
+			) {
+				asset.Clear();
+			}
 		}
 	}
 }

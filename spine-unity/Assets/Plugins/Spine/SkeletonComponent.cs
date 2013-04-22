@@ -60,14 +60,21 @@ public class SkeletonComponent : MonoBehaviour {
 
 		skeleton = new Skeleton(skeletonDataAsset.GetSkeletonData(false));
 	}
-
+	
+	public void UpdateAnimation () {
+		skeleton.Update(Time.deltaTime * timeScale);
+		state.Update(Time.deltaTime * timeScale);
+		state.Apply(skeleton);
+		skeleton.UpdateWorldTransform();
+	}
+	
 	public void Update () {
 		// Clear fields if missing information to render.
 		if (skeletonDataAsset == null || skeletonDataAsset.GetSkeletonData(false) == null) {
 			Clear();
 			return;
 		}
-
+		
 		// Initialize fields.
 		if (skeleton == null || skeleton.Data != skeletonDataAsset.GetSkeletonData(false))
 			Initialize();
@@ -81,12 +88,8 @@ public class SkeletonComponent : MonoBehaviour {
 				state.SetAnimation(animation, loop);
 		}
 		state.Loop = loop;
-
-		// Apply animation.
-		skeleton.Update(Time.deltaTime * timeScale);
-		state.Update(Time.deltaTime * timeScale);
-		state.Apply(skeleton);
-		skeleton.UpdateWorldTransform();
+		
+		UpdateAnimation();
 
 		// Count quads.
 		int quadCount = 0;

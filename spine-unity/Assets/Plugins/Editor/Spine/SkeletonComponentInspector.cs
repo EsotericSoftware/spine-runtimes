@@ -74,11 +74,14 @@ public class SkeletonComponentInspector : Editor {
 		EditorGUILayout.EndHorizontal();
 
 		EditorGUILayout.PropertyField(timeScale);
-
-		if (serializedObject.ApplyModifiedProperties() ||
-			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
-		) {
-			component.Clear();
+		
+		if (!Application.isPlaying) {
+			if (serializedObject.ApplyModifiedProperties() ||
+				(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
+			) {
+				component.Clear();
+				component.Update();
+			}
 		}
 	}
 }
