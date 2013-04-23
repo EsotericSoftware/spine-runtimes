@@ -114,7 +114,7 @@ namespace Spine {
 
 			// Skins.
 			if (root.ContainsKey("skins")) {
-				Dictionary<String, Object> skinMap = (Dictionary<String, Object>)root["skins"];
+				var skinMap = (Dictionary<String, Object>)root["skins"];
 				foreach (KeyValuePair<String, Object> entry in skinMap) {
 					Skin skin = new Skin(entry.Key);
 					foreach (KeyValuePair<String, Object> slotEntry in (Dictionary<String, Object>)entry.Value) {
@@ -133,7 +133,7 @@ namespace Spine {
 
 			// Animations.
 			if (root.ContainsKey("animations")) {
-				Dictionary<String, Object> animationMap = (Dictionary<String, Object>)root["animations"];
+				var animationMap = (Dictionary<String, Object>)root["animations"];
 				foreach (KeyValuePair<String, Object> entry in animationMap)
 					ReadAnimation(entry.Key, (Dictionary<String, Object>)entry.Value, skeletonData);
 			}
@@ -185,68 +185,70 @@ namespace Spine {
 			var timelines = new List<Timeline>();
 			float duration = 0;
 
-			var bonesMap = (Dictionary<String, Object>)map["bones"];
-			foreach (KeyValuePair<String, Object> entry in bonesMap) {
-				String boneName = entry.Key;
-				int boneIndex = skeletonData.FindBoneIndex(boneName);
-				if (boneIndex == -1)
-					throw new Exception("Bone not found: " + boneName);
+			if (map.ContainsKey("bones")) {
+				var bonesMap = (Dictionary<String, Object>)map["bones"];
+				foreach (KeyValuePair<String, Object> entry in bonesMap) {
+					String boneName = entry.Key;
+					int boneIndex = skeletonData.FindBoneIndex(boneName);
+					if (boneIndex == -1)
+						throw new Exception("Bone not found: " + boneName);
 
-				Dictionary<String, Object> timelineMap = (Dictionary<String, Object>)entry.Value;
-				foreach (KeyValuePair<String, Object> timelineEntry in timelineMap) {
-					List<Object> values = (List<Object>)timelineEntry.Value;
-					String timelineName = (String)timelineEntry.Key;
-					if (timelineName.Equals(TIMELINE_ROTATE)) {
-						RotateTimeline timeline = new RotateTimeline(values.Count);
-						timeline.BoneIndex = boneIndex;
+					var timelineMap = (Dictionary<String, Object>)entry.Value;
+					foreach (KeyValuePair<String, Object> timelineEntry in timelineMap) {
+						var values = (List<Object>)timelineEntry.Value;
+						String timelineName = (String)timelineEntry.Key;
+						if (timelineName.Equals(TIMELINE_ROTATE)) {
+							RotateTimeline timeline = new RotateTimeline(values.Count);
+							timeline.BoneIndex = boneIndex;
 
-						int frameIndex = 0;
-						foreach (Dictionary<String, Object> valueMap in values) {
-							float time = (float)valueMap["time"];
-							timeline.SetFrame(frameIndex, time, (float)valueMap["angle"]);
-							ReadCurve(timeline, frameIndex, valueMap);
-							frameIndex++;
-						}
-						timelines.Add(timeline);
-						duration = Math.Max(duration, timeline.Frames[timeline.FrameCount * 2 - 2]);
+							int frameIndex = 0;
+							foreach (Dictionary<String, Object> valueMap in values) {
+								float time = (float)valueMap["time"];
+								timeline.SetFrame(frameIndex, time, (float)valueMap["angle"]);
+								ReadCurve(timeline, frameIndex, valueMap);
+								frameIndex++;
+							}
+							timelines.Add(timeline);
+							duration = Math.Max(duration, timeline.Frames[timeline.FrameCount * 2 - 2]);
 
-					} else if (timelineName.Equals(TIMELINE_TRANSLATE) || timelineName.Equals(TIMELINE_SCALE)) {
-						TranslateTimeline timeline;
-						float timelineScale = 1;
-						if (timelineName.Equals(TIMELINE_SCALE))
-							timeline = new ScaleTimeline(values.Count);
-						else {
-							timeline = new TranslateTimeline(values.Count);
-							timelineScale = Scale;
-						}
-						timeline.BoneIndex = boneIndex;
+						} else if (timelineName.Equals(TIMELINE_TRANSLATE) || timelineName.Equals(TIMELINE_SCALE)) {
+							TranslateTimeline timeline;
+							float timelineScale = 1;
+							if (timelineName.Equals(TIMELINE_SCALE))
+								timeline = new ScaleTimeline(values.Count);
+							else {
+								timeline = new TranslateTimeline(values.Count);
+								timelineScale = Scale;
+							}
+							timeline.BoneIndex = boneIndex;
 
-						int frameIndex = 0;
-						foreach (Dictionary<String, Object> valueMap in values) {
-							float time = (float)valueMap["time"];
-							float x = valueMap.ContainsKey("x") ? (float)valueMap["x"] : 0;
-							float y = valueMap.ContainsKey("y") ? (float)valueMap["y"] : 0;
-							timeline.SetFrame(frameIndex, time, (float)x * timelineScale, (float)y * timelineScale);
-							ReadCurve(timeline, frameIndex, valueMap);
-							frameIndex++;
-						}
-						timelines.Add(timeline);
-						duration = Math.Max(duration, timeline.Frames[timeline.FrameCount * 3 - 3]);
+							int frameIndex = 0;
+							foreach (Dictionary<String, Object> valueMap in values) {
+								float time = (float)valueMap["time"];
+								float x = valueMap.ContainsKey("x") ? (float)valueMap["x"] : 0;
+								float y = valueMap.ContainsKey("y") ? (float)valueMap["y"] : 0;
+								timeline.SetFrame(frameIndex, time, (float)x * timelineScale, (float)y * timelineScale);
+								ReadCurve(timeline, frameIndex, valueMap);
+								frameIndex++;
+							}
+							timelines.Add(timeline);
+							duration = Math.Max(duration, timeline.Frames[timeline.FrameCount * 3 - 3]);
 
-					} else
-						throw new Exception("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
+						} else
+							throw new Exception("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
+					}
 				}
 			}
 
 			if (map.ContainsKey("slots")) {
-				Dictionary<String, Object> slotsMap = (Dictionary<String, Object>)map["slots"];
+				var slotsMap = (Dictionary<String, Object>)map["slots"];
 				foreach (KeyValuePair<String, Object> entry in slotsMap) {
 					String slotName = entry.Key;
 					int slotIndex = skeletonData.FindSlotIndex(slotName);
-					Dictionary<String, Object> timelineMap = (Dictionary<String, Object>)entry.Value;
+					var timelineMap = (Dictionary<String, Object>)entry.Value;
 
 					foreach (KeyValuePair<String, Object> timelineEntry in timelineMap) {
-						List<Object> values = (List<Object>)timelineEntry.Value;
+						var values = (List<Object>)timelineEntry.Value;
 						String timelineName = (String)timelineEntry.Key;
 						if (timelineName.Equals(TIMELINE_COLOR)) {
 							ColorTimeline timeline = new ColorTimeline(values.Count);
