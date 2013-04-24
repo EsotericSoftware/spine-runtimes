@@ -45,7 +45,7 @@ struct RegionAttachment {
 	float x, y, scaleX, scaleY, rotation, width, height;
 
 	void* texture;
-	float regionOffsetX, regionOffsetY; // Unrotated pixels stripped from upper left.
+	float regionOffsetX, regionOffsetY; // Pixels stripped from the bottom left, unrotated.
 	float regionWidth, regionHeight; // Unrotated, stripped size.
 	float regionOriginalWidth, regionOriginalHeight; // Unrotated, unstripped size.
 
