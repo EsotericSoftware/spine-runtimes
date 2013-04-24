@@ -64,6 +64,7 @@ namespace Spine {
 			skeleton = new Skeleton(json.ReadSkeletonData("data/goblins.json"));
 			skeleton.SetSkin("goblingirl");
 			skeleton.SetSlotsToBindPose(); // Without this the skin attachments won't be attached. See SetSkin.
+			skeleton.SetAttachment("left hand item", "spear");
 			animation = skeleton.Data.FindAnimation("walk");
 
 			skeleton.RootBone.X = 320;
