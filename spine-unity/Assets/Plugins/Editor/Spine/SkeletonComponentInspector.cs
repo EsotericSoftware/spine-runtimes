@@ -29,10 +29,11 @@ using UnityEngine;
 
 [CustomEditor(typeof(SkeletonComponent))]
 public class SkeletonComponentInspector : Editor {
-	private SerializedProperty skeletonDataAsset, animationName, loop, timeScale;
+	private SerializedProperty skeletonDataAsset, animationName, skinName, loop, timeScale;
 
 	void OnEnable () {
 		skeletonDataAsset = serializedObject.FindProperty("skeletonDataAsset");
+		skinName = serializedObject.FindProperty("skinName");
 		animationName = serializedObject.FindProperty("animationName");
 		loop = serializedObject.FindProperty("loop");
 		timeScale = serializedObject.FindProperty("timeScale");
@@ -46,6 +47,24 @@ public class SkeletonComponentInspector : Editor {
 		EditorGUILayout.PropertyField(skeletonDataAsset);
 		
 		if (component.skeleton != null) {
+			// Skin name.
+			String[] skins = new String[component.skeleton.Data.Skins.Count + 1];
+			int skinIndex = 0;
+			for (int i = 0; i < skins.Length - 1; i++) {
+				String name = component.skeleton.Data.Skins[i].Name;
+				skins[i] = name;
+				if (name == skinName.stringValue) skinIndex = i;
+			}
+		
+			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.LabelField("Skin");
+			EditorGUIUtility.LookLikeControls();
+			skinIndex = EditorGUILayout.Popup(skinIndex, skins);
+			EditorGUIUtility.LookLikeInspector();
+			EditorGUILayout.EndHorizontal();
+		
+			skinName.stringValue = skinIndex == 0 ? null : skins[skinIndex];
+
 			// Animation name.
 			String[] animations = new String[component.skeleton.Data.Animations.Count + 1];
 			animations[0] = "<None>";
@@ -53,8 +72,7 @@ public class SkeletonComponentInspector : Editor {
 			for (int i = 0; i < animations.Length - 1; i++) {
 				String name = component.skeleton.Data.Animations[i].Name;
 				animations[i + 1] = name;
-				if (name == animationName.stringValue)
-					animationIndex = i + 1;
+				if (name == animationName.stringValue) animationIndex = i + 1;
 			}
 		
 			EditorGUILayout.BeginHorizontal();
@@ -75,10 +93,10 @@ public class SkeletonComponentInspector : Editor {
 
 		EditorGUILayout.PropertyField(timeScale);
 		
-		if (!Application.isPlaying) {
-			if (serializedObject.ApplyModifiedProperties() ||
-				(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
-			) {
+		if (serializedObject.ApplyModifiedProperties() ||
+			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
+		) {
+			if (!Application.isPlaying) {
 				component.Clear();
 				component.Update();
 			}
