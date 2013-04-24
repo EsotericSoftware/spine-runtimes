@@ -41,7 +41,7 @@ void _AtlasPage_createTexture (AtlasPage* self, const char* path) {
 	self->texture = texture;
 	Vector2u size = texture->getSize();
 	self->width = size.x;
-	self->height = size.x;
+	self->height = size.y;
 }
 
 void _AtlasPage_disposeTexture (AtlasPage* self) {
@@ -117,32 +117,19 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 		vertices[3].position.x = regionAttachment->vertices[VERTEX_X4];
 		vertices[3].position.y = regionAttachment->vertices[VERTEX_Y4];
 
-		int u = regionAttachment->region->x;
-		int u2 = u + regionAttachment->region->width;
-		int v = regionAttachment->region->y;
-		int v2 = v + regionAttachment->region->height;
-		if (regionAttachment->region->rotate) {
-			vertices[1].texCoords.x = u;
-			vertices[1].texCoords.y = v2;
-			vertices[2].texCoords.x = u;
-			vertices[2].texCoords.y = v;
-			vertices[3].texCoords.x = u2;
-			vertices[3].texCoords.y = v;
-			vertices[0].texCoords.x = u2;
-			vertices[0].texCoords.y = v2;
-		} else {
-			vertices[0].texCoords.x = u;
-			vertices[0].texCoords.y = v2;
-			vertices[1].texCoords.x = u;
-			vertices[1].texCoords.y = v;
-			vertices[2].texCoords.x = u2;
-			vertices[2].texCoords.y = v;
-			vertices[3].texCoords.x = u2;
-			vertices[3].texCoords.y = v2;
-		}
-
 		// SMFL doesn't handle batching for us, so we'll just force a single texture per skeleton.
-		states.texture = (Texture*)regionAttachment->region->page->texture;
+		states.texture = (Texture*)regionAttachment->texture;
+
+		Vector2u size = states.texture->getSize();
+		vertices[0].texCoords.x = regionAttachment->uvs[VERTEX_X1] * size.x;
+		vertices[0].texCoords.y = regionAttachment->uvs[VERTEX_Y1] * size.y;
+		vertices[1].texCoords.x = regionAttachment->uvs[VERTEX_X2] * size.x;
+		vertices[1].texCoords.y = regionAttachment->uvs[VERTEX_Y2] * size.y;
+		vertices[2].texCoords.x = regionAttachment->uvs[VERTEX_X3] * size.x;
+		vertices[2].texCoords.y = regionAttachment->uvs[VERTEX_Y3] * size.y;
+		vertices[3].texCoords.x = regionAttachment->uvs[VERTEX_X4] * size.x;
+		vertices[3].texCoords.y = regionAttachment->uvs[VERTEX_Y4] * size.y;
+
 		vertexArray->append(vertices[0]);
 		vertexArray->append(vertices[1]);
 		vertexArray->append(vertices[2]);

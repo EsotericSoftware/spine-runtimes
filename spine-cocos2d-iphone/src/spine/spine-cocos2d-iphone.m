@@ -83,25 +83,14 @@ void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_
 	quad->br.vertices.x = self->vertices[VERTEX_X4];
 	quad->br.vertices.y = self->vertices[VERTEX_Y4];
 
-	if (self->region->rotate) {
-		quad->tl.texCoords.u = self->region->u;
-		quad->tl.texCoords.v = self->region->v2;
-		quad->tr.texCoords.u = self->region->u;
-		quad->tr.texCoords.v = self->region->v;
-		quad->br.texCoords.u = self->region->u2;
-		quad->br.texCoords.v = self->region->v;
-		quad->bl.texCoords.u = self->region->u2;
-		quad->bl.texCoords.v = self->region->v2;
-	} else {
-		quad->bl.texCoords.u = self->region->u;
-		quad->bl.texCoords.v = self->region->v2;
-		quad->tl.texCoords.u = self->region->u;
-		quad->tl.texCoords.v = self->region->v;
-		quad->tr.texCoords.u = self->region->u2;
-		quad->tr.texCoords.v = self->region->v;
-		quad->br.texCoords.u = self->region->u2;
-		quad->br.texCoords.v = self->region->v2;
-	}
+	quad->bl.texCoords.u = self->uvs[VERTEX_X1];
+	quad->bl.texCoords.v = self->uvs[VERTEX_Y1];
+	quad->tl.texCoords.u = self->uvs[VERTEX_X2];
+	quad->tl.texCoords.v = self->uvs[VERTEX_Y2];
+	quad->tr.texCoords.u = self->uvs[VERTEX_X3];
+	quad->tr.texCoords.v = self->uvs[VERTEX_Y3];
+	quad->br.texCoords.u = self->uvs[VERTEX_X4];
+	quad->br.texCoords.v = self->uvs[VERTEX_Y4];
 }
 
 #ifdef __cplusplus
@@ -205,7 +194,7 @@ void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_
 }
 
 - (void) update:(ccTime)deltaTime {
-	Skeleton_update(skeleton, deltaTime);
+	Skeleton_update(skeleton, deltaTime * timeScale);
 	AnimationState_update(state, deltaTime * timeScale);
 	AnimationState_apply(state, skeleton);
 	Skeleton_updateWorldTransform(skeleton);
@@ -231,7 +220,7 @@ void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_
 		Slot* slot = skeleton->slots[i];
 		if (!slot->attachment || slot->attachment->type != ATTACHMENT_REGION) continue;
 		RegionAttachment* attachment = (RegionAttachment*)slot->attachment;
-		CCTextureAtlas* regionTextureAtlas = (CCTextureAtlas*)attachment->region->page->texture;
+		CCTextureAtlas* regionTextureAtlas = (CCTextureAtlas*)attachment->texture;
 		if (regionTextureAtlas != textureAtlas) {
 			if (textureAtlas) {
 				[textureAtlas drawQuads];

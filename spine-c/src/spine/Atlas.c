@@ -238,8 +238,13 @@ Atlas* Atlas_readAtlas (const char* begin, int length, const char* dir) {
 
 			region->u = region->x / (float)page->width;
 			region->v = region->y / (float)page->height;
-			region->u2 = (region->x + region->width) / (float)page->width;
-			region->v2 = (region->y + region->height) / (float)page->height;
+			if (region->rotate) {
+				region->u2 = (region->x + region->height) / (float)page->width;
+				region->v2 = (region->y + region->width) / (float)page->height;
+			} else {
+				region->u2 = (region->x + region->width) / (float)page->width;
+				region->v2 = (region->y + region->height) / (float)page->height;
+			}
 
 			int count;
 			if (!(count = readTuple(end, tuple))) return abortAtlas(self);

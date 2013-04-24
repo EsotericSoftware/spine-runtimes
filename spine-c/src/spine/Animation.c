@@ -44,6 +44,7 @@ void Animation_dispose (Animation* self) {
 	for (i = 0; i < self->timelineCount; ++i)
 		Timeline_dispose(self->timelines[i]);
 	FREE(self->timelines);
+	FREE(self->name);
 	FREE(self);
 }
 

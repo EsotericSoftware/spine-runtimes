@@ -39,26 +39,35 @@ RegionAttachment* RegionAttachment_create (const char* name) {
 	return self;
 }
 
-void RegionAttachment_updateOffset (RegionAttachment* self) {
-	float localX2 = self->width / 2;
-	float localY2 = self->height / 2;
-	float localX = -localX2;
-	float localY = -localY2;
-	if (self->region->rotate) {
-		localX += self->region->offsetX / self->region->originalWidth * self->height;
-		localY += self->region->offsetY / self->region->originalHeight * self->width;
-		localX2 -= (self->region->originalWidth - self->region->offsetX - self->region->height) / self->region->originalWidth * self->width;
-		localY2 -= (self->region->originalHeight - self->region->offsetY - self->region->width) / self->region->originalHeight * self->height;
+void RegionAttachment_setUVs (RegionAttachment* self, float u, float v, float u2, float v2, int/*bool*/rotate) {
+	if (rotate) {
+		self->uvs[VERTEX_X2] = u;
+		self->uvs[VERTEX_Y2] = v2;
+		self->uvs[VERTEX_X3] = u;
+		self->uvs[VERTEX_Y3] = v;
+		self->uvs[VERTEX_X4] = u2;
+		self->uvs[VERTEX_Y4] = v;
+		self->uvs[VERTEX_X1] = u2;
+		self->uvs[VERTEX_Y1] = v2;
 	} else {
-		localX += self->region->offsetX / self->region->originalWidth * self->width;
-		localY += self->region->offsetY / self->region->originalHeight * self->height;
-		localX2 -= (self->region->originalWidth - self->region->offsetX - self->region->width) / self->region->originalWidth * self->width;
-		localY2 -= (self->region->originalHeight - self->region->offsetY - self->region->height) / self->region->originalHeight * self->height;
+		self->uvs[VERTEX_X1] = u;
+		self->uvs[VERTEX_Y1] = v2;
+		self->uvs[VERTEX_X2] = u;
+		self->uvs[VERTEX_Y2] = v;
+		self->uvs[VERTEX_X3] = u2;
+		self->uvs[VERTEX_Y3] = v;
+		self->uvs[VERTEX_X4] = u2;
+		self->uvs[VERTEX_Y4] = v2;
 	}
-	localX *= self->scaleX;
-	localY *= self->scaleY;
-	localX2 *= self->scaleX;
-	localY2 *= self->scaleY;
+}
+
+void RegionAttachment_updateOffset (RegionAttachment* self) {
+	float regionScaleX = self->width / self->regionOriginalWidth * self->scaleX;
+	float regionScaleY = self->height / self->regionOriginalHeight * self->scaleX;
+	float localX = -self->width / 2 * self->scaleX + self->regionOffsetX * regionScaleX;
+	float localY = -self->height / 2 * self->scaleX + self->regionOffsetY * regionScaleY;
+	float localX2 = localX + self->regionWidth * regionScaleX;
+	float localY2 = localY + self->regionHeight * regionScaleY;
 	float radians = (float)(self->rotation * 3.1415926535897932385 / 180);
 	float cosine = cosf(radians);
 	float sine = sinf(radians);
