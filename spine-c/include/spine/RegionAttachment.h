@@ -43,14 +43,19 @@ typedef struct RegionAttachment RegionAttachment;
 struct RegionAttachment {
 	Attachment super;
 	float x, y, scaleX, scaleY, rotation, width, height;
-	AtlasRegion* region;
+
+	void* texture;
+	float regionOffsetX, regionOffsetY; // Pixels stripped from the bottom left, unrotated.
+	float regionWidth, regionHeight; // Unrotated, stripped size.
+	float regionOriginalWidth, regionOriginalHeight; // Unrotated, unstripped size.
+
 	float offset[8];
 	float vertices[8];
 	float uvs[8];
 };
 
 RegionAttachment* RegionAttachment_create (const char* name);
-
+void RegionAttachment_setUVs (RegionAttachment* self, float u, float v, float u2, float v2, int/*bool*/rotate);
 void RegionAttachment_updateOffset (RegionAttachment* self);
 void RegionAttachment_updateVertices (RegionAttachment* self, Slot* slot);
 

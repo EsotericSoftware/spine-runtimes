@@ -11,3 +11,7 @@ Note that you *must* delete the Unity 4 directory or Unity will crash.
 
 1. Delete the "Assets/examples/Unity 4" directory.
 1. Open the "Assets/examples/Unity 3.5/spineboy.unity" scene.
+
+# Notes
+
+- Atlas images should use premultiplied alpha.

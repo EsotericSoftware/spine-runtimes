@@ -60,8 +60,8 @@ public class RegionAttachment extends Attachment {
 			if (region.rotate) {
 				localX += region.offsetX / region.originalWidth * height;
 				localY += region.offsetY / region.originalHeight * width;
-				localX2 -= (region.originalWidth - region.offsetX - region.packedHeight) / region.originalWidth * width;
-				localY2 -= (region.originalHeight - region.offsetY - region.packedWidth) / region.originalHeight * height;
+				localX2 -= (region.originalWidth - region.offsetX - region.packedHeight) / region.originalWidth * height;
+				localY2 -= (region.originalHeight - region.offsetY - region.packedWidth) / region.originalHeight * width;
 			} else {
 				localX += region.offsetX / region.originalWidth * width;
 				localY += region.offsetY / region.originalHeight * height;

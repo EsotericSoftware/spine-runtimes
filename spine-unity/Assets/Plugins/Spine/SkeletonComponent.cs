@@ -32,12 +32,14 @@ using Spine;
 public class SkeletonComponent : MonoBehaviour {
 	public SkeletonDataAsset skeletonDataAsset;
 	public Skeleton skeleton;
+	public String skinName;
 	public String animationName;
 	public bool loop;
 	public float timeScale = 1;
 	public Spine.AnimationState state;
 	private Mesh mesh;
 	private Vector3[] vertices;
+	private Color[] colors;
 	private Vector2[] uvs;
 	private int[] triangles;
 	private int quadCount;
@@ -80,15 +82,26 @@ public class SkeletonComponent : MonoBehaviour {
 			Initialize();
 
 		// Keep AnimationState in sync with animationName and loop fields.
-		if (animationName == null && state.Animation != null)
-			state.ClearAnimation();
-		else if (state.Animation == null || animationName != state.Animation.Name) {
+		if (animationName == null || animationName.Length == 0) {
+			if (state.Animation != null) state.ClearAnimation();
+		} else if (state.Animation == null || animationName != state.Animation.Name) {
 			Spine.Animation animation = skeleton.Data.FindAnimation(animationName);
 			if (animation != null)
 				state.SetAnimation(animation, loop);
 		}
 		state.Loop = loop;
 		
+		// Keep Skeleton in sync with skinName.
+		if (skinName == null || skinName.Length == 0) {
+			if (skeleton.Skin != null) {
+				skeleton.SetSkin((Skin)null);
+				skeleton.SetSlotsToBindPose();
+			}
+		} else if (skeleton.Skin == null || skinName != skeleton.Skin.Name) {
+			skeleton.SetSkin(skinName);
+			skeleton.SetSlotsToBindPose();
+		}
+
 		UpdateAnimation();
 
 		// Count quads.
@@ -105,12 +118,15 @@ public class SkeletonComponent : MonoBehaviour {
 		if (quadCount != this.quadCount) {
 			this.quadCount = quadCount;
 			vertices = new Vector3[quadCount * 4];
+			colors = new Color[quadCount * 4];
 			uvs = new Vector2[quadCount * 4];
 			triangles = new int[quadCount * 6];
+			mesh.Clear();
 		}
 
 		// Setup mesh.
 		int quadIndex = 0;
+		Color color = new Color();
 		for (int i = 0, n = drawOrder.Count; i < n; i++) {
 			Slot slot = drawOrder[i];
 			Attachment attachment = slot.Attachment;
@@ -125,18 +141,20 @@ public class SkeletonComponent : MonoBehaviour {
 				vertices[vertexIndex + 2] = new Vector3(regionVertices[RegionAttachment.X2], regionVertices[RegionAttachment.Y2], 0);
 				vertices[vertexIndex + 3] = new Vector3(regionVertices[RegionAttachment.X3], regionVertices[RegionAttachment.Y3], 0);
 				
-				AtlasRegion region = regionAttachment.Region;
-				if (region.rotate) {
-					uvs[vertexIndex + 1] = new Vector2(region.u, 1 - region.v2);
-					uvs[vertexIndex + 2] = new Vector2(region.u2, 1 - region.v2);
-					uvs[vertexIndex + 3] = new Vector2(region.u, 1 - region.v);
-					uvs[vertexIndex] = new Vector2(region.u2, 1 - region.v);
-				} else {
-					uvs[vertexIndex] = new Vector2(region.u, 1 - region.v2);
-					uvs[vertexIndex + 1] = new Vector2(region.u2, 1 - region.v2);
-					uvs[vertexIndex + 2] = new Vector2(region.u, 1 - region.v);
-					uvs[vertexIndex + 3] = new Vector2(region.u2, 1 - region.v);
-				}
+				color.r = skeleton.R * slot.R;
+				color.g = skeleton.G * slot.G;
+				color.b = skeleton.B * slot.B;
+				color.a = skeleton.A * slot.A;
+				colors[vertexIndex] = color;
+				colors[vertexIndex + 1] = color;
+				colors[vertexIndex + 2] = color;
+				colors[vertexIndex + 3] = color;
+
+				float[] regionUVs = regionAttachment.UVs;
+				uvs[vertexIndex] = new Vector2(regionUVs[RegionAttachment.X1], 1 - regionUVs[RegionAttachment.Y1]);
+				uvs[vertexIndex + 1] = new Vector2(regionUVs[RegionAttachment.X4], 1 - regionUVs[RegionAttachment.Y4]);
+				uvs[vertexIndex + 2] = new Vector2(regionUVs[RegionAttachment.X2], 1 - regionUVs[RegionAttachment.Y2]);
+				uvs[vertexIndex + 3] = new Vector2(regionUVs[RegionAttachment.X3], 1 - regionUVs[RegionAttachment.Y3]);
 
 				int index = quadIndex * 6;
 				triangles[index] = vertexIndex;
@@ -150,6 +168,7 @@ public class SkeletonComponent : MonoBehaviour {
 			}
 		}
 		mesh.vertices = vertices;
+		mesh.colors = colors;
 		mesh.uv = uvs;
 		mesh.triangles = triangles;
 

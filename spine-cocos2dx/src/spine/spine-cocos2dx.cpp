@@ -87,25 +87,14 @@ void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_
 	quad->br.vertices.x = self->vertices[VERTEX_X4];
 	quad->br.vertices.y = self->vertices[VERTEX_Y4];
 
-	if (self->region->rotate) {
-		quad->tl.texCoords.u = self->region->u;
-		quad->tl.texCoords.v = self->region->v2;
-		quad->tr.texCoords.u = self->region->u;
-		quad->tr.texCoords.v = self->region->v;
-		quad->br.texCoords.u = self->region->u2;
-		quad->br.texCoords.v = self->region->v;
-		quad->bl.texCoords.u = self->region->u2;
-		quad->bl.texCoords.v = self->region->v2;
-	} else {
-		quad->bl.texCoords.u = self->region->u;
-		quad->bl.texCoords.v = self->region->v2;
-		quad->tl.texCoords.u = self->region->u;
-		quad->tl.texCoords.v = self->region->v;
-		quad->tr.texCoords.u = self->region->u2;
-		quad->tr.texCoords.v = self->region->v;
-		quad->br.texCoords.u = self->region->u2;
-		quad->br.texCoords.v = self->region->v2;
-	}
+	quad->bl.texCoords.u = self->uvs[VERTEX_X1];
+	quad->bl.texCoords.v = self->uvs[VERTEX_Y1];
+	quad->tl.texCoords.u = self->uvs[VERTEX_X2];
+	quad->tl.texCoords.v = self->uvs[VERTEX_Y2];
+	quad->tr.texCoords.u = self->uvs[VERTEX_X3];
+	quad->tr.texCoords.v = self->uvs[VERTEX_Y3];
+	quad->br.texCoords.u = self->uvs[VERTEX_X4];
+	quad->br.texCoords.v = self->uvs[VERTEX_Y4];
 }
 
 /**/
@@ -114,6 +103,7 @@ CCSkeleton* CCSkeleton::createWithFile (const char* skeletonDataFile, Atlas* atl
 	SkeletonJson* json = SkeletonJson_create(atlas);
 	json->scale = scale;
 	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, skeletonDataFile);
+	CCAssert(skeletonData, json->error ? json->error : "Error reading skeleton data.");
 	SkeletonJson_dispose(json);
 	CCSkeleton* node = skeletonData ? createWithData(skeletonData) : 0;
 	node->ownsSkeleton = true;
@@ -122,10 +112,12 @@ CCSkeleton* CCSkeleton::createWithFile (const char* skeletonDataFile, Atlas* atl
 
 CCSkeleton* CCSkeleton::createWithFile (const char* skeletonDataFile, const char* atlasFile, float scale) {
 	Atlas* atlas = Atlas_readAtlasFile(atlasFile);
+	CCAssert(atlas, "Error reading atlas file.");
 	if (!atlas) return 0;
 	SkeletonJson* json = SkeletonJson_create(atlas);
 	json->scale = scale;
 	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, skeletonDataFile);
+	CCAssert(skeletonData, json->error ? json->error : "Error reading skeleton data file.");
 	SkeletonJson_dispose(json);
 	if (!skeletonData) {
 		Atlas_dispose(atlas);
@@ -197,7 +189,7 @@ void CCSkeleton::draw () {
 		Slot* slot = skeleton->slots[i];
 		if (!slot->attachment || slot->attachment->type != ATTACHMENT_REGION) continue;
 		RegionAttachment* attachment = (RegionAttachment*)slot->attachment;
-		CCTextureAtlas* regionTextureAtlas = (CCTextureAtlas*)attachment->region->page->texture;
+		CCTextureAtlas* regionTextureAtlas = (CCTextureAtlas*)attachment->texture;
 		if (regionTextureAtlas != textureAtlas) {
 			if (textureAtlas) {
 				textureAtlas->drawQuads();

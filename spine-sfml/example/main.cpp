@@ -90,6 +90,7 @@ void goblins () {
 	// Load atlas, skeleton, and animations.
 	Atlas* atlas = Atlas_readAtlasFile("../data/goblins.atlas");
 	SkeletonJson* json = SkeletonJson_create(atlas);
+	json->scale = 2;
 	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "../data/goblins.json");
 	Animation* walkAnimation = SkeletonData_findAnimation(skeletonData, "walk");
 	SkeletonJson_dispose(json);
@@ -102,15 +103,15 @@ void goblins () {
 	skeleton->flipY = false;
 	Skeleton_setSkinByName(skeleton, "goblin");
 	Skeleton_setSlotsToBindPose(skeleton);
-	Skeleton_setAttachment(skeleton, "left hand item", "dagger");
+//	Skeleton_setAttachment(skeleton, "left hand item", "dagger");
 
 	skeleton->root->x = 320;
-	skeleton->root->y = 420;
+	skeleton->root->y = 590;
 	Skeleton_updateWorldTransform(skeleton);
 
 	AnimationState_setAnimation(drawable->state, walkAnimation, true);
 
-	sf::RenderWindow window(sf::VideoMode(640, 480), "Spine SFML");
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML");
 	window.setFramerateLimit(60);
 	sf::Event event;
 	sf::Clock deltaClock;
@@ -133,6 +134,6 @@ void goblins () {
 }
 
 int main () {
-	spineboy();
+//	spineboy();
 	goblins();
 }

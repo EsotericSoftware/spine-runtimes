@@ -45,45 +45,61 @@ namespace Spine {
 		public float Width { get; set; }
 		public float Height { get; set; }
 
+		public Object Texture { get; set; }
+		public float RegionOffsetX { get; set; }
+		public float RegionOffsetY { get; set; } // Pixels stripped from the bottom left, unrotated.
+		public float RegionWidth { get; set; }
+		public float RegionHeight { get; set; } // Unrotated, stripped size.
+		public float RegionOriginalWidth { get; set; }
+		public float RegionOriginalHeight { get; set; } // Unrotated, unstripped size.
+
 		public float[] Offset { get; private set; }
 		public float[] Vertices { get; private set; }
-		public AtlasRegion Region { get; set; }
+		public float[] UVs { get; private set; }
 
 		public RegionAttachment (string name)
 			: base(name) {
 			Offset = new float[8];
 			Vertices = new float[8];
+			UVs = new float[8];
 			ScaleX = 1;
 			ScaleY = 1;
+		}
+
+		public void SetUVs (float u, float v, float u2, float v2, bool rotate) {
+			float[] uvs = UVs;
+			if (rotate) {
+				uvs[X2] = u;
+				uvs[Y2] = v2;
+				uvs[X3] = u;
+				uvs[Y3] = v;
+				uvs[X4] = u2;
+				uvs[Y4] = v;
+				uvs[X1] = u2;
+				uvs[Y1] = v2;
+			} else {
+				uvs[X1] = u;
+				uvs[Y1] = v2;
+				uvs[X2] = u;
+				uvs[Y2] = v;
+				uvs[X3] = u2;
+				uvs[Y3] = v;
+				uvs[X4] = u2;
+				uvs[Y4] = v2;
+			}
 		}
 
 		public void UpdateOffset () {
 			float width = Width;
 			float height = Height;
-			float localX2 = width / 2;
-			float localY2 = height / 2;
-			float localX = -localX2;
-			float localY = -localY2;
-			AtlasRegion region = Region;
-			if (region != null) {
-				if (region.rotate) {
-					localX += region.offsetX / region.originalWidth * height;
-					localY += region.offsetY / region.originalHeight * width;
-					localX2 -= (region.originalWidth - region.offsetX - region.height) / region.originalWidth * width;
-					localY2 -= (region.originalHeight - region.offsetY - region.width) / region.originalHeight * height;
-				} else {
-					localX += region.offsetX / region.originalWidth * width;
-					localY += region.offsetY / region.originalHeight * height;
-					localX2 -= (region.originalWidth - region.offsetX - region.width) / region.originalWidth * width;
-					localY2 -= (region.originalHeight - region.offsetY - region.height) / region.originalHeight * height;
-				}
-			}
 			float scaleX = ScaleX;
 			float scaleY = ScaleY;
-			localX *= scaleX;
-			localY *= scaleY;
-			localX2 *= scaleX;
-			localY2 *= scaleY;
+			float regionScaleX = width / RegionOriginalWidth * scaleX;
+			float regionScaleY = height / RegionOriginalHeight * scaleY;
+			float localX = -width / 2 * scaleX + RegionOffsetX * regionScaleX;
+			float localY = -height / 2 * scaleY + RegionOffsetY * regionScaleY;
+			float localX2 = localX + RegionWidth * regionScaleX;
+			float localY2 = localY + RegionHeight * regionScaleY;
 			float radians = Rotation * (float)Math.PI / 180;
 			float cos = (float)Math.Cos(radians);
 			float sin = (float)Math.Sin(radians);

@@ -3,26 +3,26 @@
 	{ "name": "root" },
 	{ "name": "hip", "parent": "root", "x": 0.64, "y": 114.41 },
 	{ "name": "left upper leg", "parent": "hip", "length": 50.39, "x": 14.45, "y": 2.81, "rotation": -89.09 },
-	{ "name": "left lower leg", "parent": "left upper leg", "length": 49.89, "x": 56.34, "y": 0.98, "rotation": -16.65 },
-	{ "name": "left foot", "parent": "left lower leg", "length": 46.5, "x": 58.94, "y": -7.61, "rotation": 102.43 },
+	{ "name": "pelvis", "parent": "hip", "x": 1.41, "y": -6.57 },
 	{ "name": "right upper leg", "parent": "hip", "length": 42.45, "x": -20.07, "y": -6.83, "rotation": -97.49 },
-	{ "name": "right lower leg", "parent": "right upper leg", "length": 58.52, "x": 42.99, "y": -0.61, "rotation": -14.34 },
-	{ "name": "right foot", "parent": "right lower leg", "length": 45.45, "x": 64.88, "y": 0.04, "rotation": 110.3 },
 	{ "name": "torso", "parent": "hip", "length": 85.82, "x": -6.42, "y": 1.97, "rotation": 93.92 },
-	{ "name": "neck", "parent": "torso", "length": 18.38, "x": 81.67, "y": -6.34, "rotation": -1.51 },
-	{ "name": "head", "parent": "neck", "length": 68.28, "x": 20.93, "y": 11.59, "rotation": -13.92 },
-	{ "name": "right shoulder", "parent": "torso", "length": 37.24, "x": 76.02, "y": 18.14, "rotation": 133.88 },
-	{ "name": "right arm", "parent": "right shoulder", "length": 36.74, "x": 37.6, "y": 0.31, "rotation": 36.32 },
-	{ "name": "right hand", "parent": "right arm", "length": 15.32, "x": 36.9, "y": 0.34, "rotation": 2.35 },
+	{ "name": "left lower leg", "parent": "left upper leg", "length": 49.89, "x": 56.34, "y": 0.98, "rotation": -16.65 },
 	{ "name": "left shoulder", "parent": "torso", "length": 35.43, "x": 74.04, "y": -20.38, "rotation": -156.96 },
+	{ "name": "neck", "parent": "torso", "length": 18.38, "x": 81.67, "y": -6.34, "rotation": -1.51 },
+	{ "name": "right lower leg", "parent": "right upper leg", "length": 58.52, "x": 42.99, "y": -0.61, "rotation": -14.34 },
+	{ "name": "right shoulder", "parent": "torso", "length": 37.24, "x": 76.02, "y": 18.14, "rotation": 133.88 },
+	{ "name": "head", "parent": "neck", "length": 68.28, "x": 20.93, "y": 11.59, "rotation": -13.92 },
 	{ "name": "left arm", "parent": "left shoulder", "length": 35.62, "x": 37.85, "y": -2.34, "rotation": 28.16 },
+	{ "name": "left foot", "parent": "left lower leg", "length": 46.5, "x": 58.94, "y": -7.61, "rotation": 102.43 },
+	{ "name": "right arm", "parent": "right shoulder", "length": 36.74, "x": 37.6, "y": 0.31, "rotation": 36.32 },
+	{ "name": "right foot", "parent": "right lower leg", "length": 45.45, "x": 64.88, "y": 0.04, "rotation": 110.3 },
 	{ "name": "left hand", "parent": "left arm", "length": 11.52, "x": 35.62, "y": 0.07, "rotation": 2.7 },
-	{ "name": "pelvis", "parent": "hip", "x": 1.41, "y": -6.57 }
+	{ "name": "right hand", "parent": "right arm", "length": 15.32, "x": 36.9, "y": 0.34, "rotation": 2.35 }
 ],
 "slots": [
 	{ "name": "left shoulder", "bone": "left shoulder", "attachment": "left shoulder" },
 	{ "name": "left arm", "bone": "left arm", "attachment": "left arm" },
-	{ "name": "left hand item", "bone": "left hand", "attachment": "spear" },
+	{ "name": "left hand item", "bone": "left hand", "attachment": "dagger" },
 	{ "name": "left hand", "bone": "left hand", "attachment": "left hand" },
 	{ "name": "left foot", "bone": "left foot", "attachment": "left foot" },
 	{ "name": "left lower leg", "bone": "left lower leg", "attachment": "left lower leg" },
@@ -45,11 +45,11 @@
 "skins": {
 	"default": {
 		"left hand item": {
-			"dagger": { "x": 7.88, "y": -23.45, "rotation": 10.47, "width": 26, "height": 108 },
+			"dagger": { "x": -35.5, "y": 3.85, "rotation": 10.47, "width": 156, "height": 238 },
 			"spear": { "x": -4.55, "y": 39.2, "rotation": 13.04, "width": 22, "height": 368 }
 		},
 		"right hand item": {
-			"dagger": { "x": 6.51, "y": -24.15, "rotation": -8.06, "width": 26, "height": 108 }
+			"dagger": { "x": -21.57, "y": 15.8, "rotation": -8.06, "width": 156, "height": 238 }
 		}
 	},
 	"goblin": {

@@ -31,18 +31,24 @@ namespace spine {
 #endif
 
 Attachment* _AtlasAttachmentLoader_newAttachment (AttachmentLoader* loader, Skin* skin, AttachmentType type, const char* name) {
-	RegionAttachment* attachment;
-	AtlasRegion* region;
 	AtlasAttachmentLoader* self = SUB_CAST(AtlasAttachmentLoader, loader);
 	switch (type) {
 	case ATTACHMENT_REGION: {
-		region = Atlas_findRegion(self->atlas, name);
+		RegionAttachment* attachment;
+		AtlasRegion* region = Atlas_findRegion(self->atlas, name);
 		if (!region) {
 			_AttachmentLoader_setError(loader, "Region not found: ", name);
 			return 0;
 		}
 		attachment = RegionAttachment_create(name);
-		attachment->region = region;
+		attachment->texture = region->page->texture;
+		RegionAttachment_setUVs(attachment, region->u, region->v, region->u2, region->v2, region->rotate);
+		attachment->regionOffsetX = region->offsetX;
+		attachment->regionOffsetY = region->offsetY;
+		attachment->regionWidth = region->width;
+		attachment->regionHeight = region->height;
+		attachment->regionOriginalWidth = region->originalWidth;
+		attachment->regionOriginalHeight = region->originalHeight;
 		return SUPER(attachment);
 	}
 	default:
