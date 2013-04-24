@@ -31,15 +31,17 @@ namespace spine {
 #endif
 
 Attachment* _AtlasAttachmentLoader_newAttachment (AttachmentLoader* loader, Skin* skin, AttachmentType type, const char* name) {
+	RegionAttachment* attachment;
+	AtlasRegion* region;
 	AtlasAttachmentLoader* self = SUB_CAST(AtlasAttachmentLoader, loader);
 	switch (type) {
 	case ATTACHMENT_REGION: {
-		AtlasRegion* region = Atlas_findRegion(self->atlas, name);
+		region = Atlas_findRegion(self->atlas, name);
 		if (!region) {
 			_AttachmentLoader_setError(loader, "Region not found: ", name);
 			return 0;
 		}
-		RegionAttachment* attachment = RegionAttachment_create(name);
+		attachment = RegionAttachment_create(name);
 		attachment->region = region;
 		return SUPER(attachment);
 	}

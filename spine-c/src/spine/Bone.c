@@ -58,6 +58,7 @@ void Bone_setToBindPose (Bone* self) {
 }
 
 void Bone_updateWorldTransform (Bone* self, int flipX, int flipY) {
+	float radians, cosine, sine;
 	if (self->parent) {
 		CONST_CAST(float, self->worldX) = self->x * self->parent->m00 + self->y * self->parent->m01 + self->parent->worldX;
 		CONST_CAST(float, self->worldY) = self->x * self->parent->m10 + self->y * self->parent->m11 + self->parent->worldY;
@@ -71,9 +72,9 @@ void Bone_updateWorldTransform (Bone* self, int flipX, int flipY) {
 		CONST_CAST(float, self->worldScaleY) = self->scaleY;
 		CONST_CAST(float, self->worldRotation) = self->rotation;
 	}
-	float radians = (float)(self->worldRotation * 3.1415926535897932385 / 180);
-	float cosine = cosf(radians);
-	float sine = sinf(radians);
+	radians = (float)(self->worldRotation * 3.1415926535897932385 / 180);
+	cosine = cosf(radians);
+	sine = sinf(radians);
 	CONST_CAST(float, self->m00) = cosine * self->worldScaleX;
 	CONST_CAST(float, self->m10) = sine * self->worldScaleX;
 	CONST_CAST(float, self->m01) = -sine * self->worldScaleY;

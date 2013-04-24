@@ -40,6 +40,18 @@ RegionAttachment* RegionAttachment_create (const char* name) {
 }
 
 void RegionAttachment_updateOffset (RegionAttachment* self) {
+	float radians;
+	float cosine;
+	float sine;
+	float localXCos;
+	float localXSin;
+	float localYCos;
+	float localYSin;
+	float localX2Cos;
+	float localX2Sin;
+	float localY2Cos;
+	float localY2Sin;
+
 	float localX2 = self->width / 2;
 	float localY2 = self->height / 2;
 	float localX = -localX2;
@@ -59,17 +71,17 @@ void RegionAttachment_updateOffset (RegionAttachment* self) {
 	localY *= self->scaleY;
 	localX2 *= self->scaleX;
 	localY2 *= self->scaleY;
-	float radians = (float)(self->rotation * 3.1415926535897932385 / 180);
-	float cosine = cosf(radians);
-	float sine = sinf(radians);
-	float localXCos = localX * cosine + self->x;
-	float localXSin = localX * sine;
-	float localYCos = localY * cosine + self->y;
-	float localYSin = localY * sine;
-	float localX2Cos = localX2 * cosine + self->x;
-	float localX2Sin = localX2 * sine;
-	float localY2Cos = localY2 * cosine + self->y;
-	float localY2Sin = localY2 * sine;
+	radians = (float)(self->rotation * 3.1415926535897932385 / 180);
+	cosine = cosf(radians);
+	sine = sinf(radians);
+	localXCos = localX * cosine + self->x;
+	localXSin = localX * sine;
+	localYCos = localY * cosine + self->y;
+	localYSin = localY * sine;
+	localX2Cos = localX2 * cosine + self->x;
+	localX2Sin = localX2 * sine;
+	localY2Cos = localY2 * cosine + self->y;
+	localY2Sin = localY2 * sine;
 	self->offset[VERTEX_X1] = localXCos - localYSin;
 	self->offset[VERTEX_Y1] = localYCos + localXSin;
 	self->offset[VERTEX_X2] = localXCos - localY2Sin;

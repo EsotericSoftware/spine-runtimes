@@ -63,12 +63,12 @@ float Slot_getAttachmentTime (const Slot* self) {
 }
 
 void Slot_setToBindPose (Slot* self) {
+	Attachment* attachment = 0;
 	self->r = self->data->r;
 	self->g = self->data->g;
 	self->b = self->data->b;
 	self->a = self->data->a;
 
-	Attachment* attachment = 0;
 	if (self->data->attachmentName) {
 		/* Find slot index. */
 		int i;
