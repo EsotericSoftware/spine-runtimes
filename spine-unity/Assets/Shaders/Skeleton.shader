@@ -9,8 +9,9 @@ Shader "Skeleton" {
 		ZWrite Off
 		Blend One OneMinusSrcAlpha
         Pass {
+        	ColorMaterial AmbientAndDiffuse
             SetTexture [_MainTex] {
-            	combine texture
+            	combine texture * primary
             }
         }
     }

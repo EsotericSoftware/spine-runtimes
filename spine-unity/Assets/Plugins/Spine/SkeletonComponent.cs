@@ -39,6 +39,7 @@ public class SkeletonComponent : MonoBehaviour {
 	public Spine.AnimationState state;
 	private Mesh mesh;
 	private Vector3[] vertices;
+	private Color[] colors;
 	private Vector2[] uvs;
 	private int[] triangles;
 	private int quadCount;
@@ -117,6 +118,7 @@ public class SkeletonComponent : MonoBehaviour {
 		if (quadCount != this.quadCount) {
 			this.quadCount = quadCount;
 			vertices = new Vector3[quadCount * 4];
+			colors = new Color[quadCount * 4];
 			uvs = new Vector2[quadCount * 4];
 			triangles = new int[quadCount * 6];
 			mesh.Clear();
@@ -124,6 +126,7 @@ public class SkeletonComponent : MonoBehaviour {
 
 		// Setup mesh.
 		int quadIndex = 0;
+		Color color = new Color();
 		for (int i = 0, n = drawOrder.Count; i < n; i++) {
 			Slot slot = drawOrder[i];
 			Attachment attachment = slot.Attachment;
@@ -138,6 +141,15 @@ public class SkeletonComponent : MonoBehaviour {
 				vertices[vertexIndex + 2] = new Vector3(regionVertices[RegionAttachment.X2], regionVertices[RegionAttachment.Y2], 0);
 				vertices[vertexIndex + 3] = new Vector3(regionVertices[RegionAttachment.X3], regionVertices[RegionAttachment.Y3], 0);
 				
+				color.r = skeleton.R * slot.R;
+				color.g = skeleton.G * slot.G;
+				color.b = skeleton.B * slot.B;
+				color.a = skeleton.A * slot.A;
+				colors[vertexIndex] = color;
+				colors[vertexIndex + 1] = color;
+				colors[vertexIndex + 2] = color;
+				colors[vertexIndex + 3] = color;
+
 				float[] regionUVs = regionAttachment.UVs;
 				uvs[vertexIndex] = new Vector2(regionUVs[RegionAttachment.X1], 1 - regionUVs[RegionAttachment.Y1]);
 				uvs[vertexIndex + 1] = new Vector2(regionUVs[RegionAttachment.X4], 1 - regionUVs[RegionAttachment.Y4]);
@@ -156,6 +168,7 @@ public class SkeletonComponent : MonoBehaviour {
 			}
 		}
 		mesh.vertices = vertices;
+		mesh.colors = colors;
 		mesh.uv = uvs;
 		mesh.triangles = triangles;
 
