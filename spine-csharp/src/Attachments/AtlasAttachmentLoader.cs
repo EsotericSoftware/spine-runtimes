@@ -40,7 +40,14 @@ namespace Spine {
 				AtlasRegion region = atlas.FindRegion(name);
 				if (region == null) throw new Exception("Region not found in atlas: " + name + " (" + type + ")");
 				RegionAttachment attachment = new RegionAttachment(name);
-				attachment.Region = region;
+				attachment.Texture = region.page.texture;
+				attachment.SetUVs(region.u, region.v, region.u2, region.v2, region.rotate);
+				attachment.RegionOffsetX = region.offsetX;
+				attachment.RegionOffsetY = region.offsetY;
+				attachment.RegionWidth = region.width;
+				attachment.RegionHeight = region.height;
+				attachment.RegionOriginalWidth = region.originalWidth;
+				attachment.RegionOriginalHeight = region.originalHeight;
 				return attachment;
 			}
 			throw new Exception("Unknown attachment type: " + type);

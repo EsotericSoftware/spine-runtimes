@@ -31,8 +31,6 @@ spine-xna/obj
 spine-xna/example/bin
 spine-xna/example/obj
 
-spine-unity/Assets/Plugins/Spine/spine-csharp/*
-!spine-unity/Assets/Plugins/Spine/spine-csharp/Place spine-csharp here.txt
 spine-unity/ProjectSettings
 spine-unity/Temp
 spine-unity/Library
@@ -41,6 +39,8 @@ spine-unity/*.sln
 *.pidb
 Assembly-*.csproj
 Assembly-*.pidb
+spine-unity4
+spine-unity3
 
 spine-corona/spine-lua/
 !spine-corona/spine-lua/Place spine-lua here.txt
@@ -48,3 +48,5 @@ spine-corona/spine-lua/
 spine-love/spine-lua/
 spine-love/love/
 !spine-love/spine-lua/Place spine-lua here.txt
+
+spine-starling

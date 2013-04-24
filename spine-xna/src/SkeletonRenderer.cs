@@ -78,7 +78,7 @@ namespace Spine {
 					RegionAttachment regionAttachment = (RegionAttachment)attachment;
 
 					SpriteBatchItem item = batcher.CreateBatchItem();
-					item.Texture = (Texture2D)regionAttachment.Region.page.texture;
+					item.Texture = (Texture2D)regionAttachment.Texture;
 
 					byte r = (byte)(skeleton.R * slot.R * 255);
 					byte g = (byte)(skeleton.G * slot.G * 255);
@@ -116,26 +116,15 @@ namespace Spine {
 					item.vertexTR.Position.Y = vertices[RegionAttachment.Y4];
 					item.vertexTR.Position.Z = 0;
 
-					AtlasRegion region = regionAttachment.Region;
-					if (region.rotate) {
-						item.vertexBL.TextureCoordinate.X = region.u;
-						item.vertexBL.TextureCoordinate.Y = region.v2;
-						item.vertexBR.TextureCoordinate.X = region.u;
-						item.vertexBR.TextureCoordinate.Y = region.v;
-						item.vertexTR.TextureCoordinate.X = region.u2;
-						item.vertexTR.TextureCoordinate.Y = region.v;
-						item.vertexTL.TextureCoordinate.X = region.u2;
-						item.vertexTL.TextureCoordinate.Y = region.v2;
-					} else {
-						item.vertexTL.TextureCoordinate.X = region.u;
-						item.vertexTL.TextureCoordinate.Y = region.v2;
-						item.vertexBL.TextureCoordinate.X = region.u;
-						item.vertexBL.TextureCoordinate.Y = region.v;
-						item.vertexBR.TextureCoordinate.X = region.u2;
-						item.vertexBR.TextureCoordinate.Y = region.v;
-						item.vertexTR.TextureCoordinate.X = region.u2;
-						item.vertexTR.TextureCoordinate.Y = region.v2;
-					}
+					float[] uvs = regionAttachment.UVs;
+					item.vertexTL.TextureCoordinate.X = uvs[RegionAttachment.X1];
+					item.vertexTL.TextureCoordinate.Y = uvs[RegionAttachment.Y1];
+					item.vertexBL.TextureCoordinate.X = uvs[RegionAttachment.X2];
+					item.vertexBL.TextureCoordinate.Y = uvs[RegionAttachment.Y2];
+					item.vertexBR.TextureCoordinate.X = uvs[RegionAttachment.X3];
+					item.vertexBR.TextureCoordinate.Y = uvs[RegionAttachment.Y3];
+					item.vertexTR.TextureCoordinate.X = uvs[RegionAttachment.X4];
+					item.vertexTR.TextureCoordinate.Y = uvs[RegionAttachment.Y4];
 				}
 			}
 		}
