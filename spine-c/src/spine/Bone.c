@@ -73,8 +73,13 @@ void Bone_updateWorldTransform (Bone* self, int flipX, int flipY) {
 		CONST_CAST(float, self->worldRotation) = self->rotation;
 	}
 	radians = (float)(self->worldRotation * 3.1415926535897932385 / 180);
+#ifdef __STDC_VERSION__
 	cosine = cosf(radians);
 	sine = sinf(radians);
+#else
+	cosine = cos(radians);
+	sine = sin(radians);
+#endif
 	CONST_CAST(float, self->m00) = cosine * self->worldScaleX;
 	CONST_CAST(float, self->m10) = sine * self->worldScaleX;
 	CONST_CAST(float, self->m01) = -sine * self->worldScaleY;

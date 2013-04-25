@@ -69,8 +69,13 @@ void RegionAttachment_updateOffset (RegionAttachment* self) {
 	float localX2 = localX + self->regionWidth * regionScaleX;
 	float localY2 = localY + self->regionHeight * regionScaleY;
 	float radians = (float)(self->rotation * 3.1415926535897932385 / 180);
+#ifdef __STDC_VERSION__
 	float cosine = cosf(radians);
 	float sine = sinf(radians);
+#else
+	float cosine = cos(radians);
+	float sine = sin(radians);
+#endif
 	float localXCos = localX * cosine + self->x;
 	float localXSin = localX * sine;
 	float localYCos = localY * cosine + self->y;

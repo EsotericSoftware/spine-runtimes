@@ -51,7 +51,11 @@ void Animation_dispose (Animation* self) {
 void Animation_apply (const Animation* self, Skeleton* skeleton, float time, int/*bool*/loop) {
 	int i, n = self->timelineCount;
 
+#ifdef __STDC_VERSION__
 	if (loop && self->duration) time = fmodf(time, self->duration);
+#else
+	if (loop && self->duration) time = fmod(time, self->duration);
+#endif
 
 	for (i = 0; i < n; ++i)
 		Timeline_apply(self->timelines[i], skeleton, time, 1);
@@ -60,7 +64,11 @@ void Animation_apply (const Animation* self, Skeleton* skeleton, float time, int
 void Animation_mix (const Animation* self, Skeleton* skeleton, float time, int/*bool*/loop, float alpha) {
 	int i, n = self->timelineCount;
 
+#ifdef __STDC_VERSION__
 	if (loop && self->duration) time = fmodf(time, self->duration);
+#else
+	if (loop && self->duration) time = fmod(time, self->duration);
+#endif
 
 	for (i = 0; i < n; ++i)
 		Timeline_apply(self->timelines[i], skeleton, time, alpha);
@@ -73,8 +81,8 @@ typedef struct _TimelineVtable {
 	void (*dispose) (Timeline* self);
 } _TimelineVtable;
 
-void _Timeline_init (Timeline* self, //
-		void (*dispose) (Timeline* self), //
+void _Timeline_init (Timeline* self, /**/
+		void (*dispose) (Timeline* self), /**/
 		void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha)) {
 	CONST_CAST(_TimelineVtable*, self->vtable) = NEW(_TimelineVtable);
 	VTABLE(Timeline, self) ->dispose = dispose;
@@ -99,8 +107,8 @@ static const float CURVE_LINEAR = 0;
 static const float CURVE_STEPPED = -1;
 static const int CURVE_SEGMENTS = 10;
 
-void _CurveTimeline_init (CurveTimeline* self, int frameCount, //
-		void (*dispose) (Timeline* self), //
+void _CurveTimeline_init (CurveTimeline* self, int frameCount, /**/
+		void (*dispose) (Timeline* self), /**/
 		void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha)) {
 	_Timeline_init(SUPER(self), dispose, apply);
 	self->curves = CALLOC(float, (frameCount - 1) * 6);
@@ -213,7 +221,7 @@ void _BaseTimeline_dispose (Timeline* timeline) {
 }
 
 /* Many timelines have structure identical to struct BaseTimeline and extend CurveTimeline. **/
-struct BaseTimeline* _BaseTimeline_create (int frameCount, int frameSize, //
+struct BaseTimeline* _BaseTimeline_create (int frameCount, int frameSize, /**/
 		void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha)) {
 
 	struct BaseTimeline* self = NEW(struct BaseTimeline);
@@ -446,7 +454,6 @@ void _AttachmentTimeline_apply (const Timeline* timeline, Skeleton* skeleton, fl
 
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
-	frameIndex;
 	if (time >= self->frames[self->framesLength - 1]) /* Time is after last frame. */
 		frameIndex = self->framesLength - 1;
 	else
