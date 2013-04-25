@@ -29,6 +29,10 @@
 #include <spine/spine.h>
 #include "cocos2d.h"
 
+#ifdef __cplusplus
+using namespace spine;
+#endif
+
 @interface CCSkeleton : CCNodeRGBA<CCBlendProtocol> {
 @private
 	bool ownsSkeleton;
@@ -71,7 +75,6 @@ void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_
 #ifdef __cplusplus
 }
 }
-using namespace spine;
 #endif
 
 #endif /* SPINE_COCOS2D_H_ */
