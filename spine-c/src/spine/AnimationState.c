@@ -56,11 +56,14 @@ void AnimationState_update (AnimationState* self, float delta) {
 }
 
 void AnimationState_apply (AnimationState* self, Skeleton* skeleton) {
+	_Internal* internal;
+	float alpha;
+
 	if (!self->animation) return;
-	_Internal* internal = SUB_CAST(_Internal, self);
+	internal = SUB_CAST(_Internal, self);
 	if (internal->previous) {
 		Animation_apply(internal->previous, skeleton, internal->previousTime, internal->previousLoop);
-		float alpha = internal->mixTime / internal->mixDuration;
+		alpha = internal->mixTime / internal->mixDuration;
 		if (alpha >= 1) {
 			alpha = 1;
 			internal->previous = 0;

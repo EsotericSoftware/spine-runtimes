@@ -63,9 +63,9 @@ void RegionAttachment_setUVs (RegionAttachment* self, float u, float v, float u2
 
 void RegionAttachment_updateOffset (RegionAttachment* self) {
 	float regionScaleX = self->width / self->regionOriginalWidth * self->scaleX;
-	float regionScaleY = self->height / self->regionOriginalHeight * self->scaleX;
+	float regionScaleY = self->height / self->regionOriginalHeight * self->scaleY;
 	float localX = -self->width / 2 * self->scaleX + self->regionOffsetX * regionScaleX;
-	float localY = -self->height / 2 * self->scaleX + self->regionOffsetY * regionScaleY;
+	float localY = -self->height / 2 * self->scaleY + self->regionOffsetY * regionScaleY;
 	float localX2 = localX + self->regionWidth * regionScaleX;
 	float localY2 = localY + self->regionHeight * regionScaleY;
 	float radians = (float)(self->rotation * 3.1415926535897932385 / 180);

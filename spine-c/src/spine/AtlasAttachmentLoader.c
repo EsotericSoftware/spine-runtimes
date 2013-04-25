@@ -34,12 +34,13 @@ Attachment* _AtlasAttachmentLoader_newAttachment (AttachmentLoader* loader, Skin
 	AtlasAttachmentLoader* self = SUB_CAST(AtlasAttachmentLoader, loader);
 	switch (type) {
 	case ATTACHMENT_REGION: {
+		RegionAttachment* attachment;
 		AtlasRegion* region = Atlas_findRegion(self->atlas, name);
 		if (!region) {
 			_AttachmentLoader_setError(loader, "Region not found: ", name);
 			return 0;
 		}
-		RegionAttachment* attachment = RegionAttachment_create(name);
+		attachment = RegionAttachment_create(name);
 		attachment->texture = region->page->texture;
 		RegionAttachment_setUVs(attachment, region->u, region->v, region->u2, region->v2, region->rotate);
 		attachment->regionOffsetX = region->offsetX;
