@@ -32,12 +32,14 @@ namespace spine {
 #endif
 
 Skeleton* Skeleton_create (SkeletonData* data) {
+	int i, ii;
+
 	Skeleton* self = NEW(Skeleton);
 	CONST_CAST(SkeletonData*, self->data) = data;
 
 	self->boneCount = self->data->boneCount;
 	self->bones = MALLOC(Bone*, self->boneCount);
-	int i, ii;
+
 	for (i = 0; i < self->boneCount; ++i) {
 		BoneData* boneData = self->data->bones[i];
 		Bone* parent = 0;
@@ -147,11 +149,12 @@ int Skeleton_findSlotIndex (const Skeleton* self, const char* slotName) {
 }
 
 int Skeleton_setSkinByName (Skeleton* self, const char* skinName) {
+	Skin *skin;
 	if (!skinName) {
 		Skeleton_setSkin(self, 0);
 		return 1;
 	}
-	Skin *skin = SkeletonData_findSkin(self->data, skinName);
+	skin = SkeletonData_findSkin(self->data, skinName);
 	if (!skin) return 0;
 	Skeleton_setSkin(self, skin);
 	return 1;
