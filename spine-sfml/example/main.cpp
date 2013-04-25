@@ -134,6 +134,6 @@ void goblins () {
 }
 
 int main () {
-//	spineboy();
+	spineboy();
 	goblins();
 }
