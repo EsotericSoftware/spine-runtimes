@@ -4,7 +4,9 @@ package com.esotericsoftware.spine;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import static com.badlogic.gdx.graphics.g2d.SpriteBatch.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -12,6 +14,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.Array;
 
 public class SkeletonRendererDebug {
+	static private final Color slotLineColor = new Color(0, 0, 1, 0.5f);
+
 	private ShapeRenderer renderer;
 
 	public SkeletonRendererDebug () {
@@ -19,6 +23,7 @@ public class SkeletonRendererDebug {
 	}
 
 	public void draw (SpriteBatch batch, Skeleton skeleton) {
+		Gdx.gl.glEnable(GL10.GL_BLEND);
 		renderer.begin(ShapeType.Line);
 
 		renderer.setColor(Color.RED);
@@ -31,7 +36,7 @@ public class SkeletonRendererDebug {
 			renderer.line(bone.worldX, bone.worldY, x, y);
 		}
 
-		renderer.setColor(Color.BLUE);
+		renderer.setColor(slotLineColor);
 		Array<Slot> slots = skeleton.getSlots();
 		for (int i = 0, n = slots.size; i < n; i++) {
 			Slot slot = slots.get(i);
