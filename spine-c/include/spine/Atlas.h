@@ -72,7 +72,7 @@ struct AtlasRegion {
 	const char* name;
 	int x, y, width, height;
 	float u, v, u2, v2;
-	float offsetX, offsetY;
+	int offsetX, offsetY;
 	int originalWidth, originalHeight;
 	int index;
 	int/*bool*/rotate;

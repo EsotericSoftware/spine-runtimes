@@ -54,7 +54,7 @@ void Animation_apply (const Animation* self, Skeleton* skeleton, float time, int
 #ifdef __STDC_VERSION__
 	if (loop && self->duration) time = fmodf(time, self->duration);
 #else
-	if (loop && self->duration) time = fmod(time, self->duration);
+	if (loop && self->duration) time = (float)fmod(time, self->duration);
 #endif
 
 	for (i = 0; i < n; ++i)
@@ -67,7 +67,7 @@ void Animation_mix (const Animation* self, Skeleton* skeleton, float time, int/*
 #ifdef __STDC_VERSION__
 	if (loop && self->duration) time = fmodf(time, self->duration);
 #else
-	if (loop && self->duration) time = fmod(time, self->duration);
+	if (loop && self->duration) time = (float)fmod(time, self->duration);
 #endif
 
 	for (i = 0; i < n; ++i)

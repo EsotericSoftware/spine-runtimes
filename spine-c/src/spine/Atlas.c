@@ -272,8 +272,8 @@ Atlas* Atlas_readAtlas (const char* begin, int length, const char* dir) {
 			region->originalHeight = toInt(tuple + 1);
 
 			readTuple(end, tuple);
-			region->offsetX = (float)toInt(tuple);
-			region->offsetY = (float)toInt(tuple + 1);
+			region->offsetX = toInt(tuple);
+			region->offsetY = toInt(tuple + 1);
 
 			if (!readValue(end, &str)) return abortAtlas(self);
 			region->index = toInt(&str);

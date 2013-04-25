@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual C++ Express 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Spine-C", "Spine-C.vcxproj", "{5D74934A-7512-45EE-8402-7B95D3642E85}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spine-c", "spine-c.vcxproj", "{5D74934A-7512-45EE-8402-7B95D3642E85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

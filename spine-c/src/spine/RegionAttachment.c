@@ -73,8 +73,8 @@ void RegionAttachment_updateOffset (RegionAttachment* self) {
 	float cosine = cosf(radians);
 	float sine = sinf(radians);
 #else
-	float cosine = cos(radians);
-	float sine = sin(radians);
+	float cosine = (float)cos(radians);
+	float sine = (float)sin(radians);
 #endif
 	float localXCos = localX * cosine + self->x;
 	float localXSin = localX * sine;

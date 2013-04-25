@@ -77,8 +77,8 @@ void Bone_updateWorldTransform (Bone* self, int flipX, int flipY) {
 	cosine = cosf(radians);
 	sine = sinf(radians);
 #else
-	cosine = cos(radians);
-	sine = sin(radians);
+	cosine = (float)cos(radians);
+	sine = (float)sin(radians);
 #endif
 	CONST_CAST(float, self->m00) = cosine * self->worldScaleX;
 	CONST_CAST(float, self->m10) = sine * self->worldScaleX;
