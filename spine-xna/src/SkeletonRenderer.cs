@@ -73,10 +73,8 @@ namespace Spine {
 			List<Slot> drawOrder = skeleton.DrawOrder;
 			for (int i = 0, n = drawOrder.Count; i < n; i++) {
 				Slot slot = drawOrder[i];
-				Attachment attachment = slot.Attachment;
-				if (attachment is RegionAttachment) {
-					RegionAttachment regionAttachment = (RegionAttachment)attachment;
-
+				RegionAttachment regionAttachment = slot.Attachment as RegionAttachment;
+				if (regionAttachment != null) {
 					SpriteBatchItem item = batcher.CreateBatchItem();
 					item.Texture = (Texture2D)regionAttachment.Texture;
 
