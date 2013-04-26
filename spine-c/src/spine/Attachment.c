@@ -52,6 +52,7 @@ void _Attachment_deinit (Attachment* self) {
 
 void Attachment_dispose (Attachment* self) {
 	VTABLE(Attachment, self) ->dispose(self);
+    FREE(self);
 }
 
 #ifdef __cplusplus
