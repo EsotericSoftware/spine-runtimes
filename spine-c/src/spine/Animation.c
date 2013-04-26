@@ -474,7 +474,7 @@ void _AttachmentTimeline_dispose (Timeline* timeline) {
 	for (i = 0; i < self->framesLength; ++i)
 		FREE(self->attachmentNames[i]);
 	FREE(self->attachmentNames);
-
+    FREE(self->frames);
 	FREE(self);
 }
 
