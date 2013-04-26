@@ -52,7 +52,7 @@ void _AttachmentLoader_deinit (AttachmentLoader* self) {
 
 void AttachmentLoader_dispose (AttachmentLoader* self) {
 	VTABLE(AttachmentLoader, self) ->dispose(self);
-    FREE(self);
+	FREE(self);
 }
 
 Attachment* AttachmentLoader_newAttachment (AttachmentLoader* self, Skin* skin, AttachmentType type, const char* name) {
