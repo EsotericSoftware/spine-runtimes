@@ -95,6 +95,7 @@ void Skeleton_dispose (Skeleton* self) {
 	FREE(self->slots);
 
 	FREE(self->drawOrder);
+    FREE(self);
 }
 
 void Skeleton_updateWorldTransform (const Skeleton* self) {
