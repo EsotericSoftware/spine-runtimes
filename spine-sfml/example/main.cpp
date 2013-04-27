@@ -41,11 +41,11 @@ void spineboy () {
 
 	// Configure mixing.
 	AnimationStateData* stateData = AnimationStateData_create(skeletonData);
-	AnimationStateData_setMixByName(stateData, "walk", "jump", 0.4f);
+	AnimationStateData_setMixByName(stateData, "walk", "jump", 0.2f);
 	AnimationStateData_setMixByName(stateData, "jump", "walk", 0.4f);
 
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData, stateData);
-	drawable->timeScale = 0.5f;
+	drawable->timeScale = 1;
 
 	Skeleton* skeleton = drawable->skeleton;
 	skeleton->flipX = false;
@@ -57,6 +57,12 @@ void spineboy () {
 	Skeleton_updateWorldTransform(skeleton);
 
 	AnimationState_setAnimationByName(drawable->state, "walk", true);
+	AnimationState_addAnimationByName(drawable->state, "jump", false, 0);
+	AnimationState_addAnimationByName(drawable->state, "walk", true, 0);
+	AnimationState_addAnimationByName(drawable->state, "jump", false, 3);
+	AnimationState_addAnimationByName(drawable->state, "walk", true, 0);
+	AnimationState_addAnimationByName(drawable->state, 0, true, 0);
+	AnimationState_addAnimationByName(drawable->state, "walk", false, 1);
 
 	sf::RenderWindow window(sf::VideoMode(640, 480), "Spine SFML");
 	window.setFramerateLimit(60);
@@ -69,11 +75,11 @@ void spineboy () {
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
-		if (drawable->state->loop) {
-			if (drawable->state->time > 2) AnimationState_setAnimationByName(drawable->state, "jump", false);
-		} else {
-			if (drawable->state->time > 1) AnimationState_setAnimationByName(drawable->state, "walk", true);
-		}
+		/*if (drawable->state->loop) {
+		 if (drawable->state->time > 2) AnimationState_setAnimationByName(drawable->state, "jump", false);
+		 } else {
+		 if (drawable->state->time > 1) AnimationState_setAnimationByName(drawable->state, "walk", true);
+		 }*/
 
 		drawable->update(delta);
 

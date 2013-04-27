@@ -25,15 +25,17 @@
 
 package com.esotericsoftware.spine;
 
-import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pools;
 
 /** Stores state for an animation and automatically mixes between animations. */
 public class AnimationState {
 	private final AnimationStateData data;
-	Animation current, previous;
-	float currentTime, previousTime;
-	boolean currentLoop, previousLoop;
-	float mixTime, mixDuration;
+	private Animation current, previous;
+	private float currentTime, previousTime;
+	private boolean currentLoop, previousLoop;
+	private float mixTime, mixDuration;
+	private Array<QueueEntry> queue = new Array();
 
 	public AnimationState (AnimationStateData data) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -44,6 +46,15 @@ public class AnimationState {
 		currentTime += delta;
 		previousTime += delta;
 		mixTime += delta;
+
+		if (queue.size > 0) {
+			QueueEntry entry = queue.first();
+			if (currentTime >= entry.delay) {
+				setAnimationInternal(entry.animation, entry.loop);
+				Pools.free(entry);
+				queue.removeIndex(0);
+			}
+		}
 	}
 
 	public void apply (Skeleton skeleton) {
@@ -63,18 +74,15 @@ public class AnimationState {
 	public void clearAnimation () {
 		previous = null;
 		current = null;
+		clearQueue();
 	}
 
-	/** @see #setAnimation(Animation, boolean) */
-	public void setAnimation (String animationName, boolean loop) {
-		Animation animation = data.getSkeletonData().findAnimation(animationName);
-		if (animation == null) throw new IllegalArgumentException("Animation not found: " + animationName);
-		setAnimation(animation, loop);
+	private void clearQueue () {
+		Pools.freeAll(queue);
+		queue.clear();
 	}
 
-	/** Set the current animation. The current animation time is set to 0.
-	 * @param animation May be null. */
-	public void setAnimation (Animation animation, boolean loop) {
+	private void setAnimationInternal (Animation animation, boolean loop) {
 		previous = null;
 		if (animation != null && current != null) {
 			mixDuration = data.getMix(current, animation);
@@ -88,6 +96,57 @@ public class AnimationState {
 		current = animation;
 		currentLoop = loop;
 		currentTime = 0;
+	}
+
+	/** @see #setAnimation(Animation, boolean) */
+	public void setAnimation (String animationName, boolean loop) {
+		Animation animation = data.getSkeletonData().findAnimation(animationName);
+		if (animation == null) throw new IllegalArgumentException("Animation not found: " + animationName);
+		setAnimation(animation, loop);
+	}
+
+	/** Set the current animation. Any queued animations are cleared and the current animation time is set to 0.
+	 * @param animation May be null. */
+	public void setAnimation (Animation animation, boolean loop) {
+		clearQueue();
+		setAnimationInternal(animation, loop);
+	}
+
+	/** @see #addAnimation(Animation, boolean) */
+	public void addAnimation (String animationName, boolean loop) {
+		addAnimation(animationName, loop, 0);
+	}
+
+	/** @see #addAnimation(Animation, boolean, float) */
+	public void addAnimation (String animationName, boolean loop, float delay) {
+		Animation animation = data.getSkeletonData().findAnimation(animationName);
+		if (animation == null) throw new IllegalArgumentException("Animation not found: " + animationName);
+		addAnimation(animation, loop, delay);
+	}
+
+	/** Adds an animation to be played delay seconds after the current or last queued animation, taking into account any mix
+	 * duration. */
+	public void addAnimation (Animation animation, boolean loop) {
+		addAnimation(animation, loop, 0);
+	}
+
+	/** Adds an animation to be played delay seconds after the current or last queued animation.
+	 * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay. */
+	public void addAnimation (Animation animation, boolean loop, float delay) {
+		QueueEntry entry = Pools.obtain(QueueEntry.class);
+		entry.animation = animation;
+		entry.loop = loop;
+
+		if (delay <= 0) {
+			Animation previousAnimation = queue.size == 0 ? current : queue.peek().animation;
+			if (previousAnimation != null)
+				delay = previousAnimation.getDuration() - data.getMix(previousAnimation, animation) + delay;
+			else
+				delay = 0;
+		}
+		entry.delay = delay;
+
+		queue.add(entry);
 	}
 
 	/** @return May be null. */
@@ -115,5 +174,11 @@ public class AnimationState {
 
 	public String toString () {
 		return (current != null && current.getName() != null) ? current.getName() : super.toString();
+	}
+
+	static private class QueueEntry {
+		Animation animation;
+		boolean loop;
+		float delay;
 	}
 }

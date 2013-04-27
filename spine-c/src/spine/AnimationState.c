@@ -94,7 +94,7 @@ void AnimationState_addAnimation (AnimationState* self, Animation* animation, in
 
 	if (delay <= 0) {
 		if (previousAnimation)
-			delay = self->animation->duration - AnimationStateData_getMix(self->data, self->animation, previousAnimation) + delay;
+			delay = previousAnimation->duration - AnimationStateData_getMix(self->data, previousAnimation, animation) + delay;
 		else
 			delay = 0;
 	}
@@ -141,6 +141,7 @@ void AnimationState_clearAnimation (AnimationState* self) {
 }
 
 void AnimationState_update (AnimationState* self, float delta) {
+	_Entry* next;
 	_Internal* internal = SUB_CAST(_Internal, self);
 
 	self->time += delta;
@@ -149,7 +150,7 @@ void AnimationState_update (AnimationState* self, float delta) {
 
 	if (internal->queue && self->time >= internal->queue->delay) {
 		_AnimationState_setAnimation(self, internal->queue->animation, internal->queue->loop);
-		_Entry* next = internal->queue->next;
+		next = internal->queue->next;
 		FREE(internal->queue);
 		internal->queue = next;
 	}

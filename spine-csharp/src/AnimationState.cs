@@ -33,9 +33,10 @@ namespace Spine {
 		public float Time { get; set; }
 		public bool Loop { get; set; }
 		private Animation previous;
-		float previousTime;
-		bool previousLoop;
-		float mixTime, mixDuration;
+		private float previousTime;
+		private bool previousLoop;
+		private float mixTime, mixDuration;
+		private List<QueueEntry> queue = new List<QueueEntry>();
 
 		public AnimationState (AnimationStateData data) {
 			if (data == null) throw new ArgumentNullException("data cannot be null.");
@@ -46,6 +47,14 @@ namespace Spine {
 			Time += delta;
 			previousTime += delta;
 			mixTime += delta;
+
+			if (queue.Count > 0) {
+				QueueEntry entry = queue[0];
+				if (Time >= entry.delay) {
+					SetAnimationInternal(entry.animation, entry.loop);
+					queue.RemoveAt(0);
+				}
+			}
 		}
 
 		public void Apply (Skeleton skeleton) {
@@ -62,13 +71,40 @@ namespace Spine {
 				Animation.Apply(skeleton, Time, Loop);
 		}
 
-		public void SetAnimation (String animationName, bool loop) {
-			Animation animation = Data.SkeletonData.FindAnimation(animationName);
-			if (animation == null) throw new ArgumentException("Animation not found: " + animationName);
-			SetAnimation(animation, loop);
+		public void AddAnimation (String animationName, bool loop) {
+			AddAnimation(animationName, loop, 0);
 		}
 
-		public void SetAnimation (Animation animation, bool loop) {
+		public void AddAnimation (String animationName, bool loop, float delay) {
+			Animation animation = Data.SkeletonData.FindAnimation(animationName);
+			if (animation == null) throw new ArgumentException("Animation not found: " + animationName);
+			AddAnimation(animation, loop, delay);
+		}
+
+		public void AddAnimation (Animation animation, bool loop) {
+			AddAnimation(animation, loop, 0);
+		}
+
+		/** Adds an animation to be played delay seconds after the current or last queued animation.
+		 * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay. */
+		public void AddAnimation (Animation animation, bool loop, float delay) {
+			QueueEntry entry = new QueueEntry();
+			entry.animation = animation;
+			entry.loop = loop;
+
+			if (delay <= 0) {
+				Animation previousAnimation = queue.Count == 0 ? Animation : queue[queue.Count - 1].animation;
+				if (previousAnimation != null)
+					delay = previousAnimation.Duration - Data.GetMix(previousAnimation, animation) + delay;
+				else
+					delay = 0;
+			}
+			entry.delay = delay;
+
+			queue.Add(entry);
+		}
+
+		private void SetAnimationInternal (Animation animation, bool loop) {
 			previous = null;
 			if (animation != null && Animation != null) {
 				mixDuration = Data.GetMix(Animation, animation);
@@ -84,13 +120,25 @@ namespace Spine {
 			Time = 0;
 		}
 
+		public void SetAnimation (String animationName, bool loop) {
+			Animation animation = Data.SkeletonData.FindAnimation(animationName);
+			if (animation == null) throw new ArgumentException("Animation not found: " + animationName);
+			SetAnimation(animation, loop);
+		}
+
+		public void SetAnimation (Animation animation, bool loop) {
+			queue.Clear();
+			SetAnimationInternal(animation, loop);
+		}
+
 		public void ClearAnimation () {
 			previous = null;
 			Animation = null;
+			queue.Clear();
 		}
 
 		/** Returns true if no animation is set or if the current time is greater than the animation duration, regardless of looping. */
-		public bool isComplete () {
+		public bool IsComplete () {
 			return Animation == null || Time >= Animation.Duration;
 		}
 
@@ -98,4 +146,10 @@ namespace Spine {
 			return (Animation != null && Animation.Name != null) ? Animation.Name : base.ToString();
 		}
 	}
+}
+
+class QueueEntry {
+	public Spine.Animation animation;
+	public bool loop;
+	public float delay;
 }

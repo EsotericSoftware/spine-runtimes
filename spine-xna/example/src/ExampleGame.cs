@@ -40,8 +40,7 @@ namespace Spine {
 		GraphicsDeviceManager graphics;
 		SkeletonRenderer skeletonRenderer;
 		Skeleton skeleton;
-		Animation animation;
-		float time;
+		AnimationState state;
 
 		public Example () {
 			graphics = new GraphicsDeviceManager(this);
@@ -59,13 +58,25 @@ namespace Spine {
 		protected override void LoadContent () {
 			skeletonRenderer = new SkeletonRenderer(GraphicsDevice);
 
-			Atlas atlas = new Atlas("data/goblins.atlas", new XnaTextureLoader(GraphicsDevice));
+			String name = "spineboy"; // "goblins";
+
+			Atlas atlas = new Atlas("data/" + name + ".atlas", new XnaTextureLoader(GraphicsDevice));
 			SkeletonJson json = new SkeletonJson(atlas);
-			skeleton = new Skeleton(json.ReadSkeletonData("data/goblins.json"));
-			skeleton.SetSkin("goblingirl");
+			skeleton = new Skeleton(json.ReadSkeletonData("data/" + name + ".json"));
+			if (name == "goblins") skeleton.SetSkin("goblingirl");
 			skeleton.SetSlotsToBindPose(); // Without this the skin attachments won't be attached. See SetSkin.
-			skeleton.SetAttachment("left hand item", "spear");
-			animation = skeleton.Data.FindAnimation("walk");
+
+			// Define mixing between animations.
+			AnimationStateData stateData = new AnimationStateData(skeleton.Data);
+			if (name == "spineboy") {
+				stateData.SetMix("walk", "jump", 0.2f);
+				stateData.SetMix("jump", "walk", 0.4f);
+			}
+
+			state = new AnimationState(stateData);
+			state.SetAnimation("walk", false);
+			state.AddAnimation("jump", false);
+			state.AddAnimation("walk", true);
 
 			skeleton.RootBone.X = 320;
 			skeleton.RootBone.Y = 440;
@@ -89,8 +100,8 @@ namespace Spine {
 		protected override void Draw (GameTime gameTime) {
 			GraphicsDevice.Clear(Color.Black);
 
-			time += gameTime.ElapsedGameTime.Milliseconds / 1000f;
-			animation.Apply(skeleton, time, true);
+			state.Update(gameTime.ElapsedGameTime.Milliseconds / 1000f);
+			state.Apply(skeleton);
 			skeleton.UpdateWorldTransform();
 			skeletonRenderer.Begin();
 			skeletonRenderer.Draw(skeleton);

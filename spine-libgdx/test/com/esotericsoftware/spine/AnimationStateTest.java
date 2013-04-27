@@ -54,7 +54,7 @@ public class AnimationStateTest extends ApplicationAdapter {
 
 		// Define mixing between animations.
 		AnimationStateData stateData = new AnimationStateData(skeletonData);
-		stateData.setMix("walk", "jump", 0.4f);
+		stateData.setMix("walk", "jump", 0.2f);
 		stateData.setMix("jump", "walk", 0.4f);
 
 		state = new AnimationState(stateData);
