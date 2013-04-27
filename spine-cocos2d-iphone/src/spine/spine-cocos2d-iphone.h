@@ -23,47 +23,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#ifndef SPINE_COCOS2D_H_
-#define SPINE_COCOS2D_H_
-
-#include <spine/spine.h>
-#include "cocos2d.h"
-
-#ifdef __cplusplus
-using namespace spine;
-#endif
-
-@interface CCSkeleton : CCNodeRGBA<CCBlendProtocol> {
-@private
-	bool ownsSkeleton;
-	bool ownsStateData;
-	Atlas* atlas;
-
-@public
-	Skeleton* const skeleton;
-	AnimationState* const state;
-	float timeScale;
-	bool debugSlots;
-	bool debugBones;
-
-    ccBlendFunc blendFunc;
-}
-
-+ (CCSkeleton*) skeletonWithFile:(NSString*)skeletonDataFile atlas:(Atlas*)atlas;
-+ (CCSkeleton*) skeletonWithFile:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale;
-
-+ (CCSkeleton*) skeletonWithFile:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile;
-+ (CCSkeleton*) skeletonWithFile:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile scale:(float)scale;
-
-+ (CCSkeleton*) skeletonWithData:(SkeletonData*)skeletonData;
-+ (CCSkeleton*) skeletonWithData:(SkeletonData*)skeletonData stateData:(AnimationStateData*)stateData;
-
-- initWithData:(SkeletonData*)skeletonData;
-- initWithData:(SkeletonData*)skeletonData stateData:(AnimationStateData*)stateData;
-
-@end
-
-/**/
+#import <spine/spine.h>
+#import "cocos2d.h"
+#import "CCSkeleton.h"
+#import "CCSkeletonAnimation.h"
 
 #ifdef __cplusplus
 namespace spine {
@@ -76,5 +39,3 @@ void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_
 }
 }
 #endif
-
-#endif /* SPINE_COCOS2D_H_ */

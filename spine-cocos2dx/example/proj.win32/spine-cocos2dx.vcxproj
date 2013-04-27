@@ -143,6 +143,8 @@
     <ClInclude Include="..\..\..\spine-c\include\spine\SlotData.h" />
     <ClInclude Include="..\..\..\spine-c\include\spine\spine.h" />
     <ClInclude Include="..\..\..\spine-c\src\spine\Json.h" />
+    <ClInclude Include="..\..\src\spine\CCSkeleton.h" />
+    <ClInclude Include="..\..\src\spine\CCSkeletonAnimation.h" />
     <ClInclude Include="..\..\src\spine\spine-cocos2dx.h" />
     <ClInclude Include="..\Classes\AppDelegate.h" />
     <ClInclude Include="..\Classes\AppMacros.h" />
@@ -168,6 +170,8 @@
     <ClCompile Include="..\..\..\spine-c\src\spine\Skin.c" />
     <ClCompile Include="..\..\..\spine-c\src\spine\Slot.c" />
     <ClCompile Include="..\..\..\spine-c\src\spine\SlotData.c" />
+    <ClCompile Include="..\..\src\spine\CCSkeleton.cpp" />
+    <ClCompile Include="..\..\src\spine\CCSkeletonAnimation.cpp" />
     <ClCompile Include="..\..\src\spine\spine-cocos2dx.cpp" />
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
     <ClCompile Include="..\Classes\ExampleLayer.cpp" />

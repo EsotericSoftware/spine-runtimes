@@ -27,7 +27,7 @@
 #import <spine/spine-cocos2d-iphone.h>
 
 @interface ExampleLayer : CCLayer {
-	CCSkeleton* skeletonNode;
+	CCSkeletonAnimation* animationNode;
 }
 
 +(CCScene*) scene;

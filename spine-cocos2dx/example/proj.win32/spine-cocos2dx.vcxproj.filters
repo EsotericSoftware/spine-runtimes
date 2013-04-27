@@ -87,6 +87,12 @@
     <ClInclude Include="..\..\..\spine-c\include\spine\AnimationStateData.h">
       <Filter>Classes\spine-c</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\spine\CCSkeleton.h">
+      <Filter>Classes\spine-cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\spine\CCSkeletonAnimation.h">
+      <Filter>Classes\spine-cocos2dx</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -154,6 +160,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\spine-c\src\spine\AnimationState.c">
       <Filter>Classes\spine-c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spine\CCSkeleton.cpp">
+      <Filter>Classes\spine-cocos2dx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spine\CCSkeletonAnimation.cpp">
+      <Filter>Classes\spine-cocos2dx</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -158,7 +158,9 @@
 		43C32A03170B0F15004A9460 /* vec3.c in Sources */ = {isa = PBXBuildFile; fileRef = 43C32992170B0F14004A9460 /* vec3.c */; };
 		43C32A04170B0F15004A9460 /* vec4.c in Sources */ = {isa = PBXBuildFile; fileRef = 43C32993170B0F14004A9460 /* vec4.c */; };
 		43C32A06170B0F93004A9460 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 43C32A05170B0F93004A9460 /* main.m */; };
-		43C32A09170B10FF004A9460 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 43C32A08170B10FF004A9460 /* AppDelegate.m */; };
+		43C32A09170B10FF004A9460 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43C32A08170B10FF004A9460 /* AppDelegate.mm */; };
+		43DB2A3D172C16BC003045C5 /* CCSkeleton.m in Sources */ = {isa = PBXBuildFile; fileRef = 43DB2A3A172C16BC003045C5 /* CCSkeleton.m */; };
+		43DB2A3E172C16BC003045C5 /* CCSkeletonAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = 43DB2A3C172C16BC003045C5 /* CCSkeletonAnimation.m */; };
 		9A5D2499170A94DA0030D4DD /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5D2498170A94DA0030D4DD /* QuartzCore.framework */; };
 		9A5D249B170A94DA0030D4DD /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5D249A170A94DA0030D4DD /* OpenGLES.framework */; };
 		9A5D249D170A94DA0030D4DD /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5D249C170A94DA0030D4DD /* OpenAL.framework */; };
@@ -481,7 +483,11 @@
 		43C32993170B0F14004A9460 /* vec4.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vec4.c; sourceTree = "<group>"; };
 		43C32A05170B0F93004A9460 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "Resources-ios/main.m"; sourceTree = "<group>"; };
 		43C32A07170B10FF004A9460 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = "Resources-ios/AppDelegate.h"; sourceTree = "<group>"; };
-		43C32A08170B10FF004A9460 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = "Resources-ios/AppDelegate.m"; sourceTree = "<group>"; };
+		43C32A08170B10FF004A9460 /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = "Resources-ios/AppDelegate.mm"; sourceTree = "<group>"; };
+		43DB2A39172C16BC003045C5 /* CCSkeleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCSkeleton.h; path = src/spine/CCSkeleton.h; sourceTree = "<group>"; };
+		43DB2A3A172C16BC003045C5 /* CCSkeleton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CCSkeleton.m; path = src/spine/CCSkeleton.m; sourceTree = "<group>"; };
+		43DB2A3B172C16BC003045C5 /* CCSkeletonAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCSkeletonAnimation.h; path = src/spine/CCSkeletonAnimation.h; sourceTree = "<group>"; };
+		43DB2A3C172C16BC003045C5 /* CCSkeletonAnimation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CCSkeletonAnimation.m; path = src/spine/CCSkeletonAnimation.m; sourceTree = "<group>"; };
 		9A5D2495170A94DA0030D4DD /* SpineExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpineExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A5D2498170A94DA0030D4DD /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		9A5D249A170A94DA0030D4DD /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -522,7 +528,7 @@
 				43C32826170B0BF6004A9460 /* ExampleLayer.h */,
 				43C32827170B0BF6004A9460 /* ExampleLayer.m */,
 				43C32A07170B10FF004A9460 /* AppDelegate.h */,
-				43C32A08170B10FF004A9460 /* AppDelegate.m */,
+				43C32A08170B10FF004A9460 /* AppDelegate.mm */,
 				43C32A05170B0F93004A9460 /* main.m */,
 				43C32889170B0E9F004A9460 /* Prefix.pch */,
 			);
@@ -578,6 +584,10 @@
 			children = (
 				43C3282D170B0C19004A9460 /* spine-cocos2d-iphone.m */,
 				43C3282E170B0C19004A9460 /* spine-cocos2d-iphone.h */,
+				43DB2A39172C16BC003045C5 /* CCSkeleton.h */,
+				43DB2A3A172C16BC003045C5 /* CCSkeleton.m */,
+				43DB2A3B172C16BC003045C5 /* CCSkeletonAnimation.h */,
+				43DB2A3C172C16BC003045C5 /* CCSkeletonAnimation.m */,
 			);
 			name = "spine-cocos2d-iphone";
 			sourceTree = "<group>";
@@ -1217,7 +1227,9 @@
 				43C32A03170B0F15004A9460 /* vec3.c in Sources */,
 				43C32A04170B0F15004A9460 /* vec4.c in Sources */,
 				43C32A06170B0F93004A9460 /* main.m in Sources */,
-				43C32A09170B10FF004A9460 /* AppDelegate.m in Sources */,
+				43C32A09170B10FF004A9460 /* AppDelegate.mm in Sources */,
+				43DB2A3D172C16BC003045C5 /* CCSkeleton.m in Sources */,
+				43DB2A3E172C16BC003045C5 /* CCSkeletonAnimation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

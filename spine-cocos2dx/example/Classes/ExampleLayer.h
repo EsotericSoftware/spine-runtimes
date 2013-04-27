@@ -31,7 +31,7 @@
 
 class ExampleLayer: public cocos2d::CCLayer {
 private:
-	spine::CCSkeleton* skeletonNode;
+	spine::CCSkeletonAnimation* skeletonNode;
 
 public:
 	static cocos2d::CCScene* scene ();

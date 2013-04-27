@@ -23,51 +23,47 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#import "ExampleLayer.h"
+#ifndef SPINE_CCSKELETON_H_
+#define SPINE_CCSKELETON_H_
 
-@implementation ExampleLayer
+#include <spine/spine.h>
+#include "cocos2d.h"
 
-+ (CCScene*) scene {
-	CCScene *scene = [CCScene node];
-	[scene addChild:[ExampleLayer node]];
-	return scene;
+namespace spine {
+
+/**
+Draws a skeleton.
+*/
+class CCSkeleton: public cocos2d::CCNodeRGBA, public cocos2d::CCBlendProtocol {
+public:
+	Skeleton* skeleton;
+	float timeScale;
+	bool debugSlots;
+	bool debugBones;
+
+	static CCSkeleton* createWithData (SkeletonData* skeletonData);
+	static CCSkeleton* createWithFile (const char* skeletonDataFile, Atlas* atlas, float scale = 1);
+	static CCSkeleton* createWithFile (const char* skeletonDataFile, const char* atlasFile, float scale = 1);
+
+	CCSkeleton (SkeletonData* skeletonData);
+	CCSkeleton (const char* skeletonDataFile, Atlas* atlas, float scale = 1);
+	CCSkeleton (const char* skeletonDataFile, const char* atlasFile, float scale = 1);
+
+	virtual ~CCSkeleton ();
+
+	virtual void update (float deltaTime);
+	virtual void draw ();
+	virtual cocos2d::CCRect boundingBox ();
+
+	// CCBlendProtocol
+	CC_PROPERTY(cocos2d::ccBlendFunc, blendFunc, BlendFunc);
+
+private:
+	bool ownsSkeletonData;
+	Atlas* atlas;
+	void initialize (SkeletonData *skeletonData);
+};
+
 }
 
--(id) init {
-	self = [super init];
-	if (!self) return nil;
-
-	animationNode = [CCSkeletonAnimation skeletonWithFile:@"spineboy.json" atlasFile:@"spineboy.atlas" scale:1];
-	[animationNode setMixFrom:@"walk" to:@"jump" duration:0.2f];
-	[animationNode setMixFrom:@"jump" to:@"walk" duration:0.4f];
-	[animationNode setAnimation:@"walk" loop:NO];
-	[animationNode addAnimation:@"jump" loop:NO afterDelay:0];
-	[animationNode addAnimation:@"walk" loop:YES afterDelay:0];
-	animationNode.timeScale = 0.3f;
-	animationNode.debugBones = true;
-
-	CGSize windowSize = [[CCDirector sharedDirector] winSize];
-	[animationNode setPosition:ccp(windowSize.width / 2, 20)];
-	[self addChild:animationNode];
-
-#if __CC_PLATFORM_MAC
-	[self setMouseEnabled:YES];
-#endif
-
-	return self;
-}
-
-#if __CC_PLATFORM_MAC
-- (BOOL) ccMouseDown:(NSEvent*)event {
-	CCDirector* director = [CCDirector sharedDirector];
-	NSPoint location =  [director convertEventToGL:event];
-	location.x -= [[director runningScene]position].x;
-	location.y -= [[director runningScene]position].y;
-	location.x -= animationNode.position.x;
-	location.y -= animationNode.position.y;
-	if (CGRectContainsPoint(skeletonNode.boundingBox, location)) NSLog(@"Clicked!");
-	return YES;
-}
-#endif
-
-@end
+#endif /* SPINE_CCSKELETON_H_ */
