@@ -241,7 +241,7 @@ function SkeletonJson.new (attachmentLoader)
 						for i,valueMap in ipairs(values) do
 							local time = valueMap["time"]
 							local attachmentName = valueMap["name"]
-							if attachmentName == json.null then attachmentName = nil end
+							if not attachmentName then attachmentName = nil end
 							timeline:setKeyframe(keyframeIndex, time, attachmentName)
 							keyframeIndex = keyframeIndex + 1
 						end

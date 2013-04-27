@@ -100,20 +100,25 @@ function Skeleton.new (skeletonData)
 		if not attachmentName then error("attachmentName cannot be nil.", 2) end
 		local slotIndex = self.data:findSlotIndex(slotName)
 		if slotIndex == -1 then error("Slot not found: " .. slotName, 2) end
-		if self.skin then return self.skin:getAttachment(slotIndex, attachmentName) end
-		if self.data.defaultSkin then
-			local attachment = self.data.defaultSkin:getAttachment(slotIndex, attachmentName)
+		if self.skin then
+			local attachment = self.skin:getAttachment(slotIndex, attachmentName)
 			if attachment then return attachment end
+		end
+		if self.data.defaultSkin then
+			return self.data.defaultSkin:getAttachment(slotIndex, attachmentName)
 		end
 		return nil
 	end
 
 	function self:setAttachment (slotName, attachmentName)
 		if not slotName then error("slotName cannot be nil.", 2) end
-		if not attachmentName then error("attachmentName cannot be nil.", 2) end
 		for i,slot in ipairs(self.slots) do
 			if slot.data.name == slotName then
-				slot:setAttachment(self:getAttachment(slotName, attachmentName))
+				if not attachmentName then 
+					slot:setAttachment(nil)
+				else
+					slot:setAttachment(self:getAttachment(slotName, attachmentName))
+				end
 				return
 			end
 		end

@@ -61,7 +61,9 @@ function Slot.new (slotData, skeleton, bone)
 		self:setColor(data.r, data.g, data.b, data.a)
 
 		local attachment
-		if data.attachmentName then attachment = self.skeleton:getAttachment(data.name, data.attachmentName) end
+		if data.attachmentName then 
+			attachment = self.skeleton:getAttachment(data.name, data.attachmentName)
+		end
 		self:setAttachment(attachment)
 	end
 

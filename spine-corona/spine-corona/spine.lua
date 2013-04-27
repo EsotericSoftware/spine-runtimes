@@ -59,8 +59,8 @@ spine.Skeleton.new_super = spine.Skeleton.new
 function spine.Skeleton.new (skeletonData, group)
 	-- Skeleton extends a group.
 	local self = spine.Skeleton.new_super(skeletonData)
-	self = spine.utils.copy(self, group or display.newGroup())
-	
+	self.group = group or display.newGroup()
+
 	-- createImage can customize where images are found.
 	function self:createImage (attachment)
 		return display.newImage(attachment.name .. ".png")
@@ -76,12 +76,12 @@ function spine.Skeleton.new (skeletonData, group)
 
 		for i,slot in ipairs(self.drawOrder) do
 			local attachment = slot.attachment
-			local image = images[attachment]
+			local image = images[slot]
 			if not attachment then
 				-- Attachment is gone, remove the image.
 				if image then
 					image:removeSelf()
-					images[attachment] = nil
+					images[slot] = nil
 				end
 			else
 				-- Create new image.
@@ -95,7 +95,7 @@ function spine.Skeleton.new (skeletonData, group)
 						print("Error creating image: " .. attachment.name)
 						image = spine.Skeleton.failed
 					end
-					images[attachment] = image
+					images[slot] = image
 				end
 				-- Position image based on attachment and bone.
 				if image ~= spine.Skeleton.failed then
@@ -113,7 +113,7 @@ function spine.Skeleton.new (skeletonData, group)
 						image.rotation = -image.rotation
 					end
 					image:setFillColor(slot.r, slot.g, slot.b, slot.a)
-					self:insert(image)
+					self.group:insert(image)
 				end
 			end
 		end
@@ -137,13 +137,13 @@ function spine.Skeleton.new (skeletonData, group)
 					bone.line.yScale = 1
 				end
 				bone.line:setColor(255, 0, 0)
-				self:insert(bone.line)
+				self.group:insert(bone.line)
 
 				if not bone.circle then bone.circle = display.newCircle(0, 0, 3) end
 				bone.circle.x = bone.worldX
 				bone.circle.y = -bone.worldY
 				bone.circle:setFillColor(0, 255, 0)
-				self:insert(bone.circle)
+				self.group:insert(bone.circle)
 			end
 		end
 	end
