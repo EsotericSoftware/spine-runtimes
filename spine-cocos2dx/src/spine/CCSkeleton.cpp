@@ -32,8 +32,8 @@ using std::max;
 
 namespace spine {
 
-static CCSkeleton* createWithData (SkeletonData* skeletonData) {
-	CCSkeleton* node = new CCSkeleton(skeletonData);
+static CCSkeleton* createWithData (SkeletonData* skeletonData, bool ownsSkeletonData) {
+	CCSkeleton* node = new CCSkeleton(skeletonData, ownsSkeletonData);
 	node->autorelease();
 	return node;
 }
@@ -50,13 +50,10 @@ static CCSkeleton* createWithFile (const char* skeletonDataFile, const char* atl
 	return node;
 }
 
-void CCSkeleton::initialize (SkeletonData *skeletonData) {
-	ownsSkeletonData = false;
+void CCSkeleton::initialize () {
 	atlas = 0;
 	debugSlots = false;
 	debugBones = false;
-
-	skeleton = Skeleton_create(skeletonData);
 
 	blendFunc.src = GL_ONE;
 	blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
@@ -65,22 +62,36 @@ void CCSkeleton::initialize (SkeletonData *skeletonData) {
 	scheduleUpdate();
 }
 
-CCSkeleton::CCSkeleton (SkeletonData *skeletonData) {
-	initialize(skeletonData);
+void CCSkeleton::setSkeletonData (SkeletonData *skeletonData, bool ownsSkeletonData) {
+	skeleton = Skeleton_create(skeletonData);
+	this->ownsSkeletonData = ownsSkeletonData;	
+}
+
+CCSkeleton::CCSkeleton () {
+	initialize();
+}
+
+CCSkeleton::CCSkeleton (SkeletonData *skeletonData, bool ownsSkeletonData) {
+	initialize();
+
+	setSkeletonData(skeletonData, ownsSkeletonData);
 }
 
 CCSkeleton::CCSkeleton (const char* skeletonDataFile, Atlas* atlas, float scale) {
+	initialize();
+
 	SkeletonJson* json = SkeletonJson_create(atlas);
 	json->scale = scale;
 	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, skeletonDataFile);
 	CCAssert(skeletonData, json->error ? json->error : "Error reading skeleton data.");
 	SkeletonJson_dispose(json);
 
-	initialize(skeletonData);
-	ownsSkeletonData = true;
+	setSkeletonData(skeletonData, true);
 }
 
 CCSkeleton::CCSkeleton (const char* skeletonDataFile, const char* atlasFile, float scale) {
+	initialize();
+
 	atlas = Atlas_readAtlasFile(atlasFile);
 	CCAssert(atlas, "Error reading atlas file.");
 
@@ -90,8 +101,7 @@ CCSkeleton::CCSkeleton (const char* skeletonDataFile, const char* atlasFile, flo
 	CCAssert(skeletonData, json->error ? json->error : "Error reading skeleton data file.");
 	SkeletonJson_dispose(json);
 
-	initialize(skeletonData);
-	ownsSkeletonData = true;
+	setSkeletonData(skeletonData, true);
 }
 
 CCSkeleton::~CCSkeleton () {

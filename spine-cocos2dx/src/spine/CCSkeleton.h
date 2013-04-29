@@ -41,11 +41,11 @@ public:
 	bool debugSlots;
 	bool debugBones;
 
-	static CCSkeleton* createWithData (SkeletonData* skeletonData);
+	static CCSkeleton* createWithData (SkeletonData* skeletonData, bool ownsSkeletonData = false);
 	static CCSkeleton* createWithFile (const char* skeletonDataFile, Atlas* atlas, float scale = 1);
 	static CCSkeleton* createWithFile (const char* skeletonDataFile, const char* atlasFile, float scale = 1);
 
-	CCSkeleton (SkeletonData* skeletonData);
+	CCSkeleton (SkeletonData* skeletonData, bool ownsSkeletonData = false);
 	CCSkeleton (const char* skeletonDataFile, Atlas* atlas, float scale = 1);
 	CCSkeleton (const char* skeletonDataFile, const char* atlasFile, float scale = 1);
 
@@ -58,10 +58,14 @@ public:
 	// CCBlendProtocol
 	CC_PROPERTY(cocos2d::ccBlendFunc, blendFunc, BlendFunc);
 
+protected:
+	CCSkeleton ();
+	void CCSkeleton::setSkeletonData (SkeletonData *skeletonData, bool ownsSkeletonData);
+
 private:
 	bool ownsSkeletonData;
 	Atlas* atlas;
-	void initialize (SkeletonData *skeletonData);
+	void initialize ();
 };
 
 }

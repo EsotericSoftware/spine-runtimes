@@ -34,8 +34,8 @@
 
 @synthesize states = _states;
 
-+ (id) skeletonWithData:(SkeletonData*)skeletonData {
-	return [[[CCSkeletonAnimation alloc] initWithData:skeletonData] autorelease];
++ (id) skeletonWithData:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
+	return [[[CCSkeletonAnimation alloc] initWithData:skeletonData ownsSkeletonData:ownsSkeletonData] autorelease];
 }
 
 + (id) skeletonWithFile:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale {
@@ -52,8 +52,8 @@
 	[self addAnimationState];
 }
 
-- (id) initWithData:(SkeletonData*)skeletonData {
-	self = [super initWithData:skeletonData];
+- (id) initWithData:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
+	self = [super initWithData:skeletonData ownsSkeletonData:ownsSkeletonData];
 	if (!self) return nil;
 	
 	[self initialize];

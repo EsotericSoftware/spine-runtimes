@@ -27,7 +27,7 @@
 #import <spine/spine-cocos2d-iphone.h>
 
 @interface CCSkeleton (Private)
-- (void) initialize:(SkeletonData*)skeletonData;
+- (void) initialize:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData;
 @end
 
 @implementation CCSkeleton
@@ -37,8 +37,8 @@
 @synthesize debugSlots = _debugSlots;
 @synthesize debugBones = _debugBones;
 
-+ (id) skeletonWithData:(SkeletonData*)skeletonData {
-	return [[[CCSkeleton alloc] initWithData:skeletonData] autorelease];
++ (id) skeletonWithData:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
+	return [[[CCSkeleton alloc] initWithData:skeletonData ownsSkeletonData:ownsSkeletonData] autorelease];
 }
 
 + (id) skeletonWithFile:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale {
@@ -49,7 +49,9 @@
 	return [[[CCSkeleton alloc] initWithFile:skeletonDataFile atlasFile:atlasFile scale:scale] autorelease];
 }
 
-- (void) initialize:(SkeletonData*)skeletonData {
+- (void) initialize:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
+	_ownsSkeletonData = ownsSkeletonData;
+
 	_skeleton = Skeleton_create(skeletonData);
 
 	_blendFunc.src = GL_ONE;
@@ -61,13 +63,13 @@
 	[self scheduleUpdate];
 }
 
-- (id) initWithData:(SkeletonData*)skeletonData {
+- (id) initWithData:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
 	NSAssert(skeletonData, @"skeletonData cannot be null.");
 
 	self = [super init];
 	if (!self) return nil;
 
-	[self initialize:skeletonData];
+	[self initialize:skeletonData ownsSkeletonData:ownsSkeletonData];
 
 	return self;
 }
@@ -83,8 +85,7 @@
 	SkeletonJson_dispose(json);
 	if (!skeletonData) return 0;
 
-	[self initialize:skeletonData];
-	_ownsSkeletonData = YES;
+	[self initialize:skeletonData ownsSkeletonData:YES];
 
 	return self;
 }
@@ -104,8 +105,7 @@
 	SkeletonJson_dispose(json);
 	if (!skeletonData) return 0;
 
-	[self initialize:skeletonData];
-	_ownsSkeletonData = YES;
+	[self initialize:skeletonData ownsSkeletonData:YES];
 
 	return self;
 }
