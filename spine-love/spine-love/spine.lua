@@ -74,10 +74,16 @@ function spine.Skeleton.new (skeletonData, group)
 					images[attachment] = nil
 				end
 			else
+				-- Attachment image has changed.
+				if image and image.attachment ~= attachment then
+					image:removeSelf()
+					image = nil
+				end
 				-- Create new image.
 				if not image then
 					image = self:createImage(attachment)
 					if image then
+						image.attachment = attachment
 						local imageWidth = image:getWidth()
 						local imageHeight = image:getHeight()
 						attachment.widthRatio = attachment.width / imageWidth
