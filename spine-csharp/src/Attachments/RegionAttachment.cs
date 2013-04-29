@@ -95,9 +95,9 @@ namespace Spine {
 			float scaleX = ScaleX;
 			float scaleY = ScaleY;
 			float regionScaleX = width / RegionOriginalWidth * scaleX;
-			float regionScaleY = height / RegionOriginalHeight * scaleX;
+			float regionScaleY = height / RegionOriginalHeight * scaleY;
 			float localX = -width / 2 * scaleX + RegionOffsetX * regionScaleX;
-			float localY = -height / 2 * scaleX + RegionOffsetY * regionScaleY;
+			float localY = -height / 2 * scaleY + RegionOffsetY * regionScaleY;
 			float localX2 = localX + RegionWidth * regionScaleX;
 			float localY2 = localY + RegionHeight * regionScaleY;
 			float radians = Rotation * (float)Math.PI / 180;
