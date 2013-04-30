@@ -52,4 +52,6 @@ spine-love/spine-lua/
 spine-love/love/
 !spine-love/spine-lua/Place spine-lua here.txt
 
-spine-starling
+spine-as3/bin
+spine-starling/spine-starling/bin
+spine-starling/spine-starling-example/bin-debug

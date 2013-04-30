@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker http://texturepacker.com-->
+<!-- $TexturePacker:SmartUpdate:facbb1aeb75a8d9232523760a3e1920f$ -->
+<TextureAtlas imagePath="spineboy.png">
+    <SubTexture name="eyes-closed" x="149" y="320" width="34" height="27"/>
+    <SubTexture name="eyes" x="195" y="314" width="34" height="27"/>
+    <SubTexture name="head" x="2" y="345" width="121" height="132"/>
+    <SubTexture name="left-ankle" x="220" y="395" width="25" height="32"/>
+    <SubTexture name="left-arm" x="219" y="42" width="35" height="29"/>
+    <SubTexture name="left-foot" x="71" y="479" width="65" height="30"/>
+    <SubTexture name="left-hand" x="219" y="2" width="35" height="38"/>
+    <SubTexture name="left-lower-leg" x="204" y="158" width="49" height="64"/>
+    <SubTexture name="left-pant-bottom" x="195" y="290" width="44" height="22"/>
+    <SubTexture name="left-shoulder" x="219" y="73" width="34" height="53"/>
+    <SubTexture name="left-upper-leg" x="185" y="343" width="33" height="67"/>
+    <SubTexture name="neck" x="214" y="128" width="34" height="28"/>
+    <SubTexture name="pelvis" x="149" y="96" width="63" height="47"/>
+    <SubTexture name="right-ankle" x="125" y="429" width="25" height="30"/>
+    <SubTexture name="right-arm" x="231" y="314" width="21" height="45"/>
+    <SubTexture name="right-foot-idle" x="149" y="145" width="53" height="28"/>
+    <SubTexture name="right-foot" x="2" y="479" width="67" height="30"/>
+    <SubTexture name="right-hand" x="220" y="361" width="32" height="32"/>
+    <SubTexture name="right-lower-leg" x="203" y="224" width="51" height="64"/>
+    <SubTexture name="right-pant-bottom" x="149" y="228" width="46" height="18"/>
+    <SubTexture name="right-shoulder" x="149" y="175" width="52" height="51"/>
+    <SubTexture name="right-upper-leg" x="149" y="248" width="44" height="70"/>
+    <SubTexture name="torso" x="149" y="2" width="68" height="92"/>
+</TextureAtlas>
