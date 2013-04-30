@@ -60,7 +60,7 @@ public:
 
 protected:
 	CCSkeleton ();
-	void CCSkeleton::setSkeletonData (SkeletonData *skeletonData, bool ownsSkeletonData);
+	void setSkeletonData (SkeletonData *skeletonData, bool ownsSkeletonData);
 
 private:
 	bool ownsSkeletonData;

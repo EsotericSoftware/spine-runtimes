@@ -222,7 +222,7 @@ public class SkeletonJson {
 					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 3 - 3]);
 
 				} else
-					throw new RuntimeException("Invalid timeline type for a bone: " + timelineName + " (" + timelineMap.name() + ")");
+					throw new RuntimeException("Invalid timeline type for a bone: " + timelineName + " (" + boneMap.name() + ")");
 			}
 		}
 
@@ -259,7 +259,7 @@ public class SkeletonJson {
 					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() - 1]);
 
 				} else
-					throw new RuntimeException("Invalid timeline type for a slot: " + timelineName + " (" + timelineMap.name() + ")");
+					throw new RuntimeException("Invalid timeline type for a slot: " + timelineName + " (" + slotMap.name() + ")");
 			}
 		}
 
