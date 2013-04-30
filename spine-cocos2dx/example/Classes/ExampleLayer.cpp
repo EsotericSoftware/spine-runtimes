@@ -42,7 +42,6 @@ bool ExampleLayer::init () {
 	if (!CCLayer::init()) return false;
 
 	skeletonNode = new CCSkeletonAnimation("spineboy.json", "spineboy.atlas");
-	skeletonNode->addAnimationState();
 	skeletonNode->setMix("walk", "jump", 0.2f);
 	skeletonNode->setMix("jump", "walk", 0.4f);
 

@@ -219,11 +219,7 @@ CCRect CCSkeleton::boundingBox () {
 		maxY = max(maxY, quad.tr.vertices.y * scaleY);
 	}
 	CCPoint position = getPosition();
-	minX = position.x + minX;
-	minY = position.y + minY;
-	maxX = position.x + maxX;
-	maxY = position.y + maxY;
-	return CCRectMake(minX, minY, maxX - minX, maxY - minY);
+	return CCRectMake(position.x + minX, position.y + minY, maxX - minX, maxY - minY);
 }
 
 // CCBlendProtocol

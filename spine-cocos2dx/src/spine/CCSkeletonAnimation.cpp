@@ -54,14 +54,17 @@ CCSkeletonAnimation* CCSkeletonAnimation::createWithFile (const char* skeletonDa
 
 CCSkeletonAnimation::CCSkeletonAnimation (SkeletonData *skeletonData)
 		: CCSkeleton(skeletonData) {
+	addAnimationState();
 }
 
 CCSkeletonAnimation::CCSkeletonAnimation (const char* skeletonDataFile, Atlas* atlas, float scale)
 		: CCSkeleton(skeletonDataFile, atlas, scale) {
+	addAnimationState();
 }
 
 CCSkeletonAnimation::CCSkeletonAnimation (const char* skeletonDataFile, const char* atlasFile, float scale)
 		: CCSkeleton(skeletonDataFile, atlasFile, scale) {
+	addAnimationState();
 }
 
 CCSkeletonAnimation::~CCSkeletonAnimation () {
@@ -113,7 +116,7 @@ void CCSkeletonAnimation::setAnimationStateData (AnimationStateData* stateData, 
 	AnimationState_dispose(state);
 
 	state = AnimationState_create(stateData);
-	states.push_back(state);
+	states[stateIndex] = state;
 }
 
 void CCSkeletonAnimation::setMix (char* fromAnimation, char* toAnimation, float duration, int stateIndex) {
