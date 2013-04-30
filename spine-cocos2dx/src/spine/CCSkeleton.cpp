@@ -32,19 +32,19 @@ using std::max;
 
 namespace spine {
 
-static CCSkeleton* createWithData (SkeletonData* skeletonData, bool ownsSkeletonData) {
+CCSkeleton* CCSkeleton::createWithData (SkeletonData* skeletonData, bool ownsSkeletonData) {
 	CCSkeleton* node = new CCSkeleton(skeletonData, ownsSkeletonData);
 	node->autorelease();
 	return node;
 }
 
-static CCSkeleton* createWithFile (const char* skeletonDataFile, Atlas* atlas, float scale) {
+CCSkeleton* CCSkeleton::createWithFile (const char* skeletonDataFile, Atlas* atlas, float scale) {
 	CCSkeleton* node = new CCSkeleton(skeletonDataFile, atlas, scale);
 	node->autorelease();
 	return node;
 }
 
-static CCSkeleton* createWithFile (const char* skeletonDataFile, const char* atlasFile, float scale) {
+CCSkeleton* CCSkeleton::createWithFile (const char* skeletonDataFile, const char* atlasFile, float scale) {
 	CCSkeleton* node = new CCSkeleton(skeletonDataFile, atlasFile, scale);
 	node->autorelease();
 	return node;

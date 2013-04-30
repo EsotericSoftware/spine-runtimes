@@ -34,19 +34,19 @@ using std::vector;
 
 namespace spine {
 
-static CCSkeletonAnimation* createWithData (SkeletonData* skeletonData) {
+CCSkeletonAnimation* CCSkeletonAnimation::createWithData (SkeletonData* skeletonData) {
 	CCSkeletonAnimation* node = new CCSkeletonAnimation(skeletonData);
 	node->autorelease();
 	return node;
 }
 
-static CCSkeletonAnimation* createWithFile (const char* skeletonDataFile, Atlas* atlas, float scale) {
+CCSkeletonAnimation* CCSkeletonAnimation::createWithFile (const char* skeletonDataFile, Atlas* atlas, float scale) {
 	CCSkeletonAnimation* node = new CCSkeletonAnimation(skeletonDataFile, atlas, scale);
 	node->autorelease();
 	return node;
 }
 
-static CCSkeletonAnimation* createWithFile (const char* skeletonDataFile, const char* atlasFile, float scale) {
+CCSkeletonAnimation* CCSkeletonAnimation::createWithFile (const char* skeletonDataFile, const char* atlasFile, float scale) {
 	CCSkeletonAnimation* node = new CCSkeletonAnimation(skeletonDataFile, atlasFile, scale);
 	node->autorelease();
 	return node;
