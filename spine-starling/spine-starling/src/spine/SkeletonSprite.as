@@ -8,6 +8,7 @@ import spine.attachments.RegionAttachment;
 import starling.animation.IAnimatable;
 import starling.core.RenderSupport;
 import starling.display.DisplayObject;
+import starling.utils.MatrixUtil;
 
 public class SkeletonSprite extends DisplayObject implements IAnimatable {
 	static private var tempPoint:Point = new Point();
@@ -167,7 +168,15 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 	override public function getBounds (targetSpace:DisplayObject, resultRect:Rectangle = null) : Rectangle {
 		if (!resultRect)
 			resultRect = new Rectangle();
-		resultRect.setTo(0, 0, 0, 0);
+		if (targetSpace == this)
+			resultRect.setTo(0, 0, 0, 0);
+		else if (targetSpace == parent)
+			resultRect.setTo(x, y, 0, 0);
+		else {
+			getTransformationMatrix(targetSpace, tempMatrix);
+			MatrixUtil.transformCoords(tempMatrix, 0, 0, tempPoint);
+			resultRect.setTo(tempPoint.x, tempPoint.y, 0, 0);
+		}
 		return resultRect;
 	}
 
