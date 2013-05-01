@@ -66,7 +66,7 @@ public class Skeleton {
 		return _bones;
 	}
 
-	public function get rootBone () : SkeletonData {
+	public function get rootBone () : Bone {
 		if (_bones.length == 0)
 			return null;
 		return _bones[0];
