@@ -35,6 +35,7 @@ Draws a skeleton.
 */
 @interface CCSkeleton : CCNodeRGBA<CCBlendProtocol> {
 	Skeleton* _skeleton;
+	Bone* _rootBone;
 	float _timeScale;
 	bool _debugSlots;
 	bool _debugBones;
@@ -52,9 +53,33 @@ Draws a skeleton.
 - (id) initWithFile:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale;
 - (id) initWithFile:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile scale:(float)scale;
 
+// --- Convenience methods for common Skeleton_* functions.
+- (void) updateWorldTransform;
+
+- (void) setToBindPose;
+- (void) setBonesToBindPose;
+- (void) setSlotsToBindPose;
+
+/* Returns 0 if the bone was not found. */
+- (Bone*) findBone:(NSString*)boneName;
+
+/* Returns 0 if the slot was not found. */
+- (Slot*) findSlot:(NSString*)slotName;
+
+/* Sets the skin used to look up attachments not found in the SkeletonData defaultSkin. Attachments from the new skin are
+ * attached if the corresponding attachment from the old skin was attached. Returns false if the skin was not found.
+ * @param skin May be 0.*/
+- (bool) setSkin:(NSString*)skinName;
+
+/* Returns 0 if the slot or attachment was not found. */
+- (Attachment*) getAttachment:(NSString*)slotName attachmentName:(NSString*)attachmentName;
+/* Returns false if the slot or attachment was not found. */
+- (bool) setAttachment:(NSString*)slotName attachmentName:(NSString*)attachmentName;
+
 @property (nonatomic, readonly) Skeleton* skeleton;
 @property (nonatomic) float timeScale;
 @property (nonatomic) bool debugSlots;
 @property (nonatomic) bool debugBones;
+@property (nonatomic) Bone* rootBone;
 
 @end

@@ -37,6 +37,7 @@ Draws a skeleton.
 class CCSkeleton: public cocos2d::CCNodeRGBA, public cocos2d::CCBlendProtocol {
 public:
 	Skeleton* skeleton;
+	Bone* rootBone;
 	float timeScale;
 	bool debugSlots;
 	bool debugBones;
@@ -55,7 +56,29 @@ public:
 	virtual void draw ();
 	virtual cocos2d::CCRect boundingBox ();
 
-	// CCBlendProtocol
+	// --- Convenience methods for common Skeleton_* functions.
+	void updateWorldTransform ();
+
+	void setToBindPose ();
+	void setBonesToBindPose ();
+	void setSlotsToBindPose ();
+
+	/* Returns 0 if the bone was not found. */
+	Bone* findBone (const char* boneName) const;
+	/* Returns 0 if the slot was not found. */
+	Slot* findSlot (const char* slotName) const;
+	
+	/* Sets the skin used to look up attachments not found in the SkeletonData defaultSkin. Attachments from the new skin are
+	 * attached if the corresponding attachment from the old skin was attached. Returns false if the skin was not found.
+	 * @param skin May be 0.*/
+	bool setSkin (const char* skinName);
+	
+	/* Returns 0 if the slot or attachment was not found. */
+	Attachment* getAttachment (const char* slotName, const char* attachmentName) const;
+	/* Returns false if the slot or attachment was not found. */
+	bool setAttachment (const char* slotName, const char* attachmentName);
+
+	// --- CCBlendProtocol
 	CC_PROPERTY(cocos2d::ccBlendFunc, blendFunc, BlendFunc);
 
 protected:

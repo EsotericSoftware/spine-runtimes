@@ -64,6 +64,7 @@ void CCSkeleton::initialize () {
 
 void CCSkeleton::setSkeletonData (SkeletonData *skeletonData, bool ownsSkeletonData) {
 	skeleton = Skeleton_create(skeletonData);
+	rootBone = skeleton->bones[0];
 	this->ownsSkeletonData = ownsSkeletonData;	
 }
 
@@ -222,7 +223,42 @@ CCRect CCSkeleton::boundingBox () {
 	return CCRectMake(position.x + minX, position.y + minY, maxX - minX, maxY - minY);
 }
 
-// CCBlendProtocol
+// --- Convenience methods for Skeleton_* functions.
+
+void CCSkeleton::updateWorldTransform () {
+	Skeleton_updateWorldTransform(skeleton);
+}
+
+void CCSkeleton::setToBindPose () {
+	Skeleton_setToBindPose(skeleton);
+}
+void CCSkeleton::setBonesToBindPose () {
+	Skeleton_setBonesToBindPose(skeleton);
+}
+void CCSkeleton::setSlotsToBindPose () {
+	Skeleton_setSlotsToBindPose(skeleton);
+}
+
+Bone* CCSkeleton::findBone (const char* boneName) const {
+	return Skeleton_findBone(skeleton, boneName);
+}
+
+Slot* CCSkeleton::findSlot (const char* slotName) const {
+	return Skeleton_findSlot(skeleton, slotName);
+}
+
+bool CCSkeleton::setSkin (const char* skinName) {
+	return Skeleton_setSkinByName(skeleton, skinName) ? true : false;
+}
+
+Attachment* CCSkeleton::getAttachment (const char* slotName, const char* attachmentName) const {
+	return Skeleton_getAttachmentForSlotName(skeleton, slotName, attachmentName);
+}
+bool CCSkeleton::setAttachment (const char* slotName, const char* attachmentName) {
+	return Skeleton_setAttachment(skeleton, slotName, attachmentName) ? true : false;
+}
+
+// --- CCBlendProtocol
 
 ccBlendFunc CCSkeleton::getBlendFunc () {
     return blendFunc;

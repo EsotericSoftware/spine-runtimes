@@ -33,6 +33,7 @@
 @implementation CCSkeleton
 
 @synthesize skeleton = _skeleton;
+@synthesize rootBone = _rootBone;
 @synthesize timeScale = _timeScale;
 @synthesize debugSlots = _debugSlots;
 @synthesize debugBones = _debugBones;
@@ -53,6 +54,7 @@
 	_ownsSkeletonData = ownsSkeletonData;
 
 	_skeleton = Skeleton_create(skeletonData);
+	_rootBone = _skeleton->bones[0];
 
 	_blendFunc.src = GL_ONE;
 	_blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
@@ -232,7 +234,42 @@
 	return CGRectMake(minX, minY, maxX - minX, maxY - minY);
 }
 
-// CCBlendProtocol
+// --- Convenience methods for Skeleton_* functions.
+
+- (void) updateWorldTransform {
+	Skeleton_updateWorldTransform(_skeleton);
+}
+
+- (void) setToBindPose {
+	Skeleton_setToBindPose(_skeleton);
+}
+- (void) setBonesToBindPose {
+	Skeleton_setBonesToBindPose(_skeleton);
+}
+- (void) setSlotsToBindPose {
+	Skeleton_setSlotsToBindPose(_skeleton);
+}
+
+- (Bone*) findBone:(NSString*)boneName {
+	return Skeleton_findBone(_skeleton, [boneName UTF8String]);
+}
+
+- (Slot*) findSlot:(NSString*)slotName {
+	return Skeleton_findSlot(_skeleton, [slotName UTF8String]);
+}
+
+- (bool) setSkin:(NSString*)skinName {
+	return (bool)Skeleton_setSkinByName(_skeleton, skinName ? [skinName UTF8String] : 0);
+}
+
+- (Attachment*) getAttachment:(NSString*)slotName attachmentName:(NSString*)attachmentName {
+	return Skeleton_getAttachmentForSlotName(_skeleton, [slotName UTF8String], [attachmentName UTF8String]);
+}
+- (bool) setAttachment:(NSString*)slotName attachmentName:(NSString*)attachmentName {
+	return (bool)Skeleton_setAttachment(_skeleton, [slotName UTF8String], [attachmentName UTF8String]);
+}
+
+// --- CCBlendProtocol
 
 - (void) setBlendFunc:(ccBlendFunc)func {
 	self.blendFunc = func;
