@@ -13,6 +13,10 @@ public class SkeletonImage extends Image {
 		return mVertexData;
 	}
 
+	public function updateVertices () : void {
+		onVertexDataChanged();
+	}
+
 	override public function get tinted () : Boolean {
 		return true;
 	}

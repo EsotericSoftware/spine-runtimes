@@ -1,9 +1,4 @@
 package spine {
-import spine.AnimationState;
-import spine.AnimationStateData;
-import spine.SkeletonData;
-
-import starling.events.EnterFrameEvent;
 
 public class SkeletonAnimationSprite extends SkeletonSprite {
 	public var states:Vector.<AnimationState> = new Vector.<AnimationState>();
@@ -13,12 +8,11 @@ public class SkeletonAnimationSprite extends SkeletonSprite {
 		addAnimationState();
 	}
 
-	override protected function onEnterFrame (event:EnterFrameEvent) : void {
-		super.onEnterFrame(event);
+	override public function advanceTime (time:Number) : void {
+		super.advanceTime(time);
 
-		var deltaTime:Number = event.passedTime * timeScale;
 		for each (var state:AnimationState in states) {
-			state.update(deltaTime);
+			state.update(time);
 			state.apply(skeleton);
 		}
 		skeleton.updateWorldTransform();

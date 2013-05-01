@@ -3,36 +3,27 @@ import flash.geom.Matrix;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 
-import spine.Bone;
-import spine.Skeleton;
-import spine.SkeletonData;
-import spine.Slot;
 import spine.attachments.RegionAttachment;
 
+import starling.animation.IAnimatable;
 import starling.core.RenderSupport;
 import starling.display.DisplayObject;
-import starling.events.EnterFrameEvent;
-import starling.events.Event;
-import starling.utils.MatrixUtil;
 
-public class SkeletonSprite extends DisplayObject {
+public class SkeletonSprite extends DisplayObject implements IAnimatable {
 	static private var tempPoint:Point = new Point();
 	static private var tempMatrix:Matrix = new Matrix();
 
 	private var _skeleton:Skeleton;
-	public var timeScale:Number = 1;
 
 	public function SkeletonSprite (skeletonData:SkeletonData) {
 		_skeleton = new Skeleton(skeletonData);
 		_skeleton.updateWorldTransform();
 
-		addEventListener(Event.ENTER_FRAME, onEnterFrame);
-
 		Bone.yDown = true;
 	}
 
-	protected function onEnterFrame (event:EnterFrameEvent) : void {
-		_skeleton.update(event.passedTime * timeScale);
+	public function advanceTime (time:Number) : void {
+		_skeleton.update(time);
 	}
 
 	override public function render (support:RenderSupport, alpha:Number) : void {
@@ -79,16 +70,18 @@ public class SkeletonSprite extends DisplayObject {
 				vertexData[28] = b;
 				vertexData[29] = a;
 
+				image.updateVertices();
 				support.batchQuad(image, alpha, image.texture);
 			}
 		}
 	}
 
-	override public function getBounds (targetSpace:DisplayObject, resultRect:Rectangle = null) : Rectangle {
+	override public function hitTest (localPoint:Point, forTouch:Boolean = false) : DisplayObject {
+		if (forTouch && (!visible || !touchable))
+			return null;
+
 		var minX:Number = Number.MAX_VALUE, minY:Number = Number.MAX_VALUE;
 		var maxX:Number = Number.MIN_VALUE, maxY:Number = Number.MIN_VALUE;
-		var scaleX:Number = this.scaleX;
-		var scaleY:Number = this.scaleY;
 		var slots:Vector.<Slot> = skeleton.slots;
 		var value:Number;
 		for (var i:int = 0, n:int = slots.length; i < n; i++) {
@@ -100,101 +93,81 @@ public class SkeletonSprite extends DisplayObject {
 			regionAttachment.updateVertices(slot.bone);
 			var vertices:Vector.<Number> = regionAttachment.vertices;
 
-			value = vertices[0] * scaleX;
+			value = vertices[0];
 			if (value < minX)
 				minX = value;
 			if (value > maxX)
 				maxX = value;
 
-			value = vertices[1] * scaleY;
+			value = vertices[1];
 			if (value < minY)
 				minY = value;
 			if (value > maxY)
 				maxY = value;
 
-			value = vertices[2] * scaleX;
+			value = vertices[2];
 			if (value < minX)
 				minX = value;
 			if (value > maxX)
 				maxX = value;
 
-			value = vertices[3] * scaleY;
+			value = vertices[3];
 			if (value < minY)
 				minY = value;
 			if (value > maxY)
 				maxY = value;
 
-			value = vertices[4] * scaleX;
+			value = vertices[4];
 			if (value < minX)
 				minX = value;
 			if (value > maxX)
 				maxX = value;
 
-			value = vertices[5] * scaleY;
+			value = vertices[5];
 			if (value < minY)
 				minY = value;
 			if (value > maxY)
 				maxY = value;
 
-			value = vertices[6] * scaleX;
+			value = vertices[6];
 			if (value < minX)
 				minX = value;
 			if (value > maxX)
 				maxX = value;
 
-			value = vertices[7] * scaleY;
+			value = vertices[7];
 			if (value < minY)
 				minY = value;
 			if (value > maxY)
 				maxY = value;
 		}
 
+		minX *= scaleX;
+		maxX *= scaleX;
+		minY *= scaleY;
+		maxY *= scaleY;
+		var temp:Number;
+		if (maxX < minX) {
+			temp = maxX;
+			maxX = minX;
+			minX = temp;
+		}
+		if (maxY < minY) {
+			temp = maxY;
+			maxY = minY;
+			minY = temp;
+		}
+
+		if (localPoint.x >= minX && localPoint.x < maxX && localPoint.y >= minY && localPoint.y < maxY)
+			return this;
+
+		return null;
+	}
+
+	override public function getBounds (targetSpace:DisplayObject, resultRect:Rectangle = null) : Rectangle {
 		if (!resultRect)
 			resultRect = new Rectangle();
-
-		// FIXME
 		resultRect.setTo(0, 0, 0, 0);
-		return resultRect;
-		// No idea why the below makes rendering very small. :( Returning 0,0 0x0 renders fine??
-		if (targetSpace == this) {
-			resultRect.x = minX;
-			resultRect.y = minY;
-			resultRect.width = maxX - minX;
-			resultRect.height = maxY - minY;
-		} else if (targetSpace == parent && rotation == 0.0) {
-			resultRect.x = x + minX - pivotX * scaleX;
-			resultRect.y = y + minY - pivotY * scaleY;
-			resultRect.width = (maxX - minX) * scaleX;
-			resultRect.height = (maxY - minY) * scaleY;
-			if (scaleX < 0) {
-				resultRect.width *= -1;
-				resultRect.x -= resultRect.width;
-			}
-			if (scaleY < 0) {
-				resultRect.height *= -1;
-				resultRect.y -= resultRect.height;
-			}
-		} else {
-			getTransformationMatrix(targetSpace, tempMatrix);
-			MatrixUtil.transformCoords(tempMatrix, minX, minY, tempPoint);
-			minX = tempPoint.x;
-			minY = tempPoint.y;
-			MatrixUtil.transformCoords(tempMatrix, maxX, maxY, tempPoint);
-			if (minX > tempPoint.x) {
-				maxX = minX;
-				minX = tempPoint.x;
-			} else
-				maxX = tempPoint.x;
-			if (minY > tempPoint.y) {
-				maxY = minY;
-				minY = tempPoint.y;
-			} else
-				maxY = tempPoint.y;
-			resultRect.x = minX;
-			resultRect.y = minY;
-			resultRect.width = maxX - minX;
-			resultRect.height = maxY - minY;
-		}
 		return resultRect;
 	}
 
