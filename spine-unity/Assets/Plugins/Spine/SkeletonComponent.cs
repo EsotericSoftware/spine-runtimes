@@ -141,10 +141,10 @@ public class SkeletonComponent : MonoBehaviour {
 				vertices[vertexIndex + 2] = new Vector3(regionVertices[RegionAttachment.X2], regionVertices[RegionAttachment.Y2], 0);
 				vertices[vertexIndex + 3] = new Vector3(regionVertices[RegionAttachment.X3], regionVertices[RegionAttachment.Y3], 0);
 				
-				color.r = skeleton.R * slot.R;
-				color.g = skeleton.G * slot.G;
-				color.b = skeleton.B * slot.B;
 				color.a = skeleton.A * slot.A;
+				color.r = skeleton.R * slot.R * color.a;
+				color.g = skeleton.G * slot.G * color.a;
+				color.b = skeleton.B * slot.B * color.a;
 				colors[vertexIndex] = color;
 				colors[vertexIndex + 1] = color;
 				colors[vertexIndex + 2] = color;
