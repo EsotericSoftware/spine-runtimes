@@ -199,7 +199,7 @@ public class Animation {
 		static private final int FRAME_VALUE = 1;
 
 		private int boneIndex;
-		private final float[] frames; // time, value, ...
+		private final float[] frames; // time, angle, ...
 
 		public RotateTimeline (int frameCount) {
 			super(frameCount);
@@ -268,7 +268,7 @@ public class Animation {
 		static final int FRAME_Y = 2;
 
 		int boneIndex;
-		final float[] frames; // time, value, value, ...
+		final float[] frames; // time, x, y, ...
 
 		public TranslateTimeline (int frameCount) {
 			super(frameCount);

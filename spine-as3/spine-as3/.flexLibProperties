@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<flexLibProperties includeAllClasses="true" useMultiPlatformConfig="false" version="3">
+  <includeClasses>
+    <classEntry path="spine.atlas.Atlas"/>
+    <classEntry path="spine.atlas.TextureLoader"/>
+    <classEntry path="spine.flash.SingleTextureLoader"/>
+    <classEntry path="spine.attachments.AtlasAttachmentLoader"/>
+    <classEntry path="spine.flash.SkeletonAnimationSprite"/>
+  </includeClasses>
+  <includeResources/>
+  <namespaceManifests/>
+</flexLibProperties>

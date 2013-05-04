@@ -10,7 +10,6 @@ public class AttachmentTimeline implements Timeline {
 	public function AttachmentTimeline (frameCount:int) {
 		_frameCount = frameCount;
 		frames.length = frameCount;
-		attachmentNames = new String[frameCount];
 		attachmentNames.length = frameCount;
 	}
 
@@ -35,7 +34,7 @@ public class AttachmentTimeline implements Timeline {
 			frameIndex = Animation.binarySearch(frames, time, 1) - 1;
 
 		var attachmentName:String = attachmentNames[frameIndex];
-		skeleton.slots[slotIndex].setAttachment(attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slotIndex, attachmentName));
+		skeleton.slots[slotIndex].attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slotIndex, attachmentName);
 	}
 }
 

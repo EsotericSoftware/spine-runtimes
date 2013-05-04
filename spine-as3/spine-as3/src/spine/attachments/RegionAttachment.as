@@ -1,7 +1,7 @@
 package spine.attachments {
 import spine.Bone;
 
-public class RegionAttachment extends Attachment {
+public dynamic class RegionAttachment extends Attachment {
 	public const X1:int = 0;
 	public const Y1:int = 1;
 	public const X2:int = 2;
@@ -19,7 +19,7 @@ public class RegionAttachment extends Attachment {
 	public var width:Number;
 	public var height:Number;
 
-	public var texture:Object;
+	public var rendererObject:Object;
 	public var regionOffsetX:Number; // Pixels stripped from the bottom left, unrotated.
 	public var regionOffsetY:Number;
 	public var regionWidth:Number; // Unrotated, stripped size.

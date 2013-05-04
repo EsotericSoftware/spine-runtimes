@@ -7,7 +7,7 @@ public class AtlasPage {
 	public var magFilter:TextureFilter;
 	public var uWrap:TextureWrap;
 	public var vWrap:TextureWrap;
-	public var texture:Object;
+	public var rendererObject:Object;
 	public var width:int;
 	public var height:int;
 }

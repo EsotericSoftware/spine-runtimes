@@ -1,4 +1,6 @@
 package spine {
+import flash.utils.ByteArray;
+
 import spine.animation.Animation;
 import spine.animation.AttachmentTimeline;
 import spine.animation.ColorTimeline;
@@ -26,9 +28,18 @@ public class SkeletonJson {
 		this.attachmentLoader = attachmentLoader;
 	}
 
-	public function readSkeletonData (json:String, name:String) : SkeletonData {
-		if (json == null)
-			throw new ArgumentError("json cannot be null.");
+	/** @param object A String or ByteArray. */
+	public function readSkeletonData (object:*, name:String = null) : SkeletonData {
+		if (object == null)
+			throw new ArgumentError("object cannot be null.");
+
+		var json:String;
+		if (object is String)
+			json = String(object);
+		else if (object is ByteArray)
+			json = object.readUTFBytes(object.length);
+		else
+			throw new ArgumentError("object must be a String or ByteArray.");
 
 		var skeletonData:SkeletonData = new SkeletonData();
 		skeletonData.name = name;
