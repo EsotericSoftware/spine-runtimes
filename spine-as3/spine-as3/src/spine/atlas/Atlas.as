@@ -38,11 +38,11 @@ public class Atlas {
 				page = new AtlasPage();
 				page.name = line;
 
-				page.format = Format.fromString(reader.readValue());
+				page.format = Format[reader.readValue()];
 
 				reader.readTuple(tuple);
-				page.minFilter = TextureFilter.fromString(tuple[0]);
-				page.magFilter = TextureFilter.fromString(tuple[1]);
+				page.minFilter = TextureFilter[tuple[0]];
+				page.magFilter = TextureFilter[tuple[1]];
 
 				var direction:String = reader.readValue();
 				page.uWrap = TextureWrap.clampToEdge;

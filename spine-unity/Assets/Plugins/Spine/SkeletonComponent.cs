@@ -43,6 +43,7 @@ public class SkeletonComponent : MonoBehaviour {
 	private Vector2[] uvs;
 	private int[] triangles;
 	private int quadCount;
+	private float[] vertexPositions = new float[8];
 
 	public void Clear () {
 		GetComponent<MeshFilter>().mesh = null;
@@ -125,6 +126,7 @@ public class SkeletonComponent : MonoBehaviour {
 		}
 
 		// Setup mesh.
+		float[] vertexPositions = this.vertexPositions;
 		int quadIndex = 0;
 		Color color = new Color();
 		for (int i = 0, n = drawOrder.Count; i < n; i++) {
@@ -133,13 +135,12 @@ public class SkeletonComponent : MonoBehaviour {
 			if (attachment is RegionAttachment) {
 				RegionAttachment regionAttachment = (RegionAttachment)attachment;
 				
-				regionAttachment.UpdateVertices(slot.Bone);
-				float[] regionVertices = regionAttachment.Vertices;
+				regionAttachment.ComputeVertices(slot.Bone, vertexPositions);
 				int vertexIndex = quadIndex * 4;
-				vertices[vertexIndex] = new Vector3(regionVertices[RegionAttachment.X1], regionVertices[RegionAttachment.Y1], 0);
-				vertices[vertexIndex + 1] = new Vector3(regionVertices[RegionAttachment.X4], regionVertices[RegionAttachment.Y4], 0);
-				vertices[vertexIndex + 2] = new Vector3(regionVertices[RegionAttachment.X2], regionVertices[RegionAttachment.Y2], 0);
-				vertices[vertexIndex + 3] = new Vector3(regionVertices[RegionAttachment.X3], regionVertices[RegionAttachment.Y3], 0);
+				vertices[vertexIndex] = new Vector3(vertexPositions[RegionAttachment.X1], vertexPositions[RegionAttachment.Y1], 0);
+				vertices[vertexIndex + 1] = new Vector3(vertexPositions[RegionAttachment.X4], vertexPositions[RegionAttachment.Y4], 0);
+				vertices[vertexIndex + 2] = new Vector3(vertexPositions[RegionAttachment.X2], vertexPositions[RegionAttachment.Y2], 0);
+				vertices[vertexIndex + 3] = new Vector3(vertexPositions[RegionAttachment.X3], vertexPositions[RegionAttachment.Y3], 0);
 				
 				color.a = skeleton.A * slot.A;
 				color.r = skeleton.R * slot.R * color.a;

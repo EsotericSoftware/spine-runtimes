@@ -11,16 +11,6 @@ public class AttachmentType {
 		this.ordinal = ordinal;
 		this.name = name;
 	}
-
-	static public function valueOf (name:String) : AttachmentType {
-		switch (name) {
-		case "region":
-			return region;
-		case "regionSequence":
-			return regionSequence;
-		}
-		return null;
-	}
 }
 
 }

@@ -173,7 +173,7 @@ namespace Spine {
 
 		public void Dispose () {
 			for (int i = 0, n = pages.Count; i < n; i++)
-				textureLoader.Unload(pages[i].texture);
+				textureLoader.Unload(pages[i].rendererObject);
 		}
 	}
 
@@ -210,7 +210,7 @@ namespace Spine {
 		public TextureFilter magFilter;
 		public TextureWrap uWrap;
 		public TextureWrap vWrap;
-		public Object texture;
+		public Object rendererObject;
 		public int width, height;
 	}
 

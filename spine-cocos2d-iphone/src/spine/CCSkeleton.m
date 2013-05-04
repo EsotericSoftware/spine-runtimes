@@ -143,7 +143,7 @@
 		Slot* slot = _skeleton->slots[i];
 		if (!slot->attachment || slot->attachment->type != ATTACHMENT_REGION) continue;
 		RegionAttachment* attachment = (RegionAttachment*)slot->attachment;
-		CCTextureAtlas* regionTextureAtlas = (CCTextureAtlas*)attachment->texture;
+		CCTextureAtlas* regionTextureAtlas = (CCTextureAtlas*)attachment->rendererObject;
 		if (regionTextureAtlas != textureAtlas) {
 			if (textureAtlas) {
 				[textureAtlas drawQuads];

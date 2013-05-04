@@ -8,7 +8,7 @@
 /**/
 
 void _AtlasPage_createTexture (AtlasPage* self, const char* path) {
-	self->texture = 0;
+	self->rendererObject = 0;
 	self->width = 123;
 	self->height = 456;
 }

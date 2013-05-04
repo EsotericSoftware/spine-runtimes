@@ -117,7 +117,7 @@ public class SkeletonJson {
 	private function readAttachment (skin:Skin, name:String, map:Object) : Attachment {
 		name = map["name"] || name;
 
-		var type:AttachmentType = AttachmentType.valueOf(map["type"] || "region");
+		var type:AttachmentType = AttachmentType[map["type"] || "region"];
 		var attachment:Attachment = attachmentLoader.newAttachment(skin, type, name);
 
 		if (attachment is RegionAttachment) {

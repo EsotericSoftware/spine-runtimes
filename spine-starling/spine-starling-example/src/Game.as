@@ -43,9 +43,9 @@ public class Game extends Sprite {
 		skeleton.setAnimationStateData(stateData);
 		skeleton.x = 320;
 		skeleton.y = 420;
-		/*skeleton.setAnimation("walk", true);
+		skeleton.setAnimation("walk", true);
 		skeleton.addAnimation("jump", false, 3);
-		skeleton.addAnimation("walk", true);*/
+		skeleton.addAnimation("walk", true);
 
 		addChild(skeleton);
 		Starling.juggler.add(skeleton);

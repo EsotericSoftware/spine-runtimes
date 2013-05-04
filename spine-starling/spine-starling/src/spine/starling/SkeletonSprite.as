@@ -19,12 +19,15 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 	static private var tempMatrix:Matrix = new Matrix();
 
 	private var _skeleton:Skeleton;
+	private var vertices:Vector.<Number> = new Vector.<Number>();
 
 	public function SkeletonSprite (skeletonData:SkeletonData) {
 		Bone.yDown = true;
 
 		_skeleton = new Skeleton(skeletonData);
 		_skeleton.updateWorldTransform();
+		
+		vertices.length = 8;
 	}
 
 	public function advanceTime (delta:Number) : void {
@@ -37,8 +40,8 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 			var slot:Slot = drawOrder[i];
 			var regionAttachment:RegionAttachment = slot.attachment as RegionAttachment;
 			if (regionAttachment != null) {
-				regionAttachment.updateVertices(slot.bone);
-				var vertices:Vector.<Number> = regionAttachment.vertices;
+				var vertices:Vector.<Number> = this.vertices;
+				regionAttachment.updateVertices(slot.bone, vertices);
 				var r:Number = skeleton.r * slot.r;
 				var g:Number = skeleton.g * slot.g;
 				var b:Number = skeleton.b * slot.b;
@@ -95,8 +98,8 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 			if (!regionAttachment)
 				continue;
 
-			regionAttachment.updateVertices(slot.bone);
-			var vertices:Vector.<Number> = regionAttachment.vertices;
+			var vertices:Vector.<Number> = this.vertices;
+			regionAttachment.updateVertices(slot.bone, vertices);
 
 			value = vertices[0];
 			if (value < minX)

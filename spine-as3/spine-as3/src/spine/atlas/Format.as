@@ -16,26 +16,6 @@ public class Format {
 		this.ordinal = ordinal;
 		this.name = name;
 	}
-
-	static public function fromString (name:String) : Format {
-		switch (name.toLowerCase()) {
-		case "alpha":
-			return alpha;
-		case "intensity":
-			return intensity;
-		case "luminanceAlpha":
-			return luminanceAlpha;
-		case "rgb565":
-			return rgb565;
-		case "rgba4444":
-			return rgba4444;
-		case "rgb888":
-			return rgb888;
-		case "rgba8888":
-			return rgba8888;
-		}
-		throw new ArgumentError("Unknown format: " + name);
-	}
 }
 
 }

@@ -34,14 +34,14 @@ void _AtlasPage_createTexture (AtlasPage* self, const char* path) {
 	CCTexture2D* texture = [[CCTextureCache sharedTextureCache] addImage:@(path)];
 	CCTextureAtlas* textureAtlas = [[CCTextureAtlas alloc] initWithTexture:texture capacity:4];
 	[textureAtlas retain];
-	self->texture = textureAtlas;
+	self->rendererObject = textureAtlas;
 	CGSize size = texture.contentSizeInPixels;
 	self->width = size.width;
 	self->height = size.height;
 }
 
 void _AtlasPage_disposeTexture (AtlasPage* self) {
-	[(CCTextureAtlas*)self->texture release];
+	[(CCTextureAtlas*)self->rendererObject release];
 }
 
 char* _Util_readFile (const char* path, int* length) {

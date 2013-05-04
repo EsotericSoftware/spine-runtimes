@@ -38,14 +38,14 @@ namespace spine {
 void _AtlasPage_createTexture (AtlasPage* self, const char* path) {
 	Texture* texture = new Texture();
 	if (!texture->loadFromFile(path)) return;
-	self->texture = texture;
+	self->rendererObject = texture;
 	Vector2u size = texture->getSize();
 	self->width = size.x;
 	self->height = size.y;
 }
 
 void _AtlasPage_disposeTexture (AtlasPage* self) {
-	delete (Texture*)self->texture;
+	delete (Texture*)self->rendererObject;
 }
 
 char* _Util_readFile (const char* path, int* length) {
@@ -78,12 +78,13 @@ void SkeletonDrawable::update (float deltaTime) {
 
 void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 	vertexArray->clear();
+	float vertexPositions[8];
 	for (int i = 0; i < skeleton->slotCount; ++i) {
 		Slot* slot = skeleton->slots[i];
 		Attachment* attachment = slot->attachment;
 		if (!attachment || attachment->type != ATTACHMENT_REGION) continue;
 		RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
-		RegionAttachment_updateVertices(regionAttachment, slot);
+		RegionAttachment_computeVertices(regionAttachment, slot, vertexPositions);
 
 		Uint8 r = skeleton->r * slot->r * 255;
 		Uint8 g = skeleton->g * slot->g * 255;
@@ -108,17 +109,17 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 		vertices[3].color.b = b;
 		vertices[3].color.a = a;
 
-		vertices[0].position.x = regionAttachment->vertices[VERTEX_X1];
-		vertices[0].position.y = regionAttachment->vertices[VERTEX_Y1];
-		vertices[1].position.x = regionAttachment->vertices[VERTEX_X2];
-		vertices[1].position.y = regionAttachment->vertices[VERTEX_Y2];
-		vertices[2].position.x = regionAttachment->vertices[VERTEX_X3];
-		vertices[2].position.y = regionAttachment->vertices[VERTEX_Y3];
-		vertices[3].position.x = regionAttachment->vertices[VERTEX_X4];
-		vertices[3].position.y = regionAttachment->vertices[VERTEX_Y4];
+		vertices[0].position.x = vertexPositions[VERTEX_X1];
+		vertices[0].position.y = vertexPositions[VERTEX_Y1];
+		vertices[1].position.x = vertexPositions[VERTEX_X2];
+		vertices[1].position.y = vertexPositions[VERTEX_Y2];
+		vertices[2].position.x = vertexPositions[VERTEX_X3];
+		vertices[2].position.y = vertexPositions[VERTEX_Y3];
+		vertices[3].position.x = vertexPositions[VERTEX_X4];
+		vertices[3].position.y = vertexPositions[VERTEX_Y4];
 
 		// SMFL doesn't handle batching for us, so we'll just force a single texture per skeleton.
-		states.texture = (Texture*)regionAttachment->texture;
+		states.texture = (Texture*)((AtlasRegion*)regionAttachment->rendererObject)->page->rendererObject;
 
 		Vector2u size = states.texture->getSize();
 		vertices[0].texCoords.x = regionAttachment->uvs[VERTEX_X1] * size.x;

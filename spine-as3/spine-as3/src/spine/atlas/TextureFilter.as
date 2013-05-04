@@ -16,26 +16,6 @@ public class TextureFilter {
 		this.ordinal = ordinal;
 		this.name = name;
 	}
-
-	static public function fromString (name:String) : TextureFilter {
-		switch (name.toLowerCase()) {
-		case "nearest":
-			return nearest;
-		case "linear":
-			return linear;
-		case "mipMap":
-			return mipMap;
-		case "mipMapNearestNearest":
-			return mipMapNearestNearest;
-		case "mipMapLinearNearest":
-			return mipMapLinearNearest;
-		case "mipMapNearestLinear":
-			return mipMapNearestLinear;
-		case "mipMapLinearLinear":
-			return mipMapLinearLinear;
-		}
-		throw new ArgumentError("Unknown texture filter: " + name);
-	}
 }
 
 }

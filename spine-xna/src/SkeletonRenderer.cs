@@ -35,6 +35,7 @@ namespace Spine {
 		BasicEffect effect;
 		RasterizerState rasterizerState;
 		public BlendState BlendState { get; set; }
+		float[] vertices = new float[8];
 
 		public SkeletonRenderer (GraphicsDevice device) {
 			this.device = device;
@@ -76,7 +77,7 @@ namespace Spine {
 				RegionAttachment regionAttachment = slot.Attachment as RegionAttachment;
 				if (regionAttachment != null) {
 					SpriteBatchItem item = batcher.CreateBatchItem();
-					item.Texture = (Texture2D)regionAttachment.Texture;
+					item.Texture = (Texture2D)regionAttachment.RendererObject;
 
 					byte r = (byte)(skeleton.R * slot.R * 255);
 					byte g = (byte)(skeleton.G * slot.G * 255);
@@ -99,8 +100,8 @@ namespace Spine {
 					item.vertexTR.Color.B = b;
 					item.vertexTR.Color.A = a;
 
-					regionAttachment.UpdateVertices(slot.Bone);
-					float[] vertices = regionAttachment.Vertices;
+					float[] vertices = this.vertices;
+					regionAttachment.ComputeVertices(slot.Bone, vertices);
 					item.vertexTL.Position.X = vertices[RegionAttachment.X1];
 					item.vertexTL.Position.Y = vertices[RegionAttachment.Y1];
 					item.vertexTL.Position.Z = 0;

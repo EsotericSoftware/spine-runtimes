@@ -12,18 +12,6 @@ public class TextureWrap {
 		this.ordinal = ordinal;
 		this.name = name;
 	}
-
-	static public function fromString (name:String) : TextureWrap {
-		switch (name.toLowerCase()) {
-		case "mirroredRepeat":
-			return mirroredRepeat;
-		case "clampToEdge":
-			return clampToEdge;
-		case "repeat":
-			return repeat;
-		}
-		throw new ArgumentError("Unknown texture wrap: " + name);
-	}
 }
 
 }

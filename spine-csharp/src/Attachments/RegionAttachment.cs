@@ -45,7 +45,7 @@ namespace Spine {
 		public float Width { get; set; }
 		public float Height { get; set; }
 
-		public Object Texture { get; set; }
+		public Object RendererObject { get; set; }
 		public float RegionOffsetX { get; set; }
 		public float RegionOffsetY { get; set; } // Pixels stripped from the bottom left, unrotated.
 		public float RegionWidth { get; set; }
@@ -54,13 +54,11 @@ namespace Spine {
 		public float RegionOriginalHeight { get; set; } // Unrotated, unstripped size.
 
 		public float[] Offset { get; private set; }
-		public float[] Vertices { get; private set; }
 		public float[] UVs { get; private set; }
 
 		public RegionAttachment (string name)
 			: base(name) {
 			Offset = new float[8];
-			Vertices = new float[8];
 			UVs = new float[8];
 			ScaleX = 1;
 			ScaleY = 1;
@@ -124,14 +122,13 @@ namespace Spine {
 			offset[Y4] = localYCos + localX2Sin;
 		}
 
-		public void UpdateVertices (Bone bone) {
+		public void ComputeVertices (Bone bone, float[] vertices) {
 			float x = bone.WorldX;
 			float y = bone.WorldY;
 			float m00 = bone.M00;
 			float m01 = bone.M01;
 			float m10 = bone.M10;
 			float m11 = bone.M11;
-			float[] vertices = Vertices;
 			float[] offset = Offset;
 			vertices[X1] = offset[X1] * m00 + offset[Y1] * m01 + x;
 			vertices[Y1] = offset[X1] * m10 + offset[Y1] * m11 + y;

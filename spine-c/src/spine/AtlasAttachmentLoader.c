@@ -41,7 +41,7 @@ Attachment* _AtlasAttachmentLoader_newAttachment (AttachmentLoader* loader, Skin
 			return 0;
 		}
 		attachment = RegionAttachment_create(name);
-		attachment->texture = region->page->texture;
+		attachment->rendererObject = region;
 		RegionAttachment_setUVs(attachment, region->u, region->v, region->u2, region->v2, region->rotate);
 		attachment->regionOffsetX = region->offsetX;
 		attachment->regionOffsetY = region->offsetY;

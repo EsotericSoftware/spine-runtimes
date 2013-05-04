@@ -27,12 +27,13 @@ public dynamic class RegionAttachment extends Attachment {
 	public var regionOriginalWidth:Number; // Unrotated, unstripped size.
 	public var regionOriginalHeight:Number;
 
-	public var vertices:Vector.<Number> = new Vector.<Number>();
 	public var offset:Vector.<Number> = new Vector.<Number>();
 	public var uvs:Vector.<Number> = new Vector.<Number>();
 
 	public function RegionAttachment (name:String) {
 		super(name);
+		offset.length = 8;
+		uvs.length = 8;
 	}
 
 	public function setUVs (u:Number, v:Number, u2:Number, v2:Number, rotate:Boolean) : void {
@@ -85,7 +86,7 @@ public dynamic class RegionAttachment extends Attachment {
 		offset[Y4] = localYCos + localX2Sin;
 	}
 
-	public function updateVertices (bone:Bone) : void {
+	public function updateVertices (bone:Bone, vertices:Vector.<Number>) : void {
 		var x:Number = bone.worldX;
 		var y:Number = bone.worldY;
 		var m00:Number = bone.m00;
