@@ -1,4 +1,7 @@
-package spine {
+package spine.starling {
+	import spine.AnimationState;
+	import spine.AnimationStateData;
+	import spine.SkeletonData;
 
 public class SkeletonAnimationSprite extends SkeletonSprite {
 	public var states:Vector.<AnimationState> = new Vector.<AnimationState>();

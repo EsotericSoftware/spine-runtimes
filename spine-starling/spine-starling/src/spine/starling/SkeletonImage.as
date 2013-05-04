@@ -1,4 +1,4 @@
-package spine {
+package spine.starling {
 
 import starling.display.Image;
 import starling.textures.Texture;

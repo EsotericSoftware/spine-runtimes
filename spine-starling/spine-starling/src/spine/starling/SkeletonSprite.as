@@ -1,4 +1,4 @@
-package spine {
+package spine.starling {
 import flash.geom.Matrix;
 import flash.geom.Point;
 import flash.geom.Rectangle;
@@ -9,6 +9,10 @@ import starling.animation.IAnimatable;
 import starling.core.RenderSupport;
 import starling.display.DisplayObject;
 import starling.utils.MatrixUtil;
+import spine.Bone;
+import spine.Skeleton;
+import spine.SkeletonData;
+import spine.Slot;
 
 public class SkeletonSprite extends DisplayObject implements IAnimatable {
 	static private var tempPoint:Point = new Point();
@@ -17,14 +21,14 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 	private var _skeleton:Skeleton;
 
 	public function SkeletonSprite (skeletonData:SkeletonData) {
+		Bone.yDown = true;
+
 		_skeleton = new Skeleton(skeletonData);
 		_skeleton.updateWorldTransform();
-
-		Bone.yDown = true;
 	}
 
-	public function advanceTime (time:Number) : void {
-		_skeleton.update(time);
+	public function advanceTime (delta:Number) : void {
+		_skeleton.update(delta);
 	}
 
 	override public function render (support:RenderSupport, alpha:Number) : void {
@@ -40,7 +44,7 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 				var b:Number = skeleton.b * slot.b;
 				var a:Number = skeleton.a * slot.a;
 
-				var image:SkeletonImage = regionAttachment.texture as SkeletonImage;
+				var image:SkeletonImage = regionAttachment.rendererObject as SkeletonImage;
 				var vertexData:Vector.<Number> = image.vertexData.rawData;
 
 				vertexData[0] = vertices[2];

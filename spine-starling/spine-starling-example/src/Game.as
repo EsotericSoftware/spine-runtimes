@@ -1,9 +1,10 @@
 package {
 
 import spine.AnimationStateData;
-import spine.SkeletonAnimationSprite;
 import spine.SkeletonData;
-import spine.StarlingSkeletonJson;
+import spine.SkeletonJson;
+import spine.starling.SkeletonAnimationSprite;
+import spine.starling.StarlingAtlasAttachmentLoader;
 
 import starling.core.Starling;
 import starling.display.Sprite;
@@ -30,7 +31,7 @@ public class Game extends Sprite {
 		var xml:XML = XML(new SpineboyAtlasXml());
 		var atlas:TextureAtlas = new TextureAtlas(texture, xml);
 
-		var json:StarlingSkeletonJson = new StarlingSkeletonJson(atlas);
+		var json:SkeletonJson = new SkeletonJson(new StarlingAtlasAttachmentLoader(atlas));
 		var skeletonData:SkeletonData = json.readSkeletonData(new SpineboyJson());
 
 		var stateData:AnimationStateData = new AnimationStateData(skeletonData);
@@ -42,9 +43,9 @@ public class Game extends Sprite {
 		skeleton.setAnimationStateData(stateData);
 		skeleton.x = 320;
 		skeleton.y = 420;
-		skeleton.setAnimation("walk", true);
+		/*skeleton.setAnimation("walk", true);
 		skeleton.addAnimation("jump", false, 3);
-		skeleton.addAnimation("walk", true);
+		skeleton.addAnimation("walk", true);*/
 
 		addChild(skeleton);
 		Starling.juggler.add(skeleton);

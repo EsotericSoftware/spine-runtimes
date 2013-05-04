@@ -1,4 +1,4 @@
-package spine {
+package spine.starling {
 import spine.Bone;
 import spine.Skin;
 import spine.attachments.Attachment;
@@ -22,7 +22,7 @@ public class StarlingAtlasAttachmentLoader implements AttachmentLoader {
 		if (type == AttachmentType.region) {
 			var regionAttachment:RegionAttachment = new RegionAttachment(name);
 			var texture:Texture = atlas.getTexture(name);
-			regionAttachment.texture = new SkeletonImage(texture);
+			regionAttachment.rendererObject = new SkeletonImage(texture);
 			regionAttachment.regionOffsetX = texture.frame.x;
 			regionAttachment.regionOffsetY = texture.frame.y;
 			regionAttachment.regionWidth = texture.width;
