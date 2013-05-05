@@ -55,7 +55,7 @@ function Slot.new (slotData, skeleton, bone)
 		return self.skeleton.time - self.attachmentTime
 	end
 
-	function self:setToBindPose ()
+	function self:setToSetupPose ()
 		local data = self.data
 
 		self:setColor(data.r, data.g, data.b, data.a)
@@ -67,7 +67,7 @@ function Slot.new (slotData, skeleton, bone)
 		self:setAttachment(attachment)
 	end
 
-	self:setToBindPose()
+	self:setToSetupPose()
 
 	return self
 end

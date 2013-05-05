@@ -20,7 +20,7 @@ skeleton.flipX = false
 skeleton.flipY = false
 skeleton.debug = true -- Omit or set to false to not draw debug lines on top of the images.
 if name == "goblins" then skeleton:setSkin("goblingirl") end
-skeleton:setToBindPose()
+skeleton:setToSetupPose()
 
 local lastTime = 0
 local animationTime = 0

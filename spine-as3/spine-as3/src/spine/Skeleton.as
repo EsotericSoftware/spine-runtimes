@@ -42,20 +42,20 @@ public class Skeleton {
 			bone.updateWorldTransform(flipX, flipY);
 	}
 
-	/** Sets the bones and slots to their bind pose values. */
-	public function setToBindPose () : void {
-		setBonesToBindPose();
-		setSlotsToBindPose();
+	/** Sets the bones and slots to their setup pose values. */
+	public function setToSetupPose () : void {
+		setBonesToSetupPose();
+		setSlotsToSetupPose();
 	}
 
-	public function setBonesToBindPose () : void {
+	public function setBonesToSetupPose () : void {
 		for each (var bone:Bone in _bones)
-			bone.setToBindPose();
+			bone.setToSetupPose();
 	}
 
-	public function setSlotsToBindPose () : void {
+	public function setSlotsToSetupPose () : void {
 		for each (var slot:Slot in _slots)
-			slot.setToBindPose();
+			slot.setToSetupPose();
 	}
 
 	public function get data () : SkeletonData {

@@ -68,7 +68,7 @@ public class MixTest extends ApplicationAdapter {
 		jumpAnimation = skeletonData.findAnimation("jump");
 
 		skeleton = new Skeleton(skeletonData);
-		skeleton.setToBindPose();
+		skeleton.setToSetupPose();
 
 		final Bone root = skeleton.getRootBone();
 		root.x = -50;

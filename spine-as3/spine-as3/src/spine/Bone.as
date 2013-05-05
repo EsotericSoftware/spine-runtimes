@@ -27,7 +27,7 @@ public class Bone {
 			throw new ArgumentError("data cannot be null.");
 		_data = data;
 		_parent = parent;
-		setToBindPose();
+		setToSetupPose();
 	}
 
 	/** Computes the world SRT using the parent bone and the local SRT. */
@@ -66,7 +66,7 @@ public class Bone {
 		}
 	}
 
-	public function setToBindPose () : void {
+	public function setToSetupPose () : void {
 		x = _data.x;
 		y = _data.y;
 		rotation = _data.rotation;

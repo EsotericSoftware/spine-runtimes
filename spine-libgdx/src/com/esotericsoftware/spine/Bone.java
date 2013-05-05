@@ -47,7 +47,7 @@ public class Bone {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
 		this.data = data;
 		this.parent = parent;
-		setToBindPose();
+		setToSetupPose();
 	}
 
 	/** Copy constructor.
@@ -95,7 +95,7 @@ public class Bone {
 		}
 	}
 
-	public void setToBindPose () {
+	public void setToSetupPose () {
 		BoneData data = this.data;
 		x = data.x;
 		y = data.y;

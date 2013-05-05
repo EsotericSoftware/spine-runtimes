@@ -41,7 +41,7 @@ skeleton.flipX = false
 skeleton.flipY = false
 skeleton.debugBones = true -- Omit or set to false to not draw debug lines on top of the images.
 skeleton.debugSlots = false
-skeleton:setToBindPose()
+skeleton:setToSetupPose()
 
 local animationTime = 0
 function love.update (delta)

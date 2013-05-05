@@ -22,7 +22,7 @@ public class Slot {
 		_data = data;
 		_skeleton = skeleton;
 		_bone = bone;
-		setToBindPose();
+		setToSetupPose();
 	}
 
 	public function get data () : SlotData {
@@ -58,7 +58,7 @@ public class Slot {
 		return skeleton.time - _attachmentTime;
 	}
 
-	public function setToBindPose () : void {
+	public function setToSetupPose () : void {
 		var slotIndex:int = skeleton.data.slots.indexOf(data);
 		r = _data.r;
 		g = _data.g;

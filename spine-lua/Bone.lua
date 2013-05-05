@@ -65,7 +65,7 @@ function Bone.new (data, parent)
 		end
 	end
 
-	function self:setToBindPose ()
+	function self:setToSetupPose ()
 		local data = self.data
 		self.x = data.x
 		self.y = data.y

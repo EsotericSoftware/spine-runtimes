@@ -54,7 +54,7 @@ void Slot_setAttachment (Slot* self, Attachment* attachment);
 void Slot_setAttachmentTime (Slot* self, float time);
 float Slot_getAttachmentTime (const Slot* self);
 
-void Slot_setToBindPose (Slot* self);
+void Slot_setToSetupPose (Slot* self);
 
 #ifdef __cplusplus
 }

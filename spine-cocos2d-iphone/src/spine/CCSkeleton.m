@@ -240,14 +240,14 @@
 	Skeleton_updateWorldTransform(_skeleton);
 }
 
-- (void) setToBindPose {
-	Skeleton_setToBindPose(_skeleton);
+- (void) setToSetupPose {
+	Skeleton_setToSetupPose(_skeleton);
 }
-- (void) setBonesToBindPose {
-	Skeleton_setBonesToBindPose(_skeleton);
+- (void) setBonesToSetupPose {
+	Skeleton_setBonesToSetupPose(_skeleton);
 }
-- (void) setSlotsToBindPose {
-	Skeleton_setSlotsToBindPose(_skeleton);
+- (void) setSlotsToSetupPose {
+	Skeleton_setSlotsToSetupPose(_skeleton);
 }
 
 - (Bone*) findBone:(NSString*)boneName {

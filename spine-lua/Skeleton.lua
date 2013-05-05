@@ -44,20 +44,20 @@ function Skeleton.new (skeletonData)
 		end
 	end
 
-	function self:setToBindPose ()
-		self:setBonesToBindPose()
-		self:setSlotsToBindPose()
+	function self:setToSetupPose ()
+		self:setBonesToSetupPose()
+		self:setSlotsToSetupPose()
 	end
 
-	function self:setBonesToBindPose ()
+	function self:setBonesToSetupPose ()
 		for i,bone in ipairs(self.bones) do
-			bone:setToBindPose()
+			bone:setToSetupPose()
 		end
 	end
 
-	function self:setSlotsToBindPose ()
+	function self:setSlotsToSetupPose ()
 		for i,slot in ipairs(self.slots) do
-			slot:setToBindPose()
+			slot:setToSetupPose()
 		end
 	end
 

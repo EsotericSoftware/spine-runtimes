@@ -30,7 +30,7 @@ namespace Spine {
 	public class SkeletonData {
 		public String Name { get; set; }
 		public List<BoneData> Bones { get; private set; } // Ordered parents first.
-		public List<SlotData> Slots { get; private set; } // Bind pose draw order.
+		public List<SlotData> Slots { get; private set; } // Setup pose draw order.
 		public List<Skin> Skins { get; private set; }
 		/** May be null. */
 		public Skin DefaultSkin;

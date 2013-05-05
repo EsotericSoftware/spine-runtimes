@@ -80,22 +80,22 @@ namespace Spine {
 				bones[i].UpdateWorldTransform(flipX, flipY);
 		}
 
-		/** Sets the bones and slots to their bind pose values. */
-		public void SetToBindPose () {
-			SetBonesToBindPose();
-			SetSlotsToBindPose();
+		/** Sets the bones and slots to their setup pose values. */
+		public void SetToSetupPose () {
+			SetBonesToSetupPose();
+			SetSlotsToSetupPose();
 		}
 
-		public void SetBonesToBindPose () {
+		public void SetBonesToSetupPose () {
 			List<Bone> bones = this.Bones;
 			for (int i = 0, n = bones.Count; i < n; i++)
-				bones[i].SetToBindPose();
+				bones[i].SetToSetupPose();
 		}
 
-		public void SetSlotsToBindPose () {
+		public void SetSlotsToSetupPose () {
 			List<Slot> slots = this.Slots;
 			for (int i = 0, n = slots.Count; i < n; i++)
-				slots[i].SetToBindPose(i);
+				slots[i].SetToSetupPose(i);
 		}
 
 		/** @return May be null. */

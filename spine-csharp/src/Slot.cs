@@ -64,10 +64,10 @@ namespace Spine {
 			Data = data;
 			Skeleton = skeleton;
 			Bone = bone;
-			SetToBindPose();
+			SetToSetupPose();
 		}
 
-		internal void SetToBindPose (int slotIndex) {
+		internal void SetToSetupPose (int slotIndex) {
 			R = Data.R;
 			G = Data.G;
 			B = Data.B;
@@ -75,8 +75,8 @@ namespace Spine {
 			Attachment = Data.AttachmentName == null ? null : Skeleton.GetAttachment(slotIndex, Data.AttachmentName);
 		}
 
-		public void SetToBindPose () {
-			SetToBindPose(Skeleton.Data.Slots.IndexOf(Data));
+		public void SetToSetupPose () {
+			SetToSetupPose(Skeleton.Data.Slots.IndexOf(Data));
 		}
 
 		override public String ToString () {

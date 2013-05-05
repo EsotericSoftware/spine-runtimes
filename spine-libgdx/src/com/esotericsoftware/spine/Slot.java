@@ -52,7 +52,7 @@ public class Slot {
 		this.skeleton = skeleton;
 		this.bone = bone;
 		color = new Color();
-		setToBindPose();
+		setToSetupPose();
 	}
 
 	/** Copy constructor. */
@@ -105,13 +105,13 @@ public class Slot {
 		return skeleton.time - attachmentTime;
 	}
 
-	void setToBindPose (int slotIndex) {
+	void setToSetupPose (int slotIndex) {
 		color.set(data.color);
 		setAttachment(data.attachmentName == null ? null : skeleton.getAttachment(slotIndex, data.attachmentName));
 	}
 
-	public void setToBindPose () {
-		setToBindPose(skeleton.data.slots.indexOf(data, true));
+	public void setToSetupPose () {
+		setToSetupPose(skeleton.data.slots.indexOf(data, true));
 	}
 
 	public String toString () {

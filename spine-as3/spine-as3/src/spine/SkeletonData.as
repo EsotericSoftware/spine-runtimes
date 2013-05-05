@@ -4,7 +4,7 @@ import spine.animation.Animation;
 public class SkeletonData {
 	public var name:String;
 	public var bones:Vector.<BoneData> = new Vector.<BoneData>(); // Ordered parents first.
-	public var slots:Vector.<SlotData> = new Vector.<SlotData>(); // Bind pose draw order.
+	public var slots:Vector.<SlotData> = new Vector.<SlotData>(); // Setup pose draw order.
 	public var skins:Vector.<Skin> = new Vector.<Skin>();
 	public var defaultSkin:Skin;
 	public var animations:Vector.<Animation> = new Vector.<Animation>();

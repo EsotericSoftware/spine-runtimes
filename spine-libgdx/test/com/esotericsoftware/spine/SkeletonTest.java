@@ -88,7 +88,7 @@ public class SkeletonTest extends ApplicationAdapter {
 
 		skeleton = new Skeleton(skeletonData);
 		if (name.equals("goblins")) skeleton.setSkin("goblin");
-		skeleton.setToBindPose();
+		skeleton.setToSetupPose();
 		skeleton = new Skeleton(skeleton);
 
 		Bone root = skeleton.getRootBone();
@@ -103,7 +103,7 @@ public class SkeletonTest extends ApplicationAdapter {
 				if (keycode == Keys.SPACE) {
 					if (name.equals("goblins")) {
 						skeleton.setSkin(skeleton.getSkin().getName().equals("goblin") ? "goblingirl" : "goblin");
-						skeleton.setSlotsToBindPose();
+						skeleton.setSlotsToSetupPose();
 					}
 				}
 				return true;

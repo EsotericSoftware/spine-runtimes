@@ -64,7 +64,7 @@ namespace Spine {
 			SkeletonJson json = new SkeletonJson(atlas);
 			skeleton = new Skeleton(json.ReadSkeletonData("data/" + name + ".json"));
 			if (name == "goblins") skeleton.SetSkin("goblingirl");
-			skeleton.SetSlotsToBindPose(); // Without this the skin attachments won't be attached. See SetSkin.
+			skeleton.SetSlotsToSetupPose(); // Without this the skin attachments won't be attached. See SetSkin.
 
 			// Define mixing between animations.
 			AnimationStateData stateData = new AnimationStateData(skeleton.Data);

@@ -96,11 +96,11 @@ public class SkeletonComponent : MonoBehaviour {
 		if (skinName == null || skinName.Length == 0) {
 			if (skeleton.Skin != null) {
 				skeleton.SetSkin((Skin)null);
-				skeleton.SetSlotsToBindPose();
+				skeleton.SetSlotsToSetupPose();
 			}
 		} else if (skeleton.Skin == null || skinName != skeleton.Skin.Name) {
 			skeleton.SetSkin(skinName);
-			skeleton.SetSlotsToBindPose();
+			skeleton.SetSlotsToSetupPose();
 		}
 
 		UpdateAnimation();

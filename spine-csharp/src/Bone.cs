@@ -52,7 +52,7 @@ namespace Spine {
 			if (data == null) throw new ArgumentNullException("data cannot be null.");
 			Data = data;
 			Parent = parent;
-			SetToBindPose();
+			SetToSetupPose();
 		}
 
 		/** Computes the world SRT using the parent bone and the local SRT. */
@@ -92,7 +92,7 @@ namespace Spine {
 			}
 		}
 
-		public void SetToBindPose () {
+		public void SetToSetupPose () {
 			BoneData data = Data;
 			X = data.X;
 			Y = data.Y;

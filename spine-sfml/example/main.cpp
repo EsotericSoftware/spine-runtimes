@@ -50,7 +50,7 @@ void spineboy () {
 	Skeleton* skeleton = drawable->skeleton;
 	skeleton->flipX = false;
 	skeleton->flipY = false;
-	Skeleton_setToBindPose(skeleton);
+	Skeleton_setToSetupPose(skeleton);
 
 	skeleton->root->x = 320;
 	skeleton->root->y = 420;
@@ -108,7 +108,7 @@ void goblins () {
 	skeleton->flipX = false;
 	skeleton->flipY = false;
 	Skeleton_setSkinByName(skeleton, "goblin");
-	Skeleton_setSlotsToBindPose(skeleton);
+	Skeleton_setSlotsToSetupPose(skeleton);
 //	Skeleton_setAttachment(skeleton, "left hand item", "dagger");
 
 	skeleton->root->x = 320;

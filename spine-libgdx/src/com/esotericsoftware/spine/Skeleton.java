@@ -101,22 +101,22 @@ public class Skeleton {
 			bones.get(i).updateWorldTransform(flipX, flipY);
 	}
 
-	/** Sets the bones and slots to their bind pose values. */
-	public void setToBindPose () {
-		setBonesToBindPose();
-		setSlotsToBindPose();
+	/** Sets the bones and slots to their setup pose values. */
+	public void setToSetupPose () {
+		setBonesToSetupPose();
+		setSlotsToSetupPose();
 	}
 
-	public void setBonesToBindPose () {
+	public void setBonesToSetupPose () {
 		Array<Bone> bones = this.bones;
 		for (int i = 0, n = bones.size; i < n; i++)
-			bones.get(i).setToBindPose();
+			bones.get(i).setToSetupPose();
 	}
 
-	public void setSlotsToBindPose () {
+	public void setSlotsToSetupPose () {
 		Array<Slot> slots = this.slots;
 		for (int i = 0, n = slots.size; i < n; i++)
-			slots.get(i).setToBindPose(i);
+			slots.get(i).setToSetupPose(i);
 	}
 
 	public SkeletonData getData () {

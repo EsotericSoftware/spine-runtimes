@@ -229,14 +229,14 @@ void CCSkeleton::updateWorldTransform () {
 	Skeleton_updateWorldTransform(skeleton);
 }
 
-void CCSkeleton::setToBindPose () {
-	Skeleton_setToBindPose(skeleton);
+void CCSkeleton::setToSetupPose () {
+	Skeleton_setToSetupPose(skeleton);
 }
-void CCSkeleton::setBonesToBindPose () {
-	Skeleton_setBonesToBindPose(skeleton);
+void CCSkeleton::setBonesToSetupPose () {
+	Skeleton_setBonesToSetupPose(skeleton);
 }
-void CCSkeleton::setSlotsToBindPose () {
-	Skeleton_setSlotsToBindPose(skeleton);
+void CCSkeleton::setSlotsToSetupPose () {
+	Skeleton_setSlotsToSetupPose(skeleton);
 }
 
 Bone* CCSkeleton::findBone (const char* boneName) const {

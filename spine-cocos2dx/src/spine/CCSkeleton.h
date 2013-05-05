@@ -59,9 +59,9 @@ public:
 	// --- Convenience methods for common Skeleton_* functions.
 	void updateWorldTransform ();
 
-	void setToBindPose ();
-	void setBonesToBindPose ();
-	void setSlotsToBindPose ();
+	void setToSetupPose ();
+	void setBonesToSetupPose ();
+	void setSlotsToSetupPose ();
 
 	/* Returns 0 if the bone was not found. */
 	Bone* findBone (const char* boneName) const;
