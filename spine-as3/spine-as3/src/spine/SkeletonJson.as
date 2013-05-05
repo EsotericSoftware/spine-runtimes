@@ -147,13 +147,13 @@ public class SkeletonJson {
 			var boneMap:Object = bones[boneName];
 
 			for (var timelineName:Object in boneMap) {
-				var timelineMap:Object = boneMap[timelineName];
+				var values:Array = boneMap[timelineName];
 				if (timelineName == TIMELINE_ROTATE) {
-					var timeline:RotateTimeline = new RotateTimeline(count(timelineMap));
+					var timeline:RotateTimeline = new RotateTimeline(values.length);
 					timeline.boneIndex = boneIndex;
 
 					var frameIndex:int = 0;
-					for each (var valueMap:Object in timelineMap) {
+					for each (var valueMap:Object in values) {
 						timeline.setFrame(frameIndex, valueMap["time"], valueMap["angle"]);
 						readCurve(timeline, frameIndex, valueMap);
 						frameIndex++;
@@ -165,15 +165,15 @@ public class SkeletonJson {
 					var timeline1:TranslateTimeline;
 					var timelineScale:Number = 1;
 					if (timelineName == TIMELINE_SCALE)
-						timeline1 = new ScaleTimeline(count(timelineMap));
+						timeline1 = new ScaleTimeline(values.length);
 					else {
-						timeline1 = new TranslateTimeline(count(timelineMap));
+						timeline1 = new TranslateTimeline(values.length);
 						timelineScale = scale;
 					}
 					timeline1.boneIndex = boneIndex;
 
 					var frameIndex1:int = 0;
-					for each (var valueMap1:Object in timelineMap) {
+					for each (var valueMap1:Object in values) {
 						var x:Number = (valueMap1["x"] || 0) * timelineScale;
 						var y:Number = (valueMap1["y"] || 0) * timelineScale;
 						timeline1.setFrame(frameIndex1, valueMap1["time"], x, y);
@@ -194,13 +194,13 @@ public class SkeletonJson {
 			var slotIndex:int = skeletonData.findSlotIndex(slotName);
 
 			for (var timelineName2:Object in boneMap) {
-				var timelineMap2:Object = boneMap[timelineName2];
+				var values2:Object = boneMap[timelineName2];
 				if (timelineName2 == TIMELINE_COLOR) {
-					var timeline2:ColorTimeline = new ColorTimeline(count(timelineMap2));
+					var timeline2:ColorTimeline = new ColorTimeline(values2.length);
 					timeline2.slotIndex = slotIndex;
 
 					var frameIndex2:int = 0;
-					for each (var valueMap2:Object in timelineMap2) {
+					for each (var valueMap2:Object in values2) {
 						var color:String = valueMap["color"];
 						var r:Number = toColor(color, 0);
 						var g:Number = toColor(color, 1);
@@ -214,11 +214,11 @@ public class SkeletonJson {
 					duration = Math.max(duration, timeline2.frames[timeline2.frameCount * 5 - 5]);
 
 				} else if (timelineName2 == TIMELINE_ATTACHMENT) {
-					var timeline3:AttachmentTimeline = new AttachmentTimeline(count(timelineMap2));
+					var timeline3:AttachmentTimeline = new AttachmentTimeline(values2.length);
 					timeline3.slotIndex = slotIndex;
 
 					var frameIndex3:int = 0;
-					for each (var valueMap3:Object in timelineMap2) {
+					for each (var valueMap3:Object in values2) {
 						timeline3.setFrame(frameIndex3++, valueMap3["time"], valueMap3["name"]);
 					}
 					timelines.push(timeline);
@@ -247,13 +247,6 @@ public class SkeletonJson {
 		if (hexString.length != 8)
 			throw new ArgumentError("Color hexidecimal length must be 8, recieved: " + hexString);
 		return parseInt(hexString.substring(colorIndex * 2, 2), 16) / 255;
-	}
-
-	static private function count (map:Object) : int {
-		var count:int = 0;
-		for (var key:String in map)
-			count++;
-		return count;
 	}
 }
 
