@@ -135,7 +135,7 @@ void CCSkeleton::draw () {
 		Slot* slot = skeleton->slots[i];
 		if (!slot->attachment || slot->attachment->type != ATTACHMENT_REGION) continue;
 		RegionAttachment* attachment = (RegionAttachment*)slot->attachment;
-		CCTextureAtlas* regionTextureAtlas = (CCTextureAtlas*)((AtlasRegion*)attachment->rendererObject)->page->rendererObject;
+		CCTextureAtlas* regionTextureAtlas = getTextureAtlas(attachment);
 		if (regionTextureAtlas != textureAtlas) {
 			if (textureAtlas) {
 				textureAtlas->drawQuads();
@@ -190,6 +190,10 @@ void CCSkeleton::draw () {
 			if (i == 0) ccDrawColor4B(0, 255, 0, 255);
 		}
 	}
+}
+
+CCTextureAtlas* CCSkeleton::getTextureAtlas (RegionAttachment* regionAttachment) const {
+	return (CCTextureAtlas*)((AtlasRegion*)regionAttachment->rendererObject)->page->rendererObject;
 }
 
 CCRect CCSkeleton::boundingBox () {

@@ -143,7 +143,7 @@
 		Slot* slot = _skeleton->slots[i];
 		if (!slot->attachment || slot->attachment->type != ATTACHMENT_REGION) continue;
 		RegionAttachment* attachment = (RegionAttachment*)slot->attachment;
-		CCTextureAtlas* regionTextureAtlas = (CCTextureAtlas*)attachment->rendererObject;
+		CCTextureAtlas* regionTextureAtlas = [self getTextureAtlas:attachment];
 		if (regionTextureAtlas != textureAtlas) {
 			if (textureAtlas) {
 				[textureAtlas drawQuads];
@@ -198,6 +198,10 @@
 			if (i == 0) ccDrawColor4B(0, 255, 0, 255);
 		}
 	}
+}
+
+- (CCTextureAtlas*) getTextureAtlas:(RegionAttachment*)regionAttachment {
+	return (CCTextureAtlas*)((AtlasRegion*)regionAttachment->rendererObject)->page->rendererObject;
 }
 
 - (CGRect) boundingBox {

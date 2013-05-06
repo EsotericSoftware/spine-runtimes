@@ -53,6 +53,8 @@ Draws a skeleton.
 - (id) initWithFile:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale;
 - (id) initWithFile:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile scale:(float)scale;
 
+- (CCTextureAtlas*) getTextureAtlas:(RegionAttachment*)regionAttachment;
+
 // --- Convenience methods for common Skeleton_* functions.
 - (void) updateWorldTransform;
 
