@@ -38,7 +38,7 @@ public class Skin {
 			var slotIndex:int = parseInt(key.substring(0, colon));
 			var name:String = key.substring(colon + 1);
 			var slot:Slot = skeleton.slots[slotIndex];
-			if (slot.attachment.name == name) {
+			if (slot.attachment && slot.attachment.name == name) {
 				var attachment:Attachment = getAttachment(slotIndex, name);
 				if (attachment != null)
 					slot.attachment = attachment;

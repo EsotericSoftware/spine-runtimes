@@ -86,7 +86,7 @@ public dynamic class RegionAttachment extends Attachment {
 		offset[Y4] = localYCos + localX2Sin;
 	}
 
-	public function updateVertices (bone:Bone, vertices:Vector.<Number>) : void {
+	public function computeVertices (bone:Bone, vertices:Vector.<Number>) : void {
 		var x:Number = bone.worldX;
 		var y:Number = bone.worldY;
 		var m00:Number = bone.m00;
