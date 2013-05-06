@@ -1,16 +1,4 @@
-<html>
-<head>
-	<meta charset="UTF-8">
-	<title>spine-js</title>
-	<script src="spine.js" language="JavaScript"></script>
-</head>
-<body>
-
-<script>
-var json = new spine.SkeletonJson(function (skin, type, name) {
-	return new spine.RegionAttachment();
-});
-var skeletonData = json.readSkeletonData({
+{
 "bones": [
 	{ "name": "root" },
 	{ "name": "hip", "parent": "root", "x": 0.64, "y": 114.41 },
@@ -796,8 +784,4 @@ var skeletonData = json.readSkeletonData({
 		}
 	}
 }
-});
-</script>
-
-</body>
-</html>
+}
