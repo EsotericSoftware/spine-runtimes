@@ -39,8 +39,8 @@ public class Bone {
 			_worldScaleY = _parent._worldScaleY * scaleY;
 			_worldRotation = _parent._worldRotation + rotation;
 		} else {
-			_worldX = x;
-			_worldY = y;
+			_worldX = flipX ? -x : x;
+			_worldY = flipY ? -y : y;
 			_worldScaleX = scaleX;
 			_worldScaleY = scaleY;
 			_worldRotation = rotation;

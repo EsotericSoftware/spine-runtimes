@@ -65,8 +65,8 @@ namespace Spine {
 				WorldScaleY = parent.WorldScaleY * ScaleY;
 				WorldRotation = parent.WorldRotation + Rotation;
 			} else {
-				WorldX = X;
-				WorldY = Y;
+				WorldX = flipX ? -X : X;
+				WorldY = flipY ? -Y : Y;
 				WorldScaleX = ScaleX;
 				WorldScaleY = ScaleY;
 				WorldRotation = Rotation;

@@ -73,8 +73,8 @@ public class Bone {
 			worldScaleY = parent.worldScaleY * scaleY;
 			worldRotation = parent.worldRotation + rotation;
 		} else {
-			worldX = x;
-			worldY = y;
+			worldX = flipX ? -x : x;
+			worldY = flipY ? -y : y;
 			worldScaleX = scaleX;
 			worldScaleY = scaleY;
 			worldRotation = rotation;
