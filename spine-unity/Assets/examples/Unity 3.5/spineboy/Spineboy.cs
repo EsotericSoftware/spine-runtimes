@@ -26,18 +26,15 @@
 using UnityEngine;
 using System.Collections;
 
-public class SpineboyComponent : MonoBehaviour {
-	public void OnMouseDown () {
-		SkeletonComponent skeletonComponent = GetComponent<SkeletonComponent>();
-		skeletonComponent.animationName = "jump";
-		skeletonComponent.loop = false;
+public class Spineboy : MonoBehaviour {
+	public void Start () {
+		SkeletonAnimation skeletonAnimation = GetComponent<SkeletonAnimation>();
+		skeletonAnimation.state.SetAnimation("walk", true);
 	}
-
-	public void Update () {
-		SkeletonComponent skeletonComponent = GetComponent<SkeletonComponent>();
-		if (!skeletonComponent.loop && skeletonComponent.state.Time >= skeletonComponent.state.Animation.Duration - 0.25) {
-			skeletonComponent.animationName = "walk";
-			skeletonComponent.loop = true;
-		}
+	
+	public void OnMouseDown () {
+		SkeletonAnimation skeletonAnimation = GetComponent<SkeletonAnimation>();
+		skeletonAnimation.state.SetAnimation("jump", false);
+		skeletonAnimation.state.AddAnimation("walk", true);
 	}
 }

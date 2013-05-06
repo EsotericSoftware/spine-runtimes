@@ -28,15 +28,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using Spine;
 
+/** Renders a skeleton. Extend to apply animations, get bones and manipulate them, etc. */
 [ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class SkeletonComponent : MonoBehaviour {
 	public SkeletonDataAsset skeletonDataAsset;
 	public Skeleton skeleton;
-	public String skinName;
-	public String animationName;
-	public bool loop;
+	public String initialSkinName;
 	public float timeScale = 1;
-	public Spine.AnimationState state;
 	private Mesh mesh;
 	private Vector3[] vertices;
 	private Color[] colors;
@@ -45,7 +43,7 @@ public class SkeletonComponent : MonoBehaviour {
 	private int quadCount;
 	private float[] vertexPositions = new float[8];
 
-	public void Clear () {
+	public virtual void Clear () {
 		GetComponent<MeshFilter>().mesh = null;
 		DestroyImmediate(mesh);
 		mesh = null;
@@ -53,25 +51,26 @@ public class SkeletonComponent : MonoBehaviour {
 		skeleton = null;
 	}
 
-	public void Initialize () {
+	public virtual void Initialize () {
 		mesh = new Mesh();
 		GetComponent<MeshFilter>().mesh = mesh;
 		mesh.name = "Skeleton Mesh";
 		mesh.hideFlags = HideFlags.HideAndDontSave;
 
-		state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());
-
 		skeleton = new Skeleton(skeletonDataAsset.GetSkeletonData(false));
+
+		if (initialSkinName != null && initialSkinName.Length > 0) {
+			skeleton.SetSkin(initialSkinName);
+			skeleton.SetSlotsToSetupPose();
+		}
 	}
 	
-	public void UpdateAnimation () {
+	public virtual void UpdateSkeleton () {
 		skeleton.Update(Time.deltaTime * timeScale);
-		state.Update(Time.deltaTime * timeScale);
-		state.Apply(skeleton);
 		skeleton.UpdateWorldTransform();
 	}
 	
-	public void Update () {
+	public virtual void Update () {
 		// Clear fields if missing information to render.
 		if (skeletonDataAsset == null || skeletonDataAsset.GetSkeletonData(false) == null) {
 			Clear();
@@ -82,28 +81,7 @@ public class SkeletonComponent : MonoBehaviour {
 		if (skeleton == null || skeleton.Data != skeletonDataAsset.GetSkeletonData(false))
 			Initialize();
 
-		// Keep AnimationState in sync with animationName and loop fields.
-		if (animationName == null || animationName.Length == 0) {
-			if (state.Animation != null) state.ClearAnimation();
-		} else if (state.Animation == null || animationName != state.Animation.Name) {
-			Spine.Animation animation = skeleton.Data.FindAnimation(animationName);
-			if (animation != null)
-				state.SetAnimation(animation, loop);
-		}
-		state.Loop = loop;
-		
-		// Keep Skeleton in sync with skinName.
-		if (skinName == null || skinName.Length == 0) {
-			if (skeleton.Skin != null) {
-				skeleton.SetSkin((Skin)null);
-				skeleton.SetSlotsToSetupPose();
-			}
-		} else if (skeleton.Skin == null || skinName != skeleton.Skin.Name) {
-			skeleton.SetSkin(skinName);
-			skeleton.SetSlotsToSetupPose();
-		}
-
-		UpdateAnimation();
+		UpdateSkeleton();
 
 		// Count quads.
 		int quadCount = 0;
@@ -176,16 +154,16 @@ public class SkeletonComponent : MonoBehaviour {
 		renderer.sharedMaterial = skeletonDataAsset.atlasAsset.material;
 	}
 
-	void OnEnable () {
+	public virtual void OnEnable () {
 		Update();
 	}
 
-	void OnDisable () {
+	public virtual void OnDisable () {
 		if (Application.isEditor)
 			Clear();
 	}
 
-	void Reset () {
+	public virtual void Reset () {
 		Update();
 	}
 }

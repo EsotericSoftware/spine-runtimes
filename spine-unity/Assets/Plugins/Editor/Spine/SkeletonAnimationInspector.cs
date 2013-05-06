@@ -27,12 +27,15 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(SkeletonComponent))]
-public class SkeletonComponentInspector : Editor {
-	private SerializedProperty skeletonDataAsset, initialSkinName, timeScale;
+[CustomEditor(typeof(SkeletonAnimation))]
+public class SkeletonAnimationInspector : Editor {
+	private SerializedProperty skeletonDataAsset, animationName, loop, useAnimationName, initialSkinName, timeScale;
 
 	void OnEnable () {
 		skeletonDataAsset = serializedObject.FindProperty("skeletonDataAsset");
+		animationName = serializedObject.FindProperty("animationName");
+		loop = serializedObject.FindProperty("loop");
+		useAnimationName = serializedObject.FindProperty("useAnimationName");
 		initialSkinName = serializedObject.FindProperty("initialSkinName");
 		timeScale = serializedObject.FindProperty("timeScale");
 	}
@@ -62,7 +65,42 @@ public class SkeletonComponentInspector : Editor {
 			EditorGUILayout.EndHorizontal();
 		
 			initialSkinName.stringValue = skinIndex == 0 ? null : skins[skinIndex];
+
+			// Animation name.
+			String[] animations = new String[component.skeleton.Data.Animations.Count + 2];
+			animations[0] = "<No Change>";
+			animations[1] = "<None>";
+			int animationIndex = useAnimationName.boolValue ? 1 : 0;
+			for (int i = 0; i < animations.Length - 2; i++) {
+				String name = component.skeleton.Data.Animations[i].Name;
+				animations[i + 2] = name;
+				if (name == animationName.stringValue) animationIndex = i + 2;
+			}
+		
+			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.LabelField("Animation");
+			EditorGUIUtility.LookLikeControls();
+			animationIndex = EditorGUILayout.Popup(animationIndex, animations);
+			EditorGUIUtility.LookLikeInspector();
+			EditorGUILayout.EndHorizontal();
+
+			if (animationIndex == 0) {
+				animationName.stringValue = null;
+				useAnimationName.boolValue = false;
+			} else if (animationIndex == 1) {
+				animationName.stringValue = null;
+				useAnimationName.boolValue = true;
+			} else {
+				animationName.stringValue = animations[animationIndex];
+				useAnimationName.boolValue = true;
+			}
 		}
+
+		// Animation loop.
+		EditorGUILayout.BeginHorizontal();
+		EditorGUILayout.LabelField("Loop");
+		loop.boolValue = EditorGUILayout.Toggle(loop.boolValue);
+		EditorGUILayout.EndHorizontal();
 
 		EditorGUILayout.PropertyField(timeScale);
 		

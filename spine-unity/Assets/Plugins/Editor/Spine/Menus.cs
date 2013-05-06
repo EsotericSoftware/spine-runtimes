@@ -32,12 +32,12 @@ using Spine;
 public class SpineEditor {
 	[MenuItem("Assets/Create/Spine Atlas")]
 	static public void CreateAtlas () {
-		CreateAsset<AtlasAsset>("New Spine Atlas");
+		CreateAsset<AtlasAsset>("New Atlas");
 	}
 	
-	[MenuItem("Assets/Create/Spine Skeleton Data")]
+	[MenuItem("Assets/Create/Spine SkeletonData")]
 	static public void CreateSkeletonData () {
-		CreateAsset<SkeletonDataAsset>("New Spine Skeleton Data");
+		CreateAsset<SkeletonDataAsset>("New SkeletonData");
 	}
 	
 	static private void CreateAsset <T> (String path) where T : ScriptableObject {
@@ -53,20 +53,39 @@ public class SpineEditor {
 		Selection.activeObject = asset;
 	}
 
-	[MenuItem("GameObject/Create Other/Spine Skeleton")]
-	static public void CreateSkeletonGameObject () {
-		GameObject gameObject = new GameObject("New Spine Skeleton", typeof(SkeletonComponent));
+	[MenuItem("GameObject/Create Other/Spine SkeletonComponent")]
+	static public void CreateSkeletonComponentGameObject () {
+		GameObject gameObject = new GameObject("New SkeletonComponent", typeof(SkeletonComponent));
+		EditorUtility.FocusProjectWindow();
+		Selection.activeObject = gameObject;
+	}
+
+	[MenuItem("GameObject/Create Other/Spine SkeletonAnimation")]
+	static public void CreateSkeletonAnimationGameObject () {
+		GameObject gameObject = new GameObject("New SkeletonAnimation", typeof(SkeletonAnimation));
 		EditorUtility.FocusProjectWindow();
 		Selection.activeObject = gameObject;
 	}
 	
-	[MenuItem("Component/Spine Skeleton")]
+	[MenuItem("Component/Spine SkeletonComponent")]
 	static public void CreateSkeletonComponent () {
 		Selection.activeGameObject.AddComponent(typeof(SkeletonComponent));
 	}
 	
-	[MenuItem("Component/Spine Skeleton", true)]
+	[MenuItem("Component/Spine SkeletonAnimation")]
+	static public void CreateSkeletonAnimation () {
+		Selection.activeGameObject.AddComponent(typeof(SkeletonAnimation));
+	}
+	
+	[MenuItem("Component/Spine SkeletonComponent", true)]
 	static public bool ValidateCreateSkeletonComponent () {
-		return Selection.activeGameObject != null && Selection.activeGameObject.GetComponent(typeof(SkeletonComponent)) == null;
+		return Selection.activeGameObject != null
+			&& Selection.activeGameObject.GetComponent(typeof(SkeletonComponent)) == null
+			&& Selection.activeGameObject.GetComponent(typeof(SkeletonAnimation)) == null;
+	}
+
+	[MenuItem("Component/Spine SkeletonAnimation", true)]
+	static public bool ValidateCreateSkeletonAnimation () {
+		return ValidateCreateSkeletonComponent();
 	}
 }
