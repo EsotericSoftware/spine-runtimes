@@ -53,23 +53,35 @@ public class SkeletonSprite extends Sprite {
 				var region:AtlasRegion = AtlasRegion(regionAttachment.rendererObject);
 				if (!wrapper) {
 					var bitmapData:BitmapData = region.page.rendererObject as BitmapData;
-					var regionData:BitmapData = new BitmapData(region.width, region.height);
-					regionData.copyPixels(bitmapData, //
-						new Rectangle(region.x, region.y, region.width, region.height), //
-						new Point());
+					var regionData:BitmapData;
+					if (region.rotate) {
+						regionData = new BitmapData(region.height, region.width);
+						regionData.copyPixels(bitmapData, //
+							new Rectangle(region.x, region.y, region.height, region.width), //
+							new Point());
+					} else {
+						regionData = new BitmapData(region.width, region.height);
+						regionData.copyPixels(bitmapData, //
+							new Rectangle(region.x, region.y, region.width, region.height), //
+							new Point());
+					}
 
 					var bitmap:Bitmap = new Bitmap(regionData);
 					bitmap.smoothing = true;
 					bitmap.x = -regionAttachment.width / 2; // Registration point.
 					bitmap.y = -regionAttachment.height / 2;
+					if (region.rotate) {
+						bitmap.rotation = 90;
+						bitmap.x += region.width;
+					}
 
 					wrapper = new Sprite();
 					wrapper.addChild(bitmap);
 					regionAttachment["wrapper"] = wrapper;
 				}
 				var bone:Bone = slot.bone;
-				var x:Number = regionAttachment.x + region.offsetX;
-				var y:Number = regionAttachment.y + region.offsetY;
+				var x:Number = regionAttachment.x - region.offsetX;
+				var y:Number = regionAttachment.y - region.offsetY;
 				wrapper.x = bone.worldX + x * bone.m00 + y * bone.m01;
 				wrapper.y = bone.worldY + x * bone.m10 + y * bone.m11;
 				wrapper.rotation = -(bone.worldRotation + regionAttachment.rotation);

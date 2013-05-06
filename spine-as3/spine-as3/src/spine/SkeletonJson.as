@@ -193,8 +193,8 @@ public class SkeletonJson {
 			var slotMap:Object = slots[slotName];
 			var slotIndex:int = skeletonData.findSlotIndex(slotName);
 
-			for (var timelineName2:Object in boneMap) {
-				var values2:Object = boneMap[timelineName2];
+			for (var timelineName2:Object in slotMap) {
+				var values2:Object = slotMap[timelineName2];
 				if (timelineName2 == TIMELINE_COLOR) {
 					var timeline2:ColorTimeline = new ColorTimeline(values2.length);
 					timeline2.slotIndex = slotIndex;

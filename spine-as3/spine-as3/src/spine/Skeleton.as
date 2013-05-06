@@ -143,7 +143,7 @@ public class Skeleton {
 	public function set skin (newSkin:Skin) : void {
 		if (skin != null && newSkin != null)
 			newSkin.attachAll(this, skin);
-		skin = newSkin;
+		_skin = newSkin;
 	}
 
 	/** @return May be null. */
@@ -181,6 +181,7 @@ public class Skeleton {
 				slot.attachment = attachment;
 				return;
 			}
+			i++;
 		}
 		throw new ArgumentError("Slot not found: " + slotName);
 	}
