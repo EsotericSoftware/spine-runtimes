@@ -51,7 +51,8 @@ char* _Util_readFile (const char* path, int* length) {
 /**/
 
 void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_T2F_Quad* quad) {
-	RegionAttachment_updateVertices(self, slot);
+	float vertices[8];
+	RegionAttachment_computeVertices(self, slot, vertices);
 
 	GLubyte r = slot->skeleton->r * slot->r * 255;
 	GLubyte g = slot->skeleton->g * slot->g * 255;
@@ -74,14 +75,14 @@ void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_
 	quad->br.colors.b = b;
 	quad->br.colors.a = a;
 
-	quad->bl.vertices.x = self->vertices[VERTEX_X1];
-	quad->bl.vertices.y = self->vertices[VERTEX_Y1];
-	quad->tl.vertices.x = self->vertices[VERTEX_X2];
-	quad->tl.vertices.y = self->vertices[VERTEX_Y2];
-	quad->tr.vertices.x = self->vertices[VERTEX_X3];
-	quad->tr.vertices.y = self->vertices[VERTEX_Y3];
-	quad->br.vertices.x = self->vertices[VERTEX_X4];
-	quad->br.vertices.y = self->vertices[VERTEX_Y4];
+	quad->bl.vertices.x = vertices[VERTEX_X1];
+	quad->bl.vertices.y = vertices[VERTEX_Y1];
+	quad->tl.vertices.x = vertices[VERTEX_X2];
+	quad->tl.vertices.y = vertices[VERTEX_Y2];
+	quad->tr.vertices.x = vertices[VERTEX_X3];
+	quad->tr.vertices.y = vertices[VERTEX_Y3];
+	quad->br.vertices.x = vertices[VERTEX_X4];
+	quad->br.vertices.y = vertices[VERTEX_Y4];
 
 	quad->bl.texCoords.u = self->uvs[VERTEX_X1];
 	quad->bl.texCoords.v = self->uvs[VERTEX_Y1];
