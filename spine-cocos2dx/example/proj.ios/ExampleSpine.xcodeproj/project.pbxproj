@@ -16,6 +16,8 @@
 		2FEE8527170030A20013E4C9 /* AppDelegate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FEE8522170030A20013E4C9 /* AppDelegate.cpp */; };
 		2FEE8528170030A20013E4C9 /* ExampleLayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FEE8525170030A20013E4C9 /* ExampleLayer.cpp */; };
 		4319B8781700D68D00C1D7A9 /* libcocos2dx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4319B8771700D66C00C1D7A9 /* libcocos2dx.a */; };
+		437E40F41739397500F85A9E /* CCSkeleton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 437E40F01739397500F85A9E /* CCSkeleton.cpp */; };
+		437E40F51739397500F85A9E /* CCSkeletonAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 437E40F21739397500F85A9E /* CCSkeletonAnimation.cpp */; };
 		43BFBDE3170A709000ECBACB /* Animation.c in Sources */ = {isa = PBXBuildFile; fileRef = 43BFBDD0170A709000ECBACB /* Animation.c */; };
 		43BFBDE4170A709000ECBACB /* AnimationState.c in Sources */ = {isa = PBXBuildFile; fileRef = 43BFBDD1170A709000ECBACB /* AnimationState.c */; };
 		43BFBDE5170A709000ECBACB /* AnimationStateData.c in Sources */ = {isa = PBXBuildFile; fileRef = 43BFBDD2170A709000ECBACB /* AnimationStateData.c */; };
@@ -75,6 +77,10 @@
 		2FEE8525170030A20013E4C9 /* ExampleLayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ExampleLayer.cpp; sourceTree = "<group>"; };
 		2FEE8526170030A20013E4C9 /* ExampleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExampleLayer.h; sourceTree = "<group>"; };
 		4319B86F1700D66C00C1D7A9 /* cocos2dx.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = cocos2dx.xcodeproj; path = ../../cocos2dx/proj.ios/cocos2dx.xcodeproj; sourceTree = "<group>"; };
+		437E40F01739397500F85A9E /* CCSkeleton.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CCSkeleton.cpp; path = ../../src/spine/CCSkeleton.cpp; sourceTree = "<group>"; };
+		437E40F11739397500F85A9E /* CCSkeleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCSkeleton.h; path = ../../src/spine/CCSkeleton.h; sourceTree = "<group>"; };
+		437E40F21739397500F85A9E /* CCSkeletonAnimation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CCSkeletonAnimation.cpp; path = ../../src/spine/CCSkeletonAnimation.cpp; sourceTree = "<group>"; };
+		437E40F31739397500F85A9E /* CCSkeletonAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCSkeletonAnimation.h; path = ../../src/spine/CCSkeletonAnimation.h; sourceTree = "<group>"; };
 		43BFBDD0170A709000ECBACB /* Animation.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Animation.c; path = "../../../spine-c/src/spine/Animation.c"; sourceTree = "<group>"; };
 		43BFBDD1170A709000ECBACB /* AnimationState.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = AnimationState.c; path = "../../../spine-c/src/spine/AnimationState.c"; sourceTree = "<group>"; };
 		43BFBDD2170A709000ECBACB /* AnimationStateData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = AnimationStateData.c; path = "../../../spine-c/src/spine/AnimationStateData.c"; sourceTree = "<group>"; };
@@ -241,6 +247,10 @@
 			children = (
 				43BFBE07170A70C800ECBACB /* spine-cocos2dx.cpp */,
 				43BFBE08170A70C800ECBACB /* spine-cocos2dx.h */,
+				437E40F01739397500F85A9E /* CCSkeleton.cpp */,
+				437E40F11739397500F85A9E /* CCSkeleton.h */,
+				437E40F21739397500F85A9E /* CCSkeletonAnimation.cpp */,
+				437E40F31739397500F85A9E /* CCSkeletonAnimation.h */,
 			);
 			name = "spine-cocos2dx";
 			sourceTree = "<group>";
@@ -410,6 +420,8 @@
 				43BFBDF3170A709000ECBACB /* Slot.c in Sources */,
 				43BFBDF4170A709000ECBACB /* SlotData.c in Sources */,
 				43BFBE09170A70C800ECBACB /* spine-cocos2dx.cpp in Sources */,
+				437E40F41739397500F85A9E /* CCSkeleton.cpp in Sources */,
+				437E40F51739397500F85A9E /* CCSkeletonAnimation.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
