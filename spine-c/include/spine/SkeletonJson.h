@@ -33,7 +33,6 @@
 #include <spine/Animation.h>
 
 #ifdef __cplusplus
-namespace spine {
 extern "C" {
 #endif
 
@@ -51,7 +50,6 @@ SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* jso
 SkeletonData* SkeletonJson_readSkeletonDataFile (SkeletonJson* self, const char* path);
 
 #ifdef __cplusplus
-}
 }
 #endif
 

@@ -27,10 +27,6 @@
 #include <math.h>
 #include <spine/extension.h>
 
-#ifdef __cplusplus
-namespace spine {
-#endif
-
 RegionAttachment* RegionAttachment_create (const char* name) {
 	RegionAttachment* self = NEW(RegionAttachment);
 	self->scaleX = 1;
@@ -106,7 +102,3 @@ void RegionAttachment_computeVertices (RegionAttachment* self, Slot* slot, float
 	vertices[VERTEX_X4] = offset[VERTEX_X4] * bone->m00 + offset[VERTEX_Y4] * bone->m01 + bone->worldX;
 	vertices[VERTEX_Y4] = offset[VERTEX_X4] * bone->m10 + offset[VERTEX_Y4] * bone->m11 + bone->worldY;
 }
-
-#ifdef __cplusplus
-}
-#endif

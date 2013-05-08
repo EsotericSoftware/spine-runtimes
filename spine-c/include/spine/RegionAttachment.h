@@ -31,7 +31,6 @@
 #include <spine/Slot.h>
 
 #ifdef __cplusplus
-namespace spine {
 extern "C" {
 #endif
 
@@ -59,7 +58,6 @@ void RegionAttachment_updateOffset (RegionAttachment* self);
 void RegionAttachment_computeVertices (RegionAttachment* self, Slot* slot, float* vertices);
 
 #ifdef __cplusplus
-}
 }
 #endif
 

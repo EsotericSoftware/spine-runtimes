@@ -27,7 +27,6 @@
 #define SPINE_ANIMATION_H_
 
 #ifdef __cplusplus
-namespace spine {
 extern "C" {
 #endif
 
@@ -131,7 +130,6 @@ AttachmentTimeline* AttachmentTimeline_create (int frameCount);
 void AttachmentTimeline_setFrame (AttachmentTimeline* self, int frameIndex, float time, const char* attachmentName);
 
 #ifdef __cplusplus
-}
 }
 #endif
 

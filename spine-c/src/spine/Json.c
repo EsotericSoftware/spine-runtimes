@@ -29,10 +29,6 @@
 #include <ctype.h>
 #include <spine/extension.h>
 
-#ifdef __cplusplus
-namespace spine {
-#endif
-
 static const char* ep;
 
 const char* Json_getError (void) {
@@ -373,7 +369,3 @@ int Json_getInt (Json* value, const char* name, int defaultValue) {
 	value = Json_getItem(value, name);
 	return value ? (int)value->valuefloat : defaultValue;
 }
-
-#ifdef __cplusplus
-}
-#endif

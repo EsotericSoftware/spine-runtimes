@@ -26,10 +26,6 @@
 #include <spine/AtlasAttachmentLoader.h>
 #include <spine/extension.h>
 
-#ifdef __cplusplus
-namespace spine {
-#endif
-
 Attachment* _AtlasAttachmentLoader_newAttachment (AttachmentLoader* loader, Skin* skin, AttachmentType type, const char* name) {
 	AtlasAttachmentLoader* self = SUB_CAST(AtlasAttachmentLoader, loader);
 	switch (type) {
@@ -63,7 +59,3 @@ AtlasAttachmentLoader* AtlasAttachmentLoader_create (Atlas* atlas) {
 	self->atlas = atlas;
 	return self;
 }
-
-#ifdef __cplusplus
-}
-#endif

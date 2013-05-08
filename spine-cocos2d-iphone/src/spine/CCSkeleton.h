@@ -26,10 +26,6 @@
 #import <spine/spine.h>
 #import "cocos2d.h"
 
-#ifdef __cplusplus
-using namespace spine;
-#endif
-
 /**
 Draws a skeleton.
 */

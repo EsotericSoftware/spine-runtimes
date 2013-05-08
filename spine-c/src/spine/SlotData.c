@@ -26,10 +26,6 @@
 #include <spine/SlotData.h>
 #include <spine/extension.h>
 
-#ifdef __cplusplus
-namespace spine {
-#endif
-
 SlotData* SlotData_create (const char* name, BoneData* boneData) {
 	SlotData* self = NEW(SlotData);
 	MALLOC_STR(self->name, name);
@@ -54,7 +50,3 @@ void SlotData_setAttachmentName (SlotData* self, const char* attachmentName) {
 	else
 		CONST_CAST(char*, self->attachmentName) = 0;
 }
-
-#ifdef __cplusplus
-}
-#endif

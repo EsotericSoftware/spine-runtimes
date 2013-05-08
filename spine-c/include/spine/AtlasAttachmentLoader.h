@@ -30,7 +30,6 @@
 #include <spine/Atlas.h>
 
 #ifdef __cplusplus
-namespace spine {
 extern "C" {
 #endif
 
@@ -42,7 +41,6 @@ typedef struct {
 AtlasAttachmentLoader* AtlasAttachmentLoader_create (Atlas* atlas);
 
 #ifdef __cplusplus
-}
 }
 #endif
 

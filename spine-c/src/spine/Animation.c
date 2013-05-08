@@ -27,10 +27,6 @@
 #include <math.h>
 #include <spine/extension.h>
 
-#ifdef __cplusplus
-namespace spine {
-#endif
-
 Animation* Animation_create (const char* name, int timelineCount) {
 	Animation* self = NEW(Animation);
 	MALLOC_STR(self->name, name);
@@ -497,7 +493,3 @@ void AttachmentTimeline_setFrame (AttachmentTimeline* self, int frameIndex, floa
 	else
 		self->attachmentNames[frameIndex] = 0;
 }
-
-#ifdef __cplusplus
-}
-#endif

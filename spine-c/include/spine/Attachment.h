@@ -27,7 +27,6 @@
 #define SPINE_ATTACHMENT_H_
 
 #ifdef __cplusplus
-namespace spine {
 extern "C" {
 #endif
 
@@ -48,7 +47,6 @@ struct Attachment {
 void Attachment_dispose (Attachment* self);
 
 #ifdef __cplusplus
-}
 }
 #endif
 

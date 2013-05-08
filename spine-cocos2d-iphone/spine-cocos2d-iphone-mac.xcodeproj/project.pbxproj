@@ -157,6 +157,8 @@
 		43C32A36170D0A4D004A9460 /* spineboy.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 43C32A30170D0A4D004A9460 /* spineboy.atlas */; };
 		43C32A37170D0A4D004A9460 /* spineboy.json in Resources */ = {isa = PBXBuildFile; fileRef = 43C32A31170D0A4D004A9460 /* spineboy.json */; };
 		43C32A38170D0A4D004A9460 /* spineboy.png in Resources */ = {isa = PBXBuildFile; fileRef = 43C32A32170D0A4D004A9460 /* spineboy.png */; };
+		43D3163A173ACAE00028AA22 /* CCSkeleton.m in Sources */ = {isa = PBXBuildFile; fileRef = 43D31637173ACAE00028AA22 /* CCSkeleton.m */; };
+		43D3163B173ACAE00028AA22 /* CCSkeletonAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = 43D31639173ACAE00028AA22 /* CCSkeletonAnimation.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -470,6 +472,10 @@
 		43C32A30170D0A4D004A9460 /* spineboy.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = spineboy.atlas; sourceTree = "<group>"; };
 		43C32A31170D0A4D004A9460 /* spineboy.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = spineboy.json; sourceTree = "<group>"; };
 		43C32A32170D0A4D004A9460 /* spineboy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spineboy.png; sourceTree = "<group>"; };
+		43D31636173ACAE00028AA22 /* CCSkeleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCSkeleton.h; path = src/spine/CCSkeleton.h; sourceTree = "<group>"; };
+		43D31637173ACAE00028AA22 /* CCSkeleton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CCSkeleton.m; path = src/spine/CCSkeleton.m; sourceTree = "<group>"; };
+		43D31638173ACAE00028AA22 /* CCSkeletonAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCSkeletonAnimation.h; path = src/spine/CCSkeletonAnimation.h; sourceTree = "<group>"; };
+		43D31639173ACAE00028AA22 /* CCSkeletonAnimation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CCSkeletonAnimation.m; path = src/spine/CCSkeletonAnimation.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -952,6 +958,10 @@
 			children = (
 				43BFBE0D170A778A00ECBACB /* spine-cocos2d-iphone.m */,
 				43BFBE0E170A778A00ECBACB /* spine-cocos2d-iphone.h */,
+				43D31636173ACAE00028AA22 /* CCSkeleton.h */,
+				43D31637173ACAE00028AA22 /* CCSkeleton.m */,
+				43D31638173ACAE00028AA22 /* CCSkeletonAnimation.h */,
+				43D31639173ACAE00028AA22 /* CCSkeletonAnimation.m */,
 			);
 			name = "spine-cocos2d-iphone";
 			path = ..;
@@ -1183,6 +1193,8 @@
 				43BFBE0F170A778A00ECBACB /* spine-cocos2d-iphone.m in Sources */,
 				43C32A1B170B1295004A9460 /* AppDelegate.m in Sources */,
 				43C32A20170B1295004A9460 /* main.m in Sources */,
+				43D3163A173ACAE00028AA22 /* CCSkeleton.m in Sources */,
+				43D3163B173ACAE00028AA22 /* CCSkeletonAnimation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -27,7 +27,6 @@
 #define SPINE_BONEDATA_H_
 
 #ifdef __cplusplus
-namespace spine {
 extern "C" {
 #endif
 
@@ -45,7 +44,6 @@ BoneData* BoneData_create (const char* name, BoneData* parent);
 void BoneData_dispose (BoneData* self);
 
 #ifdef __cplusplus
-}
 }
 #endif
 

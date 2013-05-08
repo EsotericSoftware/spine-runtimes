@@ -29,7 +29,6 @@
 #include <spine/BoneData.h>
 
 #ifdef __cplusplus
-namespace spine {
 extern "C" {
 #endif
 
@@ -58,7 +57,6 @@ void Bone_setToSetupPose (Bone* self);
 void Bone_updateWorldTransform (Bone* self, int/*bool*/flipX, int/*bool*/flipY);
 
 #ifdef __cplusplus
-}
 }
 #endif
 

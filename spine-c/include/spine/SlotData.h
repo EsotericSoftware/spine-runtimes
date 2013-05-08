@@ -29,7 +29,6 @@
 #include <spine/BoneData.h>
 
 #ifdef __cplusplus
-namespace spine {
 extern "C" {
 #endif
 
@@ -47,7 +46,6 @@ void SlotData_dispose (SlotData* self);
 void SlotData_setAttachmentName (SlotData* self, const char* attachmentName);
 
 #ifdef __cplusplus
-}
 }
 #endif
 

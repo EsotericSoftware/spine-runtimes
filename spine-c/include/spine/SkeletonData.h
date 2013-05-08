@@ -32,7 +32,7 @@
 #include <spine/Animation.h>
 
 #ifdef __cplusplus
-namespace spine {extern "C" {
+extern "C" {
 #endif
 
 typedef struct {
@@ -64,7 +64,7 @@ Skin* SkeletonData_findSkin (const SkeletonData* self, const char* skinName);
 Animation* SkeletonData_findAnimation (const SkeletonData* self, const char* animationName);
 
 #ifdef __cplusplus
-}}
+}
 #endif
 
 #endif /* SPINE_SKELETONDATA_H_ */

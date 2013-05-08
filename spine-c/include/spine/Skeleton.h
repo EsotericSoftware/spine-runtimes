@@ -31,7 +31,6 @@
 #include <spine/Skin.h>
 
 #ifdef __cplusplus
-namespace spine {
 extern "C" {
 #endif
 
@@ -90,7 +89,6 @@ int Skeleton_setAttachment (Skeleton* self, const char* slotName, const char* at
 void Skeleton_update (Skeleton* self, float deltaTime);
 
 #ifdef __cplusplus
-}
 }
 #endif
 

@@ -30,7 +30,6 @@
 #include <spine/SkeletonData.h>
 
 #ifdef __cplusplus
-namespace spine {
 extern "C" {
 #endif
 
@@ -48,7 +47,6 @@ void AnimationStateData_setMix (AnimationStateData* self, Animation* from, Anima
 float AnimationStateData_getMix (AnimationStateData* self, Animation* from, Animation* to);
 
 #ifdef __cplusplus
-}
 }
 #endif
 

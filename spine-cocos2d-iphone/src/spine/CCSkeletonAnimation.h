@@ -27,10 +27,6 @@
 #import <spine/CCSkeleton.h>
 #import "cocos2d.h"
 
-#ifdef __cplusplus
-using namespace spine;
-#endif
-
 /**
 Draws an animated skeleton, providing a simple API for applying one or more animations and queuing animations to be played later.
 */

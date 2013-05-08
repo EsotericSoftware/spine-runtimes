@@ -26,7 +26,6 @@
 #define SPINE_JSON_H_
 
 #ifdef __cplusplus
-namespace spine {
 extern "C" {
 #endif
 
@@ -76,7 +75,6 @@ int Json_getInt (Json* json, const char* name, int defaultValue);
 const char* Json_getError (void);
 
 #ifdef __cplusplus
-}
 }
 #endif
 

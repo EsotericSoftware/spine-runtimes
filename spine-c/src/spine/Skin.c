@@ -26,10 +26,6 @@
 #include <spine/Skin.h>
 #include <spine/extension.h>
 
-#ifdef __cplusplus
-namespace spine {
-#endif
-
 typedef struct _Entry _Entry;
 struct _Entry {
 	int slotIndex;
@@ -103,7 +99,3 @@ void Skin_attachAll (const Skin* self, Skeleton* skeleton, const Skin* oldSkin) 
 		entry = entry->next;
 	}
 }
-
-#ifdef __cplusplus
-}
-#endif

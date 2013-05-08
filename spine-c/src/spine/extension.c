@@ -26,10 +26,6 @@
 #include <spine/extension.h>
 #include <stdio.h>
 
-#ifdef __cplusplus
-namespace spine {
-#endif
-
 static void* (*mallocFunc) (size_t size) = malloc;
 static void (*freeFunc) (void* ptr) = free;
 
@@ -67,7 +63,3 @@ char* _readFile (const char* path, int* length) {
 
 	return data;
 }
-
-#ifdef __cplusplus
-}
-#endif

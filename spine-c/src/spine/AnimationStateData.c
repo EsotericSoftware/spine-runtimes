@@ -26,10 +26,6 @@
 #include <spine/AnimationStateData.h>
 #include <spine/extension.h>
 
-#ifdef __cplusplus
-namespace spine {
-#endif
-
 typedef struct _ToEntry _ToEntry;
 struct _ToEntry {
 	Animation* animation;
@@ -148,7 +144,3 @@ float AnimationStateData_getMix (AnimationStateData* self, Animation* from, Anim
 	}
 	return 0;
 }
-
-#ifdef __cplusplus
-}
-#endif

@@ -28,8 +28,6 @@
 
 USING_NS_CC;
 
-namespace spine {
-
 void _AtlasPage_createTexture (AtlasPage* self, const char* path) {
 	CCTexture2D* texture = CCTextureCache::sharedTextureCache()->addImage(path);
 	CCTextureAtlas* textureAtlas = CCTextureAtlas::createWithTexture(texture, 4);
@@ -95,6 +93,4 @@ void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_
 	quad->tr.texCoords.v = self->uvs[VERTEX_Y3];
 	quad->br.texCoords.u = self->uvs[VERTEX_X4];
 	quad->br.texCoords.v = self->uvs[VERTEX_Y4];
-}
-
 }

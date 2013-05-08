@@ -33,8 +33,6 @@
 
 using namespace sf;
 
-namespace spine {
-
 void _AtlasPage_createTexture (AtlasPage* self, const char* path) {
 	Texture* texture = new Texture();
 	if (!texture->loadFromFile(path)) return;
@@ -53,6 +51,8 @@ char* _Util_readFile (const char* path, int* length) {
 }
 
 /**/
+
+namespace spine {
 
 SkeletonDrawable::SkeletonDrawable (SkeletonData* skeletonData, AnimationStateData* stateData) :
 				timeScale(1),

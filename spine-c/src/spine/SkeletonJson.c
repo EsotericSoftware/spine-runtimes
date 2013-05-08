@@ -32,10 +32,6 @@
 #include <spine/RegionAttachment.h>
 #include <spine/AtlasAttachmentLoader.h>
 
-#ifdef __cplusplus
-namespace spine {
-#endif
-
 typedef struct {
 	SkeletonJson super;
 	int ownsLoader;
@@ -415,7 +411,3 @@ SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* jso
 	Json_dispose(root);
 	return skeletonData;
 }
-
-#ifdef __cplusplus
-}
-#endif

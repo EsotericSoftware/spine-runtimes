@@ -27,10 +27,6 @@
 #include <spine/extension.h>
 #include <spine/Skeleton.h>
 
-#ifdef __cplusplus
-namespace spine {
-#endif
-
 typedef struct {
 	Slot super;
 	float attachmentTime;
@@ -81,7 +77,3 @@ void Slot_setToSetupPose (Slot* self) {
 	}
 	Slot_setAttachment(self, attachment);
 }
-
-#ifdef __cplusplus
-}
-#endif

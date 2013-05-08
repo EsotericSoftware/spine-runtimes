@@ -65,7 +65,7 @@
 	location.y -= [[director runningScene]position].y;
 	location.x -= animationNode.position.x;
 	location.y -= animationNode.position.y;
-	if (CGRectContainsPoint(skeletonNode.boundingBox, location)) NSLog(@"Clicked!");
+	if (CGRectContainsPoint(animationNode.boundingBox, location)) NSLog(@"Clicked!");
 	return YES;
 }
 #endif

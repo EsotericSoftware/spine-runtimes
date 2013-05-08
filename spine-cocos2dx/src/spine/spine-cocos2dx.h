@@ -31,10 +31,6 @@
 #include <spine/CCSkeleton.h>
 #include <spine/CCSkeletonAnimation.h>
 
-namespace spine {
-
 void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, cocos2d::ccV3F_C4B_T2F_Quad* quad);
-
-}
 
 #endif /* SPINE_COCOS2DX_H_ */

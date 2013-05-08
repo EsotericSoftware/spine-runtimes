@@ -29,7 +29,6 @@
 #include <spine/AnimationStateData.h>
 
 #ifdef __cplusplus
-namespace spine {
 extern "C" {
 #endif
 
@@ -65,7 +64,6 @@ void AnimationState_clearAnimation (AnimationState* self);
 int/*bool*/AnimationState_isComplete (AnimationState* self);
 
 #ifdef __cplusplus
-}
 }
 #endif
 

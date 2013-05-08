@@ -26,10 +26,6 @@
 #include <spine/spine-cocos2d-iphone.h>
 #include <spine/extension.h>
 
-#ifdef __cplusplus
-namespace spine {
-#endif
-
 void _AtlasPage_createTexture (AtlasPage* self, const char* path) {
 	CCTexture2D* texture = [[CCTextureCache sharedTextureCache] addImage:@(path)];
 	CCTextureAtlas* textureAtlas = [[CCTextureAtlas alloc] initWithTexture:texture capacity:4];

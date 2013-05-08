@@ -31,7 +31,6 @@
 #include <spine/SlotData.h>
 
 #ifdef __cplusplus
-namespace spine {
 extern "C" {
 #endif
 
@@ -57,7 +56,6 @@ float Slot_getAttachmentTime (const Slot* self);
 void Slot_setToSetupPose (Slot* self);
 
 #ifdef __cplusplus
-}
 }
 #endif
 

@@ -89,7 +89,6 @@
 #include <spine/AttachmentLoader.h>
 
 #ifdef __cplusplus
-namespace spine {
 extern "C" {
 #endif
 
@@ -144,7 +143,6 @@ void _CurveTimeline_init (CurveTimeline* self, int frameCount, /**/
 void _CurveTimeline_deinit (CurveTimeline* self);
 
 #ifdef __cplusplus
-}
 }
 #endif
 

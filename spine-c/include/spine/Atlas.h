@@ -27,7 +27,6 @@
 #define SPINE_ATLAS_H_
 
 #ifdef __cplusplus
-namespace spine {
 extern "C" {
 #endif
 
@@ -105,7 +104,6 @@ void Atlas_dispose (Atlas* atlas);
 AtlasRegion* Atlas_findRegion (const Atlas* self, const char* name);
 
 #ifdef __cplusplus
-}
 }
 #endif
 

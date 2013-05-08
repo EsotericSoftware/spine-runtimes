@@ -29,7 +29,6 @@
 #include <spine/Attachment.h>
 
 #ifdef __cplusplus
-namespace spine {
 extern "C" {
 #endif
 
@@ -51,7 +50,6 @@ Attachment* Skin_getAttachment (const Skin* self, int slotIndex, const char* nam
 void Skin_attachAll (const Skin* self, struct Skeleton* skeleton, const Skin* oldSkin);
 
 #ifdef __cplusplus
-}
 }
 #endif
 
