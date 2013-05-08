@@ -42,16 +42,8 @@ function Bone.new (data, parent)
 			self.worldScaleY = parent.worldScaleY * self.scaleY
 			self.worldRotation = parent.worldRotation + self.rotation
 		else
-			if flipX then
-				self.worldX = -self.x
-			else
-				self.worldX = self.x
-			end
-			if flipY then
-				self.worldY = -self.y
-			else
-				self.worldY = self.y
-			end
+			self.worldX = self.x
+			self.worldY = self.y
 			self.worldScaleX = self.scaleX
 			self.worldScaleY = self.scaleY
 			self.worldRotation = self.rotation

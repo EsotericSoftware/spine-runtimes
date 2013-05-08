@@ -44,8 +44,8 @@ spine.Bone.prototype = {
 			this.worldScaleY = parent.worldScaleY * this.scaleY;
 			this.worldRotation = parent.worldRotation + this.rotation;
 		} else {
-			this.worldX = flipX ? -this.x : this.x;
-			this.worldY = flipY ? -this.y : this.y;
+			this.worldX = this.x;
+			this.worldY = this.y;
 			this.worldScaleX = this.scaleX;
 			this.worldScaleY = this.scaleY;
 			this.worldRotation = this.rotation;

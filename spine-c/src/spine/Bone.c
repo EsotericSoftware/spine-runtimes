@@ -66,8 +66,8 @@ void Bone_updateWorldTransform (Bone* self, int flipX, int flipY) {
 		CONST_CAST(float, self->worldScaleY) = self->parent->worldScaleY * self->scaleY;
 		CONST_CAST(float, self->worldRotation) = self->parent->worldRotation + self->rotation;
 	} else {
-		CONST_CAST(float, self->worldX) = flipX ? -self->x : self->x;
-		CONST_CAST(float, self->worldY) = flipY ? -self->y : self->y;
+		CONST_CAST(float, self->worldX) = self->x;
+		CONST_CAST(float, self->worldY) = self->y;
 		CONST_CAST(float, self->worldScaleX) = self->scaleX;
 		CONST_CAST(float, self->worldScaleY) = self->scaleY;
 		CONST_CAST(float, self->worldRotation) = self->rotation;
