@@ -40,7 +40,6 @@ public class SkeletonComponent : MonoBehaviour {
 	private Color[] colors;
 	private Vector2[] uvs;
 	private int[] triangles;
-	private int quadCount;
 	private float[] vertexPositions = new float[8];
 
 	public virtual void Clear () {
@@ -56,6 +55,8 @@ public class SkeletonComponent : MonoBehaviour {
 		GetComponent<MeshFilter>().mesh = mesh;
 		mesh.name = "Skeleton Mesh";
 		mesh.hideFlags = HideFlags.HideAndDontSave;
+
+		vertices = new Vector3[0];
 
 		skeleton = new Skeleton(skeletonDataAsset.GetSkeletonData(false));
 
@@ -94,13 +95,27 @@ public class SkeletonComponent : MonoBehaviour {
 		}
 
 		// Ensure mesh data is the right size.
-		if (quadCount != this.quadCount) {
-			this.quadCount = quadCount;
+		if (quadCount > vertices.Length / 4) {
 			vertices = new Vector3[quadCount * 4];
 			colors = new Color[quadCount * 4];
 			uvs = new Vector2[quadCount * 4];
 			triangles = new int[quadCount * 6];
 			mesh.Clear();
+			
+			for (int i = 0, n = quadCount; i < n; i++) {
+				int index = i * 6;
+				int vertexIndex = i * 4;
+				triangles[index] = vertexIndex;
+				triangles[index + 1] = vertexIndex + 2;
+				triangles[index + 2] = vertexIndex + 1;
+				triangles[index + 3] = vertexIndex + 2;
+				triangles[index + 4] = vertexIndex + 3;
+				triangles[index + 5] = vertexIndex + 1;
+			}
+		} else {
+			Vector3 zero = new Vector3(0, 0, 0);
+			for (int i = quadCount * 4, n = vertices.Length; i < n; i++)
+				vertices[i] = zero;
 		}
 
 		// Setup mesh.
@@ -134,14 +149,6 @@ public class SkeletonComponent : MonoBehaviour {
 				uvs[vertexIndex + 1] = new Vector2(regionUVs[RegionAttachment.X4], 1 - regionUVs[RegionAttachment.Y4]);
 				uvs[vertexIndex + 2] = new Vector2(regionUVs[RegionAttachment.X2], 1 - regionUVs[RegionAttachment.Y2]);
 				uvs[vertexIndex + 3] = new Vector2(regionUVs[RegionAttachment.X3], 1 - regionUVs[RegionAttachment.Y3]);
-
-				int index = quadIndex * 6;
-				triangles[index] = vertexIndex;
-				triangles[index + 1] = vertexIndex + 2;
-				triangles[index + 2] = vertexIndex + 1;
-				triangles[index + 3] = vertexIndex + 2;
-				triangles[index + 4] = vertexIndex + 3;
-				triangles[index + 5] = vertexIndex + 1;
 
 				quadIndex++;
 			}
