@@ -46,14 +46,20 @@ char* _Util_readFile (const char* path, int* length) {
 
 /**/
 
-void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_T2F_Quad* quad) {
+void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_T2F_Quad* quad, bool premultipliedAlpha) {
 	float vertices[8];
 	RegionAttachment_computeVertices(self, slot, vertices);
 
 	GLubyte r = slot->skeleton->r * slot->r * 255;
 	GLubyte g = slot->skeleton->g * slot->g * 255;
 	GLubyte b = slot->skeleton->b * slot->b * 255;
-	GLubyte a = slot->skeleton->a * slot->a * 255;
+	float normalizedAlpha = slot->skeleton->a * slot->a;
+	if (premultipliedAlpha) {
+		r *= normalizedAlpha;
+		g *= normalizedAlpha;
+		b *= normalizedAlpha;
+	}
+	GLubyte a = normalizedAlpha * 255;
 	quad->bl.colors.r = r;
 	quad->bl.colors.g = g;
 	quad->bl.colors.b = b;

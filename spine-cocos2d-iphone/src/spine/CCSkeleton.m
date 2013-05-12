@@ -58,6 +58,7 @@
 
 	_blendFunc.src = GL_ONE;
 	_blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
+	[self setOpacityModifyRGB:YES];
 
 	_timeScale = 1;
 
@@ -132,6 +133,11 @@
 	_skeleton->g = color.g / (float)255;
 	_skeleton->b = color.b / (float)255;
 	_skeleton->a = self.opacity / (float)255;
+	if (_premultipliedAlpha) {
+		_skeleton->r *= _skeleton->a;
+		_skeleton->g *= _skeleton->a;
+		_skeleton->b *= _skeleton->a;
+	}
 
 	CCTextureAtlas* textureAtlas = 0;
 	ccV3F_C4B_T2F_Quad quad;
@@ -153,7 +159,7 @@
 		textureAtlas = regionTextureAtlas;
 		if (textureAtlas.capacity == textureAtlas.totalQuads &&
 			![textureAtlas resizeCapacity:textureAtlas.capacity * 2]) return;
-		RegionAttachment_updateQuad(attachment, slot, &quad);
+		RegionAttachment_updateQuad(attachment, slot, &quad, _premultipliedAlpha);
 		[textureAtlas updateQuad:&quad atIndex:textureAtlas.totalQuads];
 	}
 	if (textureAtlas) {
@@ -171,7 +177,7 @@
 			Slot* slot = _skeleton->slots[i];
 			if (!slot->attachment || slot->attachment->type != ATTACHMENT_REGION) continue;
 			RegionAttachment* attachment = (RegionAttachment*)slot->attachment;
-			RegionAttachment_updateQuad(attachment, slot, &quad);
+			RegionAttachment_updateQuad(attachment, slot, &quad, _premultipliedAlpha);
 			points[0] = ccp(quad.bl.vertices.x, quad.bl.vertices.y);
 			points[1] = ccp(quad.br.vertices.x, quad.br.vertices.y);
 			points[2] = ccp(quad.tr.vertices.x, quad.tr.vertices.y);
@@ -281,6 +287,14 @@
 
 - (ccBlendFunc) blendFunc {
 	return _blendFunc;
+}
+
+- (void) setOpacityModifyRGB:(BOOL)value {
+	_premultipliedAlpha = value;
+}
+
+- (BOOL) doesOpacityModifyRGB {
+	return _premultipliedAlpha;
 }
 
 @end

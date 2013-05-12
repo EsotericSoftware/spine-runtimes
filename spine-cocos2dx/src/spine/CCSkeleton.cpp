@@ -57,6 +57,7 @@ void CCSkeleton::initialize () {
 
 	blendFunc.src = GL_ONE;
 	blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
+	setOpacityModifyRGB(true);
 
 	setShaderProgram(CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
 	scheduleUpdate();
@@ -124,6 +125,11 @@ void CCSkeleton::draw () {
 	skeleton->g = color.g / (float)255;
 	skeleton->b = color.b / (float)255;
 	skeleton->a = getOpacity() / (float)255;
+	if (premultipliedAlpha) {
+		skeleton->r *= skeleton->a;
+		skeleton->g *= skeleton->a;
+		skeleton->b *= skeleton->a;
+	}
 
 	CCTextureAtlas* textureAtlas = 0;
 	ccV3F_C4B_T2F_Quad quad;
@@ -145,7 +151,7 @@ void CCSkeleton::draw () {
 		textureAtlas = regionTextureAtlas;
 		if (textureAtlas->getCapacity() == textureAtlas->getTotalQuads() &&
 			!textureAtlas->resizeCapacity(textureAtlas->getCapacity() * 2)) return;
-		RegionAttachment_updateQuad(attachment, slot, &quad);
+		RegionAttachment_updateQuad(attachment, slot, &quad, premultipliedAlpha);
 		textureAtlas->updateQuad(&quad, textureAtlas->getTotalQuads());
 	}
 	if (textureAtlas) {
@@ -270,6 +276,14 @@ ccBlendFunc CCSkeleton::getBlendFunc () {
 
 void CCSkeleton::setBlendFunc (ccBlendFunc blendFunc) {
     this->blendFunc = blendFunc;
+}
+
+void CCSkeleton::setOpacityModifyRGB (bool value) {
+	premultipliedAlpha = value;
+}
+
+bool CCSkeleton::isOpacityModifyRGB () {
+	return premultipliedAlpha;
 }
 
 }

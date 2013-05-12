@@ -33,7 +33,7 @@ namespace spine {
 extern "C" {
 #endif
 
-void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_T2F_Quad* quad);
+void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_T2F_Quad* quad, bool premultipliedAlpha);
 
 #ifdef __cplusplus
 }

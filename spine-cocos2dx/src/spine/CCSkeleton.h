@@ -41,6 +41,7 @@ public:
 	float timeScale;
 	bool debugSlots;
 	bool debugBones;
+	bool premultipliedAlpha;
 
 	static CCSkeleton* createWithData (SkeletonData* skeletonData, bool ownsSkeletonData = false);
 	static CCSkeleton* createWithFile (const char* skeletonDataFile, Atlas* atlas, float scale = 1);
@@ -80,6 +81,8 @@ public:
 
 	// --- CCBlendProtocol
 	CC_PROPERTY(cocos2d::ccBlendFunc, blendFunc, BlendFunc);
+	virtual void setOpacityModifyRGB (bool value);
+	virtual bool isOpacityModifyRGB ();
 
 protected:
 	CCSkeleton ();

@@ -35,8 +35,9 @@ Draws a skeleton.
 	float _timeScale;
 	bool _debugSlots;
 	bool _debugBones;
+	bool _premultipliedAlpha;
 
-    ccBlendFunc _blendFunc;
+	ccBlendFunc _blendFunc;
 	bool _ownsSkeletonData;
 	Atlas* _atlas;
 }
