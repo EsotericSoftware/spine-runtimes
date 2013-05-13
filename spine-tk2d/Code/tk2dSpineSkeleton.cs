@@ -137,7 +137,10 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		mesh.colors = colors;
 		mesh.uv = uvs;
 		mesh.triangles = triangles;
-		mesh.RecalculateNormals();
+		
+		if (skeletonDataAsset.sprites.normalGenerationMode != tk2dSpriteCollection.NormalGenerationMode.None) {
+			mesh.RecalculateNormals();
+		}
 		
 		renderer.sharedMaterial = skeletonDataAsset.sprites.spriteCollection.inst.materials[0];
 	}
