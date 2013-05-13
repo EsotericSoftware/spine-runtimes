@@ -131,6 +131,8 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 			}
 		}
 		
+		mesh.Clear();
+		
 		mesh.vertices = vertices;
 		mesh.colors = colors;
 		mesh.uv = uvs;
