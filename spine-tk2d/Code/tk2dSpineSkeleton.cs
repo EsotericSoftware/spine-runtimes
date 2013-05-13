@@ -10,7 +10,7 @@ using Spine;
 [ExecuteInEditMode]
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
-public class tk2dSpineSkeleton : MonoBehaviour {
+public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionForceBuild {
 	
 	/*
 	 */
@@ -137,7 +137,7 @@ public class tk2dSpineSkeleton : MonoBehaviour {
 		mesh.triangles = triangles;
 		mesh.RecalculateNormals();
 		
-		renderer.sharedMaterial = skeletonDataAsset.sprites.spriteCollection.materials[0];
+		renderer.sharedMaterial = skeletonDataAsset.sprites.spriteCollection.inst.materials[0];
 	}
 	
 	/*
@@ -187,5 +187,16 @@ public class tk2dSpineSkeleton : MonoBehaviour {
 		// Update animation
 		state.Update(Time.deltaTime * animationSpeed);
 		state.Apply(skeleton);
+	}
+
+	public bool UsesSpriteCollection(tk2dSpriteCollectionData spriteCollection) {
+		return skeletonDataAsset.sprites.spriteCollection == spriteCollection;
+	}
+
+	public void ForceBuild() {
+		skeletonDataAsset.ForceUpdate();
+		skeleton = new Skeleton(skeletonDataAsset.GetSkeletonData());
+		
+		UpdateMesh();
 	}
 }
