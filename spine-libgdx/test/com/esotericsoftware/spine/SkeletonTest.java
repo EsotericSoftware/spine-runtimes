@@ -99,12 +99,15 @@ public class SkeletonTest extends ApplicationAdapter {
 		skeleton.updateWorldTransform();
 
 		Gdx.input.setInputProcessor(new InputAdapter() {
+			public boolean touchDown (int screenX, int screenY, int pointer, int button) {
+				keyDown(0);
+				return true;
+			}
+
 			public boolean keyDown (int keycode) {
-				if (keycode == Keys.SPACE) {
-					if (name.equals("goblins")) {
-						skeleton.setSkin(skeleton.getSkin().getName().equals("goblin") ? "goblingirl" : "goblin");
-						skeleton.setSlotsToSetupPose();
-					}
+				if (name.equals("goblins")) {
+					skeleton.setSkin(skeleton.getSkin().getName().equals("goblin") ? "goblingirl" : "goblin");
+					skeleton.setSlotsToSetupPose();
 				}
 				return true;
 			}
@@ -122,7 +125,7 @@ public class SkeletonTest extends ApplicationAdapter {
 
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
-		animation.apply(skeleton, time, true);
+		animation.apply(skeleton, time, false);
 		skeleton.updateWorldTransform();
 		skeleton.update(Gdx.graphics.getDeltaTime());
 

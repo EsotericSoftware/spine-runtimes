@@ -27,6 +27,8 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -56,6 +58,7 @@ public class AnimationStateTest extends ApplicationAdapter {
 		AnimationStateData stateData = new AnimationStateData(skeletonData);
 		stateData.setMix("walk", "jump", 0.2f);
 		stateData.setMix("jump", "walk", 0.4f);
+		stateData.setMix("jump", "jump", 0.2f);
 
 		state = new AnimationState(stateData);
 		state.setAnimation("walk", true);
@@ -67,6 +70,19 @@ public class AnimationStateTest extends ApplicationAdapter {
 		root.setY(20);
 
 		skeleton.updateWorldTransform();
+
+		Gdx.input.setInputProcessor(new InputAdapter() {
+			public boolean touchDown (int screenX, int screenY, int pointer, int button) {
+				keyDown(0);
+				return true;
+			}
+
+			public boolean keyDown (int keycode) {
+				state.setAnimation("jump", false);
+				state.addAnimation("walk", true);
+				return true;
+			}
+		});
 	}
 
 	public void render () {
