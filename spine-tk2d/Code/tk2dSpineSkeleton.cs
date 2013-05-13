@@ -137,7 +137,7 @@ public class tk2dSpineSkeleton : MonoBehaviour {
 		mesh.triangles = triangles;
 		mesh.RecalculateNormals();
 		
-		renderer.sharedMaterial = skeletonDataAsset.sprites.spriteCollection.materials[0];
+		renderer.sharedMaterial = skeletonDataAsset.sprites.spriteCollection.inst.materials[0];
 	}
 	
 	/*
