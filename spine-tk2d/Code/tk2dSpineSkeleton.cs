@@ -140,6 +140,14 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		
 		if (skeletonDataAsset.sprites.normalGenerationMode != tk2dSpriteCollection.NormalGenerationMode.None) {
 			mesh.RecalculateNormals();
+
+			if (skeletonDataAsset.sprites.normalGenerationMode == tk2dSpriteCollection.NormalGenerationMode.NormalsAndTangents) {
+				Vector4[] tangents = new Vector4[mesh.normals.Length];
+				for (int t = 0; t < tangents.Length; ++t) {
+					tangents[t] = new Vector4(1, 0, 0, 1);
+				}
+				mesh.tangents = tangents;
+			}
 		}
 		
 		renderer.sharedMaterial = skeletonDataAsset.sprites.spriteCollection.inst.materials[0];
