@@ -23,8 +23,8 @@ public class tk2dSpineAttachmentLoader : AttachmentLoader {
 		if(type != AttachmentType.region) throw new Exception("Unknown attachment type: " + type);
 		
 		tk2dSpriteDefinition attachmentParameters = null;
-		for(int i = 0; i < sprites.spriteDefinitions.Length; ++i) {
-			tk2dSpriteDefinition def = sprites.spriteDefinitions[i];
+		for(int i = 0; i < sprites.inst.spriteDefinitions.Length; ++i) {
+			tk2dSpriteDefinition def = sprites.inst.spriteDefinitions[i];
 			if(def.name == name) {
 				attachmentParameters = def;
 				break;

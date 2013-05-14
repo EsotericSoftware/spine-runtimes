@@ -68,4 +68,8 @@ public class tk2dSpineSkeletonDataAsset : ScriptableObject {
 			stateData.SetMix(fromAnimation[i],toAnimation[i],duration[i]);
 		}
 	}
+
+	public void ForceUpdate() {
+		MakeSkeletonAndAnimationData();
+	}
 }
