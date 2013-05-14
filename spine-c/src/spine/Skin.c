@@ -88,6 +88,19 @@ Attachment* Skin_getAttachment (const Skin* self, int slotIndex, const char* nam
 	return 0;
 }
 
+const char* Skin_getAttachmentName (const Skin* self, int slotIndex, int attachmentIndex) {
+	const _Entry* entry = SUB_CAST(_Internal, self) ->entries;
+	int i = 0;
+	while (entry) {
+		if (entry->slotIndex == slotIndex) {
+			if (i == attachmentIndex) return entry->name;
+			i++;
+		}
+		entry = entry->next;
+	}
+	return 0;
+}
+
 void Skin_attachAll (const Skin* self, Skeleton* skeleton, const Skin* oldSkin) {
 	const _Entry *entry = SUB_CAST(_Internal, oldSkin) ->entries;
 	while (entry) {
