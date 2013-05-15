@@ -10,18 +10,29 @@ public class tk2dSpineSkeletonDataAssetInspector : Editor {
 	
 	/*
 	 */
-	private SerializedProperty sprites;
 	private SerializedProperty skeletonJSON;
 	private SerializedProperty scale;
 	private SerializedProperty fromAnimation;
 	private SerializedProperty toAnimation;
 	private SerializedProperty duration;
 	private bool showAnimationStateData = true;
-	
+
+	private tk2dSpriteCollection sprites;
+
 	/*
 	 */
 	void OnEnable () {
-		sprites = serializedObject.FindProperty("sprites");
+		
+		tk2dSpineSkeletonDataAsset skeletonDataAsset = target as tk2dSpineSkeletonDataAsset;
+		
+		if (skeletonDataAsset != null) {
+			tk2dSpriteCollectionData spritesData = skeletonDataAsset.spritesData;
+			
+			if (spritesData != null) {
+				sprites = AssetDatabase.LoadAssetAtPath( AssetDatabase.GUIDToAssetPath(spritesData.spriteCollectionGUID), typeof(tk2dSpriteCollection) ) as tk2dSpriteCollection;
+			}
+		}
+		
 		skeletonJSON = serializedObject.FindProperty("skeletonJSON");
 		scale = serializedObject.FindProperty("scale");
 		fromAnimation = serializedObject.FindProperty("fromAnimation");
@@ -37,7 +48,22 @@ public class tk2dSpineSkeletonDataAssetInspector : Editor {
 		tk2dSpineSkeletonDataAsset asset = target as tk2dSpineSkeletonDataAsset;
 		
 		EditorGUIUtility.LookLikeInspector();
-		EditorGUILayout.PropertyField(sprites);
+		sprites = EditorGUILayout.ObjectField("Sprites", sprites, typeof(tk2dSpriteCollection), false) as tk2dSpriteCollection;
+		
+		if (sprites != null) {
+			SerializedProperty spritesData = serializedObject.FindProperty("spritesData");
+			spritesData.objectReferenceValue = sprites.spriteCollection;
+			
+			SerializedProperty normalGenerationMode = serializedObject.FindProperty("normalGenerationMode");
+			normalGenerationMode.enumValueIndex = (int)sprites.normalGenerationMode;
+		} else {
+			SerializedProperty spritesData = serializedObject.FindProperty("spritesData");
+			spritesData.objectReferenceValue = null;
+			
+			SerializedProperty normalGenerationMode = serializedObject.FindProperty("normalGenerationMode");
+			normalGenerationMode.enumValueIndex = (int)tk2dSpriteCollection.NormalGenerationMode.None;
+		}
+		
 		EditorGUILayout.PropertyField(skeletonJSON);
 		EditorGUILayout.PropertyField(scale);
 		
