@@ -32,6 +32,7 @@ public class BoneData {
 	float x, y;
 	float rotation;
 	float scaleX = 1, scaleY = 1;
+	boolean inheritScale = true, inheritRotation = true;
 
 	/** @param parent May be null. */
 	public BoneData (String name, BoneData parent) {
@@ -109,6 +110,22 @@ public class BoneData {
 
 	public void setScaleY (float scaleY) {
 		this.scaleY = scaleY;
+	}
+
+	public boolean getInheritScale () {
+		return inheritScale;
+	}
+
+	public void setInheritScale (boolean inheritScale) {
+		this.inheritScale = inheritScale;
+	}
+
+	public boolean getInheritRotation () {
+		return inheritRotation;
+	}
+
+	public void setInheritRotation (boolean inheritRotation) {
+		this.inheritRotation = inheritRotation;
 	}
 
 	public String toString () {

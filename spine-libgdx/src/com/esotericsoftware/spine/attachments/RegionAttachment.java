@@ -40,7 +40,7 @@ import com.badlogic.gdx.utils.NumberUtils;
 /** Attachment that displays a texture region. */
 public class RegionAttachment extends Attachment {
 	private TextureRegion region;
-	private float x, y, scaleX, scaleY, rotation, width, height;
+	private float x, y, scaleX = 1, scaleY = 1, rotation, width, height;
 	private final float[] vertices = new float[20];
 	private final float[] offset = new float[8];
 

@@ -98,7 +98,7 @@ public class SkeletonBinary {
 				String parentName = input.readString();
 				if (parentName != null) {
 					parent = skeletonData.findBone(parentName);
-					if (parent == null) throw new SerializationException("Bone not found: " + parentName);
+					if (parent == null) throw new SerializationException("Parent bone not found: " + parentName);
 				}
 				BoneData boneData = new BoneData(name, parent);
 				boneData.x = input.readFloat() * scale;
@@ -107,6 +107,8 @@ public class SkeletonBinary {
 				boneData.scaleY = input.readFloat();
 				boneData.rotation = input.readFloat();
 				boneData.length = input.readFloat() * scale;
+				boneData.inheritScale = input.readByte() == 1;
+				boneData.inheritRotation = input.readByte() == 1;
 				skeletonData.addBone(boneData);
 			}
 
@@ -119,6 +121,7 @@ public class SkeletonBinary {
 				SlotData slotData = new SlotData(slotName, boneData);
 				Color.rgba8888ToColor(slotData.getColor(), input.readInt());
 				slotData.setAttachmentName(input.readString());
+				slotData.additiveBlending = input.readByte() == 1;
 				skeletonData.addSlot(slotData);
 			}
 

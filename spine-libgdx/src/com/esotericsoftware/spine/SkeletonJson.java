@@ -100,6 +100,8 @@ public class SkeletonJson {
 			boneData.rotation = boneMap.getFloat("rotation", 0);
 			boneData.scaleX = boneMap.getFloat("scaleX", 1);
 			boneData.scaleY = boneMap.getFloat("scaleY", 1);
+			boneData.inheritScale = boneMap.getBoolean("inheritScale", true);
+			boneData.inheritRotation = boneMap.getBoolean("inheritRotation", true);
 			skeletonData.addBone(boneData);
 		}
 
@@ -115,6 +117,8 @@ public class SkeletonJson {
 			if (color != null) slotData.getColor().set(Color.valueOf(color));
 
 			slotData.setAttachmentName(slotMap.getString("attachment", null));
+
+			slotData.additiveBlending = slotMap.getBoolean("additive", false);
 
 			skeletonData.addSlot(slotData);
 		}

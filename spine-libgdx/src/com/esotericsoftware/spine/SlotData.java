@@ -32,6 +32,7 @@ public class SlotData {
 	final BoneData boneData;
 	final Color color = new Color(1, 1, 1, 1);
 	String attachmentName;
+	boolean additiveBlending;
 
 	SlotData () {
 		name = null;
@@ -65,6 +66,14 @@ public class SlotData {
 	/** @return May be null. */
 	public String getAttachmentName () {
 		return attachmentName;
+	}
+
+	public boolean getAdditiveBlending () {
+		return additiveBlending;
+	}
+
+	public void setAdditiveBlending (boolean additiveBlending) {
+		this.additiveBlending = additiveBlending;
 	}
 
 	public String toString () {
