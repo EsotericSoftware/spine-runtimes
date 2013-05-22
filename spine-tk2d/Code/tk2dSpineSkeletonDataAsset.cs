@@ -9,7 +9,9 @@ public class tk2dSpineSkeletonDataAsset : ScriptableObject {
 	
 	/*
 	 */
-	public tk2dSpriteCollection sprites;
+	public tk2dSpriteCollectionData spritesData;
+	public tk2dSpriteCollection.NormalGenerationMode normalGenerationMode = tk2dSpriteCollection.NormalGenerationMode.None;
+
 	public TextAsset skeletonJSON;
 	
 	public float scale = 1;
@@ -42,7 +44,7 @@ public class tk2dSpineSkeletonDataAsset : ScriptableObject {
 	/*
 	 */
 	private void MakeSkeletonAndAnimationData() {
-		if(sprites == null) {
+		if(spritesData == null) {
 			Debug.LogWarning("Sprite collection not set for skeleton data asset: " + name,this);
 			return;
 		}
@@ -52,7 +54,7 @@ public class tk2dSpineSkeletonDataAsset : ScriptableObject {
 			return;
 		}
 		
-		SkeletonJson json = new SkeletonJson(new tk2dSpineAttachmentLoader(sprites.spriteCollection));
+		SkeletonJson json = new SkeletonJson(new tk2dSpineAttachmentLoader(spritesData));
 		json.Scale = scale;
 		
 		try {
