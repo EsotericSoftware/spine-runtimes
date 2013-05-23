@@ -54,6 +54,7 @@ void CCSkeleton::initialize () {
 	atlas = 0;
 	debugSlots = false;
 	debugBones = false;
+	timeScale = 1;
 
 	blendFunc.src = GL_ONE;
 	blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
