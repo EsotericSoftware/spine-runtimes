@@ -44,7 +44,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.SerializationException;
@@ -56,7 +55,6 @@ public class SkeletonJson {
 	static public final String TIMELINE_ATTACHMENT = "attachment";
 	static public final String TIMELINE_COLOR = "color";
 
-	private final Json json = new Json();
 	private final AttachmentLoader attachmentLoader;
 	private float scale = 1;
 
@@ -217,8 +215,8 @@ public class SkeletonJson {
 					int frameIndex = 0;
 					for (JsonValue valueMap = timelineMap.child(); valueMap != null; valueMap = valueMap.next()) {
 						float time = valueMap.getFloat("time");
-						Float x = valueMap.getFloat("x"), y = valueMap.getFloat("y");
-						timeline.setFrame(frameIndex, time, x == null ? 0 : (x * timelineScale), y == null ? 0 : (y * timelineScale));
+						float x = valueMap.getFloat("x", 0), y = valueMap.getFloat("y", 0);
+						timeline.setFrame(frameIndex, time, x * timelineScale, y * timelineScale);
 						readCurve(timeline, frameIndex, valueMap);
 						frameIndex++;
 					}
@@ -234,7 +232,7 @@ public class SkeletonJson {
 			int slotIndex = skeletonData.findSlotIndex(slotMap.name());
 
 			for (JsonValue timelineMap = slotMap.child(); timelineMap != null; timelineMap = timelineMap.next()) {
-				String timelineName = (String)timelineMap.name();
+				String timelineName = timelineMap.name();
 				if (timelineName.equals(TIMELINE_COLOR)) {
 					ColorTimeline timeline = new ColorTimeline(timelineMap.size());
 					timeline.setSlotIndex(slotIndex);

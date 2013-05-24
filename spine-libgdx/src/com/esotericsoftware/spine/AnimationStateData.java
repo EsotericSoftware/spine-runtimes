@@ -25,12 +25,12 @@
 
 package com.esotericsoftware.spine;
 
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectFloatMap;
 
 /** Stores mixing times between animations. */
 public class AnimationStateData {
 	private final SkeletonData skeletonData;
-	final ObjectMap<Key, Float> animationToMixTime = new ObjectMap();
+	final ObjectFloatMap<Key> animationToMixTime = new ObjectFloatMap();
 	final Key tempKey = new Key();
 
 	public AnimationStateData (SkeletonData skeletonData) {
@@ -61,8 +61,8 @@ public class AnimationStateData {
 	public float getMix (Animation from, Animation to) {
 		tempKey.a1 = from;
 		tempKey.a2 = to;
-		Float time = animationToMixTime.get(tempKey);
-		if (time == null) return 0;
+		float time = animationToMixTime.get(tempKey, Float.MIN_VALUE);
+		if (time == Float.MIN_VALUE) return 0;
 		return time;
 	}
 

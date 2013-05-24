@@ -31,7 +31,6 @@ import com.esotericsoftware.spine.Slot;
 import static com.badlogic.gdx.graphics.g2d.SpriteBatch.*;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -101,7 +100,6 @@ public class RegionAttachment extends Attachment {
 
 	public void setRegion (TextureRegion region) {
 		if (region == null) throw new IllegalArgumentException("region cannot be null.");
-		TextureRegion oldRegion = this.region;
 		this.region = region;
 		float[] vertices = this.vertices;
 		if (region instanceof AtlasRegion && ((AtlasRegion)region).rotate) {

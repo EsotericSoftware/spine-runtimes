@@ -4,11 +4,11 @@ package com.esotericsoftware.spine;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 
+import static com.badlogic.gdx.graphics.g2d.SpriteBatch.*;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import static com.badlogic.gdx.graphics.g2d.SpriteBatch.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.Array;
@@ -22,7 +22,7 @@ public class SkeletonRendererDebug {
 		renderer = new ShapeRenderer();
 	}
 
-	public void draw (SpriteBatch batch, Skeleton skeleton) {
+	public void draw (Skeleton skeleton) {
 		Gdx.gl.glEnable(GL10.GL_BLEND);
 		renderer.begin(ShapeType.Line);
 

@@ -25,10 +25,6 @@
 
 package com.esotericsoftware.spine.attachments;
 
-import com.esotericsoftware.spine.Slot;
-
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-
 abstract public class Attachment {
 	final String name;
 

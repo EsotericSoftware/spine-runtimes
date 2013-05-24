@@ -28,12 +28,9 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class MixTest extends ApplicationAdapter {
 	SpriteBatch batch;
@@ -128,7 +125,7 @@ public class MixTest extends ApplicationAdapter {
 		renderer.draw(batch, skeleton);
 		batch.end();
 
-		debugRenderer.draw(batch, skeleton);
+		debugRenderer.draw(skeleton);
 	}
 
 	public void resize (int width, int height) {
