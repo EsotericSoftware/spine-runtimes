@@ -79,13 +79,13 @@ function spine.Skeleton.new (skeletonData, group)
 			local image = images[slot]
 			if not attachment then
 				-- Attachment is gone, remove the image.
-				if image then
+				if image and image ~= spine.Skeleton.failed then
 					image:removeSelf()
 					images[slot] = nil
 				end
 			else
 				-- Attachment image has changed.
-				if image and image.attachment ~= attachment then
+				if image and image.attachment ~= attachment and image ~= spine.Skeleton.failed then
 					image:removeSelf()
 					image = nil
 				end
