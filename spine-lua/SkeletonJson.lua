@@ -104,7 +104,7 @@ function SkeletonJson.new (attachmentLoader)
 		end
 
 		-- Skins.
-		map = root["skins"]
+		local map = root["skins"]
 		if map then
 			for skinName,skinMap in pairs(map) do
 				local skin = Skin.new(skinName)
