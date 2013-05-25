@@ -3,12 +3,7 @@ using System.IO;
 using UnityEngine;
 using Spine;
 
-/*
- */
 public class tk2dSpineSkeletonDataAsset : ScriptableObject {
-	
-	/*
-	 */
 	public tk2dSpriteCollectionData spritesData;
 	public tk2dSpriteCollection.NormalGenerationMode normalGenerationMode = tk2dSpriteCollection.NormalGenerationMode.None;
 
@@ -20,36 +15,30 @@ public class tk2dSpineSkeletonDataAsset : ScriptableObject {
 	public string[] toAnimation;
 	public float[] duration;
 	
-	/*
-	 */
 	private SkeletonData skeletonData;
 	private AnimationStateData stateData;
 	
-	/*
-	 */
 	public SkeletonData GetSkeletonData() {
-		if(skeletonData != null) return skeletonData;
+		if (skeletonData != null) return skeletonData;
 		
 		MakeSkeletonAndAnimationData();
 		return skeletonData;
 	}
 	
 	public AnimationStateData GetAnimationStateData () {
-		if(stateData != null) return stateData;
+		if (stateData != null) return stateData;
 		
 		MakeSkeletonAndAnimationData();
 		return stateData;
 	}
 	
-	/*
-	 */
 	private void MakeSkeletonAndAnimationData() {
-		if(spritesData == null) {
+		if (spritesData == null) {
 			Debug.LogWarning("Sprite collection not set for skeleton data asset: " + name,this);
 			return;
 		}
 		
-		if(skeletonJSON == null) {
+		if (skeletonJSON == null) {
 			Debug.LogWarning("Skeleton JSON file not set for skeleton data asset: " + name,this);
 			return;
 		}
@@ -65,9 +54,9 @@ public class tk2dSpineSkeletonDataAsset : ScriptableObject {
 		}
 		
 		stateData = new AnimationStateData(skeletonData);
-		for(int i = 0, n = fromAnimation.Length; i < n; i++) {
-			if(fromAnimation[i].Length == 0 || toAnimation[i].Length == 0) continue;
-			stateData.SetMix(fromAnimation[i],toAnimation[i],duration[i]);
+		for (int i = 0, n = fromAnimation.Length; i < n; i++) {
+			if (fromAnimation[i].Length == 0 || toAnimation[i].Length == 0) continue;
+			stateData.SetMix(fromAnimation[i], toAnimation[i], duration[i]);
 		}
 	}
 

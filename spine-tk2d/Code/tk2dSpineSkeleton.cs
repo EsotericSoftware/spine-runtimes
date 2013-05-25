@@ -5,15 +5,10 @@ using Spine;
 // TODO: split skeleton and animation components
 // TODO: add events in animation component
 
-/*
- */
 [ExecuteInEditMode]
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionForceBuild {
-	
-	/*
-	 */
 	public tk2dSpineSkeletonDataAsset skeletonDataAsset;
 	public Skeleton skeleton;
 	
@@ -22,8 +17,6 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 	public float animationSpeed = 1;
 	public Spine.AnimationState state;
 	
-	/*
-	 */
 	private Mesh mesh;
 	private Vector3[] vertices;
 	private Color[] colors;
@@ -32,18 +25,14 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 	private int cachedQuadCount;
 	private float[] vertexPositions;
 	
-	/*
-	 */
 	void Awake() {
 		vertexPositions = new float[8];
 	}
 	
-	/*
-	 */
-	void Update() {
+	void Update () {
 		SkeletonData skeletonData = (skeletonDataAsset != null) ? skeletonDataAsset.GetSkeletonData() : null;
 		
-		if(skeletonData == null) {
+		if (skeletonData == null) {
 			Clear();
 			return;
 		}
@@ -56,8 +45,6 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		UpdateMesh();
 	}
 	
-	/*
-	 */
 	private void Clear() {
 		GetComponent<MeshFilter>().mesh = null;
 		DestroyImmediate(mesh);
@@ -69,8 +56,6 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		state = null;
 	}
 	
-	/*
-	 */
 	private void Initialize() {
 		mesh = new Mesh();
 		GetComponent<MeshFilter>().mesh = mesh;
@@ -81,18 +66,16 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		skeleton = new Skeleton(skeletonDataAsset.GetSkeletonData());
 	}
 	
-	/*
-	 */
 	private void UpdateMesh() {
 		int quadIndex = 0;
 		int drawCount = skeleton.DrawOrder.Count;
 		Color currentColor = new Color();
 		
-		for(int i = 0; i < drawCount; i++) {
+		for (int i = 0; i < drawCount; i++) {
 			Slot slot = skeleton.DrawOrder[i];
 			Attachment attachment = slot.Attachment;
 			
-			if(attachment is RegionAttachment) {
+			if (attachment is RegionAttachment) {
 				RegionAttachment regionAttachment = attachment as RegionAttachment;
 				
 				regionAttachment.ComputeVertices(slot.Bone,vertexPositions);
@@ -143,8 +126,8 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 
 			if (skeletonDataAsset.normalGenerationMode == tk2dSpriteCollection.NormalGenerationMode.NormalsAndTangents) {
 				Vector4[] tangents = new Vector4[mesh.normals.Length];
-				for (int t = 0; t < tangents.Length; ++t) {
-					tangents[t] = new Vector4(1, 0, 0, 1);
+				for (int i = 0; i < tangents.Length; i++) {
+					tangents[i] = new Vector4(1, 0, 0, 1);
 				}
 				mesh.tangents = tangents;
 			}
@@ -153,18 +136,16 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		renderer.sharedMaterial = skeletonDataAsset.spritesData.inst.materials[0];
 	}
 	
-	/*
-	 */
 	private void UpdateCache() {
 		int quadCount = 0;
 		int drawCount = skeleton.DrawOrder.Count;
 		
-		for(int i = 0; i < drawCount; i++) {
+		for (int i = 0; i < drawCount; i++) {
 			Attachment attachment = skeleton.DrawOrder[i].Attachment;
-			if(attachment is RegionAttachment) quadCount++;
+			if (attachment is RegionAttachment) quadCount++;
 		}
 		
-		if(quadCount == cachedQuadCount) return;
+		if (quadCount == cachedQuadCount) return;
 		
 		cachedQuadCount = quadCount;
 		vertices = new Vector3[quadCount * 4];
@@ -173,17 +154,12 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		triangles = new int[quadCount * 6];
 	}
 	
-	/*
-	 */
 	private void UpdateSkeleton() {
 		skeleton.Update(Time.deltaTime * animationSpeed);
 		skeleton.UpdateWorldTransform();
 	}
 	
-	/*
-	 */
 	private void UpdateAnimation() {
-		
 		// Check if we need to stop current animation
 		if(state.Animation != null && animationName == null) {
 			state.ClearAnimation();
