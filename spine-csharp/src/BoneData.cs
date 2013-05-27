@@ -36,6 +36,8 @@ namespace Spine {
 		public float Rotation { get; set; }
 		public float ScaleX { get; set; }
 		public float ScaleY { get; set; }
+		public bool inheritScale { get; set; }
+		public bool inheritRotation { get; set; }
 
 		/** @param parent May be null. */
 		public BoneData (String name, BoneData parent) {
