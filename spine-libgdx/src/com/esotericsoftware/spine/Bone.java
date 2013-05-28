@@ -78,8 +78,8 @@ public class Bone {
 			}
 			worldRotation = data.inheritRotation ? parent.worldRotation + rotation : rotation;
 		} else {
-			worldX = x;
-			worldY = y;
+			worldX = flipX ? -x : x;
+			worldY = flipY ? -y : y;
 			worldScaleX = scaleX;
 			worldScaleY = scaleY;
 			worldRotation = rotation;

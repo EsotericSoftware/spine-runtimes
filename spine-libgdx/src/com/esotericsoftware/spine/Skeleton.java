@@ -39,6 +39,7 @@ public class Skeleton {
 	final Color color;
 	float time;
 	boolean flipX, flipY;
+	float x, y;
 
 	public Skeleton (SkeletonData data) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -254,6 +255,22 @@ public class Skeleton {
 
 	public void setFlipY (boolean flipY) {
 		this.flipY = flipY;
+	}
+
+	public float getX () {
+		return x;
+	}
+
+	public void setX (float x) {
+		this.x = x;
+	}
+
+	public float getY () {
+		return y;
+	}
+
+	public void setY (float y) {
+		this.y = y;
 	}
 
 	public float getTime () {

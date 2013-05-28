@@ -50,6 +50,7 @@ struct Skeleton {
 	float r, g, b, a;
 	float time;
 	int/*bool*/flipX, flipY;
+	float x, y;
 };
 
 Skeleton* Skeleton_create (SkeletonData* data);

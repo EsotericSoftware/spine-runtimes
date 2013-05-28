@@ -84,7 +84,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 		Attachment* attachment = slot->attachment;
 		if (!attachment || attachment->type != ATTACHMENT_REGION) continue;
 		RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
-		RegionAttachment_computeVertices(regionAttachment, slot, vertexPositions);
+		RegionAttachment_computeVertices(regionAttachment, slot->skeleton->x, slot->skeleton->y, slot->bone, vertexPositions);
 
 		Uint8 r = skeleton->r * slot->r * 255;
 		Uint8 g = skeleton->g * slot->g * 255;

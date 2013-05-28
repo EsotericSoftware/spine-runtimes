@@ -45,6 +45,8 @@ namespace Spine {
 				return Bones.Count == 0 ? null : Bones[0];
 			}
 		}
+		public float X { get; set; }
+		public float Y { get; set; }
 
 		public Skeleton (SkeletonData data) {
 			if (data == null) throw new ArgumentNullException("data cannot be null.");

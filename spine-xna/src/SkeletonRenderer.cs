@@ -101,7 +101,7 @@ namespace Spine {
 					item.vertexTR.Color.A = a;
 
 					float[] vertices = this.vertices;
-					regionAttachment.ComputeVertices(slot.Bone, vertices);
+					regionAttachment.ComputeVertices(skeleton.X, skeleton.Y, slot.Bone, vertices);
 					item.vertexTL.Position.X = vertices[RegionAttachment.X1];
 					item.vertexTL.Position.Y = vertices[RegionAttachment.Y1];
 					item.vertexTL.Position.Z = 0;

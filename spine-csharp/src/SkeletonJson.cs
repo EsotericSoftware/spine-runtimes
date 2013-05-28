@@ -83,8 +83,8 @@ namespace Spine {
 				boneData.Rotation = GetFloat(boneMap, "rotation", 0);
 				boneData.ScaleX = GetFloat(boneMap, "scaleX", 1);
 				boneData.ScaleY = GetFloat(boneMap, "scaleY", 1);
-				boneData.inheritScale = GetBoolean (boneMap, "inheritScale", true);
-				boneData.inheritRotation = GetBoolean (boneMap, "inheritRotation", true);
+				boneData.InheritScale = GetBoolean (boneMap, "inheritScale", true);
+				boneData.InheritRotation = GetBoolean (boneMap, "inheritRotation", true);
 				skeletonData.AddBone(boneData);
 			}
 

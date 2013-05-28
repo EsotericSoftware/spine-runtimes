@@ -550,6 +550,7 @@ spine.Skeleton = function (skeletonData) {
 	}
 };
 spine.Skeleton.prototype = {
+	x: 0, y: 0,
 	skin: null,
 	r: 1, g: 1, b: 1, a: 1,
 	time: 0,
@@ -725,9 +726,9 @@ spine.RegionAttachment.prototype = {
 		offset[6/*X4*/] = localX2Cos - localYSin;
 		offset[7/*Y4*/] = localYCos + localX2Sin;
 	},
-	computeVertices: function (bone, vertices) {
-		var x = bone.worldX;
-		var y = bone.worldY;
+	computeVertices: function (x, y, bone, vertices) {
+		x += bone.worldX;
+		y += bone.worldY;
 		var m00 = bone.m00;
 		var m01 = bone.m01;
 		var m10 = bone.m10;

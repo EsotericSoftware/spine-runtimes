@@ -26,6 +26,7 @@
 package com.esotericsoftware.spine.attachments;
 
 import com.esotericsoftware.spine.Bone;
+import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.Slot;
 
 import static com.badlogic.gdx.graphics.g2d.SpriteBatch.*;
@@ -130,7 +131,8 @@ public class RegionAttachment extends Attachment {
 	}
 
 	public void updateVertices (Slot slot) {
-		Color skeletonColor = slot.getSkeleton().getColor();
+		Skeleton skeleton = slot.getSkeleton();
+		Color skeletonColor = skeleton.getColor();
 		Color slotColor = slot.getColor();
 		float color = NumberUtils.intToFloatColor( //
 			((int)(255 * skeletonColor.a * slotColor.a) << 24) //
@@ -145,8 +147,8 @@ public class RegionAttachment extends Attachment {
 
 		float[] offset = this.offset;
 		Bone bone = slot.getBone();
-		float x = bone.getWorldX();
-		float y = bone.getWorldY();
+		float x = bone.getWorldX() + skeleton.getX();
+		float y = bone.getWorldY() + skeleton.getY();
 		float m00 = bone.getM00();
 		float m01 = bone.getM01();
 		float m10 = bone.getM10();

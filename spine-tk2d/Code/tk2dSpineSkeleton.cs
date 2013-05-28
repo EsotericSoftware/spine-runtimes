@@ -78,7 +78,7 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 			if (attachment is RegionAttachment) {
 				RegionAttachment regionAttachment = attachment as RegionAttachment;
 				
-				regionAttachment.ComputeVertices(slot.Bone,vertexPositions);
+				regionAttachment.ComputeVertices(skeleton.X, skeleton.Y, slot.Bone, vertexPositions);
 				int vertexIndex = quadIndex * 4;
 				
 				vertices[vertexIndex + 0] = new Vector3(vertexPositions[RegionAttachment.X1],vertexPositions[RegionAttachment.Y1],0);

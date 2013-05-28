@@ -131,7 +131,7 @@ function drawSkeleton (batch, skeleton) {
 		var slot = drawOrder[i];
 		var attachment = slot.attachment;
 		if (!(attachment instanceof spine.RegionAttachment)) continue;
-		attachment.computeVertices(slot.bone, vertices);
+		attachment.computeVertices(skeleton.x, skeleton.y, slot.bone, vertices);
 		batch.add(
 			attachment.rendererObject.page.rendererObject,
 			vertices[0], vertices[1],

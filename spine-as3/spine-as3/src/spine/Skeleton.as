@@ -14,6 +14,8 @@ public class Skeleton {
 	public var time:Number;
 	public var flipX:Boolean;
 	public var flipY:Boolean;
+	public var x:Number = 0;
+	public var y:Number = 0;
 
 	public function Skeleton (data:SkeletonData) {
 		if (data == null)
