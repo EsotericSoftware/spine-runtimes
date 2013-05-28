@@ -41,7 +41,7 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 			var regionAttachment:RegionAttachment = slot.attachment as RegionAttachment;
 			if (regionAttachment != null) {
 				var vertices:Vector.<Number> = this.vertices;
-				regionAttachment.computeVertices(slot.bone, vertices);
+				regionAttachment.computeVertices(skeleton.x, skeleton.y, slot.bone, vertices);
 				var r:Number = skeleton.r * slot.r;
 				var g:Number = skeleton.g * slot.g;
 				var b:Number = skeleton.b * slot.b;
@@ -99,7 +99,7 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 				continue;
 
 			var vertices:Vector.<Number> = this.vertices;
-			regionAttachment.computeVertices(slot.bone, vertices);
+			regionAttachment.computeVertices(skeleton.x, skeleton.y, slot.bone, vertices);
 
 			value = vertices[0];
 			if (value < minX)

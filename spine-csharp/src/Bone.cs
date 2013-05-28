@@ -61,7 +61,6 @@ namespace Spine {
 			if (parent != null) {
 				WorldX = X * parent.M00 + Y * parent.M01 + parent.WorldX;
 				WorldY = X * parent.M10 + Y * parent.M11 + parent.WorldY;
-
 				if (Data.InheritScale) {
 					WorldScaleX = parent.WorldScaleX * ScaleX;
 					WorldScaleY = parent.WorldScaleY * ScaleY;
@@ -69,13 +68,10 @@ namespace Spine {
 					WorldScaleX = ScaleX;
 					WorldScaleY = ScaleY;
 				}
-
 				WorldRotation = Data.InheritRotation ? parent.WorldRotation + Rotation : Rotation;
-
 			} else {
-
-				WorldX = X;
-				WorldY = Y;
+				WorldX = flipX ? -X : X;
+				WorldY = flipY ? -Y : Y;
 				WorldScaleX = ScaleX;
 				WorldScaleY = ScaleY;
 				WorldRotation = Rotation;

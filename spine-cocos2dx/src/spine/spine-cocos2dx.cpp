@@ -53,7 +53,7 @@ char* _Util_readFile (const char* path, int* length) {
 
 void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_T2F_Quad* quad, bool premultipliedAlpha) {
 	float vertices[8];
-	RegionAttachment_computeVertices(self, slot, vertices);
+	RegionAttachment_computeVertices(self, slot->skeleton->x, slot->skeleton->y, slot->bone, vertices);
 
 	GLubyte r = slot->skeleton->r * slot->r * 255;
 	GLubyte g = slot->skeleton->g * slot->g * 255;

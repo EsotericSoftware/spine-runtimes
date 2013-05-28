@@ -212,7 +212,7 @@ CCRect CCSkeleton::boundingBox () {
 		Slot* slot = skeleton->slots[i];
 		if (!slot->attachment || slot->attachment->type != ATTACHMENT_REGION) continue;
 		RegionAttachment* attachment = (RegionAttachment*)slot->attachment;
-		RegionAttachment_computeVertices(attachment, slot, vertices);
+		RegionAttachment_computeVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot->bone, vertices);
 		minX = min(minX, vertices[VERTEX_X1] * scaleX);
 		minY = min(minY, vertices[VERTEX_Y1] * scaleY);
 		maxX = max(maxX, vertices[VERTEX_X1] * scaleX);
