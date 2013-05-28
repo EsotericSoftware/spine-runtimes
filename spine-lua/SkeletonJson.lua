@@ -75,6 +75,10 @@ function SkeletonJson.new (attachmentLoader)
 			boneData.rotation = (boneMap["rotation"] or 0)
 			boneData.scaleX = (boneMap["scaleX"] or 1)
 			boneData.scaleY = (boneMap["scaleY"] or 1)
+			-- typical 'value or default' will not work here, as in practice the possible values are 'false' or nil,
+			-- both of which evaluate to false and the default value is true
+      if boneMap["inheritScale"] == false then boneData.inheritScale = false else boneData.inheritScale = true end
+      if boneMap["inheritRotation"] == false then boneData.inheritRotation = false else boneData.inheritRotation = true end			
 			table.insert(skeletonData.bones, boneData)
 		end
 
