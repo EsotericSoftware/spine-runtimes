@@ -128,7 +128,7 @@ public class SkeletonComponent : MonoBehaviour {
 			if (attachment is RegionAttachment) {
 				RegionAttachment regionAttachment = (RegionAttachment)attachment;
 				
-				regionAttachment.ComputeVertices(slot.Bone, vertexPositions);
+				regionAttachment.ComputeVertices(skeleton.X, skeleton.Y, slot.Bone, vertexPositions);
 				int vertexIndex = quadIndex * 4;
 				vertices[vertexIndex] = new Vector3(vertexPositions[RegionAttachment.X1], vertexPositions[RegionAttachment.Y1], 0);
 				vertices[vertexIndex + 1] = new Vector3(vertexPositions[RegionAttachment.X4], vertexPositions[RegionAttachment.Y4], 0);
