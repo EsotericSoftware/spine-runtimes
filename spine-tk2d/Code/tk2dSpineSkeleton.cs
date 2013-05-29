@@ -29,9 +29,12 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		vertexPositions = new float[8];
 	}
 	
+	void Start () {
+		Initialize();
+	}
+	
 	void Update () {
-		SkeletonData skeletonData = (skeletonDataAsset != null) ? skeletonDataAsset.GetSkeletonData() : null;
-		
+		SkeletonData skeletonData = skeletonDataAsset == null ? null : skeletonDataAsset.GetSkeletonData();
 		if (skeletonData == null) {
 			Clear();
 			return;
@@ -46,6 +49,7 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 	}
 	
 	private void Clear() {
+		Debug.Log("clear?!");
 		GetComponent<MeshFilter>().mesh = null;
 		DestroyImmediate(mesh);
 		mesh = null;
@@ -161,14 +165,12 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 	
 	private void UpdateAnimation() {
 		// Check if we need to stop current animation
-		if(state.Animation != null && animationName == null) {
+		if (state.Animation != null && animationName == null) {
 			state.ClearAnimation();
-		}
-		
-		// Check for different animation name or animation end
-		else if(state.Animation == null || animationName != state.Animation.Name) {
+		} else if (state.Animation == null || animationName != state.Animation.Name) {
+			// Check for different animation name or animation end
 			Spine.Animation animation = skeleton.Data.FindAnimation(animationName);
-			if(animation != null) state.SetAnimation(animation,loop);
+			if (animation != null) state.SetAnimation(animation,loop);
 		}
 		
 		state.Loop = loop;
