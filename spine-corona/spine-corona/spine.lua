@@ -25,9 +25,6 @@
 
 spine = {}
 
-local path = system.pathForFile("../")
-package.path = package.path .. ";".. path .. "/?.lua"
-
 spine.utils = require "spine-lua.utils"
 spine.SkeletonJson = require "spine-lua.SkeletonJson"
 spine.SkeletonData = require "spine-lua.SkeletonData"
