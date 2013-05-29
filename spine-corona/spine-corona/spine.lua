@@ -25,6 +25,10 @@
 
 spine = {}
 
+if (system.getInfo("environment") == "simulator") then
+	package.path = package.path .. ";".. system.pathForFile("../") .. "/?.lua"
+end
+
 spine.utils = require "spine-lua.utils"
 spine.SkeletonJson = require "spine-lua.SkeletonJson"
 spine.SkeletonData = require "spine-lua.SkeletonData"
