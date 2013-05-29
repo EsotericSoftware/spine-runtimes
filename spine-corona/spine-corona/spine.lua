@@ -119,7 +119,7 @@ function spine.Skeleton.new (skeletonData, group)
                         image.xScale = slot.bone.worldScaleY * attachment.scaleX
                         image.yScale = slot.bone.worldScaleX * attachment.scaleY
                     else
-                        if (rot ~= 0) then print("WARNING: Scaling bones with attachments not rotated to the cardinal angles will not work as expected in Corona!") end
+                        --if (rot ~= 0 and (slot.bone.worldScaleX ~= 1 or slot.bone.worldScaleY ~= 1)) then print("WARNING: Scaling bones with attachments not rotated to the cardinal angles will not work as expected in Corona!") end
                         image.xScale = slot.bone.worldScaleX * attachment.scaleX
                         image.yScale = slot.bone.worldScaleY * attachment.scaleY
                     end
