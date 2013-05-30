@@ -221,7 +221,7 @@ public class SkeletonJson {
 					for each (var valueMap3:Object in values2) {
 						timeline3.setFrame(frameIndex3++, valueMap3["time"], valueMap3["name"]);
 					}
-					timelines.push(timeline);
+					timelines.push(timeline3);
 					duration = Math.max(duration, timeline3.frames[timeline3.frameCount - 1]);
 
 				} else
