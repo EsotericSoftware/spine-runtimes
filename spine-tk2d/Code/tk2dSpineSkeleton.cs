@@ -49,7 +49,6 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 	}
 	
 	private void Clear() {
-		Debug.Log("clear?!");
 		GetComponent<MeshFilter>().mesh = null;
 		DestroyImmediate(mesh);
 		mesh = null;
