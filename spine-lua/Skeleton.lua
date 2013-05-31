@@ -88,7 +88,7 @@ function Skeleton.new (skeletonData)
 			if not newSkin then error("Skin not found: " .. skinName, 2) end
 			if self.skin then
 				-- Attach all attachments from the new skin if the corresponding attachment from the old skin is currently attached.
-				for k,v in self.skin.attachments do
+				for k,v in pairs(self.skin.attachments) do
 					local attachment = v[3]
 					local slotIndex = v[1]
 					local slot = self.slots[slotIndex]
