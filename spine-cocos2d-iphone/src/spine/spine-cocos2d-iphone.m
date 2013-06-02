@@ -29,7 +29,6 @@
 void _AtlasPage_createTexture (AtlasPage* self, const char* path) {
 	CCTexture2D* texture = [[CCTextureCache sharedTextureCache] addImage:@(path)];
 	CCTextureAtlas* textureAtlas = [[CCTextureAtlas alloc] initWithTexture:texture capacity:4];
-	[textureAtlas retain];
 	self->rendererObject = textureAtlas;
 	CGSize size = texture.contentSizeInPixels;
 	self->width = size.width;
