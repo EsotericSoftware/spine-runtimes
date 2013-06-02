@@ -62,6 +62,7 @@ bool ExampleLayer::init () {
 	CCSize windowSize = CCDirector::sharedDirector()->getWinSize();
 	skeletonNode->setPosition(ccp(windowSize.width / 2, 20));
 	addChild(skeletonNode);
+	skeletonNode->release();
 
 	scheduleUpdate();
 
@@ -74,4 +75,5 @@ void ExampleLayer::update (float deltaTime) {
     } else {
         if (skeletonNode->states[0]->time > 1) skeletonNode->setAnimation("walk", true);
     }
+    // if (skeletonNode->states[0]->time > 0.1) CCDirector::sharedDirector()->replaceScene(ExampleLayer::scene());
 }
