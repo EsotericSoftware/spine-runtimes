@@ -40,7 +40,6 @@ public class AnimationStateTest extends ApplicationAdapter {
 
 	TextureAtlas atlas;
 	Skeleton skeleton;
-	Bone root;
 	AnimationState state;
 
 	public void create () {
@@ -62,11 +61,8 @@ public class AnimationStateTest extends ApplicationAdapter {
 		state.setAnimation("walk", true);
 
 		skeleton = new Skeleton(skeletonData);
-
-		root = skeleton.getRootBone();
-		root.setX(250);
-		root.setY(20);
-
+		skeleton.setX(250);
+		skeleton.setY(20);
 		skeleton.updateWorldTransform();
 
 		Gdx.input.setInputProcessor(new InputAdapter() {

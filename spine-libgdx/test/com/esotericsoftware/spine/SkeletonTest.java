@@ -87,12 +87,6 @@ public class SkeletonTest extends ApplicationAdapter {
 		if (name.equals("goblins")) skeleton.setSkin("goblin");
 		skeleton.setToSetupPose();
 		skeleton = new Skeleton(skeleton);
-
-		Bone root = skeleton.getRootBone();
-		root.x = 50;
-		root.y = 20;
-		root.scaleX = 1f;
-		root.scaleY = 1f;
 		skeleton.updateWorldTransform();
 
 		Gdx.input.setInputProcessor(new InputAdapter() {
@@ -114,15 +108,14 @@ public class SkeletonTest extends ApplicationAdapter {
 	public void render () {
 		time += Gdx.graphics.getDeltaTime();
 
-		Bone root = skeleton.getRootBone();
-		float x = root.getX() + 160 * Gdx.graphics.getDeltaTime() * (skeleton.getFlipX() ? -1 : 1);
+		float x = skeleton.getX() + 160 * Gdx.graphics.getDeltaTime() * (skeleton.getFlipX() ? -1 : 1);
 		if (x > Gdx.graphics.getWidth()) skeleton.setFlipX(true);
 		if (x < 0) skeleton.setFlipX(false);
-		root.setX(x);
+		skeleton.setX(x);
 
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
-		animation.apply(skeleton, time, false);
+		animation.apply(skeleton, time, true);
 		skeleton.updateWorldTransform();
 		skeleton.update(Gdx.graphics.getDeltaTime());
 
