@@ -36,7 +36,7 @@ function Animation.new (name, timelines, duration)
 	function self:apply (skeleton, time, loop)
 		if not skeleton then error("skeleton cannot be nil.", 2) end
 
-		if loop and duration then time = time % duration end
+		if loop and duration > 0 then time = time % duration end
 
 		for i,timeline in ipairs(self.timelines) do
 			timeline:apply(skeleton, time, 1)
@@ -46,7 +46,7 @@ function Animation.new (name, timelines, duration)
 	function self:mix (skeleton, time, loop, alpha)
 		if not skeleton then error("skeleton cannot be nil.", 2) end
 
-		if loop and duration then time = time % duration end
+		if loop and duration > 0 then time = time % duration end
 
 		for i,timeline in ipairs(self.timelines) do
 			timeline:apply(skeleton, time, alpha)
