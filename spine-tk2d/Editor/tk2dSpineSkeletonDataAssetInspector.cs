@@ -11,7 +11,6 @@ public class tk2dSpineSkeletonDataAssetInspector : Editor {
 	/*
 	 */
 	private SerializedProperty skeletonJSON;
-	private SerializedProperty scale;
 	private SerializedProperty fromAnimation;
 	private SerializedProperty toAnimation;
 	private SerializedProperty duration;
@@ -34,7 +33,6 @@ public class tk2dSpineSkeletonDataAssetInspector : Editor {
 		}
 		
 		skeletonJSON = serializedObject.FindProperty("skeletonJSON");
-		scale = serializedObject.FindProperty("scale");
 		fromAnimation = serializedObject.FindProperty("fromAnimation");
 		toAnimation = serializedObject.FindProperty("toAnimation");
 		duration = serializedObject.FindProperty("duration");
@@ -65,7 +63,6 @@ public class tk2dSpineSkeletonDataAssetInspector : Editor {
 		}
 		
 		EditorGUILayout.PropertyField(skeletonJSON);
-		EditorGUILayout.PropertyField(scale);
 		
 		SkeletonData skeletonData = asset.GetSkeletonData();
 		if(skeletonData != null) {

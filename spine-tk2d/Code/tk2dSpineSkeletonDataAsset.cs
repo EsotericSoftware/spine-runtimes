@@ -8,9 +8,7 @@ public class tk2dSpineSkeletonDataAsset : ScriptableObject {
 	public tk2dSpriteCollection.NormalGenerationMode normalGenerationMode = tk2dSpriteCollection.NormalGenerationMode.None;
 
 	public TextAsset skeletonJSON;
-	
-	public float scale = 1;
-	
+
 	public string[] fromAnimation;
 	public string[] toAnimation;
 	public float[] duration;
@@ -44,8 +42,8 @@ public class tk2dSpineSkeletonDataAsset : ScriptableObject {
 		}
 		
 		SkeletonJson json = new SkeletonJson(new tk2dSpineAttachmentLoader(spritesData));
-		json.Scale = scale;
-		
+		json.Scale = 1.0f / (spritesData.invOrthoSize * spritesData.halfTargetHeight);
+
 		try {
 			skeletonData = json.ReadSkeletonData(new StringReader(skeletonJSON.text));
 		} catch (Exception ex) {
