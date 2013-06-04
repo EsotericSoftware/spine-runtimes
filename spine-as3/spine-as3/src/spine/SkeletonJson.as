@@ -201,13 +201,13 @@ public class SkeletonJson {
 
 					var frameIndex2:int = 0;
 					for each (var valueMap2:Object in values2) {
-						var color:String = valueMap["color"];
+						var color:String = valueMap2["color"];
 						var r:Number = toColor(color, 0);
 						var g:Number = toColor(color, 1);
 						var b:Number = toColor(color, 2);
 						var a:Number = toColor(color, 3);
 						timeline2.setFrame(frameIndex2, valueMap2["time"], r, g, b, a);
-						readCurve(timeline2, frameIndex2, valueMap);
+						readCurve(timeline2, frameIndex2, valueMap2);
 						frameIndex2++;
 					}
 					timelines.push(timeline2);
