@@ -56,6 +56,8 @@ public class SkeletonComponent : MonoBehaviour {
 		mesh.name = "Skeleton Mesh";
 		mesh.hideFlags = HideFlags.HideAndDontSave;
 
+		renderer.sharedMaterial = skeletonDataAsset.atlasAsset.material;
+
 		vertices = new Vector3[0];
 
 		skeleton = new Skeleton(skeletonDataAsset.GetSkeletonData(false));
@@ -95,8 +97,10 @@ public class SkeletonComponent : MonoBehaviour {
 		}
 
 		// Ensure mesh data is the right size.
-		if (quadCount > vertices.Length / 4) {
-			vertices = new Vector3[quadCount * 4];
+		Vector3[] vertices = this.vertices;
+		bool newTriangles = quadCount > vertices.Length / 4;
+		if (newTriangles) {
+			this.vertices = vertices = new Vector3[quadCount * 4];
 			colors = new Color[quadCount * 4];
 			uvs = new Vector2[quadCount * 4];
 			triangles = new int[quadCount * 6];
@@ -104,13 +108,13 @@ public class SkeletonComponent : MonoBehaviour {
 			
 			for (int i = 0, n = quadCount; i < n; i++) {
 				int index = i * 6;
-				int vertexIndex = i * 4;
-				triangles[index] = vertexIndex;
-				triangles[index + 1] = vertexIndex + 2;
-				triangles[index + 2] = vertexIndex + 1;
-				triangles[index + 3] = vertexIndex + 2;
-				triangles[index + 4] = vertexIndex + 3;
-				triangles[index + 5] = vertexIndex + 1;
+				int vertex = i * 4;
+				triangles[index] = vertex;
+				triangles[index + 1] = vertex + 2;
+				triangles[index + 2] = vertex + 1;
+				triangles[index + 3] = vertex + 2;
+				triangles[index + 4] = vertex + 3;
+				triangles[index + 5] = vertex + 1;
 			}
 		} else {
 			Vector3 zero = new Vector3(0, 0, 0);
@@ -120,45 +124,41 @@ public class SkeletonComponent : MonoBehaviour {
 
 		// Setup mesh.
 		float[] vertexPositions = this.vertexPositions;
-		int quadIndex = 0;
+		int vertexIndex = 0;
 		Color color = new Color();
 		for (int i = 0, n = drawOrder.Count; i < n; i++) {
 			Slot slot = drawOrder[i];
-			Attachment attachment = slot.Attachment;
-			if (attachment is RegionAttachment) {
-				RegionAttachment regionAttachment = (RegionAttachment)attachment;
-				
-				regionAttachment.ComputeVertices(skeleton.X, skeleton.Y, slot.Bone, vertexPositions);
-				int vertexIndex = quadIndex * 4;
-				vertices[vertexIndex] = new Vector3(vertexPositions[RegionAttachment.X1], vertexPositions[RegionAttachment.Y1], 0);
-				vertices[vertexIndex + 1] = new Vector3(vertexPositions[RegionAttachment.X4], vertexPositions[RegionAttachment.Y4], 0);
-				vertices[vertexIndex + 2] = new Vector3(vertexPositions[RegionAttachment.X2], vertexPositions[RegionAttachment.Y2], 0);
-				vertices[vertexIndex + 3] = new Vector3(vertexPositions[RegionAttachment.X3], vertexPositions[RegionAttachment.Y3], 0);
-				
-				color.a = skeleton.A * slot.A;
-				color.r = skeleton.R * slot.R * color.a;
-				color.g = skeleton.G * slot.G * color.a;
-				color.b = skeleton.B * slot.B * color.a;
-				colors[vertexIndex] = color;
-				colors[vertexIndex + 1] = color;
-				colors[vertexIndex + 2] = color;
-				colors[vertexIndex + 3] = color;
+			RegionAttachment regionAttachment = slot.Attachment as RegionAttachment;
+			if (regionAttachment == null) continue;
 
-				float[] regionUVs = regionAttachment.UVs;
-				uvs[vertexIndex] = new Vector2(regionUVs[RegionAttachment.X1], 1 - regionUVs[RegionAttachment.Y1]);
-				uvs[vertexIndex + 1] = new Vector2(regionUVs[RegionAttachment.X4], 1 - regionUVs[RegionAttachment.Y4]);
-				uvs[vertexIndex + 2] = new Vector2(regionUVs[RegionAttachment.X2], 1 - regionUVs[RegionAttachment.Y2]);
-				uvs[vertexIndex + 3] = new Vector2(regionUVs[RegionAttachment.X3], 1 - regionUVs[RegionAttachment.Y3]);
+			regionAttachment.ComputeVertices(skeleton.X, skeleton.Y, slot.Bone, vertexPositions);
+			
+			vertices[vertexIndex] = new Vector3(vertexPositions[RegionAttachment.X1], vertexPositions[RegionAttachment.Y1], 0);
+			vertices[vertexIndex + 1] = new Vector3(vertexPositions[RegionAttachment.X4], vertexPositions[RegionAttachment.Y4], 0);
+			vertices[vertexIndex + 2] = new Vector3(vertexPositions[RegionAttachment.X2], vertexPositions[RegionAttachment.Y2], 0);
+			vertices[vertexIndex + 3] = new Vector3(vertexPositions[RegionAttachment.X3], vertexPositions[RegionAttachment.Y3], 0);
+			
+			color.a = skeleton.A * slot.A;
+			color.r = skeleton.R * slot.R * color.a;
+			color.g = skeleton.G * slot.G * color.a;
+			color.b = skeleton.B * slot.B * color.a;
+			colors[vertexIndex] = color;
+			colors[vertexIndex + 1] = color;
+			colors[vertexIndex + 2] = color;
+			colors[vertexIndex + 3] = color;
 
-				quadIndex++;
-			}
+			float[] regionUVs = regionAttachment.UVs;
+			uvs[vertexIndex] = new Vector2(regionUVs[RegionAttachment.X1], 1 - regionUVs[RegionAttachment.Y1]);
+			uvs[vertexIndex + 1] = new Vector2(regionUVs[RegionAttachment.X4], 1 - regionUVs[RegionAttachment.Y4]);
+			uvs[vertexIndex + 2] = new Vector2(regionUVs[RegionAttachment.X2], 1 - regionUVs[RegionAttachment.Y2]);
+			uvs[vertexIndex + 3] = new Vector2(regionUVs[RegionAttachment.X3], 1 - regionUVs[RegionAttachment.Y3]);
+
+			vertexIndex += 4;
 		}
 		mesh.vertices = vertices;
 		mesh.colors = colors;
 		mesh.uv = uvs;
-		mesh.triangles = triangles;
-
-		renderer.sharedMaterial = skeletonDataAsset.atlasAsset.material;
+		if (newTriangles) mesh.triangles = triangles;
 	}
 
 	public virtual void OnEnable () {
