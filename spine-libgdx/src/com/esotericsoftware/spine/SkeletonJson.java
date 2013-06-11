@@ -269,7 +269,7 @@ public class SkeletonJson {
 		skeletonData.addAnimation(new Animation(name, timelines, duration));
 	}
 
-	private void readCurve (CurveTimeline timeline, int frameIndex, JsonValue valueMap) {
+	void readCurve (CurveTimeline timeline, int frameIndex, JsonValue valueMap) {
 		JsonValue curve = valueMap.get("curve");
 		if (curve == null) return;
 		if (curve.isString() && curve.asString().equals("stepped"))

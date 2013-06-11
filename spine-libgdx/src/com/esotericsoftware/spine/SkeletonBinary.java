@@ -215,9 +215,9 @@ public class SkeletonBinary {
 					case TIMELINE_ROTATE: {
 						RotateTimeline timeline = new RotateTimeline(keyCount);
 						timeline.setBoneIndex(boneIndex);
-						for (int keyframeIndex = 0; keyframeIndex < keyCount; keyframeIndex++) {
-							timeline.setFrame(keyframeIndex, input.readFloat(), input.readFloat());
-							if (keyframeIndex < keyCount - 1) readCurve(input, keyframeIndex, timeline);
+						for (int frameIndex = 0; frameIndex < keyCount; frameIndex++) {
+							timeline.setFrame(frameIndex, input.readFloat(), input.readFloat());
+							if (frameIndex < keyCount - 1) readCurve(input, frameIndex, timeline);
 						}
 						timelines.add(timeline);
 						duration = Math.max(duration, timeline.getFrames()[keyCount * 2 - 2]);
@@ -234,10 +234,10 @@ public class SkeletonBinary {
 							timelineScale = scale;
 						}
 						timeline.setBoneIndex(boneIndex);
-						for (int keyframeIndex = 0; keyframeIndex < keyCount; keyframeIndex++) {
-							timeline.setFrame(keyframeIndex, input.readFloat(), input.readFloat() * timelineScale, input.readFloat()
+						for (int frameIndex = 0; frameIndex < keyCount; frameIndex++) {
+							timeline.setFrame(frameIndex, input.readFloat(), input.readFloat() * timelineScale, input.readFloat()
 								* timelineScale);
-							if (keyframeIndex < keyCount - 1) readCurve(input, keyframeIndex, timeline);
+							if (frameIndex < keyCount - 1) readCurve(input, frameIndex, timeline);
 						}
 						timelines.add(timeline);
 						duration = Math.max(duration, timeline.getFrames()[keyCount * 3 - 3]);
@@ -260,11 +260,11 @@ public class SkeletonBinary {
 					case TIMELINE_COLOR: {
 						ColorTimeline timeline = new ColorTimeline(keyCount);
 						timeline.setSlotIndex(slotIndex);
-						for (int keyframeIndex = 0; keyframeIndex < keyCount; keyframeIndex++) {
+						for (int frameIndex = 0; frameIndex < keyCount; frameIndex++) {
 							float time = input.readFloat();
 							Color.rgba8888ToColor(tempColor, input.readInt());
-							timeline.setFrame(keyframeIndex, time, tempColor.r, tempColor.g, tempColor.b, tempColor.a);
-							if (keyframeIndex < keyCount - 1) readCurve(input, keyframeIndex, timeline);
+							timeline.setFrame(frameIndex, time, tempColor.r, tempColor.g, tempColor.b, tempColor.a);
+							if (frameIndex < keyCount - 1) readCurve(input, frameIndex, timeline);
 						}
 						timelines.add(timeline);
 						duration = Math.max(duration, timeline.getFrames()[keyCount * 5 - 5]);
@@ -273,8 +273,8 @@ public class SkeletonBinary {
 					case TIMELINE_ATTACHMENT:
 						AttachmentTimeline timeline = new AttachmentTimeline(keyCount);
 						timeline.setSlotIndex(slotIndex);
-						for (int keyframeIndex = 0; keyframeIndex < keyCount; keyframeIndex++)
-							timeline.setFrame(keyframeIndex, input.readFloat(), input.readString());
+						for (int frameIndex = 0; frameIndex < keyCount; frameIndex++)
+							timeline.setFrame(frameIndex, input.readFloat(), input.readString());
 						timelines.add(timeline);
 						duration = Math.max(duration, timeline.getFrames()[keyCount - 1]);
 						break;
@@ -291,14 +291,18 @@ public class SkeletonBinary {
 		skeletonData.addAnimation(new Animation(name, timelines, duration));
 	}
 
-	private void readCurve (DataInput input, int keyframeIndex, CurveTimeline timeline) throws IOException {
+	private void readCurve (DataInput input, int frameIndex, CurveTimeline timeline) throws IOException {
 		switch (input.readByte()) {
 		case CURVE_STEPPED:
-			timeline.setStepped(keyframeIndex);
+			timeline.setStepped(frameIndex);
 			break;
 		case CURVE_BEZIER:
-			timeline.setCurve(keyframeIndex, input.readFloat(), input.readFloat(), input.readFloat(), input.readFloat());
+			setCurve(timeline, frameIndex, input.readFloat(), input.readFloat(), input.readFloat(), input.readFloat());
 			break;
 		}
+	}
+
+	void setCurve (CurveTimeline timeline, int frameIndex, float cx1, float cy1, float cx2, float cy2) {
+		timeline.setCurve(frameIndex, cx1, cy1, cx2, cy2);
 	}
 }

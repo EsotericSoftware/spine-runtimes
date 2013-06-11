@@ -115,8 +115,9 @@ public class Animation {
 
 	/** Base class for frames that use an interpolation bezier curve. */
 	abstract static public class CurveTimeline implements Timeline {
-		static private final float LINEAR = 0;
-		static private final float STEPPED = -1;
+		static public final float LINEAR = 0;
+		static public final float STEPPED = -1;
+		static public final float BEZIER = -2;
 		static private final int BEZIER_SEGMENTS = 10;
 
 		private final float[] curves; // dfx, dfy, ddfx, ddfy, dddfx, dddfy, ...
@@ -135,6 +136,15 @@ public class Animation {
 
 		public void setStepped (int frameIndex) {
 			curves[frameIndex * 6] = STEPPED;
+		}
+
+		public float getCurveType (int frameIndex) {
+			int index = frameIndex * 6;
+			if (index == curves.length) return LINEAR;
+			float type = curves[index];
+			if (type == LINEAR) return LINEAR;
+			if (type == STEPPED) return STEPPED;
+			return BEZIER;
 		}
 
 		/** Sets the control handle positions for an interpolation bezier curve used to transition from this keyframe to the next.
