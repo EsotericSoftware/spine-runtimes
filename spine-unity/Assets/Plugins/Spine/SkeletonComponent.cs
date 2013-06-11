@@ -55,6 +55,7 @@ public class SkeletonComponent : MonoBehaviour {
 		GetComponent<MeshFilter>().mesh = mesh;
 		mesh.name = "Skeleton Mesh";
 		mesh.hideFlags = HideFlags.HideAndDontSave;
+		mesh.MarkDynamic();
 
 		renderer.sharedMaterial = skeletonDataAsset.atlasAsset.material;
 
