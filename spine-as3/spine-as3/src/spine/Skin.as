@@ -33,7 +33,7 @@ public class Skin {
 
 	/** Attach each attachment in this skin if the corresponding attachment in the old skin is currently attached. */
 	public function attachAll (skeleton:Skeleton, oldSkin:Skin) : void {
-		for each (var key:String in oldSkin.attachments) {
+		for (var key:String in oldSkin.attachments) {
 			var colon:int = key.indexOf(":");
 			var slotIndex:int = parseInt(key.substring(0, colon));
 			var name:String = key.substring(colon + 1);
