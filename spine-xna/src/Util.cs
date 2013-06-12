@@ -80,7 +80,7 @@ namespace Spine {
       			// So instead of using this directly, we create a non-voliate Texture2D.
       			// This is computationally slower, but should be safe as long as it is done
       			// on load.
-      			Texture2D resultTexture = new Texture2D(device, (int)file.Width, (int)file.Height);
+      			Texture2D resultTexture = new Texture2D(device, file.Width, file.Height);
       			Color[] resultContent = new Color[Convert.ToInt32(file.Width * file.Height)];
       			result.GetData(resultContent);
       			resultTexture.SetData(resultContent);
