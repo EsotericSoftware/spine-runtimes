@@ -95,7 +95,7 @@ void CCSkeletonAnimation::addAnimationState (AnimationStateData* stateData) {
 	states.push_back(state);
 }
 
-AnimationState* getAnimationState (int stateIndex) {
+AnimationState* CCSkeletonAnimation::getAnimationState (int stateIndex) {
 	CCAssert(stateIndex >= 0 && stateIndex < (int)states.size(), "stateIndex out of range.");
 	return states[stateIndex];
 }
