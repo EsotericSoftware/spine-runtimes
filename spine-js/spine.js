@@ -455,7 +455,7 @@ spine.AttachmentTimeline = function (frameCount) {
 spine.AttachmentTimeline.prototype = {
 	slotIndex: 0,
 	getFrameCount: function () {
-		return this.frames.length / 2;
+		return this.frames.length;
 	},
 	setFrame: function (frameIndex, time, attachmentName) {
 		this.frames[frameIndex] = time;
