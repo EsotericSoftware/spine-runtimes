@@ -102,8 +102,8 @@ function SkeletonJson.new (attachmentLoader)
 				end
 
 				slotData.attachmentName = slotMap["attachment"]
-
-				table.insert(skeletonData.slots, slotData)
+                table.insert(skeletonData.slots, slotData)
+                skeletonData.nameIndices[slotData.name] = #skeletonData.slots
 			end
 		end
 
@@ -113,7 +113,7 @@ function SkeletonJson.new (attachmentLoader)
 			for skinName,skinMap in pairs(map) do
 				local skin = Skin.new(skinName)
 				for slotName,slotMap in pairs(skinMap) do
-					local slotIndex = skeletonData:findSlotIndex(slotName)
+					local slotIndex = skeletonData.nameIndices[slotName]
 					for attachmentName,attachmentMap in pairs(slotMap) do
 						local attachment = readAttachment(attachmentName, attachmentMap, self.scale)
 						if attachment then
@@ -213,7 +213,7 @@ function SkeletonJson.new (attachmentLoader)
 		local slotsMap = map["slots"]
 		if slotsMap then
 			for slotName,timelineMap in pairs(slotsMap) do
-				local slotIndex = skeletonData:findSlotIndex(slotName)
+				local slotIndex = skeletonData.nameIndices[slotName]
 
 				for timelineName,values in pairs(timelineMap) do
 					if timelineName == TIMELINE_COLOR then
