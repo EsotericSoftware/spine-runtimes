@@ -35,7 +35,7 @@ function Skeleton.new (skeletonData)
 		data = skeletonData,
 		bones = {},
 		slots = {},
-        slotsByName = {},
+    slotsByName = {},
 		drawOrder = {}
 	}
 
@@ -73,6 +73,11 @@ function Skeleton.new (skeletonData)
 		end
 		return nil
 	end
+
+  function self:findSlot (slotName)
+    if not slotName then error("slotName cannot be nil.", 2) end
+    return slotsByName[slotName]
+  end
 
 	function self:setSkin (skinName)
 		local newSkin
