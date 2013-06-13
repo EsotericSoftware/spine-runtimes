@@ -11,11 +11,11 @@ public class tk2dSpineAnimation : MonoBehaviour {
 	public float animationSpeed = 1;
 	public Spine.AnimationState state;
 	
-	private tk2dSpineSkeleton spineSkeleton;
+	private tk2dSpineSkeleton cachedSpineSkeleton;
 	
 	void Start () {
-		spineSkeleton = GetComponent<tk2dSpineSkeleton>();
-		state = new Spine.AnimationState(spineSkeleton.skeletonDataAsset.GetAnimationStateData());
+		cachedSpineSkeleton = GetComponent<tk2dSpineSkeleton>();
+		state = new Spine.AnimationState(cachedSpineSkeleton.skeletonDataAsset.GetAnimationStateData());
 	}
 	
 	void Update () {
@@ -26,17 +26,19 @@ public class tk2dSpineAnimation : MonoBehaviour {
 		// Check if we need to stop current animation
 		if (state.Animation != null && animationName == null) {
 			state.ClearAnimation();
-		} else if (state.Animation == null || animationName != state.Animation.Name) {
-			// Check for different animation name or animation end
-			Spine.Animation animation = spineSkeleton.skeleton.Data.FindAnimation(animationName);
+		}
+		
+		// Check for different animation name or animation end
+		else if (state.Animation == null || animationName != state.Animation.Name) {
+			Spine.Animation animation = cachedSpineSkeleton.skeleton.Data.FindAnimation(animationName);
 			if (animation != null) state.SetAnimation(animation,loop);
 		}
 		
 		state.Loop = loop;
 		
 		// Update animation
-		spineSkeleton.skeleton.Update(Time.deltaTime * animationSpeed);
+		cachedSpineSkeleton.skeleton.Update(Time.deltaTime * animationSpeed);
 		state.Update(Time.deltaTime * animationSpeed);
-		state.Apply(spineSkeleton.skeleton);
+		state.Apply(cachedSpineSkeleton.skeleton);
 	}
 }

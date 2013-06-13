@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Spine;
 
-// TODO: multiple atlas support
-
 [ExecuteInEditMode]
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
@@ -19,12 +17,14 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 	private float[] vertexPositions;
 	private List<Material> submeshMaterials = new List<Material>();
 	private List<int[]> submeshIndices = new List<int[]>();
+	private Color cachedCurrentColor;
 	
 	
 	void Awake() {
 		vertexPositions = new float[8];
 		submeshMaterials = new List<Material>();
 		submeshIndices = new List<int[]>();
+		cachedCurrentColor = new Color();
 	}
 	
 	void Start () {
@@ -38,7 +38,7 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 			return;
 		}
 		
-		if(skeleton == null || skeleton.Data != skeletonData) Initialize();
+		if (skeleton == null || skeleton.Data != skeletonData) Initialize();
 		
 		skeleton.UpdateWorldTransform();
 		
@@ -51,8 +51,6 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		DestroyImmediate(mesh);
 		mesh = null;
 		
-		renderer.sharedMaterials = null;
-		
 		skeleton = null;
 	}
 	
@@ -62,13 +60,14 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		mesh.name = "tk2dSkeleton Mesh";
 		mesh.hideFlags = HideFlags.HideAndDontSave;
 		
-		skeleton = new Skeleton(skeletonDataAsset.GetSkeletonData());
+		if(skeletonDataAsset != null) {
+			skeleton = new Skeleton(skeletonDataAsset.GetSkeletonData());
+		}
 	}
 	
 	private void UpdateMesh() {
 		int quadIndex = 0;
 		int drawCount = skeleton.DrawOrder.Count;
-		Color currentColor = new Color();
 		
 		for (int i = 0; i < drawCount; i++) {
 			Slot slot = skeleton.DrawOrder[i];
@@ -91,15 +90,15 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 				uvs[vertexIndex + 2] = new Vector2(regionUVs[RegionAttachment.X2],regionUVs[RegionAttachment.Y2]);
 				uvs[vertexIndex + 3] = new Vector2(regionUVs[RegionAttachment.X3],regionUVs[RegionAttachment.Y3]);
 				
-				currentColor.a = skeleton.A * slot.A;
-				currentColor.r = skeleton.R * slot.R * slot.A;
-				currentColor.g = skeleton.G * slot.G * slot.A;
-				currentColor.b = skeleton.B * slot.B * slot.A;
+				cachedCurrentColor.a = skeleton.A * slot.A;
+				cachedCurrentColor.r = skeleton.R * slot.R * slot.A;
+				cachedCurrentColor.g = skeleton.G * slot.G * slot.A;
+				cachedCurrentColor.b = skeleton.B * slot.B * slot.A;
 				
-				colors[vertexIndex] = currentColor;
-				colors[vertexIndex + 1] = currentColor;
-				colors[vertexIndex + 2] = currentColor;
-				colors[vertexIndex + 3] = currentColor;
+				colors[vertexIndex] = cachedCurrentColor;
+				colors[vertexIndex + 1] = cachedCurrentColor;
+				colors[vertexIndex + 2] = cachedCurrentColor;
+				colors[vertexIndex + 3] = cachedCurrentColor;
 				
 				quadIndex++;
 			}
@@ -118,7 +117,7 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		
 		if (skeletonDataAsset.normalGenerationMode != tk2dSpriteCollection.NormalGenerationMode.None) {
 			mesh.RecalculateNormals();
-
+			
 			if (skeletonDataAsset.normalGenerationMode == tk2dSpriteCollection.NormalGenerationMode.NormalsAndTangents) {
 				Vector4[] tangents = new Vector4[mesh.normals.Length];
 				for (int i = 0; i < tangents.Length; i++) {
@@ -127,8 +126,6 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 				mesh.tangents = tangents;
 			}
 		}
-		
-		renderer.sharedMaterials = submeshMaterials.ToArray();
 	}
 	
 	private void UpdateCache() {
@@ -189,6 +186,8 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		
 		submeshIndices.Add(currentSubmesh.ToArray());
 		submeshMaterials.Add(oldMaterial);
+		
+		renderer.sharedMaterials = submeshMaterials.ToArray();
 	}
 	
 	
