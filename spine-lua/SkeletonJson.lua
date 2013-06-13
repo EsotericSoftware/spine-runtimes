@@ -29,7 +29,6 @@ local SlotData = require "spine-lua.SlotData"
 local Skin = require "spine-lua.Skin"
 local AttachmentLoader = require "spine-lua.AttachmentLoader"
 local Animation = require "spine-lua.Animation"
--
 local TIMELINE_SCALE = "scale"
 local TIMELINE_ROTATE = "rotate"
 local TIMELINE_TRANSLATE = "translate"
@@ -104,6 +103,7 @@ function SkeletonJson.new (attachmentLoader)
 				slotData.attachmentName = slotMap["attachment"]
         table.insert(skeletonData.slots, slotData)
         skeletonData.slotNameIndices[slotData.name] = #skeletonData.slots
+        
 			end
 		end
 
