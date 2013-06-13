@@ -1,9 +1,8 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Spine;
 
 // TODO: multiple atlas support
-// TODO: split skeleton and animation components
-// TODO: add events in animation component
 
 [ExecuteInEditMode]
 [RequireComponent(typeof(MeshFilter))]
@@ -12,21 +11,20 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 	public tk2dSpineSkeletonDataAsset skeletonDataAsset;
 	public Skeleton skeleton;
 	
-	public string animationName;
-	public bool loop;
-	public float animationSpeed = 1;
-	public Spine.AnimationState state;
-	
 	private Mesh mesh;
 	private Vector3[] vertices;
 	private Color[] colors;
 	private Vector2[] uvs;
-	private int[] triangles;
 	private int cachedQuadCount;
 	private float[] vertexPositions;
+	private List<Material> submeshMaterials = new List<Material>();
+	private List<int[]> submeshIndices = new List<int[]>();
+	
 	
 	void Awake() {
 		vertexPositions = new float[8];
+		submeshMaterials = new List<Material>();
+		submeshIndices = new List<int[]>();
 	}
 	
 	void Start () {
@@ -42,8 +40,8 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		
 		if(skeleton == null || skeleton.Data != skeletonData) Initialize();
 		
-		UpdateAnimation();
-		UpdateSkeleton();
+		skeleton.UpdateWorldTransform();
+		
 		UpdateCache();
 		UpdateMesh();
 	}
@@ -53,10 +51,9 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		DestroyImmediate(mesh);
 		mesh = null;
 		
-		renderer.sharedMaterial = null;
+		renderer.sharedMaterials = null;
 		
 		skeleton = null;
-		state = null;
 	}
 	
 	private void Initialize() {
@@ -65,7 +62,6 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		mesh.name = "tk2dSkeleton Mesh";
 		mesh.hideFlags = HideFlags.HideAndDontSave;
 		
-		state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());
 		skeleton = new Skeleton(skeletonDataAsset.GetSkeletonData());
 	}
 	
@@ -105,14 +101,6 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 				colors[vertexIndex + 2] = currentColor;
 				colors[vertexIndex + 3] = currentColor;
 				
-				int index = quadIndex * 6;
-				triangles[index + 0] = vertexIndex;
-				triangles[index + 1] = vertexIndex + 2;
-				triangles[index + 2] = vertexIndex + 1;
-				triangles[index + 3] = vertexIndex + 2;
-				triangles[index + 4] = vertexIndex + 3;
-				triangles[index + 5] = vertexIndex + 1;
-				
 				quadIndex++;
 			}
 		}
@@ -122,7 +110,11 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		mesh.vertices = vertices;
 		mesh.colors = colors;
 		mesh.uv = uvs;
-		mesh.triangles = triangles;
+		
+		mesh.subMeshCount = submeshIndices.Count;
+		for(int i = 0; i < mesh.subMeshCount; ++i) {
+			mesh.SetTriangles(submeshIndices[i],i);
+		}
 		
 		if (skeletonDataAsset.normalGenerationMode != tk2dSpriteCollection.NormalGenerationMode.None) {
 			mesh.RecalculateNormals();
@@ -136,7 +128,7 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 			}
 		}
 		
-		renderer.sharedMaterial = skeletonDataAsset.spritesData.inst.materials[0];
+		renderer.sharedMaterials = submeshMaterials.ToArray();
 	}
 	
 	private void UpdateCache() {
@@ -154,31 +146,52 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		vertices = new Vector3[quadCount * 4];
 		uvs = new Vector2[quadCount * 4];
 		colors = new Color[quadCount * 4];
-		triangles = new int[quadCount * 6];
+		
+		UpdateSubmeshCache();
 	}
 	
-	private void UpdateSkeleton() {
-		skeleton.Update(Time.deltaTime * animationSpeed);
-		skeleton.UpdateWorldTransform();
-	}
-	
-	private void UpdateAnimation() {
-		// Check if we need to stop current animation
-		if (state.Animation != null && animationName == null) {
-			state.ClearAnimation();
-		} else if (state.Animation == null || animationName != state.Animation.Name) {
-			// Check for different animation name or animation end
-			Spine.Animation animation = skeleton.Data.FindAnimation(animationName);
-			if (animation != null) state.SetAnimation(animation,loop);
+	private void UpdateSubmeshCache() {
+		submeshIndices.Clear();
+		submeshMaterials.Clear();
+		
+		Material oldMaterial = null;
+		List<int> currentSubmesh = new List<int>();
+		int quadIndex = 0;
+		
+		int drawCount = skeleton.DrawOrder.Count;
+		for (int i = 0; i < drawCount; i++) {
+			Attachment attachment = skeleton.DrawOrder[i].Attachment;
+			Material currentMaterial = skeletonDataAsset.spritesData.GetSpriteDefinition(attachment.Name).material;
+			
+			if(!(attachment is RegionAttachment)) continue;
+			
+			if(oldMaterial == null) oldMaterial = currentMaterial;
+			
+			if(oldMaterial != currentMaterial) {
+				submeshIndices.Add(currentSubmesh.ToArray());
+				submeshMaterials.Add(oldMaterial);
+				currentSubmesh.Clear();
+			}
+			
+			int vertexIndex = quadIndex * 4;
+			
+			currentSubmesh.Add(vertexIndex);
+			currentSubmesh.Add(vertexIndex + 2);
+			currentSubmesh.Add(vertexIndex + 1);
+			currentSubmesh.Add(vertexIndex + 2);
+			currentSubmesh.Add(vertexIndex + 3);
+			currentSubmesh.Add(vertexIndex + 1);
+			
+			quadIndex++;
+			
+			oldMaterial = currentMaterial;
 		}
 		
-		state.Loop = loop;
-		
-		// Update animation
-		state.Update(Time.deltaTime * animationSpeed);
-		state.Apply(skeleton);
+		submeshIndices.Add(currentSubmesh.ToArray());
+		submeshMaterials.Add(oldMaterial);
 	}
-
+	
+	
 	public bool UsesSpriteCollection(tk2dSpriteCollectionData spriteCollection) {
 		return skeletonDataAsset.spritesData == spriteCollection;
 	}
@@ -187,6 +200,7 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		skeletonDataAsset.ForceUpdate();
 		skeleton = new Skeleton(skeletonDataAsset.GetSkeletonData());
 		
+		UpdateSubmeshCache();
 		UpdateMesh();
 	}
 }
