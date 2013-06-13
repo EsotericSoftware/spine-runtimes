@@ -36,7 +36,7 @@ function Animation.new (name, timelines, duration)
 	function self:apply (skeleton, time, loop)
 		if not skeleton then error("skeleton cannot be nil.", 2) end
 
-		if loop and duration then time = time % duration end
+		if loop and duration > 0 then time = time % duration end
 
 		for i,timeline in ipairs(self.timelines) do
 			timeline:apply(skeleton, time, 1)
@@ -46,7 +46,7 @@ function Animation.new (name, timelines, duration)
 	function self:mix (skeleton, time, loop, alpha)
 		if not skeleton then error("skeleton cannot be nil.", 2) end
 
-		if loop and duration then time = time % duration end
+		if loop and duration > 0 then time = time % duration end
 
 		for i,timeline in ipairs(self.timelines) do
 			timeline:apply(skeleton, time, alpha)
@@ -374,7 +374,7 @@ function Animation.ColorTimeline.new ()
 		if alpha < 1 then
 			slot:setColor(slot.r + (r - slot.r) * alpha, slot.g + (g - slot.g) * alpha, slot.b + (b - slot.b) * alpha, slot.a + (a - slot.a) * alpha)
 		else
-		 	slot:setColor(r, g, b, a)
+			slot:setColor(r, g, b, a)
 		end
 	end
 
