@@ -417,7 +417,7 @@ function Animation.AttachmentTimeline.new ()
     if attachmentName then
         if not slot.attachment then
             slot:setAttachment(skeleton:getAttachment(self.slotName, attachmentName))
-        elseif attachmentName and slot.attachment.name ~= attachmentName then
+        elseif slot.attachment.name ~= attachmentName then
             slot:setAttachment(skeleton:getAttachment(self.slotName, attachmentName))
         end
     end
