@@ -28,7 +28,7 @@ function SkeletonData.new ()
 	local self = {
 		bones = {},
 		slots = {},
-        nameIndices = {},
+        slotNameIndices = {},
 		skins = {},
 		animations = {}
 	}

@@ -99,7 +99,7 @@ function Skeleton.new (skeletonData)
 	function self:getAttachment (slotName, attachmentName)
 		if not slotName then error("slotName cannot be nil.", 2) end
 		if not attachmentName then error("attachmentName cannot be nil.", 2) end
-		local slotIndex = skeletonData.nameIndices[slotName]
+		local slotIndex = skeletonData.slotNameIndices[slotName]
 		if slotIndex == -1 then error("Slot not found: " .. slotName, 2) end
 		if self.skin then
 			local attachment = self.skin:getAttachment(slotIndex, attachmentName)
