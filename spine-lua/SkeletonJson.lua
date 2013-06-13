@@ -29,7 +29,6 @@ local SlotData = require "spine-lua.SlotData"
 local Skin = require "spine-lua.Skin"
 local AttachmentLoader = require "spine-lua.AttachmentLoader"
 local Animation = require "spine-lua.Animation"
-
 local TIMELINE_SCALE = "scale"
 local TIMELINE_ROTATE = "rotate"
 local TIMELINE_TRANSLATE = "translate"
@@ -102,8 +101,9 @@ function SkeletonJson.new (attachmentLoader)
 				end
 
 				slotData.attachmentName = slotMap["attachment"]
-
-				table.insert(skeletonData.slots, slotData)
+        table.insert(skeletonData.slots, slotData)
+        skeletonData.slotNameIndices[slotData.name] = #skeletonData.slots
+        
 			end
 		end
 
@@ -113,7 +113,7 @@ function SkeletonJson.new (attachmentLoader)
 			for skinName,skinMap in pairs(map) do
 				local skin = Skin.new(skinName)
 				for slotName,slotMap in pairs(skinMap) do
-					local slotIndex = skeletonData:findSlotIndex(slotName)
+					local slotIndex = skeletonData.slotNameIndices[slotName]
 					for attachmentName,attachmentMap in pairs(slotMap) do
 						local attachment = readAttachment(attachmentName, attachmentMap, self.scale)
 						if attachment then
@@ -213,7 +213,7 @@ function SkeletonJson.new (attachmentLoader)
 		local slotsMap = map["slots"]
 		if slotsMap then
 			for slotName,timelineMap in pairs(slotsMap) do
-				local slotIndex = skeletonData:findSlotIndex(slotName)
+				local slotIndex = skeletonData.slotNameIndices[slotName]
 
 				for timelineName,values in pairs(timelineMap) do
 					if timelineName == TIMELINE_COLOR then

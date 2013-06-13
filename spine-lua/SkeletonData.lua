@@ -28,6 +28,7 @@ function SkeletonData.new ()
 	local self = {
 		bones = {},
 		slots = {},
+    slotNameIndices = {},
 		skins = {},
 		animations = {}
 	}
@@ -58,10 +59,7 @@ function SkeletonData.new ()
 
 	function self:findSlotIndex (slotName)
 		if not slotName then error("slotName cannot be nil.", 2) end
-		for i,slot in ipairs(self.slots) do
-			if slot.name == slotName then return i end
-		end
-		return -1
+		return slotNameIndices[slotName] or -1
 	end
 
 	function self:findSkin (skinName)

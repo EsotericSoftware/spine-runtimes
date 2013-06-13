@@ -36,8 +36,9 @@ public class SkeletonComponent : MonoBehaviour {
 	public String initialSkinName;
 	public float timeScale = 1;
 	private Mesh mesh;
+	private int lastVertexCount;
 	private Vector3[] vertices;
-	private Color[] colors;
+	private Color32[] colors;
 	private Vector2[] uvs;
 	private int[] triangles;
 	private float[] vertexPositions = new float[8];
@@ -99,11 +100,13 @@ public class SkeletonComponent : MonoBehaviour {
 
 		// Ensure mesh data is the right size.
 		Vector3[] vertices = this.vertices;
-		bool newTriangles = quadCount > vertices.Length / 4;
+		int vertexCount = quadCount * 4;
+		bool newTriangles = vertexCount > vertices.Length;
 		if (newTriangles) {
-			this.vertices = vertices = new Vector3[quadCount * 4];
-			colors = new Color[quadCount * 4];
-			uvs = new Vector2[quadCount * 4];
+			// Not enough vertices, increase size.
+			this.vertices = vertices = new Vector3[vertexCount];
+			colors = new Color32[vertexCount];
+			uvs = new Vector2[vertexCount];
 			triangles = new int[quadCount * 6];
 			mesh.Clear();
 			
@@ -118,15 +121,17 @@ public class SkeletonComponent : MonoBehaviour {
 				triangles[index + 5] = vertex + 1;
 			}
 		} else {
+			// Too many vertices, zero the extra.
 			Vector3 zero = new Vector3(0, 0, 0);
-			for (int i = quadCount * 4, n = vertices.Length; i < n; i++)
+			for (int i = vertexCount, n = lastVertexCount; i < n; i++)
 				vertices[i] = zero;
 		}
+		lastVertexCount = vertexCount;
 
 		// Setup mesh.
 		float[] vertexPositions = this.vertexPositions;
 		int vertexIndex = 0;
-		Color color = new Color();
+		Color32 color = new Color32();
 		for (int i = 0, n = drawOrder.Count; i < n; i++) {
 			Slot slot = drawOrder[i];
 			RegionAttachment regionAttachment = slot.Attachment as RegionAttachment;
@@ -139,10 +144,10 @@ public class SkeletonComponent : MonoBehaviour {
 			vertices[vertexIndex + 2] = new Vector3(vertexPositions[RegionAttachment.X2], vertexPositions[RegionAttachment.Y2], 0);
 			vertices[vertexIndex + 3] = new Vector3(vertexPositions[RegionAttachment.X3], vertexPositions[RegionAttachment.Y3], 0);
 			
-			color.a = skeleton.A * slot.A;
-			color.r = skeleton.R * slot.R * color.a;
-			color.g = skeleton.G * slot.G * color.a;
-			color.b = skeleton.B * slot.B * color.a;
+			color.a = (byte)(skeleton.A * slot.A * 255);
+			color.r = (byte)(skeleton.R * slot.R * color.a);
+			color.g = (byte)(skeleton.G * slot.G * color.a);
+			color.b = (byte)(skeleton.B * slot.B * color.a);
 			colors[vertexIndex] = color;
 			colors[vertexIndex + 1] = color;
 			colors[vertexIndex + 2] = color;
@@ -157,7 +162,7 @@ public class SkeletonComponent : MonoBehaviour {
 			vertexIndex += 4;
 		}
 		mesh.vertices = vertices;
-		mesh.colors = colors;
+		mesh.colors32 = colors;
 		mesh.uv = uvs;
 		if (newTriangles) mesh.triangles = triangles;
 	}
