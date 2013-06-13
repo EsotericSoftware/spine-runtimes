@@ -413,14 +413,14 @@ function Animation.AttachmentTimeline.new ()
 		end
 
 		local attachmentName = self.attachmentNames[frameIndex]
-        local slot = skeleton.slotsByName[self.slotName]
-        if attachmentName then
-            if not slot.attachment then
-                slot:setAttachment(skeleton:getAttachment(self.slotName, attachmentName))
-            elseif attachmentName and slot.attachment.name ~= attachmentName then
-                slot:setAttachment(skeleton:getAttachment(self.slotName, attachmentName))
-            end
+    local slot = skeleton.slotsByName[self.slotName]
+    if attachmentName then
+        if not slot.attachment then
+            slot:setAttachment(skeleton:getAttachment(self.slotName, attachmentName))
+        elseif attachmentName and slot.attachment.name ~= attachmentName then
+            slot:setAttachment(skeleton:getAttachment(self.slotName, attachmentName))
         end
+    end
 
 
 	end
