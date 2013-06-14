@@ -4,10 +4,10 @@ using System.Collections;
 /*
  */
 public class tk2dSpineboy : MonoBehaviour {
-	private tk2dSpineSkeleton skeleton;
+	private tk2dSpineAnimation skeleton;
 	
 	void Start() {
-		skeleton = GetComponent<tk2dSpineSkeleton>();
+		skeleton = GetComponent<tk2dSpineAnimation>();
 	}
 	
 	void LateUpdate() {

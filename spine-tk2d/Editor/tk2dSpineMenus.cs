@@ -37,6 +37,15 @@ public class tk2dSpineMenus {
 	
 	/*
 	 */
+	[MenuItem("GameObject/Create Other/tk2d/Spine Animated Skeleton")]
+	static public void CreateAnimatedSkeletonGameObject() {
+		GameObject gameObject = new GameObject("New tk2d Spine Animated Skeleton",typeof(tk2dSpineAnimation));
+		EditorUtility.FocusProjectWindow();
+		Selection.activeObject = gameObject;
+	}
+	
+	/*
+	 */
 	[MenuItem("Component/2D Toolkit/Spine Skeleton")]
 	static public void CreateSkeletonComponent() {
 		Selection.activeGameObject.AddComponent(typeof(tk2dSpineSkeleton));
@@ -47,5 +56,19 @@ public class tk2dSpineMenus {
 	[MenuItem("Component/2d Toolkit/Spine Skeleton",true)]
 	static public bool ValidateCreateSkeletonComponent() {
 		return Selection.activeGameObject != null && Selection.activeGameObject.GetComponent(typeof(tk2dSpineSkeleton)) == null;
+	}
+	
+	/*
+	 */
+	[MenuItem("Component/2D Toolkit/Spine Animation")]
+	static public void CreateAnimationComponent() {
+		Selection.activeGameObject.AddComponent(typeof(tk2dSpineAnimation));
+	}
+	
+	/*
+	 */
+	[MenuItem("Component/2d Toolkit/Spine Animation",true)]
+	static public bool ValidateCreateAnimationComponent() {
+		return Selection.activeGameObject != null && Selection.activeGameObject.GetComponent(typeof(tk2dSpineAnimation)) == null;
 	}
 }

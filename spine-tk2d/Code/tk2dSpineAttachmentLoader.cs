@@ -14,19 +14,12 @@ public class tk2dSpineAttachmentLoader : AttachmentLoader {
 
 	public Attachment NewAttachment(Skin skin, AttachmentType type, String name) {
 		if (type != AttachmentType.region) throw new Exception("Unknown attachment type: " + type);
-
+		
 		// Strip folder names.
 		int index = name.LastIndexOfAny(new char[] {'/', '\\'});
 		if (index != -1) name = name.Substring(index + 1);
-
-		tk2dSpriteDefinition attachmentParameters = null;
-		for (int i = 0; i < sprites.inst.spriteDefinitions.Length; ++i) {
-			tk2dSpriteDefinition def = sprites.inst.spriteDefinitions[i];
-			if (def.name == name) {
-				attachmentParameters = def;
-				break;
-			}
-		}
+		
+		tk2dSpriteDefinition attachmentParameters = sprites.GetSpriteDefinition(name);
 		
 		if (attachmentParameters == null) throw new Exception("Sprite not found in atlas: " + name + " (" + type + ")");
 		if (attachmentParameters.complexGeometry) throw new NotImplementedException("Complex geometry is not supported: " + name + " (" + type + ")");
