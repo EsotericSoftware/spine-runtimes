@@ -30,6 +30,7 @@ namespace Spine {
 	public class AnimationStateData {
 		public SkeletonData SkeletonData { get; private set; }
 		private Dictionary<KeyValuePair<Animation, Animation>, float> animationToMixTime = new Dictionary<KeyValuePair<Animation, Animation>, float>();
+		public float defaultMix { get; set; }
 
 		public AnimationStateData (SkeletonData skeletonData) {
 			SkeletonData = skeletonData;
@@ -54,8 +55,8 @@ namespace Spine {
 		public float GetMix (Animation from, Animation to) {
 			KeyValuePair<Animation, Animation> key = new KeyValuePair<Animation, Animation>(from, to);
 			float duration;
-			animationToMixTime.TryGetValue(key, out duration);
-			return duration;
+			if (animationToMixTime.TryGetValue(key, out duration)) return duration;
+			return defaultMix;
 		}
 	}
 }
