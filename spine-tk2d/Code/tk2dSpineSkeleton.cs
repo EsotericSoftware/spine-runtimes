@@ -11,20 +11,17 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 	
 	private Mesh mesh;
 	private Vector3[] vertices;
-	private Color[] colors;
+	private Color32[] colors;
 	private Vector2[] uvs;
 	private int cachedQuadCount;
 	private float[] vertexPositions;
 	private List<Material> submeshMaterials = new List<Material>();
 	private List<int[]> submeshIndices = new List<int[]>();
-	private Color cachedCurrentColor;
-	
 	
 	void Awake() {
 		vertexPositions = new float[8];
 		submeshMaterials = new List<Material>();
 		submeshIndices = new List<int[]>();
-		cachedCurrentColor = new Color();
 	}
 	
 	void Start () {
@@ -69,6 +66,7 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		int quadIndex = 0;
 		int drawCount = skeleton.DrawOrder.Count;
 		
+		Color32 color = new Color32();
 		for (int i = 0; i < drawCount; i++) {
 			Slot slot = skeleton.DrawOrder[i];
 			Attachment attachment = slot.Attachment;
@@ -90,15 +88,15 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 				uvs[vertexIndex + 2] = new Vector2(regionUVs[RegionAttachment.X2],regionUVs[RegionAttachment.Y2]);
 				uvs[vertexIndex + 3] = new Vector2(regionUVs[RegionAttachment.X3],regionUVs[RegionAttachment.Y3]);
 				
-				cachedCurrentColor.a = skeleton.A * slot.A;
-				cachedCurrentColor.r = skeleton.R * slot.R * slot.A;
-				cachedCurrentColor.g = skeleton.G * slot.G * slot.A;
-				cachedCurrentColor.b = skeleton.B * slot.B * slot.A;
+				color.a = (byte)(skeleton.A * slot.A * 255);
+				color.r = (byte)(skeleton.R * slot.R * color.a);
+				color.g = (byte)(skeleton.G * slot.G * color.a);
+				color.b = (byte)(skeleton.B * slot.B * color.a);
 				
-				colors[vertexIndex] = cachedCurrentColor;
-				colors[vertexIndex + 1] = cachedCurrentColor;
-				colors[vertexIndex + 2] = cachedCurrentColor;
-				colors[vertexIndex + 3] = cachedCurrentColor;
+				colors[vertexIndex] = color;
+				colors[vertexIndex + 1] = color;
+				colors[vertexIndex + 2] = color;
+				colors[vertexIndex + 3] = color;
 				
 				quadIndex++;
 			}
@@ -107,7 +105,7 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		mesh.Clear();
 		
 		mesh.vertices = vertices;
-		mesh.colors = colors;
+		mesh.colors32 = colors;
 		mesh.uv = uvs;
 		
 		mesh.subMeshCount = submeshIndices.Count;
@@ -142,7 +140,7 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		cachedQuadCount = quadCount;
 		vertices = new Vector3[quadCount * 4];
 		uvs = new Vector2[quadCount * 4];
-		colors = new Color[quadCount * 4];
+		colors = new Color32[quadCount * 4];
 		
 		UpdateSubmeshCache();
 	}
