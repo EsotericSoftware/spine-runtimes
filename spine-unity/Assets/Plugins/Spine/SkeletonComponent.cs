@@ -43,11 +43,6 @@ public class SkeletonComponent : MonoBehaviour {
 	private int[] triangles;
 	private float[] vertexPositions = new float[8];
 
-#if UNITY_EDITOR
-	Vector3 gizmosCenter = new Vector3();
-	Vector3 gizmosSize = new Vector3();
-#endif
-
 	public virtual void Clear () {
 		GetComponent<MeshFilter>().mesh = null;
 		DestroyImmediate(mesh);
@@ -137,9 +132,6 @@ public class SkeletonComponent : MonoBehaviour {
 		float[] vertexPositions = this.vertexPositions;
 		int vertexIndex = 0;
 		Color32 color = new Color32();
-#if UNITY_EDITOR
-		Vector3 min = new Vector3(float.MaxValue, float.MaxValue, 0), max = new Vector3(float.MinValue, float.MinValue, 0);
-#endif
 		for (int i = 0, n = drawOrder.Count; i < n; i++) {
 			Slot slot = drawOrder[i];
 			RegionAttachment regionAttachment = slot.Attachment as RegionAttachment;
@@ -151,16 +143,6 @@ public class SkeletonComponent : MonoBehaviour {
 			vertices[vertexIndex + 1] = new Vector3(vertexPositions[RegionAttachment.X4], vertexPositions[RegionAttachment.Y4], 0);
 			vertices[vertexIndex + 2] = new Vector3(vertexPositions[RegionAttachment.X2], vertexPositions[RegionAttachment.Y2], 0);
 			vertices[vertexIndex + 3] = new Vector3(vertexPositions[RegionAttachment.X3], vertexPositions[RegionAttachment.Y3], 0);
-#if UNITY_EDITOR
-			min = Vector3.Min(min, vertices[vertexIndex + 0]);
-			min = Vector3.Min(min, vertices[vertexIndex + 1]);
-			min = Vector3.Min(min, vertices[vertexIndex + 2]);
-			min = Vector3.Min(min, vertices[vertexIndex + 3]);
-			max = Vector3.Max(max, vertices[vertexIndex + 0]);
-			max = Vector3.Max(max, vertices[vertexIndex + 1]);
-			max = Vector3.Max(max, vertices[vertexIndex + 2]);
-			max = Vector3.Max(max, vertices[vertexIndex + 3]);
-#endif
 			
 			color.a = (byte)(skeleton.A * slot.A * 255);
 			color.r = (byte)(skeleton.R * slot.R * color.a);
@@ -184,19 +166,9 @@ public class SkeletonComponent : MonoBehaviour {
 		mesh.uv = uvs;
 		if (newTriangles) mesh.triangles = triangles;
 #if UNITY_EDITOR
-		float width = max.x - min.x, height = max.y - min.y;
-		gizmosCenter = new Vector3(min.x + width / 2, min.y + height / 2, 0);
-		gizmosSize = new Vector3(Mathf.Abs(width), Mathf.Abs(height), 1);
+		UpdateEditorGizmo();
 #endif
 	}
-
-#if UNITY_EDITOR
-	void OnDrawGizmos() {
-		Gizmos.color = Color.clear;
-		Gizmos.matrix = transform.localToWorldMatrix;
-		Gizmos.DrawCube(gizmosCenter, gizmosSize);
-	}
-#endif
 
 	public virtual void OnEnable () {
 		Update();
@@ -210,4 +182,30 @@ public class SkeletonComponent : MonoBehaviour {
 	public virtual void Reset () {
 		Update();
 	}
+	
+#region Unity Editor
+#if UNITY_EDITOR
+	Vector3 gizmosCenter = new Vector3();
+	Vector3 gizmosSize = new Vector3();
+	Vector3 min = new Vector3(float.MaxValue, float.MaxValue, 0f);
+	Vector3 max = new Vector3(float.MinValue, float.MinValue, 0f);
+
+	void UpdateEditorGizmo() {
+		//determine the minimums and maximums
+		foreach (Vector3 vert in vertices) {
+			min = Vector3.Min(min, vert);
+			max = Vector3.Max(max, vert);
+		}
+		float width = max.x - min.x;
+		float height = max.y - min.y;
+		gizmosCenter = new Vector3(min.x + (width / 2f), min.y + (height / 2f), 0f);
+		gizmosSize = new Vector3(width, height, 1f);
+	}
+	void OnDrawGizmos() {
+		Gizmos.color = Color.clear;
+		Gizmos.matrix = transform.localToWorldMatrix;
+		Gizmos.DrawCube(gizmosCenter, gizmosSize);
+	}
+#endif
+#endregion
 }
