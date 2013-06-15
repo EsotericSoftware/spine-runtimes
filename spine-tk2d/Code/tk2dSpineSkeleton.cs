@@ -137,6 +137,9 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		}
 		
 		renderer.sharedMaterial = skeletonDataAsset.spritesData.inst.materials[0];
+#if UNITY_EDITOR
+		UpdateEditorGizmo();
+#endif
 	}
 	
 	private void UpdateCache() {
@@ -189,4 +192,30 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		
 		UpdateMesh();
 	}
+	
+#region Unity Editor
+#if UNITY_EDITOR
+	Vector3 gizmosCenter = new Vector3();
+	Vector3 gizmosSize = new Vector3();
+	Vector3 min = new Vector3(float.MaxValue, float.MaxValue, 0f);
+	Vector3 max = new Vector3(float.MinValue, float.MinValue, 0f);
+
+	void UpdateEditorGizmo() {
+		//determine the minimums and maximums
+		foreach (Vector3 vert in vertices) {
+			min = Vector3.Min(min, vert);
+			max = Vector3.Max(max, vert);
+		}
+		float width = max.x - min.x;
+		float height = max.y - min.y;
+		gizmosCenter = new Vector3(min.x + (width / 2f), min.y + (height / 2f), 0f);
+		gizmosSize = new Vector3(width, height, 1f);
+	}
+	void OnDrawGizmos() {
+		Gizmos.color = Color.clear;
+		Gizmos.matrix = transform.localToWorldMatrix;
+		Gizmos.DrawCube(gizmosCenter, gizmosSize);
+	}
+#endif
+#endregion
 }
