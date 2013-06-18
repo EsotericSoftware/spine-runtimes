@@ -76,19 +76,23 @@ namespace Spine {
 			// Release the GPU back to drawing to the screen
 			device.SetRenderTarget(null);
 
+#if IOS
+			return result as Texture2D;
+#else
 			// RenderTarget2D are volatile and will be lost on screen resolution changes.
-      			// So instead of using this directly, we create a non-voliate Texture2D.
-      			// This is computationally slower, but should be safe as long as it is done
-      			// on load.
-      			Texture2D resultTexture = new Texture2D(device, file.Width, file.Height);
-      			Color[] resultContent = new Color[Convert.ToInt32(file.Width * file.Height)];
-      			result.GetData(resultContent);
-      			resultTexture.SetData(resultContent);
+			// So instead of using this directly, we create a non-voliate Texture2D.
+			// This is computationally slower, but should be safe as long as it is done
+			// on load.
+			Texture2D resultTexture = new Texture2D(device, file.Width, file.Height);
+			Color[] resultContent = new Color[Convert.ToInt32(file.Width * file.Height)];
+			result.GetData(resultContent);
+			resultTexture.SetData(resultContent);
 	
 			// Dispose of the RenderTarget2D immediately.
-      			result.Dispose();
+            result.Dispose();
       			
 			return resultTexture;
+#endif
 		}
 	}
 }
