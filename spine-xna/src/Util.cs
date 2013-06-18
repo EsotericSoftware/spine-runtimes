@@ -28,8 +28,36 @@ using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
+#if WINDOWS_STOREAPP
+using System.Threading.Tasks;
+using Windows.Storage;
+#endif
+
 namespace Spine {
-	static public class Util {
+
+    static public class Util {
+#if WINDOWS_STOREAPP
+		private static async Task<Texture2D> LoadFile(GraphicsDevice device, String path)
+        {
+            var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
+
+            var file = await folder.GetFileAsync(path).AsTask().ConfigureAwait(false);
+
+            try
+            {
+                return Util.LoadTexture(device, await file.OpenStreamForReadAsync().ConfigureAwait(false));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error reading texture file: " + path, ex);
+            }
+        }
+
+        static public Texture2D LoadTexture (GraphicsDevice device, String path)
+        {
+            return LoadFile(device, path).Result;
+		}
+#else
 		static public Texture2D LoadTexture (GraphicsDevice device, String path) {
 			using (Stream input = new FileStream(path, FileMode.Open, FileAccess.Read)) {
 				try {
@@ -40,6 +68,7 @@ namespace Spine {
 			}
 		}
 
+#endif
 		static public Texture2D LoadTexture (GraphicsDevice device, Stream input) {
 			Texture2D file = Texture2D.FromStream(device, input);
 
