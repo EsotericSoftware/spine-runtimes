@@ -165,9 +165,6 @@ public class SkeletonComponent : MonoBehaviour {
 		mesh.colors32 = colors;
 		mesh.uv = uvs;
 		if (newTriangles) mesh.triangles = triangles;
-#if UNITY_EDITOR
-		UpdateEditorGizmo();
-#endif
 	}
 
 	public virtual void OnEnable () {
@@ -185,23 +182,19 @@ public class SkeletonComponent : MonoBehaviour {
 	
 #region Unity Editor
 #if UNITY_EDITOR
-	Vector3 gizmosCenter = new Vector3();
-	Vector3 gizmosSize = new Vector3();
-	Vector3 min = new Vector3(float.MaxValue, float.MaxValue, 0f);
-	Vector3 max = new Vector3(float.MinValue, float.MinValue, 0f);
-
-	void UpdateEditorGizmo() {
-		//determine the minimums and maximums
+	void OnDrawGizmos() {
+		Vector3 gizmosCenter = new Vector3();
+		Vector3 gizmosSize = new Vector3();
+		Vector3 min = new Vector3(float.MaxValue, float.MaxValue, 0f);
+		Vector3 max = new Vector3(float.MinValue, float.MinValue, 0f);
 		foreach (Vector3 vert in vertices) {
-			min = Vector3.Min(min, vert);
-			max = Vector3.Max(max, vert);
+			min = Vector3.Min (min, vert);
+			max = Vector3.Max (max, vert);
 		}
 		float width = max.x - min.x;
 		float height = max.y - min.y;
 		gizmosCenter = new Vector3(min.x + (width / 2f), min.y + (height / 2f), 0f);
-		gizmosSize = new Vector3(width, height, 1f);
-	}
-	void OnDrawGizmos() {
+		gizmosSize	= new Vector3(width, height, 1f);
 		Gizmos.color = Color.clear;
 		Gizmos.matrix = transform.localToWorldMatrix;
 		Gizmos.DrawCube(gizmosCenter, gizmosSize);
