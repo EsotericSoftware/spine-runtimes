@@ -49,70 +49,70 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\spine-csharp\src\Attachments\AtlasAttachmentLoader.cs">
+    <Compile Include="..\..\..\spine -csharp\src\Attachments\AtlasAttachmentLoader.cs">
       <Link>spine-csharp\Attachments\AtlasAttachmentLoader.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-csharp\src\Attachments\Attachment.cs">
+    <Compile Include="..\..\..\spine -csharp\src\Attachments\Attachment.cs">
       <Link>spine-csharp\Attachments\Attachment.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-csharp\src\Attachments\AttachmentLoader.cs">
+    <Compile Include="..\..\..\spine -csharp\src\Attachments\AttachmentLoader.cs">
       <Link>spine-csharp\Attachments\AttachmentLoader.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-csharp\src\Attachments\AttachmentType.cs">
+    <Compile Include="..\..\..\spine -csharp\src\Attachments\AttachmentType.cs">
       <Link>spine-csharp\Attachments\AttachmentType.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-csharp\src\Attachments\RegionAttachment.cs">
+    <Compile Include="..\..\..\spine -csharp\src\Attachments\RegionAttachment.cs">
       <Link>spine-csharp\Attachments\RegionAttachment.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-csharp\src\Animation.cs">
+    <Compile Include="..\..\..\spine -csharp\src\Animation.cs">
       <Link>spine-csharp\Animation.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-csharp\src\AnimationState.cs">
+    <Compile Include="..\..\..\spine -csharp\src\AnimationState.cs">
       <Link>spine-csharp\AnimationState.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-csharp\src\AnimationStateData.cs">
+    <Compile Include="..\..\..\spine -csharp\src\AnimationStateData.cs">
       <Link>spine-csharp\AnimationStateData.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-csharp\src\Atlas.cs">
+    <Compile Include="..\..\..\spine -csharp\src\Atlas.cs">
       <Link>spine-csharp\Atlas.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-csharp\src\Bone.cs">
+    <Compile Include="..\..\..\spine -csharp\src\Bone.cs">
       <Link>spine-csharp\Bone.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-csharp\src\BoneData.cs">
+    <Compile Include="..\..\..\spine -csharp\src\BoneData.cs">
       <Link>spine-csharp\BoneData.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-csharp\src\Json.cs">
+    <Compile Include="..\..\..\spine -csharp\src\Json.cs">
       <Link>spine-csharp\Json.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-csharp\src\Skeleton.cs">
+    <Compile Include="..\..\..\spine -csharp\src\Skeleton.cs">
       <Link>spine-csharp\Skeleton.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-csharp\src\SkeletonData.cs">
+    <Compile Include="..\..\..\spine -csharp\src\SkeletonData.cs">
       <Link>spine-csharp\SkeletonData.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-csharp\src\SkeletonJson.cs">
+    <Compile Include="..\..\..\spine -csharp\src\SkeletonJson.cs">
       <Link>spine-csharp\SkeletonJson.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-csharp\src\Skin.cs">
+    <Compile Include="..\..\..\spine -csharp\src\Skin.cs">
       <Link>spine-csharp\Skin.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-csharp\src\Slot.cs">
+    <Compile Include="..\..\..\spine -csharp\src\Slot.cs">
       <Link>spine-csharp\Slot.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-csharp\src\SlotData.cs">
+    <Compile Include="..\..\..\spine -csharp\src\SlotData.cs">
       <Link>spine-csharp\SlotData.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-xna\src\SkeletonRenderer.cs">
+    <Compile Include="..\..\..\spine -xna\src\SkeletonRenderer.cs">
       <Link>spine-xna\SkeletonRenderer.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-xna\src\SpriteBatcher.cs">
+    <Compile Include="..\..\..\spine -xna\src\SpriteBatcher.cs">
       <Link>spine-xna\SpriteBatcher.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-xna\src\Util.cs">
+    <Compile Include="..\..\..\spine -xna\src\Util.cs">
       <Link>spine-xna\Util.cs</Link>
     </Compile>
-    <Compile Include="..\..\spine-xna\src\XnaTextureLoader.cs">
+    <Compile Include="..\..\..\spine -xna\src\XnaTextureLoader.cs">
       <Link>spine-xna\XnaTextureLoader.cs</Link>
     </Compile>
   </ItemGroup>
