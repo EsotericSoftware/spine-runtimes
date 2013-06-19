@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{08DC311B-1F38-4CBD-B7B6-B734984A8CB3}</ProjectGuid>
+    <ProjectTypeGuids>{6BC8ED88-2882-458C-8E55-DFD12B67127B};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <RootNamespace>spinecsharpxamarinios</RootNamespace>
+    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
+    <AssemblyName>spine-monogame-xamarinstudio-ios</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;IOS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="monotouch" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="spine-csharp\" />
+    <Folder Include="spine-xna\" />
+    <Folder Include="spine-csharp\Attachments\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\MonoGame\MonoGame.Framework\MonoGame.Framework.iOS.csproj">
+      <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
+      <Name>MonoGame.Framework.iOS</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\spine-csharp\src\Attachments\AtlasAttachmentLoader.cs">
+      <Link>spine-csharp\Attachments\AtlasAttachmentLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Attachments\Attachment.cs">
+      <Link>spine-csharp\Attachments\Attachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Attachments\AttachmentLoader.cs">
+      <Link>spine-csharp\Attachments\AttachmentLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Attachments\AttachmentType.cs">
+      <Link>spine-csharp\Attachments\AttachmentType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Attachments\RegionAttachment.cs">
+      <Link>spine-csharp\Attachments\RegionAttachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Animation.cs">
+      <Link>spine-csharp\Animation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\AnimationState.cs">
+      <Link>spine-csharp\AnimationState.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\AnimationStateData.cs">
+      <Link>spine-csharp\AnimationStateData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Atlas.cs">
+      <Link>spine-csharp\Atlas.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Bone.cs">
+      <Link>spine-csharp\Bone.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\BoneData.cs">
+      <Link>spine-csharp\BoneData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Json.cs">
+      <Link>spine-csharp\Json.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Skeleton.cs">
+      <Link>spine-csharp\Skeleton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\SkeletonData.cs">
+      <Link>spine-csharp\SkeletonData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\SkeletonJson.cs">
+      <Link>spine-csharp\SkeletonJson.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Skin.cs">
+      <Link>spine-csharp\Skin.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Slot.cs">
+      <Link>spine-csharp\Slot.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\SlotData.cs">
+      <Link>spine-csharp\SlotData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-xna\src\SkeletonRenderer.cs">
+      <Link>spine-xna\SkeletonRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-xna\src\SpriteBatcher.cs">
+      <Link>spine-xna\SpriteBatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-xna\src\Util.cs">
+      <Link>spine-xna\Util.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-xna\src\XnaTextureLoader.cs">
+      <Link>spine-xna\XnaTextureLoader.cs</Link>
+    </Compile>
+  </ItemGroup>
+</Project>
