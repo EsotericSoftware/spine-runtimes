@@ -27,6 +27,9 @@ forums
 spine-csharp/bin
 spine-csharp/obj
 
+spine-monogame-xamarinstudio-ios/src/bin
+spine-monogame-xamarinstudio-ios/src/obj
+
 spine-monogame-windows8-store/src/bin
 spine-monogame-windows8-store/src/obj
 
