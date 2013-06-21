@@ -78,8 +78,8 @@ namespace Spine {
 			state.AddAnimation("jump", false);
 			state.AddAnimation("walk", true);
 
-			skeleton.RootBone.X = 320;
-			skeleton.RootBone.Y = 440;
+			skeleton.X = 320;
+			skeleton.Y = 440;
 			skeleton.UpdateWorldTransform();
 		}
 
