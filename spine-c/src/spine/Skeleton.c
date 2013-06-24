@@ -184,9 +184,13 @@ int Skeleton_setAttachment (Skeleton* self, const char* slotName, const char* at
 	for (i = 0; i < self->slotCount; ++i) {
 		Slot *slot = self->slots[i];
 		if (strcmp(slot->data->name, slotName) == 0) {
-			Attachment* attachment = Skeleton_getAttachmentForSlotIndex(self, i, attachmentName);
-			if (!attachment) return 0;
-			Slot_setAttachment(slot, attachment);
+			if (!attachmentName)
+				Slot_setAttachment(slot, 0);
+			else {
+				Attachment* attachment = Skeleton_getAttachmentForSlotIndex(self, i, attachmentName);
+				if (!attachment) return 0;
+				Slot_setAttachment(slot, attachment);
+			}
 			return 1;
 		}
 	}
