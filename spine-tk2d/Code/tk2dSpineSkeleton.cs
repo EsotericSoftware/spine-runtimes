@@ -125,7 +125,6 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 			}
 		}
 		
-		renderer.sharedMaterial = skeletonDataAsset.spritesData.inst.materials[0];
 #if UNITY_EDITOR
 		UpdateEditorGizmo();
 #endif
