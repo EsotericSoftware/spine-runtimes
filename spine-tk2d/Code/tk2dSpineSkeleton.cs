@@ -139,6 +139,9 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 			if (attachment is RegionAttachment) quadCount++;
 		}
 		
+#if UNITY_EDITOR
+		if (mesh.subMeshCount == submeshIndices.Count)
+#endif
 		if (quadCount == cachedQuadCount) return;
 		
 		cachedQuadCount = quadCount;
