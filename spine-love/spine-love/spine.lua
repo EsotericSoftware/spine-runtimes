@@ -68,22 +68,11 @@ function spine.Skeleton.new (skeletonData, group)
 		for i,slot in ipairs(self.drawOrder) do
 			local attachment = slot.attachment
 			local image = images[attachment]
-			if not attachment then
-				-- Attachment is gone, remove the image.
-				if image then
-					images[attachment] = nil
-				end
-			else
-				-- Attachment image has changed.
-				if image and image.attachment ~= attachment then
-					image:removeSelf()
-					image = nil
-				end
+			if attachment then
 				-- Create new image.
 				if not image then
 					image = self:createImage(attachment)
 					if image then
-						image.attachment = attachment
 						local imageWidth = image:getWidth()
 						local imageHeight = image:getHeight()
 						attachment.widthRatio = attachment.width / imageWidth
