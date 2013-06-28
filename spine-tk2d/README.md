@@ -1,5 +1,7 @@
 The Spine runtime for Unity with 2d Toolkit comes with an example project which has "spineboy" walking. When clicked, he jumps and the transition to/from walking/jumping is blended smoothly. Use the instructions below.
 
+[http://www.youtube.com/watch?v=dnQbS9ap-i8](Setup Video)
+
 # Requirements
 
 1. Latest 2d toolkit imported in your project
