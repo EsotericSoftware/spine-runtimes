@@ -41,16 +41,16 @@ public class SkeletonAnimationSprite extends SkeletonSprite {
 		states[stateIndex].data.setMixByName(fromAnimation, toAnimation, duration);
 	}
 
-	public function setAnimation (name:String, loop:Boolean, stateIndex:int = 0) : void {
+	public function setAnimation (name:String, loop:Boolean, stateIndex:int = 0, callback:Function = null) : void {
 		if (stateIndex < 0 || stateIndex >= states.length)
 			throw new ArgumentError("stateIndex out of range.");
-		states[stateIndex].setAnimationByName(name, loop);
+		states[stateIndex].setAnimationByName(name, loop, callback);
 	}
 
-	public function addAnimation (name:String, loop:Boolean, delay:Number = 0, stateIndex:int = 0) : void {
+	public function addAnimation (name:String, loop:Boolean, delay:Number = 0, stateIndex:int = 0, callback:Function = null) : void {
 		if (stateIndex < 0 || stateIndex >= states.length)
 			throw new ArgumentError("stateIndex out of range.");
-		states[stateIndex].addAnimationByName(name, loop, delay);
+		states[stateIndex].addAnimationByName(name, loop, delay, callback);
 	}
 
 	public function clearAnimation (stateIndex:int = 0) : void {
