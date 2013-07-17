@@ -5,6 +5,7 @@ public class AnimationStateData {
 	private var _skeletonData:SkeletonData;
 	private var animationToMixTime:Object = new Object();
 	public var defaultMix:Number = 0;
+	// comment
 
 	public function AnimationStateData (skeletonData:SkeletonData) {
 		_skeletonData = skeletonData;
