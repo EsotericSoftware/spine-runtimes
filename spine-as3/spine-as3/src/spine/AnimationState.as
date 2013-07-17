@@ -13,7 +13,7 @@ public class AnimationState {
 	private var mixDuration:Number;
 	private var queue:Vector.<QueueEntry> = new Vector.<QueueEntry>();
 	
-	private var endAnimationCallback:Function;
+	private var completeCallBack:Function;
 
 	public function AnimationState (data:AnimationStateData) {
 		if (data == null)
@@ -29,7 +29,7 @@ public class AnimationState {
 		if (queue.length > 0) {
 			var entry:QueueEntry = queue[0];
 			if (currentTime >= entry.delay) {
-				setAnimationInternal(entry.animation, entry.loop, entry.endAnimationCallback);
+				setAnimationInternal(entry.animation, entry.loop, entry.completeCallBack);
 				queue.shift();
 			}
 		}
@@ -60,10 +60,10 @@ public class AnimationState {
 		queue.length = 0;
 	}
 
-	private function setAnimationInternal (animation:Animation, loop:Boolean, callback:Function) : void {
+	private function setAnimationInternal (animation:Animation, loop:Boolean, completeCallBack:Function) : void {
 		if (current != null) {
-			if (endAnimationCallback != null) {
-				endAnimationCallback(current);
+			if (completeCallBack != null) {
+				completeCallBack(current);
 			}
 		}
 		previous = null;
@@ -76,42 +76,42 @@ public class AnimationState {
 				previousLoop = currentLoop;
 			}
 		}
-		endAnimationCallback = callback;
+		completeCallBack = completeCallBack;
 		current = animation;
 		currentLoop = loop;
 		currentTime = 0;
 	}
 
 	/** @see #setAnimation(Animation, Boolean) */
-	public function setAnimationByName (animationName:String, loop:Boolean, callback:Function = null) : void {
+	public function setAnimationByName (animationName:String, loop:Boolean, completeCallBack:Function = null) : void {
 		var animation:Animation = _data.skeletonData.findAnimation(animationName);
 		if (animation == null)
 			throw new ArgumentError("Animation not found: " + animationName);
-		setAnimation(animation, loop, callback);
+		setAnimation(animation, loop, completeCallBack);
 	}
 
 	/** Set the current animation. Any queued animations are cleared and the current animation time is set to 0.
 	 * @param animation May be null. */
-	public function setAnimation (animation:Animation, loop:Boolean, callback:Function = null) : void {
+	public function setAnimation (animation:Animation, loop:Boolean, completeCallBack:Function = null) : void {
 		clearQueue();
-		setAnimationInternal(animation, loop, callback);
+		setAnimationInternal(animation, loop, completeCallBack);
 	}
 
 	/** @see #addAnimation(Animation, Boolean, Number) */
-	public function addAnimationByName (animationName:String, loop:Boolean, delay:Number, callback:Function = null) : void {
+	public function addAnimationByName (animationName:String, loop:Boolean, delay:Number, completeCallBack:Function = null) : void {
 		var animation:Animation = _data.skeletonData.findAnimation(animationName);
 		if (animation == null)
 			throw new ArgumentError("Animation not found: " + animationName);
-		addAnimation(animation, loop, delay, callback);
+		addAnimation(animation, loop, delay, completeCallBack);
 	}
 
 	/** Adds an animation to be played delay seconds after the current or last queued animation.
 	 * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay. */
-	public function addAnimation (animation:Animation, loop:Boolean, delay:Number, callback:Function = null) : void {
+	public function addAnimation (animation:Animation, loop:Boolean, delay:Number, completeCallBack:Function = null) : void {
 		var entry:QueueEntry = new QueueEntry();
 		entry.animation = animation;
 		entry.loop = loop;
-		entry.endAnimationCallback = callback;
+		entry.completeCallBack = completeCallBack;
 		
 		if (delay <= 0) {
 			var previousAnimation:Animation = queue.length == 0 ? current : queue[queue.length - 1].animation;
@@ -161,5 +161,5 @@ class QueueEntry {
 	public var animation:Animation;
 	public var loop:Boolean;
 	public var delay:Number;
-	public var endAnimationCallback:Function;
+	public var completeCallBack:Function;
 }
