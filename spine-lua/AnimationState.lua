@@ -112,7 +112,6 @@ local function new(animationStateData)
         setAnimationInternal(animationStateData.getSkeletonData():findAnimation(animationName), loop) 
     end
     
-    -- Get the current animation
     local function getAnimation()
         return currentAnimation
     end
@@ -122,6 +121,7 @@ local function new(animationStateData)
         return currentAnimation == nil or currentTime >= currentAnimation.duration
     end
     
+    -- Functions reachable from the state object
     animationState.update = update
     animationState.apply = apply
     animationState.isComplete = isComplete
