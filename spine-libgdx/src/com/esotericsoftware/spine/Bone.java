@@ -196,17 +196,10 @@ public class Bone {
 	public Matrix3 getWorldTransform (Matrix3 worldTransform) {
 		if (worldTransform == null) throw new IllegalArgumentException("worldTransform cannot be null.");
 		float[] val = worldTransform.val;
-		if (data.inheritRotation) {
-			val[M00] = m00;
-			val[M01] = m01;
-			val[M10] = m10;
-			val[M11] = m11;
-		} else {
-			val[M00] = 1;
-			val[M01] = 0;
-			val[M10] = 0;
-			val[M11] = 1;
-		}
+		val[M00] = m00;
+		val[M01] = m01;
+		val[M10] = m10;
+		val[M11] = m11;
 		val[M02] = worldX;
 		val[M12] = worldY;
 		val[M20] = 0;
