@@ -35,7 +35,7 @@ function Skeleton.new (skeletonData)
 		data = skeletonData,
 		bones = {},
 		slots = {},
-    slotsByName = {},
+		slotsByName = {},
 		drawOrder = {}
 	}
 
@@ -74,10 +74,10 @@ function Skeleton.new (skeletonData)
 		return nil
 	end
 
-  function self:findSlot (slotName)
-    if not slotName then error("slotName cannot be nil.", 2) end
-    return slotsByName[slotName]
-  end
+	function self:findSlot (slotName)
+		if not slotName then error("slotName cannot be nil.", 2) end
+		return self.slotsByName[slotName]
+	end
 
 	function self:setSkin (skinName)
 		local newSkin
@@ -145,7 +145,7 @@ function Skeleton.new (skeletonData)
 		local bone = self.bones[spine.utils.indexOf(skeletonData.bones, slotData.boneData)]
 		local slot = Slot.new(slotData, self, bone)
 		table.insert(self.slots, slot)
-        self.slotsByName[slot.data.name] = slot
+		self.slotsByName[slot.data.name] = slot
 		table.insert(self.drawOrder, slot)
 	end
 
