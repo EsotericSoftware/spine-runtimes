@@ -163,13 +163,12 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		int drawCount = skeleton.DrawOrder.Count;
 		for (int i = 0; i < drawCount; i++) {
 			Attachment attachment = skeleton.DrawOrder[i].Attachment;
+			if (!(attachment is RegionAttachment)) continue;
 			Material currentMaterial = skeletonDataAsset.spritesData.GetSpriteDefinition(attachment.Name).material;
 			
-			if(!(attachment is RegionAttachment)) continue;
+			if (oldMaterial == null) oldMaterial = currentMaterial;
 			
-			if(oldMaterial == null) oldMaterial = currentMaterial;
-			
-			if(oldMaterial != currentMaterial) {
+			if (oldMaterial != currentMaterial) {
 				submeshIndices.Add(currentSubmesh.ToArray());
 				submeshMaterials.Add(oldMaterial);
 				currentSubmesh.Clear();
