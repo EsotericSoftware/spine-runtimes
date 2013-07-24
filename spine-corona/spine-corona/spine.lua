@@ -41,6 +41,8 @@ spine.Bone = require "spine-lua.Bone"
 spine.Slot = require "spine-lua.Slot"
 spine.AttachmentLoader = require "spine-lua.AttachmentLoader"
 spine.Animation = require "spine-lua.Animation"
+spine.AnimationStateData = require "spine-lua.AnimationStateData"
+spine.AnimationState = require "spine-lua.AnimationState"
 
 spine.utils.readFile = function (fileName, base)
 	if not base then base = system.ResourceDirectory end

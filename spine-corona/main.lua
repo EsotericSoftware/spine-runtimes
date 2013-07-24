@@ -22,6 +22,17 @@ skeleton.debug = true -- Omit or set to false to not draw debug lines on top of 
 if name == "goblins" then skeleton:setSkin("goblingirl") end
 skeleton:setToSetupPose()
 
+-- AnimationStateData defines crossfade durations between animations.
+local stateData = spine.AnimationStateData.new(skeletonData)
+stateData:setMix("walk", "jump", 0.2)
+stateData:setMix("jump", "walk", 0.4)
+
+-- AnimationState has a queue of animations and can apply them with crossfading.
+local state = spine.AnimationState.new(stateData)
+state:setAnimation("walk", false)
+state:addAnimation("jump", false)
+state:addAnimation("walk", true)
+
 local lastTime = 0
 local animationTime = 0
 Runtime:addEventListener("enterFrame", function (event)
@@ -30,9 +41,9 @@ Runtime:addEventListener("enterFrame", function (event)
 	local delta = currentTime - lastTime
 	lastTime = currentTime
 
-	-- Accumulate time and pose skeleton using animation.
-	animationTime = animationTime + delta
-	walkAnimation:apply(skeleton, animationTime, true)
+	-- Update the state with the delta time, apply it, and update the world transforms.
+	state:update(delta)
+	state:apply(skeleton)
 	skeleton:updateWorldTransform()
 end)
 
