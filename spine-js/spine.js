@@ -1,4 +1,3 @@
-
 var spine = {};
 
 spine.BoneData = function (name, parent) {
@@ -1078,7 +1077,7 @@ spine.SkeletonJson.readCurve = function (timeline, frameIndex, valueMap) {
 };
 spine.SkeletonJson.toColor = function (hexString, colorIndex) {
 	if (hexString.length != 8) throw "Color hexidecimal length must be 8, recieved: " + hexString;
-	return parseInt(hexString.substring(colorIndex * 2, 2), 16) / 255;
+	return parseInt(hexString.substring(colorIndex * 2, (colorIndex * 2)+2), 16) / 255;
 };
 
 spine.Atlas = function (atlasText, textureLoader) {
