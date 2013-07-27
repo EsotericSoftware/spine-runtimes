@@ -41,7 +41,7 @@ CCScene* ExampleLayer::scene () {
 bool ExampleLayer::init () {
 	if (!CCLayer::init()) return false;
 
-	skeletonNode = new CCSkeletonAnimation("spineboy.json", "spineboy.atlas");
+	skeletonNode = CCSkeletonAnimation::createWithFile("spineboy.json", "spineboy.atlas");
 	skeletonNode->setMix("walk", "jump", 0.2f);
 	skeletonNode->setMix("jump", "walk", 0.4f);
 
@@ -62,7 +62,6 @@ bool ExampleLayer::init () {
 	CCSize windowSize = CCDirector::sharedDirector()->getWinSize();
 	skeletonNode->setPosition(ccp(windowSize.width / 2, 20));
 	addChild(skeletonNode);
-	skeletonNode->release();
 
 	scheduleUpdate();
 
