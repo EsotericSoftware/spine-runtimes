@@ -19,34 +19,27 @@ public class tk2dSpineAttachmentLoader : AttachmentLoader {
 		int index = name.LastIndexOfAny(new char[] {'/', '\\'});
 		if (index != -1) name = name.Substring(index + 1);
 		
-		tk2dSpriteDefinition attachmentParameters = sprites.GetSpriteDefinition(name);
+		tk2dSpriteDefinition def = sprites.GetSpriteDefinition(name);
 		
-		if (attachmentParameters == null) throw new Exception("Sprite not found in atlas: " + name + " (" + type + ")");
-		if (attachmentParameters.complexGeometry) throw new NotImplementedException("Complex geometry is not supported: " + name + " (" + type + ")");
-		if (attachmentParameters.flipped == tk2dSpriteDefinition.FlipMode.TPackerCW) throw new NotImplementedException("Only 2D Toolkit atlases are supported: " + name + " (" + type + ")");
+		if (def == null) throw new Exception("Sprite not found in atlas: " + name + " (" + type + ")");
+		if (def.complexGeometry) throw new NotImplementedException("Complex geometry is not supported: " + name + " (" + type + ")");
+		if (def.flipped == tk2dSpriteDefinition.FlipMode.TPackerCW) throw new NotImplementedException("Only 2D Toolkit atlases are supported: " + name + " (" + type + ")");
 
+		RegionAttachment attachment = new RegionAttachment(name);
+		
 		Vector2 minTexCoords = Vector2.one;
 		Vector2 maxTexCoords = Vector2.zero;
-		for (int i = 0; i < attachmentParameters.uvs.Length; ++i) {
-			Vector2 uv = attachmentParameters.uvs[i];
+		for (int i = 0; i < def.uvs.Length; ++i) {
+			Vector2 uv = def.uvs[i];
 			minTexCoords = Vector2.Min(minTexCoords, uv);
 			maxTexCoords = Vector2.Max(maxTexCoords, uv);
 		}
-		
-		Texture texture = attachmentParameters.material.mainTexture;
-		int width = (int)(Mathf.Abs(maxTexCoords.x - minTexCoords.x) * texture.width);
-		int height = (int)(Mathf.Abs(maxTexCoords.y - minTexCoords.y) * texture.height);
-		
-		bool rotated = (attachmentParameters.flipped == tk2dSpriteDefinition.FlipMode.Tk2d);
-		
+		bool rotated = def.flipped == tk2dSpriteDefinition.FlipMode.Tk2d;
 		if (rotated) {
 			float temp = minTexCoords.x;
 			minTexCoords.x = maxTexCoords.x;
 			maxTexCoords.x = temp;
 		}
-		
-		RegionAttachment attachment = new RegionAttachment(name);
-		
 		attachment.SetUVs(
 			minTexCoords.x,
 			maxTexCoords.y,
@@ -54,13 +47,21 @@ public class tk2dSpineAttachmentLoader : AttachmentLoader {
 			minTexCoords.y,
 			rotated
 		);
-
-		// TODO - Set attachment.RegionOffsetX/Y. What units does attachmentParameters.untrimmedBoundsData use?!
-		attachment.RegionWidth = width;
-		attachment.RegionHeight = height;
-		attachment.RegionOriginalWidth = width;
-		attachment.RegionOriginalHeight = height;
 		
+		attachment.RegionOriginalWidth = (int)(def.untrimmedBoundsData[1].x / def.texelSize.x);
+		attachment.RegionOriginalHeight = (int)(def.untrimmedBoundsData[1].y / def.texelSize.y);
+
+		attachment.RegionWidth = (int)(def.boundsData[1].x / def.texelSize.x);
+		attachment.RegionHeight = (int)(def.boundsData[1].y / def.texelSize.y);
+
+		float x0 = def.untrimmedBoundsData[0].x - def.untrimmedBoundsData[1].x / 2;
+		float x1 = def.boundsData[0].x - def.boundsData[1].x / 2;
+		attachment.RegionOffsetX = (int)((x1 - x0) / def.texelSize.x);
+
+		float y0 = def.untrimmedBoundsData[0].y - def.untrimmedBoundsData[1].y / 2;
+		float y1 = def.boundsData[0].y - def.boundsData[1].y / 2;
+		attachment.RegionOffsetY = (int)((y1 - y0) / def.texelSize.y);
+
 		return attachment;
 	}
 }
