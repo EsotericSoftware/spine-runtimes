@@ -36,7 +36,8 @@ function Skeleton.new (skeletonData)
 		bones = {},
 		slots = {},
 		slotsByName = {},
-		drawOrder = {}
+		drawOrder = {},
+		r = 1, g = 1, b = 1, a = 1
 	}
 
 	function self:updateWorldTransform ()

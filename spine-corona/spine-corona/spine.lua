@@ -134,7 +134,7 @@ function spine.Skeleton.new (skeletonData, group)
 						image.yScale = -image.yScale
 						image.rotation = -image.rotation
 					end
-					image:setFillColor(slot.r, slot.g, slot.b, slot.a)
+					image:setFillColor(self.r * slot.r, self.g * slot.g, self.b * slot.b, self.a * slot.a)
 					self.group:insert(image)
 				end
 			end

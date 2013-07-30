@@ -102,7 +102,7 @@ function spine.Skeleton.new (skeletonData, group)
 						yScale = -yScale
 						rotation = -rotation
 					end
-					love.graphics.setColor(slot.r, slot.g, slot.b, slot.a)
+					love.graphics.setColor(self.r * slot.r, self.g * slot.g, self.b * slot.b, self.a * slot.a)
 					love.graphics.draw(image, 
 						self.x + x, 
 						self.y - y, 
