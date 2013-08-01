@@ -73,10 +73,9 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 			
 			if (attachment is RegionAttachment) {
 				RegionAttachment regionAttachment = attachment as RegionAttachment;
-				
 				regionAttachment.ComputeVertices(skeleton.X, skeleton.Y, slot.Bone, vertexPositions);
-				int vertexIndex = quadIndex * 4;
-				
+
+				int vertexIndex = quadIndex * 4;			
 				vertices[vertexIndex + 0] = new Vector3(vertexPositions[RegionAttachment.X1],vertexPositions[RegionAttachment.Y1],0);
 				vertices[vertexIndex + 1] = new Vector3(vertexPositions[RegionAttachment.X4],vertexPositions[RegionAttachment.Y4],0);
 				vertices[vertexIndex + 2] = new Vector3(vertexPositions[RegionAttachment.X2],vertexPositions[RegionAttachment.Y2],0);
@@ -105,11 +104,6 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		mesh.vertices = vertices;
 		mesh.colors32 = colors;
 		mesh.uv = uvs;
-		
-		mesh.subMeshCount = submeshIndices.Count;
-		for(int i = 0; i < mesh.subMeshCount; ++i) {
-			mesh.SetTriangles(submeshIndices[i],i);
-		}
 		
 		if (skeletonDataAsset.normalGenerationMode != tk2dSpriteCollection.NormalGenerationMode.None) {
 			mesh.RecalculateNormals();
@@ -141,14 +135,23 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		if (mesh.subMeshCount == submeshIndices.Count)
 #endif
 		if (quadCount == cachedQuadCount) return;
-
-		mesh.Clear();
+		
 		cachedQuadCount = quadCount;
 		vertices = new Vector3[quadCount * 4];
 		uvs = new Vector2[quadCount * 4];
 		colors = new Color32[quadCount * 4];
 		
 		UpdateSubmeshCache();
+
+		mesh.Clear();		
+		mesh.vertices = vertices;
+		mesh.colors32 = colors;
+		mesh.uv = uvs;
+
+		mesh.subMeshCount = submeshIndices.Count;
+		for(int i = 0; i < mesh.subMeshCount; ++i) {
+			mesh.SetTriangles(submeshIndices[i],i);
+		}
 	}
 	
 	private void UpdateSubmeshCache() {
