@@ -102,8 +102,6 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 			}
 		}
 		
-		mesh.Clear();
-		
 		mesh.vertices = vertices;
 		mesh.colors32 = colors;
 		mesh.uv = uvs;
@@ -143,7 +141,8 @@ public class tk2dSpineSkeleton : MonoBehaviour, tk2dRuntime.ISpriteCollectionFor
 		if (mesh.subMeshCount == submeshIndices.Count)
 #endif
 		if (quadCount == cachedQuadCount) return;
-		
+
+		mesh.Clear();
 		cachedQuadCount = quadCount;
 		vertices = new Vector3[quadCount * 4];
 		uvs = new Vector2[quadCount * 4];
