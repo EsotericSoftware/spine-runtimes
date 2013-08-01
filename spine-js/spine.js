@@ -742,7 +742,7 @@ spine.RegionAttachment.prototype = {
 		vertices[6/*X4*/] = offset[6/*X4*/] * m00 + offset[7/*Y4*/] * m01 + x;
 		vertices[7/*Y4*/] = offset[6/*X4*/] * m10 + offset[7/*Y4*/] * m11 + y;
 	}
-}
+};
 
 spine.AnimationStateData = function (skeletonData) {
 	this.skeletonData = skeletonData;
@@ -1291,11 +1291,11 @@ spine.AtlasReader.prototype = {
 		tuple[i] = this.trim(line.substring(lastMatch));
 		return i + 1;
 	}
-}
+};
 
 spine.AtlasAttachmentLoader = function (atlas) {
 	this.atlas = atlas;
-}
+};
 spine.AtlasAttachmentLoader.prototype = {
 	newAttachment: function (skin, type, name) {
 		switch (type) {
@@ -1315,4 +1315,4 @@ spine.AtlasAttachmentLoader.prototype = {
 		}
 		throw "Unknown attachment type: " + type;
 	}
-}
+};
