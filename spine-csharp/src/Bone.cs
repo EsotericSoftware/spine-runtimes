@@ -87,11 +87,7 @@ namespace Spine {
 				M00 = -M00;
 				M01 = -M01;
 			}
-			if (flipY) {
-				M10 = -M10;
-				M11 = -M11;
-			}
-			if (yDown) {
+			if (flipY ^ yDown) {
 				M10 = -M10;
 				M11 = -M11;
 			}
