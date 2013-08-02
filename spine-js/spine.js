@@ -60,11 +60,7 @@ spine.Bone.prototype = {
 			this.m00 = -this.m00;
 			this.m01 = -this.m01;
 		}
-		if (flipY) {
-			this.m10 = -this.m10;
-			this.m11 = -this.m11;
-		}
-		if (spine.Bone.yDown) {
+		if (flipY != spine.Bone.yDown) {
 			this.m10 = -this.m10;
 			this.m11 = -this.m11;
 		}
