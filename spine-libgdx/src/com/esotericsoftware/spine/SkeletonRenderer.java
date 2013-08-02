@@ -12,6 +12,7 @@ public class SkeletonRenderer {
 	public void draw (SpriteBatch batch, Skeleton skeleton) {
 		Array<Slot> drawOrder = skeleton.drawOrder;
 		boolean additive = false;
+		int srcFunc = batch.getBlendSrcFunc();
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder.get(i);
 			Attachment attachment = slot.attachment;
@@ -22,13 +23,13 @@ public class SkeletonRenderer {
 				if (slot.data.getAdditiveBlending() != additive) {
 					additive = !additive;
 					if (additive)
-						batch.setBlendFunction(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+						batch.setBlendFunction(srcFunc, GL11.GL_ONE);
 					else
-						batch.setBlendFunction(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+						batch.setBlendFunction(srcFunc, GL11.GL_ONE_MINUS_SRC_ALPHA);
 				}
 				batch.draw(regionAttachment.getRegion().getTexture(), vertices, 0, vertices.length);
 			}
 		}
-		if (additive) batch.setBlendFunction(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		if (additive) batch.setBlendFunction(srcFunc, GL11.GL_ONE_MINUS_SRC_ALPHA);
 	}
 }
