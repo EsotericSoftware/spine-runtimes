@@ -56,11 +56,7 @@ public class Bone {
 			_m00 = -_m00;
 			_m01 = -_m01;
 		}
-		if (flipY) {
-			_m10 = -_m10;
-			_m11 = -_m11;
-		}
-		if (yDown) {
+		if (flipY != yDown) {
 			_m10 = -_m10;
 			_m11 = -_m11;
 		}
