@@ -45,7 +45,8 @@
 			"eyes-closed": { "x": 28.77, "y": -32.86, "rotation": -86.9, "width": 34, "height": 27 }
 		},
 		"head": {
-			"head": { "x": 53.94, "y": -5.75, "rotation": -86.9, "width": 121, "height": 132 }
+			"head": { "x": 53.94, "y": -5.75, "rotation": -86.9, "width": 121, "height": 132 },
+			"left-foot": { "x": 53.94, "y": -5.75, "rotation": -86.9, "width": 65, "height": 30 }
 		},
 		"left arm": {
 			"left-arm": { "x": 15.11, "y": -0.44, "rotation": 33.84, "width": 35, "height": 29 }
@@ -507,6 +508,21 @@
 		}
 	},
 	"walk": {
+		"slots": {
+			"head": {
+				"color": [
+					{ "time": 0, "color": "FFFFFFFF" },
+					{ "time": 0.5, "color": "FF0000FF" },
+					{ "time": 1.0666, "color": "FFFFFFFF" }
+				]
+			},
+			"eyes": {
+				"attachment": [
+					{ "time": 0.75, "name": "eyes-closed" },
+					{ "time": 0.9, "name": "eyes" }
+				]
+			}
+		},
 		"bones": {
 			"left upper leg": {
 				"rotate": [

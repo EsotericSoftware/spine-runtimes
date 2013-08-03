@@ -5,6 +5,7 @@ import flash.display.DisplayObject;
 import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 import flash.events.Event;
+import flash.geom.ColorTransform;
 import flash.geom.Matrix;
 import flash.geom.Point;
 import flash.geom.Rectangle;
@@ -89,9 +90,17 @@ public class SkeletonSprite extends Sprite {
 
 					// Use bone as registration point.
 					wrapper = new Sprite();
+					wrapper.transform.colorTransform = new ColorTransform();
 					wrapper.addChild(bitmap);
 					regionAttachment["wrapper"] = wrapper;
-				} 
+				}
+
+				var colorTransform:ColorTransform = wrapper.transform.colorTransform;
+				colorTransform.redMultiplier = skeleton.r * slot.r;
+				colorTransform.greenMultiplier = skeleton.g * slot.g;
+				colorTransform.blueMultiplier = skeleton.b * slot.b;
+				colorTransform.alphaMultiplier = skeleton.a * slot.a;
+				wrapper.transform.colorTransform = colorTransform;
 
 				var bone:Bone = slot.bone;
 				wrapper.x = bone.worldX;
