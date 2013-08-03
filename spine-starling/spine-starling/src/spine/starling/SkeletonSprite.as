@@ -35,6 +35,7 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 	}
 
 	override public function render (support:RenderSupport, alpha:Number) : void {
+		alpha *= this.alpha * skeleton.a;
 		var drawOrder:Vector.<Slot> = skeleton.drawOrder;
 		for (var i:int = 0, n:int = drawOrder.length; i < n; i++) {
 			var slot:Slot = drawOrder[i];
@@ -45,11 +46,11 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 				var r:Number = skeleton.r * slot.r;
 				var g:Number = skeleton.g * slot.g;
 				var b:Number = skeleton.b * slot.b;
-				var a:Number = skeleton.a * slot.a;
+				var a:Number = slot.a;
 
 				var image:SkeletonImage = regionAttachment.rendererObject as SkeletonImage;
 				var vertexData:Vector.<Number> = image.vertexData.rawData;
-
+		
 				vertexData[0] = vertices[2];
 				vertexData[1] = vertices[3];
 				vertexData[2] = r;

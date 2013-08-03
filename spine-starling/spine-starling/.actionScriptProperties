@@ -10,7 +10,7 @@
         </excludedEntries>
       </libraryPathEntry>
       <libraryPathEntry kind="3" linkType="1" path="/spine-as3/bin/spine-as3.swc" useDefaultLinkType="false"/>
-      <libraryPathEntry kind="3" linkType="1" path="libs/starling.swc" useDefaultLinkType="false"/>
+      <libraryPathEntry kind="3" linkType="1" path="libs/starling-1.3.swc" useDefaultLinkType="false"/>
     </libraryPath>
     <sourceAttachmentPath/>
   </compiler>

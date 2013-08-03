@@ -1,24 +1,23 @@
-package spine.starling {
-	import spine.AnimationState;
-	import spine.AnimationStateData;
-	import spine.SkeletonData;
+package spine.flash {
+import spine.AnimationState;
+import spine.AnimationStateData;
+import spine.SkeletonData;
 
-public class SkeletonAnimationSprite extends SkeletonSprite {
+public class SkeletonAnimation extends SkeletonSprite {
 	public var states:Vector.<AnimationState> = new Vector.<AnimationState>();
 
-	public function SkeletonAnimationSprite (skeletonData:SkeletonData) {
+	public function SkeletonAnimation (skeletonData:SkeletonData) {
 		super(skeletonData);
 		addAnimationState();
 	}
 
 	override public function advanceTime (time:Number) : void {
-		super.advanceTime(time);
-
 		for each (var state:AnimationState in states) {
 			state.update(time);
 			state.apply(skeleton);
 		}
 		skeleton.updateWorldTransform();
+		super.advanceTime(time);
 	}
 
 	public function addAnimationState (stateData:AnimationStateData = null) : void {

@@ -9,7 +9,7 @@ import spine.SkeletonJson;
 import spine.atlas.Atlas;
 import spine.attachments.AtlasAttachmentLoader;
 import spine.flash.SingleTextureLoader;
-import spine.flash.SkeletonAnimationSprite;
+import spine.flash.SkeletonAnimation;
 
 [SWF(width = "640", height = "480", frameRate = "60", backgroundColor = "#dddddd")]
 public class Main extends Sprite {
@@ -22,7 +22,7 @@ public class Main extends Sprite {
 	[Embed(source = "spineboy.json", mimeType = "application/octet-stream")]
 	static public const SpineboyJson:Class;
 
-	private var skeleton:SkeletonAnimationSprite;
+	private var skeleton:SkeletonAnimation;
 
 	public function Main () {
 		var atlas:Atlas = new Atlas(new SpineboyAtlas(), new SingleTextureLoader(new SpineboyAtlasTexture()));
@@ -34,7 +34,7 @@ public class Main extends Sprite {
 		stateData.setMixByName("jump", "walk", 0.4);
 		stateData.setMixByName("jump", "jump", 0.2);
 
-		skeleton = new SkeletonAnimationSprite(skeletonData);
+		skeleton = new SkeletonAnimation(skeletonData);
 		skeleton.setAnimationStateData(stateData);
 		skeleton.x = 320;
 		skeleton.y = 420;
