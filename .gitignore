@@ -49,6 +49,15 @@ spine-unity/*.sln
 Assembly-*.csproj
 Assembly-*.pidb
 
+spine-tk2d/Assets/Spine/spine-csharp
+!spine-tk2d/Assets/Spine/spine-csharp/Place spine-csharp here.txt
+spine-tk2d/ProjectSettings
+spine-tk2d/Temp
+spine-tk2d/Library
+spine-tk2d/*.sln
+spine-tk2d/Assets/TK2DROOT*
+spine-tk2d/Assets/-tk2d*
+
 spine-corona/spine-lua/
 !spine-corona/spine-lua/Place spine-lua here.txt
 

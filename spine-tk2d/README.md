@@ -1,19 +1,18 @@
-The Spine runtime for Unity with 2d Toolkit comes with an example project which has "spineboy" walking. When clicked, he jumps and the transition to/from walking/jumping is blended smoothly. Use the instructions below.
+The Spine runtime for Unity with 2D Toolkit comes with an example project which has "spineboy" walking. When clicked, he jumps and the transition to/from walking/jumping is blended smoothly.
 
 [Setup Video](http://www.youtube.com/watch?v=dnQbS9ap-i8)
 
 # Requirements
 
-1. Latest 2d toolkit imported in your project
-1. Latest Spine C# runtime
+1. Unity 4.2+
+1. Latest 2D Toolkit
 
-# Usage
+# Instructions
 
-1. Drag spine-csharp into your project
-1. Drag spine-tk2d into your project
-1. Open spine-tk2d/Example/Example.scene
+1. Copy `spine-csharp/src` to `spine-unity-tk2d/Assets/Spine/spine-csharp`.
+1. Open the `Assets/examples/spineboy/spineboy.unity` scene.
+1. Import 2D Toolkit into your project.
 
 # Notes
 
 - Atlas images should use premultiplied alpha.
-- All skeleton game objects should use Skeleton.shader
