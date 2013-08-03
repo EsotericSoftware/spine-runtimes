@@ -172,8 +172,11 @@ public class SkeletonComponent : MonoBehaviour {
 	}
 
 	public virtual void OnDisable () {
-		if (Application.isEditor)
-			Clear();
+#region Unity Editor
+#if UNITY_EDITOR
+		Clear();
+#endif
+#endregion
 	}
 
 	public virtual void Reset () {
