@@ -24,72 +24,70 @@
  ******************************************************************************/
 using System;
 using System.IO;
-using System.Collections.Generic;
 using UnityEngine;
 using Spine;
 
-public class SkeletonDataAsset : ScriptableObject {
-	public AtlasAsset atlasAsset;
-	public TextAsset skeletonJSON;
-	public float scale = 1;
-	public String[] fromAnimation;
-	public String[] toAnimation;
-	public float[] duration;
-	private SkeletonData skeletonData;
-	private AnimationStateData stateData;
+public class AtlasAsset : ScriptableObject {
+	public TextAsset atlasFile;
+	public Material[] materials;
+	private Atlas atlas;
 
 	public void Clear () {
-		skeletonData = null;
-		stateData = null;
+		atlas = null;
 	}
 
-	public SkeletonData GetSkeletonData (bool quiet) {
-		if (atlasAsset == null) {
-			if (!quiet)
-				Debug.LogWarning("Atlas not set for skeleton data asset: " + name, this);
+	/// <returns>The atlas or null if it could not be loaded.</returns>
+	public Atlas GetAtlas () {
+		if (atlasFile == null) {
+			Debug.LogWarning("Atlas file not set for atlas asset: " + name, this);
 			Clear();
 			return null;
 		}
 
-		if (skeletonJSON == null) {
-			if (!quiet)
-				Debug.LogWarning("Skeleton JSON file not set for skeleton data asset: " + name, this);
+		if (materials == null || materials.Length == 0) {
+			Debug.LogWarning("Materials not set for atlas asset: " + name, this);
 			Clear();
 			return null;
 		}
 
-		Atlas atlas = atlasAsset.GetAtlas();
-		if (atlas == null) {
-			Clear();
-			return null;
-		}
+		if (atlas != null)
+			return atlas;
 
-		if (skeletonData != null)
-			return skeletonData;
-
-		SkeletonJson json = new SkeletonJson(atlas);
-		json.Scale = scale;
 		try {
-			skeletonData = json.ReadSkeletonData(new StringReader(skeletonJSON.text));
+			atlas = new Atlas(new StringReader(atlasFile.text), "", new MaterialsTextureLoader(this));
+			return atlas;
 		} catch (Exception ex) {
-			if (!quiet)
-				Debug.Log("Error reading skeleton JSON file for skeleton data asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, this);
+			Debug.Log("Error reading atlas file for atlas asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, this);
 			return null;
 		}
+	}
+}
 
-		stateData = new AnimationStateData(skeletonData);
-		for (int i = 0, n = fromAnimation.Length; i < n; i++) {
-			if (fromAnimation[i].Length == 0 || toAnimation[i].Length == 0) continue;
-			stateData.SetMix(fromAnimation[i], toAnimation[i], duration[i]);
+public class MaterialsTextureLoader : TextureLoader {
+	AtlasAsset atlasAsset;
+	
+	public MaterialsTextureLoader (AtlasAsset atlasAsset) {
+		this.atlasAsset = atlasAsset;
+	}
+	
+	public void Load (AtlasPage page, String path) {
+		String name = Path.GetFileNameWithoutExtension(path);
+		Material material = null;
+		foreach (Material other in atlasAsset.materials) {
+			if (other.name == name) {
+				material = other;
+				break;
+			}
 		}
-
-		return skeletonData;
+		if (material == null) {
+			Debug.LogWarning("Material with name \"" + name + "\" not found for atlas asset: " + atlasAsset.name, atlasAsset);
+			return;
+		}
+		page.rendererObject = material;
+		page.width = material.mainTexture.width;
+		page.height = material.mainTexture.height;
 	}
 
-	public AnimationStateData  GetAnimationStateData () {
-		if (stateData != null)
-			return stateData;
-		GetSkeletonData(false);
-		return stateData;
+	public void Unload (object texture) {
 	}
 }

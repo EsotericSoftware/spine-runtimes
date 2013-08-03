@@ -22,59 +22,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-using System;
-using System.IO;
 using UnityEngine;
-using Spine;
+using System.Collections;
 
-public class AtlasAsset : ScriptableObject {
-	public TextAsset atlasFile;
-	public Material material;
-	private Atlas atlas;
+public class Goblins : MonoBehaviour {
+	private bool girlSkin;
 
-	public void Clear () {
-		atlas = null;
-	}
-
-	/// <returns>The atlas or null if it could not be loaded.</returns>
-	public Atlas GetAtlas () {
-		if (atlasFile == null) {
-			Debug.LogWarning("Atlas file not set for atlas asset: " + name, this);
-			Clear();
-			return null;
-		}
-
-		if (material == null) {
-			Debug.LogWarning("Material not set for atlas asset: " + name, this);
-			Clear();
-			return null;
-		}
-
-		if (atlas != null)
-			return atlas;
-
-		try {
-			atlas = new Atlas(new StringReader(atlasFile.text), "", new SingleTextureLoader(material));
-			return atlas;
-		} catch (Exception ex) {
-			Debug.Log("Error reading atlas file for atlas asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, this);
-			return null;
-		}
-	}
-}
-
-public class SingleTextureLoader : TextureLoader {
-	Material material;
-	
-	public SingleTextureLoader (Material material) {
-		this.material = material;
-	}
-	
-	public void Load (AtlasPage page, String path) {
-		page.width = material.mainTexture.width;
-		page.height = material.mainTexture.height;
-	}
-
-	public void Unload (object texture) {
+	public void OnMouseDown () {
+		SkeletonAnimation skeletonAnimation = GetComponent<SkeletonAnimation>();
+		skeletonAnimation.skeleton.SetSkin(girlSkin ? "goblin" : "goblingirl");
+		skeletonAnimation.skeleton.SetSlotsToSetupPose();
+		
+		girlSkin = !girlSkin;
+		
+		if (girlSkin) {
+			skeletonAnimation.skeleton.SetAttachment("right hand item", null);
+			skeletonAnimation.skeleton.SetAttachment("left hand item", "spear");
+		} else
+			skeletonAnimation.skeleton.SetAttachment("left hand item", "dagger");
 	}
 }

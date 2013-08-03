@@ -29,11 +29,11 @@ using UnityEngine;
 
 [CustomEditor(typeof(AtlasAsset))]
 public class AtlasAssetInspector : Editor {
-	private SerializedProperty atlasFile, material;
+	private SerializedProperty atlasFile, materials;
 
 	void OnEnable () {
 		atlasFile = serializedObject.FindProperty("atlasFile");
-		material = serializedObject.FindProperty("material");
+		materials = serializedObject.FindProperty("materials");
 	}
 
 	override public void OnInspectorGUI () {
@@ -42,7 +42,7 @@ public class AtlasAssetInspector : Editor {
 
 		EditorGUIUtility.LookLikeInspector();
 		EditorGUILayout.PropertyField(atlasFile);
-		EditorGUILayout.PropertyField(material);
+		EditorGUILayout.PropertyField(materials, true);
 		
 		if (serializedObject.ApplyModifiedProperties() ||
 			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")

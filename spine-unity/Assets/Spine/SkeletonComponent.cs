@@ -40,8 +40,10 @@ public class SkeletonComponent : MonoBehaviour {
 	private Vector3[] vertices;
 	private Color32[] colors;
 	private Vector2[] uvs;
-	private int[] triangles;
 	private float[] vertexPositions = new float[8];
+	private List<Material> submeshMaterials = new List<Material>();
+	private List<int[]> submeshIndexes = new List<int[]>();
+	private Material[] sharedMaterials = new Material[0];
 
 	public virtual void Clear () {
 		GetComponent<MeshFilter>().mesh = null;
@@ -57,8 +59,9 @@ public class SkeletonComponent : MonoBehaviour {
 		mesh.name = "Skeleton Mesh";
 		mesh.hideFlags = HideFlags.HideAndDontSave;
 		mesh.MarkDynamic();
-
-		renderer.sharedMaterial = skeletonDataAsset.atlasAsset.material;
+		
+		// BOZO
+		//renderer.sharedMaterial = skeletonDataAsset.atlasAsset.material;
 
 		vertices = new Vector3[0];
 
@@ -76,50 +79,60 @@ public class SkeletonComponent : MonoBehaviour {
 	}
 	
 	public virtual void Update () {
+		SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(false);
 		// Clear fields if missing information to render.
-		if (skeletonDataAsset == null || skeletonDataAsset.GetSkeletonData(false) == null) {
+		if (skeletonDataAsset == null || skeletonData == null) {
 			Clear();
 			return;
 		}
 		
 		// Initialize fields.
-		if (skeleton == null || skeleton.Data != skeletonDataAsset.GetSkeletonData(false))
+		if (skeleton == null || skeleton.Data != skeletonData)
 			Initialize();
 
 		UpdateSkeleton();
 
-		// Count quads.
-		int quadCount = 0;
+		// Count quads and submeshes.
+		int quadCount = 0, submeshQuadCount = 0;
+		Material lastMaterial = null;
+		submeshMaterials.Clear();
 		List<Slot> drawOrder = skeleton.DrawOrder;
 		for (int i = 0, n = drawOrder.Count; i < n; i++) {
-			Slot slot = drawOrder[i];
-			Attachment attachment = slot.Attachment;
-			if (attachment is RegionAttachment)
-				quadCount++;
+			RegionAttachment regionAttachment = drawOrder[i].Attachment as RegionAttachment;
+			if (regionAttachment == null)
+				continue;
+			
+			// Add submesh when material changes.
+			Material material = (Material)((AtlasRegion)regionAttachment.RendererObject).page.rendererObject;
+			if (lastMaterial != material && lastMaterial != null) {
+				addSubmesh(lastMaterial, quadCount, submeshQuadCount, false);
+				submeshQuadCount = 0;
+			} 
+			lastMaterial = material;
+
+			quadCount++;
+			submeshQuadCount++;
 		}
+		addSubmesh(lastMaterial, quadCount, submeshQuadCount, false);
+		
+		// Set materials.
+		if (submeshMaterials.Count == sharedMaterials.Length)
+			submeshMaterials.CopyTo(sharedMaterials);
+		else
+			sharedMaterials = submeshMaterials.ToArray();
+		renderer.sharedMaterials = sharedMaterials;
 
 		// Ensure mesh data is the right size.
+		Mesh mesh = this.mesh;
 		Vector3[] vertices = this.vertices;
 		int vertexCount = quadCount * 4;
 		bool newTriangles = vertexCount > vertices.Length;
 		if (newTriangles) {
 			// Not enough vertices, increase size.
 			this.vertices = vertices = new Vector3[vertexCount];
-			colors = new Color32[vertexCount];
-			uvs = new Vector2[vertexCount];
-			triangles = new int[quadCount * 6];
+			this.colors = new Color32[vertexCount];
+			this.uvs = new Vector2[vertexCount];
 			mesh.Clear();
-			
-			for (int i = 0, n = quadCount; i < n; i++) {
-				int index = i * 6;
-				int vertex = i * 4;
-				triangles[index] = vertex;
-				triangles[index + 1] = vertex + 2;
-				triangles[index + 2] = vertex + 1;
-				triangles[index + 3] = vertex + 2;
-				triangles[index + 4] = vertex + 3;
-				triangles[index + 5] = vertex + 1;
-			}
 		} else {
 			// Too many vertices, zero the extra.
 			Vector3 zero = new Vector3(0, 0, 0);
@@ -130,12 +143,15 @@ public class SkeletonComponent : MonoBehaviour {
 
 		// Setup mesh.
 		float[] vertexPositions = this.vertexPositions;
+		Vector2[] uvs = this.uvs;
+		Color32[] colors = this.colors;
 		int vertexIndex = 0;
 		Color32 color = new Color32();
 		for (int i = 0, n = drawOrder.Count; i < n; i++) {
 			Slot slot = drawOrder[i];
 			RegionAttachment regionAttachment = slot.Attachment as RegionAttachment;
-			if (regionAttachment == null) continue;
+			if (regionAttachment == null)
+				continue;
 
 			regionAttachment.ComputeVertices(skeleton.X, skeleton.Y, slot.Bone, vertexPositions);
 			
@@ -164,26 +180,56 @@ public class SkeletonComponent : MonoBehaviour {
 		mesh.vertices = vertices;
 		mesh.colors32 = colors;
 		mesh.uv = uvs;
-		if (newTriangles) mesh.triangles = triangles;
+		mesh.subMeshCount = submeshMaterials.Count;
+		for (int i = 0; i < mesh.subMeshCount; ++i)
+			mesh.SetTriangles(submeshIndexes[i], i);
 	}
+	
+	/** Adds a material. Adds submesh indexes if existing indexes aren't sufficient. */
+	private void addSubmesh (Material material, int endQuadCount, int submeshQuadCount, bool exact) {
+		int submeshIndex = submeshMaterials.Count;
+		submeshMaterials.Add(material);
 
+		// Return if the existing submesh is big enough.
+		int indexCount = submeshQuadCount * 6;
+		if (submeshIndexes.Count > submeshIndex) {
+			if (exact) {
+				if (submeshIndexes[submeshIndex].Length == indexCount)
+					return;
+			} else {
+				if (submeshIndexes[submeshIndex].Length >= indexCount)
+					return;
+			}
+		} else
+			submeshIndexes.Add(null);
+
+		int vertexIndex = (endQuadCount - submeshQuadCount) * 4;
+		int[] indexes = new int[indexCount];
+		for (int i = 0; i < indexCount; i += 6, vertexIndex += 4) {
+			indexes[i] = vertexIndex;
+			indexes[i + 1] = vertexIndex + 2;
+			indexes[i + 2] = vertexIndex + 1;
+			indexes[i + 3] = vertexIndex + 2;
+			indexes[i + 4] = vertexIndex + 3;
+			indexes[i + 5] = vertexIndex + 1;
+		}
+		submeshIndexes[submeshIndex] = indexes;
+	}
+	
 	public virtual void OnEnable () {
 		Update();
 	}
 
-	public virtual void OnDisable () {
-#region Unity Editor
 #if UNITY_EDITOR
+	public virtual void OnDisable () {
 		Clear();
-#endif
-#endregion
 	}
+#endif
 
 	public virtual void Reset () {
 		Update();
 	}
 	
-#region Unity Editor
 #if UNITY_EDITOR
 	void OnDrawGizmos() {
 		Vector3 gizmosCenter = new Vector3();
@@ -203,5 +249,4 @@ public class SkeletonComponent : MonoBehaviour {
 		Gizmos.DrawCube(gizmosCenter, gizmosSize);
 	}
 #endif
-#endregion
 }
