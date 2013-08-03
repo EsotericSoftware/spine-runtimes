@@ -68,25 +68,37 @@ public class SkeletonSprite extends Sprite {
 
 					var bitmap:Bitmap = new Bitmap(regionData);
 					bitmap.smoothing = true;
-					bitmap.x = -regionAttachment.width / 2; // Registration point.
-					bitmap.y = -regionAttachment.height / 2;
-					if (region.rotate) {
-						bitmap.rotation = 90;
-						bitmap.x += region.width;
-					}
 
+					// Rotate and scale using default registration point (top left corner, y-down, CW) instead of image center.
+					bitmap.rotation = -regionAttachment.rotation;
+					bitmap.scaleX = regionAttachment.scaleX;
+					bitmap.scaleY = regionAttachment.scaleY;
+
+					// Position using attachment translation, shifted as if scale and rotation were at image center.
+					var radians:Number = -regionAttachment.rotation * Math.PI / 180;
+					var cos:Number = Math.cos(radians);
+					var sin:Number = Math.sin(radians);
+					var shiftX:Number = -regionAttachment.width / 2 * regionAttachment.scaleX;
+					var shiftY:Number = -regionAttachment.height / 2 * regionAttachment.scaleY;
+					if (region.rotate) {
+						bitmap.rotation += 90;
+						shiftX += region.width;
+					}
+					bitmap.x = regionAttachment.x + shiftX * cos - shiftY * sin;
+					bitmap.y = -regionAttachment.y + shiftX * sin + shiftY * cos;
+
+					// Use bone as registration point.
 					wrapper = new Sprite();
 					wrapper.addChild(bitmap);
 					regionAttachment["wrapper"] = wrapper;
-				}
+				} 
+
 				var bone:Bone = slot.bone;
-				var x:Number = regionAttachment.x - region.offsetX;
-				var y:Number = regionAttachment.y - region.offsetY;
-				wrapper.x = bone.worldX + x * bone.m00 + y * bone.m01;
-				wrapper.y = bone.worldY + x * bone.m10 + y * bone.m11;
-				wrapper.rotation = -(bone.worldRotation + regionAttachment.rotation);
-				wrapper.scaleX = bone.worldScaleX + regionAttachment.scaleX - 1;
-				wrapper.scaleY = bone.worldScaleY + regionAttachment.scaleY - 1;
+				wrapper.x = bone.worldX;
+				wrapper.y = bone.worldY;
+				wrapper.rotation = -bone.worldRotation;
+				wrapper.scaleX = bone.worldScaleX;
+				wrapper.scaleY = bone.worldScaleY;
 				addChild(wrapper);
 			}
 		}
