@@ -22,14 +22,14 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-
 using System;
 using UnityEditor;
 using UnityEngine;
 
 [CustomEditor(typeof(SkeletonAnimation))]
 public class SkeletonAnimationInspector : Editor {
-	private SerializedProperty skeletonDataAsset, animationName, loop, useAnimationName, initialSkinName, timeScale;
+	private SerializedProperty skeletonDataAsset, initialSkinName, timeScale, normals, tangents;
+	private SerializedProperty animationName, loop, useAnimationName;
 
 	void OnEnable () {
 		skeletonDataAsset = serializedObject.FindProperty("skeletonDataAsset");
@@ -38,6 +38,8 @@ public class SkeletonAnimationInspector : Editor {
 		useAnimationName = serializedObject.FindProperty("useAnimationName");
 		initialSkinName = serializedObject.FindProperty("initialSkinName");
 		timeScale = serializedObject.FindProperty("timeScale");
+		normals = serializedObject.FindProperty("calculateNormals");
+		tangents = serializedObject.FindProperty("calculateTangents");
 	}
 
 	override public void OnInspectorGUI () {
@@ -54,7 +56,8 @@ public class SkeletonAnimationInspector : Editor {
 			for (int i = 0; i < skins.Length - 1; i++) {
 				String name = component.skeleton.Data.Skins[i].Name;
 				skins[i] = name;
-				if (name == initialSkinName.stringValue) skinIndex = i;
+				if (name == initialSkinName.stringValue)
+					skinIndex = i;
 			}
 		
 			EditorGUILayout.BeginHorizontal();
@@ -74,7 +77,8 @@ public class SkeletonAnimationInspector : Editor {
 			for (int i = 0; i < animations.Length - 2; i++) {
 				String name = component.skeleton.Data.Animations[i].Name;
 				animations[i + 2] = name;
-				if (name == animationName.stringValue) animationIndex = i + 2;
+				if (name == animationName.stringValue)
+					animationIndex = i + 2;
 			}
 		
 			EditorGUILayout.BeginHorizontal();
@@ -103,6 +107,8 @@ public class SkeletonAnimationInspector : Editor {
 		EditorGUILayout.EndHorizontal();
 
 		EditorGUILayout.PropertyField(timeScale);
+		EditorGUILayout.PropertyField(normals);
+		EditorGUILayout.PropertyField(tangents);
 		
 		if (serializedObject.ApplyModifiedProperties() ||
 			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")

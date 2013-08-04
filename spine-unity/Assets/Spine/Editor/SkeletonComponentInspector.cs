@@ -22,19 +22,20 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-
 using System;
 using UnityEditor;
 using UnityEngine;
 
 [CustomEditor(typeof(SkeletonComponent))]
 public class SkeletonComponentInspector : Editor {
-	private SerializedProperty skeletonDataAsset, initialSkinName, timeScale;
+	private SerializedProperty skeletonDataAsset, initialSkinName, timeScale, normals, tangents;
 
 	void OnEnable () {
 		skeletonDataAsset = serializedObject.FindProperty("skeletonDataAsset");
 		initialSkinName = serializedObject.FindProperty("initialSkinName");
 		timeScale = serializedObject.FindProperty("timeScale");
+		normals = serializedObject.FindProperty("calculateNormals");
+		tangents = serializedObject.FindProperty("calculateTangents");
 	}
 
 	override public void OnInspectorGUI () {
@@ -51,7 +52,8 @@ public class SkeletonComponentInspector : Editor {
 			for (int i = 0; i < skins.Length - 1; i++) {
 				String name = component.skeleton.Data.Skins[i].Name;
 				skins[i] = name;
-				if (name == initialSkinName.stringValue) skinIndex = i;
+				if (name == initialSkinName.stringValue)
+					skinIndex = i;
 			}
 		
 			EditorGUILayout.BeginHorizontal();
@@ -65,6 +67,8 @@ public class SkeletonComponentInspector : Editor {
 		}
 
 		EditorGUILayout.PropertyField(timeScale);
+		EditorGUILayout.PropertyField(normals);
+		EditorGUILayout.PropertyField(tangents);
 		
 		if (serializedObject.ApplyModifiedProperties() ||
 			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")

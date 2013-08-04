@@ -35,15 +35,18 @@ public class SkeletonComponent : MonoBehaviour {
 	public Skeleton skeleton;
 	public String initialSkinName;
 	public float timeScale = 1;
+	public bool calculateNormals;
+	public bool calculateTangents;
 	private Mesh mesh;
+	private float[] vertexPositions = new float[8];
 	private int lastVertexCount;
 	private Vector3[] vertices;
 	private Color32[] colors;
 	private Vector2[] uvs;
-	private float[] vertexPositions = new float[8];
+	private Material[] sharedMaterials = new Material[0];
 	private List<Material> submeshMaterials = new List<Material>();
 	private List<int[]> submeshIndexes = new List<int[]>();
-	private Material[] sharedMaterials = new Material[0];
+	private Vector4[] tangents = new Vector4[0];
 
 	public virtual void Clear () {
 		GetComponent<MeshFilter>().mesh = null;
@@ -80,6 +83,7 @@ public class SkeletonComponent : MonoBehaviour {
 	
 	public virtual void Update () {
 		SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(false);
+
 		// Clear fields if missing information to render.
 		if (skeletonDataAsset == null || skeletonData == null) {
 			Clear();
@@ -180,9 +184,22 @@ public class SkeletonComponent : MonoBehaviour {
 		mesh.vertices = vertices;
 		mesh.colors32 = colors;
 		mesh.uv = uvs;
+
 		mesh.subMeshCount = submeshMaterials.Count;
 		for (int i = 0; i < mesh.subMeshCount; ++i)
 			mesh.SetTriangles(submeshIndexes[i], i);
+
+		if (calculateNormals) {
+			mesh.RecalculateNormals();
+			if (calculateTangents) {
+				Vector4[] tangents = this.tangents;
+				int count = mesh.normals.Length;
+				if (tangents.Length != count) this.tangents = tangents = new Vector4[count];
+				for (int i = 0; i < count; i++)
+					tangents[i] = new Vector4(1, 0, 0, 1);
+				mesh.tangents = tangents;
+			}
+		}
 	}
 	
 	/** Adds a material. Adds submesh indexes if existing indexes aren't sufficient. */

@@ -28,7 +28,8 @@ using UnityEngine;
 
 [CustomEditor(typeof(SkeletonAnimation))]
 public class SkeletonAnimationInspector : Editor {
-	private SerializedProperty skeletonDataAsset, animationName, loop, useAnimationName, initialSkinName, timeScale;
+	private SerializedProperty skeletonDataAsset, initialSkinName, timeScale, normals, tangents;
+	private SerializedProperty animationName, loop, useAnimationName;
 
 	void OnEnable () {
 		skeletonDataAsset = serializedObject.FindProperty("skeletonDataAsset");
@@ -37,6 +38,8 @@ public class SkeletonAnimationInspector : Editor {
 		useAnimationName = serializedObject.FindProperty("useAnimationName");
 		initialSkinName = serializedObject.FindProperty("initialSkinName");
 		timeScale = serializedObject.FindProperty("timeScale");
+		normals = serializedObject.FindProperty("calculateNormals");
+		tangents = serializedObject.FindProperty("calculateTangents");
 	}
 
 	override public void OnInspectorGUI () {
@@ -104,6 +107,8 @@ public class SkeletonAnimationInspector : Editor {
 		EditorGUILayout.EndHorizontal();
 
 		EditorGUILayout.PropertyField(timeScale);
+		EditorGUILayout.PropertyField(normals);
+		EditorGUILayout.PropertyField(tangents);
 		
 		if (serializedObject.ApplyModifiedProperties() ||
 			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")

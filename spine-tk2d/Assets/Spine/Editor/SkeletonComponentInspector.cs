@@ -28,12 +28,14 @@ using UnityEngine;
 
 [CustomEditor(typeof(SkeletonComponent))]
 public class SkeletonComponentInspector : Editor {
-	private SerializedProperty skeletonDataAsset, initialSkinName, timeScale;
+	private SerializedProperty skeletonDataAsset, initialSkinName, timeScale, normals, tangents;
 
 	void OnEnable () {
 		skeletonDataAsset = serializedObject.FindProperty("skeletonDataAsset");
 		initialSkinName = serializedObject.FindProperty("initialSkinName");
 		timeScale = serializedObject.FindProperty("timeScale");
+		normals = serializedObject.FindProperty("calculateNormals");
+		tangents = serializedObject.FindProperty("calculateTangents");
 	}
 
 	override public void OnInspectorGUI () {
@@ -65,6 +67,8 @@ public class SkeletonComponentInspector : Editor {
 		}
 
 		EditorGUILayout.PropertyField(timeScale);
+		EditorGUILayout.PropertyField(normals);
+		EditorGUILayout.PropertyField(tangents);
 		
 		if (serializedObject.ApplyModifiedProperties() ||
 			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
