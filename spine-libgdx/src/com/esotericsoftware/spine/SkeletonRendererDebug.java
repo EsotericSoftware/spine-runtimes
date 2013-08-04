@@ -46,7 +46,7 @@ public class SkeletonRendererDebug {
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
 				RegionAttachment regionAttachment = (RegionAttachment)attachment;
-				regionAttachment.updateVertices(slot);
+				regionAttachment.updateVertices(slot, false);
 				float[] vertices = regionAttachment.getVertices();
 				renderer.line(vertices[X1], vertices[Y1], vertices[X2], vertices[Y2]);
 				renderer.line(vertices[X2], vertices[Y2], vertices[X3], vertices[Y3]);
