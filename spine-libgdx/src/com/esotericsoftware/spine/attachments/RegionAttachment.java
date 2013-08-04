@@ -130,15 +130,25 @@ public class RegionAttachment extends Attachment {
 		return region;
 	}
 
-	public void updateVertices (Slot slot) {
+	public void updateVertices (Slot slot, boolean premultipliedAlpha) {
 		Skeleton skeleton = slot.getSkeleton();
 		Color skeletonColor = skeleton.getColor();
 		Color slotColor = slot.getColor();
-		float color = NumberUtils.intToFloatColor( //
-			((int)(255 * skeletonColor.a * slotColor.a) << 24) //
-				| ((int)(255 * skeletonColor.b * slotColor.b) << 16) //
-				| ((int)(255 * skeletonColor.g * slotColor.g) << 8) //
-				| ((int)(255 * skeletonColor.r * slotColor.r)));
+		float color;
+		if (premultipliedAlpha) {
+			float a = 255 * skeletonColor.a * slotColor.a;
+			color = NumberUtils.intToFloatColor( //
+				((int)a << 24) //
+					| ((int)(a * skeletonColor.b * slotColor.b) << 16) //
+					| ((int)(a * skeletonColor.g * slotColor.g) << 8) //
+					| ((int)(a * skeletonColor.r * slotColor.r)));
+		} else {
+			color = NumberUtils.intToFloatColor( //
+				((int)(255 * skeletonColor.a * slotColor.a) << 24) //
+					| ((int)(255 * skeletonColor.b * slotColor.b) << 16) //
+					| ((int)(255 * skeletonColor.g * slotColor.g) << 8) //
+					| ((int)(255 * skeletonColor.r * slotColor.r)));
+		}
 		float[] vertices = this.vertices;
 		vertices[C1] = color;
 		vertices[C2] = color;

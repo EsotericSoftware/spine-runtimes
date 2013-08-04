@@ -9,16 +9,22 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 
 public class SkeletonRenderer {
+	private boolean premultipliedAlpha;
+
 	public void draw (SpriteBatch batch, Skeleton skeleton) {
-		Array<Slot> drawOrder = skeleton.drawOrder;
+		boolean premultipliedAlpha = this.premultipliedAlpha;
+		int srcFunc = premultipliedAlpha ? GL11.GL_ONE : GL11.GL_SRC_ALPHA;
+		batch.setBlendFunction(srcFunc, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
 		boolean additive = false;
-		int srcFunc = batch.getBlendSrcFunc();
+
+		Array<Slot> drawOrder = skeleton.drawOrder;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder.get(i);
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
 				RegionAttachment regionAttachment = (RegionAttachment)attachment;
-				regionAttachment.updateVertices(slot);
+				regionAttachment.updateVertices(slot, premultipliedAlpha);
 				float[] vertices = regionAttachment.getVertices();
 				if (slot.data.getAdditiveBlending() != additive) {
 					additive = !additive;
@@ -27,9 +33,12 @@ public class SkeletonRenderer {
 					else
 						batch.setBlendFunction(srcFunc, GL11.GL_ONE_MINUS_SRC_ALPHA);
 				}
-				batch.draw(regionAttachment.getRegion().getTexture(), vertices, 0, vertices.length);
+				batch.draw(regionAttachment.getRegion().getTexture(), vertices, 0, 20);
 			}
 		}
-		if (additive) batch.setBlendFunction(srcFunc, GL11.GL_ONE_MINUS_SRC_ALPHA);
+	}
+
+	public void setPremultipliedAlpha (boolean premultipliedAlpha) {
+		this.premultipliedAlpha = premultipliedAlpha;
 	}
 }
