@@ -74,13 +74,13 @@ public class MaterialsTextureLoader : TextureLoader {
 		String name = Path.GetFileNameWithoutExtension(path);
 		Material material = null;
 		foreach (Material other in atlasAsset.materials) {
-			if (other.name == name) {
+			if (other.mainTexture.name == name) {
 				material = other;
 				break;
 			}
 		}
 		if (material == null) {
-			Debug.LogWarning("Material with name \"" + name + "\" not found for atlas asset: " + atlasAsset.name, atlasAsset);
+			Debug.LogWarning("Material with texture name \"" + name + "\" not found for atlas asset: " + atlasAsset.name, atlasAsset);
 			return;
 		}
 		page.rendererObject = material;

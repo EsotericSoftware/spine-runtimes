@@ -79,10 +79,14 @@ public class SkeletonComponent : MonoBehaviour {
 	}
 	
 	public virtual void Update () {
+		if (skeletonDataAsset == null) {
+			Clear();
+			return;
+		}
+
 		SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(false);
 
-		// Clear fields if missing information to render.
-		if (skeletonDataAsset == null || skeletonData == null) {
+		if (skeletonData == null) {
 			Clear();
 			return;
 		}
