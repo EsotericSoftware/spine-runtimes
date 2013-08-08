@@ -55,27 +55,45 @@ public class Animation {
 		this.duration = duration;
 	}
 
-	/** Poses the skeleton at the specified time for this animation. */
+	/** @deprecated */
 	public void apply (Skeleton skeleton, float time, boolean loop) {
+		apply(skeleton, Float.MAX_VALUE, time, loop, null);
+	}
+
+	/** Poses the skeleton at the specified time for this animation.
+	 * @param events Any triggered events are added. May be null if lastTime is known to not cause any events to trigger. */
+	public void apply (Skeleton skeleton, float lastTime, float time, boolean loop, Array<Event> events) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 
-		if (loop && duration != 0) time %= duration;
+		if (loop && duration != 0) {
+			lastTime %= duration;
+			time %= duration;
+		}
 
 		Array<Timeline> timelines = this.timelines;
 		for (int i = 0, n = timelines.size; i < n; i++)
-			timelines.get(i).apply(skeleton, time, 1);
+			timelines.get(i).apply(skeleton, lastTime, time, 1, events);
+	}
+
+	/** @deprecated */
+	public void mix (Skeleton skeleton, float time, boolean loop, float alpha) {
+		mix(skeleton, Float.MAX_VALUE, time, loop, null, alpha);
 	}
 
 	/** Poses the skeleton at the specified time for this animation mixed with the current pose.
-	 * @param alpha The amount of this animation that affects the current pose. */
-	public void mix (Skeleton skeleton, float time, boolean loop, float alpha) {
+	 * @param alpha The amount of this animation that affects the current pose.
+	 * @param events Any triggered events are added. May be null if lastTime is known to not cause any events to trigger. */
+	public void mix (Skeleton skeleton, float lastTime, float time, boolean loop, Array<Event> events, float alpha) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 
-		if (loop && duration != 0) time %= duration;
+		if (loop && duration != 0) {
+			lastTime %= duration;
+			time %= duration;
+		}
 
 		Array<Timeline> timelines = this.timelines;
 		for (int i = 0, n = timelines.size; i < n; i++)
-			timelines.get(i).apply(skeleton, time, alpha);
+			timelines.get(i).apply(skeleton, lastTime, time, alpha, events);
 	}
 
 	public String getName () {
@@ -110,7 +128,7 @@ public class Animation {
 
 	static public interface Timeline {
 		/** Sets the value(s) for the specified time. */
-		public void apply (Skeleton skeleton, float time, float alpha);
+		public void apply (Skeleton skeleton, float lastTime, float time, float alpha, Array<Event> events);
 	}
 
 	/** Base class for frames that use an interpolation bezier curve. */
@@ -235,7 +253,7 @@ public class Animation {
 			frames[frameIndex + 1] = angle;
 		}
 
-		public void apply (Skeleton skeleton, float time, float alpha) {
+		public void apply (Skeleton skeleton, float lastTime, float time, float alpha, Array<Event> events) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -305,7 +323,7 @@ public class Animation {
 			frames[frameIndex + 2] = y;
 		}
 
-		public void apply (Skeleton skeleton, float time, float alpha) {
+		public void apply (Skeleton skeleton, float lastTime, float time, float alpha, Array<Event> events) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -335,7 +353,7 @@ public class Animation {
 			super(frameCount);
 		}
 
-		public void apply (Skeleton skeleton, float time, float alpha) {
+		public void apply (Skeleton skeleton, float lastTime, float time, float alpha, Array<Event> events) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -398,7 +416,7 @@ public class Animation {
 			frames[frameIndex + 4] = a;
 		}
 
-		public void apply (Skeleton skeleton, float time, float alpha) {
+		public void apply (Skeleton skeleton, float lastTime, float time, float alpha, Array<Event> events) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -471,7 +489,7 @@ public class Animation {
 			attachmentNames[frameIndex] = attachmentName;
 		}
 
-		public void apply (Skeleton skeleton, float time, float alpha) {
+		public void apply (Skeleton skeleton, float lastTime, float time, float alpha, Array<Event> events) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -484,6 +502,45 @@ public class Animation {
 			String attachmentName = attachmentNames[frameIndex];
 			skeleton.slots.get(slotIndex).setAttachment(
 				attachmentName == null ? null : skeleton.getAttachment(slotIndex, attachmentName));
+		}
+	}
+
+	static public class EventTimeline implements Timeline {
+		private final float[] frames; // time, ...
+		private final Event[] events;
+
+		public EventTimeline (int frameCount) {
+			frames = new float[frameCount];
+			events = new Event[frameCount];
+		}
+
+		public int getFrameCount () {
+			return frames.length;
+		}
+
+		public float[] getFrames () {
+			return frames;
+		}
+
+		/** Sets the time of the specified keyframe. */
+		public void setFrame (int frameIndex, float time, Event event) {
+			frames[frameIndex] = time;
+			events[frameIndex] = event;
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, float alpha, Array<Event> firedEvents) {
+			float[] frames = this.frames;
+			if (time < frames[0]) return; // Time is before first frame.
+
+			int frameCount = frames.length;
+			if (lastTime >= frames[frameCount - 1]) return; // Last time is after last frame.
+
+			int frameIndex = binarySearch(frames, lastTime, 1);
+			float frame = frames[frameIndex];
+			while (frameIndex > 0 && frame == frames[frameIndex - 1])
+				frameIndex--; // Fire multiple events with the same frame.
+			for (; frameIndex < frameCount && time > frames[frameIndex]; frameIndex++)
+				firedEvents.add(events[frameIndex]);
 		}
 	}
 }

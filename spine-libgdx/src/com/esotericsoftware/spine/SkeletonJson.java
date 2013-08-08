@@ -28,6 +28,7 @@ package com.esotericsoftware.spine;
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.ColorTimeline;
 import com.esotericsoftware.spine.Animation.CurveTimeline;
+import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
@@ -135,6 +136,15 @@ public class SkeletonJson {
 			if (skin.name.equals("default")) skeletonData.setDefaultSkin(skin);
 		}
 
+		// Events.
+		for (JsonValue eventMap = root.getChild("events"); eventMap != null; eventMap = eventMap.next()) {
+			EventData eventData = new EventData(eventMap.name());
+			eventData.setInt(eventMap.getInt("int", 0));
+			eventData.setFloat(eventMap.getFloat("float", 0f));
+			eventData.setString(eventMap.getString("string", null));
+			skeletonData.addEvent(eventData);
+		}
+
 		// Animations.
 		for (JsonValue animationMap = root.getChild("animations"); animationMap != null; animationMap = animationMap.next())
 			readAnimation(animationMap.name(), animationMap, skeletonData);
@@ -188,7 +198,7 @@ public class SkeletonJson {
 			for (JsonValue timelineMap = boneMap.child(); timelineMap != null; timelineMap = timelineMap.next()) {
 				String timelineName = timelineMap.name();
 				if (timelineName.equals(TIMELINE_ROTATE)) {
-					RotateTimeline timeline = new RotateTimeline(timelineMap.size());
+					RotateTimeline timeline = new RotateTimeline(timelineMap.size);
 					timeline.setBoneIndex(boneIndex);
 
 					int frameIndex = 0;
@@ -205,9 +215,9 @@ public class SkeletonJson {
 					TranslateTimeline timeline;
 					float timelineScale = 1;
 					if (timelineName.equals(TIMELINE_SCALE))
-						timeline = new ScaleTimeline(timelineMap.size());
+						timeline = new ScaleTimeline(timelineMap.size);
 					else {
-						timeline = new TranslateTimeline(timelineMap.size());
+						timeline = new TranslateTimeline(timelineMap.size);
 						timelineScale = scale;
 					}
 					timeline.setBoneIndex(boneIndex);
@@ -234,7 +244,7 @@ public class SkeletonJson {
 			for (JsonValue timelineMap = slotMap.child(); timelineMap != null; timelineMap = timelineMap.next()) {
 				String timelineName = timelineMap.name();
 				if (timelineName.equals(TIMELINE_COLOR)) {
-					ColorTimeline timeline = new ColorTimeline(timelineMap.size());
+					ColorTimeline timeline = new ColorTimeline(timelineMap.size);
 					timeline.setSlotIndex(slotIndex);
 
 					int frameIndex = 0;
@@ -249,7 +259,7 @@ public class SkeletonJson {
 					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 5 - 5]);
 
 				} else if (timelineName.equals(TIMELINE_ATTACHMENT)) {
-					AttachmentTimeline timeline = new AttachmentTimeline(timelineMap.size());
+					AttachmentTimeline timeline = new AttachmentTimeline(timelineMap.size);
 					timeline.setSlotIndex(slotIndex);
 
 					int frameIndex = 0;
@@ -263,6 +273,23 @@ public class SkeletonJson {
 				} else
 					throw new RuntimeException("Invalid timeline type for a slot: " + timelineName + " (" + slotMap.name() + ")");
 			}
+		}
+
+		JsonValue eventsMap = map.get("events");
+		if (eventsMap != null) {
+			EventTimeline timeline = new EventTimeline(eventsMap.size);
+			int frameIndex = 0;
+			for (JsonValue eventMap = eventsMap.child; eventMap != null; eventMap = eventMap.next()) {
+				EventData eventData = skeletonData.findEvent(eventMap.getString("name"));
+				if (eventData == null) throw new SerializationException("Event not found: " + eventMap.getString("name"));
+				Event event = new Event(eventData);
+				event.setInt(eventMap.getInt("int", eventData.getInt()));
+				event.setFloat(eventMap.getFloat("float", eventData.getFloat()));
+				event.setString(eventMap.getString("string", eventData.getString()));
+				timeline.setFrame(frameIndex++, eventMap.getFloat("time"), event);
+			}
+			timelines.add(timeline);
+			duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() - 1]);
 		}
 
 		timelines.shrink();

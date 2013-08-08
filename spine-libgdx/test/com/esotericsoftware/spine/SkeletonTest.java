@@ -39,6 +39,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.TextureAtlasData;
+import com.badlogic.gdx.utils.Array;
 
 public class SkeletonTest extends ApplicationAdapter {
 	SpriteBatch batch;
@@ -49,6 +50,7 @@ public class SkeletonTest extends ApplicationAdapter {
 	SkeletonData skeletonData;
 	Skeleton skeleton;
 	Animation animation;
+	Array<Event> events = new Array();
 
 	public void create () {
 		batch = new SpriteBatch();
@@ -81,6 +83,7 @@ public class SkeletonTest extends ApplicationAdapter {
 			// binary.setScale(2);
 			skeletonData = binary.readSkeletonData(Gdx.files.internal(name + ".skel"));
 		}
+		System.out.println(skeletonData.getEvents().size);
 		animation = skeletonData.findAnimation("walk");
 
 		skeleton = new Skeleton(skeletonData);
@@ -106,6 +109,7 @@ public class SkeletonTest extends ApplicationAdapter {
 	}
 
 	public void render () {
+		float lastTime = time;
 		time += Gdx.graphics.getDeltaTime();
 
 		float x = skeleton.getX() + 160 * Gdx.graphics.getDeltaTime() * (skeleton.getFlipX() ? -1 : 1);
@@ -115,7 +119,10 @@ public class SkeletonTest extends ApplicationAdapter {
 
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
-		animation.apply(skeleton, time, true);
+		events.clear();
+		animation.apply(skeleton, lastTime, time, true, events);
+		if (events.size > 0) System.out.println(events);
+
 		skeleton.updateWorldTransform();
 		skeleton.update(Gdx.graphics.getDeltaTime());
 

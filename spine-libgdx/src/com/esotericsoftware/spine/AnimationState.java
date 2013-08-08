@@ -32,10 +32,12 @@ import com.badlogic.gdx.utils.Pools;
 public class AnimationState {
 	private final AnimationStateData data;
 	private Animation current, previous;
-	private float currentTime, previousTime;
+	private float currentTime, currentLastTime, previousTime;
 	private boolean currentLoop, previousLoop;
 	private float mixTime, mixDuration;
-	private Array<QueueEntry> queue = new Array();
+	private final Array<QueueEntry> queue = new Array();
+	private final Array<Event> events = new Array();
+	private final Array<AnimationStateListener> listeners = new Array();
 
 	public AnimationState (AnimationStateData data) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -43,9 +45,19 @@ public class AnimationState {
 	}
 
 	public void update (float delta) {
+		currentLastTime = currentTime;
 		currentTime += delta;
 		previousTime += delta;
 		mixTime += delta;
+
+		if (current != null) {
+			float duration = current.getDuration();
+			if (currentLoop ? (currentLastTime % duration > currentTime % duration)
+				: (currentLastTime < duration && currentTime >= duration)) {
+				for (int i = 0, n = listeners.size; i < n; i++)
+					listeners.get(i).complete((int)(currentTime / duration));
+			}
+		}
 
 		if (queue.size > 0) {
 			QueueEntry entry = queue.first();
@@ -59,16 +71,27 @@ public class AnimationState {
 
 	public void apply (Skeleton skeleton) {
 		if (current == null) return;
+
+		Array<Event> events = this.events;
+		events.clear();
+
 		if (previous != null) {
-			previous.apply(skeleton, previousTime, previousLoop);
+			previous.apply(skeleton, Float.MAX_VALUE, previousTime, previousLoop, null);
 			float alpha = mixTime / mixDuration;
 			if (alpha >= 1) {
 				alpha = 1;
 				previous = null;
 			}
-			current.mix(skeleton, currentTime, currentLoop, alpha);
+			current.mix(skeleton, currentLastTime, currentTime, currentLoop, events, alpha);
 		} else
-			current.apply(skeleton, currentTime, currentLoop);
+			current.apply(skeleton, currentLastTime, currentTime, currentLoop, events);
+
+		int listenerCount = listeners.size;
+		for (int i = 0, n = events.size; i < n; i++) {
+			Event event = events.get(i);
+			for (int ii = 0; ii < listenerCount; ii++)
+				listeners.get(ii).event(event);
+		}
 	}
 
 	public void clearAnimation () {
@@ -84,18 +107,26 @@ public class AnimationState {
 
 	private void setAnimationInternal (Animation animation, boolean loop) {
 		previous = null;
-		if (animation != null && current != null) {
-			mixDuration = data.getMix(current, animation);
-			if (mixDuration > 0) {
-				mixTime = 0;
-				previous = current;
-				previousTime = currentTime;
-				previousLoop = currentLoop;
+		if (current != null) {
+			for (int i = 0, n = listeners.size; i < n; i++)
+				listeners.get(i).end();
+
+			if (animation != null) {
+				mixDuration = data.getMix(current, animation);
+				if (mixDuration > 0) {
+					mixTime = 0;
+					previous = current;
+					previousTime = currentTime;
+					previousLoop = currentLoop;
+				}
 			}
 		}
 		current = animation;
 		currentLoop = loop;
 		currentTime = 0;
+
+		for (int i = 0, n = listeners.size; i < n; i++)
+			listeners.get(i).start();
 	}
 
 	/** @see #setAnimation(Animation, boolean) */
@@ -168,6 +199,15 @@ public class AnimationState {
 		return current == null || currentTime >= current.getDuration();
 	}
 
+	public void addListener (AnimationStateListener listener) {
+		if (listener == null) throw new IllegalArgumentException("listener cannot be null.");
+		listeners.add(listener);
+	}
+
+	public void removeListener (AnimationStateListener listener) {
+		listeners.removeValue(listener, true);
+	}
+
 	public AnimationStateData getData () {
 		return data;
 	}
@@ -180,5 +220,24 @@ public class AnimationState {
 		Animation animation;
 		boolean loop;
 		float delay;
+	}
+
+	static public abstract class AnimationStateListener {
+		/** Invoked when the current animation triggers an event. */
+		public void event (Event event) {
+		}
+
+		/** Invoked when the current animation has completed.
+		 * @param loopCount The number of times the animation reached the end. */
+		public void complete (int loopCount) {
+		}
+
+		/** Invoked just after the current animation is set. */
+		public void start () {
+		}
+
+		/** Invoked just before the current animation is replaced. */
+		public void end () {
+		}
 	}
 }

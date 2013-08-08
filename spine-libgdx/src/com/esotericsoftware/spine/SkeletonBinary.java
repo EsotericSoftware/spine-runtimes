@@ -55,6 +55,7 @@ public class SkeletonBinary {
 	static public final int TIMELINE_TRANSLATE = 2;
 	static public final int TIMELINE_ATTACHMENT = 3;
 	static public final int TIMELINE_COLOR = 4;
+	static public final int TIMELINE_EVENT = 5;
 
 	static public final int CURVE_LINEAR = 0;
 	static public final int CURVE_STEPPED = 1;
