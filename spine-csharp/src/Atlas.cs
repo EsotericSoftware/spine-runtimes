@@ -182,10 +182,7 @@ namespace Spine {
 			int i = 0, lastMatch = colon + 1;
 			for (; i < 3; i++) {
 				int comma = line.IndexOf(',', lastMatch);
-				if (comma == -1) {
-					if (i == 0) throw new Exception("Invalid line: " + line);
-					break;
-				}
+				if (comma == -1 && i == 0) throw new Exception("Invalid line: " + line);
 				tuple[i] = line.Substring(lastMatch, comma - lastMatch).Trim();
 				lastMatch = comma + 1;
 			}
