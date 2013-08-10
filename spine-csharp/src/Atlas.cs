@@ -38,27 +38,19 @@ namespace Spine {
 		TextureLoader textureLoader;
 
 #if WINDOWS_STOREAPP
-        private async Task ReadFile(string path, TextureLoader textureLoader)
-        {
+        private async Task ReadFile(string path, TextureLoader textureLoader) {
             var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
-
             var file = await folder.GetFileAsync(path).AsTask().ConfigureAwait(false);
-
-            using (var reader = new StreamReader(await file.OpenStreamForReadAsync().ConfigureAwait(false)))
-            {
-                try
-                {
+            using (var reader = new StreamReader(await file.OpenStreamForReadAsync().ConfigureAwait(false))) {
+                try {
                     Load(reader, Path.GetDirectoryName(path), textureLoader);
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     throw new Exception("Error reading atlas file: " + path, ex);
                 }
             }
         }
 
-        public Atlas(String path, TextureLoader textureLoader)
-        {
+        public Atlas(String path, TextureLoader textureLoader) {
             this.ReadFile(path, textureLoader).Wait();
         }
 #else
