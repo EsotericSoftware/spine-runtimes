@@ -46,10 +46,8 @@ namespace Spine {
 		private AttachmentLoader attachmentLoader;
 		public float Scale { get; set; }
 
-		public SkeletonJson (Atlas atlas) {
-			this.attachmentLoader = new AtlasAttachmentLoader(atlas);
-			Scale = 1;
-		}
+		public SkeletonJson (Atlas atlas)
+		:this(new AtlasAttachmentLoader(atlas)) { }
 
 		public SkeletonJson (AttachmentLoader attachmentLoader) {
 			if (attachmentLoader == null) throw new ArgumentNullException("attachmentLoader cannot be null.");
