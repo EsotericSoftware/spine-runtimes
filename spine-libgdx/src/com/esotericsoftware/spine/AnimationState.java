@@ -34,6 +34,7 @@ public class AnimationState {
 	private Animation current, previous;
 	private float currentTime, currentLastTime, previousTime;
 	private boolean currentLoop, previousLoop;
+	private AnimationStateListener currentListener;
 	private float mixTime, mixDuration;
 	private final Array<QueueEntry> queue = new Array();
 	private final Array<Event> events = new Array();
@@ -54,15 +55,17 @@ public class AnimationState {
 			float duration = current.getDuration();
 			if (currentLoop ? (currentLastTime % duration > currentTime % duration)
 				: (currentLastTime < duration && currentTime >= duration)) {
+				int count = (int)(currentTime / duration);
+				if (currentListener != null) currentListener.complete(count);
 				for (int i = 0, n = listeners.size; i < n; i++)
-					listeners.get(i).complete((int)(currentTime / duration));
+					listeners.get(i).complete(count);
 			}
 		}
 
 		if (queue.size > 0) {
 			QueueEntry entry = queue.first();
 			if (currentTime >= entry.delay) {
-				setAnimationInternal(entry.animation, entry.loop);
+				setAnimationInternal(entry.animation, entry.loop, entry.listener);
 				Pools.free(entry);
 				queue.removeIndex(0);
 			}
@@ -89,6 +92,7 @@ public class AnimationState {
 		int listenerCount = listeners.size;
 		for (int i = 0, n = events.size; i < n; i++) {
 			Event event = events.get(i);
+			if (currentListener != null) currentListener.event(event);
 			for (int ii = 0; ii < listenerCount; ii++)
 				listeners.get(ii).event(event);
 		}
@@ -105,9 +109,10 @@ public class AnimationState {
 		queue.clear();
 	}
 
-	private void setAnimationInternal (Animation animation, boolean loop) {
+	private void setAnimationInternal (Animation animation, boolean loop, AnimationStateListener listener) {
 		previous = null;
 		if (current != null) {
+			if (currentListener != null) currentListener.end();
 			for (int i = 0, n = listeners.size; i < n; i++)
 				listeners.get(i).end();
 
@@ -124,49 +129,65 @@ public class AnimationState {
 		current = animation;
 		currentLoop = loop;
 		currentTime = 0;
+		currentListener = listener;
 
+		if (currentListener != null) currentListener.start();
 		for (int i = 0, n = listeners.size; i < n; i++)
 			listeners.get(i).start();
 	}
 
-	/** @see #setAnimation(Animation, boolean) */
+	/** @see #setAnimation(Animation, boolean, AnimationStateListener) */
 	public void setAnimation (String animationName, boolean loop) {
-		Animation animation = data.getSkeletonData().findAnimation(animationName);
-		if (animation == null) throw new IllegalArgumentException("Animation not found: " + animationName);
-		setAnimation(animation, loop);
+		setAnimation(animationName, loop, null);
 	}
 
-	/** Set the current animation. Any queued animations are cleared and the current animation time is set to 0.
-	 * @param animation May be null. */
+	/** @see #setAnimation(Animation, boolean, AnimationStateListener) */
+	public void setAnimation (String animationName, boolean loop, AnimationStateListener listener) {
+		Animation animation = data.getSkeletonData().findAnimation(animationName);
+		if (animation == null) throw new IllegalArgumentException("Animation not found: " + animationName);
+		setAnimation(animation, loop, listener);
+	}
+
+	/** @see #setAnimation(Animation, boolean, AnimationStateListener) */
 	public void setAnimation (Animation animation, boolean loop) {
+		setAnimation(animation, loop, null);
+	}
+
+	/** Set the current animation. Any queued animations are cleared and the current animation time is set to 0. The specified
+	 * listener receives events only for this animation.
+	 * @param animation May be null.
+	 * @param listener May be null. */
+	public void setAnimation (Animation animation, boolean loop, AnimationStateListener listener) {
 		clearQueue();
-		setAnimationInternal(animation, loop);
+		setAnimationInternal(animation, loop, listener);
 	}
 
 	/** @see #addAnimation(Animation, boolean) */
 	public void addAnimation (String animationName, boolean loop) {
-		addAnimation(animationName, loop, 0);
+		addAnimation(animationName, loop, 0, null);
 	}
 
-	/** @see #addAnimation(Animation, boolean, float) */
-	public void addAnimation (String animationName, boolean loop, float delay) {
+	/** @see #addAnimation(Animation, boolean, float, AnimationStateListener) */
+	public void addAnimation (String animationName, boolean loop, float delay, AnimationStateListener listener) {
 		Animation animation = data.getSkeletonData().findAnimation(animationName);
 		if (animation == null) throw new IllegalArgumentException("Animation not found: " + animationName);
-		addAnimation(animation, loop, delay);
+		addAnimation(animation, loop, delay, listener);
 	}
 
 	/** Adds an animation to be played delay seconds after the current or last queued animation, taking into account any mix
 	 * duration. */
 	public void addAnimation (Animation animation, boolean loop) {
-		addAnimation(animation, loop, 0);
+		addAnimation(animation, loop, 0, null);
 	}
 
 	/** Adds an animation to be played delay seconds after the current or last queued animation.
-	 * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay. */
-	public void addAnimation (Animation animation, boolean loop, float delay) {
+	 * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay.
+	 * @param listener May be null. */
+	public void addAnimation (Animation animation, boolean loop, float delay, AnimationStateListener listener) {
 		QueueEntry entry = Pools.obtain(QueueEntry.class);
 		entry.animation = animation;
 		entry.loop = loop;
+		entry.listener = listener;
 
 		if (delay <= 0) {
 			Animation previousAnimation = queue.size == 0 ? current : queue.peek().animation;
@@ -199,6 +220,7 @@ public class AnimationState {
 		return current == null || currentTime >= current.getDuration();
 	}
 
+	/** Adds a listener to receive events for all animations. */
 	public void addListener (AnimationStateListener listener) {
 		if (listener == null) throw new IllegalArgumentException("listener cannot be null.");
 		listeners.add(listener);
@@ -220,6 +242,7 @@ public class AnimationState {
 		Animation animation;
 		boolean loop;
 		float delay;
+		AnimationStateListener listener;
 	}
 
 	static public abstract class AnimationStateListener {
