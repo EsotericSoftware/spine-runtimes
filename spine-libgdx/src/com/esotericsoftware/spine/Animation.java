@@ -226,7 +226,7 @@ public class Animation {
 		static private final int LAST_FRAME_TIME = -2;
 		static private final int FRAME_VALUE = 1;
 
-		private int boneIndex;
+		int boneIndex;
 		private final float[] frames; // time, angle, ...
 
 		public RotateTimeline (int frameCount) {
@@ -386,7 +386,7 @@ public class Animation {
 		static private final int FRAME_B = 3;
 		static private final int FRAME_A = 4;
 
-		private int slotIndex;
+		int slotIndex;
 		private final float[] frames; // time, r, g, b, a, ...
 
 		public ColorTimeline (int frameCount) {
@@ -454,7 +454,7 @@ public class Animation {
 	}
 
 	static public class AttachmentTimeline implements Timeline {
-		private int slotIndex;
+		int slotIndex;
 		private final float[] frames; // time, ...
 		private final String[] attachmentNames;
 
@@ -535,10 +535,15 @@ public class Animation {
 			int frameCount = frames.length;
 			if (lastTime >= frames[frameCount - 1]) return; // Last time is after last frame.
 
-			int frameIndex = binarySearch(frames, lastTime, 1);
-			float frame = frames[frameIndex];
-			while (frameIndex > 0 && frame == frames[frameIndex - 1])
-				frameIndex--; // Fire multiple events with the same frame.
+			int frameIndex;
+			if (frameCount == 1)
+				frameIndex = 0;
+			else {
+				frameIndex = binarySearch(frames, lastTime, 1);
+				float frame = frames[frameIndex];
+				while (frameIndex > 0 && frame == frames[frameIndex - 1])
+					frameIndex--; // Fire multiple events with the same frame.
+			}
 			for (; frameIndex < frameCount && time > frames[frameIndex]; frameIndex++)
 				firedEvents.add(events[frameIndex]);
 		}
