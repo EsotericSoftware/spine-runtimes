@@ -3,9 +3,9 @@ package com.esotericsoftware.spine;
 
 public class EventData {
 	final String name;
-	private int intValue;
-	private float floatValue;
-	private String stringValue;
+	int intValue;
+	float floatValue;
+	String stringValue;
 
 	public EventData (String name) {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");

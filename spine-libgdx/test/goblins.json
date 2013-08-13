@@ -200,7 +200,7 @@
 },
 "events": {
 	"test1": { "int": 1, "float": 2, "string": "three" },
-	"test2": { "int": 123, "float": 456, "string": "789" }
+	"test2": {}
 },
 "animations": {
 	"walk": {
@@ -499,9 +499,9 @@
 			}
 		},
 		"events": [
-			{ "time": 0.4, "name": "test1", "int": 0, "float": 0, "string": "" },
-			{ "time": 0.4, "name": "test2", "int": 0, "float": 0, "string": "" },
-			{ "time": 0.8, "name": "test1", "int": 12, "float": 0, "string": "" }			
+			{ "time": 0.46666667, "name": "test1" },
+			{ "time": 0.53333336, "name": "test2" },
+			{ "time": 0.93333334, "name": "test1" }
 		]
 	}
 }

@@ -28,6 +28,7 @@ package com.esotericsoftware.spine;
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.ColorTimeline;
 import com.esotericsoftware.spine.Animation.CurveTimeline;
+import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
@@ -87,7 +88,7 @@ public class SkeletonBinary {
 		if (file == null) throw new IllegalArgumentException("file cannot be null.");
 
 		SkeletonData skeletonData = new SkeletonData();
-		skeletonData.setName(file.nameWithoutExtension());
+		skeletonData.name = file.nameWithoutExtension();
 
 		DataInput input = new DataInput(file.read(512));
 		try {
@@ -120,7 +121,7 @@ public class SkeletonBinary {
 				if (boneData == null) throw new SerializationException("Bone not found: " + boneName);
 				SlotData slotData = new SlotData(slotName, boneData);
 				Color.rgba8888ToColor(slotData.getColor(), input.readInt());
-				slotData.setAttachmentName(input.readString());
+				slotData.attachmentName = input.readString();
 				slotData.additiveBlending = input.readByte() == 1;
 				skeletonData.addSlot(slotData);
 			}
@@ -128,13 +129,22 @@ public class SkeletonBinary {
 			// Default skin.
 			Skin defaultSkin = readSkin(input, "default");
 			if (defaultSkin != null) {
-				skeletonData.setDefaultSkin(defaultSkin);
+				skeletonData.defaultSkin = defaultSkin;
 				skeletonData.addSkin(defaultSkin);
 			}
 
 			// Skins.
 			for (int i = 0, n = input.readInt(true); i < n; i++)
 				skeletonData.addSkin(readSkin(input, input.readString()));
+
+			// Events.
+			for (int i = 0, n = input.readInt(true); i < n; i++) {
+				EventData eventData = new EventData(input.readString());
+				eventData.intValue = input.readInt(false);
+				eventData.floatValue = input.readFloat();
+				eventData.stringValue = input.readString();
+				skeletonData.addEvent(eventData);
+			}
 
 			// Animations.
 			for (int i = 0, n = input.readInt(true); i < n; i++)
@@ -215,7 +225,7 @@ public class SkeletonBinary {
 					switch (timelineType) {
 					case TIMELINE_ROTATE: {
 						RotateTimeline timeline = new RotateTimeline(keyCount);
-						timeline.setBoneIndex(boneIndex);
+						timeline.boneIndex = boneIndex;
 						for (int frameIndex = 0; frameIndex < keyCount; frameIndex++) {
 							timeline.setFrame(frameIndex, input.readFloat(), input.readFloat());
 							if (frameIndex < keyCount - 1) readCurve(input, frameIndex, timeline);
@@ -234,7 +244,7 @@ public class SkeletonBinary {
 							timeline = new TranslateTimeline(keyCount);
 							timelineScale = scale;
 						}
-						timeline.setBoneIndex(boneIndex);
+						timeline.boneIndex = boneIndex;
 						for (int frameIndex = 0; frameIndex < keyCount; frameIndex++) {
 							timeline.setFrame(frameIndex, input.readFloat(), input.readFloat() * timelineScale, input.readFloat()
 								* timelineScale);
@@ -260,7 +270,7 @@ public class SkeletonBinary {
 					switch (timelineType) {
 					case TIMELINE_COLOR: {
 						ColorTimeline timeline = new ColorTimeline(keyCount);
-						timeline.setSlotIndex(slotIndex);
+						timeline.slotIndex = slotIndex;
 						for (int frameIndex = 0; frameIndex < keyCount; frameIndex++) {
 							float time = input.readFloat();
 							Color.rgba8888ToColor(tempColor, input.readInt());
@@ -273,7 +283,7 @@ public class SkeletonBinary {
 					}
 					case TIMELINE_ATTACHMENT:
 						AttachmentTimeline timeline = new AttachmentTimeline(keyCount);
-						timeline.setSlotIndex(slotIndex);
+						timeline.slotIndex = slotIndex;
 						for (int frameIndex = 0; frameIndex < keyCount; frameIndex++)
 							timeline.setFrame(frameIndex, input.readFloat(), input.readString());
 						timelines.add(timeline);
@@ -282,6 +292,22 @@ public class SkeletonBinary {
 					default:
 						throw new RuntimeException("Invalid timeline type for a slot: " + timelineType + " (" + slotName + ")");
 					}
+				}
+			}
+
+			int eventCount = input.readInt(true);
+			if (eventCount > 0) {
+				EventTimeline timeline = new EventTimeline(eventCount);
+				for (int i = 0; i < eventCount; i++) {
+					float time = input.readFloat();
+					String eventName = input.readString();
+					EventData eventData = skeletonData.findEvent(eventName);
+					if (eventData == null) throw new SerializationException("Event not found: " + eventName);
+					Event event = new Event(eventData);
+					event.intValue = input.readInt(false);
+					event.floatValue = input.readFloat();
+					event.stringValue = input.readBoolean() ? input.readString() : eventData.stringValue;
+					timeline.setFrame(i, time, event);
 				}
 			}
 		} catch (IOException ex) {

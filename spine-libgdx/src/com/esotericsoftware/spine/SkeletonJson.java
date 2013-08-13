@@ -80,7 +80,7 @@ public class SkeletonJson {
 		if (file == null) throw new IllegalArgumentException("file cannot be null.");
 
 		SkeletonData skeletonData = new SkeletonData();
-		skeletonData.setName(file.nameWithoutExtension());
+		skeletonData.name = file.nameWithoutExtension();
 
 		JsonValue root = new JsonReader().parse(file);
 
@@ -115,7 +115,7 @@ public class SkeletonJson {
 			String color = slotMap.getString("color", null);
 			if (color != null) slotData.getColor().set(Color.valueOf(color));
 
-			slotData.setAttachmentName(slotMap.getString("attachment", null));
+			slotData.attachmentName = slotMap.getString("attachment", null);
 
 			slotData.additiveBlending = slotMap.getBoolean("additive", false);
 
@@ -133,15 +133,15 @@ public class SkeletonJson {
 				}
 			}
 			skeletonData.addSkin(skin);
-			if (skin.name.equals("default")) skeletonData.setDefaultSkin(skin);
+			if (skin.name.equals("default")) skeletonData.defaultSkin = skin;
 		}
 
 		// Events.
 		for (JsonValue eventMap = root.getChild("events"); eventMap != null; eventMap = eventMap.next()) {
 			EventData eventData = new EventData(eventMap.name());
-			eventData.setInt(eventMap.getInt("int", 0));
-			eventData.setFloat(eventMap.getFloat("float", 0f));
-			eventData.setString(eventMap.getString("string", null));
+			eventData.intValue = eventMap.getInt("int", 0);
+			eventData.floatValue = eventMap.getFloat("float", 0f);
+			eventData.stringValue = eventMap.getString("string", null);
 			skeletonData.addEvent(eventData);
 		}
 
@@ -199,7 +199,7 @@ public class SkeletonJson {
 				String timelineName = timelineMap.name();
 				if (timelineName.equals(TIMELINE_ROTATE)) {
 					RotateTimeline timeline = new RotateTimeline(timelineMap.size);
-					timeline.setBoneIndex(boneIndex);
+					timeline.boneIndex = boneIndex;
 
 					int frameIndex = 0;
 					for (JsonValue valueMap = timelineMap.child(); valueMap != null; valueMap = valueMap.next()) {
@@ -220,7 +220,7 @@ public class SkeletonJson {
 						timeline = new TranslateTimeline(timelineMap.size);
 						timelineScale = scale;
 					}
-					timeline.setBoneIndex(boneIndex);
+					timeline.boneIndex = boneIndex;
 
 					int frameIndex = 0;
 					for (JsonValue valueMap = timelineMap.child(); valueMap != null; valueMap = valueMap.next()) {
@@ -245,7 +245,7 @@ public class SkeletonJson {
 				String timelineName = timelineMap.name();
 				if (timelineName.equals(TIMELINE_COLOR)) {
 					ColorTimeline timeline = new ColorTimeline(timelineMap.size);
-					timeline.setSlotIndex(slotIndex);
+					timeline.slotIndex = slotIndex;
 
 					int frameIndex = 0;
 					for (JsonValue valueMap = timelineMap.child(); valueMap != null; valueMap = valueMap.next()) {
@@ -260,7 +260,7 @@ public class SkeletonJson {
 
 				} else if (timelineName.equals(TIMELINE_ATTACHMENT)) {
 					AttachmentTimeline timeline = new AttachmentTimeline(timelineMap.size);
-					timeline.setSlotIndex(slotIndex);
+					timeline.slotIndex = slotIndex;
 
 					int frameIndex = 0;
 					for (JsonValue valueMap = timelineMap.child(); valueMap != null; valueMap = valueMap.next()) {
@@ -283,9 +283,9 @@ public class SkeletonJson {
 				EventData eventData = skeletonData.findEvent(eventMap.getString("name"));
 				if (eventData == null) throw new SerializationException("Event not found: " + eventMap.getString("name"));
 				Event event = new Event(eventData);
-				event.setInt(eventMap.getInt("int", eventData.getInt()));
-				event.setFloat(eventMap.getFloat("float", eventData.getFloat()));
-				event.setString(eventMap.getString("string", eventData.getString()));
+				event.intValue = eventMap.getInt("int", eventData.getInt());
+				event.floatValue = eventMap.getFloat("float", eventData.getFloat());
+				event.stringValue = eventMap.getString("string", eventData.getString());
 				timeline.setFrame(frameIndex++, eventMap.getFloat("time"), event);
 			}
 			timelines.add(timeline);

@@ -83,7 +83,6 @@ public class SkeletonTest extends ApplicationAdapter {
 			// binary.setScale(2);
 			skeletonData = binary.readSkeletonData(Gdx.files.internal(name + ".skel"));
 		}
-		System.out.println(skeletonData.getEvents().size);
 		animation = skeletonData.findAnimation("walk");
 
 		skeleton = new Skeleton(skeletonData);

@@ -3,9 +3,9 @@ package com.esotericsoftware.spine;
 
 public class Event {
 	final private EventData data;
-	private int intValue;
-	private float floatValue;
-	private String stringValue;
+	int intValue;
+	float floatValue;
+	String stringValue;
 
 	public Event (EventData data) {
 		this.data = data;
