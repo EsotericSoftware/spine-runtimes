@@ -226,8 +226,14 @@ public class AnimationState {
 		listeners.add(listener);
 	}
 
+	/** Removes the listener, which may be for all animations, the current animation, or a queued animation. */
 	public void removeListener (AnimationStateListener listener) {
 		listeners.removeValue(listener, true);
+
+		if (listener == currentListener) currentListener = null;
+
+		for (int i = queue.size - 1; i >= 0; i--)
+			if (queue.get(i).listener == listener) queue.removeIndex(i);
 	}
 
 	public AnimationStateData getData () {
