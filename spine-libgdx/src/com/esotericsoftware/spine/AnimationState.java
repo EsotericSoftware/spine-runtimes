@@ -245,21 +245,31 @@ public class AnimationState {
 		AnimationStateListener listener;
 	}
 
-	static public abstract class AnimationStateListener {
+	static public interface AnimationStateListener {
 		/** Invoked when the current animation triggers an event. */
-		public void event (Event event) {
-		}
+		public void event (Event event);
 
 		/** Invoked when the current animation has completed.
 		 * @param loopCount The number of times the animation reached the end. */
+		public void complete (int loopCount);
+
+		/** Invoked just after the current animation is set. */
+		public void start ();
+
+		/** Invoked just before the current animation is replaced. */
+		public void end ();
+	}
+
+	static public abstract class AnimationStateAdapter implements AnimationStateListener {
+		public void event (Event event) {
+		}
+
 		public void complete (int loopCount) {
 		}
 
-		/** Invoked just after the current animation is set. */
 		public void start () {
 		}
 
-		/** Invoked just before the current animation is replaced. */
 		public void end () {
 		}
 	}
