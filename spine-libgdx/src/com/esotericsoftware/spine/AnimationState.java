@@ -232,8 +232,9 @@ public class AnimationState {
 
 		if (listener == currentListener) currentListener = null;
 
+		Array<QueueEntry> queue = this.queue;
 		for (int i = queue.size - 1; i >= 0; i--)
-			if (queue.get(i).listener == listener) queue.removeIndex(i);
+			if (queue.get(i).listener == listener) queue.get(i).listener = null;
 	}
 
 	public AnimationStateData getData () {
