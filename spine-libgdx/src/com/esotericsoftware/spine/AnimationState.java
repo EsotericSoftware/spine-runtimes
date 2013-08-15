@@ -46,7 +46,6 @@ public class AnimationState {
 	}
 
 	public void update (float delta) {
-		currentLastTime = currentTime;
 		currentTime += delta;
 		previousTime += delta;
 		mixTime += delta;
@@ -96,6 +95,8 @@ public class AnimationState {
 			for (int ii = 0; ii < listenerCount; ii++)
 				listeners.get(ii).event(event);
 		}
+
+		currentLastTime = currentTime;
 	}
 
 	public void clearAnimation () {
@@ -129,6 +130,7 @@ public class AnimationState {
 		current = animation;
 		currentLoop = loop;
 		currentTime = 0;
+		currentLastTime = 0;
 		currentListener = listener;
 
 		if (currentListener != null) currentListener.start();
@@ -213,6 +215,7 @@ public class AnimationState {
 
 	public void setTime (float time) {
 		currentTime = time;
+		currentLastTime = time;
 	}
 
 	/** Returns true if no animation is set or if the current time is greater than the animation duration, regardless of looping. */
