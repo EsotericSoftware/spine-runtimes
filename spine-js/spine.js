@@ -387,7 +387,7 @@ spine.ColorTimeline = function (frameCount) {
 spine.ColorTimeline.prototype = {
 	slotIndex: 0,
 	getFrameCount: function () {
-		return this.frames.length / 2;
+		return this.frames.length / 5;
 	},
 	setFrame: function (frameIndex, time, r, g, b, a) {
 		frameIndex *= 5;
