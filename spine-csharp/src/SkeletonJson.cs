@@ -46,9 +46,7 @@ namespace Spine {
 		private AttachmentLoader attachmentLoader;
 		public float Scale { get; set; }
 
-		public SkeletonJson (Atlas atlas) {
-			this.attachmentLoader = new AtlasAttachmentLoader(atlas);
-			Scale = 1;
+		public SkeletonJson (Atlas atlas) : this(new AtlasAttachmentLoader(atlas)) {
 		}
 
 		public SkeletonJson (AttachmentLoader attachmentLoader) {
@@ -56,23 +54,19 @@ namespace Spine {
 			this.attachmentLoader = attachmentLoader;
 			Scale = 1;
 		}
+
 #if WINDOWS_STOREAPP
-        private async Task<SkeletonData> ReadFile(string path)
-        {
+        private async Task<SkeletonData> ReadFile(string path) {
             var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
-
             var file = await folder.GetFileAsync(path).AsTask().ConfigureAwait(false);
-
-            using (var reader = new StreamReader(await file.OpenStreamForReadAsync().ConfigureAwait(false)))
-            {
+            using (var reader = new StreamReader(await file.OpenStreamForReadAsync().ConfigureAwait(false))) {
                 SkeletonData skeletonData = ReadSkeletonData(reader);
                 skeletonData.Name = Path.GetFileNameWithoutExtension(path);
                 return skeletonData;
             }
         }
 
-		public SkeletonData ReadSkeletonData (String path)
-		{
+		public SkeletonData ReadSkeletonData (String path) {
 		    return this.ReadFile(path).Result;
 		}
 #else
@@ -83,8 +77,8 @@ namespace Spine {
 				return skeletonData;
 			}
 		}
-
 #endif
+
 		public SkeletonData ReadSkeletonData (TextReader reader) {
 			if (reader == null) throw new ArgumentNullException("reader cannot be null.");
 
