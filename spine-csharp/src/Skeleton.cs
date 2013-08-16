@@ -182,7 +182,7 @@ namespace Spine {
 					Attachment attachment = null;
 					if (attachmentName != null) {
 						attachment = GetAttachment(i, attachmentName);
-						if (attachment == null) throw new ArgumentNullException("Attachment not found: " + attachmentName + ", for slot: " + slotName);
+						if (attachment == null) throw new Exception("Attachment not found: " + attachmentName + ", for slot: " + slotName);
 					}
 					slot.Attachment = attachment;
 					return;
