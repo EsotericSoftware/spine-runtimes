@@ -46,6 +46,7 @@ public class SkeletonComponent : MonoBehaviour {
 	private Material[] sharedMaterials = new Material[0];
 	private List<Material> submeshMaterials = new List<Material>();
 	private List<int[]> submeshIndexes = new List<int[]>();
+	private List<int> submeshFirstVertex = new List<int>();
 	private Vector4[] tangents = new Vector4[0];
 
 	public virtual void Clear () {
@@ -63,9 +64,6 @@ public class SkeletonComponent : MonoBehaviour {
 		mesh.hideFlags = HideFlags.HideAndDontSave;
 		mesh.MarkDynamic();
 		
-		// BOZO
-		//renderer.sharedMaterial = skeletonDataAsset.atlasAsset.material;
-
 		vertices = new Vector3[0];
 
 		skeleton = new Skeleton(skeletonDataAsset.GetSkeletonData(false));
@@ -117,7 +115,7 @@ public class SkeletonComponent : MonoBehaviour {
 			quadCount++;
 			submeshQuadCount++;
 		}
-		addSubmesh(lastMaterial, quadCount, submeshQuadCount, false);
+		addSubmesh(lastMaterial, quadCount, submeshQuadCount, true);
 		
 		// Set materials.
 		if (submeshMaterials.Count == sharedMaterials.Length)
@@ -194,7 +192,8 @@ public class SkeletonComponent : MonoBehaviour {
 			if (calculateTangents) {
 				Vector4[] tangents = this.tangents;
 				int count = mesh.normals.Length;
-				if (tangents.Length != count) this.tangents = tangents = new Vector4[count];
+				if (tangents.Length != count)
+					this.tangents = tangents = new Vector4[count];
 				for (int i = 0; i < count; i++)
 					tangents[i] = new Vector4(1, 0, 0, 1);
 				mesh.tangents = tangents;
@@ -203,25 +202,37 @@ public class SkeletonComponent : MonoBehaviour {
 	}
 	
 	/** Adds a material. Adds submesh indexes if existing indexes aren't sufficient. */
-	private void addSubmesh (Material material, int endQuadCount, int submeshQuadCount, bool exact) {
+	private void addSubmesh (Material material, int endQuadCount, int submeshQuadCount, bool lastSubmesh) {
 		int submeshIndex = submeshMaterials.Count;
 		submeshMaterials.Add(material);
 
-		// Return if the existing submesh is big enough.
 		int indexCount = submeshQuadCount * 6;
-		if (submeshIndexes.Count > submeshIndex) {
-			if (exact) {
-				if (submeshIndexes[submeshIndex].Length == indexCount)
-					return;
-			} else {
-				if (submeshIndexes[submeshIndex].Length >= indexCount)
-					return;
-			}
-		} else
-			submeshIndexes.Add(null);
-
 		int vertexIndex = (endQuadCount - submeshQuadCount) * 4;
-		int[] indexes = new int[indexCount];
+
+		int[] indexes;
+		if (submeshIndexes.Count > submeshIndex) {
+			indexes = submeshIndexes[submeshIndex];
+			// Don't reallocate if existing indexes are right size. Skip setting vertices if already set correctly.
+			if (!lastSubmesh) {
+				if (indexes.Length == indexCount) {
+					if (submeshFirstVertex[submeshIndex] == vertexIndex) return;
+				} else
+					submeshIndexes[submeshIndex] = indexes = new int[indexCount];
+			} else {
+				if (indexes.Length >= indexCount) { // Allow last submesh to have more indices than required.
+					if (submeshFirstVertex[submeshIndex] == vertexIndex) return;
+					indexCount = indexes.Length; // Update vertices to the end.
+				} else
+					submeshIndexes[submeshIndex] = indexes = new int[indexCount];
+			}
+			submeshFirstVertex[submeshIndex] = vertexIndex;
+		} else {
+			// Need new indexes.
+			indexes = new int[indexCount];
+			submeshIndexes.Add(indexes);
+			submeshFirstVertex.Add(vertexIndex);
+		}
+
 		for (int i = 0; i < indexCount; i += 6, vertexIndex += 4) {
 			indexes[i] = vertexIndex;
 			indexes[i + 1] = vertexIndex + 2;
@@ -230,18 +241,11 @@ public class SkeletonComponent : MonoBehaviour {
 			indexes[i + 4] = vertexIndex + 3;
 			indexes[i + 5] = vertexIndex + 1;
 		}
-		submeshIndexes[submeshIndex] = indexes;
 	}
 	
 	public virtual void OnEnable () {
 		Update();
 	}
-
-#if UNITY_EDITOR
-	public virtual void OnDisable () {
-		Clear();
-	}
-#endif
 
 	public virtual void Reset () {
 		Update();
@@ -249,6 +253,7 @@ public class SkeletonComponent : MonoBehaviour {
 	
 #if UNITY_EDITOR
 	void OnDrawGizmos() {
+		if (vertices == null) return;
 		Vector3 gizmosCenter = new Vector3();
 		Vector3 gizmosSize = new Vector3();
 		Vector3 min = new Vector3(float.MaxValue, float.MaxValue, 0f);
