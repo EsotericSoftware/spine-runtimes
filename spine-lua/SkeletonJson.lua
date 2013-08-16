@@ -162,50 +162,52 @@ function SkeletonJson.new (attachmentLoader)
 		local duration = 0
 
 		local bonesMap = map["bones"]
-		for boneName,timelineMap in pairs(bonesMap) do
-			local boneIndex = skeletonData:findBoneIndex(boneName)
-			if boneIndex == -1 then error("Bone not found: " .. boneName) end
+		if bonesMap then
+			for boneName,timelineMap in pairs(bonesMap) do
+				local boneIndex = skeletonData:findBoneIndex(boneName)
+				if boneIndex == -1 then error("Bone not found: " .. boneName) end
 
-			for timelineName,values in pairs(timelineMap) do
-				if timelineName == TIMELINE_ROTATE then
-					local timeline = Animation.RotateTimeline.new()
-					timeline.boneIndex = boneIndex
+				for timelineName,values in pairs(timelineMap) do
+					if timelineName == TIMELINE_ROTATE then
+						local timeline = Animation.RotateTimeline.new()
+						timeline.boneIndex = boneIndex
 
-					local keyframeIndex = 0
-					for i,valueMap in ipairs(values) do
-						local time = valueMap["time"]
-						timeline:setKeyframe(keyframeIndex, time, valueMap["angle"])
-						readCurve(timeline, keyframeIndex, valueMap)
-						keyframeIndex = keyframeIndex + 1
-					end
-					table.insert(timelines, timeline)
-					duration = math.max(duration, timeline:getDuration())
+						local keyframeIndex = 0
+						for i,valueMap in ipairs(values) do
+							local time = valueMap["time"]
+							timeline:setKeyframe(keyframeIndex, time, valueMap["angle"])
+							readCurve(timeline, keyframeIndex, valueMap)
+							keyframeIndex = keyframeIndex + 1
+						end
+						table.insert(timelines, timeline)
+						duration = math.max(duration, timeline:getDuration())
 
-				elseif timelineName == TIMELINE_TRANSLATE or timelineName == TIMELINE_SCALE then
-					local timeline
-					local timelineScale = 1
-					if timelineName == TIMELINE_SCALE then
-						timeline = Animation.ScaleTimeline.new()
+					elseif timelineName == TIMELINE_TRANSLATE or timelineName == TIMELINE_SCALE then
+						local timeline
+						local timelineScale = 1
+						if timelineName == TIMELINE_SCALE then
+							timeline = Animation.ScaleTimeline.new()
+						else
+							timeline = Animation.TranslateTimeline.new()
+							timelineScale = self.scale
+						end
+						timeline.boneIndex = boneIndex
+
+						local keyframeIndex = 0
+						for i,valueMap in ipairs(values) do
+							local time = valueMap["time"]
+							local x = (valueMap["x"] or 0) * timelineScale
+							local y = (valueMap["y"] or 0) * timelineScale
+							timeline:setKeyframe(keyframeIndex, time, x, y)
+							readCurve(timeline, keyframeIndex, valueMap)
+							keyframeIndex = keyframeIndex + 1
+						end
+						table.insert(timelines, timeline)
+						duration = math.max(duration, timeline:getDuration())
+
 					else
-						timeline = Animation.TranslateTimeline.new()
-						timelineScale = self.scale
+						error("Invalid timeline type for a bone: " .. timelineName .. " (" .. boneName .. ")")
 					end
-					timeline.boneIndex = boneIndex
-
-					local keyframeIndex = 0
-					for i,valueMap in ipairs(values) do
-						local time = valueMap["time"]
-						local x = (valueMap["x"] or 0) * timelineScale
-						local y = (valueMap["y"] or 0) * timelineScale
-						timeline:setKeyframe(keyframeIndex, time, x, y)
-						readCurve(timeline, keyframeIndex, valueMap)
-						keyframeIndex = keyframeIndex + 1
-					end
-					table.insert(timelines, timeline)
-					duration = math.max(duration, timeline:getDuration())
-
-				else
-					error("Invalid timeline type for a bone: " .. timelineName .. " (" .. boneName .. ")")
 				end
 			end
 		end
