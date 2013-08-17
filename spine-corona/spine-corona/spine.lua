@@ -116,12 +116,16 @@ function spine.Skeleton.new (skeletonData, group)
 					image.rotation = -(slot.bone.worldRotation + attachment.rotation)
 
 					-- fix scaling when attachment is rotated 90 degrees
-					local rot = math.abs(attachment.rotation) % 180
-					if (rot == 90) then
+					local rotation = math.abs(attachment.rotation) % 180
+					if (rotation == 90) then
 					    image.xScale = slot.bone.worldScaleY * attachment.scaleX
 					    image.yScale = slot.bone.worldScaleX * attachment.scaleY
 					else
-					    --if (rot ~= 0 and (slot.bone.worldScaleX ~= 1 or slot.bone.worldScaleY ~= 1)) then print("WARNING: Scaling bones with attachments not rotated to the cardinal angles will not work as expected in Corona!") end
+					    if (rotation ~= 0 and (slot.bone.worldScaleX ~= 1 or slot.bone.worldScaleY ~= 1)) then
+							print("WARNING: Non-uniform bone scaling with attachments not rotated to\n"
+								.."         cardinal angles will not work as expected with Corona.\n"
+								.."         Bone: "..slot.bone.data.name..", slot: "..slot.data.name..", attachment: "..attachment.name)
+						end
 					    image.xScale = slot.bone.worldScaleX * attachment.scaleX
 					    image.yScale = slot.bone.worldScaleY * attachment.scaleY
 					end
