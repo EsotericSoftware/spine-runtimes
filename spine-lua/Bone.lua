@@ -6,10 +6,10 @@
  -- modification, are permitted provided that the following conditions are met:
  -- 
  -- 1. Redistributions of source code must retain the above copyright notice, this
- --    list of conditions and the following disclaimer.
+ --	 list of conditions and the following disclaimer.
  -- 2. Redistributions in binary form must reproduce the above copyright notice,
- --    this list of conditions and the following disclaimer in the documentation
- --    and/or other materials provided with the distribution.
+ --	 this list of conditions and the following disclaimer in the documentation
+ --	 and/or other materials provided with the distribution.
  -- 
  -- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  -- ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -38,18 +38,18 @@ function Bone.new (data, parent)
 		if parent then
 			self.worldX = self.x * parent.m00 + self.y * parent.m01 + parent.worldX
 			self.worldY = self.x * parent.m10 + self.y * parent.m11 + parent.worldY
-      if (self.data.inheritScale) then
-          self.worldScaleX = parent.worldScaleX * self.scaleX
-          self.worldScaleY = parent.worldScaleY * self.scaleY
-      else
-          self.worldScaleX = self.scaleX
-          self.worldScaleY = self.scaleY
-      end
-      if (self.data.inheritRotation) then
-          self.worldRotation = parent.worldRotation + self.rotation
-      else
-          self.worldRotation = self.rotation
-      end
+			if (self.data.inheritScale) then
+				 self.worldScaleX = parent.worldScaleX * self.scaleX
+				 self.worldScaleY = parent.worldScaleY * self.scaleY
+			else
+				 self.worldScaleX = self.scaleX
+				 self.worldScaleY = self.scaleY
+			end
+			if (self.data.inheritRotation) then
+				 self.worldRotation = parent.worldRotation + self.rotation
+			else
+				 self.worldRotation = self.rotation
+			end
 		else
 			if flipX then
 				self.worldX = -self.x
