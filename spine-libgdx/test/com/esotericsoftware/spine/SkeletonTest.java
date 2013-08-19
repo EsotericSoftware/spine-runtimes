@@ -75,10 +75,12 @@ public class SkeletonTest extends ApplicationAdapter {
 		};
 
 		if (true) {
+			System.out.println("JSON");
 			SkeletonJson json = new SkeletonJson(atlas);
 			// json.setScale(2);
 			skeletonData = json.readSkeletonData(Gdx.files.internal(name + ".json"));
 		} else {
+			System.out.println("Binary");
 			SkeletonBinary binary = new SkeletonBinary(atlas);
 			// binary.setScale(2);
 			skeletonData = binary.readSkeletonData(Gdx.files.internal(name + ".skel"));

@@ -522,6 +522,10 @@ public class Animation {
 			return frames;
 		}
 
+		public Event[] getEvents () {
+			return events;
+		}
+
 		/** Sets the time of the specified keyframe. */
 		public void setFrame (int frameIndex, float time, Event event) {
 			frames[frameIndex] = time;
@@ -546,6 +550,51 @@ public class Animation {
 			}
 			for (; frameIndex < frameCount && time > frames[frameIndex]; frameIndex++)
 				firedEvents.add(events[frameIndex]);
+		}
+	}
+
+	static public class DrawOrderTimeline implements Timeline {
+		private final float[] frames; // time, ...
+		private final int[][] drawOrders;
+
+		public DrawOrderTimeline (int frameCount) {
+			frames = new float[frameCount];
+			drawOrders = new int[frameCount][];
+		}
+
+		public int getFrameCount () {
+			return frames.length;
+		}
+
+		public float[] getFrames () {
+			return frames;
+		}
+
+		public int[][] getDrawOrders () {
+			return drawOrders;
+		}
+
+		/** Sets the time of the specified keyframe. */
+		public void setFrame (int frameIndex, float time, int[] drawOrder) {
+			frames[frameIndex] = time;
+			drawOrders[frameIndex] = drawOrder;
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, float alpha, Array<Event> firedEvents) {
+			float[] frames = this.frames;
+			if (time < frames[0]) return; // Time is before first frame.
+
+			int frameIndex;
+			if (time >= frames[frames.length - 1]) // Time is after last frame.
+				frameIndex = frames.length - 1;
+			else
+				frameIndex = binarySearch(frames, time, 1) - 1;
+
+			Array<Slot> drawOrder = skeleton.drawOrder;
+			Array<Slot> slots = skeleton.slots;
+			int[] drawOrderToSetupIndex = drawOrders[frameIndex];
+			for (int i = 0, n = drawOrderToSetupIndex.length; i < n; i++)
+				drawOrder.set(i, slots.get(drawOrderToSetupIndex[i]));
 		}
 	}
 }

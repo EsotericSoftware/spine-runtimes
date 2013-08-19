@@ -28,6 +28,7 @@ package com.esotericsoftware.spine;
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.ColorTimeline;
 import com.esotericsoftware.spine.Animation.CurveTimeline;
+import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
@@ -45,6 +46,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.SerializationException;
@@ -127,6 +129,7 @@ public class SkeletonJson {
 			Skin skin = new Skin(skinMap.name());
 			for (JsonValue slotEntry = skinMap.child(); slotEntry != null; slotEntry = slotEntry.next()) {
 				int slotIndex = skeletonData.findSlotIndex(slotEntry.name());
+				if (slotIndex == -1) throw new SerializationException("Slot not found: " + slotEntry.name());
 				for (JsonValue entry = slotEntry.child(); entry != null; entry = entry.next()) {
 					Attachment attachment = readAttachment(skin, entry.name(), entry);
 					if (attachment != null) skin.addAttachment(slotIndex, entry.name(), attachment);
@@ -240,6 +243,7 @@ public class SkeletonJson {
 
 		for (JsonValue slotMap = map.getChild("slots"); slotMap != null; slotMap = slotMap.next()) {
 			int slotIndex = skeletonData.findSlotIndex(slotMap.name());
+			if (slotIndex == -1) throw new SerializationException("Slot not found: " + slotMap.name());
 
 			for (JsonValue timelineMap = slotMap.child(); timelineMap != null; timelineMap = timelineMap.next()) {
 				String timelineName = timelineMap.name();
@@ -287,6 +291,28 @@ public class SkeletonJson {
 				event.floatValue = eventMap.getFloat("float", eventData.getFloat());
 				event.stringValue = eventMap.getString("string", eventData.getString());
 				timeline.setFrame(frameIndex++, eventMap.getFloat("time"), event);
+			}
+			timelines.add(timeline);
+			duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() - 1]);
+		}
+
+		JsonValue drawOrdersMap = map.get("draworder");
+		if (drawOrdersMap != null) {
+			DrawOrderTimeline timeline = new DrawOrderTimeline(drawOrdersMap.size);
+			Array<SlotData> slots = skeletonData.slots;
+			int frameIndex = 0;
+			for (JsonValue drawOrderMap = drawOrdersMap.child; drawOrderMap != null; drawOrderMap = drawOrderMap.next()) {
+				IntArray drawOrder = new IntArray(slots.size);
+				for (int i = 0, n = slots.size; i < n; i++)
+					drawOrder.add(i);
+				for (JsonValue offsetMap = drawOrderMap.getChild("offsets"); offsetMap != null; offsetMap = offsetMap.next()) {
+					int slotIndex = skeletonData.findSlotIndex(offsetMap.getString("slot"));
+					if (slotIndex == -1) throw new SerializationException("Slot not found: " + offsetMap.getString("slot"));
+					int index = drawOrder.indexOf(slotIndex);
+					drawOrder.removeIndex(index);
+					drawOrder.insert(index + offsetMap.getInt("offset"), slotIndex);
+				}
+				timeline.setFrame(frameIndex++, drawOrderMap.getFloat("time"), drawOrder.toArray());
 			}
 			timelines.add(timeline);
 			duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() - 1]);
