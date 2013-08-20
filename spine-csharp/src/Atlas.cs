@@ -121,13 +121,8 @@ namespace Spine {
 
 					region.u = x / (float)page.width;
 					region.v = y / (float)page.height;
-					if (region.rotate) {
-						region.u2 = (x + height) / (float)page.width;
-						region.v2 = (y + width) / (float)page.height;
-					} else {
-						region.u2 = (x + width) / (float)page.width;
-						region.v2 = (y + height) / (float)page.height;
-					}
+                    region.u2 = (x + region.rotate ? height : width) / (float)page.width;
+                    region.v2 = (y + region.rotate ? width : height) / (float)page.height;
 					region.x = x;
 					region.y = y;
 					region.width = Math.Abs(width);
