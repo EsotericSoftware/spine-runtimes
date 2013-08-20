@@ -46,7 +46,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.SerializationException;
@@ -299,20 +298,30 @@ public class SkeletonJson {
 		JsonValue drawOrdersMap = map.get("draworder");
 		if (drawOrdersMap != null) {
 			DrawOrderTimeline timeline = new DrawOrderTimeline(drawOrdersMap.size);
-			Array<SlotData> slots = skeletonData.slots;
+			int slotCount = skeletonData.slots.size;
 			int frameIndex = 0;
 			for (JsonValue drawOrderMap = drawOrdersMap.child; drawOrderMap != null; drawOrderMap = drawOrderMap.next()) {
-				IntArray drawOrder = new IntArray(slots.size);
-				for (int i = 0, n = slots.size; i < n; i++)
-					drawOrder.add(i);
+				int[] drawOrder = new int[slotCount];
+				for (int i = slotCount - 1; i >= 0; i--)
+					drawOrder[i] = -1;
+				int[] unchanged = new int[slotCount - drawOrderMap.get("offsets").size];
+				int originalIndex = 0, unchangedIndex = 0;
 				for (JsonValue offsetMap = drawOrderMap.getChild("offsets"); offsetMap != null; offsetMap = offsetMap.next()) {
 					int slotIndex = skeletonData.findSlotIndex(offsetMap.getString("slot"));
 					if (slotIndex == -1) throw new SerializationException("Slot not found: " + offsetMap.getString("slot"));
-					int index = drawOrder.indexOf(slotIndex);
-					drawOrder.removeIndex(index);
-					drawOrder.insert(index + offsetMap.getInt("offset"), slotIndex);
+					// Collect unchanged items.
+					while (originalIndex != slotIndex)
+						unchanged[unchangedIndex++] = originalIndex++;
+					// Set changed items.
+					drawOrder[originalIndex + offsetMap.getInt("offset")] = originalIndex++;
 				}
-				timeline.setFrame(frameIndex++, drawOrderMap.getFloat("time"), drawOrder.toArray());
+				// Collect remaining unchanged items.
+				while (originalIndex < slotCount)
+					unchanged[unchangedIndex++] = originalIndex++;
+				// Fill in unchanged items.
+				for (int i = slotCount - 1; i >= 0; i--)
+					if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
+				timeline.setFrame(frameIndex++, drawOrderMap.getFloat("time"), drawOrder);
 			}
 			timelines.add(timeline);
 			duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() - 1]);

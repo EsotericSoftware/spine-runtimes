@@ -47,7 +47,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.DataInput;
-import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.SerializationException;
 
 import java.io.IOException;
@@ -169,8 +168,7 @@ public class SkeletonBinary {
 		Skin skin = new Skin(skinName);
 		for (int i = 0; i < slotCount; i++) {
 			int slotIndex = input.readInt(true);
-			int attachmentCount = input.readInt(true);
-			for (int ii = 0; ii < attachmentCount; ii++) {
+			for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 				String name = input.readString();
 				skin.addAttachment(slotIndex, name, readAttachment(input, skin, name));
 			}
@@ -211,8 +209,7 @@ public class SkeletonBinary {
 		float duration = 0;
 
 		try {
-			int boneCount = input.readInt(true);
-			for (int i = 0; i < boneCount; i++) {
+			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				int boneIndex = input.readInt(true);
 				int itemCount = input.readInt(true);
 				for (int ii = 0; ii < itemCount; ii++) {
@@ -253,8 +250,7 @@ public class SkeletonBinary {
 				}
 			}
 
-			int slotCount = input.readInt(true);
-			for (int i = 0; i < slotCount; i++) {
+			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				int slotIndex = input.readInt(true);
 				int itemCount = input.readInt(true);
 				for (int ii = 0; ii < itemCount; ii++) {
@@ -304,21 +300,30 @@ public class SkeletonBinary {
 
 			int drawOrderCount = input.readInt(true);
 			if (drawOrderCount > 0) {
-				Array<SlotData> slots = skeletonData.slots;
 				DrawOrderTimeline timeline = new DrawOrderTimeline(drawOrderCount);
+				int slotCount = skeletonData.slots.size;
 				for (int i = 0; i < drawOrderCount; i++) {
-					IntArray drawOrder = new IntArray(slots.size);
-					for (int ii = 0, n = slots.size; ii < n; ii++)
-						drawOrder.add(ii);
-
 					int offsetCount = input.readInt(true);
+					int[] drawOrder = new int[slotCount];
+					for (int ii = slotCount - 1; ii >= 0; ii--)
+						drawOrder[ii] = -1;
+					int[] unchanged = new int[slotCount - offsetCount];
+					int originalIndex = 0, unchangedIndex = 0;
 					for (int ii = 0; ii < offsetCount; ii++) {
 						int slotIndex = input.readInt(true);
-						int index = drawOrder.indexOf(slotIndex);
-						drawOrder.removeIndex(index);
-						drawOrder.insert(index + input.readInt(true), slotIndex);
+						// Collect unchanged items.
+						while (originalIndex != slotIndex)
+							unchanged[unchangedIndex++] = originalIndex++;
+						// Set changed items.
+						drawOrder[originalIndex + input.readInt(true)] = originalIndex++;
 					}
-					timeline.setFrame(i, input.readFloat(), drawOrder.toArray());
+					// Collect remaining unchanged items.
+					while (originalIndex < slotCount)
+						unchanged[unchangedIndex++] = originalIndex++;
+					// Fill in unchanged items.
+					for (int ii = slotCount - 1; ii >= 0; ii--)
+						if (drawOrder[ii] == -1) drawOrder[ii] = unchanged[--unchangedIndex];
+					timeline.setFrame(i, input.readFloat(), drawOrder);
 				}
 				timelines.add(timeline);
 				duration = Math.max(duration, timeline.getFrames()[drawOrderCount - 1]);
