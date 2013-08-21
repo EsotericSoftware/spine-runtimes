@@ -22,7 +22,7 @@ public class SpriteCollectionAttachmentLoader : AttachmentLoader {
 		if (index != -1)
 			name = name.Substring(index + 1);
 		
-		tk2dSpriteDefinition def = sprites.GetSpriteDefinition(name);
+		tk2dSpriteDefinition def = sprites.inst.GetSpriteDefinition(name);
 		
 		if (def == null)
 			throw new Exception("Sprite not found in atlas: " + name + " (" + type + ")");
