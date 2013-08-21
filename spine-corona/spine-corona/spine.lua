@@ -25,6 +25,10 @@
 
 spine = {}
 
+if (system.getInfo("environment") == "simulator") then
+	package.path = package.path .. ";".. system.pathForFile("../") .. "/?.lua"
+end
+
 spine.utils = require "spine-lua.utils"
 spine.SkeletonJson = require "spine-lua.SkeletonJson"
 spine.SkeletonData = require "spine-lua.SkeletonData"
@@ -37,6 +41,8 @@ spine.Bone = require "spine-lua.Bone"
 spine.Slot = require "spine-lua.Slot"
 spine.AttachmentLoader = require "spine-lua.AttachmentLoader"
 spine.Animation = require "spine-lua.Animation"
+spine.AnimationStateData = require "spine-lua.AnimationStateData"
+spine.AnimationState = require "spine-lua.AnimationState"
 
 spine.utils.readFile = function (fileName, base)
 	if not base then base = system.ResourceDirectory end
@@ -108,8 +114,22 @@ function spine.Skeleton.new (skeletonData, group)
 					image.x = slot.bone.worldX + attachment.x * slot.bone.m00 + attachment.y * slot.bone.m01
 					image.y = -(slot.bone.worldY + attachment.x * slot.bone.m10 + attachment.y * slot.bone.m11)
 					image.rotation = -(slot.bone.worldRotation + attachment.rotation)
-					image.xScale = slot.bone.worldScaleX + attachment.scaleX - 1
-					image.yScale = slot.bone.worldScaleY + attachment.scaleY - 1
+
+					-- fix scaling when attachment is rotated 90 degrees
+					local rotation = math.abs(attachment.rotation) % 180
+					if (rotation == 90) then
+					    image.xScale = slot.bone.worldScaleY * attachment.scaleX
+					    image.yScale = slot.bone.worldScaleX * attachment.scaleY
+					else
+					    if (rotation ~= 0 and (slot.bone.worldScaleX ~= 1 or slot.bone.worldScaleY ~= 1)) then
+							print("WARNING: Non-uniform bone scaling with attachments not rotated to\n"
+								.."         cardinal angles will not work as expected with Corona.\n"
+								.."         Bone: "..slot.bone.data.name..", slot: "..slot.data.name..", attachment: "..attachment.name)
+						end
+					    image.xScale = slot.bone.worldScaleX * attachment.scaleX
+					    image.yScale = slot.bone.worldScaleY * attachment.scaleY
+					end
+
 					if self.flipX then
 						image.xScale = -image.xScale
 						image.rotation = -image.rotation
@@ -118,7 +138,7 @@ function spine.Skeleton.new (skeletonData, group)
 						image.yScale = -image.yScale
 						image.rotation = -image.rotation
 					end
-					image:setFillColor(slot.r, slot.g, slot.b, slot.a)
+					image:setFillColor(self.r * slot.r, self.g * slot.g, self.b * slot.b, self.a * slot.a)
 					self.group:insert(image)
 				end
 			end

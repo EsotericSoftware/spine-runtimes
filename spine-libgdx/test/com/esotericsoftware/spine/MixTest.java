@@ -65,14 +65,9 @@ public class MixTest extends ApplicationAdapter {
 		jumpAnimation = skeletonData.findAnimation("jump");
 
 		skeleton = new Skeleton(skeletonData);
-		skeleton.setToSetupPose();
-
-		final Bone root = skeleton.getRootBone();
-		root.x = -50;
-		root.y = 20;
-		root.scaleX = 1f;
-		root.scaleY = 1f;
 		skeleton.updateWorldTransform();
+		skeleton.setX(-50);
+		skeleton.setY(20);
 	}
 
 	public void render () {
@@ -87,10 +82,9 @@ public class MixTest extends ApplicationAdapter {
 
 		time += delta;
 
-		Bone root = skeleton.getRootBone();
 		float speed = 180;
 		if (time > beforeJump + blendIn && time < blendOutStart) speed = 360;
-		root.setX(root.getX() + speed * delta);
+		skeleton.setX(skeleton.getX() + speed * delta);
 
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
@@ -98,7 +92,7 @@ public class MixTest extends ApplicationAdapter {
 		if (time > total) {
 			// restart
 			time = 0;
-			root.setX(-50);
+			skeleton.setX(-50);
 		} else if (time > beforeJump + jump) {
 			// just walk after jump
 			walkAnimation.apply(skeleton, time, true);

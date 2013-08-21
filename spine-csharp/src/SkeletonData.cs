@@ -129,7 +129,7 @@ namespace Spine {
 		// ---
 
 		override public String ToString () {
-			return Name != null ? Name : base.ToString();
+			return Name ?? base.ToString();
 		}
 	}
 }

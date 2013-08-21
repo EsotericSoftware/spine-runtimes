@@ -25,6 +25,8 @@
 
 package com.esotericsoftware.spine;
 
+import com.esotericsoftware.spine.AnimationState.AnimationStateListener;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
@@ -40,7 +42,6 @@ public class AnimationStateTest extends ApplicationAdapter {
 
 	TextureAtlas atlas;
 	Skeleton skeleton;
-	Bone root;
 	AnimationState state;
 
 	public void create () {
@@ -59,14 +60,28 @@ public class AnimationStateTest extends ApplicationAdapter {
 		stateData.setMix("jump", "jump", 0.2f);
 
 		state = new AnimationState(stateData);
+		state.addListener(new AnimationStateListener() {
+			public void event (Event event) {
+				System.out.println("Event: " + event.getData().getName());
+			}
+
+			public void complete (int loopCount) {
+				System.out.println("Complete: " + state.getAnimation() + ", " + loopCount);
+			}
+
+			public void start () {
+				System.out.println("Start: " + state.getAnimation());
+			}
+
+			public void end () {
+				System.out.println("End: " + state.getAnimation());
+			}
+		});
 		state.setAnimation("walk", true);
 
 		skeleton = new Skeleton(skeletonData);
-
-		root = skeleton.getRootBone();
-		root.setX(250);
-		root.setY(20);
-
+		skeleton.setX(250);
+		skeleton.setY(20);
 		skeleton.updateWorldTransform();
 
 		Gdx.input.setInputProcessor(new InputAdapter() {
@@ -91,9 +106,9 @@ public class AnimationStateTest extends ApplicationAdapter {
 		state.apply(skeleton);
 		if (state.getAnimation().getName().equals("walk")) {
 			// After one second, change the current animation. Mixing is done by AnimationState for you.
-			if (state.getTime() > 2) state.setAnimation("jump", false);
-		} else {
-			if (state.getTime() > 1) state.setAnimation("walk", true);
+// if (state.getTime() > 2) state.setAnimation("jump", false);
+// } else {
+// if (state.getTime() > 1) state.setAnimation("walk", true);
 		}
 		skeleton.updateWorldTransform();
 

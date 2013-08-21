@@ -94,8 +94,15 @@
 		}
 	}
 },
+"events": {
+	"test1": { "int": 1, "float": 2, "string": "three" },
+	"test2": { "int": 123, "float": 456, "string": "789" }
+},
 "animations": {
 	"walk": {
+		"events": [
+			{ "time": 0, "name": "test1", int: 123, float: 12.3, string: "meow" },
+		],
 		"bones": {
 			"left upper leg": {
 				"rotate": [
@@ -781,7 +788,12 @@
 					{ "time": 1.3666, "x": 1, "y": 1 }
 				]
 			}
-		}
+		},
+		"events": [
+			{ "time": 0.4, "name": "test1", "int": 0, "float": 0, "string": "" },
+			{ "time": 0.4, "name": "test2", "int": 0, "float": 0, "string": "" },
+			{ "time": 0.8, "name": "test1", "int": 12, "float": 0, "string": "" },
+		]
 	}
 }
 }

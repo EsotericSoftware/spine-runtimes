@@ -115,6 +115,11 @@
 	[_states addObject:[NSValue valueWithPointer:state]];
 }
 
+- (AnimationState*) getAnimationState:(int)stateIndex {
+	NSAssert(stateIndex >= 0 && stateIndex < (int)_states.count, @"stateIndex out of range.");
+	return [[_states objectAtIndex:stateIndex] pointerValue];
+}
+
 - (void) setAnimationStateData:(AnimationStateData*)stateData forState:(int)stateIndex {
 	NSAssert(stateData, @"stateData cannot be null.");
 	NSAssert(stateIndex >= 0 && stateIndex < (int)_states.count, @"stateIndex out of range.");

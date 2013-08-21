@@ -95,6 +95,11 @@ void CCSkeletonAnimation::addAnimationState (AnimationStateData* stateData) {
 	states.push_back(state);
 }
 
+AnimationState* CCSkeletonAnimation::getAnimationState (int stateIndex) {
+	CCAssert(stateIndex >= 0 && stateIndex < (int)states.size(), "stateIndex out of range.");
+	return states[stateIndex];
+}
+
 void CCSkeletonAnimation::setAnimationStateData (AnimationStateData* stateData, int stateIndex) {
 	CCAssert(stateIndex >= 0 && stateIndex < (int)states.size(), "stateIndex out of range.");
 	CCAssert(stateData, "stateData cannot be null.");

@@ -1,4 +1,6 @@
 package spine.starling {
+import flash.geom.Rectangle;
+
 import spine.Bone;
 import spine.Skin;
 import spine.attachments.Attachment;
@@ -22,11 +24,13 @@ public class StarlingAtlasAttachmentLoader implements AttachmentLoader {
 		if (type == AttachmentType.region) {
 			var regionAttachment:RegionAttachment = new RegionAttachment(name);
 			var texture:Texture = atlas.getTexture(name);
+			var frame:Rectangle = texture.frame;
+			texture = Texture.fromTexture(texture); // Discard frame.
 			regionAttachment.rendererObject = new SkeletonImage(texture);
-			regionAttachment.regionOffsetX = texture.frame.x;
-			regionAttachment.regionOffsetY = texture.frame.y;
-			regionAttachment.regionWidth = texture.width;
-			regionAttachment.regionHeight = texture.height;
+			regionAttachment.regionOffsetX = frame.x;
+			regionAttachment.regionOffsetY = frame.y;
+			regionAttachment.regionWidth = frame.width;
+			regionAttachment.regionHeight = frame.height;
 			regionAttachment.regionOriginalWidth = texture.width;
 			regionAttachment.regionOriginalHeight = texture.height;
 			return regionAttachment;

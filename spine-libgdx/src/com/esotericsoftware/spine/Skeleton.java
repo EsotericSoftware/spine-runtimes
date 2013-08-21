@@ -34,7 +34,7 @@ public class Skeleton {
 	final SkeletonData data;
 	final Array<Bone> bones;
 	final Array<Slot> slots;
-	final Array<Slot> drawOrder;
+	Array<Slot> drawOrder;
 	Skin skin;
 	final Color color;
 	float time;
@@ -112,6 +112,8 @@ public class Skeleton {
 	}
 
 	public void setSlotsToSetupPose () {
+		drawOrder.clear();
+		drawOrder.addAll(slots);
 		Array<Slot> slots = this.slots;
 		for (int i = 0, n = slots.size; i < n; i++)
 			slots.get(i).setToSetupPose(i);
@@ -178,6 +180,11 @@ public class Skeleton {
 	/** Returns the slots in the order they will be drawn. The returned array may be modified to change the draw order. */
 	public Array<Slot> getDrawOrder () {
 		return drawOrder;
+	}
+
+	/** Sets the slots and the order they will be drawn. */
+	public void setDrawOrder (Array<Slot> drawOrder) {
+		this.drawOrder = drawOrder;
 	}
 
 	/** @return May be null. */

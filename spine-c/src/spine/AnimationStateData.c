@@ -142,5 +142,5 @@ float AnimationStateData_getMix (AnimationStateData* self, Animation* from, Anim
 		}
 		fromEntry = fromEntry->next;
 	}
-	return 0;
+	return self->defaultMix;
 }

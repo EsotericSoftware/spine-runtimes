@@ -29,7 +29,6 @@ local SlotData = require "spine-lua.SlotData"
 local Skin = require "spine-lua.Skin"
 local AttachmentLoader = require "spine-lua.AttachmentLoader"
 local Animation = require "spine-lua.Animation"
-
 local TIMELINE_SCALE = "scale"
 local TIMELINE_ROTATE = "rotate"
 local TIMELINE_TRANSLATE = "translate"
@@ -75,6 +74,10 @@ function SkeletonJson.new (attachmentLoader)
 			boneData.rotation = (boneMap["rotation"] or 0)
 			boneData.scaleX = (boneMap["scaleX"] or 1)
 			boneData.scaleY = (boneMap["scaleY"] or 1)
+			-- typical 'value or default' will not work here, as in practice the possible values are 'false' or nil,
+			-- both of which evaluate to false and the default value is true
+      if boneMap["inheritScale"] == false then boneData.inheritScale = false else boneData.inheritScale = true end
+      if boneMap["inheritRotation"] == false then boneData.inheritRotation = false else boneData.inheritRotation = true end			
 			table.insert(skeletonData.bones, boneData)
 		end
 
@@ -98,8 +101,9 @@ function SkeletonJson.new (attachmentLoader)
 				end
 
 				slotData.attachmentName = slotMap["attachment"]
-
-				table.insert(skeletonData.slots, slotData)
+        table.insert(skeletonData.slots, slotData)
+        skeletonData.slotNameIndices[slotData.name] = #skeletonData.slots
+        
 			end
 		end
 
@@ -109,7 +113,7 @@ function SkeletonJson.new (attachmentLoader)
 			for skinName,skinMap in pairs(map) do
 				local skin = Skin.new(skinName)
 				for slotName,slotMap in pairs(skinMap) do
-					local slotIndex = skeletonData:findSlotIndex(slotName)
+					local slotIndex = skeletonData.slotNameIndices[slotName]
 					for attachmentName,attachmentMap in pairs(slotMap) do
 						local attachment = readAttachment(attachmentName, attachmentMap, self.scale)
 						if attachment then
@@ -158,50 +162,52 @@ function SkeletonJson.new (attachmentLoader)
 		local duration = 0
 
 		local bonesMap = map["bones"]
-		for boneName,timelineMap in pairs(bonesMap) do
-			local boneIndex = skeletonData:findBoneIndex(boneName)
-			if boneIndex == -1 then error("Bone not found: " .. boneName) end
+		if bonesMap then
+			for boneName,timelineMap in pairs(bonesMap) do
+				local boneIndex = skeletonData:findBoneIndex(boneName)
+				if boneIndex == -1 then error("Bone not found: " .. boneName) end
 
-			for timelineName,values in pairs(timelineMap) do
-				if timelineName == TIMELINE_ROTATE then
-					local timeline = Animation.RotateTimeline.new()
-					timeline.boneIndex = boneIndex
+				for timelineName,values in pairs(timelineMap) do
+					if timelineName == TIMELINE_ROTATE then
+						local timeline = Animation.RotateTimeline.new()
+						timeline.boneIndex = boneIndex
 
-					local keyframeIndex = 0
-					for i,valueMap in ipairs(values) do
-						local time = valueMap["time"]
-						timeline:setKeyframe(keyframeIndex, time, valueMap["angle"])
-						readCurve(timeline, keyframeIndex, valueMap)
-						keyframeIndex = keyframeIndex + 1
-					end
-					table.insert(timelines, timeline)
-					duration = math.max(duration, timeline:getDuration())
+						local keyframeIndex = 0
+						for i,valueMap in ipairs(values) do
+							local time = valueMap["time"]
+							timeline:setKeyframe(keyframeIndex, time, valueMap["angle"])
+							readCurve(timeline, keyframeIndex, valueMap)
+							keyframeIndex = keyframeIndex + 1
+						end
+						table.insert(timelines, timeline)
+						duration = math.max(duration, timeline:getDuration())
 
-				elseif timelineName == TIMELINE_TRANSLATE or timelineName == TIMELINE_SCALE then
-					local timeline
-					local timelineScale = 1
-					if timelineName == TIMELINE_SCALE then
-						timeline = Animation.ScaleTimeline.new()
+					elseif timelineName == TIMELINE_TRANSLATE or timelineName == TIMELINE_SCALE then
+						local timeline
+						local timelineScale = 1
+						if timelineName == TIMELINE_SCALE then
+							timeline = Animation.ScaleTimeline.new()
+						else
+							timeline = Animation.TranslateTimeline.new()
+							timelineScale = self.scale
+						end
+						timeline.boneIndex = boneIndex
+
+						local keyframeIndex = 0
+						for i,valueMap in ipairs(values) do
+							local time = valueMap["time"]
+							local x = (valueMap["x"] or 0) * timelineScale
+							local y = (valueMap["y"] or 0) * timelineScale
+							timeline:setKeyframe(keyframeIndex, time, x, y)
+							readCurve(timeline, keyframeIndex, valueMap)
+							keyframeIndex = keyframeIndex + 1
+						end
+						table.insert(timelines, timeline)
+						duration = math.max(duration, timeline:getDuration())
+
 					else
-						timeline = Animation.TranslateTimeline.new()
-						timelineScale = self.scale
+						error("Invalid timeline type for a bone: " .. timelineName .. " (" .. boneName .. ")")
 					end
-					timeline.boneIndex = boneIndex
-
-					local keyframeIndex = 0
-					for i,valueMap in ipairs(values) do
-						local time = valueMap["time"]
-						local x = (valueMap["x"] or 0) * timelineScale
-						local y = (valueMap["y"] or 0) * timelineScale
-						timeline:setKeyframe(keyframeIndex, time, x, y)
-						readCurve(timeline, keyframeIndex, valueMap)
-						keyframeIndex = keyframeIndex + 1
-					end
-					table.insert(timelines, timeline)
-					duration = math.max(duration, timeline:getDuration())
-
-				else
-					error("Invalid timeline type for a bone: " .. timelineName .. " (" .. boneName .. ")")
 				end
 			end
 		end
@@ -209,7 +215,7 @@ function SkeletonJson.new (attachmentLoader)
 		local slotsMap = map["slots"]
 		if slotsMap then
 			for slotName,timelineMap in pairs(slotsMap) do
-				local slotIndex = skeletonData:findSlotIndex(slotName)
+				local slotIndex = skeletonData.slotNameIndices[slotName]
 
 				for timelineName,values in pairs(timelineMap) do
 					if timelineName == TIMELINE_COLOR then

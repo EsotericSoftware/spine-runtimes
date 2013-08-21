@@ -32,6 +32,7 @@ public class AnimationStateData {
 	private final SkeletonData skeletonData;
 	final ObjectFloatMap<Key> animationToMixTime = new ObjectFloatMap();
 	final Key tempKey = new Key();
+	float defaultMix;
 
 	public AnimationStateData (SkeletonData skeletonData) {
 		this.skeletonData = skeletonData;
@@ -62,8 +63,16 @@ public class AnimationStateData {
 		tempKey.a1 = from;
 		tempKey.a2 = to;
 		float time = animationToMixTime.get(tempKey, Float.MIN_VALUE);
-		if (time == Float.MIN_VALUE) return 0;
+		if (time == Float.MIN_VALUE) return defaultMix;
 		return time;
+	}
+
+	public float getDefaultMix () {
+		return defaultMix;
+	}
+
+	public void setDefaultMix (float defaultMix) {
+		this.defaultMix = defaultMix;
 	}
 
 	static class Key {

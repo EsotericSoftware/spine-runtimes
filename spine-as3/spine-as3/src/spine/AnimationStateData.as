@@ -4,6 +4,7 @@ import spine.animation.Animation;
 public class AnimationStateData {
 	private var _skeletonData:SkeletonData;
 	private var animationToMixTime:Object = new Object();
+	public var defaultMix:Number = 0;
 
 	public function AnimationStateData (skeletonData:SkeletonData) {
 		_skeletonData = skeletonData;
@@ -34,7 +35,7 @@ public class AnimationStateData {
 	public function getMix (from:Animation, to:Animation) : Number {
 		var time:Object = animationToMixTime[from.name + ":" + to.name];
 		if (time == null)
-			return 0;
+			return defaultMix;
 		return time as Number;
 	}
 }

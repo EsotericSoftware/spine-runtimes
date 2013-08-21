@@ -40,7 +40,7 @@ public class Bone {
 			_worldRotation = _parent._worldRotation + rotation;
 		} else {
 			_worldX = flipX ? -x : x;
-			_worldY = flipX ? -y : y;
+			_worldY = flipY ? -y : y;
 			_worldScaleX = scaleX;
 			_worldScaleY = scaleY;
 			_worldRotation = rotation;
@@ -56,11 +56,7 @@ public class Bone {
 			_m00 = -_m00;
 			_m01 = -_m01;
 		}
-		if (flipY) {
-			_m10 = -_m10;
-			_m11 = -_m11;
-		}
-		if (yDown) {
+		if (flipY != yDown) {
 			_m10 = -_m10;
 			_m11 = -_m11;
 		}

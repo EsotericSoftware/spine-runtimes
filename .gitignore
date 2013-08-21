@@ -27,13 +27,19 @@ forums
 spine-csharp/bin
 spine-csharp/obj
 
+spine-monogame/xamarinstudio-ios/src/bin
+spine-monogame/xamarinstudio-ios/src/obj
+
+spine-monogame/windows8-store/src/bin
+spine-monogame/windows8-store/src/obj
+
 spine-xna/bin
 spine-xna/obj
 spine-xna/example/bin
 spine-xna/example/obj
 
-spine-unity/Assets/Plugins/Spine/spine-csharp
-!spine-unity/Assets/Plugins/Spine/spine-csharp/Place spine-csharp here.txt
+spine-unity/Assets/Spine/spine-csharp
+!spine-unity/Assets/Spine/spine-csharp/Place spine-csharp here.txt
 spine-unity/ProjectSettings
 spine-unity/Temp
 spine-unity/Library
@@ -42,8 +48,15 @@ spine-unity/*.sln
 *.pidb
 Assembly-*.csproj
 Assembly-*.pidb
-spine-unity4
-spine-unity3
+
+spine-tk2d/Assets/Spine/spine-csharp
+!spine-tk2d/Assets/Spine/spine-csharp/Place spine-csharp here.txt
+spine-tk2d/ProjectSettings
+spine-tk2d/Temp
+spine-tk2d/Library
+spine-tk2d/*.sln
+spine-tk2d/Assets/TK2DROOT*
+spine-tk2d/Assets/-tk2d*
 
 spine-corona/spine-lua/
 !spine-corona/spine-lua/Place spine-lua here.txt

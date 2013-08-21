@@ -45,6 +45,7 @@ public class Skin {
 
 	public void addAttachment (int slotIndex, String name, Attachment attachment) {
 		if (attachment == null) throw new IllegalArgumentException("attachment cannot be null.");
+		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
 		Key key = new Key();
 		key.set(slotIndex, name);
 		attachments.put(key, attachment);
@@ -52,18 +53,21 @@ public class Skin {
 
 	/** @return May be null. */
 	public Attachment getAttachment (int slotIndex, String name) {
+		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
 		lookup.set(slotIndex, name);
 		return attachments.get(lookup);
 	}
 
 	public void findNamesForSlot (int slotIndex, Array<String> names) {
 		if (names == null) throw new IllegalArgumentException("names cannot be null.");
+		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
 		for (Key key : attachments.keys())
 			if (key.slotIndex == slotIndex) names.add(key.name);
 	}
 
 	public void findAttachmentsForSlot (int slotIndex, Array<Attachment> attachments) {
 		if (attachments == null) throw new IllegalArgumentException("attachments cannot be null.");
+		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
 		for (Entry<Key, Attachment> entry : this.attachments.entries())
 			if (entry.key.slotIndex == slotIndex) attachments.add(entry.value);
 	}

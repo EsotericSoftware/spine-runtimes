@@ -35,6 +35,7 @@ extern "C" {
 
 typedef struct {
 	SkeletonData* const skeletonData;
+	float defaultMix;
 	const void* const entries;
 } AnimationStateData;
 

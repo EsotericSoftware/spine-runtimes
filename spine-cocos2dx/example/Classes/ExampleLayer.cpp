@@ -41,7 +41,7 @@ CCScene* ExampleLayer::scene () {
 bool ExampleLayer::init () {
 	if (!CCLayer::init()) return false;
 
-	skeletonNode = new CCSkeletonAnimation("spineboy.json", "spineboy.atlas");
+	skeletonNode = CCSkeletonAnimation::createWithFile("spineboy.json", "spineboy.atlas");
 	skeletonNode->setMix("walk", "jump", 0.2f);
 	skeletonNode->setMix("jump", "walk", 0.4f);
 
@@ -74,4 +74,5 @@ void ExampleLayer::update (float deltaTime) {
     } else {
         if (skeletonNode->states[0]->time > 1) skeletonNode->setAnimation("walk", true);
     }
+    // if (skeletonNode->states[0]->time > 0.1) CCDirector::sharedDirector()->replaceScene(ExampleLayer::scene());
 }

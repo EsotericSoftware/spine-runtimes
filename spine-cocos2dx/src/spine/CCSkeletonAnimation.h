@@ -53,6 +53,7 @@ public:
 
 	void addAnimationState (AnimationStateData* stateData = 0);
 	void setAnimationStateData (AnimationStateData* stateData, int stateIndex = 0);
+	AnimationState* getAnimationState (int stateIndex = 0);
 	void setMix (const char* fromAnimation, const char* toAnimation, float duration, int stateIndex = 0);
 	void setAnimation (const char* name, bool loop, int stateIndex = 0);
 	void addAnimation (const char* name, bool loop, float delay = 0, int stateIndex = 0);

@@ -38,6 +38,8 @@ spine.Bone = require "spine-lua.Bone"
 spine.Slot = require "spine-lua.Slot"
 spine.AttachmentLoader = require "spine-lua.AttachmentLoader"
 spine.Animation = require "spine-lua.Animation"
+spine.AnimationStateData = require "spine-lua.AnimationStateData"
+spine.AnimationState = require "spine-lua.AnimationState"
 
 spine.utils.readFile = function (fileName, base)
 	local path = fileName
@@ -68,22 +70,11 @@ function spine.Skeleton.new (skeletonData, group)
 		for i,slot in ipairs(self.drawOrder) do
 			local attachment = slot.attachment
 			local image = images[attachment]
-			if not attachment then
-				-- Attachment is gone, remove the image.
-				if image then
-					images[attachment] = nil
-				end
-			else
-				-- Attachment image has changed.
-				if image and image.attachment ~= attachment then
-					image:removeSelf()
-					image = nil
-				end
+			if attachment then
 				-- Create new image.
 				if not image then
 					image = self:createImage(attachment)
 					if image then
-						image.attachment = attachment
 						local imageWidth = image:getWidth()
 						local imageHeight = image:getHeight()
 						attachment.widthRatio = attachment.width / imageWidth
@@ -111,7 +102,7 @@ function spine.Skeleton.new (skeletonData, group)
 						yScale = -yScale
 						rotation = -rotation
 					end
-					love.graphics.setColor(slot.r, slot.g, slot.b, slot.a)
+					love.graphics.setColor(self.r * slot.r, self.g * slot.g, self.b * slot.b, self.a * slot.a)
 					love.graphics.draw(image, 
 						self.x + x, 
 						self.y - y, 

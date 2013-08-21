@@ -40,7 +40,7 @@ public class RegionSequenceAttachment extends RegionAttachment {
 		super(name);
 	}
 
-	public void updateVertices (Slot slot) {
+	public void updateVertices (Slot slot, boolean premultipliedAlpha) {
 		if (regions == null) throw new IllegalStateException("Regions have not been set: " + this);
 
 		int frameIndex = (int)(slot.getAttachmentTime() / frameTime);
@@ -68,7 +68,7 @@ public class RegionSequenceAttachment extends RegionAttachment {
 		}
 		setRegion(regions[frameIndex]);
 
-		super.updateVertices(slot);
+		super.updateVertices(slot, premultipliedAlpha);
 	}
 
 	public TextureRegion[] getRegions () {

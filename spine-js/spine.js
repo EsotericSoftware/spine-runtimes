@@ -1,4 +1,3 @@
-
 var spine = {};
 
 spine.BoneData = function (name, parent) {
@@ -61,11 +60,7 @@ spine.Bone.prototype = {
 			this.m00 = -this.m00;
 			this.m01 = -this.m01;
 		}
-		if (flipY) {
-			this.m10 = -this.m10;
-			this.m11 = -this.m11;
-		}
-		if (spine.Bone.yDown) {
+		if (flipY != spine.Bone.yDown) {
 			this.m10 = -this.m10;
 			this.m11 = -this.m11;
 		}
@@ -392,9 +387,9 @@ spine.ColorTimeline = function (frameCount) {
 spine.ColorTimeline.prototype = {
 	slotIndex: 0,
 	getFrameCount: function () {
-		return this.frames.length / 2;
+		return this.frames.length / 5;
 	},
-	setFrame: function (frameIndex, time, x, y) {
+	setFrame: function (frameIndex, time, r, g, b, a) {
 		frameIndex *= 5;
 		this.frames[frameIndex] = time;
 		this.frames[frameIndex + 1] = r;
@@ -455,7 +450,7 @@ spine.AttachmentTimeline = function (frameCount) {
 spine.AttachmentTimeline.prototype = {
 	slotIndex: 0,
 	getFrameCount: function () {
-		return this.frames.length / 2;
+		return this.frames.length;
 	},
 	setFrame: function (frameIndex, time, attachmentName) {
 		this.frames[frameIndex] = time;
@@ -743,13 +738,14 @@ spine.RegionAttachment.prototype = {
 		vertices[6/*X4*/] = offset[6/*X4*/] * m00 + offset[7/*Y4*/] * m01 + x;
 		vertices[7/*Y4*/] = offset[6/*X4*/] * m10 + offset[7/*Y4*/] * m11 + y;
 	}
-}
+};
 
 spine.AnimationStateData = function (skeletonData) {
 	this.skeletonData = skeletonData;
 	this.animationToMixTime = {};
 };
 spine.AnimationStateData.prototype = {
+	defaultMix: 0,
 	setMixByName: function (fromName, toName, duration) {
 		var from = this.skeletonData.findAnimation(fromName);
 		if (!from) throw "Animation not found: " + fromName;
@@ -762,7 +758,7 @@ spine.AnimationStateData.prototype = {
 	},
 	getMix: function (from, to) {
 		var time = this.animationToMixTime[from.name + ":" + to.name];
-		return time ? time : 0;
+		return time ? time : this.defaultMix;
 	}
 };
 
@@ -1077,7 +1073,7 @@ spine.SkeletonJson.readCurve = function (timeline, frameIndex, valueMap) {
 };
 spine.SkeletonJson.toColor = function (hexString, colorIndex) {
 	if (hexString.length != 8) throw "Color hexidecimal length must be 8, recieved: " + hexString;
-	return parseInt(hexString.substring(colorIndex * 2, 2), 16) / 255;
+	return parseInt(hexString.substring(colorIndex * 2, (colorIndex * 2)+2), 16) / 255;
 };
 
 spine.Atlas = function (atlasText, textureLoader) {
@@ -1291,11 +1287,11 @@ spine.AtlasReader.prototype = {
 		tuple[i] = this.trim(line.substring(lastMatch));
 		return i + 1;
 	}
-}
+};
 
 spine.AtlasAttachmentLoader = function (atlas) {
 	this.atlas = atlas;
-}
+};
 spine.AtlasAttachmentLoader.prototype = {
 	newAttachment: function (skin, type, name) {
 		switch (type) {
@@ -1315,4 +1311,4 @@ spine.AtlasAttachmentLoader.prototype = {
 		}
 		throw "Unknown attachment type: " + type;
 	}
-}
+};

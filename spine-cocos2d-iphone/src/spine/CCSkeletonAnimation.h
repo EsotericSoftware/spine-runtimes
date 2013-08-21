@@ -46,6 +46,7 @@ Draws an animated skeleton, providing a simple API for applying one or more anim
 
 - (void) addAnimationState;
 - (void) addAnimationState:(AnimationStateData*)stateData;
+- (AnimationState*) getAnimationState:(int)stateIndex;
 - (void) setAnimationStateData:(AnimationStateData*)stateData forState:(int)stateIndex;
 
 - (void) setMixFrom:(NSString*)fromAnimation to:(NSString*)toAnimation duration:(float)duration;

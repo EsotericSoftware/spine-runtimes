@@ -84,11 +84,7 @@ void Bone_updateWorldTransform (Bone* self, int flipX, int flipY) {
 		CONST_CAST(float, self->m00) = -self->m00;
 		CONST_CAST(float, self->m01) = -self->m01;
 	}
-	if (flipY) {
-		CONST_CAST(float, self->m10) = -self->m10;
-		CONST_CAST(float, self->m11) = -self->m11;
-	}
-	if (yDown) {
+	if (flipY != yDown) {
 		CONST_CAST(float, self->m10) = -self->m10;
 		CONST_CAST(float, self->m11) = -self->m11;
 	}

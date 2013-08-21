@@ -201,13 +201,13 @@ public class SkeletonJson {
 
 					var frameIndex2:int = 0;
 					for each (var valueMap2:Object in values2) {
-						var color:String = valueMap["color"];
+						var color:String = valueMap2["color"];
 						var r:Number = toColor(color, 0);
 						var g:Number = toColor(color, 1);
 						var b:Number = toColor(color, 2);
 						var a:Number = toColor(color, 3);
 						timeline2.setFrame(frameIndex2, valueMap2["time"], r, g, b, a);
-						readCurve(timeline2, frameIndex2, valueMap);
+						readCurve(timeline2, frameIndex2, valueMap2);
 						frameIndex2++;
 					}
 					timelines.push(timeline2);
@@ -221,7 +221,7 @@ public class SkeletonJson {
 					for each (var valueMap3:Object in values2) {
 						timeline3.setFrame(frameIndex3++, valueMap3["time"], valueMap3["name"]);
 					}
-					timelines.push(timeline);
+					timelines.push(timeline3);
 					duration = Math.max(duration, timeline3.frames[timeline3.frameCount - 1]);
 
 				} else
@@ -246,7 +246,7 @@ public class SkeletonJson {
 	static private function toColor (hexString:String, colorIndex:int) : Number {
 		if (hexString.length != 8)
 			throw new ArgumentError("Color hexidecimal length must be 8, recieved: " + hexString);
-		return parseInt(hexString.substring(colorIndex * 2, 2), 16) / 255;
+		return parseInt(hexString.substring(colorIndex * 2, colorIndex * 2 + 2), 16) / 255;
 	}
 }
 

@@ -23,6 +23,9 @@ public class SkeletonRendererDebug {
 	}
 
 	public void draw (Skeleton skeleton) {
+		float skeletonX = skeleton.getX();
+		float skeletonY = skeleton.getY();
+
 		Gdx.gl.glEnable(GL10.GL_BLEND);
 		renderer.begin(ShapeType.Line);
 
@@ -31,9 +34,9 @@ public class SkeletonRendererDebug {
 		for (int i = 0, n = bones.size; i < n; i++) {
 			Bone bone = bones.get(i);
 			if (bone.parent == null) continue;
-			float x = bone.data.length * bone.m00 + bone.worldX;
-			float y = bone.data.length * bone.m10 + bone.worldY;
-			renderer.line(bone.worldX, bone.worldY, x, y);
+			float x = skeletonX + bone.data.length * bone.m00 + bone.worldX;
+			float y = skeletonY + bone.data.length * bone.m10 + bone.worldY;
+			renderer.line(skeletonX + bone.worldX, skeletonY + bone.worldY, x, y);
 		}
 
 		renderer.setColor(slotLineColor);
@@ -43,7 +46,7 @@ public class SkeletonRendererDebug {
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
 				RegionAttachment regionAttachment = (RegionAttachment)attachment;
-				regionAttachment.updateVertices(slot);
+				regionAttachment.updateVertices(slot, false);
 				float[] vertices = regionAttachment.getVertices();
 				renderer.line(vertices[X1], vertices[Y1], vertices[X2], vertices[Y2]);
 				renderer.line(vertices[X2], vertices[Y2], vertices[X3], vertices[Y3]);
@@ -59,7 +62,7 @@ public class SkeletonRendererDebug {
 		for (int i = 0, n = bones.size; i < n; i++) {
 			Bone bone = bones.get(i);
 			renderer.setColor(Color.GREEN);
-			renderer.circle(bone.worldX, bone.worldY, 3);
+			renderer.circle(skeletonX + bone.worldX, skeletonY + bone.worldY, 3);
 		}
 		renderer.end();
 	}

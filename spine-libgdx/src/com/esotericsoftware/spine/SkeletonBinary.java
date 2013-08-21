@@ -28,6 +28,8 @@ package com.esotericsoftware.spine;
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.ColorTimeline;
 import com.esotericsoftware.spine.Animation.CurveTimeline;
+import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
+import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
@@ -55,6 +57,8 @@ public class SkeletonBinary {
 	static public final int TIMELINE_TRANSLATE = 2;
 	static public final int TIMELINE_ATTACHMENT = 3;
 	static public final int TIMELINE_COLOR = 4;
+	static public final int TIMELINE_EVENT = 5;
+	static public final int TIMELINE_DRAWORDER = 6;
 
 	static public final int CURVE_LINEAR = 0;
 	static public final int CURVE_STEPPED = 1;
@@ -86,7 +90,7 @@ public class SkeletonBinary {
 		if (file == null) throw new IllegalArgumentException("file cannot be null.");
 
 		SkeletonData skeletonData = new SkeletonData();
-		skeletonData.setName(file.nameWithoutExtension());
+		skeletonData.name = file.nameWithoutExtension();
 
 		DataInput input = new DataInput(file.read(512));
 		try {
@@ -94,11 +98,8 @@ public class SkeletonBinary {
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				String name = input.readString();
 				BoneData parent = null;
-				String parentName = input.readString();
-				if (parentName != null) {
-					parent = skeletonData.findBone(parentName);
-					if (parent == null) throw new SerializationException("Parent bone not found: " + parentName);
-				}
+				int parentIndex = input.readInt(true) - 1;
+				if (parentIndex != -1) parent = skeletonData.bones.get(parentIndex);
 				BoneData boneData = new BoneData(name, parent);
 				boneData.x = input.readFloat() * scale;
 				boneData.y = input.readFloat() * scale;
@@ -114,12 +115,10 @@ public class SkeletonBinary {
 			// Slots.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				String slotName = input.readString();
-				String boneName = input.readString();
-				BoneData boneData = skeletonData.findBone(boneName);
-				if (boneData == null) throw new SerializationException("Bone not found: " + boneName);
+				BoneData boneData = skeletonData.bones.get(input.readInt(true));
 				SlotData slotData = new SlotData(slotName, boneData);
 				Color.rgba8888ToColor(slotData.getColor(), input.readInt());
-				slotData.setAttachmentName(input.readString());
+				slotData.attachmentName = input.readString();
 				slotData.additiveBlending = input.readByte() == 1;
 				skeletonData.addSlot(slotData);
 			}
@@ -127,13 +126,22 @@ public class SkeletonBinary {
 			// Default skin.
 			Skin defaultSkin = readSkin(input, "default");
 			if (defaultSkin != null) {
-				skeletonData.setDefaultSkin(defaultSkin);
+				skeletonData.defaultSkin = defaultSkin;
 				skeletonData.addSkin(defaultSkin);
 			}
 
 			// Skins.
 			for (int i = 0, n = input.readInt(true); i < n; i++)
 				skeletonData.addSkin(readSkin(input, input.readString()));
+
+			// Events.
+			for (int i = 0, n = input.readInt(true); i < n; i++) {
+				EventData eventData = new EventData(input.readString());
+				eventData.intValue = input.readInt(false);
+				eventData.floatValue = input.readFloat();
+				eventData.stringValue = input.readString();
+				skeletonData.addEvent(eventData);
+			}
 
 			// Animations.
 			for (int i = 0, n = input.readInt(true); i < n; i++)
@@ -160,8 +168,7 @@ public class SkeletonBinary {
 		Skin skin = new Skin(skinName);
 		for (int i = 0; i < slotCount; i++) {
 			int slotIndex = input.readInt(true);
-			int attachmentCount = input.readInt(true);
-			for (int ii = 0; ii < attachmentCount; ii++) {
+			for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 				String name = input.readString();
 				skin.addAttachment(slotIndex, name, readAttachment(input, skin, name));
 			}
@@ -202,11 +209,8 @@ public class SkeletonBinary {
 		float duration = 0;
 
 		try {
-			int boneCount = input.readInt(true);
-			for (int i = 0; i < boneCount; i++) {
-				String boneName = input.readString();
-				int boneIndex = skeletonData.findBoneIndex(boneName);
-				if (boneIndex == -1) throw new SerializationException("Bone not found: " + boneName);
+			for (int i = 0, n = input.readInt(true); i < n; i++) {
+				int boneIndex = input.readInt(true);
 				int itemCount = input.readInt(true);
 				for (int ii = 0; ii < itemCount; ii++) {
 					int timelineType = input.readByte();
@@ -214,10 +218,10 @@ public class SkeletonBinary {
 					switch (timelineType) {
 					case TIMELINE_ROTATE: {
 						RotateTimeline timeline = new RotateTimeline(keyCount);
-						timeline.setBoneIndex(boneIndex);
-						for (int keyframeIndex = 0; keyframeIndex < keyCount; keyframeIndex++) {
-							timeline.setFrame(keyframeIndex, input.readFloat(), input.readFloat());
-							if (keyframeIndex < keyCount - 1) readCurve(input, keyframeIndex, timeline);
+						timeline.boneIndex = boneIndex;
+						for (int frameIndex = 0; frameIndex < keyCount; frameIndex++) {
+							timeline.setFrame(frameIndex, input.readFloat(), input.readFloat());
+							if (frameIndex < keyCount - 1) readCurve(input, frameIndex, timeline);
 						}
 						timelines.add(timeline);
 						duration = Math.max(duration, timeline.getFrames()[keyCount * 2 - 2]);
@@ -233,25 +237,21 @@ public class SkeletonBinary {
 							timeline = new TranslateTimeline(keyCount);
 							timelineScale = scale;
 						}
-						timeline.setBoneIndex(boneIndex);
-						for (int keyframeIndex = 0; keyframeIndex < keyCount; keyframeIndex++) {
-							timeline.setFrame(keyframeIndex, input.readFloat(), input.readFloat() * timelineScale, input.readFloat()
+						timeline.boneIndex = boneIndex;
+						for (int frameIndex = 0; frameIndex < keyCount; frameIndex++) {
+							timeline.setFrame(frameIndex, input.readFloat(), input.readFloat() * timelineScale, input.readFloat()
 								* timelineScale);
-							if (keyframeIndex < keyCount - 1) readCurve(input, keyframeIndex, timeline);
+							if (frameIndex < keyCount - 1) readCurve(input, frameIndex, timeline);
 						}
 						timelines.add(timeline);
 						duration = Math.max(duration, timeline.getFrames()[keyCount * 3 - 3]);
 						break;
-					default:
-						throw new RuntimeException("Invalid timeline type for a bone: " + timelineType + " (" + boneName + ")");
 					}
 				}
 			}
 
-			int slotCount = input.readInt(true);
-			for (int i = 0; i < slotCount; i++) {
-				String slotName = input.readString();
-				int slotIndex = skeletonData.findSlotIndex(slotName);
+			for (int i = 0, n = input.readInt(true); i < n; i++) {
+				int slotIndex = input.readInt(true);
 				int itemCount = input.readInt(true);
 				for (int ii = 0; ii < itemCount; ii++) {
 					int timelineType = input.readByte();
@@ -259,12 +259,12 @@ public class SkeletonBinary {
 					switch (timelineType) {
 					case TIMELINE_COLOR: {
 						ColorTimeline timeline = new ColorTimeline(keyCount);
-						timeline.setSlotIndex(slotIndex);
-						for (int keyframeIndex = 0; keyframeIndex < keyCount; keyframeIndex++) {
+						timeline.slotIndex = slotIndex;
+						for (int frameIndex = 0; frameIndex < keyCount; frameIndex++) {
 							float time = input.readFloat();
 							Color.rgba8888ToColor(tempColor, input.readInt());
-							timeline.setFrame(keyframeIndex, time, tempColor.r, tempColor.g, tempColor.b, tempColor.a);
-							if (keyframeIndex < keyCount - 1) readCurve(input, keyframeIndex, timeline);
+							timeline.setFrame(frameIndex, time, tempColor.r, tempColor.g, tempColor.b, tempColor.a);
+							if (frameIndex < keyCount - 1) readCurve(input, frameIndex, timeline);
 						}
 						timelines.add(timeline);
 						duration = Math.max(duration, timeline.getFrames()[keyCount * 5 - 5]);
@@ -272,16 +272,61 @@ public class SkeletonBinary {
 					}
 					case TIMELINE_ATTACHMENT:
 						AttachmentTimeline timeline = new AttachmentTimeline(keyCount);
-						timeline.setSlotIndex(slotIndex);
-						for (int keyframeIndex = 0; keyframeIndex < keyCount; keyframeIndex++)
-							timeline.setFrame(keyframeIndex, input.readFloat(), input.readString());
+						timeline.slotIndex = slotIndex;
+						for (int frameIndex = 0; frameIndex < keyCount; frameIndex++)
+							timeline.setFrame(frameIndex, input.readFloat(), input.readString());
 						timelines.add(timeline);
 						duration = Math.max(duration, timeline.getFrames()[keyCount - 1]);
 						break;
-					default:
-						throw new RuntimeException("Invalid timeline type for a slot: " + timelineType + " (" + slotName + ")");
 					}
 				}
+			}
+
+			int eventCount = input.readInt(true);
+			if (eventCount > 0) {
+				EventTimeline timeline = new EventTimeline(eventCount);
+				for (int i = 0; i < eventCount; i++) {
+					float time = input.readFloat();
+					EventData eventData = skeletonData.eventDatas.get(input.readInt(true));
+					Event event = new Event(eventData);
+					event.intValue = input.readInt(false);
+					event.floatValue = input.readFloat();
+					event.stringValue = input.readBoolean() ? input.readString() : eventData.stringValue;
+					timeline.setFrame(i, time, event);
+				}
+				timelines.add(timeline);
+				duration = Math.max(duration, timeline.getFrames()[eventCount - 1]);
+			}
+
+			int drawOrderCount = input.readInt(true);
+			if (drawOrderCount > 0) {
+				DrawOrderTimeline timeline = new DrawOrderTimeline(drawOrderCount);
+				int slotCount = skeletonData.slots.size;
+				for (int i = 0; i < drawOrderCount; i++) {
+					int offsetCount = input.readInt(true);
+					int[] drawOrder = new int[slotCount];
+					for (int ii = slotCount - 1; ii >= 0; ii--)
+						drawOrder[ii] = -1;
+					int[] unchanged = new int[slotCount - offsetCount];
+					int originalIndex = 0, unchangedIndex = 0;
+					for (int ii = 0; ii < offsetCount; ii++) {
+						int slotIndex = input.readInt(true);
+						// Collect unchanged items.
+						while (originalIndex != slotIndex)
+							unchanged[unchangedIndex++] = originalIndex++;
+						// Set changed items.
+						drawOrder[originalIndex + input.readInt(true)] = originalIndex++;
+					}
+					// Collect remaining unchanged items.
+					while (originalIndex < slotCount)
+						unchanged[unchangedIndex++] = originalIndex++;
+					// Fill in unchanged items.
+					for (int ii = slotCount - 1; ii >= 0; ii--)
+						if (drawOrder[ii] == -1) drawOrder[ii] = unchanged[--unchangedIndex];
+					timeline.setFrame(i, input.readFloat(), drawOrder);
+				}
+				timelines.add(timeline);
+				duration = Math.max(duration, timeline.getFrames()[drawOrderCount - 1]);
 			}
 		} catch (IOException ex) {
 			throw new SerializationException("Error reading skeleton file.", ex);
@@ -291,14 +336,18 @@ public class SkeletonBinary {
 		skeletonData.addAnimation(new Animation(name, timelines, duration));
 	}
 
-	private void readCurve (DataInput input, int keyframeIndex, CurveTimeline timeline) throws IOException {
+	private void readCurve (DataInput input, int frameIndex, CurveTimeline timeline) throws IOException {
 		switch (input.readByte()) {
 		case CURVE_STEPPED:
-			timeline.setStepped(keyframeIndex);
+			timeline.setStepped(frameIndex);
 			break;
 		case CURVE_BEZIER:
-			timeline.setCurve(keyframeIndex, input.readFloat(), input.readFloat(), input.readFloat(), input.readFloat());
+			setCurve(timeline, frameIndex, input.readFloat(), input.readFloat(), input.readFloat(), input.readFloat());
 			break;
 		}
+	}
+
+	void setCurve (CurveTimeline timeline, int frameIndex, float cx1, float cy1, float cx2, float cy2) {
+		timeline.setCurve(frameIndex, cx1, cy1, cx2, cy2);
 	}
 }

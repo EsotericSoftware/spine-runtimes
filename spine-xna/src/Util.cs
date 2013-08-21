@@ -6,10 +6,10 @@
  * modification, are permitted provided that the following conditions are met:
  * 
  * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
+ *	list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
+ *	this list of conditions and the following disclaimer in the documentation
+ *	and/or other materials provided with the distribution.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -28,8 +28,29 @@ using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
+#if WINDOWS_STOREAPP
+using System.Threading.Tasks;
+using Windows.Storage;
+#endif
+
 namespace Spine {
+
 	static public class Util {
+#if WINDOWS_STOREAPP
+		private static async Task<Texture2D> LoadFile(GraphicsDevice device, String path) {
+			var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
+			var file = await folder.GetFileAsync(path).AsTask().ConfigureAwait(false);
+			try {
+				return Util.LoadTexture(device, await file.OpenStreamForReadAsync().ConfigureAwait(false));
+			} catch (Exception ex) {
+				throw new Exception("Error reading texture file: " + path, ex);
+			}
+		}
+
+		static public Texture2D LoadTexture (GraphicsDevice device, String path) {
+			return LoadFile(device, path).Result;
+		}
+#else
 		static public Texture2D LoadTexture (GraphicsDevice device, String path) {
 			using (Stream input = new FileStream(path, FileMode.Open, FileAccess.Read)) {
 				try {
@@ -39,6 +60,7 @@ namespace Spine {
 				}
 			}
 		}
+#endif
 
 		static public Texture2D LoadTexture (GraphicsDevice device, Stream input) {
 			Texture2D file = Texture2D.FromStream(device, input);
@@ -73,10 +95,24 @@ namespace Spine {
 			spriteBatch.Draw(file, file.Bounds, Color.White);
 			spriteBatch.End();
 
-			// Release the GPU back to drawing to the screen
+			// Release the GPU back to drawing to the screen.
 			device.SetRenderTarget(null);
+			spriteBatch.Dispose();
+			file.Dispose();
 
+#if IOS
 			return result as Texture2D;
+#else
+			// RenderTarget2D are volatile and will be lost on screen resolution changes.
+			// So instead of using this directly, we create a non-voliate Texture2D.
+			// This is computationally slower, but should be safe as long as it is done on load.
+			Texture2D resultTexture = new Texture2D(device, file.Width, file.Height);
+			Color[] resultContent = new Color[Convert.ToInt32(file.Width * file.Height)];
+			result.GetData(resultContent);
+			resultTexture.SetData(resultContent);
+			result.Dispose(); // Dispose of the RenderTarget2D immediately.
+			return resultTexture;
+#endif
 		}
 	}
 }

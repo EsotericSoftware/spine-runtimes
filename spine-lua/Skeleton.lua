@@ -35,7 +35,9 @@ function Skeleton.new (skeletonData)
 		data = skeletonData,
 		bones = {},
 		slots = {},
-		drawOrder = {}
+		slotsByName = {},
+		drawOrder = {},
+		r = 1, g = 1, b = 1, a = 1
 	}
 
 	function self:updateWorldTransform ()
@@ -75,10 +77,7 @@ function Skeleton.new (skeletonData)
 
 	function self:findSlot (slotName)
 		if not slotName then error("slotName cannot be nil.", 2) end
-		for i,slot in ipairs(self.slots) do
-			if slot.data.name == slotName then return slot end
-		end
-		return nil
+		return self.slotsByName[slotName]
 	end
 
 	function self:setSkin (skinName)
@@ -88,7 +87,7 @@ function Skeleton.new (skeletonData)
 			if not newSkin then error("Skin not found: " .. skinName, 2) end
 			if self.skin then
 				-- Attach all attachments from the new skin if the corresponding attachment from the old skin is currently attached.
-				for k,v in self.skin.attachments do
+				for k,v in pairs(self.skin.attachments) do
 					local attachment = v[3]
 					local slotIndex = v[1]
 					local slot = self.slots[slotIndex]
@@ -106,7 +105,7 @@ function Skeleton.new (skeletonData)
 	function self:getAttachment (slotName, attachmentName)
 		if not slotName then error("slotName cannot be nil.", 2) end
 		if not attachmentName then error("attachmentName cannot be nil.", 2) end
-		local slotIndex = self.data:findSlotIndex(slotName)
+		local slotIndex = skeletonData.slotNameIndices[slotName]
 		if slotIndex == -1 then error("Slot not found: " .. slotName, 2) end
 		if self.skin then
 			local attachment = self.skin:getAttachment(slotIndex, attachmentName)
@@ -147,6 +146,7 @@ function Skeleton.new (skeletonData)
 		local bone = self.bones[spine.utils.indexOf(skeletonData.bones, slotData.boneData)]
 		local slot = Slot.new(slotData, self, bone)
 		table.insert(self.slots, slot)
+		self.slotsByName[slot.data.name] = slot
 		table.insert(self.drawOrder, slot)
 	end
 

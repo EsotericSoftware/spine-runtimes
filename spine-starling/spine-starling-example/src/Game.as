@@ -3,7 +3,7 @@ package {
 import spine.AnimationStateData;
 import spine.SkeletonData;
 import spine.SkeletonJson;
-import spine.starling.SkeletonAnimationSprite;
+import spine.starling.SkeletonAnimation;
 import spine.starling.StarlingAtlasAttachmentLoader;
 
 import starling.core.Starling;
@@ -24,7 +24,7 @@ public class Game extends Sprite {
 	[Embed(source = "spineboy.json", mimeType = "application/octet-stream")]
 	static public const SpineboyJson:Class;
 
-	private var skeleton:SkeletonAnimationSprite;
+	private var skeleton:SkeletonAnimation;
 
 	public function Game () {
 		var texture:Texture = Texture.fromBitmap(new SpineboyAtlasTexture());
@@ -39,7 +39,7 @@ public class Game extends Sprite {
 		stateData.setMixByName("jump", "walk", 0.4);
 		stateData.setMixByName("jump", "jump", 0.2);
 
-		skeleton = new SkeletonAnimationSprite(skeletonData);
+		skeleton = new SkeletonAnimation(skeletonData);
 		skeleton.setAnimationStateData(stateData);
 		skeleton.x = 320;
 		skeleton.y = 420;

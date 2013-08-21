@@ -198,9 +198,9 @@ public class Bone {
 		float[] val = worldTransform.val;
 		val[M00] = m00;
 		val[M01] = m01;
-		val[M02] = worldX;
 		val[M10] = m10;
 		val[M11] = m11;
+		val[M02] = worldX;
 		val[M12] = worldY;
 		val[M20] = 0;
 		val[M21] = 0;
