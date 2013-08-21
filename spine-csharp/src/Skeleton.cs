@@ -94,7 +94,10 @@ namespace Spine {
 				bones[i].SetToSetupPose();
 		}
 
-		public void SetSlotsToSetupPose () {
+		public void SetSlotsToSetupPose () {			
+			DrawOrder.Clear();
+			DrawOrder.AddRange(this.Slots);
+			
 			List<Slot> slots = this.Slots;
 			for (int i = 0, n = slots.Count; i < n; i++)
 				slots[i].SetToSetupPose(i);
