@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spine-xna", "spine-xna.cspr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spine-xna-example", "example\spine-xna-example.csproj", "{29CC4385-294A-4885-A3E8-FD4825E0CFDD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spine-csharp", "..\spine-csharp\spine-csharp.csproj", "{94144E22-2431-4A8F-AC04-DEC22F7EDD8F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spine-csharp_xna", "..\spine-csharp\spine-csharp_xna.csproj", "{94144E22-2431-4A8F-AC04-DEC22F7EDD8F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
