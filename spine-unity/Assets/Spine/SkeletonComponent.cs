@@ -196,9 +196,11 @@ public class SkeletonComponent : MonoBehaviour {
 			if (calculateTangents) {
 				Vector4[] tangents = this.tangents;
 				int count = mesh.normals.Length;
-				if (tangents.Length != count) this.tangents = tangents = new Vector4[count];
-				for (int i = 0; i < count; i++)
-					tangents[i] = new Vector4(1, 0, 0, 1);
+				if (tangents.Length != count) {
+					this.tangents = tangents = new Vector4[count];
+					for (int i = 0; i < count; i++)
+						tangents[i] = new Vector4(1, 0, 0, 1);
+				}
 				mesh.tangents = tangents;
 			}
 		}

@@ -46,6 +46,7 @@ spine-unity/Library
 spine-unity/*.sln
 *.userprefs
 *.pidb
+*.cachefile
 Assembly-*.csproj
 Assembly-*.pidb
 
