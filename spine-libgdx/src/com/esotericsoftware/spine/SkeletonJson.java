@@ -38,6 +38,7 @@ import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.AttachmentLoader;
 import com.esotericsoftware.spine.attachments.AttachmentType;
+import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.RegionSequenceAttachment;
 import com.esotericsoftware.spine.attachments.RegionSequenceAttachment.Mode;
@@ -172,9 +173,8 @@ public class SkeletonJson {
 
 			String modeString = map.getString("mode");
 			regionSequenceAttachment.setMode(modeString == null ? Mode.forward : Mode.valueOf(modeString));
-		}
 
-		if (attachment instanceof RegionAttachment) {
+		} else if (attachment instanceof RegionAttachment) {
 			RegionAttachment regionAttachment = (RegionAttachment)attachment;
 			regionAttachment.setX(map.getFloat("x", 0) * scale);
 			regionAttachment.setY(map.getFloat("y", 0) * scale);
@@ -184,6 +184,15 @@ public class SkeletonJson {
 			regionAttachment.setWidth(map.getFloat("width", 32) * scale);
 			regionAttachment.setHeight(map.getFloat("height", 32) * scale);
 			regionAttachment.updateOffset();
+
+		} else if (attachment instanceof BoundingBoxAttachment) {
+			BoundingBoxAttachment box = (BoundingBoxAttachment)attachment;
+			JsonValue pointsArray = map.require("points");
+			float[] points = new float[pointsArray.size];
+			int i = 0;
+			for (JsonValue point = pointsArray.child; point != null; point = point.next())
+				points[i++] = point.asFloat();
+			box.setPoints(points);
 		}
 
 		return attachment;

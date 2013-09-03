@@ -177,6 +177,10 @@ public class RegionAttachment extends Attachment {
 		return vertices;
 	}
 
+	public float[] getOffset () {
+		return offset;
+	}
+
 	public float getX () {
 		return x;
 	}

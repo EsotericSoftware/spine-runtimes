@@ -26,5 +26,5 @@
 package com.esotericsoftware.spine.attachments;
 
 public enum AttachmentType {
-	region, regionSequence
+	region, regionsequence, boundingbox
 }

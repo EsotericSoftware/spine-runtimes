@@ -38,6 +38,7 @@ import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.AttachmentLoader;
 import com.esotericsoftware.spine.attachments.AttachmentType;
+import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.RegionSequenceAttachment;
 import com.esotericsoftware.spine.attachments.RegionSequenceAttachment.Mode;
@@ -187,9 +188,8 @@ public class SkeletonBinary {
 			RegionSequenceAttachment regionSequenceAttachment = (RegionSequenceAttachment)attachment;
 			regionSequenceAttachment.setFrameTime(1 / input.readFloat());
 			regionSequenceAttachment.setMode(Mode.values()[input.readInt(true)]);
-		}
 
-		if (attachment instanceof RegionAttachment) {
+		} else if (attachment instanceof RegionAttachment) {
 			RegionAttachment regionAttachment = (RegionAttachment)attachment;
 			regionAttachment.setX(input.readFloat() * scale);
 			regionAttachment.setY(input.readFloat() * scale);
@@ -199,6 +199,14 @@ public class SkeletonBinary {
 			regionAttachment.setWidth(input.readFloat() * scale);
 			regionAttachment.setHeight(input.readFloat() * scale);
 			regionAttachment.updateOffset();
+
+		} else if (attachment instanceof BoundingBoxAttachment) {
+			BoundingBoxAttachment box = (BoundingBoxAttachment)attachment;
+			int n = input.readInt(true);
+			float[] points = new float[n];
+			for (int i = 0; i < n; i++)
+				points[i] = input.readFloat();
+			box.setPoints(points);
 		}
 
 		return attachment;

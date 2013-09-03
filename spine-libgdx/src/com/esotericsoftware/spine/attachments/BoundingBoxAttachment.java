@@ -25,41 +25,47 @@
 
 package com.esotericsoftware.spine.attachments;
 
-import com.esotericsoftware.spine.Skin;
+import com.esotericsoftware.spine.Bone;
+import com.esotericsoftware.spine.Skeleton;
+import com.esotericsoftware.spine.Slot;
 
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+public class BoundingBoxAttachment extends Attachment {
+	private float[] points;
+	private float[] vertices;
 
-public class AtlasAttachmentLoader implements AttachmentLoader {
-	private TextureAtlas atlas;
-
-	public AtlasAttachmentLoader (TextureAtlas atlas) {
-		if (atlas == null) throw new IllegalArgumentException("atlas cannot be null.");
-		this.atlas = atlas;
+	public BoundingBoxAttachment (String name) {
+		super(name);
 	}
 
-	public Attachment newAttachment (Skin skin, AttachmentType type, String name) {
-		Attachment attachment = null;
-		switch (type) {
-		case region:
-			attachment = new RegionAttachment(name);
-			break;
-		case regionsequence:
-			attachment = new RegionSequenceAttachment(name);
-			break;
-		case boundingbox:
-			return new BoundingBoxAttachment(name);
-		default:
-			throw new IllegalArgumentException("Unknown attachment type: " + type);
+	public void updateVertices (Slot slot) {
+		Bone bone = slot.getBone();
+		Skeleton skeleton = slot.getSkeleton();
+		float x = bone.getWorldX() + skeleton.getX();
+		float y = bone.getWorldY() + skeleton.getY();
+		float m00 = bone.getM00();
+		float m01 = bone.getM01();
+		float m10 = bone.getM10();
+		float m11 = bone.getM11();
+		float[] vertices = this.vertices;
+		float[] points = this.points;
+		for (int i = 0, n = points.length; i < n; i += 2) {
+			float px = points[i];
+			float py = points[i + 1];
+			vertices[i] = px * m00 + py * m01 + x;
+			vertices[i + 1] = px * m10 + py * m11 + y;
 		}
+	}
 
-		if (attachment instanceof RegionAttachment) {
-			AtlasRegion region = atlas.findRegion(attachment.getName());
-			if (region == null)
-				throw new RuntimeException("Region not found in atlas: " + attachment + " (" + type + " attachment: " + name + ")");
-			((RegionAttachment)attachment).setRegion(region);
-		}
+	public float[] getVertices () {
+		return vertices;
+	}
 
-		return attachment;
+	public float[] getPoints () {
+		return points;
+	}
+
+	public void setPoints (float[] points) {
+		this.points = points;
+		if (vertices == null || vertices.length != points.length) vertices = new float[points.length];
 	}
 }
