@@ -39,6 +39,7 @@ namespace Spine {
 		static public String TIMELINE_TRANSLATE = "translate";
 		static public String TIMELINE_ATTACHMENT = "attachment";
 		static public String TIMELINE_COLOR = "color";
+		//static public String TIMELINE_DRAWORDER = "draworder";
 
 		static public String ATTACHMENT_REGION = "region";
 		static public String ATTACHMENT_REGION_SEQUENCE = "regionSequence";
@@ -308,6 +309,62 @@ namespace Spine {
 							throw new Exception("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
 					}
 				}
+			}
+			
+			//TODO: Remove comments when reviewed
+			if(map.ContainsKey("draworder")) {
+				// String timelineName = (String)timelineEntry.Key;
+				// if (timelineName.Equals(TIMELINE_COLOR)) { 
+				// there's always this timelineName check in the other deserializing stuff. not sure if it's applicable but I mirrored on top anyway. but I'm not sure where to put it here.
+				
+				var drawOrderKeyframeList = (List<Object>) map["draworder"];			//List < Dictionary <String, Object> >
+				int slotCount = skeletonData.Slots.Count;
+				int frameIndex = 0;	
+				
+				DrawOrderTimeline timeline = new DrawOrderTimeline( drawOrderKeyframeList.Count );
+				
+				foreach ( Dictionary<string, Object> drawOrderKeyframe in drawOrderKeyframeList ) {
+					int[] drawOrder = new int[slotCount];
+					for (int i = slotCount - 1; i >= 0; i--) {							// fill an int[] of the same size as skeletonData.Slots with -1.
+						drawOrder[i] = -1;
+					}
+					
+					var values = (List<Object>) drawOrderKeyframe["offsets"];			// List< Dictionary <String, Object> >
+					int[] unchanged = new int[slotCount - values.Count];
+					int originalIndex = 0;
+					int unchagedIndex = 0;
+					
+					foreach( Dictionary<String, Object> valueMap in values ) {
+						String slotname = (String) valueMap["slot"];
+						int slotOffset = (int) ((float) valueMap["offset"]);			// is this explicit cast-and-convert necessary? I wasn't sure how this Json parser + .NET deals with turning downcast float objects into ints.
+						
+						int slotIndex = skeletonData.FindSlotIndex( slotname );
+						if (slotIndex == -1) throw new Exception("Slot not found: " + slotname);					
+						
+						// Collect unchanged items.
+						while (originalIndex != slotIndex)						
+							unchanged[unchagedIndex++] = originalIndex++;
+						
+						// Set changed items.
+						drawOrder[originalIndex + slotOffset] = originalIndex++;
+					}
+					
+					// Collect remaining unchanged items.
+					while(originalIndex < slotCount)
+						unchanged[unchagedIndex++] = originalIndex++;
+					
+					// Fill in unchanged items.
+					for(int i = slotCount - 1; i >= 0; i--) {
+						if(drawOrder[i] == -1) drawOrder[i] = unchanged[--unchagedIndex];
+					}
+					
+					// Push drawOrder (int[]) into the timeline.
+					float time = (float) drawOrderKeyframe["time"];
+					timeline.setFrame(frameIndex++, time, drawOrder);						
+				}
+
+				timelines.Add(timeline);
+				duration = Math.Max(duration, timeline.Frames[timeline.FrameCount - 1]);
 			}
 
 			timelines.TrimExcess();
