@@ -36,6 +36,9 @@ struct Skeleton;
 typedef struct {
 	const char* const name;
 	float duration;
+    
+    float fromTime;
+    float toTime;
 
 	int timelineCount;
 	Timeline** timelines;
