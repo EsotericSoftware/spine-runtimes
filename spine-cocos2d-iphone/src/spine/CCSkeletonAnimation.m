@@ -158,7 +158,7 @@
 }
 
 - (void) setAnimation:(NSString*)name loop:(bool)loop fromTime:(float)fromTime toTime:(float)toTime {
-    [self setAnimation:name loop:loop fromTime:0 toTime:0 forState:0];
+    [self setAnimation:name loop:loop fromTime:fromTime toTime:toTime forState:0];
 }
 
 - (void) setAnimation:(NSString*)name loop:(bool)loop fromTime:(float)fromTime toTime:(float)toTime forState:(int)stateIndex {
@@ -178,7 +178,7 @@
 - (void) addAnimation:(NSString*)name loop:(bool)loop fromTime:(float)fromTime toTime:(float)toTime forState:(int)stateIndex {
 	NSAssert(stateIndex >= 0 && stateIndex < (int)_states.count, @"stateIndex out of range.");
 	AnimationState* state = [[_states objectAtIndex:stateIndex] pointerValue];
-	AnimationState_addAnimationByName(state, [name UTF8String], loop, -fromTime, fromTime, toTime);
+	AnimationState_addAnimationByName(state, [name UTF8String], loop, 0, fromTime, toTime);
 }
 
 - (void) addAnimation:(NSString*)name loop:(bool)loop afterDelay:(float)delay forState:(int)stateIndex {
