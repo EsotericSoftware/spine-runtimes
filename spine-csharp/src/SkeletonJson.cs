@@ -110,7 +110,7 @@ namespace Spine {
 			// Slots.
 			if (root.ContainsKey("slots")) {
 				var slots = (List<Object>)root["slots"];
-				foreach (Dictionary<String, Object> slotMap in (List<Object>)slots) {
+				foreach (Dictionary<String, Object> slotMap in slots) {
 					String slotName = (String)slotMap["name"];
 					String boneName = (String)slotMap["bone"];
 					BoneData boneData = skeletonData.FindBone(boneName);
@@ -308,6 +308,39 @@ namespace Spine {
 							throw new Exception("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
 					}
 				}
+			}
+
+			if (map.ContainsKey("draworder")) {
+				var values = (List<Object>)map["draworder"];
+				DrawOrderTimeline timeline = new DrawOrderTimeline(values.Count);
+				int slotCount = skeletonData.Slots.Count;
+				int frameIndex = 0;
+				foreach (Dictionary<String, Object> drawOrderMap in values) {
+					int[] drawOrder = new int[slotCount];
+					for (int i = slotCount - 1; i >= 0; i--)
+						drawOrder[i] = -1;
+					List<Object> offsets = (List<Object>)drawOrderMap["offsets"];
+					int[] unchanged = new int[slotCount - offsets.Count];
+					int originalIndex = 0, unchangedIndex = 0;
+					foreach (Dictionary<String, Object> offsetMap in offsets) {
+						int slotIndex = skeletonData.FindSlotIndex((String)offsetMap["slot"]);
+						if (slotIndex == -1) throw new Exception("Slot not found: " + offsetMap["slot"]);
+						// Collect unchanged items.
+						while (originalIndex != slotIndex)
+							unchanged[unchangedIndex++] = originalIndex++;
+						// Set changed items.
+						drawOrder[originalIndex + (int)(float)offsetMap["offset"]] = originalIndex++;
+					}
+					// Collect remaining unchanged items.
+					while (originalIndex < slotCount)
+						unchanged[unchangedIndex++] = originalIndex++;
+					// Fill in unchanged items.
+					for (int i = slotCount - 1; i >= 0; i--)
+						if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
+					timeline.setFrame(frameIndex++, (float)drawOrderMap["time"], drawOrder);
+				}
+				timelines.Add(timeline);
+				duration = Math.Max(duration, timeline.Frames[timeline.FrameCount - 1]);
 			}
 
 			timelines.TrimExcess();

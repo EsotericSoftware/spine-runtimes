@@ -74,9 +74,10 @@ namespace Spine {
 			}
 
 			state = new AnimationState(stateData);
-			state.SetAnimation("walk", false);
-			state.AddAnimation("jump", false);
-			state.AddAnimation("walk", true);
+			state.SetAnimation("drawOrder", true);
+			//state.SetAnimation("walk", false);
+			//state.AddAnimation("jump", false);
+			//state.AddAnimation("walk", true);
 
 			skeleton.X = 320;
 			skeleton.Y = 440;
