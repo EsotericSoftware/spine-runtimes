@@ -49,6 +49,8 @@ namespace Spine {
 				attachment.RegionOriginalWidth = region.originalWidth;
 				attachment.RegionOriginalHeight = region.originalHeight;
 				return attachment;
+			case AttachmentType.boundingbox:
+				return new BoundingBoxAttachment(name);
 			}
 			throw new Exception("Unknown attachment type: " + type);
 		}

@@ -33,7 +33,7 @@ using Windows.Storage;
 #endif
 
 namespace Spine {
-    public class SkeletonJson {
+	public class SkeletonJson {
 		static public String TIMELINE_SCALE = "scale";
 		static public String TIMELINE_ROTATE = "rotate";
 		static public String TIMELINE_TRANSLATE = "translate";
@@ -46,7 +46,8 @@ namespace Spine {
 		private AttachmentLoader attachmentLoader;
 		public float Scale { get; set; }
 
-		public SkeletonJson (Atlas atlas) : this(new AtlasAttachmentLoader(atlas)) {
+		public SkeletonJson (Atlas atlas)
+			: this(new AtlasAttachmentLoader(atlas)) {
 		}
 
 		public SkeletonJson (AttachmentLoader attachmentLoader) {
@@ -102,8 +103,8 @@ namespace Spine {
 				boneData.Rotation = GetFloat(boneMap, "rotation", 0);
 				boneData.ScaleX = GetFloat(boneMap, "scaleX", 1);
 				boneData.ScaleY = GetFloat(boneMap, "scaleY", 1);
-				boneData.InheritScale = GetBoolean (boneMap, "inheritScale", true);
-				boneData.InheritRotation = GetBoolean (boneMap, "inheritRotation", true);
+				boneData.InheritScale = GetBoolean(boneMap, "inheritScale", true);
+				boneData.InheritRotation = GetBoolean(boneMap, "inheritRotation", true);
 				skeletonData.AddBone(boneData);
 			}
 
@@ -145,7 +146,7 @@ namespace Spine {
 						int slotIndex = skeletonData.FindSlotIndex(slotEntry.Key);
 						foreach (KeyValuePair<String, Object> attachmentEntry in ((Dictionary<String, Object>)slotEntry.Value)) {
 							Attachment attachment = ReadAttachment(skin, attachmentEntry.Key, (Dictionary<String, Object>)attachmentEntry.Value);
-							skin.AddAttachment(slotIndex, attachmentEntry.Key, attachment);
+							if (attachment != null) skin.AddAttachment(slotIndex, attachmentEntry.Key, attachment);
 						}
 					}
 					skeletonData.AddSkin(skin);
@@ -178,8 +179,8 @@ namespace Spine {
 				type = (AttachmentType)Enum.Parse(typeof(AttachmentType), (String)map["type"], false);
 			Attachment attachment = attachmentLoader.NewAttachment(skin, type, name);
 
-			if (attachment is RegionAttachment) {
-				RegionAttachment regionAttachment = (RegionAttachment)attachment;
+			RegionAttachment regionAttachment = attachment as RegionAttachment;
+			if (regionAttachment != null) {
 				regionAttachment.X = GetFloat(map, "x", 0) * Scale;
 				regionAttachment.Y = GetFloat(map, "y", 0) * Scale;
 				regionAttachment.ScaleX = GetFloat(map, "scaleX", 1);
@@ -190,6 +191,15 @@ namespace Spine {
 				regionAttachment.UpdateOffset();
 			}
 
+			BoundingBoxAttachment boundingBox = attachment as BoundingBoxAttachment;
+			if (boundingBox != null) {
+				List<Object> values = (List<Object>)map["vertices"];
+				float[] vertices = new float[values.Count];
+				for (int i = 0, n = values.Count; i < n; i++)
+					vertices[i] = (float)values[i];
+				boundingBox.Vertices = vertices;
+			}
+
 			return attachment;
 		}
 
@@ -198,7 +208,7 @@ namespace Spine {
 				return (float)defaultValue;
 			return (float)map[name];
 		}
-		
+
 		private bool GetBoolean (Dictionary<String, Object> map, String name, bool defaultValue) {
 			if (!map.ContainsKey(name))
 				return (bool)defaultValue;

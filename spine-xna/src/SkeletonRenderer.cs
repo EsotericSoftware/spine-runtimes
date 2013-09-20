@@ -69,8 +69,6 @@ namespace Spine {
 		}
 
 		public void Draw (Skeleton skeleton) {
-			Console.WriteLine();
-
 			List<Slot> drawOrder = skeleton.DrawOrder;
 			for (int i = 0, n = drawOrder.Count; i < n; i++) {
 				Slot slot = drawOrder[i];

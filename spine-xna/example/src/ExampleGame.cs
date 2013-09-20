@@ -40,9 +40,13 @@ namespace Spine {
 		GraphicsDeviceManager graphics;
 		SkeletonRenderer skeletonRenderer;
 		Skeleton skeleton;
+		Slot headSlot;
 		AnimationState state;
+		SkeletonBounds bounds = new SkeletonBounds();
 
 		public Example () {
+			IsMouseVisible = true;
+
 			graphics = new GraphicsDeviceManager(this);
 			graphics.IsFullScreen = false;
 			graphics.PreferredBackBufferWidth = 640;
@@ -74,14 +78,19 @@ namespace Spine {
 			}
 
 			state = new AnimationState(stateData);
-			state.SetAnimation("drawOrder", true);
-			//state.SetAnimation("walk", false);
-			//state.AddAnimation("jump", false);
-			//state.AddAnimation("walk", true);
+			if (true) {
+				state.SetAnimation("drawOrder", true);
+			} else {
+				state.SetAnimation("walk", false);
+				state.AddAnimation("jump", false);
+				state.AddAnimation("walk", true);
+			}
 
 			skeleton.X = 320;
 			skeleton.Y = 440;
 			skeleton.UpdateWorldTransform();
+
+			headSlot = skeleton.FindSlot("head");
 		}
 
 		protected override void UnloadContent () {
@@ -107,6 +116,19 @@ namespace Spine {
 			skeletonRenderer.Begin();
 			skeletonRenderer.Draw(skeleton);
 			skeletonRenderer.End();
+
+			bounds.Update(skeleton);
+			MouseState mouse = Mouse.GetState();
+			if (bounds.AabbContainsPoint(mouse.X, mouse.Y)) {
+				BoundingBoxAttachment hit = bounds.ContainsPoint(mouse.X, mouse.Y);
+				if (hit != null) {
+					headSlot.G = 0;
+					headSlot.B = 0;
+				} else {
+					headSlot.G = 1;
+					headSlot.B = 1;
+				}
+			}
 
 			base.Draw(gameTime);
 		}
