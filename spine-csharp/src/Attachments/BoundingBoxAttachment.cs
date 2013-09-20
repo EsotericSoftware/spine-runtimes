@@ -34,7 +34,7 @@ namespace Spine {
 			: base(name) {
 		}
 
-		/** @param worldVertices Must have at least the same as this attachment's vertices. */
+		/** @param worldVertices Must have at least the same length as this attachment's vertices. */
 		public void ComputeWorldVertices (float x, float y, Bone bone, float[] worldVertices) {
 			x += bone.WorldX;
 			y += bone.WorldY;

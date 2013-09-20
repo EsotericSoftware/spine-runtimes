@@ -107,9 +107,8 @@ namespace Spine {
 			float x = skeleton.X, y = skeleton.Y;
 
 			boundingBoxes.Clear();
-			foreach (Polygon polygon in polygons) {
+			foreach (Polygon polygon in polygons)
 				polygonPool.Add(polygon);
-			}
 			polygons.Clear();
 
 			for (int i = 0; i < slotCount; i++) {
@@ -127,7 +126,7 @@ namespace Spine {
 					polygon = new Polygon();
 				polygons.Add(polygon);
 				polygon.Count = boundingBox.Vertices.Length;
-				if (polygon.Vertices == null || polygon.Vertices.Length < polygon.Count) polygon.Vertices = new float[polygon.Count];
+				if (polygon.Vertices.Length < polygon.Count) polygon.Vertices = new float[polygon.Count];
 				boundingBox.ComputeWorldVertices(x, y, slot.Bone, polygon.Vertices);
 			}
 		}
@@ -262,7 +261,6 @@ namespace Spine {
 				}
 				x3 = x4;
 				y3 = y4;
-
 			}
 			return false;
 		}
@@ -272,4 +270,8 @@ namespace Spine {
 public class Polygon {
 	public float[] Vertices { get; set; }
 	public int Count { get; set; }
+
+	public Polygon () {
+		Vertices = new float[16];
+	}
 }
