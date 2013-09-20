@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -147,6 +147,9 @@
     <Compile Include="..\..\..\spine-csharp\src\Attachments\AttachmentLoader.cs">
       <Link>spine-csharp\Attachments\AttachmentLoader.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Attachments\BoundingBoxAttachment.cs">
+      <Link>spine-csharp\Attachments\BoundingBoxAttachment.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\spine-csharp\src\Attachments\AttachmentType.cs">
       <Link>spine-csharp\Attachments\AttachmentType.cs</Link>
     </Compile>
@@ -164,6 +167,9 @@
     </Compile>
     <Compile Include="..\..\..\spine-csharp\src\Skeleton.cs">
       <Link>spine-csharp\Skeleton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\SkeletonBounds.cs">
+      <Link>spine-csharp\SkeletonBounds.cs</Link>
     </Compile>
     <Compile Include="..\..\..\spine-csharp\src\SkeletonData.cs">
       <Link>spine-csharp\SkeletonData.cs</Link>
