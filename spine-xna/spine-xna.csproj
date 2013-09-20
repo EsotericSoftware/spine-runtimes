@@ -115,12 +115,6 @@
     <Compile Include="src\SpriteBatcher.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\spine-csharp\spine-csharp.csproj">
-      <Project>{94144E22-2431-4A8F-AC04-DEC22F7EDD8F}</Project>
-      <Name>spine-csharp</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4 Client Profile %28x86 and x64%29</ProductName>
@@ -141,6 +135,12 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\spine-csharp\spine-csharp_xna.csproj">
+      <Project>{DF7AAFE1-401E-4278-8F9A-3DD2B8CC3D0A}</Project>
+      <Name>spine-csharp_xna</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />

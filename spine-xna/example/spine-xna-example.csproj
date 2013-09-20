@@ -126,9 +126,9 @@
     <Content Include="GameThumbnail.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\spine-csharp\spine-csharp.csproj">
-      <Project>{94144E22-2431-4A8F-AC04-DEC22F7EDD8F}</Project>
-      <Name>spine-csharp</Name>
+    <ProjectReference Include="..\..\spine-csharp\spine-csharp_xna.csproj">
+      <Project>{DF7AAFE1-401E-4278-8F9A-3DD2B8CC3D0A}</Project>
+      <Name>spine-csharp_xna</Name>
     </ProjectReference>
     <ProjectReference Include="..\spine-xna.csproj">
       <Project>{7F8F2327-C016-49C8-BB4D-F3F77971961E}</Project>

@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spine-xna", "spine-xna.cspr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spine-xna-example", "example\spine-xna-example.csproj", "{29CC4385-294A-4885-A3E8-FD4825E0CFDD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spine-csharp_xna", "..\spine-csharp\spine-csharp_xna.csproj", "{94144E22-2431-4A8F-AC04-DEC22F7EDD8F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spine-csharp_xna", "..\spine-csharp\spine-csharp_xna.csproj", "{DF7AAFE1-401E-4278-8F9A-3DD2B8CC3D0A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +21,10 @@ Global
 		{29CC4385-294A-4885-A3E8-FD4825E0CFDD}.Debug|x86.Build.0 = Debug|x86
 		{29CC4385-294A-4885-A3E8-FD4825E0CFDD}.Release|x86.ActiveCfg = Release|x86
 		{29CC4385-294A-4885-A3E8-FD4825E0CFDD}.Release|x86.Build.0 = Release|x86
-		{94144E22-2431-4A8F-AC04-DEC22F7EDD8F}.Debug|x86.ActiveCfg = Debug|x86
-		{94144E22-2431-4A8F-AC04-DEC22F7EDD8F}.Debug|x86.Build.0 = Debug|x86
-		{94144E22-2431-4A8F-AC04-DEC22F7EDD8F}.Release|x86.ActiveCfg = Release|x86
-		{94144E22-2431-4A8F-AC04-DEC22F7EDD8F}.Release|x86.Build.0 = Release|x86
+		{DF7AAFE1-401E-4278-8F9A-3DD2B8CC3D0A}.Debug|x86.ActiveCfg = Debug|x86
+		{DF7AAFE1-401E-4278-8F9A-3DD2B8CC3D0A}.Debug|x86.Build.0 = Debug|x86
+		{DF7AAFE1-401E-4278-8F9A-3DD2B8CC3D0A}.Release|x86.ActiveCfg = Release|x86
+		{DF7AAFE1-401E-4278-8F9A-3DD2B8CC3D0A}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
