@@ -1,15 +1,23 @@
-/*******************************************************************************
+/******************************************************************************
+ * Spine Runtime Software License - Version 1.0
+ * 
  * Copyright (c) 2013, Esoteric Software
  * All rights reserved.
  * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms in whole or in part, with
+ * or without modification, are permitted provided that the following conditions
+ * are met:
  * 
- * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
+ * 1. A Spine Single User License or Spine Professional License must be
+ *    purchased from Esoteric Software and the license must remain valid:
+ *    http://esotericsoftware.com/
+ * 2. Redistributions of source code must retain this license, which is the
+ *    above copyright notice, this declaration of conditions and the following
+ *    disclaimer.
+ * 3. Redistributions in binary form must reproduce this license, which is the
+ *    above copyright notice, this declaration of conditions and the following
+ *    disclaimer, in the documentation and/or other materials provided with the
+ *    distribution.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -21,7 +29,7 @@
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- ******************************************************************************/
+ *****************************************************************************/
 
 package com.esotericsoftware.spine.attachments;
 
@@ -39,6 +47,15 @@ import com.badlogic.gdx.utils.NumberUtils;
 
 /** Attachment that displays a texture region. */
 public class RegionAttachment extends Attachment {
+	static public final int BLX = 0;
+	static public final int BLY = 1;
+	static public final int ULX = 2;
+	static public final int ULY = 3;
+	static public final int URX = 4;
+	static public final int URY = 5;
+	static public final int BRX = 6;
+	static public final int BRY = 7;
+
 	private TextureRegion region;
 	private float x, y, scaleX = 1, scaleY = 1, rotation, width, height;
 	private final float[] vertices = new float[20];
@@ -89,14 +106,14 @@ public class RegionAttachment extends Attachment {
 		float localY2Cos = localY2 * cos + y;
 		float localY2Sin = localY2 * sin;
 		float[] offset = this.offset;
-		offset[0] = localXCos - localYSin;
-		offset[1] = localYCos + localXSin;
-		offset[2] = localXCos - localY2Sin;
-		offset[3] = localY2Cos + localXSin;
-		offset[4] = localX2Cos - localY2Sin;
-		offset[5] = localY2Cos + localX2Sin;
-		offset[6] = localX2Cos - localYSin;
-		offset[7] = localYCos + localX2Sin;
+		offset[BLX] = localXCos - localYSin;
+		offset[BLY] = localYCos + localXSin;
+		offset[ULX] = localXCos - localY2Sin;
+		offset[ULY] = localY2Cos + localXSin;
+		offset[URX] = localX2Cos - localY2Sin;
+		offset[URY] = localY2Cos + localX2Sin;
+		offset[BRX] = localX2Cos - localYSin;
+		offset[BRY] = localYCos + localX2Sin;
 	}
 
 	public void setRegion (TextureRegion region) {
@@ -105,6 +122,15 @@ public class RegionAttachment extends Attachment {
 		float[] vertices = this.vertices;
 		if (region instanceof AtlasRegion && ((AtlasRegion)region).rotate) {
 			vertices[U2] = region.getU();
+			vertices[V2] = region.getV();
+			vertices[U3] = region.getU2();
+			vertices[V3] = region.getV();
+			vertices[U4] = region.getU2();
+			vertices[V4] = region.getV2();
+			vertices[U1] = region.getU();
+			vertices[V1] = region.getV2();
+		} else {
+			vertices[U2] = region.getU();
 			vertices[V2] = region.getV2();
 			vertices[U3] = region.getU();
 			vertices[V3] = region.getV();
@@ -112,15 +138,6 @@ public class RegionAttachment extends Attachment {
 			vertices[V4] = region.getV();
 			vertices[U1] = region.getU2();
 			vertices[V1] = region.getV2();
-		} else {
-			vertices[U1] = region.getU();
-			vertices[V1] = region.getV2();
-			vertices[U2] = region.getU();
-			vertices[V2] = region.getV();
-			vertices[U3] = region.getU2();
-			vertices[V3] = region.getV();
-			vertices[U4] = region.getU2();
-			vertices[V4] = region.getV2();
 		}
 		updateOffset();
 	}
@@ -130,7 +147,7 @@ public class RegionAttachment extends Attachment {
 		return region;
 	}
 
-	public void updateVertices (Slot slot, boolean premultipliedAlpha) {
+	public void updateWorldVertices (Slot slot, boolean premultipliedAlpha) {
 		Skeleton skeleton = slot.getSkeleton();
 		Color skeletonColor = skeleton.getColor();
 		Color slotColor = slot.getColor();
@@ -149,12 +166,8 @@ public class RegionAttachment extends Attachment {
 					| ((int)(255 * skeletonColor.g * slotColor.g) << 8) //
 					| ((int)(255 * skeletonColor.r * slotColor.r)));
 		}
-		float[] vertices = this.vertices;
-		vertices[C1] = color;
-		vertices[C2] = color;
-		vertices[C3] = color;
-		vertices[C4] = color;
 
+		float[] vertices = this.vertices;
 		float[] offset = this.offset;
 		Bone bone = slot.getBone();
 		float x = bone.getWorldX() + skeleton.getX();
@@ -163,17 +176,33 @@ public class RegionAttachment extends Attachment {
 		float m01 = bone.getM01();
 		float m10 = bone.getM10();
 		float m11 = bone.getM11();
-		vertices[X1] = offset[0] * m00 + offset[1] * m01 + x;
-		vertices[Y1] = offset[0] * m10 + offset[1] * m11 + y;
-		vertices[X2] = offset[2] * m00 + offset[3] * m01 + x;
-		vertices[Y2] = offset[2] * m10 + offset[3] * m11 + y;
-		vertices[X3] = offset[4] * m00 + offset[5] * m01 + x;
-		vertices[Y3] = offset[4] * m10 + offset[5] * m11 + y;
-		vertices[X4] = offset[6] * m00 + offset[7] * m01 + x;
-		vertices[Y4] = offset[6] * m10 + offset[7] * m11 + y;
+		float offsetX, offsetY;
+		offsetX = offset[BRX];
+		offsetY = offset[BRY];
+		vertices[X1] = offsetX * m00 + offsetY * m01 + x; // br
+		vertices[Y1] = offsetX * m10 + offsetY * m11 + y;
+		vertices[C1] = color;
+
+		offsetX = offset[BLX];
+		offsetY = offset[BLY];
+		vertices[X2] = offsetX * m00 + offsetY * m01 + x; // bl
+		vertices[Y2] = offsetX * m10 + offsetY * m11 + y;
+		vertices[C2] = color;
+
+		offsetX = offset[ULX];
+		offsetY = offset[ULY];
+		vertices[X3] = offsetX * m00 + offsetY * m01 + x; // ul
+		vertices[Y3] = offsetX * m10 + offsetY * m11 + y;
+		vertices[C3] = color;
+
+		offsetX = offset[URX];
+		offsetY = offset[URY];
+		vertices[X4] = offsetX * m00 + offsetY * m01 + x; // ur
+		vertices[Y4] = offsetX * m10 + offsetY * m11 + y;
+		vertices[C4] = color;
 	}
 
-	public float[] getVertices () {
+	public float[] getWorldVertices () {
 		return vertices;
 	}
 
