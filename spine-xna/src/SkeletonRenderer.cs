@@ -34,7 +34,7 @@ namespace Spine {
 		SpriteBatcher batcher;
 		BasicEffect effect;
 		RasterizerState rasterizerState;
-		public BlendState BlendState { get; set; }
+		public bool PremultipliedAlpha { get; set; }
 		float[] vertices = new float[8];
 
 		public SkeletonRenderer (GraphicsDevice device) {
@@ -51,14 +51,12 @@ namespace Spine {
 			rasterizerState = new RasterizerState();
 			rasterizerState.CullMode = CullMode.None;
 
-			BlendState = BlendState.AlphaBlend;
-
 			Bone.yDown = true;
 		}
 
 		public void Begin () {
 			device.RasterizerState = rasterizerState;
-			device.BlendState = BlendState;
+			device.BlendState = BlendState.AlphaBlend;
 
 			effect.Projection = Matrix.CreateOrthographicOffCenter(0, device.Viewport.Width, device.Viewport.Height, 0, 1, 0);
 		}
@@ -71,11 +69,19 @@ namespace Spine {
 		}
 
 		public void Draw (Skeleton skeleton) {
+			Console.WriteLine();
+
 			List<Slot> drawOrder = skeleton.DrawOrder;
 			for (int i = 0, n = drawOrder.Count; i < n; i++) {
 				Slot slot = drawOrder[i];
 				RegionAttachment regionAttachment = slot.Attachment as RegionAttachment;
 				if (regionAttachment != null) {
+					BlendState blend = slot.Data.AdditiveBlending ? BlendState.Additive : BlendState.AlphaBlend;
+					if (device.BlendState != blend) {
+						End();
+						device.BlendState = blend;
+					}
+
 					SpriteBatchItem item = batcher.CreateBatchItem();
 					AtlasRegion region = (AtlasRegion)regionAttachment.RendererObject;
 					item.Texture = (Texture2D)region.page.rendererObject;

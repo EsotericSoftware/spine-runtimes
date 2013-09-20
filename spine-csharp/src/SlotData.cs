@@ -35,6 +35,7 @@ namespace Spine {
 		public float A { get; set; }
 		/** @param attachmentName May be null. */
 		public String AttachmentName { get; set; }
+		public bool AdditiveBlending { get; set; }
 
 		public SlotData (String name, BoneData boneData) {
 			if (name == null) throw new ArgumentNullException("name cannot be null.");

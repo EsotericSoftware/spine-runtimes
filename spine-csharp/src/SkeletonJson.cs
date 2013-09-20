@@ -129,6 +129,9 @@ namespace Spine {
 					if (slotMap.ContainsKey("attachment"))
 						slotData.AttachmentName = (String)slotMap["attachment"];
 
+					if (slotMap.ContainsKey("additive"))
+						slotData.AdditiveBlending = (bool)slotMap["additive"];
+
 					skeletonData.AddSlot(slotData);
 				}
 			}
