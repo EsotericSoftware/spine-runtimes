@@ -1,3 +1,35 @@
+/******************************************************************************
+ * Spine Runtime Software License - Version 1.0
+ * 
+ * Copyright (c) 2013, Esoteric Software
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms in whole or in part, with
+ * or without modification, are permitted provided that the following conditions
+ * are met:
+ * 
+ * 1. A Spine Single User License or Spine Professional License must be
+ *    purchased from Esoteric Software and the license must remain valid:
+ *    http://esotericsoftware.com/
+ * 2. Redistributions of source code must retain this license, which is the
+ *    above copyright notice, this declaration of conditions and the following
+ *    disclaimer.
+ * 3. Redistributions in binary form must reproduce this license, which is the
+ *    above copyright notice, this declaration of conditions and the following
+ *    disclaimer, in the documentation and/or other materials provided with the
+ *    distribution.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 
 package com.esotericsoftware.spine;
 
@@ -5,34 +37,53 @@ import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.FloatArray;
 
 public class SkeletonBounds {
 	private boolean aabb;
 	private float minX, minY, maxX, maxY;
-	private Array<BoundingBoxAttachment> boundingBoxAttachments = new Array();
+	private Array<BoundingBoxAttachment> boundingBoxes = new Array();
+	private Array<FloatArray> polygons = new Array();
 
 	public void update (Skeleton skeleton) {
 		aabb = false;
-		Array<BoundingBoxAttachment> polygons = this.boundingBoxAttachments;
-		polygons.clear();
+
+		Array<BoundingBoxAttachment> boundingBoxes = this.boundingBoxes;
+		Array<FloatArray> polygons = this.polygons;
 		Array<Slot> slots = skeleton.slots;
-		for (int i = 0, n = slots.size; i < n; i++) {
+		int slotCount = slots.size;
+		float x = skeleton.getX(), y = skeleton.getY();
+
+		boundingBoxes.clear();
+		polygons.clear();
+		polygons.ensureCapacity(slotCount);
+
+		for (int i = 0; i < slotCount; i++) {
 			Slot slot = slots.get(i);
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof BoundingBoxAttachment) {
 				BoundingBoxAttachment boundingBox = (BoundingBoxAttachment)attachment;
-				boundingBox.updateVertices(slot);
-				polygons.add(boundingBox);
+				boundingBoxes.add(boundingBox);
+
+				polygons.size = boundingBoxes.size;
+				FloatArray polygon = polygons.peek();
+				if (polygon == null) polygons.set(polygons.size - 1, polygon = new FloatArray());
+
+				int vertexCount = boundingBox.getVertices().length;
+				polygon.ensureCapacity(vertexCount);
+				polygon.size = vertexCount;
+				boundingBox.computeWorldVertices(x, y, slot.bone, polygon.items);
 			}
 		}
 	}
 
 	private void aabbCompute () {
 		float minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
-		Array<BoundingBoxAttachment> boundingBoxes = this.boundingBoxAttachments;
-		for (int i = 0, n = boundingBoxes.size; i < n; i++) {
-			float[] vertices = boundingBoxes.get(i).getVertices();
-			for (int ii = 0, nn = vertices.length; ii < nn; ii += 2) {
+		Array<FloatArray> polygons = this.polygons;
+		for (int i = 0, n = polygons.size; i < n; i++) {
+			FloatArray polygon = polygons.get(i);
+			float[] vertices = polygon.items;
+			for (int ii = 0, nn = polygon.size; ii < nn; ii += 2) {
 				float x = vertices[ii];
 				float y = vertices[ii + 1];
 				minX = Math.min(minX, x);
@@ -82,21 +133,12 @@ public class SkeletonBounds {
 		return minX < bounds.maxX && maxX > bounds.minX && minY < bounds.maxY && maxY > bounds.minY;
 	}
 
-	/** Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
-	 * efficient to only call this method if {@link #aabbContainsPoint(float, float)} return true. */
-	public BoundingBoxAttachment containsPoint (float x, float y) {
-		Array<BoundingBoxAttachment> boundingBoxes = this.boundingBoxAttachments;
-		for (int i = 0, n = boundingBoxes.size; i < n; i++) {
-			BoundingBoxAttachment attachment = boundingBoxes.get(i);
-			if (containsPoint(attachment, x, y)) return attachment;
-		}
-		return null;
-	}
-
 	/** Returns true if the bounding box attachment contains the point. */
-	public boolean containsPoint (BoundingBoxAttachment attachment, float x, float y) {
-		float[] vertices = attachment.getVertices();
-		int nn = vertices.length;
+	public boolean containsPoint (int index, float x, float y) {
+		FloatArray polygon = polygons.get(index);
+		float[] vertices = polygon.items;
+		int nn = polygon.size;
+
 		int prevIndex = nn - 2;
 		boolean inside = false;
 		for (int ii = 0; ii < nn; ii += 2) {
@@ -111,10 +153,25 @@ public class SkeletonBounds {
 		return inside;
 	}
 
+	/** Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
+	 * efficient to only call this method if {@link #aabbContainsPoint(float, float)} return true. */
+	public BoundingBoxAttachment containsPoint (float x, float y) {
+		Array<BoundingBoxAttachment> boundingBoxes = this.boundingBoxes;
+		for (int i = 0, n = boundingBoxes.size; i < n; i++)
+			if (containsPoint(i, x, y)) return boundingBoxes.get(i);
+		return null;
+	}
+
+	/** Returns true if the bounding box attachment contains the point. The bounding box must be in the SkeletonBounds. */
+	public boolean containsPoint (BoundingBoxAttachment attachment, float x, float y) {
+		int index = boundingBoxes.indexOf(attachment, true);
+		return index == -1 ? false : containsPoint(index, x, y);
+	}
+
 	/** Returns the first bounding box attachment that contains the line segment, or null. When doing many checks, it is usually
 	 * more efficient to only call this method if {@link #aabbIntersectsSegment(float, float, float, float)} return true. */
 	public BoundingBoxAttachment intersectsSegment (float x1, float y1, float x2, float y2) {
-		Array<BoundingBoxAttachment> boundingBoxes = this.boundingBoxAttachments;
+		Array<BoundingBoxAttachment> boundingBoxes = this.boundingBoxes;
 		for (int i = 0, n = boundingBoxes.size; i < n; i++) {
 			BoundingBoxAttachment attachment = boundingBoxes.get(i);
 			if (intersectsSegment(attachment, x1, y1, x2, y2)) return attachment;
@@ -124,10 +181,18 @@ public class SkeletonBounds {
 
 	/** Returns true if the bounding box attachment contains the line segment. */
 	public boolean intersectsSegment (BoundingBoxAttachment attachment, float x1, float y1, float x2, float y2) {
-		float[] vertices = attachment.getVertices();
+		int index = boundingBoxes.indexOf(attachment, true);
+		return index == -1 ? false : intersectsSegment(index, x1, y1, x2, y2);
+	}
+
+	/** Returns true if the bounding box attachment contains the line segment. */
+	public boolean intersectsSegment (int index, float x1, float y1, float x2, float y2) {
+		FloatArray polygon = polygons.get(index);
+		float[] vertices = polygon.items;
+		int nn = polygon.size;
+
 		float width12 = x1 - x2, height12 = y1 - y2;
 		float det1 = x1 * y2 - y1 * x2;
-		int nn = vertices.length;
 		float x3 = vertices[nn - 2], y3 = vertices[nn - 1];
 		for (int ii = 0; ii < nn; ii += 2) {
 			float x4 = vertices[ii], y4 = vertices[ii + 1];
@@ -141,7 +206,6 @@ public class SkeletonBounds {
 			}
 			x3 = x4;
 			y3 = y4;
-
 		}
 		return false;
 	}
@@ -176,7 +240,17 @@ public class SkeletonBounds {
 		return maxY - minY;
 	}
 
-	public Array<BoundingBoxAttachment> getBoundingBoxAttachments () {
-		return boundingBoxAttachments;
+	public Array<BoundingBoxAttachment> getBoundingBoxes () {
+		return boundingBoxes;
+	}
+
+	public Array<FloatArray> getPolygons () {
+		return polygons;
+	}
+
+	/** Returns the polygon for the specified bounding box, or null. */
+	public FloatArray getPolygon (BoundingBoxAttachment boundingBox) {
+		int index = boundingBoxes.indexOf(boundingBox, true);
+		return index == -1 ? null : polygons.get(index);
 	}
 }

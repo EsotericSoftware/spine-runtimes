@@ -8,10 +8,10 @@
 	{ "name": "torso", "parent": "hip", "length": 85.82, "x": -6.42, "y": 1.97, "rotation": 93.92 },
 	{ "name": "left lower leg", "parent": "left upper leg", "length": 49.89, "x": 56.34, "y": 0.98, "rotation": -16.65 },
 	{ "name": "left shoulder", "parent": "torso", "length": 35.43, "x": 74.04, "y": -20.38, "rotation": -156.96 },
-	{ "name": "neck", "parent": "torso", "length": 18.38, "x": 81.67, "y": -6.34, "rotation": -1.51 },
+	{ "name": "neck", "parent": "torso", "length": 18.38, "x": 81.67, "y": -6.34, "rotation": -13.92 },
 	{ "name": "right lower leg", "parent": "right upper leg", "length": 58.52, "x": 42.99, "y": -0.61, "rotation": -14.34 },
 	{ "name": "right shoulder", "parent": "torso", "length": 37.24, "x": 76.02, "y": 18.14, "rotation": 133.88 },
-	{ "name": "head", "parent": "neck", "length": 68.28, "x": 20.93, "y": 11.59, "rotation": -13.92 },
+	{ "name": "head", "parent": "neck", "length": 68.28, "x": 20.93, "y": 11.59 },
 	{ "name": "left arm", "parent": "left shoulder", "length": 35.62, "x": 37.85, "y": -2.34, "rotation": 28.16 },
 	{ "name": "left foot", "parent": "left lower leg", "length": 46.5, "x": 58.94, "y": -7.61, "rotation": 102.43 },
 	{ "name": "right arm", "parent": "right shoulder", "length": 36.74, "x": 37.6, "y": 0.31, "rotation": 36.32 },
@@ -26,7 +26,7 @@
 	{ "name": "left hand", "bone": "left hand", "attachment": "left hand" },
 	{ "name": "left foot", "bone": "left foot", "attachment": "left foot" },
 	{ "name": "left lower leg", "bone": "left lower leg", "attachment": "left lower leg" },
-	{ "name": "left upper leg", "bone": "left upper leg", "attachment": "left upper leg" },
+	{ "name": "left upper leg", "bone": "left upper leg", "attachment": "boundingbox" },
 	{ "name": "neck", "bone": "neck", "attachment": "neck" },
 	{ "name": "torso", "bone": "torso", "attachment": "torso" },
 	{ "name": "pelvis", "bone": "pelvis", "attachment": "pelvis" },
@@ -40,13 +40,69 @@
 	{ "name": "right shoulder", "bone": "right shoulder", "attachment": "right shoulder" },
 	{ "name": "right arm", "bone": "right arm", "attachment": "right arm" },
 	{ "name": "right hand item", "bone": "right hand", "attachment": "dagger" },
-	{ "name": "right hand", "bone": "right hand", "attachment": "right hand" }
+	{ "name": "right hand", "bone": "right hand", "attachment": "right hand" },
+	{ "name": "bounding box", "bone": "head", "attachment": "bbox" }
 ],
 "skins": {
 	"default": {
+		"bounding box": {
+			"bbox": {
+				"type": "boundingbox",
+				"points": [
+					-7.2252045,
+					-34.808647,
+					-1.9847412,
+					-40.70198,
+					12.63089,
+					-37.503178,
+					13.559738,
+					-44.273937,
+					21.15651,
+					-45.197586,
+					25.916733,
+					-36.59557,
+					30.31987,
+					-37.271088,
+					31.82283,
+					-47.966175,
+					36.74109,
+					-47.863335,
+					37.828888,
+					-37.763573,
+					52.86676,
+					-18.987732,
+					54.687653,
+					4.058235,
+					42.064606,
+					24.16484,
+					37.09868,
+					25.39936,
+					36.084442,
+					44.725235,
+					28.417389,
+					53.716904,
+					23.382614,
+					49.773712,
+					28.766006,
+					39.868294,
+					25.873352,
+					27.605164,
+					8.960373,
+					14.733994,
+					-0.746933,
+					1.7576027
+				]
+			}
+		},
 		"left hand item": {
 			"dagger": { "x": 7.88, "y": -23.45, "rotation": 10.47, "width": 26, "height": 108 },
 			"spear": { "x": -4.55, "y": 39.2, "rotation": 13.04, "width": 22, "height": 368 }
+		},
+		"left upper leg": {
+			"boundingbox": {
+				"type": "boundingbox",
+				"points": [ -73.94766, 8.514406, -49.917465, 25.294191, -79.28125, 46.664314, -95.755325, 34.604897, -74.9664, 27.453112 ]
+			}
 		},
 		"right hand item": {
 			"dagger": { "x": 6.51, "y": -24.15, "rotation": -8.06, "width": 26, "height": 108 }
@@ -499,9 +555,9 @@
 			}
 		},
 		"events": [
-			{ "time": 0.46666667, "name": "test1" },
-			{ "time": 0.53333336, "name": "test2" },
-			{ "time": 0.93333334, "name": "test1" }
+			{ "time": 0.4666, "name": "test1" },
+			{ "time": 0.5333, "name": "test2" },
+			{ "time": 0.9333, "name": "test1" }
 		]
 	}
 }
