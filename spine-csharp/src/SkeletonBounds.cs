@@ -133,8 +133,10 @@ namespace Spine {
 				} else
 					polygon = new Polygon();
 				polygons.Add(polygon);
-				polygon.Count = boundingBox.Vertices.Length;
-				if (polygon.Vertices.Length < polygon.Count) polygon.Vertices = new float[polygon.Count];
+
+				int count = boundingBox.Vertices.Length;
+				polygon.Count = count;
+				if (polygon.Vertices.Length < count) polygon.Vertices = new float[count];
 				boundingBox.ComputeWorldVertices(x, y, slot.Bone, polygon.Vertices);
 			}
 		}

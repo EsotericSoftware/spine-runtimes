@@ -48,27 +48,47 @@ namespace Spine {
 			Duration = duration;
 		}
 
-		/** Poses the skeleton at the specified time for this animation. */
+		/** @deprecated */
 		public void Apply (Skeleton skeleton, float time, bool loop) {
+			Apply(skeleton, time, time, loop, null);
+		}
+
+		/** Poses the skeleton at the specified time for this animation.
+		 * @param lastTime The last time the animation was applied. Can be equal to time if events shouldn't be fired.
+		 * @param events Any triggered events are added. May be null if lastTime is known to not cause any events to trigger. */
+		public void Apply (Skeleton skeleton, float lastTime, float time, bool loop, List<Event> events) {
 			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
 
-			if (loop && Duration != 0) time %= Duration;
+			if (loop && Duration != 0) {
+				time %= Duration;
+				lastTime %= Duration;
+			}
 
 			List<Timeline> timelines = Timelines;
 			for (int i = 0, n = timelines.Count; i < n; i++)
-				timelines[i].Apply(skeleton, time, 1);
+				timelines[i].Apply(skeleton, lastTime, time, 1, events);
+		}
+
+		/** @deprecated */
+		public void Mix (Skeleton skeleton, float time, bool loop, float alpha) {
+			Mix(skeleton, time, time, loop, null, alpha);
 		}
 
 		/** Poses the skeleton at the specified time for this animation mixed with the current pose.
+		 * @param lastTime The last time the animation was applied. Can be equal to time if events shouldn't be fired.
+		 * @param events Any triggered events are added. May be null if lastTime is known to not cause any events to trigger.
 		 * @param alpha The amount of this animation that affects the current pose. */
-		public void Mix (Skeleton skeleton, float time, bool loop, float alpha) {
+		public void Mix (Skeleton skeleton, float lastTime, float time, bool loop, List<Event> events, float alpha) {
 			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
 
-			if (loop && Duration != 0) time %= Duration;
+			if (loop && Duration != 0) {
+				time %= Duration;
+				lastTime %= Duration;
+			}
 
 			List<Timeline> timelines = Timelines;
 			for (int i = 0, n = timelines.Count; i < n; i++)
-				timelines[i].Apply(skeleton, time, alpha);
+				timelines[i].Apply(skeleton, lastTime, time, alpha, events);
 		}
 
 		/** @param target After the first and before the last entry. */
@@ -96,7 +116,7 @@ namespace Spine {
 
 	public interface Timeline {
 		/** Sets the value(s) for the specified time. */
-		void Apply (Skeleton skeleton, float time, float alpha);
+		void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents);
 	}
 
 	/** Base class for frames that use an interpolation bezier curve. */
@@ -116,7 +136,7 @@ namespace Spine {
 			curves = new float[(frameCount - 1) * 6];
 		}
 
-		abstract public void Apply (Skeleton skeleton, float time, float alpha);
+		abstract public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents);
 
 		public void SetLinear (int frameIndex) {
 			curves[frameIndex * 6] = LINEAR;
@@ -202,7 +222,7 @@ namespace Spine {
 			Frames[frameIndex + 1] = angle;
 		}
 
-		override public void Apply (Skeleton skeleton, float time, float alpha) {
+		override public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents) {
 			float[] frames = Frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -262,7 +282,7 @@ namespace Spine {
 			Frames[frameIndex + 2] = y;
 		}
 
-		override public void Apply (Skeleton skeleton, float time, float alpha) {
+		override public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents) {
 			float[] frames = Frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -292,7 +312,7 @@ namespace Spine {
 			: base(frameCount) {
 		}
 
-		override public void Apply (Skeleton skeleton, float time, float alpha) {
+		override public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents) {
 			float[] frames = Frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -341,7 +361,7 @@ namespace Spine {
 			Frames[frameIndex + 4] = a;
 		}
 
-		override public void Apply (Skeleton skeleton, float time, float alpha) {
+		override public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents) {
 			float[] frames = Frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -405,7 +425,7 @@ namespace Spine {
 			AttachmentNames[frameIndex] = attachmentName;
 		}
 
-		public void Apply (Skeleton skeleton, float time, float alpha) {
+		public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents) {
 			float[] frames = Frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -418,6 +438,57 @@ namespace Spine {
 			String attachmentName = AttachmentNames[frameIndex];
 			skeleton.Slots[SlotIndex].Attachment =
 				 attachmentName == null ? null : skeleton.GetAttachment(SlotIndex, attachmentName);
+		}
+	}
+
+	public class EventTimeline : Timeline {
+		public float[] Frames { get; private set; } // time, ...
+		public Event[] Events { get; private set; }
+		public int FrameCount {
+			get {
+				return Frames.Length;
+			}
+		}
+
+		public EventTimeline (int frameCount) {
+			Frames = new float[frameCount];
+			Events = new Event[frameCount];
+		}
+
+		/** Sets the time and value of the specified keyframe. */
+		public void setFrame (int frameIndex, float time, Event e) {
+			Frames[frameIndex] = time;
+			Events[frameIndex] = e;
+		}
+
+		public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents) {
+			float[] frames = Frames;
+			if (time < frames[0]) return; // Time is before first frame.
+
+			int frameCount = frames.Length;
+			if (lastTime >= frames[frameCount - 1]) return; // Last time is after last frame.
+
+			if (lastTime > time) {
+				// Fire events after last time for looped animations.
+				Apply(skeleton, lastTime, int.MaxValue, alpha, firedEvents);
+				lastTime = 0;
+			}
+
+			int frameIndex;
+			if (frameCount == 1)
+				frameIndex = 0;
+			else {
+				frameIndex = Animation.binarySearch(frames, lastTime, 1);
+				float frame = frames[frameIndex];
+				while (frameIndex > 0) {
+					float lastFrame = frames[frameIndex - 1];
+					// Fire multiple events with the same frame and events that occurred at lastTime.
+					if (lastFrame != frame && lastFrame != lastTime) break;
+					frameIndex--;
+				}
+			}
+			for (; frameIndex < frameCount && time > frames[frameIndex]; frameIndex++)
+				firedEvents.Add(Events[frameIndex]);
 		}
 	}
 
@@ -441,7 +512,7 @@ namespace Spine {
 			DrawOrders[frameIndex] = drawOrder;
 		}
 
-		public void Apply (Skeleton skeleton, float time, float alpha) {
+		public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents) {
 			float[] frames = Frames;
 			if (time < frames[0]) return; // Time is before first frame.
 

@@ -42,12 +42,14 @@ namespace Spine {
 		public List<Skin> Skins { get; private set; }
 		/** May be null. */
 		public Skin DefaultSkin;
+		public List<EventData> Events { get; private set; }
 		public List<Animation> Animations { get; private set; }
 
 		public SkeletonData () {
 			Bones = new List<BoneData>();
 			Slots = new List<SlotData>();
 			Skins = new List<Skin>();
+			Events = new List<EventData>();
 			Animations = new List<Animation>();
 		}
 
@@ -114,6 +116,21 @@ namespace Spine {
 			if (skinName == null) throw new ArgumentNullException("skinName cannot be null.");
 			foreach (Skin skin in Skins)
 				if (skin.Name == skinName) return skin;
+			return null;
+		}
+
+		// --- Events.
+
+		public void AddEvent (EventData eventData) {
+			if (eventData == null) throw new ArgumentNullException("eventData cannot be null.");
+			Events.Add(eventData);
+		}
+
+		/** @return May be null. */
+		public EventData findEvent (String eventDataName) {
+			if (eventDataName == null) throw new ArgumentNullException("eventDataName cannot be null.");
+			foreach (EventData eventData in Events)
+				if (eventData.Name == eventDataName) return eventData;
 			return null;
 		}
 

@@ -86,6 +86,11 @@ namespace Spine {
 			}
 
 			state = new AnimationState(stateData);
+			state.Start += new EventHandler(Start);
+			state.End += new EventHandler(End);
+			state.Complete += new EventHandler<CompleteArgs>(Complete);
+			state.Event += new EventHandler<EventTriggeredArgs>(Event);
+
 			if (true) {
 				state.SetAnimation("drawOrder", true);
 			} else {
@@ -139,6 +144,22 @@ namespace Spine {
 			}
 
 			base.Draw(gameTime);
+		}
+
+		public void Start (object sender, EventArgs e) {
+			Console.WriteLine("start");
+		}
+
+		public void End (object sender, EventArgs e) {
+			Console.WriteLine("end");
+		}
+
+		public void Complete (object sender, CompleteArgs e) {
+			Console.WriteLine("complete " + e.LoopCount);
+		}
+
+		public void Event (object sender, EventTriggeredArgs e) {
+			Console.WriteLine("event " + e.Event);
 		}
 	}
 }

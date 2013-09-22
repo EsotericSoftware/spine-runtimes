@@ -118,8 +118,7 @@ namespace Spine {
 
 			// Slots.
 			if (root.ContainsKey("slots")) {
-				var slots = (List<Object>)root["slots"];
-				foreach (Dictionary<String, Object> slotMap in slots) {
+				foreach (Dictionary<String, Object> slotMap in (List<Object>)root["slots"]) {
 					String slotName = (String)slotMap["name"];
 					String boneName = (String)slotMap["bone"];
 					BoneData boneData = skeletonData.FindBone(boneName);
@@ -147,8 +146,7 @@ namespace Spine {
 
 			// Skins.
 			if (root.ContainsKey("skins")) {
-				var skinMap = (Dictionary<String, Object>)root["skins"];
-				foreach (KeyValuePair<String, Object> entry in skinMap) {
+				foreach (KeyValuePair<String, Object> entry in (Dictionary<String, Object>)root["skins"]) {
 					Skin skin = new Skin(entry.Key);
 					foreach (KeyValuePair<String, Object> slotEntry in (Dictionary<String, Object>)entry.Value) {
 						int slotIndex = skeletonData.FindSlotIndex(slotEntry.Key);
@@ -163,11 +161,21 @@ namespace Spine {
 				}
 			}
 
+			// Events.
+			if (root.ContainsKey("events")) {
+				foreach (KeyValuePair<String, Object> entry in (Dictionary<String, Object>)root["events"]) {
+					var entryMap = (Dictionary<String, Object>)entry.Value;
+					EventData eventData = new EventData(entry.Key);
+					eventData.Int = GetInt(entryMap, "int", 0);
+					eventData.Float = GetFloat(entryMap, "float", 0);
+					eventData.String = GetString(entryMap, "string", null);
+					skeletonData.AddEvent(eventData);
+				}
+			}
 
 			// Animations.
 			if (root.ContainsKey("animations")) {
-				var animationMap = (Dictionary<String, Object>)root["animations"];
-				foreach (KeyValuePair<String, Object> entry in animationMap)
+				foreach (KeyValuePair<String, Object> entry in (Dictionary<String, Object>)root["animations"])
 					ReadAnimation(entry.Key, (Dictionary<String, Object>)entry.Value, skeletonData);
 			}
 
@@ -213,14 +221,26 @@ namespace Spine {
 
 		private float GetFloat (Dictionary<String, Object> map, String name, float defaultValue) {
 			if (!map.ContainsKey(name))
-				return (float)defaultValue;
+				return defaultValue;
 			return (float)map[name];
+		}
+
+		private int GetInt (Dictionary<String, Object> map, String name, int defaultValue) {
+			if (!map.ContainsKey(name))
+				return defaultValue;
+			return (int)map[name];
 		}
 
 		private bool GetBoolean (Dictionary<String, Object> map, String name, bool defaultValue) {
 			if (!map.ContainsKey(name))
-				return (bool)defaultValue;
+				return defaultValue;
 			return (bool)map[name];
+		}
+
+		private String GetString (Dictionary<String, Object> map, String name, String defaultValue) {
+			if (!map.ContainsKey(name))
+				return defaultValue;
+			return (String)map[name];
 		}
 
 		public static float ToColor (String hexString, int colorIndex) {
@@ -234,8 +254,7 @@ namespace Spine {
 			float duration = 0;
 
 			if (map.ContainsKey("bones")) {
-				var bonesMap = (Dictionary<String, Object>)map["bones"];
-				foreach (KeyValuePair<String, Object> entry in bonesMap) {
+				foreach (KeyValuePair<String, Object> entry in (Dictionary<String, Object>)map["bones"]) {
 					String boneName = entry.Key;
 					int boneIndex = skeletonData.FindBoneIndex(boneName);
 					if (boneIndex == -1)
@@ -289,8 +308,7 @@ namespace Spine {
 			}
 
 			if (map.ContainsKey("slots")) {
-				var slotsMap = (Dictionary<String, Object>)map["slots"];
-				foreach (KeyValuePair<String, Object> entry in slotsMap) {
+				foreach (KeyValuePair<String, Object> entry in (Dictionary<String, Object>)map["slots"]) {
 					String slotName = entry.Key;
 					int slotIndex = skeletonData.FindSlotIndex(slotName);
 					var timelineMap = (Dictionary<String, Object>)entry.Value;
@@ -329,6 +347,23 @@ namespace Spine {
 							throw new Exception("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
 					}
 				}
+			}
+
+			if (map.ContainsKey("events")) {
+				var eventsMap = (List<Object>)map["events"];
+				EventTimeline timeline = new EventTimeline(eventsMap.Count);
+				int frameIndex = 0;
+				foreach (Dictionary<String, Object> eventMap in eventsMap) {
+					EventData eventData = skeletonData.findEvent((String)eventMap["name"]);
+					if (eventData == null) throw new Exception("Event not found: " + eventMap["name"]);
+					Event e = new Event(eventData);
+					e.Int = GetInt(eventMap, "int", eventData.Int);
+					e.Float = GetFloat(eventMap, "float", eventData.Float);
+					e.String = GetString(eventMap, "string", eventData.String);
+					timeline.setFrame(frameIndex++, (float)eventMap["time"], e);
+				}
+				timelines.Add(timeline);
+				duration = Math.Max(duration, timeline.Frames[timeline.FrameCount - 1]);
 			}
 
 			if (map.ContainsKey("draworder")) {
