@@ -122,5 +122,11 @@
     <Compile Include="..\..\..\spine-xna\src\XnaTextureLoader.cs">
       <Link>spine-xna\XnaTextureLoader.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Event.cs">
+      <Link>spine-csharp\Event.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\EventData.cs">
+      <Link>spine-csharp\EventData.cs</Link>
+    </Compile>
   </ItemGroup>
 </Project>
