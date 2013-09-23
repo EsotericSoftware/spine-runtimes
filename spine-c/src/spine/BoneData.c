@@ -40,6 +40,8 @@ BoneData* BoneData_create (const char* name, BoneData* parent) {
 	CONST_CAST(BoneData*, self->parent) = parent;
 	self->scaleX = 1;
 	self->scaleY = 1;
+	self->inheritScale = 1;
+	self->inheritRotation = 1;
 	return self;
 }
 

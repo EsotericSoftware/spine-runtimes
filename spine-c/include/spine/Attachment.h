@@ -41,7 +41,7 @@ extern "C" {
 struct Slot;
 
 typedef enum {
-	ATTACHMENT_REGION, ATTACHMENT_REGION_SEQUENCE
+	ATTACHMENT_REGION, ATTACHMENT_REGION_SEQUENCE, ATTACHMENT_BOUNDING_BOX
 } AttachmentType;
 
 typedef struct Attachment Attachment;

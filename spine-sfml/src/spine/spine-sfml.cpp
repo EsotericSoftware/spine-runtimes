@@ -44,6 +44,7 @@ using namespace sf;
 void _AtlasPage_createTexture (AtlasPage* self, const char* path) {
 	Texture* texture = new Texture();
 	if (!texture->loadFromFile(path)) return;
+	texture->setSmooth(true);
 	self->rendererObject = texture;
 	Vector2u size = texture->getSize();
 	self->width = size.x;

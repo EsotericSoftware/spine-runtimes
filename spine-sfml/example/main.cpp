@@ -45,6 +45,10 @@ void spineboy () {
 	Atlas* atlas = Atlas_readAtlasFile("../data/spineboy.atlas");
 	SkeletonJson* json = SkeletonJson_create(atlas);
 	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "../data/spineboy.json");
+	if (!skeletonData) {
+		printf("%s\n", json->error);
+		exit(0);
+	}
 	SkeletonJson_dispose(json);
 
 	// Configure mixing.
@@ -67,10 +71,6 @@ void spineboy () {
 	AnimationState_setAnimationByName(drawable->state, "walk", true);
 	AnimationState_addAnimationByName(drawable->state, "jump", false, 0);
 	AnimationState_addAnimationByName(drawable->state, "walk", true, 0);
-	AnimationState_addAnimationByName(drawable->state, "jump", false, 3);
-	AnimationState_addAnimationByName(drawable->state, "walk", true, 0);
-	AnimationState_addAnimationByName(drawable->state, 0, true, 0);
-	AnimationState_addAnimationByName(drawable->state, "walk", false, 1);
 
 	sf::RenderWindow window(sf::VideoMode(640, 480), "Spine SFML");
 	window.setFramerateLimit(60);

@@ -370,7 +370,9 @@ SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* jso
 					AttachmentType type;
 					if (strcmp(typeString, "region") == 0)
 						type = ATTACHMENT_REGION;
-					else if (strcmp(typeString, "regionSequence") == 0)
+					else if (strcmp(typeString, "boundingbox") == 0)
+						type = ATTACHMENT_BOUNDING_BOX;
+					else if (strcmp(typeString, "regionsequence") == 0)
 						type = ATTACHMENT_REGION_SEQUENCE;
 					else {
 						SkeletonData_dispose(skeletonData);

@@ -31,8 +31,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-//
-
 /* This demonstrates implementing an extension to spine-c. spine/extension.h declares the functions that must be implemented along
  * with internal methods exposed to facilitate extension. */
 
