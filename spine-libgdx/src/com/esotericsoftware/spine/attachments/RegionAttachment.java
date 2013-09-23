@@ -121,14 +121,14 @@ public class RegionAttachment extends Attachment {
 		this.region = region;
 		float[] vertices = this.vertices;
 		if (region instanceof AtlasRegion && ((AtlasRegion)region).rotate) {
-			vertices[U2] = region.getU();
-			vertices[V2] = region.getV();
-			vertices[U3] = region.getU2();
-			vertices[V3] = region.getV();
-			vertices[U4] = region.getU2();
-			vertices[V4] = region.getV2();
-			vertices[U1] = region.getU();
-			vertices[V1] = region.getV2();
+			vertices[U3] = region.getU();
+			vertices[V3] = region.getV2();
+			vertices[U4] = region.getU();
+			vertices[V4] = region.getV();
+			vertices[U1] = region.getU2();
+			vertices[V1] = region.getV();
+			vertices[U2] = region.getU2();
+			vertices[V2] = region.getV2();
 		} else {
 			vertices[U2] = region.getU();
 			vertices[V2] = region.getV2();
