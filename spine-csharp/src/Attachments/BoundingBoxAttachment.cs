@@ -44,12 +44,12 @@ namespace Spine {
 
 		/** @param worldVertices Must have at least the same length as this attachment's vertices. */
 		public void ComputeWorldVertices (float x, float y, Bone bone, float[] worldVertices) {
-			x += bone.WorldX;
-			y += bone.WorldY;
-			float m00 = bone.M00;
-			float m01 = bone.M01;
-			float m10 = bone.M10;
-			float m11 = bone.M11;
+			x += bone.worldX;
+			y += bone.worldY;
+			float m00 = bone.m00;
+			float m01 = bone.m01;
+			float m10 = bone.m10;
+			float m11 = bone.m11;
 			float[] vertices = Vertices;
 			for (int i = 0, n = vertices.Length; i < n; i += 2) {
 				float px = vertices[i];

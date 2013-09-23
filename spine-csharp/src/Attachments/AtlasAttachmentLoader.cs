@@ -50,12 +50,12 @@ namespace Spine {
 				RegionAttachment attachment = new RegionAttachment(name);
 				attachment.RendererObject = region;
 				attachment.SetUVs(region.u, region.v, region.u2, region.v2, region.rotate);
-				attachment.RegionOffsetX = region.offsetX;
-				attachment.RegionOffsetY = region.offsetY;
-				attachment.RegionWidth = region.width;
-				attachment.RegionHeight = region.height;
-				attachment.RegionOriginalWidth = region.originalWidth;
-				attachment.RegionOriginalHeight = region.originalHeight;
+				attachment.regionOffsetX = region.offsetX;
+				attachment.regionOffsetY = region.offsetY;
+				attachment.regionWidth = region.width;
+				attachment.regionHeight = region.height;
+				attachment.regionOriginalWidth = region.originalWidth;
+				attachment.regionOriginalHeight = region.originalHeight;
 				return attachment;
 			case AttachmentType.boundingbox:
 				return new BoundingBoxAttachment(name);

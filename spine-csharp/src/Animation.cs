@@ -36,16 +36,20 @@ using System.Collections.Generic;
 
 namespace Spine {
 	public class Animation {
-		public String Name { get; private set; }
-		public List<Timeline> Timelines { get; set; }
-		public float Duration { get; set; }
+		internal List<Timeline> timelines;
+		internal float duration;
+		internal String name;
+
+		public String Name { get { return name; } }
+		public List<Timeline> Timelines { get { return timelines; } set { timelines = value; } }
+		public float Duration { get { return duration; } set { duration = value; } }
 
 		public Animation (String name, List<Timeline> timelines, float duration) {
 			if (name == null) throw new ArgumentNullException("name cannot be null.");
 			if (timelines == null) throw new ArgumentNullException("timelines cannot be null.");
-			Name = name;
-			Timelines = timelines;
-			Duration = duration;
+			this.name = name;
+			this.timelines = timelines;
+			this.duration = duration;
 		}
 
 		/** @deprecated */
@@ -59,12 +63,12 @@ namespace Spine {
 		public void Apply (Skeleton skeleton, float lastTime, float time, bool loop, List<Event> events) {
 			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
 
-			if (loop && Duration != 0) {
-				time %= Duration;
-				lastTime %= Duration;
+			if (loop && duration != 0) {
+				time %= duration;
+				lastTime %= duration;
 			}
 
-			List<Timeline> timelines = Timelines;
+			List<Timeline> timelines = this.timelines;
 			for (int i = 0, n = timelines.Count; i < n; i++)
 				timelines[i].Apply(skeleton, lastTime, time, 1, events);
 		}
@@ -81,12 +85,12 @@ namespace Spine {
 		public void Mix (Skeleton skeleton, float lastTime, float time, bool loop, List<Event> events, float alpha) {
 			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
 
-			if (loop && Duration != 0) {
-				time %= Duration;
-				lastTime %= Duration;
+			if (loop && duration != 0) {
+				time %= duration;
+				lastTime %= duration;
 			}
 
-			List<Timeline> timelines = Timelines;
+			List<Timeline> timelines = this.timelines;
 			for (int i = 0, n = timelines.Count; i < n; i++)
 				timelines[i].Apply(skeleton, lastTime, time, alpha, events);
 		}
@@ -126,11 +130,7 @@ namespace Spine {
 		static protected int BEZIER_SEGMENTS = 10;
 
 		private float[] curves; // dfx, dfy, ddfx, ddfy, dddfx, dddfy, ...
-		public int FrameCount {
-			get {
-				return curves.Length / 6 + 1;
-			}
-		}
+		public int FrameCount { get { return curves.Length / 6 + 1; } }
 
 		public CurveTimeline (int frameCount) {
 			curves = new float[(frameCount - 1) * 6];
@@ -207,36 +207,39 @@ namespace Spine {
 		static protected int LAST_FRAME_TIME = -2;
 		static protected int FRAME_VALUE = 1;
 
-		public int BoneIndex { get; set; }
-		public float[] Frames { get; private set; } // time, value, ...
+		internal int boneIndex;
+		internal float[] frames;
+
+		public int BoneIndex { get { return boneIndex; } set { boneIndex = value; } }
+		public float[] Frames { get { return frames; } set { frames = value; } } // time, value, ...
 
 		public RotateTimeline (int frameCount)
 			: base(frameCount) {
-			Frames = new float[frameCount * 2];
+			frames = new float[frameCount * 2];
 		}
 
 		/** Sets the time and value of the specified keyframe. */
 		public void SetFrame (int frameIndex, float time, float angle) {
 			frameIndex *= 2;
-			Frames[frameIndex] = time;
-			Frames[frameIndex + 1] = angle;
+			frames[frameIndex] = time;
+			frames[frameIndex + 1] = angle;
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents) {
-			float[] frames = Frames;
+			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			Bone bone = skeleton.Bones[BoneIndex];
+			Bone bone = skeleton.bones[boneIndex];
 
 			float amount;
 
 			if (time >= frames[frames.Length - 2]) { // Time is after last frame.
-				amount = bone.Data.Rotation + frames[frames.Length - 1] - bone.Rotation;
+				amount = bone.data.rotation + frames[frames.Length - 1] - bone.rotation;
 				while (amount > 180)
 					amount -= 360;
 				while (amount < -180)
 					amount += 360;
-				bone.Rotation += amount * alpha;
+				bone.rotation += amount * alpha;
 				return;
 			}
 
@@ -252,12 +255,12 @@ namespace Spine {
 				amount -= 360;
 			while (amount < -180)
 				amount += 360;
-			amount = bone.Data.Rotation + (lastFrameValue + amount * percent) - bone.Rotation;
+			amount = bone.data.rotation + (lastFrameValue + amount * percent) - bone.rotation;
 			while (amount > 180)
 				amount -= 360;
 			while (amount < -180)
 				amount += 360;
-			bone.Rotation += amount * alpha;
+			bone.rotation += amount * alpha;
 		}
 	}
 
@@ -266,31 +269,34 @@ namespace Spine {
 		static protected int FRAME_X = 1;
 		static protected int FRAME_Y = 2;
 
-		public int BoneIndex { get; set; }
-		public float[] Frames { get; private set; } // time, value, value, ...
+		internal int boneIndex;
+		internal float[] frames;
+
+		public int BoneIndex { get { return boneIndex; } set { boneIndex = value; } }
+		public float[] Frames { get { return frames; } set { frames = value; } } // time, value, value, ...
 
 		public TranslateTimeline (int frameCount)
 			: base(frameCount) {
-			Frames = new float[frameCount * 3];
+			frames = new float[frameCount * 3];
 		}
 
 		/** Sets the time and value of the specified keyframe. */
 		public void SetFrame (int frameIndex, float time, float x, float y) {
 			frameIndex *= 3;
-			Frames[frameIndex] = time;
-			Frames[frameIndex + 1] = x;
-			Frames[frameIndex + 2] = y;
+			frames[frameIndex] = time;
+			frames[frameIndex + 1] = x;
+			frames[frameIndex + 2] = y;
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents) {
-			float[] frames = Frames;
+			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			Bone bone = skeleton.Bones[BoneIndex];
+			Bone bone = skeleton.bones[boneIndex];
 
 			if (time >= frames[frames.Length - 3]) { // Time is after last frame.
-				bone.X += (bone.Data.X + frames[frames.Length - 2] - bone.X) * alpha;
-				bone.Y += (bone.Data.Y + frames[frames.Length - 1] - bone.Y) * alpha;
+				bone.x += (bone.data.x + frames[frames.Length - 2] - bone.x) * alpha;
+				bone.y += (bone.data.y + frames[frames.Length - 1] - bone.y) * alpha;
 				return;
 			}
 
@@ -302,8 +308,8 @@ namespace Spine {
 			float percent = 1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime);
 			percent = GetCurvePercent(frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-			bone.X += (bone.Data.X + lastFrameX + (frames[frameIndex + FRAME_X] - lastFrameX) * percent - bone.X) * alpha;
-			bone.Y += (bone.Data.Y + lastFrameY + (frames[frameIndex + FRAME_Y] - lastFrameY) * percent - bone.Y) * alpha;
+			bone.x += (bone.data.x + lastFrameX + (frames[frameIndex + FRAME_X] - lastFrameX) * percent - bone.x) * alpha;
+			bone.y += (bone.data.y + lastFrameY + (frames[frameIndex + FRAME_Y] - lastFrameY) * percent - bone.y) * alpha;
 		}
 	}
 
@@ -313,13 +319,13 @@ namespace Spine {
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents) {
-			float[] frames = Frames;
+			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			Bone bone = skeleton.Bones[BoneIndex];
+			Bone bone = skeleton.bones[boneIndex];
 			if (time >= frames[frames.Length - 3]) { // Time is after last frame.
-				bone.ScaleX += (bone.Data.ScaleX - 1 + frames[frames.Length - 2] - bone.ScaleX) * alpha;
-				bone.ScaleY += (bone.Data.ScaleY - 1 + frames[frames.Length - 1] - bone.ScaleY) * alpha;
+				bone.scaleX += (bone.data.scaleX - 1 + frames[frames.Length - 2] - bone.scaleX) * alpha;
+				bone.scaleY += (bone.data.scaleY - 1 + frames[frames.Length - 1] - bone.scaleY) * alpha;
 				return;
 			}
 
@@ -331,8 +337,8 @@ namespace Spine {
 			float percent = 1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime);
 			percent = GetCurvePercent(frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-			bone.ScaleX += (bone.Data.ScaleX - 1 + lastFrameX + (frames[frameIndex + FRAME_X] - lastFrameX) * percent - bone.ScaleX) * alpha;
-			bone.ScaleY += (bone.Data.ScaleY - 1 + lastFrameY + (frames[frameIndex + FRAME_Y] - lastFrameY) * percent - bone.ScaleY) * alpha;
+			bone.scaleX += (bone.data.scaleX - 1 + lastFrameX + (frames[frameIndex + FRAME_X] - lastFrameX) * percent - bone.scaleX) * alpha;
+			bone.scaleY += (bone.data.scaleY - 1 + lastFrameY + (frames[frameIndex + FRAME_Y] - lastFrameY) * percent - bone.scaleY) * alpha;
 		}
 	}
 
@@ -343,36 +349,39 @@ namespace Spine {
 		static protected int FRAME_B = 3;
 		static protected int FRAME_A = 4;
 
-		public int SlotIndex { get; set; }
-		public float[] Frames { get; private set; } // time, r, g, b, a, ...
+		internal int slotIndex;
+		internal float[] frames;
+
+		public int SlotIndex { get { return slotIndex; } set { slotIndex = value; } }
+		public float[] Frames { get { return frames; } set { frames = value; } } // time, r, g, b, a, ...
 
 		public ColorTimeline (int frameCount)
 			: base(frameCount) {
-			Frames = new float[frameCount * 5];
+			frames = new float[frameCount * 5];
 		}
 
 		/** Sets the time and value of the specified keyframe. */
 		public void setFrame (int frameIndex, float time, float r, float g, float b, float a) {
 			frameIndex *= 5;
-			Frames[frameIndex] = time;
-			Frames[frameIndex + 1] = r;
-			Frames[frameIndex + 2] = g;
-			Frames[frameIndex + 3] = b;
-			Frames[frameIndex + 4] = a;
+			frames[frameIndex] = time;
+			frames[frameIndex + 1] = r;
+			frames[frameIndex + 2] = g;
+			frames[frameIndex + 3] = b;
+			frames[frameIndex + 4] = a;
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents) {
-			float[] frames = Frames;
+			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			Slot slot = skeleton.Slots[SlotIndex];
+			Slot slot = skeleton.slots[slotIndex];
 
 			if (time >= frames[frames.Length - 5]) { // Time is after last frame.
 				int i = frames.Length - 1;
-				slot.R = frames[i - 3];
-				slot.G = frames[i - 2];
-				slot.B = frames[i - 1];
-				slot.A = frames[i];
+				slot.r = frames[i - 3];
+				slot.g = frames[i - 2];
+				slot.b = frames[i - 1];
+				slot.a = frames[i];
 				return;
 			}
 
@@ -391,42 +400,42 @@ namespace Spine {
 			float b = lastFrameB + (frames[frameIndex + FRAME_B] - lastFrameB) * percent;
 			float a = lastFrameA + (frames[frameIndex + FRAME_A] - lastFrameA) * percent;
 			if (alpha < 1) {
-				slot.R += (r - slot.R) * alpha;
-				slot.G += (g - slot.G) * alpha;
-				slot.B += (b - slot.B) * alpha;
-				slot.A += (a - slot.A) * alpha;
+				slot.r += (r - slot.r) * alpha;
+				slot.g += (g - slot.g) * alpha;
+				slot.b += (b - slot.b) * alpha;
+				slot.a += (a - slot.a) * alpha;
 			} else {
-				slot.R = r;
-				slot.G = g;
-				slot.B = b;
-				slot.A = a;
+				slot.r = r;
+				slot.g = g;
+				slot.b = b;
+				slot.a = a;
 			}
 		}
 	}
 
 	public class AttachmentTimeline : Timeline {
-		public int SlotIndex { get; set; }
-		public float[] Frames { get; private set; } // time, ...
-		public String[] AttachmentNames { get; private set; }
-		public int FrameCount {
-			get {
-				return Frames.Length;
-			}
-		}
+		internal int slotIndex;
+		internal float[] frames;
+		private String[] attachmentNames;
+
+		public int SlotIndex { get { return slotIndex; } set { slotIndex = value; } }
+		public float[] Frames { get { return frames; } set { frames = value; } } // time, ...
+		public String[] AttachmentNames { get { return attachmentNames; } set { attachmentNames = value; } }
+		public int FrameCount { get { return frames.Length; } }
 
 		public AttachmentTimeline (int frameCount) {
-			Frames = new float[frameCount];
-			AttachmentNames = new String[frameCount];
+			frames = new float[frameCount];
+			attachmentNames = new String[frameCount];
 		}
 
 		/** Sets the time and value of the specified keyframe. */
 		public void setFrame (int frameIndex, float time, String attachmentName) {
-			Frames[frameIndex] = time;
-			AttachmentNames[frameIndex] = attachmentName;
+			frames[frameIndex] = time;
+			attachmentNames[frameIndex] = attachmentName;
 		}
 
 		public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents) {
-			float[] frames = Frames;
+			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
 			int frameIndex;
@@ -435,34 +444,33 @@ namespace Spine {
 			else
 				frameIndex = Animation.binarySearch(frames, time, 1) - 1;
 
-			String attachmentName = AttachmentNames[frameIndex];
-			skeleton.Slots[SlotIndex].Attachment =
-				 attachmentName == null ? null : skeleton.GetAttachment(SlotIndex, attachmentName);
+			String attachmentName = attachmentNames[frameIndex];
+			skeleton.slots[slotIndex].Attachment =
+				 attachmentName == null ? null : skeleton.GetAttachment(slotIndex, attachmentName);
 		}
 	}
 
 	public class EventTimeline : Timeline {
-		public float[] Frames { get; private set; } // time, ...
-		public Event[] Events { get; private set; }
-		public int FrameCount {
-			get {
-				return Frames.Length;
-			}
-		}
+		internal float[] frames;
+		private Event[] events;
+
+		public float[] Frames { get { return frames; } set { frames = value; } } // time, ...
+		public Event[] Events { get { return events; } set { events = value; } }
+		public int FrameCount { get { return frames.Length; } }
 
 		public EventTimeline (int frameCount) {
-			Frames = new float[frameCount];
-			Events = new Event[frameCount];
+			frames = new float[frameCount];
+			events = new Event[frameCount];
 		}
 
 		/** Sets the time and value of the specified keyframe. */
 		public void setFrame (int frameIndex, float time, Event e) {
-			Frames[frameIndex] = time;
-			Events[frameIndex] = e;
+			frames[frameIndex] = time;
+			events[frameIndex] = e;
 		}
 
 		public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents) {
-			float[] frames = Frames;
+			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
 			int frameCount = frames.Length;
@@ -488,32 +496,31 @@ namespace Spine {
 				}
 			}
 			for (; frameIndex < frameCount && time > frames[frameIndex]; frameIndex++)
-				firedEvents.Add(Events[frameIndex]);
+				firedEvents.Add(events[frameIndex]);
 		}
 	}
 
 	public class DrawOrderTimeline : Timeline {
-		public float[] Frames { get; private set; } // time, ...
-		public int[][] DrawOrders { get; private set; }
-		public int FrameCount {
-			get {
-				return Frames.Length;
-			}
-		}
+		internal float[] frames;
+		private int[][] drawOrders;
+
+		public float[] Frames { get { return frames; } set { frames = value; } } // time, ...
+		public int[][] DrawOrders { get { return drawOrders; } set { drawOrders = value; } }
+		public int FrameCount { get { return frames.Length; } }
 
 		public DrawOrderTimeline (int frameCount) {
-			Frames = new float[frameCount];
-			DrawOrders = new int[frameCount][];
+			frames = new float[frameCount];
+			drawOrders = new int[frameCount][];
 		}
 
 		/** Sets the time and value of the specified keyframe. */
 		public void setFrame (int frameIndex, float time, int[] drawOrder) {
-			Frames[frameIndex] = time;
-			DrawOrders[frameIndex] = drawOrder;
+			frames[frameIndex] = time;
+			drawOrders[frameIndex] = drawOrder;
 		}
 
 		public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents) {
-			float[] frames = Frames;
+			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
 			int frameIndex;
@@ -522,9 +529,9 @@ namespace Spine {
 			else
 				frameIndex = Animation.binarySearch(frames, time, 1) - 1;
 
-			List<Slot> drawOrder = skeleton.DrawOrder;
-			List<Slot> slots = skeleton.Slots;
-			int[] drawOrderToSetupIndex = DrawOrders[frameIndex];
+			List<Slot> drawOrder = skeleton.drawOrder;
+			List<Slot> slots = skeleton.slots;
+			int[] drawOrderToSetupIndex = drawOrders[frameIndex];
 			for (int i = 0, n = drawOrderToSetupIndex.Length; i < n; i++)
 				drawOrder[i] = slots[drawOrderToSetupIndex[i]];
 		}

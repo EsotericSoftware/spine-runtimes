@@ -82,7 +82,7 @@ namespace Spine {
 		public SkeletonData ReadSkeletonData (String path) {
 			using (StreamReader reader = new StreamReader(path)) {
 				SkeletonData skeletonData = ReadSkeletonData(reader);
-				skeletonData.Name = Path.GetFileNameWithoutExtension(path);
+				skeletonData.name = Path.GetFileNameWithoutExtension(path);
 				return skeletonData;
 			}
 		}
@@ -105,14 +105,14 @@ namespace Spine {
 						throw new Exception("Parent bone not found: " + boneMap["parent"]);
 				}
 				BoneData boneData = new BoneData((String)boneMap["name"], parent);
-				boneData.Length = GetFloat(boneMap, "length", 0) * Scale;
-				boneData.X = GetFloat(boneMap, "x", 0) * Scale;
-				boneData.Y = GetFloat(boneMap, "y", 0) * Scale;
-				boneData.Rotation = GetFloat(boneMap, "rotation", 0);
-				boneData.ScaleX = GetFloat(boneMap, "scaleX", 1);
-				boneData.ScaleY = GetFloat(boneMap, "scaleY", 1);
-				boneData.InheritScale = GetBoolean(boneMap, "inheritScale", true);
-				boneData.InheritRotation = GetBoolean(boneMap, "inheritRotation", true);
+				boneData.length = GetFloat(boneMap, "length", 0) * Scale;
+				boneData.x = GetFloat(boneMap, "x", 0) * Scale;
+				boneData.y = GetFloat(boneMap, "y", 0) * Scale;
+				boneData.rotation = GetFloat(boneMap, "rotation", 0);
+				boneData.scaleX = GetFloat(boneMap, "scaleX", 1);
+				boneData.scaleY = GetFloat(boneMap, "scaleY", 1);
+				boneData.inheritScale = GetBoolean(boneMap, "inheritScale", true);
+				boneData.inheritRotation = GetBoolean(boneMap, "inheritRotation", true);
 				skeletonData.AddBone(boneData);
 			}
 
@@ -128,17 +128,17 @@ namespace Spine {
 
 					if (slotMap.ContainsKey("color")) {
 						String color = (String)slotMap["color"];
-						slotData.R = ToColor(color, 0);
-						slotData.G = ToColor(color, 1);
-						slotData.B = ToColor(color, 2);
-						slotData.A = ToColor(color, 3);
+						slotData.r = ToColor(color, 0);
+						slotData.g = ToColor(color, 1);
+						slotData.b = ToColor(color, 2);
+						slotData.a = ToColor(color, 3);
 					}
 
 					if (slotMap.ContainsKey("attachment"))
-						slotData.AttachmentName = (String)slotMap["attachment"];
+						slotData.attachmentName = (String)slotMap["attachment"];
 
 					if (slotMap.ContainsKey("additive"))
-						slotData.AdditiveBlending = (bool)slotMap["additive"];
+						slotData.additiveBlending = (bool)slotMap["additive"];
 
 					skeletonData.AddSlot(slotData);
 				}
@@ -156,8 +156,8 @@ namespace Spine {
 						}
 					}
 					skeletonData.AddSkin(skin);
-					if (skin.Name == "default")
-						skeletonData.DefaultSkin = skin;
+					if (skin.name == "default")
+						skeletonData.defaultSkin = skin;
 				}
 			}
 
@@ -179,10 +179,10 @@ namespace Spine {
 					ReadAnimation(entry.Key, (Dictionary<String, Object>)entry.Value, skeletonData);
 			}
 
-			skeletonData.Bones.TrimExcess();
-			skeletonData.Slots.TrimExcess();
-			skeletonData.Skins.TrimExcess();
-			skeletonData.Animations.TrimExcess();
+			skeletonData.bones.TrimExcess();
+			skeletonData.slots.TrimExcess();
+			skeletonData.skins.TrimExcess();
+			skeletonData.animations.TrimExcess();
 			return skeletonData;
 		}
 
@@ -197,13 +197,13 @@ namespace Spine {
 
 			RegionAttachment regionAttachment = attachment as RegionAttachment;
 			if (regionAttachment != null) {
-				regionAttachment.X = GetFloat(map, "x", 0) * Scale;
-				regionAttachment.Y = GetFloat(map, "y", 0) * Scale;
-				regionAttachment.ScaleX = GetFloat(map, "scaleX", 1);
-				regionAttachment.ScaleY = GetFloat(map, "scaleY", 1);
-				regionAttachment.Rotation = GetFloat(map, "rotation", 0);
-				regionAttachment.Width = GetFloat(map, "width", 32) * Scale;
-				regionAttachment.Height = GetFloat(map, "height", 32) * Scale;
+				regionAttachment.x = GetFloat(map, "x", 0) * Scale;
+				regionAttachment.y = GetFloat(map, "y", 0) * Scale;
+				regionAttachment.scaleX = GetFloat(map, "scaleX", 1);
+				regionAttachment.scaleY = GetFloat(map, "scaleY", 1);
+				regionAttachment.rotation = GetFloat(map, "rotation", 0);
+				regionAttachment.width = GetFloat(map, "width", 32) * Scale;
+				regionAttachment.height = GetFloat(map, "height", 32) * Scale;
 				regionAttachment.UpdateOffset();
 			}
 
@@ -266,7 +266,7 @@ namespace Spine {
 						String timelineName = (String)timelineEntry.Key;
 						if (timelineName.Equals(TIMELINE_ROTATE)) {
 							RotateTimeline timeline = new RotateTimeline(values.Count);
-							timeline.BoneIndex = boneIndex;
+							timeline.boneIndex = boneIndex;
 
 							int frameIndex = 0;
 							foreach (Dictionary<String, Object> valueMap in values) {
@@ -276,7 +276,7 @@ namespace Spine {
 								frameIndex++;
 							}
 							timelines.Add(timeline);
-							duration = Math.Max(duration, timeline.Frames[timeline.FrameCount * 2 - 2]);
+							duration = Math.Max(duration, timeline.frames[timeline.FrameCount * 2 - 2]);
 
 						} else if (timelineName.Equals(TIMELINE_TRANSLATE) || timelineName.Equals(TIMELINE_SCALE)) {
 							TranslateTimeline timeline;
@@ -287,7 +287,7 @@ namespace Spine {
 								timeline = new TranslateTimeline(values.Count);
 								timelineScale = Scale;
 							}
-							timeline.BoneIndex = boneIndex;
+							timeline.boneIndex = boneIndex;
 
 							int frameIndex = 0;
 							foreach (Dictionary<String, Object> valueMap in values) {
@@ -299,7 +299,7 @@ namespace Spine {
 								frameIndex++;
 							}
 							timelines.Add(timeline);
-							duration = Math.Max(duration, timeline.Frames[timeline.FrameCount * 3 - 3]);
+							duration = Math.Max(duration, timeline.frames[timeline.FrameCount * 3 - 3]);
 
 						} else
 							throw new Exception("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
@@ -318,7 +318,7 @@ namespace Spine {
 						String timelineName = (String)timelineEntry.Key;
 						if (timelineName.Equals(TIMELINE_COLOR)) {
 							ColorTimeline timeline = new ColorTimeline(values.Count);
-							timeline.SlotIndex = slotIndex;
+							timeline.slotIndex = slotIndex;
 
 							int frameIndex = 0;
 							foreach (Dictionary<String, Object> valueMap in values) {
@@ -329,11 +329,11 @@ namespace Spine {
 								frameIndex++;
 							}
 							timelines.Add(timeline);
-							duration = Math.Max(duration, timeline.Frames[timeline.FrameCount * 5 - 5]);
+							duration = Math.Max(duration, timeline.frames[timeline.FrameCount * 5 - 5]);
 
 						} else if (timelineName.Equals(TIMELINE_ATTACHMENT)) {
 							AttachmentTimeline timeline = new AttachmentTimeline(values.Count);
-							timeline.SlotIndex = slotIndex;
+							timeline.slotIndex = slotIndex;
 
 							int frameIndex = 0;
 							foreach (Dictionary<String, Object> valueMap in values) {
@@ -341,7 +341,7 @@ namespace Spine {
 								timeline.setFrame(frameIndex++, time, (String)valueMap["name"]);
 							}
 							timelines.Add(timeline);
-							duration = Math.Max(duration, timeline.Frames[timeline.FrameCount - 1]);
+							duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1]);
 
 						} else
 							throw new Exception("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
@@ -363,13 +363,13 @@ namespace Spine {
 					timeline.setFrame(frameIndex++, (float)eventMap["time"], e);
 				}
 				timelines.Add(timeline);
-				duration = Math.Max(duration, timeline.Frames[timeline.FrameCount - 1]);
+				duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1]);
 			}
 
 			if (map.ContainsKey("draworder")) {
 				var values = (List<Object>)map["draworder"];
 				DrawOrderTimeline timeline = new DrawOrderTimeline(values.Count);
-				int slotCount = skeletonData.Slots.Count;
+				int slotCount = skeletonData.slots.Count;
 				int frameIndex = 0;
 				foreach (Dictionary<String, Object> drawOrderMap in values) {
 					int[] drawOrder = new int[slotCount];
@@ -396,7 +396,7 @@ namespace Spine {
 					timeline.setFrame(frameIndex++, (float)drawOrderMap["time"], drawOrder);
 				}
 				timelines.Add(timeline);
-				duration = Math.Max(duration, timeline.Frames[timeline.FrameCount - 1]);
+				duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1]);
 			}
 
 			timelines.TrimExcess();

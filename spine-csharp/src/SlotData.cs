@@ -35,29 +35,31 @@ using System;
 
 namespace Spine {
 	public class SlotData {
-		public String Name { get; private set; }
-		public BoneData BoneData { get; private set; }
-		public float R { get; set; }
-		public float G { get; set; }
-		public float B { get; set; }
-		public float A { get; set; }
+		internal String name;
+		internal BoneData boneData;
+		internal float r = 1, g = 1, b = 1, a = 1;
+		internal String attachmentName;
+		internal bool additiveBlending;
+
+		public String Name { get { return name; } }
+		public BoneData BoneData { get { return boneData; } }
+		public float R { get { return r; } set { r = value; } }
+		public float G { get { return g; } set { g = value; } }
+		public float B { get { return b; } set { b = value; } }
+		public float A { get { return a; } set { a = value; } }
 		/** @param attachmentName May be null. */
-		public String AttachmentName { get; set; }
-		public bool AdditiveBlending { get; set; }
+		public String AttachmentName { get { return attachmentName; } set { attachmentName = value; } }
+		public bool AdditiveBlending { get { return additiveBlending; } set { additiveBlending = value; } }
 
 		public SlotData (String name, BoneData boneData) {
 			if (name == null) throw new ArgumentNullException("name cannot be null.");
 			if (boneData == null) throw new ArgumentNullException("boneData cannot be null.");
-			Name = name;
-			BoneData = boneData;
-			R = 1;
-			G = 1;
-			B = 1;
-			A = 1;
+			this.name = name;
+			this.boneData = boneData;
 		}
 
 		override public String ToString () {
-			return Name;
+			return name;
 		}
 	}
 }

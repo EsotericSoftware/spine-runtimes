@@ -45,35 +45,35 @@ namespace Spine {
 		public const int X4 = 6;
 		public const int Y4 = 7;
 
-		public float X { get; set; }
-		public float Y { get; set; }
-		public float ScaleX { get; set; }
-		public float ScaleY { get; set; }
-		public float Rotation { get; set; }
-		public float Width { get; set; }
-		public float Height { get; set; }
+		internal float x, y, rotation, scaleX = 1, scaleY = 1, width, height;
+		internal float regionOffsetX, regionOffsetY, regionWidth, regionHeight, regionOriginalWidth, regionOriginalHeight;
+		internal float[] offset = new float[8], uvs = new float[8];
+
+		public float X { get { return x; } set { x = value; } }
+		public float Y { get { return y; } set { y = value; } }
+		public float Rotation { get { return rotation; } set { rotation = value; } }
+		public float ScaleX { get { return scaleX; } set { scaleX = value; } }
+		public float ScaleY { get { return scaleY; } set { scaleY = value; } }
+		public float Width { get { return width; } set { width = value; } }
+		public float Height { get { return height; } set { height = value; } }
 
 		public Object RendererObject { get; set; }
-		public float RegionOffsetX { get; set; }
-		public float RegionOffsetY { get; set; } // Pixels stripped from the bottom left, unrotated.
-		public float RegionWidth { get; set; }
-		public float RegionHeight { get; set; } // Unrotated, stripped size.
-		public float RegionOriginalWidth { get; set; }
-		public float RegionOriginalHeight { get; set; } // Unrotated, unstripped size.
+		public float RegionOffsetX { get { return regionOffsetX; } set { regionOffsetX = value; } }
+		public float RegionOffsetY { get { return regionOffsetY; } set { regionOffsetY = value; } } // Pixels stripped from the bottom left, unrotated.
+		public float RegionWidth { get { return regionWidth; } set { regionWidth = value; } }
+		public float RegionHeight { get { return regionHeight; } set { regionHeight = value; } } // Unrotated, stripped size.
+		public float RegionOriginalWidth { get { return regionOriginalWidth; } set { regionOriginalWidth = value; } }
+		public float RegionOriginalHeight { get { return regionOriginalHeight; } set { regionOriginalHeight = value; } } // Unrotated, unstripped size.
 
-		public float[] Offset { get; private set; }
-		public float[] UVs { get; private set; }
+		public float[] Offset { get { return offset; } }
+		public float[] UVs { get { return uvs; } }
 
 		public RegionAttachment (string name)
 			: base(name) {
-			Offset = new float[8];
-			UVs = new float[8];
-			ScaleX = 1;
-			ScaleY = 1;
 		}
 
 		public void SetUVs (float u, float v, float u2, float v2, bool rotate) {
-			float[] uvs = UVs;
+			float[] uvs = this.uvs;
 			if (rotate) {
 				uvs[X2] = u;
 				uvs[Y2] = v2;
@@ -96,21 +96,21 @@ namespace Spine {
 		}
 
 		public void UpdateOffset () {
-			float width = Width;
-			float height = Height;
-			float scaleX = ScaleX;
-			float scaleY = ScaleY;
-			float regionScaleX = width / RegionOriginalWidth * scaleX;
-			float regionScaleY = height / RegionOriginalHeight * scaleY;
-			float localX = -width / 2 * scaleX + RegionOffsetX * regionScaleX;
-			float localY = -height / 2 * scaleY + RegionOffsetY * regionScaleY;
-			float localX2 = localX + RegionWidth * regionScaleX;
-			float localY2 = localY + RegionHeight * regionScaleY;
-			float radians = Rotation * (float)Math.PI / 180;
+			float width = this.width;
+			float height = this.height;
+			float scaleX = this.scaleX;
+			float scaleY = this.scaleY;
+			float regionScaleX = width / regionOriginalWidth * scaleX;
+			float regionScaleY = height / regionOriginalHeight * scaleY;
+			float localX = -width / 2 * scaleX + regionOffsetX * regionScaleX;
+			float localY = -height / 2 * scaleY + regionOffsetY * regionScaleY;
+			float localX2 = localX + regionWidth * regionScaleX;
+			float localY2 = localY + regionHeight * regionScaleY;
+			float radians = rotation * (float)Math.PI / 180;
 			float cos = (float)Math.Cos(radians);
 			float sin = (float)Math.Sin(radians);
-			float x = X;
-			float y = Y;
+			float x = this.x;
+			float y = this.y;
 			float localXCos = localX * cos + x;
 			float localXSin = localX * sin;
 			float localYCos = localY * cos + y;
@@ -119,7 +119,7 @@ namespace Spine {
 			float localX2Sin = localX2 * sin;
 			float localY2Cos = localY2 * cos + y;
 			float localY2Sin = localY2 * sin;
-			float[] offset = Offset;
+			float[] offset = this.offset;
 			offset[X1] = localXCos - localYSin;
 			offset[Y1] = localYCos + localXSin;
 			offset[X2] = localXCos - localY2Sin;
@@ -131,13 +131,13 @@ namespace Spine {
 		}
 
 		public void ComputeVertices (float x, float y, Bone bone, float[] vertices) {
-			x += bone.WorldX;
-			y += bone.WorldY;
-			float m00 = bone.M00;
-			float m01 = bone.M01;
-			float m10 = bone.M10;
-			float m11 = bone.M11;
-			float[] offset = Offset;
+			x += bone.worldX;
+			y += bone.worldY;
+			float m00 = bone.m00;
+			float m01 = bone.m01;
+			float m10 = bone.m10;
+			float m11 = bone.m11;
+			float[] offset = this.offset;
 			vertices[X1] = offset[X1] * m00 + offset[Y1] * m01 + x;
 			vertices[Y1] = offset[X1] * m10 + offset[Y1] * m11 + y;
 			vertices[X2] = offset[X2] * m00 + offset[Y2] * m01 + x;

@@ -35,29 +35,32 @@ using System;
 
 namespace Spine {
 	public class BoneData {
+		internal BoneData parent;
+		internal String name;
+		internal float length, x, y, rotation, scaleX = 1, scaleY = 1;
+		internal bool inheritScale, inheritRotation;
+
 		/** May be null. */
-		public BoneData Parent { get; private set; }
-		public String Name { get; private set; }
-		public float Length { get; set; }
-		public float X { get; set; }
-		public float Y { get; set; }
-		public float Rotation { get; set; }
-		public float ScaleX { get; set; }
-		public float ScaleY { get; set; }
-		public bool InheritScale { get; set; }
-		public bool InheritRotation { get; set; }
+		public BoneData Parent { get { return parent; } }
+		public String Name { get { return name; } }
+		public float Length { get { return length; } set { length = value; } }
+		public float X { get { return x; } set { x = value; } }
+		public float Y { get { return y; } set { y = value; } }
+		public float Rotation { get { return rotation; } set { rotation = value; } }
+		public float ScaleX { get { return scaleX; } set { scaleX = value; } }
+		public float ScaleY { get { return scaleY; } set { scaleY = value; } }
+		public bool InheritScale { get { return inheritScale; } set { inheritScale = value; } }
+		public bool InheritRotation { get { return inheritRotation; } set { inheritRotation = value; } }
 
 		/** @param parent May be null. */
 		public BoneData (String name, BoneData parent) {
 			if (name == null) throw new ArgumentNullException("name cannot be null.");
-			Name = name;
-			Parent = parent;
-			ScaleX = 1;
-			ScaleY = 1;
+			this.name = name;
+			this.parent = parent;
 		}
 
 		override public String ToString () {
-			return Name;
+			return name;
 		}
 	}
 }

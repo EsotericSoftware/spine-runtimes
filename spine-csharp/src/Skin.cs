@@ -37,12 +37,14 @@ using System.Collections.Generic;
 namespace Spine {
 	/** Stores attachments by slot index and attachment name. */
 	public class Skin {
-		public String Name { get; private set; }
+		internal String name;
+
+		public String Name { get { return name; } }
 		private Dictionary<KeyValuePair<int, String>, Attachment> attachments = new Dictionary<KeyValuePair<int, String>, Attachment>();
 
 		public Skin (String name) {
 			if (name == null) throw new ArgumentNullException("name cannot be null.");
-			Name = name;
+			this.name = name;
 		}
 
 		public void AddAttachment (int slotIndex, String name, Attachment attachment) {
@@ -70,15 +72,15 @@ namespace Spine {
 		}
 
 		override public String ToString () {
-			return Name;
+			return name;
 		}
 
 		/** Attach all attachments from this skin if the corresponding attachment from the old skin is currently attached. */
 		internal void AttachAll (Skeleton skeleton, Skin oldSkin) {
 			foreach (KeyValuePair<KeyValuePair<int, String>, Attachment> entry in oldSkin.attachments) {
 				int slotIndex = entry.Key.Key;
-				Slot slot = skeleton.Slots[slotIndex];
-				if (slot.Attachment == entry.Value) {
+				Slot slot = skeleton.slots[slotIndex];
+				if (slot.attachment == entry.Value) {
 					Attachment attachment = GetAttachment(slotIndex, entry.Key.Value);
 					if (attachment != null) slot.Attachment = attachment;
 				}

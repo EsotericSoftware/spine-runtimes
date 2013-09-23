@@ -36,18 +36,21 @@ using System.Collections.Generic;
 
 namespace Spine {
 	public class AnimationStateData {
-		public SkeletonData SkeletonData { get; private set; }
+		internal SkeletonData skeletonData;
 		private Dictionary<KeyValuePair<Animation, Animation>, float> animationToMixTime = new Dictionary<KeyValuePair<Animation, Animation>, float>();
-		public float defaultMix { get; set; }
+		internal float defaultMix;
+
+		public SkeletonData SkeletonData { get { return skeletonData; } }
+		public float DefaultMix { get { return defaultMix; } set { defaultMix = value; } }
 
 		public AnimationStateData (SkeletonData skeletonData) {
-			SkeletonData = skeletonData;
+			this.skeletonData = skeletonData;
 		}
 
 		public void SetMix (String fromName, String toName, float duration) {
-			Animation from = SkeletonData.FindAnimation(fromName);
+			Animation from = skeletonData.FindAnimation(fromName);
 			if (from == null) throw new ArgumentException("Animation not found: " + fromName);
-			Animation to = SkeletonData.FindAnimation(toName);
+			Animation to = skeletonData.FindAnimation(toName);
 			if (to == null) throw new ArgumentException("Animation not found: " + toName);
 			SetMix(from, to, duration);
 		}

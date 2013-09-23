@@ -37,81 +37,87 @@ namespace Spine {
 	public class Bone {
 		static public bool yDown;
 
-		public BoneData Data { get; private set; }
-		public Bone Parent { get; private set; }
-		public float X { get; set; }
-		public float Y { get; set; }
-		public float Rotation { get; set; }
-		public float ScaleX { get; set; }
-		public float ScaleY { get; set; }
+		internal BoneData data;
+		internal Bone parent;
+		internal float x, y, rotation, scaleX, scaleY;
+		internal float m00, m01, m10, m11;
+		internal float worldX, worldY, worldRotation, worldScaleX, worldScaleY;
 
-		public float M00 { get; private set; }
-		public float M01 { get; private set; }
-		public float M10 { get; private set; }
-		public float M11 { get; private set; }
-		public float WorldX { get; private set; }
-		public float WorldY { get; private set; }
-		public float WorldRotation { get; private set; }
-		public float WorldScaleX { get; private set; }
-		public float WorldScaleY { get; private set; }
+		public BoneData Data { get { return data; } }
+		public Bone Parent { get { return parent; } }
+		public float X { get { return x; } set { x = value; } }
+		public float Y { get { return y; } set { y = value; } }
+		public float Rotation { get { return rotation; } set { rotation = value; } }
+		public float ScaleX { get { return scaleX; } set { scaleX = value; } }
+		public float ScaleY { get { return scaleY; } set { scaleY = value; } }
+
+		public float M00 { get { return m00; } }
+		public float M01 { get { return m01; } }
+		public float M10 { get { return m10; } }
+		public float M11 { get { return m11; } }
+		public float WorldX { get { return worldX; } }
+		public float WorldY { get { return worldY; } }
+		public float WorldRotation { get { return worldRotation; } }
+		public float WorldScaleX { get { return worldScaleX; } }
+		public float WorldScaleY { get { return worldScaleY; } }
 
 		/** @param parent May be null. */
 		public Bone (BoneData data, Bone parent) {
 			if (data == null) throw new ArgumentNullException("data cannot be null.");
-			Data = data;
-			Parent = parent;
+			this.data = data;
+			this.parent = parent;
 			SetToSetupPose();
 		}
 
 		/** Computes the world SRT using the parent bone and the local SRT. */
 		public void UpdateWorldTransform (bool flipX, bool flipY) {
-			Bone parent = Parent;
+			Bone parent = this.parent;
 			if (parent != null) {
-				WorldX = X * parent.M00 + Y * parent.M01 + parent.WorldX;
-				WorldY = X * parent.M10 + Y * parent.M11 + parent.WorldY;
-				if (Data.InheritScale) {
-					WorldScaleX = parent.WorldScaleX * ScaleX;
-					WorldScaleY = parent.WorldScaleY * ScaleY;
+				worldX = x * parent.m00 + y * parent.m01 + parent.worldX;
+				worldY = x * parent.m10 + y * parent.m11 + parent.worldY;
+				if (data.inheritScale) {
+					worldScaleX = parent.worldScaleX * scaleX;
+					worldScaleY = parent.worldScaleY * scaleY;
 				} else {
-					WorldScaleX = ScaleX;
-					WorldScaleY = ScaleY;
+					worldScaleX = scaleX;
+					worldScaleY = scaleY;
 				}
-				WorldRotation = Data.InheritRotation ? parent.WorldRotation + Rotation : Rotation;
+				worldRotation = data.inheritRotation ? parent.worldRotation + rotation : rotation;
 			} else {
-				WorldX = flipX ? -X : X;
-				WorldY = flipY ? -Y : Y;
-				WorldScaleX = ScaleX;
-				WorldScaleY = ScaleY;
-				WorldRotation = Rotation;
+				worldX = flipX ? -x : x;
+				worldY = flipY ? -y : y;
+				worldScaleX = scaleX;
+				worldScaleY = scaleY;
+				worldRotation = rotation;
 			}
-			float radians = WorldRotation * (float)Math.PI / 180;
+			float radians = worldRotation * (float)Math.PI / 180;
 			float cos = (float)Math.Cos(radians);
 			float sin = (float)Math.Sin(radians);
-			M00 = cos * WorldScaleX;
-			M10 = sin * WorldScaleX;
-			M01 = -sin * WorldScaleY;
-			M11 = cos * WorldScaleY;
+			m00 = cos * worldScaleX;
+			m10 = sin * worldScaleX;
+			m01 = -sin * worldScaleY;
+			m11 = cos * worldScaleY;
 			if (flipX) {
-				M00 = -M00;
-				M01 = -M01;
+				m00 = -m00;
+				m01 = -m01;
 			}
 			if (flipY != yDown) {
-				M10 = -M10;
-				M11 = -M11;
+				m10 = -m10;
+				m11 = -m11;
 			}
 		}
 
 		public void SetToSetupPose () {
-			BoneData data = Data;
-			X = data.X;
-			Y = data.Y;
-			Rotation = data.Rotation;
-			ScaleX = data.ScaleX;
-			ScaleY = data.ScaleY;
+			BoneData data = this.data;
+			x = data.x;
+			y = data.y;
+			rotation = data.rotation;
+			scaleX = data.scaleX;
+			scaleY = data.scaleY;
 		}
 
 		override public String ToString () {
-			return Data.Name;
+			return data.name;
 		}
 	}
 }

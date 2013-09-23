@@ -36,27 +36,26 @@ using System.Collections.Generic;
 
 namespace Spine {
 	public class AnimationState {
-		public AnimationStateData Data { get; private set; }
-		public Animation Animation { get; private set; }
-
-		private float time;
-		public float Time {
-			get { return time; }
-			set {
-				time = value;
-				currentLastTime = value - 0.00001f;
-			}
-		}
-
-		private float currentLastTime;
-		public bool Loop { get; set; }
-		private Animation previous;
-		private float previousTime;
-		private bool previousLoop;
+		private AnimationStateData data;
+		private Animation current, previous;
+		private float currentTime, currentLastTime, previousTime;
+		private bool currentLoop, previousLoop;
 		private QueueEntry currentQueueEntry;
 		private float mixTime, mixDuration;
 		private List<Event> events = new List<Event>();
 		private List<QueueEntry> queue = new List<QueueEntry>();
+
+		public AnimationStateData Data { get { return data; } }
+		public Animation Animation { get { return current; } }
+		public bool Loop { get { return currentLoop; } set { currentLoop = value; } }
+
+		public float Time {
+			get { return currentTime; }
+			set {
+				currentTime = value;
+				currentLastTime = value - 0.00001f;
+			}
+		}
 
 		public event EventHandler Start;
 		public event EventHandler End;
@@ -65,19 +64,19 @@ namespace Spine {
 
 		public AnimationState (AnimationStateData data) {
 			if (data == null) throw new ArgumentNullException("data cannot be null.");
-			Data = data;
+			this.data = data;
 		}
 
 		public void Update (float delta) {
-			time += delta;
+			currentTime += delta;
 			previousTime += delta;
 			mixTime += delta;
 
-			if (Animation != null) {
-				float duration = Animation.Duration;
-				if (Loop ? (currentLastTime % duration > time % duration)
-					: (currentLastTime < duration && time >= duration)) {
-					int count = (int)(time / duration);
+			if (current != null) {
+				float duration = current.duration;
+				if (currentLoop ? (currentLastTime % duration > currentTime % duration)
+					: (currentLastTime < duration && currentTime >= duration)) {
+						int count = (int)(currentTime / duration);
 					if (currentQueueEntry != null) currentQueueEntry.OnComplete(this, count);
 					if (Complete != null) Complete(this, new CompleteArgs(count));
 				}
@@ -85,7 +84,7 @@ namespace Spine {
 
 			if (queue.Count > 0) {
 				QueueEntry entry = queue[0];
-				if (time >= entry.delay) {
+				if (currentTime >= entry.delay) {
 					SetAnimationInternal(entry.animation, entry.loop, entry);
 					queue.RemoveAt(0);
 				}
@@ -93,7 +92,7 @@ namespace Spine {
 		}
 
 		public void Apply (Skeleton skeleton) {
-			if (Animation == null) return;
+			if (current == null) return;
 
 			List<Event> events = this.events;
 			events.Clear();
@@ -105,9 +104,9 @@ namespace Spine {
 					alpha = 1;
 					previous = null;
 				}
-				Animation.Mix(skeleton, currentLastTime, time, Loop, events, alpha);
+				current.Mix(skeleton, currentLastTime, currentTime, currentLoop, events, alpha);
 			} else
-				Animation.Apply(skeleton, currentLastTime, time, Loop, events);
+				current.Apply(skeleton, currentLastTime, currentTime, currentLoop, events);
 
 			if (Event != null || currentQueueEntry != null) {
 				foreach (Event e in events) {
@@ -116,34 +115,34 @@ namespace Spine {
 				}
 			}
 
-			currentLastTime = time;
+			currentLastTime = currentTime;
 		}
 
 		public void ClearAnimation () {
 			previous = null;
-			Animation = null;
+			current = null;
 			queue.Clear();
 		}
 
 		private void SetAnimationInternal (Animation animation, bool loop, QueueEntry entry) {
 			previous = null;
-			if (Animation != null) {
+			if (current != null) {
 				if (currentQueueEntry != null) currentQueueEntry.OnEnd(this);
 				if (End != null) End(this, EventArgs.Empty);
 
 				if (animation != null) {
-					mixDuration = Data.GetMix(Animation, animation);
+					mixDuration = data.GetMix(current, animation);
 					if (mixDuration > 0) {
 						mixTime = 0;
-						previous = Animation;
-						previousTime = time;
-						previousLoop = Loop;
+						previous = current;
+						previousTime = currentTime;
+						previousLoop = currentLoop;
 					}
 				}
 			}
-			Animation = animation;
-			Loop = loop;
-			time = 0;
+			current = animation;
+			currentLoop = loop;
+			currentTime = 0;
 			currentLastTime = 0;
 			currentQueueEntry = entry;
 
@@ -152,7 +151,7 @@ namespace Spine {
 		}
 
 		public void SetAnimation (String animationName, bool loop) {
-			Animation animation = Data.SkeletonData.FindAnimation(animationName);
+			Animation animation = data.skeletonData.FindAnimation(animationName);
 			if (animation == null) throw new ArgumentException("Animation not found: " + animationName);
 			SetAnimation(animation, loop);
 		}
@@ -170,7 +169,7 @@ namespace Spine {
 		}
 
 		public QueueEntry AddAnimation (String animationName, bool loop, float delay) {
-			Animation animation = Data.SkeletonData.FindAnimation(animationName);
+			Animation animation = data.skeletonData.FindAnimation(animationName);
 			if (animation == null) throw new ArgumentException("Animation not found: " + animationName);
 			return AddAnimation(animation, loop, delay);
 		}
@@ -187,9 +186,9 @@ namespace Spine {
 			entry.loop = loop;
 
 			if (delay <= 0) {
-				Animation previousAnimation = queue.Count == 0 ? Animation : queue[queue.Count - 1].animation;
+				Animation previousAnimation = queue.Count == 0 ? current : queue[queue.Count - 1].animation;
 				if (previousAnimation != null)
-					delay = previousAnimation.Duration - Data.GetMix(previousAnimation, animation) + delay;
+					delay = previousAnimation.duration - data.GetMix(previousAnimation, animation) + delay;
 				else
 					delay = 0;
 			}
@@ -201,11 +200,11 @@ namespace Spine {
 
 		/** Returns true if no animation is set or if the current time is greater than the animation duration, regardless of looping. */
 		public bool IsComplete () {
-			return Animation == null || time >= Animation.Duration;
+			return current == null || currentTime >= current.duration;
 		}
 
 		override public String ToString () {
-			return (Animation != null && Animation.Name != null) ? Animation.Name : base.ToString();
+			return (current != null && current.name != null) ? current.name : base.ToString();
 		}
 	}
 

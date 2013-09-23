@@ -36,37 +36,38 @@ using System.Collections.Generic;
 
 namespace Spine {
 	public class SkeletonData {
-		public String Name { get; set; }
-		public List<BoneData> Bones { get; private set; } // Ordered parents first.
-		public List<SlotData> Slots { get; private set; } // Setup pose draw order.
-		public List<Skin> Skins { get; private set; }
-		/** May be null. */
-		public Skin DefaultSkin;
-		public List<EventData> Events { get; private set; }
-		public List<Animation> Animations { get; private set; }
+		internal String name;
+		internal List<BoneData> bones = new List<BoneData>();
+		internal List<SlotData> slots = new List<SlotData>();
+		internal List<Skin> skins = new List<Skin>();
+		internal Skin defaultSkin;
+		internal List<EventData> events = new List<EventData>();
+		internal List<Animation> animations = new List<Animation>();
 
-		public SkeletonData () {
-			Bones = new List<BoneData>();
-			Slots = new List<SlotData>();
-			Skins = new List<Skin>();
-			Events = new List<EventData>();
-			Animations = new List<Animation>();
-		}
+		public String Name { get { return name; } set { name = value; } }
+		public List<BoneData> Bones { get { return bones; } } // Ordered parents first.
+		public List<SlotData> Slots { get { return slots; } } // Setup pose draw order.
+		public List<Skin> Skins { get { return skins; } set { skins = value; } }
+		/** May be null. */
+		public Skin DefaultSkin { get { return defaultSkin; } set { defaultSkin = value; } }
+		public List<EventData> Events { get { return events; } set { events = value; } }
+		public List<Animation> Animations { get { return animations; } set { animations = value; } }
 
 		// --- Bones.
 
 		public void AddBone (BoneData bone) {
 			if (bone == null) throw new ArgumentNullException("bone cannot be null.");
-			Bones.Add(bone);
+			bones.Add(bone);
 		}
 
 
 		/** @return May be null. */
 		public BoneData FindBone (String boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName cannot be null.");
-			for (int i = 0, n = Bones.Count; i < n; i++) {
-				BoneData bone = Bones[i];
-				if (bone.Name == boneName) return bone;
+			List<BoneData> bones = this.bones;
+			for (int i = 0, n = bones.Count; i < n; i++) {
+				BoneData bone = bones[i];
+				if (bone.name == boneName) return bone;
 			}
 			return null;
 		}
@@ -74,8 +75,9 @@ namespace Spine {
 		/** @return -1 if the bone was not found. */
 		public int FindBoneIndex (String boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName cannot be null.");
-			for (int i = 0, n = Bones.Count; i < n; i++)
-				if (Bones[i].Name == boneName) return i;
+			List<BoneData> bones = this.bones;
+			for (int i = 0, n = bones.Count; i < n; i++)
+				if (bones[i].name == boneName) return i;
 			return -1;
 		}
 
@@ -83,15 +85,16 @@ namespace Spine {
 
 		public void AddSlot (SlotData slot) {
 			if (slot == null) throw new ArgumentNullException("slot cannot be null.");
-			Slots.Add(slot);
+			slots.Add(slot);
 		}
 
 		/** @return May be null. */
 		public SlotData FindSlot (String slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
-			for (int i = 0, n = Slots.Count; i < n; i++) {
-				SlotData slot = Slots[i];
-				if (slot.Name == slotName) return slot;
+			List<SlotData> slots = this.slots;
+			for (int i = 0, n = slots.Count; i < n; i++) {
+				SlotData slot = slots[i];
+				if (slot.name == slotName) return slot;
 			}
 			return null;
 		}
@@ -99,8 +102,9 @@ namespace Spine {
 		/** @return -1 if the bone was not found. */
 		public int FindSlotIndex (String slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
-			for (int i = 0, n = Slots.Count; i < n; i++)
-				if (Slots[i].Name == slotName) return i;
+			List<SlotData> slots = this.slots;
+			for (int i = 0, n = slots.Count; i < n; i++)
+				if (slots[i].name == slotName) return i;
 			return -1;
 		}
 
@@ -108,14 +112,14 @@ namespace Spine {
 
 		public void AddSkin (Skin skin) {
 			if (skin == null) throw new ArgumentNullException("skin cannot be null.");
-			Skins.Add(skin);
+			skins.Add(skin);
 		}
 
 		/** @return May be null. */
 		public Skin FindSkin (String skinName) {
 			if (skinName == null) throw new ArgumentNullException("skinName cannot be null.");
-			foreach (Skin skin in Skins)
-				if (skin.Name == skinName) return skin;
+			foreach (Skin skin in skins)
+				if (skin.name == skinName) return skin;
 			return null;
 		}
 
@@ -123,13 +127,13 @@ namespace Spine {
 
 		public void AddEvent (EventData eventData) {
 			if (eventData == null) throw new ArgumentNullException("eventData cannot be null.");
-			Events.Add(eventData);
+			events.Add(eventData);
 		}
 
 		/** @return May be null. */
 		public EventData findEvent (String eventDataName) {
 			if (eventDataName == null) throw new ArgumentNullException("eventDataName cannot be null.");
-			foreach (EventData eventData in Events)
+			foreach (EventData eventData in events)
 				if (eventData.Name == eventDataName) return eventData;
 			return null;
 		}
@@ -138,14 +142,15 @@ namespace Spine {
 
 		public void AddAnimation (Animation animation) {
 			if (animation == null) throw new ArgumentNullException("animation cannot be null.");
-			Animations.Add(animation);
+			animations.Add(animation);
 		}
 
 		/** @return May be null. */
 		public Animation FindAnimation (String animationName) {
 			if (animationName == null) throw new ArgumentNullException("animationName cannot be null.");
-			for (int i = 0, n = Animations.Count; i < n; i++) {
-				Animation animation = Animations[i];
+			List<Animation> animations = this.animations;
+			for (int i = 0, n = animations.Count; i < n; i++) {
+				Animation animation = animations[i];
 				if (animation.Name == animationName) return animation;
 			}
 			return null;
@@ -154,7 +159,7 @@ namespace Spine {
 		// ---
 
 		override public String ToString () {
-			return Name ?? base.ToString();
+			return name ?? base.ToString();
 		}
 	}
 }

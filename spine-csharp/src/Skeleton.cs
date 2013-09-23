@@ -36,56 +36,62 @@ using System.Collections.Generic;
 
 namespace Spine {
 	public class Skeleton {
-		public SkeletonData Data { get; private set; }
-		public List<Bone> Bones { get; private set; }
-		public List<Slot> Slots { get; private set; }
-		public List<Slot> DrawOrder { get; private set; }
-		public Skin Skin { get; set; }
-		public float R { get; set; }
-		public float G { get; set; }
-		public float B { get; set; }
-		public float A { get; set; }
-		public float Time { get; set; }
-		public bool FlipX { get; set; }
-		public bool FlipY { get; set; }
+		internal SkeletonData data;
+		internal List<Bone> bones;
+		internal List<Slot> slots;
+		internal List<Slot> drawOrder;
+		internal Skin skin;
+		internal float r = 1, g = 1, b = 1, a = 1;
+		internal float time;
+		internal bool flipX, flipY;
+		internal float x, y;
+
+		public SkeletonData Data { get { return data; } }
+		public List<Bone> Bones { get { return bones; } }
+		public List<Slot> Slots { get { return slots; } }
+		public List<Slot> DrawOrder { get { return drawOrder; } }
+		public Skin Skin { get { return skin; } set { skin = value; } }
+		public float R { get { return r; } set { r = value; } }
+		public float G { get { return g; } set { g = value; } }
+		public float B { get { return b; } set { b = value; } }
+		public float A { get { return a; } set { a = value; } }
+		public float Time { get { return time; } set { time = value; } }
+		public bool FlipX { get { return flipX; } set { flipX = value; } }
+		public bool FlipY { get { return flipY; } set { flipY = value; } }
+		public float X { get { return x; } set { x = value; } }
+		public float Y { get { return y; } set { y = value; } }
+
 		public Bone RootBone {
 			get {
-				return Bones.Count == 0 ? null : Bones[0];
+				return bones.Count == 0 ? null : bones[0];
 			}
 		}
-		public float X { get; set; }
-		public float Y { get; set; }
 
 		public Skeleton (SkeletonData data) {
 			if (data == null) throw new ArgumentNullException("data cannot be null.");
-			Data = data;
+			this.data = data;
 
-			Bones = new List<Bone>(Data.Bones.Count);
-			foreach (BoneData boneData in Data.Bones) {
-				Bone parent = boneData.Parent == null ? null : Bones[Data.Bones.IndexOf(boneData.Parent)];
-				Bones.Add(new Bone(boneData, parent));
+			bones = new List<Bone>(data.bones.Count);
+			foreach (BoneData boneData in data.bones) {
+				Bone parent = boneData.parent == null ? null : bones[data.bones.IndexOf(boneData.parent)];
+				bones.Add(new Bone(boneData, parent));
 			}
 
-			Slots = new List<Slot>(Data.Slots.Count);
-			DrawOrder = new List<Slot>(Data.Slots.Count);
-			foreach (SlotData slotData in Data.Slots) {
-				Bone bone = Bones[Data.Bones.IndexOf(slotData.BoneData)];
+			slots = new List<Slot>(data.slots.Count);
+			drawOrder = new List<Slot>(data.slots.Count);
+			foreach (SlotData slotData in data.slots) {
+				Bone bone = bones[data.bones.IndexOf(slotData.boneData)];
 				Slot slot = new Slot(slotData, this, bone);
-				Slots.Add(slot);
-				DrawOrder.Add(slot);
+				slots.Add(slot);
+				drawOrder.Add(slot);
 			}
-
-			R = 1;
-			G = 1;
-			B = 1;
-			A = 1;
 		}
 
 		/** Updates the world transform for each bone. */
 		public void UpdateWorldTransform () {
-			bool flipX = FlipX;
-			bool flipY = FlipY;
-			List<Bone> bones = Bones;
+			bool flipX = this.flipX;
+			bool flipY = this.flipY;
+			List<Bone> bones = this.bones;
 			for (int i = 0, n = bones.Count; i < n; i++)
 				bones[i].UpdateWorldTransform(flipX, flipY);
 		}
@@ -97,13 +103,13 @@ namespace Spine {
 		}
 
 		public void SetBonesToSetupPose () {
-			List<Bone> bones = this.Bones;
+			List<Bone> bones = this.bones;
 			for (int i = 0, n = bones.Count; i < n; i++)
 				bones[i].SetToSetupPose();
 		}
 
 		public void SetSlotsToSetupPose () {
-			List<Slot> slots = this.Slots;
+			List<Slot> slots = this.slots;
 			for (int i = 0, n = slots.Count; i < n; i++)
 				slots[i].SetToSetupPose(i);
 		}
@@ -111,10 +117,10 @@ namespace Spine {
 		/** @return May be null. */
 		public Bone FindBone (String boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName cannot be null.");
-			List<Bone> bones = this.Bones;
+			List<Bone> bones = this.bones;
 			for (int i = 0, n = bones.Count; i < n; i++) {
 				Bone bone = bones[i];
-				if (bone.Data.Name == boneName) return bone;
+				if (bone.data.name == boneName) return bone;
 			}
 			return null;
 		}
@@ -122,19 +128,19 @@ namespace Spine {
 		/** @return -1 if the bone was not found. */
 		public int FindBoneIndex (String boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName cannot be null.");
-			List<Bone> bones = this.Bones;
+			List<Bone> bones = this.bones;
 			for (int i = 0, n = bones.Count; i < n; i++)
-				if (bones[i].Data.Name == boneName) return i;
+				if (bones[i].data.name == boneName) return i;
 			return -1;
 		}
 
 		/** @return May be null. */
 		public Slot FindSlot (String slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
-			List<Slot> slots = this.Slots;
+			List<Slot> slots = this.slots;
 			for (int i = 0, n = slots.Count; i < n; i++) {
 				Slot slot = slots[i];
-				if (slot.Data.Name == slotName) return slot;
+				if (slot.data.name == slotName) return slot;
 			}
 			return null;
 		}
@@ -142,16 +148,16 @@ namespace Spine {
 		/** @return -1 if the bone was not found. */
 		public int FindSlotIndex (String slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
-			List<Slot> slots = this.Slots;
+			List<Slot> slots = this.slots;
 			for (int i = 0, n = slots.Count; i < n; i++)
-				if (slots[i].Data.Name.Equals(slotName)) return i;
+				if (slots[i].data.name.Equals(slotName)) return i;
 			return -1;
 		}
 
 		/** Sets a skin by name.
 		 * @see #setSkin(Skin) */
 		public void SetSkin (String skinName) {
-			Skin skin = Data.FindSkin(skinName);
+			Skin skin = data.FindSkin(skinName);
 			if (skin == null) throw new ArgumentException("Skin not found: " + skinName);
 			SetSkin(skin);
 		}
@@ -160,33 +166,33 @@ namespace Spine {
 	 * from the new skin are attached if the corresponding attachment from the old skin was attached.
 	 * @param newSkin May be null. */
 		public void SetSkin (Skin newSkin) {
-			if (Skin != null && newSkin != null) newSkin.AttachAll(this, Skin);
-			Skin = newSkin;
+			if (skin != null && newSkin != null) newSkin.AttachAll(this, skin);
+			skin = newSkin;
 		}
 
 		/** @return May be null. */
 		public Attachment GetAttachment (String slotName, String attachmentName) {
-			return GetAttachment(Data.FindSlotIndex(slotName), attachmentName);
+			return GetAttachment(data.FindSlotIndex(slotName), attachmentName);
 		}
 
 		/** @return May be null. */
 		public Attachment GetAttachment (int slotIndex, String attachmentName) {
 			if (attachmentName == null) throw new ArgumentNullException("attachmentName cannot be null.");
-			if (Skin != null) {
-				Attachment attachment = Skin.GetAttachment(slotIndex, attachmentName);
+			if (skin != null) {
+				Attachment attachment = skin.GetAttachment(slotIndex, attachmentName);
 				if (attachment != null) return attachment;
 			}
-			if (Data.DefaultSkin != null) return Data.DefaultSkin.GetAttachment(slotIndex, attachmentName);
+			if (data.defaultSkin != null) return data.defaultSkin.GetAttachment(slotIndex, attachmentName);
 			return null;
 		}
 
 		/** @param attachmentName May be null. */
 		public void SetAttachment (String slotName, String attachmentName) {
 			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
-			List<Slot> slots = Slots;
+			List<Slot> slots = this.slots;
 			for (int i = 0, n = slots.Count; i < n; i++) {
 				Slot slot = slots[i];
-				if (slot.Data.Name == slotName) {
+				if (slot.data.name == slotName) {
 					Attachment attachment = null;
 					if (attachmentName != null) {
 						attachment = GetAttachment(i, attachmentName);
@@ -200,7 +206,7 @@ namespace Spine {
 		}
 
 		public void Update (float delta) {
-			Time += delta;
+			time += delta;
 		}
 	}
 }
