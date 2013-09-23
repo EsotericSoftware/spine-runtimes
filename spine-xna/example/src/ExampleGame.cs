@@ -86,16 +86,19 @@ namespace Spine {
 			}
 
 			state = new AnimationState(stateData);
-			state.Start += new EventHandler(Start);
-			state.End += new EventHandler(End);
-			state.Complete += new EventHandler<CompleteArgs>(Complete);
-			state.Event += new EventHandler<EventTriggeredArgs>(Event);
 
 			if (true) {
+				// Event handling for all animations.
+				state.Start += new EventHandler(Start);
+				state.End += new EventHandler(End);
+				state.Complete += new EventHandler<CompleteArgs>(Complete);
+				state.Event += new EventHandler<EventTriggeredArgs>(Event);
+
 				state.SetAnimation("drawOrder", true);
 			} else {
 				state.SetAnimation("walk", false);
-				state.AddAnimation("jump", false);
+				QueueEntry entry = state.AddAnimation("jump", false);
+				entry.End += new EventHandler(End); // Event handling for queued animations.
 				state.AddAnimation("walk", true);
 			}
 
@@ -132,14 +135,13 @@ namespace Spine {
 
 			bounds.Update(skeleton);
 			MouseState mouse = Mouse.GetState();
+			headSlot.G = 1;
+			headSlot.B = 1;
 			if (bounds.AabbContainsPoint(mouse.X, mouse.Y)) {
 				BoundingBoxAttachment hit = bounds.ContainsPoint(mouse.X, mouse.Y);
 				if (hit != null) {
 					headSlot.G = 0;
 					headSlot.B = 0;
-				} else {
-					headSlot.G = 1;
-					headSlot.B = 1;
 				}
 			}
 
@@ -147,19 +149,19 @@ namespace Spine {
 		}
 
 		public void Start (object sender, EventArgs e) {
-			Console.WriteLine("start");
+			Console.WriteLine(state + ": start");
 		}
 
 		public void End (object sender, EventArgs e) {
-			Console.WriteLine("end");
+			Console.WriteLine(state + ": end");
 		}
 
 		public void Complete (object sender, CompleteArgs e) {
-			Console.WriteLine("complete " + e.LoopCount);
+			Console.WriteLine(state + ": complete " + e.LoopCount);
 		}
 
 		public void Event (object sender, EventTriggeredArgs e) {
-			Console.WriteLine("event " + e.Event);
+			Console.WriteLine(state + ": event " + e.Event);
 		}
 	}
 }

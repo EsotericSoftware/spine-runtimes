@@ -129,15 +129,15 @@
 			"head": {
 				"rotate": [
 					{ "time": 0, "angle": 0 },
-					{ "time": 0.4827, "angle": -11.07, "curve": "stepped" },
-					{ "time": 0.8965, "angle": -11.07 },
+					{ "time": 0.4827, "angle": -23.11 },
+					{ "time": 0.8965, "angle": -56.45 },
 					{ "time": 1.3103, "angle": 1.38 },
-					{ "time": 1.7931, "angle": 12.91 },
+					{ "time": 1.7931, "angle": 36.12 },
 					{ "time": 2.1379, "angle": 1.24 },
-					{ "time": 2.6206, "angle": -16.12, "curve": "stepped" },
-					{ "time": 3.3103, "angle": -16.12 },
-					{ "time": 3.6551, "angle": 1.31 },
-					{ "time": 4, "angle": 359.99 }
+					{ "time": 2.6206, "angle": -37.12 },
+					{ "time": 2.9666, "angle": 2.07 },
+					{ "time": 3.4666, "angle": 34.72 },
+					{ "time": 3.9, "angle": 359.99 }
 				],
 				"translate": [
 					{

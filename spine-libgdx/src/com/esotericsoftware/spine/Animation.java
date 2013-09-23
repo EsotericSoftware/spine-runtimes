@@ -65,10 +65,11 @@ public class Animation {
 
 	/** @deprecated */
 	public void apply (Skeleton skeleton, float time, boolean loop) {
-		apply(skeleton, Float.MAX_VALUE, time, loop, null);
+		apply(skeleton, time, time, loop, null);
 	}
 
 	/** Poses the skeleton at the specified time for this animation.
+	 * @param lastTime The last time the animation was applied. Can be equal to time if events shouldn't be fired.
 	 * @param events Any triggered events are added. May be null if lastTime is known to not cause any events to trigger. */
 	public void apply (Skeleton skeleton, float lastTime, float time, boolean loop, Array<Event> events) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
@@ -85,12 +86,13 @@ public class Animation {
 
 	/** @deprecated */
 	public void mix (Skeleton skeleton, float time, boolean loop, float alpha) {
-		mix(skeleton, Float.MAX_VALUE, time, loop, null, alpha);
+		mix(skeleton, time, time, loop, null, alpha);
 	}
 
 	/** Poses the skeleton at the specified time for this animation mixed with the current pose.
-	 * @param alpha The amount of this animation that affects the current pose.
-	 * @param events Any triggered events are added. May be null if lastTime is known to not cause any events to trigger. */
+	 * @param lastTime The last time the animation was applied. Can be equal to time if events shouldn't be fired.
+	 * @param events Any triggered events are added. May be null if lastTime is known to not cause any events to trigger.
+	 * @param alpha The amount of this animation that affects the current pose. */
 	public void mix (Skeleton skeleton, float lastTime, float time, boolean loop, Array<Event> events, float alpha) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 

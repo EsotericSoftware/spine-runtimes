@@ -65,7 +65,7 @@ public class SkeletonTest extends ApplicationAdapter {
 		renderer = new SkeletonRenderer();
 		debugRenderer = new SkeletonRendererDebug();
 
-		final String name = "spineboy"; // "spineboy";
+		final String name = "goblins"; // "spineboy";
 
 		// A regular texture atlas would normally usually be used. This returns a white image for images not found in the atlas.
 		Pixmap pixmap = new Pixmap(32, 32, Format.RGBA8888);
@@ -93,7 +93,7 @@ public class SkeletonTest extends ApplicationAdapter {
 			// binary.setScale(2);
 			skeletonData = binary.readSkeletonData(Gdx.files.internal(name + ".skel"));
 		}
-		animation = skeletonData.findAnimation("drawOrder");
+		animation = skeletonData.findAnimation("walk");
 
 		skeleton = new Skeleton(skeletonData);
 		if (name.equals("goblins")) skeleton.setSkin("goblin");

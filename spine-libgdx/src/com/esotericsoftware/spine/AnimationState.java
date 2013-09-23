@@ -86,7 +86,7 @@ public class AnimationState {
 		events.clear();
 
 		if (previous != null) {
-			previous.apply(skeleton, Float.MAX_VALUE, previousTime, previousLoop, null);
+			previous.apply(skeleton, Integer.MAX_VALUE, previousTime, previousLoop, null);
 			float alpha = mixTime / mixDuration;
 			if (alpha >= 1) {
 				alpha = 1;
