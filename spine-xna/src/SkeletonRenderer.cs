@@ -78,6 +78,8 @@ namespace Spine {
 
 		public void Draw (Skeleton skeleton) {
 			List<Slot> drawOrder = skeleton.DrawOrder;
+			float x = skeleton.X, y = skeleton.Y;
+			float skeletonR = skeleton.R, skeletonG = skeleton.G, skeletonB = skeleton.B, skeletonA = skeleton.A;
 			for (int i = 0, n = drawOrder.Count; i < n; i++) {
 				Slot slot = drawOrder[i];
 				RegionAttachment regionAttachment = slot.Attachment as RegionAttachment;
@@ -92,10 +94,10 @@ namespace Spine {
 					AtlasRegion region = (AtlasRegion)regionAttachment.RendererObject;
 					item.Texture = (Texture2D)region.page.rendererObject;
 
-					byte r = (byte)(skeleton.R * slot.R * 255);
-					byte g = (byte)(skeleton.G * slot.G * 255);
-					byte b = (byte)(skeleton.B * slot.B * 255);
-					byte a = (byte)(skeleton.A * slot.A * 255);
+					byte r = (byte)(skeletonR * slot.R * 255);
+					byte g = (byte)(skeletonG * slot.G * 255);
+					byte b = (byte)(skeletonB * slot.B * 255);
+					byte a = (byte)(skeletonA * slot.A * 255);
 					item.vertexTL.Color.R = r;
 					item.vertexTL.Color.G = g;
 					item.vertexTL.Color.B = b;
@@ -114,7 +116,7 @@ namespace Spine {
 					item.vertexTR.Color.A = a;
 
 					float[] vertices = this.vertices;
-					regionAttachment.ComputeVertices(skeleton.X, skeleton.Y, slot.Bone, vertices);
+					regionAttachment.ComputeVertices(x, y, slot.Bone, vertices);
 					item.vertexTL.Position.X = vertices[RegionAttachment.X1];
 					item.vertexTL.Position.Y = vertices[RegionAttachment.Y1];
 					item.vertexTL.Position.Z = 0;
