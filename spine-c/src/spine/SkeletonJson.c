@@ -326,6 +326,8 @@ SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* jso
 		boneData->rotation = Json_getFloat(boneMap, "rotation", 0);
 		boneData->scaleX = Json_getFloat(boneMap, "scaleX", 1);
 		boneData->scaleY = Json_getFloat(boneMap, "scaleY", 1);
+		boneData->inheritScale = Json_getInt(boneMap, "inheritScale", 1);
+		boneData->inheritRotation = Json_getInt(boneMap, "inheritRotation", 1);
 
 		skeletonData->bones[i] = boneData;
 		++skeletonData->boneCount;
@@ -359,6 +361,8 @@ SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* jso
 
 			attachmentItem = Json_getItem(slotMap, "attachment");
 			if (attachmentItem) SlotData_setAttachmentName(slotData, attachmentItem->valueString);
+
+			slotData->additiveBlending = Json_getInt(slotMap, "additive", 0);
 
 			skeletonData->slots[i] = slotData;
 			++skeletonData->slotCount;

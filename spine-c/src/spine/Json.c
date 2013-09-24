@@ -355,5 +355,5 @@ float Json_getFloat (Json* value, const char* name, float defaultValue) {
 
 int Json_getInt (Json* value, const char* name, int defaultValue) {
 	value = Json_getItem(value, name);
-	return value ? (int)value->valueFloat : defaultValue;
+	return value ? value->valueInt : defaultValue;
 }

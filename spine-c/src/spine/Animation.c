@@ -504,8 +504,6 @@ void AttachmentTimeline_setFrame (AttachmentTimeline* self, int frameIndex, floa
 
 /**/
 
-#include <stdio.h>
-
 void _DrawOrderTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float time, float alpha) {
 	int i;
 	int frameIndex;

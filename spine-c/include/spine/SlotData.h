@@ -45,6 +45,7 @@ typedef struct {
 	const BoneData* const boneData;
 	const char* const attachmentName;
 	float r, g, b, a;
+	int/*bool*/additiveBlending;
 } SlotData;
 
 SlotData* SlotData_create (const char* name, BoneData* boneData);

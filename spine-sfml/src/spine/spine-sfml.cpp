@@ -87,12 +87,22 @@ void SkeletonDrawable::update (float deltaTime) {
 
 void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 	vertexArray->clear();
+	states.blendMode = BlendAlpha;
+
 	float vertexPositions[8];
 	for (int i = 0; i < skeleton->slotCount; ++i) {
 		Slot* slot = skeleton->drawOrder[i];
 		Attachment* attachment = slot->attachment;
 		if (!attachment || attachment->type != ATTACHMENT_REGION) continue;
 		RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
+
+		BlendMode blend = slot->data->additiveBlending ? BlendAdd : BlendAlpha;
+		if (states.blendMode != blend) {
+			target.draw(*vertexArray, states);
+			vertexArray->clear();
+			states.blendMode = blend;
+		}
+
 		RegionAttachment_computeVertices(regionAttachment, slot->skeleton->x, slot->skeleton->y, slot->bone, vertexPositions);
 
 		Uint8 r = skeleton->r * slot->r * 255;
