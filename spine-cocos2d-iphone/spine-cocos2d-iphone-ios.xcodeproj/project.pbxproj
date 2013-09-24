@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4374AF5F17F1D74000401ACE /* BoundingBoxAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 4374AF5D17F1D74000401ACE /* BoundingBoxAttachment.c */; };
+		4374AF6017F1D74000401ACE /* SkeletonBounds.c in Sources */ = {isa = PBXBuildFile; fileRef = 4374AF5E17F1D74000401ACE /* SkeletonBounds.c */; };
 		43C3282B170B0BF6004A9460 /* ExampleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 43C32827170B0BF6004A9460 /* ExampleLayer.m */; };
 		43C3282F170B0C19004A9460 /* spine-cocos2d-iphone.m in Sources */ = {isa = PBXBuildFile; fileRef = 43C3282D170B0C19004A9460 /* spine-cocos2d-iphone.m */; };
 		43C32855170B0C6C004A9460 /* Animation.c in Sources */ = {isa = PBXBuildFile; fileRef = 43C32830170B0C6C004A9460 /* Animation.c */; };
@@ -173,6 +175,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4374AF5D17F1D74000401ACE /* BoundingBoxAttachment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = BoundingBoxAttachment.c; path = "../spine-c/src/spine/BoundingBoxAttachment.c"; sourceTree = "<group>"; };
+		4374AF5E17F1D74000401ACE /* SkeletonBounds.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = SkeletonBounds.c; path = "../spine-c/src/spine/SkeletonBounds.c"; sourceTree = "<group>"; };
+		4374AF6217F1D74E00401ACE /* BoundingBoxAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BoundingBoxAttachment.h; path = "../spine-c/include/spine/BoundingBoxAttachment.h"; sourceTree = "<group>"; };
+		4374AF6317F1D74E00401ACE /* SkeletonBounds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonBounds.h; path = "../spine-c/include/spine/SkeletonBounds.h"; sourceTree = "<group>"; };
 		43C32826170B0BF6004A9460 /* ExampleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ExampleLayer.h; path = example/ExampleLayer.h; sourceTree = "<group>"; };
 		43C32827170B0BF6004A9460 /* ExampleLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ExampleLayer.m; path = example/ExampleLayer.m; sourceTree = "<group>"; };
 		43C3282D170B0C19004A9460 /* spine-cocos2d-iphone.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "spine-cocos2d-iphone.m"; path = "src/spine/spine-cocos2d-iphone.m"; sourceTree = "<group>"; };
@@ -556,6 +562,8 @@
 				43C3283F170B0C6C004A9460 /* Bone.h */,
 				43C32840170B0C6C004A9460 /* BoneData.c */,
 				43C32841170B0C6C004A9460 /* BoneData.h */,
+				4374AF5D17F1D74000401ACE /* BoundingBoxAttachment.c */,
+				4374AF6217F1D74E00401ACE /* BoundingBoxAttachment.h */,
 				43C32842170B0C6C004A9460 /* extension.c */,
 				43C32843170B0C6C004A9460 /* extension.h */,
 				43C32844170B0C6C004A9460 /* Json.c */,
@@ -564,6 +572,8 @@
 				43C32847170B0C6C004A9460 /* RegionAttachment.h */,
 				43C32848170B0C6C004A9460 /* Skeleton.c */,
 				43C32849170B0C6C004A9460 /* Skeleton.h */,
+				4374AF5E17F1D74000401ACE /* SkeletonBounds.c */,
+				4374AF6317F1D74E00401ACE /* SkeletonBounds.h */,
 				43C3284A170B0C6C004A9460 /* SkeletonData.c */,
 				43C3284B170B0C6C004A9460 /* SkeletonData.h */,
 				43C3284C170B0C6C004A9460 /* SkeletonJson.c */,
@@ -1230,6 +1240,8 @@
 				43C32A09170B10FF004A9460 /* AppDelegate.mm in Sources */,
 				43DB2A3D172C16BC003045C5 /* CCSkeleton.m in Sources */,
 				43DB2A3E172C16BC003045C5 /* CCSkeletonAnimation.m in Sources */,
+				4374AF5F17F1D74000401ACE /* BoundingBoxAttachment.c in Sources */,
+				4374AF6017F1D74000401ACE /* SkeletonBounds.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

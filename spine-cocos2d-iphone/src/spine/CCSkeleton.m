@@ -227,7 +227,7 @@
 		Slot* slot = _skeleton->slots[i];
 		if (!slot->attachment || slot->attachment->type != ATTACHMENT_REGION) continue;
 		RegionAttachment* attachment = (RegionAttachment*)slot->attachment;
-		RegionAttachment_computeVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot->bone, vertices);
+		RegionAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot->bone, vertices);
 		minX = fmin(minX, vertices[VERTEX_X1] * scaleX);
 		minY = fmin(minY, vertices[VERTEX_Y1] * scaleY);
 		maxX = fmax(maxX, vertices[VERTEX_X1] * scaleX);
