@@ -45,20 +45,20 @@ typedef struct {
 	float* const vertices;
 	int count;
 	int capacity;
-} Polygon;
+} BoundingPolygon;
 
-Polygon* Polygon_create (int capacity);
-void Polygon_dispose (Polygon* self);
+BoundingPolygon* BoundingPolygon_create (int capacity);
+void BoundingPolygon_dispose (BoundingPolygon* self);
 
-int/*bool*/Polygon_containsPoint (Polygon* polygon, float x, float y);
-int/*bool*/Polygon_intersectsSegment (Polygon* polygon, float x1, float y1, float x2, float y2);
+int/*bool*/BoundingPolygon_containsPoint (BoundingPolygon* polygon, float x, float y);
+int/*bool*/BoundingPolygon_intersectsSegment (BoundingPolygon* polygon, float x1, float y1, float x2, float y2);
 
 /**/
 
 typedef struct {
 	int count;
 	BoundingBoxAttachment** boundingBoxes;
-	Polygon** polygons;
+	BoundingPolygon** polygons;
 
 	float minX, minY, maxX, maxY;
 } SkeletonBounds;
@@ -85,7 +85,7 @@ BoundingBoxAttachment* SkeletonBounds_containsPoint (SkeletonBounds* self, float
 BoundingBoxAttachment* SkeletonBounds_intersectsSegment (SkeletonBounds* self, float x1, float y1, float x2, float y2);
 
 /** Returns the polygon for the specified bounding box, or null. */
-Polygon* SkeletonBounds_getPolygon (SkeletonBounds* self, BoundingBoxAttachment* boundingBox);
+BoundingPolygon* SkeletonBounds_getPolygon (SkeletonBounds* self, BoundingBoxAttachment* boundingBox);
 
 #ifdef __cplusplus
 }

@@ -109,6 +109,7 @@ void spineboy () {
 	}
 
 	SkeletonData_dispose(skeletonData);
+	SkeletonBounds_dispose(bounds);
 	Atlas_dispose(atlas);
 }
 
