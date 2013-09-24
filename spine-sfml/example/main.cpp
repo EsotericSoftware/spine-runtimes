@@ -35,6 +35,7 @@
 #include <string.h>
 #include <spine/spine-sfml.h>
 #include <SFML/Graphics.hpp>
+#include <SFML/Window/Mouse.hpp>
 
 using namespace std;
 using namespace spine;
@@ -50,6 +51,7 @@ void spineboy () {
 		exit(0);
 	}
 	SkeletonJson_dispose(json);
+	SkeletonBounds* bounds = SkeletonBounds_create();
 
 	// Configure mixing.
 	AnimationStateData* stateData = AnimationStateData_create(skeletonData);
@@ -67,6 +69,8 @@ void spineboy () {
 	skeleton->root->x = 320;
 	skeleton->root->y = 420;
 	Skeleton_updateWorldTransform(skeleton);
+
+	Slot* headSlot = Skeleton_findSlot(skeleton, "head");
 
 	if (true) {
 		AnimationState_setAnimationByName(drawable->state, "drawOrder", true);
@@ -87,11 +91,15 @@ void spineboy () {
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
-		/*if (drawable->state->loop) {
-		 if (drawable->state->time > 2) AnimationState_setAnimationByName(drawable->state, "jump", false);
-		 } else {
-		 if (drawable->state->time > 1) AnimationState_setAnimationByName(drawable->state, "walk", true);
-		 }*/
+		SkeletonBounds_update(bounds, skeleton, true);
+		sf::Vector2i position = sf::Mouse::getPosition(window);
+		if (SkeletonBounds_containsPoint(bounds, position.x, position.y)) {
+			headSlot->g = 0;
+			headSlot->b = 0;
+		} else {
+			headSlot->g = 1;
+			headSlot->b = 1;
+		}
 
 		drawable->update(delta);
 
@@ -105,7 +113,7 @@ void spineboy () {
 }
 
 void goblins () {
-	// Load atlas, skeleton, and animations.
+// Load atlas, skeleton, and animations.
 	Atlas* atlas = Atlas_readAtlasFile("../data/goblins.atlas");
 	SkeletonJson* json = SkeletonJson_create(atlas);
 	json->scale = 2;

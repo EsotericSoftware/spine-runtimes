@@ -411,7 +411,9 @@ SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* jso
 						continue;
 					}
 
-					if (attachment->type == ATTACHMENT_REGION || attachment->type == ATTACHMENT_REGION_SEQUENCE) {
+					switch (attachment->type) {
+					case ATTACHMENT_REGION:
+					case ATTACHMENT_REGION_SEQUENCE: {
 						RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
 						regionAttachment->x = Json_getFloat(attachmentMap, "x", 0) * self->scale;
 						regionAttachment->y = Json_getFloat(attachmentMap, "y", 0) * self->scale;
@@ -421,6 +423,19 @@ SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* jso
 						regionAttachment->width = Json_getFloat(attachmentMap, "width", 32) * self->scale;
 						regionAttachment->height = Json_getFloat(attachmentMap, "height", 32) * self->scale;
 						RegionAttachment_updateOffset(regionAttachment);
+						break;
+					}
+					case ATTACHMENT_BOUNDING_BOX: {
+						BoundingBoxAttachment* box = (BoundingBoxAttachment*)attachment;
+						Json* verticesArray = Json_getItem(attachmentMap, "vertices");
+						Json* vertex;
+						int i = 0;
+						box->verticesCount = verticesArray->size;
+						box->vertices = MALLOC(float, verticesArray->size);
+						for (vertex = verticesArray->child; vertex; vertex = vertex->next, ++i)
+							box->vertices[i] = vertex->valueFloat;
+						break;
+					}
 					}
 
 					Skin_addAttachment(skin, slotIndex, skinAttachmentName, attachment);

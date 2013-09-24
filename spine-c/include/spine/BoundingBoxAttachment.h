@@ -45,8 +45,8 @@ extern "C" {
 typedef struct BoundingBoxAttachment BoundingBoxAttachment;
 struct BoundingBoxAttachment {
 	Attachment super;
-	float* vertices;
 	int verticesCount;
+	float* vertices;
 };
 
 BoundingBoxAttachment* BoundingBoxAttachment_create (const char* name);

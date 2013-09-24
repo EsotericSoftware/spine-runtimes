@@ -41,7 +41,7 @@ BoundingBoxAttachment* BoundingBoxAttachment_create (const char* name) {
 	return self;
 }
 
-void BoundingBoxAttachment_computeVertices (BoundingBoxAttachment* self, float x, float y, Bone* bone, float* worldVertices) {
+void BoundingBoxAttachment_computeWorldVertices (BoundingBoxAttachment* self, float x, float y, Bone* bone, float* worldVertices) {
 	int i;
 	float px, py;
 	float* vertices = self->vertices;

@@ -89,7 +89,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 	vertexArray->clear();
 	states.blendMode = BlendAlpha;
 
-	float vertexPositions[8];
+	float worldVertices[8];
 	for (int i = 0; i < skeleton->slotCount; ++i) {
 		Slot* slot = skeleton->drawOrder[i];
 		Attachment* attachment = slot->attachment;
@@ -103,7 +103,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 			states.blendMode = blend;
 		}
 
-		RegionAttachment_computeVertices(regionAttachment, slot->skeleton->x, slot->skeleton->y, slot->bone, vertexPositions);
+		RegionAttachment_computeWorldVertices(regionAttachment, slot->skeleton->x, slot->skeleton->y, slot->bone, worldVertices);
 
 		Uint8 r = skeleton->r * slot->r * 255;
 		Uint8 g = skeleton->g * slot->g * 255;
@@ -128,14 +128,14 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 		vertices[3].color.b = b;
 		vertices[3].color.a = a;
 
-		vertices[0].position.x = vertexPositions[VERTEX_X1];
-		vertices[0].position.y = vertexPositions[VERTEX_Y1];
-		vertices[1].position.x = vertexPositions[VERTEX_X2];
-		vertices[1].position.y = vertexPositions[VERTEX_Y2];
-		vertices[2].position.x = vertexPositions[VERTEX_X3];
-		vertices[2].position.y = vertexPositions[VERTEX_Y3];
-		vertices[3].position.x = vertexPositions[VERTEX_X4];
-		vertices[3].position.y = vertexPositions[VERTEX_Y4];
+		vertices[0].position.x = worldVertices[VERTEX_X1];
+		vertices[0].position.y = worldVertices[VERTEX_Y1];
+		vertices[1].position.x = worldVertices[VERTEX_X2];
+		vertices[1].position.y = worldVertices[VERTEX_Y2];
+		vertices[2].position.x = worldVertices[VERTEX_X3];
+		vertices[2].position.y = worldVertices[VERTEX_Y3];
+		vertices[3].position.x = worldVertices[VERTEX_X4];
+		vertices[3].position.y = worldVertices[VERTEX_Y4];
 
 		// SMFL doesn't handle batching for us, so we'll just force a single texture per skeleton.
 		states.texture = (Texture*)((AtlasRegion*)regionAttachment->rendererObject)->page->rendererObject;

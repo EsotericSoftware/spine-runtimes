@@ -63,7 +63,7 @@ struct RegionAttachment {
 RegionAttachment* RegionAttachment_create (const char* name);
 void RegionAttachment_setUVs (RegionAttachment* self, float u, float v, float u2, float v2, int/*bool*/rotate);
 void RegionAttachment_updateOffset (RegionAttachment* self);
-void RegionAttachment_computeVertices (RegionAttachment* self, float x, float y, Bone* bone, float* vertices);
+void RegionAttachment_computeWorldVertices (RegionAttachment* self, float x, float y, Bone* bone, float* vertices);
 
 #ifdef __cplusplus
 }
