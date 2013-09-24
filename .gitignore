@@ -26,6 +26,8 @@ spine-cocos2d-iphone/libs/*
 forums
 spine-csharp/bin
 spine-csharp/obj
+*.DotSettings
+
 
 spine-monogame/xamarinstudio-ios/src/bin
 spine-monogame/xamarinstudio-ios/src/obj
