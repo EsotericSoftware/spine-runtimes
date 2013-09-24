@@ -92,6 +92,7 @@
 #include <string.h>
 #include <spine/Skeleton.h>
 #include <spine/RegionAttachment.h>
+#include <spine/BoundingBoxAttachment.h>
 #include <spine/Animation.h>
 #include <spine/Atlas.h>
 #include <spine/AttachmentLoader.h>

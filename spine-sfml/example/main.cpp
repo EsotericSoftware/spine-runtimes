@@ -68,9 +68,13 @@ void spineboy () {
 	skeleton->root->y = 420;
 	Skeleton_updateWorldTransform(skeleton);
 
-	AnimationState_setAnimationByName(drawable->state, "walk", true);
-	AnimationState_addAnimationByName(drawable->state, "jump", false, 0);
-	AnimationState_addAnimationByName(drawable->state, "walk", true, 0);
+	if (true) {
+		AnimationState_setAnimationByName(drawable->state, "drawOrder", true);
+	} else {
+		AnimationState_setAnimationByName(drawable->state, "walk", true);
+		AnimationState_addAnimationByName(drawable->state, "jump", false, 0);
+		AnimationState_addAnimationByName(drawable->state, "walk", true, 0);
+	}
 
 	sf::RenderWindow window(sf::VideoMode(640, 480), "Spine SFML");
 	window.setFramerateLimit(60);

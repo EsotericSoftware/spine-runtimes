@@ -89,7 +89,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 	vertexArray->clear();
 	float vertexPositions[8];
 	for (int i = 0; i < skeleton->slotCount; ++i) {
-		Slot* slot = skeleton->slots[i];
+		Slot* slot = skeleton->drawOrder[i];
 		Attachment* attachment = slot->attachment;
 		if (!attachment || attachment->type != ATTACHMENT_REGION) continue;
 		RegionAttachment* regionAttachment = (RegionAttachment*)attachment;

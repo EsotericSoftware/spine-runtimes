@@ -86,11 +86,11 @@ typedef struct _TimelineVtable {
 } _TimelineVtable;
 
 void _Timeline_init (Timeline* self, /**/
-		void (*dispose) (Timeline* self), /**/
-		void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha)) {
+void (*dispose) (Timeline* self), /**/
+void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha)) {
 	CONST_CAST(_TimelineVtable*, self->vtable) = NEW(_TimelineVtable);
-	VTABLE(Timeline, self) ->dispose = dispose;
-	VTABLE(Timeline, self) ->apply = apply;
+	VTABLE(Timeline, self)->dispose = dispose;
+	VTABLE(Timeline, self)->apply = apply;
 }
 
 void _Timeline_deinit (Timeline* self) {
@@ -98,11 +98,11 @@ void _Timeline_deinit (Timeline* self) {
 }
 
 void Timeline_dispose (Timeline* self) {
-	VTABLE(Timeline, self) ->dispose(self);
+	VTABLE(Timeline, self)->dispose(self);
 }
 
 void Timeline_apply (const Timeline* self, Skeleton* skeleton, float time, float alpha) {
-	VTABLE(Timeline, self) ->apply(self, skeleton, time, alpha);
+	VTABLE(Timeline, self)->apply(self, skeleton, time, alpha);
 }
 
 /**/
@@ -112,8 +112,8 @@ static const float CURVE_STEPPED = -1;
 static const int CURVE_SEGMENTS = 10;
 
 void _CurveTimeline_init (CurveTimeline* self, int frameCount, /**/
-		void (*dispose) (Timeline* self), /**/
-		void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha)) {
+void (*dispose) (Timeline* self), /**/
+void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha)) {
 	_Timeline_init(SUPER(self), dispose, apply);
 	self->curves = CALLOC(float, (frameCount - 1) * 6);
 }
@@ -226,7 +226,7 @@ void _BaseTimeline_dispose (Timeline* timeline) {
 
 /* Many timelines have structure identical to struct BaseTimeline and extend CurveTimeline. **/
 struct BaseTimeline* _BaseTimeline_create (int frameCount, int frameSize, /**/
-		void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha)) {
+void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha)) {
 
 	struct BaseTimeline* self = NEW(struct BaseTimeline);
 	_CurveTimeline_init(SUPER(self), frameCount, _BaseTimeline_dispose, apply);
@@ -349,7 +349,7 @@ void _ScaleTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float t
 	float lastFrameX, lastFrameY, frameTime, percent;
 
 	ScaleTimeline* self = SUB_CAST(ScaleTimeline, timeline);
-	
+
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
 	bone = skeleton->bones[self->boneIndex];
@@ -469,11 +469,10 @@ void _AttachmentTimeline_apply (const Timeline* timeline, Skeleton* skeleton, fl
 }
 
 void _AttachmentTimeline_dispose (Timeline* timeline) {
-	AttachmentTimeline* self;
+	AttachmentTimeline* self = SUB_CAST(AttachmentTimeline, timeline);
 	int i;
 
 	_Timeline_deinit(timeline);
-	self = (AttachmentTimeline*)timeline;
 
 	for (i = 0; i < self->framesLength; ++i)
 		FREE(self->attachmentNames[i]);
@@ -495,9 +494,73 @@ AttachmentTimeline* AttachmentTimeline_create (int frameCount) {
 
 void AttachmentTimeline_setFrame (AttachmentTimeline* self, int frameIndex, float time, const char* attachmentName) {
 	self->frames[frameIndex] = time;
+
 	FREE(self->attachmentNames[frameIndex]);
 	if (attachmentName)
 		MALLOC_STR(self->attachmentNames[frameIndex], attachmentName);
 	else
 		self->attachmentNames[frameIndex] = 0;
+}
+
+/**/
+
+#include <stdio.h>
+
+void _DrawOrderTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float time, float alpha) {
+	int i;
+	int frameIndex;
+	const int* drawOrderToSetupIndex;
+	DrawOrderTimeline* self = (DrawOrderTimeline*)timeline;
+
+	if (time < self->frames[0]) return; /* Time is before first frame. */
+
+	if (time >= self->frames[self->framesLength - 1]) /* Time is after last frame. */
+		frameIndex = self->framesLength - 1;
+	else
+		frameIndex = binarySearch(self->frames, self->framesLength, time, 1) - 1;
+
+	drawOrderToSetupIndex = self->drawOrders[frameIndex];
+	if (!drawOrderToSetupIndex)
+		memcpy(skeleton->drawOrder, skeleton->slots, self->slotCount * sizeof(int));
+	else {
+		for (i = 0; i < self->slotCount; i++)
+			skeleton->drawOrder[i] = skeleton->slots[drawOrderToSetupIndex[i]];
+	}
+}
+
+void _DrawOrderTimeline_dispose (Timeline* timeline) {
+	DrawOrderTimeline* self = SUB_CAST(DrawOrderTimeline, timeline);
+	int i;
+
+	_Timeline_deinit(timeline);
+
+	for (i = 0; i < self->framesLength; ++i)
+		FREE(self->drawOrders[i]);
+	FREE(self->drawOrders);
+	FREE(self->frames);
+	FREE(self);
+}
+
+DrawOrderTimeline* DrawOrderTimeline_create (int frameCount, int slotCount) {
+	DrawOrderTimeline* self = NEW(DrawOrderTimeline);
+	_Timeline_init(SUPER(self), _DrawOrderTimeline_dispose, _DrawOrderTimeline_apply);
+
+	CONST_CAST(int**, self->drawOrders) = CALLOC(int*, frameCount);
+	CONST_CAST(int, self->framesLength) = frameCount;
+	CONST_CAST(float*, self->frames) = CALLOC(float, frameCount);
+	CONST_CAST(int, self->slotCount) = slotCount;
+
+	return self;
+}
+
+void DrawOrderTimeline_setFrame (DrawOrderTimeline* self, int frameIndex, float time, const int* drawOrder) {
+	self->frames[frameIndex] = time;
+
+	FREE(self->drawOrders[frameIndex]);
+	if (!drawOrder)
+		self->drawOrders[frameIndex] = 0;
+	else {
+		self->drawOrders[frameIndex] = MALLOC(int, self->slotCount);
+		memcpy(CONST_CAST(int*, self->drawOrders[frameIndex]), drawOrder, self->slotCount * sizeof(int));
+	}
 }

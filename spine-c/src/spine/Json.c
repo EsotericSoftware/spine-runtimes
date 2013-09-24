@@ -54,7 +54,7 @@ void Json_dispose (Json *c) {
 	while (c) {
 		next = c->next;
 		if (c->child) Json_dispose(c->child);
-		if (c->valuestring) FREE(c->valuestring);
+		if (c->valueString) FREE(c->valueString);
 		if (c->name) FREE(c->name);
 		FREE(c);
 		c = next;
@@ -90,8 +90,8 @@ static const char* parse_number (Json *item, const char* num) {
 
 	n = sign * n * (float)pow(10.0f, (scale + subscale * signsubscale)); /* number = +/- number.fraction * 10^+/- exponent */
 
-	item->valuefloat = n;
-	item->valueint = (int)n;
+	item->valueFloat = n;
+	item->valueInt = (int)n;
 	item->type = Json_Number;
 	return num;
 }
@@ -185,7 +185,7 @@ static const char* parse_string (Json *item, const char* str) {
 	}
 	*ptr2 = 0;
 	if (*ptr == '\"') ptr++;
-	item->valuestring = out;
+	item->valueString = out;
 	item->type = Json_String;
 	return ptr;
 }
@@ -231,7 +231,7 @@ static const char* parse_value (Json *item, const char* value) {
 	}
 	if (!strncmp(value, "true", 4)) {
 		item->type = Json_True;
-		item->valueint = 1;
+		item->valueInt = 1;
 		return value + 4;
 	}
 	if (*value == '\"') {
@@ -267,6 +267,7 @@ static const char* parse_array (Json *item, const char* value) {
 	if (!item->child) return 0; /* memory fail */
 	value = skip(parse_value(child, skip(value))); /* skip any spacing, get the value. */
 	if (!value) return 0;
+	item->size = 1;
 
 	while (*value == ',') {
 		Json *new_item;
@@ -276,6 +277,7 @@ static const char* parse_array (Json *item, const char* value) {
 		child = new_item;
 		value = skip(parse_value(child, skip(value + 1)));
 		if (!value) return 0; /* memory fail */
+		item->size++;
 	}
 
 	if (*value == ']') return value + 1; /* end of array */
@@ -299,14 +301,15 @@ static const char* parse_object (Json *item, const char* value) {
 	if (!item->child) return 0;
 	value = skip(parse_string(child, skip(value)));
 	if (!value) return 0;
-	child->name = child->valuestring;
-	child->valuestring = 0;
+	child->name = child->valueString;
+	child->valueString = 0;
 	if (*value != ':') {
 		ep = value;
 		return 0;
 	} /* fail! */
 	value = skip(parse_value(child, skip(value + 1))); /* skip any spacing, get the value. */
 	if (!value) return 0;
+	item->size = 1;
 
 	while (*value == ',') {
 		Json *new_item;
@@ -316,35 +319,20 @@ static const char* parse_object (Json *item, const char* value) {
 		child = new_item;
 		value = skip(parse_string(child, skip(value + 1)));
 		if (!value) return 0;
-		child->name = child->valuestring;
-		child->valuestring = 0;
+		child->name = child->valueString;
+		child->valueString = 0;
 		if (*value != ':') {
 			ep = value;
 			return 0;
 		} /* fail! */
 		value = skip(parse_value(child, skip(value + 1))); /* skip any spacing, get the value. */
 		if (!value) return 0;
+		item->size++;
 	}
 
 	if (*value == '}') return value + 1; /* end of array */
 	ep = value;
 	return 0; /* malformed. */
-}
-
-/* Get Array size/item / object item. */
-int Json_getSize (Json *array) {
-	Json *c = array->child;
-	int i = 0;
-	while (c)
-		i++, c = c->next;
-	return i;
-}
-
-Json *Json_getItemAt (Json *array, int item) {
-	Json *c = array->child;
-	while (c && item > 0)
-		item--, c = c->next;
-	return c;
 }
 
 Json *Json_getItem (Json *object, const char* string) {
@@ -356,16 +344,16 @@ Json *Json_getItem (Json *object, const char* string) {
 
 const char* Json_getString (Json* object, const char* name, const char* defaultValue) {
 	object = Json_getItem(object, name);
-	if (object) return object->valuestring;
+	if (object) return object->valueString;
 	return defaultValue;
 }
 
 float Json_getFloat (Json* value, const char* name, float defaultValue) {
 	value = Json_getItem(value, name);
-	return value ? value->valuefloat : defaultValue;
+	return value ? value->valueFloat : defaultValue;
 }
 
 int Json_getInt (Json* value, const char* name, int defaultValue) {
 	value = Json_getItem(value, name);
-	return value ? (int)value->valuefloat : defaultValue;
+	return value ? (int)value->valueFloat : defaultValue;
 }

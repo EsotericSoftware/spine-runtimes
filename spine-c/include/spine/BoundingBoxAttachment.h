@@ -31,41 +31,29 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/AtlasAttachmentLoader.h>
-#include <spine/extension.h>
+#ifndef SPINE_BOUNDINGBOXATTACHMENT_H_
+#define SPINE_BOUNDINGBOXATTACHMENT_H_
 
-Attachment* _AtlasAttachmentLoader_newAttachment (AttachmentLoader* loader, Skin* skin, AttachmentType type, const char* name) {
-	AtlasAttachmentLoader* self = SUB_CAST(AtlasAttachmentLoader, loader);
-	switch (type) {
-	case ATTACHMENT_REGION: {
-		RegionAttachment* attachment;
-		AtlasRegion* region = Atlas_findRegion(self->atlas, name);
-		if (!region) {
-			_AttachmentLoader_setError(loader, "Region not found: ", name);
-			return 0;
-		}
-		attachment = RegionAttachment_create(name);
-		attachment->rendererObject = region;
-		RegionAttachment_setUVs(attachment, region->u, region->v, region->u2, region->v2, region->rotate);
-		attachment->regionOffsetX = region->offsetX;
-		attachment->regionOffsetY = region->offsetY;
-		attachment->regionWidth = region->width;
-		attachment->regionHeight = region->height;
-		attachment->regionOriginalWidth = region->originalWidth;
-		attachment->regionOriginalHeight = region->originalHeight;
-		return SUPER(attachment);
-	}
-	case ATTACHMENT_BOUNDING_BOX:
-		return SUPER(BoundingBoxAttachment_create(name));
-	default:
-		_AttachmentLoader_setUnknownTypeError(loader, type);
-		return 0;
-	}
-}
+#include <spine/Attachment.h>
+#include <spine/Atlas.h>
+#include <spine/Slot.h>
 
-AtlasAttachmentLoader* AtlasAttachmentLoader_create (Atlas* atlas) {
-	AtlasAttachmentLoader* self = NEW(AtlasAttachmentLoader);
-	_AttachmentLoader_init(SUPER(self), _AttachmentLoader_deinit, _AtlasAttachmentLoader_newAttachment);
-	self->atlas = atlas;
-	return self;
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct BoundingBoxAttachment BoundingBoxAttachment;
+struct BoundingBoxAttachment {
+	Attachment super;
+	float* vertices;
+	int verticesCount;
+};
+
+BoundingBoxAttachment* BoundingBoxAttachment_create (const char* name);
+void BoundingBoxAttachment_computeWorldVertices (BoundingBoxAttachment* self, float x, float y, Bone* bone, float* vertices);
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* SPINE_BOUNDINGBOXATTACHMENT_H_ */

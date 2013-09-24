@@ -137,6 +137,21 @@ AttachmentTimeline* AttachmentTimeline_create (int frameCount);
 /* @param attachmentName May be 0. */
 void AttachmentTimeline_setFrame (AttachmentTimeline* self, int frameIndex, float time, const char* attachmentName);
 
+/**/
+
+typedef struct {
+	Timeline super;
+	int const framesLength;
+	float* const frames; /* time, ... */
+	int slotIndex;
+	const int** const drawOrders;
+	int const slotCount;
+} DrawOrderTimeline;
+
+DrawOrderTimeline* DrawOrderTimeline_create (int frameCount, int slotCount);
+
+void DrawOrderTimeline_setFrame (DrawOrderTimeline* self, int frameIndex, float time, const int* drawOrder);
+
 #ifdef __cplusplus
 }
 #endif

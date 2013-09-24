@@ -31,41 +31,27 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/AtlasAttachmentLoader.h>
+#include <spine/BoundingBoxAttachment.h>
+#include <math.h>
 #include <spine/extension.h>
 
-Attachment* _AtlasAttachmentLoader_newAttachment (AttachmentLoader* loader, Skin* skin, AttachmentType type, const char* name) {
-	AtlasAttachmentLoader* self = SUB_CAST(AtlasAttachmentLoader, loader);
-	switch (type) {
-	case ATTACHMENT_REGION: {
-		RegionAttachment* attachment;
-		AtlasRegion* region = Atlas_findRegion(self->atlas, name);
-		if (!region) {
-			_AttachmentLoader_setError(loader, "Region not found: ", name);
-			return 0;
-		}
-		attachment = RegionAttachment_create(name);
-		attachment->rendererObject = region;
-		RegionAttachment_setUVs(attachment, region->u, region->v, region->u2, region->v2, region->rotate);
-		attachment->regionOffsetX = region->offsetX;
-		attachment->regionOffsetY = region->offsetY;
-		attachment->regionWidth = region->width;
-		attachment->regionHeight = region->height;
-		attachment->regionOriginalWidth = region->originalWidth;
-		attachment->regionOriginalHeight = region->originalHeight;
-		return SUPER(attachment);
-	}
-	case ATTACHMENT_BOUNDING_BOX:
-		return SUPER(BoundingBoxAttachment_create(name));
-	default:
-		_AttachmentLoader_setUnknownTypeError(loader, type);
-		return 0;
-	}
+BoundingBoxAttachment* BoundingBoxAttachment_create (const char* name) {
+	BoundingBoxAttachment* self = NEW(BoundingBoxAttachment);
+	_Attachment_init(SUPER(self), name, ATTACHMENT_BOUNDING_BOX, _Attachment_deinit);
+	return self;
 }
 
-AtlasAttachmentLoader* AtlasAttachmentLoader_create (Atlas* atlas) {
-	AtlasAttachmentLoader* self = NEW(AtlasAttachmentLoader);
-	_AttachmentLoader_init(SUPER(self), _AttachmentLoader_deinit, _AtlasAttachmentLoader_newAttachment);
-	self->atlas = atlas;
-	return self;
+void BoundingBoxAttachment_computeVertices (BoundingBoxAttachment* self, float x, float y, Bone* bone, float* worldVertices) {
+	int i;
+	float px, py;
+	float* vertices = self->vertices;
+
+	x += bone->worldX;
+	y += bone->worldY;
+	for (i = 0; i < self->verticesCount; i += 2) {
+		px = vertices[i];
+		py = vertices[i + 1];
+		worldVertices[i] = px * bone->m00 + py * bone->m01 + x;
+		worldVertices[i + 1] = px * bone->m10 + py * bone->m11 + y;
+	}
 }
