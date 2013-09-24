@@ -97,23 +97,15 @@ namespace Spine {
 					byte r = (byte)(skeletonR * slot.R * 255);
 					byte g = (byte)(skeletonG * slot.G * 255);
 					byte b = (byte)(skeletonB * slot.B * 255);
-					byte a = (byte)(skeletonA * slot.A * 255);
-					item.vertexTL.Color.R = r;
-					item.vertexTL.Color.G = g;
-					item.vertexTL.Color.B = b;
-					item.vertexTL.Color.A = a;
-					item.vertexBL.Color.R = r;
-					item.vertexBL.Color.G = g;
-					item.vertexBL.Color.B = b;
-					item.vertexBL.Color.A = a;
-					item.vertexBR.Color.R = r;
-					item.vertexBR.Color.G = g;
-					item.vertexBR.Color.B = b;
-					item.vertexBR.Color.A = a;
-					item.vertexTR.Color.R = r;
-					item.vertexTR.Color.G = g;
-					item.vertexTR.Color.B = b;
-					item.vertexTR.Color.A = a;
+					float a = (skeletonA * slot.A); //Alpha is from 0 to 1
+					
+					//For XNA 4.0 (Alphablend) Alpha is applied to a color by multiplication
+					Color color = new Color(r,g,b) * a;
+					
+					item.vertexTL.Color = color;
+                    			item.vertexBL.Color = color;
+                    			item.vertexBR.Color = color;
+                    			item.vertexTR.Color = color;
 
 					float[] vertices = this.vertices;
 					regionAttachment.ComputeWorldVertices(x, y, slot.Bone, vertices);
