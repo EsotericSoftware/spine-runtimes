@@ -320,26 +320,30 @@ public class SkeletonJson {
 			int slotCount = skeletonData.slots.size;
 			int frameIndex = 0;
 			for (JsonValue drawOrderMap = drawOrdersMap.child; drawOrderMap != null; drawOrderMap = drawOrderMap.next()) {
-				int[] drawOrder = new int[slotCount];
-				for (int i = slotCount - 1; i >= 0; i--)
-					drawOrder[i] = -1;
-				int[] unchanged = new int[slotCount - drawOrderMap.get("offsets").size];
-				int originalIndex = 0, unchangedIndex = 0;
-				for (JsonValue offsetMap = drawOrderMap.getChild("offsets"); offsetMap != null; offsetMap = offsetMap.next()) {
-					int slotIndex = skeletonData.findSlotIndex(offsetMap.getString("slot"));
-					if (slotIndex == -1) throw new SerializationException("Slot not found: " + offsetMap.getString("slot"));
-					// Collect unchanged items.
-					while (originalIndex != slotIndex)
+				int[] drawOrder = null;
+				JsonValue offsets = drawOrderMap.get("offsets");
+				if (offsets != null) {
+					drawOrder = new int[slotCount];
+					for (int i = slotCount - 1; i >= 0; i--)
+						drawOrder[i] = -1;
+					int[] unchanged = new int[slotCount - offsets.size];
+					int originalIndex = 0, unchangedIndex = 0;
+					for (JsonValue offsetMap = offsets.child; offsetMap != null; offsetMap = offsetMap.next()) {
+						int slotIndex = skeletonData.findSlotIndex(offsetMap.getString("slot"));
+						if (slotIndex == -1) throw new SerializationException("Slot not found: " + offsetMap.getString("slot"));
+						// Collect unchanged items.
+						while (originalIndex != slotIndex)
+							unchanged[unchangedIndex++] = originalIndex++;
+						// Set changed items.
+						drawOrder[originalIndex + offsetMap.getInt("offset")] = originalIndex++;
+					}
+					// Collect remaining unchanged items.
+					while (originalIndex < slotCount)
 						unchanged[unchangedIndex++] = originalIndex++;
-					// Set changed items.
-					drawOrder[originalIndex + offsetMap.getInt("offset")] = originalIndex++;
+					// Fill in unchanged items.
+					for (int i = slotCount - 1; i >= 0; i--)
+						if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
 				}
-				// Collect remaining unchanged items.
-				while (originalIndex < slotCount)
-					unchanged[unchangedIndex++] = originalIndex++;
-				// Fill in unchanged items.
-				for (int i = slotCount - 1; i >= 0; i--)
-					if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
 				timeline.setFrame(frameIndex++, drawOrderMap.getFloat("time"), drawOrder);
 			}
 			timelines.add(timeline);

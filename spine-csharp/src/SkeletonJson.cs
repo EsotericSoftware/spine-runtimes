@@ -372,27 +372,30 @@ namespace Spine {
 				int slotCount = skeletonData.slots.Count;
 				int frameIndex = 0;
 				foreach (Dictionary<String, Object> drawOrderMap in values) {
-					int[] drawOrder = new int[slotCount];
-					for (int i = slotCount - 1; i >= 0; i--)
-						drawOrder[i] = -1;
-					List<Object> offsets = (List<Object>)drawOrderMap["offsets"];
-					int[] unchanged = new int[slotCount - offsets.Count];
-					int originalIndex = 0, unchangedIndex = 0;
-					foreach (Dictionary<String, Object> offsetMap in offsets) {
-						int slotIndex = skeletonData.FindSlotIndex((String)offsetMap["slot"]);
-						if (slotIndex == -1) throw new Exception("Slot not found: " + offsetMap["slot"]);
-						// Collect unchanged items.
-						while (originalIndex != slotIndex)
+					int[] drawOrder = null;
+					if (drawOrderMap.ContainsKey("offsets")) {
+						drawOrder = new int[slotCount];
+						for (int i = slotCount - 1; i >= 0; i--)
+							drawOrder[i] = -1;
+						List<Object> offsets = (List<Object>)drawOrderMap["offsets"];
+						int[] unchanged = new int[slotCount - offsets.Count];
+						int originalIndex = 0, unchangedIndex = 0;
+						foreach (Dictionary<String, Object> offsetMap in offsets) {
+							int slotIndex = skeletonData.FindSlotIndex((String)offsetMap["slot"]);
+							if (slotIndex == -1) throw new Exception("Slot not found: " + offsetMap["slot"]);
+							// Collect unchanged items.
+							while (originalIndex != slotIndex)
+								unchanged[unchangedIndex++] = originalIndex++;
+							// Set changed items.
+							drawOrder[originalIndex + (int)(float)offsetMap["offset"]] = originalIndex++;
+						}
+						// Collect remaining unchanged items.
+						while (originalIndex < slotCount)
 							unchanged[unchangedIndex++] = originalIndex++;
-						// Set changed items.
-						drawOrder[originalIndex + (int)(float)offsetMap["offset"]] = originalIndex++;
+						// Fill in unchanged items.
+						for (int i = slotCount - 1; i >= 0; i--)
+							if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
 					}
-					// Collect remaining unchanged items.
-					while (originalIndex < slotCount)
-						unchanged[unchangedIndex++] = originalIndex++;
-					// Fill in unchanged items.
-					for (int i = slotCount - 1; i >= 0; i--)
-						if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
 					timeline.setFrame(frameIndex++, (float)drawOrderMap["time"], drawOrder);
 				}
 				timelines.Add(timeline);
