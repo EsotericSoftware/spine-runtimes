@@ -127,6 +127,8 @@
 		4319B84416FF9D3A00C1D7A9 /* LICENSE_cocos2d.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4319B7C816FF9D3900C1D7A9 /* LICENSE_cocos2d.txt */; };
 		4319B84516FF9D3A00C1D7A9 /* LICENSE_CocosDenshion.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4319B7C916FF9D3900C1D7A9 /* LICENSE_CocosDenshion.txt */; };
 		4319B84616FF9D3A00C1D7A9 /* LICENSE_Kazmath.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4319B7CA16FF9D3900C1D7A9 /* LICENSE_Kazmath.txt */; };
+		4374AF6D17F1D85F00401ACE /* BoundingBoxAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 4374AF6B17F1D85F00401ACE /* BoundingBoxAttachment.c */; };
+		4374AF6E17F1D85F00401ACE /* SkeletonBounds.c in Sources */ = {isa = PBXBuildFile; fileRef = 4374AF6C17F1D85F00401ACE /* SkeletonBounds.c */; };
 		43BFBE0F170A778A00ECBACB /* spine-cocos2d-iphone.m in Sources */ = {isa = PBXBuildFile; fileRef = 43BFBE0D170A778A00ECBACB /* spine-cocos2d-iphone.m */; };
 		43BFBE10170A804700ECBACB /* Animation.c in Sources */ = {isa = PBXBuildFile; fileRef = 43BFBDB3170A705100ECBACB /* Animation.c */; };
 		43BFBE11170A804700ECBACB /* AnimationState.c in Sources */ = {isa = PBXBuildFile; fileRef = 43BFBDB4170A705100ECBACB /* AnimationState.c */; };
@@ -419,6 +421,10 @@
 		4319B7C816FF9D3900C1D7A9 /* LICENSE_cocos2d.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE_cocos2d.txt; sourceTree = "<group>"; };
 		4319B7C916FF9D3900C1D7A9 /* LICENSE_CocosDenshion.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE_CocosDenshion.txt; sourceTree = "<group>"; };
 		4319B7CA16FF9D3900C1D7A9 /* LICENSE_Kazmath.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE_Kazmath.txt; sourceTree = "<group>"; };
+		4374AF6817F1D84300401ACE /* BoundingBoxAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BoundingBoxAttachment.h; path = "../spine-c/include/spine/BoundingBoxAttachment.h"; sourceTree = "<group>"; };
+		4374AF6917F1D84300401ACE /* SkeletonBounds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonBounds.h; path = "../spine-c/include/spine/SkeletonBounds.h"; sourceTree = "<group>"; };
+		4374AF6B17F1D85F00401ACE /* BoundingBoxAttachment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = BoundingBoxAttachment.c; path = "../spine-c/src/spine/BoundingBoxAttachment.c"; sourceTree = "<group>"; };
+		4374AF6C17F1D85F00401ACE /* SkeletonBounds.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = SkeletonBounds.c; path = "../spine-c/src/spine/SkeletonBounds.c"; sourceTree = "<group>"; };
 		43BFBDA1170A703E00ECBACB /* Animation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Animation.h; path = "../spine-c/include/spine/Animation.h"; sourceTree = "<group>"; };
 		43BFBDA2170A703E00ECBACB /* AnimationState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AnimationState.h; path = "../spine-c/include/spine/AnimationState.h"; sourceTree = "<group>"; };
 		43BFBDA3170A703E00ECBACB /* AnimationStateData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AnimationStateData.h; path = "../spine-c/include/spine/AnimationStateData.h"; sourceTree = "<group>"; };
@@ -929,6 +935,8 @@
 				43BFBDA8170A703E00ECBACB /* Bone.h */,
 				43BFBDBB170A705100ECBACB /* BoneData.c */,
 				43BFBDA9170A703E00ECBACB /* BoneData.h */,
+				4374AF6B17F1D85F00401ACE /* BoundingBoxAttachment.c */,
+				4374AF6817F1D84300401ACE /* BoundingBoxAttachment.h */,
 				43BFBDBC170A705100ECBACB /* extension.c */,
 				43BFBDAA170A703E00ECBACB /* extension.h */,
 				43BFBDBD170A705100ECBACB /* Json.c */,
@@ -937,6 +945,8 @@
 				43BFBDAB170A703E00ECBACB /* RegionAttachment.h */,
 				43BFBDC0170A705100ECBACB /* Skeleton.c */,
 				43BFBDAC170A703E00ECBACB /* Skeleton.h */,
+				4374AF6C17F1D85F00401ACE /* SkeletonBounds.c */,
+				4374AF6917F1D84300401ACE /* SkeletonBounds.h */,
 				43BFBDC1170A705100ECBACB /* SkeletonData.c */,
 				43BFBDAD170A703E00ECBACB /* SkeletonData.h */,
 				43BFBDC2170A705100ECBACB /* SkeletonJson.c */,
@@ -1195,6 +1205,8 @@
 				43C32A20170B1295004A9460 /* main.m in Sources */,
 				43D3163A173ACAE00028AA22 /* CCSkeleton.m in Sources */,
 				43D3163B173ACAE00028AA22 /* CCSkeletonAnimation.m in Sources */,
+				4374AF6D17F1D85F00401ACE /* BoundingBoxAttachment.c in Sources */,
+				4374AF6E17F1D85F00401ACE /* SkeletonBounds.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

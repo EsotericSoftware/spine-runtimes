@@ -36,78 +36,24 @@ using System.Collections.Generic;
 
 namespace Spine {
 	public class SkeletonBounds {
-		private bool aabb;
 		private List<Polygon> polygonPool = new List<Polygon>();
+		private float minX, minY, maxX, maxY;
 
 		public List<BoundingBoxAttachment> BoundingBoxes { get; private set; }
 		public List<Polygon> Polygons { get; private set; }
-
-		private float minX;
-		public float MinX {
-			get {
-				if (!aabb) aabbCompute();
-				return minX;
-			}
-			private set {
-				minX = value;
-			}
-		}
-
-		private float maxX;
-		public float MaxX {
-			get {
-				if (!aabb) aabbCompute();
-				return maxX;
-			}
-			private set {
-				maxX = value;
-			}
-		}
-
-		private float minY;
-		public float MinY {
-			get {
-				if (!aabb) aabbCompute();
-				return minY;
-			}
-			private set {
-				minY = value;
-			}
-		}
-
-		private float maxY;
-		public float MaxY {
-			get {
-				if (!aabb) aabbCompute();
-				return maxY;
-			}
-			private set {
-				maxY = value;
-			}
-		}
-
-		public float Width {
-			get {
-				if (!aabb) aabbCompute();
-				return maxX - minX;
-			}
-		}
-
-		public float Height {
-			get {
-				if (!aabb) aabbCompute();
-				return maxY - minY;
-			}
-		}
+		public float MinX { get { return minX; } set { minX = value; } }
+		public float MinY { get { return minY; } set { minY = value; } }
+		public float MaxX { get { return maxX; } set { maxX = value; } }
+		public float MaxY { get { return maxY; } set { maxY = value; } }
+		public float Width { get { return maxX - minX; } }
+		public float Height { get { return maxY - minY; } }
 
 		public SkeletonBounds () {
 			BoundingBoxes = new List<BoundingBoxAttachment>();
 			Polygons = new List<Polygon>();
 		}
 
-		public void Update (Skeleton skeleton) {
-			aabb = false;
-
+		public void Update (Skeleton skeleton, bool updateAabb) {
 			List<BoundingBoxAttachment> boundingBoxes = BoundingBoxes;
 			List<Polygon> polygons = Polygons;
 			List<Slot> slots = skeleton.slots;
@@ -139,6 +85,8 @@ namespace Spine {
 				if (polygon.Vertices.Length < count) polygon.Vertices = new float[count];
 				boundingBox.ComputeWorldVertices(x, y, slot.bone, polygon.Vertices);
 			}
+
+			if (updateAabb) aabbCompute();
 		}
 
 		private void aabbCompute () {
@@ -160,19 +108,16 @@ namespace Spine {
 			this.minY = minY;
 			this.maxX = maxX;
 			this.maxY = maxY;
-			aabb = true;
 		}
 
 
 		/** Returns true if the axis aligned bounding box contains the point. */
 		public bool AabbContainsPoint (float x, float y) {
-			if (!aabb) aabbCompute();
 			return x >= minX && x <= maxX && y >= minY && y <= maxY;
 		}
 
 		/** Returns true if the axis aligned bounding box intersects the line segment. */
 		public bool AabbIntersectsSegment (float x1, float y1, float x2, float y2) {
-			if (!aabb) aabbCompute();
 			float minX = this.minX;
 			float minY = this.minY;
 			float maxX = this.maxX;
@@ -193,14 +138,11 @@ namespace Spine {
 
 		/** Returns true if the axis aligned bounding box intersects the axis aligned bounding box of the specified bounds. */
 		public bool AabbIntersectsSkeleton (SkeletonBounds bounds) {
-			if (!aabb) aabbCompute();
-			if (!bounds.aabb) bounds.aabbCompute();
 			return minX < bounds.maxX && maxX > bounds.minX && minY < bounds.maxY && maxY > bounds.minY;
 		}
 
-		/** Returns true if the bounding box attachment contains the point. */
-		public bool ContainsPoint (int index, float x, float y) {
-			Polygon polygon = Polygons[index];
+		/** Returns true if the polygon contains the point. */
+		public bool ContainsPoint (Polygon polygon, float x, float y) {
 			float[] vertices = polygon.Vertices;
 			int nn = polygon.Count;
 
@@ -209,7 +151,7 @@ namespace Spine {
 			for (int ii = 0; ii < nn; ii += 2) {
 				float vertexY = vertices[ii + 1];
 				float prevY = vertices[prevIndex + 1];
-				if (vertexY < y && prevY >= y || prevY < y && vertexY >= y) {
+				if ((vertexY < y && prevY >= y) || (prevY < y && vertexY >= y)) {
 					float vertexX = vertices[ii];
 					if (vertexX + (y - vertexY) / (prevY - vertexY) * (vertices[prevIndex] - vertexX) < x) inside = !inside;
 				}
@@ -219,40 +161,25 @@ namespace Spine {
 		}
 
 		/** Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
-		 * efficient to only call this method if {@link #aabbContainsPoint(float, float)} return true. */
+		 * efficient to only call this method if {@link #aabbContainsPoint(float, float)} returns true. */
 		public BoundingBoxAttachment ContainsPoint (float x, float y) {
-			List<BoundingBoxAttachment> boundingBoxes = BoundingBoxes;
-			for (int i = 0, n = boundingBoxes.Count; i < n; i++)
-				if (ContainsPoint(i, x, y)) return boundingBoxes[i];
+			List<Polygon> polygons = Polygons;
+			for (int i = 0, n = polygons.Count; i < n; i++)
+				if (ContainsPoint(polygons[i], x, y)) return BoundingBoxes[i];
 			return null;
-		}
-
-		/** Returns true if the bounding box attachment contains the point. The bounding box must be in the SkeletonBounds. */
-		public bool containsPoint (BoundingBoxAttachment attachment, float x, float y) {
-			int index = BoundingBoxes.IndexOf(attachment);
-			return index == -1 ? false : ContainsPoint(index, x, y);
 		}
 
 		/** Returns the first bounding box attachment that contains the line segment, or null. When doing many checks, it is usually
-		 * more efficient to only call this method if {@link #aabbIntersectsSegment(float, float, float, float)} return true. */
+		 * more efficient to only call this method if {@link #aabbIntersectsSegment(float, float, float, float)} returns true. */
 		public BoundingBoxAttachment IntersectsSegment (float x1, float y1, float x2, float y2) {
-			List<BoundingBoxAttachment> boundingBoxes = BoundingBoxes;
-			for (int i = 0, n = boundingBoxes.Count; i < n; i++) {
-				BoundingBoxAttachment attachment = boundingBoxes[i];
-				if (IntersectsSegment(attachment, x1, y1, x2, y2)) return attachment;
-			}
+			List<Polygon> polygons = Polygons;
+			for (int i = 0, n = polygons.Count; i < n; i++)
+				if (IntersectsSegment(polygons[i], x1, y1, x2, y2)) return BoundingBoxes[i];
 			return null;
 		}
 
-		/** Returns true if the bounding box attachment contains the line segment. */
-		public bool IntersectsSegment (BoundingBoxAttachment attachment, float x1, float y1, float x2, float y2) {
-			int index = BoundingBoxes.IndexOf(attachment);
-			return index == -1 ? false : IntersectsSegment(index, x1, y1, x2, y2);
-		}
-
-		/** Returns true if the bounding box attachment contains the line segment. */
-		public bool IntersectsSegment (int index, float x1, float y1, float x2, float y2) {
-			Polygon polygon = Polygons[index];
+		/** Returns true if the polygon contains the line segment. */
+		public bool IntersectsSegment (Polygon polygon, float x1, float y1, float x2, float y2) {
 			float[] vertices = polygon.Vertices;
 			int nn = polygon.Count;
 
@@ -273,6 +200,11 @@ namespace Spine {
 				y3 = y4;
 			}
 			return false;
+		}
+
+		public Polygon getPolygon (BoundingBoxAttachment attachment) {
+			int index = BoundingBoxes.IndexOf(attachment);
+			return index == -1 ? null : Polygons[index];
 		}
 	}
 }

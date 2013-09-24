@@ -32,39 +32,29 @@
  *****************************************************************************/
 
 package spine.attachments {
-import spine.Skin;
-import spine.atlas.Atlas;
-import spine.atlas.AtlasRegion;
+import spine.Bone;
 
-public class AtlasAttachmentLoader implements AttachmentLoader {
-	private var atlas:Atlas;
+public dynamic class BoundingBoxAttachment extends Attachment {
+	public var vertices:Vector.<Number> = new Vector.<Number>();
 
-	public function AtlasAttachmentLoader (atlas:Atlas) {
-		if (atlas == null)
-			throw new ArgumentError("atlas cannot be null.");
-		this.atlas = atlas;
+	public function BoundingBoxAttachment (name:String) {
+		super(name);
 	}
-
-	public function newAttachment (skin:Skin, type:AttachmentType, name:String) : Attachment {
-		switch (type) {
-		case AttachmentType.region:
-			var region:AtlasRegion  = atlas.findRegion(name);
-			if (region == null)
-				throw new Error("Region not found in atlas: " + name + " (" + type + ")");
-			var attachment:RegionAttachment = new RegionAttachment(name);
-			attachment.rendererObject = region;
-			attachment.setUVs(region.u, region.v, region.u2, region.v2, region.rotate);
-			attachment.regionOffsetX = region.offsetX;
-			attachment.regionOffsetY = region.offsetY;
-			attachment.regionWidth = region.width;
-			attachment.regionHeight = region.height;
-			attachment.regionOriginalWidth = region.originalWidth;
-			attachment.regionOriginalHeight = region.originalHeight;
-			return attachment;
-		case AttachmentType.boundingbox:
-			return new BoundingBoxAttachment(name);
+	
+	public function computeWorldVertices (x:Number, y:Number, bone:Bone, worldVertices:Vector.<Number>) : void {
+		x += bone.worldX;
+		y += bone.worldY;
+		var m00:Number = bone.m00;
+		var m01:Number = bone.m01;
+		var m10:Number = bone.m10;
+		var m11:Number = bone.m11;
+		var vertices:Vector.<Number> = this.vertices;
+		for (var i:int = 0, n:int = vertices.length; i < n; i += 2) {
+			var px:Number = vertices[i];
+			var py:Number = vertices[i + 1];
+			worldVertices[i] = px * m00 + py * m01 + x;
+			worldVertices[i + 1] = px * m10 + py * m11 + y;
 		}
-		throw new Error("Unknown attachment type: " + type);
 	}
 }
 

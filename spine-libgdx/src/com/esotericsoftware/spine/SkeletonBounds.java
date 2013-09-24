@@ -40,14 +40,11 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 
 public class SkeletonBounds {
-	private boolean aabb;
 	private float minX, minY, maxX, maxY;
 	private Array<BoundingBoxAttachment> boundingBoxes = new Array();
 	private Array<FloatArray> polygons = new Array();
 
-	public void update (Skeleton skeleton) {
-		aabb = false;
-
+	public void update (Skeleton skeleton, boolean updateAabb) {
 		Array<BoundingBoxAttachment> boundingBoxes = this.boundingBoxes;
 		Array<FloatArray> polygons = this.polygons;
 		Array<Slot> slots = skeleton.slots;
@@ -75,6 +72,8 @@ public class SkeletonBounds {
 				boundingBox.computeWorldVertices(x, y, slot.bone, polygon.items);
 			}
 		}
+
+		if (updateAabb) aabbCompute();
 	}
 
 	private void aabbCompute () {
@@ -96,18 +95,15 @@ public class SkeletonBounds {
 		this.minY = minY;
 		this.maxX = maxX;
 		this.maxY = maxY;
-		aabb = true;
 	}
 
 	/** Returns true if the axis aligned bounding box contains the point. */
 	public boolean aabbContainsPoint (float x, float y) {
-		if (!aabb) aabbCompute();
 		return x >= minX && x <= maxX && y >= minY && y <= maxY;
 	}
 
 	/** Returns true if the axis aligned bounding box intersects the line segment. */
 	public boolean aabbIntersectsSegment (float x1, float y1, float x2, float y2) {
-		if (!aabb) aabbCompute();
 		float minX = this.minX;
 		float minY = this.minY;
 		float maxX = this.maxX;
@@ -128,14 +124,20 @@ public class SkeletonBounds {
 
 	/** Returns true if the axis aligned bounding box intersects the axis aligned bounding box of the specified bounds. */
 	public boolean aabbIntersectsSkeleton (SkeletonBounds bounds) {
-		if (!aabb) aabbCompute();
-		if (!bounds.aabb) bounds.aabbCompute();
 		return minX < bounds.maxX && maxX > bounds.minX && minY < bounds.maxY && maxY > bounds.minY;
 	}
 
+	/** Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
+	 * efficient to only call this method if {@link #aabbContainsPoint(float, float)} returns true. */
+	public BoundingBoxAttachment containsPoint (float x, float y) {
+		Array<FloatArray> polygons = this.polygons;
+		for (int i = 0, n = polygons.size; i < n; i++)
+			if (containsPoint(polygons.get(i), x, y)) return boundingBoxes.get(i);
+		return null;
+	}
+
 	/** Returns true if the bounding box attachment contains the point. */
-	public boolean containsPoint (int index, float x, float y) {
-		FloatArray polygon = polygons.get(index);
+	public boolean containsPoint (FloatArray polygon, float x, float y) {
 		float[] vertices = polygon.items;
 		int nn = polygon.size;
 
@@ -144,7 +146,7 @@ public class SkeletonBounds {
 		for (int ii = 0; ii < nn; ii += 2) {
 			float vertexY = vertices[ii + 1];
 			float prevY = vertices[prevIndex + 1];
-			if (vertexY < y && prevY >= y || prevY < y && vertexY >= y) {
+			if ((vertexY < y && prevY >= y) || (prevY < y && vertexY >= y)) {
 				float vertexX = vertices[ii];
 				if (vertexX + (y - vertexY) / (prevY - vertexY) * (vertices[prevIndex] - vertexX) < x) inside = !inside;
 			}
@@ -153,41 +155,17 @@ public class SkeletonBounds {
 		return inside;
 	}
 
-	/** Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
-	 * efficient to only call this method if {@link #aabbContainsPoint(float, float)} return true. */
-	public BoundingBoxAttachment containsPoint (float x, float y) {
-		Array<BoundingBoxAttachment> boundingBoxes = this.boundingBoxes;
-		for (int i = 0, n = boundingBoxes.size; i < n; i++)
-			if (containsPoint(i, x, y)) return boundingBoxes.get(i);
-		return null;
-	}
-
-	/** Returns true if the bounding box attachment contains the point. The bounding box must be in the SkeletonBounds. */
-	public boolean containsPoint (BoundingBoxAttachment attachment, float x, float y) {
-		int index = boundingBoxes.indexOf(attachment, true);
-		return index == -1 ? false : containsPoint(index, x, y);
-	}
-
 	/** Returns the first bounding box attachment that contains the line segment, or null. When doing many checks, it is usually
-	 * more efficient to only call this method if {@link #aabbIntersectsSegment(float, float, float, float)} return true. */
+	 * more efficient to only call this method if {@link #aabbIntersectsSegment(float, float, float, float)} returns true. */
 	public BoundingBoxAttachment intersectsSegment (float x1, float y1, float x2, float y2) {
-		Array<BoundingBoxAttachment> boundingBoxes = this.boundingBoxes;
-		for (int i = 0, n = boundingBoxes.size; i < n; i++) {
-			BoundingBoxAttachment attachment = boundingBoxes.get(i);
-			if (intersectsSegment(attachment, x1, y1, x2, y2)) return attachment;
-		}
+		Array<FloatArray> polygons = this.polygons;
+		for (int i = 0, n = polygons.size; i < n; i++)
+			if (intersectsSegment(polygons.get(i), x1, y1, x2, y2)) return boundingBoxes.get(i);
 		return null;
 	}
 
 	/** Returns true if the bounding box attachment contains the line segment. */
-	public boolean intersectsSegment (BoundingBoxAttachment attachment, float x1, float y1, float x2, float y2) {
-		int index = boundingBoxes.indexOf(attachment, true);
-		return index == -1 ? false : intersectsSegment(index, x1, y1, x2, y2);
-	}
-
-	/** Returns true if the bounding box attachment contains the line segment. */
-	public boolean intersectsSegment (int index, float x1, float y1, float x2, float y2) {
-		FloatArray polygon = polygons.get(index);
+	public boolean intersectsSegment (FloatArray polygon, float x1, float y1, float x2, float y2) {
 		float[] vertices = polygon.items;
 		int nn = polygon.size;
 
@@ -211,32 +189,26 @@ public class SkeletonBounds {
 	}
 
 	public float getMinX () {
-		if (!aabb) aabbCompute();
 		return minX;
 	}
 
 	public float getMinY () {
-		if (!aabb) aabbCompute();
 		return minY;
 	}
 
 	public float getMaxX () {
-		if (!aabb) aabbCompute();
 		return maxX;
 	}
 
 	public float getMaxY () {
-		if (!aabb) aabbCompute();
 		return maxY;
 	}
 
 	public float getWidth () {
-		if (!aabb) aabbCompute();
 		return maxX - minX;
 	}
 
 	public float getHeight () {
-		if (!aabb) aabbCompute();
 		return maxY - minY;
 	}
 

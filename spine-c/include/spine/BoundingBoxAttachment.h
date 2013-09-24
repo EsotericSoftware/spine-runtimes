@@ -31,41 +31,29 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine.attachments {
-import spine.Skin;
-import spine.atlas.Atlas;
-import spine.atlas.AtlasRegion;
+#ifndef SPINE_BOUNDINGBOXATTACHMENT_H_
+#define SPINE_BOUNDINGBOXATTACHMENT_H_
 
-public class AtlasAttachmentLoader implements AttachmentLoader {
-	private var atlas:Atlas;
+#include <spine/Attachment.h>
+#include <spine/Atlas.h>
+#include <spine/Slot.h>
 
-	public function AtlasAttachmentLoader (atlas:Atlas) {
-		if (atlas == null)
-			throw new ArgumentError("atlas cannot be null.");
-		this.atlas = atlas;
-	}
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-	public function newAttachment (skin:Skin, type:AttachmentType, name:String) : Attachment {
-		switch (type) {
-		case AttachmentType.region:
-			var region:AtlasRegion  = atlas.findRegion(name);
-			if (region == null)
-				throw new Error("Region not found in atlas: " + name + " (" + type + ")");
-			var attachment:RegionAttachment = new RegionAttachment(name);
-			attachment.rendererObject = region;
-			attachment.setUVs(region.u, region.v, region.u2, region.v2, region.rotate);
-			attachment.regionOffsetX = region.offsetX;
-			attachment.regionOffsetY = region.offsetY;
-			attachment.regionWidth = region.width;
-			attachment.regionHeight = region.height;
-			attachment.regionOriginalWidth = region.originalWidth;
-			attachment.regionOriginalHeight = region.originalHeight;
-			return attachment;
-		case AttachmentType.boundingbox:
-			return new BoundingBoxAttachment(name);
-		}
-		throw new Error("Unknown attachment type: " + type);
-	}
+typedef struct BoundingBoxAttachment BoundingBoxAttachment;
+struct BoundingBoxAttachment {
+	Attachment super;
+	int verticesCount;
+	float* vertices;
+};
+
+BoundingBoxAttachment* BoundingBoxAttachment_create (const char* name);
+void BoundingBoxAttachment_computeWorldVertices (BoundingBoxAttachment* self, float x, float y, Bone* bone, float* vertices);
+
+#ifdef __cplusplus
 }
+#endif
 
-}
+#endif /* SPINE_BOUNDINGBOXATTACHMENT_H_ */

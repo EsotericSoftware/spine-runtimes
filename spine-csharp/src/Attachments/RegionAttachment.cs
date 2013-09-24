@@ -130,7 +130,7 @@ namespace Spine {
 			offset[Y4] = localYCos + localX2Sin;
 		}
 
-		public void ComputeVertices (float x, float y, Bone bone, float[] vertices) {
+		public void ComputeWorldVertices (float x, float y, Bone bone, float[] vertices) {
 			x += bone.worldX;
 			y += bone.worldY;
 			float m00 = bone.m00;

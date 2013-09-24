@@ -55,9 +55,8 @@ Attachment* _AtlasAttachmentLoader_newAttachment (AttachmentLoader* loader, Skin
 		attachment->regionOriginalHeight = region->originalHeight;
 		return SUPER(attachment);
 	}
-	case ATTACHMENT_BOUNDING_BOX: {
-		return 0; // BOZO - Implement bounding boxes.
-	}
+	case ATTACHMENT_BOUNDING_BOX:
+		return SUPER(BoundingBoxAttachment_create(name));
 	default:
 		_AttachmentLoader_setUnknownTypeError(loader, type);
 		return 0;

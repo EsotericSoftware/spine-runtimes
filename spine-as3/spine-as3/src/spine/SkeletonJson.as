@@ -96,6 +96,8 @@ public class SkeletonJson {
 			boneData.rotation = (boneMap["rotation"] || 0);
 			boneData.scaleX = boneMap["scaleX"] || 1;
 			boneData.scaleY = boneMap["scaleY"] || 1;
+			boneData.inheritScale = boneMap["inheritScale"] || true;
+			boneData.inheritRotation = boneMap["inheritRotation"] || true;
 			skeletonData.addBone(boneData);
 		}
 
@@ -116,6 +118,7 @@ public class SkeletonJson {
 			}
 
 			slotData.attachmentName = slotMap["attachment"];
+			slotData.additiveBlending = slotMap["additive"];
 
 			skeletonData.addSlot(slotData);
 		}

@@ -31,41 +31,27 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine.attachments {
-import spine.Skin;
-import spine.atlas.Atlas;
-import spine.atlas.AtlasRegion;
+#include <spine/BoundingBoxAttachment.h>
+#include <math.h>
+#include <spine/extension.h>
 
-public class AtlasAttachmentLoader implements AttachmentLoader {
-	private var atlas:Atlas;
-
-	public function AtlasAttachmentLoader (atlas:Atlas) {
-		if (atlas == null)
-			throw new ArgumentError("atlas cannot be null.");
-		this.atlas = atlas;
-	}
-
-	public function newAttachment (skin:Skin, type:AttachmentType, name:String) : Attachment {
-		switch (type) {
-		case AttachmentType.region:
-			var region:AtlasRegion  = atlas.findRegion(name);
-			if (region == null)
-				throw new Error("Region not found in atlas: " + name + " (" + type + ")");
-			var attachment:RegionAttachment = new RegionAttachment(name);
-			attachment.rendererObject = region;
-			attachment.setUVs(region.u, region.v, region.u2, region.v2, region.rotate);
-			attachment.regionOffsetX = region.offsetX;
-			attachment.regionOffsetY = region.offsetY;
-			attachment.regionWidth = region.width;
-			attachment.regionHeight = region.height;
-			attachment.regionOriginalWidth = region.originalWidth;
-			attachment.regionOriginalHeight = region.originalHeight;
-			return attachment;
-		case AttachmentType.boundingbox:
-			return new BoundingBoxAttachment(name);
-		}
-		throw new Error("Unknown attachment type: " + type);
-	}
+BoundingBoxAttachment* BoundingBoxAttachment_create (const char* name) {
+	BoundingBoxAttachment* self = NEW(BoundingBoxAttachment);
+	_Attachment_init(SUPER(self), name, ATTACHMENT_BOUNDING_BOX, _Attachment_deinit);
+	return self;
 }
 
+void BoundingBoxAttachment_computeWorldVertices (BoundingBoxAttachment* self, float x, float y, Bone* bone, float* worldVertices) {
+	int i;
+	float px, py;
+	float* vertices = self->vertices;
+
+	x += bone->worldX;
+	y += bone->worldY;
+	for (i = 0; i < self->verticesCount; i += 2) {
+		px = vertices[i];
+		py = vertices[i + 1];
+		worldVertices[i] = px * bone->m00 + py * bone->m01 + x;
+		worldVertices[i + 1] = px * bone->m10 + py * bone->m11 + y;
+	}
 }

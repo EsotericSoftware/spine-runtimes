@@ -62,13 +62,19 @@ int main (void) {
 
 	SkeletonJson* json = SkeletonJson_create(atlas);
 	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/spineboy.json");
-	if (!skeletonData) printf("Error: %s\n", json->error);
+	if (!skeletonData) {
+		printf("Error: %s\n", json->error);
+		exit(0);
+	}
 	printf("Default skin name: %s\n", skeletonData->defaultSkin->name);
 
 	Skeleton* skeleton = Skeleton_create(skeletonData);
 
 	Animation* animation = SkeletonData_findAnimation(skeletonData, "walk");
-	if (!animation) printf("Error: %s\n", json->error);
+	if (!animation) {
+		printf("Error: Animation not found: walk\n");
+		exit(0);
+	}
 	printf("Animation timelineCount: %d\n", animation->timelineCount);
 
 	Skeleton_dispose(skeleton);

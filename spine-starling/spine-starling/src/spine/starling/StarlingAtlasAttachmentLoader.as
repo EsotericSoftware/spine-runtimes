@@ -39,6 +39,7 @@ import spine.Skin;
 import spine.attachments.Attachment;
 import spine.attachments.AttachmentLoader;
 import spine.attachments.AttachmentType;
+import spine.attachments.BoundingBoxAttachment;
 import spine.attachments.RegionAttachment;
 
 import starling.textures.Texture;
@@ -54,7 +55,8 @@ public class StarlingAtlasAttachmentLoader implements AttachmentLoader {
 	}
 
 	public function newAttachment (skin:Skin, type:AttachmentType, name:String) : Attachment {
-		if (type == AttachmentType.region) {
+		switch (type) {
+		case AttachmentType.region:
 			var regionAttachment:RegionAttachment = new RegionAttachment(name);
 			var texture:Texture = atlas.getTexture(name);
 			var frame:Rectangle = texture.frame;
@@ -67,6 +69,8 @@ public class StarlingAtlasAttachmentLoader implements AttachmentLoader {
 			regionAttachment.regionOriginalWidth = texture.width;
 			regionAttachment.regionOriginalHeight = texture.height;
 			return regionAttachment;
+		case AttachmentType.boundingbox:
+			return new BoundingBoxAttachment(name);
 		}
 
 		throw new Error("Unknown attachment type: " + type);

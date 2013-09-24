@@ -41,7 +41,9 @@ spine.BoneData.prototype = {
 	length: 0,
 	x: 0, y: 0,
 	rotation: 0,
-	scaleX: 1, scaleY: 1
+	scaleX: 1, scaleY: 1,
+	inheritScale: true,
+	inheritRotation: true
 };
 
 spine.SlotData = function (name, boneData) {
@@ -50,7 +52,8 @@ spine.SlotData = function (name, boneData) {
 };
 spine.SlotData.prototype = {
 	r: 1, g: 1, b: 1, a: 1,
-	attachmentName: null
+	attachmentName: null,
+	additiveBlending: false
 };
 
 spine.Bone = function (boneData, parent) {
@@ -72,9 +75,14 @@ spine.Bone.prototype = {
 		if (parent != null) {
 			this.worldX = this.x * parent.m00 + this.y * parent.m01 + parent.worldX;
 			this.worldY = this.x * parent.m10 + this.y * parent.m11 + parent.worldY;
-			this.worldScaleX = parent.worldScaleX * this.scaleX;
-			this.worldScaleY = parent.worldScaleY * this.scaleY;
-			this.worldRotation = parent.worldRotation + this.rotation;
+			if (this.data.inheritScale) {
+				this.worldScaleX = parent.worldScaleX * this.scaleX;
+				this.worldScaleY = parent.worldScaleY * this.scaleY;
+			} else {
+				this.worldScaleX = this.scaleX;
+				this.worldScaleY = this.scaleY;
+			}
+			this.worldRotation = this.data.inheritRotation ? parent.worldRotation + this.rotation : this.rotation;
 		} else {
 			this.worldX = this.x;
 			this.worldY = this.y;
@@ -920,6 +928,8 @@ spine.SkeletonJson.prototype = {
 			boneData.rotation = (boneMap["rotation"] || 0);
 			boneData.scaleX = boneMap["scaleX"] || 1;
 			boneData.scaleY = boneMap["scaleY"] || 1;
+			boneData.inheritScale = boneMap["inheritScale"] || true;
+			boneData.inheritRotation = boneMap["inheritRotation"] || true;
 			skeletonData.bones.push(boneData);
 		}
 
@@ -940,6 +950,7 @@ spine.SkeletonJson.prototype = {
 			}
 
 			slotData.attachmentName = slotMap["attachment"];
+			slotData.additiveBlending = slotMap["additive"];
 
 			skeletonData.slots.push(slotData);
 		}

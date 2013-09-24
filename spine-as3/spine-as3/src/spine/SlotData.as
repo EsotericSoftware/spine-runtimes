@@ -41,6 +41,7 @@ public class SlotData {
 	public var b:Number = 1;
 	public var a:Number = 1;
 	public var attachmentName:String;
+	public var additiveBlending:Boolean;
 
 	public function SlotData (name:String, boneData:BoneData) {
 		if (name == null)

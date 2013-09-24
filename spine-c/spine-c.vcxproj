@@ -80,9 +80,11 @@
     <ClInclude Include="include\spine\AttachmentLoader.h" />
     <ClInclude Include="include\spine\Bone.h" />
     <ClInclude Include="include\spine\BoneData.h" />
+    <ClInclude Include="include\spine\BoundingBoxAttachment.h" />
     <ClInclude Include="include\spine\extension.h" />
     <ClInclude Include="include\spine\RegionAttachment.h" />
     <ClInclude Include="include\spine\Skeleton.h" />
+    <ClInclude Include="include\spine\SkeletonBounds.h" />
     <ClInclude Include="include\spine\SkeletonData.h" />
     <ClInclude Include="include\spine\SkeletonJson.h" />
     <ClInclude Include="include\spine\Skin.h" />
@@ -101,10 +103,12 @@
     <ClCompile Include="src\spine\AttachmentLoader.c" />
     <ClCompile Include="src\spine\Bone.c" />
     <ClCompile Include="src\spine\BoneData.c" />
+    <ClCompile Include="src\spine\BoundingBoxAttachment.c" />
     <ClCompile Include="src\spine\extension.c" />
     <ClCompile Include="src\spine\Json.c" />
     <ClCompile Include="src\spine\RegionAttachment.c" />
     <ClCompile Include="src\spine\Skeleton.c" />
+    <ClCompile Include="src\spine\SkeletonBounds.c" />
     <ClCompile Include="src\spine\SkeletonData.c" />
     <ClCompile Include="src\spine\SkeletonJson.c" />
     <ClCompile Include="src\spine\Skin.c" />

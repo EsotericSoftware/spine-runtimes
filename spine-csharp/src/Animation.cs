@@ -513,7 +513,8 @@ namespace Spine {
 			drawOrders = new int[frameCount][];
 		}
 
-		/** Sets the time and value of the specified keyframe. */
+		/** Sets the time and value of the specified keyframe.
+		 * @param drawOrder May be null to use bind pose draw order. */
 		public void setFrame (int frameIndex, float time, int[] drawOrder) {
 			frames[frameIndex] = time;
 			drawOrders[frameIndex] = drawOrder;
@@ -532,8 +533,13 @@ namespace Spine {
 			List<Slot> drawOrder = skeleton.drawOrder;
 			List<Slot> slots = skeleton.slots;
 			int[] drawOrderToSetupIndex = drawOrders[frameIndex];
-			for (int i = 0, n = drawOrderToSetupIndex.Length; i < n; i++)
-				drawOrder[i] = slots[drawOrderToSetupIndex[i]];
+			if (drawOrderToSetupIndex == null) {
+				drawOrder.Clear();
+				drawOrder.AddRange(slots);
+			} else {
+				for (int i = 0, n = drawOrderToSetupIndex.Length; i < n; i++)
+					drawOrder[i] = slots[drawOrderToSetupIndex[i]];
+			}
 		}
 	}
 }

@@ -34,6 +34,7 @@
 package spine.flash {
 import flash.display.Bitmap;
 import flash.display.BitmapData;
+import flash.display.BlendMode;
 import flash.display.DisplayObject;
 import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
@@ -127,6 +128,8 @@ public class SkeletonSprite extends Sprite {
 					wrapper.addChild(bitmap);
 					regionAttachment["wrapper"] = wrapper;
 				}
+
+				wrapper.blendMode = slot.data.additiveBlending ? BlendMode.ADD : BlendMode.NORMAL;
 
 				var colorTransform:ColorTransform = wrapper.transform.colorTransform;
 				colorTransform.redMultiplier = skeleton.r * slot.r;

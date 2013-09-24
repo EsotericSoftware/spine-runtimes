@@ -307,10 +307,7 @@
 					{ "slot": "eyes", "offset": -12 }
 				]
 			},
-			{
-				"time": 3.5862,
-				"offsets": []
-			}
+			{ "time": 3.5862 }
 		]
 	},
 	"jump": {

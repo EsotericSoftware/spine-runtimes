@@ -594,7 +594,8 @@ public class Animation {
 			return drawOrders;
 		}
 
-		/** Sets the time of the specified keyframe. */
+		/** Sets the time of the specified keyframe.
+		 * @param drawOrder May be null to use bind pose draw order. */
 		public void setFrame (int frameIndex, float time, int[] drawOrder) {
 			frames[frameIndex] = time;
 			drawOrders[frameIndex] = drawOrder;
@@ -613,8 +614,12 @@ public class Animation {
 			Array<Slot> drawOrder = skeleton.drawOrder;
 			Array<Slot> slots = skeleton.slots;
 			int[] drawOrderToSetupIndex = drawOrders[frameIndex];
-			for (int i = 0, n = drawOrderToSetupIndex.length; i < n; i++)
-				drawOrder.set(i, slots.get(drawOrderToSetupIndex[i]));
+			if (drawOrderToSetupIndex == null)
+				System.arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
+			else {
+				for (int i = 0, n = drawOrderToSetupIndex.length; i < n; i++)
+					drawOrder.set(i, slots.get(drawOrderToSetupIndex[i]));
+			}
 		}
 	}
 }

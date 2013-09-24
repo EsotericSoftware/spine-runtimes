@@ -133,7 +133,7 @@ namespace Spine {
 			skeletonRenderer.Draw(skeleton);
 			skeletonRenderer.End();
 
-			bounds.Update(skeleton);
+			bounds.Update(skeleton, true);
 			MouseState mouse = Mouse.GetState();
 			headSlot.G = 1;
 			headSlot.B = 1;

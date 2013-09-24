@@ -42,6 +42,8 @@ public class BoneData {
 	public var rotation:Number;
 	public var scaleX:Number = 1;
 	public var scaleY:Number = 1;
+	public var inheritScale:Boolean = true;
+	public var inheritRotation:Boolean = true;
 
 	/** @param parent May be null. */
 	public function BoneData (name:String, parent:BoneData) {

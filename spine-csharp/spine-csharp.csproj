@@ -60,10 +60,13 @@
     <Compile Include="src\Attachments\AtlasAttachmentLoader.cs" />
     <Compile Include="src\Attachments\Attachment.cs" />
     <Compile Include="src\Attachments\AttachmentType.cs" />
+    <Compile Include="src\Attachments\BoundingBoxAttachment.cs" />
     <Compile Include="src\Attachments\RegionAttachment.cs" />
     <Compile Include="src\Bone.cs" />
     <Compile Include="src\BoneData.cs" />
     <Compile Include="src\AnimationState.cs" />
+    <Compile Include="src\Event.cs" />
+    <Compile Include="src\EventData.cs" />
     <Compile Include="src\Json.cs" />
     <Compile Include="src\Skeleton.cs" />
     <Compile Include="src\SkeletonData.cs" />
