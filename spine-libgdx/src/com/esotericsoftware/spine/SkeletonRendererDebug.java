@@ -101,7 +101,7 @@ public class SkeletonRendererDebug {
 
 		if (drawBoundingBoxes) {
 			SkeletonBounds bounds = this.bounds;
-			bounds.update(skeleton);
+			bounds.update(skeleton, true);
 			renderer.setColor(aabbColor);
 			renderer.rect(bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
 			renderer.setColor(boundingBoxColor);

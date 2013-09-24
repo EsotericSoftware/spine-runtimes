@@ -116,7 +116,7 @@ namespace Spine {
 					item.vertexTR.Color.A = a;
 
 					float[] vertices = this.vertices;
-					regionAttachment.ComputeVertices(x, y, slot.Bone, vertices);
+					regionAttachment.ComputeWorldVertices(x, y, slot.Bone, vertices);
 					item.vertexTL.Position.X = vertices[RegionAttachment.X1];
 					item.vertexTL.Position.Y = vertices[RegionAttachment.Y1];
 					item.vertexTL.Position.Z = 0;
