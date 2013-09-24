@@ -36,16 +36,17 @@ import flash.geom.Matrix;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 
-import spine.attachments.RegionAttachment;
-
-import starling.animation.IAnimatable;
-import starling.core.RenderSupport;
-import starling.display.DisplayObject;
-import starling.utils.MatrixUtil;
 import spine.Bone;
 import spine.Skeleton;
 import spine.SkeletonData;
 import spine.Slot;
+import spine.attachments.RegionAttachment;
+
+import starling.animation.IAnimatable;
+import starling.core.RenderSupport;
+import starling.display.BlendMode;
+import starling.display.DisplayObject;
+import starling.utils.MatrixUtil;
 
 public class SkeletonSprite extends DisplayObject implements IAnimatable {
 	static private var tempPoint:Point = new Point();
@@ -75,7 +76,7 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 			var regionAttachment:RegionAttachment = slot.attachment as RegionAttachment;
 			if (regionAttachment != null) {
 				var vertices:Vector.<Number> = this.vertices;
-				regionAttachment.computeVertices(skeleton.x, skeleton.y, slot.bone, vertices);
+				regionAttachment.computeWorldVertices(skeleton.x, skeleton.y, slot.bone, vertices);
 				var r:Number = skeleton.r * slot.r;
 				var g:Number = skeleton.g * slot.g;
 				var b:Number = skeleton.b * slot.b;
@@ -113,6 +114,7 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 				vertexData[29] = a;
 
 				image.updateVertices();
+				support.blendMode = slot.data.additiveBlending ? BlendMode.ADD : BlendMode.NORMAL;
 				support.batchQuad(image, alpha, image.texture);
 			}
 		}
@@ -133,7 +135,7 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 				continue;
 
 			var vertices:Vector.<Number> = this.vertices;
-			regionAttachment.computeVertices(skeleton.x, skeleton.y, slot.bone, vertices);
+			regionAttachment.computeWorldVertices(skeleton.x, skeleton.y, slot.bone, vertices);
 
 			value = vertices[0];
 			if (value < minX)

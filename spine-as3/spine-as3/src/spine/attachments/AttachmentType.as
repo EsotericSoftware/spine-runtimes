@@ -35,7 +35,8 @@ package spine.attachments {
 
 public class AttachmentType {
 	public static const region:AttachmentType = new AttachmentType(0, "region");
-	public static const regionSequence:AttachmentType = new AttachmentType(1, "regionSequence");
+	public static const regionsequence:AttachmentType = new AttachmentType(1, "regionsequence");
+	public static const boundingbox:AttachmentType = new AttachmentType(1, "boundingbox");
 
 	public var ordinal:int;
 	public var name:String;

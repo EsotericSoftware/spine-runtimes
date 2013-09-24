@@ -70,9 +70,13 @@ public class Main extends Sprite {
 		skeleton.setAnimationStateData(stateData);
 		skeleton.x = 320;
 		skeleton.y = 420;
-		skeleton.setAnimation("walk", true);
-		skeleton.addAnimation("jump", false, 3);
-		skeleton.addAnimation("walk", true);
+		if (true) {
+			skeleton.setAnimation("drawOrder", true);
+		} else {
+			skeleton.setAnimation("walk", true);
+			skeleton.addAnimation("jump", false, 3);
+			skeleton.addAnimation("walk", true);
+		}
 
 		addChild(skeleton);
 	}

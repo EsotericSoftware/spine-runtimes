@@ -68,9 +68,14 @@ public class Bone {
 		if (_parent != null) {
 			_worldX = x * _parent._m00 + y * _parent._m01 + _parent._worldX;
 			_worldY = x * _parent._m10 + y * _parent._m11 + _parent._worldY;
-			_worldScaleX = _parent._worldScaleX * scaleX;
-			_worldScaleY = _parent._worldScaleY * scaleY;
-			_worldRotation = _parent._worldRotation + rotation;
+			if (_data.inheritScale) {
+				_worldScaleX = _parent._worldScaleX * scaleX;
+				_worldScaleY = _parent._worldScaleY * scaleY;
+			} else {
+				_worldScaleX = scaleX;
+				_worldScaleY = scaleY;
+			}
+			_worldRotation = _data.inheritRotation ? _parent._worldRotation + rotation : rotation;
 		} else {
 			_worldX = flipX ? -x : x;
 			_worldY = flipY ? -y : y;
