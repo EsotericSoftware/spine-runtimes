@@ -16,3 +16,4 @@ The Spine runtime for Unity comes with an example project which has "spineboy" w
 # Notes
 
 - Atlas images should use premultiplied alpha.
+- Unity scales large images down by default if they exceed 1024x1024, which causes the altas coordinates to be incorrect. To fix this, override the import settings in the Inspector for any large atlas image you have so Unity does not scale it down.
