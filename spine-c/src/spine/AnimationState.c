@@ -82,6 +82,7 @@ void AnimationState_addAnimation (AnimationState* self, Animation* animation, in
 		while (existingEntry->next)
 			existingEntry = existingEntry->next;
 		existingEntry->next = entry;
+        existingEntry->loop = 0;
 		previousAnimation = existingEntry->animation;
 	} else {
 		internal->queue = entry;
