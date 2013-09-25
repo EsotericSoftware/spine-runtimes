@@ -538,7 +538,7 @@ spine.SkeletonData.prototype = {
 	findSlot: function (slotName) {
 		var slots = this.slots;
 		for (var i = 0, n = slots.length; i < n; i++) {
-			if (slots[i].name == slotName) return slot[i];
+			if (slots[i].name == slotName) return slots[i];
 		}
 		return null;
 	},
@@ -612,7 +612,7 @@ spine.Skeleton.prototype = {
 	setSlotsToSetupPose: function () {
 		var slots = this.slots;
 		for (var i = 0, n = slots.length; i < n; i++)
-			slots[i].setToSetupPose(i);
+			slots[i].setToSetupPose();
 	},
 	/** @return May return null. */
 	getRootBone: function () {
@@ -674,12 +674,12 @@ spine.Skeleton.prototype = {
 	/** @param attachmentName May be null. */
 	setAttachment: function (slotName, attachmentName) {
 		var slots = this.slots;
-		for (var i = 0, n = slots.size; i < n; i++) {
+		for (var i = 0, n = slots.length; i < n; i++) {
 			var slot = slots[i];
 			if (slot.data.name == slotName) {
 				var attachment = null;
 				if (attachmentName) {
-					attachment = this.getAttachment(i, attachmentName);
+					attachment = this.getAttachmentBySlotIndex(i, attachmentName);
 					if (attachment == null) throw "Attachment not found: " + attachmentName + ", for slot: " + slotName;
 				}
 				slot.setAttachment(attachment);
@@ -689,7 +689,7 @@ spine.Skeleton.prototype = {
 		throw "Slot not found: " + slotName;
 	},
 	update: function (delta) {
-		time += delta;
+		this.time += delta;
 	}
 };
 
@@ -1342,7 +1342,7 @@ spine.AtlasAttachmentLoader.prototype = {
 		case spine.AttachmentType.region:
 			var region = this.atlas.findRegion(name);
 			if (!region) throw "Region not found in atlas: " + name + " (" + type + ")";
-			var attachment = new spine.RegionAttachment(name);
+			var attachment = new spine.RegionAttachment();
 			attachment.rendererObject = region;
 			attachment.setUVs(region.u, region.v, region.u2, region.v2, region.rotate);
 			attachment.regionOffsetX = region.offsetX;
