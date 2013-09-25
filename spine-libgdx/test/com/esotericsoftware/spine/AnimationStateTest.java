@@ -112,12 +112,6 @@ public class AnimationStateTest extends ApplicationAdapter {
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
 		state.apply(skeleton);
-		if (state.getAnimation().getName().equals("walk")) {
-			// After one second, change the current animation. Mixing is done by AnimationState for you.
-// if (state.getTime() > 2) state.setAnimation("jump", false);
-// } else {
-// if (state.getTime() > 1) state.setAnimation("walk", true);
-		}
 		skeleton.updateWorldTransform();
 
 		batch.begin();

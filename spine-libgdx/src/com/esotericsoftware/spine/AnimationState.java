@@ -34,19 +34,17 @@
 package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool.Poolable;
 import com.badlogic.gdx.utils.Pools;
 
 /** Stores state for an animation and automatically mixes between animations. */
 public class AnimationState {
 	private final AnimationStateData data;
-	private Animation current, previous;
-	private float currentTime, currentLastTime, previousTime;
-	private boolean currentLoop, previousLoop;
-	private AnimationStateListener currentListener;
+	private QueuedAnimation current, previous;
 	private float mixTime, mixDuration;
-	private final Array<QueueEntry> queue = new Array();
-	private final Array<Event> events = new Array();
+	private final Array<QueuedAnimation> queue = new Array();
 	private final Array<AnimationStateListener> listeners = new Array();
+	private final Array<Event> events = new Array();
 
 	public AnimationState (AnimationStateData data) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -54,62 +52,79 @@ public class AnimationState {
 	}
 
 	public void update (float delta) {
-		currentTime += delta;
-		previousTime += delta;
-		mixTime += delta;
+		QueuedAnimation current = this.current;
+		if (current == null) return;
 
-		if (current != null) {
-			float duration = current.getDuration();
-			if (currentLoop ? (currentLastTime % duration > currentTime % duration)
-				: (currentLastTime < duration && currentTime >= duration)) {
-				int count = (int)(currentTime / duration);
-				if (currentListener != null) currentListener.complete(count);
-				for (int i = 0, n = listeners.size; i < n; i++)
-					listeners.get(i).complete(count);
-			}
+		float time = current.time;
+		float duration = current.endTime;
+
+		current.time = time + delta;
+		if (previous != null) {
+			previous.time += delta;
+			mixTime += delta;
+		}
+
+		// Check if completed the animation or a loop iteration.
+		if (current.loop ? (current.lastTime % duration > time % duration) : (current.lastTime < duration && time >= duration)) {
+			int count = (int)(time / duration);
+			if (current.listener != null) current.listener.complete(count);
+			for (int i = 0, n = listeners.size; i < n; i++)
+				listeners.get(i).complete(count);
 		}
 
 		if (queue.size > 0) {
-			QueueEntry entry = queue.first();
-			if (currentTime >= entry.delay) {
-				setAnimationInternal(entry.animation, entry.loop, entry.listener);
-				Pools.free(entry);
-				queue.removeIndex(0);
+			QueuedAnimation entry = queue.first();
+			if (time >= entry.delay) {
+				if (entry.animation == null)
+					clearAnimation();
+				else {
+					setAnimationEntry(entry);
+					queue.removeIndex(0);
+				}
 			}
 		}
 	}
 
 	public void apply (Skeleton skeleton) {
+		QueuedAnimation current = this.current;
 		if (current == null) return;
 
 		Array<Event> events = this.events;
-		events.clear();
+		events.size = 0;
 
+		QueuedAnimation previous = this.previous;
 		if (previous != null) {
-			previous.apply(skeleton, Integer.MAX_VALUE, previousTime, previousLoop, null);
+			previous.animation.apply(skeleton, Integer.MAX_VALUE, previous.time, previous.loop, null);
 			float alpha = mixTime / mixDuration;
 			if (alpha >= 1) {
 				alpha = 1;
-				previous = null;
+				Pools.free(previous);
+				this.previous = null;
 			}
-			current.mix(skeleton, currentLastTime, currentTime, currentLoop, events, alpha);
+			current.animation.mix(skeleton, current.lastTime, current.time, current.loop, events, alpha);
 		} else
-			current.apply(skeleton, currentLastTime, currentTime, currentLoop, events);
+			current.animation.apply(skeleton, current.lastTime, current.time, current.loop, events);
 
 		int listenerCount = listeners.size;
 		for (int i = 0, n = events.size; i < n; i++) {
 			Event event = events.get(i);
-			if (currentListener != null) currentListener.event(event);
+			if (current.listener != null) current.listener.event(event);
 			for (int ii = 0; ii < listenerCount; ii++)
 				listeners.get(ii).event(event);
 		}
 
-		currentLastTime = currentTime;
+		current.lastTime = current.time;
 	}
 
 	public void clearAnimation () {
-		previous = null;
-		current = null;
+		if (previous != null) {
+			Pools.free(previous);
+			previous = null;
+		}
+		if (current != null) {
+			Pools.free(current);
+			current = null;
+		}
 		clearQueue();
 	}
 
@@ -118,117 +133,121 @@ public class AnimationState {
 		queue.clear();
 	}
 
-	private void setAnimationInternal (Animation animation, boolean loop, AnimationStateListener listener) {
-		previous = null;
+	private void setAnimationEntry (QueuedAnimation entry) {
+		if (previous != null) {
+			Pools.free(previous);
+			previous = null;
+		}
+
+		QueuedAnimation current = this.current;
 		if (current != null) {
-			if (currentListener != null) currentListener.end();
+			if (current.listener != null) current.listener.end();
 			for (int i = 0, n = listeners.size; i < n; i++)
 				listeners.get(i).end();
 
-			if (animation != null) {
-				mixDuration = data.getMix(current, animation);
-				if (mixDuration > 0) {
-					mixTime = 0;
-					previous = current;
-					previousTime = currentTime;
-					previousLoop = currentLoop;
-				}
-			}
+			mixDuration = data.getMix(current.animation, entry.animation);
+			if (mixDuration > 0) {
+				mixTime = 0;
+				previous = current;
+			} else
+				Pools.free(current);
 		}
-		current = animation;
-		currentLoop = loop;
-		currentTime = 0;
-		currentLastTime = 0;
-		currentListener = listener;
+		this.current = entry;
 
-		if (currentListener != null) currentListener.start();
+		if (entry != null && entry.listener != null) entry.listener.start();
 		for (int i = 0, n = listeners.size; i < n; i++)
 			listeners.get(i).start();
 	}
 
-	/** @see #setAnimation(Animation, boolean, AnimationStateListener) */
-	public void setAnimation (String animationName, boolean loop) {
-		setAnimation(animationName, loop, null);
-	}
-
-	/** @see #setAnimation(Animation, boolean, AnimationStateListener) */
-	public void setAnimation (String animationName, boolean loop, AnimationStateListener listener) {
+	/** @see #setAnimation(Animation, boolean) */
+	public QueuedAnimation setAnimation (String animationName, boolean loop) {
 		Animation animation = data.getSkeletonData().findAnimation(animationName);
 		if (animation == null) throw new IllegalArgumentException("Animation not found: " + animationName);
-		setAnimation(animation, loop, listener);
+		return setAnimation(animation, loop);
 	}
 
-	/** @see #setAnimation(Animation, boolean, AnimationStateListener) */
-	public void setAnimation (Animation animation, boolean loop) {
-		setAnimation(animation, loop, null);
-	}
-
-	/** Set the current animation. Any queued animations are cleared and the current animation time is set to 0. The specified
-	 * listener receives events only for this animation.
-	 * @param animation May be null.
-	 * @param listener May be null. */
-	public void setAnimation (Animation animation, boolean loop, AnimationStateListener listener) {
+	/** Set the current animation. Any queued animations are cleared. */
+	public QueuedAnimation setAnimation (Animation animation, boolean loop) {
 		clearQueue();
-		setAnimationInternal(animation, loop, listener);
+
+		QueuedAnimation entry = Pools.obtain(QueuedAnimation.class);
+		entry.animation = animation;
+		entry.loop = loop;
+		entry.time = 0;
+		entry.endTime = animation.getDuration();
+		setAnimationEntry(entry);
+		return entry;
 	}
 
 	/** @see #addAnimation(Animation, boolean) */
-	public void addAnimation (String animationName, boolean loop) {
-		addAnimation(animationName, loop, 0, null);
+	public QueuedAnimation addAnimation (String animationName, boolean loop) {
+		return addAnimation(animationName, loop, 0);
 	}
 
-	/** @see #addAnimation(Animation, boolean, float, AnimationStateListener) */
-	public void addAnimation (String animationName, boolean loop, float delay, AnimationStateListener listener) {
+	/** @see #addAnimation(Animation, boolean, float) */
+	public QueuedAnimation addAnimation (String animationName, boolean loop, float delay) {
 		Animation animation = data.getSkeletonData().findAnimation(animationName);
 		if (animation == null) throw new IllegalArgumentException("Animation not found: " + animationName);
-		addAnimation(animation, loop, delay, listener);
+		return addAnimation(animation, loop, delay);
 	}
 
 	/** Adds an animation to be played delay seconds after the current or last queued animation, taking into account any mix
-	 * duration. */
-	public void addAnimation (Animation animation, boolean loop) {
-		addAnimation(animation, loop, 0, null);
+	 * duration.
+	 * @param animation May be null to queue clearing the AnimationState. */
+	public QueuedAnimation addAnimation (Animation animation, boolean loop) {
+		return addAnimation(animation, loop, 0);
 	}
 
 	/** Adds an animation to be played delay seconds after the current or last queued animation.
-	 * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay.
-	 * @param listener May be null. */
-	public void addAnimation (Animation animation, boolean loop, float delay, AnimationStateListener listener) {
-		QueueEntry entry = Pools.obtain(QueueEntry.class);
+	 * @param animation May be null to queue clearing the AnimationState.
+	 * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay. */
+	public QueuedAnimation addAnimation (Animation animation, boolean loop, float delay) {
+		QueuedAnimation entry = Pools.obtain(QueuedAnimation.class);
 		entry.animation = animation;
 		entry.loop = loop;
-		entry.listener = listener;
+		entry.time = 0;
+		entry.endTime = animation != null ? animation.getDuration() : 0;
 
 		if (delay <= 0) {
-			Animation previousAnimation = queue.size == 0 ? current : queue.peek().animation;
-			if (previousAnimation != null)
-				delay = previousAnimation.getDuration() - data.getMix(previousAnimation, animation) + delay;
-			else
+			QueuedAnimation previousEntry = queue.size > 0 ? queue.peek() : current;
+			if (previousEntry != null) {
+				delay += previousEntry.endTime;
+				if (animation != null) delay += -data.getMix(previousEntry.animation, animation);
+			} else
 				delay = 0;
 		}
 		entry.delay = delay;
 
 		queue.add(entry);
+		return entry;
+	}
+
+	public Array<QueuedAnimation> getQueue () {
+		return queue;
+	}
+
+	/** @return May be null. */
+	public QueuedAnimation getCurrent () {
+		return current;
 	}
 
 	/** @return May be null. */
 	public Animation getAnimation () {
-		return current;
+		return current != null ? current.animation : null;
 	}
 
 	/** Returns the time within the current animation. */
 	public float getTime () {
-		return currentTime;
+		return current != null ? current.time : 0;
 	}
 
 	public void setTime (float time) {
-		currentTime = time;
-		currentLastTime = time - 0.00001f;
+		if (current != null) current.setTime(time);
 	}
 
 	/** Returns true if no animation is set or if the current time is greater than the animation duration, regardless of looping. */
 	public boolean isComplete () {
-		return current == null || currentTime >= current.getDuration();
+		return current == null || current.time >= current.endTime;
 	}
 
 	/** Adds a listener to receive events for all animations. */
@@ -237,15 +256,9 @@ public class AnimationState {
 		listeners.add(listener);
 	}
 
-	/** Removes the listener, which may be for all animations, the current animation, or a queued animation. */
+	/** Removes the listener added with {@link #addListener(AnimationStateListener)}. */
 	public void removeListener (AnimationStateListener listener) {
 		listeners.removeValue(listener, true);
-
-		if (listener == currentListener) currentListener = null;
-
-		Array<QueueEntry> queue = this.queue;
-		for (int i = queue.size - 1; i >= 0; i--)
-			if (queue.get(i).listener == listener) queue.get(i).listener = null;
 	}
 
 	public AnimationStateData getData () {
@@ -253,14 +266,66 @@ public class AnimationState {
 	}
 
 	public String toString () {
-		return (current != null && current.getName() != null) ? current.getName() : super.toString();
+		if (current == null || current.animation == null) return "<none>";
+		return current.animation.getName();
 	}
 
-	static private class QueueEntry {
+	/** A queued animation. */
+	static public class QueuedAnimation implements Poolable {
 		Animation animation;
 		boolean loop;
-		float delay;
+		float delay, time, lastTime, endTime;
 		AnimationStateListener listener;
+
+		public void reset () {
+			animation = null;
+			listener = null;
+		}
+
+		public Animation getAnimation () {
+			return animation;
+		}
+
+		public boolean getLoop () {
+			return loop;
+		}
+
+		public void setLoop (boolean loop) {
+			this.loop = loop;
+		}
+
+		public float getTime () {
+			return time;
+		}
+
+		public void setTime (float time) {
+			this.time = time;
+			if (lastTime < time) lastTime = time;
+		}
+
+		public float getEndTime () {
+			return endTime;
+		}
+
+		public void setEndTime (float endTime) {
+			this.endTime = endTime;
+		}
+
+		public AnimationStateListener getListener () {
+			return listener;
+		}
+
+		public void setListener (AnimationStateListener listener) {
+			this.listener = listener;
+		}
+
+		public float getDelay () {
+			return delay;
+		}
+
+		public void setDelay (float delay) {
+			this.delay = delay;
+		}
 	}
 
 	static public interface AnimationStateListener {

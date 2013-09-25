@@ -88,7 +88,7 @@ namespace Spine {
 
 			state = new AnimationState(stateData);
 
-			if (true) {
+			if (false) {
 				// Event handling for all animations.
 				state.Start += new EventHandler(Start);
 				state.End += new EventHandler(End);
@@ -98,7 +98,7 @@ namespace Spine {
 				state.SetAnimation("drawOrder", true);
 			} else {
 				state.SetAnimation("walk", false);
-				QueueEntry entry = state.AddAnimation("jump", false);
+				QueuedAnimation entry = state.AddAnimation("jump", false);
 				entry.End += new EventHandler(End); // Event handling for queued animations.
 				state.AddAnimation("walk", true);
 			}

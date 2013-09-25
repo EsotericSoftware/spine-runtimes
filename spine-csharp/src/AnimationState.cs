@@ -37,24 +37,24 @@ using System.Collections.Generic;
 namespace Spine {
 	public class AnimationState {
 		private AnimationStateData data;
-		private Animation current, previous;
-		private float currentTime, currentLastTime, previousTime;
-		private bool currentLoop, previousLoop;
-		private QueueEntry currentQueueEntry;
+		private QueuedAnimation current, previous;
 		private float mixTime, mixDuration;
+		private List<QueuedAnimation> queue = new List<QueuedAnimation>();
 		private List<Event> events = new List<Event>();
-		private List<QueueEntry> queue = new List<QueueEntry>();
 
 		public AnimationStateData Data { get { return data; } }
-		public Animation Animation { get { return current; } }
-		public bool Loop { get { return currentLoop; } set { currentLoop = value; } }
-
+		public List<QueuedAnimation> Queue { get { return queue; } }
+		public QueuedAnimation Current { get { return current; } }
+		public Animation Animation {
+			get { return current != null ? current.animation : null; }
+		}
 		public float Time {
-			get { return currentTime; }
-			set {
-				currentTime = value;
-				currentLastTime = value - 0.00001f;
-			}
+			get { return current != null ? current.time : 0; }
+			set { if (current != null) current.Time = value; }
+		}
+		public bool Loop {
+			get { return current != null ? current.loop : false; }
+			set { if (current != null) current.Loop = value; }
 		}
 
 		public event EventHandler Start;
@@ -68,54 +68,63 @@ namespace Spine {
 		}
 
 		public void Update (float delta) {
-			currentTime += delta;
-			previousTime += delta;
-			mixTime += delta;
+			QueuedAnimation current = this.current;
+			if (current == null) return;
 
-			if (current != null) {
-				float duration = current.duration;
-				if (currentLoop ? (currentLastTime % duration > currentTime % duration)
-					: (currentLastTime < duration && currentTime >= duration)) {
-						int count = (int)(currentTime / duration);
-					if (currentQueueEntry != null) currentQueueEntry.OnComplete(this, count);
-					if (Complete != null) Complete(this, new CompleteArgs(count));
-				}
+			float time = current.time;
+			float duration = current.endTime;
+
+			current.time = time + delta;
+			if (previous != null) {
+				previous.time += delta;
+				mixTime += delta;
+			}
+
+			// Check if completed the animation or a loop iteration.
+			if (current.loop ? (current.lastTime % duration > time % duration) : (current.lastTime < duration && time >= duration)) {
+				int count = (int)(time / duration);
+				current.OnComplete(this, count);
+				if (Complete != null) Complete(this, new CompleteArgs(count));
 			}
 
 			if (queue.Count > 0) {
-				QueueEntry entry = queue[0];
-				if (currentTime >= entry.delay) {
-					SetAnimationInternal(entry.animation, entry.loop, entry);
-					queue.RemoveAt(0);
+				QueuedAnimation entry = queue[0];
+				if (time >= entry.delay) {
+					if (entry.animation == null)
+						ClearAnimation();
+					else {
+						SetAnimationEntry(entry);
+						queue.RemoveAt(0);
+					}
 				}
 			}
 		}
 
 		public void Apply (Skeleton skeleton) {
+			QueuedAnimation current = this.current;
 			if (current == null) return;
 
 			List<Event> events = this.events;
 			events.Clear();
 
+			QueuedAnimation previous = this.previous;
 			if (previous != null) {
-				previous.Apply(skeleton, int.MaxValue, previousTime, previousLoop, null);
+				previous.animation.Apply(skeleton, int.MaxValue, previous.time, previous.loop, null);
 				float alpha = mixTime / mixDuration;
 				if (alpha >= 1) {
 					alpha = 1;
-					previous = null;
+					this.previous = null;
 				}
-				current.Mix(skeleton, currentLastTime, currentTime, currentLoop, events, alpha);
+				current.animation.Mix(skeleton, current.lastTime, current.time, current.loop, events, alpha);
 			} else
-				current.Apply(skeleton, currentLastTime, currentTime, currentLoop, events);
+				current.animation.Apply(skeleton, current.lastTime, current.time, current.loop, events);
 
-			if (Event != null || currentQueueEntry != null) {
-				foreach (Event e in events) {
-					if (currentQueueEntry != null) currentQueueEntry.OnEvent(this, e);
-					if (Event != null) Event(this, new EventTriggeredArgs(e));
-				}
+			foreach (Event e in events) {
+				current.OnEvent(this, e);
+				if (Event != null) Event(this, new EventTriggeredArgs(e));
 			}
 
-			currentLastTime = currentTime;
+			current.lastTime = current.time;
 		}
 
 		public void ClearAnimation () {
@@ -124,72 +133,73 @@ namespace Spine {
 			queue.Clear();
 		}
 
-		private void SetAnimationInternal (Animation animation, bool loop, QueueEntry entry) {
+		private void SetAnimationEntry (QueuedAnimation entry) {
 			previous = null;
+
+			QueuedAnimation current = this.current;
 			if (current != null) {
-				if (currentQueueEntry != null) currentQueueEntry.OnEnd(this);
+				current.OnEnd(this);
 				if (End != null) End(this, EventArgs.Empty);
 
-				if (animation != null) {
-					mixDuration = data.GetMix(current, animation);
-					if (mixDuration > 0) {
-						mixTime = 0;
-						previous = current;
-						previousTime = currentTime;
-						previousLoop = currentLoop;
-					}
+				mixDuration = data.GetMix(current.animation, entry.animation);
+				if (mixDuration > 0) {
+					mixTime = 0;
+					previous = current;
 				}
 			}
-			current = animation;
-			currentLoop = loop;
-			currentTime = 0;
-			currentLastTime = 0;
-			currentQueueEntry = entry;
+			this.current = entry;
 
-			if (currentQueueEntry != null) currentQueueEntry.OnStart(this);
+			entry.OnStart(this);
 			if (Start != null) Start(this, EventArgs.Empty);
 		}
 
-		public void SetAnimation (String animationName, bool loop) {
+		public QueuedAnimation SetAnimation (String animationName, bool loop) {
 			Animation animation = data.skeletonData.FindAnimation(animationName);
 			if (animation == null) throw new ArgumentException("Animation not found: " + animationName);
-			SetAnimation(animation, loop);
+			return SetAnimation(animation, loop);
 		}
 
-		/** Set the current animation. Any queued animations are cleared and the current animation time is set to 0.
-		 * @param animation May be null.
-		 * @param listener May be null. */
-		public void SetAnimation (Animation animation, bool loop) {
+		/** Set the current animation. Any queued animations are cleared. */
+		public QueuedAnimation SetAnimation (Animation animation, bool loop) {
 			queue.Clear();
-			SetAnimationInternal(animation, loop, null);
+			QueuedAnimation entry = new QueuedAnimation();
+			entry.animation = animation;
+			entry.loop = loop;
+			entry.time = 0;
+			entry.endTime = animation.Duration;
+			SetAnimationEntry(entry);
+			return entry;
 		}
 
-		public QueueEntry AddAnimation (String animationName, bool loop) {
+		public QueuedAnimation AddAnimation (String animationName, bool loop) {
 			return AddAnimation(animationName, loop, 0);
 		}
 
-		public QueueEntry AddAnimation (String animationName, bool loop, float delay) {
+		public QueuedAnimation AddAnimation (String animationName, bool loop, float delay) {
 			Animation animation = data.skeletonData.FindAnimation(animationName);
 			if (animation == null) throw new ArgumentException("Animation not found: " + animationName);
 			return AddAnimation(animation, loop, delay);
 		}
 
-		public QueueEntry AddAnimation (Animation animation, bool loop) {
+		public QueuedAnimation AddAnimation (Animation animation, bool loop) {
 			return AddAnimation(animation, loop, 0);
 		}
 
 		/** Adds an animation to be played delay seconds after the current or last queued animation.
 		 * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay. */
-		public QueueEntry AddAnimation (Animation animation, bool loop, float delay) {
-			QueueEntry entry = new QueueEntry();
+		public QueuedAnimation AddAnimation (Animation animation, bool loop, float delay) {
+			QueuedAnimation entry = new QueuedAnimation();
 			entry.animation = animation;
 			entry.loop = loop;
+			entry.time = 0;
+			entry.endTime = animation != null ? animation.Duration : 0;
 
 			if (delay <= 0) {
-				Animation previousAnimation = queue.Count == 0 ? current : queue[queue.Count - 1].animation;
-				if (previousAnimation != null)
-					delay = previousAnimation.duration - data.GetMix(previousAnimation, animation) + delay;
-				else
+				QueuedAnimation previousEntry = queue.Count > 0 ? queue[queue.Count - 1] : current;
+				if (previousEntry != null) {
+					delay += previousEntry.endTime;
+					if (animation != null) delay += -data.GetMix(previousEntry.animation, animation);
+				} else
 					delay = 0;
 			}
 			entry.delay = delay;
@@ -200,11 +210,12 @@ namespace Spine {
 
 		/** Returns true if no animation is set or if the current time is greater than the animation duration, regardless of looping. */
 		public bool IsComplete () {
-			return current == null || currentTime >= current.duration;
+			return current == null || current.time >= current.endTime;
 		}
 
 		override public String ToString () {
-			return (current != null && current.name != null) ? current.name : base.ToString();
+			if (current == null || current.animation == null) return "<none>";
+			return current.animation.Name;
 		}
 	}
 
@@ -224,10 +235,23 @@ namespace Spine {
 		}
 	}
 
-	public class QueueEntry {
-		internal Spine.Animation animation;
+	public class QueuedAnimation {
+		internal Animation animation;
 		internal bool loop;
-		internal float delay;
+		internal float delay, time, lastTime, endTime;
+
+		public Animation Animation { get { return animation; } }
+		public bool Loop { get { return loop; } set { loop = value; } }
+		public float Delay { get { return delay; } set { delay = value; } }
+		public float EndTime { get { return EndTime; } set { EndTime = value; } }
+
+		public float Time {
+			get { return time; }
+			set {
+				time = value;
+				if (lastTime < value) lastTime = value;
+			}
+		}
 
 		public event EventHandler Start;
 		public event EventHandler End;
