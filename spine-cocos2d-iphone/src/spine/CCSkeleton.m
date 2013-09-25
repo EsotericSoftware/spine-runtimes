@@ -47,15 +47,15 @@
 @synthesize debugBones = _debugBones;
 
 + (id) skeletonWithData:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
-	return [[[CCSkeleton alloc] initWithData:skeletonData ownsSkeletonData:ownsSkeletonData] autorelease];
+	return [[[self alloc] initWithData:skeletonData ownsSkeletonData:ownsSkeletonData] autorelease];
 }
 
 + (id) skeletonWithFile:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale {
-	return [[[CCSkeleton alloc] initWithFile:skeletonDataFile atlas:atlas scale:scale] autorelease];
+	return [[[self alloc] initWithFile:skeletonDataFile atlas:atlas scale:scale] autorelease];
 }
 
 + (id) skeletonWithFile:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile scale:(float)scale {
-	return [[[CCSkeleton alloc] initWithFile:skeletonDataFile atlasFile:atlasFile scale:scale] autorelease];
+	return [[[self alloc] initWithFile:skeletonDataFile atlasFile:atlasFile scale:scale] autorelease];
 }
 
 - (void) initialize:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
