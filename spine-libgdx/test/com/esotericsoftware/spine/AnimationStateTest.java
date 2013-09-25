@@ -69,23 +69,23 @@ public class AnimationStateTest extends ApplicationAdapter {
 
 		state = new AnimationState(stateData);
 		state.addListener(new AnimationStateListener() {
-			public void event (Event event) {
-				System.out.println("Event: " + event.getData().getName());
+			public void event (int trackIndex, Event event) {
+				System.out.println(trackIndex + " event: " + state.getTrackEntry(trackIndex) + ", " + event.getData().getName());
 			}
 
-			public void complete (int loopCount) {
-				System.out.println("Complete: " + state.getAnimation() + ", " + loopCount);
+			public void complete (int trackIndex, int loopCount) {
+				System.out.println(trackIndex + " complete: " + state.getTrackEntry(trackIndex) + ", " + loopCount);
 			}
 
-			public void start () {
-				System.out.println("Start: " + state.getAnimation());
+			public void start (int trackIndex) {
+				System.out.println(trackIndex + " start: " + state.getTrackEntry(trackIndex));
 			}
 
-			public void end () {
-				System.out.println("End: " + state.getAnimation());
+			public void end (int trackIndex) {
+				System.out.println(trackIndex + " end: " + state.getTrackEntry(trackIndex));
 			}
 		});
-		state.setAnimation("walk", true);
+		state.setAnimation(0, "walk", true);
 
 		skeleton = new Skeleton(skeletonData);
 		skeleton.setX(250);
@@ -99,8 +99,11 @@ public class AnimationStateTest extends ApplicationAdapter {
 			}
 
 			public boolean keyDown (int keycode) {
-				state.setAnimation("jump", false);
-				state.addAnimation("walk", true);
+// state.setAnimation(1, "jump", false);
+// state.addAnimation(1, (Animation)null, true, 0);
+
+				state.setAnimation(0, "jump", false);
+				state.addAnimation(0, "walk", true, 0);
 				return true;
 			}
 		});

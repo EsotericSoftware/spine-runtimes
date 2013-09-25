@@ -70,7 +70,7 @@ namespace Spine {
 
 			List<Timeline> timelines = this.timelines;
 			for (int i = 0, n = timelines.Count; i < n; i++)
-				timelines[i].Apply(skeleton, lastTime, time, 1, events);
+				timelines[i].Apply(skeleton, lastTime, time, events, 1);
 		}
 
 		/** @deprecated */
@@ -92,7 +92,7 @@ namespace Spine {
 
 			List<Timeline> timelines = this.timelines;
 			for (int i = 0, n = timelines.Count; i < n; i++)
-				timelines[i].Apply(skeleton, lastTime, time, alpha, events);
+				timelines[i].Apply(skeleton, lastTime, time, events, alpha);
 		}
 
 		/** @param target After the first and before the last entry. */
@@ -120,7 +120,7 @@ namespace Spine {
 
 	public interface Timeline {
 		/** Sets the value(s) for the specified time. */
-		void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents);
+		void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha);
 	}
 
 	/** Base class for frames that use an interpolation bezier curve. */
@@ -136,7 +136,7 @@ namespace Spine {
 			curves = new float[(frameCount - 1) * 6];
 		}
 
-		abstract public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents);
+		abstract public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha);
 
 		public void SetLinear (int frameIndex) {
 			curves[frameIndex * 6] = LINEAR;
@@ -225,7 +225,7 @@ namespace Spine {
 			frames[frameIndex + 1] = angle;
 		}
 
-		override public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents) {
+		override public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -288,7 +288,7 @@ namespace Spine {
 			frames[frameIndex + 2] = y;
 		}
 
-		override public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents) {
+		override public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -318,7 +318,7 @@ namespace Spine {
 			: base(frameCount) {
 		}
 
-		override public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents) {
+		override public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -370,7 +370,7 @@ namespace Spine {
 			frames[frameIndex + 4] = a;
 		}
 
-		override public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents) {
+		override public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -434,7 +434,7 @@ namespace Spine {
 			attachmentNames[frameIndex] = attachmentName;
 		}
 
-		public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents) {
+		public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -469,7 +469,7 @@ namespace Spine {
 			events[frameIndex] = e;
 		}
 
-		public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents) {
+		public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -478,7 +478,7 @@ namespace Spine {
 
 			if (lastTime > time) {
 				// Fire events after last time for looped animations.
-				Apply(skeleton, lastTime, int.MaxValue, alpha, firedEvents);
+				Apply(skeleton, lastTime, int.MaxValue, firedEvents, alpha);
 				lastTime = 0;
 			}
 
@@ -520,7 +520,7 @@ namespace Spine {
 			drawOrders[frameIndex] = drawOrder;
 		}
 
-		public void Apply (Skeleton skeleton, float lastTime, float time, float alpha, List<Event> firedEvents) {
+		public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 

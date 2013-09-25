@@ -33,32 +33,18 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Spine {
 	public class AnimationState {
 		private AnimationStateData data;
-		private QueuedAnimation current, previous;
-		private float mixTime, mixDuration;
-		private List<QueuedAnimation> queue = new List<QueuedAnimation>();
+		private List<TrackEntry> tracks = new List<TrackEntry>();
 		private List<Event> events = new List<Event>();
 
 		public AnimationStateData Data { get { return data; } }
-		public List<QueuedAnimation> Queue { get { return queue; } }
-		public QueuedAnimation Current { get { return current; } }
-		public Animation Animation {
-			get { return current != null ? current.animation : null; }
-		}
-		public float Time {
-			get { return current != null ? current.time : 0; }
-			set { if (current != null) current.Time = value; }
-		}
-		public bool Loop {
-			get { return current != null ? current.loop : false; }
-			set { if (current != null) current.Loop = value; }
-		}
 
-		public event EventHandler Start;
-		public event EventHandler End;
+		public event EventHandler<StartEndArgs> Start;
+		public event EventHandler<StartEndArgs> End;
 		public event EventHandler<EventTriggeredArgs> Event;
 		public event EventHandler<CompleteArgs> Complete;
 
@@ -68,177 +54,218 @@ namespace Spine {
 		}
 
 		public void Update (float delta) {
-			QueuedAnimation current = this.current;
-			if (current == null) return;
+			for (int i = 0, n = tracks.Count; i < n; i++) {
+				TrackEntry current = tracks[i];
+				if (current == null) continue;
 
-			float time = current.time;
-			float duration = current.endTime;
+				float time = current.time + delta;
+				float endTime = current.endTime;
 
-			current.time = time + delta;
-			if (previous != null) {
-				previous.time += delta;
-				mixTime += delta;
-			}
+				current.time = time;
+				if (current.previous != null) {
+					current.previous.time += delta;
+					current.mixTime += delta;
+				}
 
-			// Check if completed the animation or a loop iteration.
-			if (current.loop ? (current.lastTime % duration > time % duration) : (current.lastTime < duration && time >= duration)) {
-				int count = (int)(time / duration);
-				current.OnComplete(this, count);
-				if (Complete != null) Complete(this, new CompleteArgs(count));
-			}
+				// Check if completed the animation or a loop iteration.
+				if (current.loop ? (current.lastTime % endTime > time % endTime) : (current.lastTime < endTime && time >= endTime)) {
+					int count = (int)(time / endTime);
+					current.OnComplete(this, i, count);
+					if (Complete != null) Complete(this, new CompleteArgs(i, count));
+				}
 
-			if (queue.Count > 0) {
-				QueuedAnimation entry = queue[0];
-				if (time >= entry.delay) {
-					if (entry.animation == null)
-						ClearAnimation();
-					else {
-						SetAnimationEntry(entry);
-						queue.RemoveAt(0);
-					}
+				TrackEntry next = current.next;
+				if (next != null && time >= next.delay) {
+					if (next.animation == null)
+						Clear(i);
+					else
+						SetCurrent(i, next);
 				}
 			}
 		}
 
 		public void Apply (Skeleton skeleton) {
-			QueuedAnimation current = this.current;
+			List<Event> events = this.events;
+
+			for (int i = 0, n = tracks.Count; i < n; i++) {
+				TrackEntry current = tracks[i];
+				if (current == null) continue;
+
+				events.Clear();
+
+				TrackEntry previous = current.previous;
+				if (previous == null)
+					current.animation.Apply(skeleton, current.lastTime, current.time, current.loop, events);
+				else {
+					previous.animation.Apply(skeleton, int.MaxValue, previous.time, previous.loop, null);
+					float alpha = current.mixTime / current.mixDuration;
+					if (alpha >= 1) {
+						alpha = 1;
+						current.previous = null;
+					}
+					current.animation.Mix(skeleton, current.lastTime, current.time, current.loop, events, alpha);
+				}
+
+				for (int ii = 0, nn = events.Count; ii < nn; ii++) {
+					Event e = events[ii];
+					current.OnEvent(this, i, e);
+					if (Event != null) Event(this, new EventTriggeredArgs(i, e));
+				}
+
+				current.lastTime = current.time;
+			}
+		}
+
+		public void Clear () {
+			for (int i = 0, n = tracks.Count; i < n; i++)
+				Clear(i);
+			tracks.Clear();
+		}
+
+		public void Clear (int trackIndex) {
+			if (trackIndex >= tracks.Count) return;
+			TrackEntry current = tracks[trackIndex];
 			if (current == null) return;
 
-			List<Event> events = this.events;
-			events.Clear();
+			current.OnEnd(this, trackIndex);
+			if (End != null) End(this, new StartEndArgs(trackIndex));
 
-			QueuedAnimation previous = this.previous;
-			if (previous != null) {
-				previous.animation.Apply(skeleton, int.MaxValue, previous.time, previous.loop, null);
-				float alpha = mixTime / mixDuration;
-				if (alpha >= 1) {
-					alpha = 1;
-					this.previous = null;
-				}
-				current.animation.Mix(skeleton, current.lastTime, current.time, current.loop, events, alpha);
-			} else
-				current.animation.Apply(skeleton, current.lastTime, current.time, current.loop, events);
-
-			foreach (Event e in events) {
-				current.OnEvent(this, e);
-				if (Event != null) Event(this, new EventTriggeredArgs(e));
-			}
-
-			current.lastTime = current.time;
+			tracks[trackIndex] = null;
 		}
 
-		public void ClearAnimation () {
-			previous = null;
-			current = null;
-			queue.Clear();
+		private TrackEntry ExpandToIndex (int index) {
+			if (index < tracks.Count) return tracks[index];
+			while (index >= tracks.Count)
+				tracks.Add(null);
+			return null;
 		}
 
-		private void SetAnimationEntry (QueuedAnimation entry) {
-			previous = null;
-
-			QueuedAnimation current = this.current;
+		private void SetCurrent (int index, TrackEntry entry) {
+			TrackEntry current = ExpandToIndex(index);
 			if (current != null) {
-				current.OnEnd(this);
-				if (End != null) End(this, EventArgs.Empty);
+				current.previous = null;
 
-				mixDuration = data.GetMix(current.animation, entry.animation);
-				if (mixDuration > 0) {
-					mixTime = 0;
-					previous = current;
+				current.OnEnd(this, index);
+				if (End != null) End(this, new StartEndArgs(index));
+
+				entry.mixDuration = data.GetMix(current.animation, entry.animation);
+				if (entry.mixDuration > 0) {
+					entry.mixTime = 0;
+					entry.previous = current;
 				}
 			}
-			this.current = entry;
 
-			entry.OnStart(this);
-			if (Start != null) Start(this, EventArgs.Empty);
+			tracks[index] = entry;
+
+			entry.OnStart(this, index);
+			if (Start != null) Start(this, new StartEndArgs(index));
 		}
 
-		public QueuedAnimation SetAnimation (String animationName, bool loop) {
+		public TrackEntry SetAnimation (int trackIndex, String animationName, bool loop) {
 			Animation animation = data.skeletonData.FindAnimation(animationName);
 			if (animation == null) throw new ArgumentException("Animation not found: " + animationName);
-			return SetAnimation(animation, loop);
+			return SetAnimation(trackIndex, animation, loop);
 		}
 
 		/** Set the current animation. Any queued animations are cleared. */
-		public QueuedAnimation SetAnimation (Animation animation, bool loop) {
-			queue.Clear();
-			QueuedAnimation entry = new QueuedAnimation();
+		public TrackEntry SetAnimation (int trackIndex, Animation animation, bool loop) {
+			TrackEntry entry = new TrackEntry();
 			entry.animation = animation;
 			entry.loop = loop;
 			entry.time = 0;
 			entry.endTime = animation.Duration;
-			SetAnimationEntry(entry);
+			SetCurrent(trackIndex, entry);
 			return entry;
 		}
 
-		public QueuedAnimation AddAnimation (String animationName, bool loop) {
-			return AddAnimation(animationName, loop, 0);
-		}
-
-		public QueuedAnimation AddAnimation (String animationName, bool loop, float delay) {
+		public TrackEntry AddAnimation (int trackIndex, String animationName, bool loop, float delay) {
 			Animation animation = data.skeletonData.FindAnimation(animationName);
 			if (animation == null) throw new ArgumentException("Animation not found: " + animationName);
-			return AddAnimation(animation, loop, delay);
-		}
-
-		public QueuedAnimation AddAnimation (Animation animation, bool loop) {
-			return AddAnimation(animation, loop, 0);
+			return AddAnimation(trackIndex, animation, loop, delay);
 		}
 
 		/** Adds an animation to be played delay seconds after the current or last queued animation.
 		 * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay. */
-		public QueuedAnimation AddAnimation (Animation animation, bool loop, float delay) {
-			QueuedAnimation entry = new QueuedAnimation();
+		public TrackEntry AddAnimation (int trackIndex, Animation animation, bool loop, float delay) {
+			TrackEntry entry = new TrackEntry();
 			entry.animation = animation;
 			entry.loop = loop;
 			entry.time = 0;
 			entry.endTime = animation != null ? animation.Duration : 0;
 
+			TrackEntry last = ExpandToIndex(trackIndex);
+			if (last != null) {
+				while (last.next != null)
+					last = last.next;
+				last.next = entry;
+			} else
+				tracks[trackIndex] = entry;
+
 			if (delay <= 0) {
-				QueuedAnimation previousEntry = queue.Count > 0 ? queue[queue.Count - 1] : current;
-				if (previousEntry != null) {
-					delay += previousEntry.endTime;
-					if (animation != null) delay += -data.GetMix(previousEntry.animation, animation);
+				if (last != null) {
+					delay += last.endTime;
+					if (animation != null) delay += -data.GetMix(last.animation, animation);
 				} else
 					delay = 0;
 			}
 			entry.delay = delay;
 
-			queue.Add(entry);
 			return entry;
 		}
 
-		/** Returns true if no animation is set or if the current time is greater than the animation duration, regardless of looping. */
-		public bool IsComplete () {
-			return current == null || current.time >= current.endTime;
+		/** @return May be null. */
+		public TrackEntry getTrackEntry (int trackIndex) {
+			if (trackIndex >= tracks.Count) return null;
+			return tracks[trackIndex];
 		}
 
 		override public String ToString () {
-			if (current == null || current.animation == null) return "<none>";
-			return current.animation.Name;
+			StringBuilder buffer = new StringBuilder();
+			for (int i = 0, n = tracks.Count; i < n; i++) {
+				TrackEntry entry = tracks[i];
+				if (entry == null) continue;
+				if (buffer.Length > 0) buffer.Append(", ");
+				buffer.Append(entry.ToString());
+			}
+			if (buffer.Length == 0) return "<none>";
+			return buffer.ToString();
 		}
 	}
 
 	public class EventTriggeredArgs : EventArgs {
+		public int TrackIndex { get; private set; }
 		public Event Event { get; private set; }
 
-		public EventTriggeredArgs (Event e) {
+		public EventTriggeredArgs (int trackIndex, Event e) {
+			TrackIndex = trackIndex;
 			Event = e;
 		}
 	}
 
 	public class CompleteArgs : EventArgs {
+		public int TrackIndex { get; private set; }
 		public int LoopCount { get; private set; }
 
-		public CompleteArgs (int loopCount) {
+		public CompleteArgs (int trackIndex, int loopCount) {
+			TrackIndex = trackIndex;
 			LoopCount = loopCount;
 		}
 	}
 
-	public class QueuedAnimation {
+	public class StartEndArgs : EventArgs {
+		public int TrackIndex { get; private set; }
+
+		public StartEndArgs (int trackIndex) {
+			TrackIndex = trackIndex;
+		}
+	}
+
+	public class TrackEntry {
+		internal TrackEntry next, previous;
 		internal Animation animation;
 		internal bool loop;
 		internal float delay, time, lastTime, endTime;
+		internal float mixTime, mixDuration;
 
 		public Animation Animation { get { return animation; } }
 		public bool Loop { get { return loop; } set { loop = value; } }
@@ -253,25 +280,25 @@ namespace Spine {
 			}
 		}
 
-		public event EventHandler Start;
-		public event EventHandler End;
+		public event EventHandler<StartEndArgs> Start;
+		public event EventHandler<StartEndArgs> End;
 		public event EventHandler<EventTriggeredArgs> Event;
 		public event EventHandler<CompleteArgs> Complete;
 
-		internal void OnStart (AnimationState state) {
-			if (Start != null) Start(state, EventArgs.Empty);
+		internal void OnStart (AnimationState state, int index) {
+			if (Start != null) Start(state, new StartEndArgs(index));
 		}
 
-		internal void OnEnd (AnimationState state) {
-			if (End != null) End(state, EventArgs.Empty);
+		internal void OnEnd (AnimationState state, int index) {
+			if (End != null) End(state, new StartEndArgs(index));
 		}
 
-		internal void OnEvent (AnimationState state, Event e) {
-			if (Event != null) Event(state, new EventTriggeredArgs(e));
+		internal void OnEvent (AnimationState state, int index, Event e) {
+			if (Event != null) Event(state, new EventTriggeredArgs(index, e));
 		}
 
-		internal void OnComplete (AnimationState state, int loopCount) {
-			if (Complete != null) Complete(state, new CompleteArgs(loopCount));
+		internal void OnComplete (AnimationState state, int index, int loopCount) {
+			if (Complete != null) Complete(state, new CompleteArgs(index, loopCount));
 		}
 	}
 }

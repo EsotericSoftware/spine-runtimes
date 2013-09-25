@@ -40,11 +40,9 @@ import com.badlogic.gdx.utils.Pools;
 /** Stores state for an animation and automatically mixes between animations. */
 public class AnimationState {
 	private final AnimationStateData data;
-	private QueuedAnimation current, previous;
-	private float mixTime, mixDuration;
-	private final Array<QueuedAnimation> queue = new Array();
-	private final Array<AnimationStateListener> listeners = new Array();
+	private Array<TrackEntry> tracks = new Array();
 	private final Array<Event> events = new Array();
+	private final Array<AnimationStateListener> listeners = new Array();
 
 	public AnimationState (AnimationStateData data) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -52,202 +50,196 @@ public class AnimationState {
 	}
 
 	public void update (float delta) {
-		QueuedAnimation current = this.current;
-		if (current == null) return;
+		for (int i = 0, n = tracks.size; i < n; i++) {
+			TrackEntry current = tracks.get(i);
+			if (current == null) continue;
 
-		float time = current.time;
-		float duration = current.endTime;
+			float time = current.time + delta;
+			float endTime = current.endTime;
 
-		current.time = time + delta;
-		if (previous != null) {
-			previous.time += delta;
-			mixTime += delta;
-		}
+			current.time = time;
+			if (current.previous != null) {
+				current.previous.time += delta;
+				current.mixTime += delta;
+			}
 
-		// Check if completed the animation or a loop iteration.
-		if (current.loop ? (current.lastTime % duration > time % duration) : (current.lastTime < duration && time >= duration)) {
-			int count = (int)(time / duration);
-			if (current.listener != null) current.listener.complete(count);
-			for (int i = 0, n = listeners.size; i < n; i++)
-				listeners.get(i).complete(count);
-		}
+			// Check if completed the animation or a loop iteration.
+			if (current.loop ? (current.lastTime % endTime > time % endTime) : (current.lastTime < endTime && time >= endTime)) {
+				int count = (int)(time / endTime);
+				if (current.listener != null) current.listener.complete(i, count);
+				for (int ii = 0, nn = listeners.size; ii < nn; ii++)
+					listeners.get(ii).complete(i, count);
+			}
 
-		if (queue.size > 0) {
-			QueuedAnimation entry = queue.first();
-			if (time >= entry.delay) {
-				if (entry.animation == null)
-					clearAnimation();
-				else {
-					setAnimationEntry(entry);
-					queue.removeIndex(0);
-				}
+			TrackEntry next = current.next;
+			if (next != null && time >= next.delay) {
+				if (next.animation == null)
+					clear(i);
+				else
+					setCurrent(i, next);
 			}
 		}
 	}
 
 	public void apply (Skeleton skeleton) {
-		QueuedAnimation current = this.current;
+		Array<Event> events = this.events;
+		int listenerCount = listeners.size;
+
+		for (int i = 0, n = tracks.size; i < n; i++) {
+			TrackEntry current = tracks.get(i);
+			if (current == null) continue;
+
+			events.size = 0;
+
+			TrackEntry previous = current.previous;
+			if (previous == null)
+				current.animation.apply(skeleton, current.lastTime, current.time, current.loop, events);
+			else {
+				previous.animation.apply(skeleton, Integer.MAX_VALUE, previous.time, previous.loop, null);
+				float alpha = current.mixTime / current.mixDuration;
+				if (alpha >= 1) {
+					alpha = 1;
+					Pools.free(previous);
+					current.previous = null;
+				}
+				current.animation.mix(skeleton, current.lastTime, current.time, current.loop, events, alpha);
+			}
+
+			for (int ii = 0, nn = events.size; ii < nn; ii++) {
+				Event event = events.get(ii);
+				if (current.listener != null) current.listener.event(i, event);
+				for (int iii = 0; iii < listenerCount; iii++)
+					listeners.get(iii).event(i, event);
+			}
+
+			current.lastTime = current.time;
+		}
+	}
+
+	public void clear () {
+		for (int i = 0, n = tracks.size; i < n; i++)
+			clear(i);
+		tracks.clear();
+	}
+
+	public void clear (int trackIndex) {
+		if (trackIndex >= tracks.size) return;
+		TrackEntry current = tracks.get(trackIndex);
 		if (current == null) return;
 
-		Array<Event> events = this.events;
-		events.size = 0;
+		if (current.listener != null) current.listener.end(trackIndex);
+		for (int i = 0, n = listeners.size; i < n; i++)
+			listeners.get(i).end(trackIndex);
 
-		QueuedAnimation previous = this.previous;
-		if (previous != null) {
-			previous.animation.apply(skeleton, Integer.MAX_VALUE, previous.time, previous.loop, null);
-			float alpha = mixTime / mixDuration;
-			if (alpha >= 1) {
-				alpha = 1;
-				Pools.free(previous);
-				this.previous = null;
+		tracks.set(trackIndex, null);
+		freeAll(current);
+		if (current.previous != null) Pools.free(current.previous);
+	}
+
+	private void freeAll (TrackEntry entry) {
+		while (entry != null) {
+			TrackEntry next = entry.next;
+			Pools.free(entry);
+			entry = next;
+		}
+	}
+
+	private TrackEntry expandToIndex (int index) {
+		if (index < tracks.size) return tracks.get(index);
+		tracks.ensureCapacity(index - tracks.size + 1);
+		tracks.size = index + 1;
+		return null;
+	}
+
+	private void setCurrent (int index, TrackEntry entry) {
+		TrackEntry current = expandToIndex(index);
+		if (current != null) {
+			if (current.previous != null) {
+				Pools.free(current.previous);
+				current.previous = null;
 			}
-			current.animation.mix(skeleton, current.lastTime, current.time, current.loop, events, alpha);
-		} else
-			current.animation.apply(skeleton, current.lastTime, current.time, current.loop, events);
 
-		int listenerCount = listeners.size;
-		for (int i = 0, n = events.size; i < n; i++) {
-			Event event = events.get(i);
-			if (current.listener != null) current.listener.event(event);
-			for (int ii = 0; ii < listenerCount; ii++)
-				listeners.get(ii).event(event);
-		}
-
-		current.lastTime = current.time;
-	}
-
-	public void clearAnimation () {
-		if (previous != null) {
-			Pools.free(previous);
-			previous = null;
-		}
-		if (current != null) {
-			Pools.free(current);
-			current = null;
-		}
-		clearQueue();
-	}
-
-	private void clearQueue () {
-		Pools.freeAll(queue);
-		queue.clear();
-	}
-
-	private void setAnimationEntry (QueuedAnimation entry) {
-		if (previous != null) {
-			Pools.free(previous);
-			previous = null;
-		}
-
-		QueuedAnimation current = this.current;
-		if (current != null) {
-			if (current.listener != null) current.listener.end();
+			if (current.listener != null) current.listener.end(index);
 			for (int i = 0, n = listeners.size; i < n; i++)
-				listeners.get(i).end();
+				listeners.get(i).end(index);
 
-			mixDuration = data.getMix(current.animation, entry.animation);
-			if (mixDuration > 0) {
-				mixTime = 0;
-				previous = current;
+			entry.mixDuration = data.getMix(current.animation, entry.animation);
+			if (entry.mixDuration > 0) {
+				entry.mixTime = 0;
+				entry.previous = current;
 			} else
 				Pools.free(current);
 		}
-		this.current = entry;
 
-		if (entry != null && entry.listener != null) entry.listener.start();
+		tracks.set(index, entry);
+
+		if (entry.listener != null) entry.listener.start(index);
 		for (int i = 0, n = listeners.size; i < n; i++)
-			listeners.get(i).start();
+			listeners.get(i).start(index);
 	}
 
-	/** @see #setAnimation(Animation, boolean) */
-	public QueuedAnimation setAnimation (String animationName, boolean loop) {
+	/** @see #setAnimation(int, Animation, boolean) */
+	public TrackEntry setAnimation (int trackIndex, String animationName, boolean loop) {
 		Animation animation = data.getSkeletonData().findAnimation(animationName);
 		if (animation == null) throw new IllegalArgumentException("Animation not found: " + animationName);
-		return setAnimation(animation, loop);
+		return setAnimation(trackIndex, animation, loop);
 	}
 
 	/** Set the current animation. Any queued animations are cleared. */
-	public QueuedAnimation setAnimation (Animation animation, boolean loop) {
-		clearQueue();
+	public TrackEntry setAnimation (int trackIndex, Animation animation, boolean loop) {
+		TrackEntry current = expandToIndex(trackIndex);
+		if (current != null) freeAll(current.next);
 
-		QueuedAnimation entry = Pools.obtain(QueuedAnimation.class);
+		TrackEntry entry = Pools.obtain(TrackEntry.class);
 		entry.animation = animation;
 		entry.loop = loop;
 		entry.time = 0;
 		entry.endTime = animation.getDuration();
-		setAnimationEntry(entry);
+		setCurrent(trackIndex, entry);
 		return entry;
 	}
 
-	/** @see #addAnimation(Animation, boolean) */
-	public QueuedAnimation addAnimation (String animationName, boolean loop) {
-		return addAnimation(animationName, loop, 0);
-	}
-
-	/** @see #addAnimation(Animation, boolean, float) */
-	public QueuedAnimation addAnimation (String animationName, boolean loop, float delay) {
+	/** {@link #addAnimation(int, Animation, boolean, float)} */
+	public TrackEntry addAnimation (int trackIndex, String animationName, boolean loop, float delay) {
 		Animation animation = data.getSkeletonData().findAnimation(animationName);
 		if (animation == null) throw new IllegalArgumentException("Animation not found: " + animationName);
-		return addAnimation(animation, loop, delay);
-	}
-
-	/** Adds an animation to be played delay seconds after the current or last queued animation, taking into account any mix
-	 * duration.
-	 * @param animation May be null to queue clearing the AnimationState. */
-	public QueuedAnimation addAnimation (Animation animation, boolean loop) {
-		return addAnimation(animation, loop, 0);
+		return addAnimation(trackIndex, animation, loop, delay);
 	}
 
 	/** Adds an animation to be played delay seconds after the current or last queued animation.
 	 * @param animation May be null to queue clearing the AnimationState.
 	 * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay. */
-	public QueuedAnimation addAnimation (Animation animation, boolean loop, float delay) {
-		QueuedAnimation entry = Pools.obtain(QueuedAnimation.class);
+	public TrackEntry addAnimation (int trackIndex, Animation animation, boolean loop, float delay) {
+		TrackEntry entry = Pools.obtain(TrackEntry.class);
 		entry.animation = animation;
 		entry.loop = loop;
 		entry.time = 0;
 		entry.endTime = animation != null ? animation.getDuration() : 0;
 
+		TrackEntry last = expandToIndex(trackIndex);
+		if (last != null) {
+			while (last.next != null)
+				last = last.next;
+			last.next = entry;
+		} else
+			tracks.set(trackIndex, entry);
+
 		if (delay <= 0) {
-			QueuedAnimation previousEntry = queue.size > 0 ? queue.peek() : current;
-			if (previousEntry != null) {
-				delay += previousEntry.endTime;
-				if (animation != null) delay += -data.getMix(previousEntry.animation, animation);
+			if (last != null) {
+				delay += last.endTime;
+				if (animation != null) delay += -data.getMix(last.animation, animation);
 			} else
 				delay = 0;
 		}
 		entry.delay = delay;
 
-		queue.add(entry);
 		return entry;
 	}
 
-	public Array<QueuedAnimation> getQueue () {
-		return queue;
-	}
-
 	/** @return May be null. */
-	public QueuedAnimation getCurrent () {
-		return current;
-	}
-
-	/** @return May be null. */
-	public Animation getAnimation () {
-		return current != null ? current.animation : null;
-	}
-
-	/** Returns the time within the current animation. */
-	public float getTime () {
-		return current != null ? current.time : 0;
-	}
-
-	public void setTime (float time) {
-		if (current != null) current.setTime(time);
-	}
-
-	/** Returns true if no animation is set or if the current time is greater than the animation duration, regardless of looping. */
-	public boolean isComplete () {
-		return current == null || current.time >= current.endTime;
+	public TrackEntry getTrackEntry (int trackIndex) {
+		if (trackIndex >= tracks.size) return null;
+		return tracks.get(trackIndex);
 	}
 
 	/** Adds a listener to receive events for all animations. */
@@ -266,24 +258,37 @@ public class AnimationState {
 	}
 
 	public String toString () {
-		if (current == null || current.animation == null) return "<none>";
-		return current.animation.getName();
+		StringBuilder buffer = new StringBuilder(64);
+		for (int i = 0, n = tracks.size; i < n; i++) {
+			TrackEntry entry = tracks.get(i);
+			if (entry == null) continue;
+			if (buffer.length() > 0) buffer.append(", ");
+			buffer.append(entry.toString());
+		}
+		if (buffer.length() == 0) return "<none>";
+		return buffer.toString();
 	}
 
-	/** A queued animation. */
-	static public class QueuedAnimation implements Poolable {
+	static public class TrackEntry implements Poolable {
+		TrackEntry next, previous;
 		Animation animation;
 		boolean loop;
 		float delay, time, lastTime, endTime;
 		AnimationStateListener listener;
+		float mixTime, mixDuration;
 
 		public void reset () {
 			animation = null;
 			listener = null;
+			next = null;
 		}
 
 		public Animation getAnimation () {
 			return animation;
+		}
+
+		public void setAnimation (Animation animation) {
+			this.animation = animation;
 		}
 
 		public boolean getLoop () {
@@ -294,13 +299,20 @@ public class AnimationState {
 			this.loop = loop;
 		}
 
+		public float getDelay () {
+			return delay;
+		}
+
+		public void setDelay (float delay) {
+			this.delay = delay;
+		}
+
 		public float getTime () {
 			return time;
 		}
 
 		public void setTime (float time) {
 			this.time = time;
-			if (lastTime < time) lastTime = time;
 		}
 
 		public float getEndTime () {
@@ -319,41 +331,58 @@ public class AnimationState {
 			this.listener = listener;
 		}
 
-		public float getDelay () {
-			return delay;
+		public float getLastTime () {
+			return lastTime;
 		}
 
-		public void setDelay (float delay) {
-			this.delay = delay;
+		public void setLastTime (float lastTime) {
+			this.lastTime = lastTime;
+		}
+
+		public TrackEntry getNext () {
+			return next;
+		}
+
+		public void setNext (TrackEntry next) {
+			this.next = next;
+		}
+
+		/** Returns true if the current time is greater than the end time, regardless of looping. */
+		public boolean isComplete () {
+			return time >= endTime;
+		}
+
+		public String toString () {
+			return animation == null ? "<none>" : animation.name;
 		}
 	}
 
 	static public interface AnimationStateListener {
 		/** Invoked when the current animation triggers an event. */
-		public void event (Event event);
+		public void event (int trackIndex, Event event);
 
 		/** Invoked when the current animation has completed.
 		 * @param loopCount The number of times the animation reached the end. */
-		public void complete (int loopCount);
+		public void complete (int trackIndex, int loopCount);
 
 		/** Invoked just after the current animation is set. */
-		public void start ();
+		public void start (int trackIndex);
 
 		/** Invoked just before the current animation is replaced. */
-		public void end ();
+		public void end (int trackIndex);
 	}
 
 	static public abstract class AnimationStateAdapter implements AnimationStateListener {
-		public void event (Event event) {
+		public void event (int trackIndex, Event event) {
 		}
 
-		public void complete (int loopCount) {
+		public void complete (int trackIndex, int loopCount) {
 		}
 
-		public void start () {
+		public void start (int trackIndex) {
 		}
 
-		public void end () {
+		public void end (int trackIndex) {
 		}
 	}
 }

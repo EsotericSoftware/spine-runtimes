@@ -81,7 +81,7 @@ public class Animation {
 
 		Array<Timeline> timelines = this.timelines;
 		for (int i = 0, n = timelines.size; i < n; i++)
-			timelines.get(i).apply(skeleton, lastTime, time, 1, events);
+			timelines.get(i).apply(skeleton, lastTime, time, events, 1);
 	}
 
 	/** @deprecated */
@@ -103,7 +103,7 @@ public class Animation {
 
 		Array<Timeline> timelines = this.timelines;
 		for (int i = 0, n = timelines.size; i < n; i++)
-			timelines.get(i).apply(skeleton, lastTime, time, alpha, events);
+			timelines.get(i).apply(skeleton, lastTime, time, events, alpha);
 	}
 
 	public String getName () {
@@ -138,7 +138,7 @@ public class Animation {
 
 	static public interface Timeline {
 		/** Sets the value(s) for the specified time. */
-		public void apply (Skeleton skeleton, float lastTime, float time, float alpha, Array<Event> events);
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha);
 	}
 
 	/** Base class for frames that use an interpolation bezier curve. */
@@ -263,7 +263,7 @@ public class Animation {
 			frames[frameIndex + 1] = angle;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, float alpha, Array<Event> events) {
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -333,7 +333,7 @@ public class Animation {
 			frames[frameIndex + 2] = y;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, float alpha, Array<Event> events) {
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -363,7 +363,7 @@ public class Animation {
 			super(frameCount);
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, float alpha, Array<Event> events) {
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -426,7 +426,7 @@ public class Animation {
 			frames[frameIndex + 4] = a;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, float alpha, Array<Event> events) {
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -499,7 +499,7 @@ public class Animation {
 			attachmentNames[frameIndex] = attachmentName;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, float alpha, Array<Event> events) {
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -542,7 +542,7 @@ public class Animation {
 			events[frameIndex] = event;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, float alpha, Array<Event> firedEvents) {
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -551,7 +551,7 @@ public class Animation {
 
 			if (lastTime > time) {
 				// Fire events after last time for looped animations.
-				apply(skeleton, lastTime, Integer.MAX_VALUE, alpha, firedEvents);
+				apply(skeleton, lastTime, Integer.MAX_VALUE, firedEvents, alpha);
 				lastTime = 0;
 			}
 
@@ -601,7 +601,7 @@ public class Animation {
 			drawOrders[frameIndex] = drawOrder;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, float alpha, Array<Event> firedEvents) {
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 

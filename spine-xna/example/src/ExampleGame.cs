@@ -88,19 +88,19 @@ namespace Spine {
 
 			state = new AnimationState(stateData);
 
-			if (false) {
+			if (true) {
 				// Event handling for all animations.
-				state.Start += new EventHandler(Start);
-				state.End += new EventHandler(End);
+				state.Start += new EventHandler<StartEndArgs>(Start);
+				state.End += new EventHandler<StartEndArgs>(End);
 				state.Complete += new EventHandler<CompleteArgs>(Complete);
 				state.Event += new EventHandler<EventTriggeredArgs>(Event);
 
-				state.SetAnimation("drawOrder", true);
+				state.SetAnimation(0, "drawOrder", true);
 			} else {
-				state.SetAnimation("walk", false);
-				QueuedAnimation entry = state.AddAnimation("jump", false);
-				entry.End += new EventHandler(End); // Event handling for queued animations.
-				state.AddAnimation("walk", true);
+				state.SetAnimation(0, "walk", false);
+				TrackEntry entry = state.AddAnimation(0, "jump", false, 0);
+				entry.End += new EventHandler<StartEndArgs>(End); // Event handling for queued animations.
+				state.AddAnimation(0, "walk", true, 0);
 			}
 
 			skeleton.X = 320;
@@ -149,20 +149,20 @@ namespace Spine {
 			base.Draw(gameTime);
 		}
 
-		public void Start (object sender, EventArgs e) {
-			Console.WriteLine(state + ": start");
+		public void Start (object sender, StartEndArgs e) {
+			Console.WriteLine(e.TrackIndex + " " + state.getTrackEntry(e.TrackIndex) + ": start");
 		}
 
-		public void End (object sender, EventArgs e) {
-			Console.WriteLine(state + ": end");
+		public void End (object sender, StartEndArgs e) {
+			Console.WriteLine(e.TrackIndex + " " + state.getTrackEntry(e.TrackIndex) + ": end");
 		}
 
 		public void Complete (object sender, CompleteArgs e) {
-			Console.WriteLine(state + ": complete " + e.LoopCount);
+			Console.WriteLine(e.TrackIndex + " " + state.getTrackEntry(e.TrackIndex) + ": complete " + e.LoopCount);
 		}
 
 		public void Event (object sender, EventTriggeredArgs e) {
-			Console.WriteLine(state + ": event " + e.Event);
+			Console.WriteLine(e.TrackIndex + " " + state.getTrackEntry(e.TrackIndex) + ": event " + e.Event);
 		}
 	}
 }
