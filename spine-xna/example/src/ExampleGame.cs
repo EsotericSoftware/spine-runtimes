@@ -69,6 +69,7 @@ namespace Spine {
 
 		protected override void LoadContent () {
 			skeletonRenderer = new SkeletonRenderer(GraphicsDevice);
+			skeletonRenderer.PremultipliedAlpha = true;
 
 			String name = "spineboy"; // "goblins";
 

@@ -43,6 +43,10 @@ namespace Spine {
 		BasicEffect effect;
 		RasterizerState rasterizerState;
 		float[] vertices = new float[8];
+		BlendState defaultBlendState;
+
+		private bool premultipliedAlpha;
+		public bool PremultipliedAlpha { get { return premultipliedAlpha; } set { premultipliedAlpha = value; } }
 
 		public SkeletonRenderer (GraphicsDevice device) {
 			this.device = device;
@@ -62,8 +66,10 @@ namespace Spine {
 		}
 
 		public void Begin () {
+			defaultBlendState = premultipliedAlpha ? BlendState.AlphaBlend : BlendState.NonPremultiplied;
+
 			device.RasterizerState = rasterizerState;
-			device.BlendState = BlendState.AlphaBlend; // spine-xna textures are premultiplied on load, see Util.cs.
+			device.BlendState = defaultBlendState;
 
 			effect.Projection = Matrix.CreateOrthographicOffCenter(0, device.Viewport.Width, device.Viewport.Height, 0, 1, 0);
 		}
@@ -83,7 +89,7 @@ namespace Spine {
 				Slot slot = drawOrder[i];
 				RegionAttachment regionAttachment = slot.Attachment as RegionAttachment;
 				if (regionAttachment != null) {
-					BlendState blend = slot.Data.AdditiveBlending ? BlendState.Additive : BlendState.AlphaBlend;
+					BlendState blend = slot.Data.AdditiveBlending ? BlendState.Additive : defaultBlendState;
 					if (device.BlendState != blend) {
 						End();
 						device.BlendState = blend;
@@ -93,8 +99,12 @@ namespace Spine {
 					AtlasRegion region = (AtlasRegion)regionAttachment.RendererObject;
 					item.Texture = (Texture2D)region.page.rendererObject;
 
+					Color color;
 					float a = skeletonA * slot.A;
-					Color color = new Color(skeletonR * slot.R * a, skeletonG * slot.G * a, skeletonB * slot.B * a, a);
+					if (premultipliedAlpha)
+						color = new Color(skeletonR * slot.R * a, skeletonG * slot.G * a, skeletonB * slot.B * a, a);
+					else
+						color = new Color(skeletonR * slot.R, skeletonG * slot.G, skeletonB * slot.B, a);
 					item.vertexTL.Color = color;
 					item.vertexBL.Color = color;
 					item.vertexBR.Color = color;
