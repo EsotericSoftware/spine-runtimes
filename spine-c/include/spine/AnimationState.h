@@ -56,13 +56,17 @@ void AnimationState_update (AnimationState* self, float delta);
 void AnimationState_apply (AnimationState* self, struct Skeleton* skeleton);
 
 /* @param animationName May be 0. */
-void AnimationState_setAnimationByName (AnimationState* self, const char* animationName, int/*bool*/loop);
-/* @param animation May be 0. */
+void AnimationState_setAnimationByName (AnimationState* self, const char* animationName, int/*bool*/loop, float fromTime, float toTime);
+/* @param animation May be 0. 
+ * @param fromTime May be > 0 to set the first time to be animated from
+ * @param toTime May be > 0 to set the last time to be animated to */
 void AnimationState_setAnimation (AnimationState* self, Animation* animation, int/*bool*/loop);
 
 /** @param animationName May be 0.
- * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay. */
-void AnimationState_addAnimationByName (AnimationState* self, const char* animationName, int/*bool*/loop, float delay);
+ * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay. 
+ * @param fromTime May be > 0 to set the first time to be animated from
+ * @param toTime May be > 0 to set the last time to be animated to */
+void AnimationState_addAnimationByName (AnimationState* self, const char* animationName, int/*bool*/loop, float delay, float fromTime, float toTime);
 /** @param animation May be 0.
  * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay. */
 void AnimationState_addAnimation (AnimationState* self, Animation* animation, int/*bool*/loop, float delay);

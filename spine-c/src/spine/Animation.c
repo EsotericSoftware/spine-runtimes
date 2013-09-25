@@ -38,6 +38,8 @@
 Animation* Animation_create (const char* name, int timelineCount) {
 	Animation* self = NEW(Animation);
 	MALLOC_STR(self->name, name);
+    self->fromTime = 0;
+    self->toTime = 0;
 	self->timelineCount = timelineCount;
 	self->timelines = MALLOC(Timeline*, timelineCount);
 	return self;
@@ -60,6 +62,9 @@ void Animation_apply (const Animation* self, Skeleton* skeleton, float time, int
 #else
 	if (loop && self->duration) time = (float)fmod(time, self->duration);
 #endif
+    
+    if (self->fromTime > 0 && time < self->fromTime) return; /* Time is before first frame. */
+    if (self->toTime > 0 && time >= self->toTime) return; /* Time is after last frame. */
 
 	for (i = 0; i < n; ++i)
 		Timeline_apply(self->timelines[i], skeleton, time, 1);

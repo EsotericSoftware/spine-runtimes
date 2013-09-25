@@ -105,8 +105,10 @@ void AnimationState_addAnimation (AnimationState* self, Animation* animation, in
 	entry->delay = delay;
 }
 
-void AnimationState_addAnimationByName (AnimationState* self, const char* animationName, int/*bool*/loop, float delay) {
+void AnimationState_addAnimationByName (AnimationState* self, const char* animationName, int/*bool*/loop, float delay, float fromTime, float toTime) {
 	Animation* animation = animationName ? SkeletonData_findAnimation(self->data->skeletonData, animationName) : 0;
+    animation->fromTime = fromTime;
+    animation->toTime = toTime;
 	AnimationState_addAnimation(self, animation, loop, delay);
 }
 
@@ -132,8 +134,10 @@ void AnimationState_setAnimation (AnimationState* self, Animation* newAnimation,
 	_AnimationState_setAnimation(self, newAnimation, loop);
 }
 
-void AnimationState_setAnimationByName (AnimationState* self, const char* animationName, int/*bool*/loop) {
+void AnimationState_setAnimationByName (AnimationState* self, const char* animationName, int/*bool*/loop, float fromTime, float toTime) {
 	Animation* animation = animationName ? SkeletonData_findAnimation(self->data->skeletonData, animationName) : 0;
+    animation->fromTime = fromTime;
+    animation->toTime = toTime;
 	AnimationState_setAnimation(self, animation, loop);
 }
 

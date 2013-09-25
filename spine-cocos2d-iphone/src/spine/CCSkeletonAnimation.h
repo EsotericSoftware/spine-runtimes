@@ -62,8 +62,12 @@ Draws an animated skeleton, providing a simple API for applying one or more anim
 
 - (void) setAnimation:(NSString*)name loop:(bool)loop;
 - (void) setAnimation:(NSString*)name loop:(bool)loop forState:(int)stateIndex;
+- (void) setAnimation:(NSString*)name loop:(bool)loop fromTime:(float)fromTime toTime:(float)toTime;
+- (void) setAnimation:(NSString*)name loop:(bool)loop fromTime:(float)fromTime toTime:(float)toTime forState:(int)stateIndex;
 
 - (void) addAnimation:(NSString*)name loop:(bool)loop afterDelay:(float)delay;
+- (void) addAnimation:(NSString*)name loop:(bool)loop fromTime:(float)fromTime toTime:(float)toTime;
+- (void) addAnimation:(NSString*)name loop:(bool)loop fromTime:(float)fromTime toTime:(float)toTime forState:(int)stateIndex;
 - (void) addAnimation:(NSString*)name loop:(bool)loop afterDelay:(float)delay forState:(int)stateIndex;
 
 - (void) clearAnimation;
