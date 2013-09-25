@@ -1,0 +1,52 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<title>spine-js</title>
+<script src="ajax.js"></script>
+<script src="Canvas2DSpine.class.js"></script>
+<script src="../build/spine.js"></script>
+<style>body, input { font-family: tahoma; font-size: 11pt }</style>
+</head>
+<body>
+
+<div id="message"></div>
+<div><canvas id="canvas" width="640" height="480"/></div>
+
+    <button id="btGoblin">Goblin</button>
+    <button id="btGoblingirl">Goblin Girl</button>
+    <button id="btSpineboy">Spineboy</button>
+<br>
+
+<script>
+
+</script>
+<script>
+var canvas = document.getElementById("canvas");
+var context = canvas.getContext('2d');
+
+
+
+var spn = new Canvas2DSpine('../data/', 200, 400);
+spn.load('spineboy', 'walk');
+
+
+setInterval(function () {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+	spn.update();
+	spn.draw(context);
+}, 1000 / 60);
+
+document.getElementById('btGoblin').addEventListener('click', function () {
+    spn.load('goblins', 'walk', 'goblin');
+}, false);
+document.getElementById('btGoblingirl').addEventListener('click', function () {
+    spn.load('goblins', 'walk', 'goblingirl');
+}, false);
+
+document.getElementById('btSpineboy').addEventListener('click', function () {
+    spn.load('spineboy', 'walk');
+}, false);
+</script>
+
+</body>
+</html>
