@@ -214,7 +214,7 @@ namespace Spine {
 		}
 
 		/** @return May be null. */
-		public TrackEntry getCurrent (int trackIndex) {
+		public TrackEntry GetCurrent (int trackIndex) {
 			if (trackIndex >= tracks.Count) return null;
 			return tracks[trackIndex];
 		}

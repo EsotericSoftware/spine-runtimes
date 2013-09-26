@@ -30,7 +30,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -101,7 +100,7 @@ public class SkeletonDataAssetInspector : Editor {
 		
 		if (!Application.isPlaying) {
 			if (serializedObject.ApplyModifiedProperties() ||
-				(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
+				(UnityEngine.Event.current.type == EventType.ValidateCommand && UnityEngine.Event.current.commandName == "UndoRedoPerformed")
 			) {
 				asset.Clear();
 			}

@@ -150,19 +150,19 @@ namespace Spine {
 		}
 
 		public void Start (object sender, StartEndArgs e) {
-			Console.WriteLine(e.TrackIndex + " " + state.getCurrent(e.TrackIndex) + ": start");
+			Console.WriteLine(e.TrackIndex + " " + state.GetCurrent(e.TrackIndex) + ": start");
 		}
 
 		public void End (object sender, StartEndArgs e) {
-			Console.WriteLine(e.TrackIndex + " " + state.getCurrent(e.TrackIndex) + ": end");
+			Console.WriteLine(e.TrackIndex + " " + state.GetCurrent(e.TrackIndex) + ": end");
 		}
 
 		public void Complete (object sender, CompleteArgs e) {
-			Console.WriteLine(e.TrackIndex + " " + state.getCurrent(e.TrackIndex) + ": complete " + e.LoopCount);
+			Console.WriteLine(e.TrackIndex + " " + state.GetCurrent(e.TrackIndex) + ": complete " + e.LoopCount);
 		}
 
 		public void Event (object sender, EventTriggeredArgs e) {
-			Console.WriteLine(e.TrackIndex + " " + state.getCurrent(e.TrackIndex) + ": event " + e.Event);
+			Console.WriteLine(e.TrackIndex + " " + state.GetCurrent(e.TrackIndex) + ": event " + e.Event);
 		}
 	}
 }

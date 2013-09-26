@@ -33,6 +33,7 @@
 
 using UnityEngine;
 using System.Collections;
+using Spine;
 
 public class Spineboy : MonoBehaviour {
 	private SkeletonAnimation skeleton;
@@ -44,7 +45,8 @@ public class Spineboy : MonoBehaviour {
 	void LateUpdate() {
 		if (skeleton.loop) return;
 		
-		if (skeleton.state.Animation != null && skeleton.state.Time >= skeleton.state.Animation.Duration - 0.25) {
+		TrackEntry entry = skeleton.state.GetCurrent(0);
+		if (entry != null && entry.Time >= entry.Animation.Duration - 0.25) {
 			skeleton.animationName = "walk";
 			skeleton.loop = true;
 		}
