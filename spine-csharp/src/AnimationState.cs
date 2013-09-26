@@ -76,10 +76,10 @@ namespace Spine {
 
 				TrackEntry next = current.next;
 				if (next != null && time >= next.delay) {
-					if (next.animation == null)
-						Clear(i);
-					else
+					if (next.animation != null)
 						SetCurrent(i, next);
+					else
+						Clear(i);
 				}
 			}
 		}
@@ -204,7 +204,7 @@ namespace Spine {
 			if (delay <= 0) {
 				if (last != null) {
 					delay += last.endTime;
-					if (animation != null) delay += -data.GetMix(last.animation, animation);
+					if (animation != null) delay -= data.GetMix(last.animation, animation);
 				} else
 					delay = 0;
 			}
@@ -214,7 +214,7 @@ namespace Spine {
 		}
 
 		/** @return May be null. */
-		public TrackEntry getTrackEntry (int trackIndex) {
+		public TrackEntry getCurrent (int trackIndex) {
 			if (trackIndex >= tracks.Count) return null;
 			return tracks[trackIndex];
 		}

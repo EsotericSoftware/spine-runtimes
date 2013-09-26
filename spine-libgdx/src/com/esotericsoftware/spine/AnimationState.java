@@ -73,10 +73,10 @@ public class AnimationState {
 
 			TrackEntry next = current.next;
 			if (next != null && time >= next.delay) {
-				if (next.animation == null)
-					clear(i);
-				else
+				if (next.animation != null)
 					setCurrent(i, next);
+				else
+					clear(i);
 			}
 		}
 	}
@@ -227,7 +227,7 @@ public class AnimationState {
 		if (delay <= 0) {
 			if (last != null) {
 				delay += last.endTime;
-				if (animation != null) delay += -data.getMix(last.animation, animation);
+				if (animation != null) delay -= data.getMix(last.animation, animation);
 			} else
 				delay = 0;
 		}
@@ -237,7 +237,7 @@ public class AnimationState {
 	}
 
 	/** @return May be null. */
-	public TrackEntry getTrackEntry (int trackIndex) {
+	public TrackEntry getCurrent (int trackIndex) {
 		if (trackIndex >= tracks.size) return null;
 		return tracks.get(trackIndex);
 	}

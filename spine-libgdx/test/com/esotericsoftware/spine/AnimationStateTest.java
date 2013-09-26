@@ -70,19 +70,19 @@ public class AnimationStateTest extends ApplicationAdapter {
 		state = new AnimationState(stateData);
 		state.addListener(new AnimationStateListener() {
 			public void event (int trackIndex, Event event) {
-				System.out.println(trackIndex + " event: " + state.getTrackEntry(trackIndex) + ", " + event.getData().getName());
+				System.out.println(trackIndex + " event: " + state.getCurrent(trackIndex) + ", " + event.getData().getName());
 			}
 
 			public void complete (int trackIndex, int loopCount) {
-				System.out.println(trackIndex + " complete: " + state.getTrackEntry(trackIndex) + ", " + loopCount);
+				System.out.println(trackIndex + " complete: " + state.getCurrent(trackIndex) + ", " + loopCount);
 			}
 
 			public void start (int trackIndex) {
-				System.out.println(trackIndex + " start: " + state.getTrackEntry(trackIndex));
+				System.out.println(trackIndex + " start: " + state.getCurrent(trackIndex));
 			}
 
 			public void end (int trackIndex) {
-				System.out.println(trackIndex + " end: " + state.getTrackEntry(trackIndex));
+				System.out.println(trackIndex + " end: " + state.getCurrent(trackIndex));
 			}
 		});
 		state.setAnimation(0, "walk", true);
