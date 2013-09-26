@@ -31,29 +31,28 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
-using System.Collections;
-using Spine;
+#ifndef SPINE_EVENT_H_
+#define SPINE_EVENT_H_
 
-public class Spineboy : MonoBehaviour {
-	private SkeletonAnimation skeleton;
-	
-	void Start() {
-		skeleton = GetComponent<SkeletonAnimation>();
-	}
-	
-	void LateUpdate() {
-		if (skeleton.loop) return;
-		
-		TrackEntry entry = skeleton.state.GetCurrent(0);
-		if (entry != null && entry.Time >= entry.Animation.Duration - 0.25) {
-			skeleton.animationName = "walk";
-			skeleton.loop = true;
-		}
-	}
-	
-	void OnMouseDown() {
-		skeleton.animationName = "jump";
-		skeleton.loop = false;
-	}
+#include <spine/EventData.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct Event Event;
+struct Event {
+	EventData* const data;
+	int intValue;
+	float floatValue;
+	const char* stringValue;
+};
+
+Event* Event_create (EventData* data);
+void Event_dispose (Event* self);
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* SPINE_EVENT_H_ */

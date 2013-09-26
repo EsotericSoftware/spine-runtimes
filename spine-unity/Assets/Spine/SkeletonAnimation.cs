@@ -30,7 +30,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -54,14 +53,16 @@ public class SkeletonAnimation : SkeletonComponent {
 	override public void UpdateSkeleton () {
 		if (useAnimationName) {
 			// Keep AnimationState in sync with animationName and loop fields.
+			TrackEntry entry = state.GetCurrent(0);
 			if (animationName == null || animationName.Length == 0) {
-				if (state.Animation != null) state.ClearAnimation();
-			} else if (state.Animation == null || animationName != state.Animation.Name) {
+				if (entry != null && entry.Animation != null)
+					state.Clear(0);
+			} else if (entry == null || entry.Animation == null || animationName != entry.Animation.Name) {
 				Spine.Animation animation = skeleton.Data.FindAnimation(animationName);
 				if (animation != null)
-					state.SetAnimation(animation, loop);
-			}
-			state.Loop = loop;
+					state.SetAnimation(0, animation, loop);
+			} else if (entry != null)
+				entry.Loop = loop;
 		}
 		
 		// Apply the animation.

@@ -40,12 +40,11 @@
 
 namespace spine {
 
-/**
-Draws an animated skeleton, providing a simple API for applying one or more animations and queuing animations to be played later.
-*/
+/** Draws an animated skeleton, providing an AnimationState for applying one or more animations and queuing animations to be
+  * played later. */
 class CCSkeletonAnimation: public CCSkeleton {
 public:
-	std::vector<AnimationState*> states;
+	AnimationState* state;
 
 	static CCSkeletonAnimation* createWithData (SkeletonData* skeletonData);
 	static CCSkeletonAnimation* createWithFile (const char* skeletonDataFile, Atlas* atlas, float scale = 1);
@@ -59,20 +58,21 @@ public:
 
 	virtual void update (float deltaTime);
 
-	void addAnimationState (AnimationStateData* stateData = 0);
-	void setAnimationStateData (AnimationStateData* stateData, int stateIndex = 0);
-	AnimationState* getAnimationState (int stateIndex = 0);
-	void setMix (const char* fromAnimation, const char* toAnimation, float duration, int stateIndex = 0);
-	void setAnimation (const char* name, bool loop, int stateIndex = 0);
-	void addAnimation (const char* name, bool loop, float delay = 0, int stateIndex = 0);
-	void clearAnimation (int stateIndex = 0);
+	void setAnimationStateData (AnimationStateData* stateData);
+	void setMix (const char* fromAnimation, const char* toAnimation, float duration);
+
+	TrackEntry* setAnimation (int trackIndex, const char* name, bool loop);
+	TrackEntry* addAnimation (int trackIndex, const char* name, bool loop, float delay = 0);
+	TrackEntry* getCurrent (int trackIndex = 0);
+	void clearAnimation ();
+	void clearAnimation (int trackIndex = 0);
 
 protected:
 	CCSkeletonAnimation ();
 
 private:
 	typedef CCSkeleton super;
-	std::vector<AnimationStateData*> stateDatas;
+	bool ownsAnimationStateData;
 
 	void initialize ();
 };

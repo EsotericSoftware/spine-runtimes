@@ -81,6 +81,8 @@
     <ClInclude Include="include\spine\Bone.h" />
     <ClInclude Include="include\spine\BoneData.h" />
     <ClInclude Include="include\spine\BoundingBoxAttachment.h" />
+    <ClInclude Include="include\spine\Event.h" />
+    <ClInclude Include="include\spine\EventData.h" />
     <ClInclude Include="include\spine\extension.h" />
     <ClInclude Include="include\spine\RegionAttachment.h" />
     <ClInclude Include="include\spine\Skeleton.h" />
@@ -104,6 +106,8 @@
     <ClCompile Include="src\spine\Bone.c" />
     <ClCompile Include="src\spine\BoneData.c" />
     <ClCompile Include="src\spine\BoundingBoxAttachment.c" />
+    <ClCompile Include="src\spine\Event.c" />
+    <ClCompile Include="src\spine\EventData.c" />
     <ClCompile Include="src\spine\extension.c" />
     <ClCompile Include="src\spine\Json.c" />
     <ClCompile Include="src\spine\RegionAttachment.c" />

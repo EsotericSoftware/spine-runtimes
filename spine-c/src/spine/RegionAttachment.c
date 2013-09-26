@@ -32,7 +32,6 @@
  *****************************************************************************/
 
 #include <spine/RegionAttachment.h>
-#include <math.h>
 #include <spine/extension.h>
 
 RegionAttachment* RegionAttachment_create (const char* name) {

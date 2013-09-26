@@ -41,8 +41,8 @@ void* _malloc (size_t size) {
 	return mallocFunc(size);
 }
 void* _calloc (size_t num, size_t size) {
-	void* ptr = mallocFunc(size);
-	if (ptr) memset(ptr, 0, size);
+	void* ptr = mallocFunc(num * size);
+	if (ptr) memset(ptr, 0, num * size);
 	return ptr;
 }
 void _free (void* ptr) {

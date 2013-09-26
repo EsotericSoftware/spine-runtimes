@@ -31,153 +31,239 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#include <spine/Animation.h>
 #include <spine/AnimationState.h>
+#include <spine/AnimationStateData.h>
+#include <spine/Event.h>
 #include <spine/extension.h>
+#include <spine/Skeleton.h>
+#include <spine/SkeletonData.h>
+#include <string.h>
+#include <limits.h>
 
-typedef struct _Entry _Entry;
-struct _Entry {
-	Animation* animation;
-	int/*bool*/loop;
-	float delay;
-	_Entry* next;
-};
+TrackEntry* _TrackEntry_create () {
+	TrackEntry* entry = NEW(TrackEntry);
+	return entry;
+}
+
+void _TrackEntry_dispose (TrackEntry* entry) {
+	FREE(entry);
+}
+
+void _TrackEntry_disposeAll (TrackEntry* entry) {
+	while (entry) {
+		TrackEntry* next = entry->next;
+		_TrackEntry_dispose(entry);
+		entry = next;
+	}
+}
+
+/**/
 
 typedef struct {
 	AnimationState super;
-	Animation *previous;
-	float previousTime;
-	int/*bool*/previousLoop;
-	float mixTime;
-	float mixDuration;
-	_Entry* queue;
-} _Internal;
+	Event** events;
+} _AnimationState;
+
+void _AnimationState_setCurrent (AnimationState* self, int index, TrackEntry* entry);
 
 AnimationState* AnimationState_create (AnimationStateData* data) {
-	AnimationState* self = SUPER(NEW(_Internal));
+	_AnimationState* internal = NEW(_AnimationState);
+	AnimationState* self = SUPER(internal);
+	internal->events = MALLOC(Event*, 64);
 	CONST_CAST(AnimationStateData*, self->data) = data;
 	return self;
 }
 
-void _AnimationState_clearQueue (AnimationState* self) {
-	_Internal* internal = SUB_CAST(_Internal, self);
-	_Entry* entry = internal->queue;
-	while (entry) {
-		_Entry* nextEntry = entry->next;
-		FREE(entry);
-		entry = nextEntry;
-	}
-	internal->queue = 0;
-}
-
 void AnimationState_dispose (AnimationState* self) {
-	_AnimationState_clearQueue(self);
+	int i;
+	for (i = 0; i < self->trackCount; i++)
+		_TrackEntry_disposeAll(self->tracks[i]);
 	FREE(self);
 }
 
-#include <stdio.h>
-
-void AnimationState_addAnimation (AnimationState* self, Animation* animation, int/*bool*/loop, float delay) {
-	_Entry* existingEntry;
-	Animation* previousAnimation;
-
-	_Internal* internal = SUB_CAST(_Internal, self);
-	_Entry* entry = NEW(_Entry);
-	entry->animation = animation;
-	entry->loop = loop;
-
-	existingEntry = internal->queue;
-	if (existingEntry) {
-		while (existingEntry->next)
-			existingEntry = existingEntry->next;
-		existingEntry->next = entry;
-		previousAnimation = existingEntry->animation;
-	} else {
-		internal->queue = entry;
-		previousAnimation = self->animation;
-	}
-
-	if (delay <= 0) {
-		if (previousAnimation)
-			delay = previousAnimation->duration - AnimationStateData_getMix(self->data, previousAnimation, animation) + delay;
-		else
-			delay = 0;
-	}
-	entry->delay = delay;
-}
-
-void AnimationState_addAnimationByName (AnimationState* self, const char* animationName, int/*bool*/loop, float delay) {
-	Animation* animation = animationName ? SkeletonData_findAnimation(self->data->skeletonData, animationName) : 0;
-	AnimationState_addAnimation(self, animation, loop, delay);
-}
-
-void _AnimationState_setAnimation (AnimationState* self, Animation* newAnimation, int/*bool*/loop) {
-	_Internal* internal = SUB_CAST(_Internal, self);
-	internal->previous = 0;
-	if (newAnimation && self->animation && self->data) {
-		internal->mixDuration = AnimationStateData_getMix(self->data, self->animation, newAnimation);
-		if (internal->mixDuration > 0) {
-			internal->mixTime = 0;
-			internal->previous = self->animation;
-			internal->previousTime = self->time;
-			internal->previousLoop = self->loop;
-		}
-	}
-	CONST_CAST(Animation*, self->animation) = newAnimation;
-	self->loop = loop;
-	self->time = 0;
-}
-
-void AnimationState_setAnimation (AnimationState* self, Animation* newAnimation, int/*bool*/loop) {
-	_AnimationState_clearQueue(self);
-	_AnimationState_setAnimation(self, newAnimation, loop);
-}
-
-void AnimationState_setAnimationByName (AnimationState* self, const char* animationName, int/*bool*/loop) {
-	Animation* animation = animationName ? SkeletonData_findAnimation(self->data->skeletonData, animationName) : 0;
-	AnimationState_setAnimation(self, animation, loop);
-}
-
-void AnimationState_clearAnimation (AnimationState* self) {
-	_Internal* internal = SUB_CAST(_Internal, self);
-	internal->previous = 0;
-	CONST_CAST(Animation*, self->animation) = 0;
-	_AnimationState_clearQueue(self);
-}
-
 void AnimationState_update (AnimationState* self, float delta) {
-	_Entry* next;
-	_Internal* internal = SUB_CAST(_Internal, self);
+	int i;
+	float time, endTime;
+	for (i = 0; i < self->trackCount; i++) {
+		TrackEntry* current = self->tracks[i];
+		if (!current) continue;
 
-	self->time += delta;
-	internal->previousTime += delta;
-	internal->mixTime += delta;
+		time = current->time + delta;
+		endTime = current->endTime;
 
-	if (internal->queue && self->time >= internal->queue->delay) {
-		_AnimationState_setAnimation(self, internal->queue->animation, internal->queue->loop);
-		next = internal->queue->next;
-		FREE(internal->queue);
-		internal->queue = next;
+		current->time = time;
+		if (current->previous) {
+			current->previous->time += delta;
+			current->mixTime += delta;
+		}
+
+		/* Check if completed the animation or a loop iteration. */
+		if (current->loop ?
+				(FMOD(current->lastTime, endTime) > FMOD(time, endTime)) : (current->lastTime < endTime && time >= endTime)) {
+			int count = (int)(time / endTime);
+			if (current->listener) current->listener(self, i, ANIMATION_COMPLETE, 0, count);
+			if (self->listener) self->listener(self, i, ANIMATION_COMPLETE, 0, count);
+		}
+
+		if (current->next && time >= current->next->delay) {
+			if (current->next->animation)
+				_AnimationState_setCurrent(self, i, current->next);
+			else
+				AnimationState_clearTrack(self, i);
+		}
 	}
 }
 
 void AnimationState_apply (AnimationState* self, Skeleton* skeleton) {
-	_Internal* internal;
-	float alpha;
+	_AnimationState* internal = SUB_CAST(_AnimationState, self);
 
-	if (!self->animation) return;
-	internal = SUB_CAST(_Internal, self);
-	if (internal->previous) {
-		Animation_apply(internal->previous, skeleton, internal->previousTime, internal->previousLoop);
-		alpha = internal->mixTime / internal->mixDuration;
-		if (alpha >= 1) {
-			alpha = 1;
-			internal->previous = 0;
+	int i, ii;
+	int eventCount;
+	TrackEntry* previous;
+	for (i = 0; i < self->trackCount; i++) {
+		TrackEntry* current = self->tracks[i];
+		if (!current) continue;
+
+		eventCount = 0;
+
+		previous = current->previous;
+		if (!previous) {
+			Animation_apply(current->animation, skeleton, current->lastTime, current->time, current->loop, internal->events,
+					&eventCount);
+		} else {
+			float alpha = current->mixTime / current->mixDuration;
+			Animation_apply(previous->animation, skeleton, (float)INT_MAX, previous->time, previous->loop, 0, 0);
+			if (alpha >= 1) {
+				alpha = 1;
+				_TrackEntry_dispose(current->previous);
+				current->previous = 0;
+			}
+			Animation_mix(current->animation, skeleton, current->lastTime, current->time, current->loop, internal->events,
+					&eventCount, alpha);
 		}
-		Animation_mix(self->animation, skeleton, self->time, self->loop, alpha);
-	} else
-		Animation_apply(self->animation, skeleton, self->time, self->loop);
+
+		for (ii = 0; ii < eventCount; ii++) {
+			Event* event = internal->events[ii];
+			if (current->listener) current->listener(self, i, ANIMATION_EVENT, event, 0);
+			if (self->listener) self->listener(self, i, ANIMATION_EVENT, event, 0);
+		}
+
+		current->lastTime = current->time;
+	}
 }
 
-int/*bool*/AnimationState_isComplete (AnimationState* self) {
-	return !self->animation || self->time >= self->animation->duration;
+void AnimationState_clear (AnimationState* self) {
+	int i;
+	for (i = 0; i < self->trackCount; i++)
+		AnimationState_clearTrack(self, i);
+	self->trackCount = 0;
+}
+
+void AnimationState_clearTrack (AnimationState* self, int trackIndex) {
+	TrackEntry* current;
+	if (trackIndex >= self->trackCount) return;
+	current = self->tracks[trackIndex];
+	if (!current) return;
+
+	if (current->listener) current->listener(self, trackIndex, ANIMATION_END, 0, 0);
+	if (self->listener) self->listener(self, trackIndex, ANIMATION_END, 0, 0);
+
+	self->tracks[trackIndex] = 0;
+	_TrackEntry_disposeAll(current);
+	if (current->previous) _TrackEntry_dispose(current->previous);
+}
+
+TrackEntry* _AnimationState_expandToIndex (AnimationState* self, int index) {
+	TrackEntry** newTracks;
+	if (index < self->trackCount) return self->tracks[index];
+	newTracks = CALLOC(TrackEntry*, index + 1);
+	memcpy(newTracks, self->tracks, self->trackCount * sizeof(TrackEntry*));
+	self->tracks = newTracks;
+	self->trackCount = index + 1;
+	return 0;
+}
+
+void _AnimationState_setCurrent (AnimationState* self, int index, TrackEntry* entry) {
+	TrackEntry* current = _AnimationState_expandToIndex(self, index);
+	if (current) {
+		if (current->previous) {
+			_TrackEntry_dispose(current->previous);
+			current->previous = 0;
+		}
+
+		if (current->listener) current->listener(self, index, ANIMATION_END, 0, 0);
+		if (self->listener) self->listener(self, index, ANIMATION_END, 0, 0);
+
+		entry->mixDuration = AnimationStateData_getMix(self->data, current->animation, entry->animation);
+		if (entry->mixDuration > 0) {
+			entry->mixTime = 0;
+			entry->previous = current;
+		} else
+			_TrackEntry_dispose(current);
+	}
+
+	self->tracks[index] = entry;
+
+	if (entry->listener) current->listener(self, index, ANIMATION_START, 0, 0);
+	if (self->listener) self->listener(self, index, ANIMATION_START, 0, 0);
+}
+
+TrackEntry* AnimationState_setAnimationByName (AnimationState* self, int trackIndex, const char* animationName, int/*bool*/loop) {
+	Animation* animation = animationName ? SkeletonData_findAnimation(self->data->skeletonData, animationName) : 0;
+	return AnimationState_setAnimation(self, trackIndex, animation, loop);
+}
+
+TrackEntry* AnimationState_setAnimation (AnimationState* self, int trackIndex, Animation* animation, int/*bool*/loop) {
+	TrackEntry* entry;
+	TrackEntry* current = _AnimationState_expandToIndex(self, trackIndex);
+	if (current) _TrackEntry_disposeAll(current->next);
+
+	entry = _TrackEntry_create();
+	entry->animation = animation;
+	entry->loop = loop;
+	entry->time = 0;
+	entry->endTime = animation->duration;
+	_AnimationState_setCurrent(self, trackIndex, entry);
+	return entry;
+}
+
+TrackEntry* AnimationState_addAnimationByName (AnimationState* self, int trackIndex, const char* animationName, int/*bool*/loop,
+		float delay) {
+	Animation* animation = animationName ? SkeletonData_findAnimation(self->data->skeletonData, animationName) : 0;
+	return AnimationState_addAnimation(self, trackIndex, animation, loop, delay);
+}
+
+TrackEntry* AnimationState_addAnimation (AnimationState* self, int trackIndex, Animation* animation, int/*bool*/loop, float delay) {
+	TrackEntry* last;
+
+	TrackEntry* entry = _TrackEntry_create();
+	entry->animation = animation;
+	entry->loop = loop;
+	entry->time = 0;
+	entry->endTime = animation ? animation->duration : 0;
+
+	last = _AnimationState_expandToIndex(self, trackIndex);
+	if (last) {
+		while (last->next)
+			last = last->next;
+		last->next = entry;
+	} else
+		self->tracks[trackIndex] = entry;
+
+	if (delay <= 0) {
+		if (last) {
+			delay += last->endTime;
+			if (animation) delay -= AnimationStateData_getMix(self->data, last->animation, animation);
+		} else
+			delay = 0;
+	}
+	entry->delay = delay;
+
+	return entry;
+}
+
+TrackEntry* AnimationState_getCurrent (AnimationState* self, int trackIndex) {
+	if (trackIndex >= self->trackCount) return 0;
+	return self->tracks[trackIndex];
 }

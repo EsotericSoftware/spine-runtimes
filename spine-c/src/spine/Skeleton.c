@@ -120,6 +120,7 @@ void Skeleton_setBonesToSetupPose (const Skeleton* self) {
 
 void Skeleton_setSlotsToSetupPose (const Skeleton* self) {
 	int i;
+	memcpy(self->drawOrder, self->slots, self->slotCount * sizeof(int));
 	for (i = 0; i < self->slotCount; ++i)
 		Slot_setToSetupPose(self->slots[i]);
 }

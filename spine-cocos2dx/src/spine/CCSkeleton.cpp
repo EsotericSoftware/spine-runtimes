@@ -147,7 +147,7 @@ void CCSkeleton::draw () {
 	quad.bl.vertices.z = 0;
 	quad.br.vertices.z = 0;
 	for (int i = 0, n = skeleton->slotCount; i < n; i++) {
-		Slot* slot = skeleton->slots[i];
+		Slot* slot = skeleton->drawOrder[i];
 		if (!slot->attachment || slot->attachment->type != ATTACHMENT_REGION) continue;
 		RegionAttachment* attachment = (RegionAttachment*)slot->attachment;
 		CCTextureAtlas* regionTextureAtlas = getTextureAtlas(attachment);
@@ -175,7 +175,7 @@ void CCSkeleton::draw () {
 		CCPoint points[4];
 		ccV3F_C4B_T2F_Quad quad;
 		for (int i = 0, n = skeleton->slotCount; i < n; i++) {
-			Slot* slot = skeleton->slots[i];
+			Slot* slot = skeleton->drawOrder[i];
 			if (!slot->attachment || slot->attachment->type != ATTACHMENT_REGION) continue;
 			RegionAttachment* attachment = (RegionAttachment*)slot->attachment;
 			RegionAttachment_updateQuad(attachment, slot, &quad);

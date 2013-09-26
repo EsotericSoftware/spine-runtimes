@@ -64,7 +64,7 @@
 
 /* All allocation uses these. */
 #define MALLOC(TYPE,COUNT) ((TYPE*)_malloc(sizeof(TYPE) * COUNT))
-#define CALLOC(TYPE,COUNT) ((TYPE*)_calloc(1, sizeof(TYPE) * COUNT))
+#define CALLOC(TYPE,COUNT) ((TYPE*)_calloc(COUNT, sizeof(TYPE)))
 #define NEW(TYPE) CALLOC(TYPE,1)
 
 /* Gets the direct super class. Type safe. */
@@ -88,8 +88,15 @@
 /* Allocates a new char[], assigns it to TO, and copies FROM to it. Can be used on const types. */
 #define MALLOC_STR(TO,FROM) strcpy(CONST_CAST(char*, TO) = (char*)malloc(strlen(FROM) + 1), FROM)
 
+#ifdef __STDC_VERSION__
+	#define FMOD(A,B) fmodf(A, B)
+#else
+	#define FMOD(A,B) (float)fmod(A, B)
+#endif
+
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <spine/Skeleton.h>
 #include <spine/RegionAttachment.h>
 #include <spine/BoundingBoxAttachment.h>
@@ -141,14 +148,16 @@ void _Attachment_deinit (Attachment* self);
 
 void _Timeline_init (Timeline* self, /**/
 		void (*dispose) (Timeline* self), /**/
-		void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha));
+		void (*apply) (const Timeline* self, Skeleton* skeleton, float lastTime, float time, Event** firedEvents, int* eventCount,
+				float alpha));
 void _Timeline_deinit (Timeline* self);
 
 /**/
 
 void _CurveTimeline_init (CurveTimeline* self, int frameCount, /**/
 		void (*dispose) (Timeline* self), /**/
-		void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha));
+		void (*apply) (const Timeline* self, Skeleton* skeleton, float lastTime, float time, Event** firedEvents, int* eventCount,
+				float alpha));
 void _CurveTimeline_deinit (CurveTimeline* self);
 
 #ifdef __cplusplus

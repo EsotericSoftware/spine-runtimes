@@ -52,5 +52,7 @@
 #include <spine/Skin.h>
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
+#include <spine/Event.h>
+#include <spine/EventData.h>
 
 #endif /* SPINE_SPINE_H_ */

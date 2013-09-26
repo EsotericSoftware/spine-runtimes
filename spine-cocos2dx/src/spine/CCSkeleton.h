@@ -39,9 +39,7 @@
 
 namespace spine {
 
-/**
-Draws a skeleton.
-*/
+/** Draws a skeleton. */
 class CCSkeleton: public cocos2d::CCNodeRGBA, public cocos2d::CCBlendProtocol {
 public:
 	Skeleton* skeleton;

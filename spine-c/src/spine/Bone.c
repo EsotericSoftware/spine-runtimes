@@ -32,7 +32,6 @@
  *****************************************************************************/
 
 #include <spine/Bone.h>
-#include <math.h>
 #include <spine/extension.h>
 
 static int yDown;

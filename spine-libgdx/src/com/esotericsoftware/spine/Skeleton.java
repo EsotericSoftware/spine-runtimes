@@ -120,9 +120,8 @@ public class Skeleton {
 	}
 
 	public void setSlotsToSetupPose () {
-		drawOrder.clear();
-		drawOrder.addAll(slots);
 		Array<Slot> slots = this.slots;
+		System.arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);		
 		for (int i = 0, n = slots.size; i < n; i++)
 			slots.get(i).setToSetupPose(i);
 	}

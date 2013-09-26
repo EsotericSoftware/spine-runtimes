@@ -37,12 +37,12 @@ using System.Collections;
 public class Spineboy : MonoBehaviour {
 	public void Start () {
 		SkeletonAnimation skeletonAnimation = GetComponent<SkeletonAnimation>();
-		skeletonAnimation.state.SetAnimation("walk", true);
+		skeletonAnimation.state.SetAnimation(0, "walk", true);
 	}
 	
 	public void OnMouseDown () {
 		SkeletonAnimation skeletonAnimation = GetComponent<SkeletonAnimation>();
-		skeletonAnimation.state.SetAnimation("jump", false);
-		skeletonAnimation.state.AddAnimation("walk", true);
+		skeletonAnimation.state.SetAnimation(0, "jump", false);
+		skeletonAnimation.state.AddAnimation(0, "walk", true, 0);
 	}
 }

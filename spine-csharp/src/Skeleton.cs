@@ -110,6 +110,8 @@ namespace Spine {
 
 		public void SetSlotsToSetupPose () {
 			List<Slot> slots = this.slots;
+			drawOrder.Clear();
+			drawOrder.AddRange(slots);
 			for (int i = 0, n = slots.Count; i < n; i++)
 				slots[i].SetToSetupPose(i);
 		}

@@ -42,8 +42,11 @@ namespace Spine {
 		SpriteBatcher batcher;
 		BasicEffect effect;
 		RasterizerState rasterizerState;
-		public bool PremultipliedAlpha { get; set; }
 		float[] vertices = new float[8];
+		BlendState defaultBlendState;
+
+		private bool premultipliedAlpha;
+		public bool PremultipliedAlpha { get { return premultipliedAlpha; } set { premultipliedAlpha = value; } }
 
 		public SkeletonRenderer (GraphicsDevice device) {
 			this.device = device;
@@ -63,8 +66,10 @@ namespace Spine {
 		}
 
 		public void Begin () {
+			defaultBlendState = premultipliedAlpha ? BlendState.AlphaBlend : BlendState.NonPremultiplied;
+
 			device.RasterizerState = rasterizerState;
-			device.BlendState = BlendState.AlphaBlend;
+			device.BlendState = defaultBlendState;
 
 			effect.Projection = Matrix.CreateOrthographicOffCenter(0, device.Viewport.Width, device.Viewport.Height, 0, 1, 0);
 		}
@@ -84,7 +89,7 @@ namespace Spine {
 				Slot slot = drawOrder[i];
 				RegionAttachment regionAttachment = slot.Attachment as RegionAttachment;
 				if (regionAttachment != null) {
-					BlendState blend = slot.Data.AdditiveBlending ? BlendState.Additive : BlendState.AlphaBlend;
+					BlendState blend = slot.Data.AdditiveBlending ? BlendState.Additive : defaultBlendState;
 					if (device.BlendState != blend) {
 						End();
 						device.BlendState = blend;
@@ -94,26 +99,16 @@ namespace Spine {
 					AtlasRegion region = (AtlasRegion)regionAttachment.RendererObject;
 					item.Texture = (Texture2D)region.page.rendererObject;
 
-					byte r = (byte)(skeletonR * slot.R * 255);
-					byte g = (byte)(skeletonG * slot.G * 255);
-					byte b = (byte)(skeletonB * slot.B * 255);
-					byte a = (byte)(skeletonA * slot.A * 255);
-					item.vertexTL.Color.R = r;
-					item.vertexTL.Color.G = g;
-					item.vertexTL.Color.B = b;
-					item.vertexTL.Color.A = a;
-					item.vertexBL.Color.R = r;
-					item.vertexBL.Color.G = g;
-					item.vertexBL.Color.B = b;
-					item.vertexBL.Color.A = a;
-					item.vertexBR.Color.R = r;
-					item.vertexBR.Color.G = g;
-					item.vertexBR.Color.B = b;
-					item.vertexBR.Color.A = a;
-					item.vertexTR.Color.R = r;
-					item.vertexTR.Color.G = g;
-					item.vertexTR.Color.B = b;
-					item.vertexTR.Color.A = a;
+					Color color;
+					float a = skeletonA * slot.A;
+					if (premultipliedAlpha)
+						color = new Color(skeletonR * slot.R * a, skeletonG * slot.G * a, skeletonB * slot.B * a, a);
+					else
+						color = new Color(skeletonR * slot.R, skeletonG * slot.G, skeletonB * slot.B, a);
+					item.vertexTL.Color = color;
+					item.vertexBL.Color = color;
+					item.vertexBR.Color = color;
+					item.vertexTR.Color = color;
 
 					float[] vertices = this.vertices;
 					regionAttachment.ComputeWorldVertices(x, y, slot.Bone, vertices);

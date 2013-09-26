@@ -37,6 +37,7 @@
 #include <spine/BoneData.h>
 #include <spine/SlotData.h>
 #include <spine/Skin.h>
+#include <spine/EventData.h>
 #include <spine/Animation.h>
 
 #ifdef __cplusplus
@@ -54,6 +55,9 @@ typedef struct {
 	Skin** skins;
 	Skin* defaultSkin;
 
+	int eventCount;
+	EventData** events;
+
 	int animationCount;
 	Animation** animations;
 } SkeletonData;
@@ -68,6 +72,8 @@ SlotData* SkeletonData_findSlot (const SkeletonData* self, const char* slotName)
 int SkeletonData_findSlotIndex (const SkeletonData* self, const char* slotName);
 
 Skin* SkeletonData_findSkin (const SkeletonData* self, const char* skinName);
+
+EventData* SkeletonData_findEvent (const SkeletonData* self, const char* eventName);
 
 Animation* SkeletonData_findAnimation (const SkeletonData* self, const char* animationName);
 

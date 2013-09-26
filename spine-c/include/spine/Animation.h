@@ -34,6 +34,8 @@
 #ifndef SPINE_ANIMATION_H_
 #define SPINE_ANIMATION_H_
 
+#include <spine/Event.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -52,8 +54,10 @@ typedef struct {
 Animation* Animation_create (const char* name, int timelineCount);
 void Animation_dispose (Animation* self);
 
-void Animation_apply (const Animation* self, struct Skeleton* skeleton, float time, int/*bool*/loop);
-void Animation_mix (const Animation* self, struct Skeleton* skeleton, float time, int/*bool*/loop, float alpha);
+void Animation_apply (const Animation* self, struct Skeleton* skeleton, float lastTime, float time, int loop,
+		Event** events, int* eventCount);
+void Animation_mix (const Animation* self, struct Skeleton* skeleton, float lastTime, float time, int loop, Event** events,
+		int* eventCount, float alpha);
 
 /**/
 
@@ -62,7 +66,8 @@ struct Timeline {
 };
 
 void Timeline_dispose (Timeline* self);
-void Timeline_apply (const Timeline* self, struct Skeleton* skeleton, float time, float alpha);
+void Timeline_apply (const Timeline* self, struct Skeleton* skeleton, float lastTime, float time, Event** firedEvents,
+		int* eventCount, float alpha);
 
 /**/
 
@@ -143,7 +148,19 @@ typedef struct {
 	Timeline super;
 	int const framesLength;
 	float* const frames; /* time, ... */
-	int slotIndex;
+	Event** const events;
+} EventTimeline;
+
+EventTimeline* EventTimeline_create (int frameCount);
+
+void EventTimeline_setFrame (EventTimeline* self, int frameIndex, float time, Event* event);
+
+/**/
+
+typedef struct {
+	Timeline super;
+	int const framesLength;
+	float* const frames; /* time, ... */
 	const int** const drawOrders;
 	int const slotCount;
 } DrawOrderTimeline;

@@ -32,7 +32,6 @@
  *****************************************************************************/
 
 #include <spine/SkeletonBounds.h>
-#include <math.h>
 #include <limits.h>
 #include <spine/extension.h>
 
@@ -51,8 +50,8 @@ void BoundingPolygon_dispose (BoundingPolygon* self) {
 int/*bool*/BoundingPolygon_containsPoint (BoundingPolygon* self, float x, float y) {
 	int prevIndex = self->count - 2;
 	int inside = 0;
-	int i = 0;
-	for (; i < self->count; i += 2) {
+	int i;
+	for (i = 0; i < self->count; i += 2) {
 		float vertexY = self->vertices[i + 1];
 		float prevY = self->vertices[prevIndex + 1];
 		if ((vertexY < y && prevY >= y) || (prevY < y && vertexY >= y)) {
@@ -68,8 +67,8 @@ int/*bool*/BoundingPolygon_intersectsSegment (BoundingPolygon* self, float x1, f
 	float width12 = x1 - x2, height12 = y1 - y2;
 	float det1 = x1 * y2 - y1 * x2;
 	float x3 = self->vertices[self->count - 2], y3 = self->vertices[self->count - 1];
-	int i = 0;
-	for (; i < self->count; i += 2) {
+	int i;
+	for (i = 0; i < self->count; i += 2) {
 		float x4 = self->vertices[i], y4 = self->vertices[i + 1];
 		float det2 = x3 * y4 - y3 * x4;
 		float width34 = x3 - x4, height34 = y3 - y4;
@@ -90,15 +89,15 @@ int/*bool*/BoundingPolygon_intersectsSegment (BoundingPolygon* self, float x1, f
 typedef struct {
 	SkeletonBounds super;
 	int capacity;
-} _Internal;
+} _SkeletonBounds;
 
 SkeletonBounds* SkeletonBounds_create () {
-	return SUPER(NEW(_Internal));
+	return SUPER(NEW(_SkeletonBounds));
 }
 
 void SkeletonBounds_dispose (SkeletonBounds* self) {
-	int i = 0;
-	for (; i < SUB_CAST(_Internal, self)->capacity; ++i)
+	int i;
+	for (i = 0; i < SUB_CAST(_SkeletonBounds, self)->capacity; ++i)
 		if (self->polygons[i]) BoundingPolygon_dispose(self->polygons[i]);
 	FREE(self->polygons);
 	FREE(self->boundingBoxes);
@@ -108,7 +107,7 @@ void SkeletonBounds_dispose (SkeletonBounds* self) {
 void SkeletonBounds_update (SkeletonBounds* self, Skeleton* skeleton, int/*bool*/updateAabb) {
 	int i;
 
-	_Internal* internal = SUB_CAST(_Internal, self);
+	_SkeletonBounds* internal = SUB_CAST(_SkeletonBounds, self);
 	if (internal->capacity < skeleton->slotCount) {
 		BoundingPolygon** newPolygons;
 
@@ -188,22 +187,22 @@ int/*bool*/SkeletonBounds_aabbIntersectsSkeleton (SkeletonBounds* self, Skeleton
 }
 
 BoundingBoxAttachment* SkeletonBounds_containsPoint (SkeletonBounds* self, float x, float y) {
-	int i = 0;
-	for (; i < self->count; ++i)
+	int i;
+	for (i = 0; i < self->count; ++i)
 		if (BoundingPolygon_containsPoint(self->polygons[i], x, y)) return self->boundingBoxes[i];
 	return 0;
 }
 
 BoundingBoxAttachment* SkeletonBounds_intersectsSegment (SkeletonBounds* self, float x1, float y1, float x2, float y2) {
-	int i = 0;
-	for (; i < self->count; ++i)
+	int i;
+	for (i = 0; i < self->count; ++i)
 		if (BoundingPolygon_intersectsSegment(self->polygons[i], x1, y1, x2, y2)) return self->boundingBoxes[i];
 	return 0;
 }
 
 BoundingPolygon* SkeletonBounds_getPolygon (SkeletonBounds* self, BoundingBoxAttachment* boundingBox) {
-	int i = 0;
-	for (; i < self->count; ++i)
+	int i;
+	for (i = 0; i < self->count; ++i)
 		if (self->boundingBoxes[i] == boundingBox) return self->polygons[i];
 	return 0;
 }

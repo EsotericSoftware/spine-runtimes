@@ -99,6 +99,12 @@
     <ClInclude Include="..\..\..\spine-c\include\spine\SkeletonBounds.h">
       <Filter>Classes\spine-c</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\spine-c\include\spine\Event.h">
+      <Filter>Classes\spine-c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\spine-c\include\spine\EventData.h">
+      <Filter>Classes\spine-c</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -177,6 +183,12 @@
       <Filter>Classes\spine-c</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\spine-c\src\spine\SkeletonBounds.c">
+      <Filter>Classes\spine-c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\spine-c\src\spine\Event.c">
+      <Filter>Classes\spine-c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\spine-c\src\spine\EventData.c">
       <Filter>Classes\spine-c</Filter>
     </ClCompile>
   </ItemGroup>
