@@ -114,6 +114,7 @@ void AnimationState_update (AnimationState* self, float delta) {
 		}
 	}
 }
+
 void AnimationState_apply (AnimationState* self, Skeleton* skeleton) {
 	_AnimationState* internal = SUB_CAST(_AnimationState, self);
 
@@ -132,14 +133,14 @@ void AnimationState_apply (AnimationState* self, Skeleton* skeleton) {
 					&eventCount);
 		} else {
 			float alpha = current->mixTime / current->mixDuration;
-			Animation_apply(previous->animation, skeleton, (float)INT_MAX, previous->time, previous->loop, internal->events, &eventCount);
+			Animation_apply(previous->animation, skeleton, (float)INT_MAX, previous->time, previous->loop, 0, 0);
 			if (alpha >= 1) {
 				alpha = 1;
 				_TrackEntry_dispose(current->previous);
 				current->previous = 0;
 			}
-			Animation_apply(current->animation, skeleton, current->lastTime, current->time, current->loop, internal->events,
-					&eventCount);
+			Animation_mix(current->animation, skeleton, current->lastTime, current->time, current->loop, internal->events,
+					&eventCount, alpha);
 		}
 
 		for (ii = 0; ii < eventCount; ii++) {
