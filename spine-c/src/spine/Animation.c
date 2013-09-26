@@ -524,15 +524,16 @@ void _EventTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float l
 
 	if (lastTime > time) {
 		/* Fire events after last time for looped animations. */
-		_EventTimeline_apply(timeline, skeleton, lastTime, INT_MAX, firedEvents, eventCount, alpha);
+		_EventTimeline_apply(timeline, skeleton, lastTime, (float)INT_MAX, firedEvents, eventCount, alpha);
 		lastTime = 0;
 	}
 
 	if (self->framesLength == 1)
 		frameIndex = 0;
 	else {
+		float frame;
 		frameIndex = binarySearch(self->frames, self->framesLength, lastTime, 1);
-		float frame = self->frames[frameIndex];
+		frame = self->frames[frameIndex];
 		while (frameIndex > 0) {
 			float lastFrame = self->frames[frameIndex - 1];
 			/* Fire multiple events with the same frame and events that occurred at lastTime. */

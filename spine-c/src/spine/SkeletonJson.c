@@ -230,16 +230,18 @@ static Animation* _SkeletonJson_readAnimation (SkeletonJson* self, Json* root, S
 
 		EventTimeline* timeline = EventTimeline_create(events->size);
 		for (frame = events->child, i = 0; frame; frame = frame->next, ++i) {
+			Event* event;
+			const char* stringValue;
 			EventData* eventData = SkeletonData_findEvent(skeletonData, Json_getString(frame, "name", 0));
 			if (!eventData) {
 				Animation_dispose(animation);
 				_SkeletonJson_setError(self, 0, "Event not found: ", Json_getString(frame, "name", 0));
 				return 0;
 			}
-			Event* event = Event_create(eventData);
+			event = Event_create(eventData);
 			event->intValue = Json_getInt(frame, "int", eventData->intValue);
 			event->floatValue = Json_getFloat(frame, "float", eventData->floatValue);
-			const char* stringValue = Json_getString(frame, "string", eventData->stringValue);
+			stringValue = Json_getString(frame, "string", eventData->stringValue);
 			if (stringValue) MALLOC_STR(event->stringValue, stringValue);
 			EventTimeline_setFrame(timeline, i, Json_getFloat(frame, "time", 0), event);
 		}
@@ -477,12 +479,13 @@ SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* jso
 	events = Json_getItem(root, "events");
 	if (events) {
 		Json *eventMap;
+		const char* stringValue;
 		skeletonData->events = MALLOC(EventData*, events->size);
 		for (eventMap = events->child; eventMap; eventMap = eventMap->next) {
 			EventData* eventData = EventData_create(eventMap->name);
 			eventData->intValue = Json_getInt(eventMap, "int", 0);
 			eventData->floatValue = Json_getFloat(eventMap, "float", 0);
-			const char* stringValue = Json_getString(eventMap, "string", 0);
+			stringValue = Json_getString(eventMap, "string", 0);
 			if (stringValue) MALLOC_STR(eventData->stringValue, stringValue);
 			skeletonData->events[skeletonData->eventCount++] = eventData;
 		}

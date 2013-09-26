@@ -69,9 +69,8 @@ void _AnimationState_setCurrent (AnimationState* self, int index, TrackEntry* en
 
 AnimationState* AnimationState_create (AnimationStateData* data) {
 	_AnimationState* internal = NEW(_AnimationState);
-	internal->events = MALLOC(Event*, 64);
-
 	AnimationState* self = SUPER(internal);
+	internal->events = MALLOC(Event*, 64);
 	CONST_CAST(AnimationStateData*, self->data) = data;
 	return self;
 }
@@ -85,12 +84,13 @@ void AnimationState_dispose (AnimationState* self) {
 
 void AnimationState_update (AnimationState* self, float delta) {
 	int i;
+	float time, endTime;
 	for (i = 0; i < self->trackCount; i++) {
 		TrackEntry* current = self->tracks[i];
 		if (!current) continue;
 
-		float time = current->time + delta;
-		float endTime = current->endTime;
+		time = current->time + delta;
+		endTime = current->endTime;
 
 		current->time = time;
 		if (current->previous) {
@@ -106,10 +106,9 @@ void AnimationState_update (AnimationState* self, float delta) {
 			if (self->listener) self->listener(self, i, ANIMATION_COMPLETE, 0, count);
 		}
 
-		TrackEntry* next = current->next;
-		if (next && time >= next->delay) {
-			if (next->animation)
-				_AnimationState_setCurrent(self, i, next);
+		if (current->next && time >= current->next->delay) {
+			if (current->next->animation)
+				_AnimationState_setCurrent(self, i, current->next);
 			else
 				AnimationState_clearTrack(self, i);
 		}
@@ -120,19 +119,20 @@ void AnimationState_apply (AnimationState* self, Skeleton* skeleton) {
 
 	int i, ii;
 	int eventCount;
+	TrackEntry* previous;
 	for (i = 0; i < self->trackCount; i++) {
 		TrackEntry* current = self->tracks[i];
 		if (!current) continue;
 
 		eventCount = 0;
 
-		TrackEntry* previous = current->previous;
+		previous = current->previous;
 		if (!previous) {
 			Animation_apply(current->animation, skeleton, current->lastTime, current->time, current->loop, internal->events,
 					&eventCount);
 		} else {
-			Animation_apply(previous->animation, skeleton, INT_MAX, previous->time, previous->loop, internal->events, &eventCount);
 			float alpha = current->mixTime / current->mixDuration;
+			Animation_apply(previous->animation, skeleton, (float)INT_MAX, previous->time, previous->loop, internal->events, &eventCount);
 			if (alpha >= 1) {
 				alpha = 1;
 				_TrackEntry_dispose(current->previous);
@@ -160,8 +160,9 @@ void AnimationState_clear (AnimationState* self) {
 }
 
 void AnimationState_clearTrack (AnimationState* self, int trackIndex) {
+	TrackEntry* current;
 	if (trackIndex >= self->trackCount) return;
-	TrackEntry* current = self->tracks[trackIndex];
+	current = self->tracks[trackIndex];
 	if (!current) return;
 
 	if (current->listener) current->listener(self, trackIndex, ANIMATION_END, 0, 0);
@@ -173,13 +174,16 @@ void AnimationState_clearTrack (AnimationState* self, int trackIndex) {
 }
 
 TrackEntry* _AnimationState_expandToIndex (AnimationState* self, int index) {
+	TrackEntry** newTracks;
 	if (index < self->trackCount) return self->tracks[index];
-	TrackEntry** newTracks = CALLOC(TrackEntry*, index + 1);
+	newTracks = CALLOC(TrackEntry*, index + 1);
 	memcpy(newTracks, self->tracks, self->trackCount * sizeof(TrackEntry*));
 	self->tracks = newTracks;
 	self->trackCount = index + 1;
 	return 0;
 }
+
+#include <stdio.h>
 
 void _AnimationState_setCurrent (AnimationState* self, int index, TrackEntry* entry) {
 	TrackEntry* current = _AnimationState_expandToIndex(self, index);
@@ -193,6 +197,7 @@ void _AnimationState_setCurrent (AnimationState* self, int index, TrackEntry* en
 		if (self->listener) self->listener(self, index, ANIMATION_END, 0, 0);
 
 		entry->mixDuration = AnimationStateData_getMix(self->data, current->animation, entry->animation);
+		printf("mix %f\n", entry->mixDuration);
 		if (entry->mixDuration > 0) {
 			entry->mixTime = 0;
 			entry->previous = current;
@@ -212,10 +217,11 @@ TrackEntry* AnimationState_setAnimationByName (AnimationState* self, int trackIn
 }
 
 TrackEntry* AnimationState_setAnimation (AnimationState* self, int trackIndex, Animation* animation, int/*bool*/loop) {
+	TrackEntry* entry;
 	TrackEntry* current = _AnimationState_expandToIndex(self, trackIndex);
 	if (current) _TrackEntry_disposeAll(current->next);
 
-	TrackEntry* entry = _TrackEntry_create();
+	entry = _TrackEntry_create();
 	entry->animation = animation;
 	entry->loop = loop;
 	entry->time = 0;
@@ -231,13 +237,15 @@ TrackEntry* AnimationState_addAnimationByName (AnimationState* self, int trackIn
 }
 
 TrackEntry* AnimationState_addAnimation (AnimationState* self, int trackIndex, Animation* animation, int/*bool*/loop, float delay) {
+	TrackEntry* last;
+
 	TrackEntry* entry = _TrackEntry_create();
 	entry->animation = animation;
 	entry->loop = loop;
 	entry->time = 0;
 	entry->endTime = animation ? animation->duration : 0;
 
-	TrackEntry* last = _AnimationState_expandToIndex(self, trackIndex);
+	last = _AnimationState_expandToIndex(self, trackIndex);
 	if (last) {
 		while (last->next)
 			last = last->next;

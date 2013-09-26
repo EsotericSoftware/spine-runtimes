@@ -55,9 +55,9 @@ Animation* Animation_create (const char* name, int timelineCount);
 void Animation_dispose (Animation* self);
 
 void Animation_apply (const Animation* self, struct Skeleton* skeleton, float lastTime, float time, int loop,
-		Event**/*out*/events, int*/*out*/eventCount);
-void Animation_mix (const Animation* self, struct Skeleton* skeleton, float lastTime, float time, int loop, Event**/*out*/events,
-		int*/*out*/eventCount, float alpha);
+		Event** events, int* eventCount);
+void Animation_mix (const Animation* self, struct Skeleton* skeleton, float lastTime, float time, int loop, Event** events,
+		int* eventCount, float alpha);
 
 /**/
 
