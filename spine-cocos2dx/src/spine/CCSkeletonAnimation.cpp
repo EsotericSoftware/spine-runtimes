@@ -122,7 +122,7 @@ void CCSkeletonAnimation::setMix (const char* fromAnimation, const char* toAnima
 	AnimationStateData_setMixByName(state->data, fromAnimation, toAnimation, duration);
 }
 
-void CCSkeletonAnimation::setListener (CCObject* instance, SEL_AnimationStateEvent method) {
+void CCSkeletonAnimation::setAnimationListener (CCObject* instance, SEL_AnimationStateEvent method) {
 	listenerInstance = instance;
 	listenerMethod = method;
 }

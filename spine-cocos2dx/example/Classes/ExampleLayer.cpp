@@ -22,7 +22,7 @@ bool ExampleLayer::init () {
 	skeletonNode->setMix("walk", "jump", 0.2f);
 	skeletonNode->setMix("jump", "walk", 0.4f);
 	
-	skeletonNode->setListener(this, animationStateEvent_selector(ExampleLayer::animationStateEvent));
+	skeletonNode->setAnimationListener(this, animationStateEvent_selector(ExampleLayer::animationStateEvent));
 	skeletonNode->setAnimation(0, "walk", true);
 	// This shows how to setup animations to play back to back.
 	//skeletonNode->addAnimation(0, "jump", false);

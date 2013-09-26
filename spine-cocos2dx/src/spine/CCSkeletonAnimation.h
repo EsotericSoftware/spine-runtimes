@@ -65,7 +65,7 @@ public:
 	void setAnimationStateData (AnimationStateData* stateData);
 	void setMix (const char* fromAnimation, const char* toAnimation, float duration);
 
-	void setListener (CCObject* instance, SEL_AnimationStateEvent method);
+	void setAnimationListener (CCObject* instance, SEL_AnimationStateEvent method);
 	TrackEntry* setAnimation (int trackIndex, const char* name, bool loop);
 	TrackEntry* addAnimation (int trackIndex, const char* name, bool loop, float delay = 0);
 	TrackEntry* getCurrent (int trackIndex = 0);
