@@ -183,8 +183,6 @@ TrackEntry* _AnimationState_expandToIndex (AnimationState* self, int index) {
 	return 0;
 }
 
-#include <stdio.h>
-
 void _AnimationState_setCurrent (AnimationState* self, int index, TrackEntry* entry) {
 	TrackEntry* current = _AnimationState_expandToIndex(self, index);
 	if (current) {
@@ -197,7 +195,6 @@ void _AnimationState_setCurrent (AnimationState* self, int index, TrackEntry* en
 		if (self->listener) self->listener(self, index, ANIMATION_END, 0, 0);
 
 		entry->mixDuration = AnimationStateData_getMix(self->data, current->animation, entry->animation);
-		printf("mix %f\n", entry->mixDuration);
 		if (entry->mixDuration > 0) {
 			entry->mixTime = 0;
 			entry->previous = current;
