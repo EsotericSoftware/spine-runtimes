@@ -61,16 +61,16 @@ void _Entry_dispose (_Entry* self) {
 typedef struct {
 	Skin super;
 	_Entry* entries;
-} _Internal;
+} _Skin;
 
 Skin* Skin_create (const char* name) {
-	Skin* self = SUPER(NEW(_Internal));
+	Skin* self = SUPER(NEW(_Skin));
 	MALLOC_STR(self->name, name);
 	return self;
 }
 
 void Skin_dispose (Skin* self) {
-	_Entry* entry = SUB_CAST(_Internal, self) ->entries;
+	_Entry* entry = SUB_CAST(_Skin, self)->entries;
 	while (entry) {
 		_Entry* nextEntry = entry->next;
 		_Entry_dispose(entry);
@@ -83,12 +83,12 @@ void Skin_dispose (Skin* self) {
 
 void Skin_addAttachment (Skin* self, int slotIndex, const char* name, Attachment* attachment) {
 	_Entry* newEntry = _Entry_create(slotIndex, name, attachment);
-	newEntry->next = SUB_CAST(_Internal, self) ->entries;
-	SUB_CAST(_Internal, self) ->entries = newEntry;
+	newEntry->next = SUB_CAST(_Skin, self)->entries;
+	SUB_CAST(_Skin, self)->entries = newEntry;
 }
 
 Attachment* Skin_getAttachment (const Skin* self, int slotIndex, const char* name) {
-	const _Entry* entry = SUB_CAST(_Internal, self) ->entries;
+	const _Entry* entry = SUB_CAST(_Skin, self)->entries;
 	while (entry) {
 		if (entry->slotIndex == slotIndex && strcmp(entry->name, name) == 0) return entry->attachment;
 		entry = entry->next;
@@ -97,7 +97,7 @@ Attachment* Skin_getAttachment (const Skin* self, int slotIndex, const char* nam
 }
 
 const char* Skin_getAttachmentName (const Skin* self, int slotIndex, int attachmentIndex) {
-	const _Entry* entry = SUB_CAST(_Internal, self) ->entries;
+	const _Entry* entry = SUB_CAST(_Skin, self)->entries;
 	int i = 0;
 	while (entry) {
 		if (entry->slotIndex == slotIndex) {
@@ -110,7 +110,7 @@ const char* Skin_getAttachmentName (const Skin* self, int slotIndex, int attachm
 }
 
 void Skin_attachAll (const Skin* self, Skeleton* skeleton, const Skin* oldSkin) {
-	const _Entry *entry = SUB_CAST(_Internal, oldSkin) ->entries;
+	const _Entry *entry = SUB_CAST(_Skin, oldSkin)->entries;
 	while (entry) {
 		Slot *slot = skeleton->slots[entry->slotIndex];
 		if (slot->attachment == entry->attachment) {

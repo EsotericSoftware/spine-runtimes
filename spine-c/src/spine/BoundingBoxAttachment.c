@@ -32,7 +32,6 @@
  *****************************************************************************/
 
 #include <spine/BoundingBoxAttachment.h>
-#include <math.h>
 #include <spine/extension.h>
 
 BoundingBoxAttachment* BoundingBoxAttachment_create (const char* name) {

@@ -31,43 +31,28 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/extension.h>
-#include <stdio.h>
+#ifndef SPINE_EVENT_H_
+#define SPINE_EVENT_H_
 
-static void* (*mallocFunc) (size_t size) = malloc;
-static void (*freeFunc) (void* ptr) = free;
+#include <spine/EventData.h>
 
-void* _malloc (size_t size) {
-	return mallocFunc(size);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct Event Event;
+struct Event {
+	EventData* const data;
+	int intValue;
+	float floatValue;
+	const char* stringValue;
+};
+
+Event* Event_create (EventData* data);
+void Event_dispose (Event* self);
+
+#ifdef __cplusplus
 }
-void* _calloc (size_t num, size_t size) {
-	void* ptr = mallocFunc(num * size);
-	if (ptr) memset(ptr, 0, num * size);
-	return ptr;
-}
-void _free (void* ptr) {
-	freeFunc(ptr);
-}
+#endif
 
-void _setMalloc (void* (*malloc) (size_t size)) {
-	mallocFunc = malloc;
-}
-void _setFree (void (*free) (void* ptr)) {
-	freeFunc = free;
-}
-
-char* _readFile (const char* path, int* length) {
-	char *data;
-	FILE *file = fopen(path, "rb");
-	if (!file) return 0;
-
-	fseek(file, 0, SEEK_END);
-	*length = ftell(file);
-	fseek(file, 0, SEEK_SET);
-
-	data = MALLOC(char, *length);
-	fread(data, 1, *length, file);
-	fclose(file);
-
-	return data;
-}
+#endif /* SPINE_EVENT_H_ */

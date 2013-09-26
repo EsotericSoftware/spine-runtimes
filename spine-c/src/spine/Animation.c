@@ -32,7 +32,7 @@
  *****************************************************************************/
 
 #include <spine/Animation.h>
-#include <math.h>
+#include <limits.h>
 #include <spine/extension.h>
 
 Animation* Animation_create (const char* name, int timelineCount) {
@@ -52,42 +52,44 @@ void Animation_dispose (Animation* self) {
 	FREE(self);
 }
 
-void Animation_apply (const Animation* self, Skeleton* skeleton, float time, int/*bool*/loop) {
+void Animation_apply (const Animation* self, Skeleton* skeleton, float lastTime, float time, int loop, Event** events,
+		int* eventCount) {
 	int i, n = self->timelineCount;
 
-#ifdef __STDC_VERSION__
-	if (loop && self->duration) time = fmodf(time, self->duration);
-#else
-	if (loop && self->duration) time = (float)fmod(time, self->duration);
-#endif
+	if (loop && self->duration) {
+		time = FMOD(time, self->duration);
+		lastTime = FMOD(lastTime, self->duration);
+	}
 
 	for (i = 0; i < n; ++i)
-		Timeline_apply(self->timelines[i], skeleton, time, 1);
+		Timeline_apply(self->timelines[i], skeleton, lastTime, time, events, eventCount, 1);
 }
 
-void Animation_mix (const Animation* self, Skeleton* skeleton, float time, int/*bool*/loop, float alpha) {
+void Animation_mix (const Animation* self, Skeleton* skeleton, float lastTime, float time, int loop, Event** events,
+		int* eventCount, float alpha) {
 	int i, n = self->timelineCount;
 
-#ifdef __STDC_VERSION__
-	if (loop && self->duration) time = fmodf(time, self->duration);
-#else
-	if (loop && self->duration) time = (float)fmod(time, self->duration);
-#endif
+	if (loop && self->duration) {
+		time = FMOD(time, self->duration);
+		lastTime = FMOD(lastTime, self->duration);
+	}
 
 	for (i = 0; i < n; ++i)
-		Timeline_apply(self->timelines[i], skeleton, time, alpha);
+		Timeline_apply(self->timelines[i], skeleton, lastTime, time, events, eventCount, alpha);
 }
 
 /**/
 
 typedef struct _TimelineVtable {
-	void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha);
+	void (*apply) (const Timeline* self, Skeleton* skeleton, float lastTime, float time, Event** firedEvents, int* eventCount,
+			float alpha);
 	void (*dispose) (Timeline* self);
 } _TimelineVtable;
 
 void _Timeline_init (Timeline* self, /**/
 void (*dispose) (Timeline* self), /**/
-void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha)) {
+		void (*apply) (const Timeline* self, Skeleton* skeleton, float lastTime, float time, Event** firedEvents, int* eventCount,
+				float alpha)) {
 	CONST_CAST(_TimelineVtable*, self->vtable) = NEW(_TimelineVtable);
 	VTABLE(Timeline, self)->dispose = dispose;
 	VTABLE(Timeline, self)->apply = apply;
@@ -101,8 +103,9 @@ void Timeline_dispose (Timeline* self) {
 	VTABLE(Timeline, self)->dispose(self);
 }
 
-void Timeline_apply (const Timeline* self, Skeleton* skeleton, float time, float alpha) {
-	VTABLE(Timeline, self)->apply(self, skeleton, time, alpha);
+void Timeline_apply (const Timeline* self, Skeleton* skeleton, float lastTime, float time, Event** firedEvents, int* eventCount,
+		float alpha) {
+	VTABLE(Timeline, self)->apply(self, skeleton, lastTime, time, firedEvents, eventCount, alpha);
 }
 
 /**/
@@ -113,7 +116,8 @@ static const int CURVE_SEGMENTS = 10;
 
 void _CurveTimeline_init (CurveTimeline* self, int frameCount, /**/
 void (*dispose) (Timeline* self), /**/
-void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha)) {
+		void (*apply) (const Timeline* self, Skeleton* skeleton, float lastTime, float time, Event** firedEvents, int* eventCount,
+				float alpha)) {
 	_Timeline_init(SUPER(self), dispose, apply);
 	self->curves = CALLOC(float, (frameCount - 1) * 6);
 }
@@ -226,8 +230,8 @@ void _BaseTimeline_dispose (Timeline* timeline) {
 
 /* Many timelines have structure identical to struct BaseTimeline and extend CurveTimeline. **/
 struct BaseTimeline* _BaseTimeline_create (int frameCount, int frameSize, /**/
-void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha)) {
-
+		void (*apply) (const Timeline* self, Skeleton* skeleton, float lastTime, float time, Event** firedEvents, int* eventCount,
+				float alpha)) {
 	struct BaseTimeline* self = NEW(struct BaseTimeline);
 	_CurveTimeline_init(SUPER(self), frameCount, _BaseTimeline_dispose, apply);
 
@@ -242,7 +246,8 @@ void (*apply) (const Timeline* self, Skeleton* skeleton, float time, float alpha
 static const int ROTATE_LAST_FRAME_TIME = -2;
 static const int ROTATE_FRAME_VALUE = 1;
 
-void _RotateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float time, float alpha) {
+void _RotateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float lastTime, float time, Event** firedEvents,
+		int* eventCount, float alpha) {
 	Bone *bone;
 	int frameIndex;
 	float lastFrameValue, frameTime, percent, amount;
@@ -299,7 +304,8 @@ static const int TRANSLATE_LAST_FRAME_TIME = -3;
 static const int TRANSLATE_FRAME_X = 1;
 static const int TRANSLATE_FRAME_Y = 2;
 
-void _TranslateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float time, float alpha) {
+void _TranslateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float lastTime, float time, Event** firedEvents,
+		int* eventCount, float alpha) {
 	Bone *bone;
 	int frameIndex;
 	float lastFrameX, lastFrameY, frameTime, percent;
@@ -343,7 +349,8 @@ void TranslateTimeline_setFrame (TranslateTimeline* self, int frameIndex, float 
 
 /**/
 
-void _ScaleTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float time, float alpha) {
+void _ScaleTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float lastTime, float time, Event** firedEvents,
+		int* eventCount, float alpha) {
 	Bone *bone;
 	int frameIndex;
 	float lastFrameX, lastFrameY, frameTime, percent;
@@ -389,7 +396,8 @@ static const int COLOR_FRAME_G = 2;
 static const int COLOR_FRAME_B = 3;
 static const int COLOR_FRAME_A = 4;
 
-void _ColorTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float time, float alpha) {
+void _ColorTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float lastTime, float time, Event** firedEvents,
+		int* eventCount, float alpha) {
 	Slot *slot;
 	int frameIndex;
 	float lastFrameR, lastFrameG, lastFrameB, lastFrameA, percent, frameTime;
@@ -451,7 +459,8 @@ void ColorTimeline_setFrame (ColorTimeline* self, int frameIndex, float time, fl
 
 /**/
 
-void _AttachmentTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float time, float alpha) {
+void _AttachmentTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float lastTime, float time, Event** firedEvents,
+		int* eventCount, float alpha) {
 	int frameIndex;
 	const char* attachmentName;
 	AttachmentTimeline* self = (AttachmentTimeline*)timeline;
@@ -485,9 +494,9 @@ AttachmentTimeline* AttachmentTimeline_create (int frameCount) {
 	AttachmentTimeline* self = NEW(AttachmentTimeline);
 	_Timeline_init(SUPER(self), _AttachmentTimeline_dispose, _AttachmentTimeline_apply);
 
-	CONST_CAST(char**, self->attachmentNames) = CALLOC(char*, frameCount);
 	CONST_CAST(int, self->framesLength) = frameCount;
 	CONST_CAST(float*, self->frames) = CALLOC(float, frameCount);
+	CONST_CAST(char**, self->attachmentNames) = CALLOC(char*, frameCount);
 
 	return self;
 }
@@ -504,7 +513,74 @@ void AttachmentTimeline_setFrame (AttachmentTimeline* self, int frameIndex, floa
 
 /**/
 
-void _DrawOrderTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float time, float alpha) {
+void _EventTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float lastTime, float time, Event** firedEvents,
+		int* eventCount, float alpha) {
+	int frameIndex;
+	EventTimeline* self = (EventTimeline*)timeline;
+
+	if (time < self->frames[0]) return; /* Time is before first frame. */
+
+	if (lastTime >= self->frames[self->framesLength - 1]) return; /* Last time is after last frame. */
+
+	if (lastTime > time) {
+		/* Fire events after last time for looped animations. */
+		_EventTimeline_apply(timeline, skeleton, lastTime, INT_MAX, firedEvents, eventCount, alpha);
+		lastTime = 0;
+	}
+
+	if (self->framesLength == 1)
+		frameIndex = 0;
+	else {
+		frameIndex = binarySearch(self->frames, self->framesLength, lastTime, 1);
+		float frame = self->frames[frameIndex];
+		while (frameIndex > 0) {
+			float lastFrame = self->frames[frameIndex - 1];
+			/* Fire multiple events with the same frame and events that occurred at lastTime. */
+			if (lastFrame != frame && lastFrame != lastTime) break;
+			frameIndex--;
+		}
+	}
+	for (; frameIndex < self->framesLength && time > self->frames[frameIndex]; frameIndex++) {
+		firedEvents[*eventCount] = self->events[frameIndex];
+		(*eventCount)++;
+	}
+}
+
+void _EventTimeline_dispose (Timeline* timeline) {
+	EventTimeline* self = SUB_CAST(EventTimeline, timeline);
+	int i;
+
+	_Timeline_deinit(timeline);
+
+	for (i = 0; i < self->framesLength; ++i)
+		FREE(self->events[i]);
+	FREE(self->events);
+	FREE(self->frames);
+	FREE(self);
+}
+
+EventTimeline* EventTimeline_create (int frameCount) {
+	EventTimeline* self = NEW(EventTimeline);
+	_Timeline_init(SUPER(self), _EventTimeline_dispose, _EventTimeline_apply);
+
+	CONST_CAST(int, self->framesLength) = frameCount;
+	CONST_CAST(float*, self->frames) = CALLOC(float, frameCount);
+	CONST_CAST(Event**, self->events) = CALLOC(Event*, frameCount);
+
+	return self;
+}
+
+void EventTimeline_setFrame (EventTimeline* self, int frameIndex, float time, Event* event) {
+	self->frames[frameIndex] = time;
+
+	FREE(self->events[frameIndex]);
+	self->events[frameIndex] = event;
+}
+
+/**/
+
+void _DrawOrderTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float lastTime, float time, Event** firedEvents,
+		int* eventCount, float alpha) {
 	int i;
 	int frameIndex;
 	const int* drawOrderToSetupIndex;
@@ -543,9 +619,9 @@ DrawOrderTimeline* DrawOrderTimeline_create (int frameCount, int slotCount) {
 	DrawOrderTimeline* self = NEW(DrawOrderTimeline);
 	_Timeline_init(SUPER(self), _DrawOrderTimeline_dispose, _DrawOrderTimeline_apply);
 
-	CONST_CAST(int**, self->drawOrders) = CALLOC(int*, frameCount);
 	CONST_CAST(int, self->framesLength) = frameCount;
 	CONST_CAST(float*, self->frames) = CALLOC(float, frameCount);
+	CONST_CAST(int**, self->drawOrders) = CALLOC(int*, frameCount);
 	CONST_CAST(int, self->slotCount) = slotCount;
 
 	return self;

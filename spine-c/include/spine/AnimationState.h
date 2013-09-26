@@ -35,41 +35,63 @@
 #define SPINE_ANIMATIONSTATE_H_
 
 #include <spine/AnimationStateData.h>
+#include <spine/Event.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct {
-	AnimationStateData* const data;
-	Animation* const animation;
-	float time;
+typedef enum {
+	ANIMATION_START, ANIMATION_END, ANIMATION_COMPLETE, ANIMATION_EVENT
+} EventType;
+
+typedef struct AnimationState AnimationState;
+
+typedef void (*AnimationStateListener) (AnimationState* state, int trackIndex, EventType type, Event* event, int loopCount);
+
+typedef struct TrackEntry TrackEntry;
+struct TrackEntry {
+	TrackEntry* next;
+	TrackEntry* previous;
+	Animation* animation;
 	int/*bool*/loop;
-} AnimationState;
+	float delay, time, lastTime, endTime;
+	AnimationStateListener listener;
+	float mixTime, mixDuration;
+};
+
+struct AnimationState {
+	AnimationStateData* const data;
+
+	int trackCount;
+	TrackEntry** tracks;
+
+	AnimationStateListener listener;
+};
 
 /* @param data May be 0 for no mixing. */
 AnimationState* AnimationState_create (AnimationStateData* data);
 void AnimationState_dispose (AnimationState* self);
 
 void AnimationState_update (AnimationState* self, float delta);
-
 void AnimationState_apply (AnimationState* self, struct Skeleton* skeleton);
 
-/* @param animationName May be 0. */
-void AnimationState_setAnimationByName (AnimationState* self, const char* animationName, int/*bool*/loop);
-/* @param animation May be 0. */
-void AnimationState_setAnimation (AnimationState* self, Animation* animation, int/*bool*/loop);
+void AnimationState_clear (AnimationState* self);
+void AnimationState_clearTrack (AnimationState* self, int trackIndex);
 
-/** @param animationName May be 0.
- * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay. */
-void AnimationState_addAnimationByName (AnimationState* self, const char* animationName, int/*bool*/loop, float delay);
-/** @param animation May be 0.
- * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay. */
-void AnimationState_addAnimation (AnimationState* self, Animation* animation, int/*bool*/loop, float delay);
+/** Set the current animation. Any queued animations are cleared. */
+TrackEntry* AnimationState_setAnimationByName (AnimationState* self, int trackIndex, const char* animationName, int/*bool*/loop);
+TrackEntry* AnimationState_setAnimation (AnimationState* self, int trackIndex, Animation* animation, int/*bool*/loop);
 
-void AnimationState_clearAnimation (AnimationState* self);
+/** Adds an animation to be played delay seconds after the current or last queued animation, taking into account any mix
+ * duration.
+ * @param animation May be 0 to queue clearing the AnimationState. */
+TrackEntry* AnimationState_addAnimationByName (AnimationState* self, int trackIndex, const char* animationName, int/*bool*/loop,
+		float delay);
+TrackEntry* AnimationState_addAnimation (AnimationState* self, int trackIndex, Animation* animation, int/*bool*/loop,
+		float delay);
 
-int/*bool*/AnimationState_isComplete (AnimationState* self);
+TrackEntry* AnimationState_getCurrent (AnimationState* self, int trackIndex);
 
 #ifdef __cplusplus
 }

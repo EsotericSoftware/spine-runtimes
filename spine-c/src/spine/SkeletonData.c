@@ -95,6 +95,13 @@ Skin* SkeletonData_findSkin (const SkeletonData* self, const char* skinName) {
 	return 0;
 }
 
+EventData* SkeletonData_findEvent (const SkeletonData* self, const char* eventName) {
+	int i;
+	for (i = 0; i < self->eventCount; ++i)
+		if (strcmp(self->events[i]->name, eventName) == 0) return self->events[i];
+	return 0;
+}
+
 Animation* SkeletonData_findAnimation (const SkeletonData* self, const char* animationName) {
 	int i;
 	for (i = 0; i < self->animationCount; ++i)

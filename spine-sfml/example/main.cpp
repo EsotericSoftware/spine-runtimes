@@ -41,6 +41,28 @@ using namespace std;
 using namespace spine;
 #include <stdio.h>
 
+void callback (AnimationState* state, int trackIndex, EventType type, Event* event, int loopCount) {
+	TrackEntry* entry = AnimationState_getCurrent(state, trackIndex);
+	const char* animationName = (entry && entry->animation) ? entry->animation->name : 0;
+
+	switch (type) {
+	case ANIMATION_START:
+		printf("%d start: %s\n", trackIndex, animationName);
+		break;
+	case ANIMATION_END:
+		printf("%d end: %s\n", trackIndex, animationName);
+		break;
+	case ANIMATION_COMPLETE:
+		printf("%d complete: %s, %d\n", trackIndex, animationName, loopCount);
+		break;
+	case ANIMATION_EVENT:
+		printf("%d event: %s, %s: %d, %f, %s\n", trackIndex, animationName, event->data->name, event->intValue, event->floatValue,
+				event->stringValue);
+		break;
+	}
+	fflush(stdout);
+}
+
 void spineboy () {
 	// Load atlas, skeleton, and animations.
 	Atlas* atlas = Atlas_readAtlasFile("../data/spineboy.atlas");
@@ -72,12 +94,13 @@ void spineboy () {
 
 	Slot* headSlot = Skeleton_findSlot(skeleton, "head");
 
+	drawable->state->listener = callback;
 	if (true) {
-		AnimationState_setAnimationByName(drawable->state, "drawOrder", true);
+		AnimationState_setAnimationByName(drawable->state, 0, "drawOrder", true);
 	} else {
-		AnimationState_setAnimationByName(drawable->state, "walk", true);
-		AnimationState_addAnimationByName(drawable->state, "jump", false, 0);
-		AnimationState_addAnimationByName(drawable->state, "walk", true, 0);
+		AnimationState_setAnimationByName(drawable->state, 0, "walk", true);
+		AnimationState_addAnimationByName(drawable->state, 0, "jump", false, 0);
+		AnimationState_addAnimationByName(drawable->state, 0, "walk", true, 0);
 	}
 
 	sf::RenderWindow window(sf::VideoMode(640, 480), "Spine SFML");
@@ -136,7 +159,7 @@ void goblins () {
 	skeleton->root->y = 590;
 	Skeleton_updateWorldTransform(skeleton);
 
-	AnimationState_setAnimation(drawable->state, walkAnimation, true);
+	AnimationState_setAnimation(drawable->state, 0, walkAnimation, true);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML");
 	window.setFramerateLimit(60);

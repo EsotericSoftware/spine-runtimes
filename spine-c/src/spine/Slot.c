@@ -38,10 +38,10 @@
 typedef struct {
 	Slot super;
 	float attachmentTime;
-} _Internal;
+} _Slot;
 
 Slot* Slot_create (SlotData* data, Skeleton* skeleton, Bone* bone) {
-	Slot* self = SUPER(NEW(_Internal));
+	Slot* self = SUPER(NEW(_Slot));
 	CONST_CAST(SlotData*, self->data) = data;
 	CONST_CAST(Skeleton*, self->skeleton) = skeleton;
 	CONST_CAST(Bone*, self->bone) = bone;
@@ -55,15 +55,15 @@ void Slot_dispose (Slot* self) {
 
 void Slot_setAttachment (Slot* self, Attachment* attachment) {
 	CONST_CAST(Attachment*, self->attachment) = attachment;
-	SUB_CAST(_Internal, self) ->attachmentTime = self->skeleton->time;
+	SUB_CAST(_Slot, self) ->attachmentTime = self->skeleton->time;
 }
 
 void Slot_setAttachmentTime (Slot* self, float time) {
-	SUB_CAST(_Internal, self) ->attachmentTime = self->skeleton->time - time;
+	SUB_CAST(_Slot, self) ->attachmentTime = self->skeleton->time - time;
 }
 
 float Slot_getAttachmentTime (const Slot* self) {
-	return self->skeleton->time - SUB_CAST(_Internal, self) ->attachmentTime;
+	return self->skeleton->time - SUB_CAST(_Slot, self) ->attachmentTime;
 }
 
 void Slot_setToSetupPose (Slot* self) {

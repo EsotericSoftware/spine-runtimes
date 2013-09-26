@@ -78,6 +78,12 @@
     <ClInclude Include="include\spine\SkeletonBounds.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\spine\Event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spine\EventData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\spine\Animation.c">
@@ -138,6 +144,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\spine\SkeletonBounds.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\spine\EventData.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\spine\Event.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
