@@ -22,11 +22,11 @@ bool ExampleLayer::init () {
 	skeletonNode->setMix("walk", "jump", 0.2f);
 	skeletonNode->setMix("jump", "walk", 0.4f);
 
-	skeletonNode->setAnimation("walk", true);
+	skeletonNode->setAnimation(0, "walk", true);
 	// This shows how to setup animations to play back to back.
-	//skeletonNode->addAnimation("jump", true);
-	//skeletonNode->addAnimation("walk", true);
-	//skeletonNode->addAnimation("jump", true);
+	//skeletonNode->addAnimation(0, "jump", false);
+	//skeletonNode->addAnimation(0, "walk", false);
+	//skeletonNode->addAnimation(0, "jump", true);
 
 	skeletonNode->timeScale = 0.3f;
 	skeletonNode->debugBones = true;
@@ -46,10 +46,11 @@ bool ExampleLayer::init () {
 }
 
 void ExampleLayer::update (float deltaTime) {
-    if (skeletonNode->states[0]->loop) {
-        if (skeletonNode->states[0]->time > 2) skeletonNode->setAnimation("jump", false);
+	TrackEntry* entry = skeletonNode->getCurrent(0);
+	if (entry->loop) {
+        if (entry->time > 2) skeletonNode->setAnimation(0, "jump", false);
     } else {
-        if (skeletonNode->states[0]->time > 1) skeletonNode->setAnimation("walk", true);
+        if (entry->time > 1) skeletonNode->setAnimation(0, "walk", true);
     }
-    // if (skeletonNode->states[0]->time > 0.1) CCDirector::sharedDirector()->replaceScene(ExampleLayer::scene());
+    // if (entry->time > 0.1) CCDirector::sharedDirector()->replaceScene(ExampleLayer::scene());
 }
