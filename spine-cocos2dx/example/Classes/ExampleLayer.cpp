@@ -17,11 +17,12 @@ CCScene* ExampleLayer::scene () {
 
 bool ExampleLayer::init () {
 	if (!CCLayer::init()) return false;
-
+	
 	skeletonNode = CCSkeletonAnimation::createWithFile("spineboy.json", "spineboy.atlas");
 	skeletonNode->setMix("walk", "jump", 0.2f);
 	skeletonNode->setMix("jump", "walk", 0.4f);
-
+	
+	skeletonNode->setListener(this, animationStateEvent_selector(ExampleLayer::animationStateEvent));
 	skeletonNode->setAnimation(0, "walk", true);
 	// This shows how to setup animations to play back to back.
 	//skeletonNode->addAnimation(0, "jump", false);
@@ -53,4 +54,25 @@ void ExampleLayer::update (float deltaTime) {
         if (entry->time > 1) skeletonNode->setAnimation(0, "walk", true);
     }
     // if (entry->time > 0.1) CCDirector::sharedDirector()->replaceScene(ExampleLayer::scene());
+}
+
+void ExampleLayer::animationStateEvent (CCSkeletonAnimation* node, int trackIndex, EventType type, Event* event, int loopCount) {
+	TrackEntry* entry = AnimationState_getCurrent(node->state, trackIndex);
+	const char* animationName = (entry && entry->animation) ? entry->animation->name : 0;
+
+	switch (type) {
+	case ANIMATION_START:
+		CCLog("%d start: %s", trackIndex, animationName);
+		break;
+	case ANIMATION_END:
+		CCLog("%d end: %s", trackIndex, animationName);
+		break;
+	case ANIMATION_COMPLETE:
+		CCLog("%d complete: %s, %d", trackIndex, animationName, loopCount);
+		break;
+	case ANIMATION_EVENT:
+		CCLog("%d event: %s, %s: %d, %f, %s", trackIndex, animationName, event->data->name, event->intValue, event->floatValue, event->stringValue);
+		break;
+	}
+	fflush(stdout);
 }
