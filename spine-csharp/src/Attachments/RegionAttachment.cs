@@ -34,7 +34,9 @@
 using System;
 
 namespace Spine {
-	/** Attachment that displays a texture region. */
+	/// <summary>
+	/// Attachment that displays a texture region.
+	/// </summary>
 	public class RegionAttachment : Attachment {
 		public const int X1 = 0;
 		public const int Y1 = 1;
