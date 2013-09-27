@@ -42,7 +42,7 @@ using std::vector;
 
 namespace spine {
 
-extern "C" static void callback (AnimationState* state, int trackIndex, EventType type, Event* event, int loopCount) {
+static void callback (AnimationState* state, int trackIndex, EventType type, Event* event, int loopCount) {
 	((CCSkeletonAnimation*)state->context)->onAnimationStateEvent(trackIndex, type, event, loopCount);
 }
 
