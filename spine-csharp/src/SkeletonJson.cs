@@ -228,7 +228,7 @@ namespace Spine {
 		private int GetInt (Dictionary<String, Object> map, String name, int defaultValue) {
 			if (!map.ContainsKey(name))
 				return defaultValue;
-			return (int)map[name];
+			return (int)(float)map[name];
 		}
 
 		private bool GetBoolean (Dictionary<String, Object> map, String name, bool defaultValue) {
