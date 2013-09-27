@@ -46,6 +46,7 @@ import starling.animation.IAnimatable;
 import starling.core.RenderSupport;
 import starling.display.BlendMode;
 import starling.display.DisplayObject;
+import starling.utils.Color;
 import starling.utils.MatrixUtil;
 
 public class SkeletonSprite extends DisplayObject implements IAnimatable {
@@ -77,41 +78,26 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 			if (regionAttachment != null) {
 				var vertices:Vector.<Number> = this.vertices;
 				regionAttachment.computeWorldVertices(skeleton.x, skeleton.y, slot.bone, vertices);
-				var r:Number = skeleton.r * slot.r;
-				var g:Number = skeleton.g * slot.g;
-				var b:Number = skeleton.b * slot.b;
+				var r:Number = skeleton.r * slot.r * 255;
+				var g:Number = skeleton.g * slot.g * 255;
+				var b:Number = skeleton.b * slot.b * 255;
 				var a:Number = slot.a;
+				var rgb:uint = Color.rgb(r,g,b);
 
 				var image:SkeletonImage = regionAttachment.rendererObject as SkeletonImage;
 				var vertexData:Vector.<Number> = image.vertexData.rawData;
-		
-				vertexData[0] = vertices[2];
-				vertexData[1] = vertices[3];
-				vertexData[2] = r;
-				vertexData[3] = g;
-				vertexData[4] = b;
-				vertexData[5] = a;
-
-				vertexData[8] = vertices[4];
-				vertexData[9] = vertices[5];
-				vertexData[10] = r;
-				vertexData[11] = g;
-				vertexData[12] = b;
-				vertexData[13] = a;
-
-				vertexData[16] = vertices[0];
-				vertexData[17] = vertices[1];
-				vertexData[18] = r;
-				vertexData[19] = g;
-				vertexData[20] = b;
-				vertexData[21] = a;
-
-				vertexData[24] = vertices[6];
-				vertexData[25] = vertices[7];
-				vertexData[26] = r;
-				vertexData[27] = g;
-				vertexData[28] = b;
-				vertexData[29] = a;
+						
+				image.vertexData.setPosition(0, vertices[2], vertices[3]);				
+				image.vertexData.setColorAndAlpha(0, rgb, a);
+				
+				image.vertexData.setPosition(1, vertices[4], vertices[5]);
+				image.vertexData.setColorAndAlpha(1, rgb, a);
+				
+				image.vertexData.setPosition(2, vertices[0], vertices[1]);
+				image.vertexData.setColorAndAlpha(2, rgb, a);
+				
+				image.vertexData.setPosition(3, vertices[6], vertices[7]);
+				image.vertexData.setColorAndAlpha(3, rgb, a);
 
 				image.updateVertices();
 				support.blendMode = slot.data.additiveBlending ? BlendMode.ADD : BlendMode.NORMAL;
