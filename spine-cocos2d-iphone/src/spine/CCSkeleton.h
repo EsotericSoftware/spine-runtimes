@@ -34,9 +34,7 @@
 #import <spine/spine.h>
 #import "cocos2d.h"
 
-/**
-Draws a skeleton.
-*/
+/** Draws a skeleton. */
 @interface CCSkeleton : CCNodeRGBA<CCBlendProtocol> {
 	Skeleton* _skeleton;
 	Bone* _rootBone;

@@ -34,13 +34,17 @@
 #import <spine/CCSkeletonAnimation.h>
 #import <spine/spine-cocos2d-iphone.h>
 
+static void callback (AnimationState* state, int trackIndex, EventType type, Event* event, int loopCount) {
+	[(CCSkeletonAnimation*)state->context onAnimationStateEvent:trackIndex type:type event:event loopCount:loopCount];
+}
+
 @interface CCSkeletonAnimation (Private)
 - (void) initialize;
 @end
 
 @implementation CCSkeletonAnimation
 
-@synthesize states = _states;
+@synthesize state = _state;
 
 + (id) skeletonWithData:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
 	return [[[self alloc] initWithData:skeletonData ownsSkeletonData:ownsSkeletonData] autorelease];
@@ -55,9 +59,9 @@
 }
 
 - (void) initialize {
-	_states = [[NSMutableArray arrayWithCapacity:2] retain];
-	_stateDatas = [[NSMutableArray arrayWithCapacity:2] retain];
-	[self addAnimationState];
+	_state = AnimationState_create(AnimationStateData_create(_skeleton->data));
+	_state->context = self;
+	_state->listener = callback;
 }
 
 - (id) initWithData:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
@@ -88,13 +92,8 @@
 }
 
 - (void) dealloc {
-	for (NSValue* value in _stateDatas)
-		AnimationStateData_dispose([value pointerValue]);
-	[_stateDatas release];
-	
-	for (NSValue* value in _states)
-		AnimationState_dispose([value pointerValue]);
-	[_states release];
+	if (_ownsAnimationStateData) AnimationStateData_dispose(_state->data);
+	AnimationState_dispose(_state);
 
 	[super dealloc];
 }
@@ -103,88 +102,71 @@
 	[super update:deltaTime];
 
 	deltaTime *= _timeScale;
-	for (NSValue* value in _states) {
-		AnimationState* state = [value pointerValue];
-		AnimationState_update(state, deltaTime);
-		AnimationState_apply(state, _skeleton);
-	}
+	AnimationState_update(_state, deltaTime);
+	AnimationState_apply(_state, _skeleton);
 	Skeleton_updateWorldTransform(_skeleton);
 }
 
-- (void) addAnimationState {
-	AnimationStateData* stateData = AnimationStateData_create(_skeleton->data);
-	[_stateDatas addObject:[NSValue valueWithPointer:stateData]];
-	[self addAnimationState:stateData];
-}
-
-- (void) addAnimationState:(AnimationStateData*)stateData {
+- (void) setAnimationStateData:(AnimationStateData*)stateData {
 	NSAssert(stateData, @"stateData cannot be null.");
-	AnimationState* state = AnimationState_create(stateData);
-	[_states addObject:[NSValue valueWithPointer:state]];
-}
-
-- (AnimationState*) getAnimationState:(int)stateIndex {
-	NSAssert(stateIndex >= 0 && stateIndex < (int)_states.count, @"stateIndex out of range.");
-	return [[_states objectAtIndex:stateIndex] pointerValue];
-}
-
-- (void) setAnimationStateData:(AnimationStateData*)stateData forState:(int)stateIndex {
-	NSAssert(stateData, @"stateData cannot be null.");
-	NSAssert(stateIndex >= 0 && stateIndex < (int)_states.count, @"stateIndex out of range.");
 	
-	AnimationState* state = [[_states objectAtIndex:stateIndex] pointerValue];
-	for (NSValue* value in _stateDatas) {
-		if (state->data == [value pointerValue]) {
-			AnimationStateData_dispose(state->data);
-			[_stateDatas removeObject:value];
-			break;
-		}
-	}
-	[_states removeObject:[NSValue valueWithPointer:state]];
-	AnimationState_dispose(state);
+	if (_ownsAnimationStateData) AnimationStateData_dispose(_state->data);
+	AnimationState_dispose(_state);
 
-	state = AnimationState_create(stateData);
-	[_states setObject:[NSValue valueWithPointer:state] atIndexedSubscript:stateIndex];
+	_ownsAnimationStateData = true;
+	_state = AnimationState_create(stateData);
+	_state->context = self;
+	_state->listener = callback;
 }
 
 - (void) setMixFrom:(NSString*)fromAnimation to:(NSString*)toAnimation duration:(float)duration {
-	[self setMixFrom:fromAnimation to:toAnimation duration:duration forState:0];
+	AnimationStateData_setMixByName(_state->data, [fromAnimation UTF8String], [toAnimation UTF8String], duration);
 }
 
-- (void) setMixFrom:(NSString*)fromAnimation to:(NSString*)toAnimation duration:(float)duration forState:(int)stateIndex {
-	NSAssert(stateIndex >= 0 && stateIndex < (int)_states.count, @"stateIndex out of range.");
-	AnimationState* state = [[_states objectAtIndex:stateIndex] pointerValue];
-	AnimationStateData_setMixByName(state->data, [fromAnimation UTF8String], [toAnimation UTF8String], duration);
+- (void) setDelegate:(id<CCSkeletonAnimationDelegate>)delegate {
+	_delegate = delegate;
+	_delegateStart = [delegate respondsToSelector:@selector(animationDidStart:track:)];
+	_delegateEnd = [delegate respondsToSelector:@selector(animationWillEnd:track:)];
+	_delegateEvent = [delegate respondsToSelector:@selector(animationDidTriggerEvent:track:event:)];
+	_delegateComplete = [delegate respondsToSelector:@selector(animationDidComplete:track:loopCount:)];
 }
 
-- (void) setAnimation:(NSString*)name loop:(bool)loop {
-	[self setAnimation:name loop:loop forState:0];
+- (TrackEntry*) setAnimationForTrack:(int)trackIndex name:(NSString*)name loop:(bool)loop {
+	return AnimationState_setAnimationByName(_state, trackIndex, [name UTF8String], loop);
 }
 
-- (void) setAnimation:(NSString*)name loop:(bool)loop forState:(int)stateIndex {
-	NSAssert(stateIndex >= 0 && stateIndex < (int)_states.count, @"stateIndex out of range.");
-	AnimationState* state = [[_states objectAtIndex:stateIndex] pointerValue];
-	AnimationState_setAnimationByName(state, [name UTF8String], loop);
+- (TrackEntry*) addAnimationForTrack:(int)trackIndex name:(NSString*)name loop:(bool)loop afterDelay:(int)delay {
+	return AnimationState_addAnimationByName(_state, trackIndex, [name UTF8String], loop, delay);
 }
 
-- (void) addAnimation:(NSString*)name loop:(bool)loop afterDelay:(float)delay {
-	[self addAnimation:name loop:loop afterDelay:delay forState:0];
-}
-
-- (void) addAnimation:(NSString*)name loop:(bool)loop afterDelay:(float)delay forState:(int)stateIndex {
-	NSAssert(stateIndex >= 0 && stateIndex < (int)_states.count, @"stateIndex out of range.");
-	AnimationState* state = [[_states objectAtIndex:stateIndex] pointerValue];
-	AnimationState_addAnimationByName(state, [name UTF8String], loop, delay);
+- (TrackEntry*) getCurrentForTrack:(int)trackIndex {
+	return AnimationState_getCurrent(_state, trackIndex);
 }
 
 - (void) clearAnimation {
-	[self clearAnimationForState:0];
+	AnimationState_clear(_state);
 }
 
-- (void) clearAnimationForState:(int)stateIndex {
-	NSAssert(stateIndex >= 0 && stateIndex < (int)_states.count, @"stateIndex out of range.");
-	AnimationState* state = [[_states objectAtIndex:stateIndex] pointerValue];
-	AnimationState_clearAnimation(state);
+- (void) clearAnimationForTrack:(int)trackIndex {
+	AnimationState_clearTrack(_state, trackIndex);
+}
+
+- (void) onAnimationStateEvent:(int)trackIndex type:(EventType)type event:(Event*)event loopCount:(int)loopCount {
+	if (!_delegate) return;
+	switch (type) {
+		case ANIMATION_START:
+			if (_delegateStart) [_delegate animationDidStart:self track:trackIndex];
+			break;
+		case ANIMATION_END:
+			if (_delegateEnd) [_delegate animationWillEnd:self track:trackIndex];
+			break;
+		case ANIMATION_COMPLETE:
+			if (_delegateComplete) [_delegate animationDidComplete:self track:trackIndex loopCount:loopCount];
+			break;
+		case ANIMATION_EVENT:
+			if (_delegateEvent) [_delegate animationDidTriggerEvent:self track:trackIndex event:event];
+			break;
+	}
 }
 
 @end
