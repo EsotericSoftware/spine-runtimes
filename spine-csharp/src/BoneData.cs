@@ -38,7 +38,7 @@ namespace Spine {
 		internal BoneData parent;
 		internal String name;
 		internal float length, x, y, rotation, scaleX = 1, scaleY = 1;
-		internal bool inheritScale, inheritRotation;
+		internal bool inheritScale = true, inheritRotation = true;
 
 		/// <summary>May be null.</summary>
 		public BoneData Parent { get { return parent; } }
