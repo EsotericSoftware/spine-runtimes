@@ -23,13 +23,13 @@ bool ExampleLayer::init () {
 	skeletonNode->setMix("jump", "walk", 0.4f);
 	
 	skeletonNode->setAnimationListener(this, animationStateEvent_selector(ExampleLayer::animationStateEvent));
-	skeletonNode->setAnimation(0, "walk", true);
-	// This shows how to setup animations to play back to back.
-	//skeletonNode->addAnimation(0, "jump", false);
-	//skeletonNode->addAnimation(0, "walk", false);
-	//skeletonNode->addAnimation(0, "jump", true);
+	skeletonNode->setAnimation(0, "walk", false);
+	skeletonNode->addAnimation(0, "jump", false);
+	skeletonNode->addAnimation(0, "walk", true);
+	skeletonNode->addAnimation(0, "jump", true, 4);
+	skeletonNode->addAnimation(1, "drawOrder", true);
 
-	skeletonNode->timeScale = 0.3f;
+	// skeletonNode->timeScale = 0.3f;
 	skeletonNode->debugBones = true;
 
 	skeletonNode->runAction(CCRepeatForever::create(CCSequence::create(CCFadeOut::create(1),
@@ -47,13 +47,8 @@ bool ExampleLayer::init () {
 }
 
 void ExampleLayer::update (float deltaTime) {
-	TrackEntry* entry = skeletonNode->getCurrent(0);
-	if (entry->loop) {
-        if (entry->time > 2) skeletonNode->setAnimation(0, "jump", false);
-    } else {
-        if (entry->time > 1) skeletonNode->setAnimation(0, "walk", true);
-    }
-    // if (entry->time > 0.1) CCDirector::sharedDirector()->replaceScene(ExampleLayer::scene());
+	// Test releasing memory.
+	// if (entry->time > 0.1) CCDirector::sharedDirector()->replaceScene(ExampleLayer::scene());
 }
 
 void ExampleLayer::animationStateEvent (CCSkeletonAnimation* node, int trackIndex, EventType type, Event* event, int loopCount) {

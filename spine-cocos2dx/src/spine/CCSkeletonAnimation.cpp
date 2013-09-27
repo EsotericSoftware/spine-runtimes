@@ -46,10 +46,6 @@ static void callback (AnimationState* state, int trackIndex, EventType type, Eve
 	((CCSkeletonAnimation*)state->context)->onAnimationStateEvent(trackIndex, type, event, loopCount);
 }
 
-void CCSkeletonAnimation::onAnimationStateEvent (int trackIndex, EventType type, Event* event, int loopCount) {
-	if (listenerInstance) (listenerInstance->*listenerMethod)(this, trackIndex, type, event, loopCount);
-}
-
 CCSkeletonAnimation* CCSkeletonAnimation::createWithData (SkeletonData* skeletonData) {
 	CCSkeletonAnimation* node = new CCSkeletonAnimation(skeletonData);
 	node->autorelease();
@@ -145,6 +141,10 @@ void CCSkeletonAnimation::clearAnimation () {
 
 void CCSkeletonAnimation::clearAnimation (int trackIndex) {
 	AnimationState_clearTrack(state, trackIndex);
+}
+
+void CCSkeletonAnimation::onAnimationStateEvent (int trackIndex, EventType type, Event* event, int loopCount) {
+	if (listenerInstance) (listenerInstance->*listenerMethod)(this, trackIndex, type, event, loopCount);
 }
 
 }
