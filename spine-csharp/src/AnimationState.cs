@@ -40,8 +40,10 @@ namespace Spine {
 		private AnimationStateData data;
 		private List<TrackEntry> tracks = new List<TrackEntry>();
 		private List<Event> events = new List<Event>();
+		private float timeScale = 1;
 
 		public AnimationStateData Data { get { return data; } }
+		public float TimeScale { get { return timeScale; } set { timeScale = value; } }
 
 		public event EventHandler<StartEndArgs> Start;
 		public event EventHandler<StartEndArgs> End;
@@ -58,6 +60,7 @@ namespace Spine {
 				TrackEntry current = tracks[i];
 				if (current == null) continue;
 
+				delta *= timeScale * current.timeScale;
 				float time = current.time + delta;
 				float endTime = current.endTime;
 
@@ -264,21 +267,16 @@ namespace Spine {
 		internal TrackEntry next, previous;
 		internal Animation animation;
 		internal bool loop;
-		internal float delay, time, lastTime, endTime;
+		internal float delay, time, lastTime, endTime, timeScale = 1;
 		internal float mixTime, mixDuration;
 
 		public Animation Animation { get { return animation; } }
-		public bool Loop { get { return loop; } set { loop = value; } }
 		public float Delay { get { return delay; } set { delay = value; } }
-		public float EndTime { get { return EndTime; } set { EndTime = value; } }
-
-		public float Time {
-			get { return time; }
-			set {
-				time = value;
-				if (lastTime < value) lastTime = value;
-			}
-		}
+		public float Time { get { return time; } set { time = value; } }
+		public float LastTime { get { return lastTime; } set { lastTime = value; } }
+		public float EndTime { get { return endTime; } set { endTime = value; } }
+		public float TimeScale { get { return timeScale; } set { timeScale = value; } }
+		public bool Loop { get { return loop; } set { loop = value; } }
 
 		public event EventHandler<StartEndArgs> Start;
 		public event EventHandler<StartEndArgs> End;

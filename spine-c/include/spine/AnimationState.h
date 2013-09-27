@@ -55,19 +55,19 @@ struct TrackEntry {
 	TrackEntry* previous;
 	Animation* animation;
 	int/*bool*/loop;
-	float delay, time, lastTime, endTime;
+	float delay, time, lastTime, endTime, timeScale;
 	AnimationStateListener listener;
 	float mixTime, mixDuration;
 };
 
 struct AnimationState {
 	AnimationStateData* const data;
+	float timeScale;
+	AnimationStateListener listener;
+	void* context;
 
 	int trackCount;
 	TrackEntry** tracks;
-
-	AnimationStateListener listener;
-	void* context;
 };
 
 /* @param data May be 0 for no mixing. */

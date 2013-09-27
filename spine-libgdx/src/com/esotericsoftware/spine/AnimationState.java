@@ -43,6 +43,7 @@ public class AnimationState {
 	private Array<TrackEntry> tracks = new Array();
 	private final Array<Event> events = new Array();
 	private final Array<AnimationStateListener> listeners = new Array();
+	private float timeScale;
 
 	public AnimationState (AnimationStateData data) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -54,6 +55,7 @@ public class AnimationState {
 			TrackEntry current = tracks.get(i);
 			if (current == null) continue;
 
+			delta *= timeScale * current.timeScale;
 			float time = current.time + delta;
 			float endTime = current.endTime;
 
@@ -253,6 +255,14 @@ public class AnimationState {
 		listeners.removeValue(listener, true);
 	}
 
+	public float getTimeScale () {
+		return timeScale;
+	}
+
+	public void setTimeScale (float timeScale) {
+		this.timeScale = timeScale;
+	}
+
 	public AnimationStateData getData () {
 		return data;
 	}
@@ -273,14 +283,15 @@ public class AnimationState {
 		TrackEntry next, previous;
 		Animation animation;
 		boolean loop;
-		float delay, time, lastTime, endTime;
-		AnimationStateListener listener;
+		float delay, time, lastTime, endTime, timeScale = 1;
 		float mixTime, mixDuration;
+		AnimationStateListener listener;
 
 		public void reset () {
 			animation = null;
 			listener = null;
 			next = null;
+			timeScale = 1;
 		}
 
 		public Animation getAnimation () {
@@ -337,6 +348,14 @@ public class AnimationState {
 
 		public void setLastTime (float lastTime) {
 			this.lastTime = lastTime;
+		}
+
+		public float getTimeScale () {
+			return timeScale;
+		}
+
+		public void setTimeScale (float timeScale) {
+			this.timeScale = timeScale;
 		}
 
 		public TrackEntry getNext () {

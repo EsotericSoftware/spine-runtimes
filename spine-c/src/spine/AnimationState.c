@@ -43,6 +43,7 @@
 
 TrackEntry* _TrackEntry_create () {
 	TrackEntry* entry = NEW(TrackEntry);
+	entry->timeScale = 1;
 	return entry;
 }
 
@@ -71,6 +72,7 @@ AnimationState* AnimationState_create (AnimationStateData* data) {
 	_AnimationState* internal = NEW(_AnimationState);
 	AnimationState* self = SUPER(internal);
 	internal->events = MALLOC(Event*, 64);
+	self->timeScale = 1;
 	CONST_CAST(AnimationStateData*, self->data) = data;
 	return self;
 }
@@ -89,6 +91,7 @@ void AnimationState_update (AnimationState* self, float delta) {
 		TrackEntry* current = self->tracks[i];
 		if (!current) continue;
 
+		delta *= self->timeScale * current->timeScale;
 		time = current->time + delta;
 		endTime = current->endTime;
 
