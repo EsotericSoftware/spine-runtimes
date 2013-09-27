@@ -158,10 +158,10 @@ void CCSkeleton::draw () {
 			}
 		}
 		textureAtlas = regionTextureAtlas;
-		if (textureAtlas->getCapacity() == textureAtlas->getTotalQuads() &&
-			!textureAtlas->resizeCapacity(textureAtlas->getCapacity() * 2)) return;
+		int quadCount = textureAtlas->getTotalQuads();
+		if (textureAtlas->getCapacity() == quadCount && !textureAtlas->resizeCapacity(textureAtlas->getCapacity() * 2)) return;
 		RegionAttachment_updateQuad(attachment, slot, &quad, premultipliedAlpha);
-		textureAtlas->updateQuad(&quad, textureAtlas->getTotalQuads());
+		textureAtlas->updateQuad(&quad, quadCount);
 	}
 	if (textureAtlas) {
 		textureAtlas->drawQuads();

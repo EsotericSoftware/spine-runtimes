@@ -223,7 +223,7 @@ TrackEntry* AnimationState_setAnimation (AnimationState* self, int trackIndex, A
 	entry->animation = animation;
 	entry->loop = loop;
 	entry->time = 0;
-	entry->endTime = animation->duration;
+	entry->endTime = animation ? animation->duration : 0;
 	_AnimationState_setCurrent(self, trackIndex, entry);
 	return entry;
 }

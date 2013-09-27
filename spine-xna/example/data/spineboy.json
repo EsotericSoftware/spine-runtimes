@@ -119,7 +119,7 @@
 	}
 },
 "events": {
-	"behind": {},
+	"behind": { "int": 4 },
 	"headAttach": {},
 	"headPop": {}
 },

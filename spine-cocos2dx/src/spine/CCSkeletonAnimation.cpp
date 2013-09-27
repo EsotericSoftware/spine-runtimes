@@ -42,6 +42,10 @@ using std::vector;
 
 namespace spine {
 
+static void callback (AnimationState* state, int trackIndex, EventType type, Event* event, int loopCount) {
+	((CCSkeletonAnimation*)state->context)->onAnimationStateEvent(trackIndex, type, event, loopCount);
+}
+
 CCSkeletonAnimation* CCSkeletonAnimation::createWithData (SkeletonData* skeletonData) {
 	CCSkeletonAnimation* node = new CCSkeletonAnimation(skeletonData);
 	node->autorelease();
@@ -61,7 +65,12 @@ CCSkeletonAnimation* CCSkeletonAnimation::createWithFile (const char* skeletonDa
 }
 
 void CCSkeletonAnimation::initialize () {
+	listenerInstance = 0;
+	listenerMethod = 0;
+
 	state = AnimationState_create(AnimationStateData_create(skeleton->data));
+	state->context = this;
+	state->listener = callback;
 }
 
 CCSkeletonAnimation::CCSkeletonAnimation (SkeletonData *skeletonData)
@@ -101,10 +110,17 @@ void CCSkeletonAnimation::setAnimationStateData (AnimationStateData* stateData) 
 
 	ownsAnimationStateData = true;
 	state = AnimationState_create(stateData);
+	state->context = this;
+	state->listener = callback;
 }
 
 void CCSkeletonAnimation::setMix (const char* fromAnimation, const char* toAnimation, float duration) {
 	AnimationStateData_setMixByName(state->data, fromAnimation, toAnimation, duration);
+}
+
+void CCSkeletonAnimation::setAnimationListener (CCObject* instance, SEL_AnimationStateEvent method) {
+	listenerInstance = instance;
+	listenerMethod = method;
 }
 
 TrackEntry* CCSkeletonAnimation::setAnimation (int trackIndex, const char* name, bool loop) {
@@ -125,6 +141,10 @@ void CCSkeletonAnimation::clearAnimation () {
 
 void CCSkeletonAnimation::clearAnimation (int trackIndex) {
 	AnimationState_clearTrack(state, trackIndex);
+}
+
+void CCSkeletonAnimation::onAnimationStateEvent (int trackIndex, EventType type, Event* event, int loopCount) {
+	if (listenerInstance) (listenerInstance->*listenerMethod)(this, trackIndex, type, event, loopCount);
 }
 
 }

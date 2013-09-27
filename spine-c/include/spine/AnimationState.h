@@ -67,6 +67,7 @@ struct AnimationState {
 	TrackEntry** tracks;
 
 	AnimationStateListener listener;
+	void* context;
 };
 
 /* @param data May be 0 for no mixing. */
