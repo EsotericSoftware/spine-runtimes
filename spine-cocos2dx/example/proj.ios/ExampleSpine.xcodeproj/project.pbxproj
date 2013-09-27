@@ -16,6 +16,9 @@
 		2FEE8527170030A20013E4C9 /* AppDelegate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FEE8522170030A20013E4C9 /* AppDelegate.cpp */; };
 		2FEE8528170030A20013E4C9 /* ExampleLayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FEE8525170030A20013E4C9 /* ExampleLayer.cpp */; };
 		4319B8781700D68D00C1D7A9 /* libcocos2dx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4319B8771700D66C00C1D7A9 /* libcocos2dx.a */; };
+		4374AF8A17F58AD100401ACE /* BoundingBoxAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 4374AF8717F58AD100401ACE /* BoundingBoxAttachment.c */; };
+		4374AF8B17F58AD100401ACE /* Event.c in Sources */ = {isa = PBXBuildFile; fileRef = 4374AF8817F58AD100401ACE /* Event.c */; };
+		4374AF8C17F58AD100401ACE /* EventData.c in Sources */ = {isa = PBXBuildFile; fileRef = 4374AF8917F58AD100401ACE /* EventData.c */; };
 		437E40F41739397500F85A9E /* CCSkeleton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 437E40F01739397500F85A9E /* CCSkeleton.cpp */; };
 		437E40F51739397500F85A9E /* CCSkeletonAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 437E40F21739397500F85A9E /* CCSkeletonAnimation.cpp */; };
 		43BFBDE3170A709000ECBACB /* Animation.c in Sources */ = {isa = PBXBuildFile; fileRef = 43BFBDD0170A709000ECBACB /* Animation.c */; };
@@ -77,6 +80,12 @@
 		2FEE8525170030A20013E4C9 /* ExampleLayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ExampleLayer.cpp; sourceTree = "<group>"; };
 		2FEE8526170030A20013E4C9 /* ExampleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExampleLayer.h; sourceTree = "<group>"; };
 		4319B86F1700D66C00C1D7A9 /* cocos2dx.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = cocos2dx.xcodeproj; path = ../../cocos2dx/proj.ios/cocos2dx.xcodeproj; sourceTree = "<group>"; };
+		4374AF8417F58AC000401ACE /* BoundingBoxAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BoundingBoxAttachment.h; path = "../../../spine-c/include/spine/BoundingBoxAttachment.h"; sourceTree = "<group>"; };
+		4374AF8517F58AC000401ACE /* Event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Event.h; path = "../../../spine-c/include/spine/Event.h"; sourceTree = "<group>"; };
+		4374AF8617F58AC000401ACE /* EventData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EventData.h; path = "../../../spine-c/include/spine/EventData.h"; sourceTree = "<group>"; };
+		4374AF8717F58AD100401ACE /* BoundingBoxAttachment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = BoundingBoxAttachment.c; path = "../../../spine-c/src/spine/BoundingBoxAttachment.c"; sourceTree = "<group>"; };
+		4374AF8817F58AD100401ACE /* Event.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Event.c; path = "../../../spine-c/src/spine/Event.c"; sourceTree = "<group>"; };
+		4374AF8917F58AD100401ACE /* EventData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = EventData.c; path = "../../../spine-c/src/spine/EventData.c"; sourceTree = "<group>"; };
 		437E40F01739397500F85A9E /* CCSkeleton.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CCSkeleton.cpp; path = ../../src/spine/CCSkeleton.cpp; sourceTree = "<group>"; };
 		437E40F11739397500F85A9E /* CCSkeleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCSkeleton.h; path = ../../src/spine/CCSkeleton.h; sourceTree = "<group>"; };
 		437E40F21739397500F85A9E /* CCSkeletonAnimation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CCSkeletonAnimation.cpp; path = ../../src/spine/CCSkeletonAnimation.cpp; sourceTree = "<group>"; };
@@ -219,6 +228,12 @@
 				43BFBDFC170A70A300ECBACB /* Bone.h */,
 				43BFBDD8170A709000ECBACB /* BoneData.c */,
 				43BFBDFD170A70A300ECBACB /* BoneData.h */,
+				4374AF8717F58AD100401ACE /* BoundingBoxAttachment.c */,
+				4374AF8417F58AC000401ACE /* BoundingBoxAttachment.h */,
+				4374AF8817F58AD100401ACE /* Event.c */,
+				4374AF8517F58AC000401ACE /* Event.h */,
+				4374AF8917F58AD100401ACE /* EventData.c */,
+				4374AF8617F58AC000401ACE /* EventData.h */,
 				43BFBDD9170A709000ECBACB /* extension.c */,
 				43BFBDFE170A70A300ECBACB /* extension.h */,
 				43BFBDDA170A709000ECBACB /* Json.c */,
@@ -422,6 +437,9 @@
 				43BFBE09170A70C800ECBACB /* spine-cocos2dx.cpp in Sources */,
 				437E40F41739397500F85A9E /* CCSkeleton.cpp in Sources */,
 				437E40F51739397500F85A9E /* CCSkeletonAnimation.cpp in Sources */,
+				4374AF8A17F58AD100401ACE /* BoundingBoxAttachment.c in Sources */,
+				4374AF8B17F58AD100401ACE /* Event.c in Sources */,
+				4374AF8C17F58AD100401ACE /* EventData.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
