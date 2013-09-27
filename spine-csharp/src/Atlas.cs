@@ -175,7 +175,7 @@ namespace Spine {
 			return line.Substring(colon + 1).Trim();
 		}
 
-		/** Returns the number of tuple values read (2 or 4). */
+		/// <summary>Returns the number of tuple values read (2 or 4).</summary>
 		static int readTuple (TextReader reader, String[] tuple) {
 			String line = reader.ReadLine();
 			int colon = line.IndexOf(':');
@@ -194,9 +194,9 @@ namespace Spine {
 			return i + 1;
 		}
 
-		/** Returns the first region found with the specified name. This method uses string comparison to find the region, so the result
-		 * should be cached rather than calling this method multiple times.
-		 * @return The region, or null. */
+		/// <summary>Returns the first region found with the specified name. This method uses string comparison to find the region, so the result
+		/// should be cached rather than calling this method multiple times.</summary>
+		/// <returns>The region, or null.</returns>
 		public AtlasRegion FindRegion (String name) {
 			for (int i = 0, n = regions.Count; i < n; i++)
 				if (regions[i].name == name) return regions[i];

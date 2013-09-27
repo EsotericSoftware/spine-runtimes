@@ -35,7 +35,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Spine {
-	/** Stores attachments by slot index and attachment name. */
+	/// <summary>Stores attachments by slot index and attachment name.</summary>
 	public class Skin {
 		internal String name;
 
@@ -52,7 +52,7 @@ namespace Spine {
 			attachments.Add(new KeyValuePair<int, String>(slotIndex, name), attachment);
 		}
 
-		/** @return May be null. */
+		/// <returns>May be null.</returns>
 		public Attachment GetAttachment (int slotIndex, String name) {
 			Attachment attachment;
 			attachments.TryGetValue(new KeyValuePair<int, String>(slotIndex, name), out attachment);
@@ -75,7 +75,7 @@ namespace Spine {
 			return name;
 		}
 
-		/** Attach all attachments from this skin if the corresponding attachment from the old skin is currently attached. */
+		/// <summary>Attach all attachments from this skin if the corresponding attachment from the old skin is currently attached.</summary>
 		internal void AttachAll (Skeleton skeleton, Skin oldSkin) {
 			foreach (KeyValuePair<KeyValuePair<int, String>, Attachment> entry in oldSkin.attachments) {
 				int slotIndex = entry.Key.Key;

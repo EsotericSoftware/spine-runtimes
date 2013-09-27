@@ -52,14 +52,14 @@ namespace Spine {
 			this.duration = duration;
 		}
 
-		/** @deprecated */
+		[Obsolete]
 		public void Apply (Skeleton skeleton, float time, bool loop) {
 			Apply(skeleton, time, time, loop, null);
 		}
 
-		/** Poses the skeleton at the specified time for this animation.
-		 * @param lastTime The last time the animation was applied. Can be equal to time if events shouldn't be fired.
-		 * @param events Any triggered events are added. May be null if lastTime is known to not cause any events to trigger. */
+		/// <summary>Poses the skeleton at the specified time for this animation.</summary>
+		/// <param name="lastTime The last time the animation was applied. Can be equal to time if events shouldn't be fired.</param>
+		/// <param name="events Any triggered events are added. May be null if lastTime is known to not cause any events to trigger.</param>
 		public void Apply (Skeleton skeleton, float lastTime, float time, bool loop, List<Event> events) {
 			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
 
@@ -73,15 +73,15 @@ namespace Spine {
 				timelines[i].Apply(skeleton, lastTime, time, events, 1);
 		}
 
-		/** @deprecated */
+		[Obsolete] 
 		public void Mix (Skeleton skeleton, float time, bool loop, float alpha) {
 			Mix(skeleton, time, time, loop, null, alpha);
 		}
 
-		/** Poses the skeleton at the specified time for this animation mixed with the current pose.
-		 * @param lastTime The last time the animation was applied. Can be equal to time if events shouldn't be fired.
-		 * @param events Any triggered events are added. May be null if lastTime is known to not cause any events to trigger.
-		 * @param alpha The amount of this animation that affects the current pose. */
+		/// <summary>Poses the skeleton at the specified time for this animation mixed with the current pose.</summary>
+		/// <param name="lastTime The last time the animation was applied. Can be equal to time if events shouldn't be fired.</param>
+		/// <param name="events Any triggered events are added. May be null if lastTime is known to not cause any events to trigger.</param>
+		/// <param name="alpha The amount of this animation that affects the current pose.</param>
 		public void Mix (Skeleton skeleton, float lastTime, float time, bool loop, List<Event> events, float alpha) {
 			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
 
@@ -95,7 +95,7 @@ namespace Spine {
 				timelines[i].Apply(skeleton, lastTime, time, events, alpha);
 		}
 
-		/** @param target After the first and before the last entry. */
+		/// <param name="target">After the first and before the last entry.</param>
 		internal static int binarySearch (float[] values, float target, int step) {
 			int low = 0;
 			int high = values.Length / step - 2;
@@ -119,11 +119,11 @@ namespace Spine {
 	}
 
 	public interface Timeline {
-		/** Sets the value(s) for the specified time. */
+		/// <summary>Sets the value(s) for the specified time.</summary>
 		void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha);
 	}
 
-	/** Base class for frames that use an interpolation bezier curve. */
+	/// <summary>Base class for frames that use an interpolation bezier curve.</summary>
 	abstract public class CurveTimeline : Timeline {
 		static protected float LINEAR = 0;
 		static protected float STEPPED = -1;
@@ -146,9 +146,9 @@ namespace Spine {
 			curves[frameIndex * 6] = STEPPED;
 		}
 
-		/** Sets the control handle positions for an interpolation bezier curve used to transition from this keyframe to the next.
-	 * cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of
-	 * the difference between the keyframe's values. */
+		/// <summary>Sets the control handle positions for an interpolation bezier curve used to transition from this keyframe to the next.
+	   /// cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of
+		/// the difference between the keyframe's values.</summary>
 		public void SetCurve (int frameIndex, float cx1, float cy1, float cx2, float cy2) {
 			float subdiv_step = 1f / BEZIER_SEGMENTS;
 			float subdiv_step2 = subdiv_step * subdiv_step;
@@ -218,7 +218,7 @@ namespace Spine {
 			frames = new float[frameCount * 2];
 		}
 
-		/** Sets the time and value of the specified keyframe. */
+		/// <summary>Sets the time and value of the specified keyframe.</summary>
 		public void SetFrame (int frameIndex, float time, float angle) {
 			frameIndex *= 2;
 			frames[frameIndex] = time;
@@ -280,7 +280,7 @@ namespace Spine {
 			frames = new float[frameCount * 3];
 		}
 
-		/** Sets the time and value of the specified keyframe. */
+		/// <summary>Sets the time and value of the specified keyframe.</summary>
 		public void SetFrame (int frameIndex, float time, float x, float y) {
 			frameIndex *= 3;
 			frames[frameIndex] = time;
@@ -360,7 +360,7 @@ namespace Spine {
 			frames = new float[frameCount * 5];
 		}
 
-		/** Sets the time and value of the specified keyframe. */
+		/// <summary>Sets the time and value of the specified keyframe.</summary>
 		public void setFrame (int frameIndex, float time, float r, float g, float b, float a) {
 			frameIndex *= 5;
 			frames[frameIndex] = time;
@@ -428,7 +428,7 @@ namespace Spine {
 			attachmentNames = new String[frameCount];
 		}
 
-		/** Sets the time and value of the specified keyframe. */
+		/// <summary>Sets the time and value of the specified keyframe.</summary>
 		public void setFrame (int frameIndex, float time, String attachmentName) {
 			frames[frameIndex] = time;
 			attachmentNames[frameIndex] = attachmentName;
@@ -463,7 +463,7 @@ namespace Spine {
 			events = new Event[frameCount];
 		}
 
-		/** Sets the time and value of the specified keyframe. */
+		/// <summary>Sets the time and value of the specified keyframe.</summary>
 		public void setFrame (int frameIndex, float time, Event e) {
 			frames[frameIndex] = time;
 			events[frameIndex] = e;
@@ -513,8 +513,8 @@ namespace Spine {
 			drawOrders = new int[frameCount][];
 		}
 
-		/** Sets the time and value of the specified keyframe.
-		 * @param drawOrder May be null to use bind pose draw order. */
+		/// <summary>Sets the time and value of the specified keyframe.</summary>
+		/// <param name="drawOrder">May be null to use bind pose draw order.</param>
 		public void setFrame (int frameIndex, float time, int[] drawOrder) {
 			frames[frameIndex] = time;
 			drawOrders[frameIndex] = drawOrder;

@@ -87,7 +87,7 @@ namespace Spine {
 			}
 		}
 
-		/** Updates the world transform for each bone. */
+		/// <summary>Updates the world transform for each bone.</summary>
 		public void UpdateWorldTransform () {
 			bool flipX = this.flipX;
 			bool flipY = this.flipY;
@@ -96,7 +96,7 @@ namespace Spine {
 				bones[i].UpdateWorldTransform(flipX, flipY);
 		}
 
-		/** Sets the bones and slots to their setup pose values. */
+		/// <summary>Sets the bones and slots to their setup pose values.</summary>
 		public void SetToSetupPose () {
 			SetBonesToSetupPose();
 			SetSlotsToSetupPose();
@@ -116,7 +116,7 @@ namespace Spine {
 				slots[i].SetToSetupPose(i);
 		}
 
-		/** @return May be null. */
+		/// <returns>May be null.</returns>
 		public Bone FindBone (String boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName cannot be null.");
 			List<Bone> bones = this.bones;
@@ -127,7 +127,7 @@ namespace Spine {
 			return null;
 		}
 
-		/** @return -1 if the bone was not found. */
+		/// <returns>-1 if the bone was not found.</returns>
 		public int FindBoneIndex (String boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName cannot be null.");
 			List<Bone> bones = this.bones;
@@ -136,7 +136,7 @@ namespace Spine {
 			return -1;
 		}
 
-		/** @return May be null. */
+		/// <returns>May be null.</returns>
 		public Slot FindSlot (String slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
 			List<Slot> slots = this.slots;
@@ -147,7 +147,7 @@ namespace Spine {
 			return null;
 		}
 
-		/** @return -1 if the bone was not found. */
+		/// <returns>-1 if the bone was not found.</returns>
 		public int FindSlotIndex (String slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
 			List<Slot> slots = this.slots;
@@ -156,28 +156,27 @@ namespace Spine {
 			return -1;
 		}
 
-		/** Sets a skin by name.
-		 * @see #setSkin(Skin) */
+		/// <summary>Sets a skin by name (see setSkin).</summary>
 		public void SetSkin (String skinName) {
 			Skin skin = data.FindSkin(skinName);
 			if (skin == null) throw new ArgumentException("Skin not found: " + skinName);
 			SetSkin(skin);
 		}
 
-		/** Sets the skin used to look up attachments not found in the {@link SkeletonData#getDefaultSkin() default skin}. Attachments
-	 * from the new skin are attached if the corresponding attachment from the old skin was attached.
-	 * @param newSkin May be null. */
+		/// <summary>Sets the skin used to look up attachments not found in the {@link SkeletonData#getDefaultSkin() default skin}. Attachments
+		/// from the new skin are attached if the corresponding attachment from the old skin was attached.</summary>
+		/// <param name="newSkin">May be null.</param>
 		public void SetSkin (Skin newSkin) {
 			if (skin != null && newSkin != null) newSkin.AttachAll(this, skin);
 			skin = newSkin;
 		}
 
-		/** @return May be null. */
+		/// <returns>May be null.</returns>
 		public Attachment GetAttachment (String slotName, String attachmentName) {
 			return GetAttachment(data.FindSlotIndex(slotName), attachmentName);
 		}
 
-		/** @return May be null. */
+		/// <returns>May be null.</returns>
 		public Attachment GetAttachment (int slotIndex, String attachmentName) {
 			if (attachmentName == null) throw new ArgumentNullException("attachmentName cannot be null.");
 			if (skin != null) {
@@ -188,7 +187,7 @@ namespace Spine {
 			return null;
 		}
 
-		/** @param attachmentName May be null. */
+		/// <param name="attachmentName">May be null.</param>
 		public void SetAttachment (String slotName, String attachmentName) {
 			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
 			List<Slot> slots = this.slots;

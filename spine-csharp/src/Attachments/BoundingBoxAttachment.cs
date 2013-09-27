@@ -34,7 +34,7 @@
 using System;
 
 namespace Spine {
-	/** Attachment that has a polygon for bounds checking. */
+	/// <summary>Attachment that has a polygon for bounds checking.</summary>
 	public class BoundingBoxAttachment : Attachment {
 		public float[] Vertices { get; set; }
 
@@ -42,7 +42,7 @@ namespace Spine {
 			: base(name) {
 		}
 
-		/** @param worldVertices Must have at least the same length as this attachment's vertices. */
+		/// <param name="worldVertices">Must have at least the same length as this attachment's vertices.</param>
 		public void ComputeWorldVertices (float x, float y, Bone bone, float[] worldVertices) {
 			x += bone.worldX;
 			y += bone.worldY;

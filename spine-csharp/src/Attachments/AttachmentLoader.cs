@@ -35,7 +35,7 @@ using System;
 
 namespace Spine {
 	public interface AttachmentLoader {
-		/** @return May be null to not load any attachment. */
+		/// <return>May be null to not load any attachment.</return>
 		Attachment NewAttachment (Skin skin, AttachmentType type, String name);
 	}
 }
