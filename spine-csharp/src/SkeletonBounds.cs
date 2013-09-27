@@ -111,12 +111,24 @@ namespace Spine {
 		}
 
 
-		/** Returns true if the axis aligned bounding box contains the point. */
+		/// <summary>
+		/// Returns true if the axis aligned bounding box contains the point.
+		/// </summary>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <returns> true if the axis aligned bounding box contains the point.</returns>
 		public bool AabbContainsPoint (float x, float y) {
 			return x >= minX && x <= maxX && y >= minY && y <= maxY;
 		}
 
-		/** Returns true if the axis aligned bounding box intersects the line segment. */
+		/// <summary>
+		/// Returns true if the axis aligned bounding box intersects the line segment.
+		/// </summary>
+		/// <param name="x1"></param>
+		/// <param name="y1"></param>
+		/// <param name="x2"></param>
+		/// <param name="y2"></param>
+		/// <returns></returns>
 		public bool AabbIntersectsSegment (float x1, float y1, float x2, float y2) {
 			float minX = this.minX;
 			float minY = this.minY;
@@ -136,12 +148,22 @@ namespace Spine {
 			return false;
 		}
 
-		/** Returns true if the axis aligned bounding box intersects the axis aligned bounding box of the specified bounds. */
+		/// <summary>
+		/// Returns true if the axis aligned bounding box intersects the axis aligned bounding box of the specified bounds.
+		/// </summary>
+		/// <param name="bounds"></param>
+		/// <returns></returns>
 		public bool AabbIntersectsSkeleton (SkeletonBounds bounds) {
 			return minX < bounds.maxX && maxX > bounds.minX && minY < bounds.maxY && maxY > bounds.minY;
 		}
 
-		/** Returns true if the polygon contains the point. */
+		/// <summary>
+		///  Returns true if the polygon contains the point.
+		/// </summary>
+		/// <param name="polygon"></param>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <returns></returns>
 		public bool ContainsPoint (Polygon polygon, float x, float y) {
 			float[] vertices = polygon.Vertices;
 			int nn = polygon.Count;
@@ -160,8 +182,13 @@ namespace Spine {
 			return inside;
 		}
 
-		/** Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
-		 * efficient to only call this method if {@link #aabbContainsPoint(float, float)} returns true. */
+		 /// <summary>
+		 /// Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
+		 /// efficient to only call this method if {@link #aabbContainsPoint(float, float)} returns true. 
+		 /// </summary>
+		 /// <param name="x"></param>
+		 /// <param name="y"></param>
+		 /// <returns></returns>
 		public BoundingBoxAttachment ContainsPoint (float x, float y) {
 			List<Polygon> polygons = Polygons;
 			for (int i = 0, n = polygons.Count; i < n; i++)
@@ -169,8 +196,15 @@ namespace Spine {
 			return null;
 		}
 
-		/** Returns the first bounding box attachment that contains the line segment, or null. When doing many checks, it is usually
-		 * more efficient to only call this method if {@link #aabbIntersectsSegment(float, float, float, float)} returns true. */
+		/// <summary>
+		/// Returns the first bounding box attachment that contains the line segment, or null. When doing many checks, it is usually
+		/// more efficient to only call this method if {@link #aabbIntersectsSegment(float, float, float, float)} returns true. 
+		/// </summary>
+		/// <param name="x1"></param>
+		/// <param name="y1"></param>
+		/// <param name="x2"></param>
+		/// <param name="y2"></param>
+		/// <returns></returns>
 		public BoundingBoxAttachment IntersectsSegment (float x1, float y1, float x2, float y2) {
 			List<Polygon> polygons = Polygons;
 			for (int i = 0, n = polygons.Count; i < n; i++)
@@ -178,7 +212,15 @@ namespace Spine {
 			return null;
 		}
 
-		/** Returns true if the polygon contains the line segment. */
+		/// <summary>
+		/// Returns true if the polygon contains the line segment. 
+		/// </summary>
+		/// <param name="polygon"></param>
+		/// <param name="x1"></param>
+		/// <param name="y1"></param>
+		/// <param name="x2"></param>
+		/// <param name="y2"></param>
+		/// <returns></returns>
 		public bool IntersectsSegment (Polygon polygon, float x1, float y1, float x2, float y2) {
 			float[] vertices = polygon.Vertices;
 			int nn = polygon.Count;

@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package>
+    <metadata>
+        <id>SpineRuntimeCSharp</id>
+        <version>0.1.0.0</version>
+        <title>Spine runtime c#</title>
+        <authors>@silverspoon</authors>
+        <owners />
+        <projectUrl>https://github.com/Andrea/spine-runtimes.git</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Spine runtime c#</description>
+        <language>en-IE</language>
+    </metadata>    
+    <files>
+        <file src="spine-csharp\bin\Release\spine-csharp.dll" target="lib\net40\spine-csharp.dll" />                
+    </files>
+</package>

@@ -48,7 +48,9 @@ namespace Spine {
 		public List<BoneData> Bones { get { return bones; } } // Ordered parents first.
 		public List<SlotData> Slots { get { return slots; } } // Setup pose draw order.
 		public List<Skin> Skins { get { return skins; } set { skins = value; } }
-		/** May be null. */
+		/// <summary>
+		///  May be null. 
+		/// </summary>
 		public Skin DefaultSkin { get { return defaultSkin; } set { defaultSkin = value; } }
 		public List<EventData> Events { get { return events; } set { events = value; } }
 		public List<Animation> Animations { get { return animations; } set { animations = value; } }
@@ -61,7 +63,11 @@ namespace Spine {
 		}
 
 
-		/** @return May be null. */
+		/// <summary>
+		///  
+		/// </summary>
+		/// <param name="boneName"></param>
+		/// <returns> May be null. </returns>
 		public BoneData FindBone (String boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName cannot be null.");
 			List<BoneData> bones = this.bones;
@@ -72,7 +78,11 @@ namespace Spine {
 			return null;
 		}
 
-		/** @return -1 if the bone was not found. */
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="boneName"></param>
+		/// <returns>-1 if the bone was not found.</returns>
 		public int FindBoneIndex (String boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName cannot be null.");
 			List<BoneData> bones = this.bones;
@@ -88,7 +98,11 @@ namespace Spine {
 			slots.Add(slot);
 		}
 
-		/** @return May be null. */
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="slotName"></param>
+		/// <returns>-1 if the bone was not found.</returns>
 		public SlotData FindSlot (String slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
 			List<SlotData> slots = this.slots;
@@ -99,7 +113,11 @@ namespace Spine {
 			return null;
 		}
 
-		/** @return -1 if the bone was not found. */
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="slotName"></param>
+		/// <returns>-1 if not found</returns>
 		public int FindSlotIndex (String slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
 			List<SlotData> slots = this.slots;
@@ -115,7 +133,11 @@ namespace Spine {
 			skins.Add(skin);
 		}
 
-		/** @return May be null. */
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="skinName"></param>
+		/// <returns>May be null</returns>
 		public Skin FindSkin (String skinName) {
 			if (skinName == null) throw new ArgumentNullException("skinName cannot be null.");
 			foreach (Skin skin in skins)
@@ -130,7 +152,11 @@ namespace Spine {
 			events.Add(eventData);
 		}
 
-		/** @return May be null. */
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="eventDataName"></param>
+		/// <returns>May be null</returns>
 		public EventData findEvent (String eventDataName) {
 			if (eventDataName == null) throw new ArgumentNullException("eventDataName cannot be null.");
 			foreach (EventData eventData in events)
@@ -145,7 +171,11 @@ namespace Spine {
 			animations.Add(animation);
 		}
 
-		/** @return May be null. */
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="animationName"></param>
+		/// <returns> May be null. </returns>
 		public Animation FindAnimation (String animationName) {
 			if (animationName == null) throw new ArgumentNullException("animationName cannot be null.");
 			List<Animation> animations = this.animations;
