@@ -56,18 +56,19 @@ namespace Spine {
 		}
 
 		public void Update (float delta) {
+			delta *= timeScale;
 			for (int i = 0, n = tracks.Count; i < n; i++) {
 				TrackEntry current = tracks[i];
 				if (current == null) continue;
 
-				delta *= timeScale * current.timeScale;
-				float time = current.time + delta;
+				float trackDelta = delta * current.timeScale;
+				float time = current.time + trackDelta;
 				float endTime = current.endTime;
 
 				current.time = time;
 				if (current.previous != null) {
-					current.previous.time += delta;
-					current.mixTime += delta;
+					current.previous.time += trackDelta;
+					current.mixTime += trackDelta;
 				}
 
 				// Check if completed the animation or a loop iteration.

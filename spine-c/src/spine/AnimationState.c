@@ -86,19 +86,20 @@ void AnimationState_dispose (AnimationState* self) {
 
 void AnimationState_update (AnimationState* self, float delta) {
 	int i;
-	float time, endTime;
+	float time, endTime, trackDelta;
+	delta *= self->timeScale;
 	for (i = 0; i < self->trackCount; i++) {
 		TrackEntry* current = self->tracks[i];
 		if (!current) continue;
 
-		delta *= self->timeScale * current->timeScale;
-		time = current->time + delta;
+		trackDelta = delta * current->timeScale;
+		time = current->time + trackDelta;
 		endTime = current->endTime;
 
 		current->time = time;
 		if (current->previous) {
-			current->previous->time += delta;
-			current->mixTime += delta;
+			current->previous->time += trackDelta;
+			current->mixTime += trackDelta;
 		}
 
 		/* Check if completed the animation or a loop iteration. */
