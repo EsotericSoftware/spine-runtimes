@@ -39,7 +39,6 @@
 #include <spine/Skeleton.h>
 #include <spine/SkeletonData.h>
 #include <string.h>
-#include <limits.h>
 
 TrackEntry* _TrackEntry_create () {
 	TrackEntry* entry = NEW(TrackEntry);
@@ -110,11 +109,11 @@ void AnimationState_update (AnimationState* self, float delta) {
 			if (self->listener) self->listener(self, i, ANIMATION_COMPLETE, 0, count);
 		}
 
-		if (current->next && time >= current->next->delay) {
-			if (current->next->animation)
-				_AnimationState_setCurrent(self, i, current->next);
-			else
-				AnimationState_clearTrack(self, i);
+		if (current->next) {
+			if (time >= current->next->delay) _AnimationState_setCurrent(self, i, current->next);
+		} else {
+			/* End non-looping animation when it reaches its end time and there is no next entry. */
+			if (!current->loop && current->lastTime >= current->endTime) AnimationState_clearTrack(self, i);
 		}
 	}
 }
@@ -124,6 +123,7 @@ void AnimationState_apply (AnimationState* self, Skeleton* skeleton) {
 
 	int i, ii;
 	int eventCount;
+	float time;
 	TrackEntry* previous;
 	for (i = 0; i < self->trackCount; i++) {
 		TrackEntry* current = self->tracks[i];
@@ -131,19 +131,26 @@ void AnimationState_apply (AnimationState* self, Skeleton* skeleton) {
 
 		eventCount = 0;
 
+		time = current->time;
+		if (!current->loop && time > current->endTime) time = current->endTime;
+
 		previous = current->previous;
 		if (!previous) {
-			Animation_apply(current->animation, skeleton, current->lastTime, current->time, current->loop, internal->events,
+			Animation_apply(current->animation, skeleton, current->lastTime, time, current->loop, internal->events,
 					&eventCount);
 		} else {
 			float alpha = current->mixTime / current->mixDuration;
-			Animation_apply(previous->animation, skeleton, (float)INT_MAX, previous->time, previous->loop, 0, 0);
+
+			float previousTime = previous->time;
+			if (!previous->loop && previousTime > previous->endTime) previousTime = previous->endTime;
+			Animation_apply(previous->animation, skeleton, previousTime, previousTime, previous->loop, 0, 0);
+
 			if (alpha >= 1) {
 				alpha = 1;
 				_TrackEntry_dispose(current->previous);
 				current->previous = 0;
 			}
-			Animation_mix(current->animation, skeleton, current->lastTime, current->time, current->loop, internal->events,
+			Animation_mix(current->animation, skeleton, current->lastTime, time, current->loop, internal->events,
 					&eventCount, alpha);
 		}
 

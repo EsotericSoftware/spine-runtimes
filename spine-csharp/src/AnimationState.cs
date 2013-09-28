@@ -79,11 +79,11 @@ namespace Spine {
 				}
 
 				TrackEntry next = current.next;
-				if (next != null && time >= next.delay) {
-					if (next.animation != null)
-						SetCurrent(i, next);
-					else
-						Clear(i);
+				if (next != null) {
+					if (time >= next.delay) SetCurrent(i, next);
+				} else {
+					// End non-looping animation when it reaches its end time and there is no next entry.
+					if (!current.loop && current.lastTime >= current.endTime) ClearTrack(i);
 				}
 			}
 		}
@@ -97,17 +97,24 @@ namespace Spine {
 
 				events.Clear();
 
+				float time = current.time;
+				bool loop = current.loop;
+				if (!loop && time > current.endTime) time = current.endTime;
+
 				TrackEntry previous = current.previous;
 				if (previous == null)
-					current.animation.Apply(skeleton, current.lastTime, current.time, current.loop, events);
+					current.animation.Apply(skeleton, current.lastTime, time, loop, events);
 				else {
-					previous.animation.Apply(skeleton, int.MaxValue, previous.time, previous.loop, null);
+					float previousTime = previous.time;
+					if (!previous.loop && previousTime > previous.endTime) previousTime = previous.endTime;
+					previous.animation.Apply(skeleton, previousTime, previousTime, previous.loop, null);
+
 					float alpha = current.mixTime / current.mixDuration;
 					if (alpha >= 1) {
 						alpha = 1;
 						current.previous = null;
 					}
-					current.animation.Mix(skeleton, current.lastTime, current.time, current.loop, events, alpha);
+					current.animation.Mix(skeleton, current.lastTime, time, loop, events, alpha);
 				}
 
 				for (int ii = 0, nn = events.Count; ii < nn; ii++) {
@@ -120,13 +127,13 @@ namespace Spine {
 			}
 		}
 
-		public void Clear () {
+		public void ClearTracks () {
 			for (int i = 0, n = tracks.Count; i < n; i++)
-				Clear(i);
+				ClearTrack(i);
 			tracks.Clear();
 		}
 
-		public void Clear (int trackIndex) {
+		public void ClearTrack (int trackIndex) {
 			if (trackIndex >= tracks.Count) return;
 			TrackEntry current = tracks[trackIndex];
 			if (current == null) return;
@@ -195,7 +202,7 @@ namespace Spine {
 			entry.animation = animation;
 			entry.loop = loop;
 			entry.time = 0;
-			entry.endTime = animation != null ? animation.Duration : 0;
+			entry.endTime = animation.Duration;
 
 			TrackEntry last = ExpandToIndex(trackIndex);
 			if (last != null) {
@@ -206,10 +213,9 @@ namespace Spine {
 				tracks[trackIndex] = entry;
 
 			if (delay <= 0) {
-				if (last != null) {
-					delay += last.endTime;
-					if (animation != null) delay -= data.GetMix(last.animation, animation);
-				} else
+				if (last != null)
+					delay += last.endTime - data.GetMix(last.animation, animation);
+				else
 					delay = 0;
 			}
 			entry.delay = delay;

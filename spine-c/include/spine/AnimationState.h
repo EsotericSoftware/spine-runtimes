@@ -85,8 +85,7 @@ TrackEntry* AnimationState_setAnimationByName (AnimationState* self, int trackIn
 TrackEntry* AnimationState_setAnimation (AnimationState* self, int trackIndex, Animation* animation, int/*bool*/loop);
 
 /** Adds an animation to be played delay seconds after the current or last queued animation, taking into account any mix
- * duration.
- * @param animation May be 0 to queue clearing the AnimationState. */
+ * duration. */
 TrackEntry* AnimationState_addAnimationByName (AnimationState* self, int trackIndex, const char* animationName, int/*bool*/loop,
 		float delay);
 TrackEntry* AnimationState_addAnimation (AnimationState* self, int trackIndex, Animation* animation, int/*bool*/loop,

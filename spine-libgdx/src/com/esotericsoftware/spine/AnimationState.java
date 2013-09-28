@@ -43,7 +43,7 @@ public class AnimationState {
 	private Array<TrackEntry> tracks = new Array();
 	private final Array<Event> events = new Array();
 	private final Array<AnimationStateListener> listeners = new Array();
-	private float timeScale;
+	private float timeScale = 1;
 
 	public AnimationState (AnimationStateData data) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -75,11 +75,11 @@ public class AnimationState {
 			}
 
 			TrackEntry next = current.next;
-			if (next != null && time >= next.delay) {
-				if (next.animation != null)
-					setCurrent(i, next);
-				else
-					clear(i);
+			if (next != null) {
+				if (time >= next.delay) setCurrent(i, next);
+			} else {
+				// End non-looping animation when it reaches its end time and there is no next entry.
+				if (!current.loop && current.lastTime >= current.endTime) clearTrack(i);
 			}
 		}
 	}
@@ -94,18 +94,25 @@ public class AnimationState {
 
 			events.size = 0;
 
+			float time = current.time;
+			boolean loop = current.loop;
+			if (!loop && time > current.endTime) time = current.endTime;
+
 			TrackEntry previous = current.previous;
 			if (previous == null)
-				current.animation.apply(skeleton, current.lastTime, current.time, current.loop, events);
+				current.animation.apply(skeleton, current.lastTime, time, loop, events);
 			else {
-				previous.animation.apply(skeleton, Integer.MAX_VALUE, previous.time, previous.loop, null);
+				float previousTime = previous.time;
+				if (!previous.loop && previousTime > previous.endTime) previousTime = previous.endTime;
+				previous.animation.apply(skeleton, previousTime, previousTime, previous.loop, null);
+
 				float alpha = current.mixTime / current.mixDuration;
 				if (alpha >= 1) {
 					alpha = 1;
 					Pools.free(previous);
 					current.previous = null;
 				}
-				current.animation.mix(skeleton, current.lastTime, current.time, current.loop, events, alpha);
+				current.animation.mix(skeleton, current.lastTime, time, loop, events, alpha);
 			}
 
 			for (int ii = 0, nn = events.size; ii < nn; ii++) {
@@ -119,13 +126,13 @@ public class AnimationState {
 		}
 	}
 
-	public void clear () {
+	public void clearTracks () {
 		for (int i = 0, n = tracks.size; i < n; i++)
-			clear(i);
+			clearTrack(i);
 		tracks.clear();
 	}
 
-	public void clear (int trackIndex) {
+	public void clearTrack (int trackIndex) {
 		if (trackIndex >= tracks.size) return;
 		TrackEntry current = tracks.get(trackIndex);
 		if (current == null) return;
@@ -210,14 +217,13 @@ public class AnimationState {
 	}
 
 	/** Adds an animation to be played delay seconds after the current or last queued animation.
-	 * @param animation May be null to queue clearing the AnimationState.
 	 * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay. */
 	public TrackEntry addAnimation (int trackIndex, Animation animation, boolean loop, float delay) {
 		TrackEntry entry = Pools.obtain(TrackEntry.class);
 		entry.animation = animation;
 		entry.loop = loop;
 		entry.time = 0;
-		entry.endTime = animation != null ? animation.getDuration() : 0;
+		entry.endTime = animation.getDuration();
 
 		TrackEntry last = expandToIndex(trackIndex);
 		if (last != null) {
@@ -228,10 +234,9 @@ public class AnimationState {
 			tracks.set(trackIndex, entry);
 
 		if (delay <= 0) {
-			if (last != null) {
-				delay += last.endTime;
-				if (animation != null) delay -= data.getMix(last.animation, animation);
-			} else
+			if (last != null)
+				delay += last.endTime - data.getMix(last.animation, animation);
+			else
 				delay = 0;
 		}
 		entry.delay = delay;
