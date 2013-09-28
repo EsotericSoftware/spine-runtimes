@@ -150,6 +150,7 @@ void CCSkeleton::draw () {
 		Slot* slot = skeleton->drawOrder[i];
 		if (!slot->attachment || slot->attachment->type != ATTACHMENT_REGION) continue;
 		RegionAttachment* attachment = (RegionAttachment*)slot->attachment;
+		
 		CCTextureAtlas* regionTextureAtlas = getTextureAtlas(attachment);
 		if (regionTextureAtlas != textureAtlas) {
 			if (textureAtlas) {
@@ -158,8 +159,14 @@ void CCSkeleton::draw () {
 			}
 		}
 		textureAtlas = regionTextureAtlas;
+
 		int quadCount = textureAtlas->getTotalQuads();
-		if (textureAtlas->getCapacity() == quadCount && !textureAtlas->resizeCapacity(textureAtlas->getCapacity() * 2)) return;
+		if (textureAtlas->getCapacity() == quadCount) {
+			textureAtlas->drawQuads();
+			textureAtlas->removeAllQuads();
+			if (!textureAtlas->resizeCapacity(textureAtlas->getCapacity() * 2)) return;
+		}
+
 		RegionAttachment_updateQuad(attachment, slot, &quad, premultipliedAlpha);
 		textureAtlas->updateQuad(&quad, quadCount);
 	}
