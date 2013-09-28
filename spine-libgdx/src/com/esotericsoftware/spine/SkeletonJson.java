@@ -197,12 +197,12 @@ public class SkeletonJson {
 
 		} else if (attachment instanceof BoundingBoxAttachment) {
 			BoundingBoxAttachment box = (BoundingBoxAttachment)attachment;
-			JsonValue pointsArray = map.require("vertices");
-			float[] points = new float[pointsArray.size];
+			JsonValue verticesArray = map.require("vertices");
+			float[] vertices = new float[verticesArray.size];
 			int i = 0;
-			for (JsonValue point = pointsArray.child; point != null; point = point.next())
-				points[i++] = point.asFloat();
-			box.setVertices(points);
+			for (JsonValue point = verticesArray.child; point != null; point = point.next())
+				vertices[i++] = point.asFloat() * scale;
+			box.setVertices(vertices);
 		}
 
 		return attachment;

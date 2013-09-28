@@ -464,7 +464,7 @@ SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* jso
 						box->verticesCount = verticesArray->size;
 						box->vertices = MALLOC(float, verticesArray->size);
 						for (vertex = verticesArray->child, i = 0; vertex; vertex = vertex->next, ++i)
-							box->vertices[i] = vertex->valueFloat;
+							box->vertices[i] = vertex->valueFloat * self->scale;
 						break;
 					}
 					}
