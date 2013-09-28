@@ -41,27 +41,27 @@ using Windows.Storage;
 #endif
 
 namespace Spine {
-    public class Atlas {
+	public class Atlas {
 		List<AtlasPage> pages = new List<AtlasPage>();
 		List<AtlasRegion> regions = new List<AtlasRegion>();
 		TextureLoader textureLoader;
 
 #if WINDOWS_STOREAPP
-        private async Task ReadFile(string path, TextureLoader textureLoader) {
-            var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
-            var file = await folder.GetFileAsync(path).AsTask().ConfigureAwait(false);
-            using (var reader = new StreamReader(await file.OpenStreamForReadAsync().ConfigureAwait(false))) {
-                try {
-                    Load(reader, Path.GetDirectoryName(path), textureLoader);
-                } catch (Exception ex) {
-                    throw new Exception("Error reading atlas file: " + path, ex);
-                }
-            }
-        }
+		private async Task ReadFile(string path, TextureLoader textureLoader) {
+			var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
+			var file = await folder.GetFileAsync(path).AsTask().ConfigureAwait(false);
+			using (var reader = new StreamReader(await file.OpenStreamForReadAsync().ConfigureAwait(false))) {
+				try {
+					Load(reader, Path.GetDirectoryName(path), textureLoader);
+				} catch (Exception ex) {
+					throw new Exception("Error reading atlas file: " + path, ex);
+				}
+			}
+		}
 
-        public Atlas(String path, TextureLoader textureLoader) {
-            this.ReadFile(path, textureLoader).Wait();
-        }
+		public Atlas(String path, TextureLoader textureLoader) {
+			this.ReadFile(path, textureLoader).Wait();
+		}
 #else
 		public Atlas (String path, TextureLoader textureLoader) {
 			using (StreamReader reader = new StreamReader(path)) {
@@ -74,8 +74,14 @@ namespace Spine {
 		}
 #endif
 
-        public Atlas (TextReader reader, String dir, TextureLoader textureLoader) {
+		public Atlas (TextReader reader, String dir, TextureLoader textureLoader) {
 			Load(reader, dir, textureLoader);
+		}
+
+		public Atlas (List<AtlasPage> pages, List<AtlasRegion> regions) {
+			this.pages = pages;
+			this.regions = regions;
+			this.textureLoader = null;
 		}
 
 		private void Load (TextReader reader, String imagesDir, TextureLoader textureLoader) {
@@ -204,6 +210,7 @@ namespace Spine {
 		}
 
 		public void Dispose () {
+			if (textureLoader == null) return;
 			for (int i = 0, n = pages.Count; i < n; i++)
 				textureLoader.Unload(pages[i].rendererObject);
 		}
