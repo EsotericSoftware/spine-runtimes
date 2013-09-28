@@ -174,11 +174,8 @@ void AnimationState_clearTrack (AnimationState* self, int trackIndex) {
 	if (self->listener) self->listener(self, trackIndex, ANIMATION_END, 0, 0);
 
 	self->tracks[trackIndex] = 0;
+	if (current->previous) _TrackEntry_dispose(current->previous);
 	_TrackEntry_disposeAll(current);
-	if (current->previous) {
-		_TrackEntry_dispose(current->previous);
-		current->previous = 0;
-	}
 }
 
 TrackEntry* _AnimationState_expandToIndex (AnimationState* self, int index) {
