@@ -70,8 +70,8 @@
 - (TrackEntry*) setAnimationForTrack:(int)trackIndex name:(NSString*)name loop:(bool)loop;
 - (TrackEntry*) addAnimationForTrack:(int)trackIndex name:(NSString*)name loop:(bool)loop afterDelay:(int)delay;
 - (TrackEntry*) getCurrentForTrack:(int)trackIndex;
-- (void) clearAnimation;
-- (void) clearAnimationForTrack:(int)trackIndex;
+- (void) clearTracks;
+- (void) clearTrack:(int)trackIndex;
 
 - (void) onAnimationStateEvent:(int)trackIndex type:(EventType)type event:(Event*)event loopCount:(int)loopCount;
 

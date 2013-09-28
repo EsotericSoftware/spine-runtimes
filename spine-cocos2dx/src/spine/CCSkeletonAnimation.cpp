@@ -135,11 +135,11 @@ TrackEntry* CCSkeletonAnimation::getCurrent (int trackIndex) {
 	return AnimationState_getCurrent(state, trackIndex);
 }
 
-void CCSkeletonAnimation::clearAnimation () {
-	AnimationState_clear(state);
+void CCSkeletonAnimation::clearTracks () {
+	AnimationState_clearTracks(state);
 }
 
-void CCSkeletonAnimation::clearAnimation (int trackIndex) {
+void CCSkeletonAnimation::clearTrack (int trackIndex) {
 	AnimationState_clearTrack(state, trackIndex);
 }
 

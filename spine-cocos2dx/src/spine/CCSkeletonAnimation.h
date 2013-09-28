@@ -69,8 +69,8 @@ public:
 	TrackEntry* setAnimation (int trackIndex, const char* name, bool loop);
 	TrackEntry* addAnimation (int trackIndex, const char* name, bool loop, float delay = 0);
 	TrackEntry* getCurrent (int trackIndex = 0);
-	void clearAnimation ();
-	void clearAnimation (int trackIndex = 0);
+	void clearTracks ();
+	void clearTrack (int trackIndex = 0);
 
 	void onAnimationStateEvent (int trackIndex, EventType type, Event* event, int loopCount);
 

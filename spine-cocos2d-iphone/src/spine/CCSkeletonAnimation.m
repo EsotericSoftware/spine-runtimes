@@ -143,11 +143,11 @@ static void callback (AnimationState* state, int trackIndex, EventType type, Eve
 	return AnimationState_getCurrent(_state, trackIndex);
 }
 
-- (void) clearAnimation {
-	AnimationState_clear(_state);
+- (void) clearTracks {
+	AnimationState_clearTracks(_state);
 }
 
-- (void) clearAnimationForTrack:(int)trackIndex {
+- (void) clearTrack:(int)trackIndex {
 	AnimationState_clearTrack(_state, trackIndex);
 }
 

@@ -77,7 +77,7 @@ void AnimationState_dispose (AnimationState* self);
 void AnimationState_update (AnimationState* self, float delta);
 void AnimationState_apply (AnimationState* self, struct Skeleton* skeleton);
 
-void AnimationState_clear (AnimationState* self);
+void AnimationState_clearTracks (AnimationState* self);
 void AnimationState_clearTrack (AnimationState* self, int trackIndex);
 
 /** Set the current animation. Any queued animations are cleared. */

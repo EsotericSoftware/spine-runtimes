@@ -157,7 +157,7 @@ void AnimationState_apply (AnimationState* self, Skeleton* skeleton) {
 	}
 }
 
-void AnimationState_clear (AnimationState* self) {
+void AnimationState_clearTracks (AnimationState* self) {
 	int i;
 	for (i = 0; i < self->trackCount; i++)
 		AnimationState_clearTrack(self, i);
