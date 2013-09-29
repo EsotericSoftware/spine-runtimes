@@ -1,15 +1,18 @@
 
+-- This is a more complex animation that has a number of image changes.
+-- Note the exported dragon project was modified to not use non-uniform scaling.
+
 local spine = require "spine-corona.spine"
 
 local json = spine.SkeletonJson.new()
-json.scale = 0.5
+json.scale = 0.47
 local skeletonData = json:readSkeletonDataFile("examples/dragon/dragon.json")
 
 local skeleton = spine.Skeleton.new(skeletonData)
 function skeleton:createImage (attachment)
 	return display.newImage("examples/dragon/images/" .. attachment.name .. ".png")
 end
-skeleton.group.x = 160
+skeleton.group.x = 165
 skeleton.group.y = 225
 skeleton.flipX = false
 skeleton.flipY = false
