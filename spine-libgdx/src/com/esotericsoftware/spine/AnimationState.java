@@ -76,7 +76,7 @@ public class AnimationState {
 
 			TrackEntry next = current.next;
 			if (next != null) {
-				if (time >= next.delay) setCurrent(i, next);
+				if (time - trackDelta > next.delay) setCurrent(i, next);
 			} else {
 				// End non-looping animation when it reaches its end time and there is no next entry.
 				if (!current.loop && current.lastTime >= current.endTime) clearTrack(i);

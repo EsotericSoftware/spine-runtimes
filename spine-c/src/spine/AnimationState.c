@@ -110,7 +110,7 @@ void AnimationState_update (AnimationState* self, float delta) {
 		}
 
 		if (current->next) {
-			if (time >= current->next->delay) _AnimationState_setCurrent(self, i, current->next);
+			if (time - trackDelta >= current->next->delay) _AnimationState_setCurrent(self, i, current->next);
 		} else {
 			/* End non-looping animation when it reaches its end time and there is no next entry. */
 			if (!current->loop && current->lastTime >= current->endTime) AnimationState_clearTrack(self, i);

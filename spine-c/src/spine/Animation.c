@@ -518,29 +518,24 @@ void _EventTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float l
 	EventTimeline* self = (EventTimeline*)timeline;
 	int frameIndex;
 
-	if (lastTime <= self->frames[0] || self->framesLength == 1)
+	if (lastTime > time) {
+		/* Fire events after last time for looped animations. */
+		_EventTimeline_apply(timeline, skeleton, lastTime, (float)INT_MAX, firedEvents, eventCount, alpha);
+		lastTime = 0;
+	} else if (lastTime >= self->frames[self->framesLength - 1]) return; /* Last time is after last frame. */
+
+	if (lastTime < self->frames[0] || self->framesLength == 1)
 		frameIndex = 0;
 	else {
 		float frame;
-
-		if (lastTime >= self->frames[self->framesLength - 1]) return; /* Last time is after last frame. */
-
-		if (lastTime > time) {
-			/* Fire events after last time for looped animations. */
-			_EventTimeline_apply(timeline, skeleton, lastTime, (float)INT_MAX, firedEvents, eventCount, alpha);
-			lastTime = 0;
-		}
-
 		frameIndex = binarySearch(self->frames, self->framesLength, lastTime, 1);
 		frame = self->frames[frameIndex];
-		while (frameIndex > 0) {
-			float lastFrame = self->frames[frameIndex - 1];
-			/* Fire multiple events with the same frame and events that occurred at lastTime. */
-			if (lastFrame != frame && lastFrame != lastTime) break;
+		while (frameIndex > 0) { /* Fire multiple events with the same frame. */
+			if (self->frames[frameIndex - 1] != frame) break;
 			frameIndex--;
 		}
 	}
-	for (; frameIndex < self->framesLength && time > self->frames[frameIndex]; frameIndex++) {
+	for (; frameIndex < self->framesLength && time >= self->frames[frameIndex]; frameIndex++) {
 		firedEvents[*eventCount] = self->events[frameIndex];
 		(*eventCount)++;
 	}
