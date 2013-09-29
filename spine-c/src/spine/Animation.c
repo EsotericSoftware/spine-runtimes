@@ -532,16 +532,19 @@ void _EventTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float l
 		frameIndex = 0;
 	else {
 		float frame;
-		frameIndex = binarySearch(self->frames, self->framesLength, lastTime, 1);
+		frameIndex = binarySearch(self->frames, self->framesLength, lastTime, 1)-1;
 		frame = self->frames[frameIndex];
 		while (frameIndex > 0) {
-			float lastFrame = self->frames[frameIndex - 1];
+			float lastFrame = self->frames[frameIndex];
 			/* Fire multiple events with the same frame and events that occurred at lastTime. */
 			if (lastFrame != frame && lastFrame != lastTime) break;
 			frameIndex--;
 		}
 	}
 	for (; frameIndex < self->framesLength && time > self->frames[frameIndex]; frameIndex++) {
+        if(self->frames[frameIndex] < lastTime) // exclude events that were fired previously.
+            continue;
+        
 		firedEvents[*eventCount] = self->events[frameIndex];
 		(*eventCount)++;
 	}
