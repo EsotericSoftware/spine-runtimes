@@ -524,7 +524,7 @@ void _EventTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float l
 		lastTime = 0;
 	} else if (lastTime >= self->frames[self->framesLength - 1]) return; /* Last time is after last frame. */
 
-	if (lastTime < self->frames[0] || self->framesLength == 1)
+	if (lastTime <= self->frames[0] || self->framesLength == 1)
 		frameIndex = 0;
 	else {
 		float frame;

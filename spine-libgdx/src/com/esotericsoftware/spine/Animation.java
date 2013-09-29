@@ -553,7 +553,7 @@ public class Animation {
 			} else if (lastTime >= frames[frameCount - 1]) return; // Last time is after last frame.
 
 			int frameIndex;
-			if (lastTime < frames[0] || frameCount == 1)
+			if (lastTime <= frames[0] || frameCount == 1)
 				frameIndex = 0;
 			else {
 				frameIndex = binarySearch(frames, lastTime, 1);
