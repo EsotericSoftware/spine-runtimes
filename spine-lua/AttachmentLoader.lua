@@ -35,7 +35,8 @@ local RegionAttachment = require "spine-lua.RegionAttachment"
 
 local AttachmentLoader = {
 	failed = {},
-	ATTACHMENT_REGION = "region"
+	ATTACHMENT_REGION = "region",
+	ATTACHMENT_BOUNDINGBOX = "boundingbox",
 }
 function AttachmentLoader.new ()
 	local self = {}
@@ -44,7 +45,10 @@ function AttachmentLoader.new ()
 		if type == AttachmentLoader.ATTACHMENT_REGION then
 			return RegionAttachment.new(name)
 		end
-		error("Unknown attachment type: " .. type .. " (" + name + ")")
+		if type == AttachmentLoader.ATTACHMENT_BOUNDINGBOX then
+			return nil -- BOZO - Implement bounding boxes.
+		end
+		error("Unknown attachment type: " .. type .. " (" .. name .. ")")
 	end
 
 	return self
