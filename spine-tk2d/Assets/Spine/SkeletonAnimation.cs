@@ -56,7 +56,7 @@ public class SkeletonAnimation : SkeletonComponent {
 			TrackEntry entry = state.GetCurrent(0);
 			if (animationName == null || animationName.Length == 0) {
 				if (entry != null && entry.Animation != null)
-					state.Clear(0);
+					state.ClearTrack(0);
 			} else if (entry == null || entry.Animation == null || animationName != entry.Animation.Name) {
 				Spine.Animation animation = skeleton.Data.FindAnimation(animationName);
 				if (animation != null)

@@ -212,7 +212,7 @@ namespace Spine {
 				List<Object> values = (List<Object>)map["vertices"];
 				float[] vertices = new float[values.Count];
 				for (int i = 0, n = values.Count; i < n; i++)
-					vertices[i] = (float)values[i] * scale;
+					vertices[i] = (float)values[i] * Scale;
 				boundingBox.Vertices = vertices;
 			}
 

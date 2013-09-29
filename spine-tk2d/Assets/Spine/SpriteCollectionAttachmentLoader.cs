@@ -47,8 +47,14 @@ public class SpriteCollectionAttachmentLoader : AttachmentLoader {
 	}
 
 	public Attachment NewAttachment (Skin skin, AttachmentType type, String name) {
-		if (type != AttachmentType.region)
+		switch (type) {
+		case AttachmentType.region:
+			break;
+		case AttachmentType.boundingbox:
+			return new BoundingBoxAttachment(name);
+		default:
 			throw new Exception("Unknown attachment type: " + type);
+		}
 		
 		// Strip folder names.
 		int index = name.LastIndexOfAny(new char[] {'/', '\\'});

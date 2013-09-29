@@ -72,7 +72,7 @@ public class SkeletonComponent : MonoBehaviour {
 		mesh.name = "Skeleton Mesh";
 		mesh.hideFlags = HideFlags.HideAndDontSave;
 		mesh.MarkDynamic();
-		
+
 		vertices = new Vector3[0];
 
 		skeleton = new Skeleton(skeletonDataAsset.GetSkeletonData(false));
@@ -89,10 +89,14 @@ public class SkeletonComponent : MonoBehaviour {
 	}
 	
 	public virtual void Update () {
+		if (skeletonDataAsset == null) {
+			Clear();
+			return;
+		}
+
 		SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(false);
 
-		// Clear fields if missing information to render.
-		if (skeletonDataAsset == null || skeletonData == null) {
+		if (skeletonData == null) {
 			Clear();
 			return;
 		}
@@ -112,7 +116,7 @@ public class SkeletonComponent : MonoBehaviour {
 			RegionAttachment regionAttachment = drawOrder[i].Attachment as RegionAttachment;
 			if (regionAttachment == null)
 				continue;
-			
+		
 			// Add submesh when material changes.
 			Material material = (Material)regionAttachment.RendererObject;
 			if (lastMaterial != material && lastMaterial != null) {
@@ -163,7 +167,7 @@ public class SkeletonComponent : MonoBehaviour {
 			RegionAttachment regionAttachment = slot.Attachment as RegionAttachment;
 			if (regionAttachment == null)
 				continue;
-
+			
 			regionAttachment.ComputeWorldVertices(skeleton.X, skeleton.Y, slot.Bone, vertexPositions);
 			
 			vertices[vertexIndex] = new Vector3(vertexPositions[RegionAttachment.X1], vertexPositions[RegionAttachment.Y1], 0);
@@ -193,7 +197,7 @@ public class SkeletonComponent : MonoBehaviour {
 		mesh.uv = uvs;
 
 		mesh.subMeshCount = submeshMaterials.Count;
-		for (int i = 0; i < mesh.subMeshCount; ++i)
+		for (int i = 0, n = mesh.subMeshCount; i < n; ++i)
 			mesh.SetTriangles(submeshIndexes[i], i);
 
 		if (calculateNormals) {
@@ -201,10 +205,11 @@ public class SkeletonComponent : MonoBehaviour {
 			if (calculateTangents) {
 				Vector4[] tangents = this.tangents;
 				int count = mesh.normals.Length;
-				if (tangents.Length != count)
+				if (tangents.Length != count) {
 					this.tangents = tangents = new Vector4[count];
-				for (int i = 0; i < count; i++)
-					tangents[i] = new Vector4(1, 0, 0, 1);
+					for (int i = 0; i < count; i++)
+						tangents[i] = new Vector4(1, 0, 0, 1);
+				}
 				mesh.tangents = tangents;
 			}
 		}
@@ -230,7 +235,6 @@ public class SkeletonComponent : MonoBehaviour {
 			} else {
 				if (indexes.Length >= indexCount) { // Allow last submesh to have more indices than required.
 					if (submeshFirstVertex[submeshIndex] == vertexIndex) return;
-					indexCount = indexes.Length; // Update vertices to the end.
 				} else
 					submeshIndexes[submeshIndex] = indexes = new int[indexCount];
 			}
@@ -249,6 +253,12 @@ public class SkeletonComponent : MonoBehaviour {
 			indexes[i + 3] = vertexIndex + 2;
 			indexes[i + 4] = vertexIndex + 3;
 			indexes[i + 5] = vertexIndex + 1;
+		}
+
+		if (lastSubmesh) {
+			// Update vertices to the end.
+			for (int i = indexCount, n = indexes.Length; i < n; i++)
+				indexes[i] = 0;
 		}
 	}
 	
