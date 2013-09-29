@@ -140,6 +140,7 @@ void CCSkeleton::draw () {
 		skeleton->b *= skeleton->a;
 	}
 
+	int additive = 0;
 	CCTextureAtlas* textureAtlas = 0;
 	ccV3F_C4B_T2F_Quad quad;
 	quad.tl.vertices.z = 0;
@@ -150,13 +151,18 @@ void CCSkeleton::draw () {
 		Slot* slot = skeleton->drawOrder[i];
 		if (!slot->attachment || slot->attachment->type != ATTACHMENT_REGION) continue;
 		RegionAttachment* attachment = (RegionAttachment*)slot->attachment;
-		
 		CCTextureAtlas* regionTextureAtlas = getTextureAtlas(attachment);
-		if (regionTextureAtlas != textureAtlas) {
+
+		if (slot->data->additiveBlending != additive) {
 			if (textureAtlas) {
 				textureAtlas->drawQuads();
 				textureAtlas->removeAllQuads();
 			}
+			additive = !additive;
+			ccGLBlendFunc(blendFunc.src, additive ? GL_ONE : blendFunc.dst);
+		} else if (regionTextureAtlas != textureAtlas && textureAtlas) {
+			textureAtlas->drawQuads();
+			textureAtlas->removeAllQuads();
 		}
 		textureAtlas = regionTextureAtlas;
 

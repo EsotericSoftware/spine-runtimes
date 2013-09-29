@@ -147,6 +147,7 @@
 		_skeleton->b *= _skeleton->a;
 	}
 
+	int additive = 0;
 	CCTextureAtlas* textureAtlas = 0;
 	ccV3F_C4B_T2F_Quad quad;
 	quad.tl.vertices.z = 0;
@@ -158,15 +159,26 @@
 		if (!slot->attachment || slot->attachment->type != ATTACHMENT_REGION) continue;
 		RegionAttachment* attachment = (RegionAttachment*)slot->attachment;
 		CCTextureAtlas* regionTextureAtlas = [self getTextureAtlas:attachment];
-		if (regionTextureAtlas != textureAtlas) {
+
+		if (slot->data->additiveBlending != additive) {
 			if (textureAtlas) {
 				[textureAtlas drawQuads];
 				[textureAtlas removeAllQuads];
 			}
+			additive = !additive;
+			ccGLBlendFunc(_blendFunc.src, additive ? GL_ONE : _blendFunc.dst);
+		} else if (regionTextureAtlas != textureAtlas && textureAtlas) {
+			[textureAtlas drawQuads];
+			[textureAtlas removeAllQuads];
 		}
 		textureAtlas = regionTextureAtlas;
-		if (textureAtlas.capacity == textureAtlas.totalQuads &&
-			![textureAtlas resizeCapacity:textureAtlas.capacity * 2]) return;
+		
+		if (textureAtlas.capacity == textureAtlas.totalQuads) {
+			[textureAtlas drawQuads];
+			[textureAtlas removeAllQuads];
+			if (![textureAtlas resizeCapacity:textureAtlas.capacity * 2]) return;
+		}
+
 		RegionAttachment_updateQuad(attachment, slot, &quad, _premultipliedAlpha);
 		[textureAtlas updateQuad:&quad atIndex:textureAtlas.totalQuads];
 	}
