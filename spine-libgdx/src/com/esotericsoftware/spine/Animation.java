@@ -114,7 +114,8 @@ public class Animation {
 		return name;
 	}
 
-	/** @param target After the first and before the last entry. */
+	/** @param target After the first and before the last value.
+	 * @return index of first value greater than the target. */
 	static int binarySearch (float[] values, float target, int step) {
 		int low = 0;
 		int high = values.length / step - 2;
@@ -544,21 +545,19 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha) {
 			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
-
 			int frameCount = frames.length;
-			if (lastTime >= frames[frameCount - 1]) return; // Last time is after last frame.
-
-			if (lastTime > time) {
-				// Fire events after last time for looped animations.
-				apply(skeleton, lastTime, Integer.MAX_VALUE, firedEvents, alpha);
-				lastTime = 0;
-			}
 
 			int frameIndex;
-			if (frameCount == 1)
+			if (lastTime <= frames[0] || frameCount == 1)
 				frameIndex = 0;
 			else {
+				if (lastTime >= frames[frameCount - 1]) return; // Last time is after last frame.
+
+				if (lastTime > time) { // Fire events after last time for looped animations.
+					apply(skeleton, lastTime, Integer.MAX_VALUE, firedEvents, alpha);
+					lastTime = 0;
+				}
+
 				frameIndex = binarySearch(frames, lastTime, 1);
 				float frame = frames[frameIndex];
 				while (frameIndex > 0) {

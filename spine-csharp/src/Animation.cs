@@ -471,26 +471,24 @@ namespace Spine {
 
 		public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
 			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
-
 			int frameCount = frames.Length;
-			if (lastTime >= frames[frameCount - 1]) return; // Last time is after last frame.
-
-			if (lastTime > time) {
-				// Fire events after last time for looped animations.
-				Apply(skeleton, lastTime, int.MaxValue, firedEvents, alpha);
-				lastTime = 0;
-			}
 
 			int frameIndex;
-			if (frameCount == 1)
+			if (lastTime <= frames[0] || frameCount == 1)
 				frameIndex = 0;
 			else {
+				if (lastTime >= frames[frameCount - 1]) return; // Last time is after last frame.
+
+				if (lastTime > time) { // Fire events after last time for looped animations.
+					Apply(skeleton, lastTime, int.MaxValue, firedEvents, alpha);
+					lastTime = 0;
+				}
+
 				frameIndex = Animation.binarySearch(frames, lastTime, 1);
 				float frame = frames[frameIndex];
 				while (frameIndex > 0) {
 					float lastFrame = frames[frameIndex - 1];
-					// Fire multiple events with the same frame and events that occurred at lastTime.
+					// Fire multiple events with same frame and events that occurred at lastTime.
 					if (lastFrame != frame && lastFrame != lastTime) break;
 					frameIndex--;
 				}

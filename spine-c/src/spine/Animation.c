@@ -515,23 +515,22 @@ void AttachmentTimeline_setFrame (AttachmentTimeline* self, int frameIndex, floa
 
 void _EventTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float lastTime, float time, Event** firedEvents,
 		int* eventCount, float alpha) {
-	int frameIndex;
 	EventTimeline* self = (EventTimeline*)timeline;
+	int frameIndex;
 
-	if (time < self->frames[0]) return; /* Time is before first frame. */
-
-	if (lastTime >= self->frames[self->framesLength - 1]) return; /* Last time is after last frame. */
-
-	if (lastTime > time) {
-		/* Fire events after last time for looped animations. */
-		_EventTimeline_apply(timeline, skeleton, lastTime, (float)INT_MAX, firedEvents, eventCount, alpha);
-		lastTime = 0;
-	}
-
-	if (self->framesLength == 1)
+	if (lastTime <= self->frames[0] || self->framesLength == 1)
 		frameIndex = 0;
 	else {
 		float frame;
+
+		if (lastTime >= self->frames[self->framesLength - 1]) return; /* Last time is after last frame. */
+
+		if (lastTime > time) {
+			/* Fire events after last time for looped animations. */
+			_EventTimeline_apply(timeline, skeleton, lastTime, (float)INT_MAX, firedEvents, eventCount, alpha);
+			lastTime = 0;
+		}
+
 		frameIndex = binarySearch(self->frames, self->framesLength, lastTime, 1);
 		frame = self->frames[frameIndex];
 		while (frameIndex > 0) {

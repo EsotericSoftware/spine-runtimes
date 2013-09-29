@@ -95,7 +95,7 @@ void spineboy () {
 	Slot* headSlot = Skeleton_findSlot(skeleton, "head");
 
 	drawable->state->listener = callback;
-	if (false) {
+	if (true) {
 		AnimationState_setAnimationByName(drawable->state, 0, "drawOrder", true);
 	} else {
 		AnimationState_setAnimationByName(drawable->state, 0, "walk", true);

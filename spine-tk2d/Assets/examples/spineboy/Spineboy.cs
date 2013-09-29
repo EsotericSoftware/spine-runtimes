@@ -34,14 +34,21 @@
 using UnityEngine;
 using System.Collections;
 using Spine;
+using System;
 
 public class Spineboy : MonoBehaviour {
 	private SkeletonAnimation skeleton;
 	
 	void Start() {
 		skeleton = GetComponent<SkeletonAnimation>();
+		
+		skeleton.state.Event += new EventHandler<EventTriggeredArgs>(Event);
 	}
 	
+	public void Event (object sender, EventTriggeredArgs e) {
+		Debug.Log(e.TrackIndex + " " + skeleton.state.GetCurrent(e.TrackIndex) + ": event " + e.Event + ", " + e.Event.Int);
+	}
+
 	void LateUpdate() {
 		if (skeleton.loop) return;
 		

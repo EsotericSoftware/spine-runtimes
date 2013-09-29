@@ -85,7 +85,7 @@ public class AnimationStateTest extends ApplicationAdapter {
 				System.out.println(trackIndex + " end: " + state.getCurrent(trackIndex));
 			}
 		});
-		state.setAnimation(0, "walk", true);
+		state.setAnimation(0, "drawOrder", true);
 
 		skeleton = new Skeleton(skeletonData);
 		skeleton.setX(250);
@@ -110,7 +110,7 @@ public class AnimationStateTest extends ApplicationAdapter {
 	}
 
 	public void render () {
-		state.update(Gdx.graphics.getDeltaTime() / 3);
+		state.update(Gdx.graphics.getDeltaTime());
 
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
