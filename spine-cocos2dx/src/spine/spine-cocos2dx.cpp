@@ -38,7 +38,7 @@ USING_NS_CC;
 
 void _AtlasPage_createTexture (AtlasPage* self, const char* path) {
 	CCTexture2D* texture = CCTextureCache::sharedTextureCache()->addImage(path);
-	CCTextureAtlas* textureAtlas = CCTextureAtlas::createWithTexture(texture, 4);
+	CCTextureAtlas* textureAtlas = CCTextureAtlas::createWithTexture(texture, 128);
 	textureAtlas->retain();
 	self->rendererObject = textureAtlas;
 	self->width = texture->getPixelsWide();
