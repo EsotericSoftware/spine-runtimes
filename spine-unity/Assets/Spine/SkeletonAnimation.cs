@@ -53,7 +53,7 @@ public class SkeletonAnimation : SkeletonComponent {
 			if (!useAnimationName) return;
 			if (_animationName == value) return;
 			_animationName = value;
-			if (value == null)
+			if (value == null || value.Length == 0)
 				state.ClearTrack(0);
 			else
 				state.SetAnimation(0, value, loop);
@@ -64,7 +64,7 @@ public class SkeletonAnimation : SkeletonComponent {
 		base.Initialize(); // Call overridden method to initialize the skeleton.
 		
 		state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());
-		if (_animationName != null) state.SetAnimation(0, _animationName, loop);
+		if (_animationName != null && _animationName.Length > 0) state.SetAnimation(0, _animationName, loop);
 	}
 
 	override public void UpdateSkeleton () {
