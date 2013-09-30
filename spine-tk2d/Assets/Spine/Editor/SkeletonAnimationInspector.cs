@@ -42,7 +42,7 @@ public class SkeletonAnimationInspector : Editor {
 
 	void OnEnable () {
 		skeletonDataAsset = serializedObject.FindProperty("skeletonDataAsset");
-		animationName = serializedObject.FindProperty("animationName");
+		animationName = serializedObject.FindProperty("_animationName");
 		loop = serializedObject.FindProperty("loop");
 		useAnimationName = serializedObject.FindProperty("useAnimationName");
 		initialSkinName = serializedObject.FindProperty("initialSkinName");
@@ -53,7 +53,7 @@ public class SkeletonAnimationInspector : Editor {
 
 	override public void OnInspectorGUI () {
 		serializedObject.Update();
-		SkeletonComponent component = (SkeletonComponent)target;
+		SkeletonAnimation component = (SkeletonAnimation)target;
 
 		EditorGUIUtility.LookLikeInspector();
 		EditorGUILayout.PropertyField(skeletonDataAsset);
@@ -98,13 +98,13 @@ public class SkeletonAnimationInspector : Editor {
 			EditorGUILayout.EndHorizontal();
 
 			if (animationIndex == 0) {
-				animationName.stringValue = null;
+				component.animationName = null;
 				useAnimationName.boolValue = false;
 			} else if (animationIndex == 1) {
-				animationName.stringValue = null;
+				component.animationName = null;
 				useAnimationName.boolValue = true;
 			} else {
-				animationName.stringValue = animations[animationIndex];
+				component.animationName = animations[animationIndex];
 				useAnimationName.boolValue = true;
 			}
 		}

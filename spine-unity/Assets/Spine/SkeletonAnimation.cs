@@ -40,31 +40,34 @@ using Spine;
 [ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class SkeletonAnimation : SkeletonComponent {
 	public bool useAnimationName;
-	public String animationName;
 	public bool loop;
 	public Spine.AnimationState state;
+
+	public String _animationName;
+	public String animationName {
+		get {
+			TrackEntry entry = state.GetCurrent(0);
+			return entry == null ? null : entry.Animation.Name;
+		}
+		set {
+			if (!useAnimationName) return;
+			if (_animationName == value) return;
+			_animationName = value;
+			if (value == null)
+				state.ClearTrack(0);
+			else
+				state.SetAnimation(0, value, loop);
+		}
+	}
 
 	override public void Initialize () {
 		base.Initialize(); // Call overridden method to initialize the skeleton.
 		
 		state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());
+		if (_animationName != null) state.SetAnimation(0, _animationName, loop);
 	}
 
 	override public void UpdateSkeleton () {
-		if (useAnimationName) {
-			// Keep AnimationState in sync with animationName and loop fields.
-			TrackEntry entry = state.GetCurrent(0);
-			if (animationName == null || animationName.Length == 0) {
-				if (entry != null && entry.Animation != null)
-					state.ClearTrack(0);
-			} else if (entry == null || entry.Animation == null || animationName != entry.Animation.Name) {
-				Spine.Animation animation = skeleton.Data.FindAnimation(animationName);
-				if (animation != null)
-					state.SetAnimation(0, animation, loop);
-			} else if (entry != null)
-				entry.Loop = loop;
-		}
-		
 		// Apply the animation.
 		state.Update(Time.deltaTime * timeScale);
 		state.Apply(skeleton);
