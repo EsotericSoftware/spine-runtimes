@@ -115,6 +115,10 @@ function spine.Skeleton.new (skeletonData, group)
 						print("Error creating image: " .. attachment.name)
 						image = spine.Skeleton.failed
 					end
+					print(slot.data.additiveBlending)
+					if slot.data.additiveBlending then
+						image.blendMode = "add"
+					end
 					images[slot] = image
 				end
 				-- Position image based on attachment and bone.

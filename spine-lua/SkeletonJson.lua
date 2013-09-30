@@ -115,9 +115,10 @@ function SkeletonJson.new (attachmentLoader)
 				end
 
 				slotData.attachmentName = slotMap["attachment"]
-        table.insert(skeletonData.slots, slotData)
-        skeletonData.slotNameIndices[slotData.name] = #skeletonData.slots
-        
+				slotData.additiveBlending = slotMap["additive"]
+
+				table.insert(skeletonData.slots, slotData)
+				skeletonData.slotNameIndices[slotData.name] = #skeletonData.slots
 			end
 		end
 
