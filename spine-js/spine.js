@@ -694,7 +694,8 @@ spine.Skeleton.prototype = {
 };
 
 spine.AttachmentType = {
-	region: 0
+	region: 0,
+	boundingbox: 1
 };
 
 spine.RegionAttachment = function () {
@@ -1339,6 +1340,8 @@ spine.AtlasAttachmentLoader = function (atlas) {
 spine.AtlasAttachmentLoader.prototype = {
 	newAttachment: function (skin, type, name) {
 		switch (type) {
+		case spine.AttachmentType.boundingbox:
+			return null; // BOZO - Implement bounding boxes.
 		case spine.AttachmentType.region:
 			var region = this.atlas.findRegion(name);
 			if (!region) throw "Region not found in atlas: " + name + " (" + type + ")";

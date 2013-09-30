@@ -132,6 +132,13 @@ function drawSkeleton (batch, skeleton) {
 		var attachment = slot.attachment;
 		if (!(attachment instanceof spine.RegionAttachment)) continue;
 		attachment.computeVertices(skeleton.x, skeleton.y, slot.bone, vertices);
+		
+		var blendMode = slot.data.additiveBlending ? draw2D.blend.additive : draw2D.blend.alpha;
+		if (batch.blendMode != blendMode) {
+			batch.end();
+			batch.begin(blendMode);
+		}
+
 		batch.add(
 			attachment.rendererObject.page.rendererObject,
 			vertices[0], vertices[1],

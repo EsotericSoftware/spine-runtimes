@@ -38,7 +38,9 @@ function SpriteBatch (draw2D) {
 SpriteBatch.prototype = {
 	count: 0,
 	texture: null,
+	blendMode: null,
 	begin: function (blendMode, sortMode) {
+		this.blendMode = blendMode;
 		this.draw2D.begin(blendMode, sortMode);
 	},
 	add: function (texture, x1, y1, x2, y2, x3, y3, x4, y4, r, g, b, a, u1, v1, u2, v2) {

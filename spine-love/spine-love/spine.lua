@@ -110,6 +110,11 @@ function spine.Skeleton.new (skeletonData, group)
 						rotation = -rotation
 					end
 					love.graphics.setColor(self.r * slot.r, self.g * slot.g, self.b * slot.b, self.a * slot.a)
+					if slot.data.additiveBlending then
+						love.graphics.setBlendMode("additive")
+					else
+						love.graphics.setBlendMode("alpha")
+					end
 					love.graphics.draw(image, 
 						self.x + x, 
 						self.y - y, 
