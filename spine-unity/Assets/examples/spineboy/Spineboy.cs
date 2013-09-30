@@ -33,15 +33,24 @@
 
 using UnityEngine;
 using System.Collections;
+using Spine;
+using System;
 
 public class Spineboy : MonoBehaviour {
+	SkeletonAnimation skeletonAnimation;
+
 	public void Start () {
-		SkeletonAnimation skeletonAnimation = GetComponent<SkeletonAnimation>();
+		skeletonAnimation = GetComponent<SkeletonAnimation>();
 		skeletonAnimation.state.SetAnimation(0, "walk", true);
+		
+		skeletonAnimation.state.Event += new EventHandler<EventTriggeredArgs>(Event);
 	}
 	
+	public void Event (object sender, EventTriggeredArgs e) {
+		Debug.Log(e.TrackIndex + " " + skeletonAnimation.state.GetCurrent(e.TrackIndex) + ": event " + e.Event + ", " + e.Event.Int);
+	}
+
 	public void OnMouseDown () {
-		SkeletonAnimation skeletonAnimation = GetComponent<SkeletonAnimation>();
 		skeletonAnimation.state.SetAnimation(0, "jump", false);
 		skeletonAnimation.state.AddAnimation(0, "walk", true, 0);
 	}

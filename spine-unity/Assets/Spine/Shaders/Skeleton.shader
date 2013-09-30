@@ -11,7 +11,7 @@ Shader "Skeleton" {
         Pass {
         	ColorMaterial AmbientAndDiffuse
             SetTexture [_MainTex] {
-            	combine texture * primary
+            	Combine texture * primary
             }
         }
     }
