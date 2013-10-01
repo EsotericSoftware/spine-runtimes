@@ -60,9 +60,9 @@ public class SkeletonAnimationInspector : Editor {
 		
 		if (component.skeleton != null) {
 			// Initial skin name.
-			String[] skins = new String[component.skeleton.Data.Skins.Count + 1];
+			String[] skins = new String[component.skeleton.Data.Skins.Count];
 			int skinIndex = 0;
-			for (int i = 0; i < skins.Length - 1; i++) {
+			for (int i = 0; i < skins.Length; i++) {
 				String name = component.skeleton.Data.Skins[i].Name;
 				skins[i] = name;
 				if (name == initialSkinName.stringValue)
@@ -76,7 +76,7 @@ public class SkeletonAnimationInspector : Editor {
 			EditorGUIUtility.LookLikeInspector();
 			EditorGUILayout.EndHorizontal();
 		
-			initialSkinName.stringValue = skinIndex == 0 ? null : skins[skinIndex];
+			initialSkinName.stringValue = skins[skinIndex];
 
 			// Animation name.
 			String[] animations = new String[component.skeleton.Data.Animations.Count + 2];
