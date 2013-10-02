@@ -39,10 +39,13 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.utils.Array;
 
 public class MixTest extends ApplicationAdapter {
 	SpriteBatch batch;
 	float time;
+	Array<Event> events = new Array();
+
 	SkeletonRenderer renderer;
 	SkeletonRendererDebug debugRenderer;
 
@@ -103,21 +106,21 @@ public class MixTest extends ApplicationAdapter {
 			skeleton.setX(-50);
 		} else if (time > beforeJump + jump) {
 			// just walk after jump
-			walkAnimation.apply(skeleton, time, true);
+			walkAnimation.apply(skeleton, time, time, true, events);
 		} else if (time > blendOutStart) {
 			// blend out jump
-			walkAnimation.apply(skeleton, time, true);
-			jumpAnimation.mix(skeleton, time - beforeJump, false, 1 - (time - blendOutStart) / blendOut);
+			walkAnimation.apply(skeleton, time, time, true, events);
+			jumpAnimation.mix(skeleton, time - beforeJump, time - beforeJump, false, events, 1 - (time - blendOutStart) / blendOut);
 		} else if (time > beforeJump + blendIn) {
 			// just jump
-			jumpAnimation.apply(skeleton, time - beforeJump, false);
+			jumpAnimation.apply(skeleton, time - beforeJump, time - beforeJump, false, events);
 		} else if (time > beforeJump) {
 			// blend in jump
-			walkAnimation.apply(skeleton, time, true);
-			jumpAnimation.mix(skeleton, time - beforeJump, false, (time - beforeJump) / blendIn);
+			walkAnimation.apply(skeleton, time, time, true, events);
+			jumpAnimation.mix(skeleton, time - beforeJump, time - beforeJump, false, events, (time - beforeJump) / blendIn);
 		} else {
 			// just walk before jump
-			walkAnimation.apply(skeleton, time, true);
+			walkAnimation.apply(skeleton, time, time, true, events);
 		}
 
 		skeleton.updateWorldTransform();

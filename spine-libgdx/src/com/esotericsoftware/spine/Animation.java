@@ -63,14 +63,9 @@ public class Animation {
 		this.duration = duration;
 	}
 
-	/** @deprecated */
-	public void apply (Skeleton skeleton, float time, boolean loop) {
-		apply(skeleton, time, time, loop, null);
-	}
-
 	/** Poses the skeleton at the specified time for this animation.
-	 * @param lastTime The last time the animation was applied. Can be equal to time if events shouldn't be fired.
-	 * @param events Any triggered events are added. May be null if lastTime is known to not cause any events to trigger. */
+	 * @param lastTime The last time the animation was applied.
+	 * @param events Any triggered events are added. */
 	public void apply (Skeleton skeleton, float lastTime, float time, boolean loop, Array<Event> events) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 
@@ -84,14 +79,9 @@ public class Animation {
 			timelines.get(i).apply(skeleton, lastTime, time, events, 1);
 	}
 
-	/** @deprecated */
-	public void mix (Skeleton skeleton, float time, boolean loop, float alpha) {
-		mix(skeleton, time, time, loop, null, alpha);
-	}
-
 	/** Poses the skeleton at the specified time for this animation mixed with the current pose.
-	 * @param lastTime The last time the animation was applied. Can be equal to time if events shouldn't be fired.
-	 * @param events Any triggered events are added. May be null if lastTime is known to not cause any events to trigger.
+	 * @param lastTime The last time the animation was applied.
+	 * @param events Any triggered events are added.
 	 * @param alpha The amount of this animation that affects the current pose. */
 	public void mix (Skeleton skeleton, float lastTime, float time, boolean loop, Array<Event> events, float alpha) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
@@ -550,7 +540,7 @@ public class Animation {
 			if (lastTime > time) { // Fire events after last time for looped animations.
 				apply(skeleton, lastTime, Integer.MAX_VALUE, firedEvents, alpha);
 				lastTime = 0;
-			} else if (lastTime >= frames[frameCount - 1]) return; // Last time is after last frame.
+			}
 
 			int frameIndex;
 			if (lastTime <= frames[0] || frameCount == 1)

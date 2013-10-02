@@ -54,8 +54,16 @@ typedef struct {
 Animation* Animation_create (const char* name, int timelineCount);
 void Animation_dispose (Animation* self);
 
+/** Poses the skeleton at the specified time for this animation.
+ * @param lastTime The last time the animation was applied.
+ * @param events Any triggered events are added. */
 void Animation_apply (const Animation* self, struct Skeleton* skeleton, float lastTime, float time, int loop,
 		Event** events, int* eventCount);
+
+/** Poses the skeleton at the specified time for this animation mixed with the current pose.
+ * @param lastTime The last time the animation was applied.
+ * @param events Any triggered events are added.
+ * @param alpha The amount of this animation that affects the current pose. */
 void Animation_mix (const Animation* self, struct Skeleton* skeleton, float lastTime, float time, int loop, Event** events,
 		int* eventCount, float alpha);
 

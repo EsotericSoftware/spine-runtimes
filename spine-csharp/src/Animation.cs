@@ -52,14 +52,9 @@ namespace Spine {
 			this.duration = duration;
 		}
 
-		[Obsolete]
-		public void Apply (Skeleton skeleton, float time, bool loop) {
-			Apply(skeleton, time, time, loop, null);
-		}
-
 		/// <summary>Poses the skeleton at the specified time for this animation.</summary>
-		/// <param name="lastTime The last time the animation was applied. Can be equal to time if events shouldn't be fired.</param>
-		/// <param name="events Any triggered events are added. May be null if lastTime is known to not cause any events to trigger.</param>
+		/// <param name="lastTime">The last time the animation was applied.</param>
+		/// <param name="events">Any triggered events are added.</param>
 		public void Apply (Skeleton skeleton, float lastTime, float time, bool loop, List<Event> events) {
 			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
 
@@ -73,15 +68,10 @@ namespace Spine {
 				timelines[i].Apply(skeleton, lastTime, time, events, 1);
 		}
 
-		[Obsolete] 
-		public void Mix (Skeleton skeleton, float time, bool loop, float alpha) {
-			Mix(skeleton, time, time, loop, null, alpha);
-		}
-
 		/// <summary>Poses the skeleton at the specified time for this animation mixed with the current pose.</summary>
-		/// <param name="lastTime The last time the animation was applied. Can be equal to time if events shouldn't be fired.</param>
-		/// <param name="events Any triggered events are added. May be null if lastTime is known to not cause any events to trigger.</param>
-		/// <param name="alpha The amount of this animation that affects the current pose.</param>
+		/// <param name="lastTime">The last time the animation was applied.</param>
+		/// <param name="events">Any triggered events are added.</param>
+		/// <param name="alpha">The amount of this animation that affects the current pose.</param>
 		public void Mix (Skeleton skeleton, float lastTime, float time, bool loop, List<Event> events, float alpha) {
 			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
 
@@ -476,7 +466,7 @@ namespace Spine {
 			if (lastTime > time) { // Fire events after last time for looped animations.
 				Apply(skeleton, lastTime, int.MaxValue, firedEvents, alpha);
 				lastTime = 0;
-			} else if (lastTime >= frames[frameCount - 1]) return; // Last time is after last frame.
+			}
 
 			int frameIndex;
 			if (lastTime <= frames[0] || frameCount == 1)

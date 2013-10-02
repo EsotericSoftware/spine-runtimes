@@ -58,6 +58,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 
 public class Box2DExample extends ApplicationAdapter {
 	SpriteBatch batch;
@@ -68,6 +69,7 @@ public class Box2DExample extends ApplicationAdapter {
 	Skeleton skeleton;
 	Animation animation;
 	float time;
+	Array<Event> events = new Array();
 
 	OrthographicCamera camera;
 	Box2DDebugRenderer box2dRenderer;
@@ -146,7 +148,7 @@ public class Box2DExample extends ApplicationAdapter {
 		batch.setTransformMatrix(camera.view);
 		batch.begin();
 
-		animation.apply(skeleton, time, true);
+		animation.apply(skeleton, time, time, true, events);
 		skeleton.x += 8 * delta;
 		skeleton.updateWorldTransform();
 		skeletonRenderer.draw(batch, skeleton);
