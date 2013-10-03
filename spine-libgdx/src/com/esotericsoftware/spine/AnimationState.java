@@ -204,6 +204,7 @@ public class AnimationState {
 		entry.animation = animation;
 		entry.loop = loop;
 		entry.time = 0;
+		entry.lastTime = 0;
 		entry.endTime = animation.getDuration();
 		setCurrent(trackIndex, entry);
 		return entry;
@@ -223,6 +224,7 @@ public class AnimationState {
 		entry.animation = animation;
 		entry.loop = loop;
 		entry.time = 0;
+		entry.lastTime = 0;
 		entry.endTime = animation.getDuration();
 
 		TrackEntry last = expandToIndex(trackIndex);
