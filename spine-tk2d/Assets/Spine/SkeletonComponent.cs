@@ -229,8 +229,10 @@ public class SkeletonComponent : MonoBehaviour {
 		
 		// Allocate indexes if not the right size, allowing last submesh to have more than required.
 		int[] indexes = submesh.indexes;
-		if (lastSubmesh ? (indexes.Length < indexCount) : (indexes.Length != indexCount))
+		if (lastSubmesh ? (indexes.Length < indexCount) : (indexes.Length != indexCount)) {
 			submesh.indexes = indexes = new int[indexCount];
+			submesh.indexCount = 0;
+		}
 		
 		// Set indexes if not already set.
 		if (submesh.firstVertex != vertexIndex || submesh.indexCount < indexCount) {
