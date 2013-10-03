@@ -38,13 +38,12 @@ using UnityEngine;
 [CustomEditor(typeof(SkeletonAnimation))]
 public class SkeletonAnimationInspector : Editor {
 	private SerializedProperty skeletonDataAsset, initialSkinName, timeScale, normals, tangents;
-	private SerializedProperty animationName, loop, useAnimationName;
+	private SerializedProperty animationName, loop;
 
 	void OnEnable () {
 		skeletonDataAsset = serializedObject.FindProperty("skeletonDataAsset");
 		animationName = serializedObject.FindProperty("_animationName");
 		loop = serializedObject.FindProperty("loop");
-		useAnimationName = serializedObject.FindProperty("useAnimationName");
 		initialSkinName = serializedObject.FindProperty("initialSkinName");
 		timeScale = serializedObject.FindProperty("timeScale");
 		normals = serializedObject.FindProperty("calculateNormals");
@@ -79,15 +78,14 @@ public class SkeletonAnimationInspector : Editor {
 			initialSkinName.stringValue = skins[skinIndex];
 
 			// Animation name.
-			String[] animations = new String[component.skeleton.Data.Animations.Count + 2];
-			animations[0] = "<No Change>";
-			animations[1] = "<None>";
-			int animationIndex = useAnimationName.boolValue ? 1 : 0;
-			for (int i = 0; i < animations.Length - 2; i++) {
+			String[] animations = new String[component.skeleton.Data.Animations.Count + 1];
+			animations[0] = "<None>";
+			int animationIndex = 0;
+			for (int i = 0; i < animations.Length - 1; i++) {
 				String name = component.skeleton.Data.Animations[i].Name;
-				animations[i + 2] = name;
+				animations[i + 1] = name;
 				if (name == animationName.stringValue)
-					animationIndex = i + 2;
+					animationIndex = i + 1;
 			}
 		
 			EditorGUILayout.BeginHorizontal();
@@ -97,16 +95,10 @@ public class SkeletonAnimationInspector : Editor {
 			EditorGUIUtility.LookLikeInspector();
 			EditorGUILayout.EndHorizontal();
 
-			if (animationIndex == 0) {
+			if (animationIndex == 0)
 				component.animationName = null;
-				useAnimationName.boolValue = false;
-			} else if (animationIndex == 1) {
-				component.animationName = null;
-				useAnimationName.boolValue = true;
-			} else {
+			else
 				component.animationName = animations[animationIndex];
-				useAnimationName.boolValue = true;
-			}
 		}
 
 		// Animation loop.

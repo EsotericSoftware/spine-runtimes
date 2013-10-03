@@ -49,7 +49,6 @@ public class Spineboy : MonoBehaviour {
 	}
 
 	void OnMouseDown() {
-		skeleton.useAnimationName = false;
 		skeleton.state.SetAnimation(0, "jump", false);
 		skeleton.state.AddAnimation(0, "walk", true, 0);
 	}

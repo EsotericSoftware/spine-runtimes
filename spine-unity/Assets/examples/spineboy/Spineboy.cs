@@ -40,9 +40,7 @@ public class Spineboy : MonoBehaviour {
 	SkeletonAnimation skeletonAnimation;
 
 	public void Start () {
-		skeletonAnimation = GetComponent<SkeletonAnimation>();
-		skeletonAnimation.state.SetAnimation(0, "walk", true);
-		
+		skeletonAnimation = GetComponent<SkeletonAnimation>();	
 		skeletonAnimation.state.Event += new EventHandler<EventTriggeredArgs>(Event);
 	}
 	
