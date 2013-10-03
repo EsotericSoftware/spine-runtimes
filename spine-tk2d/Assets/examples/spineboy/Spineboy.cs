@@ -41,7 +41,6 @@ public class Spineboy : MonoBehaviour {
 	
 	void Start() {
 		skeleton = GetComponent<SkeletonAnimation>();
-		
 		skeleton.state.Event += new EventHandler<EventTriggeredArgs>(Event);
 	}
 	
@@ -49,18 +48,9 @@ public class Spineboy : MonoBehaviour {
 		Debug.Log(e.TrackIndex + " " + skeleton.state.GetCurrent(e.TrackIndex) + ": event " + e.Event + ", " + e.Event.Int);
 	}
 
-	void LateUpdate() {
-		if (skeleton.loop) return;
-		
-		TrackEntry entry = skeleton.state.GetCurrent(0);
-		if (entry != null && entry.Time >= entry.Animation.Duration - 0.25) {
-			skeleton.animationName = "walk";
-			skeleton.loop = true;
-		}
-	}
-	
 	void OnMouseDown() {
-		skeleton.animationName = "jump";
-		skeleton.loop = false;
+		skeleton.useAnimationName = false;
+		skeleton.state.SetAnimation(0, "jump", false);
+		skeleton.state.AddAnimation(0, "walk", true, 0);
 	}
 }

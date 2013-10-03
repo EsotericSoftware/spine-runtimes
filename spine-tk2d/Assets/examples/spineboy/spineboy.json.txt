@@ -280,12 +280,10 @@
 			}
 		},
 		"events": [
-			{ "time": 0.3333, "name": "headPop", "int": 1 },
-			{ "time": 0.5, "name": "headPop", "int": 2 },
-			{ "time": 0.6666, "name": "headPop", "int": 3 },
-			{ "time": 0.8333, "name": "headPop", "int": 4 },
-			{ "time": 1, "name": "headPop", "int": 5 },
-			{ "time": 1.1666, "name": "headPop", "int": 6 }
+			{ "time": 0, "name": "headPop", "string": "pop.wav" },
+			{ "time": 1.3103, "name": "behind" },
+			{ "time": 2.9655, "name": "behind" },
+			{ "time": 4, "name": "headAttach", "string": "attach.wav" }
 		],
 		"draworder": [
 			{
@@ -996,6 +994,11 @@
 					{ "time": 0.8, "angle": 6.09 },
 					{ "time": 0.9333, "angle": 2.28 },
 					{ "time": 1.0666, "angle": 3.6 }
+				]
+			},
+			"root": {
+				"rotate": [
+					{ "time": 0, "angle": 0 }
 				]
 			}
 		}
