@@ -203,8 +203,6 @@ public class AnimationState {
 		TrackEntry entry = Pools.obtain(TrackEntry.class);
 		entry.animation = animation;
 		entry.loop = loop;
-		entry.time = 0;
-		entry.lastTime = 0;
 		entry.endTime = animation.getDuration();
 		setCurrent(trackIndex, entry);
 		return entry;
@@ -223,8 +221,6 @@ public class AnimationState {
 		TrackEntry entry = Pools.obtain(TrackEntry.class);
 		entry.animation = animation;
 		entry.loop = loop;
-		entry.time = 0;
-		entry.lastTime = 0;
 		entry.endTime = animation.getDuration();
 
 		TrackEntry last = expandToIndex(trackIndex);
@@ -296,10 +292,13 @@ public class AnimationState {
 		AnimationStateListener listener;
 
 		public void reset () {
+			next = null;
+			previous = null;
 			animation = null;
 			listener = null;
-			next = null;
 			timeScale = 1;
+			lastTime = 0;
+			time = 0;
 		}
 
 		public Animation getAnimation () {
