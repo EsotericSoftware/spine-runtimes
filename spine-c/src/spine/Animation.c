@@ -518,6 +518,8 @@ void _EventTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float l
 	EventTimeline* self = (EventTimeline*)timeline;
 	int frameIndex;
 
+	if (lastTime >= self->frames[self->framesLength - 1]) return; // Last time is after last frame.
+
 	if (lastTime > time) {
 		/* Fire events after last time for looped animations. */
 		_EventTimeline_apply(timeline, skeleton, lastTime, (float)INT_MAX, firedEvents, eventCount, alpha);

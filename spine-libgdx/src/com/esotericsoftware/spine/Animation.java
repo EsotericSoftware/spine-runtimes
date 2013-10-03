@@ -537,6 +537,8 @@ public class Animation {
 			float[] frames = this.frames;
 			int frameCount = frames.length;
 
+			if (lastTime >= frames[frameCount - 1]) return; // Last time is after last frame.
+
 			if (lastTime > time) { // Fire events after last time for looped animations.
 				apply(skeleton, lastTime, Integer.MAX_VALUE, firedEvents, alpha);
 				lastTime = 0;
