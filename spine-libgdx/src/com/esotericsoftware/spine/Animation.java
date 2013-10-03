@@ -534,6 +534,7 @@ public class Animation {
 		}
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha) {
+			if (firedEvents == null) return;
 			float[] frames = this.frames;
 			int frameCount = frames.length;
 

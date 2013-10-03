@@ -460,6 +460,7 @@ namespace Spine {
 		}
 
 		public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
+			if (firedEvents == null) return;
 			float[] frames = this.frames;
 			int frameCount = frames.Length;
 

@@ -515,6 +515,7 @@ void AttachmentTimeline_setFrame (AttachmentTimeline* self, int frameIndex, floa
 
 void _EventTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float lastTime, float time, Event** firedEvents,
 		int* eventCount, float alpha) {
+	if (!firedEvents) return;
 	EventTimeline* self = (EventTimeline*)timeline;
 	int frameIndex;
 
