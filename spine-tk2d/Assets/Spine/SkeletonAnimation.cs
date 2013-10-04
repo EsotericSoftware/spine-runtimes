@@ -40,7 +40,6 @@ using Spine;
 /** Extends SkeletonComponent to apply an animation. */
 [ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class SkeletonAnimation : SkeletonComponent {
-	public bool useAnimationName;
 	public bool loop;
 	public Spine.AnimationState state;
 	
@@ -51,7 +50,6 @@ public class SkeletonAnimation : SkeletonComponent {
 			return entry == null ? null : entry.Animation.Name;
 		}
 		set {
-			if (!useAnimationName) return;
 			if (_animationName == value) return;
 			_animationName = value;
 			if (value == null || value.Length == 0)
