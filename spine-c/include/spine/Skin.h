@@ -8,7 +8,7 @@
  * or without modification, are permitted provided that the following conditions
  * are met:
  * 
- * 1. A Spine Single User License, Professional License, or Education License must
+ * 1. A Spine Essential, Professional, Enterprise, or Education License must
  *    be purchased from Esoteric Software and the license must remain valid:
  *    http://esotericsoftware.com/
  * 2. Redistributions of source code must retain this license, which is the
