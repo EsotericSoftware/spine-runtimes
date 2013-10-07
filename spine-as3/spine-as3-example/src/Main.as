@@ -65,17 +65,27 @@ public class Main extends Sprite {
 		stateData.setMixByName("walk", "jump", 0.2);
 		stateData.setMixByName("jump", "walk", 0.4);
 		stateData.setMixByName("jump", "jump", 0.2);
+        
+        var stateData2:AnimationStateData = new AnimationStateData(skeletonData);
+        stateData2.setMixByName("walk", "jump", 0.2);
+        stateData2.setMixByName("jump", "walk", 0.4);
+        stateData2.setMixByName("jump", "jump", 0.2);
+        stateData2.additive = true;
+        stateData2.additiveAlpha = 0.3;
 
 		skeleton = new SkeletonAnimation(skeletonData);
 		skeleton.setAnimationStateData(stateData);
+        skeleton.addAnimationState(stateData2);
 		skeleton.x = 320;
 		skeleton.y = 420;
-		if (true) {
+		if (false) {
 			skeleton.setAnimation("drawOrder", true);
 		} else {
 			skeleton.setAnimation("walk", true);
 			skeleton.addAnimation("jump", false, 3);
 			skeleton.addAnimation("walk", true);
+            
+            skeleton.setAnimation("jump", true, 1);
 		}
 
 		addChild(skeleton);

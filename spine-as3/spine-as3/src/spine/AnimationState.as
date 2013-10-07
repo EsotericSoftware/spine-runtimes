@@ -69,16 +69,26 @@ public class AnimationState {
 	public function apply (skeleton:Skeleton) : void {
 		if (!current)
 			return;
-		if (previous) {
-			previous.apply(skeleton, previousTime, previousLoop);
-			var alpha:Number = mixTime / mixDuration;
-			if (alpha >= 1) {
-				alpha = 1;
-				previous = null;
-			}
-			current.mix(skeleton, currentTime, currentLoop, alpha);
-		} else
-			current.apply(skeleton, currentTime, currentLoop);
+            
+        if (previous) {
+            previous.apply(skeleton, previousTime, previousLoop);
+            var alpha:Number = mixTime / mixDuration;
+            if (alpha >= 1) {
+                alpha = 1;
+                previous = null;
+            }
+            if (_data.additive) {
+                current.mix(skeleton, currentTime, currentLoop, alpha * _data.additiveAlpha);
+            } else {
+                current.mix(skeleton, currentTime, currentLoop, alpha);
+            }
+        } else {
+            if (_data.additive) {
+                current.mix(skeleton, currentTime, currentLoop, _data.additiveAlpha);
+            } else {
+                current.apply(skeleton, currentTime, currentLoop);
+            }
+        }
 	}
 
 	public function clearAnimation () : void {

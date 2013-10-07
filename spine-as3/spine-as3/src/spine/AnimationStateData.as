@@ -37,10 +37,14 @@ import spine.animation.Animation;
 public class AnimationStateData {
 	private var _skeletonData:SkeletonData;
 	private var animationToMixTime:Object = new Object();
+    private var _additive:Boolean; // Additive animation support
+	private var _additiveAlpha:Number;
 	public var defaultMix:Number = 0;
 
 	public function AnimationStateData (skeletonData:SkeletonData) {
 		_skeletonData = skeletonData;
+        _additive = false;
+        _additiveAlpha = 1.0;
 	}
 
 	public function get skeletonData () : SkeletonData {
@@ -70,6 +74,24 @@ public class AnimationStateData {
 		if (time == null)
 			return defaultMix;
 		return time as Number;
+	}
+    
+    /** Set the additive support */
+	public function get additive () : Boolean {
+		return _additive;
+	}
+	
+	public function set additive (enable:Boolean) : void {
+        _additive = enable;
+	}
+	
+	/** Set the additive blend alpha */
+	public function get additiveAlpha () : Number {
+		return _additiveAlpha;
+	}
+	
+	public function set additiveAlpha (alpha:Number) : void {
+        _additiveAlpha = alpha;
 	}
 }
 
