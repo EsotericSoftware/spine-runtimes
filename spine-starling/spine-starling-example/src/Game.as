@@ -3,7 +3,9 @@ package {
 import spine.AnimationStateData;
 import spine.SkeletonData;
 import spine.SkeletonJson;
+import spine.Slot;
 import spine.starling.SkeletonAnimation;
+import spine.starling.SkeletonAttachment;
 import spine.starling.StarlingAtlasAttachmentLoader;
 
 import starling.core.Starling;
@@ -25,6 +27,7 @@ public class Game extends Sprite {
 	static public const SpineboyJson:Class;
 
 	private var skeleton:SkeletonAnimation;
+    private var skeleton2:SkeletonAnimation;
 
 	public function Game () {
 		var texture:Texture = Texture.fromBitmap(new SpineboyAtlasTexture());
@@ -49,6 +52,16 @@ public class Game extends Sprite {
 
 		addChild(skeleton);
 		Starling.juggler.add(skeleton);
+        
+        // Add the second skeleton and bind it to the first left hand.
+        skeleton2 = new SkeletonAnimation(skeletonData);
+        skeleton2.setAnimationStateData(stateData);
+        skeleton2.setAnimation("walk", true);
+        
+        var slot:Slot = skeleton.findSlot("left hand");
+        slot.attachment = new SkeletonAttachment("right hand attachment", skeleton2);
+
+        Starling.juggler.add(skeleton2);
 
 		addEventListener(TouchEvent.TOUCH, onClick);
 	}

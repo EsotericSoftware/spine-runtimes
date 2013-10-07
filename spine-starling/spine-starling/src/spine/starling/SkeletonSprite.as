@@ -46,6 +46,7 @@ import starling.animation.IAnimatable;
 import starling.core.RenderSupport;
 import starling.display.BlendMode;
 import starling.display.DisplayObject;
+import starling.filters.FragmentFilter
 import starling.utils.Color;
 import starling.utils.MatrixUtil;
 
@@ -68,6 +69,10 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 	public function advanceTime (delta:Number) : void {
 		_skeleton.update(delta);
 	}
+    
+    public function findSlot(name:String) : Slot {
+        return _skeleton.findSlot(name);
+    }
 
 	override public function render (support:RenderSupport, alpha:Number) : void {
 		alpha *= this.alpha * skeleton.a;
@@ -86,23 +91,56 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 
 				var image:SkeletonImage = regionAttachment.rendererObject as SkeletonImage;
 				var vertexData:Vector.<Number> = image.vertexData.rawData;
-						
-				image.vertexData.setPosition(0, vertices[2], vertices[3]);				
-				image.vertexData.setColorAndAlpha(0, rgb, a);
-				
-				image.vertexData.setPosition(1, vertices[4], vertices[5]);
-				image.vertexData.setColorAndAlpha(1, rgb, a);
-				
-				image.vertexData.setPosition(2, vertices[0], vertices[1]);
-				image.vertexData.setColorAndAlpha(2, rgb, a);
-				
-				image.vertexData.setPosition(3, vertices[6], vertices[7]);
-				image.vertexData.setColorAndAlpha(3, rgb, a);
+                
+                image.vertexData.setPosition(0, vertices[2], vertices[3]);				
+                image.vertexData.setColor(0, rgb);
+                image.vertexData.setAlpha(0, a);
+                
+                image.vertexData.setPosition(1, vertices[4], vertices[5]);
+                image.vertexData.setColor(1, rgb);
+                image.vertexData.setAlpha(1, a);
+                
+                image.vertexData.setPosition(2, vertices[0], vertices[1]);
+                image.vertexData.setColor(2, rgb);
+                image.vertexData.setAlpha(2, a);
+                
+                image.vertexData.setPosition(3, vertices[6], vertices[7]);
+                image.vertexData.setColor(3, rgb);
+                image.vertexData.setAlpha(3, a);
 
 				image.updateVertices();
 				support.blendMode = slot.data.additiveBlending ? BlendMode.ADD : BlendMode.NORMAL;
 				support.batchQuad(image, alpha, image.texture);
 			}
+            else
+            {
+                var skeletonAttachment:SkeletonAttachment = slot.attachment as SkeletonAttachment;
+                if (skeletonAttachment != null) {
+                    var skt:SkeletonAnimation = skeletonAttachment.skeletion;
+                    
+                    if (skt.hasVisibleArea) {
+                        skt.x = slot.bone.worldX;
+                        skt.y = slot.bone.worldY;
+                        skt.rotation = slot.bone.worldRotation * (3.1415926) / 180;
+                        skt.scaleX = slot.bone.worldScaleX;
+                        skt.scaleY = slot.bone.worldScaleY;
+                        
+                        skt.alpha = slot.a;
+                        
+                        var filter:FragmentFilter = skt.filter;
+                        
+                        support.pushMatrix();
+                        support.transformMatrix(skt);
+                        support.blendMode = skt.blendMode;
+                        
+                        if (filter) filter.render(skt, support, alpha);
+                        else        skt.render(support, alpha);
+                        
+                        support.blendMode = blendMode;
+                        support.popMatrix();
+                    }
+                }
+            }
 		}
 	}
 
