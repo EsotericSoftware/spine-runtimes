@@ -92,7 +92,7 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 				var image:SkeletonImage = regionAttachment.rendererObject as SkeletonImage;
 				var vertexData:Vector.<Number> = image.vertexData.rawData;
                 
-                image.vertexData.setPosition(0, vertices[2], vertices[3]);				
+                image.vertexData.setPosition(0, vertices[2], vertices[3]);
                 image.vertexData.setColor(0, rgb);
                 image.vertexData.setAlpha(0, a);
                 
@@ -114,27 +114,27 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 			}
             else
             {
-                var skeletonAttachment:SkeletonAttachment = slot.attachment as SkeletonAttachment;
-                if (skeletonAttachment != null) {
-                    var skt:SkeletonAnimation = skeletonAttachment.skeletion;
+                var displayAttachment:DisplayAttachment = slot.attachment as DisplayAttachment;
+                if (displayAttachment != null) {
+                    var display:DisplayObject = displayAttachment.display;
                     
-                    if (skt.hasVisibleArea) {
-                        skt.x = slot.bone.worldX;
-                        skt.y = slot.bone.worldY;
-                        skt.rotation = slot.bone.worldRotation * (3.1415926) / 180;
-                        skt.scaleX = slot.bone.worldScaleX;
-                        skt.scaleY = slot.bone.worldScaleY;
+                    if (display.hasVisibleArea) {
+                        display.x = slot.bone.worldX;
+                        display.y = slot.bone.worldY;
+                        display.rotation = slot.bone.worldRotation * (3.1415926) / 180;
+                        display.scaleX = slot.bone.worldScaleX;
+                        display.scaleY = slot.bone.worldScaleY;
                         
-                        skt.alpha = slot.a;
+                        display.alpha = slot.a;
                         
-                        var filter:FragmentFilter = skt.filter;
+                        var filter:FragmentFilter = display.filter;
                         
                         support.pushMatrix();
-                        support.transformMatrix(skt);
-                        support.blendMode = skt.blendMode;
+                        support.transformMatrix(display);
+                        support.blendMode = display.blendMode;
                         
-                        if (filter) filter.render(skt, support, alpha);
-                        else        skt.render(support, alpha);
+                        if (filter) filter.render(display, support, alpha);
+                        else        display.render(support, alpha);
                         
                         support.blendMode = blendMode;
                         support.popMatrix();

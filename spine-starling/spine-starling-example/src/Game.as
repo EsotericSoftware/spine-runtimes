@@ -5,7 +5,7 @@ import spine.SkeletonData;
 import spine.SkeletonJson;
 import spine.Slot;
 import spine.starling.SkeletonAnimation;
-import spine.starling.SkeletonAttachment;
+import spine.starling.DisplayAttachment;
 import spine.starling.StarlingAtlasAttachmentLoader;
 
 import starling.core.Starling;
@@ -44,7 +44,7 @@ public class Game extends Sprite {
 
 		skeleton = new SkeletonAnimation(skeletonData);
 		skeleton.setAnimationStateData(stateData);
-		skeleton.x = 320;
+		skeleton.x = 220;
 		skeleton.y = 420;
 		skeleton.setAnimation("walk", true);
 		skeleton.addAnimation("jump", false, 3);
@@ -59,7 +59,7 @@ public class Game extends Sprite {
         skeleton2.setAnimation("walk", true);
         
         var slot:Slot = skeleton.findSlot("left hand");
-        slot.attachment = new SkeletonAttachment("right hand attachment", skeleton2);
+        slot.attachment = new DisplayAttachment("right hand attachment", skeleton2);
 
         Starling.juggler.add(skeleton2);
 
