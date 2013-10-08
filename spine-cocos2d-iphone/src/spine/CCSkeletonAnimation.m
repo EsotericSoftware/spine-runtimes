@@ -132,11 +132,21 @@ static void callback (AnimationState* state, int trackIndex, EventType type, Eve
 }
 
 - (TrackEntry*) setAnimationForTrack:(int)trackIndex name:(NSString*)name loop:(bool)loop {
-	return AnimationState_setAnimationByName(_state, trackIndex, [name UTF8String], loop);
+	Animation* animation = SkeletonData_findAnimation(_skeleton->data, [name UTF8String]);
+	if (!animation) {
+		CCLOG(@"Spine: Animation not found: %@", name);
+		return 0;
+	}
+	return AnimationState_setAnimation(_state, trackIndex, animation, loop);
 }
 
 - (TrackEntry*) addAnimationForTrack:(int)trackIndex name:(NSString*)name loop:(bool)loop afterDelay:(int)delay {
-	return AnimationState_addAnimationByName(_state, trackIndex, [name UTF8String], loop, delay);
+	Animation* animation = SkeletonData_findAnimation(_skeleton->data, [name UTF8String]);
+	if (!animation) {
+		CCLOG(@"Spine: Animation not found: %@", name);
+		return 0;
+	}
+	return AnimationState_addAnimation(_state, trackIndex, animation, loop, delay);
 }
 
 - (TrackEntry*) getCurrentForTrack:(int)trackIndex {

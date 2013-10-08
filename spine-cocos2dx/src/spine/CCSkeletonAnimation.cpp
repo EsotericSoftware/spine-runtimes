@@ -124,11 +124,21 @@ void CCSkeletonAnimation::setAnimationListener (CCObject* instance, SEL_Animatio
 }
 
 TrackEntry* CCSkeletonAnimation::setAnimation (int trackIndex, const char* name, bool loop) {
-	return AnimationState_setAnimationByName(state, trackIndex, name, loop);
+	Animation* animation = SkeletonData_findAnimation(skeleton->data, name);
+	if (!animation) {
+		CCLog("Spine: Animation not found: %s", name);
+		return 0;
+	}
+	return AnimationState_setAnimation(state, trackIndex, animation, loop);
 }
 
 TrackEntry* CCSkeletonAnimation::addAnimation (int trackIndex, const char* name, bool loop, float delay) {
-	return AnimationState_addAnimationByName(state, trackIndex, name, loop, delay);
+	Animation* animation = SkeletonData_findAnimation(skeleton->data, name);
+	if (!animation) {
+		CCLog("Spine: Animation not found: %s", name);
+		return 0;
+	}
+	return AnimationState_addAnimation(state, trackIndex, animation, loop, delay);
 }
 
 TrackEntry* CCSkeletonAnimation::getCurrent (int trackIndex) { 
