@@ -221,7 +221,7 @@ void _AnimationState_setCurrent (AnimationState* self, int index, TrackEntry* en
 }
 
 TrackEntry* AnimationState_setAnimationByName (AnimationState* self, int trackIndex, const char* animationName, int/*bool*/loop) {
-	Animation* animation = animationName ? SkeletonData_findAnimation(self->data->skeletonData, animationName) : 0;
+	Animation* animation = SkeletonData_findAnimation(self->data->skeletonData, animationName);
 	return AnimationState_setAnimation(self, trackIndex, animation, loop);
 }
 
@@ -234,14 +234,14 @@ TrackEntry* AnimationState_setAnimation (AnimationState* self, int trackIndex, A
 	entry->animation = animation;
 	entry->loop = loop;
 	entry->time = 0;
-	entry->endTime = animation ? animation->duration : 0;
+	entry->endTime = animation->duration;
 	_AnimationState_setCurrent(self, trackIndex, entry);
 	return entry;
 }
 
 TrackEntry* AnimationState_addAnimationByName (AnimationState* self, int trackIndex, const char* animationName, int/*bool*/loop,
 		float delay) {
-	Animation* animation = animationName ? SkeletonData_findAnimation(self->data->skeletonData, animationName) : 0;
+	Animation* animation = SkeletonData_findAnimation(self->data->skeletonData, animationName);
 	return AnimationState_addAnimation(self, trackIndex, animation, loop, delay);
 }
 
@@ -252,7 +252,7 @@ TrackEntry* AnimationState_addAnimation (AnimationState* self, int trackIndex, A
 	entry->animation = animation;
 	entry->loop = loop;
 	entry->time = 0;
-	entry->endTime = animation ? animation->duration : 0;
+	entry->endTime = animation->duration;
 
 	last = _AnimationState_expandToIndex(self, trackIndex);
 	if (last) {
