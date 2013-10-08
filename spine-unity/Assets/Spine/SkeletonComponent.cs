@@ -55,7 +55,6 @@ public class SkeletonComponent : MonoBehaviour {
 	private Material[] sharedMaterials = new Material[0];
 	private List<Material> submeshMaterials = new List<Material>();
 	private List<Submesh> submeshes = new List<Submesh>();
-	private Vector4[] tangents = new Vector4[0];
 
 	public virtual void Clear () {
 		GetComponent<MeshFilter>().mesh = null;
@@ -192,6 +191,7 @@ public class SkeletonComponent : MonoBehaviour {
 
 			vertexIndex += 4;
 		}
+		
 		mesh.vertices = vertices;
 		mesh.colors32 = colors;
 		mesh.uv = uvs;
@@ -201,16 +201,18 @@ public class SkeletonComponent : MonoBehaviour {
 		for (int i = 0; i < submeshCount; ++i)
 			mesh.SetTriangles(submeshes[i].indexes, i);
 
-		if (calculateNormals) {
-			mesh.RecalculateNormals();
+		if (newTriangles && calculateNormals) {
+			Vector3[] normals = new Vector3[vertexCount];
+			Vector3 normal = new Vector3(0, 0, -1);
+			for (int i = 0; i < vertexCount; i++)
+				normals[i] = normal;
+			mesh.normals = normals;
+
 			if (calculateTangents) {
-				Vector4[] tangents = this.tangents;
-				int count = mesh.normals.Length;
-				if (tangents.Length != count) {
-					this.tangents = tangents = new Vector4[count];
-					for (int i = 0; i < count; i++)
-						tangents[i] = new Vector4(1, 0, 0, 1);
-				}
+				Vector4[] tangents = new Vector4[vertexCount];
+				Vector3 tangent = new Vector3(0, 0, 1);
+				for (int i = 0; i < vertexCount; i++)
+					tangents[i] = tangent;
 				mesh.tangents = tangents;
 			}
 		}
