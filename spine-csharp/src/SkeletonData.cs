@@ -131,7 +131,7 @@ namespace Spine {
 		}
 
 		/// <returns>May be null.</returns>
-		public EventData findEvent (String eventDataName) {
+		public EventData FindEvent (String eventDataName) {
 			if (eventDataName == null) throw new ArgumentNullException("eventDataName cannot be null.");
 			foreach (EventData eventData in events)
 				if (eventData.Name == eventDataName) return eventData;
