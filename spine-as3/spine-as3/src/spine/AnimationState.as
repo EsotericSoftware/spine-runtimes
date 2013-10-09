@@ -78,13 +78,19 @@ public class AnimationState {
                 previous = null;
             }
             if (_data.additive) {
-                current.mix(skeleton, currentTime, currentLoop, alpha * _data.additiveAlpha);
+                if(current.duration >= currentTime)
+                {
+                    current.mix(skeleton, currentTime, currentLoop, alpha * _data.additiveAlpha);
+                }
             } else {
                 current.mix(skeleton, currentTime, currentLoop, alpha);
             }
         } else {
             if (_data.additive) {
-                current.mix(skeleton, currentTime, currentLoop, _data.additiveAlpha);
+                if(current.duration >= currentTime)
+                {
+                    current.mix(skeleton, currentTime, currentLoop, _data.additiveAlpha);
+                }
             } else {
                 current.apply(skeleton, currentTime, currentLoop);
             }

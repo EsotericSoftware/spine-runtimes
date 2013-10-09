@@ -41,9 +41,14 @@ public class Game extends Sprite {
 		stateData.setMixByName("walk", "jump", 0.2);
 		stateData.setMixByName("jump", "walk", 0.4);
 		stateData.setMixByName("jump", "jump", 0.2);
+        
+        var additiveStateData:AnimationStateData = new AnimationStateData(skeletonData);
+        additiveStateData.additive = true;
+        additiveStateData.additiveAlpha = 0.4;
 
 		skeleton = new SkeletonAnimation(skeletonData);
 		skeleton.setAnimationStateData(stateData);
+        skeleton.addAnimationState(additiveStateData);
 		skeleton.x = 220;
 		skeleton.y = 420;
 		skeleton.setAnimation("walk", true);
@@ -69,8 +74,8 @@ public class Game extends Sprite {
 	private function onClick (event:TouchEvent) : void {
 		var touch:Touch = event.getTouch(this);
 		if (touch && touch.phase == TouchPhase.BEGAN) {
-			skeleton.setAnimation("jump", false);
-			skeleton.addAnimation("walk", true);
+			skeleton.setAnimation("jump", false, 1);
+			//skeleton.addAnimation("walk", true);
 		}
 	}
 }
