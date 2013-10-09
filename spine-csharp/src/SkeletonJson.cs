@@ -354,7 +354,7 @@ namespace Spine {
 				EventTimeline timeline = new EventTimeline(eventsMap.Count);
 				int frameIndex = 0;
 				foreach (Dictionary<String, Object> eventMap in eventsMap) {
-					EventData eventData = skeletonData.findEvent((String)eventMap["name"]);
+					EventData eventData = skeletonData.FindEvent((String)eventMap["name"]);
 					if (eventData == null) throw new Exception("Event not found: " + eventMap["name"]);
 					Event e = new Event(eventData);
 					e.Int = GetInt(eventMap, "int", eventData.Int);
