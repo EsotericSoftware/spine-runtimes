@@ -45,47 +45,68 @@ typedef struct {
 	float* const vertices;
 	int count;
 	int capacity;
-} BoundingPolygon;
+} spBoundingPolygon;
 
-BoundingPolygon* BoundingPolygon_create (int capacity);
-void BoundingPolygon_dispose (BoundingPolygon* self);
+spBoundingPolygon* spBoundingPolygon_create (int capacity);
+void spBoundingPolygon_dispose (spBoundingPolygon* self);
 
-int/*bool*/BoundingPolygon_containsPoint (BoundingPolygon* polygon, float x, float y);
-int/*bool*/BoundingPolygon_intersectsSegment (BoundingPolygon* polygon, float x1, float y1, float x2, float y2);
+int/*bool*/spBoundingPolygon_containsPoint (spBoundingPolygon* polygon, float x, float y);
+int/*bool*/spBoundingPolygon_intersectsSegment (spBoundingPolygon* polygon, float x1, float y1, float x2, float y2);
+
+#ifdef SPINE_SHORT_NAMES
+typedef spBoundingPolygon BoundingPolygon;
+#define BoundingPolygon_create(...) spBoundingPolygon_create(__VA_ARGS__)
+#define BoundingPolygon_dispose(...) spBoundingPolygon_dispose(__VA_ARGS__)
+#define BoundingPolygon_containsPoint(...) spBoundingPolygon_containsPoint(__VA_ARGS__)
+#define BoundingPolygon_intersectsSegment(...) spBoundingPolygon_intersectsSegment(__VA_ARGS__)
+#endif
 
 /**/
 
 typedef struct {
 	int count;
-	BoundingBoxAttachment** boundingBoxes;
-	BoundingPolygon** polygons;
+	spBoundingBoxAttachment** boundingBoxes;
+	spBoundingPolygon** polygons;
 
 	float minX, minY, maxX, maxY;
-} SkeletonBounds;
+} spSkeletonBounds;
 
-SkeletonBounds* SkeletonBounds_create ();
-void SkeletonBounds_dispose (SkeletonBounds* self);
-void SkeletonBounds_update (SkeletonBounds* self, Skeleton* skeleton, int/*bool*/updateAabb);
+spSkeletonBounds* spSkeletonBounds_create ();
+void spSkeletonBounds_dispose (spSkeletonBounds* self);
+void spSkeletonBounds_update (spSkeletonBounds* self, spSkeleton* skeleton, int/*bool*/updateAabb);
 
 /** Returns true if the axis aligned bounding box contains the point. */
-int/*bool*/SkeletonBounds_aabbContainsPoint (SkeletonBounds* self, float x, float y);
+int/*bool*/spSkeletonBounds_aabbContainsPoint (spSkeletonBounds* self, float x, float y);
 
 /** Returns true if the axis aligned bounding box intersects the line segment. */
-int/*bool*/SkeletonBounds_aabbIntersectsSegment (SkeletonBounds* self, float x1, float y1, float x2, float y2);
+int/*bool*/spSkeletonBounds_aabbIntersectsSegment (spSkeletonBounds* self, float x1, float y1, float x2, float y2);
 
 /** Returns true if the axis aligned bounding box intersects the axis aligned bounding box of the specified bounds. */
-int/*bool*/SkeletonBounds_aabbIntersectsSkeleton (SkeletonBounds* self, SkeletonBounds* bounds);
+int/*bool*/spSkeletonBounds_aabbIntersectsSkeleton (spSkeletonBounds* self, spSkeletonBounds* bounds);
 
 /** Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
- * efficient to only call this method if SkeletonBounds_aabbContainsPoint returns true. */
-BoundingBoxAttachment* SkeletonBounds_containsPoint (SkeletonBounds* self, float x, float y);
+ * efficient to only call this method if spSkeletonBounds_aabbContainsPoint returns true. */
+spBoundingBoxAttachment* spSkeletonBounds_containsPoint (spSkeletonBounds* self, float x, float y);
 
 /** Returns the first bounding box attachment that contains the line segment, or null. When doing many checks, it is usually
- * more efficient to only call this method if SkeletonBounds_aabbIntersectsSegment returns true. */
-BoundingBoxAttachment* SkeletonBounds_intersectsSegment (SkeletonBounds* self, float x1, float y1, float x2, float y2);
+ * more efficient to only call this method if spSkeletonBounds_aabbIntersectsSegment returns true. */
+spBoundingBoxAttachment* spSkeletonBounds_intersectsSegment (spSkeletonBounds* self, float x1, float y1, float x2, float y2);
 
 /** Returns the polygon for the specified bounding box, or null. */
-BoundingPolygon* SkeletonBounds_getPolygon (SkeletonBounds* self, BoundingBoxAttachment* boundingBox);
+spBoundingPolygon* spSkeletonBounds_getPolygon (spSkeletonBounds* self, spBoundingBoxAttachment* boundingBox);
+
+#ifdef SPINE_SHORT_NAMES
+typedef spSkeletonBounds SkeletonBounds;
+#define SkeletonBounds_create(...) spSkeletonBounds_create(__VA_ARGS__)
+#define SkeletonBounds_dispose(...) spSkeletonBounds_dispose(__VA_ARGS__)
+#define SkeletonBounds_update(...) spSkeletonBounds_update(__VA_ARGS__)
+#define SkeletonBounds_aabbContainsPoint(...) spSkeletonBounds_aabbContainsPoint(__VA_ARGS__)
+#define SkeletonBounds_aabbIntersectsSegment(...) spSkeletonBounds_aabbIntersectsSegment(__VA_ARGS__)
+#define SkeletonBounds_aabbIntersectsSkeleton(...) spSkeletonBounds_aabbIntersectsSkeleton(__VA_ARGS__)
+#define SkeletonBounds_containsPoint(...) spSkeletonBounds_containsPoint(__VA_ARGS__)
+#define SkeletonBounds_intersectsSegment(...) spSkeletonBounds_intersectsSegment(__VA_ARGS__)
+#define SkeletonBounds_getPolygon(...) spSkeletonBounds_getPolygon(__VA_ARGS__)
+#endif
 
 #ifdef __cplusplus
 }

@@ -36,38 +36,38 @@
 #include <spine/Skeleton.h>
 
 typedef struct {
-	Slot super;
+	spSlot super;
 	float attachmentTime;
-} _Slot;
+} _spSlot;
 
-Slot* Slot_create (SlotData* data, Skeleton* skeleton, Bone* bone) {
-	Slot* self = SUPER(NEW(_Slot));
-	CONST_CAST(SlotData*, self->data) = data;
-	CONST_CAST(Skeleton*, self->skeleton) = skeleton;
-	CONST_CAST(Bone*, self->bone) = bone;
-	Slot_setToSetupPose(self);
+spSlot* spSlot_create (spSlotData* data, spSkeleton* skeleton, spBone* bone) {
+	spSlot* self = SUPER(NEW(_spSlot));
+	CONST_CAST(spSlotData*, self->data) = data;
+	CONST_CAST(spSkeleton*, self->skeleton) = skeleton;
+	CONST_CAST(spBone*, self->bone) = bone;
+	spSlot_setToSetupPose(self);
 	return self;
 }
 
-void Slot_dispose (Slot* self) {
+void spSlot_dispose (spSlot* self) {
 	FREE(self);
 }
 
-void Slot_setAttachment (Slot* self, Attachment* attachment) {
-	CONST_CAST(Attachment*, self->attachment) = attachment;
-	SUB_CAST(_Slot, self) ->attachmentTime = self->skeleton->time;
+void spSlot_setAttachment (spSlot* self, spAttachment* attachment) {
+	CONST_CAST(spAttachment*, self->attachment) = attachment;
+	SUB_CAST(_spSlot, self) ->attachmentTime = self->skeleton->time;
 }
 
-void Slot_setAttachmentTime (Slot* self, float time) {
-	SUB_CAST(_Slot, self) ->attachmentTime = self->skeleton->time - time;
+void spSlot_setAttachmentTime (spSlot* self, float time) {
+	SUB_CAST(_spSlot, self) ->attachmentTime = self->skeleton->time - time;
 }
 
-float Slot_getAttachmentTime (const Slot* self) {
-	return self->skeleton->time - SUB_CAST(_Slot, self) ->attachmentTime;
+float spSlot_getAttachmentTime (const spSlot* self) {
+	return self->skeleton->time - SUB_CAST(_spSlot, self) ->attachmentTime;
 }
 
-void Slot_setToSetupPose (Slot* self) {
-	Attachment* attachment = 0;
+void spSlot_setToSetupPose (spSlot* self) {
+	spAttachment* attachment = 0;
 	self->r = self->data->r;
 	self->g = self->data->g;
 	self->b = self->data->b;
@@ -78,10 +78,10 @@ void Slot_setToSetupPose (Slot* self) {
 		int i;
 		for (i = 0; i < self->skeleton->data->slotCount; ++i) {
 			if (self->data == self->skeleton->data->slots[i]) {
-				attachment = Skeleton_getAttachmentForSlotIndex(self->skeleton, i, self->data->attachmentName);
+				attachment = spSkeleton_getAttachmentForSlotIndex(self->skeleton, i, self->data->attachmentName);
 				break;
 			}
 		}
 	}
-	Slot_setAttachment(self, attachment);
+	spSlot_setAttachment(self, attachment);
 }

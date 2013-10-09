@@ -40,10 +40,10 @@
 extern "C" {
 #endif
 
-typedef struct Bone Bone;
-struct Bone {
-	BoneData* const data;
-	Bone* const parent;
+typedef struct spBone spBone;
+struct spBone {
+	spBoneData* const data;
+	spBone* const parent;
 	float x, y;
 	float rotation;
 	float scaleX, scaleY;
@@ -54,15 +54,24 @@ struct Bone {
 	float const worldScaleX, worldScaleY;
 };
 
-void Bone_setYDown (int/*bool*/yDown);
+void spBone_setYDown (int/*bool*/yDown);
 
 /* @param parent May be 0. */
-Bone* Bone_create (BoneData* data, Bone* parent);
-void Bone_dispose (Bone* self);
+spBone* spBone_create (spBoneData* data, spBone* parent);
+void spBone_dispose (spBone* self);
 
-void Bone_setToSetupPose (Bone* self);
+void spBone_setToSetupPose (spBone* self);
 
-void Bone_updateWorldTransform (Bone* self, int/*bool*/flipX, int/*bool*/flipY);
+void spBone_updateWorldTransform (spBone* self, int/*bool*/flipX, int/*bool*/flipY);
+
+#ifdef SPINE_SHORT_NAMES
+typedef spBone Bone;
+#define Bone_setYDown(...) spBone_setYDown(__VA_ARGS__)
+#define Bone_create(...) spBone_create(__VA_ARGS__)
+#define Bone_dispose(...) spBone_dispose(__VA_ARGS__)
+#define Bone_setToSetupPose(...) spBone_setToSetupPose(__VA_ARGS__)
+#define Bone_updateWorldTransform(...) spBone_updateWorldTransform(__VA_ARGS__)
+#endif
 
 #ifdef __cplusplus
 }

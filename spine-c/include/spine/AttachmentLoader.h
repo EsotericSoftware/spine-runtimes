@@ -41,21 +41,31 @@
 extern "C" {
 #endif
 
-typedef struct AttachmentLoader AttachmentLoader;
-struct AttachmentLoader {
+typedef struct spAttachmentLoader spAttachmentLoader;
+struct spAttachmentLoader {
 	const char* error1;
 	const char* error2;
 
 	const void* const vtable;
 #ifdef __cplusplus
-	AttachmentLoader () : error1(0), error2(0), vtable(0) {}
+	spAttachmentLoader () :
+					error1(0),
+					error2(0),
+					vtable(0) {
+	}
 #endif
 };
 
-void AttachmentLoader_dispose (AttachmentLoader* self);
+void spAttachmentLoader_dispose (spAttachmentLoader* self);
 
-/* Returns 0 to not load an attachment. If 0 is returned and AttachmentLoader.error1 is set, an error occurred. */
-Attachment* AttachmentLoader_newAttachment (AttachmentLoader* self, Skin* skin, AttachmentType type, const char* name);
+/* Returns 0 to not load an attachment. If 0 is returned and spAttachmentLoader.error1 is set, an error occurred. */
+spAttachment* spAttachmentLoader_newAttachment (spAttachmentLoader* self, spSkin* skin, spAttachmentType type, const char* name);
+
+#ifdef SPINE_SHORT_NAMES
+typedef spAttachmentLoader AttachmentLoader;
+#define AttachmentLoader_dispose(...) spAttachmentLoader_dispose(__VA_ARGS__)
+#define AttachmentLoader_newAttachment(...) spAttachmentLoader_newAttachment(__VA_ARGS__)
+#endif
 
 #ifdef __cplusplus
 }

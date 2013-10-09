@@ -38,21 +38,27 @@
 extern "C" {
 #endif
 
-struct Slot;
+struct spSlot;
 
 typedef enum {
 	ATTACHMENT_REGION, ATTACHMENT_REGION_SEQUENCE, ATTACHMENT_BOUNDING_BOX
-} AttachmentType;
+} spAttachmentType;
 
-typedef struct Attachment Attachment;
-struct Attachment {
+typedef struct spAttachment spAttachment;
+struct spAttachment {
 	const char* const name;
-	AttachmentType type;
+	spAttachmentType type;
 
 	const void* const vtable;
 };
 
-void Attachment_dispose (Attachment* self);
+void spAttachment_dispose (spAttachment* self);
+
+#ifdef SPINE_SHORT_NAMES
+typedef spAttachmentType AttachmentType;
+typedef spAttachment Attachment;
+#define Attachment_dispose(...) spAttachment_dispose(__VA_ARGS__)
+#endif
 
 #ifdef __cplusplus
 }

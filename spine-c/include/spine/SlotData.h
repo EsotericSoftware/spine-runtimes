@@ -42,17 +42,24 @@ extern "C" {
 
 typedef struct {
 	const char* const name;
-	const BoneData* const boneData;
+	const spBoneData* const boneData;
 	const char* const attachmentName;
 	float r, g, b, a;
 	int/*bool*/additiveBlending;
-} SlotData;
+} spSlotData;
 
-SlotData* SlotData_create (const char* name, BoneData* boneData);
-void SlotData_dispose (SlotData* self);
+spSlotData* spSlotData_create (const char* name, spBoneData* boneData);
+void spSlotData_dispose (spSlotData* self);
 
 /* @param attachmentName May be 0 for no setup pose attachment. */
-void SlotData_setAttachmentName (SlotData* self, const char* attachmentName);
+void spSlotData_setAttachmentName (spSlotData* self, const char* attachmentName);
+
+#ifdef SPINE_SHORT_NAMES
+typedef spSlotData SlotData;
+#define SlotData_create(...) spSlotData_create(__VA_ARGS__)
+#define SlotData_dispose(...) spSlotData_dispose(__VA_ARGS__)
+#define SlotData_setAttachmentName(...) spSlotData_setAttachmentName(__VA_ARGS__)
+#endif
 
 #ifdef __cplusplus
 }

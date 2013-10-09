@@ -44,11 +44,11 @@ extern "C" {
 
 typedef enum {
 	VERTEX_X1 = 0, VERTEX_Y1, VERTEX_X2, VERTEX_Y2, VERTEX_X3, VERTEX_Y3, VERTEX_X4, VERTEX_Y4
-} VertexIndex;
+} spVertexIndex;
 
-typedef struct RegionAttachment RegionAttachment;
-struct RegionAttachment {
-	Attachment super;
+typedef struct spRegionAttachment spRegionAttachment;
+struct spRegionAttachment {
+	spAttachment super;
 	float x, y, scaleX, scaleY, rotation, width, height;
 
 	void* rendererObject;
@@ -60,10 +60,19 @@ struct RegionAttachment {
 	float uvs[8];
 };
 
-RegionAttachment* RegionAttachment_create (const char* name);
-void RegionAttachment_setUVs (RegionAttachment* self, float u, float v, float u2, float v2, int/*bool*/rotate);
-void RegionAttachment_updateOffset (RegionAttachment* self);
-void RegionAttachment_computeWorldVertices (RegionAttachment* self, float x, float y, Bone* bone, float* vertices);
+spRegionAttachment* spRegionAttachment_create (const char* name);
+void spRegionAttachment_setUVs (spRegionAttachment* self, float u, float v, float u2, float v2, int/*bool*/rotate);
+void spRegionAttachment_updateOffset (spRegionAttachment* self);
+void spRegionAttachment_computeWorldVertices (spRegionAttachment* self, float x, float y, spBone* bone, float* vertices);
+
+#ifdef SPINE_SHORT_NAMES
+typedef spVertexIndex VertexIndex;
+typedef spRegionAttachment RegionAttachment;
+#define RegionAttachment_create(...) spRegionAttachment_create(__VA_ARGS__)
+#define RegionAttachment_setUVs(...) spRegionAttachment_setUVs(__VA_ARGS__)
+#define RegionAttachment_updateOffset(...) spRegionAttachment_updateOffset(__VA_ARGS__)
+#define RegionAttachment_computeWorldVertices(...) spRegionAttachment_computeWorldVertices(__VA_ARGS__)
+#endif
 
 #ifdef __cplusplus
 }

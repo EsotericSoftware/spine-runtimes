@@ -9,47 +9,47 @@
 
 /**/
 
-void _AtlasPage_createTexture (AtlasPage* self, const char* path) {
+void _spAtlasPage_createTexture (spAtlasPage* self, const char* path) {
 	self->rendererObject = 0;
 	self->width = 123;
 	self->height = 456;
 }
 
-void _AtlasPage_disposeTexture (AtlasPage* self) {
+void _spAtlasPage_disposeTexture (spAtlasPage* self) {
 }
 
-char* _Util_readFile (const char* path, int* length) {
+char* _spUtil_readFile (const char* path, int* length) {
 	return _readFile(path, length);
 }
 
 /**/
 
 int main (void) {
-	Atlas* atlas = Atlas_readAtlasFile("data/spineboy.atlas");
+	spAtlas* atlas = spAtlas_readAtlasFile("data/spineboy.atlas");
 	printf("First region name: %s, x: %d, y: %d\n", atlas->regions->name, atlas->regions->x, atlas->regions->y);
 	printf("First page name: %s, size: %d, %d\n", atlas->pages->name, atlas->pages->width, atlas->pages->height);
 
-	SkeletonJson* json = SkeletonJson_create(atlas);
-	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/spineboy.json");
+	spSkeletonJson* json = spSkeletonJson_create(atlas);
+	spSkeletonData *skeletonData = spSkeletonJson_readSkeletonDataFile(json, "data/spineboy.json");
 	if (!skeletonData) {
 		printf("Error: %s\n", json->error);
 		exit(0);
 	}
 	printf("Default skin name: %s\n", skeletonData->defaultSkin->name);
 
-	Skeleton* skeleton = Skeleton_create(skeletonData);
+	spSkeleton* skeleton = spSkeleton_create(skeletonData);
 
-	Animation* animation = SkeletonData_findAnimation(skeletonData, "walk");
+	spAnimation* animation = spSkeletonData_findAnimation(skeletonData, "walk");
 	if (!animation) {
 		printf("Error: Animation not found: walk\n");
 		exit(0);
 	}
 	printf("Animation timelineCount: %d\n", animation->timelineCount);
 
-	Skeleton_dispose(skeleton);
-	SkeletonData_dispose(skeletonData);
-	SkeletonJson_dispose(json);
-	Atlas_dispose(atlas);
+	spSkeleton_dispose(skeleton);
+	spSkeletonData_dispose(skeletonData);
+	spSkeletonJson_dispose(json);
+	spAtlas_dispose(atlas);
 
 	return 0;
 }

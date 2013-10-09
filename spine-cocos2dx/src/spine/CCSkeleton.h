@@ -42,19 +42,19 @@ namespace spine {
 /** Draws a skeleton. */
 class CCSkeleton: public cocos2d::CCNodeRGBA, public cocos2d::CCBlendProtocol {
 public:
-	Skeleton* skeleton;
-	Bone* rootBone;
+	spSkeleton* skeleton;
+	spBone* rootBone;
 	float timeScale;
 	bool debugSlots;
 	bool debugBones;
 	bool premultipliedAlpha;
 
-	static CCSkeleton* createWithData (SkeletonData* skeletonData, bool ownsSkeletonData = false);
-	static CCSkeleton* createWithFile (const char* skeletonDataFile, Atlas* atlas, float scale = 1);
+	static CCSkeleton* createWithData (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
+	static CCSkeleton* createWithFile (const char* skeletonDataFile, spAtlas* atlas, float scale = 1);
 	static CCSkeleton* createWithFile (const char* skeletonDataFile, const char* atlasFile, float scale = 1);
 
-	CCSkeleton (SkeletonData* skeletonData, bool ownsSkeletonData = false);
-	CCSkeleton (const char* skeletonDataFile, Atlas* atlas, float scale = 1);
+	CCSkeleton (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
+	CCSkeleton (const char* skeletonDataFile, spAtlas* atlas, float scale = 1);
 	CCSkeleton (const char* skeletonDataFile, const char* atlasFile, float scale = 1);
 
 	virtual ~CCSkeleton ();
@@ -71,9 +71,9 @@ public:
 	void setSlotsToSetupPose ();
 
 	/* Returns 0 if the bone was not found. */
-	Bone* findBone (const char* boneName) const;
+	spBone* findBone (const char* boneName) const;
 	/* Returns 0 if the slot was not found. */
-	Slot* findSlot (const char* slotName) const;
+	spSlot* findSlot (const char* slotName) const;
 	
 	/* Sets the skin used to look up attachments not found in the SkeletonData defaultSkin. Attachments from the new skin are
 	 * attached if the corresponding attachment from the old skin was attached. Returns false if the skin was not found.
@@ -81,7 +81,7 @@ public:
 	bool setSkin (const char* skinName);
 	
 	/* Returns 0 if the slot or attachment was not found. */
-	Attachment* getAttachment (const char* slotName, const char* attachmentName) const;
+	spAttachment* getAttachment (const char* slotName, const char* attachmentName) const;
 	/* Returns false if the slot or attachment was not found. */
 	bool setAttachment (const char* slotName, const char* attachmentName);
 
@@ -92,12 +92,12 @@ public:
 
 protected:
 	CCSkeleton ();
-	void setSkeletonData (SkeletonData* skeletonData, bool ownsSkeletonData);
-	cocos2d::CCTextureAtlas* getTextureAtlas (RegionAttachment* regionAttachment) const;
+	void setSkeletonData (spSkeletonData* skeletonData, bool ownsSkeletonData);
+	cocos2d::CCTextureAtlas* getTextureAtlas (spRegionAttachment* regionAttachment) const;
 
 private:
 	bool ownsSkeletonData;
-	Atlas* atlas;
+	spAtlas* atlas;
 	void initialize ();
 };
 

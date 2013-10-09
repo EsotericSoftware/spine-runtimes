@@ -36,7 +36,7 @@
 
 USING_NS_CC;
 
-void _AtlasPage_createTexture (AtlasPage* self, const char* path) {
+void _spAtlasPage_createTexture (spAtlasPage* self, const char* path) {
 	CCTexture2D* texture = CCTextureCache::sharedTextureCache()->addImage(path);
 	CCTextureAtlas* textureAtlas = CCTextureAtlas::createWithTexture(texture, 128);
 	textureAtlas->retain();
@@ -45,11 +45,11 @@ void _AtlasPage_createTexture (AtlasPage* self, const char* path) {
 	self->height = texture->getPixelsHigh();
 }
 
-void _AtlasPage_disposeTexture (AtlasPage* self) {
+void _spAtlasPage_disposeTexture (spAtlasPage* self) {
 	((CCTextureAtlas*)self->rendererObject)->release();
 }
 
-char* _Util_readFile (const char* path, int* length) {
+char* _spUtil_readFile (const char* path, int* length) {
 	unsigned long size;
 	char* data = reinterpret_cast<char*>(CCFileUtils::sharedFileUtils()->getFileData(
 		CCFileUtils::sharedFileUtils()->fullPathForFilename(path).c_str(), "r", &size));
@@ -59,9 +59,9 @@ char* _Util_readFile (const char* path, int* length) {
 
 /**/
 
-void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_T2F_Quad* quad, bool premultipliedAlpha) {
+void spRegionAttachment_updateQuad (spRegionAttachment* self, spSlot* slot, ccV3F_C4B_T2F_Quad* quad, bool premultipliedAlpha) {
 	float vertices[8];
-	RegionAttachment_computeWorldVertices(self, slot->skeleton->x, slot->skeleton->y, slot->bone, vertices);
+	spRegionAttachment_computeWorldVertices(self, slot->skeleton->x, slot->skeleton->y, slot->bone, vertices);
 
 	GLubyte r = slot->skeleton->r * slot->r * 255;
 	GLubyte g = slot->skeleton->g * slot->g * 255;

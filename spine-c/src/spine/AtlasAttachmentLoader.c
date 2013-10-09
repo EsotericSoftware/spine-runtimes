@@ -34,19 +34,20 @@
 #include <spine/AtlasAttachmentLoader.h>
 #include <spine/extension.h>
 
-Attachment* _AtlasAttachmentLoader_newAttachment (AttachmentLoader* loader, Skin* skin, AttachmentType type, const char* name) {
-	AtlasAttachmentLoader* self = SUB_CAST(AtlasAttachmentLoader, loader);
+spAttachment* _spAtlasAttachmentLoader_newAttachment (spAttachmentLoader* loader, spSkin* skin, spAttachmentType type,
+		const char* name) {
+	spAtlasAttachmentLoader* self = SUB_CAST(spAtlasAttachmentLoader, loader);
 	switch (type) {
 	case ATTACHMENT_REGION: {
-		RegionAttachment* attachment;
-		AtlasRegion* region = Atlas_findRegion(self->atlas, name);
+		spRegionAttachment* attachment;
+		spAtlasRegion* region = spAtlas_findRegion(self->atlas, name);
 		if (!region) {
-			_AttachmentLoader_setError(loader, "Region not found: ", name);
+			_spAttachmentLoader_setError(loader, "Region not found: ", name);
 			return 0;
 		}
-		attachment = RegionAttachment_create(name);
+		attachment = spRegionAttachment_create(name);
 		attachment->rendererObject = region;
-		RegionAttachment_setUVs(attachment, region->u, region->v, region->u2, region->v2, region->rotate);
+		spRegionAttachment_setUVs(attachment, region->u, region->v, region->u2, region->v2, region->rotate);
 		attachment->regionOffsetX = region->offsetX;
 		attachment->regionOffsetY = region->offsetY;
 		attachment->regionWidth = region->width;
@@ -56,16 +57,16 @@ Attachment* _AtlasAttachmentLoader_newAttachment (AttachmentLoader* loader, Skin
 		return SUPER(attachment);
 	}
 	case ATTACHMENT_BOUNDING_BOX:
-		return SUPER(BoundingBoxAttachment_create(name));
+		return SUPER(spBoundingBoxAttachment_create(name));
 	default:
-		_AttachmentLoader_setUnknownTypeError(loader, type);
+		_spAttachmentLoader_setUnknownTypeError(loader, type);
 		return 0;
 	}
 }
 
-AtlasAttachmentLoader* AtlasAttachmentLoader_create (Atlas* atlas) {
-	AtlasAttachmentLoader* self = NEW(AtlasAttachmentLoader);
-	_AttachmentLoader_init(SUPER(self), _AttachmentLoader_deinit, _AtlasAttachmentLoader_newAttachment);
+spAtlasAttachmentLoader* spAtlasAttachmentLoader_create (spAtlas* atlas) {
+	spAtlasAttachmentLoader* self = NEW(spAtlasAttachmentLoader);
+	_spAttachmentLoader_init(SUPER(self), _spAttachmentLoader_deinit, _spAtlasAttachmentLoader_newAttachment);
 	self->atlas = atlas;
 	return self;
 }

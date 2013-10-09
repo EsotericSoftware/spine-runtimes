@@ -40,16 +40,22 @@
 extern "C" {
 #endif
 
-typedef struct Event Event;
-struct Event {
-	EventData* const data;
+typedef struct spEvent spEvent;
+struct spEvent {
+	spEventData* const data;
 	int intValue;
 	float floatValue;
 	const char* stringValue;
 };
 
-Event* Event_create (EventData* data);
-void Event_dispose (Event* self);
+spEvent* spEvent_create (spEventData* data);
+void spEvent_dispose (spEvent* self);
+
+#ifdef SPINE_SHORT_NAMES
+typedef spEvent Event;
+#define Event_create(...) spEvent_create(__VA_ARGS__)
+#define Event_dispose(...) spEvent_dispose(__VA_ARGS__)
+#endif
 
 #ifdef __cplusplus
 }

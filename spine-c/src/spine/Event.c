@@ -34,13 +34,13 @@
 #include <spine/Event.h>
 #include <spine/extension.h>
 
-Event* Event_create (EventData* data) {
-	Event* self = NEW(Event);
-	CONST_CAST(EventData*, self->data) = data;
+spEvent* spEvent_create (spEventData* data) {
+	spEvent* self = NEW(spEvent);
+	CONST_CAST(spEventData*, self->data) = data;
 	return self;
 }
 
-void Event_dispose (Event* self) {
+void spEvent_dispose (spEvent* self) {
 	FREE(self->stringValue);
 	FREE(self);
 }

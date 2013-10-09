@@ -46,16 +46,25 @@ extern "C" {
 
 typedef struct {
 	float scale;
-	AttachmentLoader* attachmentLoader;
+	spAttachmentLoader* attachmentLoader;
 	const char* const error;
-} SkeletonJson;
+} spSkeletonJson;
 
-SkeletonJson* SkeletonJson_createWithLoader (AttachmentLoader* attachmentLoader);
-SkeletonJson* SkeletonJson_create (Atlas* atlas);
-void SkeletonJson_dispose (SkeletonJson* self);
+spSkeletonJson* spSkeletonJson_createWithLoader (spAttachmentLoader* attachmentLoader);
+spSkeletonJson* spSkeletonJson_create (spAtlas* atlas);
+void spSkeletonJson_dispose (spSkeletonJson* self);
 
-SkeletonData* SkeletonJson_readSkeletonData (SkeletonJson* self, const char* json);
-SkeletonData* SkeletonJson_readSkeletonDataFile (SkeletonJson* self, const char* path);
+spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const char* json);
+spSkeletonData* spSkeletonJson_readSkeletonDataFile (spSkeletonJson* self, const char* path);
+
+#ifdef SPINE_SHORT_NAMES
+typedef spSkeletonJson SkeletonJson;
+#define SkeletonJson_createWithLoader(...) spSkeletonJson_createWithLoader(__VA_ARGS__)
+#define SkeletonJson_create(...) spSkeletonJson_create(__VA_ARGS__)
+#define SkeletonJson_dispose(...) spSkeletonJson_dispose(__VA_ARGS__)
+#define SkeletonJson_readSkeletonData(...) spSkeletonJson_readSkeletonData(__VA_ARGS__)
+#define SkeletonJson_readSkeletonDataFile(...) spSkeletonJson_readSkeletonDataFile(__VA_ARGS__)
+#endif
 
 #ifdef __cplusplus
 }

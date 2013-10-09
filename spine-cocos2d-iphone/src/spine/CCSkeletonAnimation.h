@@ -31,6 +31,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#define SPINE_SHORT_NAMES
 #import <spine/spine.h>
 #import <spine/CCSkeleton.h>
 #import "cocos2d.h"

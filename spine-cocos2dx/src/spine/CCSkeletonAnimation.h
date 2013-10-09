@@ -41,38 +41,38 @@
 namespace spine {
 
 class CCSkeletonAnimation;
-typedef void (cocos2d::CCObject::*SEL_AnimationStateEvent)(spine::CCSkeletonAnimation* node, int trackIndex, EventType type, Event* event, int loopCount);
+typedef void (cocos2d::CCObject::*SEL_AnimationStateEvent)(spine::CCSkeletonAnimation* node, int trackIndex, spEventType type, spEvent* event, int loopCount);
 #define animationStateEvent_selector(_SELECTOR) (SEL_AnimationStateEvent)(&_SELECTOR)
 
 /** Draws an animated skeleton, providing an AnimationState for applying one or more animations and queuing animations to be
   * played later. */
 class CCSkeletonAnimation: public CCSkeleton {
 public:
-	AnimationState* state;
+	spAnimationState* state;
 
-	static CCSkeletonAnimation* createWithData (SkeletonData* skeletonData);
-	static CCSkeletonAnimation* createWithFile (const char* skeletonDataFile, Atlas* atlas, float scale = 1);
+	static CCSkeletonAnimation* createWithData (spSkeletonData* skeletonData);
+	static CCSkeletonAnimation* createWithFile (const char* skeletonDataFile, spAtlas* atlas, float scale = 1);
 	static CCSkeletonAnimation* createWithFile (const char* skeletonDataFile, const char* atlasFile, float scale = 1);
 
-	CCSkeletonAnimation (SkeletonData* skeletonData);
-	CCSkeletonAnimation (const char* skeletonDataFile, Atlas* atlas, float scale = 1);
+	CCSkeletonAnimation (spSkeletonData* skeletonData);
+	CCSkeletonAnimation (const char* skeletonDataFile, spAtlas* atlas, float scale = 1);
 	CCSkeletonAnimation (const char* skeletonDataFile, const char* atlasFile, float scale = 1);
 
 	virtual ~CCSkeletonAnimation ();
 
 	virtual void update (float deltaTime);
 
-	void setAnimationStateData (AnimationStateData* stateData);
+	void setAnimationStateData (spAnimationStateData* stateData);
 	void setMix (const char* fromAnimation, const char* toAnimation, float duration);
 
 	void setAnimationListener (CCObject* instance, SEL_AnimationStateEvent method);
-	TrackEntry* setAnimation (int trackIndex, const char* name, bool loop);
-	TrackEntry* addAnimation (int trackIndex, const char* name, bool loop, float delay = 0);
-	TrackEntry* getCurrent (int trackIndex = 0);
+	spTrackEntry* setAnimation (int trackIndex, const char* name, bool loop);
+	spTrackEntry* addAnimation (int trackIndex, const char* name, bool loop, float delay = 0);
+	spTrackEntry* getCurrent (int trackIndex = 0);
 	void clearTracks ();
 	void clearTrack (int trackIndex = 0);
 
-	void onAnimationStateEvent (int trackIndex, EventType type, Event* event, int loopCount);
+	void onAnimationStateEvent (int trackIndex, spEventType type, spEvent* event, int loopCount);
 
 protected:
 	CCSkeletonAnimation ();

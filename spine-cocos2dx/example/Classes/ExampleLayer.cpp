@@ -51,8 +51,8 @@ void ExampleLayer::update (float deltaTime) {
 	// if (entry->time > 0.1) CCDirector::sharedDirector()->replaceScene(ExampleLayer::scene());
 }
 
-void ExampleLayer::animationStateEvent (CCSkeletonAnimation* node, int trackIndex, EventType type, Event* event, int loopCount) {
-	TrackEntry* entry = AnimationState_getCurrent(node->state, trackIndex);
+void ExampleLayer::animationStateEvent (CCSkeletonAnimation* node, int trackIndex, spEventType type, spEvent* event, int loopCount) {
+	spTrackEntry* entry = spAnimationState_getCurrent(node->state, trackIndex);
 	const char* animationName = (entry && entry->animation) ? entry->animation->name : 0;
 
 	switch (type) {

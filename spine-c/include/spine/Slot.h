@@ -42,26 +42,36 @@
 extern "C" {
 #endif
 
-struct Skeleton;
+struct spSkeleton;
 
-typedef struct Slot {
-	SlotData* const data;
-	struct Skeleton* const skeleton;
-	Bone* const bone;
+typedef struct spSlot {
+	spSlotData* const data;
+	struct spSkeleton* const skeleton;
+	spBone* const bone;
 	float r, g, b, a;
-	Attachment* const attachment;
-} Slot;
+	spAttachment* const attachment;
+} spSlot;
 
-Slot* Slot_create (SlotData* data, struct Skeleton* skeleton, Bone* bone);
-void Slot_dispose (Slot* self);
+spSlot* spSlot_create (spSlotData* data, struct spSkeleton* skeleton, spBone* bone);
+void spSlot_dispose (spSlot* self);
 
 /* @param attachment May be 0 to clear the attachment for the slot. */
-void Slot_setAttachment (Slot* self, Attachment* attachment);
+void spSlot_setAttachment (spSlot* self, spAttachment* attachment);
 
-void Slot_setAttachmentTime (Slot* self, float time);
-float Slot_getAttachmentTime (const Slot* self);
+void spSlot_setAttachmentTime (spSlot* self, float time);
+float spSlot_getAttachmentTime (const spSlot* self);
 
-void Slot_setToSetupPose (Slot* self);
+void spSlot_setToSetupPose (spSlot* self);
+
+#ifdef SPINE_SHORT_NAMES
+typedef spSlot Slot;
+#define Slot_create(...) spSlot_create(__VA_ARGS__)
+#define Slot_dispose(...) spSlot_dispose(__VA_ARGS__)
+#define Slot_setAttachment(...) spSlot_setAttachment(__VA_ARGS__)
+#define Slot_setAttachmentTime(...) spSlot_setAttachmentTime(__VA_ARGS__)
+#define Slot_getAttachmentTime(...) spSlot_getAttachmentTime(__VA_ARGS__)
+#define Slot_setToSetupPose(...) spSlot_setToSetupPose(__VA_ARGS__)
+#endif
 
 #ifdef __cplusplus
 }

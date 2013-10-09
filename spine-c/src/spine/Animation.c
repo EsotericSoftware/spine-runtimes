@@ -35,24 +35,24 @@
 #include <limits.h>
 #include <spine/extension.h>
 
-Animation* Animation_create (const char* name, int timelineCount) {
-	Animation* self = NEW(Animation);
+spAnimation* spAnimation_create (const char* name, int timelineCount) {
+	spAnimation* self = NEW(spAnimation);
 	MALLOC_STR(self->name, name);
 	self->timelineCount = timelineCount;
-	self->timelines = MALLOC(Timeline*, timelineCount);
+	self->timelines = MALLOC(spTimeline*, timelineCount);
 	return self;
 }
 
-void Animation_dispose (Animation* self) {
+void spAnimation_dispose (spAnimation* self) {
 	int i;
 	for (i = 0; i < self->timelineCount; ++i)
-		Timeline_dispose(self->timelines[i]);
+		spTimeline_dispose(self->timelines[i]);
 	FREE(self->timelines);
 	FREE(self->name);
 	FREE(self);
 }
 
-void Animation_apply (const Animation* self, Skeleton* skeleton, float lastTime, float time, int loop, Event** events,
+void spAnimation_apply (const spAnimation* self, spSkeleton* skeleton, float lastTime, float time, int loop, spEvent** events,
 		int* eventCount) {
 	int i, n = self->timelineCount;
 
@@ -62,10 +62,10 @@ void Animation_apply (const Animation* self, Skeleton* skeleton, float lastTime,
 	}
 
 	for (i = 0; i < n; ++i)
-		Timeline_apply(self->timelines[i], skeleton, lastTime, time, events, eventCount, 1);
+		spTimeline_apply(self->timelines[i], skeleton, lastTime, time, events, eventCount, 1);
 }
 
-void Animation_mix (const Animation* self, Skeleton* skeleton, float lastTime, float time, int loop, Event** events,
+void spAnimation_mix (const spAnimation* self, spSkeleton* skeleton, float lastTime, float time, int loop, spEvent** events,
 		int* eventCount, float alpha) {
 	int i, n = self->timelineCount;
 
@@ -75,37 +75,37 @@ void Animation_mix (const Animation* self, Skeleton* skeleton, float lastTime, f
 	}
 
 	for (i = 0; i < n; ++i)
-		Timeline_apply(self->timelines[i], skeleton, lastTime, time, events, eventCount, alpha);
+		spTimeline_apply(self->timelines[i], skeleton, lastTime, time, events, eventCount, alpha);
 }
 
 /**/
 
-typedef struct _TimelineVtable {
-	void (*apply) (const Timeline* self, Skeleton* skeleton, float lastTime, float time, Event** firedEvents, int* eventCount,
+typedef struct _spTimelineVtable {
+	void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents, int* eventCount,
 			float alpha);
-	void (*dispose) (Timeline* self);
-} _TimelineVtable;
+	void (*dispose) (spTimeline* self);
+} _spTimelineVtable;
 
-void _Timeline_init (Timeline* self, /**/
-void (*dispose) (Timeline* self), /**/
-		void (*apply) (const Timeline* self, Skeleton* skeleton, float lastTime, float time, Event** firedEvents, int* eventCount,
-				float alpha)) {
-	CONST_CAST(_TimelineVtable*, self->vtable) = NEW(_TimelineVtable);
-	VTABLE(Timeline, self)->dispose = dispose;
-	VTABLE(Timeline, self)->apply = apply;
+void _spTimeline_init (spTimeline* self, /**/
+void (*dispose) (spTimeline* self), /**/
+		void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
+				int* eventCount, float alpha)) {
+	CONST_CAST(_spTimelineVtable*, self->vtable) = NEW(_spTimelineVtable);
+	VTABLE(spTimeline, self)->dispose = dispose;
+	VTABLE(spTimeline, self)->apply = apply;
 }
 
-void _Timeline_deinit (Timeline* self) {
+void _spTimeline_deinit (spTimeline* self) {
 	FREE(self->vtable);
 }
 
-void Timeline_dispose (Timeline* self) {
-	VTABLE(Timeline, self)->dispose(self);
+void spTimeline_dispose (spTimeline* self) {
+	VTABLE(spTimeline, self)->dispose(self);
 }
 
-void Timeline_apply (const Timeline* self, Skeleton* skeleton, float lastTime, float time, Event** firedEvents, int* eventCount,
-		float alpha) {
-	VTABLE(Timeline, self)->apply(self, skeleton, lastTime, time, firedEvents, eventCount, alpha);
+void spTimeline_apply (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
+		int* eventCount, float alpha) {
+	VTABLE(spTimeline, self)->apply(self, skeleton, lastTime, time, firedEvents, eventCount, alpha);
 }
 
 /**/
@@ -114,28 +114,28 @@ static const float CURVE_LINEAR = 0;
 static const float CURVE_STEPPED = -1;
 static const int CURVE_SEGMENTS = 10;
 
-void _CurveTimeline_init (CurveTimeline* self, int frameCount, /**/
-void (*dispose) (Timeline* self), /**/
-		void (*apply) (const Timeline* self, Skeleton* skeleton, float lastTime, float time, Event** firedEvents, int* eventCount,
-				float alpha)) {
-	_Timeline_init(SUPER(self), dispose, apply);
+void _spCurveTimeline_init (spCurveTimeline* self, int frameCount, /**/
+void (*dispose) (spTimeline* self), /**/
+		void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
+				int* eventCount, float alpha)) {
+	_spTimeline_init(SUPER(self), dispose, apply);
 	self->curves = CALLOC(float, (frameCount - 1) * 6);
 }
 
-void _CurveTimeline_deinit (CurveTimeline* self) {
-	_Timeline_deinit(SUPER(self));
+void _spCurveTimeline_deinit (spCurveTimeline* self) {
+	_spTimeline_deinit(SUPER(self));
 	FREE(self->curves);
 }
 
-void CurveTimeline_setLinear (CurveTimeline* self, int frameIndex) {
+void spCurveTimeline_setLinear (spCurveTimeline* self, int frameIndex) {
 	self->curves[frameIndex * 6] = CURVE_LINEAR;
 }
 
-void CurveTimeline_setStepped (CurveTimeline* self, int frameIndex) {
+void spCurveTimeline_setStepped (spCurveTimeline* self, int frameIndex) {
 	self->curves[frameIndex * 6] = CURVE_STEPPED;
 }
 
-void CurveTimeline_setCurve (CurveTimeline* self, int frameIndex, float cx1, float cy1, float cx2, float cy2) {
+void spCurveTimeline_setCurve (spCurveTimeline* self, int frameIndex, float cx1, float cy1, float cx2, float cy2) {
 	float subdiv_step = 1.0f / CURVE_SEGMENTS;
 	float subdiv_step2 = subdiv_step * subdiv_step;
 	float subdiv_step3 = subdiv_step2 * subdiv_step;
@@ -156,7 +156,7 @@ void CurveTimeline_setCurve (CurveTimeline* self, int frameIndex, float cx1, flo
 	self->curves[i + 5] = tmp2y * pre5;
 }
 
-float CurveTimeline_getCurvePercent (const CurveTimeline* self, int frameIndex, float percent) {
+float spCurveTimeline_getCurvePercent (const spCurveTimeline* self, int frameIndex, float percent) {
 	float dfy;
 	float ddfx;
 	float ddfy;
@@ -221,19 +221,19 @@ static int binarySearch (float *values, int valuesLength, float target, int step
 
 /**/
 
-void _BaseTimeline_dispose (Timeline* timeline) {
-	struct BaseTimeline* self = SUB_CAST(struct BaseTimeline, timeline);
-	_CurveTimeline_deinit(SUPER(self));
+void _spBaseTimeline_dispose (spTimeline* timeline) {
+	struct spBaseTimeline* self = SUB_CAST(struct spBaseTimeline, timeline);
+	_spCurveTimeline_deinit(SUPER(self));
 	FREE(self->frames);
 	FREE(self);
 }
 
-/* Many timelines have structure identical to struct BaseTimeline and extend CurveTimeline. **/
-struct BaseTimeline* _BaseTimeline_create (int frameCount, int frameSize, /**/
-		void (*apply) (const Timeline* self, Skeleton* skeleton, float lastTime, float time, Event** firedEvents, int* eventCount,
-				float alpha)) {
-	struct BaseTimeline* self = NEW(struct BaseTimeline);
-	_CurveTimeline_init(SUPER(self), frameCount, _BaseTimeline_dispose, apply);
+/* Many timelines have structure identical to struct spBaseTimeline and extend spCurveTimeline. **/
+struct spBaseTimeline* _spBaseTimeline_create (int frameCount, int frameSize, /**/
+		void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
+				int* eventCount, float alpha)) {
+	struct spBaseTimeline* self = NEW(struct spBaseTimeline);
+	_spCurveTimeline_init(SUPER(self), frameCount, _spBaseTimeline_dispose, apply);
 
 	CONST_CAST(int, self->framesLength) = frameCount * frameSize;
 	CONST_CAST(float*, self->frames) = CALLOC(float, self->framesLength);
@@ -246,13 +246,13 @@ struct BaseTimeline* _BaseTimeline_create (int frameCount, int frameSize, /**/
 static const int ROTATE_LAST_FRAME_TIME = -2;
 static const int ROTATE_FRAME_VALUE = 1;
 
-void _RotateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float lastTime, float time, Event** firedEvents,
+void _spRotateTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 		int* eventCount, float alpha) {
-	Bone *bone;
+	spBone *bone;
 	int frameIndex;
 	float lastFrameValue, frameTime, percent, amount;
 
-	RotateTimeline* self = SUB_CAST(RotateTimeline, timeline);
+	spRotateTimeline* self = SUB_CAST(spRotateTimeline, timeline);
 
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
@@ -273,7 +273,7 @@ void _RotateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float 
 	lastFrameValue = self->frames[frameIndex - 1];
 	frameTime = self->frames[frameIndex];
 	percent = 1 - (time - frameTime) / (self->frames[frameIndex + ROTATE_LAST_FRAME_TIME] - frameTime);
-	percent = CurveTimeline_getCurvePercent(SUPER(self), frameIndex / 2 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
+	percent = spCurveTimeline_getCurvePercent(SUPER(self), frameIndex / 2 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
 	amount = self->frames[frameIndex + ROTATE_FRAME_VALUE] - lastFrameValue;
 	while (amount > 180)
@@ -288,11 +288,11 @@ void _RotateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float 
 	bone->rotation += amount * alpha;
 }
 
-RotateTimeline* RotateTimeline_create (int frameCount) {
-	return _BaseTimeline_create(frameCount, 2, _RotateTimeline_apply);
+spRotateTimeline* spRotateTimeline_create (int frameCount) {
+	return _spBaseTimeline_create(frameCount, 2, _spRotateTimeline_apply);
 }
 
-void RotateTimeline_setFrame (RotateTimeline* self, int frameIndex, float time, float angle) {
+void spRotateTimeline_setFrame (spRotateTimeline* self, int frameIndex, float time, float angle) {
 	frameIndex *= 2;
 	self->frames[frameIndex] = time;
 	self->frames[frameIndex + 1] = angle;
@@ -304,13 +304,13 @@ static const int TRANSLATE_LAST_FRAME_TIME = -3;
 static const int TRANSLATE_FRAME_X = 1;
 static const int TRANSLATE_FRAME_Y = 2;
 
-void _TranslateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float lastTime, float time, Event** firedEvents,
+void _spTranslateTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 		int* eventCount, float alpha) {
-	Bone *bone;
+	spBone *bone;
 	int frameIndex;
 	float lastFrameX, lastFrameY, frameTime, percent;
 
-	TranslateTimeline* self = SUB_CAST(TranslateTimeline, timeline);
+	spTranslateTimeline* self = SUB_CAST(spTranslateTimeline, timeline);
 
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
@@ -328,7 +328,7 @@ void _TranslateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, flo
 	lastFrameY = self->frames[frameIndex - 1];
 	frameTime = self->frames[frameIndex];
 	percent = 1 - (time - frameTime) / (self->frames[frameIndex + TRANSLATE_LAST_FRAME_TIME] - frameTime);
-	percent = CurveTimeline_getCurvePercent(SUPER(self), frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
+	percent = spCurveTimeline_getCurvePercent(SUPER(self), frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
 	bone->x += (bone->data->x + lastFrameX + (self->frames[frameIndex + TRANSLATE_FRAME_X] - lastFrameX) * percent - bone->x)
 			* alpha;
@@ -336,11 +336,11 @@ void _TranslateTimeline_apply (const Timeline* timeline, Skeleton* skeleton, flo
 			* alpha;
 }
 
-TranslateTimeline* TranslateTimeline_create (int frameCount) {
-	return _BaseTimeline_create(frameCount, 3, _TranslateTimeline_apply);
+spTranslateTimeline* spTranslateTimeline_create (int frameCount) {
+	return _spBaseTimeline_create(frameCount, 3, _spTranslateTimeline_apply);
 }
 
-void TranslateTimeline_setFrame (TranslateTimeline* self, int frameIndex, float time, float x, float y) {
+void spTranslateTimeline_setFrame (spTranslateTimeline* self, int frameIndex, float time, float x, float y) {
 	frameIndex *= 3;
 	self->frames[frameIndex] = time;
 	self->frames[frameIndex + 1] = x;
@@ -349,13 +349,13 @@ void TranslateTimeline_setFrame (TranslateTimeline* self, int frameIndex, float 
 
 /**/
 
-void _ScaleTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float lastTime, float time, Event** firedEvents,
+void _spScaleTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 		int* eventCount, float alpha) {
-	Bone *bone;
+	spBone *bone;
 	int frameIndex;
 	float lastFrameX, lastFrameY, frameTime, percent;
 
-	ScaleTimeline* self = SUB_CAST(ScaleTimeline, timeline);
+	spScaleTimeline* self = SUB_CAST(spScaleTimeline, timeline);
 
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
@@ -372,7 +372,7 @@ void _ScaleTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float l
 	lastFrameY = self->frames[frameIndex - 1];
 	frameTime = self->frames[frameIndex];
 	percent = 1 - (time - frameTime) / (self->frames[frameIndex + TRANSLATE_LAST_FRAME_TIME] - frameTime);
-	percent = CurveTimeline_getCurvePercent(SUPER(self), frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
+	percent = spCurveTimeline_getCurvePercent(SUPER(self), frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
 	bone->scaleX += (bone->data->scaleX - 1 + lastFrameX + (self->frames[frameIndex + TRANSLATE_FRAME_X] - lastFrameX) * percent
 			- bone->scaleX) * alpha;
@@ -380,12 +380,12 @@ void _ScaleTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float l
 			- bone->scaleY) * alpha;
 }
 
-ScaleTimeline* ScaleTimeline_create (int frameCount) {
-	return _BaseTimeline_create(frameCount, 3, _ScaleTimeline_apply);
+spScaleTimeline* spScaleTimeline_create (int frameCount) {
+	return _spBaseTimeline_create(frameCount, 3, _spScaleTimeline_apply);
 }
 
-void ScaleTimeline_setFrame (ScaleTimeline* self, int frameIndex, float time, float x, float y) {
-	TranslateTimeline_setFrame(self, frameIndex, time, x, y);
+void spScaleTimeline_setFrame (spScaleTimeline* self, int frameIndex, float time, float x, float y) {
+	spTranslateTimeline_setFrame(self, frameIndex, time, x, y);
 }
 
 /**/
@@ -396,13 +396,13 @@ static const int COLOR_FRAME_G = 2;
 static const int COLOR_FRAME_B = 3;
 static const int COLOR_FRAME_A = 4;
 
-void _ColorTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float lastTime, float time, Event** firedEvents,
+void _spColorTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 		int* eventCount, float alpha) {
-	Slot *slot;
+	spSlot *slot;
 	int frameIndex;
 	float lastFrameR, lastFrameG, lastFrameB, lastFrameA, percent, frameTime;
 	float r, g, b, a;
-	ColorTimeline* self = (ColorTimeline*)timeline;
+	spColorTimeline* self = (spColorTimeline*)timeline;
 
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
@@ -425,7 +425,7 @@ void _ColorTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float l
 	lastFrameA = self->frames[frameIndex - 1];
 	frameTime = self->frames[frameIndex];
 	percent = 1 - (time - frameTime) / (self->frames[frameIndex + COLOR_LAST_FRAME_TIME] - frameTime);
-	percent = CurveTimeline_getCurvePercent(SUPER(self), frameIndex / 5 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
+	percent = spCurveTimeline_getCurvePercent(SUPER(self), frameIndex / 5 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
 	r = lastFrameR + (self->frames[frameIndex + COLOR_FRAME_R] - lastFrameR) * percent;
 	g = lastFrameG + (self->frames[frameIndex + COLOR_FRAME_G] - lastFrameG) * percent;
@@ -444,11 +444,11 @@ void _ColorTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float l
 	}
 }
 
-ColorTimeline* ColorTimeline_create (int frameCount) {
-	return (ColorTimeline*)_BaseTimeline_create(frameCount, 5, _ColorTimeline_apply);
+spColorTimeline* spColorTimeline_create (int frameCount) {
+	return (spColorTimeline*)_spBaseTimeline_create(frameCount, 5, _spColorTimeline_apply);
 }
 
-void ColorTimeline_setFrame (ColorTimeline* self, int frameIndex, float time, float r, float g, float b, float a) {
+void spColorTimeline_setFrame (spColorTimeline* self, int frameIndex, float time, float r, float g, float b, float a) {
 	frameIndex *= 5;
 	self->frames[frameIndex] = time;
 	self->frames[frameIndex + 1] = r;
@@ -459,11 +459,11 @@ void ColorTimeline_setFrame (ColorTimeline* self, int frameIndex, float time, fl
 
 /**/
 
-void _AttachmentTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float lastTime, float time, Event** firedEvents,
+void _spAttachmentTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 		int* eventCount, float alpha) {
 	int frameIndex;
 	const char* attachmentName;
-	AttachmentTimeline* self = (AttachmentTimeline*)timeline;
+	spAttachmentTimeline* self = (spAttachmentTimeline*)timeline;
 
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
@@ -473,15 +473,15 @@ void _AttachmentTimeline_apply (const Timeline* timeline, Skeleton* skeleton, fl
 		frameIndex = binarySearch(self->frames, self->framesLength, time, 1) - 1;
 
 	attachmentName = self->attachmentNames[frameIndex];
-	Slot_setAttachment(skeleton->slots[self->slotIndex],
-			attachmentName ? Skeleton_getAttachmentForSlotIndex(skeleton, self->slotIndex, attachmentName) : 0);
+	spSlot_setAttachment(skeleton->slots[self->slotIndex],
+			attachmentName ? spSkeleton_getAttachmentForSlotIndex(skeleton, self->slotIndex, attachmentName) : 0);
 }
 
-void _AttachmentTimeline_dispose (Timeline* timeline) {
-	AttachmentTimeline* self = SUB_CAST(AttachmentTimeline, timeline);
+void _spAttachmentTimeline_dispose (spTimeline* timeline) {
+	spAttachmentTimeline* self = SUB_CAST(spAttachmentTimeline, timeline);
 	int i;
 
-	_Timeline_deinit(timeline);
+	_spTimeline_deinit(timeline);
 
 	for (i = 0; i < self->framesLength; ++i)
 		FREE(self->attachmentNames[i]);
@@ -490,9 +490,9 @@ void _AttachmentTimeline_dispose (Timeline* timeline) {
 	FREE(self);
 }
 
-AttachmentTimeline* AttachmentTimeline_create (int frameCount) {
-	AttachmentTimeline* self = NEW(AttachmentTimeline);
-	_Timeline_init(SUPER(self), _AttachmentTimeline_dispose, _AttachmentTimeline_apply);
+spAttachmentTimeline* spAttachmentTimeline_create (int frameCount) {
+	spAttachmentTimeline* self = NEW(spAttachmentTimeline);
+	_spTimeline_init(SUPER(self), _spAttachmentTimeline_dispose, _spAttachmentTimeline_apply);
 
 	CONST_CAST(int, self->framesLength) = frameCount;
 	CONST_CAST(float*, self->frames) = CALLOC(float, frameCount);
@@ -501,7 +501,7 @@ AttachmentTimeline* AttachmentTimeline_create (int frameCount) {
 	return self;
 }
 
-void AttachmentTimeline_setFrame (AttachmentTimeline* self, int frameIndex, float time, const char* attachmentName) {
+void spAttachmentTimeline_setFrame (spAttachmentTimeline* self, int frameIndex, float time, const char* attachmentName) {
 	self->frames[frameIndex] = time;
 
 	FREE(self->attachmentNames[frameIndex]);
@@ -513,17 +513,17 @@ void AttachmentTimeline_setFrame (AttachmentTimeline* self, int frameIndex, floa
 
 /**/
 
-void _EventTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float lastTime, float time, Event** firedEvents,
+void _spEventTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 		int* eventCount, float alpha) {
 	if (!firedEvents) return;
-	EventTimeline* self = (EventTimeline*)timeline;
+	spEventTimeline* self = (spEventTimeline*)timeline;
 	int frameIndex;
 
 	if (lastTime >= self->frames[self->framesLength - 1]) return; /* Last time is after last frame. */
 
 	if (lastTime > time) {
 		/* Fire events after last time for looped animations. */
-		_EventTimeline_apply(timeline, skeleton, lastTime, (float)INT_MAX, firedEvents, eventCount, alpha);
+		_spEventTimeline_apply(timeline, skeleton, lastTime, (float)INT_MAX, firedEvents, eventCount, alpha);
 		lastTime = 0;
 	}
 
@@ -544,11 +544,11 @@ void _EventTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float l
 	}
 }
 
-void _EventTimeline_dispose (Timeline* timeline) {
-	EventTimeline* self = SUB_CAST(EventTimeline, timeline);
+void _spEventTimeline_dispose (spTimeline* timeline) {
+	spEventTimeline* self = SUB_CAST(spEventTimeline, timeline);
 	int i;
 
-	_Timeline_deinit(timeline);
+	_spTimeline_deinit(timeline);
 
 	for (i = 0; i < self->framesLength; ++i)
 		FREE(self->events[i]);
@@ -557,18 +557,18 @@ void _EventTimeline_dispose (Timeline* timeline) {
 	FREE(self);
 }
 
-EventTimeline* EventTimeline_create (int frameCount) {
-	EventTimeline* self = NEW(EventTimeline);
-	_Timeline_init(SUPER(self), _EventTimeline_dispose, _EventTimeline_apply);
+spEventTimeline* spEventTimeline_create (int frameCount) {
+	spEventTimeline* self = NEW(spEventTimeline);
+	_spTimeline_init(SUPER(self), _spEventTimeline_dispose, _spEventTimeline_apply);
 
 	CONST_CAST(int, self->framesLength) = frameCount;
 	CONST_CAST(float*, self->frames) = CALLOC(float, frameCount);
-	CONST_CAST(Event**, self->events) = CALLOC(Event*, frameCount);
+	CONST_CAST(spEvent**, self->events) = CALLOC(spEvent*, frameCount);
 
 	return self;
 }
 
-void EventTimeline_setFrame (EventTimeline* self, int frameIndex, float time, Event* event) {
+void spEventTimeline_setFrame (spEventTimeline* self, int frameIndex, float time, spEvent* event) {
 	self->frames[frameIndex] = time;
 
 	FREE(self->events[frameIndex]);
@@ -577,12 +577,12 @@ void EventTimeline_setFrame (EventTimeline* self, int frameIndex, float time, Ev
 
 /**/
 
-void _DrawOrderTimeline_apply (const Timeline* timeline, Skeleton* skeleton, float lastTime, float time, Event** firedEvents,
+void _spDrawOrderTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 		int* eventCount, float alpha) {
 	int i;
 	int frameIndex;
 	const int* drawOrderToSetupIndex;
-	DrawOrderTimeline* self = (DrawOrderTimeline*)timeline;
+	spDrawOrderTimeline* self = (spDrawOrderTimeline*)timeline;
 
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
@@ -600,11 +600,11 @@ void _DrawOrderTimeline_apply (const Timeline* timeline, Skeleton* skeleton, flo
 	}
 }
 
-void _DrawOrderTimeline_dispose (Timeline* timeline) {
-	DrawOrderTimeline* self = SUB_CAST(DrawOrderTimeline, timeline);
+void _spDrawOrderTimeline_dispose (spTimeline* timeline) {
+	spDrawOrderTimeline* self = SUB_CAST(spDrawOrderTimeline, timeline);
 	int i;
 
-	_Timeline_deinit(timeline);
+	_spTimeline_deinit(timeline);
 
 	for (i = 0; i < self->framesLength; ++i)
 		FREE(self->drawOrders[i]);
@@ -613,9 +613,9 @@ void _DrawOrderTimeline_dispose (Timeline* timeline) {
 	FREE(self);
 }
 
-DrawOrderTimeline* DrawOrderTimeline_create (int frameCount, int slotCount) {
-	DrawOrderTimeline* self = NEW(DrawOrderTimeline);
-	_Timeline_init(SUPER(self), _DrawOrderTimeline_dispose, _DrawOrderTimeline_apply);
+spDrawOrderTimeline* spDrawOrderTimeline_create (int frameCount, int slotCount) {
+	spDrawOrderTimeline* self = NEW(spDrawOrderTimeline);
+	_spTimeline_init(SUPER(self), _spDrawOrderTimeline_dispose, _spDrawOrderTimeline_apply);
 
 	CONST_CAST(int, self->framesLength) = frameCount;
 	CONST_CAST(float*, self->frames) = CALLOC(float, frameCount);
@@ -625,7 +625,7 @@ DrawOrderTimeline* DrawOrderTimeline_create (int frameCount, int slotCount) {
 	return self;
 }
 
-void DrawOrderTimeline_setFrame (DrawOrderTimeline* self, int frameIndex, float time, const int* drawOrder) {
+void spDrawOrderTimeline_setFrame (spDrawOrderTimeline* self, int frameIndex, float time, const int* drawOrder) {
 	self->frames[frameIndex] = time;
 
 	FREE(self->drawOrders[frameIndex]);

@@ -42,18 +42,27 @@ extern "C" {
 #endif
 
 typedef struct {
-	SkeletonData* const skeletonData;
+	spSkeletonData* const skeletonData;
 	float defaultMix;
 	const void* const entries;
-} AnimationStateData;
+} spAnimationStateData;
 
-AnimationStateData* AnimationStateData_create (SkeletonData* skeletonData);
-void AnimationStateData_dispose (AnimationStateData* self);
+spAnimationStateData* spAnimationStateData_create (spSkeletonData* skeletonData);
+void spAnimationStateData_dispose (spAnimationStateData* self);
 
-void AnimationStateData_setMixByName (AnimationStateData* self, const char* fromName, const char* toName, float duration);
-void AnimationStateData_setMix (AnimationStateData* self, Animation* from, Animation* to, float duration);
+void spAnimationStateData_setMixByName (spAnimationStateData* self, const char* fromName, const char* toName, float duration);
+void spAnimationStateData_setMix (spAnimationStateData* self, spAnimation* from, spAnimation* to, float duration);
 /* Returns 0 if there is no mixing between the animations. */
-float AnimationStateData_getMix (AnimationStateData* self, Animation* from, Animation* to);
+float spAnimationStateData_getMix (spAnimationStateData* self, spAnimation* from, spAnimation* to);
+
+#ifdef SPINE_SHORT_NAMES
+typedef spAnimationStateData AnimationStateData;
+#define AnimationStateData_create(...) spAnimationStateData_create(__VA_ARGS__)
+#define AnimationStateData_dispose(...) spAnimationStateData_dispose(__VA_ARGS__)
+#define AnimationStateData_setMixByName(...) spAnimationStateData_setMixByName(__VA_ARGS__)
+#define AnimationStateData_setMix(...) spAnimationStateData_setMix(__VA_ARGS__)
+#define AnimationStateData_getMix(...) spAnimationStateData_getMix(__VA_ARGS__)
+#endif
 
 #ifdef __cplusplus
 }

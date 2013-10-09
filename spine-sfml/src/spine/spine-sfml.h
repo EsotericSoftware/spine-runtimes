@@ -34,6 +34,7 @@
 #ifndef SPINE_SFML_H_
 #define SPINE_SFML_H_
 
+#define SPINE_SHORT_NAMES
 #include <spine/spine.h>
 #include <SFML/Graphics/Vertex.hpp>
 #include <SFML/Graphics/VertexArray.hpp>

@@ -34,10 +34,10 @@
 #include <spine/BoneData.h>
 #include <spine/extension.h>
 
-BoneData* BoneData_create (const char* name, BoneData* parent) {
-	BoneData* self = NEW(BoneData);
+spBoneData* spBoneData_create (const char* name, spBoneData* parent) {
+	spBoneData* self = NEW(spBoneData);
 	MALLOC_STR(self->name, name);
-	CONST_CAST(BoneData*, self->parent) = parent;
+	CONST_CAST(spBoneData*, self->parent) = parent;
 	self->scaleX = 1;
 	self->scaleY = 1;
 	self->inheritScale = 1;
@@ -45,7 +45,7 @@ BoneData* BoneData_create (const char* name, BoneData* parent) {
 	return self;
 }
 
-void BoneData_dispose (BoneData* self) {
+void spBoneData_dispose (spBoneData* self) {
 	FREE(self->name);
 	FREE(self);
 }

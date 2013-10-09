@@ -35,26 +35,26 @@
 #include <spine/extension.h>
 #include <spine/Slot.h>
 
-typedef struct _AttachmentVtable {
-	void (*dispose) (Attachment* self);
-} _AttachmentVtable;
+typedef struct _spAttachmentVtable {
+	void (*dispose) (spAttachment* self);
+} _spAttachmentVtable;
 
-void _Attachment_init (Attachment* self, const char* name, AttachmentType type, /**/
-		void (*dispose) (Attachment* self)) {
+void _spAttachment_init (spAttachment* self, const char* name, spAttachmentType type, /**/
+		void (*dispose) (spAttachment* self)) {
 
-	CONST_CAST(_AttachmentVtable*, self->vtable) = NEW(_AttachmentVtable);
-	VTABLE(Attachment, self) ->dispose = dispose;
+	CONST_CAST(_spAttachmentVtable*, self->vtable) = NEW(_spAttachmentVtable);
+	VTABLE(spAttachment, self) ->dispose = dispose;
 
 	MALLOC_STR(self->name, name);
 	self->type = type;
 }
 
-void _Attachment_deinit (Attachment* self) {
+void _spAttachment_deinit (spAttachment* self) {
 	FREE(self->vtable);
 	FREE(self->name);
 }
 
-void Attachment_dispose (Attachment* self) {
-	VTABLE(Attachment, self) ->dispose(self);
+void spAttachment_dispose (spAttachment* self) {
+	VTABLE(spAttachment, self) ->dispose(self);
 	FREE(self);
 }

@@ -34,6 +34,7 @@
 #ifndef SPINE_ANIMATIONSTATE_H_
 #define SPINE_ANIMATIONSTATE_H_
 
+#include <spine/Animation.h>
 #include <spine/AnimationStateData.h>
 #include <spine/Event.h>
 
@@ -43,55 +44,75 @@ extern "C" {
 
 typedef enum {
 	ANIMATION_START, ANIMATION_END, ANIMATION_COMPLETE, ANIMATION_EVENT
-} EventType;
+} spEventType;
 
-typedef struct AnimationState AnimationState;
+typedef struct spAnimationState spAnimationState;
 
-typedef void (*AnimationStateListener) (AnimationState* state, int trackIndex, EventType type, Event* event, int loopCount);
+typedef void (*spAnimationStateListener) (spAnimationState* state, int trackIndex, spEventType type, spEvent* event,
+		int loopCount);
 
-typedef struct TrackEntry TrackEntry;
-struct TrackEntry {
-	TrackEntry* next;
-	TrackEntry* previous;
-	Animation* animation;
+typedef struct spTrackEntry spTrackEntry;
+struct spTrackEntry {
+	spTrackEntry* next;
+	spTrackEntry* previous;
+	spAnimation* animation;
 	int/*bool*/loop;
 	float delay, time, lastTime, endTime, timeScale;
-	AnimationStateListener listener;
+	spAnimationStateListener listener;
 	float mixTime, mixDuration;
 };
 
-struct AnimationState {
-	AnimationStateData* const data;
+struct spAnimationState {
+	spAnimationStateData* const data;
 	float timeScale;
-	AnimationStateListener listener;
+	spAnimationStateListener listener;
 	void* context;
 
 	int trackCount;
-	TrackEntry** tracks;
+	spTrackEntry** tracks;
 };
 
 /* @param data May be 0 for no mixing. */
-AnimationState* AnimationState_create (AnimationStateData* data);
-void AnimationState_dispose (AnimationState* self);
+spAnimationState* spAnimationState_create (spAnimationStateData* data);
+void spAnimationState_dispose (spAnimationState* self);
 
-void AnimationState_update (AnimationState* self, float delta);
-void AnimationState_apply (AnimationState* self, struct Skeleton* skeleton);
+void spAnimationState_update (spAnimationState* self, float delta);
+void spAnimationState_apply (spAnimationState* self, struct spSkeleton* skeleton);
 
-void AnimationState_clearTracks (AnimationState* self);
-void AnimationState_clearTrack (AnimationState* self, int trackIndex);
+void spAnimationState_clearTracks (spAnimationState* self);
+void spAnimationState_clearTrack (spAnimationState* self, int trackIndex);
 
 /** Set the current animation. Any queued animations are cleared. */
-TrackEntry* AnimationState_setAnimationByName (AnimationState* self, int trackIndex, const char* animationName, int/*bool*/loop);
-TrackEntry* AnimationState_setAnimation (AnimationState* self, int trackIndex, Animation* animation, int/*bool*/loop);
+spTrackEntry* spAnimationState_setAnimationByName (spAnimationState* self, int trackIndex, const char* animationName,
+		int/*bool*/loop);
+spTrackEntry* spAnimationState_setAnimation (spAnimationState* self, int trackIndex, spAnimation* animation, int/*bool*/loop);
 
 /** Adds an animation to be played delay seconds after the current or last queued animation, taking into account any mix
  * duration. */
-TrackEntry* AnimationState_addAnimationByName (AnimationState* self, int trackIndex, const char* animationName, int/*bool*/loop,
-		float delay);
-TrackEntry* AnimationState_addAnimation (AnimationState* self, int trackIndex, Animation* animation, int/*bool*/loop,
+spTrackEntry* spAnimationState_addAnimationByName (spAnimationState* self, int trackIndex, const char* animationName,
+		int/*bool*/loop, float delay);
+spTrackEntry* spAnimationState_addAnimation (spAnimationState* self, int trackIndex, spAnimation* animation, int/*bool*/loop,
 		float delay);
 
-TrackEntry* AnimationState_getCurrent (AnimationState* self, int trackIndex);
+spTrackEntry* spAnimationState_getCurrent (spAnimationState* self, int trackIndex);
+
+#ifdef SPINE_SHORT_NAMES
+typedef spEventType EventType;
+typedef spAnimationStateListener AnimationStateListener;
+typedef spTrackEntry TrackEntry;
+typedef spAnimationState AnimationState;
+#define AnimationState_create(...) spAnimationState_create(__VA_ARGS__)
+#define AnimationState_dispose(...) spAnimationState_dispose(__VA_ARGS__)
+#define AnimationState_update(...) spAnimationState_update(__VA_ARGS__)
+#define AnimationState_apply(...) spAnimationState_apply(__VA_ARGS__)
+#define AnimationState_clearTracks(...) spAnimationState_clearTracks(__VA_ARGS__)
+#define AnimationState_clearTrack(...) spAnimationState_clearTrack(__VA_ARGS__)
+#define AnimationState_setAnimationByName(...) spAnimationState_setAnimationByName(__VA_ARGS__)
+#define AnimationState_setAnimation(...) spAnimationState_setAnimation(__VA_ARGS__)
+#define AnimationState_addAnimationByName(...) spAnimationState_addAnimationByName(__VA_ARGS__)
+#define AnimationState_addAnimation(...) spAnimationState_addAnimation(__VA_ARGS__)
+#define AnimationState_getCurrent(...) spAnimationState_getCurrent(__VA_ARGS__)
+#endif
 
 #ifdef __cplusplus
 }

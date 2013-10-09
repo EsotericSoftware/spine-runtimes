@@ -34,10 +34,10 @@
 #include <spine/SlotData.h>
 #include <spine/extension.h>
 
-SlotData* SlotData_create (const char* name, BoneData* boneData) {
-	SlotData* self = NEW(SlotData);
+spSlotData* spSlotData_create (const char* name, spBoneData* boneData) {
+	spSlotData* self = NEW(spSlotData);
 	MALLOC_STR(self->name, name);
-	CONST_CAST(BoneData*, self->boneData) = boneData;
+	CONST_CAST(spBoneData*, self->boneData) = boneData;
 	self->r = 1;
 	self->g = 1;
 	self->b = 1;
@@ -45,13 +45,13 @@ SlotData* SlotData_create (const char* name, BoneData* boneData) {
 	return self;
 }
 
-void SlotData_dispose (SlotData* self) {
+void spSlotData_dispose (spSlotData* self) {
 	FREE(self->name);
 	FREE(self->attachmentName);
 	FREE(self);
 }
 
-void SlotData_setAttachmentName (SlotData* self, const char* attachmentName) {
+void spSlotData_setAttachmentName (spSlotData* self, const char* attachmentName) {
 	FREE(self->attachmentName);
 	if (attachmentName)
 		MALLOC_STR(self->attachmentName, attachmentName);

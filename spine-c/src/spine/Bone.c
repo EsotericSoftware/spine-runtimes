@@ -36,23 +36,23 @@
 
 static int yDown;
 
-void Bone_setYDown (int value) {
+void spBone_setYDown (int value) {
 	yDown = value;
 }
 
-Bone* Bone_create (BoneData* data, Bone* parent) {
-	Bone* self = NEW(Bone);
-	CONST_CAST(BoneData*, self->data) = data;
-	CONST_CAST(Bone*, self->parent) = parent;
-	Bone_setToSetupPose(self);
+spBone* spBone_create (spBoneData* data, spBone* parent) {
+	spBone* self = NEW(spBone);
+	CONST_CAST(spBoneData*, self->data) = data;
+	CONST_CAST(spBone*, self->parent) = parent;
+	spBone_setToSetupPose(self);
 	return self;
 }
 
-void Bone_dispose (Bone* self) {
+void spBone_dispose (spBone* self) {
 	FREE(self);
 }
 
-void Bone_setToSetupPose (Bone* self) {
+void spBone_setToSetupPose (spBone* self) {
 	self->x = self->data->x;
 	self->y = self->data->y;
 	self->rotation = self->data->rotation;
@@ -60,7 +60,7 @@ void Bone_setToSetupPose (Bone* self) {
 	self->scaleY = self->data->scaleY;
 }
 
-void Bone_updateWorldTransform (Bone* self, int flipX, int flipY) {
+void spBone_updateWorldTransform (spBone* self, int flipX, int flipY) {
 	float radians, cosine, sine;
 	if (self->parent) {
 		CONST_CAST(float, self->worldX) = self->x * self->parent->m00 + self->y * self->parent->m01 + self->parent->worldX;

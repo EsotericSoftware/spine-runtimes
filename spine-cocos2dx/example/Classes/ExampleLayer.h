@@ -17,7 +17,7 @@ public:
 private:
 	spine::CCSkeletonAnimation* skeletonNode;
 	
-	void animationStateEvent (spine::CCSkeletonAnimation* node, int trackIndex, EventType type, Event* event, int loopCount);
+	void animationStateEvent (spine::CCSkeletonAnimation* node, int trackIndex, spEventType type, spEvent* event, int loopCount);
 };
 
 #endif // _EXAMPLELAYER_H_

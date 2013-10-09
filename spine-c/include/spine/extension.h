@@ -1,5 +1,4 @@
 
-
 /*
  Implementation notes:
 
@@ -58,9 +57,9 @@
 #define MALLOC_STR(TO,FROM) strcpy(CONST_CAST(char*, TO) = (char*)malloc(strlen(FROM) + 1), FROM)
 
 #ifdef __STDC_VERSION__
-	#define FMOD(A,B) fmodf(A, B)
+#define FMOD(A,B) fmodf(A, B)
 #else
-	#define FMOD(A,B) (float)fmod(A, B)
+#define FMOD(A,B) (float)fmod(A, B)
 #endif
 
 #include <stdlib.h>
@@ -81,9 +80,15 @@ extern "C" {
  * Functions that must be implemented:
  */
 
-void _AtlasPage_createTexture (AtlasPage* self, const char* path);
-void _AtlasPage_disposeTexture (AtlasPage* self);
-char* _Util_readFile (const char* path, int* length);
+void _spAtlasPage_createTexture (spAtlasPage* self, const char* path);
+void _spAtlasPage_disposeTexture (spAtlasPage* self);
+char* _spUtil_readFile (const char* path, int* length);
+
+#ifdef SPINE_SHORT_NAMES
+#define _AtlasPage_createTexture(...) _spAtlasPage_createTexture(__VA_ARGS__)
+#define _AtlasPage_disposeTexture(...) _spAtlasPage_disposeTexture(__VA_ARGS__)
+#define _Util_readFile(...) _spUtil_readFile(__VA_ARGS__)
+#endif
 
 /*
  * Internal API available for extension:
@@ -100,34 +105,56 @@ char* _readFile (const char* path, int* length);
 
 /**/
 
-void _AttachmentLoader_init (AttachmentLoader* self, /**/
-		void (*dispose) (AttachmentLoader* self), /**/
-		Attachment* (*newAttachment) (AttachmentLoader* self, Skin* skin, AttachmentType type, const char* name));
-void _AttachmentLoader_deinit (AttachmentLoader* self);
-void _AttachmentLoader_setError (AttachmentLoader* self, const char* error1, const char* error2);
-void _AttachmentLoader_setUnknownTypeError (AttachmentLoader* self, AttachmentType type);
+void _spAttachmentLoader_init (spAttachmentLoader* self, /**/
+void (*dispose) (spAttachmentLoader* self), /**/
+spAttachment* (*newAttachment) (spAttachmentLoader* self, spSkin* skin, spAttachmentType type, const char* name));
+void _spAttachmentLoader_deinit (spAttachmentLoader* self);
+void _spAttachmentLoader_setError (spAttachmentLoader* self, const char* error1, const char* error2);
+void _spAttachmentLoader_setUnknownTypeError (spAttachmentLoader* self, spAttachmentType type);
+
+#ifdef SPINE_SHORT_NAMES
+#define _AttachmentLoader_init(...) _spAttachmentLoader_init(__VA_ARGS__)
+#define _AttachmentLoader_deinit(...) _spAttachmentLoader_deinit(__VA_ARGS__)
+#define _AttachmentLoader_setError(...) _spAttachmentLoader_setError(__VA_ARGS__)
+#define _AttachmentLoader_setUnknownTypeError(...) _spAttachmentLoader_setUnknownTypeError(__VA_ARGS__)
+#endif
 
 /**/
 
-void _Attachment_init (Attachment* self, const char* name, AttachmentType type, /**/
-		void (*dispose) (Attachment* self));
-void _Attachment_deinit (Attachment* self);
+void _spAttachment_init (spAttachment* self, const char* name, spAttachmentType type, /**/
+void (*dispose) (spAttachment* self));
+void _spAttachment_deinit (spAttachment* self);
+
+#ifdef SPINE_SHORT_NAMES
+#define _Attachment_init(...) _spAttachment_init(__VA_ARGS__)
+#define _Attachment_deinit(...) _spAttachment_deinit(__VA_ARGS__)
+#endif
 
 /**/
 
-void _Timeline_init (Timeline* self, /**/
-		void (*dispose) (Timeline* self), /**/
-		void (*apply) (const Timeline* self, Skeleton* skeleton, float lastTime, float time, Event** firedEvents, int* eventCount,
-				float alpha));
-void _Timeline_deinit (Timeline* self);
+void _spTimeline_init (spTimeline* self, /**/
+void (*dispose) (spTimeline* self), /**/
+		void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
+				int* eventCount, float alpha));
+void _spTimeline_deinit (spTimeline* self);
+
+#ifdef SPINE_SHORT_NAMES
+#define _Timeline_init(...) _spTimeline_init(__VA_ARGS__)
+#define _Timeline_deinit(...) _spTimeline_deinit(__VA_ARGS__)
+#endif
 
 /**/
 
-void _CurveTimeline_init (CurveTimeline* self, int frameCount, /**/
-		void (*dispose) (Timeline* self), /**/
-		void (*apply) (const Timeline* self, Skeleton* skeleton, float lastTime, float time, Event** firedEvents, int* eventCount,
-				float alpha));
-void _CurveTimeline_deinit (CurveTimeline* self);
+void _spCurveTimeline_init (spCurveTimeline* self, int frameCount, /**/
+void (*dispose) (spTimeline* self), /**/
+		void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
+				int* eventCount, float alpha));
+void _spCurveTimeline_deinit (spCurveTimeline* self);
+
+#ifdef SPINE_SHORT_NAMES
+#define _CurveTimeline_init(...) _spCurveTimeline_init(__VA_ARGS__)
+#define _CurveTimeline_deinit(...) _spCurveTimeline_deinit(__VA_ARGS__)
+#endif
 
 #ifdef __cplusplus
 }

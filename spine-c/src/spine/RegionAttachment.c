@@ -34,15 +34,15 @@
 #include <spine/RegionAttachment.h>
 #include <spine/extension.h>
 
-RegionAttachment* RegionAttachment_create (const char* name) {
-	RegionAttachment* self = NEW(RegionAttachment);
+spRegionAttachment* spRegionAttachment_create (const char* name) {
+	spRegionAttachment* self = NEW(spRegionAttachment);
 	self->scaleX = 1;
 	self->scaleY = 1;
-	_Attachment_init(SUPER(self), name, ATTACHMENT_REGION, _Attachment_deinit);
+	_spAttachment_init(SUPER(self), name, ATTACHMENT_REGION, _spAttachment_deinit);
 	return self;
 }
 
-void RegionAttachment_setUVs (RegionAttachment* self, float u, float v, float u2, float v2, int/*bool*/rotate) {
+void spRegionAttachment_setUVs (spRegionAttachment* self, float u, float v, float u2, float v2, int/*bool*/rotate) {
 	if (rotate) {
 		self->uvs[VERTEX_X2] = u;
 		self->uvs[VERTEX_Y2] = v2;
@@ -64,7 +64,7 @@ void RegionAttachment_setUVs (RegionAttachment* self, float u, float v, float u2
 	}
 }
 
-void RegionAttachment_updateOffset (RegionAttachment* self) {
+void spRegionAttachment_updateOffset (spRegionAttachment* self) {
 	float regionScaleX = self->width / self->regionOriginalWidth * self->scaleX;
 	float regionScaleY = self->height / self->regionOriginalHeight * self->scaleY;
 	float localX = -self->width / 2 * self->scaleX + self->regionOffsetX * regionScaleX;
@@ -97,7 +97,7 @@ void RegionAttachment_updateOffset (RegionAttachment* self) {
 	self->offset[VERTEX_Y4] = localYCos + localX2Sin;
 }
 
-void RegionAttachment_computeWorldVertices (RegionAttachment* self, float x, float y, Bone* bone, float* vertices) {
+void spRegionAttachment_computeWorldVertices (spRegionAttachment* self, float x, float y, spBone* bone, float* vertices) {
 	float* offset = self->offset;
 	x += bone->worldX;
 	y += bone->worldY;

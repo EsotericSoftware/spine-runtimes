@@ -35,74 +35,74 @@
 #include <string.h>
 #include <spine/extension.h>
 
-SkeletonData* SkeletonData_create () {
-	return NEW(SkeletonData);
+spSkeletonData* spSkeletonData_create () {
+	return NEW(spSkeletonData);
 }
 
-void SkeletonData_dispose (SkeletonData* self) {
+void spSkeletonData_dispose (spSkeletonData* self) {
 	int i;
 	for (i = 0; i < self->boneCount; ++i)
-		BoneData_dispose(self->bones[i]);
+		spBoneData_dispose(self->bones[i]);
 	FREE(self->bones);
 
 	for (i = 0; i < self->slotCount; ++i)
-		SlotData_dispose(self->slots[i]);
+		spSlotData_dispose(self->slots[i]);
 	FREE(self->slots);
 
 	for (i = 0; i < self->skinCount; ++i)
-		Skin_dispose(self->skins[i]);
+		spSkin_dispose(self->skins[i]);
 	FREE(self->skins);
 
 	for (i = 0; i < self->animationCount; ++i)
-		Animation_dispose(self->animations[i]);
+		spAnimation_dispose(self->animations[i]);
 	FREE(self->animations);
 
 	FREE(self);
 }
 
-BoneData* SkeletonData_findBone (const SkeletonData* self, const char* boneName) {
+spBoneData* spSkeletonData_findBone (const spSkeletonData* self, const char* boneName) {
 	int i;
 	for (i = 0; i < self->boneCount; ++i)
 		if (strcmp(self->bones[i]->name, boneName) == 0) return self->bones[i];
 	return 0;
 }
 
-int SkeletonData_findBoneIndex (const SkeletonData* self, const char* boneName) {
+int spSkeletonData_findBoneIndex (const spSkeletonData* self, const char* boneName) {
 	int i;
 	for (i = 0; i < self->boneCount; ++i)
 		if (strcmp(self->bones[i]->name, boneName) == 0) return i;
 	return 0;
 }
 
-SlotData* SkeletonData_findSlot (const SkeletonData* self, const char* slotName) {
+spSlotData* spSkeletonData_findSlot (const spSkeletonData* self, const char* slotName) {
 	int i;
 	for (i = 0; i < self->slotCount; ++i)
 		if (strcmp(self->slots[i]->name, slotName) == 0) return self->slots[i];
 	return 0;
 }
 
-int SkeletonData_findSlotIndex (const SkeletonData* self, const char* slotName) {
+int spSkeletonData_findSlotIndex (const spSkeletonData* self, const char* slotName) {
 	int i;
 	for (i = 0; i < self->slotCount; ++i)
 		if (strcmp(self->slots[i]->name, slotName) == 0) return i;
 	return 0;
 }
 
-Skin* SkeletonData_findSkin (const SkeletonData* self, const char* skinName) {
+spSkin* spSkeletonData_findSkin (const spSkeletonData* self, const char* skinName) {
 	int i;
 	for (i = 0; i < self->skinCount; ++i)
 		if (strcmp(self->skins[i]->name, skinName) == 0) return self->skins[i];
 	return 0;
 }
 
-EventData* SkeletonData_findEvent (const SkeletonData* self, const char* eventName) {
+spEventData* spSkeletonData_findEvent (const spSkeletonData* self, const char* eventName) {
 	int i;
 	for (i = 0; i < self->eventCount; ++i)
 		if (strcmp(self->events[i]->name, eventName) == 0) return self->events[i];
 	return 0;
 }
 
-Animation* SkeletonData_findAnimation (const SkeletonData* self, const char* animationName) {
+spAnimation* spSkeletonData_findAnimation (const spSkeletonData* self, const char* animationName) {
 	int i;
 	for (i = 0; i < self->animationCount; ++i)
 		if (strcmp(self->animations[i]->name, animationName) == 0) return self->animations[i];
