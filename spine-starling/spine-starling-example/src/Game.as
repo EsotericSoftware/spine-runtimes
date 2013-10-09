@@ -58,7 +58,7 @@ public class Game extends Sprite {
         skeleton2.setAnimationStateData(stateData);
         skeleton2.setAnimation("walk", true);
         
-        var slot:Slot = skeleton.findSlot("left hand");
+        var slot:Slot = skeleton.skeleton.findSlot("left hand");
         slot.attachment = new DisplayAttachment("right hand attachment", skeleton2);
 
         Starling.juggler.add(skeleton2);

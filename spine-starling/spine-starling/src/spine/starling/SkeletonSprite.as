@@ -69,10 +69,6 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 	public function advanceTime (delta:Number) : void {
 		_skeleton.update(delta);
 	}
-    
-    public function findSlot(name:String) : Slot {
-        return _skeleton.findSlot(name);
-    }
 
 	override public function render (support:RenderSupport, alpha:Number) : void {
 		alpha *= this.alpha * skeleton.a;
@@ -121,7 +117,7 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
                     if (display.hasVisibleArea) {
                         display.x = slot.bone.worldX;
                         display.y = slot.bone.worldY;
-                        display.rotation = slot.bone.worldRotation * (3.1415926) / 180;
+                        display.rotation = -slot.bone.worldRotation * (3.1415926) / 180;
                         display.scaleX = slot.bone.worldScaleX;
                         display.scaleY = slot.bone.worldScaleY;
                         
