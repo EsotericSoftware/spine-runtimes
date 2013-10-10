@@ -62,6 +62,8 @@ public class SkeletonComponent : MonoBehaviour {
 		meshFilter.sharedMesh = null;
 		DestroyImmediate(mesh);
 		mesh = null;
+		mesh1 = null;
+		mesh2 = null;
 		renderer.sharedMaterial = null;
 		skeleton = null;
 	}

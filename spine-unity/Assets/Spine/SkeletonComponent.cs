@@ -62,6 +62,8 @@ public class SkeletonComponent : MonoBehaviour {
 		meshFilter.sharedMesh = null;
 		DestroyImmediate(mesh);
 		mesh = null;
+		mesh1 = null;
+		mesh2 = null;
 		renderer.sharedMaterial = null;
 		skeleton = null;
 	}
@@ -145,7 +147,6 @@ public class SkeletonComponent : MonoBehaviour {
 		
 		// Double buffer mesh.
 		Mesh mesh = useMesh1 ? mesh1 : mesh2;
-		useMesh1 = !useMesh1;
 		meshFilter.sharedMesh = mesh;
 
 		// Ensure mesh data is the right size.
@@ -182,10 +183,11 @@ public class SkeletonComponent : MonoBehaviour {
 			
 			regionAttachment.ComputeWorldVertices(skeleton.X, skeleton.Y, slot.Bone, vertexPositions);
 			
-			vertices[vertexIndex] = new Vector3(vertexPositions[RegionAttachment.X1], vertexPositions[RegionAttachment.Y1], 0);
-			vertices[vertexIndex + 1] = new Vector3(vertexPositions[RegionAttachment.X4], vertexPositions[RegionAttachment.Y4], 0);
-			vertices[vertexIndex + 2] = new Vector3(vertexPositions[RegionAttachment.X2], vertexPositions[RegionAttachment.Y2], 0);
-			vertices[vertexIndex + 3] = new Vector3(vertexPositions[RegionAttachment.X3], vertexPositions[RegionAttachment.Y3], 0);
+			float z = -i * 0.1f;
+			vertices[vertexIndex] = new Vector3(vertexPositions[RegionAttachment.X1], vertexPositions[RegionAttachment.Y1], z);
+			vertices[vertexIndex + 1] = new Vector3(vertexPositions[RegionAttachment.X4], vertexPositions[RegionAttachment.Y4], z);
+			vertices[vertexIndex + 2] = new Vector3(vertexPositions[RegionAttachment.X2], vertexPositions[RegionAttachment.Y2], z);
+			vertices[vertexIndex + 3] = new Vector3(vertexPositions[RegionAttachment.X3], vertexPositions[RegionAttachment.Y3], z);
 			
 			color.a = (byte)(a * slot.A);
 			color.r = (byte)(r * slot.R * color.a);
@@ -219,7 +221,7 @@ public class SkeletonComponent : MonoBehaviour {
 			Vector3 normal = new Vector3(0, 0, -1);
 			for (int i = 0; i < vertexCount; i++)
 				normals[i] = normal;
-			(useMesh1 ? mesh1 : mesh2).vertices = vertices;
+			(useMesh1 ? mesh2 : mesh1).vertices = vertices;
 			mesh1.normals = normals;
 			mesh2.normals = normals;
 
@@ -232,6 +234,8 @@ public class SkeletonComponent : MonoBehaviour {
 				mesh2.tangents = tangents;
 			}
 		}
+		
+		useMesh1 = !useMesh1;
 	}
 	
 	/** Adds a material. Adds submesh indexes if existing indexes aren't sufficient. */
