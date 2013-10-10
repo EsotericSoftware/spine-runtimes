@@ -91,7 +91,7 @@ namespace Spine {
 		public void Apply (Skeleton skeleton) {
 			List<Event> events = this.events;
 
-			for (int i = 0, n = tracks.Count; i < n; i++) {
+			for (int i = 0; i < tracks.Count; i++) {
 				TrackEntry current = tracks[i];
 				if (current == null) continue;
 
@@ -304,6 +304,10 @@ namespace Spine {
 
 		internal void OnComplete (AnimationState state, int index, int loopCount) {
 			if (Complete != null) Complete(state, new CompleteArgs(index, loopCount));
+		}
+
+		override public String ToString () {
+			return animation == null ? "<none>" : animation.name;
 		}
 	}
 }

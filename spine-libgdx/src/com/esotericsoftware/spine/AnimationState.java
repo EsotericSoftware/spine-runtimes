@@ -88,7 +88,7 @@ public class AnimationState {
 		Array<Event> events = this.events;
 		int listenerCount = listeners.size;
 
-		for (int i = 0, n = tracks.size; i < n; i++) {
+		for (int i = 0; i < tracks.size; i++) {
 			TrackEntry current = tracks.get(i);
 			if (current == null) continue;
 

@@ -33,8 +33,6 @@
 
 package com.esotericsoftware.spine;
 
-// BOZO - Event values don't seem to key properly.
-
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.ColorTimeline;
 import com.esotericsoftware.spine.Animation.CurveTimeline;
