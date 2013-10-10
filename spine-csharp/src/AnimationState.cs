@@ -57,7 +57,7 @@ namespace Spine {
 
 		public void Update (float delta) {
 			delta *= timeScale;
-			for (int i = 0, n = tracks.Count; i < n; i++) {
+			for (int i = 0; i < tracks.Count; i++) {
 				TrackEntry current = tracks[i];
 				if (current == null) continue;
 

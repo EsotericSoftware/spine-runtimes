@@ -52,7 +52,7 @@ public class AnimationState {
 
 	public void update (float delta) {
 		delta *= timeScale;
-		for (int i = 0, n = tracks.size; i < n; i++) {
+		for (int i = 0; i < tracks.size; i++) {
 			TrackEntry current = tracks.get(i);
 			if (current == null) continue;
 
