@@ -64,8 +64,8 @@ void spAnimation_apply (const spAnimation* self, struct spSkeleton* skeleton, fl
  * @param lastTime The last time the animation was applied.
  * @param events Any triggered events are added.
  * @param alpha The amount of this animation that affects the current pose. */
-void spAnimation_mix (const spAnimation* self, struct spSkeleton* skeleton, float lastTime, float time, int loop, spEvent** events,
-		int* eventCount, float alpha);
+void spAnimation_mix (const spAnimation* self, struct spSkeleton* skeleton, float lastTime, float time, int loop,
+		spEvent** events, int* eventCount, float alpha);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spAnimation Animation;
@@ -77,7 +77,13 @@ typedef spAnimation Animation;
 
 /**/
 
+typedef enum {
+	TIMELINE_SCALE, TIMELINE_ROTATE, TIMELINE_TRANLATE, TIMELINE_COLOR, TIMELINE_ATTACHMENT, TIMELINE_EVENT, TIMELINE_DRAWORDER
+} spTimelineType;
+
 struct spTimeline {
+	const spTimelineType type;
+
 	const void* const vtable;
 };
 

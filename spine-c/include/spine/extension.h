@@ -1,4 +1,3 @@
-
 /*
  Implementation notes:
 
@@ -132,7 +131,7 @@ void _spAttachment_deinit (spAttachment* self);
 
 /**/
 
-void _spTimeline_init (spTimeline* self, /**/
+void _spTimeline_init (spTimeline* self, spTimelineType type, /**/
 void (*dispose) (spTimeline* self), /**/
 		void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 				int* eventCount, float alpha));
@@ -145,7 +144,7 @@ void _spTimeline_deinit (spTimeline* self);
 
 /**/
 
-void _spCurveTimeline_init (spCurveTimeline* self, int frameCount, /**/
+void _spCurveTimeline_init (spCurveTimeline* self, spTimelineType type, int frameCount, /**/
 void (*dispose) (spTimeline* self), /**/
 		void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 				int* eventCount, float alpha));
