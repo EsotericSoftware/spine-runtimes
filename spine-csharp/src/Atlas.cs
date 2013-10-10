@@ -102,8 +102,8 @@ namespace Spine {
 					page.format = (Format)Enum.Parse(typeof(Format), readValue(reader), false);
 
 					readTuple(reader, tuple);
-					page.minFilter = (TextureFilter)Enum.Parse(typeof(TextureFilter), tuple[0]);
-					page.magFilter = (TextureFilter)Enum.Parse(typeof(TextureFilter), tuple[1]);
+					page.minFilter = (TextureFilter)Enum.Parse(typeof(TextureFilter), tuple[0], false);
+					page.magFilter = (TextureFilter)Enum.Parse(typeof(TextureFilter), tuple[1], false);
 
 					String direction = readValue(reader);
 					page.uWrap = TextureWrap.ClampToEdge;
