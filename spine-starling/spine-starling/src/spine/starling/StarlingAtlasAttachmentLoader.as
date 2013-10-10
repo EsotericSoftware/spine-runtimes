@@ -62,12 +62,12 @@ public class StarlingAtlasAttachmentLoader implements AttachmentLoader {
 			var frame:Rectangle = texture.frame;
 			texture = Texture.fromTexture(texture); // Discard frame.
 			regionAttachment.rendererObject = new SkeletonImage(texture);
-			regionAttachment.regionOffsetX = frame.x;
-			regionAttachment.regionOffsetY = frame.y;
-			regionAttachment.regionWidth = frame.width;
-			regionAttachment.regionHeight = frame.height;
-			regionAttachment.regionOriginalWidth = texture.width;
-			regionAttachment.regionOriginalHeight = texture.height;
+			regionAttachment.regionOffsetX = -frame.x;
+			regionAttachment.regionOffsetY = -frame.y;
+			regionAttachment.regionWidth = texture.width;
+			regionAttachment.regionHeight = texture.height;
+			regionAttachment.regionOriginalWidth = frame.width;
+			regionAttachment.regionOriginalHeight = frame.height;
 			return regionAttachment;
 		case AttachmentType.boundingbox:
 			return new BoundingBoxAttachment(name);
