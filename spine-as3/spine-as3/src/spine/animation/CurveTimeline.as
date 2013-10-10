@@ -32,6 +32,7 @@
  *****************************************************************************/
 
 package spine.animation {
+import spine.Event;
 import spine.Skeleton;
 
 /** Base class for frames that use an interpolation bezier curve. */
@@ -41,18 +42,16 @@ public class CurveTimeline implements Timeline {
 	static private const BEZIER_SEGMENTS:int = 10;
 
 	private var curves:Vector.<Number> = new Vector.<Number>(); // dfx, dfy, ddfx, ddfy, dddfx, dddfy, ...
-	private var _frameCount:int;
 
 	public function CurveTimeline (frameCount:int) {
-		_frameCount = frameCount;
 		curves.length = frameCount * 6;
 	}
 
-	public function apply (skeleton:Skeleton, time:Number, alpha:Number) : void {
+	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
 	}
 
 	public function get frameCount () : int {
-		return _frameCount;
+		return curves.length / 6;
 	}
 
 	public function setLinear (frameIndex:int) : void {

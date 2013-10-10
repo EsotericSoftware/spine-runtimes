@@ -32,36 +32,50 @@
  *****************************************************************************/
 
 package spine.animation {
-import spine.Bone;
 import spine.Event;
 import spine.Skeleton;
+import spine.Slot;
 
-public class ScaleTimeline extends TranslateTimeline {
-	public function ScaleTimeline (frameCount:int) {
-		super(frameCount);
+public class DrawOrderTimeline implements Timeline {
+	public var frames:Vector.<Number> = new Vector.<Number>(); // time, ...
+	public var drawOrders:Vector.<Vector.<int>> = new Vector.<Vector.<int>>();
+
+	public function DrawOrderTimeline (frameCount:int) {
+		frames.length = frameCount;
+		drawOrders.length = frameCount;
 	}
 
-	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
+	public function get frameCount () : int {
+		return frames.length;
+	}
+
+	/** Sets the time and value of the specified keyframe. */
+	public function setFrame (frameIndex:int, time:Number, drawOrder:Vector.<int>) : void {
+		frames[frameIndex] = time;
+		drawOrders[frameIndex] = drawOrder;
+	}
+
+	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
 		if (time < frames[0])
 			return; // Time is before first frame.
 
-		var bone:Bone = skeleton.bones[boneIndex];
-		if (time >= frames[frames.length - 3]) { // Time is after last frame.
-			bone.scaleX += (bone.data.scaleX - 1 + frames[frames.length - 2] - bone.scaleX) * alpha;
-			bone.scaleY += (bone.data.scaleY - 1 + frames[frames.length - 1] - bone.scaleY) * alpha;
-			return;
+		var frameIndex:int;
+		if (time >= frames[frames.length - 1]) // Time is after last frame.
+			frameIndex = frames.length - 1;
+		else
+			frameIndex = Animation.binarySearch(frames, time, 1) - 1;
+
+		var drawOrder:Vector.<Slot> = skeleton.drawOrder;
+		var slots:Vector.<Slot> = skeleton.slots;
+		var drawOrderToSetupIndex:Vector.<int> = drawOrders[frameIndex];
+		var i:int = 0;
+		if (drawOrderToSetupIndex == null) {
+			for each (var slot:Slot in skeleton.slots)
+				drawOrder[i++] = slot;
+		} else {
+			for each (var setupIndex:int in drawOrderToSetupIndex) 
+				drawOrder[i++] = skeleton.slots[setupIndex];
 		}
-
-		// Interpolate between the last frame and the current frame.
-		var frameIndex:int = Animation.binarySearch(frames, time, 3);
-		var lastFrameX:Number = frames[frameIndex - 2];
-		var lastFrameY:Number = frames[frameIndex - 1];
-		var frameTime:Number = frames[frameIndex];
-		var percent:Number = 1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime);
-		percent = getCurvePercent(frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
-
-		bone.scaleX += (bone.data.scaleX - 1 + lastFrameX + (frames[frameIndex + FRAME_X] - lastFrameX) * percent - bone.scaleX) * alpha;
-		bone.scaleY += (bone.data.scaleY - 1 + lastFrameY + (frames[frameIndex + FRAME_Y] - lastFrameY) * percent - bone.scaleY) * alpha;
 	}
 }
 

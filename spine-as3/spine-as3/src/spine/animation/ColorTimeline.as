@@ -32,6 +32,7 @@
  *****************************************************************************/
 
 package spine.animation {
+import spine.Event;
 import spine.Skeleton;
 import spine.Slot;
 
@@ -60,7 +61,7 @@ public class ColorTimeline extends CurveTimeline {
 		frames[frameIndex + 4] = a;
 	}
 
-	override public function apply (skeleton:Skeleton, time:Number, alpha:Number) : void {
+	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
 		if (time < frames[0])
 			return; // Time is before first frame.
 

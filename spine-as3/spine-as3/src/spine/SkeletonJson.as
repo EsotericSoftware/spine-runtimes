@@ -38,6 +38,8 @@ import spine.animation.Animation;
 import spine.animation.AttachmentTimeline;
 import spine.animation.ColorTimeline;
 import spine.animation.CurveTimeline;
+import spine.animation.DrawOrderTimeline;
+import spine.animation.EventTimeline;
 import spine.animation.RotateTimeline;
 import spine.animation.ScaleTimeline;
 import spine.animation.Timeline;
@@ -140,6 +142,19 @@ public class SkeletonJson {
 			skeletonData.addSkin(skin);
 			if (skin.name == "default")
 				skeletonData.defaultSkin = skin;
+		}
+
+		// Events.
+		var events:Object = root["events"];
+		if (events) {
+			for (var eventName:String in events) {
+				var eventMap:Object = events[eventName];
+				var eventData:EventData = new EventData(eventName);
+				eventData.intValue = eventMap["int"] || 0;
+				eventData.floatValue = eventMap["float"] || 0;
+				eventData.stringValue = eventMap["string"] || null;
+				skeletonData.addEvent(eventData);
+			}
 		}
 
 		// Animations.
@@ -263,6 +278,59 @@ public class SkeletonJson {
 				} else
 					throw new Error("Invalid timeline type for a slot: " + timelineName2 + " (" + slotName + ")");
 			}
+		}
+
+		var eventsMap:Object = map["events"];
+		if (eventsMap) {
+			var timeline4:EventTimeline = new EventTimeline(eventsMap.Count);
+			var frameIndex4:int = 0;
+			for each (var eventMap:Object in eventsMap) {
+				var eventData:EventData = skeletonData.findEvent(eventMap["name"]);
+				if (eventData == null) throw new Error("Event not found: " + eventMap["name"]);
+				var event:Event = new Event(eventData);
+				event.intValue = eventMap.hasOwnProperty("int") ? eventMap["int"] : eventData.intValue;
+				event.floatValue = eventMap.hasOwnProperty("float") ? eventMap["float"] : eventData.floatValue;
+				event.stringValue = eventMap.hasOwnProperty("string") ? eventMap["string"] : eventData.stringValue;
+				timeline4.setFrame(frameIndex4++, eventMap["time"], event);
+			}
+			timelines.push(timeline4);
+			duration = Math.max(duration, timeline.frames[timeline4.frameCount - 1]);
+		}
+
+		var drawOrderValues:Object = map["draworder"];
+		if (drawOrderValues) {
+			var timeline5:DrawOrderTimeline = new DrawOrderTimeline(drawOrderValues.length);
+			var slotCount:int = skeletonData.slots.length;
+			var frameIndex5:int = 0;
+			for each (var drawOrderMap:Object in drawOrderValues) {
+				var drawOrder:Vector.<int> = null;
+				if (drawOrderMap["offsets"]) {
+					drawOrder = new Vector.<int>(slotCount);
+					for (var i:int = slotCount - 1; i >= 0; i--)
+						drawOrder[i] = -1;
+					var offsets:Object = drawOrderMap["offsets"];
+					var unchanged:Vector.<int> = new Vector.<int>(slotCount - offsets.length);
+					var originalIndex:int = 0, unchangedIndex:int = 0;
+					for each (var offsetMap:Object in offsets) {
+						var slotIndex2:int = skeletonData.findSlotIndex(offsetMap["slot"]);
+						if (slotIndex2 == -1) throw new Error("Slot not found: " + offsetMap["slot"]);
+						// Collect unchanged items.
+						while (originalIndex != slotIndex2)
+							unchanged[unchangedIndex++] = originalIndex++;
+						// Set changed items.
+						drawOrder[originalIndex + offsetMap["offset"]] = originalIndex++;
+					}
+					// Collect remaining unchanged items.
+					while (originalIndex < slotCount)
+						unchanged[unchangedIndex++] = originalIndex++;
+					// Fill in unchanged items.
+					for (i = slotCount - 1; i >= 0; i--)
+						if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
+				}
+				timeline5.setFrame(frameIndex5++, drawOrderMap["time"], drawOrder);
+			}
+			timelines.push(timeline5);
+			duration = Math.max(duration, timeline5.frames[timeline5.frameCount - 1]);
 		}
 
 		skeletonData.addAnimation(new Animation(name, timelines, duration));

@@ -32,36 +32,44 @@
  *****************************************************************************/
 
 package spine.animation {
-import spine.Bone;
-import spine.Event;
-import spine.Skeleton;
+import spine.SkeletonData;
 
-public class ScaleTimeline extends TranslateTimeline {
-	public function ScaleTimeline (frameCount:int) {
-		super(frameCount);
+public class AnimationStateData {
+	internal var _skeletonData:SkeletonData;
+	private var animationToMixTime:Object = new Object();
+	public var defaultMix:Number = 0;
+
+	public function AnimationStateData (skeletonData:SkeletonData) {
+		_skeletonData = skeletonData;
 	}
 
-	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
-		if (time < frames[0])
-			return; // Time is before first frame.
+	public function get skeletonData () : SkeletonData {
+		return _skeletonData;
+	}
 
-		var bone:Bone = skeleton.bones[boneIndex];
-		if (time >= frames[frames.length - 3]) { // Time is after last frame.
-			bone.scaleX += (bone.data.scaleX - 1 + frames[frames.length - 2] - bone.scaleX) * alpha;
-			bone.scaleY += (bone.data.scaleY - 1 + frames[frames.length - 1] - bone.scaleY) * alpha;
-			return;
-		}
+	public function setMixByName (fromName:String, toName:String, duration:Number) : void {
+		var from:Animation = _skeletonData.findAnimation(fromName);
+		if (from == null)
+			throw new ArgumentError("Animation not found: " + fromName);
+		var to:Animation = _skeletonData.findAnimation(toName);
+		if (to == null)
+			throw new ArgumentError("Animation not found: " + toName);
+		setMix(from, to, duration);
+	}
 
-		// Interpolate between the last frame and the current frame.
-		var frameIndex:int = Animation.binarySearch(frames, time, 3);
-		var lastFrameX:Number = frames[frameIndex - 2];
-		var lastFrameY:Number = frames[frameIndex - 1];
-		var frameTime:Number = frames[frameIndex];
-		var percent:Number = 1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime);
-		percent = getCurvePercent(frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
+	public function setMix (from:Animation, to:Animation, duration:Number) : void {
+		if (from == null)
+			throw new ArgumentError("from cannot be null.");
+		if (to == null)
+			throw new ArgumentError("to cannot be null.");
+		animationToMixTime[from.name + ":" + to.name] = duration;
+	}
 
-		bone.scaleX += (bone.data.scaleX - 1 + lastFrameX + (frames[frameIndex + FRAME_X] - lastFrameX) * percent - bone.scaleX) * alpha;
-		bone.scaleY += (bone.data.scaleY - 1 + lastFrameY + (frames[frameIndex + FRAME_Y] - lastFrameY) * percent - bone.scaleY) * alpha;
+	public function getMix (from:Animation, to:Animation) : Number {
+		var time:Object = animationToMixTime[from.name + ":" + to.name];
+		if (time == null)
+			return defaultMix;
+		return time as Number;
 	}
 }
 

@@ -32,22 +32,21 @@
  *****************************************************************************/
 
 package spine.animation {
+import spine.Event;
 import spine.Skeleton;
 
 public class AttachmentTimeline implements Timeline {
 	public var slotIndex:int;
-	private var _frameCount:int;
 	public var frames:Vector.<Number> = new Vector.<Number>(); // time, ...
 	public var attachmentNames:Vector.<String> = new Vector.<String>();
 
 	public function AttachmentTimeline (frameCount:int) {
-		_frameCount = frameCount;
 		frames.length = frameCount;
 		attachmentNames.length = frameCount;
 	}
 
 	public function get frameCount () : int {
-		return _frameCount;
+		return frames.length;
 	}
 
 	/** Sets the time and value of the specified keyframe. */
@@ -56,7 +55,7 @@ public class AttachmentTimeline implements Timeline {
 		attachmentNames[frameIndex] = attachmentName;
 	}
 
-	public function apply (skeleton:Skeleton, time:Number, alpha:Number) : void {
+	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
 		if (time < frames[0])
 			return; // Time is before first frame.
 

@@ -31,37 +31,26 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine.animation {
-import spine.Bone;
-import spine.Event;
-import spine.Skeleton;
+package spine {
 
-public class ScaleTimeline extends TranslateTimeline {
-	public function ScaleTimeline (frameCount:int) {
-		super(frameCount);
+public class EventData {
+	internal var _name:String;
+	public var intValue:int;;
+	public var floatValue:Number;
+	public var stringValue:String;
+	
+	public function EventData (name:String) {
+		if (name == null)
+			throw new ArgumentError("name cannot be null.");
+		_name = name;
 	}
 
-	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
-		if (time < frames[0])
-			return; // Time is before first frame.
+	public function get name () : String {
+		return _name;
+	}
 
-		var bone:Bone = skeleton.bones[boneIndex];
-		if (time >= frames[frames.length - 3]) { // Time is after last frame.
-			bone.scaleX += (bone.data.scaleX - 1 + frames[frames.length - 2] - bone.scaleX) * alpha;
-			bone.scaleY += (bone.data.scaleY - 1 + frames[frames.length - 1] - bone.scaleY) * alpha;
-			return;
-		}
-
-		// Interpolate between the last frame and the current frame.
-		var frameIndex:int = Animation.binarySearch(frames, time, 3);
-		var lastFrameX:Number = frames[frameIndex - 2];
-		var lastFrameY:Number = frames[frameIndex - 1];
-		var frameTime:Number = frames[frameIndex];
-		var percent:Number = 1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime);
-		percent = getCurvePercent(frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
-
-		bone.scaleX += (bone.data.scaleX - 1 + lastFrameX + (frames[frameIndex + FRAME_X] - lastFrameX) * percent - bone.scaleX) * alpha;
-		bone.scaleY += (bone.data.scaleY - 1 + lastFrameY + (frames[frameIndex + FRAME_Y] - lastFrameY) * percent - bone.scaleY) * alpha;
+	public function toString () : String {
+		return _name;
 	}
 }
 

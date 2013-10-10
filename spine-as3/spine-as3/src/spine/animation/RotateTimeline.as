@@ -33,6 +33,7 @@
 
 package spine.animation {
 import spine.Bone;
+import spine.Event;
 import spine.Skeleton;
 
 public class RotateTimeline extends CurveTimeline {
@@ -54,7 +55,7 @@ public class RotateTimeline extends CurveTimeline {
 		frames[frameIndex + 1] = angle;
 	}
 
-	override public function apply (skeleton:Skeleton, time:Number, alpha:Number) : void {
+	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
 		if (time < frames[0])
 			return; // Time is before first frame.
 
