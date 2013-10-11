@@ -286,6 +286,7 @@ public class SkeletonComponent : MonoBehaviour {
 	
 #if UNITY_EDITOR
 	void OnDrawGizmos() {
+		// Make selection easier by drawing a clear gizmo over the skeleton.
 		if (vertices == null) return;
 		Vector3 gizmosCenter = new Vector3();
 		Vector3 gizmosSize = new Vector3();
