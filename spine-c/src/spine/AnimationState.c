@@ -107,7 +107,7 @@ void spAnimationState_update (spAnimationState* self, float delta) {
 			int count = (int)(time / endTime);
 			if (current->listener) current->listener(self, i, ANIMATION_COMPLETE, 0, count);
 			if (self->listener) self->listener(self, i, ANIMATION_COMPLETE, 0, count);
-			if (i >= self->trackCount || !self->tracks[i]) continue;
+			if (i >= self->trackCount || self->tracks[i] != current) continue;
 		}
 
 		if (current->next) {
@@ -161,7 +161,7 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 			if (self->listener) self->listener(self, i, ANIMATION_EVENT, event, 0);
 		}
 
-		if (i >= self->trackCount || !self->tracks[i]) continue;
+		if (i >= self->trackCount || self->tracks[i] != current) continue;
 		current->lastTime = current->time;
 	}
 }
