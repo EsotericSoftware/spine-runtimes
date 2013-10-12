@@ -45,20 +45,20 @@ typedef struct {
 	float* const vertices;
 	int count;
 	int capacity;
-} spBoundingPolygon;
+} spPolygon;
 
-spBoundingPolygon* spBoundingPolygon_create (int capacity);
-void spBoundingPolygon_dispose (spBoundingPolygon* self);
+spPolygon* spPolygon_create (int capacity);
+void spPolygon_dispose (spPolygon* self);
 
-int/*bool*/spBoundingPolygon_containsPoint (spBoundingPolygon* polygon, float x, float y);
-int/*bool*/spBoundingPolygon_intersectsSegment (spBoundingPolygon* polygon, float x1, float y1, float x2, float y2);
+int/*bool*/spPolygon_containsPoint (spPolygon* polygon, float x, float y);
+int/*bool*/spPolygon_intersectsSegment (spPolygon* polygon, float x1, float y1, float x2, float y2);
 
 #ifdef SPINE_SHORT_NAMES
-typedef spBoundingPolygon BoundingPolygon;
-#define BoundingPolygon_create(...) spBoundingPolygon_create(__VA_ARGS__)
-#define BoundingPolygon_dispose(...) spBoundingPolygon_dispose(__VA_ARGS__)
-#define BoundingPolygon_containsPoint(...) spBoundingPolygon_containsPoint(__VA_ARGS__)
-#define BoundingPolygon_intersectsSegment(...) spBoundingPolygon_intersectsSegment(__VA_ARGS__)
+typedef spPolygon Polygon;
+#define Polygon_create(...) spPolygon_create(__VA_ARGS__)
+#define Polygon_dispose(...) spPolygon_dispose(__VA_ARGS__)
+#define Polygon_containsPoint(...) spPolygon_containsPoint(__VA_ARGS__)
+#define Polygon_intersectsSegment(...) spPolygon_intersectsSegment(__VA_ARGS__)
 #endif
 
 /**/
@@ -66,7 +66,7 @@ typedef spBoundingPolygon BoundingPolygon;
 typedef struct {
 	int count;
 	spBoundingBoxAttachment** boundingBoxes;
-	spBoundingPolygon** polygons;
+	spPolygon** polygons;
 
 	float minX, minY, maxX, maxY;
 } spSkeletonBounds;
@@ -93,7 +93,7 @@ spBoundingBoxAttachment* spSkeletonBounds_containsPoint (spSkeletonBounds* self,
 spBoundingBoxAttachment* spSkeletonBounds_intersectsSegment (spSkeletonBounds* self, float x1, float y1, float x2, float y2);
 
 /** Returns the polygon for the specified bounding box, or null. */
-spBoundingPolygon* spSkeletonBounds_getPolygon (spSkeletonBounds* self, spBoundingBoxAttachment* boundingBox);
+spPolygon* spSkeletonBounds_getPolygon (spSkeletonBounds* self, spBoundingBoxAttachment* boundingBox);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spSkeletonBounds SkeletonBounds;

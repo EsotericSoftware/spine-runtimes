@@ -35,19 +35,19 @@
 #include <limits.h>
 #include <spine/extension.h>
 
-spBoundingPolygon* spBoundingPolygon_create (int capacity) {
-	spBoundingPolygon* self = NEW(spBoundingPolygon);
+spPolygon* spPolygon_create (int capacity) {
+	spPolygon* self = NEW(spPolygon);
 	self->capacity = capacity;
 	CONST_CAST(float*, self->vertices) = MALLOC(float, capacity);
 	return self;
 }
 
-void spBoundingPolygon_dispose (spBoundingPolygon* self) {
+void spPolygon_dispose (spPolygon* self) {
 	FREE(self->vertices);
 	FREE(self);
 }
 
-int/*bool*/spBoundingPolygon_containsPoint (spBoundingPolygon* self, float x, float y) {
+int/*bool*/spPolygon_containsPoint (spPolygon* self, float x, float y) {
 	int prevIndex = self->count - 2;
 	int inside = 0;
 	int i;
@@ -63,7 +63,7 @@ int/*bool*/spBoundingPolygon_containsPoint (spBoundingPolygon* self, float x, fl
 	return inside;
 }
 
-int/*bool*/spBoundingPolygon_intersectsSegment (spBoundingPolygon* self, float x1, float y1, float x2, float y2) {
+int/*bool*/spPolygon_intersectsSegment (spPolygon* self, float x1, float y1, float x2, float y2) {
 	float width12 = x1 - x2, height12 = y1 - y2;
 	float det1 = x1 * y2 - y1 * x2;
 	float x3 = self->vertices[self->count - 2], y3 = self->vertices[self->count - 1];
@@ -98,7 +98,7 @@ spSkeletonBounds* spSkeletonBounds_create () {
 void spSkeletonBounds_dispose (spSkeletonBounds* self) {
 	int i;
 	for (i = 0; i < SUB_CAST(_spSkeletonBounds, self)->capacity; ++i)
-		if (self->polygons[i]) spBoundingPolygon_dispose(self->polygons[i]);
+		if (self->polygons[i]) spPolygon_dispose(self->polygons[i]);
 	FREE(self->polygons);
 	FREE(self->boundingBoxes);
 	FREE(self);
@@ -109,12 +109,12 @@ void spSkeletonBounds_update (spSkeletonBounds* self, spSkeleton* skeleton, int/
 
 	_spSkeletonBounds* internal = SUB_CAST(_spSkeletonBounds, self);
 	if (internal->capacity < skeleton->slotCount) {
-		spBoundingPolygon** newPolygons;
+		spPolygon** newPolygons;
 
 		FREE(self->boundingBoxes);
 		self->boundingBoxes = MALLOC(spBoundingBoxAttachment*, skeleton->slotCount);
 
-		newPolygons = CALLOC(spBoundingPolygon*, skeleton->slotCount);
+		newPolygons = CALLOC(spPolygon*, skeleton->slotCount);
 		memcpy(newPolygons, self->polygons, internal->capacity);
 		FREE(self->polygons);
 		self->polygons = newPolygons;
@@ -129,7 +129,7 @@ void spSkeletonBounds_update (spSkeletonBounds* self, spSkeleton* skeleton, int/
 
 	self->count = 0;
 	for (i = 0; i < skeleton->slotCount; ++i) {
-		spBoundingPolygon* polygon;
+		spPolygon* polygon;
 		spBoundingBoxAttachment* boundingBox;
 
 		spSlot* slot = skeleton->slots[i];
@@ -140,8 +140,8 @@ void spSkeletonBounds_update (spSkeletonBounds* self, spSkeleton* skeleton, int/
 
 		polygon = self->polygons[self->count];
 		if (!polygon || polygon->capacity < boundingBox->verticesCount) {
-			if (polygon) spBoundingPolygon_dispose(polygon);
-			self->polygons[self->count] = polygon = spBoundingPolygon_create(boundingBox->verticesCount);
+			if (polygon) spPolygon_dispose(polygon);
+			self->polygons[self->count] = polygon = spPolygon_create(boundingBox->verticesCount);
 		}
 		polygon->count = boundingBox->verticesCount;
 		spBoundingBoxAttachment_computeWorldVertices(boundingBox, skeleton->x, skeleton->y, slot->bone, polygon->vertices);
@@ -189,18 +189,18 @@ int/*bool*/spSkeletonBounds_aabbIntersectsSkeleton (spSkeletonBounds* self, spSk
 spBoundingBoxAttachment* spSkeletonBounds_containsPoint (spSkeletonBounds* self, float x, float y) {
 	int i;
 	for (i = 0; i < self->count; ++i)
-		if (spBoundingPolygon_containsPoint(self->polygons[i], x, y)) return self->boundingBoxes[i];
+		if (spPolygon_containsPoint(self->polygons[i], x, y)) return self->boundingBoxes[i];
 	return 0;
 }
 
 spBoundingBoxAttachment* spSkeletonBounds_intersectsSegment (spSkeletonBounds* self, float x1, float y1, float x2, float y2) {
 	int i;
 	for (i = 0; i < self->count; ++i)
-		if (spBoundingPolygon_intersectsSegment(self->polygons[i], x1, y1, x2, y2)) return self->boundingBoxes[i];
+		if (spPolygon_intersectsSegment(self->polygons[i], x1, y1, x2, y2)) return self->boundingBoxes[i];
 	return 0;
 }
 
-spBoundingPolygon* spSkeletonBounds_getPolygon (spSkeletonBounds* self, spBoundingBoxAttachment* boundingBox) {
+spPolygon* spSkeletonBounds_getPolygon (spSkeletonBounds* self, spBoundingBoxAttachment* boundingBox) {
 	int i;
 	for (i = 0; i < self->count; ++i)
 		if (self->boundingBoxes[i] == boundingBox) return self->polygons[i];
