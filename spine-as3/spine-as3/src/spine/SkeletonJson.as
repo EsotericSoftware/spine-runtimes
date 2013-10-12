@@ -287,7 +287,7 @@ public class SkeletonJson {
 
 		var eventsMap:Object = map["events"];
 		if (eventsMap) {
-			var timeline4:EventTimeline = new EventTimeline(eventsMap.Count);
+			var timeline4:EventTimeline = new EventTimeline(eventsMap.length);
 			var frameIndex4:int = 0;
 			for each (var eventMap:Object in eventsMap) {
 				var eventData:EventData = skeletonData.findEvent(eventMap["name"]);
@@ -299,7 +299,7 @@ public class SkeletonJson {
 				timeline4.setFrame(frameIndex4++, eventMap["time"], event);
 			}
 			timelines.push(timeline4);
-			duration = Math.max(duration, timeline.frames[timeline4.frameCount - 1]);
+			duration = Math.max(duration, timeline4.frames[timeline4.frameCount - 1]);
 		}
 
 		var drawOrderValues:Object = map["draworder"];

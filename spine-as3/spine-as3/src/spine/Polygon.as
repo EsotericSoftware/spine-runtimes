@@ -36,7 +36,26 @@ package spine {
 public class Polygon {
 	public var vertices:Vector.<Number> = new Vector.<Number>();
 	
-	/// <summary>Returns true if the polygon contains the line segment.</summary>
+	/** Returns true if the polygon contains the point. */
+	public function containsPoint (x:Number, y:Number) : Boolean {
+		var nn:int = vertices.length;
+		
+		var prevIndex:int = nn - 2;
+		var inside:Boolean = false;
+		for (var ii:int = 0; ii < nn; ii += 2) {
+			var vertexY:Number = vertices[ii + 1];
+			var prevY:Number = vertices[prevIndex + 1];
+			if ((vertexY < y && prevY >= y) || (prevY < y && vertexY >= y)) {
+				var vertexX:Number = vertices[ii];
+				if (vertexX + (y - vertexY) / (prevY - vertexY) * (vertices[prevIndex] - vertexX) < x) inside = !inside;
+			}
+			prevIndex = ii;
+		}
+		
+		return inside;
+	}
+
+	/** Returns true if the polygon contains the line segment. */
 	public function intersectsSegment (x1:Number, y1:Number, x2:Number, y2:Number) : Boolean {
 		var nn:int = vertices.length;
 		
@@ -57,25 +76,6 @@ public class Polygon {
 			y3 = y4;
 		}
 		return false;
-	}
-	
-	/// <summary>Returns true if the polygon contains the point.</summary>
-	public function containsPoint (x:Number, y:Number) : Boolean {
-		var nn:int = vertices.length;
-		
-		var prevIndex:int = nn - 2;
-		var inside:Boolean = false;
-		for (var ii:int = 0; ii < nn; ii += 2) {
-			var vertexY:Number = vertices[ii + 1];
-			var prevY:Number = vertices[prevIndex + 1];
-			if ((vertexY < y && prevY >= y) || (prevY < y && vertexY >= y)) {
-				var vertexX:Number = vertices[ii];
-				if (vertexX + (y - vertexY) / (prevY - vertexY) * (vertices[prevIndex] - vertexX) < x) inside = !inside;
-			}
-			prevIndex = ii;
-		}
-		
-		return inside;
 	}
 }
 

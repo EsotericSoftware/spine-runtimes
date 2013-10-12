@@ -230,11 +230,3 @@ public class AnimationState {
 }
 
 }
-
-import spine.animation.Animation;
-
-class QueueEntry {
-	public var animation:Animation;
-	public var loop:Boolean;
-	public var delay:Number;
-}

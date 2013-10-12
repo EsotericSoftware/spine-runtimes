@@ -40,7 +40,7 @@ public class SkeletonData {
 	public var slots:Vector.<SlotData> = new Vector.<SlotData>(); // Setup pose draw order.
 	public var skins:Vector.<Skin> = new Vector.<Skin>();
 	public var defaultSkin:Skin;
-	public var eventDatas:Vector.<EventData> = new Vector.<EventData>();
+	public var events:Vector.<EventData> = new Vector.<EventData>();
 	public var animations:Vector.<Animation> = new Vector.<Animation>();
 
 	// --- Bones.
@@ -126,15 +126,15 @@ public class SkeletonData {
 	public function addEvent (eventData:EventData) : void {
 		if (eventData == null)
 			throw new ArgumentError("eventData cannot be null.");
-		eventDatas.push(eventData);
+		events.push(eventData);
 	}
 	
 	/** @return May be null. */
 	public function findEvent (eventName:String) : EventData {
 		if (eventName == null)
 			throw new ArgumentError("eventName cannot be null.");
-		for (var i:int = 0, n:int = eventDatas.length; i < n; i++) {
-			var eventData:EventData = eventDatas[i];
+		for (var i:int = 0, n:int = events.length; i < n; i++) {
+			var eventData:EventData = events[i];
 			if (eventData.name == eventName)
 				return eventData;
 		}

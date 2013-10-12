@@ -303,7 +303,7 @@ public class SkeletonBinary {
 				EventTimeline timeline = new EventTimeline(eventCount);
 				for (int i = 0; i < eventCount; i++) {
 					float time = input.readFloat();
-					EventData eventData = skeletonData.eventDatas.get(input.readInt(true));
+					EventData eventData = skeletonData.events.get(input.readInt(true));
 					Event event = new Event(eventData);
 					event.intValue = input.readInt(false);
 					event.floatValue = input.readFloat();

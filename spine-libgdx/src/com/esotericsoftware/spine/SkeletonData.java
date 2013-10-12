@@ -41,7 +41,7 @@ public class SkeletonData {
 	final Array<SlotData> slots = new Array(); // Setup pose draw order.
 	final Array<Skin> skins = new Array();
 	Skin defaultSkin;
-	final Array<EventData> eventDatas = new Array();
+	final Array<EventData> events = new Array();
 	final Array<Animation> animations = new Array();
 
 	public void clear () {
@@ -49,7 +49,7 @@ public class SkeletonData {
 		slots.clear();
 		skins.clear();
 		defaultSkin = null;
-		eventDatas.clear();
+		events.clear();
 		animations.clear();
 	}
 
@@ -149,19 +149,19 @@ public class SkeletonData {
 
 	public void addEvent (EventData eventData) {
 		if (eventData == null) throw new IllegalArgumentException("eventData cannot be null.");
-		eventDatas.add(eventData);
+		events.add(eventData);
 	}
 
 	/** @return May be null. */
 	public EventData findEvent (String eventDataName) {
 		if (eventDataName == null) throw new IllegalArgumentException("eventDataName cannot be null.");
-		for (EventData eventData : eventDatas)
+		for (EventData eventData : events)
 			if (eventData.name.equals(eventDataName)) return eventData;
 		return null;
 	}
 
 	public Array<EventData> getEvents () {
-		return eventDatas;
+		return events;
 	}
 
 	// --- Animations.

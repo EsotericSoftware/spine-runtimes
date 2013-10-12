@@ -69,7 +69,7 @@ public class DrawOrderTimeline implements Timeline {
 		var slots:Vector.<Slot> = skeleton.slots;
 		var drawOrderToSetupIndex:Vector.<int> = drawOrders[frameIndex];
 		var i:int = 0;
-		if (drawOrderToSetupIndex == null) {
+		if (!drawOrderToSetupIndex) {
 			for each (var slot:Slot in skeleton.slots)
 				drawOrder[i++] = slot;
 		} else {
