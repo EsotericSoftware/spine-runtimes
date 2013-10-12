@@ -136,7 +136,7 @@ public class SkeletonBounds {
 		return null;
 	}
 
-	/** Returns true if the bounding box attachment contains the point. */
+	/** Returns true if the polygon contains the point. */
 	public boolean containsPoint (FloatArray polygon, float x, float y) {
 		float[] vertices = polygon.items;
 		int nn = polygon.size;
@@ -164,7 +164,7 @@ public class SkeletonBounds {
 		return null;
 	}
 
-	/** Returns true if the bounding box attachment contains the line segment. */
+	/** Returns true if the polygon contains the line segment. */
 	public boolean intersectsSegment (FloatArray polygon, float x1, float y1, float x2, float y2) {
 		float[] vertices = polygon.items;
 		int nn = polygon.size;

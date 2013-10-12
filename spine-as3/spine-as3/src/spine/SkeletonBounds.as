@@ -94,12 +94,12 @@ public class SkeletonBounds {
 	}
 	
 	
-	/// <summary>Returns true if the axis aligned bounding box contains the point.</summary>
+	/** Returns true if the axis aligned bounding box contains the point. */
 	public function aabbContainsPoint (x:Number, y:Number) : Boolean {
 		return x >= minX && x <= maxX && y >= minY && y <= maxY;
 	}
 	
-	/// <summary>Returns true if the axis aligned bounding box intersects the line segment.</summary>
+	/** Returns true if the axis aligned bounding box intersects the line segment. */
 	public function aabbIntersectsSegment (x1:Number, y1:Number, x2:Number, y2:Number) : Boolean {
 		if ((x1 <= minX && x2 <= minX) || (y1 <= minY && y2 <= minY) || (x1 >= maxX && x2 >= maxX) || (y1 >= maxY && y2 >= maxY))
 			return false;
@@ -115,21 +115,21 @@ public class SkeletonBounds {
 		return false;
 	}
 	
-	/// <summary>Returns true if the axis aligned bounding box intersects the axis aligned bounding box of the specified bounds.</summary>
+	/** Returns true if the axis aligned bounding box intersects the axis aligned bounding box of the specified bounds. */
 	public function aabbIntersectsSkeleton (bounds:SkeletonBounds) : Boolean {
 		return minX < bounds.maxX && maxX > bounds.minX && minY < bounds.maxY && maxY > bounds.minY;
 	}
 	
-	/// <summary>Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
-	/// efficient to only call this method if {@link #aabbContainsPoint(float, float)} returns true.</summary>
+	/** Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
+	 * efficient to only call this method if {@link #aabbContainsPoint(float, float)} returns true. */
 	public function containsPoint (x:Number, y:Number) : BoundingBoxAttachment {
 		for (var i:int = 0, n:int = polygons.length; i < n; i++)
 			if (polygons[i].containsPoint(x, y)) return boundingBoxes[i];
 		return null;
 	}
 	
-	/// <summary>Returns the first bounding box attachment that contains the line segment, or null. When doing many checks, it is usually
-	/// more efficient to only call this method if {@link #aabbIntersectsSegment(float, float, float, float)} returns true.</summary>
+	/** Returns the first bounding box attachment that contains the line segment, or null. When doing many checks, it is usually
+	 * more efficient to only call this method if {@link #aabbIntersectsSegment(float, float, float, float)} returns true. */
 	public function intersectsSegment (x1:Number, y1:Number, x2:Number, y2:Number) : BoundingBoxAttachment {
 		for (var i:int = 0, n:int = polygons.length; i < n; i++)
 			if (polygons[i].intersectsSegment(x1, y1, x2, y2)) return boundingBoxes[i];
