@@ -47,6 +47,7 @@ import spine.animation.TranslateTimeline;
 import spine.attachments.Attachment;
 import spine.attachments.AttachmentLoader;
 import spine.attachments.AttachmentType;
+import spine.attachments.BoundingBoxAttachment;
 import spine.attachments.RegionAttachment;
 
 public class SkeletonJson {
@@ -181,6 +182,10 @@ public class SkeletonJson {
 			regionAttachment.width = (map["width"] || 32) * scale;
 			regionAttachment.height = (map["height"] || 32) * scale;
 			regionAttachment.updateOffset();
+		} else if (attachment is BoundingBoxAttachment) {
+			var box:BoundingBoxAttachment = attachment as BoundingBoxAttachment;
+			for each (var point:Number in map["vertices"])
+				box.vertices.push(point * scale);
 		}
 
 		return attachment;
