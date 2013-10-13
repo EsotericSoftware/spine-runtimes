@@ -516,9 +516,9 @@ void spAttachmentTimeline_setFrame (spAttachmentTimeline* self, int frameIndex, 
 
 void _spEventTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 		int* eventCount, float alpha) {
-	if (!firedEvents) return;
 	spEventTimeline* self = (spEventTimeline*)timeline;
 	int frameIndex;
+	if (!firedEvents) return;
 
 	if (lastTime >= self->frames[self->framesLength - 1]) return; /* Last time is after last frame. */
 

@@ -15,102 +15,81 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\spine\spAnimation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\spine\spAnimationState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\spine\spAnimationStateData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\spine\Atlas.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\spine\spAtlasAttachmentLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\spine\Attachment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\spine\spAttachmentLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\spine\spBone.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\spine\spBoneData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\spine\extension.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\spine\spRegionAttachment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\spine\Skeleton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\spine\spSkeletonData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\spine\spSkeletonJson.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\spine\spSkin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\spine\spSlot.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\spine\spSlotData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\spine\spine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\spine\Json.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\spine\spBoundingBoxAttachment.h">
+    <ClInclude Include="include\spine\Animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\spine\spSkeletonBounds.h">
+    <ClInclude Include="include\spine\AnimationState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\spine\spEvent.h">
+    <ClInclude Include="include\spine\AnimationStateData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\spine\spEventData.h">
+    <ClInclude Include="include\spine\AtlasAttachmentLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spine\AttachmentLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spine\Bone.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spine\BoneData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spine\BoundingBoxAttachment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spine\Event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spine\EventData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spine\RegionAttachment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spine\SkeletonBounds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spine\SkeletonData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spine\SkeletonJson.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spine\Skin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spine\Slot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spine\SlotData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spine\ine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\spine\spAnimation.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\spine\spAnimationState.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\spine\spAnimationStateData.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\spine\Atlas.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\spine\spAtlasAttachmentLoader.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\spine\Attachment.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\spine\spAttachmentLoader.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\spine\spBone.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\spine\spBoneData.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\spine\extension.c">
@@ -119,37 +98,58 @@
     <ClCompile Include="src\spine\Json.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\spine\spRegionAttachment.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\spine\Skeleton.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\spine\spSkeletonData.c">
+    <ClCompile Include="src\spine\Animation.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\spine\spSkeletonJson.c">
+    <ClCompile Include="src\spine\AnimationState.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\spine\spSkin.c">
+    <ClCompile Include="src\spine\AnimationStateData.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\spine\spSlot.c">
+    <ClCompile Include="src\spine\AttachmentLoader.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\spine\spSlotData.c">
+    <ClCompile Include="src\spine\Bone.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\spine\spBoundingBoxAttachment.c">
+    <ClCompile Include="src\spine\BoneData.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\spine\spSkeletonBounds.c">
+    <ClCompile Include="src\spine\BoundingBoxAttachment.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\spine\spEventData.c">
+    <ClCompile Include="src\spine\Event.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\spine\spEvent.c">
+    <ClCompile Include="src\spine\EventData.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\spine\RegionAttachment.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\spine\SkeletonBounds.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\spine\SkeletonData.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\spine\SkeletonJson.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\spine\Skin.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\spine\Slot.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\spine\SlotData.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\spine\AtlasAttachmentLoader.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
