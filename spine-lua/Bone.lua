@@ -38,7 +38,10 @@ function Bone.new (data, parent)
 	
 	local self = {
 		data = data,
-		parent = parent
+		parent = parent,
+		x = 0, y = 0,
+		rotation = 0,
+		scaleX = 1, scaleY = 1
 	}
 
 	function self:updateWorldTransform (flipX, flipY)

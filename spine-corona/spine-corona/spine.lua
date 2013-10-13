@@ -47,7 +47,9 @@ spine.AttachmentLoader = require "spine-lua.AttachmentLoader"
 spine.Animation = require "spine-lua.Animation"
 spine.AnimationStateData = require "spine-lua.AnimationStateData"
 spine.AnimationState = require "spine-lua.AnimationState"
- 
+spine.EventData = require "spine-lua.EventData"
+spine.Event = require "spine-lua.Event"
+
 spine.utils.readFile = function (fileName, base)
 	if not base then base = system.ResourceDirectory end
 	local path = system.pathForFile(fileName, base)
@@ -116,11 +118,6 @@ function spine.Skeleton.new (skeletonData, group)
 					end
 					if slot.data.additiveBlending then image.blendMode = "add" end
 					images[slot] = image
-					if i < self.group.numChildren then
-						self.group:insert(i, image)
-					else
-						self.group:insert(image)
-					end
 				end
 				-- Position image based on attachment and bone.
 				if image ~= spine.Skeleton.failed then
@@ -179,6 +176,8 @@ function spine.Skeleton.new (skeletonData, group)
 						image.lastA = a / 255
 						image.alpha = image.lastA
 					end
+					
+					self.group:insert(image)
 				end
 			end
 		end

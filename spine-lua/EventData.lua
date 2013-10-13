@@ -31,52 +31,17 @@
  -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ------------------------------------------------------------------------------
 
-local utils = {}
+local EventData = {}
+function EventData.new (name)
+	if not name then error("name cannot be nil", 2) end
 
-function tablePrint (tt, indent, done)
-	done = done or {}
-	indent = indent or 0
-	for key, value in pairs(tt) do
-		local spaces = string.rep (" ", indent)
-		if type(value) == "table" and not done [value] then
-			done [value] = true
-			print(spaces .. "{")
-			utils.print(value, indent + 2, done)
-			print(spaces .. "}")
-		else
-			io.write(spaces .. tostring(key) .. " = ")
-			utils.print(value, indent + 2, done)
-		end
-	end
+	local self = {
+		name = name,
+		intValue = 0,
+		floatValue = 0,
+		stringValue = nil
+	}
+
+	return self
 end
-
-function utils.print (value, indent, done)
-	if "nil" == type(value) then
-		print(tostring(nil))
-	elseif "table" == type(value) then
-		print("{")
-		tablePrint(value, 2)
-		print("}")
-	elseif "string" == type(value) then
-		print("\"" .. value .. "\"")
-	else
-		print(tostring(value))
-	end
-end
-
-function utils.indexOf (haystack, needle)
-	for i,value in ipairs(haystack) do
-		if value == needle then return i end
-	end
-	return nil
-end
-
-function utils.copy (from, to)
-	if not to then to = {} end
-	for k,v in pairs(from) do
-		to[k] = v
-	end
-	return to
-end
-
-return utils
+return EventData

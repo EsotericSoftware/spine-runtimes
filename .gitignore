@@ -49,6 +49,7 @@ spine-unity/*.sln
 *.cachefile
 Assembly-*.csproj
 Assembly-*.pidb
+AssetStoreTools*
 
 spine-tk2d/Assets/Spine/spine-csharp
 !spine-tk2d/Assets/Spine/spine-csharp/Place spine-csharp here.txt

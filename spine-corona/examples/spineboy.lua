@@ -26,9 +26,22 @@ stateData:setMix("jump", "walk", 0.4)
 
 -- AnimationState has a queue of animations and can apply them with crossfading.
 local state = spine.AnimationState.new(stateData)
-state:setAnimation("walk", false)
-state:addAnimation("jump", false)
-state:addAnimation("walk", true)
+state:setAnimationByName(0, "drawOrder")
+state:addAnimationByName(0, "jump", false, 0)
+state:addAnimationByName(0, "walk", true, 0)
+
+state.onStart = function (trackIndex)
+	print(trackIndex.." start: "..state:getCurrent(trackIndex).animation.name)
+end
+state.onEnd = function (trackIndex)
+	print(trackIndex.." end: "..state:getCurrent(trackIndex).animation.name)
+end
+state.onComplete = function (trackIndex, loopCount)
+	print(trackIndex.." complete: "..state:getCurrent(trackIndex).animation.name..", "..loopCount)
+end
+state.onEvent = function (trackIndex, event)
+	print(trackIndex.." event: "..state:getCurrent(trackIndex).animation.name..", "..event.data.name..", "..event.intValue..", "..event.floatValue..", '"..(event.stringValue or "").."'")
+end
 
 local lastTime = 0
 local animationTime = 0

@@ -41,23 +41,29 @@ function Animation.new (name, timelines, duration)
 		duration = duration
 	}
 
-	function self:apply (skeleton, time, loop)
+	function self:apply (skeleton, lastTime, time, loop, events)
 		if not skeleton then error("skeleton cannot be nil.", 2) end
 
-		if loop and duration > 0 then time = time % duration end
+		if loop and duration > 0 then
+			time = time % self.duration
+			lastTime = lastTime % self.duration
+		end
 
 		for i,timeline in ipairs(self.timelines) do
-			timeline:apply(skeleton, time, 1)
+			timeline:apply(skeleton, lastTime, time, events, 1)
 		end
 	end
 
-	function self:mix (skeleton, time, loop, alpha)
+	function self:mix (skeleton, lastTime, time, loop, events, alpha)
 		if not skeleton then error("skeleton cannot be nil.", 2) end
 
-		if loop and duration > 0 then time = time % duration end
+		if loop and duration > 0 then
+			time = time % self.duration
+			lastTime = lastTime % self.duration
+		end
 
 		for i,timeline in ipairs(self.timelines) do
-			timeline:apply(skeleton, time, alpha)
+			timeline:apply(skeleton, lastTime, time, events, alpha)
 		end
 	end
 
@@ -97,15 +103,15 @@ function Animation.CurveTimeline.new ()
 		curves = {}
 	}
 
-	function self:setLinear (keyframeIndex)
-		self.curves[keyframeIndex * 6] = LINEAR
+	function self:setLinear (frameIndex)
+		self.curves[frameIndex * 6] = LINEAR
 	end
 
-	function self:setStepped (keyframeIndex)
-		self.curves[keyframeIndex * 6] = STEPPED
+	function self:setStepped (frameIndex)
+		self.curves[frameIndex * 6] = STEPPED
 	end
 
-	function self:setCurve (keyframeIndex, cx1, cy1, cx2, cy2)
+	function self:setCurve (frameIndex, cx1, cy1, cx2, cy2)
 		local subdiv_step = 1 / BEZIER_SEGMENTS
 		local subdiv_step2 = subdiv_step * subdiv_step
 		local subdiv_step3 = subdiv_step2 * subdiv_step
@@ -117,7 +123,7 @@ function Animation.CurveTimeline.new ()
 		local tmp1y = -cy1 * 2 + cy2
 		local tmp2x = (cx1 - cx2) * 3 + 1
 		local tmp2y = (cy1 - cy2) * 3 + 1
-		local i = keyframeIndex * 6
+		local i = frameIndex * 6
 		local curves = self.curves
 		curves[i] = cx1 * pre1 + tmp1x * pre2 + tmp2x * subdiv_step3
 		curves[i + 1] = cy1 * pre1 + tmp1y * pre2 + tmp2y * subdiv_step3
@@ -127,8 +133,8 @@ function Animation.CurveTimeline.new ()
 		curves[i + 5] = tmp2y * pre5
 	end
 
-	function self:getCurvePercent (keyframeIndex, percent)
-		local curveIndex = keyframeIndex * 6
+	function self:getCurvePercent (frameIndex, percent)
+		local curveIndex = frameIndex * 6
 		local curves = self.curves
 		local dfx = curves[curveIndex]
 		if not dfx then return percent end -- linear
@@ -175,17 +181,17 @@ function Animation.RotateTimeline.new ()
 		return self.frames[#self.frames - 1]
 	end
 
-	function self:getKeyframeCount ()
+	function self:getFrameCount ()
 		return (#self.frames + 1) / 2
 	end
 
-	function self:setKeyframe (keyframeIndex, time, value)
-		keyframeIndex = keyframeIndex * 2
-		self.frames[keyframeIndex] = time
-		self.frames[keyframeIndex + 1] = value
+	function self:setFrame (frameIndex, time, value)
+		frameIndex = frameIndex * 2
+		self.frames[frameIndex] = time
+		self.frames[frameIndex + 1] = value
 	end
 
-	function self:apply (skeleton, time, alpha)
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
 		local frames = self.frames
 		if time < frames[0] then return end -- Time is before first frame.
 
@@ -245,18 +251,18 @@ function Animation.TranslateTimeline.new ()
 		return self.frames[#self.frames - 2]
 	end
 
-	function self:getKeyframeCount ()
+	function self:getFrameCount ()
 		return (#self.frames + 1) / 3
 	end
 
-	function self:setKeyframe (keyframeIndex, time, x, y)
-		keyframeIndex = keyframeIndex * 3
-		self.frames[keyframeIndex] = time
-		self.frames[keyframeIndex + 1] = x
-		self.frames[keyframeIndex + 2] = y
+	function self:setFrame (frameIndex, time, x, y)
+		frameIndex = frameIndex * 3
+		self.frames[frameIndex] = time
+		self.frames[frameIndex + 1] = x
+		self.frames[frameIndex + 2] = y
 	end
 
-	function self:apply (skeleton, time, alpha)
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
 		local frames = self.frames
 		if time < frames[0] then return end -- Time is before first frame.
 
@@ -292,7 +298,7 @@ function Animation.ScaleTimeline.new ()
 
 	local self = Animation.TranslateTimeline.new()
 
-	function self:apply (skeleton, time, alpha)
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
 		local frames = self.frames
 		if time < frames[0] then return end -- Time is before first frame.
 
@@ -336,20 +342,20 @@ function Animation.ColorTimeline.new ()
 		return self.frames[#self.frames - 4]
 	end
 
-	function self:getKeyframeCount ()
+	function self:getFrameCount ()
 		return (#self.frames + 1) / 5
 	end
 
-	function self:setKeyframe (keyframeIndex, time, r, g, b, a)
-		keyframeIndex = keyframeIndex * 5
-		self.frames[keyframeIndex] = time
-		self.frames[keyframeIndex + 1] = r
-		self.frames[keyframeIndex + 2] = g
-		self.frames[keyframeIndex + 3] = b
-		self.frames[keyframeIndex + 4] = a
+	function self:setFrame (frameIndex, time, r, g, b, a)
+		frameIndex = frameIndex * 5
+		self.frames[frameIndex] = time
+		self.frames[frameIndex + 1] = r
+		self.frames[frameIndex + 2] = g
+		self.frames[frameIndex + 3] = b
+		self.frames[frameIndex + 4] = a
 	end
 
-	function self:apply (skeleton, time, alpha)
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
 		local frames = self.frames
 		if time < frames[0] then return end -- Time is before first frame.
 
@@ -391,25 +397,26 @@ end
 
 Animation.AttachmentTimeline = {}
 function Animation.AttachmentTimeline.new ()
-	local self = Animation.CurveTimeline.new()
-	self.frames = {}
-	self.attachmentNames = {}
-	self.slotName = nil
+	local self = {
+		frames = {},
+		attachmentNames = {},
+		slotName = nil
+	}
 
 	function self:getDuration ()
 		return self.frames[#self.frames]
 	end
 
-	function self:getKeyframeCount ()
+	function self:getFrameCount ()
 		return #self.frames + 1
 	end
 
-	function self:setKeyframe (keyframeIndex, time, attachmentName)
-		self.frames[keyframeIndex] = time
-		self.attachmentNames[keyframeIndex] = attachmentName
+	function self:setFrame (frameIndex, time, attachmentName)
+		self.frames[frameIndex] = time
+		self.attachmentNames[frameIndex] = attachmentName
 	end
 
-	function self:apply (skeleton, time, alpha)
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
 		local frames = self.frames
 		if time < frames[0] then return end -- Time is before first frame.
 
@@ -421,16 +428,118 @@ function Animation.AttachmentTimeline.new ()
 		end
 
 		local attachmentName = self.attachmentNames[frameIndex]
-    local slot = skeleton.slotsByName[self.slotName]
-    if attachmentName then
-      if not slot.attachment then
-        slot:setAttachment(skeleton:getAttachment(self.slotName, attachmentName))
-      elseif slot.attachment.name ~= attachmentName then
-        slot:setAttachment(skeleton:getAttachment(self.slotName, attachmentName))
-      end
-    else
-      slot:setAttachment(nil)
-    end
+		local slot = skeleton.slotsByName[self.slotName]
+		if attachmentName then
+			if not slot.attachment then
+				slot:setAttachment(skeleton:getAttachment(self.slotName, attachmentName))
+			elseif slot.attachment.name ~= attachmentName then
+				slot:setAttachment(skeleton:getAttachment(self.slotName, attachmentName))
+			end
+		else
+			slot:setAttachment(nil)
+		end
+	end
+
+	return self
+end
+
+Animation.EventTimeline = {}
+function Animation.EventTimeline.new ()
+	local self = {
+		frames = {},
+		events = {}
+	}
+
+	function self:getDuration ()
+		return self.frames[#self.frames]
+	end
+
+	function self:getFrameCount ()
+		return #self.frames + 1
+	end
+
+	function self:setFrame (frameIndex, time, event)
+		self.frames[frameIndex] = time
+		self.events[frameIndex] = event
+	end
+
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
+		if not firedEvents then return end
+
+		local frames = self.frames
+		local frameCount = #frames
+		if lastTime >= frames[frameCount] then return end -- Last time is after last frame.
+		frameCount = frameCount + 1
+
+		if lastTime > time then -- Fire events after last time for looped animations.
+			self:apply(skeleton, lastTime, 999999, firedEvents, alpha)
+			lastTime = 0
+		end
+
+		local frameIndex
+		if lastTime <= frames[0] or frameCount == 1 then
+			frameIndex = 0
+		else
+			frameIndex = binarySearch(frames, lastTime, 1)
+			local frame = frames[frameIndex]
+			while frameIndex > 0 do -- Fire multiple events with the same frame.
+				if frames[frameIndex - 1] ~= frame then break end
+				frameIndex = frameIndex - 1
+			end
+		end
+		local events = self.events
+		while frameIndex < frameCount and time >= frames[frameIndex] do
+			table.insert(firedEvents, events[frameIndex])
+			frameIndex = frameIndex + 1
+		end
+	end
+
+	return self
+end
+
+Animation.DrawOrderTimeline = {}
+function Animation.DrawOrderTimeline.new ()
+	local self = {
+		frames = {},
+		drawOrders = {}
+	}
+
+	function self:getDuration ()
+		return self.frames[#self.frames]
+	end
+
+	function self:getFrameCount ()
+		return #self.frames + 1
+	end
+
+	function self:setFrame (frameIndex, time, drawOrder)
+		self.frames[frameIndex] = time
+		self.drawOrders[frameIndex] = drawOrder
+	end
+
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
+		local frames = self.frames
+		if time < frames[0] then return end -- Time is before first frame.
+
+		local frameIndex
+		if time >= frames[#frames] then -- Time is after last frame.
+			frameIndex = #frames
+		else
+			frameIndex = binarySearch(frames, time, 1) - 1
+		end
+
+		local drawOrder = skeleton.drawOrder
+		local slots = skeleton.slots
+		local drawOrderToSetupIndex = self.drawOrders[frameIndex]
+		if not drawOrderToSetupIndex then
+			for i,slot in ipairs(slots) do
+				drawOrder[i] = slots[i]
+			end
+		else
+			for i,setupIndex in ipairs(drawOrderToSetupIndex) do
+				drawOrder[i] = skeleton.slots[setupIndex]
+			end
+		end
 	end
 
 	return self
