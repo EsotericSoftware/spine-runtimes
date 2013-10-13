@@ -39,6 +39,7 @@ local AttachmentLoader = require "spine-lua.AttachmentLoader"
 local Animation = require "spine-lua.Animation"
 local EventData = require "spine-lua.EventData"
 local Event = require "spine-lua.Event"
+local AttachmentType = require "spine-lua.AttachmentType"
 
 local TIMELINE_SCALE = "scale"
 local TIMELINE_ROTATE = "rotate"
@@ -170,17 +171,25 @@ function SkeletonJson.new (attachmentLoader)
 	readAttachment = function (name, map, scale)
 		name = map["name"] or name
 		local attachment
-		local type = map["type"] or AttachmentLoader.ATTACHMENT_REGION
+		local type = AttachmentType[map["type"] or "region"]
 		attachment = attachmentLoader:newAttachment(type, name)
 		if not attachment then return nil end
 
-		attachment.x = (map["x"] or 0) * scale
-		attachment.y = (map["y"] or 0) * scale
-		attachment.scaleX = (map["scaleX"] or 1)
-		attachment.scaleY = (map["scaleY"] or 1)
-		attachment.rotation = (map["rotation"] or 0)
-		attachment.width = map["width"] * scale
-		attachment.height = map["height"] * scale
+		if type == AttachmentType.region then
+			attachment.x = (map["x"] or 0) * scale
+			attachment.y = (map["y"] or 0) * scale
+			attachment.scaleX = (map["scaleX"] or 1)
+			attachment.scaleY = (map["scaleY"] or 1)
+			attachment.rotation = (map["rotation"] or 0)
+			attachment.width = map["width"] * scale
+			attachment.height = map["height"] * scale
+		elseif type == AttachmentType.boundingbox then
+			local vertices = map["vertices"]
+			for i,point in ipairs(vertices) do
+				table.insert(attachment.vertices, vertices[i] * scale)
+			end
+		end
+
 		return attachment
 	end
 

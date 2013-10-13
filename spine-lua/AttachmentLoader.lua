@@ -31,22 +31,22 @@
  -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ------------------------------------------------------------------------------
 
+local AttachmentType = require "spine-lua.AttachmentType"
 local RegionAttachment = require "spine-lua.RegionAttachment"
+local BoundingBoxAttachment = require "spine-lua.BoundingBoxAttachment"
 
 local AttachmentLoader = {
-	failed = {},
-	ATTACHMENT_REGION = "region",
-	ATTACHMENT_BOUNDINGBOX = "boundingbox",
+	failed = {}
 }
 function AttachmentLoader.new ()
 	local self = {}
 
 	function self:newAttachment (type, name)
-		if type == AttachmentLoader.ATTACHMENT_REGION then
+		if type == AttachmentType.region then
 			return RegionAttachment.new(name)
 		end
-		if type == AttachmentLoader.ATTACHMENT_BOUNDINGBOX then
-			return nil -- BOZO - Implement bounding boxes.
+		if type == AttachmentType.boundingbox then
+			return BoundingBoxAttachment.new(name)
 		end
 		error("Unknown attachment type: " .. type .. " (" .. name .. ")")
 	end

@@ -38,7 +38,8 @@ function SlotData.new (name, boneData)
 	
 	local self = {
 		name = name,
-		boneData = boneData
+		boneData = boneData,
+		r = 1, g = 1, b = 1, a = 1
 	}
 
 	function self:setColor (r, g, b, a)
@@ -48,8 +49,6 @@ function SlotData.new (name, boneData)
 		self.a = a
 	end
 
-	self:setColor(255, 255, 255, 255)
-	
 	return self;
 end
 return SlotData

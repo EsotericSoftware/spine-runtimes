@@ -35,7 +35,6 @@ local utils = {}
 
 function tablePrint (tt, indent, done)
 	done = done or {}
-	indent = indent or 0
 	for key, value in pairs(tt) do
 		local spaces = string.rep (" ", indent)
 		if type(value) == "table" and not done [value] then
@@ -51,12 +50,14 @@ function tablePrint (tt, indent, done)
 end
 
 function utils.print (value, indent, done)
+	indent = indent or 0
 	if "nil" == type(value) then
 		print(tostring(nil))
 	elseif "table" == type(value) then
-		print("{")
-		tablePrint(value, 2)
-		print("}")
+		local spaces = string.rep (" ", indent)
+		print(spaces .. "{")
+		tablePrint(value, indent + 2)
+		print(spaces .. "}")
 	elseif "string" == type(value) then
 		print("\"" .. value .. "\"")
 	else

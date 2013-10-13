@@ -31,12 +31,15 @@
  -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ------------------------------------------------------------------------------
 
+local AttachmentType = require "spine-lua.AttachmentType"
+
 local RegionAttachment = {}
 function RegionAttachment.new (name)
 	if not name then error("name cannot be nil", 2) end
 	
 	local self = {
-		name = name
+		name = name,
+		type = AttachmentType.region
 	}
 	
 	return self

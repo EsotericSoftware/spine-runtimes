@@ -45,7 +45,8 @@ function Skeleton.new (skeletonData)
 		slots = {},
 		slotsByName = {},
 		drawOrder = {},
-		r = 1, g = 1, b = 1, a = 1
+		r = 1, g = 1, b = 1, a = 1,
+		x = 0, y = 0
 	}
 
 	function self:updateWorldTransform ()

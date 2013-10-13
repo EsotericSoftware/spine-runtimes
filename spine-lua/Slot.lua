@@ -40,7 +40,8 @@ function Slot.new (slotData, skeleton, bone)
 	local self = {
 		data = slotData,
 		skeleton = skeleton,
-		bone = bone
+		bone = bone,
+		r = 1, g = 1, b = 1, a = 1
 	}
 
 	function self:setColor (r, g, b, a)
