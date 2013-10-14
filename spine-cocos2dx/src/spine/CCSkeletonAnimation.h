@@ -72,7 +72,7 @@ public:
 	void clearTracks ();
 	void clearTrack (int trackIndex = 0);
 
-	void onAnimationStateEvent (int trackIndex, spEventType type, spEvent* event, int loopCount);
+	virtual void onAnimationStateEvent (int trackIndex, spEventType type, spEvent* event, int loopCount);
 
 protected:
 	CCSkeletonAnimation ();
