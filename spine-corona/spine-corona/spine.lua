@@ -95,7 +95,7 @@ function spine.Skeleton.new (skeletonData, group)
 		local skeletonR, skeletonG, skeletonB, skeletonA = self.r * 255, self.g * 255, self.b * 255, self.a
 		for i,slot in ipairs(self.drawOrder) do
 			local attachment = slot.attachment
-			if attachment.type == spine.AttachmentType.region then
+			if attachment and attachment.type == spine.AttachmentType.region then
 				local image = images[slot]
 				if not attachment then -- Attachment is gone, remove the image.
 					if image then
