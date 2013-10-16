@@ -201,7 +201,9 @@ function AnimationState.new (data)
 		delay = delay or 0
 		if delay <= 0 then
 			if last then
-				delay = delay + last.endTime - self.data:getMix(last.animation.name, animation.name)
+				local remaining = last.endTime - last.time
+				if remaining < 0 then remaining = 0 end
+				delay = delay + remaining - self.data:getMix(last.animation.name, animation.name)
 			else
 				delay = 0
 			end

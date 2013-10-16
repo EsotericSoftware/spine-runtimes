@@ -214,7 +214,7 @@ namespace Spine {
 
 			if (delay <= 0) {
 				if (last != null)
-					delay += last.endTime - data.GetMix(last.animation, animation);
+					delay += Math.Max(0, last.endTime - last.time) - data.GetMix(last.animation, animation);
 				else
 					delay = 0;
 			}

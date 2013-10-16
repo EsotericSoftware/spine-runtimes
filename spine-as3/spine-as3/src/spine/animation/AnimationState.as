@@ -202,7 +202,7 @@ public class AnimationState {
 		
 		if (delay <= 0) {
 			if (last)
-				delay += last.endTime - _data.getMix(last.animation, animation);
+				delay += Math.max(0, last.endTime - last.time) - _data.getMix(last.animation, animation);
 			else
 				delay = 0;
 		}
