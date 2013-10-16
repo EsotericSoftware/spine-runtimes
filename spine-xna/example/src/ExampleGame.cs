@@ -90,10 +90,10 @@ namespace Spine {
 
 			if (true) {
 				// Event handling for all animations.
-				state.Start += new EventHandler<StartEndArgs>(Start);
-				state.End += new EventHandler<StartEndArgs>(End);
-				state.Complete += new EventHandler<CompleteArgs>(Complete);
-				state.Event += new EventHandler<EventTriggeredArgs>(Event);
+				state.Start += Start;
+				state.End += End;
+				state.Complete += Complete;
+				state.Event += Event;
 
 				state.SetAnimation(0, "drawOrder", true);
 			} else {
