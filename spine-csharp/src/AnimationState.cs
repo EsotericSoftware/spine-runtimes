@@ -213,9 +213,10 @@ namespace Spine {
 				tracks[trackIndex] = entry;
 
 			if (delay <= 0) {
-				if (last != null)
-					delay += Math.Max(0, last.endTime - last.time) - data.GetMix(last.animation, animation);
-				else
+				if (last != null) {
+					if (last.time < last.endTime) delay += last.endTime - last.time;
+					delay -= data.GetMix(last.animation, animation);
+				} else
 					delay = 0;
 			}
 			entry.delay = delay;

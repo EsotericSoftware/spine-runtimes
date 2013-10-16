@@ -1109,9 +1109,10 @@ spine.AnimationState.prototype = {
 			this.tracks[trackIndex] = entry;
 		
 		if (delay <= 0) {
-			if (last)
-				delay += last.endTime - this.data.getMix(last.animation, animation);
-			else
+			if (last) {
+				if (last.time < last.endTime) delay += last.endTime - last.time;
+				delay -= this.data.getMix(last.animation, animation);
+			} else
 				delay = 0;
 		}
 		entry.delay = delay;
