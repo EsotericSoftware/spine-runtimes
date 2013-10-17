@@ -48,10 +48,10 @@ function AnimationState.new (data)
 		local current = self.tracks[index]
 		if current then
 			current.previous = nil
-			
+
 			if current.onEnd then current.onEnd(index) end
 			if self.onEnd then self.onEnd(index) end
-			
+
 			entry.mixDuration = self.data:getMix(current.animation.name, entry.animation.name)
 			if entry.mixDuration > 0 then
 				entry.mixTime = 0
@@ -70,31 +70,15 @@ function AnimationState.new (data)
 		for i,current in pairs(self.tracks) do
 			if current then
 				local trackDelta = delta * current.timeScale
-				local time = current.time + trackDelta
-				local endTime = current.endTime
-				
-				current.time = time
+				current.time = current.time + trackDelta
 				if current.previous then
 					current.previous.time = current.previous.time + trackDelta
 					current.mixTime = current.mixTime + trackDelta
 				end
-				
-				-- Check if completed the animation or a loop iteration.
-				local complete
-				if current.loop then
-					complete = current.lastTime % endTime > time % endTime
-				else
-					complete = current.lastTime < endTime and time >= endTime
-				end
-				if complete then 
-					local count = math.floor(time / endTime)
-					if current.onComplete then current.onComplete(i, count) end
-					if self.onComplete then self.onComplete(i, count) end
-				end
-				
+
 				local next = current.next
 				if next then
-					if time - trackDelta > next.delay then setCurrent(i, next) end
+					if current.lastTime >= next.delay then setCurrent(i, next) end
 				else
 					-- End non-looping animation when it reaches its end time and there is no next entry.
 					if not current.loop and current.lastTime >= current.endTime then self:clearTrack(i) end
@@ -102,14 +86,16 @@ function AnimationState.new (data)
 			end
 		end
 	end
-	
+
 	function self:apply(skeleton)
 		for i,current in pairs(self.tracks) do
-			if current then			
+			if current then
 				local time = current.time
+				local lastTime = current.lastTime
+				local endTime = current.endTime
 				local loop = current.loop
-				if not loop and time > current.endTime then time = current.endTime end
-				
+				if not loop and time > endTime then time = endTime end
+
 				local previous = current.previous
 				if not previous then
 					current.animation:apply(skeleton, current.lastTime, time, loop, self.events)
@@ -117,7 +103,7 @@ function AnimationState.new (data)
 					local previousTime = previous.time
 					if not previous.loop and previousTime > previous.endTime then previousTime = previous.endTime end
 					previous.animation:apply(skeleton, previousTime, previousTime, previous.loop, nil)
-					
+
 					local alpha = current.mixTime / current.mixDuration
 					if alpha >= 1 then
 						alpha = 1
@@ -125,7 +111,7 @@ function AnimationState.new (data)
 					end
 					current.animation:mix(skeleton, current.lastTime, time, loop, self.events, alpha)
 				end
-				
+
 				local eventCount = #self.events
 				for ii = 1, eventCount, 1 do
 					local event = self.events[ii]
@@ -136,18 +122,31 @@ function AnimationState.new (data)
 					table.remove(self.events)
 				end
 
+				-- Check if completed the animation or a loop iteration.
+				local complete
+				if current.loop then
+					complete = lastTime % endTime > time % endTime
+				else
+					complete = lastTime < endTime and time >= endTime
+				end
+				if complete then 
+					local count = math.floor(time / endTime)
+					if current.onComplete then current.onComplete(i, count) end
+					if self.onComplete then self.onComplete(i, count) end
+				end
+
 				current.lastTime = current.time
 			end
 		end
 	end
-	
+
 	function self:clearTracks ()
 		for i,current in pairs(self.tracks) do
 			self.clearTrack(i)
 		end
 		self.tracks = {}
 	end
-	
+
 	function self:clearTrack (trackIndex)
 		local current = self.tracks[trackIndex]
 		if not current then return end
@@ -157,7 +156,7 @@ function AnimationState.new (data)
 
 		self.tracks[trackIndex] = nil
 	end
-	
+
 	function self:setAnimationByName (trackIndex, animationName, loop)
 		local animation = self.data.skeletonData:findAnimation(animationName)
 		if not animation then error("Animation not found: " + animationName) end
@@ -173,7 +172,7 @@ function AnimationState.new (data)
 		setCurrent(trackIndex, entry)
 		return entry
 	end
-	
+
 	function self:addAnimationByName (trackIndex, animationName, loop, delay)
 		local animation = self.data.skeletonData:findAnimation(animationName)
 		if not animation then error("Animation not found: " + animationName) end
@@ -187,7 +186,7 @@ function AnimationState.new (data)
 		entry.animation = animation
 		entry.loop = loop
 		entry.endTime = animation.duration
-		
+
 		local last = self.tracks[trackIndex]
 		if last then
 			while (last.next) do
@@ -197,7 +196,7 @@ function AnimationState.new (data)
 		else
 			self.tracks[trackIndex] = entry
 		end
-		
+
 		delay = delay or 0
 		if delay <= 0 then
 			if last then
@@ -208,7 +207,7 @@ function AnimationState.new (data)
 			end
 		end
 		entry.delay = delay
-		
+
 		return entry
 	end
 

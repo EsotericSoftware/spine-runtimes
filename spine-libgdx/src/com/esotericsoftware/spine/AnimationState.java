@@ -57,26 +57,15 @@ public class AnimationState {
 			if (current == null) continue;
 
 			float trackDelta = delta * current.timeScale;
-			float time = current.time + trackDelta;
-			float endTime = current.endTime;
-
-			current.time = time;
+			current.time += trackDelta;
 			if (current.previous != null) {
 				current.previous.time += trackDelta;
 				current.mixTime += trackDelta;
 			}
 
-			// Check if completed the animation or a loop iteration.
-			if (current.loop ? (current.lastTime % endTime > time % endTime) : (current.lastTime < endTime && time >= endTime)) {
-				int count = (int)(time / endTime);
-				if (current.listener != null) current.listener.complete(i, count);
-				for (int ii = 0, nn = listeners.size; ii < nn; ii++)
-					listeners.get(ii).complete(i, count);
-			}
-
 			TrackEntry next = current.next;
 			if (next != null) {
-				if (time - trackDelta > next.delay) setCurrent(i, next);
+				if (current.lastTime >= next.delay) setCurrent(i, next);
 			} else {
 				// End non-looping animation when it reaches its end time and there is no next entry.
 				if (!current.loop && current.lastTime >= current.endTime) clearTrack(i);
@@ -95,12 +84,14 @@ public class AnimationState {
 			events.size = 0;
 
 			float time = current.time;
+			float lastTime = current.lastTime;
+			float endTime = current.endTime;
 			boolean loop = current.loop;
-			if (!loop && time > current.endTime) time = current.endTime;
+			if (!loop && time > endTime) time = endTime;
 
 			TrackEntry previous = current.previous;
 			if (previous == null)
-				current.animation.apply(skeleton, current.lastTime, time, loop, events);
+				current.animation.apply(skeleton, lastTime, time, loop, events);
 			else {
 				float previousTime = previous.time;
 				if (!previous.loop && previousTime > previous.endTime) previousTime = previous.endTime;
@@ -112,7 +103,7 @@ public class AnimationState {
 					Pools.free(previous);
 					current.previous = null;
 				}
-				current.animation.mix(skeleton, current.lastTime, time, loop, events, alpha);
+				current.animation.mix(skeleton, lastTime, time, loop, events, alpha);
 			}
 
 			for (int ii = 0, nn = events.size; ii < nn; ii++) {
@@ -120,6 +111,14 @@ public class AnimationState {
 				if (current.listener != null) current.listener.event(i, event);
 				for (int iii = 0; iii < listenerCount; iii++)
 					listeners.get(iii).event(i, event);
+			}
+
+			// Check if completed the animation or a loop iteration.
+			if (loop ? (lastTime % endTime > time % endTime) : (lastTime < endTime && time >= endTime)) {
+				int count = (int)(time / endTime);
+				if (current.listener != null) current.listener.complete(i, count);
+				for (int ii = 0, nn = listeners.size; ii < nn; ii++)
+					listeners.get(ii).complete(i, count);
 			}
 
 			current.lastTime = current.time;

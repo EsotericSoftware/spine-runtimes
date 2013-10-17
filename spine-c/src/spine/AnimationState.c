@@ -85,33 +85,21 @@ void spAnimationState_dispose (spAnimationState* self) {
 
 void spAnimationState_update (spAnimationState* self, float delta) {
 	int i;
-	float time, endTime, trackDelta;
+	float trackDelta;
 	delta *= self->timeScale;
 	for (i = 0; i < self->trackCount; i++) {
 		spTrackEntry* current = self->tracks[i];
 		if (!current) continue;
 
 		trackDelta = delta * current->timeScale;
-		time = current->time + trackDelta;
-		endTime = current->endTime;
-
-		current->time = time;
+		current->time += trackDelta;
 		if (current->previous) {
 			current->previous->time += trackDelta;
 			current->mixTime += trackDelta;
 		}
 
-		/* Check if completed the animation or a loop iteration. */
-		if (current->loop ?
-				(FMOD(current->lastTime, endTime) > FMOD(time, endTime)) : (current->lastTime < endTime && time >= endTime)) {
-			int count = (int)(time / endTime);
-			if (current->listener) current->listener(self, i, ANIMATION_COMPLETE, 0, count);
-			if (self->listener) self->listener(self, i, ANIMATION_COMPLETE, 0, count);
-			if (i >= self->trackCount || self->tracks[i] != current) continue;
-		}
-
 		if (current->next) {
-			if (time - trackDelta >= current->next->delay) _spAnimationState_setCurrent(self, i, current->next);
+			if (current->lastTime >= current->next->delay) _spAnimationState_setCurrent(self, i, current->next);
 		} else {
 			/* End non-looping animation when it reaches its end time and there is no next entry. */
 			if (!current->loop && current->lastTime >= current->endTime) spAnimationState_clearTrack(self, i);
@@ -137,8 +125,7 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 
 		previous = current->previous;
 		if (!previous) {
-			spAnimation_apply(current->animation, skeleton, current->lastTime, time, current->loop, internal->events,
-					&eventCount);
+			spAnimation_apply(current->animation, skeleton, current->lastTime, time, current->loop, internal->events, &eventCount);
 		} else {
 			float alpha = current->mixTime / current->mixDuration;
 
@@ -151,14 +138,23 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 				_spTrackEntry_dispose(current->previous);
 				current->previous = 0;
 			}
-			spAnimation_mix(current->animation, skeleton, current->lastTime, time, current->loop, internal->events,
-					&eventCount, alpha);
+			spAnimation_mix(current->animation, skeleton, current->lastTime, time, current->loop, internal->events, &eventCount,
+					alpha);
 		}
 
 		for (ii = 0; ii < eventCount; ii++) {
 			spEvent* event = internal->events[ii];
 			if (current->listener) current->listener(self, i, ANIMATION_EVENT, event, 0);
 			if (self->listener) self->listener(self, i, ANIMATION_EVENT, event, 0);
+		}
+
+		/* Check if completed the animation or a loop iteration. */
+		if (current->loop ? (FMOD(current->lastTime, current->endTime) > FMOD(time, current->endTime)) //
+				: (current->lastTime < current->endTime && time >= current->endTime)) {
+			int count = (int)(time / current->endTime);
+			if (current->listener) current->listener(self, i, ANIMATION_COMPLETE, 0, count);
+			if (self->listener) self->listener(self, i, ANIMATION_COMPLETE, 0, count);
+			if (i >= self->trackCount || self->tracks[i] != current) continue;
 		}
 
 		if (i >= self->trackCount || self->tracks[i] != current) continue;
@@ -222,7 +218,8 @@ void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEnt
 	if (self->listener) self->listener(self, index, ANIMATION_START, 0, 0);
 }
 
-spTrackEntry* spAnimationState_setAnimationByName (spAnimationState* self, int trackIndex, const char* animationName, int/*bool*/loop) {
+spTrackEntry* spAnimationState_setAnimationByName (spAnimationState* self, int trackIndex, const char* animationName,
+		int/*bool*/loop) {
 	spAnimation* animation = spSkeletonData_findAnimation(self->data->skeletonData, animationName);
 	return spAnimationState_setAnimation(self, trackIndex, animation, loop);
 }
@@ -241,13 +238,14 @@ spTrackEntry* spAnimationState_setAnimation (spAnimationState* self, int trackIn
 	return entry;
 }
 
-spTrackEntry* spAnimationState_addAnimationByName (spAnimationState* self, int trackIndex, const char* animationName, int/*bool*/loop,
-		float delay) {
+spTrackEntry* spAnimationState_addAnimationByName (spAnimationState* self, int trackIndex, const char* animationName,
+		int/*bool*/loop, float delay) {
 	spAnimation* animation = spSkeletonData_findAnimation(self->data->skeletonData, animationName);
 	return spAnimationState_addAnimation(self, trackIndex, animation, loop, delay);
 }
 
-spTrackEntry* spAnimationState_addAnimation (spAnimationState* self, int trackIndex, spAnimation* animation, int/*bool*/loop, float delay) {
+spTrackEntry* spAnimationState_addAnimation (spAnimationState* self, int trackIndex, spAnimation* animation, int/*bool*/loop,
+		float delay) {
 	spTrackEntry* last;
 
 	spTrackEntry* entry = _spTrackEntry_create();

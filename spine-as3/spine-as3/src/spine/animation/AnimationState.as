@@ -54,26 +54,16 @@ public class AnimationState {
 			var current:TrackEntry = _tracks[i];
 			if (!current) continue;
 			
-			var trackDelta:Number = delta * current.timeScale;
-			var time:Number = current.time + trackDelta;
-			var endTime:Number = current.endTime;
-			
-			current.time = time;
+			var trackDelta:Number = delta * current.timeScale;		
+			current.time += trackDelta;
 			if (current.previous) {
 				current.previous.time += trackDelta;
 				current.mixTime += trackDelta;
 			}
-			
-			// Check if completed the animation or a loop iteration.
-			if (current.loop ? (current.lastTime % endTime > time % endTime) : (current.lastTime < endTime && time >= endTime)) {
-				var count:int = (int)(time / endTime);
-				if (current.onComplete != null) current.onComplete(i, count);
-				if (onComplete != null) onComplete(i, count);
-			}
-			
+
 			var next:TrackEntry = current.next;
 			if (next) {
-				if (time - trackDelta > next.delay) setCurrent(i, next);
+				if (current.lastTime >= next.delay) setCurrent(i, next);
 			} else {
 				// End non-looping animation when it reaches its end time and there is no next entry.
 				if (!current.loop && current.lastTime >= current.endTime) clearTrack(i);
@@ -89,8 +79,10 @@ public class AnimationState {
 			_events.length = 0;
 			
 			var time:Number = current.time;
+			var lastTime:Number = current.lastTime;
+			var endTime:Number = current.endTime;
 			var loop:Boolean = current.loop;
-			if (!loop && time > current.endTime) time = current.endTime;
+			if (!loop && time > endTime) time = endTime;
 			
 			var previous:TrackEntry = current.previous;
 			if (!previous)
@@ -112,7 +104,14 @@ public class AnimationState {
 				if (current.onEvent != null) current.onEvent(i, event);
 				if (onEvent != null) onEvent(i, event);
 			}
-			
+
+			// Check if completed the animation or a loop iteration.
+			if (loop ? (lastTime % endTime > time % endTime) : (lastTime < endTime && time >= endTime)) {
+				var count:int = (int)(time / endTime);
+				if (current.onComplete != null) current.onComplete(i, count);
+				if (onComplete != null) onComplete(i, count);
+			}
+
 			current.lastTime = current.time;
 		}
 	}

@@ -142,7 +142,7 @@ spine.Slot.prototype = {
 		this.g = data.g;
 		this.b = data.b;
 		this.a = data.a;
-		
+
 		var slotDatas = this.skeleton.data.slots;
 		for (var i = 0, n = slotDatas.length; i < n; i++) {
 			if (slotDatas[i] == data) {
@@ -969,27 +969,17 @@ spine.AnimationState.prototype = {
 		for (var i = 0; i < this.tracks.length; i++) {
 			var current = this.tracks[i];
 			if (!current) continue;
-			
+
 			var trackDelta = delta * current.timeScale;
-			var time = current.time + trackDelta;
-			var endTime = current.endTime;
-			
-			current.time = time;
+			current.time += trackDelta;
 			if (current.previous) {
 				current.previous.time += trackDelta;
 				current.mixTime += trackDelta;
 			}
-			
-			// Check if completed the animation or a loop iteration.
-			if (current.loop ? (current.lastTime % endTime > time % endTime) : (current.lastTime < endTime && time >= endTime)) {
-				var count = Math.floor(time / endTime);
-				if (current.onComplete) current.onComplete(i, count);
-				if (this.onComplete) this.onComplete(i, count);
-			}
-			
+
 			var next = current.next;
 			if (next) {
-				if (time - trackDelta > next.delay) this.setCurrent(i, next);
+				if (current.lastTime >= next.delay) this.setCurrent(i, next);
 			} else {
 				// End non-looping animation when it reaches its end time and there is no next entry.
 				if (!current.loop && current.lastTime >= current.endTime) this.clearTrack(i);
@@ -1000,13 +990,15 @@ spine.AnimationState.prototype = {
 		for (var i = 0; i < this.tracks.length; i++) {
 			var current = this.tracks[i];
 			if (!current) continue;
-			
+
 			this.events.length = 0;
-			
+
 			var time = current.time;
+			var lastTime = current.lastTime;
+			var endTime = current.endTime;
 			var loop = current.loop;
-			if (!loop && time > current.endTime) time = current.endTime;
-			
+			if (!loop && time > endTime) time = endTime;
+
 			var previous = current.previous;
 			if (!previous)
 				current.animation.apply(skeleton, current.lastTime, time, loop, this.events);
@@ -1014,7 +1006,7 @@ spine.AnimationState.prototype = {
 				var previousTime = previous.time;
 				if (!previous.loop && previousTime > previous.endTime) previousTime = previous.endTime;
 				previous.animation.apply(skeleton, previousTime, previousTime, previous.loop, null);
-				
+
 				var alpha = current.mixTime / current.mixDuration;
 				if (alpha >= 1) {
 					alpha = 1;
@@ -1022,17 +1014,24 @@ spine.AnimationState.prototype = {
 				}
 				current.animation.mix(skeleton, current.lastTime, time, loop, this.events, alpha);
 			}
-			
+
 			for (var ii = 0, nn = this.events.length; ii < nn; ii++) {
 				var event = this.events[ii];
 				if (current.onEvent != null) current.onEvent(i, event);
 				if (this.onEvent != null) this.onEvent(i, event);
 			}
-			
+
+			// Check if completed the animation or a loop iteration.
+			if (loop ? (lastTime % endTime > time % endTime) : (lastTime < endTime && time >= endTime)) {
+				var count = Math.floor(time / endTime);
+				if (current.onComplete) current.onComplete(i, count);
+				if (this.onComplete) this.onComplete(i, count);
+			}
+
 			current.lastTime = current.time;
 		}
 	},
-	clearTracks: function () {	
+	clearTracks: function () {
 		for (var i = 0, n = this.tracks.length; i < n; i++)
 			this.clearTrack(i);
 		this.tracks.length = 0; 
@@ -1057,19 +1056,19 @@ spine.AnimationState.prototype = {
 		var current = this._expandToIndex(index);
 		if (current) {
 			current.previous = null;
-			
+
 			if (current.onEnd != null) current.onEnd(index);
 			if (this.onEnd != null) this.onEnd(index);
-			
+
 			entry.mixDuration = this.data.getMix(current.animation, entry.animation);
 			if (entry.mixDuration > 0) {
 				entry.mixTime = 0;
 				entry.previous = current;
 			}
 		}
-		
+
 		this.tracks[index] = entry;
-		
+
 		if (entry.onStart != null) entry.onStart(index);
 		if (this.onStart != null) this.onStart(index);
 	},
@@ -1099,7 +1098,7 @@ spine.AnimationState.prototype = {
 		entry.animation = animation;
 		entry.loop = loop;
 		entry.endTime = animation.duration;
-		
+
 		var last = this._expandToIndex(trackIndex);
 		if (last) {
 			while (last.next)
@@ -1107,7 +1106,7 @@ spine.AnimationState.prototype = {
 			last.next = entry;
 		} else
 			this.tracks[trackIndex] = entry;
-		
+
 		if (delay <= 0) {
 			if (last) {
 				if (last.time < last.endTime) delay += last.endTime - last.time;
@@ -1116,9 +1115,9 @@ spine.AnimationState.prototype = {
 				delay = 0;
 		}
 		entry.delay = delay;
-		
+
 		return entry;
-	},	
+	},
 	/** May be null. */
 	getCurrent: function (trackIndex) {
 		if (trackIndex >= this.tracks.length) return null;
@@ -1669,7 +1668,7 @@ spine.SkeletonBounds.prototype = {
 		var boundingBoxes = this.boundingBoxes;
 		var polygonPool = this.polygonPool;
 		var polygons = this.polygons;
-		
+
 		boundingBoxes.length = 0;
 		for (var i = 0, n = polygons.length; i < n; i++)
 			polygonPool.push(polygons[i]);
@@ -1756,7 +1755,7 @@ spine.SkeletonBounds.prototype = {
 	},
 	/** Returns true if the polygon contains the point. */
 	polygonContainsPoint: function (polygon, x, y) {
-		var nn = polygon.length;		
+		var nn = polygon.length;
 		var prevIndex = nn - 2;
 		var inside = false;
 		for (var ii = 0; ii < nn; ii += 2) {
