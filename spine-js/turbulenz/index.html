@@ -94,7 +94,7 @@ function start () {
 	} else {
 		skeleton.setSkinByName("goblingirl");
 		skeleton.setSlotsToSetupPose();
-		state.setAnimationByName("walk", true);
+		state.setAnimationByName(0, "walk", true);
 
 		canvas.onmousedown = function () {
 			skeleton.setSkinByName(skeleton.skin.name == "goblin" ? "goblingirl" : "goblin");
