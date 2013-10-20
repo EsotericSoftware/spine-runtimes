@@ -466,7 +466,7 @@ namespace Spine {
 			int frameCount = frames.Length;
 
 			if (lastTime > time) { // Fire events after last time for looped animations.
-				apply(skeleton, lastTime, Integer.MAX_VALUE, firedEvents, alpha);
+				Apply(skeleton, lastTime, int.MaxValue, firedEvents, alpha);
 				lastTime = -1f;
 			} else if (lastTime >= frames[frameCount - 1]) // Last time is after last frame.
 				return;
