@@ -463,21 +463,23 @@ function Animation.EventTimeline.new ()
 		self.events[frameIndex] = event
 	end
 
+	-- Fires events for frames > lastTime and <= time.
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
 		if not firedEvents then return end
 
 		local frames = self.frames
 		local frameCount = #frames
-		if lastTime >= frames[frameCount] then return end -- Last time is after last frame.
-		frameCount = frameCount + 1
 
 		if lastTime > time then -- Fire events after last time for looped animations.
 			self:apply(skeleton, lastTime, 999999, firedEvents, alpha)
-			lastTime = 0
+			lastTime = -1
+		elseif lastTime >= frames[frameCount - 1] then -- Last time is after last frame.
+			return
 		end
+		if time < frames[0] then return end -- Time is before first frame.
 
 		local frameIndex
-		if lastTime <= frames[0] or frameCount == 1 then
+		if lastTime < frames[0] then
 			frameIndex = 0
 		else
 			frameIndex = binarySearch(frames, lastTime, 1)

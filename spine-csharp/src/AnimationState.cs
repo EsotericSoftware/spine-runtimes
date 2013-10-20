@@ -275,7 +275,7 @@ namespace Spine {
 		internal TrackEntry next, previous;
 		internal Animation animation;
 		internal bool loop;
-		internal float delay, time, lastTime, endTime, timeScale = 1;
+		internal float delay, time, lastTime = -1, endTime, timeScale = 1;
 		internal float mixTime, mixDuration;
 
 		public Animation Animation { get { return animation; } }

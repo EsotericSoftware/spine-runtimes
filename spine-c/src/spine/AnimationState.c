@@ -43,6 +43,7 @@
 spTrackEntry* _spTrackEntry_create () {
 	spTrackEntry* entry = NEW(spTrackEntry);
 	entry->timeScale = 1;
+	entry->lastTime = -1;
 	return entry;
 }
 
@@ -232,7 +233,6 @@ spTrackEntry* spAnimationState_setAnimation (spAnimationState* self, int trackIn
 	entry = _spTrackEntry_create();
 	entry->animation = animation;
 	entry->loop = loop;
-	entry->time = 0;
 	entry->endTime = animation->duration;
 	_spAnimationState_setCurrent(self, trackIndex, entry);
 	return entry;
@@ -251,7 +251,6 @@ spTrackEntry* spAnimationState_addAnimation (spAnimationState* self, int trackIn
 	spTrackEntry* entry = _spTrackEntry_create();
 	entry->animation = animation;
 	entry->loop = loop;
-	entry->time = 0;
 	entry->endTime = animation->duration;
 
 	last = _spAnimationState_expandToIndex(self, trackIndex);

@@ -297,7 +297,7 @@ public class AnimationState {
 			animation = null;
 			listener = null;
 			timeScale = 1;
-			lastTime = 0;
+			lastTime = -1;
 			time = 0;
 		}
 

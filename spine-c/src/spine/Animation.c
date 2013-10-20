@@ -514,21 +514,21 @@ void spAttachmentTimeline_setFrame (spAttachmentTimeline* self, int frameIndex, 
 
 /**/
 
+/** Fires events for frames > lastTime and <= time. */
 void _spEventTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 		int* eventCount, float alpha) {
 	spEventTimeline* self = (spEventTimeline*)timeline;
 	int frameIndex;
 	if (!firedEvents) return;
 
-	if (lastTime >= self->frames[self->framesLength - 1]) return; /* Last time is after last frame. */
-
-	if (lastTime > time) {
-		/* Fire events after last time for looped animations. */
+	if (lastTime > time) { /* Fire events after last time for looped animations. */
 		_spEventTimeline_apply(timeline, skeleton, lastTime, (float)INT_MAX, firedEvents, eventCount, alpha);
-		lastTime = 0;
-	}
+		lastTime = -1;
+	} else if (lastTime >= self->frames[self->framesLength - 1]) /* Last time is after last frame. */
+		return;
+	if (time < self->frames[0]) return; /* Time is before first frame. */
 
-	if (lastTime <= self->frames[0] || self->framesLength == 1)
+	if (lastTime < self->frames[0])
 		frameIndex = 0;
 	else {
 		float frame;

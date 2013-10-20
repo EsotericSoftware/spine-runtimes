@@ -225,7 +225,7 @@ function AnimationState.TrackEntry.new (data)
 		next = nil, previous = nil,
 		animation = nil,
 		loop = false,
-		delay = 0, time = 0, lastTime = 0, endTime = 0,
+		delay = 0, time = 0, lastTime = -1, endTime = 0,
 		timeScale = 1,
 		mixTime = 0, mixDuration = 0,
 		onStart = nil, onEnd = nil, onComplete = nil, onEvent = nil
