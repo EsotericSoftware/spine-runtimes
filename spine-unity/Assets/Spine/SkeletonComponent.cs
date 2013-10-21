@@ -90,9 +90,9 @@ public class SkeletonComponent : MonoBehaviour {
 		mesh.MarkDynamic();
 		return mesh;
 	}
-	
-	public virtual void UpdateSkeleton () {
-		skeleton.Update(Time.deltaTime * timeScale);
+
+	public virtual void UpdateSkeleton (float deltaTime) {
+		skeleton.Update(deltaTime * timeScale);
 		skeleton.UpdateWorldTransform();
 	}
 	
@@ -113,7 +113,7 @@ public class SkeletonComponent : MonoBehaviour {
 		if (skeleton == null || skeleton.Data != skeletonData)
 			Initialize();
 
-		UpdateSkeleton();
+		UpdateSkeleton(Time.deltaTime);
 
 		// Count quads and submeshes.
 		int quadCount = 0, submeshQuadCount = 0;

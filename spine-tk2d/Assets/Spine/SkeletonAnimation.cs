@@ -66,12 +66,12 @@ public class SkeletonAnimation : SkeletonComponent {
 		if (_animationName != null && _animationName.Length > 0) state.SetAnimation(0, _animationName, loop);
 	}
 
-	override public void UpdateSkeleton () {
+	override public void UpdateSkeleton (float deltaTime) {
 		// Apply the animation.
-		state.Update(Time.deltaTime * timeScale);
+		state.Update(deltaTime * timeScale);
 		state.Apply(skeleton);
 
 		// Call overridden method to call skeleton Update and UpdateWorldTransform.
-		base.UpdateSkeleton();
+		base.UpdateSkeleton(deltaTime);
 	}
 }
