@@ -90,104 +90,102 @@ function spine.Skeleton.new (skeletonData, group)
 	local updateWorldTransform_super = self.updateWorldTransform
 	function self:updateWorldTransform ()
 		updateWorldTransform_super(self)
-		local images = self.images
 
+		local images = self.images
 		local skeletonR, skeletonG, skeletonB, skeletonA = self.r * 255, self.g * 255, self.b * 255, self.a
 		for i,slot in ipairs(self.drawOrder) do
+			local image = images[slot]
 			local attachment = slot.attachment
-			if attachment and attachment.type == spine.AttachmentType.region then
-				local image = images[slot]
-				if not attachment then -- Attachment is gone, remove the image.
-					if image then
+			if not attachment then -- Attachment is gone, remove the image.
+				if image then
+					image:removeSelf()
+					images[slot] = nil
+				end
+			elseif attachment.type == spine.AttachmentType.region then
+				if image and image.attachment ~= attachment then -- Attachment image has changed.
+					if self:modifyImage(image, attachment) then
+						image.lastR, image.lastA = nil, nil
+						image.attachment = attachment
+					else -- If not modified, remove the image and it will be recreated.
 						image:removeSelf()
 						images[slot] = nil
+						image = nil
 					end
-				else
-					if image and image.attachment ~= attachment then -- Attachment image has changed.
-						if self:modifyImage(image, attachment) then
-							image.lastR, image.lastA = nil, nil
-							image.attachment = attachment
-						else -- If not modified, remove the image and it will be recreated.
-							image:removeSelf()
-							images[slot] = nil
-							image = nil
+				end
+				if not image then -- Create new image.
+					image = self:createImage(attachment)
+					if image then
+						image.attachment = attachment
+						image:setReferencePoint(display.CenterReferencePoint)
+						image.width = attachment.width
+						image.height = attachment.height
+					else
+						print("Error creating image: " .. attachment.name)
+						image = spine.Skeleton.failed
+					end
+					if slot.data.additiveBlending then image.blendMode = "add" end
+					images[slot] = image
+				end
+				-- Position image based on attachment and bone.
+				if image ~= spine.Skeleton.failed then
+					local flipX, flipY = ((self.flipX and -1) or 1), ((self.flipY and -1) or 1)
+
+					local x = slot.bone.worldX + attachment.x * slot.bone.m00 + attachment.y * slot.bone.m01
+					local y = -(slot.bone.worldY + attachment.x * slot.bone.m10 + attachment.y * slot.bone.m11)
+					if not image.lastX then
+						image.x, image.y = x, y
+						image.lastX, image.lastY = x, y
+					elseif image.lastX ~= x or image.lastY ~= y then
+						image:translate(x - image.lastX, y - image.lastY)
+						image.lastX, image.lastY = x, y
+					end
+
+					local xScale = attachment.scaleX * flipX
+					local yScale = attachment.scaleY * flipY
+					-- Fix scaling when attachment is rotated 90 or -90.
+					local rotation = math.abs(attachment.rotation) % 180
+					if (rotation == 90) then
+						xScale = xScale * slot.bone.worldScaleY
+						yScale = yScale * slot.bone.worldScaleX
+					else
+						xScale = xScale * slot.bone.worldScaleX
+						yScale = yScale * slot.bone.worldScaleY
+						if rotation ~= 0 and xScale ~= yScale and not image.rotationWarning then
+							image.rotationWarning = true
+							print("WARNING: Non-uniform bone scaling with attachments not rotated to\n"
+								.."         cardinal angles will not work as expected with Corona.\n"
+								.."         Bone: "..slot.bone.data.name..", slot: "..slot.data.name..", attachment: "..attachment.name)
 						end
 					end
-					if not image then -- Create new image.
-						image = self:createImage(attachment)
-						if image then
-							image.attachment = attachment
-							image:setReferencePoint(display.CenterReferencePoint)
-							image.width = attachment.width
-							image.height = attachment.height
-						else
-							print("Error creating image: " .. attachment.name)
-							image = spine.Skeleton.failed
-						end
-						if slot.data.additiveBlending then image.blendMode = "add" end
-						images[slot] = image
+					if not image.lastScaleX then
+						image.xScale, image.yScale = xScale, yScale
+						image.lastScaleX, image.lastScaleY = xScale, yScale
+					elseif image.lastScaleX ~= xScale or image.lastScaleY ~= yScale then
+						image:scale(xScale / image.lastScaleX, yScale / image.lastScaleY)
+						image.lastScaleX, image.lastScaleY = xScale, yScale
 					end
-					-- Position image based on attachment and bone.
-					if image ~= spine.Skeleton.failed then
-						local flipX, flipY = ((self.flipX and -1) or 1), ((self.flipY and -1) or 1)
 
-						local x = slot.bone.worldX + attachment.x * slot.bone.m00 + attachment.y * slot.bone.m01
-						local y = -(slot.bone.worldY + attachment.x * slot.bone.m10 + attachment.y * slot.bone.m11)
-						if not image.lastX then
-							image.x, image.y = x, y
-							image.lastX, image.lastY = x, y
-						elseif image.lastX ~= x or image.lastY ~= y then
-							image:translate(x - image.lastX, y - image.lastY)
-							image.lastX, image.lastY = x, y
-						end
-
-						local xScale = attachment.scaleX * flipX
-						local yScale = attachment.scaleY * flipY
-						-- Fix scaling when attachment is rotated 90 or -90.
-						local rotation = math.abs(attachment.rotation) % 180
-						if (rotation == 90) then
-							xScale = xScale * slot.bone.worldScaleY
-							yScale = yScale * slot.bone.worldScaleX
-						else
-							xScale = xScale * slot.bone.worldScaleX
-							yScale = yScale * slot.bone.worldScaleY
-							if rotation ~= 0 and xScale ~= yScale and not image.rotationWarning then
-								image.rotationWarning = true
-								print("WARNING: Non-uniform bone scaling with attachments not rotated to\n"
-									.."         cardinal angles will not work as expected with Corona.\n"
-									.."         Bone: "..slot.bone.data.name..", slot: "..slot.data.name..", attachment: "..attachment.name)
-							end
-						end
-						if not image.lastScaleX then
-							image.xScale, image.yScale = xScale, yScale
-							image.lastScaleX, image.lastScaleY = xScale, yScale
-						elseif image.lastScaleX ~= xScale or image.lastScaleY ~= yScale then
-							image:scale(xScale / image.lastScaleX, yScale / image.lastScaleY)
-							image.lastScaleX, image.lastScaleY = xScale, yScale
-						end
-
-						rotation = -(slot.bone.worldRotation + attachment.rotation) * flipX * flipY
-						if not image.lastRotation then
-							image.rotation = rotation
-							image.lastRotation = rotation
-						elseif rotation ~= image.lastRotation then
-							image:rotate(rotation - image.lastRotation)
-							image.lastRotation = rotation
-						end
-
-						local r, g, b = skeletonR * slot.r, skeletonG * slot.g, skeletonB * slot.b
-						if image.lastR ~= r or image.lastG ~= g or image.lastB ~= b or not image.lastR then
-							image:setFillColor(r, g, b)
-							image.lastR, image.lastG, image.lastB = r, g, b
-						end
-						local a = skeletonA * slot.a
-						if a and (image.lastA ~= a or not image.lastA) then
-							image.lastA = a
-							image.alpha = image.lastA
-						end
-						
-						self.group:insert(image)
+					rotation = -(slot.bone.worldRotation + attachment.rotation) * flipX * flipY
+					if not image.lastRotation then
+						image.rotation = rotation
+						image.lastRotation = rotation
+					elseif rotation ~= image.lastRotation then
+						image:rotate(rotation - image.lastRotation)
+						image.lastRotation = rotation
 					end
+
+					local r, g, b = skeletonR * slot.r, skeletonG * slot.g, skeletonB * slot.b
+					if image.lastR ~= r or image.lastG ~= g or image.lastB ~= b or not image.lastR then
+						image:setFillColor(r, g, b)
+						image.lastR, image.lastG, image.lastB = r, g, b
+					end
+					local a = skeletonA * slot.a
+					if a and (image.lastA ~= a or not image.lastA) then
+						image.lastA = a
+						image.alpha = image.lastA
+					end
+					
+					self.group:insert(image)
 				end
 			end
 		end
