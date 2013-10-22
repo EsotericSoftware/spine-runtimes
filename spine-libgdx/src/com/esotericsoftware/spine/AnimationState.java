@@ -231,10 +231,9 @@ public class AnimationState {
 			tracks.set(trackIndex, entry);
 
 		if (delay <= 0) {
-			if (last != null) {
-				if (last.time < last.endTime) delay += last.endTime - last.time;
-				delay -= data.getMix(last.animation, animation);
-			} else
+			if (last != null)
+				delay += last.endTime - data.getMix(last.animation, animation);
+			else
 				delay = 0;
 		}
 		entry.delay = delay;
