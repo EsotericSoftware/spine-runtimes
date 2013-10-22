@@ -43,10 +43,14 @@ spine.RegionAttachment = require "spine-lua.RegionAttachment"
 spine.Skeleton = require "spine-lua.Skeleton"
 spine.Bone = require "spine-lua.Bone"
 spine.Slot = require "spine-lua.Slot"
+spine.AttachmentType = require "spine-lua.AttachmentType"
 spine.AttachmentLoader = require "spine-lua.AttachmentLoader"
 spine.Animation = require "spine-lua.Animation"
 spine.AnimationStateData = require "spine-lua.AnimationStateData"
 spine.AnimationState = require "spine-lua.AnimationState"
+spine.EventData = require "spine-lua.EventData"
+spine.Event = require "spine-lua.Event"
+spine.SkeletonBounds = require "spine-lua.SkeletonBounds"
 
 spine.utils.readFile = function (fileName, base)
 	local path = fileName
@@ -70,16 +74,27 @@ function spine.Skeleton.new (skeletonData, group)
 		return love.graphics.newImage(attachment.name .. ".png")
 	end
 
-	function self:draw()
+	-- updateWorldTransform positions images.
+	local updateWorldTransform_super = self.updateWorldTransform
+	function self:updateWorldTransform ()
+		updateWorldTransform_super(self)
+
 		if not self.images then self.images = {} end
 		local images = self.images
 
+		if not self.attachments then self.attachments = {} end
+		local attachments = self.attachments
+
 		for i,slot in ipairs(self.drawOrder) do
 			local attachment = slot.attachment
-			local image = images[attachment]
-			if attachment then
-				-- Create new image.
-				if not image then
+			if not attachment then
+				images[slot] = nil
+			elseif attachment.type == spine.AttachmentType.region then
+				local image = images[slot]
+				if image and attachments[image] ~= attachment then -- Attachment image has changed.
+					image = nil
+				end
+				if not image then -- Create new image.
 					image = self:createImage(attachment)
 					if image then
 						local imageWidth = image:getWidth()
@@ -92,38 +107,50 @@ function spine.Skeleton.new (skeletonData, group)
 						print("Error creating image: " .. attachment.name)
 						image = spine.Skeleton.failed
 					end
-					self.images[attachment] = image
+					images[slot] = image
+					attachments[image] = attachment
 				end
-				-- Draw,
-				if image ~= spine.Skeleton.failed then
-					local x = slot.bone.worldX + attachment.x * slot.bone.m00 + attachment.y * slot.bone.m01
-					local y = slot.bone.worldY + attachment.x * slot.bone.m10 + attachment.y * slot.bone.m11
-					local rotation = slot.bone.worldRotation + attachment.rotation
-					local xScale = slot.bone.worldScaleX + attachment.scaleX - 1
-					local yScale = slot.bone.worldScaleY + attachment.scaleY - 1
-					if self.flipX then
-						xScale = -xScale
-						rotation = -rotation
-					end
-					if self.flipY then
-						yScale = -yScale
-						rotation = -rotation
-					end
-					love.graphics.setColor(self.r * slot.r, self.g * slot.g, self.b * slot.b, self.a * slot.a)
-					if slot.data.additiveBlending then
-						love.graphics.setBlendMode("additive")
-					else
-						love.graphics.setBlendMode("alpha")
-					end
-					love.graphics.draw(image, 
-						self.x + x, 
-						self.y - y, 
-						-rotation * 3.1415927 / 180,
-						xScale * attachment.widthRatio,
-						yScale * attachment.heightRatio,
-						attachment.originX,
-						attachment.originY)
+			end
+		end
+	end
+
+	function self:draw()
+		if not self.images then self.images = {} end
+		local images = self.images
+
+		local r, g, b, a = self.r * 255, self.g * 255, self.b * 255, self.a * 255
+
+		for i,slot in ipairs(self.drawOrder) do
+			local image = images[slot]
+			if image and image ~= spine.Skeleton.failed then
+				local attachment = slot.attachment
+				local x = slot.bone.worldX + attachment.x * slot.bone.m00 + attachment.y * slot.bone.m01
+				local y = slot.bone.worldY + attachment.x * slot.bone.m10 + attachment.y * slot.bone.m11
+				local rotation = slot.bone.worldRotation + attachment.rotation
+				local xScale = slot.bone.worldScaleX + attachment.scaleX - 1
+				local yScale = slot.bone.worldScaleY + attachment.scaleY - 1
+				if self.flipX then
+					xScale = -xScale
+					rotation = -rotation
 				end
+				if self.flipY then
+					yScale = -yScale
+					rotation = -rotation
+				end
+				love.graphics.setColor(r * slot.r, g * slot.g, b * slot.b, a * slot.a)
+				if slot.data.additiveBlending then
+					love.graphics.setBlendMode("additive")
+				else
+					love.graphics.setBlendMode("alpha")
+				end
+				love.graphics.draw(image, 
+					self.x + x, 
+					self.y - y, 
+					-rotation * 3.1415927 / 180,
+					xScale * attachment.widthRatio,
+					yScale * attachment.heightRatio,
+					attachment.originX,
+					attachment.originY)
 			end
 		end
 
@@ -165,7 +192,7 @@ function spine.Skeleton.new (skeletonData, group)
 			love.graphics.setColor(0, 0, 255, 128)
 			for i,slot in ipairs(self.drawOrder) do
 				local attachment = slot.attachment
-				if attachment then
+				if attachment and attachment.type == spine.AttachmentType.region then
 					local x = slot.bone.worldX + attachment.x * slot.bone.m00 + attachment.y * slot.bone.m01
 					local y = slot.bone.worldY + attachment.x * slot.bone.m10 + attachment.y * slot.bone.m11
 					local rotation = slot.bone.worldRotation + attachment.rotation

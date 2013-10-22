@@ -28,7 +28,6 @@ local spine = require "spine-love.spine"
 local json = spine.SkeletonJson.new()
 json.scale = 1
 local skeletonData = json:readSkeletonDataFile("data/spineboy.json")
-local walkAnimation = skeletonData:findAnimation("walk")
 
 local skeleton = spine.Skeleton.new(skeletonData)
 function skeleton:createImage (attachment)
@@ -40,13 +39,37 @@ skeleton.y = love.graphics.getHeight() / 2 + 150
 skeleton.flipX = false
 skeleton.flipY = false
 skeleton.debugBones = true -- Omit or set to false to not draw debug lines on top of the images.
-skeleton.debugSlots = false
+skeleton.debugSlots = true
 skeleton:setToSetupPose()
 
-local animationTime = 0
+-- AnimationStateData defines crossfade durations between animations.
+local stateData = spine.AnimationStateData.new(skeletonData)
+stateData:setMix("walk", "jump", 0.2)
+stateData:setMix("jump", "walk", 0.4)
+
+-- AnimationState has a queue of animations and can apply them with crossfading.
+local state = spine.AnimationState.new(stateData)
+state:setAnimationByName(0, "drawOrder")
+state:addAnimationByName(0, "jump", false, 0)
+state:addAnimationByName(0, "walk", true, 0)
+
+state.onStart = function (trackIndex)
+	print(trackIndex.." start: "..state:getCurrent(trackIndex).animation.name)
+end
+state.onEnd = function (trackIndex)
+	print(trackIndex.." end: "..state:getCurrent(trackIndex).animation.name)
+end
+state.onComplete = function (trackIndex, loopCount)
+	print(trackIndex.." complete: "..state:getCurrent(trackIndex).animation.name..", "..loopCount)
+end
+state.onEvent = function (trackIndex, event)
+	print(trackIndex.." event: "..state:getCurrent(trackIndex).animation.name..", "..event.data.name..", "..event.intValue..", "..event.floatValue..", '"..(event.stringValue or "").."'")
+end
+
 function love.update (delta)
-	animationTime = animationTime + delta
-	walkAnimation:apply(skeleton, animationTime, true)
+	-- Update the state with the delta time, apply it, and update the world transforms.
+	state:update(delta)
+	state:apply(skeleton)
 	skeleton:updateWorldTransform()
 end
 
