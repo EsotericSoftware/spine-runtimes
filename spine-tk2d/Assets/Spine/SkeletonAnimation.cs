@@ -60,7 +60,9 @@ public class SkeletonAnimation : SkeletonComponent {
 	}
 	
 	override public void Initialize () {
-		base.Initialize(); // Call overridden method to initialize the skeleton.
+		if (Initialized) return;
+
+		base.Initialize();
 		
 		state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());
 		if (_animationName != null && _animationName.Length > 0) state.SetAnimation(0, _animationName, loop);

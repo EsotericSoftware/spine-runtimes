@@ -57,6 +57,16 @@ public class SkeletonComponent : MonoBehaviour {
 	private Material[] sharedMaterials = new Material[0];
 	private List<Material> submeshMaterials = new List<Material>();
 	private List<Submesh> submeshes = new List<Submesh>();
+	
+	/// <summary>False if Initialize needs to be called.</summary>
+	public bool Initialized {
+		get {
+			if (skeletonDataAsset == null) return true;
+			SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(false);
+			if (skeletonData == null) return true;
+			return skeleton != null && skeleton.Data == skeletonData;
+		}
+	}
 
 	public virtual void Clear () {
 		meshFilter.sharedMesh = null;
@@ -69,6 +79,8 @@ public class SkeletonComponent : MonoBehaviour {
 	}
 
 	public virtual void Initialize () {
+		if (Initialized) return;
+
 		meshFilter = GetComponent<MeshFilter>();
 		mesh1 = newMesh();
 		mesh2 = newMesh();
