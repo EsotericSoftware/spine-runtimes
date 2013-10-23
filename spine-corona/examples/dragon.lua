@@ -23,7 +23,7 @@ skeleton:setToSetupPose()
 local stateData = spine.AnimationStateData.new(skeletonData)
 -- AnimationState has a queue of animations and can apply them with crossfading.
 local state = spine.AnimationState.new(stateData)
-state:setAnimation("flying", true)
+state:setAnimationByName(0, "flying", true, 0)
 
 local lastTime = 0
 local animationTime = 0
