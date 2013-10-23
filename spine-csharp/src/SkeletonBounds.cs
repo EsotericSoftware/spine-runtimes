@@ -207,13 +207,13 @@ namespace Spine {
 			return index == -1 ? null : Polygons[index];
 		}
 	}
-}
 
-public class Polygon {
-	public float[] Vertices { get; set; }
-	public int Count { get; set; }
+	public class Polygon {
+		public float[] Vertices { get; set; }
+		public int Count { get; set; }
 
-	public Polygon () {
-		Vertices = new float[16];
+		public Polygon () {
+			Vertices = new float[16];
+		}
 	}
 }
