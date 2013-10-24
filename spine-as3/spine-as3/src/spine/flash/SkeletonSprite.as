@@ -138,12 +138,15 @@ public class SkeletonSprite extends Sprite {
 				colorTransform.alphaMultiplier = skeleton.a * slot.a;
 				wrapper.transform.colorTransform = colorTransform;
 
+				var flipX:int = skeleton.flipX ? -1 : 1;
+				var flipY:int = skeleton.flipY ? -1 : 1;
+
 				var bone:Bone = slot.bone;
 				wrapper.x = bone.worldX;
 				wrapper.y = bone.worldY;
-				wrapper.rotation = -bone.worldRotation;
-				wrapper.scaleX = bone.worldScaleX;
-				wrapper.scaleY = bone.worldScaleY;
+				wrapper.rotation = -bone.worldRotation * flipX * flipY;
+				wrapper.scaleX = bone.worldScaleX * flipX;
+				wrapper.scaleY = bone.worldScaleY * flipY;
 				addChild(wrapper);
 			}
 		}
