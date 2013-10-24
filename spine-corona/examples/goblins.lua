@@ -22,7 +22,7 @@ skeleton:setToSetupPose() -- Required after changing skin to attach attachments 
 -- AnimationState has a queue of animations and can apply them with crossfading.
 local stateData = spine.AnimationStateData.new(skeletonData)
 local state = spine.AnimationState.new(stateData)
-state:setAnimation("walk", true)
+state:setAnimationByName(0, "walk", true, 0)
 
 local lastTime = 0
 local animationTime = 0
