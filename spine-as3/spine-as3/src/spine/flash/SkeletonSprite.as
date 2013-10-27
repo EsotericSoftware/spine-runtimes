@@ -88,26 +88,18 @@ public class SkeletonSprite extends Sprite {
 				var region:AtlasRegion = AtlasRegion(regionAttachment.rendererObject);
 				if (!wrapper) {
 					var bitmapData:BitmapData = region.page.rendererObject as BitmapData;
-					var regionData:BitmapData;
-					if (region.rotate) {
-						regionData = new BitmapData(region.height, region.width);
-						regionData.copyPixels(bitmapData, //
-							new Rectangle(region.x, region.y, region.height, region.width), //
-							new Point());
-					} else {
-						regionData = new BitmapData(region.width, region.height);
-						regionData.copyPixels(bitmapData, //
-							new Rectangle(region.x, region.y, region.width, region.height), //
-							new Point());
-					}
+					var regionWidth:Number = region.rotate ? region.height : region.width;
+					var regionHeight:Number = region.rotate ? region.width : region.height;
+					var regionData:BitmapData = new BitmapData(regionWidth, regionHeight);
+					regionData.copyPixels(bitmapData, new Rectangle(region.x, region.y, regionWidth, regionHeight), new Point());
 
 					var bitmap:Bitmap = new Bitmap(regionData);
 					bitmap.smoothing = true;
 
 					// Rotate and scale using default registration point (top left corner, y-down, CW) instead of image center.
 					bitmap.rotation = -regionAttachment.rotation;
-					bitmap.scaleX = regionAttachment.scaleX;
-					bitmap.scaleY = regionAttachment.scaleY;
+					bitmap.scaleX = regionAttachment.scaleX * (regionAttachment.width / region.width);
+					bitmap.scaleY = regionAttachment.scaleY * (regionAttachment.height / region.height);
 
 					// Position using attachment translation, shifted as if scale and rotation were at image center.
 					var radians:Number = -regionAttachment.rotation * Math.PI / 180;
@@ -117,7 +109,7 @@ public class SkeletonSprite extends Sprite {
 					var shiftY:Number = -regionAttachment.height / 2 * regionAttachment.scaleY;
 					if (region.rotate) {
 						bitmap.rotation += 90;
-						shiftX += region.width;
+						shiftX += regionHeight * (regionAttachment.width / region.width);
 					}
 					bitmap.x = regionAttachment.x + shiftX * cos - shiftY * sin;
 					bitmap.y = -regionAttachment.y + shiftX * sin + shiftY * cos;
