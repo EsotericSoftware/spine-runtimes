@@ -541,7 +541,7 @@ spine.EventTimeline.prototype = {
 
 		if (lastTime > time) { // Fire events after last time for looped animations.
 			apply(skeleton, lastTime, Number.MAX_VALUE, firedEvents, alpha);
-			lastTime = -1f;
+			lastTime = -1;
 		} else if (lastTime >= frames[frameCount - 1]) // Last time is after last frame.
 			return;
 		if (time < frames[0]) return; // Time is before first frame.
