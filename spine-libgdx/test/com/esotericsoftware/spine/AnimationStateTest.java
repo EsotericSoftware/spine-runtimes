@@ -71,7 +71,6 @@ public class AnimationStateTest extends ApplicationAdapter {
 		skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
 		skeleton.setX(250);
 		skeleton.setY(20);
-		skeleton.updateWorldTransform();
 
 		bounds = new SkeletonBounds(); // Convenience class to do hit detection with bounding boxes.
 
