@@ -31,17 +31,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine.flash {
+package spine.starling {
 import flash.display.Bitmap;
 import flash.display.BitmapData;
+import flash.geom.Point;
+import flash.geom.Rectangle;
 
 import spine.atlas.AtlasPage;
 import spine.atlas.AtlasRegion;
 import spine.atlas.TextureLoader;
 
+import starling.textures.SubTexture;
+import starling.textures.Texture;
+
 public class SingleTextureLoader implements TextureLoader {
 	private var pageBitmapData:BitmapData;
-
+	
 	/** @param object A Bitmap or BitmapData. */
 	public function SingleTextureLoader (object:*) {
 		if (object is BitmapData)
@@ -51,18 +56,31 @@ public class SingleTextureLoader implements TextureLoader {
 		else
 			throw new ArgumentError("object must be a Bitmap or BitmapData.");
 	}
-
+	
 	public function loadPage (page:AtlasPage, path:String) : void {
-		page.rendererObject = pageBitmapData;
+		page.rendererObject = Texture.fromBitmapData(pageBitmapData);
 		page.width = pageBitmapData.width;
 		page.height = pageBitmapData.height;
 	}
-	
-	public function loadRegion (region:AtlasRegion) : void {
-	}
 
+	public function loadRegion (region:AtlasRegion) : void {
+		var image:SkeletonImage = new SkeletonImage(Texture(region.page.rendererObject));
+		if (region.rotate) {
+			image.setTexCoordsTo(0, region.u, region.v2);
+			image.setTexCoordsTo(1, region.u, region.v);
+			image.setTexCoordsTo(2, region.u2, region.v2);
+			image.setTexCoordsTo(3, region.u2, region.v);
+		} else {
+			image.setTexCoordsTo(0, region.u, region.v);
+			image.setTexCoordsTo(1, region.u2, region.v);
+			image.setTexCoordsTo(2, region.u, region.v2);
+			image.setTexCoordsTo(3, region.u2, region.v2);
+		}
+		region.rendererObject = image;
+	}
+	
 	public function unloadPage (page:AtlasPage) : void {
-		BitmapData(page.rendererObject).dispose();
+		BitmapData(pageBitmapData).dispose();
 	}
 }
 

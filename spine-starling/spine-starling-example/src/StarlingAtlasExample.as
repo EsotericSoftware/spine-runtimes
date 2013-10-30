@@ -15,11 +15,11 @@ import starling.events.TouchPhase;
 import starling.textures.Texture;
 import starling.textures.TextureAtlas;
 
-public class Game extends Sprite {
-	[Embed(source = "spineboy.xml", mimeType = "application/octet-stream")]
+public class StarlingAtlasExample extends Sprite {
+	[Embed(source = "spineboy-starling.xml", mimeType = "application/octet-stream")]
 	static public const SpineboyAtlasXml:Class;
 
-	[Embed(source = "spineboy.png")]
+	[Embed(source = "spineboy-starling.png")]
 	static public const SpineboyAtlasTexture:Class;
 
 	[Embed(source = "spineboy.json", mimeType = "application/octet-stream")]
@@ -27,7 +27,7 @@ public class Game extends Sprite {
 
 	private var skeleton:SkeletonAnimation;
 
-	public function Game () {
+	public function StarlingAtlasExample () {
 		var texture:Texture = Texture.fromBitmap(new SpineboyAtlasTexture());
 		var xml:XML = XML(new SpineboyAtlasXml());
 		var atlas:TextureAtlas = new TextureAtlas(texture, xml);

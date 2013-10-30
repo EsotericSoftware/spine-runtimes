@@ -40,6 +40,8 @@ import spine.Bone;
 import spine.Skeleton;
 import spine.SkeletonData;
 import spine.Slot;
+import spine.atlas.AtlasPage;
+import spine.atlas.AtlasRegion;
 import spine.attachments.RegionAttachment;
 
 import starling.animation.IAnimatable;
@@ -87,12 +89,15 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 				var a:Number = slot.a;
 				var rgb:uint = Color.rgb(r * slot.r, g * slot.g, b * slot.b);
 
-				var image:SkeletonImage = regionAttachment.rendererObject as SkeletonImage;
+				var image:SkeletonImage;
+				image = regionAttachment.rendererObject as SkeletonImage;
+				if (image == null) image = SkeletonImage(AtlasRegion(regionAttachment.rendererObject).rendererObject);
+
 				var vertexData:VertexData = image.vertexData;
-						
-				vertexData.setPosition(0, vertices[2], vertices[3]);				
+
+				vertexData.setPosition(0, vertices[2], vertices[3]);
 				vertexData.setColorAndAlpha(0, rgb, a);
-				
+
 				vertexData.setPosition(1, vertices[4], vertices[5]);
 				vertexData.setColorAndAlpha(1, rgb, a);
 				

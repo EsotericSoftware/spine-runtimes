@@ -87,7 +87,7 @@ public class Atlas {
 				else if (direction == "xy")
 					page.uWrap = page.vWrap = TextureWrap.repeat;
 
-				textureLoader.load(page, line);
+				textureLoader.loadPage(page, line);
 
 				pages.push(page);
 
@@ -139,6 +139,7 @@ public class Atlas {
 
 				region.index = parseInt(reader.readValue());
 
+				textureLoader.loadRegion(region);
 				regions.push(region);
 			}
 		}
@@ -156,7 +157,7 @@ public class Atlas {
 
 	public function dispose () : void {
 		for (var i:int = 0, n:int = pages.length; i < n; i++)
-			textureLoader.unload(pages[i].rendererObject);
+			textureLoader.unloadPage(pages[i]);
 	}
 }
 
