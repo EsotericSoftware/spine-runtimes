@@ -129,7 +129,7 @@ public class AnimationStateTest extends ApplicationAdapter {
 	}
 
 	public void render () {
-		state.update(Gdx.graphics.getDeltaTime());
+		state.update(Gdx.graphics.getDeltaTime()); // Update the animation time.
 
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
