@@ -90,7 +90,7 @@
 	if (!self) return nil;
 
 	SkeletonJson* json = SkeletonJson_create(atlas);
-	json->scale = scale;
+	json->scale = scale == 0 ? (1 / CC_CONTENT_SCALE_FACTOR()) : scale;
 	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, [skeletonDataFile UTF8String]);
 	NSAssert(skeletonData, ([NSString stringWithFormat:@"Error reading skeleton data file: %@\nError: %s", skeletonDataFile, json->error]));
 	SkeletonJson_dispose(json);
@@ -110,7 +110,7 @@
 	if (!_atlas) return 0;
 
 	SkeletonJson* json = SkeletonJson_create(_atlas);
-	json->scale = scale;
+	json->scale = scale == 0 ? (1 / CC_CONTENT_SCALE_FACTOR()) : scale;
 	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, [skeletonDataFile UTF8String]);
 	NSAssert(skeletonData, ([NSString stringWithFormat:@"Error reading skeleton data file: %@\nError: %s", skeletonDataFile, json->error]));
 	SkeletonJson_dispose(json);

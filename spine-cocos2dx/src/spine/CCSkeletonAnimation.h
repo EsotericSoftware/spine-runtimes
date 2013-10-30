@@ -51,12 +51,12 @@ public:
 	spAnimationState* state;
 
 	static CCSkeletonAnimation* createWithData (spSkeletonData* skeletonData);
-	static CCSkeletonAnimation* createWithFile (const char* skeletonDataFile, spAtlas* atlas, float scale = 1);
-	static CCSkeletonAnimation* createWithFile (const char* skeletonDataFile, const char* atlasFile, float scale = 1);
+	static CCSkeletonAnimation* createWithFile (const char* skeletonDataFile, spAtlas* atlas, float scale = 0);
+	static CCSkeletonAnimation* createWithFile (const char* skeletonDataFile, const char* atlasFile, float scale = 0);
 
 	CCSkeletonAnimation (spSkeletonData* skeletonData);
-	CCSkeletonAnimation (const char* skeletonDataFile, spAtlas* atlas, float scale = 1);
-	CCSkeletonAnimation (const char* skeletonDataFile, const char* atlasFile, float scale = 1);
+	CCSkeletonAnimation (const char* skeletonDataFile, spAtlas* atlas, float scale = 0);
+	CCSkeletonAnimation (const char* skeletonDataFile, const char* atlasFile, float scale = 0);
 
 	virtual ~CCSkeletonAnimation ();
 

@@ -14,7 +14,8 @@
 	self = [super init];
 	if (!self) return nil;
 
-	animationNode = [CCSkeletonAnimation skeletonWithFile:@"spineboy.json" atlasFile:@"spineboy.atlas" scale:1];
+	// A scale of zero will use 1 / CC_CONTENT_SCALE_FACTOR().
+	animationNode = [CCSkeletonAnimation skeletonWithFile:@"spineboy.json" atlasFile:@"spineboy.atlas" scale:0]; 
 	[animationNode setMixFrom:@"walk" to:@"jump" duration:0.2f];
 	[animationNode setMixFrom:@"jump" to:@"walk" duration:0.4f];
 	[animationNode setDelegate:self];
@@ -22,7 +23,7 @@
 	[animationNode addAnimationForTrack:0 name:@"jump" loop:NO afterDelay:0];
 	[animationNode addAnimationForTrack:0 name:@"walk" loop:YES afterDelay:0];
 	[animationNode addAnimationForTrack:0 name:@"jump" loop:YES afterDelay:4];
-	[animationNode setAnimationForTrack:1 name:@"drawOrder" loop:YES];
+	// [animationNode setAnimationForTrack:1 name:@"drawOrder" loop:YES];
 	animationNode.timeScale = 0.3f;
 	animationNode.debugBones = true;
 

@@ -50,12 +50,12 @@ public:
 	bool premultipliedAlpha;
 
 	static CCSkeleton* createWithData (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
-	static CCSkeleton* createWithFile (const char* skeletonDataFile, spAtlas* atlas, float scale = 1);
-	static CCSkeleton* createWithFile (const char* skeletonDataFile, const char* atlasFile, float scale = 1);
+	static CCSkeleton* createWithFile (const char* skeletonDataFile, spAtlas* atlas, float scale = 0);
+	static CCSkeleton* createWithFile (const char* skeletonDataFile, const char* atlasFile, float scale = 0);
 
 	CCSkeleton (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
-	CCSkeleton (const char* skeletonDataFile, spAtlas* atlas, float scale = 1);
-	CCSkeleton (const char* skeletonDataFile, const char* atlasFile, float scale = 1);
+	CCSkeleton (const char* skeletonDataFile, spAtlas* atlas, float scale = 0);
+	CCSkeleton (const char* skeletonDataFile, const char* atlasFile, float scale = 0);
 
 	virtual ~CCSkeleton ();
 
