@@ -31,6 +31,7 @@ bool ExampleLayer::init () {
 
 	// skeletonNode->timeScale = 0.3f;
 	skeletonNode->debugBones = true;
+	skeletonNode->update(0);
 
 	skeletonNode->runAction(CCRepeatForever::create(CCSequence::create(CCFadeOut::create(1),
 		CCFadeIn::create(1),
