@@ -59,6 +59,7 @@ static void callback (AnimationState* state, int trackIndex, EventType type, Eve
 }
 
 - (void) initialize {
+	_ownsAnimationStateData = true;
 	_state = AnimationState_create(AnimationStateData_create(_skeleton->data));
 	_state->context = self;
 	_state->listener = callback;
@@ -113,7 +114,7 @@ static void callback (AnimationState* state, int trackIndex, EventType type, Eve
 	if (_ownsAnimationStateData) AnimationStateData_dispose(_state->data);
 	AnimationState_dispose(_state);
 
-	_ownsAnimationStateData = true;
+	_ownsAnimationStateData = false;
 	_state = AnimationState_create(stateData);
 	_state->context = self;
 	_state->listener = callback;

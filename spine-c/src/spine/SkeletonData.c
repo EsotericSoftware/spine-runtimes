@@ -57,6 +57,10 @@ void spSkeletonData_dispose (spSkeletonData* self) {
 		spAnimation_dispose(self->animations[i]);
 	FREE(self->animations);
 
+	for (i = 0; i < self->eventCount; ++i)
+		spEventData_dispose(self->events[i]);
+	FREE(self->events);
+
 	FREE(self);
 }
 

@@ -68,6 +68,7 @@ void CCSkeletonAnimation::initialize () {
 	listenerInstance = 0;
 	listenerMethod = 0;
 
+	ownsAnimationStateData = true;
 	state = spAnimationState_create(spAnimationStateData_create(skeleton->data));
 	state->context = this;
 	state->listener = callback;
@@ -108,7 +109,7 @@ void CCSkeletonAnimation::setAnimationStateData (spAnimationStateData* stateData
 	if (ownsAnimationStateData) spAnimationStateData_dispose(state->data);
 	spAnimationState_dispose(state);
 
-	ownsAnimationStateData = true;
+	ownsAnimationStateData = false;
 	state = spAnimationState_create(stateData);
 	state->context = this;
 	state->listener = callback;
