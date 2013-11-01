@@ -5,14 +5,14 @@ filter: Linear,Linear
 repeat: none
 eyes
   rotate: false
-  xy: 230, 102
+  xy: 153, 38
   size: 34, 27
   orig: 34, 27
   offset: 0, 0
   index: -1
 eyes-closed
-  rotate: true
-  xy: 273, 163
+  rotate: false
+  xy: 178, 176
   size: 34, 27
   orig: 34, 27
   offset: 0, 0
@@ -26,28 +26,28 @@ head
   index: -1
 left-ankle
   rotate: false
-  xy: 118, 50
+  xy: 214, 171
   size: 25, 32
   orig: 25, 32
   offset: 0, 0
   index: -1
 left-arm
   rotate: false
-  xy: 230, 131
+  xy: 72, 17
   size: 35, 29
   orig: 35, 29
   offset: 0, 0
   index: -1
 left-foot
   rotate: false
-  xy: 381, 222
+  xy: 366, 222
   size: 65, 30
   orig: 65, 30
   offset: 0, 0
   index: -1
 left-hand
-  rotate: true
-  xy: 233, 162
+  rotate: false
+  xy: 345, 182
   size: 35, 38
   orig: 35, 38
   offset: 0, 0
@@ -67,22 +67,22 @@ left-pant-bottom
   offset: 0, 0
   index: -1
 left-shoulder
-  rotate: true
-  xy: 448, 218
+  rotate: false
+  xy: 153, 67
   size: 34, 53
   orig: 34, 53
   offset: 0, 0
   index: -1
 left-upper-leg
-  rotate: true
-  xy: 243, 219
+  rotate: false
+  xy: 118, 51
   size: 33, 67
   orig: 33, 67
   offset: 0, 0
   index: -1
 neck
-  rotate: true
-  xy: 118, 84
+  rotate: false
+  xy: 241, 171
   size: 34, 28
   orig: 34, 28
   offset: 0, 0
@@ -96,35 +96,35 @@ pelvis
   index: -1
 right-ankle
   rotate: false
-  xy: 182, 90
+  xy: 277, 169
   size: 25, 30
   orig: 25, 30
   offset: 0, 0
   index: -1
 right-arm
-  rotate: true
-  xy: 72, 25
+  rotate: false
+  xy: 176, 129
   size: 21, 45
   orig: 21, 45
   offset: 0, 0
   index: -1
 right-foot
   rotate: false
-  xy: 312, 222
+  xy: 297, 222
   size: 67, 30
   orig: 67, 30
   offset: 0, 0
   index: -1
 right-foot-idle
   rotate: false
-  xy: 178, 175
+  xy: 433, 224
   size: 53, 28
   orig: 53, 28
   offset: 0, 0
   index: -1
 right-hand
   rotate: false
-  xy: 148, 88
+  xy: 382, 188
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -138,14 +138,14 @@ right-lower-leg
   index: -1
 right-pant-bottom
   rotate: false
-  xy: 243, 199
+  xy: 297, 202
   size: 46, 18
   orig: 46, 18
   offset: 0, 0
   index: -1
 right-shoulder
   rotate: false
-  xy: 176, 122
+  xy: 243, 201
   size: 52, 51
   orig: 52, 51
   offset: 0, 0
