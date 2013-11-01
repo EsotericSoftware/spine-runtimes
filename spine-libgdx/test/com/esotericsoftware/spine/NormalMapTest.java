@@ -73,7 +73,7 @@ public class NormalMapTest extends ApplicationAdapter {
 		batch.setShader(program);
 		renderer = new SkeletonRenderer();
 
-		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("spineboy-ws.atlas"));
+		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("spineboy-diffuse.atlas"));
 		atlasTexture = atlas.getRegions().first().getTexture();
 		normalMapTexture = new Texture(Gdx.files.internal("spineboy-normal.png"));
 
@@ -186,10 +186,9 @@ public class NormalMapTest extends ApplicationAdapter {
 			+ "  gl_FragColor = v_color * vec4(result, color.a);\n" //
 			+ "}";
 
-		System.out.println("VERTEX PROGRAM:\n------------\n\n" + vert);
-		System.out.println("FRAGMENT PROGRAM:\n------------\n\n" + frag);
+		// System.out.println("VERTEX PROGRAM:\n------------\n\n" + vert);
+		// System.out.println("FRAGMENT PROGRAM:\n------------\n\n" + frag);
 		ShaderProgram program = new ShaderProgram(vert, frag);
-
 		ShaderProgram.pedantic = false;
 		if (!program.isCompiled()) throw new IllegalArgumentException("Error compiling shader: " + program.getLog());
 

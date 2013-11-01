@@ -1,18 +1,18 @@
 
-spineboy-ws.png
+spineboy-diffuse.png
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 eyes
   rotate: false
-  xy: 153, 38
+  xy: 380, 193
   size: 34, 27
   orig: 34, 27
   offset: 0, 0
   index: -1
 eyes-closed
   rotate: false
-  xy: 178, 176
+  xy: 344, 193
   size: 34, 27
   orig: 34, 27
   offset: 0, 0
@@ -26,7 +26,7 @@ head
   index: -1
 left-ankle
   rotate: false
-  xy: 214, 171
+  xy: 213, 171
   size: 25, 32
   orig: 25, 32
   offset: 0, 0
@@ -40,16 +40,16 @@ left-arm
   index: -1
 left-foot
   rotate: false
-  xy: 366, 222
+  xy: 365, 222
   size: 65, 30
   orig: 65, 30
   offset: 0, 0
   index: -1
 left-hand
   rotate: false
-  xy: 345, 182
-  size: 35, 38
-  orig: 35, 38
+  xy: 176, 135
+  size: 30, 38
+  orig: 30, 38
   offset: 0, 0
   index: -1
 left-lower-leg
@@ -75,56 +75,56 @@ left-shoulder
   index: -1
 left-upper-leg
   rotate: false
-  xy: 118, 51
-  size: 33, 67
-  orig: 33, 67
+  xy: 118, 52
+  size: 33, 66
+  orig: 33, 66
   offset: 0, 0
   index: -1
 neck
   rotate: false
-  xy: 241, 171
+  xy: 177, 175
   size: 34, 28
   orig: 34, 28
   offset: 0, 0
   index: -1
 pelvis
   rotate: false
-  xy: 178, 205
+  xy: 177, 205
   size: 63, 47
   orig: 63, 47
   offset: 0, 0
   index: -1
 right-ankle
   rotate: false
-  xy: 277, 169
+  xy: 297, 170
   size: 25, 30
   orig: 25, 30
   offset: 0, 0
   index: -1
 right-arm
   rotate: false
-  xy: 176, 129
+  xy: 274, 154
   size: 21, 45
   orig: 21, 45
   offset: 0, 0
   index: -1
 right-foot
   rotate: false
-  xy: 297, 222
+  xy: 296, 222
   size: 67, 30
   orig: 67, 30
   offset: 0, 0
   index: -1
 right-foot-idle
   rotate: false
-  xy: 433, 224
+  xy: 432, 224
   size: 53, 28
   orig: 53, 28
   offset: 0, 0
   index: -1
 right-hand
   rotate: false
-  xy: 382, 188
+  xy: 240, 167
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -132,20 +132,20 @@ right-hand
 right-lower-leg
   rotate: false
   xy: 125, 188
-  size: 51, 64
-  orig: 51, 64
+  size: 50, 64
+  orig: 50, 64
   offset: 0, 0
   index: -1
 right-pant-bottom
   rotate: false
-  xy: 297, 202
+  xy: 296, 202
   size: 46, 18
   orig: 46, 18
   offset: 0, 0
   index: -1
 right-shoulder
   rotate: false
-  xy: 243, 201
+  xy: 242, 201
   size: 52, 51
   orig: 52, 51
   offset: 0, 0
