@@ -111,10 +111,10 @@ function SkeletonJson.new (attachmentLoader)
 				local color = slotMap["color"]
 				if color then
 					slotData:setColor(
-						tonumber(color:sub(1, 2), 16)/255,
-						tonumber(color:sub(3, 4), 16)/255,
-						tonumber(color:sub(5, 6), 16)/255,
-						tonumber(color:sub(7, 8), 16)/255
+						tonumber(color:sub(1, 2), 16) / 255,
+						tonumber(color:sub(3, 4), 16) / 255,
+						tonumber(color:sub(5, 6), 16) / 255,
+						tonumber(color:sub(7, 8), 16) / 255
 					)
 				end
 
@@ -264,10 +264,10 @@ function SkeletonJson.new (attachmentLoader)
 							local color = valueMap["color"]
 							timeline:setFrame(
 								keyframeIndex, time, 
-								tonumber(color:sub(1, 2), 16)/255,
-								tonumber(color:sub(3, 4), 16)/255,
-								tonumber(color:sub(5, 6), 16)/255,
-								tonumber(color:sub(7, 8), 16)/255
+								tonumber(color:sub(1, 2), 16) / 255,
+								tonumber(color:sub(3, 4), 16) / 255,
+								tonumber(color:sub(5, 6), 16) / 255,
+								tonumber(color:sub(7, 8), 16) / 255
 							)
 							readCurve(timeline, keyframeIndex, valueMap)
 							keyframeIndex = keyframeIndex + 1

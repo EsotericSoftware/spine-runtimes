@@ -182,7 +182,7 @@ function spine.Skeleton.new (skeletonData, group)
 					local a = skeletonA * slot.a
 					if a and (image.lastA ~= a or not image.lastA) then
 						image.lastA = a
-						image.alpha = image.lastA
+						image.alpha = image.lastA -- 0-1 range, unlike RGB.
 					end
 					
 					self.group:insert(image)
