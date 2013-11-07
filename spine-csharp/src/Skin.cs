@@ -38,9 +38,10 @@ namespace Spine {
 	/// <summary>Stores attachments by slot index and attachment name.</summary>
 	public class Skin {
 		internal String name;
+		private Dictionary<KeyValuePair<int, String>, Attachment> attachments =
+			new Dictionary<KeyValuePair<int, String>, Attachment>(AttachmentComparer.Instance);
 
 		public String Name { get { return name; } }
-		private Dictionary<KeyValuePair<int, String>, Attachment> attachments = new Dictionary<KeyValuePair<int, String>, Attachment>();
 
 		public Skin (String name) {
 			if (name == null) throw new ArgumentNullException("name cannot be null.");
@@ -84,6 +85,19 @@ namespace Spine {
 					Attachment attachment = GetAttachment(slotIndex, entry.Key.Value);
 					if (attachment != null) slot.Attachment = attachment;
 				}
+			}
+		}
+
+		// Avoids boxing in the dictionary.
+		private class AttachmentComparer : IEqualityComparer<KeyValuePair<int, String>> {
+			internal static readonly AttachmentComparer Instance = new AttachmentComparer();
+
+			bool IEqualityComparer<KeyValuePair<int, string>>.Equals (KeyValuePair<int, string> o1, KeyValuePair<int, string> o2) {
+				return o1.Key == o2.Key && o1.Value == o2.Value;
+			}
+
+			int IEqualityComparer<KeyValuePair<int, string>>.GetHashCode (KeyValuePair<int, string> o) {
+				return o.Key;
 			}
 		}
 	}
