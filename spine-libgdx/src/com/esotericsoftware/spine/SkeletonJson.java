@@ -48,8 +48,6 @@ import com.esotericsoftware.spine.attachments.AttachmentLoader;
 import com.esotericsoftware.spine.attachments.AttachmentType;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
-import com.esotericsoftware.spine.attachments.RegionSequenceAttachment;
-import com.esotericsoftware.spine.attachments.RegionSequenceAttachment.Mode;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -170,40 +168,42 @@ public class SkeletonJson {
 	private Attachment readAttachment (Skin skin, String name, JsonValue map) {
 		name = map.getString("name", name);
 
-		AttachmentType type = AttachmentType.valueOf(map.getString("type", AttachmentType.region.name()));
-		Attachment attachment = attachmentLoader.newAttachment(skin, type, name);
+		switch (AttachmentType.valueOf(map.getString("type", AttachmentType.region.name()))) {
+		case region:
+			RegionAttachment region = attachmentLoader.newRegionAttachment(skin, name, map.getString("path", name));
+			region.setX(map.getFloat("x", 0) * scale);
+			region.setY(map.getFloat("y", 0) * scale);
+			region.setScaleX(map.getFloat("scaleX", 1));
+			region.setScaleY(map.getFloat("scaleY", 1));
+			region.setRotation(map.getFloat("rotation", 0));
+			region.setWidth(map.getFloat("width") * scale);
+			region.setHeight(map.getFloat("height") * scale);
 
-		if (attachment instanceof RegionSequenceAttachment) {
-			RegionSequenceAttachment regionSequenceAttachment = (RegionSequenceAttachment)attachment;
+			String color = map.getString("color", null);
+			if (color != null) region.getColor().set(Color.valueOf(color));
 
-			float fps = map.getFloat("fps");
-			regionSequenceAttachment.setFrameTime(fps);
-
-			String modeString = map.getString("mode");
-			regionSequenceAttachment.setMode(modeString == null ? Mode.forward : Mode.valueOf(modeString));
-
-		} else if (attachment instanceof RegionAttachment) {
-			RegionAttachment regionAttachment = (RegionAttachment)attachment;
-			regionAttachment.setX(map.getFloat("x", 0) * scale);
-			regionAttachment.setY(map.getFloat("y", 0) * scale);
-			regionAttachment.setScaleX(map.getFloat("scaleX", 1));
-			regionAttachment.setScaleY(map.getFloat("scaleY", 1));
-			regionAttachment.setRotation(map.getFloat("rotation", 0));
-			regionAttachment.setWidth(map.getFloat("width", 32) * scale);
-			regionAttachment.setHeight(map.getFloat("height", 32) * scale);
-			regionAttachment.updateOffset();
-
-		} else if (attachment instanceof BoundingBoxAttachment) {
-			BoundingBoxAttachment box = (BoundingBoxAttachment)attachment;
+			region.updateOffset();
+			return region;
+		case boundingbox:
+			BoundingBoxAttachment box = attachmentLoader.newBoundingBoxAttachment(skin, name);
 			JsonValue verticesArray = map.require("vertices");
 			float[] vertices = new float[verticesArray.size];
 			int i = 0;
 			for (JsonValue point = verticesArray.child; point != null; point = point.next())
 				vertices[i++] = point.asFloat() * scale;
 			box.setVertices(vertices);
+			return box;
 		}
 
-		return attachment;
+		// RegionSequenceAttachment regionSequenceAttachment = (RegionSequenceAttachment)attachment;
+		//
+		// float fps = map.getFloat("fps");
+		// regionSequenceAttachment.setFrameTime(fps);
+		//
+		// String modeString = map.getString("mode");
+		// regionSequenceAttachment.setMode(modeString == null ? Mode.forward : Mode.valueOf(modeString));
+
+		return null;
 	}
 
 	private void readAnimation (String name, JsonValue map, SkeletonData skeletonData) {

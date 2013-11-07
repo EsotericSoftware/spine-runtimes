@@ -48,8 +48,6 @@ import com.esotericsoftware.spine.attachments.AttachmentLoader;
 import com.esotericsoftware.spine.attachments.AttachmentType;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
-import com.esotericsoftware.spine.attachments.RegionSequenceAttachment;
-import com.esotericsoftware.spine.attachments.RegionSequenceAttachment.Mode;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -189,35 +187,33 @@ public class SkeletonBinary {
 		String name = input.readString();
 		if (name == null) name = attachmentName;
 
-		AttachmentType type = AttachmentType.values()[input.readByte()];
-		Attachment attachment = attachmentLoader.newAttachment(skin, type, name);
-
-		if (attachment instanceof RegionSequenceAttachment) {
-			RegionSequenceAttachment regionSequenceAttachment = (RegionSequenceAttachment)attachment;
-			regionSequenceAttachment.setFrameTime(1 / input.readFloat());
-			regionSequenceAttachment.setMode(Mode.values()[input.readInt(true)]);
-
-		} else if (attachment instanceof RegionAttachment) {
-			RegionAttachment regionAttachment = (RegionAttachment)attachment;
-			regionAttachment.setX(input.readFloat() * scale);
-			regionAttachment.setY(input.readFloat() * scale);
-			regionAttachment.setScaleX(input.readFloat());
-			regionAttachment.setScaleY(input.readFloat());
-			regionAttachment.setRotation(input.readFloat());
-			regionAttachment.setWidth(input.readFloat() * scale);
-			regionAttachment.setHeight(input.readFloat() * scale);
-			regionAttachment.updateOffset();
-
-		} else if (attachment instanceof BoundingBoxAttachment) {
-			BoundingBoxAttachment box = (BoundingBoxAttachment)attachment;
+		switch (AttachmentType.values()[input.readByte()]) {
+		case region:
+			String path = input.readString();
+			if (path.length() == 0) path = name;
+			RegionAttachment region = attachmentLoader.newRegionAttachment(skin, name, path);
+			if (region == null) return null;
+			region.setX(input.readFloat() * scale);
+			region.setY(input.readFloat() * scale);
+			region.setScaleX(input.readFloat());
+			region.setScaleY(input.readFloat());
+			region.setRotation(input.readFloat());
+			region.setWidth(input.readFloat() * scale);
+			region.setHeight(input.readFloat() * scale);
+			Color.rgba8888ToColor(region.getColor(), input.readInt());
+			region.updateOffset();
+			return region;
+		case boundingbox:
+			BoundingBoxAttachment box = attachmentLoader.newBoundingBoxAttachment(skin, name);
+			if (box == null) return null;
 			int n = input.readInt(true);
 			float[] points = new float[n];
 			for (int i = 0; i < n; i++)
 				points[i] = input.readFloat();
 			box.setVertices(points);
+			return box;
 		}
-
-		return attachment;
+		return null;
 	}
 
 	private void readAnimation (String name, DataInput input, SkeletonData skeletonData) {

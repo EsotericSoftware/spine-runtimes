@@ -34,8 +34,6 @@
 package com.esotericsoftware.spine;
 
 import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
-import com.esotericsoftware.spine.attachments.Attachment;
-import com.esotericsoftware.spine.attachments.AttachmentType;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -87,7 +85,7 @@ public class Box2DExample extends ApplicationAdapter {
 		// This loader creates Box2dAttachments instead of RegionAttachments for an easy way to keep
 		// track of the Box2D body for each attachment.
 		AtlasAttachmentLoader atlasLoader = new AtlasAttachmentLoader(atlas) {
-			public Attachment newAttachment (Skin skin, AttachmentType type, String name) {
+			public RegionAttachment newRegionAttachment (Skin skin, String name, String path) {
 				Box2dAttachment attachment = new Box2dAttachment(name);
 				AtlasRegion region = atlas.findRegion(attachment.getName());
 				if (region == null) throw new RuntimeException("Region not found in atlas: " + attachment);

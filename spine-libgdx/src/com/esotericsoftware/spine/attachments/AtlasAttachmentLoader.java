@@ -46,28 +46,16 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 		this.atlas = atlas;
 	}
 
-	public Attachment newAttachment (Skin skin, AttachmentType type, String name) {
-		Attachment attachment = null;
-		switch (type) {
-		case region:
-			attachment = new RegionAttachment(name);
-			break;
-		case regionsequence:
-			attachment = new RegionSequenceAttachment(name);
-			break;
-		case boundingbox:
-			return new BoundingBoxAttachment(name);
-		default:
-			throw new IllegalArgumentException("Unknown attachment type: " + type);
-		}
-
-		if (attachment instanceof RegionAttachment) {
-			AtlasRegion region = atlas.findRegion(attachment.getName());
-			if (region == null)
-				throw new RuntimeException("Region not found in atlas: " + attachment + " (" + type + " attachment: " + name + ")");
-			((RegionAttachment)attachment).setRegion(region);
-		}
-
+	public RegionAttachment newRegionAttachment (Skin skin, String name, String path) {
+		RegionAttachment attachment = new RegionAttachment(name);
+		AtlasRegion region = atlas.findRegion(path);
+		if (region == null)
+			throw new RuntimeException("Region not found in atlas: " + attachment + " (region attachment: " + name + ")");
+		attachment.setRegion(region);
 		return attachment;
+	}
+
+	public BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String name) {
+		return new BoundingBoxAttachment(name);
 	}
 }

@@ -60,6 +60,7 @@ public class RegionAttachment extends Attachment {
 	private float x, y, scaleX = 1, scaleY = 1, rotation, width, height;
 	private final float[] vertices = new float[20];
 	private final float[] offset = new float[8];
+	private final Color color = new Color(1, 1, 1, 1);
 
 	public RegionAttachment (String name) {
 		super(name);
@@ -151,21 +152,26 @@ public class RegionAttachment extends Attachment {
 		Skeleton skeleton = slot.getSkeleton();
 		Color skeletonColor = skeleton.getColor();
 		Color slotColor = slot.getColor();
+		Color regionColor = color;
+		float r = skeletonColor.r * slotColor.r * regionColor.r;
+		float g = skeletonColor.g * slotColor.g * regionColor.g;
+		float b = skeletonColor.b * slotColor.b * regionColor.b;
+		float a = skeletonColor.a * slotColor.a * regionColor.a * 255;
 		float color;
 		if (premultipliedAlpha) {
-			float a = 255 * skeletonColor.a * slotColor.a;
-			color = NumberUtils.intToFloatColor( //
-				((int)a << 24) //
-					| ((int)(a * skeletonColor.b * slotColor.b) << 16) //
-					| ((int)(a * skeletonColor.g * slotColor.g) << 8) //
-					| ((int)(a * skeletonColor.r * slotColor.r)));
+			r *= a;
+			g *= a;
+			b *= a;
 		} else {
-			color = NumberUtils.intToFloatColor( //
-				((int)(255 * skeletonColor.a * slotColor.a) << 24) //
-					| ((int)(255 * skeletonColor.b * slotColor.b) << 16) //
-					| ((int)(255 * skeletonColor.g * slotColor.g) << 8) //
-					| ((int)(255 * skeletonColor.r * slotColor.r)));
+			r *= 255;
+			g *= 255;
+			b *= 255;
 		}
+		color = NumberUtils.intToFloatColor( //
+			((int)(a) << 24) //
+				| ((int)(b) << 16) //
+				| ((int)(g) << 8) //
+				| ((int)(r)));
 
 		float[] vertices = this.vertices;
 		float[] offset = this.offset;
@@ -264,5 +270,9 @@ public class RegionAttachment extends Attachment {
 
 	public void setHeight (float height) {
 		this.height = height;
+	}
+
+	public Color getColor () {
+		return color;
 	}
 }

@@ -37,5 +37,8 @@ import com.esotericsoftware.spine.Skin;
 
 public interface AttachmentLoader {
 	/** @return May be null to not load any attachment. */
-	public Attachment newAttachment (Skin skin, AttachmentType type, String name);
+	public RegionAttachment newRegionAttachment (Skin skin, String name, String path);
+
+	/** @return May be null to not load any attachment. */
+	public BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String name);
 }
