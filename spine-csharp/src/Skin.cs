@@ -36,14 +36,15 @@ using System.Collections.Generic;
 
 namespace Spine {
 	/// <summary>Stores attachments by slot index and attachment name.</summary>
-	public class Skin {
+	public class Skin : IEqualityComparer<KeyValuePair<int, String>> {
 		internal String name;
 
 		public String Name { get { return name; } }
-		private Dictionary<KeyValuePair<int, String>, Attachment> attachments = new Dictionary<KeyValuePair<int, String>, Attachment>();
+		private Dictionary<KeyValuePair<int, String>, Attachment> attachments;
 
 		public Skin (String name) {
 			if (name == null) throw new ArgumentNullException("name cannot be null.");
+			this.attachments = new Dictionary<KeyValuePair<int, String>, Attachment>(this);
 			this.name = name;
 		}
 
@@ -85,6 +86,17 @@ namespace Spine {
 					if (attachment != null) slot.Attachment = attachment;
 				}
 			}
+		}
+
+		bool IEqualityComparer<KeyValuePair<int, string>>.Equals(KeyValuePair<int, string> x, KeyValuePair<int, string> y)
+		{
+			return (x.Key == y.Key) && (x.Value == y.Value);
+		}
+
+		int IEqualityComparer<KeyValuePair<int, string>>.GetHashCode(KeyValuePair<int, string> obj)
+		{
+			// KeyValuePair picks the hashcode for the first item in the struct, so we do it here and avoid boxing.
+			return obj.Key.GetHashCode();
 		}
 	}
 }
