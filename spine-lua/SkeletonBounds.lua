@@ -74,7 +74,7 @@ function SkeletonBounds.new ()
 
 		for i,slot in ipairs(skeleton.slots) do
 			local boundingBox = slot.attachment
-			if boundingBox.type == AttachmentType.boundingbox then
+			if boundingBox and boundingBox.type == AttachmentType.boundingbox then
 				table.insert(boundingBoxes, boundingBox)
 
 				local polygon = {}
