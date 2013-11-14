@@ -78,9 +78,9 @@ spAnimationState* spAnimationState_create (spAnimationStateData* data) {
 }
 
 void spAnimationState_dispose (spAnimationState* self) {
+	int i;
 	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
 	FREE(internal->events);
-	int i;
 	for (i = 0; i < self->trackCount; i++)
 		_spTrackEntry_disposeAll(self->tracks[i]);
 	FREE(self->tracks);
