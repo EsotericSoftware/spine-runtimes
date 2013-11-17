@@ -70,7 +70,7 @@ public class SkeletonDataLoader extends AsynchronousAssetLoader<SkeletonData, Sk
 	/** 
 	 * Mandatory parameter to be passed to {@link AssetManager#load(String, Class, AssetLoaderParameters)}.
 	 * This will insure the skeleton data is loaded correctly
-     * @author mzechner */
+     * @author Alvaro Barbeira */
     static public class SkeletonDataLoaderParameter extends AssetLoaderParameters<SkeletonData> {
     	// A SkeletonJson must be loaded from an atlas.
     	public String atlasName;
