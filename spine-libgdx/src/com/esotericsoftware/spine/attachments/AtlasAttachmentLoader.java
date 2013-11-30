@@ -48,6 +48,7 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 
 	public RegionAttachment newRegionAttachment (Skin skin, String name, String path) {
 		RegionAttachment attachment = new RegionAttachment(name);
+		attachment.setPath(path);
 		AtlasRegion region = atlas.findRegion(path);
 		if (region == null)
 			throw new RuntimeException("Region not found in atlas: " + attachment + " (region attachment: " + name + ")");

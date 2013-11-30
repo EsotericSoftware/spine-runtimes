@@ -57,6 +57,7 @@ public class RegionAttachment extends Attachment {
 	static public final int BRY = 7;
 
 	private TextureRegion region;
+	private String path;
 	private float x, y, scaleX = 1, scaleY = 1, rotation, width, height;
 	private final float[] vertices = new float[20];
 	private final float[] offset = new float[8];
@@ -274,5 +275,13 @@ public class RegionAttachment extends Attachment {
 
 	public Color getColor () {
 		return color;
+	}
+
+	public String getPath () {
+		return path;
+	}
+
+	public void setPath (String path) {
+		this.path = path;
 	}
 }
