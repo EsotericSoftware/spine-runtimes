@@ -45,7 +45,7 @@ public class SkeletonAnimation extends SkeletonSprite {
 	}
 
 	override public function advanceTime (time:Number) : void {
-		state.update(time);
+		state.update(time * timeScale);
 		state.apply(skeleton);
 		skeleton.updateWorldTransform();
 		super.advanceTime(time);
