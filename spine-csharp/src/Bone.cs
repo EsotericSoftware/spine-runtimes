@@ -85,7 +85,7 @@ namespace Spine {
 				worldRotation = data.inheritRotation ? parent.worldRotation + rotation : rotation;
 			} else {
 				worldX = flipX ? -x : x;
-				worldY = flipY ? -y : y;
+				worldY = (flipY != yDown) ? -y : y;
 				worldScaleX = scaleX;
 				worldScaleY = scaleY;
 				worldRotation = rotation;
