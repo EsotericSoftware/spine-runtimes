@@ -41,12 +41,12 @@ import com.badlogic.gdx.math.Matrix3;
 public class Bone {
 	final BoneData data;
 	final Bone parent;
-	public float x, y;
+	float x, y;
 	float rotation;
 	float scaleX, scaleY;
 
-	public float m00, m01, worldX; // a b x
-	public float m10, m11, worldY; // c d y
+	float m00, m01, worldX; // a b x
+	float m10, m11, worldY; // c d y
 	float worldRotation;
 	float worldScaleX, worldScaleY;
 
