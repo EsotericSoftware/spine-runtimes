@@ -75,7 +75,7 @@ int spSkeletonData_findBoneIndex (const spSkeletonData* self, const char* boneNa
 	int i;
 	for (i = 0; i < self->boneCount; ++i)
 		if (strcmp(self->bones[i]->name, boneName) == 0) return i;
-	return 0;
+	return -1;
 }
 
 spSlotData* spSkeletonData_findSlot (const spSkeletonData* self, const char* slotName) {
@@ -89,7 +89,7 @@ int spSkeletonData_findSlotIndex (const spSkeletonData* self, const char* slotNa
 	int i;
 	for (i = 0; i < self->slotCount; ++i)
 		if (strcmp(self->slots[i]->name, slotName) == 0) return i;
-	return 0;
+	return -1;
 }
 
 spSkin* spSkeletonData_findSkin (const spSkeletonData* self, const char* skinName) {
