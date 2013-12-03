@@ -123,8 +123,8 @@ void spSkeletonBounds_update (spSkeletonBounds* self, spSkeleton* skeleton, int/
 	}
 
 	self->minX = (float)INT_MAX;
-	self->minY = (float)INT_MIN;
-	self->maxX = (float)INT_MAX;
+	self->minY = (float)INT_MAX;
+	self->maxX = (float)INT_MIN;
 	self->maxY = (float)INT_MIN;
 
 	self->count = 0;
