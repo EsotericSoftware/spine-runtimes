@@ -39,6 +39,7 @@ function AnimationState.new (data)
 	local self = {
 		data = data,
 		tracks = {},
+		trackCount = 0,
 		events = {},
 		onStart = nil, onEnd = nil, onComplete = nil, onEvent = nil,
 		timeScale = 1
@@ -60,6 +61,7 @@ function AnimationState.new (data)
 		end
 
 		self.tracks[index] = entry
+		self.trackCount = math.max(self.trackCount, index)
 
 		if entry.onStart then entry.onStart(index) end
 		if self.onStart then self.onStart(index) end
@@ -67,7 +69,8 @@ function AnimationState.new (data)
 
 	function self:update (delta)
 		delta = delta * self.timeScale
-		for i,current in pairs(self.tracks) do
+		for i = 0, self.trackCount do
+			local current = self.tracks[i]
 			if current then
 				local trackDelta = delta * current.timeScale
 				current.time = current.time + trackDelta
@@ -88,7 +91,8 @@ function AnimationState.new (data)
 	end
 
 	function self:apply(skeleton)
-		for i,current in pairs(self.tracks) do
+		for i = 0, self.trackCount do
+			local current = self.tracks[i]
 			if current then
 				local time = current.time
 				local lastTime = current.lastTime
@@ -145,6 +149,7 @@ function AnimationState.new (data)
 			self.clearTrack(i)
 		end
 		self.tracks = {}
+		self.trackCount = 0
 	end
 
 	function self:clearTrack (trackIndex)
@@ -155,6 +160,9 @@ function AnimationState.new (data)
 		if self.onEnd then self.onEnd(trackIndex) end
 
 		self.tracks[trackIndex] = nil
+		if trackIndex == self.trackCount - 1 then
+			self.trackCount = self.trackCount - 1
+		end
 	end
 
 	function self:setAnimationByName (trackIndex, animationName, loop)
