@@ -1150,8 +1150,8 @@ spine.SkeletonJson.prototype = {
 			boneData.rotation = (boneMap["rotation"] || 0);
 			boneData.scaleX = boneMap["scaleX"] || 1;
 			boneData.scaleY = boneMap["scaleY"] || 1;
-			boneData.inheritScale = boneMap["inheritScale"] || true;
-			boneData.inheritRotation = boneMap["inheritRotation"] || true;
+			boneData.inheritScale = boneMap["inheritScale"] == "false" ? false : true;
+			boneData.inheritRotation = boneMap["inheritRotation"] == "false" ? false : true;
 			skeletonData.bones.push(boneData);
 		}
 
@@ -1172,7 +1172,7 @@ spine.SkeletonJson.prototype = {
 			}
 
 			slotData.attachmentName = slotMap["attachment"];
-			slotData.additiveBlending = slotMap["additive"];
+			slotData.additiveBlending = slotMap["additive"] == "false" ? false : true;
 
 			skeletonData.slots.push(slotData);
 		}
