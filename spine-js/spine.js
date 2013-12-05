@@ -85,7 +85,7 @@ spine.Bone.prototype = {
 			this.worldRotation = this.data.inheritRotation ? parent.worldRotation + this.rotation : this.rotation;
 		} else {
 			this.worldX = flipX ? -this.x : this.x;
-			this.worldY = (flipY != spine.Bone.yDown) ? -this.y : this.y;
+			this.worldY = (flipY && spine.Bone.yDown != flipY) ? -this.y : this.y;
 			this.worldScaleX = this.scaleX;
 			this.worldScaleY = this.scaleY;
 			this.worldRotation = this.rotation;
@@ -540,7 +540,7 @@ spine.EventTimeline.prototype = {
 		var frameCount = frames.length;
 
 		if (lastTime > time) { // Fire events after last time for looped animations.
-			apply(skeleton, lastTime, Number.MAX_VALUE, firedEvents, alpha);
+			this.apply(skeleton, lastTime, Number.MAX_VALUE, firedEvents, alpha);
 			lastTime = -1;
 		} else if (lastTime >= frames[frameCount - 1]) // Last time is after last frame.
 			return;
@@ -1150,8 +1150,8 @@ spine.SkeletonJson.prototype = {
 			boneData.rotation = (boneMap["rotation"] || 0);
 			boneData.scaleX = boneMap["scaleX"] || 1;
 			boneData.scaleY = boneMap["scaleY"] || 1;
-			boneData.inheritScale = boneMap["inheritScale"] == "false" ? false : true;
-			boneData.inheritRotation = boneMap["inheritRotation"] == "false" ? false : true;
+			boneData.inheritScale = !boneMap["inheritScale"] || boneMap["inheritScale"] == "true";
+			boneData.inheritRotation = !boneMap["inheritRotation"] || boneMap["inheritRotation"] == "true";
 			skeletonData.bones.push(boneData);
 		}
 
@@ -1172,7 +1172,7 @@ spine.SkeletonJson.prototype = {
 			}
 
 			slotData.attachmentName = slotMap["attachment"];
-			slotData.additiveBlending = slotMap["additive"] == "false" ? false : true;
+			slotData.additiveBlending = slotMap["additive"] && slotMap["additive"] == "true";
 
 			skeletonData.slots.push(slotData);
 		}
