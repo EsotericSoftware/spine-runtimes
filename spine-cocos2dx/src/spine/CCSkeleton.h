@@ -93,7 +93,7 @@ public:
 protected:
 	CCSkeleton ();
 	void setSkeletonData (spSkeletonData* skeletonData, bool ownsSkeletonData);
-	cocos2d::CCTextureAtlas* getTextureAtlas (spRegionAttachment* regionAttachment) const;
+	virtual cocos2d::CCTextureAtlas* getTextureAtlas (spRegionAttachment* regionAttachment) const;
 
 private:
 	bool ownsSkeletonData;
