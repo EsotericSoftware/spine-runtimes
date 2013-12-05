@@ -56,5 +56,4 @@ void _spAttachment_deinit (spAttachment* self) {
 
 void spAttachment_dispose (spAttachment* self) {
 	VTABLE(spAttachment, self) ->dispose(self);
-	FREE(self);
 }
