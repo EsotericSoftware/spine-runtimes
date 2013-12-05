@@ -49,7 +49,7 @@ bool ExampleLayer::init () {
 
 void ExampleLayer::update (float deltaTime) {
 	// Test releasing memory.
-	// if (entry->time > 0.1) CCDirector::sharedDirector()->replaceScene(ExampleLayer::scene());
+	// CCDirector::sharedDirector()->replaceScene(ExampleLayer::scene());
 }
 
 void ExampleLayer::animationStateEvent (CCSkeletonAnimation* node, int trackIndex, spEventType type, spEvent* event, int loopCount) {
