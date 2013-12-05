@@ -76,7 +76,7 @@ void spBone_updateWorldTransform (spBone* self, int flipX, int flipY) {
 				self->data->inheritRotation ? self->parent->worldRotation + self->rotation : self->rotation;
 	} else {
 		CONST_CAST(float, self->worldX) = flipX ? -self->x : self->x;
-		CONST_CAST(float, self->worldY) = (flipY != yDown) ? -self->y : self->y;
+		CONST_CAST(float, self->worldY) = (flipY && flipY != yDown) ? -self->y : self->y;
 		CONST_CAST(float, self->worldScaleX) = self->scaleX;
 		CONST_CAST(float, self->worldScaleY) = self->scaleY;
 		CONST_CAST(float, self->worldRotation) = self->rotation;
