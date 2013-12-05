@@ -37,7 +37,7 @@ var atlas;
 function loadAtlas (atlasText) {
 	var textureCount = 0;
 	atlas = new spine.Atlas(atlasText, {
-		load: function (page, path) {
+		load: function (page, path, atlas) {
 			textureCount++;
 			graphicsDevice.createTexture({
 				src: "../data/" + path,
