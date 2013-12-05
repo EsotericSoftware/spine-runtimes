@@ -552,7 +552,7 @@ void _spEventTimeline_dispose (spTimeline* timeline) {
 	_spTimeline_deinit(timeline);
 
 	for (i = 0; i < self->framesLength; ++i)
-		FREE(self->events[i]);
+		spEvent_dispose(self->events[i]);
 	FREE(self->events);
 	FREE(self->frames);
 	FREE(self);

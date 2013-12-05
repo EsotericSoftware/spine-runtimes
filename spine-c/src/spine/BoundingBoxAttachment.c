@@ -34,9 +34,18 @@
 #include <spine/BoundingBoxAttachment.h>
 #include <spine/extension.h>
 
+void _spBoundingBoxAttachment_dispose (spAttachment* attachment) {
+	spBoundingBoxAttachment* self = SUB_CAST(spBoundingBoxAttachment, attachment);
+
+	_spAttachment_deinit(attachment);
+
+	FREE(self->vertices);
+	FREE(self);
+}
+
 spBoundingBoxAttachment* spBoundingBoxAttachment_create (const char* name) {
 	spBoundingBoxAttachment* self = NEW(spBoundingBoxAttachment);
-	_spAttachment_init(SUPER(self), name, ATTACHMENT_BOUNDING_BOX, _spAttachment_deinit);
+	_spAttachment_init(SUPER(self), name, ATTACHMENT_BOUNDING_BOX, _spBoundingBoxAttachment_dispose);
 	return self;
 }
 

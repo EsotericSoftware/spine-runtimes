@@ -34,11 +34,19 @@
 #include <spine/RegionAttachment.h>
 #include <spine/extension.h>
 
+void _spRegionAttachment_dispose (spAttachment* attachment) {
+	spRegionAttachment* self = SUB_CAST(spRegionAttachment, attachment);
+
+	_spAttachment_deinit(attachment);
+
+	FREE(self);
+}
+
 spRegionAttachment* spRegionAttachment_create (const char* name) {
 	spRegionAttachment* self = NEW(spRegionAttachment);
 	self->scaleX = 1;
 	self->scaleY = 1;
-	_spAttachment_init(SUPER(self), name, ATTACHMENT_REGION, _spAttachment_deinit);
+	_spAttachment_init(SUPER(self), name, ATTACHMENT_REGION, _spRegionAttachment_dispose);
 	return self;
 }
 
