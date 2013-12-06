@@ -190,7 +190,7 @@ public class SkeletonBinary {
 		switch (AttachmentType.values()[input.readByte()]) {
 		case region:
 			String path = input.readString();
-			if (path.length() == 0) path = name;
+			if (path == null) path = name;
 			RegionAttachment region = attachmentLoader.newRegionAttachment(skin, name, path);
 			if (region == null) return null;
 			region.setX(input.readFloat() * scale);
