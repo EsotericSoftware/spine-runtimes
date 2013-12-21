@@ -56,6 +56,16 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 		return attachment;
 	}
 
+	public MeshAttachment newMeshAttachment (Skin skin, String name, String path) {
+		MeshAttachment attachment = new MeshAttachment(name);
+		attachment.setPath(path);
+		AtlasRegion region = atlas.findRegion(path);
+		if (region == null)
+			throw new RuntimeException("Region not found in atlas: " + attachment + " (region attachment: " + name + ")");
+		attachment.setRegion(region);
+		return attachment;
+	}
+
 	public BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String name) {
 		return new BoundingBoxAttachment(name);
 	}

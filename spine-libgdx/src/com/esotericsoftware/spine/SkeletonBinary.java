@@ -47,6 +47,7 @@ import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.AttachmentLoader;
 import com.esotericsoftware.spine.attachments.AttachmentType;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
+import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 
 import com.badlogic.gdx.files.FileHandle;
@@ -188,7 +189,7 @@ public class SkeletonBinary {
 		if (name == null) name = attachmentName;
 
 		switch (AttachmentType.values()[input.readByte()]) {
-		case region:
+		case region: {
 			String path = input.readString();
 			if (path == null) path = name;
 			RegionAttachment region = attachmentLoader.newRegionAttachment(skin, name, path);
@@ -203,17 +204,56 @@ public class SkeletonBinary {
 			Color.rgba8888ToColor(region.getColor(), input.readInt());
 			region.updateOffset();
 			return region;
-		case boundingbox:
+		}
+		case boundingbox: {
 			BoundingBoxAttachment box = attachmentLoader.newBoundingBoxAttachment(skin, name);
 			if (box == null) return null;
-			int n = input.readInt(true);
-			float[] points = new float[n];
-			for (int i = 0; i < n; i++)
-				points[i] = input.readFloat();
-			box.setVertices(points);
+			box.setVertices(readFloatArray(input, scale));
 			return box;
 		}
+		case mesh: {
+			String path = input.readString();
+			if (path == null) path = name;
+			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, path);
+			float[] vertices = readFloatArray(input, scale);
+			short[] triangles = readShortArray(input);
+			float[] uvs = readFloatArray(input, 1);
+			Color.rgba8888ToColor(mesh.getColor(), input.readInt());
+			mesh.setEdges(readIntArray(input));
+			if (mesh.getEdges().length > 0) {
+				mesh.setHullLength(input.readInt(true));
+				mesh.setWidth(input.readFloat() * scale);
+				mesh.setHeight(input.readFloat() * scale);
+			}
+			mesh.setMesh(vertices, triangles, uvs);
+			return mesh;
+		}
+		}
 		return null;
+	}
+
+	private float[] readFloatArray (DataInput input, float scale) throws IOException {
+		int n = input.readInt(true);
+		float[] array = new float[n];
+		for (int i = 0; i < n; i++)
+			array[i] = input.readFloat() * scale;
+		return array;
+	}
+
+	private short[] readShortArray (DataInput input) throws IOException {
+		int n = input.readInt(true);
+		short[] array = new short[n];
+		for (int i = 0; i < n; i++)
+			array[i] = input.readShort();
+		return array;
+	}
+
+	private int[] readIntArray (DataInput input) throws IOException {
+		int n = input.readInt(true);
+		int[] array = new int[n];
+		for (int i = 0; i < n; i++)
+			array[i] = input.readInt(true);
+		return array;
 	}
 
 	private void readAnimation (String name, DataInput input, SkeletonData skeletonData) {

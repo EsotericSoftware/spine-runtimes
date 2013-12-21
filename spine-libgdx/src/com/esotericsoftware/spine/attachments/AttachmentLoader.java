@@ -40,5 +40,8 @@ public interface AttachmentLoader {
 	public RegionAttachment newRegionAttachment (Skin skin, String name, String path);
 
 	/** @return May be null to not load any attachment. */
+	public MeshAttachment newMeshAttachment (Skin skin, String name, String path);
+
+	/** @return May be null to not load any attachment. */
 	public BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String name);
 }

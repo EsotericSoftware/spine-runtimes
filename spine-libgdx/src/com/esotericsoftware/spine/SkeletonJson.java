@@ -47,6 +47,7 @@ import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.AttachmentLoader;
 import com.esotericsoftware.spine.attachments.AttachmentType;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
+import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 
 import com.badlogic.gdx.files.FileHandle;
@@ -184,15 +185,23 @@ public class SkeletonJson {
 
 			region.updateOffset();
 			return region;
-		case boundingbox:
+		case boundingbox: {
 			BoundingBoxAttachment box = attachmentLoader.newBoundingBoxAttachment(skin, name);
-			JsonValue verticesArray = map.require("vertices");
-			float[] vertices = new float[verticesArray.size];
-			int i = 0;
-			for (JsonValue point = verticesArray.child; point != null; point = point.next())
-				vertices[i++] = point.asFloat() * scale;
-			box.setVertices(vertices);
+			box.setVertices(readFloatArray(map.require("vertices"), scale));
 			return box;
+		}
+		case mesh: {
+			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, map.getString("path", name));
+			float[] vertices = readFloatArray(map.require("vertices"), scale);
+			short[] triangles = readShortArray(map.require("triangles"));
+			float[] uvs = readFloatArray(map.require("uvs"), 1);
+			mesh.setMesh(vertices, triangles, uvs);
+			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt());
+			if (map.has("edges")) mesh.setEdges(readIntArray(map.require("edges")));
+			mesh.setWidth(map.getFloat("width", 0) * scale);
+			mesh.setHeight(map.getFloat("height", 0) * scale);
+			return mesh;
+		}
 		}
 
 		// RegionSequenceAttachment regionSequenceAttachment = (RegionSequenceAttachment)attachment;
@@ -204,6 +213,30 @@ public class SkeletonJson {
 		// regionSequenceAttachment.setMode(modeString == null ? Mode.forward : Mode.valueOf(modeString));
 
 		return null;
+	}
+
+	private float[] readFloatArray (JsonValue jsonArray, float scale) {
+		float[] array = new float[jsonArray.size];
+		int i = 0;
+		for (JsonValue point = jsonArray.child; point != null; point = point.next())
+			array[i++] = point.asFloat() * scale;
+		return array;
+	}
+
+	private short[] readShortArray (JsonValue jsonArray) {
+		short[] array = new short[jsonArray.size];
+		int i = 0;
+		for (JsonValue point = jsonArray.child; point != null; point = point.next())
+			array[i++] = (short)point.asInt();
+		return array;
+	}
+
+	private int[] readIntArray (JsonValue jsonArray) {
+		int[] array = new int[jsonArray.size];
+		int i = 0;
+		for (JsonValue point = jsonArray.child; point != null; point = point.next())
+			array[i++] = point.asInt();
+		return array;
 	}
 
 	private void readAnimation (String name, JsonValue map, SkeletonData skeletonData) {

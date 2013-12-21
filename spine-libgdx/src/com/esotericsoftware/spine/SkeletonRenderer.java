@@ -34,6 +34,7 @@
 package com.esotericsoftware.spine;
 
 import com.esotericsoftware.spine.attachments.Attachment;
+import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.SkeletonAttachment;
 
@@ -78,6 +79,15 @@ public class SkeletonRenderer {
 				}
 
 				batch.draw(texture, vertices, 0, vertices.length, triangles, 0, triangles.length);
+
+			} else if (attachment instanceof MeshAttachment) {
+				MeshAttachment mesh = (MeshAttachment)attachment;
+				mesh.updateWorldVertices(slot, true);
+				vertices = mesh.getWorldVertices();
+				triangles = mesh.getTriangles();
+				texture = mesh.getRegion().getTexture();
+				batch.draw(texture, vertices, 0, vertices.length, triangles, 0, triangles.length);
+
 			} else if (attachment instanceof SkeletonAttachment) {
 				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
 				if (attachmentSkeleton == null) continue;
