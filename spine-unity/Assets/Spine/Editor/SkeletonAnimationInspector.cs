@@ -54,7 +54,6 @@ public class SkeletonAnimationInspector : Editor {
 		serializedObject.Update();
 		SkeletonAnimation component = (SkeletonAnimation)target;
 
-		EditorGUIUtility.LookLikeInspector();
 		EditorGUILayout.PropertyField(skeletonDataAsset);
 		
 		if (component.skeleton != null) {
@@ -72,7 +71,6 @@ public class SkeletonAnimationInspector : Editor {
 			EditorGUILayout.LabelField("Initial Skin");
 			EditorGUIUtility.LookLikeControls();
 			skinIndex = EditorGUILayout.Popup(skinIndex, skins);
-			EditorGUIUtility.LookLikeInspector();
 			EditorGUILayout.EndHorizontal();
 		
 			initialSkinName.stringValue = skins[skinIndex];
@@ -92,7 +90,6 @@ public class SkeletonAnimationInspector : Editor {
 			EditorGUILayout.LabelField("Animation");
 			EditorGUIUtility.LookLikeControls();
 			animationIndex = EditorGUILayout.Popup(animationIndex, animations);
-			EditorGUIUtility.LookLikeInspector();
 			EditorGUILayout.EndHorizontal();
 
 			if (animationIndex == 0)

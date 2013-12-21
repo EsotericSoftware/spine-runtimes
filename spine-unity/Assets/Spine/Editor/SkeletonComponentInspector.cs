@@ -51,7 +51,6 @@ public class SkeletonComponentInspector : Editor {
 		serializedObject.Update();
 		SkeletonComponent component = (SkeletonComponent)target;
 
-		EditorGUIUtility.LookLikeInspector();
 		EditorGUILayout.PropertyField(skeletonDataAsset);
 		
 		if (component.skeleton != null) {
@@ -69,7 +68,6 @@ public class SkeletonComponentInspector : Editor {
 			EditorGUILayout.LabelField("Initial Skin");
 			EditorGUIUtility.LookLikeControls();
 			skinIndex = EditorGUILayout.Popup(skinIndex, skins);
-			EditorGUIUtility.LookLikeInspector();
 			EditorGUILayout.EndHorizontal();
 		
 			initialSkinName.stringValue = skins[skinIndex];

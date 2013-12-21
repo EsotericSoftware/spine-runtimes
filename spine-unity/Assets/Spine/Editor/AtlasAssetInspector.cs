@@ -48,7 +48,6 @@ public class AtlasAssetInspector : Editor {
 		serializedObject.Update();
 		AtlasAsset asset = (AtlasAsset)target;
 
-		EditorGUIUtility.LookLikeInspector();
 		EditorGUILayout.PropertyField(atlasFile);
 		EditorGUILayout.PropertyField(materials, true);
 		

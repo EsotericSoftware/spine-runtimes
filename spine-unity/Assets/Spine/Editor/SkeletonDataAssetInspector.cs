@@ -54,7 +54,6 @@ public class SkeletonDataAssetInspector : Editor {
 		serializedObject.Update();
 		SkeletonDataAsset asset = (SkeletonDataAsset)target;
 
-		EditorGUIUtility.LookLikeInspector();
 		EditorGUILayout.PropertyField(atlasAsset);
 		EditorGUILayout.PropertyField(skeletonJSON);
 		EditorGUILayout.PropertyField(scale);
