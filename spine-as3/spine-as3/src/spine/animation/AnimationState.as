@@ -40,7 +40,10 @@ public class AnimationState {
 	private var _data:AnimationStateData;
 	private var _tracks:Vector.<TrackEntry> = new Vector.<TrackEntry>();
 	private var _events:Vector.<Event> = new Vector.<Event>();
-	public var onStart:Function, onEnd:Function, onComplete:Function, onEvent:Function;
+	public var onStart:Vector.<Function> = new Vector.<Function>();
+	public var onEnd:Vector.<Function> = new Vector.<Function>();
+	public var onComplete:Vector.<Function> = new Vector.<Function>();
+	public var onEvent:Vector.<Function> = new Vector.<Function>();
 	public var timeScale:Number = 1;
 
 	public function AnimationState (data:AnimationStateData) {
@@ -102,14 +105,16 @@ public class AnimationState {
 			
 			for each (var event:Event in _events) {
 				if (current.onEvent != null) current.onEvent(i, event);
-				if (onEvent != null) onEvent(i, event);
+				for each (var onEventFunc:Function in onEvent)
+					onEventFunc(i, event);
 			}
 
 			// Check if completed the animation or a loop iteration.
 			if (loop ? (lastTime % endTime > time % endTime) : (lastTime < endTime && time >= endTime)) {
 				var count:int = (int)(time / endTime);
 				if (current.onComplete != null) current.onComplete(i, count);
-				if (onComplete != null) onComplete(i, count);
+				for each (var onCompleteFunc:Function in onComplete)
+					onCompleteFunc(i, count);
 			}
 
 			current.lastTime = current.time;
@@ -128,7 +133,8 @@ public class AnimationState {
 		if (!current) return;
 		
 		if (current.onEnd != null) current.onEnd(trackIndex);
-		if (onEnd != null) onEnd(trackIndex);
+		for each (var onEndFunc:Function in onEnd)
+			onEndFunc(trackIndex);
 
 		_tracks[trackIndex] = null;
 	}
@@ -144,10 +150,11 @@ public class AnimationState {
 		var current:TrackEntry = expandToIndex(index);
 		if (current) {
 			current.previous = null;
-			
+
 			if (current.onEnd != null) current.onEnd(index);
-			if (onEnd != null) onEnd(index);
-			
+			for each (var onEndFunc:Function in onEnd)
+				onEndFunc(index);
+
 			entry.mixDuration = _data.getMix(current.animation, entry.animation);
 			if (entry.mixDuration > 0) {
 				entry.mixTime = 0;
@@ -156,9 +163,10 @@ public class AnimationState {
 		}
 		
 		_tracks[index] = entry;
-		
+
 		if (entry.onStart != null) entry.onStart(index);
-		if (onStart != null) onStart(index);
+		for each (var onStartFunc:Function in onStart)
+			onStartFunc(index);
 	}
 	
 	public function setAnimationByName (trackIndex:int, animationName:String, loop:Boolean) : TrackEntry {
