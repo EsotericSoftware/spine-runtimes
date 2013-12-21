@@ -71,16 +71,16 @@ public class Main extends Sprite {
 		skeleton.x = 320;
 		skeleton.y = 420;
 		
-		skeleton.state.onStart.push(function (trackIndex:int) : void {
+		skeleton.state.onStart.add(function (trackIndex:int) : void {
 			trace(trackIndex + " start: " + skeleton.state.getCurrent(trackIndex));
 		});
-		skeleton.state.onEnd.push(function (trackIndex:int) : void {
+		skeleton.state.onEnd.add(function (trackIndex:int) : void {
 			trace(trackIndex + " end: " + skeleton.state.getCurrent(trackIndex));
 		});
-		skeleton.state.onComplete.push(function (trackIndex:int, count:int) : void {
+		skeleton.state.onComplete.add(function (trackIndex:int, count:int) : void {
 			trace(trackIndex + " complete: " + skeleton.state.getCurrent(trackIndex) + ", " + count);
 		});
-		skeleton.state.onEvent.push(function (trackIndex:int, event:Event) : void {
+		skeleton.state.onEvent.add(function (trackIndex:int, event:Event) : void {
 			trace(trackIndex + " event: " + skeleton.state.getCurrent(trackIndex) + ", "
 				+ event.data.name + ": " + event.intValue + ", " + event.floatValue + ", " + event.stringValue);
 		});
