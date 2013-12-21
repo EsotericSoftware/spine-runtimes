@@ -39,6 +39,7 @@ spine-xna/example/bin
 spine-xna/example/obj
 
 spine-unity/Assets/Spine/spine-csharp
+spine-unity/Assets/Spine/spine-csharp.meta
 !spine-unity/Assets/Spine/spine-csharp/Place spine-csharp here.txt
 spine-unity/ProjectSettings
 spine-unity/Temp
