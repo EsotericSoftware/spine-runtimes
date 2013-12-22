@@ -34,8 +34,8 @@
 package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
-import com.badlogic.gdx.utils.Pools;
 
 /** Stores state for an animation and automatically mixes between animations. */
 public class AnimationState {
@@ -44,6 +44,12 @@ public class AnimationState {
 	private final Array<Event> events = new Array();
 	private final Array<AnimationStateListener> listeners = new Array();
 	private float timeScale = 1;
+
+	private Pool<TrackEntry> trackEntryPool = new Pool() {
+		protected Object newObject () {
+			return new TrackEntry();
+		}
+	};
 
 	public AnimationState (AnimationStateData data) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -100,7 +106,7 @@ public class AnimationState {
 				float alpha = current.mixTime / current.mixDuration;
 				if (alpha >= 1) {
 					alpha = 1;
-					Pools.free(previous);
+					trackEntryPool.free(previous);
 					current.previous = null;
 				}
 				current.animation.mix(skeleton, lastTime, time, loop, events, alpha);
@@ -142,13 +148,13 @@ public class AnimationState {
 
 		tracks.set(trackIndex, null);
 		freeAll(current);
-		if (current.previous != null) Pools.free(current.previous);
+		if (current.previous != null) trackEntryPool.free(current.previous);
 	}
 
 	private void freeAll (TrackEntry entry) {
 		while (entry != null) {
 			TrackEntry next = entry.next;
-			Pools.free(entry);
+			trackEntryPool.free(entry);
 			entry = next;
 		}
 	}
@@ -164,7 +170,7 @@ public class AnimationState {
 		TrackEntry current = expandToIndex(index);
 		if (current != null) {
 			if (current.previous != null) {
-				Pools.free(current.previous);
+				trackEntryPool.free(current.previous);
 				current.previous = null;
 			}
 
@@ -177,7 +183,7 @@ public class AnimationState {
 				entry.mixTime = 0;
 				entry.previous = current;
 			} else
-				Pools.free(current);
+				trackEntryPool.free(current);
 		}
 
 		tracks.set(index, entry);
@@ -199,7 +205,7 @@ public class AnimationState {
 		TrackEntry current = expandToIndex(trackIndex);
 		if (current != null) freeAll(current.next);
 
-		TrackEntry entry = Pools.obtain(TrackEntry.class);
+		TrackEntry entry = trackEntryPool.obtain();
 		entry.animation = animation;
 		entry.loop = loop;
 		entry.endTime = animation.getDuration();
@@ -217,7 +223,7 @@ public class AnimationState {
 	/** Adds an animation to be played delay seconds after the current or last queued animation.
 	 * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay. */
 	public TrackEntry addAnimation (int trackIndex, Animation animation, boolean loop, float delay) {
-		TrackEntry entry = Pools.obtain(TrackEntry.class);
+		TrackEntry entry = trackEntryPool.obtain();
 		entry.animation = animation;
 		entry.loop = loop;
 		entry.endTime = animation.getDuration();
