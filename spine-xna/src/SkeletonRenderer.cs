@@ -40,10 +40,12 @@ namespace Spine {
 	public class SkeletonRenderer {
 		GraphicsDevice device;
 		SpriteBatcher batcher;
-		BasicEffect effect;
 		RasterizerState rasterizerState;
 		float[] vertices = new float[8];
 		BlendState defaultBlendState;
+
+		BasicEffect effect;
+		public BasicEffect Effect { get { return effect; } set { effect = value; } }
 
 		private bool premultipliedAlpha;
 		public bool PremultipliedAlpha { get { return premultipliedAlpha; } set { premultipliedAlpha = value; } }
