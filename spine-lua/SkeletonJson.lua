@@ -322,15 +322,12 @@ function SkeletonJson.new (attachmentLoader)
 			local frameIndex = 0
 			for i,drawOrderMap in ipairs(drawOrderValues) do
 				local drawOrder = nil
-				if drawOrderMap["offsets"] then
+				local offsets = drawOrderMap["offsets"]
+				if offsets then
 					drawOrder = {}
-					for ii = 1, slotCount do
-						drawOrder[ii] = -1
-					end
-					local offsets = drawOrderMap["offsets"]
 					local unchanged = {}
-					local originalIndex = 0
-					local unchangedIndex = 0
+					local originalIndex = 1
+					local unchangedIndex = 1
 					for ii,offsetMap in ipairs(offsets) do
 						local slotIndex = skeletonData:findSlotIndex(offsetMap["slot"])
 						if slotIndex == -1 then error("Slot not found: " + offsetMap["slot"]) end
@@ -345,16 +342,16 @@ function SkeletonJson.new (attachmentLoader)
 						originalIndex = originalIndex + 1
 					end
 					-- Collect remaining unchanged items.
-					while originalIndex < slotCount do
+					while originalIndex <= slotCount do
 						unchanged[unchangedIndex] = originalIndex
 						unchangedIndex = unchangedIndex + 1
 						originalIndex = originalIndex + 1
 					end
 					-- Fill in unchanged items.
 					for ii = slotCount, 1, -1 do
-						if drawOrder[ii] == -1 then
-							drawOrder[ii] = unchanged[unchangedIndex]
+						if not drawOrder[ii] then
 							unchangedIndex = unchangedIndex - 1
+							drawOrder[ii] = unchanged[unchangedIndex]
 						end
 					end
 				end
