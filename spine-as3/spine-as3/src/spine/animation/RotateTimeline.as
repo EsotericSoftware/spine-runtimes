@@ -37,7 +37,7 @@ import spine.Event;
 import spine.Skeleton;
 
 public class RotateTimeline extends CurveTimeline {
-	static private const LAST_FRAME_TIME:int = -2;
+	static private const PREV_FRAME_TIME:int = -2;
 	static private const FRAME_VALUE:int = 1;
 
 	public var boneIndex:int;
@@ -52,7 +52,7 @@ public class RotateTimeline extends CurveTimeline {
 	public function setFrame (frameIndex:int, time:Number, angle:Number) : void {
 		frameIndex *= 2;
 		frames[frameIndex] = time;
-		frames[frameIndex + 1] = angle;
+		frames[int(frameIndex + 1)] = angle;
 	}
 
 	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
@@ -62,8 +62,8 @@ public class RotateTimeline extends CurveTimeline {
 		var bone:Bone = skeleton.bones[boneIndex];
 
 		var amount:Number;
-		if (time >= frames[frames.length - 2]) { // Time is after last frame.
-			amount = bone.data.rotation + frames[frames.length - 1] - bone.rotation;
+		if (time >= frames[int(frames.length - 2)]) { // Time is after last frame.
+			amount = bone.data.rotation + frames[int(frames.length - 1)] - bone.rotation;
 			while (amount > 180)
 				amount -= 360;
 			while (amount < -180)
@@ -72,19 +72,19 @@ public class RotateTimeline extends CurveTimeline {
 			return;
 		}
 
-		// Interpolate between the last frame and the current frame.
+		// Interpolate between the previous frame and the current frame.
 		var frameIndex:int = Animation.binarySearch(frames, time, 2);
-		var lastFrameValue:Number = frames[frameIndex - 1];
+		var prevFrameValue:Number = frames[int(frameIndex - 1)];
 		var frameTime:Number = frames[frameIndex];
-		var percent:Number = 1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime);
+		var percent:Number = 1 - (time - frameTime) / (frames[int(frameIndex + PREV_FRAME_TIME)] - frameTime);
 		percent = getCurvePercent(frameIndex / 2 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-		amount = frames[frameIndex + FRAME_VALUE] - lastFrameValue;
+		amount = frames[int(frameIndex + FRAME_VALUE)] - prevFrameValue;
 		while (amount > 180)
 			amount -= 360;
 		while (amount < -180)
 			amount += 360;
-		amount = bone.data.rotation + (lastFrameValue + amount * percent) - bone.rotation;
+		amount = bone.data.rotation + (prevFrameValue + amount * percent) - bone.rotation;
 		while (amount > 180)
 			amount -= 360;
 		while (amount < -180)

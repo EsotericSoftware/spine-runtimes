@@ -62,7 +62,7 @@ public class EventTimeline implements Timeline {
 		if (lastTime > time) { // Fire events after last time for looped animations.
 			apply(skeleton, lastTime, int.MAX_VALUE, firedEvents, alpha);
 			lastTime = -1;
-		} else if (lastTime >= frames[frameCount - 1]) // Last time is after last frame.
+		} else if (lastTime >= frames[int(frameCount - 1)]) // Last time is after last frame.
 			return;
 		if (time < frames[0]) return; // Time is before first frame.
 		
@@ -73,12 +73,12 @@ public class EventTimeline implements Timeline {
 			frameIndex = Animation.binarySearch(frames, lastTime, 1);
 			var frame:Number = frames[frameIndex];
 			while (frameIndex > 0) { // Fire multiple events with the same frame.
-				if (frames[frameIndex - 1] != frame) break;
+				if (frames[int(frameIndex - 1)] != frame) break;
 				frameIndex--;
 			}
 		}
 		for (; frameIndex < frameCount && time >= frames[frameIndex]; frameIndex++)
-			firedEvents.push(events[frameIndex]);
+			firedEvents[firedEvents.length] = events[frameIndex];
 	}
 }
 

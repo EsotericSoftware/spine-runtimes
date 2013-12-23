@@ -55,11 +55,11 @@ public class CurveTimeline implements Timeline {
 	}
 
 	public function setLinear (frameIndex:int) : void {
-		curves[frameIndex * 6] = LINEAR;
+		curves[int(frameIndex * 6)] = LINEAR;
 	}
 
 	public function setStepped (frameIndex:int) : void {
-		curves[frameIndex * 6] = STEPPED;
+		curves[int(frameIndex * 6)] = STEPPED;
 	}
 
 	/** Sets the control handle positions for an interpolation bezier curve used to transition from this keyframe to the next.
@@ -79,11 +79,11 @@ public class CurveTimeline implements Timeline {
 		var tmp2y:Number = (cy1 - cy2) * 3 + 1;
 		var i:int = frameIndex * 6;
 		curves[i] = cx1 * pre1 + tmp1x * pre2 + tmp2x * subdiv_step3;
-		curves[i + 1] = cy1 * pre1 + tmp1y * pre2 + tmp2y * subdiv_step3;
-		curves[i + 2] = tmp1x * pre4 + tmp2x * pre5;
-		curves[i + 3] = tmp1y * pre4 + tmp2y * pre5;
-		curves[i + 4] = tmp2x * pre5;
-		curves[i + 5] = tmp2y * pre5;
+		curves[int(i + 1)] = cy1 * pre1 + tmp1y * pre2 + tmp2y * subdiv_step3;
+		curves[int(i + 2)] = tmp1x * pre4 + tmp2x * pre5;
+		curves[int(i + 3)] = tmp1y * pre4 + tmp2y * pre5;
+		curves[int(i + 4)] = tmp2x * pre5;
+		curves[int(i + 5)] = tmp2y * pre5;
 	}
 
 	public function getCurvePercent (frameIndex:int, percent:Number) : Number {
@@ -93,19 +93,19 @@ public class CurveTimeline implements Timeline {
 			return percent;
 		if (dfx == STEPPED)
 			return 0;
-		var dfy:Number = curves[curveIndex + 1];
-		var ddfx:Number = curves[curveIndex + 2];
-		var ddfy:Number = curves[curveIndex + 3];
-		var dddfx:Number = curves[curveIndex + 4];
-		var dddfy:Number = curves[curveIndex + 5];
+		var dfy:Number = curves[int(curveIndex + 1)];
+		var ddfx:Number = curves[int(curveIndex + 2)];
+		var ddfy:Number = curves[int(curveIndex + 3)];
+		var dddfx:Number = curves[int(curveIndex + 4)];
+		var dddfy:Number = curves[int(curveIndex + 5)];
 		var x:Number = dfx;
 		var y:Number = dfy;
 		var i:int = BEZIER_SEGMENTS - 2;
 		while (true) {
 			if (x >= percent) {
-				var lastX:Number = x - dfx;
-				var lastY:Number = y - dfy;
-				return lastY + (y - lastY) * (percent - lastX) / (x - lastX);
+				var prevX:Number = x - dfx;
+				var prevY:Number = y - dfy;
+				return prevY + (y - prevY) * (percent - prevX) / (x - prevX);
 			}
 			if (i == 0)
 				break;

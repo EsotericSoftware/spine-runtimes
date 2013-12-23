@@ -58,7 +58,7 @@ public class Skeleton {
 		_bones = new Vector.<Bone>();
 		for each (var boneData:BoneData in data.bones) {
 			var parent:Bone = boneData.parent == null ? null : _bones[data.bones.indexOf(boneData.parent)];
-			_bones.push(new Bone(boneData, parent));
+			_bones[_bones.length] = new Bone(boneData, parent);
 		}
 
 		_slots = new Vector.<Slot>();
@@ -66,8 +66,8 @@ public class Skeleton {
 		for each (var slotData:SlotData in data.slots) {
 			var bone:Bone  = _bones[data.bones.indexOf(slotData.boneData)];
 			var slot:Slot  = new Slot(slotData, this, bone);
-			_slots.push(slot);
-			_drawOrder.push(slot);
+			_slots[_slots.length] = slot;
+			_drawOrder[_drawOrder.length] = slot;
 		}
 	}
 

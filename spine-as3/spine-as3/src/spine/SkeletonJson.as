@@ -184,8 +184,9 @@ public class SkeletonJson {
 			regionAttachment.updateOffset();
 		} else if (attachment is BoundingBoxAttachment) {
 			var box:BoundingBoxAttachment = attachment as BoundingBoxAttachment;
+			var vertices:Vector.<Number> = box.vertices;
 			for each (var point:Number in map["vertices"])
-				box.vertices.push(point * scale);
+				vertices[vertices.length] = point * scale;
 		}
 
 		return attachment;
@@ -214,7 +215,7 @@ public class SkeletonJson {
 						readCurve(timeline, frameIndex, valueMap);
 						frameIndex++;
 					}
-					timelines.push(timeline);
+					timelines[timelines.length] = timeline;
 					duration = Math.max(duration, timeline.frames[timeline.frameCount * 2 - 2]);
 
 				} else if (timelineName == TIMELINE_TRANSLATE || timelineName == TIMELINE_SCALE) {
@@ -236,7 +237,7 @@ public class SkeletonJson {
 						readCurve(timeline1, frameIndex1, valueMap1);
 						frameIndex1++;
 					}
-					timelines.push(timeline1);
+					timelines[timelines.length] = timeline1;
 					duration = Math.max(duration, timeline1.frames[timeline1.frameCount * 3 - 3]);
 
 				} else
@@ -266,7 +267,7 @@ public class SkeletonJson {
 						readCurve(timeline2, frameIndex2, valueMap2);
 						frameIndex2++;
 					}
-					timelines.push(timeline2);
+					timelines[timelines.length] = timeline2;
 					duration = Math.max(duration, timeline2.frames[timeline2.frameCount * 5 - 5]);
 
 				} else if (timelineName2 == TIMELINE_ATTACHMENT) {
@@ -277,7 +278,7 @@ public class SkeletonJson {
 					for each (var valueMap3:Object in values2) {
 						timeline3.setFrame(frameIndex3++, valueMap3["time"], valueMap3["name"]);
 					}
-					timelines.push(timeline3);
+					timelines[timelines.length] = timeline3;
 					duration = Math.max(duration, timeline3.frames[timeline3.frameCount - 1]);
 
 				} else
@@ -298,7 +299,7 @@ public class SkeletonJson {
 				event.stringValue = eventMap.hasOwnProperty("string") ? eventMap["string"] : eventData.stringValue;
 				timeline4.setFrame(frameIndex4++, eventMap["time"], event);
 			}
-			timelines.push(timeline4);
+			timelines[timelines.length] = timeline4;
 			duration = Math.max(duration, timeline4.frames[timeline4.frameCount - 1]);
 		}
 
@@ -334,7 +335,7 @@ public class SkeletonJson {
 				}
 				timeline5.setFrame(frameIndex5++, drawOrderMap["time"], drawOrder);
 			}
-			timelines.push(timeline5);
+			timelines[timelines.length] = timeline5;
 			duration = Math.max(duration, timeline5.frames[timeline5.frameCount - 1]);
 		}
 

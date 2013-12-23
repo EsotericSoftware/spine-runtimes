@@ -139,7 +139,7 @@ public class AnimationState {
 	private function expandToIndex (index:int) : TrackEntry {
 		if (index < _tracks.length) return _tracks[index];
 		while (index >= _tracks.length)
-			_tracks.push(null);
+			_tracks[_tracks.length] = null;
 		return null;
 	}
 	

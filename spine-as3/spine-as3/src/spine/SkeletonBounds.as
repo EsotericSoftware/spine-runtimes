@@ -49,14 +49,14 @@ public class SkeletonBounds {
 		
 		boundingBoxes.length = 0;
 		for each (var polygon:Polygon in polygons)
-			polygonPool.push(polygon);
+			polygonPool[polygonPool.length] = polygon;
 		polygons.length = 0;
 
 		for (var i:int = 0; i < slotCount; i++) {
 			var slot:Slot = slots[i];
 			var boundingBox:BoundingBoxAttachment = slot.attachment as BoundingBoxAttachment;
 			if (boundingBox == null) continue;
-			boundingBoxes.push(boundingBox);
+			boundingBoxes[boundingBoxes.length] = boundingBox;
 
 			var poolCount:int = polygonPool.length;
 			if (poolCount > 0) {
@@ -64,7 +64,7 @@ public class SkeletonBounds {
 				polygonPool.splice(poolCount - 1, 1);
 			} else
 				polygon = new Polygon();
-			polygons.push(polygon);
+			polygons[polygons.length] = polygon;
 
 			polygon.vertices.length = boundingBox.vertices.length;
 			boundingBox.computeWorldVertices(x, y, slot.bone, polygon.vertices);

@@ -46,22 +46,22 @@ public class ScaleTimeline extends TranslateTimeline {
 			return; // Time is before first frame.
 
 		var bone:Bone = skeleton.bones[boneIndex];
-		if (time >= frames[frames.length - 3]) { // Time is after last frame.
-			bone.scaleX += (bone.data.scaleX - 1 + frames[frames.length - 2] - bone.scaleX) * alpha;
-			bone.scaleY += (bone.data.scaleY - 1 + frames[frames.length - 1] - bone.scaleY) * alpha;
+		if (time >= frames[int(frames.length - 3)]) { // Time is after last frame.
+			bone.scaleX += (bone.data.scaleX - 1 + frames[int(frames.length - 2)] - bone.scaleX) * alpha;
+			bone.scaleY += (bone.data.scaleY - 1 + frames[int(frames.length - 1)] - bone.scaleY) * alpha;
 			return;
 		}
 
-		// Interpolate between the last frame and the current frame.
+		// Interpolate between the previous frame and the current frame.
 		var frameIndex:int = Animation.binarySearch(frames, time, 3);
-		var lastFrameX:Number = frames[frameIndex - 2];
-		var lastFrameY:Number = frames[frameIndex - 1];
+		var prevFrameX:Number = frames[int(frameIndex - 2)];
+		var prevFrameY:Number = frames[int(frameIndex - 1)];
 		var frameTime:Number = frames[frameIndex];
-		var percent:Number = 1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime);
+		var percent:Number = 1 - (time - frameTime) / (frames[int(frameIndex + PREV_FRAME_TIME)] - frameTime);
 		percent = getCurvePercent(frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-		bone.scaleX += (bone.data.scaleX - 1 + lastFrameX + (frames[frameIndex + FRAME_X] - lastFrameX) * percent - bone.scaleX) * alpha;
-		bone.scaleY += (bone.data.scaleY - 1 + lastFrameY + (frames[frameIndex + FRAME_Y] - lastFrameY) * percent - bone.scaleY) * alpha;
+		bone.scaleX += (bone.data.scaleX - 1 + prevFrameX + (frames[int(frameIndex + FRAME_X)] - prevFrameX) * percent - bone.scaleX) * alpha;
+		bone.scaleY += (bone.data.scaleY - 1 + prevFrameY + (frames[int(frameIndex + FRAME_Y)] - prevFrameY) * percent - bone.scaleY) * alpha;
 	}
 }
 

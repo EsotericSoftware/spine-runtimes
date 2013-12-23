@@ -60,7 +60,7 @@ public class AttachmentTimeline implements Timeline {
 			return; // Time is before first frame.
 
 		var frameIndex:int;
-		if (time >= frames[frames.length - 1]) // Time is after last frame.
+		if (time >= frames[int(frames.length - 1)]) // Time is after last frame.
 			frameIndex = frames.length - 1;
 		else
 			frameIndex = Animation.binarySearch(frames, time, 1) - 1;

@@ -83,7 +83,7 @@ public class Bone {
 			_worldScaleY = scaleY;
 			_worldRotation = rotation;
 		}
-		var radians:Number = _worldRotation * Math.PI / 180;
+		var radians:Number = _worldRotation * (Math.PI / 180);
 		var cos:Number = Math.cos(radians);
 		var sin:Number = Math.sin(radians);
 		_m00 = cos * _worldScaleX;

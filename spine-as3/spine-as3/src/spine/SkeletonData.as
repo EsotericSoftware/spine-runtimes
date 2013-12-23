@@ -48,7 +48,7 @@ public class SkeletonData {
 	public function addBone (bone:BoneData) : void {
 		if (bone == null)
 			throw new ArgumentError("bone cannot be null.");
-		bones.push(bone);
+		bones[bones.length] = bone;
 	}
 
 	/** @return May be null. */
@@ -78,7 +78,7 @@ public class SkeletonData {
 	public function addSlot (slot:SlotData) : void {
 		if (slot == null)
 			throw new ArgumentError("slot cannot be null.");
-		slots.push(slot);
+		slots[slots.length] = slot;
 	}
 
 	/** @return May be null. */
@@ -108,7 +108,7 @@ public class SkeletonData {
 	public function addSkin (skin:Skin) : void {
 		if (skin == null)
 			throw new ArgumentError("skin cannot be null.");
-		skins.push(skin);
+		skins[skins.length] = skin;
 	}
 
 	/** @return May be null. */
@@ -126,7 +126,7 @@ public class SkeletonData {
 	public function addEvent (eventData:EventData) : void {
 		if (eventData == null)
 			throw new ArgumentError("eventData cannot be null.");
-		events.push(eventData);
+		events[events.length] = eventData;
 	}
 	
 	/** @return May be null. */
@@ -146,7 +146,7 @@ public class SkeletonData {
 	public function addAnimation (animation:Animation) : void {
 		if (animation == null)
 			throw new ArgumentError("animation cannot be null.");
-		animations.push(animation);
+		animations[animations.length] = animation;
 	}
 	
 	/** @return May be null. */

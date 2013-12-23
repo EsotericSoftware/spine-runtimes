@@ -126,14 +126,22 @@ public dynamic class RegionAttachment extends Attachment {
 		var m01:Number = bone.m01;
 		var m10:Number = bone.m10;
 		var m11:Number = bone.m11;
-		vertices[X1] = offset[X1] * m00 + offset[Y1] * m01 + x;
-		vertices[Y1] = offset[X1] * m10 + offset[Y1] * m11 + y;
-		vertices[X2] = offset[X2] * m00 + offset[Y2] * m01 + x;
-		vertices[Y2] = offset[X2] * m10 + offset[Y2] * m11 + y;
-		vertices[X3] = offset[X3] * m00 + offset[Y3] * m01 + x;
-		vertices[Y3] = offset[X3] * m10 + offset[Y3] * m11 + y;
-		vertices[X4] = offset[X4] * m00 + offset[Y4] * m01 + x;
-		vertices[Y4] = offset[X4] * m10 + offset[Y4] * m11 + y;
+		var x1:Number = offset[X1];
+		var y1:Number = offset[Y1];
+		var x2:Number = offset[X2];
+		var y2:Number = offset[Y2];
+		var x3:Number = offset[X3];
+		var y3:Number = offset[Y3];
+		var x4:Number = offset[X4];
+		var y4:Number = offset[Y4];
+		vertices[X1] = x1 * m00 + y1 * m01 + x;
+		vertices[Y1] = x1 * m10 + y1 * m11 + y;
+		vertices[X2] = x2 * m00 + y2 * m01 + x;
+		vertices[Y2] = x2 * m10 + y2 * m11 + y;
+		vertices[X3] = x3 * m00 + y3 * m01 + x;
+		vertices[Y3] = x3 * m10 + y3 * m11 + y;
+		vertices[X4] = x4 * m00 + y4 * m01 + x;
+		vertices[Y4] = x4 * m10 + y4 * m11 + y;
 	}
 }
 

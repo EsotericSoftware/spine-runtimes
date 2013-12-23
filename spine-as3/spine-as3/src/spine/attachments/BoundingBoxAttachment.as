@@ -50,10 +50,11 @@ public dynamic class BoundingBoxAttachment extends Attachment {
 		var m11:Number = bone.m11;
 		var vertices:Vector.<Number> = this.vertices;
 		for (var i:int = 0, n:int = vertices.length; i < n; i += 2) {
+			var ii:int = i + 1;
 			var px:Number = vertices[i];
-			var py:Number = vertices[i + 1];
+			var py:Number = vertices[ii];
 			worldVertices[i] = px * m00 + py * m01 + x;
-			worldVertices[i + 1] = px * m10 + py * m11 + y;
+			worldVertices[ii] = px * m10 + py * m11 + y;
 		}
 	}
 }

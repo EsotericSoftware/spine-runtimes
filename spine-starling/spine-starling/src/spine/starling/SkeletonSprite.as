@@ -91,7 +91,10 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 
 				var image:SkeletonImage;
 				image = regionAttachment.rendererObject as SkeletonImage;
-				if (image == null) image = SkeletonImage(AtlasRegion(regionAttachment.rendererObject).rendererObject);
+				if (image == null) {
+					image = SkeletonImage(AtlasRegion(regionAttachment.rendererObject).rendererObject);
+					regionAttachment.rendererObject = image;
+				}
 
 				var vertexData:VertexData = image.vertexData;
 

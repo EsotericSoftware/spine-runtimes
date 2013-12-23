@@ -42,7 +42,7 @@ package spine.animation {
 		public function add (listener:Function) : void {
 			if (listener == null)
 				throw new ArgumentError("listener cannot be null.");
-			_listeners.push(listener);
+			_listeners[_listeners.length] = listener;
 		}
 
 		public function remove (listener:Function) : void {

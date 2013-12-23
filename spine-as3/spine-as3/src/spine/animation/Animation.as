@@ -99,7 +99,7 @@ public class Animation {
 			return step;
 		var current:int = high >>> 1;
 		while (true) {
-			if (values[(current + 1) * step] <= target)
+			if (values[int((current + 1) * step)] <= target)
 				low = current + 1;
 			else
 				high = current;
