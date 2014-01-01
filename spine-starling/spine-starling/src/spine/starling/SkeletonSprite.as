@@ -55,17 +55,15 @@ import starling.utils.VertexData;
 public class SkeletonSprite extends DisplayObject implements IAnimatable {
 	static private var tempPoint:Point = new Point();
 	static private var tempMatrix:Matrix = new Matrix();
+	static private var tempVertices:Vector.<Number> = new Vector.<Number>(8);
 
 	private var _skeleton:Skeleton;
-	private var vertices:Vector.<Number> = new Vector.<Number>();
 
 	public function SkeletonSprite (skeletonData:SkeletonData) {
 		Bone.yDown = true;
 
 		_skeleton = new Skeleton(skeletonData);
 		_skeleton.updateWorldTransform();
-		
-		vertices.length = 8;
 	}
 
 	public function advanceTime (delta:Number) : void {
@@ -84,7 +82,7 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 			var slot:Slot = drawOrder[i];
 			var regionAttachment:RegionAttachment = slot.attachment as RegionAttachment;
 			if (regionAttachment != null) {
-				var vertices:Vector.<Number> = this.vertices;
+				var vertices:Vector.<Number> = tempVertices;
 				regionAttachment.computeWorldVertices(x, y, slot.bone, vertices);
 				var a:Number = slot.a;
 				var rgb:uint = Color.rgb(r * slot.r, g * slot.g, b * slot.b);
@@ -131,7 +129,7 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 			if (!regionAttachment)
 				continue;
 
-			var vertices:Vector.<Number> = this.vertices;
+			var vertices:Vector.<Number> = tempVertices;
 			regionAttachment.computeWorldVertices(skeleton.x, skeleton.y, slot.bone, vertices);
 
 			value = vertices[0];
