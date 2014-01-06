@@ -48,6 +48,7 @@ function AnimationState.new (data)
 	local function setCurrent (index, entry)
 		local current = self.tracks[index]
 		if current then
+			local previous = current.previous
 			current.previous = nil
 
 			if current.onEnd then current.onEnd(index) end
@@ -56,7 +57,12 @@ function AnimationState.new (data)
 			entry.mixDuration = self.data:getMix(current.animation.name, entry.animation.name)
 			if entry.mixDuration > 0 then
 				entry.mixTime = 0
-				entry.previous = current
+				-- If a mix is in progress, mix from the closest animation.
+				if previous and current.mixTime / current.mixDuration < 0.5 then
+					entry.previous = previous
+				else
+					entry.previous = current
+				end
 			end
 		end
 

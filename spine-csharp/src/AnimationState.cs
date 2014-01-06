@@ -154,6 +154,7 @@ namespace Spine {
 		private void SetCurrent (int index, TrackEntry entry) {
 			TrackEntry current = ExpandToIndex(index);
 			if (current != null) {
+				TrackEntry previous = current.previous;
 				current.previous = null;
 
 				current.OnEnd(this, index);
@@ -162,7 +163,11 @@ namespace Spine {
 				entry.mixDuration = data.GetMix(current.animation, entry.animation);
 				if (entry.mixDuration > 0) {
 					entry.mixTime = 0;
-					entry.previous = current;
+					// If a mix is in progress, mix from the closest animation.
+					if (previous != null && current.mixTime / current.mixDuration < 0.5f)
+						entry.previous = previous;
+					else
+						entry.previous = current;
 				}
 			}
 

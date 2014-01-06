@@ -153,7 +153,7 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 		}
 
 		/* Check if completed the animation or a loop iteration. */
-		if (current->loop ? (FMOD(current->lastTime, current->endTime) > FMOD(time, current->endTime)) //
+		if (current->loop ? (FMOD(current->lastTime, current->endTime) > FMOD(time, current->endTime))
 				: (current->lastTime < current->endTime && time >= current->endTime)) {
 			int count = (int)(time / current->endTime);
 			if (current->listener) current->listener(self, i, ANIMATION_COMPLETE, 0, count);
@@ -201,10 +201,8 @@ spTrackEntry* _spAnimationState_expandToIndex (spAnimationState* self, int index
 void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEntry* entry) {
 	spTrackEntry* current = _spAnimationState_expandToIndex(self, index);
 	if (current) {
-		if (current->previous) {
-			_spTrackEntry_dispose(current->previous);
-			current->previous = 0;
-		}
+		spTrackEntry* previous = current->previous;
+		current->previous = 0;
 
 		if (current->listener) current->listener(self, index, ANIMATION_END, 0, 0);
 		if (self->listener) self->listener(self, index, ANIMATION_END, 0, 0);
@@ -212,9 +210,16 @@ void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEnt
 		entry->mixDuration = spAnimationStateData_getMix(self->data, current->animation, entry->animation);
 		if (entry->mixDuration > 0) {
 			entry->mixTime = 0;
-			entry->previous = current;
+			/* If a mix is in progress, mix from the closest animation. */
+			if (previous && current->mixTime / current->mixDuration < 0.5f) {
+				entry->previous = previous;
+				previous = current;
+			} else
+				entry->previous = current;
 		} else
 			_spTrackEntry_dispose(current);
+
+		if (previous) _spTrackEntry_dispose(previous);
 	}
 
 	self->tracks[index] = entry;

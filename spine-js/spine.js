@@ -1057,6 +1057,7 @@ spine.AnimationState.prototype = {
 	setCurrent: function (index, entry) {
 		var current = this._expandToIndex(index);
 		if (current) {
+			var previous = current.previous;
 			current.previous = null;
 
 			if (current.onEnd != null) current.onEnd(index);
@@ -1065,7 +1066,11 @@ spine.AnimationState.prototype = {
 			entry.mixDuration = this.data.getMix(current.animation, entry.animation);
 			if (entry.mixDuration > 0) {
 				entry.mixTime = 0;
-				entry.previous = current;
+				// If a mix is in progress, mix from the closest animation.
+				if (previous && current.mixTime / current.mixDuration < 0.5)
+					entry.previous = previous;
+				else
+					entry.previous = current;
 			}
 		}
 

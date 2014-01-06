@@ -169,10 +169,8 @@ public class AnimationState {
 	private void setCurrent (int index, TrackEntry entry) {
 		TrackEntry current = expandToIndex(index);
 		if (current != null) {
-			if (current.previous != null) {
-				trackEntryPool.free(current.previous);
-				current.previous = null;
-			}
+			TrackEntry previous = current.previous;
+			current.previous = null;
 
 			if (current.listener != null) current.listener.end(index);
 			for (int i = 0, n = listeners.size; i < n; i++)
@@ -181,9 +179,16 @@ public class AnimationState {
 			entry.mixDuration = data.getMix(current.animation, entry.animation);
 			if (entry.mixDuration > 0) {
 				entry.mixTime = 0;
-				entry.previous = current;
+				// If a mix is in progress, mix from the closest animation.
+				if (previous != null && current.mixTime / current.mixDuration < 0.5f) {
+					entry.previous = previous;
+					previous = current;
+				} else
+					entry.previous = current;
 			} else
 				trackEntryPool.free(current);
+
+			if (previous != null) trackEntryPool.free(previous);
 		}
 
 		tracks.set(index, entry);

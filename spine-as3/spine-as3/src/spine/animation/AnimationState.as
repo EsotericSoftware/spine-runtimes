@@ -146,6 +146,7 @@ public class AnimationState {
 	private function setCurrent (index:int, entry:TrackEntry) : void {
 		var current:TrackEntry = expandToIndex(index);
 		if (current) {
+			var previous:TrackEntry = current.previous;
 			current.previous = null;
 
 			if (current.onEnd != null) current.onEnd(index);
@@ -154,7 +155,12 @@ public class AnimationState {
 			entry.mixDuration = _data.getMix(current.animation, entry.animation);
 			if (entry.mixDuration > 0) {
 				entry.mixTime = 0;
-				entry.previous = current;
+				// If a mix is in progress, mix from the closest animation.
+				if (previous != null && current.mixTime / current.mixDuration < 0.5) {
+					entry.previous = previous;
+					previous = current;
+				} else
+					entry.previous = current;
 			}
 		}
 		
