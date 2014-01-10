@@ -74,10 +74,12 @@ public class BoneComponentInspector : Editor
 			
 			if (boneIndex == 0)
 			{
+				component.boneName = "";
 				BoneName.stringValue = "";
 			}
 			else
 			{
+				component.boneName = bones[boneIndex];
 				BoneName.stringValue = bones[boneIndex];
 			}
 			}
