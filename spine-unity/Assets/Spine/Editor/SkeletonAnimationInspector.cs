@@ -37,7 +37,7 @@ using UnityEngine;
 
 [CustomEditor(typeof(SkeletonAnimation))]
 public class SkeletonAnimationInspector : Editor {
-	private SerializedProperty skeletonDataAsset, initialSkinName, timeScale, normals, tangents;
+	private SerializedProperty skeletonDataAsset, initialSkinName, timeScale, normals, tangents,meshZSpacing;
 	private SerializedProperty animationName, loop;
 
 	void OnEnable () {
@@ -48,6 +48,7 @@ public class SkeletonAnimationInspector : Editor {
 		timeScale = serializedObject.FindProperty("timeScale");
 		normals = serializedObject.FindProperty("calculateNormals");
 		tangents = serializedObject.FindProperty("calculateTangents");
+		meshZSpacing = serializedObject.FindProperty("MeshZSpacing");
 	}
 
 	override public void OnInspectorGUI () {
@@ -107,6 +108,8 @@ public class SkeletonAnimationInspector : Editor {
 		EditorGUILayout.PropertyField(timeScale);
 		EditorGUILayout.PropertyField(normals);
 		EditorGUILayout.PropertyField(tangents);
+		EditorGUILayout.PropertyField(meshZSpacing,new GUIContent("Mesh Z Spacing"));
+
 		
 		if (serializedObject.ApplyModifiedProperties() ||
 			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")

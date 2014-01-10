@@ -57,6 +57,7 @@ public class SkeletonComponent : MonoBehaviour {
 	private Material[] sharedMaterials = new Material[0];
 	private List<Material> submeshMaterials = new List<Material>();
 	private List<Submesh> submeshes = new List<Submesh>();
+	public float MeshZSpacing = 0.01f;
 	
 	/// <summary>False if Initialize needs to be called.</summary>
 	public bool Initialized {
@@ -67,7 +68,7 @@ public class SkeletonComponent : MonoBehaviour {
 			return skeleton != null && skeleton.Data == skeletonData;
 		}
 	}
-
+	
 	public virtual void Clear () {
 		meshFilter.sharedMesh = null;
 		DestroyImmediate(mesh);
@@ -77,18 +78,18 @@ public class SkeletonComponent : MonoBehaviour {
 		renderer.sharedMaterial = null;
 		skeleton = null;
 	}
-
+	
 	public virtual void Initialize () {
 		if (Initialized) return;
-
+		
 		meshFilter = GetComponent<MeshFilter>();
 		mesh1 = newMesh();
 		mesh2 = newMesh();
-
+		
 		vertices = new Vector3[0];
-
+		
 		skeleton = new Skeleton(skeletonDataAsset.GetSkeletonData(false));
-
+		
 		if (initialSkinName != null && initialSkinName.Length > 0 && initialSkinName != "default") {
 			skeleton.SetSkin(initialSkinName);
 			skeleton.SetSlotsToSetupPose();
@@ -102,7 +103,7 @@ public class SkeletonComponent : MonoBehaviour {
 		mesh.MarkDynamic();
 		return mesh;
 	}
-
+	
 	public virtual void UpdateSkeleton (float deltaTime) {
 		skeleton.Update(deltaTime * timeScale);
 		skeleton.UpdateWorldTransform();
@@ -113,9 +114,9 @@ public class SkeletonComponent : MonoBehaviour {
 			Clear();
 			return;
 		}
-
+		
 		SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(false);
-
+		
 		if (skeletonData == null) {
 			Clear();
 			return;
@@ -124,9 +125,9 @@ public class SkeletonComponent : MonoBehaviour {
 		// Initialize fields.
 		if (skeleton == null || skeleton.Data != skeletonData)
 			Initialize();
-
+		
 		UpdateSkeleton(Time.deltaTime);
-
+		
 		// Count quads and submeshes.
 		int quadCount = 0, submeshQuadCount = 0;
 		Material lastMaterial = null;
@@ -136,7 +137,7 @@ public class SkeletonComponent : MonoBehaviour {
 			RegionAttachment regionAttachment = drawOrder[i].Attachment as RegionAttachment;
 			if (regionAttachment == null)
 				continue;
-		
+			
 			// Add submesh when material changes.
 			Material material = (Material)((AtlasRegion)regionAttachment.RendererObject).page.rendererObject;
 			if (lastMaterial != material && lastMaterial != null) {
@@ -144,7 +145,7 @@ public class SkeletonComponent : MonoBehaviour {
 				submeshQuadCount = 0;
 			} 
 			lastMaterial = material;
-
+			
 			quadCount++;
 			submeshQuadCount++;
 		}
@@ -160,7 +161,7 @@ public class SkeletonComponent : MonoBehaviour {
 		// Double buffer mesh.
 		Mesh mesh = useMesh1 ? mesh1 : mesh2;
 		meshFilter.sharedMesh = mesh;
-
+		
 		// Ensure mesh data is the right size.
 		Vector3[] vertices = this.vertices;
 		int vertexCount = quadCount * 4;
@@ -179,7 +180,7 @@ public class SkeletonComponent : MonoBehaviour {
 				vertices[i] = zero;
 		}
 		lastVertexCount = vertexCount;
-
+		
 		// Setup mesh.
 		float[] vertexPositions = this.vertexPositions;
 		Vector2[] uvs = this.uvs;
@@ -195,7 +196,7 @@ public class SkeletonComponent : MonoBehaviour {
 			
 			regionAttachment.ComputeWorldVertices(skeleton.X, skeleton.Y, slot.Bone, vertexPositions);
 			
-			float z = -i * 0.1f;
+			float z = -i * MeshZSpacing;
 			vertices[vertexIndex] = new Vector3(vertexPositions[RegionAttachment.X1], vertexPositions[RegionAttachment.Y1], z);
 			vertices[vertexIndex + 1] = new Vector3(vertexPositions[RegionAttachment.X4], vertexPositions[RegionAttachment.Y4], z);
 			vertices[vertexIndex + 2] = new Vector3(vertexPositions[RegionAttachment.X2], vertexPositions[RegionAttachment.Y2], z);
@@ -209,13 +210,13 @@ public class SkeletonComponent : MonoBehaviour {
 			colors[vertexIndex + 1] = color;
 			colors[vertexIndex + 2] = color;
 			colors[vertexIndex + 3] = color;
-
+			
 			float[] regionUVs = regionAttachment.UVs;
 			uvs[vertexIndex] = new Vector2(regionUVs[RegionAttachment.X1], 1 - regionUVs[RegionAttachment.Y1]);
 			uvs[vertexIndex + 1] = new Vector2(regionUVs[RegionAttachment.X4], 1 - regionUVs[RegionAttachment.Y4]);
 			uvs[vertexIndex + 2] = new Vector2(regionUVs[RegionAttachment.X2], 1 - regionUVs[RegionAttachment.Y2]);
 			uvs[vertexIndex + 3] = new Vector2(regionUVs[RegionAttachment.X3], 1 - regionUVs[RegionAttachment.Y3]);
-
+			
 			vertexIndex += 4;
 		}
 		
@@ -227,7 +228,7 @@ public class SkeletonComponent : MonoBehaviour {
 		mesh.subMeshCount = submeshCount;
 		for (int i = 0; i < submeshCount; ++i)
 			mesh.SetTriangles(submeshes[i].indexes, i);
-
+		
 		if (newTriangles && calculateNormals) {
 			Vector3[] normals = new Vector3[vertexCount];
 			Vector3 normal = new Vector3(0, 0, -1);
@@ -236,7 +237,7 @@ public class SkeletonComponent : MonoBehaviour {
 			(useMesh1 ? mesh2 : mesh1).vertices = vertices;
 			mesh1.normals = normals;
 			mesh2.normals = normals;
-
+			
 			if (calculateTangents) {
 				Vector4[] tangents = new Vector4[vertexCount];
 				Vector3 tangent = new Vector3(0, 0, 1);
@@ -254,7 +255,7 @@ public class SkeletonComponent : MonoBehaviour {
 	private void addSubmesh (Material material, int endQuadCount, int submeshQuadCount, bool lastSubmesh) {
 		int submeshIndex = submeshMaterials.Count;
 		submeshMaterials.Add(material);
-
+		
 		int indexCount = submeshQuadCount * 6;
 		int vertexIndex = (endQuadCount - submeshQuadCount) * 4;
 		
@@ -281,7 +282,7 @@ public class SkeletonComponent : MonoBehaviour {
 				indexes[i + 5] = vertexIndex + 1;
 			}
 		}
-
+		
 		// Last submesh may have more indices than required, so zero indexes to the end.
 		if (lastSubmesh && submesh.indexCount != indexCount) {
 			submesh.indexCount = indexCount;
@@ -293,12 +294,12 @@ public class SkeletonComponent : MonoBehaviour {
 	public virtual void OnEnable () {
 		Update();
 	}
-
+	
 	public virtual void Reset () {
 		Update();
 	}
 	
-#if UNITY_EDITOR
+	#if UNITY_EDITOR
 	void OnDrawGizmos() {
 		// Make selection easier by drawing a clear gizmo over the skeleton.
 		if (vertices == null) return;
@@ -318,7 +319,7 @@ public class SkeletonComponent : MonoBehaviour {
 		Gizmos.matrix = transform.localToWorldMatrix;
 		Gizmos.DrawCube(gizmosCenter, gizmosSize);
 	}
-#endif
+	#endif
 }
 
 class Submesh {
