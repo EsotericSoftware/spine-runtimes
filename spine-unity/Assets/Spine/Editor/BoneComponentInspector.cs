@@ -35,58 +35,53 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(SkeletonComponent))]
-public class SkeletonComponentInspector : Editor {
-	private SerializedProperty skeletonDataAsset, initialSkinName, timeScale, normals, tangents,meshZSpacing;
+[CustomEditor(typeof(BoneComponent))]
+public class BoneComponentInspector : Editor
+{
+	private SerializedProperty BoneName,ParentSkeleton;
+	int boneIndex = 0;
 
 	void OnEnable () {
-		skeletonDataAsset = serializedObject.FindProperty("skeletonDataAsset");
-		initialSkinName = serializedObject.FindProperty("initialSkinName");
-		timeScale = serializedObject.FindProperty("timeScale");
-		normals = serializedObject.FindProperty("calculateNormals");
-		tangents = serializedObject.FindProperty("calculateTangents");
-		meshZSpacing = serializedObject.FindProperty("MeshZSpacing");
+		ParentSkeleton = serializedObject.FindProperty("parentSkeleton");
+		BoneName = serializedObject.FindProperty("boneName");
 	}
 
 	override public void OnInspectorGUI () {
-		serializedObject.Update();
-		SkeletonComponent component = (SkeletonComponent)target;
+		BoneComponent component = (BoneComponent)target;
+	
+		if(component != null)
+		{
+			EditorGUILayout.PropertyField(ParentSkeleton);
+		}
 
-		EditorGUILayout.PropertyField(skeletonDataAsset);
-		
-		if (component.skeleton != null) {
-			// Initial skin name.
-			String[] skins = new String[component.skeleton.Data.Skins.Count];
-			int skinIndex = 0;
-			for (int i = 0; i < skins.Length; i++) {
-				String name = component.skeleton.Data.Skins[i].Name;
-				skins[i] = name;
-				if (name == initialSkinName.stringValue)
-					skinIndex = i;
+		if(component != null && component.parentSkeleton != null)
+		{
+			//Bone name.
+			String[] bones = new String[component.parentSkeleton.skeleton.Data.Bones.Count + 1];
+			bones[0] = "<None>";
+			for (int i = 0; i < bones.Length - 1; i++) {
+				String name = component.parentSkeleton.skeleton.Data.Bones[i].Name;
+				bones[i + 1] = name;
+				if (name == BoneName.stringValue)
+					boneIndex = i + 1;
 			}
-		
+			
 			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.LabelField("Initial Skin");
+			EditorGUILayout.LabelField("Bone");
 			EditorGUIUtility.LookLikeControls();
-			skinIndex = EditorGUILayout.Popup(skinIndex, skins);
+			boneIndex = EditorGUILayout.Popup(boneIndex, bones);
 			EditorGUILayout.EndHorizontal();
-		
-			initialSkinName.stringValue = skins[skinIndex];
-		}
-
-
-		EditorGUILayout.PropertyField(timeScale);
-		EditorGUILayout.PropertyField(normals);
-		EditorGUILayout.PropertyField(tangents);
-		EditorGUILayout.PropertyField(meshZSpacing);
-		
-		if (serializedObject.ApplyModifiedProperties() ||
-			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
-		) {
-			if (!Application.isPlaying) {
-				component.Clear();
-				component.Update();
+			
+			if (boneIndex == 0)
+			{
+				BoneName.stringValue = "";
 			}
+			else
+			{
+				BoneName.stringValue = bones[boneIndex];
+			}
+			}
+
+			component.LateUpdate();
 		}
-	}
 }

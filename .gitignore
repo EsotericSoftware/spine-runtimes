@@ -75,3 +75,7 @@ spine-as3/spine-as3-example/bin-release
 spine-starling/spine-starling/bin
 spine-starling/spine-starling-example/bin-debug
 spine-starling/spine-starling-example/bin-release
+
+spine-unity/Assets/Spine/Editor/BoneComponentInspector.cs.meta
+
+spine-unity/Assets/Spine/BoneComponent.cs.meta
