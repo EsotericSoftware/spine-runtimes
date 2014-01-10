@@ -82,8 +82,13 @@ public class BoneComponentInspector : Editor
 				component.boneName = bones[boneIndex];
 				BoneName.stringValue = bones[boneIndex];
 			}
-			}
 
+
+			}
+		if(serializedObject.ApplyModifiedProperties())
+		{
 			component.LateUpdate();
 		}
+
+	}
 }
