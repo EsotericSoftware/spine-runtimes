@@ -50,9 +50,9 @@ TODO:Redo Documentation And Formatting for BoneComponent!
 public class BoneComponent : MonoBehaviour
 {
 
-		public Spine.Bone attachedBone;
-		public string boneName;
-		public SkeletonComponent parentSkeleton;
+		public Spine.Bone attachedBone = null;
+		public string boneName = "";
+		public SkeletonComponent parentSkeleton = null;
 		private Vector3 CurrentRotation;//Cache Rotation
 
 		/// <summary>
