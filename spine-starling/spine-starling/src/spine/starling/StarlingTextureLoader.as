@@ -44,23 +44,42 @@ import spine.atlas.TextureLoader;
 import starling.textures.SubTexture;
 import starling.textures.Texture;
 
-public class SingleTextureLoader implements TextureLoader {
-	private var pageBitmapData:BitmapData;
-	
-	/** @param object A Bitmap or BitmapData. */
-	public function SingleTextureLoader (object:*) {
-		if (object is BitmapData)
-			pageBitmapData = BitmapData(object);
-		else if (object is Bitmap)
-			pageBitmapData = Bitmap(object).bitmapData;
-		else
-			throw new ArgumentError("object must be a Bitmap or BitmapData.");
+public class StarlingTextureLoader implements TextureLoader {
+	public var bitmapDatas:Object = {};
+	public var singleBitmapData:BitmapData;
+
+	/** @param bitmaps A Bitmap or BitmapData for an atlas that has only one page, or for a multi page atlas an object where the 
+	 * key is the image path and the value is the Bitmap or BitmapData. */
+	public function StarlingTextureLoader (bitmaps:Object) {
+		if (bitmaps is BitmapData) {
+			singleBitmapData = BitmapData(bitmaps);
+			return;
+		}
+		if (bitmaps is Bitmap) {
+			singleBitmapData = Bitmap(bitmaps).bitmapData;
+			return;
+		}
+		
+		for (var path:* in bitmaps) {
+			var object:* = bitmaps[path];
+			var bitmapData:BitmapData;
+			if (object is BitmapData)
+				bitmapData = BitmapData(object);
+			else if (object is Bitmap)
+				bitmapData = Bitmap(object).bitmapData;
+			else
+				throw new ArgumentError("Object for path \"" + path + "\" must be a Bitmap or BitmapData: " + object);
+			bitmapDatas[path] = bitmapData;
+		}
 	}
-	
+
 	public function loadPage (page:AtlasPage, path:String) : void {
-		page.rendererObject = Texture.fromBitmapData(pageBitmapData);
-		page.width = pageBitmapData.width;
-		page.height = pageBitmapData.height;
+		var bitmapData:BitmapData = singleBitmapData || bitmapDatas[path];
+		if (!bitmapData)
+			throw new ArgumentError("BitmapData not found with name: " + path);
+		page.rendererObject = Texture.fromBitmapData(bitmapData);
+		page.width = bitmapData.width;
+		page.height = bitmapData.height;
 	}
 
 	public function loadRegion (region:AtlasRegion) : void {
@@ -78,9 +97,9 @@ public class SingleTextureLoader implements TextureLoader {
 		}
 		region.rendererObject = image;
 	}
-	
+
 	public function unloadPage (page:AtlasPage) : void {
-		BitmapData(pageBitmapData).dispose();
+		BitmapData(page.rendererObject).dispose();
 	}
 }
 

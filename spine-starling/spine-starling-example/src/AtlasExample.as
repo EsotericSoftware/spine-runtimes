@@ -6,7 +6,7 @@ import spine.SkeletonJson;
 import spine.animation.AnimationStateData;
 import spine.atlas.Atlas;
 import spine.attachments.AtlasAttachmentLoader;
-import spine.starling.SingleTextureLoader;
+import spine.starling.StarlingTextureLoader;
 import spine.starling.SkeletonAnimation;
 import spine.starling.StarlingAtlasAttachmentLoader;
 
@@ -31,7 +31,7 @@ public class AtlasExample extends Sprite {
 	private var skeleton:SkeletonAnimation;
 
 	public function AtlasExample () {
-		var atlas:Atlas = new Atlas(new SpineboyAtlasFile(), new SingleTextureLoader(new SpineboyAtlasTexture()));
+		var atlas:Atlas = new Atlas(new SpineboyAtlasFile(), new StarlingTextureLoader(new SpineboyAtlasTexture()));
 		var json:SkeletonJson = new SkeletonJson(new AtlasAttachmentLoader(atlas));
 		var skeletonData:SkeletonData = json.readSkeletonData(new SpineboyJson());
 

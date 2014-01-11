@@ -41,7 +41,7 @@ import spine.SkeletonJson;
 import spine.animation.AnimationStateData;
 import spine.atlas.Atlas;
 import spine.attachments.AtlasAttachmentLoader;
-import spine.flash.SingleTextureLoader;
+import spine.flash.FlashTextureLoader;
 import spine.flash.SkeletonAnimation;
 
 [SWF(width = "640", height = "480", frameRate = "60", backgroundColor = "#dddddd")]
@@ -58,7 +58,7 @@ public class Main extends Sprite {
 	private var skeleton:SkeletonAnimation;
 
 	public function Main () {
-		var atlas:Atlas = new Atlas(new SpineboyAtlas(), new SingleTextureLoader(new SpineboyAtlasTexture()));
+		var atlas:Atlas = new Atlas(new SpineboyAtlas(), new FlashTextureLoader(new SpineboyAtlasTexture()));
 		var json:SkeletonJson = new SkeletonJson(new AtlasAttachmentLoader(atlas));
 		var skeletonData:SkeletonData = json.readSkeletonData(new SpineboyJson());
 
