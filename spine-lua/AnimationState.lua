@@ -13,7 +13,7 @@
 -- new applications using the Software or (b) remove, delete, alter or obscure
 -- any trademarks or any copyright, trademark, patent or other intellectual
 -- property or proprietary rights notices on or in the Software, including
--- any copy thereof. Redistributions in binary or source code must include
+-- any copy thereof. Redistributions in binary or source form must include
 -- this license and terms. THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE
 -- "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 -- TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
