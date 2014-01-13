@@ -37,15 +37,6 @@ using Windows.Storage;
 
 namespace Spine {
 	public class SkeletonJson {
-		static public String TIMELINE_SCALE = "scale";
-		static public String TIMELINE_ROTATE = "rotate";
-		static public String TIMELINE_TRANSLATE = "translate";
-		static public String TIMELINE_ATTACHMENT = "attachment";
-		static public String TIMELINE_COLOR = "color";
-
-		static public String ATTACHMENT_REGION = "region";
-		static public String ATTACHMENT_REGION_SEQUENCE = "regionSequence";
-
 		private AttachmentLoader attachmentLoader;
 		public float Scale { get; set; }
 
@@ -265,7 +256,7 @@ namespace Spine {
 					foreach (KeyValuePair<String, Object> timelineEntry in timelineMap) {
 						var values = (List<Object>)timelineEntry.Value;
 						String timelineName = (String)timelineEntry.Key;
-						if (timelineName.Equals(TIMELINE_ROTATE)) {
+						if (timelineName.Equals("rotate")) {
 							RotateTimeline timeline = new RotateTimeline(values.Count);
 							timeline.boneIndex = boneIndex;
 
@@ -279,10 +270,10 @@ namespace Spine {
 							timelines.Add(timeline);
 							duration = Math.Max(duration, timeline.frames[timeline.FrameCount * 2 - 2]);
 
-						} else if (timelineName.Equals(TIMELINE_TRANSLATE) || timelineName.Equals(TIMELINE_SCALE)) {
+						} else if (timelineName.Equals("translate") || timelineName.Equals("scale")) {
 							TranslateTimeline timeline;
 							float timelineScale = 1;
-							if (timelineName.Equals(TIMELINE_SCALE))
+							if (timelineName.Equals("scale"))
 								timeline = new ScaleTimeline(values.Count);
 							else {
 								timeline = new TranslateTimeline(values.Count);
@@ -317,7 +308,7 @@ namespace Spine {
 					foreach (KeyValuePair<String, Object> timelineEntry in timelineMap) {
 						var values = (List<Object>)timelineEntry.Value;
 						String timelineName = (String)timelineEntry.Key;
-						if (timelineName.Equals(TIMELINE_COLOR)) {
+						if (timelineName.Equals("color")) {
 							ColorTimeline timeline = new ColorTimeline(values.Count);
 							timeline.slotIndex = slotIndex;
 
@@ -332,7 +323,7 @@ namespace Spine {
 							timelines.Add(timeline);
 							duration = Math.Max(duration, timeline.frames[timeline.FrameCount * 5 - 5]);
 
-						} else if (timelineName.Equals(TIMELINE_ATTACHMENT)) {
+						} else if (timelineName.Equals("attachment")) {
 							AttachmentTimeline timeline = new AttachmentTimeline(values.Count);
 							timeline.slotIndex = slotIndex;
 

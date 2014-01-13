@@ -36,12 +36,6 @@ local EventData = require "spine-lua.EventData"
 local Event = require "spine-lua.Event"
 local AttachmentType = require "spine-lua.AttachmentType"
 
-local TIMELINE_SCALE = "scale"
-local TIMELINE_ROTATE = "rotate"
-local TIMELINE_TRANSLATE = "translate"
-local TIMELINE_ATTACHMENT = "attachment"
-local TIMELINE_COLOR = "color"
-
 local SkeletonJson = {}
 function SkeletonJson.new (attachmentLoader)
 	if not attachmentLoader then attachmentLoader = AttachmentLoader.new() end
@@ -199,7 +193,7 @@ function SkeletonJson.new (attachmentLoader)
 				if boneIndex == -1 then error("Bone not found: " .. boneName) end
 
 				for timelineName,values in pairs(timelineMap) do
-					if timelineName == TIMELINE_ROTATE then
+					if timelineName == "rotate" then
 						local timeline = Animation.RotateTimeline.new()
 						timeline.boneIndex = boneIndex
 
@@ -213,10 +207,10 @@ function SkeletonJson.new (attachmentLoader)
 						table.insert(timelines, timeline)
 						duration = math.max(duration, timeline:getDuration())
 
-					elseif timelineName == TIMELINE_TRANSLATE or timelineName == TIMELINE_SCALE then
+					elseif timelineName == "translate" or timelineName == "scale" then
 						local timeline
 						local timelineScale = 1
-						if timelineName == TIMELINE_SCALE then
+						if timelineName == "scale" then
 							timeline = Animation.ScaleTimeline.new()
 						else
 							timeline = Animation.TranslateTimeline.new()
@@ -249,7 +243,7 @@ function SkeletonJson.new (attachmentLoader)
 				local slotIndex = skeletonData.slotNameIndices[slotName]
 
 				for timelineName,values in pairs(timelineMap) do
-					if timelineName == TIMELINE_COLOR then
+					if timelineName == "color" then
 						local timeline = Animation.ColorTimeline.new()
 						timeline.slotIndex = slotIndex
 
@@ -270,7 +264,7 @@ function SkeletonJson.new (attachmentLoader)
 						table.insert(timelines, timeline)
 						duration = math.max(duration, timeline:getDuration())
 
-					elseif timelineName == TIMELINE_ATTACHMENT then
+					elseif timelineName == "attachment" then
 						local timeline = Animation.AttachmentTimeline.new()
 						timeline.slotName = slotName
 
