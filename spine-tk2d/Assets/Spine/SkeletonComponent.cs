@@ -222,6 +222,7 @@ public class SkeletonComponent : MonoBehaviour {
 		mesh.subMeshCount = submeshCount;
 		for (int i = 0; i < submeshCount; ++i)
 			mesh.SetTriangles(submeshes[i].indexes, i);
+		mesh.RecalculateBounds();
 
 		if (newTriangles && calculateNormals) {
 			Vector3[] normals = new Vector3[vertexCount];
