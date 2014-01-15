@@ -34,19 +34,22 @@ import com.esotericsoftware.spine.Slot;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.NumberUtils;
 
 /** Attachment that displays a texture region. */
 public class MeshAttachment extends Attachment {
 	private TextureRegion region;
 	private String path;
-	private int hullLength;
 	private float[] vertices;
 	private short[] triangles;
-	private int[] edges;
 	private float[] worldVertices;
 	private final Color color = new Color(1, 1, 1, 1);
+
+	// Nonessential.
+	private int[] edges;
 	private float width, height;
+	private int hullLength;
 
 	public MeshAttachment (String name) {
 		super(name);
@@ -71,41 +74,24 @@ public class MeshAttachment extends Attachment {
 		float g = skeletonColor.g * slotColor.g * regionColor.g;
 		float b = skeletonColor.b * slotColor.b * regionColor.b;
 		float a = skeletonColor.a * slotColor.a * regionColor.a * 255;
-		float color;
-		if (premultipliedAlpha) {
-			r *= a;
-			g *= a;
-			b *= a;
-		} else {
-			r *= 255;
-			g *= 255;
-			b *= 255;
-		}
-		color = NumberUtils.intToFloatColor( //
+		float multiplier = premultipliedAlpha ? a : 255;
+		float color = NumberUtils.intToFloatColor( //
 			((int)(a) << 24) //
-				| ((int)(b) << 16) //
-				| ((int)(g) << 8) //
-				| ((int)(r)));
+				| ((int)(b * multiplier) << 16) //
+				| ((int)(g * multiplier) << 8) //
+				| ((int)(r * multiplier)));
 
 		float[] worldVertices = this.worldVertices;
-		float[] vertices = this.vertices;
-		Bone bone1 = slot.getBone();
-		float x = skeleton.getX();
-		float y = skeleton.getY();
-		float m00 = bone1.getM00();
-		float m01 = bone1.getM01();
-		float m10 = bone1.getM10();
-		float m11 = bone1.getM11();
-
-		float vx, vy;
-		for (int v = 0, w = 0, n = vertices.length; v < n; v += 2, w += 5) {
-			vx = vertices[v];
-			vy = vertices[v + 1];
-			float wx1 = vx * m00 + vy * m01 + x + bone1.getWorldX();
-			float wy1 = vx * m10 + vy * m11 + y + bone1.getWorldY();
-			worldVertices[w] = wx1;
-			worldVertices[w + 1] = wy1;
-			worldVertices[w + 2] = Color.WHITE.toFloatBits();
+		FloatArray verticesArray = slot.getAttachmentVertices();
+		float[] vertices = verticesArray.size > 0 ? verticesArray.items : this.vertices;
+		Bone bone = slot.getBone();
+		float x = skeleton.getX() + bone.getWorldX(), y = skeleton.getY() + bone.getWorldY();
+		float m00 = bone.getM00(), m01 = bone.getM01(), m10 = bone.getM10(), m11 = bone.getM11();
+		for (int v = 0, w = 0, n = worldVertices.length; w < n; v += 2, w += 5) {
+			float vx = vertices[v];
+			float vy = vertices[v + 1];
+			worldVertices[w] = vx * m00 + vy * m01 + x;
+			worldVertices[w + 1] = vx * m10 + vy * m11 + y;
 			worldVertices[w + 2] = color;
 		}
 	}
@@ -173,9 +159,19 @@ public class MeshAttachment extends Attachment {
 		int worldVerticesLength = vertices.length / 2 * 5;
 		if (worldVertices == null || worldVertices.length != worldVerticesLength) worldVertices = new float[worldVerticesLength];
 
-		for (int i = 0, w = 3, n = vertices.length; i < n; i += 2, w += 5) {
-			worldVertices[w] = uvs[i];
-			worldVertices[w + 1] = uvs[i + 1];
+		float u, v, w, h;
+		if (region == null) {
+			u = v = 0;
+			w = h = 1;
+		} else {
+			u = region.getU();
+			v = region.getV();
+			w = region.getU2() - u;
+			h = region.getV2() - v;
+		}
+		for (int i = 0, ii = 3, n = vertices.length; i < n; i += 2, ii += 5) {
+			worldVertices[ii] = u + uvs[i] * w;
+			worldVertices[ii + 1] = v + uvs[i + 1] * h;
 		}
 	}
 }

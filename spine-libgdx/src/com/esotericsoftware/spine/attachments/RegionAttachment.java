@@ -153,32 +153,20 @@ public class RegionAttachment extends Attachment {
 		float g = skeletonColor.g * slotColor.g * regionColor.g;
 		float b = skeletonColor.b * slotColor.b * regionColor.b;
 		float a = skeletonColor.a * slotColor.a * regionColor.a * 255;
-		float color;
-		if (premultipliedAlpha) {
-			r *= a;
-			g *= a;
-			b *= a;
-		} else {
-			r *= 255;
-			g *= 255;
-			b *= 255;
-		}
-		color = NumberUtils.intToFloatColor( //
+		float multiplier = premultipliedAlpha ? a : 255;
+		float color = NumberUtils.intToFloatColor( //
 			((int)(a) << 24) //
-				| ((int)(b) << 16) //
-				| ((int)(g) << 8) //
-				| ((int)(r)));
+				| ((int)(b * multiplier) << 16) //
+				| ((int)(g * multiplier) << 8) //
+				| ((int)(r * multiplier)));
 
 		float[] vertices = this.vertices;
 		float[] offset = this.offset;
 		Bone bone = slot.getBone();
-		float x = bone.getWorldX() + skeleton.getX();
-		float y = bone.getWorldY() + skeleton.getY();
-		float m00 = bone.getM00();
-		float m01 = bone.getM01();
-		float m10 = bone.getM10();
-		float m11 = bone.getM11();
+		float x = skeleton.getX() + bone.getWorldX(), y = skeleton.getY() + bone.getWorldY();
+		float m00 = bone.getM00(), m01 = bone.getM01(), m10 = bone.getM10(), m11 = bone.getM11();
 		float offsetX, offsetY;
+
 		offsetX = offset[BRX];
 		offsetY = offset[BRY];
 		vertices[X1] = offsetX * m00 + offsetY * m01 + x; // br

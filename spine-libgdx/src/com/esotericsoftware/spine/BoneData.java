@@ -28,6 +28,8 @@
 
 package com.esotericsoftware.spine;
 
+import com.badlogic.gdx.graphics.Color;
+
 public class BoneData {
 	final BoneData parent;
 	final String name;
@@ -36,6 +38,9 @@ public class BoneData {
 	float rotation;
 	float scaleX = 1, scaleY = 1;
 	boolean inheritScale = true, inheritRotation = true;
+
+	// Nonessential.
+	final Color color = new Color(1, 1, 1, 1);
 
 	/** @param parent May be null. */
 	public BoneData (String name, BoneData parent) {
@@ -129,6 +134,10 @@ public class BoneData {
 
 	public void setInheritRotation (boolean inheritRotation) {
 		this.inheritRotation = inheritRotation;
+	}
+
+	public Color getColor () {
+		return color;
 	}
 
 	public String toString () {

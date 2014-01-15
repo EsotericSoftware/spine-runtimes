@@ -28,9 +28,12 @@
 
 package com.esotericsoftware.spine;
 
+import com.esotericsoftware.spine.attachments.MeshAttachment;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.FloatArray;
 
 public class Animation {
 	final String name;
@@ -201,9 +204,9 @@ public class Animation {
 			int i = BEZIER_SEGMENTS - 2;
 			while (true) {
 				if (x >= percent) {
-					float lastX = x - dfx;
-					float lastY = y - dfy;
-					return lastY + (y - lastY) * (percent - lastX) / (x - lastX);
+					float prevX = x - dfx;
+					float prevY = y - dfy;
+					return prevY + (y - prevY) * (percent - prevX) / (x - prevX);
 				}
 				if (i == 0) break;
 				i--;
@@ -219,7 +222,7 @@ public class Animation {
 	}
 
 	static public class RotateTimeline extends CurveTimeline {
-		static private final int LAST_FRAME_TIME = -2;
+		static private final int PREV_FRAME_TIME = -2;
 		static private final int FRAME_VALUE = 1;
 
 		int boneIndex;
@@ -265,19 +268,19 @@ public class Animation {
 				return;
 			}
 
-			// Interpolate between the last frame and the current frame.
+			// Interpolate between the previous frame and the current frame.
 			int frameIndex = binarySearch(frames, time, 2);
-			float lastFrameValue = frames[frameIndex - 1];
+			float prevFrameValue = frames[frameIndex - 1];
 			float frameTime = frames[frameIndex];
-			float percent = MathUtils.clamp(1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime), 0, 1);
+			float percent = MathUtils.clamp(1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime), 0, 1);
 			percent = getCurvePercent(frameIndex / 2 - 1, percent);
 
-			float amount = frames[frameIndex + FRAME_VALUE] - lastFrameValue;
+			float amount = frames[frameIndex + FRAME_VALUE] - prevFrameValue;
 			while (amount > 180)
 				amount -= 360;
 			while (amount < -180)
 				amount += 360;
-			amount = bone.data.rotation + (lastFrameValue + amount * percent) - bone.rotation;
+			amount = bone.data.rotation + (prevFrameValue + amount * percent) - bone.rotation;
 			while (amount > 180)
 				amount -= 360;
 			while (amount < -180)
@@ -287,7 +290,7 @@ public class Animation {
 	}
 
 	static public class TranslateTimeline extends CurveTimeline {
-		static final int LAST_FRAME_TIME = -3;
+		static final int PREV_FRAME_TIME = -3;
 		static final int FRAME_X = 1;
 		static final int FRAME_Y = 2;
 
@@ -331,16 +334,16 @@ public class Animation {
 				return;
 			}
 
-			// Interpolate between the last frame and the current frame.
+			// Interpolate between the previous frame and the current frame.
 			int frameIndex = binarySearch(frames, time, 3);
-			float lastFrameX = frames[frameIndex - 2];
-			float lastFrameY = frames[frameIndex - 1];
+			float prevFrameX = frames[frameIndex - 2];
+			float prevFrameY = frames[frameIndex - 1];
 			float frameTime = frames[frameIndex];
-			float percent = MathUtils.clamp(1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime), 0, 1);
+			float percent = MathUtils.clamp(1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime), 0, 1);
 			percent = getCurvePercent(frameIndex / 3 - 1, percent);
 
-			bone.x += (bone.data.x + lastFrameX + (frames[frameIndex + FRAME_X] - lastFrameX) * percent - bone.x) * alpha;
-			bone.y += (bone.data.y + lastFrameY + (frames[frameIndex + FRAME_Y] - lastFrameY) * percent - bone.y) * alpha;
+			bone.x += (bone.data.x + prevFrameX + (frames[frameIndex + FRAME_X] - prevFrameX) * percent - bone.x) * alpha;
+			bone.y += (bone.data.y + prevFrameY + (frames[frameIndex + FRAME_Y] - prevFrameY) * percent - bone.y) * alpha;
 		}
 	}
 
@@ -360,23 +363,23 @@ public class Animation {
 				return;
 			}
 
-			// Interpolate between the last frame and the current frame.
+			// Interpolate between the previous frame and the current frame.
 			int frameIndex = binarySearch(frames, time, 3);
-			float lastFrameX = frames[frameIndex - 2];
-			float lastFrameY = frames[frameIndex - 1];
+			float prevFrameX = frames[frameIndex - 2];
+			float prevFrameY = frames[frameIndex - 1];
 			float frameTime = frames[frameIndex];
-			float percent = MathUtils.clamp(1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime), 0, 1);
+			float percent = MathUtils.clamp(1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime), 0, 1);
 			percent = getCurvePercent(frameIndex / 3 - 1, percent);
 
-			bone.scaleX += (bone.data.scaleX - 1 + lastFrameX + (frames[frameIndex + FRAME_X] - lastFrameX) * percent - bone.scaleX)
+			bone.scaleX += (bone.data.scaleX - 1 + prevFrameX + (frames[frameIndex + FRAME_X] - prevFrameX) * percent - bone.scaleX)
 				* alpha;
-			bone.scaleY += (bone.data.scaleY - 1 + lastFrameY + (frames[frameIndex + FRAME_Y] - lastFrameY) * percent - bone.scaleY)
+			bone.scaleY += (bone.data.scaleY - 1 + prevFrameY + (frames[frameIndex + FRAME_Y] - prevFrameY) * percent - bone.scaleY)
 				* alpha;
 		}
 	}
 
 	static public class ColorTimeline extends CurveTimeline {
-		static private final int LAST_FRAME_TIME = -5;
+		static private final int PREV_FRAME_TIME = -5;
 		static private final int FRAME_R = 1;
 		static private final int FRAME_G = 2;
 		static private final int FRAME_B = 3;
@@ -428,20 +431,20 @@ public class Animation {
 				return;
 			}
 
-			// Interpolate between the last frame and the current frame.
+			// Interpolate between the previous frame and the current frame.
 			int frameIndex = binarySearch(frames, time, 5);
-			float lastFrameR = frames[frameIndex - 4];
-			float lastFrameG = frames[frameIndex - 3];
-			float lastFrameB = frames[frameIndex - 2];
-			float lastFrameA = frames[frameIndex - 1];
+			float prevFrameR = frames[frameIndex - 4];
+			float prevFrameG = frames[frameIndex - 3];
+			float prevFrameB = frames[frameIndex - 2];
+			float prevFrameA = frames[frameIndex - 1];
 			float frameTime = frames[frameIndex];
-			float percent = MathUtils.clamp(1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime), 0, 1);
+			float percent = MathUtils.clamp(1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime), 0, 1);
 			percent = getCurvePercent(frameIndex / 5 - 1, percent);
 
-			float r = lastFrameR + (frames[frameIndex + FRAME_R] - lastFrameR) * percent;
-			float g = lastFrameG + (frames[frameIndex + FRAME_G] - lastFrameG) * percent;
-			float b = lastFrameB + (frames[frameIndex + FRAME_B] - lastFrameB) * percent;
-			float a = lastFrameA + (frames[frameIndex + FRAME_A] - lastFrameA) * percent;
+			float r = prevFrameR + (frames[frameIndex + FRAME_R] - prevFrameR) * percent;
+			float g = prevFrameG + (frames[frameIndex + FRAME_G] - prevFrameG) * percent;
+			float b = prevFrameB + (frames[frameIndex + FRAME_B] - prevFrameB) * percent;
+			float a = prevFrameA + (frames[frameIndex + FRAME_A] - prevFrameA) * percent;
 			if (alpha < 1)
 				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
 			else
@@ -603,6 +606,86 @@ public class Animation {
 			else {
 				for (int i = 0, n = drawOrderToSetupIndex.length; i < n; i++)
 					drawOrder.set(i, slots.get(drawOrderToSetupIndex[i]));
+			}
+		}
+	}
+
+	static public class FfdTimeline extends CurveTimeline {
+		private final float[] frames; // time, ...
+		private final float[][] frameVertices;
+		int slotIndex;
+		MeshAttachment meshAttachment;
+
+		public FfdTimeline (int frameCount) {
+			super(frameCount);
+			frames = new float[frameCount];
+			frameVertices = new float[frameCount][];
+		}
+
+		public void setSlotIndex (int slotIndex) {
+			this.slotIndex = slotIndex;
+		}
+
+		public int getSlotIndex () {
+			return slotIndex;
+		}
+
+		public void setMeshAttachment (MeshAttachment attachment) {
+			this.meshAttachment = attachment;
+		}
+
+		public MeshAttachment getMeshAttachment () {
+			return meshAttachment;
+		}
+
+		public float[] getFrames () {
+			return frames;
+		}
+
+		public float[][] getVertices () {
+			return frameVertices;
+		}
+
+		/** Sets the time of the specified keyframe. */
+		public void setFrame (int frameIndex, float time, float[] vertices) {
+			frames[frameIndex] = time;
+			frameVertices[frameIndex] = vertices;
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha) {
+			Slot slot = skeleton.slots.get(slotIndex);
+			if (slot.getAttachment() != meshAttachment) return;
+
+			FloatArray verticesArray = slot.getAttachmentVertices();
+			verticesArray.size = 0;
+
+			float[] frames = this.frames;
+			if (time < frames[0]) return; // Time is before first frame.
+
+			float[][] frameVertices = this.frameVertices;
+			int vertexCount = frameVertices[0].length;
+			verticesArray.ensureCapacity(vertexCount);
+			verticesArray.size = vertexCount;
+			float[] vertices = verticesArray.items;
+
+			if (time >= frames[frames.length - 1]) { // Time is after last frame.
+				System.arraycopy(frameVertices[frames.length - 1], 0, vertices, 0, vertexCount);
+				return;
+			}
+
+			// Interpolate between the previous frame and the current frame.
+			int frameIndex = binarySearch(frames, time, 1);
+			float frameTime = frames[frameIndex];
+			float percent = MathUtils.clamp(1 - (time - frameTime) / (frames[frameIndex - 1] - frameTime), 0, 1);
+			percent = getCurvePercent(frameIndex - 1, percent);
+
+			float[] prevVertices = frameVertices[frameIndex - 1];
+			float[] nextVertices = frameVertices[frameIndex];
+
+			// BOZO - FFD, use alpha for mixing?
+			for (int i = 0; i < vertexCount; i++) {
+				float prev = prevVertices[i];
+				vertices[i] = prev + (nextVertices[i] - prev) * percent;
 			}
 		}
 	}

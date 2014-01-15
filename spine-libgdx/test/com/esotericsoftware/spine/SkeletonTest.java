@@ -38,14 +38,14 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.TextureAtlasData;
 import com.badlogic.gdx.utils.Array;
 
 public class SkeletonTest extends ApplicationAdapter {
-	SpriteBatch batch;
+	PolygonSpriteBatch batch;
 	float time;
 	SkeletonRenderer renderer;
 	SkeletonRendererDebug debugRenderer;
@@ -56,7 +56,7 @@ public class SkeletonTest extends ApplicationAdapter {
 	Array<Event> events = new Array();
 
 	public void create () {
-		batch = new SpriteBatch();
+		batch = new PolygonSpriteBatch();
 		renderer = new SkeletonRenderer();
 		debugRenderer = new SkeletonRendererDebug();
 
@@ -120,6 +120,7 @@ public class SkeletonTest extends ApplicationAdapter {
 		if (x > Gdx.graphics.getWidth()) skeleton.setFlipX(true);
 		if (x < 0) skeleton.setFlipX(false);
 		skeleton.setX(x);
+		skeleton.setX(300);
 
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
@@ -134,7 +135,7 @@ public class SkeletonTest extends ApplicationAdapter {
 		renderer.draw(batch, skeleton);
 		batch.end();
 
-		debugRenderer.draw(skeleton);
+		//debugRenderer.draw(skeleton);
 	}
 
 	public void resize (int width, int height) {
