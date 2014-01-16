@@ -19,13 +19,13 @@ import starling.textures.Texture;
 import starling.textures.TextureAtlas;
 
 public class AtlasExample extends Sprite {
-	[Embed(source = "goblins.atlas", mimeType = "application/octet-stream")]
+	[Embed(source = "spineboy.atlas", mimeType = "application/octet-stream")]
 	static public const SpineboyAtlasFile:Class;
 
-	[Embed(source = "goblins.png")]
+	[Embed(source = "spineboy.png")]
 	static public const SpineboyAtlasTexture:Class;
 
-	[Embed(source = "goblins.json", mimeType = "application/octet-stream")]
+	[Embed(source = "spineboy.json", mimeType = "application/octet-stream")]
 	static public const SpineboyJson:Class;
 
 	private var skeleton:SkeletonAnimation;
@@ -36,9 +36,9 @@ public class AtlasExample extends Sprite {
 		var skeletonData:SkeletonData = json.readSkeletonData(new SpineboyJson());
 
 		var stateData:AnimationStateData = new AnimationStateData(skeletonData);
-//		stateData.setMixByName("walk", "jump", 0.2);
-//		stateData.setMixByName("jump", "walk", 0.4);
-//		stateData.setMixByName("jump", "jump", 0.2);
+		stateData.setMixByName("walk", "jump", 0.2);
+		stateData.setMixByName("jump", "walk", 0.4);
+		stateData.setMixByName("jump", "jump", 0.2);
 
 		skeleton = new SkeletonAnimation(skeletonData, stateData);
 		skeleton.x = 320;
@@ -58,11 +58,9 @@ public class AtlasExample extends Sprite {
 				+ event.data.name + ": " + event.intValue + ", " + event.floatValue + ", " + event.stringValue);
 		});
 
-		skeleton.skeleton.skinName = "goblin";
-		skeleton.skeleton.setSlotsToSetupPose();
 		skeleton.state.setAnimationByName(0, "walk", true);
-//		skeleton.state.addAnimationByName(0, "jump", false, 3);
-//		skeleton.state.addAnimationByName(0, "walk", true, 0);
+		skeleton.state.addAnimationByName(0, "jump", false, 3);
+		skeleton.state.addAnimationByName(0, "walk", true, 0);
 
 		addChild(skeleton);
 		Starling.juggler.add(skeleton);
