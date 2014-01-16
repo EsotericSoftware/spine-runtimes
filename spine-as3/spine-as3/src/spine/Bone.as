@@ -73,7 +73,7 @@ public class Bone {
 			_worldRotation = _data.inheritRotation ? _parent._worldRotation + rotation : rotation;
 		} else {
 			_worldX = flipX ? -x : x;
-			_worldY = (flipY && spine.Bone.yDown != flipY) ? -y : y;
+			_worldY = flipY != yDown ? -y : y;
 			_worldScaleX = scaleX;
 			_worldScaleY = scaleY;
 			_worldRotation = rotation;
