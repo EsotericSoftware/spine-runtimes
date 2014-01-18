@@ -176,6 +176,15 @@ public class SkeletonJson {
 			regionAttachment.rotation = map["rotation"] || 0;
 			regionAttachment.width = (map["width"] || 32) * scale;
 			regionAttachment.height = (map["height"] || 32) * scale;
+
+			var color:String = map["color"];
+			if (color) {
+				regionAttachment.r = toColor(color, 0);
+				regionAttachment.g = toColor(color, 1);
+				regionAttachment.b = toColor(color, 2);
+				regionAttachment.a = toColor(color, 3);
+			}
+
 			regionAttachment.updateOffset();
 		} else if (attachment is BoundingBoxAttachment) {
 			var box:BoundingBoxAttachment = attachment as BoundingBoxAttachment;

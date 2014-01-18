@@ -79,8 +79,11 @@ public class SkeletonSprite extends DisplayObject implements IAnimatable {
 			if (regionAttachment != null) {
 				var vertices:Vector.<Number> = tempVertices;
 				regionAttachment.computeWorldVertices(x, y, slot.bone, vertices);
-				var a:Number = slot.a;
-				var rgb:uint = Color.rgb(r * slot.r, g * slot.g, b * slot.b);
+				var a:Number = slot.a * regionAttachment.a;
+				var rgb:uint = Color.rgb(
+					r * slot.r * regionAttachment.r,
+					g * slot.g * regionAttachment.g,
+					b * slot.b * regionAttachment.b);
 
 				var image:SkeletonImage;
 				image = regionAttachment.rendererObject as SkeletonImage;

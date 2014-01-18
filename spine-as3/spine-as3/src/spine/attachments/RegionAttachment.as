@@ -46,6 +46,10 @@ public dynamic class RegionAttachment extends Attachment {
 	public var rotation:Number;
 	public var width:Number;
 	public var height:Number;
+	public var r:Number = 1;
+	public var g:Number = 1;
+	public var b:Number = 1;
+	public var a:Number = 1;
 
 	public var rendererObject:Object;
 	public var regionOffsetX:Number; // Pixels stripped from the bottom left, unrotated.
