@@ -2,11 +2,11 @@
 <head>
 <meta charset="UTF-8">
 <title>spine-js</title>
-<script src="../spine.js"></script>
-<script src="turbulenzengine.js"></script>
-<script src="graphicsdevice.js"></script>
-<script src="draw2d.js"></script>
-<script src="SpriteBatch.js"></script>
+<script src="../spine-js/spine.js"></script>
+<script src="../turbulenz/turbulenzengine.js"></script>
+<script src="../turbulenz/graphicsdevice.js"></script>
+<script src="../turbulenz/draw2d.js"></script>
+<script src="../SpriteBatch.js"></script>
 <style>body, input { font-family: tahoma; font-size: 11pt }</style>
 </head>
 <body>
@@ -30,7 +30,7 @@ load("spineboy");
 var skeletonName;
 function load (name) {
 	skeletonName = name;
-	TurbulenzEngine.request("../data/" + skeletonName + ".atlas", loadAtlas);
+	TurbulenzEngine.request("data/" + skeletonName + ".atlas", loadAtlas);
 }
 
 var atlas;
@@ -40,7 +40,7 @@ function loadAtlas (atlasText) {
 		load: function (page, path, atlas) {
 			textureCount++;
 			graphicsDevice.createTexture({
-				src: "../data/" + path,
+				src: "data/" + path,
 				mipmaps: true,
 				onload: function (texture) {
 					page.rendererObject = texture;
@@ -57,7 +57,7 @@ function loadAtlas (atlasText) {
 	});
 	function waitForTextures () {
 		if (!textureCount)
-			TurbulenzEngine.request("../data/" + skeletonName + ".json", loadSkeletonData);
+			TurbulenzEngine.request("data/" + skeletonName + ".json", loadSkeletonData);
 		else
 			setTimeout(waitForTextures, 100);
 	}
@@ -75,8 +75,8 @@ function start () {
 	spine.Bone.yDown = true;
 
 	var skeleton = new spine.Skeleton(skeletonData);
-	skeleton.getRootBone().x = 320;
-	skeleton.getRootBone().y = 440;
+	skeleton.x = 320;
+	skeleton.y = 440;
 	skeleton.updateWorldTransform();
 
 	var stateData = new spine.AnimationStateData(skeletonData);	
