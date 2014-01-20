@@ -1,11 +1,11 @@
 # spine-c
 
-The spine-c runtime provides basic functionality to load and manipulate [Spine](http://esotericsoftware.com) skeletal animation data using ANSI C. It does not perform rendering but can can be extended to enable Spine animations for any C-based language, such as C++ or Objective-C.
+The spine-c runtime provides basic functionality to load and manipulate [Spine](http://esotericsoftware.com) skeletal animation data using ANSI C. It does not perform rendering but can be extended to enable Spine animations for other C-based projects, including C++ or Objective-C projects.
 
 ## Setup
 
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
-1. Project files are provided for Visual C++ Express 2010. You will need to create a new project and import the source for other IDEs.
+1. Open the `spine-c.sln` Visual C++ 2010 Express project file. For other IDEs, you will need to create a new project and import the source.
 
 Alternatively, the contents of the `spine-c/src` and `spine-c/include` directories can be copied into your project. Be sure your header search is configured to find the contents of the `spine-c/include` directory. Note that the includes use `spine/Xxx.h`, so the `spine` directory cannot be omitted when copying the files.
 
