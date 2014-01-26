@@ -165,6 +165,8 @@
 		43C32A09170B10FF004A9460 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43C32A08170B10FF004A9460 /* AppDelegate.mm */; };
 		43DB2A3D172C16BC003045C5 /* CCSkeleton.m in Sources */ = {isa = PBXBuildFile; fileRef = 43DB2A3A172C16BC003045C5 /* CCSkeleton.m */; };
 		43DB2A3E172C16BC003045C5 /* CCSkeletonAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = 43DB2A3C172C16BC003045C5 /* CCSkeletonAnimation.m */; };
+		65210794189524EB00B1FF07 /* CCFontDefinition.m in Sources */ = {isa = PBXBuildFile; fileRef = 65210792189524EB00B1FF07 /* CCFontDefinition.m */; };
+		652107961895250000B1FF07 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 652107951895250000B1FF07 /* CoreText.framework */; };
 		9A5D2499170A94DA0030D4DD /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5D2498170A94DA0030D4DD /* QuartzCore.framework */; };
 		9A5D249B170A94DA0030D4DD /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5D249A170A94DA0030D4DD /* OpenGLES.framework */; };
 		9A5D249D170A94DA0030D4DD /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5D249C170A94DA0030D4DD /* OpenAL.framework */; };
@@ -500,6 +502,9 @@
 		43DB2A3A172C16BC003045C5 /* CCSkeleton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CCSkeleton.m; path = src/spine/CCSkeleton.m; sourceTree = "<group>"; };
 		43DB2A3B172C16BC003045C5 /* CCSkeletonAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCSkeletonAnimation.h; path = src/spine/CCSkeletonAnimation.h; sourceTree = "<group>"; };
 		43DB2A3C172C16BC003045C5 /* CCSkeletonAnimation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CCSkeletonAnimation.m; path = src/spine/CCSkeletonAnimation.m; sourceTree = "<group>"; };
+		65210792189524EB00B1FF07 /* CCFontDefinition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCFontDefinition.m; sourceTree = "<group>"; };
+		65210793189524EB00B1FF07 /* CCFontDefinition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCFontDefinition.h; sourceTree = "<group>"; };
+		652107951895250000B1FF07 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		9A5D2495170A94DA0030D4DD /* SpineExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpineExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A5D2498170A94DA0030D4DD /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		9A5D249A170A94DA0030D4DD /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -517,6 +522,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				652107961895250000B1FF07 /* CoreText.framework in Frameworks */,
 				9A5D2499170A94DA0030D4DD /* QuartzCore.framework in Frameworks */,
 				9A5D249B170A94DA0030D4DD /* OpenGLES.framework in Frameworks */,
 				9A5D249D170A94DA0030D4DD /* OpenAL.framework in Frameworks */,
@@ -644,6 +650,8 @@
 		43C32890170B0F14004A9460 /* cocos2d */ = {
 			isa = PBXGroup;
 			children = (
+				65210792189524EB00B1FF07 /* CCFontDefinition.m */,
+				65210793189524EB00B1FF07 /* CCFontDefinition.h */,
 				43C32891170B0F14004A9460 /* CCAction.h */,
 				43C32892170B0F14004A9460 /* CCAction.m */,
 				43C32893170B0F14004A9460 /* CCActionCamera.h */,
@@ -1008,6 +1016,7 @@
 		9A5D2497170A94DA0030D4DD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				652107951895250000B1FF07 /* CoreText.framework */,
 				9A5D2498170A94DA0030D4DD /* QuartzCore.framework */,
 				9A5D249A170A94DA0030D4DD /* OpenGLES.framework */,
 				9A5D249C170A94DA0030D4DD /* OpenAL.framework */,
@@ -1122,6 +1131,7 @@
 				43C3282B170B0BF6004A9460 /* ExampleLayer.m in Sources */,
 				43C3282F170B0C19004A9460 /* spine-cocos2d-iphone.m in Sources */,
 				43C32855170B0C6C004A9460 /* Animation.c in Sources */,
+				65210794189524EB00B1FF07 /* CCFontDefinition.m in Sources */,
 				43C32856170B0C6C004A9460 /* AnimationState.c in Sources */,
 				43C32857170B0C6C004A9460 /* AnimationStateData.c in Sources */,
 				43C32858170B0C6C004A9460 /* Atlas.c in Sources */,
