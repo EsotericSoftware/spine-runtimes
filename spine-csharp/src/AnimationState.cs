@@ -40,6 +40,9 @@ namespace Spine {
 		public AnimationStateData Data { get { return data; } }
 		public float TimeScale { get { return timeScale; } set { timeScale = value; } }
 
+		/// <summary>The list of tracks that have animations, which may contain nulls.</summary>
+		public List<TrackEntry> Tracks { get { return tracks; } }
+
 		public event EventHandler<StartEndArgs> Start;
 		public event EventHandler<StartEndArgs> End;
 		public event EventHandler<EventTriggeredArgs> Event;

@@ -276,6 +276,11 @@ public class AnimationState {
 		return data;
 	}
 
+	/** Returns the list of tracks that have animations, which may contain nulls. */
+	public Array<TrackEntry> getTracks () {
+		return tracks;
+	}
+
 	public String toString () {
 		StringBuilder buffer = new StringBuilder(64);
 		for (int i = 0, n = tracks.size; i < n; i++) {
