@@ -28,12 +28,25 @@
 
 using UnityEngine;
 using System.Collections;
+using Spine;
 
 public class Goblins : MonoBehaviour {
 	private bool girlSkin;
+	private SkeletonAnimation skeletonAnimation;
+	private Bone headBone;
+	
+	public void Start () {
+		skeletonAnimation = GetComponent<SkeletonAnimation>();
+		headBone = skeletonAnimation.skeleton.FindBone("head");
+		skeletonAnimation.UpdateBones += UpdateBones;
+	}
 
+	// This is called after the animation is applied to the skeleton and can be used to adjust the bones dynamically.
+	public void UpdateBones (SkeletonComponent skeletonAnimation) {
+		headBone.Rotation -= 15;
+	}
+	
 	public void OnMouseDown () {
-		SkeletonAnimation skeletonAnimation = GetComponent<SkeletonAnimation>();
 		skeletonAnimation.skeleton.SetSkin(girlSkin ? "goblin" : "goblingirl");
 		skeletonAnimation.skeleton.SetSlotsToSetupPose();
 		

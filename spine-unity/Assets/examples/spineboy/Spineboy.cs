@@ -39,8 +39,8 @@ public class Spineboy : MonoBehaviour {
 		skeletonAnimation.state.Event += Event;
 	}
 	
-	public void Event (object sender, EventTriggeredArgs e) {
-		Debug.Log(e.TrackIndex + " " + skeletonAnimation.state.GetCurrent(e.TrackIndex) + ": event " + e.Event + ", " + e.Event.Int);
+	public void Event (Spine.AnimationState state, int trackIndex, Spine.Event e) {
+		Debug.Log(trackIndex + " " + state.GetCurrent(trackIndex) + ": event " + e + ", " + e.Int);
 	}
 
 	public void OnMouseDown () {
