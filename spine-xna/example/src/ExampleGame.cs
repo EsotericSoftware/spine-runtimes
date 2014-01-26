@@ -94,7 +94,7 @@ namespace Spine {
 			} else {
 				state.SetAnimation(0, "walk", false);
 				TrackEntry entry = state.AddAnimation(0, "jump", false, 0);
-				entry.End += new EventHandler<StartEndArgs>(End); // Event handling for queued animations.
+				entry.End += End; // Event handling for queued animations.
 				state.AddAnimation(0, "walk", true, 0);
 			}
 
@@ -144,20 +144,20 @@ namespace Spine {
 			base.Draw(gameTime);
 		}
 
-		public void Start (object sender, StartEndArgs e) {
-			Console.WriteLine(e.TrackIndex + " " + state.GetCurrent(e.TrackIndex) + ": start");
+		public void Start (AnimationState state, int trackIndex) {
+			Console.WriteLine(trackIndex + " " + state.GetCurrent(trackIndex) + ": start");
 		}
 
-		public void End (object sender, StartEndArgs e) {
-			Console.WriteLine(e.TrackIndex + " " + state.GetCurrent(e.TrackIndex) + ": end");
+		public void End (AnimationState state, int trackIndex) {
+			Console.WriteLine(trackIndex + " " + state.GetCurrent(trackIndex) + ": end");
 		}
 
-		public void Complete (object sender, CompleteArgs e) {
-			Console.WriteLine(e.TrackIndex + " " + state.GetCurrent(e.TrackIndex) + ": complete " + e.LoopCount);
+		public void Complete (AnimationState state, int trackIndex, int loopCount) {
+			Console.WriteLine(trackIndex + " " + state.GetCurrent(trackIndex) + ": complete " + loopCount);
 		}
 
-		public void Event (object sender, EventTriggeredArgs e) {
-			Console.WriteLine(e.TrackIndex + " " + state.GetCurrent(e.TrackIndex) + ": event " + e.Event);
+		public void Event (AnimationState state, int trackIndex, Event e) {
+			Console.WriteLine(trackIndex + " " + state.GetCurrent(trackIndex) + ": event " + e);
 		}
 	}
 }
