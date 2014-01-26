@@ -52,7 +52,7 @@ public class SkeletonComponent : MonoBehaviour {
 	private Material[] sharedMaterials = new Material[0];
 	private List<Material> submeshMaterials = new List<Material>();
 	private List<Submesh> submeshes = new List<Submesh>();
-	
+
 	/// <summary>False if Initialize needs to be called.</summary>
 	public bool Initialized {
 		get {
@@ -287,11 +287,11 @@ public class SkeletonComponent : MonoBehaviour {
 	}
 	
 	public virtual void OnEnable () {
-		Update();
+		Initialize();
 	}
 
 	public virtual void Reset () {
-		Update();
+		Initialize();
 	}
 	
 #if UNITY_EDITOR

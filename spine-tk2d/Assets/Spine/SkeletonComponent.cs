@@ -285,11 +285,11 @@ public class SkeletonComponent : MonoBehaviour {
 	}
 	
 	public virtual void OnEnable () {
-		Update();
+		Initialize();
 	}
 
 	public virtual void Reset () {
-		Update();
+		Initialize();
 	}
 	
 #if UNITY_EDITOR
