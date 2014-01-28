@@ -30,7 +30,7 @@ package com.esotericsoftware.spine.attachments;
 
 import com.esotericsoftware.spine.Skeleton;
 
-/** Attachment that displays a texture region. */
+/** Attachment that displays a skeleton. */
 public class SkeletonAttachment extends Attachment {
 	private Skeleton skeleton;
 
