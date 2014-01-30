@@ -51,6 +51,7 @@ public class SkeletonRendererDebug {
 	private final ShapeRenderer renderer;
 	private boolean drawBones = true, drawRegionAttachments = true, drawBoundingBoxes = true;
 	private final SkeletonBounds bounds = new SkeletonBounds();
+	private float scale = 1;
 
 	public SkeletonRendererDebug () {
 		renderer = new ShapeRenderer();
@@ -115,7 +116,7 @@ public class SkeletonRendererDebug {
 			for (int i = 0, n = bones.size; i < n; i++) {
 				Bone bone = bones.get(i);
 				renderer.setColor(Color.GREEN);
-				renderer.circle(skeletonX + bone.worldX, skeletonY + bone.worldY, 3);
+				renderer.circle(skeletonX + bone.worldX, skeletonY + bone.worldY, 3 * scale);
 			}
 		}
 
@@ -128,6 +129,10 @@ public class SkeletonRendererDebug {
 
 	public void setBones (boolean bones) {
 		this.drawBones = bones;
+	}
+
+	public void setScale (float scale) {
+		this.scale = scale;
 	}
 
 	public void setRegionAttachments (boolean regionAttachments) {
