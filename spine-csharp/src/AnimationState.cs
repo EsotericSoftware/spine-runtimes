@@ -47,8 +47,8 @@ namespace Spine {
 		public delegate void EventDelegate(AnimationState state, int trackIndex, Event e);
 		public EventDelegate Event;
 		
-		public delegate void CompleteDelete(AnimationState state, int trackIndex, int loopCount);
-		public CompleteDelete Complete;
+		public delegate void CompleteDelegate(AnimationState state, int trackIndex, int loopCount);
+		public CompleteDelegate Complete;
 
 		public AnimationState (AnimationStateData data) {
 			if (data == null) throw new ArgumentNullException("data cannot be null.");
@@ -265,7 +265,7 @@ namespace Spine {
 	    public AnimationState.StartEndDelegate Start;
 	    public AnimationState.StartEndDelegate End;
 		public AnimationState.EventDelegate Event;
-		public AnimationState.CompleteDelete Complete;
+		public AnimationState.CompleteDelegate Complete;
 
 		internal void OnStart (AnimationState state, int index) {
 			if (Start != null) Start(state, index);
