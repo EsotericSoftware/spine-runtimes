@@ -94,7 +94,7 @@ public class StarlingTextureLoader implements TextureLoader {
 	}
 
 	public function unloadPage (page:AtlasPage) : void {
-		BitmapData(page.rendererObject).dispose();
+		Texture(page.rendererObject).dispose();
 	}
 }
 
