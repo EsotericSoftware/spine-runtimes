@@ -16,7 +16,7 @@ CCScene* ExampleLayer::scene () {
 }
 
 bool ExampleLayer::init () {
-	if (!CCLayer::init()) return false;
+	if (!CCLayerColor::initWithColor(ccc4(128,128,128,255))) return false;
 	
 	skeletonNode = CCSkeletonAnimation::createWithFile("spineboy.json", "spineboy.atlas");
 	skeletonNode->setMix("walk", "jump", 0.2f);

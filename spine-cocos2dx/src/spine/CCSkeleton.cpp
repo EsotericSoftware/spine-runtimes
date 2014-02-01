@@ -129,11 +129,6 @@ void CCSkeleton::draw () {
 	skeleton->g = color.g / (float)255;
 	skeleton->b = color.b / (float)255;
 	skeleton->a = getOpacity() / (float)255;
-	if (premultipliedAlpha) {
-		skeleton->r *= skeleton->a;
-		skeleton->g *= skeleton->a;
-		skeleton->b *= skeleton->a;
-	}
 
 	int additive = 0;
 	CCTextureAtlas* textureAtlas = 0;

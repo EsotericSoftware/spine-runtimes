@@ -136,11 +136,6 @@
 	_skeleton->g = color.g / (float)255;
 	_skeleton->b = color.b / (float)255;
 	_skeleton->a = self.opacity / (float)255;
-	if (_premultipliedAlpha) {
-		_skeleton->r *= _skeleton->a;
-		_skeleton->g *= _skeleton->a;
-		_skeleton->b *= _skeleton->a;
-	}
 
 	int additive = 0;
 	CCTextureAtlas* textureAtlas = 0;

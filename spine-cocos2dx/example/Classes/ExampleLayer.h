@@ -6,7 +6,7 @@
 #include "cocos2d.h"
 #include <spine/spine-cocos2dx.h>
 
-class ExampleLayer: public cocos2d::CCLayer {
+class ExampleLayer: public cocos2d::CCLayerColor {
 public:
 	static cocos2d::CCScene* scene ();
 
