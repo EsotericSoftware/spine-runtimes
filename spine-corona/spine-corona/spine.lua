@@ -93,7 +93,7 @@ function spine.Skeleton.new (skeletonData, group)
 			local attachment = slot.attachment
 			if not attachment then -- Attachment is gone, remove the image.
 				if image then
-					image:removeSelf()
+					display.remove(image)
 					images[slot] = nil
 				end
 			elseif attachment.type == spine.AttachmentType.region then
@@ -102,7 +102,7 @@ function spine.Skeleton.new (skeletonData, group)
 						image.lastR, image.lastA = nil, nil
 						image.attachment = attachment
 					else -- If not modified, remove the image and it will be recreated.
-						image:removeSelf()
+						display.remove(image)
 						images[slot] = nil
 						image = nil
 					end
