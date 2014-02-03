@@ -53,7 +53,7 @@ public class SkeletonDataAssetInspector : Editor {
 		EditorGUILayout.PropertyField(skeletonJSON);
 		EditorGUILayout.PropertyField(scale);
 		
-		SkeletonData skeletonData = asset.GetSkeletonData(true);
+		SkeletonData skeletonData = asset.GetSkeletonData(asset.atlasAsset == null || asset.skeletonJSON == null);
 		if (skeletonData != null) {
 			showAnimationStateData = EditorGUILayout.Foldout(showAnimationStateData, "Animation State Data");
 			if (showAnimationStateData) {
