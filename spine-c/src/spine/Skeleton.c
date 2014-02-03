@@ -115,7 +115,7 @@ void spSkeleton_setBonesToSetupPose (const spSkeleton* self) {
 
 void spSkeleton_setSlotsToSetupPose (const spSkeleton* self) {
 	int i;
-	memcpy(self->drawOrder, self->slots, self->slotCount * sizeof(int));
+	memcpy(self->drawOrder, self->slots, self->slotCount * sizeof(spSlot*));
 	for (i = 0; i < self->slotCount; ++i)
 		spSlot_setToSetupPose(self->slots[i]);
 }
