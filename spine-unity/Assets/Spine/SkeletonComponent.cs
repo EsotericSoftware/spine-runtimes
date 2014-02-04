@@ -64,12 +64,12 @@ public class SkeletonComponent : MonoBehaviour {
 	}
 
 	public virtual void Clear () {
-		meshFilter.sharedMesh = null;
-		DestroyImmediate(mesh);
+		if (meshFilter != null) meshFilter.sharedMesh = null;
+		if (mesh != null) DestroyImmediate(mesh);
 		mesh = null;
 		mesh1 = null;
 		mesh2 = null;
-		renderer.sharedMaterial = null;
+		if (renderer != null) renderer.sharedMaterial = null;
 		skeleton = null;
 	}
 
