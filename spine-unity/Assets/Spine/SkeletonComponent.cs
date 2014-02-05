@@ -66,10 +66,17 @@ public class SkeletonComponent : MonoBehaviour {
 	public virtual void Clear () {
 		if (meshFilter != null) meshFilter.sharedMesh = null;
 		if (mesh != null) DestroyImmediate(mesh);
+		if (renderer != null) renderer.sharedMaterial = null;
 		mesh = null;
 		mesh1 = null;
 		mesh2 = null;
-		if (renderer != null) renderer.sharedMaterial = null;
+		lastVertexCount = 0;
+		vertices = null;
+		colors = null;
+		uvs = null;
+		sharedMaterials = new Material[0];
+		submeshMaterials.Clear();
+		submeshes.Clear();
 		skeleton = null;
 	}
 
@@ -218,7 +225,7 @@ public class SkeletonComponent : MonoBehaviour {
 		mesh.colors32 = colors;
 		mesh.uv = uvs;
 		
-		int submeshCount = submeshes.Count;
+		int submeshCount = submeshMaterials.Count;
 		mesh.subMeshCount = submeshCount;
 		for (int i = 0; i < submeshCount; ++i)
 			mesh.SetTriangles(submeshes[i].indexes, i);
