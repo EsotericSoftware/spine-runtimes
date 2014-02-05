@@ -219,7 +219,7 @@ void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEnt
 
 	self->tracks[index] = entry;
 
-	if (entry->listener) current->listener(self, index, ANIMATION_START, 0, 0);
+	if (entry->listener) entry->listener(self, index, ANIMATION_START, 0, 0);
 	if (self->listener) self->listener(self, index, ANIMATION_START, 0, 0);
 }
 
