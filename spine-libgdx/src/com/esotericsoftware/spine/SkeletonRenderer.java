@@ -35,7 +35,7 @@ import com.esotericsoftware.spine.attachments.SkeletonAttachment;
 
 import com.badlogic.gdx.graphics.GL11;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.utils.Array;
 
@@ -109,7 +109,7 @@ public class SkeletonRenderer {
 		}
 	}
 
-	public void draw (Batch batch, Skeleton skeleton) {
+	public void draw (SpriteBatch batch, Skeleton skeleton) {
 		boolean premultipliedAlpha = this.premultipliedAlpha;
 		int srcFunc = premultipliedAlpha ? GL11.GL_ONE : GL11.GL_SRC_ALPHA;
 		batch.setBlendFunction(srcFunc, GL11.GL_ONE_MINUS_SRC_ALPHA);
