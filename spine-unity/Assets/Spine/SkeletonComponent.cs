@@ -126,6 +126,7 @@ public class SkeletonComponent : MonoBehaviour {
 		int quadCount = 0, submeshQuadCount = 0;
 		Material lastMaterial = null;
 		submeshMaterials.Clear();
+		submeshes.Clear();
 		List<Slot> drawOrder = skeleton.DrawOrder;
 		for (int i = 0, n = drawOrder.Count; i < n; i++) {
 			RegionAttachment regionAttachment = drawOrder[i].Attachment as RegionAttachment;
