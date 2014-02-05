@@ -41,8 +41,8 @@ namespace Spine {
 		public float TimeScale { get { return timeScale; } set { timeScale = value; } }
 
 		public delegate void StartEndDelegate(AnimationState state, int trackIndex);
-	    public event StartEndDelegate Start;
-	    public event StartEndDelegate End;
+		public event StartEndDelegate Start;
+		public event StartEndDelegate End;
 
 		public delegate void EventDelegate(AnimationState state, int trackIndex, Event e);
 		public event EventDelegate Event;
@@ -262,8 +262,8 @@ namespace Spine {
 		public float TimeScale { get { return timeScale; } set { timeScale = value; } }
 		public bool Loop { get { return loop; } set { loop = value; } }
 		
-	    public event AnimationState.StartEndDelegate Start;
-	    public event AnimationState.StartEndDelegate End;
+		public event AnimationState.StartEndDelegate Start;
+		public event AnimationState.StartEndDelegate End;
 		public event AnimationState.EventDelegate Event;
 		public event AnimationState.CompleteDelegate Complete;
 
