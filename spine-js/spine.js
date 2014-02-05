@@ -766,7 +766,7 @@ spine.Skeleton.prototype = {
 	/** @param attachmentName May be null. */
 	setAttachment: function (slotName, attachmentName) {
 		var slots = this.slots;
-		for (var i = 0, n = slots.size; i < n; i++) {
+		for (var i = 0, n = slots.length; i < n; i++) {
 			var slot = slots[i];
 			if (slot.data.name == slotName) {
 				var attachment = null;
@@ -781,13 +781,13 @@ spine.Skeleton.prototype = {
 		throw "Slot not found: " + slotName;
 	},
 	update: function (delta) {
-		time += delta;
+		this.time += delta;
 	}
 };
 
 spine.EventData = function (name) {
 	this.name = name;
-}
+};
 spine.EventData.prototype = {
 	intValue: 0,
 	floatValue: 0,
@@ -796,7 +796,7 @@ spine.EventData.prototype = {
 
 spine.Event = function (data) {
 	this.data = data;
-}
+};
 spine.Event.prototype = {
 	intValue: 0,
 	floatValue: 0,
@@ -948,7 +948,7 @@ spine.TrackEntry.prototype = {
 	timeScale: 1,
 	mixTime: 0, mixDuration: 0,
 	onStart: null, onEnd: null, onComplete: null, onEvent: null
-}
+};
 
 spine.AnimationState = function (stateData) {
 	this.data = stateData;
@@ -1236,7 +1236,7 @@ spine.SkeletonJson.prototype = {
 		} else if (type == spine.AttachmentType.boundingBox) {
 			var vertices = map["vertices"];
 			for (var i = 0, n = vertices.length; i < n; i++)
-				attachment.vertices.push(vertices[i] * scale);
+				attachment.vertices.push(vertices[i] * this.scale);
 		}
 
 		return attachment;
@@ -1588,7 +1588,7 @@ spine.AtlasRegion.prototype = {
 	index: 0,
 	rotate: false,
 	splits: null,
-	pads: null,
+	pads: null
 };
 
 spine.AtlasReader = function (text) {
@@ -1614,7 +1614,7 @@ spine.AtlasReader.prototype = {
 		var line = this.readLine();
 		var colon = line.indexOf(":");
 		if (colon == -1) throw "Invalid line: " + line;
-		var i = 0, lastMatch= colon + 1;
+		var i = 0, lastMatch = colon + 1;
 		for (; i < 3; i++) {
 			var comma = line.indexOf(",", lastMatch);
 			if (comma == -1) {
@@ -1681,7 +1681,7 @@ spine.SkeletonBounds.prototype = {
 			if (boundingBox.type != spine.AttachmentType.boundingBox) continue;
 			boundingBoxes.push(boundingBox);
 
-			var poolCount = polygonPool.length;
+			var poolCount = polygonPool.length, polygon;
 			if (poolCount > 0) {
 				polygon = polygonPool[poolCount - 1];
 				polygonPool.splice(poolCount - 1, 1);
@@ -1751,7 +1751,7 @@ spine.SkeletonBounds.prototype = {
 	intersectsSegment: function (x1, y1, x2, y2) {
 		var polygons = this.polygons;
 		for (var i = 0, n = polygons.length; i < n; i++)
-			if (polygons[i].intersectsSegment(x1, y1, x2, y2)) return boundingBoxes[i];
+			if (polygons[i].intersectsSegment(x1, y1, x2, y2)) return this.boundingBoxes[i];
 		return null;
 	},
 	/** Returns true if the polygon contains the point. */
