@@ -35,8 +35,14 @@ public class Spineboy : MonoBehaviour {
 	SkeletonAnimation skeletonAnimation;
 
 	public void Start () {
-		skeletonAnimation = GetComponent<SkeletonAnimation>();	
+		// Get the SkeletonAnimation component for the GameObject this script is attached to.
+		skeletonAnimation = GetComponent<SkeletonAnimation>();
+		// Call our method any time an animation fires an event.
 		skeletonAnimation.state.Event += Event;
+		// Queue jump to be played on track 0 after the starting animation.
+		skeletonAnimation.state.AddAnimation(0, "jump", false, 0);
+		// Queue walk to be looped on track 0 after the jump animation.
+		skeletonAnimation.state.AddAnimation(0, "walk", true, 0);
 	}
 	
 	public void Event (Spine.AnimationState state, int trackIndex, Spine.Event e) {
@@ -44,7 +50,9 @@ public class Spineboy : MonoBehaviour {
 	}
 
 	public void OnMouseDown () {
+		// Set jump to be played on track 0 immediately.
 		skeletonAnimation.state.SetAnimation(0, "jump", false);
+		// Queue walk to be looped on track 0 after the jump animation.
 		skeletonAnimation.state.AddAnimation(0, "walk", true, 0);
 	}
 }

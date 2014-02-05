@@ -41,6 +41,7 @@ public class SkeletonComponent : MonoBehaviour {
 	public float timeScale = 1;
 	public bool calculateNormals;
 	public bool calculateTangents;
+	public float zSpacing = 0.1f;
 	private MeshFilter meshFilter;
 	private Mesh mesh, mesh1, mesh2;
 	private bool useMesh1;
@@ -188,7 +189,7 @@ public class SkeletonComponent : MonoBehaviour {
 		Color32[] colors = this.colors;
 		int vertexIndex = 0;
 		Color32 color = new Color32();
-		float a = skeleton.A * 255, r = skeleton.R, g = skeleton.G, b = skeleton.B;
+		float a = skeleton.A * 255, r = skeleton.R, g = skeleton.G, b = skeleton.B, zSpacing = this.zSpacing;
 		for (int i = 0, n = drawOrder.Count; i < n; i++) {
 			Slot slot = drawOrder[i];
 			RegionAttachment regionAttachment = slot.Attachment as RegionAttachment;
@@ -197,7 +198,7 @@ public class SkeletonComponent : MonoBehaviour {
 			
 			regionAttachment.ComputeWorldVertices(skeleton.X, skeleton.Y, slot.Bone, vertexPositions);
 			
-			float z = -i * 0.1f;
+			float z = i * zSpacing;
 			vertices[vertexIndex] = new Vector3(vertexPositions[RegionAttachment.X1], vertexPositions[RegionAttachment.Y1], z);
 			vertices[vertexIndex + 1] = new Vector3(vertexPositions[RegionAttachment.X4], vertexPositions[RegionAttachment.Y4], z);
 			vertices[vertexIndex + 2] = new Vector3(vertexPositions[RegionAttachment.X2], vertexPositions[RegionAttachment.Y2], z);
@@ -236,7 +237,7 @@ public class SkeletonComponent : MonoBehaviour {
 			Vector3 normal = new Vector3(0, 0, -1);
 			for (int i = 0; i < vertexCount; i++)
 				normals[i] = normal;
-			(useMesh1 ? mesh2 : mesh1).vertices = vertices;
+			(useMesh1 ? mesh2 : mesh1).vertices = vertices; // Set other mesh vertices.
 			mesh1.normals = normals;
 			mesh2.normals = normals;
 
@@ -249,7 +250,7 @@ public class SkeletonComponent : MonoBehaviour {
 				mesh2.tangents = tangents;
 			}
 		}
-		
+
 		useMesh1 = !useMesh1;
 	}
 	
@@ -260,7 +261,7 @@ public class SkeletonComponent : MonoBehaviour {
 
 		int indexCount = submeshQuadCount * 6;
 		int vertexIndex = (endQuadCount - submeshQuadCount) * 4;
-		
+
 		if (submeshes.Count <= submeshIndex) submeshes.Add(new Submesh());
 		Submesh submesh = submeshes[submeshIndex];
 		

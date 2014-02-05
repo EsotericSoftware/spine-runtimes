@@ -49,8 +49,6 @@ public class SkeletonDataAssetInspector : Editor {
 		serializedObject.Update();
 		SkeletonDataAsset asset = (SkeletonDataAsset)target;
 
-		EditorGUIUtility.LookLikeInspector();
-
 		tk2dSpriteCollection sprites = EditorGUILayout.ObjectField("Sprite Collection", asset.spriteCollection, typeof(tk2dSpriteCollection), false) as tk2dSpriteCollection;
 		if (sprites != null)
 			spriteCollection.objectReferenceValue = sprites.spriteCollection;
