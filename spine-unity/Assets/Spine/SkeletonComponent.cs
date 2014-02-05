@@ -34,6 +34,7 @@ using Spine;
 
 /** Renders a skeleton. Extend to apply animations, get bones and manipulate them, etc. */
 [ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
+[AddComponentMenu("Spine/SkeletonComponent")]
 public class SkeletonComponent : MonoBehaviour {
 	public SkeletonDataAsset skeletonDataAsset;
 	public Skeleton skeleton;

@@ -69,26 +69,4 @@ public class SpineEditor {
 		EditorUtility.FocusProjectWindow();
 		Selection.activeObject = gameObject;
 	}
-	
-	[MenuItem("Component/Spine SkeletonComponent")]
-	static public void CreateSkeletonComponent () {
-		Selection.activeGameObject.AddComponent(typeof(SkeletonComponent));
-	}
-	
-	[MenuItem("Component/Spine SkeletonAnimation")]
-	static public void CreateSkeletonAnimation () {
-		Selection.activeGameObject.AddComponent(typeof(SkeletonAnimation));
-	}
-	
-	[MenuItem("Component/Spine SkeletonComponent", true)]
-	static public bool ValidateCreateSkeletonComponent () {
-		return Selection.activeGameObject != null
-			&& Selection.activeGameObject.GetComponent(typeof(SkeletonComponent)) == null
-			&& Selection.activeGameObject.GetComponent(typeof(SkeletonAnimation)) == null;
-	}
-
-	[MenuItem("Component/Spine SkeletonAnimation", true)]
-	static public bool ValidateCreateSkeletonAnimation () {
-		return ValidateCreateSkeletonComponent();
-	}
 }

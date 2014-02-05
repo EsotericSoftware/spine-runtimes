@@ -27,54 +27,46 @@
  *****************************************************************************/
 
 using System;
-using System.IO;
-using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
-using Spine;
 
-/** Extends SkeletonComponent to apply an animation. */
-[ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
-[AddComponentMenu("Spine/SkeletonAnimation")]
-public class SkeletonAnimation : SkeletonComponent {
-	public bool loop;
-	public Spine.AnimationState state;
+[CustomEditor(typeof(BoneComponent))]
+public class BoneComponentInspector : Editor {
+	private SerializedProperty boneName, skeletonComponent;
 
-	public delegate void UpdateBonesDelegate(SkeletonAnimation skeleton);
-	public UpdateBonesDelegate UpdateBones;
-
-	public String _animationName;
-	public String animationName {
-		get {
-			TrackEntry entry = state.GetCurrent(0);
-			return entry == null ? null : entry.Animation.Name;
-		}
-		set {
-			if (_animationName == value) return;
-			_animationName = value;
-			if (value == null || value.Length == 0)
-				state.ClearTrack(0);
-			else
-				state.SetAnimation(0, value, loop);
-		}
+	void OnEnable () {
+		skeletonComponent = serializedObject.FindProperty("skeletonComponent");
+		boneName = serializedObject.FindProperty("boneName");
 	}
 
-	override public void Initialize () {
-		if (Initialized) return;
+	override public void OnInspectorGUI () {
+		serializedObject.Update();
+		BoneComponent component = (BoneComponent)target;
 
-		base.Initialize();
+		EditorGUILayout.PropertyField(skeletonComponent);
 
-		state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());
-		if (_animationName != null && _animationName.Length > 0) state.SetAnimation(0, _animationName, loop);
-	}
+		if (component.skeletonComponent != null) {
+			String[] bones = new String[component.skeletonComponent.skeleton.Data.Bones.Count + 1];
+			bones[0] = "<None>";
+			for (int i = 0; i < bones.Length - 1; i++)
+				bones[i + 1] = component.skeletonComponent.skeleton.Data.Bones[i].Name;
+			Array.Sort<String>(bones);
+			int boneIndex = Math.Max(0, Array.IndexOf(bones, boneName.stringValue));
 
-	override public void UpdateSkeleton (float deltaTime) {
-		// Apply the animation.
-		state.Update(deltaTime * timeScale);
-		state.Apply(skeleton);
+			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.LabelField("Bone");
+			EditorGUIUtility.LookLikeControls();
+			boneIndex = EditorGUILayout.Popup(boneIndex, bones);
+			EditorGUILayout.EndHorizontal();
 
-		if (UpdateBones != null) UpdateBones(this);
+			boneName.stringValue = bones[boneIndex];;
+		}
 
-		// Call overridden method to call skeleton Update and UpdateWorldTransform.
-		base.UpdateSkeleton(deltaTime);
+		if (serializedObject.ApplyModifiedProperties() ||
+	    	(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
+	    ) {
+			component.bone = null;
+			component.LateUpdate();
+		}
 	}
 }

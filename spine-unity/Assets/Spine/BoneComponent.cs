@@ -32,49 +32,36 @@ using System.Collections.Generic;
 using UnityEngine;
 using Spine;
 
-/** Extends SkeletonComponent to apply an animation. */
-[ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
-[AddComponentMenu("Spine/SkeletonAnimation")]
-public class SkeletonAnimation : SkeletonComponent {
-	public bool loop;
-	public Spine.AnimationState state;
+/// <summary>Sets a GameObject's transform to match a bone on a Spine skeleton.</summary>
+[ExecuteInEditMode]
+[AddComponentMenu("Spine/BoneComponent")]
+public class BoneComponent : MonoBehaviour {
+	public SkeletonComponent skeletonComponent;
+	public Bone bone;
 
-	public delegate void UpdateBonesDelegate(SkeletonAnimation skeleton);
-	public UpdateBonesDelegate UpdateBones;
+	/// <summary>If a bone isn't set, boneName is used to find the bone.</summary>
+	public String boneName;
 
-	public String _animationName;
-	public String animationName {
-		get {
-			TrackEntry entry = state.GetCurrent(0);
-			return entry == null ? null : entry.Animation.Name;
+	public void LateUpdate () {
+		if (skeletonComponent == null) return;
+		if (bone == null) {
+			if (boneName == null) return;
+			bone = skeletonComponent.skeleton.FindBone(boneName);
+			if (bone == null) {
+				Debug.Log("Bone not found: " + boneName, this);
+				return;
+			}
 		}
-		set {
-			if (_animationName == value) return;
-			_animationName = value;
-			if (value == null || value.Length == 0)
-				state.ClearTrack(0);
-			else
-				state.SetAnimation(0, value, loop);
+		if (transform.parent == skeletonComponent.transform) {
+			transform.localPosition = new Vector3(bone.worldX, bone.worldY, transform.localPosition.z);
+			Vector3 rotation = transform.localRotation.eulerAngles;
+			transform.localRotation = Quaternion.Euler(rotation.x, rotation.y, bone.worldRotation);
+		} else {
+			// Best effort to set this GameObject's transform when it isn't a child of the SkeletonComponent.
+			transform.position = skeletonComponent.transform.TransformPoint(new Vector3(bone.worldX, bone.worldY, transform.position.z));
+			Vector3 rotation = skeletonComponent.transform.rotation.eulerAngles;
+			transform.rotation = Quaternion.Euler(rotation.x, rotation.y, 
+			    skeletonComponent.transform.rotation.eulerAngles.z + bone.worldRotation);
 		}
-	}
-
-	override public void Initialize () {
-		if (Initialized) return;
-
-		base.Initialize();
-
-		state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());
-		if (_animationName != null && _animationName.Length > 0) state.SetAnimation(0, _animationName, loop);
-	}
-
-	override public void UpdateSkeleton (float deltaTime) {
-		// Apply the animation.
-		state.Update(deltaTime * timeScale);
-		state.Apply(skeleton);
-
-		if (UpdateBones != null) UpdateBones(this);
-
-		// Call overridden method to call skeleton Update and UpdateWorldTransform.
-		base.UpdateSkeleton(deltaTime);
 	}
 }

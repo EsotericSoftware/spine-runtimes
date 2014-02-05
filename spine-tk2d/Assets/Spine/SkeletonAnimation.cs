@@ -34,6 +34,7 @@ using Spine;
 
 /** Extends SkeletonComponent to apply an animation. */
 [ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
+[AddComponentMenu("Spine/SkeletonAnimation")]
 public class SkeletonAnimation : SkeletonComponent {
 	public bool loop;
 	public Spine.AnimationState state;
