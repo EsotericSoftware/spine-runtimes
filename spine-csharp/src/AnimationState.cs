@@ -41,14 +41,14 @@ namespace Spine {
 		public float TimeScale { get { return timeScale; } set { timeScale = value; } }
 
 		public delegate void StartEndDelegate(AnimationState state, int trackIndex);
-	    public StartEndDelegate Start;
-	    public StartEndDelegate End;
+	    public event StartEndDelegate Start;
+	    public event StartEndDelegate End;
 
 		public delegate void EventDelegate(AnimationState state, int trackIndex, Event e);
-		public EventDelegate Event;
+		public event EventDelegate Event;
 		
 		public delegate void CompleteDelegate(AnimationState state, int trackIndex, int loopCount);
-		public CompleteDelegate Complete;
+		public event CompleteDelegate Complete;
 
 		public AnimationState (AnimationStateData data) {
 			if (data == null) throw new ArgumentNullException("data cannot be null.");
@@ -262,10 +262,10 @@ namespace Spine {
 		public float TimeScale { get { return timeScale; } set { timeScale = value; } }
 		public bool Loop { get { return loop; } set { loop = value; } }
 		
-	    public AnimationState.StartEndDelegate Start;
-	    public AnimationState.StartEndDelegate End;
-		public AnimationState.EventDelegate Event;
-		public AnimationState.CompleteDelegate Complete;
+	    public event AnimationState.StartEndDelegate Start;
+	    public event AnimationState.StartEndDelegate End;
+		public event AnimationState.EventDelegate Event;
+		public event AnimationState.CompleteDelegate Complete;
 
 		internal void OnStart (AnimationState state, int index) {
 			if (Start != null) Start(state, index);
