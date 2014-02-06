@@ -36,27 +36,32 @@ namespace Spine {
 		internal float r, g, b, a;
 		internal float attachmentTime;
 		internal Attachment attachment;
-
+	    internal float[] attachmentVertices;
 		public SlotData Data { get { return data; } }
 		public Bone Bone { get { return bone; } }
 		public Skeleton Skeleton { get { return skeleton; } }
+        public float[] AttachmentVertices {get { return attachmentVertices; } }
 		public float R { get { return r; } set { r = value; } }
 		public float G { get { return g; } set { g = value; } }
 		public float B { get { return b; } set { b = value; } }
 		public float A { get { return a; } set { a = value; } }
 
-		/// <summary>May be null.</summary>
-		public Attachment Attachment {
-			get {
-				return attachment;
-			}
-			set {
-				attachment = value;
-				attachmentTime = skeleton.time;
-			}
-		}
+	    /// <summary>May be null.</summary>
+	    public Attachment Attachment
+	    {
+	        get
+	        {
+	            return attachment;
+	        }
+	        set
+	        {
+	            attachment = value;
+	            attachmentTime = skeleton.time;
+	            attachmentVertices = null;
+	        }
+	    }
 
-		public float AttachmentTime {
+	    public float AttachmentTime {
 			get {
 				return skeleton.time - attachmentTime;
 			}

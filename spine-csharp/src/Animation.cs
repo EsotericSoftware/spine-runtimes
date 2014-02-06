@@ -525,4 +525,87 @@ namespace Spine {
 			}
 		}
 	}
+
+    public class FfdTimeline : CurveTimeline
+    {
+        internal float[] frames; // time, ...
+        internal float[][] frameVertices;
+        internal int slotIndex;
+        internal MeshAttachment meshAttachment;
+
+        public FfdTimeline(int frameCount) : base(frameCount)
+        {
+            frames = new float[frameCount];
+            frameVertices = new float[frameCount][];
+        }
+
+        public int SlotIndex
+        {
+            get { return slotIndex; }
+            set { slotIndex = value; }
+        }
+
+        public MeshAttachment MeshAttachment
+        {
+            get { return meshAttachment; }
+            set { meshAttachment = value; }
+        }
+
+        public float[] Frames
+        {
+            get { return frames; }
+        }
+
+        public float[][] FrameVertices
+        {
+            get { return frameVertices; }
+        }
+
+        /** Sets the time of the specified keyframe. */
+
+        public void SetFrame(int frameIndex, float time, float[] vertices)
+        {
+            frames[frameIndex] = time;
+            frameVertices[frameIndex] = vertices;
+        }
+
+        public override void Apply(Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha)
+        {
+            Slot slot = skeleton.slots[slotIndex];
+            if (slot.Attachment != meshAttachment) return;
+            
+            float[] frames = this.frames;
+            if (time < frames[0]) return; // Time is before first frame.
+
+            float[][] frameVertices = this.frameVertices;
+            int vertexCount = frameVertices[0].Length;
+            if (slot.attachmentVertices == null || vertexCount > slot.attachmentVertices.Length)
+            {
+                slot.attachmentVertices = new float[vertexCount];
+            }
+
+            if (time >= frames[frames.Length - 1])
+            { 
+                // Time is after last frame.
+                Array.Copy(frameVertices[frames.Length - 1], 0, slot.AttachmentVertices, 0, vertexCount);
+                return;
+            }
+
+            // Interpolate between the previous frame and the current frame.
+            int frameIndex = Animation.binarySearch(frames, time, 1);
+            float frameTime = frames[frameIndex];
+            float percent = 1 - (time - frameTime)/(frames[frameIndex - 1] - frameTime);
+            percent = GetCurvePercent(frameIndex - 1, percent);
+
+            float[] prevVertices = frameVertices[frameIndex - 1];
+            float[] nextVertices = frameVertices[frameIndex];
+
+            // BOZO - FFD, use alpha for mixing?
+            for (int i = 0; i < vertexCount; i++)
+            {
+                float prev = prevVertices[i];
+                slot.attachmentVertices[i] = prev + (nextVertices[i] - prev) * percent;
+            }
+        }
+    }
 }

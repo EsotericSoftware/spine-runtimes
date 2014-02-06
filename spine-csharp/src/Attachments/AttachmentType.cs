@@ -28,6 +28,6 @@
 
 namespace Spine {
 	public enum AttachmentType {
-		region, regionsequence, boundingbox
-	}
+        region, boundingbox, mesh
+    }
 }
