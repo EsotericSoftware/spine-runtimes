@@ -119,6 +119,7 @@ public class Slot {
 	void setToSetupPose (int slotIndex) {
 		color.set(data.color);
 		setAttachment(data.attachmentName == null ? null : skeleton.getAttachment(slotIndex, data.attachmentName));
+		// BOZO - Set mesh to setup pose.
 	}
 
 	public void setToSetupPose () {
