@@ -133,7 +133,7 @@ function Skeleton.new (skeletonData)
 				return
 			end
 		end
-		error("Slot not found: " + slotName, 2)
+		error("Slot not found: " .. slotName, 2)
 	end
 
 	function self:update (delta)

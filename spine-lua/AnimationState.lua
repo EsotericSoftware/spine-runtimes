@@ -168,7 +168,7 @@ function AnimationState.new (data)
 
 	function self:setAnimationByName (trackIndex, animationName, loop)
 		local animation = self.data.skeletonData:findAnimation(animationName)
-		if not animation then error("Animation not found: " + animationName) end
+		if not animation then error("Animation not found: " .. animationName) end
 		return self:setAnimation(trackIndex, animation, loop)
 	end
 
@@ -184,7 +184,7 @@ function AnimationState.new (data)
 
 	function self:addAnimationByName (trackIndex, animationName, loop, delay)
 		local animation = self.data.skeletonData:findAnimation(animationName)
-		if not animation then error("Animation not found: " + animationName) end
+		if not animation then error("Animation not found: " .. animationName) end
 		return self:addAnimation(trackIndex, animation, loop, delay)
 	end
 
