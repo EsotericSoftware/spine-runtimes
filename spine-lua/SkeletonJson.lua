@@ -292,7 +292,7 @@ function SkeletonJson.new (attachmentLoader)
 			local frameIndex = 0
 			for i,eventMap in ipairs(events) do
 				local eventData = skeletonData:findEvent(eventMap["name"])
-				if not eventData then error("Event not found: " + eventMap["name"]) end
+				if not eventData then error("Event not found: " .. eventMap["name"]) end
 				local event = Event.new(eventData)
 				event.intValue = eventMap["int"] or eventData.intValue
 				event.floatValue = eventMap["float"] or eventData.floatValue
@@ -319,7 +319,7 @@ function SkeletonJson.new (attachmentLoader)
 					local unchangedIndex = 1
 					for ii,offsetMap in ipairs(offsets) do
 						local slotIndex = skeletonData:findSlotIndex(offsetMap["slot"])
-						if slotIndex == -1 then error("Slot not found: " + offsetMap["slot"]) end
+						if slotIndex == -1 then error("Slot not found: " .. offsetMap["slot"]) end
 						-- Collect unchanged items.
 						while originalIndex ~= slotIndex do
 							unchanged[unchangedIndex] = originalIndex
