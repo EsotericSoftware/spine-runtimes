@@ -2,7 +2,7 @@
 
 The spine-tk2d runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [2D Toolkit](http://www.unikronsoftware.com/2dtoolkit/) for [Unity](http://unity3d.com/). spine-tk2d is based on [spine-csharp](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-csharp) and is very similar to [spine-unity](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-unity).
 
-A Spine skeleton is a single GameObject and can be used throughout Unity like any other GameObject. The `BoneComponent` class allows other GameObjects to follow a bone in a Spine skeleton.
+A Spine skeleton is a GameObject and can be used throughout Unity like any other GameObject. The `BoneComponent` class allows other GameObjects to follow a bone in a Spine skeleton.
 
 ## Setup
 
