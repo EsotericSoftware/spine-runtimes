@@ -8,9 +8,15 @@ A Spine skeleton is a GameObject and can be used throughout Unity like any other
 
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
 1. Copy the contents of `spine-csharp/src` to `spine-unity/Assets/Spine/spine-csharp`.
-1. Open the `spine-unity/Assets/examples/spineboy/spineboy.unity` scene file using Unity 4.2+.
+1. Open an example scene file from `spine-unity/Assets/examples/` using Unity 4.2+.
 
-# Notes
+## Examples
+
+* **spineboy** This shows the spineboy skeleton, first by playing an animation that shows draw order changing, then spineboy jumps and walks. Click to jump again. Notice the walk and jump animations are mixed and transition smoothly. The white cube on spineboy's right hand is a separate GameObject that is positioned using `BoneComponent`. This example uses images that are split across two atlas pages. This demonstrates a multi-page atlas, but of course has a high number of draw calls.
+* **goblins*** This shows a male and female goblin that use the same skeleton and animations. Click to change the skin from male to female and back. It has a single atlas page, so is drawn with just 1 draw call. It uses the `Skeleton Lit` shader for vertex lighting. The [Goblins.cs](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-unity/Assets/examples/goblins/Goblins.cs) script manipulates the head bone after the animation is applied.
+* **dragon*** This shows the dragon skeleton. The flying animation has many image changes. It also shows shadow rendering. This example uses a multi-page atlas so has a high number of draw calls.
+
+## Notes
 
 - Atlas images should use premultiplied alpha when using the shaders that come with spine-unity.
 - This slightly outdated [spine-unity tutorial video](http://www.youtube.com/watch?v=x1umSQulghA) may still be useful.
