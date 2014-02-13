@@ -1,8 +1,8 @@
 # spine-unity
 
-The spine-unity runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Unity](http://unity3d.com/) directly, without other 3rd party plugins. spine-unity is based on [spine-csharp](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-csharp) and is very similar to [spine-tk2d](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-tk2d).
+The spine-unity runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Unity](http://unity3d.com/) directly, without any other plugins. spine-unity is based on [spine-csharp](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-csharp) and is very similar to [spine-tk2d](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-tk2d).
 
-A Spine skeleton is a single GameObject and can be used throughout Unity like any other GameObject. The `BoneComponent` class allows other GameObjects to follow a bone in a Spine skeleton.
+A Spine skeleton is a GameObject and can be used throughout Unity like any other GameObject. The `BoneComponent` class allows other GameObjects to follow a bone in a Spine skeleton.
 
 ## Setup
 
