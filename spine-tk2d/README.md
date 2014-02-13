@@ -11,7 +11,12 @@ A Spine skeleton is a GameObject and can be used throughout Unity like any other
 1. Open the `spine-tk2d/Assets/examples/spineboy/spineboy.unity` scene file using Unity 4.2+.
 1. Import 2D Toolkit into the project.
 
-# Notes
+
+## Examples
+
+* **spineboy** This shows the spineboy skeleton with shadows. First an animation is played that shows the draw order changing and events firing, then spineboy jumps and walks. Click spineboy to jump again. Notice the walk and jump animations are mixed and transition smoothly. The white cube on spineboy's right hand is a separate GameObject that is positioned using a `BoneComponent`.
+
+## Notes
 
 - Atlas images should use premultiplied alpha when using the shaders that come with spine-tk2d.
 - This slightly outdated [spine-tk2d setup video](http://www.youtube.com/watch?v=dnQbS9ap-i8) may still be useful.
