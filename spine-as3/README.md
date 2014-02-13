@@ -11,5 +11,5 @@ Alternatively, the contents of the `spine-as3/src` directory can be copied into 
 
 ## Demos
 
-[Flash Demo](http://esotericsoftware.com/spine/files/demos/as3/spineboy/index.html)
-[Flash Demo source](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-as3/spine-as3-example/src/Main.as#L55)
+* [Flash Demo](http://esotericsoftware.com/spine/files/demos/as3/spineboy/index.html)
+*  [Flash Demo source](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-as3/spine-as3-example/src/Main.as#L55)
