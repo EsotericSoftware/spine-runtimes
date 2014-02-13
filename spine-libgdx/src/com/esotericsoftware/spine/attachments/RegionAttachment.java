@@ -149,16 +149,13 @@ public class RegionAttachment extends Attachment {
 		Color skeletonColor = skeleton.getColor();
 		Color slotColor = slot.getColor();
 		Color regionColor = color;
-		float r = skeletonColor.r * slotColor.r * regionColor.r;
-		float g = skeletonColor.g * slotColor.g * regionColor.g;
-		float b = skeletonColor.b * slotColor.b * regionColor.b;
 		float a = skeletonColor.a * slotColor.a * regionColor.a * 255;
 		float multiplier = premultipliedAlpha ? a : 255;
 		float color = NumberUtils.intToFloatColor( //
-			((int)(a) << 24) //
-				| ((int)(b * multiplier) << 16) //
-				| ((int)(g * multiplier) << 8) //
-				| ((int)(r * multiplier)));
+			((int)a << 24) //
+				| ((int)(skeletonColor.b * slotColor.b * regionColor.b * multiplier) << 16) //
+				| ((int)(skeletonColor.g * slotColor.g * regionColor.g * multiplier) << 8) //
+				| (int)(skeletonColor.r * slotColor.r * regionColor.r * multiplier));
 
 		float[] vertices = this.vertices;
 		float[] offset = this.offset;
