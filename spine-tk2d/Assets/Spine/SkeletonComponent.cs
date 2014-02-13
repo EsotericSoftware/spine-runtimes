@@ -42,7 +42,7 @@ public class SkeletonComponent : MonoBehaviour {
 	public float timeScale = 1;
 	public bool calculateNormals;
 	public bool calculateTangents;
-	public float zSpacing = 0.1f;
+	public float zSpacing;
 	private MeshFilter meshFilter;
 	private Mesh mesh, mesh1, mesh2;
 	private bool useMesh1;
