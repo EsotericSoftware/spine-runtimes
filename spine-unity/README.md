@@ -12,7 +12,7 @@ A Spine skeleton is a GameObject and can be used throughout Unity like any other
 
 ## Examples
 
-* **spineboy** This shows the spineboy skeleton, first by playing an animation that shows draw order changing, then spineboy jumps and walks. Click to jump again. Notice the walk and jump animations are mixed and transition smoothly. The white cube on spineboy's right hand is a separate GameObject that is positioned using `BoneComponent`. This example uses images that are split across two atlas pages. This demonstrates a multi-page atlas, but of course has a high number of draw calls.
+* **spineboy** This shows the spineboy skeleton. First an animation is played that shows the draw order changing and events firing, then spineboy jumps and walks. Click spineboy to jump again. Notice the walk and jump animations are mixed and transition smoothly. The white cube on spineboy's right hand is a separate GameObject that is positioned using a `BoneComponent`. This example uses images that are split across two atlas pages. This demonstrates a multi-page atlas, but of course has a high number of draw calls.
 * **goblins*** This shows a male and female goblin that use the same skeleton and animations. Click to change the skin from male to female and back. It has a single atlas page, so is drawn with just 1 draw call. It uses the `Skeleton Lit` shader for vertex lighting. The [Goblins.cs](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-unity/Assets/examples/goblins/Goblins.cs) script manipulates the head bone after the animation is applied.
 * **dragon*** This shows the dragon skeleton. The flying animation has many image changes. It also shows shadow rendering. This example uses a multi-page atlas so has a high number of draw calls.
 
