@@ -42,8 +42,20 @@ public class BoneComponent : MonoBehaviour {
 	/// <summary>If a bone isn't set, boneName is used to find the bone.</summary>
 	public String boneName;
 
+	protected Transform cachedTransform;
+	protected Transform skeletonComponentTransform;
+	
+	protected System.Action FollowMethod;
+
+	void Awake () {
+		cachedTransform = transform;
+		UpdateFollowMethod();
+
+	}
+
 	public void LateUpdate () {
 		if (skeletonComponent == null) return;
+
 		if (bone == null) {
 			if (boneName == null) return;
 			bone = skeletonComponent.skeleton.FindBone(boneName);
@@ -52,16 +64,55 @@ public class BoneComponent : MonoBehaviour {
 				return;
 			}
 		}
-		if (transform.parent == skeletonComponent.transform) {
-			transform.localPosition = new Vector3(bone.worldX, bone.worldY, transform.localPosition.z);
-			Vector3 rotation = transform.localRotation.eulerAngles;
-			transform.localRotation = Quaternion.Euler(rotation.x, rotation.y, bone.worldRotation);
+
+		FollowMethod();
+
+	}
+	
+	/// <summary>
+	/// Checks if the BoneComponent's GameObject is a child of the SkeletonComponent GameObject
+	/// and adjusts its attachment algorithm accordingly.</summary>
+	public void UpdateFollowMethod () {
+		if(skeletonComponent == null) return;
+		skeletonComponentTransform = skeletonComponent.transform;
+
+		if (cachedTransform.parent == skeletonComponentTransform) {
+			FollowMethod = LocalFollow;
 		} else {
-			// Best effort to set this GameObject's transform when it isn't a child of the SkeletonComponent.
-			transform.position = skeletonComponent.transform.TransformPoint(new Vector3(bone.worldX, bone.worldY, transform.position.z));
-			Vector3 rotation = skeletonComponent.transform.rotation.eulerAngles;
-			transform.rotation = Quaternion.Euler(rotation.x, rotation.y, 
-			    skeletonComponent.transform.rotation.eulerAngles.z + bone.worldRotation);
+			FollowMethod = WorldFollow;
 		}
 	}
+
+	/// <summary>Use this to change the parent of the GameObject/Transform. UpdateFollowMethod is automatically called.	</summary>
+	public void SetParentTransform(Transform parentTransform) {
+		if(cachedTransform == parentTransform) return;
+
+		cachedTransform.parent = parentTransform;
+		UpdateFollowMethod();
+
+	}
+	
+	#region Follow Methods
+	/// <summary>The method to use when the GameObject to attach to the bone is a child of the SkeletonComponent GameObject.</summary>
+	void LocalFollow () {
+		// Set position.
+		cachedTransform.localPosition = new Vector3(bone.worldX, bone.worldY, cachedTransform.localPosition.z);
+		Vector3 rotation = cachedTransform.localRotation.eulerAngles;
+
+		// Set rotation.
+		cachedTransform.localRotation = Quaternion.Euler(rotation.x, rotation.y, bone.worldRotation);
+	}
+
+	/// <summary>The method to use when the GameObject to attach to the bone is NOT a child of the SkeletonComponent GameObject.</summary>
+	void WorldFollow () {
+		// Best effort to set this GameObject's transform when it isn't a child of the SkeletonComponent.
+		// Set position.
+		cachedTransform.position = skeletonComponentTransform.TransformPoint(new Vector3(bone.worldX, bone.worldY, cachedTransform.position.z));
+		Vector3 rotation = skeletonComponentTransform.rotation.eulerAngles;
+
+		// Set rotation.
+		cachedTransform.rotation = Quaternion.Euler(rotation.x, rotation.y, 
+		                                            skeletonComponentTransform.rotation.eulerAngles.z + bone.worldRotation);
+	}
+	#endregion
 }
