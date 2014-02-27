@@ -225,7 +225,42 @@ public class SkeletonJson {
 		Array<Timeline> timelines = new Array();
 		float duration = 0;
 
-		// SRT.
+		// Slot timelines.
+		for (JsonValue slotMap = map.getChild("slots"); slotMap != null; slotMap = slotMap.next) {
+			int slotIndex = skeletonData.findSlotIndex(slotMap.name);
+			if (slotIndex == -1) throw new SerializationException("Slot not found: " + slotMap.name);
+
+			for (JsonValue timelineMap = slotMap.child; timelineMap != null; timelineMap = timelineMap.next) {
+				String timelineName = timelineMap.name;
+				if (timelineName.equals("color")) {
+					ColorTimeline timeline = new ColorTimeline(timelineMap.size);
+					timeline.slotIndex = slotIndex;
+
+					int frameIndex = 0;
+					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next) {
+						Color color = Color.valueOf(valueMap.getString("color"));
+						timeline.setFrame(frameIndex, valueMap.getFloat("time"), color.r, color.g, color.b, color.a);
+						readCurve(timeline, frameIndex, valueMap);
+						frameIndex++;
+					}
+					timelines.add(timeline);
+					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 5 - 5]);
+
+				} else if (timelineName.equals("attachment")) {
+					AttachmentTimeline timeline = new AttachmentTimeline(timelineMap.size);
+					timeline.slotIndex = slotIndex;
+
+					int frameIndex = 0;
+					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next)
+						timeline.setFrame(frameIndex++, valueMap.getFloat("time"), valueMap.getString("name"));
+					timelines.add(timeline);
+					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() - 1]);
+				} else
+					throw new RuntimeException("Invalid timeline type for a slot: " + timelineName + " (" + slotMap.name + ")");
+			}
+		}
+
+		// Bone timelines.
 		for (JsonValue boneMap = map.getChild("bones"); boneMap != null; boneMap = boneMap.next) {
 			int boneIndex = skeletonData.findBoneIndex(boneMap.name);
 			if (boneIndex == -1) throw new SerializationException("Bone not found: " + boneMap.name);
@@ -271,7 +306,7 @@ public class SkeletonJson {
 			}
 		}
 
-		// FFD.
+		// FFD timelines.
 		for (JsonValue ffdMap = map.getChild("ffd"); ffdMap != null; ffdMap = ffdMap.next) {
 			Skin skin = skeletonData.findSkin(ffdMap.name);
 			if (skin == null) throw new SerializationException("Skin not found: " + ffdMap.name);
@@ -308,60 +343,7 @@ public class SkeletonJson {
 			}
 		}
 
-		// Color, attachment.
-		for (JsonValue slotMap = map.getChild("slots"); slotMap != null; slotMap = slotMap.next) {
-			int slotIndex = skeletonData.findSlotIndex(slotMap.name);
-			if (slotIndex == -1) throw new SerializationException("Slot not found: " + slotMap.name);
-
-			for (JsonValue timelineMap = slotMap.child; timelineMap != null; timelineMap = timelineMap.next) {
-				String timelineName = timelineMap.name;
-				if (timelineName.equals("color")) {
-					ColorTimeline timeline = new ColorTimeline(timelineMap.size);
-					timeline.slotIndex = slotIndex;
-
-					int frameIndex = 0;
-					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next) {
-						Color color = Color.valueOf(valueMap.getString("color"));
-						timeline.setFrame(frameIndex, valueMap.getFloat("time"), color.r, color.g, color.b, color.a);
-						readCurve(timeline, frameIndex, valueMap);
-						frameIndex++;
-					}
-					timelines.add(timeline);
-					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 5 - 5]);
-
-				} else if (timelineName.equals("attachment")) {
-					AttachmentTimeline timeline = new AttachmentTimeline(timelineMap.size);
-					timeline.slotIndex = slotIndex;
-
-					int frameIndex = 0;
-					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next)
-						timeline.setFrame(frameIndex++, valueMap.getFloat("time"), valueMap.getString("name"));
-					timelines.add(timeline);
-					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() - 1]);
-				} else
-					throw new RuntimeException("Invalid timeline type for a slot: " + timelineName + " (" + slotMap.name + ")");
-			}
-		}
-
-		// Events.
-		JsonValue eventsMap = map.get("events");
-		if (eventsMap != null) {
-			EventTimeline timeline = new EventTimeline(eventsMap.size);
-			int frameIndex = 0;
-			for (JsonValue eventMap = eventsMap.child; eventMap != null; eventMap = eventMap.next) {
-				EventData eventData = skeletonData.findEvent(eventMap.getString("name"));
-				if (eventData == null) throw new SerializationException("Event not found: " + eventMap.getString("name"));
-				Event event = new Event(eventData);
-				event.intValue = eventMap.getInt("int", eventData.getInt());
-				event.floatValue = eventMap.getFloat("float", eventData.getFloat());
-				event.stringValue = eventMap.getString("string", eventData.getString());
-				timeline.setFrame(frameIndex++, eventMap.getFloat("time"), event);
-			}
-			timelines.add(timeline);
-			duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() - 1]);
-		}
-
-		// Draw order.
+		// Draw order timeline.
 		JsonValue drawOrdersMap = map.get("draworder");
 		if (drawOrdersMap != null) {
 			DrawOrderTimeline timeline = new DrawOrderTimeline(drawOrdersMap.size);
@@ -393,6 +375,24 @@ public class SkeletonJson {
 						if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
 				}
 				timeline.setFrame(frameIndex++, drawOrderMap.getFloat("time"), drawOrder);
+			}
+			timelines.add(timeline);
+			duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() - 1]);
+		}
+
+		// Event timeline.
+		JsonValue eventsMap = map.get("events");
+		if (eventsMap != null) {
+			EventTimeline timeline = new EventTimeline(eventsMap.size);
+			int frameIndex = 0;
+			for (JsonValue eventMap = eventsMap.child; eventMap != null; eventMap = eventMap.next) {
+				EventData eventData = skeletonData.findEvent(eventMap.getString("name"));
+				if (eventData == null) throw new SerializationException("Event not found: " + eventMap.getString("name"));
+				Event event = new Event(eventData);
+				event.intValue = eventMap.getInt("int", eventData.getInt());
+				event.floatValue = eventMap.getFloat("float", eventData.getFloat());
+				event.stringValue = eventMap.getString("string", eventData.getString());
+				timeline.setFrame(frameIndex++, eventMap.getFloat("time"), event);
 			}
 			timelines.add(timeline);
 			duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() - 1]);
