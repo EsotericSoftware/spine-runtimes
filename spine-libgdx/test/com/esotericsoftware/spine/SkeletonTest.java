@@ -28,9 +28,13 @@
 
 package com.esotericsoftware.spine;
 
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -42,33 +46,64 @@ import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.TextureAtlasData;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.List;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 
+import java.awt.FileDialog;
+import java.awt.Frame;
+import java.io.File;
+
 public class SkeletonTest extends ApplicationAdapter {
+	UI ui;
+
 	PolygonSpriteBatch batch;
-	float time;
 	SkeletonRenderer renderer;
 	SkeletonRendererDebug debugRenderer;
-
 	SkeletonData skeletonData;
 	Skeleton skeleton;
-	Animation animation;
-	Array<Event> events = new Array();
+	AnimationState state;
+	int skeletonX, skeletonY;
+	FileHandle skeletonFile;
+	long lastModified;
+	float lastModifiedCheck;
 
 	public void create () {
+		ui = new UI();
 		batch = new PolygonSpriteBatch();
 		renderer = new SkeletonRenderer();
 		debugRenderer = new SkeletonRendererDebug();
+		skeletonX = (int)(ui.window.getWidth() + (Gdx.graphics.getWidth() - ui.window.getWidth()) / 2);
+		skeletonY = Gdx.graphics.getHeight() / 4;
 
-		final String name = "goblins"; // "spineboy";
+		loadSkeleton(Gdx.files.internal(Gdx.app.getPreferences("spine-skeletontest")
+			.getString("lastFile", "spineboy/spineboy.json")));
+	}
+
+	void loadSkeleton (FileHandle skeletonFile) {
+		if (skeletonFile == null) return;
 
 		// A regular texture atlas would normally usually be used. This returns a white image for images not found in the atlas.
 		Pixmap pixmap = new Pixmap(32, 32, Format.RGBA8888);
-		pixmap.setColor(Color.WHITE);
+		pixmap.setColor(new Color(1, 1, 1, 0.33f));
 		pixmap.fill();
 		final AtlasRegion fake = new AtlasRegion(new Texture(pixmap), 0, 0, 32, 32);
 		pixmap.dispose();
-		FileHandle atlasFile = Gdx.files.internal(name + ".atlas");
+		FileHandle atlasFile = skeletonFile.sibling(skeletonFile.nameWithoutExtension() + ".atlas");
 		TextureAtlasData data = !atlasFile.exists() ? null : new TextureAtlasData(atlasFile, atlasFile.parent(), false);
 		TextureAtlas atlas = new TextureAtlas(data) {
 			public AtlasRegion findRegion (String name) {
@@ -77,73 +112,351 @@ public class SkeletonTest extends ApplicationAdapter {
 			}
 		};
 
-		if (true) {
-			System.out.println("JSON");
-			SkeletonJson json = new SkeletonJson(atlas);
-			// json.setScale(2);
-			skeletonData = json.readSkeletonData(Gdx.files.internal(name + ".json"));
-		} else {
-			System.out.println("Binary");
-			SkeletonBinary binary = new SkeletonBinary(atlas);
-			// binary.setScale(2);
-			skeletonData = binary.readSkeletonData(Gdx.files.internal(name + ".skel"));
+		try {
+			if (skeletonFile.extension().equalsIgnoreCase("json")) {
+				SkeletonJson json = new SkeletonJson(atlas);
+				json.setScale(ui.scaleSlider.getValue());
+				skeletonData = json.readSkeletonData(skeletonFile);
+			} else {
+				SkeletonBinary binary = new SkeletonBinary(atlas);
+				binary.setScale(ui.scaleSlider.getValue());
+				skeletonData = binary.readSkeletonData(skeletonFile);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			ui.toast("Error loading skeleton: spineboy");
+			lastModifiedCheck = 5;
+			return;
 		}
-		animation = skeletonData.findAnimation("walk");
 
 		skeleton = new Skeleton(skeletonData);
-		if (name.equals("goblins")) skeleton.setSkin("goblin");
 		skeleton.setToSetupPose();
 		skeleton = new Skeleton(skeleton);
 		skeleton.updateWorldTransform();
 
-		Gdx.input.setInputProcessor(new InputAdapter() {
-			public boolean touchDown (int screenX, int screenY, int pointer, int button) {
-				keyDown(0);
-				return true;
-			}
+		state = new AnimationState(new AnimationStateData(skeletonData));
 
-			public boolean keyDown (int keycode) {
-				if (name.equals("goblins")) {
-					skeleton.setSkin(skeleton.getSkin().getName().equals("goblin") ? "goblingirl" : "goblin");
-					skeleton.setSlotsToSetupPose();
-				}
-				return true;
-			}
-		});
+		this.skeletonFile = skeletonFile;
+		Preferences prefs = Gdx.app.getPreferences("spine-skeletontest");
+		prefs.putString("lastFile", skeletonFile.path());
+		prefs.flush();
+		lastModified = skeletonFile.lastModified();
+		lastModifiedCheck = 0.250f;
+
+		// Populate UI.
+
+		ui.skeletonLabel.setText(skeletonFile.name());
+		{
+			Array<String> items = new Array();
+			for (Skin skin : skeletonData.getSkins())
+				items.add(skin.getName());
+			ui.skinList.setItems(items);
+		}
+		{
+			Array<String> items = new Array();
+			for (Animation animation : skeletonData.getAnimations())
+				items.add(animation.getName());
+			ui.animationList.setItems(items);
+		}
+
+		// Configure skeleton from UI.
+
+		skeleton.setSkin(ui.skinList.getSelected());
+		skeleton.setSlotsToSetupPose();
+		state.setAnimation(0, ui.animationList.getSelected(), ui.loopCheckbox.isChecked());
 	}
 
 	public void render () {
-		float lastTime = time;
-		time += Gdx.graphics.getDeltaTime();
-
-		float x = skeleton.getX() + 160 * Gdx.graphics.getDeltaTime() * (skeleton.getFlipX() ? -1 : 1);
-		if (x > Gdx.graphics.getWidth()) skeleton.setFlipX(true);
-		if (x < 0) skeleton.setFlipX(false);
-		skeleton.setX(x);
-		skeleton.setX(300);
-
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
-		events.clear();
-		animation.apply(skeleton, lastTime, time, true, events);
-		if (events.size > 0) System.out.println(events);
+		if (skeleton != null) {
+			lastModifiedCheck -= Gdx.graphics.getDeltaTime();
+			if (lastModifiedCheck < 0 && lastModified != skeletonFile.lastModified()) loadSkeleton(skeletonFile);
 
-		skeleton.updateWorldTransform();
-		skeleton.update(Gdx.graphics.getDeltaTime());
+			state.getData().setDefaultMix(ui.mixSlider.getValue());
+			renderer.setPremultipliedAlpha(ui.premultipliedCheckbox.isChecked());
 
-		batch.begin();
-		renderer.draw(batch, skeleton);
-		batch.end();
+			float delta = Math.min(Gdx.graphics.getDeltaTime(), 0.032f) * ui.speedSlider.getValue();
+			skeleton.update(delta);
+			if (!ui.pauseButton.isChecked()) {
+				state.update(delta);
+				state.apply(skeleton);
+			}
+			skeleton.updateWorldTransform();
+			skeleton.setX(skeletonX);
+			skeleton.setY(skeletonY);
+			skeleton.setFlipX(ui.flipXCheckbox.isChecked());
+			skeleton.setFlipY(ui.flipYCheckbox.isChecked());
 
-		//debugRenderer.draw(skeleton);
+			batch.begin();
+			renderer.draw(batch, skeleton);
+			batch.end();
+
+			debugRenderer.setBones(ui.debugBonesCheckbox.isChecked());
+			debugRenderer.setRegionAttachments(ui.debugRegionsCheckbox.isChecked());
+			debugRenderer.setBoundingBoxes(ui.debugBoundingBoxesCheckbox.isChecked());
+			debugRenderer.draw(skeleton);
+		}
+
+		ui.stage.act();
+		ui.stage.draw();
 	}
 
 	public void resize (int width, int height) {
 		batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
 		debugRenderer.getShapeRenderer().setProjectionMatrix(batch.getProjectionMatrix());
+		ui.stage.setViewport(width, height);
+		if (!ui.minimizeButton.isChecked()) ui.window.setHeight(height);
+	}
+
+	class UI {
+		Stage stage = new Stage();
+		com.badlogic.gdx.scenes.scene2d.ui.Skin skin = new com.badlogic.gdx.scenes.scene2d.ui.Skin(
+			Gdx.files.internal("skin/skin.json"));
+
+		Window window = new Window("Skeleton", skin);
+		Table root = new Table(skin);
+		TextButton browseButton = new TextButton("Browse", skin);
+		Label skeletonLabel = new Label("", skin);
+		List<String> animationList = new List(skin);
+		List<String> skinList = new List(skin);
+		CheckBox loopCheckbox = new CheckBox(" Loop", skin);
+		CheckBox premultipliedCheckbox = new CheckBox(" Premultiplied", skin);
+		Slider mixSlider = new Slider(0f, 2, 0.01f, false, skin);
+		Label mixLabel = new Label("0.3", skin);
+		Slider speedSlider = new Slider(0.1f, 3, 0.01f, false, skin);
+		Label speedLabel = new Label("1.0", skin);
+		CheckBox flipXCheckbox = new CheckBox(" X", skin);
+		CheckBox flipYCheckbox = new CheckBox(" Y", skin);
+		CheckBox debugBonesCheckbox = new CheckBox(" Bones", skin);
+		CheckBox debugRegionsCheckbox = new CheckBox(" Regions", skin);
+		CheckBox debugBoundingBoxesCheckbox = new CheckBox(" Bounds", skin);
+		Slider scaleSlider = new Slider(0.1f, 3, 0.01f, false, skin);
+		Label scaleLabel = new Label("1.0", skin);
+		TextButton pauseButton = new TextButton("Pause", skin, "toggle");
+		TextButton minimizeButton = new TextButton("-", skin);
+		TextButton bonesSetupPoseButton = new TextButton("Bones", skin);
+		TextButton slotsSetupPoseButton = new TextButton("Slots", skin);
+		TextButton setupPoseButton = new TextButton("Both", skin);
+		WidgetGroup toasts = new WidgetGroup();
+
+		public UI () {
+			// Configure widgets.
+
+			premultipliedCheckbox.setChecked(true);
+
+			loopCheckbox.setChecked(true);
+
+			scaleSlider.setValue(1);
+			scaleSlider.setSnapToValues(new float[] {1}, 0.1f);
+
+			mixSlider.setValue(0.3f);
+
+			speedSlider.setValue(1);
+			speedSlider.setSnapToValues(new float[] {1}, 0.1f);
+
+			window.setMovable(false);
+			window.setResizable(false);
+
+			minimizeButton.padTop(-2).padLeft(5);
+			minimizeButton.getColor().a = 0.66f;
+			window.getButtonTable().add(minimizeButton).size(20, 20);
+
+			// Layout.
+
+			root.pad(2, 4, 4, 4).defaults().space(6);
+			root.columnDefaults(0).top().right();
+			root.columnDefaults(1).left();
+			root.row().padTop(6);
+			root.add("Skeleton:");
+			{
+				Table table = table();
+				table.add(skeletonLabel).fillX().expandX();
+				table.add(browseButton);
+				root.add(table).fill().row();
+			}
+			root.add("Scale:");
+			{
+				Table table = table();
+				table.add(scaleLabel).width(29);
+				table.add(scaleSlider).fillX().expandX();
+				root.add(table).fill().row();
+			}
+			root.add("Flip:");
+			root.add(table(flipXCheckbox, flipYCheckbox)).row();
+			root.add("Debug:");
+			root.add(table(debugBonesCheckbox, debugRegionsCheckbox, debugBoundingBoxesCheckbox)).row();
+			root.add("Alpha:");
+			root.add(premultipliedCheckbox).row();
+			root.add("Skin:");
+			root.add(new ScrollPane(skinList, skin)).expand().fill().minHeight(75).row();
+			root.add("Setup Pose:");
+			root.add(table(bonesSetupPoseButton, slotsSetupPoseButton, setupPoseButton)).row();
+			root.add("Animation:");
+			root.add(new ScrollPane(animationList, skin)).expand().fill().minHeight(75).row();
+			root.add("Mix:");
+			{
+				Table table = table();
+				table.add(mixLabel).width(29);
+				table.add(mixSlider).fillX().expandX();
+				root.add(table).fill().row();
+			}
+			root.add("Speed:");
+			{
+				Table table = table();
+				table.add(speedLabel).width(29);
+				table.add(speedSlider).fillX().expandX();
+				root.add(table).fill().row();
+			}
+			root.add("Playback:");
+			root.add(table(pauseButton, loopCheckbox)).row();
+
+			window.add(root).expand().fill();
+			window.pack();
+			stage.addActor(window);
+
+			{
+				Table table = new Table(skin);
+				table.setFillParent(true);
+				table.setTouchable(Touchable.disabled);
+				stage.addActor(table);
+				table.pad(10).bottom().right();
+				table.add(toasts);
+				table.debug();
+			}
+
+			// Events.
+
+			window.addListener(new InputListener() {
+				public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+					event.cancel();
+					return true;
+				}
+			});
+
+			browseButton.addListener(new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					FileDialog fileDialog = new FileDialog((Frame)null, "Choose skeleton file");
+					fileDialog.setMode(FileDialog.LOAD);
+					fileDialog.setVisible(true);
+					String name = fileDialog.getFile();
+					String dir = fileDialog.getDirectory();
+					if (name == null || dir == null) return;
+					loadSkeleton(new FileHandle(new File(dir, name).getAbsolutePath()));
+				}
+			});
+
+			setupPoseButton.addListener(new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					if (skeleton != null) skeleton.setToSetupPose();
+				}
+			});
+			bonesSetupPoseButton.addListener(new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					if (skeleton != null) skeleton.setBonesToSetupPose();
+				}
+			});
+			slotsSetupPoseButton.addListener(new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					if (skeleton != null) skeleton.setSlotsToSetupPose();
+				}
+			});
+
+			minimizeButton.addListener(new ClickListener() {
+				public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+					event.cancel();
+					return super.touchDown(event, x, y, pointer, button);
+				}
+
+				public void clicked (InputEvent event, float x, float y) {
+					if (minimizeButton.isChecked()) {
+						window.getCells().get(0).setWidget(null);
+						window.setHeight(20);
+						minimizeButton.setText("+");
+					} else {
+						window.getCells().get(0).setWidget(root);
+						ui.window.setHeight(Gdx.graphics.getHeight());
+						minimizeButton.setText("-");
+					}
+				}
+			});
+
+			scaleSlider.addListener(new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					scaleLabel.setText(Float.toString((int)(scaleSlider.getValue() * 100) / 100f));
+					if (!scaleSlider.isDragging()) loadSkeleton(skeletonFile);
+				}
+			});
+
+			speedSlider.addListener(new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					speedLabel.setText(Float.toString((int)(speedSlider.getValue() * 100) / 100f));
+				}
+			});
+
+			mixSlider.addListener(new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					mixLabel.setText(Float.toString((int)(mixSlider.getValue() * 100) / 100f));
+					if (state != null) state.getData().setDefaultMix(mixSlider.getValue());
+				}
+			});
+
+			animationList.addListener(new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					if (state != null) state.setAnimation(0, animationList.getSelected(), loopCheckbox.isChecked());
+				}
+			});
+
+			skinList.addListener(new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					if (skeleton != null) {
+						skeleton.setSkin(skinList.getSelected());
+						skeleton.setSlotsToSetupPose();
+					}
+				}
+			});
+
+			Gdx.input.setInputProcessor(new InputMultiplexer(stage, new InputAdapter() {
+				public boolean touchDown (int screenX, int screenY, int pointer, int button) {
+					touchDragged(screenX, screenY, pointer);
+					return false;
+				}
+
+				public boolean touchDragged (int screenX, int screenY, int pointer) {
+					skeletonX = screenX;
+					skeletonY = Gdx.graphics.getHeight() - screenY;
+					return false;
+				}
+			}));
+		}
+
+		private Table table (Actor... actors) {
+			Table table = new Table();
+			table.defaults().space(6);
+			table.add(actors);
+			return table;
+		}
+
+		void toast (String text) {
+			Table table = new Table();
+			table.add(new Label(text, skin));
+			table.getColor().a = 0;
+			table.pack();
+			table.setPosition(-table.getWidth(), -3 - table.getHeight());
+			table.addAction(sequence( //
+				parallel(moveBy(0, table.getHeight(), 0.3f), fadeIn(0.3f)), //
+				delay(5f), //
+				parallel(moveBy(0, table.getHeight(), 0.3f), fadeOut(0.3f)), //
+				removeActor() //
+				));
+			for (Actor actor : toasts.getChildren())
+				actor.addAction(moveBy(0, table.getHeight(), 0.3f));
+			toasts.addActor(table);
+			toasts.getParent().toFront();
+		}
 	}
 
 	public static void main (String[] args) throws Exception {
-		new LwjglApplication(new SkeletonTest());
+		new LwjglApplication(new SkeletonTest(), "SkeletonTest", 800, 600, true);
 	}
 }

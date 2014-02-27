@@ -56,7 +56,7 @@ import com.badlogic.gdx.utils.Array;
 public class Box2DExample extends ApplicationAdapter {
 	SpriteBatch batch;
 	ShapeRenderer renderer;
-	SkeletonRenderer skeletonRenderer = new SkeletonRenderer();
+	SkeletonRenderer skeletonRenderer;
 
 	TextureAtlas atlas;
 	Skeleton skeleton;
@@ -74,8 +74,10 @@ public class Box2DExample extends ApplicationAdapter {
 	public void create () {
 		batch = new SpriteBatch();
 		renderer = new ShapeRenderer();
+		skeletonRenderer = new SkeletonRenderer();
+		skeletonRenderer.setPremultipliedAlpha(true);
 
-		atlas = new TextureAtlas(Gdx.files.internal("spineboy.atlas"));
+		atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy.atlas"));
 
 		// This loader creates Box2dAttachments instead of RegionAttachments for an easy way to keep
 		// track of the Box2D body for each attachment.
@@ -90,7 +92,7 @@ public class Box2DExample extends ApplicationAdapter {
 		};
 		SkeletonJson json = new SkeletonJson(atlasLoader);
 		json.setScale(0.05f);
-		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy.json"));
+		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy/spineboy.json"));
 		animation = skeletonData.findAnimation("walk");
 
 		skeleton = new Skeleton(skeletonData);

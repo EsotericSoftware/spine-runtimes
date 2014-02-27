@@ -52,9 +52,10 @@ public class MixTest extends ApplicationAdapter {
 	public void create () {
 		batch = new SpriteBatch();
 		renderer = new SkeletonRenderer();
+		renderer.setPremultipliedAlpha(true);
 		debugRenderer = new SkeletonRendererDebug();
 
-		final String name = "spineboy";
+		final String name = "spineboy/spineboy";
 
 		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(name + ".atlas"));
 

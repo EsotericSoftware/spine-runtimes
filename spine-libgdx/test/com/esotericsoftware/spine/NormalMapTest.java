@@ -68,13 +68,13 @@ public class NormalMapTest extends ApplicationAdapter {
 		batch.setShader(program);
 		renderer = new SkeletonRenderer();
 
-		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("spineboy-diffuse.atlas"));
+		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy-diffuse.atlas"));
 		atlasTexture = atlas.getRegions().first().getTexture();
-		normalMapTexture = new Texture(Gdx.files.internal("spineboy-normal.png"));
+		normalMapTexture = new Texture(Gdx.files.internal("spineboy/spineboy-normal.png"));
 
 		SkeletonJson json = new SkeletonJson(atlas);
 		// json.setScale(2);
-		skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy.json"));
+		skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy/spineboy.json"));
 		animation = skeletonData.findAnimation("walk");
 
 		skeleton = new Skeleton(skeletonData);

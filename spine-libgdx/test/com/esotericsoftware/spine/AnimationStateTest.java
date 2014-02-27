@@ -57,11 +57,12 @@ public class AnimationStateTest extends ApplicationAdapter {
 		camera = new OrthographicCamera();
 		batch = new SpriteBatch();
 		renderer = new SkeletonRenderer();
+		renderer.setPremultipliedAlpha(true);
 		debugRenderer = new SkeletonRendererDebug();
 
-		atlas = new TextureAtlas(Gdx.files.internal("spineboy.atlas"));
-		SkeletonJson json = new SkeletonJson(atlas); // This loads skeleton JSON data.
-		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy.json")); // SkeletonData is stateless.
+		atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy.atlas"));
+		SkeletonJson json = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
+		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy/spineboy.json"));
 
 		skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
 		skeleton.setX(250);
@@ -92,7 +93,7 @@ public class AnimationStateTest extends ApplicationAdapter {
 				System.out.println(trackIndex + " end: " + state.getCurrent(trackIndex));
 			}
 		});
-		state.setAnimation(0, "drawOrder", true);
+		state.setAnimation(0, "headPop", true);
 
 		Gdx.input.setInputProcessor(new InputAdapter() {
 			final Vector3 point = new Vector3();
