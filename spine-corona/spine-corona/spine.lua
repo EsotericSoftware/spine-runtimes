@@ -87,7 +87,7 @@ function spine.Skeleton.new (skeletonData, group)
 		updateWorldTransform_super(self)
 
 		local images = self.images
-		local skeletonR, skeletonG, skeletonB, skeletonA = self.r * 255, self.g * 255, self.b * 255, self.a
+		local skeletonR, skeletonG, skeletonB, skeletonA = self.r, self.g, self.b, self.a
 		for i,slot in ipairs(self.drawOrder) do
 			local image = images[slot]
 			local attachment = slot.attachment
@@ -111,7 +111,8 @@ function spine.Skeleton.new (skeletonData, group)
 					image = self:createImage(attachment)
 					if image then
 						image.attachment = attachment
-						image:setReferencePoint(display.CenterReferencePoint)
+						image.anchorX = 0.5
+						image.anchorY = 0.5
 						image.width = attachment.width
 						image.height = attachment.height
 					else
@@ -189,7 +190,7 @@ function spine.Skeleton.new (skeletonData, group)
 			for i,bone in ipairs(self.bones) do
 				if not bone.line then
 					bone.line = display.newLine(0, 0, bone.data.length, 0)
-					bone.line:setColor(255, 0, 0)
+					bone.line:setStrokeColor(1, 0, 0)
 				end
 				bone.line.x = bone.worldX
 				bone.line.y = -bone.worldY
@@ -210,7 +211,7 @@ function spine.Skeleton.new (skeletonData, group)
 
 				if not bone.circle then
 					bone.circle = display.newCircle(0, 0, 3)
-					bone.circle:setFillColor(0, 255, 0)
+					bone.circle:setFillColor(0, 1, 0)
 				end
 				bone.circle.x = bone.worldX
 				bone.circle.y = -bone.worldY
@@ -224,7 +225,7 @@ function spine.Skeleton.new (skeletonData, group)
 				self.boundsRect = display.newRect(self.group, 0, 0, 0, 0)
 				self.boundsRect:setFillColor(0, 0, 0, 0)
 				self.boundsRect.strokeWidth = 1
-				self.boundsRect:setStrokeColor(0, 255, 0, 255)
+				self.boundsRect:setStrokeColor(0, 1, 0, 1)
 			end
 			self.bounds:update(self, true)
 			local width = self.bounds:getWidth()
