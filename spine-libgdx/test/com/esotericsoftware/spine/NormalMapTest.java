@@ -31,8 +31,7 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -95,7 +94,7 @@ public class NormalMapTest extends ApplicationAdapter {
 		lightPosition.x = Gdx.input.getX();
 		lightPosition.y = (Gdx.graphics.getHeight() - Gdx.input.getY());
 
-		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		batch.begin();
 		program.setUniformf("ambientIntensity", ambientIntensity);
@@ -208,8 +207,6 @@ public class NormalMapTest extends ApplicationAdapter {
 	}
 
 	public static void main (String[] args) throws Exception {
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.useGL20 = true;
-		new LwjglApplication(new NormalMapTest(), config);
+		new LwjglApplication(new NormalMapTest(), "NormalMapTest", 800, 600);
 	}
 }
