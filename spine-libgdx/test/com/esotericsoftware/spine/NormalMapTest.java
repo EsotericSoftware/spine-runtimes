@@ -31,7 +31,6 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -208,7 +207,6 @@ public class NormalMapTest extends ApplicationAdapter {
 	}
 
 	public static void main (String[] args) throws Exception {
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		new LwjglApplication(new NormalMapTest(), config);
+		new LwjglApplication(new NormalMapTest(), "NormalMapTest", 800, 600);
 	}
 }
