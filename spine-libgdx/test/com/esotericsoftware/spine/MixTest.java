@@ -31,7 +31,7 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
@@ -93,7 +93,7 @@ public class MixTest extends ApplicationAdapter {
 		if (time > beforeJump + blendIn && time < blendOutStart) speed = 360;
 		skeleton.setX(skeleton.getX() + speed * delta);
 
-		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		// This shows how to manage state manually. See AnimationStatesTest.
 		if (time > total) {
