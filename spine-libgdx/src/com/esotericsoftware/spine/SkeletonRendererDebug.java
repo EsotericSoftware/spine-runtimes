@@ -35,7 +35,7 @@ import static com.badlogic.gdx.graphics.g2d.SpriteBatch.*;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.Array;
@@ -61,7 +61,7 @@ public class SkeletonRendererDebug {
 		float skeletonX = skeleton.getX();
 		float skeletonY = skeleton.getY();
 
-		Gdx.gl.glEnable(GL10.GL_BLEND);
+		Gdx.gl.glEnable(GL20.GL_BLEND);
 		ShapeRenderer renderer = this.renderer;
 		renderer.begin(ShapeType.Line);
 
