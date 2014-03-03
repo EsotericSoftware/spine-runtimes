@@ -38,7 +38,7 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
@@ -167,7 +167,7 @@ public class SkeletonTest extends ApplicationAdapter {
 	}
 
 	public void render () {
-		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		if (skeleton != null) {
 			lastModifiedCheck -= Gdx.graphics.getDeltaTime();
@@ -457,6 +457,6 @@ public class SkeletonTest extends ApplicationAdapter {
 	}
 
 	public static void main (String[] args) throws Exception {
-		new LwjglApplication(new SkeletonTest(), "SkeletonTest", 800, 600, true);
+		new LwjglApplication(new SkeletonTest(), "SkeletonTest", 800, 600);
 	}
 }
