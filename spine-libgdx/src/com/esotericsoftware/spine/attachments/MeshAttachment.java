@@ -80,7 +80,8 @@ public class MeshAttachment extends Attachment {
 
 		float[] worldVertices = this.worldVertices;
 		FloatArray verticesArray = slot.getAttachmentVertices();
-		float[] vertices = verticesArray.size > 0 ? verticesArray.items : this.vertices;
+		float[] vertices = this.vertices;
+		if (verticesArray.size == vertices.length) vertices = verticesArray.items;
 		Bone bone = slot.getBone();
 		float x = skeleton.getX() + bone.getWorldX(), y = skeleton.getY() + bone.getWorldY();
 		float m00 = bone.getM00(), m01 = bone.getM01(), m10 = bone.getM10(), m11 = bone.getM11();
