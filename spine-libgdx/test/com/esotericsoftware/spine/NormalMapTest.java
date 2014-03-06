@@ -30,6 +30,7 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.GL10;
@@ -41,6 +42,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 public class NormalMapTest extends ApplicationAdapter {
+	String skeletonPath, animationName;
 	SpriteBatch batch;
 	float time;
 	SkeletonRenderer renderer;
@@ -62,33 +64,52 @@ public class NormalMapTest extends ApplicationAdapter {
 	boolean useNormals = true;
 	boolean flipY = false;
 
+	public NormalMapTest (String skeletonPath, String animationName) {
+		this.skeletonPath = skeletonPath;
+		this.animationName = animationName;
+	}
+
 	public void create () {
 		program = createShader();
 		batch = new SpriteBatch();
 		batch.setShader(program);
 		renderer = new SkeletonRenderer();
 
-		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy-diffuse.atlas"));
+		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(skeletonPath + "-diffuse.atlas"));
 		atlasTexture = atlas.getRegions().first().getTexture();
-		normalMapTexture = new Texture(Gdx.files.internal("spineboy/spineboy-normal.png"));
+		normalMapTexture = new Texture(Gdx.files.internal(skeletonPath + "-normal.png"));
 
 		SkeletonJson json = new SkeletonJson(atlas);
 		// json.setScale(2);
-		skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy/spineboy.json"));
-		animation = skeletonData.findAnimation("walk");
+		skeletonData = json.readSkeletonData(Gdx.files.internal(skeletonPath + ".json"));
+		if (animationName != null) animation = skeletonData.findAnimation(animationName);
+		if (animation == null) animation = skeletonData.getAnimations().first();
 
 		skeleton = new Skeleton(skeletonData);
 		skeleton.setToSetupPose();
 		skeleton = new Skeleton(skeleton);
-		skeleton.setX(200);
-		skeleton.setY(100);
+		skeleton.setX(Gdx.graphics.getWidth() / 2);
+		skeleton.setY(Gdx.graphics.getHeight() / 4);
 		skeleton.updateWorldTransform();
+
+		Gdx.input.setInputProcessor(new InputAdapter() {
+			public boolean touchDown (int screenX, int screenY, int pointer, int button) {
+				touchDragged(screenX, screenY, pointer);
+				return true;
+			}
+
+			public boolean touchDragged (int screenX, int screenY, int pointer) {
+				skeleton.setX(screenX);
+				skeleton.setY(Gdx.graphics.getHeight() - screenY);
+				return true;
+			}
+		});
 	}
 
 	public void render () {
 		float lastTime = time;
 		time += Gdx.graphics.getDeltaTime();
-		animation.apply(skeleton, lastTime, time, true, null);
+		if (animation != null) animation.apply(skeleton, lastTime, time, true, null);
 		skeleton.updateWorldTransform();
 		skeleton.update(Gdx.graphics.getDeltaTime());
 
@@ -208,8 +229,13 @@ public class NormalMapTest extends ApplicationAdapter {
 	}
 
 	public static void main (String[] args) throws Exception {
+		if (args.length == 0)
+			args = new String[] {"spineboy/spineboy", "walk"};
+		else if (args.length == 1) //
+			args = new String[] {args[0], null};
+
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.useGL20 = true;
-		new LwjglApplication(new NormalMapTest(), config);
+		new LwjglApplication(new NormalMapTest(args[0], args[1]), config);
 	}
 }
