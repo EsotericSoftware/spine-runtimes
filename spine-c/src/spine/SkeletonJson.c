@@ -26,11 +26,16 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+//
+// Added support for FFD by Wojciech Trzasko CodingFingers on 24.02.2014.
+//
+
 #include <spine/SkeletonJson.h>
 #include <stdio.h>
 #include "Json.h"
 #include <spine/extension.h>
 #include <spine/RegionAttachment.h>
+#include <spine/MeshAttachment.h>
 #include <spine/AtlasAttachmentLoader.h>
 
 typedef struct {
@@ -106,15 +111,18 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 
 	Json* bones = Json_getItem(root, "bones");
 	Json* slots = Json_getItem(root, "slots");
+    Json* ffd = Json_getItem(root, "ffd");
 	Json* drawOrder = Json_getItem(root, "draworder");
 	Json* events = Json_getItem(root, "events");
-	Json *boneMap, *slotMap;
+	Json *boneMap, *slotMap, *ffdMap;
 
 	int timelineCount = 0;
 	for (boneMap = bones ? bones->child : 0; boneMap; boneMap = boneMap->next)
 		timelineCount += boneMap->size;
 	for (slotMap = slots ? slots->child : 0; slotMap; slotMap = slotMap->next)
 		timelineCount += slotMap->size;
+    for (ffdMap = ffd ? ffd->child : 0; ffdMap; ffdMap = ffdMap->next)
+        timelineCount += ffdMap->size;
 	if (events) ++timelineCount;
 	if (drawOrder) ++timelineCount;
 
@@ -218,6 +226,93 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 			}
 		}
 	}
+    
+    for (ffdMap = ffd ? ffd->child : 0; ffdMap; ffdMap = ffdMap->next) {
+        Json* slotArray;
+        
+        spSkin* skin = spSkeletonData_findSkin(skeletonData, ffdMap->name);
+        if(skin == NULL)
+        {
+            _spSkeletonJson_setError(self, root, "Skin not found: ", slotMap->name);
+			return 0;
+        }
+        
+        // Timelines iteration
+        for (slotArray = ffdMap -> child; slotArray; slotArray = slotArray -> next)
+        {
+            int slotIndex = spSkeletonData_findSlotIndex(skeletonData, slotArray->name);
+            if(slotIndex == -1)
+            {
+                _spSkeletonJson_setError(self, root, "Slot not found: ", slotMap->name);
+                return 0;
+            }
+            
+            Json* meshArray;
+            for (meshArray = slotArray->child; meshArray; meshArray = meshArray->next)
+            {
+                float duration;
+                
+                spFFDTimeline* timeline = spFFDTimeline_create(meshArray->size);
+                spMeshAttachment* mesh = (spMeshAttachment*)spSkin_getAttachment(skin, slotIndex, meshArray->name);
+                if (mesh == NULL)
+                {
+                    _spSkeletonJson_setError(self, root, "Mesh attachment not found: ", slotMap->name);
+                    return 0;
+                }
+                
+                timeline->slotIndex = slotIndex;
+                timeline->meshAttachment = mesh;
+                
+                int frameIndex = 0;
+                Json* valuesArray;
+                for (valuesArray = meshArray->child; valuesArray; valuesArray = valuesArray->next)
+                {
+                    float* vertices;
+                    float verticesLength;
+                    Json* verticesArray = Json_getItem(valuesArray, "vertices");
+                    if(verticesArray == 0)
+                    {
+                        // TODO: Check is copy needed
+                        vertices = MALLOC(float, mesh->verticesLength * sizeof(float));
+                        memcpy(vertices, mesh->vertices, mesh->verticesLength * sizeof(float));
+                        verticesLength = mesh->verticesLength;
+                    }
+                    else
+                    {
+                        vertices = MALLOC(float, verticesArray->size);
+                        verticesLength = verticesArray->size;
+                        Json* vertex;
+                        int i;
+                        for (vertex = verticesArray->child, i = 0;
+                             vertex;
+                             vertex = vertex->next, ++i)
+                        {
+                            vertices[i] = vertex->valueFloat;
+                            if(self->scale != 1) {
+                                vertices[i] *= self->scale;
+                            }
+                        }
+                    }
+                    
+                    float time = Json_getFloat(valuesArray, "time", -1.0f);
+                    if(time < 0.0f)
+                    {
+                        _spSkeletonJson_setError(self, root, "Wrong time value for: ", valuesArray->name);
+                        return 0;
+                    }
+                    
+                    spFFDTimeline_setFrame(timeline, frameIndex, time, vertices, verticesLength);
+                    readCurve(SUPER(timeline), frameIndex, valuesArray);
+                    frameIndex++;
+                }
+                animation->timelines[animation->timelineCount++] = (spTimeline*)timeline;
+                duration = timeline->frames[timeline->framesLength - 1];
+                if (duration > animation->duration) animation->duration = duration;
+            }
+            
+            
+        }
+    }
 
 	if (events) {
 		Json* frame;
@@ -421,6 +516,8 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 						type = ATTACHMENT_BOUNDING_BOX;
 					else if (strcmp(typeString, "regionsequence") == 0)
 						type = ATTACHMENT_REGION_SEQUENCE;
+                    else if (strcmp(typeString, "mesh") == 0)
+                        type = ATTACHMENT_MESH;
 					else {
 						spSkeletonData_dispose(skeletonData);
 						_spSkeletonJson_setError(self, root, "Unknown attachment type: ", typeString);
@@ -462,6 +559,61 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 							box->vertices[i] = vertex->valueFloat * self->scale;
 						break;
 					}
+                    case ATTACHMENT_MESH: {
+                        
+                        spMeshAttachment* meshAttachment = (spMeshAttachment*)attachment;
+                        
+                        // Reading vertices array
+                        Json* verticesJsonArray = Json_getItem(attachmentMap, "vertices");
+                        float* verticesArray = MALLOC(float, verticesJsonArray -> size);
+                        
+                        Json* vertex;
+                        for (vertex = verticesJsonArray -> child, i = 0;
+                             vertex;
+                             vertex = vertex -> next, ++i)
+                        {
+                            verticesArray[i] = vertex -> valueFloat;
+                        }
+                        
+                        // Reading triangles array
+                        Json* trianglesJsonArray = Json_getItem(attachmentMap, "triangles");
+                        int* trianglesArray = MALLOC(int, trianglesJsonArray -> size);
+                        
+                        Json* triangle;
+                        for (triangle= trianglesJsonArray -> child, i = 0;
+                             triangle;
+                             triangle = triangle -> next, ++i)
+                        {
+                            trianglesArray[i] = triangle -> valueInt;
+                        }
+                        
+                        // Reading uvs array
+                        Json* uvsJsonArray = Json_getItem(attachmentMap, "uvs");
+                        float* uvsArray = MALLOC(float, uvsJsonArray -> size);
+                        
+                        Json* uv;
+                        for (uv = uvsJsonArray -> child, i = 0;
+                             uv;
+                             uv = uv -> next, ++i)
+                        {
+                            uvsArray[i] = uv -> valueFloat;
+                        }
+
+                        // Setting mesh
+                        spMeshAttachment_setMesh(meshAttachment,
+                                                 verticesArray, verticesJsonArray -> size,
+                                                 trianglesArray, trianglesJsonArray -> size,
+                                                 uvsArray);
+                        meshAttachment -> width = 68;
+                        meshAttachment -> height = 92;
+                        
+                        // Freeing uvs
+                        FREE(uvsArray);
+                        
+                        break;
+                        
+                        }
+                    
 					}
 
 					spSkin_addAttachment(skin, slotIndex, skinAttachmentName, attachment);

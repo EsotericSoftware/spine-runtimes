@@ -25,9 +25,15 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
+//
+// Added support for FFD by Wojciech Trzasko CodingFingers on 24.02.2014.
+//
 
 #import <spine/CCSkeleton.h>
 #import <spine/spine-cocos2d-iphone.h>
+#import <spine/MeshAttachment.h>
+
+#import "cocos2d.h"
 
 @interface CCSkeleton (Private)
 - (void) initialize:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData;
@@ -67,6 +73,8 @@
 
 	[self setShaderProgram:[[CCShaderCache sharedShaderCache] programForKey:kCCShader_PositionTextureColor]];
 	[self scheduleUpdate];
+    
+    _renderPool = [[[CCRenderPool alloc] init] retain];
 }
 
 - (id) initWithData:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
@@ -120,6 +128,9 @@
 	if (_ownsSkeletonData) SkeletonData_dispose(_skeleton->data);
 	if (_atlas) Atlas_dispose(_atlas);
 	Skeleton_dispose(_skeleton);
+    
+    [_renderPool release];
+    
 	[super dealloc];
 }
 
@@ -128,8 +139,10 @@
 }
 
 - (void) draw {
-	CC_NODE_DRAW_SETUP();
 
+	CC_NODE_DRAW_SETUP();
+    
+    // Updating loop
 	ccGLBlendFunc(_blendFunc.src, _blendFunc.dst);
 	ccColor3B color = self.color;
 	_skeleton->r = color.r / (float)255;
@@ -138,45 +151,167 @@
 	_skeleton->a = self.opacity / (float)255;
 
 	int additive = 0;
-	CCTextureAtlas* textureAtlas = 0;
-	ccV3F_C4B_T2F_Quad quad;
-	quad.tl.vertices.z = 0;
-	quad.tr.vertices.z = 0;
-	quad.bl.vertices.z = 0;
-	quad.br.vertices.z = 0;
-	for (int i = 0, n = _skeleton->slotCount; i < n; i++) {
+	CCTriangleTextureAtlas* textureAtlas = 0;
+	ccV3F_C4B_T2F_Triangle triangle;
+	triangle.a.vertices.z = 0;
+	triangle.b.vertices.z = 0;
+	triangle.c.vertices.z = 0;
+    
+    int quadTriangleIds[6] = {
+        0, 1, 2,
+        2, 3, 0
+    };
+        
+    int prevTrianglesCount = 0;
+	for (int i = 0, n = _skeleton->slotCount; i < n; i++)
+    {
 		Slot* slot = _skeleton->drawOrder[i];
-		if (!slot->attachment || slot->attachment->type != ATTACHMENT_REGION) continue;
-		RegionAttachment* attachment = (RegionAttachment*)slot->attachment;
-		CCTextureAtlas* regionTextureAtlas = [self getTextureAtlas:attachment];
-
-		if (slot->data->additiveBlending != additive) {
-			if (textureAtlas) {
-				[textureAtlas drawQuads];
-				[textureAtlas removeAllQuads];
-			}
-			additive = !additive;
-			ccGLBlendFunc(_blendFunc.src, additive ? GL_ONE : _blendFunc.dst);
-		} else if (regionTextureAtlas != textureAtlas && textureAtlas) {
-			[textureAtlas drawQuads];
-			[textureAtlas removeAllQuads];
-		}
-		textureAtlas = regionTextureAtlas;
-		
-		if (textureAtlas.capacity == textureAtlas.totalQuads) {
-			[textureAtlas drawQuads];
-			[textureAtlas removeAllQuads];
-			if (![textureAtlas resizeCapacity:textureAtlas.capacity * 2]) return;
-		}
-
-		RegionAttachment_updateQuad(attachment, slot, &quad, _premultipliedAlpha);
-		[textureAtlas updateQuad:&quad atIndex:textureAtlas.totalQuads];
+        
+		if (!slot->attachment) continue;
+               
+        if (slot->attachment->type == ATTACHMENT_REGION || slot->attachment->type == ATTACHMENT_MESH)
+        {
+            // Getting texture atlas
+            CCTriangleTextureAtlas* regionTextureAtlas = NULL;
+            if(slot->attachment->type == ATTACHMENT_REGION)
+            {
+                RegionAttachment* attachment = (RegionAttachment*)slot->attachment;
+                regionTextureAtlas = (CCTriangleTextureAtlas*)[self getTextureAtlas:attachment];
+            }
+            else
+            {
+                MeshAttachment* attachment = (MeshAttachment*)slot->attachment;
+                regionTextureAtlas = (CCTriangleTextureAtlas*)[self getTextureAtlasFromMeshAttachment:attachment];
+            }
+            
+            // Handle additive blending
+            if (slot->data->additiveBlending != additive)
+            {
+                if (textureAtlas)
+                {
+                    [_renderPool addRenderAtlasToPool:textureAtlas withStart:prevTrianglesCount stop:textureAtlas.currentTriangles blending:additive atIndex:_renderPool.length];
+                    
+                    prevTrianglesCount = textureAtlas.currentTriangles;
+                }
+                additive = !additive;
+            }
+            // Handling changing textureAtlas
+            else if (regionTextureAtlas != textureAtlas && textureAtlas)
+            {
+                [_renderPool addRenderAtlasToPool:textureAtlas withStart:prevTrianglesCount stop:textureAtlas.currentTriangles blending:additive atIndex:_renderPool.length];
+                
+                prevTrianglesCount = regionTextureAtlas.currentTriangles;
+            }
+            
+            textureAtlas = regionTextureAtlas;
+            
+            if(slot->attachment->type == ATTACHMENT_REGION)
+            {
+                RegionAttachment* attachment = (RegionAttachment*)slot->attachment;
+                
+                // If no more room for triangles
+                if (textureAtlas.totalTriangles + 2 > textureAtlas.capacity)
+                {
+                    // Resize
+                    if(textureAtlas.capacity < n * 2)
+                    {
+                        // Assuming only region attachments
+                        [textureAtlas resizeCapacity:n * 2];
+                    }
+                    else
+                    {
+                        // Assuming that were ffd
+                        [textureAtlas resizeCapacity:(textureAtlas.totalTriangles + n)];
+                    }
+                }
+                
+                ccV3F_C4B_T2F vertices[4];
+                float verticesPos[8];
+                unsigned int startVerticle = textureAtlas.totalVertices;
+                
+                RegionAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot->bone, verticesPos);
+                
+                RegionAttachment_updateVertices(attachment, slot, vertices, _premultipliedAlpha, verticesPos);
+                [textureAtlas updateVertices:vertices atIndex:textureAtlas.totalVertices length:4];
+                
+                textureAtlas.currentTriangles += 2;
+                [textureAtlas updateTrianglesIndices:quadTriangleIds length:6 withOffset:startVerticle];
+            }
+            else
+            {
+                MeshAttachment* attachment = (MeshAttachment*)slot->attachment;
+                
+                unsigned int verticesCount = attachment->verticesLength / 2;
+                unsigned int trianglesCount = attachment->trianglesIndicesLength / 3;
+    
+                // Resizing when buffer is too small.
+                if((trianglesCount + textureAtlas.totalTriangles) > textureAtlas.capacity)
+                {
+                    int multiplier = ceil((float)(trianglesCount + textureAtlas.totalTriangles) / (float)textureAtlas.capacity);
+                    [textureAtlas resizeCapacity:(textureAtlas.capacity * multiplier)];
+                }
+                
+                MeshAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot->bone);
+                
+                unsigned int initVertexCount = textureAtlas.totalVertices;
+                ccV3F_C4B_T2F vertices[verticesCount];
+                
+                MeshAttachment_updateVertices(attachment, slot, vertices, _premultipliedAlpha);
+                [textureAtlas updateVertices:vertices atIndex:textureAtlas.totalVertices length:verticesCount];
+                
+                textureAtlas.currentTriangles += trianglesCount;
+                [textureAtlas updateTrianglesIndices:attachment->trianglesIndices length:attachment->trianglesIndicesLength withOffset:initVertexCount];
+            }
+        }
 	}
-	if (textureAtlas) {
-		[textureAtlas drawQuads];
-		[textureAtlas removeAllQuads];
-	}
-
+    
+    // Adding rendering info for last vertices
+    [_renderPool addRenderAtlasToPool:textureAtlas withStart:prevTrianglesCount stop:textureAtlas.currentTriangles blending:additive atIndex:_renderPool.length];
+    
+    // Render loop
+    // Used to minimize glBufferData calls
+    CCTriangleTextureAtlas* prevTextureAtlas = nil;
+    BOOL blending = NO;
+    
+    for (int i = 0; i < _renderPool.length; i++)
+    {
+        ccRenderInfoStructure* poolData = [_renderPool pool];
+        
+        NSInteger startIndex    = poolData[i].startIndex;
+        NSInteger stopIndex     = poolData[i].stopIndex;
+        CCTriangleTextureAtlas* renderTextureAtlas = poolData[i].textureAtlas;
+        
+        if(renderTextureAtlas != prevTextureAtlas)
+        {
+            // Transfer data for actual textureAtlas
+            [renderTextureAtlas transferBuffers];
+        }
+        
+        // Saving actual textureAtlas
+        prevTextureAtlas = renderTextureAtlas;
+        
+        if(blending != poolData[i].blending)
+        {
+            blending = !blending;
+            ccGLBlendFunc(_blendFunc.src, blending ? GL_ONE : _blendFunc.dst);
+        }
+        
+        // Rendering part of object
+        [renderTextureAtlas drawTriangles:(stopIndex - startIndex) fromIndex:startIndex];
+    }
+    
+    // Clearing loop
+    for (int i = 0; i < _renderPool.length; i++)
+    {
+        ccRenderInfoStructure* renderInfo = [_renderPool pool];
+        CCTriangleTextureAtlas* atlas = renderInfo[i].textureAtlas;
+        
+        [atlas removeAllVertices];
+        [atlas removeAllTriangles];
+        atlas.currentTriangles = 0;
+    }
+    [_renderPool removeAllInfo];
+    
 	if (_debugSlots) {
 		// Slots.
 		ccDrawColor4B(0, 0, 255, 255);
@@ -218,6 +353,10 @@
 
 - (CCTextureAtlas*) getTextureAtlas:(RegionAttachment*)regionAttachment {
 	return (CCTextureAtlas*)((AtlasRegion*)regionAttachment->rendererObject)->page->rendererObject;
+}
+
+- (CCTextureAtlas*) getTextureAtlasFromMeshAttachment:(MeshAttachment*)meshAttachment {
+	return (CCTextureAtlas*)((AtlasRegion*)meshAttachment->rendererObject)->page->rendererObject;
 }
 
 - (CGRect) boundingBox {

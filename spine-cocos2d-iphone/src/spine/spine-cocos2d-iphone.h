@@ -31,6 +31,7 @@
 #import "cocos2d.h"
 #import "CCSkeleton.h"
 #import "CCSkeletonAnimation.h"
+#import "CCTriangleTextureAtlas.h"
 
 #ifdef __cplusplus
 namespace spine {
@@ -38,6 +39,8 @@ extern "C" {
 #endif
 
 void RegionAttachment_updateQuad (RegionAttachment* self, Slot* slot, ccV3F_C4B_T2F_Quad* quad, bool premultipliedAlpha);
+void RegionAttachment_updateVertices (RegionAttachment* self, Slot* slot, ccV3F_C4B_T2F* vertices, bool premultipliedAlpha, float* calculatedVertices);
+    void MeshAttachment_updateVertices (MeshAttachment* self, Slot* slot, ccV3F_C4B_T2F* vertices, bool premultipliedAlpha);
 
 #ifdef __cplusplus
 }
