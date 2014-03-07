@@ -91,8 +91,8 @@ public class SkeletonRenderer {
 				float oldScaleX = rootBone.getScaleX();
 				float oldScaleY = rootBone.getScaleY();
 				float oldRotation = rootBone.getRotation();
-				attachmentSkeleton.setX(bone.getWorldX());
-				attachmentSkeleton.setY(bone.getWorldY());
+				attachmentSkeleton.setX(skeleton.getX() + bone.getWorldX());
+				attachmentSkeleton.setY(skeleton.getY() + bone.getWorldY());
 				rootBone.setScaleX(1 + bone.getWorldScaleX() - oldScaleX);
 				rootBone.setScaleY(1 + bone.getWorldScaleY() - oldScaleY);
 				rootBone.setRotation(oldRotation + bone.getWorldRotation());
@@ -140,8 +140,8 @@ public class SkeletonRenderer {
 				float oldScaleX = rootBone.getScaleX();
 				float oldScaleY = rootBone.getScaleY();
 				float oldRotation = rootBone.getRotation();
-				attachmentSkeleton.setX(bone.getWorldX());
-				attachmentSkeleton.setY(bone.getWorldY());
+				attachmentSkeleton.setX(skeleton.getX() + bone.getWorldX());
+				attachmentSkeleton.setY(skeleton.getY() + bone.getWorldY());
 				rootBone.setScaleX(1 + bone.getWorldScaleX() - oldScaleX);
 				rootBone.setScaleY(1 + bone.getWorldScaleY() - oldScaleY);
 				rootBone.setRotation(oldRotation + bone.getWorldRotation());
