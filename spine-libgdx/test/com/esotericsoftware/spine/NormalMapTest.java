@@ -31,15 +31,28 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.scenes.scene2d.utils.Align;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 public class NormalMapTest extends ApplicationAdapter {
 	String skeletonPath, animationName;
@@ -48,21 +61,17 @@ public class NormalMapTest extends ApplicationAdapter {
 	SkeletonRenderer renderer;
 	Texture atlasTexture, normalMapTexture;
 	ShaderProgram program;
+	UI ui;
 
 	SkeletonData skeletonData;
 	Skeleton skeleton;
 	Animation animation;
 
-	final Vector3 ambientColor = new Vector3(1, 1, 1);
-	final Vector3 lightColor = new Vector3(1, 0.7f, 0.6f);
-	final Vector3 lightPosition = new Vector3(0, 0, 0.07f);
+	final Vector3 ambientColor = new Vector3();
+	final Vector3 lightColor = new Vector3();
+	final Vector3 lightPosition = new Vector3();
 	final Vector2 resolution = new Vector2();
-	final Vector3 attenuation = new Vector3(0.4f, 3.0f, 5);
-	float ambientIntensity = 0.35f;
-	float strength = 1.0f;
-	boolean useShadow = true;
-	boolean useNormals = true;
-	boolean flipY = false;
+	final Vector3 attenuation = new Vector3();
 
 	public NormalMapTest (String skeletonPath, String animationName) {
 		this.skeletonPath = skeletonPath;
@@ -70,6 +79,8 @@ public class NormalMapTest extends ApplicationAdapter {
 	}
 
 	public void create () {
+		ui = new UI();
+
 		program = createShader();
 		batch = new SpriteBatch();
 		batch.setShader(program);
@@ -80,7 +91,6 @@ public class NormalMapTest extends ApplicationAdapter {
 		normalMapTexture = new Texture(Gdx.files.internal(skeletonPath + "-normal.png"));
 
 		SkeletonJson json = new SkeletonJson(atlas);
-		// json.setScale(2);
 		skeletonData = json.readSkeletonData(Gdx.files.internal(skeletonPath + ".json"));
 		if (animationName != null) animation = skeletonData.findAnimation(animationName);
 		if (animation == null) animation = skeletonData.getAnimations().first();
@@ -88,11 +98,11 @@ public class NormalMapTest extends ApplicationAdapter {
 		skeleton = new Skeleton(skeletonData);
 		skeleton.setToSetupPose();
 		skeleton = new Skeleton(skeleton);
-		skeleton.setX(Gdx.graphics.getWidth() / 2);
-		skeleton.setY(Gdx.graphics.getHeight() / 4);
+		skeleton.setX(ui.prefs.getFloat("x", Gdx.graphics.getWidth() / 2));
+		skeleton.setY(ui.prefs.getFloat("y", Gdx.graphics.getHeight() / 4));
 		skeleton.updateWorldTransform();
 
-		Gdx.input.setInputProcessor(new InputAdapter() {
+		Gdx.input.setInputProcessor(new InputMultiplexer(ui.stage, new InputAdapter() {
 			public boolean touchDown (int screenX, int screenY, int pointer, int button) {
 				touchDragged(screenX, screenY, pointer);
 				return true;
@@ -103,7 +113,14 @@ public class NormalMapTest extends ApplicationAdapter {
 				skeleton.setY(Gdx.graphics.getHeight() - screenY);
 				return true;
 			}
-		});
+
+			public boolean touchUp (int screenX, int screenY, int pointer, int button) {
+				ui.prefs.putFloat("x", skeleton.getX());
+				ui.prefs.putFloat("y", skeleton.getY());
+				ui.prefs.flush();
+				return true;
+			}
+		}));
 	}
 
 	public void render () {
@@ -116,23 +133,43 @@ public class NormalMapTest extends ApplicationAdapter {
 		lightPosition.x = Gdx.input.getX();
 		lightPosition.y = (Gdx.graphics.getHeight() - Gdx.input.getY());
 
-		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+		ambientColor.x = ui.ambientColorR.getValue();
+		ambientColor.y = ui.ambientColorG.getValue();
+		ambientColor.z = ui.ambientColorB.getValue();
+		lightColor.x = ui.lightColorR.getValue();
+		lightColor.y = ui.lightColorG.getValue();
+		lightColor.z = ui.lightColorB.getValue();
+		attenuation.x = ui.attenuationX.getValue();
+		attenuation.y = ui.attenuationY.getValue();
+		attenuation.z = ui.attenuationZ.getValue();
+		lightPosition.z = ui.lightZ.getValue();
 
 		batch.begin();
-		program.setUniformf("ambientIntensity", ambientIntensity);
+		program.setUniformi("yInvert", ui.yInvert.isChecked() ? 1 : 0);
+		program.setUniformf("resolution", resolution);
+		program.setUniformf("ambientColor", ambientColor);
+		program.setUniformf("ambientIntensity", ui.ambientIntensity.getValue());
 		program.setUniformf("attenuation", attenuation);
 		program.setUniformf("light", lightPosition);
-		program.setUniformi("useNormals", useNormals ? 1 : 0);
-		program.setUniformi("useShadow", useShadow ? 1 : 0);
-		program.setUniformf("strength", strength);
+		program.setUniformf("lightColor", lightColor);
+		program.setUniformi("useNormals", ui.useNormals.isChecked() ? 1 : 0);
+		program.setUniformi("useShadow", ui.useShadow.isChecked() ? 1 : 0);
+		program.setUniformf("strength", ui.strength.getValue());
 		normalMapTexture.bind(1);
 		atlasTexture.bind(0);
 		renderer.draw(batch, skeleton);
 		batch.end();
+
+		ui.stage.act();
+		ui.stage.draw();
 	}
 
 	public void resize (int width, int height) {
 		batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
+		ui.stage.setViewport(width, height);
+		resolution.set(width, height);
 	}
 
 	private ShaderProgram createShader () {
@@ -208,24 +245,128 @@ public class NormalMapTest extends ApplicationAdapter {
 		ShaderProgram.pedantic = false;
 		if (!program.isCompiled()) throw new IllegalArgumentException("Error compiling shader: " + program.getLog());
 
-		resolution.set(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
 		program.begin();
 		program.setUniformi("u_texture", 0);
 		program.setUniformi("u_normals", 1);
-		program.setUniformf("light", lightPosition);
-		program.setUniformf("strength", strength);
-		program.setUniformf("ambientIntensity", ambientIntensity);
-		program.setUniformf("ambientColor", ambientColor);
-		program.setUniformf("resolution", resolution);
-		program.setUniformf("lightColor", lightColor);
-		program.setUniformf("attenuation", attenuation);
-		program.setUniformi("useShadow", useShadow ? 1 : 0);
-		program.setUniformi("useNormals", useNormals ? 1 : 0);
-		program.setUniformi("yInvert", flipY ? 1 : 0);
 		program.end();
 
 		return program;
+	}
+
+	class UI {
+		Stage stage = new Stage();
+		com.badlogic.gdx.scenes.scene2d.ui.Skin skin = new com.badlogic.gdx.scenes.scene2d.ui.Skin(
+			Gdx.files.internal("skin/skin.json"));
+		Preferences prefs = Gdx.app.getPreferences(".spine/NormalMapTest");
+
+		Window window;
+		Table root;
+		Slider ambientColorR, ambientColorG, ambientColorB;
+		Slider lightColorR, lightColorG, lightColorB, lightZ;
+		Slider attenuationX, attenuationY, attenuationZ;
+		Slider ambientIntensity;
+		Slider strength;
+		CheckBox useShadow, useNormals, yInvert;
+
+		public UI () {
+			create();
+		}
+
+		public void create () {
+			window = new Window("Light", skin);
+
+			root = new Table(skin);
+			root.pad(2, 4, 4, 4).defaults().space(6);
+			root.columnDefaults(0).top().right();
+			root.columnDefaults(1).left();
+			ambientColorR = slider("Ambient R", 1);
+			ambientColorG = slider("Ambient G", 1);
+			ambientColorB = slider("Ambient B", 1);
+			ambientIntensity = slider("Ambient intensity", 0.35f);
+			lightColorR = slider("Light R", 1);
+			lightColorG = slider("Light G", 0.7f);
+			lightColorB = slider("Light B", 0.6f);
+			lightZ = slider("Light Z", 0.07f);
+			attenuationX = slider("Attenuation", 0.4f);
+			attenuationY = slider("Attenuation*d", 3);
+			attenuationZ = slider("Attenuation*d*d", 5);
+			strength = slider("Strength", 1);
+			{
+				Table table = new Table();
+				table.defaults().space(12);
+				table.add(useShadow = checkbox(" Use shadow", true));
+				table.add(useNormals = checkbox(" Use normals", true));
+				table.add(yInvert = checkbox(" Invert Y", true));
+				root.add(table).colspan(new Integer(2)).row();
+			}
+
+			TextButton resetButton = new TextButton("Reset", skin);
+			resetButton.getColor().a = 0.66f;
+			window.getButtonTable().add(resetButton).height(20);
+
+			window.add(root).expand().fill();
+			window.pack();
+			stage.addActor(window);
+
+			// Events.
+
+			window.addListener(new InputListener() {
+				public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+					event.cancel();
+					return true;
+				}
+			});
+
+			resetButton.addListener(new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					window.remove();
+					prefs.clear();
+					prefs.flush();
+					create();
+				}
+			});
+		}
+
+		private CheckBox checkbox (final String name, boolean defaultValue) {
+			final CheckBox checkbox = new CheckBox(name, skin);
+			checkbox.setChecked(prefs.getBoolean(checkbox.getText().toString(), defaultValue));
+
+			checkbox.addListener(new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					prefs.putBoolean(name, checkbox.isChecked());
+					prefs.flush();
+				}
+			});
+
+			return checkbox;
+		}
+
+		private Slider slider (final String name, float defaultValue) {
+			final Slider slider = new Slider(0, 1, 0.01f, false, skin);
+			slider.setValue(prefs.getFloat(name, defaultValue));
+
+			final Label label = new Label("", skin);
+			label.setAlignment(Align.right);
+			label.setText(Float.toString((int)(slider.getValue() * 100) / 100f));
+
+			slider.addListener(new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					label.setText(Float.toString((int)(slider.getValue() * 100) / 100f));
+					if (!slider.isDragging()) {
+						prefs.putFloat(name, slider.getValue());
+						prefs.flush();
+					}
+				}
+			});
+
+			Table table = new Table();
+			table.add(label).width(35).space(12);
+			table.add(slider);
+
+			root.add(name);
+			root.add(table).fill().row();
+			return slider;
+		}
 	}
 
 	public static void main (String[] args) throws Exception {
@@ -234,8 +375,6 @@ public class NormalMapTest extends ApplicationAdapter {
 		else if (args.length == 1) //
 			args = new String[] {args[0], null};
 
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.useGL20 = true;
-		new LwjglApplication(new NormalMapTest(args[0], args[1]), config);
+		new LwjglApplication(new NormalMapTest(args[0], args[1]));
 	}
 }

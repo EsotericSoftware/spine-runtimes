@@ -36,7 +36,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -127,7 +127,7 @@ public class AnimationStateTest extends ApplicationAdapter {
 	public void render () {
 		state.update(Gdx.graphics.getDeltaTime()); // Update the animation time.
 
-		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		state.apply(skeleton); // Poses skeleton using current animations. This sets the bone's local SRT.
 		skeleton.updateWorldTransform(); // Uses the bone's local SRT to set their world SRT.
