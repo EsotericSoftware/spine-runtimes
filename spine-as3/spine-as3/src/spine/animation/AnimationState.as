@@ -124,11 +124,11 @@ public class AnimationState {
 		if (trackIndex >= _tracks.length) return;
 		var current:TrackEntry = _tracks[trackIndex];
 		if (!current) return;
-		
-		if (current.onEnd != null) current.onEnd(trackIndex);
-		onEnd.invoke(trackIndex);
 
 		_tracks[trackIndex] = null;
+
+		if (current.onEnd != null) current.onEnd(trackIndex);
+		onEnd.invoke(trackIndex);
 	}
 	
 	private function expandToIndex (index:int) : TrackEntry {

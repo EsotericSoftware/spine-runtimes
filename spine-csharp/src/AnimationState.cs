@@ -138,10 +138,10 @@ namespace Spine {
 			TrackEntry current = tracks[trackIndex];
 			if (current == null) return;
 
+			tracks[trackIndex] = null;
+
 			current.OnEnd(this, trackIndex);
 			if (End != null) End(this, trackIndex);
-
-			tracks[trackIndex] = null;
 		}
 
 		private TrackEntry ExpandToIndex (int index) {

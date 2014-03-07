@@ -137,11 +137,12 @@ public class AnimationState {
 		TrackEntry current = tracks.get(trackIndex);
 		if (current == null) return;
 
+		tracks.set(trackIndex, null);
+
 		if (current.listener != null) current.listener.end(trackIndex);
 		for (int i = 0, n = listeners.size; i < n; i++)
 			listeners.get(i).end(trackIndex);
 
-		tracks.set(trackIndex, null);
 		freeAll(current);
 		if (current.previous != null) trackEntryPool.free(current.previous);
 	}

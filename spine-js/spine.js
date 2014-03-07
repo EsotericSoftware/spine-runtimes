@@ -1038,10 +1038,10 @@ spine.AnimationState.prototype = {
 		var current = this.tracks[trackIndex];
 		if (!current) return;
 
+		this.tracks[trackIndex] = null;
+
 		if (current.onEnd != null) current.onEnd(trackIndex);
 		if (this.onEnd != null) this.onEnd(trackIndex);
-
-		this.tracks[trackIndex] = null;
 	},
 	_expandToIndex: function (index) {
 		if (index < this.tracks.length) return this.tracks[index];
