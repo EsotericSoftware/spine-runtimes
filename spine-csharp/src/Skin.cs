@@ -45,7 +45,7 @@ namespace Spine {
 
 		public void AddAttachment (int slotIndex, String name, Attachment attachment) {
 			if (attachment == null) throw new ArgumentNullException("attachment cannot be null.");
-			attachments.Add(new KeyValuePair<int, String>(slotIndex, name), attachment);
+			attachments[new KeyValuePair<int, String>(slotIndex, name)] = attachment;
 		}
 
 		/// <returns>May be null.</returns>
