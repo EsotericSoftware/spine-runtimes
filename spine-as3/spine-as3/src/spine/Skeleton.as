@@ -35,10 +35,10 @@ public class Skeleton {
 	internal var _slots:Vector.<Slot>;
 	internal var _drawOrder:Vector.<Slot>;
 	internal var _skin:Skin;
-	public var r:int = 1;
-	public var g:int = 1;
-	public var b:int = 1;
-	public var a:int = 1;
+	public var r:Number = 1;
+	public var g:Number = 1;
+	public var b:Number = 1;
+	public var a:Number = 1;
 	public var time:Number;
 	public var flipX:Boolean;
 	public var flipY:Boolean;
