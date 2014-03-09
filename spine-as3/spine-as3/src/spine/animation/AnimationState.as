@@ -83,14 +83,17 @@ public class AnimationState {
 			if (!loop && time > endTime) time = endTime;
 			
 			var previous:TrackEntry = current.previous;
-			if (!previous)
-				current.animation.apply(skeleton, current.lastTime, time, loop, _events);
-			else {
+			if (!previous) {
+				if (current.mix == 1)
+					current.animation.apply(skeleton, current.lastTime, time, loop, _events);
+				else
+					current.animation.mix(skeleton, current.lastTime, time, loop, _events, current.mix);
+			} else {
 				var previousTime:Number = previous.time;
 				if (!previous.loop && previousTime > previous.endTime) previousTime = previous.endTime;
 				previous.animation.apply(skeleton, previousTime, previousTime, previous.loop, null);
 				
-				var alpha:Number = current.mixTime / current.mixDuration;
+				var alpha:Number = current.mixTime / current.mixDuration * current.mix;
 				if (alpha >= 1) {
 					alpha = 1;
 					current.previous = null;

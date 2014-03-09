@@ -946,7 +946,7 @@ spine.TrackEntry.prototype = {
 	loop: false,
 	delay: 0, time: 0, lastTime: -1, endTime: 0,
 	timeScale: 1,
-	mixTime: 0, mixDuration: 0,
+	mixTime: 0, mixDuration: 0, mix: 1,
 	onStart: null, onEnd: null, onComplete: null, onEvent: null
 };
 
@@ -997,14 +997,17 @@ spine.AnimationState.prototype = {
 			if (!loop && time > endTime) time = endTime;
 
 			var previous = current.previous;
-			if (!previous)
-				current.animation.apply(skeleton, current.lastTime, time, loop, this.events);
-			else {
+			if (!previous) {
+				if (current.mix == 1)
+					current.animation.apply(skeleton, current.lastTime, time, loop, this.events);
+				else
+					current.animation.mix(skeleton, current.lastTime, time, loop, this.events, current.mix);
+			} else {
 				var previousTime = previous.time;
 				if (!previous.loop && previousTime > previous.endTime) previousTime = previous.endTime;
 				previous.animation.apply(skeleton, previousTime, previousTime, previous.loop, null);
 
-				var alpha = current.mixTime / current.mixDuration;
+				var alpha = current.mixTime / current.mixDuration * current.mix;
 				if (alpha >= 1) {
 					alpha = 1;
 					current.previous = null;

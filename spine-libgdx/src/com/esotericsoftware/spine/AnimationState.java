@@ -91,14 +91,17 @@ public class AnimationState {
 			if (!loop && time > endTime) time = endTime;
 
 			TrackEntry previous = current.previous;
-			if (previous == null)
-				current.animation.apply(skeleton, lastTime, time, loop, events);
-			else {
+			if (previous == null) {
+				if (current.mix == 1)
+					current.animation.apply(skeleton, lastTime, time, loop, events);
+				else
+					current.animation.mix(skeleton, lastTime, time, loop, events, current.mix);
+			} else {
 				float previousTime = previous.time;
 				if (!previous.loop && previousTime > previous.endTime) previousTime = previous.endTime;
 				previous.animation.apply(skeleton, previousTime, previousTime, previous.loop, null);
 
-				float alpha = current.mixTime / current.mixDuration;
+				float alpha = current.mixTime / current.mixDuration * current.mix;
 				if (alpha >= 1) {
 					alpha = 1;
 					trackEntryPool.free(previous);
@@ -301,6 +304,7 @@ public class AnimationState {
 		float delay, time, lastTime, endTime, timeScale = 1;
 		float mixTime, mixDuration;
 		AnimationStateListener listener;
+		float mix = 1;
 
 		public void reset () {
 			next = null;
@@ -366,6 +370,14 @@ public class AnimationState {
 
 		public void setLastTime (float lastTime) {
 			this.lastTime = lastTime;
+		}
+
+		public float getMix () {
+			return mix;
+		}
+
+		public void setMix (float mix) {
+			this.mix = mix;
 		}
 
 		public float getTimeScale () {

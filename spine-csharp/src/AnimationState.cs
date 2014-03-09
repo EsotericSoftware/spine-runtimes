@@ -102,14 +102,17 @@ namespace Spine {
 				if (!loop && time > current.endTime) time = current.endTime;
 
 				TrackEntry previous = current.previous;
-				if (previous == null)
-					current.animation.Apply(skeleton, current.lastTime, time, loop, events);
-				else {
+				if (previous == null) {
+					if (current.mix == 1)
+						current.animation.Apply(skeleton, current.lastTime, time, loop, events);
+					else
+						current.animation.Apply(skeleton, current.lastTime, time, loop, events, current.mix);
+				} else {
 					float previousTime = previous.time;
 					if (!previous.loop && previousTime > previous.endTime) previousTime = previous.endTime;
 					previous.animation.Apply(skeleton, previousTime, previousTime, previous.loop, null);
 
-					float alpha = current.mixTime / current.mixDuration;
+					float alpha = current.mixTime / current.mixDuration * current.mix;
 					if (alpha >= 1) {
 						alpha = 1;
 						current.previous = null;
@@ -252,7 +255,7 @@ namespace Spine {
 		internal Animation animation;
 		internal bool loop;
 		internal float delay, time, lastTime = -1, endTime, timeScale = 1;
-		internal float mixTime, mixDuration;
+		internal float mixTime, mixDuration, mix = 1;
 
 		public Animation Animation { get { return animation; } }
 		public float Delay { get { return delay; } set { delay = value; } }
@@ -260,8 +263,9 @@ namespace Spine {
 		public float LastTime { get { return lastTime; } set { lastTime = value; } }
 		public float EndTime { get { return endTime; } set { endTime = value; } }
 		public float TimeScale { get { return timeScale; } set { timeScale = value; } }
+		public float Mix { get { return mix; } set { mix = value; } }
 		public bool Loop { get { return loop; } set { loop = value; } }
-		
+
 		public event AnimationState.StartEndDelegate Start;
 		public event AnimationState.StartEndDelegate End;
 		public event AnimationState.EventDelegate Event;

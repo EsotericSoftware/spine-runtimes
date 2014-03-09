@@ -103,13 +103,17 @@ function AnimationState.new (data)
 
 				local previous = current.previous
 				if not previous then
-					current.animation:apply(skeleton, current.lastTime, time, loop, self.events)
+					if current.mix == 1 then
+						current.animation:apply(skeleton, current.lastTime, time, loop, self.events)
+					else
+						current.animation:mix(skeleton, current.lastTime, time, loop, self.events, current.mix)
+					end
 				else
 					local previousTime = previous.time
 					if not previous.loop and previousTime > previous.endTime then previousTime = previous.endTime end
 					previous.animation:apply(skeleton, previousTime, previousTime, previous.loop, nil)
 
-					local alpha = current.mixTime / current.mixDuration
+					local alpha = current.mixTime / current.mixDuration * current.mix
 					if alpha >= 1 then
 						alpha = 1
 						current.previous = nil
@@ -235,7 +239,7 @@ function AnimationState.TrackEntry.new (data)
 		loop = false,
 		delay = 0, time = 0, lastTime = -1, endTime = 0,
 		timeScale = 1,
-		mixTime = 0, mixDuration = 0,
+		mixTime = 0, mixDuration = 0, mix = 0,
 		onStart = nil, onEnd = nil, onComplete = nil, onEvent = nil
 	}
 	return self

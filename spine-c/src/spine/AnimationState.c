@@ -39,6 +39,7 @@ spTrackEntry* _spTrackEntry_create () {
 	spTrackEntry* entry = NEW(spTrackEntry);
 	entry->timeScale = 1;
 	entry->lastTime = -1;
+	entry->mix = 1;
 	return entry;
 }
 
@@ -124,9 +125,15 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 
 		previous = current->previous;
 		if (!previous) {
-			spAnimation_apply(current->animation, skeleton, current->lastTime, time, current->loop, internal->events, &eventCount);
+			if (current->mix == 1) {
+				spAnimation_apply(current->animation, skeleton, current->lastTime, time,
+					current->loop, internal->events, &eventCount);
+			} else {
+				spAnimation_mix(current->animation, skeleton, current->lastTime, time,
+					current->loop, internal->events, &eventCount, current->mix);
+			}
 		} else {
-			float alpha = current->mixTime / current->mixDuration;
+			float alpha = current->mixTime / current->mixDuration * current->mix;
 
 			float previousTime = previous->time;
 			if (!previous->loop && previousTime > previous->endTime) previousTime = previous->endTime;
@@ -137,8 +144,8 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 				_spTrackEntry_dispose(current->previous);
 				current->previous = 0;
 			}
-			spAnimation_mix(current->animation, skeleton, current->lastTime, time, current->loop, internal->events, &eventCount,
-					alpha);
+			spAnimation_mix(current->animation, skeleton, current->lastTime, time,
+				current->loop, internal->events, &eventCount, alpha);
 		}
 
 		for (ii = 0; ii < eventCount; ii++) {

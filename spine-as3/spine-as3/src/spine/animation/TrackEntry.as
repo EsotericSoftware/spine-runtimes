@@ -36,7 +36,7 @@ public class TrackEntry {
 	public var animation:Animation;
 	public var loop:Boolean;
 	public var delay:Number, time:Number = 0, lastTime:Number = -1, endTime:Number, timeScale:Number = 1;
-	internal var mixTime:Number, mixDuration:Number;
+	internal var mixTime:Number, mixDuration:Number, mix:Number = 1;
 	public var onStart:Function, onEnd:Function, onComplete:Function, onEvent:Function;
 	
 	public function toString () : String {

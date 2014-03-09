@@ -54,7 +54,7 @@ struct spTrackEntry {
 	int/*bool*/loop;
 	float delay, time, lastTime, endTime, timeScale;
 	spAnimationStateListener listener;
-	float mixTime, mixDuration;
+	float mixTime, mixDuration, mix;
 };
 
 struct spAnimationState {
