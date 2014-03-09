@@ -28,21 +28,15 @@
 
 package com.esotericsoftware.spine;
 
-import com.esotericsoftware.spine.AnimationState.AnimationStateListener;
-import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.math.Vector3;
 
-public class AnimationStateTest extends ApplicationAdapter {
+public class SimpleTest1 extends ApplicationAdapter {
 	OrthographicCamera camera;
 	SpriteBatch batch;
 	SkeletonRenderer renderer;
@@ -50,7 +44,6 @@ public class AnimationStateTest extends ApplicationAdapter {
 
 	TextureAtlas atlas;
 	Skeleton skeleton;
-	SkeletonBounds bounds;
 	AnimationState state;
 
 	public void create () {
@@ -59,6 +52,8 @@ public class AnimationStateTest extends ApplicationAdapter {
 		renderer = new SkeletonRenderer();
 		renderer.setPremultipliedAlpha(true);
 		debugRenderer = new SkeletonRendererDebug();
+		debugRenderer.setBoundingBoxes(false);
+		debugRenderer.setRegionAttachments(false);
 
 		atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy.atlas"));
 		SkeletonJson json = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
@@ -68,60 +63,13 @@ public class AnimationStateTest extends ApplicationAdapter {
 		skeleton.setX(250);
 		skeleton.setY(20);
 
-		bounds = new SkeletonBounds(); // Convenience class to do hit detection with bounding boxes.
-
 		AnimationStateData stateData = new AnimationStateData(skeletonData); // Defines mixing (crossfading) between animations.
 		stateData.setMix("walk", "jump", 0.2f);
 		stateData.setMix("jump", "walk", 0.4f);
-		stateData.setMix("jump", "jump", 0.2f);
 
 		state = new AnimationState(stateData); // Holds the animation state for a skeleton (current animation, time, etc).
-		state.addListener(new AnimationStateListener() {
-			public void event (int trackIndex, Event event) {
-				System.out.println(trackIndex + " event: " + state.getCurrent(trackIndex) + ", " + event.getData().getName());
-			}
-
-			public void complete (int trackIndex, int loopCount) {
-				System.out.println(trackIndex + " complete: " + state.getCurrent(trackIndex) + ", " + loopCount);
-			}
-
-			public void start (int trackIndex) {
-				System.out.println(trackIndex + " start: " + state.getCurrent(trackIndex));
-			}
-
-			public void end (int trackIndex) {
-				System.out.println(trackIndex + " end: " + state.getCurrent(trackIndex));
-			}
-		});
-		state.setAnimation(0, "headPop", true);
-
-		Gdx.input.setInputProcessor(new InputAdapter() {
-			final Vector3 point = new Vector3();
-
-			public boolean touchDown (int screenX, int screenY, int pointer, int button) {
-				camera.unproject(point.set(screenX, screenY, 0)); // Convert window to world coordinates.
-				bounds.update(skeleton, true); // Update SkeletonBounds with current skeleton bounding box positions.
-				if (bounds.aabbContainsPoint(point.x, point.y)) { // Check if inside AABB first. This check is fast.
-					BoundingBoxAttachment hit = bounds.containsPoint(point.x, point.y); // Check if inside a bounding box.
-					if (hit != null) {
-						System.out.println("hit: " + hit);
-						skeleton.findSlot("head").getColor().set(Color.RED); // Turn head red until touchUp.
-					}
-				}
-				return true;
-			}
-
-			public boolean touchUp (int screenX, int screenY, int pointer, int button) {
-				skeleton.findSlot("head").getColor().set(Color.WHITE);
-				return true;
-			}
-
-			public boolean keyDown (int keycode) {
-				state.setAnimation(0, "jump", false); // Set animation on track 0 to jump.
-				state.addAnimation(0, "walk", true, 0); // Queue walk to play after jump.
-				return true;
-			}
-		});
+		state.setAnimation(0, "jump", false);
+		state.addAnimation(0, "walk", true, 0);
 	}
 
 	public void render () {
@@ -129,8 +77,8 @@ public class AnimationStateTest extends ApplicationAdapter {
 
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		state.apply(skeleton); // Poses skeleton using current animations. This sets the bone's local SRT.
-		skeleton.updateWorldTransform(); // Uses the bone's local SRT to set their world SRT.
+		state.apply(skeleton); // Poses skeleton using current animations. This sets the bones' local SRT.
+		skeleton.updateWorldTransform(); // Uses the bones' local SRT to compute their world SRT.
 
 		// Configure the camera, SpriteBatch, and SkeletonRendererDebug.
 		camera.update();
@@ -153,6 +101,6 @@ public class AnimationStateTest extends ApplicationAdapter {
 	}
 
 	public static void main (String[] args) throws Exception {
-		new LwjglApplication(new AnimationStateTest());
+		new LwjglApplication(new SimpleTest1());
 	}
 }
