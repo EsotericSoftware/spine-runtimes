@@ -106,7 +106,7 @@ namespace Spine {
 					if (current.mix == 1)
 						current.animation.Apply(skeleton, current.lastTime, time, loop, events);
 					else
-						current.animation.Apply(skeleton, current.lastTime, time, loop, events, current.mix);
+						current.animation.Mix(skeleton, current.lastTime, time, loop, events, current.mix);
 				} else {
 					float previousTime = previous.time;
 					if (!previous.loop && previousTime > previous.endTime) previousTime = previous.endTime;
