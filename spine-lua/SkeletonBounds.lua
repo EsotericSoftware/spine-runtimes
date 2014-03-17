@@ -116,7 +116,7 @@ function SkeletonBounds.new ()
 
 	function self:intersectsSegment (x1, y1, x2, y2)
 		for i,polygon in ipairs(self.polygons) do
-			if self:polygonIntersectsSegment(polygon, x1, y1, x2, y2) then return boundingBoxes[i] end
+			if self:polygonIntersectsSegment(polygon, x1, y1, x2, y2) then return self.boundingBoxes[i] end
 		end
 		return nil
 	end
@@ -138,7 +138,7 @@ function SkeletonBounds.new ()
 	end
 
 	function self:polygonIntersectsSegment (polygon, x1, y1, x2, y2)
-		local nn = polygon.length
+		local nn = #polygon
 		local width12, height12 = x1 - x2, y1 - y2
 		local det1 = x1 * y2 - y1 * x2
 		local x3, y3 = polygon[nn - 2], polygon[nn - 1]
