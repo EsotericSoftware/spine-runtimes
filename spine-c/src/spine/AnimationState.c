@@ -181,10 +181,10 @@ void spAnimationState_clearTrack (spAnimationState* self, int trackIndex) {
 	current = self->tracks[trackIndex];
 	if (!current) return;
 
-	self->tracks[trackIndex] = 0;
-
 	if (current->listener) current->listener(self, trackIndex, ANIMATION_END, 0, 0);
 	if (self->listener) self->listener(self, trackIndex, ANIMATION_END, 0, 0);
+
+	self->tracks[trackIndex] = 0;
 
 	if (current->previous) _spTrackEntry_dispose(current->previous);
 	_spTrackEntry_disposeAll(current);

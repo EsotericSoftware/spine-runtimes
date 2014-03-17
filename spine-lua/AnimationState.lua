@@ -161,13 +161,13 @@ function AnimationState.new (data)
 		local current = self.tracks[trackIndex]
 		if not current then return end
 
+		if current.onEnd then current.onEnd(trackIndex) end
+		if self.onEnd then self.onEnd(trackIndex) end
+
 		self.tracks[trackIndex] = nil
 		if trackIndex == self.trackCount - 1 then
 			self.trackCount = self.trackCount - 1
 		end
-
-		if current.onEnd then current.onEnd(trackIndex) end
-		if self.onEnd then self.onEnd(trackIndex) end
 	end
 
 	function self:setAnimationByName (trackIndex, animationName, loop)
