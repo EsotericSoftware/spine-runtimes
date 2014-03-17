@@ -112,6 +112,7 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 
 	int i, ii;
 	int eventCount;
+	int entryChanged;
 	float time;
 	spTrackEntry* previous;
 	for (i = 0; i < self->trackCount; i++) {
@@ -148,22 +149,40 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 				current->loop, internal->events, &eventCount, alpha);
 		}
 
+		entryChanged = 0;
 		for (ii = 0; ii < eventCount; ii++) {
 			spEvent* event = internal->events[ii];
-			if (current->listener) current->listener(self, i, ANIMATION_EVENT, event, 0);
-			if (self->listener) self->listener(self, i, ANIMATION_EVENT, event, 0);
+			if (current->listener) {
+				current->listener(self, i, ANIMATION_EVENT, event, 0);
+				if (self->tracks[i] != current) {
+					entryChanged = 1;
+					break;
+				}
+			}
+			if (self->listener) {
+				self->listener(self, i, ANIMATION_EVENT, event, 0);
+				if (self->tracks[i] != current) {
+					entryChanged = 1;
+					break;
+				}
+			}
 		}
+		if (entryChanged) continue;
 
 		/* Check if completed the animation or a loop iteration. */
 		if (current->loop ? (FMOD(current->lastTime, current->endTime) > FMOD(time, current->endTime))
 				: (current->lastTime < current->endTime && time >= current->endTime)) {
 			int count = (int)(time / current->endTime);
-			if (current->listener) current->listener(self, i, ANIMATION_COMPLETE, 0, count);
-			if (self->listener) self->listener(self, i, ANIMATION_COMPLETE, 0, count);
-			if (i >= self->trackCount || self->tracks[i] != current) continue;
+			if (current->listener) {
+				current->listener(self, i, ANIMATION_COMPLETE, 0, count);
+				if (self->tracks[i] != current) continue;
+			}
+			if (self->listener) {
+				self->listener(self, i, ANIMATION_COMPLETE, 0, count);
+				if (self->tracks[i] != current) continue;
+			}
 		}
 
-		if (i >= self->trackCount || self->tracks[i] != current) continue;
 		current->lastTime = current->time;
 	}
 }
@@ -227,7 +246,10 @@ void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEnt
 
 	self->tracks[index] = entry;
 
-	if (entry->listener) entry->listener(self, index, ANIMATION_START, 0, 0);
+	if (entry->listener) {
+		entry->listener(self, index, ANIMATION_START, 0, 0);
+		if (self->tracks[index] != entry) return;
+	}
 	if (self->listener) self->listener(self, index, ANIMATION_START, 0, 0);
 }
 
