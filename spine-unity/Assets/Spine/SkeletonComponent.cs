@@ -265,14 +265,21 @@ public class SkeletonComponent : MonoBehaviour {
 
 		if (submeshes.Count <= submeshIndex) submeshes.Add(new Submesh());
 		Submesh submesh = submeshes[submeshIndex];
-		
+
 		// Allocate indexes if not the right size, allowing last submesh to have more than required.
 		int[] indexes = submesh.indexes;
 		if (lastSubmesh ? (indexes.Length < indexCount) : (indexes.Length != indexCount)) {
 			submesh.indexes = indexes = new int[indexCount];
 			submesh.indexCount = 0;
 		}
-		
+
+		// Last submesh may have more indices than required, so zero indexes to the end.
+		if (lastSubmesh && submesh.indexCount != indexCount) {
+			submesh.indexCount = indexCount;
+			for (int i = indexCount, n = indexes.Length; i < n; i++)
+				indexes[i] = 0;
+		}
+
 		// Set indexes if not already set.
 		if (submesh.firstVertex != vertexIndex || submesh.indexCount < indexCount) {
 			submesh.indexCount = indexCount;
@@ -285,13 +292,6 @@ public class SkeletonComponent : MonoBehaviour {
 				indexes[i + 4] = vertexIndex + 3;
 				indexes[i + 5] = vertexIndex + 1;
 			}
-		}
-
-		// Last submesh may have more indices than required, so zero indexes to the end.
-		if (lastSubmesh && submesh.indexCount != indexCount) {
-			submesh.indexCount = indexCount;
-			for (int i = indexCount, n = indexes.Length; i < n; i++)
-				indexes[i] = 0;
 		}
 	}
 	
