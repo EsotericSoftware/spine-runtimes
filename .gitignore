@@ -23,6 +23,17 @@ spine-cocos2d-iphone/libs/*
 !spine-cocos2d-iphone/libs/CocosDenshion/Place CocosDenshion here.txt
 !spine-cocos2d-iphone/libs/kazmath/Place kazmath here.txt
 
+
+spine-cocos2dxna/cocos2dxna/
+spine-cocos2dxna/example/packages
+spine-cocos2dxna/example/win32/bin
+spine-cocos2dxna/example/win32/obj
+spine-cocos2dxna/example/wp8/bin
+spine-cocos2dxna/example/wp8/obj
+spine-cocos2dxna/example/android/bin
+spine-cocos2dxna/example/android/obj
+!spine-cocos2dxna/cocos2dxna/Place cocos2dxna here.txt
+
 *.user
 forums
 spine-csharp/bin

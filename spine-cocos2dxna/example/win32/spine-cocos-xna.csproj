@@ -1,0 +1,245 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C2AA92EF-1C66-4100-B17B-613EA7CB7BCC}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>spine_cocos_xna</RootNamespace>
+    <AssemblyName>spine-cocos-xna</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\WindowsDX\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\WindowsDX\Release\</OutputPath>
+    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Game.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\..\spine-csharp\src\Animation.cs">
+      <Link>Spine\Animation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\AnimationState.cs">
+      <Link>Spine\AnimationState.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\AnimationStateData.cs">
+      <Link>Spine\AnimationStateData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Atlas.cs">
+      <Link>Spine\Atlas.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Attachments\AtlasAttachmentLoader.cs">
+      <Link>Spine\Attachments\AtlasAttachmentLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Attachments\Attachment.cs">
+      <Link>Spine\Attachments\Attachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Attachments\AttachmentLoader.cs">
+      <Link>Spine\Attachments\AttachmentLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Attachments\AttachmentType.cs">
+      <Link>Spine\Attachments\AttachmentType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Attachments\BoundingBoxAttachment.cs">
+      <Link>Spine\Attachments\BoundingBoxAttachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Attachments\RegionAttachment.cs">
+      <Link>Spine\Attachments\RegionAttachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Bone.cs">
+      <Link>Spine\Bone.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\BoneData.cs">
+      <Link>Spine\BoneData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Event.cs">
+      <Link>Spine\Event.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\EventData.cs">
+      <Link>Spine\EventData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Json.cs">
+      <Link>Spine\Json.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Skeleton.cs">
+      <Link>Spine\Skeleton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\SkeletonBounds.cs">
+      <Link>Spine\SkeletonBounds.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\SkeletonData.cs">
+      <Link>Spine\SkeletonData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\SkeletonJson.cs">
+      <Link>Spine\SkeletonJson.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Skin.cs">
+      <Link>Spine\Skin.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Slot.cs">
+      <Link>Spine\Slot.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\SlotData.cs">
+      <Link>Spine\SlotData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-xna\src\SkeletonRenderer.cs">
+      <Link>Spine\Utils\SkeletonRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-xna\src\SpriteBatcher.cs">
+      <Link>Spine\Utils\SpriteBatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-xna\src\Util.cs">
+      <Link>Spine\Utils\Util.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-xna\src\XnaTextureLoader.cs">
+      <Link>Spine\Utils\XnaTextureLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\spine\CCSkeleton.cs">
+      <Link>Cocos\CCSkeleton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\spine\CCSkeletonAnimation.cs">
+      <Link>Cocos\CCSkeletonAnimation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\spine\MonoTextureLoader.cs">
+      <Link>Cocos\MonoTextureLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\spine\spine-cocos2dx.cs">
+      <Link>Cocos\spine-cocos2dx.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\spine\spine-cocos2dxna.cs">
+      <Link>Cocos\spine-cocos2dxna.cs</Link>
+    </Compile>
+    <Compile Include="AppDelegate.cs" />
+    <Compile Include="Game1.cs" />
+    <Compile Include="IntroLayer.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="BitMiracle.LibTiff.NET">
+      <HintPath>..\packages\Cocos2D-XNA.WindowsDX.1.3.0.2\lib\net40\BitMiracle.LibTiff.NET.dll</HintPath>
+    </Reference>
+    <Reference Include="box2d">
+      <HintPath>..\packages\Cocos2D-XNA.WindowsDX.1.3.0.2\lib\net40\box2d.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\packages\Cocos2D-XNA.WindowsDX.1.3.0.2\lib\net40\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Lidgren.Network, Version=2011.3.12.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cocos2D-XNA.WindowsDX.1.3.0.2\lib\net40\Lidgren.Network.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Framework, Version=3.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Cocos2D-XNA.WindowsDX.1.3.0.2\lib\net40\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cocos2D-XNA.WindowsDX.1.3.0.2\lib\net40\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct2D1">
+      <HintPath>..\packages\Cocos2D-XNA.WindowsDX.1.3.0.2\lib\net40\SharpDX.Direct2D1.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D11, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cocos2D-XNA.WindowsDX.1.3.0.2\lib\net40\SharpDX.Direct3D11.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D9">
+      <HintPath>..\packages\Cocos2D-XNA.WindowsDX.1.3.0.2\lib\net40\SharpDX.Direct3D9.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.DXGI, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cocos2D-XNA.WindowsDX.1.3.0.2\lib\net40\SharpDX.DXGI.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.MediaFoundation, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cocos2D-XNA.WindowsDX.1.3.0.2\lib\net40\SharpDX.MediaFoundation.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.RawInput">
+      <HintPath>..\packages\Cocos2D-XNA.WindowsDX.1.3.0.2\lib\net40\SharpDX.RawInput.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.XAudio2, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cocos2D-XNA.WindowsDX.1.3.0.2\lib\net40\SharpDX.XAudio2.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.XInput, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cocos2D-XNA.WindowsDX.1.3.0.2\lib\net40\SharpDX.XInput.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="zlib.net">
+      <HintPath>..\packages\Cocos2D-XNA.WindowsDX.1.3.0.2\lib\net40\zlib.net.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\goblins.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\spineboy.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\walk1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\wallpaper.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Game.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\fonts\arial-16.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="Content\goblins.atlas">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Content\goblins.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Content\mariotest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Content\spineboy.atlas">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Content\spineboy.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\fonts\MarkerFelt-22.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\cocos2dxna\cocos2d\cocos2d.WindowsDX.csproj">
+      <Project>{0c0afdff-a4e4-49f4-b6db-a761b0db64a8}</Project>
+      <Name>cocos2d.WindowsDX</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
