@@ -66,12 +66,12 @@ namespace Spine {
 			skeletonRenderer = new SkeletonRenderer(GraphicsDevice);
 			skeletonRenderer.PremultipliedAlpha = true;
 
-			String name = "spineboy"; // "goblins";
+            String name = "goblins"; //"spineboy"; // 
 
 			Atlas atlas = new Atlas("data/" + name + ".atlas", new XnaTextureLoader(GraphicsDevice));
 			SkeletonJson json = new SkeletonJson(atlas);
 			skeleton = new Skeleton(json.ReadSkeletonData("data/" + name + ".json"));
-			if (name == "goblins") skeleton.SetSkin("goblingirl");
+			if (name == "goblins") skeleton.SetSkin("goblin");
 			skeleton.SetSlotsToSetupPose(); // Without this the skin attachments won't be attached. See SetSkin.
 
 			// Define mixing between animations.
@@ -90,7 +90,7 @@ namespace Spine {
 				state.Complete += Complete;
 				state.Event += Event;
 
-				state.SetAnimation(0, "drawOrder", true);
+                state.SetAnimation(0, "walk", true);
 			} else {
 				state.SetAnimation(0, "walk", false);
 				TrackEntry entry = state.AddAnimation(0, "jump", false, 0);
