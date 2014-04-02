@@ -63,6 +63,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.awt.FileDialog;
 import java.awt.Frame;
@@ -195,6 +196,8 @@ public class SkeletonTest extends ApplicationAdapter {
 			debugRenderer.setBones(ui.debugBonesCheckbox.isChecked());
 			debugRenderer.setRegionAttachments(ui.debugRegionsCheckbox.isChecked());
 			debugRenderer.setBoundingBoxes(ui.debugBoundingBoxesCheckbox.isChecked());
+			debugRenderer.setMeshHull(ui.debugMeshHullCheckbox.isChecked());
+			debugRenderer.setMeshTriangles(ui.debugMeshTrianglesCheckbox.isChecked());
 			debugRenderer.draw(skeleton);
 		}
 
@@ -205,12 +208,12 @@ public class SkeletonTest extends ApplicationAdapter {
 	public void resize (int width, int height) {
 		batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
 		debugRenderer.getShapeRenderer().setProjectionMatrix(batch.getProjectionMatrix());
-		ui.stage.setViewport(width, height);
+		ui.stage.getViewport().update(width, height, true);
 		if (!ui.minimizeButton.isChecked()) ui.window.setHeight(height);
 	}
 
 	class UI {
-		Stage stage = new Stage();
+		Stage stage = new Stage(new ScreenViewport());
 		com.badlogic.gdx.scenes.scene2d.ui.Skin skin = new com.badlogic.gdx.scenes.scene2d.ui.Skin(
 			Gdx.files.internal("skin/skin.json"));
 
@@ -231,6 +234,8 @@ public class SkeletonTest extends ApplicationAdapter {
 		CheckBox debugBonesCheckbox = new CheckBox(" Bones", skin);
 		CheckBox debugRegionsCheckbox = new CheckBox(" Regions", skin);
 		CheckBox debugBoundingBoxesCheckbox = new CheckBox(" Bounds", skin);
+		CheckBox debugMeshHullCheckbox = new CheckBox(" Mesh Hull", skin);
+		CheckBox debugMeshTrianglesCheckbox = new CheckBox(" Mesh Triangles", skin);
 		Slider scaleSlider = new Slider(0.1f, 3, 0.01f, false, skin);
 		Label scaleLabel = new Label("1.0", skin);
 		TextButton pauseButton = new TextButton("Pause", skin, "toggle");
@@ -286,6 +291,8 @@ public class SkeletonTest extends ApplicationAdapter {
 			root.add(table(flipXCheckbox, flipYCheckbox)).row();
 			root.add("Debug:");
 			root.add(table(debugBonesCheckbox, debugRegionsCheckbox, debugBoundingBoxesCheckbox)).row();
+			root.add();
+			root.add(table(debugMeshHullCheckbox, debugMeshTrianglesCheckbox)).row();
 			root.add("Alpha:");
 			root.add(premultipliedCheckbox).row();
 			root.add("Skin:");

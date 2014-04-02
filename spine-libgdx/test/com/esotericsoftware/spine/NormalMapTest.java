@@ -168,7 +168,7 @@ public class NormalMapTest extends ApplicationAdapter {
 
 	public void resize (int width, int height) {
 		batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
-		ui.stage.setViewport(width, height);
+		ui.stage.getViewport().update(width, height, true);
 		resolution.set(width, height);
 	}
 

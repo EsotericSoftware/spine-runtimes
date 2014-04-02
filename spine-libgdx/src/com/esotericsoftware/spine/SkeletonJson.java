@@ -45,11 +45,14 @@ import com.esotericsoftware.spine.attachments.AttachmentType;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
+import com.esotericsoftware.spine.attachments.SkinnedMeshAttachment;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.SerializationException;
@@ -194,15 +197,44 @@ public class SkeletonJson {
 		}
 		case mesh: {
 			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, map.getString("path", name));
+			float[] uvs = map.require("uvs").asFloatArray();
+			short[] triangles = map.require("triangles").asShortArray();
+
 			float[] vertices = map.require("vertices").asFloatArray();
 			if (scale != 1) {
 				for (int i = 0, n = vertices.length; i < n; i++)
 					vertices[i] *= scale;
 			}
-			short[] triangles = map.require("triangles").asShortArray();
-			float[] uvs = map.require("uvs").asFloatArray();
 			mesh.setMesh(vertices, triangles, uvs);
-			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt());
+
+			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() * 2);
+			if (map.has("edges")) mesh.setEdges(map.require("edges").asIntArray());
+			mesh.setWidth(map.getFloat("width", 0) * scale);
+			mesh.setHeight(map.getFloat("height", 0) * scale);
+			return mesh;
+		}
+		case skinnedmesh: {
+			SkinnedMeshAttachment mesh = attachmentLoader.newSkinnedMeshAttachment(skin, name, map.getString("path", name));
+			float[] uvs = map.require("uvs").asFloatArray();
+			short[] triangles = map.require("triangles").asShortArray();
+
+			float[] vertices = map.require("vertices").asFloatArray();
+			FloatArray weights = new FloatArray(uvs.length * 3 * 3);
+			IntArray bones = new IntArray(uvs.length * 3);
+			for (int i = 0, n = vertices.length; i < n;) {
+				int boneCount = (int)vertices[i++];
+				bones.add(boneCount);
+				for (int nn = i + boneCount * 4; i < nn;) {
+					bones.add((int)vertices[i]);
+					weights.add(vertices[i + 1] * scale);
+					weights.add(vertices[i + 2] * scale);
+					weights.add(vertices[i + 3]);
+					i += 4;
+				}
+			}
+			mesh.setMesh(bones.toArray(), weights.toArray(), uvs, triangles);
+
+			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() * 2);
 			if (map.has("edges")) mesh.setEdges(map.require("edges").asIntArray());
 			mesh.setWidth(map.getFloat("width", 0) * scale);
 			mesh.setHeight(map.getFloat("height", 0) * scale);
@@ -222,6 +254,7 @@ public class SkeletonJson {
 	}
 
 	private void readAnimation (String name, JsonValue map, SkeletonData skeletonData) {
+		float scale = this.scale;
 		Array<Timeline> timelines = new Array();
 		float duration = 0;
 
@@ -315,24 +348,41 @@ public class SkeletonJson {
 				if (slotIndex == -1) throw new SerializationException("Slot not found: " + slotMap.name);
 				for (JsonValue meshMap = slotMap.child; meshMap != null; meshMap = meshMap.next) {
 					FfdTimeline timeline = new FfdTimeline(meshMap.size);
-					MeshAttachment mesh = (MeshAttachment)skin.getAttachment(slotIndex, meshMap.name);
-					if (mesh == null) throw new SerializationException("Mesh attachment not found: " + meshMap.name);
+					Attachment attachment = skin.getAttachment(slotIndex, meshMap.name);
+					if (attachment == null) throw new SerializationException("FFD attachment not found: " + meshMap.name);
 					timeline.slotIndex = slotIndex;
-					timeline.meshAttachment = mesh;
+					timeline.attachment = attachment;
 
 					int frameIndex = 0;
 					for (JsonValue valueMap = meshMap.child; valueMap != null; valueMap = valueMap.next) {
 						float[] vertices;
+						int vertexCount;
+						if (attachment instanceof MeshAttachment)
+							vertexCount = ((MeshAttachment)attachment).getVertices().length;
+						else
+							vertexCount = ((SkinnedMeshAttachment)attachment).getWeights().length / 3 * 2;
+
 						JsonValue verticesValue = valueMap.get("vertices");
-						if (verticesValue == null)
-							vertices = mesh.getVertices();
-						else {
-							vertices = verticesValue.asFloatArray();
+						if (verticesValue == null) {
+							if (attachment instanceof MeshAttachment)
+								vertices = ((MeshAttachment)attachment).getVertices();
+							else
+								vertices = new float[vertexCount];
+						} else {
+							vertices = new float[vertexCount];
+							int start = valueMap.getInt("offset", 0);
+							System.arraycopy(verticesValue.asFloatArray(), 0, vertices, start, verticesValue.size);
 							if (scale != 1) {
-								for (int i = 0, n = vertices.length; i < n; i++)
+								for (int i = start, n = i + verticesValue.size; i < n; i++)
 									vertices[i] *= scale;
 							}
+							if (attachment instanceof MeshAttachment) {
+								float[] meshVertices = ((MeshAttachment)attachment).getVertices();
+								for (int i = 0, n = vertices.length; i < n; i++)
+									vertices[i] += meshVertices[i];
+							}
 						}
+
 						timeline.setFrame(frameIndex, valueMap.getFloat("time"), vertices);
 						readCurve(timeline, frameIndex, valueMap);
 						frameIndex++;

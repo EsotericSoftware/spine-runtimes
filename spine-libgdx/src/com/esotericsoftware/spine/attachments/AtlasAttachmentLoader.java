@@ -56,7 +56,17 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 		attachment.setPath(path);
 		AtlasRegion region = atlas.findRegion(path);
 		if (region == null)
-			throw new RuntimeException("Region not found in atlas: " + attachment + " (region attachment: " + name + ")");
+			throw new RuntimeException("Region not found in atlas: " + attachment + " (mesh attachment: " + name + ")");
+		attachment.setRegion(region);
+		return attachment;
+	}
+
+	public SkinnedMeshAttachment newSkinnedMeshAttachment (Skin skin, String name, String path) {
+		SkinnedMeshAttachment attachment = new SkinnedMeshAttachment(name);
+		attachment.setPath(path);
+		AtlasRegion region = atlas.findRegion(path);
+		if (region == null)
+			throw new RuntimeException("Region not found in atlas: " + attachment + " (skinned mesh attachment: " + name + ")");
 		attachment.setRegion(region);
 		return attachment;
 	}

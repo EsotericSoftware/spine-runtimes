@@ -28,7 +28,7 @@
 
 package com.esotericsoftware.spine;
 
-import com.esotericsoftware.spine.attachments.MeshAttachment;
+import com.esotericsoftware.spine.attachments.Attachment;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
@@ -427,7 +427,10 @@ public class Animation {
 				float g = frames[i - 2];
 				float b = frames[i - 1];
 				float a = frames[i];
-				color.set(r, g, b, a);
+				if (alpha < 1)
+					color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
+				else
+					color.set(r, g, b, a);
 				return;
 			}
 
@@ -614,7 +617,7 @@ public class Animation {
 		private final float[] frames; // time, ...
 		private final float[][] frameVertices;
 		int slotIndex;
-		MeshAttachment meshAttachment;
+		Attachment attachment;
 
 		public FfdTimeline (int frameCount) {
 			super(frameCount);
@@ -630,12 +633,12 @@ public class Animation {
 			return slotIndex;
 		}
 
-		public void setMeshAttachment (MeshAttachment attachment) {
-			this.meshAttachment = attachment;
+		public void setAttachment (Attachment attachment) {
+			this.attachment = attachment;
 		}
 
-		public MeshAttachment getMeshAttachment () {
-			return meshAttachment;
+		public Attachment getAttachment () {
+			return attachment;
 		}
 
 		public float[] getFrames () {
@@ -654,7 +657,7 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha) {
 			Slot slot = skeleton.slots.get(slotIndex);
-			if (slot.getAttachment() != meshAttachment) return;
+			if (slot.getAttachment() != attachment) return;
 
 			FloatArray verticesArray = slot.getAttachmentVertices();
 			verticesArray.size = 0;
@@ -669,7 +672,12 @@ public class Animation {
 			float[] vertices = verticesArray.items;
 
 			if (time >= frames[frames.length - 1]) { // Time is after last frame.
-				System.arraycopy(frameVertices[frames.length - 1], 0, vertices, 0, vertexCount);
+				float[] lastVertices = frameVertices[frames.length - 1];
+				if (alpha < 1) {
+					for (int i = 0; i < vertexCount; i++)
+						vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
+				} else
+					System.arraycopy(lastVertices, 0, vertices, 0, vertexCount);
 				return;
 			}
 
@@ -682,10 +690,16 @@ public class Animation {
 			float[] prevVertices = frameVertices[frameIndex - 1];
 			float[] nextVertices = frameVertices[frameIndex];
 
-			// BOZO - FFD, use alpha for mixing?
-			for (int i = 0; i < vertexCount; i++) {
-				float prev = prevVertices[i];
-				vertices[i] = prev + (nextVertices[i] - prev) * percent;
+			if (alpha < 1) {
+				for (int i = 0; i < vertexCount; i++) {
+					float prev = prevVertices[i];
+					vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
+				}
+			} else {
+				for (int i = 0; i < vertexCount; i++) {
+					float prev = prevVertices[i];
+					vertices[i] = prev + (nextVertices[i] - prev) * percent;
+				}
 			}
 		}
 	}

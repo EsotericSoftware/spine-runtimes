@@ -100,7 +100,7 @@ public class Slot {
 		if (this.attachment == attachment) return;
 		this.attachment = attachment;
 		attachmentTime = skeleton.time;
-		attachmentVertices.clear();
+		//attachmentVertices.clear();
 	}
 
 	public void setAttachmentTime (float time) {
@@ -120,7 +120,7 @@ public class Slot {
 		color.set(data.color);
 		setAttachment(data.attachmentName == null ? null : skeleton.getAttachment(slotIndex, data.attachmentName));
 		// BOZO - Set mesh to setup pose.
-		// attachmentVertices.clear();
+		attachmentVertices.clear();
 	}
 
 	public void setToSetupPose () {

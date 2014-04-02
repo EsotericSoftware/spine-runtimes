@@ -40,7 +40,7 @@ public class BoneData {
 	boolean inheritScale = true, inheritRotation = true;
 
 	// Nonessential.
-	final Color color = new Color(1, 1, 1, 1);
+	final Color color = new Color(0.61f, 0.61f, 0.61f, 1);
 
 	/** @param parent May be null. */
 	public BoneData (String name, BoneData parent) {

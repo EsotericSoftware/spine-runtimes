@@ -29,7 +29,9 @@
 package com.esotericsoftware.spine;
 
 import com.esotericsoftware.spine.attachments.Attachment;
+import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
+import com.esotericsoftware.spine.attachments.SkinnedMeshAttachment;
 
 import static com.badlogic.gdx.graphics.g2d.Batch.*;
 
@@ -44,12 +46,14 @@ import com.badlogic.gdx.utils.FloatArray;
 public class SkeletonRendererDebug {
 	static private final Color boneLineColor = Color.RED;
 	static private final Color boneOriginColor = Color.GREEN;
-	static private final Color regionAttachmentLineColor = new Color(0, 0, 1, 0.5f);
+	static private final Color attachmentLineColor = new Color(0, 0, 1, 0.5f);
+	static private final Color triangleLineColor = new Color(1, 0.64f, 0, 0.5f);
 	static private final Color boundingBoxColor = new Color(0, 1, 0, 0.8f);
 	static private final Color aabbColor = new Color(0, 1, 0, 0.5f);
 
 	private final ShapeRenderer renderer;
 	private boolean drawBones = true, drawRegionAttachments = true, drawBoundingBoxes = true;
+	private boolean drawMeshHull = true, drawMeshTriangles = true;
 	private final SkeletonBounds bounds = new SkeletonBounds();
 	private float scale = 1;
 
@@ -78,7 +82,7 @@ public class SkeletonRendererDebug {
 		}
 
 		if (drawRegionAttachments) {
-			renderer.setColor(regionAttachmentLineColor);
+			renderer.setColor(attachmentLineColor);
 			Array<Slot> slots = skeleton.getSlots();
 			for (int i = 0, n = slots.size; i < n; i++) {
 				Slot slot = slots.get(i);
@@ -91,6 +95,48 @@ public class SkeletonRendererDebug {
 					renderer.line(vertices[X2], vertices[Y2], vertices[X3], vertices[Y3]);
 					renderer.line(vertices[X3], vertices[Y3], vertices[X4], vertices[Y4]);
 					renderer.line(vertices[X4], vertices[Y4], vertices[X1], vertices[Y1]);
+				}
+			}
+		}
+
+		if (drawMeshHull || drawMeshTriangles) {
+			Array<Slot> slots = skeleton.getSlots();
+			for (int i = 0, n = slots.size; i < n; i++) {
+				Slot slot = slots.get(i);
+				Attachment attachment = slot.attachment;
+				float[] vertices = null;
+				short[] triangles = null;
+				if (attachment instanceof MeshAttachment) {
+					MeshAttachment mesh = (MeshAttachment)attachment;
+					mesh.updateWorldVertices(slot, false);
+					vertices = mesh.getWorldVertices();
+					triangles = mesh.getTriangles();
+				} else if (attachment instanceof SkinnedMeshAttachment) {
+					SkinnedMeshAttachment mesh = (SkinnedMeshAttachment)attachment;
+					mesh.updateWorldVertices(slot, false);
+					vertices = mesh.getWorldVertices();
+					triangles = mesh.getTriangles();
+				}
+				if (vertices == null || triangles == null) continue;
+				if (drawMeshTriangles) {
+					renderer.setColor(triangleLineColor);
+					for (int ii = 0, nn = triangles.length; ii < nn; ii += 3) {
+						int v1 = triangles[ii] * 5, v2 = triangles[ii + 1] * 5, v3 = triangles[ii + 2] * 5;
+						renderer.triangle(vertices[v1], vertices[v1 + 1], //
+							vertices[v2], vertices[v2 + 1], //
+							vertices[v3], vertices[v3 + 1] //
+							);
+					}
+				}
+				if (drawMeshHull) {
+					renderer.setColor(attachmentLineColor);
+					float lastX = vertices[vertices.length - 5], lastY = vertices[vertices.length - 4];
+					for (int ii = 0, nn = vertices.length; ii < nn; ii += 5) {
+						float x = vertices[ii], y = vertices[ii + 1];
+						renderer.line(x, y, lastX, lastY);
+						lastX = x;
+						lastY = y;
+					}
 				}
 			}
 		}
@@ -141,5 +187,13 @@ public class SkeletonRendererDebug {
 
 	public void setBoundingBoxes (boolean boundingBoxes) {
 		this.drawBoundingBoxes = boundingBoxes;
+	}
+
+	public void setMeshHull (boolean meshHull) {
+		this.drawMeshHull = meshHull;
+	}
+
+	public void setMeshTriangles (boolean meshTriangles) {
+		this.drawMeshTriangles = meshTriangles;
 	}
 }

@@ -32,6 +32,7 @@ import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.SkeletonAttachment;
+import com.esotericsoftware.spine.attachments.SkinnedMeshAttachment;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -77,6 +78,14 @@ public class SkeletonRenderer {
 
 			} else if (attachment instanceof MeshAttachment) {
 				MeshAttachment mesh = (MeshAttachment)attachment;
+				mesh.updateWorldVertices(slot, true);
+				vertices = mesh.getWorldVertices();
+				triangles = mesh.getTriangles();
+				texture = mesh.getRegion().getTexture();
+				batch.draw(texture, vertices, 0, vertices.length, triangles, 0, triangles.length);
+
+			} else if (attachment instanceof SkinnedMeshAttachment) {
+				SkinnedMeshAttachment mesh = (SkinnedMeshAttachment)attachment;
 				mesh.updateWorldVertices(slot, true);
 				vertices = mesh.getWorldVertices();
 				triangles = mesh.getTriangles();
