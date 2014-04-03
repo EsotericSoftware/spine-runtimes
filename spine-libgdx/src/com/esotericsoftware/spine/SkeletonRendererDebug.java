@@ -51,14 +51,18 @@ public class SkeletonRendererDebug {
 	static private final Color boundingBoxColor = new Color(0, 1, 0, 0.8f);
 	static private final Color aabbColor = new Color(0, 1, 0, 0.5f);
 
-	private final ShapeRenderer renderer;
+	private final ShapeRenderer shapes;
 	private boolean drawBones = true, drawRegionAttachments = true, drawBoundingBoxes = true;
 	private boolean drawMeshHull = true, drawMeshTriangles = true;
 	private final SkeletonBounds bounds = new SkeletonBounds();
 	private float scale = 1;
 
 	public SkeletonRendererDebug () {
-		renderer = new ShapeRenderer();
+		shapes = new ShapeRenderer();
+	}
+
+	public SkeletonRendererDebug (ShapeRenderer shapes) {
+		this.shapes = shapes;
 	}
 
 	public void draw (Skeleton skeleton) {
@@ -66,23 +70,23 @@ public class SkeletonRendererDebug {
 		float skeletonY = skeleton.getY();
 
 		Gdx.gl.glEnable(GL20.GL_BLEND);
-		ShapeRenderer renderer = this.renderer;
-		renderer.begin(ShapeType.Line);
+		ShapeRenderer shapes = this.shapes;
+		shapes.begin(ShapeType.Line);
 
 		Array<Bone> bones = skeleton.getBones();
 		if (drawBones) {
-			renderer.setColor(boneLineColor);
+			shapes.setColor(boneLineColor);
 			for (int i = 0, n = bones.size; i < n; i++) {
 				Bone bone = bones.get(i);
 				if (bone.parent == null) continue;
 				float x = skeletonX + bone.data.length * bone.m00 + bone.worldX;
 				float y = skeletonY + bone.data.length * bone.m10 + bone.worldY;
-				renderer.line(skeletonX + bone.worldX, skeletonY + bone.worldY, x, y);
+				shapes.line(skeletonX + bone.worldX, skeletonY + bone.worldY, x, y);
 			}
 		}
 
 		if (drawRegionAttachments) {
-			renderer.setColor(attachmentLineColor);
+			shapes.setColor(attachmentLineColor);
 			Array<Slot> slots = skeleton.getSlots();
 			for (int i = 0, n = slots.size; i < n; i++) {
 				Slot slot = slots.get(i);
@@ -91,10 +95,10 @@ public class SkeletonRendererDebug {
 					RegionAttachment regionAttachment = (RegionAttachment)attachment;
 					regionAttachment.updateWorldVertices(slot, false);
 					float[] vertices = regionAttachment.getWorldVertices();
-					renderer.line(vertices[X1], vertices[Y1], vertices[X2], vertices[Y2]);
-					renderer.line(vertices[X2], vertices[Y2], vertices[X3], vertices[Y3]);
-					renderer.line(vertices[X3], vertices[Y3], vertices[X4], vertices[Y4]);
-					renderer.line(vertices[X4], vertices[Y4], vertices[X1], vertices[Y1]);
+					shapes.line(vertices[X1], vertices[Y1], vertices[X2], vertices[Y2]);
+					shapes.line(vertices[X2], vertices[Y2], vertices[X3], vertices[Y3]);
+					shapes.line(vertices[X3], vertices[Y3], vertices[X4], vertices[Y4]);
+					shapes.line(vertices[X4], vertices[Y4], vertices[X1], vertices[Y1]);
 				}
 			}
 		}
@@ -119,21 +123,21 @@ public class SkeletonRendererDebug {
 				}
 				if (vertices == null || triangles == null) continue;
 				if (drawMeshTriangles) {
-					renderer.setColor(triangleLineColor);
+					shapes.setColor(triangleLineColor);
 					for (int ii = 0, nn = triangles.length; ii < nn; ii += 3) {
 						int v1 = triangles[ii] * 5, v2 = triangles[ii + 1] * 5, v3 = triangles[ii + 2] * 5;
-						renderer.triangle(vertices[v1], vertices[v1 + 1], //
+						shapes.triangle(vertices[v1], vertices[v1 + 1], //
 							vertices[v2], vertices[v2 + 1], //
 							vertices[v3], vertices[v3 + 1] //
 							);
 					}
 				}
 				if (drawMeshHull) {
-					renderer.setColor(attachmentLineColor);
+					shapes.setColor(attachmentLineColor);
 					float lastX = vertices[vertices.length - 5], lastY = vertices[vertices.length - 4];
 					for (int ii = 0, nn = vertices.length; ii < nn; ii += 5) {
 						float x = vertices[ii], y = vertices[ii + 1];
-						renderer.line(x, y, lastX, lastY);
+						shapes.line(x, y, lastX, lastY);
 						lastX = x;
 						lastY = y;
 					}
@@ -144,33 +148,33 @@ public class SkeletonRendererDebug {
 		if (drawBoundingBoxes) {
 			SkeletonBounds bounds = this.bounds;
 			bounds.update(skeleton, true);
-			renderer.setColor(aabbColor);
-			renderer.rect(bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
-			renderer.setColor(boundingBoxColor);
+			shapes.setColor(aabbColor);
+			shapes.rect(bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
+			shapes.setColor(boundingBoxColor);
 			Array<FloatArray> polygons = bounds.getPolygons();
 			for (int i = 0, n = polygons.size; i < n; i++) {
 				FloatArray polygon = polygons.get(i);
-				renderer.polygon(polygon.items, 0, polygon.size);
+				shapes.polygon(polygon.items, 0, polygon.size);
 			}
 		}
 
-		renderer.end();
-		renderer.begin(ShapeType.Filled);
+		shapes.end();
+		shapes.begin(ShapeType.Filled);
 
 		if (drawBones) {
-			renderer.setColor(boneOriginColor);
+			shapes.setColor(boneOriginColor);
 			for (int i = 0, n = bones.size; i < n; i++) {
 				Bone bone = bones.get(i);
-				renderer.setColor(Color.GREEN);
-				renderer.circle(skeletonX + bone.worldX, skeletonY + bone.worldY, 3 * scale);
+				shapes.setColor(Color.GREEN);
+				shapes.circle(skeletonX + bone.worldX, skeletonY + bone.worldY, 3 * scale, 8);
 			}
 		}
 
-		renderer.end();
+		shapes.end();
 	}
 
 	public ShapeRenderer getShapeRenderer () {
-		return renderer;
+		return shapes;
 	}
 
 	public void setBones (boolean bones) {
