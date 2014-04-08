@@ -65,9 +65,7 @@ public class AnimationStateData {
 	public float getMix (Animation from, Animation to) {
 		tempKey.a1 = from;
 		tempKey.a2 = to;
-		float time = animationToMixTime.get(tempKey, Float.MIN_VALUE);
-		if (time == Float.MIN_VALUE) return defaultMix;
-		return time;
+		return animationToMixTime.get(tempKey, defaultMix);
 	}
 
 	public float getDefaultMix () {

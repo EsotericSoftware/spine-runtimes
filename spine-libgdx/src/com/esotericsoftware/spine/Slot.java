@@ -40,7 +40,7 @@ public class Slot {
 	final Color color;
 	Attachment attachment;
 	private float attachmentTime;
-	private final FloatArray attachmentVertices = new FloatArray();
+	private FloatArray attachmentVertices = new FloatArray();
 
 	Slot () {
 		data = null;
@@ -100,7 +100,7 @@ public class Slot {
 		if (this.attachment == attachment) return;
 		this.attachment = attachment;
 		attachmentTime = skeleton.time;
-		//attachmentVertices.clear();
+		// attachmentVertices.clear();
 	}
 
 	public void setAttachmentTime (float time) {
@@ -110,6 +110,10 @@ public class Slot {
 	/** Returns the time since the attachment was set. */
 	public float getAttachmentTime () {
 		return skeleton.time - attachmentTime;
+	}
+
+	public void setAttachmentVertices (FloatArray attachmentVertices) {
+		this.attachmentVertices = attachmentVertices;
 	}
 
 	public FloatArray getAttachmentVertices () {
