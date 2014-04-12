@@ -1,0 +1,224 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E3BA8186-FE45-494A-BD79-8673A361857A}</ProjectGuid>
+    <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>spine_cocos_xna_android</RootNamespace>
+    <AssemblyName>spine-cocos-xna-android</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <AndroidApplication>true</AndroidApplication>
+    <AndroidResgenFile>Resources\Resource.Designer.cs</AndroidResgenFile>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <AndroidSupportedAbis>armeabi-v7a%3bx86</AndroidSupportedAbis>
+    <AndroidStoreUncompressedFileExtensions />
+    <MandroidI18n />
+    <TargetFrameworkVersion>v2.3</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;ANDROID</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AndroidUseSharedRuntime>True</AndroidUseSharedRuntime>
+    <AndroidLinkMode>None</AndroidLinkMode>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;ANDROID</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
+    <AndroidLinkMode>SdkOnly</AndroidLinkMode>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="box2d">
+      <HintPath>..\packages\Cocos2D-XNA.Android.0.9.0.0\lib\box2d.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\packages\Cocos2D-XNA.Android.0.9.0.0\lib\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Lidgren.Network, Version=2011.3.12.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cocos2D-XNA.Android.0.9.0.0\lib\Lidgren.Network.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Android" />
+    <Reference Include="MonoGame.Framework, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Cocos2D-XNA.Android.0.9.0.0\lib\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="mscorlib" />
+    <Reference Include="OpenTK" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml" />
+    <Reference Include="zlib.net">
+      <HintPath>..\packages\Cocos2D-XNA.Android.0.9.0.0\lib\zlib.net.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\..\spine-csharp\src\Animation.cs">
+      <Link>Spine\Animation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\AnimationState.cs">
+      <Link>Spine\AnimationState.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\AnimationStateData.cs">
+      <Link>Spine\AnimationStateData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Atlas.cs">
+      <Link>Spine\Atlas.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Attachments\AtlasAttachmentLoader.cs">
+      <Link>Spine\Attachments\AtlasAttachmentLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Attachments\Attachment.cs">
+      <Link>Spine\Attachments\Attachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Attachments\AttachmentLoader.cs">
+      <Link>Spine\Attachments\AttachmentLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Attachments\AttachmentType.cs">
+      <Link>Spine\Attachments\AttachmentType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Attachments\BoundingBoxAttachment.cs">
+      <Link>Spine\Attachments\BoundingBoxAttachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Attachments\RegionAttachment.cs">
+      <Link>Spine\Attachments\RegionAttachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Bone.cs">
+      <Link>Spine\Bone.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\BoneData.cs">
+      <Link>Spine\BoneData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Event.cs">
+      <Link>Spine\Event.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\EventData.cs">
+      <Link>Spine\EventData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Json.cs">
+      <Link>Spine\Json.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Skeleton.cs">
+      <Link>Spine\Skeleton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\SkeletonBounds.cs">
+      <Link>Spine\SkeletonBounds.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\SkeletonData.cs">
+      <Link>Spine\SkeletonData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\SkeletonJson.cs">
+      <Link>Spine\SkeletonJson.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Skin.cs">
+      <Link>Spine\Skin.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Slot.cs">
+      <Link>Spine\Slot.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\SlotData.cs">
+      <Link>Spine\SlotData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-xna\src\SkeletonRenderer.cs">
+      <Link>Spine\Utils\SkeletonRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-xna\src\SpriteBatcher.cs">
+      <Link>Spine\Utils\SpriteBatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-xna\src\Util.cs">
+      <Link>Spine\Utils\Util.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-xna\src\XnaTextureLoader.cs">
+      <Link>Spine\Utils\XnaTextureLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\spine\CCSkeleton.cs">
+      <Link>Cocos\CCSkeleton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\spine\CCSkeletonAnimation.cs">
+      <Link>Cocos\CCSkeletonAnimation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\spine\MonoTextureLoader.cs">
+      <Link>Cocos\MonoTextureLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\spine\spine-cocos2dx.cs">
+      <Link>Cocos\spine-cocos2dx.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\spine\spine-cocos2dxna.cs">
+      <Link>Cocos\spine-cocos2dxna.cs</Link>
+    </Compile>
+    <Compile Include="Program.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="AppDelegate.cs" />
+    <Compile Include="Game1.cs" />
+    <Compile Include="IntroLayer.cs" />
+    <Compile Include="Resources\Resource.Designer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\Content\fonts\MarkerFelt-22.xnb" />
+    <AndroidAsset Include="Assets\goblins.atlas" />
+    <AndroidAsset Include="Assets\goblins.json" />
+    <AndroidAsset Include="Assets\mariotest.json" />
+    <AndroidAsset Include="Assets\spineboy.atlas" />
+    <AndroidAsset Include="Assets\spineboy.json" />
+    <None Include="packages.config" />
+    <None Include="Resources\AboutResources.txt" />
+    <None Include="Assets\AboutAssets.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\Values\Strings.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\Layout\" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\Drawable\Splash.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\Values\Styles.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\Drawable\icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\cocos2dxna\cocos2d\cocos2d.Android.csproj">
+      <Project>{64725c5b-a1bc-4974-8538-a1158babf572}</Project>
+      <Name>cocos2d.Android</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\wallpaper.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\goblins.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\spineboy.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\walk1.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+     Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
