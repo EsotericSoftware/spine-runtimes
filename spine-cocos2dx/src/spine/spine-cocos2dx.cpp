@@ -32,29 +32,43 @@
 USING_NS_CC;
 
 void _spAtlasPage_createTexture (spAtlasPage* self, const char* path) {
-	CCTexture2D* texture = CCTextureCache::sharedTextureCache()->addImage(path);
-	CCTextureAtlas* textureAtlas = CCTextureAtlas::createWithTexture(texture, 128);
-	textureAtlas->retain();
-	self->rendererObject = textureAtlas;
-	self->width = texture->getPixelsWide();
-	self->height = texture->getPixelsHigh();
+    Texture2D* texture = Director::getInstance()->getTextureCache()->addImage(path);
+    TextureAtlas* textureAtlas = TextureAtlas::createWithTexture(texture, 4);
+    textureAtlas->retain();
+    self->rendererObject = textureAtlas;
+    // Using getContentSize to make it supports the strategy of loading resources in cocos2d-x.
+    // self->width = texture->getPixelsWide();
+    // self->height = texture->getPixelsHigh();
+    self->width = texture->getContentSize().width;
+    self->height = texture->getContentSize().height;
 }
 
 void _spAtlasPage_disposeTexture (spAtlasPage* self) {
-	((CCTextureAtlas*)self->rendererObject)->release();
+	((TextureAtlas*)self->rendererObject)->release();
 }
 
-char* _spUtil_readFile (const char* path, int* length) {
-	unsigned long size;
-	char* data = reinterpret_cast<char*>(CCFileUtils::sharedFileUtils()->getFileData(
-		CCFileUtils::sharedFileUtils()->fullPathForFilename(path).c_str(), "r", &size));
-	*length = size;
-	return data;
+char* _spUtil_readFile (const char* path, int* length)
+{
+    char* ret = nullptr;
+    int size = 0;
+    Data data = FileUtils::getInstance()->getDataFromFile(path);
+    
+    if (!data.isNull())
+    {
+        size = static_cast<int>(data.getSize());
+        *length = size;
+        // Allocates one more byte for string terminal, it will be safe when parsing JSON file in Spine runtime.
+        ret = (char*)malloc(size + 1);
+        ret[size] = '\0';
+        memcpy(ret, data.getBytes(), size);
+    }
+    
+    return ret;
 }
 
 /**/
 
-void spRegionAttachment_updateQuad (spRegionAttachment* self, spSlot* slot, ccV3F_C4B_T2F_Quad* quad, bool premultipliedAlpha) {
+void spRegionAttachment_updateQuad (spRegionAttachment* self, spSlot* slot, V3F_C4B_T2F_Quad* quad, bool premultipliedAlpha) {
 	float vertices[8];
 	spRegionAttachment_computeWorldVertices(self, slot->skeleton->x, slot->skeleton->y, slot->bone, vertices);
 
