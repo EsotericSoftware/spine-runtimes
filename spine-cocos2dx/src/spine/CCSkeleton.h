@@ -30,12 +30,18 @@
 #define SPINE_CCSKELETON_H_
 
 #include <spine/spine.h>
-#include "cocos2d.h"
+
+#include "CCNode.h"
+#include "CCProtocols.h"
+#include "CCTextureAtlas.h"
+#include "renderer/CCCustomCommand.h"
 
 namespace spine {
 
-/** Draws a skeleton. */
-class CCSkeleton: public cocos2d::CCNodeRGBA, public cocos2d::CCBlendProtocol {
+/**
+Draws a skeleton.
+*/
+class Skeleton: public cocos2d::Node, public cocos2d::BlendProtocol {
 public:
 	spSkeleton* skeleton;
 	spBone* rootBone;
@@ -43,20 +49,24 @@ public:
 	bool debugSlots;
 	bool debugBones;
 	bool premultipliedAlpha;
+    cocos2d::BlendFunc blendFunc;
 
-	static CCSkeleton* createWithData (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
-	static CCSkeleton* createWithFile (const char* skeletonDataFile, spAtlas* atlas, float scale = 0);
-	static CCSkeleton* createWithFile (const char* skeletonDataFile, const char* atlasFile, float scale = 0);
+	static Skeleton* createWithData (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
+	static Skeleton* createWithFile (const char* skeletonDataFile, spAtlas* atlas, float scale = 0);
+	static Skeleton* createWithFile (const char* skeletonDataFile, const char* atlasFile, float scale = 0);
 
-	CCSkeleton (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
-	CCSkeleton (const char* skeletonDataFile, spAtlas* atlas, float scale = 0);
-	CCSkeleton (const char* skeletonDataFile, const char* atlasFile, float scale = 0);
+	Skeleton (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
+	Skeleton (const char* skeletonDataFile, spAtlas* atlas, float scale = 0);
+	Skeleton (const char* skeletonDataFile, const char* atlasFile, float scale = 0);
 
-	virtual ~CCSkeleton ();
+	virtual ~Skeleton ();
 
-	virtual void update (float deltaTime);
-	virtual void draw ();
-	virtual cocos2d::CCRect boundingBox ();
+	virtual void update (float deltaTime) override;
+	virtual void draw(cocos2d::Renderer *renderer, const kmMat4 &transform, bool transformUpdated) override;
+    void onDraw(const kmMat4 &transform, bool transformUpdated);
+	void onEnter() override;
+	void onExit() override;
+	virtual cocos2d::Rect getBoundingBox () const override;
 
 	// --- Convenience methods for common Skeleton_* functions.
 	void updateWorldTransform ();
@@ -81,19 +91,22 @@ public:
 	bool setAttachment (const char* slotName, const char* attachmentName);
 
 	// --- CCBlendProtocol
-	CC_PROPERTY(cocos2d::ccBlendFunc, blendFunc, BlendFunc);
-	virtual void setOpacityModifyRGB (bool value);
-	virtual bool isOpacityModifyRGB ();
+    virtual const cocos2d::BlendFunc& getBlendFunc() const override;
+    virtual void setBlendFunc(const cocos2d::BlendFunc& func) override;
 
 protected:
-	CCSkeleton ();
+	Skeleton ();
 	void setSkeletonData (spSkeletonData* skeletonData, bool ownsSkeletonData);
-	virtual cocos2d::CCTextureAtlas* getTextureAtlas (spRegionAttachment* regionAttachment) const;
+	virtual cocos2d::TextureAtlas* getTextureAtlas (spRegionAttachment* regionAttachment) const;
 
 private:
 	bool ownsSkeletonData;
 	spAtlas* atlas;
 	void initialize ();
+    // Util function that setting blend-function by nextRenderedTexture's premultiplied flag
+    void setFittedBlendingFunc(cocos2d::TextureAtlas * nextRenderedTexture);
+    
+    cocos2d::CustomCommand _customCommand;    
 };
 
 }
