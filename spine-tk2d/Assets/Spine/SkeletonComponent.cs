@@ -209,6 +209,7 @@ public class SkeletonComponent : MonoBehaviour {
 			color.r = (byte)(r * slot.R * color.a);
 			color.g = (byte)(g * slot.G * color.a);
 			color.b = (byte)(b * slot.B * color.a);
+			if (slot.Data.AdditiveBlending) color.a = 0;
 			colors[vertexIndex] = color;
 			colors[vertexIndex + 1] = color;
 			colors[vertexIndex + 2] = color;
