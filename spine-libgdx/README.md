@@ -17,7 +17,7 @@ Alternatively, the contents of the `spine-libgdx/src` directory can be copied in
 
 ## Examples
 
-[AnimationState Example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-libgdx/test/com/esotericsoftware/spine/AnimationStateTest.java#L45)
-[Box2D Example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-libgdx/test/com/esotericsoftware/spine/Box2DExample.java#L56) (written before bounding boxes were available)
-[Mix Example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-libgdx/test/com/esotericsoftware/spine/MixTest.java#L39)
-[Skeleton Example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-libgdx/test/com/esotericsoftware/spine/SkeletonTest.java#L47)
+* [AnimationState Example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-libgdx/test/com/esotericsoftware/spine/AnimationStateTest.java#L45)
+* [Box2D Example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-libgdx/test/com/esotericsoftware/spine/Box2DExample.java#L56) (written before bounding boxes were available)
+* [Mix Example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-libgdx/test/com/esotericsoftware/spine/MixTest.java#L39)
+* [Skeleton Example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-libgdx/test/com/esotericsoftware/spine/SkeletonTest.java#L47)
