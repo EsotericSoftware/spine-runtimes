@@ -9,6 +9,12 @@ The spine-libgdx runtime provides functionality to load, manipulate and render [
 
 Alternatively, the contents of the `spine-libgdx/src` directory can be copied into your project.
 
+## Notes
+
+* The "test" source directory contains optional examples.
+* spine-libgdx depends on the gdx-backend-lwjgl project so the tests can easily be run on the desktop. If the tests are excluded, spine-libgdx only needs to depend on the gdx project.
+* spine-libgdx depends on the gdx-box2d extension project solely for the `Box2DExample` test.
+
 ## Examples
 
 [AnimationState Example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-libgdx/test/com/esotericsoftware/spine/AnimationStateTest.java#L45)
