@@ -1,10 +1,10 @@
 /******************************************************************************
  * Spine Runtimes Software License
  * Version 2
- * 
+ *
  * Copyright (c) 2013, Esoteric Software
  * All rights reserved.
- * 
+ *
  * You are granted a perpetual, non-exclusive, non-sublicensable and
  * non-transferable license to install, execute and perform the Spine Runtimes
  * Software (the "Software") solely for internal use. Without the written
@@ -26,37 +26,37 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef SPINE_ATTACHMENT_H_
-#define SPINE_ATTACHMENT_H_
+//
+//  CCRenderPool.h
+//  spine-cocos2d-iphone-ios
+//
+//  Created by Wojciech Trzasko CodingFingers on 05.03.2014.
+//
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#import <Foundation/Foundation.h>
+#import "CCTriangleTextureAtlas.h"
 
-struct spSlot;
+typedef struct _ccRenderInfoStructure
+{
+	CCTriangleTextureAtlas* textureAtlas;
+    unsigned int startIndex;
+    unsigned int stopIndex;
+    bool blending;
+} ccRenderInfoStructure;
 
-typedef enum {
-	ATTACHMENT_REGION, ATTACHMENT_REGION_SEQUENCE, ATTACHMENT_BOUNDING_BOX, ATTACHMENT_MESH
-} spAttachmentType;
-
-typedef struct spAttachment spAttachment;
-struct spAttachment {
-	const char* const name;
-	spAttachmentType type;
-
-	const void* const vtable;
-};
-
-void spAttachment_dispose (spAttachment* self);
-
-#ifdef SPINE_SHORT_NAMES
-typedef spAttachmentType AttachmentType;
-typedef spAttachment Attachment;
-#define Attachment_dispose(...) spAttachment_dispose(__VA_ARGS__)
-#endif
-
-#ifdef __cplusplus
+@interface CCRenderPool : NSObject
+{
+    ccRenderInfoStructure* _pool;
+    NSUInteger _capacity;
+    NSUInteger _length;
+    NSUInteger _reusableLength;
 }
-#endif
 
-#endif /* SPINE_ATTACHMENT_H_ */
+@property(nonatomic, readonly) NSUInteger capacity;
+@property(nonatomic, readonly) NSUInteger length;
+@property(nonatomic, readonly) ccRenderInfoStructure* pool;
+
+-(void) addRenderAtlasToPool:(CCTriangleTextureAtlas*)atlas withStart:(NSUInteger)start stop:(NSUInteger)stop blending:(BOOL)blending atIndex:(NSUInteger)index;
+-(void) removeAllInfo;
+
+@end

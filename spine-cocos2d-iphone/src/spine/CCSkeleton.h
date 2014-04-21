@@ -29,6 +29,7 @@
 #define SPINE_SHORT_NAMES
 #import <spine/spine.h>
 #import "cocos2d.h"
+#import "CCRenderPool.h"
 
 /** Draws a skeleton. */
 @interface CCSkeleton : CCNodeRGBA<CCBlendProtocol> {
@@ -42,6 +43,8 @@
 	ccBlendFunc _blendFunc;
 	bool _ownsSkeletonData;
 	Atlas* _atlas;
+    
+    CCRenderPool* _renderPool;
 }
 
 + (id) skeletonWithData:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData;

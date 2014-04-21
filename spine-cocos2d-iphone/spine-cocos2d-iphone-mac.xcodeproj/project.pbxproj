@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		325CB56918C8A8BB004DC36A /* CCRenderPool.m in Sources */ = {isa = PBXBuildFile; fileRef = 325CB56618C8A8BB004DC36A /* CCRenderPool.m */; };
+		325CB56A18C8A8BB004DC36A /* CCTriangleTextureAtlas.m in Sources */ = {isa = PBXBuildFile; fileRef = 325CB56818C8A8BB004DC36A /* CCTriangleTextureAtlas.m */; };
+		325CB57018C8A950004DC36A /* MeshAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 325CB56F18C8A950004DC36A /* MeshAttachment.c */; };
 		4319B51816FF9B2600C1D7A9 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4319B51716FF9B2600C1D7A9 /* QuartzCore.framework */; };
 		4319B51A16FF9B2600C1D7A9 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4319B51916FF9B2600C1D7A9 /* OpenGL.framework */; };
 		4319B51C16FF9B2600C1D7A9 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4319B51B16FF9B2600C1D7A9 /* OpenAL.framework */; };
@@ -164,6 +167,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		325CB56518C8A8BB004DC36A /* CCRenderPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCRenderPool.h; path = src/spine/CCRenderPool.h; sourceTree = "<group>"; };
+		325CB56618C8A8BB004DC36A /* CCRenderPool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CCRenderPool.m; path = src/spine/CCRenderPool.m; sourceTree = "<group>"; };
+		325CB56718C8A8BB004DC36A /* CCTriangleTextureAtlas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCTriangleTextureAtlas.h; path = src/spine/CCTriangleTextureAtlas.h; sourceTree = "<group>"; };
+		325CB56818C8A8BB004DC36A /* CCTriangleTextureAtlas.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CCTriangleTextureAtlas.m; path = src/spine/CCTriangleTextureAtlas.m; sourceTree = "<group>"; };
+		325CB56B18C8A92E004DC36A /* MeshAttachment.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MeshAttachment.h; path = "../spine-c/include/spine/MeshAttachment.h"; sourceTree = "<group>"; };
+		325CB56F18C8A950004DC36A /* MeshAttachment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MeshAttachment.c; path = "../spine-c/src/spine/MeshAttachment.c"; sourceTree = "<group>"; };
 		4319B51316FF9B2600C1D7A9 /* SpineExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpineExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4319B51716FF9B2600C1D7A9 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		4319B51916FF9B2600C1D7A9 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
@@ -943,6 +952,8 @@
 				43BFBDBE170A705100ECBACB /* Json.h */,
 				43BFBDBF170A705100ECBACB /* RegionAttachment.c */,
 				43BFBDAB170A703E00ECBACB /* RegionAttachment.h */,
+				325CB56F18C8A950004DC36A /* MeshAttachment.c */,
+				325CB56B18C8A92E004DC36A /* MeshAttachment.h */,
 				43BFBDC0170A705100ECBACB /* Skeleton.c */,
 				43BFBDAC170A703E00ECBACB /* Skeleton.h */,
 				4374AF6C17F1D85F00401ACE /* SkeletonBounds.c */,
@@ -972,6 +983,10 @@
 				43D31637173ACAE00028AA22 /* CCSkeleton.m */,
 				43D31638173ACAE00028AA22 /* CCSkeletonAnimation.h */,
 				43D31639173ACAE00028AA22 /* CCSkeletonAnimation.m */,
+				325CB56518C8A8BB004DC36A /* CCRenderPool.h */,
+				325CB56618C8A8BB004DC36A /* CCRenderPool.m */,
+				325CB56718C8A8BB004DC36A /* CCTriangleTextureAtlas.h */,
+				325CB56818C8A8BB004DC36A /* CCTriangleTextureAtlas.m */,
 			);
 			name = "spine-cocos2d-iphone";
 			path = ..;
@@ -1102,9 +1117,11 @@
 				4319B7DC16FF9D3A00C1D7A9 /* CCActionInstant.m in Sources */,
 				4319B7DD16FF9D3A00C1D7A9 /* CCActionInterval.m in Sources */,
 				4319B7DE16FF9D3A00C1D7A9 /* CCActionManager.m in Sources */,
+				325CB56A18C8A8BB004DC36A /* CCTriangleTextureAtlas.m in Sources */,
 				4319B7DF16FF9D3A00C1D7A9 /* CCActionPageTurn3D.m in Sources */,
 				4319B7E016FF9D3A00C1D7A9 /* CCActionProgressTimer.m in Sources */,
 				4319B7E116FF9D3A00C1D7A9 /* CCActionTiledGrid.m in Sources */,
+				325CB56918C8A8BB004DC36A /* CCRenderPool.m in Sources */,
 				4319B7E216FF9D3A00C1D7A9 /* CCActionTween.m in Sources */,
 				4319B7E316FF9D3A00C1D7A9 /* CCAnimation.m in Sources */,
 				4319B7E416FF9D3A00C1D7A9 /* CCAnimationCache.m in Sources */,
@@ -1207,6 +1224,7 @@
 				43D3163B173ACAE00028AA22 /* CCSkeletonAnimation.m in Sources */,
 				4374AF6D17F1D85F00401ACE /* BoundingBoxAttachment.c in Sources */,
 				4374AF6E17F1D85F00401ACE /* SkeletonBounds.c in Sources */,
+				325CB57018C8A950004DC36A /* MeshAttachment.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

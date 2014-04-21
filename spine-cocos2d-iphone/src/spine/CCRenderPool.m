@@ -1,10 +1,10 @@
 /******************************************************************************
  * Spine Runtimes Software License
  * Version 2
- * 
+ *
  * Copyright (c) 2013, Esoteric Software
  * All rights reserved.
- * 
+ *
  * You are granted a perpetual, non-exclusive, non-sublicensable and
  * non-transferable license to install, execute and perform the Spine Runtimes
  * Software (the "Software") solely for internal use. Without the written
@@ -26,37 +26,82 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef SPINE_ATTACHMENT_H_
-#define SPINE_ATTACHMENT_H_
+//
+//  CCRenderPool.m
+//  spine-cocos2d-iphone-ios
+//
+//  Created by Wojciech Trzasko CodingFingers on 05.03.2014.
+//
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#import "CCRenderPool.h"
 
-struct spSlot;
 
-typedef enum {
-	ATTACHMENT_REGION, ATTACHMENT_REGION_SEQUENCE, ATTACHMENT_BOUNDING_BOX, ATTACHMENT_MESH
-} spAttachmentType;
+@implementation CCRenderPool
 
-typedef struct spAttachment spAttachment;
-struct spAttachment {
-	const char* const name;
-	spAttachmentType type;
+@synthesize capacity = _capacity;
+@synthesize length = _length;
+@synthesize pool = _pool;
 
-	const void* const vtable;
-};
-
-void spAttachment_dispose (spAttachment* self);
-
-#ifdef SPINE_SHORT_NAMES
-typedef spAttachmentType AttachmentType;
-typedef spAttachment Attachment;
-#define Attachment_dispose(...) spAttachment_dispose(__VA_ARGS__)
-#endif
-
-#ifdef __cplusplus
+-(id) init
+{
+    if(self = [super init])
+    {
+        _capacity = 10;
+        _pool = calloc(sizeof(ccRenderInfoStructure) * _capacity, 1);
+        _length = 0;
+        _reusableLength = 0;
+    }
+    
+    return self;
 }
-#endif
 
-#endif /* SPINE_ATTACHMENT_H_ */
+-(void) dealloc
+{
+    free(_pool);
+    [super dealloc];
+}
+
+-(void) addRenderAtlasToPool:(CCTriangleTextureAtlas*)atlas withStart:(NSUInteger)start stop:(NSUInteger)stop blending:(BOOL)blending atIndex:(NSUInteger)index
+{
+    NSAssert(_length + 1 != index, @"CCRenderPool Wrong index");
+    
+    // Realloc if needed
+    if(index >= _capacity)
+    {
+        _pool = (ccRenderInfoStructure*)realloc(_pool, sizeof(_pool[0]) * (index + 10));
+        _capacity = index + 10;
+    }
+    
+    ccRenderInfoStructure* info;
+    if(index < _reusableLength)
+    {
+        info = &_pool[index];
+        
+        info->textureAtlas  = atlas;
+        info->startIndex    = start;
+        info->stopIndex     = stop;
+        info->blending      = blending;
+    }
+    else
+    {
+        info = (ccRenderInfoStructure*)calloc(sizeof(ccRenderInfoStructure), 1);
+        
+        info->textureAtlas  = atlas;
+        info->startIndex    = start;
+        info->stopIndex     = stop;
+        info->blending      = blending;
+        
+        _pool[index] = *info;
+        
+        _reusableLength++;
+    }
+    
+    _length++;
+}
+
+-(void) removeAllInfo
+{
+    _length = 0;
+}
+
+@end
