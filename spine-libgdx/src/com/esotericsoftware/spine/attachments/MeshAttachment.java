@@ -33,6 +33,7 @@ import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.Slot;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.NumberUtils;
@@ -167,9 +168,16 @@ public class MeshAttachment extends Attachment {
 			w = region.getU2() - u;
 			h = region.getV2() - v;
 		}
-		for (int i = 0, ii = 3, n = vertices.length; i < n; i += 2, ii += 5) {
-			worldVertices[ii] = u + uvs[i] * w;
-			worldVertices[ii + 1] = v + uvs[i + 1] * h;
+		if (region instanceof AtlasRegion && ((AtlasRegion)region).rotate) {
+			for (int i = 0, ii = 3, n = vertices.length; i < n; i += 2, ii += 5) {
+				worldVertices[ii] = u + uvs[i + 1] * w;
+				worldVertices[ii + 1] = v + h - uvs[i] * h;
+			}
+		} else {
+			for (int i = 0, ii = 3, n = vertices.length; i < n; i += 2, ii += 5) {
+				worldVertices[ii] = u + uvs[i] * w;
+				worldVertices[ii + 1] = v + uvs[i + 1] * h;
+			}
 		}
 	}
 }
