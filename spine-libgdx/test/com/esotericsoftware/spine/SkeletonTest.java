@@ -163,7 +163,6 @@ public class SkeletonTest extends ApplicationAdapter {
 		// Configure skeleton from UI.
 
 		skeleton.setSkin(ui.skinList.getSelected());
-		skeleton.setSlotsToSetupPose();
 		state.setAnimation(0, ui.animationList.getSelected(), ui.loopCheckbox.isChecked());
 	}
 

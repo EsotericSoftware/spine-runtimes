@@ -116,7 +116,7 @@ public class Skeleton {
 
 	public void setSlotsToSetupPose () {
 		Array<Slot> slots = this.slots;
-		System.arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);		
+		System.arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
 		for (int i = 0, n = slots.size; i < n; i++)
 			slots.get(i).setToSetupPose(i);
 	}
@@ -203,10 +203,22 @@ public class Skeleton {
 	}
 
 	/** Sets the skin used to look up attachments not found in the {@link SkeletonData#getDefaultSkin() default skin}. Attachments
-	 * from the new skin are attached if the corresponding attachment from the old skin was attached.
+	 * from the new skin are attached if the corresponding attachment from the old skin was attached. If there was no old skin,
+	 * each slot's setup mode attachment is attached from the new skin.
 	 * @param newSkin May be null. */
 	public void setSkin (Skin newSkin) {
-		if (skin != null && newSkin != null) newSkin.attachAll(this, skin);
+		if (skin == null) {
+			Array<Slot> slots = this.slots;
+			for (int i = 0, n = slots.size; i < n; i++) {
+				Slot slot = slots.get(i);
+				String name = slot.data.attachmentName;
+				if (name != null) {
+					Attachment attachment = newSkin.getAttachment(i, name);
+					if (attachment != null) slot.setAttachment(attachment);
+				}
+			}
+		} else if (newSkin != null) //
+			newSkin.attachAll(this, skin);
 		skin = newSkin;
 	}
 
