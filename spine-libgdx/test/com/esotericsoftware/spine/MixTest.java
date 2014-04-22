@@ -95,7 +95,7 @@ public class MixTest extends ApplicationAdapter {
 
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		// This shows how to manage state manually. See AnimationStatesTest.
+		// This shows how to manage state manually. See SimpleTest1 for a higher level API using AnimationState.
 		if (time > total) {
 			// restart
 			time = 0;

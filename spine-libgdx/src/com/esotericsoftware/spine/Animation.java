@@ -132,9 +132,7 @@ public class Animation {
 
 	/** Base class for frames that use an interpolation bezier curve. */
 	abstract static public class CurveTimeline implements Timeline {
-		static public final float LINEAR = 0;
-		static public final float STEPPED = -1;
-		static public final float BEZIER = -2;
+		static public final float LINEAR = 0, STEPPED = -1, BEZIER = -2;
 		static private final int BEZIER_SEGMENTS = 10;
 
 		private final float[] curves; // dfx, dfy, ddfx, ddfy, dddfx, dddfy, ...
