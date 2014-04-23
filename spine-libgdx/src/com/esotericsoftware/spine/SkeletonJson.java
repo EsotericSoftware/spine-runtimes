@@ -170,10 +170,11 @@ public class SkeletonJson {
 	private Attachment readAttachment (Skin skin, String name, JsonValue map) {
 		float scale = this.scale;
 		name = map.getString("name", name);
+		String path = map.getString("path", name);
 
 		switch (AttachmentType.valueOf(map.getString("type", AttachmentType.region.name()))) {
 		case region:
-			RegionAttachment region = attachmentLoader.newRegionAttachment(skin, name, map.getString("path", name));
+			RegionAttachment region = attachmentLoader.newRegionAttachment(skin, name, path);
 			if (region == null) return null;
 			region.setX(map.getFloat("x", 0) * scale);
 			region.setY(map.getFloat("y", 0) * scale);
@@ -200,7 +201,7 @@ public class SkeletonJson {
 			return box;
 		}
 		case mesh: {
-			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, map.getString("path", name));
+			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, path);
 			if (mesh == null) return null;
 			float[] uvs = map.require("uvs").asFloatArray();
 			short[] triangles = map.require("triangles").asShortArray();
@@ -219,7 +220,7 @@ public class SkeletonJson {
 			return mesh;
 		}
 		case skinnedmesh: {
-			SkinnedMeshAttachment mesh = attachmentLoader.newSkinnedMeshAttachment(skin, name, map.getString("path", name));
+			SkinnedMeshAttachment mesh = attachmentLoader.newSkinnedMeshAttachment(skin, name, path);
 			if (mesh == null) return null;
 			float[] uvs = map.require("uvs").asFloatArray();
 			short[] triangles = map.require("triangles").asShortArray();

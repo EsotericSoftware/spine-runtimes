@@ -421,33 +421,30 @@ public class Animation {
 
 			Color color = skeleton.slots.get(slotIndex).color;
 
-			if (time >= frames[frames.length - 5]) { // Time is after last frame.
+			float r, g, b, a;
+			if (time >= frames[frames.length - 5]) {
+				// Time is after last frame.
 				int i = frames.length - 1;
-				float r = frames[i - 3];
-				float g = frames[i - 2];
-				float b = frames[i - 1];
-				float a = frames[i];
-				if (alpha < 1)
-					color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
-				else
-					color.set(r, g, b, a);
-				return;
+				r = frames[i - 3];
+				g = frames[i - 2];
+				b = frames[i - 1];
+				a = frames[i];
+			} else {
+				// Interpolate between the previous frame and the current frame.
+				int frameIndex = binarySearch(frames, time, 5);
+				float prevFrameR = frames[frameIndex - 4];
+				float prevFrameG = frames[frameIndex - 3];
+				float prevFrameB = frames[frameIndex - 2];
+				float prevFrameA = frames[frameIndex - 1];
+				float frameTime = frames[frameIndex];
+				float percent = MathUtils.clamp(1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime), 0, 1);
+				percent = getCurvePercent(frameIndex / 5 - 1, percent);
+
+				r = prevFrameR + (frames[frameIndex + FRAME_R] - prevFrameR) * percent;
+				g = prevFrameG + (frames[frameIndex + FRAME_G] - prevFrameG) * percent;
+				b = prevFrameB + (frames[frameIndex + FRAME_B] - prevFrameB) * percent;
+				a = prevFrameA + (frames[frameIndex + FRAME_A] - prevFrameA) * percent;
 			}
-
-			// Interpolate between the previous frame and the current frame.
-			int frameIndex = binarySearch(frames, time, 5);
-			float prevFrameR = frames[frameIndex - 4];
-			float prevFrameG = frames[frameIndex - 3];
-			float prevFrameB = frames[frameIndex - 2];
-			float prevFrameA = frames[frameIndex - 1];
-			float frameTime = frames[frameIndex];
-			float percent = MathUtils.clamp(1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime), 0, 1);
-			percent = getCurvePercent(frameIndex / 5 - 1, percent);
-
-			float r = prevFrameR + (frames[frameIndex + FRAME_R] - prevFrameR) * percent;
-			float g = prevFrameG + (frames[frameIndex + FRAME_G] - prevFrameG) * percent;
-			float b = prevFrameB + (frames[frameIndex + FRAME_B] - prevFrameB) * percent;
-			float a = prevFrameA + (frames[frameIndex + FRAME_A] - prevFrameA) * percent;
 			if (alpha < 1)
 				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
 			else
