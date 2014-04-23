@@ -112,16 +112,19 @@ public class SkeletonRendererDebug {
 				Attachment attachment = slot.attachment;
 				float[] vertices = null;
 				short[] triangles = null;
+				int hullLength = 0;
 				if (attachment instanceof MeshAttachment) {
 					MeshAttachment mesh = (MeshAttachment)attachment;
 					mesh.updateWorldVertices(slot, false);
 					vertices = mesh.getWorldVertices();
 					triangles = mesh.getTriangles();
+					hullLength = mesh.getHullLength();
 				} else if (attachment instanceof SkinnedMeshAttachment) {
 					SkinnedMeshAttachment mesh = (SkinnedMeshAttachment)attachment;
 					mesh.updateWorldVertices(slot, false);
 					vertices = mesh.getWorldVertices();
 					triangles = mesh.getTriangles();
+					hullLength = mesh.getHullLength();
 				}
 				if (vertices == null || triangles == null) continue;
 				if (drawMeshTriangles) {
@@ -136,8 +139,9 @@ public class SkeletonRendererDebug {
 				}
 				if (drawMeshHull) {
 					shapes.setColor(attachmentLineColor);
-					float lastX = vertices[vertices.length - 5], lastY = vertices[vertices.length - 4];
-					for (int ii = 0, nn = vertices.length; ii < nn; ii += 5) {
+					hullLength = hullLength / 2 * 5;
+					float lastX = vertices[hullLength - 5], lastY = vertices[hullLength - 4];
+					for (int ii = 0, nn = hullLength; ii < nn; ii += 5) {
 						float x = vertices[ii], y = vertices[ii + 1];
 						shapes.line(x, y, lastX, lastY);
 						lastX = x;
