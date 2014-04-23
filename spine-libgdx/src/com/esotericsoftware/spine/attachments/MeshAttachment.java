@@ -82,9 +82,9 @@ public class MeshAttachment extends Attachment {
 				| (int)(skeletonColor.r * slotColor.r * meshColor.r * multiplier));
 
 		float[] worldVertices = this.worldVertices;
-		FloatArray verticesArray = slot.getAttachmentVertices();
+		FloatArray slotVertices = slot.getAttachmentVertices();
 		float[] vertices = this.vertices;
-		if (verticesArray.size == vertices.length) vertices = verticesArray.items;
+		if (slotVertices.size == vertices.length) vertices = slotVertices.items;
 		Bone bone = slot.getBone();
 		float x = skeleton.getX() + bone.getWorldX(), y = skeleton.getY() + bone.getWorldY();
 		float m00 = bone.getM00(), m01 = bone.getM01(), m10 = bone.getM10(), m11 = bone.getM11();
