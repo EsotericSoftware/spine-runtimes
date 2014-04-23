@@ -62,7 +62,7 @@ public class AnimationState {
 			float trackDelta = delta * current.timeScale;
 			current.time += trackDelta;
 			if (current.previous != null) {
-				current.previous.time += trackDelta;
+				current.previous.time += delta * current.previous.timeScale;
 				current.mixTime += trackDelta;
 			}
 
