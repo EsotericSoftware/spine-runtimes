@@ -223,6 +223,7 @@ public class SkeletonBinary {
 			String path = input.readString();
 			if (path == null) path = name;
 			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, path);
+			if (mesh == null) return null;
 			float[] uvs = readFloatArray(input, 1);
 			short[] triangles = readShortArray(input);
 			float[] vertices = readFloatArray(input, scale);
@@ -240,6 +241,7 @@ public class SkeletonBinary {
 			String path = input.readString();
 			if (path == null) path = name;
 			SkinnedMeshAttachment mesh = attachmentLoader.newSkinnedMeshAttachment(skin, name, path);
+			if (mesh == null) return null;
 			float[] uvs = readFloatArray(input, 1);
 			short[] triangles = readShortArray(input);
 
