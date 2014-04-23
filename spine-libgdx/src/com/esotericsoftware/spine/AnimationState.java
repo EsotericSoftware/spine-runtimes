@@ -59,11 +59,11 @@ public class AnimationState {
 			TrackEntry current = tracks.get(i);
 			if (current == null) continue;
 
-			float trackDelta = delta * current.timeScale;
-			current.time += trackDelta;
+			current.time += delta * current.timeScale;
 			if (current.previous != null) {
-				current.previous.time += delta * current.previous.timeScale;
-				current.mixTime += trackDelta;
+				float previousDelta = delta * current.previous.timeScale;
+				current.previous.time += previousDelta;
+				current.mixTime += previousDelta;
 			}
 
 			TrackEntry next = current.next;
