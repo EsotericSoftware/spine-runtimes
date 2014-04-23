@@ -137,7 +137,7 @@ public class SkeletonRendererDebug {
 							);
 					}
 				}
-				if (drawMeshHull) {
+				if (drawMeshHull && hullLength > 0) {
 					shapes.setColor(attachmentLineColor);
 					hullLength = hullLength / 2 * 5;
 					float lastX = vertices[hullLength - 5], lastY = vertices[hullLength - 4];
