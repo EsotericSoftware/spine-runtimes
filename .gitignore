@@ -34,6 +34,10 @@ spine-monogame/xamarinstudio-ios/src/obj
 spine-monogame/windows8-store/src/bin
 spine-monogame/windows8-store/src/obj
 
+spine-monogame/windows8-store/example/spine-monogame-example_TemporaryKey.pfx
+spine-monogame/windows8-store/example/obj/*
+spine-monogame/windows8-store/example/bin/*
+
 spine-xna/bin
 spine-xna/obj
 spine-xna/example/bin
