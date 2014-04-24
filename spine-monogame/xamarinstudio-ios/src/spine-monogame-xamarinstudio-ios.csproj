@@ -110,12 +110,6 @@
     <Compile Include="..\..\..\spine-csharp\src\SlotData.cs">
       <Link>spine-csharp\SlotData.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\spine-xna\src\SkeletonRenderer.cs">
-      <Link>spine-xna\SkeletonRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\spine-xna\src\SpriteBatcher.cs">
-      <Link>spine-xna\SpriteBatcher.cs</Link>
-    </Compile>
     <Compile Include="..\..\..\spine-xna\src\Util.cs">
       <Link>spine-xna\Util.cs</Link>
     </Compile>
@@ -127,6 +121,24 @@
     </Compile>
     <Compile Include="..\..\..\spine-csharp\src\EventData.cs">
       <Link>spine-csharp\EventData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-xna\src\MeshBatcher.cs">
+      <Link>spine-xna\MeshBatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-xna\src\RegionBatcher.cs">
+      <Link>spine-xna\RegionBatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-xna\src\SkeletonMeshRenderer.cs">
+      <Link>spine-xna\SkeletonMeshRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-xna\src\SkeletonRegionRenderer.cs">
+      <Link>spine-xna\SkeletonRegionRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Attachments\MeshAttachment.cs">
+      <Link>spine-csharp\Attachments\MeshAttachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Attachments\SkinnedMeshAttachment.cs">
+      <Link>spine-csharp\Attachments\SkinnedMeshAttachment.cs</Link>
     </Compile>
   </ItemGroup>
 </Project>
