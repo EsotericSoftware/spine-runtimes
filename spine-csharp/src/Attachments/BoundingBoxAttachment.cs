@@ -33,7 +33,9 @@ using System;
 namespace Spine {
 	/// <summary>Attachment that has a polygon for bounds checking.</summary>
 	public class BoundingBoxAttachment : Attachment {
-		public float[] Vertices { get; set; }
+		internal float[] vertices;
+
+		public float[] Vertices { get { return vertices; } set { vertices = value; } }
 
 		public BoundingBoxAttachment (string name)
 			: base(name) {
@@ -47,7 +49,7 @@ namespace Spine {
 			float m01 = bone.m01;
 			float m10 = bone.m10;
 			float m11 = bone.m11;
-			float[] vertices = Vertices;
+			float[] vertices = this.vertices;
 			for (int i = 0, n = vertices.Length; i < n; i += 2) {
 				float px = vertices[i];
 				float py = vertices[i + 1];

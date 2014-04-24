@@ -39,25 +39,64 @@ namespace Spine {
 			this.atlas = atlas;
 		}
 
-		public Attachment NewAttachment (Skin skin, AttachmentType type, String name) {
-			switch (type) {
-			case AttachmentType.region:
-				AtlasRegion region = atlas.FindRegion(name);
-				if (region == null) throw new Exception("Region not found in atlas: " + name + " (" + type + ")");
-				RegionAttachment attachment = new RegionAttachment(name);
-				attachment.RendererObject = region;
-				attachment.SetUVs(region.u, region.v, region.u2, region.v2, region.rotate);
-				attachment.regionOffsetX = region.offsetX;
-				attachment.regionOffsetY = region.offsetY;
-				attachment.regionWidth = region.width;
-				attachment.regionHeight = region.height;
-				attachment.regionOriginalWidth = region.originalWidth;
-				attachment.regionOriginalHeight = region.originalHeight;
-				return attachment;
-			case AttachmentType.boundingbox:
-				return new BoundingBoxAttachment(name);
-			}
-			throw new Exception("Unknown attachment type: " + type);
+		public RegionAttachment NewRegionAttachment (Skin skin, String name, String path) {
+			AtlasRegion region = atlas.FindRegion(path);
+			if (region == null) throw new Exception("Region not found in atlas: " + path + " (region attachment: " + name + ")");
+			RegionAttachment attachment = new RegionAttachment(name);
+			attachment.Path = path;
+			attachment.RendererObject = region;
+			attachment.SetUVs(region.u, region.v, region.u2, region.v2, region.rotate);
+			attachment.regionOffsetX = region.offsetX;
+			attachment.regionOffsetY = region.offsetY;
+			attachment.regionWidth = region.width;
+			attachment.regionHeight = region.height;
+			attachment.regionOriginalWidth = region.originalWidth;
+			attachment.regionOriginalHeight = region.originalHeight;
+			return attachment;
+		}
+
+		public MeshAttachment NewMeshAttachment (Skin skin, String name, String path) {
+			AtlasRegion region = atlas.FindRegion(path);
+			if (region == null) throw new Exception("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
+			MeshAttachment attachment = new MeshAttachment(name);
+			attachment.Path = path;
+			attachment.RendererObject = region;
+			attachment.RegionU = region.u;
+			attachment.RegionV = region.v;
+			attachment.RegionU2 = region.u2;
+			attachment.RegionV2 = region.v2;
+			attachment.RegionRotate = region.rotate;
+			attachment.regionOffsetX = region.offsetX;
+			attachment.regionOffsetY = region.offsetY;
+			attachment.regionWidth = region.width;
+			attachment.regionHeight = region.height;
+			attachment.regionOriginalWidth = region.originalWidth;
+			attachment.regionOriginalHeight = region.originalHeight;
+			return attachment;
+		}
+
+		public SkinnedMeshAttachment NewSkinnedMeshAttachment (Skin skin, String name, String path) {
+			AtlasRegion region = atlas.FindRegion(path);
+			if (region == null) throw new Exception("Region not found in atlas: " + path + " (skinned mesh attachment: " + name + ")");
+			SkinnedMeshAttachment attachment = new SkinnedMeshAttachment(name);
+			attachment.Path = path;
+			attachment.RendererObject = region;
+			attachment.RegionU = region.u;
+			attachment.RegionV = region.v;
+			attachment.RegionU2 = region.u2;
+			attachment.RegionV2 = region.v2;
+			attachment.RegionRotate = region.rotate;
+			attachment.regionOffsetX = region.offsetX;
+			attachment.regionOffsetY = region.offsetY;
+			attachment.regionWidth = region.width;
+			attachment.regionHeight = region.height;
+			attachment.regionOriginalWidth = region.originalWidth;
+			attachment.regionOriginalHeight = region.originalHeight;
+			return attachment;
+		}
+
+		public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, String name) {
+			return new BoundingBoxAttachment(name);
 		}
 	}
 }

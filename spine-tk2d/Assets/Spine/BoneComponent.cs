@@ -44,8 +44,18 @@ public class BoneComponent : MonoBehaviour {
 	/// <summary>If a bone isn't set, boneName is used to find the bone.</summary>
 	public String boneName;
 
+	protected Transform cachedTransform;
+	protected Transform skeletonComponentTransform;
+
+	void Awake () {
+		cachedTransform = transform;
+
+		if(skeletonComponent == null) return;
+		skeletonComponentTransform = skeletonComponent.transform;
+	}
+
 	public void LateUpdate () {
-		if (skeletonComponent == null) return;
+		if (skeletonComponent == null || skeletonComponent.skeleton == null) return;
 		if (bone == null) {
 			if (boneName == null) return;
 			bone = skeletonComponent.skeleton.FindBone(boneName);
@@ -54,16 +64,18 @@ public class BoneComponent : MonoBehaviour {
 				return;
 			}
 		}
-		if (transform.parent == skeletonComponent.transform) {
-			transform.localPosition = new Vector3(bone.worldX, bone.worldY, transform.localPosition.z);
-			Vector3 rotation = transform.localRotation.eulerAngles;
-			transform.localRotation = Quaternion.Euler(rotation.x, rotation.y, bone.worldRotation);
+
+		if (cachedTransform.parent == skeletonComponentTransform) {
+			cachedTransform.localPosition = new Vector3(bone.worldX, bone.worldY, cachedTransform.localPosition.z);
+			Vector3 rotation = cachedTransform.localRotation.eulerAngles;
+			cachedTransform.localRotation = Quaternion.Euler(rotation.x, rotation.y, bone.worldRotation);
 		} else {
-			// Best effort to set this GameObject's transform when it isn't a child of the SkeletonComponent.
-			transform.position = skeletonComponent.transform.TransformPoint(new Vector3(bone.worldX, bone.worldY, transform.position.z));
-			Vector3 rotation = skeletonComponent.transform.rotation.eulerAngles;
-			transform.rotation = Quaternion.Euler(rotation.x, rotation.y, 
-			    skeletonComponent.transform.rotation.eulerAngles.z + bone.worldRotation);
+			cachedTransform.position = skeletonComponentTransform.TransformPoint(new Vector3(bone.worldX, bone.worldY, cachedTransform.position.z));
+			Vector3 rotation = skeletonComponentTransform.rotation.eulerAngles;
+			cachedTransform.rotation = Quaternion.Euler(rotation.x, rotation.y, 
+			                                            skeletonComponentTransform.rotation.eulerAngles.z + bone.worldRotation);
 		}
+
 	}
+
 }

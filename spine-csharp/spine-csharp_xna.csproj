@@ -116,6 +116,12 @@
     <Compile Include="src\Slot.cs" />
     <Compile Include="src\SlotData.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="src\Attachments\MeshAttachment.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="src\Attachments\SkinnedMeshAttachment.cs" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!--

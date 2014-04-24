@@ -43,7 +43,7 @@ using Spine;
 namespace Spine {
 	public class Example : Microsoft.Xna.Framework.Game {
 		GraphicsDeviceManager graphics;
-		SkeletonRenderer skeletonRenderer;
+		SkeletonMeshRenderer skeletonRenderer;
 		Skeleton skeleton;
 		Slot headSlot;
 		AnimationState state;
@@ -54,8 +54,8 @@ namespace Spine {
 
 			graphics = new GraphicsDeviceManager(this);
 			graphics.IsFullScreen = false;
-			graphics.PreferredBackBufferWidth = 640;
-			graphics.PreferredBackBufferHeight = 480;
+			graphics.PreferredBackBufferWidth = 800;
+			graphics.PreferredBackBufferHeight = 600;
 		}
 
 		protected override void Initialize () {
@@ -65,43 +65,42 @@ namespace Spine {
 		}
 
 		protected override void LoadContent () {
-			skeletonRenderer = new SkeletonRenderer(GraphicsDevice);
+			skeletonRenderer = new SkeletonMeshRenderer(GraphicsDevice);
 			skeletonRenderer.PremultipliedAlpha = true;
 
-			String name = "spineboy"; // "goblins";
+			// String name = "spineboy";
+			String name = "goblins-ffd";
 
 			Atlas atlas = new Atlas("data/" + name + ".atlas", new XnaTextureLoader(GraphicsDevice));
 			SkeletonJson json = new SkeletonJson(atlas);
+			if (name == "spineboy") json.Scale = 0.6f;
 			skeleton = new Skeleton(json.ReadSkeletonData("data/" + name + ".json"));
-			if (name == "goblins") skeleton.SetSkin("goblingirl");
-			skeleton.SetSlotsToSetupPose(); // Without this the skin attachments won't be attached. See SetSkin.
+			if (name == "goblins-ffd") skeleton.SetSkin("goblin");
 
 			// Define mixing between animations.
 			AnimationStateData stateData = new AnimationStateData(skeleton.Data);
-			if (name == "spineboy") {
-				stateData.SetMix("walk", "jump", 0.2f);
-				stateData.SetMix("jump", "walk", 0.4f);
-			}
-
 			state = new AnimationState(stateData);
 
-			if (true) {
+			if (name == "spineboy") {
+				stateData.SetMix("run", "jump", 0.2f);
+				stateData.SetMix("jump", "run", 0.4f);
+
 				// Event handling for all animations.
 				state.Start += Start;
 				state.End += End;
 				state.Complete += Complete;
 				state.Event += Event;
 
-				state.SetAnimation(0, "drawOrder", true);
-			} else {
-				state.SetAnimation(0, "walk", false);
+				state.SetAnimation(0, "test", false);
 				TrackEntry entry = state.AddAnimation(0, "jump", false, 0);
 				entry.End += End; // Event handling for queued animations.
-				state.AddAnimation(0, "walk", true, 0);
+				state.AddAnimation(0, "run", true, 0);
+			} else {
+				state.SetAnimation(0, "walk", true);
 			}
 
-			skeleton.X = 320;
-			skeleton.Y = 440;
+			skeleton.X = 400;
+			skeleton.Y = 590;
 			skeleton.UpdateWorldTransform();
 
 			headSlot = skeleton.FindSlot("head");

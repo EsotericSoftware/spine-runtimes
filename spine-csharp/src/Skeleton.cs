@@ -153,7 +153,7 @@ namespace Spine {
 			return -1;
 		}
 
-		/// <summary>Sets a skin by name (see setSkin).</summary>
+		/// <summary>Sets a skin by name (see SetSkin).</summary>
 		public void SetSkin (String skinName) {
 			Skin skin = data.FindSkin(skinName);
 			if (skin == null) throw new ArgumentException("Skin not found: " + skinName);
@@ -161,10 +161,22 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the skin used to look up attachments not found in the {@link SkeletonData#getDefaultSkin() default skin}. Attachments
-		/// from the new skin are attached if the corresponding attachment from the old skin was attached.</summary>
+		/// from the new skin are attached if the corresponding attachment from the old skin was attached. If there was no old skin, each slot's
+		/// setup mode attachment is attached from the new skin.</summary>
 		/// <param name="newSkin">May be null.</param>
 		public void SetSkin (Skin newSkin) {
-			if (skin != null && newSkin != null) newSkin.AttachAll(this, skin);
+			if (skin == null) {
+				List<Slot> slots = this.slots;
+				for (int i = 0, n = slots.Count; i < n; i++) {
+					Slot slot = slots[i];
+					String name = slot.data.attachmentName;
+					if (name != null) {
+						Attachment attachment = newSkin.GetAttachment(i, name);
+						if (attachment != null) slot.Attachment = attachment;
+					}
+				}
+			} else if (newSkin != null) //
+				newSkin.AttachAll(this, skin);
 			skin = newSkin;
 		}
 

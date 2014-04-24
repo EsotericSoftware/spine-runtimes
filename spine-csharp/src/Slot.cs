@@ -38,6 +38,8 @@ namespace Spine {
 		internal float r, g, b, a;
 		internal float attachmentTime;
 		internal Attachment attachment;
+		internal float[] attachmentVertices = new float[0];
+		internal int attachmentVerticesCount;
 
 		public SlotData Data { get { return data; } }
 		public Bone Bone { get { return bone; } }
@@ -55,6 +57,7 @@ namespace Spine {
 			set {
 				attachment = value;
 				attachmentTime = skeleton.time;
+				attachmentVerticesCount = 0;
 			}
 		}
 
@@ -66,6 +69,9 @@ namespace Spine {
 				attachmentTime = skeleton.time - value;
 			}
 		}
+
+		public float[] AttachmentVertices { get { return attachmentVertices; } set { attachmentVertices = value; } }
+		public int AttachmentVerticesCount { get { return attachmentVerticesCount; } set { attachmentVerticesCount = value; } }
 
 		public Slot (SlotData data, Skeleton skeleton, Bone bone) {
 			if (data == null) throw new ArgumentNullException("data cannot be null.");
@@ -83,6 +89,7 @@ namespace Spine {
 			b = data.b;
 			a = data.a;
 			Attachment = data.attachmentName == null ? null : skeleton.GetAttachment(slotIndex, data.attachmentName);
+			attachmentVerticesCount = 0;
 		}
 
 		public void SetToSetupPose () {

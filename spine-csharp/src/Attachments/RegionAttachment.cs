@@ -45,6 +45,7 @@ namespace Spine {
 		internal float x, y, rotation, scaleX = 1, scaleY = 1, width, height;
 		internal float regionOffsetX, regionOffsetY, regionWidth, regionHeight, regionOriginalWidth, regionOriginalHeight;
 		internal float[] offset = new float[8], uvs = new float[8];
+		internal float r = 1, g = 1, b = 1, a = 1;
 
 		public float X { get { return x; } set { x = value; } }
 		public float Y { get { return y; } set { y = value; } }
@@ -54,6 +55,12 @@ namespace Spine {
 		public float Width { get { return width; } set { width = value; } }
 		public float Height { get { return height; } set { height = value; } }
 
+		public float R { get { return r; } set { r = value; } }
+		public float G { get { return g; } set { g = value; } }
+		public float B { get { return b; } set { b = value; } }
+		public float A { get { return a; } set { a = value; } }
+
+		public String Path { get; set; }
 		public Object RendererObject { get; set; }
 		public float RegionOffsetX { get { return regionOffsetX; } set { regionOffsetX = value; } }
 		public float RegionOffsetY { get { return regionOffsetY; } set { regionOffsetY = value; } } // Pixels stripped from the bottom left, unrotated.
@@ -127,22 +134,19 @@ namespace Spine {
 			offset[Y4] = localYCos + localX2Sin;
 		}
 
-		public void ComputeWorldVertices (float x, float y, Bone bone, float[] vertices) {
+		public void ComputeWorldVertices (float x, float y, Bone bone, float[] worldVertices) {
 			x += bone.worldX;
 			y += bone.worldY;
-			float m00 = bone.m00;
-			float m01 = bone.m01;
-			float m10 = bone.m10;
-			float m11 = bone.m11;
+			float m00 = bone.m00, m01 = bone.m01, m10 = bone.m10, m11 = bone.m11;
 			float[] offset = this.offset;
-			vertices[X1] = offset[X1] * m00 + offset[Y1] * m01 + x;
-			vertices[Y1] = offset[X1] * m10 + offset[Y1] * m11 + y;
-			vertices[X2] = offset[X2] * m00 + offset[Y2] * m01 + x;
-			vertices[Y2] = offset[X2] * m10 + offset[Y2] * m11 + y;
-			vertices[X3] = offset[X3] * m00 + offset[Y3] * m01 + x;
-			vertices[Y3] = offset[X3] * m10 + offset[Y3] * m11 + y;
-			vertices[X4] = offset[X4] * m00 + offset[Y4] * m01 + x;
-			vertices[Y4] = offset[X4] * m10 + offset[Y4] * m11 + y;
+			worldVertices[X1] = offset[X1] * m00 + offset[Y1] * m01 + x;
+			worldVertices[Y1] = offset[X1] * m10 + offset[Y1] * m11 + y;
+			worldVertices[X2] = offset[X2] * m00 + offset[Y2] * m01 + x;
+			worldVertices[Y2] = offset[X2] * m10 + offset[Y2] * m11 + y;
+			worldVertices[X3] = offset[X3] * m00 + offset[Y3] * m01 + x;
+			worldVertices[Y3] = offset[X3] * m10 + offset[Y3] * m11 + y;
+			worldVertices[X4] = offset[X4] * m00 + offset[Y4] * m01 + x;
+			worldVertices[Y4] = offset[X4] * m10 + offset[Y4] * m11 + y;
 		}
 	}
 }

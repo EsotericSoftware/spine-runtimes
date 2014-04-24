@@ -80,6 +80,10 @@ public class MaterialsTextureLoader : TextureLoader {
 		String name = Path.GetFileNameWithoutExtension(path);
 		Material material = null;
 		foreach (Material other in atlasAsset.materials) {
+			if (other.mainTexture == null) {
+				Debug.LogWarning("Material is missing texture: " + other.name, other);
+				return;
+			}
 			if (other.mainTexture.name == name) {
 				material = other;
 				break;

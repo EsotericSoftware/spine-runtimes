@@ -55,7 +55,7 @@ public class BoneComponent : MonoBehaviour {
 	}
 
 	public void LateUpdate () {
-		if (skeletonComponent == null) return;
+		if (skeletonComponent == null || skeletonComponent.skeleton == null) return;
 		if (bone == null) {
 			if (boneName == null) return;
 			bone = skeletonComponent.skeleton.FindBone(boneName);
