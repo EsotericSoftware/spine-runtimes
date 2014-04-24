@@ -50,9 +50,9 @@ public class MeshAttachment extends Attachment {
 	private final Color color = new Color(1, 1, 1, 1);
 
 	// Nonessential.
+	private int hullLength;
 	private int[] edges;
 	private float width, height;
-	private int hullLength;
 
 	public MeshAttachment (String name) {
 		super(name);
@@ -66,6 +66,36 @@ public class MeshAttachment extends Attachment {
 	public TextureRegion getRegion () {
 		if (region == null) throw new IllegalStateException("Region has not been set: " + this);
 		return region;
+	}
+
+	public void setMesh (float[] vertices, short[] triangles, float[] uvs) {
+		this.vertices = vertices;
+		this.triangles = triangles;
+
+		int worldVerticesLength = vertices.length / 2 * 5;
+		if (worldVertices == null || worldVertices.length != worldVerticesLength) worldVertices = new float[worldVerticesLength];
+
+		float u, v, width, height;
+		if (region == null) {
+			u = v = 0;
+			width = height = 1;
+		} else {
+			u = region.getU();
+			v = region.getV();
+			width = region.getU2() - u;
+			height = region.getV2() - v;
+		}
+		if (region instanceof AtlasRegion && ((AtlasRegion)region).rotate) {
+			for (int i = 0, w = 3, n = vertices.length; i < n; i += 2, w += 5) {
+				worldVertices[w] = u + uvs[i + 1] * width;
+				worldVertices[w + 1] = v + height - uvs[i] * height;
+			}
+		} else {
+			for (int i = 0, w = 3, n = vertices.length; i < n; i += 2, w += 5) {
+				worldVertices[w] = u + uvs[i] * width;
+				worldVertices[w + 1] = v + uvs[i + 1] * height;
+			}
+		}
 	}
 
 	public void updateWorldVertices (Slot slot, boolean premultipliedAlpha) {
@@ -151,35 +181,5 @@ public class MeshAttachment extends Attachment {
 
 	public void setHeight (float height) {
 		this.height = height;
-	}
-
-	public void setMesh (float[] vertices, short[] triangles, float[] uvs) {
-		this.vertices = vertices;
-		this.triangles = triangles;
-
-		int worldVerticesLength = vertices.length / 2 * 5;
-		if (worldVertices == null || worldVertices.length != worldVerticesLength) worldVertices = new float[worldVerticesLength];
-
-		float u, v, w, h;
-		if (region == null) {
-			u = v = 0;
-			w = h = 1;
-		} else {
-			u = region.getU();
-			v = region.getV();
-			w = region.getU2() - u;
-			h = region.getV2() - v;
-		}
-		if (region instanceof AtlasRegion && ((AtlasRegion)region).rotate) {
-			for (int i = 0, ii = 3, n = vertices.length; i < n; i += 2, ii += 5) {
-				worldVertices[ii] = u + uvs[i + 1] * w;
-				worldVertices[ii + 1] = v + h - uvs[i] * h;
-			}
-		} else {
-			for (int i = 0, ii = 3, n = vertices.length; i < n; i += 2, ii += 5) {
-				worldVertices[ii] = u + uvs[i] * w;
-				worldVertices[ii + 1] = v + uvs[i + 1] * h;
-			}
-		}
 	}
 }

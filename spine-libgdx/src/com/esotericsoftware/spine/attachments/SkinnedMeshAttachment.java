@@ -69,6 +69,44 @@ public class SkinnedMeshAttachment extends Attachment {
 		return region;
 	}
 
+	/** @param bones For each vertex, the number of bones affecting the vertex followed by that many bone indices. Ie: count,
+	 *           boneIndex, ...
+	 * @param weights For each bone affecting the vertex, the vertex position in the bone's coordinate system and the weight for
+	 *           the bone's influence. Ie: x, y, weight, ...
+	 * @param uvs For each vertex, a texure coordinate pair. Ie: u, v, ...
+	 * @param triangles Vertex number triplets which describe the mesh's triangulation. */
+	public void setMesh (int[] bones, float[] weights, short[] triangles, float[] uvs) {
+		this.bones = bones;
+		this.weights = weights;
+		this.triangles = triangles;
+
+		int uvsLength = uvs.length;
+		int worldVerticesLength = uvsLength / 2 * 5;
+		if (worldVertices == null || worldVertices.length != worldVerticesLength) worldVertices = new float[worldVerticesLength];
+
+		float u, v, w, h;
+		if (region == null) {
+			u = v = 0;
+			w = h = 1;
+		} else {
+			u = region.getU();
+			v = region.getV();
+			w = region.getU2() - u;
+			h = region.getV2() - v;
+		}
+		if (region instanceof AtlasRegion && ((AtlasRegion)region).rotate) {
+			for (int i = 0, ii = 3; i < uvsLength; i += 2, ii += 5) {
+				worldVertices[ii] = u + uvs[i + 1] * w;
+				worldVertices[ii + 1] = v + h - uvs[i] * h;
+			}
+		} else {
+			for (int i = 0, ii = 3; i < uvsLength; i += 2, ii += 5) {
+				worldVertices[ii] = u + uvs[i] * w;
+				worldVertices[ii + 1] = v + uvs[i + 1] * h;
+			}
+		}
+	}
+
 	public void updateWorldVertices (Slot slot, boolean premultipliedAlpha) {
 		Skeleton skeleton = slot.getSkeleton();
 		Color skeletonColor = skeleton.getColor();
@@ -179,43 +217,5 @@ public class SkinnedMeshAttachment extends Attachment {
 
 	public void setHeight (float height) {
 		this.height = height;
-	}
-
-	/** @param bones For each vertex, the number of bones affecting the vertex followed by that many bone indices. Ie: count,
-	 *           boneIndex, ...
-	 * @param weights For each bone affecting the vertex, the vertex position in the bone's coordinate system and the weight for
-	 *           the bone's influence. Ie: x, y, weight, ...
-	 * @param uvs For each vertex, a texure coordinate pair. Ie: u, v, ...
-	 * @param triangles Vertex number triplets which describe the mesh's triangulation. */
-	public void setMesh (int[] bones, float[] weights, float[] uvs, short[] triangles) {
-		this.bones = bones;
-		this.weights = weights;
-		this.triangles = triangles;
-
-		int uvsLength = uvs.length;
-		int worldVerticesLength = uvsLength / 2 * 5;
-		if (worldVertices == null || worldVertices.length != worldVerticesLength) worldVertices = new float[worldVerticesLength];
-
-		float u, v, w, h;
-		if (region == null) {
-			u = v = 0;
-			w = h = 1;
-		} else {
-			u = region.getU();
-			v = region.getV();
-			w = region.getU2() - u;
-			h = region.getV2() - v;
-		}
-		if (region instanceof AtlasRegion && ((AtlasRegion)region).rotate) {
-			for (int i = 0, ii = 3; i < uvsLength; i += 2, ii += 5) {
-				worldVertices[ii] = u + uvs[i + 1] * w;
-				worldVertices[ii + 1] = v + h - uvs[i] * h;
-			}
-		} else {
-			for (int i = 0, ii = 3; i < uvsLength; i += 2, ii += 5) {
-				worldVertices[ii] = u + uvs[i] * w;
-				worldVertices[ii + 1] = v + uvs[i + 1] * h;
-			}
-		}
 	}
 }

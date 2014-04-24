@@ -239,7 +239,7 @@ public class SkeletonJson {
 					i += 4;
 				}
 			}
-			mesh.setMesh(bones.toArray(), weights.toArray(), uvs, triangles);
+			mesh.setMesh(bones.toArray(), weights.toArray(), triangles, uvs);
 
 			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() * 2);
 			if (map.has("edges")) mesh.setEdges(map.require("edges").asIntArray());

@@ -43,7 +43,7 @@ import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.utils.Array;
 
 public class SkeletonRenderer {
-	static private final short[] quadTriangle = {0, 1, 2, 2, 3, 0};
+	static private final short[] quadTriangles = {0, 1, 2, 2, 3, 0};
 
 	private boolean premultipliedAlpha;
 
@@ -65,7 +65,7 @@ public class SkeletonRenderer {
 				RegionAttachment region = (RegionAttachment)attachment;
 				region.updateWorldVertices(slot, premultipliedAlpha);
 				vertices = region.getWorldVertices();
-				triangles = quadTriangle;
+				triangles = quadTriangles;
 				texture = region.getRegion().getTexture();
 
 				if (slot.data.getAdditiveBlending() != additive) {

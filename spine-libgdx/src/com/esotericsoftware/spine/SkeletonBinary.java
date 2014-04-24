@@ -258,7 +258,7 @@ public class SkeletonBinary {
 					weights.add(input.readFloat());
 				}
 			}
-			mesh.setMesh(bones.toArray(), weights.toArray(), uvs, triangles);
+			mesh.setMesh(bones.toArray(), weights.toArray(), triangles, uvs);
 
 			Color.rgba8888ToColor(mesh.getColor(), input.readInt());
 			if (nonessential) {
