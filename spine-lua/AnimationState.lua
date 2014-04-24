@@ -241,7 +241,7 @@ function AnimationState.TrackEntry.new (data)
 		loop = false,
 		delay = 0, time = 0, lastTime = -1, endTime = 0,
 		timeScale = 1,
-		mixTime = 0, mixDuration = 0, mix = 0,
+		mixTime = 0, mixDuration = 0, mix = 1,
 		onStart = nil, onEnd = nil, onComplete = nil, onEvent = nil
 	}
 	return self
