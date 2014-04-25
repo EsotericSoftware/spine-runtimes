@@ -30,6 +30,7 @@
 
 using System;
 using System.IO;
+using System.Collections.Generic;
 using UnityEngine;
 using Spine;
 
@@ -51,14 +52,14 @@ public class SkeletonDataAsset : ScriptableObject {
 	public SkeletonData GetSkeletonData (bool quiet) {
 		if (spriteCollection == null) {
 			if (!quiet)
-				Debug.LogWarning("Sprite collection not set for skeleton data asset: " + name, this);
+				Debug.LogError("Sprite collection not set for skeleton data asset: " + name, this);
 			Clear();
 			return null;
 		}
-
+		
 		if (skeletonJSON == null) {
 			if (!quiet)
-				Debug.LogWarning("Skeleton JSON file not set for skeleton data asset: " + name, this);
+				Debug.LogError("Skeleton JSON file not set for skeleton data asset: " + name, this);
 			Clear();
 			return null;
 		}
@@ -68,19 +69,17 @@ public class SkeletonDataAsset : ScriptableObject {
 
 		SkeletonJson json = new SkeletonJson(new SpriteCollectionAttachmentLoader(spriteCollection));
 		json.Scale = 1.0f / (spriteCollection.invOrthoSize * spriteCollection.halfTargetHeight) * scale;
-
 		try {
 			skeletonData = json.ReadSkeletonData(new StringReader(skeletonJSON.text));
 		} catch (Exception ex) {
-			Debug.Log("Error reading skeleton JSON file for skeleton data asset: " + name + "\n" +
-				ex.Message + "\n" + ex.StackTrace, this);
+			if (!quiet)
+				Debug.LogError("Error reading skeleton JSON file for SkeletonData asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, this);
 			return null;
 		}
 
 		stateData = new AnimationStateData(skeletonData);
 		for (int i = 0, n = fromAnimation.Length; i < n; i++) {
-			if (fromAnimation[i].Length == 0 || toAnimation[i].Length == 0)
-				continue;
+			if (fromAnimation[i].Length == 0 || toAnimation[i].Length == 0) continue;
 			stateData.SetMix(fromAnimation[i], toAnimation[i], duration[i]);
 		}
 

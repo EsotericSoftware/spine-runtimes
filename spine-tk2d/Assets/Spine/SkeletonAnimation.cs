@@ -34,10 +34,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Spine;
 
-/** Extends SkeletonComponent to apply an animation. */
-[ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
+[ExecuteInEditMode]
 [AddComponentMenu("Spine/SkeletonAnimation")]
-public class SkeletonAnimation : SkeletonComponent {
+public class SkeletonAnimation : SkeletonRenderer {
+	public float timeScale = 1;
 	public bool loop;
 	public Spine.AnimationState state;
 
@@ -59,24 +59,30 @@ public class SkeletonAnimation : SkeletonComponent {
 				state.SetAnimation(0, value, loop);
 		}
 	}
-	
-	override public void Initialize () {
-		if (Initialized) return;
 
-		base.Initialize();
-		
+	public override void Reset () {
+		base.Reset();
+		if (!valid) return;
+
 		state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());
-		if (_animationName != null && _animationName.Length > 0) state.SetAnimation(0, _animationName, loop);
+		if (_animationName != null && _animationName.Length > 0) {
+			state.SetAnimation(0, _animationName, loop);
+			Update(0);
+		}
 	}
 
-	override public void UpdateSkeleton (float deltaTime) {
-		// Apply the animation.
+	public virtual void Update () {
+		Update(Time.deltaTime);
+	}
+
+	public virtual void Update (float deltaTime) {
+		if (!valid) return;
+
+		deltaTime *= timeScale;
+		skeleton.Update(deltaTime);
 		state.Update(deltaTime * timeScale);
 		state.Apply(skeleton);
-		
 		if (UpdateBones != null) UpdateBones(this);
-
-		// Call overridden method to call skeleton Update and UpdateWorldTransform.
-		base.UpdateSkeleton(deltaTime);
+		skeleton.UpdateWorldTransform();
 	}
 }

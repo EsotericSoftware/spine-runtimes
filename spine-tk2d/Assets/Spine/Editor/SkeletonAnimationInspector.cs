@@ -89,10 +89,8 @@ public class SkeletonAnimationInspector : Editor {
 			animationIndex = EditorGUILayout.Popup(animationIndex, animations);
 			EditorGUILayout.EndHorizontal();
 
-			if (animationIndex == 0)
-				component.animationName = null;
-			else
-				component.animationName = animations[animationIndex];
+			component.animationName = animationIndex == 0 ? null : animations[animationIndex];
+			animationName.stringValue = component.animationName;
 		}
 
 		// Animation loop.
@@ -109,8 +107,7 @@ public class SkeletonAnimationInspector : Editor {
 			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
 		) {
 			if (!Application.isPlaying) {
-				component.Clear();
-				component.Update();
+				component.Reset();
 			}
 		}
 	}

@@ -54,9 +54,9 @@ public class Menus {
 		Selection.activeObject = asset;
 	}
 
-	[MenuItem("GameObject/Create Other/Spine SkeletonComponent")]
-	static public void CreateSkeletonComponentGameObject () {
-		GameObject gameObject = new GameObject("New SkeletonComponent", typeof(SkeletonComponent));
+	[MenuItem("GameObject/Create Other/Spine SkeletonRenderer")]
+	static public void CreateSkeletonRendererGameObject () {
+		GameObject gameObject = new GameObject("New SkeletonRenderer", typeof(SkeletonRenderer));
 		EditorUtility.FocusProjectWindow();
 		Selection.activeObject = gameObject;
 	}

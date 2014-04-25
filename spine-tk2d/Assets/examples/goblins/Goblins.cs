@@ -28,46 +28,36 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using System;
-using UnityEditor;
 using UnityEngine;
+using System.Collections;
+using Spine;
 
-[CustomEditor(typeof(BoneComponent))]
-public class BoneComponentInspector : Editor {
-	private SerializedProperty boneName, skeletonRenderer;
-
-	void OnEnable () {
-		skeletonRenderer = serializedObject.FindProperty("skeletonRenderer");
-		boneName = serializedObject.FindProperty("boneName");
+public class Goblins : MonoBehaviour {
+	private bool girlSkin;
+	private SkeletonAnimation skeletonAnimation;
+	private Bone headBone;
+	
+	public void Start () {
+		skeletonAnimation = GetComponent<SkeletonAnimation>();
+		headBone = skeletonAnimation.skeleton.FindBone("head");
+		skeletonAnimation.UpdateBones += UpdateBones;
 	}
 
-	override public void OnInspectorGUI () {
-		serializedObject.Update();
-		BoneComponent component = (BoneComponent)target;
-
-		EditorGUILayout.PropertyField(skeletonRenderer);
-
-		if (component.valid) {
-			String[] bones = new String[component.skeletonRenderer.skeleton.Data.Bones.Count + 1];
-			bones[0] = "<None>";
-			for (int i = 0; i < bones.Length - 1; i++)
-				bones[i + 1] = component.skeletonRenderer.skeleton.Data.Bones[i].Name;
-			Array.Sort<String>(bones);
-			int boneIndex = Math.Max(0, Array.IndexOf(bones, boneName.stringValue));
-
-			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.LabelField("Bone");
-			EditorGUIUtility.LookLikeControls();
-			boneIndex = EditorGUILayout.Popup(boneIndex, bones);
-			EditorGUILayout.EndHorizontal();
-
-			boneName.stringValue = boneIndex == 0 ? null : bones[boneIndex];
-		}
-
-		if (serializedObject.ApplyModifiedProperties() ||
-	    	(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
-	    ) {
-			component.Reset();
-		}
+	// This is called after the animation is applied to the skeleton and can be used to adjust the bones dynamically.
+	public void UpdateBones (SkeletonAnimation skeletonAnimation) {
+		headBone.Rotation += 15;
+	}
+	
+	public void OnMouseDown () {
+		skeletonAnimation.skeleton.SetSkin(girlSkin ? "goblin" : "goblingirl");
+		skeletonAnimation.skeleton.SetSlotsToSetupPose();
+		
+		girlSkin = !girlSkin;
+		
+		if (girlSkin) {
+			skeletonAnimation.skeleton.SetAttachment("right hand item", null);
+			skeletonAnimation.skeleton.SetAttachment("left hand item", "spear");
+		} else
+			skeletonAnimation.skeleton.SetAttachment("left hand item", "dagger");
 	}
 }
