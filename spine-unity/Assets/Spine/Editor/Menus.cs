@@ -34,7 +34,7 @@ using UnityEditor;
 using UnityEngine;
 using Spine;
 
-public class SpineEditor {
+public class Menus {
 	[MenuItem("Assets/Create/Spine Atlas")]
 	static public void CreateAtlas () {
 		CreateAsset<AtlasAsset>("New Atlas");
