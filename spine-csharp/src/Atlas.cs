@@ -205,6 +205,14 @@ namespace Spine {
 			return i + 1;
 		}
 
+		public void FlipV () {
+			for (int i = 0, n = regions.Count; i < n; i++) {
+				AtlasRegion region = regions[i];
+				region.v = 1 - region.v;
+				region.v2 = 1 - region.v2;
+			}
+		}
+
 		/// <summary>Returns the first region found with the specified name. This method uses string comparison to find the region, so the result
 		/// should be cached rather than calling this method multiple times.</summary>
 		/// <returns>The region, or null.</returns>
