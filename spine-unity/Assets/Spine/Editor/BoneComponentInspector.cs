@@ -34,10 +34,10 @@ using UnityEngine;
 
 [CustomEditor(typeof(BoneComponent))]
 public class BoneComponentInspector : Editor {
-	private SerializedProperty boneName, skeletonComponent;
+	private SerializedProperty boneName, skeletonRenderer;
 
 	void OnEnable () {
-		skeletonComponent = serializedObject.FindProperty("skeletonComponent");
+		skeletonRenderer = serializedObject.FindProperty("skeletonRenderer");
 		boneName = serializedObject.FindProperty("boneName");
 	}
 
@@ -45,13 +45,13 @@ public class BoneComponentInspector : Editor {
 		serializedObject.Update();
 		BoneComponent component = (BoneComponent)target;
 
-		EditorGUILayout.PropertyField(skeletonComponent);
+		EditorGUILayout.PropertyField(skeletonRenderer);
 
-		if (component.skeletonComponent != null) {
-			String[] bones = new String[component.skeletonComponent.skeleton.Data.Bones.Count + 1];
+		if (component.valid) {
+			String[] bones = new String[component.skeletonRenderer.skeleton.Data.Bones.Count + 1];
 			bones[0] = "<None>";
 			for (int i = 0; i < bones.Length - 1; i++)
-				bones[i + 1] = component.skeletonComponent.skeleton.Data.Bones[i].Name;
+				bones[i + 1] = component.skeletonRenderer.skeleton.Data.Bones[i].Name;
 			Array.Sort<String>(bones);
 			int boneIndex = Math.Max(0, Array.IndexOf(bones, boneName.stringValue));
 
@@ -61,14 +61,13 @@ public class BoneComponentInspector : Editor {
 			boneIndex = EditorGUILayout.Popup(boneIndex, bones);
 			EditorGUILayout.EndHorizontal();
 
-			boneName.stringValue = bones[boneIndex];;
+			boneName.stringValue = boneIndex == 0 ? null : bones[boneIndex];
 		}
 
 		if (serializedObject.ApplyModifiedProperties() ||
 	    	(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
 	    ) {
-			component.bone = null;
-			component.LateUpdate();
+			component.Reset();
 		}
 	}
 }

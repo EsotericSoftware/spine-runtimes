@@ -38,44 +38,52 @@ using Spine;
 [ExecuteInEditMode]
 [AddComponentMenu("Spine/BoneComponent")]
 public class BoneComponent : MonoBehaviour {
-	public SkeletonComponent skeletonComponent;
+	public bool valid;
+	public SkeletonRenderer skeletonRenderer;
 	public Bone bone;
 
 	/// <summary>If a bone isn't set, boneName is used to find the bone.</summary>
 	public String boneName;
 
 	protected Transform cachedTransform;
-	protected Transform skeletonComponentTransform;
+	protected Transform skeletonTransform;
 
-	void Awake () {
+	public void Reset () {
+		bone = null;
 		cachedTransform = transform;
+		valid = skeletonRenderer != null && skeletonRenderer.valid;
+		if (!valid) return;
+		skeletonTransform = skeletonRenderer.transform;
+	}
 
-		if(skeletonComponent == null) return;
-		skeletonComponentTransform = skeletonComponent.transform;
+	public void Awake () {
+		Reset();
 	}
 
 	public void LateUpdate () {
-		if (skeletonComponent == null || skeletonComponent.skeleton == null) return;
+		if (!valid) {
+			Reset();
+			return;
+		}
+
 		if (bone == null) {
-			if (boneName == null) return;
-			bone = skeletonComponent.skeleton.FindBone(boneName);
+			if (boneName == null || boneName.Length == 0) return;
+			bone = skeletonRenderer.skeleton.FindBone(boneName);
 			if (bone == null) {
-				Debug.Log("Bone not found: " + boneName, this);
+				Debug.LogError("Bone not found: " + boneName, this);
 				return;
 			}
 		}
 
-		if (cachedTransform.parent == skeletonComponentTransform) {
+		if (cachedTransform.parent == skeletonTransform) {
 			cachedTransform.localPosition = new Vector3(bone.worldX, bone.worldY, cachedTransform.localPosition.z);
 			Vector3 rotation = cachedTransform.localRotation.eulerAngles;
 			cachedTransform.localRotation = Quaternion.Euler(rotation.x, rotation.y, bone.worldRotation);
 		} else {
-			cachedTransform.position = skeletonComponentTransform.TransformPoint(new Vector3(bone.worldX, bone.worldY, cachedTransform.position.z));
-			Vector3 rotation = skeletonComponentTransform.rotation.eulerAngles;
+			cachedTransform.position = skeletonTransform.TransformPoint(new Vector3(bone.worldX, bone.worldY, cachedTransform.position.z));
+			Vector3 rotation = skeletonTransform.rotation.eulerAngles;
 			cachedTransform.rotation = Quaternion.Euler(rotation.x, rotation.y, 
-			                                            skeletonComponentTransform.rotation.eulerAngles.z + bone.worldRotation);
+				skeletonTransform.rotation.eulerAngles.z + bone.worldRotation);
 		}
-
 	}
-
 }

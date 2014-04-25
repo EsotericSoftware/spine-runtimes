@@ -33,6 +33,7 @@ using System.IO;
 using UnityEngine;
 using Spine;
 
+/// <summary>Loads and stores a Spine atlas and list of materials.</summary>
 public class AtlasAsset : ScriptableObject {
 	public TextAsset atlasFile;
 	public Material[] materials;
@@ -45,13 +46,13 @@ public class AtlasAsset : ScriptableObject {
 	/// <returns>The atlas or null if it could not be loaded.</returns>
 	public Atlas GetAtlas () {
 		if (atlasFile == null) {
-			Debug.LogWarning("Atlas file not set for atlas asset: " + name, this);
+			Debug.LogError("Atlas file not set for atlas asset: " + name, this);
 			Clear();
 			return null;
 		}
 
 		if (materials == null || materials.Length == 0) {
-			Debug.LogWarning("Materials not set for atlas asset: " + name, this);
+			Debug.LogError("Materials not set for atlas asset: " + name, this);
 			Clear();
 			return null;
 		}
@@ -63,7 +64,7 @@ public class AtlasAsset : ScriptableObject {
 			atlas = new Atlas(new StringReader(atlasFile.text), "", new MaterialsTextureLoader(this));
 			return atlas;
 		} catch (Exception ex) {
-			Debug.Log("Error reading atlas file for atlas asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, this);
+			Debug.LogError("Error reading atlas file for atlas asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, this);
 			return null;
 		}
 	}
@@ -81,7 +82,7 @@ public class MaterialsTextureLoader : TextureLoader {
 		Material material = null;
 		foreach (Material other in atlasAsset.materials) {
 			if (other.mainTexture == null) {
-				Debug.LogWarning("Material is missing texture: " + other.name, other);
+				Debug.LogError("Material is missing texture: " + other.name, other);
 				return;
 			}
 			if (other.mainTexture.name == name) {
@@ -90,7 +91,7 @@ public class MaterialsTextureLoader : TextureLoader {
 			}
 		}
 		if (material == null) {
-			Debug.LogWarning("Material with texture name \"" + name + "\" not found for atlas asset: " + atlasAsset.name, atlasAsset);
+			Debug.LogError("Material with texture name \"" + name + "\" not found for atlas asset: " + atlasAsset.name, atlasAsset);
 			return;
 		}
 		page.rendererObject = material;

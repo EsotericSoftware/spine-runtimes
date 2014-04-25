@@ -32,8 +32,8 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(SkeletonComponent))]
-public class SkeletonComponentInspector : Editor {
+[CustomEditor(typeof(SkeletonRenderer))]
+public class SkeletonRendererInspector : Editor {
 	private SerializedProperty skeletonDataAsset, initialSkinName, timeScale, normals, tangents;
 
 	void OnEnable () {
@@ -46,7 +46,7 @@ public class SkeletonComponentInspector : Editor {
 
 	override public void OnInspectorGUI () {
 		serializedObject.Update();
-		SkeletonComponent component = (SkeletonComponent)target;
+		SkeletonRenderer component = (SkeletonRenderer)target;
 
 		EditorGUILayout.PropertyField(skeletonDataAsset);
 		
@@ -78,8 +78,7 @@ public class SkeletonComponentInspector : Editor {
 			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
 		) {
 			if (!Application.isPlaying) {
-				component.Clear();
-				component.Update();
+				component.Reset();
 			}
 		}
 	}

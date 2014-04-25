@@ -52,14 +52,14 @@ public class SkeletonDataAsset : ScriptableObject {
 	public SkeletonData GetSkeletonData (bool quiet) {
 		if (atlasAsset == null) {
 			if (!quiet)
-				Debug.LogWarning("Atlas not set for skeleton data asset: " + name, this);
+				Debug.LogError("Atlas not set for SkeletonData asset: " + name, this);
 			Clear();
 			return null;
 		}
 
 		if (skeletonJSON == null) {
 			if (!quiet)
-				Debug.LogWarning("Skeleton JSON file not set for skeleton data asset: " + name, this);
+				Debug.LogError("Skeleton JSON file not set for SkeletonData asset: " + name, this);
 			Clear();
 			return null;
 		}
@@ -73,13 +73,14 @@ public class SkeletonDataAsset : ScriptableObject {
 		if (skeletonData != null)
 			return skeletonData;
 
+		atlas.FlipV();
 		SkeletonJson json = new SkeletonJson(atlas);
 		json.Scale = scale;
 		try {
 			skeletonData = json.ReadSkeletonData(new StringReader(skeletonJSON.text));
 		} catch (Exception ex) {
 			if (!quiet)
-				Debug.Log("Error reading skeleton JSON file for skeleton data asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, this);
+				Debug.LogError("Error reading skeleton JSON file for SkeletonData asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, this);
 			return null;
 		}
 
