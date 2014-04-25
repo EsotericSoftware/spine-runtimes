@@ -1815,55 +1815,55 @@
 		"slots": {
 			"front_fist": {
 				"attachment": [
-					{ "time": 0, "name": "front_fist_closed" },
-					{ "time": 0.2666, "name": "front_fist_open" }
+					{ "time": 0.1333, "name": "front_fist_closed" },
+					{ "time": 0.4, "name": "front_fist_open" }
 				]
 			},
 			"mouth": {
 				"attachment": [
-					{ "time": 0, "name": "mouth_grind" }
+					{ "time": 0.1333, "name": "mouth_grind" }
 				]
 			},
 			"muzzle": {
 				"attachment": [
-					{ "time": 0, "name": "muzzle" },
-					{ "time": 0.1333, "name": null }
+					{ "time": 0.1333, "name": "muzzle" },
+					{ "time": 0.2666, "name": null }
 				],
 				"color": [
 					{
-						"time": 0,
+						"time": 0.1333,
 						"color": "ffffff00",
 						"curve": [ 0.118, 0.99, 0.75, 1 ]
 					},
 					{
-						"time": 0.0333,
+						"time": 0.1666,
 						"color": "ffffffff",
 						"curve": [ 0.821, 0, 0.909, 0.89 ]
 					},
-					{ "time": 0.1333, "color": "ffffff00" }
+					{ "time": 0.2666, "color": "ffffff00" }
 				]
 			}
 		},
 		"bones": {
 			"front_fist": {
 				"scale": [
-					{ "time": 0, "x": 1, "y": 1, "curve": "stepped" },
-					{ "time": 0.2666, "x": 1, "y": 1 }
+					{ "time": 0.1333, "x": 1, "y": 1, "curve": "stepped" },
+					{ "time": 0.4, "x": 1, "y": 1 }
 				]
 			},
 			"gunTip": {
 				"translate": [
-					{ "time": 0, "x": 0, "y": 0 },
-					{ "time": 0.0666, "x": 20.93, "y": 1.57 }
+					{ "time": 0.1333, "x": 0, "y": 0 },
+					{ "time": 0.2, "x": 20.93, "y": 1.57 }
 				],
 				"scale": [
-					{ "time": 0, "x": 1, "y": 1 },
-					{ "time": 0.0666, "x": 1.247, "y": 1.516 }
+					{ "time": 0.1333, "x": 1, "y": 1 },
+					{ "time": 0.2, "x": 1.247, "y": 1.516 }
 				]
 			},
 			"gun": {
 				"rotate": [
-					{ "time": 0, "angle": 0 }
+					{ "time": 0, "angle": 1.9 }
 				],
 				"translate": [
 					{
@@ -1872,13 +1872,13 @@
 						"y": 5.84,
 						"curve": [ 0, 0.3, 0.678, 1 ]
 					},
-					{ "time": 0.1666, "x": -9.3, "y": -1.41 },
-					{ "time": 0.2666, "x": 0, "y": 0 }
+					{ "time": 0.3, "x": -9.3, "y": -1.41 },
+					{ "time": 0.4, "x": 0, "y": 0 }
 				]
 			},
 			"rear_bracer": {
 				"rotate": [
-					{ "time": 0, "angle": 0 }
+					{ "time": 0, "angle": -30.47 }
 				],
 				"translate": [
 					{
@@ -1887,13 +1887,13 @@
 						"y": 0,
 						"curve": [ 0, 0.3, 0.678, 1 ]
 					},
-					{ "time": 0.1666, "x": -5.99, "y": -3.71 },
-					{ "time": 0.2666, "x": 0, "y": 0 }
+					{ "time": 0.3, "x": -5.99, "y": -3.71 },
+					{ "time": 0.4, "x": 0, "y": 0 }
 				]
 			},
 			"rear_upper_arm": {
 				"rotate": [
-					{ "time": 0, "angle": 0 }
+					{ "time": 0, "angle": 62.3 }
 				],
 				"translate": [
 					{
@@ -1902,8 +1902,8 @@
 						"y": 0,
 						"curve": [ 0, 0.3, 0.678, 1 ]
 					},
-					{ "time": 0.1666, "x": 2.81, "y": 11.41 },
-					{ "time": 0.2666, "x": 0, "y": 0 }
+					{ "time": 0.3, "x": 2.81, "y": 11.41 },
+					{ "time": 0.4, "x": 0, "y": 0 }
 				]
 			}
 		}
