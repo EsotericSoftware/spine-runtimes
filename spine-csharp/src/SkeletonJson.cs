@@ -220,7 +220,7 @@ namespace Spine {
 
 					float[] uvs = GetFloatArray(map, "uvs", 1);
 					int[] triangles = GetIntArray(map, "triangles");
-					float[] vertices = GetFloatArray(map, "vertices", 1);
+					float[] vertices = GetFloatArray(map, "vertices", Scale);
 					mesh.SetMesh(vertices, triangles, uvs);
 
 					if (map.ContainsKey("color")) {
