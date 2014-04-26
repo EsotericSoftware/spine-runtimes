@@ -76,12 +76,14 @@ public class SkeletonRenderer : MonoBehaviour {
 		submeshMaterials.Clear();
 		submeshes.Clear();
 		skeleton = null;
-		
+
+		valid = false;
 		if (!skeletonDataAsset) {
 			Debug.LogError("Missing SkeletonData asset.", this);
-			valid = false;
 			return;
 		}
+		SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(false);
+		if (skeletonData == null) return;
 		valid = true;
 		
 		meshFilter = GetComponent<MeshFilter>();
@@ -89,7 +91,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		mesh2 = newMesh();
 		vertices = new Vector3[0];
 		
-		skeleton = new Skeleton(skeletonDataAsset.GetSkeletonData(false));
+		skeleton = new Skeleton(skeletonData);
 		if (initialSkinName != null && initialSkinName.Length > 0 && initialSkinName != "default")
 			skeleton.SetSkin(initialSkinName);
 	}
