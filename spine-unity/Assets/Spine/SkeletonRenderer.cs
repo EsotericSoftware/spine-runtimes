@@ -41,12 +41,13 @@ public class SkeletonRenderer : MonoBehaviour {
 	public bool valid;
 	[System.NonSerialized]
 	public Skeleton skeleton;
-
+	
 	public SkeletonDataAsset skeletonDataAsset;
 	public String initialSkinName;
 	public bool calculateNormals;
 	public bool calculateTangents;
 	public float zSpacing;
+	public bool renderMeshes;
 	
 	private MeshFilter meshFilter;
 	private Mesh mesh, mesh1, mesh2;
@@ -76,7 +77,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		submeshMaterials.Clear();
 		submeshes.Clear();
 		skeleton = null;
-		
+
 		valid = false;
 		if (!skeletonDataAsset) {
 			Debug.LogError("Missing SkeletonData asset.", this);
@@ -84,7 +85,8 @@ public class SkeletonRenderer : MonoBehaviour {
 		}
 		SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(false);
 		if (skeletonData == null) return;
-
+		valid = true;
+		
 		meshFilter = GetComponent<MeshFilter>();
 		mesh1 = newMesh();
 		mesh2 = newMesh();
@@ -107,7 +109,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		return mesh;
 	}
 	
-	public virtual void OnWillRenderObject () {
+	public virtual void LateUpdate () {
 		if (!valid) return;
 		
 		// Count vertices and submesh triangles.
@@ -117,6 +119,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		submeshMaterials.Clear();
 		List<Slot> drawOrder = skeleton.DrawOrder;
 		int drawOrderCount = drawOrder.Count;
+		bool renderMeshes = this.renderMeshes;
 		for (int i = 0; i < drawOrderCount; i++) {
 			Attachment attachment = drawOrder[i].attachment;
 			
@@ -127,23 +130,26 @@ public class SkeletonRenderer : MonoBehaviour {
 				rendererObject = ((RegionAttachment)attachment).RendererObject;
 				attachmentVertexCount = 4;
 				attachmentTriangleCount = 6;
-			} else if (attachment is MeshAttachment) {
-				MeshAttachment meshAttachment = (MeshAttachment)attachment;
-				rendererObject = meshAttachment.RendererObject;
-				attachmentVertexCount = meshAttachment.vertices.Length / 2;
-				attachmentTriangleCount = meshAttachment.triangles.Length;
-			} else if (attachment is SkinnedMeshAttachment) {
-				SkinnedMeshAttachment meshAttachment = (SkinnedMeshAttachment)attachment;
-				rendererObject = meshAttachment.RendererObject;
-				attachmentVertexCount = meshAttachment.uvs.Length / 2;
-				attachmentTriangleCount = meshAttachment.triangles.Length;
-			} else
-				continue;
+			} else {
+				if (!renderMeshes) continue;
+				if (attachment is MeshAttachment) {
+					MeshAttachment meshAttachment = (MeshAttachment)attachment;
+					rendererObject = meshAttachment.RendererObject;
+					attachmentVertexCount = meshAttachment.vertices.Length >> 1;
+					attachmentTriangleCount = meshAttachment.triangles.Length;
+				} else if (attachment is SkinnedMeshAttachment) {
+					SkinnedMeshAttachment meshAttachment = (SkinnedMeshAttachment)attachment;
+					rendererObject = meshAttachment.RendererObject;
+					attachmentVertexCount = meshAttachment.uvs.Length >> 1;
+					attachmentTriangleCount = meshAttachment.triangles.Length;
+				} else
+					continue;
+			}
 
 			// Populate submesh when material changes.
 			Material material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
 			if (lastMaterial != material && lastMaterial != null) {
-				addSubmesh(lastMaterial, submeshStartSlotIndex, i, submeshTriangleCount, submeshFirstVertex, false);
+				AddSubmesh(lastMaterial, submeshStartSlotIndex, i, submeshTriangleCount, submeshFirstVertex, false);
 				submeshTriangleCount = 0;
 				submeshFirstVertex = vertexCount;
 				submeshStartSlotIndex = i;
@@ -153,7 +159,7 @@ public class SkeletonRenderer : MonoBehaviour {
 			submeshTriangleCount += attachmentTriangleCount;
 			vertexCount += attachmentVertexCount;
 		}
-		addSubmesh(lastMaterial, submeshStartSlotIndex, drawOrderCount, submeshTriangleCount, submeshFirstVertex, true);
+		AddSubmesh(lastMaterial, submeshStartSlotIndex, drawOrderCount, submeshTriangleCount, submeshFirstVertex, true);
 		
 		// Set materials.
 		if (submeshMaterials.Count == sharedMaterials.Length)
@@ -218,43 +224,46 @@ public class SkeletonRenderer : MonoBehaviour {
 				uvs[vertexIndex + 3] = new Vector2(regionUVs[RegionAttachment.X3], regionUVs[RegionAttachment.Y3]);
 				
 				vertexIndex += 4;
-			} else if (attachment is MeshAttachment) {
-				MeshAttachment meshAttachment = (MeshAttachment)attachment;
-				int meshVertexCount = meshAttachment.vertices.Length;
-				if (tempVertices.Length < meshVertexCount) tempVertices = new float[meshVertexCount];
-				meshAttachment.ComputeWorldVertices(x, y, slot, tempVertices);
-				
-				color.a = (byte)(a * slot.a * meshAttachment.a);
-				color.r = (byte)(r * slot.r * meshAttachment.r * color.a);
-				color.g = (byte)(g * slot.g * meshAttachment.g * color.a);
-				color.b = (byte)(b * slot.b * meshAttachment.b * color.a);
-				if (slot.data.additiveBlending) color.a = 0;
-				
-				float[] meshUVs = meshAttachment.uvs;
-				float z = i * zSpacing;
-				for (int ii = 0; ii < meshVertexCount; ii += 2, vertexIndex++) {
-					vertices[vertexIndex] = new Vector3(tempVertices[ii], tempVertices[ii + 1], z);
-					colors[vertexIndex] = color;
-					uvs[vertexIndex] = new Vector2(meshUVs[ii], meshUVs[ii + 1]);
-				}
-			} else if (attachment is SkinnedMeshAttachment) {
-				SkinnedMeshAttachment meshAttachment = (SkinnedMeshAttachment)attachment;
-				int meshVertexCount = meshAttachment.uvs.Length;
-				if (tempVertices.Length < meshVertexCount) tempVertices = new float[meshVertexCount];
-				meshAttachment.ComputeWorldVertices(x, y, slot, tempVertices);
-				
-				color.a = (byte)(a * slot.a * meshAttachment.a);
-				color.r = (byte)(r * slot.r * meshAttachment.r * color.a);
-				color.g = (byte)(g * slot.g * meshAttachment.g * color.a);
-				color.b = (byte)(b * slot.b * meshAttachment.b * color.a);
-				if (slot.data.additiveBlending) color.a = 0;
-				
-				float[] meshUVs = meshAttachment.uvs;
-				float z = i * zSpacing;
-				for (int ii = 0; ii < meshVertexCount; ii += 2, vertexIndex++) {
-					vertices[vertexIndex] = new Vector3(tempVertices[ii], tempVertices[ii + 1], z);
-					colors[vertexIndex] = color;
-					uvs[vertexIndex] = new Vector2(meshUVs[ii], meshUVs[ii + 1]);
+			} else {
+				if (!renderMeshes) continue;
+				if (attachment is MeshAttachment) {
+					MeshAttachment meshAttachment = (MeshAttachment)attachment;
+					int meshVertexCount = meshAttachment.vertices.Length;
+					if (tempVertices.Length < meshVertexCount) tempVertices = new float[meshVertexCount];
+					meshAttachment.ComputeWorldVertices(x, y, slot, tempVertices);
+					
+					color.a = (byte)(a * slot.a * meshAttachment.a);
+					color.r = (byte)(r * slot.r * meshAttachment.r * color.a);
+					color.g = (byte)(g * slot.g * meshAttachment.g * color.a);
+					color.b = (byte)(b * slot.b * meshAttachment.b * color.a);
+					if (slot.data.additiveBlending) color.a = 0;
+					
+					float[] meshUVs = meshAttachment.uvs;
+					float z = i * zSpacing;
+					for (int ii = 0; ii < meshVertexCount; ii += 2, vertexIndex++) {
+						vertices[vertexIndex] = new Vector3(tempVertices[ii], tempVertices[ii + 1], z);
+						colors[vertexIndex] = color;
+						uvs[vertexIndex] = new Vector2(meshUVs[ii], meshUVs[ii + 1]);
+					}
+				} else if (attachment is SkinnedMeshAttachment) {
+					SkinnedMeshAttachment meshAttachment = (SkinnedMeshAttachment)attachment;
+					int meshVertexCount = meshAttachment.uvs.Length;
+					if (tempVertices.Length < meshVertexCount) tempVertices = new float[meshVertexCount];
+					meshAttachment.ComputeWorldVertices(x, y, slot, tempVertices);
+					
+					color.a = (byte)(a * slot.a * meshAttachment.a);
+					color.r = (byte)(r * slot.r * meshAttachment.r * color.a);
+					color.g = (byte)(g * slot.g * meshAttachment.g * color.a);
+					color.b = (byte)(b * slot.b * meshAttachment.b * color.a);
+					if (slot.data.additiveBlending) color.a = 0;
+					
+					float[] meshUVs = meshAttachment.uvs;
+					float z = i * zSpacing;
+					for (int ii = 0; ii < meshVertexCount; ii += 2, vertexIndex++) {
+						vertices[vertexIndex] = new Vector3(tempVertices[ii], tempVertices[ii + 1], z);
+						colors[vertexIndex] = color;
+						uvs[vertexIndex] = new Vector2(meshUVs[ii], meshUVs[ii + 1]);
+					}
 				}
 			}
 		}
@@ -296,7 +305,7 @@ public class SkeletonRenderer : MonoBehaviour {
 	}
 	
 	/** Stores vertices and triangles for a single material. */
-	private void addSubmesh (Material material, int startSlot, int endSlot, int triangleCount, int firstVertex, bool lastSubmesh) {
+	private void AddSubmesh (Material material, int startSlot, int endSlot, int triangleCount, int firstVertex, bool lastSubmesh) {
 		int submeshIndex = submeshMaterials.Count;
 		submeshMaterials.Add(material);
 		
@@ -316,6 +325,24 @@ public class SkeletonRenderer : MonoBehaviour {
 			submesh.triangleCount = 0;
 		}
 
+		if (!renderMeshes) {
+			// Use stored triangles if possible.
+			if (submesh.firstVertex != firstVertex || submesh.triangleCount < triangleCount) {
+				submesh.triangleCount = triangleCount;
+				submesh.firstVertex = firstVertex;
+				for (int i = 0; i < triangleCount; i += 6, firstVertex += 4) {
+					triangles[i] = firstVertex;
+					triangles[i + 1] = firstVertex + 2;
+					triangles[i + 2] = firstVertex + 1;
+					triangles[i + 3] = firstVertex + 2;
+					triangles[i + 4] = firstVertex + 3;
+					triangles[i + 5] = firstVertex + 1;
+				}
+			}
+			return;
+		}
+
+		// Store triangles.
 		List<Slot> drawOrder = skeleton.DrawOrder;
 		for (int i = startSlot, triangleIndex = 0; i < endSlot; i++) {
 			Attachment attachment = drawOrder[i].attachment;
@@ -326,11 +353,11 @@ public class SkeletonRenderer : MonoBehaviour {
 				attachmentTriangles = quadTriangles;
 			} else if (attachment is MeshAttachment) {
 				MeshAttachment meshAttachment = (MeshAttachment)attachment;
-				attachmentVertexCount = meshAttachment.vertices.Length / 2;
+				attachmentVertexCount = meshAttachment.vertices.Length >> 1;
 				attachmentTriangles = meshAttachment.triangles;
 			} else if (attachment is SkinnedMeshAttachment) {
 				SkinnedMeshAttachment meshAttachment = (SkinnedMeshAttachment)attachment;
-				attachmentVertexCount = meshAttachment.uvs.Length / 2;
+				attachmentVertexCount = meshAttachment.uvs.Length >> 1;
 				attachmentTriangles = meshAttachment.triangles;
 			} else
 				continue;
@@ -366,4 +393,5 @@ public class SkeletonRenderer : MonoBehaviour {
 class Submesh {
 	public int[] triangles = new int[0];
 	public int triangleCount;
+	public int firstVertex = -1;
 }

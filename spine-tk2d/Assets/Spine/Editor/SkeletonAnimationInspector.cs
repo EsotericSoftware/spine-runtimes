@@ -33,27 +33,24 @@ using UnityEditor;
 using UnityEngine;
 
 [CustomEditor(typeof(SkeletonAnimation))]
-public class SkeletonAnimationInspector : Editor {
-	private SerializedProperty skeletonDataAsset, initialSkinName, timeScale, normals, tangents;
-	private SerializedProperty animationName, loop;
+public class SkeletonAnimationInspector : SkeletonRendererInspector {
+	protected SerializedProperty animationName, loop, timeScale;
 
-	void OnEnable () {
-		skeletonDataAsset = serializedObject.FindProperty("skeletonDataAsset");
+	protected override void OnEnable () {
+		base.OnEnable();
 		animationName = serializedObject.FindProperty("_animationName");
 		loop = serializedObject.FindProperty("loop");
-		initialSkinName = serializedObject.FindProperty("initialSkinName");
 		timeScale = serializedObject.FindProperty("timeScale");
-		normals = serializedObject.FindProperty("calculateNormals");
-		tangents = serializedObject.FindProperty("calculateTangents");
 	}
 
-	override public void OnInspectorGUI () {
-		serializedObject.Update();
+	protected override void gui () {
+		base.gui();
+
 		SkeletonAnimation component = (SkeletonAnimation)target;
 
 		EditorGUILayout.PropertyField(skeletonDataAsset);
 		
-		if (component.skeleton != null) {
+		if (component.valid) {
 			// Initial skin name.
 			String[] skins = new String[component.skeleton.Data.Skins.Count];
 			int skinIndex = 0;
@@ -98,17 +95,5 @@ public class SkeletonAnimationInspector : Editor {
 		EditorGUILayout.LabelField("Loop");
 		loop.boolValue = EditorGUILayout.Toggle(loop.boolValue);
 		EditorGUILayout.EndHorizontal();
-
-		EditorGUILayout.PropertyField(timeScale);
-		EditorGUILayout.PropertyField(normals);
-		EditorGUILayout.PropertyField(tangents);
-		
-		if (serializedObject.ApplyModifiedProperties() ||
-			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
-		) {
-			if (!Application.isPlaying) {
-				component.Reset();
-			}
-		}
 	}
 }

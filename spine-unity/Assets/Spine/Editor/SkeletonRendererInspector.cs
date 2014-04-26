@@ -34,23 +34,22 @@ using UnityEngine;
 
 [CustomEditor(typeof(SkeletonRenderer))]
 public class SkeletonRendererInspector : Editor {
-	private SerializedProperty skeletonDataAsset, initialSkinName, timeScale, normals, tangents;
+	protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes;
 
-	void OnEnable () {
+	protected virtual void OnEnable () {
 		skeletonDataAsset = serializedObject.FindProperty("skeletonDataAsset");
 		initialSkinName = serializedObject.FindProperty("initialSkinName");
-		timeScale = serializedObject.FindProperty("timeScale");
 		normals = serializedObject.FindProperty("calculateNormals");
 		tangents = serializedObject.FindProperty("calculateTangents");
+		meshes = serializedObject.FindProperty("renderMeshes");
 	}
 
-	override public void OnInspectorGUI () {
-		serializedObject.Update();
+	protected virtual void gui () {
 		SkeletonRenderer component = (SkeletonRenderer)target;
 
 		EditorGUILayout.PropertyField(skeletonDataAsset);
 		
-		if (component.skeleton != null) {
+		if (component.valid) {
 			// Initial skin name.
 			String[] skins = new String[component.skeleton.Data.Skins.Count];
 			int skinIndex = 0;
@@ -60,26 +59,28 @@ public class SkeletonRendererInspector : Editor {
 				if (name == initialSkinName.stringValue)
 					skinIndex = i;
 			}
-		
+			
 			EditorGUILayout.BeginHorizontal();
 			EditorGUILayout.LabelField("Initial Skin");
 			EditorGUIUtility.LookLikeControls();
 			skinIndex = EditorGUILayout.Popup(skinIndex, skins);
 			EditorGUILayout.EndHorizontal();
-		
+			
 			initialSkinName.stringValue = skins[skinIndex];
 		}
-
-		EditorGUILayout.PropertyField(timeScale);
+		
+		EditorGUILayout.PropertyField(meshes);
 		EditorGUILayout.PropertyField(normals);
 		EditorGUILayout.PropertyField(tangents);
-		
+	}
+
+	override public void OnInspectorGUI () {
+		serializedObject.Update();
+		gui();
 		if (serializedObject.ApplyModifiedProperties() ||
 			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
 		) {
-			if (!Application.isPlaying) {
-				component.Reset();
-			}
+			if (!Application.isPlaying) ((SkeletonRenderer)target).Reset();
 		}
 	}
 }
