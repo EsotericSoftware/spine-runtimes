@@ -38,7 +38,9 @@ using Spine;
 [ExecuteInEditMode]
 [AddComponentMenu("Spine/BoneComponent")]
 public class BoneComponent : MonoBehaviour {
+	[System.NonSerialized]
 	public bool valid;
+
 	public SkeletonRenderer skeletonRenderer;
 	public Bone bone;
 

@@ -37,9 +37,11 @@ using Spine;
 /// <summary>Renders a skeleton.</summary>
 [ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class SkeletonRenderer : MonoBehaviour {
+	[System.NonSerialized]
 	public bool valid;
+	[System.NonSerialized]
 	public Skeleton skeleton;
-	
+
 	public SkeletonDataAsset skeletonDataAsset;
 	public String initialSkinName;
 	public bool calculateNormals;
