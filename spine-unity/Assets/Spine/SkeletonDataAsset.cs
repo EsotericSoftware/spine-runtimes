@@ -73,7 +73,6 @@ public class SkeletonDataAsset : ScriptableObject {
 		if (skeletonData != null)
 			return skeletonData;
 
-		atlas.FlipV();
 		SkeletonJson json = new SkeletonJson(atlas);
 		json.Scale = scale;
 		try {
