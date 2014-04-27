@@ -278,6 +278,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		mesh.subMeshCount = submeshCount;
 		for (int i = 0; i < submeshCount; ++i)
 			mesh.SetTriangles(submeshes[i].triangles, i);
+		mesh.RecalculateBounds();
 
 		if (newTriangles && calculateNormals) {
 			Vector3[] normals = new Vector3[vertexCount];
