@@ -87,17 +87,17 @@ void spAnimationState_dispose (spAnimationState* self) {
 
 void spAnimationState_update (spAnimationState* self, float delta) {
 	int i;
-	float trackDelta;
+	float previousDelta;
 	delta *= self->timeScale;
 	for (i = 0; i < self->trackCount; i++) {
 		spTrackEntry* current = self->tracks[i];
 		if (!current) continue;
 
-		trackDelta = delta * current->timeScale;
-		current->time += trackDelta;
+		current->time += delta * current->timeScale;
 		if (current->previous) {
-			current->previous->time += trackDelta;
-			current->mixTime += trackDelta;
+			previousDelta = delta * current->previous->timeScale;
+			current->previous->time += previousDelta;
+			current->mixTime += previousDelta;
 		}
 
 		if (current->next) {
