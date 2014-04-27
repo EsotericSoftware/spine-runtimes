@@ -155,14 +155,14 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 		for (ii = 0; ii < eventCount; ii++) {
 			spEvent* event = internal->events[ii];
 			if (current->listener) {
-				current->listener(self, i, ANIMATION_EVENT, event, 0);
+				current->listener(self, i, SP_ANIMATION_EVENT, event, 0);
 				if (self->tracks[i] != current) {
 					entryChanged = 1;
 					break;
 				}
 			}
 			if (self->listener) {
-				self->listener(self, i, ANIMATION_EVENT, event, 0);
+				self->listener(self, i, SP_ANIMATION_EVENT, event, 0);
 				if (self->tracks[i] != current) {
 					entryChanged = 1;
 					break;
@@ -176,11 +176,11 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 				: (current->lastTime < current->endTime && time >= current->endTime)) {
 			int count = (int)(time / current->endTime);
 			if (current->listener) {
-				current->listener(self, i, ANIMATION_COMPLETE, 0, count);
+				current->listener(self, i, SP_ANIMATION_COMPLETE, 0, count);
 				if (self->tracks[i] != current) continue;
 			}
 			if (self->listener) {
-				self->listener(self, i, ANIMATION_COMPLETE, 0, count);
+				self->listener(self, i, SP_ANIMATION_COMPLETE, 0, count);
 				if (self->tracks[i] != current) continue;
 			}
 		}
@@ -202,8 +202,8 @@ void spAnimationState_clearTrack (spAnimationState* self, int trackIndex) {
 	current = self->tracks[trackIndex];
 	if (!current) return;
 
-	if (current->listener) current->listener(self, trackIndex, ANIMATION_END, 0, 0);
-	if (self->listener) self->listener(self, trackIndex, ANIMATION_END, 0, 0);
+	if (current->listener) current->listener(self, trackIndex, SP_ANIMATION_END, 0, 0);
+	if (self->listener) self->listener(self, trackIndex, SP_ANIMATION_END, 0, 0);
 
 	self->tracks[trackIndex] = 0;
 
@@ -228,8 +228,8 @@ void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEnt
 		spTrackEntry* previous = current->previous;
 		current->previous = 0;
 
-		if (current->listener) current->listener(self, index, ANIMATION_END, 0, 0);
-		if (self->listener) self->listener(self, index, ANIMATION_END, 0, 0);
+		if (current->listener) current->listener(self, index, SP_ANIMATION_END, 0, 0);
+		if (self->listener) self->listener(self, index, SP_ANIMATION_END, 0, 0);
 
 		entry->mixDuration = spAnimationStateData_getMix(self->data, current->animation, entry->animation);
 		if (entry->mixDuration > 0) {
@@ -249,10 +249,10 @@ void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEnt
 	self->tracks[index] = entry;
 
 	if (entry->listener) {
-		entry->listener(self, index, ANIMATION_START, 0, 0);
+		entry->listener(self, index, SP_ANIMATION_START, 0, 0);
 		if (self->tracks[index] != entry) return;
 	}
-	if (self->listener) self->listener(self, index, ANIMATION_START, 0, 0);
+	if (self->listener) self->listener(self, index, SP_ANIMATION_START, 0, 0);
 }
 
 spTrackEntry* spAnimationState_setAnimationByName (spAnimationState* self, int trackIndex, const char* animationName,

@@ -420,9 +420,9 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 					const char* typeString = Json_getString(attachmentMap, "type", "region");
 					spAttachmentType type;
 					if (strcmp(typeString, "region") == 0)
-						type = ATTACHMENT_REGION;
+						type = SP_ATTACHMENT_REGION;
 					else if (strcmp(typeString, "boundingbox") == 0)
-						type = ATTACHMENT_BOUNDING_BOX;
+						type = SP_ATTACHMENT_BOUNDING_BOX;
 					else {
 						spSkeletonData_dispose(skeletonData);
 						_spSkeletonJson_setError(self, root, "Unknown attachment type: ", typeString);
@@ -440,7 +440,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 					}
 
 					switch (attachment->type) {
-					case ATTACHMENT_REGION: {
+					case SP_ATTACHMENT_REGION: {
 						spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;
 						regionAttachment->x = Json_getFloat(attachmentMap, "x", 0) * self->scale;
 						regionAttachment->y = Json_getFloat(attachmentMap, "y", 0) * self->scale;
@@ -461,7 +461,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 						spRegionAttachment_updateOffset(regionAttachment);
 						break;
 					}
-					case ATTACHMENT_BOUNDING_BOX: {
+					case SP_ATTACHMENT_BOUNDING_BOX: {
 						spBoundingBoxAttachment* box = (spBoundingBoxAttachment*)attachment;
 						Json* verticesArray = Json_getItem(attachmentMap, "vertices");
 						Json* vertex;

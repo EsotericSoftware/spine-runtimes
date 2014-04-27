@@ -35,7 +35,7 @@ spAttachment* _spAtlasAttachmentLoader_newAttachment (spAttachmentLoader* loader
 		const char* name, const char* path) {
 	spAtlasAttachmentLoader* self = SUB_CAST(spAtlasAttachmentLoader, loader);
 	switch (type) {
-	case ATTACHMENT_REGION: {
+	case SP_ATTACHMENT_REGION: {
 		spRegionAttachment* attachment;
 		spAtlasRegion* region = spAtlas_findRegion(self->atlas, name);
 		if (!region) {
@@ -53,7 +53,7 @@ spAttachment* _spAtlasAttachmentLoader_newAttachment (spAttachmentLoader* loader
 		attachment->regionOriginalHeight = region->originalHeight;
 		return SUPER(attachment);
 	}
-	case ATTACHMENT_BOUNDING_BOX:
+	case SP_ATTACHMENT_BOUNDING_BOX:
 		return SUPER(spBoundingBoxAttachment_create(name));
 	default:
 		_spAttachmentLoader_setUnknownTypeError(loader, type);

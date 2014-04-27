@@ -75,7 +75,13 @@ typedef spAnimation Animation;
 /**/
 
 typedef enum {
-	TIMELINE_SCALE, TIMELINE_ROTATE, TIMELINE_TRANLATE, TIMELINE_COLOR, TIMELINE_ATTACHMENT, TIMELINE_EVENT, TIMELINE_DRAWORDER
+	SP_TIMELINE_SCALE,
+	SP_TIMELINE_ROTATE,
+	SP_TIMELINE_TRANSLATE,
+	SP_TIMELINE_COLOR,
+	SP_TIMELINE_ATTACHMENT,
+	SP_TIMELINE_EVENT,
+	SP_TIMELINE_DRAWORDER
 } spTimelineType;
 
 struct spTimeline {
@@ -90,6 +96,13 @@ void spTimeline_apply (const spTimeline* self, struct spSkeleton* skeleton, floa
 
 #ifdef SPINE_SHORT_NAMES
 typedef spTimeline Timeline;
+#define TIMELINE_SCALE SP_TIMELINE_SCALE
+#define TIMELINE_ROTATE SP_TIMELINE_ROTATE
+#define TIMELINE_TRANSLATE SP_TIMELINE_TRANSLATE
+#define TIMELINE_COLOR SP_TIMELINE_COLOR
+#define TIMELINE_ATTACHMENT SP_TIMELINE_ATTACHMENT
+#define TIMELINE_EVENT SP_TIMELINE_EVENT
+#define TIMELINE_DRAWORDER SP_TIMELINE_DRAWORDER
 #define Timeline_dispose(...) spTimeline_dispose(__VA_ARGS__)
 #define Timeline_apply(...) spTimeline_apply(__VA_ARGS__)
 #endif
