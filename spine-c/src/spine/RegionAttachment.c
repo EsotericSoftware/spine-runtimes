@@ -43,6 +43,10 @@ spRegionAttachment* spRegionAttachment_create (const char* name) {
 	spRegionAttachment* self = NEW(spRegionAttachment);
 	self->scaleX = 1;
 	self->scaleY = 1;
+	self->r = 1;
+	self->g = 1;
+	self->b = 1;
+	self->a = 1;
 	_spAttachment_init(SUPER(self), name, ATTACHMENT_REGION, _spRegionAttachment_dispose);
 	return self;
 }

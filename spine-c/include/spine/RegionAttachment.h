@@ -47,6 +47,7 @@ typedef struct spRegionAttachment spRegionAttachment;
 struct spRegionAttachment {
 	spAttachment super;
 	float x, y, scaleX, scaleY, rotation, width, height;
+	float r, g, b, a;
 
 	void* rendererObject;
 	int regionOffsetX, regionOffsetY; /* Pixels stripped from the bottom left, unrotated. */

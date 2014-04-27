@@ -38,7 +38,7 @@ extern "C" {
 struct spSlot;
 
 typedef enum {
-	ATTACHMENT_REGION, ATTACHMENT_REGION_SEQUENCE, ATTACHMENT_BOUNDING_BOX
+	ATTACHMENT_REGION, ATTACHMENT_BOUNDING_BOX
 } spAttachmentType;
 
 typedef struct spAttachment spAttachment;

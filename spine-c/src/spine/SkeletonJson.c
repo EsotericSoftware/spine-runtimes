@@ -414,6 +414,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 					spAttachment* attachment;
 					const char* skinAttachmentName = attachmentMap->name;
 					const char* attachmentName = Json_getString(attachmentMap, "name", skinAttachmentName);
+					const char* color;
 
 					const char* typeString = Json_getString(attachmentMap, "type", "region");
 					spAttachmentType type;
@@ -421,8 +422,6 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 						type = ATTACHMENT_REGION;
 					else if (strcmp(typeString, "boundingbox") == 0)
 						type = ATTACHMENT_BOUNDING_BOX;
-					else if (strcmp(typeString, "regionsequence") == 0)
-						type = ATTACHMENT_REGION_SEQUENCE;
 					else {
 						spSkeletonData_dispose(skeletonData);
 						_spSkeletonJson_setError(self, root, "Unknown attachment type: ", typeString);
@@ -440,8 +439,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 					}
 
 					switch (attachment->type) {
-					case ATTACHMENT_REGION:
-					case ATTACHMENT_REGION_SEQUENCE: {
+					case ATTACHMENT_REGION: {
 						spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;
 						regionAttachment->x = Json_getFloat(attachmentMap, "x", 0) * self->scale;
 						regionAttachment->y = Json_getFloat(attachmentMap, "y", 0) * self->scale;
@@ -450,6 +448,15 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 						regionAttachment->rotation = Json_getFloat(attachmentMap, "rotation", 0);
 						regionAttachment->width = Json_getFloat(attachmentMap, "width", 32) * self->scale;
 						regionAttachment->height = Json_getFloat(attachmentMap, "height", 32) * self->scale;
+
+						color = Json_getString(slotMap, "color", 0);
+						if (color) {
+							regionAttachment->r = toColor(color, 0);
+							regionAttachment->g = toColor(color, 1);
+							regionAttachment->b = toColor(color, 2);
+							regionAttachment->a = toColor(color, 3);
+						}
+
 						spRegionAttachment_updateOffset(regionAttachment);
 						break;
 					}
