@@ -44,10 +44,9 @@ public class SkeletonRenderer : MonoBehaviour {
 	
 	public SkeletonDataAsset skeletonDataAsset;
 	public String initialSkinName;
-	public bool calculateNormals;
-	public bool calculateTangents;
+	public bool calculateNormals, calculateTangents;
 	public float zSpacing;
-	public bool renderMeshes;
+	public bool renderMeshes = true, immutableTriangles;
 	
 	private MeshFilter meshFilter;
 	private Mesh mesh, mesh1, mesh2;
@@ -60,8 +59,7 @@ public class SkeletonRenderer : MonoBehaviour {
 	private Material[] sharedMaterials = new Material[0];
 	private readonly List<Material> submeshMaterials = new List<Material>();
 	private readonly List<Submesh> submeshes = new List<Submesh>();
-	private readonly int[] quadTriangles = {0, 2, 1, 2, 3, 1};
-	
+
 	public virtual void Reset () {
 		if (meshFilter != null) meshFilter.sharedMesh = null;
 		if (mesh != null) DestroyImmediate(mesh);
@@ -280,8 +278,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		mesh.subMeshCount = submeshCount;
 		for (int i = 0; i < submeshCount; ++i)
 			mesh.SetTriangles(submeshes[i].triangles, i);
-		mesh.RecalculateBounds();
-		
+
 		if (newTriangles && calculateNormals) {
 			Vector3[] normals = new Vector3[vertexCount];
 			Vector3 normal = new Vector3(0, 0, -1);
@@ -309,7 +306,11 @@ public class SkeletonRenderer : MonoBehaviour {
 		int submeshIndex = submeshMaterials.Count;
 		submeshMaterials.Add(material);
 		
-		if (submeshes.Count <= submeshIndex) submeshes.Add(new Submesh());
+		if (submeshes.Count <= submeshIndex)
+			submeshes.Add(new Submesh());
+		else if (immutableTriangles)
+			return;
+
 		Submesh submesh = submeshes[submeshIndex];
 		
 		int[] triangles = submesh.triangles;
@@ -346,12 +347,20 @@ public class SkeletonRenderer : MonoBehaviour {
 		List<Slot> drawOrder = skeleton.DrawOrder;
 		for (int i = startSlot, triangleIndex = 0; i < endSlot; i++) {
 			Attachment attachment = drawOrder[i].attachment;
+			if (attachment is RegionAttachment) {
+				triangles[triangleIndex] = firstVertex;
+				triangles[triangleIndex + 1] = firstVertex + 2;
+				triangles[triangleIndex + 2] = firstVertex + 1;
+				triangles[triangleIndex + 3] = firstVertex + 2;
+				triangles[triangleIndex + 4] = firstVertex + 3;
+				triangles[triangleIndex + 5] = firstVertex + 1;
+				triangleIndex += 6;
+				firstVertex += 4;
+				continue;
+			}
 			int[] attachmentTriangles;
 			int attachmentVertexCount;
-			if (attachment is RegionAttachment) {
-				attachmentVertexCount = 4;
-				attachmentTriangles = quadTriangles;
-			} else if (attachment is MeshAttachment) {
+			if (attachment is MeshAttachment) {
 				MeshAttachment meshAttachment = (MeshAttachment)attachment;
 				attachmentVertexCount = meshAttachment.vertices.Length >> 1;
 				attachmentTriangles = meshAttachment.triangles;
@@ -376,8 +385,8 @@ public class SkeletonRenderer : MonoBehaviour {
 		Vector3 min = new Vector3(float.MaxValue, float.MaxValue, 0f);
 		Vector3 max = new Vector3(float.MinValue, float.MinValue, 0f);
 		foreach (Vector3 vert in vertices) {
-			min = Vector3.Min (min, vert);
-			max = Vector3.Max (max, vert);
+			min = Vector3.Min(min, vert);
+			max = Vector3.Max(max, vert);
 		}
 		float width = max.x - min.x;
 		float height = max.y - min.y;

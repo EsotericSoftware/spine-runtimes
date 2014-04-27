@@ -47,29 +47,10 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 		base.gui();
 
 		SkeletonAnimation component = (SkeletonAnimation)target;
+		if (!component.valid) return;
 
-		EditorGUILayout.PropertyField(skeletonDataAsset);
-		
-		if (component.valid) {
-			// Initial skin name.
-			String[] skins = new String[component.skeleton.Data.Skins.Count];
-			int skinIndex = 0;
-			for (int i = 0; i < skins.Length; i++) {
-				String name = component.skeleton.Data.Skins[i].Name;
-				skins[i] = name;
-				if (name == initialSkinName.stringValue)
-					skinIndex = i;
-			}
-		
-			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.LabelField("Initial Skin");
-			EditorGUIUtility.LookLikeControls();
-			skinIndex = EditorGUILayout.Popup(skinIndex, skins);
-			EditorGUILayout.EndHorizontal();
-		
-			initialSkinName.stringValue = skins[skinIndex];
-
-			// Animation name.
+		// Animation name.
+		{
 			String[] animations = new String[component.skeleton.Data.Animations.Count + 1];
 			animations[0] = "<None>";
 			int animationIndex = 0;
@@ -81,19 +62,15 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 			}
 		
 			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.LabelField("Animation");
-			EditorGUIUtility.LookLikeControls();
+			EditorGUILayout.LabelField("Animation", GUILayout.Width(EditorGUIUtility.labelWidth));
 			animationIndex = EditorGUILayout.Popup(animationIndex, animations);
 			EditorGUILayout.EndHorizontal();
 
-			component.animationName = animationIndex == 0 ? null : animations[animationIndex];
-			animationName.stringValue = component.animationName;
+			String selectedAnimationName = animationIndex == 0 ? null : animations[animationIndex];
+			component.AnimationName = selectedAnimationName;
+			animationName.stringValue = selectedAnimationName;
 		}
 
-		// Animation loop.
-		EditorGUILayout.BeginHorizontal();
-		EditorGUILayout.LabelField("Loop");
-		loop.boolValue = EditorGUILayout.Toggle(loop.boolValue);
-		EditorGUILayout.EndHorizontal();
+		EditorGUILayout.PropertyField(loop);
 	}
 }

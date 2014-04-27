@@ -44,8 +44,9 @@ public class SkeletonAnimation : SkeletonRenderer {
 	public delegate void UpdateBonesDelegate(SkeletonAnimation skeleton);
 	public UpdateBonesDelegate UpdateBones;
 
-	public String _animationName;
-	public String animationName {
+	[SerializeField]
+	private String _animationName;
+	public String AnimationName {
 		get {
 			TrackEntry entry = state.GetCurrent(0);
 			return entry == null ? null : entry.Animation.Name;

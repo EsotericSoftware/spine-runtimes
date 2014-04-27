@@ -34,7 +34,7 @@ using UnityEngine;
 
 [CustomEditor(typeof(SkeletonRenderer))]
 public class SkeletonRendererInspector : Editor {
-	protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes;
+	protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles;
 
 	protected virtual void OnEnable () {
 		skeletonDataAsset = serializedObject.FindProperty("skeletonDataAsset");
@@ -42,15 +42,29 @@ public class SkeletonRendererInspector : Editor {
 		normals = serializedObject.FindProperty("calculateNormals");
 		tangents = serializedObject.FindProperty("calculateTangents");
 		meshes = serializedObject.FindProperty("renderMeshes");
+		immutableTriangles = serializedObject.FindProperty("immutableTriangles");
 	}
 
 	protected virtual void gui () {
-		SkeletonRenderer component = (SkeletonRenderer)target;
-
 		EditorGUILayout.PropertyField(skeletonDataAsset);
-		
-		if (component.valid) {
-			// Initial skin name.
+
+		SkeletonRenderer component = (SkeletonRenderer)target;
+		if (!component.valid) {
+			component.Reset();
+			component.LateUpdate();
+			if (!component.valid) {
+				EditorGUILayout.BeginHorizontal();
+				EditorGUILayout.Space();
+				if (GUILayout.Button("Refresh")) component.Reset();
+				EditorGUILayout.Space();
+				EditorGUILayout.EndHorizontal();
+				EditorGUILayout.Space();
+				return;
+			}
+		}
+
+		// Initial skin name.
+		{
 			String[] skins = new String[component.skeleton.Data.Skins.Count];
 			int skinIndex = 0;
 			for (int i = 0; i < skins.Length; i++) {
@@ -61,15 +75,17 @@ public class SkeletonRendererInspector : Editor {
 			}
 			
 			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.LabelField("Initial Skin");
-			EditorGUIUtility.LookLikeControls();
+			EditorGUILayout.LabelField("Initial Skin", GUILayout.Width(EditorGUIUtility.labelWidth));
 			skinIndex = EditorGUILayout.Popup(skinIndex, skins);
 			EditorGUILayout.EndHorizontal();
 			
 			initialSkinName.stringValue = skins[skinIndex];
 		}
 		
-		EditorGUILayout.PropertyField(meshes);
+		EditorGUILayout.PropertyField(meshes,
+			new GUIContent("Render Meshes", "Disable to optimize rendering for skeletons that don't use meshes"));
+		EditorGUILayout.PropertyField(immutableTriangles,
+			new GUIContent("Immutable Triangles", "Enable to optimize rendering for skeletons that never change attachment visbility"));
 		EditorGUILayout.PropertyField(normals);
 		EditorGUILayout.PropertyField(tangents);
 	}
