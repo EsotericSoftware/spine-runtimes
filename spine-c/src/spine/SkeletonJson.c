@@ -414,6 +414,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 					spAttachment* attachment;
 					const char* skinAttachmentName = attachmentMap->name;
 					const char* attachmentName = Json_getString(attachmentMap, "name", skinAttachmentName);
+					const char* path = Json_getString(attachmentMap, "path", 0);
 					const char* color;
 
 					const char* typeString = Json_getString(attachmentMap, "type", "region");
@@ -428,7 +429,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 						return 0;
 					}
 
-					attachment = spAttachmentLoader_newAttachment(self->attachmentLoader, skin, type, attachmentName);
+					attachment = spAttachmentLoader_newAttachment(self->attachmentLoader, skin, type, attachmentName, path);
 					if (!attachment) {
 						if (self->attachmentLoader->error1) {
 							spSkeletonData_dispose(skeletonData);
@@ -449,7 +450,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 						regionAttachment->width = Json_getFloat(attachmentMap, "width", 32) * self->scale;
 						regionAttachment->height = Json_getFloat(attachmentMap, "height", 32) * self->scale;
 
-						color = Json_getString(slotMap, "color", 0);
+						color = Json_getString(attachmentMap, "color", 0);
 						if (color) {
 							regionAttachment->r = toColor(color, 0);
 							regionAttachment->g = toColor(color, 1);

@@ -32,7 +32,7 @@
 #include <spine/extension.h>
 
 spAttachment* _spAtlasAttachmentLoader_newAttachment (spAttachmentLoader* loader, spSkin* skin, spAttachmentType type,
-		const char* name) {
+		const char* name, const char* path) {
 	spAtlasAttachmentLoader* self = SUB_CAST(spAtlasAttachmentLoader, loader);
 	switch (type) {
 	case ATTACHMENT_REGION: {
