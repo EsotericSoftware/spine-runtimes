@@ -406,29 +406,29 @@ void _spColorTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 
 	slot = skeleton->slots[self->slotIndex];
 
-	if (time >= self->frames[self->framesLength - 5]) { /* Time is after last frame. */
+	if (time >= self->frames[self->framesLength - 5]) {
+		/* Time is after last frame. */
 		int i = self->framesLength - 1;
-		slot->r = self->frames[i - 3];
-		slot->g = self->frames[i - 2];
-		slot->b = self->frames[i - 1];
-		slot->a = self->frames[i];
-		return;
+		r = self->frames[i - 3];
+		g = self->frames[i - 2];
+		b = self->frames[i - 1];
+		a = self->frames[i];
+	} else {
+		/* Interpolate between the last frame and the current frame. */
+		frameIndex = binarySearch(self->frames, self->framesLength, time, 5);
+		lastFrameR = self->frames[frameIndex - 4];
+		lastFrameG = self->frames[frameIndex - 3];
+		lastFrameB = self->frames[frameIndex - 2];
+		lastFrameA = self->frames[frameIndex - 1];
+		frameTime = self->frames[frameIndex];
+		percent = 1 - (time - frameTime) / (self->frames[frameIndex + COLOR_LAST_FRAME_TIME] - frameTime);
+		percent = spCurveTimeline_getCurvePercent(SUPER(self), frameIndex / 5 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
+
+		r = lastFrameR + (self->frames[frameIndex + COLOR_FRAME_R] - lastFrameR) * percent;
+		g = lastFrameG + (self->frames[frameIndex + COLOR_FRAME_G] - lastFrameG) * percent;
+		b = lastFrameB + (self->frames[frameIndex + COLOR_FRAME_B] - lastFrameB) * percent;
+		a = lastFrameA + (self->frames[frameIndex + COLOR_FRAME_A] - lastFrameA) * percent;
 	}
-
-	/* Interpolate between the last frame and the current frame. */
-	frameIndex = binarySearch(self->frames, self->framesLength, time, 5);
-	lastFrameR = self->frames[frameIndex - 4];
-	lastFrameG = self->frames[frameIndex - 3];
-	lastFrameB = self->frames[frameIndex - 2];
-	lastFrameA = self->frames[frameIndex - 1];
-	frameTime = self->frames[frameIndex];
-	percent = 1 - (time - frameTime) / (self->frames[frameIndex + COLOR_LAST_FRAME_TIME] - frameTime);
-	percent = spCurveTimeline_getCurvePercent(SUPER(self), frameIndex / 5 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
-
-	r = lastFrameR + (self->frames[frameIndex + COLOR_FRAME_R] - lastFrameR) * percent;
-	g = lastFrameG + (self->frames[frameIndex + COLOR_FRAME_G] - lastFrameG) * percent;
-	b = lastFrameB + (self->frames[frameIndex + COLOR_FRAME_B] - lastFrameB) * percent;
-	a = lastFrameA + (self->frames[frameIndex + COLOR_FRAME_A] - lastFrameA) * percent;
 	if (alpha < 1) {
 		slot->r += (r - slot->r) * alpha;
 		slot->g += (g - slot->g) * alpha;
