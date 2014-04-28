@@ -51,6 +51,8 @@ public:
 	void update (float deltaTime);
 
 	virtual void draw (sf::RenderTarget& target, sf::RenderStates states) const;
+private:
+	float* worldVertices;
 };
 
 } /* namespace spine */

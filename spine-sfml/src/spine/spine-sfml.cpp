@@ -36,24 +36,28 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 
+#ifndef SPINE_MESH_VERTEX_COUNT_MAX
+#define SPINE_MESH_VERTEX_COUNT_MAX 200
+#endif
+
 using namespace sf;
 
-void _AtlasPage_createTexture (AtlasPage* self, const char* path) {
-	Texture* texture = new Texture();
-	if (!texture->loadFromFile(path)) return;
-	texture->setSmooth(true);
-	self->rendererObject = texture;
-	Vector2u size = texture->getSize();
-	self->width = size.x;
-	self->height = size.y;
+void _AtlasPage_createTexture (AtlasPage* self, const char* path){
+Texture* texture = new Texture();
+if (!texture->loadFromFile(path)) return;
+texture->setSmooth(true);
+self->rendererObject = texture;
+Vector2u size = texture->getSize();
+self->width = size.x;
+self->height = size.y;
 }
 
-void _AtlasPage_disposeTexture (AtlasPage* self) {
-	delete (Texture*)self->rendererObject;
+void _AtlasPage_disposeTexture (AtlasPage* self){
+delete (Texture*)self->rendererObject;
 }
 
-char* _Util_readFile (const char* path, int* length) {
-	return _readFile(path, length);
+char* _Util_readFile (const char* path, int* length){
+return _readFile(path, length);
 }
 
 /**/
@@ -62,9 +66,10 @@ namespace spine {
 
 SkeletonDrawable::SkeletonDrawable (SkeletonData* skeletonData, AnimationStateData* stateData) :
 				timeScale(1),
-				vertexArray(new VertexArray(Quads, skeletonData->boneCount * 4)) {
+				vertexArray(new VertexArray(Triangles, skeletonData->boneCount * 4)),
+				worldVertices(0) {
 	Bone_setYDown(true);
-
+	worldVertices = MALLOC(float, SPINE_MESH_VERTEX_COUNT_MAX);
 	skeleton = Skeleton_create(skeletonData);
 	state = AnimationState_create(stateData);
 }
@@ -86,71 +91,103 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 	vertexArray->clear();
 	states.blendMode = BlendAlpha;
 
-	float worldVertices[8];
+	sf::Vertex vertices[4];
+	sf::Vertex vertex;
 	for (int i = 0; i < skeleton->slotCount; ++i) {
 		Slot* slot = skeleton->drawOrder[i];
 		Attachment* attachment = slot->attachment;
-		if (!attachment || attachment->type != ATTACHMENT_REGION) continue;
-		RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
+		if (!attachment) continue;
+		Texture* texture = 0;
+		if (attachment->type == ATTACHMENT_REGION) {
+			RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
+			texture = (Texture*)((AtlasRegion*)regionAttachment->rendererObject)->page->rendererObject;
+			RegionAttachment_computeWorldVertices(regionAttachment, slot->skeleton->x, slot->skeleton->y, slot->bone, worldVertices);
 
-		BlendMode blend = slot->data->additiveBlending ? BlendAdd : BlendAlpha;
-		if (states.blendMode != blend) {
-			target.draw(*vertexArray, states);
-			vertexArray->clear();
-			states.blendMode = blend;
+			Uint8 r = skeleton->r * slot->r * 255;
+			Uint8 g = skeleton->g * slot->g * 255;
+			Uint8 b = skeleton->b * slot->b * 255;
+			Uint8 a = skeleton->a * slot->a * 255;
+
+			Vector2u size = texture->getSize();
+			vertices[0].color.r = r;
+			vertices[0].color.g = g;
+			vertices[0].color.b = b;
+			vertices[0].color.a = a;
+			vertices[0].position.x = worldVertices[VERTEX_X1];
+			vertices[0].position.y = worldVertices[VERTEX_Y1];
+			vertices[0].texCoords.x = regionAttachment->uvs[VERTEX_X1] * size.x;
+			vertices[0].texCoords.y = regionAttachment->uvs[VERTEX_Y1] * size.y;
+
+			vertices[1].color.r = r;
+			vertices[1].color.g = g;
+			vertices[1].color.b = b;
+			vertices[1].color.a = a;
+			vertices[1].position.x = worldVertices[VERTEX_X2];
+			vertices[1].position.y = worldVertices[VERTEX_Y2];
+			vertices[1].texCoords.x = regionAttachment->uvs[VERTEX_X2] * size.x;
+			vertices[1].texCoords.y = regionAttachment->uvs[VERTEX_Y2] * size.y;
+
+			vertices[2].color.r = r;
+			vertices[2].color.g = g;
+			vertices[2].color.b = b;
+			vertices[2].color.a = a;
+			vertices[2].position.x = worldVertices[VERTEX_X3];
+			vertices[2].position.y = worldVertices[VERTEX_Y3];
+			vertices[2].texCoords.x = regionAttachment->uvs[VERTEX_X3] * size.x;
+			vertices[2].texCoords.y = regionAttachment->uvs[VERTEX_Y3] * size.y;
+
+			vertices[3].color.r = r;
+			vertices[3].color.g = g;
+			vertices[3].color.b = b;
+			vertices[3].color.a = a;
+			vertices[3].position.x = worldVertices[VERTEX_X4];
+			vertices[3].position.y = worldVertices[VERTEX_Y4];
+			vertices[3].texCoords.x = regionAttachment->uvs[VERTEX_X4] * size.x;
+			vertices[3].texCoords.y = regionAttachment->uvs[VERTEX_Y4] * size.y;
+
+			vertexArray->append(vertices[0]);
+			vertexArray->append(vertices[1]);
+			vertexArray->append(vertices[2]);
+			vertexArray->append(vertices[0]);
+			vertexArray->append(vertices[2]);
+			vertexArray->append(vertices[3]);
+
+		} else if (attachment->type == ATTACHMENT_MESH) {
+			MeshAttachment* mesh = (MeshAttachment*)attachment;
+			texture = (Texture*)((AtlasRegion*)mesh->rendererObject)->page->rendererObject;
+			MeshAttachment_computeWorldVertices(mesh, slot->skeleton->x, slot->skeleton->y, slot, worldVertices);
+
+			Uint8 r = skeleton->r * slot->r * 255;
+			Uint8 g = skeleton->g * slot->g * 255;
+			Uint8 b = skeleton->b * slot->b * 255;
+			Uint8 a = skeleton->a * slot->a * 255;
+			vertex.color.r = r;
+			vertex.color.g = g;
+			vertex.color.b = b;
+			vertex.color.a = a;
+
+			Vector2u size = texture->getSize();
+			for (int i = 0; i < mesh->trianglesCount; ++i) {
+				int index = mesh->triangles[i] << 1;
+				vertex.position.x = worldVertices[index];
+				vertex.position.y = worldVertices[index + 1];
+				vertex.texCoords.x = mesh->uvs[index] * size.x;
+				vertex.texCoords.y = mesh->uvs[index + 1] * size.y;
+				vertexArray->append(vertex);
+			}
 		}
 
-		RegionAttachment_computeWorldVertices(regionAttachment, slot->skeleton->x, slot->skeleton->y, slot->bone, worldVertices);
+		if (texture) {
+			// SMFL doesn't handle batching for us, so we'll just force a single texture per skeleton.
+			states.texture = texture;
 
-		Uint8 r = skeleton->r * slot->r * 255;
-		Uint8 g = skeleton->g * slot->g * 255;
-		Uint8 b = skeleton->b * slot->b * 255;
-		Uint8 a = skeleton->a * slot->a * 255;
-
-		sf::Vertex vertices[4];
-		vertices[0].color.r = r;
-		vertices[0].color.g = g;
-		vertices[0].color.b = b;
-		vertices[0].color.a = a;
-		vertices[1].color.r = r;
-		vertices[1].color.g = g;
-		vertices[1].color.b = b;
-		vertices[1].color.a = a;
-		vertices[2].color.r = r;
-		vertices[2].color.g = g;
-		vertices[2].color.b = b;
-		vertices[2].color.a = a;
-		vertices[3].color.r = r;
-		vertices[3].color.g = g;
-		vertices[3].color.b = b;
-		vertices[3].color.a = a;
-
-		vertices[0].position.x = worldVertices[VERTEX_X1];
-		vertices[0].position.y = worldVertices[VERTEX_Y1];
-		vertices[1].position.x = worldVertices[VERTEX_X2];
-		vertices[1].position.y = worldVertices[VERTEX_Y2];
-		vertices[2].position.x = worldVertices[VERTEX_X3];
-		vertices[2].position.y = worldVertices[VERTEX_Y3];
-		vertices[3].position.x = worldVertices[VERTEX_X4];
-		vertices[3].position.y = worldVertices[VERTEX_Y4];
-
-		// SMFL doesn't handle batching for us, so we'll just force a single texture per skeleton.
-		states.texture = (Texture*)((AtlasRegion*)regionAttachment->rendererObject)->page->rendererObject;
-
-		Vector2u size = states.texture->getSize();
-		vertices[0].texCoords.x = regionAttachment->uvs[VERTEX_X1] * size.x;
-		vertices[0].texCoords.y = regionAttachment->uvs[VERTEX_Y1] * size.y;
-		vertices[1].texCoords.x = regionAttachment->uvs[VERTEX_X2] * size.x;
-		vertices[1].texCoords.y = regionAttachment->uvs[VERTEX_Y2] * size.y;
-		vertices[2].texCoords.x = regionAttachment->uvs[VERTEX_X3] * size.x;
-		vertices[2].texCoords.y = regionAttachment->uvs[VERTEX_Y3] * size.y;
-		vertices[3].texCoords.x = regionAttachment->uvs[VERTEX_X4] * size.x;
-		vertices[3].texCoords.y = regionAttachment->uvs[VERTEX_Y4] * size.y;
-
-		vertexArray->append(vertices[0]);
-		vertexArray->append(vertices[1]);
-		vertexArray->append(vertices[2]);
-		vertexArray->append(vertices[3]);
+			BlendMode blend = slot->data->additiveBlending ? BlendAdd : BlendAlpha;
+			if (states.blendMode != blend) {
+				target.draw(*vertexArray, states);
+				vertexArray->clear();
+				states.blendMode = blend;
+			}
+		}
 	}
 	target.draw(*vertexArray, states);
 }

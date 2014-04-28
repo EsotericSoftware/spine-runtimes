@@ -64,6 +64,7 @@ void spineboy () {
 	// Load atlas, skeleton, and animations.
 	Atlas* atlas = Atlas_readAtlasFile("../data/spineboy.atlas");
 	SkeletonJson* json = SkeletonJson_create(atlas);
+	json->scale = 0.6f;
 	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "../data/spineboy.json");
 	if (!skeletonData) {
 		printf("%s\n", json->error);
@@ -93,11 +94,11 @@ void spineboy () {
 
 	drawable->state->listener = callback;
 	if (true) {
-		AnimationState_setAnimationByName(drawable->state, 0, "drawOrder", true);
+		AnimationState_setAnimationByName(drawable->state, 0, "test", true);
 	} else {
-		AnimationState_setAnimationByName(drawable->state, 0, "walk", true);
+		AnimationState_setAnimationByName(drawable->state, 0, "run", true);
 		AnimationState_addAnimationByName(drawable->state, 0, "jump", false, 0);
-		AnimationState_addAnimationByName(drawable->state, 0, "walk", true, 0);
+		AnimationState_addAnimationByName(drawable->state, 0, "run", true, 0);
 	}
 
 	sf::RenderWindow window(sf::VideoMode(640, 480), "Spine SFML");
@@ -135,10 +136,14 @@ void spineboy () {
 
 void goblins () {
 // Load atlas, skeleton, and animations.
-	Atlas* atlas = Atlas_readAtlasFile("../data/goblins.atlas");
+	Atlas* atlas = Atlas_readAtlasFile("../data/goblins-ffd.atlas");
 	SkeletonJson* json = SkeletonJson_create(atlas);
 	json->scale = 2;
-	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "../data/goblins.json");
+	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "../data/goblins-ffd.json");
+	if (!skeletonData) {
+		printf("Error: %s\n", json->error);
+		exit(0);
+	}
 	Animation* walkAnimation = SkeletonData_findAnimation(skeletonData, "walk");
 	SkeletonJson_dispose(json);
 
@@ -181,6 +186,6 @@ void goblins () {
 }
 
 int main () {
-	spineboy();
+//	spineboy();
 	goblins();
 }

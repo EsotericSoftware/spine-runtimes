@@ -34,7 +34,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/SFML/include}&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.warnings.allwarn.2053349441" name="All warnings (-Wall)" superClass="gnu.cpp.compiler.option.warnings.allwarn" value="true" valueType="boolean"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.1463772359" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols"/>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1463772359" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1445618618" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool command="gcc" id="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.344670633" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug">
@@ -44,6 +44,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/spine-c/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/spine-c/src}&quot;"/>
 								</option>
+								<option id="gnu.c.compiler.option.misc.other.20851089" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.753970334" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug.913061526" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug"/>
@@ -156,11 +157,11 @@
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.release.1009813244;cdt.managedbuild.config.gnu.mingw.exe.release.1009813244.;cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.release.590673427;cdt.managedbuild.tool.gnu.c.compiler.input.802052137">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.release.1009813244;cdt.managedbuild.config.gnu.mingw.exe.release.1009813244.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.exe.release.1680995989;cdt.managedbuild.tool.gnu.cpp.compiler.input.672167706">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
-		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.debug.98344941;cdt.managedbuild.config.gnu.mingw.exe.debug.98344941.;cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.155084450;cdt.managedbuild.tool.gnu.c.compiler.input.1081023111">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.release.1009813244;cdt.managedbuild.config.gnu.mingw.exe.release.1009813244.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.exe.release.1680995989;cdt.managedbuild.tool.gnu.cpp.compiler.input.672167706">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.debug.804921154;cdt.managedbuild.config.gnu.mingw.exe.debug.804921154.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.exe.debug.1111247076;cdt.managedbuild.tool.gnu.cpp.compiler.input.1445618618">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
