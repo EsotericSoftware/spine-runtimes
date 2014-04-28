@@ -32,9 +32,6 @@
 #include <stdio.h>
 #include "Json.h"
 #include <spine/extension.h>
-#include <spine/RegionAttachment.h>
-#include <spine/MeshAttachment.h>
-#include <spine/SkinnedMeshAttachment.h>
 #include <spine/AtlasAttachmentLoader.h>
 
 typedef struct {

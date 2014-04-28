@@ -95,10 +95,10 @@ spTrackEntry* spAnimationState_getCurrent (spAnimationState* self, int trackInde
 
 #ifdef SPINE_SHORT_NAMES
 typedef spEventType EventType;
-#define SP_ANIMATION_START SP_SP_ANIMATION_START
-#define SP_ANIMATION_END SP_SP_ANIMATION_END
-#define SP_ANIMATION_COMPLETE SP_SP_ANIMATION_COMPLETE
-#define SP_ANIMATION_EVENT SP_SP_ANIMATION_EVENT
+#define ANIMATION_START SP_ANIMATION_START
+#define ANIMATION_END SP_ANIMATION_END
+#define ANIMATION_COMPLETE SP_ANIMATION_COMPLETE
+#define ANIMATION_EVENT SP_ANIMATION_EVENT
 typedef spAnimationStateListener AnimationStateListener;
 typedef spTrackEntry TrackEntry;
 typedef spAnimationState AnimationState;

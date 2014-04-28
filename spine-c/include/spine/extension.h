@@ -67,11 +67,13 @@
 #include <string.h>
 #include <math.h>
 #include <spine/Skeleton.h>
-#include <spine/RegionAttachment.h>
-#include <spine/BoundingBoxAttachment.h>
 #include <spine/Animation.h>
 #include <spine/Atlas.h>
 #include <spine/AttachmentLoader.h>
+#include <spine/RegionAttachment.h>
+#include <spine/MeshAttachment.h>
+#include <spine/SkinnedMeshAttachment.h>
+#include <spine/BoundingBoxAttachment.h>
 
 #ifdef __cplusplus
 extern "C" {
