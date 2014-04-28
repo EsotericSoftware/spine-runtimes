@@ -138,7 +138,6 @@ void goblins () {
 // Load atlas, skeleton, and animations.
 	Atlas* atlas = Atlas_readAtlasFile("../data/goblins-ffd.atlas");
 	SkeletonJson* json = SkeletonJson_create(atlas);
-	json->scale = 2;
 	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "../data/goblins-ffd.json");
 	if (!skeletonData) {
 		printf("Error: %s\n", json->error);
