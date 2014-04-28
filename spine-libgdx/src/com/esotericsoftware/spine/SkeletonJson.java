@@ -213,7 +213,9 @@ public class SkeletonJson {
 				for (int i = 0, n = vertices.length; i < n; i++)
 					vertices[i] *= scale;
 			}
-			mesh.setMesh(vertices, triangles, uvs);
+			mesh.setVertices(vertices);
+			mesh.setTriangles(triangles);
+			mesh.setRegionUVs(uvs);
 			mesh.updateUVs();
 
 			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() * 2);
@@ -243,7 +245,10 @@ public class SkeletonJson {
 					i += 4;
 				}
 			}
-			mesh.setMesh(bones.toArray(), weights.toArray(), triangles, uvs);
+			mesh.setBones(bones.toArray());
+			mesh.setWeights(weights.toArray());
+			mesh.setTriangles(triangles);
+			mesh.setRegionUVs(uvs);
 			mesh.updateUVs();
 
 			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() * 2);

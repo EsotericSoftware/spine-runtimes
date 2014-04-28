@@ -223,7 +223,9 @@ namespace Spine {
 					float[] uvs = GetFloatArray(map, "uvs", 1);
 					int[] triangles = GetIntArray(map, "triangles");
 					float[] vertices = GetFloatArray(map, "vertices", Scale);
-					mesh.SetMesh(vertices, triangles, uvs);
+					mesh.vertices = vertices;
+					mesh.triangles = triangles;
+					mesh.regionUVs = uvs;
 					mesh.UpdateUVs();
 
 					if (map.ContainsKey("color")) {
@@ -264,7 +266,10 @@ namespace Spine {
 							i += 4;
 						}
 					}
-					mesh.SetMesh(bones.ToArray(), weights.ToArray(), triangles, uvs);
+					mesh.bones = bones.ToArray();
+					mesh.weights = weights.ToArray();
+					mesh.triangles = triangles;
+					mesh.regionUVs = uvs;
 					mesh.UpdateUVs();
 
 					if (map.ContainsKey("color")) {

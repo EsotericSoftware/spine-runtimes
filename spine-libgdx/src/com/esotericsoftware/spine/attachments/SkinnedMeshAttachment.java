@@ -69,24 +69,11 @@ public class SkinnedMeshAttachment extends Attachment {
 		return region;
 	}
 
-	/** @param bones For each vertex, the number of bones affecting the vertex followed by that many bone indices. Ie: count,
-	 *           boneIndex, ...
-	 * @param weights For each bone affecting the vertex, the vertex position in the bone's coordinate system and the weight for
-	 *           the bone's influence. Ie: x, y, weight, ...
-	 * @param regionUVs For each vertex, a texure coordinate pair. Ie: u, v, ...
-	 * @param triangles Vertex number triplets which describe the mesh's triangulation. */
-	public void setMesh (int[] bones, float[] weights, short[] triangles, float[] regionUVs) {
-		this.bones = bones;
-		this.weights = weights;
-		this.triangles = triangles;
-		this.regionUVs = regionUVs;
-
-		int uvsLength = regionUVs.length;
-		int worldVerticesLength = uvsLength / 2 * 5;
-		if (worldVertices == null || worldVertices.length != worldVerticesLength) worldVertices = new float[worldVerticesLength];
-	}
-
 	public void updateUVs () {
+		int verticesLength = regionUVs.length;
+		int worldVerticesLength = verticesLength / 2 * 5;
+		if (worldVertices == null || worldVertices.length != worldVerticesLength) worldVertices = new float[worldVerticesLength];
+
 		float u, v, width, height;
 		if (region == null) {
 			u = v = 0;
@@ -99,12 +86,12 @@ public class SkinnedMeshAttachment extends Attachment {
 		}
 		float[] regionUVs = this.regionUVs;
 		if (region instanceof AtlasRegion && ((AtlasRegion)region).rotate) {
-			for (int i = 0, w = 3, n = regionUVs.length; i < n; i += 2, w += 5) {
+			for (int i = 0, w = 3; i < verticesLength; i += 2, w += 5) {
 				worldVertices[w] = u + regionUVs[i + 1] * width;
 				worldVertices[w + 1] = v + height - regionUVs[i] * height;
 			}
 		} else {
-			for (int i = 0, w = 3, n = regionUVs.length; i < n; i += 2, w += 5) {
+			for (int i = 0, w = 3; i < verticesLength; i += 2, w += 5) {
 				worldVertices[w] = u + regionUVs[i] * width;
 				worldVertices[w + 1] = v + regionUVs[i + 1] * height;
 			}
@@ -167,16 +154,41 @@ public class SkinnedMeshAttachment extends Attachment {
 		return worldVertices;
 	}
 
-	public short[] getTriangles () {
-		return triangles;
-	}
-
 	public int[] getBones () {
 		return bones;
 	}
 
+	/** For each vertex, the number of bones affecting the vertex followed by that many bone indices. Ie: count, boneIndex, ... */
+	public void setBones (int[] bones) {
+		this.bones = bones;
+	}
+
 	public float[] getWeights () {
 		return weights;
+	}
+
+	/** For each bone affecting the vertex, the vertex position in the bone's coordinate system and the weight for the bone's
+	 * influence. Ie: x, y, weight, ... */
+	public void setWeights (float[] weights) {
+		this.weights = weights;
+	}
+
+	public short[] getTriangles () {
+		return triangles;
+	}
+
+	/** Vertex number triplets which describe the mesh's triangulation. */
+	public void setTriangles (short[] triangles) {
+		this.triangles = triangles;
+	}
+
+	public float[] getRegionUVs () {
+		return regionUVs;
+	}
+
+	/** For each vertex, a texure coordinate pair. Ie: u, v, ... */
+	public void setRegionUVs (float[] regionUVs) {
+		this.regionUVs = regionUVs;
 	}
 
 	public Color getColor () {

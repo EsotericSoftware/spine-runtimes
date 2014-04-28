@@ -72,16 +72,10 @@ namespace Spine {
 			: base(name) {
 		}
 
-		public void SetMesh (float[] vertices, int[] triangles, float[] regionUVs) {
-			this.vertices = vertices;
-			this.triangles = triangles;
-			this.regionUVs = regionUVs;
-			this.uvs = new float[regionUVs.Length];
-		}
-
 		public void UpdateUVs () {
 			float u = RegionU, v = RegionV, width = RegionU2 - RegionU, height = RegionV2 - RegionV;
 			float[] regionUVs = this.regionUVs;
+			if (this.uvs.Length != regionUVs.Length) this.uvs = new float[regionUVs.Length];
 			float[] uvs = this.uvs;
 			if (RegionRotate) {
 				for (int i = 0, n = uvs.Length; i < n; i += 2) {

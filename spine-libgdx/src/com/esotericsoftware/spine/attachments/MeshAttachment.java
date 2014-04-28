@@ -68,16 +68,11 @@ public class MeshAttachment extends Attachment {
 		return region;
 	}
 
-	public void setMesh (float[] vertices, short[] triangles, float[] regionUVs) {
-		this.vertices = vertices;
-		this.triangles = triangles;
-		this.regionUVs = regionUVs;
-
-		int worldVerticesLength = vertices.length / 2 * 5;
-		if (worldVertices == null || worldVertices.length != worldVerticesLength) worldVertices = new float[worldVerticesLength];
-	}
-
 	public void updateUVs () {
+		int verticesLength = vertices.length;
+		int worldVerticesLength = verticesLength / 2 * 5;
+		if (worldVertices == null || worldVertices.length != worldVerticesLength) worldVertices = new float[worldVerticesLength];
+
 		float u, v, width, height;
 		if (region == null) {
 			u = v = 0;
@@ -90,12 +85,12 @@ public class MeshAttachment extends Attachment {
 		}
 		float[] regionUVs = this.regionUVs;
 		if (region instanceof AtlasRegion && ((AtlasRegion)region).rotate) {
-			for (int i = 0, w = 3, n = vertices.length; i < n; i += 2, w += 5) {
+			for (int i = 0, w = 3; i < verticesLength; i += 2, w += 5) {
 				worldVertices[w] = u + regionUVs[i + 1] * width;
 				worldVertices[w + 1] = v + height - regionUVs[i] * height;
 			}
 		} else {
-			for (int i = 0, w = 3, n = vertices.length; i < n; i += 2, w += 5) {
+			for (int i = 0, w = 3; i < verticesLength; i += 2, w += 5) {
 				worldVertices[w] = u + regionUVs[i] * width;
 				worldVertices[w + 1] = v + regionUVs[i + 1] * height;
 			}
@@ -139,8 +134,24 @@ public class MeshAttachment extends Attachment {
 		return vertices;
 	}
 
+	public void setVertices (float[] vertices) {
+		this.vertices = vertices;
+	}
+
 	public short[] getTriangles () {
 		return triangles;
+	}
+
+	public void setTriangles (short[] triangles) {
+		this.triangles = triangles;
+	}
+
+	public float[] getRegionUVs () {
+		return regionUVs;
+	}
+
+	public void setRegionUVs (float[] regionUVs) {
+		this.regionUVs = regionUVs;
 	}
 
 	public Color getColor () {
