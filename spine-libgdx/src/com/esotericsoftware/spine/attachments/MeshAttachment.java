@@ -44,7 +44,7 @@ import com.badlogic.gdx.utils.NumberUtils;
 public class MeshAttachment extends Attachment {
 	private TextureRegion region;
 	private String path;
-	private float[] vertices;
+	private float[] vertices, regionUVs;
 	private short[] triangles;
 	private float[] worldVertices;
 	private final Color color = new Color(1, 1, 1, 1);
@@ -68,13 +68,16 @@ public class MeshAttachment extends Attachment {
 		return region;
 	}
 
-	public void setMesh (float[] vertices, short[] triangles, float[] uvs) {
+	public void setMesh (float[] vertices, short[] triangles, float[] regionUVs) {
 		this.vertices = vertices;
 		this.triangles = triangles;
+		this.regionUVs = regionUVs;
 
 		int worldVerticesLength = vertices.length / 2 * 5;
 		if (worldVertices == null || worldVertices.length != worldVerticesLength) worldVertices = new float[worldVerticesLength];
+	}
 
+	public void updateUVs () {
 		float u, v, width, height;
 		if (region == null) {
 			u = v = 0;
@@ -85,15 +88,16 @@ public class MeshAttachment extends Attachment {
 			width = region.getU2() - u;
 			height = region.getV2() - v;
 		}
+		float[] regionUVs = this.regionUVs;
 		if (region instanceof AtlasRegion && ((AtlasRegion)region).rotate) {
 			for (int i = 0, w = 3, n = vertices.length; i < n; i += 2, w += 5) {
-				worldVertices[w] = u + uvs[i + 1] * width;
-				worldVertices[w + 1] = v + height - uvs[i] * height;
+				worldVertices[w] = u + regionUVs[i + 1] * width;
+				worldVertices[w + 1] = v + height - regionUVs[i] * height;
 			}
 		} else {
 			for (int i = 0, w = 3, n = vertices.length; i < n; i += 2, w += 5) {
-				worldVertices[w] = u + uvs[i] * width;
-				worldVertices[w + 1] = v + uvs[i + 1] * height;
+				worldVertices[w] = u + regionUVs[i] * width;
+				worldVertices[w + 1] = v + regionUVs[i + 1] * height;
 			}
 		}
 	}

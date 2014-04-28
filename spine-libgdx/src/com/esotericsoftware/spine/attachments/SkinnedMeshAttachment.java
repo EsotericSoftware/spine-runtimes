@@ -45,7 +45,7 @@ public class SkinnedMeshAttachment extends Attachment {
 	private TextureRegion region;
 	private String path;
 	private int[] bones;
-	private float[] weights;
+	private float[] weights, regionUVs;
 	private short[] triangles;
 	private float[] worldVertices;
 	private final Color color = new Color(1, 1, 1, 1);
@@ -73,36 +73,40 @@ public class SkinnedMeshAttachment extends Attachment {
 	 *           boneIndex, ...
 	 * @param weights For each bone affecting the vertex, the vertex position in the bone's coordinate system and the weight for
 	 *           the bone's influence. Ie: x, y, weight, ...
-	 * @param uvs For each vertex, a texure coordinate pair. Ie: u, v, ...
+	 * @param regionUVs For each vertex, a texure coordinate pair. Ie: u, v, ...
 	 * @param triangles Vertex number triplets which describe the mesh's triangulation. */
-	public void setMesh (int[] bones, float[] weights, short[] triangles, float[] uvs) {
+	public void setMesh (int[] bones, float[] weights, short[] triangles, float[] regionUVs) {
 		this.bones = bones;
 		this.weights = weights;
 		this.triangles = triangles;
+		this.regionUVs = regionUVs;
 
-		int uvsLength = uvs.length;
+		int uvsLength = regionUVs.length;
 		int worldVerticesLength = uvsLength / 2 * 5;
 		if (worldVertices == null || worldVertices.length != worldVerticesLength) worldVertices = new float[worldVerticesLength];
+	}
 
-		float u, v, w, h;
+	public void updateUVs () {
+		float u, v, width, height;
 		if (region == null) {
 			u = v = 0;
-			w = h = 1;
+			width = height = 1;
 		} else {
 			u = region.getU();
 			v = region.getV();
-			w = region.getU2() - u;
-			h = region.getV2() - v;
+			width = region.getU2() - u;
+			height = region.getV2() - v;
 		}
+		float[] regionUVs = this.regionUVs;
 		if (region instanceof AtlasRegion && ((AtlasRegion)region).rotate) {
-			for (int i = 0, ii = 3; i < uvsLength; i += 2, ii += 5) {
-				worldVertices[ii] = u + uvs[i + 1] * w;
-				worldVertices[ii + 1] = v + h - uvs[i] * h;
+			for (int i = 0, w = 3, n = regionUVs.length; i < n; i += 2, w += 5) {
+				worldVertices[w] = u + regionUVs[i + 1] * width;
+				worldVertices[w + 1] = v + height - regionUVs[i] * height;
 			}
 		} else {
-			for (int i = 0, ii = 3; i < uvsLength; i += 2, ii += 5) {
-				worldVertices[ii] = u + uvs[i] * w;
-				worldVertices[ii + 1] = v + uvs[i + 1] * h;
+			for (int i = 0, w = 3, n = regionUVs.length; i < n; i += 2, w += 5) {
+				worldVertices[w] = u + regionUVs[i] * width;
+				worldVertices[w + 1] = v + regionUVs[i + 1] * height;
 			}
 		}
 	}

@@ -33,12 +33,13 @@ using System;
 namespace Spine {
 	/// <summary>Attachment that displays a texture region.</summary>
 	public class MeshAttachment : Attachment {
-		internal float[] vertices, uvs;
+		internal float[] vertices, uvs, regionUVs;
 		internal int[] triangles;
 		internal float regionOffsetX, regionOffsetY, regionWidth, regionHeight, regionOriginalWidth, regionOriginalHeight;
 		internal float r = 1, g = 1, b = 1, a = 1;
 
 		public float[] Vertices { get { return vertices; } set { vertices = value; } }
+		public float[] RegionUVs { get { return regionUVs; } set { regionUVs = value; } }
 		public float[] UVs { get { return uvs; } set { uvs = value; } }
 		public int[] Triangles { get { return triangles; } set { triangles = value; } }
 
@@ -71,20 +72,26 @@ namespace Spine {
 			: base(name) {
 		}
 
-		public void SetMesh (float[] vertices, int[] triangles, float[] uvs) {
+		public void SetMesh (float[] vertices, int[] triangles, float[] regionUVs) {
 			this.vertices = vertices;
 			this.triangles = triangles;
-			this.uvs = uvs;
+			this.regionUVs = regionUVs;
+			this.uvs = new float[regionUVs.Length];
+		}
+
+		public void UpdateUVs () {
 			float u = RegionU, v = RegionV, width = RegionU2 - RegionU, height = RegionV2 - RegionV;
+			float[] regionUVs = this.regionUVs;
+			float[] uvs = this.uvs;
 			if (RegionRotate) {
 				for (int i = 0, n = uvs.Length; i < n; i += 2) {
-					uvs[i] = u + uvs[i + 1] * width;
-					uvs[i + 1] = v + height - uvs[i] * height;
+					uvs[i] = u + regionUVs[i + 1] * width;
+					uvs[i + 1] = v + height - regionUVs[i] * height;
 				}
 			} else {
 				for (int i = 0, n = uvs.Length; i < n; i += 2) {
-					uvs[i] = u + uvs[i] * width;
-					uvs[i + 1] = v + uvs[i + 1] * height;
+					uvs[i] = u + regionUVs[i] * width;
+					uvs[i + 1] = v + regionUVs[i + 1] * height;
 				}
 			}
 		}

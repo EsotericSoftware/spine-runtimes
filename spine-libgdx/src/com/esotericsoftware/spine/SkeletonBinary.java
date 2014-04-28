@@ -202,6 +202,7 @@ public class SkeletonBinary {
 			if (path == null) path = name;
 			RegionAttachment region = attachmentLoader.newRegionAttachment(skin, name, path);
 			if (region == null) return null;
+			region.setPath(path);
 			region.setX(input.readFloat() * scale);
 			region.setY(input.readFloat() * scale);
 			region.setScaleX(input.readFloat());
@@ -224,10 +225,12 @@ public class SkeletonBinary {
 			if (path == null) path = name;
 			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, path);
 			if (mesh == null) return null;
+			mesh.setPath(path);
 			float[] uvs = readFloatArray(input, 1);
 			short[] triangles = readShortArray(input);
 			float[] vertices = readFloatArray(input, scale);
 			mesh.setMesh(vertices, triangles, uvs);
+			mesh.updateUVs();
 			Color.rgba8888ToColor(mesh.getColor(), input.readInt());
 			if (nonessential) {
 				mesh.setEdges(readIntArray(input));
@@ -242,6 +245,7 @@ public class SkeletonBinary {
 			if (path == null) path = name;
 			SkinnedMeshAttachment mesh = attachmentLoader.newSkinnedMeshAttachment(skin, name, path);
 			if (mesh == null) return null;
+			mesh.setPath(path);
 			float[] uvs = readFloatArray(input, 1);
 			short[] triangles = readShortArray(input);
 
@@ -259,7 +263,7 @@ public class SkeletonBinary {
 				}
 			}
 			mesh.setMesh(bones.toArray(), weights.toArray(), triangles, uvs);
-
+			mesh.updateUVs();
 			Color.rgba8888ToColor(mesh.getColor(), input.readInt());
 			if (nonessential) {
 				mesh.setEdges(readIntArray(input));

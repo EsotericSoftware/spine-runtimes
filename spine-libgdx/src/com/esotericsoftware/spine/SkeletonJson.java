@@ -176,6 +176,7 @@ public class SkeletonJson {
 		case region:
 			RegionAttachment region = attachmentLoader.newRegionAttachment(skin, name, path);
 			if (region == null) return null;
+			region.setPath(path);
 			region.setX(map.getFloat("x", 0) * scale);
 			region.setY(map.getFloat("y", 0) * scale);
 			region.setScaleX(map.getFloat("scaleX", 1));
@@ -203,6 +204,7 @@ public class SkeletonJson {
 		case mesh: {
 			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, path);
 			if (mesh == null) return null;
+			mesh.setPath(path);
 			float[] uvs = map.require("uvs").asFloatArray();
 			short[] triangles = map.require("triangles").asShortArray();
 
@@ -212,6 +214,7 @@ public class SkeletonJson {
 					vertices[i] *= scale;
 			}
 			mesh.setMesh(vertices, triangles, uvs);
+			mesh.updateUVs();
 
 			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() * 2);
 			if (map.has("edges")) mesh.setEdges(map.require("edges").asIntArray());
@@ -222,6 +225,7 @@ public class SkeletonJson {
 		case skinnedmesh: {
 			SkinnedMeshAttachment mesh = attachmentLoader.newSkinnedMeshAttachment(skin, name, path);
 			if (mesh == null) return null;
+			mesh.setPath(path);
 			float[] uvs = map.require("uvs").asFloatArray();
 			short[] triangles = map.require("triangles").asShortArray();
 
@@ -240,6 +244,7 @@ public class SkeletonJson {
 				}
 			}
 			mesh.setMesh(bones.toArray(), weights.toArray(), triangles, uvs);
+			mesh.updateUVs();
 
 			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() * 2);
 			if (map.has("edges")) mesh.setEdges(map.require("edges").asIntArray());

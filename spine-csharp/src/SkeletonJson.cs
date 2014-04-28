@@ -196,6 +196,7 @@ namespace Spine {
 			case AttachmentType.region:
 				RegionAttachment region = attachmentLoader.NewRegionAttachment(skin, name, path);
 				if (region == null) return null;
+				region.Path = path;
 				region.x = GetFloat(map, "x", 0) * Scale;
 				region.y = GetFloat(map, "y", 0) * Scale;
 				region.scaleX = GetFloat(map, "scaleX", 1);
@@ -218,10 +219,12 @@ namespace Spine {
 					MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, name, path);
 					if (mesh == null) return null;
 
+					mesh.Path = path;
 					float[] uvs = GetFloatArray(map, "uvs", 1);
 					int[] triangles = GetIntArray(map, "triangles");
 					float[] vertices = GetFloatArray(map, "vertices", Scale);
 					mesh.SetMesh(vertices, triangles, uvs);
+					mesh.UpdateUVs();
 
 					if (map.ContainsKey("color")) {
 						var color = (String)map["color"];
@@ -242,6 +245,7 @@ namespace Spine {
 					SkinnedMeshAttachment mesh = attachmentLoader.NewSkinnedMeshAttachment(skin, name, path);
 					if (mesh == null) return null;
 
+					mesh.Path = path;
 					float[] uvs = GetFloatArray(map, "uvs", 1);
 					int[] triangles = GetIntArray(map, "triangles");
 
@@ -261,6 +265,7 @@ namespace Spine {
 						}
 					}
 					mesh.SetMesh(bones.ToArray(), weights.ToArray(), triangles, uvs);
+					mesh.UpdateUVs();
 
 					if (map.ContainsKey("color")) {
 						var color = (String)map["color"];
