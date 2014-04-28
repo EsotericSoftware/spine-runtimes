@@ -40,7 +40,7 @@ extern "C" {
 typedef struct {
 	const char* const name;
 	const spBoneData* const boneData;
-	const char* const attachmentName;
+	const char* attachmentName;
 	float r, g, b, a;
 	int/*bool*/additiveBlending;
 } spSlotData;

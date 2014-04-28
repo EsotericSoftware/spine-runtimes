@@ -33,6 +33,8 @@
 #include "Json.h"
 #include <spine/extension.h>
 #include <spine/RegionAttachment.h>
+#include <spine/MeshAttachment.h>
+#include <spine/SkinnedMeshAttachment.h>
 #include <spine/AtlasAttachmentLoader.h>
 
 typedef struct {
@@ -414,13 +416,19 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 					spAttachment* attachment;
 					const char* skinAttachmentName = attachmentMap->name;
 					const char* attachmentName = Json_getString(attachmentMap, "name", skinAttachmentName);
-					const char* path = Json_getString(attachmentMap, "path", 0);
+					const char* path = Json_getString(attachmentMap, "path", attachmentName);
 					const char* color;
+					int i;
+					Json* entry;
 
 					const char* typeString = Json_getString(attachmentMap, "type", "region");
 					spAttachmentType type;
 					if (strcmp(typeString, "region") == 0)
 						type = SP_ATTACHMENT_REGION;
+					else if (strcmp(typeString, "mesh") == 0)
+						type = SP_ATTACHMENT_MESH;
+					else if (strcmp(typeString, "skinnedmesh") == 0)
+						type = SP_ATTACHMENT_SKINNED_MESH;
 					else if (strcmp(typeString, "boundingbox") == 0)
 						type = SP_ATTACHMENT_BOUNDING_BOX;
 					else {
@@ -441,35 +449,152 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 
 					switch (attachment->type) {
 					case SP_ATTACHMENT_REGION: {
-						spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;
-						regionAttachment->x = Json_getFloat(attachmentMap, "x", 0) * self->scale;
-						regionAttachment->y = Json_getFloat(attachmentMap, "y", 0) * self->scale;
-						regionAttachment->scaleX = Json_getFloat(attachmentMap, "scaleX", 1);
-						regionAttachment->scaleY = Json_getFloat(attachmentMap, "scaleY", 1);
-						regionAttachment->rotation = Json_getFloat(attachmentMap, "rotation", 0);
-						regionAttachment->width = Json_getFloat(attachmentMap, "width", 32) * self->scale;
-						regionAttachment->height = Json_getFloat(attachmentMap, "height", 32) * self->scale;
+						spRegionAttachment* region = (spRegionAttachment*)attachment;
+						if (path) MALLOC_STR(region->path, path);
+						region->x = Json_getFloat(attachmentMap, "x", 0) * self->scale;
+						region->y = Json_getFloat(attachmentMap, "y", 0) * self->scale;
+						region->scaleX = Json_getFloat(attachmentMap, "scaleX", 1);
+						region->scaleY = Json_getFloat(attachmentMap, "scaleY", 1);
+						region->rotation = Json_getFloat(attachmentMap, "rotation", 0);
+						region->width = Json_getFloat(attachmentMap, "width", 32) * self->scale;
+						region->height = Json_getFloat(attachmentMap, "height", 32) * self->scale;
 
 						color = Json_getString(attachmentMap, "color", 0);
 						if (color) {
-							regionAttachment->r = toColor(color, 0);
-							regionAttachment->g = toColor(color, 1);
-							regionAttachment->b = toColor(color, 2);
-							regionAttachment->a = toColor(color, 3);
+							region->r = toColor(color, 0);
+							region->g = toColor(color, 1);
+							region->b = toColor(color, 2);
+							region->a = toColor(color, 3);
 						}
 
-						spRegionAttachment_updateOffset(regionAttachment);
+						spRegionAttachment_updateOffset(region);
+						break;
+					}
+					case SP_ATTACHMENT_MESH: {
+						spMeshAttachment* mesh = (spMeshAttachment*)attachment;
+
+						MALLOC_STR(mesh->path, path);
+
+						entry = Json_getItem(attachmentMap, "vertices");
+						mesh->verticesCount = entry->size;
+						mesh->vertices = MALLOC(float, entry->size);
+						for (entry = entry->child, i = 0; entry; entry = entry->next, ++i)
+							mesh->vertices[i] = entry->valueFloat * self->scale;
+
+						entry = Json_getItem(attachmentMap, "triangles");
+						mesh->trianglesCount = entry->size;
+						mesh->triangles = MALLOC(int, entry->size);
+						for (entry = entry->child, i = 0; entry; entry = entry->next, ++i)
+							mesh->triangles[i] = entry->valueInt;
+
+						entry = Json_getItem(attachmentMap, "uvs");
+						mesh->uvsCount = entry->size;
+						mesh->regionUVs = MALLOC(float, entry->size);
+						for (entry = entry->child, i = 0; entry; entry = entry->next, ++i)
+							mesh->regionUVs[i] = entry->valueFloat;
+
+						spMeshAttachment_updateUVs(mesh);
+
+						color = Json_getString(attachmentMap, "color", 0);
+						if (color) {
+							mesh->r = toColor(color, 0);
+							mesh->g = toColor(color, 1);
+							mesh->b = toColor(color, 2);
+							mesh->a = toColor(color, 3);
+						}
+
+						mesh->hullLength = Json_getFloat(attachmentMap, "hull", 0);
+
+						entry = Json_getItem(attachmentMap, "edges");
+						if (entry) {
+							mesh->edgesCount = entry->size;
+							mesh->edges = MALLOC(int, entry->size);
+							for (entry = entry->child, i = 0; entry; entry = entry->next, ++i)
+								mesh->edges[i] = entry->valueInt;
+						}
+
+						mesh->width = Json_getFloat(attachmentMap, "width", 32) * self->scale;
+						mesh->height = Json_getFloat(attachmentMap, "height", 32) * self->scale;
+						break;
+					}
+					case SP_ATTACHMENT_SKINNED_MESH: {
+						spSkinnedMeshAttachment* mesh = (spSkinnedMeshAttachment*)attachment;
+						int verticesCount, b, w, nn;
+						float* vertices;
+
+						MALLOC_STR(mesh->path, path);
+
+						entry = Json_getItem(attachmentMap, "uvs");
+						mesh->uvsCount = entry->size;
+						mesh->regionUVs = MALLOC(float, entry->size);
+						for (entry = entry->child, i = 0; entry; entry = entry->next, ++i)
+							mesh->regionUVs[i] = entry->valueFloat;
+
+						entry = Json_getItem(attachmentMap, "vertices");
+						verticesCount = entry->size;
+						vertices = MALLOC(float, entry->size);
+						for (entry = entry->child, i = 0; entry; entry = entry->next, ++i)
+							vertices[i] = entry->valueFloat;
+
+						for (i = 0; i < verticesCount;) {
+							int boneCount = (int)vertices[i++];
+							mesh->bonesCount += boneCount + 1;
+							mesh->weightsCount += boneCount * 3;
+						}
+						mesh->bones = MALLOC(int, mesh->bonesCount);
+						mesh->weights = MALLOC(float, mesh->weightsCount);
+
+						for (i = 0, b = 0, w = 0; i < verticesCount;) {
+							int boneCount = (int)vertices[i++];
+							mesh->bones[b++] = boneCount;
+							for (nn = i + boneCount * 4; i < nn;) {
+								mesh->bones[b++] = (int)vertices[i];
+								mesh->weights[w++] = vertices[i + 1] * self->scale;
+								mesh->weights[w++] = vertices[i + 2] * self->scale;
+								mesh->weights[w++] = vertices[i + 3];
+								i += 4;
+							}
+						}
+
+						FREE(vertices);
+
+						entry = Json_getItem(attachmentMap, "triangles");
+						mesh->trianglesCount = entry->size;
+						mesh->triangles = MALLOC(int, entry->size);
+						for (entry = entry->child, i = 0; entry; entry = entry->next, ++i)
+							mesh->triangles[i] = entry->valueInt;
+
+						spSkinnedMeshAttachment_updateUVs(mesh);
+
+						color = Json_getString(attachmentMap, "color", 0);
+						if (color) {
+							mesh->r = toColor(color, 0);
+							mesh->g = toColor(color, 1);
+							mesh->b = toColor(color, 2);
+							mesh->a = toColor(color, 3);
+						}
+
+						mesh->hullLength = Json_getFloat(attachmentMap, "hull", 0);
+
+						entry = Json_getItem(attachmentMap, "edges");
+						if (entry) {
+							mesh->edgesCount = entry->size;
+							mesh->edges = MALLOC(int, entry->size);
+							for (entry = entry->child, i = 0; entry; entry = entry->next, ++i)
+								mesh->edges[i] = entry->valueInt;
+						}
+
+						mesh->width = Json_getFloat(attachmentMap, "width", 32) * self->scale;
+						mesh->height = Json_getFloat(attachmentMap, "height", 32) * self->scale;
 						break;
 					}
 					case SP_ATTACHMENT_BOUNDING_BOX: {
 						spBoundingBoxAttachment* box = (spBoundingBoxAttachment*)attachment;
-						Json* verticesArray = Json_getItem(attachmentMap, "vertices");
-						Json* vertex;
-						int i;
-						box->verticesCount = verticesArray->size;
-						box->vertices = MALLOC(float, verticesArray->size);
-						for (vertex = verticesArray->child, i = 0; vertex; vertex = vertex->next, ++i)
-							box->vertices[i] = vertex->valueFloat * self->scale;
+						entry = Json_getItem(attachmentMap, "vertices");
+						box->verticesCount = entry->size;
+						box->vertices = MALLOC(float, entry->size);
+						for (entry = entry->child, i = 0; entry; entry = entry->next, ++i)
+							box->vertices[i] = entry->valueFloat * self->scale;
 						break;
 					}
 					}

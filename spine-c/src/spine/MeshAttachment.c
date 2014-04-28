@@ -28,58 +28,60 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/Slot.h>
+#include <spine/MeshAttachment.h>
 #include <spine/extension.h>
-#include <spine/Skeleton.h>
 
-typedef struct {
-	spSlot super;
-	float attachmentTime;
-} _spSlot;
-
-spSlot* spSlot_create (spSlotData* data, spSkeleton* skeleton, spBone* bone) {
-	spSlot* self = SUPER(NEW(_spSlot));
-	CONST_CAST(spSlotData*, self->data) = data;
-	CONST_CAST(spSkeleton*, self->skeleton) = skeleton;
-	CONST_CAST(spBone*, self->bone) = bone;
-	spSlot_setToSetupPose(self);
-	return self;
-}
-
-void spSlot_dispose (spSlot* self) {
-	FREE(self->attachmentVertices);
+void _spMeshAttachment_dispose (spAttachment* attachment) {
+	spMeshAttachment* self = SUB_CAST(spMeshAttachment, attachment);
+	_spAttachment_deinit(attachment);
+	FREE(self->path);
+	FREE(self->vertices);
+	FREE(self->regionUVs);
+	FREE(self->uvs);
+	FREE(self->triangles);
+	FREE(self->edges);
 	FREE(self);
 }
 
-void spSlot_setAttachment (spSlot* self, spAttachment* attachment) {
-	CONST_CAST(spAttachment*, self->attachment) = attachment;
-	SUB_CAST(_spSlot, self) ->attachmentTime = self->skeleton->time;
+spMeshAttachment* spMeshAttachment_create (const char* name) {
+	spMeshAttachment* self = NEW(spMeshAttachment);
+	self->r = 1;
+	self->g = 1;
+	self->b = 1;
+	self->a = 1;
+	_spAttachment_init(SUPER(self), name, SP_ATTACHMENT_MESH, _spMeshAttachment_dispose);
+	return self;
 }
 
-void spSlot_setAttachmentTime (spSlot* self, float time) {
-	SUB_CAST(_spSlot, self) ->attachmentTime = self->skeleton->time - time;
-}
-
-float spSlot_getAttachmentTime (const spSlot* self) {
-	return self->skeleton->time - SUB_CAST(_spSlot, self) ->attachmentTime;
-}
-
-void spSlot_setToSetupPose (spSlot* self) {
-	spAttachment* attachment = 0;
-	self->r = self->data->r;
-	self->g = self->data->g;
-	self->b = self->data->b;
-	self->a = self->data->a;
-
-	if (self->data->attachmentName) {
-		/* Find slot index. */
-		int i;
-		for (i = 0; i < self->skeleton->data->slotCount; ++i) {
-			if (self->data == self->skeleton->data->slots[i]) {
-				attachment = spSkeleton_getAttachmentForSlotIndex(self->skeleton, i, self->data->attachmentName);
-				break;
-			}
+void spMeshAttachment_updateUVs (spMeshAttachment* self) {
+	int i;
+	float width = self->regionU2 - self->regionU, height = self->regionV2 - self->regionV;
+	FREE(self->uvs);
+	self->uvs = MALLOC(float, self->uvsCount);
+	if (self->regionRotate) {
+		for (i = 0; i < self->uvsCount; i += 2) {
+			self->uvs[i] = self->regionU + self->regionUVs[i + 1] * width;
+			self->uvs[i + 1] = self->regionV + height - self->regionUVs[i] * height;
+		}
+	} else {
+		for (i = 0; i < self->uvsCount; i += 2) {
+			self->uvs[i] = self->regionU + self->regionUVs[i] * width;
+			self->uvs[i + 1] = self->regionV + self->regionUVs[i + 1] * height;
 		}
 	}
-	spSlot_setAttachment(self, attachment);
+}
+
+void spMeshAttachment_computeWorldVertices (spMeshAttachment* self, float x, float y, spSlot* slot, float* worldVertices) {
+	int i;
+	float* vertices = self->vertices;
+	spBone* bone = slot->bone;
+	x += bone->worldX;
+	y += bone->worldY;
+	if (slot->attachmentVerticesCount == self->verticesCount) vertices = slot->attachmentVertices;
+	for (i = 0; i < self->verticesCount; i += 2) {
+		float vx = vertices[i];
+		float vy = vertices[i + 1];
+		worldVertices[i] = vx * bone->m00 + vy * bone->m01 + x;
+		worldVertices[i + 1] = vx * bone->m10 + vy * bone->m11 + y;
+	}
 }

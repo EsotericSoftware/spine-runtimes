@@ -1,10 +1,10 @@
 /******************************************************************************
  * Spine Runtimes Software License
  * Version 2.1
- * 
+ *
  * Copyright (c) 2013, Esoteric Software
  * All rights reserved.
- * 
+ *
  * You are granted a perpetual, non-exclusive, non-sublicensable and
  * non-transferable license to install, execute and perform the Spine Runtimes
  * Software (the "Software") solely for internal use. Without the written
@@ -15,7 +15,7 @@
  * trademark, patent or other intellectual property or proprietary rights
  * notices on or in the Software, including any copy thereof. Redistributions
  * in binary or source form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -28,58 +28,63 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#ifndef SPINE_SKINNEDMESHATTACHMENT_H_
+#define SPINE_SKINNEDMESHATTACHMENT_H_
+
+#include <spine/Attachment.h>
 #include <spine/Slot.h>
-#include <spine/extension.h>
-#include <spine/Skeleton.h>
 
-typedef struct {
-	spSlot super;
-	float attachmentTime;
-} _spSlot;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-spSlot* spSlot_create (spSlotData* data, spSkeleton* skeleton, spBone* bone) {
-	spSlot* self = SUPER(NEW(_spSlot));
-	CONST_CAST(spSlotData*, self->data) = data;
-	CONST_CAST(spSkeleton*, self->skeleton) = skeleton;
-	CONST_CAST(spBone*, self->bone) = bone;
-	spSlot_setToSetupPose(self);
-	return self;
+typedef struct spSkinnedMeshAttachment spSkinnedMeshAttachment;
+struct spSkinnedMeshAttachment {
+	spAttachment super;
+	const char* path;
+
+	int bonesCount;
+	int* bones;
+
+	int weightsCount;
+	float* weights;
+
+	int trianglesCount;
+	int* triangles;
+
+	int uvsCount;
+	float* regionUVs;
+	float* uvs;
+
+	float r, g, b, a;
+
+	void* rendererObject;
+	int regionOffsetX, regionOffsetY; /* Pixels stripped from the bottom left, unrotated. */
+	int regionWidth, regionHeight; /* Unrotated, stripped pixel size. */
+	int regionOriginalWidth, regionOriginalHeight; /* Unrotated, unstripped pixel size. */
+	float regionU, regionV, regionU2, regionV2;
+	int/*bool*/regionRotate;
+
+	/* Nonessential. */
+	int hullLength;
+	int edgesCount;
+	int* edges;
+	float width, height;
+};
+
+spSkinnedMeshAttachment* spSkinnedMeshAttachment_create (const char* name);
+void spSkinnedMeshAttachment_updateUVs (spSkinnedMeshAttachment* self);
+void spSkinnedMeshAttachment_computeWorldVertices (spSkinnedMeshAttachment* self, float x, float y, spSlot* bone, float* worldVertices);
+
+#ifdef SPINE_SHORT_NAMES
+typedef spSkinnedMeshAttachment SkinnedMeshAttachment;
+#define SkinnedMeshAttachment_create(...) spSkinnedMeshAttachment_create(__VA_ARGS__)
+#define SkinnedMeshAttachment_updateUVs(...) spSkinnedMeshAttachment_updateUVs(__VA_ARGS__)
+#define SkinnedMeshAttachment_computeWorldVertices(...) spSkinnedMeshAttachment_computeWorldVertices(__VA_ARGS__)
+#endif
+
+#ifdef __cplusplus
 }
+#endif
 
-void spSlot_dispose (spSlot* self) {
-	FREE(self->attachmentVertices);
-	FREE(self);
-}
-
-void spSlot_setAttachment (spSlot* self, spAttachment* attachment) {
-	CONST_CAST(spAttachment*, self->attachment) = attachment;
-	SUB_CAST(_spSlot, self) ->attachmentTime = self->skeleton->time;
-}
-
-void spSlot_setAttachmentTime (spSlot* self, float time) {
-	SUB_CAST(_spSlot, self) ->attachmentTime = self->skeleton->time - time;
-}
-
-float spSlot_getAttachmentTime (const spSlot* self) {
-	return self->skeleton->time - SUB_CAST(_spSlot, self) ->attachmentTime;
-}
-
-void spSlot_setToSetupPose (spSlot* self) {
-	spAttachment* attachment = 0;
-	self->r = self->data->r;
-	self->g = self->data->g;
-	self->b = self->data->b;
-	self->a = self->data->a;
-
-	if (self->data->attachmentName) {
-		/* Find slot index. */
-		int i;
-		for (i = 0; i < self->skeleton->data->slotCount; ++i) {
-			if (self->data == self->skeleton->data->slots[i]) {
-				attachment = spSkeleton_getAttachmentForSlotIndex(self->skeleton, i, self->data->attachmentName);
-				break;
-			}
-		}
-	}
-	spSlot_setAttachment(self, attachment);
-}
+#endif /* SPINE_SKINNEDMESHATTACHMENT_H_ */

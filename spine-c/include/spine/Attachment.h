@@ -44,7 +44,7 @@ typedef enum {
 typedef struct spAttachment spAttachment;
 struct spAttachment {
 	const char* const name;
-	spAttachmentType type;
+	const spAttachmentType type;
 
 	const void* const vtable;
 };

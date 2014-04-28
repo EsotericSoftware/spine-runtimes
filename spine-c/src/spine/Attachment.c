@@ -43,7 +43,7 @@ void _spAttachment_init (spAttachment* self, const char* name, spAttachmentType 
 	VTABLE(spAttachment, self) ->dispose = dispose;
 
 	MALLOC_STR(self->name, name);
-	self->type = type;
+	CONST_CAST(spAttachmentType, self->type) = type;
 }
 
 void _spAttachment_deinit (spAttachment* self) {

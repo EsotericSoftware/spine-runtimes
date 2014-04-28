@@ -47,6 +47,9 @@ typedef struct spSlot {
 	spBone* const bone;
 	float r, g, b, a;
 	spAttachment* const attachment;
+
+	int attachmentVerticesCount;
+	float* attachmentVertices;
 } spSlot;
 
 spSlot* spSlot_create (spSlotData* data, struct spSkeleton* skeleton, spBone* bone);

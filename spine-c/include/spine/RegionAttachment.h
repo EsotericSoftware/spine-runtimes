@@ -46,6 +46,7 @@ typedef enum {
 typedef struct spRegionAttachment spRegionAttachment;
 struct spRegionAttachment {
 	spAttachment super;
+	const char* path;
 	float x, y, scaleX, scaleY, rotation, width, height;
 	float r, g, b, a;
 
