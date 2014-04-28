@@ -462,11 +462,8 @@ namespace Spine {
 								int vertexCount;
 								if (attachment is MeshAttachment)
 									vertexCount = ((MeshAttachment)attachment).vertices.Length;
-								// BOZO
 								else
-									vertexCount = 0;
-								// else
-								//	vertexCount = ((SkinnedMeshAttachment)attachment).Weights.Length / 3 * 2;
+									vertexCount = ((SkinnedMeshAttachment)attachment).Weights.Length / 3 * 2;
 
 								if (!valueMap.ContainsKey("vertices")) {
 									if (attachment is MeshAttachment)
