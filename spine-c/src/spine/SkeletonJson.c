@@ -534,9 +534,10 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 							vertices[i] = entry->valueFloat;
 
 						for (i = 0; i < verticesCount;) {
-							int boneCount = (int)vertices[i++];
+							int boneCount = (int)vertices[i];
 							mesh->bonesCount += boneCount + 1;
 							mesh->weightsCount += boneCount * 3;
+							i += 1 + boneCount * 4;
 						}
 						mesh->bones = MALLOC(int, mesh->bonesCount);
 						mesh->weights = MALLOC(float, mesh->weightsCount);
