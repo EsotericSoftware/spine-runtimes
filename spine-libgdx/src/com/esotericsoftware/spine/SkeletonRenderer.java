@@ -47,6 +47,7 @@ public class SkeletonRenderer {
 
 	private boolean premultipliedAlpha;
 
+	@SuppressWarnings("null")
 	public void draw (PolygonSpriteBatch batch, Skeleton skeleton) {
 		boolean premultipliedAlpha = this.premultipliedAlpha;
 		int srcFunc = premultipliedAlpha ? GL20.GL_ONE : GL20.GL_SRC_ALPHA;
@@ -54,13 +55,13 @@ public class SkeletonRenderer {
 
 		boolean additive = false;
 
-		float[] vertices;
-		short[] triangles;
-		Texture texture;
+		float[] vertices = null;
+		short[] triangles = null;
 		Array<Slot> drawOrder = skeleton.drawOrder;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder.get(i);
 			Attachment attachment = slot.attachment;
+			Texture texture = null;
 			if (attachment instanceof RegionAttachment) {
 				RegionAttachment region = (RegionAttachment)attachment;
 				region.updateWorldVertices(slot, premultipliedAlpha);
@@ -68,23 +69,12 @@ public class SkeletonRenderer {
 				triangles = quadTriangles;
 				texture = region.getRegion().getTexture();
 
-				if (slot.data.getAdditiveBlending() != additive) {
-					additive = !additive;
-					if (additive)
-						batch.setBlendFunction(srcFunc, GL20.GL_ONE);
-					else
-						batch.setBlendFunction(srcFunc, GL20.GL_ONE_MINUS_SRC_ALPHA);
-				}
-
-				batch.draw(texture, vertices, 0, vertices.length, triangles, 0, triangles.length);
-
 			} else if (attachment instanceof MeshAttachment) {
 				MeshAttachment mesh = (MeshAttachment)attachment;
 				mesh.updateWorldVertices(slot, true);
 				vertices = mesh.getWorldVertices();
 				triangles = mesh.getTriangles();
 				texture = mesh.getRegion().getTexture();
-				batch.draw(texture, vertices, 0, vertices.length, triangles, 0, triangles.length);
 
 			} else if (attachment instanceof SkinnedMeshAttachment) {
 				SkinnedMeshAttachment mesh = (SkinnedMeshAttachment)attachment;
@@ -92,7 +82,6 @@ public class SkeletonRenderer {
 				vertices = mesh.getWorldVertices();
 				triangles = mesh.getTriangles();
 				texture = mesh.getRegion().getTexture();
-				batch.draw(texture, vertices, 0, vertices.length, triangles, 0, triangles.length);
 
 			} else if (attachment instanceof SkeletonAttachment) {
 				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
@@ -116,6 +105,17 @@ public class SkeletonRenderer {
 				rootBone.setScaleX(oldScaleX);
 				rootBone.setScaleY(oldScaleY);
 				rootBone.setRotation(oldRotation);
+			}
+
+			if (texture != null) {
+				if (slot.data.getAdditiveBlending() != additive) {
+					additive = !additive;
+					if (additive)
+						batch.setBlendFunction(srcFunc, GL20.GL_ONE);
+					else
+						batch.setBlendFunction(srcFunc, GL20.GL_ONE_MINUS_SRC_ALPHA);
+				}
+				batch.draw(texture, vertices, 0, vertices.length, triangles, 0, triangles.length);
 			}
 		}
 	}
