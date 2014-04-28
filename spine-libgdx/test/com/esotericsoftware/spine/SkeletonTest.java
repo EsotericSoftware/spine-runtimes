@@ -116,7 +116,8 @@ public class SkeletonTest extends ApplicationAdapter {
 		};
 
 		try {
-			if (skeletonFile.extension().equalsIgnoreCase("json")) {
+			String extension = skeletonFile.extension();
+			if (extension.equalsIgnoreCase("json") || extension.equalsIgnoreCase("txt")) {
 				SkeletonJson json = new SkeletonJson(atlas);
 				json.setScale(ui.scaleSlider.getValue());
 				skeletonData = json.readSkeletonData(skeletonFile);
