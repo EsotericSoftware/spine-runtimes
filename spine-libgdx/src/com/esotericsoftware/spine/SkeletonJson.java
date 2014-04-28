@@ -205,17 +205,14 @@ public class SkeletonJson {
 			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, path);
 			if (mesh == null) return null;
 			mesh.setPath(path);
-			float[] uvs = map.require("uvs").asFloatArray();
-			short[] triangles = map.require("triangles").asShortArray();
-
 			float[] vertices = map.require("vertices").asFloatArray();
 			if (scale != 1) {
 				for (int i = 0, n = vertices.length; i < n; i++)
 					vertices[i] *= scale;
 			}
 			mesh.setVertices(vertices);
-			mesh.setTriangles(triangles);
-			mesh.setRegionUVs(uvs);
+			mesh.setTriangles(map.require("triangles").asShortArray());
+			mesh.setRegionUVs(map.require("uvs").asFloatArray());
 			mesh.updateUVs();
 
 			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() * 2);
@@ -229,8 +226,6 @@ public class SkeletonJson {
 			if (mesh == null) return null;
 			mesh.setPath(path);
 			float[] uvs = map.require("uvs").asFloatArray();
-			short[] triangles = map.require("triangles").asShortArray();
-
 			float[] vertices = map.require("vertices").asFloatArray();
 			FloatArray weights = new FloatArray(uvs.length * 3 * 3);
 			IntArray bones = new IntArray(uvs.length * 3);
@@ -247,7 +242,7 @@ public class SkeletonJson {
 			}
 			mesh.setBones(bones.toArray());
 			mesh.setWeights(weights.toArray());
-			mesh.setTriangles(triangles);
+			mesh.setTriangles(map.require("triangles").asShortArray());
 			mesh.setRegionUVs(uvs);
 			mesh.updateUVs();
 

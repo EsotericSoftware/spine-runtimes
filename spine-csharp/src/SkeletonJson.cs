@@ -219,13 +219,10 @@ namespace Spine {
 					MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, name, path);
 					if (mesh == null) return null;
 
-					mesh.Path = path;
-					float[] uvs = GetFloatArray(map, "uvs", 1);
-					int[] triangles = GetIntArray(map, "triangles");
-					float[] vertices = GetFloatArray(map, "vertices", Scale);
-					mesh.vertices = vertices;
-					mesh.triangles = triangles;
-					mesh.regionUVs = uvs;
+					mesh.Path = path; 
+					mesh.vertices = GetFloatArray(map, "vertices", Scale);
+					mesh.triangles = GetIntArray(map, "triangles");
+					mesh.regionUVs = GetFloatArray(map, "uvs", 1);
 					mesh.UpdateUVs();
 
 					if (map.ContainsKey("color")) {
@@ -249,8 +246,6 @@ namespace Spine {
 
 					mesh.Path = path;
 					float[] uvs = GetFloatArray(map, "uvs", 1);
-					int[] triangles = GetIntArray(map, "triangles");
-
 					float[] vertices = GetFloatArray(map, "vertices", 1);
 					var weights = new List<float>(uvs.Length * 3 * 3);
 					var bones = new List<int>(uvs.Length * 3);
@@ -268,7 +263,7 @@ namespace Spine {
 					}
 					mesh.bones = bones.ToArray();
 					mesh.weights = weights.ToArray();
-					mesh.triangles = triangles;
+					mesh.triangles = GetIntArray(map, "triangles");
 					mesh.regionUVs = uvs;
 					mesh.UpdateUVs();
 
