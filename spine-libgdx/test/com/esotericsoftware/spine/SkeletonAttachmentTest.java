@@ -58,6 +58,7 @@ public class SkeletonAttachmentTest extends ApplicationAdapter {
 		{
 			TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy.atlas"));
 			SkeletonJson json = new SkeletonJson(atlas);
+			json.setScale(0.6f);
 			SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy/spineboy.json"));
 			spineboy = new Skeleton(skeletonData);
 			spineboy.setX(320);
@@ -65,7 +66,7 @@ public class SkeletonAttachmentTest extends ApplicationAdapter {
 
 			AnimationStateData stateData = new AnimationStateData(skeletonData);
 			stateData.setMix("walk", "jump", 0.2f);
-			stateData.setMix("jump", "walk", 0.4f);
+			stateData.setMix("jump", "walk", 0.2f);
 			spineboyState = new AnimationState(stateData);
 			new AnimationStateAdapter() {
 				public void start (int trackIndex) {
@@ -89,7 +90,7 @@ public class SkeletonAttachmentTest extends ApplicationAdapter {
 			// Instead of a right shoulder, spineboy will have a goblin!
 			SkeletonAttachment skeletonAttachment = new SkeletonAttachment("goblin");
 			skeletonAttachment.setSkeleton(goblin);
-			spineboy.findSlot("right shoulder").setAttachment(skeletonAttachment);
+			spineboy.findSlot("front_upper_arm").setAttachment(skeletonAttachment);
 		}
 	}
 

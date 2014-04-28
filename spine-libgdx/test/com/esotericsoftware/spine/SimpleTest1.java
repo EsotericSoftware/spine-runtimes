@@ -59,6 +59,7 @@ public class SimpleTest1 extends ApplicationAdapter {
 
 		atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy.atlas"));
 		SkeletonJson json = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
+		json.setScale(0.6f); // Load the skeleton at 60% the size it was in Spine.
 		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy/spineboy.json"));
 
 		skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
@@ -66,12 +67,14 @@ public class SimpleTest1 extends ApplicationAdapter {
 		skeleton.setY(20);
 
 		AnimationStateData stateData = new AnimationStateData(skeletonData); // Defines mixing (crossfading) between animations.
-		stateData.setMix("walk", "jump", 0.2f);
-		stateData.setMix("jump", "walk", 0.4f);
+		stateData.setMix("run", "jump", 0.2f);
+		stateData.setMix("jump", "run", 0.2f);
 
 		state = new AnimationState(stateData); // Holds the animation state for a skeleton (current animation, time, etc).
-		state.setAnimation(0, "jump", false);
-		state.addAnimation(0, "walk", true, 0);
+		state.setTimeScale(0.5f); // Slow all animations down to 50% speed.
+		state.setAnimation(0, "run", true);
+		state.addAnimation(0, "jump", false, 2); // Jump after 2 seconds.
+		state.addAnimation(0, "run", true, 0); // Run after the jump.
 	}
 
 	public void render () {

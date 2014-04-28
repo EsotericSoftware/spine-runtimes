@@ -63,11 +63,11 @@ public class MixTest extends ApplicationAdapter {
 
 		if (true) {
 			SkeletonJson json = new SkeletonJson(atlas);
-			// json.setScale(2);
+			json.setScale(0.6f);
 			skeletonData = json.readSkeletonData(Gdx.files.internal(name + ".json"));
 		} else {
 			SkeletonBinary binary = new SkeletonBinary(atlas);
-			// binary.setScale(2);
+			binary.setScale(0.6f);
 			skeletonData = binary.readSkeletonData(Gdx.files.internal(name + ".skel"));
 		}
 		walkAnimation = skeletonData.findAnimation("walk");
@@ -84,8 +84,8 @@ public class MixTest extends ApplicationAdapter {
 
 		float jump = jumpAnimation.getDuration();
 		float beforeJump = 1f;
-		float blendIn = 0.4f;
-		float blendOut = 0.4f;
+		float blendIn = 0.2f;
+		float blendOut = 0.2f;
 		float blendOutStart = beforeJump + jump - blendOut;
 		float total = 3.75f;
 

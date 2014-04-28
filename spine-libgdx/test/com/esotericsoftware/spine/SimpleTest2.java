@@ -64,23 +64,27 @@ public class SimpleTest2 extends ApplicationAdapter {
 
 		atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy.atlas"));
 		SkeletonJson json = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
+		json.setScale(0.6f); // Load the skeleton at 60% the size it was in Spine.
 		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy/spineboy.json"));
 
 		skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
 		skeleton.setX(250);
 		skeleton.setY(20);
+		skeleton.setAttachment("head-bb", "head"); // Attach "head" bounding box to "head-bb" slot.
 
 		bounds = new SkeletonBounds(); // Convenience class to do hit detection with bounding boxes.
 
 		AnimationStateData stateData = new AnimationStateData(skeletonData); // Defines mixing (crossfading) between animations.
-		stateData.setMix("walk", "jump", 0.2f);
-		stateData.setMix("jump", "walk", 0.4f);
-		stateData.setMix("jump", "jump", 0.2f);
+		stateData.setMix("run", "jump", 0.2f);
+		stateData.setMix("jump", "run", 0.2f);
+		stateData.setMix("jump", "jump", 0);
 
 		state = new AnimationState(stateData); // Holds the animation state for a skeleton (current animation, time, etc).
+		state.setTimeScale(0.3f); // Slow all animations down to 30% speed.
 		state.addListener(new AnimationStateListener() {
 			public void event (int trackIndex, Event event) {
-				System.out.println(trackIndex + " event: " + state.getCurrent(trackIndex) + ", " + event.getData().getName());
+				System.out.println(trackIndex + " event: " + state.getCurrent(trackIndex) + ", " + event.getData().getName() + ", "
+					+ event.getInt());
 			}
 
 			public void complete (int trackIndex, int loopCount) {
@@ -95,7 +99,7 @@ public class SimpleTest2 extends ApplicationAdapter {
 				System.out.println(trackIndex + " end: " + state.getCurrent(trackIndex));
 			}
 		});
-		state.setAnimation(0, "headPop", true);
+		state.setAnimation(0, "run", true);
 
 		Gdx.input.setInputProcessor(new InputAdapter() {
 			final Vector3 point = new Vector3();
@@ -120,7 +124,7 @@ public class SimpleTest2 extends ApplicationAdapter {
 
 			public boolean keyDown (int keycode) {
 				state.setAnimation(0, "jump", false); // Set animation on track 0 to jump.
-				state.addAnimation(0, "walk", true, 0); // Queue walk to play after jump.
+				state.addAnimation(0, "run", true, 0); // Queue run to play after jump.
 				return true;
 			}
 		});

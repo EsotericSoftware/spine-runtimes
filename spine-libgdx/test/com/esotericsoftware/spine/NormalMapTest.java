@@ -373,7 +373,7 @@ public class NormalMapTest extends ApplicationAdapter {
 
 	public static void main (String[] args) throws Exception {
 		if (args.length == 0)
-			args = new String[] {"spineboy/spineboy", "walk"};
+			args = new String[] {"spineboy/spineboy-old", "walk"};
 		else if (args.length == 1) //
 			args = new String[] {args[0], null};
 
