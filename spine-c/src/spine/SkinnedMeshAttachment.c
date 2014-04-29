@@ -79,11 +79,11 @@ void spSkinnedMeshAttachment_computeWorldVertices (spSkinnedMeshAttachment* self
 	if (slot->attachmentVerticesCount == 0) {
 		for (; v < self->bonesCount; w += 2) {
 			float wx = 0, wy = 0;
-			int nn = self->bones[v] + v;
+			const int nn = self->bones[v] + v;
 			v++;
 			for (; v <= nn; v++, b += 3) {
-				spBone* bone = skeletonBones[self->bones[v]];
-				float vx = self->weights[b], vy = self->weights[b + 1], weight = self->weights[b + 2];
+				const spBone* bone = skeletonBones[self->bones[v]];
+				const float vx = self->weights[b], vy = self->weights[b + 1], weight = self->weights[b + 2];
 				wx += (vx * bone->m00 + vy * bone->m01 + bone->worldX) * weight;
 				wy += (vx * bone->m10 + vy * bone->m11 + bone->worldY) * weight;
 			}
@@ -91,14 +91,14 @@ void spSkinnedMeshAttachment_computeWorldVertices (spSkinnedMeshAttachment* self
 			worldVertices[w + 1] = wy + y;
 		}
 	} else {
-		float* ffd = slot->attachmentVertices;
+		const float* ffd = slot->attachmentVertices;
 		for (; v < self->bonesCount; w += 2) {
 			float wx = 0, wy = 0;
-			int nn = self->bones[v] + v;
+			const int nn = self->bones[v] + v;
 			v++;
 			for (; v <= nn; v++, b += 3, f += 2) {
-				spBone* bone = skeletonBones[self->bones[v]];
-				float vx = self->weights[b] + ffd[f], vy = self->weights[b + 1] + ffd[f + 1], weight = self->weights[b + 2];
+				const spBone* bone = skeletonBones[self->bones[v]];
+				const float vx = self->weights[b] + ffd[f], vy = self->weights[b + 1] + ffd[f + 1], weight = self->weights[b + 2];
 				wx += (vx * bone->m00 + vy * bone->m01 + bone->worldX) * weight;
 				wy += (vx * bone->m10 + vy * bone->m11 + bone->worldY) * weight;
 			}

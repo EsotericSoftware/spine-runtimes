@@ -135,7 +135,7 @@ void spineboy () {
 }
 
 void goblins () {
-// Load atlas, skeleton, and animations.
+	// Load atlas, skeleton, and animations.
 	Atlas* atlas = Atlas_readAtlasFile("../data/goblins-ffd.atlas");
 	SkeletonJson* json = SkeletonJson_create(atlas);
 	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "../data/goblins-ffd.json");
@@ -154,7 +154,7 @@ void goblins () {
 	skeleton->flipY = false;
 	Skeleton_setSkinByName(skeleton, "goblin");
 	Skeleton_setSlotsToSetupPose(skeleton);
-//	Skeleton_setAttachment(skeleton, "left hand item", "dagger");
+	//Skeleton_setAttachment(skeleton, "left hand item", "dagger");
 
 	skeleton->x = 320;
 	skeleton->y = 590;
@@ -185,6 +185,6 @@ void goblins () {
 }
 
 int main () {
-//	spineboy();
+	spineboy();
 	goblins();
 }

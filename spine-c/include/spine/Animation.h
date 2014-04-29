@@ -32,6 +32,7 @@
 #define SPINE_ANIMATION_H_
 
 #include <spine/Event.h>
+#include <spine/Attachment.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -81,7 +82,8 @@ typedef enum {
 	SP_TIMELINE_COLOR,
 	SP_TIMELINE_ATTACHMENT,
 	SP_TIMELINE_EVENT,
-	SP_TIMELINE_DRAWORDER
+	SP_TIMELINE_DRAWORDER,
+	SP_TIMELINE_FFD
 } spTimelineType;
 
 struct spTimeline {
@@ -135,7 +137,7 @@ typedef spCurveTimeline CurveTimeline;
 
 typedef struct spBaseTimeline {
 	spCurveTimeline super;
-	int const framesLength;
+	int const framesCount;
 	float* const frames; /* time, angle, ... for rotate. time, x, y, ... for translate and scale. */
 	int boneIndex;
 } spRotateTimeline;
@@ -182,7 +184,7 @@ typedef spScaleTimeline ScaleTimeline;
 
 typedef struct {
 	spCurveTimeline super;
-	int const framesLength;
+	int const framesCount;
 	float* const frames; /* time, r, g, b, a, ... */
 	int slotIndex;
 } spColorTimeline;
@@ -201,7 +203,7 @@ typedef spColorTimeline ColorTimeline;
 
 typedef struct {
 	spTimeline super;
-	int const framesLength;
+	int const framesCount;
 	float* const frames; /* time, ... */
 	int slotIndex;
 	const char** const attachmentNames;
@@ -222,7 +224,7 @@ typedef spAttachmentTimeline AttachmentTimeline;
 
 typedef struct {
 	spTimeline super;
-	int const framesLength;
+	int const framesCount;
 	float* const frames; /* time, ... */
 	spEvent** const events;
 } spEventTimeline;
@@ -241,7 +243,7 @@ typedef spEventTimeline EventTimeline;
 
 typedef struct {
 	spTimeline super;
-	int const framesLength;
+	int const framesCount;
 	float* const frames; /* time, ... */
 	const int** const drawOrders;
 	int const slotCount;
@@ -255,6 +257,28 @@ void spDrawOrderTimeline_setFrame (spDrawOrderTimeline* self, int frameIndex, fl
 typedef spDrawOrderTimeline DrawOrderTimeline;
 #define DrawOrderTimeline_create(...) spDrawOrderTimeline_create(__VA_ARGS__)
 #define DrawOrderTimeline_setFrame(...) spDrawOrderTimeline_setFrame(__VA_ARGS__)
+#endif
+
+/**/
+
+typedef struct {
+	spCurveTimeline super;
+	int const framesCount;
+	float* const frames; /* time, ... */
+	int const frameVerticesCount;
+	const float** const frameVertices;
+	int slotIndex;
+	spAttachment* attachment;
+} spFFDTimeline;
+
+spFFDTimeline* spFFDTimeline_create (int frameCount, int frameVerticesCount);
+
+void spFFDTimeline_setFrame (spFFDTimeline* self, int frameIndex, float time, float* vertices);
+
+#ifdef SPINE_SHORT_NAMES
+typedef spFFDTimeline FFDTimeline;
+#define FFDTimeline_create(...) spFFDTimeline_create(__VA_ARGS__)
+#define FFDTimeline_setFrame(...) spFFDTimeline_setFrame(__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

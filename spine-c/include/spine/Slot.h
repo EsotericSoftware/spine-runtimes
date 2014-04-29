@@ -48,6 +48,7 @@ typedef struct spSlot {
 	float r, g, b, a;
 	spAttachment* const attachment;
 
+	int attachmentVerticesCapacity;
 	int attachmentVerticesCount;
 	float* attachmentVertices;
 } spSlot;
