@@ -365,15 +365,15 @@ public class SkeletonJson {
 					timeline.slotIndex = slotIndex;
 					timeline.attachment = attachment;
 
+					int vertexCount;
+					if (attachment instanceof MeshAttachment)
+						vertexCount = ((MeshAttachment)attachment).getVertices().length;
+					else
+						vertexCount = ((SkinnedMeshAttachment)attachment).getWeights().length / 3 * 2;
+
 					int frameIndex = 0;
 					for (JsonValue valueMap = meshMap.child; valueMap != null; valueMap = valueMap.next) {
 						float[] vertices;
-						int vertexCount;
-						if (attachment instanceof MeshAttachment)
-							vertexCount = ((MeshAttachment)attachment).getVertices().length;
-						else
-							vertexCount = ((SkinnedMeshAttachment)attachment).getWeights().length / 3 * 2;
-
 						JsonValue verticesValue = valueMap.get("vertices");
 						if (verticesValue == null) {
 							if (attachment instanceof MeshAttachment)

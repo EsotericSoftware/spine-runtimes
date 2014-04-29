@@ -347,6 +347,48 @@ namespace Spine {
 			float duration = 0;
 			float scale = Scale;
 
+			if (map.ContainsKey("slots")) {
+				foreach (KeyValuePair<String, Object> entry in (Dictionary<String, Object>)map["slots"]) {
+					String slotName = entry.Key;
+					int slotIndex = skeletonData.FindSlotIndex(slotName);
+					var timelineMap = (Dictionary<String, Object>)entry.Value;
+
+					foreach (KeyValuePair<String, Object> timelineEntry in timelineMap) {
+						var values = (List<Object>)timelineEntry.Value;
+						var timelineName = (String)timelineEntry.Key;
+						if (timelineName.Equals("color")) {
+							var timeline = new ColorTimeline(values.Count);
+							timeline.slotIndex = slotIndex;
+
+							int frameIndex = 0;
+							foreach (Dictionary<String, Object> valueMap in values) {
+								float time = (float)valueMap["time"];
+								String c = (String)valueMap["color"];
+								timeline.setFrame(frameIndex, time, ToColor(c, 0), ToColor(c, 1), ToColor(c, 2), ToColor(c, 3));
+								ReadCurve(timeline, frameIndex, valueMap);
+								frameIndex++;
+							}
+							timelines.Add(timeline);
+							duration = Math.Max(duration, timeline.frames[timeline.FrameCount * 5 - 5]);
+
+						} else if (timelineName.Equals("attachment")) {
+							var timeline = new AttachmentTimeline(values.Count);
+							timeline.slotIndex = slotIndex;
+
+							int frameIndex = 0;
+							foreach (Dictionary<String, Object> valueMap in values) {
+								float time = (float)valueMap["time"];
+								timeline.setFrame(frameIndex++, time, (String)valueMap["name"]);
+							}
+							timelines.Add(timeline);
+							duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1]);
+
+						} else
+							throw new Exception("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
+					}
+				}
+			}
+
 			if (map.ContainsKey("bones")) {
 				foreach (KeyValuePair<String, Object> entry in (Dictionary<String, Object>)map["bones"]) {
 					String boneName = entry.Key;
@@ -401,48 +443,6 @@ namespace Spine {
 				}
 			}
 
-			if (map.ContainsKey("slots")) {
-				foreach (KeyValuePair<String, Object> entry in (Dictionary<String, Object>)map["slots"]) {
-					String slotName = entry.Key;
-					int slotIndex = skeletonData.FindSlotIndex(slotName);
-					var timelineMap = (Dictionary<String, Object>)entry.Value;
-
-					foreach (KeyValuePair<String, Object> timelineEntry in timelineMap) {
-						var values = (List<Object>)timelineEntry.Value;
-						var timelineName = (String)timelineEntry.Key;
-						if (timelineName.Equals("color")) {
-							var timeline = new ColorTimeline(values.Count);
-							timeline.slotIndex = slotIndex;
-
-							int frameIndex = 0;
-							foreach (Dictionary<String, Object> valueMap in values) {
-								float time = (float)valueMap["time"];
-								String c = (String)valueMap["color"];
-								timeline.setFrame(frameIndex, time, ToColor(c, 0), ToColor(c, 1), ToColor(c, 2), ToColor(c, 3));
-								ReadCurve(timeline, frameIndex, valueMap);
-								frameIndex++;
-							}
-							timelines.Add(timeline);
-							duration = Math.Max(duration, timeline.frames[timeline.FrameCount * 5 - 5]);
-
-						} else if (timelineName.Equals("attachment")) {
-							var timeline = new AttachmentTimeline(values.Count);
-							timeline.slotIndex = slotIndex;
-
-							int frameIndex = 0;
-							foreach (Dictionary<String, Object> valueMap in values) {
-								float time = (float)valueMap["time"];
-								timeline.setFrame(frameIndex++, time, (String)valueMap["name"]);
-							}
-							timelines.Add(timeline);
-							duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1]);
-
-						} else
-							throw new Exception("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
-					}
-				}
-			}
-
 			if (map.ContainsKey("ffd")) {
 				foreach (KeyValuePair<String, Object> ffdMap in (Dictionary<String, Object>)map["ffd"]) {
 					Skin skin = skeletonData.FindSkin(ffdMap.Key);
@@ -456,15 +456,15 @@ namespace Spine {
 							timeline.slotIndex = slotIndex;
 							timeline.attachment = attachment;
 
+							int vertexCount;
+							if (attachment is MeshAttachment)
+								vertexCount = ((MeshAttachment)attachment).vertices.Length;
+							else
+								vertexCount = ((SkinnedMeshAttachment)attachment).Weights.Length / 3 * 2;
+
 							int frameIndex = 0;
 							foreach (Dictionary<String, Object> valueMap in values) {
 								float[] vertices;
-								int vertexCount;
-								if (attachment is MeshAttachment)
-									vertexCount = ((MeshAttachment)attachment).vertices.Length;
-								else
-									vertexCount = ((SkinnedMeshAttachment)attachment).Weights.Length / 3 * 2;
-
 								if (!valueMap.ContainsKey("vertices")) {
 									if (attachment is MeshAttachment)
 										vertices = ((MeshAttachment)attachment).vertices;
@@ -475,11 +475,11 @@ namespace Spine {
 									vertices = new float[vertexCount];
 									int start = GetInt(valueMap, "offset", 0);
 									if (scale == 1) {
-										for (int i = 0, n = verticesValue.Count; i < n; i++)
-											vertices[i + start] = (float)verticesValue[i];
+										for (int i = start, n = verticesValue.Count; i < n; i++)
+											vertices[i] = (float)verticesValue[i];
 									} else {
-										for (int i = 0, n = verticesValue.Count; i < n; i++)
-											vertices[i + start] = (float)verticesValue[i] * scale;
+										for (int i = start, n = i + verticesValue.Count; i < n; i++)
+											vertices[i] = (float)verticesValue[i] * scale;
 									}
 									if (attachment is MeshAttachment) {
 										float[] meshVertices = ((MeshAttachment)attachment).vertices;
