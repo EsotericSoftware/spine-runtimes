@@ -25,7 +25,7 @@ char* _spUtil_readFile (const char* path, int* length) {
 /**/
 
 int main (void) {
-	spAtlas* atlas = spAtlas_readAtlasFile("data/spineboy.atlas");
+	spAtlas* atlas = spAtlas_createFromFile("data/spineboy.atlas", 0);
 	printf("First region name: %s, x: %d, y: %d\n", atlas->regions->name, atlas->regions->x, atlas->regions->y);
 	printf("First page name: %s, size: %d, %d\n", atlas->pages->name, atlas->pages->width, atlas->pages->height);
 

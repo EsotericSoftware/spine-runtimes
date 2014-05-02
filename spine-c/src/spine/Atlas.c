@@ -32,8 +32,9 @@
 #include <ctype.h>
 #include <spine/extension.h>
 
-spAtlasPage* spAtlasPage_create (const char* name) {
+spAtlasPage* spAtlasPage_create (spAtlas* atlas, const char* name) {
 	spAtlasPage* self = NEW(spAtlasPage);
+	CONST_CAST(spAtlas*, self->atlas) = atlas;
 	MALLOC_STR(self->name, name);
 	return self;
 }
@@ -171,7 +172,7 @@ static const char* formatNames[] = {"Alpha", "Intensity", "LuminanceAlpha", "RGB
 static const char* textureFilterNames[] = {"Nearest", "Linear", "MipMap", "MipMapNearestNearest", "MipMapLinearNearest",
 		"MipMapNearestLinear", "MipMapLinearLinear"};
 
-spAtlas* spAtlas_readAtlas (const char* begin, int length, const char* dir) {
+spAtlas* spAtlas_create (const char* begin, int length, const char* dir, void* rendererObject) {
 	int count;
 	const char* end = begin + length;
 	int dirLength = strlen(dir);
@@ -195,7 +196,7 @@ spAtlas* spAtlas_readAtlas (const char* begin, int length, const char* dir) {
 			if (needsSlash) path[dirLength] = '/';
 			strcpy(path + dirLength + needsSlash, name);
 
-			page = spAtlasPage_create(name);
+			page = spAtlasPage_create(self, name);
 			FREE(name);
 			if (lastPage)
 				lastPage->next = page;
@@ -285,7 +286,7 @@ spAtlas* spAtlas_readAtlas (const char* begin, int length, const char* dir) {
 	return self;
 }
 
-spAtlas* spAtlas_readAtlasFile (const char* path) {
+spAtlas* spAtlas_createFromFile (const char* path, void* rendererObject) {
 	int dirLength;
 	char *dir;
 	int length;
@@ -304,7 +305,7 @@ spAtlas* spAtlas_readAtlasFile (const char* path) {
 	dir[dirLength] = '\0';
 
 	data = _spUtil_readFile(path, &length);
-	if (data) atlas = spAtlas_readAtlas(data, length, dir);
+	if (data) atlas = spAtlas_create(data, length, dir, rendererObject);
 
 	FREE(data);
 	FREE(dir);

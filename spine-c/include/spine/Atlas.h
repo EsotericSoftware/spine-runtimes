@@ -35,6 +35,8 @@
 extern "C" {
 #endif
 
+typedef struct spAtlas spAtlas;
+
 typedef enum {
 	SP_ATLAS_ALPHA,
 	SP_ATLAS_INTENSITY,
@@ -61,6 +63,7 @@ typedef enum {
 
 typedef struct spAtlasPage spAtlasPage;
 struct spAtlasPage {
+	const spAtlas* atlas;
 	const char* name;
 	spAtlasFormat format;
 	spAtlasFilter minFilter, magFilter;
@@ -72,7 +75,7 @@ struct spAtlasPage {
 	spAtlasPage* next;
 };
 
-spAtlasPage* spAtlasPage_create (const char* name);
+spAtlasPage* spAtlasPage_create (spAtlas* atlas, const char* name);
 void spAtlasPage_dispose (spAtlasPage* self);
 
 #ifdef SPINE_SHORT_NAMES
@@ -132,15 +135,17 @@ typedef spAtlasRegion AtlasRegion;
 
 /**/
 
-typedef struct {
+struct spAtlas {
 	spAtlasPage* pages;
 	spAtlasRegion* regions;
-} spAtlas;
+
+	void* rendererObject;
+};
 
 /* Image files referenced in the atlas file will be prefixed with dir. */
-spAtlas* spAtlas_readAtlas (const char* data, int length, const char* dir);
+spAtlas* spAtlas_create (const char* data, int length, const char* dir, void* rendererObject);
 /* Image files referenced in the atlas file will be prefixed with the directory containing the atlas file. */
-spAtlas* spAtlas_readAtlasFile (const char* path);
+spAtlas* spAtlas_createFromFile (const char* path, void* rendererObject);
 void spAtlas_dispose (spAtlas* atlas);
 
 /* Returns 0 if the region was not found. */
@@ -148,8 +153,8 @@ spAtlasRegion* spAtlas_findRegion (const spAtlas* self, const char* name);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spAtlas Atlas;
-#define Atlas_readAtlas(...) spAtlas_readAtlas(__VA_ARGS__)
-#define Atlas_readAtlasFile(...) spAtlas_readAtlasFile(__VA_ARGS__)
+#define Atlas_create(...) spAtlas_create(__VA_ARGS__)
+#define Atlas_createFromFile(...) spAtlas_createFromFile(__VA_ARGS__)
 #define Atlas_dispose(...) spAtlas_dispose(__VA_ARGS__)
 #define Atlas_findRegion(...) spAtlas_findRegion(__VA_ARGS__)
 #endif
