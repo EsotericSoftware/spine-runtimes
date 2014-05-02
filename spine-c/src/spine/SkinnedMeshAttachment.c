@@ -28,8 +28,8 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/SkinnedMeshAttachment.h>
-#include <spine/extension.h>
+#include "spine/SkinnedMeshAttachment.h"
+#include "spine/extension.h"
 
 void _spSkinnedMeshAttachment_dispose (spAttachment* attachment) {
 	spSkinnedMeshAttachment* self = SUB_CAST(spSkinnedMeshAttachment, attachment);

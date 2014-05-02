@@ -28,9 +28,9 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/Slot.h>
-#include <spine/extension.h>
-#include <spine/Skeleton.h>
+#include "spine/Slot.h"
+#include "spine/extension.h"
+#include "spine/Skeleton.h"
 
 typedef struct {
 	spSlot super;

@@ -28,9 +28,9 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/Animation.h>
+#include "spine/Animation.h"
 #include <limits.h>
-#include <spine/extension.h>
+#include "spine/extension.h"
 
 spAnimation* spAnimation_create (const char* name, int timelineCount) {
 	spAnimation* self = NEW(spAnimation);

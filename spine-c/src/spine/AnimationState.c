@@ -28,8 +28,8 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/AnimationState.h>
-#include <spine/extension.h>
+#include "spine/AnimationState.h"
+#include "spine/extension.h"
 #include <string.h>
 
 spTrackEntry* _spTrackEntry_create () {

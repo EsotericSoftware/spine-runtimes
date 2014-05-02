@@ -28,8 +28,8 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/SlotData.h>
-#include <spine/extension.h>
+#include "spine/SlotData.h"
+#include "spine/extension.h"
 
 spSlotData* spSlotData_create (const char* name, spBoneData* boneData) {
 	spSlotData* self = NEW(spSlotData);

@@ -28,11 +28,11 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/SkeletonJson.h>
+#include "spine/SkeletonJson.h"
 #include <stdio.h>
 #include "Json.h"
-#include <spine/extension.h>
-#include <spine/AtlasAttachmentLoader.h>
+#include "spine/extension.h"
+#include "spine/AtlasAttachmentLoader.h"
 
 typedef struct {
 	spSkeletonJson super;
