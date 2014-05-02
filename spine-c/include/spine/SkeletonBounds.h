@@ -31,8 +31,8 @@
 #ifndef SPINE_SKELETONBOUNDS_H_
 #define SPINE_SKELETONBOUNDS_H_
 
-#include <spine/BoundingBoxAttachment.h>
-#include <spine/Skeleton.h>
+#include "spine/BoundingBoxAttachment.h"
+#include "spine/Skeleton.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,7 +60,7 @@ typedef spPolygon Polygon;
 
 /**/
 
-typedef struct {
+typedef struct spSkeletonBounds{
 	int count;
 	spBoundingBoxAttachment** boundingBoxes;
 	spPolygon** polygons;

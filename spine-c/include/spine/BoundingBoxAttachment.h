@@ -31,9 +31,9 @@
 #ifndef SPINE_BOUNDINGBOXATTACHMENT_H_
 #define SPINE_BOUNDINGBOXATTACHMENT_H_
 
-#include <spine/Attachment.h>
-#include <spine/Atlas.h>
-#include <spine/Slot.h>
+#include "spine/Attachment.h"
+#include "spine/Atlas.h"
+#include "spine/Slot.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -28,9 +28,9 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/Skeleton.h>
+#include "spine/Skeleton.h"
 #include <string.h>
-#include <spine/extension.h>
+#include "spine/extension.h"
 
 spSkeleton* spSkeleton_create (spSkeletonData* data) {
 	int i, ii;

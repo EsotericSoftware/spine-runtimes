@@ -31,9 +31,9 @@
 #ifndef SPINE_SLOT_H_
 #define SPINE_SLOT_H_
 
-#include <spine/Bone.h>
-#include <spine/Attachment.h>
-#include <spine/SlotData.h>
+#include "spine/Bone.h"
+#include "spine/Attachment.h"
+#include "spine/SlotData.h"
 
 #ifdef __cplusplus
 extern "C" {

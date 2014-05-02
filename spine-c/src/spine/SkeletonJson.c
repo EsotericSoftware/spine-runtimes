@@ -28,11 +28,11 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/SkeletonJson.h>
+#include "spine/SkeletonJson.h"
 #include <stdio.h>
 #include "Json.h"
-#include <spine/extension.h>
-#include <spine/AtlasAttachmentLoader.h>
+#include "spine/extension.h"
+#include "spine/AtlasAttachmentLoader.h"
 
 typedef struct {
 	spSkeletonJson super;
@@ -564,7 +564,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 							mesh->a = toColor(color, 3);
 						}
 
-						mesh->hullLength = Json_getFloat(attachmentMap, "hull", 0);
+						mesh->hullLength = (int)Json_getFloat(attachmentMap, "hull", 0);
 
 						entry = Json_getItem(attachmentMap, "edges");
 						if (entry) {
@@ -635,7 +635,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 							mesh->a = toColor(color, 3);
 						}
 
-						mesh->hullLength = Json_getFloat(attachmentMap, "hull", 0);
+						mesh->hullLength = (int)Json_getFloat(attachmentMap, "hull", 0);
 
 						entry = Json_getItem(attachmentMap, "edges");
 						if (entry) {

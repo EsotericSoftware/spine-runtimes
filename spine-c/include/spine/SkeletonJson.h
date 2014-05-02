@@ -31,11 +31,11 @@
 #ifndef SPINE_SKELETONJSON_H_
 #define SPINE_SKELETONJSON_H_
 
-#include <spine/Attachment.h>
-#include <spine/AttachmentLoader.h>
-#include <spine/SkeletonData.h>
-#include <spine/Atlas.h>
-#include <spine/Animation.h>
+#include "spine/Attachment.h"
+#include "spine/AttachmentLoader.h"
+#include "spine/SkeletonData.h"
+#include "spine/Atlas.h"
+#include "spine/Animation.h"
 
 #ifdef __cplusplus
 extern "C" {

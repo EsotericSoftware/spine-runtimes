@@ -31,17 +31,17 @@
 #ifndef SPINE_SKELETONDATA_H_
 #define SPINE_SKELETONDATA_H_
 
-#include <spine/BoneData.h>
-#include <spine/SlotData.h>
-#include <spine/Skin.h>
-#include <spine/EventData.h>
-#include <spine/Animation.h>
+#include "spine/BoneData.h"
+#include "spine/SlotData.h"
+#include "spine/Skin.h"
+#include "spine/EventData.h"
+#include "spine/Animation.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct {
+typedef struct spSkeletonData{
 	int boneCount;
 	spBoneData** bones;
 

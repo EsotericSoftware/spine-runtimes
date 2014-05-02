@@ -28,8 +28,8 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/Bone.h>
-#include <spine/extension.h>
+#include "spine/Bone.h"
+#include "spine/extension.h"
 
 static int yDown;
 

@@ -31,8 +31,8 @@
 #ifndef SPINE_SKINNEDMESHATTACHMENT_H_
 #define SPINE_SKINNEDMESHATTACHMENT_H_
 
-#include <spine/Attachment.h>
-#include <spine/Slot.h>
+#include "spine/Attachment.h"
+#include "spine/Slot.h"
 
 #ifdef __cplusplus
 extern "C" {

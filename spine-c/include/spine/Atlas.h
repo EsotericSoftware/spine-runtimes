@@ -132,7 +132,7 @@ typedef spAtlasRegion AtlasRegion;
 
 /**/
 
-typedef struct {
+typedef struct spAtlas{
 	spAtlasPage* pages;
 	spAtlasRegion* regions;
 } spAtlas;

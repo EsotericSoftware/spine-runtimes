@@ -26,7 +26,7 @@
 #include "Json.h"
 #include <stdio.h>
 #include <ctype.h>
-#include <spine/extension.h>
+#include "spine/extension.h"
 
 static const char* ep;
 

@@ -31,7 +31,7 @@
 #ifndef SPINE_BONE_H_
 #define SPINE_BONE_H_
 
-#include <spine/BoneData.h>
+#include "spine/BoneData.h"
 
 #ifdef __cplusplus
 extern "C" {

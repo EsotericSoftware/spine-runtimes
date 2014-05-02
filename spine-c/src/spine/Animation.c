@@ -28,9 +28,9 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/Animation.h>
+#include "spine/Animation.h"
 #include <limits.h>
-#include <spine/extension.h>
+#include "spine/extension.h"
 
 spAnimation* spAnimation_create (const char* name, int timelineCount) {
 	spAnimation* self = NEW(spAnimation);
@@ -642,6 +642,9 @@ void _spFFDTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, flo
 	int frameIndex, i;
 	float percent, frameTime;
 	spFFDTimeline* self = (spFFDTimeline*)timeline;
+	float* prevVertices;
+	float* nextVertices;
+
 
 	spSlot *slot = skeleton->slots[self->slotIndex];
 	if (slot->attachment != self->attachment) return;
@@ -677,8 +680,8 @@ void _spFFDTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, flo
 	percent = 1 - (time - frameTime) / (self->frames[frameIndex - 1] - frameTime);
 	percent = spCurveTimeline_getCurvePercent(SUPER(self), frameIndex - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-	const float* prevVertices = self->frameVertices[frameIndex - 1];
-	const float* nextVertices = self->frameVertices[frameIndex];
+	prevVertices = CONST_CAST(float*, self->frameVertices[frameIndex - 1]);
+	nextVertices = CONST_CAST(float*, self->frameVertices[frameIndex]);
 
 	if (alpha < 1) {
 		for (i = 0; i < self->frameVerticesCount; i++) {
