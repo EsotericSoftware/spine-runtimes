@@ -41,7 +41,7 @@
 extern "C" {
 #endif
 
-typedef struct {
+typedef struct spSkeletonData{
 	int boneCount;
 	spBoneData** bones;
 

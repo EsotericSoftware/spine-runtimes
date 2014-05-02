@@ -60,7 +60,7 @@ typedef spPolygon Polygon;
 
 /**/
 
-typedef struct {
+typedef struct spSkeletonBounds{
 	int count;
 	spBoundingBoxAttachment** boundingBoxes;
 	spPolygon** polygons;
