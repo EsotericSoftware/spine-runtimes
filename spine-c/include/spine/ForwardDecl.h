@@ -20,7 +20,9 @@ Usage:
     - #include "spine/ " relevant headers in the cpp files that actually use the Spine objects
  */
  
-extern "C"{
+#ifdef __cplusplus
+extern "C" {
+#endif
 
     typedef struct spEvent spEvent;
     
@@ -34,6 +36,9 @@ extern "C"{
     typedef struct spSkeletonData spSkeletonData;
     typedef struct spSlot spSlot;
     typedef struct spAttachment spAttachment;
+
+#ifdef __cplusplus
 };
+#endif
 
 #endif /* SPINE_FORWARDDECL_H_ */
