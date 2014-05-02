@@ -76,7 +76,7 @@ void spineboy () {
 	// Configure mixing.
 	AnimationStateData* stateData = AnimationStateData_create(skeletonData);
 	AnimationStateData_setMixByName(stateData, "walk", "jump", 0.2f);
-	AnimationStateData_setMixByName(stateData, "jump", "walk", 0.4f);
+	AnimationStateData_setMixByName(stateData, "jump", "run", 0.2f);
 
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData, stateData);
 	drawable->timeScale = 1;
@@ -87,17 +87,17 @@ void spineboy () {
 	Skeleton_setToSetupPose(skeleton);
 
 	skeleton->x = 320;
-	skeleton->y = 420;
+	skeleton->y = 460;
 	Skeleton_updateWorldTransform(skeleton);
 
 	Slot* headSlot = Skeleton_findSlot(skeleton, "head");
 
 	drawable->state->listener = callback;
-	if (true) {
+	if (false) {
 		AnimationState_setAnimationByName(drawable->state, 0, "test", true);
 	} else {
-		AnimationState_setAnimationByName(drawable->state, 0, "run", true);
-		AnimationState_addAnimationByName(drawable->state, 0, "jump", false, 0);
+		AnimationState_setAnimationByName(drawable->state, 0, "walk", true);
+		AnimationState_addAnimationByName(drawable->state, 0, "jump", false, 3);
 		AnimationState_addAnimationByName(drawable->state, 0, "run", true, 0);
 	}
 
@@ -138,6 +138,7 @@ void goblins () {
 	// Load atlas, skeleton, and animations.
 	Atlas* atlas = Atlas_readAtlasFile("../data/goblins-ffd.atlas");
 	SkeletonJson* json = SkeletonJson_create(atlas);
+	json->scale = 1.4f;
 	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "../data/goblins-ffd.json");
 	if (!skeletonData) {
 		printf("Error: %s\n", json->error);
