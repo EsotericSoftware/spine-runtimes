@@ -667,7 +667,7 @@ void _spFFDTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, flo
 			for (i = 0; i < self->frameVerticesCount; i++)
 				slot->attachmentVertices[i] += (lastVertices[i] - slot->attachmentVertices[i]) * alpha;
 		} else
-			memcpy(slot->attachmentVertices, lastVertices, self->frameVerticesCount);
+			memcpy(slot->attachmentVertices, lastVertices, self->frameVerticesCount * sizeof(float));
 		return;
 	}
 
@@ -693,8 +693,24 @@ void _spFFDTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, flo
 	}
 }
 
+void _spFFDTimeline_dispose (spTimeline* timeline) {
+	spFFDTimeline* self = SUB_CAST(spFFDTimeline, timeline);
+	int i;
+
+	_spCurveTimeline_deinit(SUPER(self));
+
+	for (i = 0; i < self->framesCount; ++i)
+		FREE(self->frameVertices[i]);
+	FREE(self->frameVertices);
+	FREE(self->frames);
+	FREE(self);
+}
+
 spFFDTimeline* spFFDTimeline_create (int frameCount, int frameVerticesCount) {
-	spFFDTimeline* self = SUB_CAST(spFFDTimeline, _spBaseTimeline_create(frameCount, SP_TIMELINE_FFD, 1, _spFFDTimeline_apply));
+	spFFDTimeline* self = NEW(spFFDTimeline);
+	_spCurveTimeline_init(SUPER(self), SP_TIMELINE_FFD, frameCount, _spFFDTimeline_dispose, _spFFDTimeline_apply);
+	CONST_CAST(int, self->framesCount) = frameCount;
+	CONST_CAST(float*, self->frames) = CALLOC(float, self->framesCount);
 	CONST_CAST(float**, self->frameVertices) = CALLOC(float*, frameCount);
 	CONST_CAST(int, self->frameVerticesCount) = frameVerticesCount;
 	return self;
