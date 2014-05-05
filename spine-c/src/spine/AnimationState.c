@@ -74,7 +74,7 @@ void spAnimationState_dispose (spAnimationState* self) {
 	int i;
 	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
 	FREE(internal->events);
-	for (i = 0; i < self->trackCount; i++)
+	for (i = 0; i < self->trackCount; ++i)
 		_spTrackEntry_disposeAll(self->tracks[i]);
 	FREE(self->tracks);
 	FREE(self);
@@ -84,7 +84,7 @@ void spAnimationState_update (spAnimationState* self, float delta) {
 	int i;
 	float previousDelta;
 	delta *= self->timeScale;
-	for (i = 0; i < self->trackCount; i++) {
+	for (i = 0; i < self->trackCount; ++i) {
 		spTrackEntry* current = self->tracks[i];
 		if (!current) continue;
 
@@ -112,7 +112,7 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 	int entryChanged;
 	float time;
 	spTrackEntry* previous;
-	for (i = 0; i < self->trackCount; i++) {
+	for (i = 0; i < self->trackCount; ++i) {
 		spTrackEntry* current = self->tracks[i];
 		if (!current) continue;
 
@@ -147,7 +147,7 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 		}
 
 		entryChanged = 0;
-		for (ii = 0; ii < eventCount; ii++) {
+		for (ii = 0; ii < eventCount; ++ii) {
 			spEvent* event = internal->events[ii];
 			if (current->listener) {
 				current->listener(self, i, SP_ANIMATION_EVENT, event, 0);
@@ -186,7 +186,7 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 
 void spAnimationState_clearTracks (spAnimationState* self) {
 	int i;
-	for (i = 0; i < self->trackCount; i++)
+	for (i = 0; i < self->trackCount; ++i)
 		spAnimationState_clearTrack(self, i);
 	self->trackCount = 0;
 }

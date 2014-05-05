@@ -536,7 +536,7 @@ void _spEventTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 			frameIndex--;
 		}
 	}
-	for (; frameIndex < self->framesCount && time >= self->frames[frameIndex]; frameIndex++) {
+	for (; frameIndex < self->framesCount && time >= self->frames[frameIndex]; ++frameIndex) {
 		firedEvents[*eventCount] = self->events[frameIndex];
 		(*eventCount)++;
 	}
@@ -593,7 +593,7 @@ void _spDrawOrderTimeline_apply (const spTimeline* timeline, spSkeleton* skeleto
 	if (!drawOrderToSetupIndex)
 		memcpy(skeleton->drawOrder, skeleton->slots, self->slotCount * sizeof(int));
 	else {
-		for (i = 0; i < self->slotCount; i++)
+		for (i = 0; i < self->slotCount; ++i)
 			skeleton->drawOrder[i] = skeleton->slots[drawOrderToSetupIndex[i]];
 	}
 }
@@ -664,7 +664,7 @@ void _spFFDTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, flo
 		/* Time is after last frame. */
 		const float* lastVertices = self->frameVertices[self->framesCount - 1];
 		if (alpha < 1) {
-			for (i = 0; i < self->frameVerticesCount; i++)
+			for (i = 0; i < self->frameVerticesCount; ++i)
 				slot->attachmentVertices[i] += (lastVertices[i] - slot->attachmentVertices[i]) * alpha;
 		} else
 			memcpy(slot->attachmentVertices, lastVertices, self->frameVerticesCount * sizeof(float));
@@ -681,12 +681,12 @@ void _spFFDTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, flo
 	const float* nextVertices = self->frameVertices[frameIndex];
 
 	if (alpha < 1) {
-		for (i = 0; i < self->frameVerticesCount; i++) {
+		for (i = 0; i < self->frameVerticesCount; ++i) {
 			float prev = prevVertices[i];
 			slot->attachmentVertices[i] += (prev + (nextVertices[i] - prev) * percent - slot->attachmentVertices[i]) * alpha;
 		}
 	} else {
-		for (i = 0; i < self->frameVerticesCount; i++) {
+		for (i = 0; i < self->frameVerticesCount; ++i) {
 			float prev = prevVertices[i];
 			slot->attachmentVertices[i] = prev + (nextVertices[i] - prev) * percent;
 		}
