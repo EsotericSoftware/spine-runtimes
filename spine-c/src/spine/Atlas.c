@@ -179,6 +179,7 @@ spAtlas* spAtlas_create (const char* begin, int length, const char* dir, void* r
 	int needsSlash = dirLength > 0 && dir[dirLength - 1] != '/' && dir[dirLength - 1] != '\\';
 
 	spAtlas* self = NEW(spAtlas);
+	self->rendererObject = rendererObject;
 
 	spAtlasPage *page = 0;
 	spAtlasPage *lastPage = 0;
