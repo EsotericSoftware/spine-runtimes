@@ -641,6 +641,8 @@ void _spFFDTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, flo
 		int* eventCount, float alpha) {
 	int frameIndex, i;
 	float percent, frameTime;
+	const float* prevVertices;
+	const float* nextVertices;
 	spFFDTimeline* self = (spFFDTimeline*)timeline;
 
 	spSlot *slot = skeleton->slots[self->slotIndex];
@@ -677,8 +679,8 @@ void _spFFDTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, flo
 	percent = 1 - (time - frameTime) / (self->frames[frameIndex - 1] - frameTime);
 	percent = spCurveTimeline_getCurvePercent(SUPER(self), frameIndex - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-	const float* prevVertices = self->frameVertices[frameIndex - 1];
-	const float* nextVertices = self->frameVertices[frameIndex];
+	prevVertices = self->frameVertices[frameIndex - 1];
+	nextVertices = self->frameVertices[frameIndex];
 
 	if (alpha < 1) {
 		for (i = 0; i < self->frameVerticesCount; ++i) {

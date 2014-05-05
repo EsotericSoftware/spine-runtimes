@@ -173,19 +173,22 @@ static const char* textureFilterNames[] = {"Nearest", "Linear", "MipMap", "MipMa
 		"MipMapNearestLinear", "MipMapLinearLinear"};
 
 spAtlas* spAtlas_create (const char* begin, int length, const char* dir, void* rendererObject) {
+	spAtlas* self;
+
 	int count;
 	const char* end = begin + length;
 	int dirLength = strlen(dir);
 	int needsSlash = dirLength > 0 && dir[dirLength - 1] != '/' && dir[dirLength - 1] != '\\';
-
-	spAtlas* self = NEW(spAtlas);
-	self->rendererObject = rendererObject;
 
 	spAtlasPage *page = 0;
 	spAtlasPage *lastPage = 0;
 	spAtlasRegion *lastRegion = 0;
 	Str str;
 	Str tuple[4];
+
+	self = NEW(spAtlas);
+	self->rendererObject = rendererObject;
+
 	readLine(begin, 0, 0);
 	while (readLine(0, end, &str)) {
 		if (str.end - str.begin == 0) {
