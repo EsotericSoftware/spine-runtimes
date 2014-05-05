@@ -705,8 +705,11 @@ spine.Skeleton.prototype = {
 	},
 	setSlotsToSetupPose: function () {
 		var slots = this.slots;
-		for (var i = 0, n = slots.length; i < n; i++)
+		var drawOrder = this.drawOrder;
+		for (var i = 0, n = slots.length; i < n; i++) {
+			drawOrder[i] = slots[i];
 			slots[i].setToSetupPose(i);
+		}
 	},
 	/** @return May return null. */
 	getRootBone: function () {
