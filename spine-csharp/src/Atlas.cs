@@ -104,7 +104,12 @@ namespace Spine {
 					page = new AtlasPage();
 					page.name = line;
 
-					page.format = (Format)Enum.Parse(typeof(Format), readValue(reader), false);
+					if (readTuple(reader, tuple) == 2) { // size is only optional for an atlas packed with an old TexturePacker.
+						page.width = int.Parse(tuple[0]);
+						page.height = int.Parse(tuple[1]);
+						readTuple(reader, tuple);
+					}
+					page.format = (Format)Enum.Parse(typeof(Format), tuple[0], false);
 
 					readTuple(reader, tuple);
 					page.minFilter = (TextureFilter)Enum.Parse(typeof(TextureFilter), tuple[0], false);
@@ -186,7 +191,7 @@ namespace Spine {
 			return line.Substring(colon + 1).Trim();
 		}
 
-		/// <summary>Returns the number of tuple values read (2 or 4).</summary>
+		/// <summary>Returns the number of tuple values read (1, 2 or 4).</summary>
 		static int readTuple (TextReader reader, String[] tuple) {
 			String line = reader.ReadLine();
 			int colon = line.IndexOf(':');
@@ -194,10 +199,7 @@ namespace Spine {
 			int i = 0, lastMatch = colon + 1;
 			for (; i < 3; i++) {
 				int comma = line.IndexOf(',', lastMatch);
-				if (comma == -1) {
-					if (i == 0) throw new Exception("Invalid line: " + line);
-					break;
-				}
+				if (comma == -1) break;
 				tuple[i] = line.Substring(lastMatch, comma - lastMatch).Trim();
 				lastMatch = comma + 1;
 			}
