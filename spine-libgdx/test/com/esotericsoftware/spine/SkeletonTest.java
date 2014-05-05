@@ -106,7 +106,11 @@ public class SkeletonTest extends ApplicationAdapter {
 		pixmap.fill();
 		final AtlasRegion fake = new AtlasRegion(new Texture(pixmap), 0, 0, 32, 32);
 		pixmap.dispose();
-		FileHandle atlasFile = skeletonFile.sibling(skeletonFile.nameWithoutExtension() + ".atlas");
+
+		String atlasFileName = skeletonFile.nameWithoutExtension();
+		if (atlasFileName.endsWith(".json")) atlasFileName = new FileHandle(atlasFileName).nameWithoutExtension();
+		FileHandle atlasFile = skeletonFile.sibling(atlasFileName + ".atlas");
+		if (!atlasFile.exists()) atlasFile = skeletonFile.sibling(atlasFileName + ".atlas.txt");
 		TextureAtlasData data = !atlasFile.exists() ? null : new TextureAtlasData(atlasFile, atlasFile.parent(), false);
 		TextureAtlas atlas = new TextureAtlas(data) {
 			public AtlasRegion findRegion (String name) {
