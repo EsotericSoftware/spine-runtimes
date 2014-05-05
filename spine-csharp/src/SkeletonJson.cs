@@ -475,11 +475,11 @@ namespace Spine {
 									vertices = new float[vertexCount];
 									int start = GetInt(valueMap, "offset", 0);
 									if (scale == 1) {
-										for (int i = start, n = verticesValue.Count; i < n; i++)
-											vertices[i] = (float)verticesValue[i];
+										for (int i = 0, n = verticesValue.Count; i < n; i++)
+											vertices[i + start] = (float)verticesValue[i];
 									} else {
-										for (int i = start, n = i + verticesValue.Count; i < n; i++)
-											vertices[i] = (float)verticesValue[i] * scale;
+										for (int i = 0, n = verticesValue.Count; i < n; i++)
+											vertices[i + start] = (float)verticesValue[i] * scale;
 									}
 									if (attachment is MeshAttachment) {
 										float[] meshVertices = ((MeshAttachment)attachment).vertices;
