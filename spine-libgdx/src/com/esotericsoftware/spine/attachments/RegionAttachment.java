@@ -138,7 +138,6 @@ public class RegionAttachment extends Attachment {
 			vertices[U1] = region.getU2();
 			vertices[V1] = region.getV2();
 		}
-		updateOffset();
 	}
 
 	public TextureRegion getRegion () {
