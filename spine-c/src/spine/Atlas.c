@@ -48,7 +48,7 @@ void spAtlasPage_dispose (spAtlasPage* self) {
 /**/
 
 spAtlasRegion* spAtlasRegion_create () {
-	return NEW(spAtlasRegion) ;
+	return NEW(spAtlasRegion);
 }
 
 void spAtlasRegion_dispose (spAtlasRegion* self) {
@@ -117,7 +117,7 @@ static int readValue (const char* end, Str* str) {
 	return 1;
 }
 
-/* Returns the number of tuple values read (2, 4, or 0 for failure). */
+/* Returns the number of tuple values read (1, 2, 4, or 0 for failure). */
 static int readTuple (const char* end, Str tuple[]) {
 	int i;
 	Str str;
@@ -126,10 +126,7 @@ static int readTuple (const char* end, Str tuple[]) {
 
 	for (i = 0; i < 3; ++i) {
 		tuple[i].begin = str.begin;
-		if (!beginPast(&str, ',')) {
-			if (i == 0) return 0;
-			break;
-		}
+		if (!beginPast(&str, ',')) break;
 		tuple[i].end = str.begin - 2;
 		trim(&tuple[i]);
 	}
@@ -208,8 +205,15 @@ spAtlas* spAtlas_create (const char* begin, int length, const char* dir, void* r
 				self->pages = page;
 			lastPage = page;
 
-			if (!readValue(end, &str)) return abortAtlas(self);
-			page->format = (spAtlasFormat)indexOf(formatNames, 7, &str);
+			switch (readTuple(end, tuple)) {
+			case 0:
+				return abortAtlas(self);
+			case 2:  /* size is only optional for an atlas packed with an old TexturePacker. */
+				page->width = toInt(tuple);
+				page->height = toInt(tuple + 1);
+				if (!readTuple(end, tuple)) return abortAtlas(self);
+			}
+			page->format = (spAtlasFormat)indexOf(formatNames, 7, tuple);
 
 			if (!readTuple(end, tuple)) return abortAtlas(self);
 			page->minFilter = (spAtlasFilter)indexOf(textureFilterNames, 7, tuple);
