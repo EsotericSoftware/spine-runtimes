@@ -1779,7 +1779,7 @@ spine.SkeletonBounds.prototype = {
 		return inside;
 	},
 	/** Returns true if the polygon contains the line segment. */
-	intersectsSegment: function (polygon, x1, y1, x2, y2) {
+	polygonIntersectsSegment: function (polygon, x1, y1, x2, y2) {
 		var nn = polygon.length;
 		var width12 = x1 - x2, height12 = y1 - y2;
 		var det1 = x1 * y2 - y1 * x2;
