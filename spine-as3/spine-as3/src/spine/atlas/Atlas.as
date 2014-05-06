@@ -68,7 +68,12 @@ public class Atlas {
 				page = new AtlasPage();
 				page.name = line;
 
-				page.format = Format[reader.readValue()];
+				if (reader.readTuple(tuple) == 2) { // size is only optional for an atlas packed with an old TexturePacker.
+					page.width = parseInt(tuple[0]);
+					page.height = parseInt(tuple[1]);
+					reader.readTuple(tuple);
+				}
+				page.format = Format[tuple[0]];
 
 				reader.readTuple(tuple);
 				page.minFilter = TextureFilter[tuple[0]];
@@ -186,7 +191,7 @@ class Reader {
 		return trim(line.substring(colon + 1));
 	}
 
-	/** Returns the number of tuple values read (2 or 4). */
+	/** Returns the number of tuple values read (1, 2 or 4). */
 	public function readTuple (tuple:Array) : int {
 		var line:String = readLine();
 		var colon:int = line.indexOf(":");
@@ -195,11 +200,7 @@ class Reader {
 		var i:int = 0, lastMatch:int = colon + 1;
 		for (; i < 3; i++) {
 			var comma:int = line.indexOf(",", lastMatch);
-			if (comma == -1) {
-				if (i == 0)
-					throw new Error("Invalid line: " + line);
-				break;
-			}
+			if (comma == -1) break;
 			tuple[i] = trim(line.substr(lastMatch, comma - lastMatch));
 			lastMatch = comma + 1;
 		}

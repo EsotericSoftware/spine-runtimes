@@ -1443,7 +1443,12 @@ spine.Atlas = function (atlasText, textureLoader) {
 			page = new spine.AtlasPage();
 			page.name = line;
 
-			page.format = spine.Atlas.Format[reader.readValue()];
+			if (reader.readTuple(tuple) == 2) { // size is only optional for an atlas packed with an old TexturePacker.
+				page.width = parseInt(tuple[0]);
+				page.height = parseInt(tuple[1]);
+				reader.readTuple(tuple);
+			}
+			page.format = spine.Atlas.Format[tuple[0]];
 
 			reader.readTuple(tuple);
 			page.minFilter = spine.Atlas.TextureFilter[tuple[0]];
@@ -1617,7 +1622,7 @@ spine.AtlasReader.prototype = {
 		if (colon == -1) throw "Invalid line: " + line;
 		return this.trim(line.substring(colon + 1));
 	},
-	/** Returns the number of tuple values read (2 or 4). */
+	/** Returns the number of tuple values read (1, 2 or 4). */
 	readTuple: function (tuple) {
 		var line = this.readLine();
 		var colon = line.indexOf(":");
@@ -1625,10 +1630,7 @@ spine.AtlasReader.prototype = {
 		var i = 0, lastMatch = colon + 1;
 		for (; i < 3; i++) {
 			var comma = line.indexOf(",", lastMatch);
-			if (comma == -1) {
-				if (i == 0) throw "Invalid line: " + line;
-				break;
-			}
+			if (comma == -1) break;
 			tuple[i] = this.trim(line.substr(lastMatch, comma - lastMatch));
 			lastMatch = comma + 1;
 		}
