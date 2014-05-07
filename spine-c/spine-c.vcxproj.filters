@@ -81,7 +81,13 @@
     <ClInclude Include="include\spine\SlotData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\spine\ine.h">
+    <ClInclude Include="include\spine\MeshAttachment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spine\SkinnedMeshAttachment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spine\spine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -150,6 +156,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\spine\AtlasAttachmentLoader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\spine\MeshAttachment.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\spine\SkinnedMeshAttachment.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
