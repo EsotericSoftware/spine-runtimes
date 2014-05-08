@@ -14,6 +14,7 @@ target
 
 spine-cocos2dx/cocos2dx/
 !spine-cocos2dx/cocos2dx/Place cocos2dx here.txt
+spine-cocos2dx/example/proj.win32/Debug
 *.swp
 .DS_Store
 xcuserdata
