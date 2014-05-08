@@ -810,7 +810,7 @@ spine.Event.prototype = {
 
 spine.AttachmentType = {
 	region: 0,
-	boundingbox: 1
+	boundingBox: 1
 };
 
 spine.RegionAttachment = function (name) {
@@ -1645,7 +1645,7 @@ spine.AtlasAttachmentLoader = function (atlas) {
 spine.AtlasAttachmentLoader.prototype = {
 	newAttachment: function (skin, type, name) {
 		switch (type) {
-		case spine.AttachmentType.boundingbox:
+		case spine.AttachmentType.boundingBox:
 			return new spine.BoundingBoxAttachment(name);
 		case spine.AttachmentType.region:
 			var region = this.atlas.findRegion(name);
