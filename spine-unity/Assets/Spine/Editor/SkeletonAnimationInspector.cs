@@ -72,5 +72,7 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 		}
 
 		EditorGUILayout.PropertyField(loop);
+		EditorGUILayout.PropertyField(timeScale);
+		component.timeScale = Math.Max(component.timeScale, 0);
 	}
 }

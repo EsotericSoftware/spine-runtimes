@@ -81,7 +81,7 @@ public class SkeletonAnimation : SkeletonRenderer {
 
 		deltaTime *= timeScale;
 		skeleton.Update(deltaTime);
-		state.Update(deltaTime * timeScale);
+		state.Update(deltaTime);
 		state.Apply(skeleton);
 		if (UpdateBones != null) UpdateBones(this);
 		skeleton.UpdateWorldTransform();
