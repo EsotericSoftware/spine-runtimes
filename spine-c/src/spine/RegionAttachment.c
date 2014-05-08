@@ -34,6 +34,7 @@
 void _spRegionAttachment_dispose (spAttachment* attachment) {
 	spRegionAttachment* self = SUB_CAST(spRegionAttachment, attachment);
 	_spAttachment_deinit(attachment);
+	FREE(self->path);
 	FREE(self);
 }
 
