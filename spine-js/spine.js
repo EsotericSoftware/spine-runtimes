@@ -776,7 +776,7 @@ spine.Skeleton.prototype = {
 			if (slot.data.name == slotName) {
 				var attachment = null;
 				if (attachmentName) {
-					attachment = this.getAttachment(i, attachmentName);
+					attachment = this.getAttachmentBySlotIndex(i, attachmentName);
 					if (!attachment) throw "Attachment not found: " + attachmentName + ", for slot: " + slotName;
 				}
 				slot.setAttachment(attachment);
