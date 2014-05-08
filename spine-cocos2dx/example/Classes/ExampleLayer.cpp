@@ -49,7 +49,7 @@ bool ExampleLayer::init () {
 	skeletonNode = SkeletonAnimation::createWithFile("spineboy.json", "spineboy.atlas", 0.6f);
 	skeletonNode->setMix("walk", "jump", 0.2f);
 	skeletonNode->setMix("jump", "run", 0.2f);
-	skeletonNode->setAnimationListener(this, animationStateEvent_selector(ExampleLayer::animationStateEvent));
+	skeletonNode->setAnimationListener(&ExampleLayer::animationStateEvent, this);
 	// skeletonNode->timeScale = 0.3f;
 	skeletonNode->debugBones = true;
 

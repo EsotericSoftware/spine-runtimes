@@ -63,9 +63,6 @@ SkeletonAnimation* SkeletonAnimation::createWithFile (const char* skeletonDataFi
 }
 
 void SkeletonAnimation::initialize () {
-	listenerInstance = 0;
-	listenerMethod = 0;
-
 	ownsAnimationStateData = true;
 	state = spAnimationState_create(spAnimationStateData_create(skeleton->data));
 	state->context = this;
@@ -117,11 +114,6 @@ void SkeletonAnimation::setMix (const char* fromAnimation, const char* toAnimati
 	spAnimationStateData_setMixByName(state->data, fromAnimation, toAnimation, duration);
 }
 
-void SkeletonAnimation::setAnimationListener (Ref* instance, SEL_AnimationStateEvent method) {
-	listenerInstance = instance;
-	listenerMethod = method;
-}
-
 spTrackEntry* SkeletonAnimation::setAnimation (int trackIndex, const char* name, bool loop) {
 	spAnimation* animation = spSkeletonData_findAnimation(skeleton->data, name);
 	if (!animation) {
@@ -153,7 +145,7 @@ void SkeletonAnimation::clearTrack (int trackIndex) {
 }
 
 void SkeletonAnimation::onAnimationStateEvent (int trackIndex, spEventType type, spEvent* event, int loopCount) {
-	if (listenerInstance) (listenerInstance->*listenerMethod)(this, trackIndex, type, event, loopCount);
+	if (listener) listener(this, trackIndex, type, event, loopCount);
 }
 
 }

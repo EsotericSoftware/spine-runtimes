@@ -38,8 +38,7 @@
 namespace spine {
 
 class SkeletonAnimation;
-typedef void (cocos2d::Ref::*SEL_AnimationStateEvent)(spine::SkeletonAnimation* node, int trackIndex, spEventType type, spEvent* event, int loopCount);
-#define animationStateEvent_selector(_SELECTOR) (SEL_AnimationStateEvent)(&_SELECTOR)
+typedef std::function<void(spine::SkeletonAnimation* node, int trackIndex, spEventType type, spEvent* event, int loopCount)> AnimationStateListener;
 
 /** Draws an animated skeleton, providing an AnimationState for applying one or more animations and queuing animations to be
   * played later. */
@@ -62,7 +61,10 @@ public:
 	void setAnimationStateData (spAnimationStateData* stateData);
 	void setMix (const char* fromAnimation, const char* toAnimation, float duration);
 
-	void setAnimationListener (cocos2d::Ref* instance, SEL_AnimationStateEvent method);
+	template<class _Rx, class _Farg0, class _Arg0> void setAnimationListener (_Rx _Farg0::* const type, _Arg0&& target) {
+		this->listener = std::bind(type, target, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5);
+	}
+
 	spTrackEntry* setAnimation (int trackIndex, const char* name, bool loop);
 	spTrackEntry* addAnimation (int trackIndex, const char* name, bool loop, float delay = 0);
 	spTrackEntry* getCurrent (int trackIndex = 0);
@@ -76,8 +78,7 @@ protected:
 
 private:
 	typedef SkeletonRenderer super;
-	cocos2d::Ref* listenerInstance;
-	SEL_AnimationStateEvent listenerMethod;
+	AnimationStateListener listener;
 	bool ownsAnimationStateData;
 
 	void initialize ();
