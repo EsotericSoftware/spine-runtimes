@@ -62,7 +62,8 @@ public:
 	void setMix (const char* fromAnimation, const char* toAnimation, float duration);
 
 	template<class _Rx, class _Farg0, class _Arg0> void setAnimationListener (_Rx _Farg0::* const type, _Arg0&& target) {
-		this->listener = std::bind(type, target, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5);
+		using namespace std::placeholders;
+		this->listener = std::bind(type, target, _1, _2, _3, _4, _5);
 	}
 
 	spTrackEntry* setAnimation (int trackIndex, const char* name, bool loop);
