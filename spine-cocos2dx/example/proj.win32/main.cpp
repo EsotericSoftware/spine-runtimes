@@ -1,6 +1,5 @@
 #include "main.h"
 #include "../Classes/AppDelegate.h"
-#include "CCEGLView.h"
 
 USING_NS_CC;
 
@@ -14,8 +13,10 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	// create the application instance
 	AppDelegate app;
-	CCEGLView* eglView = CCEGLView::sharedOpenGLView();
-	eglView->setViewName("SpineExample");
-	eglView->setFrameSize(960, 640);
-	return CCApplication::sharedApplication()->run();
+
+	auto director = Director::getInstance();
+	auto glview = GLView::create("Spine Example");
+	glview->setFrameSize(960, 640);
+	director->setOpenGLView(glview);
+	return Application::getInstance()->run();
 }

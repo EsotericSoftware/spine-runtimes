@@ -34,8 +34,8 @@
 USING_NS_CC;
 
 void _spAtlasPage_createTexture (spAtlasPage* self, const char* path) {
-	CCTexture2D* texture = CCTextureCache::sharedTextureCache()->addImage(path);
-	CCTextureAtlas* textureAtlas = CCTextureAtlas::createWithTexture(texture, 128);
+	Texture2D* texture = Director::getInstance()->getTextureCache()->addImage(path);
+	TextureAtlas* textureAtlas = TextureAtlas::createWithTexture(texture, 128);
 	textureAtlas->retain();
 	self->rendererObject = textureAtlas;
 	self->width = texture->getPixelsWide();
@@ -43,20 +43,21 @@ void _spAtlasPage_createTexture (spAtlasPage* self, const char* path) {
 }
 
 void _spAtlasPage_disposeTexture (spAtlasPage* self) {
-	((CCTextureAtlas*)self->rendererObject)->release();
+	((TextureAtlas*)self->rendererObject)->release();
 }
 
 char* _spUtil_readFile (const char* path, int* length) {
-	unsigned long size;
-	char* data = reinterpret_cast<char*>(CCFileUtils::sharedFileUtils()->getFileData(
-		CCFileUtils::sharedFileUtils()->fullPathForFilename(path).c_str(), "r", &size));
-	*length = size;
-	return data;
+	Data data = FileUtils::getInstance()->getDataFromFile(
+			FileUtils::getInstance()->fullPathForFilename(path).c_str());
+	*length = data.getSize();
+	char* bytes = MALLOC(char, *length);
+	memcpy(bytes, data.getBytes(), *length);
+	return bytes;
 }
 
 /**/
 
-void spRegionAttachment_updateQuad (spRegionAttachment* self, spSlot* slot, ccV3F_C4B_T2F_Quad* quad, bool premultipliedAlpha) {
+void spRegionAttachment_updateQuad (spRegionAttachment* self, spSlot* slot, V3F_C4B_T2F_Quad* quad, bool premultipliedAlpha) {
 	float vertices[8];
 	spRegionAttachment_computeWorldVertices(self, slot->skeleton->x, slot->skeleton->y, slot->bone, vertices);
 
@@ -87,21 +88,21 @@ void spRegionAttachment_updateQuad (spRegionAttachment* self, spSlot* slot, ccV3
 	quad->br.colors.b = b;
 	quad->br.colors.a = a;
 
-	quad->bl.vertices.x = vertices[VERTEX_X1];
-	quad->bl.vertices.y = vertices[VERTEX_Y1];
-	quad->tl.vertices.x = vertices[VERTEX_X2];
-	quad->tl.vertices.y = vertices[VERTEX_Y2];
-	quad->tr.vertices.x = vertices[VERTEX_X3];
-	quad->tr.vertices.y = vertices[VERTEX_Y3];
-	quad->br.vertices.x = vertices[VERTEX_X4];
-	quad->br.vertices.y = vertices[VERTEX_Y4];
+	quad->bl.vertices.x = vertices[SP_VERTEX_X1];
+	quad->bl.vertices.y = vertices[SP_VERTEX_Y1];
+	quad->tl.vertices.x = vertices[SP_VERTEX_X2];
+	quad->tl.vertices.y = vertices[SP_VERTEX_Y2];
+	quad->tr.vertices.x = vertices[SP_VERTEX_X3];
+	quad->tr.vertices.y = vertices[SP_VERTEX_Y3];
+	quad->br.vertices.x = vertices[SP_VERTEX_X4];
+	quad->br.vertices.y = vertices[SP_VERTEX_Y4];
 
-	quad->bl.texCoords.u = self->uvs[VERTEX_X1];
-	quad->bl.texCoords.v = self->uvs[VERTEX_Y1];
-	quad->tl.texCoords.u = self->uvs[VERTEX_X2];
-	quad->tl.texCoords.v = self->uvs[VERTEX_Y2];
-	quad->tr.texCoords.u = self->uvs[VERTEX_X3];
-	quad->tr.texCoords.v = self->uvs[VERTEX_Y3];
-	quad->br.texCoords.u = self->uvs[VERTEX_X4];
-	quad->br.texCoords.v = self->uvs[VERTEX_Y4];
+	quad->bl.texCoords.u = self->uvs[SP_VERTEX_X1];
+	quad->bl.texCoords.v = self->uvs[SP_VERTEX_Y1];
+	quad->tl.texCoords.u = self->uvs[SP_VERTEX_X2];
+	quad->tl.texCoords.v = self->uvs[SP_VERTEX_Y2];
+	quad->tr.texCoords.u = self->uvs[SP_VERTEX_X3];
+	quad->tr.texCoords.v = self->uvs[SP_VERTEX_Y3];
+	quad->br.texCoords.u = self->uvs[SP_VERTEX_X4];
+	quad->br.texCoords.v = self->uvs[SP_VERTEX_Y4];
 }

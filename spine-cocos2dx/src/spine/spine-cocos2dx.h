@@ -33,9 +33,9 @@
 
 #include <spine/spine.h>
 #include "cocos2d.h"
-#include <spine/CCSkeleton.h>
-#include <spine/CCSkeletonAnimation.h>
+#include <spine/SkeletonRenderer.h>
+#include <spine/SkeletonAnimation.h>
 
-void spRegionAttachment_updateQuad (spRegionAttachment* self, spSlot* slot, cocos2d::ccV3F_C4B_T2F_Quad* quad, bool premultiplied = false);
+void spRegionAttachment_updateQuad (spRegionAttachment* self, spSlot* slot, cocos2d::V3F_C4B_T2F_Quad* quad, bool premultiplied = false);
 
 #endif /* SPINE_COCOS2DX_H_ */

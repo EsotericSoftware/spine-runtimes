@@ -28,8 +28,8 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef SPINE_CCSKELETON_H_
-#define SPINE_CCSKELETON_H_
+#ifndef SPINE_SKELETONRENDERER_H_
+#define SPINE_SKELETONRENDERER_H_
 
 #include <spine/spine.h>
 #include "cocos2d.h"
@@ -37,7 +37,7 @@
 namespace spine {
 
 /** Draws a skeleton. */
-class CCSkeleton: public cocos2d::CCNodeRGBA, public cocos2d::CCBlendProtocol {
+class SkeletonRenderer: public cocos2d::NodeRGBA, public cocos2d::BlendProtocol {
 public:
 	spSkeleton* skeleton;
 	spBone* rootBone;
@@ -46,19 +46,20 @@ public:
 	bool debugBones;
 	bool premultipliedAlpha;
 
-	static CCSkeleton* createWithData (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
-	static CCSkeleton* createWithFile (const char* skeletonDataFile, spAtlas* atlas, float scale = 0);
-	static CCSkeleton* createWithFile (const char* skeletonDataFile, const char* atlasFile, float scale = 0);
+	static SkeletonRenderer* createWithData (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
+	static SkeletonRenderer* createWithFile (const char* skeletonDataFile, spAtlas* atlas, float scale = 0);
+	static SkeletonRenderer* createWithFile (const char* skeletonDataFile, const char* atlasFile, float scale = 0);
 
-	CCSkeleton (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
-	CCSkeleton (const char* skeletonDataFile, spAtlas* atlas, float scale = 0);
-	CCSkeleton (const char* skeletonDataFile, const char* atlasFile, float scale = 0);
+	SkeletonRenderer (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
+	SkeletonRenderer (const char* skeletonDataFile, spAtlas* atlas, float scale = 0);
+	SkeletonRenderer (const char* skeletonDataFile, const char* atlasFile, float scale = 0);
 
-	virtual ~CCSkeleton ();
+	virtual ~SkeletonRenderer ();
 
 	virtual void update (float deltaTime);
-	virtual void draw ();
-	virtual cocos2d::CCRect boundingBox ();
+	virtual void draw (cocos2d::Renderer* renderer, const cocos2d::Matrix& transform, bool transformUpdated) override;
+	void drawSkeleton (const cocos2d::Matrix& transform, bool transformUpdated);
+	virtual cocos2d::Rect boundingBox ();
 
 	// --- Convenience methods for common Skeleton_* functions.
 	void updateWorldTransform ();
@@ -82,22 +83,25 @@ public:
 	/* Returns false if the slot or attachment was not found. */
 	bool setAttachment (const char* slotName, const char* attachmentName);
 
-	// --- CCBlendProtocol
-	CC_PROPERTY(cocos2d::ccBlendFunc, blendFunc, BlendFunc);
+	// --- BlendProtocol
+	virtual void setBlendFunc (const cocos2d::BlendFunc& blendFunc);
+	virtual const cocos2d::BlendFunc& getBlendFunc () const;
 	virtual void setOpacityModifyRGB (bool value);
 	virtual bool isOpacityModifyRGB ();
 
 protected:
-	CCSkeleton ();
+	SkeletonRenderer ();
 	void setSkeletonData (spSkeletonData* skeletonData, bool ownsSkeletonData);
-	virtual cocos2d::CCTextureAtlas* getTextureAtlas (spRegionAttachment* regionAttachment) const;
+	virtual cocos2d::TextureAtlas* getTextureAtlas (spRegionAttachment* regionAttachment) const;
 
 private:
 	bool ownsSkeletonData;
 	spAtlas* atlas;
+	cocos2d::BlendFunc blendFunc;
+	cocos2d::CustomCommand drawCommand;
 	void initialize ();
 };
 
 }
 
-#endif /* SPINE_CCSKELETON_H_ */
+#endif /* SPINE_SKELETONRENDERER_H_ */
