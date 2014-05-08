@@ -904,7 +904,7 @@ spine.BoundingBoxAttachment = function (name) {
 	this.vertices = [];
 };
 spine.BoundingBoxAttachment.prototype = {
-	type: spine.AttachmentType.boundingBox,
+	type: spine.AttachmentType.boundingbox,
 	computeWorldVertices: function (x, y, bone, worldVertices) {
 		x += bone.worldX;
 		y += bone.worldY;
@@ -1241,7 +1241,7 @@ spine.SkeletonJson.prototype = {
 			attachment.width = (map["width"] || 32) * this.scale;
 			attachment.height = (map["height"] || 32) * this.scale;
 			attachment.updateOffset();
-		} else if (type == spine.AttachmentType.boundingBox) {
+		} else if (type == spine.AttachmentType.boundingbox) {
 			var vertices = map["vertices"];
 			for (var i = 0, n = vertices.length; i < n; i++)
 				attachment.vertices.push(vertices[i] * this.scale);
@@ -1688,7 +1688,7 @@ spine.SkeletonBounds.prototype = {
 		for (var i = 0; i < slotCount; i++) {
 			var slot = slots[i];
 			var boundingBox = slot.attachment;
-			if (boundingBox.type != spine.AttachmentType.boundingBox) continue;
+			if (boundingBox.type != spine.AttachmentType.boundingbox) continue;
 			boundingBoxes.push(boundingBox);
 
 			var poolCount = polygonPool.length, polygon;
