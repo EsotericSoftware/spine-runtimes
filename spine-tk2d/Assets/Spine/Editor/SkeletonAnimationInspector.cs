@@ -72,5 +72,6 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 		}
 
 		EditorGUILayout.PropertyField(loop);
+		EditorGUILayout.PropertyField(timeScale);
 	}
 }
