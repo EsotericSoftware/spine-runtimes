@@ -38,6 +38,7 @@ namespace Spine {
 		internal float regionOffsetX, regionOffsetY, regionWidth, regionHeight, regionOriginalWidth, regionOriginalHeight;
 		internal float r = 1, g = 1, b = 1, a = 1;
 
+		public int HullLength { get; set; }
 		public float[] Vertices { get { return vertices; } set { vertices = value; } }
 		public float[] RegionUVs { get { return regionUVs; } set { regionUVs = value; } }
 		public float[] UVs { get { return uvs; } set { uvs = value; } }
@@ -63,7 +64,6 @@ namespace Spine {
 		public float RegionOriginalHeight { get { return regionOriginalHeight; } set { regionOriginalHeight = value; } } // Unrotated, unstripped size.
 
 		// Nonessential.
-		public int HullLength { get; set; }
 		public int[] Edges { get; set; }
 		public float Width { get; set; }
 		public float Height { get; set; }

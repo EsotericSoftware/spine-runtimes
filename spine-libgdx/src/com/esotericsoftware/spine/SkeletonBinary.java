@@ -234,9 +234,9 @@ public class SkeletonBinary {
 			mesh.setRegionUVs(uvs);
 			mesh.updateUVs();
 			Color.rgba8888ToColor(mesh.getColor(), input.readInt());
+			mesh.setHullLength(input.readInt(true) * 2);
 			if (nonessential) {
 				mesh.setEdges(readIntArray(input));
-				mesh.setHullLength(input.readInt(true) * 2);
 				mesh.setWidth(input.readFloat() * scale);
 				mesh.setHeight(input.readFloat() * scale);
 			}
@@ -270,9 +270,9 @@ public class SkeletonBinary {
 			mesh.setRegionUVs(uvs);
 			mesh.updateUVs();
 			Color.rgba8888ToColor(mesh.getColor(), input.readInt());
+			mesh.setHullLength(input.readInt(true) * 2);
 			if (nonessential) {
 				mesh.setEdges(readIntArray(input));
-				mesh.setHullLength(input.readInt(true) * 2);
 				mesh.setWidth(input.readFloat() * scale);
 				mesh.setHeight(input.readFloat() * scale);
 			}

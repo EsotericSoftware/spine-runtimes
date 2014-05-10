@@ -49,11 +49,11 @@ public class SkinnedMeshAttachment extends Attachment {
 	private short[] triangles;
 	private float[] worldVertices;
 	private final Color color = new Color(1, 1, 1, 1);
+	private int hullLength;
 
 	// Nonessential.
 	private int[] edges;
 	private float width, height;
-	private int hullLength;
 
 	public SkinnedMeshAttachment (String name) {
 		super(name);

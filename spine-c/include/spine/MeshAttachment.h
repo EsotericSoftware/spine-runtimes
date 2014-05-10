@@ -46,6 +46,7 @@ struct spMeshAttachment {
 
 	int verticesCount;
 	float* vertices;
+	int hullLength;
 
 	int uvsCount;
 	float* regionUVs;
@@ -64,7 +65,6 @@ struct spMeshAttachment {
 	int/*bool*/regionRotate;
 
 	/* Nonessential. */
-	int hullLength;
 	int edgesCount;
 	int* edges;
 	float width, height;

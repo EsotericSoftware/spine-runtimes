@@ -55,6 +55,7 @@ struct spSkinnedMeshAttachment {
 	int uvsCount;
 	float* regionUVs;
 	float* uvs;
+	int hullLength;
 
 	float r, g, b, a;
 
@@ -66,7 +67,6 @@ struct spSkinnedMeshAttachment {
 	int/*bool*/regionRotate;
 
 	/* Nonessential. */
-	int hullLength;
 	int edgesCount;
 	int* edges;
 	float width, height;

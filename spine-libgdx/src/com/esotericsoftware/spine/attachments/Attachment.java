@@ -43,6 +43,6 @@ abstract public class Attachment {
 	}
 
 	public String toString () {
-		return name;
+		return getName();
 	}
 }

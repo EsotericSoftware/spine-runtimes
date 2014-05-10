@@ -48,9 +48,9 @@ public class MeshAttachment extends Attachment {
 	private short[] triangles;
 	private float[] worldVertices;
 	private final Color color = new Color(1, 1, 1, 1);
+	private int hullLength;
 
 	// Nonessential.
-	private int hullLength;
 	private int[] edges;
 	private float width, height;
 
