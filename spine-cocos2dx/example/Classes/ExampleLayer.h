@@ -44,8 +44,6 @@ public:
 	CREATE_FUNC (ExampleLayer);
 private:
 	spine::SkeletonAnimation* skeletonNode;
-
-	void animationStateEvent (spine::SkeletonAnimation* node, int trackIndex, spEventType type, spEvent* event, int loopCount);
 };
 
 #endif // _EXAMPLELAYER_H_

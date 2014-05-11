@@ -55,7 +55,18 @@ char* _spUtil_readFile (const char* path, int* length) {
 	return bytes;
 }
 
+spTrackEntry* _spAnimationState_createTrackEntry (spAnimationState* self) {
+	return _spTrackEntry_create();
+}
+
+void _spAnimationState_disposeTrackEntry (spAnimationState* self, spTrackEntry* entry) {
+	if (entry->rendererObject) FREE(entry->rendererObject);
+	_spTrackEntry_dispose(entry);
+}
+
 /**/
+
+namespace spine {
 
 void spRegionAttachment_updateQuad (spRegionAttachment* self, spSlot* slot, V3F_C4B_T2F_Quad* quad, bool premultipliedAlpha) {
 	float vertices[8];
@@ -105,4 +116,6 @@ void spRegionAttachment_updateQuad (spRegionAttachment* self, spSlot* slot, V3F_
 	quad->tr.texCoords.v = self->uvs[SP_VERTEX_Y3];
 	quad->br.texCoords.u = self->uvs[SP_VERTEX_X4];
 	quad->br.texCoords.v = self->uvs[SP_VERTEX_Y4];
+}
+
 }

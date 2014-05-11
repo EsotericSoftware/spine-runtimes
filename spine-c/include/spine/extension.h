@@ -74,6 +74,7 @@
 #include <spine/MeshAttachment.h>
 #include <spine/SkinnedMeshAttachment.h>
 #include <spine/BoundingBoxAttachment.h>
+#include <spine/AnimationState.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -86,6 +87,8 @@ extern "C" {
 void _spAtlasPage_createTexture (spAtlasPage* self, const char* path);
 void _spAtlasPage_disposeTexture (spAtlasPage* self);
 char* _spUtil_readFile (const char* path, int* length);
+spTrackEntry* _spAnimationState_createTrackEntry (spAnimationState* self);
+void _spAnimationState_disposeTrackEntry (spAnimationState* self, spTrackEntry* entry);
 
 #ifdef SPINE_SHORT_NAMES
 #define _AtlasPage_createTexture(...) _spAtlasPage_createTexture(__VA_ARGS__)
@@ -106,6 +109,11 @@ void _setDebugMalloc (void* (*_malloc) (size_t size, const char* file, int line)
 void _setFree (void (*_free) (void* ptr));
 
 char* _readFile (const char* path, int* length);
+
+/**/
+
+spTrackEntry* _spTrackEntry_create ();
+void _spTrackEntry_dispose (spTrackEntry* entry);
 
 /**/
 

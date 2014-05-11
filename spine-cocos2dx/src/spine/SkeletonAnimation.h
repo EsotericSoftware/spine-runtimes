@@ -37,8 +37,17 @@
 
 namespace spine {
 
-class SkeletonAnimation;
-typedef std::function<void(spine::SkeletonAnimation* node, int trackIndex, spEventType type, spEvent* event, int loopCount)> AnimationStateListener;
+typedef std::function<void(int trackIndex)> StartListener;
+typedef std::function<void(int trackIndex)> EndListener;
+typedef std::function<void(int trackIndex, int loopCount)> CompleteListener;
+typedef std::function<void(int trackIndex, spEvent* event)> EventListener;
+
+typedef struct _TrackEntryListeners {
+	StartListener startListener;
+	EndListener endListener;
+	CompleteListener completeListener;
+	EventListener eventListener;
+} _TrackEntryListeners;
 
 /** Draws an animated skeleton, providing an AnimationState for applying one or more animations and queuing animations to be
   * played later. */
@@ -61,25 +70,29 @@ public:
 	void setAnimationStateData (spAnimationStateData* stateData);
 	void setMix (const char* fromAnimation, const char* toAnimation, float duration);
 
-	template<class _Rx, class _Farg0, class _Arg0> void setAnimationListener (_Rx _Farg0::* const type, _Arg0&& target) {
-		using namespace std::placeholders;
-		this->listener = std::bind(type, target, _1, _2, _3, _4, _5);
-	}
-
 	spTrackEntry* setAnimation (int trackIndex, const char* name, bool loop);
 	spTrackEntry* addAnimation (int trackIndex, const char* name, bool loop, float delay = 0);
 	spTrackEntry* getCurrent (int trackIndex = 0);
 	void clearTracks ();
 	void clearTrack (int trackIndex = 0);
 
+	StartListener startListener;
+	EndListener endListener;
+	CompleteListener completeListener;
+	EventListener eventListener;
+	void setStartListener (spTrackEntry* entry, StartListener listener);
+	void setEndListener (spTrackEntry* entry, EndListener listener);
+	void setCompleteListener (spTrackEntry* entry, CompleteListener listener);
+	void setEventListener (spTrackEntry* entry, EventListener listener);
+
 	virtual void onAnimationStateEvent (int trackIndex, spEventType type, spEvent* event, int loopCount);
+	virtual void onTrackEntryEvent (int trackIndex, spEventType type, spEvent* event, int loopCount);
 
 protected:
 	SkeletonAnimation ();
 
 private:
 	typedef SkeletonRenderer super;
-	AnimationStateListener listener;
 	bool ownsAnimationStateData;
 
 	void initialize ();

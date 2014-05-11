@@ -57,6 +57,8 @@ struct spTrackEntry {
 	float delay, time, lastTime, endTime, timeScale;
 	spAnimationStateListener listener;
 	float mixTime, mixDuration, mix;
+
+	void* rendererObject;
 };
 
 struct spAnimationState {

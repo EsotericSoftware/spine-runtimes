@@ -40,8 +40,12 @@ using std::vector;
 
 namespace spine {
 
-static void callback (spAnimationState* state, int trackIndex, spEventType type, spEvent* event, int loopCount) {
-	((SkeletonAnimation*)state->context)->onAnimationStateEvent(trackIndex, type, event, loopCount);
+static void animationCallback (spAnimationState* state, int trackIndex, spEventType type, spEvent* event, int loopCount) {
+	((SkeletonAnimation*)state->rendererObject)->onAnimationStateEvent(trackIndex, type, event, loopCount);
+}
+
+static void trackEntryCallback (spAnimationState* state, int trackIndex, spEventType type, spEvent* event, int loopCount) {
+	((SkeletonAnimation*)state->rendererObject)->onTrackEntryEvent(trackIndex, type, event, loopCount);
 }
 
 SkeletonAnimation* SkeletonAnimation::createWithData (spSkeletonData* skeletonData) {
@@ -65,8 +69,8 @@ SkeletonAnimation* SkeletonAnimation::createWithFile (const char* skeletonDataFi
 void SkeletonAnimation::initialize () {
 	ownsAnimationStateData = true;
 	state = spAnimationState_create(spAnimationStateData_create(skeleton->data));
-	state->context = this;
-	state->listener = callback;
+	state->rendererObject = this;
+	state->listener = animationCallback;
 }
 
 SkeletonAnimation::SkeletonAnimation (spSkeletonData *skeletonData)
@@ -106,8 +110,8 @@ void SkeletonAnimation::setAnimationStateData (spAnimationStateData* stateData) 
 
 	ownsAnimationStateData = false;
 	state = spAnimationState_create(stateData);
-	state->context = this;
-	state->listener = callback;
+	state->rendererObject = this;
+	state->listener = animationCallback;
 }
 
 void SkeletonAnimation::setMix (const char* fromAnimation, const char* toAnimation, float duration) {
@@ -145,7 +149,64 @@ void SkeletonAnimation::clearTrack (int trackIndex) {
 }
 
 void SkeletonAnimation::onAnimationStateEvent (int trackIndex, spEventType type, spEvent* event, int loopCount) {
-	if (listener) listener(this, trackIndex, type, event, loopCount);
+	switch (type) {
+	case SP_ANIMATION_START:
+		if (startListener) startListener(trackIndex);
+		break;
+	case SP_ANIMATION_END:
+		if (endListener) endListener(trackIndex);
+		break;
+	case SP_ANIMATION_COMPLETE:
+		if (completeListener) completeListener(trackIndex, loopCount);
+		break;
+	case SP_ANIMATION_EVENT:
+		if (eventListener) eventListener(trackIndex, event);
+		break;
+	}
+}
+
+void SkeletonAnimation::onTrackEntryEvent (int trackIndex, spEventType type, spEvent* event, int loopCount) {
+	spTrackEntry* entry = spAnimationState_getCurrent(state, trackIndex);
+	if (!entry->rendererObject) return;
+	_TrackEntryListeners* listeners = (_TrackEntryListeners*)entry->rendererObject;
+	switch (type) {
+	case SP_ANIMATION_START:
+		if (listeners->startListener) listeners->startListener(trackIndex);
+		break;
+	case SP_ANIMATION_END:
+		if (listeners->endListener) listeners->endListener(trackIndex);
+		break;
+	case SP_ANIMATION_COMPLETE:
+		if (listeners->completeListener) listeners->completeListener(trackIndex, loopCount);
+		break;
+	case SP_ANIMATION_EVENT:
+		if (listeners->eventListener) listeners->eventListener(trackIndex, event);
+		break;
+	}
+}
+
+static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
+	if (!entry->rendererObject) {
+		entry->rendererObject = NEW(spine::_TrackEntryListeners);
+		entry->listener = trackEntryCallback;
+	}
+	return (_TrackEntryListeners*)entry->rendererObject;
+}
+
+void SkeletonAnimation::setStartListener (spTrackEntry* entry, StartListener listener) {
+	getListeners(entry)->startListener = listener;
+}
+
+void SkeletonAnimation::setEndListener (spTrackEntry* entry, EndListener listener) {
+	getListeners(entry)->endListener = listener;
+}
+
+void SkeletonAnimation::setCompleteListener (spTrackEntry* entry, CompleteListener listener) {
+	getListeners(entry)->completeListener = listener;
+}
+
+void SkeletonAnimation::setEventListener (spTrackEntry* entry, spine::EventListener listener) {
+	getListeners(entry)->eventListener = listener;
 }
 
 }
