@@ -63,10 +63,11 @@ struct spAnimationState {
 	spAnimationStateData* const data;
 	float timeScale;
 	spAnimationStateListener listener;
-	void* context;
 
 	int trackCount;
 	spTrackEntry** tracks;
+
+	void* rendererObject;
 };
 
 /* @param data May be 0 for no mixing. */
