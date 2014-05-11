@@ -41,6 +41,7 @@ spTrackEntry* _spTrackEntry_create () {
 }
 
 void _spTrackEntry_dispose (spTrackEntry* entry) {
+	if (entry->previous) _spTrackEntry_dispose(entry->previous);
 	FREE(entry);
 }
 
