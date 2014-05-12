@@ -69,10 +69,12 @@
 								</option>
 								<option id="gnu.cpp.link.option.libs.43946887" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="spine-c"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="sfml-main-d"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="sfml-graphics-s-d"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="sfml-window-s-d"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="sfml-system-s-d"/>
 								</option>
+								<option id="gnu.cpp.link.option.flags.705669165" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-Wl,-subsystem,windows" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.241907813" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
