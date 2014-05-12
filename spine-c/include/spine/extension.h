@@ -110,10 +110,15 @@ void _setFree (void (*_free) (void* ptr));
 
 char* _readFile (const char* path, int* length);
 
-/**/
+/*
+ * Override Track Entry Creation
+ */
 
 spTrackEntry* _spTrackEntry_create ();
 void _spTrackEntry_dispose (spTrackEntry* entry);
+
+void _spSetAnimationState_createTrackEntry(spTrackEntry* (*animationState_createTrackEntry) (spAnimationState* self));
+void _spSetAnimationState_disposeTrackEntry(void (*animationState_disposeTrackEntry) (spAnimationState* self, spTrackEntry* entry));
 
 /**/
 
