@@ -64,14 +64,14 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug.913061526" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug.1697744244" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug">
 								<option id="gnu.cpp.link.option.paths.1569606245" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/spine-sfml/SFML/bin}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/spine-c/Debug}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/spine-sfml/SFML/lib}&quot;"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.43946887" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="spine-c"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="sfml-system-2"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="sfml-window-2"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="sfml-graphics-2"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="sfml-graphics-s-d"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="sfml-window-s-d"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="sfml-system-s-d"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.241907813" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
