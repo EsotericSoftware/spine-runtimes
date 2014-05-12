@@ -55,15 +55,6 @@ char* _spUtil_readFile (const char* path, int* length) {
 	return bytes;
 }
 
-spTrackEntry* _spAnimationState_createTrackEntry (spAnimationState* self) {
-	return _spTrackEntry_create();
-}
-
-void _spAnimationState_disposeTrackEntry (spAnimationState* self, spTrackEntry* entry) {
-	if (entry->rendererObject) FREE(entry->rendererObject);
-	_spTrackEntry_dispose(entry);
-}
-
 /**/
 
 namespace spine {

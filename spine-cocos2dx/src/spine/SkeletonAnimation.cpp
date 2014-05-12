@@ -40,12 +40,17 @@ using std::vector;
 
 namespace spine {
 
-static void animationCallback (spAnimationState* state, int trackIndex, spEventType type, spEvent* event, int loopCount) {
+void animationCallback (spAnimationState* state, int trackIndex, spEventType type, spEvent* event, int loopCount) {
 	((SkeletonAnimation*)state->rendererObject)->onAnimationStateEvent(trackIndex, type, event, loopCount);
 }
 
-static void trackEntryCallback (spAnimationState* state, int trackIndex, spEventType type, spEvent* event, int loopCount) {
+void trackEntryCallback (spAnimationState* state, int trackIndex, spEventType type, spEvent* event, int loopCount) {
 	((SkeletonAnimation*)state->rendererObject)->onTrackEntryEvent(trackIndex, type, event, loopCount);
+}
+
+void disposeTrackEntry (spAnimationState* self, spTrackEntry* entry) {
+	if (entry->rendererObject) FREE(entry->rendererObject);
+	_spTrackEntry_dispose(entry);
 }
 
 SkeletonAnimation* SkeletonAnimation::createWithData (spSkeletonData* skeletonData) {
@@ -71,6 +76,9 @@ void SkeletonAnimation::initialize () {
 	state = spAnimationState_create(spAnimationStateData_create(skeleton->data));
 	state->rendererObject = this;
 	state->listener = animationCallback;
+
+	_spAnimationState* stateInternal = (_spAnimationState*)state;
+	stateInternal->disposeTrackEntry = disposeTrackEntry;
 }
 
 SkeletonAnimation::SkeletonAnimation (spSkeletonData *skeletonData)

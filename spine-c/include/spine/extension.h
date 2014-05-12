@@ -87,8 +87,6 @@ extern "C" {
 void _spAtlasPage_createTexture (spAtlasPage* self, const char* path);
 void _spAtlasPage_disposeTexture (spAtlasPage* self);
 char* _spUtil_readFile (const char* path, int* length);
-spTrackEntry* _spAnimationState_createTrackEntry (spAnimationState* self);
-void _spAnimationState_disposeTrackEntry (spAnimationState* self, spTrackEntry* entry);
 
 #ifdef SPINE_SHORT_NAMES
 #define _AtlasPage_createTexture(...) _spAtlasPage_createTexture(__VA_ARGS__)
@@ -111,6 +109,14 @@ void _setFree (void (*_free) (void* ptr));
 char* _readFile (const char* path, int* length);
 
 /**/
+
+typedef struct {
+	spAnimationState super;
+	spEvent** events;
+
+	spTrackEntry* (*createTrackEntry) (spAnimationState* self);
+	void (*disposeTrackEntry) (spAnimationState* self, spTrackEntry* entry);
+} _spAnimationState;
 
 spTrackEntry* _spTrackEntry_create ();
 void _spTrackEntry_dispose (spTrackEntry* entry);
