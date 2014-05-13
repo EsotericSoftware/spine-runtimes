@@ -72,6 +72,9 @@ import java.awt.Frame;
 import java.io.File;
 
 public class SkeletonTest extends ApplicationAdapter {
+	static final float checkModifiedInterval = 0.250f;
+	static final float reloadDelay = 1;
+
 	UI ui;
 
 	PolygonSpriteBatch batch;
@@ -83,7 +86,7 @@ public class SkeletonTest extends ApplicationAdapter {
 	int skeletonX, skeletonY;
 	FileHandle skeletonFile;
 	long lastModified;
-	float lastModifiedCheck;
+	float lastModifiedCheck, reloadTimer;
 
 	public void create () {
 		ui = new UI();
@@ -93,11 +96,11 @@ public class SkeletonTest extends ApplicationAdapter {
 		skeletonX = (int)(ui.window.getWidth() + (Gdx.graphics.getWidth() - ui.window.getWidth()) / 2);
 		skeletonY = Gdx.graphics.getHeight() / 4;
 
-		loadSkeleton(Gdx.files.internal(Gdx.app.getPreferences("spine-skeletontest")
-			.getString("lastFile", "spineboy/spineboy.json")));
+		loadSkeleton(
+			Gdx.files.internal(Gdx.app.getPreferences("spine-skeletontest").getString("lastFile", "spineboy/spineboy.json")), false);
 	}
 
-	void loadSkeleton (FileHandle skeletonFile) {
+	void loadSkeleton (FileHandle skeletonFile, boolean reload) {
 		if (skeletonFile == null) return;
 
 		// A regular texture atlas would normally usually be used. This returns a white image for images not found in the atlas.
@@ -132,7 +135,7 @@ public class SkeletonTest extends ApplicationAdapter {
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			ui.toast("Error loading skeleton: spineboy");
+			ui.toast("Error loading skeleton: " + skeletonFile.name());
 			lastModifiedCheck = 5;
 			return;
 		}
@@ -149,7 +152,7 @@ public class SkeletonTest extends ApplicationAdapter {
 		prefs.putString("lastFile", skeletonFile.path());
 		prefs.flush();
 		lastModified = skeletonFile.lastModified();
-		lastModifiedCheck = 0.250f;
+		lastModifiedCheck = checkModifiedInterval;
 
 		// Populate UI.
 
@@ -171,29 +174,45 @@ public class SkeletonTest extends ApplicationAdapter {
 
 		skeleton.setSkin(ui.skinList.getSelected());
 		state.setAnimation(0, ui.animationList.getSelected(), ui.loopCheckbox.isChecked());
+
+		if (reload) ui.toast("Reloaded.");
 	}
 
 	public void render () {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+		float delta = Gdx.graphics.getDeltaTime();
+
 		if (skeleton != null) {
-			lastModifiedCheck -= Gdx.graphics.getDeltaTime();
-			if (lastModifiedCheck < 0 && lastModified != skeletonFile.lastModified()) loadSkeleton(skeletonFile);
+			if (reloadTimer <= 0) {
+				lastModifiedCheck -= delta;
+				if (lastModifiedCheck < 0) {
+					lastModifiedCheck = checkModifiedInterval;
+					if (lastModified != skeletonFile.lastModified()) reloadTimer = reloadDelay;
+				}
+			} else {
+				reloadTimer -= delta;
+				if (reloadTimer <= 0) loadSkeleton(skeletonFile, true);
+			}
 
 			state.getData().setDefaultMix(ui.mixSlider.getValue());
 			renderer.setPremultipliedAlpha(ui.premultipliedCheckbox.isChecked());
 
-			float delta = Math.min(Gdx.graphics.getDeltaTime(), 0.032f) * ui.speedSlider.getValue();
+			delta = Math.min(delta, 0.032f) * ui.speedSlider.getValue();
 			skeleton.update(delta);
 			if (!ui.pauseButton.isChecked()) {
 				state.update(delta);
 				state.apply(skeleton);
 			}
-			skeleton.updateWorldTransform();
 			skeleton.setX(skeletonX);
 			skeleton.setY(skeletonY);
+			// skeleton.setX(0);
+			// skeleton.setY(0);
+			// skeleton.getRootBone().setX(skeletonX);
+			// skeleton.getRootBone().setY(skeletonY);
 			skeleton.setFlipX(ui.flipXCheckbox.isChecked());
 			skeleton.setFlipY(ui.flipYCheckbox.isChecked());
+			skeleton.updateWorldTransform();
 
 			batch.begin();
 			renderer.draw(batch, skeleton);
@@ -355,7 +374,7 @@ public class SkeletonTest extends ApplicationAdapter {
 					String name = fileDialog.getFile();
 					String dir = fileDialog.getDirectory();
 					if (name == null || dir == null) return;
-					loadSkeleton(new FileHandle(new File(dir, name).getAbsolutePath()));
+					loadSkeleton(new FileHandle(new File(dir, name).getAbsolutePath()), false);
 				}
 			});
 
@@ -397,7 +416,7 @@ public class SkeletonTest extends ApplicationAdapter {
 			scaleSlider.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
 					scaleLabel.setText(Float.toString((int)(scaleSlider.getValue() * 100) / 100f));
-					if (!scaleSlider.isDragging()) loadSkeleton(skeletonFile);
+					if (!scaleSlider.isDragging()) loadSkeleton(skeletonFile, false);
 				}
 			});
 
