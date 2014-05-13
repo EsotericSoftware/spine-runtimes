@@ -204,10 +204,8 @@ public class SkeletonTest extends ApplicationAdapter {
 				state.update(delta);
 				state.apply(skeleton);
 			}
-			skeleton.setX(skeletonX);
-			skeleton.setY(skeletonY);
-			// skeleton.setX(0);
-			// skeleton.setY(0);
+			skeleton.setPosition(skeletonX, skeletonY);
+			// skeleton.setPosition(0, 0);
 			// skeleton.getRootBone().setX(skeletonX);
 			// skeleton.getRootBone().setY(skeletonY);
 			skeleton.setFlipX(ui.flipXCheckbox.isChecked());

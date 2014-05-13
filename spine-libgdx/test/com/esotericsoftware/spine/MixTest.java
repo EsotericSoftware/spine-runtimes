@@ -75,8 +75,7 @@ public class MixTest extends ApplicationAdapter {
 
 		skeleton = new Skeleton(skeletonData);
 		skeleton.updateWorldTransform();
-		skeleton.setX(-50);
-		skeleton.setY(20);
+		skeleton.setPosition(-50, 20);
 	}
 
 	public void render () {

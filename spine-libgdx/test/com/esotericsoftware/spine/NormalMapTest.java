@@ -111,8 +111,7 @@ public class NormalMapTest extends ApplicationAdapter {
 			}
 
 			public boolean touchDragged (int screenX, int screenY, int pointer) {
-				skeleton.setX(screenX);
-				skeleton.setY(Gdx.graphics.getHeight() - screenY);
+				skeleton.setPosition(screenX, Gdx.graphics.getHeight() - screenY);
 				return true;
 			}
 

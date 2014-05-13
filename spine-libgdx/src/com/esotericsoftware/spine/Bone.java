@@ -138,6 +138,11 @@ public class Bone {
 		this.y = y;
 	}
 
+	public void setPosition (float x, float y) {
+		this.x = x;
+		this.y = y;
+	}
+
 	public float getRotation () {
 		return rotation;
 	}
@@ -160,6 +165,16 @@ public class Bone {
 
 	public void setScaleY (float scaleY) {
 		this.scaleY = scaleY;
+	}
+
+	public void setScale (float scaleX, float scaleY) {
+		this.scaleX = scaleX;
+		this.scaleY = scaleY;
+	}
+
+	public void setScale (float scale) {
+		scaleX = scale;
+		scaleY = scale;
 	}
 
 	public float getM00 () {

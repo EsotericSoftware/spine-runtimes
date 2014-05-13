@@ -61,8 +61,7 @@ public class SkeletonAttachmentTest extends ApplicationAdapter {
 			json.setScale(0.6f);
 			SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy/spineboy.json"));
 			spineboy = new Skeleton(skeletonData);
-			spineboy.setX(320);
-			spineboy.setY(20);
+			spineboy.setPosition(320, 20);
 
 			AnimationStateData stateData = new AnimationStateData(skeletonData);
 			stateData.setMix("walk", "jump", 0.2f);

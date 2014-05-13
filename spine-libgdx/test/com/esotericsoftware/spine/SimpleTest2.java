@@ -68,8 +68,7 @@ public class SimpleTest2 extends ApplicationAdapter {
 		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy/spineboy.json"));
 
 		skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
-		skeleton.setX(250);
-		skeleton.setY(20);
+		skeleton.setPosition(250, 20);
 		skeleton.setAttachment("head-bb", "head"); // Attach "head" bounding box to "head-bb" slot.
 
 		bounds = new SkeletonBounds(); // Convenience class to do hit detection with bounding boxes.

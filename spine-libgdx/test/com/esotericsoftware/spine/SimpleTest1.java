@@ -63,8 +63,7 @@ public class SimpleTest1 extends ApplicationAdapter {
 		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy/spineboy.json"));
 
 		skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
-		skeleton.setX(250);
-		skeleton.setY(20);
+		skeleton.setPosition(250, 20);
 
 		AnimationStateData stateData = new AnimationStateData(skeletonData); // Defines mixing (crossfading) between animations.
 		stateData.setMix("run", "jump", 0.2f);
