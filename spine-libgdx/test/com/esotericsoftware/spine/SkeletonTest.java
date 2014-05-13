@@ -188,7 +188,8 @@ public class SkeletonTest extends ApplicationAdapter {
 				lastModifiedCheck -= delta;
 				if (lastModifiedCheck < 0) {
 					lastModifiedCheck = checkModifiedInterval;
-					if (lastModified != skeletonFile.lastModified()) reloadTimer = reloadDelay;
+					long time = skeletonFile.lastModified();
+					if (time != 0 && lastModified != time) reloadTimer = reloadDelay;
 				}
 			} else {
 				reloadTimer -= delta;
