@@ -57,14 +57,14 @@ void spMeshAttachment_updateUVs (spMeshAttachment* self) {
 	int i;
 	float width = self->regionU2 - self->regionU, height = self->regionV2 - self->regionV;
 	FREE(self->uvs);
-	self->uvs = MALLOC(float, self->uvsCount);
+	self->uvs = MALLOC(float, self->verticesCount);
 	if (self->regionRotate) {
-		for (i = 0; i < self->uvsCount; i += 2) {
+		for (i = 0; i < self->verticesCount; i += 2) {
 			self->uvs[i] = self->regionU + self->regionUVs[i + 1] * width;
 			self->uvs[i + 1] = self->regionV + height - self->regionUVs[i] * height;
 		}
 	} else {
-		for (i = 0; i < self->uvsCount; i += 2) {
+		for (i = 0; i < self->verticesCount; i += 2) {
 			self->uvs[i] = self->regionU + self->regionUVs[i] * width;
 			self->uvs[i + 1] = self->regionV + self->regionUVs[i + 1] * height;
 		}
