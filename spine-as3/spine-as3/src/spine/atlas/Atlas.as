@@ -1,6 +1,6 @@
 /******************************************************************************
  * Spine Runtimes Software License
- * Version 2
+ * Version 2.1
  * 
  * Copyright (c) 2013, Esoteric Software
  * All rights reserved.
@@ -8,22 +8,24 @@
  * You are granted a perpetual, non-exclusive, non-sublicensable and
  * non-transferable license to install, execute and perform the Spine Runtimes
  * Software (the "Software") solely for internal use. Without the written
- * permission of Esoteric Software, you may not (a) modify, translate, adapt or
- * otherwise create derivative works, improvements of the Software or develop
- * new applications using the Software or (b) remove, delete, alter or obscure
- * any trademarks or any copyright, trademark, patent or other intellectual
- * property or proprietary rights notices on or in the Software, including
- * any copy thereof. Redistributions in binary or source form must include
- * this license and terms. THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * permission of Esoteric Software (typically granted by licensing Spine), you
+ * may not (a) modify, translate, adapt or otherwise create derivative works,
+ * improvements of the Software or develop new applications using the Software
+ * or (b) remove, delete, alter or obscure any trademarks or any copyright,
+ * trademark, patent or other intellectual property or proprietary rights
+ * notices on or in the Software, including any copy thereof. Redistributions
+ * in binary or source form must include this license and terms.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 package spine.atlas {
@@ -66,7 +68,12 @@ public class Atlas {
 				page = new AtlasPage();
 				page.name = line;
 
-				page.format = Format[reader.readValue()];
+				if (reader.readTuple(tuple) == 2) { // size is only optional for an atlas packed with an old TexturePacker.
+					page.width = parseInt(tuple[0]);
+					page.height = parseInt(tuple[1]);
+					reader.readTuple(tuple);
+				}
+				page.format = Format[tuple[0]];
 
 				reader.readTuple(tuple);
 				page.minFilter = TextureFilter[tuple[0]];
@@ -184,7 +191,7 @@ class Reader {
 		return trim(line.substring(colon + 1));
 	}
 
-	/** Returns the number of tuple values read (2 or 4). */
+	/** Returns the number of tuple values read (1, 2 or 4). */
 	public function readTuple (tuple:Array) : int {
 		var line:String = readLine();
 		var colon:int = line.indexOf(":");
@@ -193,11 +200,7 @@ class Reader {
 		var i:int = 0, lastMatch:int = colon + 1;
 		for (; i < 3; i++) {
 			var comma:int = line.indexOf(",", lastMatch);
-			if (comma == -1) {
-				if (i == 0)
-					throw new Error("Invalid line: " + line);
-				break;
-			}
+			if (comma == -1) break;
 			tuple[i] = trim(line.substr(lastMatch, comma - lastMatch));
 			lastMatch = comma + 1;
 		}

@@ -14,6 +14,7 @@ target
 
 spine-cocos2dx/cocos2dx/
 !spine-cocos2dx/cocos2dx/Place cocos2dx here.txt
+spine-cocos2dx/example/proj.win32/Debug
 *.swp
 .DS_Store
 xcuserdata
@@ -33,6 +34,10 @@ spine-monogame/xamarinstudio-ios/src/obj
 
 spine-monogame/windows8-store/src/bin
 spine-monogame/windows8-store/src/obj
+
+spine-monogame/windows8-store/example/spine-monogame-example_TemporaryKey.pfx
+spine-monogame/windows8-store/example/obj/*
+spine-monogame/windows8-store/example/bin/*
 
 spine-xna/bin
 spine-xna/obj

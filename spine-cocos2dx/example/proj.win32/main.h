@@ -6,6 +6,4 @@
 #include <windows.h>
 #include <tchar.h>
 
-#include "CCStdC.h"
-
 #endif    // __MAIN_H__

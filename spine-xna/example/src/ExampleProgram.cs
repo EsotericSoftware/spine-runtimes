@@ -11,5 +11,17 @@ namespace Spine {
             }
         }
     }
+#elif WINDOWS_STOREAPP 
+    public static class Program
+    {
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        static void Main()
+        {
+            var factory = new MonoGame.Framework.GameFrameworkViewSource<Example>();
+            Windows.ApplicationModel.Core.CoreApplication.Run(factory);
+        }
+    }
 #endif
 }

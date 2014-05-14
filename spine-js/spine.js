@@ -1,6 +1,6 @@
 /******************************************************************************
  * Spine Runtimes Software License
- * Version 2
+ * Version 2.1
  * 
  * Copyright (c) 2013, Esoteric Software
  * All rights reserved.
@@ -8,22 +8,24 @@
  * You are granted a perpetual, non-exclusive, non-sublicensable and
  * non-transferable license to install, execute and perform the Spine Runtimes
  * Software (the "Software") solely for internal use. Without the written
- * permission of Esoteric Software, you may not (a) modify, translate, adapt or
- * otherwise create derivative works, improvements of the Software or develop
- * new applications using the Software or (b) remove, delete, alter or obscure
- * any trademarks or any copyright, trademark, patent or other intellectual
- * property or proprietary rights notices on or in the Software, including
- * any copy thereof. Redistributions in binary or source form must include
- * this license and terms. THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * permission of Esoteric Software (typically granted by licensing Spine), you
+ * may not (a) modify, translate, adapt or otherwise create derivative works,
+ * improvements of the Software or develop new applications using the Software
+ * or (b) remove, delete, alter or obscure any trademarks or any copyright,
+ * trademark, patent or other intellectual property or proprietary rights
+ * notices on or in the Software, including any copy thereof. Redistributions
+ * in binary or source form must include this license and terms.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 var spine = {};
@@ -703,8 +705,11 @@ spine.Skeleton.prototype = {
 	},
 	setSlotsToSetupPose: function () {
 		var slots = this.slots;
-		for (var i = 0, n = slots.length; i < n; i++)
+		var drawOrder = this.drawOrder;
+		for (var i = 0, n = slots.length; i < n; i++) {
+			drawOrder[i] = slots[i];
 			slots[i].setToSetupPose(i);
+		}
 	},
 	/** @return May return null. */
 	getRootBone: function () {
@@ -771,7 +776,7 @@ spine.Skeleton.prototype = {
 			if (slot.data.name == slotName) {
 				var attachment = null;
 				if (attachmentName) {
-					attachment = this.getAttachment(i, attachmentName);
+					attachment = this.getAttachmentBySlotIndex(i, attachmentName);
 					if (!attachment) throw "Attachment not found: " + attachmentName + ", for slot: " + slotName;
 				}
 				slot.setAttachment(attachment);
@@ -899,7 +904,7 @@ spine.BoundingBoxAttachment = function (name) {
 	this.vertices = [];
 };
 spine.BoundingBoxAttachment.prototype = {
-	type: spine.AttachmentType.boundingBox,
+	type: spine.AttachmentType.boundingbox,
 	computeWorldVertices: function (x, y, bone, worldVertices) {
 		x += bone.worldX;
 		y += bone.worldY;
@@ -1236,7 +1241,7 @@ spine.SkeletonJson.prototype = {
 			attachment.width = (map["width"] || 32) * this.scale;
 			attachment.height = (map["height"] || 32) * this.scale;
 			attachment.updateOffset();
-		} else if (type == spine.AttachmentType.boundingBox) {
+		} else if (type == spine.AttachmentType.boundingbox) {
 			var vertices = map["vertices"];
 			for (var i = 0, n = vertices.length; i < n; i++)
 				attachment.vertices.push(vertices[i] * this.scale);
@@ -1438,7 +1443,12 @@ spine.Atlas = function (atlasText, textureLoader) {
 			page = new spine.AtlasPage();
 			page.name = line;
 
-			page.format = spine.Atlas.Format[reader.readValue()];
+			if (reader.readTuple(tuple) == 2) { // size is only optional for an atlas packed with an old TexturePacker.
+				page.width = parseInt(tuple[0]);
+				page.height = parseInt(tuple[1]);
+				reader.readTuple(tuple);
+			}
+			page.format = spine.Atlas.Format[tuple[0]];
 
 			reader.readTuple(tuple);
 			page.minFilter = spine.Atlas.TextureFilter[tuple[0]];
@@ -1612,7 +1622,7 @@ spine.AtlasReader.prototype = {
 		if (colon == -1) throw "Invalid line: " + line;
 		return this.trim(line.substring(colon + 1));
 	},
-	/** Returns the number of tuple values read (2 or 4). */
+	/** Returns the number of tuple values read (1, 2 or 4). */
 	readTuple: function (tuple) {
 		var line = this.readLine();
 		var colon = line.indexOf(":");
@@ -1620,10 +1630,7 @@ spine.AtlasReader.prototype = {
 		var i = 0, lastMatch = colon + 1;
 		for (; i < 3; i++) {
 			var comma = line.indexOf(",", lastMatch);
-			if (comma == -1) {
-				if (i == 0) throw "Invalid line: " + line;
-				break;
-			}
+			if (comma == -1) break;
 			tuple[i] = this.trim(line.substr(lastMatch, comma - lastMatch));
 			lastMatch = comma + 1;
 		}
@@ -1681,7 +1688,7 @@ spine.SkeletonBounds.prototype = {
 		for (var i = 0; i < slotCount; i++) {
 			var slot = slots[i];
 			var boundingBox = slot.attachment;
-			if (boundingBox.type != spine.AttachmentType.boundingBox) continue;
+			if (boundingBox.type != spine.AttachmentType.boundingbox) continue;
 			boundingBoxes.push(boundingBox);
 
 			var poolCount = polygonPool.length, polygon;
@@ -1774,7 +1781,7 @@ spine.SkeletonBounds.prototype = {
 		return inside;
 	},
 	/** Returns true if the polygon contains the line segment. */
-	intersectsSegment: function (polygon, x1, y1, x2, y2) {
+	polygonIntersectsSegment: function (polygon, x1, y1, x2, y2) {
 		var nn = polygon.length;
 		var width12 = x1 - x2, height12 = y1 - y2;
 		var det1 = x1 * y2 - y1 * x2;

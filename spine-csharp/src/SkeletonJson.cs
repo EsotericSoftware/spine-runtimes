@@ -1,6 +1,6 @@
 /******************************************************************************
  * Spine Runtimes Software License
- * Version 2
+ * Version 2.1
  * 
  * Copyright (c) 2013, Esoteric Software
  * All rights reserved.
@@ -8,22 +8,24 @@
  * You are granted a perpetual, non-exclusive, non-sublicensable and
  * non-transferable license to install, execute and perform the Spine Runtimes
  * Software (the "Software") solely for internal use. Without the written
- * permission of Esoteric Software, you may not (a) modify, translate, adapt or
- * otherwise create derivative works, improvements of the Software or develop
- * new applications using the Software or (b) remove, delete, alter or obscure
- * any trademarks or any copyright, trademark, patent or other intellectual
- * property or proprietary rights notices on or in the Software, including
- * any copy thereof. Redistributions in binary or source form must include
- * this license and terms. THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * permission of Esoteric Software (typically granted by licensing Spine), you
+ * may not (a) modify, translate, adapt or otherwise create derivative works,
+ * improvements of the Software or develop new applications using the Software
+ * or (b) remove, delete, alter or obscure any trademarks or any copyright,
+ * trademark, patent or other intellectual property or proprietary rights
+ * notices on or in the Software, including any copy thereof. Redistributions
+ * in binary or source form must include this license and terms.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 using System;
@@ -71,9 +73,9 @@ namespace Spine {
             using (StreamReader reader = new StreamReader(stream))
             {
 #else
-            using (StreamReader reader = new StreamReader(path)) {
+			using (StreamReader reader = new StreamReader(path)) {
 #endif
-                SkeletonData skeletonData = ReadSkeletonData(reader);
+				SkeletonData skeletonData = ReadSkeletonData(reader);
 				skeletonData.name = Path.GetFileNameWithoutExtension(path);
 				return skeletonData;
 			}
@@ -83,7 +85,7 @@ namespace Spine {
 		public SkeletonData ReadSkeletonData (TextReader reader) {
 			if (reader == null) throw new ArgumentNullException("reader cannot be null.");
 
-			SkeletonData skeletonData = new SkeletonData();
+			var skeletonData = new SkeletonData();
 
 			var root = Json.Deserialize(reader) as Dictionary<String, Object>;
 			if (root == null) throw new Exception("Invalid JSON.");
@@ -96,7 +98,7 @@ namespace Spine {
 					if (parent == null)
 						throw new Exception("Parent bone not found: " + boneMap["parent"]);
 				}
-				BoneData boneData = new BoneData((String)boneMap["name"], parent);
+				var boneData = new BoneData((String)boneMap["name"], parent);
 				boneData.length = GetFloat(boneMap, "length", 0) * Scale;
 				boneData.x = GetFloat(boneMap, "x", 0) * Scale;
 				boneData.y = GetFloat(boneMap, "y", 0) * Scale;
@@ -111,15 +113,15 @@ namespace Spine {
 			// Slots.
 			if (root.ContainsKey("slots")) {
 				foreach (Dictionary<String, Object> slotMap in (List<Object>)root["slots"]) {
-					String slotName = (String)slotMap["name"];
-					String boneName = (String)slotMap["bone"];
+					var slotName = (String)slotMap["name"];
+					var boneName = (String)slotMap["bone"];
 					BoneData boneData = skeletonData.FindBone(boneName);
 					if (boneData == null)
 						throw new Exception("Slot bone not found: " + boneName);
-					SlotData slotData = new SlotData(slotName, boneData);
+					var slotData = new SlotData(slotName, boneData);
 
 					if (slotMap.ContainsKey("color")) {
-						String color = (String)slotMap["color"];
+						var color = (String)slotMap["color"];
 						slotData.r = ToColor(color, 0);
 						slotData.g = ToColor(color, 1);
 						slotData.b = ToColor(color, 2);
@@ -139,7 +141,7 @@ namespace Spine {
 			// Skins.
 			if (root.ContainsKey("skins")) {
 				foreach (KeyValuePair<String, Object> entry in (Dictionary<String, Object>)root["skins"]) {
-					Skin skin = new Skin(entry.Key);
+					var skin = new Skin(entry.Key);
 					foreach (KeyValuePair<String, Object> slotEntry in (Dictionary<String, Object>)entry.Value) {
 						int slotIndex = skeletonData.FindSlotIndex(slotEntry.Key);
 						foreach (KeyValuePair<String, Object> attachmentEntry in ((Dictionary<String, Object>)slotEntry.Value)) {
@@ -157,7 +159,7 @@ namespace Spine {
 			if (root.ContainsKey("events")) {
 				foreach (KeyValuePair<String, Object> entry in (Dictionary<String, Object>)root["events"]) {
 					var entryMap = (Dictionary<String, Object>)entry.Value;
-					EventData eventData = new EventData(entry.Key);
+					var eventData = new EventData(entry.Key);
 					eventData.Int = GetInt(entryMap, "int", 0);
 					eventData.Float = GetFloat(entryMap, "float", 0);
 					eventData.String = GetString(entryMap, "string", null);
@@ -182,33 +184,132 @@ namespace Spine {
 			if (map.ContainsKey("name"))
 				name = (String)map["name"];
 
-			AttachmentType type = AttachmentType.region;
+			var type = AttachmentType.region;
 			if (map.ContainsKey("type"))
 				type = (AttachmentType)Enum.Parse(typeof(AttachmentType), (String)map["type"], false);
-			Attachment attachment = attachmentLoader.NewAttachment(skin, type, name);
 
-			RegionAttachment regionAttachment = attachment as RegionAttachment;
-			if (regionAttachment != null) {
-				regionAttachment.x = GetFloat(map, "x", 0) * Scale;
-				regionAttachment.y = GetFloat(map, "y", 0) * Scale;
-				regionAttachment.scaleX = GetFloat(map, "scaleX", 1);
-				regionAttachment.scaleY = GetFloat(map, "scaleY", 1);
-				regionAttachment.rotation = GetFloat(map, "rotation", 0);
-				regionAttachment.width = GetFloat(map, "width", 32) * Scale;
-				regionAttachment.height = GetFloat(map, "height", 32) * Scale;
-				regionAttachment.UpdateOffset();
+			String path = name;
+			if (map.ContainsKey("path"))
+				path = (String)map["path"];
+
+			switch (type) {
+			case AttachmentType.region:
+				RegionAttachment region = attachmentLoader.NewRegionAttachment(skin, name, path);
+				if (region == null) return null;
+				region.Path = path;
+				region.x = GetFloat(map, "x", 0) * Scale;
+				region.y = GetFloat(map, "y", 0) * Scale;
+				region.scaleX = GetFloat(map, "scaleX", 1);
+				region.scaleY = GetFloat(map, "scaleY", 1);
+				region.rotation = GetFloat(map, "rotation", 0);
+				region.width = GetFloat(map, "width", 32) * Scale;
+				region.height = GetFloat(map, "height", 32) * Scale;
+				region.UpdateOffset();
+
+				if (map.ContainsKey("color")) {
+					var color = (String)map["color"];
+					region.r = ToColor(color, 0);
+					region.g = ToColor(color, 1);
+					region.b = ToColor(color, 2);
+					region.a = ToColor(color, 3);
+				}
+
+				return region;
+			case AttachmentType.mesh: {
+					MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, name, path);
+					if (mesh == null) return null;
+
+					mesh.Path = path; 
+					mesh.vertices = GetFloatArray(map, "vertices", Scale);
+					mesh.triangles = GetIntArray(map, "triangles");
+					mesh.regionUVs = GetFloatArray(map, "uvs", 1);
+					mesh.UpdateUVs();
+
+					if (map.ContainsKey("color")) {
+						var color = (String)map["color"];
+						mesh.r = ToColor(color, 0);
+						mesh.g = ToColor(color, 1);
+						mesh.b = ToColor(color, 2);
+						mesh.a = ToColor(color, 3);
+					}
+
+					mesh.HullLength = GetInt(map, "hull", 0) * 2;
+					if (map.ContainsKey("edges")) mesh.Edges = GetIntArray(map, "edges");
+					mesh.Width = GetInt(map, "width", 0) * Scale;
+					mesh.Height = GetInt(map, "height", 0) * Scale;
+
+					return mesh;
+				}
+			case AttachmentType.skinnedmesh: {
+					SkinnedMeshAttachment mesh = attachmentLoader.NewSkinnedMeshAttachment(skin, name, path);
+					if (mesh == null) return null;
+
+					mesh.Path = path;
+					float[] uvs = GetFloatArray(map, "uvs", 1);
+					float[] vertices = GetFloatArray(map, "vertices", 1);
+					var weights = new List<float>(uvs.Length * 3 * 3);
+					var bones = new List<int>(uvs.Length * 3);
+					float scale = Scale;
+					for (int i = 0, n = vertices.Length; i < n; ) {
+						int boneCount = (int)vertices[i++];
+						bones.Add(boneCount);
+						for (int nn = i + boneCount * 4; i < nn; ) {
+							bones.Add((int)vertices[i]);
+							weights.Add(vertices[i + 1] * scale);
+							weights.Add(vertices[i + 2] * scale);
+							weights.Add(vertices[i + 3]);
+							i += 4;
+						}
+					}
+					mesh.bones = bones.ToArray();
+					mesh.weights = weights.ToArray();
+					mesh.triangles = GetIntArray(map, "triangles");
+					mesh.regionUVs = uvs;
+					mesh.UpdateUVs();
+
+					if (map.ContainsKey("color")) {
+						var color = (String)map["color"];
+						mesh.r = ToColor(color, 0);
+						mesh.g = ToColor(color, 1);
+						mesh.b = ToColor(color, 2);
+						mesh.a = ToColor(color, 3);
+					}
+
+					mesh.HullLength = GetInt(map, "hull", 0) * 2;
+					if (map.ContainsKey("edges")) mesh.Edges = GetIntArray(map, "edges");
+					mesh.Width = GetInt(map, "width", 0) * Scale;
+					mesh.Height = GetInt(map, "height", 0) * Scale;
+
+					return mesh;
+				}
+			case AttachmentType.boundingbox:
+				BoundingBoxAttachment box = attachmentLoader.NewBoundingBoxAttachment(skin, name);
+				if (box == null) return null;
+				box.vertices = GetFloatArray(map, "vertices", Scale);
+				return box;
 			}
+			return null;
+		}
 
-			BoundingBoxAttachment boundingBox = attachment as BoundingBoxAttachment;
-			if (boundingBox != null) {
-				List<Object> values = (List<Object>)map["vertices"];
-				float[] vertices = new float[values.Count];
-				for (int i = 0, n = values.Count; i < n; i++)
-					vertices[i] = (float)values[i] * Scale;
-				boundingBox.Vertices = vertices;
+		private float[] GetFloatArray (Dictionary<String, Object> map, String name, float scale) {
+			var list = (List<Object>)map[name];
+			var values = new float[list.Count];
+			if (scale == 1) {
+				for (int i = 0, n = list.Count; i < n; i++)
+					values[i] = (float)list[i];
+			} else {
+				for (int i = 0, n = list.Count; i < n; i++)
+					values[i] = (float)list[i] * scale;
 			}
+			return values;
+		}
 
-			return attachment;
+		private int[] GetIntArray (Dictionary<String, Object> map, String name) {
+			var list = (List<Object>)map[name];
+			var values = new int[list.Count];
+			for (int i = 0, n = list.Count; i < n; i++)
+				values[i] = (int)(float)list[i];
+			return values;
 		}
 
 		private float GetFloat (Dictionary<String, Object> map, String name, float defaultValue) {
@@ -244,6 +345,49 @@ namespace Spine {
 		private void ReadAnimation (String name, Dictionary<String, Object> map, SkeletonData skeletonData) {
 			var timelines = new List<Timeline>();
 			float duration = 0;
+			float scale = Scale;
+
+			if (map.ContainsKey("slots")) {
+				foreach (KeyValuePair<String, Object> entry in (Dictionary<String, Object>)map["slots"]) {
+					String slotName = entry.Key;
+					int slotIndex = skeletonData.FindSlotIndex(slotName);
+					var timelineMap = (Dictionary<String, Object>)entry.Value;
+
+					foreach (KeyValuePair<String, Object> timelineEntry in timelineMap) {
+						var values = (List<Object>)timelineEntry.Value;
+						var timelineName = (String)timelineEntry.Key;
+						if (timelineName.Equals("color")) {
+							var timeline = new ColorTimeline(values.Count);
+							timeline.slotIndex = slotIndex;
+
+							int frameIndex = 0;
+							foreach (Dictionary<String, Object> valueMap in values) {
+								float time = (float)valueMap["time"];
+								String c = (String)valueMap["color"];
+								timeline.setFrame(frameIndex, time, ToColor(c, 0), ToColor(c, 1), ToColor(c, 2), ToColor(c, 3));
+								ReadCurve(timeline, frameIndex, valueMap);
+								frameIndex++;
+							}
+							timelines.Add(timeline);
+							duration = Math.Max(duration, timeline.frames[timeline.FrameCount * 5 - 5]);
+
+						} else if (timelineName.Equals("attachment")) {
+							var timeline = new AttachmentTimeline(values.Count);
+							timeline.slotIndex = slotIndex;
+
+							int frameIndex = 0;
+							foreach (Dictionary<String, Object> valueMap in values) {
+								float time = (float)valueMap["time"];
+								timeline.setFrame(frameIndex++, time, (String)valueMap["name"]);
+							}
+							timelines.Add(timeline);
+							duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1]);
+
+						} else
+							throw new Exception("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
+					}
+				}
+			}
 
 			if (map.ContainsKey("bones")) {
 				foreach (KeyValuePair<String, Object> entry in (Dictionary<String, Object>)map["bones"]) {
@@ -255,9 +399,9 @@ namespace Spine {
 					var timelineMap = (Dictionary<String, Object>)entry.Value;
 					foreach (KeyValuePair<String, Object> timelineEntry in timelineMap) {
 						var values = (List<Object>)timelineEntry.Value;
-						String timelineName = (String)timelineEntry.Key;
+						var timelineName = (String)timelineEntry.Key;
 						if (timelineName.Equals("rotate")) {
-							RotateTimeline timeline = new RotateTimeline(values.Count);
+							var timeline = new RotateTimeline(values.Count);
 							timeline.boneIndex = boneIndex;
 
 							int frameIndex = 0;
@@ -277,7 +421,7 @@ namespace Spine {
 								timeline = new ScaleTimeline(values.Count);
 							else {
 								timeline = new TranslateTimeline(values.Count);
-								timelineScale = Scale;
+								timelineScale = scale;
 							}
 							timeline.boneIndex = boneIndex;
 
@@ -299,68 +443,65 @@ namespace Spine {
 				}
 			}
 
-			if (map.ContainsKey("slots")) {
-				foreach (KeyValuePair<String, Object> entry in (Dictionary<String, Object>)map["slots"]) {
-					String slotName = entry.Key;
-					int slotIndex = skeletonData.FindSlotIndex(slotName);
-					var timelineMap = (Dictionary<String, Object>)entry.Value;
-
-					foreach (KeyValuePair<String, Object> timelineEntry in timelineMap) {
-						var values = (List<Object>)timelineEntry.Value;
-						String timelineName = (String)timelineEntry.Key;
-						if (timelineName.Equals("color")) {
-							ColorTimeline timeline = new ColorTimeline(values.Count);
+			if (map.ContainsKey("ffd")) {
+				foreach (KeyValuePair<String, Object> ffdMap in (Dictionary<String, Object>)map["ffd"]) {
+					Skin skin = skeletonData.FindSkin(ffdMap.Key);
+					foreach (KeyValuePair<String, Object> slotMap in (Dictionary<String, Object>)ffdMap.Value) {
+						int slotIndex = skeletonData.FindSlotIndex(slotMap.Key);
+						foreach (KeyValuePair<String, Object> meshMap in (Dictionary<String, Object>)slotMap.Value) {
+							var values = (List<Object>)meshMap.Value;
+							var timeline = new FFDTimeline(values.Count);
+							Attachment attachment = skin.GetAttachment(slotIndex, meshMap.Key);
+							if (attachment == null) throw new Exception("FFD attachment not found: " + meshMap.Key);
 							timeline.slotIndex = slotIndex;
+							timeline.attachment = attachment;
+
+							int vertexCount;
+							if (attachment is MeshAttachment)
+								vertexCount = ((MeshAttachment)attachment).vertices.Length;
+							else
+								vertexCount = ((SkinnedMeshAttachment)attachment).Weights.Length / 3 * 2;
 
 							int frameIndex = 0;
 							foreach (Dictionary<String, Object> valueMap in values) {
-								float time = (float)valueMap["time"];
-								String c = (String)valueMap["color"];
-								timeline.setFrame(frameIndex, time, ToColor(c, 0), ToColor(c, 1), ToColor(c, 2), ToColor(c, 3));
+								float[] vertices;
+								if (!valueMap.ContainsKey("vertices")) {
+									if (attachment is MeshAttachment)
+										vertices = ((MeshAttachment)attachment).vertices;
+									else
+										vertices = new float[vertexCount];
+								} else {
+									var verticesValue = (List<Object>)valueMap["vertices"];
+									vertices = new float[vertexCount];
+									int start = GetInt(valueMap, "offset", 0);
+									if (scale == 1) {
+										for (int i = 0, n = verticesValue.Count; i < n; i++)
+											vertices[i + start] = (float)verticesValue[i];
+									} else {
+										for (int i = 0, n = verticesValue.Count; i < n; i++)
+											vertices[i + start] = (float)verticesValue[i] * scale;
+									}
+									if (attachment is MeshAttachment) {
+										float[] meshVertices = ((MeshAttachment)attachment).vertices;
+										for (int i = 0, n = vertices.Length; i < n; i++)
+											vertices[i] += meshVertices[i];
+									}
+								}
+
+								timeline.setFrame(frameIndex, (float)valueMap["time"], vertices);
 								ReadCurve(timeline, frameIndex, valueMap);
 								frameIndex++;
 							}
 							timelines.Add(timeline);
-							duration = Math.Max(duration, timeline.frames[timeline.FrameCount * 5 - 5]);
-
-						} else if (timelineName.Equals("attachment")) {
-							AttachmentTimeline timeline = new AttachmentTimeline(values.Count);
-							timeline.slotIndex = slotIndex;
-
-							int frameIndex = 0;
-							foreach (Dictionary<String, Object> valueMap in values) {
-								float time = (float)valueMap["time"];
-								timeline.setFrame(frameIndex++, time, (String)valueMap["name"]);
-							}
-							timelines.Add(timeline);
 							duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1]);
-
-						} else
-							throw new Exception("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
+						}
 					}
 				}
 			}
 
-			if (map.ContainsKey("events")) {
-				var eventsMap = (List<Object>)map["events"];
-				EventTimeline timeline = new EventTimeline(eventsMap.Count);
-				int frameIndex = 0;
-				foreach (Dictionary<String, Object> eventMap in eventsMap) {
-					EventData eventData = skeletonData.FindEvent((String)eventMap["name"]);
-					if (eventData == null) throw new Exception("Event not found: " + eventMap["name"]);
-					Event e = new Event(eventData);
-					e.Int = GetInt(eventMap, "int", eventData.Int);
-					e.Float = GetFloat(eventMap, "float", eventData.Float);
-					e.String = GetString(eventMap, "string", eventData.String);
-					timeline.setFrame(frameIndex++, (float)eventMap["time"], e);
-				}
-				timelines.Add(timeline);
-				duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1]);
-			}
-
 			if (map.ContainsKey("draworder")) {
 				var values = (List<Object>)map["draworder"];
-				DrawOrderTimeline timeline = new DrawOrderTimeline(values.Count);
+				var timeline = new DrawOrderTimeline(values.Count);
 				int slotCount = skeletonData.slots.Count;
 				int frameIndex = 0;
 				foreach (Dictionary<String, Object> drawOrderMap in values) {
@@ -369,7 +510,7 @@ namespace Spine {
 						drawOrder = new int[slotCount];
 						for (int i = slotCount - 1; i >= 0; i--)
 							drawOrder[i] = -1;
-						List<Object> offsets = (List<Object>)drawOrderMap["offsets"];
+						var offsets = (List<Object>)drawOrderMap["offsets"];
 						int[] unchanged = new int[slotCount - offsets.Count];
 						int originalIndex = 0, unchangedIndex = 0;
 						foreach (Dictionary<String, Object> offsetMap in offsets) {
@@ -394,6 +535,23 @@ namespace Spine {
 				duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1]);
 			}
 
+			if (map.ContainsKey("events")) {
+				var eventsMap = (List<Object>)map["events"];
+				var timeline = new EventTimeline(eventsMap.Count);
+				int frameIndex = 0;
+				foreach (Dictionary<String, Object> eventMap in eventsMap) {
+					EventData eventData = skeletonData.FindEvent((String)eventMap["name"]);
+					if (eventData == null) throw new Exception("Event not found: " + eventMap["name"]);
+					var e = new Event(eventData);
+					e.Int = GetInt(eventMap, "int", eventData.Int);
+					e.Float = GetFloat(eventMap, "float", eventData.Float);
+					e.String = GetString(eventMap, "string", eventData.String);
+					timeline.setFrame(frameIndex++, (float)eventMap["time"], e);
+				}
+				timelines.Add(timeline);
+				duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1]);
+			}
+
 			timelines.TrimExcess();
 			skeletonData.AddAnimation(new Animation(name, timelines, duration));
 		}
@@ -405,7 +563,7 @@ namespace Spine {
 			if (curveObject.Equals("stepped"))
 				timeline.SetStepped(frameIndex);
 			else if (curveObject is List<Object>) {
-				List<Object> curve = (List<Object>)curveObject;
+				var curve = (List<Object>)curveObject;
 				timeline.SetCurve(frameIndex, (float)curve[0], (float)curve[1], (float)curve[2], (float)curve[3]);
 			}
 		}

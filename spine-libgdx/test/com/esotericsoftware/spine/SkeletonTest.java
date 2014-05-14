@@ -1,6 +1,6 @@
 /******************************************************************************
  * Spine Runtimes Software License
- * Version 2
+ * Version 2.1
  * 
  * Copyright (c) 2013, Esoteric Software
  * All rights reserved.
@@ -8,22 +8,24 @@
  * You are granted a perpetual, non-exclusive, non-sublicensable and
  * non-transferable license to install, execute and perform the Spine Runtimes
  * Software (the "Software") solely for internal use. Without the written
- * permission of Esoteric Software, you may not (a) modify, translate, adapt or
- * otherwise create derivative works, improvements of the Software or develop
- * new applications using the Software or (b) remove, delete, alter or obscure
- * any trademarks or any copyright, trademark, patent or other intellectual
- * property or proprietary rights notices on or in the Software, including
- * any copy thereof. Redistributions in binary or source form must include
- * this license and terms. THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * permission of Esoteric Software (typically granted by licensing Spine), you
+ * may not (a) modify, translate, adapt or otherwise create derivative works,
+ * improvements of the Software or develop new applications using the Software
+ * or (b) remove, delete, alter or obscure any trademarks or any copyright,
+ * trademark, patent or other intellectual property or proprietary rights
+ * notices on or in the Software, including any copy thereof. Redistributions
+ * in binary or source form must include this license and terms.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 package com.esotericsoftware.spine;
@@ -63,12 +65,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.awt.FileDialog;
 import java.awt.Frame;
 import java.io.File;
 
 public class SkeletonTest extends ApplicationAdapter {
+	static final float checkModifiedInterval = 0.250f;
+	static final float reloadDelay = 1;
+
 	UI ui;
 
 	PolygonSpriteBatch batch;
@@ -80,7 +86,7 @@ public class SkeletonTest extends ApplicationAdapter {
 	int skeletonX, skeletonY;
 	FileHandle skeletonFile;
 	long lastModified;
-	float lastModifiedCheck;
+	float lastModifiedCheck, reloadTimer;
 
 	public void create () {
 		ui = new UI();
@@ -90,11 +96,11 @@ public class SkeletonTest extends ApplicationAdapter {
 		skeletonX = (int)(ui.window.getWidth() + (Gdx.graphics.getWidth() - ui.window.getWidth()) / 2);
 		skeletonY = Gdx.graphics.getHeight() / 4;
 
-		loadSkeleton(Gdx.files.internal(Gdx.app.getPreferences("spine-skeletontest")
-			.getString("lastFile", "spineboy/spineboy.json")));
+		loadSkeleton(
+			Gdx.files.internal(Gdx.app.getPreferences("spine-skeletontest").getString("lastFile", "spineboy/spineboy.json")), false);
 	}
 
-	void loadSkeleton (FileHandle skeletonFile) {
+	void loadSkeleton (FileHandle skeletonFile, boolean reload) {
 		if (skeletonFile == null) return;
 
 		// A regular texture atlas would normally usually be used. This returns a white image for images not found in the atlas.
@@ -103,7 +109,11 @@ public class SkeletonTest extends ApplicationAdapter {
 		pixmap.fill();
 		final AtlasRegion fake = new AtlasRegion(new Texture(pixmap), 0, 0, 32, 32);
 		pixmap.dispose();
-		FileHandle atlasFile = skeletonFile.sibling(skeletonFile.nameWithoutExtension() + ".atlas");
+
+		String atlasFileName = skeletonFile.nameWithoutExtension();
+		if (atlasFileName.endsWith(".json")) atlasFileName = new FileHandle(atlasFileName).nameWithoutExtension();
+		FileHandle atlasFile = skeletonFile.sibling(atlasFileName + ".atlas");
+		if (!atlasFile.exists()) atlasFile = skeletonFile.sibling(atlasFileName + ".atlas.txt");
 		TextureAtlasData data = !atlasFile.exists() ? null : new TextureAtlasData(atlasFile, atlasFile.parent(), false);
 		TextureAtlas atlas = new TextureAtlas(data) {
 			public AtlasRegion findRegion (String name) {
@@ -113,7 +123,8 @@ public class SkeletonTest extends ApplicationAdapter {
 		};
 
 		try {
-			if (skeletonFile.extension().equalsIgnoreCase("json")) {
+			String extension = skeletonFile.extension();
+			if (extension.equalsIgnoreCase("json") || extension.equalsIgnoreCase("txt")) {
 				SkeletonJson json = new SkeletonJson(atlas);
 				json.setScale(ui.scaleSlider.getValue());
 				skeletonData = json.readSkeletonData(skeletonFile);
@@ -124,7 +135,7 @@ public class SkeletonTest extends ApplicationAdapter {
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			ui.toast("Error loading skeleton: spineboy");
+			ui.toast("Error loading skeleton: " + skeletonFile.name());
 			lastModifiedCheck = 5;
 			return;
 		}
@@ -141,7 +152,7 @@ public class SkeletonTest extends ApplicationAdapter {
 		prefs.putString("lastFile", skeletonFile.path());
 		prefs.flush();
 		lastModified = skeletonFile.lastModified();
-		lastModifiedCheck = 0.250f;
+		lastModifiedCheck = checkModifiedInterval;
 
 		// Populate UI.
 
@@ -162,31 +173,45 @@ public class SkeletonTest extends ApplicationAdapter {
 		// Configure skeleton from UI.
 
 		skeleton.setSkin(ui.skinList.getSelected());
-		skeleton.setSlotsToSetupPose();
 		state.setAnimation(0, ui.animationList.getSelected(), ui.loopCheckbox.isChecked());
+
+		if (reload) ui.toast("Reloaded.");
 	}
 
 	public void render () {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+		float delta = Gdx.graphics.getDeltaTime();
+
 		if (skeleton != null) {
-			lastModifiedCheck -= Gdx.graphics.getDeltaTime();
-			if (lastModifiedCheck < 0 && lastModified != skeletonFile.lastModified()) loadSkeleton(skeletonFile);
+			if (reloadTimer <= 0) {
+				lastModifiedCheck -= delta;
+				if (lastModifiedCheck < 0) {
+					lastModifiedCheck = checkModifiedInterval;
+					long time = skeletonFile.lastModified();
+					if (time != 0 && lastModified != time) reloadTimer = reloadDelay;
+				}
+			} else {
+				reloadTimer -= delta;
+				if (reloadTimer <= 0) loadSkeleton(skeletonFile, true);
+			}
 
 			state.getData().setDefaultMix(ui.mixSlider.getValue());
 			renderer.setPremultipliedAlpha(ui.premultipliedCheckbox.isChecked());
 
-			float delta = Math.min(Gdx.graphics.getDeltaTime(), 0.032f) * ui.speedSlider.getValue();
+			delta = Math.min(delta, 0.032f) * ui.speedSlider.getValue();
 			skeleton.update(delta);
 			if (!ui.pauseButton.isChecked()) {
 				state.update(delta);
 				state.apply(skeleton);
 			}
-			skeleton.updateWorldTransform();
-			skeleton.setX(skeletonX);
-			skeleton.setY(skeletonY);
+			skeleton.setPosition(skeletonX, skeletonY);
+			// skeleton.setPosition(0, 0);
+			// skeleton.getRootBone().setX(skeletonX);
+			// skeleton.getRootBone().setY(skeletonY);
 			skeleton.setFlipX(ui.flipXCheckbox.isChecked());
 			skeleton.setFlipY(ui.flipYCheckbox.isChecked());
+			skeleton.updateWorldTransform();
 
 			batch.begin();
 			renderer.draw(batch, skeleton);
@@ -195,6 +220,8 @@ public class SkeletonTest extends ApplicationAdapter {
 			debugRenderer.setBones(ui.debugBonesCheckbox.isChecked());
 			debugRenderer.setRegionAttachments(ui.debugRegionsCheckbox.isChecked());
 			debugRenderer.setBoundingBoxes(ui.debugBoundingBoxesCheckbox.isChecked());
+			debugRenderer.setMeshHull(ui.debugMeshHullCheckbox.isChecked());
+			debugRenderer.setMeshTriangles(ui.debugMeshTrianglesCheckbox.isChecked());
 			debugRenderer.draw(skeleton);
 		}
 
@@ -205,12 +232,12 @@ public class SkeletonTest extends ApplicationAdapter {
 	public void resize (int width, int height) {
 		batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
 		debugRenderer.getShapeRenderer().setProjectionMatrix(batch.getProjectionMatrix());
-		ui.stage.setViewport(width, height);
+		ui.stage.getViewport().update(width, height, true);
 		if (!ui.minimizeButton.isChecked()) ui.window.setHeight(height);
 	}
 
 	class UI {
-		Stage stage = new Stage();
+		Stage stage = new Stage(new ScreenViewport());
 		com.badlogic.gdx.scenes.scene2d.ui.Skin skin = new com.badlogic.gdx.scenes.scene2d.ui.Skin(
 			Gdx.files.internal("skin/skin.json"));
 
@@ -231,6 +258,8 @@ public class SkeletonTest extends ApplicationAdapter {
 		CheckBox debugBonesCheckbox = new CheckBox(" Bones", skin);
 		CheckBox debugRegionsCheckbox = new CheckBox(" Regions", skin);
 		CheckBox debugBoundingBoxesCheckbox = new CheckBox(" Bounds", skin);
+		CheckBox debugMeshHullCheckbox = new CheckBox(" Mesh Hull", skin);
+		CheckBox debugMeshTrianglesCheckbox = new CheckBox(" Mesh Triangles", skin);
 		Slider scaleSlider = new Slider(0.1f, 3, 0.01f, false, skin);
 		Label scaleLabel = new Label("1.0", skin);
 		TextButton pauseButton = new TextButton("Pause", skin, "toggle");
@@ -286,6 +315,8 @@ public class SkeletonTest extends ApplicationAdapter {
 			root.add(table(flipXCheckbox, flipYCheckbox)).row();
 			root.add("Debug:");
 			root.add(table(debugBonesCheckbox, debugRegionsCheckbox, debugBoundingBoxesCheckbox)).row();
+			root.add();
+			root.add(table(debugMeshHullCheckbox, debugMeshTrianglesCheckbox)).row();
 			root.add("Alpha:");
 			root.add(premultipliedCheckbox).row();
 			root.add("Skin:");
@@ -342,7 +373,7 @@ public class SkeletonTest extends ApplicationAdapter {
 					String name = fileDialog.getFile();
 					String dir = fileDialog.getDirectory();
 					if (name == null || dir == null) return;
-					loadSkeleton(new FileHandle(new File(dir, name).getAbsolutePath()));
+					loadSkeleton(new FileHandle(new File(dir, name).getAbsolutePath()), false);
 				}
 			});
 
@@ -384,7 +415,7 @@ public class SkeletonTest extends ApplicationAdapter {
 			scaleSlider.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
 					scaleLabel.setText(Float.toString((int)(scaleSlider.getValue() * 100) / 100f));
-					if (!scaleSlider.isDragging()) loadSkeleton(skeletonFile);
+					if (!scaleSlider.isDragging()) loadSkeleton(skeletonFile, false);
 				}
 			});
 

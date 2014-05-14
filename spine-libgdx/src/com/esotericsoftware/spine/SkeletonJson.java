@@ -1,6 +1,6 @@
 /******************************************************************************
  * Spine Runtimes Software License
- * Version 2
+ * Version 2.1
  * 
  * Copyright (c) 2013, Esoteric Software
  * All rights reserved.
@@ -8,22 +8,24 @@
  * You are granted a perpetual, non-exclusive, non-sublicensable and
  * non-transferable license to install, execute and perform the Spine Runtimes
  * Software (the "Software") solely for internal use. Without the written
- * permission of Esoteric Software, you may not (a) modify, translate, adapt or
- * otherwise create derivative works, improvements of the Software or develop
- * new applications using the Software or (b) remove, delete, alter or obscure
- * any trademarks or any copyright, trademark, patent or other intellectual
- * property or proprietary rights notices on or in the Software, including
- * any copy thereof. Redistributions in binary or source form must include
- * this license and terms. THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * permission of Esoteric Software (typically granted by licensing Spine), you
+ * may not (a) modify, translate, adapt or otherwise create derivative works,
+ * improvements of the Software or develop new applications using the Software
+ * or (b) remove, delete, alter or obscure any trademarks or any copyright,
+ * trademark, patent or other intellectual property or proprietary rights
+ * notices on or in the Software, including any copy thereof. Redistributions
+ * in binary or source form must include this license and terms.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 package com.esotericsoftware.spine;
@@ -45,11 +47,14 @@ import com.esotericsoftware.spine.attachments.AttachmentType;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
+import com.esotericsoftware.spine.attachments.SkinnedMeshAttachment;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.SerializationException;
@@ -165,10 +170,13 @@ public class SkeletonJson {
 	private Attachment readAttachment (Skin skin, String name, JsonValue map) {
 		float scale = this.scale;
 		name = map.getString("name", name);
+		String path = map.getString("path", name);
 
 		switch (AttachmentType.valueOf(map.getString("type", AttachmentType.region.name()))) {
 		case region:
-			RegionAttachment region = attachmentLoader.newRegionAttachment(skin, name, map.getString("path", name));
+			RegionAttachment region = attachmentLoader.newRegionAttachment(skin, name, path);
+			if (region == null) return null;
+			region.setPath(path);
 			region.setX(map.getFloat("x", 0) * scale);
 			region.setY(map.getFloat("y", 0) * scale);
 			region.setScaleX(map.getFloat("scaleX", 1));
@@ -184,6 +192,7 @@ public class SkeletonJson {
 			return region;
 		case boundingbox: {
 			BoundingBoxAttachment box = attachmentLoader.newBoundingBoxAttachment(skin, name);
+			if (box == null) return null;
 			float[] vertices = map.require("vertices").asFloatArray();
 			if (scale != 1) {
 				for (int i = 0, n = vertices.length; i < n; i++)
@@ -193,16 +202,51 @@ public class SkeletonJson {
 			return box;
 		}
 		case mesh: {
-			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, map.getString("path", name));
+			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, path);
+			if (mesh == null) return null;
+			mesh.setPath(path);
 			float[] vertices = map.require("vertices").asFloatArray();
 			if (scale != 1) {
 				for (int i = 0, n = vertices.length; i < n; i++)
 					vertices[i] *= scale;
 			}
-			short[] triangles = map.require("triangles").asShortArray();
+			mesh.setVertices(vertices);
+			mesh.setTriangles(map.require("triangles").asShortArray());
+			mesh.setRegionUVs(map.require("uvs").asFloatArray());
+			mesh.updateUVs();
+
+			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() * 2);
+			if (map.has("edges")) mesh.setEdges(map.require("edges").asIntArray());
+			mesh.setWidth(map.getFloat("width", 0) * scale);
+			mesh.setHeight(map.getFloat("height", 0) * scale);
+			return mesh;
+		}
+		case skinnedmesh: {
+			SkinnedMeshAttachment mesh = attachmentLoader.newSkinnedMeshAttachment(skin, name, path);
+			if (mesh == null) return null;
+			mesh.setPath(path);
 			float[] uvs = map.require("uvs").asFloatArray();
-			mesh.setMesh(vertices, triangles, uvs);
-			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt());
+			float[] vertices = map.require("vertices").asFloatArray();
+			FloatArray weights = new FloatArray(uvs.length * 3 * 3);
+			IntArray bones = new IntArray(uvs.length * 3);
+			for (int i = 0, n = vertices.length; i < n;) {
+				int boneCount = (int)vertices[i++];
+				bones.add(boneCount);
+				for (int nn = i + boneCount * 4; i < nn;) {
+					bones.add((int)vertices[i]);
+					weights.add(vertices[i + 1] * scale);
+					weights.add(vertices[i + 2] * scale);
+					weights.add(vertices[i + 3]);
+					i += 4;
+				}
+			}
+			mesh.setBones(bones.toArray());
+			mesh.setWeights(weights.toArray());
+			mesh.setTriangles(map.require("triangles").asShortArray());
+			mesh.setRegionUVs(uvs);
+			mesh.updateUVs();
+
+			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() * 2);
 			if (map.has("edges")) mesh.setEdges(map.require("edges").asIntArray());
 			mesh.setWidth(map.getFloat("width", 0) * scale);
 			mesh.setHeight(map.getFloat("height", 0) * scale);
@@ -222,6 +266,7 @@ public class SkeletonJson {
 	}
 
 	private void readAnimation (String name, JsonValue map, SkeletonData skeletonData) {
+		float scale = this.scale;
 		Array<Timeline> timelines = new Array();
 		float duration = 0;
 
@@ -315,24 +360,41 @@ public class SkeletonJson {
 				if (slotIndex == -1) throw new SerializationException("Slot not found: " + slotMap.name);
 				for (JsonValue meshMap = slotMap.child; meshMap != null; meshMap = meshMap.next) {
 					FfdTimeline timeline = new FfdTimeline(meshMap.size);
-					MeshAttachment mesh = (MeshAttachment)skin.getAttachment(slotIndex, meshMap.name);
-					if (mesh == null) throw new SerializationException("Mesh attachment not found: " + meshMap.name);
+					Attachment attachment = skin.getAttachment(slotIndex, meshMap.name);
+					if (attachment == null) throw new SerializationException("FFD attachment not found: " + meshMap.name);
 					timeline.slotIndex = slotIndex;
-					timeline.meshAttachment = mesh;
+					timeline.attachment = attachment;
+
+					int vertexCount;
+					if (attachment instanceof MeshAttachment)
+						vertexCount = ((MeshAttachment)attachment).getVertices().length;
+					else
+						vertexCount = ((SkinnedMeshAttachment)attachment).getWeights().length / 3 * 2;
 
 					int frameIndex = 0;
 					for (JsonValue valueMap = meshMap.child; valueMap != null; valueMap = valueMap.next) {
 						float[] vertices;
 						JsonValue verticesValue = valueMap.get("vertices");
-						if (verticesValue == null)
-							vertices = mesh.getVertices();
-						else {
-							vertices = verticesValue.asFloatArray();
+						if (verticesValue == null) {
+							if (attachment instanceof MeshAttachment)
+								vertices = ((MeshAttachment)attachment).getVertices();
+							else
+								vertices = new float[vertexCount];
+						} else {
+							vertices = new float[vertexCount];
+							int start = valueMap.getInt("offset", 0);
+							System.arraycopy(verticesValue.asFloatArray(), 0, vertices, start, verticesValue.size);
 							if (scale != 1) {
-								for (int i = 0, n = vertices.length; i < n; i++)
+								for (int i = start, n = i + verticesValue.size; i < n; i++)
 									vertices[i] *= scale;
 							}
+							if (attachment instanceof MeshAttachment) {
+								float[] meshVertices = ((MeshAttachment)attachment).getVertices();
+								for (int i = 0, n = vertices.length; i < n; i++)
+									vertices[i] += meshVertices[i];
+							}
 						}
+
 						timeline.setFrame(frameIndex, valueMap.getFloat("time"), vertices);
 						readCurve(timeline, frameIndex, valueMap);
 						frameIndex++;

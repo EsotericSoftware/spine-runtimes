@@ -34,28 +34,28 @@
 #define TARGET_DESIGN_RESOLUTION_SIZE  DESIGN_RESOLUTION_960x640
 
 typedef struct tagResource {
-	cocos2d::CCSize size;
+	cocos2d::Size size;
 	char directory[100];
 } Resource;
 
-static Resource smallResource = {cocos2d::CCSizeMake(480, 320), "iphone"};
-static Resource mediumResource = {cocos2d::CCSizeMake(960, 640), "iphone-retina"};
-static Resource largeResource = {cocos2d::CCSizeMake(1024, 768), "iphone"};
-static Resource extralargeResource = {cocos2d::CCSizeMake(2048, 1536), "iphone-retina"};
+static Resource smallResource = {cocos2d::Size(480, 320), "iphone"};
+static Resource mediumResource = {cocos2d::Size(960, 640), "iphone-retina"};
+static Resource largeResource = {cocos2d::Size(1024, 768), "ipad"};
+static Resource extralargeResource = {cocos2d::Size(2048, 1536), "ipad-retina"};
 
 #if (TARGET_DESIGN_RESOLUTION_SIZE == DESIGN_RESOLUTION_480X320)
-static cocos2d::CCSize designResolutionSize = cocos2d::CCSizeMake(480, 320);
+static cocos2d::CCSize designResolutionSize = cocos2d::Size(480, 320);
 #elif (TARGET_DESIGN_RESOLUTION_SIZE == DESIGN_RESOLUTION_960x640)
-static cocos2d::CCSize designResolutionSize = cocos2d::CCSizeMake(960, 640);
+static cocos2d::CCSize designResolutionSize = cocos2d::Size(960, 640);
 #elif (TARGET_DESIGN_RESOLUTION_SIZE == DESIGN_RESOLUTION_1024X768)
-static cocos2d::CCSize designResolutionSize = cocos2d::CCSizeMake(1024, 768);
+static cocos2d::CCSize designResolutionSize = cocos2d::Size(1024, 768);
 #elif (TARGET_DESIGN_RESOLUTION_SIZE == DESIGN_RESOLUTION_2048X1536)
-static cocos2d::CCSize designResolutionSize = cocos2d::CCSizeMake(2048, 1536);
+static cocos2d::CCSize designResolutionSize = cocos2d::Size(2048, 1536);
 #else
 #error unknown target design resolution!
 #endif
 
 // The font size 24 is designed for small resolution, so we should change it to fit for current design resolution
-#define TITLE_FONT_SIZE  (cocos2d::CCEGLView::sharedOpenGLView()->getDesignResolutionSize().width / smallResource.size.width * 24)
+#define TITLE_FONT_SIZE (cocos2d::Director::getInstance()->getOpenGLView()->getDesignResolutionSize().width / smallResource.size.width * 24)
 
 #endif /* _APPMACROS_H_ */

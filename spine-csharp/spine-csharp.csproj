@@ -61,7 +61,9 @@
     <Compile Include="src\Attachments\Attachment.cs" />
     <Compile Include="src\Attachments\AttachmentType.cs" />
     <Compile Include="src\Attachments\BoundingBoxAttachment.cs" />
+    <Compile Include="src\Attachments\MeshAttachment.cs" />
     <Compile Include="src\Attachments\RegionAttachment.cs" />
+    <Compile Include="src\Attachments\SkinnedMeshAttachment.cs" />
     <Compile Include="src\Bone.cs" />
     <Compile Include="src\BoneData.cs" />
     <Compile Include="src\AnimationState.cs" />

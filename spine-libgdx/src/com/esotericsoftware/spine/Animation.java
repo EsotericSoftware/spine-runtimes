@@ -1,6 +1,6 @@
 /******************************************************************************
  * Spine Runtimes Software License
- * Version 2
+ * Version 2.1
  * 
  * Copyright (c) 2013, Esoteric Software
  * All rights reserved.
@@ -8,27 +8,29 @@
  * You are granted a perpetual, non-exclusive, non-sublicensable and
  * non-transferable license to install, execute and perform the Spine Runtimes
  * Software (the "Software") solely for internal use. Without the written
- * permission of Esoteric Software, you may not (a) modify, translate, adapt or
- * otherwise create derivative works, improvements of the Software or develop
- * new applications using the Software or (b) remove, delete, alter or obscure
- * any trademarks or any copyright, trademark, patent or other intellectual
- * property or proprietary rights notices on or in the Software, including
- * any copy thereof. Redistributions in binary or source form must include
- * this license and terms. THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * permission of Esoteric Software (typically granted by licensing Spine), you
+ * may not (a) modify, translate, adapt or otherwise create derivative works,
+ * improvements of the Software or develop new applications using the Software
+ * or (b) remove, delete, alter or obscure any trademarks or any copyright,
+ * trademark, patent or other intellectual property or proprietary rights
+ * notices on or in the Software, including any copy thereof. Redistributions
+ * in binary or source form must include this license and terms.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 package com.esotericsoftware.spine;
 
-import com.esotericsoftware.spine.attachments.MeshAttachment;
+import com.esotericsoftware.spine.attachments.Attachment;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
@@ -132,9 +134,7 @@ public class Animation {
 
 	/** Base class for frames that use an interpolation bezier curve. */
 	abstract static public class CurveTimeline implements Timeline {
-		static public final float LINEAR = 0;
-		static public final float STEPPED = -1;
-		static public final float BEZIER = -2;
+		static public final float LINEAR = 0, STEPPED = -1, BEZIER = -2;
 		static private final int BEZIER_SEGMENTS = 10;
 
 		private final float[] curves; // dfx, dfy, ddfx, ddfy, dddfx, dddfy, ...
@@ -421,30 +421,30 @@ public class Animation {
 
 			Color color = skeleton.slots.get(slotIndex).color;
 
-			if (time >= frames[frames.length - 5]) { // Time is after last frame.
+			float r, g, b, a;
+			if (time >= frames[frames.length - 5]) {
+				// Time is after last frame.
 				int i = frames.length - 1;
-				float r = frames[i - 3];
-				float g = frames[i - 2];
-				float b = frames[i - 1];
-				float a = frames[i];
-				color.set(r, g, b, a);
-				return;
+				r = frames[i - 3];
+				g = frames[i - 2];
+				b = frames[i - 1];
+				a = frames[i];
+			} else {
+				// Interpolate between the previous frame and the current frame.
+				int frameIndex = binarySearch(frames, time, 5);
+				float prevFrameR = frames[frameIndex - 4];
+				float prevFrameG = frames[frameIndex - 3];
+				float prevFrameB = frames[frameIndex - 2];
+				float prevFrameA = frames[frameIndex - 1];
+				float frameTime = frames[frameIndex];
+				float percent = MathUtils.clamp(1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime), 0, 1);
+				percent = getCurvePercent(frameIndex / 5 - 1, percent);
+
+				r = prevFrameR + (frames[frameIndex + FRAME_R] - prevFrameR) * percent;
+				g = prevFrameG + (frames[frameIndex + FRAME_G] - prevFrameG) * percent;
+				b = prevFrameB + (frames[frameIndex + FRAME_B] - prevFrameB) * percent;
+				a = prevFrameA + (frames[frameIndex + FRAME_A] - prevFrameA) * percent;
 			}
-
-			// Interpolate between the previous frame and the current frame.
-			int frameIndex = binarySearch(frames, time, 5);
-			float prevFrameR = frames[frameIndex - 4];
-			float prevFrameG = frames[frameIndex - 3];
-			float prevFrameB = frames[frameIndex - 2];
-			float prevFrameA = frames[frameIndex - 1];
-			float frameTime = frames[frameIndex];
-			float percent = MathUtils.clamp(1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime), 0, 1);
-			percent = getCurvePercent(frameIndex / 5 - 1, percent);
-
-			float r = prevFrameR + (frames[frameIndex + FRAME_R] - prevFrameR) * percent;
-			float g = prevFrameG + (frames[frameIndex + FRAME_G] - prevFrameG) * percent;
-			float b = prevFrameB + (frames[frameIndex + FRAME_B] - prevFrameB) * percent;
-			float a = prevFrameA + (frames[frameIndex + FRAME_A] - prevFrameA) * percent;
 			if (alpha < 1)
 				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
 			else
@@ -614,7 +614,7 @@ public class Animation {
 		private final float[] frames; // time, ...
 		private final float[][] frameVertices;
 		int slotIndex;
-		MeshAttachment meshAttachment;
+		Attachment attachment;
 
 		public FfdTimeline (int frameCount) {
 			super(frameCount);
@@ -630,12 +630,12 @@ public class Animation {
 			return slotIndex;
 		}
 
-		public void setMeshAttachment (MeshAttachment attachment) {
-			this.meshAttachment = attachment;
+		public void setAttachment (Attachment attachment) {
+			this.attachment = attachment;
 		}
 
-		public MeshAttachment getMeshAttachment () {
-			return meshAttachment;
+		public Attachment getAttachment () {
+			return attachment;
 		}
 
 		public float[] getFrames () {
@@ -654,7 +654,7 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha) {
 			Slot slot = skeleton.slots.get(slotIndex);
-			if (slot.getAttachment() != meshAttachment) return;
+			if (slot.getAttachment() != attachment) return;
 
 			FloatArray verticesArray = slot.getAttachmentVertices();
 			verticesArray.size = 0;
@@ -669,7 +669,12 @@ public class Animation {
 			float[] vertices = verticesArray.items;
 
 			if (time >= frames[frames.length - 1]) { // Time is after last frame.
-				System.arraycopy(frameVertices[frames.length - 1], 0, vertices, 0, vertexCount);
+				float[] lastVertices = frameVertices[frames.length - 1];
+				if (alpha < 1) {
+					for (int i = 0; i < vertexCount; i++)
+						vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
+				} else
+					System.arraycopy(lastVertices, 0, vertices, 0, vertexCount);
 				return;
 			}
 
@@ -682,10 +687,16 @@ public class Animation {
 			float[] prevVertices = frameVertices[frameIndex - 1];
 			float[] nextVertices = frameVertices[frameIndex];
 
-			// BOZO - FFD, use alpha for mixing?
-			for (int i = 0; i < vertexCount; i++) {
-				float prev = prevVertices[i];
-				vertices[i] = prev + (nextVertices[i] - prev) * percent;
+			if (alpha < 1) {
+				for (int i = 0; i < vertexCount; i++) {
+					float prev = prevVertices[i];
+					vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
+				}
+			} else {
+				for (int i = 0; i < vertexCount; i++) {
+					float prev = prevVertices[i];
+					vertices[i] = prev + (nextVertices[i] - prev) * percent;
+				}
 			}
 		}
 	}
