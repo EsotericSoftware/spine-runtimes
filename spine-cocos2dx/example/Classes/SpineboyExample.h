@@ -28,22 +28,22 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef _EXAMPLELAYER_H_
-#define _EXAMPLELAYER_H_
+#ifndef _SPINEBOYEXAMPLE_H_
+#define _SPINEBOYEXAMPLE_H_
 
 #include "cocos2d.h"
 #include <spine/spine-cocos2dx.h>
 
-class ExampleLayer: public cocos2d::LayerColor {
+class SpineboyExample : public cocos2d::LayerColor {
 public:
 	static cocos2d::Scene* scene ();
 
 	virtual bool init ();
 	virtual void update (float deltaTime);
 
-	CREATE_FUNC (ExampleLayer);
+	CREATE_FUNC (SpineboyExample);
 private:
 	spine::SkeletonAnimation* skeletonNode;
 };
 
-#endif // _EXAMPLELAYER_H_
+#endif // _SPINEBOYEXAMPLE_H_

@@ -28,12 +28,21 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef SPINE_COCOS2DX_H_
-#define SPINE_COCOS2DX_H_
+#ifndef _GOBLINSEXAMPLE_H_
+#define _GOBLINSEXAMPLE_H_
 
-#include <spine/spine.h>
 #include "cocos2d.h"
-#include <spine/SkeletonRenderer.h>
-#include <spine/SkeletonAnimation.h>
+#include <spine/spine-cocos2dx.h>
 
-#endif /* SPINE_COCOS2DX_H_ */
+class GoblinsExample : public cocos2d::LayerColor {
+public:
+	static cocos2d::Scene* scene ();
+
+	virtual bool init ();
+
+	CREATE_FUNC (GoblinsExample);
+private:
+	spine::SkeletonAnimation* skeletonNode;
+};
+
+#endif // _GOBLINSEXAMPLE_H_

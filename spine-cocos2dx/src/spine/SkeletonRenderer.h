@@ -36,6 +36,8 @@
 
 namespace spine {
 
+class PolygonBatch;
+
 /** Draws a skeleton. */
 class SkeletonRenderer: public cocos2d::NodeRGBA, public cocos2d::BlendProtocol {
 public:
@@ -58,7 +60,7 @@ public:
 
 	virtual void update (float deltaTime);
 	virtual void draw (cocos2d::Renderer* renderer, const cocos2d::Matrix& transform, bool transformUpdated) override;
-	void drawSkeleton (const cocos2d::Matrix& transform, bool transformUpdated);
+	virtual void drawSkeleton (const cocos2d::Matrix& transform, bool transformUpdated);
 	virtual cocos2d::Rect boundingBox ();
 
 	// --- Convenience methods for common Skeleton_* functions.
@@ -92,13 +94,17 @@ public:
 protected:
 	SkeletonRenderer ();
 	void setSkeletonData (spSkeletonData* skeletonData, bool ownsSkeletonData);
-	virtual cocos2d::TextureAtlas* getTextureAtlas (spRegionAttachment* regionAttachment) const;
+	virtual cocos2d::Texture2D* getTexture (spRegionAttachment* attachment) const;
+	virtual cocos2d::Texture2D* getTexture (spMeshAttachment* attachment) const;
+	virtual cocos2d::Texture2D* getTexture (spSkinnedMeshAttachment* attachment) const;
 
 private:
 	bool ownsSkeletonData;
 	spAtlas* atlas;
-	cocos2d::BlendFunc blendFunc;
 	cocos2d::CustomCommand drawCommand;
+	cocos2d::BlendFunc blendFunc;
+	PolygonBatch* batch;
+	float* worldVertices;
 	void initialize ();
 };
 

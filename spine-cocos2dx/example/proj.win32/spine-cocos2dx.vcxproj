@@ -129,20 +129,24 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\spine\PolygonBatch.h" />
     <ClInclude Include="..\..\src\spine\SkeletonAnimation.h" />
     <ClInclude Include="..\..\src\spine\SkeletonRenderer.h" />
     <ClInclude Include="..\..\src\spine\spine-cocos2dx.h" />
     <ClInclude Include="..\Classes\AppDelegate.h" />
     <ClInclude Include="..\Classes\AppMacros.h" />
-    <ClInclude Include="..\Classes\ExampleLayer.h" />
+    <ClInclude Include="..\Classes\GoblinsExample.h" />
+    <ClInclude Include="..\Classes\SpineboyExample.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\spine\PolygonBatch.cpp" />
     <ClCompile Include="..\..\src\spine\SkeletonAnimation.cpp" />
     <ClCompile Include="..\..\src\spine\SkeletonRenderer.cpp" />
     <ClCompile Include="..\..\src\spine\spine-cocos2dx.cpp" />
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
-    <ClCompile Include="..\Classes\ExampleLayer.cpp" />
+    <ClCompile Include="..\Classes\GoblinsExample.cpp" />
+    <ClCompile Include="..\Classes\SpineboyExample.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>

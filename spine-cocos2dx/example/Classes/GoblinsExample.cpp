@@ -28,7 +28,8 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "ExampleLayer.h"
+#include "GoblinsExample.h"
+#include "SpineboyExample.h"
 #include <iostream>
 #include <fstream>
 #include <string.h>
@@ -37,57 +38,36 @@ USING_NS_CC;
 using namespace spine;
 using namespace std;
 
-Scene* ExampleLayer::scene () {
+Scene* GoblinsExample::scene () {
 	Scene *scene = Scene::create();
-	scene->addChild(ExampleLayer::create());
+	scene->addChild(GoblinsExample::create());
 	return scene;
 }
 
-bool ExampleLayer::init () {
+bool GoblinsExample::init () {
 	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
 
-	skeletonNode = SkeletonAnimation::createWithFile("spineboy.json", "spineboy.atlas", 0.6f);
-	// skeletonNode->timeScale = 0.3f;
-	skeletonNode->debugBones = true;
-	
-	skeletonNode->startListener = [this](int trackIndex) {
-		spTrackEntry* entry = spAnimationState_getCurrent(skeletonNode->state, trackIndex);
-		const char* animationName = (entry && entry->animation) ? entry->animation->name : 0;
-		log("%d start: %s", trackIndex, animationName);
-	};
-	skeletonNode->endListener = [](int trackIndex) {
-		log("%d end", trackIndex);
-	};
-	skeletonNode->completeListener = [](int trackIndex, int loopCount) {
-		log("%d complete: %d", trackIndex, loopCount);
-	};
-	skeletonNode->eventListener = [](int trackIndex, spEvent* event) {
-		log("%d event: %s, %d, %f, %s", trackIndex, event->data->name, event->intValue, event->floatValue, event->stringValue);
-	};
-
-	skeletonNode->setMix("walk", "jump", 0.2f);
-	skeletonNode->setMix("jump", "run", 0.2f);
+	skeletonNode = SkeletonAnimation::createWithFile("goblins-ffd.json", "goblins-ffd.atlas", 1.5f);
 	skeletonNode->setAnimation(0, "walk", true);
-	spTrackEntry* jumpEntry = skeletonNode->addAnimation(0, "jump", false, 3);
-	skeletonNode->addAnimation(0, "run", true);
-
-	skeletonNode->setStartListener(jumpEntry, [](int trackIndex) {
-		log("jumped!", trackIndex);
-	});
-
-	// skeletonNode->addAnimation(1, "test", true);
-	// skeletonNode->runAction(RepeatForever::create(Sequence::create(FadeOut::create(1), FadeIn::create(1), DelayTime::create(5), NULL)));
+	skeletonNode->setSkin("goblin");
 
 	Size windowSize = Director::getInstance()->getWinSize();
 	skeletonNode->setPosition(Vector2(windowSize.width / 2, 20));
 	addChild(skeletonNode);
 
 	scheduleUpdate();
+	
+	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
+	listener->onTouchBegan = [this] (Touch* touch, Event* event) -> bool {
+		if (!skeletonNode->debugBones)
+			skeletonNode->debugBones = true;
+		else if (skeletonNode->timeScale == 1)
+			skeletonNode->timeScale = 0.3f;
+		else
+			Director::getInstance()->replaceScene(SpineboyExample::scene());
+		return true;
+	};
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
 	return true;
-}
-
-void ExampleLayer::update (float deltaTime) {
-	// Test releasing memory.
-	// Director::getInstance()->replaceScene(ExampleLayer::scene());
 }

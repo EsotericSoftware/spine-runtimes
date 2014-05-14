@@ -28,12 +28,42 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef SPINE_COCOS2DX_H_
-#define SPINE_COCOS2DX_H_
+#ifndef SPINE_POLYGONBATCH_H_
+#define SPINE_POLYGONBATCH_H_
 
-#include <spine/spine.h>
 #include "cocos2d.h"
-#include <spine/SkeletonRenderer.h>
-#include <spine/SkeletonAnimation.h>
 
-#endif /* SPINE_COCOS2DX_H_ */
+namespace spine {
+
+class cocos2d::Texture2D;
+
+class PolygonBatch : public cocos2d::Ref {
+public:
+	static PolygonBatch* createWithCapacity (int capacity);
+
+	/** @js ctor */
+	PolygonBatch();
+
+	/** @js NA
+	  * @lua NA */
+	virtual ~PolygonBatch();
+
+	bool initWithCapacity (int capacity);
+	void add (const cocos2d::Texture2D* texture,
+		const float* vertices, const float* uvs, int verticesCount,
+		const int* triangles, int trianglesCount,
+		cocos2d::Color4B* color);
+	void flush ();
+
+private:
+	int capacity;
+	cocos2d::V2F_C4B_T2F* vertices;
+	int verticesCount;
+	GLushort* triangles;
+	int trianglesCount;
+	const cocos2d::Texture2D* texture;
+};
+
+}
+
+#endif // SPINE_POLYGONBATCH_H_

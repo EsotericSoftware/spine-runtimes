@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-#include "ExampleLayer.h"
+#include "SpineboyExample.h"
 #include "AppMacros.h"
 
 USING_NS_CC;
@@ -62,7 +62,7 @@ bool AppDelegate::applicationDidFinishLaunching () {
 	director->setAnimationInterval(1.0 / 60);
 
 	// create a scene. it's an autorelease object
-	auto scene = ExampleLayer::scene();
+	auto scene = SpineboyExample::scene();
 
 	// run
 	director->runWithScene(scene);

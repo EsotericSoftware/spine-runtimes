@@ -35,15 +35,12 @@ USING_NS_CC;
 
 void _spAtlasPage_createTexture (spAtlasPage* self, const char* path) {
 	Texture2D* texture = Director::getInstance()->getTextureCache()->addImage(path);
-	TextureAtlas* textureAtlas = TextureAtlas::createWithTexture(texture, 128);
-	textureAtlas->retain();
-	self->rendererObject = textureAtlas;
+	self->rendererObject = texture;
 	self->width = texture->getPixelsWide();
 	self->height = texture->getPixelsHigh();
 }
 
 void _spAtlasPage_disposeTexture (spAtlasPage* self) {
-	((TextureAtlas*)self->rendererObject)->release();
 }
 
 char* _spUtil_readFile (const char* path, int* length) {
@@ -53,60 +50,4 @@ char* _spUtil_readFile (const char* path, int* length) {
 	char* bytes = MALLOC(char, *length);
 	memcpy(bytes, data.getBytes(), *length);
 	return bytes;
-}
-
-/**/
-
-namespace spine {
-
-void spRegionAttachment_updateQuad (spRegionAttachment* self, spSlot* slot, V3F_C4B_T2F_Quad* quad, bool premultipliedAlpha) {
-	float vertices[8];
-	spRegionAttachment_computeWorldVertices(self, slot->skeleton->x, slot->skeleton->y, slot->bone, vertices);
-
-	GLubyte r = slot->skeleton->r * slot->r * 255;
-	GLubyte g = slot->skeleton->g * slot->g * 255;
-	GLubyte b = slot->skeleton->b * slot->b * 255;
-	float normalizedAlpha = slot->skeleton->a * slot->a;
-	if (premultipliedAlpha) {
-		r *= normalizedAlpha;
-		g *= normalizedAlpha;
-		b *= normalizedAlpha;
-	}
-	GLubyte a = normalizedAlpha * 255;
-	quad->bl.colors.r = r;
-	quad->bl.colors.g = g;
-	quad->bl.colors.b = b;
-	quad->bl.colors.a = a;
-	quad->tl.colors.r = r;
-	quad->tl.colors.g = g;
-	quad->tl.colors.b = b;
-	quad->tl.colors.a = a;
-	quad->tr.colors.r = r;
-	quad->tr.colors.g = g;
-	quad->tr.colors.b = b;
-	quad->tr.colors.a = a;
-	quad->br.colors.r = r;
-	quad->br.colors.g = g;
-	quad->br.colors.b = b;
-	quad->br.colors.a = a;
-
-	quad->bl.vertices.x = vertices[SP_VERTEX_X1];
-	quad->bl.vertices.y = vertices[SP_VERTEX_Y1];
-	quad->tl.vertices.x = vertices[SP_VERTEX_X2];
-	quad->tl.vertices.y = vertices[SP_VERTEX_Y2];
-	quad->tr.vertices.x = vertices[SP_VERTEX_X3];
-	quad->tr.vertices.y = vertices[SP_VERTEX_Y3];
-	quad->br.vertices.x = vertices[SP_VERTEX_X4];
-	quad->br.vertices.y = vertices[SP_VERTEX_Y4];
-
-	quad->bl.texCoords.u = self->uvs[SP_VERTEX_X1];
-	quad->bl.texCoords.v = self->uvs[SP_VERTEX_Y1];
-	quad->tl.texCoords.u = self->uvs[SP_VERTEX_X2];
-	quad->tl.texCoords.v = self->uvs[SP_VERTEX_Y2];
-	quad->tr.texCoords.u = self->uvs[SP_VERTEX_X3];
-	quad->tr.texCoords.v = self->uvs[SP_VERTEX_Y3];
-	quad->br.texCoords.u = self->uvs[SP_VERTEX_X4];
-	quad->br.texCoords.v = self->uvs[SP_VERTEX_Y4];
-}
-
 }

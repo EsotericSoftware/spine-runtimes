@@ -30,6 +30,8 @@
 
 #include <spine/SkeletonRenderer.h>
 #include <spine/spine-cocos2dx.h>
+#include <spine/extension.h>
+#include <spine/PolygonBatch.h>
 #include <algorithm>
 
 USING_NS_CC;
@@ -37,6 +39,8 @@ using std::min;
 using std::max;
 
 namespace spine {
+
+static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 
 SkeletonRenderer* SkeletonRenderer::createWithData (spSkeletonData* skeletonData, bool ownsSkeletonData) {
 	SkeletonRenderer* node = new SkeletonRenderer(skeletonData, ownsSkeletonData);
@@ -61,6 +65,11 @@ void SkeletonRenderer::initialize () {
 	debugSlots = false;
 	debugBones = false;
 	timeScale = 1;
+
+	worldVertices = MALLOC(float, 1000); // Max number of vertices per mesh.
+
+	batch = PolygonBatch::createWithCapacity(2000); // Max number of vertices and triangles per batch.
+	batch->retain();
 
 	blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
 	setOpacityModifyRGB(true);
@@ -116,6 +125,7 @@ SkeletonRenderer::~SkeletonRenderer () {
 	if (ownsSkeletonData) spSkeletonData_dispose(skeleton->data);
 	if (atlas) spAtlas_dispose(atlas);
 	spSkeleton_dispose(skeleton);
+	batch->release();
 }
 
 void SkeletonRenderer::update (float deltaTime) {
@@ -132,54 +142,82 @@ void SkeletonRenderer::drawSkeleton (const Matrix &transform, bool transformUpda
 	getShaderProgram()->use();
 	getShaderProgram()->setUniformsForBuiltins(transform);
 
-	GL::blendFunc(blendFunc.src, blendFunc.dst);
-	Color3B color = getColor();
-	skeleton->r = color.r / (float)255;
-	skeleton->g = color.g / (float)255;
-	skeleton->b = color.b / (float)255;
+	Color3B nodeColor = getColor();
+	skeleton->r = nodeColor.r / (float)255;
+	skeleton->g = nodeColor.g / (float)255;
+	skeleton->b = nodeColor.b / (float)255;
 	skeleton->a = getOpacity() / (float)255;
 
-	int additive = 0;
-	TextureAtlas* textureAtlas = 0;
-	V3F_C4B_T2F_Quad quad;
-	quad.tl.vertices.z = 0;
-	quad.tr.vertices.z = 0;
-	quad.bl.vertices.z = 0;
-	quad.br.vertices.z = 0;
-
+	int additive = -1;
+	Color4B color;
+	const float* uvs = nullptr;
+	int verticesCount = 0;
+	const int* triangles = nullptr;
+	int trianglesCount = 0;
+	float r = 0, g = 0, b = 0, a = 0;
 	for (int i = 0, n = skeleton->slotCount; i < n; i++) {
 		spSlot* slot = skeleton->drawOrder[i];
-		if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION) continue;
-		spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-		TextureAtlas* regionTextureAtlas = getTextureAtlas(attachment);
-
-		if (slot->data->additiveBlending != additive) {
-			if (textureAtlas) {
-				textureAtlas->drawQuads();
-				textureAtlas->removeAllQuads();
+		if (!slot->attachment) continue;
+		Texture2D *texture = nullptr;
+		switch (slot->attachment->type) {
+		case SP_ATTACHMENT_REGION: {
+			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
+			spRegionAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot->bone, worldVertices);
+			texture = getTexture(attachment);
+			uvs = attachment->uvs;
+			verticesCount = 8;
+			triangles = quadTriangles;
+			trianglesCount = 6;
+			r = attachment->r;
+			g = attachment->g;
+			b = attachment->b;
+			a = attachment->a;
+			break;
+		}
+		case SP_ATTACHMENT_MESH: {
+			spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
+			spMeshAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot, worldVertices);
+			texture = getTexture(attachment);
+			uvs = attachment->uvs;
+			verticesCount = attachment->verticesCount;
+			triangles = attachment->triangles;
+			trianglesCount = attachment->trianglesCount;
+			r = attachment->r;
+			g = attachment->g;
+			b = attachment->b;
+			a = attachment->a;
+			break;
+		}
+		case SP_ATTACHMENT_SKINNED_MESH: {
+			spSkinnedMeshAttachment* attachment = (spSkinnedMeshAttachment*)slot->attachment;
+			spSkinnedMeshAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot, worldVertices);
+			texture = getTexture(attachment);
+			uvs = attachment->uvs;
+			verticesCount = attachment->uvsCount;
+			triangles = attachment->triangles;
+			trianglesCount = attachment->trianglesCount;
+			r = attachment->r;
+			g = attachment->g;
+			b = attachment->b;
+			a = attachment->a;
+			break;
+		}
+		} 
+		if (texture) {
+			if (slot->data->additiveBlending != additive) {
+				batch->flush();
+				GL::blendFunc(blendFunc.src, slot->data->additiveBlending ? GL_ONE : blendFunc.dst);
+				additive = slot->data->additiveBlending;
 			}
-			additive = !additive;
-			GL::blendFunc(blendFunc.src, additive ? GL_ONE : blendFunc.dst);
-		} else if (regionTextureAtlas != textureAtlas && textureAtlas) {
-			textureAtlas->drawQuads();
-			textureAtlas->removeAllQuads();
+			color.a = skeleton->a * slot->a * a * 255;
+			float multiplier = premultipliedAlpha ? color.a : 255;
+			color.r = skeleton->r * slot->r * r * multiplier;
+			color.g = skeleton->g * slot->g * g * multiplier;
+			color.b = skeleton->b * slot->b * b * multiplier;
+			batch->add(texture, worldVertices, uvs, verticesCount, triangles, trianglesCount, &color);
 		}
-		textureAtlas = regionTextureAtlas;
-
-		int quadCount = textureAtlas->getTotalQuads();
-		if (textureAtlas->getCapacity() == quadCount) {
-			textureAtlas->drawQuads();
-			textureAtlas->removeAllQuads();
-			if (!textureAtlas->resizeCapacity(textureAtlas->getCapacity() * 2)) return;
-		}
-
-		spRegionAttachment_updateQuad(attachment, slot, &quad, premultipliedAlpha);
-		textureAtlas->updateQuad(&quad, quadCount);
 	}
-	if (textureAtlas) {
-		textureAtlas->drawQuads();
-		textureAtlas->removeAllQuads();
-	}
+	batch->flush();
 
 	if (debugSlots || debugBones) {
 		Director* director = Director::getInstance();
@@ -196,11 +234,11 @@ void SkeletonRenderer::drawSkeleton (const Matrix &transform, bool transformUpda
 				spSlot* slot = skeleton->drawOrder[i];
 				if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION) continue;
 				spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-				spRegionAttachment_updateQuad(attachment, slot, &quad);
-				points[0] = Vector2(quad.bl.vertices.x, quad.bl.vertices.y);
-				points[1] = Vector2(quad.br.vertices.x, quad.br.vertices.y);
-				points[2] = Vector2(quad.tr.vertices.x, quad.tr.vertices.y);
-				points[3] = Vector2(quad.tl.vertices.x, quad.tl.vertices.y);
+				spRegionAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot->bone, worldVertices);
+				points[0] = Vector2(worldVertices[0], worldVertices[1]);
+				points[1] = Vector2(worldVertices[2], worldVertices[3]);
+				points[2] = Vector2(worldVertices[4], worldVertices[5]);
+				points[3] = Vector2(worldVertices[6], worldVertices[7]);
 				DrawPrimitives::drawPoly(points, 4, true);
 			}
 		}
@@ -227,8 +265,16 @@ void SkeletonRenderer::drawSkeleton (const Matrix &transform, bool transformUpda
 	}
 }
 
-TextureAtlas* SkeletonRenderer::getTextureAtlas (spRegionAttachment* regionAttachment) const {
-	return (TextureAtlas*)((spAtlasRegion*)regionAttachment->rendererObject)->page->rendererObject;
+Texture2D* SkeletonRenderer::getTexture (spRegionAttachment* attachment) const {
+	return (Texture2D*)((spAtlasRegion*)attachment->rendererObject)->page->rendererObject;
+}
+
+Texture2D* SkeletonRenderer::getTexture (spMeshAttachment* attachment) const {
+	return (Texture2D*)((spAtlasRegion*)attachment->rendererObject)->page->rendererObject;
+}
+
+Texture2D* SkeletonRenderer::getTexture (spSkinnedMeshAttachment* attachment) const {
+	return (Texture2D*)((spAtlasRegion*)attachment->rendererObject)->page->rendererObject;
 }
 
 Rect SkeletonRenderer::boundingBox () {
@@ -303,7 +349,7 @@ const BlendFunc& SkeletonRenderer::getBlendFunc () const {
     return blendFunc;
 }
 
-void SkeletonRenderer::setBlendFunc (const cocos2d::BlendFunc &) {
+void SkeletonRenderer::setBlendFunc (const cocos2d::BlendFunc &blendFunc) {
     this->blendFunc = blendFunc;
 }
 
