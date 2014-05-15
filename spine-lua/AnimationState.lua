@@ -84,7 +84,8 @@ function AnimationState.new (data)
 
 				local next = current.next
 				if next then
-					if current.lastTime >= next.delay then setCurrent(i, next) end
+					next.time = current.lastTime - next.delay
+					if next.time >= 0 then setCurrent(i, next) end
 				else
 					-- End non-looping animation when it reaches its end time and there is no next entry.
 					if not current.loop and current.lastTime >= current.endTime then self:clearTrack(i) end

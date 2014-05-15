@@ -103,7 +103,8 @@ void spAnimationState_update (spAnimationState* self, float delta) {
 		}
 
 		if (current->next) {
-			if (current->lastTime >= current->next->delay) _spAnimationState_setCurrent(self, i, current->next);
+			current->next->time = current->lastTime - current->next->delay;
+			if (current->next->time >= 0) _spAnimationState_setCurrent(self, i, current->next);
 		} else {
 			/* End non-looping animation when it reaches its end time and there is no next entry. */
 			if (!current->loop && current->lastTime >= current->endTime) spAnimationState_clearTrack(self, i);

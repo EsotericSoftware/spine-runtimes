@@ -981,7 +981,8 @@ spine.AnimationState.prototype = {
 
 			var next = current.next;
 			if (next) {
-				if (current.lastTime >= next.delay) this.setCurrent(i, next);
+				next.time = current.lastTime - next.delay;
+				if (next.time >= 0) this.setCurrent(i, next);
 			} else {
 				// End non-looping animation when it reaches its end time and there is no next entry.
 				if (!current.loop && current.lastTime >= current.endTime) this.clearTrack(i);
