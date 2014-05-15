@@ -32,7 +32,7 @@
 #import <spine/spine-cocos2d-iphone.h>
 
 static void callback (AnimationState* state, int trackIndex, EventType type, Event* event, int loopCount) {
-	[(CCSkeletonAnimation*)state->context onAnimationStateEvent:trackIndex type:type event:event loopCount:loopCount];
+	[(CCSkeletonAnimation*)state->rendererObject onAnimationStateEvent:trackIndex type:type event:event loopCount:loopCount];
 }
 
 @interface CCSkeletonAnimation (Private)
@@ -58,7 +58,7 @@ static void callback (AnimationState* state, int trackIndex, EventType type, Eve
 - (void) initialize {
 	_ownsAnimationStateData = true;
 	_state = AnimationState_create(AnimationStateData_create(_skeleton->data));
-	_state->context = self;
+	_state->rendererObject = self;
 	_state->listener = callback;
 }
 
@@ -113,7 +113,7 @@ static void callback (AnimationState* state, int trackIndex, EventType type, Eve
 
 	_ownsAnimationStateData = false;
 	_state = AnimationState_create(stateData);
-	_state->context = self;
+	_state->rendererObject = self;
 	_state->listener = callback;
 }
 

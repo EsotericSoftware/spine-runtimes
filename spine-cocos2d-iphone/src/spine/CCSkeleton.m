@@ -102,7 +102,7 @@
 	self = [super init];
 	if (!self) return nil;
 
-	_atlas = Atlas_readAtlasFile([atlasFile UTF8String]);
+	_atlas = Atlas_createFromFile([atlasFile UTF8String], 0);
 	NSAssert(_atlas, ([NSString stringWithFormat:@"Error reading atlas file: %@", atlasFile]));
 	if (!_atlas) return 0;
 
