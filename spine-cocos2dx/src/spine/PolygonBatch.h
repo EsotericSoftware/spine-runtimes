@@ -35,8 +35,6 @@
 
 namespace spine {
 
-class cocos2d::Texture2D;
-
 class PolygonBatch : public cocos2d::Ref {
 public:
 	static PolygonBatch* createWithCapacity (int capacity);
