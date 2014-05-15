@@ -50,7 +50,7 @@ function AnimationStateData.new (skeletonData)
 		local first = self.animationToMixTime[fromName]
 		if not first then return self.defaultMix end
 		local duration = first[toName]
-		if not duration then return defaultMix end
+		if not duration then return self.defaultMix end
 		return duration
 	end
 
