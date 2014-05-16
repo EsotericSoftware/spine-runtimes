@@ -52,7 +52,7 @@ bool GoblinsExample::init () {
 	skeletonNode->setSkin("goblin");
 
 	Size windowSize = Director::getInstance()->getWinSize();
-	skeletonNode->setPosition(Vector2(windowSize.width / 2, 20));
+	skeletonNode->setPosition(Vec2(windowSize.width / 2, 20));
 	addChild(skeletonNode);
 
 	scheduleUpdate();

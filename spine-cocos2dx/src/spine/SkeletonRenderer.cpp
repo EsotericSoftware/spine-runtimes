@@ -132,13 +132,13 @@ void SkeletonRenderer::update (float deltaTime) {
 	spSkeleton_update(skeleton, deltaTime * timeScale);
 }
 
-void SkeletonRenderer::draw (Renderer* renderer, const Matrix& transform, bool transformUpdated) {
+void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, bool transformUpdated) {
     drawCommand.init(_globalZOrder);
     drawCommand.func = CC_CALLBACK_0(SkeletonRenderer::drawSkeleton, this, transform, transformUpdated);
     renderer->addCommand(&drawCommand);
 }
 
-void SkeletonRenderer::drawSkeleton (const Matrix &transform, bool transformUpdated) {
+void SkeletonRenderer::drawSkeleton (const Mat4 &transform, bool transformUpdated) {
 	getShaderProgram()->use();
 	getShaderProgram()->setUniformsForBuiltins(transform);
 
@@ -228,17 +228,17 @@ void SkeletonRenderer::drawSkeleton (const Matrix &transform, bool transformUpda
 			// Slots.
 			DrawPrimitives::setDrawColor4B(0, 0, 255, 255);
 			glLineWidth(1);
-			Vector2 points[4];
+			Vec2 points[4];
 			V3F_C4B_T2F_Quad quad;
 			for (int i = 0, n = skeleton->slotCount; i < n; i++) {
 				spSlot* slot = skeleton->drawOrder[i];
 				if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION) continue;
 				spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
 				spRegionAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot->bone, worldVertices);
-				points[0] = Vector2(worldVertices[0], worldVertices[1]);
-				points[1] = Vector2(worldVertices[2], worldVertices[3]);
-				points[2] = Vector2(worldVertices[4], worldVertices[5]);
-				points[3] = Vector2(worldVertices[6], worldVertices[7]);
+				points[0] = Vec2(worldVertices[0], worldVertices[1]);
+				points[1] = Vec2(worldVertices[2], worldVertices[3]);
+				points[2] = Vec2(worldVertices[4], worldVertices[5]);
+				points[3] = Vec2(worldVertices[6], worldVertices[7]);
 				DrawPrimitives::drawPoly(points, 4, true);
 			}
 		}
@@ -250,14 +250,14 @@ void SkeletonRenderer::drawSkeleton (const Matrix &transform, bool transformUpda
 				spBone *bone = skeleton->bones[i];
 				float x = bone->data->length * bone->m00 + bone->worldX;
 				float y = bone->data->length * bone->m10 + bone->worldY;
-				DrawPrimitives::drawLine(Vector2(bone->worldX, bone->worldY), Vector2(x, y));
+				DrawPrimitives::drawLine(Vec2(bone->worldX, bone->worldY), Vec2(x, y));
 			}
 			// Bone origins.
 			DrawPrimitives::setPointSize(4);
 			DrawPrimitives::setDrawColor4B(0, 0, 255, 255); // Root bone is blue.
 			for (int i = 0, n = skeleton->boneCount; i < n; i++) {
 				spBone *bone = skeleton->bones[i];
-				DrawPrimitives::drawPoint(Vector2(bone->worldX, bone->worldY));
+				DrawPrimitives::drawPoint(Vec2(bone->worldX, bone->worldY));
 				if (i == 0) DrawPrimitives::setDrawColor4B(0, 255, 0, 255);
 			}
 		}
@@ -304,7 +304,7 @@ Rect SkeletonRenderer::boundingBox () {
 		maxX = max(maxX, vertices[SP_VERTEX_X3] * scaleX);
 		maxY = max(maxY, vertices[SP_VERTEX_Y3] * scaleY);
 	}
-	Vector2 position = getPosition();
+	Vec2 position = getPosition();
 	return Rect(position.x + minX, position.y + minY, maxX - minX, maxY - minY);
 }
 
