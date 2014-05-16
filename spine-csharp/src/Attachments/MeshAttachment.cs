@@ -96,8 +96,9 @@ namespace Spine {
 			y += bone.worldY;
 			float m00 = bone.m00, m01 = bone.m01, m10 = bone.m10, m11 = bone.m11;
 			float[] vertices = this.vertices;
-			if (slot.attachmentVerticesCount == vertices.Length) vertices = slot.AttachmentVertices;
-			for (int i = 0, n = vertices.Length; i < n; i += 2) {
+			int verticesCount = vertices.Length;
+			if (slot.attachmentVerticesCount == verticesCount) vertices = slot.AttachmentVertices;
+			for (int i = 0; i < verticesCount; i += 2) {
 				float vx = vertices[i];
 				float vy = vertices[i + 1];
 				worldVertices[i] = vx * m00 + vy * m01 + x;
