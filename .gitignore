@@ -12,9 +12,15 @@ target
 *.suo
 *.ipch
 
-spine-cocos2dx/cocos2dx/
-!spine-cocos2dx/cocos2dx/Place cocos2dx here.txt
-spine-cocos2dx/example/proj.win32/Debug
+spine-cocos2dx/2/cocos2dx/
+!spine-cocos2dx/2/cocos2dx/Place cocos2dx here.txt
+spine-cocos2dx/2/example/proj.win32/Debug
+spine-cocos2dx/3.0/cocos2dx/
+!spine-cocos2dx/3.0/cocos2dx/Place cocos2dx here.txt
+spine-cocos2dx/3.0/example/proj.win32/Debug
+spine-cocos2dx/3.1/cocos2dx/
+!spine-cocos2dx/3.1/cocos2dx/Place cocos2dx here.txt
+spine-cocos2dx/3.1/example/proj.win32/Debug
 *.swp
 .DS_Store
 xcuserdata
