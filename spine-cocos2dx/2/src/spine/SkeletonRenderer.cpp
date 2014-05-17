@@ -218,7 +218,6 @@ void SkeletonRenderer::draw () {
 		ccDrawColor4B(0, 0, 255, 255);
 		glLineWidth(1);
 		CCPoint points[4];
-		ccV3F_C4B_T2F_Quad quad;
 		for (int i = 0, n = skeleton->slotCount; i < n; i++) {
 			spSlot* slot = skeleton->drawOrder[i];
 			if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION) continue;

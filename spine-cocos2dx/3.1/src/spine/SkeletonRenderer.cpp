@@ -74,7 +74,7 @@ void SkeletonRenderer::initialize () {
 	blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
 	setOpacityModifyRGB(true);
 
-	setShaderProgram(ShaderCache::getInstance()->getProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR));
+	setGLProgram(ShaderCache::getInstance()->getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR));
 	scheduleUpdate();
 }
 
@@ -139,8 +139,8 @@ void SkeletonRenderer::draw (Renderer* renderer, const Matrix& transform, bool t
 }
 
 void SkeletonRenderer::drawSkeleton (const Matrix &transform, bool transformUpdated) {
-	getShaderProgram()->use();
-	getShaderProgram()->setUniformsForBuiltins(transform);
+	getGLProgram()->use();
+	getGLProgram()->setUniformsForBuiltins(transform);
 
 	Color3B nodeColor = getColor();
 	skeleton->r = nodeColor.r / (float)255;

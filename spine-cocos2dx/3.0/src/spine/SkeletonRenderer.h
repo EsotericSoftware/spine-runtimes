@@ -39,7 +39,7 @@ namespace spine {
 class PolygonBatch;
 
 /** Draws a skeleton. */
-class SkeletonRenderer: public cocos2d::NodeRGBA, public cocos2d::BlendProtocol {
+class SkeletonRenderer: public cocos2d::Node, public cocos2d::BlendProtocol {
 public:
 	spSkeleton* skeleton;
 	spBone* rootBone;
