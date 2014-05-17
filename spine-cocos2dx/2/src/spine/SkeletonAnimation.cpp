@@ -48,10 +48,27 @@ void trackEntryCallback (spAnimationState* state, int trackIndex, spEventType ty
 	((SkeletonAnimation*)state->rendererObject)->onTrackEntryEvent(trackIndex, type, event, loopCount);
 }
 
+typedef struct _TrackEntryListeners {
+	StartListener startListener;
+	EndListener endListener;
+	CompleteListener completeListener;
+	EventListener eventListener;
+} _TrackEntryListeners;
+
+static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
+	if (!entry->rendererObject) {
+		entry->rendererObject = NEW(spine::_TrackEntryListeners);
+		entry->listener = trackEntryCallback;
+	}
+	return (_TrackEntryListeners*)entry->rendererObject;
+}
+
 void disposeTrackEntry (spAnimationState* self, spTrackEntry* entry) {
 	if (entry->rendererObject) FREE(entry->rendererObject);
 	_spTrackEntry_dispose(entry);
 }
+
+//
 
 SkeletonAnimation* SkeletonAnimation::createWithData (spSkeletonData* skeletonData) {
 	SkeletonAnimation* node = new SkeletonAnimation(skeletonData);
@@ -191,14 +208,6 @@ void SkeletonAnimation::onTrackEntryEvent (int trackIndex, spEventType type, spE
 		if (listeners->eventListener) listeners->eventListener(trackIndex, event);
 		break;
 	}
-}
-
-static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
-	if (!entry->rendererObject) {
-		entry->rendererObject = NEW(spine::_TrackEntryListeners);
-		entry->listener = trackEntryCallback;
-	}
-	return (_TrackEntryListeners*)entry->rendererObject;
 }
 
 void SkeletonAnimation::setStartListener (spTrackEntry* entry, StartListener listener) {

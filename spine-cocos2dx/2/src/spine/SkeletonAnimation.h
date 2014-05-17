@@ -42,13 +42,6 @@ typedef std::function<void(int trackIndex)> EndListener;
 typedef std::function<void(int trackIndex, int loopCount)> CompleteListener;
 typedef std::function<void(int trackIndex, spEvent* event)> EventListener;
 
-typedef struct _TrackEntryListeners {
-	StartListener startListener;
-	EndListener endListener;
-	CompleteListener completeListener;
-	EventListener eventListener;
-} _TrackEntryListeners;
-
 /** Draws an animated skeleton, providing an AnimationState for applying one or more animations and queuing animations to be
   * played later. */
 class SkeletonAnimation: public SkeletonRenderer {
