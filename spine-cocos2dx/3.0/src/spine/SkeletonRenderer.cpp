@@ -126,6 +126,7 @@ SkeletonRenderer::~SkeletonRenderer () {
 	if (atlas) spAtlas_dispose(atlas);
 	spSkeleton_dispose(skeleton);
 	batch->release();
+	FREE(worldVertices);
 }
 
 void SkeletonRenderer::update (float deltaTime) {

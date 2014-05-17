@@ -82,7 +82,7 @@ void SkeletonRenderer::initialize () {
 void SkeletonRenderer::setSkeletonData (spSkeletonData *skeletonData, bool ownsSkeletonData) {
 	skeleton = spSkeleton_create(skeletonData);
 	rootBone = skeleton->bones[0];
-	this->ownsSkeletonData = ownsSkeletonData;	
+	this->ownsSkeletonData = ownsSkeletonData;
 }
 
 SkeletonRenderer::SkeletonRenderer () {
@@ -126,6 +126,7 @@ SkeletonRenderer::~SkeletonRenderer () {
 	if (ownsSkeletonData) spSkeletonData_dispose(skeleton->data);
 	if (atlas) spAtlas_dispose(atlas);
 	spSkeleton_dispose(skeleton);
+	FREE(worldVertices);
 	batch->release();
 }
 
@@ -196,7 +197,7 @@ void SkeletonRenderer::draw () {
 			a = attachment->a;
 			break;
 		}
-		} 
+		}
 		if (texture) {
 			if (slot->data->additiveBlending != additive) {
 				batch->flush();
