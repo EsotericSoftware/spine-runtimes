@@ -75,10 +75,11 @@ public:
 	spSlot* findSlot (const char* slotName) const;
 	
 	/* Sets the skin used to look up attachments not found in the SkeletonData defaultSkin. Attachments from the new skin are
-	 * attached if the corresponding attachment from the old skin was attached. Returns false if the skin was not found.
+	 * attached if the corresponding attachment from the old skin was attached. If there was no old skin, each slot's setup mode
+	 * attachment is attached from the new skin. Returns false if the skin was not found.
 	 * @param skin May be 0.*/
 	bool setSkin (const char* skinName);
-	
+
 	/* Returns 0 if the slot or attachment was not found. */
 	spAttachment* getAttachment (const char* slotName, const char* attachmentName) const;
 	/* Returns false if the slot or attachment was not found. */
@@ -92,6 +93,7 @@ public:
 protected:
 	SkeletonRenderer ();
 	void setSkeletonData (spSkeletonData* skeletonData, bool ownsSkeletonData);
+
 	virtual cocos2d::CCTexture2D* getTexture (spRegionAttachment* attachment) const;
 	virtual cocos2d::CCTexture2D* getTexture (spMeshAttachment* attachment) const;
 	virtual cocos2d::CCTexture2D* getTexture (spSkinnedMeshAttachment* attachment) const;
