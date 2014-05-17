@@ -33,10 +33,8 @@ spine-cocos2dx/3.1/cocos2dx/
 spine-cocos2dx/3.1/example/proj.win32/Debug
 xcuserdata
 
-spine-cocos2d-iphone/libs/*
-!spine-cocos2d-iphone/libs/cocos2d/Place cocos2d here.txt
-!spine-cocos2d-iphone/libs/CocosDenshion/Place CocosDenshion here.txt
-!spine-cocos2d-iphone/libs/kazmath/Place kazmath here.txt
+spine-cocos2d-iphone/2/cocos2d/*
+!spine-cocos2d-iphone/2/cocos2d/Place cocos2d here.txt
 
 spine-csharp/bin
 spine-csharp/obj
