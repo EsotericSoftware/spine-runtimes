@@ -10,6 +10,10 @@ The spine-cocos2dx runtime provides functionality to load, manipulate and render
 
 Alternatively, the contents of the `spine-c/src`, `spine-c/include` and `spine-cocos2dx/src` directories can be copied into your project. Be sure your header search path will find the contents of the `spine-c/include` and `spine-cocos2dx/src` directories. Note that the includes use `spine/Xxx.h`, so the `spine` directory cannot be omitted when copying the files.
 
+## Notes
+
+- Images are no longer premultiplied by cocos2d-x as they where in cocos2d-x v2, so the Spine atlas images *should* use premultiplied alpha.
+
 ## Examples
 
 [Simple example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx/example/Classes/ExampleLayer.cpp#L18)
