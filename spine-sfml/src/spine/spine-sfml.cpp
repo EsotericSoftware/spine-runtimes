@@ -37,7 +37,7 @@
 #include <SFML/Graphics/RenderStates.hpp>
 
 #ifndef SPINE_MESH_VERTEX_COUNT_MAX
-#define SPINE_MESH_VERTEX_COUNT_MAX 200
+#define SPINE_MESH_VERTEX_COUNT_MAX 1000
 #endif
 
 using namespace sf;
@@ -154,7 +154,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 
 		} else if (attachment->type == ATTACHMENT_MESH) {
 			MeshAttachment* mesh = (MeshAttachment*)attachment;
-			if (mesh->uvsCount > SPINE_MESH_VERTEX_COUNT_MAX) continue;
+			if (mesh->verticesCount > SPINE_MESH_VERTEX_COUNT_MAX) continue;
 			texture = (Texture*)((AtlasRegion*)mesh->rendererObject)->page->rendererObject;
 			MeshAttachment_computeWorldVertices(mesh, slot->skeleton->x, slot->skeleton->y, slot, worldVertices);
 

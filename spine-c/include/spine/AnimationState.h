@@ -50,6 +50,7 @@ typedef void (*spAnimationStateListener) (spAnimationState* state, int trackInde
 
 typedef struct spTrackEntry spTrackEntry;
 struct spTrackEntry {
+	spAnimationState* const state;
 	spTrackEntry* next;
 	spTrackEntry* previous;
 	spAnimation* animation;

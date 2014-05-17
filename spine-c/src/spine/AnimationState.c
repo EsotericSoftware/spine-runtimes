@@ -32,26 +32,27 @@
 #include <spine/extension.h>
 #include <string.h>
 
-spTrackEntry* _spTrackEntry_create () {
-	spTrackEntry* entry = NEW(spTrackEntry);
-	entry->timeScale = 1;
-	entry->lastTime = -1;
-	entry->mix = 1;
-	return entry;
+spTrackEntry* _spTrackEntry_create (spAnimationState* state) {
+	spTrackEntry* self = NEW(spTrackEntry);
+	CONST_CAST(spAnimationState*, self->state) = state;
+	self->timeScale = 1;
+	self->lastTime = -1;
+	self->mix = 1;
+	return self;
 }
 
-void _spTrackEntry_dispose (spTrackEntry* entry) {
-	if (entry->previous) _spTrackEntry_dispose(entry->previous);
-	FREE(entry);
+void _spTrackEntry_dispose (spTrackEntry* self) {
+	if (self->previous) SUB_CAST(_spAnimationState, self->state)->disposeTrackEntry(self->previous);
+	FREE(self);
 }
 
 /**/
 
 spTrackEntry* _spAnimationState_createTrackEntry (spAnimationState* self) {
-	return _spTrackEntry_create();
+	return _spTrackEntry_create(self);
 }
 
-void _spAnimationState_disposeTrackEntry (spAnimationState* self, spTrackEntry* entry) {
+void _spAnimationState_disposeTrackEntry (spTrackEntry* entry) {
 	_spTrackEntry_dispose(entry);
 }
 
@@ -70,7 +71,7 @@ void _spAnimationState_disposeAllEntries (spAnimationState* self, spTrackEntry* 
 	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
 	while (entry) {
 		spTrackEntry* next = entry->next;
-		internal->disposeTrackEntry(self, entry);
+		internal->disposeTrackEntry(entry);
 		entry = next;
 	}
 }
@@ -147,7 +148,7 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 
 			if (alpha >= 1) {
 				alpha = 1;
-				internal->disposeTrackEntry(self, current->previous);
+				internal->disposeTrackEntry(current->previous);
 				current->previous = 0;
 			}
 			spAnimation_mix(current->animation, skeleton, current->lastTime, time,
@@ -212,7 +213,7 @@ void spAnimationState_clearTrack (spAnimationState* self, int trackIndex) {
 
 	self->tracks[trackIndex] = 0;
 
-	if (current->previous) internal->disposeTrackEntry(self, current->previous);
+	if (current->previous) internal->disposeTrackEntry(current->previous);
 	_spAnimationState_disposeAllEntries(self, current);
 }
 
@@ -248,9 +249,9 @@ void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEnt
 			} else
 				entry->previous = current;
 		} else
-			internal->disposeTrackEntry(self, current);
+			internal->disposeTrackEntry(current);
 
-		if (previous) internal->disposeTrackEntry(self, previous);
+		if (previous) internal->disposeTrackEntry(previous);
 	}
 
 	self->tracks[index] = entry;

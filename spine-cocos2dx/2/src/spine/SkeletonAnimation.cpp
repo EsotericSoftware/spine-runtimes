@@ -63,7 +63,7 @@ static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
 	return (_TrackEntryListeners*)entry->rendererObject;
 }
 
-void disposeTrackEntry (spAnimationState* self, spTrackEntry* entry) {
+void disposeTrackEntry (spTrackEntry* entry) {
 	if (entry->rendererObject) FREE(entry->rendererObject);
 	_spTrackEntry_dispose(entry);
 }
