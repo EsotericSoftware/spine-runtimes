@@ -71,7 +71,7 @@ bool SpineboyExample::init () {
 	skeletonNode->addAnimation(0, "run", true);
 
 	skeletonNode->setStartListener(jumpEntry, [] (int trackIndex) {
-		log("jumped!", trackIndex);
+		log("jumped!");
 	});
 
 	// skeletonNode->addAnimation(1, "test", true);
