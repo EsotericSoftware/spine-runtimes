@@ -8,7 +8,7 @@ A Spine skeleton is a GameObject and can be used throughout Unity like any other
 
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
 1. Copy the contents of `spine-csharp/src` to `spine-tk2d/Assets/spine-csharp`.
-1. Open the `spine-tk2d/Assets/examples/spineboy/spineboy.unity` scene file using Unity 4.2+.
+1. Open the `spine-tk2d/Assets/examples/spineboy/spineboy.unity` scene file using Unity 4.3.4+.
 1. Import 2D Toolkit into the example project.
 
 To use spine-tk2d in your own Unity project:
