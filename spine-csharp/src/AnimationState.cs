@@ -82,7 +82,8 @@ namespace Spine {
 
 				TrackEntry next = current.next;
 				if (next != null) {
-					if (time - trackDelta >= next.delay) SetCurrent(i, next);
+					next.time = current.lastTime - next.delay;
+					if (next.time >= 0) SetCurrent(i, next);
 				} else {
 					// End non-looping animation when it reaches its end time and there is no next entry.
 					if (!current.loop && current.lastTime >= current.endTime) ClearTrack(i);
