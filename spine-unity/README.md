@@ -6,9 +6,16 @@ A Spine skeleton is a GameObject and can be used throughout Unity like any other
 
 ## Setup
 
+To run the examples:
+
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
-1. Copy the contents of `spine-csharp/src` to `spine-unity/Assets/Spine/spine-csharp`.
+1. Copy the contents of `spine-csharp/src` to `spine-unity/Assets/spine-csharp`.
 1. Open an example scene file from `spine-unity/Assets/examples/` using Unity 4.2+.
+
+To use spine-unity in your own Unity project:
+
+1. Copy the contents of `spine-csharp/src` to `Assets/spine-csharp` in your project.
+1. Copy the `spine-unity/Assets/spine-unity` to `Assets/spine-unity` in your project.
 
 ## Examples
 

@@ -1,16 +1,26 @@
-spine-c/Debug/*
-spine-cpp/Debug/*
-spine-sfml/Debug/*
-spine-sfml/SFML
-spine-libgdx/bin/*
-spine-libgdx/libs/*
-target
 
+target
 *Debug.win32
 *.sdf
 *.opensdf
 *.suo
 *.ipch
+*.userprefs
+*.pidb
+*.cachefile
+*.swp
+*.user
+.DS_Store
+
+spine-c/Debug/*
+
+spine-cpp/Debug/*
+
+spine-sfml/Debug/*
+spine-sfml/SFML
+
+spine-libgdx/bin/*
+spine-libgdx/libs/*
 
 spine-cocos2dx/2/cocos2dx/
 !spine-cocos2dx/2/cocos2dx/Place cocos2dx here.txt
@@ -21,8 +31,6 @@ spine-cocos2dx/3.0/example/proj.win32/Debug
 spine-cocos2dx/3.1/cocos2dx/
 !spine-cocos2dx/3.1/cocos2dx/Place cocos2dx here.txt
 spine-cocos2dx/3.1/example/proj.win32/Debug
-*.swp
-.DS_Store
 xcuserdata
 
 spine-cocos2d-iphone/libs/*
@@ -30,8 +38,6 @@ spine-cocos2d-iphone/libs/*
 !spine-cocos2d-iphone/libs/CocosDenshion/Place CocosDenshion here.txt
 !spine-cocos2d-iphone/libs/kazmath/Place kazmath here.txt
 
-*.user
-forums
 spine-csharp/bin
 spine-csharp/obj
 
@@ -50,22 +56,18 @@ spine-xna/obj
 spine-xna/example/bin
 spine-xna/example/obj
 
-spine-unity/Assets/Spine/spine-csharp
-spine-unity/Assets/Spine/spine-csharp.meta
-!spine-unity/Assets/Spine/spine-csharp/Place spine-csharp here.txt
+spine-unity/Assets/spine-csharp*
+!spine-unity/Assets/spine-csharp/Place spine-csharp src here.*
 spine-unity/ProjectSettings
 spine-unity/Temp
 spine-unity/Library
 spine-unity/*.sln
-*.userprefs
-*.pidb
-*.cachefile
 Assembly-*.csproj
 Assembly-*.pidb
 AssetStoreTools*
 
-spine-tk2d/Assets/Spine/spine-csharp
-!spine-tk2d/Assets/Spine/spine-csharp/Place spine-csharp here.txt
+spine-tk2d/Assets/Spine/spine-csharp*
+!spine-tk2d/Assets/Spine/spine-csharp/Place spine-csharp src here.*
 spine-tk2d/ProjectSettings
 spine-tk2d/Temp
 spine-tk2d/Library
