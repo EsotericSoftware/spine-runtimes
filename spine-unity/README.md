@@ -17,6 +17,10 @@ To use spine-unity in your own Unity project:
 1. Copy the contents of `spine-csharp/src` to `Assets/spine-csharp` in your project.
 1. Copy the `spine-unity/Assets/spine-unity` to `Assets/spine-unity` in your project.
 
+### Setup video
+
+[![](http://i.imgur.com/cPxKK3S.png)](https://www.youtube.com/watch?v=Cwfa5gDH0UI)
+
 ## Examples
 
 * **spineboy** This shows the spineboy skeleton. First an animation is played that shows the draw order changing and events firing, then spineboy jumps and walks. Click spineboy to jump again. Notice the walk and jump animations are mixed and transition smoothly. The white cube on spineboy's right hand is a separate GameObject that is positioned using a `BoneComponent`. This example uses images that are split across two atlas pages. This demonstrates a multi-page atlas, but of course has a high number of draw calls.
