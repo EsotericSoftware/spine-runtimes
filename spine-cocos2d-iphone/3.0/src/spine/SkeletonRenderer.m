@@ -221,9 +221,9 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	}
 	[batch flush];
 
+	/*
 	if (_debugSlots) {
 		// Slots.
-		
 		ccDrawColor4B(0, 0, 255, 255);
 		glLineWidth(1);
 		CGPoint points[4];
@@ -258,6 +258,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 			if (i == 0) ccDrawColor4B(0, 255, 0, 255);
 		}
 	}
+	*/
 }
 
 - (CCTexture*) getTextureForRegion:(RegionAttachment*)attachment {
