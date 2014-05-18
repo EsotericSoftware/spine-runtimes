@@ -227,7 +227,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 			Json* timelineArray;
 			for (timelineArray = slotMap->child; timelineArray; timelineArray = timelineArray->next) {
 				Json* frame;
-				int verticesCount;
+				int verticesCount = 0;
 				float* tempVertices;
 				spFFDTimeline *timeline;
 
