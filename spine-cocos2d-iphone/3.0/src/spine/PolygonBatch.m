@@ -89,6 +89,7 @@
     if (!_verticesCount) return;
     
 	ccGLBindTexture2D(_texture.name);
+	ccGLBindVAO(0);
 	glEnableVertexAttribArray(kCCVertexAttrib_Position);
 	glEnableVertexAttribArray(kCCVertexAttrib_Color);
 	glEnableVertexAttribArray(kCCVertexAttrib_TexCoords);
