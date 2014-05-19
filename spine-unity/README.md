@@ -19,7 +19,7 @@ To use spine-unity in your own Unity project:
 
 ### Setup video
 
-[![](http://i.imgur.com/cPxKK3S.png)](https://www.youtube.com/watch?v=Cwfa5gDH0UI)
+[![](http://i.imgur.com/cPxKK3S.png)](https://www.youtube.com/watch?v=-V84OIvZdQc)
 
 ## Examples
 
