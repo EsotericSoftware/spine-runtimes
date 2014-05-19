@@ -41,6 +41,10 @@ public class Spineboy : MonoBehaviour {
 		skeletonAnimation = GetComponent<SkeletonAnimation>();
 		// Call our method any time an animation fires an event.
 		skeletonAnimation.state.Event += Event;
+		// A lambda can be used for the callback instead of a method.
+		skeletonAnimation.state.End += (state, trackIndex) => {
+			Debug.Log("start: " + state.GetCurrent(trackIndex));
+		};
 		// Queue jump to be played on track 0 two seconds after the starting animation.
 		skeletonAnimation.state.AddAnimation(0, "jump", false, 2);
 		// Queue walk to be looped on track 0 after the jump animation.
