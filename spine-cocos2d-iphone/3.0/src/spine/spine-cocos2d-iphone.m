@@ -31,7 +31,7 @@
 #import <spine/spine-cocos2d-iphone.h>
 #import <spine/extension.h>
 
-void _AtlasPage_createTexture (AtlasPage* self, const char* path) {
+void _spAtlasPage_createTexture (spAtlasPage* self, const char* path) {
 	CCTexture* texture = [[CCTexture textureWithFile:@(path)] retain];
 	self->rendererObject = texture;
 	CGSize size = texture.contentSizeInPixels;
@@ -39,10 +39,10 @@ void _AtlasPage_createTexture (AtlasPage* self, const char* path) {
 	self->height = size.height;
 }
 
-void _AtlasPage_disposeTexture (AtlasPage* self) {
+void _spAtlasPage_disposeTexture (spAtlasPage* self) {
 	[(CCTexture*)self->rendererObject release];
 }
 
-char* _Util_readFile (const char* path, int* length) {
+char* _spUtil_readFile (const char* path, int* length) {
 	return _readFile([[[CCFileUtils sharedFileUtils] fullPathForFilename:@(path)] UTF8String], length);
 }

@@ -33,10 +33,10 @@
 #import <spine/extension.h>
 #import "CCTexture_Private.h"
 
-@implementation PolygonBatch
+@implementation spPolygonBatch
 
 + (id) createWithCapacity:(int)capacity {
-	return [[(PolygonBatch*)[self alloc] initWithCapacity:capacity] autorelease];
+	return [[(spPolygonBatch*)[self alloc] initWithCapacity:capacity] autorelease];
 }
 
 - (id) initWithCapacity:(int)capacity {
@@ -57,7 +57,7 @@
 - (void) dealloc {
 	FREE(_vertices);
 	FREE(_triangles);
-    [super dealloc];
+	[super dealloc];
 }
 
 - (void) add:(CCTexture*)addTexture vertices:(const float*)addVertices uvs:(const float*)uvs
@@ -86,22 +86,21 @@
 }
 
 - (void) flush {
-    if (!_verticesCount) return;
-    
-	ccGLBindTexture2D(_texture.name);
+	if (!_verticesCount) return;
+
 	ccGLBindVAO(0);
+	ccGLBindTexture2D(_texture.name);
 	glEnableVertexAttribArray(kCCVertexAttrib_Position);
 	glEnableVertexAttribArray(kCCVertexAttrib_Color);
 	glEnableVertexAttribArray(kCCVertexAttrib_TexCoords);
 	glVertexAttribPointer(kCCVertexAttrib_Position, 2, GL_FLOAT, GL_FALSE, sizeof(ccV2F_C4B_T2F), &_vertices[0].vertices);
 	glVertexAttribPointer(kCCVertexAttrib_Color, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(ccV2F_C4B_T2F), &_vertices[0].colors);
 	glVertexAttribPointer(kCCVertexAttrib_TexCoords, 2, GL_FLOAT, GL_FALSE, sizeof(ccV2F_C4B_T2F), &_vertices[0].texCoords);
-    
 	glDrawElements(GL_TRIANGLES, _trianglesCount, GL_UNSIGNED_SHORT, _triangles);
-    
+
 	_verticesCount = 0;
 	_trianglesCount = 0;
-    
+
 	CHECK_GL_ERROR_DEBUG();
 }
 

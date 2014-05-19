@@ -23,24 +23,20 @@
 	[self addChild:skeletonNode];
 
 	self.userInteractionEnabled = YES;
-
+    self.contentSize = windowSize;
+    
 	return self;
 }
 
-#if __CC_PLATFORM_MAC
-- (BOOL) ccMouseDown:(NSEvent*)event {
-#else
-- (void) ccTouchesBegan:(NSSet*)touches withEvent:(UIEvent*)event {
-#endif
+#if ( TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR )
+- (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event {
 	if (!skeletonNode.debugBones)
 		skeletonNode.debugBones = true;
 	else if (skeletonNode.timeScale == 1)
 		skeletonNode.timeScale = 0.3f;
 	else
 		[[CCDirector sharedDirector] replaceScene:[SpineboyExample scene]];
-#if __CC_PLATFORM_MAC
-	return YES;
-#endif
 }
+#endif
 
 @end

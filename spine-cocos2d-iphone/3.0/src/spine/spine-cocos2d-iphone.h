@@ -28,7 +28,6 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#define SPINE_SHORT_NAMES
 #import <spine/spine.h>
 #import "cocos2d.h"
 #import <spine/SkeletonRenderer.h>

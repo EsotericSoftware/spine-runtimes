@@ -33,26 +33,26 @@
 #import <spine/extension.h>
 #import <spine/PolygonBatch.h>
 #import "CCNode_Private.h"
+#import "CCDrawingPrimitives.h"
 
 static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 
 @interface SkeletonRenderer (Private)
-- (void) initialize:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData;
+- (void) initialize:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData;
 @end
 
 @implementation SkeletonRenderer
 
 @synthesize skeleton = _skeleton;
 @synthesize rootBone = _rootBone;
-@synthesize timeScale = _timeScale;
 @synthesize debugSlots = _debugSlots;
 @synthesize debugBones = _debugBones;
 
-+ (id) skeletonWithData:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
++ (id) skeletonWithData:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
 	return [[[self alloc] initWithData:skeletonData ownsSkeletonData:ownsSkeletonData] autorelease];
 }
 
-+ (id) skeletonWithFile:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale {
++ (id) skeletonWithFile:(NSString*)skeletonDataFile atlas:(spAtlas*)atlas scale:(float)scale {
 	return [[[self alloc] initWithFile:skeletonDataFile atlas:atlas scale:scale] autorelease];
 }
 
@@ -60,16 +60,14 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	return [[[self alloc] initWithFile:skeletonDataFile atlasFile:atlasFile scale:scale] autorelease];
 }
 
-- (void) initialize:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
+- (void) initialize:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
 	_ownsSkeletonData = ownsSkeletonData;
-
-	_timeScale = 1;
 
 	worldVertices = MALLOC(float, 1000); // Max number of vertices per mesh.
 
-    batch = [[PolygonBatch createWithCapacity:2000] retain]; // Max number of vertices and triangles per batch.
+	batch = [[spPolygonBatch createWithCapacity:2000] retain]; // Max number of vertices and triangles per batch.
 
-	_skeleton = Skeleton_create(skeletonData);
+	_skeleton = spSkeleton_create(skeletonData);
 	_rootBone = _skeleton->bones[0];
 
 	_blendFunc.src = GL_ONE;
@@ -79,7 +77,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	[self setShaderProgram:[[CCShaderCache sharedShaderCache] programForKey:kCCShader_PositionTextureColor]];
 }
 
-- (id) initWithData:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
+- (id) initWithData:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
 	NSAssert(skeletonData, @"skeletonData cannot be null.");
 
 	self = [super init];
@@ -90,15 +88,15 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	return self;
 }
 
-- (id) initWithFile:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale {
+- (id) initWithFile:(NSString*)skeletonDataFile atlas:(spAtlas*)atlas scale:(float)scale {
 	self = [super init];
 	if (!self) return nil;
 
-	SkeletonJson* json = SkeletonJson_create(atlas);
+	spSkeletonJson* json = spSkeletonJson_create(atlas);
 	json->scale = scale == 0 ? (1 / [CCDirector sharedDirector].contentScaleFactor) : scale;
-	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, [skeletonDataFile UTF8String]);
+	spSkeletonData* skeletonData = spSkeletonJson_readSkeletonDataFile(json, [skeletonDataFile UTF8String]);
 	NSAssert(skeletonData, ([NSString stringWithFormat:@"Error reading skeleton data file: %@\nError: %s", skeletonDataFile, json->error]));
-	SkeletonJson_dispose(json);
+	spSkeletonJson_dispose(json);
 	if (!skeletonData) return 0;
 
 	[self initialize:skeletonData ownsSkeletonData:YES];
@@ -110,15 +108,15 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	self = [super init];
 	if (!self) return nil;
 
-	_atlas = Atlas_createFromFile([atlasFile UTF8String], 0);
+	_atlas = spAtlas_createFromFile([atlasFile UTF8String], 0);
 	NSAssert(_atlas, ([NSString stringWithFormat:@"Error reading atlas file: %@", atlasFile]));
 	if (!_atlas) return 0;
 
-	SkeletonJson* json = SkeletonJson_create(_atlas);
-	json->scale = scale == 0 ? (1 / [CCDirector sharedDirector].contentScaleFactor) : scale;
-	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, [skeletonDataFile UTF8String]);
+	spSkeletonJson* json = spSkeletonJson_create(_atlas);
+	json->scale = scale / [CCDirector sharedDirector].contentScaleFactor;
+	spSkeletonData* skeletonData = spSkeletonJson_readSkeletonDataFile(json, [skeletonDataFile UTF8String]);
 	NSAssert(skeletonData, ([NSString stringWithFormat:@"Error reading skeleton data file: %@\nError: %s", skeletonDataFile, json->error]));
-	SkeletonJson_dispose(json);
+	spSkeletonJson_dispose(json);
 	if (!skeletonData) return 0;
 
 	[self initialize:skeletonData ownsSkeletonData:YES];
@@ -127,16 +125,12 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 }
 
 - (void) dealloc {
-	if (_ownsSkeletonData) SkeletonData_dispose(_skeleton->data);
-	if (_atlas) Atlas_dispose(_atlas);
-	Skeleton_dispose(_skeleton);
-    [batch release];
+	if (_ownsSkeletonData) spSkeletonData_dispose(_skeleton->data);
+	if (_atlas) spAtlas_dispose(_atlas);
+	spSkeleton_dispose(_skeleton);
+	[batch release];
 	FREE(worldVertices);
 	[super dealloc];
-}
-
-- (void) update:(CCTime)deltaTime {
-	Skeleton_update(_skeleton, deltaTime * _timeScale);
 }
 
 - (void) draw {
@@ -156,7 +150,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	int trianglesCount = 0;
 	float r = 0, g = 0, b = 0, a = 0;
 	for (int i = 0, n = _skeleton->slotCount; i < n; i++) {
-		Slot* slot = _skeleton->drawOrder[i];
+		spSlot* slot = _skeleton->drawOrder[i];
 		if (!slot->attachment) continue;
 		CCTexture *texture = 0;
 		switch (slot->attachment->type) {
@@ -221,16 +215,15 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	}
 	[batch flush];
 
-	/*
 	if (_debugSlots) {
 		// Slots.
 		ccDrawColor4B(0, 0, 255, 255);
 		glLineWidth(1);
 		CGPoint points[4];
 		for (int i = 0, n = _skeleton->slotCount; i < n; i++) {
-			Slot* slot = _skeleton->drawOrder[i];
-			if (!slot->attachment || slot->attachment->type != ATTACHMENT_REGION) continue;
-			RegionAttachment* attachment = (RegionAttachment*)slot->attachment;
+			spSlot* slot = _skeleton->drawOrder[i];
+			if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION) continue;
+			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
 			spRegionAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot->bone, worldVertices);
 			points[0] = ccp(worldVertices[0], worldVertices[1]);
 			points[1] = ccp(worldVertices[2], worldVertices[3]);
@@ -244,7 +237,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 		glLineWidth(2);
 		ccDrawColor4B(255, 0, 0, 255);
 		for (int i = 0, n = _skeleton->boneCount; i < n; i++) {
-			Bone *bone = _skeleton->bones[i];
+			spBone *bone = _skeleton->bones[i];
 			float x = bone->data->length * bone->m00 + bone->worldX;
 			float y = bone->data->length * bone->m10 + bone->worldY;
 			ccDrawLine(ccp(bone->worldX, bone->worldY), ccp(x, y));
@@ -253,24 +246,23 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 		ccPointSize(4);
 		ccDrawColor4B(0, 0, 255, 255); // Root bone is blue.
 		for (int i = 0, n = _skeleton->boneCount; i < n; i++) {
-			Bone *bone = _skeleton->bones[i];
+			spBone *bone = _skeleton->bones[i];
 			ccDrawPoint(ccp(bone->worldX, bone->worldY));
 			if (i == 0) ccDrawColor4B(0, 255, 0, 255);
 		}
 	}
-	*/
 }
 
-- (CCTexture*) getTextureForRegion:(RegionAttachment*)attachment {
-	return (CCTexture*)((AtlasRegion*)attachment->rendererObject)->page->rendererObject;
+- (CCTexture*) getTextureForRegion:(spRegionAttachment*)attachment {
+	return (CCTexture*)((spAtlasRegion*)attachment->rendererObject)->page->rendererObject;
 }
 
-- (CCTexture*) getTextureForMesh:(MeshAttachment*)attachment {
-	return (CCTexture*)((AtlasRegion*)attachment->rendererObject)->page->rendererObject;
+- (CCTexture*) getTextureForMesh:(spMeshAttachment*)attachment {
+	return (CCTexture*)((spAtlasRegion*)attachment->rendererObject)->page->rendererObject;
 }
 
-- (CCTexture*) getTextureForSkinnedMesh:(SkinnedMeshAttachment*)attachment {
-	return (CCTexture*)((AtlasRegion*)attachment->rendererObject)->page->rendererObject;
+- (CCTexture*) getTextureForSkinnedMesh:(spSkinnedMeshAttachment*)attachment {
+	return (CCTexture*)((spAtlasRegion*)attachment->rendererObject)->page->rendererObject;
 }
 
 - (CGRect) boundingBox {
@@ -279,26 +271,26 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	float scaleY = self.scaleY;
 	float vertices[8];
 	for (int i = 0; i < _skeleton->slotCount; ++i) {
-		Slot* slot = _skeleton->slots[i];
-		if (!slot->attachment || slot->attachment->type != ATTACHMENT_REGION) continue;
-		RegionAttachment* attachment = (RegionAttachment*)slot->attachment;
-		RegionAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot->bone, vertices);
-		minX = fmin(minX, vertices[VERTEX_X1] * scaleX);
-		minY = fmin(minY, vertices[VERTEX_Y1] * scaleY);
-		maxX = fmax(maxX, vertices[VERTEX_X1] * scaleX);
-		maxY = fmax(maxY, vertices[VERTEX_Y1] * scaleY);
-		minX = fmin(minX, vertices[VERTEX_X4] * scaleX);
-		minY = fmin(minY, vertices[VERTEX_Y4] * scaleY);
-		maxX = fmax(maxX, vertices[VERTEX_X4] * scaleX);
-		maxY = fmax(maxY, vertices[VERTEX_Y4] * scaleY);
-		minX = fmin(minX, vertices[VERTEX_X2] * scaleX);
-		minY = fmin(minY, vertices[VERTEX_Y2] * scaleY);
-		maxX = fmax(maxX, vertices[VERTEX_X2] * scaleX);
-		maxY = fmax(maxY, vertices[VERTEX_Y2] * scaleY);
-		minX = fmin(minX, vertices[VERTEX_X3] * scaleX);
-		minY = fmin(minY, vertices[VERTEX_Y3] * scaleY);
-		maxX = fmax(maxX, vertices[VERTEX_X3] * scaleX);
-		maxY = fmax(maxY, vertices[VERTEX_Y3] * scaleY);
+		spSlot* slot = _skeleton->slots[i];
+		if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION) continue;
+		spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
+		spRegionAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot->bone, vertices);
+		minX = fmin(minX, vertices[SP_VERTEX_X1] * scaleX);
+		minY = fmin(minY, vertices[SP_VERTEX_Y1] * scaleY);
+		maxX = fmax(maxX, vertices[SP_VERTEX_X1] * scaleX);
+		maxY = fmax(maxY, vertices[SP_VERTEX_Y1] * scaleY);
+		minX = fmin(minX, vertices[SP_VERTEX_X4] * scaleX);
+		minY = fmin(minY, vertices[SP_VERTEX_Y4] * scaleY);
+		maxX = fmax(maxX, vertices[SP_VERTEX_X4] * scaleX);
+		maxY = fmax(maxY, vertices[SP_VERTEX_Y4] * scaleY);
+		minX = fmin(minX, vertices[SP_VERTEX_X2] * scaleX);
+		minY = fmin(minY, vertices[SP_VERTEX_Y2] * scaleY);
+		maxX = fmax(maxX, vertices[SP_VERTEX_X2] * scaleX);
+		maxY = fmax(maxY, vertices[SP_VERTEX_Y2] * scaleY);
+		minX = fmin(minX, vertices[SP_VERTEX_X3] * scaleX);
+		minY = fmin(minY, vertices[SP_VERTEX_Y3] * scaleY);
+		maxX = fmax(maxX, vertices[SP_VERTEX_X3] * scaleX);
+		maxY = fmax(maxY, vertices[SP_VERTEX_Y3] * scaleY);
 	}
 	minX = self.position.x + minX;
 	minY = self.position.y + minY;
@@ -310,36 +302,36 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 // --- Convenience methods for Skeleton_* functions.
 
 - (void) updateWorldTransform {
-	Skeleton_updateWorldTransform(_skeleton);
+	spSkeleton_updateWorldTransform(_skeleton);
 }
 
 - (void) setToSetupPose {
-	Skeleton_setToSetupPose(_skeleton);
+	spSkeleton_setToSetupPose(_skeleton);
 }
 - (void) setBonesToSetupPose {
-	Skeleton_setBonesToSetupPose(_skeleton);
+	spSkeleton_setBonesToSetupPose(_skeleton);
 }
 - (void) setSlotsToSetupPose {
-	Skeleton_setSlotsToSetupPose(_skeleton);
+	spSkeleton_setSlotsToSetupPose(_skeleton);
 }
 
-- (Bone*) findBone:(NSString*)boneName {
-	return Skeleton_findBone(_skeleton, [boneName UTF8String]);
+- (spBone*) findBone:(NSString*)boneName {
+	return spSkeleton_findBone(_skeleton, [boneName UTF8String]);
 }
 
-- (Slot*) findSlot:(NSString*)slotName {
-	return Skeleton_findSlot(_skeleton, [slotName UTF8String]);
+- (spSlot*) findSlot:(NSString*)slotName {
+	return spSkeleton_findSlot(_skeleton, [slotName UTF8String]);
 }
 
 - (bool) setSkin:(NSString*)skinName {
-	return (bool)Skeleton_setSkinByName(_skeleton, skinName ? [skinName UTF8String] : 0);
+	return (bool)spSkeleton_setSkinByName(_skeleton, skinName ? [skinName UTF8String] : 0);
 }
 
-- (Attachment*) getAttachment:(NSString*)slotName attachmentName:(NSString*)attachmentName {
-	return Skeleton_getAttachmentForSlotName(_skeleton, [slotName UTF8String], [attachmentName UTF8String]);
+- (spAttachment*) getAttachment:(NSString*)slotName attachmentName:(NSString*)attachmentName {
+	return spSkeleton_getAttachmentForSlotName(_skeleton, [slotName UTF8String], [attachmentName UTF8String]);
 }
 - (bool) setAttachment:(NSString*)slotName attachmentName:(NSString*)attachmentName {
-	return (bool)Skeleton_setAttachment(_skeleton, [slotName UTF8String], [attachmentName UTF8String]);
+	return (bool)spSkeleton_setAttachment(_skeleton, [slotName UTF8String], [attachmentName UTF8String]);
 }
 
 // --- CCBlendProtocol
