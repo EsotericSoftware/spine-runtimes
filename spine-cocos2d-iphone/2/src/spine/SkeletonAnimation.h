@@ -28,59 +28,60 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#define SPINE_SHORT_NAMES
 #import <spine/spine.h>
 #import <spine/SkeletonRenderer.h>
 #import "cocos2d.h"
 
 @class SkeletonAnimation;
 
-typedef void(^StartListener)(int trackIndex);
-typedef void(^EndListener)(int trackIndex);
-typedef void(^CompleteListener)(int trackIndex, int loopCount);
-typedef void(^EventListener)(int trackIndex, spEvent* event);
+typedef void(^spStartListener)(int trackIndex);
+typedef void(^spEndListener)(int trackIndex);
+typedef void(^spCompleteListener)(int trackIndex, int loopCount);
+typedef void(^spEventListener)(int trackIndex, spEvent* event);
 
 /** Draws an animated skeleton, providing an AnimationState for applying one or more animations and queuing animations to be
  * played later. */
 @interface SkeletonAnimation : SkeletonRenderer {
-	AnimationState* _state;
+	spAnimationState* _state;
 	bool _ownsAnimationStateData;
+	float _timeScale;
 
-	StartListener _startListener;
-	EndListener _endListener;
-	CompleteListener _completeListener;
-	EventListener _eventListener;
+	spStartListener _startListener;
+	spEndListener _endListener;
+	spCompleteListener _completeListener;
+	spEventListener _eventListener;
 }
 
-+ (id) skeletonWithData:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData;
-+ (id) skeletonWithFile:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale;
++ (id) skeletonWithData:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData;
++ (id) skeletonWithFile:(NSString*)skeletonDataFile atlas:(spAtlas*)atlas scale:(float)scale;
 + (id) skeletonWithFile:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile scale:(float)scale;
 
-- (id) initWithData:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData;
-- (id) initWithFile:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale;
+- (id) initWithData:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData;
+- (id) initWithFile:(NSString*)skeletonDataFile atlas:(spAtlas*)atlas scale:(float)scale;
 - (id) initWithFile:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile scale:(float)scale;
 
-- (void) setAnimationStateData:(AnimationStateData*)stateData;
+- (void) setAnimationStateData:(spAnimationStateData*)stateData;
 - (void) setMixFrom:(NSString*)fromAnimation to:(NSString*)toAnimation duration:(float)duration;
 
-- (TrackEntry*) setAnimationForTrack:(int)trackIndex name:(NSString*)name loop:(bool)loop;
-- (TrackEntry*) addAnimationForTrack:(int)trackIndex name:(NSString*)name loop:(bool)loop afterDelay:(int)delay;
-- (TrackEntry*) getCurrentForTrack:(int)trackIndex;
+- (spTrackEntry*) setAnimationForTrack:(int)trackIndex name:(NSString*)name loop:(bool)loop;
+- (spTrackEntry*) addAnimationForTrack:(int)trackIndex name:(NSString*)name loop:(bool)loop afterDelay:(int)delay;
+- (spTrackEntry*) getCurrentForTrack:(int)trackIndex;
 - (void) clearTracks;
 - (void) clearTrack:(int)trackIndex;
 
-- (void) setListenerForEntry:(spTrackEntry*)entry onStart:(StartListener)listener;
-- (void) setListenerForEntry:(spTrackEntry*)entry onEnd:(EndListener)listener;
-- (void) setListenerForEntry:(spTrackEntry*)entry onComplete:(CompleteListener)listener;
-- (void) setListenerForEntry:(spTrackEntry*)entry onEvent:(EventListener)listener;
+- (void) setListenerForEntry:(spTrackEntry*)entry onStart:(spStartListener)listener;
+- (void) setListenerForEntry:(spTrackEntry*)entry onEnd:(spEndListener)listener;
+- (void) setListenerForEntry:(spTrackEntry*)entry onComplete:(spCompleteListener)listener;
+- (void) setListenerForEntry:(spTrackEntry*)entry onEvent:(spEventListener)listener;
 
-- (void) onAnimationStateEvent:(int)trackIndex type:(EventType)type event:(Event*)event loopCount:(int)loopCount;
-- (void) onTrackEntryEvent:(int)trackIndex type:(EventType)type event:(Event*)event loopCount:(int)loopCount;
+- (void) onAnimationStateEvent:(int)trackIndex type:(spEventType)type event:(spEvent*)event loopCount:(int)loopCount;
+- (void) onTrackEntryEvent:(int)trackIndex type:(spEventType)type event:(spEvent*)event loopCount:(int)loopCount;
 
-@property (nonatomic, readonly) AnimationState* state;
-@property (nonatomic, copy) StartListener startListener;
-@property (nonatomic, copy) EndListener endListener;
-@property (nonatomic, copy) CompleteListener completeListener;
-@property (nonatomic, copy) EventListener eventListener;
+@property (nonatomic, readonly) spAnimationState* state;
+@property (nonatomic) float timeScale;
+@property (nonatomic, copy) spStartListener startListener;
+@property (nonatomic, copy) spEndListener endListener;
+@property (nonatomic, copy) spCompleteListener completeListener;
+@property (nonatomic, copy) spEventListener eventListener;
 
 @end

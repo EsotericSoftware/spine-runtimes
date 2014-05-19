@@ -34,7 +34,7 @@
 	};
 
 	[skeletonNode setAnimationForTrack:0 name:@"walk" loop:YES];
-	TrackEntry* jumpEntry = [skeletonNode addAnimationForTrack:0 name:@"jump" loop:NO afterDelay:3];
+	spTrackEntry* jumpEntry = [skeletonNode addAnimationForTrack:0 name:@"jump" loop:NO afterDelay:3];
 	[skeletonNode addAnimationForTrack:0 name:@"run" loop:YES afterDelay:0];
 
 	[skeletonNode setListenerForEntry:jumpEntry onStart:^(int trackIndex) {

@@ -32,10 +32,10 @@
 #import <spine/spine-cocos2d-iphone.h>
 #import <spine/extension.h>
 
-@implementation PolygonBatch
+@implementation spPolygonBatch
 
 + (id) createWithCapacity:(int)capacity {
-	return [[(PolygonBatch*)[self alloc] initWithCapacity:capacity] autorelease];
+	return [[(spPolygonBatch*)[self alloc] initWithCapacity:capacity] autorelease];
 }
 
 - (id) initWithCapacity:(int)capacity {

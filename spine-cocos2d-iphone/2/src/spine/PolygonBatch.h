@@ -30,7 +30,7 @@
 
 #import <spine/spine-cocos2d-iphone.h>
 
-@interface PolygonBatch : NSObject {
+@interface spPolygonBatch : NSObject {
 	int _capacity;
 	ccV2F_C4B_T2F* _vertices;
 	int _verticesCount;

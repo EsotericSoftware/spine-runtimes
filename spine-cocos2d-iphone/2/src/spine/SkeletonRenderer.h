@@ -28,39 +28,37 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#define SPINE_SHORT_NAMES
 #import <spine/spine.h>
 #import "cocos2d.h"
 
-@class PolygonBatch;
+@class spPolygonBatch;
 
 /** Draws a skeleton. */
 @interface SkeletonRenderer : CCNodeRGBA<CCBlendProtocol> {
-	Skeleton* _skeleton;
-	Bone* _rootBone;
-	float _timeScale;
+	spSkeleton* _skeleton;
+	spBone* _rootBone;
 	bool _debugSlots;
 	bool _debugBones;
 	bool _premultipliedAlpha;
 	ccBlendFunc _blendFunc;
 
 	bool _ownsSkeletonData;
-	Atlas* _atlas;
-	PolygonBatch* batch;
+	spAtlas* _atlas;
+	spPolygonBatch* batch;
 	float* worldVertices;
 }
 
-+ (id) skeletonWithData:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData;
-+ (id) skeletonWithFile:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale;
++ (id) skeletonWithData:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData;
++ (id) skeletonWithFile:(NSString*)skeletonDataFile atlas:(spAtlas*)atlas scale:(float)scale;
 + (id) skeletonWithFile:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile scale:(float)scale;
 
-- (id) initWithData:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData;
-- (id) initWithFile:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale;
+- (id) initWithData:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData;
+- (id) initWithFile:(NSString*)skeletonDataFile atlas:(spAtlas*)atlas scale:(float)scale;
 - (id) initWithFile:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile scale:(float)scale;
 
-- (CCTexture2D*) getTextureForRegion:(RegionAttachment*)attachment;
-- (CCTexture2D*) getTextureForMesh:(MeshAttachment*)attachment;
-- (CCTexture2D*) getTextureForSkinnedMesh:(SkinnedMeshAttachment*)attachment;
+- (CCTexture2D*) getTextureForRegion:(spRegionAttachment*)attachment;
+- (CCTexture2D*) getTextureForMesh:(spMeshAttachment*)attachment;
+- (CCTexture2D*) getTextureForSkinnedMesh:(spSkinnedMeshAttachment*)attachment;
 
 // --- Convenience methods for common Skeleton_* functions.
 - (void) updateWorldTransform;
@@ -70,10 +68,10 @@
 - (void) setSlotsToSetupPose;
 
 /* Returns 0 if the bone was not found. */
-- (Bone*) findBone:(NSString*)boneName;
+- (spBone*) findBone:(NSString*)boneName;
 
 /* Returns 0 if the slot was not found. */
-- (Slot*) findSlot:(NSString*)slotName;
+- (spSlot*) findSlot:(NSString*)slotName;
 
 /* Sets the skin used to look up attachments not found in the SkeletonData defaultSkin. Attachments from the new skin are
  * attached if the corresponding attachment from the old skin was attached. If there was no old skin, each slot's setup mode
@@ -82,14 +80,13 @@
 - (bool) setSkin:(NSString*)skinName;
 
 /* Returns 0 if the slot or attachment was not found. */
-- (Attachment*) getAttachment:(NSString*)slotName attachmentName:(NSString*)attachmentName;
+- (spAttachment*) getAttachment:(NSString*)slotName attachmentName:(NSString*)attachmentName;
 /* Returns false if the slot or attachment was not found. */
 - (bool) setAttachment:(NSString*)slotName attachmentName:(NSString*)attachmentName;
 
-@property (nonatomic, readonly) Skeleton* skeleton;
-@property (nonatomic) float timeScale;
+@property (nonatomic, readonly) spSkeleton* skeleton;
 @property (nonatomic) bool debugSlots;
 @property (nonatomic) bool debugBones;
-@property (nonatomic) Bone* rootBone;
+@property (nonatomic) spBone* rootBone;
 
 @end

@@ -32,7 +32,7 @@
 #import <spine/spine-cocos2d-iphone.h>
 #import <spine/extension.h>
 
-static void animationCallback (AnimationState* state, int trackIndex, EventType type, Event* event, int loopCount) {
+static void animationCallback (spAnimationState* state, int trackIndex, spEventType type, spEvent* event, int loopCount) {
 	[(SkeletonAnimation*)state->rendererObject onAnimationStateEvent:trackIndex type:type event:event loopCount:loopCount];
 }
 
@@ -41,10 +41,10 @@ void trackEntryCallback (spAnimationState* state, int trackIndex, spEventType ty
 }
 
 typedef struct _TrackEntryListeners {
-	StartListener startListener;
-	EndListener endListener;
-	CompleteListener completeListener;
-	EventListener eventListener;
+	spStartListener startListener;
+	spEndListener endListener;
+	spCompleteListener completeListener;
+	spEventListener eventListener;
 } _TrackEntryListeners;
 
 static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
@@ -76,16 +76,17 @@ void disposeTrackEntry (spTrackEntry* entry) {
 @implementation SkeletonAnimation
 
 @synthesize state = _state;
+@synthesize timeScale = _timeScale;
 @synthesize startListener = _startListener;
 @synthesize endListener = _endListener;
 @synthesize completeListener = _completeListener;
 @synthesize eventListener = _eventListener;
 
-+ (id) skeletonWithData:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
++ (id) skeletonWithData:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
 	return [[[self alloc] initWithData:skeletonData ownsSkeletonData:ownsSkeletonData] autorelease];
 }
 
-+ (id) skeletonWithFile:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale {
++ (id) skeletonWithFile:(NSString*)skeletonDataFile atlas:(spAtlas*)atlas scale:(float)scale {
 	return [[[self alloc] initWithFile:skeletonDataFile atlas:atlas scale:scale] autorelease];
 }
 
@@ -95,7 +96,9 @@ void disposeTrackEntry (spTrackEntry* entry) {
 
 - (void) initialize {
 	_ownsAnimationStateData = true;
-	_state = AnimationState_create(AnimationStateData_create(_skeleton->data));
+	_timeScale = 1;
+
+	_state = spAnimationState_create(spAnimationStateData_create(_skeleton->data));
 	_state->rendererObject = self;
 	_state->listener = animationCallback;
 
@@ -103,7 +106,7 @@ void disposeTrackEntry (spTrackEntry* entry) {
 	stateInternal->disposeTrackEntry = disposeTrackEntry;
 }
 
-- (id) initWithData:(SkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
+- (id) initWithData:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
 	self = [super initWithData:skeletonData ownsSkeletonData:ownsSkeletonData];
 	if (!self) return nil;
 	
@@ -112,7 +115,7 @@ void disposeTrackEntry (spTrackEntry* entry) {
 	return self;
 }
 
-- (id) initWithFile:(NSString*)skeletonDataFile atlas:(Atlas*)atlas scale:(float)scale {
+- (id) initWithFile:(NSString*)skeletonDataFile atlas:(spAtlas*)atlas scale:(float)scale {
 	self = [super initWithFile:skeletonDataFile atlas:atlas scale:scale];
 	if (!self) return nil;
 	
@@ -131,8 +134,8 @@ void disposeTrackEntry (spTrackEntry* entry) {
 }
 
 - (void) dealloc {
-	if (_ownsAnimationStateData) AnimationStateData_dispose(_state->data);
-	AnimationState_dispose(_state);
+	if (_ownsAnimationStateData) spAnimationStateData_dispose(_state->data);
+	spAnimationState_dispose(_state);
 
 	[_startListener release];
 	[_endListener release];
@@ -143,61 +146,60 @@ void disposeTrackEntry (spTrackEntry* entry) {
 }
 
 - (void) update:(ccTime)deltaTime {
-	[super update:deltaTime];
-
 	deltaTime *= _timeScale;
-	AnimationState_update(_state, deltaTime);
-	AnimationState_apply(_state, _skeleton);
-	Skeleton_updateWorldTransform(_skeleton);
+	spSkeleton_update(_skeleton, deltaTime);
+	spAnimationState_update(_state, deltaTime);
+	spAnimationState_apply(_state, _skeleton);
+	spSkeleton_updateWorldTransform(_skeleton);
 }
 
-- (void) setAnimationStateData:(AnimationStateData*)stateData {
+- (void) setAnimationStateData:(spAnimationStateData*)stateData {
 	NSAssert(stateData, @"stateData cannot be null.");
 	
-	if (_ownsAnimationStateData) AnimationStateData_dispose(_state->data);
-	AnimationState_dispose(_state);
+	if (_ownsAnimationStateData) spAnimationStateData_dispose(_state->data);
+	spAnimationState_dispose(_state);
 
 	_ownsAnimationStateData = false;
-	_state = AnimationState_create(stateData);
+	_state = spAnimationState_create(stateData);
 	_state->rendererObject = self;
 	_state->listener = animationCallback;
 }
 
 - (void) setMixFrom:(NSString*)fromAnimation to:(NSString*)toAnimation duration:(float)duration {
-	AnimationStateData_setMixByName(_state->data, [fromAnimation UTF8String], [toAnimation UTF8String], duration);
+	spAnimationStateData_setMixByName(_state->data, [fromAnimation UTF8String], [toAnimation UTF8String], duration);
 }
 
-- (TrackEntry*) setAnimationForTrack:(int)trackIndex name:(NSString*)name loop:(bool)loop {
-	Animation* animation = SkeletonData_findAnimation(_skeleton->data, [name UTF8String]);
+- (spTrackEntry*) setAnimationForTrack:(int)trackIndex name:(NSString*)name loop:(bool)loop {
+	spAnimation* animation = spSkeletonData_findAnimation(_skeleton->data, [name UTF8String]);
 	if (!animation) {
 		CCLOG(@"Spine: Animation not found: %@", name);
 		return 0;
 	}
-	return AnimationState_setAnimation(_state, trackIndex, animation, loop);
+	return spAnimationState_setAnimation(_state, trackIndex, animation, loop);
 }
 
-- (TrackEntry*) addAnimationForTrack:(int)trackIndex name:(NSString*)name loop:(bool)loop afterDelay:(int)delay {
-	Animation* animation = SkeletonData_findAnimation(_skeleton->data, [name UTF8String]);
+- (spTrackEntry*) addAnimationForTrack:(int)trackIndex name:(NSString*)name loop:(bool)loop afterDelay:(int)delay {
+	spAnimation* animation = spSkeletonData_findAnimation(_skeleton->data, [name UTF8String]);
 	if (!animation) {
 		CCLOG(@"Spine: Animation not found: %@", name);
 		return 0;
 	}
-	return AnimationState_addAnimation(_state, trackIndex, animation, loop, delay);
+	return spAnimationState_addAnimation(_state, trackIndex, animation, loop, delay);
 }
 
-- (TrackEntry*) getCurrentForTrack:(int)trackIndex {
-	return AnimationState_getCurrent(_state, trackIndex);
+- (spTrackEntry*) getCurrentForTrack:(int)trackIndex {
+	return spAnimationState_getCurrent(_state, trackIndex);
 }
 
 - (void) clearTracks {
-	AnimationState_clearTracks(_state);
+	spAnimationState_clearTracks(_state);
 }
 
 - (void) clearTrack:(int)trackIndex {
-	AnimationState_clearTrack(_state, trackIndex);
+	spAnimationState_clearTrack(_state, trackIndex);
 }
 
-- (void) onAnimationStateEvent:(int)trackIndex type:(EventType)type event:(Event*)event loopCount:(int)loopCount {
+- (void) onAnimationStateEvent:(int)trackIndex type:(spEventType)type event:(spEvent*)event loopCount:(int)loopCount {
 	switch (type) {
 	case SP_ANIMATION_START:
 		if (_startListener) _startListener(trackIndex);
@@ -214,7 +216,7 @@ void disposeTrackEntry (spTrackEntry* entry) {
 	}
 }
 
-- (void) onTrackEntryEvent:(int)trackIndex type:(EventType)type event:(Event*)event loopCount:(int)loopCount {
+- (void) onTrackEntryEvent:(int)trackIndex type:(spEventType)type event:(spEvent*)event loopCount:(int)loopCount {
 	spTrackEntry* entry = spAnimationState_getCurrent(_state, trackIndex);
 	if (!entry->rendererObject) return;
 	_TrackEntryListeners* listeners = (_TrackEntryListeners*)entry->rendererObject;
@@ -234,19 +236,19 @@ void disposeTrackEntry (spTrackEntry* entry) {
 	}
 }
 
-- (void) setListenerForEntry:(spTrackEntry*)entry onStart:(StartListener)listener {
+- (void) setListenerForEntry:(spTrackEntry*)entry onStart:(spStartListener)listener {
 	getListeners(entry)->startListener = [listener copy];
 }
 
-- (void) setListenerForEntry:(spTrackEntry*)entry onEnd:(EndListener)listener {
+- (void) setListenerForEntry:(spTrackEntry*)entry onEnd:(spEndListener)listener {
 	getListeners(entry)->endListener = [listener copy];
 }
 
-- (void) setListenerForEntry:(spTrackEntry*)entry onComplete:(CompleteListener)listener {
+- (void) setListenerForEntry:(spTrackEntry*)entry onComplete:(spCompleteListener)listener {
 	getListeners(entry)->completeListener = [listener copy];
 }
 
-- (void) setListenerForEntry:(spTrackEntry*)entry onEvent:(EventListener)listener {
+- (void) setListenerForEntry:(spTrackEntry*)entry onEvent:(spEventListener)listener {
 	getListeners(entry)->eventListener = [listener copy];
 }
 
