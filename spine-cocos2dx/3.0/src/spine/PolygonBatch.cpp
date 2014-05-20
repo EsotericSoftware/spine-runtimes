@@ -93,6 +93,7 @@ void PolygonBatch::add (const Texture2D* addTexture,
 void PolygonBatch::flush () {
 	if (!verticesCount) return;
 
+	GL::bindVAO(0);
 	GL::bindTexture2D(texture->getName());
 	glEnableVertexAttribArray(GLProgram::VERTEX_ATTRIB_POSITION);
 	glEnableVertexAttribArray(GLProgram::VERTEX_ATTRIB_COLOR);
