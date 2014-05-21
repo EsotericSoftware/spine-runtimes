@@ -36,8 +36,8 @@ namespace Spine {
 		internal Bone bone;
 		internal Skeleton skeleton;
 		internal float r, g, b, a;
-		internal float attachmentTime;
 		internal Attachment attachment;
+		internal float attachmentTime;
 		internal float[] attachmentVertices = new float[0];
 		internal int attachmentVerticesCount;
 
@@ -89,7 +89,6 @@ namespace Spine {
 			b = data.b;
 			a = data.a;
 			Attachment = data.attachmentName == null ? null : skeleton.GetAttachment(slotIndex, data.attachmentName);
-			attachmentVerticesCount = 0;
 		}
 
 		public void SetToSetupPose () {
