@@ -34,12 +34,12 @@ import spine.Skeleton;
 import spine.Slot;
 
 public class DrawOrderTimeline implements Timeline {
-	public var frames:Vector.<Number> = new Vector.<Number>(); // time, ...
-	public var drawOrders:Vector.<Vector.<int>> = new Vector.<Vector.<int>>();
+	public var frames:Vector.<Number>; // time, ...
+	public var drawOrders:Vector.<Vector.<int>>;
 
 	public function DrawOrderTimeline (frameCount:int) {
-		frames.length = frameCount;
-		drawOrders.length = frameCount;
+		frames = new Vector.<Number>(frameCount, true);
+		drawOrders = new Vector.<Vector.<int>>(frameCount, true);
 	}
 
 	public function get frameCount () : int {

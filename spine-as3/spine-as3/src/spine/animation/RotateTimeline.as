@@ -38,11 +38,11 @@ public class RotateTimeline extends CurveTimeline {
 	static private const FRAME_VALUE:int = 1;
 
 	public var boneIndex:int;
-	public var frames:Vector.<Number> = new Vector.<Number>(); // time, value, ...
+	public var frames:Vector.<Number>; // time, value, ...
 
 	public function RotateTimeline (frameCount:int) {
 		super(frameCount);
-		frames.length = frameCount * 2;
+		frames = new Vector.<Number>(frameCount * 2, true);
 	}
 
 	/** Sets the time and angle of the specified keyframe. */

@@ -54,11 +54,11 @@ public class AnimationState {
 			var current:TrackEntry = _tracks[i];
 			if (!current) continue;
 			
-			var trackDelta:Number = delta * current.timeScale;		
-			current.time += trackDelta;
+			current.time += delta * current.timeScale;
 			if (current.previous) {
-				current.previous.time += trackDelta;
-				current.mixTime += trackDelta;
+				var previousDelta:Number = delta * current.previous.timeScale;
+				current.previous.time += previousDelta;
+				current.mixTime += previousDelta;
 			}
 
 			var next:TrackEntry = current.next;

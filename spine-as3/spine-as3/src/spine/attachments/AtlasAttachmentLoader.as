@@ -41,27 +41,65 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 			throw new ArgumentError("atlas cannot be null.");
 		this.atlas = atlas;
 	}
+	
+	public function newRegionAttachment (skin:Skin, name:String, path:String) : RegionAttachment {
+		var region:AtlasRegion = atlas.findRegion(name);
+		if (region == null)
+			throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
+		var attachment:RegionAttachment = new RegionAttachment(name);
+		attachment.rendererObject = region;
+		attachment.setUVs(region.u, region.v, region.u2, region.v2, region.rotate);
+		attachment.regionOffsetX = region.offsetX;
+		attachment.regionOffsetY = region.offsetY;
+		attachment.regionWidth = region.width;
+		attachment.regionHeight = region.height;
+		attachment.regionOriginalWidth = region.originalWidth;
+		attachment.regionOriginalHeight = region.originalHeight;
+		return attachment;
+	}
+	
+	public function newMeshAttachment (skin:Skin, name:String, path:String) : MeshAttachment {
+		var region:AtlasRegion = atlas.findRegion(name);
+		if (region == null)
+			throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
+		var attachment:MeshAttachment = new MeshAttachment(name);
+		attachment.rendererObject = region;
+		attachment.regionU = region.u;
+		attachment.regionV = region.v;
+		attachment.regionU2 = region.u2;
+		attachment.regionV2 = region.v2;
+		attachment.regionRotate = region.rotate;
+		attachment.regionOffsetX = region.offsetX;
+		attachment.regionOffsetY = region.offsetY;
+		attachment.regionWidth = region.width;
+		attachment.regionHeight = region.height;
+		attachment.regionOriginalWidth = region.originalWidth;
+		attachment.regionOriginalHeight = region.originalHeight;
+		return attachment;
+	}
+	
+	public function newSkinnedMeshAttachment (skin:Skin, name:String, path:String) : SkinnedMeshAttachment {
+		var region:AtlasRegion = atlas.findRegion(name);
+		if (region == null)
+			throw new Error("Region not found in atlas: " + path + " (skinned mesh attachment: " + name + ")");
+		var attachment:SkinnedMeshAttachment = new SkinnedMeshAttachment(name);
+		attachment.rendererObject = region;
+		attachment.regionU = region.u;
+		attachment.regionV = region.v;
+		attachment.regionU2 = region.u2;
+		attachment.regionV2 = region.v2;
+		attachment.regionRotate = region.rotate;
+		attachment.regionOffsetX = region.offsetX;
+		attachment.regionOffsetY = region.offsetY;
+		attachment.regionWidth = region.width;
+		attachment.regionHeight = region.height;
+		attachment.regionOriginalWidth = region.originalWidth;
+		attachment.regionOriginalHeight = region.originalHeight;
+		return attachment;
+	}
 
-	public function newAttachment (skin:Skin, type:AttachmentType, name:String) : Attachment {
-		switch (type) {
-		case AttachmentType.region:
-			var region:AtlasRegion  = atlas.findRegion(name);
-			if (region == null)
-				throw new Error("Region not found in atlas: " + name + " (" + type + ")");
-			var attachment:RegionAttachment = new RegionAttachment(name);
-			attachment.rendererObject = region;
-			attachment.setUVs(region.u, region.v, region.u2, region.v2, region.rotate);
-			attachment.regionOffsetX = region.offsetX;
-			attachment.regionOffsetY = region.offsetY;
-			attachment.regionWidth = region.width;
-			attachment.regionHeight = region.height;
-			attachment.regionOriginalWidth = region.originalWidth;
-			attachment.regionOriginalHeight = region.originalHeight;
-			return attachment;
-		case AttachmentType.boundingbox:
-			return new BoundingBoxAttachment(name);
-		}
-		throw new Error("Unknown attachment type: " + type);
+	public function newBoundingBoxAttachment (skin:Skin, name:String) : BoundingBoxAttachment {
+		return new BoundingBoxAttachment(name);
 	}
 }
 

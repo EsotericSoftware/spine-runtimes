@@ -39,11 +39,11 @@ public class TranslateTimeline extends CurveTimeline {
 	static internal const FRAME_Y:int = 2;
 
 	public var boneIndex:int;
-	public var frames:Vector.<Number> = new Vector.<Number>(); // time, value, value, ...
+	public var frames:Vector.<Number>; // time, value, value, ...
 
 	public function TranslateTimeline (frameCount:int) {
 		super(frameCount);
-		frames.length = frameCount * 3;
+		frames = new Vector.<Number>(frameCount * 3, true);
 	}
 
 	/** Sets the time and value of the specified keyframe. */

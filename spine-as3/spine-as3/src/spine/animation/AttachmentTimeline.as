@@ -34,12 +34,12 @@ import spine.Skeleton;
 
 public class AttachmentTimeline implements Timeline {
 	public var slotIndex:int;
-	public var frames:Vector.<Number> = new Vector.<Number>(); // time, ...
-	public var attachmentNames:Vector.<String> = new Vector.<String>();
+	public var frames:Vector.<Number>; // time, ...
+	public var attachmentNames:Vector.<String>;
 
 	public function AttachmentTimeline (frameCount:int) {
-		frames.length = frameCount;
-		attachmentNames.length = frameCount;
+		frames = new Vector.<Number>(frameCount, true);
+		attachmentNames = new Vector.<String>(frameCount, true);
 	}
 
 	public function get frameCount () : int {
