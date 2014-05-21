@@ -1157,8 +1157,8 @@ spine.SkeletonJson.prototype = {
 			boneData.x = (boneMap["x"] || 0) * this.scale;
 			boneData.y = (boneMap["y"] || 0) * this.scale;
 			boneData.rotation = (boneMap["rotation"] || 0);
-			boneData.scaleX = boneMap["scaleX"] || 1;
-			boneData.scaleY = boneMap["scaleY"] || 1;
+			boneData.scaleX = boneMap.hasOwnProperty("scaleX") ? boneMap["scaleX"] : 1;
+			boneData.scaleY = boneMap.hasOwnProperty("scaleY") ? boneMap["scaleY"] : 1;
 			boneData.inheritScale = !boneMap["inheritScale"] || boneMap["inheritScale"] == "true";
 			boneData.inheritRotation = !boneMap["inheritRotation"] || boneMap["inheritRotation"] == "true";
 			skeletonData.bones.push(boneData);
@@ -1236,11 +1236,11 @@ spine.SkeletonJson.prototype = {
 		if (type == spine.AttachmentType.region) {
 			attachment.x = (map["x"] || 0) * this.scale;
 			attachment.y = (map["y"] || 0) * this.scale;
-			attachment.scaleX = map["scaleX"] || 1;
-			attachment.scaleY = map["scaleY"] || 1;
+			attachment.scaleX = map.hasOwnProperty("scaleX") ? map["scaleX"] : 1;
+			attachment.scaleY = map.hasOwnProperty("scaleY") ? map["scaleY"] : 1;
 			attachment.rotation = map["rotation"] || 0;
-			attachment.width = (map["width"] || 32) * this.scale;
-			attachment.height = (map["height"] || 32) * this.scale;
+			attachment.width = (map["width"] || 0) * this.scale;
+			attachment.height = (map["height"] || 0) * this.scale;
 			attachment.updateOffset();
 		} else if (type == spine.AttachmentType.boundingbox) {
 			var vertices = map["vertices"];
