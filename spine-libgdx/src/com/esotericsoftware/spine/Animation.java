@@ -419,8 +419,6 @@ public class Animation {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			Color color = skeleton.slots.get(slotIndex).color;
-
 			float r, g, b, a;
 			if (time >= frames[frames.length - 5]) {
 				// Time is after last frame.
@@ -445,6 +443,7 @@ public class Animation {
 				b = prevFrameB + (frames[frameIndex + FRAME_B] - prevFrameB) * percent;
 				a = prevFrameA + (frames[frameIndex + FRAME_A] - prevFrameA) * percent;
 			}
+			Color color = skeleton.slots.get(slotIndex).color;
 			if (alpha < 1)
 				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
 			else
