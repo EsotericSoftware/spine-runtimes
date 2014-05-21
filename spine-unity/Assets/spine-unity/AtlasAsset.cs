@@ -34,72 +34,93 @@ using UnityEngine;
 using Spine;
 
 /// <summary>Loads and stores a Spine atlas and list of materials.</summary>
-public class AtlasAsset : ScriptableObject {
-	public TextAsset atlasFile;
-	public Material[] materials;
-	private Atlas atlas;
+public class AtlasAsset : ScriptableObject
+{
+    public TextAsset atlasFile;
+    public Material[] materials;
+    private Atlas atlas;
 
-	public void Clear () {
-		atlas = null;
-	}
+    public void Clear ()
+    {
+        atlas = null;
+    }
 
-	/// <returns>The atlas or null if it could not be loaded.</returns>
-	public Atlas GetAtlas () {
-		if (atlasFile == null) {
-			Debug.LogError("Atlas file not set for atlas asset: " + name, this);
-			Clear();
-			return null;
-		}
+    /// <returns>The atlas or null if it could not be loaded.</returns>
+    public Atlas GetAtlas ()
+    {
+        if (atlasFile == null)
+        {
+            Debug.LogError ("Atlas file not set for atlas asset: " + name, this);
+            Clear ();
+            return null;
+        }
 
-		if (materials == null || materials.Length == 0) {
-			Debug.LogError("Materials not set for atlas asset: " + name, this);
-			Clear();
-			return null;
-		}
+        if (materials == null || materials.Length == 0)
+        {
+            Debug.LogError ("Materials not set for atlas asset: " + name, this);
+            Clear ();
+            return null;
+        }
 
-		if (atlas != null)
-			return atlas;
+        if (atlas != null)
+        {
+            return atlas;
+        }
 
-		try {
-			atlas = new Atlas(new StringReader(atlasFile.text), "", new MaterialsTextureLoader(this));
-			atlas.FlipV();
-			return atlas;
-		} catch (Exception ex) {
-			Debug.LogError("Error reading atlas file for atlas asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, this);
-			return null;
-		}
-	}
+        try
+        {
+            atlas = new Atlas (new StringReader (atlasFile.text), "", new MaterialsTextureLoader (this));
+            atlas.FlipV ();
+            return atlas;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError ("Error reading atlas file for atlas asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, this);
+            return null;
+        }
+    }
 }
 
-public class MaterialsTextureLoader : TextureLoader {
-	AtlasAsset atlasAsset;
-	
-	public MaterialsTextureLoader (AtlasAsset atlasAsset) {
-		this.atlasAsset = atlasAsset;
-	}
-	
-	public void Load (AtlasPage page, String path) {
-		String name = Path.GetFileNameWithoutExtension(path);
-		Material material = null;
-		foreach (Material other in atlasAsset.materials) {
-			if (other.mainTexture == null) {
-				Debug.LogError("Material is missing texture: " + other.name, other);
-				return;
-			}
-			if (other.mainTexture.name == name) {
-				material = other;
-				break;
-			}
-		}
-		if (material == null) {
-			Debug.LogError("Material with texture name \"" + name + "\" not found for atlas asset: " + atlasAsset.name, atlasAsset);
-			return;
-		}
-		page.rendererObject = material;
-		page.width = material.mainTexture.width;
-		page.height = material.mainTexture.height;
-	}
+public class MaterialsTextureLoader : TextureLoader
+{
+    private AtlasAsset atlasAsset;
 
-	public void Unload (object texture) {
-	}
+    public MaterialsTextureLoader (AtlasAsset atlasAsset)
+    {
+        this.atlasAsset = atlasAsset;
+    }
+
+    public void Load (AtlasPage page, String path)
+    {
+        String name = Path.GetFileNameWithoutExtension (path);
+        Material material = null;
+
+        foreach (Material other in atlasAsset.materials)
+        {
+            if (other.mainTexture == null)
+            {
+                Debug.LogError ("Material is missing texture: " + other.name, other);
+                return;
+            }
+            if (other.mainTexture.name == name)
+            {
+                material = other;
+                break;
+            }
+        }
+
+        if (material == null)
+        {
+            Debug.LogError ("Material with texture name \"" + name + "\" not found for atlas asset: " + atlasAsset.name, atlasAsset);
+            return;
+        }
+
+        page.rendererObject = material;
+        page.width = material.mainTexture.width;
+        page.height = material.mainTexture.height;
+    }
+
+    public void Unload (object texture)
+    {
+    }
 }
