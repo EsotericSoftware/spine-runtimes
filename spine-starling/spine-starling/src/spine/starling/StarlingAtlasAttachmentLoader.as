@@ -29,16 +29,18 @@
  *****************************************************************************/
 
 package spine.starling {
+import flash.geom.Matrix;
 import flash.geom.Rectangle;
 
 import spine.Bone;
 import spine.Skin;
-import spine.attachments.Attachment;
 import spine.attachments.AttachmentLoader;
-import spine.attachments.AttachmentType;
 import spine.attachments.BoundingBoxAttachment;
+import spine.attachments.MeshAttachment;
 import spine.attachments.RegionAttachment;
+import spine.attachments.SkinnedMeshAttachment;
 
+import starling.textures.SubTexture;
 import starling.textures.Texture;
 import starling.textures.TextureAtlas;
 
@@ -51,26 +53,84 @@ public class StarlingAtlasAttachmentLoader implements AttachmentLoader {
 		Bone.yDown = true;
 	}
 
-	public function newAttachment (skin:Skin, type:AttachmentType, name:String) : Attachment {
-		switch (type) {
-		case AttachmentType.region:
-			var regionAttachment:RegionAttachment = new RegionAttachment(name);
-			var texture:Texture = atlas.getTexture(name);
-			var frame:Rectangle = texture.frame;
-			texture = Texture.fromTexture(texture); // Discard frame.
-			regionAttachment.rendererObject = new SkeletonImage(texture);
-			regionAttachment.regionOffsetX = frame ? -frame.x : 0;
-			regionAttachment.regionOffsetY = frame ? -frame.y : 0;
-			regionAttachment.regionWidth = texture.width;
-			regionAttachment.regionHeight = texture.height;
-			regionAttachment.regionOriginalWidth = frame ? frame.width : texture.width;
-			regionAttachment.regionOriginalHeight = frame ? frame.height : texture.height;
-			return regionAttachment;
-		case AttachmentType.boundingbox:
-			return new BoundingBoxAttachment(name);
+	public function newRegionAttachment (skin:Skin, name:String, path:String) : RegionAttachment {
+		var texture:Texture = atlas.getTexture(path);
+		if (texture == null)
+			throw new Error("Region not found in Starling atlas: " + path + " (region attachment: " + name + ")");
+		var attachment:RegionAttachment = new RegionAttachment(name);
+		attachment.rendererObject = new SkeletonImage(Texture.fromTexture(texture)); // Discard frame.
+		var frame:Rectangle = texture.frame;
+		attachment.regionOffsetX = frame ? -frame.x : 0;
+		attachment.regionOffsetY = frame ? -frame.y : 0;
+		attachment.regionWidth = texture.width;
+		attachment.regionHeight = texture.height;
+		attachment.regionOriginalWidth = frame ? frame.width : texture.width;
+		attachment.regionOriginalHeight = frame ? frame.height : texture.height;
+		return attachment;
+	}
+	
+	public function newMeshAttachment (skin:Skin, name:String, path:String) : MeshAttachment {
+		var texture:Texture = atlas.getTexture(path);
+		if (texture == null)
+			throw new Error("Region not found in Starling atlas: " + path + " (region attachment: " + name + ")");
+		var attachment:MeshAttachment = new MeshAttachment(name);
+		attachment.rendererObject = new SkeletonImage(Texture.fromTexture(texture)); // Discard frame.
+		var subTexture:SubTexture = texture as SubTexture;
+		if (subTexture) {
+			var matrix:Matrix = subTexture.transformationMatrix;
+			var root:Texture = subTexture.root;
+			attachment.regionU = matrix.tx / root.width;
+			attachment.regionV = matrix.ty / root.height;
+			attachment.regionU2 = (matrix.tx + subTexture.width) / root.width;
+			attachment.regionV2 = (matrix.tx + subTexture.height) / root.height;
+		} else {
+			attachment.regionU = 0;
+			attachment.regionV = 1;
+			attachment.regionU2 = 1;
+			attachment.regionV2 = 0;
 		}
+		var frame:Rectangle = texture.frame;
+		attachment.regionOffsetX = frame ? -frame.x : 0;
+		attachment.regionOffsetY = frame ? -frame.y : 0;
+		attachment.regionWidth = texture.width;
+		attachment.regionHeight = texture.height;
+		attachment.regionOriginalWidth = frame ? frame.width : texture.width;
+		attachment.regionOriginalHeight = frame ? frame.height : texture.height;
+		return attachment;
+	}
 
-		throw new Error("Unknown attachment type: " + type);
+	public function newSkinnedMeshAttachment (skin:Skin, name:String, path:String) : SkinnedMeshAttachment {
+		var texture:Texture = atlas.getTexture(path);
+		if (texture == null)
+			throw new Error("Region not found in Starling atlas: " + path + " (region attachment: " + name + ")");
+		var attachment:SkinnedMeshAttachment = new SkinnedMeshAttachment(name);
+		attachment.rendererObject = new SkeletonImage(Texture.fromTexture(texture)); // Discard frame.
+		var subTexture:SubTexture = texture as SubTexture;
+		if (subTexture) {
+			var matrix:Matrix = subTexture.transformationMatrix;
+			var root:Texture = subTexture.root;
+			attachment.regionU = matrix.tx / root.width;
+			attachment.regionV = matrix.ty / root.height;
+			attachment.regionU2 = (matrix.tx + subTexture.width) / root.width;
+			attachment.regionV2 = (matrix.tx + subTexture.height) / root.height;
+		} else {
+			attachment.regionU = 0;
+			attachment.regionV = 1;
+			attachment.regionU2 = 1;
+			attachment.regionV2 = 0;
+		}
+		var frame:Rectangle = texture.frame;
+		attachment.regionOffsetX = frame ? -frame.x : 0;
+		attachment.regionOffsetY = frame ? -frame.y : 0;
+		attachment.regionWidth = texture.width;
+		attachment.regionHeight = texture.height;
+		attachment.regionOriginalWidth = frame ? frame.width : texture.width;
+		attachment.regionOriginalHeight = frame ? frame.height : texture.height;
+		return attachment;
+	}
+
+	public function newBoundingBoxAttachment (skin:Skin, name:String) : BoundingBoxAttachment {
+		return new BoundingBoxAttachment(name);
 	}
 }
 
