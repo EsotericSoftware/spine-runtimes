@@ -57,11 +57,12 @@ public class Main extends Sprite {
 	public function Main () {
 		var atlas:Atlas = new Atlas(new SpineboyAtlas(), new FlashTextureLoader(new SpineboyAtlasTexture()));
 		var json:SkeletonJson = new SkeletonJson(new AtlasAttachmentLoader(atlas));
+		json.scale = 0.6;
 		var skeletonData:SkeletonData = json.readSkeletonData(new SpineboyJson());
 
 		var stateData:AnimationStateData = new AnimationStateData(skeletonData);
 		stateData.setMixByName("walk", "jump", 0.2);
-		stateData.setMixByName("jump", "walk", 0.4);
+		stateData.setMixByName("jump", "run", 0.4);
 		stateData.setMixByName("jump", "jump", 0.2);
 
 		skeleton = new SkeletonAnimation(skeletonData, stateData);
@@ -82,12 +83,12 @@ public class Main extends Sprite {
 				+ event.data.name + ": " + event.intValue + ", " + event.floatValue + ", " + event.stringValue);
 		});
 		
-		if (true) {
-			skeleton.state.setAnimationByName(0, "drawOrder", true);
+		if (false) {
+			skeleton.state.setAnimationByName(0, "test", true);
 		} else {
 			skeleton.state.setAnimationByName(0, "walk", true);
 			skeleton.state.addAnimationByName(0, "jump", false, 3);
-			skeleton.state.addAnimationByName(0, "walk", true, 0);
+			skeleton.state.addAnimationByName(0, "run", true, 0);
 		}
 
 		addChild(skeleton);
