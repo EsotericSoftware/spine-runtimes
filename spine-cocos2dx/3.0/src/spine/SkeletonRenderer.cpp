@@ -147,7 +147,7 @@ void SkeletonRenderer::drawSkeleton (const kmMat4& transform, bool transformUpda
 	skeleton->r = nodeColor.r / (float)255;
 	skeleton->g = nodeColor.g / (float)255;
 	skeleton->b = nodeColor.b / (float)255;
-	skeleton->a = getOpacity() / (float)255;
+	skeleton->a = getDisplayedOpacity() / (float)255;
 
 	int additive = -1;
 	Color4B color;
