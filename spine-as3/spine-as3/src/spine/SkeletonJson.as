@@ -176,27 +176,27 @@ public class SkeletonJson {
 		var color:String, vertices:Vector.<Number>;
 		switch (type) {
 		case AttachmentType.region:
-			var regionAttachment:RegionAttachment = attachmentLoader.newRegionAttachment(skin, name, path);
-			if (!regionAttachment) return null;
-			regionAttachment.path = path;
-			regionAttachment.x = (map["x"] || 0) * scale;
-			regionAttachment.y = (map["y"] || 0) * scale;
-			regionAttachment.scaleX = map.hasOwnProperty("scaleX") ? map["scaleX"] : 1;
-			regionAttachment.scaleY = map.hasOwnProperty("scaleY") ? map["scaleY"] : 1;
-			regionAttachment.rotation = map["rotation"] || 0;
-			regionAttachment.width = (map["width"] || 0) * scale;
-			regionAttachment.height = (map["height"] || 0) * scale;
+			var region:RegionAttachment = attachmentLoader.newRegionAttachment(skin, name, path);
+			if (!region) return null;
+			region.path = path;
+			region.x = (map["x"] || 0) * scale;
+			region.y = (map["y"] || 0) * scale;
+			region.scaleX = map.hasOwnProperty("scaleX") ? map["scaleX"] : 1;
+			region.scaleY = map.hasOwnProperty("scaleY") ? map["scaleY"] : 1;
+			region.rotation = map["rotation"] || 0;
+			region.width = (map["width"] || 0) * scale;
+			region.height = (map["height"] || 0) * scale;
 			
 			color = map["color"];
 			if (color) {
-				regionAttachment.r = toColor(color, 0);
-				regionAttachment.g = toColor(color, 1);
-				regionAttachment.b = toColor(color, 2);
-				regionAttachment.a = toColor(color, 3);
+				region.r = toColor(color, 0);
+				region.g = toColor(color, 1);
+				region.b = toColor(color, 2);
+				region.a = toColor(color, 3);
 			}
 			
-			regionAttachment.updateOffset();
-			return regionAttachment;
+			region.updateOffset();
+			return region;
 
 		case AttachmentType.mesh:
 			var mesh:MeshAttachment = attachmentLoader.newMeshAttachment(skin, name, path);
@@ -205,7 +205,7 @@ public class SkeletonJson {
 			mesh.vertices = getFloatArray(map, "vertices", scale);
 			mesh.triangles = getIntArray(map, "triangles");
 			mesh.regionUVs = getFloatArray(map, "uvs", 1);
-			mesh.UpdateUVs();
+			mesh.updateUVs();
 
 			color = map["color"];
 			if (color) {
@@ -216,15 +216,15 @@ public class SkeletonJson {
 			}
 
 			mesh.hullLength = (map["hull"] || 0) * 2;
-			if (map["edges"]) mesh.Edges = getIntArray(map, "edges");
+			if (map["edges"]) mesh.edges = getIntArray(map, "edges");
 			mesh.width = (map["width"] || 0) * scale;
 			mesh.height = (map["height"] || 0) * scale;
 			return mesh;
 		case AttachmentType.skinnedmesh:
 			var skinnedMesh:SkinnedMeshAttachment = attachmentLoader.newSkinnedMeshAttachment(skin, name, path);
 			if (!skinnedMesh) return null;
-			
-			skinnedMesh.Path = path;
+			skinnedMesh.path = path;
+
 			var uvs:Vector.<Number> = getFloatArray(map, "uvs", 1);
 			vertices = getFloatArray(map, "vertices", 1);
 			var weights:Vector.<Number> = new Vector.<Number>();
@@ -255,7 +255,7 @@ public class SkeletonJson {
 			}
 			
 			skinnedMesh.hullLength = (map["hull"] || 0) * 2;
-			if (map["edges"]) skinnedMesh.Edges = getIntArray(map, "edges");
+			if (map["edges"]) skinnedMesh.edges = getIntArray(map, "edges");
 			skinnedMesh.width = (map["width"] || 0) * scale;
 			skinnedMesh.height = (map["height"] || 0) * scale;
 			return skinnedMesh;
@@ -382,8 +382,8 @@ public class SkeletonJson {
 					if (!attachment) throw new Error("FFD attachment not found: " + meshName);
 					ffdTimeline.slotIndex = slotIndex;
 					ffdTimeline.attachment = attachment;
-					
-					var vertexCount:int ;
+
+					var vertexCount:int;
 					if (attachment is MeshAttachment)
 						vertexCount = (attachment as MeshAttachment).vertices.length;
 					else
@@ -501,7 +501,7 @@ public class SkeletonJson {
 
 	static private function getFloatArray (map:Object, name:String, scale:Number) : Vector.<Number> {
 		var list:Array = map[name];
-		var values:Vector.<Number> = new Vector.<Number>(list.Count, true);
+		var values:Vector.<Number> = new Vector.<Number>(list.length, true);
 		var i:int = 0, n:int = list.length;
 		if (scale == 1) {
 			for (; i < n; i++)
@@ -515,7 +515,7 @@ public class SkeletonJson {
 	
 	static private function getIntArray (map:Object, name:String) : Vector.<int> {
 		var list:Array = map[name];
-		var values:Vector.<int> = new Vector.<int>(list.Count, true);
+		var values:Vector.<int> = new Vector.<int>(list.length, true);
 		for (var i:int = 0, n:int = list.length; i < n; i++)
 			values[i] = int(list[i]);
 		return values;

@@ -74,7 +74,7 @@ public class FfdTimeline extends CurveTimeline {
 
 		var i:int;
 		if (time >= frames[frames.length - 1]) { // Time is after last frame.
-			var lastVertices:Vector.<Number> = frameVertices[frames.length - 1];
+			var lastVertices:Vector.<Number> = frameVertices[int(frames.length - 1)];
 			if (alpha < 1) {
 				for (i = 0; i < vertexCount; i++)
 					vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
@@ -88,10 +88,10 @@ public class FfdTimeline extends CurveTimeline {
 		// Interpolate between the previous frame and the current frame.
 		var frameIndex:int = Animation.binarySearch(frames, time, 1);
 		var frameTime:Number = frames[frameIndex];
-		var percent:Number = 1 - (time - frameTime) / (frames[frameIndex - 1] - frameTime);
+		var percent:Number = 1 - (time - frameTime) / (frames[int(frameIndex - 1)] - frameTime);
 		percent = getCurvePercent(frameIndex - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-		var prevVertices:Vector.<Number> = frameVertices[frameIndex - 1];
+		var prevVertices:Vector.<Number> = frameVertices[int(frameIndex - 1)];
 		var nextVertices:Vector.<Number> = frameVertices[frameIndex];
 
 		var prev:Number;

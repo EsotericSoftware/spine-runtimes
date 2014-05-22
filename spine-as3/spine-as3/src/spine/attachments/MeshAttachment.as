@@ -66,19 +66,19 @@ public dynamic class MeshAttachment extends Attachment {
 		super(name);
 	}
 
-	public function UpdateUVs () : void {
+	public function updateUVs () : void {
 		var width:Number = regionU2 - regionU, height:Number = regionV2 - regionV;
-		if (!uvs || uvs.length != regionUVs.length) uvs = new Vector.<Number>(regionUVs.length, true);
 		var i:int, n:int = uvs.length;
+		if (!uvs || uvs.length != n) uvs = new Vector.<Number>(n, true);
 		if (regionRotate) {
 			for (i = 0; i < n; i += 2) {
-				uvs[i] = regionU + regionUVs[i + 1] * width;
-				uvs[i + 1] = regionV + height - regionUVs[i] * height;
+				uvs[i] = regionU + regionUVs[int(i + 1)] * width;
+				uvs[int(i + 1)] = regionV + height - regionUVs[i] * height;
 			}
 		} else {
 			for (i = 0; i < n; i += 2) {
 				uvs[i] = regionU + regionUVs[i] * width;
-				uvs[i + 1] = regionV + regionUVs[i + 1] * height;
+				uvs[int(i + 1)] = regionV + regionUVs[int(i + 1)] * height;
 			}
 		}
 	}
@@ -94,11 +94,11 @@ public dynamic class MeshAttachment extends Attachment {
 		var vertices:Vector.<Number> = this.vertices;
 		var verticesCount:int = vertices.length;
 		if (slot.attachmentVertices.length == verticesCount) vertices = slot.attachmentVertices;
-		for (var i:int = 0; i < verticesCount; i += 2) {
+		for (var i:int = 0, ii:int = 0; i < verticesCount; i += 2, ii += 2) {
 			var vx:Number = vertices[i];
-			var vy:Number = vertices[i + 1];
+			var vy:Number = vertices[ii];
 			worldVertices[i] = vx * m00 + vy * m01 + x;
-			worldVertices[i + 1] = vx * m10 + vy * m11 + y;
+			worldVertices[ii] = vx * m10 + vy * m11 + y;
 		}
 	}
 }

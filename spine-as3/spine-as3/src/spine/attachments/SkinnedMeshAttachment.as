@@ -67,19 +67,19 @@ public dynamic class SkinnedMeshAttachment extends Attachment {
 		super(name);
 	}
 
-	public function UpdateUVs () : void {
+	public function updateUVs () : void {
 		var width:Number = regionU2 - regionU, height:Number = regionV2 - regionV;
-		if (!uvs || uvs.length != regionUVs.length) uvs = new Vector.<Number>(regionUVs.length, true);
 		var i:int, n:int = uvs.length;
+		if (!uvs || uvs.length != n) uvs = new Vector.<Number>(n, true);
 		if (regionRotate) {
 			for (i = 0; i < n; i += 2) {
-				uvs[i] = regionU + regionUVs[i + 1] * width;
-				uvs[i + 1] = regionV + height - regionUVs[i] * height;
+				uvs[i] = regionU + regionUVs[int(i + 1)] * width;
+				uvs[int(i + 1)] = regionV + height - regionUVs[i] * height;
 			}
 		} else {
 			for (i = 0; i < n; i += 2) {
 				uvs[i] = regionU + regionUVs[i] * width;
-				uvs[i + 1] = regionV + regionUVs[i + 1] * height;
+				uvs[int(i + 1)] = regionV + regionUVs[int(i + 1)] * height;
 			}
 		}
 	}
@@ -99,13 +99,13 @@ public dynamic class SkinnedMeshAttachment extends Attachment {
 				for (; v < nn; v++, b += 3) {
 					bone = skeletonBones[bones[v]];
 					vx = weights[b];
-					vy = weights[b + 1];
-					weight = weights[b + 2];
+					vy = weights[int(b + 1)];
+					weight = weights[int(b + 2)];
 					wx += (vx * bone.m00 + vy * bone.m01 + bone.worldX) * weight;
 					wy += (vx * bone.m10 + vy * bone.m11 + bone.worldY) * weight;
 				}
 				worldVertices[w] = wx + x;
-				worldVertices[w + 1] = wy + y;
+				worldVertices[int(w + 1)] = wy + y;
 			}
 		} else {
 			var ffd:Vector.<Number> = slot.attachmentVertices;
@@ -116,13 +116,13 @@ public dynamic class SkinnedMeshAttachment extends Attachment {
 				for (; v < nn; v++, b += 3, f += 2) {
 					bone = skeletonBones[bones[v]];
 					vx = weights[b] + ffd[f];
-					vy = weights[b + 1] + ffd[f + 1];
-					weight = weights[b + 2];
+					vy = weights[int(b + 1)] + ffd[int(f + 1)];
+					weight = weights[int(b + 2)];
 					wx += (vx * bone.m00 + vy * bone.m01 + bone.worldX) * weight;
 					wy += (vx * bone.m10 + vy * bone.m11 + bone.worldY) * weight;
 				}
 				worldVertices[w] = wx + x;
-				worldVertices[w + 1] = wy + y;
+				worldVertices[int(w + 1)] = wy + y;
 			}
 		}
 	}
