@@ -97,7 +97,7 @@ public class SpriteCollectionAttachmentLoader : AttachmentLoader {
 		float y1 = def.boundsData[0].y - def.boundsData[1].y / 2;
 		regionOffsetY = (int)((y1 - y0) / def.texelSize.y);
 
-		material = def.material;
+		material = def.materialInst;
 	}
 
 	public RegionAttachment NewRegionAttachment (Skin skin, String name, String path) {
