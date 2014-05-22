@@ -278,7 +278,7 @@ Texture2D* SkeletonRenderer::getTexture (spSkinnedMeshAttachment* attachment) co
 	return (Texture2D*)((spAtlasRegion*)attachment->rendererObject)->page->rendererObject;
 }
 
-Rect SkeletonRenderer::boundingBox () {
+Rect SkeletonRenderer::getBoundingBox () const {
 	float minX = FLT_MAX, minY = FLT_MAX, maxX = FLT_MIN, maxY = FLT_MIN;
 	float scaleX = getScaleX(), scaleY = getScaleY();
 	for (int i = 0; i < skeleton->slotCount; ++i) {
