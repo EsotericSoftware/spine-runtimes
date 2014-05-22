@@ -278,30 +278,32 @@ Texture2D* SkeletonRenderer::getTexture (spSkinnedMeshAttachment* attachment) co
 
 Rect SkeletonRenderer::boundingBox () {
 	float minX = FLT_MAX, minY = FLT_MAX, maxX = FLT_MIN, maxY = FLT_MIN;
-	float scaleX = getScaleX();
-	float scaleY = getScaleY();
-	float vertices[8];
+	float scaleX = getScaleX(), scaleY = getScaleY();
 	for (int i = 0; i < skeleton->slotCount; ++i) {
 		spSlot* slot = skeleton->slots[i];
-		if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION) continue;
-		spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-		spRegionAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot->bone, vertices);
-		minX = min(minX, vertices[SP_VERTEX_X1] * scaleX);
-		minY = min(minY, vertices[SP_VERTEX_Y1] * scaleY);
-		maxX = max(maxX, vertices[SP_VERTEX_X1] * scaleX);
-		maxY = max(maxY, vertices[SP_VERTEX_Y1] * scaleY);
-		minX = min(minX, vertices[SP_VERTEX_X4] * scaleX);
-		minY = min(minY, vertices[SP_VERTEX_Y4] * scaleY);
-		maxX = max(maxX, vertices[SP_VERTEX_X4] * scaleX);
-		maxY = max(maxY, vertices[SP_VERTEX_Y4] * scaleY);
-		minX = min(minX, vertices[SP_VERTEX_X2] * scaleX);
-		minY = min(minY, vertices[SP_VERTEX_Y2] * scaleY);
-		maxX = max(maxX, vertices[SP_VERTEX_X2] * scaleX);
-		maxY = max(maxY, vertices[SP_VERTEX_Y2] * scaleY);
-		minX = min(minX, vertices[SP_VERTEX_X3] * scaleX);
-		minY = min(minY, vertices[SP_VERTEX_Y3] * scaleY);
-		maxX = max(maxX, vertices[SP_VERTEX_X3] * scaleX);
-		maxY = max(maxY, vertices[SP_VERTEX_Y3] * scaleY);
+		if (!slot->attachment) continue;
+		int verticesCount;
+		if (slot->attachment->type == SP_ATTACHMENT_REGION) {
+			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
+			spRegionAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot->bone, worldVertices);
+			verticesCount = 8;
+		} else if (slot->attachment->type == SP_ATTACHMENT_MESH) {
+			spMeshAttachment* mesh = (spMeshAttachment*)slot->attachment;
+			spMeshAttachment_computeWorldVertices(mesh, slot->skeleton->x, slot->skeleton->y, slot, worldVertices);
+			verticesCount = mesh->verticesCount;
+		} else if (slot->attachment->type == SP_ATTACHMENT_SKINNED_MESH) {
+			spSkinnedMeshAttachment* mesh = (spSkinnedMeshAttachment*)slot->attachment;
+			spSkinnedMeshAttachment_computeWorldVertices(mesh, slot->skeleton->x, slot->skeleton->y, slot, worldVertices);
+			verticesCount = mesh->uvsCount;
+		} else
+			continue;
+		for (int ii = 0; ii < verticesCount; ii += 2) {
+			float x = worldVertices[ii] * scaleX, y = worldVertices[ii + 1] * scaleY;
+			minX = min(minX, x);
+			minY = min(minY, y);
+			maxX = max(maxX, x);
+			maxY = max(maxY, y);
+		}
 	}
 	Point position = getPosition();
 	return Rect(position.x + minX, position.y + minY, maxX - minX, maxY - minY);

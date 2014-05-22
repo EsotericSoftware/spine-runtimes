@@ -266,30 +266,32 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 
 - (CGRect) boundingBox {
 	float minX = FLT_MAX, minY = FLT_MAX, maxX = FLT_MIN, maxY = FLT_MIN;
-	float scaleX = self.scaleX;
-	float scaleY = self.scaleY;
-	float vertices[8];
+	float scaleX = self.scaleX, scaleY = self.scaleY;
 	for (int i = 0; i < _skeleton->slotCount; ++i) {
 		spSlot* slot = _skeleton->slots[i];
-		if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION) continue;
-		spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-		spRegionAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot->bone, vertices);
-		minX = fmin(minX, vertices[SP_VERTEX_X1] * scaleX);
-		minY = fmin(minY, vertices[SP_VERTEX_Y1] * scaleY);
-		maxX = fmax(maxX, vertices[SP_VERTEX_X1] * scaleX);
-		maxY = fmax(maxY, vertices[SP_VERTEX_Y1] * scaleY);
-		minX = fmin(minX, vertices[SP_VERTEX_X4] * scaleX);
-		minY = fmin(minY, vertices[SP_VERTEX_Y4] * scaleY);
-		maxX = fmax(maxX, vertices[SP_VERTEX_X4] * scaleX);
-		maxY = fmax(maxY, vertices[SP_VERTEX_Y4] * scaleY);
-		minX = fmin(minX, vertices[SP_VERTEX_X2] * scaleX);
-		minY = fmin(minY, vertices[SP_VERTEX_Y2] * scaleY);
-		maxX = fmax(maxX, vertices[SP_VERTEX_X2] * scaleX);
-		maxY = fmax(maxY, vertices[SP_VERTEX_Y2] * scaleY);
-		minX = fmin(minX, vertices[SP_VERTEX_X3] * scaleX);
-		minY = fmin(minY, vertices[SP_VERTEX_Y3] * scaleY);
-		maxX = fmax(maxX, vertices[SP_VERTEX_X3] * scaleX);
-		maxY = fmax(maxY, vertices[SP_VERTEX_Y3] * scaleY);
+		if (!slot->attachment) continue;
+		int verticesCount;
+		if (slot->attachment->type == SP_ATTACHMENT_REGION) {
+			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
+			spRegionAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot->bone, worldVertices);
+			verticesCount = 8;
+		} else if (slot->attachment->type == SP_ATTACHMENT_MESH) {
+			spMeshAttachment* mesh = (spMeshAttachment*)slot->attachment;
+			spMeshAttachment_computeWorldVertices(mesh, slot->skeleton->x, slot->skeleton->y, slot, worldVertices);
+			verticesCount = mesh->verticesCount;
+		} else if (slot->attachment->type == SP_ATTACHMENT_SKINNED_MESH) {
+			spSkinnedMeshAttachment* mesh = (spSkinnedMeshAttachment*)slot->attachment;
+			spSkinnedMeshAttachment_computeWorldVertices(mesh, slot->skeleton->x, slot->skeleton->y, slot, worldVertices);
+			verticesCount = mesh->uvsCount;
+		} else
+			continue;
+		for (int ii = 0; ii < verticesCount; ii += 2) {
+			float x = worldVertices[ii] * scaleX, y = worldVertices[ii + 1] * scaleY;
+			minX = min(minX, x);
+			minY = min(minY, y);
+			maxX = max(maxX, x);
+			maxY = max(maxY, y);
+		}
 	}
 	minX = self.position.x + minX;
 	minY = self.position.y + minY;
