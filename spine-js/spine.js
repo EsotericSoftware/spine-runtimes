@@ -123,7 +123,7 @@ spine.Slot.prototype = {
 	r: 1, g: 1, b: 1, a: 1,
 	_attachmentTime: 0,
 	attachment: null,
-	attachmentVertices: null,
+	attachmentVertices: [],
 	setAttachment: function (attachment) {
 		this.attachment = attachment;
 		this._attachmentTime = this.skeleton.time;
@@ -1456,7 +1456,7 @@ spine.SkeletonJson.prototype = {
 		
 		var scale = this.scale;
 		if (type == spine.AttachmentType.region) {
-			var region = attachmentLoader.newRegionAttachment(skin, name, path);
+			var region = this.attachmentLoader.newRegionAttachment(skin, name, path);
 			if (!region) return null;
 			region.path = path;
 			region.x = (map["x"] || 0) * this.scale;
@@ -1478,7 +1478,7 @@ spine.SkeletonJson.prototype = {
 			region.updateOffset();
 			return region;
 		} else if (type == spine.AttachmentType.mesh) {
-			var mesh = attachmentLoader.newMeshAttachment(skin, name, path);
+			var mesh = this.attachmentLoader.newMeshAttachment(skin, name, path);
 			if (!mesh) return null;
 			mesh.path = path; 
 			mesh.vertices = this.getFloatArray(map, "vertices", scale);
@@ -1500,7 +1500,7 @@ spine.SkeletonJson.prototype = {
 			mesh.height = (map["height"] || 0) * scale;
 			return mesh;
 		} else if (type == spine.AttachmentType.skinnedmesh) {
-			var mesh = attachmentLoader.newSkinnedMeshAttachment(skin, name, path);
+			var mesh = this.attachmentLoader.newSkinnedMeshAttachment(skin, name, path);
 			if (!mesh) return null;
 			mesh.path = path;
 
@@ -1539,6 +1539,7 @@ spine.SkeletonJson.prototype = {
 			mesh.height = (map["height"] || 0) * scale;
 			return mesh;
 		} else if (type == spine.AttachmentType.boundingbox) {
+            var attachment = this.attachmentLoader.newBoundingBoxAttachment(skin, name);
 			var vertices = map["vertices"];
 			for (var i = 0, n = vertices.length; i < n; i++)
 				attachment.vertices.push(vertices[i] * this.scale);
