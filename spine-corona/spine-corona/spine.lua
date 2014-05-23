@@ -29,7 +29,7 @@
 -------------------------------------------------------------------------------
 
 spine = {}
- 
+
 spine.utils = require "spine-lua.utils"
 spine.SkeletonJson = require "spine-lua.SkeletonJson"
 spine.SkeletonData = require "spine-lua.SkeletonData"
@@ -37,6 +37,8 @@ spine.BoneData = require "spine-lua.BoneData"
 spine.SlotData = require "spine-lua.SlotData"
 spine.Skin = require "spine-lua.Skin"
 spine.RegionAttachment = require "spine-lua.RegionAttachment"
+spine.MeshAttachment = require "spine-lua.MeshAttachment"
+spine.SkinnedMeshAttachment = require "spine-lua.SkinnedMeshAttachment"
 spine.Skeleton = require "spine-lua.Skeleton"
 spine.Bone = require "spine-lua.Bone"
 spine.Slot = require "spine-lua.Slot"

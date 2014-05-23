@@ -34,8 +34,8 @@ function AnimationStateData.new (skeletonData)
 	if not skeletonData then error("skeletonData cannot be nil", 2) end
 
 	local self = {
-		animationToMixTime = {},
 		skeletonData = skeletonData,
+		animationToMixTime = {},
 		defaultMix = 0
 	}
 

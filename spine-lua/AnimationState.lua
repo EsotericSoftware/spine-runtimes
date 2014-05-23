@@ -75,11 +75,11 @@ function AnimationState.new (data)
 		for i = 0, self.trackCount do
 			local current = self.tracks[i]
 			if current then
-				local trackDelta = delta * current.timeScale
-				current.time = current.time + trackDelta
+				current.time = current.time + delta * current.timeScale
 				if current.previous then
-					current.previous.time = current.previous.time + trackDelta
-					current.mixTime = current.mixTime + trackDelta
+					local previousDelta = delta * current.previous.timeScale
+					current.previous.time = current.previous.time + previousDelta
+					current.mixTime = current.mixTime + previousDelta
 				end
 
 				local next = current.next

@@ -356,32 +356,30 @@ function Animation.ColorTimeline.new ()
 		local frames = self.frames
 		if time < frames[0] then return end -- Time is before first frame.
 
-		local slot = skeleton.slots[self.slotIndex]
-
+		local r, g, b, a
 		if time >= frames[#frames - 4] then -- Time is after last frame.
-			local r = frames[#frames - 3]
-			local g = frames[#frames - 2]
-			local b = frames[#frames - 1]
-			local a = frames[#frames]
-			slot:setColor(r, g, b, a)
-			return
+			r = frames[#frames - 3]
+			g = frames[#frames - 2]
+			b = frames[#frames - 1]
+			a = frames[#frames]
+		else
+			-- Interpolate between the last frame and the current frame.
+			local frameIndex = binarySearch(frames, time, 5)
+			local lastFrameR = frames[frameIndex - 4]
+			local lastFrameG = frames[frameIndex - 3]
+			local lastFrameB = frames[frameIndex - 2]
+			local lastFrameA = frames[frameIndex - 1]
+			local frameTime = frames[frameIndex]
+			local percent = 1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime)
+			if percent < 0 then percent = 0 elseif percent > 255 then percent = 255 end
+			percent = self:getCurvePercent(frameIndex / 5 - 1, percent)
+
+			r = lastFrameR + (frames[frameIndex + FRAME_R] - lastFrameR) * percent
+			g = lastFrameG + (frames[frameIndex + FRAME_G] - lastFrameG) * percent
+			b = lastFrameB + (frames[frameIndex + FRAME_B] - lastFrameB) * percent
+			a = lastFrameA + (frames[frameIndex + FRAME_A] - lastFrameA) * percent
 		end
-
-		-- Interpolate between the last frame and the current frame.
-		local frameIndex = binarySearch(frames, time, 5)
-		local lastFrameR = frames[frameIndex - 4]
-		local lastFrameG = frames[frameIndex - 3]
-		local lastFrameB = frames[frameIndex - 2]
-		local lastFrameA = frames[frameIndex - 1]
-		local frameTime = frames[frameIndex]
-		local percent = 1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime)
-		if percent < 0 then percent = 0 elseif percent > 255 then percent = 255 end
-		percent = self:getCurvePercent(frameIndex / 5 - 1, percent)
-
-		local r = lastFrameR + (frames[frameIndex + FRAME_R] - lastFrameR) * percent
-		local g = lastFrameG + (frames[frameIndex + FRAME_G] - lastFrameG) * percent
-		local b = lastFrameB + (frames[frameIndex + FRAME_B] - lastFrameB) * percent
-		local a = lastFrameA + (frames[frameIndex + FRAME_A] - lastFrameA) * percent
+		local slot = skeleton.slots[self.slotIndex]
 		if alpha < 1 then
 			slot:setColor(slot.r + (r - slot.r) * alpha, slot.g + (g - slot.g) * alpha, slot.b + (b - slot.b) * alpha, slot.a + (a - slot.a) * alpha)
 		else

@@ -43,7 +43,10 @@ function Skeleton.new (skeletonData)
 		slotsByName = {},
 		drawOrder = {},
 		r = 1, g = 1, b = 1, a = 1,
-		x = 0, y = 0
+		x = 0, y = 0,
+		skin = nil,
+		flipX = false, flipY = false,
+		time = 0
 	}
 
 	function self:updateWorldTransform ()
@@ -65,6 +68,7 @@ function Skeleton.new (skeletonData)
 
 	function self:setSlotsToSetupPose ()
 		for i,slot in ipairs(self.slots) do
+			self.drawOrder[i] = slot
 			slot:setToSetupPose()
 		end
 	end
@@ -90,7 +94,7 @@ function Skeleton.new (skeletonData)
 		local newSkin
 		if skinName then
 			newSkin = self.data:findSkin(skinName)
-			if not newSkin then error("Skin not found: " .. skinName, 2) end
+			if not newSkin then error("Skin not found = " .. skinName, 2) end
 			if self.skin then
 				-- Attach all attachments from the new skin if the corresponding attachment from the old skin is currently attached.
 				for k,v in pairs(self.skin.attachments) do
@@ -103,6 +107,15 @@ function Skeleton.new (skeletonData)
 						if newAttachment then slot:setAttachment(newAttachment) end
 					end
 				end
+			else
+				-- No previous skin, attach setup pose attachments.
+				for i,slot in ipairs(self.slots) do
+					local name = slot.data.attachmentName
+					if name then
+						local attachment = newSkin:getAttachment(i, name)
+						if attachment then slot:setAttachment(attachment) end
+					end
+				end
 			end
 		end
 		self.skin = newSkin
@@ -112,7 +125,7 @@ function Skeleton.new (skeletonData)
 		if not slotName then error("slotName cannot be nil.", 2) end
 		if not attachmentName then error("attachmentName cannot be nil.", 2) end
 		local slotIndex = skeletonData.slotNameIndices[slotName]
-		if slotIndex == -1 then error("Slot not found: " .. slotName, 2) end
+		if slotIndex == -1 then error("Slot not found = " .. slotName, 2) end
 		if self.skin then
 			local attachment = self.skin:getAttachment(slotIndex, attachmentName)
 			if attachment then return attachment end
@@ -135,11 +148,18 @@ function Skeleton.new (skeletonData)
 				return
 			end
 		end
-		error("Slot not found: " .. slotName, 2)
+		error("Slot not found = " .. slotName, 2)
 	end
 
 	function self:update (delta)
 		self.time = self.time + delta
+	end
+
+	function self:setColor (r, g, b, a)
+		self.r = r
+		self.g = g
+		self.b = b
+		self.a = a
 	end
 
 	for i,boneData in ipairs(skeletonData.bones) do

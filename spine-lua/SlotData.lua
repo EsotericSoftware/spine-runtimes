@@ -36,7 +36,9 @@ function SlotData.new (name, boneData)
 	local self = {
 		name = name,
 		boneData = boneData,
-		r = 1, g = 1, b = 1, a = 1
+		r = 1, g = 1, b = 1, a = 1,
+		attachmentName = nil,
+		additiveBlending = false
 	}
 
 	function self:setColor (r, g, b, a)
@@ -46,6 +48,6 @@ function SlotData.new (name, boneData)
 		self.a = a
 	end
 
-	return self;
+	return self
 end
 return SlotData

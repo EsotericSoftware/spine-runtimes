@@ -12,8 +12,8 @@ function skeleton:createImage (attachment)
 	-- Customize where images are loaded.
 	return display.newImage("examples/spineboy/images/" .. attachment.name .. ".png")
 end
-skeleton.group.x = 150
-skeleton.group.y = 325
+skeleton.group.x = display.contentWidth * 0.5
+skeleton.group.y = display.contentHeight * 0.9
 skeleton.flipX = false
 skeleton.flipY = false
 skeleton.debug = true -- Omit or set to false to not draw debug lines on top of the images.
