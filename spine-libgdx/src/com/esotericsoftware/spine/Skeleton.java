@@ -209,18 +209,21 @@ public class Skeleton {
 	 * each slot's setup mode attachment is attached from the new skin.
 	 * @param newSkin May be null. */
 	public void setSkin (Skin newSkin) {
-		if (skin == null) {
-			Array<Slot> slots = this.slots;
-			for (int i = 0, n = slots.size; i < n; i++) {
-				Slot slot = slots.get(i);
-				String name = slot.data.attachmentName;
-				if (name != null) {
-					Attachment attachment = newSkin.getAttachment(i, name);
-					if (attachment != null) slot.setAttachment(attachment);
+		if (newSkin != null) {
+			if (skin != null)
+				newSkin.attachAll(this, skin);
+			else {
+				Array<Slot> slots = this.slots;
+				for (int i = 0, n = slots.size; i < n; i++) {
+					Slot slot = slots.get(i);
+					String name = slot.data.attachmentName;
+					if (name != null) {
+						Attachment attachment = newSkin.getAttachment(i, name);
+						if (attachment != null) slot.setAttachment(attachment);
+					}
 				}
 			}
-		} else if (newSkin != null) //
-			newSkin.attachAll(this, skin);
+		}
 		skin = newSkin;
 	}
 

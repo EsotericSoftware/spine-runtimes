@@ -163,17 +163,21 @@ int spSkeleton_setSkinByName (spSkeleton* self, const char* skinName) {
 }
 
 void spSkeleton_setSkin (spSkeleton* self, spSkin* newSkin) {
-	if (!self->skin) {
-		int i;
-		for (i = 0; i < self->slotCount; ++i) {
-			spSlot* slot = self->slots[i];
-			if (slot->data->attachmentName) {
-				spAttachment* attachment = spSkin_getAttachment(newSkin, i, slot->data->attachmentName);
-				if (attachment) spSlot_setAttachment(slot, attachment);
+	if (newSkin) {
+		if (self->skin)
+			spSkin_attachAll(newSkin, self, self->skin);
+		else {
+			/* No previous skin, attach setup pose attachments. */
+			int i;
+			for (i = 0; i < self->slotCount; ++i) {
+				spSlot* slot = self->slots[i];
+				if (slot->data->attachmentName) {
+					spAttachment* attachment = spSkin_getAttachment(newSkin, i, slot->data->attachmentName);
+					if (attachment) spSlot_setAttachment(slot, attachment);
+				}
 			}
 		}
-	} else if (newSkin) /**/
-		spSkin_attachAll(newSkin, self, self->skin);
+	}
 	CONST_CAST(spSkin*, self->skin) = newSkin;
 }
 

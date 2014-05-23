@@ -483,7 +483,7 @@ namespace Spine {
 									}
 									if (attachment is MeshAttachment) {
 										float[] meshVertices = ((MeshAttachment)attachment).vertices;
-										for (int i = 0, n = vertices.Length; i < n; i++)
+										for (int i = 0; i < vertexCount; i++)
 											vertices[i] += meshVertices[i];
 									}
 								}

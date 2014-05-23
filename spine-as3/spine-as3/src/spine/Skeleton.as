@@ -177,18 +177,21 @@ public class Skeleton {
 	 * each slot's setup mode attachment is attached from the new skin.
 	 * @param newSkin May be null. */
 	public function set skin (newSkin:Skin) : void {
-		if (!skin) {
-			var i:int = 0;
-			for each (var slot:Slot in _slots) {
-				var name:String = slot.data.attachmentName;
-				if (name) {
-					var attachment:Attachment = newSkin.getAttachment(i, name);
-					if (attachment) slot.attachment = attachment;
+		if (newSkin) {
+			if (skin)
+				newSkin.attachAll(this, skin);
+			else {
+				var i:int = 0;
+				for each (var slot:Slot in _slots) {
+					var name:String = slot.data.attachmentName;
+					if (name) {
+						var attachment:Attachment = newSkin.getAttachment(i, name);
+						if (attachment) slot.attachment = attachment;
+					}
+					i++;
 				}
-				i++;
 			}
-		} else if (newSkin)
-			newSkin.attachAll(this, skin);
+		}
 		_skin = newSkin;
 	}
 

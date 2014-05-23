@@ -828,18 +828,21 @@ spine.Skeleton.prototype = {
 	 * each slot's setup mode attachment is attached from the new skin.
 	 * @param newSkin May be null. */
 	setSkin: function (newSkin) {
-		if (!this.skin) {
-			var slots = this.slots;
-			for (var i = 0, n = slots.length; i < n; i++) {
-				var slot = slots[i];
-				var name = slot.data.attachmentName;
-				if (name) {
-					var attachment = newSkin.getAttachment(i, name);
-					if (attachment) slot.setAttachment(attachment);
+		if (newSkin) {
+			if (this.skin)
+				newSkin._attachAll(this, this.skin);
+			else {
+				var slots = this.slots;
+				for (var i = 0, n = slots.length; i < n; i++) {
+					var slot = slots[i];
+					var name = slot.data.attachmentName;
+					if (name) {
+						var attachment = newSkin.getAttachment(i, name);
+						if (attachment) slot.setAttachment(attachment);
+					}
 				}
 			}
-		} else if (newSkin)
-			newSkin._attachAll(this, this.skin);
+		}
 		this.skin = newSkin;
 	},
 	/** @return May be null. */
@@ -915,6 +918,8 @@ spine.RegionAttachment.prototype = {
 	rotation: 0,
 	scaleX: 1, scaleY: 1,
 	width: 0, height: 0,
+	r: 1, g: 1, b: 1, a: 1,
+	path: null,
 	rendererObject: null,
 	regionOffsetX: 0, regionOffsetY: 0,
 	regionWidth: 0, regionHeight: 0,
@@ -1004,7 +1009,7 @@ spine.MeshAttachment.prototype = {
 	regionOriginalWidth: 0, regionOriginalHeight: 0,
 	edges: null,
 	width: 0, height: 0,
-	updateUVs: function (u, v, u2, v2, rotate) {
+	updateUVs: function () {
 		var width = regionU2 - regionU, height = regionV2 - regionV;
 		var n = regionUVs.length;
 		if (!uvs || uvs.length != n) {

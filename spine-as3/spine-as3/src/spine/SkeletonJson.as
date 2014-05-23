@@ -411,7 +411,7 @@ public class SkeletonJson {
 							}
 							if (attachment is MeshAttachment) {
 								var meshVertices:Vector.<Number> = (attachment as MeshAttachment).vertices;
-								for (i = 0, n = vertices.length; i < n; i++)
+								for (i = 0; i < vertexCount; i++)
 									vertices[i] += meshVertices[i];
 							}
 						}

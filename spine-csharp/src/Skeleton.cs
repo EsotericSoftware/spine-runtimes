@@ -165,18 +165,21 @@ namespace Spine {
 		/// setup mode attachment is attached from the new skin.</summary>
 		/// <param name="newSkin">May be null.</param>
 		public void SetSkin (Skin newSkin) {
-			if (skin == null) {
-				List<Slot> slots = this.slots;
-				for (int i = 0, n = slots.Count; i < n; i++) {
-					Slot slot = slots[i];
-					String name = slot.data.attachmentName;
-					if (name != null) {
-						Attachment attachment = newSkin.GetAttachment(i, name);
-						if (attachment != null) slot.Attachment = attachment;
+			if (newSkin != null) {
+				if (skin != null)
+					newSkin.AttachAll(this, skin);
+				else {
+					List<Slot> slots = this.slots;
+					for (int i = 0, n = slots.Count; i < n; i++) {
+						Slot slot = slots[i];
+						String name = slot.data.attachmentName;
+						if (name != null) {
+							Attachment attachment = newSkin.GetAttachment(i, name);
+							if (attachment != null) slot.Attachment = attachment;
+						}
 					}
 				}
-			} else if (newSkin != null) //
-				newSkin.AttachAll(this, skin);
+			}
 			skin = newSkin;
 		}
 

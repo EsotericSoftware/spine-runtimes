@@ -390,7 +390,7 @@ public class SkeletonJson {
 							}
 							if (attachment instanceof MeshAttachment) {
 								float[] meshVertices = ((MeshAttachment)attachment).getVertices();
-								for (int i = 0, n = vertices.length; i < n; i++)
+								for (int i = 0; i < vertexCount; i++)
 									vertices[i] += meshVertices[i];
 							}
 						}
