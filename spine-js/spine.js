@@ -1544,7 +1544,7 @@ spine.SkeletonJson.prototype = {
 			mesh.height = (map["height"] || 0) * scale;
 			return mesh;
 		} else if (type == spine.AttachmentType.boundingbox) {
-            var attachment = this.attachmentLoader.newBoundingBoxAttachment(skin, name);
+			var attachment = this.attachmentLoader.newBoundingBoxAttachment(skin, name);
 			var vertices = map["vertices"];
 			for (var i = 0, n = vertices.length; i < n; i++)
 				attachment.vertices.push(vertices[i] * this.scale);
