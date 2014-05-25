@@ -64,8 +64,8 @@ Assembly-*.csproj
 Assembly-*.pidb
 AssetStoreTools*
 
-spine-tk2d/Assets/Spine/spine-csharp*
-!spine-tk2d/Assets/Spine/spine-csharp/Place spine-csharp src here.*
+spine-tk2d/Assets/spine-csharp*
+!spine-tk2d/Assets/spine-csharp/Place spine-csharp src here.*
 spine-tk2d/ProjectSettings
 spine-tk2d/Temp
 spine-tk2d/Library
