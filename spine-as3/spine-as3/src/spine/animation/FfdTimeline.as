@@ -43,7 +43,7 @@ public class FfdTimeline extends CurveTimeline {
 	public function FfdTimeline (frameCount:int) {
 		super(frameCount);
 		frames = new Vector.<Number>(frameCount, true);
-		frameVertices = new Vector.<Number>(frameCount, true);
+		frameVertices = new Vector.<Vector.<Number>>(frameCount, true);
 	}
 
 	/** Sets the time and value of the specified keyframe. */

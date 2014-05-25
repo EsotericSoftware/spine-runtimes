@@ -69,7 +69,7 @@ public dynamic class SkinnedMeshAttachment extends Attachment {
 
 	public function updateUVs () : void {
 		var width:Number = regionU2 - regionU, height:Number = regionV2 - regionV;
-		var i:int, n:int = uvs.length;
+		var i:int, n:int = regionUVs.length;
 		if (!uvs || uvs.length != n) uvs = new Vector.<Number>(n, true);
 		if (regionRotate) {
 			for (i = 0; i < n; i += 2) {
