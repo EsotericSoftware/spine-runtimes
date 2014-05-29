@@ -59,8 +59,8 @@ public:
 	virtual ~SkeletonRenderer ();
 
 	virtual void update (float deltaTime) override;
-	virtual void draw (cocos2d::Renderer* renderer, const cocos2d::Matrix& transform, bool transformUpdated) override;
-	virtual void drawSkeleton (const cocos2d::Matrix& transform, bool transformUpdated);
+	virtual void draw (cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, bool transformUpdated) override;
+	virtual void drawSkeleton (const cocos2d::Mat4& transform, bool transformUpdated);
 	virtual cocos2d::Rect getBoundingBox () const override;
 
 	// --- Convenience methods for common Skeleton_* functions.
