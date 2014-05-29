@@ -59,7 +59,7 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 	}
 	
 	public function newMeshAttachment (skin:Skin, name:String, path:String) : MeshAttachment {
-		var region:AtlasRegion = atlas.findRegion(name);
+		var region:AtlasRegion = atlas.findRegion(path);
 		if (region == null)
 			throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
 		var attachment:MeshAttachment = new MeshAttachment(name);
