@@ -142,6 +142,7 @@ void SkeletonRenderer::draw(Renderer* renderer, const kmMat4& transform, bool tr
 void SkeletonRenderer::drawSkeleton (const kmMat4& transform, bool transformUpdated) {
 	getShaderProgram()->use();
 	getShaderProgram()->setUniformsForBuiltins(transform);
+	GL::bindVAO(0);
 
 	Color3B nodeColor = getColor();
 	skeleton->r = nodeColor.r / (float)255;

@@ -136,6 +136,7 @@ void SkeletonRenderer::update (float deltaTime) {
 
 void SkeletonRenderer::draw () {
 	CC_NODE_DRAW_SETUP();
+	ccGLBindVAO(0);
 
 	ccColor3B nodeColor = getColor();
 	skeleton->r = nodeColor.r / (float)255;

@@ -93,7 +93,6 @@ void PolygonBatch::add (CCTexture2D* addTexture,
 void PolygonBatch::flush () {
 	if (!verticesCount) return;
 
-	ccGLBindVAO(0);
 	ccGLBindTexture2D(texture->getName());
 	glEnableVertexAttribArray(kCCVertexAttrib_Position);
 	glEnableVertexAttribArray(kCCVertexAttrib_Color);
