@@ -41,7 +41,6 @@ public class BoneComponentInspector : Editor {
 		boneName = serializedObject.FindProperty("boneName");
 		followBoneRotation = serializedObject.FindProperty("followBoneRotation");
 		followZPosition = serializedObject.FindProperty("followZPosition");
-
 	}
 
 	override public void OnInspectorGUI () {

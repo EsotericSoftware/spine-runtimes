@@ -39,7 +39,7 @@ public class AtlasAsset : ScriptableObject {
 	public Material[] materials;
 	private Atlas atlas;
 
-	public void Clear () {
+	public void Reset () {
 		atlas = null;
 	}
 
@@ -47,13 +47,13 @@ public class AtlasAsset : ScriptableObject {
 	public Atlas GetAtlas () {
 		if (atlasFile == null) {
 			Debug.LogError("Atlas file not set for atlas asset: " + name, this);
-			Clear();
+			Reset();
 			return null;
 		}
 
 		if (materials == null || materials.Length == 0) {
 			Debug.LogError("Materials not set for atlas asset: " + name, this);
-			Clear();
+			Reset();
 			return null;
 		}
 

@@ -51,7 +51,7 @@ public class AtlasAssetInspector : Editor {
 		if (serializedObject.ApplyModifiedProperties() ||
 			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
 		) {
-			asset.Clear();
+			asset.Reset();
 		}
 	}
 }

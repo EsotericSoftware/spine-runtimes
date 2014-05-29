@@ -46,21 +46,25 @@ public class SkeletonRendererInspector : Editor {
 	}
 
 	protected virtual void gui () {
-		EditorGUILayout.PropertyField(skeletonDataAsset);
-
 		SkeletonRenderer component = (SkeletonRenderer)target;
+
+		EditorGUILayout.BeginHorizontal();
+		EditorGUILayout.PropertyField(skeletonDataAsset);
+		float reloadWidth = GUI.skin.label.CalcSize(new GUIContent("Reload")).x + 20;
+		if (GUILayout.Button("Reload", GUILayout.Width(reloadWidth))) {
+			if (component.skeletonDataAsset != null) {
+				if (component.skeletonDataAsset.atlasAsset != null)
+					component.skeletonDataAsset.atlasAsset.Reset();
+				component.skeletonDataAsset.Reset();
+			}
+			component.Reset();
+		}
+		EditorGUILayout.EndHorizontal();
+
 		if (!component.valid) {
 			component.Reset();
 			component.LateUpdate();
-			if (!component.valid) {
-				EditorGUILayout.BeginHorizontal();
-				EditorGUILayout.Space();
-				if (GUILayout.Button("Refresh")) component.Reset();
-				EditorGUILayout.Space();
-				EditorGUILayout.EndHorizontal();
-				EditorGUILayout.Space();
-				return;
-			}
+			if (!component.valid) return;
 		}
 
 		// Initial skin name.
