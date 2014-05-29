@@ -204,6 +204,7 @@ void SkeletonRenderer::drawSkeleton (const Mat4 &transform, bool transformUpdate
 			a = attachment->a;
 			break;
 		}
+		default: ;
 		} 
 		if (texture) {
 			if (slot->data->additiveBlending != additive) {
