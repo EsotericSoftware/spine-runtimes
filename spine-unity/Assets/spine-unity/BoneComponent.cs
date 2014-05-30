@@ -99,12 +99,14 @@ public class BoneComponent : MonoBehaviour {
 		bool flipX = skeleton.flipX;
 		bool flipY = skeleton.flipY;
 
-		float flipRotation = (flipX ^ flipY) ? -1f : 1f;
+		float flipRotation = 1f;
 		Vector3 rotation = Vector3.zero;
 
 		if(followFlips) {
 			rotation.x = flipY ? 180f : 0f;
 			rotation.y = flipX ? 180f : 0f;
+		} else {
+			flipRotation = (flipX ^ flipY) ? -1f : 1f;
 		}
 
 		rotation.z = (followBoneRotation) ? (bone.worldRotation * flipRotation) : (cachedTransform.localEulerAngles.z);
