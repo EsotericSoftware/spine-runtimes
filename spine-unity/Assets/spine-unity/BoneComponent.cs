@@ -47,6 +47,7 @@ public class BoneComponent : MonoBehaviour {
 	public bool followZPosition = true;
 	public bool followBoneRotation = true;
 	public bool followFlips = true;
+	public bool followBoneScale = false;
 
 	public SkeletonRenderer SkeletonRenderer {
 		get { return skeletonRenderer; }
@@ -55,13 +56,7 @@ public class BoneComponent : MonoBehaviour {
 			Reset ();
 		}
 	}
-
-	// TODO: Make the rotation behavior more customizable
-	// public bool followTransformRotation = false;
-
-	// TODO: Make transform follow bone scale? too specific? This is really useful for shared shadow assets.
-	//public bool followBoneScale = false;
-
+	
 	/// <summary>If a bone isn't set, boneName is used to find the bone.</summary>
 	public String boneName;
 
@@ -126,5 +121,9 @@ public class BoneComponent : MonoBehaviour {
 			rotation += offsetEuler;
 			cachedTransform.rotation = Quaternion.Euler(rotation);
 		}
+
+		if(followBoneScale)
+			cachedTransform.localScale = new Vector3(bone.worldScaleX, bone.worldScaleY, 1f);
+
 	}
 }
