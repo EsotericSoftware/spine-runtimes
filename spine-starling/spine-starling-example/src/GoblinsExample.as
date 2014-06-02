@@ -19,13 +19,13 @@ import starling.textures.Texture;
 import starling.textures.TextureAtlas;
 
 public class GoblinsExample extends Sprite {
-	[Embed(source = "goblins.atlas", mimeType = "application/octet-stream")]
+	[Embed(source = "goblins-ffd.atlas", mimeType = "application/octet-stream")]
 	static public const SpineboyAtlasFile:Class;
 
-	[Embed(source = "goblins.png")]
+	[Embed(source = "goblins-ffd.png")]
 	static public const SpineboyAtlasTexture:Class;
 
-	[Embed(source = "goblins.json", mimeType = "application/octet-stream")]
+	[Embed(source = "goblins-ffd.json", mimeType = "application/octet-stream")]
 	static public const SpineboyJson:Class;
 
 	private var skeleton:SkeletonAnimation;
@@ -35,7 +35,7 @@ public class GoblinsExample extends Sprite {
 		var json:SkeletonJson = new SkeletonJson(new AtlasAttachmentLoader(atlas));
 		var skeletonData:SkeletonData = json.readSkeletonData(new SpineboyJson());
 
-		skeleton = new SkeletonAnimation(skeletonData);
+		skeleton = new SkeletonAnimation(skeletonData, true);
 		skeleton.x = 320;
 		skeleton.y = 420;
 		skeleton.skeleton.skinName = "goblin";

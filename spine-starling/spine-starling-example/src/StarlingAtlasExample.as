@@ -22,7 +22,7 @@ public class StarlingAtlasExample extends Sprite {
 	[Embed(source = "spineboy-starling.png")]
 	static public const SpineboyAtlasTexture:Class;
 
-	[Embed(source = "spineboy.json", mimeType = "application/octet-stream")]
+	[Embed(source = "spineboy-starling.json", mimeType = "application/octet-stream")]
 	static public const SpineboyJson:Class;
 
 	private var skeleton:SkeletonAnimation;
@@ -40,24 +40,24 @@ public class StarlingAtlasExample extends Sprite {
 		stateData.setMixByName("jump", "walk", 0.4);
 		stateData.setMixByName("jump", "jump", 0.2);
 
-		skeleton = new SkeletonAnimation(skeletonData, stateData);
+		skeleton = new SkeletonAnimation(skeletonData, false, stateData);
 		skeleton.x = 320;
 		skeleton.y = 420;
 		
-		skeleton.state.onStart = function (trackIndex:int) : void {
+		skeleton.state.onStart.add(function (trackIndex:int) : void {
 			trace(trackIndex + " start: " + skeleton.state.getCurrent(trackIndex));
-		};
-		skeleton.state.onEnd = function (trackIndex:int) : void {
+		});
+		skeleton.state.onEnd.add(function (trackIndex:int) : void {
 			trace(trackIndex + " end: " + skeleton.state.getCurrent(trackIndex));
-		};
-		skeleton.state.onComplete = function (trackIndex:int, count:int) : void {
+		});
+		skeleton.state.onComplete.add(function (trackIndex:int, count:int) : void {
 			trace(trackIndex + " complete: " + skeleton.state.getCurrent(trackIndex) + ", " + count);
-		};
-		skeleton.state.onEvent = function (trackIndex:int, event:Event) : void {
+		});
+		skeleton.state.onEvent.add(function (trackIndex:int, event:Event) : void {
 			trace(trackIndex + " event: " + skeleton.state.getCurrent(trackIndex) + ", "
 				+ event.data.name + ": " + event.intValue + ", " + event.floatValue + ", " + event.stringValue);
-		};
-		
+		});
+
 		skeleton.state.setAnimationByName(0, "walk", true);
 		skeleton.state.addAnimationByName(0, "jump", false, 3);
 		skeleton.state.addAnimationByName(0, "walk", true, 0);

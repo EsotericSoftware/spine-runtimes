@@ -96,9 +96,9 @@ public dynamic class MeshAttachment extends Attachment {
 		if (slot.attachmentVertices.length == verticesCount) vertices = slot.attachmentVertices;
 		for (var i:int = 0, ii:int = 0; i < verticesCount; i += 2, ii += 2) {
 			var vx:Number = vertices[i];
-			var vy:Number = vertices[ii];
-			worldVertices[i] = vx * m00 + vy * m01 + x;
-			worldVertices[ii] = vx * m10 + vy * m11 + y;
+			var vy:Number = vertices[int(i + 1)];
+			worldVertices[ii] = vx * m00 + vy * m01 + x;
+			worldVertices[int(ii + 1)] = vx * m10 + vy * m11 + y;
 		}
 	}
 }

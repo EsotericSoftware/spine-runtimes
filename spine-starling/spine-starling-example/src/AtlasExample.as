@@ -1,14 +1,15 @@
 package {
 
+import flash.display.Bitmap;
+
 import spine.Event;
 import spine.SkeletonData;
 import spine.SkeletonJson;
 import spine.animation.AnimationStateData;
 import spine.atlas.Atlas;
 import spine.attachments.AtlasAttachmentLoader;
-import spine.starling.StarlingTextureLoader;
 import spine.starling.SkeletonAnimation;
-import spine.starling.StarlingAtlasAttachmentLoader;
+import spine.starling.StarlingTextureLoader;
 
 import starling.core.Starling;
 import starling.display.Sprite;
@@ -16,7 +17,6 @@ import starling.events.Touch;
 import starling.events.TouchEvent;
 import starling.events.TouchPhase;
 import starling.textures.Texture;
-import starling.textures.TextureAtlas;
 
 public class AtlasExample extends Sprite {
 	[Embed(source = "spineboy.atlas", mimeType = "application/octet-stream")]
@@ -33,14 +33,14 @@ public class AtlasExample extends Sprite {
 	public function AtlasExample () {
 		var atlas:Atlas = new Atlas(new SpineboyAtlasFile(), new StarlingTextureLoader(new SpineboyAtlasTexture()));
 		var json:SkeletonJson = new SkeletonJson(new AtlasAttachmentLoader(atlas));
+		json.scale = 0.6;
 		var skeletonData:SkeletonData = json.readSkeletonData(new SpineboyJson());
 
 		var stateData:AnimationStateData = new AnimationStateData(skeletonData);
-		stateData.setMixByName("walk", "jump", 0.2);
-		stateData.setMixByName("jump", "walk", 0.4);
-		stateData.setMixByName("jump", "jump", 0.2);
+		stateData.defaultMix = 0.2;
+		stateData.setMixByName("jump", "run", 0.3);
 
-		skeleton = new SkeletonAnimation(skeletonData, stateData);
+		skeleton = new SkeletonAnimation(skeletonData, false, stateData);
 		skeleton.x = 320;
 		skeleton.y = 420;
 		
@@ -60,7 +60,7 @@ public class AtlasExample extends Sprite {
 
 		skeleton.state.setAnimationByName(0, "walk", true);
 		skeleton.state.addAnimationByName(0, "jump", false, 3);
-		skeleton.state.addAnimationByName(0, "walk", true, 0);
+		skeleton.state.addAnimationByName(0, "run", true, 0);
 
 		addChild(skeleton);
 		Starling.juggler.add(skeleton);
@@ -72,7 +72,7 @@ public class AtlasExample extends Sprite {
 		var touch:Touch = event.getTouch(this);
 		if (touch && touch.phase == TouchPhase.BEGAN) {
 			skeleton.state.setAnimationByName(0, "jump", false);
-			skeleton.state.addAnimationByName(0, "walk", true, 0);
+			skeleton.state.addAnimationByName(0, "run", true, 0);
 		}
 	}
 }
