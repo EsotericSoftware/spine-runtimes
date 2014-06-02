@@ -203,7 +203,7 @@ public class SkeletonJson {
 			if (!mesh) return null;
 			mesh.path = path; 
 			mesh.vertices = getFloatArray(map, "vertices", scale);
-			mesh.triangles = getIntArray(map, "triangles");
+			mesh.triangles = getUintArray(map, "triangles");
 			mesh.regionUVs = getFloatArray(map, "uvs", 1);
 			mesh.updateUVs();
 
@@ -242,7 +242,7 @@ public class SkeletonJson {
 			}
 			skinnedMesh.bones = bones;
 			skinnedMesh.weights = weights;
-			skinnedMesh.triangles = getIntArray(map, "triangles");
+			skinnedMesh.triangles = getUintArray(map, "triangles");
 			skinnedMesh.regionUVs = uvs;
 			skinnedMesh.updateUVs();
 			
@@ -516,6 +516,14 @@ public class SkeletonJson {
 	static private function getIntArray (map:Object, name:String) : Vector.<int> {
 		var list:Array = map[name];
 		var values:Vector.<int> = new Vector.<int>(list.length, true);
+		for (var i:int = 0, n:int = list.length; i < n; i++)
+			values[i] = int(list[i]);
+		return values;
+	}
+	
+	static private function getUintArray (map:Object, name:String) : Vector.<uint> {
+		var list:Array = map[name];
+		var values:Vector.<uint> = new Vector.<uint>(list.length, true);
 		for (var i:int = 0, n:int = list.length; i < n; i++)
 			values[i] = int(list[i]);
 		return values;
