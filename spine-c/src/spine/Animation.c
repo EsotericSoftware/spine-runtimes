@@ -652,6 +652,7 @@ void _spFFDTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, flo
 		return; /* Time is before first frame. */
 	}
 
+	if (slot->attachmentVerticesCount == 0) alpha = 1;
 	if (slot->attachmentVerticesCount < self->frameVerticesCount) {
 		if (slot->attachmentVerticesCapacity < self->frameVerticesCount) {
 			FREE(slot->attachmentVertices);

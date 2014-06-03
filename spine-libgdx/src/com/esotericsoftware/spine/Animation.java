@@ -31,6 +31,7 @@
 package com.esotericsoftware.spine;
 
 import com.esotericsoftware.spine.attachments.Attachment;
+import com.esotericsoftware.spine.attachments.MeshAttachment;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
@@ -655,14 +656,15 @@ public class Animation {
 			Slot slot = skeleton.slots.get(slotIndex);
 			if (slot.getAttachment() != attachment) return;
 
-			FloatArray verticesArray = slot.getAttachmentVertices();
-			verticesArray.size = 0;
-
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
-
+			
 			float[][] frameVertices = this.frameVertices;
 			int vertexCount = frameVertices[0].length;
+
+			FloatArray verticesArray = slot.getAttachmentVertices();
+			if (verticesArray.size != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
+			verticesArray.size = 0;
 			verticesArray.ensureCapacity(vertexCount);
 			verticesArray.size = vertexCount;
 			float[] vertices = verticesArray.items;

@@ -565,6 +565,7 @@ namespace Spine {
 			int vertexCount = frameVertices[0].Length;
 
 			float[] vertices = slot.attachmentVertices;
+			if (vertices.Length != vertexCount) alpha = 1;
 			if (vertices.Length < vertexCount) {
 				vertices = new float[vertexCount];
 				slot.attachmentVertices = vertices;

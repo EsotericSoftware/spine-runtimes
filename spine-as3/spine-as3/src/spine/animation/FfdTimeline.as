@@ -66,11 +66,8 @@ public class FfdTimeline extends CurveTimeline {
 		var vertexCount:int = frameVertices[0].length;
 
 		var vertices:Vector.<Number> = slot.attachmentVertices;
-		if (vertices.length < vertexCount) {
-			vertices = new Vector.<Number>(vertexCount);
-			slot.attachmentVertices = vertices;
-		}
-		slot.attachmentVertices.length = vertexCount;
+		if (vertices.length != vertexCount) alpha = 1;
+		vertices.length = vertexCount;
 
 		var i:int;
 		if (time >= frames[frames.length - 1]) { // Time is after last frame.
