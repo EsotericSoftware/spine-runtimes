@@ -59,7 +59,9 @@ public class SkeletonRenderer : MonoBehaviour {
 	private Material[] sharedMaterials = new Material[0];
 	private readonly List<Material> submeshMaterials = new List<Material>();
 	private readonly List<Submesh> submeshes = new List<Submesh>();
-
+	private bool isSetColor;
+	private Color newColor;
+	
 	public virtual void Reset () {
 		if (meshFilter != null) meshFilter.sharedMesh = null;
 		if (mesh != null) DestroyImmediate(mesh);
@@ -107,6 +109,11 @@ public class SkeletonRenderer : MonoBehaviour {
 		return mesh;
 	}
 	
+    	public void SetColor (Color color) {
+	        isSetColor = true;
+        	newColor = color;
+	}
+    
 	public virtual void LateUpdate () {
 		if (!valid) return;
 		
@@ -205,10 +212,18 @@ public class SkeletonRenderer : MonoBehaviour {
 				vertices[vertexIndex + 2] = new Vector3(tempVertices[RegionAttachment.X2], tempVertices[RegionAttachment.Y2], z);
 				vertices[vertexIndex + 3] = new Vector3(tempVertices[RegionAttachment.X3], tempVertices[RegionAttachment.Y3], z);
 				
-				color.a = (byte)(a * slot.a * regionAttachment.a);
-				color.r = (byte)(r * slot.r * regionAttachment.r * color.a);
-				color.g = (byte)(g * slot.g * regionAttachment.g * color.a);
-				color.b = (byte)(b * slot.b * regionAttachment.b * color.a);
+                                if (isSetColor)
+                                {
+                                    color = newColor;
+                                }
+                                else
+                                {
+				    color.a = (byte)(a * slot.a * regionAttachment.a);
+				    color.r = (byte)(r * slot.r * regionAttachment.r * color.a);
+				    color.g = (byte)(g * slot.g * regionAttachment.g * color.a);
+				    color.b = (byte)(b * slot.b * regionAttachment.b * color.a);
+                                }
+				
 				if (slot.data.additiveBlending) color.a = 0;
 				colors[vertexIndex] = color;
 				colors[vertexIndex + 1] = color;
