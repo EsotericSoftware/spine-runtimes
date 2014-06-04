@@ -133,8 +133,8 @@ internal class PolygonBatch {
 		var tl:int = triangles.length;
 		var vc:int = _verticesCount, tc:int = _trianglesCount;
 		var firstVertex:int = vc >> 3;
-		if (firstVertex + (vl >> 1) > _capacity) resize(vl >> 1);
-		if (tc + tl > _triangles.length) resize(tl / 3);
+		if (firstVertex + (vl >> 1) > _capacity) resize(firstVertex + (vl >> 1) - _capacity);
+		if (tc + tl > _triangles.length) resize((tc + tl - _triangles.length) / 3);
 
 		var i:int, t:Vector.<uint> = _triangles;
 		for (i = 0; i < tl; i += 3, tc += 3) {
@@ -174,7 +174,7 @@ internal class PolygonBatch {
 	}
 
 	private function resize (additional:int) : void {
-		var newCapacity:int = (_verticesCount >> 3) + additional;
+		var newCapacity:int = _capacity + additional;
 		if (newCapacity > maxCapacity) {
 			flush();
 			newCapacity = additional;
