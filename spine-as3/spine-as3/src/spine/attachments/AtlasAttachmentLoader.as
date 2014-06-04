@@ -48,7 +48,9 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 			throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
 		var attachment:RegionAttachment = new RegionAttachment(name);
 		attachment.rendererObject = region;
-		attachment.setUVs(region.u, region.v, region.u2, region.v2, region.rotate);
+		var scaleX:Number = region.page.width / nextPOT(region.page.width);
+		var scaleY:Number = region.page.height / nextPOT(region.page.height);
+		attachment.setUVs(region.u * scaleX, region.v * scaleY, region.u2 * scaleX, region.v2 * scaleY, region.rotate);
 		attachment.regionOffsetX = region.offsetX;
 		attachment.regionOffsetY = region.offsetY;
 		attachment.regionWidth = region.width;
@@ -64,10 +66,12 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 			throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
 		var attachment:MeshAttachment = new MeshAttachment(name);
 		attachment.rendererObject = region;
-		attachment.regionU = region.u;
-		attachment.regionV = region.v;
-		attachment.regionU2 = region.u2;
-		attachment.regionV2 = region.v2;
+		var scaleX:Number = region.page.width / nextPOT(region.page.width);
+		var scaleY:Number = region.page.height / nextPOT(region.page.height);
+		attachment.regionU = region.u * scaleX;
+		attachment.regionV = region.v * scaleY;
+		attachment.regionU2 = region.u2 * scaleX;
+		attachment.regionV2 = region.v2 * scaleY;
 		attachment.regionRotate = region.rotate;
 		attachment.regionOffsetX = region.offsetX;
 		attachment.regionOffsetY = region.offsetY;
@@ -84,10 +88,12 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 			throw new Error("Region not found in atlas: " + path + " (skinned mesh attachment: " + name + ")");
 		var attachment:SkinnedMeshAttachment = new SkinnedMeshAttachment(name);
 		attachment.rendererObject = region;
-		attachment.regionU = region.u;
-		attachment.regionV = region.v;
-		attachment.regionU2 = region.u2;
-		attachment.regionV2 = region.v2;
+		var scaleX:Number = region.page.width / nextPOT(region.page.width);
+		var scaleY:Number = region.page.height / nextPOT(region.page.height);
+		attachment.regionU = region.u * scaleX;
+		attachment.regionV = region.v * scaleY;
+		attachment.regionU2 = region.u2 * scaleX;
+		attachment.regionV2 = region.v2 * scaleY;
 		attachment.regionRotate = region.rotate;
 		attachment.regionOffsetX = region.offsetX;
 		attachment.regionOffsetY = region.offsetY;
@@ -100,6 +106,16 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 
 	public function newBoundingBoxAttachment (skin:Skin, name:String) : BoundingBoxAttachment {
 		return new BoundingBoxAttachment(name);
+	}
+
+	static public function nextPOT (value:int) : int {
+		value--;
+		value |= value >> 1;
+		value |= value >> 2;
+		value |= value >> 4;
+		value |= value >> 8;
+		value |= value >> 16;
+		return value + 1;
 	}
 }
 
