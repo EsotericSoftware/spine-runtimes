@@ -49,7 +49,7 @@ public class Skeleton {
 
 	public function Skeleton (data:SkeletonData) {
 		if (data == null)
-			throw new ArgumentError("data cannot be null.");
+			return;
 		_data = data;
 
 		_bones = new Vector.<Bone>();
