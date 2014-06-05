@@ -59,7 +59,7 @@ public class SkeletonSprite extends DisplayObject {
 	static private var _tempVertices:Vector.<Number> = new Vector.<Number>(8);
 	static private var _quadTriangles:Vector.<uint> = new <uint>[0, 1, 2, 2, 3, 0];
 
-	private var _skeleton:Skeleton;
+	protected var _skeleton:Skeleton;
 	private var _renderMeshes:Boolean;
 	private var _polygonBatch:PolygonBatch;
 	public var batchable:Boolean = true;
