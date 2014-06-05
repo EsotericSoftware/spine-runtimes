@@ -169,6 +169,7 @@ public class SkeletonSprite extends DisplayObject {
 	}
 
 	private function renderRegions (support:RenderSupport, alpha:Number) : void {
+		var originalBlendMode:String = support.blendMode;
 		var r:Number = skeleton.r * 255;
 		var g:Number = skeleton.g * 255;
 		var b:Number = skeleton.b * 255;
@@ -204,10 +205,11 @@ public class SkeletonSprite extends DisplayObject {
 				vertexData.setColorAndAlpha(3, rgb, a);
 				
 				image.updateVertices();
-				support.blendMode = slot.data.additiveBlending ? BlendMode.ADD : blendMode;
+				support.blendMode = slot.data.additiveBlending ? BlendMode.ADD : originalBlendMode;
 				support.batchQuad(image, alpha, image.texture);
 			}
 		}
+		support.blendMode = originalBlendMode;
 	}
 
 	override public function hitTest (localPoint:Point, forTouch:Boolean = false) : DisplayObject {
