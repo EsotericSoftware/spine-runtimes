@@ -64,7 +64,7 @@ public class SkeletonJson {
 		this.attachmentLoader = attachmentLoader;
 	}
 
-	/** @param object A String or ByteArray. */
+	/** @param object A String or ByteArray or a dynamic Object. */
 	public function readSkeletonData (object:*, name:String = null) : SkeletonData {
 		if (object == null)
 			throw new ArgumentError("object cannot be null.");
@@ -74,13 +74,15 @@ public class SkeletonJson {
 			json = String(object);
 		else if (object is ByteArray)
 			json = object.readUTFBytes(object.length);
-		else
-			throw new ArgumentError("object must be a String or ByteArray.");
 
 		var skeletonData:SkeletonData = new SkeletonData();
 		skeletonData.name = name;
 
-		var root:Object = JSON.parse(json);
+		var root:Object;
+		if (json)
+			root = JSON.parse(json);
+		else
+			root = object;
 
 		// Bones.
 		var boneData:BoneData;
