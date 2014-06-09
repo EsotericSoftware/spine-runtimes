@@ -35,11 +35,17 @@ import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.utils.Pool;
 
 public class SkeletonBounds {
 	private float minX, minY, maxX, maxY;
 	private Array<BoundingBoxAttachment> boundingBoxes = new Array();
 	private Array<FloatArray> polygons = new Array();
+	private Pool<FloatArray> polygonPool = new Pool() {
+		protected Object newObject () {
+			return new FloatArray();
+		}
+	};
 
 	public void update (Skeleton skeleton, boolean updateAabb) {
 		Array<BoundingBoxAttachment> boundingBoxes = this.boundingBoxes;
@@ -49,8 +55,8 @@ public class SkeletonBounds {
 		float x = skeleton.getX(), y = skeleton.getY();
 
 		boundingBoxes.clear();
+		polygonPool.freeAll(polygons);
 		polygons.clear();
-		polygons.ensureCapacity(slotCount);
 
 		for (int i = 0; i < slotCount; i++) {
 			Slot slot = slots.get(i);
@@ -59,13 +65,12 @@ public class SkeletonBounds {
 				BoundingBoxAttachment boundingBox = (BoundingBoxAttachment)attachment;
 				boundingBoxes.add(boundingBox);
 
-				polygons.size = boundingBoxes.size;
-				FloatArray polygon = polygons.peek();
-				if (polygon == null) polygons.set(polygons.size - 1, polygon = new FloatArray());
-
+				FloatArray polygon = polygonPool.obtain();
+				polygons.add(polygon);
 				int vertexCount = boundingBox.getVertices().length;
 				polygon.ensureCapacity(vertexCount);
 				polygon.size = vertexCount;
+
 				boundingBox.computeWorldVertices(x, y, slot.bone, polygon.items);
 			}
 		}

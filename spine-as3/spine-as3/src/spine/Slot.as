@@ -41,6 +41,7 @@ public class Slot {
 	public var a:Number;
 	internal var _attachment:Attachment;
 	private var _attachmentTime:Number;
+	public var attachmentVertices:Vector.<Number> = new Vector.<Number>();
 
 	public function Slot (data:SlotData, skeleton:Skeleton, bone:Bone) {
 		if (data == null)
@@ -77,6 +78,7 @@ public class Slot {
 	public function set attachment (attachment:Attachment) : void {
 		_attachment = attachment;
 		_attachmentTime = _skeleton.time;
+		attachmentVertices.length = 0;
 	}
 
 	public function set attachmentTime (time:Number) : void {

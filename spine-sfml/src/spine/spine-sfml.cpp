@@ -37,27 +37,27 @@
 #include <SFML/Graphics/RenderStates.hpp>
 
 #ifndef SPINE_MESH_VERTEX_COUNT_MAX
-#define SPINE_MESH_VERTEX_COUNT_MAX 200
+#define SPINE_MESH_VERTEX_COUNT_MAX 1000
 #endif
 
 using namespace sf;
 
 void _AtlasPage_createTexture (AtlasPage* self, const char* path){
-Texture* texture = new Texture();
-if (!texture->loadFromFile(path)) return;
-texture->setSmooth(true);
-self->rendererObject = texture;
-Vector2u size = texture->getSize();
-self->width = size.x;
-self->height = size.y;
+	Texture* texture = new Texture();
+	if (!texture->loadFromFile(path)) return;
+	texture->setSmooth(true);
+	self->rendererObject = texture;
+	Vector2u size = texture->getSize();
+	self->width = size.x;
+	self->height = size.y;
 }
 
 void _AtlasPage_disposeTexture (AtlasPage* self){
-delete (Texture*)self->rendererObject;
+	delete (Texture*)self->rendererObject;
 }
 
 char* _Util_readFile (const char* path, int* length){
-return _readFile(path, length);
+	return _readFile(path, length);
 }
 
 /**/
@@ -76,6 +76,7 @@ SkeletonDrawable::SkeletonDrawable (SkeletonData* skeletonData, AnimationStateDa
 
 SkeletonDrawable::~SkeletonDrawable () {
 	delete vertexArray;
+	FREE(worldVertices);
 	AnimationState_dispose(state);
 	Skeleton_dispose(skeleton);
 }
@@ -154,7 +155,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 
 		} else if (attachment->type == ATTACHMENT_MESH) {
 			MeshAttachment* mesh = (MeshAttachment*)attachment;
-			if (mesh->uvsCount > SPINE_MESH_VERTEX_COUNT_MAX) continue;
+			if (mesh->verticesCount > SPINE_MESH_VERTEX_COUNT_MAX) continue;
 			texture = (Texture*)((AtlasRegion*)mesh->rendererObject)->page->rendererObject;
 			MeshAttachment_computeWorldVertices(mesh, slot->skeleton->x, slot->skeleton->y, slot, worldVertices);
 

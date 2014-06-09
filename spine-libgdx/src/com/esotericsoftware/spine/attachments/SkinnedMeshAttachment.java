@@ -70,6 +70,7 @@ public class SkinnedMeshAttachment extends Attachment {
 	}
 
 	public void updateUVs () {
+		float[] regionUVs = this.regionUVs;
 		int verticesLength = regionUVs.length;
 		int worldVerticesLength = verticesLength / 2 * 5;
 		if (worldVertices == null || worldVertices.length != worldVerticesLength) worldVertices = new float[worldVerticesLength];
@@ -84,7 +85,6 @@ public class SkinnedMeshAttachment extends Attachment {
 			width = region.getU2() - u;
 			height = region.getV2() - v;
 		}
-		float[] regionUVs = this.regionUVs;
 		if (region instanceof AtlasRegion && ((AtlasRegion)region).rotate) {
 			for (int i = 0, w = 3; i < verticesLength; i += 2, w += 5) {
 				worldVertices[w] = u + regionUVs[i + 1] * width;

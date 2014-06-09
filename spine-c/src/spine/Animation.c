@@ -404,8 +404,6 @@ void _spColorTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
-	slot = skeleton->slots[self->slotIndex];
-
 	if (time >= self->frames[self->framesCount - 5]) {
 		/* Time is after last frame. */
 		int i = self->framesCount - 1;
@@ -429,6 +427,7 @@ void _spColorTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 		b = lastFrameB + (self->frames[frameIndex + COLOR_FRAME_B] - lastFrameB) * percent;
 		a = lastFrameA + (self->frames[frameIndex + COLOR_FRAME_A] - lastFrameA) * percent;
 	}
+	slot = skeleton->slots[self->slotIndex];
 	if (alpha < 1) {
 		slot->r += (r - slot->r) * alpha;
 		slot->g += (g - slot->g) * alpha;
@@ -653,6 +652,7 @@ void _spFFDTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, flo
 		return; /* Time is before first frame. */
 	}
 
+	if (slot->attachmentVerticesCount == 0) alpha = 1;
 	if (slot->attachmentVerticesCount < self->frameVerticesCount) {
 		if (slot->attachmentVerticesCapacity < self->frameVerticesCount) {
 			FREE(slot->attachmentVertices);

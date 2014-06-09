@@ -38,10 +38,10 @@ public class CurveTimeline implements Timeline {
 	static private const STEPPED:Number = -1;
 	static private const BEZIER_SEGMENTS:int = 10;
 
-	private var curves:Vector.<Number> = new Vector.<Number>(); // dfx, dfy, ddfx, ddfy, dddfx, dddfy, ...
+	private var curves:Vector.<Number>; // dfx, dfy, ddfx, ddfy, dddfx, dddfy, ...
 
 	public function CurveTimeline (frameCount:int) {
-		curves.length = frameCount * 6;
+		curves = new Vector.<Number>(frameCount * 6, true)
 	}
 
 	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {

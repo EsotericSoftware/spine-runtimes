@@ -102,7 +102,8 @@ function Bone.new (data, parent)
 		self.scaleX = data.scaleX
 		self.scaleY = data.scaleY
 	end
-	
+
+	self:setToSetupPose()
 	return self
 end
 return Bone

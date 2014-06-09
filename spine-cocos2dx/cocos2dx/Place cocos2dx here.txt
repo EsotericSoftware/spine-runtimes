@@ -1,1 +1,0 @@
-cocos2d-x-3.1alpha0 or later.

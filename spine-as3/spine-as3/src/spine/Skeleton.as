@@ -41,7 +41,7 @@ public class Skeleton {
 	public var g:Number = 1;
 	public var b:Number = 1;
 	public var a:Number = 1;
-	public var time:Number;
+	public var time:Number = 0;
 	public var flipX:Boolean;
 	public var flipY:Boolean;
 	public var x:Number = 0;
@@ -86,8 +86,11 @@ public class Skeleton {
 	}
 
 	public function setSlotsToSetupPose () : void {
-		for each (var slot:Slot in _slots)
+		var i:int = 0;
+		for each (var slot:Slot in _slots) { 
+			drawOrder[i++] = slot;
 			slot.setToSetupPose();
+		}
 	}
 
 	public function get data () : SkeletonData {
@@ -170,11 +173,25 @@ public class Skeleton {
 	}
 
 	/** Sets the skin used to look up attachments not found in the {@link SkeletonData#getDefaultSkin() default skin}. Attachments
-	 * from the new skin are attached if the corresponding attachment from the old skin was attached.
+	 * from the new skin are attached if the corresponding attachment from the old skin was attached. If there was no old skin,
+	 * each slot's setup mode attachment is attached from the new skin.
 	 * @param newSkin May be null. */
 	public function set skin (newSkin:Skin) : void {
-		if (skin != null && newSkin != null)
-			newSkin.attachAll(this, skin);
+		if (newSkin) {
+			if (skin)
+				newSkin.attachAll(this, skin);
+			else {
+				var i:int = 0;
+				for each (var slot:Slot in _slots) {
+					var name:String = slot.data.attachmentName;
+					if (name) {
+						var attachment:Attachment = newSkin.getAttachment(i, name);
+						if (attachment) slot.attachment = attachment;
+					}
+					i++;
+				}
+			}
+		}
 		_skin = newSkin;
 	}
 

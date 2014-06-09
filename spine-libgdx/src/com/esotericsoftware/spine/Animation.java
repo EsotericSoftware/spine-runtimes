@@ -419,8 +419,6 @@ public class Animation {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			Color color = skeleton.slots.get(slotIndex).color;
-
 			float r, g, b, a;
 			if (time >= frames[frames.length - 5]) {
 				// Time is after last frame.
@@ -445,6 +443,7 @@ public class Animation {
 				b = prevFrameB + (frames[frameIndex + FRAME_B] - prevFrameB) * percent;
 				a = prevFrameA + (frames[frameIndex + FRAME_A] - prevFrameA) * percent;
 			}
+			Color color = skeleton.slots.get(slotIndex).color;
 			if (alpha < 1)
 				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
 			else
@@ -656,14 +655,15 @@ public class Animation {
 			Slot slot = skeleton.slots.get(slotIndex);
 			if (slot.getAttachment() != attachment) return;
 
-			FloatArray verticesArray = slot.getAttachmentVertices();
-			verticesArray.size = 0;
-
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
-
+			
 			float[][] frameVertices = this.frameVertices;
 			int vertexCount = frameVertices[0].length;
+
+			FloatArray verticesArray = slot.getAttachmentVertices();
+			if (verticesArray.size != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
+			verticesArray.size = 0;
 			verticesArray.ensureCapacity(vertexCount);
 			verticesArray.size = vertexCount;
 			float[] vertices = verticesArray.items;

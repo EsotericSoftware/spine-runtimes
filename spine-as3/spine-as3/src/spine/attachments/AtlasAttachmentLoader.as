@@ -41,27 +41,81 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 			throw new ArgumentError("atlas cannot be null.");
 		this.atlas = atlas;
 	}
+	
+	public function newRegionAttachment (skin:Skin, name:String, path:String) : RegionAttachment {
+		var region:AtlasRegion = atlas.findRegion(path);
+		if (region == null)
+			throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
+		var attachment:RegionAttachment = new RegionAttachment(name);
+		attachment.rendererObject = region;
+		var scaleX:Number = region.page.width / nextPOT(region.page.width);
+		var scaleY:Number = region.page.height / nextPOT(region.page.height);
+		attachment.setUVs(region.u * scaleX, region.v * scaleY, region.u2 * scaleX, region.v2 * scaleY, region.rotate);
+		attachment.regionOffsetX = region.offsetX;
+		attachment.regionOffsetY = region.offsetY;
+		attachment.regionWidth = region.width;
+		attachment.regionHeight = region.height;
+		attachment.regionOriginalWidth = region.originalWidth;
+		attachment.regionOriginalHeight = region.originalHeight;
+		return attachment;
+	}
+	
+	public function newMeshAttachment (skin:Skin, name:String, path:String) : MeshAttachment {
+		var region:AtlasRegion = atlas.findRegion(path);
+		if (region == null)
+			throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
+		var attachment:MeshAttachment = new MeshAttachment(name);
+		attachment.rendererObject = region;
+		var scaleX:Number = region.page.width / nextPOT(region.page.width);
+		var scaleY:Number = region.page.height / nextPOT(region.page.height);
+		attachment.regionU = region.u * scaleX;
+		attachment.regionV = region.v * scaleY;
+		attachment.regionU2 = region.u2 * scaleX;
+		attachment.regionV2 = region.v2 * scaleY;
+		attachment.regionRotate = region.rotate;
+		attachment.regionOffsetX = region.offsetX;
+		attachment.regionOffsetY = region.offsetY;
+		attachment.regionWidth = region.width;
+		attachment.regionHeight = region.height;
+		attachment.regionOriginalWidth = region.originalWidth;
+		attachment.regionOriginalHeight = region.originalHeight;
+		return attachment;
+	}
+	
+	public function newSkinnedMeshAttachment (skin:Skin, name:String, path:String) : SkinnedMeshAttachment {
+		var region:AtlasRegion = atlas.findRegion(path);
+		if (region == null)
+			throw new Error("Region not found in atlas: " + path + " (skinned mesh attachment: " + name + ")");
+		var attachment:SkinnedMeshAttachment = new SkinnedMeshAttachment(name);
+		attachment.rendererObject = region;
+		var scaleX:Number = region.page.width / nextPOT(region.page.width);
+		var scaleY:Number = region.page.height / nextPOT(region.page.height);
+		attachment.regionU = region.u * scaleX;
+		attachment.regionV = region.v * scaleY;
+		attachment.regionU2 = region.u2 * scaleX;
+		attachment.regionV2 = region.v2 * scaleY;
+		attachment.regionRotate = region.rotate;
+		attachment.regionOffsetX = region.offsetX;
+		attachment.regionOffsetY = region.offsetY;
+		attachment.regionWidth = region.width;
+		attachment.regionHeight = region.height;
+		attachment.regionOriginalWidth = region.originalWidth;
+		attachment.regionOriginalHeight = region.originalHeight;
+		return attachment;
+	}
 
-	public function newAttachment (skin:Skin, type:AttachmentType, name:String) : Attachment {
-		switch (type) {
-		case AttachmentType.region:
-			var region:AtlasRegion  = atlas.findRegion(name);
-			if (region == null)
-				throw new Error("Region not found in atlas: " + name + " (" + type + ")");
-			var attachment:RegionAttachment = new RegionAttachment(name);
-			attachment.rendererObject = region;
-			attachment.setUVs(region.u, region.v, region.u2, region.v2, region.rotate);
-			attachment.regionOffsetX = region.offsetX;
-			attachment.regionOffsetY = region.offsetY;
-			attachment.regionWidth = region.width;
-			attachment.regionHeight = region.height;
-			attachment.regionOriginalWidth = region.originalWidth;
-			attachment.regionOriginalHeight = region.originalHeight;
-			return attachment;
-		case AttachmentType.boundingbox:
-			return new BoundingBoxAttachment(name);
-		}
-		throw new Error("Unknown attachment type: " + type);
+	public function newBoundingBoxAttachment (skin:Skin, name:String) : BoundingBoxAttachment {
+		return new BoundingBoxAttachment(name);
+	}
+
+	static public function nextPOT (value:int) : int {
+		value--;
+		value |= value >> 1;
+		value |= value >> 2;
+		value |= value >> 4;
+		value |= value >> 8;
+		value |= value >> 16;
+		return value + 1;
 	}
 }
 

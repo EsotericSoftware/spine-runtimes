@@ -115,11 +115,11 @@ typedef struct {
 	spEvent** events;
 
 	spTrackEntry* (*createTrackEntry) (spAnimationState* self);
-	void (*disposeTrackEntry) (spAnimationState* self, spTrackEntry* entry);
+	void (*disposeTrackEntry) (spTrackEntry* entry);
 } _spAnimationState;
 
-spTrackEntry* _spTrackEntry_create ();
-void _spTrackEntry_dispose (spTrackEntry* entry);
+spTrackEntry* _spTrackEntry_create (spAnimationState* self);
+void _spTrackEntry_dispose (spTrackEntry* self);
 
 /**/
 

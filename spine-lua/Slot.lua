@@ -38,7 +38,10 @@ function Slot.new (slotData, skeleton, bone)
 		data = slotData,
 		skeleton = skeleton,
 		bone = bone,
-		r = 1, g = 1, b = 1, a = 1
+		r = 1, g = 1, b = 1, a = 1,
+		attachment = nil,
+		attachmentTime = 0,
+		attachmentVertices = nil
 	}
 
 	function self:setColor (r, g, b, a)

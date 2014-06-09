@@ -75,16 +75,17 @@ function AnimationState.new (data)
 		for i = 0, self.trackCount do
 			local current = self.tracks[i]
 			if current then
-				local trackDelta = delta * current.timeScale
-				current.time = current.time + trackDelta
+				current.time = current.time + delta * current.timeScale
 				if current.previous then
-					current.previous.time = current.previous.time + trackDelta
-					current.mixTime = current.mixTime + trackDelta
+					local previousDelta = delta * current.previous.timeScale
+					current.previous.time = current.previous.time + previousDelta
+					current.mixTime = current.mixTime + previousDelta
 				end
 
 				local next = current.next
 				if next then
-					if current.lastTime >= next.delay then setCurrent(i, next) end
+					next.time = current.lastTime - next.delay
+					if next.time >= 0 then setCurrent(i, next) end
 				else
 					-- End non-looping animation when it reaches its end time and there is no next entry.
 					if not current.loop and current.lastTime >= current.endTime then self:clearTrack(i) end

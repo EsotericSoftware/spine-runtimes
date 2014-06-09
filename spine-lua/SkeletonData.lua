@@ -36,7 +36,8 @@ function SkeletonData.new ()
 		slotNameIndices = {},
 		skins = {},
 		events = {},
-		animations = {}
+		animations = {},
+		defaultSkin = nil
 	}
 
 	function self:findBone (boneName)

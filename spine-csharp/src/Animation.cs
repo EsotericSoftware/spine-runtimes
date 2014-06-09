@@ -361,8 +361,6 @@ namespace Spine {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			Slot slot = skeleton.slots[slotIndex];
-
 			float r, g, b, a;
 			if (time >= frames[frames.Length - 5]) {
 				// Time is after last frame.
@@ -387,6 +385,7 @@ namespace Spine {
 				b = lastFrameB + (frames[frameIndex + FRAME_B] - lastFrameB) * percent;
 				a = lastFrameA + (frames[frameIndex + FRAME_A] - lastFrameA) * percent;
 			}
+			Slot slot = skeleton.slots[slotIndex];
 			if (alpha < 1) {
 				slot.r += (r - slot.r) * alpha;
 				slot.g += (g - slot.g) * alpha;
@@ -566,6 +565,7 @@ namespace Spine {
 			int vertexCount = frameVertices[0].Length;
 
 			float[] vertices = slot.attachmentVertices;
+			if (vertices.Length != vertexCount) alpha = 1;
 			if (vertices.Length < vertexCount) {
 				vertices = new float[vertexCount];
 				slot.attachmentVertices = vertices;

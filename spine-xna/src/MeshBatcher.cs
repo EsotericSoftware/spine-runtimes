@@ -80,7 +80,7 @@ namespace Spine {
 		private readonly List<MeshItem> items;
 		private readonly Queue<MeshItem> freeItems;
 		private VertexPositionColorTexture[] vertexArray = { };
-		private int[] triangles = { };
+		private short[] triangles = { };
 
 		public MeshBatcher () {
 			items = new List<MeshItem>(256);
@@ -101,7 +101,7 @@ namespace Spine {
 
 		private void EnsureCapacity (int vertexCount, int triangleCount) {
 			if (vertexArray.Length < vertexCount) vertexArray = new VertexPositionColorTexture[vertexCount];
-			if (triangles.Length < triangleCount) triangles = new int[triangleCount];
+			if (triangles.Length < triangleCount) triangles = new short[triangleCount];
 		}
 
 		public void Draw (GraphicsDevice device) {
@@ -121,7 +121,9 @@ namespace Spine {
 			Texture2D lastTexture = null;
 			for (int i = 0; i < itemCount; i++) {
 				MeshItem item = items[i];
-				if (item.texture != lastTexture) {
+				int itemVertexCount = item.vertexCount;
+
+				if (item.texture != lastTexture || vertexCount + itemVertexCount > short.MaxValue) {
 					FlushVertexArray(device, vertexCount, triangleCount);
 					vertexCount = 0;
 					triangleCount = 0;
@@ -132,10 +134,9 @@ namespace Spine {
 				int[] itemTriangles = item.triangles;
 				int itemTriangleCount = item.triangleCount;
 				for (int ii = 0, t = triangleCount; ii < itemTriangleCount; ii++, t++)
-					triangles[t] = itemTriangles[ii] + vertexCount;
+					triangles[t] = (short)(itemTriangles[ii] + vertexCount);
 				triangleCount += itemTriangleCount;
 
-				int itemVertexCount = item.vertexCount;
 				Array.Copy(item.vertices, 0, vertexArray, vertexCount, itemVertexCount);
 				vertexCount += itemVertexCount;
 

@@ -87,7 +87,7 @@ public class SimpleTest1 extends ApplicationAdapter {
 		// Configure the camera, SpriteBatch, and SkeletonRendererDebug.
 		camera.update();
 		batch.getProjectionMatrix().set(camera.combined);
-		debugRenderer.getShapeRenderer().getProjectionMatrix().set(camera.combined);
+		debugRenderer.getShapeRenderer().setProjectionMatrix(camera.combined);
 
 		batch.begin();
 		renderer.draw(batch, skeleton); // Draw the skeleton images.

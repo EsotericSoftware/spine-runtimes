@@ -34,12 +34,12 @@ import spine.Skeleton;
 import spine.Slot;
 
 public class EventTimeline implements Timeline {
-	public var frames:Vector.<Number> = new Vector.<Number>(); // time, ...
-	public var events:Vector.<Event> = new Vector.<Event>();
+	public var frames:Vector.<Number>; // time, ...
+	public var events:Vector.<Event>;
 
 	public function EventTimeline (frameCount:int) {
-		frames.length = frameCount;
-		events.length = frameCount;
+		frames = new Vector.<Number>(frameCount, true);
+		events = new Vector.<Event>(frameCount, true)
 	}
 
 	public function get frameCount () : int {

@@ -32,20 +32,24 @@ local AttachmentType = require "spine-lua.AttachmentType"
 local RegionAttachment = require "spine-lua.RegionAttachment"
 local BoundingBoxAttachment = require "spine-lua.BoundingBoxAttachment"
 
-local AttachmentLoader = {
-	failed = {}
-}
+local AttachmentLoader = {}
 function AttachmentLoader.new ()
 	local self = {}
 
-	function self:newAttachment (type, name)
-		if type == AttachmentType.region then
-			return RegionAttachment.new(name)
-		end
-		if type == AttachmentType.boundingbox then
-			return BoundingBoxAttachment.new(name)
-		end
-		error("Unknown attachment type: " .. type .. " (" .. name .. ")")
+	function self:newRegionAttachment (skin, name, path)
+		return RegionAttachment.new(name)
+	end
+
+	function self:newMeshAttachment (skin, name, path)
+		return MeshAttachment.new(name)
+	end
+
+	function self:newSkinningMeshAttachment (skin, name, path)
+		return SkinningMeshAttachment.new(name)
+	end
+
+	function self:newBoundingBoxAttachment (skin, name)
+		return BoundingBoxAttachment.new(name)
 	end
 
 	return self
