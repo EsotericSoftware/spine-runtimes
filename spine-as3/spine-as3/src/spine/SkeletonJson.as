@@ -69,18 +69,19 @@ public class SkeletonJson {
 		if (object == null)
 			throw new ArgumentError("object cannot be null.");
 
-		var json:String;
+		var root:Object
 		if (object is String)
-			json = String(object);
+			root = JSON.parse(String(object));
 		else if (object is ByteArray)
-			json = object.readUTFBytes(object.length);
+			root = JSON.parse(object.readUTFBytes(object.length));
+		else if (object is Object)
+			root = object;
 		else
-			throw new ArgumentError("object must be a String or ByteArray.");
+			throw new ArgumentError("object must be a String, ByteArray or Object.");
 
 		var skeletonData:SkeletonData = new SkeletonData();
 		skeletonData.name = name;
 
-		var root:Object = JSON.parse(json);
 
 		// Bones.
 		var boneData:BoneData;
