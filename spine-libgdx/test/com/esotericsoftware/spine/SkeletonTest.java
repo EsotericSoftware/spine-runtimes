@@ -401,11 +401,11 @@ public class SkeletonTest extends ApplicationAdapter {
 
 				public void clicked (InputEvent event, float x, float y) {
 					if (minimizeButton.isChecked()) {
-						window.getCells().get(0).setWidget(null);
+						window.getCells().get(0).setActor(null);
 						window.setHeight(20);
 						minimizeButton.setText("+");
 					} else {
-						window.getCells().get(0).setWidget(root);
+						window.getCells().get(0).setActor(root);
 						ui.window.setHeight(Gdx.graphics.getHeight());
 						minimizeButton.setText("-");
 					}
