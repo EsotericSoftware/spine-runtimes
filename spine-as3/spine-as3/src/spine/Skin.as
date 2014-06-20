@@ -29,12 +29,14 @@
  *****************************************************************************/
 
 package spine {
+import flash.utils.Dictionary;
+
 import spine.attachments.Attachment;
 
 /** Stores attachments by slot index and attachment name. */
 public class Skin {
 	internal var _name:String;
-	private var attachments:Object = new Object();
+	private var attachments:Array = new Array();
 
 	public function Skin (name:String) {
 		if (name == null)
@@ -45,12 +47,19 @@ public class Skin {
 	public function addAttachment (slotIndex:int, name:String, attachment:Attachment) : void {
 		if (attachment == null)
 			throw new ArgumentError("attachment cannot be null.");
-		attachments[slotIndex + ":" + name] = attachment;
+		if ( !attachments[slotIndex] ) {
+			attachments[slotIndex] = new Dictionary();
+		}
+		attachments[slotIndex][name] = attachment;
 	}
 
 	/** @return May be null. */
 	public function getAttachment (slotIndex:int, name:String) : Attachment {
-		return attachments[slotIndex + ":" + name];
+		var result:Attachment;
+		if ( attachments[slotIndex] ) {
+			result = attachments[slotIndex][name];
+		}
+		return result;
 	}
 
 	public function get name () : String {
@@ -64,14 +73,14 @@ public class Skin {
 	/** Attach each attachment in this skin if the corresponding attachment in the old skin is currently attached. */
 	public function attachAll (skeleton:Skeleton, oldSkin:Skin) : void {
 		for (var key:String in oldSkin.attachments) {
-			var colon:int = key.indexOf(":");
-			var slotIndex:int = parseInt(key.substring(0, colon));
-			var name:String = key.substring(colon + 1);
-			var slot:Slot = skeleton.slots[slotIndex];
-			if (slot.attachment && slot.attachment.name == name) {
-				var attachment:Attachment = getAttachment(slotIndex, name);
-				if (attachment != null)
-					slot.attachment = attachment;
+			var slotIndex:int = int(key);
+			for ( var name:String in oldSkin.attachments[slotIndex] ) {
+				var slot:Slot = skeleton.slots[slotIndex];
+				if (slot.attachment && slot.attachment.name == name) {
+					var attachment:Attachment = getAttachment(slotIndex, name);
+					if (attachment != null)
+						slot.attachment = attachment;
+				}
 			}
 		}
 	}
