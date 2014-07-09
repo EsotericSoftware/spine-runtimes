@@ -340,8 +340,8 @@ public class SkeletonRenderer : MonoBehaviour {
 					triangles[i + 4] = firstVertex + 3;
 					triangles[i + 5] = firstVertex + 1;
 				}
+				return;
 			}
-			return;
 		}
 
 		// Store triangles.
