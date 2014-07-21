@@ -69,6 +69,7 @@ public class SkeletonBinary {
 	static public final int TIMELINE_EVENT = 5;
 	static public final int TIMELINE_DRAWORDER = 6;
 	static public final int TIMELINE_FFD = 7;
+	static public final int TIMELINE_IK = 8;
 
 	static public final int CURVE_LINEAR = 0;
 	static public final int CURVE_STEPPED = 1;
@@ -123,7 +124,7 @@ public class SkeletonBinary {
 				boneData.inheritScale = input.readBoolean();
 				boneData.inheritRotation = input.readBoolean();
 				if (nonessential) Color.rgba8888ToColor(boneData.getColor(), input.readInt());
-				skeletonData.addBone(boneData);
+				skeletonData.getBones().add(boneData);
 			}
 
 			// Slots.
@@ -134,19 +135,19 @@ public class SkeletonBinary {
 				Color.rgba8888ToColor(slotData.getColor(), input.readInt());
 				slotData.attachmentName = input.readString();
 				slotData.additiveBlending = input.readBoolean();
-				skeletonData.addSlot(slotData);
+				skeletonData.getSlots().add(slotData);
 			}
 
 			// Default skin.
 			Skin defaultSkin = readSkin(input, "default", nonessential);
 			if (defaultSkin != null) {
 				skeletonData.defaultSkin = defaultSkin;
-				skeletonData.addSkin(defaultSkin);
+				skeletonData.getSkins().add(defaultSkin);
 			}
 
 			// Skins.
 			for (int i = 0, n = input.readInt(true); i < n; i++)
-				skeletonData.addSkin(readSkin(input, input.readString(), nonessential));
+				skeletonData.getSkins().add(readSkin(input, input.readString(), nonessential));
 
 			// Events.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
@@ -154,7 +155,7 @@ public class SkeletonBinary {
 				eventData.intValue = input.readInt(false);
 				eventData.floatValue = input.readFloat();
 				eventData.stringValue = input.readString();
-				skeletonData.addEvent(eventData);
+				skeletonData.getEvents().add(eventData);
 			}
 
 			// Animations.
@@ -497,7 +498,7 @@ public class SkeletonBinary {
 		}
 
 		timelines.shrink();
-		skeletonData.addAnimation(new Animation(name, timelines, duration));
+		skeletonData.getAnimations().add(new Animation(name, timelines, duration));
 	}
 
 	private void readCurve (DataInput input, int frameIndex, CurveTimeline timeline) throws IOException {

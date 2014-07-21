@@ -111,7 +111,7 @@ public class SkeletonJson {
 			String color = boneMap.getString("color", null);
 			if (color != null) boneData.getColor().set(Color.valueOf(color));
 
-			skeletonData.addBone(boneData);
+			skeletonData.getBones().add(boneData);
 		}
 
 		// Slots.
@@ -129,7 +129,7 @@ public class SkeletonJson {
 
 			slotData.additiveBlending = slotMap.getBoolean("additive", false);
 
-			skeletonData.addSlot(slotData);
+			skeletonData.getSlots().add(slotData);
 		}
 
 		// Skins.
@@ -143,7 +143,7 @@ public class SkeletonJson {
 					if (attachment != null) skin.addAttachment(slotIndex, entry.name, attachment);
 				}
 			}
-			skeletonData.addSkin(skin);
+			skeletonData.getSkins().add(skin);
 			if (skin.name.equals("default")) skeletonData.defaultSkin = skin;
 		}
 
@@ -153,7 +153,7 @@ public class SkeletonJson {
 			eventData.intValue = eventMap.getInt("int", 0);
 			eventData.floatValue = eventMap.getFloat("float", 0f);
 			eventData.stringValue = eventMap.getString("string", null);
-			skeletonData.addEvent(eventData);
+			skeletonData.getEvents().add(eventData);
 		}
 
 		// Animations.
@@ -461,7 +461,7 @@ public class SkeletonJson {
 		}
 
 		timelines.shrink();
-		skeletonData.addAnimation(new Animation(name, timelines, duration));
+		skeletonData.getAnimations().add(new Animation(name, timelines, duration));
 	}
 
 	void readCurve (CurveTimeline timeline, int frameIndex, JsonValue valueMap) {

@@ -273,7 +273,7 @@ public class Animation {
 			float prevFrameValue = frames[frameIndex - 1];
 			float frameTime = frames[frameIndex];
 			float percent = MathUtils.clamp(1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime), 0, 1);
-			percent = getCurvePercent(frameIndex / 2 - 1, percent);
+			percent = getCurvePercent((frameIndex >> 1) - 1, percent);
 
 			float amount = frames[frameIndex + FRAME_VALUE] - prevFrameValue;
 			while (amount > 180)
@@ -657,7 +657,7 @@ public class Animation {
 
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
-			
+
 			float[][] frameVertices = this.frameVertices;
 			int vertexCount = frameVertices[0].length;
 
@@ -698,6 +698,65 @@ public class Animation {
 					vertices[i] = prev + (nextVertices[i] - prev) * percent;
 				}
 			}
+		}
+	}
+
+	static public class IkConstraintTimeline extends CurveTimeline {
+		static private final int PREV_FRAME_TIME = -2;
+		static private final int FRAME_VALUE = 1;
+
+		int ikConstraintIndex;
+		private final float[] frames; // time, mix, ...
+		private final int[] bendDirections;
+
+		public IkConstraintTimeline (int frameCount) {
+			super(frameCount);
+			frames = new float[frameCount * 2];
+			bendDirections = new int[frameCount];
+		}
+
+		public void setIkConstraintIndex (int ikConstraint) {
+			this.ikConstraintIndex = ikConstraint;
+		}
+
+		public int getIkConstraintIndex () {
+			return ikConstraintIndex;
+		}
+
+		public float[] getFrames () {
+			return frames;
+		}
+
+		/** Sets the time and mix and bend direction of the specified keyframe. */
+		public void setFrame (int frameIndex, float time, float mix, int bendDirection) {
+			bendDirections[frameIndex] = bendDirection;
+			frameIndex *= 2;
+			frames[frameIndex] = time;
+			frames[frameIndex + 1] = mix;
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha) {
+			float[] frames = this.frames;
+			if (time < frames[0]) return; // Time is before first frame.
+
+			IkConstraint ikConstraint = skeleton.ikConstraints.get(ikConstraintIndex);
+
+			if (time >= frames[frames.length - 2]) { // Time is after last frame.
+				ikConstraint.mix += (frames[frames.length - 1] - ikConstraint.mix) * alpha;
+				ikConstraint.bendDirection = bendDirections[bendDirections.length - 1];
+				return;
+			}
+
+			// Interpolate between the previous frame and the current frame.
+			int frameIndex = binarySearch(frames, time, 2);
+			float prevFrameValue = frames[frameIndex - 1];
+			float frameTime = frames[frameIndex];
+			float percent = MathUtils.clamp(1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime), 0, 1);
+			percent = getCurvePercent((frameIndex >> 1) - 1, percent);
+
+			float mix = prevFrameValue + (frames[frameIndex + FRAME_VALUE] - prevFrameValue) * percent;
+			ikConstraint.mix += (mix - ikConstraint.mix) * alpha;
+			ikConstraint.bendDirection = bendDirections[(frameIndex - 2) >> 1];
 		}
 	}
 }
