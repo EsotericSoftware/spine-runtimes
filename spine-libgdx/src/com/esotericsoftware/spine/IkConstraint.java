@@ -1,7 +1,8 @@
 
 package com.esotericsoftware.spine;
 
-import com.badlogic.gdx.math.MathUtils;
+import static com.badlogic.gdx.math.MathUtils.*;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
@@ -39,7 +40,14 @@ public class IkConstraint {
 	public void apply () {
 		Bone target = this.target;
 		Array<Bone> bones = this.bones;
-		apply(bones.first(), bones.get(1), target.worldX, target.worldY, bendDirection, mix);
+		switch (bones.size) {
+		case 1:
+			apply(bones.first(), target.worldX, target.worldY, mix);
+			break;
+		case 2:
+			apply(bones.first(), bones.get(1), target.worldX, target.worldY, bendDirection, mix);
+			break;
+		}
 	}
 
 	public Array<Bone> getBones () {
@@ -78,6 +86,15 @@ public class IkConstraint {
 		return data.name;
 	}
 
+	/** Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified in the world
+	 * coordinate system. */
+	static public void apply (Bone bone, float targetX, float targetY, float alpha) {
+		float parentRotation = bone.parent == null ? 0 : bone.parent.worldRotation;
+		float rotation = bone.rotation;
+		float rotationIK = (float)Math.atan2(targetY - bone.getWorldY(), targetX - bone.getWorldX()) * radDeg - parentRotation;
+		bone.rotationIK = rotation + (rotationIK - rotation) * alpha;
+	}
+
 	/** Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as possible. The
 	 * target is specified in the world coordinate system.
 	 * @param child Any descendant bone of the parent. */
@@ -108,21 +125,21 @@ public class IkConstraint {
 		// Based on code by Ryan Juckett with permission: Copyright (c) 2008-2009 Ryan Juckett, http://www.ryanjuckett.com/
 		float cosDenom = 2 * len1 * len2;
 		if (cosDenom < 0.0001f) {
-			child.rotationIK = childRotation
-				+ ((float)Math.atan2(targetY, targetX) * MathUtils.radDeg - parentRotation - childRotation) * alpha;
+			child.rotationIK = childRotation + ((float)Math.atan2(targetY, targetX) * radDeg - parentRotation - childRotation)
+				* alpha;
 			return;
 		}
-		float cos = MathUtils.clamp((targetX * targetX + targetY * targetY - len1 * len1 - len2 * len2) / cosDenom, -1, 1);
+		float cos = clamp((targetX * targetX + targetY * targetY - len1 * len1 - len2 * len2) / cosDenom, -1, 1);
 		float childAngle = (float)Math.acos(cos) * bendDirection;
-		float adjacent = len1 + len2 * cos, opposite = len2 * MathUtils.sin(childAngle);
+		float adjacent = len1 + len2 * cos, opposite = len2 * sin(childAngle);
 		float parentAngle = (float)Math.atan2(targetY * adjacent - targetX * opposite, targetX * adjacent + targetY * opposite);
-		float rotation = (parentAngle - offset) * MathUtils.radDeg - parentRotation;
+		float rotation = (parentAngle - offset) * radDeg - parentRotation;
 		if (rotation > 180)
 			rotation -= 360;
 		else if (rotation < -180) //
 			rotation += 360;
 		parent.rotationIK = parentRotation + rotation * alpha;
-		rotation = (childAngle + offset) * MathUtils.radDeg - childRotation;
+		rotation = (childAngle + offset) * radDeg - childRotation;
 		if (rotation > 180)
 			rotation -= 360;
 		else if (rotation < -180) //
