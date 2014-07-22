@@ -89,7 +89,7 @@ public class IkConstraint {
 	/** Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified in the world
 	 * coordinate system. */
 	static public void apply (Bone bone, float targetX, float targetY, float alpha) {
-		float parentRotation = bone.parent == null ? 0 : bone.parent.worldRotation;
+		float parentRotation = (!bone.data.inheritRotation || bone.parent == null) ? 0 : bone.parent.worldRotation;
 		float rotation = bone.rotation;
 		float rotationIK = (float)Math.atan2(targetY - bone.getWorldY(), targetX - bone.getWorldX()) * radDeg - parentRotation;
 		bone.rotationIK = rotation + (rotationIK - rotation) * alpha;
