@@ -42,10 +42,11 @@ public class Bone {
 	float x, y;
 	float rotation, rotationIK;
 	float scaleX, scaleY;
+	boolean flipX, flipY;
 
 	float m00, m01, worldX; // a b x
 	float m10, m11, worldY; // c d y
-	float worldRotation, worldCos, worldSin;
+	float worldRotation;
 	float worldScaleX, worldScaleY;
 
 	/** @param parent May be null. */
@@ -68,10 +69,12 @@ public class Bone {
 		rotationIK = bone.rotationIK;
 		scaleX = bone.scaleX;
 		scaleY = bone.scaleY;
+		flipX = bone.flipX;
+		flipY = bone.flipY;
 	}
 
 	/** Computes the world SRT using the parent bone and the local SRT. */
-	public void updateWorldTransform (boolean flipX, boolean flipY) {
+	public void updateWorldTransform () {
 		Bone parent = this.parent;
 		float x = this.x, y = this.y;
 		if (parent != null) {
@@ -92,21 +95,21 @@ public class Bone {
 			worldScaleY = scaleY;
 			worldRotation = rotationIK;
 		}
-		float cos = MathUtils.cosDeg(worldRotation);
-		float sin = MathUtils.sinDeg(worldRotation);
-		worldCos = cos;
-		worldSin = sin;
-		m00 = cos * worldScaleX;
-		m10 = sin * worldScaleX;
-		m01 = -sin * worldScaleY;
-		m11 = cos * worldScaleY;
+		float cos = MathUtils.cosDeg(worldRotation) * worldScaleX;
+		float sin = MathUtils.sinDeg(worldRotation) * worldScaleY;
 		if (flipX) {
-			m00 = -m00;
-			m01 = -m01;
+			m00 = -cos;
+			m01 = sin;
+		} else {
+			m00 = cos;
+			m01 = -sin;
 		}
 		if (flipY) {
-			m10 = -m10;
-			m11 = -m11;
+			m10 = -sin;
+			m11 = -cos;
+		} else {
+			m10 = sin;
+			m11 = cos;
 		}
 	}
 
@@ -221,14 +224,6 @@ public class Bone {
 		return worldRotation;
 	}
 
-	public float getWorldCos () {
-		return worldCos;
-	}
-
-	public float getWorldSin () {
-		return worldSin;
-	}
-
 	public float getWorldScaleX () {
 		return worldScaleX;
 	}
@@ -253,12 +248,15 @@ public class Bone {
 	}
 
 	public Vector2 worldToLocal (Vector2 world) {
-		float x = world.x - worldX;
-		float y = world.y - worldY;
-		float cos = worldCos;
-		float sin = -worldSin;
-		world.x = (x * cos - y * sin) / worldScaleX;
-		world.y = (x * sin + y * cos) / worldScaleY;
+		float x = world.x - worldX, y = world.y - worldY;
+		float m00 = this.m00, m10 = this.m10, m01 = this.m01, m11 = this.m11;
+		if (flipX != flipY) {
+			m00 *= -1;
+			m11 *= -1;
+		}
+		float invDet = 1 / (m00 * m11 - m01 * m10);
+		world.x = (x * m00 * invDet - y * m01 * invDet);
+		world.y = (y * m11 * invDet - x * m10 * invDet);
 		return world;
 	}
 

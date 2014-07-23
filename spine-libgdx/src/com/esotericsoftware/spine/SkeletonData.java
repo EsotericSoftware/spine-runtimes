@@ -41,6 +41,8 @@ public class SkeletonData {
 	final Array<EventData> events = new Array();
 	final Array<Animation> animations = new Array();
 	final Array<IkConstraintData> ikConstraints = new Array();
+	float width, height;
+	String version, hash;
 
 	// --- Bones.
 
@@ -177,6 +179,39 @@ public class SkeletonData {
 	/** @param name May be null. */
 	public void setName (String name) {
 		this.name = name;
+	}
+
+	public float getWidth () {
+		return width;
+	}
+
+	public void setWidth (float width) {
+		this.width = width;
+	}
+
+	public float getHeight () {
+		return height;
+	}
+
+	public void setHeight (float height) {
+		this.height = height;
+	}
+
+	/** Returns the Spine version used to export this data. */
+	public String getVersion () {
+		return version;
+	}
+
+	public void setVersion (String version) {
+		this.version = version;
+	}
+
+	public String getHash () {
+		return hash;
+	}
+
+	public void setHash (String hash) {
+		this.hash = hash;
 	}
 
 	public String toString () {

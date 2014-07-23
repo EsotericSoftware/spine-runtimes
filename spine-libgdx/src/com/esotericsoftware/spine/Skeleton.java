@@ -98,12 +98,19 @@ public class Skeleton {
 			drawOrder.add(slots.get(skeleton.slots.indexOf(slot, true)));
 
 		ikConstraints = new Array(skeleton.ikConstraints.size);
-		for (IkConstraint ikConstraint : skeleton.ikConstraints)
-			ikConstraints.add(new IkConstraint(ikConstraint));
+		for (IkConstraint ikConstraint : skeleton.ikConstraints) {
+			Bone target = bones.get(skeleton.bones.indexOf(ikConstraint.target, true));
+			Array<Bone> ikBones = new Array(ikConstraint.bones.size);
+			for (Bone bone : ikConstraint.bones)
+				ikBones.add(bones.get(skeleton.bones.indexOf(bone, true)));
+			ikConstraints.add(new IkConstraint(ikConstraint, ikBones, target));
+		}
 
 		skin = skeleton.skin;
 		color = new Color(skeleton.color);
 		time = skeleton.time;
+		flipX = skeleton.flipX;
+		flipY = skeleton.flipY;
 
 		updateCache();
 	}
@@ -155,15 +162,13 @@ public class Skeleton {
 			Bone bone = bones.get(i);
 			bone.rotationIK = bone.rotation;
 		}
-		boolean flipX = this.flipX;
-		boolean flipY = this.flipY;
 		Array<Array<Bone>> updateBonesCache = this.updateBonesCache;
 		Array<IkConstraint> ikConstraints = this.ikConstraints;
 		int i = 0, last = updateBonesCache.size - 1;
 		while (true) {
 			Array<Bone> updateBones = updateBonesCache.get(i);
 			for (int ii = 0, nn = updateBones.size; ii < nn; ii++)
-				updateBones.get(ii).updateWorldTransform(flipX, flipY);
+				updateBones.get(ii).updateWorldTransform();
 			if (i == last) break;
 			ikConstraints.get(i).apply();
 			i++;
@@ -360,7 +365,11 @@ public class Skeleton {
 	}
 
 	public void setFlipX (boolean flipX) {
+// if (this.flipX == flipX) return;
 		this.flipX = flipX;
+		Array<Bone> bones = this.bones;
+		for (int i = 0, n = bones.size; i < n; i++)
+			bones.get(i).flipX = flipX;
 	}
 
 	public boolean getFlipY () {
@@ -368,7 +377,20 @@ public class Skeleton {
 	}
 
 	public void setFlipY (boolean flipY) {
+		if (this.flipY == flipY) return;
 		this.flipY = flipY;
+		Array<Bone> bones = this.bones;
+		for (int i = 0, n = bones.size; i < n; i++)
+			bones.get(i).flipY = flipY;
+	}
+
+	public void setFlip (boolean flipX, boolean flipY) {
+		Array<Bone> bones = this.bones;
+		for (int i = 0, n = bones.size; i < n; i++) {
+			Bone bone = bones.get(i);
+			bone.flipX = flipX;
+			bone.flipY = flipY;
+		}
 	}
 
 	public float getX () {

@@ -29,10 +29,10 @@ public class IkConstraint {
 	}
 
 	/** Copy constructor. */
-	public IkConstraint (IkConstraint ikConstraint) {
+	public IkConstraint (IkConstraint ikConstraint, Array<Bone> bones, Bone target) {
 		data = ikConstraint.data;
-		bones = new Array(ikConstraint.bones);
-		target = ikConstraint.target;
+		this.bones = bones;
+		this.target = target;
 		mix = ikConstraint.mix;
 		bendDirection = ikConstraint.bendDirection;
 	}
