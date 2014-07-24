@@ -95,21 +95,21 @@ public class Bone {
 			worldScaleY = scaleY;
 			worldRotation = rotationIK;
 		}
-		float cos = MathUtils.cosDeg(worldRotation) * worldScaleX;
-		float sin = MathUtils.sinDeg(worldRotation) * worldScaleY;
+		float cos = MathUtils.cosDeg(worldRotation);
+		float sin = MathUtils.sinDeg(worldRotation);
 		if (flipX) {
-			m00 = -cos;
-			m01 = sin;
+			m00 = -cos * worldScaleX;
+			m01 = sin * worldScaleY;
 		} else {
-			m00 = cos;
-			m01 = -sin;
+			m00 = cos * worldScaleX;
+			m01 = -sin * worldScaleY;
 		}
 		if (flipY) {
-			m10 = -sin;
-			m11 = -cos;
+			m10 = -sin * worldScaleX;
+			m11 = -cos * worldScaleY;
 		} else {
-			m10 = sin;
-			m11 = cos;
+			m10 = sin * worldScaleX;
+			m11 = cos * worldScaleY;
 		}
 	}
 
