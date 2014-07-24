@@ -34,7 +34,7 @@ import spine.attachments.Attachment;
 /** Stores attachments by slot index and attachment name. */
 public class Skin {
 	internal var _name:String;
-	private var attachments:Object = new Object();
+	private var _attachments:Object = new Object();
 
 	public function Skin (name:String) {
 		if (name == null)
@@ -45,12 +45,16 @@ public class Skin {
 	public function addAttachment (slotIndex:int, name:String, attachment:Attachment) : void {
 		if (attachment == null)
 			throw new ArgumentError("attachment cannot be null.");
-		attachments[slotIndex + ":" + name] = attachment;
+		_attachments[slotIndex + ":" + name] = attachment;
 	}
 
 	/** @return May be null. */
 	public function getAttachment (slotIndex:int, name:String) : Attachment {
-		return attachments[slotIndex + ":" + name];
+		return _attachments[slotIndex + ":" + name];
+	}
+
+	public function get attachments () : Object {
+		return _attachments;
 	}
 
 	public function get name () : String {
@@ -63,7 +67,7 @@ public class Skin {
 
 	/** Attach each attachment in this skin if the corresponding attachment in the old skin is currently attached. */
 	public function attachAll (skeleton:Skeleton, oldSkin:Skin) : void {
-		for (var key:String in oldSkin.attachments) {
+		for (var key:String in oldSkin._attachments) {
 			var colon:int = key.indexOf(":");
 			var slotIndex:int = parseInt(key.substring(0, colon));
 			var name:String = key.substring(colon + 1);
