@@ -264,7 +264,7 @@ internal class PolygonBatch {
 			var fragmentShader:String = 
 				"tex ft1, v1, fs0 " + flags + " \n" + // sample texture 0
 				"mul oc, ft1, v0 \n"; // multiply color with texel color
-			Starling.current.registerProgramFromSource(name, vertexShader, fragmentShader);
+			program = Starling.current.registerProgramFromSource(name, vertexShader, fragmentShader);
 		}
 		context.setProgram(program);
 	}

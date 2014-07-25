@@ -16,6 +16,7 @@ public class Main extends Sprite {
 		example = GoblinsExample;
 
 		_starling = new Starling(example, stage);
+		_starling.enableErrorChecking = true;
 		_starling.showStats = true;
 		_starling.start();
 	}
