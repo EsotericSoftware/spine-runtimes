@@ -60,15 +60,14 @@ public class SkeletonSprite extends DisplayObject {
 	static private var _quadTriangles:Vector.<uint> = new <uint>[0, 1, 2, 2, 3, 0];
 
 	private var _skeleton:Skeleton;
-	private var _renderMeshes:Boolean;
 	private var _polygonBatch:PolygonBatch;
 	public var batchable:Boolean = true;
 	private var _batched:Boolean;
+	private var _smoothing:String = "bilinear";
 
 	public function SkeletonSprite (skeletonData:SkeletonData, renderMeshes:Boolean = false) {
 		Bone.yDown = true;
 
-		_renderMeshes = renderMeshes;
 		if (renderMeshes) _polygonBatch = new PolygonBatch();
 
 		_skeleton = new Skeleton(skeletonData);
@@ -77,7 +76,7 @@ public class SkeletonSprite extends DisplayObject {
 
 	override public function render (support:RenderSupport, alpha:Number) : void {
 		alpha *= this.alpha * skeleton.a;
-		if (_renderMeshes)
+		if (_polygonBatch)
 			renderMeshes(support, alpha);
 		else
 			renderRegions(support, alpha);
@@ -205,7 +204,7 @@ public class SkeletonSprite extends DisplayObject {
 				
 				image.updateVertices();
 				support.blendMode = slot.data.additiveBlending ? BlendMode.ADD : blendMode;
-				support.batchQuad(image, alpha, image.texture);
+				support.batchQuad(image, alpha, image.texture, _smoothing);
 			}
 		}
 	}
@@ -284,9 +283,18 @@ public class SkeletonSprite extends DisplayObject {
 		}
 		return resultRect;
 	}
-
+	
 	public function get skeleton () : Skeleton {
 		return _skeleton;
+	}
+
+	public function get smoothing () : String {
+		return _smoothing;
+	}
+
+	public function set smoothing (smoothing:String) : void {
+		_smoothing = smoothing;
+		if (_polygonBatch) _polygonBatch.smoothing = _smoothing;
 	}
 }
 

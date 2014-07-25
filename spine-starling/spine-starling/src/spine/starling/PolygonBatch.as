@@ -56,7 +56,7 @@ internal class PolygonBatch {
 
 	private var _capacity:int;
 	public var maxCapacity:int = 2000;
-	public var smoothing:String = "bilinear";
+	public var smoothing:String = TextureSmoothing.BILINEAR;
 
 	private var _texture:Texture;
 	private var _support:RenderSupport;
