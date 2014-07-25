@@ -77,10 +77,12 @@ public class SkeletonSprite extends DisplayObject {
 
 	override public function render (support:RenderSupport, alpha:Number) : void {
 		alpha *= this.alpha * skeleton.a;
+		var originalBlendMode:String = support.blendMode;
 		if (_polygonBatch)
 			renderMeshes(support, alpha);
 		else
-			renderRegions(support, alpha);
+			renderRegions(support, alpha, originalBlendMode);
+		support.blendMode = originalBlendMode;
 	}
 
 	private function renderMeshes (support:RenderSupport, alpha:Number) : void {
@@ -168,7 +170,7 @@ public class SkeletonSprite extends DisplayObject {
 		}
 	}
 
-	private function renderRegions (support:RenderSupport, alpha:Number) : void {
+	private function renderRegions (support:RenderSupport, alpha:Number, blendMode:String) : void {
 		var r:Number = skeleton.r * 255;
 		var g:Number = skeleton.g * 255;
 		var b:Number = skeleton.b * 255;
