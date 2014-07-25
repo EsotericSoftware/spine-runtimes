@@ -19,7 +19,13 @@ To use spine-unity in your own Unity project:
 
 ### Setup video
 
-[![](http://i.imgur.com/cPxKK3S.png)](https://www.youtube.com/watch?v=-V84OIvZdQc)
+The [setup video](https://www.youtube.com/watch?v=-V84OIvZdQc) shows how to manually set up a skeleton, which may be useful for understanding how the pieces fit together. To set up a skeleton automatically:
+
+1. Move the JSON, atlas and PNG files into your Unity project directory.
+1. Right click the JSON file and click Spine, Ingest. This will create the Unity assets.
+1. Right click the SkeletonData asset that was created and click Spine, Spawn.
+
+The [readme PDF](https://raw.githubusercontent.com/EsotericSoftware/spine-runtimes/master/spine-unity/README.pdf) illustrates these steps.
 
 ## Examples
 
