@@ -37,29 +37,25 @@ namespace spine {
 
 class PolygonBatch : public cocos2d::Ref {
 public:
-	static PolygonBatch* createWithCapacity (int capacity);
+	static PolygonBatch* createWithCapacity (ssize_t capacity);
 
-	/** @js ctor */
-	PolygonBatch();
-
-	/** @js NA
-	  * @lua NA */
-	virtual ~PolygonBatch();
-
-	bool initWithCapacity (int capacity);
 	void add (const cocos2d::Texture2D* texture,
 		const float* vertices, const float* uvs, int verticesCount,
 		const int* triangles, int trianglesCount,
 		cocos2d::Color4B* color);
 	void flush ();
 
-private:
-	int capacity;
-	cocos2d::V2F_C4B_T2F* vertices;
-	int verticesCount;
-	GLushort* triangles;
-	int trianglesCount;
-	const cocos2d::Texture2D* texture;
+protected:
+	PolygonBatch();
+	virtual ~PolygonBatch();
+	bool initWithCapacity (ssize_t capacity);
+
+	ssize_t _capacity;
+	cocos2d::V2F_C4B_T2F* _vertices;
+	int _verticesCount;
+	GLushort* _triangles;
+	int _trianglesCount;
+	const cocos2d::Texture2D* _texture;
 };
 
 }

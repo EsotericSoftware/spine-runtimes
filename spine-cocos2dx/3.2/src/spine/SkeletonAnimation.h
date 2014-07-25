@@ -46,33 +46,21 @@ typedef std::function<void(int trackIndex, spEvent* event)> EventListener;
   * played later. */
 class SkeletonAnimation: public SkeletonRenderer {
 public:
-	spAnimationState* state;
-
 	static SkeletonAnimation* createWithData (spSkeletonData* skeletonData);
-	static SkeletonAnimation* createWithFile (const char* skeletonDataFile, spAtlas* atlas, float scale = 0);
-	static SkeletonAnimation* createWithFile (const char* skeletonDataFile, const char* atlasFile, float scale = 0);
-
-	SkeletonAnimation (spSkeletonData* skeletonData);
-	SkeletonAnimation (const char* skeletonDataFile, spAtlas* atlas, float scale = 0);
-	SkeletonAnimation (const char* skeletonDataFile, const char* atlasFile, float scale = 0);
-
-	virtual ~SkeletonAnimation ();
+	static SkeletonAnimation* createWithFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 0);
+	static SkeletonAnimation* createWithFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 0);
 
 	virtual void update (float deltaTime);
 
 	void setAnimationStateData (spAnimationStateData* stateData);
-	void setMix (const char* fromAnimation, const char* toAnimation, float duration);
+	void setMix (const std::string& fromAnimation, const std::string& toAnimation, float duration);
 
-	spTrackEntry* setAnimation (int trackIndex, const char* name, bool loop);
-	spTrackEntry* addAnimation (int trackIndex, const char* name, bool loop, float delay = 0);
+	spTrackEntry* setAnimation (int trackIndex, const std::string& name, bool loop);
+	spTrackEntry* addAnimation (int trackIndex, const std::string& name, bool loop, float delay = 0);
 	spTrackEntry* getCurrent (int trackIndex = 0);
 	void clearTracks ();
 	void clearTrack (int trackIndex = 0);
 
-	StartListener startListener;
-	EndListener endListener;
-	CompleteListener completeListener;
-	EventListener eventListener;
 	void setStartListener (spTrackEntry* entry, StartListener listener);
 	void setEndListener (spTrackEntry* entry, EndListener listener);
 	void setCompleteListener (spTrackEntry* entry, CompleteListener listener);
@@ -81,14 +69,27 @@ public:
 	virtual void onAnimationStateEvent (int trackIndex, spEventType type, spEvent* event, int loopCount);
 	virtual void onTrackEntryEvent (int trackIndex, spEventType type, spEvent* event, int loopCount);
 
+	spAnimationState* getState() const;
+
+	StartListener startListener;
+	EndListener endListener;
+	CompleteListener completeListener;
+	EventListener eventListener;
+
 protected:
 	SkeletonAnimation ();
+	SkeletonAnimation (spSkeletonData* skeletonData);
+	SkeletonAnimation (const std::string&skeletonDataFile, spAtlas* atlas, float scale = 0);
+	SkeletonAnimation (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 0);
+	virtual ~SkeletonAnimation ();
+	void initialize ();
+
+	spAnimationState* _state;
+
+	bool ownsAnimationStateData;
 
 private:
 	typedef SkeletonRenderer super;
-	bool ownsAnimationStateData;
-
-	void initialize ();
 };
 
 }

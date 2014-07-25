@@ -35,7 +35,7 @@ USING_NS_CC;
 
 namespace spine {
 
-PolygonBatch* PolygonBatch::createWithCapacity (int capacity) {
+PolygonBatch* PolygonBatch::createWithCapacity (ssize_t capacity) {
 	PolygonBatch* batch = new PolygonBatch();
 	batch->initWithCapacity(capacity);
 	batch->autorelease();
@@ -43,25 +43,25 @@ PolygonBatch* PolygonBatch::createWithCapacity (int capacity) {
 }
 
 PolygonBatch::PolygonBatch () :
-	capacity(0), 
-	vertices(nullptr), verticesCount(0),
-	triangles(nullptr), trianglesCount(0),
-	texture(nullptr)
+	_capacity(0),
+	_vertices(nullptr), _verticesCount(0),
+	_triangles(nullptr), _trianglesCount(0),
+	_texture(nullptr)
 {}
 
-bool PolygonBatch::initWithCapacity (int capacity) {
+bool PolygonBatch::initWithCapacity (ssize_t capacity) {
 	// 32767 is max index, so 32767 / 3 - (32767 / 3 % 3) = 10920.
 	CCASSERT(capacity <= 10920, "capacity cannot be > 10920");
 	CCASSERT(capacity >= 0, "capacity cannot be < 0");
-	this->capacity = capacity;
-	vertices = MALLOC(V2F_C4B_T2F, capacity);
-	triangles = MALLOC(GLushort, capacity * 3);
+	_capacity = capacity;
+	_vertices = MALLOC(V2F_C4B_T2F, capacity);
+	_triangles = MALLOC(GLushort, capacity * 3);
 	return true;
 }
 
 PolygonBatch::~PolygonBatch () {
-	FREE(vertices);
-	FREE(triangles);
+	FREE(_vertices);
+	FREE(_triangles);
 }
 
 void PolygonBatch::add (const Texture2D* addTexture,
@@ -70,18 +70,18 @@ void PolygonBatch::add (const Texture2D* addTexture,
 		Color4B* color) {
 
 	if (
-		addTexture != texture
-		|| verticesCount + (addVerticesCount >> 1) > capacity
-		|| trianglesCount + addTrianglesCount > capacity * 3) {
+		addTexture != _texture
+		|| _verticesCount + (addVerticesCount >> 1) > _capacity
+		|| _trianglesCount + addTrianglesCount > _capacity * 3) {
 		this->flush();
-		texture = addTexture;
+		_texture = addTexture;
 	}
 
-	for (int i = 0; i < addTrianglesCount; ++i, ++trianglesCount)
-		triangles[trianglesCount] = addTriangles[i] + verticesCount;
+	for (int i = 0; i < addTrianglesCount; ++i, ++_trianglesCount)
+		_triangles[_trianglesCount] = addTriangles[i] + _verticesCount;
 
-	for (int i = 0; i < addVerticesCount; i += 2, ++verticesCount) {
-		V2F_C4B_T2F* vertex = vertices + verticesCount;
+	for (int i = 0; i < addVerticesCount; i += 2, ++_verticesCount) {
+		V2F_C4B_T2F* vertex = _vertices + _verticesCount;
 		vertex->vertices.x = addVertices[i];
 		vertex->vertices.y = addVertices[i + 1];
 		vertex->colors = *color;
@@ -91,20 +91,22 @@ void PolygonBatch::add (const Texture2D* addTexture,
 }
 
 void PolygonBatch::flush () {
-	if (!verticesCount) return;
+	if (!_verticesCount) return;
 
-	GL::bindTexture2D(texture->getName());
+	GL::bindTexture2D(_texture->getName());
 	glEnableVertexAttribArray(GLProgram::VERTEX_ATTRIB_POSITION);
 	glEnableVertexAttribArray(GLProgram::VERTEX_ATTRIB_COLOR);
 	glEnableVertexAttribArray(GLProgram::VERTEX_ATTRIB_TEX_COORDS);
-	glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(V2F_C4B_T2F), &vertices[0].vertices);
-	glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(V2F_C4B_T2F), &vertices[0].colors);
-	glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_TEX_COORDS, 2, GL_FLOAT, GL_FALSE, sizeof(V2F_C4B_T2F), &vertices[0].texCoords);
+	glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(V2F_C4B_T2F), &_vertices[0].vertices);
+	glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(V2F_C4B_T2F), &_vertices[0].colors);
+	glVertexAttribPointer(GLProgram::VERTEX_ATTRIB_TEX_COORDS, 2, GL_FLOAT, GL_FALSE, sizeof(V2F_C4B_T2F), &_vertices[0].texCoords);
 
-	glDrawElements(GL_TRIANGLES, trianglesCount, GL_UNSIGNED_SHORT, triangles);
+	glDrawElements(GL_TRIANGLES, _trianglesCount, GL_UNSIGNED_SHORT, _triangles);
 
-	verticesCount = 0;
-	trianglesCount = 0;
+	CC_INCREMENT_GL_DRAWN_BATCHES_AND_VERTICES(1, _verticesCount);
+
+	_verticesCount = 0;
+	_trianglesCount = 0;
 
 	CHECK_GL_ERROR_DEBUG();
 }

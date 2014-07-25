@@ -41,26 +41,13 @@ class PolygonBatch;
 /** Draws a skeleton. */
 class SkeletonRenderer: public cocos2d::Node, public cocos2d::BlendProtocol {
 public:
-	spSkeleton* skeleton;
-	spBone* rootBone;
-	float timeScale;
-	bool debugSlots;
-	bool debugBones;
-	bool premultipliedAlpha;
-
 	static SkeletonRenderer* createWithData (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
-	static SkeletonRenderer* createWithFile (const char* skeletonDataFile, spAtlas* atlas, float scale = 0);
-	static SkeletonRenderer* createWithFile (const char* skeletonDataFile, const char* atlasFile, float scale = 0);
-
-	SkeletonRenderer (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
-	SkeletonRenderer (const char* skeletonDataFile, spAtlas* atlas, float scale = 0);
-	SkeletonRenderer (const char* skeletonDataFile, const char* atlasFile, float scale = 0);
-
-	virtual ~SkeletonRenderer ();
+	static SkeletonRenderer* createWithFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 0);
+	static SkeletonRenderer* createWithFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 0);
 
 	virtual void update (float deltaTime) override;
-	virtual void draw (cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, bool transformUpdated) override;
-	virtual void drawSkeleton (const cocos2d::Mat4& transform, bool transformUpdated);
+	virtual void draw (cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformFlags) override;
+	virtual void drawSkeleton (const cocos2d::Mat4& transform, uint32_t transformFlags);
 	virtual cocos2d::Rect getBoundingBox () const override;
 
 	// --- Convenience methods for common Skeleton_* functions.
@@ -71,41 +58,51 @@ public:
 	void setSlotsToSetupPose ();
 
 	/* Returns 0 if the bone was not found. */
-	spBone* findBone (const char* boneName) const;
+	spBone* findBone (const std::string& boneName) const;
 	/* Returns 0 if the slot was not found. */
-	spSlot* findSlot (const char* slotName) const;
+	spSlot* findSlot (const std::string& slotName) const;
 	
 	/* Sets the skin used to look up attachments not found in the SkeletonData defaultSkin. Attachments from the new skin are
 	 * attached if the corresponding attachment from the old skin was attached. Returns false if the skin was not found.
 	 * @param skin May be 0.*/
-	bool setSkin (const char* skinName);
+	bool setSkin (const std::string& skinName);
 	
 	/* Returns 0 if the slot or attachment was not found. */
-	spAttachment* getAttachment (const char* slotName, const char* attachmentName) const;
+	spAttachment* getAttachment (const std::string& slotName, const std::string& attachmentName) const;
 	/* Returns false if the slot or attachment was not found. */
-	bool setAttachment (const char* slotName, const char* attachmentName);
+	bool setAttachment (const std::string& slotName, const std::string& attachmentName);
 
 	// --- BlendProtocol
 	virtual void setBlendFunc (const cocos2d::BlendFunc& blendFunc);
 	virtual const cocos2d::BlendFunc& getBlendFunc () const;
 	virtual void setOpacityModifyRGB (bool value);
-	virtual bool isOpacityModifyRGB ();
+	virtual bool isOpacityModifyRGB () const;
 
 protected:
 	SkeletonRenderer ();
+	SkeletonRenderer (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
+	SkeletonRenderer (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 0);
+	SkeletonRenderer (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 0);
+	virtual ~SkeletonRenderer ();
+	void initialize ();
+
 	void setSkeletonData (spSkeletonData* skeletonData, bool ownsSkeletonData);
 	virtual cocos2d::Texture2D* getTexture (spRegionAttachment* attachment) const;
 	virtual cocos2d::Texture2D* getTexture (spMeshAttachment* attachment) const;
 	virtual cocos2d::Texture2D* getTexture (spSkinnedMeshAttachment* attachment) const;
 
-private:
-	bool ownsSkeletonData;
-	spAtlas* atlas;
-	cocos2d::CustomCommand drawCommand;
-	cocos2d::BlendFunc blendFunc;
-	PolygonBatch* batch;
-	float* worldVertices;
-	void initialize ();
+	bool _ownsSkeletonData;
+	spAtlas* _atlas;
+	cocos2d::CustomCommand _drawCommand;
+	cocos2d::BlendFunc _blendFunc;
+	PolygonBatch* _batch;
+	float* _worldVertices;
+	bool _premultipliedAlpha;
+	spSkeleton* _skeleton;
+	spBone* _rootBone;
+	float _timeScale;
+	bool _debugSlots;
+	bool _debugBones;
 };
 
 }
