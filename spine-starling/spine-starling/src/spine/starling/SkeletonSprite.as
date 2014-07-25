@@ -65,7 +65,8 @@ public class SkeletonSprite extends DisplayObject {
 	private var _batched:Boolean;
 	private var _smoothing:String = "bilinear";
 
-	public function SkeletonSprite (skeletonData:SkeletonData, renderMeshes:Boolean = false) {
+	/** @param renderMeshes If false, meshes won't be rendered. This may improve batching with non-Spine display objects. */
+	public function SkeletonSprite (skeletonData:SkeletonData, renderMeshes:Boolean = true) {
 		Bone.yDown = true;
 
 		if (renderMeshes) _polygonBatch = new PolygonBatch();
