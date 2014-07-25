@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6b194f808b1af6499c93410e504af42, type: 3}
+  m_Name: dragon_Atlas
+  m_EditorClassIdentifier: 
+  atlasFile: {fileID: 4900000, guid: 40ca8efa87a2fae4a9de6fa585dc6b4b, type: 3}
+  materials:
+  - {fileID: 2100000, guid: 3277fd5561d95724e83c6ca4a1dd28a4, type: 2}
+  - {fileID: 2100000, guid: d58543c96f991934ca874395eb40222c, type: 2}

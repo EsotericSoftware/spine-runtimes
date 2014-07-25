@@ -47,6 +47,7 @@ public class SkeletonRenderer : MonoBehaviour {
 	public bool calculateNormals, calculateTangents;
 	public float zSpacing;
 	public bool renderMeshes = true, immutableTriangles;
+	public bool logErrors = false;
 	
 	private MeshFilter meshFilter;
 	private Mesh mesh, mesh1, mesh2;
@@ -78,7 +79,9 @@ public class SkeletonRenderer : MonoBehaviour {
 
 		valid = false;
 		if (!skeletonDataAsset) {
-			Debug.LogError("Missing SkeletonData asset.", this);
+			if(logErrors)
+				Debug.LogError("Missing SkeletonData asset.", this);
+
 			return;
 		}
 		SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(false);
