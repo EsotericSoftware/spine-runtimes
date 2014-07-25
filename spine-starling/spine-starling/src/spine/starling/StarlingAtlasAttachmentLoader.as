@@ -66,9 +66,24 @@ public class StarlingAtlasAttachmentLoader implements AttachmentLoader {
 		attachment.regionHeight = texture.height;
 		attachment.regionOriginalWidth = frame ? frame.width : texture.width;
 		attachment.regionOriginalHeight = frame ? frame.height : texture.height;
+		var subTexture:SubTexture = texture as SubTexture;
+		if (subTexture) {
+			var root:Texture = subTexture.root;
+			var rectRegion:Rectangle = atlas.getRegion(path);
+			attachment.regionU = rectRegion.x / root.width;
+			attachment.regionV = rectRegion.y / root.height;
+			attachment.regionU2 = (rectRegion.x + subTexture.width) / root.width;
+			attachment.regionV2 = (rectRegion.y + subTexture.height) / root.height;
+			attachment.setUVs(attachment.regionU, attachment.regionV, attachment.regionU2, attachment.regionV2, atlas.getRotation(path));
+		} else {
+			attachment.regionU = 0;
+			attachment.regionV = 1;
+			attachment.regionU2 = 1;
+			attachment.regionV2 = 0;
+		}
 		return attachment;
 	}
-	
+
 	public function newMeshAttachment (skin:Skin, name:String, path:String) : MeshAttachment {
 		var texture:Texture = atlas.getTexture(path);
 		if (texture == null)
@@ -77,12 +92,12 @@ public class StarlingAtlasAttachmentLoader implements AttachmentLoader {
 		attachment.rendererObject = new SkeletonImage(Texture.fromTexture(texture)); // Discard frame.
 		var subTexture:SubTexture = texture as SubTexture;
 		if (subTexture) {
-			var matrix:Matrix = subTexture.transformationMatrix;
 			var root:Texture = subTexture.root;
-			attachment.regionU = matrix.tx / root.width;
-			attachment.regionV = matrix.ty / root.height;
-			attachment.regionU2 = (matrix.tx + subTexture.width) / root.width;
-			attachment.regionV2 = (matrix.tx + subTexture.height) / root.height;
+			var rectRegion:Rectangle = atlas.getRegion(path);
+			attachment.regionU = rectRegion.x / root.width;
+			attachment.regionV = rectRegion.y / root.height;
+			attachment.regionU2 = (rectRegion.x + subTexture.width) / root.width;
+			attachment.regionV2 = (rectRegion.y + subTexture.height) / root.height;
 		} else {
 			attachment.regionU = 0;
 			attachment.regionV = 1;
@@ -107,12 +122,12 @@ public class StarlingAtlasAttachmentLoader implements AttachmentLoader {
 		attachment.rendererObject = new SkeletonImage(Texture.fromTexture(texture)); // Discard frame.
 		var subTexture:SubTexture = texture as SubTexture;
 		if (subTexture) {
-			var matrix:Matrix = subTexture.transformationMatrix;
 			var root:Texture = subTexture.root;
-			attachment.regionU = matrix.tx / root.width;
-			attachment.regionV = matrix.ty / root.height;
-			attachment.regionU2 = (matrix.tx + subTexture.width) / root.width;
-			attachment.regionV2 = (matrix.tx + subTexture.height) / root.height;
+			var rectRegion:Rectangle = atlas.getRegion(path);
+			attachment.regionU = rectRegion.x / root.width;
+			attachment.regionV = rectRegion.y / root.height;
+			attachment.regionU2 = (rectRegion.x + subTexture.width) / root.width;
+			attachment.regionV2 = (rectRegion.y + subTexture.height) / root.height;
 		} else {
 			attachment.regionU = 0;
 			attachment.regionV = 1;

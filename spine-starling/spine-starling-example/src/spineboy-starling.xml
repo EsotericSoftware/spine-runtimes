@@ -1,28 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with TexturePacker http://texturepacker.com-->
-<!-- $TexturePacker:SmartUpdate:facbb1aeb75a8d9232523760a3e1920f$ -->
+<!-- Created with TexturePacker http://www.codeandweb.com/texturepacker-->
+<!-- $TexturePacker:SmartUpdate:8ea0251acc356491e9a6f72df2f73636:074436a8c81d0728682274bde39d8bb8:676322d6615ca6a250a9e93de5572f1e$ -->
 <TextureAtlas imagePath="spineboy.png">
-    <SubTexture name="eyes-closed" x="149" y="320" width="34" height="27"/>
-    <SubTexture name="eyes" x="195" y="314" width="34" height="27"/>
-    <SubTexture name="head" x="2" y="345" width="121" height="132"/>
-    <SubTexture name="left-ankle" x="220" y="395" width="25" height="32"/>
-    <SubTexture name="left-arm" x="219" y="42" width="35" height="29"/>
-    <SubTexture name="left-foot" x="71" y="479" width="65" height="30"/>
-    <SubTexture name="left-hand" x="219" y="2" width="35" height="38"/>
-    <SubTexture name="left-lower-leg" x="204" y="158" width="49" height="64"/>
-    <SubTexture name="left-pant-bottom" x="195" y="290" width="44" height="22"/>
-    <SubTexture name="left-shoulder" x="219" y="73" width="34" height="53"/>
-    <SubTexture name="left-upper-leg" x="185" y="343" width="33" height="67"/>
-    <SubTexture name="neck" x="214" y="128" width="34" height="28"/>
-    <SubTexture name="pelvis" x="149" y="96" width="63" height="47"/>
-    <SubTexture name="right-ankle" x="125" y="429" width="25" height="30"/>
-    <SubTexture name="right-arm" x="231" y="314" width="21" height="45"/>
-    <SubTexture name="right-foot-idle" x="149" y="145" width="53" height="28"/>
-    <SubTexture name="right-foot" x="2" y="479" width="67" height="30"/>
-    <SubTexture name="right-hand" x="220" y="361" width="32" height="32"/>
-    <SubTexture name="right-lower-leg" x="203" y="224" width="51" height="64"/>
-    <SubTexture name="right-pant-bottom" x="149" y="228" width="46" height="18"/>
-    <SubTexture name="right-shoulder" x="149" y="175" width="52" height="51"/>
-    <SubTexture name="right-upper-leg" x="149" y="248" width="44" height="70"/>
-    <SubTexture name="torso" x="149" y="2" width="68" height="92"/>
+    <SubTexture name="eye_indifferent" x="424" y="253" width="56" height="53"/>
+    <SubTexture name="eye_surprised" x="429" y="198" width="56" height="53"/>
+    <SubTexture name="front_bracer" x="401" y="345" width="35" height="48"/>
+    <SubTexture name="front_fist_closed" x="300" y="353" width="45" height="49"/>
+    <SubTexture name="front_fist_open" x="347" y="344" width="52" height="52"/>
+    <SubTexture name="front_foot" x="36" y="346" width="76" height="41"/>
+    <SubTexture name="front_foot_bend1" x="432" y="112" width="77" height="42"/>
+    <SubTexture name="front_foot_bend2" x="267" y="183" width="65" height="56"/>
+    <SubTexture name="front_shin" x="289" y="241" width="49" height="110"/>
+    <SubTexture name="front_thigh" x="398" y="183" width="29" height="67"/>
+    <SubTexture name="front_upper_arm" x="2" y="346" width="32" height="58"/>
+    <SubTexture name="goggles" x="2" y="244" width="157" height="100"/>
+    <SubTexture name="gun" x="161" y="244" width="126" height="122"/>
+    <SubTexture name="head" x="267" y="2" width="163" height="179"/>
+    <SubTexture name="mouth_grind" x="424" y="308" width="56" height="35"/>
+    <SubTexture name="mouth_oooo" x="242" y="368" width="56" height="35"/>
+    <SubTexture name="mouth_smile" x="184" y="368" width="56" height="35"/>
+    <SubTexture name="muzzle" x="2" y="2" width="263" height="240" frameX="-5" frameY="0" frameWidth="277" frameHeight="240"/>
+    <SubTexture name="neck" x="487" y="198" width="22" height="25"/>
+    <SubTexture name="rear_bracer" x="438" y="345" width="34" height="43"/>
+    <SubTexture name="rear_foot" x="114" y="368" width="68" height="36"/>
+    <SubTexture name="rear_foot_bend1" x="432" y="156" width="70" height="40"/>
+    <SubTexture name="rear_foot_bend2" x="334" y="183" width="62" height="50"/>
+    <SubTexture name="rear_shin" x="340" y="235" width="45" height="107"/>
+    <SubTexture name="rear_thigh" x="387" y="252" width="35" height="62" frameX="-4" frameY="0" frameWidth="39" frameHeight="62"/>
+    <SubTexture name="rear_upper_arm" x="474" y="345" width="28" height="52"/>
+    <SubTexture name="torso" x="432" y="2" width="59" height="108"/>
 </TextureAtlas>
