@@ -180,6 +180,22 @@ Prefab:
       propertyPath: m_RootOrder
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: d51ed5943e10bcb4394b5eec480293f8, type: 2}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: d58543c96f991934ca874395eb40222c, type: 2}
+    - target: {fileID: 3300000, guid: d51ed5943e10bcb4394b5eec480293f8, type: 2}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: d51ed5943e10bcb4394b5eec480293f8, type: 2}
+      propertyPath: _animationName
+      value: flying
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: d51ed5943e10bcb4394b5eec480293f8, type: 2}
+      propertyPath: loop
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d51ed5943e10bcb4394b5eec480293f8, type: 2}
   m_RootGameObject: {fileID: 1169702454}
@@ -293,8 +309,8 @@ MonoBehaviour:
   immutableTriangles: 0
   logErrors: 0
   timeScale: 1
-  loop: 0
-  _animationName: 
+  loop: 1
+  _animationName: flying
 --- !u!23 &1169702456
 Renderer:
   m_ObjectHideFlags: 0
