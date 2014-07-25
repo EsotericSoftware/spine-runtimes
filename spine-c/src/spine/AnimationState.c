@@ -201,8 +201,6 @@ void spAnimationState_clearTracks (spAnimationState* self) {
 }
 
 void spAnimationState_clearTrack (spAnimationState* self, int trackIndex) {
-	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
-
 	spTrackEntry* current;
 	if (trackIndex >= self->trackCount) return;
 	current = self->tracks[trackIndex];
