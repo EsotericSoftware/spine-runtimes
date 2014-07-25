@@ -99,8 +99,8 @@ public class SkeletonJson {
 			boneData.rotation = (boneMap["rotation"] || 0);
 			boneData.scaleX = boneMap.hasOwnProperty("scaleX") ? boneMap["scaleX"] : 1;
 			boneData.scaleY = boneMap.hasOwnProperty("scaleY") ? boneMap["scaleY"] : 1;
-			boneData.inheritScale = !boneMap["inheritScale"] || boneMap["inheritScale"] == "true";
-			boneData.inheritRotation = !boneMap["inheritRotation"] || boneMap["inheritRotation"] == "true";
+			boneData.inheritScale = boneMap.hasOwnProperty("inheritScale") ? boneMap["inheritScale"] : true;
+			boneData.inheritRotation = boneMap.hasOwnProperty("inheritRotation") ? boneMap["inheritRotation"] : true;
 			skeletonData.addBone(boneData);
 		}
 
