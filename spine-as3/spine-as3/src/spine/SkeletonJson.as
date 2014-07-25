@@ -69,7 +69,7 @@ public class SkeletonJson {
 		if (object == null)
 			throw new ArgumentError("object cannot be null.");
 
-		var root:Object
+		var root:Object;
 		if (object is String)
 			root = JSON.parse(String(object));
 		else if (object is ByteArray)
@@ -81,7 +81,6 @@ public class SkeletonJson {
 
 		var skeletonData:SkeletonData = new SkeletonData();
 		skeletonData.name = name;
-
 
 		// Bones.
 		var boneData:BoneData;
