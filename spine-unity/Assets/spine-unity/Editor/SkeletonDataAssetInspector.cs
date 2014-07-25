@@ -80,8 +80,10 @@ public class SkeletonDataAssetInspector : Editor {
 		EditorGUILayout.PropertyField(skeletonJSON);
 		EditorGUILayout.PropertyField(scale);
 		if(EditorGUI.EndChangeCheck()){
-			m_previewUtility.Cleanup();
-			m_previewUtility = null;
+			if(m_previewUtility != null){
+				m_previewUtility.Cleanup();
+				m_previewUtility = null;
+			}
 		}
 
 		SkeletonData skeletonData = asset.GetSkeletonData(asset.atlasAsset == null || asset.skeletonJSON == null);
@@ -262,7 +264,8 @@ public class SkeletonDataAssetInspector : Editor {
 
 	public override bool HasPreviewGUI ()
 	{
-		return true;
+		//TODO: validate json data
+		return skeletonJSON.objectReferenceValue != null;
 	}
 
 	Texture m_previewTex = new Texture();
@@ -584,10 +587,14 @@ public class SkeletonDataAssetInspector : Editor {
 			this.m_previewUtility.m_Camera.transform.position = m_posGoal;
 			this.m_previewUtility.BeginStaticPreview(new Rect(0,0,width,height));
 			this.DoRenderPreview(false);
-			Handles.SetCamera(this.m_previewUtility.m_Camera);
-			Handles.BeginGUI();
-			GUI.DrawTexture(new Rect(40,60,width,height), SpineEditorUtilities.Icons.spine, ScaleMode.StretchToFill);
-			Handles.EndGUI();
+
+		//TODO:  Figure out why this is throwing errors on first attempt
+//		if(m_previewUtility != null){
+//			Handles.SetCamera(this.m_previewUtility.m_Camera);
+//			Handles.BeginGUI();
+//			GUI.DrawTexture(new Rect(40,60,width,height), SpineEditorUtilities.Icons.spine, ScaleMode.StretchToFill);
+//			Handles.EndGUI();
+//		}
 			tex = this.m_previewUtility.EndStaticPreview();
 		return tex;
 	}
