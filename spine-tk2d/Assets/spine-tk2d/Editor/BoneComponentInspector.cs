@@ -34,13 +34,15 @@ using UnityEngine;
 
 [CustomEditor(typeof(BoneComponent))]
 public class BoneComponentInspector : Editor {
-	private SerializedProperty boneName, skeletonRenderer, followZPosition, followBoneRotation;
+	private SerializedProperty boneName, skeletonRenderer, followZPosition, followBoneRotation, followFlips, followBoneScale;
 
 	void OnEnable () {
 		skeletonRenderer = serializedObject.FindProperty("skeletonRenderer");
 		boneName = serializedObject.FindProperty("boneName");
 		followBoneRotation = serializedObject.FindProperty("followBoneRotation");
 		followZPosition = serializedObject.FindProperty("followZPosition");
+		followFlips = serializedObject.FindProperty("followFlips");
+		followBoneScale = serializedObject.FindProperty("followBoneScale");
 	}
 
 	override public void OnInspectorGUI () {
@@ -67,6 +69,8 @@ public class BoneComponentInspector : Editor {
 
 			EditorGUILayout.PropertyField(followBoneRotation);
 			EditorGUILayout.PropertyField(followZPosition);
+			EditorGUILayout.PropertyField(followFlips);
+			EditorGUILayout.PropertyField(followBoneScale);
 		}
 
 		if (serializedObject.ApplyModifiedProperties() ||

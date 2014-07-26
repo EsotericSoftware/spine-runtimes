@@ -46,6 +46,8 @@ public class BoneComponent : MonoBehaviour {
 
 	public bool followZPosition = true;
 	public bool followBoneRotation = true;
+	public bool followFlips = true;
+	public bool followBoneScale = false;
 
 	public SkeletonRenderer SkeletonRenderer {
 		get { return skeletonRenderer; }
@@ -54,13 +56,7 @@ public class BoneComponent : MonoBehaviour {
 			Reset ();
 		}
 	}
-
-	// TODO: Make the rotation behavior more customizable
-	// public bool followTransformRotation = false;
-
-	// TODO: Make transform follow bone scale? too specific? This is really useful for shared shadow assets.
-	//public bool followBoneScale = false;
-
+	
 	/// <summary>If a bone isn't set, boneName is used to find the bone.</summary>
 	public String boneName;
 
@@ -95,27 +91,39 @@ public class BoneComponent : MonoBehaviour {
 		}
 
 		Spine.Skeleton skeleton = skeletonRenderer.skeleton;
-		float flipRotation = (skeleton.flipX ^ skeleton.flipY) ? -1f : 1f;
+		bool flipX = skeleton.flipX;
+		bool flipY = skeleton.flipY;
 
-		if (cachedTransform.parent == skeletonTransform) {
+		float flipRotation = 1f;
+		Vector3 rotation = Vector3.zero;
+
+		if(followFlips) {
+			rotation.x = flipY ? 180f : 0f;
+			rotation.y = flipX ? 180f : 0f;
+		} else {
+			flipRotation = (flipX ^ flipY) ? -1f : 1f;
+		}
+
+		rotation.z = (followBoneRotation) ? (bone.worldRotation * flipRotation) : (cachedTransform.localEulerAngles.z);
+
+
+		if (cachedTransform.parent == skeletonTransform) {	// is child (but not a deep child) of SkeletonRenderer's Transform
 			cachedTransform.localPosition = new Vector3(bone.worldX, bone.worldY, followZPosition ? 0f : cachedTransform.localPosition.z);
-
-			if(followBoneRotation) {
-				Vector3 rotation = cachedTransform.localRotation.eulerAngles;
-				cachedTransform.localRotation = Quaternion.Euler(rotation.x, rotation.y, bone.worldRotation * flipRotation);
-			}
+			cachedTransform.localRotation = Quaternion.Euler(rotation);
 
 		} else {
 			Vector3 targetWorldPosition = skeletonTransform.TransformPoint(new Vector3(bone.worldX, bone.worldY, 0f));
 			if(!followZPosition) targetWorldPosition.z = cachedTransform.position.z;
-
 			cachedTransform.position = targetWorldPosition;
 
-			if(followBoneRotation) {
-				Vector3 rotation = skeletonTransform.rotation.eulerAngles;
-				cachedTransform.rotation = Quaternion.Euler(rotation.x, rotation.y, 
-				                                            skeletonTransform.rotation.eulerAngles.z + (bone.worldRotation * flipRotation) );
-			}
+			//TODO: Fix flipped rotation inheritance in the case where the parent has x and y axis rotations.
+			Vector3 offsetEuler = skeletonTransform.eulerAngles;
+			rotation += offsetEuler;
+			cachedTransform.rotation = Quaternion.Euler(rotation);
 		}
+
+		if(followBoneScale)
+			cachedTransform.localScale = new Vector3(bone.worldScaleX, bone.worldScaleY, 1f);
+
 	}
 }
