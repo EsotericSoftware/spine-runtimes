@@ -6,18 +6,32 @@ A Spine skeleton is a GameObject and can be used throughout Unity like any other
 
 ## Setup
 
-To use spine-unity in your own Unity project:
+To use spine-unity in your own Unity project first:
 
-1. Copy the contents of `spine-csharp/src` to `Assets/spine-csharp` in your project.
-1. Copy the `spine-unity/Assets/spine-unity` to `Assets/spine-unity` in your project.
+1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
+1. Copy the contents of `spine-csharp/src` to `Assets/spine-csharp` in your Unity project directory.
+1. Copy the `spine-unity/Assets/spine-unity` to `Assets/spine-unity` in your Unity project directory.
 
-The [setup video](https://www.youtube.com/watch?v=-V84OIvZdQc) shows how to manually set up the assets for a skeleton in Unity, which may be useful for understanding how the pieces fit together. Setting up a skeleton automatically is much easier:
+Next, there are a few options for importing Spine skeletons into your Unity project:
 
-1. Move the JSON, atlas and PNG files into your Unity project directory.
-1. Right click the JSON file and click Spine, Ingest to create the Unity assets.
-1. Right click the SkeletonData asset that was created and click Spine, Spawn.
+*The hard way*
+
+1. Follow the [setup video](https://www.youtube.com/watch?v=-V84OIvZdQc) to manually set up the assets for a skeleton in Unity. This video may prove useful to understand how the pieces fit together.
+
+*The easy way*
+
+1. Place the JSON, atlas and PNG files exported from Spine into your Unity project directory.
+1. Right click the JSON file and click `Spine`, `Ingest` to create the Unity assets.
+1. Right click the SkeletonData asset that was created and click `Spine`, `Spawn`.
 
 The [readme PDF](https://raw.githubusercontent.com/EsotericSoftware/spine-runtimes/master/spine-unity/README.pdf) illustrates these steps.
+
+*The easier way*
+
+1. Drag and drop a folder containing the JSON, atlas and PNG files exported from Spine directly into Unity.
+1. Drag the prefab that was created into your scene.
+
+The [drag and drop video](www.youtube.com/watch?v=-Gk_zJsY1Ms) shows how this works.
 
 ## Examples
 
