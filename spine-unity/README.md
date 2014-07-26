@@ -14,11 +14,11 @@ To use spine-unity in your own Unity project first:
 
 Next, there are a few options for importing Spine skeletons into your Unity project:
 
-*The hard way*
+**The hard way**
 
 1. Follow the [setup video](https://www.youtube.com/watch?v=-V84OIvZdQc) to manually set up the assets for a skeleton in Unity. This video may prove useful to understand how the pieces fit together.
 
-*The easy way*
+**The easy way**
 
 1. Place the JSON, atlas and PNG files exported from Spine into your Unity project directory.
 1. Right click the JSON file and click `Spine`, `Ingest` to create the Unity assets.
@@ -26,7 +26,7 @@ Next, there are a few options for importing Spine skeletons into your Unity proj
 
 The [readme PDF](https://raw.githubusercontent.com/EsotericSoftware/spine-runtimes/master/spine-unity/README.pdf) illustrates these steps.
 
-*The easier way*
+**The easier way**
 
 1. Drag and drop a folder containing the JSON, atlas and PNG files exported from Spine directly into Unity.
 1. Drag the prefab that was created into your scene.
