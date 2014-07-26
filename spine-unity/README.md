@@ -19,7 +19,7 @@ Next, there are a few options for importing Spine skeletons into your Unity proj
 1. Drag and drop a folder containing the JSON, atlas and PNG files exported from Spine directly into Unity.
 1. Drag the prefab that was created into your scene.
 
-The [drag and drop video](www.youtube.com/watch?v=-Gk_zJsY1Ms) shows how this works.
+The [drag and drop video](http://www.youtube.com/watch?v=-Gk_zJsY1Ms) shows how this works.
 
 ### Automated import
 
