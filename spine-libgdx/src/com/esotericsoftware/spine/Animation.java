@@ -30,12 +30,11 @@
 
 package com.esotericsoftware.spine;
 
-import com.esotericsoftware.spine.attachments.Attachment;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
+import com.esotericsoftware.spine.attachments.Attachment;
 
 public class Animation {
 	final String name;
@@ -134,29 +133,29 @@ public class Animation {
 
 	/** Base class for frames that use an interpolation bezier curve. */
 	abstract static public class CurveTimeline implements Timeline {
-		static public final float LINEAR = 0, STEPPED = -1, BEZIER = -2;
-		static private final int BEZIER_SEGMENTS = 10;
+		static public final float LINEAR = 0, STEPPED = 1, BEZIER = 2;
+		static private final int BEZIER_SEGMENTS = 10, BEZIER_SIZE = BEZIER_SEGMENTS * 2 - 5;
 
-		private final float[] curves; // dfx, dfy, ddfx, ddfy, dddfx, dddfy, ...
+		private final float[] curves; // type, x, y, ...
 
 		public CurveTimeline (int frameCount) {
-			curves = new float[(frameCount - 1) * 6];
+			curves = new float[(frameCount - 1) * BEZIER_SIZE];
 		}
 
 		public int getFrameCount () {
-			return curves.length / 6 + 1;
+			return curves.length / BEZIER_SIZE + 1;
 		}
 
 		public void setLinear (int frameIndex) {
-			curves[frameIndex * 6] = LINEAR;
+			curves[frameIndex * BEZIER_SIZE] = LINEAR;
 		}
 
 		public void setStepped (int frameIndex) {
-			curves[frameIndex * 6] = STEPPED;
+			curves[frameIndex * BEZIER_SIZE] = STEPPED;
 		}
 
 		public float getCurveType (int frameIndex) {
-			int index = frameIndex * 6;
+			int index = frameIndex * BEZIER_SIZE;
 			if (index == curves.length) return LINEAR;
 			float type = curves[index];
 			if (type == LINEAR) return LINEAR;
@@ -168,55 +167,52 @@ public class Animation {
 		 * cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of
 		 * the difference between the keyframe's values. */
 		public void setCurve (int frameIndex, float cx1, float cy1, float cx2, float cy2) {
-			float subdiv_step = 1f / BEZIER_SEGMENTS;
-			float subdiv_step2 = subdiv_step * subdiv_step;
-			float subdiv_step3 = subdiv_step2 * subdiv_step;
-			float pre1 = 3 * subdiv_step;
-			float pre2 = 3 * subdiv_step2;
-			float pre4 = 6 * subdiv_step2;
-			float pre5 = 6 * subdiv_step3;
-			float tmp1x = -cx1 * 2 + cx2;
-			float tmp1y = -cy1 * 2 + cy2;
-			float tmp2x = (cx1 - cx2) * 3 + 1;
-			float tmp2y = (cy1 - cy2) * 3 + 1;
-			int i = frameIndex * 6;
-			float[] curves = this.curves;
-			curves[i] = cx1 * pre1 + tmp1x * pre2 + tmp2x * subdiv_step3;
-			curves[i + 1] = cy1 * pre1 + tmp1y * pre2 + tmp2y * subdiv_step3;
-			curves[i + 2] = tmp1x * pre4 + tmp2x * pre5;
-			curves[i + 3] = tmp1y * pre4 + tmp2y * pre5;
-			curves[i + 4] = tmp2x * pre5;
-			curves[i + 5] = tmp2y * pre5;
-		}
+			float subdiv1 = 1f / BEZIER_SEGMENTS, subdiv2 = subdiv1 * subdiv1, subdiv3 = subdiv2 * subdiv1;
+			float pre1 = 3 * subdiv1, pre2 = 3 * subdiv2, pre4 = 6 * subdiv2, pre5 = 6 * subdiv3;
+			float tmp1x = -cx1 * 2 + cx2, tmp1y = -cy1 * 2 + cy2, tmp2x = (cx1 - cx2) * 3 + 1, tmp2y = (cy1 - cy2) * 3 + 1;
+			float dfx = cx1 * pre1 + tmp1x * pre2 + tmp2x * subdiv3, dfy = cy1 * pre1 + tmp1y * pre2 + tmp2y * subdiv3;
+			float ddfx = tmp1x * pre4 + tmp2x * pre5, ddfy = tmp1y * pre4 + tmp2y * pre5;
+			float dddfx = tmp2x * pre5, dddfy = tmp2y * pre5;
 
-		public float getCurvePercent (int frameIndex, float percent) {
-			int curveIndex = frameIndex * 6;
+			int i = frameIndex * BEZIER_SIZE;
 			float[] curves = this.curves;
-			float dfx = curves[curveIndex];
-			if (dfx == LINEAR) return percent;
-			if (dfx == STEPPED) return 0;
-			float dfy = curves[curveIndex + 1];
-			float ddfx = curves[curveIndex + 2];
-			float ddfy = curves[curveIndex + 3];
-			float dddfx = curves[curveIndex + 4];
-			float dddfy = curves[curveIndex + 5];
+			curves[i++] = BEZIER;
+
 			float x = dfx, y = dfy;
-			int i = BEZIER_SEGMENTS - 2;
-			while (true) {
-				if (x >= percent) {
-					float prevX = x - dfx;
-					float prevY = y - dfy;
-					return prevY + (y - prevY) * (percent - prevX) / (x - prevX);
-				}
-				if (i == 0) break;
-				i--;
+			for (int n = i + BEZIER_SIZE - 1; i < n; i += 2) {
 				dfx += ddfx;
 				dfy += ddfy;
 				ddfx += dddfx;
 				ddfy += dddfy;
 				x += dfx;
 				y += dfy;
+				curves[i] = x;
+				curves[i + 1] = y;
 			}
+		}
+
+		public float getCurvePercent (int frameIndex, float percent) {
+			float[] curves = this.curves;
+			int i = frameIndex * BEZIER_SIZE + 1;
+			float type = curves[i];
+			if (type == LINEAR) return percent;
+			if (type == STEPPED) return 0;
+			float x = 0;
+			for (int start = i, n = i + BEZIER_SIZE - 1; i < n; i += 2) {
+				x = curves[i];
+				if (x >= percent) {
+					float prevX, prevY;
+					if (i == start) {
+						prevX = 0;
+						prevY = 0;
+					} else {
+						prevX = curves[i - 2];
+						prevY = curves[i - 1];
+					}
+					return prevY + (curves[i + 1] - prevY) * (percent - prevX) / (x - prevX);
+				}
+			}
+			float y = curves[i - 1];
 			return y + (1 - y) * (percent - x) / (1 - x); // Last point is 1,1.
 		}
 	}
@@ -727,7 +723,7 @@ public class Animation {
 			return frames;
 		}
 
-		/** Sets the time and mix and bend direction of the specified keyframe. */
+		/** Sets the time, mix and bend direction of the specified keyframe. */
 		public void setFrame (int frameIndex, float time, float mix, int bendDirection) {
 			bendDirections[frameIndex] = bendDirection;
 			frameIndex *= 2;
