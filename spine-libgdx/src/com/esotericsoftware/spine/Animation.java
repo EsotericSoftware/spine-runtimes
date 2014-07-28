@@ -134,7 +134,7 @@ public class Animation {
 	/** Base class for frames that use an interpolation bezier curve. */
 	abstract static public class CurveTimeline implements Timeline {
 		static public final float LINEAR = 0, STEPPED = 1, BEZIER = 2;
-		static private final int BEZIER_SEGMENTS = 10, BEZIER_SIZE = BEZIER_SEGMENTS * 2 - 5;
+		static private final int BEZIER_SEGMENTS = 10, BEZIER_SIZE = BEZIER_SEGMENTS * 2 - 1;
 
 		private final float[] curves; // type, x, y, ...
 
@@ -180,23 +180,24 @@ public class Animation {
 
 			float x = dfx, y = dfy;
 			for (int n = i + BEZIER_SIZE - 1; i < n; i += 2) {
+				curves[i] = x;
+				curves[i + 1] = y;
 				dfx += ddfx;
 				dfy += ddfy;
 				ddfx += dddfx;
 				ddfy += dddfy;
 				x += dfx;
 				y += dfy;
-				curves[i] = x;
-				curves[i + 1] = y;
 			}
 		}
 
 		public float getCurvePercent (int frameIndex, float percent) {
 			float[] curves = this.curves;
-			int i = frameIndex * BEZIER_SIZE + 1;
+			int i = frameIndex * BEZIER_SIZE;
 			float type = curves[i];
 			if (type == LINEAR) return percent;
 			if (type == STEPPED) return 0;
+			i++;
 			float x = 0;
 			for (int start = i, n = i + BEZIER_SIZE - 1; i < n; i += 2) {
 				x = curves[i];
