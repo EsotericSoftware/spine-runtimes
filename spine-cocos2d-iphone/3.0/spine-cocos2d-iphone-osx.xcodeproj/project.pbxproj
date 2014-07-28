@@ -40,7 +40,6 @@
 		43F7FD861927C31700CA4038 /* SkinnedMeshAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FD6E1927C31700CA4038 /* SkinnedMeshAttachment.c */; };
 		43F7FD871927C31700CA4038 /* Slot.c in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FD6F1927C31700CA4038 /* Slot.c */; };
 		43F7FD881927C31700CA4038 /* SlotData.c in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FD701927C31700CA4038 /* SlotData.c */; };
-		43F7FDA71927C33C00CA4038 /* PolygonBatch.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FDA21927C33C00CA4038 /* PolygonBatch.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		43F7FDA81927C33C00CA4038 /* SkeletonAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FDA41927C33C00CA4038 /* SkeletonAnimation.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		43F7FDA91927C33C00CA4038 /* SkeletonRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FDA61927C33C00CA4038 /* SkeletonRenderer.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		43F7FDAC1927C34600CA4038 /* SpineboyExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FDAB1927C34600CA4038 /* SpineboyExample.m */; };
@@ -48,6 +47,7 @@
 		43F7FDB11927C35600CA4038 /* goblins-ffd.json in Resources */ = {isa = PBXBuildFile; fileRef = 43F7FDAE1927C35600CA4038 /* goblins-ffd.json */; };
 		43F7FDB21927C35600CA4038 /* goblins-ffd.png in Resources */ = {isa = PBXBuildFile; fileRef = 43F7FDAF1927C35600CA4038 /* goblins-ffd.png */; };
 		43F7FDB51927D04200CA4038 /* GoblinsExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FDB41927D04200CA4038 /* GoblinsExample.m */; };
+		83F1A0E319868B46001F6B44 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83F1A0E219868B46001F6B44 /* GLKit.framework */; };
 		A2BD1E68192A41C100405470 /* libcocos2d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A2BD1E63192A417300405470 /* libcocos2d.a */; };
 		A2BD1E73192A47A000405470 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2BD1E6C192A47A000405470 /* AVFoundation.framework */; };
 		A2BD1E74192A47A000405470 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2BD1E6D192A47A000405470 /* QuartzCore.framework */; };
@@ -65,13 +65,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = E01E663D121CA00A001A484F;
 			remoteInfo = cocos2d;
-		};
-		A2BD1E64192A417300405470 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A2BD1E5C192A417300405470 /* cocos2d-osx.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A06430E713C1414300CC5554;
-			remoteInfo = kazmath;
 		};
 		A2BD1E66192A417300405470 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -146,8 +139,6 @@
 		43F7FD9E1927C32800CA4038 /* Slot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Slot.h; path = "../../spine-c/include/spine/Slot.h"; sourceTree = "<group>"; };
 		43F7FD9F1927C32800CA4038 /* SlotData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SlotData.h; path = "../../spine-c/include/spine/SlotData.h"; sourceTree = "<group>"; };
 		43F7FDA01927C32800CA4038 /* spine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = spine.h; path = "../../spine-c/include/spine/spine.h"; sourceTree = "<group>"; };
-		43F7FDA11927C33C00CA4038 /* PolygonBatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PolygonBatch.h; path = src/spine/PolygonBatch.h; sourceTree = "<group>"; };
-		43F7FDA21927C33C00CA4038 /* PolygonBatch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PolygonBatch.m; path = src/spine/PolygonBatch.m; sourceTree = "<group>"; };
 		43F7FDA31927C33C00CA4038 /* SkeletonAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonAnimation.h; path = src/spine/SkeletonAnimation.h; sourceTree = "<group>"; };
 		43F7FDA41927C33C00CA4038 /* SkeletonAnimation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SkeletonAnimation.m; path = src/spine/SkeletonAnimation.m; sourceTree = "<group>"; };
 		43F7FDA51927C33C00CA4038 /* SkeletonRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonRenderer.h; path = src/spine/SkeletonRenderer.h; sourceTree = "<group>"; };
@@ -159,6 +150,7 @@
 		43F7FDAF1927C35600CA4038 /* goblins-ffd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "goblins-ffd.png"; sourceTree = "<group>"; };
 		43F7FDB31927D04200CA4038 /* GoblinsExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoblinsExample.h; sourceTree = "<group>"; };
 		43F7FDB41927D04200CA4038 /* GoblinsExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoblinsExample.m; sourceTree = "<group>"; };
+		83F1A0E219868B46001F6B44 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		A2BD1E5C192A417300405470 /* cocos2d-osx.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "cocos2d-osx.xcodeproj"; path = "cocos2d/cocos2d-osx.xcodeproj"; sourceTree = SOURCE_ROOT; };
 		A2BD1E6C192A47A000405470 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		A2BD1E6D192A47A000405470 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -174,6 +166,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				83F1A0E319868B46001F6B44 /* GLKit.framework in Frameworks */,
 				A2BD1E78192A47A000405470 /* AppKit.framework in Frameworks */,
 				A2BD1E73192A47A000405470 /* AVFoundation.framework in Frameworks */,
 				A2BD1E75192A47A000405470 /* OpenGL.framework in Frameworks */,
@@ -211,6 +204,7 @@
 		4319B51616FF9B2600C1D7A9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				83F1A0E219868B46001F6B44 /* GLKit.framework */,
 				A2BD1E6C192A47A000405470 /* AVFoundation.framework */,
 				A2BD1E6D192A47A000405470 /* QuartzCore.framework */,
 				A2BD1E6E192A47A000405470 /* OpenGL.framework */,
@@ -322,8 +316,6 @@
 		4319B8931701168F00C1D7A9 /* spine-cocos2d-iphone */ = {
 			isa = PBXGroup;
 			children = (
-				43F7FDA11927C33C00CA4038 /* PolygonBatch.h */,
-				43F7FDA21927C33C00CA4038 /* PolygonBatch.m */,
 				43F7FDA31927C33C00CA4038 /* SkeletonAnimation.h */,
 				43F7FDA41927C33C00CA4038 /* SkeletonAnimation.m */,
 				43F7FDA51927C33C00CA4038 /* SkeletonRenderer.h */,
@@ -359,7 +351,6 @@
 			isa = PBXGroup;
 			children = (
 				A2BD1E63192A417300405470 /* libcocos2d.a */,
-				A2BD1E65192A417300405470 /* libkazmath.a */,
 				A2BD1E67192A417300405470 /* libObjectiveChipmunk.a */,
 			);
 			name = Products;
@@ -426,13 +417,6 @@
 			remoteRef = A2BD1E62192A417300405470 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		A2BD1E65192A417300405470 /* libkazmath.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libkazmath.a;
-			remoteRef = A2BD1E64192A417300405470 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		A2BD1E67192A417300405470 /* libObjectiveChipmunk.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -493,7 +477,6 @@
 				43F7FD861927C31700CA4038 /* SkinnedMeshAttachment.c in Sources */,
 				43F7FD871927C31700CA4038 /* Slot.c in Sources */,
 				43F7FD881927C31700CA4038 /* SlotData.c in Sources */,
-				43F7FDA71927C33C00CA4038 /* PolygonBatch.m in Sources */,
 				43F7FDA81927C33C00CA4038 /* SkeletonAnimation.m in Sources */,
 				43F7FDA91927C33C00CA4038 /* SkeletonRenderer.m in Sources */,
 				43F7FDAC1927C34600CA4038 /* SpineboyExample.m in Sources */,

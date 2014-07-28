@@ -31,8 +31,6 @@
 #import <spine/spine.h>
 #import "cocos2d.h"
 
-@class spPolygonBatch;
-
 /** Draws a skeleton. */
 @interface SkeletonRenderer : CCNode<CCBlendProtocol> {
 	spSkeleton* _skeleton;
@@ -41,10 +39,9 @@
 	bool _debugBones;
 	bool _premultipliedAlpha;
 	ccBlendFunc _blendFunc;
-
+    CCDrawNode *_drawNode;
 	bool _ownsSkeletonData;
 	spAtlas* _atlas;
-	spPolygonBatch* batch;
 	float* worldVertices;
 }
 
