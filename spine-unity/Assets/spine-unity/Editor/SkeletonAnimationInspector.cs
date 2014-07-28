@@ -29,7 +29,6 @@
  *****************************************************************************/
 
 using System;
-using Spine;
 using UnityEditor;
 using UnityEngine;
 
