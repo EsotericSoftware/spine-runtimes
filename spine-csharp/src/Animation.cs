@@ -422,14 +422,16 @@ namespace Spine {
 		}
 
 		public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
-			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
+            float[] frames = this.frames;
 
-			int frameIndex;
-			if (time >= frames[frames.Length - 1]) // Time is after last frame.
-				frameIndex = frames.Length - 1;
-			else
-				frameIndex = Animation.binarySearch(frames, time, 1) - 1;
+            int frameIndex;
+            bool looped = lastTime > time;
+            if (looped && time < frames[0] || time >= frames[frames.Length - 1]) // Time is after last frame.
+                frameIndex = frames.Length - 1;
+            else if (time >= frames[0])
+                frameIndex = Animation.binarySearch(frames, time, 1) - 1;
+            else
+                return; // Time is before first frame and not looped.
 
 			String attachmentName = attachmentNames[frameIndex];
 			skeleton.slots[slotIndex].Attachment =
