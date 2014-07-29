@@ -120,6 +120,23 @@ public class Animation {
 		}
 	}
 
+	/** @param target After the first and before the last value.
+	 * @return index of first value greater than the target. */
+	static int binarySearch (float[] values, float target) {
+		int low = 0;
+		int high = values.length - 2;
+		if (high == 0) return 1;
+		int current = high >>> 1;
+		while (true) {
+			if (values[(current + 1)] <= target)
+				low = current + 1;
+			else
+				high = current;
+			if (low == high) return (low + 1);
+			current = (low + high) >>> 1;
+		}
+	}
+
 	static int linearSearch (float[] values, float target, int step) {
 		for (int i = 0, last = values.length - step; i <= last; i += step)
 			if (values[i] > target) return i;
@@ -127,7 +144,8 @@ public class Animation {
 	}
 
 	static public interface Timeline {
-		/** Sets the value(s) for the specified time. */
+		/** Sets the value(s) for the specified time.
+		 * @param events May be null. */
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha);
 	}
 
@@ -486,13 +504,14 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha) {
 			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
+			if (time < frames[0]) {
+				if (lastTime > time) apply(skeleton, lastTime, Integer.MAX_VALUE, null, 0);
+				return;
+			} else if (lastTime > time) //
+				lastTime = -1;
 
-			int frameIndex;
-			if (time >= frames[frames.length - 1]) // Time is after last frame.
-				frameIndex = frames.length - 1;
-			else
-				frameIndex = binarySearch(frames, time, 1) - 1;
+			int frameIndex = time >= frames[frames.length - 1] ? frames.length - 1 : binarySearch(frames, time, 1) - 1;
+			if (frames[frameIndex] <= lastTime) return;
 
 			String attachmentName = attachmentNames[frameIndex];
 			skeleton.slots.get(slotIndex).setAttachment(
@@ -544,7 +563,7 @@ public class Animation {
 			if (lastTime < frames[0])
 				frameIndex = 0;
 			else {
-				frameIndex = binarySearch(frames, lastTime, 1);
+				frameIndex = binarySearch(frames, lastTime);
 				float frame = frames[frameIndex];
 				while (frameIndex > 0) { // Fire multiple events with the same frame.
 					if (frames[frameIndex - 1] != frame) break;
@@ -592,7 +611,7 @@ public class Animation {
 			if (time >= frames[frames.length - 1]) // Time is after last frame.
 				frameIndex = frames.length - 1;
 			else
-				frameIndex = binarySearch(frames, time, 1) - 1;
+				frameIndex = binarySearch(frames, time) - 1;
 
 			Array<Slot> drawOrder = skeleton.drawOrder;
 			Array<Slot> slots = skeleton.slots;
@@ -676,7 +695,7 @@ public class Animation {
 			}
 
 			// Interpolate between the previous frame and the current frame.
-			int frameIndex = binarySearch(frames, time, 1);
+			int frameIndex = binarySearch(frames, time);
 			float frameTime = frames[frameIndex];
 			float percent = MathUtils.clamp(1 - (time - frameTime) / (frames[frameIndex - 1] - frameTime), 0, 1);
 			percent = getCurvePercent(frameIndex - 1, percent);
