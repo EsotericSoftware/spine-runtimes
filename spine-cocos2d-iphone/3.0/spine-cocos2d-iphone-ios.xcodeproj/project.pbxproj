@@ -51,12 +51,12 @@
 		43F7FF661927F91900CA4038 /* SkinnedMeshAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF4E1927F91900CA4038 /* SkinnedMeshAttachment.c */; };
 		43F7FF671927F91900CA4038 /* Slot.c in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF4F1927F91900CA4038 /* Slot.c */; };
 		43F7FF681927F91900CA4038 /* SlotData.c in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF501927F91900CA4038 /* SlotData.c */; };
-		43F7FF871927F94800CA4038 /* PolygonBatch.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF821927F94800CA4038 /* PolygonBatch.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		43F7FF881927F94800CA4038 /* SkeletonAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF841927F94800CA4038 /* SkeletonAnimation.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		43F7FF891927F94800CA4038 /* SkeletonRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF861927F94800CA4038 /* SkeletonRenderer.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		43F7FF8E1927F96700CA4038 /* GoblinsExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF8B1927F96700CA4038 /* GoblinsExample.m */; };
 		43F7FF8F1927F96700CA4038 /* SpineboyExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF8D1927F96700CA4038 /* SpineboyExample.m */; };
 		652107961895250000B1FF07 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 652107951895250000B1FF07 /* CoreText.framework */; };
+		83F1A0EF1986955A001F6B44 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83F1A0EE1986955A001F6B44 /* GLKit.framework */; };
 		9A5D2499170A94DA0030D4DD /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5D2498170A94DA0030D4DD /* QuartzCore.framework */; };
 		9A5D249B170A94DA0030D4DD /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5D249A170A94DA0030D4DD /* OpenGLES.framework */; };
 		9A5D249D170A94DA0030D4DD /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5D249C170A94DA0030D4DD /* OpenAL.framework */; };
@@ -153,8 +153,6 @@
 		43F7FF7E1927F92500CA4038 /* Slot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Slot.h; path = "../../spine-c/include/spine/Slot.h"; sourceTree = "<group>"; };
 		43F7FF7F1927F92500CA4038 /* SlotData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SlotData.h; path = "../../spine-c/include/spine/SlotData.h"; sourceTree = "<group>"; };
 		43F7FF801927F92500CA4038 /* spine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = spine.h; path = "../../spine-c/include/spine/spine.h"; sourceTree = "<group>"; };
-		43F7FF811927F94800CA4038 /* PolygonBatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PolygonBatch.h; path = src/spine/PolygonBatch.h; sourceTree = "<group>"; };
-		43F7FF821927F94800CA4038 /* PolygonBatch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PolygonBatch.m; path = src/spine/PolygonBatch.m; sourceTree = "<group>"; };
 		43F7FF831927F94800CA4038 /* SkeletonAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonAnimation.h; path = src/spine/SkeletonAnimation.h; sourceTree = "<group>"; };
 		43F7FF841927F94800CA4038 /* SkeletonAnimation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SkeletonAnimation.m; path = src/spine/SkeletonAnimation.m; sourceTree = "<group>"; };
 		43F7FF851927F94800CA4038 /* SkeletonRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonRenderer.h; path = src/spine/SkeletonRenderer.h; sourceTree = "<group>"; };
@@ -164,6 +162,7 @@
 		43F7FF8C1927F96700CA4038 /* SpineboyExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SpineboyExample.h; path = example/SpineboyExample.h; sourceTree = "<group>"; };
 		43F7FF8D1927F96700CA4038 /* SpineboyExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SpineboyExample.m; path = example/SpineboyExample.m; sourceTree = "<group>"; };
 		652107951895250000B1FF07 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
+		83F1A0EE1986955A001F6B44 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		9A5D2495170A94DA0030D4DD /* SpineExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpineExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A5D2498170A94DA0030D4DD /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		9A5D249A170A94DA0030D4DD /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -182,6 +181,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				83F1A0EF1986955A001F6B44 /* GLKit.framework in Frameworks */,
 				A28E1F0C192926C500D16B23 /* libcocos2d.a in Frameworks */,
 				652107961895250000B1FF07 /* CoreText.framework in Frameworks */,
 				9A5D2499170A94DA0030D4DD /* QuartzCore.framework in Frameworks */,
@@ -275,8 +275,6 @@
 		43C32823170B0BC7004A9460 /* spine-cocos2d-iphone */ = {
 			isa = PBXGroup;
 			children = (
-				43F7FF811927F94800CA4038 /* PolygonBatch.h */,
-				43F7FF821927F94800CA4038 /* PolygonBatch.m */,
 				43F7FF831927F94800CA4038 /* SkeletonAnimation.h */,
 				43F7FF841927F94800CA4038 /* SkeletonAnimation.m */,
 				43F7FF851927F94800CA4038 /* SkeletonRenderer.h */,
@@ -342,6 +340,7 @@
 		9A5D2497170A94DA0030D4DD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				83F1A0EE1986955A001F6B44 /* GLKit.framework */,
 				652107951895250000B1FF07 /* CoreText.framework */,
 				9A5D2498170A94DA0030D4DD /* QuartzCore.framework */,
 				9A5D249A170A94DA0030D4DD /* OpenGLES.framework */,
@@ -494,7 +493,6 @@
 				43F7FF661927F91900CA4038 /* SkinnedMeshAttachment.c in Sources */,
 				43F7FF671927F91900CA4038 /* Slot.c in Sources */,
 				43F7FF681927F91900CA4038 /* SlotData.c in Sources */,
-				43F7FF871927F94800CA4038 /* PolygonBatch.m in Sources */,
 				43F7FF881927F94800CA4038 /* SkeletonAnimation.m in Sources */,
 				43F7FF891927F94800CA4038 /* SkeletonRenderer.m in Sources */,
 				43F7FF8E1927F96700CA4038 /* GoblinsExample.m in Sources */,
