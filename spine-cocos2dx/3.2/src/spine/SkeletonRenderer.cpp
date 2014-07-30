@@ -347,6 +347,35 @@ bool SkeletonRenderer::setAttachment (const std::string& slotName, const std::st
 	return spSkeleton_setAttachment(_skeleton, slotName.c_str(), attachmentName.c_str()) ? true : false;
 }
 
+void SkeletonRenderer::setTimeScale(float scale)
+{
+	_timeScale = scale;
+}
+
+float SkeletonRenderer::getTimeScale() const
+{
+	return _timeScale;
+}
+
+void SkeletonRenderer::setDebugSlotsEnabled(bool enabled)
+{
+	_debugSlots = enabled;
+}
+bool SkeletonRenderer::getDebugSlotsEnabled() const
+{
+	return _debugSlots;
+}
+
+void SkeletonRenderer::setDebugBonesEnabled(bool enabled)
+{
+	_debugBones = enabled;
+}
+bool SkeletonRenderer::getDebugBonesEnabled() const
+{
+	return _debugBones;
+}
+
+
 // --- CCBlendProtocol
 
 const BlendFunc& SkeletonRenderer::getBlendFunc () const {

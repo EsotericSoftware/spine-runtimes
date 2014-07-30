@@ -61,20 +61,30 @@ public:
 	void clearTracks ();
 	void clearTrack (int trackIndex = 0);
 
-	void setStartListener (spTrackEntry* entry, StartListener listener);
-	void setEndListener (spTrackEntry* entry, EndListener listener);
-	void setCompleteListener (spTrackEntry* entry, CompleteListener listener);
-	void setEventListener (spTrackEntry* entry, EventListener listener);
+	void setStartListener (const StartListener& listener);
+	void setEndListener (const EndListener& listener);
+	void setCompleteListener (const CompleteListener& listener);
+	void setEventListener (const EventListener& listener);
+
+	void setTrackStartListener (spTrackEntry* entry, const StartListener& listener);
+	void setTrackEndListener (spTrackEntry* entry, const EndListener& listener);
+	void setTrackCompleteListener (spTrackEntry* entry, const CompleteListener& listener);
+	void setTrackEventListener (spTrackEntry* entry, const EventListener& listener);
+
+	void setStartListener (spTrackEntry* entry, const StartListener& listener) CC_DEPRECATED_ATTRIBUTE
+	{ setTrackStartListener(entry, listener); }
+	void setEndListener (spTrackEntry* entry, const EndListener& listener) CC_DEPRECATED_ATTRIBUTE
+	{ setTrackEndListener(entry, listener); }
+	void setCompleteListener (spTrackEntry* entry, const CompleteListener& listener) CC_DEPRECATED_ATTRIBUTE
+	{ setTrackCompleteListener(entry, listener); }
+	void setEventListener (spTrackEntry* entry, const EventListener& listener) CC_DEPRECATED_ATTRIBUTE
+	{ setTrackEventListener(entry, listener); }
+
 
 	virtual void onAnimationStateEvent (int trackIndex, spEventType type, spEvent* event, int loopCount);
 	virtual void onTrackEntryEvent (int trackIndex, spEventType type, spEvent* event, int loopCount);
 
 	spAnimationState* getState() const;
-
-	StartListener startListener;
-	EndListener endListener;
-	CompleteListener completeListener;
-	EventListener eventListener;
 
 protected:
 	SkeletonAnimation ();
@@ -86,7 +96,12 @@ protected:
 
 	spAnimationState* _state;
 
-	bool ownsAnimationStateData;
+	bool _ownsAnimationStateData;
+
+	StartListener _startListener;
+	EndListener _endListener;
+	CompleteListener _completeListener;
+	EventListener _eventListener;
 
 private:
 	typedef SkeletonRenderer super;
