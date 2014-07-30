@@ -289,8 +289,9 @@ public class SpineEditorUtilities : AssetPostprocessor {
 		string[] atlasLines = atlasText.text.Split('\n');
 		List<string> pageFiles = new List<string>();
 		for(int i = 0; i < atlasLines.Length-1; i++){
-			if(atlasLines[i].Length == 0)
-				pageFiles.Add(atlasLines[i+1]);
+			// Trim() because sometimes generated assets contains spaces
+			if(atlasLines[i].Trim().Length == 0)
+				pageFiles.Add(atlasLines[i+1].Trim());
 		}
 		
 		atlasAsset.materials = new Material[pageFiles.Count];
