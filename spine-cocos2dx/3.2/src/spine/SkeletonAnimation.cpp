@@ -89,7 +89,7 @@ SkeletonAnimation* SkeletonAnimation::createWithFile (const std::string& skeleto
 }
 
 void SkeletonAnimation::initialize () {
-	ownsAnimationStateData = true;
+	_ownsAnimationStateData = true;
 	_state = spAnimationState_create(spAnimationStateData_create(_skeleton->data));
 	_state->rendererObject = this;
 	_state->listener = animationCallback;
@@ -114,7 +114,7 @@ SkeletonAnimation::SkeletonAnimation (const std::string& skeletonDataFile, const
 }
 
 SkeletonAnimation::~SkeletonAnimation () {
-	if (ownsAnimationStateData) spAnimationStateData_dispose(_state->data);
+	if (_ownsAnimationStateData) spAnimationStateData_dispose(_state->data);
 	spAnimationState_dispose(_state);
 }
 
@@ -130,10 +130,10 @@ void SkeletonAnimation::update (float deltaTime) {
 void SkeletonAnimation::setAnimationStateData (spAnimationStateData* stateData) {
 	CCASSERT(stateData, "stateData cannot be null.");
 
-	if (ownsAnimationStateData) spAnimationStateData_dispose(_state->data);
+	if (_ownsAnimationStateData) spAnimationStateData_dispose(_state->data);
 	spAnimationState_dispose(_state);
 
-	ownsAnimationStateData = false;
+	_ownsAnimationStateData = false;
 	_state = spAnimationState_create(stateData);
 	_state->rendererObject = this;
 	_state->listener = animationCallback;
@@ -176,16 +176,16 @@ void SkeletonAnimation::clearTrack (int trackIndex) {
 void SkeletonAnimation::onAnimationStateEvent (int trackIndex, spEventType type, spEvent* event, int loopCount) {
 	switch (type) {
 	case SP_ANIMATION_START:
-		if (startListener) startListener(trackIndex);
+		if (_startListener) _startListener(trackIndex);
 		break;
 	case SP_ANIMATION_END:
-		if (endListener) endListener(trackIndex);
+		if (_endListener) _endListener(trackIndex);
 		break;
 	case SP_ANIMATION_COMPLETE:
-		if (completeListener) completeListener(trackIndex, loopCount);
+		if (_completeListener) _completeListener(trackIndex, loopCount);
 		break;
 	case SP_ANIMATION_EVENT:
-		if (eventListener) eventListener(trackIndex, event);
+		if (_eventListener) _eventListener(trackIndex, event);
 		break;
 	}
 }
@@ -210,19 +210,35 @@ void SkeletonAnimation::onTrackEntryEvent (int trackIndex, spEventType type, spE
 	}
 }
 
-void SkeletonAnimation::setStartListener (spTrackEntry* entry, StartListener listener) {
+void SkeletonAnimation::setStartListener (const StartListener& listener) {
+	_startListener = listener;
+}
+
+void SkeletonAnimation::setEndListener (const EndListener& listener) {
+	_endListener = listener;
+}
+
+void SkeletonAnimation::setCompleteListener (const CompleteListener& listener) {
+	_completeListener = listener;
+}
+
+void SkeletonAnimation::setEventListener (const EventListener& listener) {
+	_eventListener = listener;
+}
+
+void SkeletonAnimation::setTrackStartListener (spTrackEntry* entry, const StartListener& listener) {
 	getListeners(entry)->startListener = listener;
 }
 
-void SkeletonAnimation::setEndListener (spTrackEntry* entry, EndListener listener) {
+void SkeletonAnimation::setTrackEndListener (spTrackEntry* entry, const EndListener& listener) {
 	getListeners(entry)->endListener = listener;
 }
 
-void SkeletonAnimation::setCompleteListener (spTrackEntry* entry, CompleteListener listener) {
+void SkeletonAnimation::setTrackCompleteListener (spTrackEntry* entry, const CompleteListener& listener) {
 	getListeners(entry)->completeListener = listener;
 }
 
-void SkeletonAnimation::setEventListener (spTrackEntry* entry, spine::EventListener listener) {
+void SkeletonAnimation::setTrackEventListener (spTrackEntry* entry, const EventListener& listener) {
 	getListeners(entry)->eventListener = listener;
 }
 

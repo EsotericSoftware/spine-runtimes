@@ -57,6 +57,16 @@ public:
 	void setBonesToSetupPose ();
 	void setSlotsToSetupPose ();
 
+	void setTimeScale(float scale);
+	float getTimeScale() const;
+
+	void setDebugSlotsEnabled(bool enabled);
+	bool getDebugSlotsEnabled() const;
+
+	void setDebugBonesEnabled(bool enabled);
+	bool getDebugBonesEnabled() const;
+
+
 	/* Returns 0 if the bone was not found. */
 	spBone* findBone (const std::string& boneName) const;
 	/* Returns 0 if the slot was not found. */
