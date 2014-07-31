@@ -49,20 +49,20 @@ bool SpineboyExample::init () {
 
 	skeletonNode = SkeletonAnimation::createWithFile("spineboy.json", "spineboy.atlas", 0.6f);
 
-	skeletonNode->startListener = [this] (int trackIndex) {
-		spTrackEntry* entry = spAnimationState_getCurrent(skeletonNode->state, trackIndex);
+	skeletonNode->setStartListener( [this] (int trackIndex) {
+		spTrackEntry* entry = spAnimationState_getCurrent(skeletonNode->getState(), trackIndex);
 		const char* animationName = (entry && entry->animation) ? entry->animation->name : 0;
 		log("%d start: %s", trackIndex, animationName);
-	};
-	skeletonNode->endListener = [] (int trackIndex) {
+	});
+	skeletonNode->setEndListener( [] (int trackIndex) {
 		log("%d end", trackIndex);
-	};
-	skeletonNode->completeListener = [] (int trackIndex, int loopCount) {
+	});
+	skeletonNode->setCompleteListener( [] (int trackIndex, int loopCount) {
 		log("%d complete: %d", trackIndex, loopCount);
-	};
-	skeletonNode->eventListener = [] (int trackIndex, spEvent* event) {
+	});
+	skeletonNode->setEventListener( [] (int trackIndex, spEvent* event) {
 		log("%d event: %s, %d, %f, %s", trackIndex, event->data->name, event->intValue, event->floatValue, event->stringValue);
-	};
+	});
 
 	skeletonNode->setMix("walk", "jump", 0.2f);
 	skeletonNode->setMix("jump", "run", 0.2f);
@@ -70,7 +70,7 @@ bool SpineboyExample::init () {
 	spTrackEntry* jumpEntry = skeletonNode->addAnimation(0, "jump", false, 3);
 	skeletonNode->addAnimation(0, "run", true);
 
-	skeletonNode->setStartListener(jumpEntry, [] (int trackIndex) {
+	skeletonNode->setTrackStartListener(jumpEntry, [] (int trackIndex) {
 		log("jumped!");
 	});
 
@@ -85,10 +85,10 @@ bool SpineboyExample::init () {
 	
 	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
 	listener->onTouchBegan = [this] (Touch* touch, Event* event) -> bool {
-		if (!skeletonNode->debugBones)
-			skeletonNode->debugBones = true;
-		else if (skeletonNode->timeScale == 1)
-			skeletonNode->timeScale = 0.3f;
+		if (!skeletonNode->getDebugBonesEnabled())
+			skeletonNode->setDebugBonesEnabled(true);
+		else if (skeletonNode->getTimeScale() == 1)
+			skeletonNode->setTimeScale(0.3f);
 		else
 			Director::getInstance()->replaceScene(GoblinsExample::scene());
 		return true;
