@@ -19,6 +19,10 @@ bool AppDelegate::applicationDidFinishLaunching () {
 	// initialize director
 	auto director = Director::getInstance();
 	auto glview = director->getOpenGLView();
+    if(!glview) {
+        glview = GLView::create("Spine Example");
+        director->setOpenGLView(glview);
+    }
 
 	// Set the design resolution
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8)

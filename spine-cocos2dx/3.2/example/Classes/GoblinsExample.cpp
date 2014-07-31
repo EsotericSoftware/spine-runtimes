@@ -59,10 +59,10 @@ bool GoblinsExample::init () {
 	
 	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
 	listener->onTouchBegan = [this] (Touch* touch, Event* event) -> bool {
-		if (!skeletonNode->debugBones)
-			skeletonNode->debugBones = true;
-		else if (skeletonNode->timeScale == 1)
-			skeletonNode->timeScale = 0.3f;
+		if (!skeletonNode->getDebugBonesEnabled())
+			skeletonNode->setDebugBonesEnabled(true);
+		else if (skeletonNode->getTimeScale() == 1)
+			skeletonNode->setTimeScale(0.3f);
 		else
 			Director::getInstance()->replaceScene(SpineboyExample::scene());
 		return true;
