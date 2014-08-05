@@ -36,16 +36,23 @@ package spine.animation {
 			return _listeners;
 		}
 		
+		public function has (listener:Function) : Boolean {
+			return (_listeners.indexOf(listener) >= 0);
+		}
+
 		public function add (listener:Function) : void {
 			if (listener == null)
 				throw new ArgumentError("listener cannot be null.");
+			if (_listeners.indexOf(listener) == -1)
 			_listeners[_listeners.length] = listener;
 		}
 
 		public function remove (listener:Function) : void {
 			if (listener == null)
 				throw new ArgumentError("listener cannot be null.");
-			_listeners.splice(_listeners.indexOf(listener), 1);
+			var index:int = _listeners.indexOf(listener);
+			if (index >= 0)
+				_listeners.splice(index, 1);
 		}
 
 		public function invoke (... args:*) : void {
