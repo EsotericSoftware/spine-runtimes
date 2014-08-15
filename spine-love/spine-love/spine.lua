@@ -49,6 +49,8 @@ spine.EventData = require "spine-lua.EventData"
 spine.Event = require "spine-lua.Event"
 spine.SkeletonBounds = require "spine-lua.SkeletonBounds"
 
+spine.Bone.yDown = true
+
 spine.utils.readFile = function (fileName, base)
 	local path = fileName
 	if base then path = base .. '/' .. path end
@@ -142,7 +144,7 @@ function spine.Skeleton.new (skeletonData, group)
 				end
 				love.graphics.draw(image, 
 					self.x + x, 
-					self.y - y, 
+					self.y + y,
 					-rotation * 3.1415927 / 180,
 					xScale * attachment.widthRatio,
 					yScale * attachment.heightRatio,
@@ -173,7 +175,7 @@ function spine.Skeleton.new (skeletonData, group)
 				end
 
 				love.graphics.push()
-				love.graphics.translate(self.x + bone.worldX, self.y - bone.worldY)
+				love.graphics.translate(self.x + bone.worldX, self.y + bone.worldY)
 				love.graphics.rotate(rotation * 3.1415927 / 180)
 				love.graphics.scale(xScale, yScale)
 				love.graphics.setColor(255, 0, 0)
@@ -204,7 +206,7 @@ function spine.Skeleton.new (skeletonData, group)
 						rotation = -rotation
 					end
 					love.graphics.push()
-					love.graphics.translate(self.x + x, self.y - y)
+					love.graphics.translate(self.x + x, self.y + y)
 					love.graphics.rotate(-rotation * 3.1415927 / 180)
 					love.graphics.scale(xScale, yScale)
 					love.graphics.rectangle('line', -attachment.width / 2, -attachment.height / 2, attachment.width, attachment.height)

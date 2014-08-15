@@ -28,7 +28,9 @@
 -- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
-local Bone = {}
+local Bone = {
+	yDown = false,
+}
 
 function Bone.new (data, parent)
 	if not data then error("data cannot be nil", 2) end
@@ -68,7 +70,7 @@ function Bone.new (data, parent)
 			else
 				self.worldX = self.x
 			end
-			if flipY then
+			if flipY ~= Bone.yDown then
 				self.worldY = -self.y
 			else
 				self.worldY = self.y
@@ -88,7 +90,7 @@ function Bone.new (data, parent)
 			self.m00 = -self.m00
 			self.m01 = -self.m01
 		end
-		if flipY then
+		if flipY ~= Bone.yDown then
 			self.m10 = -self.m10
 			self.m11 = -self.m11
 		end
