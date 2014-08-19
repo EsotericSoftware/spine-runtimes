@@ -141,7 +141,7 @@ function AnimationState.new (data)
 				else
 					complete = lastTime < endTime and time >= endTime
 				end
-				if complete then 
+				if complete then
 					local count = math.floor(time / endTime)
 					if current.onComplete then current.onComplete(i, count) end
 					if self.onComplete then self.onComplete(i, count) end
@@ -154,7 +154,7 @@ function AnimationState.new (data)
 
 	function self:clearTracks ()
 		for i,current in pairs(self.tracks) do
-			self.clearTrack(i)
+			self:clearTrack(i)
 		end
 		self.tracks = {}
 		self.trackCount = 0
