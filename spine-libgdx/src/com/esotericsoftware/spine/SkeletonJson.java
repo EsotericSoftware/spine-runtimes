@@ -215,6 +215,12 @@ public class SkeletonJson {
 			mesh.setRegionUVs(map.require("uvs").asFloatArray());
 			mesh.updateUVs();
 
+            //Check if color exists
+            JsonValue meshColor = map.get("color");
+            if(meshColor != null) {
+                mesh.getColor().set(Color.valueOf(meshColor.asString()));
+            }
+
 			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() * 2);
 			if (map.has("edges")) mesh.setEdges(map.require("edges").asIntArray());
 			mesh.setWidth(map.getFloat("width", 0) * scale);
