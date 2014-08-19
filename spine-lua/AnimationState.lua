@@ -36,7 +36,6 @@ function AnimationState.new (data)
 	local self = {
 		data = data,
 		tracks = {},
-		trackCount = 0,
 		events = {},
 		onStart = nil, onEnd = nil, onComplete = nil, onEvent = nil,
 		timeScale = 1
@@ -64,7 +63,6 @@ function AnimationState.new (data)
 		end
 
 		self.tracks[index] = entry
-		self.trackCount = math.max(self.trackCount, index)
 
 		if entry.onStart then entry.onStart(index) end
 		if self.onStart then self.onStart(index) end
@@ -72,83 +70,77 @@ function AnimationState.new (data)
 
 	function self:update (delta)
 		delta = delta * self.timeScale
-		for i = 0, self.trackCount do
-			local current = self.tracks[i]
-			if current then
-				current.time = current.time + delta * current.timeScale
-				if current.previous then
-					local previousDelta = delta * current.previous.timeScale
-					current.previous.time = current.previous.time + previousDelta
-					current.mixTime = current.mixTime + previousDelta
-				end
+		for i,current in pairs(self.tracks) do
+			current.time = current.time + delta * current.timeScale
+			if current.previous then
+				local previousDelta = delta * current.previous.timeScale
+				current.previous.time = current.previous.time + previousDelta
+				current.mixTime = current.mixTime + previousDelta
+			end
 
-				local next = current.next
-				if next then
-					next.time = current.lastTime - next.delay
-					if next.time >= 0 then setCurrent(i, next) end
-				else
-					-- End non-looping animation when it reaches its end time and there is no next entry.
-					if not current.loop and current.lastTime >= current.endTime then self:clearTrack(i) end
-				end
+			local next = current.next
+			if next then
+				next.time = current.lastTime - next.delay
+				if next.time >= 0 then setCurrent(i, next) end
+			else
+				-- End non-looping animation when it reaches its end time and there is no next entry.
+				if not current.loop and current.lastTime >= current.endTime then self:clearTrack(i) end
 			end
 		end
 	end
 
 	function self:apply(skeleton)
-		for i = 0, self.trackCount do
-			local current = self.tracks[i]
-			if current then
-				local time = current.time
-				local lastTime = current.lastTime
-				local endTime = current.endTime
-				local loop = current.loop
-				if not loop and time > endTime then time = endTime end
+		for i,current in pairs(self.tracks) do
+			local time = current.time
+			local lastTime = current.lastTime
+			local endTime = current.endTime
+			local loop = current.loop
+			if not loop and time > endTime then time = endTime end
 
-				local previous = current.previous
-				if not previous then
-					if current.mix == 1 then
-						current.animation:apply(skeleton, current.lastTime, time, loop, self.events)
-					else
-						current.animation:mix(skeleton, current.lastTime, time, loop, self.events, current.mix)
-					end
+			local previous = current.previous
+			if not previous then
+				if current.mix == 1 then
+					current.animation:apply(skeleton, current.lastTime, time, loop, self.events)
 				else
-					local previousTime = previous.time
-					if not previous.loop and previousTime > previous.endTime then previousTime = previous.endTime end
-					previous.animation:apply(skeleton, previousTime, previousTime, previous.loop, nil)
+					current.animation:mix(skeleton, current.lastTime, time, loop, self.events, current.mix)
+				end
+			else
+				local previousTime = previous.time
+				if not previous.loop and previousTime > previous.endTime then previousTime = previous.endTime end
+				previous.animation:apply(skeleton, previousTime, previousTime, previous.loop, nil)
 
-					local alpha = current.mixTime / current.mixDuration * current.mix
-					if alpha >= 1 then
-						alpha = 1
-						current.previous = nil
-					end
-					current.animation:mix(skeleton, current.lastTime, time, loop, self.events, alpha)
+				local alpha = current.mixTime / current.mixDuration * current.mix
+				if alpha >= 1 then
+					alpha = 1
+					current.previous = nil
 				end
-
-				local eventCount = #self.events
-				for ii = 1, eventCount, 1 do
-					local event = self.events[ii]
-					if current.onEvent then current.onEvent(i, event) end
-					if self.onEvent then self.onEvent(i, event) end
-				end
-				for ii = 1, eventCount, 1 do
-					table.remove(self.events)
-				end
-
-				-- Check if completed the animation or a loop iteration.
-				local complete
-				if current.loop then
-					complete = lastTime % endTime > time % endTime
-				else
-					complete = lastTime < endTime and time >= endTime
-				end
-				if complete then
-					local count = math.floor(time / endTime)
-					if current.onComplete then current.onComplete(i, count) end
-					if self.onComplete then self.onComplete(i, count) end
-				end
-
-				current.lastTime = current.time
+				current.animation:mix(skeleton, current.lastTime, time, loop, self.events, alpha)
 			end
+
+			local eventCount = #self.events
+			for ii = 1, eventCount, 1 do
+				local event = self.events[ii]
+				if current.onEvent then current.onEvent(i, event) end
+				if self.onEvent then self.onEvent(i, event) end
+			end
+			for ii = 1, eventCount, 1 do
+				table.remove(self.events)
+			end
+
+			-- Check if completed the animation or a loop iteration.
+			local complete
+			if current.loop then
+				complete = lastTime % endTime > time % endTime
+			else
+				complete = lastTime < endTime and time >= endTime
+			end
+			if complete then
+				local count = math.floor(time / endTime)
+				if current.onComplete then current.onComplete(i, count) end
+				if self.onComplete then self.onComplete(i, count) end
+			end
+
+			current.lastTime = current.time
 		end
 	end
 
@@ -157,7 +149,6 @@ function AnimationState.new (data)
 			self:clearTrack(i)
 		end
 		self.tracks = {}
-		self.trackCount = 0
 	end
 
 	function self:clearTrack (trackIndex)
@@ -168,9 +159,6 @@ function AnimationState.new (data)
 		if self.onEnd then self.onEnd(trackIndex) end
 
 		self.tracks[trackIndex] = nil
-		if trackIndex == self.trackCount - 1 then
-			self.trackCount = self.trackCount - 1
-		end
 	end
 
 	function self:setAnimationByName (trackIndex, animationName, loop)
