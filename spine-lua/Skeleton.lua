@@ -137,17 +137,15 @@ function Skeleton.new (skeletonData)
 
 	function self:setAttachment (slotName, attachmentName)
 		if not slotName then error("slotName cannot be nil.", 2) end
-		for i,slot in ipairs(self.slots) do
-			if slot.data.name == slotName then
-				if not attachmentName then 
-					slot:setAttachment(nil)
-				else
-					slot:setAttachment(self:getAttachment(slotName, attachmentName))
-				end
-				return
-			end
-		end
-		error("Slot not found = " .. slotName, 2)
+
+        local slot = self:findSlot(slotName)
+        if not slot then error("Slot not found = " .. slotName, 2) end
+
+        if not attachmentName then
+            slot:setAttachment(nil)
+        else
+            slot:setAttachment(self:getAttachment(slotName, attachmentName))
+        end
 	end
 
 	function self:update (delta)
