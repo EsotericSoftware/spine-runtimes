@@ -30,7 +30,6 @@
 
 local Bone = require "spine-lua.Bone"
 local Slot = require "spine-lua.Slot"
-local AttachmentLoader = require "spine-lua.AttachmentLoader"
 
 local Skeleton = {}
 function Skeleton.new (skeletonData)
