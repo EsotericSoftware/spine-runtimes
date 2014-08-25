@@ -67,13 +67,14 @@ PolygonBatch::~PolygonBatch () {
 void PolygonBatch::add (const Texture2D* addTexture,
 		const float* addVertices, const float* uvs, int addVerticesCount,
 		const int* addTriangles, int addTrianglesCount,
-		Color4B* color) {
+		Color4B* color, cocos2d::BlendFunc blend) {
 
 	if (
 		addTexture != _texture
 		|| _verticesCount + (addVerticesCount >> 1) > _capacity
-		|| _trianglesCount + addTrianglesCount > _capacity * 3) {
+		|| _trianglesCount + addTrianglesCount > _capacity * 3 || !(_blend == blend)) {
 		this->flush();
+		_blend = blend;
 		_texture = addTexture;
 	}
 
@@ -92,7 +93,7 @@ void PolygonBatch::add (const Texture2D* addTexture,
 
 void PolygonBatch::flush () {
 	if (!_verticesCount) return;
-
+	GL::blendFunc(_blend.src, _blend.dst);
 	GL::bindTexture2D(_texture->getName());
 	glEnableVertexAttribArray(GLProgram::VERTEX_ATTRIB_POSITION);
 	glEnableVertexAttribArray(GLProgram::VERTEX_ATTRIB_COLOR);

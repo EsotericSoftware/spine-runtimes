@@ -206,17 +206,14 @@ void SkeletonRenderer::drawSkeleton (const Mat4 &transform, uint32_t transformFl
 		default: ;
 		} 
 		if (texture) {
-			if (slot->data->additiveBlending != additive) {
-				_batch->flush();
-				GL::blendFunc(_blendFunc.src, slot->data->additiveBlending ? GL_ONE : _blendFunc.dst);
-				additive = slot->data->additiveBlending;
-			}
 			color.a = _skeleton->a * slot->a * a * 255;
 			float multiplier = _premultipliedAlpha ? color.a : 255;
 			color.r = _skeleton->r * slot->r * r * multiplier;
 			color.g = _skeleton->g * slot->g * g * multiplier;
 			color.b = _skeleton->b * slot->b * b * multiplier;
-			_batch->add(texture, _worldVertices, uvs, verticesCount, triangles, trianglesCount, &color);
+			BlendFunc blend(_blendFunc);
+			blend.dst = slot->data->additiveBlending ? GL_ONE : _blendFunc.dst;
+			_batch->add(texture, _worldVertices, uvs, verticesCount, triangles, trianglesCount, &color, blend);
 		}
 	}
 	_batch->flush();

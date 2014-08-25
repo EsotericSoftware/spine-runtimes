@@ -42,7 +42,7 @@ public:
 	void add (const cocos2d::Texture2D* texture,
 		const float* vertices, const float* uvs, int verticesCount,
 		const int* triangles, int trianglesCount,
-		cocos2d::Color4B* color);
+		cocos2d::Color4B* color, cocos2d::BlendFunc blend);
 	void flush ();
 
 protected:
@@ -56,6 +56,7 @@ protected:
 	GLushort* _triangles;
 	int _trianglesCount;
 	const cocos2d::Texture2D* _texture;
+	cocos2d::BlendFunc _blend;
 };
 
 }
