@@ -91,7 +91,7 @@ public class IkConstraint {
 	static public void apply (Bone bone, float targetX, float targetY, float alpha) {
 		float parentRotation = (!bone.data.inheritRotation || bone.parent == null) ? 0 : bone.parent.worldRotation;
 		float rotation = bone.rotation;
-		float rotationIK = (float)Math.atan2(targetY - bone.getWorldY(), targetX - bone.getWorldX()) * radDeg - parentRotation;
+		float rotationIK = (float)Math.atan2(targetY - bone.worldY, targetX - bone.worldX) * radDeg - parentRotation;
 		bone.rotationIK = rotation + (rotationIK - rotation) * alpha;
 	}
 
