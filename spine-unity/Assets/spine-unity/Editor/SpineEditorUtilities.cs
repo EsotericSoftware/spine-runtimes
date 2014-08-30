@@ -410,6 +410,9 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 		if(skin == null)
 			skin = skeletonDataAsset.GetSkeletonData(true).DefaultSkin;
+			
+		if(skin == null)
+			skin = skeletonDataAsset.GetSkeletonData(true).Skins[0];
 
 		anim.Reset();
 		
