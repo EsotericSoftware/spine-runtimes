@@ -145,7 +145,7 @@ public class Animation {
 
 	static public interface Timeline {
 		/** Sets the value(s) for the specified time.
-		 * @param events May be null. */
+		 * @param events May be null to not collect fired events. */
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha);
 	}
 

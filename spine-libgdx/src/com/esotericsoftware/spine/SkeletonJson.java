@@ -120,7 +120,7 @@ public class SkeletonJson {
 			String color = boneMap.getString("color", null);
 			if (color != null) boneData.getColor().set(Color.valueOf(color));
 
-			skeletonData.getBones().add(boneData);
+			skeletonData.bones.add(boneData);
 		}
 
 		// IK constraints.
@@ -131,17 +131,17 @@ public class SkeletonJson {
 				String boneName = boneMap.asString();
 				BoneData bone = skeletonData.findBone(boneName);
 				if (bone == null) throw new SerializationException("IK bone not found: " + boneName);
-				ikConstraintData.getBones().add(bone);
+				ikConstraintData.bones.add(bone);
 			}
 
 			String targetName = ikMap.getString("target");
-			ikConstraintData.setTarget(skeletonData.findBone(targetName));
-			if (ikConstraintData.getTarget() == null) throw new SerializationException("Target bone not found: " + targetName);
+			ikConstraintData.target = skeletonData.findBone(targetName);
+			if (ikConstraintData.target == null) throw new SerializationException("Target bone not found: " + targetName);
 
-			ikConstraintData.setBendDirection(ikMap.getBoolean("bendPositive", true) ? 1 : -1);
-			ikConstraintData.setMix(ikMap.getFloat("mix", 1));
+			ikConstraintData.bendDirection = ikMap.getBoolean("bendPositive", true) ? 1 : -1;
+			ikConstraintData.mix = ikMap.getFloat("mix", 1);
 
-			skeletonData.getIkConstraints().add(ikConstraintData);
+			skeletonData.ikConstraints.add(ikConstraintData);
 		}
 
 		// Slots.
@@ -159,7 +159,7 @@ public class SkeletonJson {
 
 			slotData.additiveBlending = slotMap.getBoolean("additive", false);
 
-			skeletonData.getSlots().add(slotData);
+			skeletonData.slots.add(slotData);
 		}
 
 		// Skins.
@@ -173,7 +173,7 @@ public class SkeletonJson {
 					if (attachment != null) skin.addAttachment(slotIndex, entry.name, attachment);
 				}
 			}
-			skeletonData.getSkins().add(skin);
+			skeletonData.skins.add(skin);
 			if (skin.name.equals("default")) skeletonData.defaultSkin = skin;
 		}
 
@@ -183,7 +183,7 @@ public class SkeletonJson {
 			eventData.intValue = eventMap.getInt("int", 0);
 			eventData.floatValue = eventMap.getFloat("float", 0f);
 			eventData.stringValue = eventMap.getString("string", null);
-			skeletonData.getEvents().add(eventData);
+			skeletonData.events.add(eventData);
 		}
 
 		// Animations.
@@ -385,7 +385,7 @@ public class SkeletonJson {
 		for (JsonValue ikMap = map.getChild("ik"); ikMap != null; ikMap = ikMap.next) {
 			IkConstraintData ikConstraint = skeletonData.findIkConstraint(ikMap.name);
 			IkConstraintTimeline timeline = new IkConstraintTimeline(ikMap.size);
-			timeline.setIkConstraintIndex(skeletonData.getIkConstraints().indexOf(ikConstraint, true));
+			timeline.ikConstraintIndex = skeletonData.getIkConstraints().indexOf(ikConstraint, true);
 			int frameIndex = 0;
 			for (JsonValue valueMap = ikMap.child; valueMap != null; valueMap = valueMap.next) {
 				timeline.setFrame(frameIndex, valueMap.getFloat("time"), valueMap.getFloat("mix"),
@@ -507,7 +507,7 @@ public class SkeletonJson {
 		}
 
 		timelines.shrink();
-		skeletonData.getAnimations().add(new Animation(name, timelines, duration));
+		skeletonData.animations.add(new Animation(name, timelines, duration));
 	}
 
 	void readCurve (CurveTimeline timeline, int frameIndex, JsonValue valueMap) {

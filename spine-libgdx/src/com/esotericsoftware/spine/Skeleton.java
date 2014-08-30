@@ -39,9 +39,9 @@ public class Skeleton {
 	final SkeletonData data;
 	final Array<Bone> bones;
 	final Array<Slot> slots;
+	Array<Slot> drawOrder;
 	final Array<IkConstraint> ikConstraints;
 	private final Array<Array<Bone>> updateBonesCache = new Array();
-	Array<Slot> drawOrder;
 	Skin skin;
 	final Color color;
 	float time;
@@ -365,7 +365,7 @@ public class Skeleton {
 	}
 
 	public void setFlipX (boolean flipX) {
-// if (this.flipX == flipX) return;
+		if (this.flipX == flipX) return;
 		this.flipX = flipX;
 		Array<Bone> bones = this.bones;
 		for (int i = 0, n = bones.size; i < n; i++)
@@ -385,6 +385,7 @@ public class Skeleton {
 	}
 
 	public void setFlip (boolean flipX, boolean flipY) {
+		if (this.flipX == flipX && this.flipY == flipY) return;
 		Array<Bone> bones = this.bones;
 		for (int i = 0, n = bones.size; i < n; i++) {
 			Bone bone = bones.get(i);

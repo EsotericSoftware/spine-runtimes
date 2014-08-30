@@ -128,7 +128,7 @@ public class SkeletonBinary {
 				boneData.length = input.readFloat() * scale;
 				boneData.inheritScale = input.readBoolean();
 				boneData.inheritRotation = input.readBoolean();
-				if (nonessential) Color.rgba8888ToColor(boneData.getColor(), input.readInt());
+				if (nonessential) Color.rgba8888ToColor(boneData.color, input.readInt());
 				skeletonData.bones.add(boneData);
 			}
 
@@ -148,22 +148,22 @@ public class SkeletonBinary {
 				String slotName = input.readString();
 				BoneData boneData = skeletonData.bones.get(input.readInt(true));
 				SlotData slotData = new SlotData(slotName, boneData);
-				Color.rgba8888ToColor(slotData.getColor(), input.readInt());
+				Color.rgba8888ToColor(slotData.color, input.readInt());
 				slotData.attachmentName = input.readString();
 				slotData.additiveBlending = input.readBoolean();
-				skeletonData.getSlots().add(slotData);
+				skeletonData.slots.add(slotData);
 			}
 
 			// Default skin.
 			Skin defaultSkin = readSkin(input, "default", nonessential);
 			if (defaultSkin != null) {
 				skeletonData.defaultSkin = defaultSkin;
-				skeletonData.getSkins().add(defaultSkin);
+				skeletonData.skins.add(defaultSkin);
 			}
 
 			// Skins.
 			for (int i = 0, n = input.readInt(true); i < n; i++)
-				skeletonData.getSkins().add(readSkin(input, input.readString(), nonessential));
+				skeletonData.skins.add(readSkin(input, input.readString(), nonessential));
 
 			// Events.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
@@ -171,7 +171,7 @@ public class SkeletonBinary {
 				eventData.intValue = input.readInt(false);
 				eventData.floatValue = input.readFloat();
 				eventData.stringValue = input.readString();
-				skeletonData.getEvents().add(eventData);
+				skeletonData.events.add(eventData);
 			}
 
 			// Animations.
@@ -412,7 +412,7 @@ public class SkeletonBinary {
 				IkConstraintData ikConstraint = skeletonData.findIkConstraint(input.readString());
 				int frameCount = input.readInt(true);
 				IkConstraintTimeline timeline = new IkConstraintTimeline(frameCount);
-				timeline.setIkConstraintIndex(skeletonData.getIkConstraints().indexOf(ikConstraint, true));
+				timeline.ikConstraintIndex = skeletonData.getIkConstraints().indexOf(ikConstraint, true);
 				for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
 					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readByte());
 					if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
@@ -528,7 +528,7 @@ public class SkeletonBinary {
 		}
 
 		timelines.shrink();
-		skeletonData.getAnimations().add(new Animation(name, timelines, duration));
+		skeletonData.animations.add(new Animation(name, timelines, duration));
 	}
 
 	private void readCurve (DataInput input, int frameIndex, CurveTimeline timeline) throws IOException {
