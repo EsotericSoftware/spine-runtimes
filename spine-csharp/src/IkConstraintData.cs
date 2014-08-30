@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
  * Spine Runtimes Software License
  * Version 2.1
  * 
@@ -29,23 +29,29 @@
  *****************************************************************************/
 
 using System;
+using System.Collections.Generic;
 
 namespace Spine {
-	public class EventData {
+	public class IkConstraintData {
 		internal String name;
+		internal List<BoneData> bones = new List<BoneData>();
+		internal BoneData target;
+		internal int bendDirection = 1;
+		internal float mix = 1;
 
 		public String Name { get { return name; } }
-		public int Int { get; set; }
-		public float Float { get; set; }
-		public String String { get; set; }
+		public List<BoneData> Bones { get { return bones; } }
+		public BoneData Target { get { return target; } set { target = value; } }
+		public int BendDirection { get { return bendDirection; } set { bendDirection = value; } }
+		public float Mix { get { return mix; } set { mix = value; } }
 
-		public EventData (String name) {
+		public IkConstraintData (String name) {
 			if (name == null) throw new ArgumentNullException("name cannot be null.");
 			this.name = name;
 		}
 
 		override public String ToString () {
-			return Name;
+			return name;
 		}
 	}
 }

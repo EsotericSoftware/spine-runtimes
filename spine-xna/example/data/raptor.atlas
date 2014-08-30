@@ -1,0 +1,104 @@
+
+raptor.png
+size: 1014,480
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+stirrup
+  rotate: false
+  xy: 657, 57
+  size: 50, 45
+  orig: 50, 45
+  offset: 0, 0
+  index: -1
+velo_arm_back
+  rotate: false
+  xy: 881, 204
+  size: 82, 86
+  orig: 82, 86
+  offset: 0, 0
+  index: -1
+velo_body
+  rotate: false
+  xy: 2, 195
+  size: 610, 285
+  orig: 610, 285
+  offset: 0, 0
+  index: -1
+velo_front_arm
+  rotate: false
+  xy: 798, 188
+  size: 81, 102
+  orig: 81, 102
+  offset: 0, 0
+  index: -1
+velo_front_leg
+  rotate: true
+  xy: 2, 2
+  size: 191, 257
+  orig: 191, 257
+  offset: 0, 0
+  index: -1
+velo_hindleg_back
+  rotate: false
+  xy: 614, 265
+  size: 169, 215
+  orig: 169, 215
+  offset: 0, 0
+  index: -1
+velo_horn
+  rotate: false
+  xy: 614, 183
+  size: 182, 80
+  orig: 182, 80
+  offset: 0, 0
+  index: -1
+velo_horn_back
+  rotate: false
+  xy: 581, 104
+  size: 176, 77
+  orig: 176, 77
+  offset: 0, 0
+  index: -1
+velo_jaw
+  rotate: false
+  xy: 426, 50
+  size: 153, 143
+  orig: 153, 143
+  offset: 0, 0
+  index: -1
+velo_saddle_noshadow
+  rotate: false
+  xy: 261, 5
+  size: 163, 188
+  orig: 163, 188
+  offset: 0, 0
+  index: -1
+velo_saddle_strap_front
+  rotate: false
+  xy: 950, 385
+  size: 57, 95
+  orig: 57, 95
+  offset: 0, 0
+  index: -1
+velo_saddle_strap_rear
+  rotate: true
+  xy: 581, 48
+  size: 54, 74
+  orig: 54, 74
+  offset: 0, 0
+  index: -1
+velo_saddle_w_shadow
+  rotate: false
+  xy: 785, 292
+  size: 163, 188
+  orig: 163, 188
+  offset: 0, 0
+  index: -1
+velo_tongue
+  rotate: true
+  xy: 950, 297
+  size: 86, 64
+  orig: 86, 64
+  offset: 0, 0
+  index: -1

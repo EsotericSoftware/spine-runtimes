@@ -40,6 +40,9 @@ namespace Spine {
 		internal Skin defaultSkin;
 		internal List<EventData> events = new List<EventData>();
 		internal List<Animation> animations = new List<Animation>();
+		internal List<IkConstraintData> ikConstraints = new List<IkConstraintData>();
+		internal float width, height;
+		internal String version, hash;
 
 		public String Name { get { return name; } set { name = value; } }
 		public List<BoneData> Bones { get { return bones; } } // Ordered parents first.
@@ -49,14 +52,14 @@ namespace Spine {
 		public Skin DefaultSkin { get { return defaultSkin; } set { defaultSkin = value; } }
 		public List<EventData> Events { get { return events; } set { events = value; } }
 		public List<Animation> Animations { get { return animations; } set { animations = value; } }
+		public List<IkConstraintData> IkConstraints { get { return ikConstraints; } set { ikConstraints = value; } }
+		public float Width { get { return width; } set { width = value; } }
+		public float Height { get { return height; } set { height = value; } }
+		/// <summary>The Spine version used to export this data.</summary>
+		public String Version { get { return version; } set { version = value; } }
+		public String Hash { get { return hash; } set { hash = value; } }
 
 		// --- Bones.
-
-		public void AddBone (BoneData bone) {
-			if (bone == null) throw new ArgumentNullException("bone cannot be null.");
-			bones.Add(bone);
-		}
-
 
 		/// <returns>May be null.</returns>
 		public BoneData FindBone (String boneName) {
@@ -80,11 +83,6 @@ namespace Spine {
 
 		// --- Slots.
 
-		public void AddSlot (SlotData slot) {
-			if (slot == null) throw new ArgumentNullException("slot cannot be null.");
-			slots.Add(slot);
-		}
-
 		/// <returns>May be null.</returns>
 		public SlotData FindSlot (String slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
@@ -106,12 +104,7 @@ namespace Spine {
 		}
 
 		// --- Skins.
-
-		public void AddSkin (Skin skin) {
-			if (skin == null) throw new ArgumentNullException("skin cannot be null.");
-			skins.Add(skin);
-		}
-
+		
 		/// <returns>May be null.</returns>
 		public Skin FindSkin (String skinName) {
 			if (skinName == null) throw new ArgumentNullException("skinName cannot be null.");
@@ -122,33 +115,36 @@ namespace Spine {
 
 		// --- Events.
 
-		public void AddEvent (EventData eventData) {
-			if (eventData == null) throw new ArgumentNullException("eventData cannot be null.");
-			events.Add(eventData);
-		}
-
 		/// <returns>May be null.</returns>
 		public EventData FindEvent (String eventDataName) {
 			if (eventDataName == null) throw new ArgumentNullException("eventDataName cannot be null.");
 			foreach (EventData eventData in events)
-				if (eventData.Name == eventDataName) return eventData;
+				if (eventData.name == eventDataName) return eventData;
 			return null;
 		}
 
 		// --- Animations.
-
-		public void AddAnimation (Animation animation) {
-			if (animation == null) throw new ArgumentNullException("animation cannot be null.");
-			animations.Add(animation);
-		}
-
+		
 		/// <returns>May be null.</returns>
 		public Animation FindAnimation (String animationName) {
 			if (animationName == null) throw new ArgumentNullException("animationName cannot be null.");
 			List<Animation> animations = this.animations;
 			for (int i = 0, n = animations.Count; i < n; i++) {
 				Animation animation = animations[i];
-				if (animation.Name == animationName) return animation;
+				if (animation.name == animationName) return animation;
+			}
+			return null;
+		}
+
+		// --- IK
+
+		/// <returns>May be null.</returns>
+		public IkConstraintData FindIkConstraint (String ikConstraintName) {
+			if (ikConstraintName == null) throw new ArgumentNullException("ikConstraintName cannot be null.");
+			List<IkConstraintData> ikConstraints = this.ikConstraints;
+			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
+				IkConstraintData ikConstraint = ikConstraints[i];
+				if (ikConstraint.name == ikConstraintName) return ikConstraint;
 			}
 			return null;
 		}
