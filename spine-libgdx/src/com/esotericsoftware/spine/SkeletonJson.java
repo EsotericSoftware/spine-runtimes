@@ -36,6 +36,7 @@ import com.esotericsoftware.spine.Animation.CurveTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.FfdTimeline;
+import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
@@ -48,7 +49,6 @@ import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.SkinnedMeshAttachment;
-
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -123,7 +123,7 @@ public class SkeletonJson {
 			skeletonData.getBones().add(boneData);
 		}
 
-		// IK.
+		// IK constraints.
 		for (JsonValue ikMap = root.getChild("ik"); ikMap != null; ikMap = ikMap.next) {
 			IkConstraintData ikConstraintData = new IkConstraintData(ikMap.getString("name"));
 
@@ -379,6 +379,22 @@ public class SkeletonJson {
 				} else
 					throw new RuntimeException("Invalid timeline type for a bone: " + timelineName + " (" + boneMap.name + ")");
 			}
+		}
+
+		// IK timelines.
+		for (JsonValue ikMap = map.getChild("ik"); ikMap != null; ikMap = ikMap.next) {
+			IkConstraintData ikConstraint = skeletonData.findIkConstraint(ikMap.name);
+			IkConstraintTimeline timeline = new IkConstraintTimeline(ikMap.size);
+			timeline.setIkConstraintIndex(skeletonData.getIkConstraints().indexOf(ikConstraint, true));
+			int frameIndex = 0;
+			for (JsonValue valueMap = ikMap.child; valueMap != null; valueMap = valueMap.next) {
+				timeline.setFrame(frameIndex, valueMap.getFloat("time"), valueMap.getFloat("mix"),
+					valueMap.getBoolean("bendPositive") ? 1 : -1);
+				readCurve(timeline, frameIndex, valueMap);
+				frameIndex++;
+			}
+			timelines.add(timeline);
+			duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 3 - 3]);
 		}
 
 		// FFD timelines.

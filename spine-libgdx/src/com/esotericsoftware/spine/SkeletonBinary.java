@@ -30,12 +30,23 @@
 
 package com.esotericsoftware.spine;
 
+import java.io.IOException;
+
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.DataInput;
+import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.SerializationException;
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.ColorTimeline;
 import com.esotericsoftware.spine.Animation.CurveTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.FfdTimeline;
+import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
@@ -48,17 +59,6 @@ import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.SkinnedMeshAttachment;
-
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.DataInput;
-import com.badlogic.gdx.utils.FloatArray;
-import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.SerializationException;
-
-import java.io.IOException;
 
 public class SkeletonBinary {
 	static public final int TIMELINE_SCALE = 0;
@@ -129,7 +129,18 @@ public class SkeletonBinary {
 				boneData.inheritScale = input.readBoolean();
 				boneData.inheritRotation = input.readBoolean();
 				if (nonessential) Color.rgba8888ToColor(boneData.getColor(), input.readInt());
-				skeletonData.getBones().add(boneData);
+				skeletonData.bones.add(boneData);
+			}
+
+			// IK constraints.
+			for (int i = 0, n = input.readInt(true); i < n; i++) {
+				IkConstraintData ikConstraint = new IkConstraintData(input.readString());
+				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++)
+					ikConstraint.bones.add(skeletonData.bones.get(input.readInt(true)));
+				ikConstraint.target = skeletonData.bones.get(input.readInt(true));
+				ikConstraint.mix = input.readFloat();
+				ikConstraint.bendDirection = input.readByte();
+				skeletonData.ikConstraints.add(ikConstraint);
 			}
 
 			// Slots.
@@ -394,6 +405,20 @@ public class SkeletonBinary {
 						break;
 					}
 				}
+			}
+
+			// IK timelines.
+			for (int i = 0, n = input.readInt(true); i < n; i++) {
+				IkConstraintData ikConstraint = skeletonData.findIkConstraint(input.readString());
+				int frameCount = input.readInt(true);
+				IkConstraintTimeline timeline = new IkConstraintTimeline(frameCount);
+				timeline.setIkConstraintIndex(skeletonData.getIkConstraints().indexOf(ikConstraint, true));
+				for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
+					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readByte());
+					if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
+				}
+				timelines.add(timeline);
+				duration = Math.max(duration, timeline.getFrames()[frameCount * 3 - 3]);
 			}
 
 			// FFD timelines.
