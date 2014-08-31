@@ -74,14 +74,15 @@ void spIkConstraint_apply1 (spBone* bone, float targetX, float targetY, float al
 }
 
 void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float targetY, int bendDirection, float alpha) {
+	float positionX, positionY, childX, childY, offset, len1, len2, cosDenom, cos, childAngle, adjacent, opposite, parentAngle, rotation;
+	spBone* parentParent;
 	float childRotation = child->rotation, parentRotation = parent->rotation;
 	if (alpha == 0) {
 		child->rotationIK = childRotation;
 		parent->rotationIK = parentRotation;
 		return;
 	}
-	float positionX, positionY;
-	spBone* parentParent = parent->parent;
+	parentParent = parent->parent;
 	if (parentParent) {
 		spBone_worldToLocal(parentParent, targetX, targetY, &positionX, &positionY);
 		targetX = (positionX - parent->x) * parentParent->worldScaleX;
@@ -97,24 +98,27 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float 
 		spBone_localToWorld(child->parent, child->x, child->y, &positionX, &positionY);
 		spBone_worldToLocal(parent, positionX, positionY, &positionX, &positionY);
 	}
-	float childX = positionX * parent->worldScaleX, childY = positionY * parent->worldScaleY;
-	float offset = ATAN2(childY, childX);
-	float len1 = SQRT(childX * childX + childY * childY);
-	float len2 = child->data->length * child->worldScaleX;
+	childX = positionX * parent->worldScaleX;
+	childY = positionY * parent->worldScaleY;
+	offset = ATAN2(childY, childX);
+	len1 = SQRT(childX * childX + childY * childY);
+	len2 = child->data->length * child->worldScaleX;
 	/* Based on code by Ryan Juckett with permission: Copyright (c) 2008-2009 Ryan Juckett, http://www.ryanjuckett.com/ */
-	float cosDenom = 2 * len1 * len2;
+	cosDenom = 2 * len1 * len2;
 	if (cosDenom < 0.0001f) {
 		child->rotationIK = childRotation + (ATAN2(targetY, targetX) * RAD_DEG - parentRotation - childRotation) * alpha;
 		return;
 	}
-	float cos = (targetX * targetX + targetY * targetY - len1 * len1 - len2 * len2) / cosDenom;
+	cos = (targetX * targetX + targetY * targetY - len1 * len1 - len2 * len2) / cosDenom;
 	if (cos < -1)
 		cos = -1;
-	else if (cos > 1) cos = 1;
-	float childAngle = ACOS(cos) * bendDirection;
-	float adjacent = len1 + len2 * cos, opposite = len2 * SIN(childAngle);
-	float parentAngle = ATAN2(targetY * adjacent - targetX * opposite, targetX * adjacent + targetY * opposite);
-	float rotation = (parentAngle - offset) * RAD_DEG - parentRotation;
+	else if (cos > 1) /**/
+		cos = 1;
+	childAngle = ACOS(cos) * bendDirection;
+	adjacent = len1 + len2 * cos;
+	opposite = len2 * SIN(childAngle);
+	parentAngle = ATAN2(targetY * adjacent - targetX * opposite, targetX * adjacent + targetY * opposite);
+	rotation = (parentAngle - offset) * RAD_DEG - parentRotation;
 	if (rotation > 180)
 		rotation -= 360;
 	else if (rotation < -180) /**/

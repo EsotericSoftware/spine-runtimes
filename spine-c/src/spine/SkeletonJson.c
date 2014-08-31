@@ -462,6 +462,8 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 		skeletonData->ikConstraintsCount = ik->size;
 		skeletonData->ikConstraints = MALLOC(spIkConstraintData*, ik->size);
 		for (ikMap = ik->child, i = 0; ikMap; ikMap = ikMap->next, ++i) {
+			const char* targetName;
+
 			spIkConstraintData* ikConstraintData = spIkConstraintData_create(Json_getString(ikMap, "name", 0));
 			boneMap = Json_getItem(ikMap, "bones");
 			ikConstraintData->bonesCount = boneMap->size;
@@ -475,7 +477,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 				}
 			}
 
-			const char* targetName = Json_getString(ikMap, "target", 0);
+			targetName = Json_getString(ikMap, "target", 0);
 			ikConstraintData->target = spSkeletonData_findBone(skeletonData, targetName);
 			if (!ikConstraintData->target) {
 				spSkeletonData_dispose(skeletonData);

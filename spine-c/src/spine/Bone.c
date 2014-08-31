@@ -100,13 +100,14 @@ void spBone_setToSetupPose (spBone* self) {
 }
 
 void spBone_worldToLocal (spBone* self, float worldX, float worldY, float* localX, float* localY) {
+	float invDet;
 	float dx = worldX - self->worldX, dy = worldY - self->worldY;
 	float m00 = self->m00, m11 = self->m11;
 	if (self->flipX != (self->flipY != yDown)) {
 		m00 *= -1;
 		m11 *= -1;
 	}
-	float invDet = 1 / (m00 * m11 - self->m01 * self->m10);
+	invDet = 1 / (m00 * m11 - self->m01 * self->m10);
 	*localX = (dx * m00 * invDet - dy * self->m01 * invDet);
 	*localY = (dy * m11 * invDet - dx * self->m10 * invDet);
 }
