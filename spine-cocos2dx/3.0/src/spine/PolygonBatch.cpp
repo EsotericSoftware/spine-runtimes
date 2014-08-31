@@ -94,6 +94,7 @@ void PolygonBatch::flush () {
 	if (!verticesCount) return;
 
 	GL::bindTexture2D(texture->getName());
+	GL::bindVAO(0);
 	glEnableVertexAttribArray(GLProgram::VERTEX_ATTRIB_POSITION);
 	glEnableVertexAttribArray(GLProgram::VERTEX_ATTRIB_COLOR);
 	glEnableVertexAttribArray(GLProgram::VERTEX_ATTRIB_TEX_COORDS);
