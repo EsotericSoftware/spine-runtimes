@@ -101,7 +101,7 @@ void spineboy () {
 		AnimationState_addAnimationByName(drawable->state, 0, "run", true, 0);
 	}
 
-	sf::RenderWindow window(sf::VideoMode(640, 480), "Spine SFML");
+	sf::RenderWindow window(sf::VideoMode(640, 480), "Spine SFML - spineboy");
 	window.setFramerateLimit(60);
 	sf::Event event;
 	sf::Clock deltaClock;
@@ -163,7 +163,52 @@ void goblins () {
 
 	AnimationState_setAnimation(drawable->state, 0, walkAnimation, true);
 
-	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML");
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - goblins");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		drawable->update(delta);
+
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
+
+	SkeletonData_dispose(skeletonData);
+	Atlas_dispose(atlas);
+}
+
+void raptor () {
+	// Load atlas, skeleton, and animations.
+	Atlas* atlas = Atlas_createFromFile("data/raptor.atlas", 0);
+	SkeletonJson* json = SkeletonJson_create(atlas);
+	json->scale = 0.5f;
+	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/raptor.json");
+	if (!skeletonData) {
+		printf("Error: %s\n", json->error);
+		exit(0);
+	}
+	Animation* walkAnimation = SkeletonData_findAnimation(skeletonData, "walk");
+	SkeletonJson_dispose(json);
+
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+
+	Skeleton* skeleton = drawable->skeleton;
+	skeleton->x = 320;
+	skeleton->y = 590;
+	Skeleton_updateWorldTransform(skeleton);
+
+	AnimationState_setAnimation(drawable->state, 0, walkAnimation, true);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - raptor");
 	window.setFramerateLimit(60);
 	sf::Event event;
 	sf::Clock deltaClock;
@@ -186,6 +231,7 @@ void goblins () {
 }
 
 int main () {
+	raptor();
 	spineboy();
 	goblins();
 }

@@ -34,6 +34,7 @@
 #include <spine/SkeletonData.h>
 #include <spine/Slot.h>
 #include <spine/Skin.h>
+#include <spine/IkConstraint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,13 +44,16 @@ typedef struct spSkeleton spSkeleton;
 struct spSkeleton {
 	spSkeletonData* const data;
 
-	int boneCount;
+	int bonesCount;
 	spBone** bones;
 	spBone* const root;
 
-	int slotCount;
+	int slotsCount;
 	spSlot** slots;
 	spSlot** drawOrder;
+
+	int ikConstraintsCount;
+	spIkConstraint** ikConstraints;
 
 	spSkin* const skin;
 	float r, g, b, a;
@@ -61,6 +65,8 @@ struct spSkeleton {
 spSkeleton* spSkeleton_create (spSkeletonData* data);
 void spSkeleton_dispose (spSkeleton* self);
 
+/* Caches information about bones and IK constraints. Must be called if bones or IK constraints are added or removed. */
+void spSkeleton_updateCache (const spSkeleton* self);
 void spSkeleton_updateWorldTransform (const spSkeleton* self);
 
 void spSkeleton_setToSetupPose (const spSkeleton* self);
@@ -91,6 +97,9 @@ spAttachment* spSkeleton_getAttachmentForSlotName (const spSkeleton* self, const
 spAttachment* spSkeleton_getAttachmentForSlotIndex (const spSkeleton* self, int slotIndex, const char* attachmentName);
 /* Returns 0 if the slot or attachment was not found. */
 int spSkeleton_setAttachment (spSkeleton* self, const char* slotName, const char* attachmentName);
+
+/* Returns 0 if the IK constraint was not found. */
+spIkConstraint* spSkeleton_findIkConstraint (const spSkeleton* self, const char* ikConstraintName);
 
 void spSkeleton_update (spSkeleton* self, float deltaTime);
 

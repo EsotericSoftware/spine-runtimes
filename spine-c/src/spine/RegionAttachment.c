@@ -79,14 +79,8 @@ void spRegionAttachment_updateOffset (spRegionAttachment* self) {
 	float localY = -self->height / 2 * self->scaleY + self->regionOffsetY * regionScaleY;
 	float localX2 = localX + self->regionWidth * regionScaleX;
 	float localY2 = localY + self->regionHeight * regionScaleY;
-	float radians = (float)(self->rotation * 3.1415926535897932385 / 180);
-#ifdef __STDC_VERSION__
-	float cosine = cosf(radians);
-	float sine = sinf(radians);
-#else
-	float cosine = (float)cos(radians);
-	float sine = (float)sin(radians);
-#endif
+	float radians = self->rotation * DEG_RAD;
+	float cosine = COS(radians), sine = SIN(radians);
 	float localXCos = localX * cosine + self->x;
 	float localXSin = localX * sine;
 	float localYCos = localY * cosine + self->y;
@@ -105,10 +99,9 @@ void spRegionAttachment_updateOffset (spRegionAttachment* self) {
 	self->offset[SP_VERTEX_Y4] = localYCos + localX2Sin;
 }
 
-void spRegionAttachment_computeWorldVertices (spRegionAttachment* self, float x, float y, spBone* bone, float* vertices) {
+void spRegionAttachment_computeWorldVertices (spRegionAttachment* self, spBone* bone, float* vertices) {
 	const float* offset = self->offset;
-	x += bone->worldX;
-	y += bone->worldY;
+	float x = bone->skeleton->x + bone->worldX, y = bone->skeleton->y + bone->worldY;
 	vertices[SP_VERTEX_X1] = offset[SP_VERTEX_X1] * bone->m00 + offset[SP_VERTEX_Y1] * bone->m01 + x;
 	vertices[SP_VERTEX_Y1] = offset[SP_VERTEX_X1] * bone->m10 + offset[SP_VERTEX_Y1] * bone->m11 + y;
 	vertices[SP_VERTEX_X2] = offset[SP_VERTEX_X2] * bone->m00 + offset[SP_VERTEX_Y2] * bone->m01 + x;

@@ -37,13 +37,17 @@
 extern "C" {
 #endif
 
+struct spSkeleton;
+
 typedef struct spBone spBone;
 struct spBone {
 	spBoneData* const data;
+	struct spSkeleton* const skeleton;
 	spBone* const parent;
 	float x, y;
-	float rotation;
+	float rotation, rotationIK;
 	float scaleX, scaleY;
+	int/*bool*/flipX, flipY;
 
 	float const m00, m01, worldX; /* a b x */
 	float const m10, m11, worldY; /* c d y */
@@ -54,12 +58,15 @@ struct spBone {
 void spBone_setYDown (int/*bool*/yDown);
 
 /* @param parent May be 0. */
-spBone* spBone_create (spBoneData* data, spBone* parent);
+spBone* spBone_create (spBoneData* data, struct spSkeleton* skeleton, spBone* parent);
 void spBone_dispose (spBone* self);
 
 void spBone_setToSetupPose (spBone* self);
 
-void spBone_updateWorldTransform (spBone* self, int/*bool*/flipX, int/*bool*/flipY);
+void spBone_updateWorldTransform (spBone* self);
+
+void spBone_worldToLocal (spBone* self, float worldX, float worldY, float* localX, float* localY);
+void spBone_localToWorld (spBone* self, float localX, float localY, float* worldX, float* worldY);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spBone Bone;
@@ -68,6 +75,8 @@ typedef spBone Bone;
 #define Bone_dispose(...) spBone_dispose(__VA_ARGS__)
 #define Bone_setToSetupPose(...) spBone_setToSetupPose(__VA_ARGS__)
 #define Bone_updateWorldTransform(...) spBone_updateWorldTransform(__VA_ARGS__)
+#define Bone_worldToLocal(...) spBone_worldToLocal(__VA_ARGS__)
+#define Bone_localToWorld(...) spBone_localToWorld(__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

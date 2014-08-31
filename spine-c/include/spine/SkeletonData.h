@@ -36,27 +36,35 @@
 #include <spine/Skin.h>
 #include <spine/EventData.h>
 #include <spine/Animation.h>
+#include <spine/IkConstraintData.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct {
-	int boneCount;
+	const char* version;
+	const char* hash;
+	float width, height;
+
+	int bonesCount;
 	spBoneData** bones;
 
-	int slotCount;
+	int slotsCount;
 	spSlotData** slots;
 
-	int skinCount;
+	int skinsCount;
 	spSkin** skins;
 	spSkin* defaultSkin;
 
-	int eventCount;
+	int eventsCount;
 	spEventData** events;
 
-	int animationCount;
+	int animationsCount;
 	spAnimation** animations;
+
+	int ikConstraintsCount;
+	spIkConstraintData** ikConstraints;
 } spSkeletonData;
 
 spSkeletonData* spSkeletonData_create ();
@@ -73,6 +81,8 @@ spSkin* spSkeletonData_findSkin (const spSkeletonData* self, const char* skinNam
 spEventData* spSkeletonData_findEvent (const spSkeletonData* self, const char* eventName);
 
 spAnimation* spSkeletonData_findAnimation (const spSkeletonData* self, const char* animationName);
+
+spIkConstraintData* spSkeletonData_findIkConstraint (const spSkeletonData* self, const char* ikConstraintName);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spSkeletonData SkeletonData;

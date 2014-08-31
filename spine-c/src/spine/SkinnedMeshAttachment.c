@@ -72,10 +72,10 @@ void spSkinnedMeshAttachment_updateUVs (spSkinnedMeshAttachment* self) {
 	}
 }
 
-void spSkinnedMeshAttachment_computeWorldVertices (spSkinnedMeshAttachment* self, float x, float y, spSlot* slot,
-		float* worldVertices) {
+void spSkinnedMeshAttachment_computeWorldVertices (spSkinnedMeshAttachment* self, spSlot* slot, float* worldVertices) {
 	int w = 0, v = 0, b = 0, f = 0;
-	spBone** skeletonBones = slot->skeleton->bones;
+	float x = slot->bone->skeleton->x, y = slot->bone->skeleton->y;
+	spBone** skeletonBones = slot->bone->skeleton->bones;
 	if (slot->attachmentVerticesCount == 0) {
 		for (; v < self->bonesCount; w += 2) {
 			float wx = 0, wy = 0;
