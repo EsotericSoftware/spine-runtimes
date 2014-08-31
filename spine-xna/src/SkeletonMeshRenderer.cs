@@ -90,7 +90,6 @@ namespace Spine {
 		public void Draw (Skeleton skeleton) {
 			float[] vertices = this.vertices;
 			List<Slot> drawOrder = skeleton.DrawOrder;
-			float x = skeleton.X, y = skeleton.Y;
 			float skeletonR = skeleton.R, skeletonG = skeleton.G, skeletonB = skeleton.B, skeletonA = skeleton.A;
 			for (int i = 0, n = drawOrder.Count; i < n; i++) {
 				Slot slot = drawOrder[i];
@@ -128,7 +127,7 @@ namespace Spine {
 					itemVertices[BR].Color = color;
 					itemVertices[TR].Color = color;
 
-					regionAttachment.ComputeWorldVertices(x, y, slot.Bone, vertices);
+					regionAttachment.ComputeWorldVertices(slot.Bone, vertices);
 					itemVertices[TL].Position.X = vertices[RegionAttachment.X1];
 					itemVertices[TL].Position.Y = vertices[RegionAttachment.Y1];
 					itemVertices[TL].Position.Z = 0;
@@ -155,7 +154,7 @@ namespace Spine {
 					MeshAttachment mesh = (MeshAttachment)attachment;
 					int vertexCount = mesh.Vertices.Length;
 					if (vertices.Length < vertexCount) vertices = new float[vertexCount];
-					mesh.ComputeWorldVertices(x, y, slot, vertices);
+					mesh.ComputeWorldVertices(slot, vertices);
 
 					int[] triangles = mesh.Triangles;
 					MeshItem item = batcher.NextItem(vertexCount, triangles.Length);
@@ -192,7 +191,7 @@ namespace Spine {
 					SkinnedMeshAttachment mesh = (SkinnedMeshAttachment)attachment;
 					int vertexCount = mesh.UVs.Length;
 					if (vertices.Length < vertexCount) vertices = new float[vertexCount];
-					mesh.ComputeWorldVertices(x, y, slot, vertices);
+					mesh.ComputeWorldVertices(slot, vertices);
 
 					int[] triangles = mesh.Triangles;
 					MeshItem item = batcher.NextItem(vertexCount, triangles.Length);

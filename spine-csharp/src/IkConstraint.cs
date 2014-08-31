@@ -53,11 +53,9 @@ namespace Spine {
 			bendDirection = data.bendDirection;
 
 			bones = new List<Bone>(data.bones.Count);
-			if (skeleton != null) {
-				foreach (BoneData boneData in data.bones)
-					bones.Add(skeleton.FindBone(boneData.name));
-				target = skeleton.FindBone(data.target.name);
-			}
+			foreach (BoneData boneData in data.bones)
+				bones.Add(skeleton.FindBone(boneData.name));
+			target = skeleton.FindBone(data.target.name);
 		}
 
 		public void apply () {
