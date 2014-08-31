@@ -203,7 +203,7 @@ public class SkeletonJson {
 		String path = map.getString("path", name);
 
 		switch (AttachmentType.valueOf(map.getString("type", AttachmentType.region.name()))) {
-		case region:
+		case region: {
 			RegionAttachment region = attachmentLoader.newRegionAttachment(skin, name, path);
 			if (region == null) return null;
 			region.setPath(path);
@@ -220,6 +220,7 @@ public class SkeletonJson {
 
 			region.updateOffset();
 			return region;
+		}
 		case boundingbox: {
 			BoundingBoxAttachment box = attachmentLoader.newBoundingBoxAttachment(skin, name);
 			if (box == null) return null;
@@ -245,11 +246,8 @@ public class SkeletonJson {
 			mesh.setRegionUVs(map.require("uvs").asFloatArray());
 			mesh.updateUVs();
 
-            //Check if color exists
-            JsonValue meshColor = map.get("color");
-            if(meshColor != null) {
-                mesh.getColor().set(Color.valueOf(meshColor.asString()));
-            }
+			String color = map.getString("color", null);
+			if (color != null) mesh.getColor().set(Color.valueOf(color));
 
 			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() * 2);
 			if (map.has("edges")) mesh.setEdges(map.require("edges").asIntArray());
@@ -281,6 +279,9 @@ public class SkeletonJson {
 			mesh.setTriangles(map.require("triangles").asShortArray());
 			mesh.setRegionUVs(uvs);
 			mesh.updateUVs();
+
+			String color = map.getString("color", null);
+			if (color != null) mesh.getColor().set(Color.valueOf(color));
 
 			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() * 2);
 			if (map.has("edges")) mesh.setEdges(map.require("edges").asIntArray());
