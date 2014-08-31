@@ -17,6 +17,6 @@ Alternatively, the contents of the `spine-c/src`, `spine-c/include` and `spine-c
 
 ## Examples
 
-[Raptor](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx/3/example/Classes/RaptorExample.cpp)
-[Spineboy](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx/3/example/Classes/SpineboyExample.cpp)
-[Golbins](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx/3/example/Classes/GoblinsExample.cpp)
+- [Raptor](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx/3/example/Classes/RaptorExample.cpp)
+- [Spineboy](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx/3/example/Classes/SpineboyExample.cpp)
+- [Golbins](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx/3/example/Classes/GoblinsExample.cpp)
