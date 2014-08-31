@@ -41,7 +41,7 @@ public class Skeleton {
 	final Array<Slot> slots;
 	Array<Slot> drawOrder;
 	final Array<IkConstraint> ikConstraints;
-	private final Array<Array<Bone>> bonesCache = new Array();
+	private final Array<Array<Bone>> boneCache = new Array();
 	Skin skin;
 	final Color color;
 	float time;
@@ -117,18 +117,18 @@ public class Skeleton {
 
 	/** Caches information about bones and IK constraints. Must be called if bones or IK constraints are added or removed. */
 	public void updateCache () {
-		Array<Array<Bone>> bonesCache = this.bonesCache;
+		Array<Array<Bone>> boneCache = this.boneCache;
 		Array<IkConstraint> ikConstraints = this.ikConstraints;
 		int ikConstraintsCount = ikConstraints.size;
 
 		int arrayCount = ikConstraintsCount + 1;
-		bonesCache.truncate(arrayCount);
-		for (int i = 0, n = bonesCache.size; i < n; i++)
-			bonesCache.get(i).clear();
-		while (bonesCache.size < arrayCount)
-			bonesCache.add(new Array());
+		boneCache.truncate(arrayCount);
+		for (int i = 0, n = boneCache.size; i < n; i++)
+			boneCache.get(i).clear();
+		while (boneCache.size < arrayCount)
+			boneCache.add(new Array());
 
-		Array<Bone> nonIkBones = bonesCache.first();
+		Array<Bone> nonIkBones = boneCache.first();
 
 		outer:
 		for (int i = 0, n = bones.size; i < n; i++) {
@@ -141,8 +141,8 @@ public class Skeleton {
 					Bone child = ikConstraint.bones.peek();
 					while (true) {
 						if (current == child) {
-							bonesCache.get(ii).add(bone);
-							bonesCache.get(ii + 1).add(bone);
+							boneCache.get(ii).add(bone);
+							boneCache.get(ii + 1).add(bone);
 							continue outer;
 						}
 						if (child == parent) break;
@@ -162,11 +162,11 @@ public class Skeleton {
 			Bone bone = bones.get(i);
 			bone.rotationIK = bone.rotation;
 		}
-		Array<Array<Bone>> bonesCache = this.bonesCache;
+		Array<Array<Bone>> boneCache = this.boneCache;
 		Array<IkConstraint> ikConstraints = this.ikConstraints;
-		int i = 0, last = bonesCache.size - 1;
+		int i = 0, last = boneCache.size - 1;
 		while (true) {
-			Array<Bone> updateBones = bonesCache.get(i);
+			Array<Bone> updateBones = boneCache.get(i);
 			for (int ii = 0, nn = updateBones.size; ii < nn; ii++)
 				updateBones.get(ii).updateWorldTransform();
 			if (i == last) break;

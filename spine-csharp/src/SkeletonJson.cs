@@ -93,8 +93,8 @@ namespace Spine {
 			// Skeleton.
 			if (root.ContainsKey("skeleton")) {
 				var skeletonMap = (Dictionary<String, Object>)root["skeleton"];
-				skeletonData.version = (String)skeletonMap["spine"];
 				skeletonData.hash = (String)skeletonMap["hash"];
+				skeletonData.version = (String)skeletonMap["spine"];
 				skeletonData.width = GetFloat(skeletonMap, "width", 0);
 				skeletonData.height = GetFloat(skeletonMap, "width", 1);
 			}
