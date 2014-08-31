@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-#include "SpineboyExample.h"
+#include "RaptorExample.h"
 #include "AppMacros.h"
 
 USING_NS_CC;
@@ -19,10 +19,10 @@ bool AppDelegate::applicationDidFinishLaunching () {
 	// initialize director
 	auto director = Director::getInstance();
 	auto glview = director->getOpenGLView();
-    if(!glview) {
-        glview = GLView::create("Spine Example");
-        director->setOpenGLView(glview);
-    }
+	if (!glview) {
+		glview = GLView::create("Spine Example");
+		director->setOpenGLView(glview);
+	}
 
 	// Set the design resolution
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8)
@@ -66,7 +66,7 @@ bool AppDelegate::applicationDidFinishLaunching () {
 	director->setAnimationInterval(1.0 / 60);
 
 	// create a scene. it's an autorelease object
-	auto scene = SpineboyExample::scene();
+	auto scene = RaptorExample::scene();
 
 	// run
 	director->runWithScene(scene);

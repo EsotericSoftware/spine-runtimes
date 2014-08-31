@@ -71,16 +71,6 @@ public:
 	void setTrackCompleteListener (spTrackEntry* entry, const CompleteListener& listener);
 	void setTrackEventListener (spTrackEntry* entry, const EventListener& listener);
 
-	void setStartListener (spTrackEntry* entry, const StartListener& listener) CC_DEPRECATED_ATTRIBUTE
-	{ setTrackStartListener(entry, listener); }
-	void setEndListener (spTrackEntry* entry, const EndListener& listener) CC_DEPRECATED_ATTRIBUTE
-	{ setTrackEndListener(entry, listener); }
-	void setCompleteListener (spTrackEntry* entry, const CompleteListener& listener) CC_DEPRECATED_ATTRIBUTE
-	{ setTrackCompleteListener(entry, listener); }
-	void setEventListener (spTrackEntry* entry, const EventListener& listener) CC_DEPRECATED_ATTRIBUTE
-	{ setTrackEventListener(entry, listener); }
-
-
 	virtual void onAnimationStateEvent (int trackIndex, spEventType type, spEvent* event, int loopCount);
 	virtual void onTrackEntryEvent (int trackIndex, spEventType type, spEvent* event, int loopCount);
 

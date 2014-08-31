@@ -140,8 +140,8 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 }
 
 void SkeletonRenderer::drawSkeleton (const Mat4 &transform, uint32_t transformFlags) {
-
 	getGLProgramState()->apply(transform);
+	GL::blendFunc(_blendFunc.src, _blendFunc.dst);
 
 	Color3B nodeColor = getColor();
 	_skeleton->r = nodeColor.r / (float)255;
@@ -156,14 +156,14 @@ void SkeletonRenderer::drawSkeleton (const Mat4 &transform, uint32_t transformFl
 	const int* triangles = nullptr;
 	int trianglesCount = 0;
 	float r = 0, g = 0, b = 0, a = 0;
-	for (int i = 0, n = _skeleton->slotCount; i < n; i++) {
+	for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
 		spSlot* slot = _skeleton->drawOrder[i];
 		if (!slot->attachment) continue;
 		Texture2D *texture = nullptr;
 		switch (slot->attachment->type) {
 		case SP_ATTACHMENT_REGION: {
 			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-			spRegionAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot->bone, _worldVertices);
+			spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices);
 			texture = getTexture(attachment);
 			uvs = attachment->uvs;
 			verticesCount = 8;
@@ -177,7 +177,7 @@ void SkeletonRenderer::drawSkeleton (const Mat4 &transform, uint32_t transformFl
 		}
 		case SP_ATTACHMENT_MESH: {
 			spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
-			spMeshAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot, _worldVertices);
+			spMeshAttachment_computeWorldVertices(attachment, slot, _worldVertices);
 			texture = getTexture(attachment);
 			uvs = attachment->uvs;
 			verticesCount = attachment->verticesCount;
@@ -191,7 +191,7 @@ void SkeletonRenderer::drawSkeleton (const Mat4 &transform, uint32_t transformFl
 		}
 		case SP_ATTACHMENT_SKINNED_MESH: {
 			spSkinnedMeshAttachment* attachment = (spSkinnedMeshAttachment*)slot->attachment;
-			spSkinnedMeshAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot, _worldVertices);
+			spSkinnedMeshAttachment_computeWorldVertices(attachment, slot, _worldVertices);
 			texture = getTexture(attachment);
 			uvs = attachment->uvs;
 			verticesCount = attachment->uvsCount;
@@ -232,11 +232,11 @@ void SkeletonRenderer::drawSkeleton (const Mat4 &transform, uint32_t transformFl
 			glLineWidth(1);
 			Vec2 points[4];
 			V3F_C4B_T2F_Quad quad;
-			for (int i = 0, n = _skeleton->slotCount; i < n; i++) {
+			for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
 				spSlot* slot = _skeleton->drawOrder[i];
 				if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION) continue;
 				spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-				spRegionAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot->bone, _worldVertices);
+				spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices);
 				points[0] = Vec2(_worldVertices[0], _worldVertices[1]);
 				points[1] = Vec2(_worldVertices[2], _worldVertices[3]);
 				points[2] = Vec2(_worldVertices[4], _worldVertices[5]);
@@ -248,7 +248,7 @@ void SkeletonRenderer::drawSkeleton (const Mat4 &transform, uint32_t transformFl
 			// Bone lengths.
 			glLineWidth(2);
 			DrawPrimitives::setDrawColor4B(255, 0, 0, 255);
-			for (int i = 0, n = _skeleton->boneCount; i < n; i++) {
+			for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
 				spBone *bone = _skeleton->bones[i];
 				float x = bone->data->length * bone->m00 + bone->worldX;
 				float y = bone->data->length * bone->m10 + bone->worldY;
@@ -257,7 +257,7 @@ void SkeletonRenderer::drawSkeleton (const Mat4 &transform, uint32_t transformFl
 			// Bone origins.
 			DrawPrimitives::setPointSize(4);
 			DrawPrimitives::setDrawColor4B(0, 0, 255, 255); // Root bone is blue.
-			for (int i = 0, n = _skeleton->boneCount; i < n; i++) {
+			for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
 				spBone *bone = _skeleton->bones[i];
 				DrawPrimitives::drawPoint(Vec2(bone->worldX, bone->worldY));
 				if (i == 0) DrawPrimitives::setDrawColor4B(0, 255, 0, 255);
@@ -282,21 +282,21 @@ Texture2D* SkeletonRenderer::getTexture (spSkinnedMeshAttachment* attachment) co
 Rect SkeletonRenderer::getBoundingBox () const {
 	float minX = FLT_MAX, minY = FLT_MAX, maxX = FLT_MIN, maxY = FLT_MIN;
 	float scaleX = getScaleX(), scaleY = getScaleY();
-	for (int i = 0; i < _skeleton->slotCount; ++i) {
+	for (int i = 0; i < _skeleton->slotsCount; ++i) {
 		spSlot* slot = _skeleton->slots[i];
 		if (!slot->attachment) continue;
 		int verticesCount;
 		if (slot->attachment->type == SP_ATTACHMENT_REGION) {
 			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-			spRegionAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot->bone, _worldVertices);
+			spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices);
 			verticesCount = 8;
 		} else if (slot->attachment->type == SP_ATTACHMENT_MESH) {
 			spMeshAttachment* mesh = (spMeshAttachment*)slot->attachment;
-			spMeshAttachment_computeWorldVertices(mesh, slot->skeleton->x, slot->skeleton->y, slot, _worldVertices);
+			spMeshAttachment_computeWorldVertices(mesh, slot, _worldVertices);
 			verticesCount = mesh->verticesCount;
 		} else if (slot->attachment->type == SP_ATTACHMENT_SKINNED_MESH) {
 			spSkinnedMeshAttachment* mesh = (spSkinnedMeshAttachment*)slot->attachment;
-			spSkinnedMeshAttachment_computeWorldVertices(mesh, slot->skeleton->x, slot->skeleton->y, slot, _worldVertices);
+			spSkinnedMeshAttachment_computeWorldVertices(mesh, slot, _worldVertices);
 			verticesCount = mesh->uvsCount;
 		} else
 			continue;

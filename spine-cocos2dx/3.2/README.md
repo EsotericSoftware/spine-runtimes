@@ -13,9 +13,10 @@ Alternatively, the contents of the `spine-c/src`, `spine-c/include` and `spine-c
 
 ## Notes
 
-- Images are no longer premultiplied by cocos2d-x as they where in cocos2d-x v2, so the Spine atlas images *should* use premultiplied alpha.
+- Images are premultiplied by cocos2d-x, so the Spine atlas images should *not* use premultiplied alpha.
 
 ## Examples
 
+[Raptor](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx/3.2/example/Classes/RaptorExample.cpp)
 [Spineboy](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx/3.2/example/Classes/SpineboyExample.cpp)
 [Golbins](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx/3.2/example/Classes/GoblinsExample.cpp)

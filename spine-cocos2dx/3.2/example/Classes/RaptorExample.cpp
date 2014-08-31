@@ -28,8 +28,8 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "GoblinsExample.h"
 #include "RaptorExample.h"
+#include "SpineboyExample.h"
 #include <iostream>
 #include <fstream>
 #include <string.h>
@@ -38,18 +38,17 @@ USING_NS_CC;
 using namespace spine;
 using namespace std;
 
-Scene* GoblinsExample::scene () {
+Scene* RaptorExample::scene () {
 	Scene *scene = Scene::create();
-	scene->addChild(GoblinsExample::create());
+	scene->addChild(RaptorExample::create());
 	return scene;
 }
 
-bool GoblinsExample::init () {
+bool RaptorExample::init () {
 	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
 
-	skeletonNode = SkeletonAnimation::createWithFile("goblins-ffd.json", "goblins-ffd.atlas", 1.5f);
+	skeletonNode = SkeletonAnimation::createWithFile("raptor.json", "raptor.atlas", 0.5f);
 	skeletonNode->setAnimation(0, "walk", true);
-	skeletonNode->setSkin("goblin");
 
 	Size windowSize = Director::getInstance()->getWinSize();
 	skeletonNode->setPosition(Vec2(windowSize.width / 2, 20));
@@ -64,7 +63,7 @@ bool GoblinsExample::init () {
 		else if (skeletonNode->getTimeScale() == 1)
 			skeletonNode->setTimeScale(0.3f);
 		else
-			Director::getInstance()->replaceScene(RaptorExample::scene());
+			Director::getInstance()->replaceScene(SpineboyExample::scene());
 		return true;
 	};
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);

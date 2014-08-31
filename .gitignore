@@ -31,6 +31,9 @@ spine-cocos2dx/3.0/example/proj.win32/Debug
 spine-cocos2dx/3.1/cocos2dx/
 !spine-cocos2dx/3.1/cocos2dx/Place cocos2dx here.txt
 spine-cocos2dx/3.1/example/proj.win32/Debug
+spine-cocos2dx/3.2/cocos2dx/
+!spine-cocos2dx/3.2/cocos2dx/Place cocos2dx here.txt
+spine-cocos2dx/3.2/example/proj.win32/Debug
 xcuserdata
 
 spine-cocos2d-iphone/2/cocos2d/*
