@@ -71,13 +71,13 @@ public:
 	void setTrackCompleteListener (spTrackEntry* entry, const CompleteListener& listener);
 	void setTrackEventListener (spTrackEntry* entry, const EventListener& listener);
 
-	void setStartListener (spTrackEntry* entry, const StartListener& listener) CC_DEPRECATED_ATTRIBUTE
+	CC_DEPRECATED_ATTRIBUTE void setStartListener(spTrackEntry* entry, const StartListener& listener)
 	{ setTrackStartListener(entry, listener); }
-	void setEndListener (spTrackEntry* entry, const EndListener& listener) CC_DEPRECATED_ATTRIBUTE
+	CC_DEPRECATED_ATTRIBUTE void setEndListener(spTrackEntry* entry, const EndListener& listener)
 	{ setTrackEndListener(entry, listener); }
-	void setCompleteListener (spTrackEntry* entry, const CompleteListener& listener) CC_DEPRECATED_ATTRIBUTE
+	CC_DEPRECATED_ATTRIBUTE void setCompleteListener(spTrackEntry* entry, const CompleteListener& listener)
 	{ setTrackCompleteListener(entry, listener); }
-	void setEventListener (spTrackEntry* entry, const EventListener& listener) CC_DEPRECATED_ATTRIBUTE
+	CC_DEPRECATED_ATTRIBUTE void setEventListener(spTrackEntry* entry, const EventListener& listener)
 	{ setTrackEventListener(entry, listener); }
 
 
