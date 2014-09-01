@@ -103,6 +103,10 @@ namespace Spine {
 				TrackEntry entry = state.AddAnimation(0, "jump", false, 0);
 				entry.End += End; // Event handling for queued animations.
 				state.AddAnimation(0, "run", true, 0);
+			} else if (name == "raptor") {
+				state.SetAnimation(0, "walk", true);
+				state.SetAnimation(1, "empty", false);
+				state.AddAnimation(1, "gungrab", false, 2);
 			} else {
 				state.SetAnimation(0, "walk", true);
 			}
