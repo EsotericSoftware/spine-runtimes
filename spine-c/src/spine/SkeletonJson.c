@@ -233,7 +233,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 				break;
 			}
 		}
-		for (frame = events->child, i = 0; frame; frame = frame->next, ++i) {
+		for (frame = ikMap->child, i = 0; frame; frame = frame->next, ++i) {
 			spIkConstraintTimeline_setFrame(timeline, i, Json_getFloat(frame, "time", 0), Json_getFloat(frame, "mix", 0),
 					Json_getFloat(frame, "bendPositive", 1) ? 1 : -1);
 			readCurve(SUPER(timeline), i, frame);
