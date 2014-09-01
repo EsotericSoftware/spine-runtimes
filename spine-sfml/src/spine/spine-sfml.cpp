@@ -71,6 +71,10 @@ SkeletonDrawable::SkeletonDrawable (SkeletonData* skeletonData, AnimationStateDa
 	Bone_setYDown(true);
 	worldVertices = MALLOC(float, SPINE_MESH_VERTEX_COUNT_MAX);
 	skeleton = Skeleton_create(skeletonData);
+
+	ownsAnimationStateData = stateData == 0;
+	if (ownsAnimationStateData) stateData = AnimationStateData_create(skeletonData);
+
 	state = AnimationState_create(stateData);
 }
 
@@ -78,6 +82,7 @@ SkeletonDrawable::~SkeletonDrawable () {
 	delete vertexArray;
 	FREE(worldVertices);
 	AnimationState_dispose(state);
+	if (ownsAnimationStateData) AnimationStateData_dispose(state->data);
 	Skeleton_dispose(skeleton);
 }
 

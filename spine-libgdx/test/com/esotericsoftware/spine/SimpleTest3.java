@@ -35,12 +35,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
-public class SimpleTest1 extends ApplicationAdapter {
+public class SimpleTest3 extends ApplicationAdapter {
 	OrthographicCamera camera;
-	SpriteBatch batch;
+	PolygonSpriteBatch batch;
 	SkeletonRenderer renderer;
 	SkeletonRendererDebug debugRenderer;
 
@@ -50,32 +50,31 @@ public class SimpleTest1 extends ApplicationAdapter {
 
 	public void create () {
 		camera = new OrthographicCamera();
-		batch = new SpriteBatch();
+		batch = new PolygonSpriteBatch(); // Required to render meshes. SpriteBatch can't render meshes.
 		renderer = new SkeletonRenderer();
-		renderer.setPremultipliedAlpha(true); // PMA results in correct blending without outlines.
+		renderer.setPremultipliedAlpha(true);
 		debugRenderer = new SkeletonRendererDebug();
-		debugRenderer.setBoundingBoxes(false);
+		debugRenderer.setMeshTriangles(false);
 		debugRenderer.setRegionAttachments(false);
+		debugRenderer.setMeshHull(false);
 
-		atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy.atlas"));
+		atlas = new TextureAtlas(Gdx.files.internal("raptor/raptor.atlas"));
 		SkeletonJson json = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
-		json.setScale(0.6f); // Load the skeleton at 60% the size it was in Spine.
-		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy/spineboy.json"));
+		json.setScale(0.5f); // Load the skeleton at 50% the size it was in Spine.
+		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("raptor/raptor.json"));
 
 		skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
 		skeleton.setPosition(250, 20);
 
 		AnimationStateData stateData = new AnimationStateData(skeletonData); // Defines mixing (crossfading) between animations.
-		stateData.setMix("run", "jump", 0.2f);
-		stateData.setMix("jump", "run", 0.2f);
 
 		state = new AnimationState(stateData); // Holds the animation state for a skeleton (current animation, time, etc).
-		state.setTimeScale(0.5f); // Slow all animations down to 50% speed.
+		state.setTimeScale(0.6f); // Slow all animations down to 60% speed.
 
-		// Queue animations on track 0.
-		state.setAnimation(0, "run", true);
-		state.addAnimation(0, "jump", false, 2); // Jump after 2 seconds.
-		state.addAnimation(0, "run", true, 0); // Run after the jump.
+		// Queue animations on tracks 0 and 1.
+		state.setAnimation(0, "walk", true);
+		state.setAnimation(1, "empty", false);
+		state.addAnimation(1, "gungrab", false, 2); // Keys in higher tracks override the pose from lower tracks.
 	}
 
 	public void render () {
@@ -107,6 +106,6 @@ public class SimpleTest1 extends ApplicationAdapter {
 	}
 
 	public static void main (String[] args) throws Exception {
-		new LwjglApplication(new SimpleTest1());
+		new LwjglApplication(new SimpleTest3());
 	}
 }

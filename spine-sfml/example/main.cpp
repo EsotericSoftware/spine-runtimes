@@ -144,7 +144,6 @@ void goblins () {
 		printf("Error: %s\n", json->error);
 		exit(0);
 	}
-	Animation* walkAnimation = SkeletonData_findAnimation(skeletonData, "walk");
 	SkeletonJson_dispose(json);
 
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
@@ -161,7 +160,7 @@ void goblins () {
 	skeleton->y = 590;
 	Skeleton_updateWorldTransform(skeleton);
 
-	AnimationState_setAnimation(drawable->state, 0, walkAnimation, true);
+	AnimationState_setAnimationByName(drawable->state, 0, "walk", true);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - goblins");
 	window.setFramerateLimit(60);
@@ -195,7 +194,6 @@ void raptor () {
 		printf("Error: %s\n", json->error);
 		exit(0);
 	}
-	Animation* walkAnimation = SkeletonData_findAnimation(skeletonData, "walk");
 	SkeletonJson_dispose(json);
 
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
@@ -206,7 +204,9 @@ void raptor () {
 	skeleton->y = 590;
 	Skeleton_updateWorldTransform(skeleton);
 
-	AnimationState_setAnimation(drawable->state, 0, walkAnimation, true);
+	AnimationState_setAnimationByName(drawable->state, 0, "walk", true);
+	AnimationState_setAnimationByName(drawable->state, 1, "empty", false);
+	AnimationState_addAnimationByName(drawable->state, 1, "gungrab", false, 2);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - raptor");
 	window.setFramerateLimit(60);
