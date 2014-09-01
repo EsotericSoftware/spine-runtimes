@@ -117,6 +117,10 @@ void spSkeleton_dispose (spSkeleton* self) {
 		spSlot_dispose(self->slots[i]);
 	FREE(self->slots);
 
+	for (i = 0; i < self->ikConstraintsCount; ++i)
+		spIkConstraint_dispose(self->ikConstraints[i]);
+	FREE(self->ikConstraints);
+
 	FREE(self->drawOrder);
 	FREE(self);
 }
