@@ -36,11 +36,24 @@ using UnityEngine;
 public class SkeletonAnimationInspector : SkeletonRendererInspector {
 	protected SerializedProperty animationName, loop, timeScale;
 
+	// Inspector playback variables
+	protected bool doPlayback;
+	protected float lastUpdateTime;
+
 	protected override void OnEnable () {
 		base.OnEnable();
 		animationName = serializedObject.FindProperty("_animationName");
 		loop = serializedObject.FindProperty("loop");
 		timeScale = serializedObject.FindProperty("timeScale");
+		doPlayback = false;
+	}
+
+	void OnDisable()
+	{
+		if (doPlayback)
+		{
+			TogglePlayback(false);
+		}
 	}
 
 	protected override void gui () {
@@ -74,5 +87,52 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 		EditorGUILayout.PropertyField(loop);
 		EditorGUILayout.PropertyField(timeScale);
 		component.timeScale = Math.Max(component.timeScale, 0);
+
+		if (component.state != null)
+		{
+			string playButton = (doPlayback) ? "\u2225" : "\u25BA";
+			if (GUILayout.Button(playButton))
+			{
+				TogglePlayback();
+			}
+		}
+	}
+
+	protected void TogglePlayback(bool playback)
+	{
+		doPlayback = playback;
+		if (doPlayback)
+		{
+			lastUpdateTime = Time.realtimeSinceStartup;
+			EditorApplication.update += PlaybackUpdate;
+		}
+		else
+		{
+			EditorApplication.update -= PlaybackUpdate;
+		}
+	}
+
+	protected void TogglePlayback()
+	{
+		TogglePlayback(!doPlayback);
+	}
+
+	protected void PlaybackUpdate()
+	{
+		if (Application.isPlaying)
+			TogglePlayback(false);
+
+		SkeletonAnimation component = (SkeletonAnimation)target;
+		if (!component.valid)
+		{
+			TogglePlayback(false);
+			return;
+		}
+		
+		float deltaTime = Time.realtimeSinceStartup - lastUpdateTime;
+		deltaTime *= component.timeScale;
+		component.Update(deltaTime);
+		EditorUtility.SetDirty(target);
+		lastUpdateTime = Time.realtimeSinceStartup;
 	}
 }
