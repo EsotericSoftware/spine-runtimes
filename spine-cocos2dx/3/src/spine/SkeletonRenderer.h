@@ -42,8 +42,8 @@ class PolygonBatch;
 class SkeletonRenderer: public cocos2d::Node, public cocos2d::BlendProtocol {
 public:
 	static SkeletonRenderer* createWithData (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
-	static SkeletonRenderer* createWithFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 0);
-	static SkeletonRenderer* createWithFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 0);
+	static SkeletonRenderer* createWithFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 1);
+	static SkeletonRenderer* createWithFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1);
 
 	virtual void update (float deltaTime) override;
 	virtual void draw (cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformFlags) override;
@@ -91,8 +91,8 @@ public:
 protected:
 	SkeletonRenderer ();
 	SkeletonRenderer (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
-	SkeletonRenderer (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 0);
-	SkeletonRenderer (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 0);
+	SkeletonRenderer (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 1);
+	SkeletonRenderer (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1);
 	virtual ~SkeletonRenderer ();
 	void initialize ();
 

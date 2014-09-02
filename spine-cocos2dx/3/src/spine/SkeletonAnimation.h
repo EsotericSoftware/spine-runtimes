@@ -47,8 +47,8 @@ typedef std::function<void(int trackIndex, spEvent* event)> EventListener;
 class SkeletonAnimation: public SkeletonRenderer {
 public:
 	static SkeletonAnimation* createWithData (spSkeletonData* skeletonData);
-	static SkeletonAnimation* createWithFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 0);
-	static SkeletonAnimation* createWithFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 0);
+	static SkeletonAnimation* createWithFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 1);
+	static SkeletonAnimation* createWithFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1);
 
 	virtual void update (float deltaTime);
 
@@ -79,8 +79,8 @@ public:
 protected:
 	SkeletonAnimation ();
 	SkeletonAnimation (spSkeletonData* skeletonData);
-	SkeletonAnimation (const std::string&skeletonDataFile, spAtlas* atlas, float scale = 0);
-	SkeletonAnimation (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 0);
+	SkeletonAnimation (const std::string&skeletonDataFile, spAtlas* atlas, float scale = 1);
+	SkeletonAnimation (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1);
 	virtual ~SkeletonAnimation ();
 	void initialize ();
 
