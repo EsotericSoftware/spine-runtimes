@@ -65,8 +65,8 @@ void spBone_updateWorldTransform (spBone* self) {
 		CONST_CAST(float, self->worldRotation) =
 				self->data->inheritRotation ? self->parent->worldRotation + self->rotationIK : self->rotationIK;
 	} else {
-		CONST_CAST(float, self->worldX) = self->flipX ? -self->x : self->x;
-		CONST_CAST(float, self->worldY) = self->flipY != yDown ? -self->y : self->y;
+		CONST_CAST(float, self->worldX) = self->skeleton->flipX ? -self->x : self->x;
+		CONST_CAST(float, self->worldY) = self->skeleton->flipY != yDown ? -self->y : self->y;
 		CONST_CAST(float, self->worldScaleX) = self->scaleX;
 		CONST_CAST(float, self->worldScaleY) = self->scaleY;
 		CONST_CAST(float, self->worldRotation) = self->rotationIK;
@@ -74,14 +74,14 @@ void spBone_updateWorldTransform (spBone* self) {
 	radians = self->worldRotation * DEG_RAD;
 	cosine = COS(radians);
 	sine = SIN(radians);
-	if (self->flipX) {
+	if (self->skeleton->flipX) {
 		CONST_CAST(float, self->m00) = -cosine * self->worldScaleX;
 		CONST_CAST(float, self->m01) = sine * self->worldScaleY;
 	} else {
 		CONST_CAST(float, self->m00) = cosine * self->worldScaleX;
 		CONST_CAST(float, self->m01) = -sine * self->worldScaleY;
 	}
-	if (self->flipY != yDown) {
+	if (self->skeleton->flipY != yDown) {
 		CONST_CAST(float, self->m10) = -sine * self->worldScaleX;
 		CONST_CAST(float, self->m11) = -cosine * self->worldScaleY;
 	} else {
@@ -103,7 +103,7 @@ void spBone_worldToLocal (spBone* self, float worldX, float worldY, float* local
 	float invDet;
 	float dx = worldX - self->worldX, dy = worldY - self->worldY;
 	float m00 = self->m00, m11 = self->m11;
-	if (self->flipX != (self->flipY != yDown)) {
+	if (self->skeleton->flipX != (self->skeleton->flipY != yDown)) {
 		m00 *= -1;
 		m11 *= -1;
 	}
