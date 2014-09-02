@@ -235,7 +235,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 		}
 		for (frame = ikMap->child, i = 0; frame; frame = frame->next, ++i) {
 			spIkConstraintTimeline_setFrame(timeline, i, Json_getFloat(frame, "time", 0), Json_getFloat(frame, "mix", 0),
-					Json_getFloat(frame, "bendPositive", 1) ? 1 : -1);
+					Json_getInt(frame, "bendPositive", 1) ? 1 : -1);
 			readCurve(SUPER(timeline), i, frame);
 		}
 		animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
