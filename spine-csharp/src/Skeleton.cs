@@ -38,7 +38,7 @@ namespace Spine {
 		internal List<Slot> slots;
 		internal List<Slot> drawOrder;
 		internal List<IkConstraint> ikConstraints = new List<IkConstraint>();
-		private List<List<Bone>> updateBonesCache = new List<List<Bone>>();
+		private List<List<Bone>> boneCache = new List<List<Bone>>();
 		internal Skin skin;
 		internal float r = 1, g = 1, b = 1, a = 1;
 		internal float time;
@@ -58,28 +58,8 @@ namespace Spine {
 		public float Time { get { return time; } set { time = value; } }
 		public float X { get { return x; } set { x = value; } }
 		public float Y { get { return y; } set { y = value; } }
-
-		public bool FlipX {
-			get { return flipX; }
-			set {
-				if (flipX == value) return;
-				flipX = value;
-				List<Bone> bones = this.bones;
-				for (int i = 0, n = bones.Count; i < n; i++)
-					bones[i].flipX = value;
-			}
-		}
-
-		public bool FlipY {
-			get { return flipY; }
-			set {
-				if (flipY == value) return;
-				flipY = value;
-				List<Bone> bones = this.bones;
-				for (int i = 0, n = bones.Count; i < n; i++)
-					bones[i].flipY = value;
-			}
-		}
+		public bool FlipX { get { return flipX; } set { flipX = value; } }
+		public bool FlipY { get { return flipY; } set { flipY = value; } }
 
 		public Bone RootBone {
 			get {
@@ -94,14 +74,14 @@ namespace Spine {
 			bones = new List<Bone>(data.bones.Count);
 			foreach (BoneData boneData in data.bones) {
 				Bone parent = boneData.parent == null ? null : bones[data.bones.IndexOf(boneData.parent)];
-				bones.Add(new Bone(boneData, parent));
+				bones.Add(new Bone(boneData, this, parent));
 			}
 
 			slots = new List<Slot>(data.slots.Count);
 			drawOrder = new List<Slot>(data.slots.Count);
 			foreach (SlotData slotData in data.slots) {
 				Bone bone = bones[data.bones.IndexOf(slotData.boneData)];
-				Slot slot = new Slot(slotData, this, bone);
+				Slot slot = new Slot(slotData, bone);
 				slots.Add(slot);
 				drawOrder.Add(slot);
 			}
@@ -116,18 +96,18 @@ namespace Spine {
 		/// <summary>Caches information about bones and IK constraints. Must be called if bones or IK constraints are added or
 		/// removed.</summary>
 		public void UpdateCache () {
-			List<List<Bone>> updateBonesCache = this.updateBonesCache;
+			List<List<Bone>> boneCache = this.boneCache;
 			List<IkConstraint> ikConstraints = this.ikConstraints;
 			int ikConstraintsCount = ikConstraints.Count;
 
 			int arrayCount = ikConstraintsCount + 1;
-			if (updateBonesCache.Count > arrayCount) updateBonesCache.RemoveRange(arrayCount, updateBonesCache.Count - arrayCount);
-			for (int i = 0, n = updateBonesCache.Count; i < n; i++)
-				updateBonesCache[i].Clear();
-			while (updateBonesCache.Count < arrayCount)
-				updateBonesCache.Add(new List<Bone>());
+			if (boneCache.Count > arrayCount) boneCache.RemoveRange(arrayCount, boneCache.Count - arrayCount);
+			for (int i = 0, n = boneCache.Count; i < n; i++)
+				boneCache[i].Clear();
+			while (boneCache.Count < arrayCount)
+				boneCache.Add(new List<Bone>());
 
-			List<Bone> nonIkBones = updateBonesCache[0];
+			List<Bone> nonIkBones = boneCache[0];
 
 			for (int i = 0, n = bones.Count; i < n; i++) {
 				Bone bone = bones[i];
@@ -139,8 +119,8 @@ namespace Spine {
 						Bone child = ikConstraint.bones[ikConstraint.bones.Count - 1];
 						while (true) {
 							if (current == child) {
-								updateBonesCache[ii].Add(bone);
-								updateBonesCache[ii + 1].Add(bone);
+								boneCache[ii].Add(bone);
+								boneCache[ii + 1].Add(bone);
 								goto outer;
 							}
 							if (child == parent) break;
@@ -161,11 +141,11 @@ namespace Spine {
 				Bone bone = bones[ii];
 				bone.rotationIK = bone.rotation;
 			}
-			List<List<Bone>> updateBonesCache = this.updateBonesCache;
+			List<List<Bone>> boneCache = this.boneCache;
 			List<IkConstraint> ikConstraints = this.ikConstraints;
-			int i = 0, last = updateBonesCache.Count - 1;
+			int i = 0, last = boneCache.Count - 1;
 			while (true) {
-				List<Bone> updateBones = updateBonesCache[i];
+				List<Bone> updateBones = boneCache[i];
 				for (int ii = 0, nn = updateBones.Count; ii < nn; ii++)
 					updateBones[ii].UpdateWorldTransform();
 				if (i == last) break;

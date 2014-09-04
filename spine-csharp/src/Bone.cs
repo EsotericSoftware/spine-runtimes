@@ -35,13 +35,14 @@ namespace Spine {
 		static public bool yDown;
 
 		internal BoneData data;
+		internal Skeleton skeleton;
 		internal Bone parent;
 		internal float x, y, rotation, rotationIK, scaleX, scaleY;
 		internal float m00, m01, m10, m11;
 		internal float worldX, worldY, worldRotation, worldScaleX, worldScaleY;
-		internal bool flipX, flipY;
 
 		public BoneData Data { get { return data; } }
+		public Skeleton Skeleton { get { return skeleton; } }
 		public Bone Parent { get { return parent; } }
 		public float X { get { return x; } set { x = value; } }
 		public float Y { get { return y; } set { y = value; } }
@@ -63,9 +64,11 @@ namespace Spine {
 		public float WorldScaleY { get { return worldScaleY; } }
 
 		/// <param name="parent">May be null.</param>
-		public Bone (BoneData data, Bone parent) {
+		public Bone (BoneData data, Skeleton skeleton, Bone parent) {
 			if (data == null) throw new ArgumentNullException("data cannot be null.");
+			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
 			this.data = data;
+			this.skeleton = skeleton;
 			this.parent = parent;
 			SetToSetupPose();
 		}
@@ -73,6 +76,7 @@ namespace Spine {
 		/// <summary>Computes the world SRT using the parent bone and the local SRT.</summary>
 		public void UpdateWorldTransform () {
 			Bone parent = this.parent;
+			Skeleton skeleton = this.skeleton;
 			float x = this.x, y = this.y;
 			if (parent != null) {
 				worldX = x * parent.m00 + y * parent.m01 + parent.worldX;
@@ -86,8 +90,8 @@ namespace Spine {
 				}
 				worldRotation = data.inheritRotation ? parent.worldRotation + rotationIK : rotationIK;
 			} else {
-				worldX = flipX ? -x : x;
-				worldY = flipY != yDown ? -y : y;
+				worldX = skeleton.flipX ? -x : x;
+				worldY = skeleton.flipY != yDown ? -y : y;
 				worldScaleX = scaleX;
 				worldScaleY = scaleY;
 				worldRotation = rotationIK;
@@ -95,14 +99,14 @@ namespace Spine {
 			float radians = worldRotation * (float)Math.PI / 180;
 			float cos = (float)Math.Cos(radians);
 			float sin = (float)Math.Sin(radians);
-			if (flipX) {
+			if (skeleton.flipX) {
 				m00 = -cos * worldScaleX;
 				m01 = sin * worldScaleY;
 			} else {
 				m00 = cos * worldScaleX;
 				m01 = -sin * worldScaleY;
 			}
-			if (flipY != yDown) {
+			if (skeleton.flipY != yDown) {
 				m10 = -sin * worldScaleX;
 				m11 = -cos * worldScaleY;
 			} else {
@@ -124,7 +128,8 @@ namespace Spine {
 		public void worldToLocal (float worldX, float worldY, out float localX, out float localY) {
 			float dx = worldX - this.worldX, dy = worldY - this.worldY;
 			float m00 = this.m00, m10 = this.m10, m01 = this.m01, m11 = this.m11;
-			if (flipX != (flipY != yDown)) {
+			Skeleton skeleton = this.skeleton;
+			if (skeleton.flipX != (skeleton.flipY != yDown)) {
 				m00 *= -1;
 				m11 *= -1;
 			}

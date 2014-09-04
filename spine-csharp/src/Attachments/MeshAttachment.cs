@@ -90,10 +90,9 @@ namespace Spine {
 			}
 		}
 
-		public void ComputeWorldVertices (float x, float y, Slot slot, float[] worldVertices) {
+		public void ComputeWorldVertices (Slot slot, float[] worldVertices) {
 			Bone bone = slot.bone;
-			x += bone.worldX;
-			y += bone.worldY;
+			float x = bone.skeleton.x + bone.worldX, y = bone.skeleton.y + bone.worldY;
 			float m00 = bone.m00, m01 = bone.m01, m10 = bone.m10, m11 = bone.m11;
 			float[] vertices = this.vertices;
 			int verticesCount = vertices.Length;

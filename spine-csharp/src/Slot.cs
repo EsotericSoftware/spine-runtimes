@@ -34,7 +34,6 @@ namespace Spine {
 	public class Slot {
 		internal SlotData data;
 		internal Bone bone;
-		internal Skeleton skeleton;
 		internal float r, g, b, a;
 		internal Attachment attachment;
 		internal float attachmentTime;
@@ -43,7 +42,7 @@ namespace Spine {
 
 		public SlotData Data { get { return data; } }
 		public Bone Bone { get { return bone; } }
-		public Skeleton Skeleton { get { return skeleton; } }
+		public Skeleton Skeleton { get { return bone.skeleton; } }
 		public float R { get { return r; } set { r = value; } }
 		public float G { get { return g; } set { g = value; } }
 		public float B { get { return b; } set { b = value; } }
@@ -56,29 +55,27 @@ namespace Spine {
 			}
 			set {
 				attachment = value;
-				attachmentTime = skeleton.time;
+				attachmentTime = bone.skeleton.time;
 				attachmentVerticesCount = 0;
 			}
 		}
 
 		public float AttachmentTime {
 			get {
-				return skeleton.time - attachmentTime;
+				return bone.skeleton.time - attachmentTime;
 			}
 			set {
-				attachmentTime = skeleton.time - value;
+				attachmentTime = bone.skeleton.time - value;
 			}
 		}
 
 		public float[] AttachmentVertices { get { return attachmentVertices; } set { attachmentVertices = value; } }
 		public int AttachmentVerticesCount { get { return attachmentVerticesCount; } set { attachmentVerticesCount = value; } }
 
-		public Slot (SlotData data, Skeleton skeleton, Bone bone) {
+		public Slot (SlotData data, Bone bone) {
 			if (data == null) throw new ArgumentNullException("data cannot be null.");
-			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
 			if (bone == null) throw new ArgumentNullException("bone cannot be null.");
 			this.data = data;
-			this.skeleton = skeleton;
 			this.bone = bone;
 			SetToSetupPose();
 		}
@@ -88,11 +85,11 @@ namespace Spine {
 			g = data.g;
 			b = data.b;
 			a = data.a;
-			Attachment = data.attachmentName == null ? null : skeleton.GetAttachment(slotIndex, data.attachmentName);
+			Attachment = data.attachmentName == null ? null : bone.skeleton.GetAttachment(slotIndex, data.attachmentName);
 		}
 
 		public void SetToSetupPose () {
-			SetToSetupPose(skeleton.data.slots.IndexOf(data));
+			SetToSetupPose(bone.skeleton.data.slots.IndexOf(data));
 		}
 
 		override public String ToString () {

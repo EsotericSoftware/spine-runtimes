@@ -91,14 +91,14 @@ namespace Spine {
 			if (root == null) throw new Exception("Invalid JSON.");
 
 			// Skeleton.
-			var skeletonMap = (Dictionary<String, Object>)root["skeleton"];
-			if (skeletonMap != null) {
-				skeletonData.version = (String)skeletonMap["spine"];
+			if (root.ContainsKey("skeleton")) {
+				var skeletonMap = (Dictionary<String, Object>)root["skeleton"];
 				skeletonData.hash = (String)skeletonMap["hash"];
+				skeletonData.version = (String)skeletonMap["spine"];
 				skeletonData.width = GetFloat(skeletonMap, "width", 0);
 				skeletonData.height = GetFloat(skeletonMap, "width", 1);
 			}
-
+			
 			// Bones.
 			foreach (Dictionary<String, Object> boneMap in (List<Object>)root["bones"]) {
 				BoneData parent = null;
@@ -120,7 +120,7 @@ namespace Spine {
 			}
 
 			// IK constraints.
-			if(root.ContainsKey("ik")){
+			if (root.ContainsKey("ik")) {
 				foreach (Dictionary<String, Object> ikMap in (List<Object>)root["ik"]) {
 					IkConstraintData ikConstraintData = new IkConstraintData((String)ikMap["name"]);
 

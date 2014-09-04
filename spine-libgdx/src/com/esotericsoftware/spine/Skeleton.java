@@ -41,7 +41,7 @@ public class Skeleton {
 	final Array<Slot> slots;
 	Array<Slot> drawOrder;
 	final Array<IkConstraint> ikConstraints;
-	private final Array<Array<Bone>> updateBonesCache = new Array();
+	private final Array<Array<Bone>> boneCache = new Array();
 	Skin skin;
 	final Color color;
 	float time;
@@ -55,14 +55,14 @@ public class Skeleton {
 		bones = new Array(data.bones.size);
 		for (BoneData boneData : data.bones) {
 			Bone parent = boneData.parent == null ? null : bones.get(data.bones.indexOf(boneData.parent, true));
-			bones.add(new Bone(boneData, parent));
+			bones.add(new Bone(boneData, this, parent));
 		}
 
 		slots = new Array(data.slots.size);
 		drawOrder = new Array(data.slots.size);
 		for (SlotData slotData : data.slots) {
 			Bone bone = bones.get(data.bones.indexOf(slotData.boneData, true));
-			Slot slot = new Slot(slotData, this, bone);
+			Slot slot = new Slot(slotData, bone);
 			slots.add(slot);
 			drawOrder.add(slot);
 		}
@@ -84,13 +84,13 @@ public class Skeleton {
 		bones = new Array(skeleton.bones.size);
 		for (Bone bone : skeleton.bones) {
 			Bone parent = bone.parent == null ? null : bones.get(skeleton.bones.indexOf(bone.parent, true));
-			bones.add(new Bone(bone, parent));
+			bones.add(new Bone(bone, this, parent));
 		}
 
 		slots = new Array(skeleton.slots.size);
 		for (Slot slot : skeleton.slots) {
 			Bone bone = bones.get(skeleton.bones.indexOf(slot.bone, true));
-			slots.add(new Slot(slot, this, bone));
+			slots.add(new Slot(slot, bone));
 		}
 
 		drawOrder = new Array(slots.size);
@@ -117,18 +117,18 @@ public class Skeleton {
 
 	/** Caches information about bones and IK constraints. Must be called if bones or IK constraints are added or removed. */
 	public void updateCache () {
-		Array<Array<Bone>> updateBonesCache = this.updateBonesCache;
+		Array<Array<Bone>> boneCache = this.boneCache;
 		Array<IkConstraint> ikConstraints = this.ikConstraints;
 		int ikConstraintsCount = ikConstraints.size;
 
 		int arrayCount = ikConstraintsCount + 1;
-		updateBonesCache.truncate(arrayCount);
-		for (int i = 0, n = updateBonesCache.size; i < n; i++)
-			updateBonesCache.get(i).clear();
-		while (updateBonesCache.size < arrayCount)
-			updateBonesCache.add(new Array());
+		boneCache.truncate(arrayCount);
+		for (int i = 0, n = boneCache.size; i < n; i++)
+			boneCache.get(i).clear();
+		while (boneCache.size < arrayCount)
+			boneCache.add(new Array());
 
-		Array<Bone> nonIkBones = updateBonesCache.first();
+		Array<Bone> nonIkBones = boneCache.first();
 
 		outer:
 		for (int i = 0, n = bones.size; i < n; i++) {
@@ -141,8 +141,8 @@ public class Skeleton {
 					Bone child = ikConstraint.bones.peek();
 					while (true) {
 						if (current == child) {
-							updateBonesCache.get(ii).add(bone);
-							updateBonesCache.get(ii + 1).add(bone);
+							boneCache.get(ii).add(bone);
+							boneCache.get(ii + 1).add(bone);
 							continue outer;
 						}
 						if (child == parent) break;
@@ -162,11 +162,11 @@ public class Skeleton {
 			Bone bone = bones.get(i);
 			bone.rotationIK = bone.rotation;
 		}
-		Array<Array<Bone>> updateBonesCache = this.updateBonesCache;
+		Array<Array<Bone>> boneCache = this.boneCache;
 		Array<IkConstraint> ikConstraints = this.ikConstraints;
-		int i = 0, last = updateBonesCache.size - 1;
+		int i = 0, last = boneCache.size - 1;
 		while (true) {
-			Array<Bone> updateBones = updateBonesCache.get(i);
+			Array<Bone> updateBones = boneCache.get(i);
 			for (int ii = 0, nn = updateBones.size; ii < nn; ii++)
 				updateBones.get(ii).updateWorldTransform();
 			if (i == last) break;
@@ -365,11 +365,7 @@ public class Skeleton {
 	}
 
 	public void setFlipX (boolean flipX) {
-		if (this.flipX == flipX) return;
 		this.flipX = flipX;
-		Array<Bone> bones = this.bones;
-		for (int i = 0, n = bones.size; i < n; i++)
-			bones.get(i).flipX = flipX;
 	}
 
 	public boolean getFlipY () {
@@ -377,21 +373,12 @@ public class Skeleton {
 	}
 
 	public void setFlipY (boolean flipY) {
-		if (this.flipY == flipY) return;
 		this.flipY = flipY;
-		Array<Bone> bones = this.bones;
-		for (int i = 0, n = bones.size; i < n; i++)
-			bones.get(i).flipY = flipY;
 	}
 
 	public void setFlip (boolean flipX, boolean flipY) {
-		if (this.flipX == flipX && this.flipY == flipY) return;
-		Array<Bone> bones = this.bones;
-		for (int i = 0, n = bones.size; i < n; i++) {
-			Bone bone = bones.get(i);
-			bone.flipX = flipX;
-			bone.flipY = flipY;
-		}
+		this.flipX = flipX;
+		this.flipY = flipY;
 	}
 
 	public float getX () {

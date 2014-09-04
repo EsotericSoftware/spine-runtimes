@@ -52,6 +52,7 @@ public:
 
 	virtual void draw (sf::RenderTarget& target, sf::RenderStates states) const;
 private:
+	bool ownsAnimationStateData;
 	float* worldVertices;
 };
 

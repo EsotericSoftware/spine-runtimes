@@ -90,6 +90,12 @@
     <ClInclude Include="include\spine\spine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\spine\IkConstraint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spine\IkConstraintData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\spine\Atlas.c">
@@ -162,6 +168,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\spine\SkinnedMeshAttachment.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\spine\IkConstraint.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\spine\IkConstraintData.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

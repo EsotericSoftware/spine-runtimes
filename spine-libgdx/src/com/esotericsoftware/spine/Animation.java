@@ -128,11 +128,11 @@ public class Animation {
 		if (high == 0) return 1;
 		int current = high >>> 1;
 		while (true) {
-			if (values[(current + 1)] <= target)
+			if (values[current + 1] <= target)
 				low = current + 1;
 			else
 				high = current;
-			if (low == high) return (low + 1);
+			if (low == high) return low + 1;
 			current = (low + high) >>> 1;
 		}
 	}
@@ -510,7 +510,7 @@ public class Animation {
 			} else if (lastTime > time) //
 				lastTime = -1;
 
-			int frameIndex = time >= frames[frames.length - 1] ? frames.length - 1 : binarySearch(frames, time, 1) - 1;
+			int frameIndex = time >= frames[frames.length - 1] ? frames.length - 1 : binarySearch(frames, time) - 1;
 			if (frames[frameIndex] <= lastTime) return;
 
 			String attachmentName = attachmentNames[frameIndex];

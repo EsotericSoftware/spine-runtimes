@@ -1,5 +1,6 @@
 /*
- Copyright (c) 2009 Dave Gamble
+ Copyright (c) 2009, Dave Gamble
+ Copyright (c) 2013, Esoteric Software
 
  Permission is hereby granted, dispose of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -55,19 +56,19 @@ static int Json_strcasecmp (const char* s1, const char* s2) {
 	/* TODO we may be able to elide these NULL checks if we can prove
 	 * the graph and input (only callsite is Json_getItem) should not have NULLs
 	 */
-	if ( s1 && s2 )
-	{
+	if (s1 && s2) {
 #if defined(_WIN32)
-		return _stricmp( s1, s2 );
+		return _stricmp(s1, s2);
 #else
 		return strcasecmp( s1, s2 );
 #endif
-	}
-	else
-	{
-		if ( s1 < s2 )       return -1; /* s1 is null, s2 is not */
-		else if ( s1 == s2 ) return 0;  /* both are null */
-		else                 return 1;  /* s2 is nul	s1 is not */
+	} else {
+		if (s1 < s2)
+			return -1; /* s1 is null, s2 is not */
+		else if (s1 == s2)
+			return 0; /* both are null */
+		else
+			return 1; /* s2 is nul	s1 is not */
 	}
 }
 
@@ -101,29 +102,24 @@ static const char* parse_number (Json *item, const char* num) {
 	 * We also already know that this starts with [-0-9] from parse_value.
 	 */
 #if __STDC_VERSION__ >= 199901L
-	n = strtof( num, &endptr );
+	n = strtof(num, &endptr);
 #else
 	n = (float)strtod( num, &endptr );
 #endif
 	/* ignore errno's ERANGE, which returns +/-HUGE_VAL */
 	/* n is 0 on any other error */
 
-
-	if ( endptr != num )
-	{
+	if (endptr != num) {
 		/* Parse success, number found. */
 		item->valueFloat = n;
 		item->valueInt = (int)n;
 		item->type = Json_Number;
 		return endptr;
-	}
-	else
-	{
+	} else {
 		/* Parse failure, ep is set. */
 		ep = num;
 		return 0;
 	}
-
 }
 
 /* Parse the input text into an unescaped cstring, and populate item. */
@@ -231,7 +227,7 @@ static const char* parse_object (Json *item, const char* value);
 
 /* Utility to jump whitespace and cr/lf */
 static const char* skip (const char* in) {
-	if ( !in ) return 0; /* must propagate NULL since it's often called in skip(f(...)) form */
+	if (!in) return 0; /* must propagate NULL since it's often called in skip(f(...)) form */
 	while (*in && (unsigned char)*in <= 32)
 		in++;
 	return in;
@@ -262,54 +258,50 @@ static const char* parse_value (Json *item, const char* value) {
 	if (!value) return 0; /* Fail on null. */
 #endif
 
-	switch ( *value )
-	{
-		case 'n':
-		{
-			if (!strncmp(value+1, "ull", 3)) {
-				item->type = Json_NULL;
-				return value + 4;
-			}
-			break;
+	switch (*value) {
+	case 'n': {
+		if (!strncmp(value + 1, "ull", 3)) {
+			item->type = Json_NULL;
+			return value + 4;
 		}
-		case 'f':
-		{
-			if (!strncmp(value+1, "alse", 4)) {
-				item->type = Json_False;
-				/* calloc prevents us needing item->type = Json_False or valueInt = 0 here */
-				return value + 5;
-			}
-			break;
+		break;
+	}
+	case 'f': {
+		if (!strncmp(value + 1, "alse", 4)) {
+			item->type = Json_False;
+			/* calloc prevents us needing item->type = Json_False or valueInt = 0 here */
+			return value + 5;
 		}
-		case 't':
-		{
-			if (!strncmp(value+1, "rue", 3)) {
-				item->type = Json_True;
-				item->valueInt = 1;
-				return value + 4;
-			}
-			break;
+		break;
+	}
+	case 't': {
+		if (!strncmp(value + 1, "rue", 3)) {
+			item->type = Json_True;
+			item->valueInt = 1;
+			return value + 4;
 		}
-		case '\"':
-			return parse_string(item, value);
-		case '[':
-			return parse_array(item, value);
-		case '{':
-			return parse_object(item, value);
-		case '-': /* fallthrough */
-		case '0': /* fallthrough */
-		case '1': /* fallthrough */
-		case '2': /* fallthrough */
-		case '3': /* fallthrough */
-		case '4': /* fallthrough */
-		case '5': /* fallthrough */
-		case '6': /* fallthrough */
-		case '7': /* fallthrough */
-		case '8': /* fallthrough */
-		case '9':
-			return parse_number(item, value);
-		default:
-			break;
+		break;
+	}
+	case '\"':
+		return parse_string(item, value);
+	case '[':
+		return parse_array(item, value);
+	case '{':
+		return parse_object(item, value);
+	case '-': /* fallthrough */
+	case '0': /* fallthrough */
+	case '1': /* fallthrough */
+	case '2': /* fallthrough */
+	case '3': /* fallthrough */
+	case '4': /* fallthrough */
+	case '5': /* fallthrough */
+	case '6': /* fallthrough */
+	case '7': /* fallthrough */
+	case '8': /* fallthrough */
+	case '9':
+		return parse_number(item, value);
+	default:
+		break;
 	}
 
 	ep = value;

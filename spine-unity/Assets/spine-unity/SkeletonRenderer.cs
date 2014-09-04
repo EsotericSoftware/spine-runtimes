@@ -193,14 +193,14 @@ public class SkeletonRenderer : MonoBehaviour {
 		Color32[] colors = this.colors;
 		int vertexIndex = 0;
 		Color32 color = new Color32();
-		float x = skeleton.x, y = skeleton.y, zSpacing = this.zSpacing;
+		float zSpacing = this.zSpacing;
 		float a = skeleton.a * 255, r = skeleton.r, g = skeleton.g, b = skeleton.b;
 		for (int i = 0; i < drawOrderCount; i++) {
 			Slot slot = drawOrder[i];
 			Attachment attachment = slot.attachment;
 			if (attachment is RegionAttachment) {
 				RegionAttachment regionAttachment = (RegionAttachment)attachment;
-				regionAttachment.ComputeWorldVertices(x, y, slot.bone, tempVertices);
+				regionAttachment.ComputeWorldVertices(slot.bone, tempVertices);
 				
 				float z = i * zSpacing;
 				vertices[vertexIndex] = new Vector3(tempVertices[RegionAttachment.X1], tempVertices[RegionAttachment.Y1], z);
@@ -231,7 +231,7 @@ public class SkeletonRenderer : MonoBehaviour {
 					MeshAttachment meshAttachment = (MeshAttachment)attachment;
 					int meshVertexCount = meshAttachment.vertices.Length;
 					if (tempVertices.Length < meshVertexCount) tempVertices = new float[meshVertexCount];
-					meshAttachment.ComputeWorldVertices(x, y, slot, tempVertices);
+					meshAttachment.ComputeWorldVertices(slot, tempVertices);
 					
 					color.a = (byte)(a * slot.a * meshAttachment.a);
 					color.r = (byte)(r * slot.r * meshAttachment.r * color.a);
@@ -250,7 +250,7 @@ public class SkeletonRenderer : MonoBehaviour {
 					SkinnedMeshAttachment meshAttachment = (SkinnedMeshAttachment)attachment;
 					int meshVertexCount = meshAttachment.uvs.Length;
 					if (tempVertices.Length < meshVertexCount) tempVertices = new float[meshVertexCount];
-					meshAttachment.ComputeWorldVertices(x, y, slot, tempVertices);
+					meshAttachment.ComputeWorldVertices(slot, tempVertices);
 					
 					color.a = (byte)(a * slot.a * meshAttachment.a);
 					color.r = (byte)(r * slot.r * meshAttachment.r * color.a);

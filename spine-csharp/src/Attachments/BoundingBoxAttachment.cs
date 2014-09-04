@@ -42,9 +42,8 @@ namespace Spine {
 		}
 
 		/// <param name="worldVertices">Must have at least the same length as this attachment's vertices.</param>
-		public void ComputeWorldVertices (float x, float y, Bone bone, float[] worldVertices) {
-			x += bone.worldX;
-			y += bone.worldY;
+		public void ComputeWorldVertices (Bone bone, float[] worldVertices) {
+			float x = bone.skeleton.x + bone.worldX, y = bone.skeleton.y + bone.worldY;
 			float m00 = bone.m00;
 			float m01 = bone.m01;
 			float m10 = bone.m10;

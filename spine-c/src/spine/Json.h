@@ -39,7 +39,7 @@ extern "C" {
 #define Json_Object 6
 
 #ifndef SPINE_JSON_HAVE_PREV
-/* Spine doesn't use the "prev" link in the Json sibling lists. */ 
+/* Spine doesn't use the "prev" link in the Json sibling lists. */
 #define SPINE_JSON_HAVE_PREV 0
 #endif
 

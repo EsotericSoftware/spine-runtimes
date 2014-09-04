@@ -109,27 +109,29 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 
 	Json* bones = Json_getItem(root, "bones");
 	Json* slots = Json_getItem(root, "slots");
+	Json* ik = Json_getItem(root, "ik");
 	Json* ffd = Json_getItem(root, "ffd");
 	Json* drawOrder = Json_getItem(root, "draworder");
 	Json* events = Json_getItem(root, "events");
-	Json *boneMap, *slotMap, *ffdMap;
+	Json *boneMap, *slotMap, *ikMap, *ffdMap;
 
-	int timelineCount = 0;
+	int timelinesCount = 0;
 	for (boneMap = bones ? bones->child : 0; boneMap; boneMap = boneMap->next)
-		timelineCount += boneMap->size;
+		timelinesCount += boneMap->size;
 	for (slotMap = slots ? slots->child : 0; slotMap; slotMap = slotMap->next)
-		timelineCount += slotMap->size;
+		timelinesCount += slotMap->size;
+	timelinesCount += ik ? ik->size : 0;
 	for (ffdMap = ffd ? ffd->child : 0; ffdMap; ffdMap = ffdMap->next)
 		for (slotMap = ffdMap->child; slotMap; slotMap = slotMap->next)
-			timelineCount += slotMap->size;
-	if (events) ++timelineCount;
-	if (drawOrder) ++timelineCount;
+			timelinesCount += slotMap->size;
+	if (events) ++timelinesCount;
+	if (drawOrder) ++timelinesCount;
 
-	animation = spAnimation_create(root->name, timelineCount);
-	animation->timelineCount = 0;
-	skeletonData->animations[skeletonData->animationCount] = animation;
-	++skeletonData->animationCount;
+	animation = spAnimation_create(root->name, timelinesCount);
+	animation->timelinesCount = 0;
+	skeletonData->animations[skeletonData->animationsCount++] = animation;
 
+	/* Slot timelines. */
 	for (slotMap = slots ? slots->child : 0; slotMap; slotMap = slotMap->next) {
 		Json *timelineArray;
 
@@ -150,7 +152,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 							toColor(s, 3));
 					readCurve(SUPER(timeline), i, frame);
 				}
-				animation->timelines[animation->timelineCount++] = SUPER_CAST(spTimeline, timeline);
+				animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
 				duration = timeline->frames[timelineArray->size * 5 - 5];
 				if (duration > animation->duration) animation->duration = duration;
 
@@ -162,7 +164,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 					spAttachmentTimeline_setFrame(timeline, i, Json_getFloat(frame, "time", 0),
 							name->type == Json_NULL ? 0 : name->valueString);
 				}
-				animation->timelines[animation->timelineCount++] = SUPER_CAST(spTimeline, timeline);
+				animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
 				duration = timeline->frames[timelineArray->size - 1];
 				if (duration > animation->duration) animation->duration = duration;
 
@@ -174,13 +176,14 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 		}
 	}
 
+	/* Bone timelines. */
 	for (boneMap = bones ? bones->child : 0; boneMap; boneMap = boneMap->next) {
 		Json *timelineArray;
 
 		int boneIndex = spSkeletonData_findBoneIndex(skeletonData, boneMap->name);
 		if (boneIndex == -1) {
 			spAnimation_dispose(animation);
-			_spSkeletonJson_setError(self, root, "spBone not found: ", boneMap->name);
+			_spSkeletonJson_setError(self, root, "Bone not found: ", boneMap->name);
 			return 0;
 		}
 
@@ -192,7 +195,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 					spRotateTimeline_setFrame(timeline, i, Json_getFloat(frame, "time", 0), Json_getFloat(frame, "angle", 0));
 					readCurve(SUPER(timeline), i, frame);
 				}
-				animation->timelines[animation->timelineCount++] = SUPER_CAST(spTimeline, timeline);
+				animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
 				duration = timeline->frames[timelineArray->size * 2 - 2];
 				if (duration > animation->duration) animation->duration = duration;
 
@@ -208,7 +211,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 								Json_getFloat(frame, "y", 0) * scale);
 						readCurve(SUPER(timeline), i, frame);
 					}
-					animation->timelines[animation->timelineCount++] = SUPER_CAST(spTimeline, timeline);
+					animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
 					duration = timeline->frames[timelineArray->size * 3 - 3];
 					if (duration > animation->duration) animation->duration = duration;
 				} else {
@@ -220,6 +223,27 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 		}
 	}
 
+	/* IK timelines. */
+	for (ikMap = ik ? ik->child : 0; ikMap; ikMap = ikMap->next) {
+		spIkConstraintData* ikConstraint = spSkeletonData_findIkConstraint(skeletonData, ikMap->name);
+		spIkConstraintTimeline* timeline = spIkConstraintTimeline_create(ikMap->size);
+		for (i = 0; i < skeletonData->ikConstraintsCount; ++i) {
+			if (ikConstraint == skeletonData->ikConstraints[i]) {
+				timeline->ikConstraintIndex = i;
+				break;
+			}
+		}
+		for (frame = ikMap->child, i = 0; frame; frame = frame->next, ++i) {
+			spIkConstraintTimeline_setFrame(timeline, i, Json_getFloat(frame, "time", 0), Json_getFloat(frame, "mix", 0),
+					Json_getInt(frame, "bendPositive", 1) ? 1 : -1);
+			readCurve(SUPER(timeline), i, frame);
+		}
+		animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
+		duration = timeline->frames[ikMap->size * 3 - 3];
+		if (duration > animation->duration) animation->duration = duration;
+	}
+
+	/* FFD timelines. */
 	for (ffdMap = ffd ? ffd->child : 0; ffdMap; ffdMap = ffdMap->next) {
 		spSkin* skin = spSkeletonData_findSkin(skeletonData, ffdMap->name);
 		for (slotMap = ffdMap->child; slotMap; slotMap = slotMap->next) {
@@ -281,26 +305,27 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 				}
 				FREE(tempVertices);
 
-				animation->timelines[animation->timelineCount++] = SUPER_CAST(spTimeline, timeline);
+				animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
 				duration = timeline->frames[timelineArray->size - 1];
 				if (duration > animation->duration) animation->duration = duration;
 			}
 		}
 	}
 
+	/* Draw order timeline. */
 	if (drawOrder) {
-		spDrawOrderTimeline* timeline = spDrawOrderTimeline_create(drawOrder->size, skeletonData->slotCount);
+		spDrawOrderTimeline* timeline = spDrawOrderTimeline_create(drawOrder->size, skeletonData->slotsCount);
 		for (frame = drawOrder->child, i = 0; frame; frame = frame->next, ++i) {
 			int ii;
 			int* drawOrder = 0;
 			Json* offsets = Json_getItem(frame, "offsets");
 			if (offsets) {
 				Json* offsetMap;
-				int* unchanged = MALLOC(int, skeletonData->slotCount - offsets->size);
+				int* unchanged = MALLOC(int, skeletonData->slotsCount - offsets->size);
 				int originalIndex = 0, unchangedIndex = 0;
 
-				drawOrder = MALLOC(int, skeletonData->slotCount);
-				for (ii = skeletonData->slotCount - 1; ii >= 0; --ii)
+				drawOrder = MALLOC(int, skeletonData->slotsCount);
+				for (ii = skeletonData->slotsCount - 1; ii >= 0; --ii)
 					drawOrder[ii] = -1;
 
 				for (offsetMap = offsets->child; offsetMap; offsetMap = offsetMap->next) {
@@ -315,24 +340,25 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 						unchanged[unchangedIndex++] = originalIndex++;
 					/* Set changed items. */
 					drawOrder[originalIndex + Json_getInt(offsetMap, "offset", 0)] = originalIndex;
-					++originalIndex;
+					originalIndex++;
 				}
 				/* Collect remaining unchanged items. */
-				while (originalIndex < skeletonData->slotCount)
+				while (originalIndex < skeletonData->slotsCount)
 					unchanged[unchangedIndex++] = originalIndex++;
 				/* Fill in unchanged items. */
-				for (ii = skeletonData->slotCount - 1; ii >= 0; ii--)
+				for (ii = skeletonData->slotsCount - 1; ii >= 0; ii--)
 					if (drawOrder[ii] == -1) drawOrder[ii] = unchanged[--unchangedIndex];
 				FREE(unchanged);
 			}
 			spDrawOrderTimeline_setFrame(timeline, i, Json_getFloat(frame, "time", 0), drawOrder);
 			FREE(drawOrder);
 		}
-		animation->timelines[animation->timelineCount++] = SUPER_CAST(spTimeline, timeline);
+		animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
 		duration = timeline->frames[drawOrder->size - 1];
 		if (duration > animation->duration) animation->duration = duration;
 	}
 
+	/* Event timeline. */
 	if (events) {
 		Json* frame;
 
@@ -353,7 +379,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 			if (stringValue) MALLOC_STR(event->stringValue, stringValue);
 			spEventTimeline_setFrame(timeline, i, Json_getFloat(frame, "time", 0), event);
 		}
-		animation->timelines[animation->timelineCount++] = SUPER_CAST(spTimeline, timeline);
+		animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
 		duration = timeline->frames[events->size - 1];
 		if (duration > animation->duration) animation->duration = duration;
 	}
@@ -375,9 +401,9 @@ spSkeletonData* spSkeletonJson_readSkeletonDataFile (spSkeletonJson* self, const
 }
 
 spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const char* json) {
-	int i;
+	int i, ii;
 	spSkeletonData* skeletonData;
-	Json *root, *bones, *boneMap, *slots, *skins, *animations, *events;
+	Json *root, *skeleton, *bones, *boneMap, *ik, *slots, *skins, *animations, *events;
 
 	FREE(self->error);
 	CONST_CAST(char*, self->error) = 0;
@@ -390,6 +416,15 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 
 	skeletonData = spSkeletonData_create();
 
+	skeleton = Json_getItem(root, "skeleton");
+	if (skeleton) {
+		skeletonData->hash = Json_getString(skeleton, "hash", 0);
+		skeletonData->version = Json_getString(skeleton, "spine", 0);
+		skeletonData->width = Json_getFloat(skeleton, "width", 0);
+		skeletonData->height = Json_getFloat(skeleton, "height", 0);
+	}
+
+	/* Bones. */
 	bones = Json_getItem(root, "bones");
 	skeletonData->bones = MALLOC(spBoneData*, bones->size);
 	for (boneMap = bones->child, i = 0; boneMap; boneMap = boneMap->next, ++i) {
@@ -417,12 +452,51 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 		boneData->inheritRotation = Json_getInt(boneMap, "inheritRotation", 1);
 
 		skeletonData->bones[i] = boneData;
-		++skeletonData->boneCount;
+		skeletonData->bonesCount++;
 	}
 
+	/* IK constraints. */
+	ik = Json_getItem(root, "ik");
+	if (ik) {
+		Json *ikMap;
+		skeletonData->ikConstraintsCount = ik->size;
+		skeletonData->ikConstraints = MALLOC(spIkConstraintData*, ik->size);
+		for (ikMap = ik->child, i = 0; ikMap; ikMap = ikMap->next, ++i) {
+			const char* targetName;
+
+			spIkConstraintData* ikConstraintData = spIkConstraintData_create(Json_getString(ikMap, "name", 0));
+			boneMap = Json_getItem(ikMap, "bones");
+			ikConstraintData->bonesCount = boneMap->size;
+			ikConstraintData->bones = MALLOC(spBoneData*, boneMap->size);
+			for (boneMap = boneMap->child, ii = 0; boneMap; boneMap = boneMap->next, ++ii) {
+				ikConstraintData->bones[ii] = spSkeletonData_findBone(skeletonData, boneMap->valueString);
+				if (!ikConstraintData->bones[ii]) {
+					spSkeletonData_dispose(skeletonData);
+					_spSkeletonJson_setError(self, root, "IK bone not found: ", boneMap->valueString);
+					return 0;
+				}
+			}
+
+			targetName = Json_getString(ikMap, "target", 0);
+			ikConstraintData->target = spSkeletonData_findBone(skeletonData, targetName);
+			if (!ikConstraintData->target) {
+				spSkeletonData_dispose(skeletonData);
+				_spSkeletonJson_setError(self, root, "Target bone not found: ", boneMap->name);
+				return 0;
+			}
+
+			ikConstraintData->bendDirection = Json_getInt(ikMap, "bendPositive", 1) ? 1 : -1;
+			ikConstraintData->mix = Json_getFloat(ikMap, "mix", 1);
+
+			skeletonData->ikConstraints[i] = ikConstraintData;
+		}
+	}
+
+	/* Slots. */
 	slots = Json_getItem(root, "slots");
 	if (slots) {
 		Json *slotMap;
+		skeletonData->slotsCount = slots->size;
 		skeletonData->slots = MALLOC(spSlotData*, slots->size);
 		for (slotMap = slots->child, i = 0; slotMap; slotMap = slotMap->next, ++i) {
 			spSlotData* slotData;
@@ -433,7 +507,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 			spBoneData* boneData = spSkeletonData_findBone(skeletonData, boneName);
 			if (!boneData) {
 				spSkeletonData_dispose(skeletonData);
-				_spSkeletonJson_setError(self, root, "spSlot bone not found: ", boneName);
+				_spSkeletonJson_setError(self, root, "Slot bone not found: ", boneName);
 				return 0;
 			}
 
@@ -453,20 +527,20 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 			slotData->additiveBlending = Json_getInt(slotMap, "additive", 0);
 
 			skeletonData->slots[i] = slotData;
-			++skeletonData->slotCount;
 		}
 	}
 
+	/* Skins. */
 	skins = Json_getItem(root, "skins");
 	if (skins) {
 		Json *slotMap;
+		skeletonData->skinsCount = skins->size;
 		skeletonData->skins = MALLOC(spSkin*, skins->size);
 		for (slotMap = skins->child, i = 0; slotMap; slotMap = slotMap->next, ++i) {
 			Json *attachmentsMap;
 			spSkin *skin = spSkin_create(slotMap->name);
 
 			skeletonData->skins[i] = skin;
-			++skeletonData->skinCount;
 			if (strcmp(slotMap->name, "default") == 0) skeletonData->defaultSkin = skin;
 
 			for (attachmentsMap = slotMap->child; attachmentsMap; attachmentsMap = attachmentsMap->next) {
@@ -597,18 +671,18 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 							vertices[i] = entry->valueFloat;
 
 						for (i = 0; i < verticesCount;) {
-							int boneCount = (int)vertices[i];
-							mesh->bonesCount += boneCount + 1;
-							mesh->weightsCount += boneCount * 3;
-							i += 1 + boneCount * 4;
+							int bonesCount = (int)vertices[i];
+							mesh->bonesCount += bonesCount + 1;
+							mesh->weightsCount += bonesCount * 3;
+							i += 1 + bonesCount * 4;
 						}
 						mesh->bones = MALLOC(int, mesh->bonesCount);
 						mesh->weights = MALLOC(float, mesh->weightsCount);
 
 						for (i = 0, b = 0, w = 0; i < verticesCount;) {
-							int boneCount = (int)vertices[i++];
-							mesh->bones[b++] = boneCount;
-							for (nn = i + boneCount * 4; i < nn; i += 4, ++b, w += 3) {
+							int bonesCount = (int)vertices[i++];
+							mesh->bones[b++] = bonesCount;
+							for (nn = i + bonesCount * 4; i < nn; i += 4, ++b, w += 3) {
 								mesh->bones[b] = (int)vertices[i];
 								mesh->weights[w] = vertices[i + 1] * self->scale;
 								mesh->weights[w + 1] = vertices[i + 2] * self->scale;
@@ -670,14 +744,15 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 	if (events) {
 		Json *eventMap;
 		const char* stringValue;
+		skeletonData->eventsCount = events->size;
 		skeletonData->events = MALLOC(spEventData*, events->size);
-		for (eventMap = events->child; eventMap; eventMap = eventMap->next) {
+		for (eventMap = events->child, i = 0; eventMap; eventMap = eventMap->next, ++i) {
 			spEventData* eventData = spEventData_create(eventMap->name);
 			eventData->intValue = Json_getInt(eventMap, "int", 0);
 			eventData->floatValue = Json_getFloat(eventMap, "float", 0);
 			stringValue = Json_getString(eventMap, "string", 0);
 			if (stringValue) MALLOC_STR(eventData->stringValue, stringValue);
-			skeletonData->events[skeletonData->eventCount++] = eventData;
+			skeletonData->events[i] = eventData;
 		}
 	}
 

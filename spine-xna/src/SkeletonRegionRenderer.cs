@@ -83,7 +83,6 @@ namespace Spine {
 
 		public void Draw (Skeleton skeleton) {
 			List<Slot> drawOrder = skeleton.DrawOrder;
-			float x = skeleton.X, y = skeleton.Y;
 			float skeletonR = skeleton.R, skeletonG = skeleton.G, skeletonB = skeleton.B, skeletonA = skeleton.A;
 			for (int i = 0, n = drawOrder.Count; i < n; i++) {
 				Slot slot = drawOrder[i];
@@ -112,7 +111,7 @@ namespace Spine {
 					item.vertexTR.Color = color;
 
 					float[] vertices = this.vertices;
-					regionAttachment.ComputeWorldVertices(x, y, slot.Bone, vertices);
+					regionAttachment.ComputeWorldVertices(slot.Bone, vertices);
 					item.vertexTL.Position.X = vertices[RegionAttachment.X1];
 					item.vertexTL.Position.Y = vertices[RegionAttachment.Y1];
 					item.vertexTL.Position.Z = 0;

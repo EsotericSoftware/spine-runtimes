@@ -38,29 +38,38 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Bone {
 	final BoneData data;
+	final Skeleton skeleton;
 	final Bone parent;
 	float x, y;
 	float rotation, rotationIK;
 	float scaleX, scaleY;
-	boolean flipX, flipY;
 
 	float m00, m01, worldX; // a b x
 	float m10, m11, worldY; // c d y
 	float worldRotation;
 	float worldScaleX, worldScaleY;
 
-	/** @param parent May be null. */
-	public Bone (BoneData data, Bone parent) {
-		if (data == null) throw new IllegalArgumentException("data cannot be null.");
+	Bone (BoneData data) {
 		this.data = data;
+		parent = null;
+		skeleton = null;
+	}
+
+	/** @param parent May be null. */
+	public Bone (BoneData data, Skeleton skeleton, Bone parent) {
+		if (data == null) throw new IllegalArgumentException("data cannot be null.");
+		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
+		this.data = data;
+		this.skeleton = skeleton;
 		this.parent = parent;
 		setToSetupPose();
 	}
 
 	/** Copy constructor.
 	 * @param parent May be null. */
-	public Bone (Bone bone, Bone parent) {
+	public Bone (Bone bone, Skeleton skeleton, Bone parent) {
 		if (bone == null) throw new IllegalArgumentException("bone cannot be null.");
+		this.skeleton = skeleton;
 		this.parent = parent;
 		data = bone.data;
 		x = bone.x;
@@ -69,12 +78,11 @@ public class Bone {
 		rotationIK = bone.rotationIK;
 		scaleX = bone.scaleX;
 		scaleY = bone.scaleY;
-		flipX = bone.flipX;
-		flipY = bone.flipY;
 	}
 
 	/** Computes the world SRT using the parent bone and the local SRT. */
 	public void updateWorldTransform () {
+		Skeleton skeleton = this.skeleton;
 		Bone parent = this.parent;
 		float x = this.x, y = this.y;
 		if (parent != null) {
@@ -89,22 +97,22 @@ public class Bone {
 			}
 			worldRotation = data.inheritRotation ? parent.worldRotation + rotationIK : rotationIK;
 		} else {
-			worldX = flipX ? -x : x;
-			worldY = flipY ? -y : y;
+			worldX = skeleton.flipX ? -x : x;
+			worldY = skeleton.flipY ? -y : y;
 			worldScaleX = scaleX;
 			worldScaleY = scaleY;
 			worldRotation = rotationIK;
 		}
 		float cos = MathUtils.cosDeg(worldRotation);
 		float sin = MathUtils.sinDeg(worldRotation);
-		if (flipX) {
+		if (skeleton.flipX) {
 			m00 = -cos * worldScaleX;
 			m01 = sin * worldScaleY;
 		} else {
 			m00 = cos * worldScaleX;
 			m01 = -sin * worldScaleY;
 		}
-		if (flipY) {
+		if (skeleton.flipY) {
 			m10 = -sin * worldScaleX;
 			m11 = -cos * worldScaleY;
 		} else {
@@ -125,6 +133,10 @@ public class Bone {
 
 	public BoneData getData () {
 		return data;
+	}
+
+	public Skeleton getSkeleton () {
+		return skeleton;
 	}
 
 	public Bone getParent () {
@@ -250,7 +262,8 @@ public class Bone {
 	public Vector2 worldToLocal (Vector2 world) {
 		float x = world.x - worldX, y = world.y - worldY;
 		float m00 = this.m00, m10 = this.m10, m01 = this.m01, m11 = this.m11;
-		if (flipX != flipY) {
+		Skeleton skeleton = this.skeleton;
+		if (skeleton.flipX != skeleton.flipY) {
 			m00 *= -1;
 			m11 *= -1;
 		}

@@ -52,7 +52,6 @@ public class SkeletonBounds {
 		Array<FloatArray> polygons = this.polygons;
 		Array<Slot> slots = skeleton.slots;
 		int slotCount = slots.size;
-		float x = skeleton.getX(), y = skeleton.getY();
 
 		boundingBoxes.clear();
 		polygonPool.freeAll(polygons);
@@ -71,7 +70,7 @@ public class SkeletonBounds {
 				polygon.ensureCapacity(vertexCount);
 				polygon.size = vertexCount;
 
-				boundingBox.computeWorldVertices(x, y, slot.bone, polygon.items);
+				boundingBox.computeWorldVertices(slot.bone, polygon.items);
 			}
 		}
 
