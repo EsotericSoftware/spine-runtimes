@@ -42,7 +42,6 @@ namespace Spine {
 		internal float x, y, rotation, rotationIK, scaleX, scaleY;
 		internal float m00, m01, m10, m11;
 		internal float worldX, worldY, worldRotation, worldScaleX, worldScaleY;
-		internal bool flipX, flipY;
 
 		public BoneData Data { get { return data; } }
 		public Skeleton Skeleton { get { return skeleton; } }
