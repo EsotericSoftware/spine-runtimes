@@ -29,44 +29,10 @@
  *****************************************************************************/
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Spine {
-	public class Bone : IEnumerable {
-		private sealed class Enumerator : IEnumerator{
-			private int currentIndex = -1;
-			private Bone outer;
-
-			internal Enumerator(Bone outer){
-				this.outer = outer;
-			}
-
-			public bool MoveNext(){
-				int childCount = this.outer.children.Count;
-				return (++this.currentIndex < childCount);
-			}
-
-			public void Reset(){
-				this.currentIndex = -1;
-			}
-
-			public object Current{
-				get{
-					return this.outer.children[this.currentIndex];
-				}
-			}
-		}
-		public IEnumerator GetEnumerator ()
-		{
-			return new Enumerator(this);
-		}
-
-		public Bone this[int i]{
-			get{
-				return children[i];
-			}
-		}
+	public class Bone{
 		static public bool yDown;
 
 		internal BoneData data;
@@ -76,10 +42,12 @@ namespace Spine {
 		internal float x, y, rotation, rotationIK, scaleX, scaleY;
 		internal float m00, m01, m10, m11;
 		internal float worldX, worldY, worldRotation, worldScaleX, worldScaleY;
+		internal bool flipX, flipY;
 
 		public BoneData Data { get { return data; } }
 		public Skeleton Skeleton { get { return skeleton; } }
 		public Bone Parent { get { return parent; } }
+		public List<Bone> Children { get { return children; } }
 		public float X { get { return x; } set { x = value; } }
 		public float Y { get { return y; } set { y = value; } }
 		/// <summary>The forward kinetics rotation.</summary>
