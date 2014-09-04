@@ -120,23 +120,25 @@ namespace Spine {
 			}
 
 			// IK constraints.
-			foreach (Dictionary<String, Object> ikMap in (List<Object>)root["ik"]) {
-				IkConstraintData ikConstraintData = new IkConstraintData((String)ikMap["name"]);
+			if(root.ContainsKey("ik")){
+				foreach (Dictionary<String, Object> ikMap in (List<Object>)root["ik"]) {
+					IkConstraintData ikConstraintData = new IkConstraintData((String)ikMap["name"]);
 
-				foreach (String boneName in (List<Object>)ikMap["bones"]) {
-					BoneData bone = skeletonData.FindBone(boneName);
-					if (bone == null) throw new Exception("IK bone not found: " + boneName);
-					ikConstraintData.bones.Add(bone);
+					foreach (String boneName in (List<Object>)ikMap["bones"]) {
+						BoneData bone = skeletonData.FindBone(boneName);
+						if (bone == null) throw new Exception("IK bone not found: " + boneName);
+						ikConstraintData.bones.Add(bone);
+					}
+
+					String targetName = (String)ikMap["target"];
+					ikConstraintData.target = skeletonData.FindBone(targetName);
+					if (ikConstraintData.target == null) throw new Exception("Target bone not found: " + targetName);
+
+					ikConstraintData.bendDirection = GetBoolean(ikMap, "bendPositive", true) ? 1 : -1;
+					ikConstraintData.mix = GetFloat(ikMap, "mix", 1);
+
+					skeletonData.ikConstraints.Add(ikConstraintData);
 				}
-
-				String targetName = (String)ikMap["target"];
-				ikConstraintData.target = skeletonData.FindBone(targetName);
-				if (ikConstraintData.target == null) throw new Exception("Target bone not found: " + targetName);
-
-				ikConstraintData.bendDirection = GetBoolean(ikMap, "bendPositive", true) ? 1 : -1;
-				ikConstraintData.mix = GetFloat(ikMap, "mix", 1);
-
-				skeletonData.ikConstraints.Add(ikConstraintData);
 			}
 
 			// Slots.
