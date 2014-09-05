@@ -30,17 +30,15 @@
 
 #include <spine/Slot.h>
 #include <spine/extension.h>
-#include <spine/Skeleton.h>
 
 typedef struct {
 	spSlot super;
 	float attachmentTime;
 } _spSlot;
 
-spSlot* spSlot_create (spSlotData* data, spSkeleton* skeleton, spBone* bone) {
+spSlot* spSlot_create (spSlotData* data, spBone* bone) {
 	spSlot* self = SUPER(NEW(_spSlot));
 	CONST_CAST(spSlotData*, self->data) = data;
-	CONST_CAST(spSkeleton*, self->skeleton) = skeleton;
 	CONST_CAST(spBone*, self->bone) = bone;
 	spSlot_setToSetupPose(self);
 	return self;
@@ -53,15 +51,15 @@ void spSlot_dispose (spSlot* self) {
 
 void spSlot_setAttachment (spSlot* self, spAttachment* attachment) {
 	CONST_CAST(spAttachment*, self->attachment) = attachment;
-	SUB_CAST(_spSlot, self) ->attachmentTime = self->skeleton->time;
+	SUB_CAST(_spSlot, self) ->attachmentTime = self->bone->skeleton->time;
 }
 
 void spSlot_setAttachmentTime (spSlot* self, float time) {
-	SUB_CAST(_spSlot, self) ->attachmentTime = self->skeleton->time - time;
+	SUB_CAST(_spSlot, self) ->attachmentTime = self->bone->skeleton->time - time;
 }
 
 float spSlot_getAttachmentTime (const spSlot* self) {
-	return self->skeleton->time - SUB_CAST(_spSlot, self) ->attachmentTime;
+	return self->bone->skeleton->time - SUB_CAST(_spSlot, self) ->attachmentTime;
 }
 
 void spSlot_setToSetupPose (spSlot* self) {
@@ -74,9 +72,9 @@ void spSlot_setToSetupPose (spSlot* self) {
 	if (self->data->attachmentName) {
 		/* Find slot index. */
 		int i;
-		for (i = 0; i < self->skeleton->data->slotCount; ++i) {
-			if (self->data == self->skeleton->data->slots[i]) {
-				attachment = spSkeleton_getAttachmentForSlotIndex(self->skeleton, i, self->data->attachmentName);
+		for (i = 0; i < self->bone->skeleton->data->slotsCount; ++i) {
+			if (self->data == self->bone->skeleton->data->slots[i]) {
+				attachment = spSkeleton_getAttachmentForSlotIndex(self->bone->skeleton, i, self->data->attachmentName);
 				break;
 			}
 		}

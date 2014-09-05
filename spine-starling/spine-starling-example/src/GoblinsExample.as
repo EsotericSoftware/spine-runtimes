@@ -1,14 +1,13 @@
 package {
 
-import spine.Event;
 import spine.SkeletonData;
 import spine.SkeletonJson;
-import spine.animation.AnimationStateData;
 import spine.atlas.Atlas;
 import spine.attachments.AtlasAttachmentLoader;
-import spine.starling.StarlingTextureLoader;
+import spine.attachments.AttachmentLoader;
 import spine.starling.SkeletonAnimation;
 import spine.starling.StarlingAtlasAttachmentLoader;
+import spine.starling.StarlingTextureLoader;
 
 import starling.core.Starling;
 import starling.display.Sprite;
@@ -19,23 +18,39 @@ import starling.textures.Texture;
 import starling.textures.TextureAtlas;
 
 public class GoblinsExample extends Sprite {
-	[Embed(source = "goblins.atlas", mimeType = "application/octet-stream")]
-	static public const SpineboyAtlasFile:Class;
-
-	[Embed(source = "goblins.png")]
-	static public const SpineboyAtlasTexture:Class;
-
-	[Embed(source = "goblins.json", mimeType = "application/octet-stream")]
-	static public const SpineboyJson:Class;
+	[Embed(source = "goblins-ffd.json", mimeType = "application/octet-stream")]
+	static public const GoblinsJson:Class;
+	
+	[Embed(source = "goblins-ffd.atlas", mimeType = "application/octet-stream")]
+	static public const GoblinsAtlas:Class;
+	
+	[Embed(source = "goblins-ffd.png")]
+	static public const GoblinsAtlasTexture:Class;
+	
+	[Embed(source = "goblins-ffd-starling.xml", mimeType = "application/octet-stream")]
+	static public const GoblinsStarlingAtlas:Class;
+	
+	[Embed(source = "goblins-ffd-starling.png")]
+	static public const GoblinsStarlingAtlasTexture:Class;
 
 	private var skeleton:SkeletonAnimation;
 
 	public function GoblinsExample () {
-		var atlas:Atlas = new Atlas(new SpineboyAtlasFile(), new StarlingTextureLoader(new SpineboyAtlasTexture()));
-		var json:SkeletonJson = new SkeletonJson(new AtlasAttachmentLoader(atlas));
-		var skeletonData:SkeletonData = json.readSkeletonData(new SpineboyJson());
+		var attachmentLoader:AttachmentLoader;
+		if (Main.useStarlingAtlas) {
+			var texture:Texture = Texture.fromBitmap(new GoblinsStarlingAtlasTexture());
+			var xml:XML = XML(new GoblinsStarlingAtlas());
+			var starlingAtlas:TextureAtlas = new TextureAtlas(texture, xml);
+			attachmentLoader = new StarlingAtlasAttachmentLoader(starlingAtlas);
+		} else {
+			var spineAtlas:Atlas = new Atlas(new GoblinsAtlas(), new StarlingTextureLoader(new GoblinsAtlasTexture()));
+			attachmentLoader = new AtlasAttachmentLoader(spineAtlas);
+		}
 
-		skeleton = new SkeletonAnimation(skeletonData);
+		var json:SkeletonJson = new SkeletonJson(attachmentLoader);
+		var skeletonData:SkeletonData = json.readSkeletonData(new GoblinsJson());
+
+		skeleton = new SkeletonAnimation(skeletonData, true);
 		skeleton.x = 320;
 		skeleton.y = 420;
 		skeleton.skeleton.skinName = "goblin";

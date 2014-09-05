@@ -40,22 +40,11 @@ public class SkeletonData {
 	Skin defaultSkin;
 	final Array<EventData> events = new Array();
 	final Array<Animation> animations = new Array();
-
-	public void clear () {
-		bones.clear();
-		slots.clear();
-		skins.clear();
-		defaultSkin = null;
-		events.clear();
-		animations.clear();
-	}
+	final Array<IkConstraintData> ikConstraints = new Array();
+	float width, height;
+	String version, hash;
 
 	// --- Bones.
-
-	public void addBone (BoneData bone) {
-		if (bone == null) throw new IllegalArgumentException("bone cannot be null.");
-		bones.add(bone);
-	}
 
 	public Array<BoneData> getBones () {
 		return bones;
@@ -82,11 +71,6 @@ public class SkeletonData {
 	}
 
 	// --- Slots.
-
-	public void addSlot (SlotData slot) {
-		if (slot == null) throw new IllegalArgumentException("slot cannot be null.");
-		slots.add(slot);
-	}
 
 	public Array<SlotData> getSlots () {
 		return slots;
@@ -124,11 +108,6 @@ public class SkeletonData {
 		this.defaultSkin = defaultSkin;
 	}
 
-	public void addSkin (Skin skin) {
-		if (skin == null) throw new IllegalArgumentException("skin cannot be null.");
-		skins.add(skin);
-	}
-
 	/** @return May be null. */
 	public Skin findSkin (String skinName) {
 		if (skinName == null) throw new IllegalArgumentException("skinName cannot be null.");
@@ -144,11 +123,6 @@ public class SkeletonData {
 
 	// --- Events.
 
-	public void addEvent (EventData eventData) {
-		if (eventData == null) throw new IllegalArgumentException("eventData cannot be null.");
-		events.add(eventData);
-	}
-
 	/** @return May be null. */
 	public EventData findEvent (String eventDataName) {
 		if (eventDataName == null) throw new IllegalArgumentException("eventDataName cannot be null.");
@@ -162,11 +136,6 @@ public class SkeletonData {
 	}
 
 	// --- Animations.
-
-	public void addAnimation (Animation animation) {
-		if (animation == null) throw new IllegalArgumentException("animation cannot be null.");
-		animations.add(animation);
-	}
 
 	public Array<Animation> getAnimations () {
 		return animations;
@@ -183,6 +152,23 @@ public class SkeletonData {
 		return null;
 	}
 
+	// --- IK
+
+	public Array<IkConstraintData> getIkConstraints () {
+		return ikConstraints;
+	}
+
+	/** @return May be null. */
+	public IkConstraintData findIkConstraint (String ikConstraintName) {
+		if (ikConstraintName == null) throw new IllegalArgumentException("ikConstraintName cannot be null.");
+		Array<IkConstraintData> ikConstraints = this.ikConstraints;
+		for (int i = 0, n = ikConstraints.size; i < n; i++) {
+			IkConstraintData ikConstraint = ikConstraints.get(i);
+			if (ikConstraint.name.equals(ikConstraintName)) return ikConstraint;
+		}
+		return null;
+	}
+
 	// ---
 
 	/** @return May be null. */
@@ -193,6 +179,39 @@ public class SkeletonData {
 	/** @param name May be null. */
 	public void setName (String name) {
 		this.name = name;
+	}
+
+	public float getWidth () {
+		return width;
+	}
+
+	public void setWidth (float width) {
+		this.width = width;
+	}
+
+	public float getHeight () {
+		return height;
+	}
+
+	public void setHeight (float height) {
+		this.height = height;
+	}
+
+	/** Returns the Spine version used to export this data. */
+	public String getVersion () {
+		return version;
+	}
+
+	public void setVersion (String version) {
+		this.version = version;
+	}
+
+	public String getHash () {
+		return hash;
+	}
+
+	public void setHash (String hash) {
+		this.hash = hash;
 	}
 
 	public String toString () {

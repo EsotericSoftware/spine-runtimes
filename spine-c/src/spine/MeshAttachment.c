@@ -71,12 +71,11 @@ void spMeshAttachment_updateUVs (spMeshAttachment* self) {
 	}
 }
 
-void spMeshAttachment_computeWorldVertices (spMeshAttachment* self, float x, float y, spSlot* slot, float* worldVertices) {
+void spMeshAttachment_computeWorldVertices (spMeshAttachment* self, spSlot* slot, float* worldVertices) {
 	int i;
 	float* vertices = self->vertices;
 	const spBone* bone = slot->bone;
-	x += bone->worldX;
-	y += bone->worldY;
+	float x = bone->skeleton->x + bone->worldX, y = bone->skeleton->y + bone->worldY;
 	if (slot->attachmentVerticesCount == self->verticesCount) vertices = slot->attachmentVertices;
 	for (i = 0; i < self->verticesCount; i += 2) {
 		const float vx = vertices[i], vy = vertices[i + 1];

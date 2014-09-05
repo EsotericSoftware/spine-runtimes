@@ -31,6 +31,7 @@
 package com.esotericsoftware.spine.attachments;
 
 import com.esotericsoftware.spine.Bone;
+import com.esotericsoftware.spine.Skeleton;
 
 public class BoundingBoxAttachment extends Attachment {
 	private float[] vertices;
@@ -39,9 +40,9 @@ public class BoundingBoxAttachment extends Attachment {
 		super(name);
 	}
 
-	public void computeWorldVertices (float x, float y, Bone bone, float[] worldVertices) {
-		x += bone.getWorldX();
-		y += bone.getWorldY();
+	public void computeWorldVertices (Bone bone, float[] worldVertices) {
+		Skeleton skeleton = bone.getSkeleton();
+		float x = skeleton.getX() + bone.getWorldX(), y = skeleton.getY() + bone.getWorldY();
 		float m00 = bone.getM00();
 		float m01 = bone.getM01();
 		float m10 = bone.getM10();

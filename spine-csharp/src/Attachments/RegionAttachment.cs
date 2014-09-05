@@ -134,9 +134,8 @@ namespace Spine {
 			offset[Y4] = localYCos + localX2Sin;
 		}
 
-		public void ComputeWorldVertices (float x, float y, Bone bone, float[] worldVertices) {
-			x += bone.worldX;
-			y += bone.worldY;
+		public void ComputeWorldVertices (Bone bone, float[] worldVertices) {
+			float x = bone.skeleton.x + bone.worldX, y = bone.skeleton.y + bone.worldY;
 			float m00 = bone.m00, m01 = bone.m01, m10 = bone.m10, m11 = bone.m11;
 			float[] offset = this.offset;
 			worldVertices[X1] = offset[X1] * m00 + offset[Y1] * m01 + x;

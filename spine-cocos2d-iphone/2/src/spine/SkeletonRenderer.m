@@ -92,7 +92,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	if (!self) return nil;
 
 	spSkeletonJson* json = spSkeletonJson_create(atlas);
-	json->scale = scale / CC_CONTENT_SCALE_FACTOR();
+	json->scale = scale;
 	spSkeletonData* skeletonData = spSkeletonJson_readSkeletonDataFile(json, [skeletonDataFile UTF8String]);
 	NSAssert(skeletonData, ([NSString stringWithFormat:@"Error reading skeleton data file: %@\nError: %s", skeletonDataFile, json->error]));
 	spSkeletonJson_dispose(json);
@@ -112,7 +112,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	if (!_atlas) return 0;
 
 	spSkeletonJson* json = spSkeletonJson_create(_atlas);
-	json->scale = scale / CC_CONTENT_SCALE_FACTOR();
+	json->scale = scale;
 	spSkeletonData* skeletonData = spSkeletonJson_readSkeletonDataFile(json, [skeletonDataFile UTF8String]);
 	NSAssert(skeletonData, ([NSString stringWithFormat:@"Error reading skeleton data file: %@\nError: %s", skeletonDataFile, json->error]));
 	spSkeletonJson_dispose(json);
@@ -134,6 +134,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 
 - (void) draw {
 	CC_NODE_DRAW_SETUP();
+	ccGLBindVAO(0);
 
 	ccColor3B nodeColor = self.color;
 	_skeleton->r = nodeColor.r / (float)255;
@@ -148,14 +149,14 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	const int* triangles = 0;
 	int trianglesCount = 0;
 	float r = 0, g = 0, b = 0, a = 0;
-	for (int i = 0, n = _skeleton->slotCount; i < n; i++) {
+	for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
 		spSlot* slot = _skeleton->drawOrder[i];
 		if (!slot->attachment) continue;
 		CCTexture2D *texture = 0;
 		switch (slot->attachment->type) {
 		case SP_ATTACHMENT_REGION: {
 			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-			spRegionAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot->bone, worldVertices);
+			spRegionAttachment_computeWorldVertices(attachment, slot->bone, worldVertices);
 			texture = [self getTextureForRegion:attachment];
 			uvs = attachment->uvs;
 			verticesCount = 8;
@@ -169,7 +170,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 		}
 		case SP_ATTACHMENT_MESH: {
 			spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
-			spMeshAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot, worldVertices);
+			spMeshAttachment_computeWorldVertices(attachment, slot, worldVertices);
 			texture = [self getTextureForMesh:attachment];
 			uvs = attachment->uvs;
 			verticesCount = attachment->verticesCount;
@@ -183,7 +184,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 		}
 		case SP_ATTACHMENT_SKINNED_MESH: {
 			spSkinnedMeshAttachment* attachment = (spSkinnedMeshAttachment*)slot->attachment;
-			spSkinnedMeshAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot, worldVertices);
+			spSkinnedMeshAttachment_computeWorldVertices(attachment, slot, worldVertices);
 			texture = [self getTextureForSkinnedMesh:attachment];
 			uvs = attachment->uvs;
 			verticesCount = attachment->uvsCount;
@@ -219,11 +220,11 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 		ccDrawColor4B(0, 0, 255, 255);
 		glLineWidth(1);
 		CGPoint points[4];
-		for (int i = 0, n = _skeleton->slotCount; i < n; i++) {
+		for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
 			spSlot* slot = _skeleton->drawOrder[i];
 			if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION) continue;
 			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-			spRegionAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot->bone, worldVertices);
+			spRegionAttachment_computeWorldVertices(attachment, slot->bone, worldVertices);
 			points[0] = ccp(worldVertices[0], worldVertices[1]);
 			points[1] = ccp(worldVertices[2], worldVertices[3]);
 			points[2] = ccp(worldVertices[4], worldVertices[5]);
@@ -235,7 +236,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 		// Bone lengths.
 		glLineWidth(2);
 		ccDrawColor4B(255, 0, 0, 255);
-		for (int i = 0, n = _skeleton->boneCount; i < n; i++) {
+		for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
 			spBone *bone = _skeleton->bones[i];
 			float x = bone->data->length * bone->m00 + bone->worldX;
 			float y = bone->data->length * bone->m10 + bone->worldY;
@@ -244,7 +245,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 		// Bone origins.
 		ccPointSize(4);
 		ccDrawColor4B(0, 0, 255, 255); // Root bone is blue.
-		for (int i = 0, n = _skeleton->boneCount; i < n; i++) {
+		for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
 			spBone *bone = _skeleton->bones[i];
 			ccDrawPoint(ccp(bone->worldX, bone->worldY));
 			if (i == 0) ccDrawColor4B(0, 255, 0, 255);
@@ -267,21 +268,21 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 - (CGRect) boundingBox {
 	float minX = FLT_MAX, minY = FLT_MAX, maxX = FLT_MIN, maxY = FLT_MIN;
 	float scaleX = self.scaleX, scaleY = self.scaleY;
-	for (int i = 0; i < _skeleton->slotCount; ++i) {
+	for (int i = 0; i < _skeleton->slotsCount; ++i) {
 		spSlot* slot = _skeleton->slots[i];
 		if (!slot->attachment) continue;
 		int verticesCount;
 		if (slot->attachment->type == SP_ATTACHMENT_REGION) {
 			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-			spRegionAttachment_computeWorldVertices(attachment, slot->skeleton->x, slot->skeleton->y, slot->bone, worldVertices);
+			spRegionAttachment_computeWorldVertices(attachment, slot->bone, worldVertices);
 			verticesCount = 8;
 		} else if (slot->attachment->type == SP_ATTACHMENT_MESH) {
 			spMeshAttachment* mesh = (spMeshAttachment*)slot->attachment;
-			spMeshAttachment_computeWorldVertices(mesh, slot->skeleton->x, slot->skeleton->y, slot, worldVertices);
+			spMeshAttachment_computeWorldVertices(mesh, slot, worldVertices);
 			verticesCount = mesh->verticesCount;
 		} else if (slot->attachment->type == SP_ATTACHMENT_SKINNED_MESH) {
 			spSkinnedMeshAttachment* mesh = (spSkinnedMeshAttachment*)slot->attachment;
-			spSkinnedMeshAttachment_computeWorldVertices(mesh, slot->skeleton->x, slot->skeleton->y, slot, worldVertices);
+			spSkinnedMeshAttachment_computeWorldVertices(mesh, slot, worldVertices);
 			verticesCount = mesh->uvsCount;
 		} else
 			continue;

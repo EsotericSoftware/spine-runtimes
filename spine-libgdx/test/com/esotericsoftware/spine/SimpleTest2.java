@@ -98,6 +98,8 @@ public class SimpleTest2 extends ApplicationAdapter {
 				System.out.println(trackIndex + " end: " + state.getCurrent(trackIndex));
 			}
 		});
+		
+		// Set animation on track 0.
 		state.setAnimation(0, "run", true);
 
 		Gdx.input.setInputProcessor(new InputAdapter() {
@@ -140,7 +142,7 @@ public class SimpleTest2 extends ApplicationAdapter {
 		// Configure the camera, SpriteBatch, and SkeletonRendererDebug.
 		camera.update();
 		batch.getProjectionMatrix().set(camera.combined);
-		debugRenderer.getShapeRenderer().getProjectionMatrix().set(camera.combined);
+		debugRenderer.getShapeRenderer().setProjectionMatrix(camera.combined);
 
 		batch.begin();
 		renderer.draw(batch, skeleton); // Draw the skeleton images.

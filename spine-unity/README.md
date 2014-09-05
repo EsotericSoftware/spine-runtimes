@@ -6,22 +6,40 @@ A Spine skeleton is a GameObject and can be used throughout Unity like any other
 
 ## Setup
 
+To use spine-unity in your own Unity project first:
+
+1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
+1. Copy the contents of `spine-csharp/src` to `Assets/spine-csharp` in your Unity project directory.
+1. Copy the `spine-unity/Assets/spine-unity` to `Assets/spine-unity` in your Unity project directory.
+
+Next, there are a few options for importing Spine skeletons into your Unity project:
+
+### Drag and drop import
+
+1. Drag and drop a folder containing the JSON, atlas and PNG files exported from Spine directly into Unity.
+1. Drag the prefab that was created into your scene.
+
+The [drag and drop video](http://www.youtube.com/watch?v=-Gk_zJsY1Ms) shows how this works.
+
+### Automated import
+
+1. Place the JSON, atlas and PNG files exported from Spine into your Unity project directory.
+1. Right click the JSON file and click `Spine`, `Ingest` to create the Unity assets.
+1. Right click the SkeletonData asset that was created and click `Spine`, `Spawn`.
+
+The [readme PDF](https://raw.githubusercontent.com/EsotericSoftware/spine-runtimes/master/spine-unity/README.pdf) illustrates these steps.
+
+### Manual import
+
+1. Follow the [setup video](https://www.youtube.com/watch?v=-V84OIvZdQc) to manually set up the assets for a skeleton in Unity. This video may prove useful to understand how the pieces fit together but the other import methods are much easier.
+
+## Examples
+
 To run the examples:
 
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
 1. Copy the contents of `spine-csharp/src` to `spine-unity/Assets/spine-csharp`.
 1. Open an example scene file from `spine-unity/Assets/examples/` using Unity 4.3.4+.
-
-To use spine-unity in your own Unity project:
-
-1. Copy the contents of `spine-csharp/src` to `Assets/spine-csharp` in your project.
-1. Copy the `spine-unity/Assets/spine-unity` to `Assets/spine-unity` in your project.
-
-### Setup video
-
-[![](http://i.imgur.com/cPxKK3S.png)](https://www.youtube.com/watch?v=-V84OIvZdQc)
-
-## Examples
 
 * **spineboy** This shows the spineboy skeleton. First an animation is played that shows the draw order changing and events firing, then spineboy jumps and walks. Click spineboy to jump again. Notice the walk and jump animations are mixed and transition smoothly. The white cube on spineboy's right hand is a separate GameObject that is positioned using a `BoneComponent`. This example uses images that are split across two atlas pages. This demonstrates a multi-page atlas, but of course has a high number of draw calls.
 * **goblins*** This shows a male and female goblin that use the same skeleton and animations. Click to change the skin from male to female and back. It has a single atlas page, so is drawn with just 1 draw call. It uses the `Skeleton Lit` shader for vertex lighting. The [Goblins.cs](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-unity/Assets/examples/goblins/Goblins.cs) script manipulates the head bone after the animation is applied.

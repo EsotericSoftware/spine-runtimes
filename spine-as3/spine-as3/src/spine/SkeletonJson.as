@@ -69,18 +69,18 @@ public class SkeletonJson {
 		if (object == null)
 			throw new ArgumentError("object cannot be null.");
 
-		var json:String;
+		var root:Object;
 		if (object is String)
-			json = String(object);
+			root = JSON.parse(String(object));
 		else if (object is ByteArray)
-			json = object.readUTFBytes(object.length);
+			root = JSON.parse(object.readUTFBytes(object.length));
+		else if (object is Object)
+			root = object;
 		else
-			throw new ArgumentError("object must be a String or ByteArray.");
+			throw new ArgumentError("object must be a String, ByteArray or Object.");
 
 		var skeletonData:SkeletonData = new SkeletonData();
 		skeletonData.name = name;
-
-		var root:Object = JSON.parse(json);
 
 		// Bones.
 		var boneData:BoneData;
@@ -99,8 +99,8 @@ public class SkeletonJson {
 			boneData.rotation = (boneMap["rotation"] || 0);
 			boneData.scaleX = boneMap.hasOwnProperty("scaleX") ? boneMap["scaleX"] : 1;
 			boneData.scaleY = boneMap.hasOwnProperty("scaleY") ? boneMap["scaleY"] : 1;
-			boneData.inheritScale = !boneMap["inheritScale"] || boneMap["inheritScale"] == "true";
-			boneData.inheritRotation = !boneMap["inheritRotation"] || boneMap["inheritRotation"] == "true";
+			boneData.inheritScale = boneMap.hasOwnProperty("inheritScale") ? boneMap["inheritScale"] : true;
+			boneData.inheritRotation = boneMap.hasOwnProperty("inheritRotation") ? boneMap["inheritRotation"] : true;
 			skeletonData.addBone(boneData);
 		}
 
@@ -203,7 +203,7 @@ public class SkeletonJson {
 			if (!mesh) return null;
 			mesh.path = path; 
 			mesh.vertices = getFloatArray(map, "vertices", scale);
-			mesh.triangles = getIntArray(map, "triangles");
+			mesh.triangles = getUintArray(map, "triangles");
 			mesh.regionUVs = getFloatArray(map, "uvs", 1);
 			mesh.updateUVs();
 
@@ -242,7 +242,7 @@ public class SkeletonJson {
 			}
 			skinnedMesh.bones = bones;
 			skinnedMesh.weights = weights;
-			skinnedMesh.triangles = getIntArray(map, "triangles");
+			skinnedMesh.triangles = getUintArray(map, "triangles");
 			skinnedMesh.regionUVs = uvs;
 			skinnedMesh.updateUVs();
 			
@@ -516,6 +516,14 @@ public class SkeletonJson {
 	static private function getIntArray (map:Object, name:String) : Vector.<int> {
 		var list:Array = map[name];
 		var values:Vector.<int> = new Vector.<int>(list.length, true);
+		for (var i:int = 0, n:int = list.length; i < n; i++)
+			values[i] = int(list[i]);
+		return values;
+	}
+	
+	static private function getUintArray (map:Object, name:String) : Vector.<uint> {
+		var list:Array = map[name];
+		var values:Vector.<uint> = new Vector.<uint>(list.length, true);
 		for (var i:int = 0, n:int = list.length; i < n; i++)
 			values[i] = int(list[i]);
 		return values;

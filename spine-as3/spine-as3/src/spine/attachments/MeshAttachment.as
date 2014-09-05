@@ -36,7 +36,7 @@ public dynamic class MeshAttachment extends Attachment {
 	public var vertices:Vector.<Number>;
 	public var uvs:Vector.<Number>;
 	public var regionUVs:Vector.<Number>;
-	public var triangles:Vector.<int>;
+	public var triangles:Vector.<uint>;
 	public var hullLength:int;
 	public var r:Number = 1;
 	public var g:Number = 1;
@@ -68,7 +68,7 @@ public dynamic class MeshAttachment extends Attachment {
 
 	public function updateUVs () : void {
 		var width:Number = regionU2 - regionU, height:Number = regionV2 - regionV;
-		var i:int, n:int = uvs.length;
+		var i:int, n:int = regionUVs.length;
 		if (!uvs || uvs.length != n) uvs = new Vector.<Number>(n, true);
 		if (regionRotate) {
 			for (i = 0; i < n; i += 2) {
@@ -96,9 +96,9 @@ public dynamic class MeshAttachment extends Attachment {
 		if (slot.attachmentVertices.length == verticesCount) vertices = slot.attachmentVertices;
 		for (var i:int = 0, ii:int = 0; i < verticesCount; i += 2, ii += 2) {
 			var vx:Number = vertices[i];
-			var vy:Number = vertices[ii];
-			worldVertices[i] = vx * m00 + vy * m01 + x;
-			worldVertices[ii] = vx * m10 + vy * m11 + y;
+			var vy:Number = vertices[int(i + 1)];
+			worldVertices[ii] = vx * m00 + vy * m01 + x;
+			worldVertices[int(ii + 1)] = vx * m10 + vy * m11 + y;
 		}
 	}
 }

@@ -35,16 +35,21 @@ namespace Spine {
 		static public bool yDown;
 
 		internal BoneData data;
+		internal Skeleton skeleton;
 		internal Bone parent;
-		internal float x, y, rotation, scaleX, scaleY;
+		internal float x, y, rotation, rotationIK, scaleX, scaleY;
 		internal float m00, m01, m10, m11;
 		internal float worldX, worldY, worldRotation, worldScaleX, worldScaleY;
 
 		public BoneData Data { get { return data; } }
+		public Skeleton Skeleton { get { return skeleton; } }
 		public Bone Parent { get { return parent; } }
 		public float X { get { return x; } set { x = value; } }
 		public float Y { get { return y; } set { y = value; } }
+		/// <summary>The forward kinetics rotation.</summary>
 		public float Rotation { get { return rotation; } set { rotation = value; } }
+		/// <summary>The inverse kinetics rotation, as calculated by any IK constraints.</summary>
+		public float RotationIK { get { return rotationIK; } set { rotationIK = value; } }
 		public float ScaleX { get { return scaleX; } set { scaleX = value; } }
 		public float ScaleY { get { return scaleY; } set { scaleY = value; } }
 
@@ -59,16 +64,20 @@ namespace Spine {
 		public float WorldScaleY { get { return worldScaleY; } }
 
 		/// <param name="parent">May be null.</param>
-		public Bone (BoneData data, Bone parent) {
+		public Bone (BoneData data, Skeleton skeleton, Bone parent) {
 			if (data == null) throw new ArgumentNullException("data cannot be null.");
+			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
 			this.data = data;
+			this.skeleton = skeleton;
 			this.parent = parent;
 			SetToSetupPose();
 		}
 
 		/// <summary>Computes the world SRT using the parent bone and the local SRT.</summary>
-		public void UpdateWorldTransform (bool flipX, bool flipY) {
+		public void UpdateWorldTransform () {
 			Bone parent = this.parent;
+			Skeleton skeleton = this.skeleton;
+			float x = this.x, y = this.y;
 			if (parent != null) {
 				worldX = x * parent.m00 + y * parent.m01 + parent.worldX;
 				worldY = x * parent.m10 + y * parent.m11 + parent.worldY;
@@ -79,28 +88,30 @@ namespace Spine {
 					worldScaleX = scaleX;
 					worldScaleY = scaleY;
 				}
-				worldRotation = data.inheritRotation ? parent.worldRotation + rotation : rotation;
+				worldRotation = data.inheritRotation ? parent.worldRotation + rotationIK : rotationIK;
 			} else {
-				worldX = flipX ? -x : x;
-				worldY = flipY != yDown ? -y : y;
+				worldX = skeleton.flipX ? -x : x;
+				worldY = skeleton.flipY != yDown ? -y : y;
 				worldScaleX = scaleX;
 				worldScaleY = scaleY;
-				worldRotation = rotation;
+				worldRotation = rotationIK;
 			}
 			float radians = worldRotation * (float)Math.PI / 180;
 			float cos = (float)Math.Cos(radians);
 			float sin = (float)Math.Sin(radians);
-			m00 = cos * worldScaleX;
-			m10 = sin * worldScaleX;
-			m01 = -sin * worldScaleY;
-			m11 = cos * worldScaleY;
-			if (flipX) {
-				m00 = -m00;
-				m01 = -m01;
+			if (skeleton.flipX) {
+				m00 = -cos * worldScaleX;
+				m01 = sin * worldScaleY;
+			} else {
+				m00 = cos * worldScaleX;
+				m01 = -sin * worldScaleY;
 			}
-			if (flipY != yDown) {
-				m10 = -m10;
-				m11 = -m11;
+			if (skeleton.flipY != yDown) {
+				m10 = -sin * worldScaleX;
+				m11 = -cos * worldScaleY;
+			} else {
+				m10 = sin * worldScaleX;
+				m11 = cos * worldScaleY;
 			}
 		}
 
@@ -109,8 +120,27 @@ namespace Spine {
 			x = data.x;
 			y = data.y;
 			rotation = data.rotation;
+			rotationIK = rotation;
 			scaleX = data.scaleX;
 			scaleY = data.scaleY;
+		}
+
+		public void worldToLocal (float worldX, float worldY, out float localX, out float localY) {
+			float dx = worldX - this.worldX, dy = worldY - this.worldY;
+			float m00 = this.m00, m10 = this.m10, m01 = this.m01, m11 = this.m11;
+			Skeleton skeleton = this.skeleton;
+			if (skeleton.flipX != (skeleton.flipY != yDown)) {
+				m00 *= -1;
+				m11 *= -1;
+			}
+			float invDet = 1 / (m00 * m11 - m01 * m10);
+			localX = (dx * m00 * invDet - dy * m01 * invDet);
+			localY = (dy * m11 * invDet - dx * m10 * invDet);
+		}
+
+		public void localToWorld (float localX, float localY, out float worldX, out float worldY) {
+			worldX = localX * m00 + localY * m01 + this.worldX;
+			worldY = localX * m10 + localY * m11 + this.worldY;
 		}
 
 		override public String ToString () {

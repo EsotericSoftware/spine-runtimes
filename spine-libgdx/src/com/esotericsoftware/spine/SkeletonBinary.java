@@ -30,12 +30,23 @@
 
 package com.esotericsoftware.spine;
 
+import java.io.IOException;
+
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.DataInput;
+import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.SerializationException;
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.ColorTimeline;
 import com.esotericsoftware.spine.Animation.CurveTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.FfdTimeline;
+import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
@@ -49,17 +60,6 @@ import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.SkinnedMeshAttachment;
 
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.DataInput;
-import com.badlogic.gdx.utils.FloatArray;
-import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.SerializationException;
-
-import java.io.IOException;
-
 public class SkeletonBinary {
 	static public final int TIMELINE_SCALE = 0;
 	static public final int TIMELINE_ROTATE = 1;
@@ -69,6 +69,7 @@ public class SkeletonBinary {
 	static public final int TIMELINE_EVENT = 5;
 	static public final int TIMELINE_DRAWORDER = 6;
 	static public final int TIMELINE_FFD = 7;
+	static public final int TIMELINE_IK = 8;
 
 	static public final int CURVE_LINEAR = 0;
 	static public final int CURVE_STEPPED = 1;
@@ -106,6 +107,11 @@ public class SkeletonBinary {
 
 		DataInput input = new DataInput(file.read(512));
 		try {
+			skeletonData.hash = input.readString();
+			skeletonData.version = input.readString();
+			skeletonData.width = input.readFloat();
+			skeletonData.height = input.readFloat();
+
 			boolean nonessential = input.readBoolean();
 			// Bones.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
@@ -122,8 +128,19 @@ public class SkeletonBinary {
 				boneData.length = input.readFloat() * scale;
 				boneData.inheritScale = input.readBoolean();
 				boneData.inheritRotation = input.readBoolean();
-				if (nonessential) Color.rgba8888ToColor(boneData.getColor(), input.readInt());
-				skeletonData.addBone(boneData);
+				if (nonessential) Color.rgba8888ToColor(boneData.color, input.readInt());
+				skeletonData.bones.add(boneData);
+			}
+
+			// IK constraints.
+			for (int i = 0, n = input.readInt(true); i < n; i++) {
+				IkConstraintData ikConstraint = new IkConstraintData(input.readString());
+				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++)
+					ikConstraint.bones.add(skeletonData.bones.get(input.readInt(true)));
+				ikConstraint.target = skeletonData.bones.get(input.readInt(true));
+				ikConstraint.mix = input.readFloat();
+				ikConstraint.bendDirection = input.readByte();
+				skeletonData.ikConstraints.add(ikConstraint);
 			}
 
 			// Slots.
@@ -131,22 +148,22 @@ public class SkeletonBinary {
 				String slotName = input.readString();
 				BoneData boneData = skeletonData.bones.get(input.readInt(true));
 				SlotData slotData = new SlotData(slotName, boneData);
-				Color.rgba8888ToColor(slotData.getColor(), input.readInt());
+				Color.rgba8888ToColor(slotData.color, input.readInt());
 				slotData.attachmentName = input.readString();
 				slotData.additiveBlending = input.readBoolean();
-				skeletonData.addSlot(slotData);
+				skeletonData.slots.add(slotData);
 			}
 
 			// Default skin.
 			Skin defaultSkin = readSkin(input, "default", nonessential);
 			if (defaultSkin != null) {
 				skeletonData.defaultSkin = defaultSkin;
-				skeletonData.addSkin(defaultSkin);
+				skeletonData.skins.add(defaultSkin);
 			}
 
 			// Skins.
 			for (int i = 0, n = input.readInt(true); i < n; i++)
-				skeletonData.addSkin(readSkin(input, input.readString(), nonessential));
+				skeletonData.skins.add(readSkin(input, input.readString(), nonessential));
 
 			// Events.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
@@ -154,7 +171,7 @@ public class SkeletonBinary {
 				eventData.intValue = input.readInt(false);
 				eventData.floatValue = input.readFloat();
 				eventData.stringValue = input.readString();
-				skeletonData.addEvent(eventData);
+				skeletonData.events.add(eventData);
 			}
 
 			// Animations.
@@ -390,6 +407,20 @@ public class SkeletonBinary {
 				}
 			}
 
+			// IK timelines.
+			for (int i = 0, n = input.readInt(true); i < n; i++) {
+				IkConstraintData ikConstraint = skeletonData.findIkConstraint(input.readString());
+				int frameCount = input.readInt(true);
+				IkConstraintTimeline timeline = new IkConstraintTimeline(frameCount);
+				timeline.ikConstraintIndex = skeletonData.getIkConstraints().indexOf(ikConstraint, true);
+				for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
+					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readByte());
+					if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
+				}
+				timelines.add(timeline);
+				duration = Math.max(duration, timeline.getFrames()[frameCount * 3 - 3]);
+			}
+
 			// FFD timelines.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				Skin skin = skeletonData.getSkins().get(input.readInt(true) + 1);
@@ -497,7 +528,7 @@ public class SkeletonBinary {
 		}
 
 		timelines.shrink();
-		skeletonData.addAnimation(new Animation(name, timelines, duration));
+		skeletonData.animations.add(new Animation(name, timelines, duration));
 	}
 
 	private void readCurve (DataInput input, int frameIndex, CurveTimeline timeline) throws IOException {

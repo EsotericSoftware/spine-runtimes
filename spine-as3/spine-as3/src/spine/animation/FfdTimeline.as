@@ -43,7 +43,7 @@ public class FfdTimeline extends CurveTimeline {
 	public function FfdTimeline (frameCount:int) {
 		super(frameCount);
 		frames = new Vector.<Number>(frameCount, true);
-		frameVertices = new Vector.<Number>(frameCount, true);
+		frameVertices = new Vector.<Vector.<Number>>(frameCount, true);
 	}
 
 	/** Sets the time and value of the specified keyframe. */
@@ -66,11 +66,8 @@ public class FfdTimeline extends CurveTimeline {
 		var vertexCount:int = frameVertices[0].length;
 
 		var vertices:Vector.<Number> = slot.attachmentVertices;
-		if (vertices.length < vertexCount) {
-			vertices = new Vector.<Number>(vertexCount);
-			slot.attachmentVertices = vertices;
-		}
-		slot.attachmentVertices.length = vertexCount;
+		if (vertices.length != vertexCount) alpha = 1;
+		vertices.length = vertexCount;
 
 		var i:int;
 		if (time >= frames[frames.length - 1]) { // Time is after last frame.

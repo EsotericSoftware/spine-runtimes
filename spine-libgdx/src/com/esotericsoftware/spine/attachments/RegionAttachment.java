@@ -34,7 +34,7 @@ import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.Slot;
 
-import static com.badlogic.gdx.graphics.g2d.SpriteBatch.*;
+import static com.badlogic.gdx.graphics.g2d.Batch.*;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;

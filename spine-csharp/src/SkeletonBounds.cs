@@ -55,7 +55,6 @@ namespace Spine {
 			List<Polygon> polygons = Polygons;
 			List<Slot> slots = skeleton.slots;
 			int slotCount = slots.Count;
-			float x = skeleton.x, y = skeleton.y;
 
 			boundingBoxes.Clear();
 			foreach (Polygon polygon in polygons)
@@ -80,7 +79,7 @@ namespace Spine {
 				int count = boundingBox.Vertices.Length;
 				polygon.Count = count;
 				if (polygon.Vertices.Length < count) polygon.Vertices = new float[count];
-				boundingBox.ComputeWorldVertices(x, y, slot.bone, polygon.Vertices);
+				boundingBox.ComputeWorldVertices(slot.bone, polygon.Vertices);
 			}
 
 			if (updateAabb) aabbCompute();

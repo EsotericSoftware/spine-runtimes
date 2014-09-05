@@ -54,6 +54,7 @@ function SkeletonJson.new (attachmentLoader)
 	local readAttachment
 	local readAnimation
 	local readCurve
+	local getArray
 
 	function self:readSkeletonData (jsonText)
 		local skeletonData = SkeletonData.new(self.attachmentLoader)
@@ -208,9 +209,9 @@ function SkeletonJson.new (attachmentLoader)
 			local mesh = attachmentLoader:newMeshAttachment(skin, name, path)
 			if not mesh then return null end
 			mesh.path = path 
-			mesh.vertices = getFloatArray(map, "vertices", scale)
-			mesh.triangles = getIntArray(map, "triangles")
-			mesh.regionUVs = getFloatArray(map, "uvs", 1)
+			mesh.vertices = getArray(map, "vertices", scale)
+			mesh.triangles = getArray(map, "triangles", 1)
+			mesh.regionUVs = getArray(map, "uvs", 1)
 			mesh:updateUVs()
 
 			local color = map["color"]
@@ -222,7 +223,7 @@ function SkeletonJson.new (attachmentLoader)
 			end
 
 			mesh.hullLength = (map["hull"] or 0) * 2
-			if map["edges"] then mesh.edges = getIntArray(map, "edges") end
+			if map["edges"] then mesh.edges = getArray(map, "edges", 1) end
 			mesh.width = (map["width"] or 0) * scale
 			mesh.height = (map["height"] or 0) * scale
 			return mesh
@@ -232,8 +233,8 @@ function SkeletonJson.new (attachmentLoader)
 			if not mesh then return null end
 			mesh.path = path
 
-			local uvs = getFloatArray(map, "uvs", 1)
-			vertices = getFloatArray(map, "vertices", 1)
+			local uvs = getArray(map, "uvs", 1)
+			vertices = getArray(map, "vertices", 1)
 			local weights = {}
 			local bones = {}
 			for i = 1, vertices do
@@ -250,7 +251,7 @@ function SkeletonJson.new (attachmentLoader)
 			end
 			mesh.bones = bones
 			mesh.weights = weights
-			mesh.triangles = getIntArray(map, "triangles")
+			mesh.triangles = getArray(map, "triangles", 1)
 			mesh.regionUVs = uvs
 			mesh:updateUVs()
 
@@ -263,7 +264,7 @@ function SkeletonJson.new (attachmentLoader)
 			end
 
 			mesh.hullLength = (map["hull"] or 0) * 2
-			if map["edges"] then mesh.edges = getIntArray(map, "edges") end
+			if map["edges"] then mesh.edges = getArray(map, "edges", 1) end
 			mesh.width = (map["width"] or 0) * scale
 			mesh.height = (map["height"] or 0) * scale
 			return mesh
@@ -534,6 +535,21 @@ function SkeletonJson.new (attachmentLoader)
 		else
 			timeline:setCurve(frameIndex, curve[1], curve[2], curve[3], curve[4])
 		end
+	end
+
+	getArray = function (map, name, scale)
+		local list = map[name]
+		local values = {}
+		if scale == 1 then
+			for i = 1, #list do
+				values[i] = list[i]
+			end
+		else
+			for i = 1, #list do
+				values[i] = list[i] * scale
+			end
+		end
+		return values
 	end
 
 	return self

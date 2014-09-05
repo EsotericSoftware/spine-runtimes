@@ -29,23 +29,28 @@
  *****************************************************************************/
 
 package spine.starling {
+import spine.SkeletonData;
 import spine.animation.AnimationState;
 import spine.animation.AnimationStateData;
-import spine.SkeletonData;
 
-public class SkeletonAnimation extends SkeletonSprite {
+import starling.animation.IAnimatable;
+
+public class SkeletonAnimation extends SkeletonSprite implements IAnimatable {
 	public var state:AnimationState;
-	
-	public function SkeletonAnimation (skeletonData:SkeletonData, stateData:AnimationStateData = null) {
-		super(skeletonData);
+	public var timeScale:Number = 1;
+
+	/** @param renderMeshes If false, meshes won't be rendered. This may improve batching with non-Spine display objects. */
+	public function SkeletonAnimation (skeletonData:SkeletonData, renderMeshes:Boolean = true, stateData:AnimationStateData = null) {
+		super(skeletonData, renderMeshes);
 		state = new AnimationState(stateData ? stateData : new AnimationStateData(skeletonData));
 	}
-	
-	override public function advanceTime (time:Number) : void {
+
+	public function advanceTime (time:Number) : void {
+		time *= timeScale;
+		skeleton.update(time);
 		state.update(time);
 		state.apply(skeleton);
 		skeleton.updateWorldTransform();
-		super.advanceTime(time);
 	}
 }
 

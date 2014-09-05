@@ -40,6 +40,8 @@ public class Skeleton {
 	final Array<Bone> bones;
 	final Array<Slot> slots;
 	Array<Slot> drawOrder;
+	final Array<IkConstraint> ikConstraints;
+	private final Array<Array<Bone>> boneCache = new Array();
 	Skin skin;
 	final Color color;
 	float time;
@@ -53,19 +55,25 @@ public class Skeleton {
 		bones = new Array(data.bones.size);
 		for (BoneData boneData : data.bones) {
 			Bone parent = boneData.parent == null ? null : bones.get(data.bones.indexOf(boneData.parent, true));
-			bones.add(new Bone(boneData, parent));
+			bones.add(new Bone(boneData, this, parent));
 		}
 
 		slots = new Array(data.slots.size);
 		drawOrder = new Array(data.slots.size);
 		for (SlotData slotData : data.slots) {
 			Bone bone = bones.get(data.bones.indexOf(slotData.boneData, true));
-			Slot slot = new Slot(slotData, this, bone);
+			Slot slot = new Slot(slotData, bone);
 			slots.add(slot);
 			drawOrder.add(slot);
 		}
 
+		ikConstraints = new Array(data.ikConstraints.size);
+		for (IkConstraintData ikConstraintData : data.ikConstraints)
+			ikConstraints.add(new IkConstraint(ikConstraintData, this));
+
 		color = new Color(1, 1, 1, 1);
+
+		updateCache();
 	}
 
 	/** Copy constructor. */
@@ -76,32 +84,95 @@ public class Skeleton {
 		bones = new Array(skeleton.bones.size);
 		for (Bone bone : skeleton.bones) {
 			Bone parent = bone.parent == null ? null : bones.get(skeleton.bones.indexOf(bone.parent, true));
-			bones.add(new Bone(bone, parent));
+			bones.add(new Bone(bone, this, parent));
 		}
 
 		slots = new Array(skeleton.slots.size);
 		for (Slot slot : skeleton.slots) {
 			Bone bone = bones.get(skeleton.bones.indexOf(slot.bone, true));
-			Slot newSlot = new Slot(slot, this, bone);
-			slots.add(newSlot);
+			slots.add(new Slot(slot, bone));
 		}
 
 		drawOrder = new Array(slots.size);
 		for (Slot slot : skeleton.drawOrder)
 			drawOrder.add(slots.get(skeleton.slots.indexOf(slot, true)));
 
+		ikConstraints = new Array(skeleton.ikConstraints.size);
+		for (IkConstraint ikConstraint : skeleton.ikConstraints) {
+			Bone target = bones.get(skeleton.bones.indexOf(ikConstraint.target, true));
+			Array<Bone> ikBones = new Array(ikConstraint.bones.size);
+			for (Bone bone : ikConstraint.bones)
+				ikBones.add(bones.get(skeleton.bones.indexOf(bone, true)));
+			ikConstraints.add(new IkConstraint(ikConstraint, ikBones, target));
+		}
+
 		skin = skeleton.skin;
 		color = new Color(skeleton.color);
 		time = skeleton.time;
+		flipX = skeleton.flipX;
+		flipY = skeleton.flipY;
+
+		updateCache();
 	}
 
-	/** Updates the world transform for each bone. */
+	/** Caches information about bones and IK constraints. Must be called if bones or IK constraints are added or removed. */
+	public void updateCache () {
+		Array<Array<Bone>> boneCache = this.boneCache;
+		Array<IkConstraint> ikConstraints = this.ikConstraints;
+		int ikConstraintsCount = ikConstraints.size;
+
+		int arrayCount = ikConstraintsCount + 1;
+		boneCache.truncate(arrayCount);
+		for (int i = 0, n = boneCache.size; i < n; i++)
+			boneCache.get(i).clear();
+		while (boneCache.size < arrayCount)
+			boneCache.add(new Array());
+
+		Array<Bone> nonIkBones = boneCache.first();
+
+		outer:
+		for (int i = 0, n = bones.size; i < n; i++) {
+			Bone bone = bones.get(i);
+			Bone current = bone;
+			do {
+				for (int ii = 0; ii < ikConstraintsCount; ii++) {
+					IkConstraint ikConstraint = ikConstraints.get(ii);
+					Bone parent = ikConstraint.bones.first();
+					Bone child = ikConstraint.bones.peek();
+					while (true) {
+						if (current == child) {
+							boneCache.get(ii).add(bone);
+							boneCache.get(ii + 1).add(bone);
+							continue outer;
+						}
+						if (child == parent) break;
+						child = child.parent;
+					}
+				}
+				current = current.parent;
+			} while (current != null);
+			nonIkBones.add(bone);
+		}
+	}
+
+	/** Updates the world transform for each bone and applies IK constraints. */
 	public void updateWorldTransform () {
-		boolean flipX = this.flipX;
-		boolean flipY = this.flipY;
 		Array<Bone> bones = this.bones;
-		for (int i = 0, n = bones.size; i < n; i++)
-			bones.get(i).updateWorldTransform(flipX, flipY);
+		for (int i = 0, nn = bones.size; i < nn; i++) {
+			Bone bone = bones.get(i);
+			bone.rotationIK = bone.rotation;
+		}
+		Array<Array<Bone>> boneCache = this.boneCache;
+		Array<IkConstraint> ikConstraints = this.ikConstraints;
+		int i = 0, last = boneCache.size - 1;
+		while (true) {
+			Array<Bone> updateBones = boneCache.get(i);
+			for (int ii = 0, nn = updateBones.size; ii < nn; ii++)
+				updateBones.get(ii).updateWorldTransform();
+			if (i == last) break;
+			ikConstraints.get(i).apply();
+			i++;
+		}
 	}
 
 	/** Sets the bones and slots to their setup pose values. */
@@ -114,6 +185,13 @@ public class Skeleton {
 		Array<Bone> bones = this.bones;
 		for (int i = 0, n = bones.size; i < n; i++)
 			bones.get(i).setToSetupPose();
+
+		Array<IkConstraint> ikConstraints = this.ikConstraints;
+		for (int i = 0, n = ikConstraints.size; i < n; i++) {
+			IkConstraint ikConstraint = ikConstraints.get(i);
+			ikConstraint.bendDirection = ikConstraint.data.bendDirection;
+			ikConstraint.mix = ikConstraint.data.mix;
+		}
 	}
 
 	public void setSlotsToSetupPose () {
@@ -263,6 +341,21 @@ public class Skeleton {
 		throw new IllegalArgumentException("Slot not found: " + slotName);
 	}
 
+	public Array<IkConstraint> getIkConstraints () {
+		return ikConstraints;
+	}
+
+	/** @return May be null. */
+	public IkConstraint findIkConstraint (String ikConstraintName) {
+		if (ikConstraintName == null) throw new IllegalArgumentException("ikConstraintName cannot be null.");
+		Array<IkConstraint> ikConstraints = this.ikConstraints;
+		for (int i = 0, n = ikConstraints.size; i < n; i++) {
+			IkConstraint ikConstraint = ikConstraints.get(i);
+			if (ikConstraint.data.name.equals(ikConstraintName)) return ikConstraint;
+		}
+		return null;
+	}
+
 	public Color getColor () {
 		return color;
 	}
@@ -280,6 +373,11 @@ public class Skeleton {
 	}
 
 	public void setFlipY (boolean flipY) {
+		this.flipY = flipY;
+	}
+
+	public void setFlip (boolean flipX, boolean flipY) {
+		this.flipX = flipX;
 		this.flipY = flipY;
 	}
 

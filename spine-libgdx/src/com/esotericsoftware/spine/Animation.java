@@ -30,12 +30,11 @@
 
 package com.esotericsoftware.spine;
 
-import com.esotericsoftware.spine.attachments.Attachment;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
+import com.esotericsoftware.spine.attachments.Attachment;
 
 public class Animation {
 	final String name;
@@ -121,6 +120,23 @@ public class Animation {
 		}
 	}
 
+	/** @param target After the first and before the last value.
+	 * @return index of first value greater than the target. */
+	static int binarySearch (float[] values, float target) {
+		int low = 0;
+		int high = values.length - 2;
+		if (high == 0) return 1;
+		int current = high >>> 1;
+		while (true) {
+			if (values[current + 1] <= target)
+				low = current + 1;
+			else
+				high = current;
+			if (low == high) return low + 1;
+			current = (low + high) >>> 1;
+		}
+	}
+
 	static int linearSearch (float[] values, float target, int step) {
 		for (int i = 0, last = values.length - step; i <= last; i += step)
 			if (values[i] > target) return i;
@@ -128,35 +144,36 @@ public class Animation {
 	}
 
 	static public interface Timeline {
-		/** Sets the value(s) for the specified time. */
+		/** Sets the value(s) for the specified time.
+		 * @param events May be null to not collect fired events. */
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha);
 	}
 
 	/** Base class for frames that use an interpolation bezier curve. */
 	abstract static public class CurveTimeline implements Timeline {
-		static public final float LINEAR = 0, STEPPED = -1, BEZIER = -2;
-		static private final int BEZIER_SEGMENTS = 10;
+		static public final float LINEAR = 0, STEPPED = 1, BEZIER = 2;
+		static private final int BEZIER_SEGMENTS = 10, BEZIER_SIZE = BEZIER_SEGMENTS * 2 - 1;
 
-		private final float[] curves; // dfx, dfy, ddfx, ddfy, dddfx, dddfy, ...
+		private final float[] curves; // type, x, y, ...
 
 		public CurveTimeline (int frameCount) {
-			curves = new float[(frameCount - 1) * 6];
+			curves = new float[(frameCount - 1) * BEZIER_SIZE];
 		}
 
 		public int getFrameCount () {
-			return curves.length / 6 + 1;
+			return curves.length / BEZIER_SIZE + 1;
 		}
 
 		public void setLinear (int frameIndex) {
-			curves[frameIndex * 6] = LINEAR;
+			curves[frameIndex * BEZIER_SIZE] = LINEAR;
 		}
 
 		public void setStepped (int frameIndex) {
-			curves[frameIndex * 6] = STEPPED;
+			curves[frameIndex * BEZIER_SIZE] = STEPPED;
 		}
 
 		public float getCurveType (int frameIndex) {
-			int index = frameIndex * 6;
+			int index = frameIndex * BEZIER_SIZE;
 			if (index == curves.length) return LINEAR;
 			float type = curves[index];
 			if (type == LINEAR) return LINEAR;
@@ -168,48 +185,21 @@ public class Animation {
 		 * cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of
 		 * the difference between the keyframe's values. */
 		public void setCurve (int frameIndex, float cx1, float cy1, float cx2, float cy2) {
-			float subdiv_step = 1f / BEZIER_SEGMENTS;
-			float subdiv_step2 = subdiv_step * subdiv_step;
-			float subdiv_step3 = subdiv_step2 * subdiv_step;
-			float pre1 = 3 * subdiv_step;
-			float pre2 = 3 * subdiv_step2;
-			float pre4 = 6 * subdiv_step2;
-			float pre5 = 6 * subdiv_step3;
-			float tmp1x = -cx1 * 2 + cx2;
-			float tmp1y = -cy1 * 2 + cy2;
-			float tmp2x = (cx1 - cx2) * 3 + 1;
-			float tmp2y = (cy1 - cy2) * 3 + 1;
-			int i = frameIndex * 6;
-			float[] curves = this.curves;
-			curves[i] = cx1 * pre1 + tmp1x * pre2 + tmp2x * subdiv_step3;
-			curves[i + 1] = cy1 * pre1 + tmp1y * pre2 + tmp2y * subdiv_step3;
-			curves[i + 2] = tmp1x * pre4 + tmp2x * pre5;
-			curves[i + 3] = tmp1y * pre4 + tmp2y * pre5;
-			curves[i + 4] = tmp2x * pre5;
-			curves[i + 5] = tmp2y * pre5;
-		}
+			float subdiv1 = 1f / BEZIER_SEGMENTS, subdiv2 = subdiv1 * subdiv1, subdiv3 = subdiv2 * subdiv1;
+			float pre1 = 3 * subdiv1, pre2 = 3 * subdiv2, pre4 = 6 * subdiv2, pre5 = 6 * subdiv3;
+			float tmp1x = -cx1 * 2 + cx2, tmp1y = -cy1 * 2 + cy2, tmp2x = (cx1 - cx2) * 3 + 1, tmp2y = (cy1 - cy2) * 3 + 1;
+			float dfx = cx1 * pre1 + tmp1x * pre2 + tmp2x * subdiv3, dfy = cy1 * pre1 + tmp1y * pre2 + tmp2y * subdiv3;
+			float ddfx = tmp1x * pre4 + tmp2x * pre5, ddfy = tmp1y * pre4 + tmp2y * pre5;
+			float dddfx = tmp2x * pre5, dddfy = tmp2y * pre5;
 
-		public float getCurvePercent (int frameIndex, float percent) {
-			int curveIndex = frameIndex * 6;
+			int i = frameIndex * BEZIER_SIZE;
 			float[] curves = this.curves;
-			float dfx = curves[curveIndex];
-			if (dfx == LINEAR) return percent;
-			if (dfx == STEPPED) return 0;
-			float dfy = curves[curveIndex + 1];
-			float ddfx = curves[curveIndex + 2];
-			float ddfy = curves[curveIndex + 3];
-			float dddfx = curves[curveIndex + 4];
-			float dddfy = curves[curveIndex + 5];
+			curves[i++] = BEZIER;
+
 			float x = dfx, y = dfy;
-			int i = BEZIER_SEGMENTS - 2;
-			while (true) {
-				if (x >= percent) {
-					float prevX = x - dfx;
-					float prevY = y - dfy;
-					return prevY + (y - prevY) * (percent - prevX) / (x - prevX);
-				}
-				if (i == 0) break;
-				i--;
+			for (int n = i + BEZIER_SIZE - 1; i < n; i += 2) {
+				curves[i] = x;
+				curves[i + 1] = y;
 				dfx += ddfx;
 				dfy += ddfy;
 				ddfx += dddfx;
@@ -217,6 +207,31 @@ public class Animation {
 				x += dfx;
 				y += dfy;
 			}
+		}
+
+		public float getCurvePercent (int frameIndex, float percent) {
+			float[] curves = this.curves;
+			int i = frameIndex * BEZIER_SIZE;
+			float type = curves[i];
+			if (type == LINEAR) return percent;
+			if (type == STEPPED) return 0;
+			i++;
+			float x = 0;
+			for (int start = i, n = i + BEZIER_SIZE - 1; i < n; i += 2) {
+				x = curves[i];
+				if (x >= percent) {
+					float prevX, prevY;
+					if (i == start) {
+						prevX = 0;
+						prevY = 0;
+					} else {
+						prevX = curves[i - 2];
+						prevY = curves[i - 1];
+					}
+					return prevY + (curves[i + 1] - prevY) * (percent - prevX) / (x - prevX);
+				}
+			}
+			float y = curves[i - 1];
 			return y + (1 - y) * (percent - x) / (1 - x); // Last point is 1,1.
 		}
 	}
@@ -273,7 +288,7 @@ public class Animation {
 			float prevFrameValue = frames[frameIndex - 1];
 			float frameTime = frames[frameIndex];
 			float percent = MathUtils.clamp(1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime), 0, 1);
-			percent = getCurvePercent(frameIndex / 2 - 1, percent);
+			percent = getCurvePercent((frameIndex >> 1) - 1, percent);
 
 			float amount = frames[frameIndex + FRAME_VALUE] - prevFrameValue;
 			while (amount > 180)
@@ -489,13 +504,14 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha) {
 			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
+			if (time < frames[0]) {
+				if (lastTime > time) apply(skeleton, lastTime, Integer.MAX_VALUE, null, 0);
+				return;
+			} else if (lastTime > time) //
+				lastTime = -1;
 
-			int frameIndex;
-			if (time >= frames[frames.length - 1]) // Time is after last frame.
-				frameIndex = frames.length - 1;
-			else
-				frameIndex = binarySearch(frames, time, 1) - 1;
+			int frameIndex = time >= frames[frames.length - 1] ? frames.length - 1 : binarySearch(frames, time) - 1;
+			if (frames[frameIndex] <= lastTime) return;
 
 			String attachmentName = attachmentNames[frameIndex];
 			skeleton.slots.get(slotIndex).setAttachment(
@@ -547,7 +563,7 @@ public class Animation {
 			if (lastTime < frames[0])
 				frameIndex = 0;
 			else {
-				frameIndex = binarySearch(frames, lastTime, 1);
+				frameIndex = binarySearch(frames, lastTime);
 				float frame = frames[frameIndex];
 				while (frameIndex > 0) { // Fire multiple events with the same frame.
 					if (frames[frameIndex - 1] != frame) break;
@@ -595,7 +611,7 @@ public class Animation {
 			if (time >= frames[frames.length - 1]) // Time is after last frame.
 				frameIndex = frames.length - 1;
 			else
-				frameIndex = binarySearch(frames, time, 1) - 1;
+				frameIndex = binarySearch(frames, time) - 1;
 
 			Array<Slot> drawOrder = skeleton.drawOrder;
 			Array<Slot> slots = skeleton.slots;
@@ -655,14 +671,15 @@ public class Animation {
 			Slot slot = skeleton.slots.get(slotIndex);
 			if (slot.getAttachment() != attachment) return;
 
-			FloatArray verticesArray = slot.getAttachmentVertices();
-			verticesArray.size = 0;
-
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
 			float[][] frameVertices = this.frameVertices;
 			int vertexCount = frameVertices[0].length;
+
+			FloatArray verticesArray = slot.getAttachmentVertices();
+			if (verticesArray.size != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
+			verticesArray.size = 0;
 			verticesArray.ensureCapacity(vertexCount);
 			verticesArray.size = vertexCount;
 			float[] vertices = verticesArray.items;
@@ -678,7 +695,7 @@ public class Animation {
 			}
 
 			// Interpolate between the previous frame and the current frame.
-			int frameIndex = binarySearch(frames, time, 1);
+			int frameIndex = binarySearch(frames, time);
 			float frameTime = frames[frameIndex];
 			float percent = MathUtils.clamp(1 - (time - frameTime) / (frames[frameIndex - 1] - frameTime), 0, 1);
 			percent = getCurvePercent(frameIndex - 1, percent);
@@ -697,6 +714,64 @@ public class Animation {
 					vertices[i] = prev + (nextVertices[i] - prev) * percent;
 				}
 			}
+		}
+	}
+
+	static public class IkConstraintTimeline extends CurveTimeline {
+		static private final int PREV_FRAME_TIME = -3;
+		static private final int FRAME_MIX = 1;
+		static private final int FRAME_BEND_DIRECTION = 2;
+
+		int ikConstraintIndex;
+		private final float[] frames; // time, mix, bendDirection, ...
+
+		public IkConstraintTimeline (int frameCount) {
+			super(frameCount);
+			frames = new float[frameCount * 3];
+		}
+
+		public void setIkConstraintIndex (int ikConstraint) {
+			this.ikConstraintIndex = ikConstraint;
+		}
+
+		public int getIkConstraintIndex () {
+			return ikConstraintIndex;
+		}
+
+		public float[] getFrames () {
+			return frames;
+		}
+
+		/** Sets the time, mix and bend direction of the specified keyframe. */
+		public void setFrame (int frameIndex, float time, float mix, int bendDirection) {
+			frameIndex *= 3;
+			frames[frameIndex] = time;
+			frames[frameIndex + 1] = mix;
+			frames[frameIndex + 2] = bendDirection;
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha) {
+			float[] frames = this.frames;
+			if (time < frames[0]) return; // Time is before first frame.
+
+			IkConstraint ikConstraint = skeleton.ikConstraints.get(ikConstraintIndex);
+
+			if (time >= frames[frames.length - 3]) { // Time is after last frame.
+				ikConstraint.mix += (frames[frames.length - 2] - ikConstraint.mix) * alpha;
+				ikConstraint.bendDirection = (int)frames[frames.length - 1];
+				return;
+			}
+
+			// Interpolate between the previous frame and the current frame.
+			int frameIndex = binarySearch(frames, time, 3);
+			float prevFrameMix = frames[frameIndex - 2];
+			float frameTime = frames[frameIndex];
+			float percent = MathUtils.clamp(1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime), 0, 1);
+			percent = getCurvePercent(frameIndex / 3 - 1, percent);
+
+			float mix = prevFrameMix + (frames[frameIndex + FRAME_MIX] - prevFrameMix) * percent;
+			ikConstraint.mix += (mix - ikConstraint.mix) * alpha;
+			ikConstraint.bendDirection = (int)frames[frameIndex + FRAME_BEND_DIRECTION];
 		}
 	}
 }

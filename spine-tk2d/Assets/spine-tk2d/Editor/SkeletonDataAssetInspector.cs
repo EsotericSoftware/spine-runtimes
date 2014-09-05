@@ -35,7 +35,7 @@ using Spine;
 
 [CustomEditor(typeof(SkeletonDataAsset))]
 public class SkeletonDataAssetInspector : Editor {
-	private SerializedProperty spriteCollection, skeletonJSON, scale, fromAnimation, toAnimation, duration;
+	private SerializedProperty spriteCollection, skeletonJSON, scale, fromAnimation, toAnimation, duration, defaultMix;
 	private bool showAnimationStateData = true;
 
 	void OnEnable () {
@@ -45,6 +45,7 @@ public class SkeletonDataAssetInspector : Editor {
 		fromAnimation = serializedObject.FindProperty("fromAnimation");
 		toAnimation = serializedObject.FindProperty("toAnimation");
 		duration = serializedObject.FindProperty("duration");
+		defaultMix = serializedObject.FindProperty("defaultMix");
 	}
 
 	override public void OnInspectorGUI () {
@@ -62,6 +63,8 @@ public class SkeletonDataAssetInspector : Editor {
 		if (skeletonData != null) {
 			showAnimationStateData = EditorGUILayout.Foldout(showAnimationStateData, "Animation State Data");
 			if (showAnimationStateData) {
+				EditorGUILayout.PropertyField(defaultMix);
+
 				// Animation names.
 				String[] animations = new String[skeletonData.Animations.Count];
 				for (int i = 0; i < animations.Length; i++)
@@ -98,7 +101,7 @@ public class SkeletonDataAssetInspector : Editor {
 			if (serializedObject.ApplyModifiedProperties() ||
 				(UnityEngine.Event.current.type == EventType.ValidateCommand && UnityEngine.Event.current.commandName == "UndoRedoPerformed")
 			) {
-				asset.Clear();
+				asset.Reset();
 			}
 		}
 	}

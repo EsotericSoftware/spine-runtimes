@@ -46,13 +46,11 @@ spBoundingBoxAttachment* spBoundingBoxAttachment_create (const char* name) {
 	return self;
 }
 
-void spBoundingBoxAttachment_computeWorldVertices (spBoundingBoxAttachment* self, float x, float y, spBone* bone, float* worldVertices) {
+void spBoundingBoxAttachment_computeWorldVertices (spBoundingBoxAttachment* self, spBone* bone, float* worldVertices) {
 	int i;
 	float px, py;
 	float* vertices = self->vertices;
-
-	x += bone->worldX;
-	y += bone->worldY;
+	float x = bone->skeleton->x + bone->worldX, y = bone->skeleton->y + bone->worldY;
 	for (i = 0; i < self->verticesCount; i += 2) {
 		px = vertices[i];
 		py = vertices[i + 1];

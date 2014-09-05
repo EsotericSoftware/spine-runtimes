@@ -41,10 +41,11 @@ public class SkeletonDataAsset : ScriptableObject {
 	public String[] fromAnimation;
 	public String[] toAnimation;
 	public float[] duration;
+	public float defaultMix;
 	private SkeletonData skeletonData;
 	private AnimationStateData stateData;
 
-	public void Clear () {
+	public void Reset () {
 		skeletonData = null;
 		stateData = null;
 	}
@@ -53,14 +54,14 @@ public class SkeletonDataAsset : ScriptableObject {
 		if (spriteCollection == null) {
 			if (!quiet)
 				Debug.LogError("Sprite collection not set for skeleton data asset: " + name, this);
-			Clear();
+			Reset();
 			return null;
 		}
 		
 		if (skeletonJSON == null) {
 			if (!quiet)
 				Debug.LogError("Skeleton JSON file not set for skeleton data asset: " + name, this);
-			Clear();
+			Reset();
 			return null;
 		}
 
@@ -78,6 +79,7 @@ public class SkeletonDataAsset : ScriptableObject {
 		}
 
 		stateData = new AnimationStateData(skeletonData);
+		stateData.DefaultMix = defaultMix;
 		for (int i = 0, n = fromAnimation.Length; i < n; i++) {
 			if (fromAnimation[i].Length == 0 || toAnimation[i].Length == 0) continue;
 			stateData.SetMix(fromAnimation[i], toAnimation[i], duration[i]);

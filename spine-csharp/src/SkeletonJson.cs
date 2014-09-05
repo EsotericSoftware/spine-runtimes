@@ -90,6 +90,15 @@ namespace Spine {
 			var root = Json.Deserialize(reader) as Dictionary<String, Object>;
 			if (root == null) throw new Exception("Invalid JSON.");
 
+			// Skeleton.
+			if (root.ContainsKey("skeleton")) {
+				var skeletonMap = (Dictionary<String, Object>)root["skeleton"];
+				skeletonData.hash = (String)skeletonMap["hash"];
+				skeletonData.version = (String)skeletonMap["spine"];
+				skeletonData.width = GetFloat(skeletonMap, "width", 0);
+				skeletonData.height = GetFloat(skeletonMap, "width", 1);
+			}
+			
 			// Bones.
 			foreach (Dictionary<String, Object> boneMap in (List<Object>)root["bones"]) {
 				BoneData parent = null;
@@ -107,7 +116,29 @@ namespace Spine {
 				boneData.scaleY = GetFloat(boneMap, "scaleY", 1);
 				boneData.inheritScale = GetBoolean(boneMap, "inheritScale", true);
 				boneData.inheritRotation = GetBoolean(boneMap, "inheritRotation", true);
-				skeletonData.AddBone(boneData);
+				skeletonData.bones.Add(boneData);
+			}
+
+			// IK constraints.
+			if (root.ContainsKey("ik")) {
+				foreach (Dictionary<String, Object> ikMap in (List<Object>)root["ik"]) {
+					IkConstraintData ikConstraintData = new IkConstraintData((String)ikMap["name"]);
+
+					foreach (String boneName in (List<Object>)ikMap["bones"]) {
+						BoneData bone = skeletonData.FindBone(boneName);
+						if (bone == null) throw new Exception("IK bone not found: " + boneName);
+						ikConstraintData.bones.Add(bone);
+					}
+
+					String targetName = (String)ikMap["target"];
+					ikConstraintData.target = skeletonData.FindBone(targetName);
+					if (ikConstraintData.target == null) throw new Exception("Target bone not found: " + targetName);
+
+					ikConstraintData.bendDirection = GetBoolean(ikMap, "bendPositive", true) ? 1 : -1;
+					ikConstraintData.mix = GetFloat(ikMap, "mix", 1);
+
+					skeletonData.ikConstraints.Add(ikConstraintData);
+				}
 			}
 
 			// Slots.
@@ -134,7 +165,7 @@ namespace Spine {
 					if (slotMap.ContainsKey("additive"))
 						slotData.additiveBlending = (bool)slotMap["additive"];
 
-					skeletonData.AddSlot(slotData);
+					skeletonData.slots.Add(slotData);
 				}
 			}
 
@@ -149,7 +180,7 @@ namespace Spine {
 							if (attachment != null) skin.AddAttachment(slotIndex, attachmentEntry.Key, attachment);
 						}
 					}
-					skeletonData.AddSkin(skin);
+					skeletonData.skins.Add(skin);
 					if (skin.name == "default")
 						skeletonData.defaultSkin = skin;
 				}
@@ -163,7 +194,7 @@ namespace Spine {
 					eventData.Int = GetInt(entryMap, "int", 0);
 					eventData.Float = GetFloat(entryMap, "float", 0);
 					eventData.String = GetString(entryMap, "string", null);
-					skeletonData.AddEvent(eventData);
+					skeletonData.events.Add(eventData);
 				}
 			}
 
@@ -443,6 +474,26 @@ namespace Spine {
 				}
 			}
 
+			if (map.ContainsKey("ik")) {
+				foreach (KeyValuePair<String, Object> ikMap in (Dictionary<String, Object>)map["ik"]) {
+					IkConstraintData ikConstraint = skeletonData.FindIkConstraint(ikMap.Key);
+					var values = (List<Object>)ikMap.Value;
+					var timeline = new IkConstraintTimeline(values.Count);
+					timeline.ikConstraintIndex = skeletonData.ikConstraints.IndexOf(ikConstraint);
+					int frameIndex = 0;
+					foreach (Dictionary<String, Object> valueMap in values) {
+						float time = (float)valueMap["time"];
+						float mix = valueMap.ContainsKey("mix") ? (float)valueMap["mix"] : 1;
+						bool bendPositive = valueMap.ContainsKey("bendPositive") ? (bool)valueMap["bendPositive"] : true;
+						timeline.setFrame(frameIndex, time, mix, bendPositive ? 1 : -1);
+						ReadCurve(timeline, frameIndex, valueMap);
+						frameIndex++;
+					}
+					timelines.Add(timeline);
+					duration = Math.Max(duration, timeline.frames[timeline.FrameCount * 3 - 3]);
+				}
+			}
+
 			if (map.ContainsKey("ffd")) {
 				foreach (KeyValuePair<String, Object> ffdMap in (Dictionary<String, Object>)map["ffd"]) {
 					Skin skin = skeletonData.FindSkin(ffdMap.Key);
@@ -553,7 +604,7 @@ namespace Spine {
 			}
 
 			timelines.TrimExcess();
-			skeletonData.AddAnimation(new Animation(name, timelines, duration));
+			skeletonData.animations.Add(new Animation(name, timelines, duration));
 		}
 
 		private void ReadCurve (CurveTimeline timeline, int frameIndex, Dictionary<String, Object> valueMap) {

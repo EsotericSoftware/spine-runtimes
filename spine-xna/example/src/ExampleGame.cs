@@ -34,7 +34,6 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
@@ -50,9 +49,9 @@ namespace Spine {
 		SkeletonBounds bounds = new SkeletonBounds();
 
 #if WINDOWS_STOREAPP
-	    private string assetsFolder = @"Assets\";
+		private string assetsFolder = @"Assets\";
 #else
-	    private string assetsFolder = "data/";
+		private string assetsFolder = "data/";
 #endif
 
 		public Example () {
@@ -75,11 +74,13 @@ namespace Spine {
 			skeletonRenderer.PremultipliedAlpha = true;
 
 			// String name = "spineboy";
-			String name = "goblins-ffd";
+			// String name = "goblins-ffd";
+			String name = "raptor";
 
-            Atlas atlas = new Atlas(assetsFolder + name + ".atlas", new XnaTextureLoader(GraphicsDevice));
+			Atlas atlas = new Atlas(assetsFolder + name + ".atlas", new XnaTextureLoader(GraphicsDevice));
 			SkeletonJson json = new SkeletonJson(atlas);
 			if (name == "spineboy") json.Scale = 0.6f;
+			if (name == "raptor") json.Scale = 0.5f;
 			skeleton = new Skeleton(json.ReadSkeletonData(assetsFolder + name + ".json"));
 			if (name == "goblins-ffd") skeleton.SetSkin("goblin");
 
@@ -101,6 +102,10 @@ namespace Spine {
 				TrackEntry entry = state.AddAnimation(0, "jump", false, 0);
 				entry.End += End; // Event handling for queued animations.
 				state.AddAnimation(0, "run", true, 0);
+			} else if (name == "raptor") {
+				state.SetAnimation(0, "walk", true);
+				state.SetAnimation(1, "empty", false);
+				state.AddAnimation(1, "gungrab", false, 2);
 			} else {
 				state.SetAnimation(0, "walk", true);
 			}
@@ -118,9 +123,10 @@ namespace Spine {
 
 		protected override void Update (GameTime gameTime) {
 			// Allows the game to exit
+#if !WINDOWS_STOREAPP	
 			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
 				this.Exit();
-
+#endif
 			// TODO: Add your update logic here
 
 			base.Update(gameTime);
@@ -138,13 +144,15 @@ namespace Spine {
 
 			bounds.Update(skeleton, true);
 			MouseState mouse = Mouse.GetState();
-			headSlot.G = 1;
-			headSlot.B = 1;
-			if (bounds.AabbContainsPoint(mouse.X, mouse.Y)) {
-				BoundingBoxAttachment hit = bounds.ContainsPoint(mouse.X, mouse.Y);
-				if (hit != null) {
-					headSlot.G = 0;
-					headSlot.B = 0;
+			if (headSlot != null) {
+				headSlot.G = 1;
+				headSlot.B = 1;
+				if (bounds.AabbContainsPoint(mouse.X, mouse.Y)) {
+					BoundingBoxAttachment hit = bounds.ContainsPoint(mouse.X, mouse.Y);
+					if (hit != null) {
+						headSlot.G = 0;
+						headSlot.B = 0;
+					}
 				}
 			}
 
@@ -152,25 +160,25 @@ namespace Spine {
 		}
 
 		public void Start (AnimationState state, int trackIndex) {
-#if !WINDOWS_STOREAPP		    
+#if !WINDOWS_STOREAPP
 			Console.WriteLine(trackIndex + " " + state.GetCurrent(trackIndex) + ": start");
 #endif
 		}
 
 		public void End (AnimationState state, int trackIndex) {
-#if !WINDOWS_STOREAPP		    
+#if !WINDOWS_STOREAPP	
 			Console.WriteLine(trackIndex + " " + state.GetCurrent(trackIndex) + ": end");
 #endif
 		}
 
 		public void Complete (AnimationState state, int trackIndex, int loopCount) {
-#if !WINDOWS_STOREAPP		    
+#if !WINDOWS_STOREAPP	
 			Console.WriteLine(trackIndex + " " + state.GetCurrent(trackIndex) + ": complete " + loopCount);
 #endif
 		}
 
 		public void Event (AnimationState state, int trackIndex, Event e) {
-#if !WINDOWS_STOREAPP		    
+#if !WINDOWS_STOREAPP	
 			Console.WriteLine(trackIndex + " " + state.GetCurrent(trackIndex) + ": event " + e);
 #endif
 		}

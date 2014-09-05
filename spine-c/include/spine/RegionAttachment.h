@@ -62,7 +62,7 @@ struct spRegionAttachment {
 spRegionAttachment* spRegionAttachment_create (const char* name);
 void spRegionAttachment_setUVs (spRegionAttachment* self, float u, float v, float u2, float v2, int/*bool*/rotate);
 void spRegionAttachment_updateOffset (spRegionAttachment* self);
-void spRegionAttachment_computeWorldVertices (spRegionAttachment* self, float x, float y, spBone* bone, float* vertices);
+void spRegionAttachment_computeWorldVertices (spRegionAttachment* self, spBone* bone, float* vertices);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spVertexIndex VertexIndex;

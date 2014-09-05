@@ -52,7 +52,7 @@ public class SimpleTest1 extends ApplicationAdapter {
 		camera = new OrthographicCamera();
 		batch = new SpriteBatch();
 		renderer = new SkeletonRenderer();
-		renderer.setPremultipliedAlpha(true);
+		renderer.setPremultipliedAlpha(true); // PMA results in correct blending without outlines.
 		debugRenderer = new SkeletonRendererDebug();
 		debugRenderer.setBoundingBoxes(false);
 		debugRenderer.setRegionAttachments(false);
@@ -71,6 +71,8 @@ public class SimpleTest1 extends ApplicationAdapter {
 
 		state = new AnimationState(stateData); // Holds the animation state for a skeleton (current animation, time, etc).
 		state.setTimeScale(0.5f); // Slow all animations down to 50% speed.
+
+		// Queue animations on track 0.
 		state.setAnimation(0, "run", true);
 		state.addAnimation(0, "jump", false, 2); // Jump after 2 seconds.
 		state.addAnimation(0, "run", true, 0); // Run after the jump.
@@ -87,7 +89,7 @@ public class SimpleTest1 extends ApplicationAdapter {
 		// Configure the camera, SpriteBatch, and SkeletonRendererDebug.
 		camera.update();
 		batch.getProjectionMatrix().set(camera.combined);
-		debugRenderer.getShapeRenderer().getProjectionMatrix().set(camera.combined);
+		debugRenderer.getShapeRenderer().setProjectionMatrix(camera.combined);
 
 		batch.begin();
 		renderer.draw(batch, skeleton); // Draw the skeleton images.

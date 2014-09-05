@@ -41,7 +41,7 @@ public class Skeleton {
 	public var g:Number = 1;
 	public var b:Number = 1;
 	public var a:Number = 1;
-	public var time:Number;
+	public var time:Number = 0;
 	public var flipX:Boolean;
 	public var flipY:Boolean;
 	public var x:Number = 0;

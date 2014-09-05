@@ -66,11 +66,15 @@ namespace spine {
 
 SkeletonDrawable::SkeletonDrawable (SkeletonData* skeletonData, AnimationStateData* stateData) :
 				timeScale(1),
-				vertexArray(new VertexArray(Triangles, skeletonData->boneCount * 4)),
+				vertexArray(new VertexArray(Triangles, skeletonData->bonesCount * 4)),
 				worldVertices(0) {
 	Bone_setYDown(true);
 	worldVertices = MALLOC(float, SPINE_MESH_VERTEX_COUNT_MAX);
 	skeleton = Skeleton_create(skeletonData);
+
+	ownsAnimationStateData = stateData == 0;
+	if (ownsAnimationStateData) stateData = AnimationStateData_create(skeletonData);
+
 	state = AnimationState_create(stateData);
 }
 
@@ -78,6 +82,7 @@ SkeletonDrawable::~SkeletonDrawable () {
 	delete vertexArray;
 	FREE(worldVertices);
 	AnimationState_dispose(state);
+	if (ownsAnimationStateData) AnimationStateData_dispose(state->data);
 	Skeleton_dispose(skeleton);
 }
 
@@ -94,7 +99,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 
 	sf::Vertex vertices[4];
 	sf::Vertex vertex;
-	for (int i = 0; i < skeleton->slotCount; ++i) {
+	for (int i = 0; i < skeleton->slotsCount; ++i) {
 		Slot* slot = skeleton->drawOrder[i];
 		Attachment* attachment = slot->attachment;
 		if (!attachment) continue;
@@ -102,12 +107,12 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 		if (attachment->type == ATTACHMENT_REGION) {
 			RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
 			texture = (Texture*)((AtlasRegion*)regionAttachment->rendererObject)->page->rendererObject;
-			RegionAttachment_computeWorldVertices(regionAttachment, slot->skeleton->x, slot->skeleton->y, slot->bone, worldVertices);
+			RegionAttachment_computeWorldVertices(regionAttachment, slot->bone, worldVertices);
 
-			Uint8 r = skeleton->r * slot->r * 255;
-			Uint8 g = skeleton->g * slot->g * 255;
-			Uint8 b = skeleton->b * slot->b * 255;
-			Uint8 a = skeleton->a * slot->a * 255;
+			Uint8 r = static_cast<Uint8>(skeleton->r * slot->r * 255);
+			Uint8 g = static_cast<Uint8>(skeleton->g * slot->g * 255);
+			Uint8 b = static_cast<Uint8>(skeleton->b * slot->b * 255);
+			Uint8 a = static_cast<Uint8>(skeleton->a * slot->a * 255);
 
 			Vector2u size = texture->getSize();
 			vertices[0].color.r = r;
@@ -157,12 +162,12 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 			MeshAttachment* mesh = (MeshAttachment*)attachment;
 			if (mesh->verticesCount > SPINE_MESH_VERTEX_COUNT_MAX) continue;
 			texture = (Texture*)((AtlasRegion*)mesh->rendererObject)->page->rendererObject;
-			MeshAttachment_computeWorldVertices(mesh, slot->skeleton->x, slot->skeleton->y, slot, worldVertices);
+			MeshAttachment_computeWorldVertices(mesh, slot, worldVertices);
 
-			Uint8 r = skeleton->r * slot->r * 255;
-			Uint8 g = skeleton->g * slot->g * 255;
-			Uint8 b = skeleton->b * slot->b * 255;
-			Uint8 a = skeleton->a * slot->a * 255;
+			Uint8 r = static_cast<Uint8>(skeleton->r * slot->r * 255);
+			Uint8 g = static_cast<Uint8>(skeleton->g * slot->g * 255);
+			Uint8 b = static_cast<Uint8>(skeleton->b * slot->b * 255);
+			Uint8 a = static_cast<Uint8>(skeleton->a * slot->a * 255);
 			vertex.color.r = r;
 			vertex.color.g = g;
 			vertex.color.b = b;
@@ -182,12 +187,12 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 			SkinnedMeshAttachment* mesh = (SkinnedMeshAttachment*)attachment;
 			if (mesh->uvsCount > SPINE_MESH_VERTEX_COUNT_MAX) continue;
 			texture = (Texture*)((AtlasRegion*)mesh->rendererObject)->page->rendererObject;
-			SkinnedMeshAttachment_computeWorldVertices(mesh, slot->skeleton->x, slot->skeleton->y, slot, worldVertices);
+			SkinnedMeshAttachment_computeWorldVertices(mesh, slot, worldVertices);
 
-			Uint8 r = skeleton->r * slot->r * 255;
-			Uint8 g = skeleton->g * slot->g * 255;
-			Uint8 b = skeleton->b * slot->b * 255;
-			Uint8 a = skeleton->a * slot->a * 255;
+			Uint8 r = static_cast<Uint8>(skeleton->r * slot->r * 255);
+			Uint8 g = static_cast<Uint8>(skeleton->g * slot->g * 255);
+			Uint8 b = static_cast<Uint8>(skeleton->b * slot->b * 255);
+			Uint8 a = static_cast<Uint8>(skeleton->a * slot->a * 255);
 			vertex.color.r = r;
 			vertex.color.g = g;
 			vertex.color.b = b;

@@ -37,6 +37,8 @@ namespace Spine {
 		internal List<Bone> bones;
 		internal List<Slot> slots;
 		internal List<Slot> drawOrder;
+		internal List<IkConstraint> ikConstraints = new List<IkConstraint>();
+		private List<List<Bone>> boneCache = new List<List<Bone>>();
 		internal Skin skin;
 		internal float r = 1, g = 1, b = 1, a = 1;
 		internal float time;
@@ -47,16 +49,17 @@ namespace Spine {
 		public List<Bone> Bones { get { return bones; } }
 		public List<Slot> Slots { get { return slots; } }
 		public List<Slot> DrawOrder { get { return drawOrder; } }
+		public List<IkConstraint> IkConstraints { get { return ikConstraints; } set { ikConstraints = value; } }
 		public Skin Skin { get { return skin; } set { skin = value; } }
 		public float R { get { return r; } set { r = value; } }
 		public float G { get { return g; } set { g = value; } }
 		public float B { get { return b; } set { b = value; } }
 		public float A { get { return a; } set { a = value; } }
 		public float Time { get { return time; } set { time = value; } }
-		public bool FlipX { get { return flipX; } set { flipX = value; } }
-		public bool FlipY { get { return flipY; } set { flipY = value; } }
 		public float X { get { return x; } set { x = value; } }
 		public float Y { get { return y; } set { y = value; } }
+		public bool FlipX { get { return flipX; } set { flipX = value; } }
+		public bool FlipY { get { return flipY; } set { flipY = value; } }
 
 		public Bone RootBone {
 			get {
@@ -71,26 +74,84 @@ namespace Spine {
 			bones = new List<Bone>(data.bones.Count);
 			foreach (BoneData boneData in data.bones) {
 				Bone parent = boneData.parent == null ? null : bones[data.bones.IndexOf(boneData.parent)];
-				bones.Add(new Bone(boneData, parent));
+				bones.Add(new Bone(boneData, this, parent));
 			}
 
 			slots = new List<Slot>(data.slots.Count);
 			drawOrder = new List<Slot>(data.slots.Count);
 			foreach (SlotData slotData in data.slots) {
 				Bone bone = bones[data.bones.IndexOf(slotData.boneData)];
-				Slot slot = new Slot(slotData, this, bone);
+				Slot slot = new Slot(slotData, bone);
 				slots.Add(slot);
 				drawOrder.Add(slot);
 			}
+
+			ikConstraints = new List<IkConstraint>(data.ikConstraints.Count);
+			foreach (IkConstraintData ikConstraintData in data.ikConstraints)
+				ikConstraints.Add(new IkConstraint(ikConstraintData, this));
+
+			UpdateCache();
 		}
 
-		/// <summary>Updates the world transform for each bone.</summary>
+		/// <summary>Caches information about bones and IK constraints. Must be called if bones or IK constraints are added or
+		/// removed.</summary>
+		public void UpdateCache () {
+			List<List<Bone>> boneCache = this.boneCache;
+			List<IkConstraint> ikConstraints = this.ikConstraints;
+			int ikConstraintsCount = ikConstraints.Count;
+
+			int arrayCount = ikConstraintsCount + 1;
+			if (boneCache.Count > arrayCount) boneCache.RemoveRange(arrayCount, boneCache.Count - arrayCount);
+			for (int i = 0, n = boneCache.Count; i < n; i++)
+				boneCache[i].Clear();
+			while (boneCache.Count < arrayCount)
+				boneCache.Add(new List<Bone>());
+
+			List<Bone> nonIkBones = boneCache[0];
+
+			for (int i = 0, n = bones.Count; i < n; i++) {
+				Bone bone = bones[i];
+				Bone current = bone;
+				do {
+					for (int ii = 0; ii < ikConstraintsCount; ii++) {
+						IkConstraint ikConstraint = ikConstraints[ii];
+						Bone parent = ikConstraint.bones[0];
+						Bone child = ikConstraint.bones[ikConstraint.bones.Count - 1];
+						while (true) {
+							if (current == child) {
+								boneCache[ii].Add(bone);
+								boneCache[ii + 1].Add(bone);
+								goto outer;
+							}
+							if (child == parent) break;
+							child = child.parent;
+						}
+					}
+					current = current.parent;
+				} while (current != null);
+				nonIkBones.Add(bone);
+				outer: {}
+			}
+		}
+
+		/// <summary>Updates the world transform for each bone and applies IK constraints.</summary>
 		public void UpdateWorldTransform () {
-			bool flipX = this.flipX;
-			bool flipY = this.flipY;
 			List<Bone> bones = this.bones;
-			for (int i = 0, n = bones.Count; i < n; i++)
-				bones[i].UpdateWorldTransform(flipX, flipY);
+			for (int ii = 0, nn = bones.Count; ii < nn; ii++) {
+				Bone bone = bones[ii];
+				bone.rotationIK = bone.rotation;
+			}
+			List<List<Bone>> boneCache = this.boneCache;
+			List<IkConstraint> ikConstraints = this.ikConstraints;
+			int i = 0, last = boneCache.Count - 1;
+			while (true) {
+				List<Bone> updateBones = boneCache[i];
+				for (int ii = 0, nn = updateBones.Count; ii < nn; ii++)
+					updateBones[ii].UpdateWorldTransform();
+				if (i == last) break;
+				ikConstraints[i].apply();
+				i++;
+			}
 		}
 
 		/// <summary>Sets the bones and slots to their setup pose values.</summary>
@@ -103,6 +164,13 @@ namespace Spine {
 			List<Bone> bones = this.bones;
 			for (int i = 0, n = bones.Count; i < n; i++)
 				bones[i].SetToSetupPose();
+
+			List<IkConstraint> ikConstraints = this.ikConstraints;
+			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
+				IkConstraint ikConstraint = ikConstraints[i];
+				ikConstraint.bendDirection = ikConstraint.data.bendDirection;
+				ikConstraint.mix = ikConstraint.data.mix;
+			}
 		}
 
 		public void SetSlotsToSetupPose () {
@@ -216,6 +284,17 @@ namespace Spine {
 				}
 			}
 			throw new Exception("Slot not found: " + slotName);
+		}
+
+		/** @return May be null. */
+		public IkConstraint FindIkConstraint (String ikConstraintName) {
+			if (ikConstraintName == null) throw new ArgumentNullException("ikConstraintName cannot be null.");
+			List<IkConstraint> ikConstraints = this.ikConstraints;
+			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
+				IkConstraint ikConstraint = ikConstraints[i];
+				if (ikConstraint.data.name == ikConstraintName) return ikConstraint;
+			}
+			return null;
 		}
 
 		public void Update (float delta) {
