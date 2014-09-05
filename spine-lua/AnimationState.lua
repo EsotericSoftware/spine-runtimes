@@ -211,6 +211,7 @@ function AnimationState.new (data)
 			last.next = entry
 		else
 			self.tracks[trackIndex] = entry
+			self.trackCount = math.max(self.trackCount, index)
 		end
 
 		delay = delay or 0
