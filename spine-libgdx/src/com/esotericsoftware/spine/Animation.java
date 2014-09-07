@@ -245,7 +245,7 @@ public class Animation {
 
 		public RotateTimeline (int frameCount) {
 			super(frameCount);
-			frames = new float[frameCount * 2];
+			frames = new float[frameCount << 1];
 		}
 
 		public void setBoneIndex (int boneIndex) {
@@ -510,7 +510,7 @@ public class Animation {
 			} else if (lastTime > time) //
 				lastTime = -1;
 
-			int frameIndex = time >= frames[frames.length - 1] ? frames.length - 1 : binarySearch(frames, time) - 1;
+			int frameIndex = (time >= frames[frames.length - 1] ? frames.length : binarySearch(frames, time)) - 1;
 			if (frames[frameIndex] <= lastTime) return;
 
 			String attachmentName = attachmentNames[frameIndex];
@@ -772,6 +772,57 @@ public class Animation {
 			float mix = prevFrameMix + (frames[frameIndex + FRAME_MIX] - prevFrameMix) * percent;
 			ikConstraint.mix += (mix - ikConstraint.mix) * alpha;
 			ikConstraint.bendDirection = (int)frames[frameIndex + FRAME_BEND_DIRECTION];
+		}
+	}
+
+	static public class FlipXTimeline implements Timeline {
+		private final float[] frames; // time, flip, ...
+
+		public FlipXTimeline (int frameCount) {
+			frames = new float[frameCount << 1];
+		}
+
+		public int getFrameCount () {
+			return frames.length >> 1;
+		}
+
+		public float[] getFrames () {
+			return frames;
+		}
+
+		/** Sets the time and value of the specified keyframe. */
+		public void setFrame (int frameIndex, float time, boolean flip) {
+			frameIndex *= 2;
+			frames[frameIndex] = time;
+			frames[frameIndex + 1] = flip ? 1 : 0;
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha) {
+			float[] frames = this.frames;
+			if (time < frames[0]) {
+				if (lastTime > time) apply(skeleton, lastTime, Integer.MAX_VALUE, null, 0);
+				return;
+			} else if (lastTime > time) //
+				lastTime = -1;
+
+			int frameIndex = (time >= frames[frames.length - 2] ? frames.length : binarySearch(frames, time, 2)) - 2;
+			if (frames[frameIndex] <= lastTime) return;
+
+			flip(skeleton, frames[frameIndex + 1] != 0);
+		}
+
+		protected void flip (Skeleton skeleton, boolean flip) {
+			skeleton.setFlipX(flip);
+		}
+	}
+
+	static public class FlipYTimeline extends FlipXTimeline {
+		public FlipYTimeline (int frameCount) {
+			super(frameCount);
+		}
+
+		protected void flip (Skeleton skeleton, boolean flip) {
+			skeleton.setFlipY(flip);
 		}
 	}
 }
