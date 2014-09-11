@@ -145,6 +145,9 @@
     <Content Include="..\..\..\spine-xna\example\data\goblins-ffd.json">
       <Link>Assets\goblins-ffd.json</Link>
     </Content>
+    <Content Include="..\..\..\spine-xna\example\data\raptor.png">
+      <Link>Assets\raptor.png</Link>
+    </Content>
     <Content Include="..\..\..\spine-xna\example\data\spineboy.atlas">
       <Link>Assets\spineboy.atlas</Link>
     </Content>
@@ -172,6 +175,14 @@
       <Project>{8e5baee2-8ccc-4a32-8bcf-5ff438056c0e}</Project>
       <Name>SpineMonogameWindows8Store</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\..\spine-xna\example\data\raptor.atlas">
+      <Link>Assets\raptor.atlas</Link>
+    </Content>
+    <Content Include="..\..\..\spine-xna\example\data\raptor.json">
+      <Link>Assets\raptor.json</Link>
+    </Content>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>
