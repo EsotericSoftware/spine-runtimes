@@ -39,7 +39,8 @@ public class SkeletonAnimation extends SkeletonSprite implements IAnimatable {
 	public var state:AnimationState;
 	public var timeScale:Number = 1;
 
-	public function SkeletonAnimation (skeletonData:SkeletonData, renderMeshes:Boolean = false, stateData:AnimationStateData = null) {
+	/** @param renderMeshes If false, meshes won't be rendered. This may improve batching with non-Spine display objects. */
+	public function SkeletonAnimation (skeletonData:SkeletonData, renderMeshes:Boolean = true, stateData:AnimationStateData = null) {
 		super(skeletonData, renderMeshes);
 		state = new AnimationState(stateData ? stateData : new AnimationStateData(skeletonData));
 	}

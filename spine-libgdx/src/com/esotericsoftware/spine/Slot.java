@@ -38,37 +38,31 @@ import com.badlogic.gdx.utils.FloatArray;
 public class Slot {
 	final SlotData data;
 	final Bone bone;
-	private final Skeleton skeleton;
 	final Color color;
 	Attachment attachment;
 	private float attachmentTime;
 	private FloatArray attachmentVertices = new FloatArray();
 
-	Slot () {
-		data = null;
+	Slot (SlotData data) {
+		this.data = data;
 		bone = null;
-		skeleton = null;
 		color = new Color(1, 1, 1, 1);
 	}
 
-	public Slot (SlotData data, Skeleton skeleton, Bone bone) {
+	public Slot (SlotData data, Bone bone) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
-		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		if (bone == null) throw new IllegalArgumentException("bone cannot be null.");
 		this.data = data;
-		this.skeleton = skeleton;
 		this.bone = bone;
 		color = new Color();
 		setToSetupPose();
 	}
 
 	/** Copy constructor. */
-	public Slot (Slot slot, Skeleton skeleton, Bone bone) {
+	public Slot (Slot slot, Bone bone) {
 		if (slot == null) throw new IllegalArgumentException("slot cannot be null.");
-		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		if (bone == null) throw new IllegalArgumentException("bone cannot be null.");
 		data = slot.data;
-		this.skeleton = skeleton;
 		this.bone = bone;
 		color = new Color(slot.color);
 		attachment = slot.attachment;
@@ -79,12 +73,12 @@ public class Slot {
 		return data;
 	}
 
-	public Skeleton getSkeleton () {
-		return skeleton;
-	}
-
 	public Bone getBone () {
 		return bone;
+	}
+
+	public Skeleton getSkeleton () {
+		return bone.skeleton;
 	}
 
 	public Color getColor () {
@@ -101,17 +95,17 @@ public class Slot {
 	public void setAttachment (Attachment attachment) {
 		if (this.attachment == attachment) return;
 		this.attachment = attachment;
-		attachmentTime = skeleton.time;
+		attachmentTime = bone.skeleton.time;
 		attachmentVertices.clear();
 	}
 
 	public void setAttachmentTime (float time) {
-		attachmentTime = skeleton.time - time;
+		attachmentTime = bone.skeleton.time - time;
 	}
 
 	/** Returns the time since the attachment was set. */
 	public float getAttachmentTime () {
-		return skeleton.time - attachmentTime;
+		return bone.skeleton.time - attachmentTime;
 	}
 
 	public void setAttachmentVertices (FloatArray attachmentVertices) {
@@ -124,12 +118,12 @@ public class Slot {
 
 	void setToSetupPose (int slotIndex) {
 		color.set(data.color);
-		setAttachment(data.attachmentName == null ? null : skeleton.getAttachment(slotIndex, data.attachmentName));
+		setAttachment(data.attachmentName == null ? null : bone.skeleton.getAttachment(slotIndex, data.attachmentName));
 		attachmentVertices.clear();
 	}
 
 	public void setToSetupPose () {
-		setToSetupPose(skeleton.data.slots.indexOf(data, true));
+		setToSetupPose(bone.skeleton.data.slots.indexOf(data, true));
 	}
 
 	public String toString () {

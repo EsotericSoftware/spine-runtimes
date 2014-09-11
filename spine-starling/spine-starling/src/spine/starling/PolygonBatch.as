@@ -56,7 +56,7 @@ internal class PolygonBatch {
 
 	private var _capacity:int;
 	public var maxCapacity:int = 2000;
-	public var smoothing:String = "bilinear";
+	public var smoothing:String = TextureSmoothing.BILINEAR;
 
 	private var _texture:Texture;
 	private var _support:RenderSupport;
@@ -264,7 +264,7 @@ internal class PolygonBatch {
 			var fragmentShader:String = 
 				"tex ft1, v1, fs0 " + flags + " \n" + // sample texture 0
 				"mul oc, ft1, v0 \n"; // multiply color with texel color
-			Starling.current.registerProgramFromSource(name, vertexShader, fragmentShader);
+			program = Starling.current.registerProgramFromSource(name, vertexShader, fragmentShader);
 		}
 		context.setProgram(program);
 	}

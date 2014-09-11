@@ -85,6 +85,7 @@ public class SkeletonRendererDebug {
 				float y = skeletonY + bone.data.length * bone.m10 + bone.worldY;
 				shapes.line(skeletonX + bone.worldX, skeletonY + bone.worldY, x, y);
 			}
+			shapes.x(skeletonX, skeletonY, 4 * scale);
 		}
 
 		if (drawRegionAttachments) {

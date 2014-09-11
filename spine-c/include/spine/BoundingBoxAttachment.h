@@ -47,7 +47,7 @@ struct spBoundingBoxAttachment {
 };
 
 spBoundingBoxAttachment* spBoundingBoxAttachment_create (const char* name);
-void spBoundingBoxAttachment_computeWorldVertices (spBoundingBoxAttachment* self, float x, float y, spBone* bone, float* vertices);
+void spBoundingBoxAttachment_computeWorldVertices (spBoundingBoxAttachment* self, spBone* bone, float* vertices);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spBoundingBoxAttachment BoundingBoxAttachment;

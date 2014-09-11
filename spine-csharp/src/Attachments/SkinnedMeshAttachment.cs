@@ -93,8 +93,10 @@ namespace Spine {
 			}
 		}
 
-		public void ComputeWorldVertices (float x, float y, Slot slot, float[] worldVertices) {
-			List<Bone> skeletonBones = slot.skeleton.bones;
+		public void ComputeWorldVertices (Slot slot, float[] worldVertices) {
+			Skeleton skeleton = slot.bone.skeleton;
+			List<Bone> skeletonBones = skeleton.bones;
+			float x = skeleton.x, y = skeleton.y;
 			float[] weights = this.weights;
 			int[] bones = this.bones;
 			if (slot.attachmentVerticesCount == 0) {

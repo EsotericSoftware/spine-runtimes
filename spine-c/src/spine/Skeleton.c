@@ -32,76 +32,182 @@
 #include <string.h>
 #include <spine/extension.h>
 
+typedef struct {
+	spSkeleton super;
+
+	int boneCacheCount;
+	int* boneCacheCounts;
+	spBone*** boneCache;
+} _spSkeleton;
+
 spSkeleton* spSkeleton_create (spSkeletonData* data) {
 	int i, ii;
 
-	spSkeleton* self = NEW(spSkeleton);
+	_spSkeleton* internal = NEW(_spSkeleton);
+	spSkeleton* self = SUPER(internal);
 	CONST_CAST(spSkeletonData*, self->data) = data;
 
-	self->boneCount = self->data->boneCount;
-	self->bones = MALLOC(spBone*, self->boneCount);
+	self->bonesCount = self->data->bonesCount;
+	self->bones = MALLOC(spBone*, self->bonesCount);
 
-	for (i = 0; i < self->boneCount; ++i) {
+	for (i = 0; i < self->bonesCount; ++i) {
 		spBoneData* boneData = self->data->bones[i];
 		spBone* parent = 0;
 		if (boneData->parent) {
 			/* Find parent bone. */
-			for (ii = 0; ii < self->boneCount; ++ii) {
+			for (ii = 0; ii < self->bonesCount; ++ii) {
 				if (data->bones[ii] == boneData->parent) {
 					parent = self->bones[ii];
 					break;
 				}
 			}
 		}
-		self->bones[i] = spBone_create(boneData, parent);
+		self->bones[i] = spBone_create(boneData, self, parent);
 	}
 	CONST_CAST(spBone*, self->root) = self->bones[0];
 
-	self->slotCount = data->slotCount;
-	self->slots = MALLOC(spSlot*, self->slotCount);
-	for (i = 0; i < self->slotCount; ++i) {
+	self->slotsCount = data->slotsCount;
+	self->slots = MALLOC(spSlot*, self->slotsCount);
+	for (i = 0; i < self->slotsCount; ++i) {
 		spSlotData *slotData = data->slots[i];
 
 		/* Find bone for the slotData's boneData. */
 		spBone* bone = 0;
-		for (ii = 0; ii < self->boneCount; ++ii) {
+		for (ii = 0; ii < self->bonesCount; ++ii) {
 			if (data->bones[ii] == slotData->boneData) {
 				bone = self->bones[ii];
 				break;
 			}
 		}
-		self->slots[i] = spSlot_create(slotData, self, bone);
+		self->slots[i] = spSlot_create(slotData, bone);
 	}
 
-	self->drawOrder = MALLOC(spSlot*, self->slotCount);
-	memcpy(self->drawOrder, self->slots, sizeof(spSlot*) * self->slotCount);
+	self->drawOrder = MALLOC(spSlot*, self->slotsCount);
+	memcpy(self->drawOrder, self->slots, sizeof(spSlot*) * self->slotsCount);
 
 	self->r = 1;
 	self->g = 1;
 	self->b = 1;
 	self->a = 1;
 
+	self->ikConstraintsCount = data->ikConstraintsCount;
+	self->ikConstraints = MALLOC(spIkConstraint*, self->ikConstraintsCount);
+	for (i = 0; i < self->data->ikConstraintsCount; ++i)
+		self->ikConstraints[i] = spIkConstraint_create(self->data->ikConstraints[i], self);
+
+	spSkeleton_updateCache(self);
+
 	return self;
 }
 
 void spSkeleton_dispose (spSkeleton* self) {
 	int i;
-	for (i = 0; i < self->boneCount; ++i)
+	_spSkeleton* internal = SUB_CAST(_spSkeleton, self);
+
+	for (i = 0; i < internal->boneCacheCount; ++i)
+		FREE(internal->boneCache[i]);
+	FREE(internal->boneCache);
+	FREE(internal->boneCacheCounts);
+
+	for (i = 0; i < self->bonesCount; ++i)
 		spBone_dispose(self->bones[i]);
 	FREE(self->bones);
 
-	for (i = 0; i < self->slotCount; ++i)
+	for (i = 0; i < self->slotsCount; ++i)
 		spSlot_dispose(self->slots[i]);
 	FREE(self->slots);
+
+	for (i = 0; i < self->ikConstraintsCount; ++i)
+		spIkConstraint_dispose(self->ikConstraints[i]);
+	FREE(self->ikConstraints);
 
 	FREE(self->drawOrder);
 	FREE(self);
 }
 
+void spSkeleton_updateCache (const spSkeleton* self) {
+	int i, ii;
+	_spSkeleton* internal = SUB_CAST(_spSkeleton, self);
+
+	for (i = 0; i < internal->boneCacheCount; ++i)
+		FREE(internal->boneCache[i]);
+	FREE(internal->boneCache);
+	FREE(internal->boneCacheCounts);
+
+	internal->boneCacheCount = self->ikConstraintsCount + 1;
+	internal->boneCache = MALLOC(spBone**, internal->boneCacheCount);
+	internal->boneCacheCounts = CALLOC(int, internal->boneCacheCount);
+
+	/* Compute array sizes. */
+	for (i = 0; i < self->bonesCount; ++i) {
+		spBone* current = self->bones[i];
+		do {
+			for (ii = 0; ii < self->ikConstraintsCount; ++ii) {
+				spIkConstraint* ikConstraint = self->ikConstraints[ii];
+				spBone* parent = ikConstraint->bones[0];
+				spBone* child = ikConstraint->bones[ikConstraint->bonesCount - 1];
+				while (1) {
+					if (current == child) {
+						internal->boneCacheCounts[ii]++;
+						internal->boneCacheCounts[ii + 1]++;
+						goto outer1;
+					}
+					if (child == parent) break;
+					child = child->parent;
+				}
+			}
+			current = current->parent;
+		} while (current);
+		internal->boneCacheCounts[0]++;
+		outer1: {}
+	}
+
+	for (i = 0; i < internal->boneCacheCount; ++i)
+		internal->boneCache[i] = MALLOC(spBone*, internal->boneCacheCounts[i]);
+	memset(internal->boneCacheCounts, 0, internal->boneCacheCount * sizeof(int));
+
+	/* Populate arrays. */
+	for (i = 0; i < self->bonesCount; ++i) {
+		spBone* bone = self->bones[i];
+		spBone* current = bone;
+		do {
+			for (ii = 0; ii < self->ikConstraintsCount; ++ii) {
+				spIkConstraint* ikConstraint = self->ikConstraints[ii];
+				spBone* parent = ikConstraint->bones[0];
+				spBone* child = ikConstraint->bones[ikConstraint->bonesCount - 1];
+				while (1) {
+					if (current == child) {
+						internal->boneCache[ii][internal->boneCacheCounts[ii]++] = bone;
+						internal->boneCache[ii + 1][internal->boneCacheCounts[ii + 1]++] = bone;
+						goto outer2;
+					}
+					if (child == parent) break;
+					child = child->parent;
+				}
+			}
+			current = current->parent;
+		} while (current);
+		internal->boneCache[0][internal->boneCacheCounts[0]++] = bone;
+		outer2: {}
+	}
+}
+
 void spSkeleton_updateWorldTransform (const spSkeleton* self) {
-	int i;
-	for (i = 0; i < self->boneCount; ++i)
-		spBone_updateWorldTransform(self->bones[i], self->flipX, self->flipY);
+	int i, ii, nn, last;
+	_spSkeleton* internal = SUB_CAST(_spSkeleton, self);
+
+	for (i = 0; i < self->bonesCount; ++i)
+		self->bones[i]->rotationIK = self->bones[i]->rotation;
+
+	i = 0;
+	last = internal->boneCacheCount - 1;
+	while (1) {
+		for (ii = 0, nn = internal->boneCacheCounts[i]; ii < nn; ++ii)
+			spBone_updateWorldTransform(internal->boneCache[i][ii]);
+		if (i == last) break;
+		spIkConstraint_apply(self->ikConstraints[i]);
+		i++;
+	}
 }
 
 void spSkeleton_setToSetupPose (const spSkeleton* self) {
@@ -111,41 +217,47 @@ void spSkeleton_setToSetupPose (const spSkeleton* self) {
 
 void spSkeleton_setBonesToSetupPose (const spSkeleton* self) {
 	int i;
-	for (i = 0; i < self->boneCount; ++i)
+	for (i = 0; i < self->bonesCount; ++i)
 		spBone_setToSetupPose(self->bones[i]);
+
+	for (i = 0; i < self->ikConstraintsCount; ++i) {
+		spIkConstraint* ikConstraint = self->ikConstraints[i];
+		ikConstraint->bendDirection = ikConstraint->data->bendDirection;
+		ikConstraint->mix = ikConstraint->data->mix;
+	}
 }
 
 void spSkeleton_setSlotsToSetupPose (const spSkeleton* self) {
 	int i;
-	memcpy(self->drawOrder, self->slots, self->slotCount * sizeof(spSlot*));
-	for (i = 0; i < self->slotCount; ++i)
+	memcpy(self->drawOrder, self->slots, self->slotsCount * sizeof(spSlot*));
+	for (i = 0; i < self->slotsCount; ++i)
 		spSlot_setToSetupPose(self->slots[i]);
 }
 
 spBone* spSkeleton_findBone (const spSkeleton* self, const char* boneName) {
 	int i;
-	for (i = 0; i < self->boneCount; ++i)
+	for (i = 0; i < self->bonesCount; ++i)
 		if (strcmp(self->data->bones[i]->name, boneName) == 0) return self->bones[i];
 	return 0;
 }
 
 int spSkeleton_findBoneIndex (const spSkeleton* self, const char* boneName) {
 	int i;
-	for (i = 0; i < self->boneCount; ++i)
+	for (i = 0; i < self->bonesCount; ++i)
 		if (strcmp(self->data->bones[i]->name, boneName) == 0) return i;
 	return -1;
 }
 
 spSlot* spSkeleton_findSlot (const spSkeleton* self, const char* slotName) {
 	int i;
-	for (i = 0; i < self->slotCount; ++i)
+	for (i = 0; i < self->slotsCount; ++i)
 		if (strcmp(self->data->slots[i]->name, slotName) == 0) return self->slots[i];
 	return 0;
 }
 
 int spSkeleton_findSlotIndex (const spSkeleton* self, const char* slotName) {
 	int i;
-	for (i = 0; i < self->slotCount; ++i)
+	for (i = 0; i < self->slotsCount; ++i)
 		if (strcmp(self->data->slots[i]->name, slotName) == 0) return i;
 	return -1;
 }
@@ -169,7 +281,7 @@ void spSkeleton_setSkin (spSkeleton* self, spSkin* newSkin) {
 		else {
 			/* No previous skin, attach setup pose attachments. */
 			int i;
-			for (i = 0; i < self->slotCount; ++i) {
+			for (i = 0; i < self->slotsCount; ++i) {
 				spSlot* slot = self->slots[i];
 				if (slot->data->attachmentName) {
 					spAttachment* attachment = spSkin_getAttachment(newSkin, i, slot->data->attachmentName);
@@ -201,7 +313,7 @@ spAttachment* spSkeleton_getAttachmentForSlotIndex (const spSkeleton* self, int 
 
 int spSkeleton_setAttachment (spSkeleton* self, const char* slotName, const char* attachmentName) {
 	int i;
-	for (i = 0; i < self->slotCount; ++i) {
+	for (i = 0; i < self->slotsCount; ++i) {
 		spSlot *slot = self->slots[i];
 		if (strcmp(slot->data->name, slotName) == 0) {
 			if (!attachmentName)
@@ -214,6 +326,13 @@ int spSkeleton_setAttachment (spSkeleton* self, const char* slotName, const char
 			return 1;
 		}
 	}
+	return 0;
+}
+
+spIkConstraint* spSkeleton_findIkConstraint (const spSkeleton* self, const char* ikConstraintName) {
+	int i;
+	for (i = 0; i < self->ikConstraintsCount; ++i)
+		if (strcmp(self->ikConstraints[i]->data->name, ikConstraintName) == 0) return self->ikConstraints[i];
 	return 0;
 }
 

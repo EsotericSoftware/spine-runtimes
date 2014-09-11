@@ -29,12 +29,14 @@
  *****************************************************************************/
 
 package spine {
+import flash.utils.Dictionary;
+
 import spine.attachments.Attachment;
 
 /** Stores attachments by slot index and attachment name. */
 public class Skin {
 	internal var _name:String;
-	private var attachments:Object = new Object();
+	private var _attachments:Vector.<Dictionary> = new Vector.<Dictionary>();
 
 	public function Skin (name:String) {
 		if (name == null)
@@ -45,12 +47,20 @@ public class Skin {
 	public function addAttachment (slotIndex:int, name:String, attachment:Attachment) : void {
 		if (attachment == null)
 			throw new ArgumentError("attachment cannot be null.");
-		attachments[slotIndex + ":" + name] = attachment;
+		if (slotIndex >= attachments.length) attachments.length = slotIndex + 1;
+		if (!attachments[slotIndex]) attachments[slotIndex] = new Dictionary();
+		attachments[slotIndex][name] = attachment;
 	}
 
 	/** @return May be null. */
 	public function getAttachment (slotIndex:int, name:String) : Attachment {
-		return attachments[slotIndex + ":" + name];
+		if (slotIndex >= attachments.length) return null;
+		var dictionary:Dictionary = attachments[slotIndex];
+		return dictionary ? dictionary[name] : null;
+	}
+
+	public function get attachments () : Vector.<Dictionary> {
+		return _attachments;
 	}
 
 	public function get name () : String {
@@ -63,16 +73,21 @@ public class Skin {
 
 	/** Attach each attachment in this skin if the corresponding attachment in the old skin is currently attached. */
 	public function attachAll (skeleton:Skeleton, oldSkin:Skin) : void {
-		for (var key:String in oldSkin.attachments) {
-			var colon:int = key.indexOf(":");
-			var slotIndex:int = parseInt(key.substring(0, colon));
-			var name:String = key.substring(colon + 1);
-			var slot:Slot = skeleton.slots[slotIndex];
-			if (slot.attachment && slot.attachment.name == name) {
-				var attachment:Attachment = getAttachment(slotIndex, name);
-				if (attachment != null)
-					slot.attachment = attachment;
+		var slotIndex:int = 0;
+		for each (var slot:Slot in skeleton._slots) {
+			var slotAttachment:Attachment = slot.attachment;
+			if (slotAttachment && slotIndex < oldSkin.attachments.length) {
+				var dictionary:Dictionary = oldSkin.attachments[slotIndex];
+				for (var name:String in dictionary) {
+					var skinAttachment:Attachment = dictionary[name];
+					if (slotAttachment == skinAttachment) {
+						var attachment:Attachment = getAttachment(slotIndex, name);
+						if (attachment != null) slot.attachment = attachment;
+						break;
+					}
+				}
 			}
+			slotIndex++;
 		}
 	}
 }

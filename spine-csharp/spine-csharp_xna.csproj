@@ -105,6 +105,8 @@
     <Compile Include="src\Attachments\RegionAttachment.cs" />
     <Compile Include="src\Bone.cs" />
     <Compile Include="src\BoneData.cs" />
+    <Compile Include="src\IkConstraint.cs" />
+    <Compile Include="src\IkConstraintData.cs" />
     <Compile Include="src\Event.cs" />
     <Compile Include="src\EventData.cs" />
     <Compile Include="src\Json.cs" />

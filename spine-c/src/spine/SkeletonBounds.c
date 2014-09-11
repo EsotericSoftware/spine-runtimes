@@ -105,18 +105,18 @@ void spSkeletonBounds_update (spSkeletonBounds* self, spSkeleton* skeleton, int/
 	int i;
 
 	_spSkeletonBounds* internal = SUB_CAST(_spSkeletonBounds, self);
-	if (internal->capacity < skeleton->slotCount) {
+	if (internal->capacity < skeleton->slotsCount) {
 		spPolygon** newPolygons;
 
 		FREE(self->boundingBoxes);
-		self->boundingBoxes = MALLOC(spBoundingBoxAttachment*, skeleton->slotCount);
+		self->boundingBoxes = MALLOC(spBoundingBoxAttachment*, skeleton->slotsCount);
 
-		newPolygons = CALLOC(spPolygon*, skeleton->slotCount);
+		newPolygons = CALLOC(spPolygon*, skeleton->slotsCount);
 		memcpy(newPolygons, self->polygons, internal->capacity);
 		FREE(self->polygons);
 		self->polygons = newPolygons;
 
-		internal->capacity = skeleton->slotCount;
+		internal->capacity = skeleton->slotsCount;
 	}
 
 	self->minX = (float)INT_MAX;
@@ -125,7 +125,7 @@ void spSkeletonBounds_update (spSkeletonBounds* self, spSkeleton* skeleton, int/
 	self->maxY = (float)INT_MIN;
 
 	self->count = 0;
-	for (i = 0; i < skeleton->slotCount; ++i) {
+	for (i = 0; i < skeleton->slotsCount; ++i) {
 		spPolygon* polygon;
 		spBoundingBoxAttachment* boundingBox;
 
@@ -141,7 +141,7 @@ void spSkeletonBounds_update (spSkeletonBounds* self, spSkeleton* skeleton, int/
 			self->polygons[self->count] = polygon = spPolygon_create(boundingBox->verticesCount);
 		}
 		polygon->count = boundingBox->verticesCount;
-		spBoundingBoxAttachment_computeWorldVertices(boundingBox, skeleton->x, skeleton->y, slot->bone, polygon->vertices);
+		spBoundingBoxAttachment_computeWorldVertices(boundingBox, slot->bone, polygon->vertices);
 
 		if (updateAabb) {
 			int ii = 0;
@@ -155,7 +155,7 @@ void spSkeletonBounds_update (spSkeletonBounds* self, spSkeleton* skeleton, int/
 			}
 		}
 
-		++self->count;
+		self->count++;
 	}
 }
 

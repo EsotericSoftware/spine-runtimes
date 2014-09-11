@@ -98,6 +98,8 @@ public class SimpleTest2 extends ApplicationAdapter {
 				System.out.println(trackIndex + " end: " + state.getCurrent(trackIndex));
 			}
 		});
+		
+		// Set animation on track 0.
 		state.setAnimation(0, "run", true);
 
 		Gdx.input.setInputProcessor(new InputAdapter() {
