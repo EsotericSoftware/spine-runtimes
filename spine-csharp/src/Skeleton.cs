@@ -77,6 +77,11 @@ namespace Spine {
 				bones.Add(new Bone(boneData, this, parent));
 			}
 
+			foreach(Bone b in bones){
+				if(b.Parent != null)
+					b.Parent.children.Add(b);
+			}
+
 			slots = new List<Slot>(data.slots.Count);
 			drawOrder = new List<Slot>(data.slots.Count);
 			foreach (SlotData slotData in data.slots) {
