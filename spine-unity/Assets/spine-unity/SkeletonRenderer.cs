@@ -37,6 +37,10 @@ using Spine;
 /// <summary>Renders a skeleton.</summary>
 [ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class SkeletonRenderer : MonoBehaviour {
+
+	public delegate void SkeletonRendererDelegate(SkeletonRenderer skeletonRenderer);
+	public SkeletonRendererDelegate OnReset;
+	
 	[System.NonSerialized]
 	public bool valid;
 	[System.NonSerialized]
@@ -96,6 +100,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		skeleton = new Skeleton(skeletonData);
 		if (initialSkinName != null && initialSkinName.Length > 0 && initialSkinName != "default")
 			skeleton.SetSkin(initialSkinName);
+		if(OnReset != null) OnReset(this);
 	}
 	
 	public void Awake () {
@@ -112,7 +117,6 @@ public class SkeletonRenderer : MonoBehaviour {
 	
 	public virtual void LateUpdate () {
 		if (!valid) return;
-		
 		// Count vertices and submesh triangles.
 		int vertexCount = 0;
 		int submeshTriangleCount = 0, submeshFirstVertex = 0, submeshStartSlotIndex = 0;
@@ -122,7 +126,8 @@ public class SkeletonRenderer : MonoBehaviour {
 		int drawOrderCount = drawOrder.Count;
 		bool renderMeshes = this.renderMeshes;
 		for (int i = 0; i < drawOrderCount; i++) {
-			Attachment attachment = drawOrder[i].attachment;
+			Slot slot = drawOrder[i];
+			Attachment attachment = slot.attachment;
 			
 			object rendererObject;
 			int attachmentVertexCount, attachmentTriangleCount;
@@ -149,7 +154,7 @@ public class SkeletonRenderer : MonoBehaviour {
 
 			// Populate submesh when material changes.
 			Material material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
-			if (lastMaterial != material && lastMaterial != null) {
+			if ((lastMaterial != material && lastMaterial != null) || slot.Data.name[0] == '*') {
 				AddSubmesh(lastMaterial, submeshStartSlotIndex, i, submeshTriangleCount, submeshFirstVertex, false);
 				submeshTriangleCount = 0;
 				submeshFirstVertex = vertexCount;

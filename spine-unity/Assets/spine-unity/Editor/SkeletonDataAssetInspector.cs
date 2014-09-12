@@ -28,6 +28,11 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+/*****************************************************************************
+ * Automatic import and advanced preview added by Mitch Thompson
+ * Full irrevocable rights and permissions granted to Esoteric Software
+*****************************************************************************/
+
 using System;
 using System.Collections.Generic;
 using UnityEditor;
@@ -53,18 +58,26 @@ public class SkeletonDataAssetInspector : Editor {
 	private string m_skeletonDataAssetGUID;
 	
 	void OnEnable () {
-		atlasAsset = serializedObject.FindProperty("atlasAsset");
-		skeletonJSON = serializedObject.FindProperty("skeletonJSON");
-		scale = serializedObject.FindProperty("scale");
-		fromAnimation = serializedObject.FindProperty("fromAnimation");
-		toAnimation = serializedObject.FindProperty("toAnimation");
-		duration = serializedObject.FindProperty("duration");
-		defaultMix = serializedObject.FindProperty("defaultMix");
-		
-		m_skeletonDataAsset = (SkeletonDataAsset)target;
-		m_skeletonDataAssetGUID = AssetDatabase.AssetPathToGUID( AssetDatabase.GetAssetPath(m_skeletonDataAsset) );
-		
-		EditorApplication.update += Update;
+		try{
+
+			atlasAsset = serializedObject.FindProperty("atlasAsset");
+			skeletonJSON = serializedObject.FindProperty("skeletonJSON");
+			scale = serializedObject.FindProperty("scale");
+			fromAnimation = serializedObject.FindProperty("fromAnimation");
+			toAnimation = serializedObject.FindProperty("toAnimation");
+			duration = serializedObject.FindProperty("duration");
+			defaultMix = serializedObject.FindProperty("defaultMix");
+			
+			m_skeletonDataAsset = (SkeletonDataAsset)target;
+			m_skeletonDataAssetGUID = AssetDatabase.AssetPathToGUID( AssetDatabase.GetAssetPath(m_skeletonDataAsset) );
+			
+			EditorApplication.update += Update;
+
+		}
+		catch{
+
+
+		}
 	}
 	
 	void OnDestroy(){
