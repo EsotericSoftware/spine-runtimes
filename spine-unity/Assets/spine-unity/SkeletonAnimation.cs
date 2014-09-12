@@ -42,7 +42,9 @@ public class SkeletonAnimation : SkeletonRenderer {
 	public Spine.AnimationState state;
 
 	public delegate void UpdateBonesDelegate(SkeletonAnimation skeleton);
-	public UpdateBonesDelegate UpdateBones;
+	public UpdateBonesDelegate UpdateLocal;
+	public UpdateBonesDelegate UpdateWorld;
+	public UpdateBonesDelegate UpdateComplete;
 
 	[SerializeField]
 	private String _animationName;
@@ -83,7 +85,19 @@ public class SkeletonAnimation : SkeletonRenderer {
 		skeleton.Update(deltaTime);
 		state.Update(deltaTime);
 		state.Apply(skeleton);
-		if (UpdateBones != null) UpdateBones(this);
+
+		if (UpdateLocal != null) 
+			UpdateLocal(this);
+
 		skeleton.UpdateWorldTransform();
+
+		if (UpdateWorld != null){ 
+			UpdateWorld(this);
+			skeleton.UpdateWorldTransform();
+		}
+
+		if (UpdateComplete != null){ 
+			UpdateComplete(this);
+		}
 	}
 }
