@@ -63,14 +63,6 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 				if(component.AnimationName != animationName.stringValue){
 					animationName.stringValue = currentState.Animation.Name;
 				}
-
-				if(loop.boolValue != currentState.Loop){
-					loop.boolValue = currentState.Loop;
-				}
-
-				if(timeScale.floatValue != currentState.TimeScale){
-					timeScale.floatValue = currentState.TimeScale;
-				}
 			}
 		}
 
@@ -102,6 +94,7 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 		EditorGUILayout.PropertyField(loop);
 		EditorGUILayout.PropertyField(timeScale);
 		component.timeScale = Math.Max(component.timeScale, 0);
+
 		EditorGUILayout.Space();
 
 		if(!isPrefab){
