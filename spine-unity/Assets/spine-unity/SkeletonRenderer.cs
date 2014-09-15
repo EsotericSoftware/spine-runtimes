@@ -52,7 +52,9 @@ public class SkeletonRenderer : MonoBehaviour {
 	public float zSpacing;
 	public bool renderMeshes = true, immutableTriangles;
 	public bool logErrors = false;
-	
+	public bool overbright = false;
+
+	private float brightMod = 1f;
 	private MeshFilter meshFilter;
 	private Mesh mesh, mesh1, mesh2;
 	private bool useMesh1;
@@ -80,6 +82,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		submeshMaterials.Clear();
 		submeshes.Clear();
 		skeleton = null;
+		brightMod = overbright ? 0.25f : 1f;
 
 		valid = false;
 		if (!skeletonDataAsset) {
@@ -214,9 +217,9 @@ public class SkeletonRenderer : MonoBehaviour {
 				vertices[vertexIndex + 3] = new Vector3(tempVertices[RegionAttachment.X3], tempVertices[RegionAttachment.Y3], z);
 				
 				color.a = (byte)(a * slot.a * regionAttachment.a);
-				color.r = (byte)(r * slot.r * regionAttachment.r * color.a);
-				color.g = (byte)(g * slot.g * regionAttachment.g * color.a);
-				color.b = (byte)(b * slot.b * regionAttachment.b * color.a);
+				color.r = (byte)(r * slot.r * regionAttachment.r * color.a * brightMod);
+				color.g = (byte)(g * slot.g * regionAttachment.g * color.a * brightMod);
+				color.b = (byte)(b * slot.b * regionAttachment.b * color.a * brightMod);
 				if (slot.data.additiveBlending) color.a = 0;
 				colors[vertexIndex] = color;
 				colors[vertexIndex + 1] = color;
@@ -239,9 +242,9 @@ public class SkeletonRenderer : MonoBehaviour {
 					meshAttachment.ComputeWorldVertices(slot, tempVertices);
 					
 					color.a = (byte)(a * slot.a * meshAttachment.a);
-					color.r = (byte)(r * slot.r * meshAttachment.r * color.a);
-					color.g = (byte)(g * slot.g * meshAttachment.g * color.a);
-					color.b = (byte)(b * slot.b * meshAttachment.b * color.a);
+					color.r = (byte)(r * slot.r * meshAttachment.r * color.a * brightMod);
+					color.g = (byte)(g * slot.g * meshAttachment.g * color.a * brightMod);
+					color.b = (byte)(b * slot.b * meshAttachment.b * color.a * brightMod);
 					if (slot.data.additiveBlending) color.a = 0;
 					
 					float[] meshUVs = meshAttachment.uvs;
@@ -258,9 +261,9 @@ public class SkeletonRenderer : MonoBehaviour {
 					meshAttachment.ComputeWorldVertices(slot, tempVertices);
 					
 					color.a = (byte)(a * slot.a * meshAttachment.a);
-					color.r = (byte)(r * slot.r * meshAttachment.r * color.a);
-					color.g = (byte)(g * slot.g * meshAttachment.g * color.a);
-					color.b = (byte)(b * slot.b * meshAttachment.b * color.a);
+					color.r = (byte)(r * slot.r * meshAttachment.r * color.a * brightMod);
+					color.g = (byte)(g * slot.g * meshAttachment.g * color.a * brightMod);
+					color.b = (byte)(b * slot.b * meshAttachment.b * color.a * brightMod);
 					if (slot.data.additiveBlending) color.a = 0;
 					
 					float[] meshUVs = meshAttachment.uvs;
