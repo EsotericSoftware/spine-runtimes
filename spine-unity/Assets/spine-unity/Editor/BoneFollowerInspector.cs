@@ -47,10 +47,12 @@ public class BoneFollowerInspector : Editor {
 
 	void FindRenderer(){
 		if(skeletonRenderer.objectReferenceValue == null){
-			SkeletonRenderer parentRenderer = component.GetComponentInParent<SkeletonRenderer>();
+			SkeletonRenderer parentRenderer = SkeletonUtility.GetInParent<SkeletonRenderer>( component.transform );
+
 			if(parentRenderer != null){
 				skeletonRenderer.objectReferenceValue = (UnityEngine.Object)parentRenderer;
 			}
+
 		}
 	}
 

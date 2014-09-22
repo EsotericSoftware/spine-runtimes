@@ -88,8 +88,14 @@ public class SpineEditorUtilities : AssetPostprocessor {
 		public static Material boneMaterial{
 			get{
 				if(_boneMaterial == null){
+#if UNITY_4_3
+					_boneMaterial = new Material(Shader.Find("Particles/Alpha Blended"));
+					_boneMaterial.SetColor("_TintColor", new Color(0.4f, 0.4f, 0.4f, 0.25f));
+#else
 					_boneMaterial = new Material(Shader.Find("Spine/Bones"));
 					_boneMaterial.SetColor("_Color", new Color(0.4f, 0.4f, 0.4f, 0.25f));
+#endif
+
 				}
 
 				return _boneMaterial;
@@ -177,21 +183,22 @@ public class SpineEditorUtilities : AssetPostprocessor {
 		}
 		else if(skeletonUtilityBoneTable.ContainsKey(instanceId)){
 			Rect r = new Rect (selectionRect); 
-			//r.x = r.width - 15;
 			r.x -= 26;
 
 			if(skeletonUtilityBoneTable[instanceId] != null){
 				if( skeletonUtilityBoneTable[instanceId].transform.childCount == 0 )
-					r.x += 15;
+					r.x += 13;
 				
+				r.y += 2;
 
-				r.width = 15;
+				r.width = 13;
+				r.height = 13;
 
 				if( skeletonUtilityBoneTable[instanceId].mode == SkeletonUtilityBone.Mode.Follow ){
-					GUI.Label(r, Icons.bone);
+					GUI.DrawTexture(r, Icons.bone);
 				}
 				else{
-					GUI.Label(r, Icons.poseBones);
+					GUI.DrawTexture(r, Icons.poseBones);
 				}
 			}
 
