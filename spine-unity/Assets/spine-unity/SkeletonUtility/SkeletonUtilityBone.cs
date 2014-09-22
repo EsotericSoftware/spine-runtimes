@@ -97,7 +97,8 @@ public class SkeletonUtilityBone : MonoBehaviour {
 	}
 
 	void OnEnable(){
-		skeletonUtility = GetComponentInParent<SkeletonUtility>();
+		skeletonUtility = SkeletonUtility.GetInParent<SkeletonUtility>(transform);
+
 		if(skeletonUtility == null)
 			return;
 

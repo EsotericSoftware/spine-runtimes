@@ -41,6 +41,23 @@ using Spine;
 [RequireComponent(typeof(SkeletonAnimation))]
 [ExecuteInEditMode]
 public class SkeletonUtility : MonoBehaviour {
+
+	public static T GetInParent<T>(Transform origin) where T : Component{
+#if UNITY_4_3
+		Transform parent = origin.parent;
+		while(parent.GetComponent<T>() == null){
+			parent = parent.parent;
+			if(parent == null)
+				return default(T);
+		}
+
+		return parent.GetComponent<T>();
+#else
+		return origin.GetComponentInParent<T>();
+#endif
+	}
+
+
 	public delegate void SkeletonUtilityDelegate();
 	public event SkeletonUtilityDelegate OnReset;
 

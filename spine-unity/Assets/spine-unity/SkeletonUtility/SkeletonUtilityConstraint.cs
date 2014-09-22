@@ -10,7 +10,7 @@ public abstract class SkeletonUtilityConstraint : MonoBehaviour {
 
 	protected virtual void OnEnable(){
 		utilBone = GetComponent<SkeletonUtilityBone>();
-		skeletonUtility = GetComponentInParent<SkeletonUtility>();
+		skeletonUtility = SkeletonUtility.GetInParent<SkeletonUtility>(transform);
 		skeletonUtility.RegisterConstraint(this);
 	}
 
