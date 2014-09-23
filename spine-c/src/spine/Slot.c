@@ -51,11 +51,12 @@ void spSlot_dispose (spSlot* self) {
 
 void spSlot_setAttachment (spSlot* self, spAttachment* attachment) {
 	CONST_CAST(spAttachment*, self->attachment) = attachment;
-	SUB_CAST(_spSlot, self) ->attachmentTime = self->bone->skeleton->time;
+	SUB_CAST(_spSlot, self)->attachmentTime = self->bone->skeleton->time;
+	self->attachmentVerticesCount = 0;
 }
 
 void spSlot_setAttachmentTime (spSlot* self, float time) {
-	SUB_CAST(_spSlot, self) ->attachmentTime = self->bone->skeleton->time - time;
+	SUB_CAST(_spSlot, self)->attachmentTime = self->bone->skeleton->time - time;
 }
 
 float spSlot_getAttachmentTime (const spSlot* self) {
@@ -64,6 +65,7 @@ float spSlot_getAttachmentTime (const spSlot* self) {
 
 void spSlot_setToSetupPose (spSlot* self) {
 	spAttachment* attachment = 0;
+
 	self->r = self->data->r;
 	self->g = self->data->g;
 	self->b = self->data->b;
