@@ -205,7 +205,7 @@ namespace Spine {
 	}
 
 	public class RotateTimeline : CurveTimeline {
-		protected const int LAST_FRAME_TIME = -2;
+		protected const int PREV_FRAME_TIME = -2;
 		protected const int FRAME_VALUE = 1;
 
 		internal int boneIndex;
@@ -244,19 +244,19 @@ namespace Spine {
 				return;
 			}
 
-			// Interpolate between the last frame and the current frame.
+			// Interpolate between the previous frame and the current frame.
 			int frameIndex = Animation.binarySearch(frames, time, 2);
-			float lastFrameValue = frames[frameIndex - 1];
+			float prevFrameValue = frames[frameIndex - 1];
 			float frameTime = frames[frameIndex];
-			float percent = 1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime);
+			float percent = 1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime);
 			percent = GetCurvePercent((frameIndex >> 1) - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-			amount = frames[frameIndex + FRAME_VALUE] - lastFrameValue;
+			amount = frames[frameIndex + FRAME_VALUE] - prevFrameValue;
 			while (amount > 180)
 				amount -= 360;
 			while (amount < -180)
 				amount += 360;
-			amount = bone.data.rotation + (lastFrameValue + amount * percent) - bone.rotation;
+			amount = bone.data.rotation + (prevFrameValue + amount * percent) - bone.rotation;
 			while (amount > 180)
 				amount -= 360;
 			while (amount < -180)
@@ -266,7 +266,7 @@ namespace Spine {
 	}
 
 	public class TranslateTimeline : CurveTimeline {
-		protected const int LAST_FRAME_TIME = -3;
+		protected const int PREV_FRAME_TIME = -3;
 		protected const int FRAME_X = 1;
 		protected const int FRAME_Y = 2;
 
@@ -301,16 +301,16 @@ namespace Spine {
 				return;
 			}
 
-			// Interpolate between the last frame and the current frame.
+			// Interpolate between the previous frame and the current frame.
 			int frameIndex = Animation.binarySearch(frames, time, 3);
-			float lastFrameX = frames[frameIndex - 2];
-			float lastFrameY = frames[frameIndex - 1];
+			float prevFrameX = frames[frameIndex - 2];
+			float prevFrameY = frames[frameIndex - 1];
 			float frameTime = frames[frameIndex];
-			float percent = 1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime);
+			float percent = 1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime);
 			percent = GetCurvePercent(frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-			bone.x += (bone.data.x + lastFrameX + (frames[frameIndex + FRAME_X] - lastFrameX) * percent - bone.x) * alpha;
-			bone.y += (bone.data.y + lastFrameY + (frames[frameIndex + FRAME_Y] - lastFrameY) * percent - bone.y) * alpha;
+			bone.x += (bone.data.x + prevFrameX + (frames[frameIndex + FRAME_X] - prevFrameX) * percent - bone.x) * alpha;
+			bone.y += (bone.data.y + prevFrameY + (frames[frameIndex + FRAME_Y] - prevFrameY) * percent - bone.y) * alpha;
 		}
 	}
 
@@ -330,21 +330,21 @@ namespace Spine {
 				return;
 			}
 
-			// Interpolate between the last frame and the current frame.
+			// Interpolate between the previous frame and the current frame.
 			int frameIndex = Animation.binarySearch(frames, time, 3);
-			float lastFrameX = frames[frameIndex - 2];
-			float lastFrameY = frames[frameIndex - 1];
+			float prevFrameX = frames[frameIndex - 2];
+			float prevFrameY = frames[frameIndex - 1];
 			float frameTime = frames[frameIndex];
-			float percent = 1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime);
+			float percent = 1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime);
 			percent = GetCurvePercent(frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-			bone.scaleX += (bone.data.scaleX * (lastFrameX + (frames[frameIndex + FRAME_X] - lastFrameX) * percent) - bone.scaleX) * alpha;
-			bone.scaleY += (bone.data.scaleY * (lastFrameY + (frames[frameIndex + FRAME_Y] - lastFrameY) * percent) - bone.scaleY) * alpha;
+			bone.scaleX += (bone.data.scaleX * (prevFrameX + (frames[frameIndex + FRAME_X] - prevFrameX) * percent) - bone.scaleX) * alpha;
+			bone.scaleY += (bone.data.scaleY * (prevFrameY + (frames[frameIndex + FRAME_Y] - prevFrameY) * percent) - bone.scaleY) * alpha;
 		}
 	}
 
 	public class ColorTimeline : CurveTimeline {
-		protected const int LAST_FRAME_TIME = -5;
+		protected const int PREV_FRAME_TIME = -5;
 		protected const int FRAME_R = 1;
 		protected const int FRAME_G = 2;
 		protected const int FRAME_B = 3;
@@ -384,20 +384,20 @@ namespace Spine {
 				b = frames[i - 1];
 				a = frames[i];
 			} else {
-				// Interpolate between the last frame and the current frame.
+				// Interpolate between the previous frame and the current frame.
 				int frameIndex = Animation.binarySearch(frames, time, 5);
-				float lastFrameR = frames[frameIndex - 4];
-				float lastFrameG = frames[frameIndex - 3];
-				float lastFrameB = frames[frameIndex - 2];
-				float lastFrameA = frames[frameIndex - 1];
+				float prevFrameR = frames[frameIndex - 4];
+				float prevFrameG = frames[frameIndex - 3];
+				float prevFrameB = frames[frameIndex - 2];
+				float prevFrameA = frames[frameIndex - 1];
 				float frameTime = frames[frameIndex];
-				float percent = 1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime);
+				float percent = 1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime);
 				percent = GetCurvePercent(frameIndex / 5 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-				r = lastFrameR + (frames[frameIndex + FRAME_R] - lastFrameR) * percent;
-				g = lastFrameG + (frames[frameIndex + FRAME_G] - lastFrameG) * percent;
-				b = lastFrameB + (frames[frameIndex + FRAME_B] - lastFrameB) * percent;
-				a = lastFrameA + (frames[frameIndex + FRAME_A] - lastFrameA) * percent;
+				r = prevFrameR + (frames[frameIndex + FRAME_R] - prevFrameR) * percent;
+				g = prevFrameG + (frames[frameIndex + FRAME_G] - prevFrameG) * percent;
+				b = prevFrameB + (frames[frameIndex + FRAME_B] - prevFrameB) * percent;
+				a = prevFrameA + (frames[frameIndex + FRAME_A] - prevFrameA) * percent;
 			}
 			Slot slot = skeleton.slots[slotIndex];
 			if (alpha < 1) {
