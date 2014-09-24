@@ -746,8 +746,9 @@ void spFFDTimeline_setFrame (spFFDTimeline* self, int frameIndex, float time, fl
 /**/
 
 static const int IKCONSTRAINT_PREV_FRAME_TIME = -3;
+static const int IKCONSTRAINT_PREV_FRAME_MIX = -2;
+static const int IKCONSTRAINT_PREV_FRAME_BEND_DIRECTION = -1;
 static const int IKCONSTRAINT_FRAME_MIX = 1;
-static const int IKCONSTRAINT_FRAME_BEND_DIRECTION = 2;
 
 void _spIkConstraintTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time,
 		spEvent** firedEvents, int* eventsCount, float alpha) {
@@ -768,14 +769,14 @@ void _spIkConstraintTimeline_apply (const spTimeline* timeline, spSkeleton* skel
 
 	/* Interpolate between the previous frame and the current frame. */
 	frameIndex = binarySearch(self->frames, self->framesCount, time, 3);
-	prevFrameMix = self->frames[frameIndex - 2];
+	prevFrameMix = self->frames[frameIndex + IKCONSTRAINT_PREV_FRAME_MIX];
 	frameTime = self->frames[frameIndex];
 	percent = 1 - (time - frameTime) / (self->frames[frameIndex + IKCONSTRAINT_PREV_FRAME_TIME] - frameTime);
 	percent = spCurveTimeline_getCurvePercent(SUPER(self), frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
 	mix = prevFrameMix + (self->frames[frameIndex + IKCONSTRAINT_FRAME_MIX] - prevFrameMix) * percent;
 	ikConstraint->mix += (mix - ikConstraint->mix) * alpha;
-	ikConstraint->bendDirection = (int)self->frames[frameIndex + IKCONSTRAINT_FRAME_BEND_DIRECTION];
+	ikConstraint->bendDirection = (int)self->frames[frameIndex + IKCONSTRAINT_PREV_FRAME_BEND_DIRECTION];
 }
 
 spIkConstraintTimeline* spIkConstraintTimeline_create (int framesCount) {

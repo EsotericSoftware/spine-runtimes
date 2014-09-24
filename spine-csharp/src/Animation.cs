@@ -622,8 +622,9 @@ namespace Spine {
 
 	public class IkConstraintTimeline : CurveTimeline {
 		private const int PREV_FRAME_TIME = -3;
+		private const int PREV_FRAME_MIX = -2;
+		private const int PREV_FRAME_BEND_DIRECTION = -1;
 		private const int FRAME_MIX = 1;
-		private const int FRAME_BEND_DIRECTION = 2;
 
 		internal int ikConstraintIndex;
 		internal float[] frames;
@@ -662,14 +663,14 @@ namespace Spine {
 
 			// Interpolate between the previous frame and the current frame.
 			int frameIndex = Animation.binarySearch(frames, time, 3);
-			float prevFrameMix = frames[frameIndex - 2];
+			float prevFrameMix = frames[frameIndex + PREV_FRAME_MIX];
 			float frameTime = frames[frameIndex];
 			float percent = 1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime);
 			percent = GetCurvePercent(frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
 			float mix = prevFrameMix + (frames[frameIndex + FRAME_MIX] - prevFrameMix) * percent;
 			ikConstraint.mix += (mix - ikConstraint.mix) * alpha;
-			ikConstraint.bendDirection = (int)frames[frameIndex + FRAME_BEND_DIRECTION];
+			ikConstraint.bendDirection = (int)frames[frameIndex + PREV_FRAME_BEND_DIRECTION];
 		}
 	}
 }
