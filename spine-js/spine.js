@@ -407,8 +407,8 @@ spine.ScaleTimeline.prototype = {
 		var bone = skeleton.bones[this.boneIndex];
 
 		if (time >= frames[frames.length - 3]) { // Time is after last frame.
-			bone.scaleX += (bone.data.scaleX - 1 + frames[frames.length - 2] - bone.scaleX) * alpha;
-			bone.scaleY += (bone.data.scaleY - 1 + frames[frames.length - 1] - bone.scaleY) * alpha;
+			bone.scaleX += (bone.data.scaleX * frames[frames.length - 2] - bone.scaleX) * alpha;
+			bone.scaleY += (bone.data.scaleY * frames[frames.length - 1] - bone.scaleY) * alpha;
 			return;
 		}
 
@@ -420,8 +420,8 @@ spine.ScaleTimeline.prototype = {
 		var percent = 1 - (time - frameTime) / (frames[frameIndex + -3/*LAST_FRAME_TIME*/] - frameTime);
 		percent = this.curves.getCurvePercent(frameIndex / 3 - 1, percent);
 
-		bone.scaleX += (bone.data.scaleX - 1 + lastFrameX + (frames[frameIndex + 1/*FRAME_X*/] - lastFrameX) * percent - bone.scaleX) * alpha;
-		bone.scaleY += (bone.data.scaleY - 1 + lastFrameY + (frames[frameIndex + 2/*FRAME_Y*/] - lastFrameY) * percent - bone.scaleY) * alpha;
+		bone.scaleX += (bone.data.scaleX * (lastFrameX + (frames[frameIndex + 1/*FRAME_X*/] - lastFrameX) * percent) - bone.scaleX) * alpha;
+		bone.scaleY += (bone.data.scaleY * (lastFrameY + (frames[frameIndex + 2/*FRAME_Y*/] - lastFrameY) * percent) - bone.scaleY) * alpha;
 	}
 };
 

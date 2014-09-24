@@ -325,8 +325,8 @@ namespace Spine {
 
 			Bone bone = skeleton.bones[boneIndex];
 			if (time >= frames[frames.Length - 3]) { // Time is after last frame.
-				bone.scaleX += (bone.data.scaleX - 1 + frames[frames.Length - 2] - bone.scaleX) * alpha;
-				bone.scaleY += (bone.data.scaleY - 1 + frames[frames.Length - 1] - bone.scaleY) * alpha;
+				bone.scaleX += (bone.data.scaleX * frames[frames.Length - 2] - bone.scaleX) * alpha;
+				bone.scaleY += (bone.data.scaleY * frames[frames.Length - 1] - bone.scaleY) * alpha;
 				return;
 			}
 
@@ -338,8 +338,8 @@ namespace Spine {
 			float percent = 1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime);
 			percent = GetCurvePercent(frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-			bone.scaleX += (bone.data.scaleX - 1 + lastFrameX + (frames[frameIndex + FRAME_X] - lastFrameX) * percent - bone.scaleX) * alpha;
-			bone.scaleY += (bone.data.scaleY - 1 + lastFrameY + (frames[frameIndex + FRAME_Y] - lastFrameY) * percent - bone.scaleY) * alpha;
+			bone.scaleX += (bone.data.scaleX * (lastFrameX + (frames[frameIndex + FRAME_X] - lastFrameX) * percent) - bone.scaleX) * alpha;
+			bone.scaleY += (bone.data.scaleY * (lastFrameY + (frames[frameIndex + FRAME_Y] - lastFrameY) * percent) - bone.scaleY) * alpha;
 		}
 	}
 
