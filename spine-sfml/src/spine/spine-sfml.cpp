@@ -81,8 +81,8 @@ SkeletonDrawable::SkeletonDrawable (SkeletonData* skeletonData, AnimationStateDa
 SkeletonDrawable::~SkeletonDrawable () {
 	delete vertexArray;
 	FREE(worldVertices);
+    if (ownsAnimationStateData) AnimationStateData_dispose(state->data);
 	AnimationState_dispose(state);
-	if (ownsAnimationStateData) AnimationStateData_dispose(state->data);
 	Skeleton_dispose(skeleton);
 }
 
