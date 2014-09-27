@@ -83,13 +83,6 @@ local function binarySearch (values, target, step)
 	end
 end
 
-local function linearSearch (values, target, step)
-	for i = 0, #values, step do
-		if (values[i] > target) then return i end
-	end
-	return -1
-end
-
 Animation.CurveTimeline = {}
 function Animation.CurveTimeline.new ()
 	local LINEAR = 0
@@ -463,7 +456,7 @@ function Animation.EventTimeline.new ()
 		if not firedEvents then return end
 
 		local frames = self.frames
-		local frameCount = #frames
+		local frameCount = #frames + 1 -- "+ 1" to count frames[0]
 
 		if lastTime > time then -- Fire events after last time for looped animations.
 			self:apply(skeleton, lastTime, 999999, firedEvents, alpha)
