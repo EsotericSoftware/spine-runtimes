@@ -67,6 +67,7 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 		}
 
 
+		//TODO:  Refactor this to use GenericMenu and callbacks to avoid interfering with control by other behaviours.
 		// Animation name.
 		{
 			String[] animations = new String[component.skeleton.Data.Animations.Count + 1];
@@ -85,8 +86,10 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 			EditorGUILayout.EndHorizontal();
 
 			String selectedAnimationName = animationIndex == 0 ? null : animations[animationIndex];
-			component.AnimationName = selectedAnimationName;
-			animationName.stringValue = selectedAnimationName;
+			if(component.AnimationName != selectedAnimationName){
+				component.AnimationName = selectedAnimationName;
+				animationName.stringValue = selectedAnimationName;
+			}
 
 
 		}
