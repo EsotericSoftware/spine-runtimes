@@ -60,7 +60,7 @@ public class AttachmentTimeline implements Timeline {
 		} else if (lastTime > time) //
 			lastTime = -1;
 
-		var frameIndex:int = time >= frames[frames.length - 1] ? frames.length - 1 : Animation.binarySearch1(frames, time) - 1;
+		var frameIndex:int = time >= frames[frames.length - 1] ? frames.length - 1 : Animation.binarySearch(frames, time, 1) - 1;
 		if (frames[frameIndex] < lastTime) return;
 
 		var attachmentName:String = attachmentNames[frameIndex];
