@@ -463,7 +463,7 @@ function Animation.EventTimeline.new ()
 		if not firedEvents then return end
 
 		local frames = self.frames
-		local frameCount = #frames
+		local frameCount = #frames + 1
 
 		if lastTime > time then -- Fire events after last time for looped animations.
 			self:apply(skeleton, lastTime, 999999, firedEvents, alpha)
