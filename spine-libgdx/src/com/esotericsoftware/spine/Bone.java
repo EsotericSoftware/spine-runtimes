@@ -264,8 +264,8 @@ public class Bone {
 		float m00 = this.m00, m10 = this.m10, m01 = this.m01, m11 = this.m11;
 		Skeleton skeleton = this.skeleton;
 		if (skeleton.flipX != skeleton.flipY) {
-			m00 *= -1;
-			m11 *= -1;
+			m00 = -m00;
+			m11 = -m11;
 		}
 		float invDet = 1 / (m00 * m11 - m01 * m10);
 		world.x = (x * m00 * invDet - y * m01 * invDet);

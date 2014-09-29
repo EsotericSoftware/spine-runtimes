@@ -637,10 +637,6 @@ namespace Spine {
 			frames = new float[frameCount * 3];
 		}
 
-		public float[] getFrames () {
-			return frames;
-		}
-
 		/** Sets the time, mix and bend direction of the specified keyframe. */
 		public void setFrame (int frameIndex, float time, float mix, int bendDirection) {
 			frameIndex *= 3;

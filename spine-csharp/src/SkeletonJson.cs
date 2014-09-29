@@ -96,7 +96,7 @@ namespace Spine {
 				skeletonData.hash = (String)skeletonMap["hash"];
 				skeletonData.version = (String)skeletonMap["spine"];
 				skeletonData.width = GetFloat(skeletonMap, "width", 0);
-				skeletonData.height = GetFloat(skeletonMap, "width", 1);
+				skeletonData.height = GetFloat(skeletonMap, "height", 0);
 			}
 			
 			// Bones.

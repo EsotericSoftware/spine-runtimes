@@ -37,7 +37,7 @@ namespace Spine {
 		internal List<Bone> bones;
 		internal List<Slot> slots;
 		internal List<Slot> drawOrder;
-		internal List<IkConstraint> ikConstraints = new List<IkConstraint>();
+		internal List<IkConstraint> ikConstraints;
 		private List<List<Bone>> boneCache = new List<List<Bone>>();
 		internal Skin skin;
 		internal float r = 1, g = 1, b = 1, a = 1;
@@ -74,12 +74,9 @@ namespace Spine {
 			bones = new List<Bone>(data.bones.Count);
 			foreach (BoneData boneData in data.bones) {
 				Bone parent = boneData.parent == null ? null : bones[data.bones.IndexOf(boneData.parent)];
-				bones.Add(new Bone(boneData, this, parent));
-			}
-
-			foreach(Bone b in bones){
-				if(b.Parent != null)
-					b.Parent.children.Add(b);
+				Bone bone = new Bone(boneData, this, parent);
+				if (parent != null) parent.children.Add(bone);
+				bones.Add(bone);
 			}
 
 			slots = new List<Slot>(data.slots.Count);
