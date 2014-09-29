@@ -80,7 +80,6 @@ void SkeletonRenderer::initialize () {
 
 void SkeletonRenderer::setSkeletonData (spSkeletonData *skeletonData, bool ownsSkeletonData) {
 	_skeleton = spSkeleton_create(skeletonData);
-	_rootBone = _skeleton->bones[0];
 	_ownsSkeletonData = ownsSkeletonData;
 }
 
@@ -346,34 +345,30 @@ bool SkeletonRenderer::setAttachment (const std::string& slotName, const std::st
 	return spSkeleton_setAttachment(_skeleton, slotName.c_str(), attachmentName.c_str()) ? true : false;
 }
 
-void SkeletonRenderer::setTimeScale(float scale)
-{
-	_timeScale = scale;
+spSkeleton* SkeletonRenderer::getSkeleton () {
+	return _skeleton;
 }
 
-float SkeletonRenderer::getTimeScale() const
-{
+void SkeletonRenderer::setTimeScale (float scale) {
+	_timeScale = scale;
+}
+float SkeletonRenderer::getTimeScale () const {
 	return _timeScale;
 }
 
-void SkeletonRenderer::setDebugSlotsEnabled(bool enabled)
-{
+void SkeletonRenderer::setDebugSlotsEnabled (bool enabled) {
 	_debugSlots = enabled;
 }
-bool SkeletonRenderer::getDebugSlotsEnabled() const
-{
+bool SkeletonRenderer::getDebugSlotsEnabled () const {
 	return _debugSlots;
 }
 
-void SkeletonRenderer::setDebugBonesEnabled(bool enabled)
-{
+void SkeletonRenderer::setDebugBonesEnabled (bool enabled) {
 	_debugBones = enabled;
 }
-bool SkeletonRenderer::getDebugBonesEnabled() const
-{
+bool SkeletonRenderer::getDebugBonesEnabled () const {
 	return _debugBones;
 }
-
 
 // --- CCBlendProtocol
 

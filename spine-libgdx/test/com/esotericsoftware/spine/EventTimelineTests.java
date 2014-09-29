@@ -72,7 +72,7 @@ public class EventTimelineTests {
 		test(0.1f, 0.2f, 0.3f, 0.4f);
 		test(1, 2, 3, 4, 5, 6, 6, 7, 7, 8, 9, 10, 11, 11.01f, 12, 12, 12, 12);
 
-		System.out.println("All tests passed.");
+		System.out.println("EventTimeline tests passed.");
 	}
 
 	private void test (float... frames) {

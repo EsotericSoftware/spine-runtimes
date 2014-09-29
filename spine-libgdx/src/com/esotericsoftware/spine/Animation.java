@@ -86,8 +86,8 @@ public class Animation {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 
 		if (loop && duration != 0) {
-			lastTime %= duration;
 			time %= duration;
+			lastTime %= duration;
 		}
 
 		Array<Timeline> timelines = this.timelines;
@@ -468,8 +468,8 @@ public class Animation {
 
 	static public class AttachmentTimeline implements Timeline {
 		int slotIndex;
-		private final float[] frames; // time, ...
-		private final String[] attachmentNames;
+		final float[] frames; // time, ...
+		final String[] attachmentNames;
 
 		public AttachmentTimeline (int frameCount) {
 			frames = new float[frameCount];
@@ -511,7 +511,7 @@ public class Animation {
 				lastTime = -1;
 
 			int frameIndex = (time >= frames[frames.length - 1] ? frames.length : binarySearch(frames, time)) - 1;
-			if (frames[frameIndex] <= lastTime) return;
+			if (frames[frameIndex] < lastTime) return;
 
 			String attachmentName = attachmentNames[frameIndex];
 			skeleton.slots.get(slotIndex).setAttachment(

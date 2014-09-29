@@ -32,12 +32,17 @@ package com.esotericsoftware.spine;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 
+import java.awt.FileDialog;
+import java.awt.Frame;
+import java.io.File;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -67,11 +72,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import java.awt.FileDialog;
-import java.awt.Frame;
-import java.io.File;
-
-public class SkeletonTest extends ApplicationAdapter {
+public class SkeletonViewer extends ApplicationAdapter {
 	static final float checkModifiedInterval = 0.250f;
 	static final float reloadDelay = 1;
 
@@ -291,6 +292,12 @@ public class SkeletonTest extends ApplicationAdapter {
 			minimizeButton.getColor().a = 0.66f;
 			window.getButtonTable().add(minimizeButton).size(20, 20);
 
+			ScrollPane skinScroll = new ScrollPane(skinList, skin);
+			skinScroll.setFadeScrollBars(false);
+
+			ScrollPane animationScroll = new ScrollPane(animationList, skin);
+			animationScroll.setFadeScrollBars(false);
+
 			// Layout.
 
 			root.pad(2, 4, 4, 4).defaults().space(6);
@@ -320,11 +327,11 @@ public class SkeletonTest extends ApplicationAdapter {
 			root.add("Alpha:");
 			root.add(premultipliedCheckbox).row();
 			root.add("Skin:");
-			root.add(new ScrollPane(skinList, skin)).expand().fill().minHeight(75).row();
+			root.add(skinScroll).expand().fill().minHeight(75).row();
 			root.add("Setup Pose:");
 			root.add(table(bonesSetupPoseButton, slotsSetupPoseButton, setupPoseButton)).row();
 			root.add("Animation:");
-			root.add(new ScrollPane(animationList, skin)).expand().fill().minHeight(75).row();
+			root.add(animationScroll).expand().fill().minHeight(75).row();
 			root.add("Mix:");
 			{
 				Table table = table();
@@ -487,7 +494,13 @@ public class SkeletonTest extends ApplicationAdapter {
 		}
 	}
 
-	public static void main (String[] args) throws Exception {
-		new LwjglApplication(new SkeletonTest(), "SkeletonTest", 800, 600);
+	static public void main (String[] args) throws Exception {
+		LwjglApplicationConfiguration.disableAudio = true;
+		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		config.width = 800;
+		config.height = 600;
+		config.title = "Skeleton Viewer";
+		config.allowSoftwareMode = true;
+		new LwjglApplication(new SkeletonViewer(), config);
 	}
 }

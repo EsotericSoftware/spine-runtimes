@@ -444,7 +444,7 @@ namespace Spine {
 				lastTime = -1;
 
 			int frameIndex = time >= frames[frames.Length - 1] ? frames.Length - 1 : Animation.binarySearch(frames, time) - 1;
-			if (frames[frameIndex] <= lastTime) return;
+			if (frames[frameIndex] < lastTime) return;
 
 			String attachmentName = attachmentNames[frameIndex];
 			skeleton.slots[slotIndex].Attachment =

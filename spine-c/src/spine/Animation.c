@@ -479,7 +479,7 @@ void _spAttachmentTimeline_apply (const spTimeline* timeline, spSkeleton* skelet
 
 	frameIndex = time >= self->frames[self->framesCount - 1] ?
 		self->framesCount - 1 : binarySearch1(self->frames, self->framesCount, time) - 1;
-	if (self->frames[frameIndex] <= lastTime) return;
+	if (self->frames[frameIndex] < lastTime) return;
 
 	attachmentName = self->attachmentNames[frameIndex];
 	spSlot_setAttachment(skeleton->slots[self->slotIndex],
