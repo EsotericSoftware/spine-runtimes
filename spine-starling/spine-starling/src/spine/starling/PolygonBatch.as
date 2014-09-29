@@ -125,7 +125,7 @@ internal class PolygonBatch {
 			_support.applyBlendMode(true);
 		}
 
-		if (texture != _texture) {
+		if (!_texture || texture.base != _texture.base) {
 			flush();
 			_texture = texture;
 		}
