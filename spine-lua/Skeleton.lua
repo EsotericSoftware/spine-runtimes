@@ -28,9 +28,9 @@
 -- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
-local Bone = require "spine-lua.Bone"
-local Slot = require "spine-lua.Slot"
-local AttachmentLoader = require "spine-lua.AttachmentLoader"
+local Bone = require "library.spine-runtimes.spine-lua.Bone"
+local Slot = require "library.spine-runtimes.spine-lua.Slot"
+local AttachmentLoader = require "library.spine-runtimes.spine-lua.AttachmentLoader"
 
 local Skeleton = {}
 function Skeleton.new (skeletonData)

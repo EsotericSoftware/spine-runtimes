@@ -28,9 +28,9 @@
 -- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
-local AttachmentType = require "spine-lua.AttachmentType"
-local RegionAttachment = require "spine-lua.RegionAttachment"
-local BoundingBoxAttachment = require "spine-lua.BoundingBoxAttachment"
+local AttachmentType = require "library.spine-runtimes.spine-lua.AttachmentType"
+local RegionAttachment = require "library.spine-runtimes.spine-lua.RegionAttachment"
+local BoundingBoxAttachment = require "library.spine-runtimes.spine-lua.BoundingBoxAttachment"
 
 local AttachmentLoader = {}
 function AttachmentLoader.new ()

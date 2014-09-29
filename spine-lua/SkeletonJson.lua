@@ -28,15 +28,15 @@
 -- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
-local SkeletonData = require "spine-lua.SkeletonData"
-local BoneData = require "spine-lua.BoneData"
-local SlotData = require "spine-lua.SlotData"
-local Skin = require "spine-lua.Skin"
-local AttachmentLoader = require "spine-lua.AttachmentLoader"
-local Animation = require "spine-lua.Animation"
-local EventData = require "spine-lua.EventData"
-local Event = require "spine-lua.Event"
-local AttachmentType = require "spine-lua.AttachmentType"
+local SkeletonData = require "library.spine-runtimes.spine-lua.SkeletonData"
+local BoneData = require "library.spine-runtimes.spine-lua.BoneData"
+local SlotData = require "library.spine-runtimes.spine-lua.SlotData"
+local Skin = require "library.spine-runtimes.spine-lua.Skin"
+local AttachmentLoader = require "library.spine-runtimes.spine-lua.AttachmentLoader"
+local Animation = require "library.spine-runtimes.spine-lua.Animation"
+local EventData = require "library.spine-runtimes.spine-lua.EventData"
+local Event = require "library.spine-runtimes.spine-lua.Event"
+local AttachmentType = require "library.spine-runtimes.spine-lua.AttachmentType"
 
 local SkeletonJson = {}
 function SkeletonJson.new (attachmentLoader)
