@@ -368,8 +368,12 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 		AtlasAsset atlasAsset = AtlasAsset.CreateInstance<AtlasAsset>();
 		atlasAsset.atlasFile = atlasText;
-		
-		string[] atlasLines = atlasText.text.Split('\n');
+
+        //strip CR
+        string atlasStr = atlasText.text;
+        atlasStr = atlasStr.Replace("\r", "");
+
+		string[] atlasLines = atlasStr.Split('\n');
 		List<string> pageFiles = new List<string>();
 		for(int i = 0; i < atlasLines.Length-1; i++){
 			if(atlasLines[i].Length == 0)
@@ -385,6 +389,8 @@ public class SpineEditorUtilities : AssetPostprocessor {
 			TextureImporter texImporter = (TextureImporter)TextureImporter.GetAtPath(texturePath);
 			texImporter.textureFormat = TextureImporterFormat.AutomaticTruecolor;
 			texImporter.mipmapEnabled = false;
+            //TODO: Get actual size from atlas data
+            texImporter.maxTextureSize = 2048;
 			EditorUtility.SetDirty(texImporter);
 			AssetDatabase.ImportAsset(texturePath);
 			AssetDatabase.SaveAssets();
