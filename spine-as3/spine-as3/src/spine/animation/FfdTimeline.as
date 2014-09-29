@@ -83,7 +83,7 @@ public class FfdTimeline extends CurveTimeline {
 		}
 
 		// Interpolate between the previous frame and the current frame.
-		var frameIndex:int = Animation.binarySearch(frames, time, 1);
+		var frameIndex:int = Animation.binarySearch1(frames, time);
 		var frameTime:Number = frames[frameIndex];
 		var percent:Number = 1 - (time - frameTime) / (frames[int(frameIndex - 1)] - frameTime);
 		percent = getCurvePercent(frameIndex - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));

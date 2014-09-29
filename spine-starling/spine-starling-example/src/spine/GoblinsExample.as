@@ -1,7 +1,5 @@
-package {
+package spine {
 
-import spine.SkeletonData;
-import spine.SkeletonJson;
 import spine.atlas.Atlas;
 import spine.attachments.AtlasAttachmentLoader;
 import spine.attachments.AttachmentLoader;

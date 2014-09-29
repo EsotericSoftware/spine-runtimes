@@ -1,8 +1,5 @@
-package {
+package spine {
 
-import spine.Event;
-import spine.SkeletonData;
-import spine.SkeletonJson;
 import spine.animation.AnimationStateData;
 import spine.atlas.Atlas;
 import spine.attachments.AtlasAttachmentLoader;

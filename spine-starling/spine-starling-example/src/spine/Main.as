@@ -1,11 +1,11 @@
 
-package {
+package spine {
 
 import flash.display.Sprite;
 
 import starling.core.Starling;
 
-[SWF(width = "640", height = "480", frameRate = "60", backgroundColor = "#dddddd")]
+[SWF(width = "800", height = "600", frameRate = "60", backgroundColor = "#dddddd")]
 public class Main extends Sprite {
 	private var _starling:Starling;
 	static public var useStarlingAtlas:Boolean;
@@ -13,7 +13,8 @@ public class Main extends Sprite {
 	public function Main () {
 		var example:Class;
 		//example = SpineboyExample;
-		example = GoblinsExample;
+		//example = GoblinsExample;
+		example = RaptorExample;
 		useStarlingAtlas = true;
 
 		_starling = new Starling(example, stage);

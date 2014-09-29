@@ -33,45 +33,95 @@ import spine.attachments.Attachment;
 
 public class Skeleton {
 	internal var _data:SkeletonData;
-	internal var _bones:Vector.<Bone>;
-	internal var _slots:Vector.<Slot>;
-	internal var _drawOrder:Vector.<Slot>;
-	internal var _skin:Skin;
-	public var r:Number = 1;
-	public var g:Number = 1;
-	public var b:Number = 1;
-	public var a:Number = 1;
+	public var bones:Vector.<Bone>;
+	public var slots:Vector.<Slot>;
+	public var drawOrder:Vector.<Slot>;
+	public var ikConstraints:Vector.<IkConstraint>;
+	private var _boneCache:Vector.<Vector.<Bone>> = new Vector.<Vector.<Bone>>();
+	private var _skin:Skin;
+	public var r:Number = 1, g:Number = 1, b:Number = 1, a:Number = 1;
 	public var time:Number = 0;
-	public var flipX:Boolean;
-	public var flipY:Boolean;
-	public var x:Number = 0;
-	public var y:Number = 0;
+	public var flipX:Boolean, flipY:Boolean;
+	public var x:Number = 0, y:Number = 0;
 
 	public function Skeleton (data:SkeletonData) {
 		if (data == null)
 			throw new ArgumentError("data cannot be null.");
 		_data = data;
 
-		_bones = new Vector.<Bone>();
+		bones = new Vector.<Bone>();
 		for each (var boneData:BoneData in data.bones) {
-			var parent:Bone = boneData.parent == null ? null : _bones[data.bones.indexOf(boneData.parent)];
-			_bones[_bones.length] = new Bone(boneData, parent);
+			var parent:Bone = boneData.parent == null ? null : bones[data.bones.indexOf(boneData.parent)];
+			bones[bones.length] = new Bone(boneData, this, parent);
 		}
 
-		_slots = new Vector.<Slot>();
-		_drawOrder = new Vector.<Slot>();
+		slots = new Vector.<Slot>();
+		drawOrder = new Vector.<Slot>();
 		for each (var slotData:SlotData in data.slots) {
-			var bone:Bone  = _bones[data.bones.indexOf(slotData.boneData)];
-			var slot:Slot  = new Slot(slotData, this, bone);
-			_slots[_slots.length] = slot;
-			_drawOrder[_drawOrder.length] = slot;
+			var bone:Bone = bones[data.bones.indexOf(slotData.boneData)];
+			var slot:Slot = new Slot(slotData, bone);
+			slots[slots.length] = slot;
+			drawOrder[drawOrder.length] = slot;
+		}
+		
+		ikConstraints = new Vector.<IkConstraint>()
+		for each (var ikConstraintData:IkConstraintData in data.ikConstraints)
+			ikConstraints[ikConstraints.length] = new IkConstraint(ikConstraintData, this);
+
+		updateCache();
+	}
+
+	/** Caches information about bones and IK constraints. Must be called if bones or IK constraints are added or removed. */
+	public function updateCache () : void {
+		var ikConstraintsCount:int = ikConstraints.length;
+
+		var arrayCount:int = ikConstraintsCount + 1;
+		if (_boneCache.length > arrayCount) _boneCache.splice(arrayCount, _boneCache.length - arrayCount);
+		for each (var cachedBones:Vector.<Bone> in _boneCache)
+			cachedBones.length = 0;
+		while (_boneCache.length < arrayCount)
+			_boneCache[_boneCache.length] = new Vector.<Bone>();
+
+		var nonIkBones:Vector.<Bone> = _boneCache[0];
+
+		outer:
+		for each (var bone:Bone in bones) {
+			var current:Bone = bone;
+			do {
+				var ii:int = 0;
+				for each (var ikConstraint:IkConstraint in ikConstraints) {
+					var parent:Bone = ikConstraint.bones[0];
+					var child:Bone = ikConstraint.bones[int(ikConstraint.bones.length - 1)];
+					while (true) {
+						if (current == child) {
+							_boneCache[ii].push(bone);
+							_boneCache[int(ii + 1)].push(bone);
+							continue outer;
+						}
+						if (child == parent) break;
+						child = child.parent;
+					}
+					ii++;
+				}
+				current = current.parent;
+			} while (current != null);
+			nonIkBones[nonIkBones.length] = bone;
 		}
 	}
 
-	/** Updates the world transform for each bone. */
+	/** Updates the world transform for each bone and applies IK constraints. */
 	public function updateWorldTransform () : void {
-		for each (var bone:Bone in _bones)
-			bone.updateWorldTransform(flipX, flipY);
+		var bone:Bone;
+		for each (bone in bones)
+			bone.rotationIK = bone.rotation;
+		var i:int = 0, last:int = _boneCache.length - 1;
+		while (true) {
+			for each (bone in _boneCache[i])
+				bone.updateWorldTransform();
+			if (i == last) break;
+			ikConstraints[i].apply();
+			i++;
+		}
 	}
 
 	/** Sets the bones and slots to their setup pose values. */
@@ -81,13 +131,18 @@ public class Skeleton {
 	}
 
 	public function setBonesToSetupPose () : void {
-		for each (var bone:Bone in _bones)
+		for each (var bone:Bone in bones)
 			bone.setToSetupPose();
+
+		for each (var ikConstraint:IkConstraint in ikConstraints) {
+			ikConstraint.bendDirection = ikConstraint._data.bendDirection;
+			ikConstraint.mix = ikConstraint._data.mix;
+		}
 	}
 
 	public function setSlotsToSetupPose () : void {
 		var i:int = 0;
-		for each (var slot:Slot in _slots) { 
+		for each (var slot:Slot in slots) { 
 			drawOrder[i++] = slot;
 			slot.setToSetupPose();
 		}
@@ -97,23 +152,17 @@ public class Skeleton {
 		return _data;
 	}
 
-	public function get bones () : Vector.<Bone> {
-		return _bones;
-	}
-
 	public function get rootBone () : Bone {
-		if (_bones.length == 0)
-			return null;
-		return _bones[0];
+		if (bones.length == 0) return null;
+		return bones[0];
 	}
 
 	/** @return May be null. */
 	public function findBone (boneName:String) : Bone {
 		if (boneName == null)
 			throw new ArgumentError("boneName cannot be null.");
-		for each (var bone:Bone in _bones)
-			if (bone.data.name == boneName)
-				return bone;
+		for each (var bone:Bone in bones)
+			if (bone._data._name == boneName) return bone;
 		return null;
 	}
 
@@ -122,25 +171,19 @@ public class Skeleton {
 		if (boneName == null)
 			throw new ArgumentError("boneName cannot be null.");
 		var i:int = 0;
-		for each (var bone:Bone in _bones) {
-			if (bone.data.name == boneName)
-				return i;
+		for each (var bone:Bone in bones) {
+			if (bone._data._name == boneName) return i;
 			i++;
 		}
 		return -1;
-	}
-
-	public function get slots () : Vector.<Slot> {
-		return _slots;
 	}
 
 	/** @return May be null. */
 	public function findSlot (slotName:String) : Slot {
 		if (slotName == null)
 			throw new ArgumentError("slotName cannot be null.");
-		for each (var slot:Slot in _slots)
-			if (slot.data.name == slotName)
-				return slot;
+		for each (var slot:Slot in slots)
+			if (slot._data._name == slotName) return slot;
 		return null;
 	}
 
@@ -149,16 +192,11 @@ public class Skeleton {
 		if (slotName == null)
 			throw new ArgumentError("slotName cannot be null.");
 		var i:int = 0;
-		for each (var slot:Slot in _slots) {
-			if (slot.data.name == slotName)
-				return i;
+		for each (var slot:Slot in slots) {
+			if (slot._data._name == slotName) return i;
 			i++;
 		}
 		return -1;
-	}
-
-	public function get drawOrder () : Vector.<Slot> {
-		return _drawOrder;
 	}
 
 	public function get skin () : Skin {
@@ -167,8 +205,7 @@ public class Skeleton {
 
 	public function set skinName (skinName:String) : void {
 		var skin:Skin = data.findSkin(skinName);
-		if (skin == null)
-			throw new ArgumentError("Skin not found: " + skinName);
+		if (skin == null) throw new ArgumentError("Skin not found: " + skinName);
 		this.skin = skin;
 	}
 
@@ -182,8 +219,8 @@ public class Skeleton {
 				newSkin.attachAll(this, skin);
 			else {
 				var i:int = 0;
-				for each (var slot:Slot in _slots) {
-					var name:String = slot.data.attachmentName;
+				for each (var slot:Slot in slots) {
+					var name:String = slot._data.attachmentName;
 					if (name) {
 						var attachment:Attachment = newSkin.getAttachment(i, name);
 						if (attachment) slot.attachment = attachment;
@@ -202,25 +239,21 @@ public class Skeleton {
 
 	/** @return May be null. */
 	public function getAttachmentForSlotIndex (slotIndex:int, attachmentName:String) : Attachment {
-		if (attachmentName == null)
-			throw new ArgumentError("attachmentName cannot be null.");
+		if (attachmentName == null) throw new ArgumentError("attachmentName cannot be null.");
 		if (skin != null) {
 			var attachment:Attachment = skin.getAttachment(slotIndex, attachmentName);
-			if (attachment != null)
-				return attachment;
+			if (attachment != null) return attachment;
 		}
-		if (data.defaultSkin != null)
-			return data.defaultSkin.getAttachment(slotIndex, attachmentName);
+		if (data.defaultSkin != null) return data.defaultSkin.getAttachment(slotIndex, attachmentName);
 		return null;
 	}
 
 	/** @param attachmentName May be null. */
 	public function setAttachment (slotName:String, attachmentName:String) : void {
-		if (slotName == null)
-			throw new ArgumentError("slotName cannot be null.");
+		if (slotName == null) throw new ArgumentError("slotName cannot be null.");
 		var i:int = 0;
-		for each (var slot:Slot in _slots) {
-			if (slot.data.name == slotName) {
+		for each (var slot:Slot in slots) {
+			if (slot._data._name == slotName) {
 				var attachment:Attachment = null;
 				if (attachmentName != null) {
 					attachment = getAttachmentForSlotIndex(i, attachmentName);
@@ -233,6 +266,14 @@ public class Skeleton {
 			i++;
 		}
 		throw new ArgumentError("Slot not found: " + slotName);
+	}
+
+	/** @return May be null. */
+	public function findIkConstraint (ikConstraintName:String) : IkConstraint {
+		if (ikConstraintName == null) throw new ArgumentError("ikConstraintName cannot be null.");
+		for each (var ikConstraint:IkConstraint in ikConstraints)
+			if (ikConstraint._data._name == ikConstraintName) return ikConstraint;
+		return null;
 	}
 
 	public function update (delta:Number) : void {

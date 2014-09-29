@@ -38,10 +38,8 @@ public class Animation {
 	public var duration:Number;
 
 	public function Animation (name:String, timelines:Vector.<Timeline>, duration:Number) {
-		if (name == null)
-			throw new ArgumentError("name cannot be null.");
-		if (timelines == null)
-			throw new ArgumentError("timelines cannot be null.");
+		if (name == null) throw new ArgumentError("name cannot be null.");
+		if (timelines == null) throw new ArgumentError("timelines cannot be null.");
 		_name = name;
 		_timelines = timelines;
 		this.duration = duration;
@@ -53,8 +51,7 @@ public class Animation {
 
 	/** Poses the skeleton at the specified time for this animation. */
 	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, loop:Boolean, events:Vector.<Event>) : void {
-		if (skeleton == null)
-			throw new ArgumentError("skeleton cannot be null.");
+		if (skeleton == null) throw new ArgumentError("skeleton cannot be null.");
 
 		if (loop && duration != 0) {
 			time %= duration;
@@ -68,8 +65,7 @@ public class Animation {
 	/** Poses the skeleton at the specified time for this animation mixed with the current pose.
 	 * @param alpha The amount of this animation that affects the current pose. */
 	public function mix (skeleton:Skeleton, lastTime:Number, time:Number, loop:Boolean, events:Vector.<Event>, alpha:Number) : void {
-		if (skeleton == null)
-			throw new ArgumentError("skeleton cannot be null.");
+		if (skeleton == null) throw new ArgumentError("skeleton cannot be null.");
 
 		if (loop && duration != 0) {
 			time %= duration;
@@ -107,6 +103,25 @@ public class Animation {
 		return 0; // Can't happen.
 	}
 
+	/** @param target After the first and before the last entry. */
+	static public function binarySearch1 (values:Vector.<Number>, target:Number) : int {
+		var low:int = 0;
+		var high:int = values.length - 2;
+		if (high == 0)
+			return 1;
+		var current:int = high >>> 1;
+		while (true) {
+			if (values[int(current + 1)] <= target)
+				low = current + 1;
+			else
+				high = current;
+			if (low == high)
+				return low + 1;
+			current = (low + high) >>> 1;
+		}
+		return 0; // Can't happen.
+	}
+	
 	static public function linearSearch (values:Vector.<Number>, target:Number, step:int) : int {
 		for (var i:int = 0, last:int = values.length - step; i <= last; i += step)
 			if (values[i] > target)

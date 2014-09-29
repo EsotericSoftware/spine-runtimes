@@ -39,14 +39,12 @@ public class Skin {
 	private var _attachments:Vector.<Dictionary> = new Vector.<Dictionary>();
 
 	public function Skin (name:String) {
-		if (name == null)
-			throw new ArgumentError("name cannot be null.");
+		if (name == null) throw new ArgumentError("name cannot be null.");
 		_name = name;
 	}
 
 	public function addAttachment (slotIndex:int, name:String, attachment:Attachment) : void {
-		if (attachment == null)
-			throw new ArgumentError("attachment cannot be null.");
+		if (attachment == null) throw new ArgumentError("attachment cannot be null.");
 		if (slotIndex >= attachments.length) attachments.length = slotIndex + 1;
 		if (!attachments[slotIndex]) attachments[slotIndex] = new Dictionary();
 		attachments[slotIndex][name] = attachment;
@@ -74,7 +72,7 @@ public class Skin {
 	/** Attach each attachment in this skin if the corresponding attachment in the old skin is currently attached. */
 	public function attachAll (skeleton:Skeleton, oldSkin:Skin) : void {
 		var slotIndex:int = 0;
-		for each (var slot:Slot in skeleton._slots) {
+		for each (var slot:Slot in skeleton.slots) {
 			var slotAttachment:Attachment = slot.attachment;
 			if (slotAttachment && slotIndex < oldSkin.attachments.length) {
 				var dictionary:Dictionary = oldSkin.attachments[slotIndex];
