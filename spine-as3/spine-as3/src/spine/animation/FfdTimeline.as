@@ -66,7 +66,7 @@ public class FfdTimeline extends CurveTimeline {
 		var vertexCount:int = frameVertices[0].length;
 
 		var vertices:Vector.<Number> = slot.attachmentVertices;
-		if (vertices.length != vertexCount) alpha = 1;
+		if (vertices.length != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
 		vertices.length = vertexCount;
 
 		var i:int;
