@@ -2,17 +2,31 @@
 
 The spine-unity runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Unity](http://unity3d.com/) directly, without any other plugins. spine-unity is based on [spine-csharp](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-csharp) and is very similar to [spine-tk2d](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-tk2d).
 
-A Spine skeleton is a GameObject and can be used throughout Unity like any other GameObject. The `BoneComponent` class allows other GameObjects to follow a bone in a Spine skeleton.
+A Spine skeleton is a GameObject and can be used throughout Unity like any other GameObject. It depends only on Unity's `MeshRenderer`, so it is close to the metal. `SkeletonUtility` allows other GameObjects to interact with the Spine skeleton, to control bones in the skeleton, be controlled by the skeleton, attach colliders, etc.
 
-## Setup
+## Documentation
 
-To use spine-unity in your own Unity project first:
+The [Spine Unity Examples](http://esotericsoftware.com/forum/viewtopic.php?f=3&t=3318) forum thread has many videos on how to use spine-unity features.
+
+## Quick installation
+
+Download and run this Unity package:
+
+[spine-unity.unitypackage](http://esotericsoftware.com/files/runtimes/unity/spine-unity.unitypackage)
+
+In the `Examples/Scenes` folder you will find many example scenes that demonstrate various spine-unity features.
+
+## Manual installation
+
+You can also choose to setup and run from the Git files:
 
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
 1. Copy the contents of `spine-csharp/src` to `Assets/spine-csharp` in your Unity project directory.
 1. Copy the `spine-unity/Assets/spine-unity` to `Assets/spine-unity` in your Unity project directory.
 
-Next, there are a few options for importing Spine skeletons into your Unity project:
+## Importing skeleton data
+
+There are a few options for importing Spine skeletons into your Unity project:
 
 ### Drag and drop import
 
