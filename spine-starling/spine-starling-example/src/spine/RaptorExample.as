@@ -38,7 +38,7 @@ public class RaptorExample extends Sprite {
 		var skeletonData:SkeletonData = json.readSkeletonData(new RaptorJson());
 
 		skeleton = new SkeletonAnimation(skeletonData, true);
-		skeleton.x = 320;
+		skeleton.x = 400;
 		skeleton.y = 560;
 		skeleton.state.setAnimationByName(0, "walk", true);
 

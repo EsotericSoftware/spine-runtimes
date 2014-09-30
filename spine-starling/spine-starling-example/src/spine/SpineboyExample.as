@@ -26,26 +26,11 @@ public class SpineboyExample extends Sprite {
 	[Embed(source = "spineboy.png")]
 	static public const SpineboyAtlasTexture:Class;
 
-	[Embed(source = "spineboy-starling.xml", mimeType = "application/octet-stream")]
-	static public const SpineboyStarlingAtlas:Class;
-
-	[Embed(source = "spineboy-starling.png")]
-	static public const SpineboyStarlingAtlasTexture:Class;
-
 	private var skeleton:SkeletonAnimation;
 
 	public function SpineboyExample () {
-		var attachmentLoader:AttachmentLoader;
-		if (Main.useStarlingAtlas) {
-			var texture:Texture = Texture.fromBitmap(new SpineboyAtlasTexture());
-			var xml:XML = XML(new SpineboyStarlingAtlas());
-			var starlingAtlas:TextureAtlas = new TextureAtlas(texture, xml);
-			attachmentLoader = new StarlingAtlasAttachmentLoader(starlingAtlas);
-		} else {
-			var spineAtlas:Atlas = new Atlas(new SpineboyAtlas(), new StarlingTextureLoader(new SpineboyAtlasTexture()));
-			attachmentLoader = new AtlasAttachmentLoader(spineAtlas);
-		}
-
+		var spineAtlas:Atlas = new Atlas(new SpineboyAtlas(), new StarlingTextureLoader(new SpineboyAtlasTexture()));
+		var attachmentLoader:AttachmentLoader = new AtlasAttachmentLoader(spineAtlas);
 		var json:SkeletonJson = new SkeletonJson(attachmentLoader);
 		json.scale = 0.6;
 		var skeletonData:SkeletonData = json.readSkeletonData(new SpineboyJson());
@@ -56,8 +41,8 @@ public class SpineboyExample extends Sprite {
 		stateData.setMixByName("jump", "jump", 0.2);
 
 		skeleton = new SkeletonAnimation(skeletonData, false, stateData);
-		skeleton.x = 320;
-		skeleton.y = 420;
+		skeleton.x = 400;
+		skeleton.y = 560;
 		
 		skeleton.state.onStart.add(function (trackIndex:int) : void {
 			trace(trackIndex + " start: " + skeleton.state.getCurrent(trackIndex));

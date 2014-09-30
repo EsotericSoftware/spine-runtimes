@@ -34,8 +34,10 @@ public class GoblinsExample extends Sprite {
 	private var skeleton:SkeletonAnimation;
 
 	public function GoblinsExample () {
+		var useStarlingAtlas:Boolean = true;
+
 		var attachmentLoader:AttachmentLoader;
-		if (Main.useStarlingAtlas) {
+		if (useStarlingAtlas) {
 			var texture:Texture = Texture.fromBitmap(new GoblinsStarlingAtlasTexture());
 			var xml:XML = XML(new GoblinsStarlingAtlas());
 			var starlingAtlas:TextureAtlas = new TextureAtlas(texture, xml);

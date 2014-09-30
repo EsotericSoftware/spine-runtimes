@@ -8,14 +8,12 @@ import starling.core.Starling;
 [SWF(width = "800", height = "600", frameRate = "60", backgroundColor = "#dddddd")]
 public class Main extends Sprite {
 	private var _starling:Starling;
-	static public var useStarlingAtlas:Boolean;
 
 	public function Main () {
 		var example:Class;
 		//example = SpineboyExample;
 		//example = GoblinsExample;
 		example = RaptorExample;
-		useStarlingAtlas = true;
 
 		_starling = new Starling(example, stage);
 		_starling.enableErrorChecking = true;

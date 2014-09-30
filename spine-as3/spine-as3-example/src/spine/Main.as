@@ -28,20 +28,17 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package {
+package spine {
 
 import flash.display.Sprite;
 
-import spine.Event;
-import spine.SkeletonData;
-import spine.SkeletonJson;
 import spine.animation.AnimationStateData;
 import spine.atlas.Atlas;
 import spine.attachments.AtlasAttachmentLoader;
 import spine.flash.FlashTextureLoader;
 import spine.flash.SkeletonAnimation;
 
-[SWF(width = "640", height = "480", frameRate = "60", backgroundColor = "#dddddd")]
+[SWF(width = "800", height = "600", frameRate = "60", backgroundColor = "#dddddd")]
 public class Main extends Sprite {
 	[Embed(source = "spineboy.atlas", mimeType = "application/octet-stream")]
 	static public const SpineboyAtlas:Class;
@@ -66,8 +63,8 @@ public class Main extends Sprite {
 		stateData.setMixByName("jump", "jump", 0.2);
 
 		skeleton = new SkeletonAnimation(skeletonData, stateData);
-		skeleton.x = 320;
-		skeleton.y = 420;
+		skeleton.x = 400;
+		skeleton.y = 560;
 		
 		skeleton.state.onStart.add(function (trackIndex:int) : void {
 			trace(trackIndex + " start: " + skeleton.state.getCurrent(trackIndex));
