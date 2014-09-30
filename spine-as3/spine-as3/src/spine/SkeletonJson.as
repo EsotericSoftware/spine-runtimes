@@ -126,7 +126,7 @@ public class SkeletonJson {
 			if (!ikConstraintData.target) throw new Error("Target bone not found: " + ikMap["target"]);
 
 			ikConstraintData.bendDirection = (!ikMap.hasOwnProperty("bendPositive") || ikMap["bendPositive"]) ? 1 : -1;
-			ikConstraintData.mix = ikMap["mix"] || 1;
+			ikConstraintData.mix = ikMap.hasOwnProperty("mix") ? ikMap["mix"] : 1;
 
 			skeletonData.ikConstraints[skeletonData.ikConstraints.length] = ikConstraintData;
 		}
@@ -401,7 +401,7 @@ public class SkeletonJson {
 			ikTimeline.ikConstraintIndex = skeletonData.ikConstraints.indexOf(ikConstraint);
 			frameIndex = 0;
 			for each (valueMap in values) {
-				var mix:Number = valueMap["mix"] || 1;
+				var mix:Number = valueMap.hasOwnProperty("mix") ? valueMap["mix"] : 1;
 				var bendDirection:int = (!valueMap.hasOwnProperty("bendPositive") || valueMap["bendPositive"]) ? 1 : -1;
 				ikTimeline.setFrame(frameIndex, valueMap["time"], mix, bendDirection);
 				readCurve(ikTimeline, frameIndex, valueMap);
