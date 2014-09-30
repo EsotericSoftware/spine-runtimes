@@ -53,6 +53,7 @@ public class SkeletonRenderer : MonoBehaviour {
 	public bool renderMeshes = true, immutableTriangles;
 	public bool logErrors = false;
 	
+	private Transform myTransform;
 	private MeshFilter meshFilter;
 	private Mesh mesh, mesh1, mesh2;
 	private bool useMesh1;
@@ -104,6 +105,7 @@ public class SkeletonRenderer : MonoBehaviour {
 	}
 	
 	public void Awake () {
+		myTransform = transform;
 		Reset();
 	}
 	
@@ -402,7 +404,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		gizmosCenter = new Vector3(min.x + (width / 2f), min.y + (height / 2f), 0f);
 		gizmosSize	= new Vector3(width, height, 1f);
 		Gizmos.color = Color.clear;
-		Gizmos.matrix = transform.localToWorldMatrix;
+		Gizmos.matrix = myTransform.localToWorldMatrix;
 		Gizmos.DrawCube(gizmosCenter, gizmosSize);
 	}
 	#endif
