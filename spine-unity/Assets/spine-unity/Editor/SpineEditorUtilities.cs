@@ -269,15 +269,23 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 					sharedAtlas = data.atlasAsset;
 
-					SkeletonAnimation anim = SpawnAnimatedSkeleton(data);
+
 					string dir = Path.GetDirectoryName(Path.GetDirectoryName(AssetDatabase.GetAssetPath(data)));
 					string prefabPath = Path.Combine(dir, data.skeletonJSON.name + ".prefab").Replace("\\", "/");
-					PrefabUtility.CreatePrefab(prefabPath, anim.gameObject, ReplacePrefabOptions.ReplaceNameBased);
 
-					if(EditorApplication.isPlaying)
-						GameObject.Destroy(anim.gameObject);
-					else
-						GameObject.DestroyImmediate(anim.gameObject);
+					if(File.Exists(prefabPath) == false){
+						SkeletonAnimation anim = SpawnAnimatedSkeleton(data);
+						PrefabUtility.CreatePrefab(prefabPath, anim.gameObject, ReplacePrefabOptions.ReplaceNameBased);
+						if(EditorApplication.isPlaying)
+							GameObject.Destroy(anim.gameObject);
+						else
+							GameObject.DestroyImmediate(anim.gameObject);
+					}
+					else{
+
+					}
+
+
 				}
 			}
 		}
@@ -338,7 +346,6 @@ public class SpineEditorUtilities : AssetPostprocessor {
 							path = path.Replace("\\", "/");
 							path = path.Replace(Application.dataPath.Replace("\\", "/"), "Assets");
 							atlasText = (TextAsset)AssetDatabase.LoadAssetAtPath(path, typeof(TextAsset));
-//							Debug.Log("Atlas Path: " + path);
 						}
 					}
 
@@ -363,10 +370,12 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 		string atlasPath = assetPath + "/" + primaryName + "_Atlas.asset";
 
-		if(File.Exists(atlasPath))
-			return (AtlasAsset)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(AtlasAsset));
+		AtlasAsset atlasAsset = (AtlasAsset)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(AtlasAsset));
 
-		AtlasAsset atlasAsset = AtlasAsset.CreateInstance<AtlasAsset>();
+
+		if(atlasAsset == null)
+			atlasAsset = AtlasAsset.CreateInstance<AtlasAsset>();
+
 		atlasAsset.atlasFile = atlasText;
 
         //strip CR
@@ -402,18 +411,26 @@ public class SpineEditorUtilities : AssetPostprocessor {
 				pageName = "Material";
 			
 			string materialPath = assetPath + "/" + primaryName + "_" + pageName + ".mat";
-			
-			Material mat = new Material(Shader.Find(defaultShader));
+			Material mat = (Material)AssetDatabase.LoadAssetAtPath(materialPath, typeof(Material));
+
+			if(mat == null){
+			 	mat = new Material(Shader.Find(defaultShader));
+				AssetDatabase.CreateAsset(mat, materialPath);
+			}
 			
 			mat.mainTexture = texture;
-			
-			AssetDatabase.CreateAsset(mat, materialPath);
+			EditorUtility.SetDirty(mat);
+
 			AssetDatabase.SaveAssets();
 			
 			atlasAsset.materials[i] = mat;
 		}
-		
-		AssetDatabase.CreateAsset(atlasAsset, atlasPath);
+
+		if(AssetDatabase.GetAssetPath( atlasAsset ) == "")
+			AssetDatabase.CreateAsset(atlasAsset, atlasPath);
+		else
+			atlasAsset.Reset();
+
 		AssetDatabase.SaveAssets();
 
 		return (AtlasAsset)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(AtlasAsset));
@@ -441,6 +458,10 @@ public class SpineEditorUtilities : AssetPostprocessor {
 				
 				AssetDatabase.CreateAsset(skelDataAsset, filePath);
 				AssetDatabase.SaveAssets();
+			}
+			else{
+				skelDataAsset.Reset();
+				skelDataAsset.GetSkeletonData(true);
 			}
 
 			return skelDataAsset;
@@ -484,7 +505,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 		return SpawnAnimatedSkeleton(skeletonDataAsset, skeletonDataAsset.GetSkeletonData(true).FindSkin(skinName));
 	}
 
-	public static SkeletonAnimation SpawnAnimatedSkeleton(SkeletonDataAsset skeletonDataAsset, Skin skin = null){
+		public static SkeletonAnimation SpawnAnimatedSkeleton(SkeletonDataAsset skeletonDataAsset, Skin skin = null){
 		
 		GameObject go = new GameObject(skeletonDataAsset.name.Replace("_SkeletonData", ""), typeof(MeshFilter), typeof(MeshRenderer), typeof(SkeletonAnimation));
 		SkeletonAnimation anim = go.GetComponent<SkeletonAnimation>();
@@ -501,11 +522,19 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 		anim.calculateNormals = requiresNormals;
 
+		SkeletonData data = skeletonDataAsset.GetSkeletonData(true);
+
+		if(data == null){
+			string reloadAtlasPath = AssetDatabase.GetAssetPath( skeletonDataAsset.atlasAsset );
+			skeletonDataAsset.atlasAsset = (AtlasAsset)AssetDatabase.LoadAssetAtPath( reloadAtlasPath, typeof(AtlasAsset));
+			data = skeletonDataAsset.GetSkeletonData(true);
+		}
+
 		if(skin == null)
-			skin = skeletonDataAsset.GetSkeletonData(true).DefaultSkin;
+			skin = data.DefaultSkin;
 			
 		if(skin == null)
-			skin = skeletonDataAsset.GetSkeletonData(true).Skins[0];
+			skin = data.Skins[0];
 
 		anim.Reset();
 		
