@@ -34,7 +34,7 @@ using UnityEngine;
 
 [CustomEditor(typeof(SkeletonRenderer))]
 public class SkeletonRendererInspector : Editor {
-	protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles;
+	protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, overbright;
 
 	protected virtual void OnEnable () {
 		skeletonDataAsset = serializedObject.FindProperty("skeletonDataAsset");
@@ -43,6 +43,7 @@ public class SkeletonRendererInspector : Editor {
 		tangents = serializedObject.FindProperty("calculateTangents");
 		meshes = serializedObject.FindProperty("renderMeshes");
 		immutableTriangles = serializedObject.FindProperty("immutableTriangles");
+		overbright = serializedObject.FindProperty("overbright");
 	}
 
 	protected virtual void gui () {
@@ -92,6 +93,7 @@ public class SkeletonRendererInspector : Editor {
 			new GUIContent("Immutable Triangles", "Enable to optimize rendering for skeletons that never change attachment visbility"));
 		EditorGUILayout.PropertyField(normals);
 		EditorGUILayout.PropertyField(tangents);
+		EditorGUILayout.PropertyField(overbright);
 	}
 
 	override public void OnInspectorGUI () {
