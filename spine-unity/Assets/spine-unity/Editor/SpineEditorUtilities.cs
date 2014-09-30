@@ -398,8 +398,8 @@ public class SpineEditorUtilities : AssetPostprocessor {
 			TextureImporter texImporter = (TextureImporter)TextureImporter.GetAtPath(texturePath);
 			texImporter.textureFormat = TextureImporterFormat.AutomaticTruecolor;
 			texImporter.mipmapEnabled = false;
-            //TODO: Get actual size from atlas data
             texImporter.maxTextureSize = 2048;
+
 			EditorUtility.SetDirty(texImporter);
 			AssetDatabase.ImportAsset(texturePath);
 			AssetDatabase.SaveAssets();
