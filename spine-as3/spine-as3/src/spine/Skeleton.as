@@ -209,6 +209,11 @@ public class Skeleton {
 		this.skin = skin;
 	}
 
+	/** @return May be null. */
+	public function get skinName () : String {
+		return _skin == null ? null : _skin._name;
+	}
+
 	/** Sets the skin used to look up attachments not found in the {@link SkeletonData#getDefaultSkin() default skin}. Attachments
 	 * from the new skin are attached if the corresponding attachment from the old skin was attached. If there was no old skin,
 	 * each slot's setup mode attachment is attached from the new skin.
