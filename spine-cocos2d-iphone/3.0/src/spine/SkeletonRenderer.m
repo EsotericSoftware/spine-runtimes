@@ -66,14 +66,14 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 
 	_skeleton = spSkeleton_create(skeletonData);
 	_rootBone = _skeleton->bones[0];
-    
-    _blendFunc.src = GL_ONE;
-    _blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
-    _drawNode = [[CCDrawNode alloc] init];
-    [_drawNode setBlendMode: [CCBlendMode premultipliedAlphaMode]];
-    [self addChild:_drawNode];
-    
-    [self setShader:[CCShader positionTextureColorShader]];
+
+	_blendFunc.src = GL_ONE;
+	_blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
+	_drawNode = [[CCDrawNode alloc] init];
+	[_drawNode setBlendMode: [CCBlendMode premultipliedAlphaMode]];
+	[self addChild:_drawNode];
+	
+	[self setShader:[CCShader positionTextureColorShader]];
 }
 
 - (id) initWithData:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
@@ -124,7 +124,6 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 }
 
 - (void) dealloc {
-    
 	if (_ownsSkeletonData) spSkeletonData_dispose(_skeleton->data);
 	if (_atlas) spAtlas_dispose(_atlas);
 	spSkeleton_dispose(_skeleton);
@@ -133,7 +132,6 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 }
 
 -(void)draw:(CCRenderer *)renderer transform:(const GLKMatrix4 *)transform {
-    
 	CCColor* nodeColor = self.color;
 	_skeleton->r = nodeColor.red;
 	_skeleton->g = nodeColor.green;
@@ -148,7 +146,6 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	int trianglesCount = 0;
 	float r = 0, g = 0, b = 0, a = 0;
 	for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
-        
 		spSlot* slot = _skeleton->drawOrder[i];
 		if (!slot->attachment) continue;
 		CCTexture *texture = 0;
@@ -168,7 +165,6 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 			break;
 		}
 		case SP_ATTACHMENT_MESH: {
-            
 			spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
 			spMeshAttachment_computeWorldVertices(attachment, slot, worldVertices);
 			texture = [self getTextureForMesh:attachment];
@@ -183,7 +179,6 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 			break;
 		}
 		case SP_ATTACHMENT_SKINNED_MESH: {
-            
 			spSkinnedMeshAttachment* attachment = (spSkinnedMeshAttachment*)slot->attachment;
 			spSkinnedMeshAttachment_computeWorldVertices(attachment, slot, worldVertices);
 			texture = [self getTextureForSkinnedMesh:attachment];
@@ -201,7 +196,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 		}
 		if (texture) {
 			if (slot->data->additiveBlending != additive) {
-                    [self setBlendMode:[CCBlendMode blendModeWithOptions:@{CCBlendFuncSrcColor: @(_blendFunc.src),CCBlendFuncDstColor: @(slot->data->additiveBlending ? GL_ONE : _blendFunc.dst)}]];
+				[self setBlendMode:[CCBlendMode blendModeWithOptions:@{CCBlendFuncSrcColor: @(_blendFunc.src),CCBlendFuncDstColor: @(slot->data->additiveBlending ? GL_ONE : _blendFunc.dst)}]];
 				additive = slot->data->additiveBlending;
 			}
 			color.a = _skeleton->a * slot->a * a * 255;
@@ -209,27 +204,26 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 			color.r = _skeleton->r * slot->r * r * multiplier;
 			color.g = _skeleton->g * slot->g * g * multiplier;
 			color.b = _skeleton->b * slot->b * b * multiplier;
-            self.texture = texture;
-            CGSize size = texture.contentSize;
-            GLKVector2 center = GLKVector2Make(size.width/2.0, size.height/2.0);
-            GLKVector2 extents = GLKVector2Make(size.width/2.0, size.height/2.0);
-            if(CCRenderCheckVisbility(transform, center, extents)){
-                CCRenderBuffer buffer = [renderer enqueueTriangles:trianglesCount/3 andVertexes:verticesCount withState:self.renderState globalSortOrder:0];
-                for(int i = 0; (i*2)  < verticesCount; ++i) {
-                    CCVertex vertex;
-                    vertex.position = GLKVector4Make(worldVertices[i*2], worldVertices[i*2 + 1], 0.0, 1.0);
-                    vertex.color = GLKVector4Make(color.r, color.g, color.b, color.a);
-                    vertex.texCoord1 = GLKVector2Make(uvs[i*2], 1 - uvs[(i*2) +1]);
-                    CCRenderBufferSetVertex(buffer, i, CCVertexApplyTransform(vertex, transform));
-                }
-                for(int j = 0; j*3 < trianglesCount; ++j) {
-                    CCRenderBufferSetTriangle(buffer, j, triangles[j*3], triangles[(j*3) + 1], triangles[(j*3) + 2]);
-                }
-            }
+			self.texture = texture;
+			CGSize size = texture.contentSize;
+			GLKVector2 center = GLKVector2Make(size.width / 2.0, size.height / 2.0);
+			GLKVector2 extents = GLKVector2Make(size.width / 2.0, size.height / 2.0);
+			if (CCRenderCheckVisbility(transform, center, extents)) {
+				CCRenderBuffer buffer = [renderer enqueueTriangles:(trianglesCount / 3) andVertexes:verticesCount withState:self.renderState globalSortOrder:0];
+				for (int i = 0; i * 2 < verticesCount; ++i) {
+					CCVertex vertex;
+					vertex.position = GLKVector4Make(worldVertices[i * 2], worldVertices[i * 2 + 1], 0.0, 1.0);
+					vertex.color = GLKVector4Make(color.r, color.g, color.b, color.a);
+					vertex.texCoord1 = GLKVector2Make(uvs[i * 2], 1 - uvs[i * 2 + 1]);
+					CCRenderBufferSetVertex(buffer, i, CCVertexApplyTransform(vertex, transform));
+				}
+				for (int j = 0; j * 3 < trianglesCount; ++j) {
+					CCRenderBufferSetTriangle(buffer, j, triangles[j * 3], triangles[j * 3 + 1], triangles[j * 3 + 2]);
+				}
+			}
 		}
-        
 	}
-    [_drawNode clear];
+	[_drawNode clear];
 	if (_debugSlots) {
 		// Slots.
 		CGPoint points[4];
@@ -242,8 +236,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 			points[1] = ccp(worldVertices[2], worldVertices[3]);
 			points[2] = ccp(worldVertices[4], worldVertices[5]);
 			points[3] = ccp(worldVertices[6], worldVertices[7]);
-            [_drawNode drawPolyWithVerts:points count:4 fillColor:[CCColor clearColor] borderWidth:1 borderColor:[CCColor blueColor]];
-            
+			[_drawNode drawPolyWithVerts:points count:4 fillColor:[CCColor clearColor] borderWidth:1 borderColor:[CCColor blueColor]];
 		}
 	}
 	if (_debugBones) {
@@ -252,14 +245,14 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 			spBone *bone = _skeleton->bones[i];
 			float x = bone->data->length * bone->m00 + bone->worldX;
 			float y = bone->data->length * bone->m10 + bone->worldY;
-            [_drawNode drawSegmentFrom:ccp(bone->worldX, bone->worldY) to: ccp(x, y)radius:2 color:[CCColor redColor]];
+			[_drawNode drawSegmentFrom:ccp(bone->worldX, bone->worldY) to: ccp(x, y)radius:2 color:[CCColor redColor]];
 		}
-        
+		
 		// Bone origins.
 		for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
 			spBone *bone = _skeleton->bones[i];
-            [_drawNode drawDot:ccp(bone->worldX, bone->worldY) radius:4 color:[CCColor greenColor]];
-            if (i == 0) [_drawNode drawDot:ccp(bone->worldX, bone->worldY) radius:4 color:[CCColor blueColor]];
+			[_drawNode drawDot:ccp(bone->worldX, bone->worldY) radius:4 color:[CCColor greenColor]];
+			if (i == 0) [_drawNode drawDot:ccp(bone->worldX, bone->worldY) radius:4 color:[CCColor blueColor]];
 		}
 	}
 }
