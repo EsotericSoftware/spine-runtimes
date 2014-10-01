@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		43B7CC0919DC4ACD0031321C /* IkConstraint.c in Sources */ = {isa = PBXBuildFile; fileRef = 43B7CC0719DC4ACD0031321C /* IkConstraint.c */; };
+		43B7CC0A19DC4ACD0031321C /* IkConstraintData.c in Sources */ = {isa = PBXBuildFile; fileRef = 43B7CC0819DC4ACD0031321C /* IkConstraintData.c */; };
 		43C3282F170B0C19004A9460 /* spine-cocos2d-iphone.m in Sources */ = {isa = PBXBuildFile; fileRef = 43C3282D170B0C19004A9460 /* spine-cocos2d-iphone.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		43C3286C170B0DA6004A9460 /* spineboy.json in Resources */ = {isa = PBXBuildFile; fileRef = 43C32868170B0DA6004A9460 /* spineboy.json */; };
 		43C3286E170B0DA6004A9460 /* spineboy.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 43C3286A170B0DA6004A9460 /* spineboy.atlas */; };
@@ -80,6 +82,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		43B7CC0719DC4ACD0031321C /* IkConstraint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = IkConstraint.c; path = "../../spine-c/src/spine/IkConstraint.c"; sourceTree = "<group>"; };
+		43B7CC0819DC4ACD0031321C /* IkConstraintData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = IkConstraintData.c; path = "../../spine-c/src/spine/IkConstraintData.c"; sourceTree = "<group>"; };
+		43B7CC0D19DC4AE30031321C /* IkConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IkConstraint.h; path = "../../spine-c/include/spine/IkConstraint.h"; sourceTree = "<group>"; };
+		43B7CC0E19DC4AE30031321C /* IkConstraintData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IkConstraintData.h; path = "../../spine-c/include/spine/IkConstraintData.h"; sourceTree = "<group>"; };
 		43C3282D170B0C19004A9460 /* spine-cocos2d-iphone.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "spine-cocos2d-iphone.m"; path = "src/spine/spine-cocos2d-iphone.m"; sourceTree = "<group>"; };
 		43C3282E170B0C19004A9460 /* spine-cocos2d-iphone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "spine-cocos2d-iphone.h"; path = "src/spine/spine-cocos2d-iphone.h"; sourceTree = "<group>"; };
 		43C32868170B0DA6004A9460 /* spineboy.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = spineboy.json; path = Resources/spineboy.json; sourceTree = "<group>"; };
@@ -245,6 +251,10 @@
 				43F7FF741927F92500CA4038 /* EventData.h */,
 				43F7FF441927F91900CA4038 /* extension.c */,
 				43F7FF751927F92500CA4038 /* extension.h */,
+				43B7CC0719DC4ACD0031321C /* IkConstraint.c */,
+				43B7CC0D19DC4AE30031321C /* IkConstraint.h */,
+				43B7CC0819DC4ACD0031321C /* IkConstraintData.c */,
+				43B7CC0E19DC4AE30031321C /* IkConstraintData.h */,
 				43F7FF451927F91900CA4038 /* Json.c */,
 				43F7FF461927F91900CA4038 /* Json.h */,
 				43F7FF471927F91900CA4038 /* MeshAttachment.c */,
@@ -481,6 +491,7 @@
 				43F7FF5A1927F91900CA4038 /* BoundingBoxAttachment.c in Sources */,
 				43F7FF5B1927F91900CA4038 /* Event.c in Sources */,
 				43F7FF5C1927F91900CA4038 /* EventData.c in Sources */,
+				43B7CC0A19DC4ACD0031321C /* IkConstraintData.c in Sources */,
 				43F7FF5D1927F91900CA4038 /* extension.c in Sources */,
 				43F7FF5E1927F91900CA4038 /* Json.c in Sources */,
 				43F7FF5F1927F91900CA4038 /* MeshAttachment.c in Sources */,
@@ -490,6 +501,7 @@
 				43F7FF631927F91900CA4038 /* SkeletonData.c in Sources */,
 				43F7FF641927F91900CA4038 /* SkeletonJson.c in Sources */,
 				43F7FF651927F91900CA4038 /* Skin.c in Sources */,
+				43B7CC0919DC4ACD0031321C /* IkConstraint.c in Sources */,
 				43F7FF661927F91900CA4038 /* SkinnedMeshAttachment.c in Sources */,
 				43F7FF671927F91900CA4038 /* Slot.c in Sources */,
 				43F7FF681927F91900CA4038 /* SlotData.c in Sources */,
