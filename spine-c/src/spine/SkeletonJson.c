@@ -64,7 +64,7 @@ void _spSkeletonJson_setError (spSkeletonJson* self, Json* root, const char* val
 	int length;
 	FREE(self->error);
 	strcpy(message, value1);
-	length = strlen(value1);
+	length = (int)strlen(value1);
 	if (value2) strncat(message + length, value2, 256 - length);
 	MALLOC_STR(self->error, message);
 	if (root) Json_dispose(root);
@@ -81,7 +81,7 @@ static float toColor (const char* value, int index) {
 	digits[0] = *value;
 	digits[1] = *(value + 1);
 	digits[2] = '\0';
-	color = strtoul(digits, &error, 16);
+	color = (int)strtoul(digits, &error, 16);
 	if (*error != 0) return -1;
 	return color / (float)255;
 }
