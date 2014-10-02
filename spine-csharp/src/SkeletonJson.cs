@@ -550,6 +550,25 @@ namespace Spine {
 				}
 			}
 
+			if (map.ContainsKey("flipx")) {
+				var flipMap = (List<Object>)map["flipx"];
+				var timeline = new FlipXTimeline(flipMap.Count);
+				int frameIndex = 0;
+				foreach (Dictionary<String, Object> valueMap in flipMap)
+					timeline.SetFrame(frameIndex++, (float)valueMap["time"], valueMap.ContainsKey("x") ? (bool)valueMap["x"] : false);
+				timelines.Add(timeline);
+				duration = Math.Max(duration, timeline.frames[timeline.FrameCount * 2 - 2]);
+			}
+			if (map.ContainsKey("flipy")) {
+				var flipMap = (List<Object>)map["flipy"];
+				var timeline = new FlipYTimeline(flipMap.Count);
+				int frameIndex = 0;
+				foreach (Dictionary<String, Object> valueMap in flipMap)
+					timeline.SetFrame(frameIndex++, (float)valueMap["time"], valueMap.ContainsKey("y") ? (bool)valueMap["y"] : false);
+				timelines.Add(timeline);
+				duration = Math.Max(duration, timeline.frames[timeline.FrameCount * 2 - 2]);
+			}
+
 			if (map.ContainsKey("draworder")) {
 				var values = (List<Object>)map["draworder"];
 				var timeline = new DrawOrderTimeline(values.Count);

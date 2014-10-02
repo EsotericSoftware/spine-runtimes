@@ -216,7 +216,7 @@ namespace Spine {
 
 		public RotateTimeline (int frameCount)
 			: base(frameCount) {
-			frames = new float[frameCount * 2];
+			frames = new float[frameCount << 1];
 		}
 
 		/// <summary>Sets the time and value of the specified keyframe.</summary>
@@ -667,6 +667,52 @@ namespace Spine {
 			float mix = prevFrameMix + (frames[frameIndex + FRAME_MIX] - prevFrameMix) * percent;
 			ikConstraint.mix += (mix - ikConstraint.mix) * alpha;
 			ikConstraint.bendDirection = (int)frames[frameIndex + PREV_FRAME_BEND_DIRECTION];
+		}
+	}
+
+	public class FlipXTimeline : CurveTimeline {
+		internal float[] frames;
+
+		public float[] Frames { get { return frames; } set { frames = value; } } // time, flip, ...
+
+		public FlipXTimeline (int frameCount)
+			: base(frameCount) {
+			frames = new float[frameCount << 1];
+		}
+
+		/// <summary>Sets the time and value of the specified keyframe.</summary>
+		public void SetFrame (int frameIndex, float time, bool flip) {
+			frameIndex *= 2;
+			frames[frameIndex] = time;
+			frames[frameIndex + 1] = flip ? 1 : 0;
+		}
+
+		override public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
+			float[] frames = this.frames;
+			if (time < frames[0]) {
+				if (lastTime > time) Apply(skeleton, lastTime, int.MaxValue, null, 0);
+				return;
+			} else if (lastTime > time) //
+				lastTime = -1;
+
+			int frameIndex = (time >= frames[frames.Length - 2] ? frames.Length : Animation.binarySearch(frames, time, 2)) - 2;
+			if (frames[frameIndex] <= lastTime) return;
+
+			Flip(skeleton, frames[frameIndex + 1] != 0);
+		}
+
+		virtual protected void Flip (Skeleton skeleton, bool flip) {
+			skeleton.flipX = flip;
+		}
+	}
+
+	public class FlipYTimeline : FlipXTimeline {
+		public FlipYTimeline (int frameCount)
+			: base(frameCount) {
+		}
+
+		override protected void Flip (Skeleton skeleton, bool flip) {
+			skeleton.flipY = flip;
 		}
 	}
 }
