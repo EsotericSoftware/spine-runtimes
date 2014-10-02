@@ -423,7 +423,7 @@ public class SkeletonBinary {
 
 			// FFD timelines.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
-				Skin skin = skeletonData.getSkins().get(input.readInt(true) + 1);
+				Skin skin = skeletonData.skins.get(input.readInt(true));
 				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 					int slotIndex = input.readInt(true);
 					for (int iii = 0, nnn = input.readInt(true); iii < nnn; iii++) {
