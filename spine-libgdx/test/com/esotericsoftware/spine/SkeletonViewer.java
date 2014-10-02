@@ -202,16 +202,17 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 			delta = Math.min(delta, 0.032f) * ui.speedSlider.getValue();
 			skeleton.update(delta);
+			skeleton.setFlip(ui.flipXCheckbox.isChecked(), ui.flipYCheckbox.isChecked());
 			if (!ui.pauseButton.isChecked()) {
 				state.update(delta);
 				state.apply(skeleton);
+				ui.flipXCheckbox.setChecked(skeleton.getFlipX());
+				ui.flipYCheckbox.setChecked(skeleton.getFlipY());
 			}
 			skeleton.setPosition(skeletonX, skeletonY);
 			// skeleton.setPosition(0, 0);
 			// skeleton.getRootBone().setX(skeletonX);
 			// skeleton.getRootBone().setY(skeletonY);
-			skeleton.setFlipX(ui.flipXCheckbox.isChecked());
-			skeleton.setFlipY(ui.flipYCheckbox.isChecked());
 			skeleton.updateWorldTransform();
 
 			batch.begin();

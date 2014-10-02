@@ -46,6 +46,8 @@ import com.esotericsoftware.spine.Animation.CurveTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.FfdTimeline;
+import com.esotericsoftware.spine.Animation.FlipXTimeline;
+import com.esotericsoftware.spine.Animation.FlipYTimeline;
 import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
@@ -66,10 +68,6 @@ public class SkeletonBinary {
 	static public final int TIMELINE_TRANSLATE = 2;
 	static public final int TIMELINE_ATTACHMENT = 3;
 	static public final int TIMELINE_COLOR = 4;
-	static public final int TIMELINE_EVENT = 5;
-	static public final int TIMELINE_DRAWORDER = 6;
-	static public final int TIMELINE_FFD = 7;
-	static public final int TIMELINE_IK = 8;
 
 	static public final int CURVE_LINEAR = 0;
 	static public final int CURVE_STEPPED = 1;
@@ -474,6 +472,28 @@ public class SkeletonBinary {
 						duration = Math.max(duration, timeline.getFrames()[frameCount - 1]);
 					}
 				}
+			}
+
+			// Flip timelines.
+			int flipCount = input.readInt(true);
+			if (flipCount > 0) {
+				FlipXTimeline timeline = new FlipXTimeline(flipCount);
+				for (int i = 0; i < flipCount; i++) {
+					float time = input.readFloat();
+					timeline.setFrame(i, time, input.readBoolean());
+				}
+				timelines.add(timeline);
+				duration = Math.max(duration, timeline.getFrames()[flipCount * 2 - 2]);
+			}
+			flipCount = input.readInt(true);
+			if (flipCount > 0) {
+				FlipYTimeline timeline = new FlipYTimeline(flipCount);
+				for (int i = 0; i < flipCount; i++) {
+					float time = input.readFloat();
+					timeline.setFrame(i, time, input.readBoolean());
+				}
+				timelines.add(timeline);
+				duration = Math.max(duration, timeline.getFrames()[flipCount * 2 - 2]);
 			}
 
 			// Draw order timeline.

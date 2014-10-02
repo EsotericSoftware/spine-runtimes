@@ -30,12 +30,23 @@
 
 package com.esotericsoftware.spine;
 
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.SerializationException;
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.ColorTimeline;
 import com.esotericsoftware.spine.Animation.CurveTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.FfdTimeline;
+import com.esotericsoftware.spine.Animation.FlipXTimeline;
+import com.esotericsoftware.spine.Animation.FlipYTimeline;
 import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
@@ -49,15 +60,6 @@ import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.SkinnedMeshAttachment;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.FloatArray;
-import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.SerializationException;
 
 public class SkeletonJson {
 	private final AttachmentLoader attachmentLoader;
@@ -456,6 +458,26 @@ public class SkeletonJson {
 					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() - 1]);
 				}
 			}
+		}
+
+		// Flip timelines.
+		JsonValue flipMap = map.get("flipx");
+		if (flipMap != null) {
+			FlipXTimeline timeline = new FlipXTimeline(flipMap.size);
+			int frameIndex = 0;
+			for (JsonValue valueMap = flipMap.child; valueMap != null; valueMap = valueMap.next)
+				timeline.setFrame(frameIndex++, valueMap.getFloat("time"), valueMap.getBoolean("x", false));
+			timelines.add(timeline);
+			duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 2 - 2]);
+		}
+		flipMap = map.get("flipy");
+		if (flipMap != null) {
+			FlipYTimeline timeline = new FlipYTimeline(flipMap.size);
+			int frameIndex = 0;
+			for (JsonValue valueMap = flipMap.child; valueMap != null; valueMap = valueMap.next)
+				timeline.setFrame(frameIndex++, valueMap.getFloat("time"), valueMap.getBoolean("y", false));
+			timelines.add(timeline);
+			duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 2 - 2]);
 		}
 
 		// Draw order timeline.
