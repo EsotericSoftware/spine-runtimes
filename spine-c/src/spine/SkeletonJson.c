@@ -113,6 +113,8 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 	Json* ffd = Json_getItem(root, "ffd");
 	Json* drawOrder = Json_getItem(root, "draworder");
 	Json* events = Json_getItem(root, "events");
+	Json* flipX = Json_getItem(root, "flipx");
+	Json* flipY = Json_getItem(root, "flipy");
 	Json *boneMap, *slotMap, *ikMap, *ffdMap;
 
 	int timelinesCount = 0;
@@ -124,8 +126,10 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 	for (ffdMap = ffd ? ffd->child : 0; ffdMap; ffdMap = ffdMap->next)
 		for (slotMap = ffdMap->child; slotMap; slotMap = slotMap->next)
 			timelinesCount += slotMap->size;
-	if (events) ++timelinesCount;
 	if (drawOrder) ++timelinesCount;
+	if (events) ++timelinesCount;
+	if (flipX) ++timelinesCount;
+	if (flipY) ++timelinesCount;
 
 	animation = spAnimation_create(root->name, timelinesCount);
 	animation->timelinesCount = 0;
@@ -310,6 +314,26 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 				if (duration > animation->duration) animation->duration = duration;
 			}
 		}
+	}
+
+	/* Flip timelines. */
+	if (flipX) {
+		Json* frame;
+		spFlipTimeline* timeline = spFlipTimeline_create(flipX->size, 1);
+		for (frame = flipX->child, i = 0; frame; frame = frame->next, ++i)
+			spFlipTimeline_setFrame(timeline, i, Json_getFloat(frame, "time", 0), Json_getInt(frame, "x", 0));
+		animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
+		duration = timeline->frames[flipX->size * 2 - 2];
+		if (duration > animation->duration) animation->duration = duration;
+	}
+	if (flipY) {
+		Json* frame;
+		spFlipTimeline* timeline = spFlipTimeline_create(flipY->size, 0);
+		for (frame = flipY->child, i = 0; frame; frame = frame->next, ++i)
+			spFlipTimeline_setFrame(timeline, i, Json_getFloat(frame, "time", 0), Json_getInt(frame, "y", 0));
+		animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
+		duration = timeline->frames[flipY->size * 2 - 2];
+		if (duration > animation->duration) animation->duration = duration;
 	}
 
 	/* Draw order timeline. */
