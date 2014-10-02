@@ -410,7 +410,7 @@ public class SkeletonBinary {
 
 			// IK timelines.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
-				IkConstraintData ikConstraint = skeletonData.findIkConstraint(input.readString());
+				IkConstraintData ikConstraint = skeletonData.ikConstraints.get(input.readInt(true));
 				int frameCount = input.readInt(true);
 				IkConstraintTimeline timeline = new IkConstraintTimeline(frameCount);
 				timeline.ikConstraintIndex = skeletonData.getIkConstraints().indexOf(ikConstraint, true);
