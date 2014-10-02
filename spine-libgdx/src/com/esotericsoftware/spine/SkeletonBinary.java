@@ -134,13 +134,13 @@ public class SkeletonBinary {
 
 			// IK constraints.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
-				IkConstraintData ikConstraint = new IkConstraintData(input.readString());
+				IkConstraintData ikConstraintData = new IkConstraintData(input.readString());
 				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++)
-					ikConstraint.bones.add(skeletonData.bones.get(input.readInt(true)));
-				ikConstraint.target = skeletonData.bones.get(input.readInt(true));
-				ikConstraint.mix = input.readFloat();
-				ikConstraint.bendDirection = input.readByte();
-				skeletonData.ikConstraints.add(ikConstraint);
+					ikConstraintData.bones.add(skeletonData.bones.get(input.readInt(true)));
+				ikConstraintData.target = skeletonData.bones.get(input.readInt(true));
+				ikConstraintData.mix = input.readFloat();
+				ikConstraintData.bendDirection = input.readByte();
+				skeletonData.ikConstraints.add(ikConstraintData);
 			}
 
 			// Slots.
@@ -193,6 +193,7 @@ public class SkeletonBinary {
 		return skeletonData;
 	}
 
+	/** @return May be null. */
 	private Skin readSkin (DataInput input, String skinName, boolean nonessential) throws IOException {
 		int slotCount = input.readInt(true);
 		if (slotCount == 0) return null;

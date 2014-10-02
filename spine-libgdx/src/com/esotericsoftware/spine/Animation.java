@@ -157,6 +157,7 @@ public class Animation {
 		private final float[] curves; // type, x, y, ...
 
 		public CurveTimeline (int frameCount) {
+			if (frameCount <= 0) throw new IllegalArgumentException("frameCount must be > 0: " + frameCount);
 			curves = new float[(frameCount - 1) * BEZIER_SIZE];
 		}
 
