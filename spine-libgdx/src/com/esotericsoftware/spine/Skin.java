@@ -106,9 +106,9 @@ public class Skin {
 		String name;
 		int hashCode;
 
-		public void set (int slotName, String name) {
+		public void set (int slotIndex, String name) {
 			if (name == null) throw new IllegalArgumentException("name cannot be null.");
-			this.slotIndex = slotName;
+			this.slotIndex = slotIndex;
 			this.name = name;
 			hashCode = 31 * (31 + name.hashCode()) + slotIndex;
 		}

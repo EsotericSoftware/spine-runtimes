@@ -778,7 +778,7 @@ public class Animation {
 	}
 
 	static public class FlipXTimeline implements Timeline {
-		private final float[] frames; // time, flip, ...
+		final float[] frames; // time, flip, ...
 
 		public FlipXTimeline (int frameCount) {
 			frames = new float[frameCount << 1];
