@@ -808,22 +808,21 @@ void _spFlipTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, fl
 	if (self->frames[frameIndex] <= lastTime) return;
 
 	if (self->x)
-		skeleton->flipX = self->frames[frameIndex + 1];
+		skeleton->bones[self->boneIndex]->flipX = self->frames[frameIndex + 1];
 	else
-		skeleton->flipY = self->frames[frameIndex + 1];
+		skeleton->bones[self->boneIndex]->flipY = self->frames[frameIndex + 1];
 }
 
 void _spFlipTimeline_dispose (spTimeline* timeline) {
 	spFlipTimeline* self = SUB_CAST(spFlipTimeline, timeline);
-	_spCurveTimeline_deinit(SUPER(self));
+	_spTimeline_deinit(SUPER(self));
 	FREE(self->frames);
 	FREE(self);
 }
 
 spFlipTimeline* spFlipTimeline_create (int framesCount, int/*bool*/x) {
 	spFlipTimeline* self = NEW(spFlipTimeline);
-	_spCurveTimeline_init(SUPER(self), x ? SP_TIMELINE_FLIPX : SP_TIMELINE_FLIPY, framesCount,
-			_spFlipTimeline_dispose, _spFlipTimeline_apply);
+	_spTimeline_init(SUPER(self), x ? SP_TIMELINE_FLIPX : SP_TIMELINE_FLIPY, _spFlipTimeline_dispose, _spFlipTimeline_apply);
 	CONST_CAST(int, self->x) = x;
 	CONST_CAST(int, self->framesCount) = framesCount << 1;
 	CONST_CAST(float*, self->frames) = CALLOC(float, self->framesCount);

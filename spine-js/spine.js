@@ -1712,7 +1712,8 @@ spine.SkeletonJson.prototype = {
 			}
 		}
 
-		var drawOrderValues = map["draworder"];
+		var drawOrderValues = map["drawOrder"];
+		if (!drawOrderValues) drawOrderValues = map["draworder"];
 		if (drawOrderValues) {
 			var timeline = new spine.DrawOrderTimeline(drawOrderValues.length);
 			var slotCount = skeletonData.slots.length;

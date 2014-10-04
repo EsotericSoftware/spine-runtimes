@@ -469,7 +469,8 @@ public class SkeletonJson {
 			}
 		}
 
-		var drawOrderValues:Object = map["draworder"];
+		var drawOrderValues:Object = map["drawOrder"];
+		if (!drawOrderValues) drawOrderValues = map["draworder"];
 		if (drawOrderValues) {
 			var drawOrderTimeline:DrawOrderTimeline = new DrawOrderTimeline(drawOrderValues.length);
 			var slotCount:int = skeletonData.slots.length;

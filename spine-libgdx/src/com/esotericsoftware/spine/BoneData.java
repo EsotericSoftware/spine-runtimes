@@ -39,6 +39,7 @@ public class BoneData {
 	float x, y;
 	float rotation;
 	float scaleX = 1, scaleY = 1;
+	boolean flipX, flipY;
 	boolean inheritScale = true, inheritRotation = true;
 
 	// Nonessential.
@@ -63,6 +64,8 @@ public class BoneData {
 		rotation = bone.rotation;
 		scaleX = bone.scaleX;
 		scaleY = bone.scaleY;
+		flipX = bone.flipX;
+		flipY = bone.flipY;
 	}
 
 	/** @return May be null. */
@@ -130,6 +133,22 @@ public class BoneData {
 	public void setScale (float scaleX, float scaleY) {
 		this.scaleX = scaleX;
 		this.scaleY = scaleY;
+	}
+
+	public boolean getFlipX () {
+		return flipX;
+	}
+
+	public void setFlipX (boolean flipX) {
+		this.flipX = flipX;
+	}
+
+	public boolean getFlipY () {
+		return flipY;
+	}
+
+	public void setFlipY (boolean flipY) {
+		this.flipY = flipY;
 	}
 
 	public boolean getInheritScale () {

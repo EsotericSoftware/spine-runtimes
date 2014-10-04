@@ -68,6 +68,8 @@ public class SkeletonBinary {
 	static public final int TIMELINE_TRANSLATE = 2;
 	static public final int TIMELINE_ATTACHMENT = 3;
 	static public final int TIMELINE_COLOR = 4;
+	static public final int TIMELINE_FLIPX = 5;
+	static public final int TIMELINE_FLIPY = 6;
 
 	static public final int CURVE_LINEAR = 0;
 	static public final int CURVE_STEPPED = 1;
@@ -124,6 +126,8 @@ public class SkeletonBinary {
 				boneData.scaleY = input.readFloat();
 				boneData.rotation = input.readFloat();
 				boneData.length = input.readFloat() * scale;
+				boneData.flipX = input.readBoolean();
+				boneData.flipY = input.readBoolean();
 				boneData.inheritScale = input.readBoolean();
 				boneData.inheritRotation = input.readBoolean();
 				if (nonessential) Color.rgba8888ToColor(boneData.color, input.readInt());
@@ -384,7 +388,7 @@ public class SkeletonBinary {
 						break;
 					}
 					case TIMELINE_TRANSLATE:
-					case TIMELINE_SCALE:
+					case TIMELINE_SCALE: {
 						TranslateTimeline timeline;
 						float timelineScale = 1;
 						if (timelineType == TIMELINE_SCALE)
@@ -402,6 +406,18 @@ public class SkeletonBinary {
 						timelines.add(timeline);
 						duration = Math.max(duration, timeline.getFrames()[frameCount * 3 - 3]);
 						break;
+					}
+					case TIMELINE_FLIPX:
+					case TIMELINE_FLIPY: {
+						FlipXTimeline timeline = timelineType == TIMELINE_FLIPX ? new FlipXTimeline(frameCount) : new FlipYTimeline(
+							frameCount);
+						timeline.boneIndex = boneIndex;
+						for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+							timeline.setFrame(frameIndex, input.readFloat(), input.readBoolean());
+						timelines.add(timeline);
+						duration = Math.max(duration, timeline.getFrames()[frameCount * 2 - 2]);
+						break;
+					}
 					}
 				}
 			}
@@ -472,28 +488,6 @@ public class SkeletonBinary {
 						duration = Math.max(duration, timeline.getFrames()[frameCount - 1]);
 					}
 				}
-			}
-
-			// Flip timelines.
-			int flipCount = input.readInt(true);
-			if (flipCount > 0) {
-				FlipXTimeline timeline = new FlipXTimeline(flipCount);
-				for (int i = 0; i < flipCount; i++) {
-					float time = input.readFloat();
-					timeline.setFrame(i, time, input.readBoolean());
-				}
-				timelines.add(timeline);
-				duration = Math.max(duration, timeline.getFrames()[flipCount * 2 - 2]);
-			}
-			flipCount = input.readInt(true);
-			if (flipCount > 0) {
-				FlipYTimeline timeline = new FlipYTimeline(flipCount);
-				for (int i = 0; i < flipCount; i++) {
-					float time = input.readFloat();
-					timeline.setFrame(i, time, input.readBoolean());
-				}
-				timelines.add(timeline);
-				duration = Math.max(duration, timeline.getFrames()[flipCount * 2 - 2]);
 			}
 
 			// Draw order timeline.

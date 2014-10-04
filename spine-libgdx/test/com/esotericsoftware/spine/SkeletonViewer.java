@@ -206,8 +206,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 			if (!ui.pauseButton.isChecked()) {
 				state.update(delta);
 				state.apply(skeleton);
-				ui.flipXCheckbox.setChecked(skeleton.getFlipX());
-				ui.flipYCheckbox.setChecked(skeleton.getFlipY());
 			}
 			skeleton.setPosition(skeletonX, skeletonY);
 			// skeleton.setPosition(0, 0);

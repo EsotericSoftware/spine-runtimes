@@ -307,10 +307,11 @@ typedef spIkConstraintTimeline IkConstraintTimeline;
 /**/
 
 typedef struct {
-	spCurveTimeline super;
+	spTimeline super;
 	int const x;
 	int const framesCount;
 	float* const frames; /* time, flip, ... */
+	int boneIndex;
 } spFlipTimeline;
 
 spFlipTimeline* spFlipTimeline_create (int framesCount, int/*bool*/x);

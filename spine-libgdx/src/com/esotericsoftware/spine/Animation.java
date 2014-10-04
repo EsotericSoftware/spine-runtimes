@@ -778,10 +778,19 @@ public class Animation {
 	}
 
 	static public class FlipXTimeline implements Timeline {
+		int boneIndex;
 		final float[] frames; // time, flip, ...
 
 		public FlipXTimeline (int frameCount) {
 			frames = new float[frameCount << 1];
+		}
+
+		public void setBoneIndex (int boneIndex) {
+			this.boneIndex = boneIndex;
+		}
+
+		public int getBoneIndex () {
+			return boneIndex;
 		}
 
 		public int getFrameCount () {
@@ -806,15 +815,13 @@ public class Animation {
 				return;
 			} else if (lastTime > time) //
 				lastTime = -1;
-
 			int frameIndex = (time >= frames[frames.length - 2] ? frames.length : binarySearch(frames, time, 2)) - 2;
 			if (frames[frameIndex] <= lastTime) return;
-
-			flip(skeleton, frames[frameIndex + 1] != 0);
+			setFlip(skeleton.bones.get(boneIndex), frames[frameIndex + 1] != 0);
 		}
 
-		protected void flip (Skeleton skeleton, boolean flip) {
-			skeleton.setFlipX(flip);
+		protected void setFlip (Bone bone, boolean flip) {
+			bone.setFlipX(flip);
 		}
 	}
 
@@ -823,8 +830,8 @@ public class Animation {
 			super(frameCount);
 		}
 
-		protected void flip (Skeleton skeleton, boolean flip) {
-			skeleton.setFlipY(flip);
+		protected void setFlip (Bone bone, boolean flip) {
+			bone.setFlipY(flip);
 		}
 	}
 }

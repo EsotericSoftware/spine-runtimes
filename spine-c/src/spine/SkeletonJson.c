@@ -111,7 +111,8 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 	Json* slots = Json_getItem(root, "slots");
 	Json* ik = Json_getItem(root, "ik");
 	Json* ffd = Json_getItem(root, "ffd");
-	Json* drawOrder = Json_getItem(root, "draworder");
+	Json* drawOrder = Json_getItem(root, "drawOrder");
+	if (!drawOrder) drawOrder = Json_getItem(root, "draworder");
 	Json* events = Json_getItem(root, "events");
 	Json* flipX = Json_getItem(root, "flipx");
 	Json* flipY = Json_getItem(root, "flipy");
@@ -218,6 +219,17 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 					animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
 					duration = timeline->frames[timelineArray->size * 3 - 3];
 					if (duration > animation->duration) animation->duration = duration;
+				} else if (strcmp(timelineArray->name, "flipX") == 0 || strcmp(timelineArray->name, "flipY") == 0) {
+					int x = strcmp(timelineArray->name, "flipX") == 0;
+					char* field = x ? "x" : "y";
+					spFlipTimeline *timeline = spFlipTimeline_create(timelineArray->size, x);
+					timeline->boneIndex = boneIndex;
+					for (frame = timelineArray->child, i = 0; frame; frame = frame->next, ++i)
+						spFlipTimeline_setFrame(timeline, i, Json_getFloat(frame, "time", 0), Json_getInt(frame, field, 0));
+					animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
+					duration = timeline->frames[timelineArray->size * 2 - 2];
+					if (duration > animation->duration) animation->duration = duration;
+
 				} else {
 					spAnimation_dispose(animation);
 					_spSkeletonJson_setError(self, 0, "Invalid timeline type for a bone: ", timelineArray->name);
@@ -314,26 +326,6 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 				if (duration > animation->duration) animation->duration = duration;
 			}
 		}
-	}
-
-	/* Flip timelines. */
-	if (flipX) {
-		Json* frame;
-		spFlipTimeline* timeline = spFlipTimeline_create(flipX->size, 1);
-		for (frame = flipX->child, i = 0; frame; frame = frame->next, ++i)
-			spFlipTimeline_setFrame(timeline, i, Json_getFloat(frame, "time", 0), Json_getInt(frame, "x", 0));
-		animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
-		duration = timeline->frames[flipX->size * 2 - 2];
-		if (duration > animation->duration) animation->duration = duration;
-	}
-	if (flipY) {
-		Json* frame;
-		spFlipTimeline* timeline = spFlipTimeline_create(flipY->size, 0);
-		for (frame = flipY->child, i = 0; frame; frame = frame->next, ++i)
-			spFlipTimeline_setFrame(timeline, i, Json_getFloat(frame, "time", 0), Json_getInt(frame, "y", 0));
-		animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
-		duration = timeline->frames[flipY->size * 2 - 2];
-		if (duration > animation->duration) animation->duration = duration;
 	}
 
 	/* Draw order timeline. */

@@ -670,13 +670,15 @@ namespace Spine {
 		}
 	}
 
-	public class FlipXTimeline : CurveTimeline {
+	public class FlipXTimeline : Timeline {
+		internal int boneIndex;
 		internal float[] frames;
 
+		public int BoneIndex { get { return boneIndex; } set { boneIndex = value; } }
 		public float[] Frames { get { return frames; } set { frames = value; } } // time, flip, ...
+		public int FrameCount { get { return frames.Length >> 1; } }
 
-		public FlipXTimeline (int frameCount)
-			: base(frameCount) {
+		public FlipXTimeline (int frameCount) {
 			frames = new float[frameCount << 1];
 		}
 
@@ -687,7 +689,7 @@ namespace Spine {
 			frames[frameIndex + 1] = flip ? 1 : 0;
 		}
 
-		override public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
+		public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (lastTime > time) Apply(skeleton, lastTime, int.MaxValue, null, 0);
@@ -698,11 +700,11 @@ namespace Spine {
 			int frameIndex = (time >= frames[frames.Length - 2] ? frames.Length : Animation.binarySearch(frames, time, 2)) - 2;
 			if (frames[frameIndex] <= lastTime) return;
 
-			Flip(skeleton, frames[frameIndex + 1] != 0);
+			SetFlip(skeleton.bones[boneIndex], frames[frameIndex + 1] != 0);
 		}
 
-		virtual protected void Flip (Skeleton skeleton, bool flip) {
-			skeleton.flipX = flip;
+		virtual protected void SetFlip (Bone bone, bool flip) {
+			bone.flipX = flip;
 		}
 	}
 
@@ -711,8 +713,8 @@ namespace Spine {
 			: base(frameCount) {
 		}
 
-		override protected void Flip (Skeleton skeleton, bool flip) {
-			skeleton.flipY = flip;
+		override protected void SetFlip (Bone bone, bool flip) {
+			bone.flipY = flip;
 		}
 	}
 }
