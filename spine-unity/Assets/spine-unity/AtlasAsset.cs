@@ -97,13 +97,11 @@ public class MaterialsTextureLoader : TextureLoader {
 		}
 		page.rendererObject = material;
 
-        //deal with really, really old atlas files
-        if (page.width == 0 || page.height == 0)
-        {
-            page.width = material.mainTexture.width;
-            page.height = material.mainTexture.height;
-        }
-        
+		// Very old atlas files expected the texture's actual size to be used at runtime.
+		if (page.width == 0 || page.height == 0) {
+			page.width = material.mainTexture.width;
+			page.height = material.mainTexture.height;
+		}
 	}
 
 	public void Unload (object texture) {

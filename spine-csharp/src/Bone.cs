@@ -38,7 +38,7 @@ namespace Spine {
 		internal BoneData data;
 		internal Skeleton skeleton;
 		internal Bone parent;
-		internal List<Bone> children;
+		internal List<Bone> children = new List<Bone>();
 		internal float x, y, rotation, rotationIK, scaleX, scaleY;
 		internal bool flipX, flipY;
 		internal float m00, m01, m10, m11;
@@ -79,7 +79,6 @@ namespace Spine {
 			this.data = data;
 			this.skeleton = skeleton;
 			this.parent = parent;
-			this.children = new List<Bone>();
 			SetToSetupPose();
 		}
 
