@@ -41,7 +41,7 @@ using Spine;
 
 [CustomEditor(typeof(SkeletonUtilityBone)), CanEditMultipleObjects]
 public class SkeletonUtilityBoneInspector : Editor {
-	SerializedProperty mode, boneName, zPosition, position, rotation, scale, overrideAlpha, parentReference;
+    SerializedProperty mode, boneName, zPosition, position, rotation, scale, overrideAlpha, parentReference, flip, flipX;
 
 	//multi selected flags
 	bool containsFollows, containsOverrides, multiObject;
@@ -60,6 +60,8 @@ public class SkeletonUtilityBoneInspector : Editor {
 		scale = this.serializedObject.FindProperty("scale");
 		overrideAlpha = this.serializedObject.FindProperty("overrideAlpha");
 		parentReference = this.serializedObject.FindProperty("parentReference");
+        flip = this.serializedObject.FindProperty("flip");
+        flipX = this.serializedObject.FindProperty("flipX");
 
 		EvaluateFlags();
 
@@ -134,11 +136,24 @@ public class SkeletonUtilityBoneInspector : Editor {
 		EditorGUILayout.PropertyField(position);
 		EditorGUILayout.PropertyField(rotation);
 		EditorGUILayout.PropertyField(scale);
+        EditorGUILayout.PropertyField(flip);
 
 		EditorGUI.BeginDisabledGroup( containsFollows );
 		{
 			EditorGUILayout.PropertyField(overrideAlpha);
 			EditorGUILayout.PropertyField(parentReference);
+
+            EditorGUI.BeginDisabledGroup(multiObject || !flip.boolValue);
+            {
+                EditorGUI.BeginChangeCheck();
+                EditorGUILayout.PropertyField(flipX);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    FlipX(flipX.boolValue);
+                }
+            }
+            EditorGUI.EndDisabledGroup();
+
 		}
 		EditorGUI.EndDisabledGroup();
 
@@ -172,6 +187,15 @@ public class SkeletonUtilityBoneInspector : Editor {
 
 		serializedObject.ApplyModifiedProperties();
 	}
+
+    void FlipX(bool state)
+    {
+        utilityBone.FlipX(state);
+        if (Application.isPlaying == false)
+        {
+            skeletonUtility.skeletonAnimation.LateUpdate();
+        }
+    }
 
 	void BoneSelectorContextMenu(string current, List<Bone> bones, string topValue, GenericMenu.MenuFunction2 callback){
 		GenericMenu menu = new GenericMenu();
