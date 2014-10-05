@@ -27,7 +27,6 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -64,7 +63,8 @@ public class SkeletonRendererInspector : Editor {
 		if (!component.valid) {
 			component.Reset();
 			component.LateUpdate();
-			if (!component.valid) return;
+			if (!component.valid)
+				return;
 		}
 
 		// Initial skin name.
@@ -100,7 +100,8 @@ public class SkeletonRendererInspector : Editor {
 		if (serializedObject.ApplyModifiedProperties() ||
 			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
 		) {
-			if (!Application.isPlaying) ((SkeletonRenderer)target).Reset();
+			if (!Application.isPlaying)
+				((SkeletonRenderer)target).Reset();
 		}
 	}
 }

@@ -44,52 +44,49 @@ using Spine;
 [AddComponentMenu("Spine/SkeletonUtilityBone")]
 public class SkeletonUtilityBone : MonoBehaviour {
 
-	public enum Mode { Follow, Override }
+	public enum Mode {
+		Follow,
+		Override
+	}
 
 	[System.NonSerialized]
 	public bool valid;
-
 	[System.NonSerialized]
 	public SkeletonUtility skeletonUtility;
-
 	[System.NonSerialized]
 	public Bone bone;
-
 	public Mode mode;
-	
 	public bool zPosition = true;
 	public bool position;
 	public bool rotation;
 	public bool scale;
-    public bool flip;
-    public bool flipX;
-
+	public bool flip;
+	public bool flipX;
 	[Range(0f,1f)]
 	public float overrideAlpha = 1;
 
 	/// <summary>If a bone isn't set, boneName is used to find the bone.</summary>
 	public String boneName;
-
 	public Transform parentReference;
-
 	[HideInInspector]
 	public bool transformLerpComplete;
-
 	protected Transform cachedTransform;
 	protected Transform skeletonTransform;
 
-	public bool NonUniformScaleWarning{
-		get{
+	public bool NonUniformScaleWarning {
+		get {
 			return nonUniformScaleWarning;
 		}
 	}
+
 	private bool nonUniformScaleWarning;
 
 	public void Reset () {
 		bone = null;
 		cachedTransform = transform;
 		valid = skeletonUtility != null && skeletonUtility.skeletonRenderer != null && skeletonUtility.skeletonRenderer.valid;
-		if (!valid) return;
+		if (!valid)
+			return;
 		skeletonTransform = skeletonUtility.transform;
 
 		skeletonUtility.OnReset -= HandleOnReset;
@@ -98,10 +95,10 @@ public class SkeletonUtilityBone : MonoBehaviour {
 		DoUpdate();
 	}
 
-	void OnEnable(){
+	void OnEnable () {
 		skeletonUtility = SkeletonUtility.GetInParent<SkeletonUtility>(transform);
 
-		if(skeletonUtility == null)
+		if (skeletonUtility == null)
 			return;
 
 		skeletonUtility.RegisterBone(this);
@@ -109,13 +106,12 @@ public class SkeletonUtilityBone : MonoBehaviour {
 		skeletonUtility.OnReset += HandleOnReset;
 	}
 
-	void HandleOnReset ()
-	{
-		Reset ();
+	void HandleOnReset () {
+		Reset();
 	}
 
-	void OnDisable(){
-		if(skeletonUtility != null){
+	void OnDisable () {
+		if (skeletonUtility != null) {
 			skeletonUtility.OnReset -= HandleOnReset;
 
 			skeletonUtility.UnregisterBone(this);
@@ -132,7 +128,8 @@ public class SkeletonUtilityBone : MonoBehaviour {
 		Spine.Skeleton skeleton = skeletonUtility.skeletonRenderer.skeleton;
 
 		if (bone == null) {
-			if (boneName == null || boneName.Length == 0) return;
+			if (boneName == null || boneName.Length == 0)
+				return;
 			bone = skeleton.FindBone(boneName);
 			if (bone == null) {
 				Debug.LogError("Bone not found: " + boneName, this);
@@ -144,170 +141,153 @@ public class SkeletonUtilityBone : MonoBehaviour {
 
 		float skeletonFlipRotation = (skeleton.flipX ^ skeleton.flipY) ? -1f : 1f;
         
-        float flipCompensation = 0;
-        if (flip && (flipX || ( flipX != bone.flipX)) && bone.parent != null)
-        {
-            flipCompensation = bone.parent.WorldRotation * -2;
-        }
+		float flipCompensation = 0;
+		if (flip && (flipX || (flipX != bone.flipX)) && bone.parent != null) {
+			flipCompensation = bone.parent.WorldRotation * -2;
+		}
 
-		if(mode == Mode.Follow){
-            if (flip)
-            {
-                flipX = bone.flipX;
-            }
+		if (mode == Mode.Follow) {
+			if (flip) {
+				flipX = bone.flipX;
+			}
 
 
-			if(position){
+			if (position) {
 				cachedTransform.localPosition = new Vector3(bone.x, bone.y, 0);
 			}
 
-			if(rotation){
+			if (rotation) {
 
-				if(bone.Data.InheritRotation){
-                    if (bone.FlipX)
-                    {
-                        cachedTransform.localRotation = Quaternion.Euler(0, 180, bone.rotationIK - flipCompensation);
-                    }
-                    else { 
-					    cachedTransform.localRotation = Quaternion.Euler(0,0,bone.rotationIK);
-                    }
-				}
-				else{
+				if (bone.Data.InheritRotation) {
+					if (bone.FlipX) {
+						cachedTransform.localRotation = Quaternion.Euler(0, 180, bone.rotationIK - flipCompensation);
+					} else { 
+						cachedTransform.localRotation = Quaternion.Euler(0, 0, bone.rotationIK);
+					}
+				} else {
 					Vector3 euler = skeletonTransform.rotation.eulerAngles;
-					cachedTransform.rotation = Quaternion.Euler(euler.x, euler.y, skeletonTransform.rotation.eulerAngles.z + (bone.worldRotation * skeletonFlipRotation) );
+					cachedTransform.rotation = Quaternion.Euler(euler.x, euler.y, skeletonTransform.rotation.eulerAngles.z + (bone.worldRotation * skeletonFlipRotation));
 				}
 
 			}
 
-			if(scale){
+			if (scale) {
 				cachedTransform.localScale = new Vector3(bone.scaleX, bone.scaleY, 1);
 
 				nonUniformScaleWarning = (bone.scaleX != bone.scaleY);
 			}
 
-		}
-		else if(mode == Mode.Override){
+		} else if (mode == Mode.Override) {
 
 
 
-			if(transformLerpComplete)
-				return;            
+				if (transformLerpComplete)
+					return;            
 
-			if(parentReference == null){
-				if(position){
-					bone.x = Mathf.Lerp(bone.x, cachedTransform.localPosition.x, overrideAlpha);
-					bone.y = Mathf.Lerp(bone.y, cachedTransform.localPosition.y, overrideAlpha);
-				}
+				if (parentReference == null) {
+					if (position) {
+						bone.x = Mathf.Lerp(bone.x, cachedTransform.localPosition.x, overrideAlpha);
+						bone.y = Mathf.Lerp(bone.y, cachedTransform.localPosition.y, overrideAlpha);
+					}
 
-				if(rotation){
-                    float angle = Mathf.LerpAngle(bone.Rotation, cachedTransform.localRotation.eulerAngles.z, overrideAlpha) + flipCompensation;
+					if (rotation) {
+						float angle = Mathf.LerpAngle(bone.Rotation, cachedTransform.localRotation.eulerAngles.z, overrideAlpha) + flipCompensation;
 
-                    if (flip) { 
-                        if ((!flipX && bone.flipX))
-                        {
-                            angle -= flipCompensation;
-                        }
+						if (flip) { 
+							if ((!flipX && bone.flipX)) {
+								angle -= flipCompensation;
+							}
                         
-                        //TODO fix this...
-                        if (angle >= 360)
-                            angle -= 360;
-                        else if (angle <= -360)
-                            angle += 360;
-                    }
+							//TODO fix this...
+							if (angle >= 360)
+								angle -= 360;
+							else if (angle <= -360)
+									angle += 360;
+						}
 
-                    bone.Rotation = angle;
-                }
+						bone.Rotation = angle;
+					}
 
-				if(scale){
-					bone.scaleX = Mathf.Lerp(bone.scaleX, cachedTransform.localScale.x, overrideAlpha);
-					bone.scaleY = Mathf.Lerp(bone.scaleY, cachedTransform.localScale.y, overrideAlpha);
+					if (scale) {
+						bone.scaleX = Mathf.Lerp(bone.scaleX, cachedTransform.localScale.x, overrideAlpha);
+						bone.scaleY = Mathf.Lerp(bone.scaleY, cachedTransform.localScale.y, overrideAlpha);
 
-					nonUniformScaleWarning = (bone.scaleX != bone.scaleY);
-				}
+						nonUniformScaleWarning = (bone.scaleX != bone.scaleY);
+					}
 
-                if (flip)
-                {
-                    bone.flipX = flipX;
-                }
-			}
-			else{
+					if (flip) {
+						bone.flipX = flipX;
+					}
+				} else {
 
-                if (transformLerpComplete)
-                    return; 
+					if (transformLerpComplete)
+						return; 
 
-				if(position){
-					Vector3 pos = parentReference.InverseTransformPoint(cachedTransform.position);
-					bone.x = Mathf.Lerp(bone.x, pos.x, overrideAlpha);
-					bone.y = Mathf.Lerp(bone.y, pos.y, overrideAlpha);
-				}
+					if (position) {
+						Vector3 pos = parentReference.InverseTransformPoint(cachedTransform.position);
+						bone.x = Mathf.Lerp(bone.x, pos.x, overrideAlpha);
+						bone.y = Mathf.Lerp(bone.y, pos.y, overrideAlpha);
+					}
 				
-				if(rotation){
-                    float angle = Mathf.LerpAngle(bone.Rotation, Quaternion.LookRotation(flipX ? Vector3.forward * -1 : Vector3.forward, parentReference.InverseTransformDirection(cachedTransform.up)).eulerAngles.z, overrideAlpha) + flipCompensation;
+					if (rotation) {
+						float angle = Mathf.LerpAngle(bone.Rotation, Quaternion.LookRotation(flipX ? Vector3.forward * -1 : Vector3.forward, parentReference.InverseTransformDirection(cachedTransform.up)).eulerAngles.z, overrideAlpha) + flipCompensation;
 
-                    if (flip)
-                    {
-                        if ((!flipX && bone.flipX))
-                        {
-                            angle -= flipCompensation;
-                        }
+						if (flip) {
+							if ((!flipX && bone.flipX)) {
+								angle -= flipCompensation;
+							}
 
-                        //TODO fix this...
-                        if (angle >= 360)
-                            angle -= 360;
-                        else if (angle <= -360)
-                            angle += 360;
-                    }
+							//TODO fix this...
+							if (angle >= 360)
+								angle -= 360;
+							else if (angle <= -360)
+									angle += 360;
+						}
 
-                    bone.Rotation = angle;
-				}
+						bone.Rotation = angle;
+					}
 
-				//TODO: Something about this
-				if(scale){
-                    bone.scaleX = Mathf.Lerp(bone.scaleX, cachedTransform.localScale.x, overrideAlpha);
-                    bone.scaleY = Mathf.Lerp(bone.scaleY, cachedTransform.localScale.y, overrideAlpha);
+					//TODO: Something about this
+					if (scale) {
+						bone.scaleX = Mathf.Lerp(bone.scaleX, cachedTransform.localScale.x, overrideAlpha);
+						bone.scaleY = Mathf.Lerp(bone.scaleY, cachedTransform.localScale.y, overrideAlpha);
 					
-					nonUniformScaleWarning = (bone.scaleX != bone.scaleY);
+						nonUniformScaleWarning = (bone.scaleX != bone.scaleY);
+					}
+
+					if (flip) {
+						bone.flipX = flipX;
+					}
+
 				}
 
-                if (flip)
-                {
-                    bone.flipX = flipX;
-                }
-
-			}
-
-			transformLerpComplete = true;
-		}		
+				transformLerpComplete = true;
+			}		
 	}
 
-    public void FlipX(bool state)
-    {
-        if (state != flipX)
-        {
-            flipX = state;
-            if (flipX && Mathf.Abs(transform.localRotation.eulerAngles.y) > 90)
-            {
-                skeletonUtility.skeletonAnimation.LateUpdate();
-                return;
-            }
-            else if (!flipX && Mathf.Abs(transform.localRotation.eulerAngles.y) < 90)
-            {
-                skeletonUtility.skeletonAnimation.LateUpdate();
-                return;
-            }
-        }
+	public void FlipX (bool state) {
+		if (state != flipX) {
+			flipX = state;
+			if (flipX && Mathf.Abs(transform.localRotation.eulerAngles.y) > 90) {
+				skeletonUtility.skeletonAnimation.LateUpdate();
+				return;
+			} else if (!flipX && Mathf.Abs(transform.localRotation.eulerAngles.y) < 90) {
+					skeletonUtility.skeletonAnimation.LateUpdate();
+					return;
+				}
+		}
 
-        bone.FlipX = state;
-        transform.RotateAround(transform.position, skeletonUtility.transform.up, 180);
-        Vector3 euler = transform.localRotation.eulerAngles;
-        euler.x = 0;
-        euler.y = bone.FlipX ? 180 : 0;
-        transform.localRotation = Quaternion.Euler(euler);
-    }
+		bone.FlipX = state;
+		transform.RotateAround(transform.position, skeletonUtility.transform.up, 180);
+		Vector3 euler = transform.localRotation.eulerAngles;
+		euler.x = 0;
+		euler.y = bone.FlipX ? 180 : 0;
+		transform.localRotation = Quaternion.Euler(euler);
+	}
 
-	void OnDrawGizmos(){
-		if(NonUniformScaleWarning){
-			Gizmos.DrawIcon(transform.position + new Vector3(0,0.128f,0), "icon-warning");
+	void OnDrawGizmos () {
+		if (NonUniformScaleWarning) {
+			Gizmos.DrawIcon(transform.position + new Vector3(0, 0.128f, 0), "icon-warning");
 		}
 	}
 }

@@ -27,7 +27,6 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -36,6 +35,7 @@ using UnityEngine;
 public class BoneFollowerInspector : Editor {
 	private SerializedProperty boneName, skeletonRenderer, followZPosition, followBoneRotation;
 	BoneFollower component;
+
 	void OnEnable () {
 		skeletonRenderer = serializedObject.FindProperty("skeletonRenderer");
 		boneName = serializedObject.FindProperty("boneName");
@@ -45,20 +45,20 @@ public class BoneFollowerInspector : Editor {
 		ForceReload();
 	}
 
-	void FindRenderer(){
-		if(skeletonRenderer.objectReferenceValue == null){
-			SkeletonRenderer parentRenderer = SkeletonUtility.GetInParent<SkeletonRenderer>( component.transform );
+	void FindRenderer () {
+		if (skeletonRenderer.objectReferenceValue == null) {
+			SkeletonRenderer parentRenderer = SkeletonUtility.GetInParent<SkeletonRenderer>(component.transform);
 
-			if(parentRenderer != null){
+			if (parentRenderer != null) {
 				skeletonRenderer.objectReferenceValue = (UnityEngine.Object)parentRenderer;
 			}
 
 		}
 	}
 
-	void ForceReload(){
-		if(component.skeletonRenderer != null){
-			if(component.skeletonRenderer.valid == false)
+	void ForceReload () {
+		if (component.skeletonRenderer != null) {
+			if (component.skeletonRenderer.valid == false)
 				component.skeletonRenderer.Reset();
 		}
 	}
@@ -72,10 +72,9 @@ public class BoneFollowerInspector : Editor {
 
 		if (component.valid) {
 			String[] bones = new String[1];
-			try{
+			try {
 				bones = new String[component.skeletonRenderer.skeleton.Data.Bones.Count + 1];
-			}
-			catch{
+			} catch {
 
 			}
 
@@ -94,13 +93,12 @@ public class BoneFollowerInspector : Editor {
 			boneName.stringValue = boneIndex == 0 ? null : bones[boneIndex];
 			EditorGUILayout.PropertyField(followBoneRotation);
 			EditorGUILayout.PropertyField(followZPosition);
-		}
-		else{
+		} else {
 			GUILayout.Label("INVALID");
 		}
 
 		if (serializedObject.ApplyModifiedProperties() ||
-	    	(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
+			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
 	    ) {
 			component.Reset();
 		}

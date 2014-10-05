@@ -40,11 +40,10 @@ using Spine;
 public class BoneFollower : MonoBehaviour {
 
 	[System.NonSerialized]
-	public bool valid;
-
+	public bool
+		valid;
 	public SkeletonRenderer skeletonRenderer;
 	public Bone bone;
-
 	public bool followZPosition = true;
 	public bool followBoneRotation = true;
 
@@ -52,20 +51,18 @@ public class BoneFollower : MonoBehaviour {
 		get { return skeletonRenderer; }
 		set {
 			skeletonRenderer = value;
-			Reset ();
+			Reset();
 		}
 	}
 
 
 	/// <summary>If a bone isn't set, boneName is used to find the bone.</summary>
 	public String boneName;
-
 	public bool resetOnAwake = true;
-
 	protected Transform cachedTransform;
 	protected Transform skeletonTransform;
 
-	public void HandleResetRenderer(SkeletonRenderer skeletonRenderer){
+	public void HandleResetRenderer (SkeletonRenderer skeletonRenderer) {
 		Reset();
 	}
 
@@ -73,31 +70,31 @@ public class BoneFollower : MonoBehaviour {
 		bone = null;
 		cachedTransform = transform;
 		valid = skeletonRenderer != null && skeletonRenderer.valid;
-		if (!valid) return;
+		if (!valid)
+			return;
 		skeletonTransform = skeletonRenderer.transform;
 
 		skeletonRenderer.OnReset -= HandleResetRenderer;
 		skeletonRenderer.OnReset += HandleResetRenderer;
 
-		if(Application.isEditor)
+		if (Application.isEditor)
 			DoUpdate();
 	}
 
-	void OnDestroy(){
+	void OnDestroy () {
 		//cleanup
-		if(skeletonRenderer != null)
+		if (skeletonRenderer != null)
 			skeletonRenderer.OnReset -= HandleResetRenderer;
 	}
 
 	public void Awake () {
-		if(resetOnAwake)
+		if (resetOnAwake)
 			Reset();
 	}
 
-	void LateUpdate(){
+	void LateUpdate () {
 		DoUpdate();
 	}
-
 
 	public void DoUpdate () {
 		if (!valid) {
@@ -106,13 +103,13 @@ public class BoneFollower : MonoBehaviour {
 		}
 
 		if (bone == null) {
-			if (boneName == null || boneName.Length == 0) return;
+			if (boneName == null || boneName.Length == 0)
+				return;
 			bone = skeletonRenderer.skeleton.FindBone(boneName);
 			if (bone == null) {
 				Debug.LogError("Bone not found: " + boneName, this);
 				return;
-			}
-			else{
+			} else {
 
 			}
 		}
@@ -123,21 +120,22 @@ public class BoneFollower : MonoBehaviour {
 		if (cachedTransform.parent == skeletonTransform) {
 			cachedTransform.localPosition = new Vector3(bone.worldX, bone.worldY, followZPosition ? 0f : cachedTransform.localPosition.z);
 
-			if(followBoneRotation) {
+			if (followBoneRotation) {
 				Vector3 rotation = cachedTransform.localRotation.eulerAngles;
 				cachedTransform.localRotation = Quaternion.Euler(rotation.x, rotation.y, bone.worldRotation * flipRotation);
 			}
 
 		} else {
 			Vector3 targetWorldPosition = skeletonTransform.TransformPoint(new Vector3(bone.worldX, bone.worldY, 0f));
-			if(!followZPosition) targetWorldPosition.z = cachedTransform.position.z;
+			if (!followZPosition)
+				targetWorldPosition.z = cachedTransform.position.z;
 
 			cachedTransform.position = targetWorldPosition;
 
-			if(followBoneRotation) {
+			if (followBoneRotation) {
 				Vector3 rotation = skeletonTransform.rotation.eulerAngles;
 
-				cachedTransform.rotation = Quaternion.Euler(rotation.x, rotation.y, skeletonTransform.rotation.eulerAngles.z + (bone.worldRotation * flipRotation) );
+				cachedTransform.rotation = Quaternion.Euler(rotation.x, rotation.y, skeletonTransform.rotation.eulerAngles.z + (bone.worldRotation * flipRotation));
 			}
 		}
 

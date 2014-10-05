@@ -39,10 +39,8 @@ using System.Collections;
 public class ConstrainedCamera : MonoBehaviour {
 	public Transform target;
 	public Vector3 offset;
-
 	public Vector3 min;
 	public Vector3 max;
-
 	public float smoothing = 5f;
 	
 	// Use this for initialization

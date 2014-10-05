@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PolicySet name="Spine">
+  <TextStylePolicy inheritsSet="Mono" inheritsScope="text/plain" scope="text/x-csharp">
+    <FileWidth>130</FileWidth>
+    <TabWidth>3</TabWidth>
+    <IndentWidth>3</IndentWidth>
+  </TextStylePolicy>
+  <CSharpFormattingPolicy inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp">
+    <IndentNamespaceBody>False</IndentNamespaceBody>
+    <AlignEmbeddedUsingStatements>False</AlignEmbeddedUsingStatements>
+    <AlignEmbeddedIfStatements>False</AlignEmbeddedIfStatements>
+    <NamespaceBraceStyle>EndOfLine</NamespaceBraceStyle>
+    <ClassBraceStyle>EndOfLine</ClassBraceStyle>
+    <InterfaceBraceStyle>EndOfLine</InterfaceBraceStyle>
+    <StructBraceStyle>EndOfLine</StructBraceStyle>
+    <EnumBraceStyle>EndOfLine</EnumBraceStyle>
+    <MethodBraceStyle>EndOfLine</MethodBraceStyle>
+    <ConstructorBraceStyle>EndOfLine</ConstructorBraceStyle>
+    <DestructorBraceStyle>EndOfLine</DestructorBraceStyle>
+    <ElseIfNewLinePlacement>SameLine</ElseIfNewLinePlacement>
+    <BeforeMethodCallParentheses>False</BeforeMethodCallParentheses>
+    <AfterDelegateDeclarationParameterComma>True</AfterDelegateDeclarationParameterComma>
+    <NewParentheses>False</NewParentheses>
+    <SpacesBeforeBrackets>False</SpacesBeforeBrackets>
+    <BlankLinesBeforeUsings>1</BlankLinesBeforeUsings>
+    <BlankLinesBeforeFirstDeclaration>1</BlankLinesBeforeFirstDeclaration>
+  </CSharpFormattingPolicy>
+</PolicySet>

@@ -3,46 +3,42 @@ using System.Collections;
 
 [ExecuteInEditMode]
 public class SkeletonUtilitySubmeshRenderer : MonoBehaviour {
-
 	public Renderer parentRenderer;
-
 	[System.NonSerialized]
 	public Mesh mesh;
-
 	public int submeshIndex = 0;
 	public int sortingOrder = 0;
 	public int sortingLayerID = 0;
-
 	public Material hiddenPassMaterial;
 	Renderer cachedRenderer;
 	MeshFilter filter;
 	Material[] sharedMaterials;
 	MeshFilter parentFilter;
 
-	void Awake(){
+	void Awake () {
 		cachedRenderer = renderer;
 		sharedMaterials = cachedRenderer.sharedMaterials;
 		filter = GetComponent<MeshFilter>();
 
-		if(parentRenderer != null)
-			Initialize( parentRenderer );
+		if (parentRenderer != null)
+			Initialize(parentRenderer);
 	}
 
-	void OnEnable(){
+	void OnEnable () {
 		parentRenderer = transform.parent.GetComponent<Renderer>();
 		parentRenderer.GetComponent<SkeletonRenderer>().OnReset += HandleSkeletonReset;
 	}
 
-	void OnDisable(){
+	void OnDisable () {
 		parentRenderer.GetComponent<SkeletonRenderer>().OnReset -= HandleSkeletonReset;
 	}
 
-	void HandleSkeletonReset(SkeletonRenderer r){
-		if(parentRenderer != null)
+	void HandleSkeletonReset (SkeletonRenderer r) {
+		if (parentRenderer != null)
 			Initialize(parentRenderer);
 	}
 
-	public void Initialize(Renderer parentRenderer){
+	public void Initialize (Renderer parentRenderer) {
 		this.parentRenderer = parentRenderer;
 		parentFilter = parentRenderer.GetComponent<MeshFilter>();
 		mesh = parentFilter.sharedMesh;
@@ -50,51 +46,49 @@ public class SkeletonUtilitySubmeshRenderer : MonoBehaviour {
 		Debug.Log("Mesh: " + mesh);
 	}
 
-	public void Update(){
-		if(mesh == null || mesh != parentFilter.sharedMesh){
+	public void Update () {
+		if (mesh == null || mesh != parentFilter.sharedMesh) {
 			mesh = parentFilter.sharedMesh;
 			filter.sharedMesh = mesh;
 		}
 
-		if(cachedRenderer == null)
+		if (cachedRenderer == null)
 			cachedRenderer = renderer;
 
-		if(mesh == null || submeshIndex > mesh.subMeshCount - 1){
+		if (mesh == null || submeshIndex > mesh.subMeshCount - 1) {
 			cachedRenderer.enabled = false;
 			return;
-		}
-		else{
+		} else {
 			renderer.enabled = true;
 		}
 
 		bool changed = false;
 
-		if(sharedMaterials.Length != parentRenderer.sharedMaterials.Length){
+		if (sharedMaterials.Length != parentRenderer.sharedMaterials.Length) {
 			sharedMaterials = parentRenderer.sharedMaterials;
 			changed = true;
 		}
 
 
 
-		for(int i = 0; i < renderer.sharedMaterials.Length; i++){
-			if(i == submeshIndex)
+		for (int i = 0; i < renderer.sharedMaterials.Length; i++) {
+			if (i == submeshIndex)
 				continue;
 
-			if(sharedMaterials[i] != hiddenPassMaterial){
+			if (sharedMaterials[i] != hiddenPassMaterial) {
 				sharedMaterials[i] = hiddenPassMaterial;
 				changed = true;
 			}
 		}
 
-		if(sharedMaterials[submeshIndex] != parentRenderer.sharedMaterials[submeshIndex]){
+		if (sharedMaterials[submeshIndex] != parentRenderer.sharedMaterials[submeshIndex]) {
 			sharedMaterials[submeshIndex] = parentRenderer.sharedMaterials[submeshIndex];
 			changed = true;
 		}
 
-		if(changed){
+		if (changed) {
 			cachedRenderer.sharedMaterials = sharedMaterials;
 		}
-
 
 		cachedRenderer.sortingLayerID = sortingLayerID;
 		cachedRenderer.sortingOrder = sortingOrder;

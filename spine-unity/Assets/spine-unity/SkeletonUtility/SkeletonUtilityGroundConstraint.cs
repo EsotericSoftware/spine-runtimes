@@ -34,71 +34,63 @@ public class SkeletonUtilityGroundConstraint : SkeletonUtilityConstraint {
 
 
 	Vector3 rayOrigin;
-	Vector3 rayDir = new Vector3(0,-1,0);
+	Vector3 rayDir = new Vector3(0, -1, 0);
 	float hitY;
 	float lastHitY;
 
-	protected override void OnEnable ()
-	{
-		base.OnEnable ();
+	protected override void OnEnable () {
+		base.OnEnable();
 	}
 
-	protected override void OnDisable ()
-	{
-		base.OnDisable ();
+	protected override void OnDisable () {
+		base.OnDisable();
 	}
 
-	public override void DoUpdate()
-	{
-		rayOrigin = transform.position + new Vector3(castOffset,castDistance,0);
+	public override void DoUpdate () {
+		rayOrigin = transform.position + new Vector3(castOffset, castDistance, 0);
 
 		hitY = float.MinValue;
-		if(use2D){
+		if (use2D) {
 			RaycastHit2D hit;
 
-			if(useRadius){
+			if (useRadius) {
 #if UNITY_4_3
 				//NOTE:  Unity 4.3.x does not have CircleCast
 				hit = Physics2D.Raycast(rayOrigin , rayDir, castDistance + groundOffset, groundMask);
 #else
-				hit = Physics2D.CircleCast( rayOrigin, castRadius, rayDir, castDistance + groundOffset, groundMask );
+				hit = Physics2D.CircleCast(rayOrigin, castRadius, rayDir, castDistance + groundOffset, groundMask);
 #endif
-			}
-			else{
-				hit = Physics2D.Raycast(rayOrigin , rayDir, castDistance + groundOffset, groundMask);
+			} else {
+				hit = Physics2D.Raycast(rayOrigin, rayDir, castDistance + groundOffset, groundMask);
 			}
 
-			if(hit.collider != null){
+			if (hit.collider != null) {
 				hitY = hit.point.y + groundOffset;
-				if(Application.isPlaying){
-					hitY = Mathf.MoveTowards( lastHitY, hitY, adjustSpeed * Time.deltaTime );
+				if (Application.isPlaying) {
+					hitY = Mathf.MoveTowards(lastHitY, hitY, adjustSpeed * Time.deltaTime);
 				}
+			} else {
+				if (Application.isPlaying)
+					hitY = Mathf.MoveTowards(lastHitY, transform.position.y, adjustSpeed * Time.deltaTime);
 			}
-			else{
-				if(Application.isPlaying)
-					hitY = Mathf.MoveTowards( lastHitY, transform.position.y, adjustSpeed * Time.deltaTime );
-			}
-		}
-		else{
+		} else {
 			RaycastHit hit;
 			bool validHit = false;
 
-			if(useRadius){
-				validHit = Physics.SphereCast( rayOrigin, castRadius, rayDir, out hit, castDistance + groundOffset, groundMask );
-			}
-			else{
-				validHit = Physics.Raycast( rayOrigin, rayDir, out hit, castDistance + groundOffset, groundMask);
+			if (useRadius) {
+				validHit = Physics.SphereCast(rayOrigin, castRadius, rayDir, out hit, castDistance + groundOffset, groundMask);
+			} else {
+				validHit = Physics.Raycast(rayOrigin, rayDir, out hit, castDistance + groundOffset, groundMask);
 			}
 
-			if(validHit){
+			if (validHit) {
 				hitY = hit.point.y + groundOffset;
-				if(Application.isPlaying){
-					hitY = Mathf.MoveTowards( lastHitY, hitY, adjustSpeed * Time.deltaTime );
+				if (Application.isPlaying) {
+					hitY = Mathf.MoveTowards(lastHitY, hitY, adjustSpeed * Time.deltaTime);
 				}
-			}
-			else{
-				if(Application.isPlaying)
-					hitY = Mathf.MoveTowards( lastHitY, transform.position.y, adjustSpeed * Time.deltaTime );
+			} else {
+				if (Application.isPlaying)
+					hitY = Mathf.MoveTowards(lastHitY, transform.position.y, adjustSpeed * Time.deltaTime);
 			}
 		}
 
@@ -110,20 +102,17 @@ public class SkeletonUtilityGroundConstraint : SkeletonUtilityConstraint {
 		utilBone.bone.Y = transform.localPosition.y;
 
 		lastHitY = hitY;
-
 	}
 
-	void OnDrawGizmos(){
+	void OnDrawGizmos () {
 		Vector3 hitEnd = rayOrigin + (rayDir * Mathf.Min(castDistance, rayOrigin.y - hitY));
 		Vector3 clearEnd = rayOrigin + (rayDir * castDistance);
 		Gizmos.DrawLine(rayOrigin, hitEnd);
 
-		if(useRadius){
+		if (useRadius) {
 			Gizmos.DrawLine(new Vector3(hitEnd.x - castRadius, hitEnd.y - groundOffset, hitEnd.z), new Vector3(hitEnd.x + castRadius, hitEnd.y - groundOffset, hitEnd.z));
 			Gizmos.DrawLine(new Vector3(clearEnd.x - castRadius, clearEnd.y, clearEnd.z), new Vector3(clearEnd.x + castRadius, clearEnd.y, clearEnd.z));
 		}
-
-
 
 		Gizmos.color = Color.red;
 		Gizmos.DrawLine(hitEnd, clearEnd);

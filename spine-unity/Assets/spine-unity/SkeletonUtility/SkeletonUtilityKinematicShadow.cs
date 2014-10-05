@@ -3,15 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class SkeletonUtilityKinematicShadow : MonoBehaviour {
-
 	public bool hideShadow = true;
-
 	Dictionary<Transform, Transform> shadowTable;
 	GameObject shadowRoot;
 
-	void Start(){
+	void Start () {
 		shadowRoot = (GameObject)Instantiate(gameObject);
-		if(hideShadow)
+		if (hideShadow)
 			shadowRoot.hideFlags = HideFlags.HideInHierarchy;
 
 		shadowRoot.transform.parent = transform.root;
@@ -28,20 +26,20 @@ public class SkeletonUtilityKinematicShadow : MonoBehaviour {
 		shadowRoot.transform.localScale = Vector3.one;
 
 		var shadowJoints = shadowRoot.GetComponentsInChildren<Joint>();
-		foreach(Joint j in shadowJoints){
+		foreach (Joint j in shadowJoints) {
 			j.connectedAnchor *= scale;
 		}
 
 		var joints = GetComponentsInChildren<Joint>();
-		foreach(var j in joints)
+		foreach (var j in joints)
 			Destroy(j);
 
 		var rbs = GetComponentsInChildren<Rigidbody>();
-		foreach(var rb in rbs)
+		foreach (var rb in rbs)
 			Destroy(rb);
 
 		var colliders = GetComponentsInChildren<Collider>();
-		foreach(var c in colliders)
+		foreach (var c in colliders)
 			Destroy(c);
 
 
@@ -50,30 +48,30 @@ public class SkeletonUtilityKinematicShadow : MonoBehaviour {
 		var bones = GetComponentsInChildren<SkeletonUtilityBone>();
 
 		//build bone lookup
-		foreach(var b in bones){
-			if(b.gameObject == gameObject)
+		foreach (var b in bones) {
+			if (b.gameObject == gameObject)
 				continue;
 
-			foreach(var sb in shadowBones){
-				if(sb.rigidbody == null)
+			foreach (var sb in shadowBones) {
+				if (sb.rigidbody == null)
 					continue;
 
-				if(sb.boneName == b.boneName){
-					shadowTable.Add( sb.transform, b.transform );
+				if (sb.boneName == b.boneName) {
+					shadowTable.Add(sb.transform, b.transform);
 					break;
 				}
 			}
 		}
 
-		foreach(var b in shadowBones)
+		foreach (var b in shadowBones)
 			Destroy(b);
 	}
 
-	void FixedUpdate(){
-		shadowRoot.rigidbody.MovePosition( transform.position );
-		shadowRoot.rigidbody.MoveRotation( transform.rotation );
+	void FixedUpdate () {
+		shadowRoot.rigidbody.MovePosition(transform.position);
+		shadowRoot.rigidbody.MoveRotation(transform.rotation);
 
-		foreach(var pair in shadowTable){
+		foreach (var pair in shadowTable) {
 			pair.Value.localPosition = pair.Key.localPosition;
 			pair.Value.localRotation = pair.Key.localRotation;
 		}
