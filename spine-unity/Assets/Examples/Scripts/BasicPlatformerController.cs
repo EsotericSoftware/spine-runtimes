@@ -39,36 +39,48 @@ using System.Collections;
 [RequireComponent(typeof(CharacterController))]
 public class BasicPlatformerController : MonoBehaviour {
 
+#if !UNITY_4_3 && !UNITY_4_4
     [Header("Controls")]
+#endif
     public string XAxis = "Horizontal";
     public string YAxis = "Vertical";
     public string JumpButton = "Jump";
 
-    [Header("Moving")]
-    public float walkSpeed = 4;
+#if !UNITY_4_3 && !UNITY_4_4
+	[Header("Moving")]
+#endif
+	public float walkSpeed = 4;
     public float runSpeed = 10;
     public float gravity = 65;
 
-    [Header("Jumping")]
-    public float jumpSpeed = 25;
+#if !UNITY_4_3 && !UNITY_4_4
+	[Header("Jumping")]
+#endif
+	public float jumpSpeed = 25;
     public float jumpDuration = 0.5f;
     public float jumpInterruptFactor = 100;
     public float forceCrouchVelocity = 25;
     public float forceCrouchDuration = 0.5f;
 
-    [Header("Graphics")]
-    public Transform graphicsRoot;
+#if !UNITY_4_3 && !UNITY_4_4
+	[Header("Graphics")]
+#endif
+	public Transform graphicsRoot;
     public SkeletonAnimation skeletonAnimation;
 
-    [Header("Animation")]
-    public string walkName = "Walk";
+#if !UNITY_4_3 && !UNITY_4_4
+	[Header("Animation")]
+#endif
+	public string walkName = "Walk";
     public string runName = "Run";
     public string idleName = "Idle";
     public string jumpName = "Jump";
     public string fallName = "Fall";
     public string crouchName = "Crouch";
 
+#if !UNITY_4_3 && !UNITY_4_4
 	[Header("Audio")]
+#endif
 	public AudioSource jumpAudioSource;
 	public AudioSource hardfallAudioSource;
 	public AudioSource footstepAudioSource;
