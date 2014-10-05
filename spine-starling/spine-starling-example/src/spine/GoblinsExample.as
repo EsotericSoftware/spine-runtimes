@@ -16,19 +16,19 @@ import starling.textures.Texture;
 import starling.textures.TextureAtlas;
 
 public class GoblinsExample extends Sprite {
-	[Embed(source = "goblins-ffd.json", mimeType = "application/octet-stream")]
+	[Embed(source = "goblins-mesh.json", mimeType = "application/octet-stream")]
 	static public const GoblinsJson:Class;
 	
-	[Embed(source = "goblins-ffd.atlas", mimeType = "application/octet-stream")]
+	[Embed(source = "goblins-mesh.atlas", mimeType = "application/octet-stream")]
 	static public const GoblinsAtlas:Class;
 	
-	[Embed(source = "goblins-ffd.png")]
+	[Embed(source = "goblins-mesh.png")]
 	static public const GoblinsAtlasTexture:Class;
 	
-	[Embed(source = "goblins-ffd-starling.xml", mimeType = "application/octet-stream")]
+	[Embed(source = "goblins-mesh-starling.xml", mimeType = "application/octet-stream")]
 	static public const GoblinsStarlingAtlas:Class;
 	
-	[Embed(source = "goblins-ffd-starling.png")]
+	[Embed(source = "goblins-mesh-starling.png")]
 	static public const GoblinsStarlingAtlasTexture:Class;
 
 	private var skeleton:SkeletonAnimation;

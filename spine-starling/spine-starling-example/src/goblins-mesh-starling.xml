@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with TexturePacker http://www.codeandweb.com/texturepacker-->
 <!-- $TexturePacker:SmartUpdate:f68bf4c346737170377644079d2ad6c4:9a192cf6a7e1162a41e47cd5b4f91d60:bd0257f46142cc1d3e967d306d329226$ -->
-<TextureAtlas imagePath="goblins.png">
+<TextureAtlas imagePath="goblins-mesh.png">
     <SubTexture name="dagger" x="2" y="372" width="26" height="108"/>
     <SubTexture name="goblin/eyes-closed" x="157" y="426" width="34" height="12"/>
     <SubTexture name="goblin/head" x="26" y="85" width="103" height="66"/>

@@ -14,7 +14,7 @@
 	self = [super init];
 	if (!self) return nil;
 
-	skeletonNode = [SkeletonAnimation skeletonWithFile:@"goblins-ffd.json" atlasFile:@"goblins-ffd.atlas" scale:1];
+	skeletonNode = [SkeletonAnimation skeletonWithFile:@"goblins-mesh.json" atlasFile:@"goblins-mesh.atlas" scale:1];
 	[skeletonNode setSkin:@"goblin"];
 	[skeletonNode setAnimationForTrack:0 name:@"walk" loop:YES];
 
