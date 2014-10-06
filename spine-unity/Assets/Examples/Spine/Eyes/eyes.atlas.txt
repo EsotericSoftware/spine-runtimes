@@ -1,6 +1,6 @@
 
 eyes.png
-size: 1020,474
+size: 1024,512
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
