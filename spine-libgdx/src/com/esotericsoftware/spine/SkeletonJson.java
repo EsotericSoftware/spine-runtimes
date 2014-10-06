@@ -99,6 +99,7 @@ public class SkeletonJson {
 			skeletonData.version = skeletonMap.getString("spine");
 			skeletonData.width = skeletonMap.getFloat("width");
 			skeletonData.height = skeletonMap.getFloat("height");
+			skeletonData.imagesPath = skeletonMap.getString("images", null);
 		}
 
 		// Bones.

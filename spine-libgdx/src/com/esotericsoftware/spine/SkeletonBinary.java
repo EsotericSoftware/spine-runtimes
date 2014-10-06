@@ -113,6 +113,12 @@ public class SkeletonBinary {
 			skeletonData.height = input.readFloat();
 
 			boolean nonessential = input.readBoolean();
+
+			if (nonessential) {
+				String imagesPath = input.readString();
+				if (imagesPath.length() > 0) skeletonData.imagesPath = imagesPath;
+			}
+
 			// Bones.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				String name = input.readString();
