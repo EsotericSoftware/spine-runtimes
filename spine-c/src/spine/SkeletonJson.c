@@ -106,19 +106,19 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 	spAnimation* animation;
 	Json* frame;
 	float duration;
+	int timelinesCount = 0;
 
 	Json* bones = Json_getItem(root, "bones");
 	Json* slots = Json_getItem(root, "slots");
 	Json* ik = Json_getItem(root, "ik");
 	Json* ffd = Json_getItem(root, "ffd");
 	Json* drawOrder = Json_getItem(root, "drawOrder");
-	if (!drawOrder) drawOrder = Json_getItem(root, "draworder");
 	Json* events = Json_getItem(root, "events");
 	Json* flipX = Json_getItem(root, "flipx");
 	Json* flipY = Json_getItem(root, "flipy");
 	Json *boneMap, *slotMap, *ikMap, *ffdMap;
+	if (!drawOrder) drawOrder = Json_getItem(root, "draworder");
 
-	int timelinesCount = 0;
 	for (boneMap = bones ? bones->child : 0; boneMap; boneMap = boneMap->next)
 		timelinesCount += boneMap->size;
 	for (slotMap = slots ? slots->child : 0; slotMap; slotMap = slotMap->next)
