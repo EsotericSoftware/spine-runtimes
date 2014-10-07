@@ -95,10 +95,10 @@ public class SkeletonJson {
 		// Skeleton.
 		JsonValue skeletonMap = root.get("skeleton");
 		if (skeletonMap != null) {
-			skeletonData.hash = skeletonMap.getString("hash");
-			skeletonData.version = skeletonMap.getString("spine");
-			skeletonData.width = skeletonMap.getFloat("width");
-			skeletonData.height = skeletonMap.getFloat("height");
+			skeletonData.hash = skeletonMap.getString("hash", null);
+			skeletonData.version = skeletonMap.getString("spine", null);
+			skeletonData.width = skeletonMap.getFloat("width", 0);
+			skeletonData.height = skeletonMap.getFloat("height", 0);
 			skeletonData.imagesPath = skeletonMap.getString("images", null);
 		}
 
