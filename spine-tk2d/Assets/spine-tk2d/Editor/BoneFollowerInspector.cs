@@ -27,30 +27,57 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
 using System;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(BoneComponent))]
-public class BoneComponentInspector : Editor {
+[CustomEditor(typeof(BoneFollower))]
+public class BoneFollowerInspector : Editor {
 	private SerializedProperty boneName, skeletonRenderer, followZPosition, followBoneRotation;
+	BoneFollower component;
 
 	void OnEnable () {
 		skeletonRenderer = serializedObject.FindProperty("skeletonRenderer");
 		boneName = serializedObject.FindProperty("boneName");
 		followBoneRotation = serializedObject.FindProperty("followBoneRotation");
 		followZPosition = serializedObject.FindProperty("followZPosition");
+		component = (BoneFollower)target;
+		ForceReload();
+	}
+
+	void FindRenderer () {
+		if (skeletonRenderer.objectReferenceValue == null) {
+			SkeletonRenderer parentRenderer = SkeletonUtility.GetInParent<SkeletonRenderer>(component.transform);
+
+			if (parentRenderer != null) {
+				skeletonRenderer.objectReferenceValue = (UnityEngine.Object)parentRenderer;
+			}
+
+		}
+	}
+
+	void ForceReload () {
+		if (component.skeletonRenderer != null) {
+			if (component.skeletonRenderer.valid == false)
+				component.skeletonRenderer.Reset();
+		}
 	}
 
 	override public void OnInspectorGUI () {
 		serializedObject.Update();
-		BoneComponent component = (BoneComponent)target;
+
+		FindRenderer();
 
 		EditorGUILayout.PropertyField(skeletonRenderer);
 
 		if (component.valid) {
-			String[] bones = new String[component.skeletonRenderer.skeleton.Data.Bones.Count + 1];
+			String[] bones = new String[1];
+			try {
+				bones = new String[component.skeletonRenderer.skeleton.Data.Bones.Count + 1];
+			} catch {
+
+			}
+
 			bones[0] = "<None>";
 			for (int i = 0; i < bones.Length - 1; i++)
 				bones[i + 1] = component.skeletonRenderer.skeleton.Data.Bones[i].Name;
@@ -64,13 +91,14 @@ public class BoneComponentInspector : Editor {
 			EditorGUILayout.EndHorizontal();
 
 			boneName.stringValue = boneIndex == 0 ? null : bones[boneIndex];
-
 			EditorGUILayout.PropertyField(followBoneRotation);
 			EditorGUILayout.PropertyField(followZPosition);
+		} else {
+			GUILayout.Label("INVALID");
 		}
 
 		if (serializedObject.ApplyModifiedProperties() ||
-	    	(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
+			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
 	    ) {
 			component.Reset();
 		}

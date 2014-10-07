@@ -27,28 +27,47 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
 using System;
 using UnityEditor;
 using UnityEngine;
+using Spine;
 
 [CustomEditor(typeof(SkeletonAnimation))]
 public class SkeletonAnimationInspector : SkeletonRendererInspector {
 	protected SerializedProperty animationName, loop, timeScale;
+	protected bool isPrefab;
 
 	protected override void OnEnable () {
 		base.OnEnable();
 		animationName = serializedObject.FindProperty("_animationName");
 		loop = serializedObject.FindProperty("loop");
 		timeScale = serializedObject.FindProperty("timeScale");
+
+		if (PrefabUtility.GetPrefabType(this.target) == PrefabType.Prefab)
+			isPrefab = true;
+
+
 	}
 
 	protected override void gui () {
 		base.gui();
 
 		SkeletonAnimation component = (SkeletonAnimation)target;
-		if (!component.valid) return;
+		if (!component.valid)
+			return;
 
+		//catch case where SetAnimation was used to set track 0 without using AnimationName
+		if (Application.isPlaying) {
+			TrackEntry currentState = component.state.GetCurrent(0);
+			if (currentState != null) {
+				if (component.AnimationName != animationName.stringValue) {
+					animationName.stringValue = currentState.Animation.Name;
+				}
+			}
+		}
+
+
+		//TODO:  Refactor this to use GenericMenu and callbacks to avoid interfering with control by other behaviours.
 		// Animation name.
 		{
 			String[] animations = new String[component.skeleton.Data.Animations.Count + 1];
@@ -67,12 +86,26 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 			EditorGUILayout.EndHorizontal();
 
 			String selectedAnimationName = animationIndex == 0 ? null : animations[animationIndex];
-			component.AnimationName = selectedAnimationName;
-			animationName.stringValue = selectedAnimationName;
+			if (component.AnimationName != selectedAnimationName) {
+				component.AnimationName = selectedAnimationName;
+				animationName.stringValue = selectedAnimationName;
+			}
+
+
 		}
 
 		EditorGUILayout.PropertyField(loop);
 		EditorGUILayout.PropertyField(timeScale);
 		component.timeScale = Math.Max(component.timeScale, 0);
+
+		EditorGUILayout.Space();
+
+		if (!isPrefab) {
+			if (component.GetComponent<SkeletonUtility>() == null) {
+				if (GUILayout.Button(new GUIContent("Add Skeleton Utility", SpineEditorUtilities.Icons.skeletonUtility), GUILayout.Height(30))) {
+					component.gameObject.AddComponent<SkeletonUtility>();
+				}
+			}
+		}
 	}
 }
