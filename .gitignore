@@ -32,6 +32,8 @@ xcuserdata
 
 spine-cocos2d-iphone/2/cocos2d/*
 !spine-cocos2d-iphone/2/cocos2d/Place cocos2d here.txt
+spine-cocos2d-iphone/3.0/cocos2d/*
+!spine-cocos2d-iphone/3.0/cocos2d/Place cocos2d here.txt
 
 spine-csharp/bin
 spine-csharp/obj
