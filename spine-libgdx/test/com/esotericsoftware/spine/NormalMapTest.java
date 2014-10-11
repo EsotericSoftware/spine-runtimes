@@ -298,7 +298,7 @@ public class NormalMapTest extends ApplicationAdapter {
 				table.add(useShadow = checkbox(" Use shadow", true));
 				table.add(useNormals = checkbox(" Use normals", true));
 				table.add(yInvert = checkbox(" Invert Y", true));
-				root.add(table).colspan(new Integer(2)).row();
+				root.add(table).colspan(2).row();
 			}
 
 			TextButton resetButton = new TextButton("Reset", skin);

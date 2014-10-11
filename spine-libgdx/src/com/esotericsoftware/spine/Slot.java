@@ -119,7 +119,6 @@ public class Slot {
 	void setToSetupPose (int slotIndex) {
 		color.set(data.color);
 		setAttachment(data.attachmentName == null ? null : bone.skeleton.getAttachment(slotIndex, data.attachmentName));
-		attachmentVertices.clear();
 	}
 
 	public void setToSetupPose () {

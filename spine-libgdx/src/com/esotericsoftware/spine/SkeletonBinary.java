@@ -46,6 +46,8 @@ import com.esotericsoftware.spine.Animation.CurveTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.FfdTimeline;
+import com.esotericsoftware.spine.Animation.FlipXTimeline;
+import com.esotericsoftware.spine.Animation.FlipYTimeline;
 import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
@@ -66,10 +68,8 @@ public class SkeletonBinary {
 	static public final int TIMELINE_TRANSLATE = 2;
 	static public final int TIMELINE_ATTACHMENT = 3;
 	static public final int TIMELINE_COLOR = 4;
-	static public final int TIMELINE_EVENT = 5;
-	static public final int TIMELINE_DRAWORDER = 6;
-	static public final int TIMELINE_FFD = 7;
-	static public final int TIMELINE_IK = 8;
+	static public final int TIMELINE_FLIPX = 5;
+	static public final int TIMELINE_FLIPY = 6;
 
 	static public final int CURVE_LINEAR = 0;
 	static public final int CURVE_STEPPED = 1;
@@ -108,11 +108,19 @@ public class SkeletonBinary {
 		DataInput input = new DataInput(file.read(512));
 		try {
 			skeletonData.hash = input.readString();
+			if (skeletonData.hash.isEmpty()) skeletonData.hash = null;
 			skeletonData.version = input.readString();
+			if (skeletonData.version.isEmpty()) skeletonData.version = null;
 			skeletonData.width = input.readFloat();
 			skeletonData.height = input.readFloat();
 
 			boolean nonessential = input.readBoolean();
+
+			if (nonessential) {
+				skeletonData.imagesPath = input.readString();
+				if (skeletonData.imagesPath.isEmpty()) skeletonData.imagesPath = null;
+			}
+
 			// Bones.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				String name = input.readString();
@@ -126,6 +134,8 @@ public class SkeletonBinary {
 				boneData.scaleY = input.readFloat();
 				boneData.rotation = input.readFloat();
 				boneData.length = input.readFloat() * scale;
+				boneData.flipX = input.readBoolean();
+				boneData.flipY = input.readBoolean();
 				boneData.inheritScale = input.readBoolean();
 				boneData.inheritRotation = input.readBoolean();
 				if (nonessential) Color.rgba8888ToColor(boneData.color, input.readInt());
@@ -134,13 +144,13 @@ public class SkeletonBinary {
 
 			// IK constraints.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
-				IkConstraintData ikConstraint = new IkConstraintData(input.readString());
+				IkConstraintData ikConstraintData = new IkConstraintData(input.readString());
 				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++)
-					ikConstraint.bones.add(skeletonData.bones.get(input.readInt(true)));
-				ikConstraint.target = skeletonData.bones.get(input.readInt(true));
-				ikConstraint.mix = input.readFloat();
-				ikConstraint.bendDirection = input.readByte();
-				skeletonData.ikConstraints.add(ikConstraint);
+					ikConstraintData.bones.add(skeletonData.bones.get(input.readInt(true)));
+				ikConstraintData.target = skeletonData.bones.get(input.readInt(true));
+				ikConstraintData.mix = input.readFloat();
+				ikConstraintData.bendDirection = input.readByte();
+				skeletonData.ikConstraints.add(ikConstraintData);
 			}
 
 			// Slots.
@@ -193,6 +203,7 @@ public class SkeletonBinary {
 		return skeletonData;
 	}
 
+	/** @return May be null. */
 	private Skin readSkin (DataInput input, String skinName, boolean nonessential) throws IOException {
 		int slotCount = input.readInt(true);
 		if (slotCount == 0) return null;
@@ -385,7 +396,7 @@ public class SkeletonBinary {
 						break;
 					}
 					case TIMELINE_TRANSLATE:
-					case TIMELINE_SCALE:
+					case TIMELINE_SCALE: {
 						TranslateTimeline timeline;
 						float timelineScale = 1;
 						if (timelineType == TIMELINE_SCALE)
@@ -404,12 +415,24 @@ public class SkeletonBinary {
 						duration = Math.max(duration, timeline.getFrames()[frameCount * 3 - 3]);
 						break;
 					}
+					case TIMELINE_FLIPX:
+					case TIMELINE_FLIPY: {
+						FlipXTimeline timeline = timelineType == TIMELINE_FLIPX ? new FlipXTimeline(frameCount) : new FlipYTimeline(
+							frameCount);
+						timeline.boneIndex = boneIndex;
+						for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+							timeline.setFrame(frameIndex, input.readFloat(), input.readBoolean());
+						timelines.add(timeline);
+						duration = Math.max(duration, timeline.getFrames()[frameCount * 2 - 2]);
+						break;
+					}
+					}
 				}
 			}
 
 			// IK timelines.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
-				IkConstraintData ikConstraint = skeletonData.findIkConstraint(input.readString());
+				IkConstraintData ikConstraint = skeletonData.ikConstraints.get(input.readInt(true));
 				int frameCount = input.readInt(true);
 				IkConstraintTimeline timeline = new IkConstraintTimeline(frameCount);
 				timeline.ikConstraintIndex = skeletonData.getIkConstraints().indexOf(ikConstraint, true);
@@ -423,7 +446,7 @@ public class SkeletonBinary {
 
 			// FFD timelines.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
-				Skin skin = skeletonData.getSkins().get(input.readInt(true) + 1);
+				Skin skin = skeletonData.skins.get(input.readInt(true));
 				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 					int slotIndex = input.readInt(true);
 					for (int iii = 0, nnn = input.readInt(true); iii < nnn; iii++) {

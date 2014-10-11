@@ -87,7 +87,8 @@ public class SkeletonDataAsset : ScriptableObject {
 		stateData = new AnimationStateData(skeletonData);
 		stateData.DefaultMix = defaultMix;
 		for (int i = 0, n = fromAnimation.Length; i < n; i++) {
-			if (fromAnimation[i].Length == 0 || toAnimation[i].Length == 0) continue;
+			if (fromAnimation[i].Length == 0 || toAnimation[i].Length == 0)
+				continue;
 			stateData.SetMix(fromAnimation[i], toAnimation[i], duration[i]);
 		}
 

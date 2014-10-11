@@ -37,8 +37,7 @@ public class Event {
 	public var stringValue:String;
 
 	public function Event (data:EventData) {
-		if (data == null)
-			throw new ArgumentError("data cannot be null.");
+		if (data == null) throw new ArgumentError("data cannot be null.");
 		_data = data;
 	}
 

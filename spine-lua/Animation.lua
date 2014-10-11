@@ -302,8 +302,8 @@ function Animation.ScaleTimeline.new ()
 		local bone = skeleton.bones[self.boneIndex]
 
 		if time >= frames[#frames - 2] then -- Time is after last frame.
-			bone.scaleX = bone.scaleX + (bone.data.scaleX - 1 + frames[#frames - 1] - bone.scaleX) * alpha
-			bone.scaleY = bone.scaleY + (bone.data.scaleY - 1 + frames[#frames] - bone.scaleY) * alpha
+			bone.scaleX = bone.scaleX + (bone.data.scaleX * frames[#frames - 1] - bone.scaleX) * alpha
+			bone.scaleY = bone.scaleY + (bone.data.scaleY * frames[#frames] - bone.scaleY) * alpha
 			return
 		end
 
@@ -316,8 +316,8 @@ function Animation.ScaleTimeline.new ()
 		if percent < 0 then percent = 0 elseif percent > 1 then percent = 1 end
 		percent = self:getCurvePercent(frameIndex / 3 - 1, percent)
 
-		bone.scaleX = bone.scaleX + (bone.data.scaleX - 1 + lastFrameX + (frames[frameIndex + FRAME_X] - lastFrameX) * percent - bone.scaleX) * alpha
-		bone.scaleY = bone.scaleY + (bone.data.scaleY - 1 + lastFrameY + (frames[frameIndex + FRAME_Y] - lastFrameY) * percent - bone.scaleY) * alpha
+		bone.scaleX = bone.scaleX + (bone.data.scaleX * (lastFrameX + (frames[frameIndex + FRAME_X] - lastFrameX) * percent) - bone.scaleX) * alpha
+		bone.scaleY = bone.scaleY + (bone.data.scaleY * (lastFrameY + (frames[frameIndex + FRAME_Y] - lastFrameY) * percent) - bone.scaleY) * alpha
 	end
 
 	return self
@@ -463,7 +463,7 @@ function Animation.EventTimeline.new ()
 		if not firedEvents then return end
 
 		local frames = self.frames
-		local frameCount = #frames
+		local frameCount = #frames + 1
 
 		if lastTime > time then -- Fire events after last time for looped animations.
 			self:apply(skeleton, lastTime, 999999, firedEvents, alpha)

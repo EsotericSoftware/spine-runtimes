@@ -41,10 +41,8 @@ public class SlotData {
 	public var additiveBlending:Boolean;
 
 	public function SlotData (name:String, boneData:BoneData) {
-		if (name == null)
-			throw new ArgumentError("name cannot be null.");
-		if (boneData == null)
-			throw new ArgumentError("boneData cannot be null.");
+		if (name == null) throw new ArgumentError("name cannot be null.");
+		if (boneData == null) throw new ArgumentError("boneData cannot be null.");
 		_name = name;
 		_boneData = boneData;
 	}

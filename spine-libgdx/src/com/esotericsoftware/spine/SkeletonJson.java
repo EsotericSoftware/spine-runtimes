@@ -30,12 +30,23 @@
 
 package com.esotericsoftware.spine;
 
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.SerializationException;
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.ColorTimeline;
 import com.esotericsoftware.spine.Animation.CurveTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.FfdTimeline;
+import com.esotericsoftware.spine.Animation.FlipXTimeline;
+import com.esotericsoftware.spine.Animation.FlipYTimeline;
 import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
@@ -49,15 +60,6 @@ import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.SkinnedMeshAttachment;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.FloatArray;
-import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.SerializationException;
 
 public class SkeletonJson {
 	private final AttachmentLoader attachmentLoader;
@@ -93,10 +95,11 @@ public class SkeletonJson {
 		// Skeleton.
 		JsonValue skeletonMap = root.get("skeleton");
 		if (skeletonMap != null) {
-			skeletonData.hash = skeletonMap.getString("hash");
-			skeletonData.version = skeletonMap.getString("spine");
-			skeletonData.width = skeletonMap.getFloat("width");
-			skeletonData.height = skeletonMap.getFloat("height");
+			skeletonData.hash = skeletonMap.getString("hash", null);
+			skeletonData.version = skeletonMap.getString("spine", null);
+			skeletonData.width = skeletonMap.getFloat("width", 0);
+			skeletonData.height = skeletonMap.getFloat("height", 0);
+			skeletonData.imagesPath = skeletonMap.getString("images", null);
 		}
 
 		// Bones.
@@ -114,6 +117,8 @@ public class SkeletonJson {
 			boneData.rotation = boneMap.getFloat("rotation", 0);
 			boneData.scaleX = boneMap.getFloat("scaleX", 1);
 			boneData.scaleY = boneMap.getFloat("scaleY", 1);
+			boneData.flipX = boneMap.getBoolean("flipX", false);
+			boneData.flipY = boneMap.getBoolean("flipY", false);
 			boneData.inheritScale = boneMap.getBoolean("inheritScale", true);
 			boneData.inheritRotation = boneMap.getBoolean("inheritRotation", true);
 
@@ -383,6 +388,20 @@ public class SkeletonJson {
 					timelines.add(timeline);
 					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 3 - 3]);
 
+				} else if (timelineName.equals("flipX") || timelineName.equals("flipY")) {
+					boolean x = timelineName.equals("flipX");
+					FlipXTimeline timeline = x ? new FlipXTimeline(timelineMap.size) : new FlipYTimeline(timelineMap.size);
+					timeline.boneIndex = boneIndex;
+
+					String field = x ? "x" : "y";
+					int frameIndex = 0;
+					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next) {
+						timeline.setFrame(frameIndex, valueMap.getFloat("time"), valueMap.getBoolean(field, false));
+						frameIndex++;
+					}
+					timelines.add(timeline);
+					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 2 - 2]);
+
 				} else
 					throw new RuntimeException("Invalid timeline type for a bone: " + timelineName + " (" + boneMap.name + ")");
 			}
@@ -459,7 +478,8 @@ public class SkeletonJson {
 		}
 
 		// Draw order timeline.
-		JsonValue drawOrdersMap = map.get("draworder");
+		JsonValue drawOrdersMap = map.get("drawOrder");
+		if (drawOrdersMap == null) drawOrdersMap = map.get("draworder");
 		if (drawOrdersMap != null) {
 			DrawOrderTimeline timeline = new DrawOrderTimeline(drawOrdersMap.size);
 			int slotCount = skeletonData.slots.size;

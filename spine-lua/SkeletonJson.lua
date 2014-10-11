@@ -447,7 +447,8 @@ function SkeletonJson.new (attachmentLoader)
 			end
 		end
 
-		local drawOrderValues = map["draworder"]
+		local drawOrderValues = map["drawOrder"]
+		if not drawOrderValues then drawOrderValues = map["draworder"] end
 		if drawOrderValues then
 			local timeline = Animation.DrawOrderTimeline.new(#drawOrderValues)
 			local slotCount = #skeletonData.slots

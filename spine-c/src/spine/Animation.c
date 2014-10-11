@@ -368,8 +368,8 @@ void _spScaleTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 
 	bone = skeleton->bones[self->boneIndex];
 	if (time >= self->frames[self->framesCount - 3]) { /* Time is after last frame. */
-		bone->scaleX += (bone->data->scaleX - 1 + self->frames[self->framesCount - 2] - bone->scaleX) * alpha;
-		bone->scaleY += (bone->data->scaleY - 1 + self->frames[self->framesCount - 1] - bone->scaleY) * alpha;
+		bone->scaleX += (bone->data->scaleX * self->frames[self->framesCount - 2] - bone->scaleX) * alpha;
+		bone->scaleY += (bone->data->scaleY * self->frames[self->framesCount - 1] - bone->scaleY) * alpha;
 		return;
 	}
 
@@ -381,9 +381,9 @@ void _spScaleTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 	percent = 1 - (time - frameTime) / (self->frames[frameIndex + TRANSLATE_PREV_FRAME_TIME] - frameTime);
 	percent = spCurveTimeline_getCurvePercent(SUPER(self), frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-	bone->scaleX += (bone->data->scaleX - 1 + prevFrameX + (self->frames[frameIndex + TRANSLATE_FRAME_X] - prevFrameX) * percent
+	bone->scaleX += (bone->data->scaleX * (prevFrameX + (self->frames[frameIndex + TRANSLATE_FRAME_X] - prevFrameX) * percent)
 			- bone->scaleX) * alpha;
-	bone->scaleY += (bone->data->scaleY - 1 + prevFrameY + (self->frames[frameIndex + TRANSLATE_FRAME_Y] - prevFrameY) * percent
+	bone->scaleY += (bone->data->scaleY * (prevFrameY + (self->frames[frameIndex + TRANSLATE_FRAME_Y] - prevFrameY) * percent)
 			- bone->scaleY) * alpha;
 }
 
@@ -479,7 +479,7 @@ void _spAttachmentTimeline_apply (const spTimeline* timeline, spSkeleton* skelet
 
 	frameIndex = time >= self->frames[self->framesCount - 1] ?
 		self->framesCount - 1 : binarySearch1(self->frames, self->framesCount, time) - 1;
-	if (self->frames[frameIndex] <= lastTime) return;
+	if (self->frames[frameIndex] < lastTime) return;
 
 	attachmentName = self->attachmentNames[frameIndex];
 	spSlot_setAttachment(skeleton->slots[self->slotIndex],
@@ -664,15 +664,15 @@ void _spFFDTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, flo
 		return; /* Time is before first frame. */
 	}
 
-	if (slot->attachmentVerticesCount == 0) alpha = 1;
+	if (slot->attachmentVerticesCount != self->frameVerticesCount) alpha = 1; /* Don't mix from uninitialized slot vertices. */
 	if (slot->attachmentVerticesCount < self->frameVerticesCount) {
 		if (slot->attachmentVerticesCapacity < self->frameVerticesCount) {
 			FREE(slot->attachmentVertices);
 			slot->attachmentVertices = MALLOC(float, self->frameVerticesCount);
 			slot->attachmentVerticesCapacity = self->frameVerticesCount;
 		}
-		slot->attachmentVerticesCount = self->frameVerticesCount;
 	}
+	slot->attachmentVerticesCount = self->frameVerticesCount;
 
 	if (time >= self->frames[self->framesCount - 1]) {
 		/* Time is after last frame. */
@@ -746,8 +746,9 @@ void spFFDTimeline_setFrame (spFFDTimeline* self, int frameIndex, float time, fl
 /**/
 
 static const int IKCONSTRAINT_PREV_FRAME_TIME = -3;
+static const int IKCONSTRAINT_PREV_FRAME_MIX = -2;
+static const int IKCONSTRAINT_PREV_FRAME_BEND_DIRECTION = -1;
 static const int IKCONSTRAINT_FRAME_MIX = 1;
-static const int IKCONSTRAINT_FRAME_BEND_DIRECTION = 2;
 
 void _spIkConstraintTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time,
 		spEvent** firedEvents, int* eventsCount, float alpha) {
@@ -768,14 +769,14 @@ void _spIkConstraintTimeline_apply (const spTimeline* timeline, spSkeleton* skel
 
 	/* Interpolate between the previous frame and the current frame. */
 	frameIndex = binarySearch(self->frames, self->framesCount, time, 3);
-	prevFrameMix = self->frames[frameIndex - 2];
+	prevFrameMix = self->frames[frameIndex + IKCONSTRAINT_PREV_FRAME_MIX];
 	frameTime = self->frames[frameIndex];
 	percent = 1 - (time - frameTime) / (self->frames[frameIndex + IKCONSTRAINT_PREV_FRAME_TIME] - frameTime);
 	percent = spCurveTimeline_getCurvePercent(SUPER(self), frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
 	mix = prevFrameMix + (self->frames[frameIndex + IKCONSTRAINT_FRAME_MIX] - prevFrameMix) * percent;
 	ikConstraint->mix += (mix - ikConstraint->mix) * alpha;
-	ikConstraint->bendDirection = (int)self->frames[frameIndex + IKCONSTRAINT_FRAME_BEND_DIRECTION];
+	ikConstraint->bendDirection = (int)self->frames[frameIndex + IKCONSTRAINT_PREV_FRAME_BEND_DIRECTION];
 }
 
 spIkConstraintTimeline* spIkConstraintTimeline_create (int framesCount) {
@@ -788,3 +789,51 @@ void spIkConstraintTimeline_setFrame (spIkConstraintTimeline* self, int frameInd
 	self->frames[frameIndex + 1] = mix;
 	self->frames[frameIndex + 2] = (float)bendDirection;
 }
+
+/**/
+
+void _spFlipTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time,
+		spEvent** firedEvents, int* eventsCount, float alpha) {
+	int frameIndex;
+	spFlipTimeline* self = (spFlipTimeline*)timeline;
+
+	if (time < self->frames[0]) {
+		if (lastTime > time) _spFlipTimeline_apply(timeline, skeleton, lastTime, (float)INT_MAX, 0, 0, 0);
+		return;
+	} else if (lastTime > time) /**/
+		lastTime = -1;
+
+	frameIndex = (time >= self->frames[self->framesCount - 2] ?
+		self->framesCount : binarySearch(self->frames, self->framesCount, time, 2)) - 2;
+	if (self->frames[frameIndex] <= lastTime) return;
+
+	if (self->x)
+		skeleton->bones[self->boneIndex]->flipX = self->frames[frameIndex + 1];
+	else
+		skeleton->bones[self->boneIndex]->flipY = self->frames[frameIndex + 1];
+}
+
+void _spFlipTimeline_dispose (spTimeline* timeline) {
+	spFlipTimeline* self = SUB_CAST(spFlipTimeline, timeline);
+	_spTimeline_deinit(SUPER(self));
+	FREE(self->frames);
+	FREE(self);
+}
+
+spFlipTimeline* spFlipTimeline_create (int framesCount, int/*bool*/x) {
+	spFlipTimeline* self = NEW(spFlipTimeline);
+	_spTimeline_init(SUPER(self), x ? SP_TIMELINE_FLIPX : SP_TIMELINE_FLIPY, _spFlipTimeline_dispose, _spFlipTimeline_apply);
+	CONST_CAST(int, self->x) = x;
+	CONST_CAST(int, self->framesCount) = framesCount << 1;
+	CONST_CAST(float*, self->frames) = CALLOC(float, self->framesCount);
+	return self;
+}
+
+void spFlipTimeline_setFrame (spFlipTimeline* self, int frameIndex, float time, int/*bool*/flip) {
+	frameIndex <<= 1;
+	self->frames[frameIndex] = time;
+	self->frames[frameIndex + 1] = flip;
+}
+
+/**/
+

@@ -41,18 +41,23 @@ public class SkeletonAnimation : SkeletonRenderer {
 	public bool loop;
 	public Spine.AnimationState state;
 
-	public delegate void UpdateBonesDelegate(SkeletonAnimation skeleton);
-	public UpdateBonesDelegate UpdateBones;
+	public delegate void UpdateBonesDelegate (SkeletonAnimation skeleton);
 
+	public UpdateBonesDelegate UpdateLocal;
+	public UpdateBonesDelegate UpdateWorld;
+	public UpdateBonesDelegate UpdateComplete;
 	[SerializeField]
-	private String _animationName;
+	private String
+		_animationName;
+
 	public String AnimationName {
 		get {
 			TrackEntry entry = state.GetCurrent(0);
 			return entry == null ? null : entry.Animation.Name;
 		}
 		set {
-			if (_animationName == value) return;
+			if (_animationName == value)
+				return;
 			_animationName = value;
 			if (value == null || value.Length == 0)
 				state.ClearTrack(0);
@@ -63,7 +68,8 @@ public class SkeletonAnimation : SkeletonRenderer {
 
 	public override void Reset () {
 		base.Reset();
-		if (!valid) return;
+		if (!valid)
+			return;
 
 		state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());
 		if (_animationName != null && _animationName.Length > 0) {
@@ -77,13 +83,26 @@ public class SkeletonAnimation : SkeletonRenderer {
 	}
 
 	public virtual void Update (float deltaTime) {
-		if (!valid) return;
+		if (!valid)
+			return;
 
 		deltaTime *= timeScale;
 		skeleton.Update(deltaTime);
 		state.Update(deltaTime);
 		state.Apply(skeleton);
-		if (UpdateBones != null) UpdateBones(this);
+
+		if (UpdateLocal != null) 
+			UpdateLocal(this);
+
 		skeleton.UpdateWorldTransform();
+
+		if (UpdateWorld != null) { 
+			UpdateWorld(this);
+			skeleton.UpdateWorldTransform();
+		}
+
+		if (UpdateComplete != null) { 
+			UpdateComplete(this);
+		}
 	}
 }

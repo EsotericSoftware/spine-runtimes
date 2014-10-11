@@ -43,7 +43,7 @@ public class SkeletonBounds {
 		var slots:Vector.<Slot> = skeleton.slots;
 		var slotCount:int = slots.length;
 		var x:Number = skeleton.x, y:Number = skeleton.y;
-		
+
 		boundingBoxes.length = 0;
 		for each (var polygon:Polygon in polygons)
 			polygonPool[polygonPool.length] = polygon;

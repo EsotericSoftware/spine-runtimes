@@ -205,7 +205,7 @@ namespace Spine {
 	}
 
 	public class RotateTimeline : CurveTimeline {
-		protected const int LAST_FRAME_TIME = -2;
+		protected const int PREV_FRAME_TIME = -2;
 		protected const int FRAME_VALUE = 1;
 
 		internal int boneIndex;
@@ -216,7 +216,7 @@ namespace Spine {
 
 		public RotateTimeline (int frameCount)
 			: base(frameCount) {
-			frames = new float[frameCount * 2];
+			frames = new float[frameCount << 1];
 		}
 
 		/// <summary>Sets the time and value of the specified keyframe.</summary>
@@ -244,19 +244,19 @@ namespace Spine {
 				return;
 			}
 
-			// Interpolate between the last frame and the current frame.
+			// Interpolate between the previous frame and the current frame.
 			int frameIndex = Animation.binarySearch(frames, time, 2);
-			float lastFrameValue = frames[frameIndex - 1];
+			float prevFrameValue = frames[frameIndex - 1];
 			float frameTime = frames[frameIndex];
-			float percent = 1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime);
+			float percent = 1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime);
 			percent = GetCurvePercent((frameIndex >> 1) - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-			amount = frames[frameIndex + FRAME_VALUE] - lastFrameValue;
+			amount = frames[frameIndex + FRAME_VALUE] - prevFrameValue;
 			while (amount > 180)
 				amount -= 360;
 			while (amount < -180)
 				amount += 360;
-			amount = bone.data.rotation + (lastFrameValue + amount * percent) - bone.rotation;
+			amount = bone.data.rotation + (prevFrameValue + amount * percent) - bone.rotation;
 			while (amount > 180)
 				amount -= 360;
 			while (amount < -180)
@@ -266,7 +266,7 @@ namespace Spine {
 	}
 
 	public class TranslateTimeline : CurveTimeline {
-		protected const int LAST_FRAME_TIME = -3;
+		protected const int PREV_FRAME_TIME = -3;
 		protected const int FRAME_X = 1;
 		protected const int FRAME_Y = 2;
 
@@ -301,16 +301,16 @@ namespace Spine {
 				return;
 			}
 
-			// Interpolate between the last frame and the current frame.
+			// Interpolate between the previous frame and the current frame.
 			int frameIndex = Animation.binarySearch(frames, time, 3);
-			float lastFrameX = frames[frameIndex - 2];
-			float lastFrameY = frames[frameIndex - 1];
+			float prevFrameX = frames[frameIndex - 2];
+			float prevFrameY = frames[frameIndex - 1];
 			float frameTime = frames[frameIndex];
-			float percent = 1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime);
+			float percent = 1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime);
 			percent = GetCurvePercent(frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-			bone.x += (bone.data.x + lastFrameX + (frames[frameIndex + FRAME_X] - lastFrameX) * percent - bone.x) * alpha;
-			bone.y += (bone.data.y + lastFrameY + (frames[frameIndex + FRAME_Y] - lastFrameY) * percent - bone.y) * alpha;
+			bone.x += (bone.data.x + prevFrameX + (frames[frameIndex + FRAME_X] - prevFrameX) * percent - bone.x) * alpha;
+			bone.y += (bone.data.y + prevFrameY + (frames[frameIndex + FRAME_Y] - prevFrameY) * percent - bone.y) * alpha;
 		}
 	}
 
@@ -325,26 +325,26 @@ namespace Spine {
 
 			Bone bone = skeleton.bones[boneIndex];
 			if (time >= frames[frames.Length - 3]) { // Time is after last frame.
-				bone.scaleX += (bone.data.scaleX - 1 + frames[frames.Length - 2] - bone.scaleX) * alpha;
-				bone.scaleY += (bone.data.scaleY - 1 + frames[frames.Length - 1] - bone.scaleY) * alpha;
+				bone.scaleX += (bone.data.scaleX * frames[frames.Length - 2] - bone.scaleX) * alpha;
+				bone.scaleY += (bone.data.scaleY * frames[frames.Length - 1] - bone.scaleY) * alpha;
 				return;
 			}
 
-			// Interpolate between the last frame and the current frame.
+			// Interpolate between the previous frame and the current frame.
 			int frameIndex = Animation.binarySearch(frames, time, 3);
-			float lastFrameX = frames[frameIndex - 2];
-			float lastFrameY = frames[frameIndex - 1];
+			float prevFrameX = frames[frameIndex - 2];
+			float prevFrameY = frames[frameIndex - 1];
 			float frameTime = frames[frameIndex];
-			float percent = 1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime);
+			float percent = 1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime);
 			percent = GetCurvePercent(frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-			bone.scaleX += (bone.data.scaleX - 1 + lastFrameX + (frames[frameIndex + FRAME_X] - lastFrameX) * percent - bone.scaleX) * alpha;
-			bone.scaleY += (bone.data.scaleY - 1 + lastFrameY + (frames[frameIndex + FRAME_Y] - lastFrameY) * percent - bone.scaleY) * alpha;
+			bone.scaleX += (bone.data.scaleX * (prevFrameX + (frames[frameIndex + FRAME_X] - prevFrameX) * percent) - bone.scaleX) * alpha;
+			bone.scaleY += (bone.data.scaleY * (prevFrameY + (frames[frameIndex + FRAME_Y] - prevFrameY) * percent) - bone.scaleY) * alpha;
 		}
 	}
 
 	public class ColorTimeline : CurveTimeline {
-		protected const int LAST_FRAME_TIME = -5;
+		protected const int PREV_FRAME_TIME = -5;
 		protected const int FRAME_R = 1;
 		protected const int FRAME_G = 2;
 		protected const int FRAME_B = 3;
@@ -384,20 +384,20 @@ namespace Spine {
 				b = frames[i - 1];
 				a = frames[i];
 			} else {
-				// Interpolate between the last frame and the current frame.
+				// Interpolate between the previous frame and the current frame.
 				int frameIndex = Animation.binarySearch(frames, time, 5);
-				float lastFrameR = frames[frameIndex - 4];
-				float lastFrameG = frames[frameIndex - 3];
-				float lastFrameB = frames[frameIndex - 2];
-				float lastFrameA = frames[frameIndex - 1];
+				float prevFrameR = frames[frameIndex - 4];
+				float prevFrameG = frames[frameIndex - 3];
+				float prevFrameB = frames[frameIndex - 2];
+				float prevFrameA = frames[frameIndex - 1];
 				float frameTime = frames[frameIndex];
-				float percent = 1 - (time - frameTime) / (frames[frameIndex + LAST_FRAME_TIME] - frameTime);
+				float percent = 1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime);
 				percent = GetCurvePercent(frameIndex / 5 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-				r = lastFrameR + (frames[frameIndex + FRAME_R] - lastFrameR) * percent;
-				g = lastFrameG + (frames[frameIndex + FRAME_G] - lastFrameG) * percent;
-				b = lastFrameB + (frames[frameIndex + FRAME_B] - lastFrameB) * percent;
-				a = lastFrameA + (frames[frameIndex + FRAME_A] - lastFrameA) * percent;
+				r = prevFrameR + (frames[frameIndex + FRAME_R] - prevFrameR) * percent;
+				g = prevFrameG + (frames[frameIndex + FRAME_G] - prevFrameG) * percent;
+				b = prevFrameB + (frames[frameIndex + FRAME_B] - prevFrameB) * percent;
+				a = prevFrameA + (frames[frameIndex + FRAME_A] - prevFrameA) * percent;
 			}
 			Slot slot = skeleton.slots[slotIndex];
 			if (alpha < 1) {
@@ -444,7 +444,7 @@ namespace Spine {
 				lastTime = -1;
 
 			int frameIndex = time >= frames[frames.Length - 1] ? frames.Length - 1 : Animation.binarySearch(frames, time) - 1;
-			if (frames[frameIndex] <= lastTime) return;
+			if (frames[frameIndex] < lastTime) return;
 
 			String attachmentName = attachmentNames[frameIndex];
 			skeleton.slots[slotIndex].Attachment =
@@ -580,7 +580,7 @@ namespace Spine {
 			int vertexCount = frameVertices[0].Length;
 
 			float[] vertices = slot.attachmentVertices;
-			if (vertices.Length != vertexCount) alpha = 1;
+			if (vertices.Length != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
 			if (vertices.Length < vertexCount) {
 				vertices = new float[vertexCount];
 				slot.attachmentVertices = vertices;
@@ -622,8 +622,9 @@ namespace Spine {
 
 	public class IkConstraintTimeline : CurveTimeline {
 		private const int PREV_FRAME_TIME = -3;
+		private const int PREV_FRAME_MIX = -2;
+		private const int PREV_FRAME_BEND_DIRECTION = -1;
 		private const int FRAME_MIX = 1;
-		private const int FRAME_BEND_DIRECTION = 2;
 
 		internal int ikConstraintIndex;
 		internal float[] frames;
@@ -634,10 +635,6 @@ namespace Spine {
 		public IkConstraintTimeline (int frameCount)
 			: base(frameCount) {
 			frames = new float[frameCount * 3];
-		}
-
-		public float[] getFrames () {
-			return frames;
 		}
 
 		/** Sets the time, mix and bend direction of the specified keyframe. */
@@ -662,14 +659,62 @@ namespace Spine {
 
 			// Interpolate between the previous frame and the current frame.
 			int frameIndex = Animation.binarySearch(frames, time, 3);
-			float prevFrameMix = frames[frameIndex - 2];
+			float prevFrameMix = frames[frameIndex + PREV_FRAME_MIX];
 			float frameTime = frames[frameIndex];
 			float percent = 1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime);
 			percent = GetCurvePercent(frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
 			float mix = prevFrameMix + (frames[frameIndex + FRAME_MIX] - prevFrameMix) * percent;
 			ikConstraint.mix += (mix - ikConstraint.mix) * alpha;
-			ikConstraint.bendDirection = (int)frames[frameIndex + FRAME_BEND_DIRECTION];
+			ikConstraint.bendDirection = (int)frames[frameIndex + PREV_FRAME_BEND_DIRECTION];
+		}
+	}
+
+	public class FlipXTimeline : Timeline {
+		internal int boneIndex;
+		internal float[] frames;
+
+		public int BoneIndex { get { return boneIndex; } set { boneIndex = value; } }
+		public float[] Frames { get { return frames; } set { frames = value; } } // time, flip, ...
+		public int FrameCount { get { return frames.Length >> 1; } }
+
+		public FlipXTimeline (int frameCount) {
+			frames = new float[frameCount << 1];
+		}
+
+		/// <summary>Sets the time and value of the specified keyframe.</summary>
+		public void SetFrame (int frameIndex, float time, bool flip) {
+			frameIndex *= 2;
+			frames[frameIndex] = time;
+			frames[frameIndex + 1] = flip ? 1 : 0;
+		}
+
+		public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
+			float[] frames = this.frames;
+			if (time < frames[0]) {
+				if (lastTime > time) Apply(skeleton, lastTime, int.MaxValue, null, 0);
+				return;
+			} else if (lastTime > time) //
+				lastTime = -1;
+
+			int frameIndex = (time >= frames[frames.Length - 2] ? frames.Length : Animation.binarySearch(frames, time, 2)) - 2;
+			if (frames[frameIndex] <= lastTime) return;
+
+			SetFlip(skeleton.bones[boneIndex], frames[frameIndex + 1] != 0);
+		}
+
+		virtual protected void SetFlip (Bone bone, bool flip) {
+			bone.flipX = flip;
+		}
+	}
+
+	public class FlipYTimeline : FlipXTimeline {
+		public FlipYTimeline (int frameCount)
+			: base(frameCount) {
+		}
+
+		override protected void SetFlip (Bone bone, bool flip) {
+			bone.flipY = flip;
 		}
 	}
 }

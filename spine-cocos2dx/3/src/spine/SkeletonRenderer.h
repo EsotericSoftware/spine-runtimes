@@ -50,12 +50,7 @@ public:
 	virtual void drawSkeleton (const cocos2d::Mat4& transform, uint32_t transformFlags);
 	virtual cocos2d::Rect getBoundingBox () const override;
 
-	// --- Convenience methods for common Skeleton_* functions.
-	void updateWorldTransform ();
-
-	void setToSetupPose ();
-	void setBonesToSetupPose ();
-	void setSlotsToSetupPose ();
+	spSkeleton* getSkeleton();
 
 	void setTimeScale(float scale);
 	float getTimeScale() const;
@@ -66,6 +61,12 @@ public:
 	void setDebugBonesEnabled(bool enabled);
 	bool getDebugBonesEnabled() const;
 
+	// --- Convenience methods for common Skeleton_* functions.
+	void updateWorldTransform ();
+
+	void setToSetupPose ();
+	void setBonesToSetupPose ();
+	void setSlotsToSetupPose ();
 
 	/* Returns 0 if the bone was not found. */
 	spBone* findBone (const std::string& boneName) const;
@@ -109,7 +110,6 @@ protected:
 	float* _worldVertices;
 	bool _premultipliedAlpha;
 	spSkeleton* _skeleton;
-	spBone* _rootBone;
 	float _timeScale;
 	bool _debugSlots;
 	bool _debugBones;

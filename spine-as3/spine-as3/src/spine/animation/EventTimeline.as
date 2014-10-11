@@ -67,7 +67,7 @@ public class EventTimeline implements Timeline {
 		if (lastTime < frames[0])
 			frameIndex = 0;
 		else {
-			frameIndex = Animation.binarySearch(frames, lastTime, 1);
+			frameIndex = Animation.binarySearch1(frames, lastTime);
 			var frame:Number = frames[frameIndex];
 			while (frameIndex > 0) { // Fire multiple events with the same frame.
 				if (frames[int(frameIndex - 1)] != frame) break;

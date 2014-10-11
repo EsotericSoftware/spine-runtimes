@@ -46,26 +46,21 @@ public class AnimationStateData {
 
 	public function setMixByName (fromName:String, toName:String, duration:Number) : void {
 		var from:Animation = _skeletonData.findAnimation(fromName);
-		if (from == null)
-			throw new ArgumentError("Animation not found: " + fromName);
+		if (from == null) throw new ArgumentError("Animation not found: " + fromName);
 		var to:Animation = _skeletonData.findAnimation(toName);
-		if (to == null)
-			throw new ArgumentError("Animation not found: " + toName);
+		if (to == null) throw new ArgumentError("Animation not found: " + toName);
 		setMix(from, to, duration);
 	}
 
 	public function setMix (from:Animation, to:Animation, duration:Number) : void {
-		if (from == null)
-			throw new ArgumentError("from cannot be null.");
-		if (to == null)
-			throw new ArgumentError("to cannot be null.");
+		if (from == null) throw new ArgumentError("from cannot be null.");
+		if (to == null) throw new ArgumentError("to cannot be null.");
 		animationToMixTime[from.name + ":" + to.name] = duration;
 	}
 
 	public function getMix (from:Animation, to:Animation) : Number {
 		var time:Object = animationToMixTime[from.name + ":" + to.name];
-		if (time == null)
-			return defaultMix;
+		if (time == null) return defaultMix;
 		return time as Number;
 	}
 }

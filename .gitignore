@@ -32,12 +32,17 @@ xcuserdata
 
 spine-cocos2d-iphone/2/cocos2d/*
 !spine-cocos2d-iphone/2/cocos2d/Place cocos2d here.txt
+spine-cocos2d-iphone/3/cocos2d/*
+!spine-cocos2d-iphone/3/cocos2d/Place cocos2d here.txt
 
 spine-csharp/bin
 spine-csharp/obj
 
 spine-monogame/xamarinstudio-ios/src/bin
 spine-monogame/xamarinstudio-ios/src/obj
+
+spine-monogame/xamarinstudio-ios/example/bin
+spine-monogame/xamarinstudio-ios/example/obj
 
 spine-monogame/windows8-store/src/bin
 spine-monogame/windows8-store/src/obj

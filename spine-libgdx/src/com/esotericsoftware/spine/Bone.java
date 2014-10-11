@@ -43,11 +43,13 @@ public class Bone {
 	float x, y;
 	float rotation, rotationIK;
 	float scaleX, scaleY;
+	boolean flipX, flipY;
 
 	float m00, m01, worldX; // a b x
 	float m10, m11, worldY; // c d y
 	float worldRotation;
 	float worldScaleX, worldScaleY;
+	boolean worldFlipX, worldFlipY;
 
 	Bone (BoneData data) {
 		this.data = data;
@@ -78,6 +80,8 @@ public class Bone {
 		rotationIK = bone.rotationIK;
 		scaleX = bone.scaleX;
 		scaleY = bone.scaleY;
+		flipX = bone.flipX;
+		flipY = bone.flipY;
 	}
 
 	/** Computes the world SRT using the parent bone and the local SRT. */
@@ -96,23 +100,28 @@ public class Bone {
 				worldScaleY = scaleY;
 			}
 			worldRotation = data.inheritRotation ? parent.worldRotation + rotationIK : rotationIK;
+			worldFlipX = parent.worldFlipX ^ flipX;
+			worldFlipY = parent.worldFlipY ^ flipY;
 		} else {
-			worldX = skeleton.flipX ? -x : x;
-			worldY = skeleton.flipY ? -y : y;
+			boolean skeletonFlipX = skeleton.flipX, skeletonFlipY = skeleton.flipY;
+			worldX = skeletonFlipX ? -x : x;
+			worldY = skeletonFlipY ? -y : y;
 			worldScaleX = scaleX;
 			worldScaleY = scaleY;
 			worldRotation = rotationIK;
+			worldFlipX = skeletonFlipX ^ flipX;
+			worldFlipY = skeletonFlipY ^ flipY;
 		}
 		float cos = MathUtils.cosDeg(worldRotation);
 		float sin = MathUtils.sinDeg(worldRotation);
-		if (skeleton.flipX) {
+		if (worldFlipX) {
 			m00 = -cos * worldScaleX;
 			m01 = sin * worldScaleY;
 		} else {
 			m00 = cos * worldScaleX;
 			m01 = -sin * worldScaleY;
 		}
-		if (skeleton.flipY) {
+		if (worldFlipY) {
 			m10 = -sin * worldScaleX;
 			m11 = -cos * worldScaleY;
 		} else {
@@ -129,6 +138,8 @@ public class Bone {
 		rotationIK = rotation;
 		scaleX = data.scaleX;
 		scaleY = data.scaleY;
+		flipX = data.flipX;
+		flipY = data.flipY;
 	}
 
 	public BoneData getData () {
@@ -208,6 +219,22 @@ public class Bone {
 		scaleY = scale;
 	}
 
+	public boolean getFlipX () {
+		return flipX;
+	}
+
+	public void setFlipX (boolean flipX) {
+		this.flipX = flipX;
+	}
+
+	public boolean getFlipY () {
+		return flipY;
+	}
+
+	public void setFlipY (boolean flipY) {
+		this.flipY = flipY;
+	}
+
 	public float getM00 () {
 		return m00;
 	}
@@ -244,6 +271,14 @@ public class Bone {
 		return worldScaleY;
 	}
 
+	public boolean getWorldFlipX () {
+		return worldFlipX;
+	}
+
+	public boolean getWorldFlipY () {
+		return worldFlipY;
+	}
+
 	public Matrix3 getWorldTransform (Matrix3 worldTransform) {
 		if (worldTransform == null) throw new IllegalArgumentException("worldTransform cannot be null.");
 		float[] val = worldTransform.val;
@@ -262,10 +297,9 @@ public class Bone {
 	public Vector2 worldToLocal (Vector2 world) {
 		float x = world.x - worldX, y = world.y - worldY;
 		float m00 = this.m00, m10 = this.m10, m01 = this.m01, m11 = this.m11;
-		Skeleton skeleton = this.skeleton;
-		if (skeleton.flipX != skeleton.flipY) {
-			m00 *= -1;
-			m11 *= -1;
+		if (worldFlipX != worldFlipY) {
+			m00 = -m00;
+			m11 = -m11;
 		}
 		float invDet = 1 / (m00 * m11 - m01 * m10);
 		world.x = (x * m00 * invDet - y * m01 * invDet);
