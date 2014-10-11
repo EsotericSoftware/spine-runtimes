@@ -139,7 +139,6 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	_skeleton->a = self.opacity;
 
 	int additive = -1;
-	ccColor4B color;
 	const float* uvs = 0;
 	int verticesCount = 0;
 	const int* triangles = 0;
