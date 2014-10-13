@@ -231,7 +231,11 @@ public class SpineEditorUtilities : AssetPostprocessor {
 	}
 
 	public static SkeletonAnimation SpawnAnimatedSkeleton (SkeletonDataAsset skeletonDataAsset, string skinName) {
-		return SpawnAnimatedSkeleton(skeletonDataAsset, skeletonDataAsset.GetSkeletonData(true).FindSkin(skinName));
+		SkeletonData skelData = skeletonDataAsset.GetSkeletonData(false);
+		if(skelData == null){
+			return null;
+		}
+		return SpawnAnimatedSkeleton(skeletonDataAsset, skelData.FindSkin(skinName));
 	}
 
 	public static SkeletonAnimation SpawnAnimatedSkeleton (SkeletonDataAsset skeletonDataAsset, Skin skin = null) {
@@ -241,7 +245,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 
 
-		SkeletonData data = skeletonDataAsset.GetSkeletonData(true);
+		SkeletonData data = skeletonDataAsset.GetSkeletonData(false);
 
 		if (data == null) {
 			return null;
@@ -265,4 +269,108 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 		return anim;
 	}
+
+	static bool IsSpineJSON (TextAsset asset) {
+		object obj = Json.Deserialize(new StringReader(asset.text));
+		if (obj == null) {
+			Debug.LogError("Is not valid JSON");
+			return false;
+		}
+		
+		Dictionary<string, object> root = (Dictionary<string, object>)obj;
+		
+		if (!root.ContainsKey("skeleton"))
+			return false;
+		
+		Dictionary<string, object> skeletonInfo = (Dictionary<string, object>)root["skeleton"];
+		
+		string spineVersion = (string)skeletonInfo["spine"];
+        //TODO:  reject old versions
+        
+        return true;
+	}
+
+	//TK2D helpers
+
+	[MenuItem("Assets/Create/Spine/SkeletonData From Selection", true)]
+	static bool CreateSkeletonDataFromSelectionValidate(){
+		int spineJsonCount = 0;
+		int collectionCount = 0;
+
+		foreach(Object obj in Selection.objects){
+			if(obj is TextAsset){
+				TextAsset t = obj as TextAsset;
+				if(IsSpineJSON(t))
+					spineJsonCount++;
+			}
+			else if(obj is GameObject){
+				GameObject go = obj as GameObject;
+				var spriteCollection = go.GetComponent<tk2dSpriteCollection>();
+				if(spriteCollection != null){
+					if(spriteCollection.spriteCollection != null){
+						collectionCount++;
+						if(collectionCount > 1){
+							Debug.LogWarning("SkeletonData From Selection only works when 1 Collection is selected.");
+							return false;
+						}
+					}
+				}
+			}
+		}
+
+		if(spineJsonCount > 0 && collectionCount == 1){
+			return true;
+		}
+
+		return false;
+	}
+
+	[MenuItem("Assets/Create/Spine/SkeletonData From Selection")]
+	static void CreateSkeletonDataFromSelection(){
+
+		List<TextAsset> jsonList = new List<TextAsset>();
+		tk2dSpriteCollectionData collectionData = null;
+
+		foreach(Object obj in Selection.objects){
+			if(obj is TextAsset){
+				TextAsset t = obj as TextAsset;
+				if(IsSpineJSON(t))
+					jsonList.Add(t);
+			}
+			else if(obj is GameObject){
+				GameObject go = obj as GameObject;
+				var spriteCollection = go.GetComponent<tk2dSpriteCollection>();
+				if(spriteCollection != null){
+					if(spriteCollection.spriteCollection != null){
+						collectionData = spriteCollection.spriteCollection;
+                    }
+                }
+            }
+        }
+
+		if(collectionData == null)
+			return;
+
+		foreach(TextAsset t in jsonList){
+			string path = Path.GetDirectoryName(AssetDatabase.GetAssetPath(t)) + "/" + t.name + "_SkeletonData.asset";
+
+			SkeletonDataAsset skeletonDataAsset = (SkeletonDataAsset)AssetDatabase.LoadAssetAtPath(path, typeof(SkeletonDataAsset));
+			if(skeletonDataAsset == null){
+				skeletonDataAsset = SkeletonDataAsset.CreateInstance<SkeletonDataAsset>();
+				AssetDatabase.CreateAsset(skeletonDataAsset, path);
+			}
+
+			skeletonDataAsset.skeletonJSON = t;
+			skeletonDataAsset.spriteCollection = collectionData;
+			skeletonDataAsset.defaultMix = 0.2f;
+			skeletonDataAsset.fromAnimation = new string[0];
+			skeletonDataAsset.toAnimation = new string[0];
+			skeletonDataAsset.duration = new float[0];
+
+			EditorUtility.SetDirty(skeletonDataAsset);
+			AssetDatabase.SaveAssets();
+			AssetDatabase.Refresh();
+		}
+
+    }
 }

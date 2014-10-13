@@ -56,7 +56,8 @@ public class SkeletonDataAssetInspector : Editor {
 	private bool m_initialized = false;
 	private SkeletonDataAsset m_skeletonDataAsset;
 	private string m_skeletonDataAssetGUID;
-	
+	bool failedSkeletonDataLatch = false;
+
 	void OnEnable () {
 		try {
 
@@ -98,12 +99,25 @@ public class SkeletonDataAssetInspector : Editor {
 		EditorGUILayout.PropertyField(skeletonJSON);
 		EditorGUILayout.PropertyField(scale);
 		if (EditorGUI.EndChangeCheck()) {
+
+			if(failedSkeletonDataLatch){
+				failedSkeletonDataLatch = false;
+			}
+
 			if (m_previewUtility != null) {
 				m_previewUtility.Cleanup();
 				m_previewUtility = null;
 			}
+
+			serializedObject.ApplyModifiedProperties();
 		}
-		
+
+		if(failedSkeletonDataLatch){
+			GUI.color = Color.red;
+			GUILayout.Label("WARNING:  Skeleton JSON and Sprite Collection Mismatch");
+			return;
+		}
+
 		SkeletonData skeletonData = asset.GetSkeletonData(asset.spriteCollection == null || asset.skeletonJSON == null);
 		if (skeletonData != null) {
 			showAnimationStateData = EditorGUILayout.Foldout(showAnimationStateData, "Animation State Data");
@@ -238,7 +252,7 @@ public class SkeletonDataAssetInspector : Editor {
 	}
 		
 	private void InitPreview () {
-		if (this.m_previewUtility == null) {
+			if (this.m_previewUtility == null && m_skeletonDataAsset.spriteCollection != null && !failedSkeletonDataLatch) {
 			this.m_lastTime = Time.realtimeSinceStartup;
 			this.m_previewUtility = new PreviewRenderUtility(true);
 			this.m_previewUtility.m_Camera.isOrthoGraphic = true;
@@ -252,8 +266,14 @@ public class SkeletonDataAssetInspector : Editor {
 		this.DestroyPreviewInstances();
 		if (this.m_previewInstance == null) {
 			string skinName = EditorPrefs.GetString(m_skeletonDataAssetGUID + "_lastSkin", "");
-				
-			m_previewInstance = SpineEditorUtilities.SpawnAnimatedSkeleton((SkeletonDataAsset)target, skinName).gameObject;
+			SkeletonAnimation skelAnim = SpineEditorUtilities.SpawnAnimatedSkeleton((SkeletonDataAsset)target, skinName);
+			if(skelAnim == null){
+				failedSkeletonDataLatch = true;
+					//EditorUtility.DisplayDialog("Skeleton / SpriteCollection Mismatch",  "GetSkeletonData failed, make sure JSON and SpriteCollection match.\nSprite Collection must contain all attachments referenced in SkeletonJSON", "OK");
+				return; //failed
+			}
+
+			m_previewInstance = skelAnim.gameObject;
 			//m_previewInstance.transform.localScale = Vector3.one * 0.01f;
 			m_previewInstance.hideFlags = HideFlags.HideAndDontSave;
 			m_previewInstance.layer = 0x1f;
@@ -281,12 +301,16 @@ public class SkeletonDataAssetInspector : Editor {
 		
 	public override bool HasPreviewGUI () {
 		//TODO: validate json data
-		return skeletonJSON.objectReferenceValue != null;
+
+		return skeletonJSON.objectReferenceValue != null && spriteCollection.objectReferenceValue != null && !failedSkeletonDataLatch;
 	}
 		
 	Texture m_previewTex = new Texture();
 
 	public override void OnInteractivePreviewGUI (Rect r, GUIStyle background) {
+		if(m_skeletonDataAsset.spriteCollection == null)
+			return;
+
 		this.InitPreview();
 			
 		if (UnityEngine.Event.current.type == EventType.Repaint) {
@@ -355,7 +379,7 @@ public class SkeletonDataAssetInspector : Editor {
 	private void DoRenderPreview (bool drawHandles) {
 		GameObject go = this.m_previewInstance;
 			
-		if (m_requireRefresh) {
+		if (m_requireRefresh && go != null) {
 			go.renderer.enabled = true;
 				
 			if (EditorApplication.isPlaying) {
@@ -581,6 +605,8 @@ public class SkeletonDataAssetInspector : Editor {
 	//TODO:  Fix first-import error
 	//TODO:  Update preview without thumbnail
 	public override Texture2D RenderStaticPreview (string assetPath, UnityEngine.Object[] subAssets, int width, int height) {
+		if(m_skeletonDataAsset.spriteCollection == null)
+			return null;
 		Texture2D tex = new Texture2D(width, height, TextureFormat.ARGB32, false);
 			
 		this.InitPreview();
