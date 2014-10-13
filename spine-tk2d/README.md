@@ -8,7 +8,7 @@ spine-tk2d differs from spine-unity in that a TK2D atlas is used instead of a Sp
 
 ## Documentation
 
-The [Spine Unity Examples](http://esotericsoftware.com/forum/viewtopic.php?f=3&t=3318) forum thread has many videos on how to use both spine-unity and spine-tk2d features.
+The [spine-tk2d video](https://www.youtube.com/watch?v=7dg9slk9mxA) shows some differences between spine-tk2d and spine-unity. Except for setting up the texture atlas, everything in spine-tk2d works the same as spine-unity. The [Spine Unity Examples](http://esotericsoftware.com/forum/viewtopic.php?f=3&t=3318) forum thread has many videos on how to use both spine-unity and spine-tk2d features.
 
 ## Quick installation
 
