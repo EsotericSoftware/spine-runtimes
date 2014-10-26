@@ -38,6 +38,7 @@ spSkeletonData* spSkeletonData_create () {
 
 void spSkeletonData_dispose (spSkeletonData* self) {
 	int i;
+
 	for (i = 0; i < self->bonesCount; ++i)
 		spBoneData_dispose(self->bones[i]);
 	FREE(self->bones);
@@ -61,6 +62,9 @@ void spSkeletonData_dispose (spSkeletonData* self) {
 	for (i = 0; i < self->ikConstraintsCount; ++i)
 		spIkConstraintData_dispose(self->ikConstraints[i]);
 	FREE(self->ikConstraints);
+
+	FREE(self->hash);
+	FREE(self->version);
 
 	FREE(self);
 }
