@@ -38,7 +38,6 @@ spSkeletonData* spSkeletonData_create () {
 
 void spSkeletonData_dispose (spSkeletonData* self) {
 	int i;
-
 	for (i = 0; i < self->bonesCount; ++i)
 		spBoneData_dispose(self->bones[i]);
 	FREE(self->bones);
