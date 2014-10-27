@@ -21,4 +21,4 @@ Alternatively, the contents of the `spine-libgdx/src` directory can be copied in
 * [Box2D Example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-libgdx/test/com/esotericsoftware/spine/Box2DExample.java#L56) (written before bounding boxes were available)
 * [Mix Example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-libgdx/test/com/esotericsoftware/spine/MixTest.java#L39)
 * [Skeleton Example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-libgdx/test/com/esotericsoftware/spine/SkeletonTest.java#L47)
-* [Super Spinboy](https://github.com/EsotericSoftware/spine-superspineboy) Full game example done with Spine Essential.
+* [Super Spineboy](https://github.com/EsotericSoftware/spine-superspineboy) Full game example done with Spine Essential.
