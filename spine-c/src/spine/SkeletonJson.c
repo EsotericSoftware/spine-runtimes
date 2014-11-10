@@ -466,6 +466,8 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 		boneData->scaleY = Json_getFloat(boneMap, "scaleY", 1);
 		boneData->inheritScale = Json_getInt(boneMap, "inheritScale", 1);
 		boneData->inheritRotation = Json_getInt(boneMap, "inheritRotation", 1);
+		boneData->flipX = Json_getInt(boneMap, "flipX", 0);
+		boneData->flipY = Json_getInt(boneMap, "flipY", 0);
 
 		skeletonData->bones[i] = boneData;
 		skeletonData->bonesCount++;
