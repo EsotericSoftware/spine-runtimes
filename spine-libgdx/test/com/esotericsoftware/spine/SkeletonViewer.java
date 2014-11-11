@@ -53,6 +53,8 @@ import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.TextureAtlasData;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -71,6 +73,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.esotericsoftware.spine.AnimationState.TrackEntry;
 
 public class SkeletonViewer extends ApplicationAdapter {
 	static final float checkModifiedInterval = 0.250f;
@@ -227,6 +230,19 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		ui.stage.act();
 		ui.stage.draw();
+
+		// Draw indicator for timeline position.
+		ShapeRenderer shapes = debugRenderer.getShapeRenderer();
+		TrackEntry entry = state.getCurrent(0);
+		if (entry != null) {
+			float percent = entry.getTime() / entry.getEndTime();
+			if (entry.getLoop()) percent %= 1;
+			float x = ui.window.getRight() + (Gdx.graphics.getWidth() - ui.window.getRight()) * percent;
+			shapes.setColor(Color.CYAN);
+			shapes.begin(ShapeType.Line);
+			shapes.line(x, 0, x, 20);
+			shapes.end();
+		}
 	}
 
 	public void resize (int width, int height) {
