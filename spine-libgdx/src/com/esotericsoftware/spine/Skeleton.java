@@ -117,16 +117,16 @@ public class Skeleton {
 
 	/** Caches information about bones and IK constraints. Must be called if bones or IK constraints are added or removed. */
 	public void updateCache () {
+		Array<Bone> bones = this.bones;
 		Array<Array<Bone>> boneCache = this.boneCache;
 		Array<IkConstraint> ikConstraints = this.ikConstraints;
 		int ikConstraintsCount = ikConstraints.size;
 
 		int arrayCount = ikConstraintsCount + 1;
-		boneCache.truncate(arrayCount);
-		for (int i = 0, n = boneCache.size; i < n; i++)
-			boneCache.get(i).clear();
 		while (boneCache.size < arrayCount)
 			boneCache.add(new Array());
+		for (int i = 0; i < arrayCount; i++)
+			boneCache.get(i).clear();
 
 		Array<Bone> nonIkBones = boneCache.first();
 
@@ -164,7 +164,7 @@ public class Skeleton {
 		}
 		Array<Array<Bone>> boneCache = this.boneCache;
 		Array<IkConstraint> ikConstraints = this.ikConstraints;
-		int i = 0, last = boneCache.size - 1;
+		int i = 0, last = ikConstraints.size;
 		while (true) {
 			Array<Bone> updateBones = boneCache.get(i);
 			for (int ii = 0, nn = updateBones.size; ii < nn; ii++)
