@@ -30,11 +30,11 @@
 
 package com.esotericsoftware.spine;
 
-import com.esotericsoftware.spine.attachments.Attachment;
-
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
+import com.badlogic.gdx.utils.Pool;
+import com.esotericsoftware.spine.attachments.Attachment;
 
 /** Stores attachments by slot index and attachment name. */
 public class Skin {
@@ -42,6 +42,11 @@ public class Skin {
 
 	final String name;
 	final ObjectMap<Key, Attachment> attachments = new ObjectMap();
+	final Pool<Key> keyPool = new Pool(64) {
+		protected Object newObject () {
+			return new Key();
+		}
+	};
 
 	public Skin (String name) {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
@@ -51,7 +56,7 @@ public class Skin {
 	public void addAttachment (int slotIndex, String name, Attachment attachment) {
 		if (attachment == null) throw new IllegalArgumentException("attachment cannot be null.");
 		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
-		Key key = new Key();
+		Key key = keyPool.obtain();
 		key.set(slotIndex, name);
 		attachments.put(key, attachment);
 	}
@@ -78,6 +83,8 @@ public class Skin {
 	}
 
 	public void clear () {
+		for (Key key : attachments.keys())
+			keyPool.free(key);
 		attachments.clear();
 	}
 
