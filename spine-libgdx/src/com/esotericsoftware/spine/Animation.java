@@ -816,7 +816,7 @@ public class Animation {
 			} else if (lastTime > time) //
 				lastTime = -1;
 			int frameIndex = (time >= frames[frames.length - 2] ? frames.length : binarySearch(frames, time, 2)) - 2;
-			if (frames[frameIndex] <= lastTime) return;
+			if (frames[frameIndex] < lastTime) return;
 			setFlip(skeleton.bones.get(boneIndex), frames[frameIndex + 1] != 0);
 		}
 

@@ -805,7 +805,7 @@ void _spFlipTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, fl
 
 	frameIndex = (time >= self->frames[self->framesCount - 2] ?
 		self->framesCount : binarySearch(self->frames, self->framesCount, time, 2)) - 2;
-	if (self->frames[frameIndex] <= lastTime) return;
+	if (self->frames[frameIndex] < lastTime) return;
 
 	if (self->x)
 		skeleton->bones[self->boneIndex]->flipX = self->frames[frameIndex + 1];

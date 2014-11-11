@@ -698,7 +698,7 @@ namespace Spine {
 				lastTime = -1;
 
 			int frameIndex = (time >= frames[frames.Length - 2] ? frames.Length : Animation.binarySearch(frames, time, 2)) - 2;
-			if (frames[frameIndex] <= lastTime) return;
+			if (frames[frameIndex] < lastTime) return;
 
 			SetFlip(skeleton.bones[boneIndex], frames[frameIndex + 1] != 0);
 		}
