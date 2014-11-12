@@ -28,40 +28,45 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine {
+package spine.animation {
+import spine.Bone;
+import spine.Event;
+import spine.Skeleton;
 
-public class BoneData {
-	internal var _name:String;
-	internal var _parent:BoneData;
-	public var length:Number;
-	public var x:Number;
-	public var y:Number;
-	public var rotation:Number;
-	public var scaleX:Number = 1;
-	public var scaleY:Number = 1;
-	public var inheritScale:Boolean = true;
-	public var inheritRotation:Boolean = true;
-	public var flipX:Boolean;
-	public var flipY:Boolean;
+public class FlipXTimeline implements Timeline {
+	public var boneIndex:int;
+	public var frames:Vector.<Number>; // time, flip, ...
 
-	/** @param parent May be null. */
-	public function BoneData (name:String, parent:BoneData) {
-		if (name == null) throw new ArgumentError("name cannot be null.");
-		_name = name;
-		_parent = parent;
+	public function FlipXTimeline (frameCount:int) {
+		frames = new Vector.<Number>(frameCount * 2, true);
 	}
 
-	public function get name () : String {
-		return _name;
+	public function get frameCount () : int {
+		return frames.length / 2;
 	}
 
-	/** @return May be null. */
-	public function get parent () : BoneData {
-		return _parent;
+	/** Sets the time and angle of the specified keyframe. */
+	public function setFrame (frameIndex:int, time:Number, flip:Boolean) : void {
+		frameIndex *= 2;
+		frames[frameIndex] = time;
+		frames[int(frameIndex + 1)] = flip ? 1 : 0;
 	}
 
-	public function toString () : String {
-		return _name;
+	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
+		if (time < frames[0]) {
+			if (lastTime > time) apply(skeleton, lastTime, int.MAX_VALUE, null, 0);
+			return;
+		} else if (lastTime > time) //
+			lastTime = -1;
+
+		var frameIndex:int = (time >= frames[frames.length - 2] ? frames.length : Animation.binarySearch(frames, time, 2)) - 2;
+		if (frames[frameIndex] < lastTime) return;
+
+		setFlip(skeleton.bones[boneIndex], frames[frameIndex + 1] != 0);
+	}
+
+	protected function setFlip (bone:Bone, flip:Boolean) : void {
+		bone.flipX = flip;
 	}
 }
 

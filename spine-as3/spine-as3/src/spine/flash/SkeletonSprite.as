@@ -97,6 +97,7 @@ public class SkeletonSprite extends Sprite {
 					bitmap.rotation = -regionAttachment.rotation;
 					bitmap.scaleX = regionAttachment.scaleX * (regionAttachment.width / region.width);
 					bitmap.scaleY = regionAttachment.scaleY * (regionAttachment.height / region.height);
+					
 
 					// Position using attachment translation, shifted as if scale and rotation were at image center.
 					var radians:Number = -regionAttachment.rotation * Math.PI / 180;
@@ -127,10 +128,12 @@ public class SkeletonSprite extends Sprite {
 				colorTransform.alphaMultiplier = skeleton.a * slot.a * regionAttachment.a;
 				wrapper.transform.colorTransform = colorTransform;
 
+				var bone:Bone = slot.bone;
 				var flipX:int = skeleton.flipX ? -1 : 1;
 				var flipY:int = skeleton.flipY ? -1 : 1;
+				if (bone.worldFlipX) flipX = -flipX;
+				if (bone.worldFlipY) flipY = -flipY;
 
-				var bone:Bone = slot.bone;
 				wrapper.x = bone.worldX;
 				wrapper.y = bone.worldY;
 				wrapper.rotation = -bone.worldRotation * flipX * flipY;
