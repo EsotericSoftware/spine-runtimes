@@ -1,166 +1,195 @@
 
 spineboy.png
+size: 1024,256
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
+eye_indifferent
+  rotate: false
+  xy: 890, 146
+  size: 56, 53
+  orig: 56, 53
+  offset: 0, 0
+  index: -1
+eye_surprised
+  rotate: false
+  xy: 444, 5
+  size: 56, 53
+  orig: 56, 53
+  offset: 0, 0
+  index: -1
+front_bracer
+  rotate: false
+  xy: 966, 103
+  size: 35, 48
+  orig: 35, 48
+  offset: 0, 0
+  index: -1
+front_fist_closed
+  rotate: false
+  xy: 847, 84
+  size: 45, 49
+  orig: 45, 49
+  offset: 0, 0
+  index: -1
+front_fist_open
+  rotate: false
+  xy: 968, 190
+  size: 52, 52
+  orig: 52, 52
+  offset: 0, 0
+  index: -1
+front_foot
+  rotate: false
+  xy: 890, 201
+  size: 76, 41
+  orig: 76, 41
+  offset: 0, 0
+  index: -1
+front_foot_bend1
+  rotate: false
+  xy: 444, 98
+  size: 77, 42
+  orig: 77, 42
+  offset: 0, 0
+  index: -1
+front_foot_bend2
+  rotate: false
+  xy: 279, 5
+  size: 65, 56
+  orig: 65, 56
+  offset: 0, 0
+  index: -1
+front_shin
+  rotate: false
+  xy: 792, 132
+  size: 49, 110
+  orig: 49, 110
+  offset: 0, 0
+  index: -1
+front_thigh
+  rotate: false
+  xy: 935, 77
+  size: 29, 67
+  orig: 29, 67
+  offset: 0, 0
+  index: -1
+front_upper_arm
+  rotate: false
+  xy: 410, 3
+  size: 32, 58
+  orig: 32, 58
+  offset: 0, 0
+  index: -1
+goggles
+  rotate: false
+  xy: 444, 142
+  size: 157, 100
+  orig: 157, 100
+  offset: 0, 0
+  index: -1
+gun
+  rotate: false
+  xy: 603, 120
+  size: 126, 122
+  orig: 126, 122
+  offset: 0, 0
+  index: -1
 head
   rotate: false
-  xy: 1, 122
-  size: 121, 132
-  orig: 121, 132
+  xy: 279, 63
+  size: 163, 179
+  orig: 163, 179
   offset: 0, 0
   index: -1
-torso
+mouth_grind
   rotate: false
-  xy: 1, 28
-  size: 68, 92
-  orig: 68, 92
+  xy: 948, 153
+  size: 56, 35
+  orig: 56, 35
   offset: 0, 0
   index: -1
-left-pant-bottom
+mouth_oooo
   rotate: false
-  xy: 1, 4
-  size: 44, 22
-  orig: 44, 22
+  xy: 731, 97
+  size: 56, 35
+  orig: 56, 35
   offset: 0, 0
   index: -1
-right-pant-bottom
+mouth_smile
   rotate: false
-  xy: 47, 8
-  size: 46, 18
-  orig: 46, 18
+  xy: 789, 95
+  size: 56, 35
+  orig: 56, 35
   offset: 0, 0
   index: -1
-right-upper-leg
+muzzle
   rotate: false
-  xy: 71, 50
-  size: 44, 70
-  orig: 44, 70
-  offset: 0, 0
-  index: -1
-pelvis
-  rotate: false
-  xy: 95, 1
-  size: 63, 47
-  orig: 63, 47
-  offset: 0, 0
-  index: -1
-left-upper-leg
-  rotate: false
-  xy: 117, 53
-  size: 33, 67
-  orig: 33, 67
-  offset: 0, 0
-  index: -1
-right-foot
-  rotate: false
-  xy: 160, 224
-  size: 67, 30
-  orig: 67, 30
-  offset: 0, 0
-  index: -1
-left-shoulder
-  rotate: false
-  xy: 124, 201
-  size: 34, 53
-  orig: 34, 53
-  offset: 0, 0
-  index: -1
-left-ankle
-  rotate: false
-  xy: 229, 222
-  size: 25, 32
-  orig: 25, 32
-  offset: 0, 0
-  index: -1
-left-foot
-  rotate: false
-  xy: 160, 192
-  size: 65, 30
-  orig: 65, 30
+  xy: 2, 2
+  size: 275, 240
+  orig: 277, 240
   offset: 0, 0
   index: -1
 neck
   rotate: false
-  xy: 124, 171
-  size: 34, 28
-  orig: 34, 28
+  xy: 595, 93
+  size: 22, 25
+  orig: 22, 25
   offset: 0, 0
   index: -1
-right-arm
+rear_bracer
   rotate: false
-  xy: 124, 124
-  size: 21, 45
-  orig: 21, 45
+  xy: 966, 58
+  size: 34, 43
+  orig: 34, 43
   offset: 0, 0
   index: -1
-right-ankle
+rear_foot
   rotate: false
-  xy: 227, 190
-  size: 25, 30
-  orig: 25, 30
+  xy: 444, 60
+  size: 68, 36
+  orig: 68, 36
   offset: 0, 0
   index: -1
-left-hand
+rear_foot_bend1
   rotate: false
-  xy: 147, 131
-  size: 35, 38
-  orig: 35, 38
+  xy: 523, 100
+  size: 70, 40
+  orig: 70, 40
   offset: 0, 0
   index: -1
-left-arm
+rear_foot_bend2
   rotate: false
-  xy: 184, 161
-  size: 35, 29
-  orig: 35, 29
+  xy: 346, 11
+  size: 62, 50
+  orig: 62, 50
   offset: 0, 0
   index: -1
-eyes-closed
+rear_shin
   rotate: false
-  xy: 221, 161
-  size: 34, 27
-  orig: 34, 27
+  xy: 843, 135
+  size: 45, 107
+  orig: 45, 107
   offset: 0, 0
   index: -1
-right-lower-leg
+rear_thigh
   rotate: false
-  xy: 152, 65
-  size: 51, 64
-  orig: 51, 64
+  xy: 894, 82
+  size: 39, 62
+  orig: 39, 62
   offset: 0, 0
   index: -1
-right-foot-idle
+rear_upper_arm
   rotate: false
-  xy: 184, 131
-  size: 53, 28
-  orig: 53, 28
+  xy: 502, 6
+  size: 28, 52
+  orig: 28, 52
   offset: 0, 0
   index: -1
-left-lower-leg
+torso
   rotate: false
-  xy: 205, 65
-  size: 49, 64
-  orig: 49, 64
-  offset: 0, 0
-  index: -1
-right-shoulder
-  rotate: false
-  xy: 160, 12
-  size: 52, 51
-  orig: 52, 51
-  offset: 0, 0
-  index: -1
-eyes
-  rotate: false
-  xy: 214, 36
-  size: 34, 27
-  orig: 34, 27
-  offset: 0, 0
-  index: -1
-right-hand
-  rotate: false
-  xy: 214, 2
-  size: 32, 32
-  orig: 32, 32
+  xy: 731, 134
+  size: 59, 108
+  orig: 59, 108
   offset: 0, 0
   index: -1

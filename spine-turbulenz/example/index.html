@@ -97,6 +97,7 @@ function loadAtlas (atlasText) {
 var skeletonData;
 function loadSkeletonData (skeletonText) {
 	var json = new spine.SkeletonJson(new spine.AtlasAttachmentLoader(atlas));
+	json.scale = 0.6;
 	skeletonData = json.readSkeletonData(JSON.parse(skeletonText));
 	start();
 }
@@ -114,12 +115,13 @@ function start () {
 
 	if (skeletonName == "spineboy") {
 		stateData.setMixByName("walk", "jump", 0.2);
-		stateData.setMixByName("jump", "walk", 0.4);
-		state.setAnimationByName(0, "drawOrder", true);
+		stateData.setMixByName("run", "jump", 0.2);
+		stateData.setMixByName("jump", "run", 0.2);
+		state.setAnimationByName(0, "walk", true);
 
 		canvas.onmousedown = function () {
 			state.setAnimationByName(0, "jump", false);
-			state.addAnimationByName(0, "walk", true, 0);
+			state.addAnimationByName(0, "run", true, 0);
 		}
 	} else {
 		skeleton.setSkinByName("goblingirl");
