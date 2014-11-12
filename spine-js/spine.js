@@ -97,7 +97,7 @@ spine.Bone.prototype = {
 			this.worldFlipX = parent.worldFlipX != this.flipX;
 			this.worldFlipY = parent.worldFlipY != this.flipY;
 		} else {
-			var skeletonFlipX = skeleton.flipX, skeletonFlipY = skeleton.flipY;
+			var skeletonFlipX = this.skeleton.flipX, skeletonFlipY = this.skeleton.flipY;
 			this.worldX = skeletonFlipX ? -this.x : this.x;
 			this.worldY = skeletonFlipY != spine.Bone.yDown ? -this.y : this.y;
 			this.worldScaleX = this.scaleX;
@@ -135,7 +135,7 @@ spine.Bone.prototype = {
 		this.flipX = data.flipX;
 		this.flipY = data.flipY;
 	},
-	worldToLocal: function (world) void {
+	worldToLocal: function (world) {
 		var dx = world[0] - this.worldX, dy = world[1] - this.worldY;
 		var m00 = this.m00, m10 = this.m10, m01 = this.m01, m11 = this.m11;
 		if (this.worldFlipX != (this.worldFlipY != spine.Bone.yDown)) {
@@ -271,7 +271,7 @@ spine.binarySearch = function (values, target, step) {
 spine.binarySearch1 = function (values, target) {
 	var low = 0;
 	var high = values.length - 2;
-	if (high == 0) return step;
+	if (high == 0) return 1;
 	var current = high >>> 1;
 	while (true) {
 		if (values[current + 1] <= target)
@@ -290,7 +290,7 @@ spine.linearSearch = function (values, target, step) {
 
 spine.Curves = function (frameCount) {
 	this.curves = []; // type, x, y, ...
-	this.curves.length = (frameCount - 1) * 19/*BEZIER_SIZE*/;
+	//this.curves.length = (frameCount - 1) * 19/*BEZIER_SIZE*/;
 };
 spine.Curves.prototype = {
 	setLinear: function (frameIndex) {
@@ -303,7 +303,7 @@ spine.Curves.prototype = {
 	 * cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of
 	 * the difference between the keyframe's values. */
 	setCurve: function (frameIndex, cx1, cy1, cx2, cy2) {
-		var subdiv1 = 1f / 10/*BEZIER_SEGMENTS*/, subdiv2 = subdiv1 * subdiv1, subdiv3 = subdiv2 * subdiv1;
+		var subdiv1 = 1 / 10/*BEZIER_SEGMENTS*/, subdiv2 = subdiv1 * subdiv1, subdiv3 = subdiv2 * subdiv1;
 		var pre1 = 3 * subdiv1, pre2 = 3 * subdiv2, pre4 = 6 * subdiv2, pre5 = 6 * subdiv3;
 		var tmp1x = -cx1 * 2 + cx2, tmp1y = -cy1 * 2 + cy2, tmp2x = (cx1 - cx2) * 3 + 1, tmp2y = (cy1 - cy2) * 3 + 1;
 		var dfx = cx1 * pre1 + tmp1x * pre2 + tmp2x * subdiv3, dfy = cy1 * pre1 + tmp1y * pre2 + tmp2y * subdiv3;
@@ -313,7 +313,7 @@ spine.Curves.prototype = {
 		var i = frameIndex * 19/*BEZIER_SIZE*/;
 		var curves = this.curves;
 		curves[i++] = 2/*BEZIER*/;
-
+		
 		var x = dfx, y = dfy;
 		for (var n = i + 19/*BEZIER_SIZE*/ - 1; i < n; i += 2) {
 			curves[i] = x;
@@ -329,13 +329,13 @@ spine.Curves.prototype = {
 	getCurvePercent: function (frameIndex, percent) {
 		percent = percent < 0 ? 0 : (percent > 1 ? 1 : percent);
 		var curves = this.curves;
-		var i = frameIndex * 10/*BEZIER_SIZE*/;
+		var i = frameIndex * 19/*BEZIER_SIZE*/;
 		var type = curves[i];
 		if (type == 0/*LINEAR*/) return percent;
 		if (type == 1/*STEPPED*/) return 0;
 		i++;
 		var x = 0;
-		for (var start = i, n = i + 10/*BEZIER_SIZE*/ - 1; i < n; i += 2) {
+		for (var start = i, n = i + 19/*BEZIER_SIZE*/ - 1; i < n; i += 2) {
 			x = curves[i];
 			if (x >= percent) {
 				var prevX, prevY;
@@ -956,7 +956,7 @@ spine.Skeleton.prototype = {
 			var bone = bones[i];
 			var current = bone;
 			do {
-				for (var ii = 0, nn = bones.length; ii < nn; ii++) {
+				for (var ii = 0, nn = ikConstraints.length; ii < nn; ii++) {
 					var ikConstraint = ikConstraints[ii];
 					var parent = ikConstraint.bones[0];
 					var child= ikConstraint.bones[ikConstraint.bones.length - 1];
@@ -1630,24 +1630,26 @@ spine.SkeletonJson.prototype = {
 
 		// IK constraints.
 		var ik = root["ik"];
-		for (var i = 0, n = ik.length; i < n; i++) {
-			var ikMap = ik[i];
-			var ikConstraintData = new spine.IkConstraintData(ikMap["name"]);
+		if (ik) {
+			for (var i = 0, n = ik.length; i < n; i++) {
+				var ikMap = ik[i];
+				var ikConstraintData = new spine.IkConstraintData(ikMap["name"]);
 
-			var bones = ikMap["bones"];
-			for (var ii = 0, nn = bones.length; ii < nn; ii++) {
-				var bone = skeletonData.findBone(bones[ii]);
-				if (!bone) throw "IK bone not found: " + bones[ii];
-				ikConstraintData.bones.push(bone);
+				var bones = ikMap["bones"];
+				for (var ii = 0, nn = bones.length; ii < nn; ii++) {
+					var bone = skeletonData.findBone(bones[ii]);
+					if (!bone) throw "IK bone not found: " + bones[ii];
+					ikConstraintData.bones.push(bone);
+				}
+
+				ikConstraintData.target = skeletonData.findBone(ikMap["target"]);
+				if (!ikConstraintData.target) throw "Target bone not found: " + ikMap["target"];
+
+				ikConstraintData.bendDirection = (!ikMap.hasOwnProperty("bendPositive") || ikMap["bendPositive"]) ? 1 : -1;
+				ikConstraintData.mix = ikMap.hasOwnProperty("mix") ? ikMap["mix"] : 1;
+
+				skeletonData.ikConstraints.push(ikConstraintData);
 			}
-
-			ikConstraintData.target = skeletonData.findBone(ikMap["target"]);
-			if (!ikConstraintData.target) throw "Target bone not found: " + ikMap["target"];
-
-			ikConstraintData.bendDirection = (!ikMap.hasOwnProperty("bendPositive") || ikMap["bendPositive"]) ? 1 : -1;
-			ikConstraintData.mix = ikMap.hasOwnProperty("mix") ? ikMap["mix"] : 1;
-
-			skeletonData.ikConstraints.push(ikConstraintData);
 		}
 
 		// Slots.
@@ -2059,8 +2061,9 @@ spine.SkeletonJson.prototype = {
 	},
 	readCurve: function (timeline, frameIndex, valueMap) {
 		var curve = valueMap["curve"];
-		if (!curve) return;
-		if (curve == "stepped")
+		if (!curve) 
+			timeline.curves.setLinear(frameIndex);
+		else if (curve == "stepped")
 			timeline.curves.setStepped(frameIndex);
 		else if (curve instanceof Array)
 			timeline.curves.setCurve(frameIndex, curve[0], curve[1], curve[2], curve[3]);
