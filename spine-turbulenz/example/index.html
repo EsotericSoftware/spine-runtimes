@@ -44,8 +44,8 @@
 <div id="message"></div>
 <div><canvas id="canvas" width="640" height="480"/></div>
 <br>
-<input type="button" value="Spineboy" onclick="load('spineboy')">
-<input type="button" value="Goblins" onclick="load('goblins')">
+<input type="button" value="Spineboy" onclick="load('spineboy', 0.6)">
+<input type="button" value="Goblins" onclick="load('goblins', 1)">
 &nbsp; &nbsp; &nbsp; Click above to change the animation (Spineboy) or skin (Goblins).
 
 <script>
@@ -54,52 +54,53 @@ var TurbulenzEngine = WebGLTurbulenzEngine.create({canvas: canvas});
 var graphicsDevice = TurbulenzEngine.createGraphicsDevice({});
 var draw2D = Draw2D.create({graphicsDevice: graphicsDevice});
 
-load("spineboy");
-//load("goblins");
-
-var skeletonName;
-function load (name) {
-	skeletonName = name;
-	TurbulenzEngine.request("data/" + skeletonName + ".atlas", loadAtlas);
-}
+load("spineboy", 0.6);
+//load("goblins", 1);
 
 var atlas;
-function loadAtlas (atlasText) {
-	var textureCount = 0;
-	atlas = new spine.Atlas(atlasText, {
-		load: function (page, path, atlas) {
-			textureCount++;
-			graphicsDevice.createTexture({
-				src: "data/" + path,
-				mipmaps: true,
-				onload: function (texture) {
-					page.rendererObject = texture;
-					page.width = texture.width;
-					page.height = texture.height;
-					atlas.updateUVs(page);
-					textureCount--;
-				}
-			});
-		},
-		unload: function (texture) {
-			texture.destroy();
-		}
-	});
-	function waitForTextures () {
-		if (!textureCount)
-			TurbulenzEngine.request("data/" + skeletonName + ".json", loadSkeletonData);
-		else
-			setTimeout(waitForTextures, 100);
-	}
-	waitForTextures();
-}
-
 var skeletonData;
-function loadSkeletonData (skeletonText) {
-	var json = new spine.SkeletonJson(new spine.AtlasAttachmentLoader(atlas));
-	json.scale = 0.6;
-	skeletonData = json.readSkeletonData(JSON.parse(skeletonText));
-	start();
+var skeletonName;
+function load (name, scale) {
+	skeletonName = name;
+	TurbulenzEngine.request("data/" + skeletonName + ".atlas", loadAtlas);
+
+	function loadAtlas (atlasText) {
+		var textureCount = 0;
+		atlas = new spine.Atlas(atlasText, {
+			load: function (page, path, atlas) {
+				textureCount++;
+				graphicsDevice.createTexture({
+					src: "data/" + path,
+					mipmaps: true,
+					onload: function (texture) {
+						page.rendererObject = texture;
+						page.width = texture.width;
+						page.height = texture.height;
+						atlas.updateUVs(page);
+						textureCount--;
+					}
+				});
+			},
+			unload: function (texture) {
+				texture.destroy();
+			}
+		});
+
+		function waitForTextures () {
+			if (!textureCount)
+				TurbulenzEngine.request("data/" + skeletonName + ".json", loadSkeletonData);
+			else
+				setTimeout(waitForTextures, 100);
+		}
+		waitForTextures();
+		
+		function loadSkeletonData (skeletonText) {
+			var json = new spine.SkeletonJson(new spine.AtlasAttachmentLoader(atlas));
+			json.scale = scale;
+			skeletonData = json.readSkeletonData(JSON.parse(skeletonText));
+			start();
+		}
+	}
 }
 
 function start () {
