@@ -221,7 +221,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 					if (duration > animation->duration) animation->duration = duration;
 				} else if (strcmp(timelineArray->name, "flipX") == 0 || strcmp(timelineArray->name, "flipY") == 0) {
 					int x = strcmp(timelineArray->name, "flipX") == 0;
-					char* field = x ? "x" : "y";
+					const char* field = x ? "x" : "y";
 					spFlipTimeline *timeline = spFlipTimeline_create(timelineArray->size, x);
 					timeline->boneIndex = boneIndex;
 					for (frame = timelineArray->child, i = 0; frame; frame = frame->next, ++i)
