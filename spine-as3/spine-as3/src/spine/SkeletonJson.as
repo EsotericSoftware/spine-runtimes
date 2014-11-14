@@ -103,8 +103,8 @@ public class SkeletonJson {
 			boneData.rotation = (boneMap["rotation"] || 0);
 			boneData.scaleX = boneMap.hasOwnProperty("scaleX") ? boneMap["scaleX"] : 1;
 			boneData.scaleY = boneMap.hasOwnProperty("scaleY") ? boneMap["scaleY"] : 1;
-			boneData.flipX = boneMap.hasOwnProperty("flipX") ? boneMap["flipX"] : false;
-			boneData.flipY = boneMap.hasOwnProperty("flipY") ? boneMap["flipY"] : false;
+			boneData.flipX = boneMap["flipX"] || false;
+			boneData.flipY = boneMap["flipY"] || false;
 			boneData.inheritScale = boneMap.hasOwnProperty("inheritScale") ? boneMap["inheritScale"] : true;
 			boneData.inheritRotation = boneMap.hasOwnProperty("inheritRotation") ? boneMap["inheritRotation"] : true;
 			skeletonData.bones[skeletonData.bones.length] = boneData;
@@ -394,7 +394,7 @@ public class SkeletonJson {
 					var field:String = flipX ? "x" : "y";
 					frameIndex = 0;
 					for each (valueMap in values) {
-						flipTimeline.setFrame(frameIndex, valueMap["time"], valueMap.hasOwnProperty(field) ? valueMap[field] : false);
+						flipTimeline.setFrame(frameIndex, valueMap["time"], valueMap[field] || false);
 						frameIndex++;
 					}
 					timelines[timelines.length] = flipTimeline;
