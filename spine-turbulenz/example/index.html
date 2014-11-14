@@ -45,8 +45,9 @@
 <div><canvas id="canvas" width="640" height="480"/></div>
 <br>
 <input type="button" value="Spineboy" onclick="load('spineboy', 0.6)">
+<input type="button" value="Hero" onclick="load('hero', 1)">
 <input type="button" value="Goblins" onclick="load('goblins', 1)">
-&nbsp; &nbsp; &nbsp; Click above to change the animation (Spineboy) or skin (Goblins).
+ &nbsp; &nbsp; Click to change the animation or skin.
 
 <script>
 var canvas = document.getElementById("canvas");
@@ -54,7 +55,8 @@ var TurbulenzEngine = WebGLTurbulenzEngine.create({canvas: canvas});
 var graphicsDevice = TurbulenzEngine.createGraphicsDevice({});
 var draw2D = Draw2D.create({graphicsDevice: graphicsDevice});
 
-load("spineboy", 0.6);
+//load("spineboy", 0.6);
+load("hero", 1);
 //load("goblins", 1);
 
 var atlas;
@@ -123,6 +125,24 @@ function start () {
 		canvas.onmousedown = function () {
 			state.setAnimationByName(0, "jump", false);
 			state.addAnimationByName(0, "run", true, 0);
+		}
+	} else if (skeletonName == "hero") {
+		stateData.defaultMix = 0.2;
+		stateData.setMixByName("Walk", "Attack", 0);
+		stateData.setMixByName("Attack", "Run", 0);
+		stateData.setMixByName("Run", "Attack", 0);
+		state.setAnimationByName(0, "Idle", true);
+
+		canvas.onmousedown = function () {
+			var name = state.getCurrent(0).animation.name;
+			if (name == "Idle") {
+				state.setAnimationByName(0, "Crouch", true);
+			} else if (name == "Crouch") {
+				state.setAnimationByName(0, "Walk", true);
+			} else {
+				state.setAnimationByName(0, "Attack", false);
+				state.addAnimationByName(0, "Run", true, 0);
+			}
 		}
 	} else {
 		skeleton.setSkinByName("goblingirl");
