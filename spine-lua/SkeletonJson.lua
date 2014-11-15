@@ -86,6 +86,8 @@ function SkeletonJson.new (attachmentLoader)
 			else
 				boneData.scaleY = 1
 			end
+			boneData.flipX = boneMap["flipX"] or false
+			boneData.flipY = boneMap["flipY"] or false
 			if boneMap["inheritScale"] == false then
 				boneData.inheritScale = false
 			else
@@ -370,6 +372,27 @@ function SkeletonJson.new (attachmentLoader)
 							local y = (valueMap["y"] or 0) * timelineScale
 							timeline:setFrame(frameIndex, valueMap["time"], x, y)
 							readCurve(timeline, frameIndex, valueMap)
+							frameIndex = frameIndex + 1
+						end
+						table.insert(timelines, timeline)
+						duration = math.max(duration, timeline:getDuration())
+
+					elseif timelineName == "flipX" or timelineName == "flipY" then
+						local x = timelineName == "flipX"
+						local timeline, field
+						if x then
+							timeline = Animation.FlipXTimeline.new()
+							field = "x"
+						else
+							timeline = Animation.FlipYTimeline.new();
+							field = "y"
+						end
+						timeline.boneIndex = boneIndex
+
+						local frameIndex = 0
+						for i,valueMap in ipairs(values) do
+							local flip
+							timeline:setFrame(frameIndex, valueMap["time"], valueMap[field] or false)
 							frameIndex = frameIndex + 1
 						end
 						table.insert(timelines, timeline)

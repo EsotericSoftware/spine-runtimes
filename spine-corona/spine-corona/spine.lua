@@ -128,10 +128,11 @@ function spine.Skeleton.new (skeletonData, group)
 				end
 				-- Position image based on attachment and bone.
 				if image ~= spine.Skeleton.failed then
-					local flipX, flipY = ((self.flipX and -1) or 1), ((self.flipY and -1) or 1)
+					local bone = slot.bone
+					local flipX, flipY = ((bone.worldFlipX and -1) or 1), ((bone.worldFlipY and -1) or 1)
 
-					local x = slot.bone.worldX + attachment.x * slot.bone.m00 + attachment.y * slot.bone.m01
-					local y = -(slot.bone.worldY + attachment.x * slot.bone.m10 + attachment.y * slot.bone.m11)
+					local x = bone.worldX + attachment.x * bone.m00 + attachment.y * bone.m01
+					local y = -(bone.worldY + attachment.x * bone.m10 + attachment.y * bone.m11)
 					if not image.lastX then
 						image.x, image.y = x, y
 						image.lastX, image.lastY = x, y
@@ -145,16 +146,16 @@ function spine.Skeleton.new (skeletonData, group)
 					-- Fix scaling when attachment is rotated 90 or -90.
 					local rotation = math.abs(attachment.rotation) % 180
 					if (rotation == 90) then
-						xScale = xScale * slot.bone.worldScaleY
-						yScale = yScale * slot.bone.worldScaleX
+						xScale = xScale * bone.worldScaleY
+						yScale = yScale * bone.worldScaleX
 					else
-						xScale = xScale * slot.bone.worldScaleX
-						yScale = yScale * slot.bone.worldScaleY
+						xScale = xScale * bone.worldScaleX
+						yScale = yScale * bone.worldScaleY
 						if rotation ~= 0 and xScale ~= yScale and not image.rotationWarning then
 							image.rotationWarning = true
 							print("WARNING: Non-uniform bone scaling with attachments not rotated to\n"
 								.."         cardinal angles will not work as expected with Corona.\n"
-								.."         Bone: "..slot.bone.data.name..", slot: "..slot.data.name..", attachment: "..attachment.name)
+								.."         Bone: "..bone.data.name..", slot: "..slot.data.name..", attachment: "..attachment.name)
 						end
 					end
 					if not image.lastScaleX then
@@ -165,7 +166,7 @@ function spine.Skeleton.new (skeletonData, group)
 						image.lastScaleX, image.lastScaleY = xScale, yScale
 					end
 
-					rotation = -(slot.bone.worldRotation + attachment.rotation) * flipX * flipY
+					rotation = -(bone.worldRotation + attachment.rotation) * flipX * flipY
 					if not image.lastRotation then
 						image.rotation = rotation
 						image.lastRotation = rotation
@@ -199,13 +200,13 @@ function spine.Skeleton.new (skeletonData, group)
 				bone.line.x = bone.worldX
 				bone.line.y = -bone.worldY
 				bone.line.rotation = -bone.worldRotation
-				if self.flipX then
+				if bone.worldFlipX then
 					bone.line.xScale = -1
 					bone.line.rotation = -bone.line.rotation
 				else
 					bone.line.xScale = 1
 				end
-				if self.flipY then
+				if bone.worldFlipY then
 					bone.line.yScale = -1
 					bone.line.rotation = -bone.line.rotation
 				else

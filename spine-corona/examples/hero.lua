@@ -1,19 +1,17 @@
 
--- This is a more complex animation that has a number of image changes.
--- Note the exported dragon project was modified to not use non-uniform scaling.
+-- This skeleton uses IK for the feet.
 
 local spine = require "spine-corona.spine"
 
 local json = spine.SkeletonJson.new()
-json.scale = 0.47
-local skeletonData = json:readSkeletonDataFile("examples/dragon/dragon.json")
+local skeletonData = json:readSkeletonDataFile("examples/hero/hero.json")
 
 local skeleton = spine.Skeleton.new(skeletonData)
 function skeleton:createImage (attachment)
-	return display.newImage("examples/dragon/images/" .. attachment.name .. ".png")
+	return display.newImage("examples/hero/images/" .. attachment.name .. ".png")
 end
-skeleton.group.x = 165
-skeleton.group.y = 225
+skeleton.group.x = 195
+skeleton.group.y = 385
 skeleton.flipX = false
 skeleton.flipY = false
 skeleton.debug = true -- Omit or set to false to not draw debug lines on top of the images.
@@ -23,7 +21,8 @@ skeleton:setToSetupPose()
 local stateData = spine.AnimationStateData.new(skeletonData)
 -- AnimationState has a queue of animations and can apply them with crossfading.
 local state = spine.AnimationState.new(stateData)
-state:setAnimationByName(0, "flying", true, 0)
+--state:setAnimationByName(0, "Idle", true, 0)
+state:setAnimationByName(0, "Walk", true, 0)
 
 local lastTime = 0
 local animationTime = 0

@@ -51,7 +51,7 @@ function Skeleton.new (skeletonData)
 
 	function self:updateWorldTransform ()
 		for i,bone in ipairs(self.bones) do
-			bone:updateWorldTransform(self.flipX, self.flipY)
+			bone:updateWorldTransform()
 		end
 	end
 
@@ -165,12 +165,12 @@ function Skeleton.new (skeletonData)
 	for i,boneData in ipairs(skeletonData.bones) do
 		local parent
 		if boneData.parent then parent = self.bones[spine.utils.indexOf(skeletonData.bones, boneData.parent)] end
-		table.insert(self.bones, Bone.new(boneData, parent))
+		table.insert(self.bones, Bone.new(boneData, self, parent))
 	end
 
 	for i,slotData in ipairs(skeletonData.slots) do
 		local bone = self.bones[spine.utils.indexOf(skeletonData.bones, slotData.boneData)]
-		local slot = Slot.new(slotData, self, bone)
+		local slot = Slot.new(slotData, bone)
 		table.insert(self.slots, slot)
 		self.slotsByName[slot.data.name] = slot
 		table.insert(self.drawOrder, slot)

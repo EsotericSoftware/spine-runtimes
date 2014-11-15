@@ -30,19 +30,23 @@
 
 local Bone = {}
 
-function Bone.new (data, parent)
+function Bone.new (data, skeleton, parent)
 	if not data then error("data cannot be nil", 2) end
-	
+	if not skeleton then error("skeleton cannot be nil", 2) end
+
 	local self = {
 		data = data,
+		skeleton = skeleton,
 		parent = parent,
 		x = 0, y = 0,
 		rotation = 0,
 		scaleX = 1, scaleY = 1,
+		flipX = false, flipY = false,
 		m00 = 0, m01 = 0, worldX = 0, -- a b x
 		m10 = 0, m11 = 0, worldY = 0, -- c d y
 		worldRotation = 0,
 		worldScaleX = 1, worldScaleY = 1,
+		worldFlipX = false, worldFlipY = false,
 	}
 
 	function self:updateWorldTransform (flipX, flipY)
@@ -62,13 +66,16 @@ function Bone.new (data, parent)
 			else
 				 self.worldRotation = self.rotation
 			end
+			self.worldFlipX = parent.worldFlipX ~= self.flipX
+			self.worldFlipY = parent.worldFlipY ~= self.flipY
 		else
-			if flipX then
+			local skeletonFlipX, skeletonFlipY = self.skeleton.flipX, self.skeleton.flipY
+			if skeletonFlipX then
 				self.worldX = -self.x
 			else
 				self.worldX = self.x
 			end
-			if flipY then
+			if skeletonFlipY then
 				self.worldY = -self.y
 			else
 				self.worldY = self.y
@@ -76,21 +83,25 @@ function Bone.new (data, parent)
 			self.worldScaleX = self.scaleX
 			self.worldScaleY = self.scaleY
 			self.worldRotation = self.rotation
+			self.worldFlipX = skeletonFlipX ~= self.flipX
+			self.worldFlipY = skeletonFlipY ~= self.flipY
 		end
 		local radians = math.rad(self.worldRotation)
 		local cos = math.cos(radians)
 		local sin = math.sin(radians)
-		self.m00 = cos * self.worldScaleX
-		self.m10 = sin * self.worldScaleX
-		self.m01 = -sin * self.worldScaleY
-		self.m11 = cos * self.worldScaleY
-		if flipX then
-			self.m00 = -self.m00
-			self.m01 = -self.m01
+		if self.worldFlipX then
+			self.m00 = -cos * self.worldScaleX
+			self.m01 = sin * self.worldScaleY
+		else
+			self.m00 = cos * self.worldScaleX
+			self.m01 = -sin * self.worldScaleY
 		end
-		if flipY then
-			self.m10 = -self.m10
-			self.m11 = -self.m11
+		if self.worldFlipY then
+			self.m10 = -sin * self.worldScaleX
+			self.m11 = -cos * self.worldScaleY
+		else
+			self.m10 = sin * self.worldScaleX
+			self.m11 = cos * self.worldScaleY
 		end
 	end
 
@@ -101,6 +112,8 @@ function Bone.new (data, parent)
 		self.rotation = data.rotation
 		self.scaleX = data.scaleX
 		self.scaleY = data.scaleY
+		self.flipX = data.flipX
+		self.flipY = data.flipY
 	end
 
 	self:setToSetupPose()

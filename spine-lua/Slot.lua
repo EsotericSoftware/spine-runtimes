@@ -29,19 +29,18 @@
 -------------------------------------------------------------------------------
 
 local Slot = {}
-function Slot.new (slotData, skeleton, bone)
+function Slot.new (slotData, bone)
 	if not slotData then error("slotData cannot be nil", 2) end
-	if not skeleton then error("skeleton cannot be nil", 2) end
 	if not bone then error("bone cannot be nil", 2) end
 
 	local self = {
 		data = slotData,
-		skeleton = skeleton,
 		bone = bone,
 		r = 1, g = 1, b = 1, a = 1,
 		attachment = nil,
 		attachmentTime = 0,
-		attachmentVertices = nil
+		attachmentVertices = nil,
+		attachmentVerticesCount = 0
 	}
 
 	function self:setColor (r, g, b, a)
@@ -53,15 +52,16 @@ function Slot.new (slotData, skeleton, bone)
 
 	function self:setAttachment (attachment)
 		self.attachment = attachment
-		self.attachmentTime = self.skeleton.time
+		self.attachmentTime = self.bone.skeleton.time
+		self.attachmentVerticesCount = 0
 	end
 
 	function self:setAttachmentTime (time)
-		self.attachmentTime = self.skeleton.time - time
+		self.attachmentTime = self.bone.skeleton.time - time
 	end
 
 	function self:getAttachmentTime ()
-		return self.skeleton.time - self.attachmentTime
+		return self.bone.skeleton.time - self.attachmentTime
 	end
 
 	function self:setToSetupPose ()
@@ -71,7 +71,7 @@ function Slot.new (slotData, skeleton, bone)
 
 		local attachment
 		if data.attachmentName then 
-			attachment = self.skeleton:getAttachment(data.name, data.attachmentName)
+			attachment = self.bone.skeleton:getAttachment(data.name, data.attachmentName)
 		end
 		self:setAttachment(attachment)
 	end

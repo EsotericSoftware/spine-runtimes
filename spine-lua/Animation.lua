@@ -83,6 +83,22 @@ local function binarySearch (values, target, step)
 	end
 end
 
+local function binarySearch1 (values, target)
+	local low = 0
+	local high = math.floor(#values - 1)
+	if high == 0 then return 1 end
+	local current = math.floor(high / 2)
+	while true do
+		if values[current + 1] <= target then
+			low = current + 1
+		else
+			high = current
+		end
+		if low == high then return low + 1 end
+		current = math.floor((low + high) / 2)
+	end
+end
+
 local function linearSearch (values, target, step)
 	for i = 0, #values, step do
 		if (values[i] > target) then return i end
@@ -419,7 +435,7 @@ function Animation.AttachmentTimeline.new ()
 		if time >= frames[#frames] then -- Time is after last frame.
 			frameIndex = #frames
 		else
-			frameIndex = binarySearch(frames, time, 1) - 1
+			frameIndex = binarySearch1(frames, time) - 1
 		end
 
 		local attachmentName = self.attachmentNames[frameIndex]
@@ -477,7 +493,7 @@ function Animation.EventTimeline.new ()
 		if lastTime < frames[0] then
 			frameIndex = 0
 		else
-			frameIndex = binarySearch(frames, lastTime, 1)
+			frameIndex = binarySearch1(frames, lastTime)
 			local frame = frames[frameIndex]
 			while frameIndex > 0 do -- Fire multiple events with the same frame.
 				if frames[frameIndex - 1] ~= frame then break end
@@ -522,7 +538,7 @@ function Animation.DrawOrderTimeline.new ()
 		if time >= frames[#frames] then -- Time is after last frame.
 			frameIndex = #frames
 		else
-			frameIndex = binarySearch(frames, time, 1) - 1
+			frameIndex = binarySearch1(frames, time) - 1
 		end
 
 		local drawOrder = skeleton.drawOrder
@@ -537,6 +553,149 @@ function Animation.DrawOrderTimeline.new ()
 				drawOrder[i] = skeleton.slots[setupIndex]
 			end
 		end
+	end
+
+	return self
+end
+
+Animation.FfdTimeline = {}
+function Animation.FfdTimeline.new ()
+	local self = Animation.CurveTimeline.new()
+	self.frames = {}
+	self.frameVertices = {}
+	self.slotIndex = -1
+
+	function self:getDuration ()
+		return self.frames[#self.frames]
+	end
+
+	function self:getFrameCount ()
+		return #self.frames + 1
+	end
+
+	function self:setFrame (frameIndex, time, vertices)
+		self.frames[frameIndex] = time
+		self.frameVertices[frameIndex] = vertices
+	end
+
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
+		local slot = skeleton.slots[self.slotIndex]
+		if slot.attachment ~= attachment then return end
+
+		local frames = self.frames
+		if time < frames[0] then -- Time is before first frame.
+			slot.attachmentVerticesCount = 0
+			return
+		end 
+		
+		local frameVertices = self.frameVertices
+		local vertexCount = #frameVertices[0]
+		local vertices = slot.attachmentVertices
+		if #vertices < vertexCount then
+			vertices = {}
+			vertices[vertexCount] = 0
+			slot.attachmentVertices = vertices
+		elseif #vertices < vertexCount then
+			alpha = 1 -- Don't mix from uninitialized slot vertices.
+		end
+		slot.attachmentVerticesCount = vertexCount
+
+		if time >= frames[#frames] then -- Time is after last frame.
+			local lastVertices = frameVertices[#frames.Length]
+			if alpha < 1 then
+				for i = 0, vertexCount do
+					local vertex = vertices[i]
+					vertices[i] = vertex + (lastVertices[i] - vertex) * alpha
+				end
+			else
+				for i = 0, vertexCount do
+					vertices[i] = lastVertices[i]
+				end
+			end
+			return
+		end
+
+		-- Interpolate between the previous frame and the current frame.
+		local frameIndex = binarySearch1(frames, time)
+		local frameTime = frames[frameIndex]
+		local percent = 1 - (time - frameTime) / (frames[frameIndex - 1] - frameTime)
+		if percent < 0 then percent = 0 elseif percent > 1 then percent = 1 end
+		percent = self:getCurvePercent(frameIndex - 1, percent)
+
+		local prevVertices = frameVertices[frameIndex - 1]
+		local nextVertices = frameVertices[frameIndex]
+
+		if alpha < 1 then
+			for i = 0, vertexCount do
+				local prev = prevVertices[i]
+				local vertices = vertices[i]
+				vertices[i] = vertices + (prev + (nextVertices[i] - prev) * percent - vertices) * alpha
+			end
+		else
+			for i = 0, vertexCount do
+				local prev = prevVertices[i]
+				vertices[i] = prev + (nextVertices[i] - prev) * percent
+			end
+		end
+	end
+
+	return self
+end
+
+Animation.FlipXTimeline = {}
+function Animation.FlipXTimeline.new ()
+	local self = {
+		frames = {}, -- time, flip, ...
+		boneIndex = -1
+	}
+
+	function self:getDuration ()
+		return self.frames[#self.frames - 1]
+	end
+
+	function self:getFrameCount ()
+		return (#self.frames + 1) / 2
+	end
+
+	function self:setFrame (frameIndex, time, flip)
+		frameIndex = frameIndex * 2
+		self.frames[frameIndex] = time
+		self.frames[frameIndex + 1] = flip
+	end
+
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
+		local frames = self.frames
+		if time < frames[0] then
+			if lastTime > time then self:apply(skeleton, lastTime, 999999, null, 0) end
+			return
+		elseif lastTime > time then
+			lastTime = -1
+		end
+
+		local frameIndex
+		if time >= frames[#frames - 1] then
+			frameIndex = #frames - 1
+		else
+			frameIndex = binarySearch(frames, time, 2) - 2
+		end
+		if frames[frameIndex] < lastTime then return end
+
+		self:setFlip(skeleton.bones[self.boneIndex], frames[frameIndex + 1])
+	end
+	
+	function self:setFlip (bone, flip)
+		bone.flipX = flip
+	end
+
+	return self
+end
+
+Animation.FlipYTimeline = {}
+function Animation.FlipYTimeline.new ()
+	local self = Animation.FlipXTimeline.new()
+
+	function self:setFlip (bone, flip)
+		bone.flipY = flip
 	end
 
 	return self
