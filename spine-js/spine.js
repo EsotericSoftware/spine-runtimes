@@ -774,10 +774,7 @@ spine.FfdTimeline.prototype = {
 		if (slot.attachment != attachment) return;
 
 		var frames = this.frames;
-		if (time < frames[0]) {
-			slot.attachmentVertices.length = 0;
-			return; // Time is before first frame.
-		}
+		if (time < frames[0]) return; // Time is before first frame.
 
 		var frameVertices = this.frameVertices;
 		var vertexCount = frameVertices[0].length;

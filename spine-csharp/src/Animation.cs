@@ -571,10 +571,7 @@ namespace Spine {
 			if (slot.attachment != attachment) return;
 
 			float[] frames = this.frames;
-			if (time < frames[0]) {
-				slot.attachmentVerticesCount = 0;
-				return; // Time is before first frame.
-			}
+			if (time < frames[0]) return; // Time is before first frame.
 
 			float[][] frameVertices = this.frameVertices;
 			int vertexCount = frameVertices[0].Length;
