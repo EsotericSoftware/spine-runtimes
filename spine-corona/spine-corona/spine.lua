@@ -51,6 +51,8 @@ spine.EventData = require "spine-lua.EventData"
 spine.Event = require "spine-lua.Event"
 spine.SkeletonBounds = require "spine-lua.SkeletonBounds"
 
+spine.Bone.yDown = true
+
 spine.utils.readFile = function (fileName, base)
 	if not base then base = system.ResourceDirectory end
 	local path = system.pathForFile(fileName, base)
@@ -131,7 +133,7 @@ function spine.Skeleton.new (skeletonData, group)
 					local flipX, flipY = ((self.flipX and -1) or 1), ((self.flipY and -1) or 1)
 
 					local x = slot.bone.worldX + attachment.x * slot.bone.m00 + attachment.y * slot.bone.m01
-					local y = -(slot.bone.worldY + attachment.x * slot.bone.m10 + attachment.y * slot.bone.m11)
+					local y = slot.bone.worldY + attachment.x * slot.bone.m10 + attachment.y * slot.bone.m11
 					if not image.lastX then
 						image.x, image.y = x, y
 						image.lastX, image.lastY = x, y
@@ -197,7 +199,7 @@ function spine.Skeleton.new (skeletonData, group)
 					bone.line:setStrokeColor(1, 0, 0)
 				end
 				bone.line.x = bone.worldX
-				bone.line.y = -bone.worldY
+				bone.line.y = bone.worldY
 				bone.line.rotation = -bone.worldRotation
 				if self.flipX then
 					bone.line.xScale = -1
@@ -218,7 +220,7 @@ function spine.Skeleton.new (skeletonData, group)
 					bone.circle:setFillColor(0, 1, 0)
 				end
 				bone.circle.x = bone.worldX
-				bone.circle.y = -bone.worldY
+				bone.circle.y = bone.worldY
 				self.group:insert(bone.circle)
 			end
 		end
@@ -235,7 +237,7 @@ function spine.Skeleton.new (skeletonData, group)
 			local width = self.bounds:getWidth()
 			local height = self.bounds:getHeight()
 			self.boundsRect.x = self.bounds.minX + width / 2
-			self.boundsRect.y = -self.bounds.minY - height / 2
+			self.boundsRect.y = self.bounds.minY + height / 2
 			self.boundsRect.width = width
 			self.boundsRect.height = height
 			self.group:insert(self.boundsRect)
