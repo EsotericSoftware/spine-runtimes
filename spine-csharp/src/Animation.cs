@@ -580,18 +580,20 @@ namespace Spine {
 			int vertexCount = frameVertices[0].Length;
 
 			float[] vertices = slot.attachmentVertices;
-			if (vertices.Length != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
 			if (vertices.Length < vertexCount) {
 				vertices = new float[vertexCount];
 				slot.attachmentVertices = vertices;
-			}
+			} else if (vertices.Length > vertexCount)
+				alpha = 1; // Don't mix from uninitialized slot vertices.
 			slot.attachmentVerticesCount = vertexCount;
 
 			if (time >= frames[frames.Length - 1]) { // Time is after last frame.
 				float[] lastVertices = frameVertices[frames.Length - 1];
 				if (alpha < 1) {
-					for (int i = 0; i < vertexCount; i++)
-						vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
+					for (int i = 0; i < vertexCount; i++) {
+						float vertex = vertices[i];
+						vertices[i] = vertex + (lastVertices[i] - vertex) * alpha;
+					}
 				} else
 					Array.Copy(lastVertices, 0, vertices, 0, vertexCount);
 				return;
@@ -609,7 +611,8 @@ namespace Spine {
 			if (alpha < 1) {
 				for (int i = 0; i < vertexCount; i++) {
 					float prev = prevVertices[i];
-					vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
+					float vertex = vertices[i];
+					vertices[i] = vertex + (prev + (nextVertices[i] - prev) * percent - vertex) * alpha;
 				}
 			} else {
 				for (int i = 0; i < vertexCount; i++) {
