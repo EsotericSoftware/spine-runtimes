@@ -443,7 +443,7 @@ namespace Spine {
 			} else if (lastTime > time) //
 				lastTime = -1;
 
-			int frameIndex = time >= frames[frames.Length - 1] ? frames.Length - 1 : Animation.binarySearch(frames, time) - 1;
+			int frameIndex = (time >= frames[frames.Length - 1] ? frames.Length : Animation.binarySearch(frames, time)) - 1;
 			if (frames[frameIndex] < lastTime) return;
 
 			String attachmentName = attachmentNames[frameIndex];

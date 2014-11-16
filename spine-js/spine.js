@@ -147,8 +147,8 @@ spine.Bone.prototype = {
 			m11 = -m11;
 		}
 		var invDet = 1 / (m00 * m11 - m01 * m10);
-		world[0] = (dx * m00 * invDet - dy * m01 * invDet);
-		world[1] = (dy * m11 * invDet - dx * m10 * invDet);
+		world[0] = dx * m00 * invDet - dy * m01 * invDet;
+		world[1] = dy * m11 * invDet - dx * m10 * invDet;
 	},
 	localToWorld: function (local) {
 		var localX = local[0], localY = local[1];

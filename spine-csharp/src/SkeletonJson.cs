@@ -98,7 +98,7 @@ namespace Spine {
 				skeletonData.width = GetFloat(skeletonMap, "width", 0);
 				skeletonData.height = GetFloat(skeletonMap, "height", 0);
 			}
-			
+
 			// Bones.
 			foreach (Dictionary<String, Object> boneMap in (List<Object>)root["bones"]) {
 				BoneData parent = null;
