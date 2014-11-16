@@ -39,7 +39,7 @@ function Bone.new (data, skeleton, parent)
 		skeleton = skeleton,
 		parent = parent,
 		x = 0, y = 0,
-		rotation = 0,
+		rotation = 0, rotationIK = 0,
 		scaleX = 1, scaleY = 1,
 		flipX = false, flipY = false,
 		m00 = 0, m01 = 0, worldX = 0, -- a b x
@@ -62,9 +62,9 @@ function Bone.new (data, skeleton, parent)
 				 self.worldScaleY = self.scaleY
 			end
 			if (self.data.inheritRotation) then
-				 self.worldRotation = parent.worldRotation + self.rotation
+				 self.worldRotation = parent.worldRotation + self.rotationIK
 			else
-				 self.worldRotation = self.rotation
+				 self.worldRotation = self.rotationIK
 			end
 			self.worldFlipX = parent.worldFlipX ~= self.flipX
 			self.worldFlipY = parent.worldFlipY ~= self.flipY
@@ -82,7 +82,7 @@ function Bone.new (data, skeleton, parent)
 			end
 			self.worldScaleX = self.scaleX
 			self.worldScaleY = self.scaleY
-			self.worldRotation = self.rotation
+			self.worldRotation = self.rotationIK
 			self.worldFlipX = skeletonFlipX ~= self.flipX
 			self.worldFlipY = skeletonFlipY ~= self.flipY
 		end
@@ -110,10 +110,34 @@ function Bone.new (data, skeleton, parent)
 		self.x = data.x
 		self.y = data.y
 		self.rotation = data.rotation
+		self.rotationIK = self.rotation
 		self.scaleX = data.scaleX
 		self.scaleY = data.scaleY
 		self.flipX = data.flipX
 		self.flipY = data.flipY
+	end
+
+	function self:worldToLocal (worldCoords)
+		local dx = worldCoords[1] - self.worldX
+		local dy = worldCoords[2] - self.worldY
+		local m00 = self.m00
+		local m10 = self.m10
+		local m01 = self.m01
+		local m11 = self.m11
+		if self.worldFlipX ~= self.worldFlipY then
+			m00 = -m00
+			m11 = -m11
+		end
+		local invDet = 1 / (m00 * m11 - m01 * m10)
+		worldCoords[1] = dx * m00 * invDet - dy * m01 * invDet
+		worldCoords[2] = dy * m11 * invDet - dx * m10 * invDet
+	end
+
+	function self:localToWorld (localCoords)
+		local localX = localCoords[1]
+		local localY = localCoords[2]
+		localCoords[1] = localX * self.m00 + localY * self.m01 + self.worldX
+		localCoords[2] = localX * self.m10 + localY * self.m11 + self.worldY
 	end
 
 	self:setToSetupPose()

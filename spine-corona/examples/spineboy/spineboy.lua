@@ -4,7 +4,7 @@
 local spine = require "spine-corona.spine"
 
 local json = spine.SkeletonJson.new()
-json.scale = 1
+json.scale = 0.6
 local skeletonData = json:readSkeletonDataFile("examples/spineboy/spineboy.json")
 
 local skeleton = spine.Skeleton.new(skeletonData)
@@ -25,13 +25,14 @@ local bounds = spine.SkeletonBounds.new()
 -- AnimationStateData defines crossfade durations between animations.
 local stateData = spine.AnimationStateData.new(skeletonData)
 stateData:setMix("walk", "jump", 0.2)
-stateData:setMix("jump", "walk", 0.4)
+stateData:setMix("jump", "run", 0.2)
 
 -- AnimationState has a queue of animations and can apply them with crossfading.
 local state = spine.AnimationState.new(stateData)
-state:setAnimationByName(0, "drawOrder")
-state:addAnimationByName(0, "jump", false, 0)
-state:addAnimationByName(0, "walk", true, 0)
+-- state:setAnimationByName(0, "test")
+state:setAnimationByName(0, "walk", true)
+state:addAnimationByName(0, "jump", false, 3)
+state:addAnimationByName(0, "run", true, 0)
 
 state.onStart = function (trackIndex)
 	print(trackIndex.." start: "..state:getCurrent(trackIndex).animation.name)
