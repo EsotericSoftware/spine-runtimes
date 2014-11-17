@@ -230,9 +230,9 @@ namespace Spine {
 			SetSkin(skin);
 		}
 
-		/// <summary>Sets the skin used to look up attachments not found in the {@link SkeletonData#getDefaultSkin() default skin}. Attachments
-		/// from the new skin are attached if the corresponding attachment from the old skin was attached. If there was no old skin, each slot's
-		/// setup mode attachment is attached from the new skin.</summary>
+		/// <summary>Sets the skin used to look up attachments before looking in the {@link SkeletonData#getDefaultSkin() default 
+		/// skin}. Attachmentsfrom the new skin are attached if the corresponding attachment from the old skin was attached. If 
+		/// there was no old skin, each slot's setup mode attachment is attached from the new skin.</summary>
 		/// <param name="newSkin">May be null.</param>
 		public void SetSkin (Skin newSkin) {
 			if (newSkin != null) {

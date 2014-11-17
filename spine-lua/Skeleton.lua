@@ -151,6 +151,9 @@ function Skeleton.new (skeletonData)
 		return self.slotsByName[slotName]
 	end
 
+	-- Sets the skin used to look up attachments before looking in the {@link SkeletonData#getDefaultSkin() default skin}. 
+	-- Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was 
+	-- no old skin, each slot's setup mode attachment is attached from the new skin.
 	function self:setSkin (skinName)
 		local newSkin
 		if skinName then
