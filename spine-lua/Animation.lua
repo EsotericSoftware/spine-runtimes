@@ -691,7 +691,7 @@ function Animation.IkConstraintTimeline.new ()
 		local frames = self.frames
 		if time < frames[0] then return end -- Time is before first frame.
 
-		local ikConstraint = skeleton.ikConstraints[ikConstraintIndex]
+		local ikConstraint = skeleton.ikConstraints[self.ikConstraintIndex]
 
 		if time >= frames[#frames - 2] then -- Time is after last frame.
 			ikConstraint.mix = ikConstraint.mix + (frames[#frames - 1] - ikConstraint.mix) * alpha

@@ -440,8 +440,8 @@ function SkeletonJson.new (attachmentLoader)
 		local ik = map["ik"]
 		if ik then
 			for ikConstraintName,values in pairs(ik) do
-				local ikConstraint = skeletonData.findIkConstraint(ikConstraintName)
-				local timeline = IkConstraintTimeline.new()
+				local ikConstraint = skeletonData:findIkConstraint(ikConstraintName)
+				local timeline = Animation.IkConstraintTimeline.new()
 				for i,other in pairs(skeletonData.ikConstraints) do
 					if other == ikConstraint then
 						timeline.ikConstraintIndex = i
