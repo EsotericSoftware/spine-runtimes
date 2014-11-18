@@ -805,9 +805,9 @@ void _spFlipTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, fl
 	if (self->frames[frameIndex] < lastTime) return;
 
 	if (self->x)
-		skeleton->bones[self->boneIndex]->flipX = self->frames[frameIndex + 1];
+		skeleton->bones[self->boneIndex]->flipX = (int)self->frames[frameIndex + 1];
 	else
-		skeleton->bones[self->boneIndex]->flipY = self->frames[frameIndex + 1];
+		skeleton->bones[self->boneIndex]->flipY = (int)self->frames[frameIndex + 1];
 }
 
 void _spFlipTimeline_dispose (spTimeline* timeline) {
@@ -829,7 +829,7 @@ spFlipTimeline* spFlipTimeline_create (int framesCount, int/*bool*/x) {
 void spFlipTimeline_setFrame (spFlipTimeline* self, int frameIndex, float time, int/*bool*/flip) {
 	frameIndex <<= 1;
 	self->frames[frameIndex] = time;
-	self->frames[frameIndex + 1] = flip;
+	self->frames[frameIndex + 1] = (float)flip;
 }
 
 /**/
