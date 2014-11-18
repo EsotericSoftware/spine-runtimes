@@ -31,6 +31,7 @@
 #include <spine/Animation.h>
 #include <spine/IkConstraint.h>
 #include <limits.h>
+#include <float.h>
 #include <spine/extension.h>
 
 spAnimation* spAnimation_create (const char* name, int timelinesCount) {
@@ -479,7 +480,7 @@ void _spAttachmentTimeline_apply (const spTimeline* timeline, spSkeleton* skelet
 
 	frameIndex = time >= self->frames[self->framesCount - 1] ?
 		self->framesCount - 1 : binarySearch1(self->frames, self->framesCount, time) - 1;
-	if (self->frames[frameIndex] <= lastTime) return;
+	if (self->frames[frameIndex] <= lastTime && 1 - alpha <= FLT_EPSILON) return;
 
 	attachmentName = self->attachmentNames[frameIndex];
 	spSlot_setAttachment(skeleton->slots[self->slotIndex],
