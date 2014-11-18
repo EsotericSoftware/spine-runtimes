@@ -40,8 +40,7 @@
 extern "C" {
 #endif
 
-typedef struct spSkeleton spSkeleton;
-struct spSkeleton {
+typedef struct spSkeleton {
 	spSkeletonData* const data;
 
 	int bonesCount;
@@ -60,7 +59,7 @@ struct spSkeleton {
 	float time;
 	int/*bool*/flipX, flipY;
 	float x, y;
-};
+} spSkeleton;
 
 spSkeleton* spSkeleton_create (spSkeletonData* data);
 void spSkeleton_dispose (spSkeleton* self);
