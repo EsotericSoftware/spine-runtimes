@@ -136,7 +136,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	_skeleton->r = nodeColor.red;
 	_skeleton->g = nodeColor.green;
 	_skeleton->b = nodeColor.blue;
-	_skeleton->a = self.opacity;
+	_skeleton->a = self.displayedOpacity;
 
 	int additive = -1;
 	const float* uvs = 0;
