@@ -31,7 +31,9 @@
 var spine = {
 	radDeg: 180 / Math.PI,
 	degRad: Math.PI / 180,
-	temp: []
+	temp: [],
+    Float32Array: (typeof(Float32Array) === 'undefined') ? Array : Float32Array,
+    Uint16Array: (typeof(Uint16Array) === 'undefined') ? Array : Uint16Array
 };
 
 spine.BoneData = function (name, parent) {
@@ -2183,8 +2185,7 @@ spine.SkeletonJson.prototype = {
 	},
 	getFloatArray: function (map, name, scale) {
 		var list = map[name];
-		var values = [];
-		values = list.length;
+		var values = new spine.Float32Array(list.length);
 		var i = 0, n = list.length;
 		if (scale == 1) {
 			for (; i < n; i++)
@@ -2197,8 +2198,7 @@ spine.SkeletonJson.prototype = {
 	},
 	getIntArray: function (map, name) {
 		var list = map[name];
-		var values = [];
-		values = list.length;
+		var values = new spine.Uint16Array(list.length);
 		for (var i = 0, n = list.length; i < n; i++)
 			values[i] = list[i] | 0;
 		return values;
