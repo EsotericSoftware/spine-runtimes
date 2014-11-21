@@ -1335,21 +1335,20 @@ spine.MeshAttachment.prototype = {
 	edges: null,
 	width: 0, height: 0,
 	updateUVs: function () {
-		var width = regionU2 - regionU, height = regionV2 - regionV;
-		var n = regionUVs.length;
-		if (!uvs || uvs.length != n) {
-			uvs = [];
-			uvs.length = n;
+		var width = this.regionU2 - this.regionU, height = this.regionV2 - this.regionV;
+		var n = this.regionUVs.length;
+		if (!this.uvs || this.uvs.length != n) {
+            this.uvs = new spine.Float32Array(n);
 		}
-		if (regionRotate) {
+		if (this.regionRotate) {
 			for (var i = 0; i < n; i += 2) {
-				uvs[i] = regionU + regionUVs[i + 1] * width;
-				uvs[i + 1] = regionV + height - regionUVs[i] * height;
+                this.uvs[i] = this.regionU + this.regionUVs[i + 1] * width;
+                this.uvs[i + 1] = this.regionV + height - this.regionUVs[i] * height;
 			}
 		} else {
 			for (var i = 0; i < n; i += 2) {
-				uvs[i] = regionU + regionUVs[i] * width;
-				uvs[i + 1] = regionV + regionUVs[i + 1] * height;
+                this.uvs[i] = this.regionU + this.regionUVs[i] * width;
+                this.uvs[i + 1] = this.regionV + this.regionUVs[i + 1] * height;
 			}
 		}
 	},
@@ -1391,21 +1390,20 @@ spine.SkinnedMeshAttachment.prototype = {
 	edges: null,
 	width: 0, height: 0,
 	updateUVs: function (u, v, u2, v2, rotate) {
-		var width = regionU2 - regionU, height = regionV2 - regionV;
-		var n = regionUVs.length;
-		if (!uvs || uvs.length != n) {
-			uvs = [];
-			uvs.length = n;
+		var width = this.regionU2 - this.regionU, height = this.regionV2 - this.regionV;
+		var n = this.regionUVs.length;
+		if (!this.uvs || this.uvs.length != n) {
+            this.uvs = new spine.Float32Array(n);
 		}
-		if (regionRotate) {
+		if (this.regionRotate) {
 			for (var i = 0; i < n; i += 2) {
-				uvs[i] = regionU + regionUVs[i + 1] * width;
-				uvs[i + 1] = regionV + height - regionUVs[i] * height;
+                this.uvs[i] = this.regionU + this.regionUVs[i + 1] * width;
+                this.uvs[i + 1] = this.regionV + height - this.regionUVs[i] * height;
 			}
 		} else {
 			for (var i = 0; i < n; i += 2) {
-				uvs[i] = regionU + regionUVs[i] * width;
-				uvs[i + 1] = regionV + regionUVs[i + 1] * height;
+                this.uvs[i] = this.regionU + this.regionUVs[i] * width;
+                this.uvs[i + 1] = this.regionV + this.regionUVs[i + 1] * height;
 			}
 		}
 	},
@@ -1869,7 +1867,7 @@ spine.SkeletonJson.prototype = {
 			mesh.path = path;
 
 			var uvs = this.getFloatArray(map, "uvs", 1);
-			vertices = this.getFloatArray(map, "vertices", 1);
+			var vertices = this.getFloatArray(map, "vertices", 1);
 			var weights = [];
 			var bones = [];
 			for (var i = 0, n = vertices.length; i < n; ) {
