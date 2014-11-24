@@ -58,6 +58,8 @@ public class SkeletonRendererDebug {
 	private boolean drawMeshHull = true, drawMeshTriangles = true;
 	private final SkeletonBounds bounds = new SkeletonBounds();
 	private float scale = 1;
+	private float boneWidth = 2;
+	private boolean premultipliedAlpha;
 
 	public SkeletonRendererDebug () {
 		shapes = new ShapeRenderer();
@@ -72,21 +74,27 @@ public class SkeletonRendererDebug {
 		float skeletonY = skeleton.getY();
 
 		Gdx.gl.glEnable(GL20.GL_BLEND);
+		int srcFunc = premultipliedAlpha ? GL20.GL_ONE : GL20.GL_SRC_ALPHA;
+		Gdx.gl.glBlendFunc(srcFunc, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
 		ShapeRenderer shapes = this.shapes;
-		shapes.begin(ShapeType.Line);
 
 		Array<Bone> bones = skeleton.getBones();
 		if (drawBones) {
 			shapes.setColor(boneLineColor);
+			shapes.begin(ShapeType.Filled);
 			for (int i = 0, n = bones.size; i < n; i++) {
 				Bone bone = bones.get(i);
 				if (bone.parent == null) continue;
 				float x = skeletonX + bone.data.length * bone.m00 + bone.worldX;
 				float y = skeletonY + bone.data.length * bone.m10 + bone.worldY;
-				shapes.line(skeletonX + bone.worldX, skeletonY + bone.worldY, x, y);
+				shapes.rectLine(skeletonX + bone.worldX, skeletonY + bone.worldY, x, y, boneWidth * scale);
 			}
+			shapes.end();
+			shapes.begin(ShapeType.Line);
 			shapes.x(skeletonX, skeletonY, 4 * scale);
-		}
+		} else
+			shapes.begin(ShapeType.Line);
 
 		if (drawRegionAttachments) {
 			shapes.setColor(attachmentLineColor);
@@ -206,5 +214,9 @@ public class SkeletonRendererDebug {
 
 	public void setMeshTriangles (boolean meshTriangles) {
 		this.drawMeshTriangles = meshTriangles;
+	}
+
+	public void setPremultipliedAlpha (boolean premultipliedAlpha) {
+		this.premultipliedAlpha = premultipliedAlpha;
 	}
 }
