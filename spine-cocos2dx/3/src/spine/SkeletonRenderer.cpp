@@ -87,12 +87,32 @@ SkeletonRenderer::SkeletonRenderer () {
 }
 
 SkeletonRenderer::SkeletonRenderer (spSkeletonData *skeletonData, bool ownsSkeletonData) {
+	initWithData(skeletonData, ownsSkeletonData);
+}
+
+SkeletonRenderer::SkeletonRenderer (const std::string& skeletonDataFile, spAtlas* atlas, float scale) {
+	initWithFile(skeletonDataFile, atlas, scale);
+}
+
+SkeletonRenderer::SkeletonRenderer (const std::string& skeletonDataFile, const std::string& atlasFile, float scale) {
+	initWithFile(skeletonDataFile, atlasFile, scale);
+}
+
+SkeletonRenderer::~SkeletonRenderer () {
+	if (_ownsSkeletonData) spSkeletonData_dispose(_skeleton->data);
+	if (_atlas) spAtlas_dispose(_atlas);
+	spSkeleton_dispose(_skeleton);
+	_batch->release();
+	FREE(_worldVertices);
+}
+
+void SkeletonRenderer::initWithData (spSkeletonData* skeletonData, bool ownsSkeletonData = false) {
 	initialize();
 
 	setSkeletonData(skeletonData, ownsSkeletonData);
 }
 
-SkeletonRenderer::SkeletonRenderer (const std::string& skeletonDataFile, spAtlas* atlas, float scale) {
+void SkeletonRenderer::initWithFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 1) {
 	initialize();
 
 	spSkeletonJson* json = spSkeletonJson_create(atlas);
@@ -104,7 +124,7 @@ SkeletonRenderer::SkeletonRenderer (const std::string& skeletonDataFile, spAtlas
 	setSkeletonData(skeletonData, true);
 }
 
-SkeletonRenderer::SkeletonRenderer (const std::string& skeletonDataFile, const std::string& atlasFile, float scale) {
+void SkeletonRenderer::initWithFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1) {
 	initialize();
 
 	_atlas = spAtlas_createFromFile(atlasFile.c_str(), 0);
@@ -119,13 +139,6 @@ SkeletonRenderer::SkeletonRenderer (const std::string& skeletonDataFile, const s
 	setSkeletonData(skeletonData, true);
 }
 
-SkeletonRenderer::~SkeletonRenderer () {
-	if (_ownsSkeletonData) spSkeletonData_dispose(_skeleton->data);
-	if (_atlas) spAtlas_dispose(_atlas);
-	spSkeleton_dispose(_skeleton);
-	_batch->release();
-	FREE(_worldVertices);
-}
 
 void SkeletonRenderer::update (float deltaTime) {
 	spSkeleton_update(_skeleton, deltaTime * _timeScale);
