@@ -211,7 +211,7 @@ public class Box2DExample extends ApplicationAdapter {
 		// Next we create the 50 box bodies using the PolygonShape we just
 		// defined. This process is similar to the one we used for the ground
 		// body. Note that we reuse the polygon for each body fixture.
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < 45; i++) {
 			// Create the BodyDef, set a random position above the
 			// ground and create a new body
 			BodyDef boxBodyDef = new BodyDef();
