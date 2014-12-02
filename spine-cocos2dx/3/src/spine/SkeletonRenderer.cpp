@@ -83,7 +83,6 @@ void SkeletonRenderer::setSkeletonData (spSkeletonData *skeletonData, bool ownsS
 }
 
 SkeletonRenderer::SkeletonRenderer () {
-	initialize();
 }
 
 SkeletonRenderer::SkeletonRenderer (spSkeletonData *skeletonData, bool ownsSkeletonData) {
@@ -106,15 +105,13 @@ SkeletonRenderer::~SkeletonRenderer () {
 	FREE(_worldVertices);
 }
 
-void SkeletonRenderer::initWithData (spSkeletonData* skeletonData, bool ownsSkeletonData = false) {
-	initialize();
-
+void SkeletonRenderer::initWithData (spSkeletonData* skeletonData, bool ownsSkeletonData) {
 	setSkeletonData(skeletonData, ownsSkeletonData);
+
+	initialize();
 }
 
-void SkeletonRenderer::initWithFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 1) {
-	initialize();
-
+void SkeletonRenderer::initWithFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale) {
 	spSkeletonJson* json = spSkeletonJson_create(atlas);
 	json->scale = scale;
 	spSkeletonData* skeletonData = spSkeletonJson_readSkeletonDataFile(json, skeletonDataFile.c_str());
@@ -122,11 +119,11 @@ void SkeletonRenderer::initWithFile (const std::string& skeletonDataFile, spAtla
 	spSkeletonJson_dispose(json);
 
 	setSkeletonData(skeletonData, true);
+
+	initialize();
 }
 
-void SkeletonRenderer::initWithFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1) {
-	initialize();
-
+void SkeletonRenderer::initWithFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale) {
 	_atlas = spAtlas_createFromFile(atlasFile.c_str(), 0);
 	CCASSERT(_atlas, "Error reading atlas file.");
 
@@ -137,6 +134,8 @@ void SkeletonRenderer::initWithFile (const std::string& skeletonDataFile, const 
 	spSkeletonJson_dispose(json);
 
 	setSkeletonData(skeletonData, true);
+
+	initialize();
 }
 
 

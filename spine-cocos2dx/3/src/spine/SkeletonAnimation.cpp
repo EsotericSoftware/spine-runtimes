@@ -100,7 +100,6 @@ void SkeletonAnimation::initialize () {
 
 SkeletonAnimation::SkeletonAnimation ()
 		: SkeletonRenderer() {
-	initialize();
 }
 
 SkeletonAnimation::SkeletonAnimation (spSkeletonData *skeletonData)
