@@ -27,7 +27,6 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -44,7 +43,7 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 		loop = serializedObject.FindProperty("loop");
 		timeScale = serializedObject.FindProperty("timeScale");
 
-		if(PrefabUtility.GetPrefabType(this.target) == PrefabType.Prefab)
+		if (PrefabUtility.GetPrefabType(this.target) == PrefabType.Prefab)
 			isPrefab = true;
 
 
@@ -54,13 +53,14 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 		base.gui();
 
 		SkeletonAnimation component = (SkeletonAnimation)target;
-		if (!component.valid) return;
+		if (!component.valid)
+			return;
 
 		//catch case where SetAnimation was used to set track 0 without using AnimationName
-		if(Application.isPlaying){
+		if (Application.isPlaying) {
 			TrackEntry currentState = component.state.GetCurrent(0);
-			if(currentState != null){
-				if(component.AnimationName != animationName.stringValue){
+			if (currentState != null) {
+				if (component.AnimationName != animationName.stringValue) {
 					animationName.stringValue = currentState.Animation.Name;
 				}
 			}
@@ -86,7 +86,7 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 			EditorGUILayout.EndHorizontal();
 
 			String selectedAnimationName = animationIndex == 0 ? null : animations[animationIndex];
-			if(component.AnimationName != selectedAnimationName){
+			if (component.AnimationName != selectedAnimationName) {
 				component.AnimationName = selectedAnimationName;
 				animationName.stringValue = selectedAnimationName;
 			}
@@ -100,9 +100,9 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 
 		EditorGUILayout.Space();
 
-		if(!isPrefab){
-			if(component.GetComponent<SkeletonUtility>() == null){
-				if(GUILayout.Button(new GUIContent("Add Skeleton Utility", SpineEditorUtilities.Icons.skeletonUtility), GUILayout.Height(30))){
+		if (!isPrefab) {
+			if (component.GetComponent<SkeletonUtility>() == null) {
+				if (GUILayout.Button(new GUIContent("Add Skeleton Utility", SpineEditorUtilities.Icons.skeletonUtility), GUILayout.Height(30))) {
 					component.gameObject.AddComponent<SkeletonUtility>();
 				}
 			}

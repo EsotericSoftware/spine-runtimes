@@ -47,7 +47,7 @@ CCScene* GoblinsExample::scene () {
 bool GoblinsExample::init () {
 	if (!CCLayerColor::initWithColor(ccc4(128, 128, 128, 255))) return false;
 
-	skeletonNode = SkeletonAnimation::createWithFile("goblins-ffd.json", "goblins-ffd.atlas", 1.5f);
+	skeletonNode = SkeletonAnimation::createWithFile("goblins-mesh.json", "goblins-mesh.atlas", 1.5f);
 	skeletonNode->setAnimation(0, "walk", true);
 	skeletonNode->setSkin("goblin");
 

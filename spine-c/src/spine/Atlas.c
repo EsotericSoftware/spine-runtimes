@@ -137,7 +137,7 @@ static int readTuple (const char* end, Str tuple[]) {
 }
 
 static char* mallocString (Str* str) {
-	int length = str->end - str->begin;
+	int length = (int)(str->end - str->begin);
 	char* string = MALLOC(char, length + 1);
 	memcpy(string, str->begin, length);
 	string[length] = '\0';
@@ -145,7 +145,7 @@ static char* mallocString (Str* str) {
 }
 
 static int indexOf (const char** array, int count, Str* str) {
-	int length = str->end - str->begin;
+	int length = (int)(str->end - str->begin);
 	int i;
 	for (i = count - 1; i >= 0; i--)
 		if (strncmp(array[i], str->begin, length) == 0) return i;
@@ -157,7 +157,7 @@ static int equals (Str* str, const char* other) {
 }
 
 static int toInt (Str* str) {
-	return strtol(str->begin, (char**)&str->end, 10);
+	return (int)strtol(str->begin, (char**)&str->end, 10);
 }
 
 static spAtlas* abortAtlas (spAtlas* self) {
@@ -174,7 +174,7 @@ spAtlas* spAtlas_create (const char* begin, int length, const char* dir, void* r
 
 	int count;
 	const char* end = begin + length;
-	int dirLength = strlen(dir);
+	int dirLength = (int)strlen(dir);
 	int needsSlash = dirLength > 0 && dir[dirLength - 1] != '/' && dir[dirLength - 1] != '\\';
 
 	spAtlasPage *page = 0;
@@ -307,7 +307,7 @@ spAtlas* spAtlas_createFromFile (const char* path, void* rendererObject) {
 	const char* lastBackwardSlash = strrchr(path, '\\');
 	const char* lastSlash = lastForwardSlash > lastBackwardSlash ? lastForwardSlash : lastBackwardSlash;
 	if (lastSlash == path) lastSlash++; /* Never drop starting slash. */
-	dirLength = lastSlash ? lastSlash - path : 0;
+	dirLength = (int)(lastSlash ? lastSlash - path : 0);
 	dir = MALLOC(char, dirLength + 1);
 	memcpy(dir, path, dirLength);
 	dir[dirLength] = '\0';

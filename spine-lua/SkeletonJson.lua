@@ -34,6 +34,8 @@ local SlotData = require "spine-lua.SlotData"
 local Skin = require "spine-lua.Skin"
 local AttachmentLoader = require "spine-lua.AttachmentLoader"
 local Animation = require "spine-lua.Animation"
+local IkConstraintData = require "spine-lua.IkConstraintData"
+local IkConstraint = require "spine-lua.IkConstraint"
 local EventData = require "spine-lua.EventData"
 local Event = require "spine-lua.Event"
 local AttachmentType = require "spine-lua.AttachmentType"
@@ -62,6 +64,15 @@ function SkeletonJson.new (attachmentLoader)
 		local root = spine.utils.readJSON(jsonText)
 		if not root then error("Invalid JSON: " .. jsonText, 2) end
 
+		-- Skeleton.
+		if root["skeleton"] then
+			local skeletonMap = root["skeleton"]
+			skeletonData.hash = skeletonMap["hash"]
+			skeletonData.version = skeletonMap["spine"]
+			skeletonData.width = skeletonMap["width"] or 0
+			skeletonData.height = skeletonMap["height"] or 0
+		end
+
 		-- Bones.
 		for i,boneMap in ipairs(root["bones"]) do
 			local boneName = boneMap["name"]
@@ -86,6 +97,8 @@ function SkeletonJson.new (attachmentLoader)
 			else
 				boneData.scaleY = 1
 			end
+			boneData.flipX = boneMap["flipX"] or false
+			boneData.flipY = boneMap["flipY"] or false
 			if boneMap["inheritScale"] == false then
 				boneData.inheritScale = false
 			else
@@ -97,6 +110,28 @@ function SkeletonJson.new (attachmentLoader)
 				boneData.inheritRotation = true
 			end
 			table.insert(skeletonData.bones, boneData)
+		end
+
+		-- IK constraints.
+		if root["ik"] then
+			for i,ikMap in ipairs(root["ik"]) do
+				local ikConstraintData = IkConstraintData.new(ikMap["name"])
+
+				for i,boneName in ipairs(ikMap["bones"]) do
+					local bone = skeletonData:findBone(boneName)
+					if not bone then error("IK bone not found: " .. boneName) end
+					table.insert(ikConstraintData.bones, bone)
+				end
+
+				local targetName = ikMap["target"]
+				ikConstraintData.target = skeletonData:findBone(targetName)
+				if not ikConstraintData.target then error("Target bone not found: " .. targetName) end
+
+				if ikMap["bendPositive"] == false then ikConstraintData.bendDirection = -1 end
+				if ikMap["mix"] ~= nil then ikConstraintData.mix = ikMap["mix"] end
+
+				table.insert(skeletonData.ikConstraints, ikConstraintData)
+			end
 		end
 
 		-- Slots.
@@ -375,10 +410,56 @@ function SkeletonJson.new (attachmentLoader)
 						table.insert(timelines, timeline)
 						duration = math.max(duration, timeline:getDuration())
 
+					elseif timelineName == "flipX" or timelineName == "flipY" then
+						local x = timelineName == "flipX"
+						local timeline, field
+						if x then
+							timeline = Animation.FlipXTimeline.new()
+							field = "x"
+						else
+							timeline = Animation.FlipYTimeline.new();
+							field = "y"
+						end
+						timeline.boneIndex = boneIndex
+
+						local frameIndex = 0
+						for i,valueMap in ipairs(values) do
+							timeline:setFrame(frameIndex, valueMap["time"], valueMap[field] or false)
+							frameIndex = frameIndex + 1
+						end
+						table.insert(timelines, timeline)
+						duration = math.max(duration, timeline:getDuration())
+
 					else
 						error("Invalid timeline type for a bone: " .. timelineName .. " (" .. boneName .. ")")
 					end
 				end
+			end
+		end
+
+		local ik = map["ik"]
+		if ik then
+			for ikConstraintName,values in pairs(ik) do
+				local ikConstraint = skeletonData:findIkConstraint(ikConstraintName)
+				local timeline = Animation.IkConstraintTimeline.new()
+				for i,other in pairs(skeletonData.ikConstraints) do
+					if other == ikConstraint then
+						timeline.ikConstraintIndex = i
+						break
+					end
+				end
+				local frameIndex = 0
+				for i,valueMap in ipairs(values) do
+					local mix = 1
+					if valueMap["mix"] ~= nil then mix = valueMap["mix"] end
+					local bendPositive = 1
+					if valueMap["bendPositive"] == false then bendPositive = -1 end
+					timeline:setFrame(frameIndex, valueMap["time"], mix, bendPositive)
+					readCurve(timeline, frameIndex, valueMap)
+					frameIndex = frameIndex + 1
+				end
+				table.insert(timelines, timeline)
+				duration = math.max(duration, timeline:getDuration())
 			end
 		end
 
@@ -447,7 +528,8 @@ function SkeletonJson.new (attachmentLoader)
 			end
 		end
 
-		local drawOrderValues = map["draworder"]
+		local drawOrderValues = map["drawOrder"]
+		if not drawOrderValues then drawOrderValues = map["draworder"] end
 		if drawOrderValues then
 			local timeline = Animation.DrawOrderTimeline.new(#drawOrderValues)
 			local slotCount = #skeletonData.slots
@@ -529,8 +611,9 @@ function SkeletonJson.new (attachmentLoader)
 
 	readCurve = function (timeline, frameIndex, valueMap)
 		local curve = valueMap["curve"]
-		if not curve then return end
-		if curve == "stepped" then
+		if not curve then 
+			timeline:setLinear(frameIndex)
+		elseif curve == "stepped" then
 			timeline:setStepped(frameIndex)
 		else
 			timeline:setCurve(frameIndex, curve[1], curve[2], curve[3], curve[4])

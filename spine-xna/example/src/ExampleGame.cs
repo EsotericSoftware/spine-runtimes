@@ -74,7 +74,7 @@ namespace Spine {
 			skeletonRenderer.PremultipliedAlpha = true;
 
 			// String name = "spineboy";
-			// String name = "goblins-ffd";
+			// String name = "goblins-mesh";
 			String name = "raptor";
 
 			Atlas atlas = new Atlas(assetsFolder + name + ".atlas", new XnaTextureLoader(GraphicsDevice));
@@ -82,7 +82,7 @@ namespace Spine {
 			if (name == "spineboy") json.Scale = 0.6f;
 			if (name == "raptor") json.Scale = 0.5f;
 			skeleton = new Skeleton(json.ReadSkeletonData(assetsFolder + name + ".json"));
-			if (name == "goblins-ffd") skeleton.SetSkin("goblin");
+			if (name == "goblins-mesh") skeleton.SetSkin("goblin");
 
 			// Define mixing between animations.
 			AnimationStateData stateData = new AnimationStateData(skeleton.Data);

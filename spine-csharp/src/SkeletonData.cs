@@ -136,7 +136,7 @@ namespace Spine {
 			return null;
 		}
 
-		// --- IK
+		// --- IK constraints.
 
 		/// <returns>May be null.</returns>
 		public IkConstraintData FindIkConstraint (String ikConstraintName) {

@@ -38,8 +38,8 @@ namespace Spine {
 		internal IkConstraintData data;
 		internal List<Bone> bones = new List<Bone>();
 		internal Bone target;
-		internal int bendDirection = 1;
-		internal float mix = 1;
+		internal int bendDirection;
+		internal float mix;
 
 		public IkConstraintData Data { get { return data; } }
 		public List<Bone> Bones { get { return bones; } }
@@ -48,6 +48,8 @@ namespace Spine {
 		public float Mix { get { return mix; } set { mix = value; } }
 
 		public IkConstraint (IkConstraintData data, Skeleton skeleton) {
+			if (data == null) throw new ArgumentNullException("data cannot be null.");
+			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
 			this.data = data;
 			mix = data.mix;
 			bendDirection = data.bendDirection;

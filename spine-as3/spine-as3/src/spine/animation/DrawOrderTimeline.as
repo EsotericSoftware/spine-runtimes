@@ -60,7 +60,7 @@ public class DrawOrderTimeline implements Timeline {
 		if (time >= frames[int(frames.length - 1)]) // Time is after last frame.
 			frameIndex = frames.length - 1;
 		else
-			frameIndex = Animation.binarySearch(frames, time, 1) - 1;
+			frameIndex = Animation.binarySearch1(frames, time) - 1;
 
 		var drawOrder:Vector.<Slot> = skeleton.drawOrder;
 		var slots:Vector.<Slot> = skeleton.slots;

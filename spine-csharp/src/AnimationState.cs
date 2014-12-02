@@ -191,6 +191,7 @@ namespace Spine {
 
 		/// <summary>Set the current animation. Any queued animations are cleared.</summary>
 		public TrackEntry SetAnimation (int trackIndex, Animation animation, bool loop) {
+			if (animation == null) throw new ArgumentException("animation cannot be null.");
 			TrackEntry entry = new TrackEntry();
 			entry.animation = animation;
 			entry.loop = loop;
@@ -209,6 +210,7 @@ namespace Spine {
 		/// <summary>Adds an animation to be played delay seconds after the current or last queued animation.</summary>
 		/// <param name="delay">May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay.</param>
 		public TrackEntry AddAnimation (int trackIndex, Animation animation, bool loop, float delay) {
+			if (animation == null) throw new ArgumentException("animation cannot be null.");
 			TrackEntry entry = new TrackEntry();
 			entry.animation = animation;
 			entry.loop = loop;

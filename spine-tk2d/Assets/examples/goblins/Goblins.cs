@@ -40,11 +40,11 @@ public class Goblins : MonoBehaviour {
 	public void Start () {
 		skeletonAnimation = GetComponent<SkeletonAnimation>();
 		headBone = skeletonAnimation.skeleton.FindBone("head");
-		skeletonAnimation.UpdateBones += UpdateBones;
+		skeletonAnimation.UpdateLocal += UpdateLocal;
 	}
 
 	// This is called after the animation is applied to the skeleton and can be used to adjust the bones dynamically.
-	public void UpdateBones (SkeletonAnimation skeletonAnimation) {
+	public void UpdateLocal (SkeletonAnimation skeletonAnimation) {
 		headBone.Rotation += 15;
 	}
 	

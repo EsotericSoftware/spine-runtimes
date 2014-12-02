@@ -7,7 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		434D47F1192A2480003127B5 /* libcocos2d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 434D47E2192A246B003127B5 /* libcocos2d.a */; };
+		4327E30419E9879C007E7FB7 /* IkConstraint.c in Sources */ = {isa = PBXBuildFile; fileRef = 4327E30219E9879C007E7FB7 /* IkConstraint.c */; };
+		4327E30519E9879C007E7FB7 /* IkConstraintData.c in Sources */ = {isa = PBXBuildFile; fileRef = 4327E30319E9879C007E7FB7 /* IkConstraintData.c */; };
+		4327E30619E98913007E7FB7 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 652107951895250000B1FF07 /* CoreText.framework */; };
+		4327E30919E98977007E7FB7 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4327E30819E98977007E7FB7 /* GLKit.framework */; };
+		4327E30A19E989A3007E7FB7 /* libcocos2d_chipmunk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 434D47E6192A246B003127B5 /* libcocos2d_chipmunk.a */; };
+		4327E30B19E98A32007E7FB7 /* libChipmunk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 434D47E0192A246B003127B5 /* libChipmunk.a */; };
 		43C3282F170B0C19004A9460 /* spine-cocos2d-iphone.m in Sources */ = {isa = PBXBuildFile; fileRef = 43C3282D170B0C19004A9460 /* spine-cocos2d-iphone.m */; };
 		43C3286C170B0DA6004A9460 /* spineboy.json in Resources */ = {isa = PBXBuildFile; fileRef = 43C32868170B0DA6004A9460 /* spineboy.json */; };
 		43C3286E170B0DA6004A9460 /* spineboy.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 43C3286A170B0DA6004A9460 /* spineboy.atlas */; };
@@ -25,9 +30,9 @@
 		43C32888170B0DBE004A9460 /* iTunesArtwork in Resources */ = {isa = PBXBuildFile; fileRef = 43C3287C170B0DBE004A9460 /* iTunesArtwork */; };
 		43C32A06170B0F93004A9460 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 43C32A05170B0F93004A9460 /* main.m */; };
 		43C32A09170B10FF004A9460 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 43C32A08170B10FF004A9460 /* AppDelegate.m */; };
-		43F7010F1927FBC700CA4038 /* goblins-ffd.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 43F7010C1927FBC700CA4038 /* goblins-ffd.atlas */; };
-		43F701101927FBC700CA4038 /* goblins-ffd.json in Resources */ = {isa = PBXBuildFile; fileRef = 43F7010D1927FBC700CA4038 /* goblins-ffd.json */; };
-		43F701111927FBC700CA4038 /* goblins-ffd.png in Resources */ = {isa = PBXBuildFile; fileRef = 43F7010E1927FBC700CA4038 /* goblins-ffd.png */; };
+		43F7010F1927FBC700CA4038 /* goblins-mesh.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 43F7010C1927FBC700CA4038 /* goblins-mesh.atlas */; };
+		43F701101927FBC700CA4038 /* goblins-mesh.json in Resources */ = {isa = PBXBuildFile; fileRef = 43F7010D1927FBC700CA4038 /* goblins-mesh.json */; };
+		43F701111927FBC700CA4038 /* goblins-mesh.png in Resources */ = {isa = PBXBuildFile; fileRef = 43F7010E1927FBC700CA4038 /* goblins-mesh.png */; };
 		43F7FF511927F91900CA4038 /* Animation.c in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF381927F91900CA4038 /* Animation.c */; };
 		43F7FF521927F91900CA4038 /* AnimationState.c in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF391927F91900CA4038 /* AnimationState.c */; };
 		43F7FF531927F91900CA4038 /* AnimationStateData.c in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF3A1927F91900CA4038 /* AnimationStateData.c */; };
@@ -57,7 +62,6 @@
 		43F7FF891927F94800CA4038 /* SkeletonRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF861927F94800CA4038 /* SkeletonRenderer.m */; };
 		43F7FF8E1927F96700CA4038 /* GoblinsExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF8B1927F96700CA4038 /* GoblinsExample.m */; };
 		43F7FF8F1927F96700CA4038 /* SpineboyExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF8D1927F96700CA4038 /* SpineboyExample.m */; };
-		652107961895250000B1FF07 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 652107951895250000B1FF07 /* CoreText.framework */; };
 		9A5D2499170A94DA0030D4DD /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5D2498170A94DA0030D4DD /* QuartzCore.framework */; };
 		9A5D249B170A94DA0030D4DD /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5D249A170A94DA0030D4DD /* OpenGLES.framework */; };
 		9A5D249D170A94DA0030D4DD /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5D249C170A94DA0030D4DD /* OpenAL.framework */; };
@@ -150,6 +154,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4327E30019E9879C007E7FB7 /* IkConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IkConstraint.h; path = "../../spine-c/include/spine/IkConstraint.h"; sourceTree = "<group>"; };
+		4327E30119E9879C007E7FB7 /* IkConstraintData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IkConstraintData.h; path = "../../spine-c/include/spine/IkConstraintData.h"; sourceTree = "<group>"; };
+		4327E30219E9879C007E7FB7 /* IkConstraint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = IkConstraint.c; path = "../../spine-c/src/spine/IkConstraint.c"; sourceTree = "<group>"; };
+		4327E30319E9879C007E7FB7 /* IkConstraintData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = IkConstraintData.c; path = "../../spine-c/src/spine/IkConstraintData.c"; sourceTree = "<group>"; };
+		4327E30819E98977007E7FB7 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		434D47CA192A246A003127B5 /* cocos2d-ios.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "cocos2d-ios.xcodeproj"; path = "cocos2d/cocos2d-ios.xcodeproj"; sourceTree = SOURCE_ROOT; };
 		43C3282D170B0C19004A9460 /* spine-cocos2d-iphone.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "spine-cocos2d-iphone.m"; path = "src/spine/spine-cocos2d-iphone.m"; sourceTree = "<group>"; };
 		43C3282E170B0C19004A9460 /* spine-cocos2d-iphone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "spine-cocos2d-iphone.h"; path = "src/spine/spine-cocos2d-iphone.h"; sourceTree = "<group>"; };
@@ -172,9 +181,9 @@
 		43C32A05170B0F93004A9460 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "Resources-ios/main.m"; sourceTree = "<group>"; };
 		43C32A07170B10FF004A9460 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = "Resources-ios/AppDelegate.h"; sourceTree = "<group>"; };
 		43C32A08170B10FF004A9460 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = "Resources-ios/AppDelegate.m"; sourceTree = "<group>"; };
-		43F7010C1927FBC700CA4038 /* goblins-ffd.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "goblins-ffd.atlas"; path = "Resources/goblins-ffd.atlas"; sourceTree = "<group>"; };
-		43F7010D1927FBC700CA4038 /* goblins-ffd.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "goblins-ffd.json"; path = "Resources/goblins-ffd.json"; sourceTree = "<group>"; };
-		43F7010E1927FBC700CA4038 /* goblins-ffd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "goblins-ffd.png"; path = "Resources/goblins-ffd.png"; sourceTree = "<group>"; };
+		43F7010C1927FBC700CA4038 /* goblins-mesh.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "goblins-mesh.atlas"; path = "Resources/goblins-mesh.atlas"; sourceTree = "<group>"; };
+		43F7010D1927FBC700CA4038 /* goblins-mesh.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "goblins-mesh.json"; path = "Resources/goblins-mesh.json"; sourceTree = "<group>"; };
+		43F7010E1927FBC700CA4038 /* goblins-mesh.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "goblins-mesh.png"; path = "Resources/goblins-mesh.png"; sourceTree = "<group>"; };
 		43F7FF381927F91900CA4038 /* Animation.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Animation.c; path = "../../spine-c/src/spine/Animation.c"; sourceTree = "<group>"; };
 		43F7FF391927F91900CA4038 /* AnimationState.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = AnimationState.c; path = "../../spine-c/src/spine/AnimationState.c"; sourceTree = "<group>"; };
 		43F7FF3A1927F91900CA4038 /* AnimationStateData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = AnimationStateData.c; path = "../../spine-c/src/spine/AnimationStateData.c"; sourceTree = "<group>"; };
@@ -252,8 +261,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				434D47F1192A2480003127B5 /* libcocos2d.a in Frameworks */,
-				652107961895250000B1FF07 /* CoreText.framework in Frameworks */,
+				4327E30A19E989A3007E7FB7 /* libcocos2d_chipmunk.a in Frameworks */,
+				4327E30B19E98A32007E7FB7 /* libChipmunk.a in Frameworks */,
+				4327E30919E98977007E7FB7 /* GLKit.framework in Frameworks */,
+				4327E30619E98913007E7FB7 /* CoreText.framework in Frameworks */,
 				9A5D2499170A94DA0030D4DD /* QuartzCore.framework in Frameworks */,
 				9A5D249B170A94DA0030D4DD /* OpenGLES.framework in Frameworks */,
 				9A5D249D170A94DA0030D4DD /* OpenAL.framework in Frameworks */,
@@ -333,6 +344,10 @@
 				43F7FF741927F92500CA4038 /* EventData.h */,
 				43F7FF441927F91900CA4038 /* extension.c */,
 				43F7FF751927F92500CA4038 /* extension.h */,
+				4327E30219E9879C007E7FB7 /* IkConstraint.c */,
+				4327E30019E9879C007E7FB7 /* IkConstraint.h */,
+				4327E30319E9879C007E7FB7 /* IkConstraintData.c */,
+				4327E30119E9879C007E7FB7 /* IkConstraintData.h */,
 				43F7FF451927F91900CA4038 /* Json.c */,
 				43F7FF461927F91900CA4038 /* Json.h */,
 				43F7FF471927F91900CA4038 /* MeshAttachment.c */,
@@ -378,9 +393,9 @@
 		43C32867170B0C7F004A9460 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				43F7010C1927FBC700CA4038 /* goblins-ffd.atlas */,
-				43F7010D1927FBC700CA4038 /* goblins-ffd.json */,
-				43F7010E1927FBC700CA4038 /* goblins-ffd.png */,
+				43F7010C1927FBC700CA4038 /* goblins-mesh.atlas */,
+				43F7010D1927FBC700CA4038 /* goblins-mesh.json */,
+				43F7010E1927FBC700CA4038 /* goblins-mesh.png */,
 				43C32868170B0DA6004A9460 /* spineboy.json */,
 				43C3286A170B0DA6004A9460 /* spineboy.atlas */,
 				43C3286B170B0DA6004A9460 /* spineboy.png */,
@@ -430,6 +445,7 @@
 		9A5D2497170A94DA0030D4DD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4327E30819E98977007E7FB7 /* GLKit.framework */,
 				652107951895250000B1FF07 /* CoreText.framework */,
 				9A5D2498170A94DA0030D4DD /* QuartzCore.framework */,
 				9A5D249A170A94DA0030D4DD /* OpenGLES.framework */,
@@ -479,7 +495,7 @@
 		9A5D248D170A94DA0030D4DD /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0460;
+				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = "Craig Hinrichs";
 			};
 			buildConfigurationList = 9A5D2490170A94DA0030D4DD /* Build configuration list for PBXProject "spine-cocos2d-iphone-ios" */;
@@ -604,9 +620,9 @@
 				43C32885170B0DBE004A9460 /* Icon.png in Resources */,
 				43C32886170B0DBE004A9460 /* Icon@2x.png in Resources */,
 				43C32888170B0DBE004A9460 /* iTunesArtwork in Resources */,
-				43F7010F1927FBC700CA4038 /* goblins-ffd.atlas in Resources */,
-				43F701101927FBC700CA4038 /* goblins-ffd.json in Resources */,
-				43F701111927FBC700CA4038 /* goblins-ffd.png in Resources */,
+				43F7010F1927FBC700CA4038 /* goblins-mesh.atlas in Resources */,
+				43F701101927FBC700CA4038 /* goblins-mesh.json in Resources */,
+				43F701111927FBC700CA4038 /* goblins-mesh.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -633,9 +649,11 @@
 				43F7FF5B1927F91900CA4038 /* Event.c in Sources */,
 				43F7FF5C1927F91900CA4038 /* EventData.c in Sources */,
 				43F7FF5D1927F91900CA4038 /* extension.c in Sources */,
+				4327E30419E9879C007E7FB7 /* IkConstraint.c in Sources */,
 				43F7FF5E1927F91900CA4038 /* Json.c in Sources */,
 				43F7FF5F1927F91900CA4038 /* MeshAttachment.c in Sources */,
 				43F7FF601927F91900CA4038 /* RegionAttachment.c in Sources */,
+				4327E30519E9879C007E7FB7 /* IkConstraintData.c in Sources */,
 				43F7FF611927F91900CA4038 /* Skeleton.c in Sources */,
 				43F7FF621927F91900CA4038 /* SkeletonBounds.c in Sources */,
 				43F7FF631927F91900CA4038 /* SkeletonData.c in Sources */,
@@ -659,6 +677,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -668,11 +692,17 @@
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 			};
 			name = Debug;
 		};
@@ -680,6 +710,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -687,18 +723,24 @@
 					"NS_BLOCK_ASSERTIONS=1",
 				);
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 			};
 			name = Release;
 		};
 		9A5D2644170A94DC0030D4DD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -710,12 +752,14 @@
 					"\"cocos2d/cocos2d\"/**",
 				);
 				INFOPLIST_FILE = "Resources-ios/Info.plist";
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-lz",
 					"-lsqlite3",
 					"-ObjC",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -723,7 +767,8 @@
 		9A5D2645170A94DC0030D4DD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Resources-ios/Prefix.pch";
@@ -734,6 +779,7 @@
 					"\"cocos2d/cocos2d\"/**",
 				);
 				INFOPLIST_FILE = "Resources-ios/Info.plist";
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-lz",
 					"-lsqlite3",
@@ -741,6 +787,7 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VALIDATE_PRODUCT = YES;
+				VALID_ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

@@ -44,9 +44,10 @@
 <div id="message"></div>
 <div><canvas id="canvas" width="640" height="480"/></div>
 <br>
-<input type="button" value="Spineboy" onclick="load('spineboy')">
-<input type="button" value="Goblins" onclick="load('goblins')">
-&nbsp; &nbsp; &nbsp; Click above to change the animation (Spineboy) or skin (Goblins).
+<input type="button" value="Spineboy" onclick="load('spineboy', 0.6)">
+<input type="button" value="Hero" onclick="load('hero', 1)">
+<input type="button" value="Goblins" onclick="load('goblins', 1)">
+ &nbsp; &nbsp; Click to change the animation or skin.
 
 <script>
 var canvas = document.getElementById("canvas");
@@ -54,51 +55,54 @@ var TurbulenzEngine = WebGLTurbulenzEngine.create({canvas: canvas});
 var graphicsDevice = TurbulenzEngine.createGraphicsDevice({});
 var draw2D = Draw2D.create({graphicsDevice: graphicsDevice});
 
-load("spineboy");
-//load("goblins");
-
-var skeletonName;
-function load (name) {
-	skeletonName = name;
-	TurbulenzEngine.request("data/" + skeletonName + ".atlas", loadAtlas);
-}
+load("spineboy", 0.6);
+//load("hero", 1);
+//load("goblins", 1);
 
 var atlas;
-function loadAtlas (atlasText) {
-	var textureCount = 0;
-	atlas = new spine.Atlas(atlasText, {
-		load: function (page, path, atlas) {
-			textureCount++;
-			graphicsDevice.createTexture({
-				src: "data/" + path,
-				mipmaps: true,
-				onload: function (texture) {
-					page.rendererObject = texture;
-					page.width = texture.width;
-					page.height = texture.height;
-					atlas.updateUVs(page);
-					textureCount--;
-				}
-			});
-		},
-		unload: function (texture) {
-			texture.destroy();
-		}
-	});
-	function waitForTextures () {
-		if (!textureCount)
-			TurbulenzEngine.request("data/" + skeletonName + ".json", loadSkeletonData);
-		else
-			setTimeout(waitForTextures, 100);
-	}
-	waitForTextures();
-}
-
 var skeletonData;
-function loadSkeletonData (skeletonText) {
-	var json = new spine.SkeletonJson(new spine.AtlasAttachmentLoader(atlas));
-	skeletonData = json.readSkeletonData(JSON.parse(skeletonText));
-	start();
+var skeletonName;
+function load (name, scale) {
+	skeletonName = name;
+	TurbulenzEngine.request("data/" + skeletonName + ".atlas", loadAtlas);
+
+	function loadAtlas (atlasText) {
+		var textureCount = 0;
+		atlas = new spine.Atlas(atlasText, {
+			load: function (page, path, atlas) {
+				textureCount++;
+				graphicsDevice.createTexture({
+					src: "data/" + path,
+					mipmaps: true,
+					onload: function (texture) {
+						page.rendererObject = texture;
+						page.width = texture.width;
+						page.height = texture.height;
+						atlas.updateUVs(page);
+						textureCount--;
+					}
+				});
+			},
+			unload: function (texture) {
+				texture.destroy();
+			}
+		});
+
+		function waitForTextures () {
+			if (!textureCount)
+				TurbulenzEngine.request("data/" + skeletonName + ".json", loadSkeletonData);
+			else
+				setTimeout(waitForTextures, 100);
+		}
+		waitForTextures();
+		
+		function loadSkeletonData (skeletonText) {
+			var json = new spine.SkeletonJson(new spine.AtlasAttachmentLoader(atlas));
+			json.scale = scale;
+			skeletonData = json.readSkeletonData(JSON.parse(skeletonText));
+			start();
+		}
+	}
 }
 
 function start () {
@@ -114,12 +118,31 @@ function start () {
 
 	if (skeletonName == "spineboy") {
 		stateData.setMixByName("walk", "jump", 0.2);
-		stateData.setMixByName("jump", "walk", 0.4);
-		state.setAnimationByName(0, "drawOrder", true);
+		stateData.setMixByName("run", "jump", 0.2);
+		stateData.setMixByName("jump", "run", 0.2);
+		state.setAnimationByName(0, "walk", true);
 
 		canvas.onmousedown = function () {
 			state.setAnimationByName(0, "jump", false);
-			state.addAnimationByName(0, "walk", true, 0);
+			state.addAnimationByName(0, "run", true, 0);
+		}
+	} else if (skeletonName == "hero") {
+		stateData.defaultMix = 0.2;
+		stateData.setMixByName("Walk", "Attack", 0);
+		stateData.setMixByName("Attack", "Run", 0);
+		stateData.setMixByName("Run", "Attack", 0);
+		state.setAnimationByName(0, "Idle", true);
+
+		canvas.onmousedown = function () {
+			var name = state.getCurrent(0).animation.name;
+			if (name == "Idle") {
+				state.setAnimationByName(0, "Crouch", true);
+			} else if (name == "Crouch") {
+				state.setAnimationByName(0, "Walk", true);
+			} else {
+				state.setAnimationByName(0, "Attack", false);
+				state.addAnimationByName(0, "Run", true, 0);
+			}
 		}
 	} else {
 		skeleton.setSkinByName("goblingirl");

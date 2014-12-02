@@ -38,21 +38,19 @@ using Spine;
 [ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class SkeletonRenderer : MonoBehaviour {
 
-	public delegate void SkeletonRendererDelegate(SkeletonRenderer skeletonRenderer);
+	public delegate void SkeletonRendererDelegate (SkeletonRenderer skeletonRenderer);
+
 	public SkeletonRendererDelegate OnReset;
-	
 	[System.NonSerialized]
 	public bool valid;
 	[System.NonSerialized]
 	public Skeleton skeleton;
-	
 	public SkeletonDataAsset skeletonDataAsset;
 	public String initialSkinName;
 	public bool calculateNormals, calculateTangents;
 	public float zSpacing;
 	public bool renderMeshes = true, immutableTriangles;
 	public bool logErrors = false;
-	
 	private MeshFilter meshFilter;
 	private Mesh mesh, mesh1, mesh2;
 	private bool useMesh1;
@@ -66,9 +64,12 @@ public class SkeletonRenderer : MonoBehaviour {
 	private readonly List<Submesh> submeshes = new List<Submesh>();
 
 	public virtual void Reset () {
-		if (meshFilter != null) meshFilter.sharedMesh = null;
-		if (mesh != null) DestroyImmediate(mesh);
-		if (renderer != null) renderer.sharedMaterial = null;
+		if (meshFilter != null)
+			meshFilter.sharedMesh = null;
+		if (mesh != null)
+			DestroyImmediate(mesh);
+		if (renderer != null)
+			renderer.sharedMaterial = null;
 		mesh = null;
 		mesh1 = null;
 		mesh2 = null;
@@ -83,13 +84,14 @@ public class SkeletonRenderer : MonoBehaviour {
 
 		valid = false;
 		if (!skeletonDataAsset) {
-			if(logErrors)
+			if (logErrors)
 				Debug.LogError("Missing SkeletonData asset.", this);
 
 			return;
 		}
 		SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(false);
-		if (skeletonData == null) return;
+		if (skeletonData == null)
+			return;
 		valid = true;
 		
 		meshFilter = GetComponent<MeshFilter>();
@@ -100,7 +102,8 @@ public class SkeletonRenderer : MonoBehaviour {
 		skeleton = new Skeleton(skeletonData);
 		if (initialSkinName != null && initialSkinName.Length > 0 && initialSkinName != "default")
 			skeleton.SetSkin(initialSkinName);
-		if(OnReset != null) OnReset(this);
+		if (OnReset != null)
+			OnReset(this);
 	}
 	
 	public void Awake () {
@@ -116,7 +119,8 @@ public class SkeletonRenderer : MonoBehaviour {
 	}
 	
 	public virtual void LateUpdate () {
-		if (!valid) return;
+		if (!valid)
+			return;
 		// Count vertices and submesh triangles.
 		int vertexCount = 0;
 		int submeshTriangleCount = 0, submeshFirstVertex = 0, submeshStartSlotIndex = 0;
@@ -137,19 +141,20 @@ public class SkeletonRenderer : MonoBehaviour {
 				attachmentVertexCount = 4;
 				attachmentTriangleCount = 6;
 			} else {
-				if (!renderMeshes) continue;
+				if (!renderMeshes)
+					continue;
 				if (attachment is MeshAttachment) {
 					MeshAttachment meshAttachment = (MeshAttachment)attachment;
 					rendererObject = meshAttachment.RendererObject;
 					attachmentVertexCount = meshAttachment.vertices.Length >> 1;
 					attachmentTriangleCount = meshAttachment.triangles.Length;
 				} else if (attachment is SkinnedMeshAttachment) {
-					SkinnedMeshAttachment meshAttachment = (SkinnedMeshAttachment)attachment;
-					rendererObject = meshAttachment.RendererObject;
-					attachmentVertexCount = meshAttachment.uvs.Length >> 1;
-					attachmentTriangleCount = meshAttachment.triangles.Length;
-				} else
-					continue;
+						SkinnedMeshAttachment meshAttachment = (SkinnedMeshAttachment)attachment;
+						rendererObject = meshAttachment.RendererObject;
+						attachmentVertexCount = meshAttachment.uvs.Length >> 1;
+						attachmentTriangleCount = meshAttachment.triangles.Length;
+					} else
+						continue;
 			}
 
 			// Populate submesh when material changes.
@@ -217,7 +222,8 @@ public class SkeletonRenderer : MonoBehaviour {
 				color.r = (byte)(r * slot.r * regionAttachment.r * color.a);
 				color.g = (byte)(g * slot.g * regionAttachment.g * color.a);
 				color.b = (byte)(b * slot.b * regionAttachment.b * color.a);
-				if (slot.data.additiveBlending) color.a = 0;
+				if (slot.data.additiveBlending)
+					color.a = 0;
 				colors[vertexIndex] = color;
 				colors[vertexIndex + 1] = color;
 				colors[vertexIndex + 2] = color;
@@ -231,18 +237,21 @@ public class SkeletonRenderer : MonoBehaviour {
 				
 				vertexIndex += 4;
 			} else {
-				if (!renderMeshes) continue;
+				if (!renderMeshes)
+					continue;
 				if (attachment is MeshAttachment) {
 					MeshAttachment meshAttachment = (MeshAttachment)attachment;
 					int meshVertexCount = meshAttachment.vertices.Length;
-					if (tempVertices.Length < meshVertexCount) tempVertices = new float[meshVertexCount];
+					if (tempVertices.Length < meshVertexCount)
+						tempVertices = new float[meshVertexCount];
 					meshAttachment.ComputeWorldVertices(slot, tempVertices);
 					
 					color.a = (byte)(a * slot.a * meshAttachment.a);
 					color.r = (byte)(r * slot.r * meshAttachment.r * color.a);
 					color.g = (byte)(g * slot.g * meshAttachment.g * color.a);
 					color.b = (byte)(b * slot.b * meshAttachment.b * color.a);
-					if (slot.data.additiveBlending) color.a = 0;
+					if (slot.data.additiveBlending)
+						color.a = 0;
 					
 					float[] meshUVs = meshAttachment.uvs;
 					float z = i * zSpacing;
@@ -252,25 +261,27 @@ public class SkeletonRenderer : MonoBehaviour {
 						uvs[vertexIndex] = new Vector2(meshUVs[ii], meshUVs[ii + 1]);
 					}
 				} else if (attachment is SkinnedMeshAttachment) {
-					SkinnedMeshAttachment meshAttachment = (SkinnedMeshAttachment)attachment;
-					int meshVertexCount = meshAttachment.uvs.Length;
-					if (tempVertices.Length < meshVertexCount) tempVertices = new float[meshVertexCount];
-					meshAttachment.ComputeWorldVertices(slot, tempVertices);
+						SkinnedMeshAttachment meshAttachment = (SkinnedMeshAttachment)attachment;
+						int meshVertexCount = meshAttachment.uvs.Length;
+						if (tempVertices.Length < meshVertexCount)
+							tempVertices = new float[meshVertexCount];
+						meshAttachment.ComputeWorldVertices(slot, tempVertices);
 					
-					color.a = (byte)(a * slot.a * meshAttachment.a);
-					color.r = (byte)(r * slot.r * meshAttachment.r * color.a);
-					color.g = (byte)(g * slot.g * meshAttachment.g * color.a);
-					color.b = (byte)(b * slot.b * meshAttachment.b * color.a);
-					if (slot.data.additiveBlending) color.a = 0;
+						color.a = (byte)(a * slot.a * meshAttachment.a);
+						color.r = (byte)(r * slot.r * meshAttachment.r * color.a);
+						color.g = (byte)(g * slot.g * meshAttachment.g * color.a);
+						color.b = (byte)(b * slot.b * meshAttachment.b * color.a);
+						if (slot.data.additiveBlending)
+							color.a = 0;
 					
-					float[] meshUVs = meshAttachment.uvs;
-					float z = i * zSpacing;
-					for (int ii = 0; ii < meshVertexCount; ii += 2, vertexIndex++) {
-						vertices[vertexIndex] = new Vector3(tempVertices[ii], tempVertices[ii + 1], z);
-						colors[vertexIndex] = color;
-						uvs[vertexIndex] = new Vector2(meshUVs[ii], meshUVs[ii + 1]);
+						float[] meshUVs = meshAttachment.uvs;
+						float z = i * zSpacing;
+						for (int ii = 0; ii < meshVertexCount; ii += 2, vertexIndex++) {
+							vertices[vertexIndex] = new Vector3(tempVertices[ii], tempVertices[ii + 1], z);
+							colors[vertexIndex] = color;
+							uvs[vertexIndex] = new Vector2(meshUVs[ii], meshUVs[ii + 1]);
+						}
 					}
-				}
 			}
 		}
 		
@@ -318,7 +329,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		if (submeshes.Count <= submeshIndex)
 			submeshes.Add(new Submesh());
 		else if (immutableTriangles)
-			return;
+				return;
 
 		Submesh submesh = submeshes[submeshIndex];
 		
@@ -330,10 +341,10 @@ public class SkeletonRenderer : MonoBehaviour {
 				triangles[i] = 0;
 			submesh.triangleCount = triangleCount;
 		} else if (trianglesCapacity != triangleCount) {
-			// Reallocate triangles when not the exact size needed.
-			submesh.triangles = triangles = new int[triangleCount];
-			submesh.triangleCount = 0;
-		}
+				// Reallocate triangles when not the exact size needed.
+				submesh.triangles = triangles = new int[triangleCount];
+				submesh.triangleCount = 0;
+			}
 
 		if (!renderMeshes) {
 			// Use stored triangles if possible.
@@ -374,18 +385,18 @@ public class SkeletonRenderer : MonoBehaviour {
 				attachmentVertexCount = meshAttachment.vertices.Length >> 1;
 				attachmentTriangles = meshAttachment.triangles;
 			} else if (attachment is SkinnedMeshAttachment) {
-				SkinnedMeshAttachment meshAttachment = (SkinnedMeshAttachment)attachment;
-				attachmentVertexCount = meshAttachment.uvs.Length >> 1;
-				attachmentTriangles = meshAttachment.triangles;
-			} else
-				continue;
+					SkinnedMeshAttachment meshAttachment = (SkinnedMeshAttachment)attachment;
+					attachmentVertexCount = meshAttachment.uvs.Length >> 1;
+					attachmentTriangles = meshAttachment.triangles;
+				} else
+					continue;
 			for (int ii = 0, nn = attachmentTriangles.Length; ii < nn; ii++, triangleIndex++)
 				triangles[triangleIndex] = firstVertex + attachmentTriangles[ii];
 			firstVertex += attachmentVertexCount;
 		}
 	}
 	
-	#if UNITY_EDITOR
+#if UNITY_EDITOR
 	void OnDrawGizmos() {
 		// Make selection easier by drawing a clear gizmo over the skeleton.
 		if (vertices == null) return;
@@ -405,7 +416,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		Gizmos.matrix = transform.localToWorldMatrix;
 		Gizmos.DrawCube(gizmosCenter, gizmosSize);
 	}
-	#endif
+#endif
 }
 
 class Submesh {

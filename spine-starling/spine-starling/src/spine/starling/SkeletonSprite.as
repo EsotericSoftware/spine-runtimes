@@ -243,10 +243,10 @@ public class SkeletonSprite extends DisplayObject {
 				continue;
 			for (var ii:int = 0; ii < verticesLength; ii += 2) {
 				var x:Number = worldVertices[ii], y:Number = worldVertices[ii + 1];
-				minX = Math.min(minX, x);
-				minY = Math.min(minY, y);
-				maxX = Math.max(maxX, x);
-				maxY = Math.max(maxY, y);
+				minX = minX < x ? minX : x;
+				minY = minY < y ? minY : y;
+				maxX = maxX > x ? maxX : x;
+				maxY = maxY > y ? maxY : y;
 			}
 		}
 

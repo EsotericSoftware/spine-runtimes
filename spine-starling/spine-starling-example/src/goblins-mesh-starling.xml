@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker http://www.codeandweb.com/texturepacker-->
+<!-- $TexturePacker:SmartUpdate:f68bf4c346737170377644079d2ad6c4:9a192cf6a7e1162a41e47cd5b4f91d60:bd0257f46142cc1d3e967d306d329226$ -->
+<TextureAtlas imagePath="goblins-mesh.png">
+    <SubTexture name="dagger" x="2" y="372" width="26" height="108"/>
+    <SubTexture name="goblin/eyes-closed" x="157" y="426" width="34" height="12"/>
+    <SubTexture name="goblin/head" x="26" y="85" width="103" height="66"/>
+    <SubTexture name="goblin/left-arm" x="145" y="442" width="37" height="35"/>
+    <SubTexture name="goblin/left-foot" x="134" y="285" width="65" height="31"/>
+    <SubTexture name="goblin/left-hand" x="204" y="123" width="36" height="41"/>
+    <SubTexture name="goblin/left-lower-leg" x="65" y="370" width="33" height="70"/>
+    <SubTexture name="goblin/left-shoulder" x="196" y="408" width="29" height="44"/>
+    <SubTexture name="goblin/left-upper-leg" x="30" y="370" width="33" height="73"/>
+    <SubTexture name="goblin/neck" x="201" y="80" width="36" height="41"/>
+    <SubTexture name="goblin/pelvis" x="131" y="100" width="62" height="43"/>
+    <SubTexture name="goblin/right-arm" x="171" y="374" width="23" height="50"/>
+    <SubTexture name="goblin/right-foot" x="134" y="318" width="63" height="33"/>
+    <SubTexture name="goblin/right-hand" x="107" y="442" width="36" height="37"/>
+    <SubTexture name="goblin/right-lower-leg" x="96" y="153" width="36" height="76"/>
+    <SubTexture name="goblin/right-shoulder" x="201" y="240" width="39" height="45"/>
+    <SubTexture name="goblin/right-upper-leg" x="98" y="296" width="34" height="63"/>
+    <SubTexture name="goblin/torso" x="26" y="153" width="68" height="96"/>
+    <SubTexture name="goblin/undie-straps" x="100" y="421" width="55" height="19"/>
+    <SubTexture name="goblin/undies" x="201" y="287" width="36" height="29"/>
+    <SubTexture name="goblingirl/eyes-closed" x="184" y="454" width="37" height="21"/>
+    <SubTexture name="goblingirl/head" x="26" y="2" width="103" height="81"/>
+    <SubTexture name="goblingirl/left-arm" x="30" y="445" width="37" height="35"/>
+    <SubTexture name="goblingirl/left-foot" x="134" y="217" width="65" height="31"/>
+    <SubTexture name="goblingirl/left-hand" x="199" y="318" width="35" height="40"/>
+    <SubTexture name="goblingirl/left-lower-leg" x="169" y="145" width="33" height="70"/>
+    <SubTexture name="goblingirl/left-shoulder" x="196" y="360" width="28" height="46"/>
+    <SubTexture name="goblingirl/left-upper-leg" x="134" y="145" width="33" height="70"/>
+    <SubTexture name="goblingirl/neck" x="204" y="166" width="35" height="41"/>
+    <SubTexture name="goblingirl/pelvis" x="26" y="325" width="62" height="43"/>
+    <SubTexture name="goblingirl/right-arm" x="100" y="361" width="28" height="50"/>
+    <SubTexture name="goblingirl/right-foot" x="134" y="250" width="63" height="33"/>
+    <SubTexture name="goblingirl/right-hand" x="69" y="442" width="36" height="37"/>
+    <SubTexture name="goblingirl/right-lower-leg" x="201" y="2" width="36" height="76"/>
+    <SubTexture name="goblingirl/right-shoulder" x="130" y="374" width="39" height="45"/>
+    <SubTexture name="goblingirl/right-upper-leg" x="98" y="231" width="34" height="63"/>
+    <SubTexture name="goblingirl/torso" x="131" y="2" width="68" height="96"/>
+    <SubTexture name="goblingirl/undie-straps" x="134" y="353" width="55" height="19"/>
+    <SubTexture name="goblingirl/undies" x="204" y="209" width="36" height="29"/>
+    <SubTexture name="shield" x="26" y="251" width="70" height="72"/>
+    <SubTexture name="spear" x="2" y="2" width="22" height="368"/>
+</TextureAtlas>

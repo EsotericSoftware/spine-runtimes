@@ -37,7 +37,7 @@ namespace Spine {
 		internal List<Bone> bones;
 		internal List<Slot> slots;
 		internal List<Slot> drawOrder;
-		internal List<IkConstraint> ikConstraints = new List<IkConstraint>();
+		internal List<IkConstraint> ikConstraints;
 		private List<List<Bone>> boneCache = new List<List<Bone>>();
 		internal Skin skin;
 		internal float r = 1, g = 1, b = 1, a = 1;
@@ -74,12 +74,9 @@ namespace Spine {
 			bones = new List<Bone>(data.bones.Count);
 			foreach (BoneData boneData in data.bones) {
 				Bone parent = boneData.parent == null ? null : bones[data.bones.IndexOf(boneData.parent)];
-				bones.Add(new Bone(boneData, this, parent));
-			}
-
-			foreach(Bone b in bones){
-				if(b.Parent != null)
-					b.Parent.children.Add(b);
+				Bone bone = new Bone(boneData, this, parent);
+				if (parent != null) parent.children.Add(bone);
+				bones.Add(bone);
 			}
 
 			slots = new List<Slot>(data.slots.Count);
@@ -233,9 +230,9 @@ namespace Spine {
 			SetSkin(skin);
 		}
 
-		/// <summary>Sets the skin used to look up attachments not found in the {@link SkeletonData#getDefaultSkin() default skin}. Attachments
-		/// from the new skin are attached if the corresponding attachment from the old skin was attached. If there was no old skin, each slot's
-		/// setup mode attachment is attached from the new skin.</summary>
+		/// <summary>Sets the skin used to look up attachments before looking in the {@link SkeletonData#getDefaultSkin() default 
+		/// skin}. Attachmentsfrom the new skin are attached if the corresponding attachment from the old skin was attached. If 
+		/// there was no old skin, each slot's setup mode attachment is attached from the new skin.</summary>
 		/// <param name="newSkin">May be null.</param>
 		public void SetSkin (Skin newSkin) {
 			if (newSkin != null) {

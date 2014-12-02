@@ -57,16 +57,13 @@ public class FfdTimeline extends CurveTimeline {
 		if (slot.attachment != attachment) return;
 
 		var frames:Vector.<Number> = this.frames;
-		if (time < frames[0]) {
-			slot.attachmentVertices.length = 0;
-			return; // Time is before first frame.
-		}
+		if (time < frames[0]) return; // Time is before first frame.
 
 		var frameVertices:Vector.<Vector.<Number>> = this.frameVertices;
 		var vertexCount:int = frameVertices[0].length;
 
 		var vertices:Vector.<Number> = slot.attachmentVertices;
-		if (vertices.length != vertexCount) alpha = 1;
+		if (vertices.length != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
 		vertices.length = vertexCount;
 
 		var i:int;
@@ -83,7 +80,7 @@ public class FfdTimeline extends CurveTimeline {
 		}
 
 		// Interpolate between the previous frame and the current frame.
-		var frameIndex:int = Animation.binarySearch(frames, time, 1);
+		var frameIndex:int = Animation.binarySearch1(frames, time);
 		var frameTime:Number = frames[frameIndex];
 		var percent:Number = 1 - (time - frameTime) / (frames[int(frameIndex - 1)] - frameTime);
 		percent = getCurvePercent(frameIndex - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));

@@ -38,10 +38,12 @@ namespace Spine {
 		internal BoneData data;
 		internal Skeleton skeleton;
 		internal Bone parent;
-		internal List<Bone> children;
+		internal List<Bone> children = new List<Bone>();
 		internal float x, y, rotation, rotationIK, scaleX, scaleY;
+		internal bool flipX, flipY;
 		internal float m00, m01, m10, m11;
 		internal float worldX, worldY, worldRotation, worldScaleX, worldScaleY;
+		internal bool worldFlipX, worldFlipY;
 
 		public BoneData Data { get { return data; } }
 		public Skeleton Skeleton { get { return skeleton; } }
@@ -55,6 +57,8 @@ namespace Spine {
 		public float RotationIK { get { return rotationIK; } set { rotationIK = value; } }
 		public float ScaleX { get { return scaleX; } set { scaleX = value; } }
 		public float ScaleY { get { return scaleY; } set { scaleY = value; } }
+		public bool FlipX { get { return flipX; } set { flipX = value; } }
+		public bool FlipY { get { return flipY; } set { flipY = value; } }
 
 		public float M00 { get { return m00; } }
 		public float M01 { get { return m01; } }
@@ -65,6 +69,8 @@ namespace Spine {
 		public float WorldRotation { get { return worldRotation; } }
 		public float WorldScaleX { get { return worldScaleX; } }
 		public float WorldScaleY { get { return worldScaleY; } }
+		public bool WorldFlipX { get { return worldFlipX; } set { worldFlipX = value; } }
+		public bool WorldFlipY { get { return worldFlipY; } set { worldFlipY = value; } }
 
 		/// <param name="parent">May be null.</param>
 		public Bone (BoneData data, Skeleton skeleton, Bone parent) {
@@ -73,14 +79,12 @@ namespace Spine {
 			this.data = data;
 			this.skeleton = skeleton;
 			this.parent = parent;
-			this.children = new List<Bone>();
 			SetToSetupPose();
 		}
 
 		/// <summary>Computes the world SRT using the parent bone and the local SRT.</summary>
 		public void UpdateWorldTransform () {
 			Bone parent = this.parent;
-			Skeleton skeleton = this.skeleton;
 			float x = this.x, y = this.y;
 			if (parent != null) {
 				worldX = x * parent.m00 + y * parent.m01 + parent.worldX;
@@ -93,24 +97,30 @@ namespace Spine {
 					worldScaleY = scaleY;
 				}
 				worldRotation = data.inheritRotation ? parent.worldRotation + rotationIK : rotationIK;
+				worldFlipX = parent.worldFlipX != flipX;
+				worldFlipY = parent.worldFlipY != flipY;
 			} else {
-				worldX = skeleton.flipX ? -x : x;
-				worldY = skeleton.flipY != yDown ? -y : y;
+				Skeleton skeleton = this.skeleton;
+				bool skeletonFlipX = skeleton.flipX, skeletonFlipY = skeleton.flipY;
+				worldX = skeletonFlipX ? -x : x;
+				worldY = skeletonFlipY != yDown ? -y : y;
 				worldScaleX = scaleX;
 				worldScaleY = scaleY;
 				worldRotation = rotationIK;
+				worldFlipX = skeletonFlipX != flipX;
+				worldFlipY = skeletonFlipY != flipY;
 			}
 			float radians = worldRotation * (float)Math.PI / 180;
 			float cos = (float)Math.Cos(radians);
 			float sin = (float)Math.Sin(radians);
-			if (skeleton.flipX) {
+			if (worldFlipX) {
 				m00 = -cos * worldScaleX;
 				m01 = sin * worldScaleY;
 			} else {
 				m00 = cos * worldScaleX;
 				m01 = -sin * worldScaleY;
 			}
-			if (skeleton.flipY != yDown) {
+			if (worldFlipY != yDown) {
 				m10 = -sin * worldScaleX;
 				m11 = -cos * worldScaleY;
 			} else {
@@ -127,15 +137,16 @@ namespace Spine {
 			rotationIK = rotation;
 			scaleX = data.scaleX;
 			scaleY = data.scaleY;
+			flipX = data.flipX;
+			flipY = data.flipY;
 		}
 
 		public void worldToLocal (float worldX, float worldY, out float localX, out float localY) {
 			float dx = worldX - this.worldX, dy = worldY - this.worldY;
 			float m00 = this.m00, m10 = this.m10, m01 = this.m01, m11 = this.m11;
-			Skeleton skeleton = this.skeleton;
-			if (skeleton.flipX != (skeleton.flipY != yDown)) {
-				m00 *= -1;
-				m11 *= -1;
+			if (worldFlipX != (worldFlipY != yDown)) {
+				m00 = -m00;
+				m11 = -m11;
 			}
 			float invDet = 1 / (m00 * m11 - m01 * m10);
 			localX = (dx * m00 * invDet - dy * m01 * invDet);

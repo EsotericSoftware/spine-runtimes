@@ -27,7 +27,6 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
 using System;
 using System.IO;
 using UnityEditor;
@@ -50,7 +49,8 @@ public class Menus {
 		var selected = Selection.activeObject;
 		if (selected != null) {
 			var assetDir = AssetDatabase.GetAssetPath(selected.GetInstanceID());
-			if (assetDir.Length > 0 && Directory.Exists(assetDir)) dir = assetDir + "/";
+			if (assetDir.Length > 0 && Directory.Exists(assetDir))
+				dir = assetDir + "/";
 		}
 		ScriptableObject asset = ScriptableObject.CreateInstance<T>();
 		AssetDatabase.CreateAsset(asset, dir + name + ".asset");
