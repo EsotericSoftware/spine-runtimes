@@ -3,8 +3,6 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{08DC311B-1F38-4CBD-B7B6-B734984A8CB3}</ProjectGuid>
     <ProjectTypeGuids>{6BC8ED88-2882-458C-8E55-DFD12B67127B};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
@@ -43,8 +41,9 @@
     <Folder Include="spine-csharp\Attachments\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.MonoTouch.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\..\..\MonoGame\MonoGame.Framework\MonoGame.Framework.iOS.csproj">
+    <ProjectReference Include="..\..\..\..\MonoGame\MonoGame.Framework\MonoGame.Framework.iOS.csproj">
       <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
       <Name>MonoGame.Framework.iOS</Name>
     </ProjectReference>
@@ -110,12 +109,6 @@
     <Compile Include="..\..\..\spine-csharp\src\SlotData.cs">
       <Link>spine-csharp\SlotData.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\spine-xna\src\SkeletonRenderer.cs">
-      <Link>spine-xna\SkeletonRenderer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\spine-xna\src\SpriteBatcher.cs">
-      <Link>spine-xna\SpriteBatcher.cs</Link>
-    </Compile>
     <Compile Include="..\..\..\spine-xna\src\Util.cs">
       <Link>spine-xna\Util.cs</Link>
     </Compile>
@@ -127,6 +120,30 @@
     </Compile>
     <Compile Include="..\..\..\spine-csharp\src\EventData.cs">
       <Link>spine-csharp\EventData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-xna\src\MeshBatcher.cs">
+      <Link>spine-xna\MeshBatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-xna\src\RegionBatcher.cs">
+      <Link>spine-xna\RegionBatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-xna\src\SkeletonMeshRenderer.cs">
+      <Link>spine-xna\SkeletonMeshRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-xna\src\SkeletonRegionRenderer.cs">
+      <Link>spine-xna\SkeletonRegionRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Attachments\MeshAttachment.cs">
+      <Link>spine-csharp\Attachments\MeshAttachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Attachments\SkinnedMeshAttachment.cs">
+      <Link>spine-csharp\Attachments\SkinnedMeshAttachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\IkConstraint.cs">
+      <Link>spine-csharp\IkConstraint.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\IkConstraintData.cs">
+      <Link>spine-csharp\IkConstraintData.cs</Link>
     </Compile>
   </ItemGroup>
 </Project>

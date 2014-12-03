@@ -1,260 +1,303 @@
 /******************************************************************************
- * Spine Runtime Software License - Version 1.1
+ * Spine Runtimes Software License
+ * Version 2.1
  * 
  * Copyright (c) 2013, Esoteric Software
  * All rights reserved.
  * 
- * Redistribution and use in source and binary forms in whole or in part, with
- * or without modification, are permitted provided that the following conditions
- * are met:
+ * You are granted a perpetual, non-exclusive, non-sublicensable and
+ * non-transferable license to install, execute and perform the Spine Runtimes
+ * Software (the "Software") solely for internal use. Without the written
+ * permission of Esoteric Software (typically granted by licensing Spine), you
+ * may not (a) modify, translate, adapt or otherwise create derivative works,
+ * improvements of the Software or develop new applications using the Software
+ * or (b) remove, delete, alter or obscure any trademarks or any copyright,
+ * trademark, patent or other intellectual property or proprietary rights
+ * notices on or in the Software, including any copy thereof. Redistributions
+ * in binary or source form must include this license and terms.
  * 
- * 1. A Spine Essential, Professional, Enterprise, or Education License must
- *    be purchased from Esoteric Software and the license must remain valid:
- *    http://esotericsoftware.com/
- * 2. Redistributions of source code must retain this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer.
- * 3. Redistributions in binary form must reproduce this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer, in the documentation and/or other materials provided with the
- *    distribution.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/Animation.h>
 #include <spine/AnimationState.h>
-#include <spine/AnimationStateData.h>
-#include <spine/Event.h>
 #include <spine/extension.h>
-#include <spine/Skeleton.h>
-#include <spine/SkeletonData.h>
 #include <string.h>
 
-TrackEntry* _TrackEntry_create () {
-	TrackEntry* entry = NEW(TrackEntry);
-	entry->timeScale = 1;
-	return entry;
+spTrackEntry* _spTrackEntry_create (spAnimationState* state) {
+	spTrackEntry* self = NEW(spTrackEntry);
+	CONST_CAST(spAnimationState*, self->state) = state;
+	self->timeScale = 1;
+	self->lastTime = -1;
+	self->mix = 1;
+	return self;
 }
 
-void _TrackEntry_dispose (TrackEntry* entry) {
-	FREE(entry);
-}
-
-void _TrackEntry_disposeAll (TrackEntry* entry) {
-	while (entry) {
-		TrackEntry* next = entry->next;
-		_TrackEntry_dispose(entry);
-		entry = next;
-	}
+void _spTrackEntry_dispose (spTrackEntry* self) {
+	if (self->previous) SUB_CAST(_spAnimationState, self->state)->disposeTrackEntry(self->previous);
+	FREE(self);
 }
 
 /**/
 
-typedef struct {
-	AnimationState super;
-	Event** events;
-} _AnimationState;
+spTrackEntry* _spAnimationState_createTrackEntry (spAnimationState* self) {
+	return _spTrackEntry_create(self);
+}
 
-void _AnimationState_setCurrent (AnimationState* self, int index, TrackEntry* entry);
+void _spAnimationState_disposeTrackEntry (spTrackEntry* entry) {
+	_spTrackEntry_dispose(entry);
+}
 
-AnimationState* AnimationState_create (AnimationStateData* data) {
-	_AnimationState* internal = NEW(_AnimationState);
-	AnimationState* self = SUPER(internal);
-	internal->events = MALLOC(Event*, 64);
+spAnimationState* spAnimationState_create (spAnimationStateData* data) {
+	_spAnimationState* internal = NEW(_spAnimationState);
+	spAnimationState* self = SUPER(internal);
+	internal->events = MALLOC(spEvent*, 64);
 	self->timeScale = 1;
-	CONST_CAST(AnimationStateData*, self->data) = data;
+	CONST_CAST(spAnimationStateData*, self->data) = data;
+	internal->createTrackEntry = _spAnimationState_createTrackEntry;
+	internal->disposeTrackEntry = _spAnimationState_disposeTrackEntry;
 	return self;
 }
 
-void AnimationState_dispose (AnimationState* self) {
+void _spAnimationState_disposeAllEntries (spAnimationState* self, spTrackEntry* entry) {
+	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
+	while (entry) {
+		spTrackEntry* next = entry->next;
+		internal->disposeTrackEntry(entry);
+		entry = next;
+	}
+}
+
+void spAnimationState_dispose (spAnimationState* self) {
 	int i;
-	for (i = 0; i < self->trackCount; i++)
-		_TrackEntry_disposeAll(self->tracks[i]);
+	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
+	FREE(internal->events);
+	for (i = 0; i < self->tracksCount; ++i)
+		_spAnimationState_disposeAllEntries(self, self->tracks[i]);
+	FREE(self->tracks);
 	FREE(self);
 }
 
-void AnimationState_update (AnimationState* self, float delta) {
+void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEntry* entry);
+
+void spAnimationState_update (spAnimationState* self, float delta) {
 	int i;
-	float time, endTime, trackDelta;
+	float previousDelta;
 	delta *= self->timeScale;
-	for (i = 0; i < self->trackCount; i++) {
-		TrackEntry* current = self->tracks[i];
+	for (i = 0; i < self->tracksCount; ++i) {
+		spTrackEntry* current = self->tracks[i];
 		if (!current) continue;
 
-		trackDelta = delta * current->timeScale;
-		time = current->time + trackDelta;
-		endTime = current->endTime;
-
-		current->time = time;
+		current->time += delta * current->timeScale;
 		if (current->previous) {
-			current->previous->time += trackDelta;
-			current->mixTime += trackDelta;
-		}
-
-		/* Check if completed the animation or a loop iteration. */
-		if (current->loop ?
-				(FMOD(current->lastTime, endTime) > FMOD(time, endTime)) : (current->lastTime < endTime && time >= endTime)) {
-			int count = (int)(time / endTime);
-			if (current->listener) current->listener(self, i, ANIMATION_COMPLETE, 0, count);
-			if (self->listener) self->listener(self, i, ANIMATION_COMPLETE, 0, count);
+			previousDelta = delta * current->previous->timeScale;
+			current->previous->time += previousDelta;
+			current->mixTime += previousDelta;
 		}
 
 		if (current->next) {
-			if (time - trackDelta >= current->next->delay) _AnimationState_setCurrent(self, i, current->next);
+			current->next->time = current->lastTime - current->next->delay;
+			if (current->next->time >= 0) _spAnimationState_setCurrent(self, i, current->next);
 		} else {
 			/* End non-looping animation when it reaches its end time and there is no next entry. */
-			if (!current->loop && current->lastTime >= current->endTime) AnimationState_clearTrack(self, i);
+			if (!current->loop && current->lastTime >= current->endTime) spAnimationState_clearTrack(self, i);
 		}
 	}
 }
 
-void AnimationState_apply (AnimationState* self, Skeleton* skeleton) {
-	_AnimationState* internal = SUB_CAST(_AnimationState, self);
+void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
+	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
 
 	int i, ii;
-	int eventCount;
+	int eventsCount;
+	int entryChanged;
 	float time;
-	TrackEntry* previous;
-	for (i = 0; i < self->trackCount; i++) {
-		TrackEntry* current = self->tracks[i];
+	spTrackEntry* previous;
+	for (i = 0; i < self->tracksCount; ++i) {
+		spTrackEntry* current = self->tracks[i];
 		if (!current) continue;
 
-		eventCount = 0;
+		eventsCount = 0;
 
 		time = current->time;
 		if (!current->loop && time > current->endTime) time = current->endTime;
 
 		previous = current->previous;
 		if (!previous) {
-			Animation_apply(current->animation, skeleton, current->lastTime, time, current->loop, internal->events,
-					&eventCount);
+			if (current->mix == 1) {
+				spAnimation_apply(current->animation, skeleton, current->lastTime, time,
+					current->loop, internal->events, &eventsCount);
+			} else {
+				spAnimation_mix(current->animation, skeleton, current->lastTime, time,
+					current->loop, internal->events, &eventsCount, current->mix);
+			}
 		} else {
-			float alpha = current->mixTime / current->mixDuration;
+			float alpha = current->mixTime / current->mixDuration * current->mix;
 
 			float previousTime = previous->time;
 			if (!previous->loop && previousTime > previous->endTime) previousTime = previous->endTime;
-			Animation_apply(previous->animation, skeleton, previousTime, previousTime, previous->loop, 0, 0);
+			spAnimation_apply(previous->animation, skeleton, previousTime, previousTime, previous->loop, 0, 0);
 
 			if (alpha >= 1) {
 				alpha = 1;
-				_TrackEntry_dispose(current->previous);
+				internal->disposeTrackEntry(current->previous);
 				current->previous = 0;
 			}
-			Animation_mix(current->animation, skeleton, current->lastTime, time, current->loop, internal->events,
-					&eventCount, alpha);
+			spAnimation_mix(current->animation, skeleton, current->lastTime, time,
+				current->loop, internal->events, &eventsCount, alpha);
 		}
 
-		for (ii = 0; ii < eventCount; ii++) {
-			Event* event = internal->events[ii];
-			if (current->listener) current->listener(self, i, ANIMATION_EVENT, event, 0);
-			if (self->listener) self->listener(self, i, ANIMATION_EVENT, event, 0);
+		entryChanged = 0;
+		for (ii = 0; ii < eventsCount; ++ii) {
+			spEvent* event = internal->events[ii];
+			if (current->listener) {
+				current->listener(self, i, SP_ANIMATION_EVENT, event, 0);
+				if (self->tracks[i] != current) {
+					entryChanged = 1;
+					break;
+				}
+			}
+			if (self->listener) {
+				self->listener(self, i, SP_ANIMATION_EVENT, event, 0);
+				if (self->tracks[i] != current) {
+					entryChanged = 1;
+					break;
+				}
+			}
+		}
+		if (entryChanged) continue;
+
+		/* Check if completed the animation or a loop iteration. */
+		if (current->loop ? (FMOD(current->lastTime, current->endTime) > FMOD(time, current->endTime))
+				: (current->lastTime < current->endTime && time >= current->endTime)) {
+			int count = (int)(time / current->endTime);
+			if (current->listener) {
+				current->listener(self, i, SP_ANIMATION_COMPLETE, 0, count);
+				if (self->tracks[i] != current) continue;
+			}
+			if (self->listener) {
+				self->listener(self, i, SP_ANIMATION_COMPLETE, 0, count);
+				if (self->tracks[i] != current) continue;
+			}
 		}
 
 		current->lastTime = current->time;
 	}
 }
 
-void AnimationState_clearTracks (AnimationState* self) {
+void spAnimationState_clearTracks (spAnimationState* self) {
 	int i;
-	for (i = 0; i < self->trackCount; i++)
-		AnimationState_clearTrack(self, i);
-	self->trackCount = 0;
+	for (i = 0; i < self->tracksCount; ++i)
+		spAnimationState_clearTrack(self, i);
+	self->tracksCount = 0;
 }
 
-void AnimationState_clearTrack (AnimationState* self, int trackIndex) {
-	TrackEntry* current;
-	if (trackIndex >= self->trackCount) return;
+void spAnimationState_clearTrack (spAnimationState* self, int trackIndex) {
+	spTrackEntry* current;
+	if (trackIndex >= self->tracksCount) return;
 	current = self->tracks[trackIndex];
 	if (!current) return;
 
-	if (current->listener) current->listener(self, trackIndex, ANIMATION_END, 0, 0);
-	if (self->listener) self->listener(self, trackIndex, ANIMATION_END, 0, 0);
+	if (current->listener) current->listener(self, trackIndex, SP_ANIMATION_END, 0, 0);
+	if (self->listener) self->listener(self, trackIndex, SP_ANIMATION_END, 0, 0);
 
 	self->tracks[trackIndex] = 0;
-	if (current->previous) _TrackEntry_dispose(current->previous);
-	_TrackEntry_disposeAll(current);
+
+	_spAnimationState_disposeAllEntries(self, current);
 }
 
-TrackEntry* _AnimationState_expandToIndex (AnimationState* self, int index) {
-	TrackEntry** newTracks;
-	if (index < self->trackCount) return self->tracks[index];
-	newTracks = CALLOC(TrackEntry*, index + 1);
-	memcpy(newTracks, self->tracks, self->trackCount * sizeof(TrackEntry*));
+spTrackEntry* _spAnimationState_expandToIndex (spAnimationState* self, int index) {
+	spTrackEntry** newTracks;
+	if (index < self->tracksCount) return self->tracks[index];
+	newTracks = CALLOC(spTrackEntry*, index + 1);
+	memcpy(newTracks, self->tracks, self->tracksCount * sizeof(spTrackEntry*));
+	FREE(self->tracks);
 	self->tracks = newTracks;
-	self->trackCount = index + 1;
+	self->tracksCount = index + 1;
 	return 0;
 }
 
-void _AnimationState_setCurrent (AnimationState* self, int index, TrackEntry* entry) {
-	TrackEntry* current = _AnimationState_expandToIndex(self, index);
+void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEntry* entry) {
+	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
+
+	spTrackEntry* current = _spAnimationState_expandToIndex(self, index);
 	if (current) {
-		if (current->previous) {
-			_TrackEntry_dispose(current->previous);
-			current->previous = 0;
-		}
+		spTrackEntry* previous = current->previous;
+		current->previous = 0;
 
-		if (current->listener) current->listener(self, index, ANIMATION_END, 0, 0);
-		if (self->listener) self->listener(self, index, ANIMATION_END, 0, 0);
+		if (current->listener) current->listener(self, index, SP_ANIMATION_END, 0, 0);
+		if (self->listener) self->listener(self, index, SP_ANIMATION_END, 0, 0);
 
-		entry->mixDuration = AnimationStateData_getMix(self->data, current->animation, entry->animation);
+		entry->mixDuration = spAnimationStateData_getMix(self->data, current->animation, entry->animation);
 		if (entry->mixDuration > 0) {
 			entry->mixTime = 0;
-			entry->previous = current;
+			/* If a mix is in progress, mix from the closest animation. */
+			if (previous && current->mixTime / current->mixDuration < 0.5f) {
+				entry->previous = previous;
+				previous = current;
+			} else
+				entry->previous = current;
 		} else
-			_TrackEntry_dispose(current);
+			internal->disposeTrackEntry(current);
+
+		if (previous) internal->disposeTrackEntry(previous);
 	}
 
 	self->tracks[index] = entry;
 
-	if (entry->listener) current->listener(self, index, ANIMATION_START, 0, 0);
-	if (self->listener) self->listener(self, index, ANIMATION_START, 0, 0);
+	if (entry->listener) {
+		entry->listener(self, index, SP_ANIMATION_START, 0, 0);
+		if (self->tracks[index] != entry) return;
+	}
+	if (self->listener) self->listener(self, index, SP_ANIMATION_START, 0, 0);
 }
 
-TrackEntry* AnimationState_setAnimationByName (AnimationState* self, int trackIndex, const char* animationName, int/*bool*/loop) {
-	Animation* animation = animationName ? SkeletonData_findAnimation(self->data->skeletonData, animationName) : 0;
-	return AnimationState_setAnimation(self, trackIndex, animation, loop);
+spTrackEntry* spAnimationState_setAnimationByName (spAnimationState* self, int trackIndex, const char* animationName,
+		int/*bool*/loop) {
+	spAnimation* animation = spSkeletonData_findAnimation(self->data->skeletonData, animationName);
+	return spAnimationState_setAnimation(self, trackIndex, animation, loop);
 }
 
-TrackEntry* AnimationState_setAnimation (AnimationState* self, int trackIndex, Animation* animation, int/*bool*/loop) {
-	TrackEntry* entry;
-	TrackEntry* current = _AnimationState_expandToIndex(self, trackIndex);
-	if (current) _TrackEntry_disposeAll(current->next);
+spTrackEntry* spAnimationState_setAnimation (spAnimationState* self, int trackIndex, spAnimation* animation, int/*bool*/loop) {
+	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
 
-	entry = _TrackEntry_create();
+	spTrackEntry* entry;
+	spTrackEntry* current = _spAnimationState_expandToIndex(self, trackIndex);
+	if (current) _spAnimationState_disposeAllEntries(self, current->next);
+
+	entry = internal->createTrackEntry(self);
 	entry->animation = animation;
 	entry->loop = loop;
-	entry->time = 0;
-	entry->endTime = animation ? animation->duration : 0;
-	_AnimationState_setCurrent(self, trackIndex, entry);
+	entry->endTime = animation->duration;
+	_spAnimationState_setCurrent(self, trackIndex, entry);
 	return entry;
 }
 
-TrackEntry* AnimationState_addAnimationByName (AnimationState* self, int trackIndex, const char* animationName, int/*bool*/loop,
-		float delay) {
-	Animation* animation = animationName ? SkeletonData_findAnimation(self->data->skeletonData, animationName) : 0;
-	return AnimationState_addAnimation(self, trackIndex, animation, loop, delay);
+spTrackEntry* spAnimationState_addAnimationByName (spAnimationState* self, int trackIndex, const char* animationName,
+		int/*bool*/loop, float delay) {
+	spAnimation* animation = spSkeletonData_findAnimation(self->data->skeletonData, animationName);
+	return spAnimationState_addAnimation(self, trackIndex, animation, loop, delay);
 }
 
-TrackEntry* AnimationState_addAnimation (AnimationState* self, int trackIndex, Animation* animation, int/*bool*/loop, float delay) {
-	TrackEntry* last;
+spTrackEntry* spAnimationState_addAnimation (spAnimationState* self, int trackIndex, spAnimation* animation, int/*bool*/loop,
+		float delay) {
+	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
+	spTrackEntry* last;
 
-	TrackEntry* entry = _TrackEntry_create();
+	spTrackEntry* entry = internal->createTrackEntry(self);
 	entry->animation = animation;
 	entry->loop = loop;
-	entry->time = 0;
-	entry->endTime = animation ? animation->duration : 0;
+	entry->endTime = animation->duration;
 
-	last = _AnimationState_expandToIndex(self, trackIndex);
+	last = _spAnimationState_expandToIndex(self, trackIndex);
 	if (last) {
 		while (last->next)
 			last = last->next;
@@ -263,10 +306,9 @@ TrackEntry* AnimationState_addAnimation (AnimationState* self, int trackIndex, A
 		self->tracks[trackIndex] = entry;
 
 	if (delay <= 0) {
-		if (last) {
-			delay += last->endTime;
-			if (animation) delay -= AnimationStateData_getMix(self->data, last->animation, animation);
-		} else
+		if (last)
+			delay += last->endTime - spAnimationStateData_getMix(self->data, last->animation, animation);
+		else
 			delay = 0;
 	}
 	entry->delay = delay;
@@ -274,7 +316,7 @@ TrackEntry* AnimationState_addAnimation (AnimationState* self, int trackIndex, A
 	return entry;
 }
 
-TrackEntry* AnimationState_getCurrent (AnimationState* self, int trackIndex) {
-	if (trackIndex >= self->trackCount) return 0;
+spTrackEntry* spAnimationState_getCurrent (spAnimationState* self, int trackIndex) {
+	if (trackIndex >= self->tracksCount) return 0;
 	return self->tracks[trackIndex];
 }

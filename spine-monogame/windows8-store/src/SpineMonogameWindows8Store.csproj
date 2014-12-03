@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -153,8 +153,14 @@
     <Compile Include="..\..\..\spine-csharp\src\Attachments\AttachmentType.cs">
       <Link>spine-csharp\Attachments\AttachmentType.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Attachments\MeshAttachment.cs">
+      <Link>spine-csharp\Attachments\MeshAttachment.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\spine-csharp\src\Attachments\RegionAttachment.cs">
       <Link>spine-csharp\Attachments\RegionAttachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\Attachments\SkinnedMeshAttachment.cs">
+      <Link>spine-csharp\Attachments\SkinnedMeshAttachment.cs</Link>
     </Compile>
     <Compile Include="..\..\..\spine-csharp\src\Bone.cs">
       <Link>spine-csharp\Bone.cs</Link>
@@ -167,6 +173,12 @@
     </Compile>
     <Compile Include="..\..\..\spine-csharp\src\EventData.cs">
       <Link>spine-csharp\EventData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\IkConstraint.cs">
+      <Link>spine-csharp\IkConstraint.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\IkConstraintData.cs">
+      <Link>spine-csharp\IkConstraintData.cs</Link>
     </Compile>
     <Compile Include="..\..\..\spine-csharp\src\Json.cs">
       <Link>spine-csharp\Json.cs</Link>
@@ -192,11 +204,17 @@
     <Compile Include="..\..\..\spine-csharp\src\SlotData.cs">
       <Link>spine-csharp\SlotData.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\spine-xna\src\SkeletonRenderer.cs">
-      <Link>spine-xna\SkeletonRenderer.cs</Link>
+    <Compile Include="..\..\..\spine-xna\src\MeshBatcher.cs">
+      <Link>spine-xna\MeshBatcher.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\spine-xna\src\SpriteBatcher.cs">
-      <Link>spine-xna\SpriteBatcher.cs</Link>
+    <Compile Include="..\..\..\spine-xna\src\RegionBatcher.cs">
+      <Link>spine-xna\RegionBatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-xna\src\SkeletonMeshRenderer.cs">
+      <Link>spine-xna\SkeletonMeshRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\spine-xna\src\SkeletonRegionRenderer.cs">
+      <Link>spine-xna\SkeletonRegionRenderer.cs</Link>
     </Compile>
     <Compile Include="..\..\..\spine-xna\src\Util.cs">
       <Link>spine-xna\Util.cs</Link>

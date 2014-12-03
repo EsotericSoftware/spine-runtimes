@@ -1,57 +1,74 @@
-spine-c/Debug/*
-spine-cpp/Debug/*
-spine-sfml/Debug/*
-spine-libgdx/bin/*
-spine-libgdx/libs/*
-target
 
+target
 *Debug.win32
 *.sdf
 *.opensdf
 *.suo
 *.ipch
-
-spine-cocos2dx/cocos2dx/
-!spine-cocos2dx/cocos2dx/Place cocos2dx here.txt
+*.userprefs
+*.pidb
+*.cachefile
 *.swp
+*.user
 .DS_Store
+
+spine-c/Debug/*
+
+spine-cpp/Debug/*
+
+spine-sfml/Debug/*
+spine-sfml/SFML
+
+spine-libgdx/spine-libgdx/bin/*
+spine-libgdx/spine-libgdx-tests/bin/*
+spine-libgdx/spine-skeletonviewer/bin/*
+
+spine-cocos2dx/2/cocos2dx/
+!spine-cocos2dx/2/cocos2dx/Place cocos2dx here.txt
+spine-cocos2dx/2/example/proj.win32/Debug
+spine-cocos2dx/3/cocos2dx/
+!spine-cocos2dx/3/cocos2dx/Place cocos2dx here.txt
+spine-cocos2dx/3/example/proj.win32/Debug
 xcuserdata
 
-spine-cocos2d-iphone/libs/*
-!spine-cocos2d-iphone/libs/cocos2d/Place cocos2d here.txt
-!spine-cocos2d-iphone/libs/CocosDenshion/Place CocosDenshion here.txt
-!spine-cocos2d-iphone/libs/kazmath/Place kazmath here.txt
+spine-cocos2d-iphone/2/cocos2d/*
+!spine-cocos2d-iphone/2/cocos2d/Place cocos2d here.txt
+spine-cocos2d-iphone/3/cocos2d/*
+!spine-cocos2d-iphone/3/cocos2d/Place cocos2d here.txt
 
-*.user
-forums
 spine-csharp/bin
 spine-csharp/obj
 
 spine-monogame/xamarinstudio-ios/src/bin
 spine-monogame/xamarinstudio-ios/src/obj
 
+spine-monogame/xamarinstudio-ios/example/bin
+spine-monogame/xamarinstudio-ios/example/obj
+
 spine-monogame/windows8-store/src/bin
 spine-monogame/windows8-store/src/obj
+
+spine-monogame/windows8-store/example/spine-monogame-example_TemporaryKey.pfx
+spine-monogame/windows8-store/example/obj/*
+spine-monogame/windows8-store/example/bin/*
 
 spine-xna/bin
 spine-xna/obj
 spine-xna/example/bin
 spine-xna/example/obj
 
-spine-unity/Assets/Spine/spine-csharp
-!spine-unity/Assets/Spine/spine-csharp/Place spine-csharp here.txt
+spine-unity/Assets/spine-csharp*
+!spine-unity/Assets/spine-csharp/Place spine-csharp src here.*
 spine-unity/ProjectSettings
 spine-unity/Temp
 spine-unity/Library
 spine-unity/*.sln
-*.userprefs
-*.pidb
-*.cachefile
 Assembly-*.csproj
 Assembly-*.pidb
+AssetStoreTools*
 
-spine-tk2d/Assets/Spine/spine-csharp
-!spine-tk2d/Assets/Spine/spine-csharp/Place spine-csharp here.txt
+spine-tk2d/Assets/spine-csharp*
+!spine-tk2d/Assets/spine-csharp/Place spine-csharp src here.*
 spine-tk2d/ProjectSettings
 spine-tk2d/Temp
 spine-tk2d/Library
@@ -69,6 +86,9 @@ spine-love/love/
 spine-as3/spine-as3/bin
 spine-as3/spine-as3-example/bin-debug
 spine-as3/spine-as3-example/bin-release
+
 spine-starling/spine-starling/bin
 spine-starling/spine-starling-example/bin-debug
 spine-starling/spine-starling-example/bin-release
+
+spine-turbulenz/spine-js/spine.js

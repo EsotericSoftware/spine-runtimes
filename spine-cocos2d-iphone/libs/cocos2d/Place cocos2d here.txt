@@ -1,1 +1,0 @@
-cocos2d-iphone v2.1-rc1 or later.

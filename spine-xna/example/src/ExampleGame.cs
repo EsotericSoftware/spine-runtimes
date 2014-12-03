@@ -1,34 +1,31 @@
 /******************************************************************************
- * Spine Runtime Software License - Version 1.1
+ * Spine Runtimes Software License
+ * Version 2.1
  * 
  * Copyright (c) 2013, Esoteric Software
  * All rights reserved.
  * 
- * Redistribution and use in source and binary forms in whole or in part, with
- * or without modification, are permitted provided that the following conditions
- * are met:
+ * You are granted a perpetual, non-exclusive, non-sublicensable and
+ * non-transferable license to install, execute and perform the Spine Runtimes
+ * Software (the "Software") solely for internal use. Without the written
+ * permission of Esoteric Software (typically granted by licensing Spine), you
+ * may not (a) modify, translate, adapt or otherwise create derivative works,
+ * improvements of the Software or develop new applications using the Software
+ * or (b) remove, delete, alter or obscure any trademarks or any copyright,
+ * trademark, patent or other intellectual property or proprietary rights
+ * notices on or in the Software, including any copy thereof. Redistributions
+ * in binary or source form must include this license and terms.
  * 
- * 1. A Spine Essential, Professional, Enterprise, or Education License must
- *    be purchased from Esoteric Software and the license must remain valid:
- *    http://esotericsoftware.com/
- * 2. Redistributions of source code must retain this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer.
- * 3. Redistributions in binary form must reproduce this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer, in the documentation and/or other materials provided with the
- *    distribution.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 using System;
@@ -37,7 +34,6 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
@@ -46,19 +42,25 @@ using Spine;
 namespace Spine {
 	public class Example : Microsoft.Xna.Framework.Game {
 		GraphicsDeviceManager graphics;
-		SkeletonRenderer skeletonRenderer;
+		SkeletonMeshRenderer skeletonRenderer;
 		Skeleton skeleton;
 		Slot headSlot;
 		AnimationState state;
 		SkeletonBounds bounds = new SkeletonBounds();
+
+#if WINDOWS_STOREAPP
+		private string assetsFolder = @"Assets\";
+#else
+		private string assetsFolder = "data/";
+#endif
 
 		public Example () {
 			IsMouseVisible = true;
 
 			graphics = new GraphicsDeviceManager(this);
 			graphics.IsFullScreen = false;
-			graphics.PreferredBackBufferWidth = 640;
-			graphics.PreferredBackBufferHeight = 480;
+			graphics.PreferredBackBufferWidth = 800;
+			graphics.PreferredBackBufferHeight = 600;
 		}
 
 		protected override void Initialize () {
@@ -68,43 +70,48 @@ namespace Spine {
 		}
 
 		protected override void LoadContent () {
-			skeletonRenderer = new SkeletonRenderer(GraphicsDevice);
+			skeletonRenderer = new SkeletonMeshRenderer(GraphicsDevice);
 			skeletonRenderer.PremultipliedAlpha = true;
 
-			String name = "spineboy"; // "goblins";
+			// String name = "spineboy";
+			// String name = "goblins-mesh";
+			String name = "raptor";
 
-			Atlas atlas = new Atlas("data/" + name + ".atlas", new XnaTextureLoader(GraphicsDevice));
+			Atlas atlas = new Atlas(assetsFolder + name + ".atlas", new XnaTextureLoader(GraphicsDevice));
 			SkeletonJson json = new SkeletonJson(atlas);
-			skeleton = new Skeleton(json.ReadSkeletonData("data/" + name + ".json"));
-			if (name == "goblins") skeleton.SetSkin("goblingirl");
-			skeleton.SetSlotsToSetupPose(); // Without this the skin attachments won't be attached. See SetSkin.
+			if (name == "spineboy") json.Scale = 0.6f;
+			if (name == "raptor") json.Scale = 0.5f;
+			skeleton = new Skeleton(json.ReadSkeletonData(assetsFolder + name + ".json"));
+			if (name == "goblins-mesh") skeleton.SetSkin("goblin");
 
 			// Define mixing between animations.
 			AnimationStateData stateData = new AnimationStateData(skeleton.Data);
-			if (name == "spineboy") {
-				stateData.SetMix("walk", "jump", 0.2f);
-				stateData.SetMix("jump", "walk", 0.4f);
-			}
-
 			state = new AnimationState(stateData);
 
-			if (true) {
-				// Event handling for all animations.
-				state.Start += new EventHandler<StartEndArgs>(Start);
-				state.End += new EventHandler<StartEndArgs>(End);
-				state.Complete += new EventHandler<CompleteArgs>(Complete);
-				state.Event += new EventHandler<EventTriggeredArgs>(Event);
+			if (name == "spineboy") {
+				stateData.SetMix("run", "jump", 0.2f);
+				stateData.SetMix("jump", "run", 0.4f);
 
-				state.SetAnimation(0, "drawOrder", true);
-			} else {
-				state.SetAnimation(0, "walk", false);
+				// Event handling for all animations.
+				state.Start += Start;
+				state.End += End;
+				state.Complete += Complete;
+				state.Event += Event;
+
+				state.SetAnimation(0, "test", false);
 				TrackEntry entry = state.AddAnimation(0, "jump", false, 0);
-				entry.End += new EventHandler<StartEndArgs>(End); // Event handling for queued animations.
-				state.AddAnimation(0, "walk", true, 0);
+				entry.End += End; // Event handling for queued animations.
+				state.AddAnimation(0, "run", true, 0);
+			} else if (name == "raptor") {
+				state.SetAnimation(0, "walk", true);
+				state.SetAnimation(1, "empty", false);
+				state.AddAnimation(1, "gungrab", false, 2);
+			} else {
+				state.SetAnimation(0, "walk", true);
 			}
 
-			skeleton.X = 320;
-			skeleton.Y = 440;
+			skeleton.X = 400;
+			skeleton.Y = 590;
 			skeleton.UpdateWorldTransform();
 
 			headSlot = skeleton.FindSlot("head");
@@ -116,9 +123,10 @@ namespace Spine {
 
 		protected override void Update (GameTime gameTime) {
 			// Allows the game to exit
+#if !WINDOWS_STOREAPP	
 			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
 				this.Exit();
-
+#endif
 			// TODO: Add your update logic here
 
 			base.Update(gameTime);
@@ -136,33 +144,43 @@ namespace Spine {
 
 			bounds.Update(skeleton, true);
 			MouseState mouse = Mouse.GetState();
-			headSlot.G = 1;
-			headSlot.B = 1;
-			if (bounds.AabbContainsPoint(mouse.X, mouse.Y)) {
-				BoundingBoxAttachment hit = bounds.ContainsPoint(mouse.X, mouse.Y);
-				if (hit != null) {
-					headSlot.G = 0;
-					headSlot.B = 0;
+			if (headSlot != null) {
+				headSlot.G = 1;
+				headSlot.B = 1;
+				if (bounds.AabbContainsPoint(mouse.X, mouse.Y)) {
+					BoundingBoxAttachment hit = bounds.ContainsPoint(mouse.X, mouse.Y);
+					if (hit != null) {
+						headSlot.G = 0;
+						headSlot.B = 0;
+					}
 				}
 			}
 
 			base.Draw(gameTime);
 		}
 
-		public void Start (object sender, StartEndArgs e) {
-			Console.WriteLine(e.TrackIndex + " " + state.GetCurrent(e.TrackIndex) + ": start");
+		public void Start (AnimationState state, int trackIndex) {
+#if !WINDOWS_STOREAPP
+			Console.WriteLine(trackIndex + " " + state.GetCurrent(trackIndex) + ": start");
+#endif
 		}
 
-		public void End (object sender, StartEndArgs e) {
-			Console.WriteLine(e.TrackIndex + " " + state.GetCurrent(e.TrackIndex) + ": end");
+		public void End (AnimationState state, int trackIndex) {
+#if !WINDOWS_STOREAPP	
+			Console.WriteLine(trackIndex + " " + state.GetCurrent(trackIndex) + ": end");
+#endif
 		}
 
-		public void Complete (object sender, CompleteArgs e) {
-			Console.WriteLine(e.TrackIndex + " " + state.GetCurrent(e.TrackIndex) + ": complete " + e.LoopCount);
+		public void Complete (AnimationState state, int trackIndex, int loopCount) {
+#if !WINDOWS_STOREAPP	
+			Console.WriteLine(trackIndex + " " + state.GetCurrent(trackIndex) + ": complete " + loopCount);
+#endif
 		}
 
-		public void Event (object sender, EventTriggeredArgs e) {
-			Console.WriteLine(e.TrackIndex + " " + state.GetCurrent(e.TrackIndex) + ": event " + e.Event);
+		public void Event (AnimationState state, int trackIndex, Event e) {
+#if !WINDOWS_STOREAPP	
+			Console.WriteLine(trackIndex + " " + state.GetCurrent(trackIndex) + ": event " + e);
+#endif
 		}
 	}
 }

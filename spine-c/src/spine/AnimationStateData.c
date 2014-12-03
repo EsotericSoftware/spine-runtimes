@@ -1,34 +1,31 @@
 /******************************************************************************
- * Spine Runtime Software License - Version 1.1
+ * Spine Runtimes Software License
+ * Version 2.1
  * 
  * Copyright (c) 2013, Esoteric Software
  * All rights reserved.
  * 
- * Redistribution and use in source and binary forms in whole or in part, with
- * or without modification, are permitted provided that the following conditions
- * are met:
+ * You are granted a perpetual, non-exclusive, non-sublicensable and
+ * non-transferable license to install, execute and perform the Spine Runtimes
+ * Software (the "Software") solely for internal use. Without the written
+ * permission of Esoteric Software (typically granted by licensing Spine), you
+ * may not (a) modify, translate, adapt or otherwise create derivative works,
+ * improvements of the Software or develop new applications using the Software
+ * or (b) remove, delete, alter or obscure any trademarks or any copyright,
+ * trademark, patent or other intellectual property or proprietary rights
+ * notices on or in the Software, including any copy thereof. Redistributions
+ * in binary or source form must include this license and terms.
  * 
- * 1. A Spine Essential, Professional, Enterprise, or Education License must
- *    be purchased from Esoteric Software and the license must remain valid:
- *    http://esotericsoftware.com/
- * 2. Redistributions of source code must retain this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer.
- * 3. Redistributions in binary form must reproduce this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer, in the documentation and/or other materials provided with the
- *    distribution.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #include <spine/AnimationStateData.h>
@@ -36,12 +33,12 @@
 
 typedef struct _ToEntry _ToEntry;
 struct _ToEntry {
-	Animation* animation;
+	spAnimation* animation;
 	float duration;
 	_ToEntry* next;
 };
 
-_ToEntry* _ToEntry_create (Animation* to, float duration) {
+_ToEntry* _ToEntry_create (spAnimation* to, float duration) {
 	_ToEntry* self = NEW(_ToEntry);
 	self->animation = to;
 	self->duration = duration;
@@ -56,12 +53,12 @@ void _ToEntry_dispose (_ToEntry* self) {
 
 typedef struct _FromEntry _FromEntry;
 struct _FromEntry {
-	Animation* animation;
+	spAnimation* animation;
 	_ToEntry* toEntries;
 	_FromEntry* next;
 };
 
-_FromEntry* _FromEntry_create (Animation* from) {
+_FromEntry* _FromEntry_create (spAnimation* from) {
 	_FromEntry* self = NEW(_FromEntry);
 	self->animation = from;
 	return self;
@@ -73,13 +70,13 @@ void _FromEntry_dispose (_FromEntry* self) {
 
 /**/
 
-AnimationStateData* AnimationStateData_create (SkeletonData* skeletonData) {
-	AnimationStateData* self = NEW(AnimationStateData);
-	CONST_CAST(SkeletonData*, self->skeletonData) = skeletonData;
+spAnimationStateData* spAnimationStateData_create (spSkeletonData* skeletonData) {
+	spAnimationStateData* self = NEW(spAnimationStateData);
+	CONST_CAST(spSkeletonData*, self->skeletonData) = skeletonData;
 	return self;
 }
 
-void AnimationStateData_dispose (AnimationStateData* self) {
+void spAnimationStateData_dispose (spAnimationStateData* self) {
 	_ToEntry* toEntry;
 	_ToEntry* nextToEntry;
 	_FromEntry* nextFromEntry;
@@ -100,16 +97,16 @@ void AnimationStateData_dispose (AnimationStateData* self) {
 	FREE(self);
 }
 
-void AnimationStateData_setMixByName (AnimationStateData* self, const char* fromName, const char* toName, float duration) {
-	Animation* to;
-	Animation* from = SkeletonData_findAnimation(self->skeletonData, fromName);
+void spAnimationStateData_setMixByName (spAnimationStateData* self, const char* fromName, const char* toName, float duration) {
+	spAnimation* to;
+	spAnimation* from = spSkeletonData_findAnimation(self->skeletonData, fromName);
 	if (!from) return;
-	to = SkeletonData_findAnimation(self->skeletonData, toName);
+	to = spSkeletonData_findAnimation(self->skeletonData, toName);
 	if (!to) return;
-	AnimationStateData_setMix(self, from, to, duration);
+	spAnimationStateData_setMix(self, from, to, duration);
 }
 
-void AnimationStateData_setMix (AnimationStateData* self, Animation* from, Animation* to, float duration) {
+void spAnimationStateData_setMix (spAnimationStateData* self, spAnimation* from, spAnimation* to, float duration) {
 	/* Find existing FromEntry. */
 	_ToEntry* toEntry;
 	_FromEntry* fromEntry = (_FromEntry*)self->entries;
@@ -138,7 +135,7 @@ void AnimationStateData_setMix (AnimationStateData* self, Animation* from, Anima
 	fromEntry->toEntries = toEntry;
 }
 
-float AnimationStateData_getMix (AnimationStateData* self, Animation* from, Animation* to) {
+float spAnimationStateData_getMix (spAnimationStateData* self, spAnimation* from, spAnimation* to) {
 	_FromEntry* fromEntry = (_FromEntry*)self->entries;
 	while (fromEntry) {
 		if (fromEntry->animation == from) {

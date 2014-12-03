@@ -1,47 +1,46 @@
 /******************************************************************************
- * Spine Runtime Software License - Version 1.1
+ * Spine Runtimes Software License
+ * Version 2.1
  * 
  * Copyright (c) 2013, Esoteric Software
  * All rights reserved.
  * 
- * Redistribution and use in source and binary forms in whole or in part, with
- * or without modification, are permitted provided that the following conditions
- * are met:
+ * You are granted a perpetual, non-exclusive, non-sublicensable and
+ * non-transferable license to install, execute and perform the Spine Runtimes
+ * Software (the "Software") solely for internal use. Without the written
+ * permission of Esoteric Software (typically granted by licensing Spine), you
+ * may not (a) modify, translate, adapt or otherwise create derivative works,
+ * improvements of the Software or develop new applications using the Software
+ * or (b) remove, delete, alter or obscure any trademarks or any copyright,
+ * trademark, patent or other intellectual property or proprietary rights
+ * notices on or in the Software, including any copy thereof. Redistributions
+ * in binary or source form must include this license and terms.
  * 
- * 1. A Spine Essential, Professional, Enterprise, or Education License must
- *    be purchased from Esoteric Software and the license must remain valid:
- *    http://esotericsoftware.com/
- * 2. Redistributions of source code must retain this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer.
- * 3. Redistributions in binary form must reproduce this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer, in the documentation and/or other materials provided with the
- *    distribution.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 package spine.starling {
+import flash.geom.Matrix;
 import flash.geom.Rectangle;
 
 import spine.Bone;
 import spine.Skin;
-import spine.attachments.Attachment;
 import spine.attachments.AttachmentLoader;
-import spine.attachments.AttachmentType;
 import spine.attachments.BoundingBoxAttachment;
+import spine.attachments.MeshAttachment;
 import spine.attachments.RegionAttachment;
+import spine.attachments.SkinnedMeshAttachment;
 
+import starling.textures.SubTexture;
 import starling.textures.Texture;
 import starling.textures.TextureAtlas;
 
@@ -54,26 +53,99 @@ public class StarlingAtlasAttachmentLoader implements AttachmentLoader {
 		Bone.yDown = true;
 	}
 
-	public function newAttachment (skin:Skin, type:AttachmentType, name:String) : Attachment {
-		switch (type) {
-		case AttachmentType.region:
-			var regionAttachment:RegionAttachment = new RegionAttachment(name);
-			var texture:Texture = atlas.getTexture(name);
-			var frame:Rectangle = texture.frame;
-			texture = Texture.fromTexture(texture); // Discard frame.
-			regionAttachment.rendererObject = new SkeletonImage(texture);
-			regionAttachment.regionOffsetX = frame.x;
-			regionAttachment.regionOffsetY = frame.y;
-			regionAttachment.regionWidth = frame.width;
-			regionAttachment.regionHeight = frame.height;
-			regionAttachment.regionOriginalWidth = texture.width;
-			regionAttachment.regionOriginalHeight = texture.height;
-			return regionAttachment;
-		case AttachmentType.boundingbox:
-			return new BoundingBoxAttachment(name);
+	public function newRegionAttachment (skin:Skin, name:String, path:String) : RegionAttachment {
+		var texture:Texture = atlas.getTexture(path);
+		if (texture == null)
+			throw new Error("Region not found in Starling atlas: " + path + " (region attachment: " + name + ")");
+		var attachment:RegionAttachment = new RegionAttachment(name);
+		attachment.rendererObject = new SkeletonImage(Texture.fromTexture(texture)); // Discard frame.
+		var frame:Rectangle = texture.frame;
+		attachment.regionOffsetX = frame ? -frame.x : 0;
+		attachment.regionOffsetY = frame ? -frame.y : 0;
+		attachment.regionWidth = texture.width;
+		attachment.regionHeight = texture.height;
+		attachment.regionOriginalWidth = frame ? frame.width : texture.width;
+		attachment.regionOriginalHeight = frame ? frame.height : texture.height;
+		var subTexture:SubTexture = texture as SubTexture;
+		if (subTexture) {
+			var root:Texture = subTexture.root;
+			var rectRegion:Rectangle = atlas.getRegion(path);
+			attachment.regionU = rectRegion.x / root.width;
+			attachment.regionV = rectRegion.y / root.height;
+			attachment.regionU2 = (rectRegion.x + subTexture.width) / root.width;
+			attachment.regionV2 = (rectRegion.y + subTexture.height) / root.height;
+			attachment.setUVs(attachment.regionU, attachment.regionV, attachment.regionU2, attachment.regionV2, atlas.getRotation(path));
+		} else {
+			attachment.regionU = 0;
+			attachment.regionV = 1;
+			attachment.regionU2 = 1;
+			attachment.regionV2 = 0;
 		}
+		return attachment;
+	}
 
-		throw new Error("Unknown attachment type: " + type);
+	public function newMeshAttachment (skin:Skin, name:String, path:String) : MeshAttachment {
+		var texture:Texture = atlas.getTexture(path);
+		if (texture == null)
+			throw new Error("Region not found in Starling atlas: " + path + " (region attachment: " + name + ")");
+		var attachment:MeshAttachment = new MeshAttachment(name);
+		attachment.rendererObject = new SkeletonImage(Texture.fromTexture(texture)); // Discard frame.
+		var subTexture:SubTexture = texture as SubTexture;
+		if (subTexture) {
+			var root:Texture = subTexture.root;
+			var rectRegion:Rectangle = atlas.getRegion(path);
+			attachment.regionU = rectRegion.x / root.width;
+			attachment.regionV = rectRegion.y / root.height;
+			attachment.regionU2 = (rectRegion.x + subTexture.width) / root.width;
+			attachment.regionV2 = (rectRegion.y + subTexture.height) / root.height;
+		} else {
+			attachment.regionU = 0;
+			attachment.regionV = 1;
+			attachment.regionU2 = 1;
+			attachment.regionV2 = 0;
+		}
+		var frame:Rectangle = texture.frame;
+		attachment.regionOffsetX = frame ? -frame.x : 0;
+		attachment.regionOffsetY = frame ? -frame.y : 0;
+		attachment.regionWidth = texture.width;
+		attachment.regionHeight = texture.height;
+		attachment.regionOriginalWidth = frame ? frame.width : texture.width;
+		attachment.regionOriginalHeight = frame ? frame.height : texture.height;
+		return attachment;
+	}
+
+	public function newSkinnedMeshAttachment (skin:Skin, name:String, path:String) : SkinnedMeshAttachment {
+		var texture:Texture = atlas.getTexture(path);
+		if (texture == null)
+			throw new Error("Region not found in Starling atlas: " + path + " (region attachment: " + name + ")");
+		var attachment:SkinnedMeshAttachment = new SkinnedMeshAttachment(name);
+		attachment.rendererObject = new SkeletonImage(Texture.fromTexture(texture)); // Discard frame.
+		var subTexture:SubTexture = texture as SubTexture;
+		if (subTexture) {
+			var root:Texture = subTexture.root;
+			var rectRegion:Rectangle = atlas.getRegion(path);
+			attachment.regionU = rectRegion.x / root.width;
+			attachment.regionV = rectRegion.y / root.height;
+			attachment.regionU2 = (rectRegion.x + subTexture.width) / root.width;
+			attachment.regionV2 = (rectRegion.y + subTexture.height) / root.height;
+		} else {
+			attachment.regionU = 0;
+			attachment.regionV = 1;
+			attachment.regionU2 = 1;
+			attachment.regionV2 = 0;
+		}
+		var frame:Rectangle = texture.frame;
+		attachment.regionOffsetX = frame ? -frame.x : 0;
+		attachment.regionOffsetY = frame ? -frame.y : 0;
+		attachment.regionWidth = texture.width;
+		attachment.regionHeight = texture.height;
+		attachment.regionOriginalWidth = frame ? frame.width : texture.width;
+		attachment.regionOriginalHeight = frame ? frame.height : texture.height;
+		return attachment;
+	}
+
+	public function newBoundingBoxAttachment (skin:Skin, name:String) : BoundingBoxAttachment {
+		return new BoundingBoxAttachment(name);
 	}
 }
 

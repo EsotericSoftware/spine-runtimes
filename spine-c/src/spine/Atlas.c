@@ -1,59 +1,57 @@
 /******************************************************************************
- * Spine Runtime Software License - Version 1.1
+ * Spine Runtimes Software License
+ * Version 2.1
  * 
  * Copyright (c) 2013, Esoteric Software
  * All rights reserved.
  * 
- * Redistribution and use in source and binary forms in whole or in part, with
- * or without modification, are permitted provided that the following conditions
- * are met:
+ * You are granted a perpetual, non-exclusive, non-sublicensable and
+ * non-transferable license to install, execute and perform the Spine Runtimes
+ * Software (the "Software") solely for internal use. Without the written
+ * permission of Esoteric Software (typically granted by licensing Spine), you
+ * may not (a) modify, translate, adapt or otherwise create derivative works,
+ * improvements of the Software or develop new applications using the Software
+ * or (b) remove, delete, alter or obscure any trademarks or any copyright,
+ * trademark, patent or other intellectual property or proprietary rights
+ * notices on or in the Software, including any copy thereof. Redistributions
+ * in binary or source form must include this license and terms.
  * 
- * 1. A Spine Essential, Professional, Enterprise, or Education License must
- *    be purchased from Esoteric Software and the license must remain valid:
- *    http://esotericsoftware.com/
- * 2. Redistributions of source code must retain this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer.
- * 3. Redistributions in binary form must reproduce this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer, in the documentation and/or other materials provided with the
- *    distribution.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #include <spine/Atlas.h>
 #include <ctype.h>
 #include <spine/extension.h>
 
-AtlasPage* AtlasPage_create (const char* name) {
-	AtlasPage* self = NEW(AtlasPage);
+spAtlasPage* spAtlasPage_create (spAtlas* atlas, const char* name) {
+	spAtlasPage* self = NEW(spAtlasPage);
+	CONST_CAST(spAtlas*, self->atlas) = atlas;
 	MALLOC_STR(self->name, name);
 	return self;
 }
 
-void AtlasPage_dispose (AtlasPage* self) {
-	_AtlasPage_disposeTexture(self);
+void spAtlasPage_dispose (spAtlasPage* self) {
+	_spAtlasPage_disposeTexture(self);
 	FREE(self->name);
 	FREE(self);
 }
 
 /**/
 
-AtlasRegion* AtlasRegion_create () {
-	return NEW(AtlasRegion) ;
+spAtlasRegion* spAtlasRegion_create () {
+	return NEW(spAtlasRegion);
 }
 
-void AtlasRegion_dispose (AtlasRegion* self) {
+void spAtlasRegion_dispose (spAtlasRegion* self) {
 	FREE(self->name);
 	FREE(self->splits);
 	FREE(self->pads);
@@ -119,7 +117,7 @@ static int readValue (const char* end, Str* str) {
 	return 1;
 }
 
-/* Returns the number of tuple values read (2, 4, or 0 for failure). */
+/* Returns the number of tuple values read (1, 2, 4, or 0 for failure). */
 static int readTuple (const char* end, Str tuple[]) {
 	int i;
 	Str str;
@@ -128,10 +126,7 @@ static int readTuple (const char* end, Str tuple[]) {
 
 	for (i = 0; i < 3; ++i) {
 		tuple[i].begin = str.begin;
-		if (!beginPast(&str, ',')) {
-			if (i == 0) return 0;
-			break;
-		}
+		if (!beginPast(&str, ',')) break;
 		tuple[i].end = str.begin - 2;
 		trim(&tuple[i]);
 	}
@@ -142,7 +137,7 @@ static int readTuple (const char* end, Str tuple[]) {
 }
 
 static char* mallocString (Str* str) {
-	int length = str->end - str->begin;
+	int length = (int)(str->end - str->begin);
 	char* string = MALLOC(char, length + 1);
 	memcpy(string, str->begin, length);
 	string[length] = '\0';
@@ -150,7 +145,7 @@ static char* mallocString (Str* str) {
 }
 
 static int indexOf (const char** array, int count, Str* str) {
-	int length = str->end - str->begin;
+	int length = (int)(str->end - str->begin);
 	int i;
 	for (i = count - 1; i >= 0; i--)
 		if (strncmp(array[i], str->begin, length) == 0) return i;
@@ -162,11 +157,11 @@ static int equals (Str* str, const char* other) {
 }
 
 static int toInt (Str* str) {
-	return strtol(str->begin, (char**)&str->end, 10);
+	return (int)strtol(str->begin, (char**)&str->end, 10);
 }
 
-static Atlas* abortAtlas (Atlas* self) {
-	Atlas_dispose(self);
+static spAtlas* abortAtlas (spAtlas* self) {
+	spAtlas_dispose(self);
 	return 0;
 }
 
@@ -174,19 +169,23 @@ static const char* formatNames[] = {"Alpha", "Intensity", "LuminanceAlpha", "RGB
 static const char* textureFilterNames[] = {"Nearest", "Linear", "MipMap", "MipMapNearestNearest", "MipMapLinearNearest",
 		"MipMapNearestLinear", "MipMapLinearLinear"};
 
-Atlas* Atlas_readAtlas (const char* begin, int length, const char* dir) {
+spAtlas* spAtlas_create (const char* begin, int length, const char* dir, void* rendererObject) {
+	spAtlas* self;
+
 	int count;
 	const char* end = begin + length;
-	int dirLength = strlen(dir);
+	int dirLength = (int)strlen(dir);
 	int needsSlash = dirLength > 0 && dir[dirLength - 1] != '/' && dir[dirLength - 1] != '\\';
 
-	Atlas* self = NEW(Atlas);
-
-	AtlasPage *page = 0;
-	AtlasPage *lastPage = 0;
-	AtlasRegion *lastRegion = 0;
+	spAtlasPage *page = 0;
+	spAtlasPage *lastPage = 0;
+	spAtlasRegion *lastRegion = 0;
 	Str str;
 	Str tuple[4];
+
+	self = NEW(spAtlas);
+	self->rendererObject = rendererObject;
+
 	readLine(begin, 0, 0);
 	while (readLine(0, end, &str)) {
 		if (str.end - str.begin == 0) {
@@ -198,7 +197,7 @@ Atlas* Atlas_readAtlas (const char* begin, int length, const char* dir) {
 			if (needsSlash) path[dirLength] = '/';
 			strcpy(path + dirLength + needsSlash, name);
 
-			page = AtlasPage_create(name);
+			page = spAtlasPage_create(self, name);
 			FREE(name);
 			if (lastPage)
 				lastPage->next = page;
@@ -206,23 +205,30 @@ Atlas* Atlas_readAtlas (const char* begin, int length, const char* dir) {
 				self->pages = page;
 			lastPage = page;
 
-			if (!readValue(end, &str)) return abortAtlas(self);
-			page->format = (AtlasFormat)indexOf(formatNames, 7, &str);
+			switch (readTuple(end, tuple)) {
+			case 0:
+				return abortAtlas(self);
+			case 2:  /* size is only optional for an atlas packed with an old TexturePacker. */
+				page->width = toInt(tuple);
+				page->height = toInt(tuple + 1);
+				if (!readTuple(end, tuple)) return abortAtlas(self);
+			}
+			page->format = (spAtlasFormat)indexOf(formatNames, 7, tuple);
 
 			if (!readTuple(end, tuple)) return abortAtlas(self);
-			page->minFilter = (AtlasFilter)indexOf(textureFilterNames, 7, tuple);
-			page->magFilter = (AtlasFilter)indexOf(textureFilterNames, 7, tuple + 1);
+			page->minFilter = (spAtlasFilter)indexOf(textureFilterNames, 7, tuple);
+			page->magFilter = (spAtlasFilter)indexOf(textureFilterNames, 7, tuple + 1);
 
 			if (!readValue(end, &str)) return abortAtlas(self);
 			if (!equals(&str, "none")) {
-				page->uWrap = *str.begin == 'x' ? ATLAS_REPEAT : (*str.begin == 'y' ? ATLAS_CLAMPTOEDGE : ATLAS_REPEAT);
-				page->vWrap = *str.begin == 'x' ? ATLAS_CLAMPTOEDGE : (*str.begin == 'y' ? ATLAS_REPEAT : ATLAS_REPEAT);
+				page->uWrap = *str.begin == 'x' ? SP_ATLAS_REPEAT : (*str.begin == 'y' ? SP_ATLAS_CLAMPTOEDGE : SP_ATLAS_REPEAT);
+				page->vWrap = *str.begin == 'x' ? SP_ATLAS_CLAMPTOEDGE : (*str.begin == 'y' ? SP_ATLAS_REPEAT : SP_ATLAS_REPEAT);
 			}
 
-			_AtlasPage_createTexture(page, path);
+			_spAtlasPage_createTexture(page, path);
 			FREE(path);
 		} else {
-			AtlasRegion *region = AtlasRegion_create();
+			spAtlasRegion *region = spAtlasRegion_create();
 			if (lastRegion)
 				lastRegion->next = region;
 			else
@@ -288,53 +294,53 @@ Atlas* Atlas_readAtlas (const char* begin, int length, const char* dir) {
 	return self;
 }
 
-Atlas* Atlas_readAtlasFile (const char* path) {
+spAtlas* spAtlas_createFromFile (const char* path, void* rendererObject) {
 	int dirLength;
 	char *dir;
 	int length;
 	const char* data;
 
-	Atlas* atlas = 0;
+	spAtlas* atlas = 0;
 
 	/* Get directory from atlas path. */
 	const char* lastForwardSlash = strrchr(path, '/');
 	const char* lastBackwardSlash = strrchr(path, '\\');
 	const char* lastSlash = lastForwardSlash > lastBackwardSlash ? lastForwardSlash : lastBackwardSlash;
 	if (lastSlash == path) lastSlash++; /* Never drop starting slash. */
-	dirLength = lastSlash ? lastSlash - path : 0;
+	dirLength = (int)(lastSlash ? lastSlash - path : 0);
 	dir = MALLOC(char, dirLength + 1);
 	memcpy(dir, path, dirLength);
 	dir[dirLength] = '\0';
 
-	data = _Util_readFile(path, &length);
-	if (data) atlas = Atlas_readAtlas(data, length, dir);
+	data = _spUtil_readFile(path, &length);
+	if (data) atlas = spAtlas_create(data, length, dir, rendererObject);
 
 	FREE(data);
 	FREE(dir);
 	return atlas;
 }
 
-void Atlas_dispose (Atlas* self) {
-	AtlasRegion* region, *nextRegion;
-	AtlasPage* page = self->pages;
+void spAtlas_dispose (spAtlas* self) {
+	spAtlasRegion* region, *nextRegion;
+	spAtlasPage* page = self->pages;
 	while (page) {
-		AtlasPage* nextPage = page->next;
-		AtlasPage_dispose(page);
+		spAtlasPage* nextPage = page->next;
+		spAtlasPage_dispose(page);
 		page = nextPage;
 	}
 
 	region = self->regions;
 	while (region) {
 		nextRegion = region->next;
-		AtlasRegion_dispose(region);
+		spAtlasRegion_dispose(region);
 		region = nextRegion;
 	}
 
 	FREE(self);
 }
 
-AtlasRegion* Atlas_findRegion (const Atlas* self, const char* name) {
-	AtlasRegion* region = self->regions;
+spAtlasRegion* spAtlas_findRegion (const spAtlas* self, const char* name) {
+	spAtlasRegion* region = self->regions;
 	while (region) {
 		if (strcmp(region->name, name) == 0) return region;
 		region = region->next;

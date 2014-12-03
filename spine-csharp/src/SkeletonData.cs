@@ -1,34 +1,31 @@
 /******************************************************************************
- * Spine Runtime Software License - Version 1.1
+ * Spine Runtimes Software License
+ * Version 2.1
  * 
  * Copyright (c) 2013, Esoteric Software
  * All rights reserved.
  * 
- * Redistribution and use in source and binary forms in whole or in part, with
- * or without modification, are permitted provided that the following conditions
- * are met:
+ * You are granted a perpetual, non-exclusive, non-sublicensable and
+ * non-transferable license to install, execute and perform the Spine Runtimes
+ * Software (the "Software") solely for internal use. Without the written
+ * permission of Esoteric Software (typically granted by licensing Spine), you
+ * may not (a) modify, translate, adapt or otherwise create derivative works,
+ * improvements of the Software or develop new applications using the Software
+ * or (b) remove, delete, alter or obscure any trademarks or any copyright,
+ * trademark, patent or other intellectual property or proprietary rights
+ * notices on or in the Software, including any copy thereof. Redistributions
+ * in binary or source form must include this license and terms.
  * 
- * 1. A Spine Essential, Professional, Enterprise, or Education License must
- *    be purchased from Esoteric Software and the license must remain valid:
- *    http://esotericsoftware.com/
- * 2. Redistributions of source code must retain this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer.
- * 3. Redistributions in binary form must reproduce this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer, in the documentation and/or other materials provided with the
- *    distribution.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 using System;
@@ -43,6 +40,9 @@ namespace Spine {
 		internal Skin defaultSkin;
 		internal List<EventData> events = new List<EventData>();
 		internal List<Animation> animations = new List<Animation>();
+		internal List<IkConstraintData> ikConstraints = new List<IkConstraintData>();
+		internal float width, height;
+		internal String version, hash;
 
 		public String Name { get { return name; } set { name = value; } }
 		public List<BoneData> Bones { get { return bones; } } // Ordered parents first.
@@ -52,14 +52,14 @@ namespace Spine {
 		public Skin DefaultSkin { get { return defaultSkin; } set { defaultSkin = value; } }
 		public List<EventData> Events { get { return events; } set { events = value; } }
 		public List<Animation> Animations { get { return animations; } set { animations = value; } }
+		public List<IkConstraintData> IkConstraints { get { return ikConstraints; } set { ikConstraints = value; } }
+		public float Width { get { return width; } set { width = value; } }
+		public float Height { get { return height; } set { height = value; } }
+		/// <summary>The Spine version used to export this data.</summary>
+		public String Version { get { return version; } set { version = value; } }
+		public String Hash { get { return hash; } set { hash = value; } }
 
 		// --- Bones.
-
-		public void AddBone (BoneData bone) {
-			if (bone == null) throw new ArgumentNullException("bone cannot be null.");
-			bones.Add(bone);
-		}
-
 
 		/// <returns>May be null.</returns>
 		public BoneData FindBone (String boneName) {
@@ -83,11 +83,6 @@ namespace Spine {
 
 		// --- Slots.
 
-		public void AddSlot (SlotData slot) {
-			if (slot == null) throw new ArgumentNullException("slot cannot be null.");
-			slots.Add(slot);
-		}
-
 		/// <returns>May be null.</returns>
 		public SlotData FindSlot (String slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
@@ -109,12 +104,7 @@ namespace Spine {
 		}
 
 		// --- Skins.
-
-		public void AddSkin (Skin skin) {
-			if (skin == null) throw new ArgumentNullException("skin cannot be null.");
-			skins.Add(skin);
-		}
-
+		
 		/// <returns>May be null.</returns>
 		public Skin FindSkin (String skinName) {
 			if (skinName == null) throw new ArgumentNullException("skinName cannot be null.");
@@ -125,33 +115,36 @@ namespace Spine {
 
 		// --- Events.
 
-		public void AddEvent (EventData eventData) {
-			if (eventData == null) throw new ArgumentNullException("eventData cannot be null.");
-			events.Add(eventData);
-		}
-
 		/// <returns>May be null.</returns>
-		public EventData findEvent (String eventDataName) {
+		public EventData FindEvent (String eventDataName) {
 			if (eventDataName == null) throw new ArgumentNullException("eventDataName cannot be null.");
 			foreach (EventData eventData in events)
-				if (eventData.Name == eventDataName) return eventData;
+				if (eventData.name == eventDataName) return eventData;
 			return null;
 		}
 
 		// --- Animations.
-
-		public void AddAnimation (Animation animation) {
-			if (animation == null) throw new ArgumentNullException("animation cannot be null.");
-			animations.Add(animation);
-		}
-
+		
 		/// <returns>May be null.</returns>
 		public Animation FindAnimation (String animationName) {
 			if (animationName == null) throw new ArgumentNullException("animationName cannot be null.");
 			List<Animation> animations = this.animations;
 			for (int i = 0, n = animations.Count; i < n; i++) {
 				Animation animation = animations[i];
-				if (animation.Name == animationName) return animation;
+				if (animation.name == animationName) return animation;
+			}
+			return null;
+		}
+
+		// --- IK constraints.
+
+		/// <returns>May be null.</returns>
+		public IkConstraintData FindIkConstraint (String ikConstraintName) {
+			if (ikConstraintName == null) throw new ArgumentNullException("ikConstraintName cannot be null.");
+			List<IkConstraintData> ikConstraints = this.ikConstraints;
+			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
+				IkConstraintData ikConstraint = ikConstraints[i];
+				if (ikConstraint.name == ikConstraintName) return ikConstraint;
 			}
 			return null;
 		}

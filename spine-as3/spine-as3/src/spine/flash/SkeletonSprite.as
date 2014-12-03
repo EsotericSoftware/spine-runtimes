@@ -1,34 +1,31 @@
 /******************************************************************************
- * Spine Runtime Software License - Version 1.1
+ * Spine Runtimes Software License
+ * Version 2.1
  * 
  * Copyright (c) 2013, Esoteric Software
  * All rights reserved.
  * 
- * Redistribution and use in source and binary forms in whole or in part, with
- * or without modification, are permitted provided that the following conditions
- * are met:
+ * You are granted a perpetual, non-exclusive, non-sublicensable and
+ * non-transferable license to install, execute and perform the Spine Runtimes
+ * Software (the "Software") solely for internal use. Without the written
+ * permission of Esoteric Software (typically granted by licensing Spine), you
+ * may not (a) modify, translate, adapt or otherwise create derivative works,
+ * improvements of the Software or develop new applications using the Software
+ * or (b) remove, delete, alter or obscure any trademarks or any copyright,
+ * trademark, patent or other intellectual property or proprietary rights
+ * notices on or in the Software, including any copy thereof. Redistributions
+ * in binary or source form must include this license and terms.
  * 
- * 1. A Spine Essential, Professional, Enterprise, or Education License must
- *    be purchased from Esoteric Software and the license must remain valid:
- *    http://esotericsoftware.com/
- * 2. Redistributions of source code must retain this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer.
- * 3. Redistributions in binary form must reproduce this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer, in the documentation and/or other materials provided with the
- *    distribution.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 package spine.flash {
@@ -88,26 +85,19 @@ public class SkeletonSprite extends Sprite {
 				var region:AtlasRegion = AtlasRegion(regionAttachment.rendererObject);
 				if (!wrapper) {
 					var bitmapData:BitmapData = region.page.rendererObject as BitmapData;
-					var regionData:BitmapData;
-					if (region.rotate) {
-						regionData = new BitmapData(region.height, region.width);
-						regionData.copyPixels(bitmapData, //
-							new Rectangle(region.x, region.y, region.height, region.width), //
-							new Point());
-					} else {
-						regionData = new BitmapData(region.width, region.height);
-						regionData.copyPixels(bitmapData, //
-							new Rectangle(region.x, region.y, region.width, region.height), //
-							new Point());
-					}
+					var regionWidth:Number = region.rotate ? region.height : region.width;
+					var regionHeight:Number = region.rotate ? region.width : region.height;
+					var regionData:BitmapData = new BitmapData(regionWidth, regionHeight);
+					regionData.copyPixels(bitmapData, new Rectangle(region.x, region.y, regionWidth, regionHeight), new Point());
 
 					var bitmap:Bitmap = new Bitmap(regionData);
 					bitmap.smoothing = true;
 
 					// Rotate and scale using default registration point (top left corner, y-down, CW) instead of image center.
 					bitmap.rotation = -regionAttachment.rotation;
-					bitmap.scaleX = regionAttachment.scaleX;
-					bitmap.scaleY = regionAttachment.scaleY;
+					bitmap.scaleX = regionAttachment.scaleX * (regionAttachment.width / region.width);
+					bitmap.scaleY = regionAttachment.scaleY * (regionAttachment.height / region.height);
+					
 
 					// Position using attachment translation, shifted as if scale and rotation were at image center.
 					var radians:Number = -regionAttachment.rotation * Math.PI / 180;
@@ -117,7 +107,7 @@ public class SkeletonSprite extends Sprite {
 					var shiftY:Number = -regionAttachment.height / 2 * regionAttachment.scaleY;
 					if (region.rotate) {
 						bitmap.rotation += 90;
-						shiftX += region.width;
+						shiftX += regionHeight * (regionAttachment.width / region.width);
 					}
 					bitmap.x = regionAttachment.x + shiftX * cos - shiftY * sin;
 					bitmap.y = -regionAttachment.y + shiftX * sin + shiftY * cos;
@@ -132,18 +122,23 @@ public class SkeletonSprite extends Sprite {
 				wrapper.blendMode = slot.data.additiveBlending ? BlendMode.ADD : BlendMode.NORMAL;
 
 				var colorTransform:ColorTransform = wrapper.transform.colorTransform;
-				colorTransform.redMultiplier = skeleton.r * slot.r;
-				colorTransform.greenMultiplier = skeleton.g * slot.g;
-				colorTransform.blueMultiplier = skeleton.b * slot.b;
-				colorTransform.alphaMultiplier = skeleton.a * slot.a;
+				colorTransform.redMultiplier = skeleton.r * slot.r * regionAttachment.r;
+				colorTransform.greenMultiplier = skeleton.g * slot.g * regionAttachment.g;
+				colorTransform.blueMultiplier = skeleton.b * slot.b * regionAttachment.b;
+				colorTransform.alphaMultiplier = skeleton.a * slot.a * regionAttachment.a;
 				wrapper.transform.colorTransform = colorTransform;
 
 				var bone:Bone = slot.bone;
+				var flipX:int = skeleton.flipX ? -1 : 1;
+				var flipY:int = skeleton.flipY ? -1 : 1;
+				if (bone.worldFlipX) flipX = -flipX;
+				if (bone.worldFlipY) flipY = -flipY;
+
 				wrapper.x = bone.worldX;
 				wrapper.y = bone.worldY;
-				wrapper.rotation = -bone.worldRotation;
-				wrapper.scaleX = bone.worldScaleX;
-				wrapper.scaleY = bone.worldScaleY;
+				wrapper.rotation = -bone.worldRotation * flipX * flipY;
+				wrapper.scaleX = bone.worldScaleX * flipX;
+				wrapper.scaleY = bone.worldScaleY * flipY;
 				addChild(wrapper);
 			}
 		}

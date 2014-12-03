@@ -105,6 +105,8 @@
     <Compile Include="src\Attachments\RegionAttachment.cs" />
     <Compile Include="src\Bone.cs" />
     <Compile Include="src\BoneData.cs" />
+    <Compile Include="src\IkConstraint.cs" />
+    <Compile Include="src\IkConstraintData.cs" />
     <Compile Include="src\Event.cs" />
     <Compile Include="src\EventData.cs" />
     <Compile Include="src\Json.cs" />
@@ -115,6 +117,12 @@
     <Compile Include="src\Skin.cs" />
     <Compile Include="src\Slot.cs" />
     <Compile Include="src\SlotData.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="src\Attachments\MeshAttachment.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="src\Attachments\SkinnedMeshAttachment.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />

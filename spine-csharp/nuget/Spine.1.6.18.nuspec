@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>Spine</id>
+    <version>1.6.18.0</version>
+    <authors>Esoteric Software</authors>
+    <owners>Esoteric Software</owners>
+    <licenseUrl>https://github.com/EsotericSoftware/spine-runtimes/blob/master/LICENSE</licenseUrl>
+    <projectUrl>http://esotericsoftware.com/</projectUrl>
+    <iconUrl>http://esotericsoftware.com/spine/files/logo-420.png</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>Spine is a 2D skeletal animation tool for game development and other animation projects.</description>
+	<summary>Spine features an intuitive workflow to rig and animate skeletons, a multiple-timeline dopesheet for retiming and tweaking animations, powerful exporting capabilities, and runtimes for many programming languages and game toolkits.</summary>
+    <releaseNotes>Release build for .NET 4.0 of version 1.6.18 (changeset c732a687, 2013-10-24)</releaseNotes>
+    <copyright>Copyright 2013</copyright>
+    <tags>2D skeletal animation runtime Spine</tags>
+  </metadata>
+</package>

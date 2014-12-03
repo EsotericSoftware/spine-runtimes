@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 7820c1c2b0e52c6408de899d6939996e
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - parentRenderer: {instanceID: 0}
+  - mesh: {instanceID: 0}
+  - hiddenPassMaterial: {fileID: 2100000, guid: 43227e5adadc6f24bb4bf74b92a56fb4,
+      type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
