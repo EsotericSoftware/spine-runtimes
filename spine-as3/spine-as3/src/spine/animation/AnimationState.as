@@ -82,26 +82,27 @@ public class AnimationState {
 			var time:Number = current.time;
 			var lastTime:Number = current.lastTime;
 			var endTime:Number = current.endTime;
+			var startTime:Number = current.startTime;
 			var loop:Boolean = current.loop;
 			if (!loop && time > endTime) time = endTime;
 			
 			var previous:TrackEntry = current.previous;
 			if (!previous) {
 				if (current.mix == 1)
-					current.animation.apply(skeleton, current.lastTime, time, loop, _events);
+					current.animation.apply(skeleton, current.lastTime, time, loop, startTime, endTime, _events);
 				else
-					current.animation.mix(skeleton, current.lastTime, time, loop, _events, current.mix);
+					current.animation.mix(skeleton, current.lastTime, time, loop, startTime, endTime, _events, current.mix);
 			} else {
 				var previousTime:Number = previous.time;
 				if (!previous.loop && previousTime > previous.endTime) previousTime = previous.endTime;
-				previous.animation.apply(skeleton, previousTime, previousTime, previous.loop, null);
+				previous.animation.apply(skeleton, previousTime, previousTime, previous.loop, previous.startTime, previous.endTime, null);
 				
 				var alpha:Number = current.mixTime / current.mixDuration * current.mix;
 				if (alpha >= 1) {
 					alpha = 1;
 					current.previous = null;
 				}
-				current.animation.mix(skeleton, current.lastTime, time, loop, _events, alpha);
+				current.animation.mix(skeleton, current.lastTime, time, loop, startTime, endTime, _events, alpha);
 			}
 			
 			for each (var event:Event in _events) {
@@ -109,11 +110,21 @@ public class AnimationState {
 				onEvent.invoke(i, event);
 			}
 
+			var count:int;
 			// Check if completed the animation or a loop iteration.
-			if (loop ? (lastTime % endTime > time % endTime) : (lastTime < endTime && time >= endTime)) {
-				var count:int = (int)(time / endTime);
-				if (current.onComplete != null) current.onComplete(i, count);
-				onComplete.invoke(i, count);
+			if(startTime <= 0) {
+				if (loop ? (lastTime % endTime > time % endTime) : (lastTime < endTime && time >= endTime)) {
+					count = (int)(time / endTime);
+					if (current.onComplete != null) current.onComplete(i, count);
+					onComplete.invoke(i, count);
+				}
+			}else{
+				var duration:Number = endTime - startTime;
+				if (loop ? (lastTime % duration > time % duration) : (lastTime < duration && time >= duration)) {
+					count = (int)(time / duration);
+					if (current.onComplete != null) current.onComplete(i, count);
+					onComplete.invoke(i, count);
+				}
 			}
 
 			current.lastTime = current.time;
@@ -171,18 +182,25 @@ public class AnimationState {
 		onStart.invoke(index);
 	}
 	
-	public function setAnimationByName (trackIndex:int, animationName:String, loop:Boolean) : TrackEntry {
+	public function setAnimationByName (trackIndex:int, animationName:String, loop:Boolean, startTime:Number = -1, endTime:Number = -1) : TrackEntry {
 		var animation:Animation = _data._skeletonData.findAnimation(animationName);
 		if (!animation) throw new ArgumentError("Animation not found: " + animationName);
-		return setAnimation(trackIndex, animation, loop);
+		return setAnimation(trackIndex, animation, loop, startTime, endTime);
 	}
 	
 	/** Set the current animation. Any queued animations are cleared. */
-	public function setAnimation (trackIndex:int, animation:Animation, loop:Boolean) : TrackEntry {
+	public function setAnimation (trackIndex:int, animation:Animation, loop:Boolean, startTime:Number = -1, endTime:Number = -1) : TrackEntry {
 		var entry:TrackEntry = new TrackEntry();
 		entry.animation = animation;
 		entry.loop = loop;
-		entry.endTime = animation.duration;
+
+		entry.startTime = startTime;
+		if(entry.startTime > -1) {
+			entry.time = entry.startTime;
+		}
+
+		entry.endTime = (endTime == -1) ? animation.duration : endTime;
+
 		setCurrent(trackIndex, entry);
 		return entry;
 	}
@@ -235,6 +253,10 @@ public class AnimationState {
 		}
 		if (buffer.length == 0) return "<none>";
 		return buffer;
+	}
+
+	public function get data():AnimationStateData {
+		return _data;
 	}
 }
 

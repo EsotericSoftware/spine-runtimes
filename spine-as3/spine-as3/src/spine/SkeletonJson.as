@@ -54,11 +54,11 @@ import spine.attachments.RegionAttachment;
 import spine.attachments.SkinnedMeshAttachment;
 
 public class SkeletonJson {
-	public var attachmentLoader:AttachmentLoader;
+	public var attachmentLoaders:Vector.<AttachmentLoader>;
 	public var scale:Number = 1;
 
-	public function SkeletonJson (attachmentLoader:AttachmentLoader = null) {
-		this.attachmentLoader = attachmentLoader;
+	public function SkeletonJson (attachmentLoaders:Vector.<AttachmentLoader>) {
+		this.attachmentLoaders = attachmentLoaders;
 	}
 
 	/** @param object A String or ByteArray. */
@@ -200,7 +200,7 @@ public class SkeletonJson {
 		var color:String, vertices:Vector.<Number>;
 		switch (type) {
 		case AttachmentType.region:
-			var region:RegionAttachment = attachmentLoader.newRegionAttachment(skin, name, path);
+			var region:RegionAttachment = newRegionAttachment(skin, name, path);
 			if (!region) return null;
 			region.path = path;
 			region.x = (map["x"] || 0) * scale;
@@ -223,7 +223,7 @@ public class SkeletonJson {
 			return region;
 
 		case AttachmentType.mesh:
-			var mesh:MeshAttachment = attachmentLoader.newMeshAttachment(skin, name, path);
+			var mesh:MeshAttachment = newMeshAttachment(skin, name, path);
 			if (!mesh) return null;
 			mesh.path = path; 
 			mesh.vertices = getFloatArray(map, "vertices", scale);
@@ -245,7 +245,7 @@ public class SkeletonJson {
 			mesh.height = (map["height"] || 0) * scale;
 			return mesh;
 		case AttachmentType.skinnedmesh:
-			var skinnedMesh:SkinnedMeshAttachment = attachmentLoader.newSkinnedMeshAttachment(skin, name, path);
+			var skinnedMesh:SkinnedMeshAttachment = newSkinnedMeshAttachment(skin, name, path);
 			if (!skinnedMesh) return null;
 			skinnedMesh.path = path;
 
@@ -284,13 +284,74 @@ public class SkeletonJson {
 			skinnedMesh.height = (map["height"] || 0) * scale;
 			return skinnedMesh;
 		case AttachmentType.boundingbox:
-			var box:BoundingBoxAttachment = attachmentLoader.newBoundingBoxAttachment(skin, name);
+			var box:BoundingBoxAttachment = newBoundingBoxAttachment(skin, name);
 			vertices = box.vertices;
 			for each (var point:Number in map["vertices"])
 				vertices[vertices.length] = point * scale;
 			return box;
 		}
 
+		return null;
+	}
+
+	private function newBoundingBoxAttachment(skin:Skin, name:String):BoundingBoxAttachment {
+		var result:BoundingBoxAttachment;
+		var len:int = attachmentLoaders.length;
+		for(var i:int = 0; i<len; i++) {
+			var attachmentLoader:AttachmentLoader = attachmentLoaders[i];
+			result = attachmentLoader.newBoundingBoxAttachment(skin, name);
+			if(result) {
+				return result;
+			}
+		}
+		return null;
+	}
+
+	private function newSkinnedMeshAttachment(skin:Skin, name:String, path:String):SkinnedMeshAttachment {
+		var result:SkinnedMeshAttachment;
+		var len:int = attachmentLoaders.length;
+		for(var i:int = 0; i<len; i++) {
+			var attachmentLoader:AttachmentLoader = attachmentLoaders[i];
+			result = attachmentLoader.newSkinnedMeshAttachment(skin, name, path);
+			if(result) {
+				return result;
+			}
+		}
+		if(!result) {
+			throw new Error("Region not found in Starling atlas: " + path + " (region attachment: " + name + ")");
+		}
+		return null;
+	}
+
+	private function newMeshAttachment(skin:Skin, name:String, path:String):MeshAttachment {
+		var result:MeshAttachment;
+		var len:int = attachmentLoaders.length;
+		for(var i:int = 0; i<len; i++) {
+			var attachmentLoader:AttachmentLoader = attachmentLoaders[i];
+			result = attachmentLoader.newMeshAttachment(skin, name, path);
+			if(result) {
+				return result;
+			}
+		}
+		if(!result) {
+			throw new Error("Region not found in Starling atlas: " + path + " (region attachment: " + name + ")");
+		}
+		return null;
+	}
+
+	private function newRegionAttachment(skin:Skin, name:String, path:String):RegionAttachment {
+		var result:RegionAttachment;
+		var len:int = attachmentLoaders.length;
+		for(var i:int = 0; i<len; i++) {
+			var attachmentLoader:AttachmentLoader = attachmentLoaders[i];
+			result = attachmentLoader.newRegionAttachment(skin, name, path);
+			if(result) {
+				return result;
+			}
+		}
+		if(!result) {
+			throw new Error("Region not found in Starling atlas: " + path + " (region attachment: " + name + ")");
+		}
 		return null;
 	}
 
@@ -398,8 +459,10 @@ public class SkeletonJson {
 						frameIndex++;
 					}
 					timelines[timelines.length] = flipTimeline;
-					duration = Math.max(duration, flipTimeline.frames[flipTimeline.frameCount * 3 - 3]);
-
+					var ind:int = flipTimeline.frameCount * 3 - 3;
+					if(flipTimeline.frames.length>ind) {
+						duration = Math.max(duration, flipTimeline.frames[ind]);
+					}
 				} else
 					throw new Error("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
 			}
