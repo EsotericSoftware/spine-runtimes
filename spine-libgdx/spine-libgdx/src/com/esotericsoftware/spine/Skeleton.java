@@ -30,10 +30,13 @@
 
 package com.esotericsoftware.spine;
 
-import com.esotericsoftware.spine.attachments.Attachment;
-
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.esotericsoftware.spine.attachments.Attachment;
+import com.esotericsoftware.spine.attachments.MeshAttachment;
+import com.esotericsoftware.spine.attachments.RegionAttachment;
+import com.esotericsoftware.spine.attachments.SkinnedMeshAttachment;
 
 public class Skeleton {
 	final SkeletonData data;
@@ -354,6 +357,45 @@ public class Skeleton {
 			if (ikConstraint.data.name.equals(ikConstraintName)) return ikConstraint;
 		}
 		return null;
+	}
+
+	/** Returns the axis aligned bounding box (AABB) of the region, mesh, and skinned mesh attachments for the current pose.
+	 * @param offset The distance from the skeleton origin to the bottom left corner of the AABB.
+	 * @param size The width and height of the AABB. */
+	public void getBounds (Vector2 offset, Vector2 size) {
+		Array<Slot> drawOrder = this.drawOrder;
+		float minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
+		for (int i = 0, n = drawOrder.size; i < n; i++) {
+			Slot slot = drawOrder.get(i);
+			float[] vertices = null;
+			Attachment attachment = slot.attachment;
+			if (attachment instanceof RegionAttachment) {
+				RegionAttachment region = (RegionAttachment)attachment;
+				region.updateWorldVertices(slot, false);
+				vertices = region.getWorldVertices();
+
+			} else if (attachment instanceof MeshAttachment) {
+				MeshAttachment mesh = (MeshAttachment)attachment;
+				mesh.updateWorldVertices(slot, true);
+				vertices = mesh.getWorldVertices();
+
+			} else if (attachment instanceof SkinnedMeshAttachment) {
+				SkinnedMeshAttachment mesh = (SkinnedMeshAttachment)attachment;
+				mesh.updateWorldVertices(slot, true);
+				vertices = mesh.getWorldVertices();
+			}
+			if (vertices != null) {
+				for (int ii = 0, nn = vertices.length; ii < nn; ii += 5) {
+					float x = vertices[ii], y = vertices[ii + 1];
+					minX = Math.min(minX, x);
+					minY = Math.min(minY, y);
+					maxX = Math.max(maxX, x);
+					maxY = Math.max(maxY, y);
+				}
+			}
+		}
+		offset.set(minX, minY);
+		size.set(maxX - minX, maxY - minY);
 	}
 
 	public Color getColor () {
