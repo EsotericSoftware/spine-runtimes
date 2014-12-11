@@ -94,12 +94,9 @@ public class AnimationState {
 			if (!loop && time > endTime) time = endTime;
 
 			TrackEntry previous = current.previous;
-			if (previous == null) {
-				if (current.mix == 1)
-					current.animation.apply(skeleton, lastTime, time, loop, events);
-				else
-					current.animation.mix(skeleton, lastTime, time, loop, events, current.mix);
-			} else {
+			if (previous == null)
+				current.animation.mix(skeleton, lastTime, time, loop, events, current.mix);
+			else {
 				float previousTime = previous.time;
 				if (!previous.loop && previousTime > previous.endTime) previousTime = previous.endTime;
 				previous.animation.apply(skeleton, previousTime, previousTime, previous.loop, null);
