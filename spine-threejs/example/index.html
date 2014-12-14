@@ -196,25 +196,17 @@
 
 				var mesh = material.meshes[slot.data.name];
 
-				if (!mesh) {
-					var geometry = new THREE.PlaneGeometry (
+				var geometry;
+
+				if (mesh) {
+					geometry = mesh.geometry;
+				} else {
+					geometry = new THREE.PlaneGeometry (
 						attachment.regionOriginalWidth,
 						attachment.regionOriginalHeight
 					);
 
-					// TODO can slot change these?
-
-					geometry.faceVertexUvs[0][0][0].set (attachment.uvs[6], 1- attachment.uvs[7]);
-					geometry.faceVertexUvs[0][0][1].set (attachment.uvs[4], 1- attachment.uvs[5]);
-					geometry.faceVertexUvs[0][0][2].set (attachment.uvs[0], 1- attachment.uvs[1]);
-					geometry.faceVertexUvs[0][1][0].set (attachment.uvs[4], 1- attachment.uvs[5]);
-					geometry.faceVertexUvs[0][1][1].set (attachment.uvs[2], 1- attachment.uvs[3]);
-					geometry.faceVertexUvs[0][1][2].set (attachment.uvs[0], 1- attachment.uvs[1]);
-
-					geometry.vertices[1].set (attachment.offset[0], attachment.offset[1], 0);
-					geometry.vertices[3].set (attachment.offset[2], attachment.offset[3], 0);
-					geometry.vertices[2].set (attachment.offset[4], attachment.offset[5], 0);
-					geometry.vertices[0].set (attachment.offset[6], attachment.offset[7], 0);
+					geometry.dynamic = true;
 
 					mesh = new THREE.Mesh (geometry, material);
 
@@ -223,6 +215,27 @@
 					mesh.matrixAutoUpdate = false;
 
 					this.add (mesh);
+				}
+
+				if (mesh.attachmentTime && (slot.getAttachmentTime () > mesh.attachmentTime)) {
+					// do nothing
+				} else {
+					// update UVs
+					geometry.faceVertexUvs[0][0][0].set (attachment.uvs[6], 1- attachment.uvs[7]);
+					geometry.faceVertexUvs[0][0][1].set (attachment.uvs[4], 1- attachment.uvs[5]);
+					geometry.faceVertexUvs[0][0][2].set (attachment.uvs[0], 1- attachment.uvs[1]);
+					geometry.faceVertexUvs[0][1][0].set (attachment.uvs[4], 1- attachment.uvs[5]);
+					geometry.faceVertexUvs[0][1][1].set (attachment.uvs[2], 1- attachment.uvs[3]);
+					geometry.faceVertexUvs[0][1][2].set (attachment.uvs[0], 1- attachment.uvs[1]);
+					geometry.uvsNeedUpdate = true;
+
+					geometry.vertices[1].set (attachment.offset[0], attachment.offset[1], 0);
+					geometry.vertices[3].set (attachment.offset[2], attachment.offset[3], 0);
+					geometry.vertices[2].set (attachment.offset[4], attachment.offset[5], 0);
+					geometry.vertices[0].set (attachment.offset[6], attachment.offset[7], 0);
+					geometry.verticesNeedUpdate = true;
+
+					mesh.attachmentTime = slot.getAttachmentTime ();
 				}
 
 				matrix.makeTranslation (
