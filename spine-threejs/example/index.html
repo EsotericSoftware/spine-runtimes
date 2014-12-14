@@ -92,6 +92,21 @@
 
 						atlas.updateUVs (page);
 
+						// propagate new UVs to attachments, if they were already created
+						if (self.skeleton) {
+							var skins = self.skeleton.data.skins;
+							for (var s = 0, n = skins.length; s < n; s++) {
+								var attachments = skins[s].attachments;
+								for (var k in attachments) {
+									var attachment = attachments[k];
+									if (attachment instanceof spine.RegionAttachment) {
+										var region = attachment.rendererObject;
+										attachment.setUVs (region.u, region.v, region.u2, region.v2, region.rotate);
+									}
+								}
+							}
+						}
+
 						// create basic material for the page
 						var texture = new THREE.Texture (image);
 						texture.needsUpdate = true;
@@ -164,7 +179,7 @@
 					continue;
 				}
 
-				if (slot.data.additiveBlending && (materials.length < 2)) {
+				if (slot.data.additiveBlending && (materials.length == 1)) {
 					// create separate material for additive blending
 					materials.push (new THREE.MeshBasicMaterial ({
 						map : materials[0].map,
@@ -305,7 +320,7 @@
 					test.skeleton.setSlotsToSetupPose();
 					test.state.setAnimationByName(0, 'walk', true);
 					canvas.onmousedown = function () {
-						test.skeleton.setSkinByName(skeleton.skin.name == 'goblin' ? 'goblingirl' : 'goblin');
+						test.skeleton.setSkinByName(test.skeleton.skin.name == 'goblin' ? 'goblingirl' : 'goblin');
 						test.skeleton.setSlotsToSetupPose();
 					}
 					break;
