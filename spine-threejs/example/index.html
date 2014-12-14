@@ -166,6 +166,12 @@
 			this.state.apply (this.skeleton);
 			this.skeleton.updateWorldTransform ();
 
+			this.traverse (function (object) {
+				if (object instanceof THREE.Mesh) {
+					object.visible = false;
+				}
+			});
+
 			var Z = 0;
 			var drawOrder = this.skeleton.drawOrder;
 			for (var i = 0, n = drawOrder.length; i < n; i++) {
@@ -200,6 +206,8 @@
 
 				if (mesh) {
 					geometry = mesh.geometry;
+
+					mesh.visible = true;
 				} else {
 					geometry = new THREE.PlaneGeometry (
 						attachment.regionOriginalWidth,
