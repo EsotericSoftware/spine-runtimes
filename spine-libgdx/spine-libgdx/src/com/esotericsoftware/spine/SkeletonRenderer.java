@@ -71,14 +71,14 @@ public class SkeletonRenderer {
 
 			} else if (attachment instanceof MeshAttachment) {
 				MeshAttachment mesh = (MeshAttachment)attachment;
-				mesh.updateWorldVertices(slot, true);
+				mesh.updateWorldVertices(slot, premultipliedAlpha);
 				vertices = mesh.getWorldVertices();
 				triangles = mesh.getTriangles();
 				texture = mesh.getRegion().getTexture();
 
 			} else if (attachment instanceof SkinnedMeshAttachment) {
 				SkinnedMeshAttachment mesh = (SkinnedMeshAttachment)attachment;
-				mesh.updateWorldVertices(slot, true);
+				mesh.updateWorldVertices(slot, premultipliedAlpha);
 				vertices = mesh.getWorldVertices();
 				triangles = mesh.getTriangles();
 				texture = mesh.getRegion().getTexture();
@@ -141,8 +141,10 @@ public class SkeletonRenderer {
 						batch.setBlendFunction(srcFunc, GL20.GL_ONE_MINUS_SRC_ALPHA);
 				}
 				batch.draw(regionAttachment.getRegion().getTexture(), vertices, 0, 20);
+
 			} else if (attachment instanceof MeshAttachment || attachment instanceof SkinnedMeshAttachment) {
 				throw new RuntimeException("PolygonSpriteBatch is required to render meshes.");
+
 			} else if (attachment instanceof SkeletonAttachment) {
 				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
 				if (attachmentSkeleton == null) continue;

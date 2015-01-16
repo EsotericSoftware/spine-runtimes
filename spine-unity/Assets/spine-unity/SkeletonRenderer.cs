@@ -52,7 +52,7 @@ public class SkeletonRenderer : MonoBehaviour {
 	public bool renderMeshes = true, immutableTriangles;
 	public bool logErrors = false;
 	private MeshFilter meshFilter;
-	private Mesh mesh, mesh1, mesh2;
+	private Mesh mesh1, mesh2;
 	private bool useMesh1;
 	private float[] tempVertices = new float[8];
 	private int lastVertexCount;
@@ -66,11 +66,8 @@ public class SkeletonRenderer : MonoBehaviour {
 	public virtual void Reset () {
 		if (meshFilter != null)
 			meshFilter.sharedMesh = null;
-		if (mesh != null)
-			DestroyImmediate(mesh);
 		if (renderer != null)
 			renderer.sharedMaterial = null;
-		mesh = null;
 		mesh1 = null;
 		mesh2 = null;
 		lastVertexCount = 0;
@@ -243,7 +240,7 @@ public class SkeletonRenderer : MonoBehaviour {
 					MeshAttachment meshAttachment = (MeshAttachment)attachment;
 					int meshVertexCount = meshAttachment.vertices.Length;
 					if (tempVertices.Length < meshVertexCount)
-						tempVertices = new float[meshVertexCount];
+						this.tempVertices = tempVertices = new float[meshVertexCount];
 					meshAttachment.ComputeWorldVertices(slot, tempVertices);
 					
 					color.a = (byte)(a * slot.a * meshAttachment.a);
@@ -264,7 +261,7 @@ public class SkeletonRenderer : MonoBehaviour {
 						SkinnedMeshAttachment meshAttachment = (SkinnedMeshAttachment)attachment;
 						int meshVertexCount = meshAttachment.uvs.Length;
 						if (tempVertices.Length < meshVertexCount)
-							tempVertices = new float[meshVertexCount];
+							this.tempVertices = tempVertices = new float[meshVertexCount];
 						meshAttachment.ComputeWorldVertices(slot, tempVertices);
 					
 						color.a = (byte)(a * slot.a * meshAttachment.a);
