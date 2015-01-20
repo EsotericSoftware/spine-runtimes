@@ -28,8 +28,14 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using Spine;
+
 
 [CustomEditor(typeof(AtlasAsset))]
 public class AtlasAssetInspector : Editor {
@@ -46,9 +52,23 @@ public class AtlasAssetInspector : Editor {
 
 		EditorGUILayout.PropertyField(atlasFile);
 		EditorGUILayout.PropertyField(materials, true);
+
+
+		if (atlasFile.objectReferenceValue != null) {
+			Atlas atlas = asset.GetAtlas();
+			FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic);
+			List<AtlasRegion> regions = (List<AtlasRegion>)field.GetValue(atlas);
+			EditorGUILayout.LabelField("Regions");
+			EditorGUI.indentLevel++;
+			for (int i = 0; i < regions.Count; i++) {
+				EditorGUILayout.LabelField(regions[i].name);
+			}
+			EditorGUI.indentLevel--;
+		}
+
 		
 		if (serializedObject.ApplyModifiedProperties() ||
-			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
+			(UnityEngine.Event.current.type == EventType.ValidateCommand && UnityEngine.Event.current.commandName == "UndoRedoPerformed")
 		) {
 			asset.Reset();
 		}

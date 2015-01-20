@@ -33,7 +33,7 @@ using UnityEngine;
 
 [CustomEditor(typeof(SkeletonRenderer))]
 public class SkeletonRendererInspector : Editor {
-	protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles;
+	protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, submeshSeparators;
 
 	protected virtual void OnEnable () {
 		skeletonDataAsset = serializedObject.FindProperty("skeletonDataAsset");
@@ -42,6 +42,7 @@ public class SkeletonRendererInspector : Editor {
 		tangents = serializedObject.FindProperty("calculateTangents");
 		meshes = serializedObject.FindProperty("renderMeshes");
 		immutableTriangles = serializedObject.FindProperty("immutableTriangles");
+		submeshSeparators = serializedObject.FindProperty("submeshSeparators");
 	}
 
 	protected virtual void gui () {
@@ -52,8 +53,11 @@ public class SkeletonRendererInspector : Editor {
 		float reloadWidth = GUI.skin.label.CalcSize(new GUIContent("Reload")).x + 20;
 		if (GUILayout.Button("Reload", GUILayout.Width(reloadWidth))) {
 			if (component.skeletonDataAsset != null) {
-				if (component.skeletonDataAsset.atlasAsset != null)
-					component.skeletonDataAsset.atlasAsset.Reset();
+				foreach (AtlasAsset aa in component.skeletonDataAsset.atlasAssets) {
+					if (aa != null)
+						aa.Reset();
+				}
+				
 				component.skeletonDataAsset.Reset();
 			}
 			component.Reset();
@@ -92,6 +96,7 @@ public class SkeletonRendererInspector : Editor {
 			new GUIContent("Immutable Triangles", "Enable to optimize rendering for skeletons that never change attachment visbility"));
 		EditorGUILayout.PropertyField(normals);
 		EditorGUILayout.PropertyField(tangents);
+		EditorGUILayout.PropertyField(submeshSeparators, true);
 	}
 
 	override public void OnInspectorGUI () {

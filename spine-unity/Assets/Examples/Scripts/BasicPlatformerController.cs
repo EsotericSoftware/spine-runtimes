@@ -71,11 +71,17 @@ public class BasicPlatformerController : MonoBehaviour {
 #if UNITY_4_5
 	[Header("Animation")]
 #endif
+	[SpineAnimation(dataSource: "skeletonAnimation")]
 	public string walkName = "Walk";
+	[SpineAnimation(dataSource: "skeletonAnimation")]
 	public string runName = "Run";
+	[SpineAnimation(dataSource: "skeletonAnimation")]
 	public string idleName = "Idle";
+	[SpineAnimation(dataSource: "skeletonAnimation")]
 	public string jumpName = "Jump";
+	[SpineAnimation(dataSource: "skeletonAnimation")]
 	public string fallName = "Fall";
+	[SpineAnimation(dataSource: "skeletonAnimation")]
 	public string crouchName = "Crouch";
 
 #if UNITY_4_5
