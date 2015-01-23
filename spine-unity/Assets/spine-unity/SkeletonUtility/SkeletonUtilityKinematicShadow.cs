@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public class SkeletonUtilityKinematicShadow : MonoBehaviour {
 	public bool hideShadow = true;
+	public Transform parent;
 	Dictionary<Transform, Transform> shadowTable;
 	GameObject shadowRoot;
 
@@ -12,7 +13,10 @@ public class SkeletonUtilityKinematicShadow : MonoBehaviour {
 		if (hideShadow)
 			shadowRoot.hideFlags = HideFlags.HideInHierarchy;
 
-		shadowRoot.transform.parent = transform.root;
+		if(parent == null)
+			shadowRoot.transform.parent = transform.root;
+		else
+			shadowRoot.transform.parent = parent;
 
 		shadowTable = new Dictionary<Transform, Transform>();
 

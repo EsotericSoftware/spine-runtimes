@@ -35,7 +35,7 @@ using UnityEngine;
 using Spine;
 
 public class SkeletonDataAsset : ScriptableObject {
-	public AtlasAsset atlasAsset;
+	public AtlasAsset[] atlasAssets;
 	public TextAsset skeletonJSON;
 	public float scale = 1;
 	public String[] fromAnimation;
@@ -45,13 +45,14 @@ public class SkeletonDataAsset : ScriptableObject {
 	private SkeletonData skeletonData;
 	private AnimationStateData stateData;
 
-	public void Reset () {
+	public void Reset() {
 		skeletonData = null;
 		stateData = null;
 	}
 
-	public SkeletonData GetSkeletonData (bool quiet) {
-		if (atlasAsset == null) {
+	public SkeletonData GetSkeletonData(bool quiet) {
+		if (atlasAssets == null) {
+			atlasAssets = new AtlasAsset[0];
 			if (!quiet)
 				Debug.LogError("Atlas not set for SkeletonData asset: " + name, this);
 			Reset();
@@ -65,16 +66,33 @@ public class SkeletonDataAsset : ScriptableObject {
 			return null;
 		}
 
-		Atlas atlas = atlasAsset.GetAtlas();
-		if (atlas == null) {
+
+
+		if (atlasAssets.Length == 0) {
 			Reset();
 			return null;
 		}
 
+		Atlas[] atlasArr = new Atlas[atlasAssets.Length];
+		for (int i = 0; i < atlasAssets.Length; i++) {
+			if (atlasAssets[i] == null) {
+				Reset();
+				return null;
+			}
+			atlasArr[i] = atlasAssets[i].GetAtlas();
+			if (atlasArr[i] == null) {
+				Reset();
+				return null;
+			}
+		}
+
+
+
+
 		if (skeletonData != null)
 			return skeletonData;
 
-		SkeletonJson json = new SkeletonJson(atlas);
+		SkeletonJson json = new SkeletonJson(atlasArr);
 		json.Scale = scale;
 		try {
 			skeletonData = json.ReadSkeletonData(new StringReader(skeletonJSON.text));
@@ -95,7 +113,7 @@ public class SkeletonDataAsset : ScriptableObject {
 		return skeletonData;
 	}
 
-	public AnimationStateData GetAnimationStateData () {
+	public AnimationStateData GetAnimationStateData() {
 		if (stateData != null)
 			return stateData;
 		GetSkeletonData(false);

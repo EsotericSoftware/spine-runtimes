@@ -42,8 +42,8 @@ namespace Spine {
 		private AttachmentLoader attachmentLoader;
 		public float Scale { get; set; }
 
-		public SkeletonJson (Atlas atlas)
-			: this(new AtlasAttachmentLoader(atlas)) {
+		public SkeletonJson (params Atlas[] atlasArray)
+			: this(new AtlasAttachmentLoader(atlasArray)) {
 		}
 
 		public SkeletonJson (AttachmentLoader attachmentLoader) {

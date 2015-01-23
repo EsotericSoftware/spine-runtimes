@@ -1,0 +1,90 @@
+
+FS_White.png
+size: 256,256
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+White/arm
+  rotate: false
+  xy: 143, 156
+  size: 111, 98
+  orig: 111, 98
+  offset: 0, 0
+  index: -1
+White/arm 2
+  rotate: false
+  xy: 95, 36
+  size: 46, 79
+  orig: 46, 79
+  offset: 0, 0
+  index: -1
+White/body
+  rotate: false
+  xy: 2, 12
+  size: 91, 103
+  orig: 91, 103
+  offset: 0, 0
+  index: -1
+White/eyes
+  rotate: true
+  xy: 195, 87
+  size: 67, 31
+  orig: 67, 31
+  offset: 0, 0
+  index: -1
+White/eyes blink
+  rotate: true
+  xy: 228, 87
+  size: 67, 22
+  orig: 67, 22
+  offset: 0, 0
+  index: -1
+White/feet
+  rotate: false
+  xy: 95, 2
+  size: 50, 32
+  orig: 50, 32
+  offset: 0, 0
+  index: -1
+White/feet 2
+  rotate: false
+  xy: 193, 58
+  size: 55, 27
+  orig: 55, 27
+  offset: 0, 0
+  index: -1
+White/hand
+  rotate: false
+  xy: 147, 9
+  size: 32, 28
+  orig: 32, 28
+  offset: 0, 0
+  index: -1
+White/head 1
+  rotate: false
+  xy: 2, 117
+  size: 139, 137
+  orig: 139, 137
+  offset: 0, 0
+  index: -1
+White/leg
+  rotate: false
+  xy: 143, 39
+  size: 48, 55
+  orig: 48, 55
+  offset: 0, 0
+  index: -1
+White/leg 2
+  rotate: false
+  xy: 143, 96
+  size: 50, 58
+  orig: 50, 58
+  offset: 0, 0
+  index: -1
+White/mouth
+  rotate: false
+  xy: 193, 35
+  size: 28, 21
+  orig: 28, 21
+  offset: 0, 0
+  index: -1

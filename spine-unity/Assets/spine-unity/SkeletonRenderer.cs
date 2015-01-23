@@ -51,6 +51,14 @@ public class SkeletonRenderer : MonoBehaviour {
 	public float zSpacing;
 	public bool renderMeshes = true, immutableTriangles;
 	public bool logErrors = false;
+
+	[SpineSlot]
+	public string[] submeshSeparators = new string[0];
+
+	[HideInInspector]
+	public List<Slot> submeshSeparatorSlots = new List<Slot>();
+
+
 	private MeshFilter meshFilter;
 	private Mesh mesh1, mesh2;
 	private bool useMesh1;
@@ -62,6 +70,7 @@ public class SkeletonRenderer : MonoBehaviour {
 	private Material[] sharedMaterials = new Material[0];
 	private readonly List<Material> submeshMaterials = new List<Material>();
 	private readonly List<Submesh> submeshes = new List<Submesh>();
+	
 
 	public virtual void Reset () {
 		if (meshFilter != null)
@@ -99,6 +108,12 @@ public class SkeletonRenderer : MonoBehaviour {
 		skeleton = new Skeleton(skeletonData);
 		if (initialSkinName != null && initialSkinName.Length > 0 && initialSkinName != "default")
 			skeleton.SetSkin(initialSkinName);
+
+		submeshSeparatorSlots.Clear();
+		for (int i = 0; i < submeshSeparators.Length; i++) {
+			submeshSeparatorSlots.Add(skeleton.FindSlot(submeshSeparators[i]));
+		}
+
 		if (OnReset != null)
 			OnReset(this);
 	}
@@ -156,7 +171,8 @@ public class SkeletonRenderer : MonoBehaviour {
 
 			// Populate submesh when material changes.
 			Material material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
-			if ((lastMaterial != material && lastMaterial != null) || slot.Data.name[0] == '*') {
+
+			if ((lastMaterial != material && lastMaterial != null) || submeshSeparatorSlots.Contains(slot)) {
 				AddSubmesh(lastMaterial, submeshStartSlotIndex, i, submeshTriangleCount, submeshFirstVertex, false);
 				submeshTriangleCount = 0;
 				submeshFirstVertex = vertexCount;
