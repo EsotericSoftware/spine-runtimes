@@ -60,6 +60,8 @@ public class SkeletonDataAssetInspector : Editor {
 
 	void OnEnable() {
 
+	SpineEditorUtilities.ConfirmInitialization();
+	
 		try {
 			atlasAssets = serializedObject.FindProperty("atlasAssets");
 			skeletonJSON = serializedObject.FindProperty("skeletonJSON");

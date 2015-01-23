@@ -36,6 +36,7 @@ public class SkeletonRendererInspector : Editor {
 	protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, submeshSeparators;
 
 	protected virtual void OnEnable () {
+		SpineEditorUtilities.ConfirmInitialization();
 		skeletonDataAsset = serializedObject.FindProperty("skeletonDataAsset");
 		initialSkinName = serializedObject.FindProperty("initialSkinName");
 		normals = serializedObject.FindProperty("calculateNormals");

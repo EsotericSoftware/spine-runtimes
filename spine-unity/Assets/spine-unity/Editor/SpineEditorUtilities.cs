@@ -146,8 +146,13 @@ public class SpineEditorUtilities : AssetPostprocessor {
 	public static float defaultScale = 0.01f;
 	public static float defaultMix = 0.2f;
 	public static string defaultShader = "Spine/Skeleton";
+	public static bool initialized;
 
 	static SpineEditorUtilities() {
+		Initialize();
+	}
+	
+	static void Initialize(){
 		DirectoryInfo rootDir = new DirectoryInfo(Application.dataPath);
 		FileInfo[] files = rootDir.GetFiles("SpineEditorUtilities.cs", SearchOption.AllDirectories);
 		editorPath = Path.GetDirectoryName(files[0].FullName.Replace("\\", "/").Replace(Application.dataPath, "Assets"));
@@ -162,6 +167,12 @@ public class SpineEditorUtilities : AssetPostprocessor {
 		EditorApplication.hierarchyWindowItemOnGUI += HierarchyWindowItemOnGUI;
 
 		HierarchyWindowChanged();
+		initialized = true;
+	}
+	
+	public static void ConfirmInitialization(){
+		if(!initialized || Icons.skeleton == null)
+		Initialize();
 	}
 
 	static void HierarchyWindowChanged() {

@@ -42,6 +42,7 @@ public class AtlasAssetInspector : Editor {
 	private SerializedProperty atlasFile, materials;
 
 	void OnEnable () {
+		SpineEditorUtilities.ConfirmInitialization();
 		atlasFile = serializedObject.FindProperty("atlasFile");
 		materials = serializedObject.FindProperty("materials");
 	}
