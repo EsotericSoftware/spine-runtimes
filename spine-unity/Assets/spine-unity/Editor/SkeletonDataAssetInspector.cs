@@ -102,12 +102,18 @@ public class SkeletonDataAssetInspector : Editor {
 		EditorGUILayout.PropertyField(skeletonJSON);
 		EditorGUILayout.PropertyField(scale);
 		if (EditorGUI.EndChangeCheck()) {
-			if (m_previewUtility != null) {
-				m_previewUtility.Cleanup();
-				m_previewUtility = null;
-			}
+			if (serializedObject.ApplyModifiedProperties()) {
 
-			RepopulateWarnings();
+				if (m_previewUtility != null) {
+					m_previewUtility.Cleanup();
+					m_previewUtility = null;
+				}
+
+				RepopulateWarnings();
+				OnEnable();
+				return;
+			}
+			
 		}
 
 		
@@ -118,6 +124,8 @@ public class SkeletonDataAssetInspector : Editor {
 			DrawSlotList();
 			
 		} else {
+
+			DrawReimportButton();
 			//Show Warnings
 			foreach (var str in warnings)
 				EditorGUILayout.LabelField(new GUIContent(str, SpineEditorUtilities.Icons.warning));
@@ -130,6 +138,24 @@ public class SkeletonDataAssetInspector : Editor {
 				asset.Reset();
 			}
 		}
+	}
+
+	void DrawReimportButton() {
+		EditorGUI.BeginDisabledGroup(skeletonJSON.objectReferenceValue == null);
+		if (GUILayout.Button(new GUIContent("Attempt Reimport", SpineEditorUtilities.Icons.warning))) {
+			SpineEditorUtilities.ImportSpineContent(new string[] { AssetDatabase.GetAssetPath(skeletonJSON.objectReferenceValue) }, true);
+
+			if (m_previewUtility != null) {
+				m_previewUtility.Cleanup();
+				m_previewUtility = null;
+			}
+
+			RepopulateWarnings();
+			OnEnable();
+			return;
+			
+		}
+		EditorGUI.EndDisabledGroup();
 	}
 
 	void DrawAnimationStateInfo() {

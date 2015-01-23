@@ -50,9 +50,27 @@ public class AtlasAssetInspector : Editor {
 		serializedObject.Update();
 		AtlasAsset asset = (AtlasAsset)target;
 
+		EditorGUI.BeginChangeCheck();
 		EditorGUILayout.PropertyField(atlasFile);
 		EditorGUILayout.PropertyField(materials, true);
+		if (EditorGUI.EndChangeCheck())
+			serializedObject.ApplyModifiedProperties();
 
+		if (materials.arraySize == 0) {
+			EditorGUILayout.LabelField(new GUIContent("Error:  Missing materials", SpineEditorUtilities.Icons.warning));
+			return;
+		}
+
+		for (int i = 0; i < materials.arraySize; i++) {
+			SerializedProperty prop = materials.GetArrayElementAtIndex(i);
+			Material mat = (Material)prop.objectReferenceValue;
+			if (mat == null) {
+				EditorGUILayout.LabelField(new GUIContent("Error:  Materials cannot be null", SpineEditorUtilities.Icons.warning));
+				return;
+			}
+		}
+			
+		
 
 		if (atlasFile.objectReferenceValue != null) {
 			Atlas atlas = asset.GetAtlas();

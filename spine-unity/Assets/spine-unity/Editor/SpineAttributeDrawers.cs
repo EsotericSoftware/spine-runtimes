@@ -1,4 +1,38 @@
-﻿using UnityEngine;
+﻿/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.1
+ * 
+ * Copyright (c) 2013, Esoteric Software
+ * All rights reserved.
+ * 
+ * You are granted a perpetual, non-exclusive, non-sublicensable and
+ * non-transferable license to install, execute and perform the Spine Runtimes
+ * Software (the "Software") solely for internal use. Without the written
+ * permission of Esoteric Software (typically granted by licensing Spine), you
+ * may not (a) modify, translate, adapt or otherwise create derivative works,
+ * improvements of the Software or develop new applications using the Software
+ * or (b) remove, delete, alter or obscure any trademarks or any copyright,
+ * trademark, patent or other intellectual property or proprietary rights
+ * notices on or in the Software, including any copy thereof. Redistributions
+ * in binary or source form must include this license and terms.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+
+/*****************************************************************************
+ * Spine Attribute Drawers created by Mitch Thompson
+ * Full irrevocable rights and permissions granted to Esoteric Software
+*****************************************************************************/
+using UnityEngine;
 using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
@@ -32,13 +66,13 @@ public class SpineSlotDrawer : PropertyDrawer {
 
 		SpineSlot attrib = (SpineSlot)attribute;
 
-		var skeletonDataAssetProperty = property.serializedObject.FindProperty(attrib.dataSource);
+		var dataProperty = property.serializedObject.FindProperty(attrib.dataField);
 
-		if (skeletonDataAssetProperty != null) {
-			if (skeletonDataAssetProperty.objectReferenceValue is SkeletonDataAsset) {
-				skeletonDataAsset = (SkeletonDataAsset)skeletonDataAssetProperty.objectReferenceValue;
-			} else if (skeletonDataAssetProperty.objectReferenceValue is SkeletonRenderer) {
-				var renderer = (SkeletonRenderer)skeletonDataAssetProperty.objectReferenceValue;
+		if (dataProperty != null) {
+			if (dataProperty.objectReferenceValue is SkeletonDataAsset) {
+				skeletonDataAsset = (SkeletonDataAsset)dataProperty.objectReferenceValue;
+			} else if (dataProperty.objectReferenceValue is SkeletonRenderer) {
+				var renderer = (SkeletonRenderer)dataProperty.objectReferenceValue;
 				if (renderer != null)
 					skeletonDataAsset = renderer.skeletonDataAsset;
 			} else {
@@ -102,7 +136,6 @@ public class SpineSlotDrawer : PropertyDrawer {
 public class SpineSkinDrawer : PropertyDrawer {
 	SkeletonDataAsset skeletonDataAsset;
 
-
 	public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 		if (property.propertyType != SerializedPropertyType.String) {
 			EditorGUI.LabelField(position, "ERROR:", "May only apply to type string");
@@ -111,13 +144,13 @@ public class SpineSkinDrawer : PropertyDrawer {
 
 		SpineSkin attrib = (SpineSkin)attribute;
 
-		var skeletonDataAssetProperty = property.serializedObject.FindProperty(attrib.dataSource);
+		var dataProperty = property.serializedObject.FindProperty(attrib.dataField);
 
-		if (skeletonDataAssetProperty != null) {
-			if (skeletonDataAssetProperty.objectReferenceValue is SkeletonDataAsset) {
-				skeletonDataAsset = (SkeletonDataAsset)skeletonDataAssetProperty.objectReferenceValue;
-			} else if (skeletonDataAssetProperty.objectReferenceValue is SkeletonRenderer) {
-				var renderer = (SkeletonRenderer)skeletonDataAssetProperty.objectReferenceValue;
+		if (dataProperty != null) {
+			if (dataProperty.objectReferenceValue is SkeletonDataAsset) {
+				skeletonDataAsset = (SkeletonDataAsset)dataProperty.objectReferenceValue;
+			} else if (dataProperty.objectReferenceValue is SkeletonRenderer) {
+				var renderer = (SkeletonRenderer)dataProperty.objectReferenceValue;
 				if (renderer != null)
 					skeletonDataAsset = renderer.skeletonDataAsset;
 			} else {
@@ -256,13 +289,13 @@ public class SpineAnimationDrawer : PropertyDrawer {
 
 		SpineAnimation attrib = (SpineAnimation)attribute;
 
-		var skeletonDataAssetProperty = property.serializedObject.FindProperty(attrib.dataSource);
+		var dataProperty = property.serializedObject.FindProperty(attrib.dataField);
 
-		if (skeletonDataAssetProperty != null) {
-			if (skeletonDataAssetProperty.objectReferenceValue is SkeletonDataAsset) {
-				skeletonDataAsset = (SkeletonDataAsset)skeletonDataAssetProperty.objectReferenceValue;
-			} else if (skeletonDataAssetProperty.objectReferenceValue is SkeletonRenderer) {
-				var renderer = (SkeletonRenderer)skeletonDataAssetProperty.objectReferenceValue;
+		if (dataProperty != null) {
+			if (dataProperty.objectReferenceValue is SkeletonDataAsset) {
+				skeletonDataAsset = (SkeletonDataAsset)dataProperty.objectReferenceValue;
+			} else if (dataProperty.objectReferenceValue is SkeletonRenderer) {
+				var renderer = (SkeletonRenderer)dataProperty.objectReferenceValue;
 				if (renderer != null)
 					skeletonDataAsset = renderer.skeletonDataAsset;
 			} else {
@@ -332,13 +365,13 @@ public class SpineAttachmentDrawer : PropertyDrawer {
 
 		SpineAttachment attrib = (SpineAttachment)attribute;
 
-		var skeletonDataAssetProperty = property.serializedObject.FindProperty(attrib.dataSource);
+		var dataProperty = property.serializedObject.FindProperty(attrib.dataField);
 
-		if (skeletonDataAssetProperty != null) {
-			if (skeletonDataAssetProperty.objectReferenceValue is SkeletonDataAsset) {
-				skeletonDataAsset = (SkeletonDataAsset)skeletonDataAssetProperty.objectReferenceValue;
-			} else if (skeletonDataAssetProperty.objectReferenceValue is SkeletonRenderer) {
-				var renderer = (SkeletonRenderer)skeletonDataAssetProperty.objectReferenceValue;
+		if (dataProperty != null) {
+			if (dataProperty.objectReferenceValue is SkeletonDataAsset) {
+				skeletonDataAsset = (SkeletonDataAsset)dataProperty.objectReferenceValue;
+			} else if (dataProperty.objectReferenceValue is SkeletonRenderer) {
+				var renderer = (SkeletonRenderer)dataProperty.objectReferenceValue;
 				if (renderer != null)
 					skeletonDataAsset = renderer.skeletonDataAsset;
 				else {
@@ -381,8 +414,11 @@ public class SpineAttachmentDrawer : PropertyDrawer {
 		List<Skin> validSkins = new List<Skin>();
 
 		if (skeletonRenderer != null && attrib.currentSkinOnly) {
-			if (skeletonRenderer.skeleton.Skin != null)
+			if (skeletonRenderer.skeleton.Skin != null) {
 				validSkins.Add(skeletonRenderer.skeleton.Skin);
+			} else {
+				validSkins.Add(data.Skins[0]);
+			}
 		} else {
 			foreach (Skin skin in data.Skins) {
 				if (skin != null)
@@ -392,6 +428,8 @@ public class SpineAttachmentDrawer : PropertyDrawer {
 
 		GenericMenu menu = new GenericMenu();
 		List<string> attachmentNames = new List<string>();
+		List<string> placeholderNames = new List<string>();
+
 		string prefix = "";
 
 		if (skeletonRenderer != null && attrib.currentSkinOnly)
@@ -405,7 +443,7 @@ public class SpineAttachmentDrawer : PropertyDrawer {
 
 		Skin defaultSkin = data.Skins[0];
 
-		SerializedProperty slotProperty = property.serializedObject.FindProperty(attrib.slotSource);
+		SerializedProperty slotProperty = property.serializedObject.FindProperty(attrib.slotField);
 		string slotMatch = "";
 		if (slotProperty != null) {
 			if (slotProperty.propertyType == SerializedPropertyType.String) {
@@ -424,22 +462,113 @@ public class SpineAttachmentDrawer : PropertyDrawer {
 					continue;
 
 				attachmentNames.Clear();
+				placeholderNames.Clear();
+
 				skin.FindNamesForSlot(i, attachmentNames);
-				if (skin != defaultSkin)
+				if (skin != defaultSkin) {
 					defaultSkin.FindNamesForSlot(i, attachmentNames);
+					skin.FindNamesForSlot(i, placeholderNames);
+				}
+					
 
 				for (int a = 0; a < attachmentNames.Count; a++) {
+					
 					string attachmentPath = attachmentNames[a];
 					string menuPath = prefix + data.Slots[i].Name + "/" + attachmentPath;
 					string name = attachmentNames[a];
 
-					if (attrib.returnFullPath)
+					if (attrib.returnAttachmentPath)
 						name = skin.Name + "/" + data.Slots[i].Name + "/" + attachmentPath;
-					menu.AddItem(new GUIContent(menuPath), name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
+
+					if (attrib.placeholdersOnly && placeholderNames.Contains(attachmentPath) == false) {
+						menu.AddDisabledItem(new GUIContent(menuPath));
+					} else {
+						menu.AddItem(new GUIContent(menuPath), name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
+					}
+					
+					
 				}
 			}
 		}
 
+
+		menu.ShowAsContext();
+	}
+
+	void HandleSelect(object val) {
+		var pair = (SpineDrawerValuePair)val;
+		pair.property.stringValue = pair.str;
+		pair.property.serializedObject.ApplyModifiedProperties();
+	}
+
+	public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
+		return 18;
+	}
+}
+
+[CustomPropertyDrawer(typeof(SpineBone))]
+public class SpineBoneDrawer : PropertyDrawer {
+	SkeletonDataAsset skeletonDataAsset;
+
+	public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
+		if (property.propertyType != SerializedPropertyType.String) {
+			EditorGUI.LabelField(position, "ERROR:", "May only apply to type string");
+			return;
+		}
+
+		SpineBone attrib = (SpineBone)attribute;
+
+		var dataProperty = property.serializedObject.FindProperty(attrib.dataField);
+
+		if (dataProperty != null) {
+			if (dataProperty.objectReferenceValue is SkeletonDataAsset) {
+				skeletonDataAsset = (SkeletonDataAsset)dataProperty.objectReferenceValue;
+			} else if (dataProperty.objectReferenceValue is SkeletonRenderer) {
+				var renderer = (SkeletonRenderer)dataProperty.objectReferenceValue;
+				if (renderer != null)
+					skeletonDataAsset = renderer.skeletonDataAsset;
+			} else {
+				EditorGUI.LabelField(position, "ERROR:", "Invalid reference type");
+				return;
+			}
+
+		} else if (property.serializedObject.targetObject is Component) {
+			var component = (Component)property.serializedObject.targetObject;
+			if (component.GetComponent<SkeletonRenderer>() != null) {
+				var skeletonRenderer = component.GetComponent<SkeletonRenderer>();
+				skeletonDataAsset = skeletonRenderer.skeletonDataAsset;
+			}
+		}
+
+		if (skeletonDataAsset == null) {
+			EditorGUI.LabelField(position, "ERROR:", "Must have reference to a SkeletonDataAsset");
+			return;
+		}
+
+		position = EditorGUI.PrefixLabel(position, label);
+
+		if (GUI.Button(position, property.stringValue, EditorStyles.popup)) {
+			Selector(property);
+		}
+
+	}
+
+	void Selector(SerializedProperty property) {
+		SpineBone attrib = (SpineBone)attribute;
+		SkeletonData data = skeletonDataAsset.GetSkeletonData(true);
+		if (data == null)
+			return;
+
+		GenericMenu menu = new GenericMenu();
+
+		menu.AddDisabledItem(new GUIContent(skeletonDataAsset.name));
+		menu.AddSeparator("");
+
+		for (int i = 0; i < data.Bones.Count; i++) {
+			string name = data.Bones[i].Name;
+			if (name.StartsWith(attrib.startsWith))
+				menu.AddItem(new GUIContent(name), name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
+		}
 
 		menu.ShowAsContext();
 	}

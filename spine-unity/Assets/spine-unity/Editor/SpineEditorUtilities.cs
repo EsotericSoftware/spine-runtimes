@@ -209,8 +209,10 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 	}
 
-
 	static void OnPostprocessAllAssets(string[] imported, string[] deleted, string[] moved, string[] movedFromAssetPaths) {
+		ImportSpineContent(imported, false);
+	}
+	public static void ImportSpineContent(string[] imported, bool reimport = false) {
 
 		List<string> atlasPaths = new List<string>();
 		List<string> imagePaths = new List<string>();
@@ -242,6 +244,9 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 		//import atlases first
 		foreach (string ap in atlasPaths) {
+			if (!reimport && CheckForValidAtlas(ap))
+				continue;
+
 			TextAsset atlasText = (TextAsset)AssetDatabase.LoadAssetAtPath(ap, typeof(TextAsset));
 			AtlasAsset atlas = IngestSpineAtlas(atlasText);
 			atlases.Add(atlas);
@@ -250,7 +255,14 @@ public class SpineEditorUtilities : AssetPostprocessor {
 		//import skeletons and match them with atlases
 		bool abortSkeletonImport = false;
 		foreach (string sp in skeletonPaths) {
+			if (!reimport && CheckForValidSkeletonData(sp)) {
+				Debug.Log("Automatically skipping: " + sp);
+				continue;
+			}
+				
+
 			string dir = Path.GetDirectoryName(sp);
+
 			var localAtlases = FindAtlasesAtPath(dir);
 			var requiredPaths = GetRequiredAtlasRegions(sp);
 			var atlasMatch = GetMatchingAtlas(requiredPaths, localAtlases);
@@ -305,6 +317,48 @@ public class SpineEditorUtilities : AssetPostprocessor {
 		}
 
 		//TODO:  any post processing of images
+	}
+
+	static bool CheckForValidSkeletonData(string skeletonJSONPath) {
+
+		string dir = Path.GetDirectoryName(skeletonJSONPath);
+		TextAsset textAsset = (TextAsset)AssetDatabase.LoadAssetAtPath(skeletonJSONPath, typeof(TextAsset));
+		DirectoryInfo dirInfo = new DirectoryInfo(dir);
+
+		FileInfo[] files = dirInfo.GetFiles("*.asset");
+
+		foreach (var f in files) {
+			string localPath = dir + "/" + f.Name;
+			var obj = AssetDatabase.LoadAssetAtPath(localPath, typeof(Object));
+			if (obj is SkeletonDataAsset) {
+				var skeletonDataAsset = (SkeletonDataAsset)obj;
+				if (skeletonDataAsset.skeletonJSON == textAsset)
+					return true;
+			}
+		}
+
+		return false;
+	}
+
+	static bool CheckForValidAtlas(string atlasPath) {
+
+		string dir = Path.GetDirectoryName(atlasPath);
+		TextAsset textAsset = (TextAsset)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(TextAsset));
+		DirectoryInfo dirInfo = new DirectoryInfo(dir);
+
+		FileInfo[] files = dirInfo.GetFiles("*.asset");
+
+		foreach (var f in files) {
+			string localPath = dir + "/" + f.Name;
+			var obj = AssetDatabase.LoadAssetAtPath(localPath, typeof(Object));
+			if (obj is AtlasAsset) {
+				var atlasAsset = (AtlasAsset)obj;
+				if (atlasAsset.atlasFile == textAsset)
+					return true;
+			}
+		}
+
+		return false;
 	}
 
 	static List<AtlasAsset> MultiAtlasDialog(List<string> requiredPaths, string initialDirectory, string header = "") {
