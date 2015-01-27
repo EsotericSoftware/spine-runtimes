@@ -17,16 +17,16 @@ public class AtlasRegionAttacher : MonoBehaviour {
 	public AtlasAsset atlasAsset;
 	public SlotRegionPair[] attachments;
 
-	[HideInInspector]
-	public SkeletonRenderer skeletonRenderer;
-
-
 	Atlas atlas;
 
-	void Start() {
-		atlas = atlasAsset.GetAtlas();
-		this.skeletonRenderer = GetComponent<SkeletonRenderer>();
+	void Awake() {
+		GetComponent<SkeletonRenderer>().OnReset += Apply;
+	}
 
+
+	void Apply(SkeletonRenderer skeletonRenderer) {
+		atlas = atlasAsset.GetAtlas();
+		
 		AtlasAttachmentLoader loader = new AtlasAttachmentLoader(atlas);
 
 		float scaleMultiplier = skeletonRenderer.skeletonDataAsset.scale;
@@ -41,7 +41,7 @@ public class AtlasRegionAttacher : MonoBehaviour {
 			regionAttachment.SetColor(new Color(1, 1, 1, 1));
 			regionAttachment.UpdateOffset();
 
-			var slot = this.skeletonRenderer.skeleton.FindSlot(entry.slot);
+			var slot = skeletonRenderer.skeleton.FindSlot(entry.slot);
 			slot.Attachment = regionAttachment;
 		}
 	}

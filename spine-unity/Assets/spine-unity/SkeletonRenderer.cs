@@ -117,9 +117,19 @@ public class SkeletonRenderer : MonoBehaviour {
 		if (OnReset != null)
 			OnReset(this);
 	}
-	
-	public void Awake () {
-		Reset();
+
+	public virtual void OnEnable() {
+		if(mesh1 == null || mesh2 == null)
+			Reset();
+	}
+
+	public virtual void OnDisable() {
+		if (Application.isPlaying && gameObject.activeInHierarchy == false) {
+			if (mesh1 != null)
+				Destroy(mesh1);
+			if (mesh2 != null)
+				Destroy(mesh2);
+		}
 	}
 	
 	private Mesh newMesh () {

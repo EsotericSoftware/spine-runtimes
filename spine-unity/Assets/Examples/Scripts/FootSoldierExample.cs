@@ -42,6 +42,9 @@ public class FootSoldierExample : MonoBehaviour {
 	[SpineAnimation]
 	public string attackAnimation;
 
+	[SpineAnimation]
+	public string moveAnimation;
+
 	[SpineSlot]
 	public string eyesSlot;
 
@@ -54,22 +57,33 @@ public class FootSoldierExample : MonoBehaviour {
 	[Range(0, 0.2f)]
 	public float blinkDuration = 0.05f;
 
+	public float moveSpeed = 3;
+
 	private SkeletonAnimation skeletonAnimation;
 
 	void Awake() {
 		skeletonAnimation = GetComponent<SkeletonAnimation>();
+		skeletonAnimation.OnReset += Apply;
 	}
 
-	void Start() {
-		skeletonAnimation.state.SetAnimation(0, idleAnimation, true);
+	void Apply(SkeletonRenderer skeletonRenderer) {
 		StartCoroutine("Blink");
 	}
 
 	void Update() {
 		if (Input.GetKey(KeyCode.Space)) {
-			if (skeletonAnimation.state.GetCurrent(0).Animation.Name != attackAnimation) {
-				skeletonAnimation.state.SetAnimation(0, attackAnimation, false);
-				skeletonAnimation.state.AddAnimation(0, idleAnimation, true, 0);
+			skeletonAnimation.AnimationName = attackAnimation;
+		} else {
+			if (Input.GetKey(KeyCode.RightArrow)) {
+				skeletonAnimation.AnimationName = moveAnimation;
+				skeletonAnimation.skeleton.FlipX = false;
+				transform.Translate(moveSpeed * Time.deltaTime, 0, 0);
+			} else if(Input.GetKey(KeyCode.LeftArrow)) {
+				skeletonAnimation.AnimationName = moveAnimation;
+				skeletonAnimation.skeleton.FlipX = true;
+				transform.Translate(-moveSpeed * Time.deltaTime, 0, 0);
+			} else {
+				skeletonAnimation.AnimationName = idleAnimation;
 			}
 		}
 	}
