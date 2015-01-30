@@ -402,6 +402,10 @@ public class Skeleton {
 		return color;
 	}
 
+	public void setColor (Color color) {
+		this.color.set(color);
+	}
+
 	public boolean getFlipX () {
 		return flipX;
 	}
