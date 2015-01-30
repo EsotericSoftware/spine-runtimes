@@ -614,7 +614,8 @@ function Animation.FfdTimeline.new ()
 		if #vertices < vertexCount then
 			vertices = {}
 			slot.attachmentVertices = vertices
-		elseif #vertices < vertexCount then
+		end
+		if #vertices ~= vertexCount then
 			alpha = 1 -- Don't mix from uninitialized slot vertices.
 		end
 		slot.attachmentVerticesCount = vertexCount

@@ -667,8 +667,8 @@ void _spFFDTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, flo
 			slot->attachmentVertices = MALLOC(float, self->frameVerticesCount);
 			slot->attachmentVerticesCapacity = self->frameVerticesCount;
 		}
-	} else if (slot->attachmentVerticesCount > self->frameVerticesCount)
-		alpha = 1; /* Don't mix from uninitialized slot vertices. */
+	}
+	if (slot->attachmentVerticesCount != self->frameVerticesCount) alpha = 1; /* Don't mix from uninitialized slot vertices. */
 	slot->attachmentVerticesCount = self->frameVerticesCount;
 
 	if (time >= self->frames[self->framesCount - 1]) {
