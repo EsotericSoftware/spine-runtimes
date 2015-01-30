@@ -57,6 +57,7 @@ struct spBone {
 };
 
 void spBone_setYDown (int/*bool*/yDown);
+int/*bool*/spBone_isYDown ();
 
 /* @param parent May be 0. */
 spBone* spBone_create (spBoneData* data, struct spSkeleton* skeleton, spBone* parent);
@@ -72,6 +73,7 @@ void spBone_localToWorld (spBone* self, float localX, float localY, float* world
 #ifdef SPINE_SHORT_NAMES
 typedef spBone Bone;
 #define Bone_setYDown(...) spBone_setYDown(__VA_ARGS__)
+#define Bone_isYDown() spBone_isYDown()
 #define Bone_create(...) spBone_create(__VA_ARGS__)
 #define Bone_dispose(...) spBone_dispose(__VA_ARGS__)
 #define Bone_setToSetupPose(...) spBone_setToSetupPose(__VA_ARGS__)
