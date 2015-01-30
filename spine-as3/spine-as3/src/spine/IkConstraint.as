@@ -77,7 +77,9 @@ public class IkConstraint {
 	static public function apply1 (bone:Bone, targetX:Number, targetY:Number, alpha:Number) : void {
 		var parentRotation:Number = (!bone._data.inheritRotation || bone._parent == null) ? 0 : bone._parent._worldRotation;
 		var rotation:Number = bone.rotation;
-		var rotationIK:Number = Math.atan2(targetY - bone._worldY, targetX - bone._worldX) * radDeg - parentRotation;
+		var rotationIK:Number = Math.atan2(targetY - bone._worldY, targetX - bone._worldX) * radDeg;
+		if (bone._worldFlipX != (bone._worldFlipY != Bone.yDown)) rotationIK = -rotationIK;
+		rotationIK -= parentRotation;
 		bone.rotationIK = rotation + (rotationIK - rotation) * alpha;
 	}
 

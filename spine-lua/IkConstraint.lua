@@ -72,7 +72,11 @@ function IkConstraint.apply1 (bone, targetX, targetY, alpha)
 		parentRotation = bone.parent.worldRotation
 	end
 	local rotation = bone.rotation
-	local rotationIK = math.atan2(targetY - bone.worldY, targetX - bone.worldX) * radDeg - parentRotation
+	local rotationIK = math.atan2(targetY - bone.worldY, targetX - bone.worldX) * radDeg
+	if bone.worldFlipX ~= bone.worldFlipY then
+		rotationIK = -rotationIK
+	end
+	rotationIK = rotationIK - parentRotation
 	bone.rotationIK = rotation + (rotationIK - rotation) * alpha
 end
 

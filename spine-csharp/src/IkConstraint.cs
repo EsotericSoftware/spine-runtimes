@@ -82,7 +82,9 @@ namespace Spine {
 		static public void apply (Bone bone, float targetX, float targetY, float alpha) {
 			float parentRotation = (!bone.data.inheritRotation || bone.parent == null) ? 0 : bone.parent.worldRotation;
 			float rotation = bone.rotation;
-			float rotationIK = (float)Math.Atan2(targetY - bone.worldY, targetX - bone.worldX) * radDeg - parentRotation;
+			float rotationIK = (float)Math.Atan2(targetY - bone.worldY, targetX - bone.worldX) * radDeg;
+			if (bone.worldFlipX != (bone.worldFlipY != Bone.yDown)) rotationIK = -rotationIK;
+			rotationIK -= parentRotation;
 			bone.rotationIK = rotation + (rotationIK - rotation) * alpha;
 		}
 
