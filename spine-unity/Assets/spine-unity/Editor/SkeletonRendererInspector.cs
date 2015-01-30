@@ -33,7 +33,7 @@ using UnityEngine;
 
 [CustomEditor(typeof(SkeletonRenderer))]
 public class SkeletonRendererInspector : Editor {
-	protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, submeshSeparators;
+	protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, submeshSeparators, front;
 
 	protected virtual void OnEnable () {
 		SpineEditorUtilities.ConfirmInitialization();
@@ -44,6 +44,7 @@ public class SkeletonRendererInspector : Editor {
 		meshes = serializedObject.FindProperty("renderMeshes");
 		immutableTriangles = serializedObject.FindProperty("immutableTriangles");
 		submeshSeparators = serializedObject.FindProperty("submeshSeparators");
+		front = serializedObject.FindProperty("frontFacing");
 	}
 
 	protected virtual void gui () {
@@ -97,6 +98,7 @@ public class SkeletonRendererInspector : Editor {
 			new GUIContent("Immutable Triangles", "Enable to optimize rendering for skeletons that never change attachment visbility"));
 		EditorGUILayout.PropertyField(normals);
 		EditorGUILayout.PropertyField(tangents);
+		EditorGUILayout.PropertyField(front);
 		EditorGUILayout.PropertyField(submeshSeparators, true);
 	}
 
