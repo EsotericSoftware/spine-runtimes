@@ -202,6 +202,9 @@ namespace Spine {
 			float y = curves[i - 1];
 			return y + (1 - y) * (percent - x) / (1 - x); // Last point is 1,1.
 		}
+		public float GetCurveType (int frameIndex) {
+			return curves[frameIndex * BEZIER_SIZE];
+		}
 	}
 
 	public class RotateTimeline : CurveTimeline {
