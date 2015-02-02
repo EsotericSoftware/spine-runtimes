@@ -151,7 +151,10 @@ public static class SkeletonBaker {
 			}
 
 			if (newAnimContainer) {
-
+				EditorUtility.SetDirty(controller);
+				AssetDatabase.SaveAssets();
+				AssetDatabase.ImportAsset(controllerPath, ImportAssetOptions.ForceUpdate);
+				AssetDatabase.Refresh();
 			} else {
 
 				foreach (string str in unusedClipNames) {
@@ -647,6 +650,8 @@ public static class SkeletonBaker {
 	static void SetAnimationSettings (AnimationClip clip, AnimationClipSettings settings) {
 		MethodInfo methodInfo = typeof(AnimationUtility).GetMethod("SetAnimationClipSettings", BindingFlags.Static | BindingFlags.NonPublic);
 		methodInfo.Invoke(null, new object[] { clip, settings });
+
+		EditorUtility.SetDirty(clip);
 	}
 
 	static AnimationClip ExtractAnimation (string name, SkeletonData skeletonData, Dictionary<int, List<string>> slotLookup, bool bakeIK, SendMessageOptions eventOptions, AnimationClip clip = null) {
@@ -716,8 +721,8 @@ public static class SkeletonBaker {
 		SetAnimationSettings(clip, settings);
 
 		clip.EnsureQuaternionContinuity();
-		clip.EnsureQuaternionContinuity();
-		clip.EnsureQuaternionContinuity();
+
+		EditorUtility.SetDirty(clip);
 
 		return clip;
 	}
