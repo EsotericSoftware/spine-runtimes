@@ -43,6 +43,8 @@ using System.Linq;
 using System.Reflection;
 using Spine;
 
+using System.Security.Cryptography;
+
 [InitializeOnLoad]
 public class SpineEditorUtilities : AssetPostprocessor {
 
@@ -70,6 +72,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 		public static Texture2D skeletonUtility;
 		public static Texture2D hingeChain;
 		public static Texture2D subMeshRenderer;
+		public static Texture2D unityIcon;
 
 		public static Mesh boneMesh {
 			get {
@@ -136,6 +139,8 @@ public class SpineEditorUtilities : AssetPostprocessor {
 			skeletonUtility = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-skeletonUtility.png");
 			hingeChain = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-hingeChain.png");
 			subMeshRenderer = (Texture2D)AssetDatabase.LoadMainAssetAtPath(SpineEditorUtilities.editorGUIPath + "/icon-subMeshRenderer.png");
+
+			unityIcon = EditorGUIUtility.FindTexture("SceneAsset Icon");
 		}
 	}
 
@@ -225,6 +230,8 @@ public class SpineEditorUtilities : AssetPostprocessor {
 	}
 	public static void ImportSpineContent(string[] imported, bool reimport = false) {
 
+		MD5 md5 = MD5.Create();
+
 		List<string> atlasPaths = new List<string>();
 		List<string> imagePaths = new List<string>();
 		List<string> skeletonPaths = new List<string>();
@@ -267,7 +274,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 		bool abortSkeletonImport = false;
 		foreach (string sp in skeletonPaths) {
 			if (!reimport && CheckForValidSkeletonData(sp)) {
-				Debug.Log("Automatically skipping: " + sp);
+				ResetExistingSkeletonData(sp);
 				continue;
 			}
 				
@@ -350,6 +357,32 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 		return false;
 	}
+
+	static void ResetExistingSkeletonData (string skeletonJSONPath) {
+
+		string dir = Path.GetDirectoryName(skeletonJSONPath);
+		TextAsset textAsset = (TextAsset)AssetDatabase.LoadAssetAtPath(skeletonJSONPath, typeof(TextAsset));
+		DirectoryInfo dirInfo = new DirectoryInfo(dir);
+
+		FileInfo[] files = dirInfo.GetFiles("*.asset");
+
+		foreach (var f in files) {
+			string localPath = dir + "/" + f.Name;
+			var obj = AssetDatabase.LoadAssetAtPath(localPath, typeof(Object));
+			if (obj is SkeletonDataAsset) {
+				var skeletonDataAsset = (SkeletonDataAsset)obj;
+
+				if (skeletonDataAsset.skeletonJSON == textAsset) {
+					if (Selection.activeObject == skeletonDataAsset)
+						Selection.activeObject = null;
+
+					skeletonDataAsset.Reset();
+				}
+					
+			}
+		}
+	}
+
 
 	static bool CheckForValidAtlas(string atlasPath) {
 
