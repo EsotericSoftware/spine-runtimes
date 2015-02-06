@@ -38,7 +38,7 @@ using Spine;
 [ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class SkeletonRenderer : MonoBehaviour {
 
-	public delegate void SkeletonRendererDelegate(SkeletonRenderer skeletonRenderer);
+	public delegate void SkeletonRendererDelegate (SkeletonRenderer skeletonRenderer);
 
 	public SkeletonRendererDelegate OnReset;
 	[System.NonSerialized]
@@ -73,11 +73,26 @@ public class SkeletonRenderer : MonoBehaviour {
 	private readonly List<Submesh> submeshes = new List<Submesh>();
 
 
-	public virtual void Reset() {
+	public virtual void Reset () {
 		if (meshFilter != null)
 			meshFilter.sharedMesh = null;
 		if (renderer != null)
 			renderer.sharedMaterial = null;
+
+		if (mesh1 != null) {
+			if (Application.isPlaying)
+				Destroy(mesh1);
+			else
+				DestroyImmediate(mesh1);
+		}
+
+		if (mesh2 != null) {
+			if (Application.isPlaying)
+				Destroy(mesh2);
+			else
+				DestroyImmediate(mesh2);
+		}
+
 		mesh1 = null;
 		mesh2 = null;
 		lastVertexCount = 0;
@@ -115,22 +130,16 @@ public class SkeletonRenderer : MonoBehaviour {
 			submeshSeparatorSlots.Add(skeleton.FindSlot(submeshSeparators[i]));
 		}
 
-
-		// Store flipped triangles for meshes
-
-
-
 		if (OnReset != null)
 			OnReset(this);
 	}
 
-	public virtual void OnEnable() {
-		if (mesh1 == null || mesh2 == null)
-			Reset();
+	public virtual void Awake () {
+		Reset();
 	}
 
-	public virtual void OnDisable() {
-		if (Application.isPlaying && gameObject.activeInHierarchy == false) {
+	public virtual void OnDestroy () {
+		if (Application.isPlaying) {
 			if (mesh1 != null) {
 				Destroy(mesh1);
 				mesh1 = null;
@@ -140,11 +149,10 @@ public class SkeletonRenderer : MonoBehaviour {
 				Destroy(mesh2);
 				mesh2 = null;
 			}
-
 		}
 	}
 
-	private Mesh newMesh() {
+	private Mesh newMesh () {
 		Mesh mesh = new Mesh();
 		mesh.name = "Skeleton Mesh";
 		mesh.hideFlags = HideFlags.HideAndDontSave;
@@ -152,7 +160,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		return mesh;
 	}
 
-	public virtual void LateUpdate() {
+	public virtual void LateUpdate () {
 		if (!valid)
 			return;
 		// Count vertices and submesh triangles.
@@ -357,7 +365,7 @@ public class SkeletonRenderer : MonoBehaviour {
 	}
 
 	/** Stores vertices and triangles for a single material. */
-	private void AddSubmesh(Material material, int startSlot, int endSlot, int triangleCount, int firstVertex, bool lastSubmesh) {
+	private void AddSubmesh (Material material, int startSlot, int endSlot, int triangleCount, int firstVertex, bool lastSubmesh) {
 		int submeshIndex = submeshMaterials.Count;
 		submeshMaterials.Add(material);
 
@@ -457,7 +465,7 @@ public class SkeletonRenderer : MonoBehaviour {
 	}
 
 #if UNITY_EDITOR
-	void OnDrawGizmos() {
+	void OnDrawGizmos () {
 		// Make selection easier by drawing a clear gizmo over the skeleton.
 		if (vertices == null) return;
 		Vector3 gizmosCenter = new Vector3();
