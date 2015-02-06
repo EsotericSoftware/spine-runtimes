@@ -139,17 +139,22 @@ public class SkeletonRenderer : MonoBehaviour {
 	}
 
 	public virtual void OnDestroy () {
-		if (Application.isPlaying) {
-			if (mesh1 != null) {
+		if (mesh1 != null) {
+			if (Application.isPlaying)
 				Destroy(mesh1);
-				mesh1 = null;
-			}
-
-			if (mesh2 != null) {
-				Destroy(mesh2);
-				mesh2 = null;
-			}
+			else
+				DestroyImmediate(mesh1);
 		}
+
+		if (mesh2 != null) {
+			if (Application.isPlaying)
+				Destroy(mesh2);
+			else
+				DestroyImmediate(mesh2);
+		}
+
+		mesh1 = null;
+		mesh2 = null;
 	}
 
 	private Mesh newMesh () {
