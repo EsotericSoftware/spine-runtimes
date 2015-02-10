@@ -417,7 +417,8 @@ public class SkeletonRenderer : MonoBehaviour {
 		for (int i = startSlot, triangleIndex = 0; i < endSlot; i++) {
 			Slot slot = drawOrder[i];
 			Attachment attachment = slot.attachment;
-			bool flip = frontFacing && ((slot.Bone.WorldFlipX != slot.Bone.WorldFlipY) != (Mathf.Sign(slot.Bone.WorldScaleX) != Mathf.Sign(slot.bone.WorldScaleY)));
+			Bone bone = slot.bone;
+			bool flip = frontFacing && ((bone.WorldFlipX != bone.WorldFlipY) != (Mathf.Sign(bone.WorldScaleX) != Mathf.Sign(bone.WorldScaleY)));
 
 			if (attachment is RegionAttachment) {
 				if (!flip) {
