@@ -250,10 +250,6 @@ public class SkeletonSprite extends DisplayObject {
 			}
 		}
 
-		minX *= scaleX;
-		maxX *= scaleX;
-		minY *= scaleY;
-		maxY *= scaleY;
 		var temp:Number;
 		if (maxX < minX) {
 			temp = maxX;
