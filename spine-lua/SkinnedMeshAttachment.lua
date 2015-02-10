@@ -128,4 +128,4 @@ function SkinnedMeshAttachment.new (name)
 
 	return self
 end
-return MeshAttachment
+return SkinnedMeshAttachment
