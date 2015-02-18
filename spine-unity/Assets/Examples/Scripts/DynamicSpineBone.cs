@@ -50,7 +50,7 @@ public class DynamicSpineBone : MonoBehaviour {
 		lastPosition = speedReference.position;
 	}
 
-	void UpdateLocal(SkeletonAnimation animation) {
+	void UpdateLocal(SkeletonRenderer renderer) {
 		Vector3 vec = useAcceleration ? acceleration : velocity;
 
 		if (Mathf.Abs(vec.x) < returnThreshhold)

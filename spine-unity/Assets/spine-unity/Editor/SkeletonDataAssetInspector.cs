@@ -53,15 +53,16 @@ public class SkeletonDataAssetInspector : Editor {
 	static bool bakeIK = true;
 	static SendMessageOptions bakeEventOptions = SendMessageOptions.DontRequireReceiver;
 
-	private SerializedProperty atlasAssets, skeletonJSON, scale, fromAnimation, toAnimation, duration, defaultMix;
+	private SerializedProperty atlasAssets, skeletonJSON, scale, fromAnimation, toAnimation, duration, defaultMix, controller;
 
 	private bool m_initialized = false;
 	private SkeletonDataAsset m_skeletonDataAsset;
 	private SkeletonData m_skeletonData;
 	private string m_skeletonDataAssetGUID;
+	private bool needToSerialize;
 
 	List<string> warnings = new List<string>();
-
+	
 	void OnEnable () {
 
 		SpineEditorUtilities.ConfirmInitialization();
@@ -74,6 +75,7 @@ public class SkeletonDataAssetInspector : Editor {
 			toAnimation = serializedObject.FindProperty("toAnimation");
 			duration = serializedObject.FindProperty("duration");
 			defaultMix = serializedObject.FindProperty("defaultMix");
+			controller = serializedObject.FindProperty("controller");
 
 			m_skeletonDataAsset = (SkeletonDataAsset)target;
 			m_skeletonDataAssetGUID = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(m_skeletonDataAsset));
@@ -103,7 +105,6 @@ public class SkeletonDataAssetInspector : Editor {
 
 	override public void OnInspectorGUI () {
 		serializedObject.Update();
-		SkeletonDataAsset asset = (SkeletonDataAsset)target;
 
 		EditorGUI.BeginChangeCheck();
 		EditorGUILayout.PropertyField(atlasAssets, true);
@@ -126,10 +127,12 @@ public class SkeletonDataAssetInspector : Editor {
 
 
 		if (m_skeletonData != null) {
+			DrawMecanim();
 			DrawAnimationStateInfo();
 			DrawAnimationList();
 			DrawSlotList();
 			DrawBaking();
+			
 		} else {
 
 			DrawReimportButton();
@@ -138,22 +141,24 @@ public class SkeletonDataAssetInspector : Editor {
 				EditorGUILayout.LabelField(new GUIContent(str, SpineEditorUtilities.Icons.warning));
 		}
 
-		if (!Application.isPlaying) {
-			if (serializedObject.ApplyModifiedProperties() ||
-				(UnityEngine.Event.current.type == EventType.ValidateCommand && UnityEngine.Event.current.commandName == "UndoRedoPerformed")
-					) {
-				asset.Reset();
-			}
+		if(!Application.isPlaying)
+			serializedObject.ApplyModifiedProperties();
+	}
+
+	void DrawMecanim () {
+		EditorGUILayout.PropertyField(controller, new GUIContent("Controller", SpineEditorUtilities.Icons.controllerIcon));		
+		if (controller.objectReferenceValue == null) {
+			if (GUILayout.Button(new GUIContent("Generate Mecanim Controller", SpineEditorUtilities.Icons.controllerIcon), GUILayout.Width(195), GUILayout.Height(20)))
+				SkeletonBaker.GenerateMecanimAnimationClips(m_skeletonDataAsset);
 		}
 	}
 
 	void DrawBaking () {
-		
 		bool pre = showBaking;
 		showBaking = EditorGUILayout.Foldout(showBaking, new GUIContent("Baking", SpineEditorUtilities.Icons.unityIcon));
 		if (pre != showBaking)
 			EditorPrefs.SetBool("SkeletonDataAssetInspector_showBaking", showBaking);
-		
+
 		if (showBaking) {
 			EditorGUI.indentLevel++;
 			bakeAnimations = EditorGUILayout.Toggle("Bake Animations", bakeAnimations);
@@ -170,20 +175,19 @@ public class SkeletonDataAssetInspector : Editor {
 			GUILayout.BeginHorizontal();
 			{
 
-				
+
 				if (GUILayout.Button(new GUIContent("Bake All Skins", SpineEditorUtilities.Icons.unityIcon), GUILayout.Height(32), GUILayout.Width(150)))
 					SkeletonBaker.BakeToPrefab(m_skeletonDataAsset, m_skeletonData.Skins, "", bakeAnimations, bakeIK, bakeEventOptions);
 
 				string skinName = "<No Skin>";
 
 				if (m_skeletonAnimation != null && m_skeletonAnimation.skeleton != null) {
-					
+
 					Skin bakeSkin = m_skeletonAnimation.skeleton.Skin;
-					if (bakeSkin == null){
+					if (bakeSkin == null) {
 						skinName = "Default";
 						bakeSkin = m_skeletonData.Skins[0];
-					}
-					else
+					} else
 						skinName = m_skeletonAnimation.skeleton.Skin.Name;
 
 					bool oops = false;
@@ -209,18 +213,17 @@ public class SkeletonDataAssetInspector : Editor {
 
 
 
-					if(!oops)
+					if (!oops)
 						GUILayout.EndVertical();
 				}
-				
+
 			}
 			GUILayout.EndHorizontal();
 			EditorGUI.indentLevel--;
-
 			EditorGUI.indentLevel--;
 		}
-		
-		
+
+
 	}
 	void DrawReimportButton () {
 		EditorGUI.BeginDisabledGroup(skeletonJSON.objectReferenceValue == null);
@@ -250,6 +253,7 @@ public class SkeletonDataAssetInspector : Editor {
 		if (!showAnimationStateData)
 			return;
 
+		EditorGUI.BeginChangeCheck();
 		EditorGUILayout.PropertyField(defaultMix);
 
 		// Animation names
@@ -282,6 +286,13 @@ public class SkeletonDataAssetInspector : Editor {
 		EditorGUILayout.Space();
 		EditorGUILayout.EndHorizontal();
 
+		if (EditorGUI.EndChangeCheck()) {
+			m_skeletonDataAsset.FillStateData();
+			EditorUtility.SetDirty(m_skeletonDataAsset);
+			serializedObject.ApplyModifiedProperties();
+			needToSerialize = true;
+		}
+			
 	}
 	void DrawAnimationList () {
 		showAnimationList = EditorGUILayout.Foldout(showAnimationList, new GUIContent("Animations", SpineEditorUtilities.Icons.animationRoot));
@@ -517,7 +528,7 @@ public class SkeletonDataAssetInspector : Editor {
 		if (this.m_previewUtility == null) {
 			this.m_lastTime = Time.realtimeSinceStartup;
 			this.m_previewUtility = new PreviewRenderUtility(true);
-			this.m_previewUtility.m_Camera.isOrthoGraphic = true;
+			this.m_previewUtility.m_Camera.orthographic = true;
 			this.m_previewUtility.m_Camera.orthographicSize = 1;
 			this.m_previewUtility.m_Camera.cullingMask = -2147483648;
 			this.m_previewUtility.m_Camera.nearClipPlane = 0.01f;
@@ -532,7 +543,7 @@ public class SkeletonDataAssetInspector : Editor {
 			try {
 				string skinName = EditorPrefs.GetString(m_skeletonDataAssetGUID + "_lastSkin", "");
 
-				m_previewInstance = SpineEditorUtilities.SpawnAnimatedSkeleton((SkeletonDataAsset)target, skinName).gameObject;
+				m_previewInstance = SpineEditorUtilities.InstantiateSkeletonAnimation((SkeletonDataAsset)target, skinName).gameObject;
 				m_previewInstance.hideFlags = HideFlags.HideAndDontSave;
 				m_previewInstance.layer = 0x1f;
 
@@ -543,7 +554,7 @@ public class SkeletonDataAssetInspector : Editor {
 
 				m_skeletonData = m_skeletonAnimation.skeletonDataAsset.GetSkeletonData(true);
 
-				m_previewInstance.renderer.enabled = false;
+				m_previewInstance.GetComponent<Renderer>().enabled = false;
 
 				m_initialized = true;
 				AdjustCameraGoals(true);
@@ -613,7 +624,7 @@ public class SkeletonDataAssetInspector : Editor {
 
 		GameObject go = this.m_previewInstance;
 
-		Bounds bounds = go.renderer.bounds;
+		Bounds bounds = go.GetComponent<Renderer>().bounds;
 		m_orthoGoal = bounds.size.y;
 
 		m_posGoal = bounds.center + new Vector3(0, 0, -10);
@@ -650,7 +661,7 @@ public class SkeletonDataAssetInspector : Editor {
 		GameObject go = this.m_previewInstance;
 
 		if (m_requireRefresh && go != null) {
-			go.renderer.enabled = true;
+			go.GetComponent<Renderer>().enabled = true;
 
 			if (EditorApplication.isPlaying) {
 				//do nothing
@@ -672,7 +683,7 @@ public class SkeletonDataAssetInspector : Editor {
 			}
 
 			this.m_previewUtility.m_Camera.Render();
-			go.renderer.enabled = false;
+			go.GetComponent<Renderer>().enabled = false;
 		}
 
 
@@ -688,6 +699,11 @@ public class SkeletonDataAssetInspector : Editor {
 			Repaint();
 		} else {
 			//only needed if using smooth menus
+		}
+
+		if (needToSerialize) {
+			needToSerialize = false;
+			serializedObject.ApplyModifiedProperties();
 		}
 	}
 

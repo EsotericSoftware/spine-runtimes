@@ -38,6 +38,7 @@ spine-cocos2d-iphone/3/cocos2d/*
 
 spine-csharp/bin
 spine-csharp/obj
+spine-csharp/src/*.cs.meta
 
 spine-monogame/xamarinstudio-ios/src/bin
 spine-monogame/xamarinstudio-ios/src/obj

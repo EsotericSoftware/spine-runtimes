@@ -68,13 +68,13 @@ public class SpineboyController : MonoBehaviour {
 
 				if (absX > 0.7f) {
 					SetAnimation(runAnimation, true);
-					rigidbody2D.velocity = new Vector2(runVelocity * Mathf.Sign(x), rigidbody2D.velocity.y);
+					GetComponent<Rigidbody2D>().velocity = new Vector2(runVelocity * Mathf.Sign(x), GetComponent<Rigidbody2D>().velocity.y);
 				} else if (absX > 0) {
 						SetAnimation(walkAnimation, true);
-						rigidbody2D.velocity = new Vector2(walkVelocity * Mathf.Sign(x), rigidbody2D.velocity.y);
+						GetComponent<Rigidbody2D>().velocity = new Vector2(walkVelocity * Mathf.Sign(x), GetComponent<Rigidbody2D>().velocity.y);
 					} else {
 						SetAnimation(idleAnimation, true);
-						rigidbody2D.velocity = new Vector2(0, rigidbody2D.velocity.y);
+						GetComponent<Rigidbody2D>().velocity = new Vector2(0, GetComponent<Rigidbody2D>().velocity.y);
 					}
 			} else {
 				if (skeletonAnimation.state.GetCurrent(0).Animation.Name != hitAnimation)
@@ -101,7 +101,7 @@ public class SpineboyController : MonoBehaviour {
 			} else {
 				skeletonAnimation.state.SetAnimation(0, hitAnimation, false);
 				skeletonAnimation.state.AddAnimation(0, currentAnimation, true, 0);
-				rigidbody2D.velocity = new Vector2(0, rigidbody2D.velocity.y);
+				GetComponent<Rigidbody2D>().velocity = new Vector2(0, GetComponent<Rigidbody2D>().velocity.y);
 				hit = true;
 			}
 

@@ -28,36 +28,44 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+/*****************************************************************************
+ * SkeletonAnimatorInspector created by Mitch Thompson
+ * Full irrevocable rights and permissions granted to Esoteric Software
+*****************************************************************************/
+using System;
+using UnityEditor;
 using UnityEngine;
-using System.Collections;
 using Spine;
 
-public class Goblins : MonoBehaviour {
-	private bool girlSkin;
-	private SkeletonAnimation skeletonAnimation;
-	private Bone headBone;
-	
-	public void Start () {
-		skeletonAnimation = GetComponent<SkeletonAnimation>();
-		headBone = skeletonAnimation.skeleton.FindBone("head");
-		skeletonAnimation.UpdateLocal += UpdateLocal;
+[CustomEditor(typeof(SkeletonAnimator))]
+public class SkeletonAnimatorInspector : SkeletonRendererInspector {
+	protected SerializedProperty layerMixModes;
+	protected bool isPrefab;
+	protected override void OnEnable () {
+		base.OnEnable();
+		layerMixModes = serializedObject.FindProperty("layerMixModes");
+
+		if (PrefabUtility.GetPrefabType(this.target) == PrefabType.Prefab)
+			isPrefab = true;
 	}
 
-	// This is called after the animation is applied to the skeleton and can be used to adjust the bones dynamically.
-	public void UpdateLocal (SkeletonRenderer skeletonRenderer) {
-		headBone.Rotation += 15;
-	}
-	
-	public void OnMouseDown () {
-		skeletonAnimation.skeleton.SetSkin(girlSkin ? "goblin" : "goblingirl");
-		skeletonAnimation.skeleton.SetSlotsToSetupPose();
-		
-		girlSkin = !girlSkin;
-		
-		if (girlSkin) {
-			skeletonAnimation.skeleton.SetAttachment("right hand item", null);
-			skeletonAnimation.skeleton.SetAttachment("left hand item", "spear");
-		} else
-			skeletonAnimation.skeleton.SetAttachment("left hand item", "dagger");
+	protected override void gui () {
+		base.gui();
+
+		EditorGUILayout.PropertyField(layerMixModes, true);
+
+		SkeletonAnimator component = (SkeletonAnimator)target;
+		if (!component.valid)
+			return;
+
+		EditorGUILayout.Space();
+
+		if (!isPrefab) {
+			if (component.GetComponent<SkeletonUtility>() == null) {
+				if (GUILayout.Button(new GUIContent("Add Skeleton Utility", SpineEditorUtilities.Icons.skeletonUtility), GUILayout.Height(30))) {
+					component.gameObject.AddComponent<SkeletonUtility>();
+				}
+			}
+		}
 	}
 }
