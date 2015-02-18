@@ -39,6 +39,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.IO;
 using Spine;
 
 
@@ -172,7 +173,7 @@ public static class SkeletonBaker {
 			bool newPrefab = false;
 
 			string prefabPath = outputPath + "/" + skeletonDataAsset.skeletonJSON.name + " (" + skin.Name + ").prefab";
-			
+
 
 			Object prefab = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject));
 			if (prefab == null) {
@@ -330,7 +331,7 @@ public static class SkeletonBaker {
 				animator.runtimeAnimatorController = (RuntimeAnimatorController)controller;
 				EditorGUIUtility.PingObject(controller);
 			}
-			
+
 
 			if (newPrefab) {
 				PrefabUtility.ReplacePrefab(prefabRoot, prefab, ReplacePrefabOptions.ConnectToPrefab);
@@ -351,6 +352,92 @@ public static class SkeletonBaker {
 			GameObject.DestroyImmediate(prefabRoot);
 		}
 
+	}
+
+	public static void GenerateMecanimAnimationClips (SkeletonDataAsset skeletonDataAsset) {
+		var data = skeletonDataAsset.GetSkeletonData(true);
+		if (data == null) {
+			Debug.LogError("SkeletonData failed!", skeletonDataAsset);
+			return;
+		}
+
+		string dataPath = AssetDatabase.GetAssetPath(skeletonDataAsset);
+		string controllerPath = dataPath.Replace("_SkeletonData", "_Controller").Replace(".asset", ".controller");
+
+
+
+		AnimatorController controller;
+
+		if (skeletonDataAsset.controller != null) {
+			controller = (AnimatorController)skeletonDataAsset.controller;
+		} else {
+			if (File.Exists(controllerPath)) {
+				if (EditorUtility.DisplayDialog("Controller Overwrite Warning", "Unknown Controller already exists at: " + controllerPath, "Update", "Overwrite")) {
+					controller = (AnimatorController)AssetDatabase.LoadAssetAtPath(controllerPath, typeof(RuntimeAnimatorController));
+				} else {
+					controller = (AnimatorController)AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
+				}
+			} else {
+				controller = (AnimatorController)AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
+			}
+			
+		}
+
+		skeletonDataAsset.controller = controller;
+		EditorUtility.SetDirty(skeletonDataAsset);
+
+		Object[] objs = AssetDatabase.LoadAllAssetsAtPath(controllerPath);
+
+		Dictionary<string, AnimationClip> clipTable = new Dictionary<string, AnimationClip>();
+		Dictionary<string, Spine.Animation> animTable = new Dictionary<string, Spine.Animation>();
+
+		foreach (var o in objs) {
+			if (o is AnimationClip) {
+				clipTable.Add(o.name, (AnimationClip)o);
+			}
+		}
+
+		foreach (var anim in data.Animations) {
+			string name = anim.Name;
+			animTable.Add(name, anim);
+
+			if (clipTable.ContainsKey(name) == false) {
+				//generate new dummy clip
+				AnimationClip newClip = new AnimationClip();
+				newClip.name = name;
+				AnimationUtility.SetAnimationType(newClip, ModelImporterAnimationType.Generic);
+				AssetDatabase.AddObjectToAsset(newClip, controller);
+				clipTable.Add(name, newClip);
+			}
+
+			AnimationClip clip = clipTable[name];
+
+			clip.SetCurve("", typeof(GameObject), "dummy", AnimationCurve.Linear(0, 0, anim.Duration, 0));
+			var settings = AnimationUtility.GetAnimationClipSettings(clip);
+			settings.stopTime = anim.Duration;
+
+			SetAnimationSettings(clip, settings);
+
+			AnimationUtility.SetAnimationEvents(clip, new AnimationEvent[0]);
+
+			foreach (Timeline t in anim.Timelines) {
+				if (t is EventTimeline) {
+					ParseEventTimeline((EventTimeline)t, clip, SendMessageOptions.DontRequireReceiver);
+				}
+			}
+
+			EditorUtility.SetDirty(clip);
+
+			clipTable.Remove(name);
+		}
+
+		//clear no longer used animations
+		foreach (var clip in clipTable.Values) {
+			AnimationClip.DestroyImmediate(clip, true);
+		}
+
+		AssetDatabase.Refresh();
+		AssetDatabase.SaveAssets();
 	}
 
 	static Bone extractionBone;
@@ -656,7 +743,7 @@ public static class SkeletonBaker {
 
 	static AnimationClip ExtractAnimation (string name, SkeletonData skeletonData, Dictionary<int, List<string>> slotLookup, bool bakeIK, SendMessageOptions eventOptions, AnimationClip clip = null) {
 		var animation = skeletonData.FindAnimation(name);
-		
+
 		var timelines = animation.Timelines;
 
 		if (clip == null) {
@@ -709,7 +796,7 @@ public static class SkeletonBaker {
 			} else if (t is AttachmentTimeline) {
 				ParseAttachmentTimeline(skeleton, (AttachmentTimeline)t, slotLookup, clip);
 			} else if (t is EventTimeline) {
-				ParseEventTimeline(skeleton, (EventTimeline)t, clip, eventOptions);
+				ParseEventTimeline((EventTimeline)t, clip, eventOptions);
 			}
 
 		}
@@ -741,7 +828,7 @@ public static class SkeletonBaker {
 		}
 	}
 
-	static void ParseEventTimeline (Skeleton skeleton, EventTimeline timeline, AnimationClip clip, SendMessageOptions eventOptions) {
+	static void ParseEventTimeline (EventTimeline timeline, AnimationClip clip, SendMessageOptions eventOptions) {
 
 		float[] frames = timeline.Frames;
 		var events = timeline.Events;
@@ -755,9 +842,9 @@ public static class SkeletonBaker {
 			ae.functionName = ev.Data.Name;
 			ae.messageOptions = eventOptions;
 
-			if (ev.String != "")
+			if (ev.String != "" && ev.String != null) {
 				ae.stringParameter = ev.String;
-			else {
+			} else {
 				if (ev.Int == 0 && ev.Float == 0) {
 					//do nothing, raw function
 				} else {
@@ -1259,7 +1346,7 @@ public static class SkeletonBaker {
 				listIndex++;
 			} else if (curveType == 1) {
 				//stepped
-				
+
 				Keyframe pk = keys[pIndex];
 
 				float time = frames[f];

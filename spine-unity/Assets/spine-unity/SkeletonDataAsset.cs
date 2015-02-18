@@ -42,6 +42,7 @@ public class SkeletonDataAsset : ScriptableObject {
 	public String[] toAnimation;
 	public float[] duration;
 	public float defaultMix;
+	public RuntimeAnimatorController controller;
 	private SkeletonData skeletonData;
 	private AnimationStateData stateData;
 
@@ -86,9 +87,6 @@ public class SkeletonDataAsset : ScriptableObject {
 			}
 		}
 
-
-
-
 		if (skeletonData != null)
 			return skeletonData;
 
@@ -103,14 +101,21 @@ public class SkeletonDataAsset : ScriptableObject {
 		}
 
 		stateData = new AnimationStateData(skeletonData);
+		FillStateData();
+
+		return skeletonData;
+	}
+
+	public void FillStateData () {
+		if (stateData == null)
+			return;
+
 		stateData.DefaultMix = defaultMix;
 		for (int i = 0, n = fromAnimation.Length; i < n; i++) {
 			if (fromAnimation[i].Length == 0 || toAnimation[i].Length == 0)
 				continue;
 			stateData.SetMix(fromAnimation[i], toAnimation[i], duration[i]);
 		}
-
-		return skeletonData;
 	}
 
 	public AnimationStateData GetAnimationStateData() {

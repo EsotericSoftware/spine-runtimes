@@ -38,7 +38,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Spine;
 
-[RequireComponent(typeof(SkeletonAnimation))]
+[RequireComponent(typeof(ISkeletonAnimation))]
 [ExecuteInEditMode]
 public class SkeletonUtility : MonoBehaviour {
 
@@ -80,7 +80,7 @@ public class SkeletonUtility : MonoBehaviour {
 	[HideInInspector]
 	public SkeletonRenderer skeletonRenderer;
 	[HideInInspector]
-	public SkeletonAnimation skeletonAnimation;
+	public ISkeletonAnimation skeletonAnimation;
 	[System.NonSerialized]
 	public List<SkeletonUtilityBone> utilityBones = new List<SkeletonUtilityBone>();
 	[System.NonSerialized]
@@ -98,6 +98,8 @@ public class SkeletonUtility : MonoBehaviour {
 
 		if (skeletonAnimation == null) {
 			skeletonAnimation = GetComponent<SkeletonAnimation>();
+			if (skeletonAnimation == null)
+				skeletonAnimation = GetComponent<SkeletonAnimator>();
 		}
 
 		skeletonRenderer.OnReset -= HandleRendererReset;
@@ -209,7 +211,7 @@ public class SkeletonUtility : MonoBehaviour {
 
 	}
 
-	void UpdateLocal (SkeletonAnimation anim) {
+	void UpdateLocal (SkeletonRenderer anim) {
 
 		if (needToReprocessBones)
 			CollectBones();
@@ -224,14 +226,14 @@ public class SkeletonUtility : MonoBehaviour {
 		UpdateAllBones();
 	}
 
-	void UpdateWorld (SkeletonAnimation anim) {
+	void UpdateWorld (SkeletonRenderer anim) {
 		UpdateAllBones();
 
 		foreach (SkeletonUtilityConstraint c in utilityConstraints)
 			c.DoUpdate();
 	}
 
-	void UpdateComplete (SkeletonAnimation anim) {
+	void UpdateComplete (SkeletonRenderer anim) {
 		UpdateAllBones();
 	}
 

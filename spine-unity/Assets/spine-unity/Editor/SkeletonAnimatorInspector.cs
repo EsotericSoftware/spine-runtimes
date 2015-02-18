@@ -27,37 +27,29 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
+using System;
+using UnityEditor;
 using UnityEngine;
-using System.Collections;
 using Spine;
 
-public class Goblins : MonoBehaviour {
-	private bool girlSkin;
-	private SkeletonAnimation skeletonAnimation;
-	private Bone headBone;
-	
-	public void Start () {
-		skeletonAnimation = GetComponent<SkeletonAnimation>();
-		headBone = skeletonAnimation.skeleton.FindBone("head");
-		skeletonAnimation.UpdateLocal += UpdateLocal;
+[CustomEditor(typeof(SkeletonAnimator))]
+public class SkeletonAnimatorInspector : SkeletonRendererInspector {
+	protected SerializedProperty animationName, loop, timeScale;
+	protected bool isPrefab;
+
+	protected override void OnEnable () {
+		base.OnEnable();
+		animationName = serializedObject.FindProperty("_animationName");
+		loop = serializedObject.FindProperty("loop");
+		timeScale = serializedObject.FindProperty("timeScale");
+
+		if (PrefabUtility.GetPrefabType(this.target) == PrefabType.Prefab)
+			isPrefab = true;
+
+
 	}
 
-	// This is called after the animation is applied to the skeleton and can be used to adjust the bones dynamically.
-	public void UpdateLocal (SkeletonRenderer skeletonRenderer) {
-		headBone.Rotation += 15;
-	}
-	
-	public void OnMouseDown () {
-		skeletonAnimation.skeleton.SetSkin(girlSkin ? "goblin" : "goblingirl");
-		skeletonAnimation.skeleton.SetSlotsToSetupPose();
-		
-		girlSkin = !girlSkin;
-		
-		if (girlSkin) {
-			skeletonAnimation.skeleton.SetAttachment("right hand item", null);
-			skeletonAnimation.skeleton.SetAttachment("left hand item", "spear");
-		} else
-			skeletonAnimation.skeleton.SetAttachment("left hand item", "dagger");
+	protected override void gui () {
+		base.gui();
 	}
 }
