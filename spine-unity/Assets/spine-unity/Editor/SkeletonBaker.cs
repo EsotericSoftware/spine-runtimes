@@ -89,20 +89,32 @@ public static class SkeletonBaker {
 
 		var skeletonData = skeletonDataAsset.GetSkeletonData(true);
 		bool hasAnimations = bakeAnimations && skeletonData.Animations.Count > 0;
+#if UNITY_5
+		UnityEditor.Animations.AnimatorController controller = null;
+#else
 		UnityEditorInternal.AnimatorController controller = null;
-
+#endif
 		if (hasAnimations) {
 			string controllerPath = outputPath + "/" + skeletonDataAsset.skeletonJSON.name + " Controller.controller";
 			bool newAnimContainer = false;
 
 			var runtimeController = AssetDatabase.LoadAssetAtPath(controllerPath, typeof(RuntimeAnimatorController));
 
+#if UNITY_5
+			if (runtimeController != null) {
+				controller = (UnityEditor.Animations.AnimatorController)runtimeController;
+			} else {
+				controller = UnityEditor.Animations.AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
+				newAnimContainer = true;
+			}
+#else
 			if (runtimeController != null) {
 				controller = (UnityEditorInternal.AnimatorController)runtimeController;
 			} else {
 				controller = UnityEditorInternal.AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
 				newAnimContainer = true;
 			}
+#endif
 
 			Dictionary<string, AnimationClip> existingClipTable = new Dictionary<string, AnimationClip>();
 			List<string> unusedClipNames = new List<string>();
@@ -147,7 +159,12 @@ public static class SkeletonBaker {
 					unusedClipNames.Remove(clip.name);
 				} else {
 					AssetDatabase.AddObjectToAsset(clip, controller);
-					AnimatorController.AddAnimationClipToController(controller, clip);
+#if UNITY_5_0
+					controller.AddMotion(clip);
+#else
+					UnityEditorInternal.AnimatorController.AddAnimationClipToController(controller, clip);
+#endif
+
 				}
 			}
 
@@ -308,8 +325,8 @@ public static class SkeletonBaker {
 						attachmentTransform.gameObject.AddComponent<MeshRenderer>();
 					}
 
-					attachmentTransform.renderer.sharedMaterial = material;
-					attachmentTransform.renderer.sortingOrder = i;
+					attachmentTransform.GetComponent<Renderer>().sharedMaterial = material;
+					attachmentTransform.GetComponent<Renderer>().sortingOrder = i;
 
 					if (attachmentName != slotData.AttachmentName)
 						attachmentTransform.gameObject.SetActive(false);
@@ -365,23 +382,40 @@ public static class SkeletonBaker {
 		string controllerPath = dataPath.Replace("_SkeletonData", "_Controller").Replace(".asset", ".controller");
 
 
-
-		AnimatorController controller;
+#if UNITY_5
+		UnityEditor.Animations.AnimatorController controller;
 
 		if (skeletonDataAsset.controller != null) {
-			controller = (AnimatorController)skeletonDataAsset.controller;
+			controller = (UnityEditor.Animations.AnimatorController)skeletonDataAsset.controller;
 		} else {
 			if (File.Exists(controllerPath)) {
 				if (EditorUtility.DisplayDialog("Controller Overwrite Warning", "Unknown Controller already exists at: " + controllerPath, "Update", "Overwrite")) {
-					controller = (AnimatorController)AssetDatabase.LoadAssetAtPath(controllerPath, typeof(RuntimeAnimatorController));
+					controller = (UnityEditor.Animations.AnimatorController)AssetDatabase.LoadAssetAtPath(controllerPath, typeof(RuntimeAnimatorController));
 				} else {
-					controller = (AnimatorController)AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
+					controller = (UnityEditor.Animations.AnimatorController)UnityEditor.Animations.AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
 				}
 			} else {
-				controller = (AnimatorController)AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
+				controller = (UnityEditor.Animations.AnimatorController)UnityEditor.Animations.AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
 			}
 			
 		}
+#else
+		UnityEditorInternal.AnimatorController controller;
+
+		if (skeletonDataAsset.controller != null) {
+			controller = (UnityEditorInternal.AnimatorController)skeletonDataAsset.controller;
+		} else {
+			if (File.Exists(controllerPath)) {
+				if (EditorUtility.DisplayDialog("Controller Overwrite Warning", "Unknown Controller already exists at: " + controllerPath, "Update", "Overwrite")) {
+					controller = (UnityEditorInternal.AnimatorController)AssetDatabase.LoadAssetAtPath(controllerPath, typeof(RuntimeAnimatorController));
+				} else {
+					controller = (UnityEditorInternal.AnimatorController)UnityEditorInternal.AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
+				}
+			} else {
+				controller = (UnityEditorInternal.AnimatorController)UnityEditorInternal.AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
+			}
+		}
+#endif
 
 		skeletonDataAsset.controller = controller;
 		EditorUtility.SetDirty(skeletonDataAsset);
@@ -405,7 +439,11 @@ public static class SkeletonBaker {
 				//generate new dummy clip
 				AnimationClip newClip = new AnimationClip();
 				newClip.name = name;
+#if UNITY_5
+#else
 				AnimationUtility.SetAnimationType(newClip, ModelImporterAnimationType.Generic);
+#endif
+
 				AssetDatabase.AddObjectToAsset(newClip, controller);
 				clipTable.Add(name, newClip);
 			}
@@ -735,10 +773,14 @@ public static class SkeletonBaker {
 	}
 
 	static void SetAnimationSettings (AnimationClip clip, AnimationClipSettings settings) {
+#if UNITY_5
+		AnimationUtility.SetAnimationClipSettings(clip, settings);
+#else
 		MethodInfo methodInfo = typeof(AnimationUtility).GetMethod("SetAnimationClipSettings", BindingFlags.Static | BindingFlags.NonPublic);
 		methodInfo.Invoke(null, new object[] { clip, settings });
 
 		EditorUtility.SetDirty(clip);
+#endif
 	}
 
 	static AnimationClip ExtractAnimation (string name, SkeletonData skeletonData, Dictionary<int, List<string>> slotLookup, bool bakeIK, SendMessageOptions eventOptions, AnimationClip clip = null) {
@@ -753,7 +795,11 @@ public static class SkeletonBaker {
 			AnimationUtility.SetAnimationEvents(clip, new AnimationEvent[0]);
 		}
 
+#if UNITY_5
+
+#else
 		AnimationUtility.SetAnimationType(clip, ModelImporterAnimationType.Generic);
+#endif
 
 		clip.name = name;
 

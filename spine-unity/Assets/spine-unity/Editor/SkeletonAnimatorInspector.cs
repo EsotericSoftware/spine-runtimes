@@ -27,6 +27,11 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
+
+/*****************************************************************************
+ * SkeletonAnimatorInspector created by Mitch Thompson
+ * Full irrevocable rights and permissions granted to Esoteric Software
+*****************************************************************************/
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -39,14 +44,10 @@ public class SkeletonAnimatorInspector : SkeletonRendererInspector {
 	protected override void OnEnable () {
 		base.OnEnable();
 		layerMixModes = serializedObject.FindProperty("layerMixModes");
-		
-
-
 	}
 
 	protected override void gui () {
 		base.gui();
-
 
 		EditorGUILayout.PropertyField(layerMixModes, true);
 

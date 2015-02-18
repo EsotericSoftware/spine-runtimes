@@ -57,7 +57,7 @@ public class SkeletonUtilityKinematicShadow : MonoBehaviour {
 				continue;
 
 			foreach (var sb in shadowBones) {
-				if (sb.rigidbody == null)
+				if (sb.GetComponent<Rigidbody>() == null)
 					continue;
 
 				if (sb.boneName == b.boneName) {
@@ -72,8 +72,8 @@ public class SkeletonUtilityKinematicShadow : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
-		shadowRoot.rigidbody.MovePosition(transform.position);
-		shadowRoot.rigidbody.MoveRotation(transform.rotation);
+		shadowRoot.GetComponent<Rigidbody>().MovePosition(transform.position);
+		shadowRoot.GetComponent<Rigidbody>().MoveRotation(transform.rotation);
 
 		foreach (var pair in shadowTable) {
 			pair.Value.localPosition = pair.Key.localPosition;

@@ -338,11 +338,11 @@ public class SkeletonUtility : MonoBehaviour {
 			SkeletonUtilitySubmeshRenderer s = go.AddComponent<SkeletonUtilitySubmeshRenderer>();
 			s.sortingOrder = i * 10;
 			s.submeshIndex = i;
-			s.Initialize(renderer);
+			s.Initialize(GetComponent<Renderer>());
 			s.Update();
 		}
 
 		if (disablePrimaryRenderer)
-			renderer.enabled = false;
+			GetComponent<Renderer>().enabled = false;
 	}
 }
