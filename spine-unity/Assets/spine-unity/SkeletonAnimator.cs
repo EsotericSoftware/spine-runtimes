@@ -6,6 +6,9 @@ using Spine;
 [RequireComponent(typeof(Animator))]
 public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 
+	public enum MixMode { AlwaysMix, MixNext, SpineStyle }
+	public MixMode[] layerMixModes = new MixMode[0];
+
 	public event UpdateBonesDelegate UpdateLocal {
 		add { _UpdateLocal += value; }
 		remove { _UpdateLocal -= value; }
@@ -42,11 +45,17 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 		}
 
 		animator = GetComponent<Animator>();
+
+
 	}
 
 	void Update () {
-		if (skeleton == null)
+		if (!valid)
 			return;
+
+		if (layerMixModes.Length != animator.layerCount) {
+			System.Array.Resize<MixMode>(ref layerMixModes, animator.layerCount);
+		}
 
 		skeleton.Update(Time.deltaTime);
 
@@ -64,22 +73,79 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 			var nextStateInfo = animator.GetNextAnimatorStateInfo(i);
 			var nextClipInfo = animator.GetNextAnimationClipState(i);
 
-			foreach (var info in clipInfo) {
-				float weight = info.weight * layerWeight;
-				if (weight == 0)
-					continue;
+			MixMode mode = layerMixModes[i];
 
-				float time = stateInfo.normalizedTime * info.clip.length;
-				animationTable[info.clip.name].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null, weight);
-			}
+			if (mode == MixMode.AlwaysMix) {
+				//always use Mix instead of Applying the first non-zero weighted clip
+				foreach (var info in clipInfo) {
+					float weight = info.weight * layerWeight;
+					if (weight == 0)
+						continue;
 
-			foreach (var info in nextClipInfo) {
-				float weight = info.weight * layerWeight;
-				if (weight == 0)
-					continue;
+					float time = stateInfo.normalizedTime * info.clip.length;
+					animationTable[info.clip.name].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null, weight);
+				}
 
-				float time = nextStateInfo.normalizedTime * info.clip.length;
-				animationTable[info.clip.name].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null, weight);
+				foreach (var info in nextClipInfo) {
+					float weight = info.weight * layerWeight;
+					if (weight == 0)
+						continue;
+
+					float time = nextStateInfo.normalizedTime * info.clip.length;
+					animationTable[info.clip.name].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null, weight);
+				}
+			} else if (mode >= MixMode.MixNext) {
+				//apply first non-zero weighted clip
+				int c = 0;
+
+				for (; c < clipInfo.Length; c++) {
+					var info = clipInfo[c];
+					float weight = info.weight * layerWeight;
+					if (weight == 0)
+						continue;
+
+					float time = stateInfo.normalizedTime * info.clip.length;
+					animationTable[info.clip.name].Apply(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null);
+					break;
+				}
+
+				//mix the rest
+				for (; c < clipInfo.Length; c++) {
+					var info = clipInfo[c];
+					float weight = info.weight * layerWeight;
+					if (weight == 0)
+						continue;
+
+					float time = stateInfo.normalizedTime * info.clip.length;
+					animationTable[info.clip.name].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null, weight);
+				}
+
+				c = 0;
+
+				//apply next clip directly instead of mixing (ie:  no crossfade, ignores mecanim transition weights)
+				if (mode == MixMode.SpineStyle) {
+					for (; c < nextClipInfo.Length; c++) {
+						var info = nextClipInfo[c];
+						float weight = info.weight * layerWeight;
+						if (weight == 0)
+							continue;
+
+						float time = nextStateInfo.normalizedTime * info.clip.length;
+						animationTable[info.clip.name].Apply(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null);
+						break;
+					}
+				}
+
+				//mix the rest
+				for (; c < nextClipInfo.Length; c++) {
+					var info = nextClipInfo[c];
+					float weight = info.weight * layerWeight;
+					if (weight == 0)
+						continue;
+
+					float time = nextStateInfo.normalizedTime * info.clip.length;
+					animationTable[info.clip.name].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null, weight);
+				}
 			}
 		}
 

@@ -34,22 +34,22 @@ using Spine;
 
 [CustomEditor(typeof(SkeletonAnimator))]
 public class SkeletonAnimatorInspector : SkeletonRendererInspector {
-	protected SerializedProperty animationName, loop, timeScale;
-	protected bool isPrefab;
+	protected SerializedProperty layerMixModes;
 
 	protected override void OnEnable () {
 		base.OnEnable();
-		animationName = serializedObject.FindProperty("_animationName");
-		loop = serializedObject.FindProperty("loop");
-		timeScale = serializedObject.FindProperty("timeScale");
-
-		if (PrefabUtility.GetPrefabType(this.target) == PrefabType.Prefab)
-			isPrefab = true;
+		layerMixModes = serializedObject.FindProperty("layerMixModes");
+		
 
 
 	}
 
 	protected override void gui () {
 		base.gui();
+
+
+		EditorGUILayout.PropertyField(layerMixModes, true);
+
+		serializedObject.ApplyModifiedProperties();
 	}
 }
