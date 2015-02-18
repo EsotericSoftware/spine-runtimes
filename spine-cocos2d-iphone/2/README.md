@@ -12,8 +12,8 @@ Alternatively, the contents of the `spine-c/src`, `spine-c/include` and `spine-c
 
 ## Examples
 
-[Spineboy](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2d-iphone/2/example/SpineboyExample.cpp)
-[Golbins](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2d-iphone/2/example/GoblinsExample.cpp)
+[Spineboy](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2d-iphone/2/example/SpineboyExample.m)
+[Golbins](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2d-iphone/2/example/GoblinsExample.m)
 
 ## Links
 
