@@ -57,11 +57,7 @@ static int Json_strcasecmp (const char* s1, const char* s2) {
 	 * the graph and input (only callsite is Json_getItem) should not have NULLs
 	 */
 	if (s1 && s2) {
-#if defined(_WIN32)
-		return _stricmp(s1, s2);
-#else
-		return strcasecmp( s1, s2 );
-#endif
+		return STRCMP(s1, s2);
 	} else {
 		if (s1 < s2)
 			return -1; /* s1 is null, s2 is not */
