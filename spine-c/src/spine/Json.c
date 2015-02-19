@@ -260,14 +260,14 @@ static const char* parse_value (Json *item, const char* value) {
 
 	switch (*value) {
 	case 'n': {
-		if (!strncmp(value + 1, "ull", 3)) {
+		if (!STRNCMP(value + 1, "ull", 3)) {
 			item->type = Json_NULL;
 			return value + 4;
 		}
 		break;
 	}
 	case 'f': {
-		if (!strncmp(value + 1, "alse", 4)) {
+		if (!STRNCMP(value + 1, "alse", 4)) {
 			item->type = Json_False;
 			/* calloc prevents us needing item->type = Json_False or valueInt = 0 here */
 			return value + 5;
@@ -275,7 +275,7 @@ static const char* parse_value (Json *item, const char* value) {
 		break;
 	}
 	case 't': {
-		if (!strncmp(value + 1, "rue", 3)) {
+		if (!STRNCMP(value + 1, "rue", 3)) {
 			item->type = Json_True;
 			item->valueInt = 1;
 			return value + 4;

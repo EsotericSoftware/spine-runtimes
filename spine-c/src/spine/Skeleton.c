@@ -237,28 +237,28 @@ void spSkeleton_setSlotsToSetupPose (const spSkeleton* self) {
 spBone* spSkeleton_findBone (const spSkeleton* self, const char* boneName) {
 	int i;
 	for (i = 0; i < self->bonesCount; ++i)
-		if (strcmp(self->data->bones[i]->name, boneName) == 0) return self->bones[i];
+		if (STRCMP(self->data->bones[i]->name, boneName) == 0) return self->bones[i];
 	return 0;
 }
 
 int spSkeleton_findBoneIndex (const spSkeleton* self, const char* boneName) {
 	int i;
 	for (i = 0; i < self->bonesCount; ++i)
-		if (strcmp(self->data->bones[i]->name, boneName) == 0) return i;
+		if (STRCMP(self->data->bones[i]->name, boneName) == 0) return i;
 	return -1;
 }
 
 spSlot* spSkeleton_findSlot (const spSkeleton* self, const char* slotName) {
 	int i;
 	for (i = 0; i < self->slotsCount; ++i)
-		if (strcmp(self->data->slots[i]->name, slotName) == 0) return self->slots[i];
+		if (STRCMP(self->data->slots[i]->name, slotName) == 0) return self->slots[i];
 	return 0;
 }
 
 int spSkeleton_findSlotIndex (const spSkeleton* self, const char* slotName) {
 	int i;
 	for (i = 0; i < self->slotsCount; ++i)
-		if (strcmp(self->data->slots[i]->name, slotName) == 0) return i;
+		if (STRCMP(self->data->slots[i]->name, slotName) == 0) return i;
 	return -1;
 }
 
@@ -315,7 +315,7 @@ int spSkeleton_setAttachment (spSkeleton* self, const char* slotName, const char
 	int i;
 	for (i = 0; i < self->slotsCount; ++i) {
 		spSlot *slot = self->slots[i];
-		if (strcmp(slot->data->name, slotName) == 0) {
+		if (STRCMP(slot->data->name, slotName) == 0) {
 			if (!attachmentName)
 				spSlot_setAttachment(slot, 0);
 			else {
@@ -332,7 +332,7 @@ int spSkeleton_setAttachment (spSkeleton* self, const char* slotName, const char
 spIkConstraint* spSkeleton_findIkConstraint (const spSkeleton* self, const char* ikConstraintName) {
 	int i;
 	for (i = 0; i < self->ikConstraintsCount; ++i)
-		if (strcmp(self->ikConstraints[i]->data->name, ikConstraintName) == 0) return self->ikConstraints[i];
+		if (STRCMP(self->ikConstraints[i]->data->name, ikConstraintName) == 0) return self->ikConstraints[i];
 	return 0;
 }
 
