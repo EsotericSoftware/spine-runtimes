@@ -312,7 +312,7 @@ public class AnimationState {
 			animation = null;
 			listener = null;
 			timeScale = 1;
-			lastTime = -1;
+			lastTime = 0;
 			time = 0;
 		}
 
