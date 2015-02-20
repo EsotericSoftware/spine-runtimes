@@ -447,12 +447,20 @@ namespace Spine {
 				lastTime = -1;
 
 			int frameIndex = (time >= frames[frames.Length - 1] ? frames.Length : Animation.binarySearch(frames, time)) - 1;
-			if (frames[frameIndex] < lastTime) return;
-
-			String attachmentName = attachmentNames[frameIndex];
-			skeleton.slots[slotIndex].Attachment =
-				 attachmentName == null ? null : skeleton.GetAttachment(slotIndex, attachmentName);
+			Attachment expectedAttachment = GetExpectedAttachment(skeleton, frameIndex);
+			Attachment actualAttachment = skeleton.slots[this.slotIndex].attachment;
+			
+			if (frames[frameIndex] < lastTime && expectedAttachment == actualAttachment) 
+				return;
+			
+			skeleton.slots[slotIndex].Attachment = expectedAttachment;
 		}
+		
+		private Attachment GetExpectedAttachment(Skeleton skeleton, int frameIndex)
+	        {
+	            String attachmentName = attachmentNames[frameIndex];
+	            return attachmentName == null ? null : skeleton.GetAttachment(slotIndex, attachmentName);
+	        }
 	}
 
 	public class EventTimeline : Timeline {
