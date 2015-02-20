@@ -148,12 +148,12 @@ static int indexOf (const char** array, int count, Str* str) {
 	int length = (int)(str->end - str->begin);
 	int i;
 	for (i = count - 1; i >= 0; i--)
-		if (strncmp(array[i], str->begin, length) == 0) return i;
+		if (STRNCMP(array[i], str->begin, length) == 0) return i;
 	return -1;
 }
 
 static int equals (Str* str, const char* other) {
-	return strncmp(other, str->begin, str->end - str->begin) == 0;
+	return STRNCMP(other, str->begin, str->end - str->begin) == 0;
 }
 
 static int toInt (Str* str) {
@@ -342,7 +342,7 @@ void spAtlas_dispose (spAtlas* self) {
 spAtlasRegion* spAtlas_findRegion (const spAtlas* self, const char* name) {
 	spAtlasRegion* region = self->regions;
 	while (region) {
-		if (strcmp(region->name, name) == 0) return region;
+		if (STRCMP(region->name, name) == 0) return region;
 		region = region->next;
 	}
 	return 0;
