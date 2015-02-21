@@ -104,7 +104,7 @@ struct spTimeline {
 
 #ifdef __cplusplus
 	spTimeline() :
-		type(SP_TIMELINE_SCALE),
+		type(0),
 		vtable(0) {
 	}
 #endif
