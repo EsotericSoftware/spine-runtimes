@@ -47,7 +47,7 @@ typedef struct spAttachment {
 #ifdef __cplusplus
 	spAttachment() :
 		name(0),
-		type(0),
+		type(SP_ATTACHMENT_REGION),
 		vtable(0) {
 	}
 #endif
