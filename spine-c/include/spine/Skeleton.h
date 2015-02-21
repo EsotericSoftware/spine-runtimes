@@ -59,6 +59,28 @@ typedef struct spSkeleton {
 	float time;
 	int/*bool*/flipX, flipY;
 	float x, y;
+
+#ifdef __cplusplus
+	spSkeleton() :
+		data(0),
+		bonesCount(0),
+		bones(0),
+		root(0),
+		slotsCount(0),
+		slots(0),
+		drawOrder(0),
+
+		ikConstraintsCount(0),
+		ikConstraints(0),
+
+		skin(0),
+		r(0), g(0), b(0), a(0),
+		time(0),
+		flipX(0),
+		flipY(0),
+		x(0), y(0) {
+	}
+#endif
 } spSkeleton;
 
 spSkeleton* spSkeleton_create (spSkeletonData* data);
