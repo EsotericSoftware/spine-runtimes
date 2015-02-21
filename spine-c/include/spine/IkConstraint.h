@@ -49,6 +49,17 @@ typedef struct spIkConstraint {
 	spBone* target;
 	int bendDirection;
 	float mix;
+
+#ifdef __cplusplus
+	spIkConstraint() :
+		data(0),
+		bonesCount(0),
+		bones(0),
+		target(0),
+		bendDirection(0),
+		mix(0) {
+	}
+#endif
 } spIkConstraint;
 
 spIkConstraint* spIkConstraint_create (spIkConstraintData* data, const struct spSkeleton* skeleton);
