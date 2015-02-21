@@ -147,53 +147,53 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 	_drawCommand.init(_globalZOrder);
 	_drawCommand.func = CC_CALLBACK_0(SkeletonRenderer::drawSkeleton, this, transform, transformFlags);
 	renderer->addCommand(&_drawCommand);
-    
-    if (_debugSlots || _debugBones) {
-        Director* director = Director::getInstance();
-        director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-        director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, transform);
-        
-        DrawNode* drawNode = DrawNode::create();
-        
-        if (_debugSlots) {
-            // Slots.
-            // DrawPrimitives::setDrawColor4B(0, 0, 255, 255);
-            glLineWidth(1);
-            Vec2 points[4];
-            V3F_C4B_T2F_Quad quad;
-            for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
-                spSlot* slot = _skeleton->drawOrder[i];
-                if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION) continue;
-                spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-                spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices);
-                points[0] = Vec2(_worldVertices[0], _worldVertices[1]);
-                points[1] = Vec2(_worldVertices[2], _worldVertices[3]);
-                points[2] = Vec2(_worldVertices[4], _worldVertices[5]);
-                points[3] = Vec2(_worldVertices[6], _worldVertices[7]);
-                drawNode->drawPoly(points, 4, true, Color4F::BLUE);
-            }
-        }
-        if (_debugBones) {
-            // Bone lengths.
-            glLineWidth(2);
-            for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
-                spBone *bone = _skeleton->bones[i];
-                float x = bone->data->length * bone->m00 + bone->worldX;
-                float y = bone->data->length * bone->m10 + bone->worldY;
-                drawNode->drawLine(Vec2(bone->worldX, bone->worldY), Vec2(x, y), Color4F::RED);
-            }
-            // Bone origins.
-            auto color = Color4F::BLUE; // Root bone is blue.
-            for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
-                spBone *bone = _skeleton->bones[i];
-                drawNode->drawPoint(Vec2(bone->worldX, bone->worldY), 4, color);
-                if (i == 0) color = Color4F::GREEN;
-            }
-        }
-        
-        drawNode->draw(renderer, transform, transformFlags);
-        director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-    }
+	
+	if (_debugSlots || _debugBones) {
+		Director* director = Director::getInstance();
+		director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+		director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, transform);
+		
+		DrawNode* drawNode = DrawNode::create();
+		
+		if (_debugSlots) {
+			// Slots.
+			// DrawPrimitives::setDrawColor4B(0, 0, 255, 255);
+			glLineWidth(1);
+			Vec2 points[4];
+			V3F_C4B_T2F_Quad quad;
+			for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
+				spSlot* slot = _skeleton->drawOrder[i];
+				if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION) continue;
+				spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
+				spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices);
+				points[0] = Vec2(_worldVertices[0], _worldVertices[1]);
+				points[1] = Vec2(_worldVertices[2], _worldVertices[3]);
+				points[2] = Vec2(_worldVertices[4], _worldVertices[5]);
+				points[3] = Vec2(_worldVertices[6], _worldVertices[7]);
+				drawNode->drawPoly(points, 4, true, Color4F::BLUE);
+			}
+		}
+		if (_debugBones) {
+			// Bone lengths.
+			glLineWidth(2);
+			for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
+				spBone *bone = _skeleton->bones[i];
+				float x = bone->data->length * bone->m00 + bone->worldX;
+				float y = bone->data->length * bone->m10 + bone->worldY;
+				drawNode->drawLine(Vec2(bone->worldX, bone->worldY), Vec2(x, y), Color4F::RED);
+			}
+			// Bone origins.
+			auto color = Color4F::BLUE; // Root bone is blue.
+			for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
+				spBone *bone = _skeleton->bones[i];
+				drawNode->drawPoint(Vec2(bone->worldX, bone->worldY), 4, color);
+				if (i == 0) color = Color4F::GREEN;
+			}
+		}
+		
+		drawNode->draw(renderer, transform, transformFlags);
+		director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+	}
 }
 
 void SkeletonRenderer::drawSkeleton (const Mat4 &transform, uint32_t transformFlags) {
