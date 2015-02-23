@@ -267,10 +267,15 @@ spTrackEntry* spAnimationState_setAnimationByName (spAnimationState* self, int t
 }
 
 spTrackEntry* spAnimationState_setAnimation (spAnimationState* self, int trackIndex, spAnimation* animation, int/*bool*/loop) {
-	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
-
+	_spAnimationState* internal;
 	spTrackEntry* entry;
-	spTrackEntry* current = _spAnimationState_expandToIndex(self, trackIndex);
+	spTrackEntry* current;
+
+	if(animation == 0) return 0;	// The animation may not exist
+
+	internal = SUB_CAST(_spAnimationState, self);
+
+	current = _spAnimationState_expandToIndex(self, trackIndex);
 	if (current) _spAnimationState_disposeAllEntries(self, current->next);
 
 	entry = internal->createTrackEntry(self);
@@ -289,10 +294,15 @@ spTrackEntry* spAnimationState_addAnimationByName (spAnimationState* self, int t
 
 spTrackEntry* spAnimationState_addAnimation (spAnimationState* self, int trackIndex, spAnimation* animation, int/*bool*/loop,
 		float delay) {
-	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
+	_spAnimationState* internal;
 	spTrackEntry* last;
+	spTrackEntry* entry;
 
-	spTrackEntry* entry = internal->createTrackEntry(self);
+	if(animation == 0) return 0;	// The animation may not exist
+
+	internal = SUB_CAST(_spAnimationState, self);
+
+	entry = internal->createTrackEntry(self);
 	entry->animation = animation;
 	entry->loop = loop;
 	entry->endTime = animation->duration;
