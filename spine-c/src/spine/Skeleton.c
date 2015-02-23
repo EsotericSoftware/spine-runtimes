@@ -416,7 +416,7 @@ int spSkeleton_setAttachment2 (spSkeleton* self, const char* slotName, const cha
 	int i;
 	for (i = 0; i < self->slotsCount; ++i) {
 		spSlot *slot = self->slots[i];
-		if (strcmp(slot->data->name, slotName) == 0) {
+		if (STRCMP(slot->data->name, slotName) == 0) {
 			if (!attachmentName)
 				spSlot_setAttachment(slot, 0);
 			else {
@@ -434,7 +434,7 @@ int spSkeleton_setAttachmentFromSkin (spSkeleton* self, const char* slotName, co
 	int i;
 	spSkin	*skin = 0;
 	for (i = 0; i < self->data->skinsCount; ++i) {
-		if (strcmp(self->data->skins[i]->name, skinName) == 0) {
+		if (STRCMP(self->data->skins[i]->name, skinName) == 0) {
 			skin = self->data->skins[i];
 		}
 	}
@@ -442,7 +442,7 @@ int spSkeleton_setAttachmentFromSkin (spSkeleton* self, const char* slotName, co
 
 	for (i = 0; i < self->slotsCount; ++i) {
 		spSlot *slot = self->slots[i];
-		if (strcmp(slot->data->name, slotName) == 0) {
+		if (STRCMP(slot->data->name, slotName) == 0) {
 			if (!attachmentName)
 				spSlot_setAttachment(slot, 0);
 			else {
