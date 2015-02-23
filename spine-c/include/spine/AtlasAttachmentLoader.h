@@ -44,10 +44,13 @@ typedef struct spAtlasAttachmentLoader {
 } spAtlasAttachmentLoader;
 
 spAtlasAttachmentLoader* spAtlasAttachmentLoader_create (spAtlas* atlas);
+/* If don't find a region in the atlas, creates a new one */
+spAtlasAttachmentLoader* spAtlasAttachmentLoader_create2 (spAtlas* atlas);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spAtlasAttachmentLoader AtlasAttachmentLoader;
-#define AtlasAttachmentLoader_create(...) spAtlasAttachmentLoader_create(__VA_ARGS__)
+#define AtlasAttachmentLoader_create(...)	spAtlasAttachmentLoader_create(__VA_ARGS__)
+#define AtlasAttachmentLoader_create2(...)	spAtlasAttachmentLoader_create2(__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus
