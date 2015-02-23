@@ -93,6 +93,15 @@ spAttachment* spSkin_getAttachment (const spSkin* self, int slotIndex, const cha
 	return 0;
 }
 
+spAttachment* spSkin_getAttachment2 (const spSkin* self, const char* name) {
+	const _Entry* entry = SUB_CAST(_spSkin, self)->entries;
+	while (entry) {
+		if (strcmp(entry->name, name) == 0) return entry->attachment;
+		entry = entry->next;
+	}
+	return 0;
+}
+
 const char* spSkin_getAttachmentName (const spSkin* self, int slotIndex, int attachmentIndex) {
 	const _Entry* entry = SUB_CAST(_spSkin, self)->entries;
 	int i = 0;
