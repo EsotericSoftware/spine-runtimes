@@ -57,7 +57,11 @@ static int Json_strcasecmp (const char* s1, const char* s2) {
 	 * the graph and input (only callsite is Json_getItem) should not have NULLs
 	 */
 	if (s1 && s2) {
-		return STRCMP(s1, s2);
+#if defined(_WIN32)
+		return _stricmp(s1, s2);
+#else
+		return strcasecmp( s1, s2 );
+#endif
 	} else {
 		if (s1 < s2)
 			return -1; /* s1 is null, s2 is not */
@@ -256,14 +260,14 @@ static const char* parse_value (Json *item, const char* value) {
 
 	switch (*value) {
 	case 'n': {
-		if (!STRNCMP(value + 1, "ull", 3)) {
+		if (!strncmp(value + 1, "ull", 3)) {
 			item->type = Json_NULL;
 			return value + 4;
 		}
 		break;
 	}
 	case 'f': {
-		if (!STRNCMP(value + 1, "alse", 4)) {
+		if (!strncmp(value + 1, "alse", 4)) {
 			item->type = Json_False;
 			/* calloc prevents us needing item->type = Json_False or valueInt = 0 here */
 			return value + 5;
@@ -271,7 +275,7 @@ static const char* parse_value (Json *item, const char* value) {
 		break;
 	}
 	case 't': {
-		if (!STRNCMP(value + 1, "rue", 3)) {
+		if (!strncmp(value + 1, "rue", 3)) {
 			item->type = Json_True;
 			item->valueInt = 1;
 			return value + 4;
