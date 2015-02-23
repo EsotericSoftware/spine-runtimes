@@ -54,6 +54,24 @@ struct spBone {
 	float const worldRotation;
 	float const worldScaleX, worldScaleY;
 	int/*bool*/const worldFlipX, worldFlipY;
+
+#ifdef __cplusplus
+	spBone() :
+		data(0),
+		skeleton(0),
+		parent(0),
+		x(0), y(0),
+		rotation(0), rotationIK(0),
+		scaleX(0), scaleY(0),
+		flipX(0), flipY(0),
+
+		m00(0), m01(0), worldX(0),
+		m10(0), m11(0), worldY(0),
+		worldRotation(0),
+		worldScaleX(0), worldScaleY(0),
+		worldFlipX(0), worldFlipY(0) {
+	}
+#endif
 };
 
 void spBone_setYDown (int/*bool*/yDown);
