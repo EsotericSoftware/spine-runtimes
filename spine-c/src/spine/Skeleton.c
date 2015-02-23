@@ -234,31 +234,92 @@ void spSkeleton_setSlotsToSetupPose (const spSkeleton* self) {
 		spSlot_setToSetupPose(self->slots[i]);
 }
 
+void spSkeleton_addBone (spSkeleton* self, spBone *bone) {
+	self->bones = (spBone **) realloc(self->bones, sizeof(spBone *) * (self->bonesCount + 1));
+	self->bones[self->bonesCount] = bone;
+
+	self->data->bones = (spBoneData **) realloc(self->data->bones, sizeof(spBoneData *) * (self->bonesCount + 1));
+	self->data->bones[self->bonesCount] = bone->data;
+
+	++self->bonesCount;
+	++self->data->bonesCount;
+
+	spSkeleton_updateCache(self);
+}
+
 spBone* spSkeleton_findBone (const spSkeleton* self, const char* boneName) {
 	int i;
 	for (i = 0; i < self->bonesCount; ++i)
-		if (strcmp(self->data->bones[i]->name, boneName) == 0) return self->bones[i];
+		if (STRCMP(self->data->bones[i]->name, boneName) == 0) return self->bones[i];
 	return 0;
 }
 
 int spSkeleton_findBoneIndex (const spSkeleton* self, const char* boneName) {
 	int i;
 	for (i = 0; i < self->bonesCount; ++i)
-		if (strcmp(self->data->bones[i]->name, boneName) == 0) return i;
+		if (STRCMP(self->data->bones[i]->name, boneName) == 0) return i;
 	return -1;
+}
+
+void _spSkeleton_addLastSlotToAnimations(spSkeleton* self)
+{
+	spAnimation *anim;
+	spTimeline *timeline;
+	spDrawOrderTimeline *drawOrderTL;
+	int	a, numAnims, t, numTL, f, numFrames;
+
+	numAnims = self->data->animationsCount;
+	for(a=0; a<numAnims; ++a)
+	{
+		anim = self->data->animations[a];
+
+		numTL = anim->timelinesCount;
+		for(t=0; t<numTL; ++t)
+		{
+			timeline = anim->timelines[t];
+			if(timeline->type == SP_TIMELINE_DRAWORDER)
+			{
+				drawOrderTL = SUB_CAST(spDrawOrderTimeline, timeline);
+				++CONST_CAST(int, drawOrderTL->slotsCount);
+
+				numFrames = drawOrderTL->framesCount;
+				for(f=0; f<numFrames; ++f)
+				{
+					drawOrderTL->drawOrders[f] = (int *) realloc(CONST_CAST(int*, drawOrderTL->drawOrders[f]), sizeof(int) * self->slotsCount);
+					CONST_CAST(int*, drawOrderTL->drawOrders[f])[self->slotsCount-1] = self->slotsCount-1;
+				}
+			}
+		}
+	}
+}
+
+void spSkeleton_addSlot (spSkeleton* self, spSlot *slot) {
+	self->slots = (spSlot **) realloc(self->slots, sizeof(spSlot *) * (self->slotsCount + 1));
+	self->slots[self->slotsCount] = slot;
+
+	self->drawOrder = (spSlot **) realloc(self->drawOrder, sizeof(spSlot *) * (self->slotsCount + 1));
+	self->drawOrder[self->slotsCount] = slot;
+
+	self->data->slots = (spSlotData **) realloc(self->data->slots, sizeof(spSlotData *) * (self->slotsCount + 1));
+	self->data->slots[self->slotsCount] = slot->data;
+
+	++self->slotsCount;
+	++self->data->slotsCount;
+
+	_spSkeleton_addLastSlotToAnimations(self);
 }
 
 spSlot* spSkeleton_findSlot (const spSkeleton* self, const char* slotName) {
 	int i;
 	for (i = 0; i < self->slotsCount; ++i)
-		if (strcmp(self->data->slots[i]->name, slotName) == 0) return self->slots[i];
+		if (STRCMP(self->data->slots[i]->name, slotName) == 0) return self->slots[i];
 	return 0;
 }
 
 int spSkeleton_findSlotIndex (const spSkeleton* self, const char* slotName) {
 	int i;
 	for (i = 0; i < self->slotsCount; ++i)
-		if (strcmp(self->data->slots[i]->name, slotName) == 0) return i;
+		if (STRCMP(self->data->slots[i]->name, slotName) == 0) return i;
 	return -1;
 }
 
@@ -311,11 +372,33 @@ spAttachment* spSkeleton_getAttachmentForSlotIndex (const spSkeleton* self, int 
 	return 0;
 }
 
+spAttachment* spSkeleton_getAttachmentByName (const spSkeleton* self, const char* attachmentName) 
+{
+	if (self->skin) {
+		spAttachment *attachment = spSkin_getAttachment2(self->skin, attachmentName);
+		if (attachment) return attachment;
+	}
+	if (self->data->defaultSkin) {
+		spAttachment *attachment = spSkin_getAttachment2(self->data->defaultSkin, attachmentName);
+		if (attachment) return attachment;
+	}
+	return 0;
+}
+
+spAttachment* spSkeleton_getAttachmentFromSkin (const spSkeleton* self, const spSkin *skin, const char* attachmentName) 
+{
+	if (skin) {
+		spAttachment *attachment = spSkin_getAttachment2(skin, attachmentName);
+		if (attachment) return attachment;
+	}
+	return 0;
+}
+
 int spSkeleton_setAttachment (spSkeleton* self, const char* slotName, const char* attachmentName) {
 	int i;
 	for (i = 0; i < self->slotsCount; ++i) {
 		spSlot *slot = self->slots[i];
-		if (strcmp(slot->data->name, slotName) == 0) {
+		if (STRCMP(slot->data->name, slotName) == 0) {
 			if (!attachmentName)
 				spSlot_setAttachment(slot, 0);
 			else {
@@ -329,10 +412,54 @@ int spSkeleton_setAttachment (spSkeleton* self, const char* slotName, const char
 	return 0;
 }
 
+int spSkeleton_setAttachment2 (spSkeleton* self, const char* slotName, const char* attachmentName) {
+	int i;
+	for (i = 0; i < self->slotsCount; ++i) {
+		spSlot *slot = self->slots[i];
+		if (STRCMP(slot->data->name, slotName) == 0) {
+			if (!attachmentName)
+				spSlot_setAttachment(slot, 0);
+			else {
+				spAttachment* attachment = spSkeleton_getAttachmentByName(self, attachmentName);
+				if (!attachment) return 0;
+				spSlot_setAttachment(slot, attachment);
+			}
+			return 1;
+		}
+	}
+	return 0;
+}
+
+int spSkeleton_setAttachmentFromSkin (spSkeleton* self, const char* slotName, const char * skinName, const char* attachmentName) {
+	int i;
+	spSkin	*skin = 0;
+	for (i = 0; i < self->data->skinsCount; ++i) {
+		if (STRCMP(self->data->skins[i]->name, skinName) == 0) {
+			skin = self->data->skins[i];
+		}
+	}
+	if(skin == 0) return 0;
+
+	for (i = 0; i < self->slotsCount; ++i) {
+		spSlot *slot = self->slots[i];
+		if (STRCMP(slot->data->name, slotName) == 0) {
+			if (!attachmentName)
+				spSlot_setAttachment(slot, 0);
+			else {
+				spAttachment* attachment = spSkeleton_getAttachmentFromSkin (self, skin, attachmentName);
+				if (!attachment) return 0;
+				spSlot_setAttachment(slot, attachment);
+			}
+			return 1;
+		}
+	}
+	return 0;
+}
+
 spIkConstraint* spSkeleton_findIkConstraint (const spSkeleton* self, const char* ikConstraintName) {
 	int i;
 	for (i = 0; i < self->ikConstraintsCount; ++i)
-		if (strcmp(self->ikConstraints[i]->data->name, ikConstraintName) == 0) return self->ikConstraints[i];
+		if (STRCMP(self->ikConstraints[i]->data->name, ikConstraintName) == 0) return self->ikConstraints[i];
 	return 0;
 }
 

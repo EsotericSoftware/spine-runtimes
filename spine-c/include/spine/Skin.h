@@ -57,6 +57,9 @@ void spSkin_addAttachment (spSkin* self, int slotIndex, const char* name, spAtta
 /* Returns 0 if the attachment was not found. */
 spAttachment* spSkin_getAttachment (const spSkin* self, int slotIndex, const char* name);
 
+/* Returns 0 if the attachment was not found. */
+spAttachment* spSkin_getAttachment2 (const spSkin* self, const char* name);
+
 /* Returns 0 if the slot or attachment was not found. */
 const char* spSkin_getAttachmentName (const spSkin* self, int slotIndex, int attachmentIndex);
 
@@ -69,6 +72,7 @@ typedef spSkin Skin;
 #define Skin_dispose(...) spSkin_dispose(__VA_ARGS__)
 #define Skin_addAttachment(...) spSkin_addAttachment(__VA_ARGS__)
 #define Skin_getAttachment(...) spSkin_getAttachment(__VA_ARGS__)
+#define Skin_getAttachment2(...) spSkin_getAttachment2(__VA_ARGS__)
 #define Skin_getAttachmentName(...) spSkin_getAttachmentName(__VA_ARGS__)
 #define Skin_attachAll(...) spSkin_attachAll(__VA_ARGS__)
 #endif
