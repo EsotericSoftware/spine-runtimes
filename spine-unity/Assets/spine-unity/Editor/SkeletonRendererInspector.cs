@@ -28,12 +28,17 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 using System;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
 [CustomEditor(typeof(SkeletonRenderer))]
 public class SkeletonRendererInspector : Editor {
 	protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, submeshSeparators, front;
+	protected bool advancedFoldout;
+
+	private static PropertyInfo SortingLayerNamesProperty;
+	private static MethodInfo GetSortingLayerUserID;
 
 	protected virtual void OnEnable () {
 		SpineEditorUtilities.ConfirmInitialization();
@@ -45,6 +50,15 @@ public class SkeletonRendererInspector : Editor {
 		immutableTriangles = serializedObject.FindProperty("immutableTriangles");
 		submeshSeparators = serializedObject.FindProperty("submeshSeparators");
 		front = serializedObject.FindProperty("frontFacing");
+
+
+		var unityInternalEditorUtility = Type.GetType("UnityEditorInternal.InternalEditorUtility, UnityEditor");
+
+		if(SortingLayerNamesProperty == null)
+			SortingLayerNamesProperty = unityInternalEditorUtility.GetProperty("sortingLayerNames", BindingFlags.Static | BindingFlags.NonPublic);
+
+		if(GetSortingLayerUserID == null) 
+			GetSortingLayerUserID = unityInternalEditorUtility.GetMethod("GetSortingLayerUserID", BindingFlags.Static | BindingFlags.NonPublic);
 	}
 
 	protected virtual void gui () {
@@ -83,23 +97,62 @@ public class SkeletonRendererInspector : Editor {
 				if (name == initialSkinName.stringValue)
 					skinIndex = i;
 			}
-			
-			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.LabelField("Initial Skin", GUILayout.Width(EditorGUIUtility.labelWidth));
-			skinIndex = EditorGUILayout.Popup(skinIndex, skins);
-			EditorGUILayout.EndHorizontal();
-			
+
+			skinIndex = EditorGUILayout.Popup("Initial Skin", skinIndex, skins);			
 			initialSkinName.stringValue = skins[skinIndex];
 		}
-		
-		EditorGUILayout.PropertyField(meshes,
-			new GUIContent("Render Meshes", "Disable to optimize rendering for skeletons that don't use meshes"));
-		EditorGUILayout.PropertyField(immutableTriangles,
-			new GUIContent("Immutable Triangles", "Enable to optimize rendering for skeletons that never change attachment visbility"));
-		EditorGUILayout.PropertyField(normals);
-		EditorGUILayout.PropertyField(tangents);
-		EditorGUILayout.PropertyField(front);
-		EditorGUILayout.PropertyField(submeshSeparators, true);
+
+		EditorGUILayout.Space();
+
+		// Sorting Layers
+		{
+			var renderer = component.GetComponent<Renderer>();
+			if(renderer != null) {
+				var sortingLayerNames = GetSortingLayerNames();
+
+				if (sortingLayerNames != null) {
+					var layerName = SortingLayerNameOfLayerID(renderer.sortingLayerID);
+
+					int oldIndex = Array.IndexOf(sortingLayerNames, layerName);
+					int newIndex = EditorGUILayout.Popup("Sorting Layer", oldIndex, sortingLayerNames);
+
+					if (newIndex != oldIndex) {
+						Undo.RecordObject(renderer, "Sorting Layer Changed");
+						renderer.sortingLayerID = SortingLayerIdOfLayerIndex(newIndex);
+						EditorUtility.SetDirty(renderer);
+					}
+				} else {
+					EditorGUI.BeginChangeCheck();
+					renderer.sortingLayerID = EditorGUILayout.IntField("Sorting Layer ID", renderer.sortingLayerID);
+					if(EditorGUI.EndChangeCheck()) {
+						EditorUtility.SetDirty(renderer);
+					}
+				}
+
+				EditorGUI.BeginChangeCheck();
+				renderer.sortingOrder = EditorGUILayout.IntField("Order in Layer", renderer.sortingOrder);
+				if(EditorGUI.EndChangeCheck()) {
+					EditorUtility.SetDirty(renderer);
+				}
+			}
+		}
+
+		// More Render Options...
+		{
+			advancedFoldout = EditorGUILayout.Foldout(advancedFoldout, "Advanced");
+			if(advancedFoldout) {
+				EditorGUI.indentLevel++;
+				EditorGUILayout.PropertyField(meshes,
+					new GUIContent("Render Meshes", "Disable to optimize rendering for skeletons that don't use meshes"));
+				EditorGUILayout.PropertyField(immutableTriangles,
+					new GUIContent("Immutable Triangles", "Enable to optimize rendering for skeletons that never change attachment visbility"));
+				EditorGUILayout.PropertyField(normals);
+				EditorGUILayout.PropertyField(tangents);
+				EditorGUILayout.PropertyField(front);
+				EditorGUILayout.PropertyField(submeshSeparators, true);
+				EditorGUI.indentLevel--;
+			}
+		}
 	}
 
 	override public void OnInspectorGUI () {
@@ -112,4 +165,33 @@ public class SkeletonRendererInspector : Editor {
 				((SkeletonRenderer)target).Reset();
 		}
 	}
+
+	#region Sorting Layers
+	protected static string[] GetSortingLayerNames () {
+		if(SortingLayerNamesProperty == null)
+			return null;
+
+		return SortingLayerNamesProperty.GetValue(null, null) as string[];
+	}
+
+	protected static string SortingLayerNameOfLayerID (int id) {
+		var layerNames = GetSortingLayerNames();
+		if(layerNames == null)
+			return null;
+		
+		for (int i = 0, n = layerNames.Length; i < n; i++) {
+			if (SortingLayerIdOfLayerIndex(i) == id)
+				return layerNames[i];
+		}
+		
+		return null;
+	}
+
+	protected static int SortingLayerIdOfLayerIndex (int index) {
+		if(GetSortingLayerUserID == null) return 0;
+
+		var parameters = new object[] {index};
+		return (int)( GetSortingLayerUserID.Invoke( null, parameters ) );
+	}
+	#endregion
 }
