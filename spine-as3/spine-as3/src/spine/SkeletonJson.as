@@ -38,6 +38,8 @@ import spine.animation.CurveTimeline;
 import spine.animation.DrawOrderTimeline;
 import spine.animation.EventTimeline;
 import spine.animation.FfdTimeline;
+import spine.animation.FlipXTimeline;
+import spine.animation.FlipYTimeline;
 import spine.animation.IkConstraintTimeline;
 import spine.animation.RotateTimeline;
 import spine.animation.ScaleTimeline;
@@ -52,12 +54,6 @@ import spine.attachments.RegionAttachment;
 import spine.attachments.SkinnedMeshAttachment;
 
 public class SkeletonJson {
-	static public const TIMELINE_SCALE:String = "scale";
-	static public const TIMELINE_ROTATE:String = "rotate";
-	static public const TIMELINE_TRANSLATE:String = "translate";
-	static public const TIMELINE_ATTACHMENT:String = "attachment";
-	static public const TIMELINE_COLOR:String = "color";
-
 	public var attachmentLoader:AttachmentLoader;
 	public var scale:Number = 1;
 
@@ -107,6 +103,8 @@ public class SkeletonJson {
 			boneData.rotation = (boneMap["rotation"] || 0);
 			boneData.scaleX = boneMap.hasOwnProperty("scaleX") ? boneMap["scaleX"] : 1;
 			boneData.scaleY = boneMap.hasOwnProperty("scaleY") ? boneMap["scaleY"] : 1;
+			boneData.flipX = boneMap["flipX"] || false;
+			boneData.flipY = boneMap["flipY"] || false;
 			boneData.inheritScale = boneMap.hasOwnProperty("inheritScale") ? boneMap["inheritScale"] : true;
 			boneData.inheritRotation = boneMap.hasOwnProperty("inheritRotation") ? boneMap["inheritRotation"] : true;
 			skeletonData.bones[skeletonData.bones.length] = boneData;
@@ -312,7 +310,7 @@ public class SkeletonJson {
 
 			for (timelineName in slotMap) {
 				values = slotMap[timelineName];
-				if (timelineName == TIMELINE_COLOR) {
+				if (timelineName == "color") {
 					var colorTimeline:ColorTimeline = new ColorTimeline(values.length);
 					colorTimeline.slotIndex = slotIndex;
 					
@@ -330,7 +328,7 @@ public class SkeletonJson {
 					timelines[timelines.length] = colorTimeline;
 					duration = Math.max(duration, colorTimeline.frames[colorTimeline.frameCount * 5 - 5]);
 					
-				} else if (timelineName == TIMELINE_ATTACHMENT) {
+				} else if (timelineName == "attachment") {
 					var attachmentTimeline:AttachmentTimeline = new AttachmentTimeline(values.length);
 					attachmentTimeline.slotIndex = slotIndex;
 					
@@ -339,7 +337,7 @@ public class SkeletonJson {
 						attachmentTimeline.setFrame(frameIndex++, valueMap["time"], valueMap["name"]);
 					timelines[timelines.length] = attachmentTimeline;
 					duration = Math.max(duration, attachmentTimeline.frames[attachmentTimeline.frameCount - 1]);
-					
+
 				} else
 					throw new Error("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
 			}
@@ -353,7 +351,7 @@ public class SkeletonJson {
 
 			for (timelineName in boneMap) {
 				values = boneMap[timelineName];
-				if (timelineName == TIMELINE_ROTATE) {
+				if (timelineName == "rotate") {
 					var rotateTimeline:RotateTimeline = new RotateTimeline(values.length);
 					rotateTimeline.boneIndex = boneIndex;
 
@@ -366,10 +364,10 @@ public class SkeletonJson {
 					timelines[timelines.length] = rotateTimeline;
 					duration = Math.max(duration, rotateTimeline.frames[rotateTimeline.frameCount * 2 - 2]);
 
-				} else if (timelineName == TIMELINE_TRANSLATE || timelineName == TIMELINE_SCALE) {
+				} else if (timelineName == "translate" || timelineName == "scale") {
 					var timeline:TranslateTimeline;
 					var timelineScale:Number = 1;
-					if (timelineName == TIMELINE_SCALE)
+					if (timelineName == "scale")
 						timeline = new ScaleTimeline(values.length);
 					else {
 						timeline = new TranslateTimeline(values.length);
@@ -387,6 +385,20 @@ public class SkeletonJson {
 					}
 					timelines[timelines.length] = timeline;
 					duration = Math.max(duration, timeline.frames[timeline.frameCount * 3 - 3]);
+
+				} else if (timelineName == "flipX" || timelineName == "flipY") {
+					var flipX:Boolean = timelineName == "flipX";
+					var flipTimeline:FlipXTimeline = flipX ? new FlipXTimeline(values.length) : new FlipYTimeline(values.length);
+					flipTimeline.boneIndex = boneIndex;
+					
+					var field:String = flipX ? "x" : "y";
+					frameIndex = 0;
+					for each (valueMap in values) {
+						flipTimeline.setFrame(frameIndex, valueMap["time"], valueMap[field] || false);
+						frameIndex++;
+					}
+					timelines[timelines.length] = flipTimeline;
+					duration = Math.max(duration, flipTimeline.frames[flipTimeline.frameCount * 3 - 3]);
 
 				} else
 					throw new Error("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");

@@ -11,10 +11,6 @@ Alternatively, the contents of the `spine-c/src` and `spine-c/include` directori
 
 If `SPINE_SHORT_NAMES` is defined, the `sp` prefix for all structs and functions is optional. Only use this if the spine-c names won't cause a conflict.
 
-## Examples
-
-[Loading data](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-c/example/main.c)
-
 ## Extension
 
 Extending spine-c requires implementing three methods:

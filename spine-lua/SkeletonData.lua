@@ -31,12 +31,15 @@
 local SkeletonData = {}
 function SkeletonData.new ()
 	local self = {
+		version = 0, hash = 0,
+		width = 0, height = 0,
 		bones = {},
 		slots = {},
 		slotNameIndices = {},
 		skins = {},
 		events = {},
 		animations = {},
+		ikConstraints = {},
 		defaultSkin = nil
 	}
 
@@ -89,6 +92,14 @@ function SkeletonData.new ()
 		if not animationName then error("animationName cannot be nil.", 2) end
 		for i,animation in ipairs(self.animations) do
 			if animation.name == animationName then return animation end
+		end
+		return nil
+	end
+
+	function self:findIkConstraint (ikConstraintName)
+		if not ikConstraintName then error("ikConstraintName cannot be nil.", 2) end
+		for i,ikConstraint in ipairs(self.ikConstraints) do
+			if ikConstraint.name == ikConstraintName then return ikConstraint end
 		end
 		return nil
 	end

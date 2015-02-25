@@ -63,6 +63,7 @@ internal class PolygonBatch {
 	private var _programBits:uint;
 	private var _blendMode:String;
 	private var _additive:Boolean;
+	private var _alpha:Number;
 
 	private var _verticesCount:int;
 	private var _vertices:Vector.<Number> = new <Number>[];
@@ -85,18 +86,15 @@ internal class PolygonBatch {
 
 	public function begin (support:RenderSupport, alpha:Number, blendMode:String) : void {
 		_support = support;
-		_renderAlpha[3] = alpha;
+		_alpha = alpha;
 		_programBits = 0xffffffff;
-
-		support.finishQuadBatch();
-
-		support.blendMode = blendMode;
-		support.applyBlendMode(true);
-		_blendMode = support.blendMode;
 		_additive = false;
 
+		support.finishQuadBatch();
+		support.blendMode = blendMode;
+		_blendMode = support.blendMode;
+
 		var context:Context3D = Starling.context;
-		context.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 0, _renderAlpha, 1);
 		context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 1, support.mvpMatrix3D, true);
 
 		var verticesBuffer:VertexBuffer3D = _verticesBuffer;
@@ -216,6 +214,13 @@ internal class PolygonBatch {
 			_verticesBuffer.uploadFromVector(_vertices, 0, _verticesCount >> 3);
 			_trianglesBuffer.uploadFromVector(_triangles, 0, _trianglesCount);
 		}
+
+		var pma:Boolean = _texture ? _texture.premultipliedAlpha : true;
+		_renderAlpha[0] = _renderAlpha[1] = _renderAlpha[2] = pma ? _alpha : 1.0;
+		_renderAlpha[3] = _alpha;
+
+		_support.applyBlendMode(pma);
+		context.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 0, _renderAlpha, 1);
 
 		setProgram(context);
 		context.setTextureAt(0, _texture.base);

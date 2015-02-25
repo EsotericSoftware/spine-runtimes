@@ -65,7 +65,7 @@ void _spSkeletonJson_setError (spSkeletonJson* self, Json* root, const char* val
 	FREE(self->error);
 	strcpy(message, value1);
 	length = (int)strlen(value1);
-	if (value2) strncat(message + length, value2, 256 - length);
+	if (value2) strncat(message + length, value2, 255 - length);
 	MALLOC_STR(self->error, message);
 	if (root) Json_dispose(root);
 }
@@ -221,7 +221,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 					if (duration > animation->duration) animation->duration = duration;
 				} else if (strcmp(timelineArray->name, "flipX") == 0 || strcmp(timelineArray->name, "flipY") == 0) {
 					int x = strcmp(timelineArray->name, "flipX") == 0;
-					char* field = x ? "x" : "y";
+					const char* field = x ? "x" : "y";
 					spFlipTimeline *timeline = spFlipTimeline_create(timelineArray->size, x);
 					timeline->boneIndex = boneIndex;
 					for (frame = timelineArray->child, i = 0; frame; frame = frame->next, ++i)
@@ -434,8 +434,8 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 
 	skeleton = Json_getItem(root, "skeleton");
 	if (skeleton) {
-		skeletonData->hash = Json_getString(skeleton, "hash", 0);
-		skeletonData->version = Json_getString(skeleton, "spine", 0);
+		MALLOC_STR(skeletonData->hash, Json_getString(skeleton, "hash", 0));
+		MALLOC_STR(skeletonData->version,  Json_getString(skeleton, "spine", 0));
 		skeletonData->width = Json_getFloat(skeleton, "width", 0);
 		skeletonData->height = Json_getFloat(skeleton, "height", 0);
 	}
@@ -466,6 +466,8 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 		boneData->scaleY = Json_getFloat(boneMap, "scaleY", 1);
 		boneData->inheritScale = Json_getInt(boneMap, "inheritScale", 1);
 		boneData->inheritRotation = Json_getInt(boneMap, "inheritRotation", 1);
+		boneData->flipX = Json_getInt(boneMap, "flipX", 0);
+		boneData->flipY = Json_getInt(boneMap, "flipY", 0);
 
 		skeletonData->bones[i] = boneData;
 		skeletonData->bonesCount++;

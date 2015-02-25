@@ -36,16 +36,32 @@ using Spine;
 
 [ExecuteInEditMode]
 [AddComponentMenu("Spine/SkeletonAnimation")]
-public class SkeletonAnimation : SkeletonRenderer {
+public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 	public float timeScale = 1;
 	public bool loop;
 	public Spine.AnimationState state;
 
-	public delegate void UpdateBonesDelegate (SkeletonAnimation skeleton);
 
-	public UpdateBonesDelegate UpdateLocal;
-	public UpdateBonesDelegate UpdateWorld;
-	public UpdateBonesDelegate UpdateComplete;
+
+	public event UpdateBonesDelegate UpdateLocal {
+		add { _UpdateLocal += value; }
+		remove { _UpdateLocal -= value; }
+	}
+
+	public event UpdateBonesDelegate UpdateWorld {
+		add { _UpdateWorld += value; }
+		remove { _UpdateWorld -= value; }
+	}
+
+	public event UpdateBonesDelegate UpdateComplete {
+		add { _UpdateComplete += value; }
+		remove { _UpdateComplete -= value; }
+	}
+
+	protected event UpdateBonesDelegate _UpdateLocal;
+	protected event UpdateBonesDelegate _UpdateWorld;
+	protected event UpdateBonesDelegate _UpdateComplete;
+
 	[SerializeField]
 	private String
 		_animationName;
@@ -91,18 +107,18 @@ public class SkeletonAnimation : SkeletonRenderer {
 		state.Update(deltaTime);
 		state.Apply(skeleton);
 
-		if (UpdateLocal != null) 
-			UpdateLocal(this);
+		if (_UpdateLocal != null) 
+			_UpdateLocal(this);
 
 		skeleton.UpdateWorldTransform();
 
-		if (UpdateWorld != null) { 
-			UpdateWorld(this);
+		if (_UpdateWorld != null) { 
+			_UpdateWorld(this);
 			skeleton.UpdateWorldTransform();
 		}
 
-		if (UpdateComplete != null) { 
-			UpdateComplete(this);
+		if (_UpdateComplete != null) { 
+			_UpdateComplete(this);
 		}
 	}
 }

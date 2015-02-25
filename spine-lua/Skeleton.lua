@@ -30,6 +30,7 @@
 
 local Bone = require "spine-lua.Bone"
 local Slot = require "spine-lua.Slot"
+local IkConstraint = require "spine-lua.IkConstraint"
 local AttachmentLoader = require "spine-lua.AttachmentLoader"
 
 local Skeleton = {}
@@ -42,16 +43,71 @@ function Skeleton.new (skeletonData)
 		slots = {},
 		slotsByName = {},
 		drawOrder = {},
+		ikConstraints = {},
 		r = 1, g = 1, b = 1, a = 1,
-		x = 0, y = 0,
 		skin = nil,
 		flipX = false, flipY = false,
-		time = 0
+		time = 0,
+		x = 0, y = 0
 	}
 
-	function self:updateWorldTransform ()
+	-- Caches information about bones and IK constraints. Must be called if bones or IK constraints are added or removed.
+	function self:updateCache ()
+		self.boneCache = {}
+		local boneCache = self.boneCache
+		local ikConstraints = self.ikConstraints
+		local ikConstraintsCount = #ikConstraints
+
+		local arrayCount = ikConstraintsCount + 1
+		while #boneCache < arrayCount do
+			table.insert(boneCache, {})
+		end
+
+		local nonIkBones = boneCache[1]
+
 		for i,bone in ipairs(self.bones) do
-			bone:updateWorldTransform(self.flipX, self.flipY)
+			local current = bone
+			local continueOuter
+			repeat
+				for ii,ikConstraint in ipairs(ikConstraints) do
+					local parent = ikConstraint.bones[0]
+					local child = ikConstraint.bones[#ikConstraint.bones - 1]
+					while true do
+						if current == child then
+							table.insert(boneCache[ii], bone)
+							table.insert(boneCache[ii + 1], bone)
+							ii = ikConstraintsCount
+							continueOuter = true
+							break
+						end
+						if child == parent then break end
+						child = child.parent
+					end
+				end
+				if continueOuter then break end
+				current = current.parent
+			until not current
+			table.insert(nonIkBones, bone)
+		end
+	end
+
+	-- Updates the world transform for each bone and applies IK constraints.
+	function self:updateWorldTransform ()
+		local bones = self.bones
+		for i,bone in ipairs(self.bones) do
+			bone.rotationIK = bone.rotation
+		end
+		local boneCache = self.boneCache
+		local ikConstraints = self.ikConstraints
+		local i = 1
+		local last = #boneCache
+		while true do
+			for ii,bone in ipairs(boneCache[i]) do
+				bone:updateWorldTransform()
+			end
+			if i == last then break end
+			ikConstraints[i]:apply()
+			i = i + 1
 		end
 	end
 
@@ -63,6 +119,11 @@ function Skeleton.new (skeletonData)
 	function self:setBonesToSetupPose ()
 		for i,bone in ipairs(self.bones) do
 			bone:setToSetupPose()
+		end
+
+		for i,ikConstraint in ipairs(self.ikConstraints) do
+			ikConstraint.bendDirection = ikConstraint.data.bendDirection
+			ikConstraint.mix = ikConstraint.data.mix
 		end
 	end
 
@@ -90,6 +151,9 @@ function Skeleton.new (skeletonData)
 		return self.slotsByName[slotName]
 	end
 
+	-- Sets the skin used to look up attachments before looking in the {@link SkeletonData#getDefaultSkin() default skin}. 
+	-- Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was 
+	-- no old skin, each slot's setup mode attachment is attached from the new skin.
 	function self:setSkin (skinName)
 		local newSkin
 		if skinName then
@@ -165,16 +229,22 @@ function Skeleton.new (skeletonData)
 	for i,boneData in ipairs(skeletonData.bones) do
 		local parent
 		if boneData.parent then parent = self.bones[spine.utils.indexOf(skeletonData.bones, boneData.parent)] end
-		table.insert(self.bones, Bone.new(boneData, parent))
+		table.insert(self.bones, Bone.new(boneData, self, parent))
 	end
 
 	for i,slotData in ipairs(skeletonData.slots) do
 		local bone = self.bones[spine.utils.indexOf(skeletonData.bones, slotData.boneData)]
-		local slot = Slot.new(slotData, self, bone)
+		local slot = Slot.new(slotData, bone)
 		table.insert(self.slots, slot)
 		self.slotsByName[slot.data.name] = slot
 		table.insert(self.drawOrder, slot)
 	end
+
+	for i,ikConstraintData in ipairs(skeletonData.ikConstraints) do
+		table.insert(self.ikConstraints, IkConstraint.new(ikConstraintData, self))
+	end
+	
+	self:updateCache()
 
 	return self
 end

@@ -16,7 +16,7 @@ public class SkeletonUtilitySubmeshRenderer : MonoBehaviour {
 	MeshFilter parentFilter;
 
 	void Awake () {
-		cachedRenderer = renderer;
+		cachedRenderer = GetComponent<Renderer>();
 		sharedMaterials = cachedRenderer.sharedMaterials;
 		filter = GetComponent<MeshFilter>();
 
@@ -53,13 +53,13 @@ public class SkeletonUtilitySubmeshRenderer : MonoBehaviour {
 		}
 
 		if (cachedRenderer == null)
-			cachedRenderer = renderer;
+			cachedRenderer = GetComponent<Renderer>();
 
 		if (mesh == null || submeshIndex > mesh.subMeshCount - 1) {
 			cachedRenderer.enabled = false;
 			return;
 		} else {
-			renderer.enabled = true;
+			GetComponent<Renderer>().enabled = true;
 		}
 
 		bool changed = false;
@@ -71,7 +71,7 @@ public class SkeletonUtilitySubmeshRenderer : MonoBehaviour {
 
 
 
-		for (int i = 0; i < renderer.sharedMaterials.Length; i++) {
+		for (int i = 0; i < GetComponent<Renderer>().sharedMaterials.Length; i++) {
 			if (i == submeshIndex)
 				continue;
 

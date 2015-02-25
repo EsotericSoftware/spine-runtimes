@@ -28,14 +28,21 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using Spine;
+
 
 [CustomEditor(typeof(AtlasAsset))]
 public class AtlasAssetInspector : Editor {
 	private SerializedProperty atlasFile, materials;
 
 	void OnEnable () {
+		SpineEditorUtilities.ConfirmInitialization();
 		atlasFile = serializedObject.FindProperty("atlasFile");
 		materials = serializedObject.FindProperty("materials");
 	}
@@ -44,11 +51,43 @@ public class AtlasAssetInspector : Editor {
 		serializedObject.Update();
 		AtlasAsset asset = (AtlasAsset)target;
 
+		EditorGUI.BeginChangeCheck();
 		EditorGUILayout.PropertyField(atlasFile);
 		EditorGUILayout.PropertyField(materials, true);
+		if (EditorGUI.EndChangeCheck())
+			serializedObject.ApplyModifiedProperties();
+
+		if (materials.arraySize == 0) {
+			EditorGUILayout.LabelField(new GUIContent("Error:  Missing materials", SpineEditorUtilities.Icons.warning));
+			return;
+		}
+
+		for (int i = 0; i < materials.arraySize; i++) {
+			SerializedProperty prop = materials.GetArrayElementAtIndex(i);
+			Material mat = (Material)prop.objectReferenceValue;
+			if (mat == null) {
+				EditorGUILayout.LabelField(new GUIContent("Error:  Materials cannot be null", SpineEditorUtilities.Icons.warning));
+				return;
+			}
+		}
+			
+		
+
+		if (atlasFile.objectReferenceValue != null) {
+			Atlas atlas = asset.GetAtlas();
+			FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic);
+			List<AtlasRegion> regions = (List<AtlasRegion>)field.GetValue(atlas);
+			EditorGUILayout.LabelField("Regions");
+			EditorGUI.indentLevel++;
+			for (int i = 0; i < regions.Count; i++) {
+				EditorGUILayout.LabelField(regions[i].name);
+			}
+			EditorGUI.indentLevel--;
+		}
+
 		
 		if (serializedObject.ApplyModifiedProperties() ||
-			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
+			(UnityEngine.Event.current.type == EventType.ValidateCommand && UnityEngine.Event.current.commandName == "UndoRedoPerformed")
 		) {
 			asset.Reset();
 		}

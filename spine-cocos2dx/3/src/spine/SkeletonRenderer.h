@@ -49,6 +49,8 @@ public:
 	virtual void draw (cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformFlags) override;
 	virtual void drawSkeleton (const cocos2d::Mat4& transform, uint32_t transformFlags);
 	virtual cocos2d::Rect getBoundingBox () const override;
+	virtual void onEnter () override;
+	virtual void onExit () override;
 
 	spSkeleton* getSkeleton();
 
@@ -89,14 +91,21 @@ public:
 	virtual void setOpacityModifyRGB (bool value);
 	virtual bool isOpacityModifyRGB () const;
 
-protected:
+CC_CONSTRUCTOR_ACCESS:
 	SkeletonRenderer ();
 	SkeletonRenderer (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
 	SkeletonRenderer (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 1);
 	SkeletonRenderer (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1);
+
 	virtual ~SkeletonRenderer ();
+
+	void initWithData (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
+	void initWithFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 1);
+	void initWithFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1);
+
 	void initialize ();
 
+protected:
 	void setSkeletonData (spSkeletonData* skeletonData, bool ownsSkeletonData);
 	virtual cocos2d::Texture2D* getTexture (spRegionAttachment* attachment) const;
 	virtual cocos2d::Texture2D* getTexture (spMeshAttachment* attachment) const;

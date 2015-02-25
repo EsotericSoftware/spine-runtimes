@@ -19,8 +19,9 @@ spine-cpp/Debug/*
 spine-sfml/Debug/*
 spine-sfml/SFML
 
-spine-libgdx/bin/*
-spine-libgdx/libs/*
+spine-libgdx/spine-libgdx/bin/*
+spine-libgdx/spine-libgdx-tests/bin/*
+spine-libgdx/spine-skeletonviewer/bin/*
 
 spine-cocos2dx/2/cocos2dx/
 !spine-cocos2dx/2/cocos2dx/Place cocos2dx here.txt
@@ -37,6 +38,7 @@ spine-cocos2d-iphone/3/cocos2d/*
 
 spine-csharp/bin
 spine-csharp/obj
+spine-csharp/src/*.cs.meta
 
 spine-monogame/xamarinstudio-ios/src/bin
 spine-monogame/xamarinstudio-ios/src/obj
@@ -85,8 +87,13 @@ spine-love/love/
 spine-as3/spine-as3/bin
 spine-as3/spine-as3-example/bin-debug
 spine-as3/spine-as3-example/bin-release
+
 spine-starling/spine-starling/bin
 spine-starling/spine-starling-example/bin-debug
 spine-starling/spine-starling-example/bin-release
 
+<<<<<<< HEAD
 spine-runtimes.mkf~
+=======
+spine-turbulenz/spine-js/spine.js
+>>>>>>> EsotericSoftware/master

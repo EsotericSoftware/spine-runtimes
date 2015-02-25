@@ -57,10 +57,7 @@ public class FfdTimeline extends CurveTimeline {
 		if (slot.attachment != attachment) return;
 
 		var frames:Vector.<Number> = this.frames;
-		if (time < frames[0]) {
-			slot.attachmentVertices.length = 0;
-			return; // Time is before first frame.
-		}
+		if (time < frames[0]) return; // Time is before first frame.
 
 		var frameVertices:Vector.<Vector.<Number>> = this.frameVertices;
 		var vertexCount:int = frameVertices[0].length;

@@ -37,6 +37,10 @@ void spBone_setYDown (int value) {
 	yDown = value;
 }
 
+int spBone_isYDown () {
+	return yDown;
+}
+
 spBone* spBone_create (spBoneData* data, spSkeleton* skeleton, spBone* parent) {
 	spBone* self = NEW(spBone);
 	CONST_CAST(spBoneData*, self->data) = data;

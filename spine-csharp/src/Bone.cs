@@ -85,7 +85,6 @@ namespace Spine {
 		/// <summary>Computes the world SRT using the parent bone and the local SRT.</summary>
 		public void UpdateWorldTransform () {
 			Bone parent = this.parent;
-			Skeleton skeleton = this.skeleton;
 			float x = this.x, y = this.y;
 			if (parent != null) {
 				worldX = x * parent.m00 + y * parent.m01 + parent.worldX;
@@ -98,17 +97,18 @@ namespace Spine {
 					worldScaleY = scaleY;
 				}
 				worldRotation = data.inheritRotation ? parent.worldRotation + rotationIK : rotationIK;
-				worldFlipX = parent.worldFlipX ^ flipX;
-				worldFlipY = parent.worldFlipY ^ flipY;
+				worldFlipX = parent.worldFlipX != flipX;
+				worldFlipY = parent.worldFlipY != flipY;
 			} else {
+				Skeleton skeleton = this.skeleton;
 				bool skeletonFlipX = skeleton.flipX, skeletonFlipY = skeleton.flipY;
 				worldX = skeletonFlipX ? -x : x;
 				worldY = skeletonFlipY != yDown ? -y : y;
 				worldScaleX = scaleX;
 				worldScaleY = scaleY;
 				worldRotation = rotationIK;
-				worldFlipX = skeletonFlipX ^ flipX;
-				worldFlipY = skeletonFlipY ^ flipY;
+				worldFlipX = skeletonFlipX != flipX;
+				worldFlipY = skeletonFlipY != flipY;
 			}
 			float radians = worldRotation * (float)Math.PI / 180;
 			float cos = (float)Math.Cos(radians);

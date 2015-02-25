@@ -31,16 +31,16 @@
 local spine = require "spine-love.spine"
 
 local json = spine.SkeletonJson.new()
-json.scale = 1
+json.scale = 0.6
 local skeletonData = json:readSkeletonDataFile("data/spineboy.json")
 
 local skeleton = spine.Skeleton.new(skeletonData)
 function skeleton:createImage (attachment)
 	-- Customize where images are loaded.
-	return love.graphics.newImage("data/" .. attachment.name .. ".png")
+	return love.graphics.newImage("data/images/" .. attachment.name .. ".png")
 end
 skeleton.x = love.graphics.getWidth() / 2
-skeleton.y = love.graphics.getHeight() / 2 + 150
+skeleton.y = love.graphics.getHeight() / 2 + 250
 skeleton.flipX = false
 skeleton.flipY = false
 skeleton.debugBones = true -- Omit or set to false to not draw debug lines on top of the images.
@@ -50,13 +50,14 @@ skeleton:setToSetupPose()
 -- AnimationStateData defines crossfade durations between animations.
 local stateData = spine.AnimationStateData.new(skeletonData)
 stateData:setMix("walk", "jump", 0.2)
-stateData:setMix("jump", "walk", 0.4)
+stateData:setMix("jump", "run", 0.2)
 
 -- AnimationState has a queue of animations and can apply them with crossfading.
 local state = spine.AnimationState.new(stateData)
-state:setAnimationByName(0, "drawOrder")
-state:addAnimationByName(0, "jump", false, 0)
-state:addAnimationByName(0, "walk", true, 0)
+-- state:setAnimationByName(0, "test")
+state:setAnimationByName(0, "walk", true)
+state:addAnimationByName(0, "jump", true, 3)
+state:addAnimationByName(0, "run", true, 0)
 
 state.onStart = function (trackIndex)
 	print(trackIndex.." start: "..state:getCurrent(trackIndex).animation.name)

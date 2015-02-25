@@ -13,3 +13,7 @@ Alternatively, the contents of the `spine-as3/src` directory can be copied into 
 
 * [Flash Demo](http://esotericsoftware.com/spine/files/demos/as3/spineboy/index.html)
 *  [Flash Demo source](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-as3/spine-as3-example/src/Main.as#L55)
+
+## Notes
+
+- Atlas images should not use premultiplied alpha.

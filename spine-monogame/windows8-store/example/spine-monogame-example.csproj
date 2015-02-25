@@ -139,11 +139,8 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
-    <Content Include="..\..\..\spine-xna\example\data\goblins-ffd.atlas">
-      <Link>Assets\goblins-ffd.atlas</Link>
-    </Content>
-    <Content Include="..\..\..\spine-xna\example\data\goblins-ffd.json">
-      <Link>Assets\goblins-ffd.json</Link>
+    <Content Include="..\..\..\spine-xna\example\data\goblins-mesh.png">
+      <Link>Assets\goblins-mesh.png</Link>
     </Content>
     <Content Include="..\..\..\spine-xna\example\data\raptor.png">
       <Link>Assets\raptor.png</Link>
@@ -156,9 +153,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\spine-xna\example\data\goblins-ffd.png">
-      <Link>Assets\goblins-ffd.png</Link>
-    </Content>
     <Content Include="..\..\..\spine-xna\example\data\spineboy.png">
       <Link>Assets\spineboy.png</Link>
     </Content>
@@ -182,6 +176,14 @@
     </Content>
     <Content Include="..\..\..\spine-xna\example\data\raptor.json">
       <Link>Assets\raptor.json</Link>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\..\spine-xna\example\data\goblins-mesh.atlas">
+      <Link>Assets\goblins-mesh.atlas</Link>
+    </Content>
+    <Content Include="..\..\..\spine-xna\example\data\goblins-mesh.json">
+      <Link>Assets\goblins-mesh.json</Link>
     </Content>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">

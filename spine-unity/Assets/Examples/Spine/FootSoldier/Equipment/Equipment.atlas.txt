@@ -1,0 +1,34 @@
+
+Equipment.png
+size: 512,128
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Equipment/shield1
+  rotate: true
+  xy: 220, 33
+  size: 71, 118
+  orig: 256, 256
+  offset: 92, 69
+  index: -1
+Equipment/shield2
+  rotate: true
+  xy: 340, 22
+  size: 82, 111
+  orig: 256, 256
+  offset: 87, 72
+  index: -1
+Equipment/sword1
+  rotate: false
+  xy: 2, 2
+  size: 161, 31
+  orig: 512, 256
+  offset: 217, 112
+  index: -1
+Equipment/sword4
+  rotate: false
+  xy: 2, 35
+  size: 216, 69
+  orig: 512, 256
+  offset: 200, 94
+  index: -1

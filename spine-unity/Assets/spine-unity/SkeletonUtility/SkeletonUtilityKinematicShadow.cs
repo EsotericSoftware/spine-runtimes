@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public class SkeletonUtilityKinematicShadow : MonoBehaviour {
 	public bool hideShadow = true;
+	public Transform parent;
 	Dictionary<Transform, Transform> shadowTable;
 	GameObject shadowRoot;
 
@@ -12,7 +13,10 @@ public class SkeletonUtilityKinematicShadow : MonoBehaviour {
 		if (hideShadow)
 			shadowRoot.hideFlags = HideFlags.HideInHierarchy;
 
-		shadowRoot.transform.parent = transform.root;
+		if(parent == null)
+			shadowRoot.transform.parent = transform.root;
+		else
+			shadowRoot.transform.parent = parent;
 
 		shadowTable = new Dictionary<Transform, Transform>();
 
@@ -53,7 +57,7 @@ public class SkeletonUtilityKinematicShadow : MonoBehaviour {
 				continue;
 
 			foreach (var sb in shadowBones) {
-				if (sb.rigidbody == null)
+				if (sb.GetComponent<Rigidbody>() == null)
 					continue;
 
 				if (sb.boneName == b.boneName) {
@@ -68,8 +72,8 @@ public class SkeletonUtilityKinematicShadow : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
-		shadowRoot.rigidbody.MovePosition(transform.position);
-		shadowRoot.rigidbody.MoveRotation(transform.rotation);
+		shadowRoot.GetComponent<Rigidbody>().MovePosition(transform.position);
+		shadowRoot.GetComponent<Rigidbody>().MoveRotation(transform.rotation);
 
 		foreach (var pair in shadowTable) {
 			pair.Value.localPosition = pair.Key.localPosition;

@@ -12,5 +12,9 @@ To run the example:
 
 ## Demos
 
-- [spine-turbulenz Demo](http://esotericsoftware.com/spine/files/demos/turbulenz/example/index.html)
+- [spine-turbulenz Demo](http://esotericsoftware.com/files/runtimes/turbulenz/example/)<br>
   [spine-turbulenz Demo source](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-turbulenz/example/index.html#L21)
+
+## Notes
+
+- Atlas images should not use premultiplied alpha or rotation.

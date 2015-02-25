@@ -13,3 +13,7 @@ Alternatively, the contents of the `spine-c/src`, `spine-c/include` and `spine-s
 ## Examples
 
 - [Simple example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-sfml/example/main.cpp#L61)
+
+## Notes
+
+- Atlas images should not use premultiplied alpha.

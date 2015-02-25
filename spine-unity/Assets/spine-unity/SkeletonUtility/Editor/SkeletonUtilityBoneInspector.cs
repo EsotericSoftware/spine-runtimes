@@ -246,7 +246,7 @@ public class SkeletonUtilityBoneInspector : Editor {
 	bool CanCreateHingeChain () {
 		if (utilityBone == null)
 			return false;
-		if (utilityBone.rigidbody != null)
+		if (utilityBone.GetComponent<Rigidbody>() != null)
 			return false;
 		if (utilityBone.bone != null && utilityBone.bone.Children.Count == 0)
 			return false;
@@ -266,7 +266,7 @@ public class SkeletonUtilityBoneInspector : Editor {
 			AttachRigidbody(utilBone);
 		}
 
-		utilityBone.rigidbody.isKinematic = true;
+		utilityBone.GetComponent<Rigidbody>().isKinematic = true;
 
 		foreach (var utilBone in utilBoneArr) {
 			if (utilBone == utilityBone)
@@ -276,13 +276,13 @@ public class SkeletonUtilityBoneInspector : Editor {
 
 			HingeJoint joint = utilBone.gameObject.AddComponent<HingeJoint>();
 			joint.axis = Vector3.forward;
-			joint.connectedBody = utilBone.transform.parent.rigidbody;
+			joint.connectedBody = utilBone.transform.parent.GetComponent<Rigidbody>();
 			joint.useLimits = true;
 			JointLimits limits = new JointLimits();
 			limits.min = -20;
 			limits.max = 20;
 			joint.limits = limits;
-			utilBone.rigidbody.mass = utilBone.transform.parent.rigidbody.mass * 0.75f;
+			utilBone.GetComponent<Rigidbody>().mass = utilBone.transform.parent.GetComponent<Rigidbody>().mass * 0.75f;
 		}
 	}
 	

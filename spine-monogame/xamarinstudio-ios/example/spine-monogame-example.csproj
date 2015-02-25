@@ -112,15 +112,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\spine-xna\example\data\goblins-ffd.atlas">
-      <Link>data\goblins-ffd.atlas</Link>
-    </Content>
-    <Content Include="..\..\..\spine-xna\example\data\goblins-ffd.json">
-      <Link>data\goblins-ffd.json</Link>
-    </Content>
-    <Content Include="..\..\..\spine-xna\example\data\goblins-ffd.png">
-      <Link>data\goblins-ffd.png</Link>
-    </Content>
     <Content Include="..\..\..\spine-xna\example\data\raptor.atlas">
       <Link>data\raptor.atlas</Link>
     </Content>
@@ -138,6 +129,15 @@
     </Content>
     <Content Include="..\..\..\spine-xna\example\data\spineboy.png">
       <Link>data\spineboy.png</Link>
+    </Content>
+    <Content Include="..\..\..\spine-xna\example\data\goblins-mesh.png">
+      <Link>data\goblins-mesh.png</Link>
+    </Content>
+    <Content Include="..\..\..\spine-xna\example\data\goblins-mesh.json">
+      <Link>data\goblins-mesh.json</Link>
+    </Content>
+    <Content Include="..\..\..\spine-xna\example\data\goblins-mesh.atlas">
+      <Link>data\goblins-mesh.atlas</Link>
     </Content>
   </ItemGroup>
 </Project>
