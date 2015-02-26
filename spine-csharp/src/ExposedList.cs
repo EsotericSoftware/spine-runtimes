@@ -1,702 +1,583 @@
-﻿using System;
+﻿//
+// System.Collections.Generic.List
+//
+// Authors:
+//    Ben Maurer (bmaurer@ximian.com)
+//    Martin Baulig (martin@ximian.com)
+//    Carlos Alberto Cortez (calberto.cortez@gmail.com)
+//    David Waite (mass@akuma.org)
+//
+// Copyright (C) 2004-2005 Novell, Inc (http://www.novell.com)
+// Copyright (C) 2005 David Waite
+//
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+// 
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Spine {
-	/// <summary>
-	/// Represents a strongly typed list of objects that can be accessed by index. Provides methods to search and manipulate lists.
-	/// </summary>
-	/// <typeparam name="T">The type of elements in the list.</typeparam>
-	public class ExposedList<T> : IEnumerable<T> {
-		private const int defaultCapacity = 4;
-		private static readonly T[] emptyArray = new T[0];
-		public T[] Items;
+    [Serializable]
+    [DebuggerDisplay("Count={Count}")]
+    public class ExposedList<T> : IEnumerable<T> {
+        public T[] Items;
+        public int Count;
 
-		private int size;
+        private const int DefaultCapacity = 4;
+        private static readonly T[] EmptyArray = new T[0];
+        private int _version;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="T:System.Collections.Generic.List`1" /> class that is empty and has the default initial capacity.
-		/// </summary>
-		public ExposedList() {
-			Items = emptyArray;
-		}
+        public ExposedList() {
+            Items = EmptyArray;
+        }
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="T:System.Collections.Generic.List`1" /> class that is empty and has the specified initial capacity.
-		/// </summary>
-		/// <param name="capacity">The number of elements that the new list can initially store.</param>
-		/// <exception cref="T:System.ArgumentOutOfRangeException">
-		/// <paramref name="capacity" /> is less than 0.
-		/// </exception>
-		public ExposedList(int capacity) {
-			if (capacity < 0) {
-				throw new ArgumentOutOfRangeException("capacity");
-			}
-			Items = new T[capacity];
-		}
+        public ExposedList(IEnumerable<T> collection) {
+            CheckCollection(collection);
 
- 
-		// Constructs a List, copying the contents of the given collection. The
-		// size and capacity of the new list will both be equal to the size of the 
-		// given collection. 
-		//
-		public ExposedList(IEnumerable<T> collection) { 
-			if (collection==null)
-				throw new ArgumentNullException("collection");
+            // initialize to needed size (if determinable)
+            ICollection<T> c = collection as ICollection<T>;
+            if (c == null) {
+                Items = EmptyArray;
+                AddEnumerable(collection);
+            } else {
+                Items = new T[c.Count];
+                AddCollection(c);
+            }
+        }
 
-			ICollection<T> c = collection as ICollection<T>; 
-			if( c != null) {
-				int count = c.Count; 
-				Items = new T[count]; 
-				c.CopyTo(Items, 0);
-				size = count; 
-			}
-			else {
-				size = 0;
-				Items = new T[defaultCapacity]; 
+        public ExposedList(int capacity) {
+            if (capacity < 0)
+                throw new ArgumentOutOfRangeException("capacity");
+            Items = new T[capacity];
+        }
 
-				using(IEnumerator<T> en = collection.GetEnumerator()) { 
-					while(en.MoveNext()) { 
-						Add(en.Current);
-					} 
-				}
-			}
-		}
+        internal ExposedList(T[] data, int size) {
+            Items = data;
+            Count = size;
+        }
 
-		/// <summary>
-		/// Gets or sets the total number of elements the internal data structure can hold without resizing.
-		/// </summary>
-		/// <returns>
-		/// The number of elements that the <see cref="T:System.Collections.Generic.List`1" /> can contain before resizing is required.
-		/// </returns>
-		/// <exception cref="T:System.ArgumentOutOfRangeException">
-		/// <see cref="P:System.Collections.Generic.List`1.Capacity" /> is set to a value that is less than
-		/// <see
-		///	 cref="P:System.Collections.Generic.List`1.Count" />
-		/// .
-		/// </exception>
-		/// <exception cref="T:System.OutOfMemoryException">There is not enough memory available on the system.</exception>
-		public int Capacity {
-			get {
-				return Items.Length;
-			}
-			set {
-				if (value == Items.Length) {
-					return;
-				}
-				if (value < size) {
-					throw new ArgumentOutOfRangeException("value");
-				}
-				if (value > 0) {
-					var objArray = new T[value];
-					if (size > 0) {
-						Array.Copy(Items, 0, objArray, 0, size);
-					}
-					Items = objArray;
-				} else {
-					Items = emptyArray;
-				}
-			}
-		}
+        public void Add(T item) {
+            // If we check to see if we need to grow before trying to grow
+            // we can speed things up by 25%
+            if (Count == Items.Length)
+                GrowIfNeeded(1);
+            Items[Count ++] = item;
+            _version++;
+        }
 
-		/// <summary>
-		/// Gets the number of elements actually contained in the <see cref="T:System.Collections.Generic.List`1" />.
-		/// </summary>
-		/// <returns>
-		/// The number of elements actually contained in the <see cref="T:System.Collections.Generic.List`1" />.
-		/// </returns>
-		public int Count {
-			get {
-				return size;
-			}
-		}
+        private void GrowIfNeeded(int newCount) {
+            int minimumSize = Count + newCount;
+            if (minimumSize > Items.Length)
+                Capacity = Math.Max(Math.Max(Capacity * 2, DefaultCapacity), minimumSize);
+        }
 
-		/// <summary>
-		/// Adds an object to the end of the <see cref="T:System.Collections.Generic.List`1" />.
-		/// </summary>
-		/// <param name="item">
-		/// The object to be added to the end of the <see cref="T:System.Collections.Generic.List`1" />. The value can be null for reference types.
-		/// </param>
-		public void Add(T item) {
-			if (size == Items.Length) {
-				EnsureCapacity(size + 1);
-			}
-			Items[size++] = item;
-		}
+        private void CheckRange(int idx, int count) {
+            if (idx < 0)
+                throw new ArgumentOutOfRangeException("index");
 
-		/// <summary>
-		/// Removes all elements from the <see cref="T:System.Collections.Generic.List`1" />.
-		/// </summary>
-		public void Clear() {
-			if (size > 0) {
-				Array.Clear(Items, 0, size);
-				size = 0;
-			}
-		}
+            if (count < 0)
+                throw new ArgumentOutOfRangeException("count");
 
-		/// <summary>
-		/// Determines whether an element is in the <see cref="T:System.Collections.Generic.List`1" />.
-		/// </summary>
-		/// <returns>
-		/// true if <paramref name="item" /> is found in the <see cref="T:System.Collections.Generic.List`1" />; otherwise, false.
-		/// </returns>
-		/// <param name="item">
-		/// The object to locate in the <see cref="T:System.Collections.Generic.List`1" />. The value can be null for reference types.
-		/// </param>
-		public bool Contains(T item) {
-			if (item == null) {
-				for (int index = 0; index < size; ++index) {
-					if (Items[index] == null) {
-						return true;
-					}
-				}
-				return false;
-			} else {
-				EqualityComparer<T> @default = EqualityComparer<T>.Default;
-				for (int index = 0; index < size; ++index) {
-					if (@default.Equals(Items[index], item)) {
-						return true;
-					}
-				}
-				return false;
-			}
-		}
+            if ((uint) idx + (uint) count > (uint) Count)
+                throw new ArgumentException("index and count exceed length of list");
+        }
 
-		/// <summary>
-		/// Copies the entire <see cref="T:System.Collections.Generic.List`1" /> to a compatible one-dimensional array, starting at the specified index of the target array.
-		/// </summary>
-		/// <param name="array">
-		/// The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// . The <see cref="T:System.Array" /> must have zero-based indexing.
-		/// </param>
-		/// <param name="arrayIndex">
-		/// The zero-based index in <paramref name="array" /> at which copying begins.
-		/// </param>
-		/// <exception cref="T:System.ArgumentNullException">
-		/// <paramref name="array" /> is null.
-		/// </exception>
-		/// <exception cref="T:System.ArgumentOutOfRangeException">
-		/// <paramref name="arrayIndex" /> is less than 0.
-		/// </exception>
-		/// <exception cref="T:System.ArgumentException">
-		/// The number of elements in the source <see cref="T:System.Collections.Generic.List`1" /> is greater than the available space from
-		/// <paramref
-		///	 name="arrayIndex" />
-		/// to the end of the destination <paramref name="array" />.
-		/// </exception>
-		public void CopyTo(T[] array, int arrayIndex) {
-			Array.Copy(Items, 0, array, arrayIndex, size);
-		}
+        private void AddCollection(ICollection<T> collection) {
+            int collectionCount = collection.Count;
+            if (collectionCount == 0)
+                return;
 
-		/// <summary>
-		/// Searches for the specified object and returns the zero-based index of the first occurrence within the entire
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// .
-		/// </summary>
-		/// <returns>
-		/// The zero-based index of the first occurrence of <paramref name="item" /> within the entire
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// , if found; otherwise, –1.
-		/// </returns>
-		/// <param name="item">
-		/// The object to locate in the <see cref="T:System.Collections.Generic.List`1" />. The value can be null for reference types.
-		/// </param>
-		public int IndexOf(T item) {
-			return Array.IndexOf(Items, item, 0, size);
-		}
+            GrowIfNeeded(collectionCount);
+            collection.CopyTo(Items, Count);
+            Count += collectionCount;
+        }
 
-		/// <summary>
-		/// Inserts an element into the <see cref="T:System.Collections.Generic.List`1" /> at the specified index.
-		/// </summary>
-		/// <param name="index">
-		/// The zero-based index at which <paramref name="item" /> should be inserted.
-		/// </param>
-		/// <param name="item">The object to insert. The value can be null for reference types.</param>
-		/// <exception cref="T:System.ArgumentOutOfRangeException">
-		/// <paramref name="index" /> is less than 0.-or-<paramref name="index" /> is greater than
-		/// <see
-		///	 cref="P:System.Collections.Generic.List`1.Count" />
-		/// .
-		/// </exception>
-		public void Insert(int index, T item) {
-			if ((uint) index > (uint) size) {
-				throw new ArgumentOutOfRangeException("index");
-			}
-			if (size == Items.Length) {
-				EnsureCapacity(size + 1);
-			}
-			if (index < size) {
-				Array.Copy(Items, index, Items, index + 1, size - index);
-			}
-			Items[index] = item;
-			++size;
-		}
+        private void AddEnumerable(IEnumerable<T> enumerable) {
+            foreach (T t in enumerable) {
+                Add(t);
+            }
+        }
 
-		/// <summary>
-		/// Removes the first occurrence of a specific object from the <see cref="T:System.Collections.Generic.List`1" />.
-		/// </summary>
-		/// <returns>
-		/// true if <paramref name="item" /> is successfully removed; otherwise, false.  This method also returns false if
-		/// <paramref
-		///	 name="item" />
-		/// was not found in the <see cref="T:System.Collections.Generic.List`1" />.
-		/// </returns>
-		/// <param name="item">
-		/// The object to remove from the <see cref="T:System.Collections.Generic.List`1" />. The value can be null for reference types.
-		/// </param>
-		public bool Remove(T item) {
-			int index = IndexOf(item);
-			if (index < 0) {
-				return false;
-			}
-			RemoveAt(index);
-			return true;
-		}
+        public void AddRange(IEnumerable<T> collection) {
+            CheckCollection(collection);
 
-		/// <summary>
-		/// Removes the element at the specified index of the <see cref="T:System.Collections.Generic.List`1" />.
-		/// </summary>
-		/// <param name="index">The zero-based index of the element to remove.</param>
-		/// <exception cref="T:System.ArgumentOutOfRangeException">
-		/// <paramref name="index" /> is less than 0.-or-<paramref name="index" /> is equal to or greater than
-		/// <see
-		///	 cref="P:System.Collections.Generic.List`1.Count" />
-		/// .
-		/// </exception>
-		public void RemoveAt(int index) {
-			if ((uint) index >= (uint) size) {
-				throw new ArgumentOutOfRangeException();
-			}
-			--size;
-			if (index < size) {
-				Array.Copy(Items, index + 1, Items, index, size - index);
-			}
-			Items[size] = default (T);
-		}
+            ICollection<T> c = collection as ICollection<T>;
+            if (c != null)
+                AddCollection(c);
+            else
+                AddEnumerable(collection);
+            _version++;
+        }
 
-		/// <summary>
-		/// Copies the entire <see cref="T:System.Collections.Generic.List`1" /> to a compatible one-dimensional array, starting at the beginning of the target array.
-		/// </summary>
-		/// <param name="array">
-		/// The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// . The <see cref="T:System.Array" /> must have zero-based indexing.
-		/// </param>
-		/// <exception cref="T:System.ArgumentNullException">
-		/// <paramref name="array" /> is null.
-		/// </exception>
-		/// <exception cref="T:System.ArgumentException">
-		/// The number of elements in the source <see cref="T:System.Collections.Generic.List`1" /> is greater than the number of elements that the destination
-		/// <paramref
-		///	 name="array" />
-		/// can contain.
-		/// </exception>
-		public void CopyTo(T[] array) {
-			CopyTo(array, 0);
-		}
+        public int BinarySearch(T item) {
+            return Array.BinarySearch<T>(Items, 0, Count, item);
+        }
 
-		/// <summary>
-		/// Copies a range of elements from the <see cref="T:System.Collections.Generic.List`1" /> to a compatible one-dimensional array, starting at the specified index of the target array.
-		/// </summary>
-		/// <param name="index">
-		/// The zero-based index in the source <see cref="T:System.Collections.Generic.List`1" /> at which copying begins.
-		/// </param>
-		/// <param name="array">
-		/// The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// . The <see cref="T:System.Array" /> must have zero-based indexing.
-		/// </param>
-		/// <param name="arrayIndex">
-		/// The zero-based index in <paramref name="array" /> at which copying begins.
-		/// </param>
-		/// <param name="count">The number of elements to copy.</param>
-		/// <exception cref="T:System.ArgumentNullException">
-		/// <paramref name="array" /> is null.
-		/// </exception>
-		/// <exception cref="T:System.ArgumentOutOfRangeException">
-		/// <paramref name="index" /> is less than 0.-or-<paramref name="arrayIndex" /> is less than 0.-or-
-		/// <paramref
-		///	 name="count" />
-		/// is less than 0.
-		/// </exception>
-		/// <exception cref="T:System.ArgumentException">
-		/// <paramref name="index" /> is equal to or greater than the <see cref="P:System.Collections.Generic.List`1.Count" /> of the source
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// .-or-The number of elements from <paramref name="index" /> to the end of the source
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// is greater than the available space from
-		/// <paramref
-		///	 name="arrayIndex" />
-		/// to the end of the destination <paramref name="array" />.
-		/// </exception>
-		public void CopyTo(int index, T[] array, int arrayIndex, int count) {
-			if (size - index < count) {
-				throw new ArgumentException("Invalid length");
-			}
-			Array.Copy(Items, index, array, arrayIndex, count);
-		}
+        public int BinarySearch(T item, IComparer<T> comparer) {
+            return Array.BinarySearch<T>(Items, 0, Count, item, comparer);
+        }
 
-		private void EnsureCapacity(int min) {
-			if (Items.Length >= min) {
-				return;
-			}
-			int num = Items.Length == 0 ? 4 : Items.Length * 2;
-			if (num < min) {
-				num = min;
-			}
-			Capacity = num;
-		}
+        public int BinarySearch(int index, int count, T item, IComparer<T> comparer) {
+            CheckRange(index, count);
+            return Array.BinarySearch<T>(Items, index, count, item, comparer);
+        }
 
-		/// <summary>
-		/// Creates a shallow copy of a range of elements in the source <see cref="T:System.Collections.Generic.List`1" />.
-		/// </summary>
-		/// <returns>
-		/// A shallow copy of a range of elements in the source <see cref="T:System.Collections.Generic.List`1" />.
-		/// </returns>
-		/// <param name="index">
-		/// The zero-based <see cref="T:System.Collections.Generic.List`1" /> index at which the range starts.
-		/// </param>
-		/// <param name="count">The number of elements in the range.</param>
-		/// <exception cref="T:System.ArgumentOutOfRangeException">
-		/// <paramref name="index" /> is less than 0.-or-<paramref name="count" /> is less than 0.
-		/// </exception>
-		/// <exception cref="T:System.ArgumentException">
-		/// <paramref name="index" /> and <paramref name="count" /> do not denote a valid range of elements in the
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// .
-		/// </exception>
-		public ExposedList<T> GetRange(int index, int count) {
-			if (index < 0 || count < 0) {
-				throw new ArgumentOutOfRangeException("index || count");
-			}
-			if (size - index < count) {
-				throw new ArgumentException("Invalid length");
-			}
-			var list = new ExposedList<T>(count);
-			Array.Copy(Items, index, list.Items, 0, count);
-			list.size = count;
-			return list;
-		}
+        public void Clear() {
+            Array.Clear(Items, 0, Items.Length);
+            Count = 0;
+            _version++;
+        }
 
-		/// <summary>
-		/// Searches for the specified object and returns the zero-based index of the first occurrence within the range of elements in the
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// that extends from the specified index to the last element.
-		/// </summary>
-		/// <returns>
-		/// The zero-based index of the first occurrence of <paramref name="item" /> within the range of elements in the
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// that extends from <paramref name="index" /> to the last element, if found; otherwise, –1.
-		/// </returns>
-		/// <param name="item">
-		/// The object to locate in the <see cref="T:System.Collections.Generic.List`1" />. The value can be null for reference types.
-		/// </param>
-		/// <param name="index">The zero-based starting index of the search. 0 (zero) is valid in an empty list.</param>
-		/// <exception cref="T:System.ArgumentOutOfRangeException">
-		/// <paramref name="index" /> is outside the range of valid indexes for the
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// .
-		/// </exception>
-		public int IndexOf(T item, int index) {
-			if (index > size) {
-				throw new ArgumentOutOfRangeException("index");
-			}
-			return Array.IndexOf(Items, item, index, size - index);
-		}
+        public bool Contains(T item) {
+            return Array.IndexOf<T>(Items, item, 0, Count) != -1;
+        }
 
-		/// <summary>
-		/// Searches for the specified object and returns the zero-based index of the first occurrence within the range of elements in the
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// that starts at the specified index and contains the specified number of elements.
-		/// </summary>
-		/// <returns>
-		/// The zero-based index of the first occurrence of <paramref name="item" /> within the range of elements in the
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// that starts at <paramref name="index" /> and contains
-		/// <paramref
-		///	 name="count" />
-		/// number of elements, if found; otherwise, –1.
-		/// </returns>
-		/// <param name="item">
-		/// The object to locate in the <see cref="T:System.Collections.Generic.List`1" />. The value can be null for reference types.
-		/// </param>
-		/// <param name="index">The zero-based starting index of the search. 0 (zero) is valid in an empty list.</param>
-		/// <param name="count">The number of elements in the section to search.</param>
-		/// <exception cref="T:System.ArgumentOutOfRangeException">
-		/// <paramref name="index" /> is outside the range of valid indexes for the
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// .-or-<paramref name="count" /> is less than 0.-or-
-		/// <paramref
-		///	 name="index" />
-		/// and <paramref name="count" /> do not specify a valid section in the
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// .
-		/// </exception>
-		public int IndexOf(T item, int index, int count) {
-			if (index > size) {
-				throw new ArgumentOutOfRangeException("index");
-			}
-			if (count < 0 || index > size - count) {
-				throw new ArgumentOutOfRangeException("count");
-			}
-			return Array.IndexOf(Items, item, index, count);
-		}
+        public ExposedList<TOutput> ConvertAll<TOutput>(Converter<T, TOutput> converter) {
+            if (converter == null)
+                throw new ArgumentNullException("converter");
+            ExposedList<TOutput> u = new ExposedList<TOutput>(Count);
+            for (int i = 0; i < Count; i++)
+                u.Items[i] = converter(Items[i]);
 
-		/// <summary>
-		/// Searches for the specified object and returns the zero-based index of the last occurrence within the entire
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// .
-		/// </summary>
-		/// <returns>
-		/// The zero-based index of the last occurrence of <paramref name="item" /> within the entire the
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// , if found; otherwise, –1.
-		/// </returns>
-		/// <param name="item">
-		/// The object to locate in the <see cref="T:System.Collections.Generic.List`1" />. The value can be null for reference types.
-		/// </param>
-		public int LastIndexOf(T item) {
-			return LastIndexOf(item, size - 1, size);
-		}
+            u.Count = Count;
+            return u;
+        }
 
-		/// <summary>
-		/// Searches for the specified object and returns the zero-based index of the last occurrence within the range of elements in the
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// that extends from the first element to the specified index.
-		/// </summary>
-		/// <returns>
-		/// The zero-based index of the last occurrence of <paramref name="item" /> within the range of elements in the
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// that extends from the first element to <paramref name="index" />, if found; otherwise, –1.
-		/// </returns>
-		/// <param name="item">
-		/// The object to locate in the <see cref="T:System.Collections.Generic.List`1" />. The value can be null for reference types.
-		/// </param>
-		/// <param name="index">The zero-based starting index of the backward search.</param>
-		/// <exception cref="T:System.ArgumentOutOfRangeException">
-		/// <paramref name="index" /> is outside the range of valid indexes for the
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// .
-		/// </exception>
-		public int LastIndexOf(T item, int index) {
-			if (index >= size) {
-				throw new ArgumentOutOfRangeException("index");
-			}
-			return LastIndexOf(item, index, index + 1);
-		}
+        public void CopyTo(T[] array) {
+            Array.Copy(Items, 0, array, 0, Count);
+        }
 
-		/// <summary>
-		/// Searches for the specified object and returns the zero-based index of the last occurrence within the range of elements in the
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// that contains the specified number of elements and ends at the specified index.
-		/// </summary>
-		/// <returns>
-		/// The zero-based index of the last occurrence of <paramref name="item" /> within the range of elements in the
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// that contains <paramref name="count" /> number of elements and ends at
-		/// <paramref
-		///	 name="index" />
-		/// , if found; otherwise, –1.
-		/// </returns>
-		/// <param name="item">
-		/// The object to locate in the <see cref="T:System.Collections.Generic.List`1" />. The value can be null for reference types.
-		/// </param>
-		/// <param name="index">The zero-based starting index of the backward search.</param>
-		/// <param name="count">The number of elements in the section to search.</param>
-		/// <exception cref="T:System.ArgumentOutOfRangeException">
-		/// <paramref name="index" /> is outside the range of valid indexes for the
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// .-or-<paramref name="count" /> is less than 0.-or-
-		/// <paramref
-		///	 name="index" />
-		/// and <paramref name="count" /> do not specify a valid section in the
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// .
-		/// </exception>
-		public int LastIndexOf(T item, int index, int count) {
-			if (size == 0) {
-				return -1;
-			}
-			if (index < 0 || count < 0) {
-				throw new ArgumentOutOfRangeException("index || count");
-			}
-			if (index >= size || count > index + 1) {
-				throw new ArgumentOutOfRangeException("size || count");
-			}
-			return Array.LastIndexOf(Items, item, index, count);
-		}
+        public void CopyTo(T[] array, int arrayIndex) {
+            Array.Copy(Items, 0, array, arrayIndex, Count);
+        }
 
-		/// <summary>
-		/// Removes a range of elements from the <see cref="T:System.Collections.Generic.List`1" />.
-		/// </summary>
-		/// <param name="index">The zero-based starting index of the range of elements to remove.</param>
-		/// <param name="count">The number of elements to remove.</param>
-		/// <exception cref="T:System.ArgumentOutOfRangeException">
-		/// <paramref name="index" /> is less than 0.-or-<paramref name="count" /> is less than 0.
-		/// </exception>
-		/// <exception cref="T:System.ArgumentException">
-		/// <paramref name="index" /> and <paramref name="count" /> do not denote a valid range of elements in the
-		/// <see
-		///	 cref="T:System.Collections.Generic.List`1" />
-		/// .
-		/// </exception>
-		public void RemoveRange(int index, int count) {
-			if (index < 0 || count < 0) {
-				throw new ArgumentOutOfRangeException("index || count");
-			}
-			if (size - index < count) {
-				throw new ArgumentException("Invalid length");
-			}
-			if (count <= 0) {
-				return;
-			}
-			size -= count;
-			if (index < size) {
-				Array.Copy(Items, index + count, Items, index, size - index);
-			}
-			Array.Clear(Items, size, count);
-		}
+        public void CopyTo(int index, T[] array, int arrayIndex, int count) {
+            CheckRange(index, count);
+            Array.Copy(Items, index, array, arrayIndex, count);
+        }
 
-		public void TrimExcess() { 
-			int threshold = (int)(((double) Items.Length) * 0.9);
-			if( size < threshold ) { 
-				Capacity = size;
-			}
-		}
+        public bool Exists(Predicate<T> match) {
+            CheckMatch(match);
+            return GetIndex(0, Count, match) != -1;
+        }
 
-		//public void Sort(Comparison<T> comparison)
-		//{
-		//  if (comparison == null)
-		//	ThrowHelper.ThrowArgumentNullException(ExceptionArgument.match);
-		//  if (this.size <= 0)
-		//	return;
-		//  Array.Sort<T>(this._items, 0, this.size, (IComparer<T>) new Array.FunctorComparer<T>(comparison));
-		//}
+        public T Find(Predicate<T> match) {
+            CheckMatch(match);
+            int i = GetIndex(0, Count, match);
+            return (i != -1) ? Items[i] : default (T);
+        }
 
-		/// <summary>
-		/// Sorts the elements in the entire <see cref="T:System.Collections.Generic.List`1" /> using the specified
-		/// <see
-		///	 cref="T:System.Comparison`1" />
-		/// .
-		/// </summary>
-		/// <param name="comparison">
-		/// The <see cref="T:System.Comparison`1" /> to use when comparing elements.
-		/// </param>
-		/// <exception cref="T:System.ArgumentNullException">
-		/// <paramref name="comparison" /> is null.
-		/// </exception>
-		/// <exception cref="T:System.ArgumentException">
-		/// The implementation of <paramref name="comparison" /> caused an error during the sort. For example,
-		/// <paramref
-		///	 name="comparison" />
-		/// might not return 0 when comparing an item with itself.
-		/// </exception>
-		/// <summary>
-		/// Copies the elements of the <see cref="T:System.Collections.Generic.List`1" /> to a new array.
-		/// </summary>
-		/// <returns>
-		/// An array containing copies of the elements of the <see cref="T:System.Collections.Generic.List`1" />.
-		/// </returns>
-		public T[] ToArray() {
-			var objArray = new T[size];
-			Array.Copy(Items, 0, objArray, 0, size);
-			return objArray;
-		}
+        private static void CheckMatch(Predicate<T> match) {
+            if (match == null)
+                throw new ArgumentNullException("match");
+        }
 
-		// Returns an enumerator for this list with the given
-		// permission for removal of elements. If modifications made to the list 
-		// while an enumeration is in progress, the MoveNext and
-		// GetObject methods of the enumerator will throw an exception.
-		//
-		public Enumerator GetEnumerator() { 
-			return new Enumerator(this);
-		} 
+        public ExposedList<T> FindAll(Predicate<T> match) {
+            CheckMatch(match);
+            return FindAllList(match);
+        }
 
-		IEnumerator<T> IEnumerable<T>.GetEnumerator() { 
-			return new Enumerator(this);
-		}
+        private ExposedList<T> FindAllList(Predicate<T> match) {
+            ExposedList<T> results = new ExposedList<T>();
+            for (int i = 0; i < Count; i++)
+                if (match(Items[i]))
+                    results.Add(Items[i]);
 
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { 
-			return new Enumerator(this);
-		} 
+            return results;
+        }
 
-		[Serializable()] 
-		public struct Enumerator : IEnumerator<T>, System.Collections.IEnumerator
-		{
-			private readonly ExposedList<T> list;
-			private int index; 
-			private T current; 
- 
-			internal Enumerator(ExposedList<T> list) {
-				this.list = list; 
-				index = 0;
-				current = default(T);
-			} 
+        public int FindIndex(Predicate<T> match) {
+            CheckMatch(match);
+            return GetIndex(0, Count, match);
+        }
 
-			public void Dispose() { 
-			} 
+        public int FindIndex(int startIndex, Predicate<T> match) {
+            CheckMatch(match);
+            CheckIndex(startIndex);
+            return GetIndex(startIndex, Count - startIndex, match);
+        }
 
-			public bool MoveNext() { 
-				ExposedList<T> localList = list;
+        public int FindIndex(int startIndex, int count, Predicate<T> match) {
+            CheckMatch(match);
+            CheckRange(startIndex, count);
+            return GetIndex(startIndex, count, match);
+        }
 
-				if (((uint)index < (uint)localList.size)) {
-					current = localList.Items[index]; 
-					index++; 
-					return true;
-				} 
-				return MoveNextRare();
-			}
+        private int GetIndex(int startIndex, int count, Predicate<T> match) {
+            int end = startIndex + count;
+            for (int i = startIndex; i < end; i ++)
+                if (match(Items[i]))
+                    return i;
 
-			private bool MoveNextRare() 
-			{
-				index = list.size + 1;
-				current = default(T);
-				return false;
-			} 
+            return -1;
+        }
 
-			public T Current { 
-				get { 
-					return current;
-				} 
-			}
+        public T FindLast(Predicate<T> match) {
+            CheckMatch(match);
+            int i = GetLastIndex(0, Count, match);
+            return i == -1 ? default (T) : Items[i];
+        }
 
-			Object System.Collections.IEnumerator.Current {
-				get { 
-					if( index == 0 || index == list.size + 1)
-						throw new InvalidOperationException();
-					return Current;
-				} 
-			}
+        public int FindLastIndex(Predicate<T> match) {
+            CheckMatch(match);
+            return GetLastIndex(0, Count, match);
+        }
 
-			void System.Collections.IEnumerator.Reset() {
-				index = 0;
-				current = default(T); 
-			}
+        public int FindLastIndex(int startIndex, Predicate<T> match) {
+            CheckMatch(match);
+            CheckIndex(startIndex);
+            return GetLastIndex(0, startIndex + 1, match);
+        }
 
-		}
-	}
+        public int FindLastIndex(int startIndex, int count, Predicate<T> match) {
+            CheckMatch(match);
+            int start = startIndex - count + 1;
+            CheckRange(start, count);
+            return GetLastIndex(start, count, match);
+        }
+
+        private int GetLastIndex(int startIndex, int count, Predicate<T> match) {
+            // unlike FindLastIndex, takes regular params for search range
+            for (int i = startIndex + count; i != startIndex;)
+                if (match(Items[--i]))
+                    return i;
+            return -1;
+        }
+
+        public void ForEach(Action<T> action) {
+            if (action == null)
+                throw new ArgumentNullException("action");
+            for (int i = 0; i < Count; i++)
+                action(Items[i]);
+        }
+
+        public Enumerator GetEnumerator() {
+            return new Enumerator(this);
+        }
+
+        public ExposedList<T> GetRange(int index, int count) {
+            CheckRange(index, count);
+            T[] tmpArray = new T[count];
+            Array.Copy(Items, index, tmpArray, 0, count);
+            return new ExposedList<T>(tmpArray, count);
+        }
+
+        public int IndexOf(T item) {
+            return Array.IndexOf<T>(Items, item, 0, Count);
+        }
+
+        public int IndexOf(T item, int index) {
+            CheckIndex(index);
+            return Array.IndexOf<T>(Items, item, index, Count - index);
+        }
+
+        public int IndexOf(T item, int index, int count) {
+            if (index < 0)
+                throw new ArgumentOutOfRangeException("index");
+
+            if (count < 0)
+                throw new ArgumentOutOfRangeException("count");
+
+            if ((uint) index + (uint) count > (uint) Count)
+                throw new ArgumentOutOfRangeException("index and count exceed length of list");
+
+            return Array.IndexOf<T>(Items, item, index, count);
+        }
+
+        private void Shift(int start, int delta) {
+            if (delta < 0)
+                start -= delta;
+
+            if (start < Count)
+                Array.Copy(Items, start, Items, start + delta, Count - start);
+
+            Count += delta;
+
+            if (delta < 0)
+                Array.Clear(Items, Count, -delta);
+        }
+
+        private void CheckIndex(int index) {
+            if (index < 0 || (uint) index > (uint) Count)
+                throw new ArgumentOutOfRangeException("index");
+        }
+
+        public void Insert(int index, T item) {
+            CheckIndex(index);
+            if (Count == Items.Length)
+                GrowIfNeeded(1);
+            Shift(index, 1);
+            Items[index] = item;
+            _version++;
+        }
+
+        private void CheckCollection(IEnumerable<T> collection) {
+            if (collection == null)
+                throw new ArgumentNullException("collection");
+        }
+
+        public void InsertRange(int index, IEnumerable<T> collection) {
+            CheckCollection(collection);
+            CheckIndex(index);
+            if (collection == this) {
+                T[] buffer = new T[Count];
+                CopyTo(buffer, 0);
+                GrowIfNeeded(Count);
+                Shift(index, buffer.Length);
+                Array.Copy(buffer, 0, Items, index, buffer.Length);
+            } else {
+                ICollection<T> c = collection as ICollection<T>;
+                if (c != null)
+                    InsertCollection(index, c);
+                else
+                    InsertEnumeration(index, collection);
+            }
+            _version++;
+        }
+
+        private void InsertCollection(int index, ICollection<T> collection) {
+            int collectionCount = collection.Count;
+            GrowIfNeeded(collectionCount);
+
+            Shift(index, collectionCount);
+            collection.CopyTo(Items, index);
+        }
+
+        private void InsertEnumeration(int index, IEnumerable<T> enumerable) {
+            foreach (T t in enumerable)
+                Insert(index++, t);
+        }
+
+        public int LastIndexOf(T item) {
+            return Array.LastIndexOf<T>(Items, item, Count - 1, Count);
+        }
+
+        public int LastIndexOf(T item, int index) {
+            CheckIndex(index);
+            return Array.LastIndexOf<T>(Items, item, index, index + 1);
+        }
+
+        public int LastIndexOf(T item, int index, int count) {
+            if (index < 0)
+                throw new ArgumentOutOfRangeException("index", index, "index is negative");
+
+            if (count < 0)
+                throw new ArgumentOutOfRangeException("count", count, "count is negative");
+
+            if (index - count + 1 < 0)
+                throw new ArgumentOutOfRangeException("count", count, "count is too large");
+
+            return Array.LastIndexOf<T>(Items, item, index, count);
+        }
+
+        public bool Remove(T item) {
+            int loc = IndexOf(item);
+            if (loc != -1)
+                RemoveAt(loc);
+
+            return loc != -1;
+        }
+
+        public int RemoveAll(Predicate<T> match) {
+            CheckMatch(match);
+            int i = 0;
+            int j = 0;
+
+            // Find the first item to remove
+            for (i = 0; i < Count; i++)
+                if (match(Items[i]))
+                    break;
+
+            if (i == Count)
+                return 0;
+
+            _version++;
+
+            // Remove any additional items
+            for (j = i + 1; j < Count; j++) {
+                if (!match(Items[j]))
+                    Items[i++] = Items[j];
+            }
+            if (j - i > 0)
+                Array.Clear(Items, i, j - i);
+
+            Count = i;
+            return (j - i);
+        }
+
+        public void RemoveAt(int index) {
+            if (index < 0 || (uint) index >= (uint) Count)
+                throw new ArgumentOutOfRangeException("index");
+            Shift(index, -1);
+            Array.Clear(Items, Count, 1);
+            _version++;
+        }
+
+        public void RemoveRange(int index, int count) {
+            CheckRange(index, count);
+            if (count > 0) {
+                Shift(index, -count);
+                Array.Clear(Items, Count, count);
+                _version++;
+            }
+        }
+
+        public void Reverse() {
+            Array.Reverse(Items, 0, Count);
+            _version++;
+        }
+
+        public void Reverse(int index, int count) {
+            CheckRange(index, count);
+            Array.Reverse(Items, index, count);
+            _version++;
+        }
+
+        public void Sort() {
+            Array.Sort<T>(Items, 0, Count, Comparer<T>.Default);
+            _version++;
+        }
+
+        public void Sort(IComparer<T> comparer) {
+            Array.Sort<T>(Items, 0, Count, comparer);
+            _version++;
+        }
+
+        public void Sort(Comparison<T> comparison) {
+            Array.Sort<T>(Items, comparison);
+            _version++;
+        }
+
+        public void Sort(int index, int count, IComparer<T> comparer) {
+            CheckRange(index, count);
+            Array.Sort<T>(Items, index, count, comparer);
+            _version++;
+        }
+
+        public T[] ToArray() {
+            T[] t = new T[Count];
+            Array.Copy(Items, t, Count);
+
+            return t;
+        }
+
+        public void TrimExcess() {
+            Capacity = Count;
+        }
+
+        public bool TrueForAll(Predicate<T> match) {
+            CheckMatch(match);
+
+            for (int i = 0; i < Count; i++)
+                if (!match(Items[i]))
+                    return false;
+
+            return true;
+        }
+
+        public int Capacity {
+            get {
+                return Items.Length;
+            }
+            set {
+                if ((uint) value < (uint) Count)
+                    throw new ArgumentOutOfRangeException();
+
+                Array.Resize(ref Items, value);
+            }
+        }
+
+        #region Interface implementations.
+
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() {
+            return GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() {
+            return GetEnumerator();
+        }
+
+        #endregion
+
+        [Serializable]
+        public struct Enumerator : IEnumerator<T>, IDisposable {
+            private ExposedList<T> l;
+            private int next;
+            private int ver;
+
+            private T current;
+
+            internal Enumerator(ExposedList<T> l)
+                : this() {
+                this.l = l;
+                ver = l._version;
+            }
+
+            public void Dispose() {
+                l = null;
+            }
+
+            private void VerifyState() {
+                if (l == null)
+                    throw new ObjectDisposedException(GetType().FullName);
+                if (ver != l._version)
+                    throw new InvalidOperationException(
+                        "Collection was modified; enumeration operation may not execute.");
+            }
+
+            public bool MoveNext() {
+                VerifyState();
+
+                if (next < 0)
+                    return false;
+
+                if (next < l.Count) {
+                    current = l.Items[next++];
+                    return true;
+                }
+
+                next = -1;
+                return false;
+            }
+
+            public T Current {
+                get {
+                    return current;
+                }
+            }
+
+            void IEnumerator.Reset() {
+                VerifyState();
+                next = 0;
+            }
+
+            object IEnumerator.Current {
+                get {
+                    VerifyState();
+                    if (next <= 0)
+                        throw new InvalidOperationException();
+                    return current;
+                }
+            }
+        }
+    }
 }
