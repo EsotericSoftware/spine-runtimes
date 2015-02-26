@@ -233,7 +233,7 @@ namespace Spine {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			Bone bone = skeleton.bones[boneIndex];
+			Bone bone = skeleton.bones.Items[boneIndex];
 
 			float amount;
 
@@ -296,7 +296,7 @@ namespace Spine {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			Bone bone = skeleton.bones[boneIndex];
+			Bone bone = skeleton.bones.Items[boneIndex];
 
 			if (time >= frames[frames.Length - 3]) { // Time is after last frame.
 				bone.x += (bone.data.x + frames[frames.Length - 2] - bone.x) * alpha;
@@ -326,7 +326,7 @@ namespace Spine {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			Bone bone = skeleton.bones[boneIndex];
+			Bone bone = skeleton.bones.Items[boneIndex];
 			if (time >= frames[frames.Length - 3]) { // Time is after last frame.
 				bone.scaleX += (bone.data.scaleX * frames[frames.Length - 2] - bone.scaleX) * alpha;
 				bone.scaleY += (bone.data.scaleY * frames[frames.Length - 1] - bone.scaleY) * alpha;
@@ -402,7 +402,7 @@ namespace Spine {
 				b = prevFrameB + (frames[frameIndex + FRAME_B] - prevFrameB) * percent;
 				a = prevFrameA + (frames[frameIndex + FRAME_A] - prevFrameA) * percent;
 			}
-			Slot slot = skeleton.slots[slotIndex];
+			Slot slot = skeleton.slots.Items[slotIndex];
 			if (alpha < 1) {
 				slot.r += (r - slot.r) * alpha;
 				slot.g += (g - slot.g) * alpha;
@@ -450,7 +450,7 @@ namespace Spine {
 			if (frames[frameIndex] < lastTime) return;
 
 			String attachmentName = attachmentNames[frameIndex];
-			skeleton.slots[slotIndex].Attachment =
+			skeleton.slots.Items[slotIndex].Attachment =
 				 attachmentName == null ? null : skeleton.GetAttachment(slotIndex, attachmentName);
 		}
 	}
@@ -533,15 +533,16 @@ namespace Spine {
 			else
 				frameIndex = Animation.binarySearch(frames, time) - 1;
 
-			List<Slot> drawOrder = skeleton.drawOrder;
-			List<Slot> slots = skeleton.slots;
+			ExposedList<Slot> drawOrder = skeleton.drawOrder;
+			ExposedList<Slot> slots = skeleton.slots;
 			int[] drawOrderToSetupIndex = drawOrders[frameIndex];
 			if (drawOrderToSetupIndex == null) {
 				drawOrder.Clear();
-				drawOrder.AddRange(slots);
+                for (int i = 0, n = slots.Count; i < n; i++)
+				    drawOrder.Add(slots.Items[i]);
 			} else {
 				for (int i = 0, n = drawOrderToSetupIndex.Length; i < n; i++)
-					drawOrder[i] = slots[drawOrderToSetupIndex[i]];
+					drawOrder.Items[i] = slots.Items[drawOrderToSetupIndex[i]];
 			}
 		}
 	}
@@ -570,7 +571,7 @@ namespace Spine {
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
-			Slot slot = skeleton.slots[slotIndex];
+			Slot slot = skeleton.slots.Items[slotIndex];
 			if (slot.attachment != attachment) return;
 
 			float[] frames = this.frames;
@@ -652,7 +653,7 @@ namespace Spine {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			IkConstraint ikConstraint = skeleton.ikConstraints[ikConstraintIndex];
+			IkConstraint ikConstraint = skeleton.ikConstraints.Items[ikConstraintIndex];
 
 			if (time >= frames[frames.Length - 3]) { // Time is after last frame.
 				ikConstraint.mix += (frames[frames.Length - 2] - ikConstraint.mix) * alpha;
@@ -703,7 +704,7 @@ namespace Spine {
 			int frameIndex = (time >= frames[frames.Length - 2] ? frames.Length : Animation.binarySearch(frames, time, 2)) - 2;
 			if (frames[frameIndex] < lastTime) return;
 
-			SetFlip(skeleton.bones[boneIndex], frames[frameIndex + 1] != 0);
+			SetFlip(skeleton.bones.Items[boneIndex], frames[frameIndex + 1] != 0);
 		}
 
 		virtual protected void SetFlip (Bone bone, bool flip) {

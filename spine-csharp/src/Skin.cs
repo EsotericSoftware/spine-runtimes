@@ -77,7 +77,7 @@ namespace Spine {
 		internal void AttachAll (Skeleton skeleton, Skin oldSkin) {
 			foreach (KeyValuePair<KeyValuePair<int, String>, Attachment> entry in oldSkin.attachments) {
 				int slotIndex = entry.Key.Key;
-				Slot slot = skeleton.slots[slotIndex];
+				Slot slot = skeleton.slots.Items[slotIndex];
 				if (slot.attachment == entry.Value) {
 					Attachment attachment = GetAttachment(slotIndex, entry.Key.Value);
 					if (attachment != null) slot.Attachment = attachment;

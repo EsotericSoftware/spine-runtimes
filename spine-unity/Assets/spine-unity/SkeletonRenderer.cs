@@ -173,11 +173,11 @@ public class SkeletonRenderer : MonoBehaviour {
 		int submeshTriangleCount = 0, submeshFirstVertex = 0, submeshStartSlotIndex = 0;
 		Material lastMaterial = null;
 		submeshMaterials.Clear();
-		List<Slot> drawOrder = skeleton.DrawOrder;
+		ExposedList<Slot> drawOrder = skeleton.DrawOrder;
 		int drawOrderCount = drawOrder.Count;
 		bool renderMeshes = this.renderMeshes;
 		for (int i = 0; i < drawOrderCount; i++) {
-			Slot slot = drawOrder[i];
+			Slot slot = drawOrder.Items[i];
 			Attachment attachment = slot.attachment;
 
 			object rendererObject;
@@ -254,7 +254,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		float zSpacing = this.zSpacing;
 		float a = skeleton.a * 255, r = skeleton.r, g = skeleton.g, b = skeleton.b;
 		for (int i = 0; i < drawOrderCount; i++) {
-			Slot slot = drawOrder[i];
+			Slot slot = drawOrder.Items[i];
 			Attachment attachment = slot.attachment;
 			if (attachment is RegionAttachment) {
 				RegionAttachment regionAttachment = (RegionAttachment)attachment;
@@ -413,9 +413,9 @@ public class SkeletonRenderer : MonoBehaviour {
 		}
 
 		// Store triangles.
-		List<Slot> drawOrder = skeleton.DrawOrder;
+		ExposedList<Slot> drawOrder = skeleton.DrawOrder;
 		for (int i = startSlot, triangleIndex = 0; i < endSlot; i++) {
-			Slot slot = drawOrder[i];
+			Slot slot = drawOrder.Items[i];
 			Attachment attachment = slot.attachment;
 			Bone bone = slot.bone;
 			bool flip = frontFacing && ((bone.WorldFlipX != bone.WorldFlipY) != (Mathf.Sign(bone.WorldScaleX) != Mathf.Sign(bone.WorldScaleY)));

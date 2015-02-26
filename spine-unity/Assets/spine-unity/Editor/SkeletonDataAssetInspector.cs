@@ -357,7 +357,7 @@ public class SkeletonDataAssetInspector : Editor {
 		}
 
 		for (int i = m_skeletonAnimation.skeleton.Slots.Count - 1; i >= 0; i--) {
-			Slot slot = m_skeletonAnimation.skeleton.Slots[i];
+			Slot slot = m_skeletonAnimation.skeleton.Slots.Items[i];
 			EditorGUILayout.LabelField(new GUIContent(slot.Data.Name, SpineEditorUtilities.Icons.slot));
 			if (showAttachments) {
 

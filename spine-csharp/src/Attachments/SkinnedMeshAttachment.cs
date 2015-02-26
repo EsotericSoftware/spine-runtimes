@@ -95,7 +95,7 @@ namespace Spine {
 
 		public void ComputeWorldVertices (Slot slot, float[] worldVertices) {
 			Skeleton skeleton = slot.bone.skeleton;
-			List<Bone> skeletonBones = skeleton.bones;
+			ExposedList<Bone> skeletonBones = skeleton.bones;
 			float x = skeleton.x, y = skeleton.y;
 			float[] weights = this.weights;
 			int[] bones = this.bones;
@@ -104,7 +104,7 @@ namespace Spine {
 					float wx = 0, wy = 0;
 					int nn = bones[v++] + v;
 					for (; v < nn; v++, b += 3) {
-						Bone bone = skeletonBones[bones[v]];
+						Bone bone = skeletonBones.Items[bones[v]];
 						float vx = weights[b], vy = weights[b + 1], weight = weights[b + 2];
 						wx += (vx * bone.m00 + vy * bone.m01 + bone.worldX) * weight;
 						wy += (vx * bone.m10 + vy * bone.m11 + bone.worldY) * weight;
@@ -118,7 +118,7 @@ namespace Spine {
 					float wx = 0, wy = 0;
 					int nn = bones[v++] + v;
 					for (; v < nn; v++, b += 3, f += 2) {
-						Bone bone = skeletonBones[bones[v]];
+						Bone bone = skeletonBones.Items[bones[v]];
 						float vx = weights[b] + ffd[f], vy = weights[b + 1] + ffd[f + 1], weight = weights[b + 2];
 						wx += (vx * bone.m00 + vy * bone.m01 + bone.worldX) * weight;
 						wy += (vx * bone.m10 + vy * bone.m11 + bone.worldY) * weight;

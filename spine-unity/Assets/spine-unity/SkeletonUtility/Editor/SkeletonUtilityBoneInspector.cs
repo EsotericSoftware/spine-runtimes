@@ -190,14 +190,14 @@ public class SkeletonUtilityBoneInspector : Editor {
 		}
 	}
 
-	void BoneSelectorContextMenu (string current, List<Bone> bones, string topValue, GenericMenu.MenuFunction2 callback) {
+	void BoneSelectorContextMenu (string current, ExposedList<Bone> bones, string topValue, GenericMenu.MenuFunction2 callback) {
 		GenericMenu menu = new GenericMenu();
 
 		if (topValue != "")
 			menu.AddItem(new GUIContent(topValue), current == topValue, callback, null);
 
 		for (int i = 0; i < bones.Count; i++) {
-			menu.AddItem(new GUIContent(bones[i].Data.Name), bones[i].Data.Name == current, callback, bones[i]);
+			menu.AddItem(new GUIContent(bones.Items[i].Data.Name), bones.Items[i].Data.Name == current, callback, bones.Items[i]);
 		}
 
 		menu.ShowAsContext();

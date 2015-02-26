@@ -640,7 +640,7 @@ public static class SkeletonBaker {
 		skeleton.UpdateWorldTransform();
 
 		float[] floatVerts = new float[attachment.UVs.Length];
-		attachment.ComputeWorldVertices(skeleton.Slots[slotIndex], floatVerts);
+		attachment.ComputeWorldVertices(skeleton.Slots.Items[slotIndex], floatVerts);
 
 		Vector2[] uvs = ExtractUV(attachment.UVs);
 		Vector3[] verts = ExtractVerts(floatVerts);
@@ -807,26 +807,26 @@ public static class SkeletonBaker {
 
 		List<int> ignoreRotateTimelineIndexes = new List<int>();
 
-		if (bakeIK) {
-			foreach (IkConstraint i in skeleton.IkConstraints) {
-				foreach (Bone b in i.Bones) {
-					int index = skeleton.FindBoneIndex(b.Data.Name);
-					ignoreRotateTimelineIndexes.Add(index);
-					BakeBone(b, animation, clip);
-				}
-			}
-		}
+        //if (bakeIK) {
+        //    foreach (IkConstraint i in skeleton.IkConstraints) {
+        //        foreach (Bone b in i.Bones) {
+        //            int index = skeleton.FindBoneIndex(b.Data.Name);
+        //            ignoreRotateTimelineIndexes.Add(index);
+        //            BakeBone(b, animation, clip);
+        //        }
+        //    }
+        //}
 
-		foreach (Bone b in skeleton.Bones) {
-			if (b.Data.InheritRotation == false) {
-				int index = skeleton.FindBoneIndex(b.Data.Name);
+        //foreach (Bone b in skeleton.Bones) {
+        //    if (b.Data.InheritRotation == false) {
+        //        int index = skeleton.FindBoneIndex(b.Data.Name);
 
-				if (ignoreRotateTimelineIndexes.Contains(index) == false) {
-					ignoreRotateTimelineIndexes.Add(index);
-					BakeBone(b, animation, clip);
-				}
-			}
-		}
+        //        if (ignoreRotateTimelineIndexes.Contains(index) == false) {
+        //            ignoreRotateTimelineIndexes.Add(index);
+        //            BakeBone(b, animation, clip);
+        //        }
+        //    }
+        //}
 
 		foreach (Timeline t in timelines) {
 			skeleton.SetToSetupPose();
@@ -911,8 +911,8 @@ public static class SkeletonBaker {
 	static void ParseAttachmentTimeline (Skeleton skeleton, AttachmentTimeline timeline, Dictionary<int, List<string>> slotLookup, AnimationClip clip) {
 		var attachmentNames = slotLookup[timeline.SlotIndex];
 
-		string bonePath = GetPath(skeleton.Slots[timeline.SlotIndex].Bone.Data);
-		string slotPath = bonePath + "/" + skeleton.Slots[timeline.SlotIndex].Data.Name;
+		string bonePath = GetPath(skeleton.Slots.Items[timeline.SlotIndex].Bone.Data);
+		string slotPath = bonePath + "/" + skeleton.Slots.Items[timeline.SlotIndex].Data.Name;
 
 		Dictionary<string, AnimationCurve> curveTable = new Dictionary<string, AnimationCurve>();
 
@@ -923,7 +923,7 @@ public static class SkeletonBaker {
 		float[] frames = timeline.Frames;
 
 		if (frames[0] != 0) {
-			string startingName = skeleton.Slots[timeline.SlotIndex].Data.AttachmentName;
+			string startingName = skeleton.Slots.Items[timeline.SlotIndex].Data.AttachmentName;
 			foreach (var pair in curveTable) {
 				if (startingName == "" || startingName == null) {
 					pair.Value.AddKey(new Keyframe(0, 0, float.PositiveInfinity, float.PositiveInfinity));
@@ -1062,7 +1062,7 @@ public static class SkeletonBaker {
 
 	static void ParseTranslateTimeline (Skeleton skeleton, TranslateTimeline timeline, AnimationClip clip) {
 		var boneData = skeleton.Data.Bones[timeline.BoneIndex];
-		var bone = skeleton.Bones[timeline.BoneIndex];
+		var bone = skeleton.Bones.Items[timeline.BoneIndex];
 
 		AnimationCurve xCurve = new AnimationCurve();
 		AnimationCurve yCurve = new AnimationCurve();
@@ -1208,7 +1208,7 @@ public static class SkeletonBaker {
 
 	static void ParseScaleTimeline (Skeleton skeleton, ScaleTimeline timeline, AnimationClip clip) {
 		var boneData = skeleton.Data.Bones[timeline.BoneIndex];
-		var bone = skeleton.Bones[timeline.BoneIndex];
+		var bone = skeleton.Bones.Items[timeline.BoneIndex];
 
 		AnimationCurve xCurve = new AnimationCurve();
 		AnimationCurve yCurve = new AnimationCurve();
@@ -1341,7 +1341,7 @@ public static class SkeletonBaker {
 
 	static void ParseRotateTimeline (Skeleton skeleton, RotateTimeline timeline, AnimationClip clip) {
 		var boneData = skeleton.Data.Bones[timeline.BoneIndex];
-		var bone = skeleton.Bones[timeline.BoneIndex];
+		var bone = skeleton.Bones.Items[timeline.BoneIndex];
 
 		AnimationCurve curve = new AnimationCurve();
 

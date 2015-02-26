@@ -160,7 +160,7 @@ public class SkeletonUtilityInspector : Editor {
 			List<Attachment> attachments = new List<Attachment>();
 			skin.FindAttachmentsForSlot(i, attachments);
 
-			attachmentTable.Add(skeleton.Slots[i], attachments);
+			attachmentTable.Add(skeleton.Slots.Items[i], attachments);
 		}
 	}
 
