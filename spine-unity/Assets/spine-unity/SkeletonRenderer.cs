@@ -286,12 +286,11 @@ public class SkeletonRenderer : MonoBehaviour {
 				vertices[vertexIndex + 3].y = tempVertices[RegionAttachment.Y3];
 				vertices[vertexIndex + 3].z = z;
 
-				color.a = (byte)(a * slot.a * regionAttachment.a);
+				color.a = slot.data.additiveBlending ? (byte) 0 : (byte)(a * slot.a * regionAttachment.a);
 				color.r = (byte)(r * slot.r * regionAttachment.r * color.a);
 				color.g = (byte)(g * slot.g * regionAttachment.g * color.a);
 				color.b = (byte)(b * slot.b * regionAttachment.b * color.a);
-				if (slot.data.additiveBlending)
-					color.a = 0;
+
 				colors[vertexIndex] = color;
 				colors[vertexIndex + 1] = color;
 				colors[vertexIndex + 2] = color;
@@ -589,7 +588,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		if (mesh == null) return;
 
 		Bounds meshBounds = mesh.bounds;
-		Gizmos.color = Color.red;
+		Gizmos.color = Color.clear;
 		Gizmos.matrix = transform.localToWorldMatrix;
 		Gizmos.DrawCube(meshBounds.center, meshBounds.size);
 	}
