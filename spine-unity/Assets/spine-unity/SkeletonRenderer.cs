@@ -69,8 +69,8 @@ public class SkeletonRenderer : MonoBehaviour {
 	private Color32[] colors;
 	private Vector2[] uvs;
 	private Material[] sharedMaterials = new Material[0];
-	private readonly List<Material> submeshMaterials = new List<Material>();
-	private readonly List<Submesh> submeshes = new List<Submesh>();
+	private readonly ExposedList<Material> submeshMaterials = new ExposedList<Material>();
+	private readonly ExposedList<Submesh> submeshes = new ExposedList<Submesh>();
 
 
 	public virtual void Reset () {
@@ -250,6 +250,14 @@ public class SkeletonRenderer : MonoBehaviour {
 		lastVertexCount = vertexCount;
 
 		// Setup mesh.
+		Vector3 meshBoundsMin;
+		meshBoundsMin.x = float.MaxValue;
+		meshBoundsMin.y = float.MaxValue;
+		meshBoundsMin.z = float.MaxValue;
+		Vector3 meshBoundsMax;
+		meshBoundsMax.x = float.MinValue;
+		meshBoundsMax.y = float.MinValue;
+		meshBoundsMax.z = float.MinValue;
 		float[] tempVertices = this.tempVertices;
 		Vector2[] uvs = this.uvs;
 		Color32[] colors = this.colors;
@@ -299,6 +307,48 @@ public class SkeletonRenderer : MonoBehaviour {
 				uvs[vertexIndex + 3].x = regionUVs[RegionAttachment.X3];
 				uvs[vertexIndex + 3].y = regionUVs[RegionAttachment.Y3];
 
+				// Calculate min/max X
+				if (tempVertices[RegionAttachment.X1] < meshBoundsMin.x)
+					meshBoundsMin.x = tempVertices[RegionAttachment.X1];
+				else if (tempVertices[RegionAttachment.X1] > meshBoundsMax.x)
+					meshBoundsMax.x = tempVertices[RegionAttachment.X1];
+				if (tempVertices[RegionAttachment.X2] < meshBoundsMin.x)
+					meshBoundsMin.x = tempVertices[RegionAttachment.X2];
+				else if (tempVertices[RegionAttachment.X2] > meshBoundsMax.x)
+					meshBoundsMax.x = tempVertices[RegionAttachment.X2];
+				if (tempVertices[RegionAttachment.X3] < meshBoundsMin.x)
+					meshBoundsMin.x = tempVertices[RegionAttachment.X3];
+				else if (tempVertices[RegionAttachment.X3] > meshBoundsMax.x)
+					meshBoundsMax.x = tempVertices[RegionAttachment.X3];
+				if (tempVertices[RegionAttachment.X4] < meshBoundsMin.x)
+					meshBoundsMin.x = tempVertices[RegionAttachment.X4];
+				else if (tempVertices[RegionAttachment.X4] > meshBoundsMax.x)
+					meshBoundsMax.x = tempVertices[RegionAttachment.X4];
+
+				// Calculate min/max Y
+				if (tempVertices[RegionAttachment.Y1] < meshBoundsMin.y)
+					meshBoundsMin.y = tempVertices[RegionAttachment.Y1];
+				else if (tempVertices[RegionAttachment.Y1] > meshBoundsMax.y)
+					meshBoundsMax.y = tempVertices[RegionAttachment.Y1];
+				if (tempVertices[RegionAttachment.Y2] < meshBoundsMin.y)
+					meshBoundsMin.y = tempVertices[RegionAttachment.Y2];
+				else if (tempVertices[RegionAttachment.Y2] > meshBoundsMax.y)
+					meshBoundsMax.y = tempVertices[RegionAttachment.Y2];
+				if (tempVertices[RegionAttachment.Y3] < meshBoundsMin.y)
+					meshBoundsMin.y = tempVertices[RegionAttachment.Y3];
+				else if (tempVertices[RegionAttachment.Y3] > meshBoundsMax.y)
+					meshBoundsMax.y = tempVertices[RegionAttachment.Y3];
+				if (tempVertices[RegionAttachment.Y4] < meshBoundsMin.y)
+					meshBoundsMin.y = tempVertices[RegionAttachment.Y4];
+				else if (tempVertices[RegionAttachment.Y4] > meshBoundsMax.y)
+					meshBoundsMax.y = tempVertices[RegionAttachment.Y4];
+
+				// Calculate min/max Z
+				if (z < meshBoundsMin.z)
+					meshBoundsMin.z = z;
+				else if (z > meshBoundsMax.z)
+					meshBoundsMax.z = z;
+
 				vertexIndex += 4;
 			} else {
 				if (!renderMeshes)
@@ -326,6 +376,19 @@ public class SkeletonRenderer : MonoBehaviour {
 						colors[vertexIndex] = color;
 						uvs[vertexIndex].x = meshUVs[ii];
 						uvs[vertexIndex].y = meshUVs[ii + 1];
+
+						if (tempVertices[ii] < meshBoundsMin.x)
+							meshBoundsMin.x = tempVertices[ii];
+						else if (tempVertices[ii] > meshBoundsMax.x)
+							meshBoundsMax.x = tempVertices[ii];
+						if (tempVertices[ii + 1]< meshBoundsMin.y)
+							meshBoundsMin.y = tempVertices[ii + 1];
+						else if (tempVertices[ii + 1] > meshBoundsMax.y)
+							meshBoundsMax.y = tempVertices[ii + 1];
+						if (z < meshBoundsMin.z)
+							meshBoundsMin.z = z;
+						else if (z > meshBoundsMax.z)
+							meshBoundsMax.z = z;
 					}
 				} else {
 					SkinnedMeshAttachment skinnedMeshAttachment = attachment as SkinnedMeshAttachment;
@@ -351,6 +414,19 @@ public class SkeletonRenderer : MonoBehaviour {
 							colors[vertexIndex] = color;
 							uvs[vertexIndex].x = meshUVs[ii];
 							uvs[vertexIndex].y = meshUVs[ii + 1];
+
+							if (tempVertices[ii] < meshBoundsMin.x)
+								meshBoundsMin.x = tempVertices[ii];
+							else if (tempVertices[ii] > meshBoundsMax.x)
+								meshBoundsMax.x = tempVertices[ii];
+							if (tempVertices[ii + 1]< meshBoundsMin.y)
+								meshBoundsMin.y = tempVertices[ii + 1];
+							else if (tempVertices[ii + 1] > meshBoundsMax.y)
+								meshBoundsMax.y = tempVertices[ii + 1];
+							if (z < meshBoundsMin.z)
+								meshBoundsMin.z = z;
+							else if (z > meshBoundsMax.z)
+								meshBoundsMax.z = z;
 						}
 					}
 				}
@@ -368,8 +444,10 @@ public class SkeletonRenderer : MonoBehaviour {
 		int submeshCount = submeshMaterials.Count;
 		mesh.subMeshCount = submeshCount;
 		for (int i = 0; i < submeshCount; ++i)
-			mesh.SetTriangles(submeshes[i].triangles, i);
-		mesh.RecalculateBounds();
+			mesh.SetTriangles(submeshes.Items[i].triangles, i);
+
+		Vector3 meshBoundsExtents = meshBoundsMax - meshBoundsMin;
+		mesh.bounds = new Bounds(meshBoundsMin + meshBoundsExtents * 0.5f, meshBoundsExtents);
 
 		if (newTriangles && calculateNormals) {
 			Vector3[] normals = new Vector3[vertexCount];
@@ -403,7 +481,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		else if (immutableTriangles)
 			return;
 
-		Submesh submesh = submeshes[submeshIndex];
+		Submesh submesh = submeshes.Items[submeshIndex];
 
 		int[] triangles = submesh.triangles;
 		int trianglesCapacity = triangles.Length;
@@ -504,22 +582,16 @@ public class SkeletonRenderer : MonoBehaviour {
 #if UNITY_EDITOR
 	void OnDrawGizmos () {
 		// Make selection easier by drawing a clear gizmo over the skeleton.
-		if (vertices == null) return;
-		Vector3 gizmosCenter = new Vector3();
-		Vector3 gizmosSize = new Vector3();
-		Vector3 min = new Vector3(float.MaxValue, float.MaxValue, 0f);
-		Vector3 max = new Vector3(float.MinValue, float.MinValue, 0f);
-		foreach (Vector3 vert in vertices) {
-			min = Vector3.Min(min, vert);
-			max = Vector3.Max(max, vert);
-		}
-		float width = max.x - min.x;
-		float height = max.y - min.y;
-		gizmosCenter = new Vector3(min.x + (width / 2f), min.y + (height / 2f), 0f);
-		gizmosSize = new Vector3(width, height, 1f);
-		Gizmos.color = Color.clear;
+		meshFilter = GetComponent<MeshFilter>();
+		if (meshFilter == null) return;
+
+		Mesh mesh = meshFilter.sharedMesh;
+		if (mesh == null) return;
+
+		Bounds meshBounds = mesh.bounds;
+		Gizmos.color = Color.red;
 		Gizmos.matrix = transform.localToWorldMatrix;
-		Gizmos.DrawCube(gizmosCenter, gizmosSize);
+		Gizmos.DrawCube(meshBounds.center, meshBounds.size);
 	}
 #endif
 }
