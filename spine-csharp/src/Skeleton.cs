@@ -139,12 +139,14 @@ namespace Spine {
 		/// <summary>Updates the world transform for each bone and applies IK constraints.</summary>
 		public void UpdateWorldTransform () {
 			ExposedList<Bone> bones = this.bones;
-			for (int ii = 0, nn = bones.Count; ii < nn; ii++) {
-				Bone bone = bones.Items[ii];
-				bone.rotationIK = bone.rotation;
-			}
-			ExposedList<ExposedList<Bone>> boneCache = this.boneCache;
-			ExposedList<IkConstraint> ikConstraints = this.ikConstraints;
+            ExposedList<IkConstraint> ikConstraints = this.ikConstraints;
+		    if (ikConstraints.Count > 0) {
+		        for (int ii = 0, nn = bones.Count; ii < nn; ii++) {
+		            Bone bone = bones.Items[ii];
+		            bone.rotationIK = bone.rotation;
+		        }
+		    }
+		    ExposedList<ExposedList<Bone>> boneCache = this.boneCache;
 			int i = 0, last = boneCache.Count - 1;
 			while (true) {
 				ExposedList<Bone> updateBones = boneCache.Items[i];

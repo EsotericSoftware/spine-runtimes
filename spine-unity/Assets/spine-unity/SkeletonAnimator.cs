@@ -63,6 +63,7 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 	protected event UpdateBonesDelegate _UpdateComplete;
 
 	Dictionary<string, Spine.Animation> animationTable = new Dictionary<string, Spine.Animation>();
+	Dictionary<AnimationClip, string> clipNameTable = new Dictionary<AnimationClip, string>();
 	Animator animator;
 
 	public override void Reset () {
@@ -71,6 +72,7 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 			return;
 
 		animationTable.Clear();
+        clipNameTable.Clear();
 
 		var data = skeletonDataAsset.GetSkeletonData(true);
 
@@ -122,7 +124,7 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 						continue;
 
 					float time = stateInfo.normalizedTime * info.clip.length;
-					animationTable[info.clip.name].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null, weight);
+					animationTable[GetAnimationClipName(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null, weight);
 				}
 
 				foreach (var info in nextClipInfo) {
@@ -131,7 +133,7 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 						continue;
 
 					float time = nextStateInfo.normalizedTime * info.clip.length;
-					animationTable[info.clip.name].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null, weight);
+					animationTable[GetAnimationClipName(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null, weight);
 				}
 			} else if (mode >= MixMode.MixNext) {
 				//apply first non-zero weighted clip
@@ -144,7 +146,7 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 						continue;
 
 					float time = stateInfo.normalizedTime * info.clip.length;
-					animationTable[info.clip.name].Apply(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null);
+					animationTable[GetAnimationClipName(info.clip)].Apply(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null);
 					break;
 				}
 
@@ -156,7 +158,7 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 						continue;
 
 					float time = stateInfo.normalizedTime * info.clip.length;
-					animationTable[info.clip.name].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null, weight);
+					animationTable[GetAnimationClipName(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null, weight);
 				}
 
 				c = 0;
@@ -170,7 +172,7 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 							continue;
 
 						float time = nextStateInfo.normalizedTime * info.clip.length;
-						animationTable[info.clip.name].Apply(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null);
+						animationTable[GetAnimationClipName(info.clip)].Apply(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null);
 						break;
 					}
 				}
@@ -183,7 +185,7 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 						continue;
 
 					float time = nextStateInfo.normalizedTime * info.clip.length;
-					animationTable[info.clip.name].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null, weight);
+					animationTable[GetAnimationClipName(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null, weight);
 				}
 			}
 		}
@@ -202,4 +204,14 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 			_UpdateComplete(this);
 		}
 	}
+
+    private string GetAnimationClipName(AnimationClip clip) {
+        string clipName;
+        if (!clipNameTable.TryGetValue(clip, out clipName)) {
+            clipName = clip.name;
+            clipNameTable.Add(clip, clipName);
+        }
+
+        return clipName;
+    }
 }
