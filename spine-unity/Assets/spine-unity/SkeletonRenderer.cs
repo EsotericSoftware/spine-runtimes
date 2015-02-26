@@ -303,8 +303,8 @@ public class SkeletonRenderer : MonoBehaviour {
 			} else {
 				if (!renderMeshes)
 					continue;
-				if (attachment is MeshAttachment) {
-					MeshAttachment meshAttachment = (MeshAttachment)attachment;
+				MeshAttachment meshAttachment = attachment as MeshAttachment;
+				if (meshAttachment != null) {
 					int meshVertexCount = meshAttachment.vertices.Length;
 					if (tempVertices.Length < meshVertexCount)
 						this.tempVertices = tempVertices = new float[meshVertexCount];
@@ -327,29 +327,31 @@ public class SkeletonRenderer : MonoBehaviour {
 						uvs[vertexIndex].x = meshUVs[ii];
 						uvs[vertexIndex].y = meshUVs[ii + 1];
 					}
-				} else if (attachment is SkinnedMeshAttachment) {
-					SkinnedMeshAttachment meshAttachment = (SkinnedMeshAttachment)attachment;
-					int meshVertexCount = meshAttachment.uvs.Length;
-					if (tempVertices.Length < meshVertexCount)
-						this.tempVertices = tempVertices = new float[meshVertexCount];
-					meshAttachment.ComputeWorldVertices(slot, tempVertices);
+				} else {
+					SkinnedMeshAttachment skinnedMeshAttachment = attachment as SkinnedMeshAttachment;
+					if (skinnedMeshAttachment != null) {
+						int meshVertexCount = skinnedMeshAttachment.uvs.Length;
+						if (tempVertices.Length < meshVertexCount)
+							this.tempVertices = tempVertices = new float[meshVertexCount];
+						skinnedMeshAttachment.ComputeWorldVertices(slot, tempVertices);
 
-					color.a = (byte)(a * slot.a * meshAttachment.a);
-					color.r = (byte)(r * slot.r * meshAttachment.r * color.a);
-					color.g = (byte)(g * slot.g * meshAttachment.g * color.a);
-					color.b = (byte)(b * slot.b * meshAttachment.b * color.a);
-					if (slot.data.additiveBlending)
-						color.a = 0;
+						color.a = (byte)(a * slot.a * skinnedMeshAttachment.a);
+						color.r = (byte)(r * slot.r * skinnedMeshAttachment.r * color.a);
+						color.g = (byte)(g * slot.g * skinnedMeshAttachment.g * color.a);
+						color.b = (byte)(b * slot.b * skinnedMeshAttachment.b * color.a);
+						if (slot.data.additiveBlending)
+							color.a = 0;
 
-					float[] meshUVs = meshAttachment.uvs;
-					float z = i * zSpacing;
-					for (int ii = 0; ii < meshVertexCount; ii += 2, vertexIndex++) {
-						vertices[vertexIndex].x = tempVertices[ii];
-						vertices[vertexIndex].y = tempVertices[ii + 1];
-						vertices[vertexIndex].z = z;
-						colors[vertexIndex] = color;
-						uvs[vertexIndex].x = meshUVs[ii];
-						uvs[vertexIndex].y = meshUVs[ii + 1];
+						float[] meshUVs = skinnedMeshAttachment.uvs;
+						float z = i * zSpacing;
+						for (int ii = 0; ii < meshVertexCount; ii += 2, vertexIndex++) {
+							vertices[vertexIndex].x = tempVertices[ii];
+							vertices[vertexIndex].y = tempVertices[ii + 1];
+							vertices[vertexIndex].z = z;
+							colors[vertexIndex] = color;
+							uvs[vertexIndex].x = meshUVs[ii];
+							uvs[vertexIndex].y = meshUVs[ii + 1];
+						}
 					}
 				}
 			}
