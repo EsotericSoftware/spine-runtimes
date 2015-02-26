@@ -72,7 +72,7 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 			return;
 
 		animationTable.Clear();
-        clipNameTable.Clear();
+		clipNameTable.Clear();
 
 		var data = skeletonDataAsset.GetSkeletonData(true);
 
@@ -205,13 +205,13 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 		}
 	}
 
-    private string GetAnimationClipName(AnimationClip clip) {
-        string clipName;
-        if (!clipNameTable.TryGetValue(clip, out clipName)) {
-            clipName = clip.name;
-            clipNameTable.Add(clip, clipName);
-        }
+	private string GetAnimationClipName(AnimationClip clip) {
+		string clipName;
+		if (!clipNameTable.TryGetValue(clip, out clipName)) {
+			clipName = clip.name;
+			clipNameTable.Add(clip, clipName);
+		}
 
-        return clipName;
-    }
+		return clipName;
+	}
 }
