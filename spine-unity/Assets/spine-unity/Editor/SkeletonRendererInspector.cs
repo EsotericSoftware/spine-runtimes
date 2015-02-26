@@ -37,8 +37,9 @@ public class SkeletonRendererInspector : Editor {
 	protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, submeshSeparators, front;
 	protected bool advancedFoldout;
 
-	private static PropertyInfo SortingLayerNamesProperty;
-	private static MethodInfo GetSortingLayerUserID;
+	private static MethodInfo EditorGUILayoutSortingLayerField;
+	protected SerializedObject rendererSerializedObject;
+	protected SerializedProperty sortingLayerIDProperty;
 
 	protected virtual void OnEnable () {
 		SpineEditorUtilities.ConfirmInitialization();
@@ -51,14 +52,11 @@ public class SkeletonRendererInspector : Editor {
 		submeshSeparators = serializedObject.FindProperty("submeshSeparators");
 		front = serializedObject.FindProperty("frontFacing");
 
+		if(EditorGUILayoutSortingLayerField == null)
+			EditorGUILayoutSortingLayerField = typeof(EditorGUILayout).GetMethod("SortingLayerField", BindingFlags.Static | BindingFlags.NonPublic);
 
-		var unityInternalEditorUtility = Type.GetType("UnityEditorInternal.InternalEditorUtility, UnityEditor");
-
-		if(SortingLayerNamesProperty == null)
-			SortingLayerNamesProperty = unityInternalEditorUtility.GetProperty("sortingLayerNames", BindingFlags.Static | BindingFlags.NonPublic);
-
-		if(GetSortingLayerUserID == null) 
-			GetSortingLayerUserID = unityInternalEditorUtility.GetMethod("GetSortingLayerUserID", BindingFlags.Static | BindingFlags.NonPublic);
+		rendererSerializedObject = new SerializedObject(((SkeletonRenderer)target).renderer);
+		sortingLayerIDProperty = rendererSerializedObject.FindProperty("m_SortingLayerID");
 	}
 
 	protected virtual void gui () {
@@ -108,30 +106,18 @@ public class SkeletonRendererInspector : Editor {
 		{
 			var renderer = component.GetComponent<Renderer>();
 			if(renderer != null) {
-				var sortingLayerNames = GetSortingLayerNames();
+				EditorGUI.BeginChangeCheck();
 
-				if (sortingLayerNames != null) {
-					var layerName = SortingLayerNameOfLayerID(renderer.sortingLayerID);
-
-					int oldIndex = Array.IndexOf(sortingLayerNames, layerName);
-					int newIndex = EditorGUILayout.Popup("Sorting Layer", oldIndex, sortingLayerNames);
-
-					if (newIndex != oldIndex) {
-						Undo.RecordObject(renderer, "Sorting Layer Changed");
-						renderer.sortingLayerID = SortingLayerIdOfLayerIndex(newIndex);
-						EditorUtility.SetDirty(renderer);
-					}
+				if(sortingLayerIDProperty != null) {
+					EditorGUILayoutSortingLayerField.Invoke(null, new object[] { new GUIContent("Sorting Layer"), sortingLayerIDProperty, EditorStyles.popup } );
 				} else {
-					EditorGUI.BeginChangeCheck();
 					renderer.sortingLayerID = EditorGUILayout.IntField("Sorting Layer ID", renderer.sortingLayerID);
-					if(EditorGUI.EndChangeCheck()) {
-						EditorUtility.SetDirty(renderer);
-					}
 				}
 
-				EditorGUI.BeginChangeCheck();
 				renderer.sortingOrder = EditorGUILayout.IntField("Order in Layer", renderer.sortingOrder);
+
 				if(EditorGUI.EndChangeCheck()) {
+					rendererSerializedObject.ApplyModifiedProperties();
 					EditorUtility.SetDirty(renderer);
 				}
 			}
@@ -166,32 +152,4 @@ public class SkeletonRendererInspector : Editor {
 		}
 	}
 
-	#region Sorting Layers
-	protected static string[] GetSortingLayerNames () {
-		if(SortingLayerNamesProperty == null)
-			return null;
-
-		return SortingLayerNamesProperty.GetValue(null, null) as string[];
-	}
-
-	protected static string SortingLayerNameOfLayerID (int id) {
-		var layerNames = GetSortingLayerNames();
-		if(layerNames == null)
-			return null;
-		
-		for (int i = 0, n = layerNames.Length; i < n; i++) {
-			if (SortingLayerIdOfLayerIndex(i) == id)
-				return layerNames[i];
-		}
-		
-		return null;
-	}
-
-	protected static int SortingLayerIdOfLayerIndex (int index) {
-		if(GetSortingLayerUserID == null) return 0;
-
-		var parameters = new object[] {index};
-		return (int)( GetSortingLayerUserID.Invoke( null, parameters ) );
-	}
-	#endregion
 }
