@@ -76,7 +76,7 @@ public static class SkeletonBaker {
 	/// </summary>
 	const float bakeIncrement = 1 / 60f;
 
-	public static void BakeToPrefab (SkeletonDataAsset skeletonDataAsset, List<Skin> skins, string outputPath = "", bool bakeAnimations = true, bool bakeIK = true, SendMessageOptions eventOptions = SendMessageOptions.DontRequireReceiver) {
+	public static void BakeToPrefab (SkeletonDataAsset skeletonDataAsset, ExposedList<Skin> skins, string outputPath = "", bool bakeAnimations = true, bool bakeIK = true, SendMessageOptions eventOptions = SendMessageOptions.DontRequireReceiver) {
 		if (skeletonDataAsset == null || skeletonDataAsset.GetSkeletonData(true) == null) {
 			Debug.LogError("Could not export Spine Skeleton because SkeletonDataAsset is null or invalid!");
 			return;
@@ -135,7 +135,7 @@ public static class SkeletonBaker {
 			for (int s = 0; s < skeletonData.Slots.Count; s++) {
 				List<string> attachmentNames = new List<string>();
 				for (int i = 0; i < skinCount; i++) {
-					var skin = skins[i];
+					var skin = skins.Items[i];
 					List<string> temp = new List<string>();
 					skin.FindNamesForSlot(s, temp);
 					foreach (string str in temp) {
@@ -216,7 +216,7 @@ public static class SkeletonBaker {
 
 			//create bones
 			for (int i = 0; i < skeletonData.Bones.Count; i++) {
-				var boneData = skeletonData.Bones[i];
+				var boneData = skeletonData.Bones.Items[i];
 				Transform boneTransform = new GameObject(boneData.Name).transform;
 				boneTransform.parent = prefabRoot.transform;
 				boneTable.Add(boneTransform.name, boneTransform);
@@ -225,7 +225,7 @@ public static class SkeletonBaker {
 
 			for (int i = 0; i < skeletonData.Bones.Count; i++) {
 
-				var boneData = skeletonData.Bones[i];
+				var boneData = skeletonData.Bones.Items[i];
 				Transform boneTransform = boneTable[boneData.Name];
 				Transform parentTransform = null;
 				if (i > 0)
@@ -246,7 +246,7 @@ public static class SkeletonBaker {
 
 			//create slots and attachments
 			for (int i = 0; i < skeletonData.Slots.Count; i++) {
-				var slotData = skeletonData.Slots[i];
+				var slotData = skeletonData.Slots.Items[i];
 				Transform slotTransform = new GameObject(slotData.Name).transform;
 				slotTransform.parent = prefabRoot.transform;
 				slotTable.Add(slotData.Name, slotTransform);
@@ -807,26 +807,26 @@ public static class SkeletonBaker {
 
 		List<int> ignoreRotateTimelineIndexes = new List<int>();
 
-        //if (bakeIK) {
-        //    foreach (IkConstraint i in skeleton.IkConstraints) {
-        //        foreach (Bone b in i.Bones) {
-        //            int index = skeleton.FindBoneIndex(b.Data.Name);
-        //            ignoreRotateTimelineIndexes.Add(index);
-        //            BakeBone(b, animation, clip);
-        //        }
-        //    }
-        //}
+		if (bakeIK) {
+			foreach (IkConstraint i in skeleton.IkConstraints) {
+				foreach (Bone b in i.Bones) {
+					int index = skeleton.FindBoneIndex(b.Data.Name);
+					ignoreRotateTimelineIndexes.Add(index);
+					BakeBone(b, animation, clip);
+				}
+			}
+		}
 
-        //foreach (Bone b in skeleton.Bones) {
-        //    if (b.Data.InheritRotation == false) {
-        //        int index = skeleton.FindBoneIndex(b.Data.Name);
+		foreach (Bone b in skeleton.Bones) {
+			if (b.Data.InheritRotation == false) {
+				int index = skeleton.FindBoneIndex(b.Data.Name);
 
-        //        if (ignoreRotateTimelineIndexes.Contains(index) == false) {
-        //            ignoreRotateTimelineIndexes.Add(index);
-        //            BakeBone(b, animation, clip);
-        //        }
-        //    }
-        //}
+				if (ignoreRotateTimelineIndexes.Contains(index) == false) {
+					ignoreRotateTimelineIndexes.Add(index);
+					BakeBone(b, animation, clip);
+				}
+			}
+		}
 
 		foreach (Timeline t in timelines) {
 			skeleton.SetToSetupPose();
@@ -1061,7 +1061,7 @@ public static class SkeletonBaker {
 	}
 
 	static void ParseTranslateTimeline (Skeleton skeleton, TranslateTimeline timeline, AnimationClip clip) {
-		var boneData = skeleton.Data.Bones[timeline.BoneIndex];
+		var boneData = skeleton.Data.Bones.Items[timeline.BoneIndex];
 		var bone = skeleton.Bones.Items[timeline.BoneIndex];
 
 		AnimationCurve xCurve = new AnimationCurve();
@@ -1207,7 +1207,7 @@ public static class SkeletonBaker {
 	}
 
 	static void ParseScaleTimeline (Skeleton skeleton, ScaleTimeline timeline, AnimationClip clip) {
-		var boneData = skeleton.Data.Bones[timeline.BoneIndex];
+		var boneData = skeleton.Data.Bones.Items[timeline.BoneIndex];
 		var bone = skeleton.Bones.Items[timeline.BoneIndex];
 
 		AnimationCurve xCurve = new AnimationCurve();
@@ -1340,7 +1340,7 @@ public static class SkeletonBaker {
 	}
 
 	static void ParseRotateTimeline (Skeleton skeleton, RotateTimeline timeline, AnimationClip clip) {
-		var boneData = skeleton.Data.Bones[timeline.BoneIndex];
+		var boneData = skeleton.Data.Bones.Items[timeline.BoneIndex];
 		var bone = skeleton.Bones.Items[timeline.BoneIndex];
 
 		AnimationCurve curve = new AnimationCurve();

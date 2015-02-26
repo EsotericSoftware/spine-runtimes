@@ -190,18 +190,20 @@ public class SkeletonRenderer : MonoBehaviour {
 			} else {
 				if (!renderMeshes)
 					continue;
-				if (attachment is MeshAttachment) {
-					MeshAttachment meshAttachment = (MeshAttachment)attachment;
+			    MeshAttachment meshAttachment = attachment as MeshAttachment;
+			    if (meshAttachment != null) {
 					rendererObject = meshAttachment.RendererObject;
 					attachmentVertexCount = meshAttachment.vertices.Length >> 1;
 					attachmentTriangleCount = meshAttachment.triangles.Length;
-				} else if (attachment is SkinnedMeshAttachment) {
-					SkinnedMeshAttachment meshAttachment = (SkinnedMeshAttachment)attachment;
-					rendererObject = meshAttachment.RendererObject;
-					attachmentVertexCount = meshAttachment.uvs.Length >> 1;
-					attachmentTriangleCount = meshAttachment.triangles.Length;
-				} else
-					continue;
+				} else {
+			        SkinnedMeshAttachment skinnedMeshAttachment = attachment as SkinnedMeshAttachment;
+			        if (skinnedMeshAttachment != null) {
+			            rendererObject = skinnedMeshAttachment.RendererObject;
+			            attachmentVertexCount = skinnedMeshAttachment.uvs.Length >> 1;
+			            attachmentTriangleCount = skinnedMeshAttachment.triangles.Length;
+			        } else
+			            continue;
+			    }
 			}
 
 			// Populate submesh when material changes.

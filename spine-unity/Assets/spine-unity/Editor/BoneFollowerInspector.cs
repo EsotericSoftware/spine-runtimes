@@ -80,7 +80,7 @@ public class BoneFollowerInspector : Editor {
 
 			bones[0] = "<None>";
 			for (int i = 0; i < bones.Length - 1; i++)
-				bones[i + 1] = component.skeletonRenderer.skeleton.Data.Bones[i].Name;
+				bones[i + 1] = component.skeletonRenderer.skeleton.Data.Bones.Items[i].Name;
 			Array.Sort<String>(bones);
 			int boneIndex = Math.Max(0, Array.IndexOf(bones, boneName.stringValue));
 

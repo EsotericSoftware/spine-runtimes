@@ -178,8 +178,8 @@ namespace Spine {
 		public void SetSlotsToSetupPose () {
 			ExposedList<Slot> slots = this.slots;
 			drawOrder.Clear();
-		    for (int i = 0, n = slots.Count; i < n; i++)
-		        drawOrder.Add(slots.Items[i]);
+			for (int i = 0, n = slots.Count; i < n; i++)
+				drawOrder.Add(slots.Items[i]);
 			
 			for (int i = 0, n = slots.Count; i < n; i++)
 				slots.Items[i].SetToSetupPose(i);

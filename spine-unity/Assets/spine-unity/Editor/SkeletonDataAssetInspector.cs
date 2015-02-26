@@ -186,7 +186,7 @@ public class SkeletonDataAssetInspector : Editor {
 					Skin bakeSkin = m_skeletonAnimation.skeleton.Skin;
 					if (bakeSkin == null) {
 						skinName = "Default";
-						bakeSkin = m_skeletonData.Skins[0];
+						bakeSkin = m_skeletonData.Skins.Items[0];
 					} else
 						skinName = m_skeletonAnimation.skeleton.Skin.Name;
 
@@ -195,7 +195,7 @@ public class SkeletonDataAssetInspector : Editor {
 					try {
 						GUILayout.BeginVertical();
 						if (GUILayout.Button(new GUIContent("Bake " + skinName, SpineEditorUtilities.Icons.unityIcon), GUILayout.Height(32), GUILayout.Width(250)))
-							SkeletonBaker.BakeToPrefab(m_skeletonDataAsset, new List<Skin>(new Skin[] { bakeSkin }), "", bakeAnimations, bakeIK, bakeEventOptions);
+							SkeletonBaker.BakeToPrefab(m_skeletonDataAsset, new ExposedList<Skin>(new Skin[] { bakeSkin }), "", bakeAnimations, bakeIK, bakeEventOptions);
 
 						GUILayout.BeginHorizontal();
 						GUILayout.Label(new GUIContent("Skins", SpineEditorUtilities.Icons.skinsRoot), GUILayout.Width(50));
@@ -259,7 +259,7 @@ public class SkeletonDataAssetInspector : Editor {
 		// Animation names
 		String[] animations = new String[m_skeletonData.Animations.Count];
 		for (int i = 0; i < animations.Length; i++)
-			animations[i] = m_skeletonData.Animations[i].Name;
+			animations[i] = m_skeletonData.Animations.Items[i].Name;
 
 		for (int i = 0; i < fromAnimation.arraySize; i++) {
 			SerializedProperty from = fromAnimation.GetArrayElementAtIndex(i);
@@ -350,7 +350,7 @@ public class SkeletonDataAssetInspector : Editor {
 		List<Attachment> slotAttachments = new List<Attachment>();
 		List<string> slotAttachmentNames = new List<string>();
 		List<string> defaultSkinAttachmentNames = new List<string>();
-		var defaultSkin = m_skeletonData.Skins[0];
+		var defaultSkin = m_skeletonData.Skins.Items[0];
 		Skin skin = m_skeletonAnimation.skeleton.Skin;
 		if (skin == null) {
 			skin = defaultSkin;

@@ -35,8 +35,8 @@ using System.Text;
 namespace Spine {
 	public class AnimationState {
 		private AnimationStateData data;
-		private List<TrackEntry> tracks = new List<TrackEntry>();
-		private List<Event> events = new List<Event>();
+		private ExposedList<TrackEntry> tracks = new ExposedList<TrackEntry>();
+		private ExposedList<Event> events = new ExposedList<Event>();
 		private float timeScale = 1;
 
 		public AnimationStateData Data { get { return data; } }
@@ -60,7 +60,7 @@ namespace Spine {
 		public void Update (float delta) {
 			delta *= timeScale;
 			for (int i = 0; i < tracks.Count; i++) {
-				TrackEntry current = tracks[i];
+				TrackEntry current = tracks.Items[i];
 				if (current == null) continue;
 
 				float trackDelta = delta * current.timeScale;
@@ -92,10 +92,10 @@ namespace Spine {
 		}
 
 		public void Apply (Skeleton skeleton) {
-			List<Event> events = this.events;
+			ExposedList<Event> events = this.events;
 
 			for (int i = 0; i < tracks.Count; i++) {
-				TrackEntry current = tracks[i];
+				TrackEntry current = tracks.Items[i];
 				if (current == null) continue;
 
 				events.Clear();
@@ -124,7 +124,7 @@ namespace Spine {
 				}
 
 				for (int ii = 0, nn = events.Count; ii < nn; ii++) {
-					Event e = events[ii];
+					Event e = events.Items[ii];
 					current.OnEvent(this, i, e);
 					if (Event != null) Event(this, i, e);
 				}
@@ -141,17 +141,17 @@ namespace Spine {
 
 		public void ClearTrack (int trackIndex) {
 			if (trackIndex >= tracks.Count) return;
-			TrackEntry current = tracks[trackIndex];
+			TrackEntry current = tracks.Items[trackIndex];
 			if (current == null) return;
 
 			current.OnEnd(this, trackIndex);
 			if (End != null) End(this, trackIndex);
 
-			tracks[trackIndex] = null;
+			tracks.Items[trackIndex] = null;
 		}
 
 		private TrackEntry ExpandToIndex (int index) {
-			if (index < tracks.Count) return tracks[index];
+			if (index < tracks.Count) return tracks.Items[index];
 			while (index >= tracks.Count)
 				tracks.Add(null);
 			return null;
@@ -177,7 +177,7 @@ namespace Spine {
 				}
 			}
 
-			tracks[index] = entry;
+			tracks.Items[index] = entry;
 
 			entry.OnStart(this, index);
 			if (Start != null) Start(this, index);
@@ -223,7 +223,7 @@ namespace Spine {
 					last = last.next;
 				last.next = entry;
 			} else
-				tracks[trackIndex] = entry;
+				tracks.Items[trackIndex] = entry;
 
 			if (delay <= 0) {
 				if (last != null)
@@ -239,13 +239,13 @@ namespace Spine {
 		/// <returns>May be null.</returns>
 		public TrackEntry GetCurrent (int trackIndex) {
 			if (trackIndex >= tracks.Count) return null;
-			return tracks[trackIndex];
+			return tracks.Items[trackIndex];
 		}
 
 		override public String ToString () {
 			StringBuilder buffer = new StringBuilder();
 			for (int i = 0, n = tracks.Count; i < n; i++) {
-				TrackEntry entry = tracks[i];
+				TrackEntry entry = tracks.Items[i];
 				if (entry == null) continue;
 				if (buffer.Length > 0) buffer.Append(", ");
 				buffer.Append(entry.ToString());

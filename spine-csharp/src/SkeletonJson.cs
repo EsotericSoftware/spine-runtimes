@@ -376,7 +376,7 @@ namespace Spine {
 		}
 
 		private void ReadAnimation (String name, Dictionary<String, Object> map, SkeletonData skeletonData) {
-			var timelines = new List<Timeline>();
+			var timelines = new ExposedList<Timeline>();
 			float duration = 0;
 			float scale = Scale;
 

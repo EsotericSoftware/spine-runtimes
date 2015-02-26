@@ -78,7 +78,7 @@ public class SkeletonRendererInspector : Editor {
 			String[] skins = new String[component.skeleton.Data.Skins.Count];
 			int skinIndex = 0;
 			for (int i = 0; i < skins.Length; i++) {
-				String name = component.skeleton.Data.Skins[i].Name;
+				String name = component.skeleton.Data.Skins.Items[i].Name;
 				skins[i] = name;
 				if (name == initialSkinName.stringValue)
 					skinIndex = i;
