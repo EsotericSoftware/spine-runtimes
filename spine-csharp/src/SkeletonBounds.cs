@@ -58,7 +58,7 @@ namespace Spine {
 
 			boundingBoxes.Clear();
 			for (int i = 0, n = polygons.Count; i < n; i++)
-				polygonPool.Add(polygons.Items[n]);
+				polygonPool.Add(polygons.Items[i]);
 			polygons.Clear();
 
 			for (int i = 0; i < slotCount; i++) {
