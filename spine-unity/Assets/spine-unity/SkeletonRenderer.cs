@@ -29,7 +29,6 @@
  *****************************************************************************/
 
 using System;
-using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 using Spine;
@@ -65,14 +64,13 @@ public class SkeletonRenderer : MonoBehaviour {
 	private Mesh mesh1, mesh2;
 	private bool useMesh1;
 	private float[] tempVertices = new float[8];
-	private int lastVertexCount;
 	private Vector3[] vertices;
 	private Color32[] colors;
 	private Vector2[] uvs;
 	private Material[] sharedMaterials = new Material[0];
+	private LastState lastState = new LastState();
 	private readonly ExposedList<Material> submeshMaterials = new ExposedList<Material>();
 	private readonly ExposedList<Submesh> submeshes = new ExposedList<Submesh>();
-
 
 	public virtual void Reset () {
 		if (meshFilter != null)
@@ -95,9 +93,9 @@ public class SkeletonRenderer : MonoBehaviour {
 				DestroyImmediate(mesh2);
 		}
 
+		lastState = new LastState();
 		mesh1 = null;
 		mesh2 = null;
-		lastVertexCount = 0;
 		vertices = null;
 		colors = null;
 		uvs = null;
@@ -176,11 +174,18 @@ public class SkeletonRenderer : MonoBehaviour {
 		int vertexCount = 0;
 		int submeshTriangleCount = 0, submeshFirstVertex = 0, submeshStartSlotIndex = 0;
 		Material lastMaterial = null;
-		submeshMaterials.Clear();
 		ExposedList<Slot> drawOrder = skeleton.drawOrder;
 		int drawOrderCount = drawOrder.Count;
 		int submeshSeparatorSlotsCount = submeshSeparatorSlots.Count;
 		bool renderMeshes = this.renderMeshes;
+
+		// Clear last state of attachments and submeshes
+		ExposedList<int> attachmentsTriangleCountTemp = lastState.attachmentsTriangleCountTemp;
+		attachmentsTriangleCountTemp.GrowIfNeeded(drawOrderCount);
+		attachmentsTriangleCountTemp.Count = drawOrderCount;
+
+		ExposedList<LastState.AddSubmeshArguments> addSubmeshArgumentsTemp = lastState.addSubmeshArgumentsTemp;
+		addSubmeshArgumentsTemp.Clear(false);
 		for (int i = 0; i < drawOrderCount; i++) {
 			Slot slot = drawOrder.Items[i];
 			Attachment attachment = slot.attachment;
@@ -188,6 +193,7 @@ public class SkeletonRenderer : MonoBehaviour {
 			object rendererObject;
 			int attachmentVertexCount, attachmentTriangleCount;
 
+			attachmentsTriangleCountTemp.Items[i] = -1;
 			RegionAttachment regionAttachment = attachment as RegionAttachment;
 			if (regionAttachment != null) {
 				rendererObject = regionAttachment.RendererObject;
@@ -216,7 +222,9 @@ public class SkeletonRenderer : MonoBehaviour {
 			Material material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
 			if ((lastMaterial != null && lastMaterial.GetInstanceID() != material.GetInstanceID()) || 
 				(submeshSeparatorSlotsCount > 0 && submeshSeparatorSlots.Contains(slot))) {
-				AddSubmesh(lastMaterial, submeshStartSlotIndex, i, submeshTriangleCount, submeshFirstVertex, false);
+				addSubmeshArgumentsTemp.Add(
+					new LastState.AddSubmeshArguments(lastMaterial, submeshStartSlotIndex, i, submeshTriangleCount, submeshFirstVertex, false)
+					);
 				submeshTriangleCount = 0;
 				submeshFirstVertex = vertexCount;
 				submeshStartSlotIndex = i;
@@ -225,15 +233,36 @@ public class SkeletonRenderer : MonoBehaviour {
 
 			submeshTriangleCount += attachmentTriangleCount;
 			vertexCount += attachmentVertexCount;
-		}
-		AddSubmesh(lastMaterial, submeshStartSlotIndex, drawOrderCount, submeshTriangleCount, submeshFirstVertex, true);
 
-		// Set materials.
-		if (submeshMaterials.Count == sharedMaterials.Length)
-			submeshMaterials.CopyTo(sharedMaterials);
-		else
-			sharedMaterials = submeshMaterials.ToArray();
-		meshRenderer.sharedMaterials = sharedMaterials;
+			attachmentsTriangleCountTemp.Items[i] = attachmentTriangleCount;
+		}
+		addSubmeshArgumentsTemp.Add(
+			new LastState.AddSubmeshArguments(lastMaterial, submeshStartSlotIndex, drawOrderCount, submeshTriangleCount, submeshFirstVertex, true)
+			);
+		
+		bool mustUpdateMeshStructure = MustUpdateMeshStructure(attachmentsTriangleCountTemp, addSubmeshArgumentsTemp);
+		if (mustUpdateMeshStructure) {
+			submeshMaterials.Clear();
+			for (int i = 0, n = addSubmeshArgumentsTemp.Count; i < n; i++) {
+				LastState.AddSubmeshArguments arguments = addSubmeshArgumentsTemp.Items[i];
+				AddSubmesh(
+					arguments.material,
+					arguments.startSlot,
+					arguments.endSlot,
+					arguments.triangleCount,
+					arguments.firstVertex,
+					arguments.lastSubmesh
+				);
+			}
+
+			// Set materials.
+			if (submeshMaterials.Count == sharedMaterials.Length)
+				submeshMaterials.CopyTo(sharedMaterials);
+			else
+				sharedMaterials = submeshMaterials.ToArray();
+
+			meshRenderer.sharedMaterials = sharedMaterials;
+		}
 
 		// Ensure mesh data is the right size.
 		Vector3[] vertices = this.vertices;
@@ -248,10 +277,10 @@ public class SkeletonRenderer : MonoBehaviour {
 		} else {
 			// Too many vertices, zero the extra.
 			Vector3 zero = Vector3.zero;
-			for (int i = vertexCount, n = lastVertexCount; i < n; i++)
+			for (int i = vertexCount, n = lastState.vertexCount ; i < n; i++)
 				vertices[i] = zero;
 		}
-		lastVertexCount = vertexCount;
+		lastState.vertexCount = vertexCount;
 
 		// Setup mesh.
 		Vector3 meshBoundsMin;
@@ -440,13 +469,16 @@ public class SkeletonRenderer : MonoBehaviour {
 		mesh.colors32 = colors;
 		mesh.uv = uvs;
 
-		int submeshCount = submeshMaterials.Count;
-		mesh.subMeshCount = submeshCount;
-		for (int i = 0; i < submeshCount; ++i)
-			mesh.SetTriangles(submeshes.Items[i].triangles, i);
+		if (mustUpdateMeshStructure) {
+			int submeshCount = submeshMaterials.Count;
+			mesh.subMeshCount = submeshCount;
+			for (int i = 0; i < submeshCount; ++i)
+				mesh.SetTriangles(submeshes.Items[i].triangles, i);
+		}
 
 		Vector3 meshBoundsExtents = meshBoundsMax - meshBoundsMin;
-		mesh.bounds = new Bounds(meshBoundsMin + meshBoundsExtents * 0.5f, meshBoundsExtents);
+		Vector3 meshBoundsCenter = meshBoundsMin + meshBoundsExtents * 0.5f;
+		mesh.bounds = new Bounds(meshBoundsCenter, meshBoundsExtents);
 
 		if (newTriangles && calculateNormals) {
 			Vector3[] normals = new Vector3[vertexCount];
@@ -467,7 +499,83 @@ public class SkeletonRenderer : MonoBehaviour {
 			}
 		}
 
+		// Update previous state
+		ExposedList<int> attachmentsTriangleCountCurrentMesh = 
+			useMesh1 ? 
+			lastState.attachmentsTriangleCountMesh1 : 
+			lastState.attachmentsTriangleCountMesh2;
+		ExposedList<LastState.AddSubmeshArguments> addSubmeshArgumentsCurrentMesh = 
+			useMesh1 ? 
+			lastState.addSubmeshArgumentsMesh1 : 
+			lastState.addSubmeshArgumentsMesh2;
+
+		attachmentsTriangleCountCurrentMesh.GrowIfNeeded(attachmentsTriangleCountTemp.Capacity);
+		attachmentsTriangleCountCurrentMesh.Count = attachmentsTriangleCountTemp.Count;
+		attachmentsTriangleCountTemp.CopyTo(attachmentsTriangleCountCurrentMesh.Items, 0);
+
+		addSubmeshArgumentsCurrentMesh.GrowIfNeeded(addSubmeshArgumentsTemp.Count);
+		addSubmeshArgumentsCurrentMesh.Count = addSubmeshArgumentsTemp.Count;
+		addSubmeshArgumentsTemp.CopyTo(addSubmeshArgumentsCurrentMesh.Items);
+
+		lastState.frontFacing = frontFacing;
+		lastState.immutableTriangles = immutableTriangles;
+
 		useMesh1 = !useMesh1;
+	}
+
+	private bool MustUpdateMeshStructure(ExposedList<int> attachmentsTriangleCountTemp, ExposedList<LastState.AddSubmeshArguments> addSubmeshArgumentsTemp) {
+		// Check if any mesh settings were changed
+		bool mustUpdateMeshStructure =
+			frontFacing != lastState.frontFacing ||
+			immutableTriangles != lastState.immutableTriangles;
+#if UNITY_EDITOR
+		mustUpdateMeshStructure |= !Application.isPlaying;
+#endif
+
+		if (mustUpdateMeshStructure)
+			return true;
+
+		// Check if any attachments were enabled/disabled
+		// or submesh structures has changed
+		ExposedList<int> attachmentsTriangleCountCurrentMesh = 
+			useMesh1 ? 
+			lastState.attachmentsTriangleCountMesh1 : 
+			lastState.attachmentsTriangleCountMesh2;
+		ExposedList<LastState.AddSubmeshArguments> addSubmeshArgumentsCurrentMesh = 
+			useMesh1 ? 
+			lastState.addSubmeshArgumentsMesh1 : 
+			lastState.addSubmeshArgumentsMesh2;
+
+		// Check attachments
+		int attachmentCount = attachmentsTriangleCountTemp.Count;
+		if (attachmentsTriangleCountCurrentMesh.Count != attachmentCount) {
+			mustUpdateMeshStructure = true;
+		} else {
+			for (int i = 0; i < attachmentCount; i++) {
+				if (attachmentsTriangleCountCurrentMesh.Items[i] != attachmentsTriangleCountTemp.Items[i]) {
+					mustUpdateMeshStructure = true;
+					break;
+				}
+			}
+		}
+
+		if (mustUpdateMeshStructure)
+			return true;
+
+		// Check submeshes
+		int submeshCount = addSubmeshArgumentsTemp.Count;
+		if (addSubmeshArgumentsCurrentMesh.Count != submeshCount) {
+			mustUpdateMeshStructure = true;
+		} else {
+			for (int i = 0; i < submeshCount; i++) {
+				if (!addSubmeshArgumentsCurrentMesh.Items[i].Equals(addSubmeshArgumentsTemp.Items[i])) {
+					mustUpdateMeshStructure = true;
+					break;
+				}
+			}
+		}
+
+		return mustUpdateMeshStructure;
 	}
 
 	/** Stores vertices and triangles for a single material. */
@@ -593,6 +701,47 @@ public class SkeletonRenderer : MonoBehaviour {
 		Gizmos.DrawCube(meshBounds.center, meshBounds.size);
 	}
 #endif
+
+	private class LastState {
+		public bool frontFacing;
+		public bool immutableTriangles;
+		public int vertexCount;
+		public readonly ExposedList<int> attachmentsTriangleCountTemp = new ExposedList<int>();
+		public readonly ExposedList<int> attachmentsTriangleCountMesh1 = new ExposedList<int>();
+		public readonly ExposedList<int> attachmentsTriangleCountMesh2 = new ExposedList<int>();
+		public readonly ExposedList<AddSubmeshArguments> addSubmeshArgumentsTemp = new ExposedList<AddSubmeshArguments>();
+		public readonly ExposedList<AddSubmeshArguments> addSubmeshArgumentsMesh1 = new ExposedList<AddSubmeshArguments>();
+		public readonly ExposedList<AddSubmeshArguments> addSubmeshArgumentsMesh2 = new ExposedList<AddSubmeshArguments>();
+
+		public struct AddSubmeshArguments {
+			public Material material;
+			public int startSlot;
+			public int endSlot;
+			public int triangleCount;
+			public int firstVertex;
+			public bool lastSubmesh;
+
+			public AddSubmeshArguments(Material material, int startSlot, int endSlot, int triangleCount, int firstVertex, bool lastSubmesh) {
+				this.material = material;
+				this.startSlot = startSlot;
+				this.endSlot = endSlot;
+				this.triangleCount = triangleCount;
+				this.firstVertex = firstVertex;
+				this.lastSubmesh = lastSubmesh;
+			}
+
+			public bool Equals(AddSubmeshArguments other) {
+				return
+					!ReferenceEquals(material, null) &&
+					!ReferenceEquals(other.material, null) &&
+					material.GetInstanceID() == other.material.GetInstanceID() &&
+					startSlot == other.startSlot && 
+					endSlot == other.endSlot && 
+					triangleCount == other.triangleCount && 
+					firstVertex == other.firstVertex;
+			}
+		}
+	}
 }
 
 class Submesh {
