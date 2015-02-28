@@ -172,7 +172,7 @@ public class SkeletonUtility : MonoBehaviour {
 
 			ExposedList<IkConstraint> ikConstraints = skeletonRenderer.skeleton.IkConstraints;
 			for (int i = 0, n = ikConstraints.Count; i < n; i++)
-				constraintTargetNames.Add(ikConstraints.Items[n].Target.Data.Name);
+				constraintTargetNames.Add(ikConstraints.Items[i].Target.Data.Name);
 
 			foreach (var b in utilityBones) {
 				if (b.bone == null) {
