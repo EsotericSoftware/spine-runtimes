@@ -90,7 +90,7 @@ namespace Spine {
 			internal static readonly AttachmentKeyTupleComparer Instance = new AttachmentKeyTupleComparer();
 
 			bool IEqualityComparer<AttachmentKeyTuple>.Equals (AttachmentKeyTuple o1, AttachmentKeyTuple o2) {
-			    return o1.SlotIndex == o2.SlotIndex && o1.NameHashCode == o2.NameHashCode;
+			    return o1.SlotIndex == o2.SlotIndex && o1.NameHashCode == o2.NameHashCode && o1.Name == o2.Name;
 			}
 
 			int IEqualityComparer<AttachmentKeyTuple>.GetHashCode (AttachmentKeyTuple o) {
