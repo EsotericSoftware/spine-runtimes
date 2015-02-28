@@ -283,21 +283,22 @@ public class SkeletonRenderer : MonoBehaviour {
 		lastState.vertexCount = vertexCount;
 
 		// Setup mesh.
-		Vector3 meshBoundsMin;
-		meshBoundsMin.x = float.MaxValue;
-		meshBoundsMin.y = float.MaxValue;
-		meshBoundsMin.z = float.MaxValue;
-		Vector3 meshBoundsMax;
-		meshBoundsMax.x = float.MinValue;
-		meshBoundsMax.y = float.MinValue;
-		meshBoundsMax.z = float.MinValue;
+		float zSpacing = this.zSpacing;
 		float[] tempVertices = this.tempVertices;
 		Vector2[] uvs = this.uvs;
 		Color32[] colors = this.colors;
 		int vertexIndex = 0;
-		Color32 color = new Color32();
-		float zSpacing = this.zSpacing;
+		Color32 color;
 		float a = skeleton.a * 255, r = skeleton.r, g = skeleton.g, b = skeleton.b;
+
+		Vector3 meshBoundsMin;
+		meshBoundsMin.x = float.MaxValue;
+		meshBoundsMin.y = float.MaxValue;
+		meshBoundsMin.z = zSpacing > 0f ? 0f : zSpacing * (drawOrderCount - 1);
+		Vector3 meshBoundsMax;
+		meshBoundsMax.x = float.MinValue;
+		meshBoundsMax.y = float.MinValue;
+		meshBoundsMax.z = zSpacing < 0f ? 0f : zSpacing * (drawOrderCount - 1);
 		for (int i = 0; i < drawOrderCount; i++) {
 			Slot slot = drawOrder.Items[i];
 			Attachment attachment = slot.attachment;
@@ -375,12 +376,6 @@ public class SkeletonRenderer : MonoBehaviour {
 				else if (tempVertices[RegionAttachment.Y4] > meshBoundsMax.y)
 					meshBoundsMax.y = tempVertices[RegionAttachment.Y4];
 
-				// Calculate min/max Z
-				if (z < meshBoundsMin.z)
-					meshBoundsMin.z = z;
-				else if (z > meshBoundsMax.z)
-					meshBoundsMax.z = z;
-
 				vertexIndex += 4;
 			} else {
 				if (!renderMeshes)
@@ -415,10 +410,6 @@ public class SkeletonRenderer : MonoBehaviour {
 							meshBoundsMin.y = tempVertices[ii + 1];
 						else if (tempVertices[ii + 1] > meshBoundsMax.y)
 							meshBoundsMax.y = tempVertices[ii + 1];
-						if (z < meshBoundsMin.z)
-							meshBoundsMin.z = z;
-						else if (z > meshBoundsMax.z)
-							meshBoundsMax.z = z;
 					}
 				} else {
 					SkinnedMeshAttachment skinnedMeshAttachment = attachment as SkinnedMeshAttachment;
@@ -451,10 +442,6 @@ public class SkeletonRenderer : MonoBehaviour {
 								meshBoundsMin.y = tempVertices[ii + 1];
 							else if (tempVertices[ii + 1] > meshBoundsMax.y)
 								meshBoundsMax.y = tempVertices[ii + 1];
-							if (z < meshBoundsMin.z)
-								meshBoundsMin.z = z;
-							else if (z > meshBoundsMax.z)
-								meshBoundsMax.z = z;
 						}
 					}
 				}
@@ -553,34 +540,25 @@ public class SkeletonRenderer : MonoBehaviour {
 
 		// Check attachments
 		int attachmentCount = attachmentsTriangleCountTemp.Count;
-		if (attachmentsTriangleCountCurrentMesh.Count != attachmentCount) {
-			mustUpdateMeshStructure = true;
-		} else {
-			for (int i = 0; i < attachmentCount; i++) {
-				if (attachmentsTriangleCountCurrentMesh.Items[i] != attachmentsTriangleCountTemp.Items[i]) {
-					mustUpdateMeshStructure = true;
-					break;
-				}
-			}
-		}
-
-		if (mustUpdateMeshStructure)
+		if (attachmentsTriangleCountCurrentMesh.Count != attachmentCount)
 			return true;
+
+		for (int i = 0; i < attachmentCount; i++) {
+			if (attachmentsTriangleCountCurrentMesh.Items[i] != attachmentsTriangleCountTemp.Items[i])
+				return true;
+		}
 
 		// Check submeshes
 		int submeshCount = addSubmeshArgumentsTemp.Count;
-		if (addSubmeshArgumentsCurrentMesh.Count != submeshCount) {
-			mustUpdateMeshStructure = true;
-		} else {
-			for (int i = 0; i < submeshCount; i++) {
-				if (!addSubmeshArgumentsCurrentMesh.Items[i].Equals(addSubmeshArgumentsTemp.Items[i])) {
-					mustUpdateMeshStructure = true;
-					break;
-				}
-			}
+		if (addSubmeshArgumentsCurrentMesh.Count != submeshCount)
+			return true;
+
+		for (int i = 0; i < submeshCount; i++) {
+			if (!addSubmeshArgumentsCurrentMesh.Items[i].Equals(ref addSubmeshArgumentsTemp.Items[i]))
+				return true;
 		}
 
-		return mustUpdateMeshStructure;
+		return false;
 	}
 
 	/** Stores vertices and triangles for a single material. */
@@ -737,7 +715,7 @@ public class SkeletonRenderer : MonoBehaviour {
 				this.lastSubmesh = lastSubmesh;
 			}
 
-			public bool Equals(AddSubmeshArguments other) {
+			public bool Equals(ref AddSubmeshArguments other) {
 				return
 					!ReferenceEquals(material, null) &&
 					!ReferenceEquals(other.material, null) &&
