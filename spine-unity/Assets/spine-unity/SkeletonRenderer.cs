@@ -517,8 +517,13 @@ public class SkeletonRenderer : MonoBehaviour {
 		addSubmeshArgumentsCurrentMesh.Count = addSubmeshArgumentsTemp.Count;
 		addSubmeshArgumentsTemp.CopyTo(addSubmeshArgumentsCurrentMesh.Items);
 
-		lastState.frontFacing = frontFacing;
-		lastState.immutableTriangles = immutableTriangles;
+		if (useMesh1) {
+			lastState.frontFacingMesh1 = frontFacing;
+			lastState.immutableTrianglesMesh1 = immutableTriangles;
+		} else {
+			lastState.frontFacingMesh2 = frontFacing;
+			lastState.immutableTrianglesMesh2 = immutableTriangles;
+		}
 
 		useMesh1 = !useMesh1;
 	}
@@ -526,8 +531,8 @@ public class SkeletonRenderer : MonoBehaviour {
 	private bool MustUpdateMeshStructure(ExposedList<int> attachmentsTriangleCountTemp, ExposedList<LastState.AddSubmeshArguments> addSubmeshArgumentsTemp) {
 		// Check if any mesh settings were changed
 		bool mustUpdateMeshStructure =
-			frontFacing != lastState.frontFacing ||
-			immutableTriangles != lastState.immutableTriangles;
+			frontFacing != (useMesh1 ? lastState.frontFacingMesh1 : lastState.frontFacingMesh2) ||
+			immutableTriangles != (useMesh1 ? lastState.immutableTrianglesMesh1 : lastState.immutableTrianglesMesh2);
 #if UNITY_EDITOR
 		mustUpdateMeshStructure |= !Application.isPlaying;
 #endif
@@ -703,8 +708,10 @@ public class SkeletonRenderer : MonoBehaviour {
 #endif
 
 	private class LastState {
-		public bool frontFacing;
-		public bool immutableTriangles;
+		public bool frontFacingMesh1;
+		public bool frontFacingMesh2;
+		public bool immutableTrianglesMesh1;
+		public bool immutableTrianglesMesh2;
 		public int vertexCount;
 		public readonly ExposedList<int> attachmentsTriangleCountTemp = new ExposedList<int>();
 		public readonly ExposedList<int> attachmentsTriangleCountMesh1 = new ExposedList<int>();
