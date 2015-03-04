@@ -53,9 +53,9 @@ public class SkeletonRendererInspector : Editor {
 		front = serializedObject.FindProperty("frontFacing");
 
 		if(EditorGUILayoutSortingLayerField == null)
-			EditorGUILayoutSortingLayerField = typeof(EditorGUILayout).GetMethod("SortingLayerField", BindingFlags.Static | BindingFlags.NonPublic);
+			EditorGUILayoutSortingLayerField = typeof(EditorGUILayout).GetMethod("SortingLayerField", BindingFlags.Static | BindingFlags.NonPublic, null, new Type[] { typeof(GUIContent), typeof(SerializedProperty), typeof(GUIStyle) }, null);
 
-		rendererSerializedObject = new SerializedObject(((SkeletonRenderer)target).renderer);
+		rendererSerializedObject = new SerializedObject(((SkeletonRenderer)target).GetComponent<Renderer>());
 		sortingLayerIDProperty = rendererSerializedObject.FindProperty("m_SortingLayerID");
 	}
 
@@ -108,7 +108,7 @@ public class SkeletonRendererInspector : Editor {
 			if(renderer != null) {
 				EditorGUI.BeginChangeCheck();
 
-				if(sortingLayerIDProperty != null) {
+				if(EditorGUILayoutSortingLayerField != null && sortingLayerIDProperty != null) {
 					EditorGUILayoutSortingLayerField.Invoke(null, new object[] { new GUIContent("Sorting Layer"), sortingLayerIDProperty, EditorStyles.popup } );
 				} else {
 					renderer.sortingLayerID = EditorGUILayout.IntField("Sorting Layer ID", renderer.sortingLayerID);
