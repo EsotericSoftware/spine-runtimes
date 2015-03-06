@@ -301,7 +301,7 @@ public class AnimationState {
 		TrackEntry next, previous;
 		Animation animation;
 		boolean loop;
-		float delay, time, lastTime = 0, endTime, timeScale = 1;
+		float delay, time, lastTime = -1, endTime, timeScale = 1;
 		float mixTime, mixDuration;
 		AnimationStateListener listener;
 		float mix = 1;
@@ -312,7 +312,7 @@ public class AnimationState {
 			animation = null;
 			listener = null;
 			timeScale = 1;
-			lastTime = 0;
+			lastTime = -1; // Trigger events on frame zero.
 			time = 0;
 		}
 
