@@ -105,28 +105,24 @@ public static class SkeletonExtensions {
 		bone.Y = position.y;
 	}
 
-	public static void AttachUnitySprite (this Skeleton skeleton, string slotName, Sprite sprite, string shaderName = "Spine/Skeleton") {
-		var loader = new SpriteAttachmentLoader(sprite, Shader.Find(shaderName));
-
-		var att = loader.NewRegionAttachment(null, sprite.name, "");
+	public static Attachment AttachUnitySprite (this Skeleton skeleton, string slotName, Sprite sprite, string shaderName = "Spine/Skeleton") {
+		var att = sprite.ToRegionAttachment(shaderName);
 		skeleton.FindSlot(slotName).Attachment = att;
 
-		loader = null;
+		return att;
 	}
 
-	public static void AddUnitySprite (this SkeletonData skeletonData, string slotName, Sprite sprite, string skinName = "", string shaderName = "Spine/Skeleton") {
-		var loader = new SpriteAttachmentLoader(sprite, Shader.Find(shaderName));
-		var att = loader.NewRegionAttachment(null, sprite.name, "");
+	public static Attachment AddUnitySprite (this SkeletonData skeletonData, string slotName, Sprite sprite, string skinName = "", string shaderName = "Spine/Skeleton") {
+		var att = sprite.ToRegionAttachment(shaderName);
 
 		var slotIndex = skeletonData.FindSlotIndex(slotName);
 		Skin skin = skeletonData.defaultSkin;
 		if (skinName != "")
 			skin = skeletonData.FindSkin(skinName);
 
-
 		skin.AddAttachment(slotIndex, att.Name, att);
 
-		loader = null;
+		return att;
 	}
 
 	public static RegionAttachment ToRegionAttachment (this Sprite sprite, string shaderName = "Spine/Skeleton") {
@@ -135,5 +131,4 @@ public static class SkeletonExtensions {
 		loader = null;
 		return att;
 	}
-
 }
