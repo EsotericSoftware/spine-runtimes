@@ -54,7 +54,7 @@ public class SpriteAttachmentLoader : AttachmentLoader {
 
 	public SpriteAttachmentLoader (Sprite sprite, Shader shader) {
 
-		if (sprite.packingMode == SpritePackingMode.Tight) {
+		if (sprite.packed && sprite.packingMode == SpritePackingMode.Tight) {
 			Debug.LogError("Tight Packer Policy not supported yet!");
 			return;
 		}
