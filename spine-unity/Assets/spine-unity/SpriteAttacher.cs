@@ -25,11 +25,11 @@ public class SpriteAttacher : MonoBehaviour {
 	public void Attach () {
 		var skeletonRenderer = GetComponent<SkeletonRenderer>();
 
-		if(loader == null)
+		if (loader == null)
 			//create loader instance, tell it what sprite and shader to use
 			loader = new SpriteAttachmentLoader(sprite, Shader.Find("Spine/Skeleton"));
 
-		if(attachment == null)
+		if (attachment == null)
 			attachment = loader.NewRegionAttachment(null, sprite.name, "");
 
 		skeletonRenderer.skeleton.FindSlot(slot).Attachment = attachment;
@@ -102,7 +102,7 @@ public class SpriteAttachmentLoader : AttachmentLoader {
 		} else {
 			//Setup new material
 			Material mat = new Material(shader);
-			if(sprite.packed)
+			if (sprite.packed)
 				mat.name = "Unity Packed Sprite Material";
 			else
 				mat.name = sprite.name + " Sprite Material";
@@ -131,7 +131,7 @@ public class SpriteAttachmentLoader : AttachmentLoader {
 
 		//TODO: make sure this rotation thing actually works
 		bool rotated = false;
-		if(sprite.packed)
+		if (sprite.packed)
 			rotated = sprite.packingRotation == SpritePackingRotation.Any;
 
 		//do some math and assign UVs and sizes
