@@ -893,11 +893,14 @@ public class SpineEditorUtilities : AssetPostprocessor {
 		}
 
 
+		EditorGUILayout.LabelField("Auto-Import Settings", EditorStyles.boldLabel);
 		EditorGUI.BeginChangeCheck();
 		defaultMix = EditorGUILayout.FloatField("Default Mix", defaultMix);
 		if (EditorGUI.EndChangeCheck())
 			EditorPrefs.SetFloat(DEFAULT_MIX_KEY, defaultMix);
 
+		GUILayout.Space(20);
+		EditorGUILayout.LabelField("3rd Party Settings", EditorStyles.boldLabel);
 		GUILayout.BeginHorizontal();
 		EditorGUILayout.PrefixLabel("TK2D");
 
