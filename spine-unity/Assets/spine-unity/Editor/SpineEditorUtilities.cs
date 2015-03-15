@@ -379,7 +379,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 						Selection.activeObject = null;
 
 					skeletonDataAsset.Reset();
-					
+
 					string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(skeletonDataAsset));
 					string lastHash = EditorPrefs.GetString(guid + "_hash");
 
@@ -832,7 +832,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 	public static SkeletonAnimator InstantiateSkeletonAnimator (SkeletonDataAsset skeletonDataAsset, Skin skin = null) {
 		GameObject go = new GameObject(skeletonDataAsset.name.Replace("_SkeletonData", ""), typeof(MeshFilter), typeof(MeshRenderer), typeof(Animator), typeof(SkeletonAnimator));
 
-		if(skeletonDataAsset.controller == null){
+		if (skeletonDataAsset.controller == null) {
 			SkeletonBaker.GenerateMecanimAnimationClips(skeletonDataAsset);
 		}
 
@@ -900,7 +900,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 		GUILayout.BeginHorizontal();
 		EditorGUILayout.PrefixLabel("TK2D");
-		
+
 		if (GUILayout.Button("Enable", GUILayout.Width(64)))
 			EnableTK2D();
 		if (GUILayout.Button("Disable", GUILayout.Width(64)))
@@ -911,8 +911,6 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 	//TK2D Support
 	const string SPINE_TK2D_DEFINE = "SPINE_TK2D";
-
-	
 
 	static void EnableTK2D () {
 		bool added = false;
@@ -936,7 +934,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 		}
 	}
 
-	
+
 	static void DisableTK2D () {
 		bool removed = false;
 		foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {
