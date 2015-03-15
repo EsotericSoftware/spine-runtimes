@@ -55,6 +55,10 @@ public class SkeletonDataAssetInspector : Editor {
 
 	private SerializedProperty atlasAssets, skeletonJSON, scale, fromAnimation, toAnimation, duration, defaultMix, controller;
 
+#if SPINE_TK2D
+	private SerializedProperty spriteCollection;
+#endif
+
 	private bool m_initialized = false;
 	private SkeletonDataAsset m_skeletonDataAsset;
 	private SkeletonData m_skeletonData;
@@ -76,6 +80,9 @@ public class SkeletonDataAssetInspector : Editor {
 			duration = serializedObject.FindProperty("duration");
 			defaultMix = serializedObject.FindProperty("defaultMix");
 			controller = serializedObject.FindProperty("controller");
+#if SPINE_TK2D
+			spriteCollection = serializedObject.FindProperty("spriteCollection");
+#endif
 
 			m_skeletonDataAsset = (SkeletonDataAsset)target;
 			m_skeletonDataAssetGUID = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(m_skeletonDataAsset));
@@ -107,7 +114,14 @@ public class SkeletonDataAssetInspector : Editor {
 		serializedObject.Update();
 
 		EditorGUI.BeginChangeCheck();
+#if !SPINE_TK2D
 		EditorGUILayout.PropertyField(atlasAssets, true);
+#else
+		EditorGUI.BeginDisabledGroup(spriteCollection.objectReferenceValue != null);
+		EditorGUILayout.PropertyField(atlasAssets, true);
+		EditorGUI.EndDisabledGroup();
+		EditorGUILayout.PropertyField(spriteCollection, true);
+#endif
 		EditorGUILayout.PropertyField(skeletonJSON);
 		EditorGUILayout.PropertyField(scale);
 		if (EditorGUI.EndChangeCheck()) {

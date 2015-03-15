@@ -205,7 +205,11 @@ public class SkeletonRenderer : MonoBehaviour {
 			}
 
 			// Populate submesh when material changes.
+#if !SPINE_TK2D
 			Material material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
+#else
+			Material material = (rendererObject.GetType() == typeof(Material)) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
+#endif
 
 			if ((lastMaterial != material && lastMaterial != null) || submeshSeparatorSlots.Contains(slot)) {
 				AddSubmesh(lastMaterial, submeshStartSlotIndex, i, submeshTriangleCount, submeshFirstVertex, false);
