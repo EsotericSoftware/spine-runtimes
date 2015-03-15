@@ -36,6 +36,9 @@ using Spine;
 
 public class SkeletonDataAsset : ScriptableObject {
 	public AtlasAsset[] atlasAssets;
+#if SPINE_TK2D
+	public tk2dSpriteCollectionData spriteCollection;
+#endif
 	public TextAsset skeletonJSON;
 	public float scale = 1;
 	public String[] fromAnimation;
@@ -67,12 +70,17 @@ public class SkeletonDataAsset : ScriptableObject {
 			return null;
 		}
 
-
-
+#if !SPINE_TK2D
 		if (atlasAssets.Length == 0) {
 			Reset();
 			return null;
 		}
+#else
+		if (atlasAssets.Length == 0 && spriteCollection == null) {
+			Reset();
+			return null;
+		}
+#endif
 
 		Atlas[] atlasArr = new Atlas[atlasAssets.Length];
 		for (int i = 0; i < atlasAssets.Length; i++) {
@@ -90,8 +98,28 @@ public class SkeletonDataAsset : ScriptableObject {
 		if (skeletonData != null)
 			return skeletonData;
 
-		SkeletonJson json = new SkeletonJson(atlasArr);
+		SkeletonJson json;
+
+#if !SPINE_TK2D
+		json = new SkeletonJson(atlasArr);
 		json.Scale = scale;
+#else
+		if (spriteCollection != null) {
+			json = new SkeletonJson(new SpriteCollectionAttachmentLoader(spriteCollection));
+			json.Scale = (1.0f / (spriteCollection.invOrthoSize * spriteCollection.halfTargetHeight) * scale) * 100f;
+		} else {
+			if (atlasArr.Length == 0) {
+				Reset();
+				if (!quiet)
+					Debug.LogError("Atlas not set for SkeletonData asset: " + name, this);
+				return null;
+			}
+			json = new SkeletonJson(atlasArr);
+			json.Scale = scale;
+		}
+#endif
+
+		
 		try {
 			skeletonData = json.ReadSkeletonData(new StringReader(skeletonJSON.text));
 		} catch (Exception ex) {
