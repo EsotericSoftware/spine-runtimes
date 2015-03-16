@@ -346,14 +346,14 @@ spSlot* SkeletonRenderer::findSlot (const std::string& slotName) const {
 }
 
 bool SkeletonRenderer::setSkin (const std::string& skinName) {
-	return spSkeleton_setSkinByName(_skeleton, skinName.c_str()) ? true : false;
+	return spSkeleton_setSkinByName(_skeleton, skinName.empty() ? 0 : skinName.c_str()) ? true : false;
 }
 
 spAttachment* SkeletonRenderer::getAttachment (const std::string& slotName, const std::string& attachmentName) const {
 	return spSkeleton_getAttachmentForSlotName(_skeleton, slotName.c_str(), attachmentName.c_str());
 }
 bool SkeletonRenderer::setAttachment (const std::string& slotName, const std::string& attachmentName) {
-	return spSkeleton_setAttachment(_skeleton, slotName.c_str(), attachmentName.c_str()) ? true : false;
+	return spSkeleton_setAttachment(_skeleton, slotName.c_str(), attachmentName.empty() ? 0 : attachmentName.c_str()) ? true : false;
 }
 
 spSkeleton* SkeletonRenderer::getSkeleton () {

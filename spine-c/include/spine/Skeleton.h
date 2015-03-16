@@ -117,7 +117,8 @@ int spSkeleton_setSkinByName (spSkeleton* self, const char* skinName);
 spAttachment* spSkeleton_getAttachmentForSlotName (const spSkeleton* self, const char* slotName, const char* attachmentName);
 /* Returns 0 if the slot or attachment was not found. */
 spAttachment* spSkeleton_getAttachmentForSlotIndex (const spSkeleton* self, int slotIndex, const char* attachmentName);
-/* Returns 0 if the slot or attachment was not found. */
+/* Returns 0 if the slot or attachment was not found.
+ * @param attachmentName May be 0. */
 int spSkeleton_setAttachment (spSkeleton* self, const char* slotName, const char* attachmentName);
 
 /* Returns 0 if the IK constraint was not found. */
