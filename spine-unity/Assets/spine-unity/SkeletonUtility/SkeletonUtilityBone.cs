@@ -287,6 +287,10 @@ public class SkeletonUtilityBone : MonoBehaviour {
 		transform.localRotation = Quaternion.Euler(euler);
 	}
 
+	public void AddBoundingBox (string skinName, string slotName, string attachmentName) {
+		SkeletonUtility.AddBoundingBox(bone.skeleton, skinName, slotName, attachmentName, transform);
+	}
+
 	void OnDrawGizmos () {
 		if (NonUniformScaleWarning) {
 			Gizmos.DrawIcon(transform.position + new Vector3(0, 0.128f, 0), "icon-warning");
