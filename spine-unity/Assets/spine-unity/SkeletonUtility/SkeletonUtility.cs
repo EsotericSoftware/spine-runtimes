@@ -57,6 +57,50 @@ public class SkeletonUtility : MonoBehaviour {
 #endif
 	}
 
+	public static PolygonCollider2D AddBoundingBox (Skeleton skeleton, string skinName, string slotName, string attachmentName, Transform parent, bool isTrigger = true) {
+		List<Attachment> attachments = new List<Attachment>();
+		Skin skin;
+
+		if (skinName == "")
+			skinName = skeleton.Data.DefaultSkin.Name;
+
+		skin = skeleton.Data.FindSkin(skinName);
+
+		if (skin == null) {
+			Debug.LogError("Skin " + skinName + " not found!");
+			return null;
+		}
+
+		var attachment = skin.GetAttachment(skeleton.FindSlotIndex(slotName), attachmentName);
+		if (attachment is BoundingBoxAttachment) {
+			GameObject go = new GameObject("[BoundingBox]" + attachmentName);
+			go.transform.parent = parent;
+			go.transform.localPosition = Vector3.zero;
+			go.transform.localRotation = Quaternion.identity;
+			go.transform.localScale = Vector3.one;
+			var collider = go.AddComponent<PolygonCollider2D>();
+			collider.isTrigger = isTrigger;
+			var boundingBox = (BoundingBoxAttachment)attachment;
+			float[] floats = boundingBox.Vertices;
+			int floatCount = floats.Length;
+			int vertCount = floatCount / 2;
+			
+			Vector2[] verts = new Vector2[vertCount];
+			int v = 0;
+			for (int i = 0; i < floatCount; i += 2, v++) {
+				verts[v].x = floats[i];
+				verts[v].y = floats[i+1];
+			}
+
+			collider.SetPath(0, verts);
+
+			return collider;
+			
+		}
+
+		return null;
+	}
+
 
 	public delegate void SkeletonUtilityDelegate ();
 

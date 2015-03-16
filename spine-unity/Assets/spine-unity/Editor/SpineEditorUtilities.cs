@@ -528,6 +528,12 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 				foreach (KeyValuePair<string, object> attachmentEntry in ((Dictionary<string, object>)slotEntry.Value)) {
 					var data = ((Dictionary<string, object>)attachmentEntry.Value);
+					if (data.ContainsKey("type")) {
+						if ((string)data["type"] == "boundingbox") {
+							continue;
+						}
+							
+					}
 					if (data.ContainsKey("path"))
 						requiredPaths.Add((string)data["path"]);
 					else if (data.ContainsKey("name"))
