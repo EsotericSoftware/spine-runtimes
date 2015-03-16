@@ -688,7 +688,9 @@ public class SkeletonDataAssetInspector : Editor {
 			if (!EditorApplication.isPlaying)
 				m_skeletonAnimation.LateUpdate();
 
-			if (drawHandles) {
+
+
+			if (drawHandles) {			
 				Handles.SetCamera(m_previewUtility.m_Camera);
 				Handles.color = m_originColor;
 
@@ -697,10 +699,47 @@ public class SkeletonDataAssetInspector : Editor {
 			}
 
 			this.m_previewUtility.m_Camera.Render();
+
+			if (drawHandles) {
+				Handles.SetCamera(m_previewUtility.m_Camera);
+				foreach (var slot in m_skeletonAnimation.skeleton.Slots) {
+					if (slot.Attachment is BoundingBoxAttachment) {
+
+						DrawBoundingBox(slot.Bone, (BoundingBoxAttachment)slot.Attachment);
+					}
+				}
+			}
+
 			go.GetComponent<Renderer>().enabled = false;
 		}
 
 
+	}
+
+	void DrawBoundingBox (Bone bone, BoundingBoxAttachment box) {
+		float[] worldVerts = new float[box.Vertices.Length];
+		box.ComputeWorldVertices(bone, worldVerts);
+
+		Handles.color = Color.green;
+		Vector3 lastVert = Vector3.back;
+		Vector3 vert = Vector3.back;
+		Vector3 firstVert = new Vector3(worldVerts[0], worldVerts[1], -1);
+		for (int i = 0; i < worldVerts.Length; i += 2) {
+			vert.x = worldVerts[i];
+			vert.y = worldVerts[i + 1];
+
+			if (i > 0) {
+				Handles.DrawLine(lastVert, vert);
+			}
+
+
+			lastVert = vert;
+		}
+
+		Handles.DrawLine(lastVert, firstVert);
+
+		
+		
 	}
 
 	void Update () {
