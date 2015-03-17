@@ -34,8 +34,9 @@ using UnityEngine;
 
 [CustomEditor(typeof(SkeletonRenderer))]
 public class SkeletonRendererInspector : Editor {
+	protected static bool advancedFoldout;
+
 	protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, submeshSeparators, front;
-	protected bool advancedFoldout;
 
 	private static MethodInfo EditorGUILayoutSortingLayerField;
 	protected SerializedObject rendererSerializedObject;
@@ -61,7 +62,6 @@ public class SkeletonRendererInspector : Editor {
 
 	protected virtual void gui () {
 		SkeletonRenderer component = (SkeletonRenderer)target;
-
 		EditorGUILayout.BeginHorizontal();
 		EditorGUILayout.PropertyField(skeletonDataAsset);
 		float reloadWidth = GUI.skin.label.CalcSize(new GUIContent("Reload")).x + 20;
