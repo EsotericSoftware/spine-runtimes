@@ -26,7 +26,7 @@ public class SkeletonUtilitySubmeshRenderer : MonoBehaviour {
 		if (cachedRenderer.sharedMaterials.Length != parentRenderer.sharedMaterials.Length) {
 			sharedMaterials = parentRenderer.sharedMaterials;
 		}
-			
+
 		for (int i = 0; i < sharedMaterials.Length; i++) {
 			if (i == submeshIndex)
 				sharedMaterials[i] = mat;
