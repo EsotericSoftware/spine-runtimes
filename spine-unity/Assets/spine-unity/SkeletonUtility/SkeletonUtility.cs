@@ -380,11 +380,11 @@ public class SkeletonUtility : MonoBehaviour {
 			go.transform.localScale = Vector3.one;
 
 			SkeletonUtilitySubmeshRenderer s = go.AddComponent<SkeletonUtilitySubmeshRenderer>();
-			s.sortingOrder = i * 10;
+			s.GetComponent<Renderer>().sortingOrder = i * 10;
 			s.submeshIndex = i;
-			s.Initialize(GetComponent<Renderer>());
-			s.Update();
 		}
+
+		skeletonRenderer.CollectSubmeshRenderers();
 
 		if (disablePrimaryRenderer)
 			GetComponent<Renderer>().enabled = false;
