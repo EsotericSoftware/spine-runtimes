@@ -1,12 +1,14 @@
 # spine-unity
 
-The spine-unity runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Unity](http://unity3d.com/) directly, without any other plugins. spine-unity is based on [spine-csharp](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-csharp) and is very similar to [spine-tk2d](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-tk2d).
+The spine-unity runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Unity](http://unity3d.com/). spine-unity is based on [spine-csharp](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-csharp).
+
+While spine-unity can render directly with Unity, without the need for any other plugins, it also works with [2D Toolkit](http://www.unikronsoftware.com/2dtoolkit/) and render skeletons from a TK2D texture atlas.
 
 A Spine skeleton is a GameObject and can be used throughout Unity like any other GameObject. It depends only on Unity's `MeshRenderer`, so it is close to the metal. `SkeletonUtility` allows other GameObjects to interact with the Spine skeleton, to control bones in the skeleton, be controlled by the skeleton, attach colliders, etc.
 
 ## Documentation
 
-The [Spine Unity Examples](http://esotericsoftware.com/forum/viewtopic.php?f=3&t=3318) forum thread has many videos on how to use both spine-unity and spine-tk2d features.
+The [Spine Unity Examples](http://esotericsoftware.com/forum/viewtopic.php?f=3&t=3318) forum thread has many videos on how to use spine-unity features.
 
 ## Quick installation
 

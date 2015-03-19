@@ -154,11 +154,15 @@ public class SpineEditorUtilities : AssetPostprocessor {
 	public static string defaultShader = "Spine/Skeleton";
 	public static bool initialized;
 
+	const string DEFAULT_MIX_KEY = "SPINE_DEFAULT_MIX";
+
 	static SpineEditorUtilities () {
 		Initialize();
 	}
 
 	static void Initialize () {
+		defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, 0.2f);
+
 		DirectoryInfo rootDir = new DirectoryInfo(Application.dataPath);
 		FileInfo[] files = rootDir.GetFiles("SpineEditorUtilities.cs", SearchOption.AllDirectories);
 		editorPath = Path.GetDirectoryName(files[0].FullName.Replace("\\", "/").Replace(Application.dataPath, "Assets"));
@@ -375,7 +379,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 						Selection.activeObject = null;
 
 					skeletonDataAsset.Reset();
-					
+
 					string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(skeletonDataAsset));
 					string lastHash = EditorPrefs.GetString(guid + "_hash");
 
@@ -524,6 +528,12 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 				foreach (KeyValuePair<string, object> attachmentEntry in ((Dictionary<string, object>)slotEntry.Value)) {
 					var data = ((Dictionary<string, object>)attachmentEntry.Value);
+					if (data.ContainsKey("type")) {
+						if ((string)data["type"] == "boundingbox") {
+							continue;
+						}
+							
+					}
 					if (data.ContainsKey("path"))
 						requiredPaths.Add((string)data["path"]);
 					else if (data.ContainsKey("name"))
@@ -828,7 +838,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 	public static SkeletonAnimator InstantiateSkeletonAnimator (SkeletonDataAsset skeletonDataAsset, Skin skin = null) {
 		GameObject go = new GameObject(skeletonDataAsset.name.Replace("_SkeletonData", ""), typeof(MeshFilter), typeof(MeshRenderer), typeof(Animator), typeof(SkeletonAnimator));
 
-		if(skeletonDataAsset.controller == null){
+		if (skeletonDataAsset.controller == null) {
 			SkeletonBaker.GenerateMecanimAnimationClips(skeletonDataAsset);
 		}
 
@@ -878,4 +888,82 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 		return anim;
 	}
+
+	static bool preferencesLoaded = false;
+
+	[PreferenceItem("Spine")]
+	static void PreferencesGUI () {
+		if (!preferencesLoaded) {
+			preferencesLoaded = true;
+			defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, 0.2f);
+		}
+
+
+		EditorGUILayout.LabelField("Auto-Import Settings", EditorStyles.boldLabel);
+		EditorGUI.BeginChangeCheck();
+		defaultMix = EditorGUILayout.FloatField("Default Mix", defaultMix);
+		if (EditorGUI.EndChangeCheck())
+			EditorPrefs.SetFloat(DEFAULT_MIX_KEY, defaultMix);
+
+		GUILayout.Space(20);
+		EditorGUILayout.LabelField("3rd Party Settings", EditorStyles.boldLabel);
+		GUILayout.BeginHorizontal();
+		EditorGUILayout.PrefixLabel("TK2D");
+
+		if (GUILayout.Button("Enable", GUILayout.Width(64)))
+			EnableTK2D();
+		if (GUILayout.Button("Disable", GUILayout.Width(64)))
+			DisableTK2D();
+		GUILayout.EndHorizontal();
+	}
+
+
+	//TK2D Support
+	const string SPINE_TK2D_DEFINE = "SPINE_TK2D";
+
+	static void EnableTK2D () {
+		bool added = false;
+		foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {
+			string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group);
+			if (!defines.Contains(SPINE_TK2D_DEFINE)) {
+				added = true;
+				if (defines.EndsWith(";"))
+					defines = defines + SPINE_TK2D_DEFINE;
+				else
+					defines = defines + ";" + SPINE_TK2D_DEFINE;
+
+				PlayerSettings.SetScriptingDefineSymbolsForGroup(group, defines);
+			}
+		}
+
+		if (added) {
+			Debug.LogWarning("Setting Scripting Define Symbol " + SPINE_TK2D_DEFINE);
+		} else {
+			Debug.LogWarning("Already Set Scripting Define Symbol " + SPINE_TK2D_DEFINE);
+		}
+	}
+
+
+	static void DisableTK2D () {
+		bool removed = false;
+		foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {
+			string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group);
+			if (defines.Contains(SPINE_TK2D_DEFINE)) {
+				removed = true;
+				if (defines.Contains(SPINE_TK2D_DEFINE + ";"))
+					defines = defines.Replace(SPINE_TK2D_DEFINE + ";", "");
+				else
+					defines = defines.Replace(SPINE_TK2D_DEFINE, "");
+
+				PlayerSettings.SetScriptingDefineSymbolsForGroup(group, defines);
+			}
+		}
+
+		if (removed) {
+			Debug.LogWarning("Removing Scripting Define Symbol " + SPINE_TK2D_DEFINE);
+		} else {
+			Debug.LogWarning("Already Removed Scripting Define Symbol " + SPINE_TK2D_DEFINE);
+		}
+	}
+
 }

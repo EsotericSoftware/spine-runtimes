@@ -66,6 +66,7 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 			}
 		}
 
+		EditorGUILayout.Space();
 
 		//TODO:  Refactor this to use GenericMenu and callbacks to avoid interfering with control by other behaviours.
 		// Animation name.
@@ -80,10 +81,7 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 					animationIndex = i + 1;
 			}
 		
-			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.LabelField("Animation", GUILayout.Width(EditorGUIUtility.labelWidth));
-			animationIndex = EditorGUILayout.Popup(animationIndex, animations);
-			EditorGUILayout.EndHorizontal();
+			animationIndex = EditorGUILayout.Popup("Animation", animationIndex, animations);
 
 			String selectedAnimationName = animationIndex == 0 ? null : animations[animationIndex];
 			if (component.AnimationName != selectedAnimationName) {
