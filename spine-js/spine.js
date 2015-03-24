@@ -162,13 +162,13 @@ spine.Bone.prototype = {
 spine.Slot = function (slotData, bone) {
 	this.data = slotData;
 	this.bone = bone;
+	this.attachmentVertices: [],
 	this.setToSetupPose();
 };
 spine.Slot.prototype = {
 	r: 1, g: 1, b: 1, a: 1,
 	_attachmentTime: 0,
 	attachment: null,
-	attachmentVertices: [],
 	setAttachment: function (attachment) {
 		this.attachment = attachment;
 		this._attachmentTime = this.bone.skeleton.time;
