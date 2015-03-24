@@ -2089,15 +2089,15 @@ spine.SkeletonJson.prototype = {
 							var nn = verticesValue.length;
 							if (this.scale == 1) {
 								for (var ii = 0; ii < nn; ii++)
-									vertices[ii + start] = verticesValue[ii];
+									vertices[ii + start] = (verticesValue[ii] || 0);
 							} else {
 								for (var ii = 0; ii < nn; ii++)
-									vertices[ii + start] = verticesValue[ii] * this.scale;
+									vertices[ii + start] = (verticesValue[ii] || 0) * this.scale;
 							}
 							if (isMesh) {
 								var meshVertices = attachment.vertices;
 								for (var ii = 0, nn = vertices.length; ii < nn; ii++)
-									vertices[ii] += meshVertices[ii];
+									vertices[ii] = (vertices[ii]||0) + (meshVertices[ii]||0);
 							}
 						}
 						
