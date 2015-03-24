@@ -810,13 +810,15 @@ spine.FfdTimeline.prototype = {
 
 		if (alpha < 1) {
 			for (var i = 0; i < vertexCount; i++) {
-				var prev = prevVertices[i];
-				vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
+				var prev = prevVertices[i]||0;
+				var next = nextVertices[i]||0;
+				vertices[i] += (prev + (next - prev) * percent - vertices[i]) * alpha;
 			}
 		} else {
 			for (var i = 0; i < vertexCount; i++) {
-				var prev = prevVertices[i];
-				vertices[i] = prev + (nextVertices[i] - prev) * percent;
+				var prev = prevVertices[i]||0;
+				var next = nextVertices[i]||0;
+				vertices[i] = prev + (next - prev) * percent;
 			}
 		}
 	}
