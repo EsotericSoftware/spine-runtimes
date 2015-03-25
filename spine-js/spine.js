@@ -99,9 +99,17 @@ spine.Bone.prototype = {
 				this.worldScaleX = this.scaleX;
 				this.worldScaleY = this.scaleY;
 			}
-			this.worldRotation = this.data.inheritRotation ? (parent.worldRotation + this.rotationIK) : this.rotationIK;
 			this.worldFlipX = parent.worldFlipX != this.flipX;
 			this.worldFlipY = parent.worldFlipY != this.flipY;
+			if (this.data.inheritRotation) {
+				if ((this.worldFlipX || this.worldFlipY) && (this.worldFlipX != this.worldFlipY)) {	// xor
+					this.worldRotation = (360-parent.worldRotation) + this.rotationIK;
+				} else {
+					this.worldRotation = parent.worldRotation + this.rotationIK;
+				}
+			} else {
+				this.worldRotation = this.rotationIK;
+			}
 		} else {
 			var skeletonFlipX = this.skeleton.flipX, skeletonFlipY = this.skeleton.flipY;
 			this.worldX = skeletonFlipX ? -this.x : this.x;
