@@ -71,7 +71,7 @@ public class SkeletonRenderer : MonoBehaviour {
 	private Material[] sharedMaterials = new Material[0];
 	private readonly List<Material> submeshMaterials = new List<Material>();
 	private readonly List<Submesh> submeshes = new List<Submesh>();
-
+	private SkeletonUtilitySubmeshRenderer[] submeshRenderers;
 
 	public virtual void Reset () {
 		if (meshFilter != null)
@@ -130,8 +130,16 @@ public class SkeletonRenderer : MonoBehaviour {
 			submeshSeparatorSlots.Add(skeleton.FindSlot(submeshSeparators[i]));
 		}
 
+		CollectSubmeshRenderers();
+
+		LateUpdate();
+
 		if (OnReset != null)
 			OnReset(this);
+	}
+
+	public void CollectSubmeshRenderers () {
+		submeshRenderers = GetComponentsInChildren<SkeletonUtilitySubmeshRenderer>();
 	}
 
 	public virtual void Awake () {
@@ -370,11 +378,21 @@ public class SkeletonRenderer : MonoBehaviour {
 			}
 		}
 
+		if (submeshRenderers.Length > 0) {
+			foreach (var smr in submeshRenderers) {
+				if (smr.submeshIndex < sharedMaterials.Length)
+					smr.SetMesh(this.renderer, useMesh1 ? mesh1 : mesh2, sharedMaterials[smr.submeshIndex]);
+				else
+					smr.GetComponent<Renderer>().enabled = false;
+			}
+		}
+
 		useMesh1 = !useMesh1;
 	}
 
 	/** Stores vertices and triangles for a single material. */
 	private void AddSubmesh (Material material, int startSlot, int endSlot, int triangleCount, int firstVertex, bool lastSubmesh) {
+		
 		int submeshIndex = submeshMaterials.Count;
 		submeshMaterials.Add(material);
 
