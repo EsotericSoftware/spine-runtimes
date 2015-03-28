@@ -198,7 +198,9 @@ public class SkeletonJson {
 		skeletonData.bones.shrink();
 		skeletonData.slots.shrink();
 		skeletonData.skins.shrink();
+		skeletonData.events.shrink();
 		skeletonData.animations.shrink();
+		skeletonData.ikConstraints.shrink();
 		return skeletonData;
 	}
 
