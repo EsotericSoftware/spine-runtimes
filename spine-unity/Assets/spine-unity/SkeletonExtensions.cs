@@ -39,6 +39,20 @@ using Spine;
 
 public static class SkeletonExtensions {
 
+	public static void SetColor (this Skeleton skeleton, Color color) {
+		skeleton.A = color.a;
+		skeleton.R = color.r;
+		skeleton.G = color.g;
+		skeleton.B = color.b;
+	}
+	
+	public static void SetColor (this Skeleton skeleton, Color32 color) {
+		skeleton.A = color.a / 255f;
+		skeleton.R = color.r / 255f;
+		skeleton.G = color.g / 255f;
+		skeleton.B = color.b / 255f;
+	}
+
 	public static void SetColor (this Slot slot, Color color) {
 		slot.A = color.a;
 		slot.R = color.r;
