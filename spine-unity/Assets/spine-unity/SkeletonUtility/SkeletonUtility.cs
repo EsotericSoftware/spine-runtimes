@@ -58,7 +58,7 @@ public class SkeletonUtility : MonoBehaviour {
 	}
 
 	public static PolygonCollider2D AddBoundingBox (Skeleton skeleton, string skinName, string slotName, string attachmentName, Transform parent, bool isTrigger = true) {
-		List<Attachment> attachments = new List<Attachment>();
+		// List<Attachment> attachments = new List<Attachment>();
 		Skin skin;
 
 		if (skinName == "")
