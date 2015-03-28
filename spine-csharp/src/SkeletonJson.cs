@@ -53,25 +53,24 @@ namespace Spine {
 		}
 
 #if WINDOWS_STOREAPP
-        private async Task<SkeletonData> ReadFile(string path) {
-            var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
-            var file = await folder.GetFileAsync(path).AsTask().ConfigureAwait(false);
-            using (var reader = new StreamReader(await file.OpenStreamForReadAsync().ConfigureAwait(false))) {
-                SkeletonData skeletonData = ReadSkeletonData(reader);
-                skeletonData.Name = Path.GetFileNameWithoutExtension(path);
-                return skeletonData;
-            }
-        }
+		private async Task<SkeletonData> ReadFile(string path) {
+			var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
+			var file = await folder.GetFileAsync(path).AsTask().ConfigureAwait(false);
+			using (var reader = new StreamReader(await file.OpenStreamForReadAsync().ConfigureAwait(false))) {
+				SkeletonData skeletonData = ReadSkeletonData(reader);
+				skeletonData.Name = Path.GetFileNameWithoutExtension(path);
+				return skeletonData;
+			}
+		}
 
 		public SkeletonData ReadSkeletonData (String path) {
-		    return this.ReadFile(path).Result;
+			return this.ReadFile(path).Result;
 		}
 #else
 		public SkeletonData ReadSkeletonData (String path) {
 #if WINDOWS_PHONE
-            Stream stream = Microsoft.Xna.Framework.TitleContainer.OpenStream(path);
-            using (StreamReader reader = new StreamReader(stream))
-            {
+			Stream stream = Microsoft.Xna.Framework.TitleContainer.OpenStream(path);
+			using (StreamReader reader = new StreamReader(stream)) {
 #else
 			using (StreamReader reader = new StreamReader(path)) {
 #endif
@@ -209,7 +208,9 @@ namespace Spine {
 			skeletonData.bones.TrimExcess();
 			skeletonData.slots.TrimExcess();
 			skeletonData.skins.TrimExcess();
+			skeletonData.events.TrimExcess();
 			skeletonData.animations.TrimExcess();
+			skeletonData.ikConstraints.TrimExcess();
 			return skeletonData;
 		}
 
@@ -369,7 +370,7 @@ namespace Spine {
 			return (String)map[name];
 		}
 
-		public static float ToColor (String hexString, int colorIndex) {
+		private float ToColor (String hexString, int colorIndex) {
 			if (hexString.Length != 8)
 				throw new ArgumentException("Color hexidecimal length must be 8, recieved: " + hexString);
 			return Convert.ToInt32(hexString.Substring(colorIndex * 2, 2), 16) / (float)255;
@@ -397,7 +398,7 @@ namespace Spine {
 							foreach (Dictionary<String, Object> valueMap in values) {
 								float time = (float)valueMap["time"];
 								String c = (String)valueMap["color"];
-								timeline.setFrame(frameIndex, time, ToColor(c, 0), ToColor(c, 1), ToColor(c, 2), ToColor(c, 3));
+								timeline.SetFrame(frameIndex, time, ToColor(c, 0), ToColor(c, 1), ToColor(c, 2), ToColor(c, 3));
 								ReadCurve(timeline, frameIndex, valueMap);
 								frameIndex++;
 							}
@@ -411,7 +412,7 @@ namespace Spine {
 							int frameIndex = 0;
 							foreach (Dictionary<String, Object> valueMap in values) {
 								float time = (float)valueMap["time"];
-								timeline.setFrame(frameIndex++, time, (String)valueMap["name"]);
+								timeline.SetFrame(frameIndex++, time, (String)valueMap["name"]);
 							}
 							timelines.Add(timeline);
 							duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1]);
@@ -502,7 +503,7 @@ namespace Spine {
 						float time = (float)valueMap["time"];
 						float mix = valueMap.ContainsKey("mix") ? (float)valueMap["mix"] : 1;
 						bool bendPositive = valueMap.ContainsKey("bendPositive") ? (bool)valueMap["bendPositive"] : true;
-						timeline.setFrame(frameIndex, time, mix, bendPositive ? 1 : -1);
+						timeline.SetFrame(frameIndex, time, mix, bendPositive ? 1 : -1);
 						ReadCurve(timeline, frameIndex, valueMap);
 						frameIndex++;
 					}
@@ -556,7 +557,7 @@ namespace Spine {
 									}
 								}
 
-								timeline.setFrame(frameIndex, (float)valueMap["time"], vertices);
+								timeline.SetFrame(frameIndex, (float)valueMap["time"], vertices);
 								ReadCurve(timeline, frameIndex, valueMap);
 								frameIndex++;
 							}
@@ -598,7 +599,7 @@ namespace Spine {
 						for (int i = slotCount - 1; i >= 0; i--)
 							if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
 					}
-					timeline.setFrame(frameIndex++, (float)drawOrderMap["time"], drawOrder);
+					timeline.SetFrame(frameIndex++, (float)drawOrderMap["time"], drawOrder);
 				}
 				timelines.Add(timeline);
 				duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1]);
@@ -615,7 +616,7 @@ namespace Spine {
 					e.Int = GetInt(eventMap, "int", eventData.Int);
 					e.Float = GetFloat(eventMap, "float", eventData.Float);
 					e.String = GetString(eventMap, "string", eventData.String);
-					timeline.setFrame(frameIndex++, (float)eventMap["time"], e);
+					timeline.SetFrame(frameIndex++, (float)eventMap["time"], e);
 				}
 				timelines.Add(timeline);
 				duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1]);

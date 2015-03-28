@@ -75,6 +75,7 @@
     <Compile Include="src\Skeleton.cs" />
     <Compile Include="src\SkeletonData.cs" />
     <Compile Include="src\SkeletonJson.cs" />
+    <Compile Include="src\SkeletonBinary.cs" />
     <Compile Include="src\Skin.cs" />
     <Compile Include="src\Slot.cs" />
     <Compile Include="src\SlotData.cs" />
