@@ -94,7 +94,7 @@ namespace Spine {
 		}
 #endif
 
-		public SkeletonData ReadSkeletonData (BufferedStream input) {
+		public SkeletonData ReadSkeletonData (Stream input) {
 			if (input == null) throw new ArgumentNullException("input cannot be null.");
 			float scale = Scale;
 
@@ -194,7 +194,7 @@ namespace Spine {
 		}
 
 		/** @return May be null. */
-		private Skin ReadSkin (BufferedStream input, String skinName, bool nonessential) {
+		private Skin ReadSkin (Stream input, String skinName, bool nonessential) {
 			int slotCount = ReadInt(input, true);
 			if (slotCount == 0) return null;
 			Skin skin = new Skin(skinName);
@@ -208,7 +208,7 @@ namespace Spine {
 			return skin;
 		}
 
-		private Attachment ReadAttachment (BufferedStream input, Skin skin, String attachmentName, bool nonessential) {
+		private Attachment ReadAttachment (Stream input, Skin skin, String attachmentName, bool nonessential) {
 			float scale = Scale;
 
 			String name = ReadString(input);
@@ -309,7 +309,7 @@ namespace Spine {
 			return null;
 		}
 
-		private float[] ReadFloatArray (BufferedStream input, float scale) {
+		private float[] ReadFloatArray (Stream input, float scale) {
 			int n = ReadInt(input, true);
 			float[] array = new float[n];
 			if (scale == 1) {
@@ -322,7 +322,7 @@ namespace Spine {
 			return array;
 		}
 
-		private int[] ReadShortArray (BufferedStream input) {
+		private int[] ReadShortArray (Stream input) {
 			int n = ReadInt(input, true);
 			int[] array = new int[n];
 			for (int i = 0; i < n; i++)
@@ -330,7 +330,7 @@ namespace Spine {
 			return array;
 		}
 
-		private int[] ReadIntArray (BufferedStream input) {
+		private int[] ReadIntArray (Stream input) {
 			int n = ReadInt(input, true);
 			int[] array = new int[n];
 			for (int i = 0; i < n; i++)
@@ -338,7 +338,7 @@ namespace Spine {
 			return array;
 		}
 
-		private void ReadAnimation (String name, BufferedStream input, SkeletonData skeletonData) {
+		private void ReadAnimation (String name, Stream input, SkeletonData skeletonData) {
 			var timelines = new List<Timeline>();
 			float scale = Scale;
 			float duration = 0;
@@ -554,7 +554,7 @@ namespace Spine {
 			skeletonData.animations.Add(new Animation(name, timelines, duration));
 		}
 
-		private void ReadCurve (BufferedStream input, int frameIndex, CurveTimeline timeline) {
+		private void ReadCurve (Stream input, int frameIndex, CurveTimeline timeline) {
 			switch (input.ReadByte()) {
 			case CURVE_STEPPED:
 				timeline.SetStepped(frameIndex);
@@ -565,17 +565,17 @@ namespace Spine {
 			}
 		}
 
-		private sbyte ReadSByte (BufferedStream input) {
+		private sbyte ReadSByte (Stream input) {
 			int value = input.ReadByte();
 			if (value == -1) throw new EndOfStreamException();
 			return (sbyte)value;
 		}
 
-		private bool ReadBoolean (BufferedStream input) {
+		private bool ReadBoolean (Stream input) {
 			return input.ReadByte() != 0;
 		}
 
-		private float ReadFloat (BufferedStream input) {
+		private float ReadFloat (Stream input) {
 			buffer[3] = (byte)input.ReadByte();
 			buffer[2] = (byte)input.ReadByte();
 			buffer[1] = (byte)input.ReadByte();
@@ -583,11 +583,11 @@ namespace Spine {
 			return BitConverter.ToSingle(buffer, 0);
 		}
 
-		private int ReadInt (BufferedStream input) {
+		private int ReadInt (Stream input) {
 			return (input.ReadByte() << 24) + (input.ReadByte() << 16) + (input.ReadByte() << 8) + input.ReadByte();
 		}
 
-		private int ReadInt (BufferedStream input, bool optimizePositive) {
+		private int ReadInt (Stream input, bool optimizePositive) {
 			int b = input.ReadByte();
 			int result = b & 0x7F;
 			if ((b & 0x80) != 0) {
@@ -609,7 +609,7 @@ namespace Spine {
 			return optimizePositive ? result : ((result >> 1) ^ -(result & 1));
 		}
 
-		private string ReadString (BufferedStream input) {
+		private string ReadString (Stream input) {
 			int charCount = ReadInt(input, true);
 			switch (charCount) {
 			case 0:
@@ -633,7 +633,7 @@ namespace Spine {
 			return new String(chars, 0, charCount);
 		}
 
-		private void ReadUtf8_slow (BufferedStream input, int charCount, int charIndex, int b) {
+		private void ReadUtf8_slow (Stream input, int charCount, int charIndex, int b) {
 			char[] chars = this.chars;
 			while (true) {
 				switch (b >> 4) {
