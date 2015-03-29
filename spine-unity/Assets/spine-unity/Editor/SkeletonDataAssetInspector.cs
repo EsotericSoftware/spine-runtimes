@@ -455,8 +455,8 @@ public class SkeletonDataAssetInspector : Editor {
 			warnings.Add("Missing Skeleton JSON");
 		else {
 
-			if (SpineEditorUtilities.IsSpineJSON((TextAsset)skeletonJSON.objectReferenceValue) == false) {
-				warnings.Add("Skeleton JSON is not a Valid JSON file");
+			if (SpineEditorUtilities.IsValidSpineData((TextAsset)skeletonJSON.objectReferenceValue) == false) {
+				warnings.Add("Skeleton data file is not a valid JSON or binary file.");
 			} else {
 				bool detectedNullAtlasEntry = false;
 				List<Atlas> atlasList = new List<Atlas>();

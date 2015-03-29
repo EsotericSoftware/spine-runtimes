@@ -97,31 +97,45 @@ public class SkeletonDataAsset : ScriptableObject {
 
 		if (skeletonData != null)
 			return skeletonData;
-
-		SkeletonJson json;
+		
+		AttachmentLoader attachmentLoader;
+		float skeletonDataScale;
 
 #if !SPINE_TK2D
-		json = new SkeletonJson(atlasArr);
-		json.Scale = scale;
+		attachmentLoader = new AtlasAttachmentLoader(atlasArr);
+		skeletonDataScale = scale;
 #else
 		if (spriteCollection != null) {
-			json = new SkeletonJson(new SpriteCollectionAttachmentLoader(spriteCollection));
-			json.Scale = (1.0f / (spriteCollection.invOrthoSize * spriteCollection.halfTargetHeight) * scale) * 100f;
+			attachmentLoader = new SpriteCollectionAttachmentLoader(spriteCollection)
+			skeletonDataScale = (1.0f / (spriteCollection.invOrthoSize * spriteCollection.halfTargetHeight) * scale) * 100f;
 		} else {
 			if (atlasArr.Length == 0) {
 				Reset();
-				if (!quiet)
-					Debug.LogError("Atlas not set for SkeletonData asset: " + name, this);
+				if (!quiet) Debug.LogError("Atlas not set for SkeletonData asset: " + name, this);
 				return null;
 			}
-			json = new SkeletonJson(atlasArr);
-			json.Scale = scale;
+			attachmentLoader = new AtlasAttachmentLoader(atlasArr);
+			skeletonDataScale = scale;
 		}
 #endif
 
-		
 		try {
-			skeletonData = json.ReadSkeletonData(new StringReader(skeletonJSON.text));
+			//var stopwatch = new System.Diagnostics.Stopwatch();
+			if (skeletonJSON.name.ToLower().Contains(".skel")) {
+				var input = new MemoryStream(skeletonJSON.bytes);
+				var binary = new SkeletonBinary(attachmentLoader);
+				binary.Scale = skeletonDataScale;
+				//stopwatch.Start();
+				skeletonData = binary.ReadSkeletonData(input);
+			} else {
+				var input = new StringReader(skeletonJSON.text);
+				var json = new SkeletonJson(attachmentLoader);
+				json.Scale = skeletonDataScale;
+				//stopwatch.Start();
+				skeletonData = json.ReadSkeletonData(input);
+			}
+			//stopwatch.Stop();
+			//Debug.Log(stopwatch.Elapsed);
 		} catch (Exception ex) {
 			if (!quiet)
 				Debug.LogError("Error reading skeleton JSON file for SkeletonData asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, this);

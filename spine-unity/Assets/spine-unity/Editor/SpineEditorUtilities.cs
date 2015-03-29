@@ -251,8 +251,8 @@ public class SpineEditorUtilities : AssetPostprocessor {
 					imagePaths.Add(str);
 					break;
 				case ".json":
-					TextAsset spineJson = (TextAsset)AssetDatabase.LoadAssetAtPath(str, typeof(TextAsset));
-					if (IsSpineJSON(spineJson)) {
+					TextAsset spineDataFile = (TextAsset)AssetDatabase.LoadAssetAtPath(str, typeof(TextAsset));
+					if (IsValidSpineData(spineDataFile)) {
 						skeletonPaths.Add(str);
 					}
 					break;
@@ -518,6 +518,9 @@ public class SpineEditorUtilities : AssetPostprocessor {
 	public static List<string> GetRequiredAtlasRegions (string jsonPath) {
 		List<string> requiredPaths = new List<string>();
 
+		// FIXME - This doesn't work for a binary skeleton file!
+		if (jsonPath.Contains(".skel")) return requiredPaths;
+
 		TextAsset spineJson = (TextAsset)AssetDatabase.LoadAssetAtPath(jsonPath, typeof(TextAsset));
 
 		StringReader reader = new StringReader(spineJson.text);
@@ -592,8 +595,14 @@ public class SpineEditorUtilities : AssetPostprocessor {
 		return arr;
 	}
 
-	public static bool IsSpineJSON (TextAsset asset) {
-		object obj = Json.Deserialize(new StringReader(asset.text));
+	public static bool IsValidSpineData (TextAsset asset) {
+		if (asset.name.Contains(".skel")) return true;
+
+		object obj = null;
+		try {
+			obj = Json.Deserialize(new StringReader(asset.text));
+		} catch (System.Exception) {
+		}
 		if (obj == null) {
 			Debug.LogError("Is not valid JSON");
 			return false;
