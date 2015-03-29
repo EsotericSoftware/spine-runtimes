@@ -48,6 +48,15 @@ public class SkeletonDataAsset : ScriptableObject {
 	public RuntimeAnimatorController controller;
 	private SkeletonData skeletonData;
 	private AnimationStateData stateData;
+	private double loadTime = -1;
+
+	public double LoadTime {
+		get {
+			return loadTime;
+		}
+	}
+
+	
 
 	public void Reset() {
 		skeletonData = null;
@@ -55,6 +64,13 @@ public class SkeletonDataAsset : ScriptableObject {
 	}
 
 	public SkeletonData GetSkeletonData(bool quiet) {
+		if (skeletonData == null) {
+			loadTime = -1;
+		}
+			
+
+		DateTime startLoadTime = DateTime.Now;
+
 		if (atlasAssets == null) {
 			atlasAssets = new AtlasAsset[0];
 			if (!quiet)
@@ -98,11 +114,43 @@ public class SkeletonDataAsset : ScriptableObject {
 		if (skeletonData != null)
 			return skeletonData;
 
-		SkeletonJson json;
+		bool isBinary = skeletonJSON.name.EndsWith(".skel");
+
+		if (isBinary) {
+			SkeletonBinary binary;
 
 #if !SPINE_TK2D
-		json = new SkeletonJson(atlasArr);
-		json.Scale = scale;
+			binary = new SkeletonBinary(atlasArr);
+			binary.Scale = scale;
+#else
+		if (spriteCollection != null) {
+			binary = new SkeletonBinary(new SpriteCollectionAttachmentLoader(spriteCollection));
+			binary.Scale = (1.0f / (spriteCollection.invOrthoSize * spriteCollection.halfTargetHeight) * scale) * 100f;
+		} else {
+			if (atlasArr.Length == 0) {
+				Reset();
+				if (!quiet)
+					Debug.LogError("Atlas not set for SkeletonData asset: " + name, this);
+				return null;
+			}
+			binary = new SkeletonBinary(atlasArr);
+			binary.Scale = scale;
+		}
+#endif
+			try {
+				skeletonData = binary.ReadSkeletonData(new BufferedStream(new MemoryStream(skeletonJSON.bytes)));
+			} catch (Exception ex) {
+				if (!quiet)
+					Debug.LogError("Error reading skeleton binary file for SkeletonData asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, this);
+				return null;
+			}
+
+		} else {
+			SkeletonJson json;
+
+#if !SPINE_TK2D
+			json = new SkeletonJson(atlasArr);
+			json.Scale = scale;
 #else
 		if (spriteCollection != null) {
 			json = new SkeletonJson(new SpriteCollectionAttachmentLoader(spriteCollection));
@@ -119,17 +167,20 @@ public class SkeletonDataAsset : ScriptableObject {
 		}
 #endif
 
-		
-		try {
-			skeletonData = json.ReadSkeletonData(new StringReader(skeletonJSON.text));
-		} catch (Exception ex) {
-			if (!quiet)
-				Debug.LogError("Error reading skeleton JSON file for SkeletonData asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, this);
-			return null;
+
+			try {
+				skeletonData = json.ReadSkeletonData(new StringReader(skeletonJSON.text));
+			} catch (Exception ex) {
+				if (!quiet)
+					Debug.LogError("Error reading skeleton JSON file for SkeletonData asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, this);
+				return null;
+			}
 		}
 
 		stateData = new AnimationStateData(skeletonData);
 		FillStateData();
+
+		loadTime = (DateTime.Now - startLoadTime).TotalMilliseconds;
 
 		return skeletonData;
 	}

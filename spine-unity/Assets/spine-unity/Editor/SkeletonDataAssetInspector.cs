@@ -34,6 +34,7 @@
 *****************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 
 #if !UNITY_4_3
@@ -123,6 +124,10 @@ public class SkeletonDataAssetInspector : Editor {
 		EditorGUILayout.PropertyField(spriteCollection, true);
 #endif
 		EditorGUILayout.PropertyField(skeletonJSON);
+		GUILayout.Label("Load Time: " + m_skeletonDataAsset.LoadTime + "ms");
+		if (IsBinary) {
+			GUILayout.Label(new GUIContent("Binary Mode Engaged! Hold on to your pants!", SpineEditorUtilities.Icons.warning));
+		}
 		EditorGUILayout.PropertyField(scale);
 		if (EditorGUI.EndChangeCheck()) {
 			if (serializedObject.ApplyModifiedProperties()) {
@@ -254,6 +259,18 @@ public class SkeletonDataAssetInspector : Editor {
 		if (m_previewUtility != null) {
 			m_previewUtility.Cleanup();
 			m_previewUtility = null;
+		}
+
+		//Temporary Binary atlas name-match reimport
+		if (IsBinary && m_skeletonData == null) {
+			string dirPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(m_skeletonDataAsset));
+			string maybeAtlasPath = Path.Combine(dirPath, m_skeletonDataAsset.skeletonJSON.name.Replace(".skel", "_Atlas.asset"));
+			if (File.Exists(maybeAtlasPath)) {
+				var atlas = (AtlasAsset)AssetDatabase.LoadAssetAtPath(maybeAtlasPath, typeof(AtlasAsset));
+				if (atlas != null) {
+					m_skeletonDataAsset.atlasAssets = new AtlasAsset[1] { atlas };
+				}
+			}
 		}
 
 		RepopulateWarnings();
@@ -447,6 +464,14 @@ public class SkeletonDataAssetInspector : Editor {
 		EditorGUI.indentLevel--;
 	}
 
+	public bool IsBinary {
+		get {
+			if (skeletonJSON.objectReferenceValue == null)
+				return false;
+
+			return skeletonJSON.objectReferenceValue.name.EndsWith(".skel");
+		}
+	}
 
 	void RepopulateWarnings () {
 		warnings.Clear();
@@ -455,7 +480,12 @@ public class SkeletonDataAssetInspector : Editor {
 			warnings.Add("Missing Skeleton JSON");
 		else {
 
-			if (SpineEditorUtilities.IsSpineJSON((TextAsset)skeletonJSON.objectReferenceValue) == false) {
+			if (IsBinary) {
+				//can't pre process binary yet
+				warnings.Add("Cannot analyze Skeleton Binary for errors!");
+				warnings.Add("Probably can't attempt reimport yet either :)");
+			}
+			else if (SpineEditorUtilities.IsSpineJSON((TextAsset)skeletonJSON.objectReferenceValue) == false) {
 				warnings.Add("Skeleton JSON is not a Valid JSON file");
 			} else {
 				bool detectedNullAtlasEntry = false;
@@ -486,9 +516,6 @@ public class SkeletonDataAssetInspector : Editor {
 
 					foreach (var str in missingPaths)
 						warnings.Add("Missing Region: '" + str + "'");
-
-
-
 				}
 			}
 
