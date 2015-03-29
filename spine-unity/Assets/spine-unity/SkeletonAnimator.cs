@@ -105,6 +105,9 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 			var stateInfo = animator.GetCurrentAnimatorStateInfo(i);
 			var nextStateInfo = animator.GetNextAnimatorStateInfo(i);
 
+			bool isValidStateInfo = (stateInfo.length > 0);
+			bool isValidNextStateInfo = (nextStateInfo.length > 0);
+
 #if UNITY_5
 			var clipInfo = animator.GetCurrentAnimatorClipInfo(i);
 			var nextClipInfo = animator.GetNextAnimatorClipInfo(i);
@@ -116,22 +119,26 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 
 			if (mode == MixMode.AlwaysMix) {
 				//always use Mix instead of Applying the first non-zero weighted clip
-				foreach (var info in clipInfo) {
-					float weight = info.weight * layerWeight;
-					if (weight == 0)
-						continue;
+				if (isValidStateInfo) {
+					foreach (var info in clipInfo) {
+						float weight = info.weight * layerWeight;
+						if (weight == 0)
+							continue;
 
-					float time = stateInfo.normalizedTime * info.clip.length;
-					animationTable[info.clip.name].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null, weight);
+						float time = stateInfo.normalizedTime * info.clip.length;
+						animationTable[info.clip.name].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null, weight);
+					}
 				}
 
-				foreach (var info in nextClipInfo) {
-					float weight = info.weight * layerWeight;
-					if (weight == 0)
-						continue;
+				if (isValidNextStateInfo) {
+					foreach (var info in nextClipInfo) {
+						float weight = info.weight * layerWeight;
+						if (weight == 0)
+							continue;
 
-					float time = nextStateInfo.normalizedTime * info.clip.length;
-					animationTable[info.clip.name].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null, weight);
+						float time = nextStateInfo.normalizedTime * info.clip.length;
+						animationTable[info.clip.name].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null, weight);
+					}
 				}
 			} else if (mode >= MixMode.MixNext) {
 				//apply first non-zero weighted clip
