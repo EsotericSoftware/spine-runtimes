@@ -122,7 +122,11 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 						continue;
 
 					float time = stateInfo.normalizedTime * info.clip.length;
-					animationTable[info.clip.name].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null, weight);
+					float lastTime = time - deltaTime;
+					if(lastTime > 0)
+					{
+						animationTable[info.clip.name].Mix(skeleton, lastTime, time, stateInfo.loop, null, weight);
+					}
 				}
 
 				foreach (var info in nextClipInfo) {
@@ -131,7 +135,11 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 						continue;
 
 					float time = nextStateInfo.normalizedTime * info.clip.length;
-					animationTable[info.clip.name].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null, weight);
+					float lastTime = time - deltaTime;
+					if(lastTime > 0)
+					{
+						animationTable[info.clip.name].Mix(skeleton, lastTime, time, nextStateInfo.loop, null, weight);
+					}
 				}
 			} else if (mode >= MixMode.MixNext) {
 				//apply first non-zero weighted clip
