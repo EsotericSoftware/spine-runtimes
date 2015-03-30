@@ -113,7 +113,7 @@ public class SkeletonDataAsset : ScriptableObject {
 #else
 		if (spriteCollection != null) {
 			attachmentLoader = new SpriteCollectionAttachmentLoader(spriteCollection)
-			skeletonDataScale = (1.0f / (spriteCollection.invOrthoSize * spriteCollection.halfTargetHeight) * scale) * 100f;
+			skeletonDataScale = 1.0f / (spriteCollection.invOrthoSize * spriteCollection.halfTargetHeight) * scale;
 		} else {
 			if (atlasArr.Length == 0) {
 				Reset();
