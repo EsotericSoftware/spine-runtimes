@@ -48,6 +48,12 @@ public class SkeletonDataAsset : ScriptableObject {
 	public RuntimeAnimatorController controller;
 	private SkeletonData skeletonData;
 	private AnimationStateData stateData;
+	
+	private void OnEnable()
+	{
+		if(this.atlasAssets == null)
+			this.atlasAssets = new AtlasAsset[0];
+	}
 
 	public void Reset() {
 		skeletonData = null;
