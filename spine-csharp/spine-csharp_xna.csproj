@@ -111,6 +111,7 @@
     <Compile Include="src\EventData.cs" />
     <Compile Include="src\Json.cs" />
     <Compile Include="src\Skeleton.cs" />
+    <Compile Include="src\SkeletonBinary.cs" />
     <Compile Include="src\SkeletonBounds.cs" />
     <Compile Include="src\SkeletonData.cs" />
     <Compile Include="src\SkeletonJson.cs" />

@@ -55,6 +55,10 @@ public class SkeletonDataAssetInspector : Editor {
 
 	private SerializedProperty atlasAssets, skeletonJSON, scale, fromAnimation, toAnimation, duration, defaultMix, controller;
 
+#if SPINE_TK2D
+	private SerializedProperty spriteCollection;
+#endif
+
 	private bool m_initialized = false;
 	private SkeletonDataAsset m_skeletonDataAsset;
 	private SkeletonData m_skeletonData;
@@ -76,6 +80,9 @@ public class SkeletonDataAssetInspector : Editor {
 			duration = serializedObject.FindProperty("duration");
 			defaultMix = serializedObject.FindProperty("defaultMix");
 			controller = serializedObject.FindProperty("controller");
+#if SPINE_TK2D
+			spriteCollection = serializedObject.FindProperty("spriteCollection");
+#endif
 
 			m_skeletonDataAsset = (SkeletonDataAsset)target;
 			m_skeletonDataAssetGUID = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(m_skeletonDataAsset));
@@ -107,7 +114,14 @@ public class SkeletonDataAssetInspector : Editor {
 		serializedObject.Update();
 
 		EditorGUI.BeginChangeCheck();
+#if !SPINE_TK2D
 		EditorGUILayout.PropertyField(atlasAssets, true);
+#else
+		EditorGUI.BeginDisabledGroup(spriteCollection.objectReferenceValue != null);
+		EditorGUILayout.PropertyField(atlasAssets, true);
+		EditorGUI.EndDisabledGroup();
+		EditorGUILayout.PropertyField(spriteCollection, true);
+#endif
 		EditorGUILayout.PropertyField(skeletonJSON);
 		EditorGUILayout.PropertyField(scale);
 		if (EditorGUI.EndChangeCheck()) {
@@ -441,8 +455,8 @@ public class SkeletonDataAssetInspector : Editor {
 			warnings.Add("Missing Skeleton JSON");
 		else {
 
-			if (SpineEditorUtilities.IsSpineJSON((TextAsset)skeletonJSON.objectReferenceValue) == false) {
-				warnings.Add("Skeleton JSON is not a Valid JSON file");
+			if (SpineEditorUtilities.IsValidSpineData((TextAsset)skeletonJSON.objectReferenceValue) == false) {
+				warnings.Add("Skeleton data file is not a valid JSON or binary file.");
 			} else {
 				bool detectedNullAtlasEntry = false;
 				List<Atlas> atlasList = new List<Atlas>();
@@ -674,7 +688,9 @@ public class SkeletonDataAssetInspector : Editor {
 			if (!EditorApplication.isPlaying)
 				m_skeletonAnimation.LateUpdate();
 
-			if (drawHandles) {
+
+
+			if (drawHandles) {			
 				Handles.SetCamera(m_previewUtility.m_Camera);
 				Handles.color = m_originColor;
 
@@ -683,10 +699,47 @@ public class SkeletonDataAssetInspector : Editor {
 			}
 
 			this.m_previewUtility.m_Camera.Render();
+
+			if (drawHandles) {
+				Handles.SetCamera(m_previewUtility.m_Camera);
+				foreach (var slot in m_skeletonAnimation.skeleton.Slots) {
+					if (slot.Attachment is BoundingBoxAttachment) {
+
+						DrawBoundingBox(slot.Bone, (BoundingBoxAttachment)slot.Attachment);
+					}
+				}
+			}
+
 			go.GetComponent<Renderer>().enabled = false;
 		}
 
 
+	}
+
+	void DrawBoundingBox (Bone bone, BoundingBoxAttachment box) {
+		float[] worldVerts = new float[box.Vertices.Length];
+		box.ComputeWorldVertices(bone, worldVerts);
+
+		Handles.color = Color.green;
+		Vector3 lastVert = Vector3.back;
+		Vector3 vert = Vector3.back;
+		Vector3 firstVert = new Vector3(worldVerts[0], worldVerts[1], -1);
+		for (int i = 0; i < worldVerts.Length; i += 2) {
+			vert.x = worldVerts[i];
+			vert.y = worldVerts[i + 1];
+
+			if (i > 0) {
+				Handles.DrawLine(lastVert, vert);
+			}
+
+
+			lastVert = vert;
+		}
+
+		Handles.DrawLine(lastVert, firstVert);
+
+		
+		
 	}
 
 	void Update () {

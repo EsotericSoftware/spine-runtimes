@@ -59,7 +59,7 @@ public class SkeletonRenderer : MonoBehaviour {
 	[HideInInspector]
 	public List<Slot> submeshSeparatorSlots = new List<Slot>();
 
-
+	private MeshRenderer meshRenderer;
 	private MeshFilter meshFilter;
 	private Mesh mesh1, mesh2;
 	private bool useMesh1;
@@ -71,13 +71,14 @@ public class SkeletonRenderer : MonoBehaviour {
 	private Material[] sharedMaterials = new Material[0];
 	private readonly List<Material> submeshMaterials = new List<Material>();
 	private readonly List<Submesh> submeshes = new List<Submesh>();
-
+	private SkeletonUtilitySubmeshRenderer[] submeshRenderers;
 
 	public virtual void Reset () {
 		if (meshFilter != null)
 			meshFilter.sharedMesh = null;
-		if (GetComponent<Renderer>() != null)
-			GetComponent<Renderer>().sharedMaterial = null;
+
+		meshRenderer = GetComponent<MeshRenderer>();
+		if (meshRenderer != null) meshRenderer.sharedMaterial = null;
 
 		if (mesh1 != null) {
 			if (Application.isPlaying)
@@ -130,8 +131,16 @@ public class SkeletonRenderer : MonoBehaviour {
 			submeshSeparatorSlots.Add(skeleton.FindSlot(submeshSeparators[i]));
 		}
 
+		CollectSubmeshRenderers();
+
+		LateUpdate();
+
 		if (OnReset != null)
 			OnReset(this);
+	}
+
+	public void CollectSubmeshRenderers () {
+		submeshRenderers = GetComponentsInChildren<SkeletonUtilitySubmeshRenderer>();
 	}
 
 	public virtual void Awake () {
@@ -205,7 +214,11 @@ public class SkeletonRenderer : MonoBehaviour {
 			}
 
 			// Populate submesh when material changes.
+#if !SPINE_TK2D
 			Material material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
+#else
+			Material material = (rendererObject.GetType() == typeof(Material)) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
+#endif
 
 			if ((lastMaterial != material && lastMaterial != null) || submeshSeparatorSlots.Contains(slot)) {
 				AddSubmesh(lastMaterial, submeshStartSlotIndex, i, submeshTriangleCount, submeshFirstVertex, false);
@@ -225,7 +238,7 @@ public class SkeletonRenderer : MonoBehaviour {
 			submeshMaterials.CopyTo(sharedMaterials);
 		else
 			sharedMaterials = submeshMaterials.ToArray();
-		GetComponent<Renderer>().sharedMaterials = sharedMaterials;
+		meshRenderer.sharedMaterials = sharedMaterials;
 
 		// Ensure mesh data is the right size.
 		Vector3[] vertices = this.vertices;
@@ -366,11 +379,21 @@ public class SkeletonRenderer : MonoBehaviour {
 			}
 		}
 
+		if (submeshRenderers.Length > 0) {
+			foreach (var submeshRenderer in submeshRenderers) {
+				if (submeshRenderer.submeshIndex < sharedMaterials.Length)
+					submeshRenderer.SetMesh(meshRenderer, useMesh1 ? mesh1 : mesh2, sharedMaterials[submeshRenderer.submeshIndex]);
+				else
+					submeshRenderer.GetComponent<Renderer>().enabled = false;
+			}
+		}
+
 		useMesh1 = !useMesh1;
 	}
 
 	/** Stores vertices and triangles for a single material. */
 	private void AddSubmesh (Material material, int startSlot, int endSlot, int triangleCount, int firstVertex, bool lastSubmesh) {
+		
 		int submeshIndex = submeshMaterials.Count;
 		submeshMaterials.Add(material);
 

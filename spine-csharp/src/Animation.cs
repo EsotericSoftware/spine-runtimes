@@ -365,7 +365,7 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time and value of the specified keyframe.</summary>
-		public void setFrame (int frameIndex, float time, float r, float g, float b, float a) {
+		public void SetFrame (int frameIndex, float time, float r, float g, float b, float a) {
 			frameIndex *= 5;
 			frames[frameIndex] = time;
 			frames[frameIndex + 1] = r;
@@ -433,7 +433,7 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time and value of the specified keyframe.</summary>
-		public void setFrame (int frameIndex, float time, String attachmentName) {
+		public void SetFrame (int frameIndex, float time, String attachmentName) {
 			frames[frameIndex] = time;
 			attachmentNames[frameIndex] = attachmentName;
 		}
@@ -469,7 +469,7 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time and value of the specified keyframe.</summary>
-		public void setFrame (int frameIndex, float time, Event e) {
+		public void SetFrame (int frameIndex, float time, Event e) {
 			frames[frameIndex] = time;
 			events[frameIndex] = e;
 		}
@@ -518,7 +518,7 @@ namespace Spine {
 
 		/// <summary>Sets the time and value of the specified keyframe.</summary>
 		/// <param name="drawOrder">May be null to use bind pose draw order.</param>
-		public void setFrame (int frameIndex, float time, int[] drawOrder) {
+		public void SetFrame (int frameIndex, float time, int[] drawOrder) {
 			frames[frameIndex] = time;
 			drawOrders[frameIndex] = drawOrder;
 		}
@@ -564,7 +564,7 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time and value of the specified keyframe.</summary>
-		public void setFrame (int frameIndex, float time, float[] vertices) {
+		public void SetFrame (int frameIndex, float time, float[] vertices) {
 			frames[frameIndex] = time;
 			frameVertices[frameIndex] = vertices;
 		}
@@ -641,7 +641,7 @@ namespace Spine {
 		}
 
 		/** Sets the time, mix and bend direction of the specified keyframe. */
-		public void setFrame (int frameIndex, float time, float mix, int bendDirection) {
+		public void SetFrame (int frameIndex, float time, float mix, int bendDirection) {
 			frameIndex *= 3;
 			frames[frameIndex] = time;
 			frames[frameIndex + 1] = mix;
