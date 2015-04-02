@@ -30,6 +30,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Spine {
@@ -43,14 +44,46 @@ namespace Spine {
 		public float TimeScale { get { return timeScale; } set { timeScale = value; } }
 
 		public delegate void StartEndDelegate(AnimationState state, int trackIndex);
-		public event StartEndDelegate Start;
-		public event StartEndDelegate End;
+		private StartEndDelegate start;
+		public event StartEndDelegate Start
+		{
+			[MethodImpl(MethodImplOptions.Synchronized)]
+			add { start += value; }
+
+			[MethodImpl(MethodImplOptions.Synchronized)]
+			remove { start -= value; }
+		}
+		private StartEndDelegate end;
+		public event StartEndDelegate End
+		{
+			[MethodImpl(MethodImplOptions.Synchronized)]
+			add { end += value; }
+
+			[MethodImpl(MethodImplOptions.Synchronized)]
+			remove { end -= value; }
+		}
 
 		public delegate void EventDelegate(AnimationState state, int trackIndex, Event e);
-		public event EventDelegate Event;
+		private EventDelegate @event;
+		public event EventDelegate Event
+		{
+			[MethodImpl(MethodImplOptions.Synchronized)]
+			add { @event += value; }
+
+			[MethodImpl(MethodImplOptions.Synchronized)]
+			remove { @event -= value; }
+		}
 		
 		public delegate void CompleteDelegate(AnimationState state, int trackIndex, int loopCount);
-		public event CompleteDelegate Complete;
+		private CompleteDelegate complete;
+		public event CompleteDelegate Complete
+		{
+			[MethodImpl(MethodImplOptions.Synchronized)]
+			add { complete += value; }
+
+			[MethodImpl(MethodImplOptions.Synchronized)]
+			remove { complete -= value; }
+		}
 
 		public AnimationState (AnimationStateData data) {
 			if (data == null) throw new ArgumentNullException("data cannot be null.");
@@ -77,7 +110,7 @@ namespace Spine {
 				if (current.loop ? (current.lastTime % endTime > time % endTime) : (current.lastTime < endTime && time >= endTime)) {
 					int count = (int)(time / endTime);
 					current.OnComplete(this, i, count);
-					if (Complete != null) Complete(this, i, count);
+					if (complete != null) complete(this, i, count);
 				}
 
 				TrackEntry next = current.next;
@@ -126,7 +159,7 @@ namespace Spine {
 				for (int ii = 0, nn = events.Count; ii < nn; ii++) {
 					Event e = events[ii];
 					current.OnEvent(this, i, e);
-					if (Event != null) Event(this, i, e);
+					if (@event != null) @event(this, i, e);
 				}
 
 				current.lastTime = current.time;
@@ -145,7 +178,7 @@ namespace Spine {
 			if (current == null) return;
 
 			current.OnEnd(this, trackIndex);
-			if (End != null) End(this, trackIndex);
+			if (end != null) end(this, trackIndex);
 
 			tracks[trackIndex] = null;
 		}
@@ -164,7 +197,7 @@ namespace Spine {
 				current.previous = null;
 
 				current.OnEnd(this, index);
-				if (End != null) End(this, index);
+				if (end != null) end(this, index);
 
 				entry.mixDuration = data.GetMix(current.animation, entry.animation);
 				if (entry.mixDuration > 0) {
@@ -180,7 +213,7 @@ namespace Spine {
 			tracks[index] = entry;
 
 			entry.OnStart(this, index);
-			if (Start != null) Start(this, index);
+			if (start != null) start(this, index);
 		}
 
 		public TrackEntry SetAnimation (int trackIndex, String animationName, bool loop) {
