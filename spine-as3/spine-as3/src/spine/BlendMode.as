@@ -28,10 +28,19 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package com.esotericsoftware.spine.attachments;
+package spine {
 
-public enum AttachmentType {
-	region, boundingbox, mesh, skinnedmesh;
+public class BlendMode {
+	public static const normal:BlendMode = new BlendMode(0);
+	public static const additive:BlendMode = new BlendMode(1);
+	public static const multiply:BlendMode = new BlendMode(2);
+	public static const screen:BlendMode = new BlendMode(3);
 
-	static public AttachmentType[] values = values();
+	public var ordinal:int;
+
+	public function BlendMode (ordinal:int) {
+		this.ordinal = ordinal;
+	}
+}
+
 }

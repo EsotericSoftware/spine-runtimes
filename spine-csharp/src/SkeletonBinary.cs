@@ -156,7 +156,7 @@ namespace Spine {
 				slotData.b = ((color & 0x0000ff00) >> 8) / 255f;
 				slotData.a = ((color & 0x000000ff)) / 255f;
 				slotData.attachmentName = ReadString(input);
-				slotData.additiveBlending = ReadBoolean(input);
+				slotData.blendMode = (BlendMode)ReadInt(input, true);
 				skeletonData.slots.Add(slotData);
 			}
 

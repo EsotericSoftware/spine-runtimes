@@ -142,7 +142,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	_skeleton->b = nodeColor.b / (float)255;
 	_skeleton->a = self.opacity / (float)255;
 
-	int additive = -1;
+	int blendMode = -1;
 	ccColor4B color;
 	const float* uvs = 0;
 	int verticesCount = 0;
@@ -199,10 +199,22 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 		default: ;
 		}
 		if (texture) {
-			if (slot->data->additiveBlending != additive) {
+			if (slot->data->blendMode != blendMode) {
 				[batch flush];
-				ccGLBlendFunc(_blendFunc.src, slot->data->additiveBlending ? GL_ONE : _blendFunc.dst);
-				additive = slot->data->additiveBlending;
+				blendMode = slot->data->blendMode;
+				switch (slot->data->blendMode) {
+				case SP_BLEND_MODE_ADDITIVE:
+					ccGLBlendFunc(_premultipliedAlpha ? GL_ONE : GL_SRC_ALPHA, GL_ONE);
+					break;
+				case SP_BLEND_MODE_MULTIPLY:
+					ccGLBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
+					break;
+				case SP_BLEND_MODE_SCREEN:
+					ccGLBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
+					break;
+				default:
+					ccGLBlendFunc(_premultipliedAlpha ? GL_ONE : GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				}
 			}
 			color.a = _skeleton->a * slot->a * a * 255;
 			float multiplier = _premultipliedAlpha ? color.a : 255;

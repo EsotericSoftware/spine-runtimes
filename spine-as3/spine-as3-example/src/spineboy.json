@@ -54,7 +54,7 @@
 	{ "name": "goggles", "bone": "head", "attachment": "goggles" },
 	{ "name": "front_bracer", "bone": "front_bracer", "attachment": "front_bracer" },
 	{ "name": "front_fist", "bone": "front_fist", "attachment": "front_fist_closed" },
-	{ "name": "muzzle", "bone": "gunTip", "additive": true },
+	{ "name": "muzzle", "bone": "gunTip", "blend": "additive" },
 	{ "name": "head-bb", "bone": "head" }
 ],
 "skins": {

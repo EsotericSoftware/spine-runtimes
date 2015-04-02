@@ -96,7 +96,7 @@ namespace Spine {
 				Attachment attachment = slot.Attachment;
 				if (attachment is RegionAttachment) {
 					RegionAttachment regionAttachment = (RegionAttachment)attachment;
-					BlendState blend = slot.Data.AdditiveBlending ? BlendState.Additive : defaultBlendState;
+					BlendState blend = slot.Data.BlendMode == BlendMode.additive ? BlendState.Additive : defaultBlendState;
 					if (device.BlendState != blend) {
 						End();
 						device.BlendState = blend;

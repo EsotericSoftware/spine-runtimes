@@ -161,9 +161,7 @@ public class SkeletonJson {
 			if (color != null) slotData.getColor().set(Color.valueOf(color));
 
 			slotData.attachmentName = slotMap.getString("attachment", null);
-
-			slotData.additiveBlending = slotMap.getBoolean("additive", false);
-
+			slotData.blendMode = BlendMode.valueOf(slotMap.getString("blend", BlendMode.normal.name()));
 			skeletonData.slots.add(slotData);
 		}
 

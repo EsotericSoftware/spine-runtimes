@@ -52,6 +52,7 @@ spine.AnimationState = require "spine-lua.AnimationState"
 spine.EventData = require "spine-lua.EventData"
 spine.Event = require "spine-lua.Event"
 spine.SkeletonBounds = require "spine-lua.SkeletonBounds"
+spine.BlendMode = require "spine-lua.BlendMode"
 
 spine.utils.readFile = function (fileName, base)
 	if not base then base = system.ResourceDirectory end
@@ -125,7 +126,15 @@ function spine.Skeleton.new (skeletonData, group)
 						print("Error creating image: " .. attachment.name)
 						image = spine.Skeleton.failed
 					end
-					if slot.data.additiveBlending then image.blendMode = "add" end
+					if slot.data.blendMode == spine.BlendMode.normal then
+						image.blendMode = "normal"
+					elseif slot.data.blendMode == spine.BlendMode.additive then
+						image.blendMode = "add"
+					elseif slot.data.blendMode == spine.BlendMode.multiply then
+						image.blendMode = "multiply"
+					elseif slot.data.blendMode == spine.BlendMode.screen then
+						image.blendMode = "screen"
+					end
 					images[slot] = image
 				end
 				-- Position image based on attachment and bone.

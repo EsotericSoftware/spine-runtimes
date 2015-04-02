@@ -144,7 +144,7 @@ void SkeletonRenderer::draw () {
 	skeleton->b = nodeColor.b / (float)255;
 	skeleton->a = getDisplayedOpacity() / (float)255;
 
-	int additive = -1;
+	int blendMode = -1;
 	ccColor4B color;
 	const float* uvs = nullptr;
 	int verticesCount = 0;
@@ -200,10 +200,22 @@ void SkeletonRenderer::draw () {
 		}
 		}
 		if (texture) {
-			if (slot->data->additiveBlending != additive) {
+			if (slot->data->blendMode != blendMode) {
 				batch->flush();
-				ccGLBlendFunc(blendFunc.src, slot->data->additiveBlending ? GL_ONE : blendFunc.dst);
-				additive = slot->data->additiveBlending;
+				blendMode = slot->data->blendMode;
+				switch (slot->data->blendMode) {
+				case SP_BLEND_MODE_ADDITIVE:
+					ccGLBlendFunc(premultipliedAlpha ? GL_ONE : GL_SRC_ALPHA, GL_ONE);
+					break;
+				case SP_BLEND_MODE_MULTIPLY:
+					ccGLBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
+					break;
+				case SP_BLEND_MODE_SCREEN:
+					ccGLBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
+					break;
+				default:
+					ccGLBlendFunc(blendFunc.src, blendFunc.dst);
+				}
 			}
 			color.a = skeleton->a * slot->a * a * 255;
 			float multiplier = premultipliedAlpha ? color.a : 255;

@@ -39,6 +39,7 @@ local IkConstraint = require "spine-lua.IkConstraint"
 local EventData = require "spine-lua.EventData"
 local Event = require "spine-lua.Event"
 local AttachmentType = require "spine-lua.AttachmentType"
+local BlendMode = require "spine-lua.BlendMode"
 
 local SkeletonJson = {}
 function SkeletonJson.new (attachmentLoader)
@@ -154,7 +155,7 @@ function SkeletonJson.new (attachmentLoader)
 				end
 
 				slotData.attachmentName = slotMap["attachment"]
-				slotData.additiveBlending = slotMap["additive"]
+				slotData.blendMode = BlendMode[slotMap["blend"] or "normal"]
 
 				table.insert(skeletonData.slots, slotData)
 				skeletonData.slotNameIndices[slotData.name] = #skeletonData.slots
