@@ -30,17 +30,15 @@
 
 package com.esotericsoftware.spine;
 
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
+import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.SkeletonAttachment;
 import com.esotericsoftware.spine.attachments.SkinnedMeshAttachment;
-
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
-import com.badlogic.gdx.utils.Array;
 
 public class SkeletonRenderer {
 	static private final short[] quadTriangles = {0, 1, 2, 2, 3, 0};
@@ -50,10 +48,7 @@ public class SkeletonRenderer {
 	@SuppressWarnings("null")
 	public void draw (PolygonSpriteBatch batch, Skeleton skeleton) {
 		boolean premultipliedAlpha = this.premultipliedAlpha;
-		int srcFunc = premultipliedAlpha ? GL20.GL_ONE : GL20.GL_SRC_ALPHA;
-		batch.setBlendFunction(srcFunc, GL20.GL_ONE_MINUS_SRC_ALPHA);
-
-		boolean additive = false;
+		BlendMode blendMode = null;
 
 		float[] vertices = null;
 		short[] triangles = null;
@@ -106,12 +101,10 @@ public class SkeletonRenderer {
 			}
 
 			if (texture != null) {
-				if (slot.data.getAdditiveBlending() != additive) {
-					additive = !additive;
-					if (additive)
-						batch.setBlendFunction(srcFunc, GL20.GL_ONE);
-					else
-						batch.setBlendFunction(srcFunc, GL20.GL_ONE_MINUS_SRC_ALPHA);
+				BlendMode slotBlendMode = slot.data.getBlendMode();
+				if (slotBlendMode != blendMode) {
+					blendMode = slotBlendMode;
+					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
 				}
 				batch.draw(texture, vertices, 0, vertices.length, triangles, 0, triangles.length);
 			}
@@ -120,10 +113,7 @@ public class SkeletonRenderer {
 
 	public void draw (Batch batch, Skeleton skeleton) {
 		boolean premultipliedAlpha = this.premultipliedAlpha;
-		int srcFunc = premultipliedAlpha ? GL20.GL_ONE : GL20.GL_SRC_ALPHA;
-		batch.setBlendFunction(srcFunc, GL20.GL_ONE_MINUS_SRC_ALPHA);
-
-		boolean additive = false;
+		BlendMode blendMode = null;
 
 		Array<Slot> drawOrder = skeleton.drawOrder;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
@@ -133,12 +123,10 @@ public class SkeletonRenderer {
 				RegionAttachment regionAttachment = (RegionAttachment)attachment;
 				regionAttachment.updateWorldVertices(slot, premultipliedAlpha);
 				float[] vertices = regionAttachment.getWorldVertices();
-				if (slot.data.getAdditiveBlending() != additive) {
-					additive = !additive;
-					if (additive)
-						batch.setBlendFunction(srcFunc, GL20.GL_ONE);
-					else
-						batch.setBlendFunction(srcFunc, GL20.GL_ONE_MINUS_SRC_ALPHA);
+				BlendMode slotBlendMode = slot.data.getBlendMode();
+				if (slotBlendMode != blendMode) {
+					blendMode = slotBlendMode;
+					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
 				}
 				batch.draw(regionAttachment.getRegion().getTexture(), vertices, 0, 20);
 

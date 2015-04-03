@@ -283,8 +283,7 @@ public class SkeletonRenderer : MonoBehaviour {
 				color.r = (byte)(r * slot.r * regionAttachment.r * color.a);
 				color.g = (byte)(g * slot.g * regionAttachment.g * color.a);
 				color.b = (byte)(b * slot.b * regionAttachment.b * color.a);
-				if (slot.data.additiveBlending)
-					color.a = 0;
+				if (slot.data.blendMode == BlendMode.additive) color.a = 0;
 				colors[vertexIndex] = color;
 				colors[vertexIndex + 1] = color;
 				colors[vertexIndex + 2] = color;
@@ -311,8 +310,7 @@ public class SkeletonRenderer : MonoBehaviour {
 					color.r = (byte)(r * slot.r * meshAttachment.r * color.a);
 					color.g = (byte)(g * slot.g * meshAttachment.g * color.a);
 					color.b = (byte)(b * slot.b * meshAttachment.b * color.a);
-					if (slot.data.additiveBlending)
-						color.a = 0;
+					if (slot.data.blendMode == BlendMode.additive) color.a = 0;
 
 					float[] meshUVs = meshAttachment.uvs;
 					float z = i * zSpacing;
@@ -332,8 +330,7 @@ public class SkeletonRenderer : MonoBehaviour {
 					color.r = (byte)(r * slot.r * meshAttachment.r * color.a);
 					color.g = (byte)(g * slot.g * meshAttachment.g * color.a);
 					color.b = (byte)(b * slot.b * meshAttachment.b * color.a);
-					if (slot.data.additiveBlending)
-						color.a = 0;
+					if (slot.data.blendMode == BlendMode.additive) color.a = 0;
 
 					float[] meshUVs = meshAttachment.uvs;
 					float z = i * zSpacing;

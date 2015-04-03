@@ -28,10 +28,8 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package com.esotericsoftware.spine.attachments;
-
-public enum AttachmentType {
-	region, boundingbox, mesh, skinnedmesh;
-
-	static public AttachmentType[] values = values();
+namespace Spine {
+	public enum BlendMode {
+		normal, additive, multiply, screen
+	}
 }

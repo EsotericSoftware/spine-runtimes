@@ -191,7 +191,7 @@ function drawSkeleton (batch, skeleton) {
 		if (!(attachment instanceof spine.RegionAttachment)) continue;
 		attachment.computeVertices(skeleton.x, skeleton.y, slot.bone, vertices);
 		
-		var blendMode = slot.data.additiveBlending ? draw2D.blend.additive : draw2D.blend.alpha;
+		var blendMode = slot.data.blendMode == spine.BlendMode.additive ? draw2D.blend.additive : draw2D.blend.alpha;
 		if (batch.blendMode != blendMode) {
 			batch.end();
 			batch.begin(blendMode);

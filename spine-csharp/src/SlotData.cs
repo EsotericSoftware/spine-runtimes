@@ -36,7 +36,7 @@ namespace Spine {
 		internal BoneData boneData;
 		internal float r = 1, g = 1, b = 1, a = 1;
 		internal String attachmentName;
-		internal bool additiveBlending;
+		internal BlendMode blendMode;
 
 		public String Name { get { return name; } }
 		public BoneData BoneData { get { return boneData; } }
@@ -46,7 +46,7 @@ namespace Spine {
 		public float A { get { return a; } set { a = value; } }
 		/// <summary>May be null.</summary>
 		public String AttachmentName { get { return attachmentName; } set { attachmentName = value; } }
-		public bool AdditiveBlending { get { return additiveBlending; } set { additiveBlending = value; } }
+		public BlendMode BlendMode { get { return blendMode; } set { blendMode = value; } }
 
 		public SlotData (String name, BoneData boneData) {
 			if (name == null) throw new ArgumentNullException("name cannot be null.");

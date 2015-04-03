@@ -163,8 +163,10 @@ namespace Spine {
 					if (slotMap.ContainsKey("attachment"))
 						slotData.attachmentName = (String)slotMap["attachment"];
 
-					if (slotMap.ContainsKey("additive"))
-						slotData.additiveBlending = (bool)slotMap["additive"];
+					if (slotMap.ContainsKey("blend"))
+						slotData.blendMode = (BlendMode)Enum.Parse(typeof(BlendMode), (String)slotMap["blend"], false);
+					else
+						slotData.blendMode = BlendMode.normal;
 
 					skeletonData.slots.Add(slotData);
 				}

@@ -145,7 +145,7 @@ public class SkeletonJson {
 			}
 
 			slotData.attachmentName = slotMap["attachment"];
-			slotData.additiveBlending = slotMap["additive"];
+			slotData.blendMode = BlendMode[slotMap["blend"] || "normal"];
 
 			skeletonData.slots[skeletonData.slots.length] = slotData;
 		}

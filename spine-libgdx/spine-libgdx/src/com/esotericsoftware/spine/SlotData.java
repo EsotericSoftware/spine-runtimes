@@ -37,7 +37,7 @@ public class SlotData {
 	final BoneData boneData;
 	final Color color = new Color(1, 1, 1, 1);
 	String attachmentName;
-	boolean additiveBlending;
+	BlendMode blendMode;
 
 	SlotData () {
 		name = null;
@@ -73,12 +73,12 @@ public class SlotData {
 		return attachmentName;
 	}
 
-	public boolean getAdditiveBlending () {
-		return additiveBlending;
+	public BlendMode getBlendMode () {
+		return blendMode;
 	}
 
-	public void setAdditiveBlending (boolean additiveBlending) {
-		this.additiveBlending = additiveBlending;
+	public void setBlendMode (BlendMode blendMode) {
+		this.blendMode = blendMode;
 	}
 
 	public String toString () {

@@ -103,6 +103,7 @@
     <Compile Include="src\Attachments\AttachmentType.cs" />
     <Compile Include="src\Attachments\BoundingBoxAttachment.cs" />
     <Compile Include="src\Attachments\RegionAttachment.cs" />
+    <Compile Include="src\BlendMode.cs" />
     <Compile Include="src\Bone.cs" />
     <Compile Include="src\BoneData.cs" />
     <Compile Include="src\IkConstraint.cs" />

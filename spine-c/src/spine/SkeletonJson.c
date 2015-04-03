@@ -519,7 +519,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 		for (slotMap = slots->child, i = 0; slotMap; slotMap = slotMap->next, ++i) {
 			spSlotData* slotData;
 			const char* color;
-			Json *attachmentItem;
+			Json *item;
 
 			const char* boneName = Json_getString(slotMap, "bone", 0);
 			spBoneData* boneData = spSkeletonData_findBone(skeletonData, boneName);
@@ -539,10 +539,18 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 				slotData->a = toColor(color, 3);
 			}
 
-			attachmentItem = Json_getItem(slotMap, "attachment");
-			if (attachmentItem) spSlotData_setAttachmentName(slotData, attachmentItem->valueString);
+			item = Json_getItem(slotMap, "attachment");
+			if (item) spSlotData_setAttachmentName(slotData, item->valueString);
 
-			slotData->additiveBlending = Json_getInt(slotMap, "additive", 0);
+			item = Json_getItem(slotMap, "blend");
+			if (item) {
+				if (strcmp(item->valueString, "additive") == 0)
+					slotData->blendMode = SP_BLEND_MODE_ADDITIVE;
+				else if (strcmp(item->valueString, "multiply") == 0)
+					slotData->blendMode = SP_BLEND_MODE_MULTIPLY;
+				else if (strcmp(item->valueString, "screen") == 0)
+					slotData->blendMode = SP_BLEND_MODE_SCREEN;
+			}
 
 			skeletonData->slots[i] = slotData;
 		}
