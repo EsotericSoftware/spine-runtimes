@@ -1,138 +1,145 @@
 
-Hero.png
-size: 512,256
+hero-mesh.png
+size: 1024,256
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
-White/body
-  rotate: true
-  xy: 172, 0
+body
+  rotate: false
+  xy: 324, 81
   size: 97, 95
   orig: 97, 95
   offset: 0, 0
   index: -1
-White/cape
+cape
   rotate: false
-  xy: 172, 97
+  xy: 176, 88
   size: 146, 159
   orig: 146, 159
   offset: 0, 0
   index: -1
-White/eyes
-  rotate: true
-  xy: 267, 15
+eyes
+  rotate: false
+  xy: 604, 216
   size: 82, 31
   orig: 82, 31
   offset: 0, 0
   index: -1
-White/fingers
-  rotate: true
-  xy: 371, 85
+fingers
+  rotate: false
+  xy: 877, 214
   size: 31, 33
   orig: 31, 33
   offset: 0, 0
   index: -1
-White/foot1
-  rotate: true
-  xy: 426, 151
+foot1
+  rotate: false
+  xy: 743, 205
   size: 50, 42
   orig: 50, 42
   offset: 0, 0
   index: -1
-White/foot2
+foot2
   rotate: false
-  xy: 318, 99
+  xy: 688, 209
   size: 53, 38
   orig: 53, 38
   offset: 0, 0
   index: -1
-White/forearm1
+forearm1
   rotate: false
-  xy: 468, 154
+  xy: 795, 198
   size: 41, 49
   orig: 41, 49
   offset: 0, 0
   index: -1
-White/forearm2
+forearm2
   rotate: false
-  xy: 412, 115
+  xy: 910, 215
   size: 31, 32
   orig: 31, 32
   offset: 0, 0
   index: -1
-White/hand1
-  rotate: true
-  xy: 110, 7
+hand1
+  rotate: false
+  xy: 838, 199
   size: 37, 48
   orig: 37, 48
   offset: 0, 0
   index: -1
-White/hand2
-  rotate: true
-  xy: 375, 116
+hand2
+  rotate: false
+  xy: 286, 49
   size: 31, 37
   orig: 31, 37
   offset: 0, 0
   index: -1
-White/head
+head
   rotate: false
-  xy: 0, 83
+  xy: 2, 74
   size: 172, 173
   orig: 172, 173
   offset: 0, 0
   index: -1
-White/mantles
+mantles
   rotate: false
-  xy: 318, 201
+  xy: 2, 17
   size: 136, 55
   orig: 136, 55
   offset: 0, 0
   index: -1
-White/mouth
-  rotate: true
-  xy: 298, 36
+mouth
+  rotate: false
+  xy: 2, 2
   size: 61, 13
   orig: 61, 13
   offset: 0, 0
   index: -1
-White/shin1
-  rotate: true
-  xy: 454, 203
+shin1
+  rotate: false
+  xy: 482, 119
   size: 53, 57
   orig: 53, 57
   offset: 0, 0
   index: -1
-White/shin2
+shin2
   rotate: false
-  xy: 375, 147
+  xy: 192, 32
   size: 51, 54
   orig: 51, 54
   offset: 0, 0
   index: -1
-White/thigh1
+sword
   rotate: false
-  xy: 0, 20
+  xy: 324, 178
+  size: 216, 69
+  orig: 216, 69
+  offset: 0, 0
+  index: -1
+thigh1
+  rotate: false
+  xy: 542, 184
   size: 60, 63
   orig: 60, 63
   offset: 0, 0
   index: -1
-White/thigh2
+thigh2
   rotate: false
-  xy: 318, 137
+  xy: 423, 112
   size: 57, 64
   orig: 57, 64
   offset: 0, 0
   index: -1
-White/upperarm1
+upperarm1
   rotate: false
-  xy: 60, 27
+  xy: 140, 16
   size: 50, 56
   orig: 50, 56
   offset: 0, 0
   index: -1
-White/upperarm2
-  rotate: true
-  xy: 110, 44
+upperarm2
+  rotate: false
+  xy: 245, 27
   size: 39, 59
   orig: 39, 59
   offset: 0, 0
