@@ -67,7 +67,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	_skeleton = spSkeleton_create(skeletonData);
 	_rootBone = _skeleton->bones[0];
 
-	_blendFunc.src = GL_ONE;
+	_blendFunc.src = GL_SRC_ALPHA;
 	_blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
 	_drawNode = [[CCDrawNode alloc] init];
 	[_drawNode setBlendMode: [CCBlendMode premultipliedAlphaMode]];
