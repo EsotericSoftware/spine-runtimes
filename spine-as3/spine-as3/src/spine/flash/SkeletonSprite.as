@@ -52,6 +52,8 @@ import spine.attachments.RegionAttachment;
 public class SkeletonSprite extends Sprite {
 	static private var tempPoint:Point = new Point();
 	static private var tempMatrix:Matrix = new Matrix();
+	static private var blendModes:Vector.<String> = new <String>[
+		BlendMode.NORMAL, BlendMode.ADD, BlendMode.MULTIPLY, BlendMode.SCREEN];
 
 	private var _skeleton:Skeleton;
 	public var timeScale:Number = 1;
@@ -119,7 +121,7 @@ public class SkeletonSprite extends Sprite {
 					regionAttachment["wrapper"] = wrapper;
 				}
 
-				wrapper.blendMode = slot.data.additiveBlending ? BlendMode.ADD : BlendMode.NORMAL;
+				wrapper.blendMode = blendModes[slot.data.blendMode.ordinal];
 
 				var colorTransform:ColorTransform = wrapper.transform.colorTransform;
 				colorTransform.redMultiplier = skeleton.r * slot.r * regionAttachment.r;

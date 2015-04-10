@@ -88,7 +88,7 @@ namespace Spine {
 				Slot slot = drawOrder[i];
 				RegionAttachment regionAttachment = slot.Attachment as RegionAttachment;
 				if (regionAttachment != null) {
-					BlendState blend = slot.Data.AdditiveBlending ? BlendState.Additive : defaultBlendState;
+					BlendState blend = slot.Data.BlendMode == BlendMode.additive ? BlendState.Additive : defaultBlendState;
 					if (device.BlendState != blend) {
 						End();
 						device.BlendState = blend;

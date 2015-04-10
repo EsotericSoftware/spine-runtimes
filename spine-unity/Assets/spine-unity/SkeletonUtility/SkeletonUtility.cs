@@ -101,6 +101,28 @@ public class SkeletonUtility : MonoBehaviour {
 		return null;
 	}
 
+	public static PolygonCollider2D AddBoundingBoxAsComponent (BoundingBoxAttachment boundingBox, GameObject gameObject, bool isTrigger = true) {
+		if (boundingBox == null)
+			return null;
+
+		var collider = gameObject.AddComponent<PolygonCollider2D>();
+		collider.isTrigger = isTrigger;
+		float[] floats = boundingBox.Vertices;
+		int floatCount = floats.Length;
+		int vertCount = floatCount / 2;
+
+		Vector2[] verts = new Vector2[vertCount];
+		int v = 0;
+		for (int i = 0; i < floatCount; i += 2, v++) {
+			verts[v].x = floats[i];
+			verts[v].y = floats[i + 1];
+		}
+
+		collider.SetPath(0, verts);
+
+		return collider;
+	}
+
 
 	public delegate void SkeletonUtilityDelegate ();
 

@@ -50,6 +50,13 @@ spine.BoneData.prototype = {
 	flipX: false, flipY: false
 };
 
+spine.BlendMode = {
+	normal: 0,
+	additive: 1,
+	multiply: 2,
+	screen: 3
+};
+
 spine.SlotData = function (name, boneData) {
 	this.name = name;
 	this.boneData = boneData;
@@ -57,7 +64,7 @@ spine.SlotData = function (name, boneData) {
 spine.SlotData.prototype = {
 	r: 1, g: 1, b: 1, a: 1,
 	attachmentName: null,
-	additiveBlending: false
+	blendMode: spine.BlendMode.normal
 };
 
 spine.IkConstraintData = function (name) {
@@ -1766,7 +1773,7 @@ spine.SkeletonJson.prototype = {
 			}
 
 			slotData.attachmentName = slotMap["attachment"];
-			slotData.additiveBlending = slotMap["additive"] && slotMap["additive"] == "true";
+			slotData.blendMode = spine.AttachmentType[slotMap["blend"] || "normal"];
 
 			skeletonData.slots.push(slotData);
 		}

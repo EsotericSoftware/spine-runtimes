@@ -38,6 +38,7 @@ using System.Collections;
 public class SpineSlot : PropertyAttribute {
 	public string startsWith = "";
 	public string dataField = "";
+	public bool containsBoundingBoxes = false;
 
 	/// <summary>
 	/// Smart popup menu for Spine Slots
@@ -47,9 +48,11 @@ public class SpineSlot : PropertyAttribute {
 	/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives).
 	/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
 	/// </param>
-	public SpineSlot(string startsWith = "", string dataField = "") {
+	/// <param name="containsBoundingBoxes">Disables popup results that don't contain bounding box attachments when true.</param>
+	public SpineSlot(string startsWith = "", string dataField = "", bool containsBoundingBoxes = false) {
 		this.startsWith = startsWith;
 		this.dataField = dataField;
+		this.containsBoundingBoxes = containsBoundingBoxes;
 	}
 }
 

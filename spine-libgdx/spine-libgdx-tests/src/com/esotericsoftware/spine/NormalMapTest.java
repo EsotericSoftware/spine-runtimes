@@ -303,7 +303,7 @@ public class NormalMapTest extends ApplicationAdapter {
 
 			TextButton resetButton = new TextButton("Reset", skin);
 			resetButton.getColor().a = 0.66f;
-			window.getButtonTable().add(resetButton).height(20);
+			window.getTitleTable().add(resetButton).height(20);
 
 			window.add(root).expand().fill();
 			window.pack();
