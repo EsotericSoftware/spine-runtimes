@@ -57,6 +57,8 @@ public class BoneFollower : MonoBehaviour {
 
 
 	/// <summary>If a bone isn't set, boneName is used to find the bone.</summary>
+	
+	[SpineBone(dataField: "skeletonRenderer")]
 	public String boneName;
 	public bool resetOnAwake = true;
 	protected Transform cachedTransform;
