@@ -95,7 +95,6 @@ void SkeletonDrawable::update (float deltaTime) {
 
 void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 	vertexArray->clear();
-	states.blendMode = BlendAlpha;
 
 	sf::Vertex vertices[4];
 	sf::Vertex vertex;
@@ -103,6 +102,25 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 		Slot* slot = skeleton->drawOrder[i];
 		Attachment* attachment = slot->attachment;
 		if (!attachment) continue;
+
+		sf::BlendMode blend;
+		switch (slot->data->blendMode) {
+		case BLEND_MODE_ADDITIVE:
+			blend = BlendAdd;
+			break;
+		case BLEND_MODE_MULTIPLY:
+			blend = BlendMultiply;
+			break;
+		case BLEND_MODE_SCREEN: // Unsupported, fall through.
+		default:
+			blend = BlendAlpha;
+		}
+		if (states.blendMode != blend) {
+			target.draw(*vertexArray, states);
+			vertexArray->clear();
+			states.blendMode = blend;
+		}
+
 		Texture* texture = 0;
 		if (attachment->type == ATTACHMENT_REGION) {
 			RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
@@ -212,13 +230,6 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 		if (texture) {
 			// SMFL doesn't handle batching for us, so we'll just force a single texture per skeleton.
 			states.texture = texture;
-
-			BlendMode blend = slot->data->additiveBlending ? BlendAdd : BlendAlpha;
-			if (states.blendMode != blend) {
-				target.draw(*vertexArray, states);
-				vertexArray->clear();
-				states.blendMode = blend;
-			}
 		}
 	}
 	target.draw(*vertexArray, states);

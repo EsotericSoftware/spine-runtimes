@@ -1,3 +1,7 @@
+<html>
+<head>
+<meta charset="UTF-8">
+
 <!-----------------------------------------------------------------------------
 -- Spine Runtimes Software License
 -- Version 2.1
@@ -28,10 +32,7 @@
 -- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ------------------------------------------------------------------------------>
 
-<html>
-<head>
-<meta charset="UTF-8">
-<title>spine-js</title>
+<title>spine-turbulenz</title>
 <script src="../spine-js/spine.js"></script>
 <script src="../turbulenz/turbulenzengine.js"></script>
 <script src="../turbulenz/graphicsdevice.js"></script>
@@ -190,7 +191,7 @@ function drawSkeleton (batch, skeleton) {
 		if (!(attachment instanceof spine.RegionAttachment)) continue;
 		attachment.computeVertices(skeleton.x, skeleton.y, slot.bone, vertices);
 		
-		var blendMode = slot.data.additiveBlending ? draw2D.blend.additive : draw2D.blend.alpha;
+		var blendMode = slot.data.blendMode == spine.BlendMode.additive ? draw2D.blend.additive : draw2D.blend.alpha;
 		if (batch.blendMode != blendMode) {
 			batch.end();
 			batch.begin(blendMode);

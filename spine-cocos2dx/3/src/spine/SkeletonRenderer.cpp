@@ -158,7 +158,7 @@ void SkeletonRenderer::drawSkeleton (const Mat4 &transform, uint32_t transformFl
 	_skeleton->b = nodeColor.b / (float)255;
 	_skeleton->a = getDisplayedOpacity() / (float)255;
 
-	int additive = -1;
+	int blendMode = -1;
 	Color4B color;
 	const float* uvs = nullptr;
 	int verticesCount = 0;
@@ -215,10 +215,22 @@ void SkeletonRenderer::drawSkeleton (const Mat4 &transform, uint32_t transformFl
 		default: ;
 		} 
 		if (texture) {
-			if (slot->data->additiveBlending != additive) {
+			if (slot->data->blendMode != blendMode) {
 				_batch->flush();
-				GL::blendFunc(_blendFunc.src, slot->data->additiveBlending ? GL_ONE : _blendFunc.dst);
-				additive = slot->data->additiveBlending;
+				blendMode = slot->data->blendMode;
+				switch (slot->data->blendMode) {
+				case SP_BLEND_MODE_ADDITIVE:
+					GL::blendFunc(_premultipliedAlpha ? GL_ONE : GL_SRC_ALPHA, GL_ONE);
+					break;
+				case SP_BLEND_MODE_MULTIPLY:
+					GL::blendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
+					break;
+				case SP_BLEND_MODE_SCREEN:
+					GL::blendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
+					break;
+				default:
+					GL::blendFunc(_blendFunc.src, _blendFunc.dst);
+				}
 			}
 			color.a = _skeleton->a * slot->a * a * 255;
 			float multiplier = _premultipliedAlpha ? color.a : 255;
@@ -346,14 +358,20 @@ spSlot* SkeletonRenderer::findSlot (const std::string& slotName) const {
 }
 
 bool SkeletonRenderer::setSkin (const std::string& skinName) {
-	return spSkeleton_setSkinByName(_skeleton, skinName.c_str()) ? true : false;
+	return spSkeleton_setSkinByName(_skeleton, skinName.empty() ? 0 : skinName.c_str()) ? true : false;
+}
+bool SkeletonRenderer::setSkin (const char* skinName) {
+	return spSkeleton_setSkinByName(_skeleton, skinName) ? true : false;
 }
 
 spAttachment* SkeletonRenderer::getAttachment (const std::string& slotName, const std::string& attachmentName) const {
 	return spSkeleton_getAttachmentForSlotName(_skeleton, slotName.c_str(), attachmentName.c_str());
 }
 bool SkeletonRenderer::setAttachment (const std::string& slotName, const std::string& attachmentName) {
-	return spSkeleton_setAttachment(_skeleton, slotName.c_str(), attachmentName.c_str()) ? true : false;
+	return spSkeleton_setAttachment(_skeleton, slotName.c_str(), attachmentName.empty() ? 0 : attachmentName.c_str()) ? true : false;
+}
+bool SkeletonRenderer::setAttachment (const std::string& slotName, const char* attachmentName) {
+	return spSkeleton_setAttachment(_skeleton, slotName.c_str(), attachmentName) ? true : false;
 }
 
 spSkeleton* SkeletonRenderer::getSkeleton () {

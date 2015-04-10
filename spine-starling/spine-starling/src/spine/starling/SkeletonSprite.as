@@ -58,6 +58,8 @@ public class SkeletonSprite extends DisplayObject {
 	static private var _tempMatrix:Matrix = new Matrix();
 	static private var _tempVertices:Vector.<Number> = new Vector.<Number>(8);
 	static private var _quadTriangles:Vector.<uint> = new <uint>[0, 1, 2, 2, 3, 0];
+	static internal var blendModes:Vector.<String> = new <String>[
+		BlendMode.NORMAL, BlendMode.ADD, BlendMode.MULTIPLY, BlendMode.SCREEN];
 
 	private var _skeleton:Skeleton;
 	private var _polygonBatch:PolygonBatch;
@@ -165,7 +167,7 @@ public class SkeletonSprite extends DisplayObject {
 				r *= skeletonR * slot.r * a;
 				g *= skeletonG * slot.g * a;
 				b *= skeletonB * slot.b * a;
-				polygonBatch.add(image.texture, worldVertices, verticesLength, uvs, triangles, r, g, b, a, slot.data.additiveBlending, matrix);
+				polygonBatch.add(image.texture, worldVertices, verticesLength, uvs, triangles, r, g, b, a, slot.data.blendMode, matrix);
 			}
 		}
 	}
@@ -206,7 +208,7 @@ public class SkeletonSprite extends DisplayObject {
 				vertexData.setColorAndAlpha(3, rgb, a);
 				
 				image.updateVertices();
-				support.blendMode = slot.data.additiveBlending ? BlendMode.ADD : blendMode;
+				support.blendMode = blendModes[slot.data.blendMode.ordinal];
 				support.batchQuad(image, alpha, image.texture, _smoothing);
 			}
 		}

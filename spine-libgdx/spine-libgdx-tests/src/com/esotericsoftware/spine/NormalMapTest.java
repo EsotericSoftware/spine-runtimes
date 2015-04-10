@@ -53,8 +53,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 
 public class NormalMapTest extends ApplicationAdapter {
 	String skeletonPath, animationName;
@@ -303,7 +303,7 @@ public class NormalMapTest extends ApplicationAdapter {
 
 			TextButton resetButton = new TextButton("Reset", skin);
 			resetButton.getColor().a = 0.66f;
-			window.getButtonTable().add(resetButton).height(20);
+			window.getTitleTable().add(resetButton).height(20);
 
 			window.add(root).expand().fill();
 			window.pack();

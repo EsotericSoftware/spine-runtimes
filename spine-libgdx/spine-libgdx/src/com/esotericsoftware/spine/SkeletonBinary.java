@@ -160,7 +160,7 @@ public class SkeletonBinary {
 				SlotData slotData = new SlotData(slotName, boneData);
 				Color.rgba8888ToColor(slotData.color, input.readInt());
 				slotData.attachmentName = input.readString();
-				slotData.additiveBlending = input.readBoolean();
+				slotData.blendMode = BlendMode.values[input.readInt(true)];
 				skeletonData.slots.add(slotData);
 			}
 
@@ -200,6 +200,9 @@ public class SkeletonBinary {
 		skeletonData.bones.shrink();
 		skeletonData.slots.shrink();
 		skeletonData.skins.shrink();
+		skeletonData.events.shrink();
+		skeletonData.animations.shrink();
+		skeletonData.ikConstraints.shrink();
 		return skeletonData;
 	}
 
@@ -224,7 +227,7 @@ public class SkeletonBinary {
 		String name = input.readString();
 		if (name == null) name = attachmentName;
 
-		switch (AttachmentType.values()[input.readByte()]) {
+		switch (AttachmentType.values[input.readByte()]) {
 		case region: {
 			String path = input.readString();
 			if (path == null) path = name;

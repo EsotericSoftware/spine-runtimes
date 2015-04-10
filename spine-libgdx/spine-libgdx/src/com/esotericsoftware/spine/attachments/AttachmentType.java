@@ -31,5 +31,7 @@
 package com.esotericsoftware.spine.attachments;
 
 public enum AttachmentType {
-	region, boundingbox, mesh, skinnedmesh
+	region, boundingbox, mesh, skinnedmesh;
+
+	static public AttachmentType[] values = values();
 }

@@ -57,6 +57,72 @@ public class SkeletonUtility : MonoBehaviour {
 #endif
 	}
 
+	public static PolygonCollider2D AddBoundingBox (Skeleton skeleton, string skinName, string slotName, string attachmentName, Transform parent, bool isTrigger = true) {
+		// List<Attachment> attachments = new List<Attachment>();
+		Skin skin;
+
+		if (skinName == "")
+			skinName = skeleton.Data.DefaultSkin.Name;
+
+		skin = skeleton.Data.FindSkin(skinName);
+
+		if (skin == null) {
+			Debug.LogError("Skin " + skinName + " not found!");
+			return null;
+		}
+
+		var attachment = skin.GetAttachment(skeleton.FindSlotIndex(slotName), attachmentName);
+		if (attachment is BoundingBoxAttachment) {
+			GameObject go = new GameObject("[BoundingBox]" + attachmentName);
+			go.transform.parent = parent;
+			go.transform.localPosition = Vector3.zero;
+			go.transform.localRotation = Quaternion.identity;
+			go.transform.localScale = Vector3.one;
+			var collider = go.AddComponent<PolygonCollider2D>();
+			collider.isTrigger = isTrigger;
+			var boundingBox = (BoundingBoxAttachment)attachment;
+			float[] floats = boundingBox.Vertices;
+			int floatCount = floats.Length;
+			int vertCount = floatCount / 2;
+			
+			Vector2[] verts = new Vector2[vertCount];
+			int v = 0;
+			for (int i = 0; i < floatCount; i += 2, v++) {
+				verts[v].x = floats[i];
+				verts[v].y = floats[i+1];
+			}
+
+			collider.SetPath(0, verts);
+
+			return collider;
+			
+		}
+
+		return null;
+	}
+
+	public static PolygonCollider2D AddBoundingBoxAsComponent (BoundingBoxAttachment boundingBox, GameObject gameObject, bool isTrigger = true) {
+		if (boundingBox == null)
+			return null;
+
+		var collider = gameObject.AddComponent<PolygonCollider2D>();
+		collider.isTrigger = isTrigger;
+		float[] floats = boundingBox.Vertices;
+		int floatCount = floats.Length;
+		int vertCount = floatCount / 2;
+
+		Vector2[] verts = new Vector2[vertCount];
+		int v = 0;
+		for (int i = 0; i < floatCount; i += 2, v++) {
+			verts[v].x = floats[i];
+			verts[v].y = floats[i + 1];
+		}
+
+		collider.SetPath(0, verts);
+
+		return collider;
+	}
+
 
 	public delegate void SkeletonUtilityDelegate ();
 
@@ -336,11 +402,11 @@ public class SkeletonUtility : MonoBehaviour {
 			go.transform.localScale = Vector3.one;
 
 			SkeletonUtilitySubmeshRenderer s = go.AddComponent<SkeletonUtilitySubmeshRenderer>();
-			s.sortingOrder = i * 10;
+			s.GetComponent<Renderer>().sortingOrder = i * 10;
 			s.submeshIndex = i;
-			s.Initialize(GetComponent<Renderer>());
-			s.Update();
 		}
+
+		skeletonRenderer.CollectSubmeshRenderers();
 
 		if (disablePrimaryRenderer)
 			GetComponent<Renderer>().enabled = false;

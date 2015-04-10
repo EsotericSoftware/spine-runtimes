@@ -41,6 +41,12 @@ struct spSkeleton;
 
 typedef struct spSkin {
 	const char* const name;
+
+#ifdef __cplusplus
+	spSkin() :
+		name(0) {
+	}
+#endif
 } spSkin;
 
 spSkin* spSkin_create (const char* name);

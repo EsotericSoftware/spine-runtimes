@@ -39,10 +39,11 @@
 	bool _debugBones;
 	bool _premultipliedAlpha;
 	ccBlendFunc _blendFunc;
-    CCDrawNode *_drawNode;
+	CCDrawNode* _drawNode;
 	bool _ownsSkeletonData;
 	spAtlas* _atlas;
-	float* worldVertices;
+	float* _worldVertices;
+	CCBlendMode* screenMode;
 }
 
 + (id) skeletonWithData:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData;

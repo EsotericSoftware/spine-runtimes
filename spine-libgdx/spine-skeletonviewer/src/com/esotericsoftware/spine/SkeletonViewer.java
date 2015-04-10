@@ -307,7 +307,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 			minimizeButton.padTop(-2).padLeft(5);
 			minimizeButton.getColor().a = 0.66f;
-			window.getButtonTable().add(minimizeButton).size(20, 20);
+			window.getTitleTable().add(minimizeButton).size(20, 20);
 
 			ScrollPane skinScroll = new ScrollPane(skinList, skin);
 			skinScroll.setFadeScrollBars(false);

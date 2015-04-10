@@ -52,6 +52,7 @@ spine.AnimationState = require "spine-lua.AnimationState"
 spine.EventData = require "spine-lua.EventData"
 spine.Event = require "spine-lua.Event"
 spine.SkeletonBounds = require "spine-lua.SkeletonBounds"
+spine.BlendMode = require "spine-lua.BlendMode"
 
 spine.utils.readFile = function (fileName, base)
 	local path = fileName
@@ -139,10 +140,14 @@ function spine.Skeleton.new (skeletonData, group)
 					rotation = -rotation
 				end
 				love.graphics.setColor(r * slot.r, g * slot.g, b * slot.b, a * slot.a)
-				if slot.data.additiveBlending then
-					love.graphics.setBlendMode("additive")
-				else
+				if slot.data.blendMode == spine.BlendMode.normal then
 					love.graphics.setBlendMode("alpha")
+				elseif slot.data.blendMode == spine.BlendMode.additive then
+					love.graphics.setBlendMode("additive")
+				elseif slot.data.blendMode == spine.BlendMode.multiply then
+					love.graphics.setBlendMode("multiply")
+				elseif slot.data.blendMode == spine.BlendMode.screen then
+					love.graphics.setBlendMode("screen")
 				end
 				love.graphics.draw(image, 
 					self.x + x, 

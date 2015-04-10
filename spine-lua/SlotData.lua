@@ -28,6 +28,8 @@
 -- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
+local BlendMode = require "spine-lua.BlendMode"
+
 local SlotData = {}
 function SlotData.new (name, boneData)
 	if not name then error("name cannot be nil", 2) end
@@ -38,7 +40,7 @@ function SlotData.new (name, boneData)
 		boneData = boneData,
 		r = 1, g = 1, b = 1, a = 1,
 		attachmentName = nil,
-		additiveBlending = false
+		blendMode = BlendMode.normal
 	}
 
 	function self:setColor (r, g, b, a)

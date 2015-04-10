@@ -42,7 +42,7 @@ namespace Spine {
 		internal List<Animation> animations = new List<Animation>();
 		internal List<IkConstraintData> ikConstraints = new List<IkConstraintData>();
 		internal float width, height;
-		internal String version, hash;
+		internal String version, hash, imagesPath;
 
 		public String Name { get { return name; } set { name = value; } }
 		public List<BoneData> Bones { get { return bones; } } // Ordered parents first.

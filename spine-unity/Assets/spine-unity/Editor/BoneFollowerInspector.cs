@@ -35,6 +35,7 @@ using UnityEngine;
 public class BoneFollowerInspector : Editor {
 	private SerializedProperty boneName, skeletonRenderer, followZPosition, followBoneRotation;
 	BoneFollower component;
+	bool needsReset;
 
 	void OnEnable () {
 		skeletonRenderer = serializedObject.FindProperty("skeletonRenderer");
@@ -64,6 +65,12 @@ public class BoneFollowerInspector : Editor {
 	}
 
 	override public void OnInspectorGUI () {
+		if (needsReset) {
+			component.Reset();
+			component.DoUpdate();
+			needsReset = false;
+			SceneView.RepaintAll();
+		}
 		serializedObject.Update();
 
 		FindRenderer();
@@ -71,26 +78,16 @@ public class BoneFollowerInspector : Editor {
 		EditorGUILayout.PropertyField(skeletonRenderer);
 
 		if (component.valid) {
-			String[] bones = new String[1];
-			try {
-				bones = new String[component.skeletonRenderer.skeleton.Data.Bones.Count + 1];
-			} catch {
-
+			EditorGUI.BeginChangeCheck();
+			EditorGUILayout.PropertyField(boneName);
+			if (EditorGUI.EndChangeCheck()) {
+				serializedObject.ApplyModifiedProperties();
+				needsReset = true;
+				serializedObject.Update();
 			}
+				
+				
 
-			bones[0] = "<None>";
-			for (int i = 0; i < bones.Length - 1; i++)
-				bones[i + 1] = component.skeletonRenderer.skeleton.Data.Bones[i].Name;
-			Array.Sort<String>(bones);
-			int boneIndex = Math.Max(0, Array.IndexOf(bones, boneName.stringValue));
-
-			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.LabelField("Bone");
-			EditorGUIUtility.LookLikeControls();
-			boneIndex = EditorGUILayout.Popup(boneIndex, bones);
-			EditorGUILayout.EndHorizontal();
-
-			boneName.stringValue = boneIndex == 0 ? null : bones[boneIndex];
 			EditorGUILayout.PropertyField(followBoneRotation);
 			EditorGUILayout.PropertyField(followZPosition);
 		} else {

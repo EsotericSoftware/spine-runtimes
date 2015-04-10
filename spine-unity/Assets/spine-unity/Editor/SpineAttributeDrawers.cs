@@ -114,8 +114,35 @@ public class SpineSlotDrawer : PropertyDrawer {
 
 		for (int i = 0; i < data.Slots.Count; i++) {
 			string name = data.Slots[i].Name;
-			if (name.StartsWith(attrib.startsWith))
-				menu.AddItem(new GUIContent(name), name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
+			if (name.StartsWith(attrib.startsWith)) {
+				if (attrib.containsBoundingBoxes) {
+
+					int slotIndex = i;
+
+					List<Attachment> attachments = new List<Attachment>();
+					foreach (var skin in data.Skins) {
+						skin.FindAttachmentsForSlot(slotIndex, attachments);
+					}
+
+					bool hasBoundingBox = false;
+					foreach (var attachment in attachments) {
+						if (attachment is BoundingBoxAttachment) {
+							menu.AddItem(new GUIContent(name), name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
+							hasBoundingBox = true;
+							break;
+						}
+					}
+
+					if (!hasBoundingBox)
+						menu.AddDisabledItem(new GUIContent(name));
+					
+
+				} else {
+					menu.AddItem(new GUIContent(name), name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
+				}
+				
+			}
+				
 		}
 
 		menu.ShowAsContext();

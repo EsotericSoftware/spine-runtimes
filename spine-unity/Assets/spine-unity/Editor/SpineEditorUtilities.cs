@@ -149,16 +149,21 @@ public class SpineEditorUtilities : AssetPostprocessor {
 	public static string editorGUIPath = "";
 	static Dictionary<int, GameObject> skeletonRendererTable;
 	static Dictionary<int, SkeletonUtilityBone> skeletonUtilityBoneTable;
+	static Dictionary<int, BoundingBoxFollower> boundingBoxFollowerTable;
 	public static float defaultScale = 0.01f;
 	public static float defaultMix = 0.2f;
 	public static string defaultShader = "Spine/Skeleton";
 	public static bool initialized;
+
+	const string DEFAULT_MIX_KEY = "SPINE_DEFAULT_MIX";
 
 	static SpineEditorUtilities () {
 		Initialize();
 	}
 
 	static void Initialize () {
+		defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, 0.2f);
+
 		DirectoryInfo rootDir = new DirectoryInfo(Application.dataPath);
 		FileInfo[] files = rootDir.GetFiles("SpineEditorUtilities.cs", SearchOption.AllDirectories);
 		editorPath = Path.GetDirectoryName(files[0].FullName.Replace("\\", "/").Replace(Application.dataPath, "Assets"));
@@ -168,6 +173,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 		skeletonRendererTable = new Dictionary<int, GameObject>();
 		skeletonUtilityBoneTable = new Dictionary<int, SkeletonUtilityBone>();
+		boundingBoxFollowerTable = new Dictionary<int, BoundingBoxFollower>();
 
 		EditorApplication.hierarchyWindowChanged += HierarchyWindowChanged;
 		EditorApplication.hierarchyWindowItemOnGUI += HierarchyWindowItemOnGUI;
@@ -184,15 +190,19 @@ public class SpineEditorUtilities : AssetPostprocessor {
 	static void HierarchyWindowChanged () {
 		skeletonRendererTable.Clear();
 		skeletonUtilityBoneTable.Clear();
+		boundingBoxFollowerTable.Clear();
 
 		SkeletonRenderer[] arr = Object.FindObjectsOfType<SkeletonRenderer>();
-
 		foreach (SkeletonRenderer r in arr)
 			skeletonRendererTable.Add(r.gameObject.GetInstanceID(), r.gameObject);
 
 		SkeletonUtilityBone[] boneArr = Object.FindObjectsOfType<SkeletonUtilityBone>();
 		foreach (SkeletonUtilityBone b in boneArr)
 			skeletonUtilityBoneTable.Add(b.gameObject.GetInstanceID(), b);
+
+		BoundingBoxFollower[] bbfArr = Object.FindObjectsOfType<BoundingBoxFollower>();
+		foreach (BoundingBoxFollower bbf in bbfArr)
+			boundingBoxFollowerTable.Add(bbf.gameObject.GetInstanceID(), bbf);
 	}
 
 	static void HierarchyWindowItemOnGUI (int instanceId, Rect selectionRect) {
@@ -222,6 +232,21 @@ public class SpineEditorUtilities : AssetPostprocessor {
 				}
 			}
 
+		} else if (boundingBoxFollowerTable.ContainsKey(instanceId)) {
+			Rect r = new Rect(selectionRect);
+			r.x -= 26;
+
+			if (boundingBoxFollowerTable[instanceId] != null) {
+				if (boundingBoxFollowerTable[instanceId].transform.childCount == 0)
+					r.x += 13;
+
+				r.y += 2;
+
+				r.width = 13;
+				r.height = 13;
+
+				GUI.DrawTexture(r, Icons.boundingBox);
+			}
 		}
 
 	}
@@ -247,8 +272,8 @@ public class SpineEditorUtilities : AssetPostprocessor {
 					imagePaths.Add(str);
 					break;
 				case ".json":
-					TextAsset spineJson = (TextAsset)AssetDatabase.LoadAssetAtPath(str, typeof(TextAsset));
-					if (IsSpineJSON(spineJson)) {
+					TextAsset spineDataFile = (TextAsset)AssetDatabase.LoadAssetAtPath(str, typeof(TextAsset));
+					if (IsValidSpineData(spineDataFile)) {
 						skeletonPaths.Add(str);
 					}
 					break;
@@ -375,7 +400,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 						Selection.activeObject = null;
 
 					skeletonDataAsset.Reset();
-					
+
 					string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(skeletonDataAsset));
 					string lastHash = EditorPrefs.GetString(guid + "_hash");
 
@@ -514,6 +539,9 @@ public class SpineEditorUtilities : AssetPostprocessor {
 	public static List<string> GetRequiredAtlasRegions (string jsonPath) {
 		List<string> requiredPaths = new List<string>();
 
+		// FIXME - This doesn't work for a binary skeleton file!
+		if (jsonPath.Contains(".skel")) return requiredPaths;
+
 		TextAsset spineJson = (TextAsset)AssetDatabase.LoadAssetAtPath(jsonPath, typeof(TextAsset));
 
 		StringReader reader = new StringReader(spineJson.text);
@@ -524,6 +552,12 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 				foreach (KeyValuePair<string, object> attachmentEntry in ((Dictionary<string, object>)slotEntry.Value)) {
 					var data = ((Dictionary<string, object>)attachmentEntry.Value);
+					if (data.ContainsKey("type")) {
+						if ((string)data["type"] == "boundingbox") {
+							continue;
+						}
+							
+					}
 					if (data.ContainsKey("path"))
 						requiredPaths.Add((string)data["path"]);
 					else if (data.ContainsKey("name"))
@@ -582,8 +616,14 @@ public class SpineEditorUtilities : AssetPostprocessor {
 		return arr;
 	}
 
-	public static bool IsSpineJSON (TextAsset asset) {
-		object obj = Json.Deserialize(new StringReader(asset.text));
+	public static bool IsValidSpineData (TextAsset asset) {
+		if (asset.name.Contains(".skel")) return true;
+
+		object obj = null;
+		try {
+			obj = Json.Deserialize(new StringReader(asset.text));
+		} catch (System.Exception) {
+		}
 		if (obj == null) {
 			Debug.LogError("Is not valid JSON");
 			return false;
@@ -828,7 +868,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 	public static SkeletonAnimator InstantiateSkeletonAnimator (SkeletonDataAsset skeletonDataAsset, Skin skin = null) {
 		GameObject go = new GameObject(skeletonDataAsset.name.Replace("_SkeletonData", ""), typeof(MeshFilter), typeof(MeshRenderer), typeof(Animator), typeof(SkeletonAnimator));
 
-		if(skeletonDataAsset.controller == null){
+		if (skeletonDataAsset.controller == null) {
 			SkeletonBaker.GenerateMecanimAnimationClips(skeletonDataAsset);
 		}
 
@@ -878,4 +918,82 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 		return anim;
 	}
+
+	static bool preferencesLoaded = false;
+
+	[PreferenceItem("Spine")]
+	static void PreferencesGUI () {
+		if (!preferencesLoaded) {
+			preferencesLoaded = true;
+			defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, 0.2f);
+		}
+
+
+		EditorGUILayout.LabelField("Auto-Import Settings", EditorStyles.boldLabel);
+		EditorGUI.BeginChangeCheck();
+		defaultMix = EditorGUILayout.FloatField("Default Mix", defaultMix);
+		if (EditorGUI.EndChangeCheck())
+			EditorPrefs.SetFloat(DEFAULT_MIX_KEY, defaultMix);
+
+		GUILayout.Space(20);
+		EditorGUILayout.LabelField("3rd Party Settings", EditorStyles.boldLabel);
+		GUILayout.BeginHorizontal();
+		EditorGUILayout.PrefixLabel("TK2D");
+
+		if (GUILayout.Button("Enable", GUILayout.Width(64)))
+			EnableTK2D();
+		if (GUILayout.Button("Disable", GUILayout.Width(64)))
+			DisableTK2D();
+		GUILayout.EndHorizontal();
+	}
+
+
+	//TK2D Support
+	const string SPINE_TK2D_DEFINE = "SPINE_TK2D";
+
+	static void EnableTK2D () {
+		bool added = false;
+		foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {
+			string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group);
+			if (!defines.Contains(SPINE_TK2D_DEFINE)) {
+				added = true;
+				if (defines.EndsWith(";"))
+					defines = defines + SPINE_TK2D_DEFINE;
+				else
+					defines = defines + ";" + SPINE_TK2D_DEFINE;
+
+				PlayerSettings.SetScriptingDefineSymbolsForGroup(group, defines);
+			}
+		}
+
+		if (added) {
+			Debug.LogWarning("Setting Scripting Define Symbol " + SPINE_TK2D_DEFINE);
+		} else {
+			Debug.LogWarning("Already Set Scripting Define Symbol " + SPINE_TK2D_DEFINE);
+		}
+	}
+
+
+	static void DisableTK2D () {
+		bool removed = false;
+		foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {
+			string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group);
+			if (defines.Contains(SPINE_TK2D_DEFINE)) {
+				removed = true;
+				if (defines.Contains(SPINE_TK2D_DEFINE + ";"))
+					defines = defines.Replace(SPINE_TK2D_DEFINE + ";", "");
+				else
+					defines = defines.Replace(SPINE_TK2D_DEFINE, "");
+
+				PlayerSettings.SetScriptingDefineSymbolsForGroup(group, defines);
+			}
+		}
+
+		if (removed) {
+			Debug.LogWarning("Removing Scripting Define Symbol " + SPINE_TK2D_DEFINE);
+		} else {
+			Debug.LogWarning("Already Removed Scripting Define Symbol " + SPINE_TK2D_DEFINE);
+		}
+	}
+
 }
