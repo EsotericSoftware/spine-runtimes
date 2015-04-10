@@ -184,7 +184,7 @@ namespace Spine {
 						}
 					}
 					skeletonData.skins.Add(skin);
-					if (skin.name == "default")
+					if(String.Compare(skin.name, "default", true) == 0)
 						skeletonData.defaultSkin = skin;
 				}
 			}

@@ -186,12 +186,11 @@ namespace Spine {
 		/// <returns>May be null.</returns>
 		public Bone FindBone (String boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName cannot be null.");
-			List<Bone> bones = this.bones;
-			for (int i = 0, n = bones.Count; i < n; i++) {
-				Bone bone = bones[i];
-				if (bone.data.name == boneName) return bone;
-			}
-			return null;
+            foreach(Bone bone in bones)
+            {
+                if(String.Compare(bone.data.name, boneName, true) == 0) return bone;
+            }
+            return null;
 		}
 
 		/// <returns>-1 if the bone was not found.</returns>
@@ -199,19 +198,21 @@ namespace Spine {
 			if (boneName == null) throw new ArgumentNullException("boneName cannot be null.");
 			List<Bone> bones = this.bones;
 			for (int i = 0, n = bones.Count; i < n; i++)
-				if (bones[i].data.name == boneName) return i;
+            {
+                Bone bone = bones[i];
+                if(String.Compare(bone.data.name, boneName, true) == 0) return i;
+            }
 			return -1;
 		}
 
 		/// <returns>May be null.</returns>
 		public Slot FindSlot (String slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
-			List<Slot> slots = this.slots;
-			for (int i = 0, n = slots.Count; i < n; i++) {
-				Slot slot = slots[i];
-				if (slot.data.name == slotName) return slot;
-			}
-			return null;
+            foreach(Slot slot in slots)
+            {
+                if(String.Compare(slot.data.name, slotName, true) == 0) return slot;
+            }
+            return null;
 		}
 
 		/// <returns>-1 if the bone was not found.</returns>
@@ -219,7 +220,10 @@ namespace Spine {
 			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
 			List<Slot> slots = this.slots;
 			for (int i = 0, n = slots.Count; i < n; i++)
-				if (slots[i].data.name.Equals(slotName)) return i;
+            {
+                Slot slot = slots[i];
+                if(String.Compare(slot.data.name, slotName, true) == 0) return i;
+            }
 			return -1;
 		}
 
@@ -275,7 +279,9 @@ namespace Spine {
 			List<Slot> slots = this.slots;
 			for (int i = 0, n = slots.Count; i < n; i++) {
 				Slot slot = slots[i];
-				if (slot.data.name == slotName) {
+                if(String.Compare(slot.data.name, slotName, true) == 0)
+                {
+
 					Attachment attachment = null;
 					if (attachmentName != null) {
 						attachment = GetAttachment(i, attachmentName);
@@ -291,12 +297,11 @@ namespace Spine {
 		/** @return May be null. */
 		public IkConstraint FindIkConstraint (String ikConstraintName) {
 			if (ikConstraintName == null) throw new ArgumentNullException("ikConstraintName cannot be null.");
-			List<IkConstraint> ikConstraints = this.ikConstraints;
-			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
-				IkConstraint ikConstraint = ikConstraints[i];
-				if (ikConstraint.data.name == ikConstraintName) return ikConstraint;
-			}
-			return null;
+            foreach(IkConstraint ikConstraint in ikConstraints)
+            {
+                if(String.Compare(ikConstraint.data.name, ikConstraintName, true) == 0) return ikConstraint;
+            }
+            return null;
 		}
 
 		public void Update (float delta) {
