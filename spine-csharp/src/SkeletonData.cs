@@ -64,12 +64,11 @@ namespace Spine {
 		/// <returns>May be null.</returns>
 		public BoneData FindBone (String boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName cannot be null.");
-			List<BoneData> bones = this.bones;
-			for (int i = 0, n = bones.Count; i < n; i++) {
-				BoneData bone = bones[i];
-				if (bone.name == boneName) return bone;
-			}
-			return null;
+            foreach(BoneData boneData in bones)
+            {
+                if(String.Compare(boneData.name, boneName, true) == 0) return boneData;
+            }
+            return null;
 		}
 
 		/// <returns>-1 if the bone was not found.</returns>
@@ -77,7 +76,10 @@ namespace Spine {
 			if (boneName == null) throw new ArgumentNullException("boneName cannot be null.");
 			List<BoneData> bones = this.bones;
 			for (int i = 0, n = bones.Count; i < n; i++)
-				if (bones[i].name == boneName) return i;
+            {
+                BoneData boneData = bones[i];
+                if(String.Compare(boneData.name, boneName, true) == 0) return i;
+            }
 			return -1;
 		}
 
@@ -86,12 +88,11 @@ namespace Spine {
 		/// <returns>May be null.</returns>
 		public SlotData FindSlot (String slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
-			List<SlotData> slots = this.slots;
-			for (int i = 0, n = slots.Count; i < n; i++) {
-				SlotData slot = slots[i];
-				if (slot.name == slotName) return slot;
-			}
-			return null;
+            foreach(SlotData slotData in slots)
+            {
+                if(String.Compare(slotData.name, slotName, true) == 0) return slotData;
+            }
+            return null;
 		}
 
 		/// <returns>-1 if the bone was not found.</returns>
@@ -99,7 +100,10 @@ namespace Spine {
 			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
 			List<SlotData> slots = this.slots;
 			for (int i = 0, n = slots.Count; i < n; i++)
-				if (slots[i].name == slotName) return i;
+            {
+                SlotData slotData = slots[i];
+                if(String.Compare(slotData.name, slotName, true) == 0) return i;
+            }
 			return -1;
 		}
 
@@ -109,7 +113,9 @@ namespace Spine {
 		public Skin FindSkin (String skinName) {
 			if (skinName == null) throw new ArgumentNullException("skinName cannot be null.");
 			foreach (Skin skin in skins)
-				if (skin.name == skinName) return skin;
+            {
+                if(String.Compare(skin.name, skinName, true) == 0) return skin;
+            }
 			return null;
 		}
 
@@ -119,7 +125,9 @@ namespace Spine {
 		public EventData FindEvent (String eventDataName) {
 			if (eventDataName == null) throw new ArgumentNullException("eventDataName cannot be null.");
 			foreach (EventData eventData in events)
-				if (eventData.name == eventDataName) return eventData;
+            {
+                if(String.Compare(eventData.name, eventDataName, true) == 0) return eventData;
+            }
 			return null;
 		}
 
@@ -128,11 +136,10 @@ namespace Spine {
 		/// <returns>May be null.</returns>
 		public Animation FindAnimation (String animationName) {
 			if (animationName == null) throw new ArgumentNullException("animationName cannot be null.");
-			List<Animation> animations = this.animations;
-			for (int i = 0, n = animations.Count; i < n; i++) {
-				Animation animation = animations[i];
-				if (animation.name == animationName) return animation;
-			}
+            foreach(Animation animation in this.animations)
+            {
+                if(String.Compare(animation.name, animationName, true) == 0) return animation;
+            }
 			return null;
 		}
 
@@ -141,12 +148,11 @@ namespace Spine {
 		/// <returns>May be null.</returns>
 		public IkConstraintData FindIkConstraint (String ikConstraintName) {
 			if (ikConstraintName == null) throw new ArgumentNullException("ikConstraintName cannot be null.");
-			List<IkConstraintData> ikConstraints = this.ikConstraints;
-			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
-				IkConstraintData ikConstraint = ikConstraints[i];
-				if (ikConstraint.name == ikConstraintName) return ikConstraint;
-			}
-			return null;
+            foreach(IkConstraintData ikConstraint in this.ikConstraints)
+            {
+                if(String.Compare(ikConstraint.name, ikConstraintName, true) == 0) return ikConstraint;
+            }
+            return null;
 		}
 
 		// ---

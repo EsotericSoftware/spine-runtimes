@@ -220,7 +220,7 @@ namespace Spine {
 		/// <returns>The region, or null.</returns>
 		public AtlasRegion FindRegion (String name) {
 			for (int i = 0, n = regions.Count; i < n; i++)
-				if (regions[i].name == name) return regions[i];
+				if (String.Compare(regions[i].name, name, true) == 0) return regions[i];
 			return null;
 		}
 
