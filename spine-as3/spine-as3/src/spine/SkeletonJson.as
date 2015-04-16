@@ -398,7 +398,7 @@ public class SkeletonJson {
 						frameIndex++;
 					}
 					timelines[timelines.length] = flipTimeline;
-					duration = Math.max(duration, flipTimeline.frames[flipTimeline.frameCount * 3 - 3]);
+					duration = Math.max(duration, flipTimeline.frames[flipTimeline.frameCount * 2 - 2]);
 
 				} else
 					throw new Error("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
