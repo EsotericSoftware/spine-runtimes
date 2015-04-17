@@ -3,7 +3,8 @@ package spine {
 import spine.animation.AnimationStateData;
 import spine.atlas.Atlas;
 import spine.attachments.AtlasAttachmentLoader;
-import spine.attachments.AttachmentLoader;
+	import spine.attachments.AttachmentLoader;
+	import spine.attachments.AttachmentLoader;
 import spine.starling.SkeletonAnimation;
 import spine.starling.StarlingAtlasAttachmentLoader;
 import spine.starling.StarlingTextureLoader;
@@ -17,13 +18,13 @@ import starling.textures.Texture;
 import starling.textures.TextureAtlas;
 
 public class SpineboyExample extends Sprite {
-	[Embed(source = "spineboy.json", mimeType = "application/octet-stream")]
+	[Embed(source = "/spineboy.json", mimeType = "application/octet-stream")]
 	static public const SpineboyJson:Class;
 
-	[Embed(source = "spineboy.atlas", mimeType = "application/octet-stream")]
+	[Embed(source = "/spineboy.atlas", mimeType = "application/octet-stream")]
 	static public const SpineboyAtlas:Class;
 
-	[Embed(source = "spineboy.png")]
+	[Embed(source = "/spineboy.png")]
 	static public const SpineboyAtlasTexture:Class;
 
 	private var skeleton:SkeletonAnimation;
@@ -31,7 +32,7 @@ public class SpineboyExample extends Sprite {
 	public function SpineboyExample () {
 		var spineAtlas:Atlas = new Atlas(new SpineboyAtlas(), new StarlingTextureLoader(new SpineboyAtlasTexture()));
 		var attachmentLoader:AttachmentLoader = new AtlasAttachmentLoader(spineAtlas);
-		var json:SkeletonJson = new SkeletonJson(attachmentLoader);
+		var json:SkeletonJson = new SkeletonJson(Vector.<AttachmentLoader>([attachmentLoader]));
 		json.scale = 0.6;
 		var skeletonData:SkeletonData = json.readSkeletonData(new SpineboyJson());
 

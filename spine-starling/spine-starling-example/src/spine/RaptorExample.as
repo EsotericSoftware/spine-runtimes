@@ -2,7 +2,8 @@ package spine {
 
 import spine.atlas.Atlas;
 import spine.attachments.AtlasAttachmentLoader;
-import spine.attachments.AttachmentLoader;
+	import spine.attachments.AttachmentLoader;
+	import spine.attachments.AttachmentLoader;
 import spine.starling.SkeletonAnimation;
 import spine.starling.StarlingAtlasAttachmentLoader;
 import spine.starling.StarlingTextureLoader;
@@ -16,13 +17,13 @@ import starling.textures.Texture;
 import starling.textures.TextureAtlas;
 
 public class RaptorExample extends Sprite {
-	[Embed(source = "raptor.json", mimeType = "application/octet-stream")]
+	[Embed(source = "/raptor.json", mimeType = "application/octet-stream")]
 	static public const RaptorJson:Class;
 	
-	[Embed(source = "raptor.atlas", mimeType = "application/octet-stream")]
+	[Embed(source = "/raptor.atlas", mimeType = "application/octet-stream")]
 	static public const RaptorAtlas:Class;
 	
-	[Embed(source = "raptor.png")]
+	[Embed(source = "/raptor.png")]
 	static public const RaptorAtlasTexture:Class;
 	
 	private var skeleton:SkeletonAnimation;
@@ -33,7 +34,7 @@ public class RaptorExample extends Sprite {
 		var spineAtlas:Atlas = new Atlas(new RaptorAtlas(), new StarlingTextureLoader(new RaptorAtlasTexture()));
 		attachmentLoader = new AtlasAttachmentLoader(spineAtlas);
 
-		var json:SkeletonJson = new SkeletonJson(attachmentLoader);
+		var json:SkeletonJson = new SkeletonJson(Vector.<AttachmentLoader>([attachmentLoader]));
 		json.scale = 0.5;
 		var skeletonData:SkeletonData = json.readSkeletonData(new RaptorJson());
 

@@ -50,26 +50,56 @@ public class Animation {
 	}
 
 	/** Poses the skeleton at the specified time for this animation. */
-	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, loop:Boolean, events:Vector.<Event>) : void {
+	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, loop:Boolean, startTime:Number, endTime:Number, events:Vector.<Event>) : void {
 		if (skeleton == null) throw new ArgumentError("skeleton cannot be null.");
+		var currentDuration:Number = (endTime == -1) ? duration : endTime;
 
-		if (loop && duration != 0) {
-			time %= duration;
-			lastTime %= duration;
+		if(startTime <= 0) {
+			if (loop && currentDuration != 0) {
+				time %= currentDuration;
+				lastTime %= currentDuration;
+			}
+		}else{
+			var delta:Number = endTime - startTime;
+			if (loop && delta != 0) {
+				time %= delta;
+				lastTime %= delta;
+
+				time+=startTime;
+				lastTime+=startTime;
+			}else{
+				time+=startTime;
+				lastTime+=startTime;
+			}
 		}
-
 		for (var i:int = 0, n:int = timelines.length; i < n; i++)
 			timelines[i].apply(skeleton, lastTime, time, events, 1);
 	}
 
 	/** Poses the skeleton at the specified time for this animation mixed with the current pose.
 	 * @param alpha The amount of this animation that affects the current pose. */
-	public function mix (skeleton:Skeleton, lastTime:Number, time:Number, loop:Boolean, events:Vector.<Event>, alpha:Number) : void {
+	public function mix (skeleton:Skeleton, lastTime:Number, time:Number, loop:Boolean, startTime:Number, endTime:Number, events:Vector.<Event>, alpha:Number) : void {
 		if (skeleton == null) throw new ArgumentError("skeleton cannot be null.");
 
-		if (loop && duration != 0) {
-			time %= duration;
-			lastTime %= duration;
+		var currentDuration:Number = (endTime == -1) ? duration : endTime;
+
+		if(startTime <= 0) {
+			if (loop && currentDuration != 0) {
+				time %= currentDuration;
+				lastTime %= currentDuration;
+			}
+		}else{
+			var delta:Number = endTime - startTime;
+			if (loop && delta != 0) {
+				time %= delta;
+				lastTime %= delta;
+
+				time+=startTime;
+				lastTime+=startTime;
+			}else{
+				time+=startTime;
+				lastTime+=startTime;
+			}
 		}
 
 		for (var i:int = 0, n:int = timelines.length; i < n; i++)
