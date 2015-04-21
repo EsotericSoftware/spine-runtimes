@@ -76,6 +76,10 @@ struct spAtlasPage {
 };
 
 spAtlasPage* spAtlasPage_create (spAtlas* atlas, const char* name);
+spAtlasPage * spAtlasPage_copyConstructor(spAtlas* atlas, spAtlasPage* src);
+spAtlasPage* spAtlasPage_addAtEnd (spAtlas* atlas, spAtlasPage* page);
+/* Returns 0 if the page was not found. */
+spAtlasPage* spAtlasPage_findPage (const spAtlas* self, const char* name);
 void spAtlasPage_dispose (spAtlasPage* self);
 
 #ifdef SPINE_SHORT_NAMES
@@ -100,8 +104,11 @@ typedef spAtlasWrap AtlasWrap;
 #define ATLAS_CLAMPTOEDGE SP_ATLAS_CLAMPTOEDGE
 #define ATLAS_REPEAT SP_ATLAS_REPEAT
 typedef spAtlasPage AtlasPage;
-#define AtlasPage_create(...) spAtlasPage_create(__VA_ARGS__)
-#define AtlasPage_dispose(...) spAtlasPage_dispose(__VA_ARGS__)
+#define AtlasPage_create(...)		spAtlasPage_create(__VA_ARGS__)
+#define AtlasPage_copyConstructor	spAtlasPage_copyConstructor(__VA_ARGS__)
+#define AtlasPage_dispose(...)		spAtlasPage_dispose(__VA_ARGS__)
+#define AtlasPage_addAtEnd(...)		spAtlasPage_addAtEnd(__VA_ARGS__)
+#define AtlasPage_findPage(...)		spAtlas_findPage(__VA_ARGS__)
 #endif
 
 /**/
@@ -125,12 +132,21 @@ struct spAtlasRegion {
 };
 
 spAtlasRegion* spAtlasRegion_create ();
+spAtlasRegion* spAtlasRegion_createWithName (const char* name);
+spAtlasRegion * spAtlasRegion_copyConstructor(spAtlas* atlas, spAtlasRegion* src);
+spAtlasRegion* spAtlasRegion_addAtEnd (spAtlas* atlas, spAtlasRegion* region);
+/* Returns 0 if the region was not found. */
+spAtlasRegion* spAtlasRegion_findRegion (const spAtlas* self, const char* name);
 void spAtlasRegion_dispose (spAtlasRegion* self);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spAtlasRegion AtlasRegion;
-#define AtlasRegion_create(...) spAtlasRegion_create(__VA_ARGS__)
-#define AtlasRegion_dispose(...) spAtlasRegion_dispose(__VA_ARGS__)
+#define AtlasRegion_create(...)			spAtlasRegion_create(__VA_ARGS__)
+#define AtlasRegion_createWithName(...)	spAtlasRegion_createWithName(__VA_ARGS__)
+#define AtlasRegion_copyConstructor		spAtlasRegion_copyConstructor(__VA_ARGS__)
+#define AtlasRegion_addAtEnd(...)		spAtlasRegion_addAtEnd(__VA_ARGS__)
+#define AtlasRegion_findRegion(...)		spAtlas_findRegion(__VA_ARGS__)
+#define AtlasRegion_dispose(...)		spAtlasRegion_dispose(__VA_ARGS__)
 #endif
 
 /**/
@@ -144,19 +160,24 @@ struct spAtlas {
 
 /* Image files referenced in the atlas file will be prefixed with dir. */
 spAtlas* spAtlas_create (const char* data, int length, const char* dir, void* rendererObject);
+
+spAtlas* spAtlas_createVoid(void* rendererObject);
+
 /* Image files referenced in the atlas file will be prefixed with the directory containing the atlas file. */
 spAtlas* spAtlas_createFromFile (const char* path, void* rendererObject);
 void spAtlas_dispose (spAtlas* atlas);
 
-/* Returns 0 if the region was not found. */
-spAtlasRegion* spAtlas_findRegion (const spAtlas* self, const char* name);
+int spAtlas_addFile (spAtlas* self, const char* path);
+void spAtlas_merge(spAtlas* self, const spAtlas* atlas);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spAtlas Atlas;
-#define Atlas_create(...) spAtlas_create(__VA_ARGS__)
-#define Atlas_createFromFile(...) spAtlas_createFromFile(__VA_ARGS__)
-#define Atlas_dispose(...) spAtlas_dispose(__VA_ARGS__)
-#define Atlas_findRegion(...) spAtlas_findRegion(__VA_ARGS__)
+#define Atlas_create(...)			spAtlas_create(__VA_ARGS__)
+#define Atlas_createVoid(...)		spAtlas_createVoid(__VA_ARGS__)
+#define Atlas_createFromFile(...)	spAtlas_createFromFile(__VA_ARGS__)
+#define Atlas_dispose(...)			spAtlas_dispose(__VA_ARGS__)
+#define Atlas_addFile(...)			spAtlas_addFile(__VA_ARGS__)
+#define Atlas_merge(...)			spAtlas_merge(__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

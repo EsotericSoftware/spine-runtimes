@@ -39,6 +39,50 @@ spAtlasPage* spAtlasPage_create (spAtlas* atlas, const char* name) {
 	return self;
 }
 
+spAtlasPage * spAtlasPage_copyConstructor(spAtlas* atlas, spAtlasPage* src) {
+	spAtlasPage	*self;
+
+	if(atlas != 0 && src != 0)
+	{
+		self                 = spAtlasPage_create(atlas, src->name);
+		self->format         = src->format;
+		self->minFilter      = src->minFilter;
+		self->magFilter      = src->magFilter;
+		self->uWrap          = src->uWrap;
+		self->vWrap          = src->vWrap;
+		self->rendererObject = src->rendererObject;
+		self->width          = src->width;
+		self->height         = src->height;
+		self->next           = 0;
+	}
+	else
+	{
+		self = 0;
+	}
+
+	return self;
+}
+
+spAtlasPage* spAtlasPage_addAtEnd(spAtlas* atlas, spAtlasPage* page)
+{
+	spAtlasPage *pageAux;
+
+	if(atlas->pages != 0x0)
+	{
+		pageAux = atlas->pages;
+		while(pageAux->next != 0x0)
+			pageAux = pageAux->next;
+
+		pageAux->next = page;
+	}
+	else
+	{
+		atlas->pages = page;
+	}
+
+	return page; // to nest this func
+}
+
 void spAtlasPage_dispose (spAtlasPage* self) {
 	_spAtlasPage_disposeTexture(self);
 	FREE(self->name);
@@ -49,6 +93,85 @@ void spAtlasPage_dispose (spAtlasPage* self) {
 
 spAtlasRegion* spAtlasRegion_create () {
 	return NEW(spAtlasRegion);
+}
+
+spAtlasRegion* spAtlasRegion_createWithName (const char* name) {
+	spAtlasRegion	*region;
+
+	region = NEW(spAtlasRegion);
+	MALLOC_STR(region->name, name);
+
+	return region;
+}
+
+spAtlasRegion * spAtlasRegion_copyConstructor(spAtlas* atlas, spAtlasRegion* src) {
+	spAtlasRegion	*region;
+
+	if(atlas != 0 && src != 0)
+	{
+		region = spAtlasRegion_create();
+		MALLOC_STR(region->name, src->name);
+		region->x              = src->x;
+		region->y              = src->y;
+		region->width          = src->width;
+		region->height         = src->height;
+		region->u              = src->u;
+		region->v              = src->v;
+		region->u2             = src->u2;
+		region->v2             = src->v2;
+		region->offsetX        = src->offsetX;
+		region->offsetY        = src->offsetY;
+		region->originalWidth  = src->originalWidth;
+		region->originalHeight = src->originalHeight;
+		region->index          = src->index;
+		region->rotate         = src->rotate;
+		region->flip           = src->flip;
+		if(src->splits != 0)
+		{
+			region->splits = MALLOC(int, 4);
+			region->splits[0] = src->splits[0];
+			region->splits[1] = src->splits[1];
+			region->splits[2] = src->splits[2];
+			region->splits[3] = src->splits[3];
+
+		}
+		if(src->pads != 0)
+		{
+			region->pads = MALLOC(int, 4);
+			region->pads[0] = src->pads[0];
+			region->pads[1] = src->pads[1];
+			region->pads[2] = src->pads[2];
+			region->pads[3] = src->pads[3];
+
+		}
+		region->next = 0;
+	}
+	else
+	{
+		region = 0;
+	}
+
+	return region;
+}
+
+spAtlasRegion * spAtlasRegion_addAtEnd(spAtlas* atlas, spAtlasRegion* region)
+{
+	spAtlasRegion	*regionAux;
+
+	if(atlas->regions != 0x0)
+	{
+		regionAux = atlas->regions;
+		while(regionAux->next != 0x0)
+			regionAux = regionAux->next;
+
+		regionAux->next = region;
+	}
+	else
+	{
+		atlas->regions = region;
+	}
+
+	return region;	// to nest this func
 }
 
 void spAtlasRegion_dispose (spAtlasRegion* self) {
@@ -148,12 +271,12 @@ static int indexOf (const char** array, int count, Str* str) {
 	int length = (int)(str->end - str->begin);
 	int i;
 	for (i = count - 1; i >= 0; i--)
-		if (strncmp(array[i], str->begin, length) == 0) return i;
+		if (STRNCMP(array[i], str->begin, length) == 0) return i;
 	return -1;
 }
 
 static int equals (Str* str, const char* other) {
-	return strncmp(other, str->begin, str->end - str->begin) == 0;
+	return STRNCMP(other, str->begin, str->end - str->begin) == 0;
 }
 
 static int toInt (Str* str) {
@@ -169,9 +292,20 @@ static const char* formatNames[] = {"Alpha", "Intensity", "LuminanceAlpha", "RGB
 static const char* textureFilterNames[] = {"Nearest", "Linear", "MipMap", "MipMapNearestNearest", "MipMapLinearNearest",
 		"MipMapNearestLinear", "MipMapLinearLinear"};
 
+spAtlas* spAtlas_parseBuffer (spAtlas* self, const char* begin, int length, const char* dir);
+
 spAtlas* spAtlas_create (const char* begin, int length, const char* dir, void* rendererObject) {
 	spAtlas* self;
 
+	self = NEW(spAtlas);
+	self->rendererObject = rendererObject;
+
+	spAtlas_parseBuffer(self, begin, length, dir);
+
+	return self;
+}
+
+spAtlas* spAtlas_parseBuffer (spAtlas* self, const char* begin, int length, const char* dir) {
 	int count;
 	const char* end = begin + length;
 	int dirLength = (int)strlen(dir);
@@ -183,8 +317,8 @@ spAtlas* spAtlas_create (const char* begin, int length, const char* dir, void* r
 	Str str;
 	Str tuple[4];
 
-	self = NEW(spAtlas);
-	self->rendererObject = rendererObject;
+	//self = NEW(spAtlas);
+	//self->rendererObject = rendererObject;
 
 	readLine(begin, 0, 0);
 	while (readLine(0, end, &str)) {
@@ -294,6 +428,15 @@ spAtlas* spAtlas_create (const char* begin, int length, const char* dir, void* r
 	return self;
 }
 
+spAtlas* spAtlas_createVoid(void* rendererObject) {
+	spAtlas* self;
+
+	self = NEW(spAtlas);
+	self->rendererObject = rendererObject;
+
+	return self;
+}
+
 spAtlas* spAtlas_createFromFile (const char* path, void* rendererObject) {
 	int dirLength;
 	char *dir;
@@ -320,6 +463,18 @@ spAtlas* spAtlas_createFromFile (const char* path, void* rendererObject) {
 	return atlas;
 }
 
+int spAtlas_addFile (spAtlas* self, const char* path) {
+	spAtlas* atlas = 0;
+
+	atlas = spAtlas_createFromFile(path, 0);
+	if(atlas)
+	{
+		spAtlas_merge(self, atlas);
+		return 1;
+	}
+	return 0;
+}
+
 void spAtlas_dispose (spAtlas* self) {
 	spAtlasRegion* region, *nextRegion;
 	spAtlasPage* page = self->pages;
@@ -339,11 +494,43 @@ void spAtlas_dispose (spAtlas* self) {
 	FREE(self);
 }
 
-spAtlasRegion* spAtlas_findRegion (const spAtlas* self, const char* name) {
+spAtlasRegion* spAtlasRegion_findRegion (const spAtlas* self, const char* name) {
 	spAtlasRegion* region = self->regions;
 	while (region) {
-		if (strcmp(region->name, name) == 0) return region;
+		if (STRCMP(region->name, name) == 0) return region;
 		region = region->next;
 	}
 	return 0;
+}
+
+spAtlasPage* spAtlasPage_findPage (const spAtlas* self, const char* name) {
+	spAtlasPage* page = self->pages;
+	while (page) {
+		if (STRCMP(page->name, name) == 0) return page;
+		page = page->next;
+	}
+	return 0;
+}
+
+void spAtlas_merge(spAtlas* self, const spAtlas* atlas) {
+	spAtlasPage		*pPage;
+	spAtlasRegion	*pRegion, *pRegionAux;
+
+	if(self != 0 && atlas != 0)
+	{
+		pPage = atlas->pages;
+		while(pPage != 0x0)
+		{
+			spAtlasPage_addAtEnd(self, spAtlasPage_copyConstructor(self, pPage));
+			pPage = pPage->next;
+		}
+
+		pRegion = atlas->regions;
+		while(pRegion != 0x0)
+		{
+			pRegionAux = spAtlasRegion_addAtEnd(self, spAtlasRegion_copyConstructor(self, pRegion));
+			pRegionAux->page = spAtlasPage_findPage(self, pRegion->page->name);
+			pRegion = pRegion->next;
+		}
+	}
 }

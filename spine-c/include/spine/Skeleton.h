@@ -94,11 +94,13 @@ void spSkeleton_setToSetupPose (const spSkeleton* self);
 void spSkeleton_setBonesToSetupPose (const spSkeleton* self);
 void spSkeleton_setSlotsToSetupPose (const spSkeleton* self);
 
+void spSkeleton_addBone (spSkeleton* self, spBone *bone);
 /* Returns 0 if the bone was not found. */
 spBone* spSkeleton_findBone (const spSkeleton* self, const char* boneName);
 /* Returns -1 if the bone was not found. */
 int spSkeleton_findBoneIndex (const spSkeleton* self, const char* boneName);
 
+void spSkeleton_addSlot (spSkeleton* self, spSlot *slot);
 /* Returns 0 if the slot was not found. */
 spSlot* spSkeleton_findSlot (const spSkeleton* self, const char* slotName);
 /* Returns -1 if the slot was not found. */
@@ -117,9 +119,17 @@ int spSkeleton_setSkinByName (spSkeleton* self, const char* skinName);
 spAttachment* spSkeleton_getAttachmentForSlotName (const spSkeleton* self, const char* slotName, const char* attachmentName);
 /* Returns 0 if the slot or attachment was not found. */
 spAttachment* spSkeleton_getAttachmentForSlotIndex (const spSkeleton* self, int slotIndex, const char* attachmentName);
+/* Returns 0 if the slot or attachment was not found. */
+spAttachment* spSkeleton_getAttachmentByName (const spSkeleton* self, const char* attachmentName);
+
 /* Returns 0 if the slot or attachment was not found.
  * @param attachmentName May be 0. */
+
 int spSkeleton_setAttachment (spSkeleton* self, const char* slotName, const char* attachmentName);
+
+int spSkeleton_setAttachment2 (spSkeleton* self, const char* slotName, const char* attachmentName);
+
+int spSkeleton_setAttachmentFromSkin (spSkeleton* self, const char* slotName, const char * skinName, const char* attachmentName);
 
 /* Returns 0 if the IK constraint was not found. */
 spIkConstraint* spSkeleton_findIkConstraint (const spSkeleton* self, const char* ikConstraintName);
@@ -128,22 +138,27 @@ void spSkeleton_update (spSkeleton* self, float deltaTime);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spSkeleton Skeleton;
-#define Skeleton_create(...) spSkeleton_create(__VA_ARGS__)
-#define Skeleton_dispose(...) spSkeleton_dispose(__VA_ARGS__)
-#define Skeleton_updateWorldTransform(...) spSkeleton_updateWorldTransform(__VA_ARGS__)
-#define Skeleton_setToSetupPose(...) spSkeleton_setToSetupPose(__VA_ARGS__)
-#define Skeleton_setBonesToSetupPose(...) spSkeleton_setBonesToSetupPose(__VA_ARGS__)
-#define Skeleton_setSlotsToSetupPose(...) spSkeleton_setSlotsToSetupPose(__VA_ARGS__)
-#define Skeleton_findBone(...) spSkeleton_findBone(__VA_ARGS__)
-#define Skeleton_findBoneIndex(...) spSkeleton_findBoneIndex(__VA_ARGS__)
-#define Skeleton_findSlot(...) spSkeleton_findSlot(__VA_ARGS__)
-#define Skeleton_findSlotIndex(...) spSkeleton_findSlotIndex(__VA_ARGS__)
-#define Skeleton_setSkin(...) spSkeleton_setSkin(__VA_ARGS__)
-#define Skeleton_setSkinByName(...) spSkeleton_setSkinByName(__VA_ARGS__)
-#define Skeleton_getAttachmentForSlotName(...) spSkeleton_getAttachmentForSlotName(__VA_ARGS__)
+#define Skeleton_create(...)					spSkeleton_create(__VA_ARGS__)
+#define Skeleton_dispose(...)					spSkeleton_dispose(__VA_ARGS__)
+#define Skeleton_updateWorldTransform(...)		spSkeleton_updateWorldTransform(__VA_ARGS__)
+#define Skeleton_setToSetupPose(...)			spSkeleton_setToSetupPose(__VA_ARGS__)
+#define Skeleton_setBonesToSetupPose(...)		spSkeleton_setBonesToSetupPose(__VA_ARGS__)
+#define Skeleton_setSlotsToSetupPose(...)		spSkeleton_setSlotsToSetupPose(__VA_ARGS__)
+#define Skeleton_addBone(...)					spSkeleton_addBone(__VA_ARGS__)
+#define Skeleton_findBone(...)					spSkeleton_findBone(__VA_ARGS__)
+#define Skeleton_findBoneIndex(...)				spSkeleton_findBoneIndex(__VA_ARGS__)
+#define Skeleton_addSlot(...)					spSkeleton_addSlot(__VA_ARGS__)
+#define Skeleton_findSlot(...)					spSkeleton_findSlot(__VA_ARGS__)
+#define Skeleton_findSlotIndex(...)				spSkeleton_findSlotIndex(__VA_ARGS__)
+#define Skeleton_setSkin(...)					spSkeleton_setSkin(__VA_ARGS__)
+#define Skeleton_setSkinByName(...)				spSkeleton_setSkinByName(__VA_ARGS__)
+#define Skeleton_getAttachmentForSlotName(...)	spSkeleton_getAttachmentForSlotName(__VA_ARGS__)
 #define Skeleton_getAttachmentForSlotIndex(...) spSkeleton_getAttachmentForSlotIndex(__VA_ARGS__)
-#define Skeleton_setAttachment(...) spSkeleton_setAttachment(__VA_ARGS__)
-#define Skeleton_update(...) spSkeleton_update(__VA_ARGS__)
+#define Skeleton_getAttachmentByName(...)		spSkeleton_getAttachmentByName(__VA_ARGS__)
+#define Skeleton_setAttachment(...)				spSkeleton_setAttachment(__VA_ARGS__)
+#define Skeleton_setAttachment2(...)			spSkeleton_setAttachment2(__VA_ARGS__)
+#define Skeleton_setAttachmentFromSkin(...)		spSkeleton_setAttachmentFromSkin(__VA_ARGS__)
+#define Skeleton_update(...)					spSkeleton_update(__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus
