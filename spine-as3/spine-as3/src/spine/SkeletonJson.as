@@ -574,9 +574,9 @@ public class SkeletonJson {
 		return values;
 	}
 	
-	static private function getUintArray (map:Object, name:String) : Vector.<uint> {
+	static private function getUintArray (map:Object, name:String) : Vector.<int> {
 		var list:Array = map[name];
-		var values:Vector.<uint> = new Vector.<uint>(list.length, true);
+		var values:Vector.<int> = new Vector.<int>(list.length, true);
 		for (var i:int = 0, n:int = list.length; i < n; i++)
 			values[i] = int(list[i]);
 		return values;

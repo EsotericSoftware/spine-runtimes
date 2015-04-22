@@ -47,7 +47,10 @@ import spine.Skeleton;
 import spine.SkeletonData;
 import spine.Slot;
 import spine.atlas.AtlasRegion;
+import spine.attachments.Attachment;
+import spine.attachments.MeshAttachment;
 import spine.attachments.RegionAttachment;
+import spine.attachments.SkinnedMeshAttachment;
 
 public class SkeletonSprite extends Sprite {
 	static private var tempPoint:Point = new Point();
@@ -81,68 +84,28 @@ public class SkeletonSprite extends Sprite {
 		var drawOrder:Vector.<Slot> = skeleton.drawOrder;
 		for (var i:int = 0, n:int = drawOrder.length; i < n; i++) {
 			var slot:Slot = drawOrder[i];
-			var regionAttachment:RegionAttachment = slot.attachment as RegionAttachment;
-			if (regionAttachment != null) {
-				var wrapper:Sprite = regionAttachment["wrapper"];
-				var region:AtlasRegion = AtlasRegion(regionAttachment.rendererObject);
-				if (!wrapper) {
-					var bitmapData:BitmapData = region.page.rendererObject as BitmapData;
-					var regionWidth:Number = region.rotate ? region.height : region.width;
-					var regionHeight:Number = region.rotate ? region.width : region.height;
-					var regionData:BitmapData = new BitmapData(regionWidth, regionHeight);
-					regionData.copyPixels(bitmapData, new Rectangle(region.x, region.y, regionWidth, regionHeight), new Point());
-
-					var bitmap:Bitmap = new Bitmap(regionData);
-					bitmap.smoothing = true;
-
-					// Rotate and scale using default registration point (top left corner, y-down, CW) instead of image center.
-					bitmap.rotation = -regionAttachment.rotation;
-					bitmap.scaleX = regionAttachment.scaleX * (regionAttachment.width / region.width);
-					bitmap.scaleY = regionAttachment.scaleY * (regionAttachment.height / region.height);
-					
-
-					// Position using attachment translation, shifted as if scale and rotation were at image center.
-					var radians:Number = -regionAttachment.rotation * Math.PI / 180;
-					var cos:Number = Math.cos(radians);
-					var sin:Number = Math.sin(radians);
-					var shiftX:Number = -regionAttachment.width / 2 * regionAttachment.scaleX;
-					var shiftY:Number = -regionAttachment.height / 2 * regionAttachment.scaleY;
-					if (region.rotate) {
-						bitmap.rotation += 90;
-						shiftX += regionHeight * (regionAttachment.width / region.width);
-					}
-					bitmap.x = regionAttachment.x + shiftX * cos - shiftY * sin;
-					bitmap.y = -regionAttachment.y + shiftX * sin + shiftY * cos;
-
-					// Use bone as registration point.
-					wrapper = new Sprite();
-					wrapper.transform.colorTransform = new ColorTransform();
-					wrapper.addChild(bitmap);
-					regionAttachment["wrapper"] = wrapper;
-				}
-
-				wrapper.blendMode = blendModes[slot.data.blendMode.ordinal];
-
-				var colorTransform:ColorTransform = wrapper.transform.colorTransform;
-				colorTransform.redMultiplier = skeleton.r * slot.r * regionAttachment.r;
-				colorTransform.greenMultiplier = skeleton.g * slot.g * regionAttachment.g;
-				colorTransform.blueMultiplier = skeleton.b * slot.b * regionAttachment.b;
-				colorTransform.alphaMultiplier = skeleton.a * slot.a * regionAttachment.a;
-				wrapper.transform.colorTransform = colorTransform;
-
-				var bone:Bone = slot.bone;
-				var flipX:int = skeleton.flipX ? -1 : 1;
-				var flipY:int = skeleton.flipY ? -1 : 1;
-				if (bone.worldFlipX) flipX = -flipX;
-				if (bone.worldFlipY) flipY = -flipY;
-
-				wrapper.x = bone.worldX;
-				wrapper.y = bone.worldY;
-				wrapper.rotation = -bone.worldRotation * flipX * flipY;
-				wrapper.scaleX = bone.worldScaleX * flipX;
-				wrapper.scaleY = bone.worldScaleY * flipY;
-				addChild(wrapper);
+            var attachment:Attachment = slot.attachment;
+            
+			if (attachment is RegionAttachment || attachment is SkinnedMeshAttachment || attachment is MeshAttachment) {
+                var wrapper:Sprite = new Sprite();
+                wrapper.alpha = slot.a;
+                wrapper.blendMode = blendModes[slot.data.blendMode.ordinal];
+                
+                var colorTransform:ColorTransform = wrapper.transform.colorTransform;
+                colorTransform.redMultiplier = skeleton.r * slot.r * attachment["r"];
+                colorTransform.greenMultiplier = skeleton.g * slot.g * attachment["g"];
+                colorTransform.blueMultiplier = skeleton.b * slot.b * attachment["b"];
+                colorTransform.alphaMultiplier = skeleton.a * slot.a * attachment["a"];
+                wrapper.transform.colorTransform = colorTransform;
+                
+                var bitmapData:BitmapData = attachment["rendererObject"].page.rendererObject as BitmapData
+                var vertices:Vector.<Number> = new Vector.<Number>();
+                attachment["computeWorldVertices"](0, 0, slot, vertices);
+                wrapper.graphics.beginBitmapFill(bitmapData, null, true, true);
+                wrapper.graphics.drawTriangles(vertices, attachment["triangles"], attachment["uvs"]);
+                wrapper.graphics.endFill();
 			}
+            addChild(wrapper);
 		}
 	}
 
