@@ -30,6 +30,7 @@
 
 package spine.attachments {
 import spine.Bone;
+import spine.Slot;
 
 public dynamic class RegionAttachment extends Attachment {
 	public const X1:int = 0;
@@ -64,11 +65,14 @@ public dynamic class RegionAttachment extends Attachment {
 
 	public var offset:Vector.<Number> = new Vector.<Number>();
 	public var uvs:Vector.<Number> = new Vector.<Number>();
+    public var triangles:Vector.<int>;
 
 	public function RegionAttachment (name:String) {
 		super(name);
 		offset.length = 8;
 		uvs.length = 8;
+        triangles = new Vector.<int>();
+        triangles.push(0, 1, 3, 1, 2, 3);
 	}
 
 	public function setUVs (u:Number, v:Number, u2:Number, v2:Number, rotate:Boolean) : void {
@@ -121,13 +125,13 @@ public dynamic class RegionAttachment extends Attachment {
 		offset[Y4] = localYCos + localX2Sin;
 	}
 
-	public function computeWorldVertices (x:Number, y:Number, bone:Bone, worldVertices:Vector.<Number>) : void {
-		x += bone.worldX;
-		y += bone.worldY;
-		var m00:Number = bone.m00;
-		var m01:Number = bone.m01;
-		var m10:Number = bone.m10;
-		var m11:Number = bone.m11;
+	public function computeWorldVertices (x:Number, y:Number, slot:Slot, worldVertices:Vector.<Number>) : void {
+		x += slot.bone.worldX;
+		y += slot.bone.worldY;
+		var m00:Number = slot.bone.m00;
+		var m01:Number = slot.bone.m01;
+		var m10:Number = slot.bone.m10;
+		var m11:Number = slot.bone.m11;
 		var x1:Number = offset[X1];
 		var y1:Number = offset[Y1];
 		var x2:Number = offset[X2];
