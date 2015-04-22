@@ -37,7 +37,7 @@ public dynamic class SkinnedMeshAttachment extends Attachment {
 	public var weights:Vector.<Number>;
 	public var uvs:Vector.<Number>;
 	public var regionUVs:Vector.<Number>;
-	public var triangles:Vector.<uint>;
+	public var triangles:Vector.<int>;
 	public var hullLength:int;
 	public var r:Number = 1;
 	public var g:Number = 1;
