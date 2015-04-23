@@ -1,10 +1,10 @@
 /******************************************************************************
  * Spine Runtimes Software License
  * Version 2.1
- * 
+ *
  * Copyright (c) 2013, Esoteric Software
  * All rights reserved.
- * 
+ *
  * You are granted a perpetual, non-exclusive, non-sublicensable and
  * non-transferable license to install, execute and perform the Spine Runtimes
  * Software (the "Software") solely for internal use. Without the written
@@ -15,7 +15,7 @@
  * trademark, patent or other intellectual property or proprietary rights
  * notices on or in the Software, including any copy thereof. Redistributions
  * in binary or source form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -83,7 +83,7 @@ public dynamic class MeshAttachment extends Attachment {
 		}
 	}
 
-	public function computeWorldVertices (x:Number, y:Number, slot:Slot, worldVertices:Vector.<Number>) : void {
+	public function computeWorldVertices (x:Number, y:Number, slot:Slot, worldVertices:Vector.<Number>, worldVerticesOffset:int = 0) : void {
 		var bone:Bone = slot.bone;
 		x += bone.worldX;
 		y += bone.worldY;
@@ -97,8 +97,8 @@ public dynamic class MeshAttachment extends Attachment {
 		for (var i:int = 0, ii:int = 0; i < verticesCount; i += 2, ii += 2) {
 			var vx:Number = vertices[i];
 			var vy:Number = vertices[int(i + 1)];
-			worldVertices[ii] = vx * m00 + vy * m01 + x;
-			worldVertices[int(ii + 1)] = vx * m10 + vy * m11 + y;
+			worldVertices[worldVerticesOffset + ii] = vx * m00 + vy * m01 + x;
+			worldVertices[worldVerticesOffset + int(ii + 1)] = vx * m10 + vy * m11 + y;
 		}
 	}
 }

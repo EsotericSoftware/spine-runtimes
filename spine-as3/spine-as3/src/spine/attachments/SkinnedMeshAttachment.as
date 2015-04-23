@@ -1,10 +1,10 @@
 /******************************************************************************
  * Spine Runtimes Software License
  * Version 2.1
- * 
+ *
  * Copyright (c) 2013, Esoteric Software
  * All rights reserved.
- * 
+ *
  * You are granted a perpetual, non-exclusive, non-sublicensable and
  * non-transferable license to install, execute and perform the Spine Runtimes
  * Software (the "Software") solely for internal use. Without the written
@@ -15,7 +15,7 @@
  * trademark, patent or other intellectual property or proprietary rights
  * notices on or in the Software, including any copy thereof. Redistributions
  * in binary or source form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -84,7 +84,7 @@ public dynamic class SkinnedMeshAttachment extends Attachment {
 		}
 	}
 
-	public function computeWorldVertices (x:Number, y:Number, slot:Slot, worldVertices:Vector.<Number>) : void {
+	public function computeWorldVertices (x:Number, y:Number, slot:Slot, worldVertices:Vector.<Number>, worldVerticesOffset:int = 0) : void {
 		var skeletonBones:Vector.<Bone> = slot.skeleton.bones;
 		var weights:Vector.<Number> = this.weights;
 		var bones:Vector.<int> = this.bones;
@@ -104,8 +104,8 @@ public dynamic class SkinnedMeshAttachment extends Attachment {
 					wx += (vx * bone.m00 + vy * bone.m01 + bone.worldX) * weight;
 					wy += (vx * bone.m10 + vy * bone.m11 + bone.worldY) * weight;
 				}
-				worldVertices[w] = wx + x;
-				worldVertices[int(w + 1)] = wy + y;
+				worldVertices[worldVerticesOffset + w] = wx + x;
+				worldVertices[worldVerticesOffset + int(w + 1)] = wy + y;
 			}
 		} else {
 			var ffd:Vector.<Number> = slot.attachmentVertices;
@@ -121,8 +121,8 @@ public dynamic class SkinnedMeshAttachment extends Attachment {
 					wx += (vx * bone.m00 + vy * bone.m01 + bone.worldX) * weight;
 					wy += (vx * bone.m10 + vy * bone.m11 + bone.worldY) * weight;
 				}
-				worldVertices[w] = wx + x;
-				worldVertices[int(w + 1)] = wy + y;
+				worldVertices[worldVerticesOffset + w] = wx + x;
+				worldVertices[worldVerticesOffset + int(w + 1)] = wy + y;
 			}
 		}
 	}
