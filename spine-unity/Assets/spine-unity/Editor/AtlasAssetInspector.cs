@@ -32,6 +32,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 using Spine;
@@ -40,12 +41,42 @@ using Spine;
 [CustomEditor(typeof(AtlasAsset))]
 public class AtlasAssetInspector : Editor {
 	private SerializedProperty atlasFile, materials;
+	private AtlasAsset atlasAsset;
+	private List<bool> baked;
+	private List<GameObject> bakedObjects;
 
 	void OnEnable () {
 		SpineEditorUtilities.ConfirmInitialization();
 		atlasFile = serializedObject.FindProperty("atlasFile");
 		materials = serializedObject.FindProperty("materials");
+		atlasAsset = (AtlasAsset)target;
+		UpdateBakedList();
 	}
+
+	void UpdateBakedList () {
+		AtlasAsset asset = (AtlasAsset)target;
+		baked = new List<bool>();
+		bakedObjects = new List<GameObject>();
+		if (atlasFile.objectReferenceValue != null) {
+			Atlas atlas = asset.GetAtlas();
+			FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic);
+			List<AtlasRegion> regions = (List<AtlasRegion>)field.GetValue(atlas);
+			string atlasAssetPath = AssetDatabase.GetAssetPath(atlasAsset);
+			string atlasAssetDirPath = Path.GetDirectoryName(atlasAssetPath);
+			string bakedDirPath = Path.Combine(atlasAssetDirPath, atlasAsset.name);
+
+
+			for (int i = 0; i < regions.Count; i++) {
+				AtlasRegion region = regions[i];
+				string bakedPrefabPath = Path.Combine(bakedDirPath, SpineEditorUtilities.GetPathSafeRegionName(region) + ".prefab").Replace("\\", "/");
+				GameObject prefab = (GameObject)AssetDatabase.LoadAssetAtPath(bakedPrefabPath, typeof(GameObject));
+				baked.Add(prefab != null);
+				bakedObjects.Add(prefab);
+			}
+		}
+	}
+
+
 
 	override public void OnInspectorGUI () {
 		serializedObject.Update();
@@ -70,22 +101,71 @@ public class AtlasAssetInspector : Editor {
 				return;
 			}
 		}
-			
-		
 
 		if (atlasFile.objectReferenceValue != null) {
 			Atlas atlas = asset.GetAtlas();
 			FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic);
 			List<AtlasRegion> regions = (List<AtlasRegion>)field.GetValue(atlas);
-			EditorGUILayout.LabelField("Regions");
+			EditorGUILayout.LabelField(new GUIContent("Region Baking", SpineEditorUtilities.Icons.unityIcon));
 			EditorGUI.indentLevel++;
+			AtlasPage lastPage = null;
 			for (int i = 0; i < regions.Count; i++) {
-				EditorGUILayout.LabelField(regions[i].name);
+				if (lastPage != regions[i].page) {
+					if (lastPage != null) {
+						EditorGUILayout.Separator();
+						EditorGUILayout.Separator();
+					}
+					lastPage = regions[i].page;
+					Material mat = ((Material)lastPage.rendererObject);
+					if (mat != null) {
+						GUILayout.BeginHorizontal();
+						{
+							EditorGUI.BeginDisabledGroup(true);
+							EditorGUILayout.ObjectField(mat, typeof(Material), GUILayout.Width(250));
+							EditorGUI.EndDisabledGroup();
+						}
+						GUILayout.EndHorizontal();
+
+					} else {
+						EditorGUILayout.LabelField(new GUIContent("Page missing material!", SpineEditorUtilities.Icons.warning));
+					}
+				}
+				GUILayout.BeginHorizontal();
+				{
+					 //EditorGUILayout.ToggleLeft(baked[i] ? "" : regions[i].name, baked[i]);
+					bool result = baked[i] ? EditorGUILayout.ToggleLeft("", baked[i], GUILayout.Width(24)) : EditorGUILayout.ToggleLeft("    " + regions[i].name, baked[i]);
+					if(baked[i]){
+						EditorGUILayout.ObjectField(bakedObjects[i], typeof(GameObject), GUILayout.Width(250));
+					}
+					if (result && !baked[i]) {
+						//bake
+						baked[i] = true;
+						bakedObjects[i] = SpineEditorUtilities.BakeRegion(atlasAsset, regions[i]);
+						EditorGUIUtility.PingObject(bakedObjects[i]);
+					} else if (!result && baked[i]) {
+						//unbake
+						bool unbakeResult = EditorUtility.DisplayDialog("Delete Baked Region", "Do you want to delete the prefab for " + regions[i].name, "Yes", "Cancel");
+						switch (unbakeResult) {
+							case true:
+								//delete
+								string atlasAssetPath = AssetDatabase.GetAssetPath(atlasAsset);
+								string atlasAssetDirPath = Path.GetDirectoryName(atlasAssetPath);
+								string bakedDirPath = Path.Combine(atlasAssetDirPath, atlasAsset.name);
+								string bakedPrefabPath = Path.Combine(bakedDirPath, SpineEditorUtilities.GetPathSafeRegionName(regions[i]) + ".prefab").Replace("\\", "/");
+								AssetDatabase.DeleteAsset(bakedPrefabPath);
+								baked[i] = false;
+								break;
+							case false:
+								//do nothing
+								break;
+						}
+					}
+				}
+				GUILayout.EndHorizontal();
 			}
 			EditorGUI.indentLevel--;
 		}
 
-		
 		if (serializedObject.ApplyModifiedProperties() ||
 			(UnityEngine.Event.current.type == EventType.ValidateCommand && UnityEngine.Event.current.commandName == "UndoRedoPerformed")
 		) {
