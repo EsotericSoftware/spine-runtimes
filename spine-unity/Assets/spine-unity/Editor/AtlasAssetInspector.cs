@@ -123,7 +123,7 @@ public class AtlasAssetInspector : Editor {
 						GUILayout.BeginHorizontal();
 						{
 							EditorGUI.BeginDisabledGroup(true);
-							EditorGUILayout.ObjectField(mat, typeof(Material), GUILayout.Width(250));
+							EditorGUILayout.ObjectField(mat, typeof(Material), false, GUILayout.Width(250));
 							EditorGUI.EndDisabledGroup();
 						}
 						GUILayout.EndHorizontal();
@@ -137,7 +137,7 @@ public class AtlasAssetInspector : Editor {
 					 //EditorGUILayout.ToggleLeft(baked[i] ? "" : regions[i].name, baked[i]);
 					bool result = baked[i] ? EditorGUILayout.ToggleLeft("", baked[i], GUILayout.Width(24)) : EditorGUILayout.ToggleLeft("    " + regions[i].name, baked[i]);
 					if(baked[i]){
-						EditorGUILayout.ObjectField(bakedObjects[i], typeof(GameObject), GUILayout.Width(250));
+						EditorGUILayout.ObjectField(bakedObjects[i], typeof(GameObject), false, GUILayout.Width(250));
 					}
 					if (result && !baked[i]) {
 						//bake

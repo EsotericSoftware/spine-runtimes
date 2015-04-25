@@ -426,8 +426,9 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 
 	static bool CheckForValidAtlas (string atlasPath) {
-		return false;
-
+		return false;		
+		//////////////DEPRECATED - always check for new atlas data now
+		/*
 		string dir = Path.GetDirectoryName(atlasPath);
 		TextAsset textAsset = (TextAsset)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(TextAsset));
 		DirectoryInfo dirInfo = new DirectoryInfo(dir);
@@ -441,7 +442,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 				var atlasAsset = (AtlasAsset)obj;
 				if (atlasAsset.atlasFile == textAsset) {
 
-					/*
+					
 					Atlas atlas = atlasAsset.GetAtlas();
 					FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic);
 					List<AtlasRegion> regions = (List<AtlasRegion>)field.GetValue(atlas);
@@ -459,7 +460,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 							BakeRegion(atlasAsset, region);
 						}
 					}
-					*/
+					
 
 					return true;
 				}
@@ -468,9 +469,8 @@ public class SpineEditorUtilities : AssetPostprocessor {
 		}
 
 		return false;
-
-
-		
+	
+		*/
 	}
 
 	static List<AtlasAsset> MultiAtlasDialog (List<string> requiredPaths, string initialDirectory, string header = "") {
