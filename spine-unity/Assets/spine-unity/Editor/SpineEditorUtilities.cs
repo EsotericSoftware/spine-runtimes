@@ -426,7 +426,9 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 
 	static bool CheckForValidAtlas (string atlasPath) {
-
+		return false;		
+		//////////////DEPRECATED - always check for new atlas data now
+		/*
 		string dir = Path.GetDirectoryName(atlasPath);
 		TextAsset textAsset = (TextAsset)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(TextAsset));
 		DirectoryInfo dirInfo = new DirectoryInfo(dir);
@@ -438,12 +440,37 @@ public class SpineEditorUtilities : AssetPostprocessor {
 			var obj = AssetDatabase.LoadAssetAtPath(localPath, typeof(Object));
 			if (obj is AtlasAsset) {
 				var atlasAsset = (AtlasAsset)obj;
-				if (atlasAsset.atlasFile == textAsset)
+				if (atlasAsset.atlasFile == textAsset) {
+
+					
+					Atlas atlas = atlasAsset.GetAtlas();
+					FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic);
+					List<AtlasRegion> regions = (List<AtlasRegion>)field.GetValue(atlas);
+					string atlasAssetPath = AssetDatabase.GetAssetPath(atlasAsset);
+					string atlasAssetDirPath = Path.GetDirectoryName(atlasAssetPath);
+					string bakedDirPath = Path.Combine(atlasAssetDirPath, atlasAsset.name);
+
+					for (int i = 0; i < regions.Count; i++) {
+						AtlasRegion region = regions[i];
+						string bakedPrefabPath = Path.Combine(bakedDirPath, SpineEditorUtilities.GetPathSafeRegionName(region) + ".prefab").Replace("\\", "/");
+						GameObject prefab = (GameObject)AssetDatabase.LoadAssetAtPath(bakedPrefabPath, typeof(GameObject));
+
+						if (prefab != null) {
+							Debug.Log("Updating: " + region.name);
+							BakeRegion(atlasAsset, region);
+						}
+					}
+					
+
 					return true;
+				}
+					
 			}
 		}
 
 		return false;
+	
+		*/
 	}
 
 	static List<AtlasAsset> MultiAtlasDialog (List<string> requiredPaths, string initialDirectory, string header = "") {
@@ -657,9 +684,14 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 		AtlasAsset atlasAsset = (AtlasAsset)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(AtlasAsset));
 
+		List<Material> vestigialMaterials = new List<Material>();
 
 		if (atlasAsset == null)
 			atlasAsset = AtlasAsset.CreateInstance<AtlasAsset>();
+		else {
+			foreach (Material m in atlasAsset.materials)
+				vestigialMaterials.Add(m);
+		}
 
 		atlasAsset.atlasFile = atlasText;
 
@@ -702,6 +734,8 @@ public class SpineEditorUtilities : AssetPostprocessor {
 			if (mat == null) {
 				mat = new Material(Shader.Find(defaultShader));
 				AssetDatabase.CreateAsset(mat, materialPath);
+			} else {
+				vestigialMaterials.Remove(mat);
 			}
 
 			mat.mainTexture = texture;
@@ -712,14 +746,94 @@ public class SpineEditorUtilities : AssetPostprocessor {
 			atlasAsset.materials[i] = mat;
 		}
 
+		for (int i = 0; i < vestigialMaterials.Count; i++)
+			AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(vestigialMaterials[i]));
+
 		if (AssetDatabase.GetAssetPath(atlasAsset) == "")
 			AssetDatabase.CreateAsset(atlasAsset, atlasPath);
 		else
 			atlasAsset.Reset();
 
+		EditorUtility.SetDirty(atlasAsset);
+
 		AssetDatabase.SaveAssets();
 
+
+		//iterate regions and bake marked
+		Atlas atlas = atlasAsset.GetAtlas();
+		FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic);
+		List<AtlasRegion> regions = (List<AtlasRegion>)field.GetValue(atlas);
+		string atlasAssetPath = AssetDatabase.GetAssetPath(atlasAsset);
+		string atlasAssetDirPath = Path.GetDirectoryName(atlasAssetPath);
+		string bakedDirPath = Path.Combine(atlasAssetDirPath, atlasAsset.name);
+
+		bool hasBakedRegions = false;
+		for (int i = 0; i < regions.Count; i++) {
+			AtlasRegion region = regions[i];
+			string bakedPrefabPath = Path.Combine(bakedDirPath, SpineEditorUtilities.GetPathSafeRegionName(region) + ".prefab").Replace("\\", "/");
+			GameObject prefab = (GameObject)AssetDatabase.LoadAssetAtPath(bakedPrefabPath, typeof(GameObject));
+
+			if (prefab != null) {
+				BakeRegion(atlasAsset, region, false);
+				hasBakedRegions = true;
+			}
+		}
+
+		if (hasBakedRegions) {
+			AssetDatabase.SaveAssets();
+			AssetDatabase.Refresh();
+		}
+
 		return (AtlasAsset)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(AtlasAsset));
+	}
+
+	public static GameObject BakeRegion (AtlasAsset atlasAsset, AtlasRegion region, bool autoSave = true) {
+		Atlas atlas = atlasAsset.GetAtlas();
+		string atlasAssetPath = AssetDatabase.GetAssetPath(atlasAsset);
+		string atlasAssetDirPath = Path.GetDirectoryName(atlasAssetPath);
+		string bakedDirPath = Path.Combine(atlasAssetDirPath, atlasAsset.name);
+		string bakedPrefabPath = Path.Combine(bakedDirPath, GetPathSafeRegionName(region) + ".prefab").Replace("\\", "/");
+
+		GameObject prefab = (GameObject)AssetDatabase.LoadAssetAtPath(bakedPrefabPath, typeof(GameObject));
+		GameObject root;
+		Mesh mesh;
+		bool isNewPrefab = false;
+
+		if (!Directory.Exists(bakedDirPath))
+			Directory.CreateDirectory(bakedDirPath);
+
+		if (prefab == null) {
+			root = new GameObject("temp", typeof(MeshFilter), typeof(MeshRenderer));
+			prefab = (GameObject)PrefabUtility.CreatePrefab(bakedPrefabPath, root);
+			isNewPrefab = true;
+			Object.DestroyImmediate(root);
+		}
+
+		mesh = (Mesh)AssetDatabase.LoadAssetAtPath(bakedPrefabPath, typeof(Mesh));		
+
+		Material mat = null;
+		mesh = atlasAsset.GenerateMesh(region.name, mesh, out mat);
+		if (isNewPrefab) {
+			AssetDatabase.AddObjectToAsset(mesh, prefab);
+			prefab.GetComponent<MeshFilter>().sharedMesh = mesh;
+		}
+
+		EditorUtility.SetDirty(mesh);
+		EditorUtility.SetDirty(prefab);
+
+		if (autoSave) {
+			AssetDatabase.SaveAssets();
+			AssetDatabase.Refresh();
+		}
+		
+
+		prefab.GetComponent<MeshRenderer>().sharedMaterial = mat;
+
+		return prefab;
+	}
+
+	public static string GetPathSafeRegionName (AtlasRegion region) {
+		return region.name.Replace("/", "_");
 	}
 
 	static SkeletonDataAsset IngestSpineProject (TextAsset spineJson, params AtlasAsset[] atlasAssets) {

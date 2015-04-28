@@ -70,6 +70,77 @@ public class AtlasAsset : ScriptableObject {
 			return null;
 		}
 	}
+
+	public Sprite GenerateSprite (string name, out Material material) {
+		AtlasRegion region = atlas.FindRegion(name);
+
+		Sprite sprite = null;
+		material = null;
+
+		if (region != null) {
+			//sprite.rect
+		}
+
+		return sprite;
+	}
+
+	public Mesh GenerateMesh(string name, Mesh mesh, out Material material, float scale = 0.01f){
+		AtlasRegion region = atlas.FindRegion(name);
+		material = null;
+		if (region != null) {
+			if (mesh == null) {
+				mesh = new Mesh();
+				mesh.name = name;
+			}
+				
+			Vector3[] verts = new Vector3[4];
+			Vector2[] uvs = new Vector2[4];
+			Color[] colors = new Color[4]{Color.white, Color.white, Color.white, Color.white};
+			int[] triangles = new int[6] { 0, 1, 2, 2, 3, 0 };
+
+			float left, right, top, bottom;
+			left = region.width / -2f;
+			right = left * -1f;
+			top = region.height / 2f;
+			bottom = top * -1;
+
+			verts[0] = new Vector3(left, bottom, 0) * scale;
+			verts[1] = new Vector3(left, top, 0) * scale;
+			verts[2] = new Vector3(right, top, 0) * scale;
+			verts[3] = new Vector3(right, bottom, 0) * scale;
+			float u, v, u2, v2;
+			u = region.u;
+			v = region.v;
+			u2 = region.u2;
+			v2 = region.v2;
+
+			if (!region.rotate) {
+				uvs[0] = new Vector2(u, v2);
+				uvs[1] = new Vector2(u, v);
+				uvs[2] = new Vector2(u2, v);
+				uvs[3] = new Vector2(u2, v2);	
+			} else {
+				uvs[0] = new Vector2(u2, v2);
+				uvs[1] = new Vector2(u, v2);
+				uvs[2] = new Vector2(u, v);
+				uvs[3] = new Vector2(u2, v);
+			}
+
+			mesh.triangles = new int[0];
+			mesh.vertices = verts;
+			mesh.uv = uvs;
+			mesh.colors = colors;
+			mesh.triangles = triangles;
+			mesh.RecalculateNormals();
+			mesh.RecalculateBounds();
+
+			material = (Material)region.page.rendererObject;
+		} else {
+			mesh = null;
+		}
+
+		return mesh;
+	}
 }
 
 public class MaterialsTextureLoader : TextureLoader {
