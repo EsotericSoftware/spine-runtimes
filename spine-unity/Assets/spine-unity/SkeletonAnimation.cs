@@ -42,7 +42,9 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 	public bool loop;
 	public Spine.AnimationState state;
 
-
+	public Skeleton GetSkeleton(){
+		return this.skeleton;
+	}
 
 	public event UpdateBonesDelegate UpdateLocal {
 		add { _UpdateLocal += value; }

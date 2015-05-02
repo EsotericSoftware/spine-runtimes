@@ -15,6 +15,10 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 	public enum MixMode { AlwaysMix, MixNext, SpineStyle }
 	public MixMode[] layerMixModes = new MixMode[0];
 
+	public Skeleton GetSkeleton () {
+		return this.skeleton;
+
+	}
 	public event UpdateBonesDelegate UpdateLocal {
 		add { _UpdateLocal += value; }
 		remove { _UpdateLocal -= value; }

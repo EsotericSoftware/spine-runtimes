@@ -31,6 +31,7 @@
 
 using UnityEngine;
 using System.Collections;
+using Spine;
 
 public delegate void UpdateBonesDelegate (SkeletonRenderer skeletonRenderer);
 public interface ISkeletonAnimation {
@@ -39,4 +40,5 @@ public interface ISkeletonAnimation {
 	event UpdateBonesDelegate UpdateComplete;
 
 	void LateUpdate ();
+	Skeleton GetSkeleton();
 }
