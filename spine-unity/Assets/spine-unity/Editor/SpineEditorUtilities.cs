@@ -1,26 +1,26 @@
-﻿#pragma warning disable 0219
 /******************************************************************************
  * Spine Runtimes Software License
- * Version 2.1
+ * Version 2.3
  * 
- * Copyright (c) 2013, Esoteric Software
+ * Copyright (c) 2013-2015, Esoteric Software
  * All rights reserved.
  * 
  * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to install, execute and perform the Spine Runtimes
- * Software (the "Software") solely for internal use. Without the written
- * permission of Esoteric Software (typically granted by licensing Spine), you
- * may not (a) modify, translate, adapt or otherwise create derivative works,
- * improvements of the Software or develop new applications using the Software
- * or (b) remove, delete, alter or obscure any trademarks or any copyright,
- * trademark, patent or other intellectual property or proprietary rights
- * notices on or in the Software, including any copy thereof. Redistributions
- * in binary or source form must include this license and terms.
+ * non-transferable license to use, install, execute and perform the Spine
+ * Runtimes Software (the "Software") and derivative works solely for personal
+ * or internal use. Without the written permission of Esoteric Software (see
+ * Section 2 of the Spine Software License Agreement), you may not (a) modify,
+ * translate, adapt or otherwise create derivative works, improvements of the
+ * Software or develop new applications using the Software or (b) remove,
+ * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
  * 
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
  * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
@@ -28,6 +28,8 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
+
+#pragma warning disable 0219
 
 /*****************************************************************************
  * Spine Editor Utilities created by Mitch Thompson
@@ -149,6 +151,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 	public static string editorGUIPath = "";
 	static Dictionary<int, GameObject> skeletonRendererTable;
 	static Dictionary<int, SkeletonUtilityBone> skeletonUtilityBoneTable;
+	static Dictionary<int, BoundingBoxFollower> boundingBoxFollowerTable;
 	public static float defaultScale = 0.01f;
 	public static float defaultMix = 0.2f;
 	public static string defaultShader = "Spine/Skeleton";
@@ -172,6 +175,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 		skeletonRendererTable = new Dictionary<int, GameObject>();
 		skeletonUtilityBoneTable = new Dictionary<int, SkeletonUtilityBone>();
+		boundingBoxFollowerTable = new Dictionary<int, BoundingBoxFollower>();
 
 		EditorApplication.hierarchyWindowChanged += HierarchyWindowChanged;
 		EditorApplication.hierarchyWindowItemOnGUI += HierarchyWindowItemOnGUI;
@@ -188,15 +192,19 @@ public class SpineEditorUtilities : AssetPostprocessor {
 	static void HierarchyWindowChanged () {
 		skeletonRendererTable.Clear();
 		skeletonUtilityBoneTable.Clear();
+		boundingBoxFollowerTable.Clear();
 
 		SkeletonRenderer[] arr = Object.FindObjectsOfType<SkeletonRenderer>();
-
 		foreach (SkeletonRenderer r in arr)
 			skeletonRendererTable.Add(r.gameObject.GetInstanceID(), r.gameObject);
 
 		SkeletonUtilityBone[] boneArr = Object.FindObjectsOfType<SkeletonUtilityBone>();
 		foreach (SkeletonUtilityBone b in boneArr)
 			skeletonUtilityBoneTable.Add(b.gameObject.GetInstanceID(), b);
+
+		BoundingBoxFollower[] bbfArr = Object.FindObjectsOfType<BoundingBoxFollower>();
+		foreach (BoundingBoxFollower bbf in bbfArr)
+			boundingBoxFollowerTable.Add(bbf.gameObject.GetInstanceID(), bbf);
 	}
 
 	static void HierarchyWindowItemOnGUI (int instanceId, Rect selectionRect) {
@@ -226,6 +234,21 @@ public class SpineEditorUtilities : AssetPostprocessor {
 				}
 			}
 
+		} else if (boundingBoxFollowerTable.ContainsKey(instanceId)) {
+			Rect r = new Rect(selectionRect);
+			r.x -= 26;
+
+			if (boundingBoxFollowerTable[instanceId] != null) {
+				if (boundingBoxFollowerTable[instanceId].transform.childCount == 0)
+					r.x += 13;
+
+				r.y += 2;
+
+				r.width = 13;
+				r.height = 13;
+
+				GUI.DrawTexture(r, Icons.boundingBox);
+			}
 		}
 
 	}
@@ -403,7 +426,9 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 
 	static bool CheckForValidAtlas (string atlasPath) {
-
+		return false;		
+		//////////////DEPRECATED - always check for new atlas data now
+		/*
 		string dir = Path.GetDirectoryName(atlasPath);
 		TextAsset textAsset = (TextAsset)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(TextAsset));
 		DirectoryInfo dirInfo = new DirectoryInfo(dir);
@@ -415,12 +440,37 @@ public class SpineEditorUtilities : AssetPostprocessor {
 			var obj = AssetDatabase.LoadAssetAtPath(localPath, typeof(Object));
 			if (obj is AtlasAsset) {
 				var atlasAsset = (AtlasAsset)obj;
-				if (atlasAsset.atlasFile == textAsset)
+				if (atlasAsset.atlasFile == textAsset) {
+
+					
+					Atlas atlas = atlasAsset.GetAtlas();
+					FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic);
+					List<AtlasRegion> regions = (List<AtlasRegion>)field.GetValue(atlas);
+					string atlasAssetPath = AssetDatabase.GetAssetPath(atlasAsset);
+					string atlasAssetDirPath = Path.GetDirectoryName(atlasAssetPath);
+					string bakedDirPath = Path.Combine(atlasAssetDirPath, atlasAsset.name);
+
+					for (int i = 0; i < regions.Count; i++) {
+						AtlasRegion region = regions[i];
+						string bakedPrefabPath = Path.Combine(bakedDirPath, SpineEditorUtilities.GetPathSafeRegionName(region) + ".prefab").Replace("\\", "/");
+						GameObject prefab = (GameObject)AssetDatabase.LoadAssetAtPath(bakedPrefabPath, typeof(GameObject));
+
+						if (prefab != null) {
+							Debug.Log("Updating: " + region.name);
+							BakeRegion(atlasAsset, region);
+						}
+					}
+					
+
 					return true;
+				}
+					
 			}
 		}
 
 		return false;
+	
+		*/
 	}
 
 	static List<AtlasAsset> MultiAtlasDialog (List<string> requiredPaths, string initialDirectory, string header = "") {
@@ -634,9 +684,14 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 		AtlasAsset atlasAsset = (AtlasAsset)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(AtlasAsset));
 
+		List<Material> vestigialMaterials = new List<Material>();
 
 		if (atlasAsset == null)
 			atlasAsset = AtlasAsset.CreateInstance<AtlasAsset>();
+		else {
+			foreach (Material m in atlasAsset.materials)
+				vestigialMaterials.Add(m);
+		}
 
 		atlasAsset.atlasFile = atlasText;
 
@@ -679,6 +734,8 @@ public class SpineEditorUtilities : AssetPostprocessor {
 			if (mat == null) {
 				mat = new Material(Shader.Find(defaultShader));
 				AssetDatabase.CreateAsset(mat, materialPath);
+			} else {
+				vestigialMaterials.Remove(mat);
 			}
 
 			mat.mainTexture = texture;
@@ -689,14 +746,94 @@ public class SpineEditorUtilities : AssetPostprocessor {
 			atlasAsset.materials[i] = mat;
 		}
 
+		for (int i = 0; i < vestigialMaterials.Count; i++)
+			AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(vestigialMaterials[i]));
+
 		if (AssetDatabase.GetAssetPath(atlasAsset) == "")
 			AssetDatabase.CreateAsset(atlasAsset, atlasPath);
 		else
 			atlasAsset.Reset();
 
+		EditorUtility.SetDirty(atlasAsset);
+
 		AssetDatabase.SaveAssets();
 
+
+		//iterate regions and bake marked
+		Atlas atlas = atlasAsset.GetAtlas();
+		FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic);
+		List<AtlasRegion> regions = (List<AtlasRegion>)field.GetValue(atlas);
+		string atlasAssetPath = AssetDatabase.GetAssetPath(atlasAsset);
+		string atlasAssetDirPath = Path.GetDirectoryName(atlasAssetPath);
+		string bakedDirPath = Path.Combine(atlasAssetDirPath, atlasAsset.name);
+
+		bool hasBakedRegions = false;
+		for (int i = 0; i < regions.Count; i++) {
+			AtlasRegion region = regions[i];
+			string bakedPrefabPath = Path.Combine(bakedDirPath, SpineEditorUtilities.GetPathSafeRegionName(region) + ".prefab").Replace("\\", "/");
+			GameObject prefab = (GameObject)AssetDatabase.LoadAssetAtPath(bakedPrefabPath, typeof(GameObject));
+
+			if (prefab != null) {
+				BakeRegion(atlasAsset, region, false);
+				hasBakedRegions = true;
+			}
+		}
+
+		if (hasBakedRegions) {
+			AssetDatabase.SaveAssets();
+			AssetDatabase.Refresh();
+		}
+
 		return (AtlasAsset)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(AtlasAsset));
+	}
+
+	public static GameObject BakeRegion (AtlasAsset atlasAsset, AtlasRegion region, bool autoSave = true) {
+		Atlas atlas = atlasAsset.GetAtlas();
+		string atlasAssetPath = AssetDatabase.GetAssetPath(atlasAsset);
+		string atlasAssetDirPath = Path.GetDirectoryName(atlasAssetPath);
+		string bakedDirPath = Path.Combine(atlasAssetDirPath, atlasAsset.name);
+		string bakedPrefabPath = Path.Combine(bakedDirPath, GetPathSafeRegionName(region) + ".prefab").Replace("\\", "/");
+
+		GameObject prefab = (GameObject)AssetDatabase.LoadAssetAtPath(bakedPrefabPath, typeof(GameObject));
+		GameObject root;
+		Mesh mesh;
+		bool isNewPrefab = false;
+
+		if (!Directory.Exists(bakedDirPath))
+			Directory.CreateDirectory(bakedDirPath);
+
+		if (prefab == null) {
+			root = new GameObject("temp", typeof(MeshFilter), typeof(MeshRenderer));
+			prefab = (GameObject)PrefabUtility.CreatePrefab(bakedPrefabPath, root);
+			isNewPrefab = true;
+			Object.DestroyImmediate(root);
+		}
+
+		mesh = (Mesh)AssetDatabase.LoadAssetAtPath(bakedPrefabPath, typeof(Mesh));		
+
+		Material mat = null;
+		mesh = atlasAsset.GenerateMesh(region.name, mesh, out mat);
+		if (isNewPrefab) {
+			AssetDatabase.AddObjectToAsset(mesh, prefab);
+			prefab.GetComponent<MeshFilter>().sharedMesh = mesh;
+		}
+
+		EditorUtility.SetDirty(mesh);
+		EditorUtility.SetDirty(prefab);
+
+		if (autoSave) {
+			AssetDatabase.SaveAssets();
+			AssetDatabase.Refresh();
+		}
+		
+
+		prefab.GetComponent<MeshRenderer>().sharedMaterial = mat;
+
+		return prefab;
+	}
+
+	public static string GetPathSafeRegionName (AtlasRegion region) {
+		return region.name.Replace("/", "_");
 	}
 
 	static SkeletonDataAsset IngestSpineProject (TextAsset spineJson, params AtlasAsset[] atlasAssets) {
