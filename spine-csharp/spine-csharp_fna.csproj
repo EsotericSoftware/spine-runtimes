@@ -38,6 +38,7 @@
     <Compile Include="src\AnimationState.cs" />
     <Compile Include="src\AnimationStateData.cs" />
     <Compile Include="src\Atlas.cs" />
+    <Compile Include="src\BlendMode.cs" />
     <Compile Include="src\Bone.cs" />
     <Compile Include="src\BoneData.cs" />
     <Compile Include="src\Event.cs" />
