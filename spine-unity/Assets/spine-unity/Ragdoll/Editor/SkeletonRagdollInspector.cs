@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 [CustomEditor(typeof(SkeletonRagdoll))]
 public class SkeletonRagdollInspector : Editor {
-	SerializedProperty startingBoneName, stopBoneNames, applyOnStart, pinStartBone, enableJointCollision, useGravity, disableIK, defaultThickness, rotationLimit, colliderLayer, mix;
+	SerializedProperty startingBoneName, stopBoneNames, applyOnStart, pinStartBone, enableJointCollision, useGravity, disableIK, thickness, rotationLimit, colliderLayer, mix, rootMass, massFalloffFactor;
 
 	void OnEnable () {
 		startingBoneName = serializedObject.FindProperty("startingBoneName");
@@ -20,10 +20,12 @@ public class SkeletonRagdollInspector : Editor {
 		enableJointCollision = serializedObject.FindProperty("enableJointCollision");
 		useGravity = serializedObject.FindProperty("useGravity");
 		disableIK = serializedObject.FindProperty("disableIK");
-		defaultThickness = serializedObject.FindProperty("defaultThickness");
+		thickness = serializedObject.FindProperty("thickness");
 		rotationLimit = serializedObject.FindProperty("rotationLimit");
 		colliderLayer = serializedObject.FindProperty("colliderLayer");
 		mix = serializedObject.FindProperty("mix");
+		rootMass = serializedObject.FindProperty("rootMass");
+		massFalloffFactor = serializedObject.FindProperty("massFalloffFactor");
 	}
 
 	public override void OnInspectorGUI () {
@@ -34,8 +36,10 @@ public class SkeletonRagdollInspector : Editor {
 		EditorGUILayout.PropertyField(enableJointCollision);
 		EditorGUILayout.PropertyField(useGravity);
 		EditorGUILayout.PropertyField(disableIK);
-		EditorGUILayout.PropertyField(defaultThickness);
+		EditorGUILayout.PropertyField(thickness);
 		EditorGUILayout.PropertyField(rotationLimit);
+		EditorGUILayout.PropertyField(rootMass);
+		EditorGUILayout.PropertyField(massFalloffFactor);
 		colliderLayer.intValue = EditorGUILayout.LayerField(colliderLayer.displayName, colliderLayer.intValue);
 		EditorGUILayout.PropertyField(mix);
 

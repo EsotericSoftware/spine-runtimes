@@ -28,9 +28,13 @@ public class SkeletonRagdoll : MonoBehaviour {
 	[Tooltip("Warning!  You will have to re-enable and tune mix values manually if attempting to remove the ragdoll system.")]
 	public bool disableIK = true;
 	[Tooltip("If no BoundingBox Attachment is attached to a bone, this becomes the default Width or Radius of a Bone's ragdoll Rigidbody")]
-	public float defaultThickness = 0.125f;
+	public float thickness = 0.125f;
 	[Tooltip("Default rotational limit value.  Min is negative this value, Max is this value.")]
 	public float rotationLimit = 20;
+	public float rootMass = 20;
+	[Tooltip("If your ragdoll seems unstable or uneffected by limits, try lowering this value.")]
+	[Range(0.01f, 1f)]
+	public float massFalloffFactor = 0.4f;
 	[Tooltip("The layer assigned to all of the rigidbody parts.")]
 	public int colliderLayer = 0;
 	[Range(0, 1)]
@@ -106,6 +110,34 @@ public class SkeletonRagdoll : MonoBehaviour {
 		foreach (Transform t in boneTable.Values) {
 			t.position -= offset;
 		}
+
+		UpdateWorld(null);
+		skeleton.UpdateWorldTransform();
+	}
+
+	public Rigidbody[] GetRigidbodyArray () {
+		if (!isActive)
+			return new Rigidbody[0];
+
+		Rigidbody[] arr = new Rigidbody[boneTable.Count];
+		int i = 0;
+		foreach(Transform t in boneTable.Values){
+			arr[i] = t.GetComponent<Rigidbody>();
+			i++;
+		}
+
+		return arr;
+	}
+
+	public Rigidbody GetRigidbody (string boneName) {
+		var bone = skeleton.FindBone(boneName);
+		if (bone == null)
+			return null;
+
+		if (boneTable.ContainsKey(bone))
+			return boneTable[bone].GetComponent<Rigidbody>();
+
+		return null;
 	}
 
 	public void Remove () {
@@ -130,6 +162,8 @@ public class SkeletonRagdoll : MonoBehaviour {
 
 		rootRigidbody = boneTable[ragdollRootBone].GetComponent<Rigidbody>();
 		rootRigidbody.isKinematic = pinStartBone;
+
+		rootRigidbody.mass = rootMass;
 
 		List<Collider> boneColliders = new List<Collider>();
 
@@ -170,7 +204,7 @@ public class SkeletonRagdoll : MonoBehaviour {
 				localPos.x *= 1;
 				joint.connectedAnchor = localPos;
 				joint.axis = Vector3.forward;
-				joint.GetComponent<Rigidbody>().mass = joint.connectedBody.mass * 0.75f;
+				joint.GetComponent<Rigidbody>().mass = joint.connectedBody.mass * massFalloffFactor;
 				JointLimits limits = new JointLimits();
 				limits.min = -rotationLimit;
 				limits.max = rotationLimit;
@@ -182,6 +216,7 @@ public class SkeletonRagdoll : MonoBehaviour {
 
 		for (int x = 0; x < boneColliders.Count; x++) {
 			for (int y = 0; y < boneColliders.Count; y++) {
+				if (x == y) continue;
 				Physics.IgnoreCollision(boneColliders[x], boneColliders[y]);
 			}
 		}
@@ -240,13 +275,13 @@ public class SkeletonRagdoll : MonoBehaviour {
 			//physics
 			if (colliders.Count == 0) {
 				var ball = go.AddComponent<SphereCollider>();
-				ball.radius = defaultThickness / 2f;
+				ball.radius = thickness / 2f;
 			}
 		} else {
 			//physics
 			if (colliders.Count == 0) {
 				var box = go.AddComponent<BoxCollider>();
-				box.size = new Vector3(length, defaultThickness, defaultThickness);
+				box.size = new Vector3(length, thickness, thickness);
 				box.center = new Vector3((b.WorldFlipX ? -length : length) / 2, 0);
 			}
 		}
@@ -254,7 +289,6 @@ public class SkeletonRagdoll : MonoBehaviour {
 		var rb = go.AddComponent<Rigidbody>();
 		rb.constraints = RigidbodyConstraints.FreezePositionZ;
 		foreach (Bone child in b.Children) {
-
 			RecursivelyCreateBoneProxies(child);
 		}
 	}
@@ -281,7 +315,7 @@ public class SkeletonRagdoll : MonoBehaviour {
 							continue;
 
 						var collider = go.AddComponent<BoxCollider>();
-						var bounds = SkeletonUtility.GetBoundingBoxBounds((BoundingBoxAttachment)a, defaultThickness);
+						var bounds = SkeletonUtility.GetBoundingBoxBounds((BoundingBoxAttachment)a, thickness);
 
 						collider.center = bounds.center;
 						collider.size = bounds.size;
