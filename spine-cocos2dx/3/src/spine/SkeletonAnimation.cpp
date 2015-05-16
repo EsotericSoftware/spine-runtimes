@@ -71,8 +71,8 @@ void disposeTrackEntry (spTrackEntry* entry) {
 
 //
 
-SkeletonAnimation* SkeletonAnimation::createWithData (spSkeletonData* skeletonData) {
-	SkeletonAnimation* node = new SkeletonAnimation(skeletonData);
+SkeletonAnimation* SkeletonAnimation::createWithData (spSkeletonData* skeletonData, bool ownsSkeletonData) {
+	SkeletonAnimation* node = new SkeletonAnimation(skeletonData, ownsSkeletonData);
 	node->autorelease();
 	return node;
 }
@@ -103,8 +103,8 @@ SkeletonAnimation::SkeletonAnimation ()
 		: SkeletonRenderer() {
 }
 
-SkeletonAnimation::SkeletonAnimation (spSkeletonData *skeletonData)
-		: SkeletonRenderer(skeletonData) {
+SkeletonAnimation::SkeletonAnimation (spSkeletonData *skeletonData, bool ownsSkeletonData)
+		: SkeletonRenderer(skeletonData, ownsSkeletonData) {
 	initialize();
 }
 
