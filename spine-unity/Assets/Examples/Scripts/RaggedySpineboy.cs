@@ -48,7 +48,6 @@ public class RaggedySpineboy : MonoBehaviour {
 		Vector3 estimatedPos = ragdoll.EstimatedSkeletonPosition;
 		Vector3 rbPosition = ragdoll.RootRigidbody.position;
 
-		Ray ray = new Ray(rbPosition, estimatedPos - rbPosition);
 		Vector3 skeletonPoint = estimatedPos;
 		RaycastHit2D hit = Physics2D.Raycast((Vector2)rbPosition, (Vector2)(estimatedPos - rbPosition), Vector3.Distance(estimatedPos, rbPosition), groundMask);
 		if (hit.collider != null)
@@ -69,7 +68,7 @@ public class RaggedySpineboy : MonoBehaviour {
 
 		float t = 0;
 		while (t < 0.5f) {
-			if (ragdoll.RootRigidbody.velocity.magnitude > 0.06f)
+			if (ragdoll.RootRigidbody.velocity.magnitude > 0.09f)
 				t = 0;
 			else
 				t += Time.deltaTime;

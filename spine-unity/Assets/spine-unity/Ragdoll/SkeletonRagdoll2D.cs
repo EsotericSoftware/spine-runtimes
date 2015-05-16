@@ -22,15 +22,17 @@ public class SkeletonRagdoll2D : MonoBehaviour {
 	public bool applyOnStart;
 	[Tooltip("Set RootRigidbody IsKinematic to true when Apply is called.")]
 	public bool pinStartBone;
-	[Tooltip("Enable Collision between adjacent ragdoll elements (IE: Neck and Head)")]
-	public bool enableJointCollision;
 	public float gravityScale = 1;
 	[Tooltip("Warning!  You will have to re-enable and tune mix values manually if attempting to remove the ragdoll system.")]
 	public bool disableIK = true;
 	[Tooltip("If no BoundingBox Attachment is attached to a bone, this becomes the default Width or Radius of a Bone's ragdoll Rigidbody")]
-	public float defaultThickness = 0.125f;
+	public float thickness = 0.125f;
 	[Tooltip("Default rotational limit value.  Min is negative this value, Max is this value.")]
 	public float rotationLimit = 20;
+	public float rootMass = 20;
+	[Tooltip("If your ragdoll seems unstable or uneffected by limits, try lowering this value.")]
+	[Range(0.01f, 1f)]
+	public float massFalloffFactor = 0.4f;
 	[Tooltip("The layer assigned to all of the rigidbody parts.")]
 	public int colliderLayer = 0;
 	[Range(0, 1)]
@@ -110,7 +112,31 @@ public class SkeletonRagdoll2D : MonoBehaviour {
 
 		UpdateWorld(null);
 		skeleton.UpdateWorldTransform();
-		//skeletonAnim.LateUpdate();		
+	}
+
+	public Rigidbody2D[] GetRigidbodyArray () {
+		if (!isActive)
+			return new Rigidbody2D[0];
+
+		Rigidbody2D[] arr = new Rigidbody2D[boneTable.Count];
+		int i = 0;
+		foreach (Transform t in boneTable.Values) {
+			arr[i] = t.GetComponent<Rigidbody2D>();
+			i++;
+		}
+
+		return arr;
+	}
+
+	public Rigidbody2D GetRigidbody (string boneName) {
+		var bone = skeleton.FindBone(boneName);
+		if (bone == null)
+			return null;
+
+		if (boneTable.ContainsKey(bone))
+			return boneTable[bone].GetComponent<Rigidbody2D>();
+
+		return null;
 	}
 
 	public void Remove () {
@@ -135,6 +161,7 @@ public class SkeletonRagdoll2D : MonoBehaviour {
 
 		rootRigidbody = boneTable[ragdollRootBone].GetComponent<Rigidbody2D>();
 		rootRigidbody.isKinematic = pinStartBone;
+		rootRigidbody.mass = rootMass;
 
 		List<Collider2D> boneColliders = new List<Collider2D>();
 
@@ -174,17 +201,18 @@ public class SkeletonRagdoll2D : MonoBehaviour {
 				Vector3 localPos = parentTransform.InverseTransformPoint(t.position);
 				localPos.x *= 1;
 				joint.connectedAnchor = localPos;
-				joint.GetComponent<Rigidbody2D>().mass = joint.connectedBody.mass * 0.75f;
+				joint.GetComponent<Rigidbody2D>().mass = joint.connectedBody.mass * massFalloffFactor;
 				JointAngleLimits2D limits = new JointAngleLimits2D();
 				limits.min = -rotationLimit;
 				limits.max = rotationLimit;
 				joint.limits = limits;
-				joint.useLimits = enableJointCollision;
+				joint.useLimits = true;
 			}
 		}
 
 		for (int x = 0; x < boneColliders.Count; x++) {
 			for (int y = 0; y < boneColliders.Count; y++) {
+				if (x == y) continue;
 				Physics2D.IgnoreCollision(boneColliders[x], boneColliders[y]);
 			}
 		}
@@ -245,13 +273,13 @@ public class SkeletonRagdoll2D : MonoBehaviour {
 			//physics
 			if (colliders.Count == 0) {
 				var circle = go.AddComponent<CircleCollider2D>();
-				circle.radius = defaultThickness / 2f;
+				circle.radius = thickness / 2f;
 			}
 		} else {
 			//physics
 			if (colliders.Count == 0) {
 				var box = go.AddComponent<BoxCollider2D>();
-				box.size = new Vector2(length, defaultThickness);
+				box.size = new Vector2(length, thickness);
 #if UNITY_5_0
 				box.offset = new Vector2((b.WorldFlipX ? -length : length) / 2, 0);
 #else
@@ -330,8 +358,15 @@ public class SkeletonRagdoll2D : MonoBehaviour {
 				flipY = parentBone.WorldFlipY;
 
 			} else {
-				flipX = b.worldFlipX;
-				flipY = b.WorldFlipY;
+				parentBone = b.Parent;
+				parentTransform = ragdollRoot;
+				if (b.Parent != null) {
+					flipX = b.worldFlipX;
+					flipY = b.WorldFlipY;
+				} else {
+					flipX = b.Skeleton.FlipX;
+					flipY = b.Skeleton.FlipY;
+				}
 			}
 
 			flip = flipX ^ flipY;
@@ -378,10 +413,10 @@ public class SkeletonRagdoll2D : MonoBehaviour {
 
 	void OnDrawGizmosSelected () {
 		if (isActive) {
-			Gizmos.DrawWireSphere(transform.position, defaultThickness * 1.2f);
+			Gizmos.DrawWireSphere(transform.position, thickness * 1.2f);
 			Vector3 newTransformPos = rootRigidbody.position - rootOffset;
 			Gizmos.DrawLine(transform.position, newTransformPos);
-			Gizmos.DrawWireSphere(newTransformPos, defaultThickness * 1.2f);
+			Gizmos.DrawWireSphere(newTransformPos, thickness * 1.2f);
 		}
 	}
 

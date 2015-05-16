@@ -10,20 +10,21 @@ using System.Collections.Generic;
 
 [CustomEditor(typeof(SkeletonRagdoll2D))]
 public class SkeletonRagdoll2DInspector : Editor {
-	SerializedProperty startingBoneName, stopBoneNames, applyOnStart, pinStartBone, enableJointCollision, gravityScale, disableIK, defaultThickness, rotationLimit, colliderLayer, mix;
+	SerializedProperty startingBoneName, stopBoneNames, applyOnStart, pinStartBone, enableJointCollision, gravityScale, disableIK, thickness, rotationLimit, colliderLayer, mix, rootMass, massFalloffFactor;
 
 	void OnEnable () {
 		startingBoneName = serializedObject.FindProperty("startingBoneName");
 		stopBoneNames = serializedObject.FindProperty("stopBoneNames");
 		applyOnStart = serializedObject.FindProperty("applyOnStart");
 		pinStartBone = serializedObject.FindProperty("pinStartBone");
-		enableJointCollision = serializedObject.FindProperty("enableJointCollision");
 		gravityScale = serializedObject.FindProperty("gravityScale");
 		disableIK = serializedObject.FindProperty("disableIK");
-		defaultThickness = serializedObject.FindProperty("defaultThickness");
+		thickness = serializedObject.FindProperty("thickness");
 		rotationLimit = serializedObject.FindProperty("rotationLimit");
 		colliderLayer = serializedObject.FindProperty("colliderLayer");
 		mix = serializedObject.FindProperty("mix");
+		rootMass = serializedObject.FindProperty("rootMass");
+		massFalloffFactor = serializedObject.FindProperty("massFalloffFactor");
 	}
 
 	public override void OnInspectorGUI () {
@@ -31,13 +32,15 @@ public class SkeletonRagdoll2DInspector : Editor {
 		EditorGUILayout.PropertyField(stopBoneNames, true);
 		EditorGUILayout.PropertyField(applyOnStart);
 		EditorGUILayout.PropertyField(pinStartBone);
-		EditorGUILayout.PropertyField(enableJointCollision);
 		EditorGUILayout.PropertyField(gravityScale);
 		EditorGUILayout.PropertyField(disableIK);
-		EditorGUILayout.PropertyField(defaultThickness);
+		EditorGUILayout.PropertyField(thickness);
 		EditorGUILayout.PropertyField(rotationLimit);
+		EditorGUILayout.PropertyField(rootMass);
+		EditorGUILayout.PropertyField(massFalloffFactor);
 		colliderLayer.intValue = EditorGUILayout.LayerField(colliderLayer.displayName, colliderLayer.intValue);
 		EditorGUILayout.PropertyField(mix);
+		
 
 		serializedObject.ApplyModifiedProperties();
 	}
