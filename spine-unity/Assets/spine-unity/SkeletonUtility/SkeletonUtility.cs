@@ -95,6 +95,22 @@ public class SkeletonUtility : MonoBehaviour {
 		return collider;
 	}
 
+	public static Bounds GetBoundingBoxBounds (BoundingBoxAttachment boundingBox, float depth = 0) {
+		float[] floats = boundingBox.Vertices;
+		int floatCount = floats.Length;
+
+		Bounds bounds = new Bounds();
+
+		bounds.center = new Vector3(floats[0], floats[1], 0);
+		for (int i = 2; i < floatCount; i += 2) {
+			bounds.Encapsulate(new Vector3(floats[i], floats[i + 1], 0));
+		}
+		Vector3 size = bounds.size;
+		size.z = depth;
+		bounds.size = size;
+
+		return bounds;
+	}
 
 	public delegate void SkeletonUtilityDelegate ();
 
