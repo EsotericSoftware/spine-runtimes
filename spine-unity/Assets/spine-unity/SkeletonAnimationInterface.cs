@@ -40,5 +40,5 @@ public interface ISkeletonAnimation {
 	event UpdateBonesDelegate UpdateComplete;
 
 	void LateUpdate ();
-	Skeleton GetSkeleton();
+	Skeleton Skeleton { get; }
 }

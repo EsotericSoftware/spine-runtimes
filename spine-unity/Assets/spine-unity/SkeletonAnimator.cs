@@ -38,6 +38,12 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 	protected event UpdateBonesDelegate _UpdateWorld;
 	protected event UpdateBonesDelegate _UpdateComplete;
 
+	public Skeleton Skeleton {
+		get {
+			return this.skeleton;
+		}
+	}
+
 	Dictionary<string, Spine.Animation> animationTable = new Dictionary<string, Spine.Animation>();
 	Animator animator;
 

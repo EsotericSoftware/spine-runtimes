@@ -42,9 +42,7 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 	public bool loop;
 	public Spine.AnimationState state;
 
-	public Skeleton GetSkeleton(){
-		return this.skeleton;
-	}
+	
 
 	public event UpdateBonesDelegate UpdateLocal {
 		add { _UpdateLocal += value; }
@@ -64,6 +62,12 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 	protected event UpdateBonesDelegate _UpdateLocal;
 	protected event UpdateBonesDelegate _UpdateWorld;
 	protected event UpdateBonesDelegate _UpdateComplete;
+
+	public Skeleton Skeleton {
+		get {
+			return this.skeleton;
+		}
+	}
 
 	[SerializeField]
 	private String
