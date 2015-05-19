@@ -183,15 +183,25 @@ public class SkeletonRenderer : MonoBehaviour {
 		ExposedList<int> attachmentsTriangleCountTemp = lastState.attachmentsTriangleCountTemp;
 		attachmentsTriangleCountTemp.GrowIfNeeded(drawOrderCount);
 		attachmentsTriangleCountTemp.Count = drawOrderCount;
+		ExposedList<bool> attachmentsFlipStateTemp = lastState.attachmentsFlipStateTemp;
+		attachmentsFlipStateTemp.GrowIfNeeded(drawOrderCount);
+		attachmentsFlipStateTemp.Count = drawOrderCount;
 
 		ExposedList<LastState.AddSubmeshArguments> addSubmeshArgumentsTemp = lastState.addSubmeshArgumentsTemp;
 		addSubmeshArgumentsTemp.Clear(false);
 		for (int i = 0; i < drawOrderCount; i++) {
 			Slot slot = drawOrder.Items[i];
+			Bone bone = slot.bone;
 			Attachment attachment = slot.attachment;
 
 			object rendererObject;
 			int attachmentVertexCount, attachmentTriangleCount;
+			bool worldScaleXIsPositive = bone.worldScaleX >= 0f;
+			bool worldScaleYIsPositive = bone.worldScaleY >= 0f;
+			bool worldScaleIsSameSigns = (worldScaleXIsPositive && worldScaleYIsPositive) || 
+										 (!worldScaleXIsPositive && !worldScaleYIsPositive);
+			bool flip = frontFacing && ((bone.worldFlipX != bone.worldFlipY) == worldScaleIsSameSigns);
+			attachmentsFlipStateTemp.Items[i] = flip;
 
 			attachmentsTriangleCountTemp.Items[i] = -1;
 			RegionAttachment regionAttachment = attachment as RegionAttachment;
@@ -240,7 +250,7 @@ public class SkeletonRenderer : MonoBehaviour {
 			new LastState.AddSubmeshArguments(lastMaterial, submeshStartSlotIndex, drawOrderCount, submeshTriangleCount, submeshFirstVertex, true)
 			);
 		
-		bool mustUpdateMeshStructure = MustUpdateMeshStructure(attachmentsTriangleCountTemp, addSubmeshArgumentsTemp);
+		bool mustUpdateMeshStructure = CheckIfMustUpdateMeshStructure(attachmentsTriangleCountTemp, attachmentsFlipStateTemp, addSubmeshArgumentsTemp);
 		if (mustUpdateMeshStructure) {
 			submeshMaterials.Clear();
 			for (int i = 0, n = addSubmeshArgumentsTemp.Count; i < n; i++) {
@@ -251,7 +261,8 @@ public class SkeletonRenderer : MonoBehaviour {
 					arguments.endSlot,
 					arguments.triangleCount,
 					arguments.firstVertex,
-					arguments.lastSubmesh
+					arguments.lastSubmesh,
+					attachmentsFlipStateTemp
 				);
 			}
 
@@ -487,38 +498,39 @@ public class SkeletonRenderer : MonoBehaviour {
 		}
 
 		// Update previous state
-		ExposedList<int> attachmentsTriangleCountCurrentMesh = 
-			useMesh1 ? 
-			lastState.attachmentsTriangleCountMesh1 : 
-			lastState.attachmentsTriangleCountMesh2;
-		ExposedList<LastState.AddSubmeshArguments> addSubmeshArgumentsCurrentMesh = 
-			useMesh1 ? 
-			lastState.addSubmeshArgumentsMesh1 : 
-			lastState.addSubmeshArgumentsMesh2;
+		ExposedList<int> attachmentsTriangleCountCurrentMesh;
+		ExposedList<bool> attachmentsFlipStateCurrentMesh;
+		ExposedList<LastState.AddSubmeshArguments> addSubmeshArgumentsCurrentMesh;
+		if (useMesh1) {
+			attachmentsTriangleCountCurrentMesh = lastState.attachmentsTriangleCountMesh1;
+			addSubmeshArgumentsCurrentMesh = lastState.addSubmeshArgumentsMesh1;
+			attachmentsFlipStateCurrentMesh = lastState.attachmentsFlipStateMesh1;
+			lastState.immutableTrianglesMesh1 = immutableTriangles;
+		} else {
+			attachmentsTriangleCountCurrentMesh = lastState.attachmentsTriangleCountMesh2;
+			addSubmeshArgumentsCurrentMesh = lastState.addSubmeshArgumentsMesh2;
+			attachmentsFlipStateCurrentMesh = lastState.attachmentsFlipStateMesh2;
+			lastState.immutableTrianglesMesh2 = immutableTriangles;
+		}
 
 		attachmentsTriangleCountCurrentMesh.GrowIfNeeded(attachmentsTriangleCountTemp.Capacity);
 		attachmentsTriangleCountCurrentMesh.Count = attachmentsTriangleCountTemp.Count;
 		attachmentsTriangleCountTemp.CopyTo(attachmentsTriangleCountCurrentMesh.Items, 0);
 
+		attachmentsFlipStateCurrentMesh.GrowIfNeeded(attachmentsFlipStateTemp.Capacity);
+		attachmentsFlipStateCurrentMesh.Count = attachmentsFlipStateTemp.Count;
+		attachmentsFlipStateTemp.CopyTo(attachmentsFlipStateCurrentMesh.Items, 0);
+
 		addSubmeshArgumentsCurrentMesh.GrowIfNeeded(addSubmeshArgumentsTemp.Count);
 		addSubmeshArgumentsCurrentMesh.Count = addSubmeshArgumentsTemp.Count;
 		addSubmeshArgumentsTemp.CopyTo(addSubmeshArgumentsCurrentMesh.Items);
 
-		if (useMesh1) {
-			lastState.frontFacingMesh1 = frontFacing;
-			lastState.immutableTrianglesMesh1 = immutableTriangles;
-		} else {
-			lastState.frontFacingMesh2 = frontFacing;
-			lastState.immutableTrianglesMesh2 = immutableTriangles;
-		}
-
 		useMesh1 = !useMesh1;
 	}
 
-	private bool MustUpdateMeshStructure(ExposedList<int> attachmentsTriangleCountTemp, ExposedList<LastState.AddSubmeshArguments> addSubmeshArgumentsTemp) {
+	private bool CheckIfMustUpdateMeshStructure(ExposedList<int> attachmentsTriangleCountTemp, ExposedList<bool> attachmentsFlipStateTemp, ExposedList<LastState.AddSubmeshArguments> addSubmeshArgumentsTemp) {
 		// Check if any mesh settings were changed
 		bool mustUpdateMeshStructure =
-			frontFacing != (useMesh1 ? lastState.frontFacingMesh1 : lastState.frontFacingMesh2) ||
 			immutableTriangles != (useMesh1 ? lastState.immutableTrianglesMesh1 : lastState.immutableTrianglesMesh2);
 #if UNITY_EDITOR
 		mustUpdateMeshStructure |= !Application.isPlaying;
@@ -529,14 +541,18 @@ public class SkeletonRenderer : MonoBehaviour {
 
 		// Check if any attachments were enabled/disabled
 		// or submesh structures has changed
-		ExposedList<int> attachmentsTriangleCountCurrentMesh = 
-			useMesh1 ? 
-			lastState.attachmentsTriangleCountMesh1 : 
-			lastState.attachmentsTriangleCountMesh2;
-		ExposedList<LastState.AddSubmeshArguments> addSubmeshArgumentsCurrentMesh = 
-			useMesh1 ? 
-			lastState.addSubmeshArgumentsMesh1 : 
-			lastState.addSubmeshArgumentsMesh2;
+		ExposedList<int> attachmentsTriangleCountCurrentMesh;
+		ExposedList<bool> attachmentsFlipStateCurrentMesh;
+		ExposedList<LastState.AddSubmeshArguments> addSubmeshArgumentsCurrentMesh;
+		if (useMesh1) {
+			attachmentsTriangleCountCurrentMesh = lastState.attachmentsTriangleCountMesh1;
+			addSubmeshArgumentsCurrentMesh = lastState.addSubmeshArgumentsMesh1;
+			attachmentsFlipStateCurrentMesh = lastState.attachmentsFlipStateMesh1;
+		} else {
+			attachmentsTriangleCountCurrentMesh = lastState.attachmentsTriangleCountMesh2;
+			addSubmeshArgumentsCurrentMesh = lastState.addSubmeshArgumentsMesh2;
+			attachmentsFlipStateCurrentMesh = lastState.attachmentsFlipStateMesh2;
+		}
 
 		// Check attachments
 		int attachmentCount = attachmentsTriangleCountTemp.Count;
@@ -545,6 +561,12 @@ public class SkeletonRenderer : MonoBehaviour {
 
 		for (int i = 0; i < attachmentCount; i++) {
 			if (attachmentsTriangleCountCurrentMesh.Items[i] != attachmentsTriangleCountTemp.Items[i])
+				return true;
+		}
+
+		// Check flip state
+		for (int i = 0; i < attachmentCount; i++) {
+			if (attachmentsFlipStateCurrentMesh.Items[i] != attachmentsFlipStateTemp.Items[i])
 				return true;
 		}
 
@@ -562,7 +584,7 @@ public class SkeletonRenderer : MonoBehaviour {
 	}
 
 	/** Stores vertices and triangles for a single material. */
-	private void AddSubmesh (Material material, int startSlot, int endSlot, int triangleCount, int firstVertex, bool lastSubmesh) {
+	private void AddSubmesh (Material material, int startSlot, int endSlot, int triangleCount, int firstVertex, bool lastSubmesh, ExposedList<bool> flipStates) {
 		int submeshIndex = submeshMaterials.Count;
 		submeshMaterials.Add(material);
 
@@ -611,11 +633,7 @@ public class SkeletonRenderer : MonoBehaviour {
 			Attachment attachment = slot.attachment;
 			Bone bone = slot.bone;
 
-			bool worldScaleXIsPositive = bone.worldScaleX >= 0f;
-			bool worldScaleYIsPositive = bone.worldScaleY >= 0f;
-			bool worldScaleIsSameSigns = (worldScaleXIsPositive && worldScaleYIsPositive) || 
-										 (!worldScaleXIsPositive && !worldScaleYIsPositive);
-			bool flip = frontFacing && ((bone.worldFlipX != bone.worldFlipY) != worldScaleIsSameSigns);
+			bool flip = flipStates.Items[i];
 
 			if (attachment is RegionAttachment) {
 				if (!flip) {
@@ -686,11 +704,12 @@ public class SkeletonRenderer : MonoBehaviour {
 #endif
 
 	private class LastState {
-		public bool frontFacingMesh1;
-		public bool frontFacingMesh2;
 		public bool immutableTrianglesMesh1;
 		public bool immutableTrianglesMesh2;
 		public int vertexCount;
+		public readonly ExposedList<bool> attachmentsFlipStateTemp = new ExposedList<bool>();
+		public readonly ExposedList<bool> attachmentsFlipStateMesh1 = new ExposedList<bool>();
+		public readonly ExposedList<bool> attachmentsFlipStateMesh2 = new ExposedList<bool>();
 		public readonly ExposedList<int> attachmentsTriangleCountTemp = new ExposedList<int>();
 		public readonly ExposedList<int> attachmentsTriangleCountMesh1 = new ExposedList<int>();
 		public readonly ExposedList<int> attachmentsTriangleCountMesh2 = new ExposedList<int>();
