@@ -142,7 +142,9 @@ namespace Spine {
 		}
 
 		public void Clear(bool clearArray = true) {
-			Array.Clear(Items, 0, Items.Length);
+			if (clearArray)
+				Array.Clear(Items, 0, Items.Length);
+
 			Count = 0;
 			version++;
 		}
