@@ -110,7 +110,7 @@ const char* spSkin_getAttachmentName (const spSkin* self, int slotIndex, int att
 void spSkin_attachAll (const spSkin* self, spSkeleton* skeleton, const spSkin* oldSkin) {
 	const _Entry *entry = SUB_CAST(_spSkin, oldSkin)->entries;
 	while (entry) {
-		spSlot *slot = skeleton->slots[entry->slotIndex];
+		spSlot *slot = skeleton->slots_[entry->slotIndex];
 		if (slot->attachment == entry->attachment) {
 			spAttachment *attachment = spSkin_getAttachment(self, entry->slotIndex, entry->name);
 			if (attachment) spSlot_setAttachment(slot, attachment);

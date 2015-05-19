@@ -52,7 +52,7 @@ typedef struct spSkeletonData {
 	spBoneData** bones;
 
 	int slotsCount;
-	spSlotData** slots;
+	spSlotData** slots_;
 
 	int skinsCount;
 	spSkin** skins;

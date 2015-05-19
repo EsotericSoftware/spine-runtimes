@@ -44,8 +44,8 @@ void spSkeletonData_dispose (spSkeletonData* self) {
 	FREE(self->bones);
 
 	for (i = 0; i < self->slotsCount; ++i)
-		spSlotData_dispose(self->slots[i]);
-	FREE(self->slots);
+        spSlotData_dispose(self->slots_[i]);
+    FREE(self->slots_);
 
 	for (i = 0; i < self->skinsCount; ++i)
 		spSkin_dispose(self->skins[i]);
@@ -86,14 +86,14 @@ int spSkeletonData_findBoneIndex (const spSkeletonData* self, const char* boneNa
 spSlotData* spSkeletonData_findSlot (const spSkeletonData* self, const char* slotName) {
 	int i;
 	for (i = 0; i < self->slotsCount; ++i)
-		if (strcmp(self->slots[i]->name, slotName) == 0) return self->slots[i];
+        if (strcmp(self->slots_[i]->name, slotName) == 0) return self->slots_[i];
 	return 0;
 }
 
 int spSkeletonData_findSlotIndex (const spSkeletonData* self, const char* slotName) {
 	int i;
 	for (i = 0; i < self->slotsCount; ++i)
-		if (strcmp(self->slots[i]->name, slotName) == 0) return i;
+        if (strcmp(self->slots_[i]->name, slotName) == 0) return i;
 	return -1;
 }
 

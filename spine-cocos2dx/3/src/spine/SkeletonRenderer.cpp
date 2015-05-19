@@ -305,7 +305,7 @@ Rect SkeletonRenderer::getBoundingBox () const {
 	float minX = FLT_MAX, minY = FLT_MAX, maxX = FLT_MIN, maxY = FLT_MIN;
 	float scaleX = getScaleX(), scaleY = getScaleY();
 	for (int i = 0; i < _skeleton->slotsCount; ++i) {
-		spSlot* slot = _skeleton->slots[i];
+		spSlot* slot = _skeleton->slots_[i];
 		if (!slot->attachment) continue;
 		int verticesCount;
 		if (slot->attachment->type == SP_ATTACHMENT_REGION) {
