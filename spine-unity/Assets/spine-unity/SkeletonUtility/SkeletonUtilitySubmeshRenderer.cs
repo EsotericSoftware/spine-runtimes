@@ -11,9 +11,11 @@ public class SkeletonUtilitySubmeshRenderer : MonoBehaviour {
 	public int sortingLayerID = 0;
 	public Material hiddenPassMaterial;
 	Renderer cachedRenderer;
+	SkeletonRenderer parentSkeletonRenderer;
 	MeshFilter filter;
 	Material[] sharedMaterials;
 	MeshFilter parentFilter;
+	bool isFirstUpdate = true;
 
 	void Awake () {
 		cachedRenderer = GetComponent<Renderer>();
@@ -43,23 +45,29 @@ public class SkeletonUtilitySubmeshRenderer : MonoBehaviour {
 		parentFilter = parentRenderer.GetComponent<MeshFilter>();
 		mesh = parentFilter.sharedMesh;
 		filter.sharedMesh = mesh;
-		Debug.Log("Mesh: " + mesh);
+		parentSkeletonRenderer = parentRenderer.GetComponent<SkeletonRenderer>();
+		Debug.Log("Mesh: " + (mesh == null ? "null" : mesh.name), parentFilter);
 	}
 
 	public void Update () {
+		if (cachedRenderer == null)
+			cachedRenderer = GetComponent<Renderer>();
+
+		if (isFirstUpdate || cachedRenderer.enabled) {
+			parentSkeletonRenderer.RequestMeshUpdate();
+			isFirstUpdate = false;
+		}
+
 		if (mesh == null || mesh != parentFilter.sharedMesh) {
 			mesh = parentFilter.sharedMesh;
 			filter.sharedMesh = mesh;
 		}
 
-		if (cachedRenderer == null)
-			cachedRenderer = GetComponent<Renderer>();
-
 		if (mesh == null || submeshIndex > mesh.subMeshCount - 1) {
 			cachedRenderer.enabled = false;
 			return;
 		} else {
-			GetComponent<Renderer>().enabled = true;
+			cachedRenderer.enabled = true;
 		}
 
 		bool changed = false;

@@ -63,6 +63,7 @@ public class SkeletonRenderer : MonoBehaviour {
 	private MeshFilter meshFilter;
 	private Mesh mesh1, mesh2;
 	private bool useMesh1;
+	private bool meshUpdateRequested;
 	private float[] tempVertices = new float[8];
 	private Vector3[] vertices;
 	private Color32[] colors;
@@ -71,6 +72,10 @@ public class SkeletonRenderer : MonoBehaviour {
 	private LastState lastState = new LastState();
 	private readonly ExposedList<Material> submeshMaterials = new ExposedList<Material>();
 	private readonly ExposedList<Submesh> submeshes = new ExposedList<Submesh>();
+
+	public void RequestMeshUpdate() {
+		meshUpdateRequested = true;
+	}
 
 	public virtual void Reset () {
 		if (meshFilter != null)
@@ -167,8 +172,11 @@ public class SkeletonRenderer : MonoBehaviour {
 	}
 
 	public virtual void LateUpdate () {
-		if (!valid || !meshRenderer.enabled)
+		if (!valid || (!meshRenderer.enabled && !meshUpdateRequested))
 			return;
+
+		// The force update request is only valid for one frame
+		meshUpdateRequested = false;
 
 		// Count vertices and submesh triangles.
 		int vertexCount = 0;
