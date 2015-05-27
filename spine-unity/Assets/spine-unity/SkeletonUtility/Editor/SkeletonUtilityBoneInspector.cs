@@ -203,7 +203,19 @@ public class SkeletonUtilityBoneInspector : Editor {
 				GUILayout.BeginHorizontal();
 				GUILayout.Space(30);
 				if (GUILayout.Button(box.Name, GUILayout.Width(200))) {
-					utilityBone.AddBoundingBox(currentSkinName, entry.Key.Data.Name, box.Name);
+					var child = utilityBone.transform.FindChild("[BoundingBox]" + box.Name);
+					if (child != null) {
+						var originalCollider = child.GetComponent<PolygonCollider2D>();
+						var updatedCollider = SkeletonUtility.AddBoundingBoxAsComponent(box, child.gameObject, originalCollider.isTrigger);
+						originalCollider.points = updatedCollider.points;
+						if (EditorApplication.isPlaying)
+							Destroy(updatedCollider);
+						else
+							DestroyImmediate(updatedCollider);
+					} else {
+						utilityBone.AddBoundingBox(currentSkinName, entry.Key.Data.Name, box.Name);
+					}
+					
 				}
 				GUILayout.EndHorizontal();
 			}
