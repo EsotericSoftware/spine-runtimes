@@ -20,7 +20,7 @@ public class SkeletonDataAssetInspector : Editor {
 	static bool showAnimationList = true;
 	static bool showSlotList = false;
 	static bool showAttachments = false;
-	static bool showBaking = true;
+	static bool showUnity = true;
 	static bool bakeAnimations = true;
 	static bool bakeIK = true;
 	static SendMessageOptions bakeEventOptions = SendMessageOptions.DontRequireReceiver;
@@ -67,7 +67,7 @@ public class SkeletonDataAssetInspector : Editor {
 
 		m_skeletonData = m_skeletonDataAsset.GetSkeletonData(true);
 
-		showBaking = EditorPrefs.GetBool("SkeletonDataAssetInspector_showBaking", true);
+		showUnity = EditorPrefs.GetBool("SkeletonDataAssetInspector_showUnity", true);
 
 		RepopulateWarnings();
 	}
@@ -113,11 +113,10 @@ public class SkeletonDataAssetInspector : Editor {
 
 
 		if (m_skeletonData != null) {
-			DrawMecanim();
 			DrawAnimationStateInfo();
 			DrawAnimationList();
 			DrawSlotList();
-			DrawBaking();
+			DrawUnityTools();
 			
 		} else {
 
@@ -132,20 +131,35 @@ public class SkeletonDataAssetInspector : Editor {
 	}
 
 	void DrawMecanim () {
+		
 		EditorGUILayout.PropertyField(controller, new GUIContent("Controller", SpineEditorUtilities.Icons.controllerIcon));		
 		if (controller.objectReferenceValue == null) {
-			if (GUILayout.Button(new GUIContent("Generate Mecanim Controller", SpineEditorUtilities.Icons.controllerIcon), GUILayout.Width(195), GUILayout.Height(20)))
+			GUILayout.BeginHorizontal();
+			GUILayout.Space(32);
+			if (GUILayout.Button(new GUIContent("Generate Mecanim Controller"), EditorStyles.toolbarButton, GUILayout.Width(195), GUILayout.Height(20)))
 				SkeletonBaker.GenerateMecanimAnimationClips(m_skeletonDataAsset);
+			//GUILayout.Label(new GUIContent("Alternative to SkeletonAnimation, not a requirement.", SpineEditorUtilities.Icons.warning));
+			GUILayout.EndHorizontal();
+			EditorGUILayout.LabelField("Alternative to SkeletonAnimation, not required", EditorStyles.miniLabel);
 		}
+		
 	}
 
-	void DrawBaking () {
-		bool pre = showBaking;
-		showBaking = EditorGUILayout.Foldout(showBaking, new GUIContent("Baking", SpineEditorUtilities.Icons.unityIcon));
-		if (pre != showBaking)
-			EditorPrefs.SetBool("SkeletonDataAssetInspector_showBaking", showBaking);
+	void DrawUnityTools () {
+		bool pre = showUnity;
+		showUnity = EditorGUILayout.Foldout(showUnity, new GUIContent("Unity Tools", SpineEditorUtilities.Icons.unityIcon));
+		if (pre != showUnity)
+			EditorPrefs.SetBool("SkeletonDataAssetInspector_showUnity", showUnity);
 
-		if (showBaking) {
+		if (showUnity) {
+			EditorGUI.indentLevel++;
+			EditorGUILayout.LabelField("SkeletonAnimator", EditorStyles.boldLabel);
+			EditorGUI.indentLevel++;
+			DrawMecanim();
+			EditorGUI.indentLevel--;
+			GUILayout.Space(32);
+			EditorGUILayout.LabelField("Baking", EditorStyles.boldLabel);
+			EditorGUILayout.HelpBox("WARNING!\n\nBaking is NOT the same as SkeletonAnimator!\nDoes not support the following:\n\tFlipX or Y\n\tInheritScale\n\tColor Keys\n\tDraw Order Keys\n\tIK and Curves are sampled at 60fps and are not realtime.\n\tPlease read SkeletonBaker.cs comments for full details.\n\nThe main use of Baking is to export Spine projects to be used without the Spine Runtime (ie: for sale on the Asset Store, or background objects that are animated only with a wind noise generator)", MessageType.Warning, true);
 			EditorGUI.indentLevel++;
 			bakeAnimations = EditorGUILayout.Toggle("Bake Animations", bakeAnimations);
 			EditorGUI.BeginDisabledGroup(bakeAnimations == false);
@@ -297,13 +311,13 @@ public class SkeletonDataAssetInspector : Editor {
 
 			if (m_skeletonAnimation != null && m_skeletonAnimation.state != null) {
 				if (m_skeletonAnimation.state.GetCurrent(0) != null && m_skeletonAnimation.state.GetCurrent(0).Animation == a) {
-					GUI.contentColor = Color.black;
-					if (GUILayout.Button("\u25BA", GUILayout.Width(24))) {
+					GUI.contentColor = Color.red;
+					if (GUILayout.Button("\u25BA", EditorStyles.toolbarButton, GUILayout.Width(24))) {
 						StopAnimation();
 					}
 					GUI.contentColor = Color.white;
 				} else {
-					if (GUILayout.Button("\u25BA", GUILayout.Width(24))) {
+					if (GUILayout.Button("\u25BA", EditorStyles.toolbarButton, GUILayout.Width(24))) {
 						PlayAnimation(a.Name, true);
 					}
 				}
