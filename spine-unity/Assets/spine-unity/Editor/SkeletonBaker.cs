@@ -360,6 +360,7 @@ public static class SkeletonBaker {
 
 		if (skeletonDataAsset.controller != null) {
 			controller = (UnityEditor.Animations.AnimatorController)skeletonDataAsset.controller;
+			controllerPath = AssetDatabase.GetAssetPath(controller);
 		} else {
 			if (File.Exists(controllerPath)) {
 				if (EditorUtility.DisplayDialog("Controller Overwrite Warning", "Unknown Controller already exists at: " + controllerPath, "Update", "Overwrite")) {
@@ -377,6 +378,7 @@ public static class SkeletonBaker {
 
 		if (skeletonDataAsset.controller != null) {
 			controller = (UnityEditorInternal.AnimatorController)skeletonDataAsset.controller;
+			controllerPath = AssetDatabase.GetAssetPath(controller);
 		} else {
 			if (File.Exists(controllerPath)) {
 				if (EditorUtility.DisplayDialog("Controller Overwrite Warning", "Unknown Controller already exists at: " + controllerPath, "Update", "Overwrite")) {
