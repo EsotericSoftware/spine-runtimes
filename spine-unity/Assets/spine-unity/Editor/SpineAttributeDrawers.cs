@@ -54,8 +54,8 @@ public class SpineSlotDrawer : PropertyDrawer {
 
 		} else if (property.serializedObject.targetObject is Component) {
 			var component = (Component)property.serializedObject.targetObject;
-			if (component.GetComponent<SkeletonRenderer>() != null) {
-				var skeletonRenderer = component.GetComponent<SkeletonRenderer>();
+			if (component.GetComponentInChildren<SkeletonRenderer>() != null) {
+				var skeletonRenderer = component.GetComponentInChildren<SkeletonRenderer>();
 				skeletonDataAsset = skeletonRenderer.skeletonDataAsset;
 			}
 		}
@@ -159,8 +159,8 @@ public class SpineSkinDrawer : PropertyDrawer {
 
 		} else if (property.serializedObject.targetObject is Component) {
 			var component = (Component)property.serializedObject.targetObject;
-			if (component.GetComponent<SkeletonRenderer>() != null) {
-				var skeletonRenderer = component.GetComponent<SkeletonRenderer>();
+			if (component.GetComponentInChildren<SkeletonRenderer>() != null) {
+				var skeletonRenderer = component.GetComponentInChildren<SkeletonRenderer>();
 				skeletonDataAsset = skeletonRenderer.skeletonDataAsset;
 			}
 		}
@@ -303,8 +303,8 @@ public class SpineAnimationDrawer : PropertyDrawer {
 			}
 		} else if (property.serializedObject.targetObject is Component) {
 			var component = (Component)property.serializedObject.targetObject;
-			if (component.GetComponent<SkeletonRenderer>() != null) {
-				var skeletonRenderer = component.GetComponent<SkeletonRenderer>();
+			if (component.GetComponentInChildren<SkeletonRenderer>() != null) {
+				var skeletonRenderer = component.GetComponentInChildren<SkeletonRenderer>();
 				skeletonDataAsset = skeletonRenderer.skeletonDataAsset;
 			}
 		}
@@ -383,8 +383,8 @@ public class SpineAttachmentDrawer : PropertyDrawer {
 
 		} else if (property.serializedObject.targetObject is Component) {
 			var component = (Component)property.serializedObject.targetObject;
-			if (component.GetComponent<SkeletonRenderer>() != null) {
-				skeletonRenderer = component.GetComponent<SkeletonRenderer>();
+			if (component.GetComponentInChildren<SkeletonRenderer>() != null) {
+				skeletonRenderer = component.GetComponentInChildren<SkeletonRenderer>();
 				skeletonDataAsset = skeletonRenderer.skeletonDataAsset;
 			}
 		}
@@ -533,8 +533,8 @@ public class SpineBoneDrawer : PropertyDrawer {
 
 		} else if (property.serializedObject.targetObject is Component) {
 			var component = (Component)property.serializedObject.targetObject;
-			if (component.GetComponent<SkeletonRenderer>() != null) {
-				var skeletonRenderer = component.GetComponent<SkeletonRenderer>();
+			if (component.GetComponentInChildren<SkeletonRenderer>() != null) {
+				var skeletonRenderer = component.GetComponentInChildren<SkeletonRenderer>();
 				skeletonDataAsset = skeletonRenderer.skeletonDataAsset;
 			}
 		}
