@@ -38,7 +38,7 @@ public class SkeletonDataAssetInspector : Editor {
 	private bool needToSerialize;
 
 	List<string> warnings = new List<string>();
-	
+
 	void OnEnable () {
 
 		SpineEditorUtilities.ConfirmInitialization();
@@ -117,7 +117,7 @@ public class SkeletonDataAssetInspector : Editor {
 			DrawAnimationList();
 			DrawSlotList();
 			DrawUnityTools();
-			
+
 		} else {
 
 			DrawReimportButton();
@@ -131,8 +131,8 @@ public class SkeletonDataAssetInspector : Editor {
 	}
 
 	void DrawMecanim () {
-		
-		EditorGUILayout.PropertyField(controller, new GUIContent("Controller", SpineEditorUtilities.Icons.controllerIcon));		
+
+		EditorGUILayout.PropertyField(controller, new GUIContent("Controller", SpineEditorUtilities.Icons.controllerIcon));
 		if (controller.objectReferenceValue == null) {
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(32);
@@ -142,7 +142,7 @@ public class SkeletonDataAssetInspector : Editor {
 			GUILayout.EndHorizontal();
 			EditorGUILayout.LabelField("Alternative to SkeletonAnimation, not required", EditorStyles.miniLabel);
 		}
-		
+
 	}
 
 	void DrawUnityTools () {
@@ -292,7 +292,7 @@ public class SkeletonDataAssetInspector : Editor {
 			serializedObject.ApplyModifiedProperties();
 			needToSerialize = true;
 		}
-			
+
 	}
 	void DrawAnimationList () {
 		showAnimationList = EditorGUILayout.Foldout(showAnimationList, new GUIContent("Animations", SpineEditorUtilities.Icons.animationRoot));
@@ -648,7 +648,7 @@ public class SkeletonDataAssetInspector : Editor {
 		this.m_previewUtility.m_Camera.orthographicSize = orthoSet;
 
 		float dist = Vector3.Distance(m_previewUtility.m_Camera.transform.position, m_posGoal);
-		if (dist > 60f * ((SkeletonDataAsset)target).scale) {
+		if(dist > 0f) {
 			Vector3 pos = Vector3.Lerp(this.m_previewUtility.m_Camera.transform.position, m_posGoal, 0.1f);
 			pos.x = 0;
 			this.m_previewUtility.m_Camera.transform.position = pos;
@@ -676,7 +676,7 @@ public class SkeletonDataAssetInspector : Editor {
 
 
 
-			if (drawHandles) {			
+			if (drawHandles) {
 				Handles.SetCamera(m_previewUtility.m_Camera);
 				Handles.color = m_originColor;
 
@@ -724,8 +724,8 @@ public class SkeletonDataAssetInspector : Editor {
 
 		Handles.DrawLine(lastVert, firstVert);
 
-		
-		
+
+
 	}
 
 	void Update () {
@@ -857,7 +857,7 @@ public class SkeletonDataAssetInspector : Editor {
 			case EventType.ScrollWheel:
 				if (position.Contains(current.mousePosition)) {
 
-					m_orthoGoal += current.delta.y * ((SkeletonDataAsset)target).scale * 10;
+					m_orthoGoal += current.delta.y;
 					GUIUtility.hotControl = controlID;
 					current.Use();
 				}
@@ -882,7 +882,7 @@ public class SkeletonDataAssetInspector : Editor {
 				EditorGUIUtility.SetWantsMouseJumping(1);
 			}
 			return scrollPosition;
-			
+
 		case EventType.MouseUp:
 			if (GUIUtility.hotControl == controlID)
 			{
@@ -890,10 +890,10 @@ public class SkeletonDataAssetInspector : Editor {
 			}
 			EditorGUIUtility.SetWantsMouseJumping(0);
 			return scrollPosition;
-			
+
 		case EventType.MouseMove:
 			return scrollPosition;
-			
+
 		case EventType.MouseDrag:
 			if (GUIUtility.hotControl == controlID)
 			{
