@@ -1,0 +1,19 @@
+display_name "Extensions/Spine"
+
+options {
+	arm-cpu=6
+	arm-fpu=vfp
+	optimise-speed
+}
+
+includepaths {
+	"spine-c/include"
+}
+
+files {
+	["include"]
+	"spine-c/include/spine/*.h"
+
+	["src"]
+	"spine-c/src/spine/*.c"
+}
