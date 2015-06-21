@@ -33,7 +33,7 @@
 #import "cocos2d.h"
 
 /** Draws a skeleton. */
-@interface SkeletonRenderer : CCNode<CCBlendProtocol> {
+@interface SkeletonRenderer : CCSprite<CCBlendProtocol> {
 	spSkeleton* _skeleton;
 	spBone* _rootBone;
 	bool _debugSlots;
