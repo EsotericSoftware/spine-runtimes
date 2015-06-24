@@ -150,7 +150,20 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	const int* triangles = 0;
 	int trianglesCount = 0;
 	float r = 0, g = 0, b = 0, a = 0;
-	for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
+
+    CCEffectPrepareResult prepResult = [self.effect prepareForRenderingWithSprite:self];
+    NSAssert(prepResult.status == CCEffectPrepareSuccess, @"Effect preparation failed.");
+
+    if (prepResult.changes & CCEffectPrepareUniformsChanged)
+    {
+        // Preparing an effect for rendering can modify its uniforms
+        // dictionary which means we need to reinitialize our copy of the
+        // uniforms.
+        [self updateShaderUniformsFromEffect];
+    }
+
+
+    for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
 		spSlot* slot = _skeleton->drawOrder[i];
 		if (!slot->attachment) continue;
 		CCTexture *texture = 0;
@@ -263,29 +276,15 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
                     }
                 }
                 else {
-                    for (int j = 0; j * 3 < trianglesCount; ++j) {
-                        _renderUsingTriangleVertices = YES;
-                        _triangleVertices.v1 = vertexArray[triangles[j * 3]];
-                        _triangleVertices.v2 = vertexArray[triangles[j * 3 + 1]];
-                        _triangleVertices.v3 = vertexArray[triangles[j * 3 + 2]];
-                        _effectRenderer.contentSize = self.boundingBox.size;
-
-                        CCEffectPrepareResult prepResult = [self.effect prepareForRenderingWithSprite:self];
-                        NSAssert(prepResult.status == CCEffectPrepareSuccess, @"Effect preparation failed.");
-
-                        if (prepResult.changes & CCEffectPrepareUniformsChanged)
-                        {
-                            // Preparing an effect for rendering can modify its uniforms
-                            // dictionary which means we need to reinitialize our copy of the
-                            // uniforms.
-                            [self updateShaderUniformsFromEffect];
-                        }
-
-                        [_effectRenderer drawSprite:self
-                                                   withEffect:self.effect uniforms:self.shaderUniforms
-                                                     renderer:renderer
-                                                    transform:transform];
-                    }
+                    _renderUsingTriangleVertices = YES;
+                    [self initializeTriangleVertices: trianglesCount / 3 withVerticesCount: verticesCount / 2];
+                    _triangleVertices = vertexArray;
+                    _triangles = triangles;
+                    _effectRenderer.contentSize = self.boundingBox.size;
+                    [_effectRenderer drawSprite:self
+                                     withEffect:self.effect uniforms:self.shaderUniforms
+                                       renderer:renderer
+                                      transform:transform];
                 }
 			}
 		}
