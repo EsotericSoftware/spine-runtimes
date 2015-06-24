@@ -276,10 +276,10 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
                     }
                 }
                 else {
-                    _renderUsingTriangleVertices = YES;
-                    [self initializeTriangleVertices: trianglesCount / 3 withVerticesCount: verticesCount / 2];
-                    _triangleVertices = vertexArray;
-                    _triangles = triangles;
+                    [self initializeTriangleVertices: trianglesCount / 3
+                                   withVerticesCount: verticesCount / 2
+                                        withVertices: vertexArray
+                                       withTriangles: triangles];
                     _effectRenderer.contentSize = self.boundingBox.size;
                     [_effectRenderer drawSprite:self
                                      withEffect:self.effect uniforms:self.shaderUniforms
