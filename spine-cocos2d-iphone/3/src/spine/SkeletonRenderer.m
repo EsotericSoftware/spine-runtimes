@@ -151,15 +151,15 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	int trianglesCount = 0;
 	float r = 0, g = 0, b = 0, a = 0;
 
-    CCEffectPrepareResult prepResult = [self.effect prepareForRenderingWithSprite:self];
-    NSAssert(prepResult.status == CCEffectPrepareSuccess, @"Effect preparation failed.");
-
-    if (prepResult.changes & CCEffectPrepareUniformsChanged)
-    {
-        // Preparing an effect for rendering can modify its uniforms
-        // dictionary which means we need to reinitialize our copy of the
-        // uniforms.
-        [self updateShaderUniformsFromEffect];
+    if(self.effect) {
+        CCEffectPrepareResult prepResult = [self.effect prepareForRenderingWithSprite:self];
+        NSAssert(prepResult.status == CCEffectPrepareSuccess, @"Effect preparation failed.");
+        if (prepResult.changes & CCEffectPrepareUniformsChanged) {
+            // Preparing an effect for rendering can modify its uniforms
+            // dictionary which means we need to reinitialize our copy of the
+            // uniforms.
+            [self updateShaderUniformsFromEffect];
+        }
     }
 
 
