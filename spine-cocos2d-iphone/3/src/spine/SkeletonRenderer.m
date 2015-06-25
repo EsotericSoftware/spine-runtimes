@@ -256,7 +256,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 				for (int i = 0; i * 2 < verticesCount; ++i) {
 					CCVertex vertex;
 					vertex.position = GLKVector4Make(_worldVertices[i * 2], _worldVertices[i * 2 + 1], 0.0, 1.0);
-					vertex.color = GLKVector4Make(r, g, b, 1);
+					vertex.color = GLKVector4Make(r, g, b, a);
 					vertex.texCoord1 = GLKVector2Make(uvs[i * 2], 1 - uvs[i * 2 + 1]);
                     if(self.effect) {
                         vertex.texCoord2 = GLKVector2Make(uvs[i * 2], 1 - uvs[i * 2 + 1]);
