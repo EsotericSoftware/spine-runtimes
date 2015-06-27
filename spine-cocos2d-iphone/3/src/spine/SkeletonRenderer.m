@@ -230,12 +230,12 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 				}
 			}
 			if (_premultipliedAlpha) {
-				a *= _skeleton->a * slot->a;
+				a *= slot->a; //_skeleton->a * slot->a;
 				r *= _skeleton->r * slot->r * a;
 				g *= _skeleton->g * slot->g * a;
 				b *= _skeleton->b * slot->b * a;
 			} else {
-				a *= _skeleton->a * slot->a;
+				a *= slot->a; //_skeleton->a * slot->a;
 				r *= _skeleton->r * slot->r;
 				g *= _skeleton->g * slot->g;
 				b *= _skeleton->b * slot->b;
