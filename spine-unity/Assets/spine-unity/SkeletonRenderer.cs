@@ -63,7 +63,6 @@ public class SkeletonRenderer : MonoBehaviour {
 	private MeshFilter meshFilter;
 	private Mesh mesh1, mesh2;
 	private bool useMesh1;
-	private bool meshUpdateRequested;
 	private float[] tempVertices = new float[8];
 	private Vector3[] vertices;
 	private Color32[] colors;
@@ -73,10 +72,6 @@ public class SkeletonRenderer : MonoBehaviour {
 	private readonly ExposedList<Submesh> submeshes = new ExposedList<Submesh>();
 	private SkeletonUtilitySubmeshRenderer[] submeshRenderers;
 	private LastState lastState = new LastState();
-
-	public void RequestMeshUpdate() {
-		meshUpdateRequested = true;
-	}
 
 	public virtual void Reset () {
 		if (meshFilter != null)
@@ -181,11 +176,12 @@ public class SkeletonRenderer : MonoBehaviour {
 	}
 
 	public virtual void LateUpdate () {
-		if (!valid || (!meshRenderer.enabled && !meshUpdateRequested))
+		if (!valid)
 			return;
 
-		// The force update request is only valid for one frame
-		meshUpdateRequested = false;
+		// Exit early if there is nothing to render
+		if (!meshRenderer.enabled && submeshRenderers.Length == 0)
+			return;
 
 		// Count vertices and submesh triangles.
 		int vertexCount = 0;
@@ -456,7 +452,7 @@ public class SkeletonRenderer : MonoBehaviour {
 						color.r = (byte)(r * slot.r * skinnedMeshAttachment.r * color.a);
 						color.g = (byte)(g * slot.g * skinnedMeshAttachment.g * color.a);
 						color.b = (byte)(b * slot.b * skinnedMeshAttachment.b * color.a);
-                        if (slot.data.blendMode == BlendMode.additive) color.a = 0;
+						if (slot.data.blendMode == BlendMode.additive) color.a = 0;
 
 						float[] meshUVs = skinnedMeshAttachment.uvs;
 						float z = i * zSpacing;
@@ -549,14 +545,14 @@ public class SkeletonRenderer : MonoBehaviour {
 		addSubmeshArgumentsTemp.CopyTo(addSubmeshArgumentsCurrentMesh.Items);
 
 		if (submeshRenderers.Length > 0) {
-		    for (int i = 0; i < submeshRenderers.Length; i++) {
-		        SkeletonUtilitySubmeshRenderer submeshRenderer = submeshRenderers[i];
-		        if (submeshRenderer.submeshIndex < sharedMaterials.Length) {
-		            submeshRenderer.SetMesh(meshRenderer, useMesh1 ? mesh1 : mesh2, sharedMaterials[submeshRenderer.submeshIndex]);
-		        } else {
-		            submeshRenderer.GetComponent<Renderer>().enabled = false;
-		        }
-		    }
+			for (int i = 0; i < submeshRenderers.Length; i++) {
+				SkeletonUtilitySubmeshRenderer submeshRenderer = submeshRenderers[i];
+				if (submeshRenderer.submeshIndex < sharedMaterials.Length) {
+					submeshRenderer.SetMesh(meshRenderer, useMesh1 ? mesh1 : mesh2, sharedMaterials[submeshRenderer.submeshIndex]);
+				} else {
+					submeshRenderer.GetComponent<Renderer>().enabled = false;
+				}
+			}
 		}
 
 		useMesh1 = !useMesh1;
