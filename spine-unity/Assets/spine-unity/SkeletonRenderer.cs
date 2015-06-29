@@ -661,7 +661,6 @@ public class SkeletonRenderer : MonoBehaviour {
 		for (int i = startSlot, triangleIndex = 0; i < endSlot; i++) {
 			Slot slot = drawOrder.Items[i];
 			Attachment attachment = slot.attachment;
-			Bone bone = slot.bone;
 
 			bool flip = flipStates.Items[i];
 
