@@ -1,32 +1,4 @@
-﻿/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.1
- * 
- * Copyright (c) 2013, Esoteric Software
- * All rights reserved.
- * 
- * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to install, execute and perform the Spine Runtimes
- * Software (the "Software") solely for internal use. Without the written
- * permission of Esoteric Software (typically granted by licensing Spine), you
- * may not (a) modify, translate, adapt or otherwise create derivative works,
- * improvements of the Software or develop new applications using the Software
- * or (b) remove, delete, alter or obscure any trademarks or any copyright,
- * trademark, patent or other intellectual property or proprietary rights
- * notices on or in the Software, including any copy thereof. Redistributions
- * in binary or source form must include this license and terms.
- * 
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
+
 
 /*****************************************************************************
  * SkeletonAnimator created by Mitch Thompson
@@ -43,6 +15,10 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 	public enum MixMode { AlwaysMix, MixNext, SpineStyle }
 	public MixMode[] layerMixModes = new MixMode[0];
 
+	public Skeleton GetSkeleton () {
+		return this.skeleton;
+
+	}
 	public event UpdateBonesDelegate UpdateLocal {
 		add { _UpdateLocal += value; }
 		remove { _UpdateLocal -= value; }
@@ -62,9 +38,16 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 	protected event UpdateBonesDelegate _UpdateWorld;
 	protected event UpdateBonesDelegate _UpdateComplete;
 
+	public Skeleton Skeleton {
+		get {
+			return this.skeleton;
+		}
+	}
+
 	Dictionary<int, Spine.Animation> animationTable = new Dictionary<int, Spine.Animation>();
 	Dictionary<AnimationClip, int> clipNameHashCodeTable = new Dictionary<AnimationClip, int>();
 	Animator animator;
+	float lastTime;
 
 	public override void Reset () {
 		base.Reset();
@@ -82,7 +65,7 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 
 		animator = GetComponent<Animator>();
 
-
+		lastTime = Time.time;
 	}
 
 	void Update () {
@@ -92,12 +75,13 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 		if (layerMixModes.Length != animator.layerCount) {
 			System.Array.Resize<MixMode>(ref layerMixModes, animator.layerCount);
 		}
+		float deltaTime = Time.time - lastTime;
 
 		skeleton.Update(Time.deltaTime);
 
 		//apply
 		int layerCount = animator.layerCount;
-		float deltaTime = Time.deltaTime;
+		
 		for (int i = 0; i < layerCount; i++) {
 
 			float layerWeight = animator.GetLayerWeight(i);
@@ -203,6 +187,8 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 		if (_UpdateComplete != null) {
 			_UpdateComplete(this);
 		}
+
+		lastTime = Time.time;
 	}
 
 	private int GetAnimationClipNameHashCode(AnimationClip clip) {

@@ -1,25 +1,26 @@
 /******************************************************************************
  * Spine Runtimes Software License
- * Version 2.1
+ * Version 2.3
  * 
- * Copyright (c) 2013, Esoteric Software
+ * Copyright (c) 2013-2015, Esoteric Software
  * All rights reserved.
  * 
  * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to install, execute and perform the Spine Runtimes
- * Software (the "Software") solely for internal use. Without the written
- * permission of Esoteric Software (typically granted by licensing Spine), you
- * may not (a) modify, translate, adapt or otherwise create derivative works,
- * improvements of the Software or develop new applications using the Software
- * or (b) remove, delete, alter or obscure any trademarks or any copyright,
- * trademark, patent or other intellectual property or proprietary rights
- * notices on or in the Software, including any copy thereof. Redistributions
- * in binary or source form must include this license and terms.
+ * non-transferable license to use, install, execute and perform the Spine
+ * Runtimes Software (the "Software") and derivative works solely for personal
+ * or internal use. Without the written permission of Esoteric Software (see
+ * Section 2 of the Spine Software License Agreement), you may not (a) modify,
+ * translate, adapt or otherwise create derivative works, improvements of the
+ * Software or develop new applications using the Software or (b) remove,
+ * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
  * 
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
  * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
@@ -58,8 +59,7 @@ public class SkeletonRenderer : MonoBehaviour {
 	[HideInInspector]
 	public List<Slot> submeshSeparatorSlots = new List<Slot>();
 
-
-	private Renderer meshRenderer;
+	private MeshRenderer meshRenderer;
 	private MeshFilter meshFilter;
 	private Mesh mesh1, mesh2;
 	private bool useMesh1;
@@ -69,9 +69,10 @@ public class SkeletonRenderer : MonoBehaviour {
 	private Color32[] colors;
 	private Vector2[] uvs;
 	private Material[] sharedMaterials = new Material[0];
-	private LastState lastState = new LastState();
 	private readonly ExposedList<Material> submeshMaterials = new ExposedList<Material>();
 	private readonly ExposedList<Submesh> submeshes = new ExposedList<Submesh>();
+	private SkeletonUtilitySubmeshRenderer[] submeshRenderers;
+	private LastState lastState = new LastState();
 
 	public void RequestMeshUpdate() {
 		meshUpdateRequested = true;
@@ -81,8 +82,8 @@ public class SkeletonRenderer : MonoBehaviour {
 		if (meshFilter != null)
 			meshFilter.sharedMesh = null;
 
-		if (meshRenderer != null)
-			meshRenderer.sharedMaterial = null;
+		meshRenderer = GetComponent<MeshRenderer>();
+		if (meshRenderer != null) meshRenderer.sharedMaterial = null;
 
 		if (mesh1 != null) {
 			if (Application.isPlaying)
@@ -122,7 +123,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		valid = true;
 
 		meshFilter = GetComponent<MeshFilter>();
-		meshRenderer = GetComponent<Renderer>();
+		meshRenderer = GetComponent<MeshRenderer>();
 		mesh1 = newMesh();
 		mesh2 = newMesh();
 		vertices = new Vector3[0];
@@ -136,8 +137,16 @@ public class SkeletonRenderer : MonoBehaviour {
 			submeshSeparatorSlots.Add(skeleton.FindSlot(submeshSeparators[i]));
 		}
 
+		CollectSubmeshRenderers();
+
+		LateUpdate();
+
 		if (OnReset != null)
 			OnReset(this);
+	}
+
+	public void CollectSubmeshRenderers () {
+		submeshRenderers = GetComponentsInChildren<SkeletonUtilitySubmeshRenderer>();
 	}
 
 	public virtual void Awake () {
@@ -237,7 +246,11 @@ public class SkeletonRenderer : MonoBehaviour {
 			}
 
 			// Populate submesh when material changes.
+#if !SPINE_TK2D
 			Material material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
+#else
+			Material material = (rendererObject.GetType() == typeof(Material)) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
+#endif
 			if ((lastMaterial != null && lastMaterial.GetInstanceID() != material.GetInstanceID()) || 
 				(submeshSeparatorSlotsCount > 0 && submeshSeparatorSlots.Contains(slot))) {
 				addSubmeshArgumentsTemp.Add(
@@ -339,11 +352,11 @@ public class SkeletonRenderer : MonoBehaviour {
 				vertices[vertexIndex + 3].y = tempVertices[RegionAttachment.Y3];
 				vertices[vertexIndex + 3].z = z;
 
-				color.a = slot.data.additiveBlending ? (byte) 0 : (byte)(a * slot.a * regionAttachment.a);
+				color.a = (byte)(a * slot.a * regionAttachment.a);
 				color.r = (byte)(r * slot.r * regionAttachment.r * color.a);
 				color.g = (byte)(g * slot.g * regionAttachment.g * color.a);
 				color.b = (byte)(b * slot.b * regionAttachment.b * color.a);
-
+				if (slot.data.blendMode == BlendMode.additive) color.a = 0;
 				colors[vertexIndex] = color;
 				colors[vertexIndex + 1] = color;
 				colors[vertexIndex + 2] = color;
@@ -406,10 +419,11 @@ public class SkeletonRenderer : MonoBehaviour {
 						this.tempVertices = tempVertices = new float[meshVertexCount];
 					meshAttachment.ComputeWorldVertices(slot, tempVertices);
 
-					color.a = slot.data.additiveBlending ? (byte) 0 : (byte)(a * slot.a * meshAttachment.a);
+					color.a = (byte)(a * slot.a * meshAttachment.a);
 					color.r = (byte)(r * slot.r * meshAttachment.r * color.a);
 					color.g = (byte)(g * slot.g * meshAttachment.g * color.a);
 					color.b = (byte)(b * slot.b * meshAttachment.b * color.a);
+					if (slot.data.blendMode == BlendMode.additive) color.a = 0;
 
 					float[] meshUVs = meshAttachment.uvs;
 					float z = i * zSpacing;
@@ -438,10 +452,11 @@ public class SkeletonRenderer : MonoBehaviour {
 							this.tempVertices = tempVertices = new float[meshVertexCount];
 						skinnedMeshAttachment.ComputeWorldVertices(slot, tempVertices);
 
-						color.a = slot.data.additiveBlending ? (byte) 0 : (byte)(a * slot.a * skinnedMeshAttachment.a);
+						color.a = (byte)(a * slot.a * skinnedMeshAttachment.a);
 						color.r = (byte)(r * slot.r * skinnedMeshAttachment.r * color.a);
 						color.g = (byte)(g * slot.g * skinnedMeshAttachment.g * color.a);
 						color.b = (byte)(b * slot.b * skinnedMeshAttachment.b * color.a);
+                        if (slot.data.blendMode == BlendMode.additive) color.a = 0;
 
 						float[] meshUVs = skinnedMeshAttachment.uvs;
 						float z = i * zSpacing;
@@ -532,6 +547,17 @@ public class SkeletonRenderer : MonoBehaviour {
 		addSubmeshArgumentsCurrentMesh.GrowIfNeeded(addSubmeshArgumentsTemp.Count);
 		addSubmeshArgumentsCurrentMesh.Count = addSubmeshArgumentsTemp.Count;
 		addSubmeshArgumentsTemp.CopyTo(addSubmeshArgumentsCurrentMesh.Items);
+
+		if (submeshRenderers.Length > 0) {
+		    for (int i = 0; i < submeshRenderers.Length; i++) {
+		        SkeletonUtilitySubmeshRenderer submeshRenderer = submeshRenderers[i];
+		        if (submeshRenderer.submeshIndex < sharedMaterials.Length) {
+		            submeshRenderer.SetMesh(meshRenderer, useMesh1 ? mesh1 : mesh2, sharedMaterials[submeshRenderer.submeshIndex]);
+		        } else {
+		            submeshRenderer.GetComponent<Renderer>().enabled = false;
+		        }
+		    }
+		}
 
 		useMesh1 = !useMesh1;
 	}

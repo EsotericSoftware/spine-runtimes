@@ -1,32 +1,4 @@
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.1
- * 
- * Copyright (c) 2013, Esoteric Software
- * All rights reserved.
- * 
- * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to install, execute and perform the Spine Runtimes
- * Software (the "Software") solely for internal use. Without the written
- * permission of Esoteric Software (typically granted by licensing Spine), you
- * may not (a) modify, translate, adapt or otherwise create derivative works,
- * improvements of the Software or develop new applications using the Software
- * or (b) remove, delete, alter or obscure any trademarks or any copyright,
- * trademark, patent or other intellectual property or proprietary rights
- * notices on or in the Software, including any copy thereof. Redistributions
- * in binary or source form must include this license and terms.
- * 
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
+
 
 /*****************************************************************************
  * Automatic import and advanced preview added by Mitch Thompson
@@ -48,12 +20,16 @@ public class SkeletonDataAssetInspector : Editor {
 	static bool showAnimationList = true;
 	static bool showSlotList = false;
 	static bool showAttachments = false;
-	static bool showBaking = true;
+	static bool showUnity = true;
 	static bool bakeAnimations = true;
 	static bool bakeIK = true;
 	static SendMessageOptions bakeEventOptions = SendMessageOptions.DontRequireReceiver;
 
 	private SerializedProperty atlasAssets, skeletonJSON, scale, fromAnimation, toAnimation, duration, defaultMix, controller;
+
+#if SPINE_TK2D
+	private SerializedProperty spriteCollection;
+#endif
 
 	private bool m_initialized = false;
 	private SkeletonDataAsset m_skeletonDataAsset;
@@ -76,6 +52,9 @@ public class SkeletonDataAssetInspector : Editor {
 			duration = serializedObject.FindProperty("duration");
 			defaultMix = serializedObject.FindProperty("defaultMix");
 			controller = serializedObject.FindProperty("controller");
+#if SPINE_TK2D
+			spriteCollection = serializedObject.FindProperty("spriteCollection");
+#endif
 
 			m_skeletonDataAsset = (SkeletonDataAsset)target;
 			m_skeletonDataAssetGUID = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(m_skeletonDataAsset));
@@ -88,7 +67,7 @@ public class SkeletonDataAssetInspector : Editor {
 
 		m_skeletonData = m_skeletonDataAsset.GetSkeletonData(true);
 
-		showBaking = EditorPrefs.GetBool("SkeletonDataAssetInspector_showBaking", true);
+		showUnity = EditorPrefs.GetBool("SkeletonDataAssetInspector_showUnity", true);
 
 		RepopulateWarnings();
 	}
@@ -107,7 +86,14 @@ public class SkeletonDataAssetInspector : Editor {
 		serializedObject.Update();
 
 		EditorGUI.BeginChangeCheck();
+#if !SPINE_TK2D
 		EditorGUILayout.PropertyField(atlasAssets, true);
+#else
+		EditorGUI.BeginDisabledGroup(spriteCollection.objectReferenceValue != null);
+		EditorGUILayout.PropertyField(atlasAssets, true);
+		EditorGUI.EndDisabledGroup();
+		EditorGUILayout.PropertyField(spriteCollection, true);
+#endif
 		EditorGUILayout.PropertyField(skeletonJSON);
 		EditorGUILayout.PropertyField(scale);
 		if (EditorGUI.EndChangeCheck()) {
@@ -127,11 +113,10 @@ public class SkeletonDataAssetInspector : Editor {
 
 
 		if (m_skeletonData != null) {
-			DrawMecanim();
 			DrawAnimationStateInfo();
 			DrawAnimationList();
 			DrawSlotList();
-			DrawBaking();
+			DrawUnityTools();
 			
 		} else {
 
@@ -146,20 +131,35 @@ public class SkeletonDataAssetInspector : Editor {
 	}
 
 	void DrawMecanim () {
+		
 		EditorGUILayout.PropertyField(controller, new GUIContent("Controller", SpineEditorUtilities.Icons.controllerIcon));		
 		if (controller.objectReferenceValue == null) {
-			if (GUILayout.Button(new GUIContent("Generate Mecanim Controller", SpineEditorUtilities.Icons.controllerIcon), GUILayout.Width(195), GUILayout.Height(20)))
+			GUILayout.BeginHorizontal();
+			GUILayout.Space(32);
+			if (GUILayout.Button(new GUIContent("Generate Mecanim Controller"), EditorStyles.toolbarButton, GUILayout.Width(195), GUILayout.Height(20)))
 				SkeletonBaker.GenerateMecanimAnimationClips(m_skeletonDataAsset);
+			//GUILayout.Label(new GUIContent("Alternative to SkeletonAnimation, not a requirement.", SpineEditorUtilities.Icons.warning));
+			GUILayout.EndHorizontal();
+			EditorGUILayout.LabelField("Alternative to SkeletonAnimation, not required", EditorStyles.miniLabel);
 		}
+		
 	}
 
-	void DrawBaking () {
-		bool pre = showBaking;
-		showBaking = EditorGUILayout.Foldout(showBaking, new GUIContent("Baking", SpineEditorUtilities.Icons.unityIcon));
-		if (pre != showBaking)
-			EditorPrefs.SetBool("SkeletonDataAssetInspector_showBaking", showBaking);
+	void DrawUnityTools () {
+		bool pre = showUnity;
+		showUnity = EditorGUILayout.Foldout(showUnity, new GUIContent("Unity Tools", SpineEditorUtilities.Icons.unityIcon));
+		if (pre != showUnity)
+			EditorPrefs.SetBool("SkeletonDataAssetInspector_showUnity", showUnity);
 
-		if (showBaking) {
+		if (showUnity) {
+			EditorGUI.indentLevel++;
+			EditorGUILayout.LabelField("SkeletonAnimator", EditorStyles.boldLabel);
+			EditorGUI.indentLevel++;
+			DrawMecanim();
+			EditorGUI.indentLevel--;
+			GUILayout.Space(32);
+			EditorGUILayout.LabelField("Baking", EditorStyles.boldLabel);
+			EditorGUILayout.HelpBox("WARNING!\n\nBaking is NOT the same as SkeletonAnimator!\nDoes not support the following:\n\tFlipX or Y\n\tInheritScale\n\tColor Keys\n\tDraw Order Keys\n\tIK and Curves are sampled at 60fps and are not realtime.\n\tPlease read SkeletonBaker.cs comments for full details.\n\nThe main use of Baking is to export Spine projects to be used without the Spine Runtime (ie: for sale on the Asset Store, or background objects that are animated only with a wind noise generator)", MessageType.Warning, true);
 			EditorGUI.indentLevel++;
 			bakeAnimations = EditorGUILayout.Toggle("Bake Animations", bakeAnimations);
 			EditorGUI.BeginDisabledGroup(bakeAnimations == false);
@@ -311,13 +311,13 @@ public class SkeletonDataAssetInspector : Editor {
 
 			if (m_skeletonAnimation != null && m_skeletonAnimation.state != null) {
 				if (m_skeletonAnimation.state.GetCurrent(0) != null && m_skeletonAnimation.state.GetCurrent(0).Animation == a) {
-					GUI.contentColor = Color.black;
-					if (GUILayout.Button("\u25BA", GUILayout.Width(24))) {
+					GUI.contentColor = Color.red;
+					if (GUILayout.Button("\u25BA", EditorStyles.toolbarButton, GUILayout.Width(24))) {
 						StopAnimation();
 					}
 					GUI.contentColor = Color.white;
 				} else {
-					if (GUILayout.Button("\u25BA", GUILayout.Width(24))) {
+					if (GUILayout.Button("\u25BA", EditorStyles.toolbarButton, GUILayout.Width(24))) {
 						PlayAnimation(a.Name, true);
 					}
 				}
@@ -441,8 +441,8 @@ public class SkeletonDataAssetInspector : Editor {
 			warnings.Add("Missing Skeleton JSON");
 		else {
 
-			if (SpineEditorUtilities.IsSpineJSON((TextAsset)skeletonJSON.objectReferenceValue) == false) {
-				warnings.Add("Skeleton JSON is not a Valid JSON file");
+			if (SpineEditorUtilities.IsValidSpineData((TextAsset)skeletonJSON.objectReferenceValue) == false) {
+				warnings.Add("Skeleton data file is not a valid JSON or binary file.");
 			} else {
 				bool detectedNullAtlasEntry = false;
 				List<Atlas> atlasList = new List<Atlas>();
@@ -674,7 +674,9 @@ public class SkeletonDataAssetInspector : Editor {
 			if (!EditorApplication.isPlaying)
 				m_skeletonAnimation.LateUpdate();
 
-			if (drawHandles) {
+
+
+			if (drawHandles) {			
 				Handles.SetCamera(m_previewUtility.m_Camera);
 				Handles.color = m_originColor;
 
@@ -683,10 +685,47 @@ public class SkeletonDataAssetInspector : Editor {
 			}
 
 			this.m_previewUtility.m_Camera.Render();
+
+			if (drawHandles) {
+				Handles.SetCamera(m_previewUtility.m_Camera);
+				foreach (var slot in m_skeletonAnimation.skeleton.Slots) {
+					if (slot.Attachment is BoundingBoxAttachment) {
+
+						DrawBoundingBox(slot.Bone, (BoundingBoxAttachment)slot.Attachment);
+					}
+				}
+			}
+
 			go.GetComponent<Renderer>().enabled = false;
 		}
 
 
+	}
+
+	void DrawBoundingBox (Bone bone, BoundingBoxAttachment box) {
+		float[] worldVerts = new float[box.Vertices.Length];
+		box.ComputeWorldVertices(bone, worldVerts);
+
+		Handles.color = Color.green;
+		Vector3 lastVert = Vector3.back;
+		Vector3 vert = Vector3.back;
+		Vector3 firstVert = new Vector3(worldVerts[0], worldVerts[1], -1);
+		for (int i = 0; i < worldVerts.Length; i += 2) {
+			vert.x = worldVerts[i];
+			vert.y = worldVerts[i + 1];
+
+			if (i > 0) {
+				Handles.DrawLine(lastVert, vert);
+			}
+
+
+			lastVert = vert;
+		}
+
+		Handles.DrawLine(lastVert, firstVert);
+
+		
+		
 	}
 
 	void Update () {

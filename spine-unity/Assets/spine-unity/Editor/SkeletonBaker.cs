@@ -1,32 +1,4 @@
-﻿/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.1
- * 
- * Copyright (c) 2013, Esoteric Software
- * All rights reserved.
- * 
- * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to install, execute and perform the Spine Runtimes
- * Software (the "Software") solely for internal use. Without the written
- * permission of Esoteric Software (typically granted by licensing Spine), you
- * may not (a) modify, translate, adapt or otherwise create derivative works,
- * improvements of the Software or develop new applications using the Software
- * or (b) remove, delete, alter or obscure any trademarks or any copyright,
- * trademark, patent or other intellectual property or proprietary rights
- * notices on or in the Software, including any copy thereof. Redistributions
- * in binary or source form must include this license and terms.
- * 
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
+
 
 /*****************************************************************************
  * SkeletonBaker added by Mitch Thompson
@@ -68,6 +40,7 @@ using Spine;
 /// FFD (Unity does not provide access to BlendShapes with code)
 /// Color Keys (Maybe one day when Unity supports full FBX standard and provides access with code)
 /// InheritScale (Never.  Unity and Spine do scaling very differently)
+/// Draw Order Keyframes
 
 /// </summary>
 public static class SkeletonBaker {
@@ -159,7 +132,7 @@ public static class SkeletonBaker {
 					unusedClipNames.Remove(clip.name);
 				} else {
 					AssetDatabase.AddObjectToAsset(clip, controller);
-#if UNITY_5_0
+#if UNITY_5
 					controller.AddMotion(clip);
 #else
 					UnityEditorInternal.AnimatorController.AddAnimationClipToController(controller, clip);
@@ -387,6 +360,7 @@ public static class SkeletonBaker {
 
 		if (skeletonDataAsset.controller != null) {
 			controller = (UnityEditor.Animations.AnimatorController)skeletonDataAsset.controller;
+			controllerPath = AssetDatabase.GetAssetPath(controller);
 		} else {
 			if (File.Exists(controllerPath)) {
 				if (EditorUtility.DisplayDialog("Controller Overwrite Warning", "Unknown Controller already exists at: " + controllerPath, "Update", "Overwrite")) {
@@ -404,6 +378,7 @@ public static class SkeletonBaker {
 
 		if (skeletonDataAsset.controller != null) {
 			controller = (UnityEditorInternal.AnimatorController)skeletonDataAsset.controller;
+			controllerPath = AssetDatabase.GetAssetPath(controller);
 		} else {
 			if (File.Exists(controllerPath)) {
 				if (EditorUtility.DisplayDialog("Controller Overwrite Warning", "Unknown Controller already exists at: " + controllerPath, "Update", "Overwrite")) {
@@ -884,6 +859,7 @@ public static class SkeletonBaker {
 			var ev = events[i];
 
 			AnimationEvent ae = new AnimationEvent();
+			//TODO:  Deal with Mecanim's zero-time missed event
 			ae.time = frames[i];
 			ae.functionName = ev.Data.Name;
 			ae.messageOptions = eventOptions;

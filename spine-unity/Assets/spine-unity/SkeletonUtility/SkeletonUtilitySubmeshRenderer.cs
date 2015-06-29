@@ -1,104 +1,70 @@
-﻿using UnityEngine;
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.3
+ * 
+ * Copyright (c) 2013-2015, Esoteric Software
+ * All rights reserved.
+ * 
+ * You are granted a perpetual, non-exclusive, non-sublicensable and
+ * non-transferable license to use, install, execute and perform the Spine
+ * Runtimes Software (the "Software") and derivative works solely for personal
+ * or internal use. Without the written permission of Esoteric Software (see
+ * Section 2 of the Spine Software License Agreement), you may not (a) modify,
+ * translate, adapt or otherwise create derivative works, improvements of the
+ * Software or develop new applications using the Software or (b) remove,
+ * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+
+using UnityEngine;
 using System.Collections;
 
 [ExecuteInEditMode]
 public class SkeletonUtilitySubmeshRenderer : MonoBehaviour {
-	public Renderer parentRenderer;
 	[System.NonSerialized]
 	public Mesh mesh;
 	public int submeshIndex = 0;
-	public int sortingOrder = 0;
-	public int sortingLayerID = 0;
 	public Material hiddenPassMaterial;
 	Renderer cachedRenderer;
-	SkeletonRenderer parentSkeletonRenderer;
 	MeshFilter filter;
 	Material[] sharedMaterials;
-	MeshFilter parentFilter;
-	bool isFirstUpdate = true;
 
 	void Awake () {
 		cachedRenderer = GetComponent<Renderer>();
-		sharedMaterials = cachedRenderer.sharedMaterials;
 		filter = GetComponent<MeshFilter>();
-
-		if (parentRenderer != null)
-			Initialize(parentRenderer);
+		sharedMaterials = new Material[0];
 	}
 
-	void OnEnable () {
-		parentRenderer = transform.parent.GetComponent<Renderer>();
-		parentRenderer.GetComponent<SkeletonRenderer>().OnReset += HandleSkeletonReset;
-	}
-
-	void OnDisable () {
-		parentRenderer.GetComponent<SkeletonRenderer>().OnReset -= HandleSkeletonReset;
-	}
-
-	void HandleSkeletonReset (SkeletonRenderer r) {
-		if (parentRenderer != null)
-			Initialize(parentRenderer);
-	}
-
-	public void Initialize (Renderer parentRenderer) {
-		this.parentRenderer = parentRenderer;
-		parentFilter = parentRenderer.GetComponent<MeshFilter>();
-		mesh = parentFilter.sharedMesh;
-		filter.sharedMesh = mesh;
-		parentSkeletonRenderer = parentRenderer.GetComponent<SkeletonRenderer>();
-		Debug.Log("Mesh: " + (mesh == null ? "null" : mesh.name), parentFilter);
-	}
-
-	public void Update () {
+	public void SetMesh (Renderer parentRenderer, Mesh mesh, Material mat) {
 		if (cachedRenderer == null)
-			cachedRenderer = GetComponent<Renderer>();
-
-		if (isFirstUpdate || cachedRenderer.enabled) {
-			parentSkeletonRenderer.RequestMeshUpdate();
-			isFirstUpdate = false;
-		}
-
-		if (mesh == null || mesh != parentFilter.sharedMesh) {
-			mesh = parentFilter.sharedMesh;
-			filter.sharedMesh = mesh;
-		}
-
-		if (mesh == null || submeshIndex > mesh.subMeshCount - 1) {
-			cachedRenderer.enabled = false;
 			return;
-		} else {
-			cachedRenderer.enabled = true;
-		}
 
-		bool changed = false;
-
-		if (sharedMaterials.Length != parentRenderer.sharedMaterials.Length) {
+		cachedRenderer.enabled = true;
+		filter.sharedMesh = mesh;
+		if (cachedRenderer.sharedMaterials.Length != parentRenderer.sharedMaterials.Length) {
 			sharedMaterials = parentRenderer.sharedMaterials;
-			changed = true;
 		}
 
-
-
-		for (int i = 0; i < GetComponent<Renderer>().sharedMaterials.Length; i++) {
+		for (int i = 0; i < sharedMaterials.Length; i++) {
 			if (i == submeshIndex)
-				continue;
-
-			if (sharedMaterials[i] != hiddenPassMaterial) {
+				sharedMaterials[i] = mat;
+			else
 				sharedMaterials[i] = hiddenPassMaterial;
-				changed = true;
-			}
 		}
 
-		if (sharedMaterials[submeshIndex] != parentRenderer.sharedMaterials[submeshIndex]) {
-			sharedMaterials[submeshIndex] = parentRenderer.sharedMaterials[submeshIndex];
-			changed = true;
-		}
-
-		if (changed) {
-			cachedRenderer.sharedMaterials = sharedMaterials;
-		}
-
-		cachedRenderer.sortingLayerID = sortingLayerID;
-		cachedRenderer.sortingOrder = sortingOrder;
+		cachedRenderer.sharedMaterials = sharedMaterials;
 	}
 }
