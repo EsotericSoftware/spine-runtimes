@@ -114,13 +114,19 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	self = [super init];
 	if (!self) return nil;
 
-	_atlas = spAtlas_createFromFile([atlasFile UTF8String], 0);
+  @synchronized(self.class) {
+    _atlas = spAtlas_createFromFile([atlasFile UTF8String], 0);
+  };
 	NSAssert(_atlas, ([NSString stringWithFormat:@"Error reading atlas file: %@", atlasFile]));
 	if (!_atlas) return 0;
 
 	spSkeletonJson* json = spSkeletonJson_create(_atlas);
 	json->scale = scale;
-	spSkeletonData* skeletonData = spSkeletonJson_readSkeletonDataFile(json, [skeletonDataFile UTF8String]);
+  spSkeletonData* skeletonData;
+  @synchronized(self.class) {
+    skeletonData = spSkeletonJson_readSkeletonDataFile(json, [skeletonDataFile UTF8String]);
+  };
+  
 	NSAssert(skeletonData, ([NSString stringWithFormat:@"Error reading skeleton data file: %@\nError: %s", skeletonDataFile, json->error]));
 	spSkeletonJson_dispose(json);
 	if (!skeletonData) return 0;
