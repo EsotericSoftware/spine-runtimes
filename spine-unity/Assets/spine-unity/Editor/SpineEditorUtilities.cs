@@ -949,7 +949,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 			skin = data.DefaultSkin;
 
 		if (skin == null)
-			skin = data.Skins[0];
+			skin = data.Skins.Items[0];
 
 		anim.Reset();
 
@@ -1035,7 +1035,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 			skin = data.DefaultSkin;
 
 		if (skin == null)
-			skin = data.Skins[0];
+			skin = data.Skins.Items[0];
 
 		anim.Reset();
 

@@ -119,7 +119,7 @@ namespace Spine {
 				String name = ReadString(input);
 				BoneData parent = null;
 				int parentIndex = ReadInt(input, true) - 1;
-				if (parentIndex != -1) parent = skeletonData.bones[parentIndex];
+				if (parentIndex != -1) parent = skeletonData.bones.Items[parentIndex];
 				BoneData boneData = new BoneData(name, parent);
 				boneData.x = ReadFloat(input) * scale;
 				boneData.y = ReadFloat(input) * scale;
@@ -139,8 +139,8 @@ namespace Spine {
 			for (int i = 0, n = ReadInt(input, true); i < n; i++) {
 				IkConstraintData ikConstraintData = new IkConstraintData(ReadString(input));
 				for (int ii = 0, nn = ReadInt(input, true); ii < nn; ii++)
-					ikConstraintData.bones.Add(skeletonData.bones[ReadInt(input, true)]);
-				ikConstraintData.target = skeletonData.bones[ReadInt(input, true)];
+					ikConstraintData.bones.Add(skeletonData.bones.Items[ReadInt(input, true)]);
+				ikConstraintData.target = skeletonData.bones.Items[ReadInt(input, true)];
 				ikConstraintData.mix = ReadFloat(input);
 				ikConstraintData.bendDirection = ReadSByte(input);
 				skeletonData.ikConstraints.Add(ikConstraintData);
@@ -149,7 +149,7 @@ namespace Spine {
 			// Slots.
 			for (int i = 0, n = ReadInt(input, true); i < n; i++) {
 				String slotName = ReadString(input);
-				BoneData boneData = skeletonData.bones[ReadInt(input, true)];
+				BoneData boneData = skeletonData.bones.Items[ReadInt(input, true)];
 				SlotData slotData = new SlotData(slotName, boneData);
 				int color = ReadInt(input);
 				slotData.r = ((color & 0xff000000) >> 24) / 255f;
@@ -340,7 +340,7 @@ namespace Spine {
 		}
 
 		private void ReadAnimation (String name, Stream input, SkeletonData skeletonData) {
-			var timelines = new List<Timeline>();
+			var timelines = new ExposedList<Timeline>();
 			float scale = Scale;
 			float duration = 0;
 	
@@ -436,7 +436,7 @@ namespace Spine {
 
 			// IK timelines.
 			for (int i = 0, n = ReadInt(input, true); i < n; i++) {
-				IkConstraintData ikConstraint = skeletonData.ikConstraints[ReadInt(input, true)];
+				IkConstraintData ikConstraint = skeletonData.ikConstraints.Items[ReadInt(input, true)];
 				int frameCount = ReadInt(input, true);
 				IkConstraintTimeline timeline = new IkConstraintTimeline(frameCount);
 				timeline.ikConstraintIndex = skeletonData.ikConstraints.IndexOf(ikConstraint);
@@ -450,7 +450,7 @@ namespace Spine {
 
 			// FFD timelines.
 			for (int i = 0, n = ReadInt(input, true); i < n; i++) {
-				Skin skin = skeletonData.skins[ReadInt(input, true)];
+				Skin skin = skeletonData.skins.Items[ReadInt(input, true)];
 				for (int ii = 0, nn = ReadInt(input, true); ii < nn; ii++) {
 					int slotIndex = ReadInt(input, true);
 					for (int iii = 0, nnn = ReadInt(input, true); iii < nnn; iii++) {
@@ -540,7 +540,7 @@ namespace Spine {
 				EventTimeline timeline = new EventTimeline(eventCount);
 				for (int i = 0; i < eventCount; i++) {
 					float time = ReadFloat(input);
-					EventData eventData = skeletonData.events[ReadInt(input, true)];
+					EventData eventData = skeletonData.events.Items[ReadInt(input, true)];
 					Event e = new Event(eventData);
 					e.Int = ReadInt(input, false);
 					e.Float = ReadFloat(input);
