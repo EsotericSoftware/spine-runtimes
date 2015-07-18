@@ -80,7 +80,7 @@ public class BoundingBoxFollower : MonoBehaviour {
 		}
 	}
 
-	
+
 	void OnEnable () {
 		ClearColliders();
 
@@ -90,6 +90,9 @@ public class BoundingBoxFollower : MonoBehaviour {
 		if (skeletonRenderer != null) {
 			skeletonRenderer.OnReset -= HandleReset;
 			skeletonRenderer.OnReset += HandleReset;
+
+			if (hasReset)
+				HandleReset(skeletonRenderer);
 		}
 	}
 
@@ -116,7 +119,7 @@ public class BoundingBoxFollower : MonoBehaviour {
 			skeletonRenderer.Reset();
 			skeletonRenderer.OnReset += HandleReset;
 		}
-			
+
 
 		var skeleton = skeletonRenderer.skeleton;
 		slot = skeleton.FindSlot(slotName);
