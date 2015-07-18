@@ -86,12 +86,14 @@ spine.SkeletonRenderer.prototype = {
 
 			var x = bone.worldX + attachment.x * bone.m00 + attachment.y * bone.m01;
 			var y = bone.worldY + attachment.x * bone.m10 + attachment.y * bone.m11;
-			var rotation = -(bone.worldRotation + attachment.rotation) * Math.PI / 180;
+			var rotation = - (attachment.scaleX * attachment.scaleY) * (bone.worldRotation + attachment.rotation) * Math.PI / 180;
 			var w = attachment.width, h = attachment.height;
 			context.translate(x, y);
+			context.scale(attachment.scaleX, attachment.scaleY);
 			context.rotate(rotation);
 			context.drawImage(attachment.rendererObject, -w / 2, -h / 2, w, h);
 			context.rotate(-rotation);
+			context.scale(attachment.scaleX, attachment.scaleY);
 			context.translate(-x, -y);
 		}
 
