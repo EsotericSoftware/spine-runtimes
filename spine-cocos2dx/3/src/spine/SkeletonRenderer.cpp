@@ -145,7 +145,7 @@ void SkeletonRenderer::update (float deltaTime) {
 }
 
 void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t transformFlags) {
-	_drawCommand.init(_globalZOrder);
+	_drawCommand.init(_globalZOrder, transform, transformFlags);
 	_drawCommand.func = CC_CALLBACK_0(SkeletonRenderer::drawSkeleton, this, transform, transformFlags);
 	renderer->addCommand(&_drawCommand);
 }
