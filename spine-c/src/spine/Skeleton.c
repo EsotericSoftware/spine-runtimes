@@ -65,7 +65,7 @@ spSkeleton* spSkeleton_create (spSkeletonData* data) {
 		}
 		self->bones[i] = spBone_create(boneData, self, parent);
 	}
-	CONST_CAST(spBone*, self->root) = self->bones[0];
+	CONST_CAST(spBone*, self->root) = (self->bonesCount > 0 ? self->bones[0] : NULL);
 
 	self->slotsCount = data->slotsCount;
 	self->slots = MALLOC(spSlot*, self->slotsCount);
