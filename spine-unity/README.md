@@ -8,7 +8,7 @@ A Spine skeleton is a GameObject and can be used throughout Unity like any other
 
 ## Documentation
 
-The [Spine Unity Examples](http://esotericsoftware.com/forum/viewtopic.php?f=3&t=3318) forum thread has many videos on how to use spine-unity features.
+The [Spine Unity Features Tutorial](http://esotericsoftware.com/forum/Unity-Feature-Tutorials-4839) forum thread has many videos on how to use spine-unity.
 
 ## Quick installation
 
