@@ -6,7 +6,7 @@ This GitHub project hosts the Spine Runtimes which are needed to use [Spine](htt
 
 The Spine Runtimes may only be used for personal or internal use, typically to evaluate Spine before purchasing. If you would like to incorporate the Spine Runtimes into your applications, distribute software containing the Spine Runtimes, or modify the Spine Runtimes, then you will need a valid [Spine license](https://esotericsoftware.com/spine-purchase). Please see the [Spine Runtimes Software License](https://github.com/EsotericSoftware/spine-runtimes/blob/master/LICENSE) for detailed information.
 
-The Spine Runtimes are developed with the intent to be used with data exported from Spine. By purchasing Spine, Section 2 of the [Spine Software License](https://esotericsoftware.com/files/license.txt) grants the right to create and distribute derivative works of the Spine Runtimes.
+The Spine Runtimes are developed with the intent to be used with data exported from Spine. By purchasing Spine, `Section 2` of the [Spine Software License](https://esotericsoftware.com/files/license.txt) grants the right to create and distribute derivative works of the Spine Runtimes.
 
 ## Documentation
 
