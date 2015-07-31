@@ -59,9 +59,9 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 		remove { _UpdateComplete -= value; }
 	}
 
-	protected event UpdateBonesDelegate _UpdateLocal;
-	protected event UpdateBonesDelegate _UpdateWorld;
-	protected event UpdateBonesDelegate _UpdateComplete;
+	protected UpdateBonesDelegate _UpdateLocal;
+	protected UpdateBonesDelegate _UpdateWorld;
+	protected UpdateBonesDelegate _UpdateComplete;
 
 	public Skeleton Skeleton {
 		get {

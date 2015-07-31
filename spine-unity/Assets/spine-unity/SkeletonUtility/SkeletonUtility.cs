@@ -8,6 +8,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Spine;
 
 [RequireComponent(typeof(ISkeletonAnimation))]
@@ -114,7 +115,15 @@ public class SkeletonUtility : MonoBehaviour {
 
 	public delegate void SkeletonUtilityDelegate ();
 
-	public event SkeletonUtilityDelegate OnReset;
+	private SkeletonUtilityDelegate _OnReset;
+	public event SkeletonUtilityDelegate OnReset
+	{
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		add { _OnReset += value; } 
+
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		remove { _OnReset -= value; }
+	}
 
 	public Transform boneRoot;
 
@@ -184,8 +193,8 @@ public class SkeletonUtility : MonoBehaviour {
 	}
 	
 	void HandleRendererReset (SkeletonRenderer r) {
-		if (OnReset != null)
-			OnReset();
+		if (_OnReset != null)
+			_OnReset();
 
 		CollectBones();
 	}
