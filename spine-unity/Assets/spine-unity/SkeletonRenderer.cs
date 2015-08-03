@@ -320,13 +320,13 @@ public class SkeletonRenderer : MonoBehaviour {
 		float a = skeleton.a * 255, r = skeleton.r, g = skeleton.g, b = skeleton.b;
 
 		Vector3 meshBoundsMin;
-		meshBoundsMin.x = float.MaxValue;
-		meshBoundsMin.y = float.MaxValue;
+		meshBoundsMin.x = int.MaxValue;
+		meshBoundsMin.y = int.MaxValue;
 		meshBoundsMin.z = zSpacing > 0f ? 0f : zSpacing * (drawOrderCount - 1);
 		Vector3 meshBoundsMax;
-		meshBoundsMax.x = float.MinValue;
-		meshBoundsMax.y = float.MinValue;
-		meshBoundsMax.z = zSpacing < 0f ? 0f : zSpacing * (drawOrderCount - 1);
+		meshBoundsMax.x = int.MinValue;
+		meshBoundsMax.y = int.MinValue;
+		meshBoundsMax.z = meshBoundsMin.z;
 		for (int i = 0; i < drawOrderCount; i++) {
 			Slot slot = drawOrder.Items[i];
 			Attachment attachment = slot.attachment;
@@ -335,17 +335,21 @@ public class SkeletonRenderer : MonoBehaviour {
 				regionAttachment.ComputeWorldVertices(slot.bone, tempVertices);
 
 				float z = i * zSpacing;
-				vertices[vertexIndex].x = tempVertices[RegionAttachment.X1];
-				vertices[vertexIndex].y = tempVertices[RegionAttachment.Y1];
+				float x1 = tempVertices[RegionAttachment.X1], y1 = tempVertices[RegionAttachment.Y1];
+				float x2 = tempVertices[RegionAttachment.X2], y2 = tempVertices[RegionAttachment.Y2];
+				float x3 = tempVertices[RegionAttachment.X3], y3 = tempVertices[RegionAttachment.Y3];
+				float x4 = tempVertices[RegionAttachment.X4], y4 = tempVertices[RegionAttachment.Y4];
+				vertices[vertexIndex].x = x1;
+				vertices[vertexIndex].y = y1;
 				vertices[vertexIndex].z = z;
-				vertices[vertexIndex + 1].x = tempVertices[RegionAttachment.X4];
-				vertices[vertexIndex + 1].y = tempVertices[RegionAttachment.Y4];
+				vertices[vertexIndex + 1].x = x4;
+				vertices[vertexIndex + 1].y = y4;
 				vertices[vertexIndex + 1].z = z;
-				vertices[vertexIndex + 2].x = tempVertices[RegionAttachment.X2];
-				vertices[vertexIndex + 2].y = tempVertices[RegionAttachment.Y2];
+				vertices[vertexIndex + 2].x = x2;
+				vertices[vertexIndex + 2].y = y2;
 				vertices[vertexIndex + 2].z = z;
-				vertices[vertexIndex + 3].x = tempVertices[RegionAttachment.X3];
-				vertices[vertexIndex + 3].y = tempVertices[RegionAttachment.Y3];
+				vertices[vertexIndex + 3].x = x3;
+				vertices[vertexIndex + 3].y = y3;
 				vertices[vertexIndex + 3].z = z;
 
 				color.a = (byte)(a * slot.a * regionAttachment.a);
@@ -369,40 +373,40 @@ public class SkeletonRenderer : MonoBehaviour {
 				uvs[vertexIndex + 3].y = regionUVs[RegionAttachment.Y3];
 
 				// Calculate min/max X
-				if (tempVertices[RegionAttachment.X1] < meshBoundsMin.x)
-					meshBoundsMin.x = tempVertices[RegionAttachment.X1];
-				else if (tempVertices[RegionAttachment.X1] > meshBoundsMax.x)
-					meshBoundsMax.x = tempVertices[RegionAttachment.X1];
-				if (tempVertices[RegionAttachment.X2] < meshBoundsMin.x)
-					meshBoundsMin.x = tempVertices[RegionAttachment.X2];
-				else if (tempVertices[RegionAttachment.X2] > meshBoundsMax.x)
-					meshBoundsMax.x = tempVertices[RegionAttachment.X2];
-				if (tempVertices[RegionAttachment.X3] < meshBoundsMin.x)
-					meshBoundsMin.x = tempVertices[RegionAttachment.X3];
-				else if (tempVertices[RegionAttachment.X3] > meshBoundsMax.x)
-					meshBoundsMax.x = tempVertices[RegionAttachment.X3];
-				if (tempVertices[RegionAttachment.X4] < meshBoundsMin.x)
-					meshBoundsMin.x = tempVertices[RegionAttachment.X4];
-				else if (tempVertices[RegionAttachment.X4] > meshBoundsMax.x)
-					meshBoundsMax.x = tempVertices[RegionAttachment.X4];
+				if (x1 < meshBoundsMin.x)
+					meshBoundsMin.x = x1;
+				else if (x1 > meshBoundsMax.x)
+					meshBoundsMax.x = x1;
+				if (x2 < meshBoundsMin.x)
+					meshBoundsMin.x = x2;
+				else if (x2 > meshBoundsMax.x)
+					meshBoundsMax.x = x2;
+				if (x3 < meshBoundsMin.x)
+					meshBoundsMin.x = x3;
+				else if (x3 > meshBoundsMax.x)
+					meshBoundsMax.x = x3;
+				if (x4 < meshBoundsMin.x)
+					meshBoundsMin.x = x4;
+				else if (x4 > meshBoundsMax.x)
+					meshBoundsMax.x = x4;
 
 				// Calculate min/max Y
-				if (tempVertices[RegionAttachment.Y1] < meshBoundsMin.y)
-					meshBoundsMin.y = tempVertices[RegionAttachment.Y1];
-				else if (tempVertices[RegionAttachment.Y1] > meshBoundsMax.y)
-					meshBoundsMax.y = tempVertices[RegionAttachment.Y1];
-				if (tempVertices[RegionAttachment.Y2] < meshBoundsMin.y)
-					meshBoundsMin.y = tempVertices[RegionAttachment.Y2];
-				else if (tempVertices[RegionAttachment.Y2] > meshBoundsMax.y)
-					meshBoundsMax.y = tempVertices[RegionAttachment.Y2];
-				if (tempVertices[RegionAttachment.Y3] < meshBoundsMin.y)
-					meshBoundsMin.y = tempVertices[RegionAttachment.Y3];
-				else if (tempVertices[RegionAttachment.Y3] > meshBoundsMax.y)
-					meshBoundsMax.y = tempVertices[RegionAttachment.Y3];
-				if (tempVertices[RegionAttachment.Y4] < meshBoundsMin.y)
-					meshBoundsMin.y = tempVertices[RegionAttachment.Y4];
-				else if (tempVertices[RegionAttachment.Y4] > meshBoundsMax.y)
-					meshBoundsMax.y = tempVertices[RegionAttachment.Y4];
+				if (y1 < meshBoundsMin.y)
+					meshBoundsMin.y = y1;
+				else if (y1 > meshBoundsMax.y)
+					meshBoundsMax.y = y1;
+				if (y2 < meshBoundsMin.y)
+					meshBoundsMin.y = y2;
+				else if (y2 > meshBoundsMax.y)
+					meshBoundsMax.y = y2;
+				if (y3 < meshBoundsMin.y)
+					meshBoundsMin.y = y3;
+				else if (y3 > meshBoundsMax.y)
+					meshBoundsMax.y = y3;
+				if (y4 < meshBoundsMin.y)
+					meshBoundsMin.y = y4;
+				else if (y4 > meshBoundsMax.y)
+					meshBoundsMax.y = y4;
 
 				vertexIndex += 4;
 			} else {
@@ -424,21 +428,22 @@ public class SkeletonRenderer : MonoBehaviour {
 					float[] meshUVs = meshAttachment.uvs;
 					float z = i * zSpacing;
 					for (int ii = 0; ii < meshVertexCount; ii += 2, vertexIndex++) {
-						vertices[vertexIndex].x = tempVertices[ii];
-						vertices[vertexIndex].y = tempVertices[ii + 1];
+						float x = tempVertices[ii], y = tempVertices[ii + 1];
+						vertices[vertexIndex].x = x;
+						vertices[vertexIndex].y = y;
 						vertices[vertexIndex].z = z;
 						colors[vertexIndex] = color;
 						uvs[vertexIndex].x = meshUVs[ii];
 						uvs[vertexIndex].y = meshUVs[ii + 1];
 
-						if (tempVertices[ii] < meshBoundsMin.x)
-							meshBoundsMin.x = tempVertices[ii];
-						else if (tempVertices[ii] > meshBoundsMax.x)
-							meshBoundsMax.x = tempVertices[ii];
-						if (tempVertices[ii + 1]< meshBoundsMin.y)
-							meshBoundsMin.y = tempVertices[ii + 1];
-						else if (tempVertices[ii + 1] > meshBoundsMax.y)
-							meshBoundsMax.y = tempVertices[ii + 1];
+						if (x < meshBoundsMin.x)
+							meshBoundsMin.x = x;
+						else if (x > meshBoundsMax.x)
+							meshBoundsMax.x = x;
+						if (y < meshBoundsMin.y)
+							meshBoundsMin.y = y;
+						else if (y > meshBoundsMax.y)
+							meshBoundsMax.y = y;
 					}
 				} else {
 					SkinnedMeshAttachment skinnedMeshAttachment = attachment as SkinnedMeshAttachment;
@@ -457,21 +462,22 @@ public class SkeletonRenderer : MonoBehaviour {
 						float[] meshUVs = skinnedMeshAttachment.uvs;
 						float z = i * zSpacing;
 						for (int ii = 0; ii < meshVertexCount; ii += 2, vertexIndex++) {
-							vertices[vertexIndex].x = tempVertices[ii];
-							vertices[vertexIndex].y = tempVertices[ii + 1];
+							float x = tempVertices[ii], y = tempVertices[ii + 1];
+							vertices[vertexIndex].x = x;
+							vertices[vertexIndex].y = y;
 							vertices[vertexIndex].z = z;
 							colors[vertexIndex] = color;
 							uvs[vertexIndex].x = meshUVs[ii];
 							uvs[vertexIndex].y = meshUVs[ii + 1];
 
-							if (tempVertices[ii] < meshBoundsMin.x)
-								meshBoundsMin.x = tempVertices[ii];
-							else if (tempVertices[ii] > meshBoundsMax.x)
-								meshBoundsMax.x = tempVertices[ii];
-							if (tempVertices[ii + 1]< meshBoundsMin.y)
-								meshBoundsMin.y = tempVertices[ii + 1];
-							else if (tempVertices[ii + 1] > meshBoundsMax.y)
-								meshBoundsMax.y = tempVertices[ii + 1];
+							if (x < meshBoundsMin.x)
+								meshBoundsMin.x = x;
+							else if (x > meshBoundsMax.x)
+								meshBoundsMax.x = x;
+							if (y < meshBoundsMin.y)
+								meshBoundsMin.y = y;
+							else if (y > meshBoundsMax.y)
+								meshBoundsMax.y = y;
 						}
 					}
 				}
