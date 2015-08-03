@@ -41,16 +41,15 @@ namespace Spine {
 	public class ExposedList<T> : IEnumerable<T> {
 		public T[] Items;
 		public int Count;
-
 		private const int DefaultCapacity = 4;
 		private static readonly T[] EmptyArray = new T[0];
 		private int version;
 
-		public ExposedList() {
+		public ExposedList () {
 			Items = EmptyArray;
 		}
 
-		public ExposedList(IEnumerable<T> collection) {
+		public ExposedList (IEnumerable<T> collection) {
 			CheckCollection(collection);
 
 			// initialize to needed size (if determinable)
@@ -64,44 +63,44 @@ namespace Spine {
 			}
 		}
 
-		public ExposedList(int capacity) {
+		public ExposedList (int capacity) {
 			if (capacity < 0)
 				throw new ArgumentOutOfRangeException("capacity");
 			Items = new T[capacity];
 		}
 
-		internal ExposedList(T[] data, int size) {
+		internal ExposedList (T[] data, int size) {
 			Items = data;
 			Count = size;
 		}
 
-		public void Add(T item) {
+		public void Add (T item) {
 			// If we check to see if we need to grow before trying to grow
 			// we can speed things up by 25%
 			if (Count == Items.Length)
 				GrowIfNeeded(1);
-			Items[Count ++] = item;
+			Items[Count++] = item;
 			version++;
 		}
 
-		public void GrowIfNeeded(int newCount) {
+		public void GrowIfNeeded (int newCount) {
 			int minimumSize = Count + newCount;
 			if (minimumSize > Items.Length)
 				Capacity = Math.Max(Math.Max(Capacity * 2, DefaultCapacity), minimumSize);
 		}
 
-		private void CheckRange(int idx, int count) {
+		private void CheckRange (int idx, int count) {
 			if (idx < 0)
 				throw new ArgumentOutOfRangeException("index");
 
 			if (count < 0)
 				throw new ArgumentOutOfRangeException("count");
 
-			if ((uint) idx + (uint) count > (uint) Count)
+			if ((uint)idx + (uint)count > (uint)Count)
 				throw new ArgumentException("index and count exceed length of list");
 		}
 
-		private void AddCollection(ICollection<T> collection) {
+		private void AddCollection (ICollection<T> collection) {
 			int collectionCount = collection.Count;
 			if (collectionCount == 0)
 				return;
@@ -111,13 +110,13 @@ namespace Spine {
 			Count += collectionCount;
 		}
 
-		private void AddEnumerable(IEnumerable<T> enumerable) {
+		private void AddEnumerable (IEnumerable<T> enumerable) {
 			foreach (T t in enumerable) {
 				Add(t);
 			}
 		}
 
-		public void AddRange(IEnumerable<T> collection) {
+		public void AddRange (IEnumerable<T> collection) {
 			CheckCollection(collection);
 
 			ICollection<T> c = collection as ICollection<T>;
@@ -128,20 +127,20 @@ namespace Spine {
 			version++;
 		}
 
-		public int BinarySearch(T item) {
+		public int BinarySearch (T item) {
 			return Array.BinarySearch<T>(Items, 0, Count, item);
 		}
 
-		public int BinarySearch(T item, IComparer<T> comparer) {
+		public int BinarySearch (T item, IComparer<T> comparer) {
 			return Array.BinarySearch<T>(Items, 0, Count, item, comparer);
 		}
 
-		public int BinarySearch(int index, int count, T item, IComparer<T> comparer) {
+		public int BinarySearch (int index, int count, T item, IComparer<T> comparer) {
 			CheckRange(index, count);
 			return Array.BinarySearch<T>(Items, index, count, item, comparer);
 		}
 
-		public void Clear(bool clearArray = true) {
+		public void Clear (bool clearArray = true) {
 			if (clearArray)
 				Array.Clear(Items, 0, Items.Length);
 
@@ -149,11 +148,11 @@ namespace Spine {
 			version++;
 		}
 
-		public bool Contains(T item) {
+		public bool Contains (T item) {
 			return Array.IndexOf<T>(Items, item, 0, Count) != -1;
 		}
 
-		public ExposedList<TOutput> ConvertAll<TOutput>(Converter<T, TOutput> converter) {
+		public ExposedList<TOutput> ConvertAll<TOutput> (Converter<T, TOutput> converter) {
 			if (converter == null)
 				throw new ArgumentNullException("converter");
 			ExposedList<TOutput> u = new ExposedList<TOutput>(Count);
@@ -164,41 +163,41 @@ namespace Spine {
 			return u;
 		}
 
-		public void CopyTo(T[] array) {
+		public void CopyTo (T[] array) {
 			Array.Copy(Items, 0, array, 0, Count);
 		}
 
-		public void CopyTo(T[] array, int arrayIndex) {
+		public void CopyTo (T[] array, int arrayIndex) {
 			Array.Copy(Items, 0, array, arrayIndex, Count);
 		}
 
-		public void CopyTo(int index, T[] array, int arrayIndex, int count) {
+		public void CopyTo (int index, T[] array, int arrayIndex, int count) {
 			CheckRange(index, count);
 			Array.Copy(Items, index, array, arrayIndex, count);
 		}
 
-		public bool Exists(Predicate<T> match) {
+		public bool Exists (Predicate<T> match) {
 			CheckMatch(match);
 			return GetIndex(0, Count, match) != -1;
 		}
 
-		public T Find(Predicate<T> match) {
+		public T Find (Predicate<T> match) {
 			CheckMatch(match);
 			int i = GetIndex(0, Count, match);
-			return (i != -1) ? Items[i] : default (T);
+			return (i != -1) ? Items[i] : default(T);
 		}
 
-		private static void CheckMatch(Predicate<T> match) {
+		private static void CheckMatch (Predicate<T> match) {
 			if (match == null)
 				throw new ArgumentNullException("match");
 		}
 
-		public ExposedList<T> FindAll(Predicate<T> match) {
+		public ExposedList<T> FindAll (Predicate<T> match) {
 			CheckMatch(match);
 			return FindAllList(match);
 		}
 
-		private ExposedList<T> FindAllList(Predicate<T> match) {
+		private ExposedList<T> FindAllList (Predicate<T> match) {
 			ExposedList<T> results = new ExposedList<T>();
 			for (int i = 0; i < Count; i++)
 				if (match(Items[i]))
@@ -207,105 +206,105 @@ namespace Spine {
 			return results;
 		}
 
-		public int FindIndex(Predicate<T> match) {
+		public int FindIndex (Predicate<T> match) {
 			CheckMatch(match);
 			return GetIndex(0, Count, match);
 		}
 
-		public int FindIndex(int startIndex, Predicate<T> match) {
+		public int FindIndex (int startIndex, Predicate<T> match) {
 			CheckMatch(match);
 			CheckIndex(startIndex);
 			return GetIndex(startIndex, Count - startIndex, match);
 		}
 
-		public int FindIndex(int startIndex, int count, Predicate<T> match) {
+		public int FindIndex (int startIndex, int count, Predicate<T> match) {
 			CheckMatch(match);
 			CheckRange(startIndex, count);
 			return GetIndex(startIndex, count, match);
 		}
 
-		private int GetIndex(int startIndex, int count, Predicate<T> match) {
+		private int GetIndex (int startIndex, int count, Predicate<T> match) {
 			int end = startIndex + count;
-			for (int i = startIndex; i < end; i ++)
+			for (int i = startIndex; i < end; i++)
 				if (match(Items[i]))
 					return i;
 
 			return -1;
 		}
 
-		public T FindLast(Predicate<T> match) {
+		public T FindLast (Predicate<T> match) {
 			CheckMatch(match);
 			int i = GetLastIndex(0, Count, match);
-			return i == -1 ? default (T) : Items[i];
+			return i == -1 ? default(T) : Items[i];
 		}
 
-		public int FindLastIndex(Predicate<T> match) {
+		public int FindLastIndex (Predicate<T> match) {
 			CheckMatch(match);
 			return GetLastIndex(0, Count, match);
 		}
 
-		public int FindLastIndex(int startIndex, Predicate<T> match) {
+		public int FindLastIndex (int startIndex, Predicate<T> match) {
 			CheckMatch(match);
 			CheckIndex(startIndex);
 			return GetLastIndex(0, startIndex + 1, match);
 		}
 
-		public int FindLastIndex(int startIndex, int count, Predicate<T> match) {
+		public int FindLastIndex (int startIndex, int count, Predicate<T> match) {
 			CheckMatch(match);
 			int start = startIndex - count + 1;
 			CheckRange(start, count);
 			return GetLastIndex(start, count, match);
 		}
 
-		private int GetLastIndex(int startIndex, int count, Predicate<T> match) {
+		private int GetLastIndex (int startIndex, int count, Predicate<T> match) {
 			// unlike FindLastIndex, takes regular params for search range
-			for (int i = startIndex + count; i != startIndex;)
+			for (int i = startIndex + count; i != startIndex; )
 				if (match(Items[--i]))
 					return i;
 			return -1;
 		}
 
-		public void ForEach(Action<T> action) {
+		public void ForEach (Action<T> action) {
 			if (action == null)
 				throw new ArgumentNullException("action");
 			for (int i = 0; i < Count; i++)
 				action(Items[i]);
 		}
 
-		public Enumerator GetEnumerator() {
+		public Enumerator GetEnumerator () {
 			return new Enumerator(this);
 		}
 
-		public ExposedList<T> GetRange(int index, int count) {
+		public ExposedList<T> GetRange (int index, int count) {
 			CheckRange(index, count);
 			T[] tmpArray = new T[count];
 			Array.Copy(Items, index, tmpArray, 0, count);
 			return new ExposedList<T>(tmpArray, count);
 		}
 
-		public int IndexOf(T item) {
+		public int IndexOf (T item) {
 			return Array.IndexOf<T>(Items, item, 0, Count);
 		}
 
-		public int IndexOf(T item, int index) {
+		public int IndexOf (T item, int index) {
 			CheckIndex(index);
 			return Array.IndexOf<T>(Items, item, index, Count - index);
 		}
 
-		public int IndexOf(T item, int index, int count) {
+		public int IndexOf (T item, int index, int count) {
 			if (index < 0)
 				throw new ArgumentOutOfRangeException("index");
 
 			if (count < 0)
 				throw new ArgumentOutOfRangeException("count");
 
-			if ((uint) index + (uint) count > (uint) Count)
+			if ((uint)index + (uint)count > (uint)Count)
 				throw new ArgumentOutOfRangeException("index and count exceed length of list");
 
 			return Array.IndexOf<T>(Items, item, index, count);
 		}
 
-		private void Shift(int start, int delta) {
+		private void Shift (int start, int delta) {
 			if (delta < 0)
 				start -= delta;
 
@@ -318,12 +317,12 @@ namespace Spine {
 				Array.Clear(Items, Count, -delta);
 		}
 
-		private void CheckIndex(int index) {
-			if (index < 0 || (uint) index > (uint) Count)
+		private void CheckIndex (int index) {
+			if (index < 0 || (uint)index > (uint)Count)
 				throw new ArgumentOutOfRangeException("index");
 		}
 
-		public void Insert(int index, T item) {
+		public void Insert (int index, T item) {
 			CheckIndex(index);
 			if (Count == Items.Length)
 				GrowIfNeeded(1);
@@ -332,12 +331,12 @@ namespace Spine {
 			version++;
 		}
 
-		private void CheckCollection(IEnumerable<T> collection) {
+		private void CheckCollection (IEnumerable<T> collection) {
 			if (collection == null)
 				throw new ArgumentNullException("collection");
 		}
 
-		public void InsertRange(int index, IEnumerable<T> collection) {
+		public void InsertRange (int index, IEnumerable<T> collection) {
 			CheckCollection(collection);
 			CheckIndex(index);
 			if (collection == this) {
@@ -356,7 +355,7 @@ namespace Spine {
 			version++;
 		}
 
-		private void InsertCollection(int index, ICollection<T> collection) {
+		private void InsertCollection (int index, ICollection<T> collection) {
 			int collectionCount = collection.Count;
 			GrowIfNeeded(collectionCount);
 
@@ -364,21 +363,21 @@ namespace Spine {
 			collection.CopyTo(Items, index);
 		}
 
-		private void InsertEnumeration(int index, IEnumerable<T> enumerable) {
+		private void InsertEnumeration (int index, IEnumerable<T> enumerable) {
 			foreach (T t in enumerable)
 				Insert(index++, t);
 		}
 
-		public int LastIndexOf(T item) {
+		public int LastIndexOf (T item) {
 			return Array.LastIndexOf<T>(Items, item, Count - 1, Count);
 		}
 
-		public int LastIndexOf(T item, int index) {
+		public int LastIndexOf (T item, int index) {
 			CheckIndex(index);
 			return Array.LastIndexOf<T>(Items, item, index, index + 1);
 		}
 
-		public int LastIndexOf(T item, int index, int count) {
+		public int LastIndexOf (T item, int index, int count) {
 			if (index < 0)
 				throw new ArgumentOutOfRangeException("index", index, "index is negative");
 
@@ -391,7 +390,7 @@ namespace Spine {
 			return Array.LastIndexOf<T>(Items, item, index, count);
 		}
 
-		public bool Remove(T item) {
+		public bool Remove (T item) {
 			int loc = IndexOf(item);
 			if (loc != -1)
 				RemoveAt(loc);
@@ -399,7 +398,7 @@ namespace Spine {
 			return loc != -1;
 		}
 
-		public int RemoveAll(Predicate<T> match) {
+		public int RemoveAll (Predicate<T> match) {
 			CheckMatch(match);
 			int i = 0;
 			int j = 0;
@@ -426,15 +425,15 @@ namespace Spine {
 			return (j - i);
 		}
 
-		public void RemoveAt(int index) {
-			if (index < 0 || (uint) index >= (uint) Count)
+		public void RemoveAt (int index) {
+			if (index < 0 || (uint)index >= (uint)Count)
 				throw new ArgumentOutOfRangeException("index");
 			Shift(index, -1);
 			Array.Clear(Items, Count, 1);
 			version++;
 		}
 
-		public void RemoveRange(int index, int count) {
+		public void RemoveRange (int index, int count) {
 			CheckRange(index, count);
 			if (count > 0) {
 				Shift(index, -count);
@@ -443,50 +442,50 @@ namespace Spine {
 			}
 		}
 
-		public void Reverse() {
+		public void Reverse () {
 			Array.Reverse(Items, 0, Count);
 			version++;
 		}
 
-		public void Reverse(int index, int count) {
+		public void Reverse (int index, int count) {
 			CheckRange(index, count);
 			Array.Reverse(Items, index, count);
 			version++;
 		}
 
-		public void Sort() {
+		public void Sort () {
 			Array.Sort<T>(Items, 0, Count, Comparer<T>.Default);
 			version++;
 		}
 
-		public void Sort(IComparer<T> comparer) {
+		public void Sort (IComparer<T> comparer) {
 			Array.Sort<T>(Items, 0, Count, comparer);
 			version++;
 		}
 
-		public void Sort(Comparison<T> comparison) {
+		public void Sort (Comparison<T> comparison) {
 			Array.Sort<T>(Items, comparison);
 			version++;
 		}
 
-		public void Sort(int index, int count, IComparer<T> comparer) {
+		public void Sort (int index, int count, IComparer<T> comparer) {
 			CheckRange(index, count);
 			Array.Sort<T>(Items, index, count, comparer);
 			version++;
 		}
 
-		public T[] ToArray() {
+		public T[] ToArray () {
 			T[] t = new T[Count];
 			Array.Copy(Items, t, Count);
 
 			return t;
 		}
 
-		public void TrimExcess() {
+		public void TrimExcess () {
 			Capacity = Count;
 		}
 
-		public bool TrueForAll(Predicate<T> match) {
+		public bool TrueForAll (Predicate<T> match) {
 			CheckMatch(match);
 
 			for (int i = 0; i < Count; i++)
@@ -501,7 +500,7 @@ namespace Spine {
 				return Items.Length;
 			}
 			set {
-				if ((uint) value < (uint) Count)
+				if ((uint)value < (uint)Count)
 					throw new ArgumentOutOfRangeException();
 
 				Array.Resize(ref Items, value);
@@ -510,11 +509,11 @@ namespace Spine {
 
 		#region Interface implementations.
 
-		IEnumerator<T> IEnumerable<T>.GetEnumerator() {
+		IEnumerator<T> IEnumerable<T>.GetEnumerator () {
 			return GetEnumerator();
 		}
 
-		IEnumerator IEnumerable.GetEnumerator() {
+		IEnumerator IEnumerable.GetEnumerator () {
 			return GetEnumerator();
 		}
 
@@ -525,28 +524,27 @@ namespace Spine {
 			private ExposedList<T> l;
 			private int next;
 			private int ver;
-
 			private T current;
 
-			internal Enumerator(ExposedList<T> l)
+			internal Enumerator (ExposedList<T> l)
 				: this() {
 				this.l = l;
 				ver = l.version;
 			}
 
-			public void Dispose() {
+			public void Dispose () {
 				l = null;
 			}
 
-			private void VerifyState() {
+			private void VerifyState () {
 				if (l == null)
 					throw new ObjectDisposedException(GetType().FullName);
 				if (ver != l.version)
 					throw new InvalidOperationException(
-						"Collection was modified; enumeration operation may not execute.");
+							"Collection was modified; enumeration operation may not execute.");
 			}
 
-			public bool MoveNext() {
+			public bool MoveNext () {
 				VerifyState();
 
 				if (next < 0)
@@ -567,7 +565,7 @@ namespace Spine {
 				}
 			}
 
-			void IEnumerator.Reset() {
+			void IEnumerator.Reset () {
 				VerifyState();
 				next = 0;
 			}

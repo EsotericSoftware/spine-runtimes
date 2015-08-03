@@ -105,7 +105,7 @@ namespace Spine {
 		}
 
 		// --- Skins.
-		
+
 		/// <returns>May be null.</returns>
 		public Skin FindSkin (String skinName) {
 			if (skinName == null) throw new ArgumentNullException("skinName cannot be null.");
@@ -125,7 +125,7 @@ namespace Spine {
 		}
 
 		// --- Animations.
-		
+
 		/// <returns>May be null.</returns>
 		public Animation FindAnimation (String animationName) {
 			if (animationName == null) throw new ArgumentNullException("animationName cannot be null.");

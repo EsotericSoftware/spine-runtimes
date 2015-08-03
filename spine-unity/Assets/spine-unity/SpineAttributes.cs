@@ -21,7 +21,7 @@ public class SpineSlot : PropertyAttribute {
 	/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
 	/// </param>
 	/// <param name="containsBoundingBoxes">Disables popup results that don't contain bounding box attachments when true.</param>
-	public SpineSlot(string startsWith = "", string dataField = "", bool containsBoundingBoxes = false) {
+	public SpineSlot (string startsWith = "", string dataField = "", bool containsBoundingBoxes = false) {
 		this.startsWith = startsWith;
 		this.dataField = dataField;
 		this.containsBoundingBoxes = containsBoundingBoxes;
@@ -40,7 +40,7 @@ public class SpineSkin : PropertyAttribute {
 	/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives)
 	/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
 	/// </param>
-	public SpineSkin(string startsWith = "", string dataField = "") {
+	public SpineSkin (string startsWith = "", string dataField = "") {
 		this.startsWith = startsWith;
 		this.dataField = dataField;
 	}
@@ -57,7 +57,7 @@ public class SpineAnimation : PropertyAttribute {
 	/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives)
 	/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
 	/// </param>
-	public SpineAnimation(string startsWith = "", string dataField = "") {
+	public SpineAnimation (string startsWith = "", string dataField = "") {
 		this.startsWith = startsWith;
 		this.dataField = dataField;
 	}
@@ -71,7 +71,7 @@ public class SpineAttachment : PropertyAttribute {
 	public string slotField = "";
 
 
-	public SpineAttachment() {
+	public SpineAttachment () {
 
 	}
 
@@ -86,19 +86,19 @@ public class SpineAttachment : PropertyAttribute {
 	/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives)
 	/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
 	/// </param>
-	public SpineAttachment(bool currentSkinOnly = true, bool returnAttachmentPath = false, bool placeholdersOnly = false, string slotField = "", string dataField = "") {
+	public SpineAttachment (bool currentSkinOnly = true, bool returnAttachmentPath = false, bool placeholdersOnly = false, string slotField = "", string dataField = "") {
 		this.currentSkinOnly = currentSkinOnly;
 		this.returnAttachmentPath = returnAttachmentPath;
 		this.placeholdersOnly = placeholdersOnly;
 		this.slotField = slotField;
-		this.dataField = dataField;		
+		this.dataField = dataField;
 	}
 
-	public static Hierarchy GetHierarchy(string fullPath) {
+	public static Hierarchy GetHierarchy (string fullPath) {
 		return new Hierarchy(fullPath);
 	}
 
-	public static Spine.Attachment GetAttachment(string attachmentPath, Spine.SkeletonData skeletonData) {
+	public static Spine.Attachment GetAttachment (string attachmentPath, Spine.SkeletonData skeletonData) {
 		var hierarchy = SpineAttachment.GetHierarchy(attachmentPath);
 		if (hierarchy.name == "")
 			return null;
@@ -106,7 +106,7 @@ public class SpineAttachment : PropertyAttribute {
 		return skeletonData.FindSkin(hierarchy.skin).GetAttachment(skeletonData.FindSlotIndex(hierarchy.slot), hierarchy.name);
 	}
 
-	public static Spine.Attachment GetAttachment(string attachmentPath, SkeletonDataAsset skeletonDataAsset) {
+	public static Spine.Attachment GetAttachment (string attachmentPath, SkeletonDataAsset skeletonDataAsset) {
 		return GetAttachment(attachmentPath, skeletonDataAsset.GetSkeletonData(true));
 	}
 
@@ -115,15 +115,14 @@ public class SpineAttachment : PropertyAttribute {
 		public string slot;
 		public string name;
 
-		public Hierarchy(string fullPath) {
-			string[] chunks = fullPath.Split(new char[]{'/'}, System.StringSplitOptions.RemoveEmptyEntries);
+		public Hierarchy (string fullPath) {
+			string[] chunks = fullPath.Split(new char[] { '/' }, System.StringSplitOptions.RemoveEmptyEntries);
 			if (chunks.Length == 0) {
 				skin = "";
 				slot = "";
 				name = "";
 				return;
-			}
-			else if (chunks.Length < 2) {
+			} else if (chunks.Length < 2) {
 				throw new System.Exception("Cannot generate Attachment Hierarchy from string! Not enough components! [" + fullPath + "]");
 			}
 			skin = chunks[0];
@@ -148,19 +147,19 @@ public class SpineBone : PropertyAttribute {
 	/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives)
 	/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
 	/// </param>
-	public SpineBone(string startsWith = "", string dataField = "") {
+	public SpineBone (string startsWith = "", string dataField = "") {
 		this.startsWith = startsWith;
 		this.dataField = dataField;
 	}
 
-	public static Spine.Bone GetBone(string boneName, SkeletonRenderer renderer) {
+	public static Spine.Bone GetBone (string boneName, SkeletonRenderer renderer) {
 		if (renderer.skeleton == null)
 			return null;
 
 		return renderer.skeleton.FindBone(boneName);
 	}
 
-	public static Spine.BoneData GetBoneData(string boneName, SkeletonDataAsset skeletonDataAsset) {
+	public static Spine.BoneData GetBoneData (string boneName, SkeletonDataAsset skeletonDataAsset) {
 		var data = skeletonDataAsset.GetSkeletonData(true);
 
 		return data.FindBone(boneName);

@@ -42,7 +42,7 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 	public bool loop;
 	public Spine.AnimationState state;
 
-	
+
 
 	public event UpdateBonesDelegate UpdateLocal {
 		add { _UpdateLocal += value; }
@@ -114,17 +114,17 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 		state.Update(deltaTime);
 		state.Apply(skeleton);
 
-		if (_UpdateLocal != null) 
+		if (_UpdateLocal != null)
 			_UpdateLocal(this);
 
 		skeleton.UpdateWorldTransform();
 
-		if (_UpdateWorld != null) { 
+		if (_UpdateWorld != null) {
 			_UpdateWorld(this);
 			skeleton.UpdateWorldTransform();
 		}
 
-		if (_UpdateComplete != null) { 
+		if (_UpdateComplete != null) {
 			_UpdateComplete(this);
 		}
 	}

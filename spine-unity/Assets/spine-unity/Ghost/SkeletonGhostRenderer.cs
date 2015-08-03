@@ -24,7 +24,7 @@ public class SkeletonGhostRenderer : MonoBehaviour {
 		StopAllCoroutines();
 
 		gameObject.SetActive(true);
-		
+
 
 		meshRenderer.sharedMaterials = materials;
 		meshRenderer.sortingOrder = sortingOrder;
@@ -83,7 +83,7 @@ public class SkeletonGhostRenderer : MonoBehaviour {
 				c = colors[i];
 				black.a = c.a;
 				if (c.r > 0 || c.g > 0 || c.b > 0)
-				breakout = false;
+					breakout = false;
 
 				colors[i] = Color32.Lerp(c, black, Time.deltaTime * fadeSpeed);
 			}

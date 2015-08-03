@@ -133,7 +133,7 @@ namespace Spine {
 					current = current.parent;
 				} while (current != null);
 				nonIkBones.Add(bone);
-				outer: {}
+			outer: { }
 			}
 		}
 
@@ -181,7 +181,7 @@ namespace Spine {
 			drawOrder.Clear();
 			for (int i = 0, n = slots.Count; i < n; i++)
 				drawOrder.Add(slots.Items[i]);
-			
+
 			for (int i = 0, n = slots.Count; i < n; i++)
 				slots.Items[i].SetToSetupPose(i);
 		}

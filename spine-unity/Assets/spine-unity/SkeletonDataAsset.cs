@@ -50,12 +50,12 @@ public class SkeletonDataAsset : ScriptableObject {
 	private SkeletonData skeletonData;
 	private AnimationStateData stateData;
 
-	public void Reset() {
+	public void Reset () {
 		skeletonData = null;
 		stateData = null;
 	}
 
-	public SkeletonData GetSkeletonData(bool quiet) {
+	public SkeletonData GetSkeletonData (bool quiet) {
 		if (atlasAssets == null) {
 			atlasAssets = new AtlasAsset[0];
 			if (!quiet)
@@ -98,7 +98,7 @@ public class SkeletonDataAsset : ScriptableObject {
 
 		if (skeletonData != null)
 			return skeletonData;
-		
+
 		AttachmentLoader attachmentLoader;
 		float skeletonDataScale;
 
@@ -161,7 +161,7 @@ public class SkeletonDataAsset : ScriptableObject {
 		}
 	}
 
-	public AnimationStateData GetAnimationStateData() {
+	public AnimationStateData GetAnimationStateData () {
 		if (stateData != null)
 			return stateData;
 		GetSkeletonData(false);

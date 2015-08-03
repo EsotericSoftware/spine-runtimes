@@ -33,7 +33,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Spine {
-	public class Bone{
+	public class Bone {
 		static public bool yDown;
 
 		internal BoneData data;

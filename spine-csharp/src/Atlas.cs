@@ -69,7 +69,7 @@ namespace Spine {
             using (StreamReader reader = new StreamReader(stream))
             {
 #else
-            using (StreamReader reader = new StreamReader(path)) {
+			using (StreamReader reader = new StreamReader(path)) {
 #endif
 				try {
 					Load(reader, Path.GetDirectoryName(path), textureLoader);

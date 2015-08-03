@@ -34,7 +34,7 @@ public class SkeletonUtilityBone : MonoBehaviour {
 	public bool scale;
 	public bool flip;
 	public bool flipX;
-	[Range(0f,1f)]
+	[Range(0f, 1f)]
 	public float overrideAlpha = 1;
 
 	/// <summary>If a bone isn't set, boneName is used to find the bone.</summary>
@@ -109,10 +109,10 @@ public class SkeletonUtilityBone : MonoBehaviour {
 			}
 		}
 
-        
+
 
 		float skeletonFlipRotation = (skeleton.flipX ^ skeleton.flipY) ? -1f : 1f;
-        
+
 		float flipCompensation = 0;
 		if (flip && (flipX || (flipX != bone.flipX)) && bone.parent != null) {
 			flipCompensation = bone.parent.WorldRotation * -2;
@@ -133,7 +133,7 @@ public class SkeletonUtilityBone : MonoBehaviour {
 				if (bone.Data.InheritRotation) {
 					if (bone.FlipX) {
 						cachedTransform.localRotation = Quaternion.Euler(0, 180, bone.rotationIK - flipCompensation);
-					} else { 
+					} else {
 						cachedTransform.localRotation = Quaternion.Euler(0, 0, bone.rotationIK);
 					}
 				} else {
@@ -153,90 +153,90 @@ public class SkeletonUtilityBone : MonoBehaviour {
 
 
 
-				if (transformLerpComplete)
-					return;            
+			if (transformLerpComplete)
+				return;
 
-				if (parentReference == null) {
-					if (position) {
-						bone.x = Mathf.Lerp(bone.x, cachedTransform.localPosition.x, overrideAlpha);
-						bone.y = Mathf.Lerp(bone.y, cachedTransform.localPosition.y, overrideAlpha);
-					}
-
-					if (rotation) {
-						float angle = Mathf.LerpAngle(bone.Rotation, cachedTransform.localRotation.eulerAngles.z, overrideAlpha) + flipCompensation;
-
-						if (flip) { 
-							if ((!flipX && bone.flipX)) {
-								angle -= flipCompensation;
-							}
-                        
-							//TODO fix this...
-							if (angle >= 360)
-								angle -= 360;
-							else if (angle <= -360)
-									angle += 360;
-						}
-
-						bone.Rotation = angle;
-						bone.RotationIK = angle;
-					}
-
-					if (scale) {
-						bone.scaleX = Mathf.Lerp(bone.scaleX, cachedTransform.localScale.x, overrideAlpha);
-						bone.scaleY = Mathf.Lerp(bone.scaleY, cachedTransform.localScale.y, overrideAlpha);
-
-						nonUniformScaleWarning = (bone.scaleX != bone.scaleY);
-					}
-
-					if (flip) {
-						bone.flipX = flipX;
-					}
-				} else {
-
-					if (transformLerpComplete)
-						return; 
-
-					if (position) {
-						Vector3 pos = parentReference.InverseTransformPoint(cachedTransform.position);
-						bone.x = Mathf.Lerp(bone.x, pos.x, overrideAlpha);
-						bone.y = Mathf.Lerp(bone.y, pos.y, overrideAlpha);
-					}
-				
-					if (rotation) {
-						float angle = Mathf.LerpAngle(bone.Rotation, Quaternion.LookRotation(flipX ? Vector3.forward * -1 : Vector3.forward, parentReference.InverseTransformDirection(cachedTransform.up)).eulerAngles.z, overrideAlpha) + flipCompensation;
-
-						if (flip) {
-							if ((!flipX && bone.flipX)) {
-								angle -= flipCompensation;
-							}
-
-							//TODO fix this...
-							if (angle >= 360)
-								angle -= 360;
-							else if (angle <= -360)
-									angle += 360;
-						}
-
-						bone.Rotation = angle;
-						bone.RotationIK = angle;
-					}
-
-					//TODO: Something about this
-					if (scale) {
-						bone.scaleX = Mathf.Lerp(bone.scaleX, cachedTransform.localScale.x, overrideAlpha);
-						bone.scaleY = Mathf.Lerp(bone.scaleY, cachedTransform.localScale.y, overrideAlpha);
-					
-						nonUniformScaleWarning = (bone.scaleX != bone.scaleY);
-					}
-
-					if (flip) {
-						bone.flipX = flipX;
-					}
-
+			if (parentReference == null) {
+				if (position) {
+					bone.x = Mathf.Lerp(bone.x, cachedTransform.localPosition.x, overrideAlpha);
+					bone.y = Mathf.Lerp(bone.y, cachedTransform.localPosition.y, overrideAlpha);
 				}
 
-				transformLerpComplete = true;
-			}		
+				if (rotation) {
+					float angle = Mathf.LerpAngle(bone.Rotation, cachedTransform.localRotation.eulerAngles.z, overrideAlpha) + flipCompensation;
+
+					if (flip) {
+						if ((!flipX && bone.flipX)) {
+							angle -= flipCompensation;
+						}
+
+						//TODO fix this...
+						if (angle >= 360)
+							angle -= 360;
+						else if (angle <= -360)
+							angle += 360;
+					}
+
+					bone.Rotation = angle;
+					bone.RotationIK = angle;
+				}
+
+				if (scale) {
+					bone.scaleX = Mathf.Lerp(bone.scaleX, cachedTransform.localScale.x, overrideAlpha);
+					bone.scaleY = Mathf.Lerp(bone.scaleY, cachedTransform.localScale.y, overrideAlpha);
+
+					nonUniformScaleWarning = (bone.scaleX != bone.scaleY);
+				}
+
+				if (flip) {
+					bone.flipX = flipX;
+				}
+			} else {
+
+				if (transformLerpComplete)
+					return;
+
+				if (position) {
+					Vector3 pos = parentReference.InverseTransformPoint(cachedTransform.position);
+					bone.x = Mathf.Lerp(bone.x, pos.x, overrideAlpha);
+					bone.y = Mathf.Lerp(bone.y, pos.y, overrideAlpha);
+				}
+
+				if (rotation) {
+					float angle = Mathf.LerpAngle(bone.Rotation, Quaternion.LookRotation(flipX ? Vector3.forward * -1 : Vector3.forward, parentReference.InverseTransformDirection(cachedTransform.up)).eulerAngles.z, overrideAlpha) + flipCompensation;
+
+					if (flip) {
+						if ((!flipX && bone.flipX)) {
+							angle -= flipCompensation;
+						}
+
+						//TODO fix this...
+						if (angle >= 360)
+							angle -= 360;
+						else if (angle <= -360)
+							angle += 360;
+					}
+
+					bone.Rotation = angle;
+					bone.RotationIK = angle;
+				}
+
+				//TODO: Something about this
+				if (scale) {
+					bone.scaleX = Mathf.Lerp(bone.scaleX, cachedTransform.localScale.x, overrideAlpha);
+					bone.scaleY = Mathf.Lerp(bone.scaleY, cachedTransform.localScale.y, overrideAlpha);
+
+					nonUniformScaleWarning = (bone.scaleX != bone.scaleY);
+				}
+
+				if (flip) {
+					bone.flipX = flipX;
+				}
+
+			}
+
+			transformLerpComplete = true;
+		}
 	}
 
 	public void FlipX (bool state) {
@@ -246,9 +246,9 @@ public class SkeletonUtilityBone : MonoBehaviour {
 				skeletonUtility.skeletonAnimation.LateUpdate();
 				return;
 			} else if (!flipX && Mathf.Abs(transform.localRotation.eulerAngles.y) < 90) {
-					skeletonUtility.skeletonAnimation.LateUpdate();
-					return;
-				}
+				skeletonUtility.skeletonAnimation.LateUpdate();
+				return;
+			}
 		}
 
 		bone.FlipX = state;

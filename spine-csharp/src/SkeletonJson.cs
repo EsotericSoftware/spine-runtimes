@@ -256,7 +256,7 @@ namespace Spine {
 					MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, name, path);
 					if (mesh == null) return null;
 
-					mesh.Path = path; 
+					mesh.Path = path;
 					mesh.vertices = GetFloatArray(map, "vertices", Scale);
 					mesh.triangles = GetIntArray(map, "triangles");
 					mesh.regionUVs = GetFloatArray(map, "uvs", 1);

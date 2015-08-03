@@ -211,7 +211,7 @@ public class SkeletonRenderer : MonoBehaviour {
 			int attachmentVertexCount, attachmentTriangleCount;
 			bool worldScaleXIsPositive = bone.worldScaleX >= 0f;
 			bool worldScaleYIsPositive = bone.worldScaleY >= 0f;
-			bool worldScaleIsSameSigns = (worldScaleXIsPositive && worldScaleYIsPositive) || 
+			bool worldScaleIsSameSigns = (worldScaleXIsPositive && worldScaleYIsPositive) ||
 										 (!worldScaleXIsPositive && !worldScaleYIsPositive);
 			bool flip = frontFacing && ((bone.worldFlipX != bone.worldFlipY) == worldScaleIsSameSigns);
 			attachmentsFlipStateTemp.Items[i] = flip;
@@ -247,7 +247,7 @@ public class SkeletonRenderer : MonoBehaviour {
 #else
 			Material material = (rendererObject.GetType() == typeof(Material)) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
 #endif
-			if ((lastMaterial != null && lastMaterial.GetInstanceID() != material.GetInstanceID()) || 
+			if ((lastMaterial != null && lastMaterial.GetInstanceID() != material.GetInstanceID()) ||
 				(submeshSeparatorSlotsCount > 0 && submeshSeparatorSlots.Contains(slot))) {
 				addSubmeshArgumentsTemp.Add(
 					new LastState.AddSubmeshArguments(lastMaterial, submeshStartSlotIndex, i, submeshTriangleCount, submeshFirstVertex, false)
@@ -266,7 +266,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		addSubmeshArgumentsTemp.Add(
 			new LastState.AddSubmeshArguments(lastMaterial, submeshStartSlotIndex, drawOrderCount, submeshTriangleCount, submeshFirstVertex, true)
 			);
-		
+
 		bool mustUpdateMeshStructure = CheckIfMustUpdateMeshStructure(attachmentsTriangleCountTemp, attachmentsFlipStateTemp, addSubmeshArgumentsTemp);
 		if (mustUpdateMeshStructure) {
 			submeshMaterials.Clear();
@@ -305,7 +305,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		} else {
 			// Too many vertices, zero the extra.
 			Vector3 zero = Vector3.zero;
-			for (int i = vertexCount, n = lastState.vertexCount ; i < n; i++)
+			for (int i = vertexCount, n = lastState.vertexCount; i < n; i++)
 				vertices[i] = zero;
 		}
 		lastState.vertexCount = vertexCount;
@@ -575,7 +575,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		useMesh1 = !useMesh1;
 	}
 
-	private bool CheckIfMustUpdateMeshStructure(ExposedList<int> attachmentsTriangleCountTemp, ExposedList<bool> attachmentsFlipStateTemp, ExposedList<LastState.AddSubmeshArguments> addSubmeshArgumentsTemp) {
+	private bool CheckIfMustUpdateMeshStructure (ExposedList<int> attachmentsTriangleCountTemp, ExposedList<bool> attachmentsFlipStateTemp, ExposedList<LastState.AddSubmeshArguments> addSubmeshArgumentsTemp) {
 		// Check if any mesh settings were changed
 		bool mustUpdateMeshStructure =
 			immutableTriangles != (useMesh1 ? lastState.immutableTrianglesMesh1 : lastState.immutableTrianglesMesh2);
@@ -771,7 +771,7 @@ public class SkeletonRenderer : MonoBehaviour {
 			public int firstVertex;
 			public bool lastSubmesh;
 
-			public AddSubmeshArguments(Material material, int startSlot, int endSlot, int triangleCount, int firstVertex, bool lastSubmesh) {
+			public AddSubmeshArguments (Material material, int startSlot, int endSlot, int triangleCount, int firstVertex, bool lastSubmesh) {
 				this.material = material;
 				this.startSlot = startSlot;
 				this.endSlot = endSlot;
@@ -780,14 +780,14 @@ public class SkeletonRenderer : MonoBehaviour {
 				this.lastSubmesh = lastSubmesh;
 			}
 
-			public bool Equals(ref AddSubmeshArguments other) {
+			public bool Equals (ref AddSubmeshArguments other) {
 				return
 					!ReferenceEquals(material, null) &&
 					!ReferenceEquals(other.material, null) &&
 					material.GetInstanceID() == other.material.GetInstanceID() &&
-					startSlot == other.startSlot && 
-					endSlot == other.endSlot && 
-					triangleCount == other.triangleCount && 
+					startSlot == other.startSlot &&
+					endSlot == other.endSlot &&
+					triangleCount == other.triangleCount &&
 					firstVertex == other.firstVertex;
 			}
 		}

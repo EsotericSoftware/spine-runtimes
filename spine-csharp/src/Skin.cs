@@ -91,7 +91,7 @@ namespace Spine {
 			internal static readonly AttachmentKeyTupleComparer Instance = new AttachmentKeyTupleComparer();
 
 			bool IEqualityComparer<AttachmentKeyTuple>.Equals (AttachmentKeyTuple o1, AttachmentKeyTuple o2) {
-			    return o1.SlotIndex == o2.SlotIndex && o1.NameHashCode == o2.NameHashCode && o1.Name == o2.Name;
+				return o1.SlotIndex == o2.SlotIndex && o1.NameHashCode == o2.NameHashCode && o1.Name == o2.Name;
 			}
 
 			int IEqualityComparer<AttachmentKeyTuple>.GetHashCode (AttachmentKeyTuple o) {
@@ -99,16 +99,16 @@ namespace Spine {
 			}
 		}
 
-        private class AttachmentKeyTuple {
-            public readonly int SlotIndex;
-            public readonly string Name;
-            public readonly int NameHashCode;
+		private class AttachmentKeyTuple {
+			public readonly int SlotIndex;
+			public readonly string Name;
+			public readonly int NameHashCode;
 
-            public AttachmentKeyTuple(int slotIndex, string name) {
-                SlotIndex = slotIndex;
-                Name = name;
-                NameHashCode = Name.GetHashCode();
-            }
-        }
+			public AttachmentKeyTuple (int slotIndex, string name) {
+				SlotIndex = slotIndex;
+				Name = name;
+				NameHashCode = Name.GetHashCode();
+			}
+		}
 	}
 }

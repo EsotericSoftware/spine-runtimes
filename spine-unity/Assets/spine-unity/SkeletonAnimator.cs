@@ -81,7 +81,7 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 
 		//apply
 		int layerCount = animator.layerCount;
-		
+
 		for (int i = 0; i < layerCount; i++) {
 
 			float layerWeight = animator.GetLayerWeight(i);
@@ -191,7 +191,7 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 		lastTime = Time.time;
 	}
 
-	private int GetAnimationClipNameHashCode(AnimationClip clip) {
+	private int GetAnimationClipNameHashCode (AnimationClip clip) {
 		int clipNameHashCode;
 		if (!clipNameHashCodeTable.TryGetValue(clip, out clipNameHashCode)) {
 			clipNameHashCode = clip.name.GetHashCode();
