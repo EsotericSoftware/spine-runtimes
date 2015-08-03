@@ -322,11 +322,16 @@ public class SkeletonRenderer : MonoBehaviour {
 		Vector3 meshBoundsMin;
 		meshBoundsMin.x = int.MaxValue;
 		meshBoundsMin.y = int.MaxValue;
-		meshBoundsMin.z = zSpacing > 0f ? 0f : zSpacing * (drawOrderCount - 1);
 		Vector3 meshBoundsMax;
 		meshBoundsMax.x = int.MinValue;
 		meshBoundsMax.y = int.MinValue;
-		meshBoundsMax.z = meshBoundsMin.z;
+		if (zSpacing > 0f) {
+			meshBoundsMin.z = 0f;
+			meshBoundsMax.z = zSpacing * (drawOrderCount - 1);
+		} else {
+			meshBoundsMin.z = zSpacing * (drawOrderCount - 1);
+			meshBoundsMax.z = 0f;
+		}
 		for (int i = 0; i < drawOrderCount; i++) {
 			Slot slot = drawOrder.Items[i];
 			Attachment attachment = slot.attachment;
