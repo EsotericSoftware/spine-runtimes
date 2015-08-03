@@ -64,6 +64,7 @@ spine-unity/ProjectSettings
 spine-unity/Temp
 spine-unity/Library
 spine-unity/*.sln
+spine-unity/obj
 Assembly-*.csproj
 Assembly-*.pidb
 AssetStoreTools*
