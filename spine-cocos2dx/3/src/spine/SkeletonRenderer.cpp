@@ -412,11 +412,25 @@ bool SkeletonRenderer::getDebugBonesEnabled () const {
 }
 
 void SkeletonRenderer::onEnter () {
+#if CC_ENABLE_SCRIPT_BINDING
+	if (_scriptType == kScriptTypeJavascript)
+	{
+		if (ScriptEngineManager::sendNodeEventToJSExtended(this, kNodeOnEnter))
+			return;
+	}
+#endif
 	Node::onEnter();
 	scheduleUpdate();
 }
 
 void SkeletonRenderer::onExit () {
+#if CC_ENABLE_SCRIPT_BINDING
+	if (_scriptType == kScriptTypeJavascript)
+	{
+		if (ScriptEngineManager::sendNodeEventToJSExtended(this, kNodeOnExit))
+			return;
+	}
+#endif
 	Node::onExit();
 	unscheduleUpdate();
 }
