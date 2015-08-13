@@ -39,6 +39,7 @@
 	bool _debugSlots;
 	bool _debugBones;
 	bool _premultipliedAlpha;
+  bool _skipVisibilityCheck;
 	ccBlendFunc _blendFunc;
 	CCDrawNode* _drawNode;
 	bool _ownsSkeletonData;
@@ -86,6 +87,7 @@
 @property (nonatomic, readonly) spSkeleton* skeleton;
 @property (nonatomic) bool debugSlots;
 @property (nonatomic) bool debugBones;
+@property (nonatomic) bool skipVisibilityCheck;
 @property (nonatomic) spBone* rootBone;
 
 @end

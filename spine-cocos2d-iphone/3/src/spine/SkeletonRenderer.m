@@ -238,7 +238,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 			CGSize size = texture.contentSize;
 			GLKVector2 center = GLKVector2Make(size.width / 2.0, size.height / 2.0);
 			GLKVector2 extents = GLKVector2Make(size.width / 2.0, size.height / 2.0);
-			if (CCRenderCheckVisbility(transform, center, extents)) {
+			if (_skipVisibilityCheck || CCRenderCheckVisbility(transform, center, extents)) {
 				CCRenderBuffer buffer = [renderer enqueueTriangles:(trianglesCount / 3) andVertexes:verticesCount withState:self.renderState globalSortOrder:0];
 				for (int i = 0; i * 2 < verticesCount; ++i) {
 					CCVertex vertex;
@@ -250,7 +250,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 				for (int j = 0; j * 3 < trianglesCount; ++j) {
 					CCRenderBufferSetTriangle(buffer, j, triangles[j * 3], triangles[j * 3 + 1], triangles[j * 3 + 2]);
 				}
-			}
+      }
 		}
 	}
 	[_drawNode clear];
