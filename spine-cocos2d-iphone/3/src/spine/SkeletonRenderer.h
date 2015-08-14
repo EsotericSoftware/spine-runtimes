@@ -87,5 +87,6 @@
 @property (nonatomic) bool debugSlots;
 @property (nonatomic) bool debugBones;
 @property (nonatomic) spBone* rootBone;
+@property (nonatomic) bool antialiased;
 
 @end

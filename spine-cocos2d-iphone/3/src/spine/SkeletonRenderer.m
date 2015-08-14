@@ -60,6 +60,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 }
 
 - (void) initialize:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
+    self.antialiased = true;
 	_ownsSkeletonData = ownsSkeletonData;
 
 	_worldVertices = MALLOC(float, 1000); // Max number of vertices per mesh.
@@ -213,6 +214,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 		default: ;
 		}
 		if (texture) {
+            [texture setAntialiased:self.antialiased];
 			if (slot->data->blendMode != blendMode) {
 				blendMode = slot->data->blendMode;
 				switch (slot->data->blendMode) {
