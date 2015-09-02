@@ -45,13 +45,64 @@ void _spSkinnedMeshAttachment_dispose (spAttachment* attachment) {
 	FREE(self);
 }
 
+spAttachment* _spSkinnedMeshAttachment_clone (const spAttachment* attachment) {
+	const spSkinnedMeshAttachment* const self = SUB_CAST(spSkinnedMeshAttachment, attachment);
+	spSkinnedMeshAttachment* const result = NEW(spSkinnedMeshAttachment);
+	_spAttachment_init(SUPER(result), SUPER(self)->name, SP_ATTACHMENT_SKINNED_MESH, _spSkinnedMeshAttachment_dispose, _spSkinnedMeshAttachment_clone);
+        MALLOC_STR(result->path, self->path);
+
+        const int boneCount = self->bonesCount;
+        result->bonesCount = boneCount;
+        MALLOC_COPY(result->bones, self->bones, int, boneCount);
+
+        const int weightCount = self->weightsCount;
+        result->weightsCount = weightCount;
+        MALLOC_COPY(result->weights, self->weights, float, weightCount);
+
+        const int triangleCount = self->trianglesCount;
+        result->trianglesCount = triangleCount;
+        MALLOC_COPY(result->triangles, self->triangles, int, triangleCount);
+
+        const int uvCount = self->uvsCount;
+        result->uvsCount = uvCount;
+        MALLOC_COPY(result->regionUVs, self->regionUVs, float, uvCount);
+        MALLOC_COPY(result->uvs, self->uvs, float, uvCount);
+        
+        result->hullLength = self->hullLength;
+        result->r = self->r;
+        result->g = self->g;
+        result->b = self->b;
+        result->a = self->a;
+        result->rendererObject = self->rendererObject;
+        result->regionOffsetX = self->regionOffsetX;
+        result->regionOffsetY = self->regionOffsetY;
+        result->regionWidth = self->regionWidth;
+        result->regionHeight = self->regionHeight;
+        result->regionOriginalWidth = self->regionOriginalWidth;
+        result->regionOriginalHeight = self->regionOriginalHeight;
+        result->regionU = self->regionU;
+        result->regionV = self->regionV;
+        result->regionU2 = self->regionU2;
+        result->regionV2 = self->regionV2;
+        result->regionRotate = self->regionRotate;
+
+        const int edgeCount = self->edgesCount;
+        result->edgesCount = edgeCount;
+        MALLOC_COPY(result->edges, self->edges, int, edgeCount);
+        
+        result->width = self->width;
+        result->height = self->height;
+
+        return SUPER_CAST(spAttachment, result);
+}
+
 spSkinnedMeshAttachment* spSkinnedMeshAttachment_create (const char* name) {
 	spSkinnedMeshAttachment* self = NEW(spSkinnedMeshAttachment);
 	self->r = 1;
 	self->g = 1;
 	self->b = 1;
 	self->a = 1;
-	_spAttachment_init(SUPER(self), name, SP_ATTACHMENT_SKINNED_MESH, _spSkinnedMeshAttachment_dispose);
+	_spAttachment_init(SUPER(self), name, SP_ATTACHMENT_SKINNED_MESH, _spSkinnedMeshAttachment_dispose, _spSkinnedMeshAttachment_clone);
 	return self;
 }
 

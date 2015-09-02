@@ -79,6 +79,27 @@ void spSkin_dispose (spSkin* self) {
 	FREE(self);
 }
 
+spSkin* spSkin_createComposed (const char* name, struct spSkin** parts, int count) {
+    spSkin* const self = spSkin_create(name);
+    while (count) {
+        --count;
+        spSkin* const part = parts[count];
+        int i = spSkin_getAttachmentCount(part);
+        while (i)
+        {
+            --i;
+            int slot;
+            const char* attachmentName;
+            spAttachment* attachment;
+
+            spSkin_getAttachmentAt(part, i, &slot, &attachmentName, &attachment);
+            spSkin_addAttachment(self, slot, attachmentName, spAttachment_clone(attachment));
+        }
+    }
+
+    return self;
+}
+
 void spSkin_addAttachment (spSkin* self, int slotIndex, const char* name, spAttachment* attachment) {
 	_Entry* newEntry = _Entry_create(slotIndex, name, attachment);
 	newEntry->next = SUB_CAST(_spSkin, self)->entries;
@@ -92,6 +113,34 @@ spAttachment* spSkin_getAttachment (const spSkin* self, int slotIndex, const cha
 		entry = entry->next;
 	}
 	return 0;
+}
+
+int spSkin_getAttachmentCount(const spSkin* self) {
+
+    const _Entry* entry = SUB_CAST(_spSkin, self)->entries;
+    int result = 0;
+    while (entry) {
+        ++result;
+        entry = entry->next;
+    }
+
+    return result;
+}
+
+void spSkin_getAttachmentAt
+( const spSkin* self, int i, int* slotIndex, const char** name,
+  spAttachment** attachment ) {
+    
+    const _Entry* entry = SUB_CAST(_spSkin, self)->entries;
+
+    while ( i != 0 ) {
+        --i;
+        entry = entry->next;
+    }
+
+    *slotIndex = entry->slotIndex;
+    *name = entry->name;
+    *attachment = entry->attachment;
 }
 
 const char* spSkin_getAttachmentName (const spSkin* self, int slotIndex, int attachmentIndex) {

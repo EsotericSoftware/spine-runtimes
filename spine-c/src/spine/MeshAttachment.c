@@ -44,13 +44,59 @@ void _spMeshAttachment_dispose (spAttachment* attachment) {
 	FREE(self);
 }
 
+spAttachment* _spMeshAttachment_clone (const spAttachment* attachment) {
+	const spMeshAttachment* const self = SUB_CAST(spMeshAttachment, attachment);
+	spMeshAttachment* const result = NEW(spMeshAttachment);
+	_spAttachment_init(SUPER(result), SUPER(self)->name, SP_ATTACHMENT_MESH, _spMeshAttachment_dispose, _spMeshAttachment_clone);
+        MALLOC_STR(result->path, self->path);
+
+        const int vertexCount = self->verticesCount;
+        result->verticesCount = vertexCount;
+        MALLOC_COPY(result->vertices, self->vertices, float, vertexCount);
+        
+        result->hullLength = self->hullLength;
+        
+        MALLOC_COPY(result->regionUVs, self->uvs, float, vertexCount);
+        MALLOC_COPY(result->uvs, self->uvs, float, vertexCount);
+
+        const int triangleCount = self->trianglesCount;
+        result->trianglesCount = triangleCount;
+        MALLOC_COPY(result->triangles, self->triangles, int, triangleCount);
+
+        result->r = self->r;
+        result->g = self->g;
+        result->b = self->b;
+        result->a = self->a;
+        result->rendererObject = self->rendererObject;
+        result->regionOffsetX = self->regionOffsetX;
+        result->regionOffsetY = self->regionOffsetY;
+        result->regionWidth = self->regionWidth;
+        result->regionHeight = self->regionHeight;
+        result->regionOriginalWidth = self->regionOriginalWidth;
+        result->regionOriginalHeight = self->regionOriginalHeight;
+        result->regionU = self->regionU;
+        result->regionV = self->regionV;
+        result->regionU2 = self->regionU2;
+        result->regionV2 = self->regionV2;
+        result->regionRotate = self->regionRotate;
+
+        const int edgeCount = self->edgesCount;
+        result->edgesCount = edgeCount;
+        MALLOC_COPY(result->edges, self->edges, int, edgeCount);
+        
+        result->width = self->width;
+        result->height = self->height;
+
+        return SUPER_CAST(spAttachment, result);
+}
+
 spMeshAttachment* spMeshAttachment_create (const char* name) {
 	spMeshAttachment* self = NEW(spMeshAttachment);
 	self->r = 1;
 	self->g = 1;
 	self->b = 1;
 	self->a = 1;
-	_spAttachment_init(SUPER(self), name, SP_ATTACHMENT_MESH, _spMeshAttachment_dispose);
+	_spAttachment_init(SUPER(self), name, SP_ATTACHMENT_MESH, _spMeshAttachment_dispose, _spMeshAttachment_clone);
 	return self;
 }
 

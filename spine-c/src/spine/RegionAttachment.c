@@ -39,6 +39,35 @@ void _spRegionAttachment_dispose (spAttachment* attachment) {
 	FREE(self);
 }
 
+spAttachment* _spRegionAttachment_clone (const spAttachment* attachment) {
+	const spRegionAttachment* const self = SUB_CAST(spRegionAttachment, attachment);
+	spRegionAttachment* const result = NEW(spRegionAttachment);
+	_spAttachment_init(SUPER(result), SUPER(self)->name, SP_ATTACHMENT_REGION, _spRegionAttachment_dispose, _spRegionAttachment_clone);
+        MALLOC_STR(result->path, self->path);
+        result->x = self->x;
+        result->y = self->y;
+        result->scaleX = self->scaleX;
+        result->scaleY = self->scaleY;
+        result->rotation = self->rotation;
+        result->width = self->width;
+        result->height = self->height;
+        result->r = self->r;
+        result->g = self->g;
+        result->b = self->b;
+        result->a = self->a;
+        result->rendererObject = self->rendererObject;
+        result->regionOffsetX = self->regionOffsetX;
+        result->regionOffsetY = self->regionOffsetY;
+        result->regionWidth = self->regionWidth;
+        result->regionHeight = self->regionHeight;
+        result->regionOriginalWidth = self->regionOriginalWidth;
+        result->regionOriginalHeight = self->regionOriginalHeight;
+        memcpy( result->offset, self->offset, sizeof( result->offset ) );
+        memcpy( result->uvs, self->uvs, sizeof( result->offset ) );
+
+        return SUPER_CAST(spAttachment, result);
+}
+
 spRegionAttachment* spRegionAttachment_create (const char* name) {
 	spRegionAttachment* self = NEW(spRegionAttachment);
 	self->scaleX = 1;
@@ -47,7 +76,7 @@ spRegionAttachment* spRegionAttachment_create (const char* name) {
 	self->g = 1;
 	self->b = 1;
 	self->a = 1;
-	_spAttachment_init(SUPER(self), name, SP_ATTACHMENT_REGION, _spRegionAttachment_dispose);
+	_spAttachment_init(SUPER(self), name, SP_ATTACHMENT_REGION, _spRegionAttachment_dispose, _spRegionAttachment_clone);
 	return self;
 }
 

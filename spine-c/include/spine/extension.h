@@ -57,6 +57,8 @@
 /* Allocates a new char[], assigns it to TO, and copies FROM to it. Can be used on const types. */
 #define MALLOC_STR(TO,FROM) strcpy(CONST_CAST(char*, TO) = (char*)MALLOC(char, strlen(FROM) + 1), FROM)
 
+#define MALLOC_COPY(TO,FROM,TYPE,COUNT) memcpy(TO = MALLOC(TYPE, COUNT), FROM, sizeof(TYPE) * (COUNT))
+
 #define PI 3.1415926535897932385f
 #define DEG_RAD (PI / 180)
 #define RAD_DEG (180 / PI)
@@ -164,7 +166,8 @@ void _spAttachmentLoader_setUnknownTypeError (spAttachmentLoader* self, spAttach
 /**/
 
 void _spAttachment_init (spAttachment* self, const char* name, spAttachmentType type, /**/
-void (*dispose) (spAttachment* self));
+void (*dispose) (spAttachment* self),
+spAttachment* (*clone) (const spAttachment* self));
 void _spAttachment_deinit (spAttachment* self);
 
 #ifdef SPINE_SHORT_NAMES

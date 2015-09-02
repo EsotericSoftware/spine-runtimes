@@ -35,13 +35,16 @@
 
 typedef struct _spAttachmentVtable {
 	void (*dispose) (spAttachment* self);
+	spAttachment* (*clone) (const spAttachment* self);
 } _spAttachmentVtable;
 
 void _spAttachment_init (spAttachment* self, const char* name, spAttachmentType type, /**/
-		void (*dispose) (spAttachment* self)) {
+		void (*dispose) (spAttachment* self),
+		spAttachment* (*clone) (const spAttachment* self) ) {
 
 	CONST_CAST(_spAttachmentVtable*, self->vtable) = NEW(_spAttachmentVtable);
 	VTABLE(spAttachment, self) ->dispose = dispose;
+	VTABLE(spAttachment, self) ->clone = clone;
 
 	MALLOC_STR(self->name, name);
 	CONST_CAST(spAttachmentType, self->type) = type;
@@ -54,4 +57,8 @@ void _spAttachment_deinit (spAttachment* self) {
 
 void spAttachment_dispose (spAttachment* self) {
 	VTABLE(spAttachment, self) ->dispose(self);
+}
+
+spAttachment* spAttachment_clone (const spAttachment* self) {
+	return VTABLE(spAttachment, self) ->clone(self);
 }

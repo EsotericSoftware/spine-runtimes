@@ -53,10 +53,15 @@ typedef struct spSkin {
 spSkin* spSkin_create (const char* name);
 void spSkin_dispose (spSkin* self);
 
+spSkin* spSkin_createComposed (const char* name, struct spSkin** parts, int count);
+    
 /* The Skin owns the attachment. */
 void spSkin_addAttachment (spSkin* self, int slotIndex, const char* name, spAttachment* attachment);
 /* Returns 0 if the attachment was not found. */
 spAttachment* spSkin_getAttachment (const spSkin* self, int slotIndex, const char* name);
+
+int spSkin_getAttachmentCount(const spSkin* self);
+void spSkin_getAttachmentAt(const spSkin* self, int i, int* slotIndex, const char** name, spAttachment** attachment);
 
 /* Returns 0 if the slot or attachment was not found. */
 const char* spSkin_getAttachmentName (const spSkin* self, int slotIndex, int attachmentIndex);
@@ -68,6 +73,7 @@ void spSkin_attachAll (const spSkin* self, struct spSkeleton* skeleton, const sp
 typedef spSkin Skin;
 #define Skin_create(...) spSkin_create(__VA_ARGS__)
 #define Skin_dispose(...) spSkin_dispose(__VA_ARGS__)
+#define Skin_createComposed(...) spSkin_createComposed(__VA_ARGS__)
 #define Skin_addAttachment(...) spSkin_addAttachment(__VA_ARGS__)
 #define Skin_getAttachment(...) spSkin_getAttachment(__VA_ARGS__)
 #define Skin_getAttachmentName(...) spSkin_getAttachmentName(__VA_ARGS__)
