@@ -187,16 +187,29 @@ function spine.Skeleton.new (skeletonData, group)
 						image.lastRotation = rotation
 					end
 
-					local r, g, b = skeletonR * slot.r, skeletonG * slot.g, skeletonB * slot.b
-					if image.lastR ~= r or image.lastG ~= g or image.lastB ~= b or not image.lastR then
-						image:setFillColor(r, g, b)
-						image.lastR, image.lastG, image.lastB = r, g, b
-					end
-					local a = skeletonA * slot.a
-					if a and (image.lastA ~= a or not image.lastA) then
-						image.lastA = a
-						image.alpha = image.lastA -- 0-1 range, unlike RGB.
-					end
+					local r, g, b, a = skeletonR * slot.r * attachment.r, skeletonG * slot.g * attachment.g, skeletonB * slot.b * attachment.b, skeletonA * slot.a * attachment.a
+                    if image.setFillColor ~= nil then
+                        if image.lastR ~= r or image.lastG ~= g or image.lastB ~= b or not image.lastR then
+                            image:setFillColor(r, g, b)
+                            image.lastR, image.lastG, image.lastB = r, g, b
+                        end
+                        if a and (image.lastA ~= a or not image.lastA) then
+                            image.lastA = a
+                            image.alpha = image.lastA -- 0-1 range, unlike RGB.
+                        end
+                    else
+                        for i = 1, image.numChildren, 1 do
+                            local element = image[i]
+                            if element.lastR ~= r or element.lastG ~= g or element.lastB ~= b or not element.lastR then
+                                element:setFillColor(r, g, b)
+                                element.lastR, element.lastG, element.lastB = r, g, b
+                            end
+                            if a and (element.lastA ~= a or not element.lastA) then
+                                element.lastA = a
+                                element.alpha = element.lastA -- 0-1 range, unlike RGB.
+                            end
+                        end
+                    end
 					
 					self.group:insert(image)
 				end
