@@ -32,6 +32,8 @@
 local AttachmentType = require "spine-lua.AttachmentType"
 local RegionAttachment = require "spine-lua.RegionAttachment"
 local BoundingBoxAttachment = require "spine-lua.BoundingBoxAttachment"
+local MeshAttachment = require "spine-lua.MeshAttachment"
+local SkinnedMeshAttachment = require "spine-lua.SkinnedMeshAttachment"
 
 local AttachmentLoader = {}
 function AttachmentLoader.new ()
@@ -45,8 +47,8 @@ function AttachmentLoader.new ()
 		return MeshAttachment.new(name)
 	end
 
-	function self:newSkinningMeshAttachment (skin, name, path)
-		return SkinningMeshAttachment.new(name)
+	function self:newSkinnedMeshAttachment (skin, name, path)
+		return SkinnedMeshAttachment.new(name)
 	end
 
 	function self:newBoundingBoxAttachment (skin, name)

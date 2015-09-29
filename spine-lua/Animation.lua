@@ -588,6 +588,7 @@ function Animation.FfdTimeline.new ()
 	self.frames = {} -- time, ...
 	self.frameVertices = {}
 	self.slotIndex = -1
+	self.attachment = {}
 
 	function self:getDuration ()
 		return self.frames[#self.frames]
@@ -604,7 +605,7 @@ function Animation.FfdTimeline.new ()
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
 		local slot = skeleton.slots[self.slotIndex]
-		if slot.attachment ~= attachment then return end
+		if slot.attachment ~= self.attachment then return end
 
 		local frames = self.frames
 		if time < frames[0] then return end -- Time is before first frame.
