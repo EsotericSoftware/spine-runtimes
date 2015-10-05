@@ -110,7 +110,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 	int timelinesCount = 0;
 
 	Json* bones = Json_getItem(root, "bones");
-	Json* slots = Json_getItem(root, "slots");
+	Json* slots_ = Json_getItem(root, "slots");
 	Json* ik = Json_getItem(root, "ik");
 	Json* ffd = Json_getItem(root, "ffd");
 	Json* drawOrder = Json_getItem(root, "drawOrder");
@@ -122,7 +122,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 
 	for (boneMap = bones ? bones->child : 0; boneMap; boneMap = boneMap->next)
 		timelinesCount += boneMap->size;
-	for (slotMap = slots ? slots->child : 0; slotMap; slotMap = slotMap->next)
+	for (slotMap = slots_ ? slots_->child : 0; slotMap; slotMap = slotMap->next)
 		timelinesCount += slotMap->size;
 	timelinesCount += ik ? ik->size : 0;
 	for (ffdMap = ffd ? ffd->child : 0; ffdMap; ffdMap = ffdMap->next)
@@ -138,7 +138,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 	skeletonData->animations[skeletonData->animationsCount++] = animation;
 
 	/* Slot timelines. */
-	for (slotMap = slots ? slots->child : 0; slotMap; slotMap = slotMap->next) {
+	for (slotMap = slots_ ? slots_->child : 0; slotMap; slotMap = slotMap->next) {
 		Json *timelineArray;
 
 		int slotIndex = spSkeletonData_findSlotIndex(skeletonData, slotMap->name);
@@ -420,7 +420,7 @@ spSkeletonData* spSkeletonJson_readSkeletonDataFile (spSkeletonJson* self, const
 spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const char* json) {
 	int i, ii;
 	spSkeletonData* skeletonData;
-	Json *root, *skeleton, *bones, *boneMap, *ik, *slots, *skins, *animations, *events;
+    Json *root, *skeleton, *bones, *boneMap, *ik, *slots_, *skins, *animations, *events;
 
 	FREE(self->error);
 	CONST_CAST(char*, self->error) = 0;
@@ -512,12 +512,12 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 	}
 
 	/* Slots. */
-	slots = Json_getItem(root, "slots");
-	if (slots) {
+    slots_ = Json_getItem(root, "slots");
+    if (slots_) {
 		Json *slotMap;
-		skeletonData->slotsCount = slots->size;
-		skeletonData->slots = MALLOC(spSlotData*, slots->size);
-		for (slotMap = slots->child, i = 0; slotMap; slotMap = slotMap->next, ++i) {
+        skeletonData->slotsCount = slots_->size;
+        skeletonData->slots_ = MALLOC(spSlotData*, slots_->size);
+        for (slotMap = slots_->child, i = 0; slotMap; slotMap = slotMap->next, ++i) {
 			spSlotData* slotData;
 			const char* color;
 			Json *item;
@@ -553,7 +553,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 					slotData->blendMode = SP_BLEND_MODE_SCREEN;
 			}
 
-			skeletonData->slots[i] = slotData;
+            skeletonData->slots_[i] = slotData;
 		}
 	}
 

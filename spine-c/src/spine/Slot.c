@@ -76,7 +76,7 @@ void spSlot_setToSetupPose (spSlot* self) {
 		/* Find slot index. */
 		int i;
 		for (i = 0; i < self->bone->skeleton->data->slotsCount; ++i) {
-			if (self->data == self->bone->skeleton->data->slots[i]) {
+			if (self->data == self->bone->skeleton->data->slots_[i]) {
 				attachment = spSkeleton_getAttachmentForSlotIndex(self->bone->skeleton, i, self->data->attachmentName);
 				break;
 			}

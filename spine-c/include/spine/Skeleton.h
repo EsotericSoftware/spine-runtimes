@@ -49,7 +49,7 @@ typedef struct spSkeleton {
 	spBone* const root;
 
 	int slotsCount;
-	spSlot** slots;
+	spSlot** slots_;
 	spSlot** drawOrder;
 
 	int ikConstraintsCount;
@@ -68,7 +68,7 @@ typedef struct spSkeleton {
 		bones(0),
 		root(0),
 		slotsCount(0),
-		slots(0),
+		slots_(0),
 		drawOrder(0),
 
 		ikConstraintsCount(0),
