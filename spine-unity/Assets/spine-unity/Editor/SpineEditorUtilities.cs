@@ -274,9 +274,13 @@ public class SpineEditorUtilities : AssetPostprocessor {
 					imagePaths.Add(str);
 					break;
 				case ".json":
-					TextAsset spineDataFile = (TextAsset)AssetDatabase.LoadAssetAtPath(str, typeof(TextAsset));
-					if (IsValidSpineData(spineDataFile)) {
+					if (IsValidSpineData((TextAsset)AssetDatabase.LoadAssetAtPath(str, typeof(TextAsset))))
 						skeletonPaths.Add(str);
+					break;
+				case ".bytes":
+					if (str.ToLower().EndsWith(".skel.bytes")) {
+						if (IsValidSpineData((TextAsset)AssetDatabase.LoadAssetAtPath(str, typeof(TextAsset))))
+							skeletonPaths.Add(str);
 					}
 					break;
 			}
@@ -426,7 +430,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 
 
 	static bool CheckForValidAtlas (string atlasPath) {
-		return false;		
+		return false;
 		//////////////DEPRECATED - always check for new atlas data now
 		/*
 		string dir = Path.GetDirectoryName(atlasPath);
@@ -565,13 +569,23 @@ public class SpineEditorUtilities : AssetPostprocessor {
 		return (AtlasAsset)obj;
 	}
 
-	public static List<string> GetRequiredAtlasRegions (string jsonPath) {
+	static void AddRequiredAtlasRegionsFromBinary (string skeletonDataPath, List<string> requiredPaths) {
+		SkeletonBinary binary = new SkeletonBinary(new AtlasRequirementLoader(requiredPaths));
+		TextAsset data = (TextAsset)AssetDatabase.LoadAssetAtPath(skeletonDataPath, typeof(TextAsset));
+		MemoryStream input = new MemoryStream(data.bytes);
+		binary.ReadSkeletonData(input);
+		binary = null;
+	}
+
+	public static List<string> GetRequiredAtlasRegions (string skeletonDataPath) {
 		List<string> requiredPaths = new List<string>();
 
-		// FIXME - This doesn't work for a binary skeleton file!
-		if (jsonPath.Contains(".skel")) return requiredPaths;
+		if (skeletonDataPath.Contains(".skel")) {
+			AddRequiredAtlasRegionsFromBinary(skeletonDataPath, requiredPaths);
+			return requiredPaths;
+		}
 
-		TextAsset spineJson = (TextAsset)AssetDatabase.LoadAssetAtPath(jsonPath, typeof(TextAsset));
+		TextAsset spineJson = (TextAsset)AssetDatabase.LoadAssetAtPath(skeletonDataPath, typeof(TextAsset));
 
 		StringReader reader = new StringReader(spineJson.text);
 		var root = Json.Deserialize(reader) as Dictionary<string, object>;
@@ -585,7 +599,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 						if ((string)data["type"] == "boundingbox") {
 							continue;
 						}
-							
+
 					}
 					if (data.ContainsKey("path"))
 						requiredPaths.Add((string)data["path"]);
@@ -713,6 +727,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 			Texture2D texture = (Texture2D)AssetDatabase.LoadAssetAtPath(texturePath, typeof(Texture2D));
 
 			TextureImporter texImporter = (TextureImporter)TextureImporter.GetAtPath(texturePath);
+			texImporter.textureType = TextureImporterType.Advanced;
 			texImporter.textureFormat = TextureImporterFormat.AutomaticTruecolor;
 			texImporter.mipmapEnabled = false;
 			texImporter.alphaIsTransparency = false;
@@ -809,7 +824,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 			Object.DestroyImmediate(root);
 		}
 
-		mesh = (Mesh)AssetDatabase.LoadAssetAtPath(bakedPrefabPath, typeof(Mesh));		
+		mesh = (Mesh)AssetDatabase.LoadAssetAtPath(bakedPrefabPath, typeof(Mesh));
 
 		Material mat = null;
 		mesh = atlasAsset.GenerateMesh(region.name, mesh, out mat);
@@ -825,7 +840,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 			AssetDatabase.SaveAssets();
 			AssetDatabase.Refresh();
 		}
-		
+
 
 		prefab.GetComponent<MeshRenderer>().sharedMaterial = mat;
 
@@ -935,7 +950,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 			skin = data.DefaultSkin;
 
 		if (skin == null)
-			skin = data.Skins[0];
+			skin = data.Skins.Items[0];
 
 		anim.Reset();
 
@@ -1021,7 +1036,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 			skin = data.DefaultSkin;
 
 		if (skin == null)
-			skin = data.Skins[0];
+			skin = data.Skins.Items[0];
 
 		anim.Reset();
 
@@ -1112,4 +1127,30 @@ public class SpineEditorUtilities : AssetPostprocessor {
 		}
 	}
 
+	public class AtlasRequirementLoader : AttachmentLoader {
+
+		List<string> requirementList;
+		public AtlasRequirementLoader (List<string> requirementList) {
+			this.requirementList = requirementList;
+		}
+
+		public RegionAttachment NewRegionAttachment (Skin skin, string name, string path) {
+			requirementList.Add(path);
+			return new RegionAttachment(name);
+		}
+
+		public MeshAttachment NewMeshAttachment (Skin skin, string name, string path) {
+			requirementList.Add(path);
+			return new MeshAttachment(name);
+		}
+
+		public SkinnedMeshAttachment NewSkinnedMeshAttachment (Skin skin, string name, string path) {
+			requirementList.Add(path);
+			return new SkinnedMeshAttachment(name);
+		}
+
+		public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, string name) {
+			return new BoundingBoxAttachment(name);
+		}
+	}
 }

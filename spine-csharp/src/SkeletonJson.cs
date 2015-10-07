@@ -256,7 +256,7 @@ namespace Spine {
 					MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, name, path);
 					if (mesh == null) return null;
 
-					mesh.Path = path; 
+					mesh.Path = path;
 					mesh.vertices = GetFloatArray(map, "vertices", Scale);
 					mesh.triangles = GetIntArray(map, "triangles");
 					mesh.regionUVs = GetFloatArray(map, "uvs", 1);
@@ -380,7 +380,7 @@ namespace Spine {
 		}
 
 		private void ReadAnimation (String name, Dictionary<String, Object> map, SkeletonData skeletonData) {
-			var timelines = new List<Timeline>();
+			var timelines = new ExposedList<Timeline>();
 			float duration = 0;
 			float scale = Scale;
 

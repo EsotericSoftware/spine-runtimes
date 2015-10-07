@@ -63,6 +63,12 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 	protected event UpdateBonesDelegate _UpdateWorld;
 	protected event UpdateBonesDelegate _UpdateComplete;
 
+	public Skeleton Skeleton {
+		get {
+			return this.skeleton;
+		}
+	}
+
 	[SerializeField]
 	private String
 		_animationName;
@@ -108,17 +114,17 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 		state.Update(deltaTime);
 		state.Apply(skeleton);
 
-		if (_UpdateLocal != null) 
+		if (_UpdateLocal != null)
 			_UpdateLocal(this);
 
 		skeleton.UpdateWorldTransform();
 
-		if (_UpdateWorld != null) { 
+		if (_UpdateWorld != null) {
 			_UpdateWorld(this);
 			skeleton.UpdateWorldTransform();
 		}
 
-		if (_UpdateComplete != null) { 
+		if (_UpdateComplete != null) {
 			_UpdateComplete(this);
 		}
 	}

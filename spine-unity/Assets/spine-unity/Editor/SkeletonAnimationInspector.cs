@@ -77,7 +77,7 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 			animations[0] = "<None>";
 			int animationIndex = 0;
 			for (int i = 0; i < animations.Length - 1; i++) {
-				String name = component.skeleton.Data.Animations[i].Name;
+				String name = component.skeleton.Data.Animations.Items[i].Name;
 				animations[i + 1] = name;
 				if (name == animationName.stringValue)
 					animationIndex = i + 1;

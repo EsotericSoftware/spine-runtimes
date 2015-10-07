@@ -62,11 +62,6 @@ SkeletonRenderer* SkeletonRenderer::createWithFile (const char* skeletonDataFile
 }
 
 void SkeletonRenderer::initialize () {
-	atlas = 0;
-	debugSlots = false;
-	debugBones = false;
-	timeScale = 1;
-
 	worldVertices = MALLOC(float, 1000); // Max number of vertices per mesh.
 
 	batch = PolygonBatch::createWithCapacity(2000); // Max number of vertices and triangles per batch.
@@ -86,17 +81,20 @@ void SkeletonRenderer::setSkeletonData (spSkeletonData *skeletonData, bool ownsS
 	this->ownsSkeletonData = ownsSkeletonData;
 }
 
-SkeletonRenderer::SkeletonRenderer () {
+SkeletonRenderer::SkeletonRenderer ()
+	: atlas(0), debugSlots(false), debugBones(false), timeScale(1) {
 	initialize();
 }
 
-SkeletonRenderer::SkeletonRenderer (spSkeletonData *skeletonData, bool ownsSkeletonData) {
+SkeletonRenderer::SkeletonRenderer (spSkeletonData *skeletonData, bool ownsSkeletonData)
+	: atlas(0), debugSlots(false), debugBones(false), timeScale(1) {
 	initialize();
 
 	setSkeletonData(skeletonData, ownsSkeletonData);
 }
 
-SkeletonRenderer::SkeletonRenderer (const char* skeletonDataFile, spAtlas* atlas, float scale) {
+SkeletonRenderer::SkeletonRenderer (const char* skeletonDataFile, spAtlas* atlas, float scale)
+	: atlas(0), debugSlots(false), debugBones(false), timeScale(1) {
 	initialize();
 
 	spSkeletonJson* json = spSkeletonJson_create(atlas);
@@ -108,7 +106,8 @@ SkeletonRenderer::SkeletonRenderer (const char* skeletonDataFile, spAtlas* atlas
 	setSkeletonData(skeletonData, true);
 }
 
-SkeletonRenderer::SkeletonRenderer (const char* skeletonDataFile, const char* atlasFile, float scale) {
+SkeletonRenderer::SkeletonRenderer (const char* skeletonDataFile, const char* atlasFile, float scale)
+	: atlas(0), debugSlots(false), debugBones(false), timeScale(1) {
 	initialize();
 
 	atlas = spAtlas_createFromFile(atlasFile, 0);

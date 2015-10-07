@@ -84,7 +84,7 @@ public class AtlasAsset : ScriptableObject {
 		return sprite;
 	}
 
-	public Mesh GenerateMesh(string name, Mesh mesh, out Material material, float scale = 0.01f){
+	public Mesh GenerateMesh (string name, Mesh mesh, out Material material, float scale = 0.01f) {
 		AtlasRegion region = atlas.FindRegion(name);
 		material = null;
 		if (region != null) {
@@ -92,10 +92,10 @@ public class AtlasAsset : ScriptableObject {
 				mesh = new Mesh();
 				mesh.name = name;
 			}
-				
+
 			Vector3[] verts = new Vector3[4];
 			Vector2[] uvs = new Vector2[4];
-			Color[] colors = new Color[4]{Color.white, Color.white, Color.white, Color.white};
+			Color[] colors = new Color[4] { Color.white, Color.white, Color.white, Color.white };
 			int[] triangles = new int[6] { 0, 1, 2, 2, 3, 0 };
 
 			float left, right, top, bottom;
@@ -118,7 +118,7 @@ public class AtlasAsset : ScriptableObject {
 				uvs[0] = new Vector2(u, v2);
 				uvs[1] = new Vector2(u, v);
 				uvs[2] = new Vector2(u2, v);
-				uvs[3] = new Vector2(u2, v2);	
+				uvs[3] = new Vector2(u2, v2);
 			} else {
 				uvs[0] = new Vector2(u2, v2);
 				uvs[1] = new Vector2(u, v2);
@@ -145,11 +145,11 @@ public class AtlasAsset : ScriptableObject {
 
 public class MaterialsTextureLoader : TextureLoader {
 	AtlasAsset atlasAsset;
-	
+
 	public MaterialsTextureLoader (AtlasAsset atlasAsset) {
 		this.atlasAsset = atlasAsset;
 	}
-	
+
 	public void Load (AtlasPage page, String path) {
 		String name = Path.GetFileNameWithoutExtension(path);
 		Material material = null;

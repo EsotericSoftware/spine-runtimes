@@ -61,7 +61,7 @@ public class SkeletonUtilityBoneInspector : Editor {
 
 		currentSkinName = skin.Name;
 		for(int i = 0; i < slotCount; i++){
-			Slot slot = skeletonUtility.skeletonRenderer.skeleton.Slots[i];
+			Slot slot = skeletonUtility.skeletonRenderer.skeleton.Slots.Items[i];
 			if (slot.Bone == utilityBone.bone) {
 				List<Attachment> attachments = new List<Attachment>();
 				
@@ -203,7 +203,19 @@ public class SkeletonUtilityBoneInspector : Editor {
 				GUILayout.BeginHorizontal();
 				GUILayout.Space(30);
 				if (GUILayout.Button(box.Name, GUILayout.Width(200))) {
-					utilityBone.AddBoundingBox(currentSkinName, entry.Key.Data.Name, box.Name);
+					var child = utilityBone.transform.FindChild("[BoundingBox]" + box.Name);
+					if (child != null) {
+						var originalCollider = child.GetComponent<PolygonCollider2D>();
+						var updatedCollider = SkeletonUtility.AddBoundingBoxAsComponent(box, child.gameObject, originalCollider.isTrigger);
+						originalCollider.points = updatedCollider.points;
+						if (EditorApplication.isPlaying)
+							Destroy(updatedCollider);
+						else
+							DestroyImmediate(updatedCollider);
+					} else {
+						utilityBone.AddBoundingBox(currentSkinName, entry.Key.Data.Name, box.Name);
+					}
+					
 				}
 				GUILayout.EndHorizontal();
 			}
@@ -221,14 +233,14 @@ public class SkeletonUtilityBoneInspector : Editor {
 		}
 	}
 
-	void BoneSelectorContextMenu (string current, List<Bone> bones, string topValue, GenericMenu.MenuFunction2 callback) {
+	void BoneSelectorContextMenu (string current, ExposedList<Bone> bones, string topValue, GenericMenu.MenuFunction2 callback) {
 		GenericMenu menu = new GenericMenu();
 
 		if (topValue != "")
 			menu.AddItem(new GUIContent(topValue), current == topValue, callback, null);
 
 		for (int i = 0; i < bones.Count; i++) {
-			menu.AddItem(new GUIContent(bones[i].Data.Name), bones[i].Data.Name == current, callback, bones[i]);
+			menu.AddItem(new GUIContent(bones.Items[i].Data.Name), bones.Items[i].Data.Name == current, callback, bones.Items[i]);
 		}
 
 		menu.ShowAsContext();
