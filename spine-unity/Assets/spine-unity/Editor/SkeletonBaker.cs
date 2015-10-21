@@ -1,32 +1,4 @@
-﻿/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.1
- * 
- * Copyright (c) 2013, Esoteric Software
- * All rights reserved.
- * 
- * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to install, execute and perform the Spine Runtimes
- * Software (the "Software") solely for internal use. Without the written
- * permission of Esoteric Software (typically granted by licensing Spine), you
- * may not (a) modify, translate, adapt or otherwise create derivative works,
- * improvements of the Software or develop new applications using the Software
- * or (b) remove, delete, alter or obscure any trademarks or any copyright,
- * trademark, patent or other intellectual property or proprietary rights
- * notices on or in the Software, including any copy thereof. Redistributions
- * in binary or source form must include this license and terms.
- * 
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
+
 
 /*****************************************************************************
  * SkeletonBaker added by Mitch Thompson
@@ -68,6 +40,7 @@ using Spine;
 /// FFD (Unity does not provide access to BlendShapes with code)
 /// Color Keys (Maybe one day when Unity supports full FBX standard and provides access with code)
 /// InheritScale (Never.  Unity and Spine do scaling very differently)
+/// Draw Order Keyframes
 
 /// </summary>
 public static class SkeletonBaker {
@@ -76,7 +49,7 @@ public static class SkeletonBaker {
 	/// </summary>
 	const float bakeIncrement = 1 / 60f;
 
-	public static void BakeToPrefab (SkeletonDataAsset skeletonDataAsset, List<Skin> skins, string outputPath = "", bool bakeAnimations = true, bool bakeIK = true, SendMessageOptions eventOptions = SendMessageOptions.DontRequireReceiver) {
+	public static void BakeToPrefab (SkeletonDataAsset skeletonDataAsset, ExposedList<Skin> skins, string outputPath = "", bool bakeAnimations = true, bool bakeIK = true, SendMessageOptions eventOptions = SendMessageOptions.DontRequireReceiver) {
 		if (skeletonDataAsset == null || skeletonDataAsset.GetSkeletonData(true) == null) {
 			Debug.LogError("Could not export Spine Skeleton because SkeletonDataAsset is null or invalid!");
 			return;
@@ -135,7 +108,7 @@ public static class SkeletonBaker {
 			for (int s = 0; s < skeletonData.Slots.Count; s++) {
 				List<string> attachmentNames = new List<string>();
 				for (int i = 0; i < skinCount; i++) {
-					var skin = skins[i];
+					var skin = skins.Items[i];
 					List<string> temp = new List<string>();
 					skin.FindNamesForSlot(s, temp);
 					foreach (string str in temp) {
@@ -159,7 +132,7 @@ public static class SkeletonBaker {
 					unusedClipNames.Remove(clip.name);
 				} else {
 					AssetDatabase.AddObjectToAsset(clip, controller);
-#if UNITY_5_0
+#if UNITY_5
 					controller.AddMotion(clip);
 #else
 					UnityEditorInternal.AnimatorController.AddAnimationClipToController(controller, clip);
@@ -216,7 +189,7 @@ public static class SkeletonBaker {
 
 			//create bones
 			for (int i = 0; i < skeletonData.Bones.Count; i++) {
-				var boneData = skeletonData.Bones[i];
+				var boneData = skeletonData.Bones.Items[i];
 				Transform boneTransform = new GameObject(boneData.Name).transform;
 				boneTransform.parent = prefabRoot.transform;
 				boneTable.Add(boneTransform.name, boneTransform);
@@ -225,7 +198,7 @@ public static class SkeletonBaker {
 
 			for (int i = 0; i < skeletonData.Bones.Count; i++) {
 
-				var boneData = skeletonData.Bones[i];
+				var boneData = skeletonData.Bones.Items[i];
 				Transform boneTransform = boneTable[boneData.Name];
 				Transform parentTransform = null;
 				if (i > 0)
@@ -246,7 +219,7 @@ public static class SkeletonBaker {
 
 			//create slots and attachments
 			for (int i = 0; i < skeletonData.Slots.Count; i++) {
-				var slotData = skeletonData.Slots[i];
+				var slotData = skeletonData.Slots.Items[i];
 				Transform slotTransform = new GameObject(slotData.Name).transform;
 				slotTransform.parent = prefabRoot.transform;
 				slotTable.Add(slotData.Name, slotTransform);
@@ -387,6 +360,7 @@ public static class SkeletonBaker {
 
 		if (skeletonDataAsset.controller != null) {
 			controller = (UnityEditor.Animations.AnimatorController)skeletonDataAsset.controller;
+			controllerPath = AssetDatabase.GetAssetPath(controller);
 		} else {
 			if (File.Exists(controllerPath)) {
 				if (EditorUtility.DisplayDialog("Controller Overwrite Warning", "Unknown Controller already exists at: " + controllerPath, "Update", "Overwrite")) {
@@ -404,6 +378,7 @@ public static class SkeletonBaker {
 
 		if (skeletonDataAsset.controller != null) {
 			controller = (UnityEditorInternal.AnimatorController)skeletonDataAsset.controller;
+			controllerPath = AssetDatabase.GetAssetPath(controller);
 		} else {
 			if (File.Exists(controllerPath)) {
 				if (EditorUtility.DisplayDialog("Controller Overwrite Warning", "Unknown Controller already exists at: " + controllerPath, "Update", "Overwrite")) {
@@ -640,7 +615,7 @@ public static class SkeletonBaker {
 		skeleton.UpdateWorldTransform();
 
 		float[] floatVerts = new float[attachment.UVs.Length];
-		attachment.ComputeWorldVertices(skeleton.Slots[slotIndex], floatVerts);
+		attachment.ComputeWorldVertices(skeleton.Slots.Items[slotIndex], floatVerts);
 
 		Vector2[] uvs = ExtractUV(attachment.UVs);
 		Vector3[] verts = ExtractVerts(floatVerts);
@@ -884,6 +859,7 @@ public static class SkeletonBaker {
 			var ev = events[i];
 
 			AnimationEvent ae = new AnimationEvent();
+			//TODO:  Deal with Mecanim's zero-time missed event
 			ae.time = frames[i];
 			ae.functionName = ev.Data.Name;
 			ae.messageOptions = eventOptions;
@@ -911,8 +887,8 @@ public static class SkeletonBaker {
 	static void ParseAttachmentTimeline (Skeleton skeleton, AttachmentTimeline timeline, Dictionary<int, List<string>> slotLookup, AnimationClip clip) {
 		var attachmentNames = slotLookup[timeline.SlotIndex];
 
-		string bonePath = GetPath(skeleton.Slots[timeline.SlotIndex].Bone.Data);
-		string slotPath = bonePath + "/" + skeleton.Slots[timeline.SlotIndex].Data.Name;
+		string bonePath = GetPath(skeleton.Slots.Items[timeline.SlotIndex].Bone.Data);
+		string slotPath = bonePath + "/" + skeleton.Slots.Items[timeline.SlotIndex].Data.Name;
 
 		Dictionary<string, AnimationCurve> curveTable = new Dictionary<string, AnimationCurve>();
 
@@ -923,7 +899,7 @@ public static class SkeletonBaker {
 		float[] frames = timeline.Frames;
 
 		if (frames[0] != 0) {
-			string startingName = skeleton.Slots[timeline.SlotIndex].Data.AttachmentName;
+			string startingName = skeleton.Slots.Items[timeline.SlotIndex].Data.AttachmentName;
 			foreach (var pair in curveTable) {
 				if (startingName == "" || startingName == null) {
 					pair.Value.AddKey(new Keyframe(0, 0, float.PositiveInfinity, float.PositiveInfinity));
@@ -1061,8 +1037,8 @@ public static class SkeletonBaker {
 	}
 
 	static void ParseTranslateTimeline (Skeleton skeleton, TranslateTimeline timeline, AnimationClip clip) {
-		var boneData = skeleton.Data.Bones[timeline.BoneIndex];
-		var bone = skeleton.Bones[timeline.BoneIndex];
+		var boneData = skeleton.Data.Bones.Items[timeline.BoneIndex];
+		var bone = skeleton.Bones.Items[timeline.BoneIndex];
 
 		AnimationCurve xCurve = new AnimationCurve();
 		AnimationCurve yCurve = new AnimationCurve();
@@ -1207,8 +1183,8 @@ public static class SkeletonBaker {
 	}
 
 	static void ParseScaleTimeline (Skeleton skeleton, ScaleTimeline timeline, AnimationClip clip) {
-		var boneData = skeleton.Data.Bones[timeline.BoneIndex];
-		var bone = skeleton.Bones[timeline.BoneIndex];
+		var boneData = skeleton.Data.Bones.Items[timeline.BoneIndex];
+		var bone = skeleton.Bones.Items[timeline.BoneIndex];
 
 		AnimationCurve xCurve = new AnimationCurve();
 		AnimationCurve yCurve = new AnimationCurve();
@@ -1340,8 +1316,8 @@ public static class SkeletonBaker {
 	}
 
 	static void ParseRotateTimeline (Skeleton skeleton, RotateTimeline timeline, AnimationClip clip) {
-		var boneData = skeleton.Data.Bones[timeline.BoneIndex];
-		var bone = skeleton.Bones[timeline.BoneIndex];
+		var boneData = skeleton.Data.Bones.Items[timeline.BoneIndex];
+		var bone = skeleton.Bones.Items[timeline.BoneIndex];
 
 		AnimationCurve curve = new AnimationCurve();
 

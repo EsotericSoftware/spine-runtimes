@@ -1,25 +1,26 @@
 /******************************************************************************
  * Spine Runtimes Software License
- * Version 2.1
+ * Version 2.3
  * 
- * Copyright (c) 2013, Esoteric Software
+ * Copyright (c) 2013-2015, Esoteric Software
  * All rights reserved.
  * 
  * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to install, execute and perform the Spine Runtimes
- * Software (the "Software") solely for internal use. Without the written
- * permission of Esoteric Software (typically granted by licensing Spine), you
- * may not (a) modify, translate, adapt or otherwise create derivative works,
- * improvements of the Software or develop new applications using the Software
- * or (b) remove, delete, alter or obscure any trademarks or any copyright,
- * trademark, patent or other intellectual property or proprietary rights
- * notices on or in the Software, including any copy thereof. Redistributions
- * in binary or source form must include this license and terms.
+ * non-transferable license to use, install, execute and perform the Spine
+ * Runtimes Software (the "Software") and derivative works solely for personal
+ * or internal use. Without the written permission of Esoteric Software (see
+ * Section 2 of the Spine Software License Agreement), you may not (a) modify,
+ * translate, adapt or otherwise create derivative works, improvements of the
+ * Software or develop new applications using the Software or (b) remove,
+ * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
  * 
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
  * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
@@ -33,15 +34,15 @@ using System.Collections.Generic;
 
 namespace Spine {
 	public class Animation {
-		internal List<Timeline> timelines;
+		internal ExposedList<Timeline> timelines;
 		internal float duration;
 		internal String name;
 
 		public String Name { get { return name; } }
-		public List<Timeline> Timelines { get { return timelines; } set { timelines = value; } }
+		public ExposedList<Timeline> Timelines { get { return timelines; } set { timelines = value; } }
 		public float Duration { get { return duration; } set { duration = value; } }
 
-		public Animation (String name, List<Timeline> timelines, float duration) {
+		public Animation (String name, ExposedList<Timeline> timelines, float duration) {
 			if (name == null) throw new ArgumentNullException("name cannot be null.");
 			if (timelines == null) throw new ArgumentNullException("timelines cannot be null.");
 			this.name = name;
@@ -52,7 +53,7 @@ namespace Spine {
 		/// <summary>Poses the skeleton at the specified time for this animation.</summary>
 		/// <param name="lastTime">The last time the animation was applied.</param>
 		/// <param name="events">Any triggered events are added.</param>
-		public void Apply (Skeleton skeleton, float lastTime, float time, bool loop, List<Event> events) {
+		public void Apply (Skeleton skeleton, float lastTime, float time, bool loop, ExposedList<Event> events) {
 			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
 
 			if (loop && duration != 0) {
@@ -60,16 +61,16 @@ namespace Spine {
 				lastTime %= duration;
 			}
 
-			List<Timeline> timelines = this.timelines;
+			ExposedList<Timeline> timelines = this.timelines;
 			for (int i = 0, n = timelines.Count; i < n; i++)
-				timelines[i].Apply(skeleton, lastTime, time, events, 1);
+				timelines.Items[i].Apply(skeleton, lastTime, time, events, 1);
 		}
 
 		/// <summary>Poses the skeleton at the specified time for this animation mixed with the current pose.</summary>
 		/// <param name="lastTime">The last time the animation was applied.</param>
 		/// <param name="events">Any triggered events are added.</param>
 		/// <param name="alpha">The amount of this animation that affects the current pose.</param>
-		public void Mix (Skeleton skeleton, float lastTime, float time, bool loop, List<Event> events, float alpha) {
+		public void Mix (Skeleton skeleton, float lastTime, float time, bool loop, ExposedList<Event> events, float alpha) {
 			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
 
 			if (loop && duration != 0) {
@@ -77,9 +78,9 @@ namespace Spine {
 				lastTime %= duration;
 			}
 
-			List<Timeline> timelines = this.timelines;
+			ExposedList<Timeline> timelines = this.timelines;
 			for (int i = 0, n = timelines.Count; i < n; i++)
-				timelines[i].Apply(skeleton, lastTime, time, events, alpha);
+				timelines.Items[i].Apply(skeleton, lastTime, time, events, alpha);
 		}
 
 		/// <param name="target">After the first and before the last entry.</param>
@@ -124,7 +125,7 @@ namespace Spine {
 	public interface Timeline {
 		/// <summary>Sets the value(s) for the specified time.</summary>
 		/// <param name="events">May be null to not collect fired events.</param>
-		void Apply (Skeleton skeleton, float lastTime, float time, List<Event> events, float alpha);
+		void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha);
 	}
 
 	/// <summary>Base class for frames that use an interpolation bezier curve.</summary>
@@ -139,7 +140,7 @@ namespace Spine {
 			curves = new float[(frameCount - 1) * BEZIER_SIZE];
 		}
 
-		abstract public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha);
+		abstract public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha);
 
 		public void SetLinear (int frameIndex) {
 			curves[frameIndex * BEZIER_SIZE] = LINEAR;
@@ -229,11 +230,11 @@ namespace Spine {
 			frames[frameIndex + 1] = angle;
 		}
 
-		override public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			Bone bone = skeleton.bones[boneIndex];
+			Bone bone = skeleton.bones.Items[boneIndex];
 
 			float amount;
 
@@ -292,11 +293,11 @@ namespace Spine {
 			frames[frameIndex + 2] = y;
 		}
 
-		override public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			Bone bone = skeleton.bones[boneIndex];
+			Bone bone = skeleton.bones.Items[boneIndex];
 
 			if (time >= frames[frames.Length - 3]) { // Time is after last frame.
 				bone.x += (bone.data.x + frames[frames.Length - 2] - bone.x) * alpha;
@@ -322,11 +323,11 @@ namespace Spine {
 			: base(frameCount) {
 		}
 
-		override public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			Bone bone = skeleton.bones[boneIndex];
+			Bone bone = skeleton.bones.Items[boneIndex];
 			if (time >= frames[frames.Length - 3]) { // Time is after last frame.
 				bone.scaleX += (bone.data.scaleX * frames[frames.Length - 2] - bone.scaleX) * alpha;
 				bone.scaleY += (bone.data.scaleY * frames[frames.Length - 1] - bone.scaleY) * alpha;
@@ -365,7 +366,7 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time and value of the specified keyframe.</summary>
-		public void setFrame (int frameIndex, float time, float r, float g, float b, float a) {
+		public void SetFrame (int frameIndex, float time, float r, float g, float b, float a) {
 			frameIndex *= 5;
 			frames[frameIndex] = time;
 			frames[frameIndex + 1] = r;
@@ -374,7 +375,7 @@ namespace Spine {
 			frames[frameIndex + 4] = a;
 		}
 
-		override public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -402,7 +403,7 @@ namespace Spine {
 				b = prevFrameB + (frames[frameIndex + FRAME_B] - prevFrameB) * percent;
 				a = prevFrameA + (frames[frameIndex + FRAME_A] - prevFrameA) * percent;
 			}
-			Slot slot = skeleton.slots[slotIndex];
+			Slot slot = skeleton.slots.Items[slotIndex];
 			if (alpha < 1) {
 				slot.r += (r - slot.r) * alpha;
 				slot.g += (g - slot.g) * alpha;
@@ -433,12 +434,12 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time and value of the specified keyframe.</summary>
-		public void setFrame (int frameIndex, float time, String attachmentName) {
+		public void SetFrame (int frameIndex, float time, String attachmentName) {
 			frames[frameIndex] = time;
 			attachmentNames[frameIndex] = attachmentName;
 		}
 
-		public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
+		public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (lastTime > time) Apply(skeleton, lastTime, int.MaxValue, null, 0);
@@ -450,7 +451,7 @@ namespace Spine {
 			if (frames[frameIndex] < lastTime) return;
 
 			String attachmentName = attachmentNames[frameIndex];
-			skeleton.slots[slotIndex].Attachment =
+			skeleton.slots.Items[slotIndex].Attachment =
 				 attachmentName == null ? null : skeleton.GetAttachment(slotIndex, attachmentName);
 		}
 	}
@@ -469,13 +470,13 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time and value of the specified keyframe.</summary>
-		public void setFrame (int frameIndex, float time, Event e) {
+		public void SetFrame (int frameIndex, float time, Event e) {
 			frames[frameIndex] = time;
 			events[frameIndex] = e;
 		}
 
 		/// <summary>Fires events for frames > lastTime and <= time.</summary>
-		public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
+		public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha) {
 			if (firedEvents == null) return;
 			float[] frames = this.frames;
 			int frameCount = frames.Length;
@@ -518,12 +519,12 @@ namespace Spine {
 
 		/// <summary>Sets the time and value of the specified keyframe.</summary>
 		/// <param name="drawOrder">May be null to use bind pose draw order.</param>
-		public void setFrame (int frameIndex, float time, int[] drawOrder) {
+		public void SetFrame (int frameIndex, float time, int[] drawOrder) {
 			frames[frameIndex] = time;
 			drawOrders[frameIndex] = drawOrder;
 		}
 
-		public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
+		public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -533,15 +534,16 @@ namespace Spine {
 			else
 				frameIndex = Animation.binarySearch(frames, time) - 1;
 
-			List<Slot> drawOrder = skeleton.drawOrder;
-			List<Slot> slots = skeleton.slots;
+			ExposedList<Slot> drawOrder = skeleton.drawOrder;
+			ExposedList<Slot> slots = skeleton.slots;
 			int[] drawOrderToSetupIndex = drawOrders[frameIndex];
 			if (drawOrderToSetupIndex == null) {
 				drawOrder.Clear();
-				drawOrder.AddRange(slots);
+				for (int i = 0, n = slots.Count; i < n; i++)
+					drawOrder.Add(slots.Items[i]);
 			} else {
 				for (int i = 0, n = drawOrderToSetupIndex.Length; i < n; i++)
-					drawOrder[i] = slots[drawOrderToSetupIndex[i]];
+					drawOrder.Items[i] = slots.Items[drawOrderToSetupIndex[i]];
 			}
 		}
 	}
@@ -564,13 +566,13 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time and value of the specified keyframe.</summary>
-		public void setFrame (int frameIndex, float time, float[] vertices) {
+		public void SetFrame (int frameIndex, float time, float[] vertices) {
 			frames[frameIndex] = time;
 			frameVertices[frameIndex] = vertices;
 		}
 
-		override public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
-			Slot slot = skeleton.slots[slotIndex];
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha) {
+			Slot slot = skeleton.slots.Items[slotIndex];
 			if (slot.attachment != attachment) return;
 
 			float[] frames = this.frames;
@@ -641,18 +643,18 @@ namespace Spine {
 		}
 
 		/** Sets the time, mix and bend direction of the specified keyframe. */
-		public void setFrame (int frameIndex, float time, float mix, int bendDirection) {
+		public void SetFrame (int frameIndex, float time, float mix, int bendDirection) {
 			frameIndex *= 3;
 			frames[frameIndex] = time;
 			frames[frameIndex + 1] = mix;
 			frames[frameIndex + 2] = bendDirection;
 		}
 
-		override public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			IkConstraint ikConstraint = skeleton.ikConstraints[ikConstraintIndex];
+			IkConstraint ikConstraint = skeleton.ikConstraints.Items[ikConstraintIndex];
 
 			if (time >= frames[frames.Length - 3]) { // Time is after last frame.
 				ikConstraint.mix += (frames[frames.Length - 2] - ikConstraint.mix) * alpha;
@@ -692,7 +694,7 @@ namespace Spine {
 			frames[frameIndex + 1] = flip ? 1 : 0;
 		}
 
-		public void Apply (Skeleton skeleton, float lastTime, float time, List<Event> firedEvents, float alpha) {
+		public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) {
 				if (lastTime > time) Apply(skeleton, lastTime, int.MaxValue, null, 0);
@@ -703,7 +705,7 @@ namespace Spine {
 			int frameIndex = (time >= frames[frames.Length - 2] ? frames.Length : Animation.binarySearch(frames, time, 2)) - 2;
 			if (frames[frameIndex] < lastTime) return;
 
-			SetFlip(skeleton.bones[boneIndex], frames[frameIndex + 1] != 0);
+			SetFlip(skeleton.bones.Items[boneIndex], frames[frameIndex + 1] != 0);
 		}
 
 		virtual protected void SetFlip (Bone bone, bool flip) {

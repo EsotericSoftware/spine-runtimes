@@ -103,6 +103,7 @@
     <Compile Include="src\Attachments\AttachmentType.cs" />
     <Compile Include="src\Attachments\BoundingBoxAttachment.cs" />
     <Compile Include="src\Attachments\RegionAttachment.cs" />
+    <Compile Include="src\BlendMode.cs" />
     <Compile Include="src\Bone.cs" />
     <Compile Include="src\BoneData.cs" />
     <Compile Include="src\IkConstraint.cs" />
@@ -111,6 +112,7 @@
     <Compile Include="src\EventData.cs" />
     <Compile Include="src\Json.cs" />
     <Compile Include="src\Skeleton.cs" />
+    <Compile Include="src\SkeletonBinary.cs" />
     <Compile Include="src\SkeletonBounds.cs" />
     <Compile Include="src\SkeletonData.cs" />
     <Compile Include="src\SkeletonJson.cs" />

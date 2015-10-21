@@ -1,25 +1,26 @@
 /******************************************************************************
  * Spine Runtimes Software License
- * Version 2.1
+ * Version 2.3
  * 
- * Copyright (c) 2013, Esoteric Software
+ * Copyright (c) 2013-2015, Esoteric Software
  * All rights reserved.
  * 
  * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to install, execute and perform the Spine Runtimes
- * Software (the "Software") solely for internal use. Without the written
- * permission of Esoteric Software (typically granted by licensing Spine), you
- * may not (a) modify, translate, adapt or otherwise create derivative works,
- * improvements of the Software or develop new applications using the Software
- * or (b) remove, delete, alter or obscure any trademarks or any copyright,
- * trademark, patent or other intellectual property or proprietary rights
- * notices on or in the Software, including any copy thereof. Redistributions
- * in binary or source form must include this license and terms.
+ * non-transferable license to use, install, execute and perform the Spine
+ * Runtimes Software (the "Software") and derivative works solely for personal
+ * or internal use. Without the written permission of Esoteric Software (see
+ * Section 2 of the Spine Software License Agreement), you may not (a) modify,
+ * translate, adapt or otherwise create derivative works, improvements of the
+ * Software or develop new applications using the Software or (b) remove,
+ * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
  * 
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
  * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
@@ -62,7 +63,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 - (void) initialize:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
 	_ownsSkeletonData = ownsSkeletonData;
 
-	worldVertices = MALLOC(float, 1000); // Max number of vertices per mesh.
+	_worldVertices = MALLOC(float, 1000); // Max number of vertices per mesh.
 
 	_skeleton = spSkeleton_create(skeletonData);
 	_rootBone = _skeleton->bones[0];
@@ -74,6 +75,12 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	[self addChild:_drawNode];
 	
 	[self setShader:[CCShader positionTextureColorShader]];
+
+	_premultipliedAlpha = true;
+	screenMode = [CCBlendMode blendModeWithOptions:@{
+		CCBlendFuncSrcColor: @(GL_ONE),
+		CCBlendFuncDstColor: @(GL_ONE_MINUS_SRC_COLOR)}
+	];
 }
 
 - (id) initWithData:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
@@ -127,7 +134,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	if (_ownsSkeletonData) spSkeletonData_dispose(_skeleton->data);
 	if (_atlas) spAtlas_dispose(_atlas);
 	spSkeleton_dispose(_skeleton);
-	FREE(worldVertices);
+	FREE(_worldVertices);
 	[super dealloc];
 }
 
@@ -138,7 +145,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	_skeleton->b = nodeColor.blue;
 	_skeleton->a = self.displayedOpacity;
 
-	int additive = -1;
+	int blendMode = -1;
 	const float* uvs = 0;
 	int verticesCount = 0;
 	const int* triangles = 0;
@@ -151,7 +158,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 		switch (slot->attachment->type) {
 		case SP_ATTACHMENT_REGION: {
 			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-			spRegionAttachment_computeWorldVertices(attachment, slot->bone, worldVertices);
+			spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices);
 			texture = [self getTextureForRegion:attachment];
 			uvs = attachment->uvs;
 			verticesCount = 8;
@@ -165,7 +172,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 		}
 		case SP_ATTACHMENT_MESH: {
 			spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
-			spMeshAttachment_computeWorldVertices(attachment, slot, worldVertices);
+			spMeshAttachment_computeWorldVertices(attachment, slot, _worldVertices);
 			texture = [self getTextureForMesh:attachment];
 			uvs = attachment->uvs;
 			verticesCount = attachment->verticesCount;
@@ -179,7 +186,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 		}
 		case SP_ATTACHMENT_SKINNED_MESH: {
 			spSkinnedMeshAttachment* attachment = (spSkinnedMeshAttachment*)slot->attachment;
-			spSkinnedMeshAttachment_computeWorldVertices(attachment, slot, worldVertices);
+			spSkinnedMeshAttachment_computeWorldVertices(attachment, slot, _worldVertices);
 			texture = [self getTextureForSkinnedMesh:attachment];
 			uvs = attachment->uvs;
 			verticesCount = attachment->uvsCount;
@@ -194,22 +201,34 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 		default: ;
 		}
 		if (texture) {
-			if (slot->data->additiveBlending != additive) {
-				[self setBlendMode:[CCBlendMode blendModeWithOptions:@{CCBlendFuncSrcColor: @(_blendFunc.src),CCBlendFuncDstColor: @(slot->data->additiveBlending ? GL_ONE : _blendFunc.dst)}]];
-				additive = slot->data->additiveBlending;
+			if (slot->data->blendMode != blendMode) {
+				blendMode = slot->data->blendMode;
+				switch (slot->data->blendMode) {
+				case SP_BLEND_MODE_ADDITIVE:
+					[self setBlendMode:[CCBlendMode addMode]];
+					break;
+				case SP_BLEND_MODE_MULTIPLY:
+					[self setBlendMode:[CCBlendMode multiplyMode]];
+					break;
+				case SP_BLEND_MODE_SCREEN:
+					[self setBlendMode:screenMode];
+					break;
+				default:
+					[self setBlendMode:_premultipliedAlpha ? [CCBlendMode premultipliedAlphaMode] : [CCBlendMode alphaMode]];
+				}
 			}
 			if (_premultipliedAlpha) {
-                a *= _skeleton->a * slot->a;
-                r *= _skeleton->r * slot->r * a;
-                g *= _skeleton->g * slot->g * a;
-                b *= _skeleton->b * slot->b * a;
-            } else {
-                a *= _skeleton->a * slot->a;
-                r *= _skeleton->r * slot->r;
-                g *= _skeleton->g * slot->g;
-                b *= _skeleton->b * slot->b;
+				a *= _skeleton->a * slot->a;
+				r *= _skeleton->r * slot->r * a;
+				g *= _skeleton->g * slot->g * a;
+				b *= _skeleton->b * slot->b * a;
+			} else {
+				a *= _skeleton->a * slot->a;
+				r *= _skeleton->r * slot->r;
+				g *= _skeleton->g * slot->g;
+				b *= _skeleton->b * slot->b;
 			}
-            self.texture = texture;
+			self.texture = texture;
 			CGSize size = texture.contentSize;
 			GLKVector2 center = GLKVector2Make(size.width / 2.0, size.height / 2.0);
 			GLKVector2 extents = GLKVector2Make(size.width / 2.0, size.height / 2.0);
@@ -217,7 +236,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 				CCRenderBuffer buffer = [renderer enqueueTriangles:(trianglesCount / 3) andVertexes:verticesCount withState:self.renderState globalSortOrder:0];
 				for (int i = 0; i * 2 < verticesCount; ++i) {
 					CCVertex vertex;
-					vertex.position = GLKVector4Make(worldVertices[i * 2], worldVertices[i * 2 + 1], 0.0, 1.0);
+					vertex.position = GLKVector4Make(_worldVertices[i * 2], _worldVertices[i * 2 + 1], 0.0, 1.0);
 					vertex.color = GLKVector4Make(r, g, b, a);
 					vertex.texCoord1 = GLKVector2Make(uvs[i * 2], 1 - uvs[i * 2 + 1]);
 					CCRenderBufferSetVertex(buffer, i, CCVertexApplyTransform(vertex, transform));
@@ -236,11 +255,11 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 			spSlot* slot = _skeleton->drawOrder[i];
 			if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION) continue;
 			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-			spRegionAttachment_computeWorldVertices(attachment, slot->bone, worldVertices);
-			points[0] = ccp(worldVertices[0], worldVertices[1]);
-			points[1] = ccp(worldVertices[2], worldVertices[3]);
-			points[2] = ccp(worldVertices[4], worldVertices[5]);
-			points[3] = ccp(worldVertices[6], worldVertices[7]);
+			spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices);
+			points[0] = ccp(_worldVertices[0], _worldVertices[1]);
+			points[1] = ccp(_worldVertices[2], _worldVertices[3]);
+			points[2] = ccp(_worldVertices[4], _worldVertices[5]);
+			points[3] = ccp(_worldVertices[6], _worldVertices[7]);
 			[_drawNode drawPolyWithVerts:points count:4 fillColor:[CCColor clearColor] borderWidth:1 borderColor:[CCColor blueColor]];
 		}
 	}
@@ -283,20 +302,20 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 		int verticesCount;
 		if (slot->attachment->type == SP_ATTACHMENT_REGION) {
 			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-			spRegionAttachment_computeWorldVertices(attachment, slot->bone, worldVertices);
+			spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices);
 			verticesCount = 8;
 		} else if (slot->attachment->type == SP_ATTACHMENT_MESH) {
 			spMeshAttachment* mesh = (spMeshAttachment*)slot->attachment;
-			spMeshAttachment_computeWorldVertices(mesh, slot, worldVertices);
+			spMeshAttachment_computeWorldVertices(mesh, slot, _worldVertices);
 			verticesCount = mesh->verticesCount;
 		} else if (slot->attachment->type == SP_ATTACHMENT_SKINNED_MESH) {
 			spSkinnedMeshAttachment* mesh = (spSkinnedMeshAttachment*)slot->attachment;
-			spSkinnedMeshAttachment_computeWorldVertices(mesh, slot, worldVertices);
+			spSkinnedMeshAttachment_computeWorldVertices(mesh, slot, _worldVertices);
 			verticesCount = mesh->uvsCount;
 		} else
 			continue;
 		for (int ii = 0; ii < verticesCount; ii += 2) {
-			float x = worldVertices[ii] * scaleX, y = worldVertices[ii + 1] * scaleY;
+			float x = _worldVertices[ii] * scaleX, y = _worldVertices[ii + 1] * scaleY;
 			minX = fmin(minX, x);
 			minY = fmin(minY, y);
 			maxX = fmax(maxX, x);

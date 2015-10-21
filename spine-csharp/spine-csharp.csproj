@@ -64,6 +64,7 @@
     <Compile Include="src\Attachments\MeshAttachment.cs" />
     <Compile Include="src\Attachments\RegionAttachment.cs" />
     <Compile Include="src\Attachments\SkinnedMeshAttachment.cs" />
+    <Compile Include="src\BlendMode.cs" />
     <Compile Include="src\Bone.cs" />
     <Compile Include="src\BoneData.cs" />
     <Compile Include="src\AnimationState.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="src\Skeleton.cs" />
     <Compile Include="src\SkeletonData.cs" />
     <Compile Include="src\SkeletonJson.cs" />
+    <Compile Include="src\SkeletonBinary.cs" />
     <Compile Include="src\Skin.cs" />
     <Compile Include="src\Slot.cs" />
     <Compile Include="src\SlotData.cs" />

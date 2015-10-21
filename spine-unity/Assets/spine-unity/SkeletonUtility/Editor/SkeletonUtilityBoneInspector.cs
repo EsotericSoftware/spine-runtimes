@@ -1,32 +1,4 @@
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.1
- * 
- * Copyright (c) 2013, Esoteric Software
- * All rights reserved.
- * 
- * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to install, execute and perform the Spine Runtimes
- * Software (the "Software") solely for internal use. Without the written
- * permission of Esoteric Software (typically granted by licensing Spine), you
- * may not (a) modify, translate, adapt or otherwise create derivative works,
- * improvements of the Software or develop new applications using the Software
- * or (b) remove, delete, alter or obscure any trademarks or any copyright,
- * trademark, patent or other intellectual property or proprietary rights
- * notices on or in the Software, including any copy thereof. Redistributions
- * in binary or source form must include this license and terms.
- * 
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
+
 
 /*****************************************************************************
  * Skeleton Utility created by Mitch Thompson
@@ -49,7 +21,10 @@ public class SkeletonUtilityBoneInspector : Editor {
 	SkeletonUtilityBone utilityBone;
 	SkeletonUtility skeletonUtility;
 	bool canCreateHingeChain = false;
-	
+
+	Dictionary<Slot, List<BoundingBoxAttachment>> boundingBoxTable = new Dictionary<Slot, List<BoundingBoxAttachment>>();
+	string currentSkinName = "";
+
 	void OnEnable () {
 		mode = this.serializedObject.FindProperty("mode");
 		boneName = this.serializedObject.FindProperty("boneName");
@@ -69,6 +44,43 @@ public class SkeletonUtilityBoneInspector : Editor {
 		}
 
 		canCreateHingeChain = CanCreateHingeChain();
+
+		boundingBoxTable.Clear();
+
+		if (multiObject)
+			return;
+
+		if (utilityBone.bone == null)
+			return;
+
+		var skeleton = utilityBone.bone.Skeleton;
+		int slotCount = skeleton.Slots.Count;
+		Skin skin = skeleton.Skin;
+		if (skeleton.Skin == null)
+			skin = skeleton.Data.DefaultSkin;
+
+		currentSkinName = skin.Name;
+		for(int i = 0; i < slotCount; i++){
+			Slot slot = skeletonUtility.skeletonRenderer.skeleton.Slots.Items[i];
+			if (slot.Bone == utilityBone.bone) {
+				List<Attachment> attachments = new List<Attachment>();
+				
+					
+				skin.FindAttachmentsForSlot(skeleton.FindSlotIndex(slot.Data.Name), attachments);
+
+				List<BoundingBoxAttachment> boundingBoxes = new List<BoundingBoxAttachment>();
+				foreach (var att in attachments) {
+					if (att is BoundingBoxAttachment) {
+						boundingBoxes.Add((BoundingBoxAttachment)att);
+					}
+				}
+
+				if (boundingBoxes.Count > 0) {
+					boundingBoxTable.Add(slot, boundingBoxes);
+				}
+			}
+		}
+		
 	}
 
 	void EvaluateFlags () {
@@ -180,6 +192,37 @@ public class SkeletonUtilityBoneInspector : Editor {
 		}
 		GUILayout.EndHorizontal();
 
+		EditorGUI.BeginDisabledGroup(multiObject || boundingBoxTable.Count == 0);
+		EditorGUILayout.LabelField(new GUIContent("Bounding Boxes", SpineEditorUtilities.Icons.boundingBox), EditorStyles.boldLabel);
+
+		foreach(var entry in boundingBoxTable){
+			EditorGUI.indentLevel++;
+			EditorGUILayout.LabelField(entry.Key.Data.Name);
+			EditorGUI.indentLevel++;
+			foreach (var box in entry.Value) {
+				GUILayout.BeginHorizontal();
+				GUILayout.Space(30);
+				if (GUILayout.Button(box.Name, GUILayout.Width(200))) {
+					var child = utilityBone.transform.FindChild("[BoundingBox]" + box.Name);
+					if (child != null) {
+						var originalCollider = child.GetComponent<PolygonCollider2D>();
+						var updatedCollider = SkeletonUtility.AddBoundingBoxAsComponent(box, child.gameObject, originalCollider.isTrigger);
+						originalCollider.points = updatedCollider.points;
+						if (EditorApplication.isPlaying)
+							Destroy(updatedCollider);
+						else
+							DestroyImmediate(updatedCollider);
+					} else {
+						utilityBone.AddBoundingBox(currentSkinName, entry.Key.Data.Name, box.Name);
+					}
+					
+				}
+				GUILayout.EndHorizontal();
+			}
+		}
+
+		EditorGUI.EndDisabledGroup();
+
 		serializedObject.ApplyModifiedProperties();
 	}
 
@@ -190,14 +233,14 @@ public class SkeletonUtilityBoneInspector : Editor {
 		}
 	}
 
-	void BoneSelectorContextMenu (string current, List<Bone> bones, string topValue, GenericMenu.MenuFunction2 callback) {
+	void BoneSelectorContextMenu (string current, ExposedList<Bone> bones, string topValue, GenericMenu.MenuFunction2 callback) {
 		GenericMenu menu = new GenericMenu();
 
 		if (topValue != "")
 			menu.AddItem(new GUIContent(topValue), current == topValue, callback, null);
 
 		for (int i = 0; i < bones.Count; i++) {
-			menu.AddItem(new GUIContent(bones[i].Data.Name), bones[i].Data.Name == current, callback, bones[i]);
+			menu.AddItem(new GUIContent(bones.Items[i].Data.Name), bones.Items[i].Data.Name == current, callback, bones.Items[i]);
 		}
 
 		menu.ShowAsContext();

@@ -1,25 +1,26 @@
-﻿/******************************************************************************
+/******************************************************************************
  * Spine Runtimes Software License
- * Version 2.1
+ * Version 2.3
  * 
- * Copyright (c) 2013, Esoteric Software
+ * Copyright (c) 2013-2015, Esoteric Software
  * All rights reserved.
  * 
  * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to install, execute and perform the Spine Runtimes
- * Software (the "Software") solely for internal use. Without the written
- * permission of Esoteric Software (typically granted by licensing Spine), you
- * may not (a) modify, translate, adapt or otherwise create derivative works,
- * improvements of the Software or develop new applications using the Software
- * or (b) remove, delete, alter or obscure any trademarks or any copyright,
- * trademark, patent or other intellectual property or proprietary rights
- * notices on or in the Software, including any copy thereof. Redistributions
- * in binary or source form must include this license and terms.
+ * non-transferable license to use, install, execute and perform the Spine
+ * Runtimes Software (the "Software") and derivative works solely for personal
+ * or internal use. Without the written permission of Esoteric Software (see
+ * Section 2 of the Spine Software License Agreement), you may not (a) modify,
+ * translate, adapt or otherwise create derivative works, improvements of the
+ * Software or develop new applications using the Software or (b) remove,
+ * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
  * 
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
  * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
@@ -36,13 +37,13 @@ namespace Spine {
 		private const float radDeg = 180 / (float)Math.PI;
 
 		internal IkConstraintData data;
-		internal List<Bone> bones = new List<Bone>();
+		internal ExposedList<Bone> bones = new ExposedList<Bone>();
 		internal Bone target;
 		internal int bendDirection;
 		internal float mix;
 
 		public IkConstraintData Data { get { return data; } }
-		public List<Bone> Bones { get { return bones; } }
+		public ExposedList<Bone> Bones { get { return bones; } }
 		public Bone Target { get { return target; } set { target = value; } }
 		public int BendDirection { get { return bendDirection; } set { bendDirection = value; } }
 		public float Mix { get { return mix; } set { mix = value; } }
@@ -54,7 +55,7 @@ namespace Spine {
 			mix = data.mix;
 			bendDirection = data.bendDirection;
 
-			bones = new List<Bone>(data.bones.Count);
+			bones = new ExposedList<Bone>(data.bones.Count);
 			foreach (BoneData boneData in data.bones)
 				bones.Add(skeleton.FindBone(boneData.name));
 			target = skeleton.FindBone(data.target.name);
@@ -62,13 +63,13 @@ namespace Spine {
 
 		public void apply () {
 			Bone target = this.target;
-			List<Bone> bones = this.bones;
+			ExposedList<Bone> bones = this.bones;
 			switch (bones.Count) {
 			case 1:
-				apply(bones[0], target.worldX, target.worldY, mix);
+				apply(bones.Items[0], target.worldX, target.worldY, mix);
 				break;
 			case 2:
-				apply(bones[0], bones[1], target.worldX, target.worldY, bendDirection, mix);
+				apply(bones.Items[0], bones.Items[1], target.worldX, target.worldY, bendDirection, mix);
 				break;
 			}
 		}
