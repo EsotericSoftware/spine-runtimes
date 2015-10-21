@@ -2051,7 +2051,7 @@ spine.SkeletonJson.prototype = {
 				frameIndex++;
 			}
 			timelines.push(timeline);
-			duration = Math.max(duration, timeline.frames[timeline.frameCount * 3 - 3]);
+			duration = Math.max(duration, timeline.frames[timeline.getFrameCount() * 3 - 3]);
 		}
 
 		var ffd = map["ffd"];
@@ -2112,7 +2112,7 @@ spine.SkeletonJson.prototype = {
 						frameIndex++;
 					}
 					timelines[timelines.length] = timeline;
-					duration = Math.max(duration, timeline.frames[timeline.frameCount - 1]);
+					duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);
 				}
 			}
 		}
