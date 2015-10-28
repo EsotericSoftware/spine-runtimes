@@ -35,14 +35,14 @@
 
 typedef struct _spAttachmentLoaderVtable {
 	spAttachment* (*newAttachment) (spAttachmentLoader* self, spSkin* skin, spAttachmentType type, const char* name,
-			const char* path);
+			const char* path, const char* images);
 	void (*dispose) (spAttachmentLoader* self);
 } _spAttachmentLoaderVtable;
 
 void _spAttachmentLoader_init (spAttachmentLoader* self, /**/
 void (*dispose) (spAttachmentLoader* self), /**/
 		spAttachment* (*newAttachment) (spAttachmentLoader* self, spSkin* skin, spAttachmentType type, const char* name,
-				const char* path)) {
+				const char* path, const char* images)) {
 	CONST_CAST(_spAttachmentLoaderVtable*, self->vtable) = NEW(_spAttachmentLoaderVtable);
 	VTABLE(spAttachmentLoader, self)->dispose = dispose;
 	VTABLE(spAttachmentLoader, self)->newAttachment = newAttachment;
@@ -60,12 +60,12 @@ void spAttachmentLoader_dispose (spAttachmentLoader* self) {
 }
 
 spAttachment* spAttachmentLoader_newAttachment (spAttachmentLoader* self, spSkin* skin, spAttachmentType type, const char* name,
-		const char* path) {
+		const char* path, const char* images) {
 	FREE(self->error1);
 	FREE(self->error2);
 	self->error1 = 0;
 	self->error2 = 0;
-	return VTABLE(spAttachmentLoader, self)->newAttachment(self, skin, type, name, path);
+	return VTABLE(spAttachmentLoader, self)->newAttachment(self, skin, type, name, path, images);
 }
 
 void _spAttachmentLoader_setError (spAttachmentLoader* self, const char* error1, const char* error2) {

@@ -65,6 +65,7 @@ void spSkeletonData_dispose (spSkeletonData* self) {
 
 	FREE(self->hash);
 	FREE(self->version);
+	FREE(self->images);
 
 	FREE(self);
 }
