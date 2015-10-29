@@ -32,7 +32,7 @@
 #include <spine/Bone.h>
 #include <spine/extension.h>
 
-static int yDown;
+static thread_local int yDown;
 
 void spBone_setYDown (int value) {
 	yDown = value;

@@ -78,7 +78,7 @@ static void trim (Str* str) {
 
 /* Tokenize string without modification. Returns 0 on failure. */
 static int readLine (const char* begin, const char* end, Str* str) {
-	static const char* nextStart;
+	static thread_local const char* nextStart;
 	if (begin) {
 		nextStart = begin;
 		return 1;
