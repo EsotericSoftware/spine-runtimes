@@ -46,7 +46,7 @@
 #define SPINE_JSON_DEBUG 0
 #endif
 
-static const char* ep;
+static thread_local const char* ep;
 
 const char* Json_getError (void) {
 	return ep;
