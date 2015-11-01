@@ -48,6 +48,8 @@ public class SkeletonRenderer {
 
 	@SuppressWarnings("null")
 	public void draw (PolygonSpriteBatch batch, Skeleton skeleton) {
+		int oldBlendSrc = batch.getBlendSrcFunc();
+		int oldBlendDst = batch.getBlendDstFunc();
 		boolean premultipliedAlpha = this.premultipliedAlpha;
 		BlendMode blendMode = null;
 
@@ -110,9 +112,13 @@ public class SkeletonRenderer {
 				batch.draw(texture, vertices, 0, vertices.length, triangles, 0, triangles.length);
 			}
 		}
+		
+		batch.setBlendFunction(oldBlendSrc, oldBlendDst);
 	}
 
 	public void draw (Batch batch, Skeleton skeleton) {
+		int oldBlendSrc = batch.getBlendSrcFunc();
+		int oldBlendDst = batch.getBlendDstFunc();
 		boolean premultipliedAlpha = this.premultipliedAlpha;
 		BlendMode blendMode = null;
 
@@ -157,6 +163,8 @@ public class SkeletonRenderer {
 				rootBone.setRotation(oldRotation);
 			}
 		}
+		
+		batch.setBlendFunction(oldBlendSrc, oldBlendDst);
 	}
 
 	public void setPremultipliedAlpha (boolean premultipliedAlpha) {
