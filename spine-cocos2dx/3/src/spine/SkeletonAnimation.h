@@ -76,6 +76,11 @@ public:
 	virtual void onTrackEntryEvent (int trackIndex, spEventType type, spEvent* event, int loopCount);
 
 	spAnimationState* getState() const;
+    
+    void gotoAndPlay(int frame);
+    void gotoAndStop(int frame);
+    void pauseAnimation();
+    void resumeAnimation();
 
 CC_CONSTRUCTOR_ACCESS:
 	SkeletonAnimation ();
@@ -94,6 +99,8 @@ protected:
 	EndListener _endListener;
 	CompleteListener _completeListener;
 	EventListener _eventListener;
+    
+    bool _isAnimationPaused = false;
 
 private:
 	typedef SkeletonRenderer super;
