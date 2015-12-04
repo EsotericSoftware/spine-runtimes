@@ -261,12 +261,11 @@ void _spRotateTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 	spBone *bone;
 	int frameIndex;
 	float prevFrameValue, frameTime, percent, amount;
+	spRotateTimeline* self = SUB_CAST(spRotateTimeline, timeline);
 
 	UNUSED(lastTime);
 	UNUSED(firedEvents);
 	UNUSED(eventsCount);
-
-	spRotateTimeline* self = SUB_CAST(spRotateTimeline, timeline);
 
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
@@ -323,12 +322,11 @@ void _spTranslateTimeline_apply (const spTimeline* timeline, spSkeleton* skeleto
 	spBone *bone;
 	int frameIndex;
 	float prevFrameX, prevFrameY, frameTime, percent;
+	spTranslateTimeline* self = SUB_CAST(spTranslateTimeline, timeline);
 
 	UNUSED(lastTime);
 	UNUSED(firedEvents);
 	UNUSED(eventsCount);
-
-	spTranslateTimeline* self = SUB_CAST(spTranslateTimeline, timeline);
 
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
@@ -372,12 +370,11 @@ void _spScaleTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 	spBone *bone;
 	int frameIndex;
 	float prevFrameX, prevFrameY, frameTime, percent;
+	spScaleTimeline* self = SUB_CAST(spScaleTimeline, timeline);
 
 	UNUSED(lastTime);
 	UNUSED(firedEvents);
 	UNUSED(eventsCount);
-
-	spScaleTimeline* self = SUB_CAST(spScaleTimeline, timeline);
 
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
@@ -684,12 +681,12 @@ void _spFFDTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, flo
 	const float* prevVertices;
 	const float* nextVertices;
 	spFFDTimeline* self = (spFFDTimeline*)timeline;
+	spSlot *slot = skeleton->slots[self->slotIndex];
 
 	UNUSED(lastTime);
 	UNUSED(firedEvents);
 	UNUSED(eventsCount);
 
-	spSlot *slot = skeleton->slots[self->slotIndex];
 	if (slot->attachment != self->attachment) return;
 
 	if (time < self->frames[0]) return; /* Time is before first frame. */
