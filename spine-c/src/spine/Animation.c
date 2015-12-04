@@ -1,10 +1,10 @@
 /******************************************************************************
  * Spine Runtimes Software License
  * Version 2.3
- * 
+ *
  * Copyright (c) 2013-2015, Esoteric Software
  * All rights reserved.
- * 
+ *
  * You are granted a perpetual, non-exclusive, non-sublicensable and
  * non-transferable license to use, install, execute and perform the Spine
  * Runtimes Software (the "Software") and derivative works solely for personal
@@ -16,7 +16,7 @@
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -33,6 +33,8 @@
 #include <spine/IkConstraint.h>
 #include <limits.h>
 #include <spine/extension.h>
+
+#define UNUSED(x) (void)(x)
 
 spAnimation* spAnimation_create (const char* name, int timelinesCount) {
 	spAnimation* self = NEW(spAnimation);
@@ -260,6 +262,10 @@ void _spRotateTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 	int frameIndex;
 	float prevFrameValue, frameTime, percent, amount;
 
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
+
 	spRotateTimeline* self = SUB_CAST(spRotateTimeline, timeline);
 
 	if (time < self->frames[0]) return; /* Time is before first frame. */
@@ -318,6 +324,10 @@ void _spTranslateTimeline_apply (const spTimeline* timeline, spSkeleton* skeleto
 	int frameIndex;
 	float prevFrameX, prevFrameY, frameTime, percent;
 
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
+
 	spTranslateTimeline* self = SUB_CAST(spTranslateTimeline, timeline);
 
 	if (time < self->frames[0]) return; /* Time is before first frame. */
@@ -362,6 +372,10 @@ void _spScaleTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 	spBone *bone;
 	int frameIndex;
 	float prevFrameX, prevFrameY, frameTime, percent;
+
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
 
 	spScaleTimeline* self = SUB_CAST(spScaleTimeline, timeline);
 
@@ -411,6 +425,10 @@ void _spColorTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 	float prevFrameR, prevFrameG, prevFrameB, prevFrameA, percent, frameTime;
 	float r, g, b, a;
 	spColorTimeline* self = (spColorTimeline*)timeline;
+
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
 
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
@@ -471,6 +489,11 @@ void _spAttachmentTimeline_apply (const spTimeline* timeline, spSkeleton* skelet
 	int frameIndex;
 	const char* attachmentName;
 	spAttachmentTimeline* self = (spAttachmentTimeline*)timeline;
+
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
+	UNUSED(alpha);
 
 	if (time < self->frames[0]) {
 		if (lastTime > time) _spAttachmentTimeline_apply(timeline, skeleton, lastTime, (float)INT_MAX, 0, 0, 0);
@@ -594,6 +617,11 @@ void _spDrawOrderTimeline_apply (const spTimeline* timeline, spSkeleton* skeleto
 	const int* drawOrderToSetupIndex;
 	spDrawOrderTimeline* self = (spDrawOrderTimeline*)timeline;
 
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
+	UNUSED(alpha);
+
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
 	if (time >= self->frames[self->framesCount - 1]) /* Time is after last frame. */
@@ -656,6 +684,10 @@ void _spFFDTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, flo
 	const float* prevVertices;
 	const float* nextVertices;
 	spFFDTimeline* self = (spFFDTimeline*)timeline;
+
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
 
 	spSlot *slot = skeleton->slots[self->slotIndex];
 	if (slot->attachment != self->attachment) return;
@@ -755,6 +787,10 @@ void _spIkConstraintTimeline_apply (const spTimeline* timeline, spSkeleton* skel
 	spIkConstraint* ikConstraint;
 	spIkConstraintTimeline* self = (spIkConstraintTimeline*)timeline;
 
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
+
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
 	ikConstraint = skeleton->ikConstraints[self->ikConstraintIndex];
@@ -795,6 +831,10 @@ void _spFlipTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, fl
 	int frameIndex;
 	spFlipTimeline* self = (spFlipTimeline*)timeline;
 
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
+	UNUSED(alpha);
+
 	if (time < self->frames[0]) {
 		if (lastTime > time) _spFlipTimeline_apply(timeline, skeleton, lastTime, (float)INT_MAX, 0, 0, 0);
 		return;
@@ -834,3 +874,5 @@ void spFlipTimeline_setFrame (spFlipTimeline* self, int frameIndex, float time, 
 }
 
 /**/
+
+#undef UNUSED
