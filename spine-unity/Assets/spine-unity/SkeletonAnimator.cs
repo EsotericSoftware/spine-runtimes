@@ -108,6 +108,7 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 						continue;
 
 					float time = stateInfo.normalizedTime * info.clip.length;
+					if (time == 0) continue;
 					animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null, weight);
 				}
 
@@ -117,6 +118,7 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 						continue;
 
 					float time = nextStateInfo.normalizedTime * info.clip.length;
+					if (time == 0) continue;
 					animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null, weight);
 				}
 			} else if (mode >= MixMode.MixNext) {
@@ -130,6 +132,7 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 						continue;
 
 					float time = stateInfo.normalizedTime * info.clip.length;
+					if (time == 0) continue;
 					animationTable[GetAnimationClipNameHashCode(info.clip)].Apply(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null);
 					break;
 				}
@@ -142,6 +145,7 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 						continue;
 
 					float time = stateInfo.normalizedTime * info.clip.length;
+					if (time == 0) continue;
 					animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null, weight);
 				}
 
@@ -156,6 +160,7 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 							continue;
 
 						float time = nextStateInfo.normalizedTime * info.clip.length;
+						if (time == 0) continue;
 						animationTable[GetAnimationClipNameHashCode(info.clip)].Apply(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null);
 						break;
 					}
@@ -169,6 +174,7 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 						continue;
 
 					float time = nextStateInfo.normalizedTime * info.clip.length;
+					if (time == 0) continue;
 					animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null, weight);
 				}
 			}
