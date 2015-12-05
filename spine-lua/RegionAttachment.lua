@@ -45,8 +45,8 @@ function RegionAttachment.new (name)
 		offset = {},
 		uvs = {},
 		r = 1, g = 1, b = 1, a = 1,
-		path = null,
-		rendererObject = null,
+		path = nil,
+		rendererObject = nil,
 		regionOffsetX = 0, regionOffsetY = 0,
 		regionWidth = 0, regionHeight = 0,
 		regionOriginalWidth = 0, regionOriginalHeight = 0
