@@ -294,8 +294,12 @@ public class SkeletonRenderer : MonoBehaviour {
 			this.vertices = vertices = new Vector3[vertexCount];
 			this.colors = new Color32[vertexCount];
 			this.uvs = new Vector2[vertexCount];
+
 			mesh1.Clear();
 			mesh2.Clear();
+			meshState.stateMesh1.forceUpdate = true;
+			meshState.stateMesh2.forceUpdate = true;
+
 		} else {
 			// Too many vertices, zero the extra.
 			Vector3 zero = Vector3.zero;
@@ -502,6 +506,13 @@ public class SkeletonRenderer : MonoBehaviour {
 			mesh.subMeshCount = submeshCount;
 			for (int i = 0; i < submeshCount; ++i)
 				mesh.SetTriangles(submeshes.Items[i].triangles, i);
+
+			// Done updating mesh. Clear the force update state.
+			if (useMesh1) {
+				meshState.stateMesh1.forceUpdate = false;
+			} else {
+				meshState.stateMesh2.forceUpdate = false;
+			}
 		}
 
 		Vector3 meshBoundsExtents = meshBoundsMax - meshBoundsMin;
@@ -565,15 +576,16 @@ public class SkeletonRenderer : MonoBehaviour {
 #endif
 
 		// Check if any mesh settings were changed
+		MeshState.SingleMeshState currentMeshState = useMesh1 ? meshState.stateMesh1 : meshState.stateMesh2;
+
 		bool mustUpdateMeshStructure =
-			immutableTriangles != (useMesh1 ? meshState.stateMesh1.immutableTriangles : meshState.stateMesh2.immutableTriangles);
+			(immutableTriangles != currentMeshState.immutableTriangles) || currentMeshState.forceUpdate;
 
 		if (mustUpdateMeshStructure)
 			return true;
 
 		// Check if any attachments were enabled/disabled
 		// or submesh structures has changed
-		MeshState.SingleMeshState currentMeshState = useMesh1 ? meshState.stateMesh1 : meshState.stateMesh2;
 		ExposedList<Attachment> attachmentsCurrentMesh = currentMeshState.attachments;
 		ExposedList<MeshState.AddSubmeshArguments> addSubmeshArgumentsCurrentMesh = currentMeshState.addSubmeshArguments;
 		ExposedList<bool> attachmentsFlipStateCurrentMesh = currentMeshState.attachmentsFlipState;
@@ -734,6 +746,7 @@ public class SkeletonRenderer : MonoBehaviour {
 
 		public class SingleMeshState {
 			public bool immutableTriangles;
+			public bool forceUpdate;
 			public readonly ExposedList<Attachment> attachments = new ExposedList<Attachment>();
 			public readonly ExposedList<bool> attachmentsFlipState = new ExposedList<bool>();
 			public readonly ExposedList<AddSubmeshArguments> addSubmeshArguments = new ExposedList<AddSubmeshArguments>();
