@@ -71,6 +71,7 @@ public class SkeletonUtilityGroundConstraint : SkeletonUtilityConstraint {
 
 	protected override void OnEnable () {
 		base.OnEnable();
+		lastHitY = transform.position.y;
 	}
 
 	protected override void OnDisable () {

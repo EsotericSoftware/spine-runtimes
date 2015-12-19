@@ -86,7 +86,13 @@ namespace Spine {
 			using (var input = new BufferedStream(Microsoft.Xna.Framework.TitleContainer.OpenStream(path)))
 			{
 #else
-			using (var input = new BufferedStream(new FileStream(path, FileMode.Open))) {
+#if UNITY_WP8 || UNITY_WP8_1
+            using (var input = new FileStream(path, FileMode.Open))
+			{
+#else
+            using (var input = new BufferedStream(new FileStream(path, FileMode.Open))) 
+            {
+#endif
 #endif
 				SkeletonData skeletonData = ReadSkeletonData(input);
 				skeletonData.name = Path.GetFileNameWithoutExtension(path);
