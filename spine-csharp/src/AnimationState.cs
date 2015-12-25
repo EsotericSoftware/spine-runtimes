@@ -114,7 +114,10 @@ namespace Spine {
 				} else {
 					float previousTime = previous.time;
 					if (!previous.loop && previousTime > previous.endTime) previousTime = previous.endTime;
-					previous.animation.Apply(skeleton, previousTime, previousTime, previous.loop, null);
+					previous.animation.Apply(skeleton, previous.lastTime, previousTime, previous.loop, null);
+					// Remove the line above, and uncomment the line below, to allow previous animations to fire events during mixing.
+					//previous.animation.Apply(skeleton, previous.lastTime, previousTime, previous.loop, events);
+					previous.lastTime = previousTime;
 
 					float alpha = current.mixTime / current.mixDuration * current.mix;
 					if (alpha >= 1) {
