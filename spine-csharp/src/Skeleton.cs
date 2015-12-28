@@ -94,6 +94,7 @@ namespace Spine {
 				ikConstraints.Add(new IkConstraint(ikConstraintData, this));
 
 			UpdateCache();
+			UpdateWorldTransform();
 		}
 
 		/// <summary>Caches information about bones and IK constraints. Must be called if bones or IK constraints are added or
