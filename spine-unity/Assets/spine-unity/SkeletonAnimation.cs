@@ -72,6 +72,11 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 
 	public String AnimationName {
 		get {
+			if (!valid) {
+				Debug.LogWarning("You tried access AnimationName but the SkeletonAnimation was not valid. Try checking your Skeleton Data for errors.");
+				return null;
+			}
+			
 			TrackEntry entry = state.GetCurrent(0);
 			return entry == null ? null : entry.Animation.Name;
 		}
@@ -79,6 +84,12 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 			if (_animationName == value)
 				return;
 			_animationName = value;
+			
+			if (!valid) {
+				Debug.LogWarning("You tried to change AnimationName but the SkeletonAnimation was not valid. Try checking your Skeleton Data for errors.");
+				return;
+			}
+			
 			if (value == null || value.Length == 0)
 				state.ClearTrack(0);
 			else
