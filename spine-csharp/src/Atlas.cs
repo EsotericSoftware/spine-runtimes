@@ -45,7 +45,7 @@ namespace Spine {
 		List<AtlasRegion> regions = new List<AtlasRegion>();
 		TextureLoader textureLoader;
 
-		#if !(UNITY_5 || UNITY_4 || UNITY_3) // Code inside this is not used by Unity and breaks when building for Unity-UWP
+		#if !(UNITY_5 || UNITY_4 || UNITY_WSA || UNITY_WP8 || UNITY_WP8_1) // !UNITY
 		#if WINDOWS_STOREAPP
 		private async Task ReadFile(string path, TextureLoader textureLoader) {
 			var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
