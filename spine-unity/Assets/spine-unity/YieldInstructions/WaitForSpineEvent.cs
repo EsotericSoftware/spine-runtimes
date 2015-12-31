@@ -74,9 +74,19 @@ namespace Spine {
 		public WaitForSpineEvent (Spine.AnimationState state, Spine.EventData eventDataReference, bool unsubscribeAfterFiring = true) {
 			Subscribe(state, eventDataReference, unsubscribeAfterFiring);
 		}
+
+		public WaitForSpineEvent (SkeletonAnimation skeletonAnimation, Spine.EventData eventDataReference, bool unsubscribeAfterFiring = true) {			
+			// If skeletonAnimation is invalid, its state will be null. Subscribe handles null states just fine.
+			Subscribe(skeletonAnimation.state, eventDataReference, unsubscribeAfterFiring);
+		}
 			
 		public WaitForSpineEvent (Spine.AnimationState state, string eventName, bool unsubscribeAfterFiring = true) {
 			SubscribeByName(state, eventName, unsubscribeAfterFiring);
+		}
+
+		public WaitForSpineEvent (SkeletonAnimation skeletonAnimation, string eventName, bool unsubscribeAfterFiring = true) {
+			// If skeletonAnimation is invalid, its state will be null. Subscribe handles null states just fine.
+			SubscribeByName(skeletonAnimation.state, eventName, unsubscribeAfterFiring);
 		}
 		#endregion
 
