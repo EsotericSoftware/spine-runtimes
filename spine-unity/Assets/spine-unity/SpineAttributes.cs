@@ -31,7 +31,7 @@ public class SpineSlot : SpineAttributeBase {
 	}
 }
 
-public class SpineEventData : SpineAttributeBase {
+public class SpineEvent : SpineAttributeBase {
 	/// <summary>
 	/// Smart popup menu for Spine Events (Spine.EventData)
 	/// </summary>
@@ -40,7 +40,7 @@ public class SpineEventData : SpineAttributeBase {
 	/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives).
 	/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
 	/// </param>
-	public SpineEventData(string startsWith = "", string dataField = "") {
+	public SpineEvent(string startsWith = "", string dataField = "") {
 		this.startsWith = startsWith;
 		this.dataField = dataField;
 	}

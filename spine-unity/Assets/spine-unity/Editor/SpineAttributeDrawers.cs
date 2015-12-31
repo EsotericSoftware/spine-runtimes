@@ -159,9 +159,9 @@ public class SpineAnimationDrawer : SpineTreeItemDrawerBase<SpineAnimation> {
 
 }
 
-[CustomPropertyDrawer(typeof(SpineEventData))]
-public class SpineEventDataDrawer : SpineTreeItemDrawerBase<SpineEventData> {
-	protected override void PopulateMenu (GenericMenu menu, SerializedProperty property, SpineEventData targetAttribute, SkeletonData data) {
+[CustomPropertyDrawer(typeof(SpineEvent))]
+public class SpineEventNameDrawer : SpineTreeItemDrawerBase<SpineEvent> {
+	protected override void PopulateMenu (GenericMenu menu, SerializedProperty property, SpineEvent targetAttribute, SkeletonData data) {
 		var events = skeletonDataAsset.GetSkeletonData(false).Events;
 		for (int i = 0; i < events.Count; i++) {
 			string name = events.Items[i].Name;
