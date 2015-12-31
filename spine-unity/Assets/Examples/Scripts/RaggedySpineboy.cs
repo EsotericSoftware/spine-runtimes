@@ -18,11 +18,11 @@ public class RaggedySpineboy : MonoBehaviour {
 
 	void AddRigidbody () {
 		var rb = gameObject.AddComponent<Rigidbody2D>();
-#if UNITY_5_1
+		#if UNITY_5_1 || UNITY_5_2 || UNITY_5_3 || UNITY_5_4 || UNITY_5_5
         rb.freezeRotation = true;
-#else
+		#else
 		rb.fixedAngle = true;
-#endif
+		#endif
 		naturalCollider.enabled = true;
 	}
 
