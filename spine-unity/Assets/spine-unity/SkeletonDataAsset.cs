@@ -50,6 +50,11 @@ public class SkeletonDataAsset : ScriptableObject {
 	private SkeletonData skeletonData;
 	private AnimationStateData stateData;
 
+	void OnEnable () {
+		if (atlasAssets == null)
+			atlasAssets = new AtlasAsset[0];
+	}
+
 	public void Reset () {
 		skeletonData = null;
 		stateData = null;
