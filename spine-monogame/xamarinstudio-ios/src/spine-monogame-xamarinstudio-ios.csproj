@@ -85,6 +85,9 @@
     <Compile Include="..\..\..\spine-csharp\src\BoneData.cs">
       <Link>spine-csharp\BoneData.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\spine-csharp\src\ExposedList.cs">
+      <Link>spine-csharp\ExposedList.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\spine-csharp\src\Json.cs">
       <Link>spine-csharp\Json.cs</Link>
     </Compile>
