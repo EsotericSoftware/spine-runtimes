@@ -149,7 +149,7 @@ void _spTrackEntry_dispose (spTrackEntry* self);
 void _spAttachmentLoader_init (spAttachmentLoader* self, /**/
 void (*dispose) (spAttachmentLoader* self), /**/
 		spAttachment* (*newAttachment) (spAttachmentLoader* self, spSkin* skin, spAttachmentType type, const char* name,
-				const char* path));
+				const char* path, const char* images));
 void _spAttachmentLoader_deinit (spAttachmentLoader* self);
 void _spAttachmentLoader_setError (spAttachmentLoader* self, const char* error1, const char* error2);
 void _spAttachmentLoader_setUnknownTypeError (spAttachmentLoader* self, spAttachmentType type);

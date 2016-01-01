@@ -57,7 +57,7 @@ void spAttachmentLoader_dispose (spAttachmentLoader* self);
 
 /* Returns 0 to not load an attachment. If 0 is returned and spAttachmentLoader.error1 is set, an error occurred. */
 spAttachment* spAttachmentLoader_newAttachment (spAttachmentLoader* self, spSkin* skin, spAttachmentType type, const char* name,
-		const char* path);
+		const char* path, const char* images);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spAttachmentLoader AttachmentLoader;

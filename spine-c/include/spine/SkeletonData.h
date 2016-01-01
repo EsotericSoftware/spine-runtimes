@@ -46,6 +46,7 @@ extern "C" {
 typedef struct spSkeletonData {
 	const char* version;
 	const char* hash;
+	const char* images;
 	float width, height;
 
 	int bonesCount;

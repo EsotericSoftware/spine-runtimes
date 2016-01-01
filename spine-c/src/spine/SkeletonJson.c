@@ -441,6 +441,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 	if (skeleton) {
 		MALLOC_STR(skeletonData->hash, Json_getString(skeleton, "hash", 0));
 		MALLOC_STR(skeletonData->version,  Json_getString(skeleton, "spine", 0));
+		MALLOC_STR(skeletonData->images, Json_getString(skeleton, "images", 0));
 		skeletonData->width = Json_getFloat(skeleton, "width", 0);
 		skeletonData->height = Json_getFloat(skeleton, "height", 0);
 	}
@@ -603,7 +604,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 						return 0;
 					}
 
-					attachment = spAttachmentLoader_newAttachment(self->attachmentLoader, skin, type, attachmentName, path);
+					attachment = spAttachmentLoader_newAttachment(self->attachmentLoader, skin, type, attachmentName, path, skeleton ? skeletonData->images : NULL);
 					if (!attachment) {
 						if (self->attachmentLoader->error1) {
 							spSkeletonData_dispose(skeletonData);
