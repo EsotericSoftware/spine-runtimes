@@ -192,6 +192,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		int submeshTriangleCount = 0, submeshFirstVertex = 0, submeshStartSlotIndex = 0;
 		Material lastMaterial = null;
 		ExposedList<Slot> drawOrder = skeleton.drawOrder;
+		var drawOrderItems = drawOrder.Items;
 		int drawOrderCount = drawOrder.Count;
 		int submeshSeparatorSlotsCount = submeshSeparatorSlots.Count;
 		bool renderMeshes = this.renderMeshes;
@@ -199,22 +200,29 @@ public class SkeletonRenderer : MonoBehaviour {
 		// Clear last state of attachments and submeshes
 		MeshState.SingleMeshState workingState = meshState.buffer;
 		var workingAttachments = workingState.attachments;
-		var workingFlips = workingState.attachmentsFlipState;
-		var workingSubmeshArguments = workingState.addSubmeshArguments;
 		workingAttachments.Clear(true);
 		workingState.UpdateAttachmentCount(drawOrderCount);
+		var workingAttachmentsItems = workingAttachments.Items;					// Make sure to not add to or remove from ExposedList inside the loop below
+
+		var workingFlips = workingState.attachmentsFlipState;
+		var workingFlipsItems = workingState.attachmentsFlipState.Items;		// Make sure to not add to or remove from ExposedList inside the loop below
+
+		var workingSubmeshArguments = workingState.addSubmeshArguments;	// Items array should not be cached. There is dynamic writing to this object.
 		workingSubmeshArguments.Clear(false);
 
 		MeshState.SingleMeshState storedState = useMesh1 ? meshState.stateMesh1 : meshState.stateMesh2;
 		var storedAttachments = storedState.attachments;
-		var storedFlips = storedState.attachmentsFlipState;
+		var storedAttachmentsItems = storedAttachments.Items;		// Make sure to not add to or remove from ExposedList inside the loop below
 
-		bool mustUpdateMeshStructure = storedState.requiresUpdate ||			// Force update if the mesh was cleared. (prevents flickering due to incorrect state)
+		var storedFlips = storedState.attachmentsFlipState;
+		var storedFlipsItems = storedFlips.Items;					// Make sure to not add to or remove from ExposedList inside the loop below
+
+		bool mustUpdateMeshStructure = storedState.requiresUpdate ||	// Force update if the mesh was cleared. (prevents flickering due to incorrect state)
 			drawOrder.Count != storedAttachments.Count ||				// Number of slots changed (when does this happen?)
 			immutableTriangles != storedState.immutableTriangles;		// Immutable Triangles flag changed.
 
 		for (int i = 0; i < drawOrderCount; i++) {
-			Slot slot = drawOrder.Items[i];
+			Slot slot = drawOrderItems[i];
 			Bone bone = slot.bone;
 			Attachment attachment = slot.attachment;
 
@@ -225,14 +233,14 @@ public class SkeletonRenderer : MonoBehaviour {
 			bool worldScaleIsSameSigns = ((bone.worldScaleY >= 0f) == (bone.worldScaleX >= 0f));
 			bool flip = frontFacing && ((bone.worldFlipX != bone.worldFlipY) == worldScaleIsSameSigns); // TODO: bone flipX and flipY will be removed in Spine 3.0
 
-			workingFlips.Items[i] = flip;
-			workingAttachments.Items[i] = attachment;
+			workingFlipsItems[i] = flip;
+			workingAttachmentsItems[i] = attachment;
 
 			mustUpdateMeshStructure = mustUpdateMeshStructure ||	// Always prefer short circuited or. || and not |=.
-				(attachment != storedAttachments.Items[i]) || 		// Attachment order changed. // This relies on the drawOrder.Count != storedAttachments.Count check above as a bounds check.
-				(flip != storedFlips.Items[i]);						// Flip states changed.
+				(attachment != storedAttachmentsItems[i]) || 		// Attachment order changed. // This relies on the drawOrder.Count != storedAttachments.Count check above as a bounds check.
+				(flip != storedFlipsItems[i]);						// Flip states changed.
 
-			RegionAttachment regionAttachment = attachment as RegionAttachment;
+			var regionAttachment = attachment as RegionAttachment;
 			if (regionAttachment != null) {
 				rendererObject = regionAttachment.RendererObject;
 				attachmentVertexCount = 4;
@@ -240,13 +248,13 @@ public class SkeletonRenderer : MonoBehaviour {
 			} else {
 				if (!renderMeshes)
 					continue;
-				MeshAttachment meshAttachment = attachment as MeshAttachment;
+				var meshAttachment = attachment as MeshAttachment;
 				if (meshAttachment != null) {
 					rendererObject = meshAttachment.RendererObject;
 					attachmentVertexCount = meshAttachment.vertices.Length >> 1;
 					attachmentTriangleCount = meshAttachment.triangles.Length;
 				} else {
-					SkinnedMeshAttachment skinnedMeshAttachment = attachment as SkinnedMeshAttachment;
+					var skinnedMeshAttachment = attachment as SkinnedMeshAttachment;
 					if (skinnedMeshAttachment != null) {
 						rendererObject = skinnedMeshAttachment.RendererObject;
 						attachmentVertexCount = skinnedMeshAttachment.uvs.Length >> 1;
@@ -301,7 +309,7 @@ public class SkeletonRenderer : MonoBehaviour {
 
 		mustUpdateMeshStructure = mustUpdateMeshStructure ||
 			this.sharedMaterials.Length != workingSubmeshArguments.Count ||		// Material array changed in size
-			CheckIfMustUpdateMeshStructure(workingSubmeshArguments);	// Submesh Argument Array changed.
+			CheckIfMustUpdateMeshStructure(workingSubmeshArguments);			// Submesh Argument Array changed.
 
 		// CheckIfMustUpdateMaterialArray (workingMaterials, sharedMaterials)
 		if (!mustUpdateMeshStructure) {
@@ -319,8 +327,10 @@ public class SkeletonRenderer : MonoBehaviour {
 
 		if (mustUpdateMeshStructure) {
 			this.submeshMaterials.Clear();
+
+			var workingSubmeshArgumentsItems = workingSubmeshArguments.Items;
 			for (int i = 0, n = workingSubmeshArguments.Count; i < n; i++) {
-				AddSubmesh(workingSubmeshArguments.Items[i], workingFlips);
+				AddSubmesh(workingSubmeshArgumentsItems[i], workingFlips);
 			}
 
 			// Set materials.
@@ -383,7 +393,7 @@ public class SkeletonRenderer : MonoBehaviour {
 			}
 			int i = 0;
 			do {
-				Slot slot = drawOrder.Items[i];
+				Slot slot = drawOrderItems[i];
 				Attachment attachment = slot.attachment;
 				RegionAttachment regionAttachment = attachment as RegionAttachment;
 				if (regionAttachment != null) {
@@ -636,7 +646,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		return false;
 	}
 
-	private void AddSubmesh (MeshState.AddSubmeshArguments submeshArguments, ExposedList<bool> flipStates) {
+	private void AddSubmesh (MeshState.AddSubmeshArguments submeshArguments, ExposedList<bool> flipStates) { //submeshArguments is a struct, so it's ok.
 		int submeshIndex = submeshMaterials.Count;
 		submeshMaterials.Add(submeshArguments.material);
 
@@ -645,8 +655,8 @@ public class SkeletonRenderer : MonoBehaviour {
 		else if (immutableTriangles)
 			return;
 
-		Submesh submesh = submeshes.Items[submeshIndex];
-		int[] triangles = submesh.triangles;
+		Submesh currentSubmesh = submeshes.Items[submeshIndex];
+		int[] triangles = currentSubmesh.triangles;
 
 		int triangleCount = submeshArguments.triangleCount;
 		int firstVertex = submeshArguments.firstVertex;
@@ -654,22 +664,24 @@ public class SkeletonRenderer : MonoBehaviour {
 		int trianglesCapacity = triangles.Length;
 		if (submeshArguments.isLastSubmesh && trianglesCapacity > triangleCount) {
 			// Last submesh may have more triangles than required, so zero triangles to the end.
-			for (int i = triangleCount; i < trianglesCapacity; i++)
+			for (int i = triangleCount; i < trianglesCapacity; i++) {
 				triangles[i] = 0;
-			submesh.triangleCount = triangleCount;
+			}
+			currentSubmesh.triangleCount = triangleCount;
+
 		} else if (trianglesCapacity != triangleCount) {
 			// Reallocate triangles when not the exact size needed.
-			submesh.triangles = triangles = new int[triangleCount];
-			submesh.triangleCount = 0;
+			currentSubmesh.triangles = triangles = new int[triangleCount];
+			currentSubmesh.triangleCount = 0;
 		}
 
-		if (!renderMeshes && !frontFacing) {
+		if (!this.renderMeshes && !this.frontFacing) {
 			// Use stored triangles if possible.
-			if (submesh.firstVertex != firstVertex || submesh.triangleCount < triangleCount) {
-				submesh.triangleCount = triangleCount;
-				submesh.firstVertex = firstVertex;
-				//int drawOrderIndex = 0;
-				for (int i = 0; i < triangleCount; i += 6, firstVertex += 4/*, drawOrderIndex++*/) {
+			if (currentSubmesh.firstVertex != firstVertex || currentSubmesh.triangleCount < triangleCount) { //|| currentSubmesh.triangleCount == 0
+				currentSubmesh.triangleCount = triangleCount;
+				currentSubmesh.firstVertex = firstVertex;
+
+				for (int i = 0; i < triangleCount; i += 6, firstVertex += 4) {
 					triangles[i] = firstVertex;
 					triangles[i + 1] = firstVertex + 2;
 					triangles[i + 2] = firstVertex + 1;
@@ -677,18 +689,21 @@ public class SkeletonRenderer : MonoBehaviour {
 					triangles[i + 4] = firstVertex + 3;
 					triangles[i + 5] = firstVertex + 1;
 				}
+
 			}
 			return;
 		}
 
 		// Iterate through all slots and store their triangles. 
-		ExposedList<Slot> drawOrder = skeleton.DrawOrder;
-		int triangleIndex = 0; // Modified by loop
-		for (int i = submeshArguments.startSlot, n = submeshArguments.endSlot; i < n; i++) {
-			Slot slot = drawOrder.Items[i];
-			Attachment attachment = slot.attachment;
 
-			bool flip = flipStates.Items[i];
+		var drawOrderItems = skeleton.DrawOrder.Items;	// Make sure to not modify ExposedList inside the loop below
+		var flipStatesItems = flipStates.Items;			// Make sure to not modify ExposedList inside the loop below
+
+		int triangleIndex = 0; // Modified by loop
+		for (int i = submeshArguments.startSlot, n = submeshArguments.endSlot; i < n; i++) {			
+			Attachment attachment = drawOrderItems[i].attachment;
+
+			bool flip = flipStatesItems[i];
 
 			// Add RegionAttachment triangles
 			if (attachment is RegionAttachment) {
@@ -716,12 +731,12 @@ public class SkeletonRenderer : MonoBehaviour {
 			// Add (Skinned)MeshAttachment triangles
 			int[] attachmentTriangles;
 			int attachmentVertexCount;
-			MeshAttachment meshAttachment = attachment as MeshAttachment;
+			var meshAttachment = attachment as MeshAttachment;
 			if (meshAttachment != null) {
 				attachmentVertexCount = meshAttachment.vertices.Length >> 1; //  length/2
 				attachmentTriangles = meshAttachment.triangles;
 			} else {
-				SkinnedMeshAttachment skinnedMeshAttachment = attachment as SkinnedMeshAttachment;
+				var skinnedMeshAttachment = attachment as SkinnedMeshAttachment;
 				if (skinnedMeshAttachment != null) {
 					attachmentVertexCount = skinnedMeshAttachment.uvs.Length >> 1; // length/2
 					attachmentTriangles = skinnedMeshAttachment.triangles;
