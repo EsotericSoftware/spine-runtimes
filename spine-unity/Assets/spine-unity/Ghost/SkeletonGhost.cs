@@ -11,7 +11,7 @@ using System.Collections.Generic;
 public class SkeletonGhost : MonoBehaviour {
 	public bool ghostingEnabled = true;
 	public float spawnRate = 0.05f;
-	public Color32 color = new Color32(0xFF, 0xFF, 0xFF, 0x00);
+	public Color32 color = new Color32(0xFF, 0xFF, 0xFF, 0x00); // default for additive.
 	[Tooltip("Remember to set color alpha to 0 if Additive is true")]
 	public bool additive = true;
 	public int maximumGhosts = 10;
@@ -20,6 +20,10 @@ public class SkeletonGhost : MonoBehaviour {
 	[Tooltip("0 is Color and Alpha, 1 is Alpha only.")]
 	[Range(0, 1)]
 	public float textureFade = 1;
+
+	[Header("Sorting")]
+	public bool sortWithDistanceOnly;
+	public float zOffset = 0f;
 
 	float nextSpawnTime;
 	SkeletonGhostRenderer[] pool;
@@ -100,14 +104,16 @@ public class SkeletonGhost : MonoBehaviour {
 				materials[i] = ghostMat;
 			}
 
-			pool[poolIndex].Initialize(meshFilter.sharedMesh, materials, color, additive, fadeSpeed, meshRenderer.sortingOrder - 1);
-			go.transform.parent = transform;
+			var goTransform = go.transform;
+			goTransform.parent = transform;
 
-			go.transform.localPosition = Vector3.zero;
-			go.transform.localRotation = Quaternion.identity;
-			go.transform.localScale = Vector3.one;
+			pool[poolIndex].Initialize(meshFilter.sharedMesh, materials, color, additive, fadeSpeed, meshRenderer.sortingLayerID, (sortWithDistanceOnly) ? meshRenderer.sortingOrder : meshRenderer.sortingOrder - 1);
 
-			go.transform.parent = null;
+			goTransform.localPosition = new Vector3(0f, 0f, zOffset);
+			goTransform.localRotation = Quaternion.identity;
+			goTransform.localScale = Vector3.one;
+
+			goTransform.parent = null;
 
 			poolIndex++;
 
