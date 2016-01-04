@@ -178,14 +178,11 @@ public class SpineAttachmentDrawer : SpineTreeItemDrawerBase<SpineAttachment> {
 		List<Skin> validSkins = new List<Skin>();
 		SkeletonRenderer skeletonRenderer = null;
 
-		if (property.serializedObject.targetObject is Component) {
-			var component = (Component)property.serializedObject.targetObject;
+		var component = property.serializedObject.targetObject as Component;
+		if (component != null) {
 			if (component.GetComponentInChildren<SkeletonRenderer>() != null) {
 				skeletonRenderer = component.GetComponentInChildren<SkeletonRenderer>();
-				if (skeletonDataAsset != skeletonRenderer.skeletonDataAsset) {
-					Debug.LogError("DataField SkeletonDataAsset and SkeletonRenderer/SkeletonAnimation's SkeletonDataAsset do not match. Remove the explicit dataField parameter of your [SpineAttachment] field.");
-				}
-
+				//if (skeletonDataAsset != skeletonRenderer.skeletonDataAsset) Debug.LogWarning("DataField SkeletonDataAsset and SkeletonRenderer/SkeletonAnimation's SkeletonDataAsset do not match. Remove the explicit dataField parameter of your [SpineAttachment] field.");
 				skeletonDataAsset = skeletonRenderer.skeletonDataAsset;
 			}
 		}
@@ -212,9 +209,11 @@ public class SpineAttachmentDrawer : SpineTreeItemDrawerBase<SpineAttachment> {
 			menu.AddDisabledItem(new GUIContent(skeletonRenderer.gameObject.name + " (SkeletonRenderer)"));
 		else
 			menu.AddDisabledItem(new GUIContent(skeletonDataAsset.name));
+		
 		menu.AddSeparator("");
 		
 		menu.AddItem(new GUIContent("Null"), property.stringValue == "", HandleSelect, new SpineDrawerValuePair("", property));
+
 		menu.AddSeparator("");
 		
 		Skin defaultSkin = data.Skins.Items[0];
