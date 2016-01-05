@@ -45,8 +45,6 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 		animationName = serializedObject.FindProperty("_animationName");
 		loop = serializedObject.FindProperty("loop");
 		timeScale = serializedObject.FindProperty("timeScale");
-		autoReset = serializedObject.FindProperty("autoReset");
-		autoResetLabel = new GUIContent("Generic Auto-reset");
 
 		if (PrefabUtility.GetPrefabType(this.target) == PrefabType.Prefab)
 			m_isPrefab = true;
@@ -97,7 +95,6 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 
 		EditorGUILayout.PropertyField(loop);
 		EditorGUILayout.PropertyField(timeScale);
-		EditorGUILayout.PropertyField(autoReset, autoResetLabel);
 		component.timeScale = Math.Max(component.timeScale, 0);
 
 		EditorGUILayout.Space();

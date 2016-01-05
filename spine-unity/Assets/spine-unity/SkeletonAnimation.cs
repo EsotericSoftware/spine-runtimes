@@ -111,9 +111,9 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 	#endif
 	public float timeScale = 1;
 
-	#if UNITY_5
+	#region AutoReset
+	/**
 	[Tooltip("Setting this to true makes the SkeletonAnimation behave similar to Spine editor. New animations will not inherit the pose from a previous animation. If you need to intermittently and programmatically pose your skeleton, leave this false.")]
-	#endif
 	[SerializeField]
 	protected bool autoReset = false;
 
@@ -132,6 +132,13 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 		}
 	}
 
+	protected virtual void HandleNewAnimationAutoreset (Spine.AnimationState state, int trackIndex) {
+		if (!autoReset) return;
+		if (skeleton != null) skeleton.SetToSetupPose();
+	}
+	*/
+	#endregion
+
 	public override void Reset () {
 		base.Reset();
 		if (!valid)
@@ -139,19 +146,16 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 
 		state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());
 
+		/*
 		if (autoReset) {
 			state.Start += HandleNewAnimationAutoreset;
 		}
+		*/
 
 		if (_animationName != null && _animationName.Length > 0) {
 			state.SetAnimation(0, _animationName, loop);
 			Update(0);
 		}
-	}
-		
-	protected virtual void HandleNewAnimationAutoreset (Spine.AnimationState state, int trackIndex) {
-		if (!autoReset) return;
-		if (skeleton != null) skeleton.SetToSetupPose();
 	}
 
 	public virtual void Update () {
