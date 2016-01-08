@@ -38,7 +38,7 @@ public class SkeletonDataAssetInspector : Editor {
 	private bool needToSerialize;
 
 	List<string> warnings = new List<string>();
-
+	
 	void OnEnable () {
 
 		SpineEditorUtilities.ConfirmInitialization();
@@ -61,7 +61,7 @@ public class SkeletonDataAssetInspector : Editor {
 
 			EditorApplication.update += Update;
 		} catch {
-
+			// TODO: WARNING: empty catch block supresses errors.
 
 		}
 
@@ -117,7 +117,7 @@ public class SkeletonDataAssetInspector : Editor {
 			DrawAnimationList();
 			DrawSlotList();
 			DrawUnityTools();
-
+			
 		} else {
 
 			DrawReimportButton();
@@ -131,8 +131,8 @@ public class SkeletonDataAssetInspector : Editor {
 	}
 
 	void DrawMecanim () {
-
-		EditorGUILayout.PropertyField(controller, new GUIContent("Controller", SpineEditorUtilities.Icons.controllerIcon));
+		
+		EditorGUILayout.PropertyField(controller, new GUIContent("Controller", SpineEditorUtilities.Icons.controllerIcon));		
 		if (controller.objectReferenceValue == null) {
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(32);
@@ -142,7 +142,7 @@ public class SkeletonDataAssetInspector : Editor {
 			GUILayout.EndHorizontal();
 			EditorGUILayout.LabelField("Alternative to SkeletonAnimation, not required", EditorStyles.miniLabel);
 		}
-
+		
 	}
 
 	void DrawUnityTools () {
@@ -162,7 +162,7 @@ public class SkeletonDataAssetInspector : Editor {
 			EditorGUILayout.HelpBox("WARNING!\n\nBaking is NOT the same as SkeletonAnimator!\nDoes not support the following:\n\tFlipX or Y\n\tInheritScale\n\tColor Keys\n\tDraw Order Keys\n\tIK and Curves are sampled at 60fps and are not realtime.\n\tPlease read SkeletonBaker.cs comments for full details.\n\nThe main use of Baking is to export Spine projects to be used without the Spine Runtime (ie: for sale on the Asset Store, or background objects that are animated only with a wind noise generator)", MessageType.Warning, true);
 			EditorGUI.indentLevel++;
 			bakeAnimations = EditorGUILayout.Toggle("Bake Animations", bakeAnimations);
-			EditorGUI.BeginDisabledGroup(bakeAnimations == false);
+			EditorGUI.BeginDisabledGroup(!bakeAnimations);
 			{
 				EditorGUI.indentLevel++;
 				bakeIK = EditorGUILayout.Toggle("Bake IK", bakeIK);
@@ -195,7 +195,7 @@ public class SkeletonDataAssetInspector : Editor {
 					try {
 						GUILayout.BeginVertical();
 						if (GUILayout.Button(new GUIContent("Bake " + skinName, SpineEditorUtilities.Icons.unityIcon), GUILayout.Height(32), GUILayout.Width(250)))
-							SkeletonBaker.BakeToPrefab(m_skeletonDataAsset, new ExposedList<Skin>(new Skin[] { bakeSkin }), "", bakeAnimations, bakeIK, bakeEventOptions);
+							SkeletonBaker.BakeToPrefab(m_skeletonDataAsset, new ExposedList<Skin>(new [] { bakeSkin }), "", bakeAnimations, bakeIK, bakeEventOptions);
 
 						GUILayout.BeginHorizontal();
 						GUILayout.Label(new GUIContent("Skins", SpineEditorUtilities.Icons.skinsRoot), GUILayout.Width(50));
@@ -257,7 +257,7 @@ public class SkeletonDataAssetInspector : Editor {
 		EditorGUILayout.PropertyField(defaultMix);
 
 		// Animation names
-		String[] animations = new String[m_skeletonData.Animations.Count];
+		var animations = new string[m_skeletonData.Animations.Count];
 		for (int i = 0; i < animations.Length; i++)
 			animations[i] = m_skeletonData.Animations.Items[i].Name;
 
@@ -292,7 +292,7 @@ public class SkeletonDataAssetInspector : Editor {
 			serializedObject.ApplyModifiedProperties();
 			needToSerialize = true;
 		}
-
+			
 	}
 	void DrawAnimationList () {
 		showAnimationList = EditorGUILayout.Foldout(showAnimationList, new GUIContent("Animations", SpineEditorUtilities.Icons.animationRoot));
@@ -445,7 +445,7 @@ public class SkeletonDataAssetInspector : Editor {
 				warnings.Add("Skeleton data file is not a valid JSON or binary file.");
 			} else {
 				bool detectedNullAtlasEntry = false;
-				List<Atlas> atlasList = new List<Atlas>();
+				var atlasList = new List<Atlas>();
 				for (int i = 0; i < atlasAssets.arraySize; i++) {
 					if (atlasAssets.GetArrayElementAtIndex(i).objectReferenceValue == null) {
 						detectedNullAtlasEntry = true;
@@ -676,7 +676,7 @@ public class SkeletonDataAssetInspector : Editor {
 
 
 
-			if (drawHandles) {
+			if (drawHandles) {			
 				Handles.SetCamera(m_previewUtility.m_Camera);
 				Handles.color = m_originColor;
 
@@ -689,9 +689,10 @@ public class SkeletonDataAssetInspector : Editor {
 			if (drawHandles) {
 				Handles.SetCamera(m_previewUtility.m_Camera);
 				foreach (var slot in m_skeletonAnimation.skeleton.Slots) {
-					if (slot.Attachment is BoundingBoxAttachment) {
+					var boundingBoxAttachment = slot.Attachment as BoundingBoxAttachment;
 
-						DrawBoundingBox(slot.Bone, (BoundingBoxAttachment)slot.Attachment);
+					if (boundingBoxAttachment != null) {
+						DrawBoundingBox (slot.Bone, boundingBoxAttachment);
 					}
 				}
 			}
@@ -702,8 +703,10 @@ public class SkeletonDataAssetInspector : Editor {
 
 	}
 
-	void DrawBoundingBox (Bone bone, BoundingBoxAttachment box) {
-		float[] worldVerts = new float[box.Vertices.Length];
+	static void DrawBoundingBox (Bone bone, BoundingBoxAttachment box) {
+		if (box.Vertices.Length <= 0) return; // Handle cases where user creates a BoundingBoxAttachment but doesn't actually define it.
+
+		var worldVerts = new float[box.Vertices.Length];
 		box.ComputeWorldVertices(bone, worldVerts);
 
 		Handles.color = Color.green;
@@ -717,15 +720,12 @@ public class SkeletonDataAssetInspector : Editor {
 			if (i > 0) {
 				Handles.DrawLine(lastVert, vert);
 			}
-
-
+				
 			lastVert = vert;
 		}
 
 		Handles.DrawLine(lastVert, firstVert);
-
-
-
+		
 	}
 
 	void Update () {
@@ -824,7 +824,7 @@ public class SkeletonDataAssetInspector : Editor {
 
 				float fr = m_animEventFrames[i];
 
-				Rect evRect = new Rect(barRect);
+				var evRect = new Rect(barRect);
 				evRect.x = Mathf.Clamp(((fr / t.Animation.Duration) * width) - (SpineEditorUtilities.Icons._event.width / 2), barRect.x, float.MaxValue);
 				evRect.width = SpineEditorUtilities.Icons._event.width;
 				evRect.height = SpineEditorUtilities.Icons._event.height;
@@ -882,7 +882,7 @@ public class SkeletonDataAssetInspector : Editor {
 				EditorGUIUtility.SetWantsMouseJumping(1);
 			}
 			return scrollPosition;
-
+			
 		case EventType.MouseUp:
 			if (GUIUtility.hotControl == controlID)
 			{
@@ -890,10 +890,10 @@ public class SkeletonDataAssetInspector : Editor {
 			}
 			EditorGUIUtility.SetWantsMouseJumping(0);
 			return scrollPosition;
-
+			
 		case EventType.MouseMove:
 			return scrollPosition;
-
+			
 		case EventType.MouseDrag:
 			if (GUIUtility.hotControl == controlID)
 			{
@@ -930,7 +930,7 @@ public class SkeletonDataAssetInspector : Editor {
 	//TODO:  Fix first-import error
 	//TODO:  Update preview without thumbnail
 	public override Texture2D RenderStaticPreview (string assetPath, UnityEngine.Object[] subAssets, int width, int height) {
-		Texture2D tex = new Texture2D(width, height, TextureFormat.ARGB32, false);
+		var tex = new Texture2D(width, height, TextureFormat.ARGB32, false);
 
 		this.InitPreview();
 
