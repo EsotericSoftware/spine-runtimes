@@ -70,6 +70,7 @@
     <Compile Include="src\AnimationState.cs" />
     <Compile Include="src\Event.cs" />
     <Compile Include="src\EventData.cs" />
+    <Compile Include="src\ExposedList.cs" />
     <Compile Include="src\IkConstraint.cs" />
     <Compile Include="src\IkConstraintData.cs" />
     <Compile Include="src\Json.cs" />

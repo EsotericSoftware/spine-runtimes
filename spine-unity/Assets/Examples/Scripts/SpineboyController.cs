@@ -11,11 +11,11 @@ using System.Collections;
 public class SpineboyController : MonoBehaviour {
 
 	SkeletonAnimation skeletonAnimation;
-	public string idleAnimation = "idle";
-	public string walkAnimation = "walk";
-	public string runAnimation = "run";
-	public string hitAnimation = "hit";
-	public string deathAnimation = "death";
+	[SpineAnimation] public string idleAnimation = "idle";
+	[SpineAnimation] public string walkAnimation = "walk";
+	[SpineAnimation] public string runAnimation = "run";
+	[SpineAnimation] public string hitAnimation = "hit";
+	[SpineAnimation] public string deathAnimation = "death";
 	public float walkVelocity = 1;
 	public float runVelocity = 3;
 	public int hp = 10;

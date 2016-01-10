@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
  * Spine Runtimes Software License
  * Version 2.3
  * 
@@ -29,37 +29,59 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef SPINE_SFML_H_
-#define SPINE_SFML_H_
+//using UnityEngine;
+using System.Collections;
+using Spine;
 
-#define SPINE_SHORT_NAMES
-#include <spine/spine.h>
-#include <spine/extension.h>
-#include <SFML/Graphics/Vertex.hpp>
-#include <SFML/Graphics/VertexArray.hpp>
-#include <SFML/Graphics/Texture.hpp>
-#include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/Graphics/RenderStates.hpp>
+namespace Spine {
+	/// <summary>
+	/// Use this as a condition-blocking yield instruction for Unity Coroutines. 
+	/// The routine will pause until the AnimationState.TrackEntry fires its Complete event.</summary>
+	public class WaitForSpineAnimationComplete : IEnumerator {
+		
+		bool m_WasFired = false;
 
-namespace spine {
+		public WaitForSpineAnimationComplete (Spine.TrackEntry trackEntry) {
+			SafeSubscribe(trackEntry);
+		}
 
-class SkeletonDrawable: public sf::Drawable {
-public:
-	Skeleton* skeleton;
-	AnimationState* state;
-	float timeScale;
-	sf::VertexArray* vertexArray;
+		void HandleComplete (AnimationState state, int trackIndex, int loopCount) {
+			m_WasFired = true;
+		}
 
-	SkeletonDrawable (SkeletonData* skeleton, AnimationStateData* stateData = 0);
-	~SkeletonDrawable ();
+		void SafeSubscribe (Spine.TrackEntry trackEntry) {
+			if (trackEntry == null) {
+				// Break immediately if trackEntry is null.
+				m_WasFired = true;
+			} else {
+				// Function normally.
+				trackEntry.Complete += HandleComplete;
+			}
+		}
 
-	void update (float deltaTime);
+		#region Reuse
+		/// <summary>
+		/// One optimization high-frequency YieldInstruction returns is to cache instances to minimize pressure. 
+		/// Use NowWaitFor to reuse the same instance of WaitForSpineAnimationComplete.</summary>
+		public WaitForSpineAnimationComplete NowWaitFor (Spine.TrackEntry trackEntry) {
+			SafeSubscribe(trackEntry);
+			return this;
+		}
+		#endregion
 
-	virtual void draw (sf::RenderTarget& target, sf::RenderStates states) const;
-private:
-	bool ownsAnimationStateData;
-	float* worldVertices;
-};
+		#region IEnumerator
+		bool IEnumerator.MoveNext () {
+			if (m_WasFired) {
+				((IEnumerator)this).Reset();	// auto-reset for YieldInstruction reuse
+				return false;
+			}
 
-} /* namespace spine */
-#endif /* SPINE_SFML_H_ */
+			return true;
+		}
+		void IEnumerator.Reset () { m_WasFired = false; }
+		object IEnumerator.Current { get { return null; } }
+		#endregion
+
+	}
+
+}

@@ -83,10 +83,11 @@ namespace Spine {
 		}
 
 		public void Draw (Skeleton skeleton) {
-			List<Slot> drawOrder = skeleton.DrawOrder;
+			var drawOrder = skeleton.DrawOrder;
+			var drawOrderItems = skeleton.DrawOrder.Items;
 			float skeletonR = skeleton.R, skeletonG = skeleton.G, skeletonB = skeleton.B, skeletonA = skeleton.A;
 			for (int i = 0, n = drawOrder.Count; i < n; i++) {
-				Slot slot = drawOrder[i];
+				Slot slot = drawOrderItems[i];
 				RegionAttachment regionAttachment = slot.Attachment as RegionAttachment;
 				if (regionAttachment != null) {
 					BlendState blend = slot.Data.BlendMode == BlendMode.additive ? BlendState.Additive : defaultBlendState;
