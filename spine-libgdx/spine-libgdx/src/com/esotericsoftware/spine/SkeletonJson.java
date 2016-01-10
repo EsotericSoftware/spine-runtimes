@@ -46,8 +46,6 @@ import com.esotericsoftware.spine.Animation.CurveTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.FfdTimeline;
-import com.esotericsoftware.spine.Animation.FlipXTimeline;
-import com.esotericsoftware.spine.Animation.FlipYTimeline;
 import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
@@ -118,10 +116,6 @@ public class SkeletonJson {
 			boneData.rotation = boneMap.getFloat("rotation", 0);
 			boneData.scaleX = boneMap.getFloat("scaleX", 1);
 			boneData.scaleY = boneMap.getFloat("scaleY", 1);
-			boneData.flipX = boneMap.getBoolean("flipX", false);
-			boneData.flipY = boneMap.getBoolean("flipY", false);
-			boneData.inheritScale = boneMap.getBoolean("inheritScale", true);
-			boneData.inheritRotation = boneMap.getBoolean("inheritRotation", true);
 
 			String color = boneMap.getString("color", null);
 			if (color != null) boneData.getColor().set(Color.valueOf(color));
@@ -388,20 +382,6 @@ public class SkeletonJson {
 					}
 					timelines.add(timeline);
 					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 3 - 3]);
-
-				} else if (timelineName.equals("flipX") || timelineName.equals("flipY")) {
-					boolean x = timelineName.equals("flipX");
-					FlipXTimeline timeline = x ? new FlipXTimeline(timelineMap.size) : new FlipYTimeline(timelineMap.size);
-					timeline.boneIndex = boneIndex;
-
-					String field = x ? "x" : "y";
-					int frameIndex = 0;
-					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next) {
-						timeline.setFrame(frameIndex, valueMap.getFloat("time"), valueMap.getBoolean(field, false));
-						frameIndex++;
-					}
-					timelines.add(timeline);
-					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 2 - 2]);
 
 				} else
 					throw new RuntimeException("Invalid timeline type for a bone: " + timelineName + " (" + boneMap.name + ")");

@@ -99,7 +99,8 @@ public class SkinnedMeshAttachment extends Attachment {
 		}
 	}
 
-	public void updateWorldVertices (Slot slot, boolean premultipliedAlpha) {
+	/** @return The updated world vertices. */
+	public float[] updateWorldVertices (Slot slot, boolean premultipliedAlpha) {
 		Skeleton skeleton = slot.getSkeleton();
 		Color skeletonColor = skeleton.getColor();
 		Color meshColor = slot.getColor();
@@ -126,8 +127,8 @@ public class SkinnedMeshAttachment extends Attachment {
 				for (; v < nn; v++, b += 3) {
 					Bone bone = (Bone)skeletonBones[bones[v]];
 					float vx = weights[b], vy = weights[b + 1], weight = weights[b + 2];
-					wx += (vx * bone.getM00() + vy * bone.getM01() + bone.getWorldX()) * weight;
-					wy += (vx * bone.getM10() + vy * bone.getM11() + bone.getWorldY()) * weight;
+					wx += (vx * bone.getA() + vy * bone.getB() + bone.getWorldX()) * weight;
+					wy += (vx * bone.getC() + vy * bone.getD() + bone.getWorldY()) * weight;
 				}
 				worldVertices[w] = wx + x;
 				worldVertices[w + 1] = wy + y;
@@ -141,14 +142,15 @@ public class SkinnedMeshAttachment extends Attachment {
 				for (; v < nn; v++, b += 3, f += 2) {
 					Bone bone = (Bone)skeletonBones[bones[v]];
 					float vx = weights[b] + ffd[f], vy = weights[b + 1] + ffd[f + 1], weight = weights[b + 2];
-					wx += (vx * bone.getM00() + vy * bone.getM01() + bone.getWorldX()) * weight;
-					wy += (vx * bone.getM10() + vy * bone.getM11() + bone.getWorldY()) * weight;
+					wx += (vx * bone.getA() + vy * bone.getB() + bone.getWorldX()) * weight;
+					wy += (vx * bone.getC() + vy * bone.getD() + bone.getWorldY()) * weight;
 				}
 				worldVertices[w] = wx + x;
 				worldVertices[w + 1] = wy + y;
 				worldVertices[w + 2] = color;
 			}
 		}
+		return worldVertices;
 	}
 
 	public float[] getWorldVertices () {
