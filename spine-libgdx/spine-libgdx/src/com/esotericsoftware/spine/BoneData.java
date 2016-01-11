@@ -40,7 +40,7 @@ public class BoneData {
 	float x, y;
 	float rotation;
 	float scaleX = 1, scaleY = 1;
-	boolean inheritScale, inheritRotation;
+	boolean inheritScale = true, inheritRotation = true;
 
 	// Nonessential.
 	final Color color = new Color(0.61f, 0.61f, 0.61f, 1);
