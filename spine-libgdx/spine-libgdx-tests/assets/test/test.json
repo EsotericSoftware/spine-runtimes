@@ -1,0 +1,18 @@
+{
+"skeleton": { "hash": "NG9aJneROk8CsMAugcCOiMeXbGA", "spine": "Dev", "width": 0, "height": 0 },
+"bones": [
+	{ "name": "root" }
+],
+"events": {
+	"event": {}
+},
+"animations": {
+	"events": {
+		"events": [
+			{ "time": 0, "name": "event", "string": "0" },
+			{ "time": 0.4666, "name": "event", "string": "14" },
+			{ "time": 1, "name": "event", "string": "30" }
+		]
+	}
+}
+}
