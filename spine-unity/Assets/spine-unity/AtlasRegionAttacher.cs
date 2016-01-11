@@ -50,14 +50,14 @@ public class AtlasRegionAttacher : MonoBehaviour {
 
 	Atlas atlas;
 
-	void Awake() {
+	void Awake () {
 		GetComponent<SkeletonRenderer>().OnReset += Apply;
 	}
 
 
-	void Apply(SkeletonRenderer skeletonRenderer) {
+	void Apply (SkeletonRenderer skeletonRenderer) {
 		atlas = atlasAsset.GetAtlas();
-		
+
 		AtlasAttachmentLoader loader = new AtlasAttachmentLoader(atlas);
 
 		float scaleMultiplier = skeletonRenderer.skeletonDataAsset.scale;

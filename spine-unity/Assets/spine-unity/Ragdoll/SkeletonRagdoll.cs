@@ -67,7 +67,7 @@ public class SkeletonRagdoll : MonoBehaviour {
 	private Rigidbody rootRigidbody;
 	private ISkeletonAnimation skeletonAnim;
 	private Skeleton skeleton;
-	private Dictionary<Bone, Transform> boneTable = new Dictionary<Bone,Transform>();
+	private Dictionary<Bone, Transform> boneTable = new Dictionary<Bone, Transform>();
 	private Bone startingBone;
 	private Transform ragdollRoot;
 	private Vector3 rootOffset;
@@ -121,7 +121,7 @@ public class SkeletonRagdoll : MonoBehaviour {
 
 		Rigidbody[] arr = new Rigidbody[boneTable.Count];
 		int i = 0;
-		foreach(Transform t in boneTable.Values){
+		foreach (Transform t in boneTable.Values) {
 			arr[i] = t.GetComponent<Rigidbody>();
 			i++;
 		}
@@ -242,7 +242,7 @@ public class SkeletonRagdoll : MonoBehaviour {
 				Debug.LogWarning(msg);
 			}
 		}
-		
+
 		if (disableIK) {
 			foreach (IkConstraint ik in skeleton.IkConstraints) {
 				ik.Mix = 0;

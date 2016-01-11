@@ -7,9 +7,12 @@
 using UnityEngine;
 using System.Collections;
 
-public class SpineSlot : PropertyAttribute {
-	public string startsWith = "";
+public abstract class SpineAttributeBase : PropertyAttribute {
 	public string dataField = "";
+	public string startsWith = "";
+}
+
+public class SpineSlot : SpineAttributeBase {
 	public bool containsBoundingBoxes = false;
 
 	/// <summary>
@@ -28,10 +31,22 @@ public class SpineSlot : PropertyAttribute {
 	}
 }
 
-public class SpineSkin : PropertyAttribute {
-	public string startsWith = "";
-	public string dataField = "";
+public class SpineEvent : SpineAttributeBase {
+	/// <summary>
+	/// Smart popup menu for Spine Events (Spine.EventData)
+	/// </summary>
+	/// <param name="startsWith">Filters popup results to elements that begin with supplied string.</param>
+	/// <param name="dataField">If specified, a locally scoped field with the name supplied by in dataField will be used to fill the popup results.
+	/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives).
+	/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
+	/// </param>
+	public SpineEvent(string startsWith = "", string dataField = "") {
+		this.startsWith = startsWith;
+		this.dataField = dataField;
+	}
+}
 
+public class SpineSkin : SpineAttributeBase {
 	/// <summary>
 	/// Smart popup menu for Spine Skins
 	/// </summary>
@@ -45,10 +60,7 @@ public class SpineSkin : PropertyAttribute {
 		this.dataField = dataField;
 	}
 }
-public class SpineAnimation : PropertyAttribute {
-	public string startsWith = "";
-	public string dataField = "";
-
+public class SpineAnimation : SpineAttributeBase {
 	/// <summary>
 	/// Smart popup menu for Spine Animations
 	/// </summary>
@@ -63,17 +75,11 @@ public class SpineAnimation : PropertyAttribute {
 	}
 }
 
-public class SpineAttachment : PropertyAttribute {
+public class SpineAttachment : SpineAttributeBase {
 	public bool returnAttachmentPath = false;
 	public bool currentSkinOnly = false;
 	public bool placeholdersOnly = false;
-	public string dataField = "";
 	public string slotField = "";
-
-
-	public SpineAttachment() {
-
-	}
 
 	/// <summary>
 	/// Smart popup menu for Spine Attachments
@@ -136,10 +142,7 @@ public class SpineAttachment : PropertyAttribute {
 	}
 }
 
-public class SpineBone : PropertyAttribute {
-	public string startsWith = "";
-	public string dataField = "";
-
+public class SpineBone : SpineAttributeBase {
 	/// <summary>
 	/// Smart popup menu for Spine Bones
 	/// </summary>

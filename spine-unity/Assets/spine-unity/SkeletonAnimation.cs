@@ -30,7 +30,6 @@
  *****************************************************************************/
 
 using System;
-using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 using Spine;
@@ -38,11 +37,11 @@ using Spine;
 [ExecuteInEditMode]
 [AddComponentMenu("Spine/SkeletonAnimation")]
 public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
-	public float timeScale = 1;
-	public bool loop;
-	public Spine.AnimationState state;
 
-	
+	/// <summary>
+	/// This is the Spine.AnimationState object of this SkeletonAnimation. You can control animations through it. 
+	/// Note that this object, like .skeleton, is not guaranteed to exist in Awake. Do all accesses and caching to it in Start</summary>
+	public Spine.AnimationState state;
 
 	public event UpdateBonesDelegate UpdateLocal {
 		add { _UpdateLocal += value; }
@@ -63,18 +62,21 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 	protected event UpdateBonesDelegate _UpdateWorld;
 	protected event UpdateBonesDelegate _UpdateComplete;
 
+	// TODO: Make this a safe getter. Lazy-initialize and avoid double-initialization.
 	public Skeleton Skeleton {
-		get {
-			return this.skeleton;
-		}
+		get { return this.skeleton; }
 	}
 
 	[SerializeField]
-	private String
-		_animationName;
+	private String _animationName;
 
 	public String AnimationName {
 		get {
+			if (!valid) {
+				Debug.LogWarning("You tried access AnimationName but the SkeletonAnimation was not valid. Try checking your Skeleton Data for errors.");
+				return null;
+			}
+			
 			TrackEntry entry = state.GetCurrent(0);
 			return entry == null ? null : entry.Animation.Name;
 		}
@@ -82,6 +84,12 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 			if (_animationName == value)
 				return;
 			_animationName = value;
+			
+			if (!valid) {
+				Debug.LogWarning("You tried to change AnimationName but the SkeletonAnimation was not valid. Try checking your Skeleton Data for errors.");
+				return;
+			}
+			
 			if (value == null || value.Length == 0)
 				state.ClearTrack(0);
 			else
@@ -89,12 +97,61 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 		}
 	}
 
+	/// <summary>Whether or not an animation should loop. This only applies to the initial animation specified in the inspector, or any subsequent Animations played through .AnimationName. Animations set through state.SetAnimation are unaffected.</summary>
+	#if UNITY_5
+	[Tooltip("Whether or not an animation should loop. This only applies to the initial animation specified in the inspector, or any subsequent Animations played through .AnimationName. Animations set through state.SetAnimation are unaffected.")]
+	#endif
+	public bool loop;
+
+	/// <summary>
+	/// The rate at which animations progress over time. 1 means 100%. 0.5 means 50%.
+	/// AnimationState and TrackEntry also have their own timeScale. These are combined multiplicatively.</summary>
+	#if UNITY_5
+	[Tooltip("The rate at which animations progress over time. 1 means 100%. 0.5 means 50%.")]
+	#endif
+	public float timeScale = 1;
+
+	#region AutoReset
+	/**
+	[Tooltip("Setting this to true makes the SkeletonAnimation behave similar to Spine editor. New animations will not inherit the pose from a previous animation. If you need to intermittently and programmatically pose your skeleton, leave this false.")]
+	[SerializeField]
+	protected bool autoReset = false;
+
+	/// <summary>
+	/// Setting this to true makes the SkeletonAnimation behave similar to Spine editor. 
+	/// New animations will not inherit the pose from a previous animation. 
+	/// If you need to intermittently and programmatically pose your skeleton, leave this false.</summary>
+	public bool AutoReset {
+		get { return this.autoReset; }
+		set {
+			if (!autoReset && value) {
+				state.Start -= HandleNewAnimationAutoreset;	// make sure there isn't a double-subscription.
+				state.Start += HandleNewAnimationAutoreset;
+			}
+			autoReset = value;
+		}
+	}
+
+	protected virtual void HandleNewAnimationAutoreset (Spine.AnimationState state, int trackIndex) {
+		if (!autoReset) return;
+		if (skeleton != null) skeleton.SetToSetupPose();
+	}
+	*/
+	#endregion
+
 	public override void Reset () {
 		base.Reset();
 		if (!valid)
 			return;
 
 		state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());
+
+		/*
+		if (autoReset) {
+			state.Start += HandleNewAnimationAutoreset;
+		}
+		*/
+
 		if (_animationName != null && _animationName.Length > 0) {
 			state.SetAnimation(0, _animationName, loop);
 			Update(0);
@@ -114,17 +171,17 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 		state.Update(deltaTime);
 		state.Apply(skeleton);
 
-		if (_UpdateLocal != null) 
+		if (_UpdateLocal != null)
 			_UpdateLocal(this);
 
 		skeleton.UpdateWorldTransform();
 
-		if (_UpdateWorld != null) { 
+		if (_UpdateWorld != null) {
 			_UpdateWorld(this);
 			skeleton.UpdateWorldTransform();
 		}
 
-		if (_UpdateComplete != null) { 
+		if (_UpdateComplete != null) {
 			_UpdateComplete(this);
 		}
 	}

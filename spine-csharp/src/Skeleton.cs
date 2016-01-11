@@ -35,11 +35,11 @@ using System.Collections.Generic;
 namespace Spine {
 	public class Skeleton {
 		internal SkeletonData data;
-		internal List<Bone> bones;
-		internal List<Slot> slots;
-		internal List<Slot> drawOrder;
-		internal List<IkConstraint> ikConstraints;
-		private List<List<Bone>> boneCache = new List<List<Bone>>();
+		internal ExposedList<Bone> bones;
+		internal ExposedList<Slot> slots;
+		internal ExposedList<Slot> drawOrder;
+		internal ExposedList<IkConstraint> ikConstraints;
+		private ExposedList<ExposedList<Bone>> boneCache = new ExposedList<ExposedList<Bone>>();
 		internal Skin skin;
 		internal float r = 1, g = 1, b = 1, a = 1;
 		internal float time;
@@ -47,10 +47,10 @@ namespace Spine {
 		internal float x, y;
 
 		public SkeletonData Data { get { return data; } }
-		public List<Bone> Bones { get { return bones; } }
-		public List<Slot> Slots { get { return slots; } }
-		public List<Slot> DrawOrder { get { return drawOrder; } }
-		public List<IkConstraint> IkConstraints { get { return ikConstraints; } set { ikConstraints = value; } }
+		public ExposedList<Bone> Bones { get { return bones; } }
+		public ExposedList<Slot> Slots { get { return slots; } }
+		public ExposedList<Slot> DrawOrder { get { return drawOrder; } }
+		public ExposedList<IkConstraint> IkConstraints { get { return ikConstraints; } set { ikConstraints = value; } }
 		public Skin Skin { get { return skin; } set { skin = value; } }
 		public float R { get { return r; } set { r = value; } }
 		public float G { get { return g; } set { g = value; } }
@@ -64,7 +64,7 @@ namespace Spine {
 
 		public Bone RootBone {
 			get {
-				return bones.Count == 0 ? null : bones[0];
+				return bones.Count == 0 ? null : bones.Items[0];
 			}
 		}
 
@@ -72,58 +72,59 @@ namespace Spine {
 			if (data == null) throw new ArgumentNullException("data cannot be null.");
 			this.data = data;
 
-			bones = new List<Bone>(data.bones.Count);
+			bones = new ExposedList<Bone>(data.bones.Count);
 			foreach (BoneData boneData in data.bones) {
-				Bone parent = boneData.parent == null ? null : bones[data.bones.IndexOf(boneData.parent)];
+				Bone parent = boneData.parent == null ? null : bones.Items[data.bones.IndexOf(boneData.parent)];
 				Bone bone = new Bone(boneData, this, parent);
 				if (parent != null) parent.children.Add(bone);
 				bones.Add(bone);
 			}
 
-			slots = new List<Slot>(data.slots.Count);
-			drawOrder = new List<Slot>(data.slots.Count);
+			slots = new ExposedList<Slot>(data.slots.Count);
+			drawOrder = new ExposedList<Slot>(data.slots.Count);
 			foreach (SlotData slotData in data.slots) {
-				Bone bone = bones[data.bones.IndexOf(slotData.boneData)];
+				Bone bone = bones.Items[data.bones.IndexOf(slotData.boneData)];
 				Slot slot = new Slot(slotData, bone);
 				slots.Add(slot);
 				drawOrder.Add(slot);
 			}
 
-			ikConstraints = new List<IkConstraint>(data.ikConstraints.Count);
+			ikConstraints = new ExposedList<IkConstraint>(data.ikConstraints.Count);
 			foreach (IkConstraintData ikConstraintData in data.ikConstraints)
 				ikConstraints.Add(new IkConstraint(ikConstraintData, this));
 
 			UpdateCache();
+			UpdateWorldTransform();
 		}
 
 		/// <summary>Caches information about bones and IK constraints. Must be called if bones or IK constraints are added or
 		/// removed.</summary>
 		public void UpdateCache () {
-			List<List<Bone>> boneCache = this.boneCache;
-			List<IkConstraint> ikConstraints = this.ikConstraints;
+			ExposedList<ExposedList<Bone>> boneCache = this.boneCache;
+			ExposedList<IkConstraint> ikConstraints = this.ikConstraints;
 			int ikConstraintsCount = ikConstraints.Count;
 
 			int arrayCount = ikConstraintsCount + 1;
 			if (boneCache.Count > arrayCount) boneCache.RemoveRange(arrayCount, boneCache.Count - arrayCount);
 			for (int i = 0, n = boneCache.Count; i < n; i++)
-				boneCache[i].Clear();
+				boneCache.Items[i].Clear();
 			while (boneCache.Count < arrayCount)
-				boneCache.Add(new List<Bone>());
+				boneCache.Add(new ExposedList<Bone>());
 
-			List<Bone> nonIkBones = boneCache[0];
+			ExposedList<Bone> nonIkBones = boneCache.Items[0];
 
 			for (int i = 0, n = bones.Count; i < n; i++) {
-				Bone bone = bones[i];
+				Bone bone = bones.Items[i];
 				Bone current = bone;
 				do {
 					for (int ii = 0; ii < ikConstraintsCount; ii++) {
-						IkConstraint ikConstraint = ikConstraints[ii];
-						Bone parent = ikConstraint.bones[0];
-						Bone child = ikConstraint.bones[ikConstraint.bones.Count - 1];
+						IkConstraint ikConstraint = ikConstraints.Items[ii];
+						Bone parent = ikConstraint.bones.Items[0];
+						Bone child = ikConstraint.bones.Items[ikConstraint.bones.Count - 1];
 						while (true) {
 							if (current == child) {
-								boneCache[ii].Add(bone);
-								boneCache[ii + 1].Add(bone);
+								boneCache.Items[ii].Add(bone);
+								boneCache.Items[ii + 1].Add(bone);
 								goto outer;
 							}
 							if (child == parent) break;
@@ -133,26 +134,26 @@ namespace Spine {
 					current = current.parent;
 				} while (current != null);
 				nonIkBones.Add(bone);
-				outer: {}
+			outer: { }
 			}
 		}
 
 		/// <summary>Updates the world transform for each bone and applies IK constraints.</summary>
 		public void UpdateWorldTransform () {
-			List<Bone> bones = this.bones;
+			ExposedList<Bone> bones = this.bones;
 			for (int ii = 0, nn = bones.Count; ii < nn; ii++) {
-				Bone bone = bones[ii];
+				Bone bone = bones.Items[ii];
 				bone.rotationIK = bone.rotation;
 			}
-			List<List<Bone>> boneCache = this.boneCache;
-			List<IkConstraint> ikConstraints = this.ikConstraints;
+			ExposedList<ExposedList<Bone>> boneCache = this.boneCache;
+			ExposedList<IkConstraint> ikConstraints = this.ikConstraints;
 			int i = 0, last = boneCache.Count - 1;
 			while (true) {
-				List<Bone> updateBones = boneCache[i];
+				ExposedList<Bone> updateBones = boneCache.Items[i];
 				for (int ii = 0, nn = updateBones.Count; ii < nn; ii++)
-					updateBones[ii].UpdateWorldTransform();
+					updateBones.Items[ii].UpdateWorldTransform();
 				if (i == last) break;
-				ikConstraints[i].apply();
+				ikConstraints.Items[i].apply();
 				i++;
 			}
 		}
@@ -164,32 +165,34 @@ namespace Spine {
 		}
 
 		public void SetBonesToSetupPose () {
-			List<Bone> bones = this.bones;
+			ExposedList<Bone> bones = this.bones;
 			for (int i = 0, n = bones.Count; i < n; i++)
-				bones[i].SetToSetupPose();
+				bones.Items[i].SetToSetupPose();
 
-			List<IkConstraint> ikConstraints = this.ikConstraints;
+			ExposedList<IkConstraint> ikConstraints = this.ikConstraints;
 			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
-				IkConstraint ikConstraint = ikConstraints[i];
+				IkConstraint ikConstraint = ikConstraints.Items[i];
 				ikConstraint.bendDirection = ikConstraint.data.bendDirection;
 				ikConstraint.mix = ikConstraint.data.mix;
 			}
 		}
 
 		public void SetSlotsToSetupPose () {
-			List<Slot> slots = this.slots;
+			ExposedList<Slot> slots = this.slots;
 			drawOrder.Clear();
-			drawOrder.AddRange(slots);
 			for (int i = 0, n = slots.Count; i < n; i++)
-				slots[i].SetToSetupPose(i);
+				drawOrder.Add(slots.Items[i]);
+
+			for (int i = 0, n = slots.Count; i < n; i++)
+				slots.Items[i].SetToSetupPose(i);
 		}
 
 		/// <returns>May be null.</returns>
 		public Bone FindBone (String boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName cannot be null.");
-			List<Bone> bones = this.bones;
+			ExposedList<Bone> bones = this.bones;
 			for (int i = 0, n = bones.Count; i < n; i++) {
-				Bone bone = bones[i];
+				Bone bone = bones.Items[i];
 				if (bone.data.name == boneName) return bone;
 			}
 			return null;
@@ -198,18 +201,18 @@ namespace Spine {
 		/// <returns>-1 if the bone was not found.</returns>
 		public int FindBoneIndex (String boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName cannot be null.");
-			List<Bone> bones = this.bones;
+			ExposedList<Bone> bones = this.bones;
 			for (int i = 0, n = bones.Count; i < n; i++)
-				if (bones[i].data.name == boneName) return i;
+				if (bones.Items[i].data.name == boneName) return i;
 			return -1;
 		}
 
 		/// <returns>May be null.</returns>
 		public Slot FindSlot (String slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
-			List<Slot> slots = this.slots;
+			ExposedList<Slot> slots = this.slots;
 			for (int i = 0, n = slots.Count; i < n; i++) {
-				Slot slot = slots[i];
+				Slot slot = slots.Items[i];
 				if (slot.data.name == slotName) return slot;
 			}
 			return null;
@@ -218,9 +221,9 @@ namespace Spine {
 		/// <returns>-1 if the bone was not found.</returns>
 		public int FindSlotIndex (String slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
-			List<Slot> slots = this.slots;
+			ExposedList<Slot> slots = this.slots;
 			for (int i = 0, n = slots.Count; i < n; i++)
-				if (slots[i].data.name.Equals(slotName)) return i;
+				if (slots.Items[i].data.name.Equals(slotName)) return i;
 			return -1;
 		}
 
@@ -240,9 +243,9 @@ namespace Spine {
 				if (skin != null)
 					newSkin.AttachAll(this, skin);
 				else {
-					List<Slot> slots = this.slots;
+					ExposedList<Slot> slots = this.slots;
 					for (int i = 0, n = slots.Count; i < n; i++) {
-						Slot slot = slots[i];
+						Slot slot = slots.Items[i];
 						String name = slot.data.attachmentName;
 						if (name != null) {
 							Attachment attachment = newSkin.GetAttachment(i, name);
@@ -273,9 +276,9 @@ namespace Spine {
 		/// <param name="attachmentName">May be null.</param>
 		public void SetAttachment (String slotName, String attachmentName) {
 			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
-			List<Slot> slots = this.slots;
+			ExposedList<Slot> slots = this.slots;
 			for (int i = 0, n = slots.Count; i < n; i++) {
-				Slot slot = slots[i];
+				Slot slot = slots.Items[i];
 				if (slot.data.name == slotName) {
 					Attachment attachment = null;
 					if (attachmentName != null) {
@@ -292,9 +295,9 @@ namespace Spine {
 		/** @return May be null. */
 		public IkConstraint FindIkConstraint (String ikConstraintName) {
 			if (ikConstraintName == null) throw new ArgumentNullException("ikConstraintName cannot be null.");
-			List<IkConstraint> ikConstraints = this.ikConstraints;
+			ExposedList<IkConstraint> ikConstraints = this.ikConstraints;
 			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
-				IkConstraint ikConstraint = ikConstraints[i];
+				IkConstraint ikConstraint = ikConstraints.Items[i];
 				if (ikConstraint.data.name == ikConstraintName) return ikConstraint;
 			}
 			return null;

@@ -44,7 +44,8 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 		}
 	}
 
-	Dictionary<string, Spine.Animation> animationTable = new Dictionary<string, Spine.Animation>();
+	Dictionary<int, Spine.Animation> animationTable = new Dictionary<int, Spine.Animation>();
+	Dictionary<AnimationClip, int> clipNameHashCodeTable = new Dictionary<AnimationClip, int>();
 	Animator animator;
 	float lastTime;
 
@@ -54,11 +55,12 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 			return;
 
 		animationTable.Clear();
+		clipNameHashCodeTable.Clear();
 
 		var data = skeletonDataAsset.GetSkeletonData(true);
 
 		foreach (var a in data.Animations) {
-			animationTable.Add(a.Name, a);
+			animationTable.Add(a.Name.GetHashCode(), a);
 		}
 
 		animator = GetComponent<Animator>();
@@ -79,7 +81,7 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 
 		//apply
 		int layerCount = animator.layerCount;
-		
+
 		for (int i = 0; i < layerCount; i++) {
 
 			float layerWeight = animator.GetLayerWeight(i);
@@ -100,22 +102,26 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 
 			if (mode == MixMode.AlwaysMix) {
 				//always use Mix instead of Applying the first non-zero weighted clip
-				foreach (var info in clipInfo) {
+				for (int c = 0; c < clipInfo.Length; c++) {
+					var info = clipInfo[c];
 					float weight = info.weight * layerWeight;
 					if (weight == 0)
 						continue;
 
 					float time = stateInfo.normalizedTime * info.clip.length;
-					animationTable[info.clip.name].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null, weight);
+					animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null, weight);
 				}
 
-				foreach (var info in nextClipInfo) {
-					float weight = info.weight * layerWeight;
-					if (weight == 0)
-						continue;
+				if (nextStateInfo.fullPathHash != 0) {
+					for (int c = 0; c < nextClipInfo.Length; c++) {
+						var info = nextClipInfo[c];
+						float weight = info.weight * layerWeight;
+						if (weight == 0)
+							continue;
 
-					float time = nextStateInfo.normalizedTime * info.clip.length;
-					animationTable[info.clip.name].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null, weight);
+						float time = nextStateInfo.normalizedTime * info.clip.length;
+						animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null, weight);
+					}
 				}
 			} else if (mode >= MixMode.MixNext) {
 				//apply first non-zero weighted clip
@@ -128,7 +134,7 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 						continue;
 
 					float time = stateInfo.normalizedTime * info.clip.length;
-					animationTable[info.clip.name].Apply(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null);
+					animationTable[GetAnimationClipNameHashCode(info.clip)].Apply(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null);
 					break;
 				}
 
@@ -140,13 +146,27 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 						continue;
 
 					float time = stateInfo.normalizedTime * info.clip.length;
-					animationTable[info.clip.name].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null, weight);
+					animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null, weight);
 				}
 
 				c = 0;
 
-				//apply next clip directly instead of mixing (ie:  no crossfade, ignores mecanim transition weights)
-				if (mode == MixMode.SpineStyle) {
+				if (nextStateInfo.fullPathHash != 0) {
+					//apply next clip directly instead of mixing (ie:  no crossfade, ignores mecanim transition weights)
+					if (mode == MixMode.SpineStyle) {
+						for (; c < nextClipInfo.Length; c++) {
+							var info = nextClipInfo[c];
+							float weight = info.weight * layerWeight;
+							if (weight == 0)
+								continue;
+
+							float time = nextStateInfo.normalizedTime * info.clip.length;
+							animationTable[GetAnimationClipNameHashCode(info.clip)].Apply(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null);
+							break;
+						}
+					}
+
+					//mix the rest
 					for (; c < nextClipInfo.Length; c++) {
 						var info = nextClipInfo[c];
 						float weight = info.weight * layerWeight;
@@ -154,20 +174,8 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 							continue;
 
 						float time = nextStateInfo.normalizedTime * info.clip.length;
-						animationTable[info.clip.name].Apply(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null);
-						break;
+						animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null, weight);
 					}
-				}
-
-				//mix the rest
-				for (; c < nextClipInfo.Length; c++) {
-					var info = nextClipInfo[c];
-					float weight = info.weight * layerWeight;
-					if (weight == 0)
-						continue;
-
-					float time = nextStateInfo.normalizedTime * info.clip.length;
-					animationTable[info.clip.name].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null, weight);
 				}
 			}
 		}
@@ -187,5 +195,15 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 		}
 
 		lastTime = Time.time;
+	}
+
+	private int GetAnimationClipNameHashCode (AnimationClip clip) {
+		int clipNameHashCode;
+		if (!clipNameHashCodeTable.TryGetValue(clip, out clipNameHashCode)) {
+			clipNameHashCode = clip.name.GetHashCode();
+			clipNameHashCodeTable.Add(clip, clipNameHashCode);
+		}
+
+		return clipNameHashCode;
 	}
 }

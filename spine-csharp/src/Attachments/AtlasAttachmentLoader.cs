@@ -97,7 +97,7 @@ namespace Spine {
 			return new BoundingBoxAttachment(name);
 		}
 
-		public AtlasRegion FindRegion(string name) {
+		public AtlasRegion FindRegion (string name) {
 			AtlasRegion region;
 
 			for (int i = 0; i < atlasArray.Length; i++) {

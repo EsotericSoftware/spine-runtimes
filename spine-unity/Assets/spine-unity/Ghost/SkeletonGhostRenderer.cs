@@ -20,13 +20,14 @@ public class SkeletonGhostRenderer : MonoBehaviour {
 		meshFilter = gameObject.AddComponent<MeshFilter>();
 	}
 
-	public void Initialize (Mesh mesh, Material[] materials, Color32 color, bool additive, float speed, int sortingOrder) {
+	public void Initialize (Mesh mesh, Material[] materials, Color32 color, bool additive, float speed, int sortingLayerID, int sortingOrder) {
 		StopAllCoroutines();
 
 		gameObject.SetActive(true);
-		
+
 
 		meshRenderer.sharedMaterials = materials;
+		meshRenderer.sortingLayerID = sortingLayerID;
 		meshRenderer.sortingOrder = sortingOrder;
 
 		meshFilter.sharedMesh = (Mesh)Instantiate(mesh);
@@ -83,7 +84,7 @@ public class SkeletonGhostRenderer : MonoBehaviour {
 				c = colors[i];
 				black.a = c.a;
 				if (c.r > 0 || c.g > 0 || c.b > 0)
-				breakout = false;
+					breakout = false;
 
 				colors[i] = Color32.Lerp(c, black, Time.deltaTime * fadeSpeed);
 			}

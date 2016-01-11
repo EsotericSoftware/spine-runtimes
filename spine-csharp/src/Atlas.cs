@@ -45,7 +45,8 @@ namespace Spine {
 		List<AtlasRegion> regions = new List<AtlasRegion>();
 		TextureLoader textureLoader;
 
-#if WINDOWS_STOREAPP
+		#if !(UNITY_5 || UNITY_4 || UNITY_WSA || UNITY_WP8 || UNITY_WP8_1) // !UNITY
+		#if WINDOWS_STOREAPP
 		private async Task ReadFile(string path, TextureLoader textureLoader) {
 			var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
 			var file = await folder.GetFileAsync(path).AsTask().ConfigureAwait(false);
@@ -61,24 +62,28 @@ namespace Spine {
 		public Atlas(String path, TextureLoader textureLoader) {
 			this.ReadFile(path, textureLoader).Wait();
 		}
-#else
+		#else
+
 		public Atlas (String path, TextureLoader textureLoader) {
 
-#if WINDOWS_PHONE
-            Stream stream = Microsoft.Xna.Framework.TitleContainer.OpenStream(path);
-            using (StreamReader reader = new StreamReader(stream))
-            {
-#else
-            using (StreamReader reader = new StreamReader(path)) {
-#endif
+			#if WINDOWS_PHONE
+			Stream stream = Microsoft.Xna.Framework.TitleContainer.OpenStream(path);
+			using (StreamReader reader = new StreamReader(stream)) {
+			#else
+			using (StreamReader reader = new StreamReader(path)) {
+			#endif // WINDOWS_PHONE
+
 				try {
 					Load(reader, Path.GetDirectoryName(path), textureLoader);
 				} catch (Exception ex) {
 					throw new Exception("Error reading atlas file: " + path, ex);
 				}
+
 			}
 		}
-#endif
+		#endif // WINDOWS_STOREAPP
+
+		#endif // !(UNITY)
 
 		public Atlas (TextReader reader, String dir, TextureLoader textureLoader) {
 			Load(reader, dir, textureLoader);
@@ -105,18 +110,18 @@ namespace Spine {
 					page = new AtlasPage();
 					page.name = line;
 
-					if (readTuple(reader, tuple) == 2) { // size is only optional for an atlas packed with an old TexturePacker.
+					if (ReadTuple(reader, tuple) == 2) { // size is only optional for an atlas packed with an old TexturePacker.
 						page.width = int.Parse(tuple[0]);
 						page.height = int.Parse(tuple[1]);
-						readTuple(reader, tuple);
+						ReadTuple(reader, tuple);
 					}
 					page.format = (Format)Enum.Parse(typeof(Format), tuple[0], false);
 
-					readTuple(reader, tuple);
+					ReadTuple(reader, tuple);
 					page.minFilter = (TextureFilter)Enum.Parse(typeof(TextureFilter), tuple[0], false);
 					page.magFilter = (TextureFilter)Enum.Parse(typeof(TextureFilter), tuple[1], false);
 
-					String direction = readValue(reader);
+					String direction = ReadValue(reader);
 					page.uWrap = TextureWrap.ClampToEdge;
 					page.vWrap = TextureWrap.ClampToEdge;
 					if (direction == "x")
@@ -135,13 +140,13 @@ namespace Spine {
 					region.name = line;
 					region.page = page;
 
-					region.rotate = Boolean.Parse(readValue(reader));
+					region.rotate = Boolean.Parse(ReadValue(reader));
 
-					readTuple(reader, tuple);
+					ReadTuple(reader, tuple);
 					int x = int.Parse(tuple[0]);
 					int y = int.Parse(tuple[1]);
 
-					readTuple(reader, tuple);
+					ReadTuple(reader, tuple);
 					int width = int.Parse(tuple[0]);
 					int height = int.Parse(tuple[1]);
 
@@ -159,33 +164,33 @@ namespace Spine {
 					region.width = Math.Abs(width);
 					region.height = Math.Abs(height);
 
-					if (readTuple(reader, tuple) == 4) { // split is optional
+					if (ReadTuple(reader, tuple) == 4) { // split is optional
 						region.splits = new int[] {int.Parse(tuple[0]), int.Parse(tuple[1]),
 								int.Parse(tuple[2]), int.Parse(tuple[3])};
 
-						if (readTuple(reader, tuple) == 4) { // pad is optional, but only present with splits
+						if (ReadTuple(reader, tuple) == 4) { // pad is optional, but only present with splits
 							region.pads = new int[] {int.Parse(tuple[0]), int.Parse(tuple[1]),
 									int.Parse(tuple[2]), int.Parse(tuple[3])};
 
-							readTuple(reader, tuple);
+							ReadTuple(reader, tuple);
 						}
 					}
 
 					region.originalWidth = int.Parse(tuple[0]);
 					region.originalHeight = int.Parse(tuple[1]);
 
-					readTuple(reader, tuple);
+					ReadTuple(reader, tuple);
 					region.offsetX = int.Parse(tuple[0]);
 					region.offsetY = int.Parse(tuple[1]);
 
-					region.index = int.Parse(readValue(reader));
+					region.index = int.Parse(ReadValue(reader));
 
 					regions.Add(region);
 				}
 			}
 		}
 
-		static String readValue (TextReader reader) {
+		static String ReadValue (TextReader reader) {
 			String line = reader.ReadLine();
 			int colon = line.IndexOf(':');
 			if (colon == -1) throw new Exception("Invalid line: " + line);
@@ -193,7 +198,7 @@ namespace Spine {
 		}
 
 		/// <summary>Returns the number of tuple values read (1, 2 or 4).</summary>
-		static int readTuple (TextReader reader, String[] tuple) {
+		static int ReadTuple (TextReader reader, String[] tuple) {
 			String line = reader.ReadLine();
 			int colon = line.IndexOf(':');
 			if (colon == -1) throw new Exception("Invalid line: " + line);

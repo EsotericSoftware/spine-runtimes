@@ -56,18 +56,18 @@ public class SkeletonUtility : MonoBehaviour {
 			float[] floats = boundingBox.Vertices;
 			int floatCount = floats.Length;
 			int vertCount = floatCount / 2;
-			
+
 			Vector2[] verts = new Vector2[vertCount];
 			int v = 0;
 			for (int i = 0; i < floatCount; i += 2, v++) {
 				verts[v].x = floats[i];
-				verts[v].y = floats[i+1];
+				verts[v].y = floats[i + 1];
 			}
 
 			collider.SetPath(0, verts);
 
 			return collider;
-			
+
 		}
 
 		return null;
@@ -139,7 +139,7 @@ public class SkeletonUtility : MonoBehaviour {
 	public List<SkeletonUtilityBone> utilityBones = new List<SkeletonUtilityBone>();
 	[System.NonSerialized]
 	public List<SkeletonUtilityConstraint> utilityConstraints = new List<SkeletonUtilityConstraint>();
-//	Dictionary<Bone, SkeletonUtilityBone> utilityBoneTable;
+	//	Dictionary<Bone, SkeletonUtilityBone> utilityBoneTable;
 
 	protected bool hasTransformBones;
 	protected bool hasUtilityConstraints;
@@ -170,7 +170,7 @@ public class SkeletonUtility : MonoBehaviour {
 
 	void Start () {
 		//recollect because order of operations failure when switching between game mode and edit mode...
-//		CollectBones();
+		//		CollectBones();
 	}
 
 	void OnDisable () {
@@ -182,7 +182,7 @@ public class SkeletonUtility : MonoBehaviour {
 			skeletonAnimation.UpdateComplete -= UpdateComplete;
 		}
 	}
-	
+
 	void HandleRendererReset (SkeletonRenderer r) {
 		if (OnReset != null)
 			OnReset();
@@ -212,7 +212,7 @@ public class SkeletonUtility : MonoBehaviour {
 			needToReprocessBones = true;
 		}
 	}
-	
+
 	public void UnregisterConstraint (SkeletonUtilityConstraint constraint) {
 		utilityConstraints.Remove(constraint);
 	}
@@ -224,9 +224,9 @@ public class SkeletonUtility : MonoBehaviour {
 		if (boneRoot != null) {
 			List<string> constraintTargetNames = new List<string>();
 
-			foreach (IkConstraint c in skeletonRenderer.skeleton.IkConstraints) {
-				constraintTargetNames.Add(c.Target.Data.Name);
-			}
+			ExposedList<IkConstraint> ikConstraints = skeletonRenderer.skeleton.IkConstraints;
+			for (int i = 0, n = ikConstraints.Count; i < n; i++)
+				constraintTargetNames.Add(ikConstraints.Items[i].Target.Data.Name);
 
 			foreach (var b in utilityBones) {
 				if (b.bone == null) {
@@ -343,17 +343,19 @@ public class SkeletonUtility : MonoBehaviour {
 	public GameObject SpawnBoneRecursively (Bone bone, Transform parent, SkeletonUtilityBone.Mode mode, bool pos, bool rot, bool sca) {
 		GameObject go = SpawnBone(bone, parent, mode, pos, rot, sca);
 
-		foreach (Bone child in bone.Children) {
+		ExposedList<Bone> childrenBones = bone.Children;
+		for (int i = 0, n = childrenBones.Count; i < n; i++) {
+			Bone child = childrenBones.Items[i];
 			SpawnBoneRecursively(child, go.transform, mode, pos, rot, sca);
 		}
 
 		return go;
 	}
-	
+
 	public GameObject SpawnBone (Bone bone, Transform parent, SkeletonUtilityBone.Mode mode, bool pos, bool rot, bool sca) {
 		GameObject go = new GameObject(bone.Data.Name);
 		go.transform.parent = parent;
-		
+
 		SkeletonUtilityBone b = go.AddComponent<SkeletonUtilityBone>();
 		b.skeletonUtility = this;
 		b.position = pos;
@@ -369,16 +371,16 @@ public class SkeletonUtility : MonoBehaviour {
 		if (mode == SkeletonUtilityBone.Mode.Override) {
 			if (rot)
 				go.transform.localRotation = Quaternion.Euler(0, 0, b.bone.RotationIK);
-			
+
 			if (pos)
 				go.transform.localPosition = new Vector3(b.bone.X, b.bone.Y, 0);
-			
+
 			go.transform.localScale = new Vector3(b.bone.scaleX, b.bone.scaleY, 0);
 		}
 
 		return go;
 	}
-	
+
 	public void SpawnSubRenderers (bool disablePrimaryRenderer) {
 		int submeshCount = GetComponent<MeshFilter>().sharedMesh.subMeshCount;
 

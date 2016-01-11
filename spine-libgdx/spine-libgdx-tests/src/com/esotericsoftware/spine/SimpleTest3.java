@@ -42,7 +42,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 public class SimpleTest3 extends ApplicationAdapter {
 	OrthographicCamera camera;
 	PolygonSpriteBatch batch;
-	SkeletonRenderer renderer;
+	SkeletonMeshRenderer renderer;
 	SkeletonRendererDebug debugRenderer;
 
 	TextureAtlas atlas;
@@ -52,7 +52,7 @@ public class SimpleTest3 extends ApplicationAdapter {
 	public void create () {
 		camera = new OrthographicCamera();
 		batch = new PolygonSpriteBatch(); // Required to render meshes. SpriteBatch can't render meshes.
-		renderer = new SkeletonRenderer();
+		renderer = new SkeletonMeshRenderer();
 		renderer.setPremultipliedAlpha(true);
 		debugRenderer = new SkeletonRendererDebug();
 		debugRenderer.setMeshTriangles(false);

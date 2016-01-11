@@ -36,8 +36,9 @@ using Spine;
 
 [CustomEditor(typeof(SkeletonAnimation))]
 public class SkeletonAnimationInspector : SkeletonRendererInspector {
-	protected SerializedProperty animationName, loop, timeScale;
-	protected bool isPrefab;
+	protected SerializedProperty animationName, loop, timeScale, autoReset;
+	protected bool m_isPrefab;
+	protected GUIContent autoResetLabel;
 
 	protected override void OnEnable () {
 		base.OnEnable();
@@ -46,9 +47,7 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 		timeScale = serializedObject.FindProperty("timeScale");
 
 		if (PrefabUtility.GetPrefabType(this.target) == PrefabType.Prefab)
-			isPrefab = true;
-
-
+			m_isPrefab = true;
 	}
 
 	protected override void gui () {
@@ -77,7 +76,7 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 			animations[0] = "<None>";
 			int animationIndex = 0;
 			for (int i = 0; i < animations.Length - 1; i++) {
-				String name = component.skeleton.Data.Animations[i].Name;
+				String name = component.skeleton.Data.Animations.Items[i].Name;
 				animations[i + 1] = name;
 				if (name == animationName.stringValue)
 					animationIndex = i + 1;
@@ -100,7 +99,7 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 
 		EditorGUILayout.Space();
 
-		if (!isPrefab) {
+		if (!m_isPrefab) {
 			if (component.GetComponent<SkeletonUtility>() == null) {
 				if (GUILayout.Button(new GUIContent("Add Skeleton Utility", SpineEditorUtilities.Icons.skeletonUtility), GUILayout.Height(30))) {
 					component.gameObject.AddComponent<SkeletonUtility>();

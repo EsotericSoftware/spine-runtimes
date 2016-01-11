@@ -87,8 +87,8 @@ public class SkeletonRendererDebug {
 			for (int i = 0, n = bones.size; i < n; i++) {
 				Bone bone = bones.get(i);
 				if (bone.parent == null) continue;
-				float x = skeletonX + bone.data.length * bone.m00 + bone.worldX;
-				float y = skeletonY + bone.data.length * bone.m10 + bone.worldY;
+				float x = skeletonX + bone.data.length * bone.a + bone.worldX;
+				float y = skeletonY + bone.data.length * bone.c + bone.worldY;
 				shapes.rectLine(skeletonX + bone.worldX, skeletonY + bone.worldY, x, y, boneWidth * scale);
 			}
 			shapes.end();
@@ -105,8 +105,7 @@ public class SkeletonRendererDebug {
 				Attachment attachment = slot.attachment;
 				if (attachment instanceof RegionAttachment) {
 					RegionAttachment regionAttachment = (RegionAttachment)attachment;
-					regionAttachment.updateWorldVertices(slot, false);
-					float[] vertices = regionAttachment.getWorldVertices();
+					float[] vertices = regionAttachment.updateWorldVertices(slot, false);
 					shapes.line(vertices[X1], vertices[Y1], vertices[X2], vertices[Y2]);
 					shapes.line(vertices[X2], vertices[Y2], vertices[X3], vertices[Y3]);
 					shapes.line(vertices[X3], vertices[Y3], vertices[X4], vertices[Y4]);

@@ -44,7 +44,7 @@ public class SkeletonUtilityKinematicShadow : MonoBehaviour {
 		if (hideShadow)
 			shadowRoot.hideFlags = HideFlags.HideInHierarchy;
 
-		if(parent == null)
+		if (parent == null)
 			shadowRoot.transform.parent = transform.root;
 		else
 			shadowRoot.transform.parent = parent;

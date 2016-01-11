@@ -34,11 +34,11 @@ using System.Collections.Generic;
 
 namespace Spine {
 	public class SkeletonBounds {
-		private List<Polygon> polygonPool = new List<Polygon>();
+		private ExposedList<Polygon> polygonPool = new ExposedList<Polygon>();
 		private float minX, minY, maxX, maxY;
 
-		public List<BoundingBoxAttachment> BoundingBoxes { get; private set; }
-		public List<Polygon> Polygons { get; private set; }
+		public ExposedList<BoundingBoxAttachment> BoundingBoxes { get; private set; }
+		public ExposedList<Polygon> Polygons { get; private set; }
 		public float MinX { get { return minX; } set { minX = value; } }
 		public float MinY { get { return minY; } set { minY = value; } }
 		public float MaxX { get { return maxX; } set { maxX = value; } }
@@ -47,23 +47,23 @@ namespace Spine {
 		public float Height { get { return maxY - minY; } }
 
 		public SkeletonBounds () {
-			BoundingBoxes = new List<BoundingBoxAttachment>();
-			Polygons = new List<Polygon>();
+			BoundingBoxes = new ExposedList<BoundingBoxAttachment>();
+			Polygons = new ExposedList<Polygon>();
 		}
 
 		public void Update (Skeleton skeleton, bool updateAabb) {
-			List<BoundingBoxAttachment> boundingBoxes = BoundingBoxes;
-			List<Polygon> polygons = Polygons;
-			List<Slot> slots = skeleton.slots;
+			ExposedList<BoundingBoxAttachment> boundingBoxes = BoundingBoxes;
+			ExposedList<Polygon> polygons = Polygons;
+			ExposedList<Slot> slots = skeleton.slots;
 			int slotCount = slots.Count;
 
 			boundingBoxes.Clear();
-			foreach (Polygon polygon in polygons)
-				polygonPool.Add(polygon);
+			for (int i = 0, n = polygons.Count; i < n; i++)
+				polygonPool.Add(polygons.Items[i]);
 			polygons.Clear();
 
 			for (int i = 0; i < slotCount; i++) {
-				Slot slot = slots[i];
+				Slot slot = slots.Items[i];
 				BoundingBoxAttachment boundingBox = slot.attachment as BoundingBoxAttachment;
 				if (boundingBox == null) continue;
 				boundingBoxes.Add(boundingBox);
@@ -71,7 +71,7 @@ namespace Spine {
 				Polygon polygon = null;
 				int poolCount = polygonPool.Count;
 				if (poolCount > 0) {
-					polygon = polygonPool[poolCount - 1];
+					polygon = polygonPool.Items[poolCount - 1];
 					polygonPool.RemoveAt(poolCount - 1);
 				} else
 					polygon = new Polygon();
@@ -88,9 +88,9 @@ namespace Spine {
 
 		private void aabbCompute () {
 			float minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
-			List<Polygon> polygons = Polygons;
+			ExposedList<Polygon> polygons = Polygons;
 			for (int i = 0, n = polygons.Count; i < n; i++) {
-				Polygon polygon = polygons[i];
+				Polygon polygon = polygons.Items[i];
 				float[] vertices = polygon.Vertices;
 				for (int ii = 0, nn = polygon.Count; ii < nn; ii += 2) {
 					float x = vertices[ii];
@@ -160,18 +160,18 @@ namespace Spine {
 		/// <summary>Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
 		/// efficient to only call this method if {@link #aabbContainsPoint(float, float)} returns true.</summary>
 		public BoundingBoxAttachment ContainsPoint (float x, float y) {
-			List<Polygon> polygons = Polygons;
+			ExposedList<Polygon> polygons = Polygons;
 			for (int i = 0, n = polygons.Count; i < n; i++)
-				if (ContainsPoint(polygons[i], x, y)) return BoundingBoxes[i];
+				if (ContainsPoint(polygons.Items[i], x, y)) return BoundingBoxes.Items[i];
 			return null;
 		}
 
 		/// <summary>Returns the first bounding box attachment that contains the line segment, or null. When doing many checks, it is usually
 		/// more efficient to only call this method if {@link #aabbIntersectsSegment(float, float, float, float)} returns true.</summary>
 		public BoundingBoxAttachment IntersectsSegment (float x1, float y1, float x2, float y2) {
-			List<Polygon> polygons = Polygons;
+			ExposedList<Polygon> polygons = Polygons;
 			for (int i = 0, n = polygons.Count; i < n; i++)
-				if (IntersectsSegment(polygons[i], x1, y1, x2, y2)) return BoundingBoxes[i];
+				if (IntersectsSegment(polygons.Items[i], x1, y1, x2, y2)) return BoundingBoxes.Items[i];
 			return null;
 		}
 
@@ -201,7 +201,7 @@ namespace Spine {
 
 		public Polygon getPolygon (BoundingBoxAttachment attachment) {
 			int index = BoundingBoxes.IndexOf(attachment);
-			return index == -1 ? null : Polygons[index];
+			return index == -1 ? null : Polygons.Items[index];
 		}
 	}
 

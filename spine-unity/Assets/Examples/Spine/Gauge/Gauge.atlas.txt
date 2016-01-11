@@ -1,0 +1,27 @@
+
+Gauge.png
+size: 1024,64
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Background
+  rotate: false
+  xy: 254, 30
+  size: 224, 32
+  orig: 224, 32
+  offset: 0, 0
+  index: -1
+Bar
+  rotate: false
+  xy: 480, 30
+  size: 224, 32
+  orig: 224, 32
+  offset: 0, 0
+  index: -1
+Border
+  rotate: false
+  xy: 2, 2
+  size: 250, 60
+  orig: 250, 60
+  offset: 0, 0
+  index: -1

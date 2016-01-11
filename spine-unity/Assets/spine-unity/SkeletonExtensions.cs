@@ -17,7 +17,7 @@ public static class SkeletonExtensions {
 		skeleton.G = color.g;
 		skeleton.B = color.b;
 	}
-	
+
 	public static void SetColor (this Skeleton skeleton, Color32 color) {
 		skeleton.A = color.a / 255f;
 		skeleton.R = color.r / 255f;

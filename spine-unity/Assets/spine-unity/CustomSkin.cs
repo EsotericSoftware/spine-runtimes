@@ -51,7 +51,7 @@ public class CustomSkin : MonoBehaviour {
 	public Skin customSkin;
 
 	SkeletonRenderer skeletonRenderer;
-	void Start() {
+	void Start () {
 		skeletonRenderer = GetComponent<SkeletonRenderer>();
 		Skeleton skeleton = skeletonRenderer.skeleton;
 

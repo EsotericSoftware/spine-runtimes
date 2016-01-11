@@ -41,7 +41,7 @@ public class SkeletonUtilityEyeConstraint : SkeletonUtilityConstraint {
 	public float speed = 10;
 	Vector3[] origins;
 	Vector3 centerPoint;
-	
+
 	protected override void OnEnable () {
 		if (!Application.isPlaying)
 			return;
@@ -57,14 +57,14 @@ public class SkeletonUtilityEyeConstraint : SkeletonUtilityConstraint {
 
 		centerPoint = centerBounds.center;
 	}
-	
+
 	protected override void OnDisable () {
 		if (!Application.isPlaying)
 			return;
 
 		base.OnDisable();
 	}
-	
+
 	public override void DoUpdate () {
 
 		if (target != null)
@@ -75,13 +75,13 @@ public class SkeletonUtilityEyeConstraint : SkeletonUtilityConstraint {
 		Vector3 center = transform.TransformPoint(centerPoint);
 		Vector3 dir = goal - center;
 
-		if (dir.magnitude > 1) 
+		if (dir.magnitude > 1)
 			dir.Normalize();
 
 		for (int i = 0; i < eyes.Length; i++) {
 			center = transform.TransformPoint(origins[i]);
 			eyes[i].position = Vector3.MoveTowards(eyes[i].position, center + (dir * radius), speed * Time.deltaTime);
 		}
-		
-	}	
+
+	}
 }

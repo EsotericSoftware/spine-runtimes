@@ -37,13 +37,13 @@ namespace Spine {
 		private const float radDeg = 180 / (float)Math.PI;
 
 		internal IkConstraintData data;
-		internal List<Bone> bones = new List<Bone>();
+		internal ExposedList<Bone> bones = new ExposedList<Bone>();
 		internal Bone target;
 		internal int bendDirection;
 		internal float mix;
 
 		public IkConstraintData Data { get { return data; } }
-		public List<Bone> Bones { get { return bones; } }
+		public ExposedList<Bone> Bones { get { return bones; } }
 		public Bone Target { get { return target; } set { target = value; } }
 		public int BendDirection { get { return bendDirection; } set { bendDirection = value; } }
 		public float Mix { get { return mix; } set { mix = value; } }
@@ -55,7 +55,7 @@ namespace Spine {
 			mix = data.mix;
 			bendDirection = data.bendDirection;
 
-			bones = new List<Bone>(data.bones.Count);
+			bones = new ExposedList<Bone>(data.bones.Count);
 			foreach (BoneData boneData in data.bones)
 				bones.Add(skeleton.FindBone(boneData.name));
 			target = skeleton.FindBone(data.target.name);
@@ -63,13 +63,13 @@ namespace Spine {
 
 		public void apply () {
 			Bone target = this.target;
-			List<Bone> bones = this.bones;
+			ExposedList<Bone> bones = this.bones;
 			switch (bones.Count) {
 			case 1:
-				apply(bones[0], target.worldX, target.worldY, mix);
+				apply(bones.Items[0], target.worldX, target.worldY, mix);
 				break;
 			case 2:
-				apply(bones[0], bones[1], target.worldX, target.worldY, bendDirection, mix);
+				apply(bones.Items[0], bones.Items[1], target.worldX, target.worldY, bendDirection, mix);
 				break;
 			}
 		}

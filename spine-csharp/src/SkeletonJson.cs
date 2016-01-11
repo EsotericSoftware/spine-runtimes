@@ -53,7 +53,9 @@ namespace Spine {
 			Scale = 1;
 		}
 
-#if WINDOWS_STOREAPP
+		#if !(UNITY_5 || UNITY_4 || UNITY_WSA || UNITY_WP8 || UNITY_WP8_1)
+		#if WINDOWS_STOREAPP
+
 		private async Task<SkeletonData> ReadFile(string path) {
 			var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
 			var file = await folder.GetFileAsync(path).AsTask().ConfigureAwait(false);
@@ -67,20 +69,22 @@ namespace Spine {
 		public SkeletonData ReadSkeletonData (String path) {
 			return this.ReadFile(path).Result;
 		}
-#else
+		#else
 		public SkeletonData ReadSkeletonData (String path) {
-#if WINDOWS_PHONE
+			#if WINDOWS_PHONE
 			Stream stream = Microsoft.Xna.Framework.TitleContainer.OpenStream(path);
 			using (StreamReader reader = new StreamReader(stream)) {
-#else
+			#else
 			using (StreamReader reader = new StreamReader(path)) {
-#endif
+			#endif // WINDOWS_PHONE
 				SkeletonData skeletonData = ReadSkeletonData(reader);
 				skeletonData.name = Path.GetFileNameWithoutExtension(path);
 				return skeletonData;
 			}
 		}
-#endif
+
+		#endif // WINDOWS_STOREAPP
+		#endif // !UNITY
 
 		public SkeletonData ReadSkeletonData (TextReader reader) {
 			if (reader == null) throw new ArgumentNullException("reader cannot be null.");
@@ -256,7 +260,7 @@ namespace Spine {
 					MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, name, path);
 					if (mesh == null) return null;
 
-					mesh.Path = path; 
+					mesh.Path = path;
 					mesh.vertices = GetFloatArray(map, "vertices", Scale);
 					mesh.triangles = GetIntArray(map, "triangles");
 					mesh.regionUVs = GetFloatArray(map, "uvs", 1);
@@ -380,7 +384,7 @@ namespace Spine {
 		}
 
 		private void ReadAnimation (String name, Dictionary<String, Object> map, SkeletonData skeletonData) {
-			var timelines = new List<Timeline>();
+			var timelines = new ExposedList<Timeline>();
 			float duration = 0;
 			float scale = Scale;
 

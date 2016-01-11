@@ -44,10 +44,10 @@ public class BoundingBoxAttachment extends Attachment {
 	public void computeWorldVertices (Bone bone, float[] worldVertices) {
 		Skeleton skeleton = bone.getSkeleton();
 		float x = skeleton.getX() + bone.getWorldX(), y = skeleton.getY() + bone.getWorldY();
-		float m00 = bone.getM00();
-		float m01 = bone.getM01();
-		float m10 = bone.getM10();
-		float m11 = bone.getM11();
+		float m00 = bone.getA();
+		float m01 = bone.getB();
+		float m10 = bone.getC();
+		float m11 = bone.getD();
 		float[] vertices = this.vertices;
 		for (int i = 0, n = vertices.length; i < n; i += 2) {
 			float px = vertices[i];
