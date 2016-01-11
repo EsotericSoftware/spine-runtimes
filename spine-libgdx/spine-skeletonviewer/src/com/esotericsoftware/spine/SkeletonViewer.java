@@ -302,6 +302,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 		public UI () {
 			// Configure widgets.
 
+			animationList.getSelection().setRequired(false);
+
 			premultipliedCheckbox.setChecked(true);
 
 			loopCheckbox.setChecked(true);
@@ -463,7 +465,13 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 			animationList.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
-					if (state != null) state.setAnimation(0, animationList.getSelected(), loopCheckbox.isChecked());
+					if (state != null) {
+						String name = animationList.getSelected();
+						if (name == null)
+							state.clearTrack(0);
+						else
+							state.setAnimation(0, name, loopCheckbox.isChecked());
+					}
 				}
 			});
 
