@@ -226,9 +226,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 				state.apply(skeleton);
 			}
 			skeleton.setPosition(skeletonX, skeletonY);
-			// skeleton.setPosition(0, 0);
-			// skeleton.getRootBone().setX(skeletonX);
-			// skeleton.getRootBone().setY(skeletonY);
 			skeleton.updateWorldTransform();
 
 			batch.setColor(Color.WHITE);
