@@ -68,8 +68,11 @@ public class AnimationState {
 			if (next != null) {
 				float nextTime = current.lastTime - next.delay;
 				if (nextTime >= 0) {
-					next.time = nextTime;
+					float nextDelta = delta * next.timeScale;
+					next.time = nextTime + nextDelta; // For start event to see correct time.
+					current.time += delta * current.timeScale; // For end event to see correct time.
 					setCurrent(i, next);
+					next.time -= nextDelta; // Prevent increasing time twice, below.
 					current = next;
 				}
 			} else if (!current.loop && current.lastTime >= current.endTime) {
