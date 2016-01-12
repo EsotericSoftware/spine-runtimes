@@ -71,7 +71,7 @@ public class Animation {
 
 		if (loop && duration != 0) {
 			time %= duration;
-			lastTime %= duration;
+			if (lastTime > 0) lastTime %= duration;
 		}
 
 		Array<Timeline> timelines = this.timelines;
@@ -88,7 +88,7 @@ public class Animation {
 
 		if (loop && duration != 0) {
 			time %= duration;
-			lastTime %= duration;
+			if (lastTime > 0) lastTime %= duration;
 		}
 
 		Array<Timeline> timelines = this.timelines;
@@ -516,8 +516,8 @@ public class Animation {
 			if (frames[frameIndex] < lastTime) return;
 
 			String attachmentName = attachmentNames[frameIndex];
-			skeleton.slots.get(slotIndex).setAttachment(
-				attachmentName == null ? null : skeleton.getAttachment(slotIndex, attachmentName));
+			skeleton.slots.get(slotIndex)
+				.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slotIndex, attachmentName));
 		}
 	}
 
