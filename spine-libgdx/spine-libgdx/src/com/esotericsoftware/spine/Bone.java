@@ -96,10 +96,14 @@ public class Bone implements Updatable {
 		if (parent == null) { // Root bone.
 			Skeleton skeleton = this.skeleton;
 			if (skeleton.flipX) {
+				la = -la;
+				lc = -lc;
 				scaleX = -scaleX;
 				x = -x;
 			}
 			if (skeleton.flipY) {
+				lb = -lb;
+				ld = -ld;
 				scaleY = -scaleY;
 				y = -y;
 			}
