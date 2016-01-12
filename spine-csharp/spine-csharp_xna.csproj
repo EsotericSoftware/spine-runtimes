@@ -110,6 +110,7 @@
     <Compile Include="src\IkConstraintData.cs" />
     <Compile Include="src\Event.cs" />
     <Compile Include="src\EventData.cs" />
+    <Compile Include="src\ExposedList.cs" />
     <Compile Include="src\Json.cs" />
     <Compile Include="src\Skeleton.cs" />
     <Compile Include="src\SkeletonBinary.cs" />

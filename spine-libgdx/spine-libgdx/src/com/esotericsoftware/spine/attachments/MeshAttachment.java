@@ -98,7 +98,8 @@ public class MeshAttachment extends Attachment {
 		}
 	}
 
-	public void updateWorldVertices (Slot slot, boolean premultipliedAlpha) {
+	/** @return The updated world vertices. */
+	public float[] updateWorldVertices (Slot slot, boolean premultipliedAlpha) {
 		Skeleton skeleton = slot.getSkeleton();
 		Color skeletonColor = skeleton.getColor();
 		Color slotColor = slot.getColor();
@@ -117,7 +118,7 @@ public class MeshAttachment extends Attachment {
 		if (slotVertices.size == vertices.length) vertices = slotVertices.items;
 		Bone bone = slot.getBone();
 		float x = skeleton.getX() + bone.getWorldX(), y = skeleton.getY() + bone.getWorldY();
-		float m00 = bone.getM00(), m01 = bone.getM01(), m10 = bone.getM10(), m11 = bone.getM11();
+		float m00 = bone.getA(), m01 = bone.getB(), m10 = bone.getC(), m11 = bone.getD();
 		for (int v = 0, w = 0, n = worldVertices.length; w < n; v += 2, w += 5) {
 			float vx = vertices[v];
 			float vy = vertices[v + 1];
@@ -125,6 +126,7 @@ public class MeshAttachment extends Attachment {
 			worldVertices[w + 1] = vx * m10 + vy * m11 + y;
 			worldVertices[w + 2] = color;
 		}
+		return worldVertices;
 	}
 
 	public float[] getWorldVertices () {

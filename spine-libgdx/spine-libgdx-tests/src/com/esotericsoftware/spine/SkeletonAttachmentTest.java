@@ -45,7 +45,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 public class SkeletonAttachmentTest extends ApplicationAdapter {
 	OrthographicCamera camera;
 	PolygonSpriteBatch batch;
-	SkeletonRenderer renderer;
+	SkeletonMeshRenderer renderer;
 
 	Skeleton spineboy, goblin;
 	AnimationState spineboyState, goblinState;
@@ -53,7 +53,7 @@ public class SkeletonAttachmentTest extends ApplicationAdapter {
 	public void create () {
 		camera = new OrthographicCamera();
 		batch = new PolygonSpriteBatch();
-		renderer = new SkeletonRenderer();
+		renderer = new SkeletonMeshRenderer();
 		renderer.setPremultipliedAlpha(true);
 
 		{
@@ -77,9 +77,9 @@ public class SkeletonAttachmentTest extends ApplicationAdapter {
 		}
 
 		{
-			TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("goblins/goblins-ffd.atlas"));
+			TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("goblins/goblins-mesh.atlas"));
 			SkeletonJson json = new SkeletonJson(atlas);
-			SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("goblins/goblins-ffd.json"));
+			SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("goblins/goblins-mesh.json"));
 			goblin = new Skeleton(skeletonData);
 			goblin.setSkin("goblin");
 			goblin.setSlotsToSetupPose();

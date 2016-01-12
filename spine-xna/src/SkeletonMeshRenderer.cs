@@ -90,10 +90,11 @@ namespace Spine {
 
 		public void Draw (Skeleton skeleton) {
 			float[] vertices = this.vertices;
-			List<Slot> drawOrder = skeleton.DrawOrder;
+			var drawOrder = skeleton.DrawOrder;
+			var drawOrderItems = skeleton.DrawOrder.Items;
 			float skeletonR = skeleton.R, skeletonG = skeleton.G, skeletonB = skeleton.B, skeletonA = skeleton.A;
 			for (int i = 0, n = drawOrder.Count; i < n; i++) {
-				Slot slot = drawOrder[i];
+				Slot slot = drawOrderItems[i];
 				Attachment attachment = slot.Attachment;
 				if (attachment is RegionAttachment) {
 					RegionAttachment regionAttachment = (RegionAttachment)attachment;

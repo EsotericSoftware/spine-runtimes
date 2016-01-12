@@ -62,6 +62,7 @@ public class BasicPlatformerController : MonoBehaviour {
 	public AudioSource jumpAudioSource;
 	public AudioSource hardfallAudioSource;
 	public AudioSource footstepAudioSource;
+	[SpineEvent]
 	public string footstepEventName = "Footstep";
 	CharacterController controller;
 	Vector2 velocity = Vector2.zero;

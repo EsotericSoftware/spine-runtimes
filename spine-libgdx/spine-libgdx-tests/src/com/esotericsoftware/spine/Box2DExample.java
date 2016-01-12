@@ -160,7 +160,7 @@ public class Box2DExample extends ApplicationAdapter {
 			if (attachment.body == null) continue;
 			float x = skeleton.x + slot.getBone().getWorldX();
 			float y = skeleton.y + slot.getBone().getWorldY();
-			float rotation = slot.getBone().getWorldRotation();
+			float rotation = slot.getBone().getWorldRotationX();
 			attachment.body.setTransform(x, y, rotation * MathUtils.degRad);
 		}
 

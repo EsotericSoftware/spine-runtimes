@@ -146,7 +146,8 @@ public class RegionAttachment extends Attachment {
 		return region;
 	}
 
-	public void updateWorldVertices (Slot slot, boolean premultipliedAlpha) {
+	/** @return The updated world vertices. */
+	public float[] updateWorldVertices (Slot slot, boolean premultipliedAlpha) {
 		Skeleton skeleton = slot.getSkeleton();
 		Color skeletonColor = skeleton.getColor();
 		Color slotColor = slot.getColor();
@@ -163,7 +164,7 @@ public class RegionAttachment extends Attachment {
 		float[] offset = this.offset;
 		Bone bone = slot.getBone();
 		float x = skeleton.getX() + bone.getWorldX(), y = skeleton.getY() + bone.getWorldY();
-		float m00 = bone.getM00(), m01 = bone.getM01(), m10 = bone.getM10(), m11 = bone.getM11();
+		float m00 = bone.getA(), m01 = bone.getB(), m10 = bone.getC(), m11 = bone.getD();
 		float offsetX, offsetY;
 
 		offsetX = offset[BRX];
@@ -189,6 +190,7 @@ public class RegionAttachment extends Attachment {
 		vertices[X4] = offsetX * m00 + offsetY * m01 + x; // ur
 		vertices[Y4] = offsetX * m10 + offsetY * m11 + y;
 		vertices[C4] = color;
+		return vertices;
 	}
 
 	public float[] getWorldVertices () {

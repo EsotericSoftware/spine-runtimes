@@ -47,8 +47,6 @@ import com.esotericsoftware.spine.Animation.CurveTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.FfdTimeline;
-import com.esotericsoftware.spine.Animation.FlipXTimeline;
-import com.esotericsoftware.spine.Animation.FlipYTimeline;
 import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
@@ -69,8 +67,6 @@ public class SkeletonBinary {
 	static public final int TIMELINE_TRANSLATE = 2;
 	static public final int TIMELINE_ATTACHMENT = 3;
 	static public final int TIMELINE_COLOR = 4;
-	static public final int TIMELINE_FLIPX = 5;
-	static public final int TIMELINE_FLIPY = 6;
 
 	static public final int CURVE_LINEAR = 0;
 	static public final int CURVE_STEPPED = 1;
@@ -135,10 +131,6 @@ public class SkeletonBinary {
 				boneData.scaleY = input.readFloat();
 				boneData.rotation = input.readFloat();
 				boneData.length = input.readFloat() * scale;
-				boneData.flipX = input.readBoolean();
-				boneData.flipY = input.readBoolean();
-				boneData.inheritScale = input.readBoolean();
-				boneData.inheritRotation = input.readBoolean();
 				if (nonessential) Color.rgba8888ToColor(boneData.color, input.readInt());
 				skeletonData.bones.add(boneData);
 			}
@@ -417,17 +409,6 @@ public class SkeletonBinary {
 						}
 						timelines.add(timeline);
 						duration = Math.max(duration, timeline.getFrames()[frameCount * 3 - 3]);
-						break;
-					}
-					case TIMELINE_FLIPX:
-					case TIMELINE_FLIPY: {
-						FlipXTimeline timeline = timelineType == TIMELINE_FLIPX ? new FlipXTimeline(frameCount) : new FlipYTimeline(
-							frameCount);
-						timeline.boneIndex = boneIndex;
-						for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
-							timeline.setFrame(frameIndex, input.readFloat(), input.readBoolean());
-						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getFrames()[frameCount * 2 - 2]);
 						break;
 					}
 					}

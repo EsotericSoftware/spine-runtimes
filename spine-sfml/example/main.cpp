@@ -137,10 +137,10 @@ void spineboy () {
 
 void goblins () {
 	// Load atlas, skeleton, and animations.
-	Atlas* atlas = Atlas_createFromFile("data/goblins-ffd.atlas", 0);
+	Atlas* atlas = Atlas_createFromFile("data/goblins-mesh.atlas", 0);
 	SkeletonJson* json = SkeletonJson_create(atlas);
 	json->scale = 1.4f;
-	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/goblins-ffd.json");
+	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/goblins-mesh.json");
 	if (!skeletonData) {
 		printf("Error: %s\n", json->error);
 		exit(0);
