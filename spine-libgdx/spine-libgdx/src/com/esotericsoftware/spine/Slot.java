@@ -91,10 +91,10 @@ public class Slot {
 		return attachment;
 	}
 
-	/** Sets the attachment, resets {@link #getAttachmentTime()}, and clears {@link #getAttachmentVertices()}.
+	/** Sets the attachment and if it changed, resets {@link #getAttachmentTime()} and clears {@link #getAttachmentVertices()}.
 	 * @param attachment May be null. */
 	public void setAttachment (Attachment attachment) {
-		if (this.attachment == attachment) return;
+		if (this.attachment != attachment) return;
 		this.attachment = attachment;
 		attachmentTime = bone.skeleton.time;
 		attachmentVertices.clear();
@@ -119,7 +119,12 @@ public class Slot {
 
 	void setToSetupPose (int slotIndex) {
 		color.set(data.color);
-		setAttachment(data.attachmentName == null ? null : bone.skeleton.getAttachment(slotIndex, data.attachmentName));
+		if (data.attachmentName == null)
+			setAttachment(null);
+		else {
+			attachment = null;
+			setAttachment(bone.skeleton.getAttachment(slotIndex, data.attachmentName));
+		}
 	}
 
 	public void setToSetupPose () {

@@ -178,6 +178,7 @@ spine.Slot.prototype = {
 	attachment: null,
 	attachmentVertices: [],
 	setAttachment: function (attachment) {
+		if (this.attachment == attachment) return;
 		this.attachment = attachment;
 		this._attachmentTime = this.bone.skeleton.time;
 		this.attachmentVertices.length = 0;
@@ -195,11 +196,16 @@ spine.Slot.prototype = {
 		this.b = data.b;
 		this.a = data.a;
 
-		var slotDatas = this.bone.skeleton.data.slots;
-		for (var i = 0, n = slotDatas.length; i < n; i++) {
-			if (slotDatas[i] == data) {
-				this.setAttachment(!data.attachmentName ? null : this.bone.skeleton.getAttachmentBySlotIndex(i, data.attachmentName));
-				break;
+		if (!data.attachmentName)
+			this.setAttachment(null);
+		else {
+			var slotDatas = this.bone.skeleton.data.slots;
+			for (var i = 0, n = slotDatas.length; i < n; i++) {
+				if (slotDatas[i] == data) {
+					this.attachment = null;
+					this.setAttachment(this.bone.skeleton.getAttachmentBySlotIndex(i, data.attachmentName));
+					break;
+				}
 			}
 		}
 	}
