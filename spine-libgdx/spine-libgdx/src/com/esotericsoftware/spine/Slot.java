@@ -94,7 +94,7 @@ public class Slot {
 	/** Sets the attachment and if it changed, resets {@link #getAttachmentTime()} and clears {@link #getAttachmentVertices()}.
 	 * @param attachment May be null. */
 	public void setAttachment (Attachment attachment) {
-		if (this.attachment != attachment) return;
+		if (this.attachment == attachment) return;
 		this.attachment = attachment;
 		attachmentTime = bone.skeleton.time;
 		attachmentVertices.clear();
