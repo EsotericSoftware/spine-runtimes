@@ -80,7 +80,7 @@ public class SkeletonActorPool extends Pool<SkeletonActor> {
 	}
 
 	/** This pool keeps a reference to the obtained instance, so it should be returned to the pool via {@link #free(SkeletonActor)}
-	 * , {@link #freeAll(Array)}, or {@link #freeComplete()} to avoid leaking memory. */
+	 * , {@link #freeAll(Array)} or {@link #freeComplete()} to avoid leaking memory. */
 	public SkeletonActor obtain () {
 		SkeletonActor actor = super.obtain();
 		actor.setSkeleton(skeletonPool.obtain());
