@@ -116,6 +116,8 @@ public class SkeletonJson {
 			boneData.rotation = boneMap.getFloat("rotation", 0);
 			boneData.scaleX = boneMap.getFloat("scaleX", 1);
 			boneData.scaleY = boneMap.getFloat("scaleY", 1);
+			boneData.inheritScale = boneMap.getBoolean("inheritScale", true);
+			boneData.inheritRotation = boneMap.getBoolean("inheritRotation", true);
 
 			String color = boneMap.getString("color", null);
 			if (color != null) boneData.getColor().set(Color.valueOf(color));
@@ -504,11 +506,11 @@ public class SkeletonJson {
 			for (JsonValue eventMap = eventsMap.child; eventMap != null; eventMap = eventMap.next) {
 				EventData eventData = skeletonData.findEvent(eventMap.getString("name"));
 				if (eventData == null) throw new SerializationException("Event not found: " + eventMap.getString("name"));
-				Event event = new Event(eventData);
+				Event event = new Event(eventMap.getFloat("time"), eventData);
 				event.intValue = eventMap.getInt("int", eventData.getInt());
 				event.floatValue = eventMap.getFloat("float", eventData.getFloat());
 				event.stringValue = eventMap.getString("string", eventData.getString());
-				timeline.setFrame(frameIndex++, eventMap.getFloat("time"), event);
+				timeline.setFrame(frameIndex++, event);
 			}
 			timelines.add(timeline);
 			duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() - 1]);

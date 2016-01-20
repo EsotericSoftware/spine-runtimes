@@ -131,6 +131,8 @@ public class SkeletonBinary {
 				boneData.scaleY = input.readFloat();
 				boneData.rotation = input.readFloat();
 				boneData.length = input.readFloat() * scale;
+				boneData.inheritScale = input.readBoolean();
+				boneData.inheritRotation = input.readBoolean();
 				if (nonessential) Color.rgba8888ToColor(boneData.color, input.readInt());
 				skeletonData.bones.add(boneData);
 			}
@@ -214,7 +216,8 @@ public class SkeletonBinary {
 		return skin;
 	}
 
-	private Attachment readAttachment (DataInput input, Skin skin, String attachmentName, boolean nonessential) throws IOException {
+	private Attachment readAttachment (DataInput input, Skin skin, String attachmentName, boolean nonessential)
+		throws IOException {
 		float scale = this.scale;
 
 		String name = input.readString();
@@ -403,8 +406,8 @@ public class SkeletonBinary {
 						}
 						timeline.boneIndex = boneIndex;
 						for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-							timeline.setFrame(frameIndex, input.readFloat(), input.readFloat() * timelineScale, input.readFloat()
-								* timelineScale);
+							timeline.setFrame(frameIndex, input.readFloat(), input.readFloat() * timelineScale,
+								input.readFloat() * timelineScale);
 							if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
 						}
 						timelines.add(timeline);
@@ -522,11 +525,11 @@ public class SkeletonBinary {
 				for (int i = 0; i < eventCount; i++) {
 					float time = input.readFloat();
 					EventData eventData = skeletonData.events.get(input.readInt(true));
-					Event event = new Event(eventData);
+					Event event = new Event(time, eventData);
 					event.intValue = input.readInt(false);
 					event.floatValue = input.readFloat();
 					event.stringValue = input.readBoolean() ? input.readString() : eventData.stringValue;
-					timeline.setFrame(i, time, event);
+					timeline.setFrame(i, event);
 				}
 				timelines.add(timeline);
 				duration = Math.max(duration, timeline.getFrames()[eventCount - 1]);
