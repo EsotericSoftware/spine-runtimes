@@ -92,8 +92,8 @@ public class EventTimelineTests {
 		float lastFrame = -1;
 		for (int i = 0; i < eventCount; i++) {
 			float frame = frames[i];
-			Event event = new Event(new EventData("" + events[i]));
-			timeline.setFrame(i, frame, event);
+			Event event = new Event(frame, new EventData("" + events[i]));
+			timeline.setFrame(i, event);
 			maxFrame = Math.max(maxFrame, frame);
 			if (lastFrame != frame) distinctCount++;
 			lastFrame = frame;

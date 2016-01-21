@@ -543,8 +543,8 @@ public class Animation {
 		}
 
 		/** Sets the time of the specified keyframe. */
-		public void setFrame (int frameIndex, float time, Event event) {
-			frames[frameIndex] = time;
+		public void setFrame (int frameIndex, Event event) {
+			frames[frameIndex] = event.time;
 			events[frameIndex] = event;
 		}
 
