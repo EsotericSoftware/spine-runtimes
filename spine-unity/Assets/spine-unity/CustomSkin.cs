@@ -35,33 +35,47 @@ using Spine;
 
 public class CustomSkin : MonoBehaviour {
 
-
 	[System.Serializable]
 	public class SkinPair {
+		/// <summary>SpineAttachment attachment path to help find the attachment.</summary>
+		/// <remarks>This use of SpineAttachment generates an attachment path string that can only be used by SpineAttachment.GetAttachment.</remarks>
 		[SpineAttachment(currentSkinOnly: false, returnAttachmentPath: true, dataField: "skinSource")]
-		public string sourceAttachment;
+		[UnityEngine.Serialization.FormerlySerializedAs("sourceAttachment")]
+		public string sourceAttachmentPath;
+
 		[SpineSlot]
 		public string targetSlot;
+
+		/// <summary>The name of the skin placeholder/skin dictionary entry this attachment should be associated with.</summary>
+		/// <remarks>This name is used by the skin dictionary, used in the method Skin.AddAttachment as well as setting a slot attachment</remarks>
 		[SpineAttachment(currentSkinOnly: true, placeholdersOnly: true)]
 		public string targetAttachment;
 	}
 
+	#region Inspector
 	public SkeletonDataAsset skinSource;
-	public SkinPair[] skinning;
+
+	[UnityEngine.Serialization.FormerlySerializedAs("skinning")]
+	public SkinPair[] skinItems;
+
 	public Skin customSkin;
+	#endregion
 
 	SkeletonRenderer skeletonRenderer;
+
 	void Start () {
 		skeletonRenderer = GetComponent<SkeletonRenderer>();
 		Skeleton skeleton = skeletonRenderer.skeleton;
 
 		customSkin = new Skin("CustomSkin");
 
-		foreach (var pair in skinning) {
-			var attachment = SpineAttachment.GetAttachment(pair.sourceAttachment, skinSource);
+		foreach (var pair in skinItems) {
+			var attachment = SpineAttachment.GetAttachment(pair.sourceAttachmentPath, skinSource);
 			customSkin.AddAttachment(skeleton.FindSlotIndex(pair.targetSlot), pair.targetAttachment, attachment);
 		}
 
+		// The custom skin does not need to be added to the skeleton data for it to work.
+		// But it's useful for your script to keep a reference to it.
 		skeleton.SetSkin(customSkin);
 	}
 }
