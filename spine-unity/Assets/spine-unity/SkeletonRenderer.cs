@@ -76,6 +76,25 @@ public class SkeletonRenderer : MonoBehaviour {
 	private readonly ExposedList<Submesh> submeshes = new ExposedList<Submesh>();
 	private SkeletonUtilitySubmeshRenderer[] submeshRenderers;
 
+	#region Runtime Instantiation
+	/// <summary>Add and prepare a Spine component that derives from SkeletonRenderer to a GameObject at runtime.</summary>
+	/// <typeparam name="T">T should be SkeletonRenderer or any of its derived classes.</typeparam>
+	public static T AddSpineComponent<T> (GameObject gameObject, SkeletonDataAsset skeletonDataAsset) where T : SkeletonRenderer {
+		var c = gameObject.AddComponent<T>();
+
+		if (skeletonDataAsset != null) {
+			c.skeletonDataAsset = skeletonDataAsset;
+			c.Reset(); // Method signature will change.
+		}
+
+		return c;
+	}
+
+	public static T NewSpineGameObject<T> (SkeletonDataAsset skeletonDataAsset) where T : SkeletonRenderer {
+		return SkeletonRenderer.AddSpineComponent<T>(new GameObject("New Spine GameObject"), skeletonDataAsset);
+	}
+	#endregion
+
 	public virtual void Awake () {
 		Reset();
 	}
