@@ -80,11 +80,16 @@ public class SkeletonRenderer : MonoBehaviour {
 	/// <summary>Add and prepare a Spine component that derives from SkeletonRenderer to a GameObject at runtime.</summary>
 	/// <typeparam name="T">T should be SkeletonRenderer or any of its derived classes.</typeparam>
 	public static T AddSpineComponent<T> (GameObject gameObject, SkeletonDataAsset skeletonDataAsset) where T : SkeletonRenderer {
+
+		// Assist [RequireComponent] enforcement.
+		gameObject.AddComponent<MeshFilter>();
+		gameObject.AddComponent<MeshRenderer>();
+
 		var c = gameObject.AddComponent<T>();
 
 		if (skeletonDataAsset != null) {
 			c.skeletonDataAsset = skeletonDataAsset;
-			c.Reset(); // Method signature will change.
+			c.Reset(); // TODO: Method name will change.
 		}
 
 		return c;
