@@ -68,6 +68,7 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 	}
 
 	[SerializeField]
+	[SpineAnimation]
 	private String _animationName;
 
 	public String AnimationName {
