@@ -133,10 +133,24 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 
 		state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());
 
-		if (_animationName != null && _animationName.Length > 0) {
+		#if UNITY_EDITOR
+		if (!string.IsNullOrEmpty(_animationName)) {
+			if (Application.isPlaying) {
+				state.SetAnimation(0, _animationName, loop);
+			} else {
+				// Assume SkeletonAnimation is valid for skeletonData and skeleton. Checked above.
+				var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(_animationName);
+				if (animationObject != null)
+					animationObject.Apply(skeleton, 0f, 0f, false, null);
+			}
+			Update(0);
+		}
+		#else
+		if (!string.IsNullOrEmpty(_animationName)) {
 			state.SetAnimation(0, _animationName, loop);
 			Update(0);
 		}
+		#endif
 	}
 
 	public virtual void Update () {
