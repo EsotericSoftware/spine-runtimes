@@ -171,7 +171,7 @@ public class Bone implements Updatable {
 				pd = pc * zb + pd * zd;
 				pc = temp;
 
-				if (psx < 0) r = PI - r;
+				if (psx < 0) r = -r;
 				cos = MathUtils.cosDeg(-r);
 				sin = MathUtils.sinDeg(-r);
 				temp = pa * cos + pb * sin;
