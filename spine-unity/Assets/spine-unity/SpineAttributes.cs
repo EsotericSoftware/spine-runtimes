@@ -85,14 +85,14 @@ public class SpineAttachment : SpineAttributeBase {
 	/// Smart popup menu for Spine Attachments
 	/// </summary>
 	/// <param name="currentSkinOnly">Filters popup results to only include the current Skin.  Only valid when a SkeletonRenderer is the data source.</param>
-	/// <param name="returnAttachmentPath">Returns a fully qualified path for an Attachment in the format "Skin/Slot/AttachmentName"</param>
+	/// <param name="returnAttachmentPath">Returns a fully qualified path for an Attachment in the format "Skin/Slot/AttachmentName". This path format is only used by the SpineAttachment helper methods like SpineAttachment.GetAttachment and .GetHierarchy. Do not use full path anywhere else in Spine's system.</param>
 	/// <param name="placeholdersOnly">Filters popup results to exclude attachments that are not children of Skin Placeholders</param>
 	/// <param name="slotField">If specified, a locally scoped field with the name supplied by in slotField will be used to limit the popup results to children of a named slot</param>
 	/// <param name="dataField">If specified, a locally scoped field with the name supplied by in dataField will be used to fill the popup results.
 	/// Valid types are SkeletonDataAsset and SkeletonRenderer (and derivatives)
 	/// If left empty and the script the attribute is applied to is derived from Component, GetComponent<SkeletonRenderer>() will be called as a fallback.
 	/// </param>
-	public SpineAttachment(bool currentSkinOnly = true, bool returnAttachmentPath = false, bool placeholdersOnly = false, string slotField = "", string dataField = "") {
+	public SpineAttachment (bool currentSkinOnly = true, bool returnAttachmentPath = false, bool placeholdersOnly = false, string slotField = "", string dataField = "") {
 		this.currentSkinOnly = currentSkinOnly;
 		this.returnAttachmentPath = returnAttachmentPath;
 		this.placeholdersOnly = placeholdersOnly;
@@ -100,11 +100,11 @@ public class SpineAttachment : SpineAttributeBase {
 		this.dataField = dataField;		
 	}
 
-	public static Hierarchy GetHierarchy(string fullPath) {
-		return new Hierarchy(fullPath);
+	public static SpineAttachment.Hierarchy GetHierarchy (string fullPath) {
+		return new SpineAttachment.Hierarchy(fullPath);
 	}
 
-	public static Spine.Attachment GetAttachment(string attachmentPath, Spine.SkeletonData skeletonData) {
+	public static Spine.Attachment GetAttachment (string attachmentPath, Spine.SkeletonData skeletonData) {
 		var hierarchy = SpineAttachment.GetHierarchy(attachmentPath);
 		if (hierarchy.name == "")
 			return null;
@@ -112,16 +112,18 @@ public class SpineAttachment : SpineAttributeBase {
 		return skeletonData.FindSkin(hierarchy.skin).GetAttachment(skeletonData.FindSlotIndex(hierarchy.slot), hierarchy.name);
 	}
 
-	public static Spine.Attachment GetAttachment(string attachmentPath, SkeletonDataAsset skeletonDataAsset) {
+	public static Spine.Attachment GetAttachment (string attachmentPath, SkeletonDataAsset skeletonDataAsset) {
 		return GetAttachment(attachmentPath, skeletonDataAsset.GetSkeletonData(true));
 	}
 
+	/// <summary>
+	/// A struct that represents 3 strings that help identify and locate an attachment in a skeleton.</summary>
 	public struct Hierarchy {
 		public string skin;
 		public string slot;
 		public string name;
 
-		public Hierarchy(string fullPath) {
+		public Hierarchy (string fullPath) {
 			string[] chunks = fullPath.Split(new char[]{'/'}, System.StringSplitOptions.RemoveEmptyEntries);
 			if (chunks.Length == 0) {
 				skin = "";
@@ -157,15 +159,11 @@ public class SpineBone : SpineAttributeBase {
 	}
 
 	public static Spine.Bone GetBone(string boneName, SkeletonRenderer renderer) {
-		if (renderer.skeleton == null)
-			return null;
-
-		return renderer.skeleton.FindBone(boneName);
+		return renderer.skeleton == null ? null : renderer.skeleton.FindBone(boneName);
 	}
 
 	public static Spine.BoneData GetBoneData(string boneName, SkeletonDataAsset skeletonDataAsset) {
 		var data = skeletonDataAsset.GetSkeletonData(true);
-
 		return data.FindBone(boneName);
 	}
 }

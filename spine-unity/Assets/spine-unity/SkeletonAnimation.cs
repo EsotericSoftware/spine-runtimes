@@ -68,6 +68,7 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 	}
 
 	[SerializeField]
+	[SpineAnimation]
 	private String _animationName;
 
 	public String AnimationName {
@@ -104,39 +105,25 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 	public bool loop;
 
 	/// <summary>
-	/// The rate at which animations progress over time. 1 means 100%. 0.5 means 50%.
-	/// AnimationState and TrackEntry also have their own timeScale. These are combined multiplicatively.</summary>
+	/// The rate at which animations progress over time. 1 means 100%. 0.5 means 50%.</summary>
+	/// <remarks>AnimationState and TrackEntry also have their own timeScale. These are combined multiplicatively.</remarks>
 	#if UNITY_5
 	[Tooltip("The rate at which animations progress over time. 1 means 100%. 0.5 means 50%.")]
 	#endif
 	public float timeScale = 1;
 
-	#region AutoReset
-	/**
-	[Tooltip("Setting this to true makes the SkeletonAnimation behave similar to Spine editor. New animations will not inherit the pose from a previous animation. If you need to intermittently and programmatically pose your skeleton, leave this false.")]
-	[SerializeField]
-	protected bool autoReset = false;
-
-	/// <summary>
-	/// Setting this to true makes the SkeletonAnimation behave similar to Spine editor. 
-	/// New animations will not inherit the pose from a previous animation. 
-	/// If you need to intermittently and programmatically pose your skeleton, leave this false.</summary>
-	public bool AutoReset {
-		get { return this.autoReset; }
-		set {
-			if (!autoReset && value) {
-				state.Start -= HandleNewAnimationAutoreset;	// make sure there isn't a double-subscription.
-				state.Start += HandleNewAnimationAutoreset;
-			}
-			autoReset = value;
-		}
+	#region Runtime Instantiation
+	/// <summary>Adds and prepares a SkeletonAnimation component to a GameObject at runtime.</summary>
+	/// <returns>The newly instantiated SkeletonAnimation</returns>
+	public static SkeletonAnimation AddToGameObject (GameObject gameObject, SkeletonDataAsset skeletonDataAsset) {
+		return SkeletonRenderer.AddSpineComponent<SkeletonAnimation>(gameObject, skeletonDataAsset);
 	}
 
-	protected virtual void HandleNewAnimationAutoreset (Spine.AnimationState state, int trackIndex) {
-		if (!autoReset) return;
-		if (skeleton != null) skeleton.SetToSetupPose();
+	/// <summary>Instantiates a new UnityEngine.GameObject and adds a prepared SkeletonAnimation component to it.</summary>
+	/// <returns>The newly instantiated SkeletonAnimation component.</returns>
+	public static SkeletonAnimation NewSkeletonAnimationGameObject (SkeletonDataAsset skeletonDataAsset) {
+		return SkeletonRenderer.NewSpineGameObject<SkeletonAnimation>(skeletonDataAsset);
 	}
-	*/
 	#endregion
 
 	public override void Reset () {
@@ -146,16 +133,24 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 
 		state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());
 
-		/*
-		if (autoReset) {
-			state.Start += HandleNewAnimationAutoreset;
+		#if UNITY_EDITOR
+		if (!string.IsNullOrEmpty(_animationName)) {
+			if (Application.isPlaying) {
+				state.SetAnimation(0, _animationName, loop);
+			} else {
+				// Assume SkeletonAnimation is valid for skeletonData and skeleton. Checked above.
+				var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(_animationName);
+				if (animationObject != null)
+					animationObject.Apply(skeleton, 0f, 0f, false, null);
+			}
+			Update(0);
 		}
-		*/
-
-		if (_animationName != null && _animationName.Length > 0) {
+		#else
+		if (!string.IsNullOrEmpty(_animationName)) {
 			state.SetAnimation(0, _animationName, loop);
 			Update(0);
 		}
+		#endif
 	}
 
 	public virtual void Update () {
@@ -185,4 +180,5 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 			_UpdateComplete(this);
 		}
 	}
+		
 }

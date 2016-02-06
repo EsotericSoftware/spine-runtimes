@@ -5,17 +5,19 @@
 *****************************************************************************/
 using UnityEngine;
 using UnityEditor;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using Spine;
 
 
+
 public struct SpineDrawerValuePair {
 	public string str;
 	public SerializedProperty property;
 
-	public SpineDrawerValuePair(string val, SerializedProperty property) {
+	public SpineDrawerValuePair (string val, SerializedProperty property) {
 		this.str = val;
 		this.property = property;
 	}
@@ -23,6 +25,7 @@ public struct SpineDrawerValuePair {
 
 public abstract class SpineTreeItemDrawerBase<T> : PropertyDrawer where T:SpineAttributeBase {
 	protected SkeletonDataAsset skeletonDataAsset;
+
 	protected T TargetAttribute { get { return (T)attribute; } }
 
 	public override void OnGUI (Rect position, SerializedProperty property, GUIContent label) {
@@ -72,7 +75,7 @@ public abstract class SpineTreeItemDrawerBase<T> : PropertyDrawer where T:SpineA
 			return;
 		
 		GenericMenu menu = new GenericMenu();
-		PopulateMenu (menu, property, this.TargetAttribute, data);
+		PopulateMenu(menu, property, this.TargetAttribute, data);
 		menu.ShowAsContext();
 	}
 
@@ -84,7 +87,7 @@ public abstract class SpineTreeItemDrawerBase<T> : PropertyDrawer where T:SpineA
 		pair.property.serializedObject.ApplyModifiedProperties();
 	}
 
-	public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
+	public override float GetPropertyHeight (SerializedProperty property, GUIContent label) {
 		return 18;
 	}
 
@@ -96,7 +99,7 @@ public class SpineSlotDrawer : SpineTreeItemDrawerBase<SpineSlot> {
 	protected override void PopulateMenu (GenericMenu menu, SerializedProperty property, SpineSlot targetAttribute, SkeletonData data) {
 		for (int i = 0; i < data.Slots.Count; i++) {
 			string name = data.Slots.Items[i].Name;
-			if (name.StartsWith(targetAttribute.startsWith)) {
+			if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal)) {
 				if (targetAttribute.containsBoundingBoxes) {
 					
 					int slotIndex = i;
@@ -139,7 +142,7 @@ public class SpineSkinDrawer : SpineTreeItemDrawerBase<SpineSkin> {
 		
 		for (int i = 0; i < data.Skins.Count; i++) {
 			string name = data.Skins.Items[i].Name;
-			if (name.StartsWith(targetAttribute.startsWith))
+			if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal))
 				menu.AddItem(new GUIContent(name), name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
 		}
 	}
@@ -150,9 +153,13 @@ public class SpineSkinDrawer : SpineTreeItemDrawerBase<SpineSkin> {
 public class SpineAnimationDrawer : SpineTreeItemDrawerBase<SpineAnimation> {
 	protected override void PopulateMenu (GenericMenu menu, SerializedProperty property, SpineAnimation targetAttribute, SkeletonData data) {
 		var animations = skeletonDataAsset.GetAnimationStateData().SkeletonData.Animations;
+
+		// <None> item
+		menu.AddItem(new GUIContent("<None>"), property.stringValue == "", HandleSelect, new SpineDrawerValuePair("", property));
+
 		for (int i = 0; i < animations.Count; i++) {
 			string name = animations.Items[i].Name;
-			if (name.StartsWith(targetAttribute.startsWith))
+			if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal))
 				menu.AddItem(new GUIContent(name), name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
 		}
 	}
@@ -165,7 +172,7 @@ public class SpineEventNameDrawer : SpineTreeItemDrawerBase<SpineEvent> {
 		var events = skeletonDataAsset.GetSkeletonData(false).Events;
 		for (int i = 0; i < events.Count; i++) {
 			string name = events.Items[i].Name;
-			if (name.StartsWith(targetAttribute.startsWith))
+			if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal))
 				menu.AddItem(new GUIContent(name), name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
 		}
 	}
@@ -289,8 +296,8 @@ public class SpineBoneDrawer : SpineTreeItemDrawerBase<SpineBone> {
 public class SpineAtlasRegionDrawer : PropertyDrawer {
 	Component component;
 	SerializedProperty atlasProp;
-	
-	public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
+
+	public override void OnGUI (Rect position, SerializedProperty property, GUIContent label) {
 		if (property.propertyType != SerializedPropertyType.String) {
 			EditorGUI.LabelField(position, "ERROR:", "May only apply to type string");
 			return;
@@ -321,7 +328,7 @@ public class SpineAtlasRegionDrawer : PropertyDrawer {
 		}
 		
 	}
-	
+
 	void Selector (SerializedProperty property) {
 		GenericMenu menu = new GenericMenu();
 		AtlasAsset atlasAsset = (AtlasAsset)atlasProp.objectReferenceValue;
@@ -337,7 +344,7 @@ public class SpineAtlasRegionDrawer : PropertyDrawer {
 		
 		menu.ShowAsContext();
 	}
-	
+
 	static void HandleSelect (object val) {
 		var pair = (SpineDrawerValuePair)val;
 		pair.property.stringValue = pair.str;
