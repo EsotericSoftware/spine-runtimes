@@ -31,7 +31,6 @@
 
 package com.esotericsoftware.spine;
 
-import static com.badlogic.gdx.math.MathUtils.*;
 import static com.badlogic.gdx.math.Matrix3.*;
 
 import com.badlogic.gdx.math.MathUtils;
