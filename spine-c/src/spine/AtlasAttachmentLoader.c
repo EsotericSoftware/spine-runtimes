@@ -1,10 +1,10 @@
 /******************************************************************************
  * Spine Runtimes Software License
  * Version 2.3
- * 
+ *
  * Copyright (c) 2013-2015, Esoteric Software
  * All rights reserved.
- * 
+ *
  * You are granted a perpetual, non-exclusive, non-sublicensable and
  * non-transferable license to use, install, execute and perform the Spine
  * Runtimes Software (the "Software") and derivative works solely for personal
@@ -16,7 +16,7 @@
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -32,9 +32,14 @@
 #include <spine/AtlasAttachmentLoader.h>
 #include <spine/extension.h>
 
+#define UNUSED(x) (void)(x)
+
 spAttachment* _spAtlasAttachmentLoader_newAttachment (spAttachmentLoader* loader, spSkin* skin, spAttachmentType type,
 		const char* name, const char* path) {
 	spAtlasAttachmentLoader* self = SUB_CAST(spAtlasAttachmentLoader, loader);
+
+	UNUSED(skin);
+
 	switch (type) {
 	case SP_ATTACHMENT_REGION: {
 		spRegionAttachment* attachment;
@@ -112,3 +117,5 @@ spAtlasAttachmentLoader* spAtlasAttachmentLoader_create (spAtlas* atlas) {
 	self->atlas = atlas;
 	return self;
 }
+
+#undef UNUSED
