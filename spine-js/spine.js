@@ -107,9 +107,17 @@ spine.Bone.prototype = {
 				this.worldScaleX = this.scaleX;
 				this.worldScaleY = this.scaleY;
 			}
-			this.worldRotation = this.data.inheritRotation ? (parent.worldRotation + this.rotationIK) : this.rotationIK;
 			this.worldFlipX = parent.worldFlipX != this.flipX;
 			this.worldFlipY = parent.worldFlipY != this.flipY;
+			if (this.data.inheritRotation) {
+				if ((this.worldFlipX || this.worldFlipY) && (this.worldFlipX != this.worldFlipY)) {	// xor
+					this.worldRotation = (360-parent.worldRotation) + this.rotationIK;
+				} else {
+					this.worldRotation = parent.worldRotation + this.rotationIK;
+				}
+			} else {
+				this.worldRotation = this.rotationIK;
+			}
 		} else {
 			var skeletonFlipX = this.skeleton.flipX, skeletonFlipY = this.skeleton.flipY;
 			this.worldX = skeletonFlipX ? -this.x : this.x;
@@ -170,13 +178,13 @@ spine.Bone.prototype = {
 spine.Slot = function (slotData, bone) {
 	this.data = slotData;
 	this.bone = bone;
+	this.attachmentVertices = [];
 	this.setToSetupPose();
 };
 spine.Slot.prototype = {
 	r: 1, g: 1, b: 1, a: 1,
 	_attachmentTime: 0,
 	attachment: null,
-	attachmentVertices: [],
 	setAttachment: function (attachment) {
 		if (this.attachment == attachment) return;
 		this.attachment = attachment;
@@ -824,13 +832,15 @@ spine.FfdTimeline.prototype = {
 
 		if (alpha < 1) {
 			for (var i = 0; i < vertexCount; i++) {
-				var prev = prevVertices[i];
-				vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
+				var prev = prevVertices[i]||0;
+				var next = nextVertices[i]||0;
+				vertices[i] += (prev + (next - prev) * percent - vertices[i]) * alpha;
 			}
 		} else {
 			for (var i = 0; i < vertexCount; i++) {
-				var prev = prevVertices[i];
-				vertices[i] = prev + (nextVertices[i] - prev) * percent;
+				var prev = prevVertices[i]||0;
+				var next = nextVertices[i]||0;
+				vertices[i] = prev + (next - prev) * percent;
 			}
 		}
 	}
@@ -1734,6 +1744,8 @@ spine.SkeletonJson.prototype = {
 			boneData.rotation = (boneMap["rotation"] || 0);
 			boneData.scaleX = boneMap.hasOwnProperty("scaleX") ? boneMap["scaleX"] : 1;
 			boneData.scaleY = boneMap.hasOwnProperty("scaleY") ? boneMap["scaleY"] : 1;
+			boneData.flipX = boneMap["flipX"] || false;
+			boneData.flipY = boneMap["flipY"] || false;
 			boneData.inheritScale = boneMap.hasOwnProperty("inheritScale") ? boneMap["inheritScale"] : true;
 			boneData.inheritRotation = boneMap.hasOwnProperty("inheritRotation") ? boneMap["inheritRotation"] : true;
 			skeletonData.bones.push(boneData);
@@ -2057,7 +2069,7 @@ spine.SkeletonJson.prototype = {
 				frameIndex++;
 			}
 			timelines.push(timeline);
-			duration = Math.max(duration, timeline.frames[timeline.frameCount * 3 - 3]);
+			duration = Math.max(duration, timeline.frames[timeline.getFrameCount() * 3 - 3]);
 		}
 
 		var ffd = map["ffd"];
@@ -2101,15 +2113,15 @@ spine.SkeletonJson.prototype = {
 							var nn = verticesValue.length;
 							if (this.scale == 1) {
 								for (var ii = 0; ii < nn; ii++)
-									vertices[ii + start] = verticesValue[ii];
+									vertices[ii + start] = (verticesValue[ii] || 0);
 							} else {
 								for (var ii = 0; ii < nn; ii++)
-									vertices[ii + start] = verticesValue[ii] * this.scale;
+									vertices[ii + start] = (verticesValue[ii] || 0) * this.scale;
 							}
 							if (isMesh) {
 								var meshVertices = attachment.vertices;
 								for (var ii = 0, nn = vertices.length; ii < nn; ii++)
-									vertices[ii] += meshVertices[ii];
+									vertices[ii] = (vertices[ii]||0) + (meshVertices[ii]||0);
 							}
 						}
 						
@@ -2118,7 +2130,7 @@ spine.SkeletonJson.prototype = {
 						frameIndex++;
 					}
 					timelines[timelines.length] = timeline;
-					duration = Math.max(duration, timeline.frames[timeline.frameCount - 1]);
+					duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);
 				}
 			}
 		}
@@ -2516,6 +2528,7 @@ spine.SkeletonBounds.prototype = {
 		for (var i = 0; i < slotCount; i++) {
 			var slot = slots[i];
 			var boundingBox = slot.attachment;
+			if (!boundingBox) continue;
 			if (boundingBox.type != spine.AttachmentType.boundingbox) continue;
 			boundingBoxes.push(boundingBox);
 

@@ -97,9 +97,17 @@ namespace Spine {
 					worldScaleX = scaleX;
 					worldScaleY = scaleY;
 				}
-				worldRotation = data.inheritRotation ? parent.worldRotation + rotationIK : rotationIK;
 				worldFlipX = parent.worldFlipX != flipX;
 				worldFlipY = parent.worldFlipY != flipY;
+				if (data.inheritRotation) {
+					if ( worldFlipX ^ worldFlipY ) {
+							worldRotation = (360-parent.worldRotation) + rotationIK;
+					} else {
+						worldRotation = parent.worldRotation + rotationIK;
+					}
+				} else {
+					worldRotation = rotationIK;
+				}
 			} else {
 				Skeleton skeleton = this.skeleton;
 				bool skeletonFlipX = skeleton.flipX, skeletonFlipY = skeleton.flipY;
