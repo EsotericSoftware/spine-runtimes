@@ -33,8 +33,8 @@ using System;
 using System.Collections.Generic;
 
 namespace Spine {
-	/// <summary>Attachment that displays a texture region.</summary>
-	public class SkinnedMeshAttachment : Attachment {
+    /// <summary>Attachment that displays a texture region using a mesh which can be deformed by bones.</summary>
+	public class WeightedMeshAttachment : Attachment {
 		internal int[] bones;
 		internal float[] weights, uvs, regionUVs;
 		internal int[] triangles;
@@ -72,7 +72,7 @@ namespace Spine {
 		public float Width { get; set; }
 		public float Height { get; set; }
 
-		public SkinnedMeshAttachment (string name)
+		public WeightedMeshAttachment (string name)
 			: base(name) {
 		}
 
@@ -107,8 +107,8 @@ namespace Spine {
 					for (; v < nn; v++, b += 3) {
 						Bone bone = skeletonBones.Items[bones[v]];
 						float vx = weights[b], vy = weights[b + 1], weight = weights[b + 2];
-						wx += (vx * bone.m00 + vy * bone.m01 + bone.worldX) * weight;
-						wy += (vx * bone.m10 + vy * bone.m11 + bone.worldY) * weight;
+						wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
+						wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
 					}
 					worldVertices[w] = wx + x;
 					worldVertices[w + 1] = wy + y;
@@ -121,8 +121,8 @@ namespace Spine {
 					for (; v < nn; v++, b += 3, f += 2) {
 						Bone bone = skeletonBones.Items[bones[v]];
 						float vx = weights[b] + ffd[f], vy = weights[b + 1] + ffd[f + 1], weight = weights[b + 2];
-						wx += (vx * bone.m00 + vy * bone.m01 + bone.worldX) * weight;
-						wy += (vx * bone.m10 + vy * bone.m11 + bone.worldY) * weight;
+						wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
+						wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
 					}
 					worldVertices[w] = wx + x;
 					worldVertices[w + 1] = wy + y;

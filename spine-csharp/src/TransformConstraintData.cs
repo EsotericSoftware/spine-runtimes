@@ -30,21 +30,29 @@
  *****************************************************************************/
 
 using System;
+using System.Collections.Generic;
 
 namespace Spine {
-	public class Event {
-		public EventData Data { get; private set; }
-		public int Int { get; set; }
-		public float Float { get; set; }
-		public String String { get; set; }
-		public float Time { get; private set; }
+	public class TransformConstraintData {
+		internal String name;
+		internal BoneData bone, target;
+		internal float translateMix;
+		internal float x, y;
 
-		public Event (float time, EventData data) {
-			Data = data;
+		public String Name { get { return name; } }
+		public BoneData Bone { get { return bone; } set { bone = value; } }
+		public BoneData Target { get { return target; } set { target = value; } }
+		public float TranslateMix { get { return translateMix; } set { translateMix = value; } }
+		public float X { get { return x; } set { x = value; } }
+		public float Y { get { return y; } set { y = value; } }
+
+		public TransformConstraintData (String name) {
+			if (name == null) throw new ArgumentNullException("name cannot be null.");
+			this.name = name;
 		}
 
 		override public String ToString () {
-			return Data.Name;
+			return name;
 		}
 	}
 }

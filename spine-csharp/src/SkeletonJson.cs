@@ -118,8 +118,6 @@ namespace Spine {
 				boneData.rotation = GetFloat(boneMap, "rotation", 0);
 				boneData.scaleX = GetFloat(boneMap, "scaleX", 1);
 				boneData.scaleY = GetFloat(boneMap, "scaleY", 1);
-				boneData.flipX = GetBoolean(boneMap, "flipX", false);
-				boneData.flipY = GetBoolean(boneMap, "flipY", false);
 				boneData.inheritScale = GetBoolean(boneMap, "inheritScale", true);
 				boneData.inheritRotation = GetBoolean(boneMap, "inheritRotation", true);
 				skeletonData.bones.Add(boneData);
@@ -144,6 +142,27 @@ namespace Spine {
 					ikConstraintData.mix = GetFloat(ikMap, "mix", 1);
 
 					skeletonData.ikConstraints.Add(ikConstraintData);
+				}
+			}
+
+			// Transform constraints.
+			if (root.ContainsKey("transform")) {
+				foreach (Dictionary<String, Object> transformMap in (List<Object>)root["ik"]) {
+					TransformConstraintData transformConstraintData = new TransformConstraintData((String)transformMap["name"]);
+
+					String boneName = (String)transformMap["bone"];
+					transformConstraintData.target = skeletonData.FindBone(boneName);
+					if (transformConstraintData.target == null) throw new Exception("Bone not found: " + boneName);
+
+					String targetName = (String)transformMap["target"];
+					transformConstraintData.target = skeletonData.FindBone(targetName);
+					if (transformConstraintData.target == null) throw new Exception("Target bone not found: " + targetName);
+
+					transformConstraintData.translateMix = GetFloat(transformMap, "mix", 1);
+					transformConstraintData.x = GetFloat(transformMap, "x", 0);
+					transformConstraintData.y = GetFloat(transformMap, "y", 0);
+
+					skeletonData.transformConstraints.Add(transformConstraintData);
 				}
 			}
 
@@ -226,8 +245,11 @@ namespace Spine {
 				name = (String)map["name"];
 
 			var type = AttachmentType.region;
-			if (map.ContainsKey("type"))
-				type = (AttachmentType)Enum.Parse(typeof(AttachmentType), (String)map["type"], false);
+			if (map.ContainsKey("type")) {
+				var typeName = (String)map["type"];
+				if (typeName == "skinnedmesh") typeName = "weightedmesh";
+				type = (AttachmentType)Enum.Parse(typeof(AttachmentType), typeName , false);
+			}
 
 			String path = name;
 			if (map.ContainsKey("path"))
@@ -281,8 +303,8 @@ namespace Spine {
 
 					return mesh;
 				}
-			case AttachmentType.skinnedmesh: {
-					SkinnedMeshAttachment mesh = attachmentLoader.NewSkinnedMeshAttachment(skin, name, path);
+			case AttachmentType.weightedmesh: {
+					WeightedMeshAttachment mesh = attachmentLoader.NewWeightedMeshAttachment(skin, name, path);
 					if (mesh == null) return null;
 
 					mesh.Path = path;
@@ -478,21 +500,6 @@ namespace Spine {
 							timelines.Add(timeline);
 							duration = Math.Max(duration, timeline.frames[timeline.FrameCount * 3 - 3]);
 
-						} else if (timelineName == "flipX" || timelineName == "flipY") {
-							bool x = timelineName == "flipX";
-							var timeline = x ? new FlipXTimeline(values.Count) : new FlipYTimeline(values.Count);
-							timeline.boneIndex = boneIndex;
-
-							String field = x ? "x" : "y";
-							int frameIndex = 0;
-							foreach (Dictionary<String, Object> valueMap in values) {
-								float time = (float)valueMap["time"];
-								timeline.SetFrame(frameIndex, time, valueMap.ContainsKey(field) ? (bool)valueMap[field] : false);
-								frameIndex++;
-							}
-							timelines.Add(timeline);
-							duration = Math.Max(duration, timeline.frames[timeline.FrameCount * 2 - 2]);
-
 						} else
 							throw new Exception("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
 					}
@@ -536,7 +543,7 @@ namespace Spine {
 							if (attachment is MeshAttachment)
 								vertexCount = ((MeshAttachment)attachment).vertices.Length;
 							else
-								vertexCount = ((SkinnedMeshAttachment)attachment).Weights.Length / 3 * 2;
+								vertexCount = ((WeightedMeshAttachment)attachment).Weights.Length / 3 * 2;
 
 							int frameIndex = 0;
 							foreach (Dictionary<String, Object> valueMap in values) {
@@ -619,11 +626,12 @@ namespace Spine {
 				foreach (Dictionary<String, Object> eventMap in eventsMap) {
 					EventData eventData = skeletonData.FindEvent((String)eventMap["name"]);
 					if (eventData == null) throw new Exception("Event not found: " + eventMap["name"]);
-					var e = new Event(eventData);
+					float time = (float)eventMap["time"];
+					var e = new Event(time, eventData);
 					e.Int = GetInt(eventMap, "int", eventData.Int);
 					e.Float = GetFloat(eventMap, "float", eventData.Float);
 					e.String = GetString(eventMap, "string", eventData.String);
-					timeline.SetFrame(frameIndex++, (float)eventMap["time"], e);
+					timeline.SetFrame(frameIndex++, time, e);
 				}
 				timelines.Add(timeline);
 				duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1]);

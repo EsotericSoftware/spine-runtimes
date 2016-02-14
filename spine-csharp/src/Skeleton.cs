@@ -39,7 +39,8 @@ namespace Spine {
 		internal ExposedList<Slot> slots;
 		internal ExposedList<Slot> drawOrder;
 		internal ExposedList<IkConstraint> ikConstraints;
-		private ExposedList<ExposedList<Bone>> boneCache = new ExposedList<ExposedList<Bone>>();
+        internal ExposedList<TransformConstraint> transformConstraints;
+        private ExposedList<IUpdatable> updateCache = new ExposedList<IUpdatable>();
 		internal Skin skin;
 		internal float r = 1, g = 1, b = 1, a = 1;
 		internal float time;
@@ -89,81 +90,62 @@ namespace Spine {
 				drawOrder.Add(slot);
 			}
 
-			ikConstraints = new ExposedList<IkConstraint>(data.ikConstraints.Count);
-			foreach (IkConstraintData ikConstraintData in data.ikConstraints)
-				ikConstraints.Add(new IkConstraint(ikConstraintData, this));
+         ikConstraints = new ExposedList<IkConstraint>(data.ikConstraints.Count);
+         foreach (IkConstraintData ikConstraintData in data.ikConstraints)
+               ikConstraints.Add(new IkConstraint(ikConstraintData, this));
+
+         transformConstraints = new ExposedList<TransformConstraint>(data.transformConstraints.Count);
+         foreach (TransformConstraintData transformConstraintData in data.transformConstraints)
+               transformConstraints.Add(new TransformConstraint(transformConstraintData, this));
 
 			UpdateCache();
 			UpdateWorldTransform();
 		}
 
-		/// <summary>Caches information about bones and IK constraints. Must be called if bones or IK constraints are added or
-		/// removed.</summary>
+		/// <summary>Caches information about bones and constraints. Must be called if bones or constraints are added
+		/// or removed.</summary>
 		public void UpdateCache () {
-			ExposedList<ExposedList<Bone>> boneCache = this.boneCache;
+			ExposedList<Bone> bones = this.bones;
+			ExposedList<IUpdatable> updateCache = this.updateCache;
 			ExposedList<IkConstraint> ikConstraints = this.ikConstraints;
+			ExposedList<TransformConstraint> transformConstraints = this.transformConstraints;
 			int ikConstraintsCount = ikConstraints.Count;
-
-			int arrayCount = ikConstraintsCount + 1;
-			if (boneCache.Count > arrayCount) boneCache.RemoveRange(arrayCount, boneCache.Count - arrayCount);
-			for (int i = 0, n = boneCache.Count; i < n; i++)
-				boneCache.Items[i].Clear();
-			while (boneCache.Count < arrayCount)
-				boneCache.Add(new ExposedList<Bone>());
-
-			ExposedList<Bone> nonIkBones = boneCache.Items[0];
-
+			int transformConstraintsCount = transformConstraints.Count;
+			updateCache.Clear();
 			for (int i = 0, n = bones.Count; i < n; i++) {
 				Bone bone = bones.Items[i];
-				Bone current = bone;
-				do {
-					for (int ii = 0; ii < ikConstraintsCount; ii++) {
-						IkConstraint ikConstraint = ikConstraints.Items[ii];
-						Bone parent = ikConstraint.bones.Items[0];
-						Bone child = ikConstraint.bones.Items[ikConstraint.bones.Count - 1];
-						while (true) {
-							if (current == child) {
-								boneCache.Items[ii].Add(bone);
-								boneCache.Items[ii + 1].Add(bone);
-								goto outer;
-							}
-							if (child == parent) break;
-							child = child.parent;
-						}
+				updateCache.Add(bone);
+				for (int ii = 0; ii < transformConstraintsCount; ii++) {
+					TransformConstraint transformConstraint = transformConstraints.Items[ii];
+					if (bone == transformConstraint.bone) {
+						updateCache.Add(transformConstraint);
+						break;
 					}
-					current = current.parent;
-				} while (current != null);
-				nonIkBones.Add(bone);
-			outer: { }
+				}
+				for (int ii = 0; ii < ikConstraintsCount; ii++) {
+					IkConstraint ikConstraint = ikConstraints.Items[ii];
+					if (bone == ikConstraint.bones.Items[ikConstraint.bones.Count - 1]) {
+						updateCache.Add(ikConstraint);
+						break;
+					}
+				}
 			}
 		}
 
 		/// <summary>Updates the world transform for each bone and applies IK constraints.</summary>
 		public void UpdateWorldTransform () {
-			ExposedList<Bone> bones = this.bones;
-			for (int ii = 0, nn = bones.Count; ii < nn; ii++) {
-				Bone bone = bones.Items[ii];
-				bone.rotationIK = bone.rotation;
-			}
-			ExposedList<ExposedList<Bone>> boneCache = this.boneCache;
-			ExposedList<IkConstraint> ikConstraints = this.ikConstraints;
-			int i = 0, last = boneCache.Count - 1;
-			while (true) {
-				ExposedList<Bone> updateBones = boneCache.Items[i];
-				for (int ii = 0, nn = updateBones.Count; ii < nn; ii++)
-					updateBones.Items[ii].UpdateWorldTransform();
-				if (i == last) break;
-				ikConstraints.Items[i].apply();
-				i++;
-			}
+			ExposedList<IUpdatable> updateCache = this.updateCache;
+			for (int i = 0, n = updateCache.Count; i < n; i++)
+				updateCache.Items[i].Update();
 		}
 
-		/// <summary>Sets the bones and slots to their setup pose values.</summary>
+		/// <summary>Sets the bones, constraints, and slots to their setup pose values.</summary>
 		public void SetToSetupPose () {
 			SetBonesToSetupPose();
 			SetSlotsToSetupPose();
 		}
 
+		/// <summary>Sets the bones and constraints to their setup pose values.</summary>
 		public void SetBonesToSetupPose () {
 			ExposedList<Bone> bones = this.bones;
 			for (int i = 0, n = bones.Count; i < n; i++)
@@ -171,9 +153,17 @@ namespace Spine {
 
 			ExposedList<IkConstraint> ikConstraints = this.ikConstraints;
 			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
-				IkConstraint ikConstraint = ikConstraints.Items[i];
-				ikConstraint.bendDirection = ikConstraint.data.bendDirection;
-				ikConstraint.mix = ikConstraint.data.mix;
+				IkConstraint constraint = ikConstraints.Items[i];
+				constraint.bendDirection = constraint.data.bendDirection;
+				constraint.mix = constraint.data.mix;
+			}
+
+			ExposedList<TransformConstraint> transformConstraints = this.transformConstraints;
+			for (int i = 0, n = transformConstraints.Count; i < n; i++) {
+				TransformConstraint constraint = transformConstraints.Items[i];
+				constraint.translateMix = constraint.data.translateMix;
+				constraint.x = constraint.data.x;
+				constraint.y = constraint.data.y;
 			}
 		}
 
@@ -293,12 +283,23 @@ namespace Spine {
 		}
 
 		/** @return May be null. */
-		public IkConstraint FindIkConstraint (String ikConstraintName) {
-			if (ikConstraintName == null) throw new ArgumentNullException("ikConstraintName cannot be null.");
+		public IkConstraint FindIkConstraint (String constraintName) {
+			if (constraintName == null) throw new ArgumentNullException("constraintName cannot be null.");
 			ExposedList<IkConstraint> ikConstraints = this.ikConstraints;
 			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
 				IkConstraint ikConstraint = ikConstraints.Items[i];
-				if (ikConstraint.data.name == ikConstraintName) return ikConstraint;
+				if (ikConstraint.data.name == constraintName) return ikConstraint;
+			}
+			return null;
+		}
+
+		/** @return May be null. */
+		public TransformConstraint FindTransformConstraint (String constraintName) {
+			if (constraintName == null) throw new ArgumentNullException("constraintName cannot be null.");
+			ExposedList<TransformConstraint> transformConstraints = this.transformConstraints;
+			for (int i = 0, n = transformConstraints.Count; i < n; i++) {
+				TransformConstraint transformConstraint = transformConstraints.Items[i];
+				if (transformConstraint.data.name == constraintName) return transformConstraint;
 			}
 			return null;
 		}

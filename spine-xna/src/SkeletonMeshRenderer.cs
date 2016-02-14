@@ -189,8 +189,8 @@ namespace Spine {
 						itemVertices[ii].TextureCoordinate.X = uvs[v];
 						itemVertices[ii].TextureCoordinate.Y = uvs[v + 1];
 					}
-				} else if (attachment is SkinnedMeshAttachment) {
-					SkinnedMeshAttachment mesh = (SkinnedMeshAttachment)attachment;
+				} else if (attachment is WeightedMeshAttachment) {
+					WeightedMeshAttachment mesh = (WeightedMeshAttachment)attachment;
 					int vertexCount = mesh.UVs.Length;
 					if (vertices.Length < vertexCount) vertices = new float[vertexCount];
 					mesh.ComputeWorldVertices(slot, vertices);

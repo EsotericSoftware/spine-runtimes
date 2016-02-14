@@ -32,19 +32,7 @@
 using System;
 
 namespace Spine {
-	public class Event {
-		public EventData Data { get; private set; }
-		public int Int { get; set; }
-		public float Float { get; set; }
-		public String String { get; set; }
-		public float Time { get; private set; }
-
-		public Event (float time, EventData data) {
-			Data = data;
-		}
-
-		override public String ToString () {
-			return Data.Name;
-		}
+	public interface IUpdatable {
+		void Update ();
 	}
 }
