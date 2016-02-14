@@ -111,7 +111,7 @@ public class SkeletonUtilityInspector : Editor {
 		foreach (Bone b in skeleton.Bones) {
 			Vector3 vec = transform.TransformPoint(new Vector3(b.WorldX, b.WorldY, 0));
 
-			Quaternion rot = Quaternion.Euler(0, 0, b.WorldRotation * flipRotation);
+			Quaternion rot = Quaternion.Euler(0, 0, b.WorldRotationX * flipRotation);
 			Vector3 forward = transform.TransformDirection(rot * Vector3.right);
 			forward *= flipRotation;
 
@@ -221,7 +221,7 @@ public class SkeletonUtilityInspector : Editor {
 
 					Texture2D icon = null;
 
-					if (attachment is MeshAttachment || attachment is SkinnedMeshAttachment)
+					if (attachment is MeshAttachment || attachment is WeightedMeshAttachment)
 						icon = SpineEditorUtilities.Icons.mesh;
 					else
 						icon = SpineEditorUtilities.Icons.image;

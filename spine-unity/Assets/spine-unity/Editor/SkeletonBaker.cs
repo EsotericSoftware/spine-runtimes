@@ -266,13 +266,13 @@ public static class SkeletonBaker {
 						unusedMeshNames.Remove(attachmentMeshName);
 						if (newPrefab || meshTable.ContainsKey(attachmentMeshName) == false)
 							AssetDatabase.AddObjectToAsset(mesh, prefab);
-					} else if (attachment is SkinnedMeshAttachment) {
-						var meshAttachment = (SkinnedMeshAttachment)attachment;
+					} else if (attachment is WeightedMeshAttachment) {
+						var meshAttachment = (WeightedMeshAttachment)attachment;
 						offset.x = 0;
 						offset.y = 0;
 						rotation = 0;
 						mesh = ExtractSkinnedMeshAttachment(attachmentMeshName, meshAttachment, i, skeletonData, boneList, mesh);
-						material = ExtractMaterial((SkinnedMeshAttachment)attachment);
+						material = ExtractMaterial((WeightedMeshAttachment)attachment);
 						unusedMeshNames.Remove(attachmentMeshName);
 						if (newPrefab || meshTable.ContainsKey(attachmentMeshName) == false)
 							AssetDatabase.AddObjectToAsset(mesh, prefab);
@@ -285,7 +285,7 @@ public static class SkeletonBaker {
 					attachmentTransform.localPosition = offset;
 					attachmentTransform.localRotation = Quaternion.Euler(0, 0, rotation);
 
-					if (attachment is SkinnedMeshAttachment) {
+					if (attachment is WeightedMeshAttachment) {
 						attachmentTransform.position = Vector3.zero;
 						attachmentTransform.rotation = Quaternion.identity;
 						var skinnedMeshRenderer = attachmentTransform.gameObject.AddComponent<SkinnedMeshRenderer>();
@@ -500,8 +500,8 @@ public static class SkeletonBaker {
 		} else if (attachment is MeshAttachment) {
 			var att = (MeshAttachment)attachment;
 			return (Material)((AtlasRegion)att.RendererObject).page.rendererObject;
-		} else if (attachment is SkinnedMeshAttachment) {
-			var att = (SkinnedMeshAttachment)attachment;
+		} else if (attachment is WeightedMeshAttachment) {
+			var att = (WeightedMeshAttachment)attachment;
 			return (Material)((AtlasRegion)att.RendererObject).page.rendererObject;
 		} else {
 			return null;
@@ -609,7 +609,7 @@ public static class SkeletonBaker {
 		}
 	}
 
-	static Mesh ExtractSkinnedMeshAttachment (string name, SkinnedMeshAttachment attachment, int slotIndex, SkeletonData skeletonData, List<Transform> boneList, Mesh mesh = null) {
+	static Mesh ExtractSkinnedMeshAttachment (string name, WeightedMeshAttachment attachment, int slotIndex, SkeletonData skeletonData, List<Transform> boneList, Mesh mesh = null) {
 
 		Skeleton skeleton = new Skeleton(skeletonData);
 		skeleton.UpdateWorldTransform();
@@ -949,10 +949,10 @@ public static class SkeletonBaker {
 	static float GetUninheritedRotation (Bone b) {
 
 		Bone parent = b.Parent;
-		float angle = b.RotationIK;
+		float angle = b.AppliedRotation;
 
 		while (parent != null) {
-			angle -= parent.RotationIK;
+			angle -= parent.AppliedRotation;
 			parent = parent.Parent;
 		}
 
@@ -971,7 +971,7 @@ public static class SkeletonBaker {
 
 		List<Keyframe> keys = new List<Keyframe>();
 
-		float rotation = bone.RotationIK;
+		float rotation = bone.AppliedRotation;
 		if (!inheritRotation)
 			rotation = GetUninheritedRotation(bone);
 
@@ -1002,7 +1002,7 @@ public static class SkeletonBaker {
 			pk = keys[pIndex];
 
 			if (inheritRotation)
-				rotation = bone.RotationIK;
+				rotation = bone.AppliedRotation;
 			else {
 				rotation = GetUninheritedRotation(bone);
 			}

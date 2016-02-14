@@ -1192,9 +1192,9 @@ public class SpineEditorUtilities : AssetPostprocessor {
 			return new MeshAttachment(name);
 		}
 
-		public SkinnedMeshAttachment NewSkinnedMeshAttachment (Skin skin, string name, string path) {
+		public WeightedMeshAttachment NewWeightedMeshAttachment(Skin skin, string name, string path) {
 			requirementList.Add(path);
-			return new SkinnedMeshAttachment(name);
+			return new WeightedMeshAttachment(name);
 		}
 
 		public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, string name) {

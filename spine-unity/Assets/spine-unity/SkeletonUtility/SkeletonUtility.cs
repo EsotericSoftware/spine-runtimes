@@ -370,7 +370,7 @@ public class SkeletonUtility : MonoBehaviour {
 
 		if (mode == SkeletonUtilityBone.Mode.Override) {
 			if (rot)
-				go.transform.localRotation = Quaternion.Euler(0, 0, b.bone.RotationIK);
+				go.transform.localRotation = Quaternion.Euler(0, 0, b.bone.AppliedRotation);
 
 			if (pos)
 				go.transform.localPosition = new Vector3(b.bone.X, b.bone.Y, 0);

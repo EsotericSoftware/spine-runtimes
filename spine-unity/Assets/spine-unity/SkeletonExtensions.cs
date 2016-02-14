@@ -17,7 +17,7 @@ public static class SkeletonExtensions {
 	public static Color GetColor (this Skeleton s) { return new Color(s.r, s.g, s.b, s.a); }
 	public static Color GetColor (this RegionAttachment a) { return new Color(a.r, a.g, a.b, a.a); }
 	public static Color GetColor (this MeshAttachment a) { return new Color(a.r, a.g, a.b, a.a); }
-	public static Color GetColor (this SkinnedMeshAttachment a) { return new Color(a.r, a.g, a.b, a.a);	}
+	public static Color GetColor (this WeightedMeshAttachment a) { return new Color(a.r, a.g, a.b, a.a);	}
 
 	public static void SetColor (this Skeleton skeleton, Color color) {
 		skeleton.A = color.a;
@@ -75,14 +75,14 @@ public static class SkeletonExtensions {
 		attachment.B = color.b * ByteToFloat;
 	}
 
-	public static void SetColor (this SkinnedMeshAttachment attachment, Color color) {
+	public static void SetColor (this WeightedMeshAttachment attachment, Color color) {
 		attachment.A = color.a;
 		attachment.R = color.r;
 		attachment.G = color.g;
 		attachment.B = color.b;
 	}
 
-	public static void SetColor (this SkinnedMeshAttachment attachment, Color32 color) {
+	public static void SetColor (this WeightedMeshAttachment attachment, Color32 color) {
 		attachment.A = color.a * ByteToFloat;
 		attachment.R = color.r * ByteToFloat;
 		attachment.G = color.g * ByteToFloat;

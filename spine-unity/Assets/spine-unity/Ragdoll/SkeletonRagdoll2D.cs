@@ -261,7 +261,9 @@ public class SkeletonRagdoll2D : MonoBehaviour {
 
 		t.localPosition = new Vector3(b.WorldX, b.WorldY, 0);
 		//TODO: deal with WorldFlipY
-		t.localRotation = Quaternion.Euler(0, 0, b.WorldFlipX ? -b.WorldRotation : b.WorldRotation);
+        // MITCH
+		// t.localRotation = Quaternion.Euler(0, 0, b.WorldFlipX ? -b.WorldRotation : b.WorldRotation);
+        t.localRotation = Quaternion.Euler(0, 0, b.WorldRotationX);
 		t.localScale = new Vector3(b.WorldScaleX, b.WorldScaleY, 0);
 
 		float length = b.Data.Length;
@@ -281,7 +283,9 @@ public class SkeletonRagdoll2D : MonoBehaviour {
 				var box = go.AddComponent<BoxCollider2D>();
 				box.size = new Vector2(length, thickness);
 #if UNITY_5
-				box.offset = new Vector2((b.WorldFlipX ? -length : length) / 2, 0);
+                // MITCH
+				// box.offset = new Vector2((b.WorldFlipX ? -length : length) / 2, 0);
+                box.offset = new Vector2(length / 2, 0);
 #else
 				box.center = new Vector2((b.WorldFlipX ? -length : length) / 2, 0);
 #endif
@@ -304,8 +308,11 @@ public class SkeletonRagdoll2D : MonoBehaviour {
 		if (skin == null)
 			skin = skeleton.Data.DefaultSkin;
 
-		bool flipX = b.WorldFlipX;
-		bool flipY = b.WorldFlipY;
+        // MITCH
+		// bool flipX = b.WorldFlipX;
+		// bool flipY = b.WorldFlipY;
+        bool flipX = false;
+		bool flipY = false;
 
 		List<Attachment> attachments = new List<Attachment>();
 		foreach (Slot s in skeleton.Slots) {
@@ -345,7 +352,7 @@ public class SkeletonRagdoll2D : MonoBehaviour {
 		foreach (var pair in boneTable) {
 			var b = pair.Key;
 			var t = pair.Value;
-			bool flip = false;
+			//bool flip = false;
 			bool flipX = false;  //TODO:  deal with negative scale instead of Flip Key
 			bool flipY = false;  //TODO:  deal with negative scale instead of Flip Key
 			Bone parentBone = null;
@@ -354,22 +361,24 @@ public class SkeletonRagdoll2D : MonoBehaviour {
 			if (b != startingBone) {
 				parentBone = b.Parent;
 				parentTransform = boneTable[parentBone];
-				flipX = parentBone.WorldFlipX;
-				flipY = parentBone.WorldFlipY;
+                // MITCH
+				// flipX = parentBone.WorldFlipX;
+				// flipY = parentBone.WorldFlipY;
 
 			} else {
 				parentBone = b.Parent;
 				parentTransform = ragdollRoot;
 				if (b.Parent != null) {
-					flipX = b.worldFlipX;
-					flipY = b.WorldFlipY;
+                    // MITCH
+					// flipX = b.worldFlipX;
+					// flipY = b.WorldFlipY;
 				} else {
 					flipX = b.Skeleton.FlipX;
 					flipY = b.Skeleton.FlipY;
 				}
 			}
 
-			flip = flipX ^ flipY;
+			//flip = flipX ^ flipY;
 
 			helper.position = parentTransform.position;
 			helper.rotation = parentTransform.rotation;
@@ -385,26 +394,30 @@ public class SkeletonRagdoll2D : MonoBehaviour {
 
 			float a = Mathf.Atan2(right.y, right.x) * Mathf.Rad2Deg;
 
-			if (b.WorldFlipX ^ b.WorldFlipY) {
-				a *= -1;
-			}
+            // MITCH
+			//if (b.WorldFlipX ^ b.WorldFlipY) {
+			//	a *= -1;
+			//}
 
 			if (parentBone != null) {
-				if ((b.WorldFlipX ^ b.WorldFlipY) != flip) {
-					a -= GetCompensatedRotationIK(parentBone) * 2;
-				}
+                // MITCH
+				//if ((b.WorldFlipX ^ b.WorldFlipY) != flip) {
+				//	a -= GetCompensatedRotationIK(parentBone) * 2;
+				//}
 			}
 
 			b.Rotation = Mathf.Lerp(b.Rotation, a, mix);
-			b.RotationIK = Mathf.Lerp(b.rotationIK, a, mix);
+            // MITCH
+			// b.RotationIK = Mathf.Lerp(b.rotationIK, a, mix);
 		}
 	}
 
 	float GetCompensatedRotationIK (Bone b) {
 		Bone parent = b.Parent;
-		float a = b.RotationIK;
+        // MITCH
+		float a = b.AppliedRotation;
 		while (parent != null) {
-			a += parent.RotationIK;
+			a += parent.AppliedRotation;
 			parent = parent.parent;
 		}
 

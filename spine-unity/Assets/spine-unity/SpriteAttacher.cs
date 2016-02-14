@@ -189,7 +189,7 @@ public class SpriteAttachmentLoader : AttachmentLoader {
 		throw new System.NotImplementedException();
 	}
 
-	public SkinnedMeshAttachment NewSkinnedMeshAttachment (Skin skin, string name, string path) {
+	public WeightedMeshAttachment NewWeightedMeshAttachment(Skin skin, string name, string path) {
 		throw new System.NotImplementedException();
 	}
 

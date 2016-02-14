@@ -250,8 +250,9 @@ public class SkeletonRenderer : MonoBehaviour {
 			int attachmentVertexCount, attachmentTriangleCount;
 
 			// Handle flipping for normals (for lighting).
-			bool worldScaleIsSameSigns = ((bone.worldScaleY >= 0f) == (bone.worldScaleX >= 0f));
-			bool flip = frontFacing && ((bone.worldFlipX != bone.worldFlipY) == worldScaleIsSameSigns); // TODO: bone flipX and flipY will be removed in Spine 3.0
+            // MITCH
+			bool worldScaleIsSameSigns = ((bone.WorldSignX >= 0f) == (bone.WorldSignY >= 0f));
+			bool flip = frontFacing && ((bone.WorldSignX != bone.WorldSignY) == worldScaleIsSameSigns); // TODO: bone flipX and flipY will be removed in Spine 3.0
 
 			workingFlipsItems[i] = flip;
 			workingAttachmentsItems[i] = attachment;
@@ -274,7 +275,7 @@ public class SkeletonRenderer : MonoBehaviour {
 					attachmentVertexCount = meshAttachment.vertices.Length >> 1;
 					attachmentTriangleCount = meshAttachment.triangles.Length;
 				} else {
-					var skinnedMeshAttachment = attachment as SkinnedMeshAttachment;
+					var skinnedMeshAttachment = attachment as WeightedMeshAttachment;
 					if (skinnedMeshAttachment != null) {
 						rendererObject = skinnedMeshAttachment.RendererObject;
 						attachmentVertexCount = skinnedMeshAttachment.uvs.Length >> 1;
@@ -531,20 +532,20 @@ public class SkeletonRenderer : MonoBehaviour {
 								meshBoundsMax.y = y;
 						}
 					} else {
-						SkinnedMeshAttachment skinnedMeshAttachment = attachment as SkinnedMeshAttachment;
-						if (skinnedMeshAttachment != null) {
-							int meshVertexCount = skinnedMeshAttachment.uvs.Length;
+						WeightedMeshAttachment weightedMeshAttachment = attachment as WeightedMeshAttachment;
+						if (weightedMeshAttachment != null) {
+							int meshVertexCount = weightedMeshAttachment.uvs.Length;
 							if (tempVertices.Length < meshVertexCount)
 								this.tempVertices = tempVertices = new float[meshVertexCount];
-							skinnedMeshAttachment.ComputeWorldVertices(slot, tempVertices);
+							weightedMeshAttachment.ComputeWorldVertices(slot, tempVertices);
 
-							color.a = (byte)(a * slot.a * skinnedMeshAttachment.a);
-							color.r = (byte)(r * slot.r * skinnedMeshAttachment.r * color.a);
-							color.g = (byte)(g * slot.g * skinnedMeshAttachment.g * color.a);
-							color.b = (byte)(b * slot.b * skinnedMeshAttachment.b * color.a);
+							color.a = (byte)(a * slot.a * weightedMeshAttachment.a);
+							color.r = (byte)(r * slot.r * weightedMeshAttachment.r * color.a);
+							color.g = (byte)(g * slot.g * weightedMeshAttachment.g * color.a);
+							color.b = (byte)(b * slot.b * weightedMeshAttachment.b * color.a);
 							if (slot.data.blendMode == BlendMode.additive) color.a = 0;
 
-							float[] meshUVs = skinnedMeshAttachment.uvs;
+							float[] meshUVs = weightedMeshAttachment.uvs;
 							float z = i * zSpacing;
 							for (int ii = 0; ii < meshVertexCount; ii += 2, vertexIndex++) {
 								float x = tempVertices[ii], y = tempVertices[ii + 1];
@@ -756,10 +757,10 @@ public class SkeletonRenderer : MonoBehaviour {
 				attachmentVertexCount = meshAttachment.vertices.Length >> 1; //  length/2
 				attachmentTriangles = meshAttachment.triangles;
 			} else {
-				var skinnedMeshAttachment = attachment as SkinnedMeshAttachment;
-				if (skinnedMeshAttachment != null) {
-					attachmentVertexCount = skinnedMeshAttachment.uvs.Length >> 1; // length/2
-					attachmentTriangles = skinnedMeshAttachment.triangles;
+				var weightedMeshAttachment = attachment as WeightedMeshAttachment;
+				if (weightedMeshAttachment != null) {
+					attachmentVertexCount = weightedMeshAttachment.uvs.Length >> 1; // length/2
+					attachmentTriangles = weightedMeshAttachment.triangles;
 				} else
 					continue;
 			}
@@ -774,7 +775,7 @@ public class SkeletonRenderer : MonoBehaviour {
 				for (int ii = 0, nn = attachmentTriangles.Length; ii < nn; ii++, triangleIndex++) {
 					triangles[triangleIndex] = firstVertex + attachmentTriangles[ii];
 				}
-			}
+            }
 
 			firstVertex += attachmentVertexCount;
 		}

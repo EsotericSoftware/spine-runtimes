@@ -394,7 +394,7 @@ public class SkeletonDataAssetInspector : Editor {
 						icon = SpineEditorUtilities.Icons.mesh;
 					else if (type == typeof(BoundingBoxAttachment))
 						icon = SpineEditorUtilities.Icons.boundingBox;
-					else if (type == typeof(SkinnedMeshAttachment))
+					else if (type == typeof(WeightedMeshAttachment))
 						icon = SpineEditorUtilities.Icons.weights;
 					else
 						icon = SpineEditorUtilities.Icons.warning;

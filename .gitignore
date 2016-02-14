@@ -60,6 +60,8 @@ spine-xna/example/obj
 
 spine-unity/Assets/spine-csharp*
 !spine-unity/Assets/spine-csharp/Place spine-csharp src here.*
+spine-unity/spine-unity.CSharp.csproj
+spine-unity/spine-unity.CSharp.Editor.csproj
 spine-unity/ProjectSettings
 spine-unity/Temp
 spine-unity/Library

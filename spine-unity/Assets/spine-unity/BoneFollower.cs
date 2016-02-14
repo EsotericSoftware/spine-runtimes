@@ -125,7 +125,7 @@ public class BoneFollower : MonoBehaviour {
 
 			if (followBoneRotation) {
 				Vector3 rotation = cachedTransform.localRotation.eulerAngles;
-				cachedTransform.localRotation = Quaternion.Euler(rotation.x, rotation.y, bone.worldRotation * flipRotation);
+				cachedTransform.localRotation = Quaternion.Euler(rotation.x, rotation.y, bone.WorldRotationX * flipRotation);
 			}
 
 		} else {
@@ -138,7 +138,7 @@ public class BoneFollower : MonoBehaviour {
 			if (followBoneRotation) {
 				Vector3 rotation = skeletonTransform.rotation.eulerAngles;
 
-				cachedTransform.rotation = Quaternion.Euler(rotation.x, rotation.y, skeletonTransform.rotation.eulerAngles.z + (bone.worldRotation * flipRotation));
+				cachedTransform.rotation = Quaternion.Euler(rotation.x, rotation.y, skeletonTransform.rotation.eulerAngles.z + (bone.WorldRotationX * flipRotation));
 			}
 		}
 

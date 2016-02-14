@@ -114,13 +114,16 @@ public class SkeletonUtilityBone : MonoBehaviour {
 		float skeletonFlipRotation = (skeleton.flipX ^ skeleton.flipY) ? -1f : 1f;
 
 		float flipCompensation = 0;
-		if (flip && (flipX || (flipX != bone.flipX)) && bone.parent != null) {
-			flipCompensation = bone.parent.WorldRotation * -2;
-		}
+
+        // MITCH
+		//if (flip && (flipX || (flipX != bone.flipX)) && bone.parent != null) {
+		//	flipCompensation = bone.parent.WorldRotation * -2;
+		//}
 
 		if (mode == Mode.Follow) {
 			if (flip) {
-				flipX = bone.flipX;
+                // MITCH
+				//flipX = bone.flipX;
 			}
 
 
@@ -131,20 +134,21 @@ public class SkeletonUtilityBone : MonoBehaviour {
 			if (rotation) {
 
 				if (bone.Data.InheritRotation) {
-					if (bone.FlipX) {
-						cachedTransform.localRotation = Quaternion.Euler(0, 180, bone.rotationIK - flipCompensation);
-					} else {
-						cachedTransform.localRotation = Quaternion.Euler(0, 0, bone.rotationIK);
-					}
+                    // MITCH
+					//if (bone.FlipX) {
+					//	cachedTransform.localRotation = Quaternion.Euler(0, 180, bone.rotationIK - flipCompensation);
+					//} else {
+						cachedTransform.localRotation = Quaternion.Euler(0, 0, bone.AppliedRotation);
+					//}
 				} else {
 					Vector3 euler = skeletonTransform.rotation.eulerAngles;
-					cachedTransform.rotation = Quaternion.Euler(euler.x, euler.y, skeletonTransform.rotation.eulerAngles.z + (bone.worldRotation * skeletonFlipRotation));
+					cachedTransform.rotation = Quaternion.Euler(euler.x, euler.y, skeletonTransform.rotation.eulerAngles.z + (bone.WorldRotationX * skeletonFlipRotation));
 				}
 
 			}
 
 			if (scale) {
-				cachedTransform.localScale = new Vector3(bone.scaleX, bone.scaleY, bone.worldFlipX ? -1 : 1);
+				cachedTransform.localScale = new Vector3(bone.scaleX, bone.scaleY, bone.WorldSignX);
 
 				nonUniformScaleWarning = (bone.scaleX != bone.scaleY);
 			}
@@ -166,9 +170,10 @@ public class SkeletonUtilityBone : MonoBehaviour {
 					float angle = Mathf.LerpAngle(bone.Rotation, cachedTransform.localRotation.eulerAngles.z, overrideAlpha) + flipCompensation;
 
 					if (flip) {
-						if ((!flipX && bone.flipX)) {
-							angle -= flipCompensation;
-						}
+                        // MITCH
+						//if ((!flipX && bone.flipX)) {
+						//	angle -= flipCompensation;
+						//}
 
 						//TODO fix this...
 						if (angle >= 360)
@@ -178,7 +183,7 @@ public class SkeletonUtilityBone : MonoBehaviour {
 					}
 
 					bone.Rotation = angle;
-					bone.RotationIK = angle;
+					bone.AppliedRotation = angle;
 				}
 
 				if (scale) {
@@ -188,9 +193,10 @@ public class SkeletonUtilityBone : MonoBehaviour {
 					nonUniformScaleWarning = (bone.scaleX != bone.scaleY);
 				}
 
-				if (flip) {
-					bone.flipX = flipX;
-				}
+                // MITCH
+				//if (flip) {
+				//	bone.flipX = flipX;
+				//}
 			} else {
 
 				if (transformLerpComplete)
@@ -206,9 +212,10 @@ public class SkeletonUtilityBone : MonoBehaviour {
 					float angle = Mathf.LerpAngle(bone.Rotation, Quaternion.LookRotation(flipX ? Vector3.forward * -1 : Vector3.forward, parentReference.InverseTransformDirection(cachedTransform.up)).eulerAngles.z, overrideAlpha) + flipCompensation;
 
 					if (flip) {
-						if ((!flipX && bone.flipX)) {
-							angle -= flipCompensation;
-						}
+                        // MITCH
+						//if ((!flipX && bone.flipX)) {
+						//	angle -= flipCompensation;
+						//}
 
 						//TODO fix this...
 						if (angle >= 360)
@@ -218,7 +225,7 @@ public class SkeletonUtilityBone : MonoBehaviour {
 					}
 
 					bone.Rotation = angle;
-					bone.RotationIK = angle;
+					bone.AppliedRotation = angle;
 				}
 
 				//TODO: Something about this
@@ -229,10 +236,10 @@ public class SkeletonUtilityBone : MonoBehaviour {
 					nonUniformScaleWarning = (bone.scaleX != bone.scaleY);
 				}
 
-				if (flip) {
-					bone.flipX = flipX;
-				}
-
+                // MITCH
+				//if (flip) {
+				//	bone.flipX = flipX;
+				//}
 			}
 
 			transformLerpComplete = true;
@@ -251,11 +258,14 @@ public class SkeletonUtilityBone : MonoBehaviour {
 			}
 		}
 
-		bone.FlipX = state;
+        // MITCH
+		//bone.FlipX = state;
 		transform.RotateAround(transform.position, skeletonUtility.transform.up, 180);
 		Vector3 euler = transform.localRotation.eulerAngles;
 		euler.x = 0;
-		euler.y = bone.FlipX ? 180 : 0;
+        // MITCH
+		//euler.y = bone.FlipX ? 180 : 0;
+        euler.y = 0;
 		transform.localRotation = Quaternion.Euler(euler);
 	}
 
