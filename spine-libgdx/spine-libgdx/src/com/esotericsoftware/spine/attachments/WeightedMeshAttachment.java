@@ -42,7 +42,7 @@ import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.NumberUtils;
 
 /** Attachment that displays a texture region. */
-public class SkinnedMeshAttachment extends Attachment {
+public class WeightedMeshAttachment extends Attachment {
 	private TextureRegion region;
 	private String path;
 	private int[] bones;
@@ -56,7 +56,7 @@ public class SkinnedMeshAttachment extends Attachment {
 	private int[] edges;
 	private float width, height;
 
-	public SkinnedMeshAttachment (String name) {
+	public WeightedMeshAttachment (String name) {
 		super(name);
 	}
 

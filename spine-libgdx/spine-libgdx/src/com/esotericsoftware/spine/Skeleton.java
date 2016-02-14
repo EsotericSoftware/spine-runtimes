@@ -37,7 +37,7 @@ import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
-import com.esotericsoftware.spine.attachments.SkinnedMeshAttachment;
+import com.esotericsoftware.spine.attachments.WeightedMeshAttachment;
 
 public class Skeleton {
 	final SkeletonData data;
@@ -380,8 +380,8 @@ public class Skeleton {
 			} else if (attachment instanceof MeshAttachment) {
 				vertices = ((MeshAttachment)attachment).updateWorldVertices(slot, true);
 
-			} else if (attachment instanceof SkinnedMeshAttachment) {
-				vertices = ((SkinnedMeshAttachment)attachment).updateWorldVertices(slot, true);
+			} else if (attachment instanceof WeightedMeshAttachment) {
+				vertices = ((WeightedMeshAttachment)attachment).updateWorldVertices(slot, true);
 			}
 			if (vertices != null) {
 				for (int ii = 0, nn = vertices.length; ii < nn; ii += 5) {

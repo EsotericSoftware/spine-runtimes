@@ -39,11 +39,11 @@ import com.esotericsoftware.spine.attachments.AttachmentLoader;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
-import com.esotericsoftware.spine.attachments.SkinnedMeshAttachment;
+import com.esotericsoftware.spine.attachments.WeightedMeshAttachment;
 
 public class AnimationStateTest {
 	final SkeletonJson json = new SkeletonJson(new AttachmentLoader() {
-		public SkinnedMeshAttachment newSkinnedMeshAttachment (Skin skin, String name, String path) {
+		public WeightedMeshAttachment newWeightedMeshAttachment (Skin skin, String name, String path) {
 			return null;
 		}
 

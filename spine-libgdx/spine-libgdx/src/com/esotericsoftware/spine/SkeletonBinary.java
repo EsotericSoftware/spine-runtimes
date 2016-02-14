@@ -59,7 +59,7 @@ import com.esotericsoftware.spine.attachments.AttachmentType;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
-import com.esotericsoftware.spine.attachments.SkinnedMeshAttachment;
+import com.esotericsoftware.spine.attachments.WeightedMeshAttachment;
 
 public class SkeletonBinary {
 	static public final int TIMELINE_SCALE = 0;
@@ -280,10 +280,10 @@ public class SkeletonBinary {
 			}
 			return mesh;
 		}
-		case skinnedmesh: {
+		case weightedmesh: {
 			String path = input.readString();
 			if (path == null) path = name;
-			SkinnedMeshAttachment mesh = attachmentLoader.newSkinnedMeshAttachment(skin, name, path);
+			WeightedMeshAttachment mesh = attachmentLoader.newWeightedMeshAttachment(skin, name, path);
 			if (mesh == null) return null;
 			mesh.setPath(path);
 			float[] uvs = readFloatArray(input, 1);
@@ -462,7 +462,7 @@ public class SkeletonBinary {
 							if (attachment instanceof MeshAttachment)
 								vertexCount = ((MeshAttachment)attachment).getVertices().length;
 							else
-								vertexCount = ((SkinnedMeshAttachment)attachment).getWeights().length / 3 * 2;
+								vertexCount = ((WeightedMeshAttachment)attachment).getWeights().length / 3 * 2;
 
 							int end = input.readInt(true);
 							if (end == 0) {
