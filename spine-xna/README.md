@@ -11,6 +11,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 ## Setup
 
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
-1. Open the `spine-xna.sln` Visual C# 2010 Express project file.
+1. If necessary, install [Microsoft XNA Game Studio 4.0](https://mxa.codeplex.com/releases/view/618279).
+1. Open the `spine-xna.sln` project file with Visual Studio.
 
 Alternatively, the contents of the `spine-csharp/src` and `spine-xna/src` directories can be copied into your project.
