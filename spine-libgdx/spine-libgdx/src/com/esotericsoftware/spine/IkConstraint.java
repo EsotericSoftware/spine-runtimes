@@ -125,6 +125,7 @@ public class IkConstraint implements Updatable {
 		float parentRotation = bone.parent == null ? 0 : bone.parent.getWorldRotationX();
 		float rotation = bone.rotation;
 		float rotationIK = atan2(targetY - bone.worldY, targetX - bone.worldX) * radDeg - parentRotation;
+		if (bone.worldSignX != bone.worldSignY) rotationIK = 360 - rotationIK;
 		if (rotationIK > 180)
 			rotationIK -= 360;
 		else if (rotationIK < -180) rotationIK += 360;
