@@ -148,6 +148,17 @@ public class SkeletonBinary {
 				skeletonData.ikConstraints.add(ikConstraintData);
 			}
 
+			// Transform constraints.
+			for (int i = 0, n = input.readInt(true); i < n; i++) {
+				TransformConstraintData transformConstraintData = new TransformConstraintData(input.readString());
+				transformConstraintData.bone = skeletonData.bones.get(input.readInt(true));
+				transformConstraintData.target = skeletonData.bones.get(input.readInt(true));
+				transformConstraintData.translateMix = input.readFloat();
+				transformConstraintData.x = input.readFloat();
+				transformConstraintData.y = input.readFloat();
+				skeletonData.transformConstraints.add(transformConstraintData);
+			}
+
 			// Slots.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				String slotName = input.readString();

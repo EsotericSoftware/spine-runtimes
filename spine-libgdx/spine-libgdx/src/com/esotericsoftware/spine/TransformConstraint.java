@@ -23,7 +23,7 @@ public class TransformConstraint implements Updatable {
 	public TransformConstraint (TransformConstraint constraint, Skeleton skeleton) {
 		data = constraint.data;
 		translateMix = data.translateMix;
-		bone = skeleton.bones.get(constraint.bone.skeleton.bones.indexOf(constraint.target, true));
+		bone = skeleton.bones.get(constraint.bone.skeleton.bones.indexOf(constraint.bone, true));
 		target = skeleton.bones.get(constraint.target.skeleton.bones.indexOf(constraint.target, true));
 	}
 

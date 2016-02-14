@@ -146,6 +146,25 @@ public class SkeletonJson {
 			skeletonData.ikConstraints.add(ikConstraintData);
 		}
 
+		// Transform constraints.
+		for (JsonValue transformMap = root.getChild("transform"); transformMap != null; transformMap = transformMap.next) {
+			TransformConstraintData transformConstraintData = new TransformConstraintData(transformMap.getString("name"));
+
+			String boneName = transformMap.getString("bone");
+			transformConstraintData.bone = skeletonData.findBone(boneName);
+			if (transformConstraintData.bone == null) throw new SerializationException("Bone not found: " + boneName);
+
+			String targetName = transformMap.getString("target");
+			transformConstraintData.target = skeletonData.findBone(targetName);
+			if (transformConstraintData.target == null) throw new SerializationException("Target bone not found: " + targetName);
+
+			transformConstraintData.translateMix = transformMap.getFloat("translateMix", 1);
+			transformConstraintData.x = transformMap.getFloat("x", 0);
+			transformConstraintData.y = transformMap.getFloat("y", 0);
+
+			skeletonData.transformConstraints.add(transformConstraintData);
+		}
+
 		// Slots.
 		for (JsonValue slotMap = root.getChild("slots"); slotMap != null; slotMap = slotMap.next) {
 			String slotName = slotMap.getString("name");
