@@ -36,6 +36,7 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 import java.awt.FileDialog;
 import java.awt.Frame;
 import java.io.File;
+import java.lang.Thread.UncaughtExceptionHandler;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -95,6 +96,13 @@ public class SkeletonViewer extends ApplicationAdapter {
 	float lastModifiedCheck, reloadTimer;
 
 	public void create () {
+		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+			public void uncaughtException (Thread thread, Throwable ex) {
+				ex.printStackTrace();
+				Runtime.getRuntime().halt(0); // Prevent Swing from keeping JVM alive.
+			}
+		});
+
 		ui = new UI();
 		batch = new PolygonSpriteBatch();
 		renderer = new SkeletonMeshRenderer();
