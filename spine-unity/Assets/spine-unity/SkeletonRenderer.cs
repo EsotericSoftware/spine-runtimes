@@ -35,6 +35,7 @@ using UnityEngine;
 using Spine;
 
 /// <summary>Renders a skeleton.</summary>
+[DisallowMultipleComponent]
 [ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class SkeletonRenderer : MonoBehaviour {
 
