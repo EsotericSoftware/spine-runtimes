@@ -153,10 +153,6 @@ namespace Spine {
 						pd = td;
 						p = p.parent;
 					}
-					if (yDown) {
-						pb = -pb;
-						pd = -pd;
-					}
 					a = pa * la + pb * lc;
 					b = pa * lb + pb * ld;
 					c = pc * la + pd * lc;
@@ -165,7 +161,7 @@ namespace Spine {
 						a = -a;
 						b = -b;
 					}
-					if (skeleton.flipY) {
+					if (skeleton.flipY != yDown) {
 						c = -c;
 						d = -d;
 					}
@@ -200,10 +196,6 @@ namespace Spine {
 
 						p = p.parent;
 					}
-					if (yDown) {
-						pb = -pb;
-						pd = -pd;
-					}
 					a = pa * la + pb * lc;
 					b = pa * lb + pb * ld;
 					c = pc * la + pd * lc;
@@ -212,7 +204,7 @@ namespace Spine {
 						a = -a;
 						b = -b;
 					}
-					if (skeleton.flipY) {
+					if (skeleton.flipY != yDown) {
 						c = -c;
 						d = -d;
 					}
