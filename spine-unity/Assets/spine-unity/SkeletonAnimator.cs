@@ -40,14 +40,18 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 		}
 	}
 
-	Dictionary<int, Spine.Animation> animationTable = new Dictionary<int, Spine.Animation>();
-	Dictionary<AnimationClip, int> clipNameHashCodeTable = new Dictionary<AnimationClip, int>();
+	readonly Dictionary<int, Spine.Animation> animationTable = new Dictionary<int, Spine.Animation>();
+	readonly Dictionary<AnimationClip, int> clipNameHashCodeTable = new Dictionary<AnimationClip, int>();
 	Animator animator;
 	float lastTime;
 
-	public override void Reset () {
-		base.Reset();
+	public override void Initialize (bool overwrite) {
+		base.Initialize(overwrite);
+
 		if (!valid)
+			return;
+
+		if (!overwrite)
 			return;
 
 		animationTable.Clear();

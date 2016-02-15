@@ -35,11 +35,11 @@ using UnityEngine;
 using Spine;
 
 /// <summary>Renders a skeleton.</summary>
-[ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
+[ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer)), DisallowMultipleComponent]
 public class SkeletonRenderer : MonoBehaviour {
 
 	public delegate void SkeletonRendererDelegate (SkeletonRenderer skeletonRenderer);
-	public SkeletonRendererDelegate OnReset;
+	public SkeletonRendererDelegate OnRebuild;
 
 	public SkeletonDataAsset skeletonDataAsset;
 	public String initialSkinName;
@@ -85,7 +85,7 @@ public class SkeletonRenderer : MonoBehaviour {
 
 		if (skeletonDataAsset != null) {
 			c.skeletonDataAsset = skeletonDataAsset;
-			c.Reset(); // TODO: Method name will change.
+			c.Initialize(false);
 		}
 
 		return c;
@@ -97,42 +97,35 @@ public class SkeletonRenderer : MonoBehaviour {
 	#endregion
 
 	public virtual void Awake () {
-		Reset();
+		Initialize(false);
 	}
 
-	public virtual void Reset () {
-		if (meshFilter != null)
-			meshFilter.sharedMesh = null;
+	public virtual void Initialize (bool overwrite) {
+		if (valid && !overwrite)
+			return;
 
-		meshRenderer = GetComponent<MeshRenderer>();
-		if (meshRenderer != null) meshRenderer.sharedMaterial = null;
+		// Clear
+		{
+			if (meshFilter != null)
+				meshFilter.sharedMesh = null;
 
-		if (mesh1 != null) {
-			if (Application.isPlaying)
-				Destroy(mesh1);
-			else
-				DestroyImmediate(mesh1);
+			meshRenderer = GetComponent<MeshRenderer>();
+			if (meshRenderer != null) meshRenderer.sharedMaterial = null;
+
+			meshState = new MeshState();
+			mesh1 = null;
+			mesh2 = null;
+			vertices = null;
+			colors = null;
+			uvs = null;
+			sharedMaterials = new Material[0];
+			submeshMaterials.Clear();
+			submeshes.Clear();
+			skeleton = null;
+
+			valid = false;
 		}
 
-		if (mesh2 != null) {
-			if (Application.isPlaying)
-				Destroy(mesh2);
-			else
-				DestroyImmediate(mesh2);
-		}
-
-		meshState = new MeshState();
-		mesh1 = null;
-		mesh2 = null;
-		vertices = null;
-		colors = null;
-		uvs = null;
-		sharedMaterials = new Material[0];
-		submeshMaterials.Clear();
-		submeshes.Clear();
-		skeleton = null;
-
-		valid = false;
 		if (!skeletonDataAsset) {
 			if (logErrors)
 				Debug.LogError("Missing SkeletonData asset.", this);
@@ -146,8 +139,8 @@ public class SkeletonRenderer : MonoBehaviour {
 
 		meshFilter = GetComponent<MeshFilter>();
 		meshRenderer = GetComponent<MeshRenderer>();
-		mesh1 = newMesh();
-		mesh2 = newMesh();
+		mesh1 = SpineMesh.NewMesh();
+		mesh2 = SpineMesh.NewMesh();
 		vertices = new Vector3[0];
 
 		skeleton = new Skeleton(skeletonData);
@@ -163,39 +156,12 @@ public class SkeletonRenderer : MonoBehaviour {
 
 		LateUpdate();
 
-		if (OnReset != null)
-			OnReset(this);
+		if (OnRebuild != null)
+			OnRebuild(this);
 	}
 
 	public void CollectSubmeshRenderers () {
 		submeshRenderers = GetComponentsInChildren<SkeletonUtilitySubmeshRenderer>();
-	}
-
-	public virtual void OnDestroy () {
-		if (mesh1 != null) {
-			if (Application.isPlaying)
-				Destroy(mesh1);
-			else
-				DestroyImmediate(mesh1);
-		}
-
-		if (mesh2 != null) {
-			if (Application.isPlaying)
-				Destroy(mesh2);
-			else
-				DestroyImmediate(mesh2);
-		}
-
-		mesh1 = null;
-		mesh2 = null;
-	}
-
-	private static Mesh newMesh () {
-		Mesh mesh = new Mesh();
-		mesh.name = "Skeleton Mesh";
-		mesh.hideFlags = HideFlags.HideAndDontSave;
-		mesh.MarkDynamic();
-		return mesh;
 	}
 
 	public virtual void LateUpdate () {
@@ -222,20 +188,20 @@ public class SkeletonRenderer : MonoBehaviour {
 		var workingAttachments = workingState.attachments;
 		workingAttachments.Clear(true);
 		workingState.UpdateAttachmentCount(drawOrderCount);
-		var workingAttachmentsItems = workingAttachments.Items;					// Make sure to not add to or remove from ExposedList inside the loop below
+		var workingAttachmentsItems = workingAttachments.Items;				// Make sure to not add to or remove from ExposedList inside the loop below
 
 		var workingFlips = workingState.attachmentsFlipState;
-		var workingFlipsItems = workingState.attachmentsFlipState.Items;		// Make sure to not add to or remove from ExposedList inside the loop below
+		var workingFlipsItems = workingState.attachmentsFlipState.Items;	// Make sure to not add to or remove from ExposedList inside the loop below
 
 		var workingSubmeshArguments = workingState.addSubmeshArguments;	// Items array should not be cached. There is dynamic writing to this object.
 		workingSubmeshArguments.Clear(false);
 
 		MeshState.SingleMeshState storedState = useMesh1 ? meshState.stateMesh1 : meshState.stateMesh2;
 		var storedAttachments = storedState.attachments;
-		var storedAttachmentsItems = storedAttachments.Items;		// Make sure to not add to or remove from ExposedList inside the loop below
+		var storedAttachmentsItems = storedAttachments.Items;			// Make sure to not add to or remove from ExposedList inside the loop below
 
 		var storedFlips = storedState.attachmentsFlipState;
-		var storedFlipsItems = storedFlips.Items;					// Make sure to not add to or remove from ExposedList inside the loop below
+		var storedFlipsItems = storedFlips.Items;						// Make sure to not add to or remove from ExposedList inside the loop below
 
 		bool mustUpdateMeshStructure = storedState.requiresUpdate ||	// Force update if the mesh was cleared. (prevents flickering due to incorrect state)
 			drawOrder.Count != storedAttachments.Count ||				// Number of slots changed (when does this happen?)
@@ -604,7 +570,7 @@ public class SkeletonRenderer : MonoBehaviour {
 
 			if (calculateTangents) {
 				Vector4[] tangents = new Vector4[vertexCount];
-				Vector3 tangent = new Vector3(0, 0, 1);
+				Vector4 tangent = new Vector4(1, 0, 0, -1);
 				for (int i = 0; i < vertexCount; i++)
 					tangents[i] = tangent;
 				mesh1.tangents = tangents;

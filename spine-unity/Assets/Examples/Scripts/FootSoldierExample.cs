@@ -29,13 +29,17 @@ public class FootSoldierExample : MonoBehaviour {
 	[Range(0, 0.2f)]
 	public float blinkDuration = 0.05f;
 
+	public KeyCode attackKey = KeyCode.Mouse0;
+	public KeyCode rightKey = KeyCode.D;
+	public KeyCode leftKey = KeyCode.A;
+
 	public float moveSpeed = 3;
 
 	private SkeletonAnimation skeletonAnimation;
 
 	void Awake() {
 		skeletonAnimation = GetComponent<SkeletonAnimation>();
-		skeletonAnimation.OnReset += Apply;
+		skeletonAnimation.OnRebuild += Apply;
 	}
 
 	void Apply(SkeletonRenderer skeletonRenderer) {
@@ -43,14 +47,14 @@ public class FootSoldierExample : MonoBehaviour {
 	}
 
 	void Update() {
-		if (Input.GetKey(KeyCode.Space)) {
+		if (Input.GetKey(attackKey)) {
 			skeletonAnimation.AnimationName = attackAnimation;
 		} else {
-			if (Input.GetKey(KeyCode.RightArrow)) {
+			if (Input.GetKey(rightKey)) {
 				skeletonAnimation.AnimationName = moveAnimation;
 				skeletonAnimation.skeleton.FlipX = false;
 				transform.Translate(moveSpeed * Time.deltaTime, 0, 0);
-			} else if(Input.GetKey(KeyCode.LeftArrow)) {
+			} else if(Input.GetKey(leftKey)) {
 				skeletonAnimation.AnimationName = moveAnimation;
 				skeletonAnimation.skeleton.FlipX = true;
 				transform.Translate(-moveSpeed * Time.deltaTime, 0, 0);

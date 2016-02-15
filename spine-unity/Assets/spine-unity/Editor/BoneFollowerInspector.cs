@@ -45,7 +45,7 @@ public class BoneFollowerInspector : Editor {
 		followBoneRotation = serializedObject.FindProperty("followBoneRotation");
 		followZPosition = serializedObject.FindProperty("followZPosition");
 		component = (BoneFollower)target;
-		ForceReload();
+		component.skeletonRenderer.Initialize(false);
 	}
 
 	void FindRenderer () {
@@ -56,13 +56,6 @@ public class BoneFollowerInspector : Editor {
 				skeletonRenderer.objectReferenceValue = (UnityEngine.Object)parentRenderer;
 			}
 
-		}
-	}
-
-	void ForceReload () {
-		if (component.skeletonRenderer != null) {
-			if (component.skeletonRenderer.valid == false)
-				component.skeletonRenderer.Reset();
 		}
 	}
 

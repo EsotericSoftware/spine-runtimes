@@ -3,35 +3,40 @@ using System.Collections;
 
 [ExecuteInEditMode]
 [RequireComponent(typeof(SkeletonRenderer))]
-public class SpineGauge : MonoBehaviour{
+public class SpineGauge : MonoBehaviour {
 
+	#region Inspector
 	[Range(0,1)]
-	public float fill = 0;
+	public float fillPercent = 0;
 
 	[SpineAnimation]
 	public string fillAnimationName;
-	Spine.Animation fillAnimation;
+	#endregion
 
 	SkeletonRenderer skeletonRenderer;
+	Spine.Animation fillAnimation;
 
-	void Start () {
+	void Awake () {
 		skeletonRenderer = GetComponent<SkeletonRenderer>();
+
 	}
 
 	void Update () {
-		
-		var skeleton = skeletonRenderer.skeleton;
+		SetGaugePercent(fillPercent);
+	}
 
-		if (skeleton == null)
-			return;
+	public void SetGaugePercent (float x) {
+		if (skeletonRenderer == null) return;
+		var skeleton = skeletonRenderer.skeleton; if (skeleton == null) return;
 
+		// Make super-sure that fillAnimation isn't null. Early exit if it is.
 		if (fillAnimation == null) {
 			fillAnimation = skeleton.Data.FindAnimation(fillAnimationName);
-			if (fillAnimation == null)
-				return;
+			if (fillAnimation == null) return;
 		}
+			
+		fillAnimation.Apply(skeleton, 0, x, false, null);
 
-		fillAnimation.Apply(skeleton, 0, fill, false, null);
 		skeleton.Update(Time.deltaTime);
 		skeleton.UpdateWorldTransform();
 	}

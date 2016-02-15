@@ -83,7 +83,7 @@ public class SkeletonUtilityInspector : Editor {
 		transform = skeletonRenderer.transform;
 
 		if (skeleton == null) {
-			skeletonRenderer.Reset();
+			skeletonRenderer.Initialize(false);
 			skeletonRenderer.LateUpdate();
 
 			skeleton = skeletonRenderer.skeleton;

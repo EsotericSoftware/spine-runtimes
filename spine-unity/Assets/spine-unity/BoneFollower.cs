@@ -77,8 +77,8 @@ public class BoneFollower : MonoBehaviour {
 			return;
 		skeletonTransform = skeletonRenderer.transform;
 
-		skeletonRenderer.OnReset -= HandleResetRenderer;
-		skeletonRenderer.OnReset += HandleResetRenderer;
+		skeletonRenderer.OnRebuild -= HandleResetRenderer;
+		skeletonRenderer.OnRebuild += HandleResetRenderer;
 
 		if (Application.isEditor)
 			DoUpdate();
@@ -87,7 +87,7 @@ public class BoneFollower : MonoBehaviour {
 	void OnDestroy () {
 		//cleanup
 		if (skeletonRenderer != null)
-			skeletonRenderer.OnReset -= HandleResetRenderer;
+			skeletonRenderer.OnRebuild -= HandleResetRenderer;
 	}
 
 	public void Awake () {

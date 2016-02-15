@@ -40,7 +40,7 @@ public class SkeletonUtilityBoneInspector : Editor {
 		EvaluateFlags();
 
 		if (utilityBone.valid == false && skeletonUtility != null && skeletonUtility.skeletonRenderer != null) {
-			skeletonUtility.skeletonRenderer.Reset();
+			skeletonUtility.skeletonRenderer.Initialize(false);
 		}
 
 		canCreateHingeChain = CanCreateHingeChain();
