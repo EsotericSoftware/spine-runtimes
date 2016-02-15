@@ -38,6 +38,7 @@
 using namespace std;
 using namespace spine;
 #include <stdio.h>
+#include <stdlib.h>
 
 void callback (AnimationState* state, int trackIndex, EventType type, Event* event, int loopCount) {
 	TrackEntry* entry = AnimationState_getCurrent(state, trackIndex);
