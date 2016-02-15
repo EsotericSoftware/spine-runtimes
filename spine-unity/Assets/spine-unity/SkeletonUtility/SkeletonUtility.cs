@@ -156,8 +156,8 @@ public class SkeletonUtility : MonoBehaviour {
 				skeletonAnimation = GetComponent<SkeletonAnimator>();
 		}
 
-		skeletonRenderer.OnReset -= HandleRendererReset;
-		skeletonRenderer.OnReset += HandleRendererReset;
+		skeletonRenderer.OnRebuild -= HandleRendererReset;
+		skeletonRenderer.OnRebuild += HandleRendererReset;
 
 		if (skeletonAnimation != null) {
 			skeletonAnimation.UpdateLocal -= UpdateLocal;
@@ -174,7 +174,7 @@ public class SkeletonUtility : MonoBehaviour {
 	}
 
 	void OnDisable () {
-		skeletonRenderer.OnReset -= HandleRendererReset;
+		skeletonRenderer.OnRebuild -= HandleRendererReset;
 
 		if (skeletonAnimation != null) {
 			skeletonAnimation.UpdateLocal -= UpdateLocal;
@@ -265,7 +265,7 @@ public class SkeletonUtility : MonoBehaviour {
 
 	}
 
-	void UpdateLocal (SkeletonRenderer anim) {
+	void UpdateLocal (ISkeletonAnimation anim) {
 
 		if (needToReprocessBones)
 			CollectBones();
@@ -280,14 +280,14 @@ public class SkeletonUtility : MonoBehaviour {
 		UpdateAllBones();
 	}
 
-	void UpdateWorld (SkeletonRenderer anim) {
+	void UpdateWorld (ISkeletonAnimation anim) {
 		UpdateAllBones();
 
 		foreach (SkeletonUtilityConstraint c in utilityConstraints)
 			c.DoUpdate();
 	}
 
-	void UpdateComplete (SkeletonRenderer anim) {
+	void UpdateComplete (ISkeletonAnimation anim) {
 		UpdateAllBones();
 	}
 

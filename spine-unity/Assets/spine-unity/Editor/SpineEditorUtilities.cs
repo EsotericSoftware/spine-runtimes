@@ -964,7 +964,8 @@ public class SpineEditorUtilities : AssetPostprocessor {
 	}
 
 	public static SkeletonAnimation InstantiateSkeletonAnimation (SkeletonDataAsset skeletonDataAsset, Skin skin = null) {
-		GameObject go = new GameObject(skeletonDataAsset.name.Replace("_SkeletonData", ""), typeof(MeshFilter), typeof(MeshRenderer), typeof(SkeletonAnimation));
+		string spineGameObjectName = string.Format("Spine GameObject ({0})", skeletonDataAsset.name.Replace("_SkeletonData", ""));
+		GameObject go = new GameObject(spineGameObjectName, typeof(MeshFilter), typeof(MeshRenderer), typeof(SkeletonAnimation));
 		SkeletonAnimation anim = go.GetComponent<SkeletonAnimation>();
 		anim.skeletonDataAsset = skeletonDataAsset;
 
@@ -1000,7 +1001,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 		if (skin == null)
 			skin = data.Skins.Items[0];
 
-		anim.Reset();
+		anim.Initialize(false);
 
 		anim.skeleton.SetSkin(skin);
 		anim.initialSkinName = skin.Name;
@@ -1045,7 +1046,8 @@ public class SpineEditorUtilities : AssetPostprocessor {
 	}
 
 	public static SkeletonAnimator InstantiateSkeletonAnimator (SkeletonDataAsset skeletonDataAsset, Skin skin = null) {
-		GameObject go = new GameObject(skeletonDataAsset.name.Replace("_SkeletonData", ""), typeof(MeshFilter), typeof(MeshRenderer), typeof(Animator), typeof(SkeletonAnimator));
+		string spineGameObjectName = string.Format("Spine Mecanim GameObject ({0})", skeletonDataAsset.name.Replace("_SkeletonData", ""));
+		GameObject go = new GameObject(spineGameObjectName, typeof(MeshFilter), typeof(MeshRenderer), typeof(Animator), typeof(SkeletonAnimator));
 
 		if (skeletonDataAsset.controller == null) {
 			SkeletonBaker.GenerateMecanimAnimationClips(skeletonDataAsset);
@@ -1086,7 +1088,7 @@ public class SpineEditorUtilities : AssetPostprocessor {
 		if (skin == null)
 			skin = data.Skins.Items[0];
 
-		anim.Reset();
+		anim.Initialize(false);
 
 		anim.skeleton.SetSkin(skin);
 		anim.initialSkinName = skin.Name;

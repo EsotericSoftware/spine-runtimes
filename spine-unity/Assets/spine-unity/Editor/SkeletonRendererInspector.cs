@@ -38,7 +38,7 @@ using UnityEngine;
 public class SkeletonRendererInspector : Editor {
 	protected static bool advancedFoldout;
 
-	protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, submeshSeparators, front;
+	protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, submeshSeparators, front, zSpacing;
 
 	private static MethodInfo EditorGUILayoutSortingLayerField;
 	protected SerializedObject rendererSerializedObject;
@@ -54,6 +54,7 @@ public class SkeletonRendererInspector : Editor {
 		immutableTriangles = serializedObject.FindProperty("immutableTriangles");
 		submeshSeparators = serializedObject.FindProperty("submeshSeparators");
 		front = serializedObject.FindProperty("frontFacing");
+		zSpacing = serializedObject.FindProperty("zSpacing");
 
 		if(EditorGUILayoutSortingLayerField == null)
 			EditorGUILayoutSortingLayerField = typeof(EditorGUILayout).GetMethod("SortingLayerField", BindingFlags.Static | BindingFlags.NonPublic, null, new Type[] { typeof(GUIContent), typeof(SerializedProperty), typeof(GUIStyle) }, null);
@@ -76,12 +77,12 @@ public class SkeletonRendererInspector : Editor {
 				
 				component.skeletonDataAsset.Reset();
 			}
-			component.Reset();
+			component.Initialize(true);
 		}
 		EditorGUILayout.EndHorizontal();
 
 		if (!component.valid) {
-			component.Reset();
+			component.Initialize(true);
 			component.LateUpdate();
 			if (!component.valid)
 				return;
@@ -130,14 +131,18 @@ public class SkeletonRendererInspector : Editor {
 			advancedFoldout = EditorGUILayout.Foldout(advancedFoldout, "Advanced");
 			if(advancedFoldout) {
 				EditorGUI.indentLevel++;
+				EditorGUILayout.PropertyField(submeshSeparators, true);
+				EditorGUILayout.Space();
 				EditorGUILayout.PropertyField(meshes,
 					new GUIContent("Render Meshes", "Disable to optimize rendering for skeletons that don't use meshes"));
 				EditorGUILayout.PropertyField(immutableTriangles,
 					new GUIContent("Immutable Triangles", "Enable to optimize rendering for skeletons that never change attachment visbility"));
+				EditorGUILayout.Space();
+				EditorGUILayout.PropertyField(zSpacing);
 				EditorGUILayout.PropertyField(normals);
 				EditorGUILayout.PropertyField(tangents);
 				EditorGUILayout.PropertyField(front);
-				EditorGUILayout.PropertyField(submeshSeparators, true);
+				EditorGUILayout.Separator();
 				EditorGUI.indentLevel--;
 			}
 		}
@@ -150,7 +155,7 @@ public class SkeletonRendererInspector : Editor {
 			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
 		) {
 			if (!Application.isPlaying)
-				((SkeletonRenderer)target).Reset();
+				((SkeletonRenderer)target).Initialize(true);
 		}
 	}
 

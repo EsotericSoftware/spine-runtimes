@@ -25,6 +25,7 @@ public struct SpineDrawerValuePair {
 
 public abstract class SpineTreeItemDrawerBase<T> : PropertyDrawer where T:SpineAttributeBase {
 	protected SkeletonDataAsset skeletonDataAsset;
+	internal const string NoneLabel = "<None>";
 
 	protected T TargetAttribute { get { return (T)attribute; } }
 
@@ -62,8 +63,9 @@ public abstract class SpineTreeItemDrawerBase<T> : PropertyDrawer where T:SpineA
 		}
 		
 		position = EditorGUI.PrefixLabel(position, label);
-		
-		if (GUI.Button(position, property.stringValue, EditorStyles.popup)) {
+
+		var propertyStringValue = property.stringValue;
+		if (GUI.Button(position, string.IsNullOrEmpty(propertyStringValue) ? NoneLabel : propertyStringValue, EditorStyles.popup)) {
 			Selector(property);
 		}
 		
@@ -155,7 +157,7 @@ public class SpineAnimationDrawer : SpineTreeItemDrawerBase<SpineAnimation> {
 		var animations = skeletonDataAsset.GetAnimationStateData().SkeletonData.Animations;
 
 		// <None> item
-		menu.AddItem(new GUIContent("<None>"), property.stringValue == "", HandleSelect, new SpineDrawerValuePair("", property));
+		menu.AddItem(new GUIContent(NoneLabel), string.IsNullOrEmpty(property.stringValue), HandleSelect, new SpineDrawerValuePair("", property));
 
 		for (int i = 0; i < animations.Count; i++) {
 			string name = animations.Items[i].Name;

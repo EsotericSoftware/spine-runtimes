@@ -62,9 +62,12 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 	protected event UpdateBonesDelegate _UpdateWorld;
 	protected event UpdateBonesDelegate _UpdateComplete;
 
-	// TODO: Make this a safe getter. Lazy-initialize and avoid double-initialization.
+	/// <summary>Gets the skeleton.</summary>
 	public Skeleton Skeleton {
-		get { return this.skeleton; }
+		get {
+			this.Initialize(false);
+			return this.skeleton;
+		}
 	}
 
 	[SerializeField]
@@ -126,8 +129,12 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 	}
 	#endregion
 
-	public override void Reset () {
-		base.Reset();
+	public override void Initialize (bool overwrite) {
+		if (valid && !overwrite)
+			return;
+
+		base.Initialize(overwrite);
+
 		if (!valid)
 			return;
 
