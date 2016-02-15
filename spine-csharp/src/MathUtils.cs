@@ -32,18 +32,18 @@
 using System;
 
 namespace Spine {
-	public class MathUtils {
-		static public float PI = 3.1415927f;
-	    static public float radDeg = 180f / PI;
-	    static public float degRad = PI / 180;
+	public static class MathUtils {
+		public const float PI = 3.1415927f;
+		public const float radDeg = 180f / PI;
+		public const float degRad = PI / 180;
 
-	    static private int SIN_BITS = 14; // 16KB. Adjust for accuracy.
-	    static private int SIN_MASK = ~(-1 << SIN_BITS);
-	    static private int SIN_COUNT = SIN_MASK + 1;
-	    static private float radFull = PI * 2;
-	    static private float degFull = 360;
-	    static private float radToIndex = SIN_COUNT / radFull;
-	    static private float degToIndex = SIN_COUNT / degFull;
+	    const int SIN_BITS = 14; // 16KB. Adjust for accuracy.
+		const int SIN_MASK = ~(-1 << SIN_BITS);
+		const int SIN_COUNT = SIN_MASK + 1;
+		const float radFull = PI * 2;
+		const float degFull = 360;
+		const float radToIndex = SIN_COUNT / radFull;
+		const float degToIndex = SIN_COUNT / degFull;
         static float[] sin = new float[SIN_COUNT];
 
         static MathUtils () {
