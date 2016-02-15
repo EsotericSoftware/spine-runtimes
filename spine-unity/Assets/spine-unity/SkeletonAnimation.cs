@@ -130,12 +130,12 @@ public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 	#endregion
 
 	public override void Initialize (bool overwrite) {
+		if (valid && !overwrite)
+			return;
+
 		base.Initialize(overwrite);
 
 		if (!valid)
-			return;
-
-		if (!overwrite)
 			return;
 
 		state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());

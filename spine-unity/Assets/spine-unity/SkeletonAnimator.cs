@@ -46,12 +46,12 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 	float lastTime;
 
 	public override void Initialize (bool overwrite) {
+		if (valid && !overwrite)
+			return;
+		
 		base.Initialize(overwrite);
 
 		if (!valid)
-			return;
-
-		if (!overwrite)
 			return;
 
 		animationTable.Clear();
