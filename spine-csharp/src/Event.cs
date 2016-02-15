@@ -40,6 +40,7 @@ namespace Spine {
 		public float Time { get; private set; }
 
 		public Event (float time, EventData data) {
+			Time = time;
 			Data = data;
 		}
 
