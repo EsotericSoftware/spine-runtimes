@@ -39,8 +39,8 @@ namespace Spine {
 		internal ExposedList<Slot> slots;
 		internal ExposedList<Slot> drawOrder;
 		internal ExposedList<IkConstraint> ikConstraints;
-        internal ExposedList<TransformConstraint> transformConstraints;
-        private ExposedList<IUpdatable> updateCache = new ExposedList<IUpdatable>();
+		internal ExposedList<TransformConstraint> transformConstraints;
+		private ExposedList<IUpdatable> updateCache = new ExposedList<IUpdatable>();
 		internal Skin skin;
 		internal float r = 1, g = 1, b = 1, a = 1;
 		internal float time;
@@ -90,13 +90,13 @@ namespace Spine {
 				drawOrder.Add(slot);
 			}
 
-         ikConstraints = new ExposedList<IkConstraint>(data.ikConstraints.Count);
-         foreach (IkConstraintData ikConstraintData in data.ikConstraints)
-               ikConstraints.Add(new IkConstraint(ikConstraintData, this));
+			ikConstraints = new ExposedList<IkConstraint>(data.ikConstraints.Count);
+			foreach (IkConstraintData ikConstraintData in data.ikConstraints)
+				ikConstraints.Add(new IkConstraint(ikConstraintData, this));
 
-         transformConstraints = new ExposedList<TransformConstraint>(data.transformConstraints.Count);
-         foreach (TransformConstraintData transformConstraintData in data.transformConstraints)
-               transformConstraints.Add(new TransformConstraint(transformConstraintData, this));
+			transformConstraints = new ExposedList<TransformConstraint>(data.transformConstraints.Count);
+			foreach (TransformConstraintData transformConstraintData in data.transformConstraints)
+				transformConstraints.Add(new TransformConstraint(transformConstraintData, this));
 
 			UpdateCache();
 			UpdateWorldTransform();

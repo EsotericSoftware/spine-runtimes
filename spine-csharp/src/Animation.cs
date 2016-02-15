@@ -452,7 +452,7 @@ namespace Spine {
 
 			String attachmentName = attachmentNames[frameIndex];
 			skeleton.slots.Items[slotIndex].Attachment =
-				 attachmentName == null ? null : skeleton.GetAttachment(slotIndex, attachmentName);
+				attachmentName == null ? null : skeleton.GetAttachment(slotIndex, attachmentName);
 		}
 	}
 

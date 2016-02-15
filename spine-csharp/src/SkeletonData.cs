@@ -42,7 +42,7 @@ namespace Spine {
 		internal ExposedList<EventData> events = new ExposedList<EventData>();
 		internal ExposedList<Animation> animations = new ExposedList<Animation>();
 		internal ExposedList<IkConstraintData> ikConstraints = new ExposedList<IkConstraintData>();
-        internal ExposedList<TransformConstraintData> transformConstraints = new ExposedList<TransformConstraintData>();
+		internal ExposedList<TransformConstraintData> transformConstraints = new ExposedList<TransformConstraintData>();
 		internal float width, height;
 		internal String version, hash, imagesPath;
 

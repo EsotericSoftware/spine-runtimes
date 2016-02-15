@@ -33,7 +33,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Spine {
-    /// <summary>Attachment that displays a texture region using a mesh which can be deformed by bones.</summary>
+	/// <summary>Attachment that displays a texture region using a mesh which can be deformed by bones.</summary>
 	public class WeightedMeshAttachment : Attachment {
 		internal int[] bones;
 		internal float[] weights, uvs, regionUVs;
