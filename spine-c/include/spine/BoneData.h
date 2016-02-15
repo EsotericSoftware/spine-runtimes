@@ -44,7 +44,6 @@ struct spBoneData {
 	float x, y;
 	float rotation;
 	float scaleX, scaleY;
-	int/*bool*/flipX, flipY;
 	int/*bool*/inheritScale, inheritRotation;
 
 #ifdef __cplusplus
@@ -55,7 +54,6 @@ struct spBoneData {
 		x(0), y(0),
 		rotation(0),
 		scaleX(0), scaleY(0),
-		flipX(0), flipY(0),
 		inheritScale(0), inheritRotation(0) {
 	}
 #endif

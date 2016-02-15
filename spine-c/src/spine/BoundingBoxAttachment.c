@@ -55,7 +55,7 @@ void spBoundingBoxAttachment_computeWorldVertices (spBoundingBoxAttachment* self
 	for (i = 0; i < self->verticesCount; i += 2) {
 		px = vertices[i];
 		py = vertices[i + 1];
-		worldVertices[i] = px * bone->m00 + py * bone->m01 + x;
-		worldVertices[i + 1] = px * bone->m10 + py * bone->m11 + y;
+		worldVertices[i] = px * bone->a + py * bone->b + x;
+		worldVertices[i + 1] = px * bone->c + py * bone->d + y;
 	}
 }

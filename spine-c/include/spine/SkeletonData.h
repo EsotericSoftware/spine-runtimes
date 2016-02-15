@@ -38,6 +38,7 @@
 #include <spine/EventData.h>
 #include <spine/Animation.h>
 #include <spine/IkConstraintData.h>
+#include <spine/TransformConstraintData.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -66,6 +67,9 @@ typedef struct spSkeletonData {
 
 	int ikConstraintsCount;
 	spIkConstraintData** ikConstraints;
+
+	int transformConstraintsCount;
+	spTransformConstraintData** transformConstraints;
 } spSkeletonData;
 
 spSkeletonData* spSkeletonData_create ();
@@ -83,7 +87,9 @@ spEventData* spSkeletonData_findEvent (const spSkeletonData* self, const char* e
 
 spAnimation* spSkeletonData_findAnimation (const spSkeletonData* self, const char* animationName);
 
-spIkConstraintData* spSkeletonData_findIkConstraint (const spSkeletonData* self, const char* ikConstraintName);
+spIkConstraintData* spSkeletonData_findIkConstraint (const spSkeletonData* self, const char* constraintName);
+
+spTransformConstraintData* spSkeletonData_findTransformConstraint (const spSkeletonData* self, const char* constraintName);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spSkeletonData SkeletonData;

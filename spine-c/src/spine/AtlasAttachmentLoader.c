@@ -76,14 +76,14 @@ spAttachment* _spAtlasAttachmentLoader_newAttachment (spAttachmentLoader* loader
 		attachment->regionOriginalHeight = region->originalHeight;
 		return SUPER(attachment);
 	}
-	case SP_ATTACHMENT_SKINNED_MESH: {
-		spSkinnedMeshAttachment* attachment;
+	case SP_ATTACHMENT_WEIGHTED_MESH: {
+		spWeightedMeshAttachment* attachment;
 		spAtlasRegion* region = spAtlas_findRegion(self->atlas, path);
 		if (!region) {
 			_spAttachmentLoader_setError(loader, "Region not found: ", path);
 			return 0;
 		}
-		attachment = spSkinnedMeshAttachment_create(name);
+		attachment = spWeightedMeshAttachment_create(name);
 		attachment->rendererObject = region;
 		attachment->regionU = region->u;
 		attachment->regionV = region->v;

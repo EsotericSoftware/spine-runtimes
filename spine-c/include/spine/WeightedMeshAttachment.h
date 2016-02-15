@@ -29,17 +29,62 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/Event.h>
-#include <spine/extension.h>
+#ifndef SPINE_WEIGHTEDMESHATTACHMENT_H_
+#define SPINE_WEIGHTEDMESHATTACHMENT_H_
 
-spEvent* spEvent_create (float time, spEventData* data) {
-	spEvent* self = NEW(spEvent);
-	CONST_CAST(spEventData*, self->data) = data;
-	CONST_CAST(float, self->time) = time;
-	return self;
-}
+#include <spine/Attachment.h>
+#include <spine/Slot.h>
 
-void spEvent_dispose (spEvent* self) {
-	FREE(self->stringValue);
-	FREE(self);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct spWeightedMeshAttachment {
+	spAttachment super;
+	const char* path;
+
+	int bonesCount;
+	int* bones;
+
+	int weightsCount;
+	float* weights;
+
+	int trianglesCount;
+	int* triangles;
+
+	int uvsCount;
+	float* regionUVs;
+	float* uvs;
+	int hullLength;
+
+	float r, g, b, a;
+
+	void* rendererObject;
+	int regionOffsetX, regionOffsetY; /* Pixels stripped from the bottom left, unrotated. */
+	int regionWidth, regionHeight; /* Unrotated, stripped pixel size. */
+	int regionOriginalWidth, regionOriginalHeight; /* Unrotated, unstripped pixel size. */
+	float regionU, regionV, regionU2, regionV2;
+	int/*bool*/regionRotate;
+
+	/* Nonessential. */
+	int edgesCount;
+	int* edges;
+	float width, height;
+} spWeightedMeshAttachment;
+
+spWeightedMeshAttachment* spWeightedMeshAttachment_create (const char* name);
+void spWeightedMeshAttachment_updateUVs (spWeightedMeshAttachment* self);
+void spWeightedMeshAttachment_computeWorldVertices (spWeightedMeshAttachment* self, spSlot* slot, float* worldVertices);
+
+#ifdef SPINE_SHORT_NAMES
+typedef spWeightedMeshAttachment WeightedMeshAttachment;
+#define WeightedMeshAttachment_create(...) spWeightedMeshAttachment_create(__VA_ARGS__)
+#define WeightedMeshAttachment_updateUVs(...) spWeightedMeshAttachment_updateUVs(__VA_ARGS__)
+#define WeightedMeshAttachment_computeWorldVertices(...) spWeightedMeshAttachment_computeWorldVertices(__VA_ARGS__)
+#endif
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* SPINE_WEIGHTEDMESHATTACHMENT_H_ */

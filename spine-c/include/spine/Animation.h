@@ -94,9 +94,7 @@ typedef enum {
 	SP_TIMELINE_EVENT,
 	SP_TIMELINE_DRAWORDER,
 	SP_TIMELINE_FFD,
-	SP_TIMELINE_IKCONSTRAINT,
-	SP_TIMELINE_FLIPX,
-	SP_TIMELINE_FLIPY
+	SP_TIMELINE_IKCONSTRAINT
 } spTimelineType;
 
 struct spTimeline {
@@ -396,36 +394,6 @@ void spIkConstraintTimeline_setFrame (spIkConstraintTimeline* self, int frameInd
 typedef spIkConstraintTimeline IkConstraintTimeline;
 #define IkConstraintTimeline_create(...) spIkConstraintTimeline_create(__VA_ARGS__)
 #define IkConstraintTimeline_setFrame(...) spIkConstraintTimeline_setFrame(__VA_ARGS__)
-#endif
-
-/**/
-
-typedef struct spFlipTimeline {
-	spTimeline super;
-	int const x;
-	int const framesCount;
-	float* const frames; /* time, flip, ... */
-	int boneIndex;
-
-#ifdef __cplusplus
-	spFlipTimeline() :
-		super(),
-		x(0),
-		framesCount(0),
-		frames(0),
-		boneIndex(0) {
-	}
-#endif
-} spFlipTimeline;
-
-spFlipTimeline* spFlipTimeline_create (int framesCount, int/*bool*/x);
-
-void spFlipTimeline_setFrame (spFlipTimeline* self, int frameIndex, float time, int/*bool*/flip);
-
-#ifdef SPINE_SHORT_NAMES
-typedef spFlipTimeline FlipTimeline;
-#define FlipTimeline_create(...) spFlipTimeline_create(__VA_ARGS__)
-#define FlipTimeline_setFrame(...) spFlipTimeline_setFrame(__VA_ARGS__)
 #endif
 
 /**/

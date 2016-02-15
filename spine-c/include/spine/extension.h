@@ -68,6 +68,7 @@
 #define COS(A) cosf(A)
 #define SQRT(A) sqrtf(A)
 #define ACOS(A) acosf(A)
+#define ABS(A) fabsf(A)
 #else
 #define FMOD(A,B) (float)fmod(A, B)
 #define ATAN2(A,B) (float)atan2(A, B)
@@ -75,6 +76,7 @@
 #define SIN(A) (float)sin(A)
 #define SQRT(A) (float)sqrt(A)
 #define ACOS(A) (float)acos(A)
+#define ABS(A) ((A) < 0 ? -(A) : (A))
 #endif
 
 #include <stdlib.h>
@@ -86,7 +88,7 @@
 #include <spine/AttachmentLoader.h>
 #include <spine/RegionAttachment.h>
 #include <spine/MeshAttachment.h>
-#include <spine/SkinnedMeshAttachment.h>
+#include <spine/WeightedMeshAttachment.h>
 #include <spine/BoundingBoxAttachment.h>
 #include <spine/AnimationState.h>
 

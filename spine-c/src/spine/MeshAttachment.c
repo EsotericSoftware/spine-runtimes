@@ -80,7 +80,7 @@ void spMeshAttachment_computeWorldVertices (spMeshAttachment* self, spSlot* slot
 	if (slot->attachmentVerticesCount == self->verticesCount) vertices = slot->attachmentVertices;
 	for (i = 0; i < self->verticesCount; i += 2) {
 		const float vx = vertices[i], vy = vertices[i + 1];
-		worldVertices[i] = vx * bone->m00 + vy * bone->m01 + x;
-		worldVertices[i + 1] = vx * bone->m10 + vy * bone->m11 + y;
+		worldVertices[i] = vx * bone->a + vy * bone->b + x;
+		worldVertices[i + 1] = vx * bone->c + vy * bone->d + y;
 	}
 }

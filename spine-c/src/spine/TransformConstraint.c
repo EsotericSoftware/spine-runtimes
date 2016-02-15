@@ -29,62 +29,30 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef SPINE_SKINNEDMESHATTACHMENT_H_
-#define SPINE_SKINNEDMESHATTACHMENT_H_
+#include <spine/TransformConstraint.h>
+#include <spine/Skeleton.h>
+#include <spine/extension.h>
 
-#include <spine/Attachment.h>
-#include <spine/Slot.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-typedef struct spSkinnedMeshAttachment {
-	spAttachment super;
-	const char* path;
-
-	int bonesCount;
-	int* bones;
-
-	int weightsCount;
-	float* weights;
-
-	int trianglesCount;
-	int* triangles;
-
-	int uvsCount;
-	float* regionUVs;
-	float* uvs;
-	int hullLength;
-
-	float r, g, b, a;
-
-	void* rendererObject;
-	int regionOffsetX, regionOffsetY; /* Pixels stripped from the bottom left, unrotated. */
-	int regionWidth, regionHeight; /* Unrotated, stripped pixel size. */
-	int regionOriginalWidth, regionOriginalHeight; /* Unrotated, unstripped pixel size. */
-	float regionU, regionV, regionU2, regionV2;
-	int/*bool*/regionRotate;
-
-	/* Nonessential. */
-	int edgesCount;
-	int* edges;
-	float width, height;
-} spSkinnedMeshAttachment;
-
-spSkinnedMeshAttachment* spSkinnedMeshAttachment_create (const char* name);
-void spSkinnedMeshAttachment_updateUVs (spSkinnedMeshAttachment* self);
-void spSkinnedMeshAttachment_computeWorldVertices (spSkinnedMeshAttachment* self, spSlot* slot, float* worldVertices);
-
-#ifdef SPINE_SHORT_NAMES
-typedef spSkinnedMeshAttachment SkinnedMeshAttachment;
-#define SkinnedMeshAttachment_create(...) spSkinnedMeshAttachment_create(__VA_ARGS__)
-#define SkinnedMeshAttachment_updateUVs(...) spSkinnedMeshAttachment_updateUVs(__VA_ARGS__)
-#define SkinnedMeshAttachment_computeWorldVertices(...) spSkinnedMeshAttachment_computeWorldVertices(__VA_ARGS__)
-#endif
-
-#ifdef __cplusplus
+spTransformConstraint* spTransformConstraint_create (spTransformConstraintData* data, const spSkeleton* skeleton) {
+	spTransformConstraint* self = NEW(spTransformConstraint);
+	CONST_CAST(spTransformConstraintData*, self->data) = data;
+	self->translateMix = data->translateMix;
+	self->x = data->x;
+	self->y = data->y;
+	self->bone = spSkeleton_findBone(skeleton, self->data->bone->name);
+	self->target = spSkeleton_findBone(skeleton, self->data->target->name);
+	return self;
 }
-#endif
 
-#endif /* SPINE_SKINNEDMESHATTACHMENT_H_ */
+void spTransformConstraint_dispose (spTransformConstraint* self) {
+	FREE(self);
+}
+
+void spTransformConstraint_apply (spTransformConstraint* self) {
+	if (self->translateMix > 0) {
+		float tx, ty;
+		spBone_localToWorld(self->target, self->x, self->y, &tx, &ty);
+		CONST_CAST(float, self->bone->worldX) = self->bone->worldX + (tx - self->bone->worldX) * self->translateMix;
+		CONST_CAST(float, self->bone->worldY) = self->bone->worldY + (ty - self->bone->worldY) * self->translateMix;
+	}
+}
