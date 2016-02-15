@@ -103,16 +103,14 @@ namespace Spine {
 			if (parent == null) { // Root bone.
 					Skeleton skeleton = this.skeleton;
 					if (skeleton.flipX) {
-						la = -la;
-						lc = -lc;
-						scaleX = -scaleX;
 						x = -x;
+						la = -la;
+						lb = -lb;
 					}
 					if (skeleton.flipY != yDown) {
-						lb = -lb;
-						ld = -ld;
-						scaleY = -scaleY;
 						y = -y;
+						lc = -lc;
+						ld = -ld;
 					}
 					a = la;
 					b = lb;
@@ -145,24 +143,32 @@ namespace Spine {
                while (p != null) {
                   cos = MathUtils.CosDeg(p.appliedRotation);
                   sin = MathUtils.SinDeg(p.appliedRotation);
-                  float a = pa * cos + pb * sin;
-                  float b = pa * -sin + pb * cos;
-                  float c = pc * cos + pd * sin;
-                  float d = pc * -sin + pd * cos;
-                  pa = a;
-                  pb = b;
-                  pc = c;
-                  pd = d;
+                  float ta = pa * cos + pb * sin;
+                  float tb = pa * -sin + pb * cos;
+                  float tc = pc * cos + pd * sin;
+                  float td = pc * -sin + pd * cos;
+                  pa = ta;
+                  pb = tb;
+                  pc = tc;
+                  pd = td;
                   p = p.parent;
                }
 					if (yDown) {
 						pb = -pb;
 						pd = -pd;
 					}
-               this.a = pa * la + pb * lc;
-               this.b = pa * lb + pb * ld;
-               this.c = pc * la + pd * lc;
-               this.d = pc * lb + pd * ld;
+               a = pa * la + pb * lc;
+               b = pa * lb + pb * ld;
+               c = pc * la + pd * lc;
+               d = pc * lb + pd * ld;
+					if (skeleton.flipX) {
+						a = -a;
+						b = -b;
+					}
+					if (skeleton.flipY) {
+						c = -c;
+						d = -d;
+					}
          } else if (data.inheritScale) { // No rotation inheritance.
                Bone p = parent;
                pa = 1;
@@ -202,6 +208,14 @@ namespace Spine {
                b = pa * lb + pb * ld;
                c = pc * la + pd * lc;
                d = pc * lb + pd * ld;
+					if (skeleton.flipX) {
+						a = -a;
+						b = -b;
+					}
+					if (skeleton.flipY) {
+						c = -c;
+						d = -d;
+					}
          } else {
                a = la;
                b = lb;

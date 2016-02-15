@@ -95,16 +95,14 @@ public class Bone implements Updatable {
 		if (parent == null) { // Root bone.
 			Skeleton skeleton = this.skeleton;
 			if (skeleton.flipX) {
-				la = -la;
-				lc = -lc;
-				scaleX = -scaleX;
 				x = -x;
+				la = -la;
+				lb = -lb;
 			}
 			if (skeleton.flipY) {
-				lb = -lb;
-				ld = -ld;
-				scaleY = -scaleY;
 				y = -y;
+				lc = -lc;
+				ld = -ld;
 			}
 			a = la;
 			b = lb;
@@ -151,6 +149,14 @@ public class Bone implements Updatable {
 			b = pa * lb + pb * ld;
 			c = pc * la + pd * lc;
 			d = pc * lb + pd * ld;
+			if (skeleton.flipX) {
+				a = -a;
+				b = -b;
+			}
+			if (skeleton.flipY) {
+				c = -c;
+				d = -d;
+			}
 		} else if (data.inheritScale) { // No rotation inheritance.
 			Bone p = parent;
 			pa = 1;
@@ -186,6 +192,14 @@ public class Bone implements Updatable {
 			b = pa * lb + pb * ld;
 			c = pc * la + pd * lc;
 			d = pc * lb + pd * ld;
+			if (skeleton.flipX) {
+				a = -a;
+				b = -b;
+			}
+			if (skeleton.flipY) {
+				c = -c;
+				d = -d;
+			}
 		} else {
 			a = la;
 			b = lb;
