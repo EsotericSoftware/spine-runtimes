@@ -138,7 +138,11 @@ public class SkeletonRendererInspector : Editor {
 				EditorGUILayout.PropertyField(immutableTriangles,
 					new GUIContent("Immutable Triangles", "Enable to optimize rendering for skeletons that never change attachment visbility"));
 				EditorGUILayout.Space();
-				EditorGUILayout.PropertyField(zSpacing);
+
+				const float MinZSpacing = 0f;
+				const float MaxZSpacing = 0.1f;
+				EditorGUILayout.Slider(zSpacing, MinZSpacing, MaxZSpacing);
+
 				EditorGUILayout.PropertyField(normals);
 				EditorGUILayout.PropertyField(tangents);
 				EditorGUILayout.PropertyField(front);

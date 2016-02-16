@@ -45,6 +45,9 @@ namespace Spine.Unity {
 
 		public int CurrentVertexCount { get { return this.positions.Count; } }
 
+		private Mesh lastGeneratedMesh;
+		public Mesh LastGeneratedMesh {	get { return lastGeneratedMesh; } }
+
 		public Mesh GenerateMesh (Skeleton skeleton) {
 			skeletonColor.r = skeleton.r;
 			skeletonColor.g = skeleton.g;
@@ -59,6 +62,7 @@ namespace Spine.Unity {
 
 			Mesh currentMesh = doubleBufferedMesh.GetNextMesh();
 			FillMesh(currentMesh);
+			lastGeneratedMesh = currentMesh;
 			return currentMesh;
 		}
 

@@ -6,5 +6,6 @@
 	public interface ISimpleMeshGenerator {
 		float Scale { set; }
 		UnityEngine.Mesh GenerateMesh (Spine.Skeleton skeleton);
+		UnityEngine.Mesh LastGeneratedMesh { get; }
 	}
 }

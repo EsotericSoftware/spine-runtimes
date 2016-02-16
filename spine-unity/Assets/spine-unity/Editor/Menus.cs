@@ -61,17 +61,24 @@ public class Menus {
 		Selection.activeObject = asset;
 	}
 
-	[MenuItem("GameObject/Create Other/Spine SkeletonRenderer")]
+	[MenuItem("GameObject/Spine/SkeletonRenderer", false, 10)]
 	static public void CreateSkeletonRendererGameObject () {
-		GameObject gameObject = new GameObject("New SkeletonRenderer", typeof(SkeletonRenderer));
-		EditorUtility.FocusProjectWindow();
-		Selection.activeObject = gameObject;
+		CreateSpineGameObject<SkeletonRenderer>("New SkeletonRenderer");
 	}
 
-	[MenuItem("GameObject/Create Other/Spine SkeletonAnimation")]
+	[MenuItem("GameObject/Spine/SkeletonAnimation", false, 10)]
 	static public void CreateSkeletonAnimationGameObject () {
-		GameObject gameObject = new GameObject("New SkeletonAnimation", typeof(SkeletonAnimation));
+		CreateSpineGameObject<SkeletonAnimation>("New SkeletonAnimation");
+	}
+
+	static public void CreateSpineGameObject<T> (string name) where T : MonoBehaviour {
+		var parentGameObject = Selection.activeObject as GameObject;
+		var parentTransform = parentGameObject == null ? null : parentGameObject.transform;
+
+		var gameObject = new GameObject("New SkeletonRenderer", typeof(T));
+		gameObject.transform.SetParent(parentTransform, false);
 		EditorUtility.FocusProjectWindow();
 		Selection.activeObject = gameObject;
+		EditorGUIUtility.PingObject(Selection.activeObject);
 	}
 }

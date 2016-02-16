@@ -35,7 +35,7 @@ using System.Collections;
 namespace Spine.Unity {
 	public class ArraysSimpleMeshGenerator : ISimpleMeshGenerator {
 		#region Settings
-		protected float scale;
+		protected float scale = 1f;
 		public float Scale {
 			get { return scale; }
 			set { scale = value; }
@@ -52,6 +52,9 @@ namespace Spine.Unity {
 		private Vector2[] uvs;
 		private int[] triangles;
 		#endregion
+
+		private Mesh lastGeneratedMesh;
+		public Mesh LastGeneratedMesh {	get { return lastGeneratedMesh; } }
 
 		public Mesh GenerateMesh (Skeleton skeleton) {
 			int totalVertexCount = 0; // size of vertex arrays
@@ -309,10 +312,12 @@ namespace Spine.Unity {
 			mesh.uv = uvs;
 
 			Vector3 meshBoundsExtents = (meshBoundsMax - meshBoundsMin) * scale;
-			mesh.bounds = new Bounds(meshBoundsMin + meshBoundsExtents * 0.5f, meshBoundsExtents);
+			Vector3 meshCenter = (meshBoundsMin * scale) + meshBoundsExtents * 0.5f;
+			mesh.bounds = new Bounds(meshCenter, meshBoundsExtents);
 
 			mesh.SetTriangles(triangles, 0);
 
+			lastGeneratedMesh = mesh;
 			return mesh;
 		}
 

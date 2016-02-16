@@ -59,7 +59,7 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 		
 		if (wasAnimationNameChanged) {
 			if (!Application.isPlaying) {
-				component.state.ClearTrack(0);
+				if (component.state != null) component.state.ClearTrack(0);
 				component.skeleton.SetToSetupPose();
 			}
 
