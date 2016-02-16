@@ -258,7 +258,7 @@ public class SkeletonRenderer : MonoBehaviour {
 			#endif
 
 			// Populate submesh when material changes. (or when forced to separate by a submeshSeparator)
-			if ((lastMaterial != null && lastMaterial.GetInstanceID() != material.GetInstanceID()) ||
+			if ((vertexCount > 0 && lastMaterial.GetInstanceID() != material.GetInstanceID()) ||
 				(submeshSeparatorSlotsCount > 0 && submeshSeparatorSlots.Contains(slot))) {
 
 				workingSubmeshArguments.Add(
