@@ -13,6 +13,14 @@
 		4319B51E16FF9B2600C1D7A9 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4319B51D16FF9B2600C1D7A9 /* AudioToolbox.framework */; };
 		4319B52016FF9B2600C1D7A9 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4319B51F16FF9B2600C1D7A9 /* AppKit.framework */; };
 		4319B52216FF9B2600C1D7A9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4319B52116FF9B2600C1D7A9 /* Foundation.framework */; };
+		431FF7CA1C735CA100D52DF2 /* IkConstraint.c in Sources */ = {isa = PBXBuildFile; fileRef = 431FF7C91C735CA100D52DF2 /* IkConstraint.c */; };
+		431FF7DA1C735CFE00D52DF2 /* IkConstraintData.c in Sources */ = {isa = PBXBuildFile; fileRef = 431FF7D61C735CFE00D52DF2 /* IkConstraintData.c */; };
+		431FF7DB1C735CFE00D52DF2 /* TransformConstraint.c in Sources */ = {isa = PBXBuildFile; fileRef = 431FF7D71C735CFE00D52DF2 /* TransformConstraint.c */; };
+		431FF7DC1C735CFE00D52DF2 /* TransformConstraintData.c in Sources */ = {isa = PBXBuildFile; fileRef = 431FF7D81C735CFE00D52DF2 /* TransformConstraintData.c */; };
+		431FF7DD1C735CFE00D52DF2 /* WeightedMeshAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 431FF7D91C735CFE00D52DF2 /* WeightedMeshAttachment.c */; };
+		431FF7E51C735D4300D52DF2 /* goblins-mesh.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 431FF7E21C735D4300D52DF2 /* goblins-mesh.atlas */; };
+		431FF7E61C735D4300D52DF2 /* goblins-mesh.json in Resources */ = {isa = PBXBuildFile; fileRef = 431FF7E31C735D4300D52DF2 /* goblins-mesh.json */; };
+		431FF7E71C735D4300D52DF2 /* goblins-mesh.png in Resources */ = {isa = PBXBuildFile; fileRef = 431FF7E41C735D4300D52DF2 /* goblins-mesh.png */; };
 		434D4819192A2B49003127B5 /* libcocos2d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 434D4808192A2B35003127B5 /* libcocos2d.a */; };
 		43BFBE0F170A778A00ECBACB /* spine-cocos2d-iphone.m in Sources */ = {isa = PBXBuildFile; fileRef = 43BFBE0D170A778A00ECBACB /* spine-cocos2d-iphone.m */; };
 		43C32A1B170B1295004A9460 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 43C32A11170B1295004A9460 /* AppDelegate.m */; };
@@ -44,16 +52,12 @@
 		43F7FD831927C31700CA4038 /* SkeletonData.c in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FD6B1927C31700CA4038 /* SkeletonData.c */; };
 		43F7FD841927C31700CA4038 /* SkeletonJson.c in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FD6C1927C31700CA4038 /* SkeletonJson.c */; };
 		43F7FD851927C31700CA4038 /* Skin.c in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FD6D1927C31700CA4038 /* Skin.c */; };
-		43F7FD861927C31700CA4038 /* SkinnedMeshAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FD6E1927C31700CA4038 /* SkinnedMeshAttachment.c */; };
 		43F7FD871927C31700CA4038 /* Slot.c in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FD6F1927C31700CA4038 /* Slot.c */; };
 		43F7FD881927C31700CA4038 /* SlotData.c in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FD701927C31700CA4038 /* SlotData.c */; };
 		43F7FDA71927C33C00CA4038 /* PolygonBatch.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FDA21927C33C00CA4038 /* PolygonBatch.m */; };
 		43F7FDA81927C33C00CA4038 /* SkeletonAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FDA41927C33C00CA4038 /* SkeletonAnimation.m */; };
 		43F7FDA91927C33C00CA4038 /* SkeletonRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FDA61927C33C00CA4038 /* SkeletonRenderer.m */; };
 		43F7FDAC1927C34600CA4038 /* SpineboyExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FDAB1927C34600CA4038 /* SpineboyExample.m */; };
-		43F7FDB01927C35600CA4038 /* goblins-ffd.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 43F7FDAD1927C35600CA4038 /* goblins-ffd.atlas */; };
-		43F7FDB11927C35600CA4038 /* goblins-ffd.json in Resources */ = {isa = PBXBuildFile; fileRef = 43F7FDAE1927C35600CA4038 /* goblins-ffd.json */; };
-		43F7FDB21927C35600CA4038 /* goblins-ffd.png in Resources */ = {isa = PBXBuildFile; fileRef = 43F7FDAF1927C35600CA4038 /* goblins-ffd.png */; };
 		43F7FDB51927D04200CA4038 /* GoblinsExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FDB41927D04200CA4038 /* GoblinsExample.m */; };
 /* End PBXBuildFile section */
 
@@ -131,6 +135,19 @@
 		4319B51D16FF9B2600C1D7A9 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		4319B51F16FF9B2600C1D7A9 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		4319B52116FF9B2600C1D7A9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		431FF7C91C735CA100D52DF2 /* IkConstraint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = IkConstraint.c; path = "../../spine-c/src/spine/IkConstraint.c"; sourceTree = "<group>"; };
+		431FF7D51C735CAE00D52DF2 /* IkConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IkConstraint.h; path = "../../spine-c/include/spine/IkConstraint.h"; sourceTree = "<group>"; };
+		431FF7D61C735CFE00D52DF2 /* IkConstraintData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = IkConstraintData.c; path = "../../spine-c/src/spine/IkConstraintData.c"; sourceTree = "<group>"; };
+		431FF7D71C735CFE00D52DF2 /* TransformConstraint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = TransformConstraint.c; path = "../../spine-c/src/spine/TransformConstraint.c"; sourceTree = "<group>"; };
+		431FF7D81C735CFE00D52DF2 /* TransformConstraintData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = TransformConstraintData.c; path = "../../spine-c/src/spine/TransformConstraintData.c"; sourceTree = "<group>"; };
+		431FF7D91C735CFE00D52DF2 /* WeightedMeshAttachment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = WeightedMeshAttachment.c; path = "../../spine-c/src/spine/WeightedMeshAttachment.c"; sourceTree = "<group>"; };
+		431FF7DE1C735D1500D52DF2 /* IkConstraintData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IkConstraintData.h; path = "../../spine-c/include/spine/IkConstraintData.h"; sourceTree = "<group>"; };
+		431FF7DF1C735D1500D52DF2 /* TransformConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TransformConstraint.h; path = "../../spine-c/include/spine/TransformConstraint.h"; sourceTree = "<group>"; };
+		431FF7E01C735D1500D52DF2 /* TransformConstraintData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TransformConstraintData.h; path = "../../spine-c/include/spine/TransformConstraintData.h"; sourceTree = "<group>"; };
+		431FF7E11C735D1500D52DF2 /* WeightedMeshAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WeightedMeshAttachment.h; path = "../../spine-c/include/spine/WeightedMeshAttachment.h"; sourceTree = "<group>"; };
+		431FF7E21C735D4300D52DF2 /* goblins-mesh.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "goblins-mesh.atlas"; sourceTree = "<group>"; };
+		431FF7E31C735D4300D52DF2 /* goblins-mesh.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "goblins-mesh.json"; sourceTree = "<group>"; };
+		431FF7E41C735D4300D52DF2 /* goblins-mesh.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "goblins-mesh.png"; sourceTree = "<group>"; };
 		434D47F7192A2B35003127B5 /* cocos2d-osx.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "cocos2d-osx.xcodeproj"; path = "cocos2d/cocos2d-osx.xcodeproj"; sourceTree = SOURCE_ROOT; };
 		43BFBE0D170A778A00ECBACB /* spine-cocos2d-iphone.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "spine-cocos2d-iphone.m"; path = "src/spine/spine-cocos2d-iphone.m"; sourceTree = "<group>"; };
 		43BFBE0E170A778A00ECBACB /* spine-cocos2d-iphone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "spine-cocos2d-iphone.h"; path = "src/spine/spine-cocos2d-iphone.h"; sourceTree = "<group>"; };
@@ -167,7 +184,6 @@
 		43F7FD6B1927C31700CA4038 /* SkeletonData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = SkeletonData.c; path = "../../spine-c/src/spine/SkeletonData.c"; sourceTree = "<group>"; };
 		43F7FD6C1927C31700CA4038 /* SkeletonJson.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = SkeletonJson.c; path = "../../spine-c/src/spine/SkeletonJson.c"; sourceTree = "<group>"; };
 		43F7FD6D1927C31700CA4038 /* Skin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Skin.c; path = "../../spine-c/src/spine/Skin.c"; sourceTree = "<group>"; };
-		43F7FD6E1927C31700CA4038 /* SkinnedMeshAttachment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = SkinnedMeshAttachment.c; path = "../../spine-c/src/spine/SkinnedMeshAttachment.c"; sourceTree = "<group>"; };
 		43F7FD6F1927C31700CA4038 /* Slot.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Slot.c; path = "../../spine-c/src/spine/Slot.c"; sourceTree = "<group>"; };
 		43F7FD701927C31700CA4038 /* SlotData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = SlotData.c; path = "../../spine-c/src/spine/SlotData.c"; sourceTree = "<group>"; };
 		43F7FD891927C32800CA4038 /* Animation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Animation.h; path = "../../spine-c/include/spine/Animation.h"; sourceTree = "<group>"; };
@@ -190,7 +206,6 @@
 		43F7FD9A1927C32800CA4038 /* SkeletonData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonData.h; path = "../../spine-c/include/spine/SkeletonData.h"; sourceTree = "<group>"; };
 		43F7FD9B1927C32800CA4038 /* SkeletonJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonJson.h; path = "../../spine-c/include/spine/SkeletonJson.h"; sourceTree = "<group>"; };
 		43F7FD9C1927C32800CA4038 /* Skin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Skin.h; path = "../../spine-c/include/spine/Skin.h"; sourceTree = "<group>"; };
-		43F7FD9D1927C32800CA4038 /* SkinnedMeshAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkinnedMeshAttachment.h; path = "../../spine-c/include/spine/SkinnedMeshAttachment.h"; sourceTree = "<group>"; };
 		43F7FD9E1927C32800CA4038 /* Slot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Slot.h; path = "../../spine-c/include/spine/Slot.h"; sourceTree = "<group>"; };
 		43F7FD9F1927C32800CA4038 /* SlotData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SlotData.h; path = "../../spine-c/include/spine/SlotData.h"; sourceTree = "<group>"; };
 		43F7FDA01927C32800CA4038 /* spine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = spine.h; path = "../../spine-c/include/spine/spine.h"; sourceTree = "<group>"; };
@@ -202,9 +217,6 @@
 		43F7FDA61927C33C00CA4038 /* SkeletonRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SkeletonRenderer.m; path = src/spine/SkeletonRenderer.m; sourceTree = "<group>"; };
 		43F7FDAA1927C34600CA4038 /* SpineboyExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpineboyExample.h; sourceTree = "<group>"; };
 		43F7FDAB1927C34600CA4038 /* SpineboyExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpineboyExample.m; sourceTree = "<group>"; };
-		43F7FDAD1927C35600CA4038 /* goblins-ffd.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "goblins-ffd.atlas"; sourceTree = "<group>"; };
-		43F7FDAE1927C35600CA4038 /* goblins-ffd.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "goblins-ffd.json"; sourceTree = "<group>"; };
-		43F7FDAF1927C35600CA4038 /* goblins-ffd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "goblins-ffd.png"; sourceTree = "<group>"; };
 		43F7FDB31927D04200CA4038 /* GoblinsExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoblinsExample.h; sourceTree = "<group>"; };
 		43F7FDB41927D04200CA4038 /* GoblinsExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoblinsExample.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -290,9 +302,9 @@
 		4319B7CB16FF9D3900C1D7A9 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				43F7FDAD1927C35600CA4038 /* goblins-ffd.atlas */,
-				43F7FDAE1927C35600CA4038 /* goblins-ffd.json */,
-				43F7FDAF1927C35600CA4038 /* goblins-ffd.png */,
+				431FF7E21C735D4300D52DF2 /* goblins-mesh.atlas */,
+				431FF7E31C735D4300D52DF2 /* goblins-mesh.json */,
+				431FF7E41C735D4300D52DF2 /* goblins-mesh.png */,
 				43C32A30170D0A4D004A9460 /* spineboy.atlas */,
 				43C32A31170D0A4D004A9460 /* spineboy.json */,
 				43C32A32170D0A4D004A9460 /* spineboy.png */,
@@ -329,6 +341,10 @@
 				43F7FD941927C32800CA4038 /* EventData.h */,
 				43F7FD641927C31700CA4038 /* extension.c */,
 				43F7FD951927C32800CA4038 /* extension.h */,
+				431FF7C91C735CA100D52DF2 /* IkConstraint.c */,
+				431FF7D51C735CAE00D52DF2 /* IkConstraint.h */,
+				431FF7D61C735CFE00D52DF2 /* IkConstraintData.c */,
+				431FF7DE1C735D1500D52DF2 /* IkConstraintData.h */,
 				43F7FD651927C31700CA4038 /* Json.c */,
 				43F7FD661927C31700CA4038 /* Json.h */,
 				43F7FD671927C31700CA4038 /* MeshAttachment.c */,
@@ -345,13 +361,17 @@
 				43F7FD9B1927C32800CA4038 /* SkeletonJson.h */,
 				43F7FD6D1927C31700CA4038 /* Skin.c */,
 				43F7FD9C1927C32800CA4038 /* Skin.h */,
-				43F7FD6E1927C31700CA4038 /* SkinnedMeshAttachment.c */,
-				43F7FD9D1927C32800CA4038 /* SkinnedMeshAttachment.h */,
 				43F7FD6F1927C31700CA4038 /* Slot.c */,
 				43F7FD9E1927C32800CA4038 /* Slot.h */,
 				43F7FD701927C31700CA4038 /* SlotData.c */,
 				43F7FD9F1927C32800CA4038 /* SlotData.h */,
 				43F7FDA01927C32800CA4038 /* spine.h */,
+				431FF7D71C735CFE00D52DF2 /* TransformConstraint.c */,
+				431FF7DF1C735D1500D52DF2 /* TransformConstraint.h */,
+				431FF7D81C735CFE00D52DF2 /* TransformConstraintData.c */,
+				431FF7E01C735D1500D52DF2 /* TransformConstraintData.h */,
+				431FF7D91C735CFE00D52DF2 /* WeightedMeshAttachment.c */,
+				431FF7E11C735D1500D52DF2 /* WeightedMeshAttachment.h */,
 			);
 			name = "spine-c";
 			path = ..;
@@ -534,14 +554,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				43C32A1C170B1295004A9460 /* InfoPlist.strings in Resources */,
+				431FF7E61C735D4300D52DF2 /* goblins-mesh.json in Resources */,
+				431FF7E71C735D4300D52DF2 /* goblins-mesh.png in Resources */,
+				431FF7E51C735D4300D52DF2 /* goblins-mesh.atlas in Resources */,
 				43C32A1D170B1295004A9460 /* MainMenu.xib in Resources */,
 				43C32A1E170B1295004A9460 /* icon.icns in Resources */,
 				43C32A36170D0A4D004A9460 /* spineboy.atlas in Resources */,
 				43C32A37170D0A4D004A9460 /* spineboy.json in Resources */,
 				43C32A38170D0A4D004A9460 /* spineboy.png in Resources */,
-				43F7FDB01927C35600CA4038 /* goblins-ffd.atlas in Resources */,
-				43F7FDB11927C35600CA4038 /* goblins-ffd.json in Resources */,
-				43F7FDB21927C35600CA4038 /* goblins-ffd.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -559,24 +579,28 @@
 				43F7FD721927C31700CA4038 /* AnimationState.c in Sources */,
 				43F7FD731927C31700CA4038 /* AnimationStateData.c in Sources */,
 				43F7FD741927C31700CA4038 /* Atlas.c in Sources */,
+				431FF7DB1C735CFE00D52DF2 /* TransformConstraint.c in Sources */,
 				43F7FD751927C31700CA4038 /* AtlasAttachmentLoader.c in Sources */,
 				43F7FD761927C31700CA4038 /* Attachment.c in Sources */,
 				43F7FD771927C31700CA4038 /* AttachmentLoader.c in Sources */,
 				43F7FD781927C31700CA4038 /* Bone.c in Sources */,
+				431FF7DC1C735CFE00D52DF2 /* TransformConstraintData.c in Sources */,
 				43F7FD791927C31700CA4038 /* BoneData.c in Sources */,
 				43F7FD7A1927C31700CA4038 /* BoundingBoxAttachment.c in Sources */,
 				43F7FD7B1927C31700CA4038 /* Event.c in Sources */,
 				43F7FD7C1927C31700CA4038 /* EventData.c in Sources */,
+				431FF7DA1C735CFE00D52DF2 /* IkConstraintData.c in Sources */,
 				43F7FD7D1927C31700CA4038 /* extension.c in Sources */,
+				431FF7CA1C735CA100D52DF2 /* IkConstraint.c in Sources */,
 				43F7FD7E1927C31700CA4038 /* Json.c in Sources */,
 				43F7FD7F1927C31700CA4038 /* MeshAttachment.c in Sources */,
 				43F7FD801927C31700CA4038 /* RegionAttachment.c in Sources */,
 				43F7FD811927C31700CA4038 /* Skeleton.c in Sources */,
+				431FF7DD1C735CFE00D52DF2 /* WeightedMeshAttachment.c in Sources */,
 				43F7FD821927C31700CA4038 /* SkeletonBounds.c in Sources */,
 				43F7FD831927C31700CA4038 /* SkeletonData.c in Sources */,
 				43F7FD841927C31700CA4038 /* SkeletonJson.c in Sources */,
 				43F7FD851927C31700CA4038 /* Skin.c in Sources */,
-				43F7FD861927C31700CA4038 /* SkinnedMeshAttachment.c in Sources */,
 				43F7FD871927C31700CA4038 /* Slot.c in Sources */,
 				43F7FD881927C31700CA4038 /* SlotData.c in Sources */,
 				43F7FDA71927C33C00CA4038 /* PolygonBatch.m in Sources */,
