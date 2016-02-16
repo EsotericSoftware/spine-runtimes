@@ -84,9 +84,6 @@
     <ClInclude Include="include\spine\MeshAttachment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\spine\SkinnedMeshAttachment.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\spine\spine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -94,6 +91,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\spine\IkConstraintData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spine\TransformConstraintData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spine\TransformConstraint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spine\WeightedMeshAttachment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -167,13 +173,19 @@
     <ClCompile Include="src\spine\MeshAttachment.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\spine\SkinnedMeshAttachment.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\spine\IkConstraint.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\spine\IkConstraintData.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\spine\TransformConstraintData.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\spine\TransformConstraint.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\spine\WeightedMeshAttachment.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

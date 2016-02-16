@@ -30,12 +30,11 @@
  *****************************************************************************/
 
 using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace Spine {
 	public class AnimationState {
-		private AnimationStateData data;
+		private readonly AnimationStateData data;
 		private ExposedList<TrackEntry> tracks = new ExposedList<TrackEntry>();
 		private ExposedList<Event> events = new ExposedList<Event>();
 		private float timeScale = 1;
@@ -64,6 +63,23 @@ namespace Spine {
 				TrackEntry current = tracks.Items[i];
 				if (current == null) continue;
 
+				TrackEntry next = current.next;
+				if (next != null) {
+					float nextTime = current.lastTime - next.delay;
+					if (nextTime >= 0) {
+						float nextDelta = delta * next.timeScale;
+						next.time = nextTime + nextDelta; // For start event to see correct time.
+						current.time += delta * current.timeScale; // For end event to see correct time.
+						SetCurrent(i, next);
+						next.time -= nextDelta; // Prevent increasing time twice, below.
+						current = next;
+					}
+				} else if (!current.loop && current.lastTime >= current.endTime) {
+					// End non-looping animation when it reaches its end time and there is no next entry.
+					ClearTrack(i);
+					continue;
+				}
+
 				float trackDelta = delta * current.timeScale;
 				float time = current.time + trackDelta;
 				float endTime = current.endTime;
@@ -79,15 +95,6 @@ namespace Spine {
 					int count = (int)(time / endTime);
 					current.OnComplete(this, i, count);
 					if (Complete != null) Complete(this, i, count);
-				}
-
-				TrackEntry next = current.next;
-				if (next != null) {
-					next.time = current.lastTime - next.delay;
-					if (next.time >= 0) SetCurrent(i, next);
-				} else {
-					// End non-looping animation when it reaches its end time and there is no next entry.
-					if (!current.loop && current.lastTime >= current.endTime) ClearTrack(i);
 				}
 			}
 		}

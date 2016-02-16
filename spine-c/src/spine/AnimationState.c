@@ -97,19 +97,27 @@ void spAnimationState_update (spAnimationState* self, float delta) {
 		spTrackEntry* current = self->tracks[i];
 		if (!current) continue;
 
+		if (current->next) {
+			float nextTime = current->lastTime - current->next->delay;
+			if (nextTime >= 0) {
+				float nextDelta = delta * current->next->timeScale;
+				current->next->time = nextTime + nextDelta; // For start event to see correct time.
+				current->time += delta * current->timeScale; // For end event to see correct time.
+				_spAnimationState_setCurrent(self, i, current->next);
+				current->next->time -= nextDelta; // Prevent increasing time twice, below.
+				current = current->next;
+			}
+		} else if (!current->loop && current->lastTime >= current->endTime) {
+			// End non-looping animation when it reaches its end time and there is no next entry.
+			spAnimationState_clearTrack(self, i);
+			continue;
+		}
+
 		current->time += delta * current->timeScale;
 		if (current->previous) {
 			previousDelta = delta * current->previous->timeScale;
 			current->previous->time += previousDelta;
 			current->mixTime += previousDelta;
-		}
-
-		if (current->next) {
-			current->next->time = current->lastTime - current->next->delay;
-			if (current->next->time >= 0) _spAnimationState_setCurrent(self, i, current->next);
-		} else {
-			/* End non-looping animation when it reaches its end time and there is no next entry. */
-			if (!current->loop && current->lastTime >= current->endTime) spAnimationState_clearTrack(self, i);
 		}
 	}
 }

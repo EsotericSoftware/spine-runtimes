@@ -30,7 +30,6 @@
  *****************************************************************************/
 
 using System;
-using System.Collections.Generic;
 
 namespace Spine {
 	public class IkConstraint : IUpdatable {
@@ -77,7 +76,7 @@ namespace Spine {
 		}
 
 		override public String ToString () {
-			return data.name;
+			return data.name + " CONSTRAINT";
 		}
 
 		/// <summary>Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified

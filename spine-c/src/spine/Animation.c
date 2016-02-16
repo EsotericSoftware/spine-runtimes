@@ -57,7 +57,7 @@ void spAnimation_apply (const spAnimation* self, spSkeleton* skeleton, float las
 
 	if (loop && self->duration) {
 		time = FMOD(time, self->duration);
-		lastTime = FMOD(lastTime, self->duration);
+		if (lastTime > 0) lastTime = FMOD(lastTime, self->duration);
 	}
 
 	for (i = 0; i < n; ++i)
@@ -70,7 +70,7 @@ void spAnimation_mix (const spAnimation* self, spSkeleton* skeleton, float lastT
 
 	if (loop && self->duration) {
 		time = FMOD(time, self->duration);
-		lastTime = FMOD(lastTime, self->duration);
+		if (lastTime > 0) lastTime = FMOD(lastTime, self->duration);
 	}
 
 	for (i = 0; i < n; ++i)
@@ -578,8 +578,8 @@ spEventTimeline* spEventTimeline_create (int framesCount) {
 	return self;
 }
 
-void spEventTimeline_setFrame (spEventTimeline* self, int frameIndex, float time, spEvent* event) {
-	self->frames[frameIndex] = time;
+void spEventTimeline_setFrame (spEventTimeline* self, int frameIndex, spEvent* event) {
+	self->frames[frameIndex] = event->time;
 
 	FREE(self->events[frameIndex]);
 	self->events[frameIndex] = event;

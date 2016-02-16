@@ -112,6 +112,9 @@ spSkeleton* spSkeleton_create (spSkeletonData* data) {
 
 void spSkeleton_dispose (spSkeleton* self) {
 	int i;
+	_spSkeleton* internal = SUB_CAST(_spSkeleton, self);
+	FREE(internal->updateCache);
+	FREE(internal->updateCacheType);
 
 	for (i = 0; i < self->bonesCount; ++i)
 		spBone_dispose(self->bones[i]);
