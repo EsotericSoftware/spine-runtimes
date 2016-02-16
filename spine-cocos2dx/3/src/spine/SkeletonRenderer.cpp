@@ -198,9 +198,9 @@ void SkeletonRenderer::drawSkeleton (const Mat4 &transform, uint32_t transformFl
 			a = attachment->a;
 			break;
 		}
-		case SP_ATTACHMENT_SKINNED_MESH: {
-			spSkinnedMeshAttachment* attachment = (spSkinnedMeshAttachment*)slot->attachment;
-			spSkinnedMeshAttachment_computeWorldVertices(attachment, slot, _worldVertices);
+		case SP_ATTACHMENT_WEIGHTED_MESH: {
+			spWeightedMeshAttachment* attachment = (spWeightedMeshAttachment*)slot->attachment;
+			spWeightedMeshAttachment_computeWorldVertices(attachment, slot, _worldVertices);
 			texture = getTexture(attachment);
 			uvs = attachment->uvs;
 			verticesCount = attachment->uvsCount;
@@ -271,8 +271,8 @@ void SkeletonRenderer::drawSkeleton (const Mat4 &transform, uint32_t transformFl
 			DrawPrimitives::setDrawColor4B(255, 0, 0, 255);
 			for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
 				spBone *bone = _skeleton->bones[i];
-				float x = bone->data->length * bone->m00 + bone->worldX;
-				float y = bone->data->length * bone->m10 + bone->worldY;
+				float x = bone->data->length * bone->a + bone->worldX;
+				float y = bone->data->length * bone->c + bone->worldY;
 				DrawPrimitives::drawLine(Vec2(bone->worldX, bone->worldY), Vec2(x, y));
 			}
 			// Bone origins.
@@ -296,7 +296,7 @@ Texture2D* SkeletonRenderer::getTexture (spMeshAttachment* attachment) const {
 	return (Texture2D*)((spAtlasRegion*)attachment->rendererObject)->page->rendererObject;
 }
 
-Texture2D* SkeletonRenderer::getTexture (spSkinnedMeshAttachment* attachment) const {
+Texture2D* SkeletonRenderer::getTexture (spWeightedMeshAttachment* attachment) const {
 	return (Texture2D*)((spAtlasRegion*)attachment->rendererObject)->page->rendererObject;
 }
 
@@ -315,9 +315,9 @@ Rect SkeletonRenderer::getBoundingBox () const {
 			spMeshAttachment* mesh = (spMeshAttachment*)slot->attachment;
 			spMeshAttachment_computeWorldVertices(mesh, slot, _worldVertices);
 			verticesCount = mesh->verticesCount;
-		} else if (slot->attachment->type == SP_ATTACHMENT_SKINNED_MESH) {
-			spSkinnedMeshAttachment* mesh = (spSkinnedMeshAttachment*)slot->attachment;
-			spSkinnedMeshAttachment_computeWorldVertices(mesh, slot, _worldVertices);
+		} else if (slot->attachment->type == SP_ATTACHMENT_WEIGHTED_MESH) {
+			spWeightedMeshAttachment* mesh = (spWeightedMeshAttachment*)slot->attachment;
+			spWeightedMeshAttachment_computeWorldVertices(mesh, slot, _worldVertices);
 			verticesCount = mesh->uvsCount;
 		} else
 			continue;

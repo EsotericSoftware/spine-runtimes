@@ -88,8 +88,8 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 		CONST_CAST(float, self->d) = ld;
 		CONST_CAST(float, self->worldX) = x;
 		CONST_CAST(float, self->worldY) = y;
-		CONST_CAST(float, self->worldSignX) = scaleX > 0 ? 1 : -1;
-		CONST_CAST(float, self->worldSignY) = scaleY > 0 ? 1 : -1;
+		CONST_CAST(float, self->worldSignX) = scaleX > 0 ? 1.0f : -1.0f;
+		CONST_CAST(float, self->worldSignY) = scaleY > 0 ? 1.0f : -1.0f;
 		return;
 	}
 
