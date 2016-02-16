@@ -34,20 +34,16 @@ using System.Collections;
 using UnityEngine.UI;
 using Spine;
 
-public delegate void SkeletonGraphicDelegate (SkeletonGraphic skeletonGraphic);
-
 [ExecuteInEditMode, RequireComponent(typeof(CanvasRenderer), typeof(RectTransform)), DisallowMultipleComponent]
 [AddComponentMenu("Spine/SkeletonGraphic (Unity UI Canvas)")]
 public class SkeletonGraphic : MaskableGraphic {
 
 	#region Inspector
-	[Header("Skeleton Renderer")]
 	public SkeletonDataAsset skeletonDataAsset;
 
 	[SpineSkin(dataField:"skeletonDataAsset")]
 	public string initialSkinName = "default";
 
-	[Header("Skeleton Animation")]
 	[SpineAnimation(dataField:"skeletonDataAsset")]
 	public string startingAnimation;
 	public bool startingLoop;
@@ -74,11 +70,13 @@ public class SkeletonGraphic : MaskableGraphic {
 			} else {
 				if (freeze) return;
 				skeleton.SetToSetupPose();
-				skeleton.PoseWithAnimation(startingAnimation, 0f, false);
+				if (!string.IsNullOrEmpty(startingAnimation)) {
+					skeleton.PoseWithAnimation(startingAnimation, 0f, false);
+				}
 			}
 		} else {
 			if (skeletonDataAsset != null)
-				Initialize(false);
+				Initialize(true);
 		}
 			
 	}
@@ -93,16 +91,11 @@ public class SkeletonGraphic : MaskableGraphic {
 	#endregion
 
 	#region Internals
-	protected Spine.Unity.ISimpleMeshGenerator spineMeshGenerator; // This is any object that can give you a mesh when you give it a skeleton to render.
-	protected Skeleton skeleton;
-	protected Spine.AnimationState state;
-
 	// This is used by the UI system to determine what to put in the MaterialPropertyBlock.
 	public override Texture mainTexture {
 		get { 
-			if (skeletonDataAsset == null) return null;
 			// Fail loudly when incorrectly set up.
-			return skeletonDataAsset.atlasAssets[0].materials[0].mainTexture;
+			return skeletonDataAsset == null ? null : skeletonDataAsset.atlasAssets[0].materials[0].mainTexture;
 		}
 	}
 
@@ -153,14 +146,22 @@ public class SkeletonGraphic : MaskableGraphic {
 	#endregion
 
 	#region API
+	protected Skeleton skeleton;
 	public Skeleton Skeleton { get { return skeleton; } }
-	public Spine.AnimationState AnimationState { get { return state; } }
 	public SkeletonData SkeletonData { get { return skeleton == null ? null : skeleton.data; } }
 	public bool IsValid { get { return skeleton != null; } }
 
-	public event SkeletonGraphicDelegate UpdateLocal;
-	public event SkeletonGraphicDelegate UpdateWorld;
-	public event SkeletonGraphicDelegate UpdateComplete;
+	protected Spine.AnimationState state;
+	public Spine.AnimationState AnimationState { get { return state; } }
+
+	// This is any object that can give you a mesh when you give it a skeleton to render.
+	protected Spine.Unity.ISimpleMeshGenerator spineMeshGenerator;
+	public Spine.Unity.ISimpleMeshGenerator SpineMeshGenerator { get { return this.spineMeshGenerator; } }
+
+	public delegate void UpdateDelegate (SkeletonGraphic skeletonGraphic);
+	public event UpdateDelegate UpdateLocal;
+	public event UpdateDelegate UpdateWorld;
+	public event UpdateDelegate UpdateComplete;
 
 	public void Clear () {
 		skeleton = null;
@@ -194,12 +195,12 @@ public class SkeletonGraphic : MaskableGraphic {
 			state.SetAnimation(0, startingAnimation, startingLoop);
 	}
 
-
 	public void UpdateMesh () {
-		//Debug.Log("update mesh");
 		if (this.IsValid) {
 			skeleton.SetColor(this.color);
-			spineMeshGenerator.Scale = canvas.referencePixelsPerUnit; // TODO: move this to a listener to of the canvas?
+			if (canvas != null)
+				spineMeshGenerator.Scale = canvas.referencePixelsPerUnit; // TODO: move this to a listener to of the canvas?
+			
 			canvasRenderer.SetMesh(spineMeshGenerator.GenerateMesh(skeleton));
 			this.UpdateMaterial();
 		}
