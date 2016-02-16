@@ -296,7 +296,7 @@ typedef struct spEventTimeline {
 
 spEventTimeline* spEventTimeline_create (int framesCount);
 
-void spEventTimeline_setFrame (spEventTimeline* self, int frameIndex, float time, spEvent* event);
+void spEventTimeline_setFrame (spEventTimeline* self, int frameIndex, spEvent* event);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spEventTimeline EventTimeline;

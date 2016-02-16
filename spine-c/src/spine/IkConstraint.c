@@ -29,6 +29,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#include <float.h>
 #include <spine/IkConstraint.h>
 #include <spine/Skeleton.h>
 #include <spine/extension.h>
@@ -46,7 +47,6 @@ spIkConstraint* spIkConstraint_create (spIkConstraintData* data, const spSkeleto
 	for (i = 0; i < self->bonesCount; ++i)
 		self->bones[i] = spSkeleton_findBone(skeleton, self->data->bones[i]->name);
 	self->target = spSkeleton_findBone(skeleton, self->data->target->name);
-
 	return self;
 }
 
@@ -143,7 +143,7 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float 
 				goto outer;
 			}
 		}
-		float minAngle = 0, minDist = 999999999, minX = 0, minY = 0;
+		float minAngle = 0, minDist = FLT_MAX, minX = 0, minY = 0;
 		float maxAngle = 0, maxDist = 0, maxX = 0, maxY = 0;
 		float x = l1 + a, dist = x * x;
 		if (dist > maxDist) {

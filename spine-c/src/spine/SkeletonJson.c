@@ -217,7 +217,6 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 					animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
 					duration = timeline->frames[timelineArray->size * 3 - 3];
 					if (duration > animation->duration) animation->duration = duration;
-
 				} else {
 					spAnimation_dispose(animation);
 					_spSkeletonJson_setError(self, 0, "Invalid timeline type for a bone: ", timelineArray->name);
@@ -370,19 +369,18 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 		for (frame = events->child, i = 0; frame; frame = frame->next, ++i) {
 			spEvent* event;
 			const char* stringValue;
-			float time = Json_getFloat(frame, "time", 0);
 			spEventData* eventData = spSkeletonData_findEvent(skeletonData, Json_getString(frame, "name", 0));
 			if (!eventData) {
 				spAnimation_dispose(animation);
 				_spSkeletonJson_setError(self, 0, "Event not found: ", Json_getString(frame, "name", 0));
 				return 0;
 			}
-			event = spEvent_create(time, eventData);
+			event = spEvent_create(Json_getFloat(frame, "time", 0), eventData);
 			event->intValue = Json_getInt(frame, "int", eventData->intValue);
 			event->floatValue = Json_getFloat(frame, "float", eventData->floatValue);
 			stringValue = Json_getString(frame, "string", eventData->stringValue);
 			if (stringValue) MALLOC_STR(event->stringValue, stringValue);
-			spEventTimeline_setFrame(timeline, i, time, event);
+			spEventTimeline_setFrame(timeline, i, event);
 		}
 		animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
 		duration = timeline->frames[events->size - 1];

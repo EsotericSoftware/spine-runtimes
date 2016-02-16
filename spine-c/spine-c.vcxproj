@@ -93,10 +93,12 @@
     <ClInclude Include="include\spine\SkeletonData.h" />
     <ClInclude Include="include\spine\SkeletonJson.h" />
     <ClInclude Include="include\spine\Skin.h" />
-    <ClInclude Include="include\spine\SkinnedMeshAttachment.h" />
     <ClInclude Include="include\spine\Slot.h" />
     <ClInclude Include="include\spine\SlotData.h" />
     <ClInclude Include="include\spine\spine.h" />
+    <ClInclude Include="include\spine\TransformConstraint.h" />
+    <ClInclude Include="include\spine\TransformConstraintData.h" />
+    <ClInclude Include="include\spine\WeightedMeshAttachment.h" />
     <ClInclude Include="src\spine\Json.h" />
   </ItemGroup>
   <ItemGroup>
@@ -123,9 +125,11 @@
     <ClCompile Include="src\spine\SkeletonData.c" />
     <ClCompile Include="src\spine\SkeletonJson.c" />
     <ClCompile Include="src\spine\Skin.c" />
-    <ClCompile Include="src\spine\SkinnedMeshAttachment.c" />
     <ClCompile Include="src\spine\Slot.c" />
     <ClCompile Include="src\spine\SlotData.c" />
+    <ClCompile Include="src\spine\TransformConstraint.c" />
+    <ClCompile Include="src\spine\TransformConstraintData.c" />
+    <ClCompile Include="src\spine\WeightedMeshAttachment.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
