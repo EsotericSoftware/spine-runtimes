@@ -36,6 +36,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/spine-c/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/spine-c/include}&quot;"/>
 								</option>
+								<option id="gnu.cpp.compiler.option.other.other.1185307642" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.564303729" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.613741168" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug">
@@ -45,7 +46,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/spine-c/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/spine-c/include}&quot;"/>
 								</option>
-								<option id="gnu.c.compiler.option.misc.other.1829716988" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -std=c89" valueType="string"/>
+								<option id="gnu.c.compiler.option.misc.other.1829716988" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -std=c89 -pedantic" valueType="string"/>
+								<option id="gnu.c.compiler.option.dialect.std.849400720" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.603555848" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug.1030541714" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug"/>
