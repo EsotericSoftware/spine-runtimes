@@ -626,12 +626,11 @@ namespace Spine {
 				foreach (Dictionary<String, Object> eventMap in eventsMap) {
 					EventData eventData = skeletonData.FindEvent((String)eventMap["name"]);
 					if (eventData == null) throw new Exception("Event not found: " + eventMap["name"]);
-					float time = (float)eventMap["time"];
-					var e = new Event(time, eventData);
+					var e = new Event((float)eventMap["time"], eventData);
 					e.Int = GetInt(eventMap, "int", eventData.Int);
 					e.Float = GetFloat(eventMap, "float", eventData.Float);
 					e.String = GetString(eventMap, "string", eventData.String);
-					timeline.SetFrame(frameIndex++, time, e);
+					timeline.SetFrame(frameIndex++, e);
 				}
 				timelines.Add(timeline);
 				duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1]);

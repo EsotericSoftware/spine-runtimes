@@ -58,7 +58,7 @@ namespace Spine {
 
 			if (loop && duration != 0) {
 				time %= duration;
-				lastTime %= duration;
+				if (lastTime > 0) lastTime %= duration;
 			}
 
 			ExposedList<Timeline> timelines = this.timelines;
@@ -75,7 +75,7 @@ namespace Spine {
 
 			if (loop && duration != 0) {
 				time %= duration;
-				lastTime %= duration;
+				if (lastTime > 0) lastTime %= duration;
 			}
 
 			ExposedList<Timeline> timelines = this.timelines;
@@ -470,8 +470,8 @@ namespace Spine {
 		}
 
 		/// <summary>Sets the time and value of the specified keyframe.</summary>
-		public void SetFrame (int frameIndex, float time, Event e) {
-			frames[frameIndex] = time;
+		public void SetFrame (int frameIndex, Event e) {
+			frames[frameIndex] = e.Time;
 			events[frameIndex] = e;
 		}
 

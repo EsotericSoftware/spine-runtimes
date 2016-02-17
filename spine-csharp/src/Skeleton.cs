@@ -132,7 +132,7 @@ namespace Spine {
 			}
 		}
 
-		/// <summary>Updates the world transform for each bone and applies IK constraints.</summary>
+		/// <summary>Updates the world transform for each bone and applies constraints.</summary>
 		public void UpdateWorldTransform () {
 			ExposedList<IUpdatable> updateCache = this.updateCache;
 			for (int i = 0, n = updateCache.Count; i < n; i++)
