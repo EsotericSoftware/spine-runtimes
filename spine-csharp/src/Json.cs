@@ -2,15 +2,9 @@ using System.IO;
 
 namespace Spine {
 	public static class Json {
-		
-		static readonly SharpJson.JsonDecoder parser;
-
-		static Json () {
-			parser = new SharpJson.JsonDecoder();
-			parser.parseNumbersAsFloat = true;
-		}
-
 		public static object Deserialize (TextReader text) {
+			var parser = new SharpJson.JsonDecoder();
+			parser.parseNumbersAsFloat = true;
 			return parser.Decode(text.ReadToEnd());
 		}
 	}
