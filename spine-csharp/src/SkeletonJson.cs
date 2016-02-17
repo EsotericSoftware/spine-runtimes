@@ -29,6 +29,10 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if (UNITY_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7 || UNITY_WSA || UNITY_WP8 || UNITY_WP8_1)
+#define IS_UNITY
+#endif
+
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -53,7 +57,7 @@ namespace Spine {
 			Scale = 1;
 		}
 
-		#if !(UNITY_5 || UNITY_4 || UNITY_WSA || UNITY_WP8 || UNITY_WP8_1)
+		#if !(IS_UNITY)
 		#if WINDOWS_STOREAPP
 
 		private async Task<SkeletonData> ReadFile(string path) {
@@ -71,12 +75,12 @@ namespace Spine {
 		}
 		#else
 		public SkeletonData ReadSkeletonData (String path) {
-			#if WINDOWS_PHONE
+		#if WINDOWS_PHONE
 			Stream stream = Microsoft.Xna.Framework.TitleContainer.OpenStream(path);
 			using (StreamReader reader = new StreamReader(stream)) {
-			#else
+		#else
 			using (StreamReader reader = new StreamReader(path)) {
-			#endif // WINDOWS_PHONE
+		#endif // WINDOWS_PHONE
 				SkeletonData skeletonData = ReadSkeletonData(reader);
 				skeletonData.name = Path.GetFileNameWithoutExtension(path);
 				return skeletonData;
@@ -89,6 +93,7 @@ namespace Spine {
 		public SkeletonData ReadSkeletonData (TextReader reader) {
 			if (reader == null) throw new ArgumentNullException("reader cannot be null.");
 
+			var scale = this.Scale;
 			var skeletonData = new SkeletonData();
 
 			var root = Json.Deserialize(reader) as Dictionary<String, Object>;
@@ -112,9 +117,9 @@ namespace Spine {
 						throw new Exception("Parent bone not found: " + boneMap["parent"]);
 				}
 				var boneData = new BoneData((String)boneMap["name"], parent);
-				boneData.length = GetFloat(boneMap, "length", 0) * Scale;
-				boneData.x = GetFloat(boneMap, "x", 0) * Scale;
-				boneData.y = GetFloat(boneMap, "y", 0) * Scale;
+				boneData.length = GetFloat(boneMap, "length", 0) * scale;
+				boneData.x = GetFloat(boneMap, "x", 0) * scale;
+				boneData.y = GetFloat(boneMap, "y", 0) * scale;
 				boneData.rotation = GetFloat(boneMap, "rotation", 0);
 				boneData.scaleX = GetFloat(boneMap, "scaleX", 1);
 				boneData.scaleY = GetFloat(boneMap, "scaleY", 1);
@@ -244,6 +249,8 @@ namespace Spine {
 			if (map.ContainsKey("name"))
 				name = (String)map["name"];
 
+			var scale = this.Scale;
+
 			var type = AttachmentType.region;
 			if (map.ContainsKey("type")) {
 				var typeName = (String)map["type"];
@@ -260,13 +267,13 @@ namespace Spine {
 				RegionAttachment region = attachmentLoader.NewRegionAttachment(skin, name, path);
 				if (region == null) return null;
 				region.Path = path;
-				region.x = GetFloat(map, "x", 0) * Scale;
-				region.y = GetFloat(map, "y", 0) * Scale;
+				region.x = GetFloat(map, "x", 0) * scale;
+				region.y = GetFloat(map, "y", 0) * scale;
 				region.scaleX = GetFloat(map, "scaleX", 1);
 				region.scaleY = GetFloat(map, "scaleY", 1);
 				region.rotation = GetFloat(map, "rotation", 0);
-				region.width = GetFloat(map, "width", 32) * Scale;
-				region.height = GetFloat(map, "height", 32) * Scale;
+				region.width = GetFloat(map, "width", 32) * scale;
+				region.height = GetFloat(map, "height", 32) * scale;
 				region.UpdateOffset();
 
 				if (map.ContainsKey("color")) {
@@ -283,7 +290,7 @@ namespace Spine {
 					if (mesh == null) return null;
 
 					mesh.Path = path;
-					mesh.vertices = GetFloatArray(map, "vertices", Scale);
+					mesh.vertices = GetFloatArray(map, "vertices", scale);
 					mesh.triangles = GetIntArray(map, "triangles");
 					mesh.regionUVs = GetFloatArray(map, "uvs", 1);
 					mesh.UpdateUVs();
@@ -298,8 +305,8 @@ namespace Spine {
 
 					mesh.HullLength = GetInt(map, "hull", 0) * 2;
 					if (map.ContainsKey("edges")) mesh.Edges = GetIntArray(map, "edges");
-					mesh.Width = GetInt(map, "width", 0) * Scale;
-					mesh.Height = GetInt(map, "height", 0) * Scale;
+					mesh.Width = GetInt(map, "width", 0) * scale;
+					mesh.Height = GetInt(map, "height", 0) * scale;
 
 					return mesh;
 				}
@@ -312,7 +319,6 @@ namespace Spine {
 					float[] vertices = GetFloatArray(map, "vertices", 1);
 					var weights = new List<float>(uvs.Length * 3 * 3);
 					var bones = new List<int>(uvs.Length * 3);
-					float scale = Scale;
 					for (int i = 0, n = vertices.Length; i < n; ) {
 						int boneCount = (int)vertices[i++];
 						bones.Add(boneCount);
@@ -340,15 +346,15 @@ namespace Spine {
 
 					mesh.HullLength = GetInt(map, "hull", 0) * 2;
 					if (map.ContainsKey("edges")) mesh.Edges = GetIntArray(map, "edges");
-					mesh.Width = GetInt(map, "width", 0) * Scale;
-					mesh.Height = GetInt(map, "height", 0) * Scale;
+					mesh.Width = GetInt(map, "width", 0) * scale;
+					mesh.Height = GetInt(map, "height", 0) * scale;
 
 					return mesh;
 				}
 			case AttachmentType.boundingbox:
 				BoundingBoxAttachment box = attachmentLoader.NewBoundingBoxAttachment(skin, name);
 				if (box == null) return null;
-				box.vertices = GetFloatArray(map, "vertices", Scale);
+				box.vertices = GetFloatArray(map, "vertices", scale);
 				return box;
 			}
 			return null;
@@ -408,7 +414,7 @@ namespace Spine {
 		private void ReadAnimation (String name, Dictionary<String, Object> map, SkeletonData skeletonData) {
 			var timelines = new ExposedList<Timeline>();
 			float duration = 0;
-			float scale = Scale;
+			var scale = this.Scale;
 
 			if (map.ContainsKey("slots")) {
 				foreach (KeyValuePair<String, Object> entry in (Dictionary<String, Object>)map["slots"]) {
