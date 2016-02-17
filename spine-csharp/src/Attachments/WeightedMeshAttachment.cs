@@ -114,7 +114,7 @@ namespace Spine {
 					worldVertices[w + 1] = wy + y;
 				}
 			} else {
-				float[] ffd = slot.AttachmentVertices;
+				float[] ffd = slot.attachmentVertices;
 				for (int w = 0, v = 0, b = 0, f = 0, n = bones.Length; v < n; w += 2) {
 					float wx = 0, wy = 0;
 					int nn = bones[v++] + v;
