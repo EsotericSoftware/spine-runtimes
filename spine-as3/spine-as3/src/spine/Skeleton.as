@@ -65,7 +65,7 @@ public class Skeleton {
 			drawOrder[drawOrder.length] = slot;
 		}
 		
-		ikConstraints = new Vector.<IkConstraint>()
+		ikConstraints = new Vector.<IkConstraint>();
 		for each (var ikConstraintData:IkConstraintData in data.ikConstraints)
 			ikConstraints[ikConstraints.length] = new IkConstraint(ikConstraintData, this);
 

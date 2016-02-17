@@ -41,7 +41,7 @@ public class Bone {
 	public var y:Number;
 	public var rotation:Number;
 	public var rotationIK:Number;
-	public var scaleX:Number
+	public var scaleX:Number;
 	public var scaleY:Number;
 	public var flipX:Boolean;
 	public var flipY:Boolean;

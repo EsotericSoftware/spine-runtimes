@@ -30,7 +30,6 @@
  *****************************************************************************/
 
 package spine {
-import spine.attachments.Attachment;
 import spine.attachments.BoundingBoxAttachment;
 
 public class SkeletonBounds {

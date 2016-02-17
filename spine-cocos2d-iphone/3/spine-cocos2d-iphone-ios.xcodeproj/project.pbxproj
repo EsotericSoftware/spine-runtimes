@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		431FF7F31C735D8D00D52DF2 /* TransformConstraint.c in Sources */ = {isa = PBXBuildFile; fileRef = 431FF7F01C735D8D00D52DF2 /* TransformConstraint.c */; };
+		431FF7F41C735D8D00D52DF2 /* TransformConstraintData.c in Sources */ = {isa = PBXBuildFile; fileRef = 431FF7F11C735D8D00D52DF2 /* TransformConstraintData.c */; };
+		431FF7F51C735D8D00D52DF2 /* WeightedMeshAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 431FF7F21C735D8D00D52DF2 /* WeightedMeshAttachment.c */; };
 		43B7CC0919DC4ACD0031321C /* IkConstraint.c in Sources */ = {isa = PBXBuildFile; fileRef = 43B7CC0719DC4ACD0031321C /* IkConstraint.c */; };
 		43B7CC0A19DC4ACD0031321C /* IkConstraintData.c in Sources */ = {isa = PBXBuildFile; fileRef = 43B7CC0819DC4ACD0031321C /* IkConstraintData.c */; };
 		43C3282F170B0C19004A9460 /* spine-cocos2d-iphone.m in Sources */ = {isa = PBXBuildFile; fileRef = 43C3282D170B0C19004A9460 /* spine-cocos2d-iphone.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -50,7 +53,6 @@
 		43F7FF631927F91900CA4038 /* SkeletonData.c in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF4B1927F91900CA4038 /* SkeletonData.c */; };
 		43F7FF641927F91900CA4038 /* SkeletonJson.c in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF4C1927F91900CA4038 /* SkeletonJson.c */; };
 		43F7FF651927F91900CA4038 /* Skin.c in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF4D1927F91900CA4038 /* Skin.c */; };
-		43F7FF661927F91900CA4038 /* SkinnedMeshAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF4E1927F91900CA4038 /* SkinnedMeshAttachment.c */; };
 		43F7FF671927F91900CA4038 /* Slot.c in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF4F1927F91900CA4038 /* Slot.c */; };
 		43F7FF681927F91900CA4038 /* SlotData.c in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF501927F91900CA4038 /* SlotData.c */; };
 		43F7FF881927F94800CA4038 /* SkeletonAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF841927F94800CA4038 /* SkeletonAnimation.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -82,6 +84,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		431FF7ED1C735D7A00D52DF2 /* TransformConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TransformConstraint.h; path = "../../spine-c/include/spine/TransformConstraint.h"; sourceTree = "<group>"; };
+		431FF7EE1C735D7A00D52DF2 /* TransformConstraintData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TransformConstraintData.h; path = "../../spine-c/include/spine/TransformConstraintData.h"; sourceTree = "<group>"; };
+		431FF7EF1C735D7A00D52DF2 /* WeightedMeshAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WeightedMeshAttachment.h; path = "../../spine-c/include/spine/WeightedMeshAttachment.h"; sourceTree = "<group>"; };
+		431FF7F01C735D8D00D52DF2 /* TransformConstraint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = TransformConstraint.c; path = "../../spine-c/src/spine/TransformConstraint.c"; sourceTree = "<group>"; };
+		431FF7F11C735D8D00D52DF2 /* TransformConstraintData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = TransformConstraintData.c; path = "../../spine-c/src/spine/TransformConstraintData.c"; sourceTree = "<group>"; };
+		431FF7F21C735D8D00D52DF2 /* WeightedMeshAttachment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = WeightedMeshAttachment.c; path = "../../spine-c/src/spine/WeightedMeshAttachment.c"; sourceTree = "<group>"; };
 		43B7CC0719DC4ACD0031321C /* IkConstraint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = IkConstraint.c; path = "../../spine-c/src/spine/IkConstraint.c"; sourceTree = "<group>"; };
 		43B7CC0819DC4ACD0031321C /* IkConstraintData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = IkConstraintData.c; path = "../../spine-c/src/spine/IkConstraintData.c"; sourceTree = "<group>"; };
 		43B7CC0D19DC4AE30031321C /* IkConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IkConstraint.h; path = "../../spine-c/include/spine/IkConstraint.h"; sourceTree = "<group>"; };
@@ -132,7 +140,6 @@
 		43F7FF4B1927F91900CA4038 /* SkeletonData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = SkeletonData.c; path = "../../spine-c/src/spine/SkeletonData.c"; sourceTree = "<group>"; };
 		43F7FF4C1927F91900CA4038 /* SkeletonJson.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = SkeletonJson.c; path = "../../spine-c/src/spine/SkeletonJson.c"; sourceTree = "<group>"; };
 		43F7FF4D1927F91900CA4038 /* Skin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Skin.c; path = "../../spine-c/src/spine/Skin.c"; sourceTree = "<group>"; };
-		43F7FF4E1927F91900CA4038 /* SkinnedMeshAttachment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = SkinnedMeshAttachment.c; path = "../../spine-c/src/spine/SkinnedMeshAttachment.c"; sourceTree = "<group>"; };
 		43F7FF4F1927F91900CA4038 /* Slot.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Slot.c; path = "../../spine-c/src/spine/Slot.c"; sourceTree = "<group>"; };
 		43F7FF501927F91900CA4038 /* SlotData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = SlotData.c; path = "../../spine-c/src/spine/SlotData.c"; sourceTree = "<group>"; };
 		43F7FF691927F92500CA4038 /* Animation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Animation.h; path = "../../spine-c/include/spine/Animation.h"; sourceTree = "<group>"; };
@@ -155,7 +162,6 @@
 		43F7FF7A1927F92500CA4038 /* SkeletonData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonData.h; path = "../../spine-c/include/spine/SkeletonData.h"; sourceTree = "<group>"; };
 		43F7FF7B1927F92500CA4038 /* SkeletonJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonJson.h; path = "../../spine-c/include/spine/SkeletonJson.h"; sourceTree = "<group>"; };
 		43F7FF7C1927F92500CA4038 /* Skin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Skin.h; path = "../../spine-c/include/spine/Skin.h"; sourceTree = "<group>"; };
-		43F7FF7D1927F92500CA4038 /* SkinnedMeshAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkinnedMeshAttachment.h; path = "../../spine-c/include/spine/SkinnedMeshAttachment.h"; sourceTree = "<group>"; };
 		43F7FF7E1927F92500CA4038 /* Slot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Slot.h; path = "../../spine-c/include/spine/Slot.h"; sourceTree = "<group>"; };
 		43F7FF7F1927F92500CA4038 /* SlotData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SlotData.h; path = "../../spine-c/include/spine/SlotData.h"; sourceTree = "<group>"; };
 		43F7FF801927F92500CA4038 /* spine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = spine.h; path = "../../spine-c/include/spine/spine.h"; sourceTree = "<group>"; };
@@ -271,13 +277,17 @@
 				43F7FF7B1927F92500CA4038 /* SkeletonJson.h */,
 				43F7FF4D1927F91900CA4038 /* Skin.c */,
 				43F7FF7C1927F92500CA4038 /* Skin.h */,
-				43F7FF4E1927F91900CA4038 /* SkinnedMeshAttachment.c */,
-				43F7FF7D1927F92500CA4038 /* SkinnedMeshAttachment.h */,
 				43F7FF4F1927F91900CA4038 /* Slot.c */,
 				43F7FF7E1927F92500CA4038 /* Slot.h */,
 				43F7FF501927F91900CA4038 /* SlotData.c */,
 				43F7FF7F1927F92500CA4038 /* SlotData.h */,
 				43F7FF801927F92500CA4038 /* spine.h */,
+				431FF7F01C735D8D00D52DF2 /* TransformConstraint.c */,
+				431FF7ED1C735D7A00D52DF2 /* TransformConstraint.h */,
+				431FF7F11C735D8D00D52DF2 /* TransformConstraintData.c */,
+				431FF7EE1C735D7A00D52DF2 /* TransformConstraintData.h */,
+				431FF7F21C735D8D00D52DF2 /* WeightedMeshAttachment.c */,
+				431FF7EF1C735D7A00D52DF2 /* WeightedMeshAttachment.h */,
 			);
 			name = "spine-c";
 			sourceTree = "<group>";
@@ -496,19 +506,21 @@
 				43F7FF5E1927F91900CA4038 /* Json.c in Sources */,
 				43F7FF5F1927F91900CA4038 /* MeshAttachment.c in Sources */,
 				43F7FF601927F91900CA4038 /* RegionAttachment.c in Sources */,
+				431FF7F51C735D8D00D52DF2 /* WeightedMeshAttachment.c in Sources */,
 				43F7FF611927F91900CA4038 /* Skeleton.c in Sources */,
 				43F7FF621927F91900CA4038 /* SkeletonBounds.c in Sources */,
 				43F7FF631927F91900CA4038 /* SkeletonData.c in Sources */,
 				43F7FF641927F91900CA4038 /* SkeletonJson.c in Sources */,
 				43F7FF651927F91900CA4038 /* Skin.c in Sources */,
 				43B7CC0919DC4ACD0031321C /* IkConstraint.c in Sources */,
-				43F7FF661927F91900CA4038 /* SkinnedMeshAttachment.c in Sources */,
 				43F7FF671927F91900CA4038 /* Slot.c in Sources */,
 				43F7FF681927F91900CA4038 /* SlotData.c in Sources */,
 				43F7FF881927F94800CA4038 /* SkeletonAnimation.m in Sources */,
 				43F7FF891927F94800CA4038 /* SkeletonRenderer.m in Sources */,
 				43F7FF8E1927F96700CA4038 /* GoblinsExample.m in Sources */,
+				431FF7F41C735D8D00D52DF2 /* TransformConstraintData.c in Sources */,
 				43F7FF8F1927F96700CA4038 /* SpineboyExample.m in Sources */,
+				431FF7F31C735D8D00D52DF2 /* TransformConstraint.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

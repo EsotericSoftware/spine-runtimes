@@ -70,7 +70,7 @@ public class SkeletonJson {
 		if (object is String)
 			root = JSON.parse(String(object));
 		else if (object is ByteArray)
-			root = JSON.parse(object.readUTFBytes(object.length));
+			root = JSON.parse(ByteArray(object).readUTFBytes(ByteArray(object).length));
 		else if (object is Object)
 			root = object;
 		else
@@ -98,9 +98,9 @@ public class SkeletonJson {
 				if (!parent) throw new Error("Parent bone not found: " + parentName);
 			}
 			boneData = new BoneData(boneMap["name"], parent);
-			boneData.length = (boneMap["length"] || 0) * scale;
-			boneData.x = (boneMap["x"] || 0) * scale;
-			boneData.y = (boneMap["y"] || 0) * scale;
+			boneData.length = Number(boneMap["length"] || 0) * scale;
+			boneData.x = Number(boneMap["x"] || 0) * scale;
+			boneData.y = Number(boneMap["y"] || 0) * scale;
 			boneData.rotation = (boneMap["rotation"] || 0);
 			boneData.scaleX = boneMap.hasOwnProperty("scaleX") ? boneMap["scaleX"] : 1;
 			boneData.scaleY = boneMap.hasOwnProperty("scaleY") ? boneMap["scaleY"] : 1;
@@ -204,13 +204,13 @@ public class SkeletonJson {
 			var region:RegionAttachment = attachmentLoader.newRegionAttachment(skin, name, path);
 			if (!region) return null;
 			region.path = path;
-			region.x = (map["x"] || 0) * scale;
-			region.y = (map["y"] || 0) * scale;
+			region.x = Number(map["x"] || 0) * scale;
+			region.y = Number(map["y"] || 0) * scale;
 			region.scaleX = map.hasOwnProperty("scaleX") ? map["scaleX"] : 1;
 			region.scaleY = map.hasOwnProperty("scaleY") ? map["scaleY"] : 1;
 			region.rotation = map["rotation"] || 0;
-			region.width = (map["width"] || 0) * scale;
-			region.height = (map["height"] || 0) * scale;
+			region.width = Number(map["width"] || 0) * scale;
+			region.height = Number(map["height"] || 0) * scale;
 			
 			color = map["color"];
 			if (color) {
@@ -240,15 +240,15 @@ public class SkeletonJson {
 				mesh.a = toColor(color, 3);
 			}
 
-			mesh.hullLength = (map["hull"] || 0) * 2;
+			mesh.hullLength = int(map["hull"] || 0) * 2;
 			if (map["edges"]) mesh.edges = getIntArray(map, "edges");
-			mesh.width = (map["width"] || 0) * scale;
-			mesh.height = (map["height"] || 0) * scale;
+			mesh.width = Number(map["width"] || 0) * scale;
+			mesh.height = Number(map["height"] || 0) * scale;
 			return mesh;
 		case AttachmentType.skinnedmesh:
-			var skinnedMesh:SkinnedMeshAttachment = attachmentLoader.newSkinnedMeshAttachment(skin, name, path);
-			if (!skinnedMesh) return null;
-			skinnedMesh.path = path;
+			var weightedMesh:SkinnedMeshAttachment = attachmentLoader.newSkinnedMeshAttachment(skin, name, path);
+			if (!weightedMesh) return null;
+			weightedMesh.path = path;
 
 			var uvs:Vector.<Number> = getFloatArray(map, "uvs", 1);
 			vertices = getFloatArray(map, "vertices", 1);
@@ -265,25 +265,25 @@ public class SkeletonJson {
 					i += 4;
 				}
 			}
-			skinnedMesh.bones = bones;
-			skinnedMesh.weights = weights;
-			skinnedMesh.triangles = getUintArray(map, "triangles");
-			skinnedMesh.regionUVs = uvs;
-			skinnedMesh.updateUVs();
+			weightedMesh.bones = bones;
+			weightedMesh.weights = weights;
+			weightedMesh.triangles = getUintArray(map, "triangles");
+			weightedMesh.regionUVs = uvs;
+			weightedMesh.updateUVs();
 			
 			color = map["color"];
 			if (color) {
-				skinnedMesh.r = toColor(color, 0);
-				skinnedMesh.g = toColor(color, 1);
-				skinnedMesh.b = toColor(color, 2);
-				skinnedMesh.a = toColor(color, 3);
+				weightedMesh.r = toColor(color, 0);
+				weightedMesh.g = toColor(color, 1);
+				weightedMesh.b = toColor(color, 2);
+				weightedMesh.a = toColor(color, 3);
 			}
 			
-			skinnedMesh.hullLength = (map["hull"] || 0) * 2;
-			if (map["edges"]) skinnedMesh.edges = getIntArray(map, "edges");
-			skinnedMesh.width = (map["width"] || 0) * scale;
-			skinnedMesh.height = (map["height"] || 0) * scale;
-			return skinnedMesh;
+			weightedMesh.hullLength = int(map["hull"] || 0) * 2;
+			if (map["edges"]) weightedMesh.edges = getIntArray(map, "edges");
+			weightedMesh.width = Number(map["width"] || 0) * scale;
+			weightedMesh.height = Number(map["height"] || 0) * scale;
+			return weightedMesh;
 		case AttachmentType.boundingbox:
 			var box:BoundingBoxAttachment = attachmentLoader.newBoundingBoxAttachment(skin, name);
 			vertices = box.vertices;
@@ -378,8 +378,8 @@ public class SkeletonJson {
 
 					frameIndex = 0;
 					for each (valueMap in values) {
-						var x:Number = (valueMap["x"] || 0) * timelineScale;
-						var y:Number = (valueMap["y"] || 0) * timelineScale;
+						var x:Number = Number(valueMap["x"] || 0) * timelineScale;
+						var y:Number = Number(valueMap["y"] || 0) * timelineScale;
 						timeline.setFrame(frameIndex, valueMap["time"], x, y);
 						readCurve(timeline, frameIndex, valueMap);
 						frameIndex++;
@@ -482,7 +482,7 @@ public class SkeletonJson {
 			}
 		}
 
-		var drawOrderValues:Object = map["drawOrder"];
+		var drawOrderValues:Array = map["drawOrder"];
 		if (!drawOrderValues) drawOrderValues = map["draworder"];
 		if (drawOrderValues) {
 			var drawOrderTimeline:DrawOrderTimeline = new DrawOrderTimeline(drawOrderValues.length);
@@ -494,7 +494,7 @@ public class SkeletonJson {
 					drawOrder = new Vector.<int>(slotCount);
 					for (i = slotCount - 1; i >= 0; i--)
 						drawOrder[i] = -1;
-					var offsets:Object = drawOrderMap["offsets"];
+					var offsets:Array = drawOrderMap["offsets"];
 					var unchanged:Vector.<int> = new Vector.<int>(slotCount - offsets.length);
 					var originalIndex:int = 0, unchangedIndex:int = 0;
 					for each (var offsetMap:Object in offsets) {
@@ -519,7 +519,7 @@ public class SkeletonJson {
 			duration = Math.max(duration, drawOrderTimeline.frames[drawOrderTimeline.frameCount - 1]);
 		}
 
-		var eventsMap:Object = map["events"];
+		var eventsMap:Array = map["events"];
 		if (eventsMap) {
 			var eventTimeline:EventTimeline = new EventTimeline(eventsMap.length);
 			frameIndex = 0;

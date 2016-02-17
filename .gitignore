@@ -87,9 +87,8 @@ spine-love/spine-lua/
 spine-love/love/
 !spine-love/spine-lua/Place spine-lua here.txt
 
-spine-as3/spine-as3/bin
-spine-as3/spine-as3-example/bin-debug
-spine-as3/spine-as3-example/bin-release
+spine-as3/spine-as3-example/bin
+spine-as3/spine-as3-example/lib/.spine-as3.swc.stamp
 
 spine-starling/spine-starling/bin
 spine-starling/spine-starling-example/bin-debug

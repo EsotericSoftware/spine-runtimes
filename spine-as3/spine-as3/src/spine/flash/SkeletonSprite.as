@@ -33,12 +33,9 @@ package spine.flash {
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.BlendMode;
-import flash.display.DisplayObject;
-import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.geom.ColorTransform;
-import flash.geom.Matrix;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 import flash.utils.getTimer;
@@ -51,8 +48,6 @@ import spine.atlas.AtlasRegion;
 import spine.attachments.RegionAttachment;
 
 public class SkeletonSprite extends Sprite {
-	static private var tempPoint:Point = new Point();
-	static private var tempMatrix:Matrix = new Matrix();
 	static private var blendModes:Vector.<String> = new <String>[
 		BlendMode.NORMAL, BlendMode.ADD, BlendMode.MULTIPLY, BlendMode.SCREEN];
 

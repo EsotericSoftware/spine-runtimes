@@ -115,7 +115,7 @@ protected:
 	void setSkeletonData (spSkeletonData* skeletonData, bool ownsSkeletonData);
 	virtual cocos2d::Texture2D* getTexture (spRegionAttachment* attachment) const;
 	virtual cocos2d::Texture2D* getTexture (spMeshAttachment* attachment) const;
-	virtual cocos2d::Texture2D* getTexture (spSkinnedMeshAttachment* attachment) const;
+	virtual cocos2d::Texture2D* getTexture (spWeightedMeshAttachment* attachment) const;
 
 	bool _ownsSkeletonData;
 	spAtlas* _atlas;

@@ -32,6 +32,7 @@
 #include <spine/IkConstraint.h>
 #include <spine/Skeleton.h>
 #include <spine/extension.h>
+#include <float.h>
 
 spIkConstraint* spIkConstraint_create (spIkConstraintData* data, const spSkeleton* skeleton) {
 	int i;
@@ -78,9 +79,11 @@ void spIkConstraint_apply1 (spBone* bone, float targetX, float targetY, float al
 }
 
 void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float targetY, int bendDir, float alpha) {
-	if (alpha == 0) return;
 	float px = parent->x, py = parent->y, psx = parent->scaleX, psy = parent->scaleY, csx = child->scaleX, cy = child->y;
 	int offset1, offset2, sign2;
+	spBone* pp = parent->parent;
+	float tx, ty, dx, dy, l1, l2, a1, a2, psd, r;
+	if (alpha == 0) return;
 	if (psx < 0) {
 		psx = -psx;
 		offset1 = 180;
@@ -98,8 +101,6 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float 
 		offset2 = 180;
 	} else
 		offset2 = 0;
-	spBone* pp = parent->parent;
-	float tx, ty, dx, dy;
 	if (!pp) {
 		tx = targetX - px;
 		ty = targetY - py;
@@ -115,27 +116,37 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float 
 		dx = (x * d - y * b) * invDet - px;
 		dy = (y * a - x * c) * invDet - py;
 	}
-	float l1 = SQRT(dx * dx + dy * dy), l2 = child->data->length * csx, a1, a2;
-	if (ABS(psx - psy) <= 0.0001f) {
+	l1 = SQRT(dx * dx + dy * dy);
+	l2 = child->data->length * csx;
+	psd = psx - psy;
+	if (psd < 0 ? -psd : psd <= 0.0001f) {
+		float cos, a, o;
 		l2 *= psx;
-		float cos = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
+		cos = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
 		if (cos < -1) cos = -1;
 		else if (cos > 1) cos = 1;
 		a2 = ACOS(cos) * bendDir;
-		float a = l1 + l2 * cos, o = l2 * SIN(a2);
+		a = l1 + l2 * cos;
+		o = l2 * SIN(a2);
 		a1 = ATAN2(ty * a - tx * o, tx * a + ty * o);
 	} else {
-		cy = 0;
 		float a = psx * l2, b = psy * l2, ta = ATAN2(ty, tx);
 		float aa = a * a, bb = b * b, ll = l1 * l1, dd = tx * tx + ty * ty;
 		float c0 = bb * ll + aa * dd - aa * bb, c1 = -2 * bb * l1, c2 = bb - aa;
 		float d = c1 * c1 - 4 * c2 * c0;
+		float minAngle = 0, minDist = FLT_MAX, minX = 0, minY = 0;
+		float maxAngle = 0, maxDist = 0, maxX = 0, maxY = 0;
+		float x = l1 + a, dist = x * x, angle, y;
+		cy = 0;
 		if (d >= 0) {
-			float q = SQRT(d);
+			float q = SQRT(d), r0, r1, ar0, ar1;;
 			if (c1 < 0) q = -q;
 			q = -(c1 + q) / 2;
-			float r0 = q / c2, r1 = c0 / q;
-			float r = ABS(r0) < ABS(r1) ? r0 : r1;
+			r0 = q / c2;
+			r1 = c0 / q;
+			ar0 = r0 < 0 ? -r0 : r0;
+			ar1 = r1 < 0 ? -r1 : r1;
+			r = ar0 < ar1 ? r0 : r1;
 			if (r * r <= dd) {
 				float y1 = SQRT(dd - r * r) * bendDir;
 				a1 = ta - ATAN2(y1, r);
@@ -143,9 +154,6 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float 
 				goto outer;
 			}
 		}
-		float minAngle = 0, minDist = 999999999, minX = 0, minY = 0;
-		float maxAngle = 0, maxDist = 0, maxX = 0, maxY = 0;
-		float x = l1 + a, dist = x * x;
 		if (dist > maxDist) {
 			maxAngle = 0;
 			maxDist = dist;
@@ -158,9 +166,9 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float 
 			minDist = dist;
 			minX = x;
 		}
-		float angle = ACOS(-a * l1 / (aa - bb));
+		angle = ACOS(-a * l1 / (aa - bb));
 		x = a * COS(angle) + l1;
-		float y = b * SIN(angle);
+		y = b * SIN(angle);
 		dist = x * x + y * y;
 		if (dist < minDist) {
 			minAngle = angle;
@@ -182,16 +190,17 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float 
 			a2 = maxAngle * bendDir;
 		}
 	}
-outer: {}
-	float offset = ATAN2(cy, child->x) * sign2;
-	a1 = (a1 - offset) * RAD_DEG + offset1;
-	a2 = (a2 + offset) * RAD_DEG * sign2 + offset2;
-	if (a1 > 180) a1 -= 360;
-	else if (a1 < -180) a1 += 360;
-	if (a2 > 180) a2 -= 360;
-	else if (a2 < -180) a2 += 360;
-	float rotation = parent->rotation;
-	spBone_updateWorldTransformWith(parent, parent->x, parent->y, rotation + (a1 - rotation) * alpha, parent->scaleX, parent->scaleY);
-	rotation = child->rotation;
-	spBone_updateWorldTransformWith(child, child->x, cy, rotation + (a2 - rotation) * alpha, child->scaleX, child->scaleY);
+	outer: {
+		float offset = ATAN2(cy, child->x) * sign2;
+		a1 = (a1 - offset) * RAD_DEG + offset1;
+		a2 = (a2 + offset) * RAD_DEG * sign2 + offset2;
+		if (a1 > 180) a1 -= 360;
+		else if (a1 < -180) a1 += 360;
+		if (a2 > 180) a2 -= 360;
+		else if (a2 < -180) a2 += 360;
+		r = parent->rotation;
+		spBone_updateWorldTransformWith(parent, parent->x, parent->y, r + (a1 - r) * alpha, parent->scaleX, parent->scaleY);
+		r = child->rotation;
+		spBone_updateWorldTransformWith(child, child->x, cy, r + (a2 - r) * alpha, child->scaleX, child->scaleY);
+	}
 }

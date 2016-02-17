@@ -184,10 +184,10 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 			a = attachment->a;
 			break;
 		}
-		case SP_ATTACHMENT_SKINNED_MESH: {
-			spSkinnedMeshAttachment* attachment = (spSkinnedMeshAttachment*)slot->attachment;
-			spSkinnedMeshAttachment_computeWorldVertices(attachment, slot, _worldVertices);
-			texture = [self getTextureForSkinnedMesh:attachment];
+		case SP_ATTACHMENT_WEIGHTED_MESH: {
+			spWeightedMeshAttachment* attachment = (spWeightedMeshAttachment*)slot->attachment;
+			spWeightedMeshAttachment_computeWorldVertices(attachment, slot, _worldVertices);
+			texture = [self getTextureForWeightedMesh:attachment];
 			uvs = attachment->uvs;
 			verticesCount = attachment->uvsCount;
 			triangles = attachment->triangles;
@@ -267,8 +267,8 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 		// Bone lengths.
 		for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
 			spBone *bone = _skeleton->bones[i];
-			float x = bone->data->length * bone->m00 + bone->worldX;
-			float y = bone->data->length * bone->m10 + bone->worldY;
+			float x = bone->data->length * bone->a + bone->worldX;
+			float y = bone->data->length * bone->c + bone->worldY;
 			[_drawNode drawSegmentFrom:ccp(bone->worldX, bone->worldY) to: ccp(x, y)radius:2 color:[CCColor redColor]];
 		}
 		
@@ -289,7 +289,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	return (CCTexture*)((spAtlasRegion*)attachment->rendererObject)->page->rendererObject;
 }
 
-- (CCTexture*) getTextureForSkinnedMesh:(spSkinnedMeshAttachment*)attachment {
+- (CCTexture*) getTextureForWeightedMesh:(spWeightedMeshAttachment*)attachment {
 	return (CCTexture*)((spAtlasRegion*)attachment->rendererObject)->page->rendererObject;
 }
 
@@ -308,9 +308,9 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 			spMeshAttachment* mesh = (spMeshAttachment*)slot->attachment;
 			spMeshAttachment_computeWorldVertices(mesh, slot, _worldVertices);
 			verticesCount = mesh->verticesCount;
-		} else if (slot->attachment->type == SP_ATTACHMENT_SKINNED_MESH) {
-			spSkinnedMeshAttachment* mesh = (spSkinnedMeshAttachment*)slot->attachment;
-			spSkinnedMeshAttachment_computeWorldVertices(mesh, slot, _worldVertices);
+		} else if (slot->attachment->type == SP_ATTACHMENT_WEIGHTED_MESH) {
+			spWeightedMeshAttachment* mesh = (spWeightedMeshAttachment*)slot->attachment;
+			spWeightedMeshAttachment_computeWorldVertices(mesh, slot, _worldVertices);
 			verticesCount = mesh->uvsCount;
 		} else
 			continue;

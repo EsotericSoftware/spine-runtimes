@@ -64,7 +64,7 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 	float cosine = COS(radians);
 	float sine = SIN(radians);
 	float la = cosine * scaleX, lb = -sine * scaleY, lc = sine * scaleX, ld = cosine * scaleY;
-	float pa, pb, pc, pd;
+	float pa, pb, pc, pd, temp;
 	spBone* parent = self->parent;
 
 	CONST_CAST(float, self->appliedRotation) = rotation;
@@ -88,8 +88,8 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 		CONST_CAST(float, self->d) = ld;
 		CONST_CAST(float, self->worldX) = x;
 		CONST_CAST(float, self->worldY) = y;
-		CONST_CAST(float, self->worldSignX) = scaleX > 0 ? 1 : -1;
-		CONST_CAST(float, self->worldSignY) = scaleY > 0 ? 1 : -1;
+		CONST_CAST(float, self->worldSignX) = scaleX > 0 ? 1.0f : -1.0f;
+		CONST_CAST(float, self->worldSignY) = scaleY > 0 ? 1.0f : -1.0f;
 		return;
 	}
 
@@ -117,14 +117,12 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 		while (p) {
 			cosine = COS(p->appliedRotation * DEG_RAD);
 			sine = SIN(p->appliedRotation * DEG_RAD);
-			float a = pa * cosine + pb * sine;
-			float b = pa * -sine + pb * cosine;
-			float c = pc * cosine + pd * sine;
-			float d = pc * -sine + pd * cosine;
-			pa = a;
-			pb = b;
-			pc = c;
-			pd = d;
+			temp = pa * cosine + pb * sine;
+			pb = pa * -sine + pb * cosine;
+			pa = temp;
+			temp = pc * cosine + pd * sine;
+			pd = pc * -sine + pd * cosine;
+			pc = temp;
 			p = p->parent;
 		}
 		CONST_CAST(float, self->a) = pa * la + pb * lc;
@@ -146,12 +144,16 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 		pc = 0;
 		pd = 1;
 		while (p) {
+			float za, zb, zc, zd;
 			float r = p->rotation;
+			float psx = p->appliedScaleX, psy = p->appliedScaleY;
 			cosine = COS(r * DEG_RAD);
 			sine = SIN(r * DEG_RAD);
-			float psx = p->appliedScaleX, psy = p->appliedScaleY;
-			float za = cosine * psx, zb = -sine * psy, zc = sine * psx, zd = cosine * psy;
-			float temp = pa * za + pb * zc;
+			za = cosine * psx;
+			zb = -sine * psy;
+			zc = sine * psx;
+			zd = cosine * psy;
+			temp = pa * za + pb * zc;
 			pb = pa * zb + pb * zd;
 			pa = temp;
 			temp = pc * za + pd * zc;

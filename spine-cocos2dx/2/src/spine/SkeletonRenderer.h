@@ -97,7 +97,7 @@ protected:
 
 	virtual cocos2d::CCTexture2D* getTexture (spRegionAttachment* attachment) const;
 	virtual cocos2d::CCTexture2D* getTexture (spMeshAttachment* attachment) const;
-	virtual cocos2d::CCTexture2D* getTexture (spSkinnedMeshAttachment* attachment) const;
+	virtual cocos2d::CCTexture2D* getTexture (spWeightedMeshAttachment* attachment) const;
 
 private:
 	bool ownsSkeletonData;

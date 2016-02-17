@@ -135,14 +135,12 @@ public class Bone implements Updatable {
 			while (p != null) {
 				cos = MathUtils.cosDeg(p.appliedRotation);
 				sin = MathUtils.sinDeg(p.appliedRotation);
-				float a = pa * cos + pb * sin;
-				float b = pa * -sin + pb * cos;
-				float c = pc * cos + pd * sin;
-				float d = pc * -sin + pd * cos;
-				pa = a;
-				pb = b;
-				pc = c;
-				pd = d;
+				float temp = pa * cos + pb * sin;
+				pb = pa * -sin + pb * cos;
+				pa = temp;
+				temp = pc * cos + pd * sin;
+				pd = pc * -sin + pd * cos;
+				pc = temp;
 				p = p.parent;
 			}
 			a = pa * la + pb * lc;
