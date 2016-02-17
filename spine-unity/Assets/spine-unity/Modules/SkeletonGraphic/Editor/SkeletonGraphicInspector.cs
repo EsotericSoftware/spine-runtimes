@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿#if (UNITY_5_0 || UNITY_5_1 || UNITY_4)
+#define PREUNITY_5_2
+#endif
+
+using UnityEngine;
 using System.Collections;
 
 using UnityEditor;
@@ -9,6 +13,7 @@ public class SkeletonGraphicInspector : Editor {
 	SerializedProperty material_, color_;
 	SerializedProperty skeletonDataAsset_, initialSkinName_;
 	SerializedProperty startingAnimation_, startingLoop_, timeScale_, freeze_;
+	#if !PREUNITY_5_2
 	SerializedProperty raycastTarget_;
 
 	SkeletonGraphic thisSkeletonGraphic;
@@ -201,4 +206,5 @@ public class SkeletonGraphicInspector : Editor {
 		return go;
 	}
 	#endregion
+	#endif
 }

@@ -29,6 +29,10 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if (UNITY_5_0 || UNITY_5_1 || UNITY_4)
+#define PREUNITY_5_2
+#endif
+
 using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
@@ -54,8 +58,7 @@ public class SkeletonGraphic : MaskableGraphic {
 	protected override void OnValidate () {
 		// This handles Scene View preview.
 		base.OnValidate ();
-		this.raycastTarget = false;
-
+		#if !PREUNITY_5_2
 		if (this.IsValid) {
 			if (skeletonDataAsset == null) {
 				Clear();
@@ -78,6 +81,9 @@ public class SkeletonGraphic : MaskableGraphic {
 			if (skeletonDataAsset != null)
 				Initialize(true);
 		}
+		#else
+		Debug.LogWarning("SkeletonGraphic requres Unity 5.2 or higher.\nUnityEngine.UI 5.1 and below does not accept meshes and can't be used to render Spine skeletons. You may delete the SkeletonGraphic folder under `Modules` if you want to exclude it from your project." );
+		#endif
 			
 	}
 
@@ -90,6 +96,7 @@ public class SkeletonGraphic : MaskableGraphic {
 	#endif
 	#endregion
 
+	#if !PREUNITY_5_2
 	#region Internals
 	// This is used by the UI system to determine what to put in the MaterialPropertyBlock.
 	public override Texture mainTexture {
@@ -200,10 +207,11 @@ public class SkeletonGraphic : MaskableGraphic {
 			skeleton.SetColor(this.color);
 			if (canvas != null)
 				spineMeshGenerator.Scale = canvas.referencePixelsPerUnit; // TODO: move this to a listener to of the canvas?
-			
+
 			canvasRenderer.SetMesh(spineMeshGenerator.GenerateMesh(skeleton));
 			this.UpdateMaterial();
 		}
 	}
 	#endregion
+	#endif
 }
