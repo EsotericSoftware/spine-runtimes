@@ -544,7 +544,7 @@ namespace Spine {
 					e.Int = ReadInt(input, false);
 					e.Float = ReadFloat(input);
 					e.String = ReadBoolean(input) ? ReadString(input) : eventData.String;
-					timeline.SetFrame(i, time, e);
+					timeline.SetFrame(i, e);
 				}
 				timelines.Add(timeline);
 				duration = Math.Max(duration, timeline.frames[eventCount - 1]);
