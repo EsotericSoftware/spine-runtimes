@@ -86,7 +86,7 @@ public class Bone implements Updatable {
 		var la:Number = cos * scaleX, lb:Number = -sin * scaleY, lc:Number = sin * scaleX, ld:Number = cos * scaleY;
 		var parent:Bone = _parent;
 		if (!parent) { // Root bone.
-			var skeleton:Skeleton = this.skeleton;
+			var skeleton:Skeleton = _skeleton;
 			if (skeleton.flipX) {
 				x = -x;
 				la = -la;
@@ -140,11 +140,11 @@ public class Bone implements Updatable {
 			_b = pa * lb + pb * ld;
 			_c = pc * la + pd * lc;
 			_d = pc * lb + pd * ld;
-			if (skeleton.flipX) {
+			if (_skeleton.flipX) {
 				_a = -_a;
 				_b = -_b;
 			}
-			if (skeleton.flipY != yDown) {
+			if (_skeleton.flipY != yDown) {
 				_c = -_c;
 				_d = -_d;
 			}
@@ -182,11 +182,11 @@ public class Bone implements Updatable {
 			_b = pa * lb + pb * ld;
 			_c = pc * la + pd * lc;
 			_d = pc * lb + pd * ld;
-			if (skeleton.flipX) {
+			if (_skeleton.flipX) {
 				_a = -_a;
 				_b = -_b;
 			}
-			if (skeleton.flipY != yDown) {
+			if (_skeleton.flipY != yDown) {
 				_c = -_c;
 				_d = -_d;
 			}

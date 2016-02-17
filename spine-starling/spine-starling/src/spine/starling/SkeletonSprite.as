@@ -30,12 +30,6 @@
  *****************************************************************************/
 
 package spine.starling {
-import flash.display3D.Context3D;
-import flash.display3D.textures.Texture;
-import flash.geom.Matrix;
-import flash.geom.Point;
-import flash.geom.Rectangle;
-
 import spine.Bone;
 import spine.Skeleton;
 import spine.SkeletonData;
@@ -47,12 +41,15 @@ import spine.attachments.RegionAttachment;
 import spine.attachments.SkinnedMeshAttachment;
 
 import starling.core.RenderSupport;
-import starling.core.Starling;
 import starling.display.BlendMode;
 import starling.display.DisplayObject;
 import starling.utils.Color;
 import starling.utils.MatrixUtil;
 import starling.utils.VertexData;
+
+import flash.geom.Matrix;
+import flash.geom.Point;
+import flash.geom.Rectangle;
 
 public class SkeletonSprite extends DisplayObject {
 	static private var _tempPoint:Point = new Point();
@@ -84,24 +81,24 @@ public class SkeletonSprite extends DisplayObject {
 		if (_polygonBatch)
 			renderMeshes(support, alpha);
 		else
-			renderRegions(support, alpha, originalBlendMode);
+			renderRegions(support, alpha);
 		support.blendMode = originalBlendMode;
 	}
 
 	private function renderMeshes (support:RenderSupport, alpha:Number) : void {
 		if (!batchable) {
 			_polygonBatch.begin(support, alpha, blendMode);
-			addToBatch(_polygonBatch, support, alpha, null);
+			addToBatch(_polygonBatch, alpha, null);
 			_polygonBatch.end();
 		} else if (!_batched) {
 			support.popMatrix();
 			_polygonBatch.begin(support, alpha, blendMode);
-			addToBatch(_polygonBatch, support, alpha, transformationMatrix);
+			addToBatch(_polygonBatch, alpha, transformationMatrix);
 			for(var i:int = parent.getChildIndex(this) + 1, n:int = parent.numChildren; i < n; ++i) {
 				var skeletonSprite:SkeletonSprite = parent.getChildAt(i) as SkeletonSprite;
 				if (!skeletonSprite || !skeletonSprite.batchable || skeletonSprite.blendMode != blendMode) break;
 				skeletonSprite._batched = true;
-				skeletonSprite.addToBatch(_polygonBatch, support, alpha, skeletonSprite.transformationMatrix);
+				skeletonSprite.addToBatch(_polygonBatch, alpha, skeletonSprite.transformationMatrix);
 			}
 			_polygonBatch.end();
 			support.pushMatrix();
@@ -110,7 +107,7 @@ public class SkeletonSprite extends DisplayObject {
 			_batched = false;
 	}
 
-	private function addToBatch (polygonBatch:PolygonBatch, support:RenderSupport, skeletonA:Number, matrix:Matrix) : void {
+	private function addToBatch (polygonBatch:PolygonBatch, skeletonA:Number, matrix:Matrix) : void {
 		var skeletonR:Number = skeleton.r;
 		var skeletonG:Number = skeleton.g;
 		var skeletonB:Number = skeleton.b;
@@ -173,7 +170,7 @@ public class SkeletonSprite extends DisplayObject {
 		}
 	}
 
-	private function renderRegions (support:RenderSupport, alpha:Number, blendMode:String) : void {
+	private function renderRegions (support:RenderSupport, alpha:Number) : void {
 		var r:Number = skeleton.r * 255;
 		var g:Number = skeleton.g * 255;
 		var b:Number = skeleton.b * 255;

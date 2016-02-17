@@ -90,8 +90,7 @@ spine-love/love/
 spine-as3/spine-as3-example/bin
 spine-as3/spine-as3-example/lib/.spine-as3.swc.stamp
 
-spine-starling/spine-starling/bin
-spine-starling/spine-starling-example/bin-debug
-spine-starling/spine-starling-example/bin-release
+spine-starling/spine-starling-example/bin
+spine-starling/spine-starling-example/lib/.spine-starling.swc.stamp
 
 spine-turbulenz/spine-js/spine.js

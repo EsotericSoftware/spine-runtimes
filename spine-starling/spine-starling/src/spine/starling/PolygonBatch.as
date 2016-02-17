@@ -30,6 +30,15 @@
  *****************************************************************************/
 
 package spine.starling {
+import spine.BlendMode;
+
+import starling.core.RenderSupport;
+import starling.core.Starling;
+import starling.textures.Texture;
+import starling.textures.TextureSmoothing;
+import starling.utils.MatrixUtil;
+import starling.utils.VertexData;
+
 import flash.display3D.Context3D;
 import flash.display3D.Context3DProgramType;
 import flash.display3D.Context3DTextureFormat;
@@ -41,17 +50,6 @@ import flash.events.Event;
 import flash.geom.Matrix;
 import flash.geom.Point;
 import flash.utils.Dictionary;
-
-import spine.BlendMode;
-import spine.flash.SkeletonSprite;
-
-import starling.core.RenderSupport;
-import starling.core.Starling;
-import starling.display.BlendMode;
-import starling.textures.Texture;
-import starling.textures.TextureSmoothing;
-import starling.utils.MatrixUtil;
-import starling.utils.VertexData;
 
 internal class PolygonBatch {
 	static private var _tempPoint:Point = new Point();

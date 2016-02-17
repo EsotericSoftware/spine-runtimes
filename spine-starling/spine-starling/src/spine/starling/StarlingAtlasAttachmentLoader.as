@@ -30,9 +30,6 @@
  *****************************************************************************/
 
 package spine.starling {
-import flash.geom.Matrix;
-import flash.geom.Rectangle;
-
 import spine.Bone;
 import spine.Skin;
 import spine.attachments.AttachmentLoader;
@@ -44,6 +41,8 @@ import spine.attachments.SkinnedMeshAttachment;
 import starling.textures.SubTexture;
 import starling.textures.Texture;
 import starling.textures.TextureAtlas;
+
+import flash.geom.Rectangle;
 
 public class StarlingAtlasAttachmentLoader implements AttachmentLoader {
 	private var atlas:TextureAtlas;
@@ -71,16 +70,17 @@ public class StarlingAtlasAttachmentLoader implements AttachmentLoader {
 		if (subTexture) {
 			var root:Texture = subTexture.root;
 			var rectRegion:Rectangle = atlas.getRegion(path);
-			attachment.regionU = rectRegion.x / root.width;
-			attachment.regionV = rectRegion.y / root.height;
-			attachment.regionU2 = (rectRegion.x + subTexture.width) / root.width;
-			attachment.regionV2 = (rectRegion.y + subTexture.height) / root.height;
-			attachment.setUVs(attachment.regionU, attachment.regionV, attachment.regionU2, attachment.regionV2, atlas.getRotation(path));
+			attachment["regionU"] = rectRegion.x / root.width;
+			attachment["regionV"] = rectRegion.y / root.height;
+			attachment["regionU2"] = (rectRegion.x + subTexture.width) / root.width;
+			attachment["regionV2"] = (rectRegion.y + subTexture.height) / root.height;
+			attachment.setUVs(attachment["regionU"], attachment["regionV"], attachment["regionU2"], attachment["regionV2"],
+				atlas.getRotation(path));
 		} else {
-			attachment.regionU = 0;
-			attachment.regionV = 1;
-			attachment.regionU2 = 1;
-			attachment.regionV2 = 0;
+			attachment["regionU"] = 0;
+			attachment["regionV"] = 1;
+			attachment["regionU2"] = 1;
+			attachment["regionV2"] = 0;
 		}
 		return attachment;
 	}
