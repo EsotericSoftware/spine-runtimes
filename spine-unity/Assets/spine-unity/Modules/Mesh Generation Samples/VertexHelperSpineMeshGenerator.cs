@@ -29,10 +29,15 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if (UNITY_5_0 || UNITY_5_1 || UNITY_4)
+#define PREUNITY_5_2
+#endif
+
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
 
+#if !(PREUNITY_5_2)
 namespace Spine.Unity {
 	/// <summary>This is for testing and educational purposes only. This takes about 10 times longer to render than ArraySpineMeshGenerator.</summary>
 	public class VertexHelperSpineMeshGenerator : ISimpleMeshGenerator {
@@ -94,7 +99,6 @@ namespace Spine.Unity {
 			mesh.SetUVs(0, uvs);
 			mesh.SetNormals(normals);
 			mesh.SetTriangles(indices, 0);
-
 			mesh.RecalculateBounds();
 		}
 
@@ -233,3 +237,4 @@ namespace Spine.Unity {
 	}
 
 }
+#endif
