@@ -33,12 +33,14 @@ package spine {
 
 public class Event {
 	internal var _data:EventData;
-	public var intValue:int;;
+	public var time:Number;
+	public var intValue:int;
 	public var floatValue:Number;
 	public var stringValue:String;
 
-	public function Event (data:EventData) {
+	public function Event (time:Number, data:EventData) {
 		if (data == null) throw new ArgumentError("data cannot be null.");
+		this.time = time;
 		_data = data;
 	}
 

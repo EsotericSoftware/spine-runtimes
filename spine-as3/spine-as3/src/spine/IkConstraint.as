@@ -31,10 +31,7 @@
 
 package spine {
 
-public class IkConstraint {
-	static private const tempPosition:Vector.<Number> = new Vector.<Number>(2, true);
-	static private const radDeg:Number = 180 / Math.PI;
-
+public class IkConstraint implements Updatable {
 	internal var _data:IkConstraintData;
 	public var bones:Vector.<Bone>;
 	public var target:Bone;
@@ -55,6 +52,10 @@ public class IkConstraint {
 	}
 
 	public function apply () : void {
+		update();
+	}
+
+	public function update () : void {
 		switch (bones.length) {
 		case 1:
 			apply1(bones[0], target._worldX, target._worldY, mix);
@@ -76,76 +77,137 @@ public class IkConstraint {
 	/** Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified in the world
 	 * coordinate system. */
 	static public function apply1 (bone:Bone, targetX:Number, targetY:Number, alpha:Number) : void {
-		var parentRotation:Number = (!bone._data.inheritRotation || bone._parent == null) ? 0 : bone._parent._worldRotation;
+		var parentRotation:Number = bone.parent == null ? 0 : bone.parent.worldRotationX;
 		var rotation:Number = bone.rotation;
-		var rotationIK:Number = Math.atan2(targetY - bone._worldY, targetX - bone._worldX) * radDeg;
-		if (bone._worldFlipX != (bone._worldFlipY != Bone.yDown)) rotationIK = -rotationIK;
-		rotationIK -= parentRotation;
-		bone.rotationIK = rotation + (rotationIK - rotation) * alpha;
+		var rotationIK:Number = Math.atan2(targetY - bone.worldY, targetX - bone.worldX) * MathUtils.radDeg - parentRotation;
+		if (bone.worldSignX != bone.worldSignY) rotationIK = 360 - rotationIK;
+		if (rotationIK > 180) rotationIK -= 360;
+		else if (rotationIK < -180) rotationIK += 360;
+		bone.updateWorldTransformWith(bone.x, bone.y, rotation + (rotationIK - rotation) * alpha, bone.scaleX, bone.scaleY);
 	}
 
 	/** Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as possible. The
 	 * target is specified in the world coordinate system.
 	 * @param child Any descendant bone of the parent. */
-	static public function apply2 (parent:Bone, child:Bone, targetX:Number, targetY:Number, bendDirection:int, alpha:Number) : void {
-		var childRotation:Number = child.rotation, parentRotation:Number = parent.rotation;
-		if (alpha == 0) {
-			child.rotationIK = childRotation;
-			parent.rotationIK = parentRotation;
-			return;
-		}
-		var positionX:Number, positionY:Number;
-		var parentParent:Bone = parent._parent;
-		if (parentParent) {
-			tempPosition[0] = targetX;
-			tempPosition[1] = targetY;
-			parentParent.worldToLocal(tempPosition);
-			targetX = (tempPosition[0] - parent.x) * parentParent._worldScaleX;
-			targetY = (tempPosition[1] - parent.y) * parentParent._worldScaleY;
+	static public function apply2 (parent:Bone, child:Bone, targetX:Number, targetY:Number, bendDir:int, alpha:Number) : void {
+		if (alpha == 0) return;
+		var px:Number = parent.x, py:Number = parent.y, psx:Number = parent.scaleX, psy:Number = parent.scaleY;
+		var csx:Number = child.scaleX, cy:Number = child.y;
+		var offset1:int, offset2:int, sign2:int;
+		if (psx < 0) {
+			psx = -psx;
+			offset1 = 180;
+			sign2 = -1;
 		} else {
-			targetX -= parent.x;
-			targetY -= parent.y;
+			offset1 = 0;
+			sign2 = 1;
 		}
-		if (child._parent == parent) {
-			positionX = child.x;
-			positionY = child.y;
+		if (psy < 0) {
+			psy = -psy;
+			sign2 = -sign2;
+		}
+		if (csx < 0) {
+			csx = -csx;
+			offset2 = 180;
+		} else
+			offset2 = 0;
+		var pp:Bone = parent.parent;
+		var tx:Number, ty:Number, dx:Number, dy:Number;
+		if (!pp) {
+			tx = targetX - px;
+			ty = targetY - py;
+			dx = child.worldX - px;
+			dy = child.worldY - py;
 		} else {
-			tempPosition[0] = child.x;
-			tempPosition[1] = child.y;
-			child._parent.localToWorld(tempPosition);
-			parent.worldToLocal(tempPosition);
-			positionX = tempPosition[0];
-			positionY = tempPosition[1];
+			var ppa:Number = pp.a, ppb:Number = pp.b, ppc:Number = pp.c, ppd:Number = pp.d;
+			var invDet:Number = 1 / (ppa * ppd - ppb * ppc);
+			var wx:Number = pp.worldX, wy:Number = pp.worldY, twx:Number = targetX - wx, twy:Number = targetY - wy;
+			tx = (twx * ppd - twy * ppb) * invDet - px;
+			ty = (twy * ppa - twx * ppc) * invDet - py;
+			twx = child.worldX - wx;
+			twy = child.worldY - wy;
+			dx = (twx * ppd - twy * ppb) * invDet - px;
+			dy = (twy * ppa - twx * ppc) * invDet - py;
 		}
-		var childX:Number = positionX * parent._worldScaleX, childY:Number = positionY * parent._worldScaleY;
-		var offset:Number = Math.atan2(childY, childX);
-		var len1:Number = Math.sqrt(childX * childX + childY * childY), len2:Number = child.data.length * child._worldScaleX;
-		// Based on code by Ryan Juckett with permission: Copyright (c) 2008-2009 Ryan Juckett, http://www.ryanjuckett.com/
-		var cosDenom:Number = 2 * len1 * len2;
-		if (cosDenom < 0.0001) {
-			child.rotationIK = childRotation + (Math.atan2(targetY, targetX) * radDeg - parentRotation - childRotation) * alpha;
-			return;
+		var l1:Number = Math.sqrt(dx * dx + dy * dy), l2:Number = child.data.length * csx, a1:Number, a2:Number;
+		outer:
+		if (Math.abs(psx - psy) <= 0.0001) {
+			l2 *= psx;
+			var cos:Number = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
+			if (cos < -1) cos = -1;
+			else if (cos > 1) cos = 1;
+			a2 = Math.acos(cos) * bendDir;
+			var ad:Number = l1 + l2 * cos, o:Number = l2 * Math.sin(a2);
+			a1 = Math.atan2(ty * ad - tx * o, tx * ad + ty * o);
+		} else {
+			cy = 0;
+			var a:Number = psx * l2, b:Number = psy * l2, ta:Number = Math.atan2(ty, tx);
+			var aa:Number = a * a, bb:Number = b * b, ll:Number = l1 * l1, dd:Number = tx * tx + ty * ty;
+			var c0:Number = bb * ll + aa * dd - aa * bb, c1:Number = -2 * bb * l1, c2:Number = bb - aa;
+			var d:Number = c1 * c1 - 4 * c2 * c0;
+			if (d >= 0) {
+				var q:Number = Math.sqrt(d);
+				if (c1 < 0) q = -q;
+				q = -(c1 + q) / 2;
+				var r0:Number = q / c2, r1:Number = c0 / q;
+				var r:Number = Math.abs(r0) < Math.abs(r1) ? r0 : r1;
+				if (r * r <= dd) {
+					var y1:Number = Math.sqrt(dd - r * r) * bendDir;
+					a1 = ta - Math.atan2(y1, r);
+					a2 = Math.atan2(y1 / psy, (r - l1) / psx);
+					break outer;
+				}
+			}
+			var minAngle:Number = 0, minDist:Number = Number.MAX_VALUE, minX:Number = 0, minY:Number = 0;
+			var maxAngle:Number = 0, maxDist:Number = 0, maxX:Number = 0, maxY:Number = 0;
+			var x:Number = l1 + a, dist:Number = x * x;
+			if (dist > maxDist) {
+				maxAngle = 0;
+				maxDist = dist;
+				maxX = x;
+			}
+			x = l1 - a;
+			dist = x * x;
+			if (dist < minDist) {
+				minAngle = Math.PI;
+				minDist = dist;
+				minX = x;
+			}
+			var angle:Number = Math.acos(-a * l1 / (aa - bb));
+			x = a * Math.cos(angle) + l1;
+			var y:Number = b * Math.sin(angle);
+			dist = x * x + y * y;
+			if (dist < minDist) {
+				minAngle = angle;
+				minDist = dist;
+				minX = x;
+				minY = y;
+			}
+			if (dist > maxDist) {
+				maxAngle = angle;
+				maxDist = dist;
+				maxX = x;
+				maxY = y;
+			}
+			if (dd <= (minDist + maxDist) / 2) {
+				a1 = ta - Math.atan2(minY * bendDir, minX);
+				a2 = minAngle * bendDir;
+			} else {
+				a1 = ta - Math.atan2(maxY * bendDir, maxX);
+				a2 = maxAngle * bendDir;
+			}
 		}
-		var cos:Number = (targetX * targetX + targetY * targetY - len1 * len1 - len2 * len2) / cosDenom;
-		if (cos < -1)
-			cos = -1;
-		else if (cos > 1)
-			cos = 1;
-		var childAngle:Number = Math.acos(cos) * bendDirection;
-		var adjacent:Number = len1 + len2 * cos, opposite:Number = len2 * Math.sin(childAngle);
-		var parentAngle:Number = Math.atan2(targetY * adjacent - targetX * opposite, targetX * adjacent + targetY * opposite);
-		var rotation:Number = (parentAngle - offset) * radDeg - parentRotation;
-		if (rotation > 180)
-			rotation -= 360;
-		else if (rotation < -180) //
-			rotation += 360;
-		parent.rotationIK = parentRotation + rotation * alpha;
-		rotation = (childAngle + offset) * radDeg - childRotation;
-		if (rotation > 180)
-			rotation -= 360;
-		else if (rotation < -180) //
-			rotation += 360;
-		child.rotationIK = childRotation + (rotation + parent._worldRotation - child._parent._worldRotation) * alpha;
+		var offset:Number = Math.atan2(cy, child.x) * sign2;
+		a1 = (a1 - offset) * MathUtils.radDeg + offset1;
+		a2 = (a2 + offset) * MathUtils.radDeg * sign2 + offset2;
+		if (a1 > 180) a1 -= 360;
+		else if (a1 < -180) a1 += 360;
+		if (a2 > 180) a2 -= 360;
+		else if (a2 < -180) a2 += 360;
+		var rotation:Number = parent.rotation;
+		parent.updateWorldTransformWith(parent.x, parent.y, rotation + (a1 - rotation) * alpha, parent.scaleX, parent.scaleY);
+		rotation = child.rotation;
+		child.updateWorldTransformWith(child.x, cy, rotation + (a2 - rotation) * alpha, child.scaleX, child.scaleY);
 	}
 }
 

@@ -42,6 +42,7 @@ public class SkeletonData {
 	public var events:Vector.<EventData> = new Vector.<EventData>();
 	public var animations:Vector.<Animation> = new Vector.<Animation>();
 	public var ikConstraints:Vector.<IkConstraintData> = new Vector.<IkConstraintData>();
+	public var transformConstraints:Vector.<TransformConstraintData> = new Vector.<TransformConstraintData>();
 	public var width:Number, height:Number;
 	public var version:String, hash:String;
 
@@ -118,10 +119,20 @@ public class SkeletonData {
 	// --- IK constraints.
 
 	/** @return May be null. */
-	public function findIkConstraint (ikConstraintName:String) : IkConstraintData {
-		if (ikConstraintName == null) throw new ArgumentError("ikConstraintName cannot be null.");
+	public function findIkConstraint (constraintName:String) : IkConstraintData {
+		if (constraintName == null) throw new ArgumentError("constraintName cannot be null.");
 		for each (var ikConstraintData:IkConstraintData in ikConstraints)
-			if (ikConstraintData._name == ikConstraintName) return ikConstraintData;
+			if (ikConstraintData._name == constraintName) return ikConstraintData;
+		return null;
+	}
+	
+	// --- Transform constraints.
+
+	/** @return May be null. */
+	public function findTransformConstraint (constraintName:String) : TransformConstraintData {
+		if (constraintName == null) throw new ArgumentError("constraintName cannot be null.");
+		for each (var transformConstraintData:TransformConstraintData in transformConstraints)
+			if (transformConstraintData._name == constraintName) return transformConstraintData;
 		return null;
 	}
 

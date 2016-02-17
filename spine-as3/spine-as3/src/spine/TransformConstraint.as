@@ -29,45 +29,50 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine.animation {
-import spine.Bone;
-import spine.Event;
-import spine.Skeleton;
+package spine {
 
-public class FlipXTimeline implements Timeline {
-	public var boneIndex:int;
-	public var frames:Vector.<Number>; // time, flip, ...
+public class TransformConstraint implements Updatable {
+	internal var _data:TransformConstraintData;
+	public var bone:Bone;
+	public var target:Bone;
+	public var translateMix:Number;
+	public var x:Number;
+	public var y:Number;
 
-	public function FlipXTimeline (frameCount:int) {
-		frames = new Vector.<Number>(frameCount * 2, true);
+	public function TransformConstraint (data:TransformConstraintData, skeleton:Skeleton) {
+		if (data == null) throw new ArgumentError("data cannot be null.");
+		if (skeleton == null) throw new ArgumentError("skeleton cannot be null.");
+		_data = data;
+		translateMix = data.translateMix;
+		x = data.x;
+		y = data.y;
+
+		bone = skeleton.findBone(data.bone._name);
+		target = skeleton.findBone(data.target._name);
 	}
 
-	public function get frameCount () : int {
-		return frames.length / 2;
+	public function apply () : void {
+		update();
 	}
 
-	/** Sets the time and angle of the specified keyframe. */
-	public function setFrame (frameIndex:int, time:Number, flip:Boolean) : void {
-		frameIndex *= 2;
-		frames[frameIndex] = time;
-		frames[int(frameIndex + 1)] = flip ? 1 : 0;
+	public function update () : void {
+		var translateMix:Number = translateMix;
+		if (translateMix > 0) {
+			var local:Vector.<Number> = new Vector.<Number>(2, true);
+			local[0] = x;
+			local[1] = y;
+			target.localToWorld(local);
+			bone._worldX += (local[0] - bone._worldX) * translateMix;
+			bone._worldY += (local[1] - bone._worldY) * translateMix;
+		}
 	}
 
-	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
-		if (time < frames[0]) {
-			if (lastTime > time) apply(skeleton, lastTime, int.MAX_VALUE, null, 0);
-			return;
-		} else if (lastTime > time) //
-			lastTime = -1;
-
-		var frameIndex:int = (time >= frames[frames.length - 2] ? frames.length : Animation.binarySearch(frames, time, 2)) - 2;
-		if (frames[frameIndex] < lastTime) return;
-
-		setFlip(skeleton.bones[boneIndex], frames[frameIndex + 1] != 0);
+	public function get data () : TransformConstraintData {
+		return _data;
 	}
 
-	protected function setFlip (bone:Bone, flip:Boolean) : void {
-		bone.flipX = flip;
+	public function toString () : String {
+		return _data._name;
 	}
 }
 

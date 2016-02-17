@@ -29,22 +29,11 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine.attachments {
+package spine {
 
-public class AttachmentType {
-	public static const region:AttachmentType = new AttachmentType(0, "region");
-	public static const regionsequence:AttachmentType = new AttachmentType(1, "regionsequence");
-	public static const boundingbox:AttachmentType = new AttachmentType(2, "boundingbox");
-	public static const mesh:AttachmentType = new AttachmentType(3, "mesh");
-	public static const weightedmesh:AttachmentType = new AttachmentType(4, "weightedmesh");
-
-	public var ordinal:int;
-	public var name:String;
-
-	public function AttachmentType (ordinal:int, name:String) {
-		this.ordinal = ordinal;
-		this.name = name;
-	}
+public class MathUtils {
+	static public var radDeg:Number = 180 / Math.PI;
+	static public var degRad:Number = Math.PI / 180;
 }
 
 }

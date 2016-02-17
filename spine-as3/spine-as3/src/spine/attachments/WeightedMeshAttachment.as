@@ -33,7 +33,7 @@ package spine.attachments {
 import spine.Slot;
 import spine.Bone;
 
-public dynamic class SkinnedMeshAttachment extends Attachment {
+public dynamic class WeightedMeshAttachment extends Attachment {
 	public var bones:Vector.<int>;
 	public var weights:Vector.<Number>;
 	public var uvs:Vector.<Number>;
@@ -64,7 +64,7 @@ public dynamic class SkinnedMeshAttachment extends Attachment {
 	public var width:Number;
 	public var height:Number;
 
-	public function SkinnedMeshAttachment (name:String) {
+	public function WeightedMeshAttachment (name:String) {
 		super(name);
 	}
 
@@ -102,8 +102,8 @@ public dynamic class SkinnedMeshAttachment extends Attachment {
 					vx = weights[b];
 					vy = weights[int(b + 1)];
 					weight = weights[int(b + 2)];
-					wx += (vx * bone.m00 + vy * bone.m01 + bone.worldX) * weight;
-					wy += (vx * bone.m10 + vy * bone.m11 + bone.worldY) * weight;
+					wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
+					wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
 				}
 				worldVertices[w] = wx + x;
 				worldVertices[int(w + 1)] = wy + y;
@@ -119,8 +119,8 @@ public dynamic class SkinnedMeshAttachment extends Attachment {
 					vx = weights[b] + ffd[f];
 					vy = weights[int(b + 1)] + ffd[int(f + 1)];
 					weight = weights[int(b + 2)];
-					wx += (vx * bone.m00 + vy * bone.m01 + bone.worldX) * weight;
-					wy += (vx * bone.m10 + vy * bone.m11 + bone.worldY) * weight;
+					wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
+					wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
 				}
 				worldVertices[w] = wx + x;
 				worldVertices[int(w + 1)] = wy + y;

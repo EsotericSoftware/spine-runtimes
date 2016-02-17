@@ -40,7 +40,7 @@ public interface AttachmentLoader {
 	function newMeshAttachment (skin:Skin, name:String, path:String) : MeshAttachment;
 
 	/** @return May be null to not load an attachment. */
-	function newSkinnedMeshAttachment (skin:Skin, name:String, path:String) : SkinnedMeshAttachment;
+	function newWeightedMeshAttachment (skin:Skin, name:String, path:String) : WeightedMeshAttachment;
 
 	/** @return May be null to not load an attachment. */
 	function newBoundingBoxAttachment (skin:Skin, name:String) : BoundingBoxAttachment;

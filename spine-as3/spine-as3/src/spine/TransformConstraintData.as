@@ -29,16 +29,27 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine.animation {
-import spine.Bone;
+package spine {
 
-public class FlipYTimeline extends FlipXTimeline {
-	public function FlipYTimeline (frameCount:int) {
-		super(frameCount);
+public class TransformConstraintData {
+	internal var _name:String;
+	public var bone:BoneData;
+	public var target:BoneData;
+	public var translateMix:Number;
+	public var x:Number;
+	public var y:Number;
+
+	public function TransformConstraintData (name:String) {
+		if (name == null) throw new ArgumentError("name cannot be null.");
+		_name = name;
 	}
 
-	override protected function setFlip (bone:Bone, flip:Boolean) : void {
-		bone.flipY = flip;
+	public function get name () : String {
+		return _name;
+	}
+
+	public function toString () : String {
+		return _name;
 	}
 }
 

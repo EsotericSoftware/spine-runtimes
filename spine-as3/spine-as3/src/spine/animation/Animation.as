@@ -56,7 +56,7 @@ public class Animation {
 
 		if (loop && duration != 0) {
 			time %= duration;
-			lastTime %= duration;
+			if (lastTime > 0) lastTime %= duration;
 		}
 
 		for (var i:int = 0, n:int = timelines.length; i < n; i++)
@@ -70,7 +70,7 @@ public class Animation {
 
 		if (loop && duration != 0) {
 			time %= duration;
-			lastTime %= duration;
+			if (lastTime > 0) lastTime %= duration;
 		}
 
 		for (var i:int = 0, n:int = timelines.length; i < n; i++)

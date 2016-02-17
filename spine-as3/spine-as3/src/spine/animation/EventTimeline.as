@@ -47,8 +47,8 @@ public class EventTimeline implements Timeline {
 	}
 
 	/** Sets the time and value of the specified keyframe. */
-	public function setFrame (frameIndex:int, time:Number, event:Event) : void {
-		frames[frameIndex] = time;
+	public function setFrame (frameIndex:int, event:Event) : void {
+		frames[frameIndex] = event.time;
 		events[frameIndex] = event;
 	}
 
