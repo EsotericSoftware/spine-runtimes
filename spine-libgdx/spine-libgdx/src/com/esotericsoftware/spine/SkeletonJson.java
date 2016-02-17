@@ -159,8 +159,8 @@ public class SkeletonJson {
 			if (transformConstraintData.target == null) throw new SerializationException("Target bone not found: " + targetName);
 
 			transformConstraintData.translateMix = transformMap.getFloat("translateMix", 1);
-			transformConstraintData.x = transformMap.getFloat("x", 0);
-			transformConstraintData.y = transformMap.getFloat("y", 0);
+			transformConstraintData.x = transformMap.getFloat("x", 0) * scale;
+			transformConstraintData.y = transformMap.getFloat("y", 0) * scale;
 
 			skeletonData.transformConstraints.add(transformConstraintData);
 		}

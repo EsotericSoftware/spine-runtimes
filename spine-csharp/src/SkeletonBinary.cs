@@ -151,8 +151,8 @@ namespace Spine {
 				transformConstraintData.bone = skeletonData.bones.Items[ReadInt(input, true)];
 				transformConstraintData.target = skeletonData.bones.Items[ReadInt(input, true)];
 				transformConstraintData.translateMix = ReadFloat(input);
-				transformConstraintData.x = ReadFloat(input);
-				transformConstraintData.y = ReadFloat(input);
+				transformConstraintData.x = ReadFloat(input) * scale;
+				transformConstraintData.y = ReadFloat(input) * scale;
 				skeletonData.transformConstraints.Add(transformConstraintData);
 			}
 

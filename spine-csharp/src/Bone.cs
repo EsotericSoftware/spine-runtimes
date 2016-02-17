@@ -86,6 +86,11 @@ namespace Spine {
 			SetToSetupPose();
 		}
 
+		/// <summary>Same as {@link #updateWorldTransform()}. This method exists for Bone to implement {@link Updatable}.</summary>
+		public void Update () {
+			UpdateWorldTransform(x, y, rotation, scaleX, scaleY);
+		}
+
 		/// <summary>Computes the world SRT using the parent bone and this bone's local SRT.</summary>
 		public void UpdateWorldTransform () {
 			UpdateWorldTransform(x, y, rotation, scaleX, scaleY);
@@ -101,26 +106,26 @@ namespace Spine {
 			float la = cos * scaleX, lb = -sin * scaleY, lc = sin * scaleX, ld = cos * scaleY;
 			Bone parent = this.parent;
 			if (parent == null) { // Root bone.
-					Skeleton skeleton = this.skeleton;
-					if (skeleton.flipX) {
-						x = -x;
-						la = -la;
-						lb = -lb;
-					}
-					if (skeleton.flipY != yDown) {
-						y = -y;
-						lc = -lc;
-						ld = -ld;
-					}
-					a = la;
-					b = lb;
-					c = lc;
-					d = ld;
-					worldX = x;
-					worldY = y;
-					worldSignX = Math.Sign(scaleX);
-					worldSignY = Math.Sign(scaleY);
-					return;
+				Skeleton skeleton = this.skeleton;
+				if (skeleton.flipX) {
+					x = -x;
+					la = -la;
+					lb = -lb;
+				}
+				if (skeleton.flipY != yDown) {
+					y = -y;
+					lc = -lc;
+					ld = -ld;
+				}
+				a = la;
+				b = lb;
+				c = lc;
+				d = ld;
+				worldX = x;
+				worldY = y;
+				worldSignX = Math.Sign(scaleX);
+				worldSignY = Math.Sign(scaleY);
+				return;
 			}
 
 			float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
@@ -130,117 +135,109 @@ namespace Spine {
 			worldSignY = parent.worldSignY * Math.Sign(scaleY);
 
 			if (data.inheritRotation && data.inheritScale) {
-					a = pa * la + pb * lc;
-					b = pa * lb + pb * ld;
-					c = pc * la + pd * lc;
-					d = pc * lb + pd * ld;
+				a = pa * la + pb * lc;
+				b = pa * lb + pb * ld;
+				c = pc * la + pd * lc;
+				d = pc * lb + pd * ld;
 			} else if (data.inheritRotation) { // No scale inheritance.
-					Bone p = parent;
-					pa = 1;
-					pb = 0;
-					pc = 0;
-					pd = 1;
-					while (p != null) {
-						cos = MathUtils.CosDeg(p.appliedRotation);
-						sin = MathUtils.SinDeg(p.appliedRotation);
-						float ta = pa * cos + pb * sin;
-						float tb = pa * -sin + pb * cos;
-						float tc = pc * cos + pd * sin;
-						float td = pc * -sin + pd * cos;
-						pa = ta;
-						pb = tb;
-						pc = tc;
-						pd = td;
-						p = p.parent;
-					}
-					a = pa * la + pb * lc;
-					b = pa * lb + pb * ld;
-					c = pc * la + pd * lc;
-					d = pc * lb + pd * ld;
-					if (skeleton.flipX) {
-						a = -a;
-						b = -b;
-					}
-					if (skeleton.flipY != yDown) {
-						c = -c;
-						d = -d;
-					}
+				pa = 1;
+				pb = 0;
+				pc = 0;
+				pd = 1;
+				do {
+					cos = MathUtils.CosDeg(parent.appliedRotation);
+					sin = MathUtils.SinDeg(parent.appliedRotation);
+					float temp = pa * cos + pb * sin;
+					pb = pa * -sin + pb * cos;
+					pa = temp;
+					temp = pc * cos + pd * sin;
+					pd = pc * -sin + pd * cos;
+					pc = temp;
+					parent = parent.parent;
+				} while (parent != null);
+				a = pa * la + pb * lc;
+				b = pa * lb + pb * ld;
+				c = pc * la + pd * lc;
+				d = pc * lb + pd * ld;
+				if (skeleton.flipX) {
+					a = -a;
+					b = -b;
+				}
+				if (skeleton.flipY != yDown) {
+					c = -c;
+					d = -d;
+				}
 			} else if (data.inheritScale) { // No rotation inheritance.
-					Bone p = parent;
-					pa = 1;
-					pb = 0;
-					pc = 0;
-					pd = 1;
-					while (p != null) {
-						float r = p.rotation;
-						cos = MathUtils.CosDeg(r);
-						sin = MathUtils.SinDeg(r);
-						float psx = p.appliedScaleX, psy = p.appliedScaleY;
-						float za = cos * psx, zb = -sin * psy, zc = sin * psx, zd = cos * psy;
-						float temp = pa * za + pb * zc;
-						pb = pa * zb + pb * zd;
-						pa = temp;
-						temp = pc * za + pd * zc;
-						pd = pc * zb + pd * zd;
-						pc = temp;
+				pa = 1;
+				pb = 0;
+				pc = 0;
+				pd = 1;
+				do {
+					float r = parent.rotation;
+					cos = MathUtils.CosDeg(r);
+					sin = MathUtils.SinDeg(r);
+					float psx = parent.appliedScaleX, psy = parent.appliedScaleY;
+					float za = cos * psx, zb = -sin * psy, zc = sin * psx, zd = cos * psy;
+					float temp = pa * za + pb * zc;
+					pb = pa * zb + pb * zd;
+					pa = temp;
+					temp = pc * za + pd * zc;
+					pd = pc * zb + pd * zd;
+					pc = temp;
 
-						if (psx < 0) r = -r;
-						cos = MathUtils.CosDeg(-r);
-						sin = MathUtils.SinDeg(-r);
-						temp = pa * cos + pb * sin;
-						pb = pa * -sin + pb * cos;
-						pa = temp;
-						temp = pc * cos + pd * sin;
-						pd = pc * -sin + pd * cos;
-						pc = temp;
+					if (psx < 0) r = -r;
+					cos = MathUtils.CosDeg(-r);
+					sin = MathUtils.SinDeg(-r);
+					temp = pa * cos + pb * sin;
+					pb = pa * -sin + pb * cos;
+					pa = temp;
+					temp = pc * cos + pd * sin;
+					pd = pc * -sin + pd * cos;
+					pc = temp;
 
-						p = p.parent;
-					}
-					a = pa * la + pb * lc;
-					b = pa * lb + pb * ld;
-					c = pc * la + pd * lc;
-					d = pc * lb + pd * ld;
-					if (skeleton.flipX) {
-						a = -a;
-						b = -b;
-					}
-					if (skeleton.flipY != yDown) {
-						c = -c;
-						d = -d;
-					}
+					parent = parent.parent;
+				} while (parent != null);
+				a = pa * la + pb * lc;
+				b = pa * lb + pb * ld;
+				c = pc * la + pd * lc;
+				d = pc * lb + pd * ld;
+				if (skeleton.flipX) {
+					a = -a;
+					b = -b;
+				}
+				if (skeleton.flipY != yDown) {
+					c = -c;
+					d = -d;
+				}
 			} else {
-					a = la;
-					b = lb;
-					c = lc;
-					d = ld;
+				a = la;
+				b = lb;
+				c = lc;
+				d = ld;
 			}
 		}
 
-		public void Update () {
-			UpdateWorldTransform(x, y, rotation, scaleX, scaleY);
-		}
-
 		public void SetToSetupPose () {
-				BoneData data = this.data;
-				x = data.x;
-				y = data.y;
-				rotation = data.rotation;
-				scaleX = data.scaleX;
-				scaleY = data.scaleY;
+			BoneData data = this.data;
+			x = data.x;
+			y = data.y;
+			rotation = data.rotation;
+			scaleX = data.scaleX;
+			scaleY = data.scaleY;
 		}
 
 		public void WorldToLocal (float worldX, float worldY, out float localX, out float localY) {
-				float x = worldX - this.worldX, y = worldY - this.worldY;
-				float a = this.a, b = this.b, c = this.c, d = this.d;
-				float invDet = 1 / (a * d - b * c);
-				localX = (x * a * invDet - y * b * invDet);
-				localY = (y * d * invDet - x * c * invDet);
+			float x = worldX - this.worldX, y = worldY - this.worldY;
+			float a = this.a, b = this.b, c = this.c, d = this.d;
+			float invDet = 1 / (a * d - b * c);
+			localX = (x * a * invDet - y * b * invDet);
+			localY = (y * d * invDet - x * c * invDet);
 		}
 
 		public void LocalToWorld (float localX, float localY, out float worldX, out float worldY) {
-				float x = localX, y = localY;
-				worldX = x * a + y * b + this.worldX;
-				worldY = x * c + y * d + this.worldY;
+			float x = localX, y = localY;
+			worldX = x * a + y * b + this.worldX;
+			worldY = x * c + y * d + this.worldY;
 		}
 
 		override public String ToString () {

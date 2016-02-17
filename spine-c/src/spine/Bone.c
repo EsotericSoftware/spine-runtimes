@@ -109,22 +109,21 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 		CONST_CAST(float, self->c) = pc * la + pd * lc;
 		CONST_CAST(float, self->d) = pc * lb + pd * ld;
 	} else if (self->data->inheritRotation) { /* No scale inheritance. */
-		spBone* p = parent;
 		pa = 1;
 		pb = 0;
 		pc = 0;
 		pd = 1;
-		while (p) {
-			cosine = COS(p->appliedRotation * DEG_RAD);
-			sine = SIN(p->appliedRotation * DEG_RAD);
+		do {
+			cosine = COS(parent->appliedRotation * DEG_RAD);
+			sine = SIN(parent->appliedRotation * DEG_RAD);
 			temp = pa * cosine + pb * sine;
 			pb = pa * -sine + pb * cosine;
 			pa = temp;
 			temp = pc * cosine + pd * sine;
 			pd = pc * -sine + pd * cosine;
 			pc = temp;
-			p = p->parent;
-		}
+			parent = parent->parent;
+		} while (parent);
 		CONST_CAST(float, self->a) = pa * la + pb * lc;
 		CONST_CAST(float, self->b) = pa * lb + pb * ld;
 		CONST_CAST(float, self->c) = pc * la + pd * lc;
@@ -138,15 +137,14 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 			CONST_CAST(float, self->d) = -self->d;
 		}
 	} else if (self->data->inheritScale) { /* No rotation inheritance. */
-		spBone* p = parent;
 		pa = 1;
 		pb = 0;
 		pc = 0;
 		pd = 1;
-		while (p) {
+		do {
 			float za, zb, zc, zd;
-			float r = p->rotation;
-			float psx = p->appliedScaleX, psy = p->appliedScaleY;
+			float r = parent->rotation;
+			float psx = parent->appliedScaleX, psy = parent->appliedScaleY;
 			cosine = COS(r * DEG_RAD);
 			sine = SIN(r * DEG_RAD);
 			za = cosine * psx;
@@ -170,8 +168,8 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 			pd = pc * -sine + pd * cosine;
 			pc = temp;
 
-			p = p->parent;
-		}
+			parent = parent->parent;
+		} while (parent);
 		CONST_CAST(float, self->a) = pa * la + pb * lc;
 		CONST_CAST(float, self->b) = pa * lb + pb * ld;
 		CONST_CAST(float, self->c) = pc * la + pd * lc;

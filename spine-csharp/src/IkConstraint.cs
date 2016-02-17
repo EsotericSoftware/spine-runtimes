@@ -137,8 +137,7 @@ namespace Spine {
 			if (Math.Abs(psx - psy) <= 0.0001f) {
 				l2 *= psx;
 				float cos = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
-				if (cos < -1)
-					cos = -1;
+				if (cos < -1) cos = -1;
 				else if (cos > 1) cos = 1;
 				a2 = (float)Math.Acos(cos) * bendDir;
 				float a = l1 + l2 * cos, o = l2 * MathUtils.Sin(a2);

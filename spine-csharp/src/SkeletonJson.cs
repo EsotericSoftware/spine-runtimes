@@ -159,8 +159,8 @@ namespace Spine {
 					if (transformConstraintData.target == null) throw new Exception("Target bone not found: " + targetName);
 
 					transformConstraintData.translateMix = GetFloat(transformMap, "translateMix", 1);
-					transformConstraintData.x = GetFloat(transformMap, "x", 0);
-					transformConstraintData.y = GetFloat(transformMap, "y", 0);
+					transformConstraintData.x = GetFloat(transformMap, "x", 0) * scale;
+					transformConstraintData.y = GetFloat(transformMap, "y", 0) * scale;
 
 					skeletonData.transformConstraints.Add(transformConstraintData);
 				}

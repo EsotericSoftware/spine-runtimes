@@ -54,10 +54,8 @@ namespace Spine {
 			x = data.x;
 			y = data.y;
 
-			if (skeleton != null) {
-				bone = skeleton.FindBone(data.bone.name);
-				target = skeleton.FindBone(data.target.name);
-			}
+			bone = skeleton.FindBone(data.bone.name);
+			target = skeleton.FindBone(data.target.name);
 		}
 
 		public void Update () {

@@ -527,8 +527,8 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 			}
 
 			transformConstraintData->translateMix = Json_getFloat(transformMap, "translateMix", 1);
-			transformConstraintData->x = Json_getFloat(transformMap, "x", 0);
-			transformConstraintData->y = Json_getFloat(transformMap, "y", 0);
+			transformConstraintData->x = Json_getFloat(transformMap, "x", 0) * self->scale;
+			transformConstraintData->y = Json_getFloat(transformMap, "y", 0) * self->scale;
 
 			skeletonData->transformConstraints[i] = transformConstraintData;
 		}
