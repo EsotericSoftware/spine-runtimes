@@ -152,11 +152,11 @@ namespace Spine {
 
 			// Transform constraints.
 			if (root.ContainsKey("transform")) {
-				foreach (Dictionary<String, Object> transformMap in (List<Object>)root["ik"]) {
+				foreach (Dictionary<String, Object> transformMap in (List<Object>)root["transform"]) {
 					TransformConstraintData transformConstraintData = new TransformConstraintData((String)transformMap["name"]);
 
 					String boneName = (String)transformMap["bone"];
-					transformConstraintData.target = skeletonData.FindBone(boneName);
+					transformConstraintData.bone = skeletonData.FindBone(boneName);
 					if (transformConstraintData.target == null) throw new Exception("Bone not found: " + boneName);
 
 					String targetName = (String)transformMap["target"];
