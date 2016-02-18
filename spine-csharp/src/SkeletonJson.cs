@@ -157,7 +157,7 @@ namespace Spine {
 
 					String boneName = (String)transformMap["bone"];
 					transformConstraintData.bone = skeletonData.FindBone(boneName);
-					if (transformConstraintData.target == null) throw new Exception("Bone not found: " + boneName);
+					if (transformConstraintData.bone == null) throw new Exception("Bone not found: " + boneName);
 
 					String targetName = (String)transformMap["target"];
 					transformConstraintData.target = skeletonData.FindBone(targetName);
