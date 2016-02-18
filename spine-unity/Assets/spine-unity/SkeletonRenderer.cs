@@ -139,8 +139,8 @@ public class SkeletonRenderer : MonoBehaviour {
 
 		meshFilter = GetComponent<MeshFilter>();
 		meshRenderer = GetComponent<MeshRenderer>();
-		mesh1 = SpineMesh.NewMesh();
-		mesh2 = SpineMesh.NewMesh();
+		mesh1 = Spine.Unity.SpineMesh.NewMesh();
+		mesh2 = Spine.Unity.SpineMesh.NewMesh();
 		vertices = new Vector3[0];
 
 		skeleton = new Skeleton(skeletonData);
