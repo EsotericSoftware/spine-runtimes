@@ -266,19 +266,21 @@ function SkeletonJson.new (attachmentLoader)
 			return mesh
 
 		elseif type == AttachmentType.skinnedmesh then
-			local mesh = self.attachmentLoader.newSkinnedMeshAttachment(skin, name, path)
+			local mesh = self.attachmentLoader.newSkinningMeshAttachment(skin, name, path)
 			if not mesh then return null end
 			mesh.path = path
 
 			local uvs = getArray(map, "uvs", 1)
-			vertices = getArray(map, "vertices", 1)
+			local vertices = getArray(map, "vertices", 1)
 			local weights = {}
 			local bones = {}
-			for i = 1, vertices do
+			local i, n = 1, #vertices
+			while i < n do
 				local boneCount = vertices[i]
 				i = i + 1
 				table.insert(bones, boneCount)
-				for ii = 1, i + boneCount * 4 do
+				local nn = i + boneCount * 4
+				while i < nn do
 					table.insert(bones, vertices[i])
 					table.insert(weights, vertices[i + 1] * scale)
 					table.insert(weights, vertices[i + 2] * scale)

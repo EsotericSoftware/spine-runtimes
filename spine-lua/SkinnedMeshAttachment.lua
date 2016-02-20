@@ -37,7 +37,7 @@ function SkinnedMeshAttachment.new (name)
 	
 	local self = {
 		name = name,
-		type = AttachmentType.mesh,
+		type = AttachmentType.skinnedmesh,
 		bones = nil,
 		weights = nil,
 		uvs = nil,
@@ -75,15 +75,15 @@ function SkinnedMeshAttachment.new (name)
 	end
 
 	function self:computeWorldVertices (x, y, slot, worldVertices)
-		local skeletonBones = slot.skeleton.bones
+		local skeletonBones = slot.bone.skeleton.bones
 		local weights = self.weights
 		local bones = self.bones
 
-		local w, v, b, f = 0, 0, 0, 0
-		local	n = bones.length
+		local w, v, b, f = 1, 1, 1, 1
+		local	n = #bones
 		local wx, wy, bone, vx, vy, weight
-		if #slot.attachmentVertices == 0 then
-			while v < n do
+		if slot.attachmentVerticesCount == 0 then
+			while v <= n do
 				wx = 0
 				wy = 0
 				local nn = bones[v] + v
