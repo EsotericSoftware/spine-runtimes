@@ -89,7 +89,7 @@ function SkinnedMeshAttachment.new (name)
 				local nn = bones[v] + v
 				v = v + 1
 				while v <= nn do
-					bone = skeletonBones[bones[v]]
+					bone = skeletonBones[bones[v] + 1]
 					vx = weights[b]
 					vy = weights[b + 1]
 					weight = weights[b + 2]
