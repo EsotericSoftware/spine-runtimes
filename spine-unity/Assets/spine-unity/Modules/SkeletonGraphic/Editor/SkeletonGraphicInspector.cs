@@ -93,7 +93,6 @@ public class SkeletonGraphicInspector : Editor {
 	#endregion
 
 	#region Menus
-	// Add a menu item called "Double Mass" to a Rigidbody's context menu.
 	[MenuItem ("CONTEXT/SkeletonGraphic/Match RectTransform with Mesh Bounds")]
 	static void MatchRectTransformWithBounds (MenuCommand command) {
 		var skeletonGraphic = (SkeletonGraphic)command.context;
