@@ -153,6 +153,8 @@ namespace Spine {
 					temp = pc * cos + pd * sin;
 					pd = pc * -sin + pd * cos;
 					pc = temp;
+
+					if (!parent.data.inheritRotation) break;
 					parent = parent.parent;
 				} while (parent != null);
 				a = pa * la + pb * lc;
@@ -195,6 +197,7 @@ namespace Spine {
 					pd = pc * -sin + pd * cos;
 					pc = temp;
 
+					if (!parent.data.inheritScale) break;
 					parent = parent.parent;
 				} while (parent != null);
 				a = pa * la + pb * lc;

@@ -145,6 +145,8 @@ public class Bone implements Updatable {
 				temp = pc * cos + pd * sin;
 				pd = pc * -sin + pd * cos;
 				pc = temp;
+
+				if (!parent.data.inheritRotation) break;
 				parent = parent.parent;
 			} while (parent != null);
 			a = pa * la + pb * lc;
@@ -187,6 +189,7 @@ public class Bone implements Updatable {
 				pd = pc * -sin + pd * cos;
 				pc = temp;
 
+				if (!parent.data.inheritScale) break;
 				parent = parent.parent;
 			} while (parent != null);
 			a = pa * la + pb * lc;

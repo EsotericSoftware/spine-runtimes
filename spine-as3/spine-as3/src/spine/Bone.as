@@ -124,7 +124,7 @@ public class Bone implements Updatable {
 			pb = 0;
 			pc = 0;
 			pd = 1;
-			while (parent != null) {
+			do {
 				radians = parent.appliedRotation * MathUtils.degRad;
 				cos = Math.cos(radians);
 				sin = Math.sin(radians);
@@ -134,8 +134,10 @@ public class Bone implements Updatable {
 				temp1 = pc * cos + pd * sin;
 				pd = pc * -sin + pd * cos;
 				pc = temp1;
+
+				if (!parent.data.inheritRotation) break;
 				parent = parent.parent;
-			}
+			} while (parent != null);
 			_a = pa * la + pb * lc;
 			_b = pa * lb + pb * ld;
 			_c = pc * la + pd * lc;
@@ -153,7 +155,7 @@ public class Bone implements Updatable {
 			pb = 0;
 			pc = 0;
 			pd = 1;
-			while (parent) {
+			do {
 				radians = parent.rotation * MathUtils.degRad;
 				cos = Math.cos(radians);
 				sin = Math.sin(radians);
@@ -176,8 +178,9 @@ public class Bone implements Updatable {
 				pd = pc * -sin + pd * cos;
 				pc = temp2;
 
+				if (!parent.data.inheritScale) break;
 				parent = parent.parent;
-			}
+			} while (parent != null);
 			_a = pa * la + pb * lc;
 			_b = pa * lb + pb * ld;
 			_c = pc * la + pd * lc;

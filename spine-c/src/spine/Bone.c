@@ -122,6 +122,8 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 			temp = pc * cosine + pd * sine;
 			pd = pc * -sine + pd * cosine;
 			pc = temp;
+
+			if (!parent->data->inheritRotation) break;
 			parent = parent->parent;
 		} while (parent);
 		CONST_CAST(float, self->a) = pa * la + pb * lc;
@@ -168,6 +170,7 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 			pd = pc * -sine + pd * cosine;
 			pc = temp;
 
+			if (!parent->data->inheritScale) break;
 			parent = parent->parent;
 		} while (parent);
 		CONST_CAST(float, self->a) = pa * la + pb * lc;
