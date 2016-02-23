@@ -178,9 +178,8 @@ function SkeletonJson.new (attachmentLoader)
 				end
 				if skin.name == "default" then
 					skeletonData.defaultSkin = skin
-				else
-					table.insert(skeletonData.skins, skin)
 				end
+				table.insert(skeletonData.skins, skin)
 			end
 		end
 
@@ -470,22 +469,21 @@ function SkeletonJson.new (attachmentLoader)
 		local ffd = map["ffd"]
 		if ffd then
 			for skinName,slotMap in pairs(ffd) do
-				local skin = skeletonData.findSkin(skinName)
+				local skin = skeletonData:findSkin(skinName)
 				for slotName,meshMap in pairs(slotMap) do
-					local slotIndex = skeletonData.findSlotIndex(slotName)
+					local slotIndex = skeletonData:findSlotIndex(slotName)
 					for meshName,values in pairs(meshMap) do
 						local timeline = Animation.FfdTimeline.new()
 						local attachment = skin:getAttachment(slotIndex, meshName)
 						if not attachment then error("FFD attachment not found: " .. meshName) end
 						timeline.slotIndex = slotIndex
 						timeline.attachment = attachment
-
 						local isMesh = attachment.type == AttachmentType.mesh
 						local vertexCount
 						if isMesh then
-							vertexCount = attachment.vertices.length
+							vertexCount = #attachment.vertices
 						else
-							vertexCount = attachment.weights.length / 3 * 2
+							vertexCount = #attachment.weights / 3 * 2
 						end
 
 						local frameIndex = 0
@@ -496,12 +494,18 @@ function SkeletonJson.new (attachmentLoader)
 									vertices = attachment.vertices
 								else
 									vertices = {}
-									vertices.length = vertexCount
+									for i = 1, vertexCount do
+										vertices[i] = 0
+									end
 								end
 							else
 								local verticesValue = valueMap["vertices"]
-								local vertices = {}
+								local scale = self.scale
+								vertices = {}
 								local start = valueMap["offset"] or 0
+								for ii = 1, start do
+									vertices[ii] = 0
+								end
 								if scale == 1 then
 									for ii = 1, #verticesValue do
 										vertices[ii + start] = verticesValue[ii]
@@ -520,7 +524,6 @@ function SkeletonJson.new (attachmentLoader)
 									vertices[vertexCount] = 0
 								end
 							end
-
 							timeline:setFrame(frameIndex, valueMap["time"], vertices)
 							readCurve(timeline, frameIndex, valueMap)
 							frameIndex = frameIndex + 1

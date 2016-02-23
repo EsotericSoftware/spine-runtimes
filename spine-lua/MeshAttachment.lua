@@ -34,7 +34,7 @@ local AttachmentType = require "spine-lua.AttachmentType"
 local MeshAttachment = {}
 function MeshAttachment.new (name)
 	if not name then error("name cannot be nil", 2) end
-	
+
 	local self = {
 		name = name,
 		type = AttachmentType.mesh,
@@ -46,7 +46,7 @@ function MeshAttachment.new (name)
 		r = 1, g = 1, b = 1, a = 1,
 		path = nil,
 		rendererObject = nil,
-		regionU = 0, regionV = 0, regionU2 = 0, regionV2 = 0, regionRotate = false,
+		regionU = 0, regionV = 0, regionU2 = 1, regionV2 = 1, regionRotate = false,
 		regionOffsetX = 0, regionOffsetY = 0,
 		regionWidth = 0, regionHeight = 0,
 		regionOriginalWidth = 0, regionOriginalHeight = 0,
@@ -75,12 +75,13 @@ function MeshAttachment.new (name)
 
 	function self:computeWorldVertices (x, y, slot, worldVertices)
 		local bone = slot.bone
+x,y=slot.bone.skeleton.x,slot.bone.skeleton.y
 		x = x + bone.worldX
 		y = y + bone.worldY
 		local m00, m01, m10, m11 = bone.m00, bone.m01, bone.m10, bone.m11
 		local vertices = self.vertices
-		local verticesCount = vertices.length
-		if #slot.attachmentVertices == verticesCount then vertices = slot.attachmentVertices end
+		local verticesCount = #vertices
+		if slot.attachmentVertices and #slot.attachmentVertices == verticesCount then vertices = slot.attachmentVertices end
 		for i = 1, verticesCount, 2 do
 			local vx = vertices[i]
 			local vy = vertices[i + 1]

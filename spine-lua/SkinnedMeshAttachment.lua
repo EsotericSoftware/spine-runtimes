@@ -47,7 +47,7 @@ function SkinnedMeshAttachment.new (name)
 		r = 1, g = 1, b = 1, a = 1,
 		path = nil,
 		rendererObject = nil,
-		regionU = 0, regionV = 0, regionU2 = 0, regionV2 = 0, regionRotate = false,
+		regionU = 0, regionV = 0, regionU2 = 1, regionV2 = 1, regionRotate = false,
 		regionOffsetX = 0, regionOffsetY = 0,
 		regionWidth = 0, regionHeight = 0,
 		regionOriginalWidth = 0, regionOriginalHeight = 0,
@@ -76,9 +76,9 @@ function SkinnedMeshAttachment.new (name)
 
 	function self:computeWorldVertices (x, y, slot, worldVertices)
 		local skeletonBones = slot.bone.skeleton.bones
+x,y=slot.bone.skeleton.x,slot.bone.skeleton.y
 		local weights = self.weights
 		local bones = self.bones
-
 		local w, v, b, f = 1, 1, 1, 1
 		local	n = #bones
 		local wx, wy, bone, vx, vy, weight
@@ -104,13 +104,13 @@ function SkinnedMeshAttachment.new (name)
 			end
 		else
 			local ffd = slot.attachmentVertices
-			while v < n do
+			while v <= n do
 				wx = 0
 				wy = 0
 				local nn = bones[v] + v
 				v = v + 1
 				while v <= nn do
-					bone = skeletonBones[bones[v]]
+					bone = skeletonBones[bones[v] + 1]
 					vx = weights[b] + ffd[f]
 					vy = weights[b + 1] + ffd[f + 1]
 					weight = weights[b + 2]
