@@ -132,20 +132,25 @@ public class Skeleton {
 		int ikConstraintsCount = ikConstraints.size;
 		int transformConstraintsCount = transformConstraints.size;
 		updateCache.clear();
+
 		for (int i = 0, n = bones.size; i < n; i++) {
 			Bone bone = bones.get(i);
 			updateCache.add(bone);
-			for (int ii = 0; ii < transformConstraintsCount; ii++) {
-				TransformConstraint transformConstraint = transformConstraints.get(ii);
-				if (bone == transformConstraint.bone) {
-					updateCache.add(transformConstraint);
-					break;
-				}
-			}
 			for (int ii = 0; ii < ikConstraintsCount; ii++) {
 				IkConstraint ikConstraint = ikConstraints.get(ii);
 				if (bone == ikConstraint.bones.peek()) {
 					updateCache.add(ikConstraint);
+					break;
+				}
+			}
+		}
+
+		for (int i = 0; i < transformConstraintsCount; i++) {
+			TransformConstraint transformConstraint = transformConstraints.get(i);
+			for (int ii = updateCache.size - 1; ii >= 0; ii--) {
+				Updatable object = updateCache.get(ii);
+				if (object == transformConstraint.bone || object == transformConstraint.target) {
+					updateCache.insert(ii + 1, transformConstraint);
 					break;
 				}
 			}
