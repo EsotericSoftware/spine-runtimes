@@ -11,7 +11,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 ## Setup
 
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
-1. Using Adobe Flash Builder 4.6, import the spine-as3 and spine-starling projects by choosing File -> Import -> Existing projects. For other IDEs you will need to create new projects and import the source.
+1. Using [FDT](http://fdt.powerflasher.com/), import the spine-as3 and spine-starling projects by choosing File -> Import -> Existing projects. For other IDEs you will need to create new projects and import the source.
 
 Alternatively, the contents of the `spine-as3/src` and `spine-starling/src` directories can be copied into your project.
 
