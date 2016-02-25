@@ -29,7 +29,11 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-//using UnityEngine;
+#if (UNITY_5_0 || UNITY_5_1 || UNITY_5_2 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7)
+#define PREUNITY_5_3
+#endif
+
+using UnityEngine;
 using System.Collections;
 using Spine;
 
@@ -48,27 +52,48 @@ namespace Spine {
 
 		#region Constructors
 		void Subscribe (Spine.AnimationState state, Spine.EventData eventDataReference, bool unsubscribe) {
-			if (state == null || eventDataReference == null) {
-				m_WasFired = true;
-			} else {
-				m_AnimationState = state;
-				m_TargetEvent = eventDataReference;
-				state.Event += HandleAnimationStateEvent;
+			#if PREUNITY_5_3
+			Debug.LogWarning("Unity 5.3 or later is required for Spine Unity custom yield instructions to function correctly.");
+			#endif
 
-				m_unsubscribeAfterFiring = unsubscribe;
+			if (state == null) {
+				Debug.LogWarning("AnimationState argument was null. Coroutine will continue immediately.");
+				m_WasFired = true;
+				return;
+			} else if (eventDataReference == null) {
+				Debug.LogWarning("eventDataReference argument was null. Coroutine will continue immediately.");
+				m_WasFired = true;
+				return;
 			}
+
+			m_AnimationState = state;
+			m_TargetEvent = eventDataReference;
+			state.Event += HandleAnimationStateEvent;
+
+			m_unsubscribeAfterFiring = unsubscribe;
+
 		}
 
 		void SubscribeByName (Spine.AnimationState state, string eventName, bool unsubscribe) {
-			if (state == null || string.IsNullOrEmpty(eventName)) {
-				m_WasFired = true;
-			} else {
-				m_AnimationState = state;
-				m_EventName = eventName;
-				state.Event += HandleAnimationStateEventByName;
+			#if PREUNITY_5_3
+			Debug.LogWarning("Unity 5.3 or later is required for Spine Unity custom yield instructions to function correctly.");
+			#endif
 
-				m_unsubscribeAfterFiring = unsubscribe;
+			if (state == null) {
+				Debug.LogWarning("AnimationState argument was null. Coroutine will continue immediately.");
+				m_WasFired = true;
+				return;
+			} else if (string.IsNullOrEmpty(eventName)) {
+				Debug.LogWarning("eventName argument was null. Coroutine will continue immediately.");
+				m_WasFired = true;
+				return;
 			}
+		
+			m_AnimationState = state;
+			m_EventName = eventName;
+			state.Event += HandleAnimationStateEventByName;
+
+			m_unsubscribeAfterFiring = unsubscribe;
 		}
 
 		public WaitForSpineEvent (Spine.AnimationState state, Spine.EventData eventDataReference, bool unsubscribeAfterFiring = true) {
