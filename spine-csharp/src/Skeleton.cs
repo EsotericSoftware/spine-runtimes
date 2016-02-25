@@ -115,17 +115,21 @@ namespace Spine {
 			for (int i = 0, n = bones.Count; i < n; i++) {
 				Bone bone = bones.Items[i];
 				updateCache.Add(bone);
-				for (int ii = 0; ii < transformConstraintsCount; ii++) {
-					TransformConstraint transformConstraint = transformConstraints.Items[ii];
-					if (bone == transformConstraint.bone) {
-						updateCache.Add(transformConstraint);
-						break;
-					}
-				}
 				for (int ii = 0; ii < ikConstraintsCount; ii++) {
 					IkConstraint ikConstraint = ikConstraints.Items[ii];
 					if (bone == ikConstraint.bones.Items[ikConstraint.bones.Count - 1]) {
 						updateCache.Add(ikConstraint);
+						break;
+					}
+				}
+			}
+
+			for (int i = 0; i < transformConstraintsCount; i++) {
+				TransformConstraint transformConstraint = transformConstraints.Items[i];
+				for (int ii = updateCache.Count - 1; i >= 0; ii--) {
+					IUpdatable updateable = updateCache.Items[ii];
+					if (updateable == transformConstraint.bone || updateable == transformConstraint.target) {
+						updateCache.Insert(ii + 1, transformConstraint);
 						break;
 					}
 				}

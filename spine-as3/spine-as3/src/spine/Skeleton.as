@@ -82,19 +82,24 @@ public class Skeleton {
 		var updateCache:Vector.<Updatable> = _updateCache;
 		var ikConstraints:Vector.<IkConstraint> = this.ikConstraints;
 		var transformConstraints:Vector.<TransformConstraint> = this.transformConstraints;
-		updateCache.length = bones.length + ikConstraints.length + transformConstraints.length;
+		updateCache.length = bones.length + ikConstraints.length;
 		var i:int = 0;
 		for each (var bone:Bone in bones) {
 			updateCache[i++] = bone;
-			for each (var transformConstraint:TransformConstraint in transformConstraints) {
-				if (bone == transformConstraint.bone) {
-					updateCache[i++] = transformConstraint;
-					break;
-				}
-			}
 			for each (var ikConstraint:IkConstraint in ikConstraints) {
 				if (bone == ikConstraint.bones[ikConstraint.bones.length - 1]) {
 					updateCache[i++] = ikConstraint;
+					break;
+				}
+			}
+		}
+		
+		for each (var transformConstraint:TransformConstraint in transformConstraints) {
+			var ii:int;
+			for (ii = updateCache.length - 1; ii >= 0; i--) {
+				var updatable:Updatable = updateCache[ii];
+				if (updateable == transformConstraint.bone || updateable == transformConstraint.target) {
+					updateCache.splice(ii + 1, 0, transformConstraint);
 					break;
 				}
 			}
