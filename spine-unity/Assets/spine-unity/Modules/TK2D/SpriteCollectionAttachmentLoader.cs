@@ -138,10 +138,10 @@ public class SpriteCollectionAttachmentLoader : AttachmentLoader {
 		return mesh;
 	}
 	
-	public SkinnedMeshAttachment NewSkinnedMeshAttachment (Skin skin, String name, String path) {
+	public WeightedMeshAttachment NewWeightedMeshAttachment (Skin skin, String name, String path) {
 		ProcessSpriteDefinition(path);
 		
-		SkinnedMeshAttachment mesh = new SkinnedMeshAttachment(name);
+		WeightedMeshAttachment mesh = new WeightedMeshAttachment(name);
 		mesh.Path = path;
 		mesh.RendererObject = material;
 		mesh.RegionU = u;
