@@ -93,13 +93,12 @@ public class Skeleton {
 				}
 			}
 		}
-		
+
 		for each (var transformConstraint:TransformConstraint in transformConstraints) {
-			var ii:int;
-			for (ii = updateCache.length - 1; ii >= 0; i--) {
-				var updatable:Updatable = updateCache[ii];
-				if (updateable == transformConstraint.bone || updateable == transformConstraint.target) {
-					updateCache.splice(ii + 1, 0, transformConstraint);
+			for (i = updateCache.length - 1; i >= 0; i--) {
+				var updatable:Updatable = updateCache[i];
+				if (updatable == transformConstraint.bone || updatable == transformConstraint.target) {
+					updateCache.splice(i + 1, 0, transformConstraint);
 					break;
 				}
 			}
