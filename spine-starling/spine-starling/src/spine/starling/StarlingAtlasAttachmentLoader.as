@@ -36,7 +36,7 @@ import spine.attachments.AttachmentLoader;
 import spine.attachments.BoundingBoxAttachment;
 import spine.attachments.MeshAttachment;
 import spine.attachments.RegionAttachment;
-import spine.attachments.SkinnedMeshAttachment;
+import spine.attachments.WeightedMeshAttachment;
 
 import starling.textures.SubTexture;
 import starling.textures.Texture;
@@ -88,7 +88,7 @@ public class StarlingAtlasAttachmentLoader implements AttachmentLoader {
 	public function newMeshAttachment (skin:Skin, name:String, path:String) : MeshAttachment {
 		var texture:Texture = atlas.getTexture(path);
 		if (texture == null)
-			throw new Error("Region not found in Starling atlas: " + path + " (region attachment: " + name + ")");
+			throw new Error("Region not found in Starling atlas: " + path + " (mesh attachment: " + name + ")");
 		var attachment:MeshAttachment = new MeshAttachment(name);
 		attachment.rendererObject = new SkeletonImage(Texture.fromTexture(texture)); // Discard frame.
 		var subTexture:SubTexture = texture as SubTexture;
@@ -115,11 +115,11 @@ public class StarlingAtlasAttachmentLoader implements AttachmentLoader {
 		return attachment;
 	}
 
-	public function newSkinnedMeshAttachment (skin:Skin, name:String, path:String) : SkinnedMeshAttachment {
+	public function newWeightedMeshAttachment (skin:Skin, name:String, path:String) : WeightedMeshAttachment {
 		var texture:Texture = atlas.getTexture(path);
 		if (texture == null)
-			throw new Error("Region not found in Starling atlas: " + path + " (region attachment: " + name + ")");
-		var attachment:SkinnedMeshAttachment = new SkinnedMeshAttachment(name);
+			throw new Error("Region not found in Starling atlas: " + path + " (weighted mesh attachment: " + name + ")");
+		var attachment:WeightedMeshAttachment = new WeightedMeshAttachment(name);
 		attachment.rendererObject = new SkeletonImage(Texture.fromTexture(texture)); // Discard frame.
 		var subTexture:SubTexture = texture as SubTexture;
 		if (subTexture) {

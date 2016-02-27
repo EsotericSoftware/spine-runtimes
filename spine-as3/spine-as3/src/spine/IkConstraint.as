@@ -77,10 +77,11 @@ public class IkConstraint implements Updatable {
 	/** Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified in the world
 	 * coordinate system. */
 	static public function apply1 (bone:Bone, targetX:Number, targetY:Number, alpha:Number) : void {
-		var parentRotation:Number = bone.parent == null ? 0 : bone.parent.worldRotationX;
+		var parentRotation:Number = bone._parent == null ? 0 : bone._parent.worldRotationX;
 		var rotation:Number = bone.rotation;
-		var rotationIK:Number = Math.atan2(targetY - bone.worldY, targetX - bone.worldX) * MathUtils.radDeg - parentRotation;
-		if (bone.worldSignX != bone.worldSignY) rotationIK = 360 - rotationIK;
+		var rotationIK:Number = Math.atan2(targetY - bone._worldY, targetX - bone._worldX) * MathUtils.radDeg - parentRotation;
+		if ((bone._worldSignX != bone._worldSignY) != (bone._skeleton.flipX != (bone._skeleton.flipY != Bone.yDown)))
+			rotationIK = 360 - rotationIK;
 		if (rotationIK > 180) rotationIK -= 360;
 		else if (rotationIK < -180) rotationIK += 360;
 		bone.updateWorldTransformWith(bone.x, bone.y, rotation + (rotationIK - rotation) * alpha, bone.scaleX, bone.scaleY);
@@ -116,16 +117,16 @@ public class IkConstraint implements Updatable {
 		if (!pp) {
 			tx = targetX - px;
 			ty = targetY - py;
-			dx = child.worldX - px;
-			dy = child.worldY - py;
+			dx = child._worldX - px;
+			dy = child._worldY - py;
 		} else {
 			var ppa:Number = pp.a, ppb:Number = pp.b, ppc:Number = pp.c, ppd:Number = pp.d;
 			var invDet:Number = 1 / (ppa * ppd - ppb * ppc);
-			var wx:Number = pp.worldX, wy:Number = pp.worldY, twx:Number = targetX - wx, twy:Number = targetY - wy;
+			var wx:Number = pp._worldX, wy:Number = pp._worldY, twx:Number = targetX - wx, twy:Number = targetY - wy;
 			tx = (twx * ppd - twy * ppb) * invDet - px;
 			ty = (twy * ppa - twx * ppc) * invDet - py;
-			twx = child.worldX - wx;
-			twy = child.worldY - wy;
+			twx = child._worldX - wx;
+			twy = child._worldY - wy;
 			dx = (twx * ppd - twy * ppb) * invDet - px;
 			dy = (twy * ppa - twx * ppc) * invDet - py;
 		}

@@ -38,7 +38,7 @@ import spine.atlas.AtlasRegion;
 import spine.attachments.Attachment;
 import spine.attachments.MeshAttachment;
 import spine.attachments.RegionAttachment;
-import spine.attachments.SkinnedMeshAttachment;
+import spine.attachments.WeightedMeshAttachment;
 
 import starling.core.RenderSupport;
 import starling.display.BlendMode;
@@ -146,19 +146,19 @@ public class SkeletonSprite extends DisplayObject {
 				a = mesh.a;
 				image = mesh.rendererObject as SkeletonImage;
 				if (image == null) mesh.rendererObject = image = SkeletonImage(AtlasRegion(mesh.rendererObject).rendererObject);
-			} else if (attachment is SkinnedMeshAttachment) {
-				var skinnedMesh:SkinnedMeshAttachment = SkinnedMeshAttachment(attachment);
-				verticesLength = skinnedMesh.uvs.length;
+			} else if (attachment is WeightedMeshAttachment) {
+				var weightedMesh:WeightedMeshAttachment = WeightedMeshAttachment(attachment);
+				verticesLength = weightedMesh.uvs.length;
 				if (worldVertices.length < verticesLength) worldVertices.length = verticesLength;
-				skinnedMesh.computeWorldVertices(x, y, slot, worldVertices);
-				uvs = skinnedMesh.uvs;
-				triangles = skinnedMesh.triangles;
-				r = skinnedMesh.r;
-				g = skinnedMesh.g;
-				b = skinnedMesh.b;
-				a = skinnedMesh.a;
-				image = skinnedMesh.rendererObject as SkeletonImage;
-				if (image == null) skinnedMesh.rendererObject = image = SkeletonImage(AtlasRegion(skinnedMesh.rendererObject).rendererObject);
+				weightedMesh.computeWorldVertices(x, y, slot, worldVertices);
+				uvs = weightedMesh.uvs;
+				triangles = weightedMesh.triangles;
+				r = weightedMesh.r;
+				g = weightedMesh.g;
+				b = weightedMesh.b;
+				a = weightedMesh.a;
+				image = weightedMesh.rendererObject as SkeletonImage;
+				if (image == null) weightedMesh.rendererObject = image = SkeletonImage(AtlasRegion(weightedMesh.rendererObject).rendererObject);
 			}
 			if (image) {
 				a *= skeletonA * slot.a;
@@ -234,11 +234,11 @@ public class SkeletonSprite extends DisplayObject {
 				verticesLength = mesh.vertices.length;
 				if (worldVertices.length < verticesLength) worldVertices.length = verticesLength;
 				mesh.computeWorldVertices(0, 0, slot, worldVertices);
-			} else if (attachment is SkinnedMeshAttachment) {
-				var skinnedMesh:SkinnedMeshAttachment = SkinnedMeshAttachment(attachment);
-				verticesLength = skinnedMesh.uvs.length;
+			} else if (attachment is WeightedMeshAttachment) {
+				var weightedMesh:WeightedMeshAttachment = WeightedMeshAttachment(attachment);
+				verticesLength = weightedMesh.uvs.length;
 				if (worldVertices.length < verticesLength) worldVertices.length = verticesLength;
-				skinnedMesh.computeWorldVertices(0, 0, slot, worldVertices);
+				weightedMesh.computeWorldVertices(0, 0, slot, worldVertices);
 			} else
 				continue;
 			for (var ii:int = 0; ii < verticesLength; ii += 2) {
