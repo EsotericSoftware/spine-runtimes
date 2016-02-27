@@ -104,7 +104,6 @@
     <Compile Include="src\MathUtils.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="src\SharpJson.cs" />
     <Compile Include="src\Skeleton.cs">
       <SubType>Code</SubType>
     </Compile>
