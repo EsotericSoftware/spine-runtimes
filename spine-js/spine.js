@@ -1430,6 +1430,9 @@ spine.SkinnedMeshAttachment.prototype = {
 
 		var w = 0, v = 0, b = 0, f = 0, n = bones.length, nn;
 		var wx, wy, bone, vx, vy, weight;
+
+		if ( slot.vertices == undefined )
+			slot.vertices = [];
 		if (!slot.attachmentVertices.length) {
 			for (; v < n; w += 2) {
 				wx = 0;
@@ -1443,6 +1446,8 @@ spine.SkinnedMeshAttachment.prototype = {
 					wx += (vx * bone.m00 + vy * bone.m01 + bone.worldX) * weight;
 					wy += (vx * bone.m10 + vy * bone.m11 + bone.worldY) * weight;
 				}
+				slot.vertices[w] = wx - slot.bone.worldX;
+				slot.vertices[w + 1] = slot.bone.worldY - wy;
 				worldVertices[w] = wx + x;
 				worldVertices[w + 1] = wy + y;
 			}
@@ -1460,6 +1465,8 @@ spine.SkinnedMeshAttachment.prototype = {
 					wx += (vx * bone.m00 + vy * bone.m01 + bone.worldX) * weight;
 					wy += (vx * bone.m10 + vy * bone.m11 + bone.worldY) * weight;
 				}
+				slot.vertices[w] = wx - slot.bone.worldX;
+				slot.vertices[w + 1] = slot.bone.worldY - wy;
 				worldVertices[w] = wx + x;
 				worldVertices[w + 1] = wy + y;
 			}
