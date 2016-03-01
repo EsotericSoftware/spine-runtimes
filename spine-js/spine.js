@@ -82,6 +82,8 @@ spine.Bone = function (boneData, skeleton, parent) {
 	this.data = boneData;
 	this.skeleton = skeleton;
 	this.parent = parent;
+	this.x = boneData.x;
+	this.y = boneData.y;
 	this.setToSetupPose();
 };
 spine.Bone.yDown = false;
