@@ -2092,12 +2092,16 @@ spine.SkeletonJson.prototype = {
 							else {
 								vertices = [];
 								vertices.length = vertexCount;
+								for (var ii = 0; ii < vertexCount; ii++)
+									vertices[ii] = 0;
 							}
 						} else {
 							var verticesValue = valueMap["vertices"];
 							var vertices = [];
 							vertices.length = vertexCount;
 							var start = valueMap["offset"] || 0;
+							for (var ii = 0; ii < vertexCount; ii++)
+								vertices[ii] = 0;
 							var nn = verticesValue.length;
 							if (this.scale == 1) {
 								for (var ii = 0; ii < nn; ii++)
