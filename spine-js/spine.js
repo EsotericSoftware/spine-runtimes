@@ -196,6 +196,8 @@ spine.Slot.prototype = {
 		this.b = data.b;
 		this.a = data.a;
 
+		this.attachmentVertices = [];
+
 		if (!data.attachmentName)
 			this.setAttachment(null);
 		else {
