@@ -2516,7 +2516,7 @@ spine.SkeletonBounds.prototype = {
 		for (var i = 0; i < slotCount; i++) {
 			var slot = slots[i];
 			var boundingBox = slot.attachment;
-			if (boundingBox.type != spine.AttachmentType.boundingbox) continue;
+			//if (boundingBox.type != spine.AttachmentType.boundingbox) continue;
 			boundingBoxes.push(boundingBox);
 
 			var poolCount = polygonPool.length, polygon;
@@ -2526,9 +2526,22 @@ spine.SkeletonBounds.prototype = {
 			} else
 				polygon = [];
 			polygons.push(polygon);
-
-			polygon.length = boundingBox.vertices.length;
-			boundingBox.computeWorldVertices(x, y, slot.bone, polygon);
+			if ( boundingBox && boundingBox.vertices )
+			{
+				polygon.length = boundingBox.vertices.length;
+				boundingBox.computeWorldVertices(x, y, slot.bone, polygon);
+			}
+			else if ( boundingBox && boundingBox.triangles )
+			{
+				polygon.length = boundingBox.edges.length/2;
+				boundingBox.computeWorldVertices(x, y, slot, polygon);
+			}
+			else if ( boundingBox )
+			{
+				boundingBox.updateOffset();
+				polygon.length = 8;
+				boundingBox.computeVertices(x, y, slot.bone, polygon);
+			}
 		}
 
 		if (updateAabb) this.aabbCompute();
