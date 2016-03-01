@@ -1844,6 +1844,10 @@ spine.SkeletonJson.prototype = {
 			region.rotation = map["rotation"] || 0;
 			region.width = (map["width"] || 0) * scale;
 			region.height = (map["height"] || 0) * scale;
+			region.regionOriginalWidth = region.width;
+			region.regionOriginalHeight = region.height
+			region.regionWidth = region.width;
+			region.regionHeight = region.height;
 
 			var color = map["color"];
 			if (color) {
@@ -1859,6 +1863,8 @@ spine.SkeletonJson.prototype = {
 			var mesh = this.attachmentLoader.newMeshAttachment(skin, name, path);
 			if (!mesh) return null;
 			mesh.path = path; 
+			mesh.x = (map["x"] || 0) * scale;
+			mesh.y = (map["y"] || 0) * scale;
 			mesh.vertices = this.getFloatArray(map, "vertices", scale);
 			mesh.triangles = this.getIntArray(map, "triangles");
 			mesh.regionUVs = this.getFloatArray(map, "uvs", 1);
