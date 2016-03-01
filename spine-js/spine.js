@@ -2535,7 +2535,7 @@ spine.SkeletonBounds.prototype = {
 	},
 	aabbCompute: function () {
 		var polygons = this.polygons;
-		var minX = Number.MAX_VALUE, minY = Number.MAX_VALUE, maxX = Number.MIN_VALUE, maxY = Number.MIN_VALUE;
+		var minX = Number.MAX_VALUE, minY = Number.MAX_VALUE, maxX = -Number.MAX_VALUE, maxY = -Number.MAX_VALUE;
 		for (var i = 0, n = polygons.length; i < n; i++) {
 			var vertices = polygons[i];
 			for (var ii = 0, nn = vertices.length; ii < nn; ii += 2) {
