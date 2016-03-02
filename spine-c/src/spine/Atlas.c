@@ -216,8 +216,14 @@ spAtlas* spAtlas_create (const char* begin, int length, const char* dir, void* r
 
 			if (!readValue(&begin, end, &str)) return abortAtlas(self);
 			if (!equals(&str, "none")) {
-				page->uWrap = *str.begin == 'x' ? SP_ATLAS_REPEAT : (*str.begin == 'y' ? SP_ATLAS_CLAMPTOEDGE : SP_ATLAS_REPEAT);
-				page->vWrap = *str.begin == 'x' ? SP_ATLAS_CLAMPTOEDGE : (*str.begin == 'y' ? SP_ATLAS_REPEAT : SP_ATLAS_REPEAT);
+				page->uWrap = SP_ATLAS_CLAMPTOEDGE;
+				page->vWrap = SP_ATLAS_CLAMPTOEDGE;
+				if (*str.begin == 'x')
+					page->uWrap = SP_ATLAS_REPEAT;
+				else if (*str.begin == 'y')
+					page->vWrap = SP_ATLAS_REPEAT;
+				else
+					page->uWrap = page->vWrap = SP_ATLAS_REPEAT;
 			}
 
 			_spAtlasPage_createTexture(page, path);
