@@ -54,6 +54,10 @@ public class SkeletonRenderer : MonoBehaviour {
 	// Submesh Separation
 	[SpineSlot] public string[] submeshSeparators = new string[0];
 	[HideInInspector] public List<Slot> submeshSeparatorSlots = new List<Slot>();
+
+	// Custom Slot Material
+	[System.NonSerialized] private readonly Dictionary<Slot, Material> customSlotMaterials = new Dictionary<Slot, Material>();
+	public Dictionary<Slot, Material> CustomSlotMaterials { get { return customSlotMaterials; } }
 	#endregion
 
 	[System.NonSerialized] public bool valid;
@@ -207,6 +211,8 @@ public class SkeletonRenderer : MonoBehaviour {
 			drawOrder.Count != storedAttachments.Count ||				// Number of slots changed (when does this happen?)
 			immutableTriangles != storedState.immutableTriangles;		// Immutable Triangles flag changed.
 
+		bool isCustomMaterialsPopulated = customSlotMaterials.Count > 0;
+
 		for (int i = 0; i < drawOrderCount; i++) {
 			Slot slot = drawOrderItems[i];
 			Bone bone = slot.bone;
@@ -252,13 +258,22 @@ public class SkeletonRenderer : MonoBehaviour {
 			}
 
 			#if !SPINE_TK2D
-			Material material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
+			// Material material = (Material)((AtlasRegion)rendererObject).page.rendererObject; // For no customSlotMaterials
+
+			Material material;
+			if (isCustomMaterialsPopulated) {
+				if (!customSlotMaterials.TryGetValue(slot, out material)) {
+					material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
+				}
+			} else {
+				material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
+			}
 			#else
 			Material material = (rendererObject.GetType() == typeof(Material)) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
 			#endif
 
 			// Populate submesh when material changes. (or when forced to separate by a submeshSeparator)
-			if ((lastMaterial != null && lastMaterial.GetInstanceID() != material.GetInstanceID()) ||
+			if ((vertexCount > 0 && lastMaterial.GetInstanceID() != material.GetInstanceID()) ||
 				(submeshSeparatorSlotsCount > 0 && submeshSeparatorSlots.Contains(slot))) {
 
 				workingSubmeshArguments.Add(
