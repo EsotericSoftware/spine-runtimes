@@ -36,6 +36,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.esotericsoftware.spine.attachments.Attachment;
+import com.esotericsoftware.spine.attachments.FfdAttachment;
 
 public class Animation {
 	final String name;
@@ -671,7 +672,8 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha) {
 			Slot slot = skeleton.slots.get(slotIndex);
-			if (slot.getAttachment() != attachment) return;
+			Attachment slotAttachment = slot.getAttachment();
+			if (!(slotAttachment instanceof FfdAttachment) || !((FfdAttachment)slotAttachment).applyFFD(attachment)) return;
 
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.

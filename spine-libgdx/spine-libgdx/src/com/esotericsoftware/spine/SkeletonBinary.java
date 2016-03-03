@@ -52,6 +52,7 @@ import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 import com.esotericsoftware.spine.Animation.TranslateTimeline;
+import com.esotericsoftware.spine.SkeletonJson.LinkedMesh;
 import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.AttachmentLoader;
@@ -76,6 +77,7 @@ public class SkeletonBinary {
 
 	private final AttachmentLoader attachmentLoader;
 	private float scale = 1;
+	private Array<LinkedMesh> linkedMeshes = new Array();
 
 	public SkeletonBinary (TextureAtlas atlas) {
 		attachmentLoader = new AtlasAttachmentLoader(atlas);
@@ -181,6 +183,24 @@ public class SkeletonBinary {
 			for (int i = 0, n = input.readInt(true); i < n; i++)
 				skeletonData.skins.add(readSkin(input, input.readString(), nonessential));
 
+			// Linked meshes.
+			for (int i = 0, n = linkedMeshes.size; i < n; i++) {
+				LinkedMesh linkedMesh = linkedMeshes.get(i);
+				Skin skin = linkedMesh.skin == null ? skeletonData.getDefaultSkin() : skeletonData.findSkin(linkedMesh.skin);
+				if (skin == null) throw new SerializationException("Skin not found: " + linkedMesh.skin);
+				Attachment parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
+				if (linkedMesh.mesh instanceof MeshAttachment) {
+					MeshAttachment mesh = (MeshAttachment)linkedMesh.mesh;
+					mesh.setParentMesh((MeshAttachment)parent);
+					mesh.updateUVs();
+				} else {
+					WeightedMeshAttachment mesh = (WeightedMeshAttachment)linkedMesh.mesh;
+					mesh.setParentMesh((WeightedMeshAttachment)parent);
+					mesh.updateUVs();
+				}
+			}
+			linkedMeshes.clear();
+
 			// Events.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				EventData eventData = new EventData(input.readString());
@@ -221,74 +241,117 @@ public class SkeletonBinary {
 			int slotIndex = input.readInt(true);
 			for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 				String name = input.readString();
-				skin.addAttachment(slotIndex, name, readAttachment(input, skin, name, nonessential));
+				skin.addAttachment(slotIndex, name, readAttachment(input, skin, slotIndex, name, nonessential));
 			}
 		}
 		return skin;
 	}
 
-	private Attachment readAttachment (DataInput input, Skin skin, String attachmentName, boolean nonessential)
+	private Attachment readAttachment (DataInput input, Skin skin, int slotIndex, String attachmentName, boolean nonessential)
 		throws IOException {
 		float scale = this.scale;
 
 		String name = input.readString();
 		if (name == null) name = attachmentName;
 
-		switch (AttachmentType.values[input.readByte()]) {
+		AttachmentType type = AttachmentType.values[input.readByte()];
+		switch (type) {
 		case region: {
 			String path = input.readString();
+			float x = input.readFloat();
+			float y = input.readFloat();
+			float scaleX = input.readFloat();
+			float scaleY = input.readFloat();
+			float rotation = input.readFloat();
+			float width = input.readFloat();
+			float height = input.readFloat();
+			int color = input.readInt();
+
 			if (path == null) path = name;
 			RegionAttachment region = attachmentLoader.newRegionAttachment(skin, name, path);
 			if (region == null) return null;
 			region.setPath(path);
-			region.setX(input.readFloat() * scale);
-			region.setY(input.readFloat() * scale);
-			region.setScaleX(input.readFloat());
-			region.setScaleY(input.readFloat());
-			region.setRotation(input.readFloat());
-			region.setWidth(input.readFloat() * scale);
-			region.setHeight(input.readFloat() * scale);
-			Color.rgba8888ToColor(region.getColor(), input.readInt());
+			region.setX(x * scale);
+			region.setY(y * scale);
+			region.setScaleX(scaleX);
+			region.setScaleY(scaleY);
+			region.setRotation(rotation);
+			region.setWidth(width);
+			region.setHeight(height);
+			Color.rgba8888ToColor(region.getColor(), color);
 			region.updateOffset();
 			return region;
 		}
 		case boundingbox: {
+			float[] vertices = readFloatArray(input, scale);
 			BoundingBoxAttachment box = attachmentLoader.newBoundingBoxAttachment(skin, name);
 			if (box == null) return null;
-			box.setVertices(readFloatArray(input, scale));
+			box.setVertices(vertices);
 			return box;
 		}
 		case mesh: {
 			String path = input.readString();
+			int color = input.readInt();
+			int hullLength = 0;
+			float[] uvs = readFloatArray(input, 1);
+			short[] triangles = readShortArray(input);
+			float[] vertices = readFloatArray(input, scale);
+			hullLength = input.readInt(true);
+			int[] edges = null;
+			float width = 0, height = 0;
+			if (nonessential) {
+				edges = readIntArray(input);
+				width = input.readFloat();
+				height = input.readFloat();
+			}
+
 			if (path == null) path = name;
 			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, path);
 			if (mesh == null) return null;
 			mesh.setPath(path);
-			float[] uvs = readFloatArray(input, 1);
-			short[] triangles = readShortArray(input);
-			float[] vertices = readFloatArray(input, scale);
+			Color.rgba8888ToColor(mesh.getColor(), color);
 			mesh.setVertices(vertices);
 			mesh.setTriangles(triangles);
 			mesh.setRegionUVs(uvs);
 			mesh.updateUVs();
-			Color.rgba8888ToColor(mesh.getColor(), input.readInt());
-			mesh.setHullLength(input.readInt(true) * 2);
+			mesh.setHullLength(hullLength * 2);
 			if (nonessential) {
-				mesh.setEdges(readIntArray(input));
-				mesh.setWidth(input.readFloat() * scale);
-				mesh.setHeight(input.readFloat() * scale);
+				mesh.setEdges(edges);
+				mesh.setWidth(width * scale);
+				mesh.setHeight(height * scale);
 			}
+			return mesh;
+		}
+		case linkedmesh: {
+			String path = input.readString();
+			int color = input.readInt();
+			String skinName = input.readString();
+			String parent = input.readString();
+			boolean inheritFFD = input.readBoolean();
+			float width = 0, height = 0;
+			if (nonessential) {
+				width = input.readFloat();
+				height = input.readFloat();
+			}
+
+			if (path == null) path = name;
+			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, path);
+			if (mesh == null) return null;
+			mesh.setPath(path);
+			Color.rgba8888ToColor(mesh.getColor(), color);
+			mesh.setInheritFFD(inheritFFD);
+			if (nonessential) {
+				mesh.setWidth(width * scale);
+				mesh.setHeight(height * scale);
+			}
+			linkedMeshes.add(new LinkedMesh(mesh, skinName, slotIndex, parent));
 			return mesh;
 		}
 		case weightedmesh: {
 			String path = input.readString();
-			if (path == null) path = name;
-			WeightedMeshAttachment mesh = attachmentLoader.newWeightedMeshAttachment(skin, name, path);
-			if (mesh == null) return null;
-			mesh.setPath(path);
+			int color = input.readInt();
 			float[] uvs = readFloatArray(input, 1);
 			short[] triangles = readShortArray(input);
-
 			int vertexCount = input.readInt(true);
 			FloatArray weights = new FloatArray(uvs.length * 3 * 3);
 			IntArray bones = new IntArray(uvs.length * 3);
@@ -302,18 +365,57 @@ public class SkeletonBinary {
 					weights.add(input.readFloat());
 				}
 			}
+			int hullLength = input.readInt(true);
+			int[] edges = null;
+			float width = 0, height = 0;
+			if (nonessential) {
+				edges = readIntArray(input);
+				width = input.readFloat();
+				height = input.readFloat();
+			}
+
+			if (path == null) path = name;
+			WeightedMeshAttachment mesh = attachmentLoader.newWeightedMeshAttachment(skin, name, path);
+			if (mesh == null) return null;
+			mesh.setPath(path);
+			Color.rgba8888ToColor(mesh.getColor(), color);
 			mesh.setBones(bones.toArray());
 			mesh.setWeights(weights.toArray());
 			mesh.setTriangles(triangles);
 			mesh.setRegionUVs(uvs);
 			mesh.updateUVs();
-			Color.rgba8888ToColor(mesh.getColor(), input.readInt());
-			mesh.setHullLength(input.readInt(true) * 2);
+			mesh.setHullLength(hullLength * 2);
 			if (nonessential) {
-				mesh.setEdges(readIntArray(input));
-				mesh.setWidth(input.readFloat() * scale);
-				mesh.setHeight(input.readFloat() * scale);
+				mesh.setEdges(edges);
+				mesh.setWidth(width * scale);
+				mesh.setHeight(height * scale);
 			}
+			// BOZO - Store to look up source attachment later.
+			return mesh;
+		}
+		case weightedlinkedmesh: {
+			String path = input.readString();
+			int color = input.readInt();
+			String skinName = input.readString();
+			String parent = input.readString();
+			boolean inheritFFD = input.readBoolean();
+			float width = 0, height = 0;
+			if (nonessential) {
+				width = input.readFloat();
+				height = input.readFloat();
+			}
+
+			if (path == null) path = name;
+			WeightedMeshAttachment mesh = attachmentLoader.newWeightedMeshAttachment(skin, name, path);
+			if (mesh == null) return null;
+			mesh.setPath(path);
+			Color.rgba8888ToColor(mesh.getColor(), color);
+			mesh.setInheritFFD(inheritFFD);
+			if (nonessential) {
+				mesh.setWidth(width * scale);
+				mesh.setHeight(height * scale);
+			}
+			linkedMeshes.add(new LinkedMesh(mesh, skinName, slotIndex, parent));
 			return mesh;
 		}
 		}

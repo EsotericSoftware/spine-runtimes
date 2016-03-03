@@ -42,7 +42,7 @@ import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.NumberUtils;
 
 /** Attachment that displays a texture region. */
-public class WeightedMeshAttachment extends Attachment {
+public class WeightedMeshAttachment extends Attachment implements FfdAttachment {
 	private TextureRegion region;
 	private String path;
 	private int[] bones;
@@ -51,6 +51,8 @@ public class WeightedMeshAttachment extends Attachment {
 	private float[] worldVertices;
 	private final Color color = new Color(1, 1, 1, 1);
 	private int hullLength;
+	private WeightedMeshAttachment parentMesh;
+	private boolean inheritFFD;
 
 	// Nonessential.
 	private int[] edges;
@@ -153,6 +155,10 @@ public class WeightedMeshAttachment extends Attachment {
 		return worldVertices;
 	}
 
+	public boolean applyFFD (Attachment sourceAttachment) {
+		return this == sourceAttachment || (inheritFFD && parentMesh == sourceAttachment);
+	}
+
 	public float[] getWorldVertices () {
 		return worldVertices;
 	}
@@ -236,5 +242,30 @@ public class WeightedMeshAttachment extends Attachment {
 
 	public void setHeight (float height) {
 		this.height = height;
+	}
+
+	/** Returns the source mesh if this is a linked mesh, else returns null. */
+	public WeightedMeshAttachment getParentMesh () {
+		return parentMesh;
+	}
+
+	/** @param parentMesh May be null. */
+	public void setParentMesh (WeightedMeshAttachment parentMesh) {
+		this.parentMesh = parentMesh;
+		if (parentMesh != null) {
+			bones = parentMesh.bones;
+			weights = parentMesh.weights;
+			regionUVs = parentMesh.regionUVs;
+			triangles = parentMesh.triangles;
+			hullLength = parentMesh.hullLength;
+		}
+	}
+
+	public boolean getInheritFFD () {
+		return inheritFFD;
+	}
+
+	public void setInheritFFD (boolean inheritFFD) {
+		this.inheritFFD = inheritFFD;
 	}
 }

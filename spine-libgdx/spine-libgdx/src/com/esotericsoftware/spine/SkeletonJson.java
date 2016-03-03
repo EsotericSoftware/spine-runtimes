@@ -63,6 +63,7 @@ import com.esotericsoftware.spine.attachments.WeightedMeshAttachment;
 public class SkeletonJson {
 	private final AttachmentLoader attachmentLoader;
 	private float scale = 1;
+	private Array<LinkedMesh> linkedMeshes = new Array();
 
 	public SkeletonJson (TextureAtlas atlas) {
 		attachmentLoader = new AtlasAttachmentLoader(atlas);
@@ -188,13 +189,31 @@ public class SkeletonJson {
 				int slotIndex = skeletonData.findSlotIndex(slotEntry.name);
 				if (slotIndex == -1) throw new SerializationException("Slot not found: " + slotEntry.name);
 				for (JsonValue entry = slotEntry.child; entry != null; entry = entry.next) {
-					Attachment attachment = readAttachment(skin, entry.name, entry);
+					Attachment attachment = readAttachment(skin, slotIndex, entry.name, entry);
 					if (attachment != null) skin.addAttachment(slotIndex, entry.name, attachment);
 				}
 			}
 			skeletonData.skins.add(skin);
 			if (skin.name.equals("default")) skeletonData.defaultSkin = skin;
 		}
+
+		// Linked meshes.
+		for (int i = 0, n = linkedMeshes.size; i < n; i++) {
+			LinkedMesh linkedMesh = linkedMeshes.get(i);
+			Skin skin = linkedMesh.skin == null ? skeletonData.getDefaultSkin() : skeletonData.findSkin(linkedMesh.skin);
+			if (skin == null) throw new SerializationException("Skin not found: " + linkedMesh.skin);
+			Attachment parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
+			if (linkedMesh.mesh instanceof MeshAttachment) {
+				MeshAttachment mesh = (MeshAttachment)linkedMesh.mesh;
+				mesh.setParentMesh((MeshAttachment)parent);
+				mesh.updateUVs();
+			} else {
+				WeightedMeshAttachment mesh = (WeightedMeshAttachment)linkedMesh.mesh;
+				mesh.setParentMesh((WeightedMeshAttachment)parent);
+				mesh.updateUVs();
+			}
+		}
+		linkedMeshes.clear();
 
 		// Events.
 		for (JsonValue eventMap = root.getChild("events"); eventMap != null; eventMap = eventMap.next) {
@@ -218,7 +237,7 @@ public class SkeletonJson {
 		return skeletonData;
 	}
 
-	private Attachment readAttachment (Skin skin, String name, JsonValue map) {
+	private Attachment readAttachment (Skin skin, int slotIndex, String name, JsonValue map) {
 		float scale = this.scale;
 		name = map.getString("name", name);
 		String path = map.getString("path", name);
@@ -255,61 +274,79 @@ public class SkeletonJson {
 			box.setVertices(vertices);
 			return box;
 		}
-		case mesh: {
+		case mesh:
+		case linkedmesh: {
 			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, path);
 			if (mesh == null) return null;
 			mesh.setPath(path);
-			float[] vertices = map.require("vertices").asFloatArray();
-			if (scale != 1) {
-				for (int i = 0, n = vertices.length; i < n; i++)
-					vertices[i] *= scale;
-			}
-			mesh.setVertices(vertices);
-			mesh.setTriangles(map.require("triangles").asShortArray());
-			mesh.setRegionUVs(map.require("uvs").asFloatArray());
-			mesh.updateUVs();
 
 			String color = map.getString("color", null);
 			if (color != null) mesh.getColor().set(Color.valueOf(color));
 
-			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() * 2);
-			if (map.has("edges")) mesh.setEdges(map.require("edges").asIntArray());
 			mesh.setWidth(map.getFloat("width", 0) * scale);
 			mesh.setHeight(map.getFloat("height", 0) * scale);
+
+			String parent = map.getString("parent", null);
+			if (parent == null) {
+				float[] vertices = map.require("vertices").asFloatArray();
+				if (scale != 1) {
+					for (int i = 0, n = vertices.length; i < n; i++)
+						vertices[i] *= scale;
+				}
+				mesh.setVertices(vertices);
+				mesh.setTriangles(map.require("triangles").asShortArray());
+				mesh.setRegionUVs(map.require("uvs").asFloatArray());
+				mesh.updateUVs();
+
+				if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() * 2);
+				if (map.has("edges")) mesh.setEdges(map.require("edges").asIntArray());
+			} else {
+				mesh.setInheritFFD(map.getBoolean("ffd", true));
+				linkedMeshes.add(new LinkedMesh(mesh, map.getString("skin", null), slotIndex, parent));
+			}
 			return mesh;
 		}
-		case weightedmesh: {
+		case weightedmesh:
+		case weightedlinkedmesh: {
 			WeightedMeshAttachment mesh = attachmentLoader.newWeightedMeshAttachment(skin, name, path);
 			if (mesh == null) return null;
 			mesh.setPath(path);
-			float[] uvs = map.require("uvs").asFloatArray();
-			float[] vertices = map.require("vertices").asFloatArray();
-			FloatArray weights = new FloatArray(uvs.length * 3 * 3);
-			IntArray bones = new IntArray(uvs.length * 3);
-			for (int i = 0, n = vertices.length; i < n;) {
-				int boneCount = (int)vertices[i++];
-				bones.add(boneCount);
-				for (int nn = i + boneCount * 4; i < nn;) {
-					bones.add((int)vertices[i]);
-					weights.add(vertices[i + 1] * scale);
-					weights.add(vertices[i + 2] * scale);
-					weights.add(vertices[i + 3]);
-					i += 4;
-				}
-			}
-			mesh.setBones(bones.toArray());
-			mesh.setWeights(weights.toArray());
-			mesh.setTriangles(map.require("triangles").asShortArray());
-			mesh.setRegionUVs(uvs);
-			mesh.updateUVs();
 
 			String color = map.getString("color", null);
 			if (color != null) mesh.getColor().set(Color.valueOf(color));
 
-			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() * 2);
-			if (map.has("edges")) mesh.setEdges(map.require("edges").asIntArray());
 			mesh.setWidth(map.getFloat("width", 0) * scale);
 			mesh.setHeight(map.getFloat("height", 0) * scale);
+
+			String parent = map.getString("parent", null);
+			if (parent == null) {
+				float[] uvs = map.require("uvs").asFloatArray();
+				float[] vertices = map.require("vertices").asFloatArray();
+				FloatArray weights = new FloatArray(uvs.length * 3 * 3);
+				IntArray bones = new IntArray(uvs.length * 3);
+				for (int i = 0, n = vertices.length; i < n;) {
+					int boneCount = (int)vertices[i++];
+					bones.add(boneCount);
+					for (int nn = i + boneCount * 4; i < nn;) {
+						bones.add((int)vertices[i]);
+						weights.add(vertices[i + 1] * scale);
+						weights.add(vertices[i + 2] * scale);
+						weights.add(vertices[i + 3]);
+						i += 4;
+					}
+				}
+				mesh.setBones(bones.toArray());
+				mesh.setWeights(weights.toArray());
+				mesh.setTriangles(map.require("triangles").asShortArray());
+				mesh.setRegionUVs(uvs);
+				mesh.updateUVs();
+
+				if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() * 2);
+				if (map.has("edges")) mesh.setEdges(map.require("edges").asIntArray());
+			} else {
+				mesh.setInheritFFD(map.getBoolean("ffd", true));
+				linkedMeshes.add(new LinkedMesh(mesh, map.getString("skin", null), slotIndex, parent));
+			}
 			return mesh;
 		}
 		}
@@ -548,6 +585,20 @@ public class SkeletonJson {
 			timeline.setStepped(frameIndex);
 		else if (curve.isArray()) {
 			timeline.setCurve(frameIndex, curve.getFloat(0), curve.getFloat(1), curve.getFloat(2), curve.getFloat(3));
+		}
+	}
+
+	static class LinkedMesh {
+		String parent, skin;
+		int slotIndex;
+		Attachment mesh;
+
+		public LinkedMesh (Attachment mesh, String skin, int slotIndex, String parent) {
+			super();
+			this.mesh = mesh;
+			this.skin = skin;
+			this.slotIndex = slotIndex;
+			this.parent = parent;
 		}
 	}
 }
