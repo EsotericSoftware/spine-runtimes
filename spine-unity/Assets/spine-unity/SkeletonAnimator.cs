@@ -111,8 +111,11 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 					float time = stateInfo.normalizedTime * info.clip.length;
 					animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null, weight);
 				}
-
+#if UNITY_5
 				if (nextStateInfo.fullPathHash != 0) {
+#else
+				if (nextStateInfo.nameHash != 0) {
+#endif
 					for (int c = 0; c < nextClipInfo.Length; c++) {
 						var info = nextClipInfo[c];
 						float weight = info.weight * layerWeight;
@@ -150,8 +153,11 @@ public class SkeletonAnimator : SkeletonRenderer, ISkeletonAnimation {
 				}
 
 				c = 0;
-
+#if UNITY_5
 				if (nextStateInfo.fullPathHash != 0) {
+#else
+				if (nextStateInfo.nameHash != 0) {
+#endif
 					//apply next clip directly instead of mixing (ie:  no crossfade, ignores mecanim transition weights)
 					if (mode == MixMode.SpineStyle) {
 						for (; c < nextClipInfo.Length; c++) {
