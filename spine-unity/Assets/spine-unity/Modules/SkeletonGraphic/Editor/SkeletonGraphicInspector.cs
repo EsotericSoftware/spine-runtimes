@@ -13,7 +13,7 @@ public class SkeletonGraphicInspector : Editor {
 	SerializedProperty material_, color_;
 	SerializedProperty skeletonDataAsset_, initialSkinName_;
 	SerializedProperty startingAnimation_, startingLoop_, timeScale_, freeze_;
-	#if !PREUNITY_5_2
+#if !PREUNITY_5_2
 	SerializedProperty raycastTarget_;
 
 	SkeletonGraphic thisSkeletonGraphic;
@@ -38,17 +38,12 @@ public class SkeletonGraphicInspector : Editor {
 		freeze_ = so.FindProperty("freeze");
 	}
 
-
 	public override void OnInspectorGUI () {
-
-		var s = thisSkeletonGraphic;
-		s.skeletonDataAsset = SkeletonGraphicInspector.ObjectField<SkeletonDataAsset>(skeletonDataAsset_);
-		s.material = SkeletonGraphicInspector.ObjectField<Material>(material_);
-
 		EditorGUI.BeginChangeCheck();
-		thisSkeletonGraphic.color = EditorGUILayout.ColorField(color_.displayName, color_.colorValue);
-		if (EditorGUI.EndChangeCheck())
-			SkeletonGraphicInspector.ForceUpdateHack(thisSkeletonGraphic.transform);
+
+		EditorGUILayout.PropertyField(skeletonDataAsset_);
+		EditorGUILayout.PropertyField(material_);
+		EditorGUILayout.PropertyField(color_);
 
 		if (thisSkeletonGraphic.skeletonDataAsset == null) {
 			EditorGUILayout.HelpBox("You need to assign a SkeletonDataAsset first.", MessageType.Info);
@@ -62,49 +57,34 @@ public class SkeletonGraphicInspector : Editor {
 		EditorGUILayout.Space();
 		EditorGUILayout.LabelField("Animation", EditorStyles.boldLabel);
 		EditorGUILayout.PropertyField(startingAnimation_);
-		s.startingLoop = SkeletonGraphicInspector.BoolField(startingLoop_);
-		s.timeScale = EditorGUILayout.FloatField(timeScale_.displayName, timeScale_.floatValue);
+		EditorGUILayout.PropertyField(startingLoop_);
+		EditorGUILayout.PropertyField(timeScale_);
 		EditorGUILayout.Space();
-		s.freeze = SkeletonGraphicInspector.BoolField(freeze_);
+		EditorGUILayout.PropertyField(freeze_);
 		EditorGUILayout.Space();
 		EditorGUILayout.LabelField("UI", EditorStyles.boldLabel);
-		s.raycastTarget = SkeletonGraphicInspector.BoolField(raycastTarget_);
+		EditorGUILayout.PropertyField(raycastTarget_);
 
-	}
+		bool wasChanged = EditorGUI.EndChangeCheck();
 
-	#region HAX - Thanks, Unity
-	// colors weren't updating in realtime in the custom inspector.
-	// Why the hell do I have to do this??
-	/// <summary>Use this when scene repaint and proper explicit update methods don't work.</summary>
-	public static void ForceUpdateHack (Transform t) {
-		var origValue = t.localScale;
-		t.localScale = new Vector3(11f, 22f, 33f);
-		t.localScale = origValue;
+		if (wasChanged) {
+			serializedObject.ApplyModifiedProperties();
+		}
 	}
-
-	// Hack for Unity 5.3 problem with PropertyField
-	public static T ObjectField<T> (SerializedProperty property) where T : UnityEngine.Object {
-		return (T)EditorGUILayout.ObjectField(property.displayName, property.objectReferenceValue, typeof(T), false);
-	}
-
-	public static bool BoolField (SerializedProperty property) {
-		return EditorGUILayout.Toggle(property.displayName, property.boolValue);
-	}
-	#endregion
 
 	#region Menus
-	[MenuItem ("CONTEXT/SkeletonGraphic/Match RectTransform with Mesh Bounds")]
+	[MenuItem("CONTEXT/SkeletonGraphic/Match RectTransform with Mesh Bounds")]
 	static void MatchRectTransformWithBounds (MenuCommand command) {
 		var skeletonGraphic = (SkeletonGraphic)command.context;
-		var mesh =  skeletonGraphic.SpineMeshGenerator.LastGeneratedMesh;
+		var mesh = skeletonGraphic.SpineMeshGenerator.LastGeneratedMesh;
 
 		var bounds = mesh.bounds;
 		var size = bounds.size;
 		var center = bounds.center;
 		var p = new Vector2(
-			0.5f - (center.x / size.x),
-			0.5f - (center.y / size.y)
-		);
+			        0.5f - (center.x / size.x),
+			        0.5f - (center.y / size.y)
+		        );
 
 		skeletonGraphic.rectTransform.sizeDelta = size;
 		skeletonGraphic.rectTransform.pivot = p;
@@ -112,8 +92,12 @@ public class SkeletonGraphicInspector : Editor {
 
 	public static Material DefaultSkeletonGraphicMaterial {
 		get {
-			var guids = AssetDatabase.FindAssets("SkeletonGraphicDefault t:material"); if (guids.Length <= 0) return null;
-			var firstAssetPath = AssetDatabase.GUIDToAssetPath(guids[0]); if (string.IsNullOrEmpty(firstAssetPath)) return null;
+			var guids = AssetDatabase.FindAssets("SkeletonGraphicDefault t:material");
+			if (guids.Length <= 0)
+				return null;
+			var firstAssetPath = AssetDatabase.GUIDToAssetPath(guids[0]);
+			if (string.IsNullOrEmpty(firstAssetPath))
+				return null;
 			var firstMaterial = AssetDatabase.LoadAssetAtPath<Material>(firstAssetPath);
 			return firstMaterial;
 		}
@@ -204,6 +188,8 @@ public class SkeletonGraphicInspector : Editor {
 		graphic.material = SkeletonGraphicInspector.DefaultSkeletonGraphicMaterial;
 		return go;
 	}
+
 	#endregion
-	#endif
+
+#endif
 }

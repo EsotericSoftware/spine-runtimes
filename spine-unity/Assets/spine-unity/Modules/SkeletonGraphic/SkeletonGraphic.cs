@@ -89,6 +89,10 @@ public class SkeletonGraphic : MaskableGraphic {
 
 	protected override void Reset () {
 		base.Reset();
+		if (canvas == null) {
+			Debug.LogWarningFormat("SkeletonGraphic requires a Canvas to be visible. Move this GameObject ({0}) in the Hierarchy so it becomes a child of a Canvas.", gameObject.name);
+		}
+
 		if (material == null || material.shader != Shader.Find("Spine/SkeletonGraphic (Premultiply Alpha)")) {
 			Debug.LogWarning("SkeletonGraphic works best with the SkeletonGraphic material.");
 		}
