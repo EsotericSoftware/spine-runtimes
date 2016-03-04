@@ -271,7 +271,7 @@ function SkeletonJson.new (attachmentLoader)
 			mesh.path = path
 
 			local uvs = getArray(map, "uvs", 1)
-			vertices = getArray(map, "vertices", 1)
+			local vertices = getArray(map, "vertices", 1)
 			local weights = {}
 			local bones = {}
 			for i = 1, vertices do
@@ -500,6 +500,7 @@ function SkeletonJson.new (attachmentLoader)
 								local verticesValue = valueMap["vertices"]
 								local vertices = {}
 								local start = valueMap["offset"] or 0
+								local scale = self.scale
 								if scale == 1 then
 									for ii = 1, #verticesValue do
 										vertices[ii + start] = verticesValue[ii]

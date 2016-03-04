@@ -86,6 +86,7 @@ function RegionAttachment.new (name)
 		y = y + bone.worldY
 		local m00, m01, m10, m11 = bone.m00, bone.m01, bone.m10, bone.m11
 		local offset = self.offset
+		local vertices = worldVertices
 		vertices[0] = offset[0] * m00 + offset[1] * m01 + x
 		vertices[1] = offset[0] * m10 + offset[1] * m11 + y
 		vertices[2] = offset[2] * m00 + offset[3] * m01 + x

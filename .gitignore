@@ -11,6 +11,7 @@ target
 *.swp
 *.user
 .DS_Store
+.idea
 
 spine-c/Debug/*
 

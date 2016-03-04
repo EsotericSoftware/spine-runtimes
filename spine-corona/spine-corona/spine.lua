@@ -187,16 +187,25 @@ function spine.Skeleton.new (skeletonData, group)
 						image.lastRotation = rotation
 					end
 
-					local r, g, b = skeletonR * slot.r, skeletonG * slot.g, skeletonB * slot.b
-					if image.lastR ~= r or image.lastG ~= g or image.lastB ~= b or not image.lastR then
-						image:setFillColor(r, g, b)
-						image.lastR, image.lastG, image.lastB = r, g, b
+					local r, g, b, a = skeletonR * slot.r * attachment.r, skeletonG * slot.g * attachment.g, skeletonB * slot.b * attachment.b, skeletonA * slot.a * attachment.a
+					local setFillColor
+					setFillColor = function(img)
+						if img.setFillColor ~= nil then
+							if img.lastR ~= r or img.lastG ~= g or img.lastB ~= b or not img.lastR then
+								img:setFillColor(r, g, b)
+								img.lastR, img.lastG, img.lastB = r, g, b
+							end
+							if a and (img.lastA ~= a or not img.lastA) then
+								img.lastA = a
+								img.alpha = img.lastA -- 0-1 range, unlike RGB.
+							end
+						else
+							for i = 1, img.numChildren, 1 do
+								setFillColor(img[i])
+							end
+						end
 					end
-					local a = skeletonA * slot.a
-					if a and (image.lastA ~= a or not image.lastA) then
-						image.lastA = a
-						image.alpha = image.lastA -- 0-1 range, unlike RGB.
-					end
+					setFillColor(image)
 					
 					self.group:insert(image)
 				end
