@@ -17,11 +17,11 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 Alternatively, the contents of the `spine-c/src`, `spine-c/include` and `spine-cocos2dx/3/src` directories can be copied into your project. Be sure your header search path will find the contents of the `spine-c/include` and `spine-cocos2dx/3.1/src` directories. Note that the includes use `spine/Xxx.h`, so the `spine` directory cannot be omitted when copying the files.
 
-## Setup for Cocos Studio Users (cocos2d-x-3.1)
+## Setup for Cocos Studio Users (cocos2d-x-3.10)
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
 	- Extract them somewhere you can find them. You will only need `spine-c` and `spine-cocos2dx`.
 1. Download and install Cocos: http://www.cocos2d-x.org/download
-	- (2016 March 4) Downloading and installing Cocos Studio and cocos2d-x-3.1 includes a Spine runtime in their source files. For instance, if the default install folder is `C:\Cocos\`, you will find an existing spine-c and spine-cocos2dx runtime inside `C:\Cocos\Cocos2d-x\cocos2d-x-3.10\cocos\editor-support\spine`.
+	- (2016 March 4) Downloading and installing Cocos Studio and cocos2d-x-3.10 includes a Spine runtime in their source files. For instance, if the default install folder is `C:\Cocos\`, you will find an existing spine-c and spine-cocos2dx runtime inside `C:\Cocos\Cocos2d-x\cocos2d-x-3.10\cocos\editor-support\spine`.
 		- Replace the contents of that folder with the files from the following Spine runtime folders:
 			- `spine-c/src/spine`
 			- `spine-c/include/spine`
