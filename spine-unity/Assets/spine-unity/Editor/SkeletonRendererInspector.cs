@@ -63,7 +63,7 @@ public class SkeletonRendererInspector : Editor {
 		sortingLayerIDProperty = rendererSerializedObject.FindProperty("m_SortingLayerID");
 	}
 
-	protected virtual void gui () {
+	protected virtual void DrawInspectorGUI () {
 		SkeletonRenderer component = (SkeletonRenderer)target;
 		EditorGUILayout.BeginHorizontal();
 		EditorGUILayout.PropertyField(skeletonDataAsset);
@@ -134,7 +134,7 @@ public class SkeletonRendererInspector : Editor {
 				EditorGUILayout.PropertyField(submeshSeparators, true);
 				EditorGUILayout.Space();
 				EditorGUILayout.PropertyField(meshes,
-					new GUIContent("Render Meshes", "Disable to optimize rendering for skeletons that don't use meshes"));
+					new GUIContent("Render Mesh Attachments", "Disable to optimize rendering for skeletons that don't use Mesh Attachments"));
 				EditorGUILayout.PropertyField(immutableTriangles,
 					new GUIContent("Immutable Triangles", "Enable to optimize rendering for skeletons that never change attachment visbility"));
 				EditorGUILayout.Space();
@@ -154,7 +154,7 @@ public class SkeletonRendererInspector : Editor {
 
 	override public void OnInspectorGUI () {
 		serializedObject.Update();
-		gui();
+		DrawInspectorGUI();
 		if (serializedObject.ApplyModifiedProperties() ||
 			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
 		) {

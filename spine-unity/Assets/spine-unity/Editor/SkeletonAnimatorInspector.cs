@@ -21,8 +21,8 @@ public class SkeletonAnimatorInspector : SkeletonRendererInspector {
 			isPrefab = true;
 	}
 
-	protected override void gui () {
-		base.gui();
+	protected override void DrawInspectorGUI () {
+		base.DrawInspectorGUI();
 
 		EditorGUILayout.PropertyField(layerMixModes, true);
 

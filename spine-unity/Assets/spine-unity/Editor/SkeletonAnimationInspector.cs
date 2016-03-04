@@ -50,8 +50,8 @@ public class SkeletonAnimationInspector : SkeletonRendererInspector {
 			m_isPrefab = true;
 	}
 
-	protected override void gui () {
-		base.gui();
+	protected override void DrawInspectorGUI () {
+		base.DrawInspectorGUI();
 
 		SkeletonAnimation component = (SkeletonAnimation)target;
 		if (!component.valid)
