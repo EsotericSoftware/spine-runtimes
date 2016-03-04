@@ -29,6 +29,7 @@ Alternatively, the contents of the `spine-c/src`, `spine-c/include` and `spine-c
 		- Since this is the shared version of the runtime Cocos Studio uses for all projects created through it, updating the Spine runtime here also updates the Spine runtime of all those projects.
 
 ### Examples
+1. Create a **new C++ Cocos Studio project**. Make sure you can find that folder. 
 1. The `spine-cocos2dx/3/` runtime folder contains a folder named `example`.
 	- Copy the files in `spine-cocos2dx/3/example/Classes` folder (except `AppDelegate.cpp`, `AppDelegate.h` and `AppMacros.h` into the `Classes` folder of your Cocos Studio project.)
 1. Add these files into your C++ Solution. (through your IDE, Visual Studio or Eclipse, etc...)
