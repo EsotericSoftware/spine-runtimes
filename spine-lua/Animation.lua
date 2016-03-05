@@ -604,7 +604,7 @@ function Animation.FfdTimeline.new ()
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
 		local slot = skeleton.slots[self.slotIndex]
-		if slot.attachment ~= attachment then return end
+		if slot.attachment ~= self.attachment then return end
 
 		local frames = self.frames
 		if time < frames[0] then return end -- Time is before first frame.
@@ -612,7 +612,7 @@ function Animation.FfdTimeline.new ()
 		local frameVertices = self.frameVertices
 		local vertexCount = #frameVertices[0]
 		local vertices = slot.attachmentVertices
-		if #vertices < vertexCount then
+		if not vertices or #vertices < vertexCount then
 			vertices = {}
 			slot.attachmentVertices = vertices
 		end
@@ -620,16 +620,15 @@ function Animation.FfdTimeline.new ()
 			alpha = 1 -- Don't mix from uninitialized slot vertices.
 		end
 		slot.attachmentVerticesCount = vertexCount
-
-		if time >= frames[#frames] then -- Time is after last frame.
-			local lastVertices = frameVertices[#frames]
+		if time >= frames[#frames - 1] then -- Time is after last frame.
+			local lastVertices = frameVertices[#frames - 1]
 			if alpha < 1 then
-				for i = 0, vertexCount do
+				for i = 1, vertexCount do
 					local vertex = vertices[i]
 					vertices[i] = vertex + (lastVertices[i] - vertex) * alpha
 				end
 			else
-				for i = 0, vertexCount do
+				for i = 1, vertexCount do
 					vertices[i] = lastVertices[i]
 				end
 			end
@@ -647,13 +646,13 @@ function Animation.FfdTimeline.new ()
 		local nextVertices = frameVertices[frameIndex]
 
 		if alpha < 1 then
-			for i = 0, vertexCount do
+			for i = 1, vertexCount do
 				local prev = prevVertices[i]
-				local vertices = vertices[i]
-				vertices[i] = vertices + (prev + (nextVertices[i] - prev) * percent - vertices) * alpha
+				local vertex = vertices[i]
+				vertices[i] = vertex + (prev + (nextVertices[i] - prev) * percent - vertex) * alpha
 			end
 		else
-			for i = 0, vertexCount do
+			for i = 1, vertexCount do
 				local prev = prevVertices[i]
 				vertices[i] = prev + (nextVertices[i] - prev) * percent
 			end

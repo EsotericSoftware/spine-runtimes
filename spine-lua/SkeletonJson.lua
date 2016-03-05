@@ -178,9 +178,8 @@ function SkeletonJson.new (attachmentLoader)
 				end
 				if skin.name == "default" then
 					skeletonData.defaultSkin = skin
-				else
-					table.insert(skeletonData.skins, skin)
 				end
+				table.insert(skeletonData.skins, skin)
 			end
 		end
 
@@ -266,19 +265,21 @@ function SkeletonJson.new (attachmentLoader)
 			return mesh
 
 		elseif type == AttachmentType.skinnedmesh then
-			local mesh = self.attachmentLoader.newSkinnedMeshAttachment(skin, name, path)
+			local mesh = self.attachmentLoader.newSkinningMeshAttachment(skin, name, path)
 			if not mesh then return null end
 			mesh.path = path
 
 			local uvs = getArray(map, "uvs", 1)
-			vertices = getArray(map, "vertices", 1)
+			local vertices = getArray(map, "vertices", 1)
 			local weights = {}
 			local bones = {}
-			for i = 1, vertices do
+			local i, n = 1, #vertices
+			while i < n do
 				local boneCount = vertices[i]
 				i = i + 1
 				table.insert(bones, boneCount)
-				for ii = 1, i + boneCount * 4 do
+				local nn = i + boneCount * 4
+				while i < nn do
 					table.insert(bones, vertices[i])
 					table.insert(weights, vertices[i + 1] * scale)
 					table.insert(weights, vertices[i + 2] * scale)
@@ -468,22 +469,21 @@ function SkeletonJson.new (attachmentLoader)
 		local ffd = map["ffd"]
 		if ffd then
 			for skinName,slotMap in pairs(ffd) do
-				local skin = skeletonData.findSkin(skinName)
+				local skin = skeletonData:findSkin(skinName)
 				for slotName,meshMap in pairs(slotMap) do
-					local slotIndex = skeletonData.findSlotIndex(slotName)
+					local slotIndex = skeletonData:findSlotIndex(slotName)
 					for meshName,values in pairs(meshMap) do
 						local timeline = Animation.FfdTimeline.new()
 						local attachment = skin:getAttachment(slotIndex, meshName)
 						if not attachment then error("FFD attachment not found: " .. meshName) end
 						timeline.slotIndex = slotIndex
 						timeline.attachment = attachment
-
 						local isMesh = attachment.type == AttachmentType.mesh
 						local vertexCount
 						if isMesh then
-							vertexCount = attachment.vertices.length
+							vertexCount = #attachment.vertices
 						else
-							vertexCount = attachment.weights.length / 3 * 2
+							vertexCount = #attachment.weights / 3 * 2
 						end
 
 						local frameIndex = 0
@@ -494,12 +494,18 @@ function SkeletonJson.new (attachmentLoader)
 									vertices = attachment.vertices
 								else
 									vertices = {}
-									vertices.length = vertexCount
+									for i = 1, vertexCount do
+										vertices[i] = 0
+									end
 								end
 							else
 								local verticesValue = valueMap["vertices"]
-								local vertices = {}
+								local scale = self.scale
+								vertices = {}
 								local start = valueMap["offset"] or 0
+								for ii = 1, start do
+									vertices[ii] = 0
+								end
 								if scale == 1 then
 									for ii = 1, #verticesValue do
 										vertices[ii + start] = verticesValue[ii]
@@ -518,7 +524,6 @@ function SkeletonJson.new (attachmentLoader)
 									vertices[vertexCount] = 0
 								end
 							end
-
 							timeline:setFrame(frameIndex, valueMap["time"], vertices)
 							readCurve(timeline, frameIndex, valueMap)
 							frameIndex = frameIndex + 1
