@@ -41,7 +41,7 @@ public class SkeletonDataAsset : ScriptableObject {
 	public tk2dSpriteCollectionData spriteCollection;
 #endif
 	public TextAsset skeletonJSON;
-	public float scale = 1;
+	public float scale = 0.01f;
 	public String[] fromAnimation;
 	public String[] toAnimation;
 	public float[] duration;
