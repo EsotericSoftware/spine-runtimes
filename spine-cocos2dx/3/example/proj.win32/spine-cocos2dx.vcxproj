@@ -129,6 +129,10 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\spine\PolygonBatch.h" />
+    <ClInclude Include="..\..\src\spine\SkeletonAnimation.h" />
+    <ClInclude Include="..\..\src\spine\SkeletonRenderer.h" />
+    <ClInclude Include="..\..\src\spine\spine-cocos2dx.h" />
     <ClInclude Include="..\Classes\AppDelegate.h" />
     <ClInclude Include="..\Classes\AppMacros.h" />
     <ClInclude Include="..\Classes\GoblinsExample.h" />
@@ -137,6 +141,10 @@
     <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\spine\PolygonBatch.cpp" />
+    <ClCompile Include="..\..\src\spine\SkeletonAnimation.cpp" />
+    <ClCompile Include="..\..\src\spine\SkeletonRenderer.cpp" />
+    <ClCompile Include="..\..\src\spine\spine-cocos2dx.cpp" />
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
     <ClCompile Include="..\Classes\GoblinsExample.cpp" />
     <ClCompile Include="..\Classes\RaptorExample.cpp" />
@@ -144,11 +152,11 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\spine-c\spine-c.vcxproj">
+      <Project>{5d74934a-7512-45ee-8402-7b95d3642e85}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\cocos2dx\cocos\2d\libcocos2d.vcxproj">
       <Project>{98a51ba8-fc3a-415b-ac8f-8c7bd464e93e}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\cocos2dx\cocos\editor-support\spine\proj.win32\libSpine.vcxproj">
-      <Project>{b7c2a162-dec9-4418-972e-240ab3cbfcae}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\cocos2dx\external\Box2D\proj.win32\libbox2d.vcxproj">
       <Project>{929480e7-23c0-4df6-8456-096d71547116}</Project>

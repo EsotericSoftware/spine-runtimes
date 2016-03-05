@@ -11,7 +11,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "librecast", "..\..\cocos2dx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spine-cocos2dx", "spine-cocos2dx.vcxproj", "{DB4C84B9-AC6D-46A1-B7E6-A77FE4515ACF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libSpine", "..\..\cocos2dx\cocos\editor-support\spine\proj.win32\libSpine.vcxproj", "{B7C2A162-DEC9-4418-972E-240AB3CBFCAE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spine-c", "..\..\..\..\spine-c\spine-c.vcxproj", "{5D74934A-7512-45EE-8402-7B95D3642E85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,16 +73,16 @@ Global
 		{DB4C84B9-AC6D-46A1-B7E6-A77FE4515ACF}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{DB4C84B9-AC6D-46A1-B7E6-A77FE4515ACF}.Release|Win32.ActiveCfg = Release|Win32
 		{DB4C84B9-AC6D-46A1-B7E6-A77FE4515ACF}.Release|Win32.Build.0 = Release|Win32
-		{B7C2A162-DEC9-4418-972E-240AB3CBFCAE}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{B7C2A162-DEC9-4418-972E-240AB3CBFCAE}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{B7C2A162-DEC9-4418-972E-240AB3CBFCAE}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{B7C2A162-DEC9-4418-972E-240AB3CBFCAE}.Debug|Win32.ActiveCfg = Debug|Win32
-		{B7C2A162-DEC9-4418-972E-240AB3CBFCAE}.Debug|Win32.Build.0 = Debug|Win32
-		{B7C2A162-DEC9-4418-972E-240AB3CBFCAE}.Release|Any CPU.ActiveCfg = Release|Win32
-		{B7C2A162-DEC9-4418-972E-240AB3CBFCAE}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{B7C2A162-DEC9-4418-972E-240AB3CBFCAE}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{B7C2A162-DEC9-4418-972E-240AB3CBFCAE}.Release|Win32.ActiveCfg = Release|Win32
-		{B7C2A162-DEC9-4418-972E-240AB3CBFCAE}.Release|Win32.Build.0 = Release|Win32
+		{5D74934A-7512-45EE-8402-7B95D3642E85}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{5D74934A-7512-45EE-8402-7B95D3642E85}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{5D74934A-7512-45EE-8402-7B95D3642E85}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{5D74934A-7512-45EE-8402-7B95D3642E85}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5D74934A-7512-45EE-8402-7B95D3642E85}.Debug|Win32.Build.0 = Debug|Win32
+		{5D74934A-7512-45EE-8402-7B95D3642E85}.Release|Any CPU.ActiveCfg = Release|Win32
+		{5D74934A-7512-45EE-8402-7B95D3642E85}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{5D74934A-7512-45EE-8402-7B95D3642E85}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{5D74934A-7512-45EE-8402-7B95D3642E85}.Release|Win32.ActiveCfg = Release|Win32
+		{5D74934A-7512-45EE-8402-7B95D3642E85}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

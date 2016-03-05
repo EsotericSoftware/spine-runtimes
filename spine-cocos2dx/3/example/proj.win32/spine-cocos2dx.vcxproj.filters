@@ -7,6 +7,9 @@
     <Filter Include="Classes">
       <UniqueIdentifier>{0dcd52ca-d521-4ba1-a1fa-c0d58a2df402}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{d38e21b5-cae6-46c6-99c4-33c99bc0383d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -27,6 +30,18 @@
     <ClInclude Include="..\Classes\RaptorExample.h">
       <Filter>Classes</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\spine\PolygonBatch.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\spine\SkeletonAnimation.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\spine\SkeletonRenderer.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\spine\spine-cocos2dx.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -43,6 +58,18 @@
     </ClCompile>
     <ClCompile Include="..\Classes\RaptorExample.cpp">
       <Filter>Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spine\PolygonBatch.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spine\SkeletonAnimation.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spine\SkeletonRenderer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spine\spine-cocos2dx.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
