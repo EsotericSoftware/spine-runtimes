@@ -26,7 +26,7 @@ To run the cocos2d-x Spine examples on Windows:
 
 1. Place cocos2d-x into `spine-cocos2dx/3/cocos2dx` and open `spine-cocos2dx/3/example/proj.win32/spine-cocos2dx.sln`. Alternatively, add `spine-cocos2dx/3/example/proj.win32/spine-cocos2dx.vcxproj` to your Visual Studio solution which contains cocos2d-x.
 1. Copy the contents of `spine-cocos2dx/3/example/Resources` to `spine-cocos2dx/3/example/proj.win32/Debug.win32`. This step is required because cocos2d-x insists on looking for resources in the directory containing the executable.
-1. Run the `spine-cocos2dx` project. Optionally, modify `AppDelegate.cpp` to change which scene is run.
+1. Run the `spine-cocos2dx` project. Click to show debug bones, again for slow motion, and again to change scenes.
 
 ## Notes
 
