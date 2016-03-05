@@ -10,67 +10,23 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Setup
 
+The setup for cocos2d-x differs from most other Spine Runtimes because the cocos2d-x distribution includes a copy of the Spine Runtime files. This is not ideal because these files may be old and fail to work with the latest Spine editor. Also it means if cocos2d-x is updated, you may get newer Spine Runtime files which can break your application if you are not using the latest Spine editor. For these reasons, we have requested cocos2d-x to cease distributing the Spine Runtime files, but they  continue to do so.
+
+To replace the Spine Runtime files distributed with cocos2d-x, please follow these directions:
+
+1. Download a [cocos2d-x](http://www.cocos2d-x.org/download) version 3.x distribution or get the latest from [GitHub](https://github.com/cocos2d/cocos2d-x) or [as a zip](https://github.com/cocos2d/cocos2d-x/archive/v3.zip).
+1. Run the `cocos2dx/download-deps.py` Python script to download dependencies required by cocos2d-x.
+1. Delete the `.c`, `.cpp`, and `.h` files in `cocos2dx/cocos/editor-support/spine`. These are the Spine Runtime files that cocos2d-x distributes.
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
-1. Place the contents of a cocos2d-x version 3.x distribution into the `spine-cocos2dx/3/cocos2dx` directory.
-1. Run the `python download-deps.py` script in the `spine-cocos2dx/3/cocos2dx` directory.
-1. Open the XCode (Mac) or Visual C++ 2012 Express (Windows) project file from the `spine-cocos2dx/3/example` directory. Build files are also provided for Android.
+1. Copy `spine-c/src/spine`, `spine-c/include/spine`, and `spine-cocos2dx/3/src/spine` to `spine-cocos2dx/3/cocos2dx/cocos/editor-support/spine`. If any files were added or removed, you may need to edit the appropriate cocos2d-x project files.
 
-Alternatively, the contents of the `spine-c/src`, `spine-c/include` and `spine-cocos2dx/3/src` directories can be copied into your project. Be sure your header search path will find the contents of the `spine-c/include` and `spine-cocos2dx/3.1/src` directories. Note that the includes use `spine/Xxx.h`, so the `spine` directory cannot be omitted when copying the files.
+Alternatively, you may delete the Spine Runtime files out of cocos2d-x and directly use the contents of the `spine-c/src`, `spine-c/include`, and `spine-cocos2dx/3/src` directories in your projects. Be sure your header search path will find the contents of these directories. Note that the includes use `spine/Xxx.h`, so the `spine` directory cannot be omitted when copying the files.
 
-## Setup for Cocos Studio Users (cocos2d-x-3.10)
-1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
-	- Extract them somewhere you can find them. You will only need `spine-c` and `spine-cocos2dx`.
-1. Download and install Cocos: http://www.cocos2d-x.org/download
-	- (2016 March 4) Downloading and installing Cocos Studio and cocos2d-x-3.10 includes a Spine runtime in their source files. For instance, if the default install folder is `C:\Cocos\`, you will find an existing spine-c and spine-cocos2dx runtime inside `C:\Cocos\Cocos2d-x\cocos2d-x-3.10\cocos\editor-support\spine`.
-		- Replace the contents of that folder with the files from the following Spine runtime folders:
-			- `spine-c/src/spine`
-			- `spine-c/include/spine`
-			- `spine-cocos2dx/3/src/spine`
-		- Since this is the shared version of the runtime Cocos Studio uses for all projects created through it, updating the Spine runtime here also updates the Spine runtime of all those projects.
+To run the cocos2d-x Spine examples on Windows:
 
-### Examples
-1. Create a **new C++ Cocos Studio project**. Make sure you can find that folder. 
-1. The `spine-cocos2dx/3/` runtime folder contains a folder named `example`.
-	- Copy the files in `spine-cocos2dx/3/example/Classes` folder (except `AppDelegate.cpp`, `AppDelegate.h` and `AppMacros.h` into the `Classes` folder of your Cocos Studio project.)
-1. Add these files into your C++ Solution. (through your IDE, Visual Studio or Eclipse, etc...)
-2. If this is a newly created project, edit the `AppDelegate.cpp`. For this example, we will use RaptorExample.
-	1. Add `#include "RaptorExample.h"` to the includes near the top of the file.
-	2. Look for the `bool AppDelegate::applicationDidFinishLaunching()` method and replace it with this. Notice the line where it defines the scene `auto scene = RaptorExample::scene()`:
-
-```cpp
-bool AppDelegate::applicationDidFinishLaunching() {
-    // initialize director
-    auto director = Director::getInstance();
-    auto glview = director->getOpenGLView();
-    if(!glview) {
-        glview = GLViewImpl::createWithRect("Spine Test", Rect(0, 0, 960, 640));
-        director->setOpenGLView(glview);
-    }
-
-    director->getOpenGLView()->setDesignResolutionSize(960, 640, ResolutionPolicy::SHOW_ALL);
-
-    // turn on display FPS
-    director->setDisplayStats(true);
-
-    // set FPS. the default value is 1.0/60 if you don't call this
-    director->setAnimationInterval(1.0f / 60);
-
-    FileUtils::getInstance()->addSearchPath("res");
-
-    // create a scene. it's an autorelease object    
-    auto scene = RaptorExample::scene();
-
-    // run
-    director->runWithScene(scene);
-
-    return true;
-}
-```
-
-You can do the same with `GoblinsExample` and `SpineboyExample`.
-	
-
-
+1. Place cocos2d-x into `spine-cocos2dx/3/cocos2dx` and open `spine-cocos2dx/3/example/proj.win32/spine-cocos2dx.sln`. Alternatively, add `spine-cocos2dx/3/example/proj.win32/spine-cocos2dx.vcxproj` to your Visual Studio solution which contains cocos2d-x.
+1. Copy the contents of `spine-cocos2dx/3/example/Resources` to `spine-cocos2dx/3/example/proj.win32/Debug.win32`. This step is required because cocos2d-x insists on looking for resources in the directory containing the executable.
+1. Run the `spine-cocos2dx` project. Optionally, modify `AppDelegate.cpp` to change which scene is run.
 
 ## Notes
 
