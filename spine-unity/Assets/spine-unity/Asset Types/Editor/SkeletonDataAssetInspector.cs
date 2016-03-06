@@ -73,7 +73,7 @@ public class SkeletonDataAssetInspector : Editor {
 
 		m_skeletonData = m_skeletonDataAsset.GetSkeletonData(true);
 
-		showBaking = EditorPrefs.GetBool("SkeletonDataAssetInspector_showUnity", true);
+		showBaking = EditorPrefs.GetBool("SkeletonDataAssetInspector_showUnity", false);
 
 		RepopulateWarnings();
 	}
