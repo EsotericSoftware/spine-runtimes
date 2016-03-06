@@ -12,7 +12,9 @@ using Spine;
 
 [CustomEditor(typeof(SkeletonUtilityBone)), CanEditMultipleObjects]
 public class SkeletonUtilityBoneInspector : Editor {
-	SerializedProperty mode, boneName, zPosition, position, rotation, scale, overrideAlpha, parentReference, flip, flipX;
+	SerializedProperty mode, boneName, zPosition, position, rotation, scale, overrideAlpha, parentReference;
+	// MITCH
+//	SerializedProperty flip, flipX;
 
 	//multi selected flags
 	bool containsFollows, containsOverrides, multiObject;
@@ -34,8 +36,10 @@ public class SkeletonUtilityBoneInspector : Editor {
 		scale = this.serializedObject.FindProperty("scale");
 		overrideAlpha = this.serializedObject.FindProperty("overrideAlpha");
 		parentReference = this.serializedObject.FindProperty("parentReference");
-		flip = this.serializedObject.FindProperty("flip");
-		flipX = this.serializedObject.FindProperty("flipX");
+
+		// MITCH
+//		flip = this.serializedObject.FindProperty("flip");
+//		flipX = this.serializedObject.FindProperty("flipX");
 
 		EvaluateFlags();
 
@@ -144,22 +148,24 @@ public class SkeletonUtilityBoneInspector : Editor {
 		EditorGUILayout.PropertyField(position);
 		EditorGUILayout.PropertyField(rotation);
 		EditorGUILayout.PropertyField(scale);
-		EditorGUILayout.PropertyField(flip);
+		// MITCH
+//		EditorGUILayout.PropertyField(flip);
 
 		EditorGUI.BeginDisabledGroup(containsFollows);
 		{
 			EditorGUILayout.PropertyField(overrideAlpha);
 			EditorGUILayout.PropertyField(parentReference);
 
-			EditorGUI.BeginDisabledGroup(multiObject || !flip.boolValue);
-			{
-				EditorGUI.BeginChangeCheck();
-				EditorGUILayout.PropertyField(flipX);
-				if (EditorGUI.EndChangeCheck()) {
-					FlipX(flipX.boolValue);
-				}
-			}
-			EditorGUI.EndDisabledGroup();
+			// MITCH
+//			EditorGUI.BeginDisabledGroup(multiObject || !flip.boolValue);
+//			{
+//				EditorGUI.BeginChangeCheck();
+//				EditorGUILayout.PropertyField(flipX);
+//				if (EditorGUI.EndChangeCheck()) {
+//					FlipX(flipX.boolValue);
+//				}
+//			}
+//			EditorGUI.EndDisabledGroup();
 
 		}
 		EditorGUI.EndDisabledGroup();
@@ -226,12 +232,13 @@ public class SkeletonUtilityBoneInspector : Editor {
 		serializedObject.ApplyModifiedProperties();
 	}
 
-	void FlipX (bool state) {
-		utilityBone.FlipX(state);
-		if (Application.isPlaying == false) {
-			skeletonUtility.skeletonAnimation.LateUpdate();
-		}
-	}
+	// MITCH
+//	void FlipX (bool state) {
+//		utilityBone.FlipX(state);
+//		if (Application.isPlaying == false) {
+//			skeletonUtility.skeletonAnimation.LateUpdate();
+//		}
+//	}
 
 	void BoneSelectorContextMenu (string current, ExposedList<Bone> bones, string topValue, GenericMenu.MenuFunction2 callback) {
 		GenericMenu menu = new GenericMenu();
@@ -329,7 +336,7 @@ public class SkeletonUtilityBoneInspector : Editor {
 		}
 	}
 	
-	void AttachRigidbody (SkeletonUtilityBone utilBone) {
+	static void AttachRigidbody (SkeletonUtilityBone utilBone) {
 		if (utilBone.GetComponent<Collider>() == null) {
 			if (utilBone.bone.Data.Length == 0) {
 				SphereCollider sphere = utilBone.gameObject.AddComponent<SphereCollider>();

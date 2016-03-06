@@ -32,6 +32,8 @@ public class SkeletonUtilityBone : MonoBehaviour {
 	public bool position;
 	public bool rotation;
 	public bool scale;
+	// MITCH : remove flipX
+	// Kept these fields public to retain serialization. Probably remove eventually?
 	public bool flip;
 	public bool flipX;
 	[Range(0f, 1f)]
@@ -40,18 +42,23 @@ public class SkeletonUtilityBone : MonoBehaviour {
 	/// <summary>If a bone isn't set, boneName is used to find the bone.</summary>
 	public String boneName;
 	public Transform parentReference;
-	[HideInInspector]
+
+	[System.NonSerialized]
 	public bool transformLerpComplete;
+
 	protected Transform cachedTransform;
 	protected Transform skeletonTransform;
 
-	public bool NonUniformScaleWarning {
-		get {
-			return nonUniformScaleWarning;
-		}
-	}
+	// MITCH : nonuniform scale
+//	private bool nonUniformScaleWarning;
+//	public bool NonUniformScaleWarning {
+//		get { return nonUniformScaleWarning; }
+//	}
 
-	private bool nonUniformScaleWarning;
+	private bool disableInheritScaleWarning;
+	public bool DisableInheritScaleWarning {
+		get { return disableInheritScaleWarning; }
+	}
 
 	public void Reset () {
 		bone = null;
@@ -60,10 +67,8 @@ public class SkeletonUtilityBone : MonoBehaviour {
 		if (!valid)
 			return;
 		skeletonTransform = skeletonUtility.transform;
-
 		skeletonUtility.OnReset -= HandleOnReset;
 		skeletonUtility.OnReset += HandleOnReset;
-
 		DoUpdate();
 	}
 
@@ -74,7 +79,6 @@ public class SkeletonUtilityBone : MonoBehaviour {
 			return;
 
 		skeletonUtility.RegisterBone(this);
-
 		skeletonUtility.OnReset += HandleOnReset;
 	}
 
@@ -85,13 +89,11 @@ public class SkeletonUtilityBone : MonoBehaviour {
 	void OnDisable () {
 		if (skeletonUtility != null) {
 			skeletonUtility.OnReset -= HandleOnReset;
-
 			skeletonUtility.UnregisterBone(this);
 		}
 	}
 
 	public void DoUpdate () {
-
 		if (!valid) {
 			Reset();
 			return;
@@ -102,39 +104,34 @@ public class SkeletonUtilityBone : MonoBehaviour {
 		if (bone == null) {
 			if (boneName == null || boneName.Length == 0)
 				return;
+			
 			bone = skeleton.FindBone(boneName);
+
 			if (bone == null) {
 				Debug.LogError("Bone not found: " + boneName, this);
 				return;
 			}
 		}
 
-
-
 		float skeletonFlipRotation = (skeleton.flipX ^ skeleton.flipY) ? -1f : 1f;
 
-		float flipCompensation = 0;
-
-        // MITCH
-		//if (flip && (flipX || (flipX != bone.flipX)) && bone.parent != null) {
-		//	flipCompensation = bone.parent.WorldRotation * -2;
-		//}
+		// MITCH : remove flipX
+//		float flipCompensation = 0;
+//		if (flip && (flipX || (flipX != bone.flipX)) && bone.parent != null) {
+//			flipCompensation = bone.parent.WorldRotation * -2;
+//		}
 
 		if (mode == Mode.Follow) {
-			if (flip) {
-                // MITCH
-				//flipX = bone.flipX;
-			}
-
-
-			if (position) {
+			// MITCH : remove flipX
+//			if (flip)
+//				flipX = bone.flipX;
+				
+			if (position)
 				cachedTransform.localPosition = new Vector3(bone.x, bone.y, 0);
-			}
 
 			if (rotation) {
-
 				if (bone.Data.InheritRotation) {
-                    // MITCH
+					// MITCH : remove flipX
 					//if (bone.FlipX) {
 					//	cachedTransform.localRotation = Quaternion.Euler(0, 180, bone.rotationIK - flipCompensation);
 					//} else {
@@ -142,21 +139,18 @@ public class SkeletonUtilityBone : MonoBehaviour {
 					//}
 				} else {
 					Vector3 euler = skeletonTransform.rotation.eulerAngles;
-					cachedTransform.rotation = Quaternion.Euler(euler.x, euler.y, skeletonTransform.rotation.eulerAngles.z + (bone.WorldRotationX * skeletonFlipRotation));
+					cachedTransform.rotation = Quaternion.Euler(euler.x, euler.y, euler.z + (bone.WorldRotationX * skeletonFlipRotation));
 				}
-
 			}
 
 			if (scale) {
 				cachedTransform.localScale = new Vector3(bone.scaleX, bone.scaleY, bone.WorldSignX);
-
-				nonUniformScaleWarning = (bone.scaleX != bone.scaleY);
+				// MITCH : nonuniform scale
+				//nonUniformScaleWarning = (bone.scaleX != bone.scaleY);
+				disableInheritScaleWarning = !bone.data.inheritScale;
 			}
 
 		} else if (mode == Mode.Override) {
-
-
-
 			if (transformLerpComplete)
 				return;
 
@@ -167,21 +161,22 @@ public class SkeletonUtilityBone : MonoBehaviour {
 				}
 
 				if (rotation) {
-					float angle = Mathf.LerpAngle(bone.Rotation, cachedTransform.localRotation.eulerAngles.z, overrideAlpha) + flipCompensation;
+					float angle = Mathf.LerpAngle(bone.Rotation, cachedTransform.localRotation.eulerAngles.z, overrideAlpha);
 
-					if (flip) {
-                        // MITCH
-						//if ((!flipX && bone.flipX)) {
-						//	angle -= flipCompensation;
-						//}
-
-						//TODO fix this...
-						if (angle >= 360)
-							angle -= 360;
-						else if (angle <= -360)
-							angle += 360;
-					}
-
+					// MITCH : remove flipX
+//					float angle = Mathf.LerpAngle(bone.Rotation, cachedTransform.localRotation.eulerAngles.z, overrideAlpha) + flipCompensation;
+//					if (flip) {
+//                        
+//						if ((!flipX && bone.flipX)) {
+//							angle -= flipCompensation;
+//						}
+//
+//						//TODO fix this...
+//						if (angle >= 360)
+//							angle -= 360;
+//						else if (angle <= -360)
+//							angle += 360;
+//					}
 					bone.Rotation = angle;
 					bone.AppliedRotation = angle;
 				}
@@ -189,16 +184,14 @@ public class SkeletonUtilityBone : MonoBehaviour {
 				if (scale) {
 					bone.scaleX = Mathf.Lerp(bone.scaleX, cachedTransform.localScale.x, overrideAlpha);
 					bone.scaleY = Mathf.Lerp(bone.scaleY, cachedTransform.localScale.y, overrideAlpha);
-
-					nonUniformScaleWarning = (bone.scaleX != bone.scaleY);
+					// MITCH : nonuniform scale
+					//nonUniformScaleWarning = (bone.scaleX != bone.scaleY);
 				}
 
-                // MITCH
-				//if (flip) {
+				// MITCH : remove flipX
+				//if (flip)
 				//	bone.flipX = flipX;
-				//}
 			} else {
-
 				if (transformLerpComplete)
 					return;
 
@@ -208,74 +201,84 @@ public class SkeletonUtilityBone : MonoBehaviour {
 					bone.y = Mathf.Lerp(bone.y, pos.y, overrideAlpha);
 				}
 
+				// MITCH
 				if (rotation) {
-					float angle = Mathf.LerpAngle(bone.Rotation, Quaternion.LookRotation(flipX ? Vector3.forward * -1 : Vector3.forward, parentReference.InverseTransformDirection(cachedTransform.up)).eulerAngles.z, overrideAlpha) + flipCompensation;
+					float angle = Mathf.LerpAngle(bone.Rotation, Quaternion.LookRotation(flipX ? Vector3.forward * -1 : Vector3.forward, parentReference.InverseTransformDirection(cachedTransform.up)).eulerAngles.z, overrideAlpha);
 
-					if (flip) {
-                        // MITCH
-						//if ((!flipX && bone.flipX)) {
-						//	angle -= flipCompensation;
-						//}
-
-						//TODO fix this...
-						if (angle >= 360)
-							angle -= 360;
-						else if (angle <= -360)
-							angle += 360;
-					}
-
+					// MITCH : remove flipX
+//					float angle = Mathf.LerpAngle(bone.Rotation, Quaternion.LookRotation(flipX ? Vector3.forward * -1 : Vector3.forward, parentReference.InverseTransformDirection(cachedTransform.up)).eulerAngles.z, overrideAlpha) + flipCompensation;
+//					if (flip) {
+//                        
+//						if ((!flipX && bone.flipX)) {
+//							angle -= flipCompensation;
+//						}
+//
+//						//TODO fix this...
+//						if (angle >= 360)
+//							angle -= 360;
+//						else if (angle <= -360)
+//							angle += 360;
+//					}
 					bone.Rotation = angle;
 					bone.AppliedRotation = angle;
 				}
-
-				//TODO: Something about this
+					
 				if (scale) {
 					bone.scaleX = Mathf.Lerp(bone.scaleX, cachedTransform.localScale.x, overrideAlpha);
 					bone.scaleY = Mathf.Lerp(bone.scaleY, cachedTransform.localScale.y, overrideAlpha);
-
-					nonUniformScaleWarning = (bone.scaleX != bone.scaleY);
+					// MITCH : nonuniform scale
+					//nonUniformScaleWarning = (bone.scaleX != bone.scaleY);
 				}
 
-                // MITCH
-				//if (flip) {
+				disableInheritScaleWarning = !bone.data.inheritScale;
+
+				// MITCH : remove flipX
+				//if (flip)
 				//	bone.flipX = flipX;
-				//}
 			}
 
 			transformLerpComplete = true;
 		}
 	}
 
-	public void FlipX (bool state) {
-		if (state != flipX) {
-			flipX = state;
-			if (flipX && Mathf.Abs(transform.localRotation.eulerAngles.y) > 90) {
-				skeletonUtility.skeletonAnimation.LateUpdate();
-				return;
-			} else if (!flipX && Mathf.Abs(transform.localRotation.eulerAngles.y) < 90) {
-				skeletonUtility.skeletonAnimation.LateUpdate();
-				return;
-			}
-		}
-
-        // MITCH
-		//bone.FlipX = state;
-		transform.RotateAround(transform.position, skeletonUtility.transform.up, 180);
-		Vector3 euler = transform.localRotation.eulerAngles;
-		euler.x = 0;
-        // MITCH
-		//euler.y = bone.FlipX ? 180 : 0;
-        euler.y = 0;
-		transform.localRotation = Quaternion.Euler(euler);
-	}
+	// MITCH : remove flipX
+//	public void FlipX (bool state) {
+//		if (state != flipX) {
+//			flipX = state;
+//			if (flipX && Mathf.Abs(transform.localRotation.eulerAngles.y) > 90) {
+//				skeletonUtility.skeletonAnimation.LateUpdate();
+//				return;
+//			} else if (!flipX && Mathf.Abs(transform.localRotation.eulerAngles.y) < 90) {
+//				skeletonUtility.skeletonAnimation.LateUpdate();
+//				return;
+//			}
+//		}
+//
+//        
+//		bone.FlipX = state;
+//		transform.RotateAround(transform.position, skeletonUtility.transform.up, 180);
+//		Vector3 euler = transform.localRotation.eulerAngles;
+//		euler.x = 0;
+//        
+//		euler.y = bone.FlipX ? 180 : 0;
+//        euler.y = 0;
+//		transform.localRotation = Quaternion.Euler(euler);
+//	}
 
 	public void AddBoundingBox (string skinName, string slotName, string attachmentName) {
 		SkeletonUtility.AddBoundingBox(bone.skeleton, skinName, slotName, attachmentName, transform);
 	}
 
+
+	#if UNITY_EDITOR
 	void OnDrawGizmos () {
-		if (NonUniformScaleWarning) {
-			Gizmos.DrawIcon(transform.position + new Vector3(0, 0.128f, 0), "icon-warning");
-		}
+		// MITCH : nonuniform scale
+//		if (NonUniformScaleWarning) {
+//			Gizmos.DrawIcon(transform.position + new Vector3(0, 0.128f, 0), "icon-warning");
+//		}
+
+		if (DisableInheritScaleWarning)
+			Gizmos.DrawIcon(transform.position + new Vector3(0, 0.128f, 0), "icon-warning");		
 	}
+	#endif
 }
