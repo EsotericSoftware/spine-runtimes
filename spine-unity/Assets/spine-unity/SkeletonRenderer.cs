@@ -176,6 +176,8 @@ public class SkeletonRenderer : MonoBehaviour {
 		if (!meshRenderer.enabled && submeshRenderers.Length == 0)
 			return;
 
+		// This method caches several .Items arrays. Whenever it does, there should be no mutations done on the overlying ExposedList object.
+
 		// Count vertices and submesh triangles.
 		int vertexCount = 0;
 
@@ -192,23 +194,23 @@ public class SkeletonRenderer : MonoBehaviour {
 		var workingAttachments = workingState.attachments;
 		workingAttachments.Clear(true);
 		workingState.UpdateAttachmentCount(drawOrderCount);
-		var workingAttachmentsItems = workingAttachments.Items;				// Make sure to not add to or remove from ExposedList inside the loop below
+		var workingAttachmentsItems = workingAttachments.Items;
 
 		var workingFlips = workingState.attachmentsFlipState;
-		var workingFlipsItems = workingState.attachmentsFlipState.Items;	// Make sure to not add to or remove from ExposedList inside the loop below
+		var workingFlipsItems = workingState.attachmentsFlipState.Items;
 
 		var workingSubmeshArguments = workingState.addSubmeshArguments;	// Items array should not be cached. There is dynamic writing to this object.
 		workingSubmeshArguments.Clear(false);
 
 		MeshState.SingleMeshState storedState = useMesh1 ? meshState.stateMesh1 : meshState.stateMesh2;
 		var storedAttachments = storedState.attachments;
-		var storedAttachmentsItems = storedAttachments.Items;			// Make sure to not add to or remove from ExposedList inside the loop below
+		var storedAttachmentsItems = storedAttachments.Items;
 
 		var storedFlips = storedState.attachmentsFlipState;
-		var storedFlipsItems = storedFlips.Items;						// Make sure to not add to or remove from ExposedList inside the loop below
+		var storedFlipsItems = storedFlips.Items;
 
 		bool mustUpdateMeshStructure = storedState.requiresUpdate ||	// Force update if the mesh was cleared. (prevents flickering due to incorrect state)
-			drawOrder.Count != storedAttachments.Count ||				// Number of slots changed (when does this happen?)
+			drawOrderCount != storedAttachments.Count ||				// Number of slots changed (when does this happen?)
 			immutableTriangles != storedState.immutableTriangles;		// Immutable Triangles flag changed.
 
 		bool isCustomMaterialsPopulated = customSlotMaterials.Count > 0;
@@ -221,10 +223,8 @@ public class SkeletonRenderer : MonoBehaviour {
 			object rendererObject; // An AtlasRegion in plain Spine-Unity. Spine-TK2D hooks into TK2D's system. eventual source of Material object.
 			int attachmentVertexCount, attachmentTriangleCount;
 
-			// Handle flipping for normals (for lighting).
-            // MITCH
-			bool worldScaleIsSameSigns = ((bone.WorldSignX >= 0f) == (bone.WorldSignY >= 0f));
-			bool flip = frontFacing && ((bone.WorldSignX != bone.WorldSignY) == worldScaleIsSameSigns); // TODO: bone flipX and flipY will be removed in Spine 3.0
+			// Handle flipping for triangle winding (for lighting?).           
+			bool flip = frontFacing && (bone.WorldSignX != bone.WorldSignY);
 
 			workingFlipsItems[i] = flip;
 			workingAttachmentsItems[i] = attachment;
@@ -633,8 +633,6 @@ public class SkeletonRenderer : MonoBehaviour {
 
 		// Check if any mesh settings were changed
 		MeshState.SingleMeshState currentMeshState = useMesh1 ? meshState.stateMesh1 : meshState.stateMesh2;
-
-		// Check if submesh structures has changed
 		ExposedList<MeshState.AddSubmeshArguments> addSubmeshArgumentsCurrentMesh = currentMeshState.addSubmeshArguments;
 		int submeshCount = workingAddSubmeshArguments.Count;
 		if (addSubmeshArgumentsCurrentMesh.Count != submeshCount)
@@ -648,7 +646,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		return false;
 	}
 
-	private void AddSubmesh (MeshState.AddSubmeshArguments submeshArguments, ExposedList<bool> flipStates) { //submeshArguments is a struct, so it's ok.
+	private void AddSubmesh (MeshState.AddSubmeshArguments submeshArguments, ExposedList<bool> flipStates) {
 		int submeshIndex = submeshMaterials.Count;
 		submeshMaterials.Add(submeshArguments.material);
 
@@ -696,10 +694,10 @@ public class SkeletonRenderer : MonoBehaviour {
 			return;
 		}
 
+		// This method caches several .Items arrays. Whenever it does, there should be no mutations done on the overlying ExposedList object.
 		// Iterate through all slots and store their triangles. 
-
-		var drawOrderItems = skeleton.DrawOrder.Items;	// Make sure to not modify ExposedList inside the loop below
-		var flipStatesItems = flipStates.Items;			// Make sure to not modify ExposedList inside the loop below
+		var drawOrderItems = skeleton.DrawOrder.Items;
+		var flipStatesItems = flipStates.Items;
 
 		int triangleIndex = 0; // Modified by loop
 		for (int i = submeshArguments.startSlot, n = submeshArguments.endSlot; i < n; i++) {			
@@ -730,12 +728,12 @@ public class SkeletonRenderer : MonoBehaviour {
 				continue;
 			}
 
-			// Add (Skinned)MeshAttachment triangles
+			// Add (Weighted)MeshAttachment triangles
 			int[] attachmentTriangles;
 			int attachmentVertexCount;
 			var meshAttachment = attachment as MeshAttachment;
 			if (meshAttachment != null) {
-				attachmentVertexCount = meshAttachment.vertices.Length >> 1; //  length/2
+				attachmentVertexCount = meshAttachment.vertices.Length >> 1; // length/2
 				attachmentTriangles = meshAttachment.triangles;
 			} else {
 				var weightedMeshAttachment = attachment as WeightedMeshAttachment;
@@ -764,7 +762,7 @@ public class SkeletonRenderer : MonoBehaviour {
 
 	#if UNITY_EDITOR
 	void OnDrawGizmos () {
-		// Make selection easier by drawing a clear gizmo over the skeleton.
+		// Make scene view selection easier by drawing a clear gizmo over the skeleton.
 		meshFilter = GetComponent<MeshFilter>();
 		if (meshFilter == null) return;
 
