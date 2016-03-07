@@ -35,7 +35,7 @@ using UnityEngine;
 
 [CustomEditor(typeof(BoneFollower))]
 public class BoneFollowerInspector : Editor {
-	private SerializedProperty boneName, skeletonRenderer, followZPosition, followBoneRotation;
+	SerializedProperty boneName, skeletonRenderer, followZPosition, followBoneRotation;
 	BoneFollower component;
 	bool needsReset;
 
@@ -47,18 +47,7 @@ public class BoneFollowerInspector : Editor {
 		component = (BoneFollower)target;
 		component.skeletonRenderer.Initialize(false);
 	}
-
-	void FindRenderer () {
-		if (skeletonRenderer.objectReferenceValue == null) {
-			SkeletonRenderer parentRenderer = SkeletonUtility.GetInParent<SkeletonRenderer>(component.transform);
-
-			if (parentRenderer != null) {
-				skeletonRenderer.objectReferenceValue = (UnityEngine.Object)parentRenderer;
-			}
-
-		}
-	}
-
+		
 	override public void OnInspectorGUI () {
 		if (needsReset) {
 			component.Reset();
@@ -68,7 +57,14 @@ public class BoneFollowerInspector : Editor {
 		}
 		serializedObject.Update();
 
-		FindRenderer();
+		// FindRenderer()
+		if (skeletonRenderer.objectReferenceValue == null) {
+			SkeletonRenderer parentRenderer = SkeletonUtility.GetInParent<SkeletonRenderer>(component.transform);
+
+			if (parentRenderer != null) {
+				skeletonRenderer.objectReferenceValue = (UnityEngine.Object)parentRenderer;
+			}
+		}
 
 		EditorGUILayout.PropertyField(skeletonRenderer);
 
@@ -81,8 +77,6 @@ public class BoneFollowerInspector : Editor {
 				serializedObject.Update();
 			}
 				
-				
-
 			EditorGUILayout.PropertyField(followBoneRotation);
 			EditorGUILayout.PropertyField(followZPosition);
 		} else {
