@@ -32,6 +32,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Spine;
+using Spine.Unity;
 
 /// <summary>Renders a skeleton.</summary>
 [ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer)), DisallowMultipleComponent]
@@ -52,11 +53,15 @@ public class SkeletonRenderer : MonoBehaviour {
 
 	// Submesh Separation
 	[SpineSlot] public string[] submeshSeparators = new string[0];
-	[HideInInspector] public List<Slot> submeshSeparatorSlots = new List<Slot>();
+	[System.NonSerialized] public List<Slot> submeshSeparatorSlots = new List<Slot>();
 
 	// Custom Slot Material
-	[System.NonSerialized] private readonly Dictionary<Slot, Material> customSlotMaterials = new Dictionary<Slot, Material>();
+	[System.NonSerialized] readonly Dictionary<Slot, Material> customSlotMaterials = new Dictionary<Slot, Material>();
 	public Dictionary<Slot, Material> CustomSlotMaterials { get { return customSlotMaterials; } }
+
+	// Custom Mesh Generation Override
+	public delegate void InstructionDelegate (SkeletonRenderer.SmartMesh.Instruction instruction);
+	public event InstructionDelegate GenerateMeshOverride;
 	#endregion
 
 	[System.NonSerialized] public bool valid;
@@ -65,7 +70,7 @@ public class SkeletonRenderer : MonoBehaviour {
 	MeshRenderer meshRenderer;
 	MeshFilter meshFilter;
 
-	DoubleBufferedSmartMesh doubleBufferedMesh;
+	Spine.Unity.DoubleBuffered<SkeletonRenderer.SmartMesh> doubleBufferedMesh;
 	readonly SmartMesh.Instruction currentInstructions = new SmartMesh.Instruction();
 	readonly ExposedList<SubmeshTriangleBuffer> submeshes = new ExposedList<SubmeshTriangleBuffer>();
 
@@ -79,8 +84,6 @@ public class SkeletonRenderer : MonoBehaviour {
 
 	Vector3[] normals;
 	Vector4[] tangents;
-
-	SkeletonUtilitySubmeshRenderer[] submeshRenderers;
 
 	#region Runtime Instantiation
 	public static T NewSpineGameObject<T> (SkeletonDataAsset skeletonDataAsset) where T : SkeletonRenderer {
@@ -140,7 +143,7 @@ public class SkeletonRenderer : MonoBehaviour {
 
 		meshFilter = GetComponent<MeshFilter>();
 		meshRenderer = GetComponent<MeshRenderer>();
-		doubleBufferedMesh = new DoubleBufferedSmartMesh();
+		doubleBufferedMesh = new DoubleBuffered<SmartMesh>();
 		vertices = new Vector3[0];
 
 		skeleton = new Skeleton(skeletonData);
@@ -152,23 +155,17 @@ public class SkeletonRenderer : MonoBehaviour {
 			submeshSeparatorSlots.Add(skeleton.FindSlot(submeshSeparators[i]));
 		}
 
-		CollectSubmeshRenderers();
-
 		LateUpdate();
 
 		if (OnRebuild != null)
 			OnRebuild(this);
 	}
 
-	public void CollectSubmeshRenderers () {
-		submeshRenderers = GetComponentsInChildren<SkeletonUtilitySubmeshRenderer>();
-	}
-
 	public virtual void LateUpdate () {
 		if (!valid)
 			return;
 
-		if (!meshRenderer.enabled && submeshRenderers.Length == 0)
+		if (!meshRenderer.enabled && GenerateMeshOverride == null)
 			return;
 
 		// Step 1. Determine a SmartMesh.Instruction. Split up instructions into submeshes.
@@ -202,6 +199,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		bool isCustomMaterialsPopulated = customSlotMaterials.Count > 0;
 
 		int vertexCount = 0;
+		int submeshVertexCount = 0;
 		int submeshTriangleCount = 0, submeshFirstVertex = 0, submeshStartSlotIndex = 0;
 		Material lastMaterial = null;
 		for (int i = 0; i < drawOrderCount; i++) {
@@ -261,16 +259,19 @@ public class SkeletonRenderer : MonoBehaviour {
 				(submeshSeparatorSlotsCount > 0 && submeshSeparatorSlots.Contains(slot))) {
 
 				workingSubmeshInstructions.Add(
-					new SmartMesh.Instruction.SubmeshInstruction {
+					new Spine.Unity.SubmeshInstruction {
+						skeleton = this.skeleton,
 						material = lastMaterial,
 						startSlot = submeshStartSlotIndex,
 						endSlot = i,
 						triangleCount = submeshTriangleCount,
-						firstVertex = submeshFirstVertex,
+						firstVertexIndex = submeshFirstVertex,
+						vertexCount = submeshVertexCount
 					}
 				);
 
 				submeshTriangleCount = 0;
+				submeshVertexCount = 0;
 				submeshFirstVertex = vertexCount;
 				submeshStartSlotIndex = i;
 			}
@@ -278,15 +279,18 @@ public class SkeletonRenderer : MonoBehaviour {
 
 			submeshTriangleCount += attachmentTriangleCount;
 			vertexCount += attachmentVertexCount;
+			submeshVertexCount += attachmentVertexCount;
 		}
 
 		workingSubmeshInstructions.Add(
-			new SmartMesh.Instruction.SubmeshInstruction {
+			new Spine.Unity.SubmeshInstruction {
+				skeleton = this.skeleton,
 				material = lastMaterial,
 				startSlot = submeshStartSlotIndex,
 				endSlot = drawOrderCount,
 				triangleCount = submeshTriangleCount,
-				firstVertex = submeshFirstVertex,
+				firstVertexIndex = submeshFirstVertex,
+				vertexCount = submeshVertexCount
 			}
 		);
 
@@ -294,6 +298,10 @@ public class SkeletonRenderer : MonoBehaviour {
 		workingInstruction.immutableTriangles = this.immutableTriangles;
 		workingInstruction.frontFacing = this.frontFacing;
 
+		if (GenerateMeshOverride != null) {
+			GenerateMeshOverride(workingInstruction);
+			return;
+		}
 
 		// Step 2. Update vertex buffer based on verts from the attachments.
 		// Uses values that were also stored in workingInstruction.
@@ -509,7 +517,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		}
 
 		// Step 3. Move the mesh data into a UnityEngine.Mesh
-		var currentSmartMesh = doubleBufferedMesh.GetNextMesh();	// Double-buffer for performance.
+		var currentSmartMesh = doubleBufferedMesh.GetNext();	// Double-buffer for performance.
 		var currentMesh = currentSmartMesh.mesh;
 
 		currentMesh.vertices = vertices;
@@ -590,20 +598,7 @@ public class SkeletonRenderer : MonoBehaviour {
 
 
 		// Step 5. Miscellaneous
-		// Submesh Renderers
-		if (submeshRenderers.Length > 0) {
-			var thisSharedMaterials = this.sharedMaterials;
-			for (int i = 0; i < submeshRenderers.Length; i++) {
-				SkeletonUtilitySubmeshRenderer submeshRenderer = submeshRenderers[i];
-				if (submeshRenderer.submeshIndex < thisSharedMaterials.Length) {
-					submeshRenderer.SetMesh(meshRenderer, currentMesh, thisSharedMaterials[submeshRenderer.submeshIndex]);
-				} else {
-					submeshRenderer.GetComponent<Renderer>().enabled = false;
-				}
-			}
-		}
-
-
+		// Add stuff here if you want
 	}
 
 	static bool CheckIfMustUpdateMeshStructure (SmartMesh.Instruction a, SmartMesh.Instruction b) {
@@ -612,6 +607,9 @@ public class SkeletonRenderer : MonoBehaviour {
 		if (!Application.isPlaying)
 			return true;
 		#endif
+
+		if (a.vertexCount != b.vertexCount)
+			return true;
 
 		if (a.immutableTriangles != b.immutableTriangles)
 			return true;
@@ -652,22 +650,25 @@ public class SkeletonRenderer : MonoBehaviour {
 			var submeshA = submeshInstructionsItemsA[i];
 			var submeshB = submeshInstructionsItemsB[i];
 
-			if (!(submeshA.startSlot == submeshB.startSlot &&
+			if (!(
+				submeshA.vertexCount == submeshB.vertexCount &&
+				submeshA.startSlot == submeshB.startSlot &&
 				submeshA.endSlot == submeshB.endSlot &&
 				submeshA.triangleCount == submeshB.triangleCount &&
-				submeshA.firstVertex == submeshB.firstVertex))
+				submeshA.firstVertexIndex == submeshB.firstVertexIndex
+			))
 				return true;			
 		}
 
 		return false;
 	}
 		
-	void SetSubmesh (int submeshIndex, SmartMesh.Instruction.SubmeshInstruction submeshInstructions, ExposedList<bool> flipStates, bool isLastSubmesh) {
+	void SetSubmesh (int submeshIndex, Spine.Unity.SubmeshInstruction submeshInstructions, ExposedList<bool> flipStates, bool isLastSubmesh) {
 		SubmeshTriangleBuffer currentSubmesh = submeshes.Items[submeshIndex];
 		int[] triangles = currentSubmesh.triangles;
 
 		int triangleCount = submeshInstructions.triangleCount;
-		int firstVertex = submeshInstructions.firstVertex;
+		int firstVertex = submeshInstructions.firstVertexIndex;
 
 		int trianglesCapacity = triangles.Length;
 		if (isLastSubmesh && trianglesCapacity > triangleCount) {
@@ -787,19 +788,8 @@ public class SkeletonRenderer : MonoBehaviour {
 	}
 	#endif
 
-	class DoubleBufferedSmartMesh {
-		readonly SmartMesh mesh1 = new SmartMesh();
-		readonly SmartMesh mesh2 = new SmartMesh();
-		bool usingMesh1;
-
-		public SmartMesh GetNextMesh () {
-			usingMesh1 = !usingMesh1;
-			return usingMesh1 ? mesh1 : mesh2;
-		}
-	}
-
 	///<summary>This is a Mesh that also stores the instructions SkeletonRenderer generated for it.</summary>
-	class SmartMesh {
+	public class SmartMesh {
 		public Mesh mesh = Spine.Unity.SpineMesh.NewMesh();
 		public SmartMesh.Instruction instructionUsed = new SmartMesh.Instruction();		
 
@@ -809,11 +799,7 @@ public class SkeletonRenderer : MonoBehaviour {
 			public int vertexCount = -1;
 			public readonly ExposedList<Attachment> attachments = new ExposedList<Attachment>();
 			public readonly ExposedList<bool> attachmentFlips = new ExposedList<bool>();
-			public readonly ExposedList<SubmeshInstruction> submeshInstructions = new ExposedList<SubmeshInstruction>();
-			public struct SubmeshInstruction {
-				public Material material;
-				public int firstVertex, startSlot, endSlot, triangleCount;
-			}
+			public readonly ExposedList<Spine.Unity.SubmeshInstruction> submeshInstructions = new ExposedList<Spine.Unity.SubmeshInstruction>();
 
 			public void Clear () {
 				this.attachments.Clear(false);
@@ -824,7 +810,6 @@ public class SkeletonRenderer : MonoBehaviour {
 			public void Set (Instruction other) {
 				this.immutableTriangles = other.immutableTriangles;
 				this.frontFacing = other.frontFacing;
-				//this.requiresUpdate = other.requiresUpdate;
 				this.vertexCount = other.vertexCount;
 
 				this.attachments.Clear(false);

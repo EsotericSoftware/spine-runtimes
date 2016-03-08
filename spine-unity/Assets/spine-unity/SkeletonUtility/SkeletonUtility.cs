@@ -381,24 +381,4 @@ public class SkeletonUtility : MonoBehaviour {
 		return go;
 	}
 
-	public void SpawnSubRenderers (bool disablePrimaryRenderer) {
-		int submeshCount = GetComponent<MeshFilter>().sharedMesh.subMeshCount;
-
-		for (int i = 0; i < submeshCount; i++) {
-			GameObject go = new GameObject("Submesh " + i, typeof(MeshFilter), typeof(MeshRenderer));
-			go.transform.parent = transform;
-			go.transform.localPosition = Vector3.zero;
-			go.transform.localRotation = Quaternion.identity;
-			go.transform.localScale = Vector3.one;
-
-			SkeletonUtilitySubmeshRenderer s = go.AddComponent<SkeletonUtilitySubmeshRenderer>();
-			s.GetComponent<Renderer>().sortingOrder = i * 10;
-			s.submeshIndex = i;
-		}
-
-		skeletonRenderer.CollectSubmeshRenderers();
-
-		if (disablePrimaryRenderer)
-			GetComponent<Renderer>().enabled = false;
-	}
 }

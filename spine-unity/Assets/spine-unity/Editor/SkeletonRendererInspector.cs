@@ -30,7 +30,6 @@
  *****************************************************************************/
 
 using System;
-using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -40,9 +39,7 @@ public class SkeletonRendererInspector : Editor {
 
 	protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, submeshSeparators, front, zSpacing;
 
-	private static MethodInfo EditorGUILayoutSortingLayerField;
-	protected SerializedObject rendererSerializedObject;
-	protected SerializedProperty sortingLayerIDProperty;
+	protected SpineInspectorUtility.SerializedSortingProperties sortingProperties;
 
 	protected virtual void OnEnable () {
 		SpineEditorUtilities.ConfirmInitialization();
@@ -56,11 +53,8 @@ public class SkeletonRendererInspector : Editor {
 		front = serializedObject.FindProperty("frontFacing");
 		zSpacing = serializedObject.FindProperty("zSpacing");
 
-		if(EditorGUILayoutSortingLayerField == null)
-			EditorGUILayoutSortingLayerField = typeof(EditorGUILayout).GetMethod("SortingLayerField", BindingFlags.Static | BindingFlags.NonPublic, null, new Type[] { typeof(GUIContent), typeof(SerializedProperty), typeof(GUIStyle) }, null);
-
-		rendererSerializedObject = new SerializedObject(((SkeletonRenderer)target).GetComponent<Renderer>());
-		sortingLayerIDProperty = rendererSerializedObject.FindProperty("m_SortingLayerID");
+		var renderer = ((SkeletonRenderer)target).GetComponent<Renderer>();
+		sortingProperties = new SpineInspectorUtility.SerializedSortingProperties(renderer);
 	}
 
 	protected virtual void DrawInspectorGUI () {
@@ -107,23 +101,7 @@ public class SkeletonRendererInspector : Editor {
 
 		// Sorting Layers
 		{
-			var renderer = component.GetComponent<Renderer>();
-			if(renderer != null) {
-				EditorGUI.BeginChangeCheck();
-
-				if(EditorGUILayoutSortingLayerField != null && sortingLayerIDProperty != null) {
-					EditorGUILayoutSortingLayerField.Invoke(null, new object[] { new GUIContent("Sorting Layer"), sortingLayerIDProperty, EditorStyles.popup } );
-				} else {
-					renderer.sortingLayerID = EditorGUILayout.IntField("Sorting Layer ID", renderer.sortingLayerID);
-				}
-
-				renderer.sortingOrder = EditorGUILayout.IntField("Order in Layer", renderer.sortingOrder);
-
-				if(EditorGUI.EndChangeCheck()) {
-					rendererSerializedObject.ApplyModifiedProperties();
-					EditorUtility.SetDirty(renderer);
-				}
-			}
+			SpineInspectorUtility.SortingPropertyFields(sortingProperties, applyModifiedProperties: true);
 		}
 
 		// More Render Options...

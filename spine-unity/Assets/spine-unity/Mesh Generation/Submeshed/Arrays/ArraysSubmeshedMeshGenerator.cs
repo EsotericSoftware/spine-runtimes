@@ -15,7 +15,7 @@ public class ArraysSubmeshedMeshGenerator : Spine.Unity.ISubmeshedMeshGenerator 
 
 	public float zSpacing = 0f;
 
-	public SubmeshedMeshInstructions GenerateInstructions (Skeleton skeleton) {
+	public SubmeshedMeshInstruction GenerateInstruction (Skeleton skeleton) {
 		if (skeleton == null) throw new System.ArgumentNullException("skeleton");
 
 		// Count vertices and submesh triangles.
@@ -33,9 +33,9 @@ public class ArraysSubmeshedMeshGenerator : Spine.Unity.ISubmeshedMeshGenerator 
 		int separatorCount = separators.Count;
 
 		var instructionList = this.currentInstructions.submeshInstructions;
-		instructionList.Clear();
+		instructionList.Clear(false);
 
-		currentInstructions.attachmentList.Clear();
+		currentInstructions.attachmentList.Clear(false);
 
 		for (int i = 0; i < drawOrderCount; i++) {
 			var slot = drawOrderItems[i];
@@ -70,11 +70,10 @@ public class ArraysSubmeshedMeshGenerator : Spine.Unity.ISubmeshedMeshGenerator 
 
 			// Populate submesh when material changes. (or when forced to separate by a submeshSeparator)
 			if (( runningVertexCount > 0 && lastMaterial.GetInstanceID() != attachmentMaterial.GetInstanceID() ) ||
-			//if (( lastMaterial != null && lastMaterial.GetInstanceID() != attachmentMaterial.GetInstanceID() ) ||
 				( separatorCount > 0 && separators.Contains(slot) )) {
 
 				instructionList.Add(
-					new SubmeshInstructions {
+					new SubmeshInstruction {
 						skeleton = skeleton,
 						material = lastMaterial,
 						triangleCount = submeshTriangleCount,
@@ -101,7 +100,7 @@ public class ArraysSubmeshedMeshGenerator : Spine.Unity.ISubmeshedMeshGenerator 
 		}
 
 		instructionList.Add(
-			new SubmeshInstructions {
+			new SubmeshInstruction {
 				skeleton = skeleton,
 				material = lastMaterial,
 				triangleCount = submeshTriangleCount,
@@ -116,7 +115,7 @@ public class ArraysSubmeshedMeshGenerator : Spine.Unity.ISubmeshedMeshGenerator 
 		return currentInstructions;
 	}
 
-	public SubmeshedMesh GenerateMesh (SubmeshedMeshInstructions meshInstructions) {
+	public SubmeshedMesh GenerateMesh (SubmeshedMeshInstruction meshInstructions) {
 		var smartMesh = doubleBufferedSmartMesh.GetNextMesh();
 		var mesh = smartMesh.mesh;
 
@@ -406,7 +405,7 @@ public class ArraysSubmeshedMeshGenerator : Spine.Unity.ISubmeshedMeshGenerator 
 
 	#region Internals
 	readonly DoubleBufferedSmartMesh doubleBufferedSmartMesh = new DoubleBufferedSmartMesh();
-	readonly SubmeshedMeshInstructions currentInstructions = new SubmeshedMeshInstructions();
+	readonly SubmeshedMeshInstruction currentInstructions = new SubmeshedMeshInstruction();
 
 	float[] attachmentVertexBuffer = new float[8];
 	Vector3[] meshVertices;
@@ -442,38 +441,34 @@ public class ArraysSubmeshedMeshGenerator : Spine.Unity.ISubmeshedMeshGenerator 
 	class SmartMesh {
 		public readonly Mesh mesh = SpineMesh.NewMesh();
 		readonly ExposedList<Attachment> attachmentsUsed = new ExposedList<Attachment>();
-		readonly ExposedList<SubmeshInstructions> instructionsUsed = new ExposedList<SubmeshInstructions>();
+		readonly ExposedList<SubmeshInstruction> instructionsUsed = new ExposedList<SubmeshInstruction>();
 
-		public void Set (Vector3[] verts, Vector2[] uvs, Color32[] colors, SubmeshedMeshInstructions instructions) {
+		public void Set (Vector3[] verts, Vector2[] uvs, Color32[] colors, SubmeshedMeshInstruction instruction) {
 			mesh.vertices = verts;
 			mesh.uv = uvs;
 			mesh.colors32 = colors;
 
-			attachmentsUsed.Clear();
-			attachmentsUsed.GrowIfNeeded(instructions.attachmentList.Capacity);
-			attachmentsUsed.Count = instructions.attachmentList.Count;
-			instructions.attachmentList.CopyTo(attachmentsUsed.Items);
+			attachmentsUsed.Clear(false);
+			attachmentsUsed.GrowIfNeeded(instruction.attachmentList.Capacity);
+			attachmentsUsed.Count = instruction.attachmentList.Count;
+			instruction.attachmentList.CopyTo(attachmentsUsed.Items);
 
-			instructionsUsed.Clear();
-			instructionsUsed.GrowIfNeeded(instructions.submeshInstructions.Capacity);
-			instructionsUsed.Count = instructions.submeshInstructions.Count;
-			instructions.submeshInstructions.CopyTo(instructionsUsed.Items);
+			instructionsUsed.Clear(false);
+			instructionsUsed.GrowIfNeeded(instruction.submeshInstructions.Capacity);
+			instructionsUsed.Count = instruction.submeshInstructions.Count;
+			instruction.submeshInstructions.CopyTo(instructionsUsed.Items);
 		}
 
-		public bool StructureDoesntMatch (SubmeshedMeshInstructions instructions) {
+		public bool StructureDoesntMatch (SubmeshedMeshInstruction instructions) {
 			// Check count inequality.
 			if (instructions.attachmentList.Count != this.attachmentsUsed.Count) return true;
 			if (instructions.submeshInstructions.Count != this.instructionsUsed.Count) return true;
-
-			//Debug.Log("broadphase matched");
 
 			// Check each attachment.
 			var attachmentsPassed = instructions.attachmentList.Items;
 			var myAttachments = this.attachmentsUsed.Items;
 			for (int i = 0, n = attachmentsUsed.Count; i < n; i++)
 				if (attachmentsPassed[i] != myAttachments[i]) return true;
-
-			//Debug.Log("attachments matched");
 
 			// Check each submesh for equal arrangement.
 			var instructionListItems = instructions.submeshInstructions.Items;
@@ -482,7 +477,6 @@ public class ArraysSubmeshedMeshGenerator : Spine.Unity.ISubmeshedMeshGenerator 
 				var lhs = instructionListItems[i];
 				var rhs = myInstructions[i];
 				if (
-					lhs.skeleton != rhs.skeleton ||
 					lhs.material.GetInstanceID() != rhs.material.GetInstanceID() ||
 					lhs.startSlot != rhs.startSlot ||
 					lhs.endSlot != rhs.endSlot ||

@@ -35,9 +35,7 @@ public class SkeletonUtilityInspector : Editor {
 				break;
 			}
 		}
-		
-		
-		
+
 		typeof(EditorGUIUtility).InvokeMember("SetIconForObject", BindingFlags.InvokeMethod | BindingFlags.Static | BindingFlags.NonPublic, null, null, new object[2] {
 			utilityBone.gameObject,
 			icon
@@ -170,8 +168,9 @@ public class SkeletonUtilityInspector : Editor {
 		}
 		EditorGUI.EndDisabledGroup();
 
-		if (GUILayout.Button(new GUIContent("Spawn Submeshes", SpineEditorUtilities.Icons.subMeshRenderer), GUILayout.Width(150), GUILayout.Height(24)))
-			skeletonUtility.SpawnSubRenderers(true);
+//		if (GUILayout.Button(new GUIContent("Spawn Submeshes", SpineEditorUtilities.Icons.subMeshRenderer), GUILayout.Width(150), GUILayout.Height(24)))
+//			skeletonUtility.SpawnSubRenderers(true);
+
 		GUILayout.EndHorizontal();
 
 		EditorGUI.BeginChangeCheck();
