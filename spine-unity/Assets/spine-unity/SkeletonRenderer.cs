@@ -58,6 +58,10 @@ public class SkeletonRenderer : MonoBehaviour {
 	// Custom Slot Material
 	[System.NonSerialized] private readonly Dictionary<Slot, Material> customSlotMaterials = new Dictionary<Slot, Material>();
 	public Dictionary<Slot, Material> CustomSlotMaterials { get { return customSlotMaterials; } }
+
+	// Custom Atlas Material
+	[System.NonSerialized] private readonly Dictionary<Material, Material> customAtlasMaterials = new Dictionary<Material, Material>();
+	public Dictionary<Material, Material> CustomAtlasMaterials { get { return customAtlasMaterials; } }
 	#endregion
 
 	[System.NonSerialized] public bool valid;
@@ -213,7 +217,8 @@ public class SkeletonRenderer : MonoBehaviour {
 			drawOrderCount != storedAttachments.Count ||				// Number of slots changed (when does this happen?)
 			immutableTriangles != storedState.immutableTriangles;		// Immutable Triangles flag changed.
 
-		bool isCustomMaterialsPopulated = customSlotMaterials.Count > 0;
+		bool isCustomSlotMaterialsPopulated = customSlotMaterials.Count > 0;
+		bool isCustomAtlasMaterialsPopulated = customAtlasMaterials.Count > 0;
 
 		for (int i = 0; i < drawOrderCount; i++) {
 			Slot slot = drawOrderItems[i];
@@ -223,7 +228,7 @@ public class SkeletonRenderer : MonoBehaviour {
 			object rendererObject; // An AtlasRegion in plain Spine-Unity. Spine-TK2D hooks into TK2D's system. eventual source of Material object.
 			int attachmentVertexCount, attachmentTriangleCount;
 
-			// Handle flipping for triangle winding (for lighting?).           
+			// Handle flipping for triangle winding (for lighting?).
 			bool flip = frontFacing && (bone.WorldSignX != bone.WorldSignY);
 
 			workingFlipsItems[i] = flip;
@@ -261,12 +266,20 @@ public class SkeletonRenderer : MonoBehaviour {
 			// Material material = (Material)((AtlasRegion)rendererObject).page.rendererObject; // For no customSlotMaterials
 
 			Material material;
-			if (isCustomMaterialsPopulated) {
+
+			// Try custom slot material first, then custom atlas material
+			if (isCustomSlotMaterialsPopulated) {
 				if (!customSlotMaterials.TryGetValue(slot, out material)) {
-					material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
+					Material originalMaterial = (Material)((AtlasRegion)rendererObject).page.rendererObject;
+					if (!isCustomAtlasMaterialsPopulated || !customAtlasMaterials.TryGetValue(originalMaterial, out material)) {
+						material = originalMaterial;
+					}
 				}
 			} else {
-				material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
+				Material originalMaterial = (Material)((AtlasRegion)rendererObject).page.rendererObject;
+				if (!isCustomAtlasMaterialsPopulated || !customAtlasMaterials.TryGetValue(originalMaterial, out material)) {
+					material = originalMaterial;
+				}
 			}
 			#else
 			Material material = (rendererObject.GetType() == typeof(Material)) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
@@ -754,7 +767,7 @@ public class SkeletonRenderer : MonoBehaviour {
 				for (int ii = 0, nn = attachmentTriangles.Length; ii < nn; ii++, triangleIndex++) {
 					triangles[triangleIndex] = firstVertex + attachmentTriangles[ii];
 				}
-            }
+			}
 
 			firstVertex += attachmentVertexCount;
 		}
