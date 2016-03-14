@@ -167,7 +167,7 @@ void spSkeleton_updateCache (const spSkeleton* self) {
 		for (ii = internal->updateCacheCount - 1; ii >= 0; --ii) {
 			void* updatable = internal->updateCache[ii];
 			if (updatable == transformConstraint->bone || updatable == transformConstraint->target) {
-				int blockSize = ((capacity - 1) - (ii + 1));
+				int blockSize = ((capacity - 2) - (ii + 1));
 				memcpy(internal->updateCache[ii+2], internal->updateCache[ii+1], blockSize * sizeof(void*));
 				memcpy(&(internal->updateCacheType[ii + 2]), &(internal->updateCacheType[ii + 1]), blockSize * sizeof(_spUpdateType));
 				internal->updateCacheCount++;
