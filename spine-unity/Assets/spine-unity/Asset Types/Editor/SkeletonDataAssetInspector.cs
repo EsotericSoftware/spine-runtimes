@@ -147,9 +147,14 @@ public class SkeletonDataAssetInspector : Editor {
 				GUILayout.Space(32);
 				if (GUILayout.Button(new GUIContent("Generate Mecanim Controller"), GUILayout.Width(195), GUILayout.Height(20)))
 					SkeletonBaker.GenerateMecanimAnimationClips(m_skeletonDataAsset);
-				//GUILayout.Label(new GUIContent("Alternative to SkeletonAnimation, not a requirement.", SpineEditorUtilities.Icons.warning));
 				GUILayout.EndHorizontal();
 				EditorGUILayout.LabelField("SkeletonAnimator is the Mecanim alternative to SkeletonAnimation. It is not required.", EditorStyles.miniLabel);
+			} else {
+				GUILayout.BeginHorizontal();
+				GUILayout.Space(32);
+				if (GUILayout.Button(new GUIContent("Update Controller Animations"), GUILayout.Width(195), GUILayout.Height(20)))
+					SkeletonBaker.GenerateMecanimAnimationClips(m_skeletonDataAsset);				
+				GUILayout.EndHorizontal();
 			}
 			EditorGUI.indentLevel--;
 		}
@@ -228,6 +233,7 @@ public class SkeletonDataAssetInspector : Editor {
 
 
 	}
+
 	void DrawReimportButton () {
 		EditorGUI.BeginDisabledGroup(skeletonJSON.objectReferenceValue == null);
 		if (GUILayout.Button(new GUIContent("Attempt Reimport", SpineEditorUtilities.Icons.warning))) {
@@ -302,10 +308,14 @@ public class SkeletonDataAssetInspector : Editor {
 		if (!showAnimationList)
 			return;
 
-		if (GUILayout.Button(new GUIContent("Setup Pose", SpineEditorUtilities.Icons.skeleton), GUILayout.Width(105), GUILayout.Height(18))) {
-			StopAnimation();
-			m_skeletonAnimation.skeleton.SetToSetupPose();
-			m_requireRefresh = true;
+		if (m_skeletonAnimation != null && m_skeletonAnimation.state != null) {
+			if (GUILayout.Button(new GUIContent("Setup Pose", SpineEditorUtilities.Icons.skeleton), GUILayout.Width(105), GUILayout.Height(18))) {
+				StopAnimation();
+				m_skeletonAnimation.skeleton.SetToSetupPose();
+				m_requireRefresh = true;
+			}
+		} else {
+			EditorGUILayout.HelpBox("Animations can be previewed if you expand the Preview window below.", MessageType.Info);
 		}
 
 		EditorGUILayout.LabelField("Name", "Duration");
@@ -498,6 +508,10 @@ public class SkeletonDataAssetInspector : Editor {
 	private Color m_originColor = new Color(0.3f, 0.3f, 0.3f, 1);
 
 	private void StopAnimation () {
+		if (m_skeletonAnimation == null) {
+			Debug.LogWarning("Animation was stopped but preview doesn't exist. It's possible that the Preview Panel is closed.");
+		}
+
 		m_skeletonAnimation.state.ClearTrack(0);
 		m_playing = false;
 	}
@@ -562,7 +576,7 @@ public class SkeletonDataAssetInspector : Editor {
 				m_initialized = true;
 				AdjustCameraGoals(true);
 			} catch {
-
+				// WARNING: Suppresses errors.
 			}
 		}
 	}
@@ -861,6 +875,7 @@ public class SkeletonDataAssetInspector : Editor {
 				if (position.Contains(current.mousePosition)) {
 
 					m_orthoGoal += current.delta.y;
+					m_orthoGoal = Mathf.Max(0.01f, m_orthoGoal);
 					GUIUtility.hotControl = controlID;
 					current.Use();
 				}
