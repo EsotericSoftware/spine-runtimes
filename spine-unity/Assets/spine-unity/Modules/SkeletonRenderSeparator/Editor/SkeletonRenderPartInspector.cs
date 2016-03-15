@@ -3,14 +3,12 @@ using System.Collections;
 using UnityEditor;
 using Spine.Unity;
 
-[CustomEditor(typeof(SubmeshRenderer))]
-public class SubmeshRendererInspector : Editor {
-
+[CustomEditor(typeof(SkeletonRenderPart))]
+public class SkeletonRenderPartInspector : Editor {
 	SpineInspectorUtility.SerializedSortingProperties sortingProperties;
-	SubmeshRenderer component;
 
 	void OnEnable () {
-		component = target as SubmeshRenderer;
+		var component = target as Component;
 		sortingProperties = new SpineInspectorUtility.SerializedSortingProperties(component.GetComponent<MeshRenderer>());
 	}
 
@@ -18,5 +16,4 @@ public class SubmeshRendererInspector : Editor {
 		DrawDefaultInspector();
 		SpineInspectorUtility.SortingPropertyFields(sortingProperties, true);
 	}
-
 }

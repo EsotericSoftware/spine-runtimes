@@ -1,33 +1,35 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-namespace Spine.Unity {
+namespace Spine.Unity.MeshGeneration {
+	// ISubmeshedMeshGenerator:
+	// How to use:
+	// Step 1: Have a SubmeshedMeshGenerator instance, and a Spine.Skeleton
+	// Step 2: Call GenerateInstruction. Pass it your Skeleton. Keep the return value (a SubmeshedMeshInstruction, you can use it in other classes too).
+	// Step 3: Pass the SubmeshedMeshInstruction into GenerateMesh. You'll get a Mesh and Materials.
+	// Step 4: Put the Mesh in MeshFilter. Put the Materials in MeshRenderer.sharedMaterials.
 	public interface ISubmeshedMeshGenerator {
-		/// <summary>Generates instructions for how to generate the submeshed mesh based on the given state of the
-		/// skeleton. The returned instructions can be used to generate a whole submeshed mesh or individual submeshes.</summary>
 		SubmeshedMeshInstruction GenerateInstruction (Skeleton skeleton);
-
-		/// <summary>Returns a SubmeshedMesh (a mesh and a material array coupled in a struct). 
-		/// Call GenerateInstructions to get the SubmeshedMeshInstructions to pass into this.</summary>
-		SubmeshedMesh GenerateMesh (SubmeshedMeshInstruction wholeMeshInstruction);
-
-		/// <summary>A list of slots that mark the end of a submesh. The slot after it will be the start of a new submesh.</summary>
+		MeshAndMaterials GenerateMesh (SubmeshedMeshInstruction wholeMeshInstruction);
 		List<Slot> Separators { get; }
 	}
 
-	public interface ISingleSubmeshGenerator {
-		Mesh GenerateMesh (SubmeshInstruction instruction);
+	// ISubmeshSetMeshGenerator
+	// How to use:
+	// Step 1: Get a list of SubmeshInstruction. You can get this from SkeletonRenderer or an ISubmeshedMeshGenerator's returned SubmeshedMeshInstruction.
+	// Step 2: Call AddInstruction one by one, or AddInstructions once.
+	// Step 3: Call GenerateMesh. You'll get a Mesh and Materials.
+	// Step 4: Put the Mesh in MeshFilter. Put the Materials in MeshRenderer.sharedMaterials.
+	public interface ISubmeshSetMeshGenerator {
+		MeshAndMaterials GenerateMesh (ExposedList<SubmeshInstruction> instructions, int startSubmesh, int endSubmesh);
 	}
 
-	/// <summary>A Submeshed mesh is a return type so the mesh with
-	/// multiple submeshes can be coupled with a material array to render its submeshes.</summary>
-	public struct SubmeshedMesh {
-		public readonly Mesh mesh;
-		public readonly Material[] materials;
-		public SubmeshedMesh (Mesh mesh, Material[] materials) {
-			this.mesh = mesh;
-			this.materials = materials;
-		}
+	// ISingleSubmeshGenerator
+	// How to use:
+	// Step 1: Have a single SubmeshInstruction
+	// Step 2: 
+	public interface ISingleSubmeshGenerator {
+		Mesh GenerateMesh (SubmeshInstruction instruction);
 	}
 
 	/// <summary>Primarily a collection of Submesh Instructions. This constitutes instructions for how to construct a mesh containing submeshes.</summary>
@@ -65,5 +67,33 @@ namespace Spine.Unity {
 
 		// Vertex index offset. Used by submesh generation if part of a bigger mesh.
 		public int firstVertexIndex;
+		public bool separatedBySlot;
+
+		/// <summary>The number of slots in this SubmeshInstruction's range. Not necessarily the number of attachments.</summary>
+		public int SlotCount { get { return endSlot - startSlot; } }
+	}
+
+	public static class SubmeshInstructionExtensions {
+		public static void FillMaterialArray (this ExposedList<SubmeshInstruction> instructions, Material[] materialArray) {
+			for (int i = 0, n = materialArray.Length; i < n; i++)
+				materialArray[i] = instructions.Items[i].material;
+		}
+
+		public static Material[] GetNewMaterialArray (this ExposedList<SubmeshInstruction> instructions) {
+			var materials = new Material[instructions.Count];
+			instructions.FillMaterialArray(materials);
+			return materials;
+		}
+	}
+
+	public struct MeshAndMaterials {
+		public readonly Mesh mesh;
+		public readonly Material[] materials;
+
+		public MeshAndMaterials (Mesh mesh, Material[] materials) {
+			this.mesh = mesh;
+			this.materials = materials;
+		}
+
 	}
 }

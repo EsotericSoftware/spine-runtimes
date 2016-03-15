@@ -33,6 +33,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Spine;
 using Spine.Unity;
+using Spine.Unity.MeshGeneration;
 
 /// <summary>Renders a skeleton.</summary>
 [ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer)), DisallowMultipleComponent]
@@ -255,18 +256,18 @@ public class SkeletonRenderer : MonoBehaviour {
 			#endif
 
 			// Create a new SubmeshInstruction when material changes. (or when forced to separate by a submeshSeparator)
-			if ((vertexCount > 0 && lastMaterial.GetInstanceID() != material.GetInstanceID()) ||
-				(submeshSeparatorSlotsCount > 0 && submeshSeparatorSlots.Contains(slot))) {
-
+			bool separatedBySlot = (submeshSeparatorSlotsCount > 0 && submeshSeparatorSlots.Contains(slot));
+			if ((vertexCount > 0 && lastMaterial.GetInstanceID() != material.GetInstanceID()) || separatedBySlot) {
 				workingSubmeshInstructions.Add(
-					new Spine.Unity.SubmeshInstruction {
+					new Spine.Unity.MeshGeneration.SubmeshInstruction {
 						skeleton = this.skeleton,
 						material = lastMaterial,
 						startSlot = submeshStartSlotIndex,
 						endSlot = i,
 						triangleCount = submeshTriangleCount,
 						firstVertexIndex = submeshFirstVertex,
-						vertexCount = submeshVertexCount
+						vertexCount = submeshVertexCount,
+						separatedBySlot = separatedBySlot
 					}
 				);
 
@@ -283,14 +284,15 @@ public class SkeletonRenderer : MonoBehaviour {
 		}
 
 		workingSubmeshInstructions.Add(
-			new Spine.Unity.SubmeshInstruction {
+			new Spine.Unity.MeshGeneration.SubmeshInstruction {
 				skeleton = this.skeleton,
 				material = lastMaterial,
 				startSlot = submeshStartSlotIndex,
 				endSlot = drawOrderCount,
 				triangleCount = submeshTriangleCount,
 				firstVertexIndex = submeshFirstVertex,
-				vertexCount = submeshVertexCount
+				vertexCount = submeshVertexCount,
+				separatedBySlot = false
 			}
 		);
 
@@ -663,7 +665,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		return false;
 	}
 		
-	void SetSubmesh (int submeshIndex, Spine.Unity.SubmeshInstruction submeshInstructions, ExposedList<bool> flipStates, bool isLastSubmesh) {
+	void SetSubmesh (int submeshIndex, Spine.Unity.MeshGeneration.SubmeshInstruction submeshInstructions, ExposedList<bool> flipStates, bool isLastSubmesh) {
 		SubmeshTriangleBuffer currentSubmesh = submeshes.Items[submeshIndex];
 		int[] triangles = currentSubmesh.triangles;
 
@@ -799,7 +801,7 @@ public class SkeletonRenderer : MonoBehaviour {
 			public int vertexCount = -1;
 			public readonly ExposedList<Attachment> attachments = new ExposedList<Attachment>();
 			public readonly ExposedList<bool> attachmentFlips = new ExposedList<bool>();
-			public readonly ExposedList<Spine.Unity.SubmeshInstruction> submeshInstructions = new ExposedList<Spine.Unity.SubmeshInstruction>();
+			public readonly ExposedList<Spine.Unity.MeshGeneration.SubmeshInstruction> submeshInstructions = new ExposedList<Spine.Unity.MeshGeneration.SubmeshInstruction>();
 
 			public void Clear () {
 				this.attachments.Clear(false);
