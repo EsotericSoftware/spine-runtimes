@@ -4,6 +4,8 @@
  * SkeletonBaker added by Mitch Thompson
  * Full irrevocable rights and permissions granted to Esoteric Software
 *****************************************************************************/
+#define SPINE_SKELETON_ANIMATOR
+
 using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
@@ -44,6 +46,133 @@ using Spine;
 
 /// </summary>
 public static class SkeletonBaker {
+
+	#region SkeletonAnimator's Mecanim Clips
+#if SPINE_SKELETON_ANIMATOR
+	public static void GenerateMecanimAnimationClips (SkeletonDataAsset skeletonDataAsset) {
+		//skeletonDataAsset.Clear();
+		var data = skeletonDataAsset.GetSkeletonData(true);
+		if (data == null) {
+			Debug.LogError("SkeletonData failed!", skeletonDataAsset);
+			return;
+		}
+
+		string dataPath = AssetDatabase.GetAssetPath(skeletonDataAsset);
+		string controllerPath = dataPath.Replace("_SkeletonData", "_Controller").Replace(".asset", ".controller");
+
+#if UNITY_5
+		UnityEditor.Animations.AnimatorController controller;
+
+		if (skeletonDataAsset.controller != null) {
+			controller = (UnityEditor.Animations.AnimatorController)skeletonDataAsset.controller;
+			controllerPath = AssetDatabase.GetAssetPath(controller);
+		} else {
+			if (File.Exists(controllerPath)) {
+				if (EditorUtility.DisplayDialog("Controller Overwrite Warning", "Unknown Controller already exists at: " + controllerPath, "Update", "Overwrite")) {
+					controller = (UnityEditor.Animations.AnimatorController)AssetDatabase.LoadAssetAtPath(controllerPath, typeof(RuntimeAnimatorController));
+				} else {
+					controller = (UnityEditor.Animations.AnimatorController)UnityEditor.Animations.AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
+				}
+			} else {
+				controller = (UnityEditor.Animations.AnimatorController)UnityEditor.Animations.AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
+			}
+
+		}
+#else
+		UnityEditorInternal.AnimatorController controller;
+
+		if (skeletonDataAsset.controller != null) {
+			controller = (UnityEditorInternal.AnimatorController)skeletonDataAsset.controller;
+			controllerPath = AssetDatabase.GetAssetPath(controller);
+		} else {
+			if (File.Exists(controllerPath)) {
+				if (EditorUtility.DisplayDialog("Controller Overwrite Warning", "Unknown Controller already exists at: " + controllerPath, "Update", "Overwrite")) {
+					controller = (UnityEditorInternal.AnimatorController)AssetDatabase.LoadAssetAtPath(controllerPath, typeof(RuntimeAnimatorController));
+				} else {
+					controller = (UnityEditorInternal.AnimatorController)UnityEditorInternal.AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
+				}
+			} else {
+				controller = (UnityEditorInternal.AnimatorController)UnityEditorInternal.AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
+			}
+		}
+#endif
+
+		skeletonDataAsset.controller = controller;
+		EditorUtility.SetDirty(skeletonDataAsset);
+
+		UnityEngine.Object[] objs = AssetDatabase.LoadAllAssetsAtPath(controllerPath);
+
+		var unityAnimationClipTable = new Dictionary<string, AnimationClip>();
+		var spineAnimationTable = new Dictionary<string, Spine.Animation>();
+
+		foreach (var o in objs) {
+			//Debug.LogFormat("({0}){1} : {3} + {2} + {4}", o.GetType(), o.name, o.hideFlags, o.GetInstanceID(), o.GetHashCode());
+			// There is a bug in Unity 5.3.3 (and likely before) that creates
+			// a duplicate AnimationClip when you duplicate a Mecanim Animator State.
+			// These duplicates seem to be identifiable by their HideFlags, so we'll exclude them.
+			if (o is AnimationClip) {
+				var clip = o as AnimationClip;
+				if (!clip.HasFlag(HideFlags.HideInHierarchy)) {
+					if (unityAnimationClipTable.ContainsKey(clip.name)) {
+						Debug.LogWarningFormat("Duplicate AnimationClips were found named {0}", clip.name);
+					}
+					unityAnimationClipTable.Add(clip.name, clip);
+				}				
+			}
+		}
+
+		foreach (var anim in data.Animations) {
+			string name = anim.Name;
+			spineAnimationTable.Add(name, anim);
+
+			if (unityAnimationClipTable.ContainsKey(name) == false) {
+				//generate new dummy clip
+				AnimationClip newClip = new AnimationClip();
+				newClip.name = name;
+#if !(UNITY_5)
+				AnimationUtility.SetAnimationType(newClip, ModelImporterAnimationType.Generic);
+#endif
+				AssetDatabase.AddObjectToAsset(newClip, controller);
+				unityAnimationClipTable.Add(name, newClip);
+			}
+
+			AnimationClip clip = unityAnimationClipTable[name];
+
+			clip.SetCurve("", typeof(GameObject), "dummy", AnimationCurve.Linear(0, 0, anim.Duration, 0));
+			var settings = AnimationUtility.GetAnimationClipSettings(clip);
+			settings.stopTime = anim.Duration;
+
+			SetAnimationSettings(clip, settings);
+
+			AnimationUtility.SetAnimationEvents(clip, new AnimationEvent[0]);
+
+			foreach (Timeline t in anim.Timelines) {
+				if (t is EventTimeline) {
+					ParseEventTimeline((EventTimeline)t, clip, SendMessageOptions.DontRequireReceiver);
+				}
+			}
+
+			EditorUtility.SetDirty(clip);
+
+			unityAnimationClipTable.Remove(name);
+		}
+
+		//clear no longer used animations
+		foreach (var clip in unityAnimationClipTable.Values) {
+			AnimationClip.DestroyImmediate(clip, true);
+		}
+
+		AssetDatabase.Refresh();
+		AssetDatabase.SaveAssets();
+	}
+
+	static bool HasFlag (this UnityEngine.Object o, HideFlags flagToCheck) {
+		return (o.hideFlags & flagToCheck) == flagToCheck;
+	}
+#endif
+	#endregion
+
+	#region Baking
 	/// <summary>
 	/// Interval between key sampling for Bezier curves, IK controlled bones, and Inherit Rotation effected bones.
 	/// </summary>
@@ -89,8 +218,8 @@ public static class SkeletonBaker {
 			}
 #endif
 
-			Dictionary<string, AnimationClip> existingClipTable = new Dictionary<string, AnimationClip>();
-			List<string> unusedClipNames = new List<string>();
+			var existingClipTable = new Dictionary<string, AnimationClip>();
+			var unusedClipNames = new List<string>();
 			Object[] animObjs = AssetDatabase.LoadAllAssetsAtPath(controllerPath);
 
 			foreach (Object o in animObjs) {
@@ -342,115 +471,6 @@ public static class SkeletonBaker {
 			GameObject.DestroyImmediate(prefabRoot);
 		}
 
-	}
-
-	public static void GenerateMecanimAnimationClips (SkeletonDataAsset skeletonDataAsset) {
-		var data = skeletonDataAsset.GetSkeletonData(true);
-		if (data == null) {
-			Debug.LogError("SkeletonData failed!", skeletonDataAsset);
-			return;
-		}
-
-		string dataPath = AssetDatabase.GetAssetPath(skeletonDataAsset);
-		string controllerPath = dataPath.Replace("_SkeletonData", "_Controller").Replace(".asset", ".controller");
-
-
-#if UNITY_5
-		UnityEditor.Animations.AnimatorController controller;
-
-		if (skeletonDataAsset.controller != null) {
-			controller = (UnityEditor.Animations.AnimatorController)skeletonDataAsset.controller;
-			controllerPath = AssetDatabase.GetAssetPath(controller);
-		} else {
-			if (File.Exists(controllerPath)) {
-				if (EditorUtility.DisplayDialog("Controller Overwrite Warning", "Unknown Controller already exists at: " + controllerPath, "Update", "Overwrite")) {
-					controller = (UnityEditor.Animations.AnimatorController)AssetDatabase.LoadAssetAtPath(controllerPath, typeof(RuntimeAnimatorController));
-				} else {
-					controller = (UnityEditor.Animations.AnimatorController)UnityEditor.Animations.AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
-				}
-			} else {
-				controller = (UnityEditor.Animations.AnimatorController)UnityEditor.Animations.AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
-			}
-			
-		}
-#else
-		UnityEditorInternal.AnimatorController controller;
-
-		if (skeletonDataAsset.controller != null) {
-			controller = (UnityEditorInternal.AnimatorController)skeletonDataAsset.controller;
-			controllerPath = AssetDatabase.GetAssetPath(controller);
-		} else {
-			if (File.Exists(controllerPath)) {
-				if (EditorUtility.DisplayDialog("Controller Overwrite Warning", "Unknown Controller already exists at: " + controllerPath, "Update", "Overwrite")) {
-					controller = (UnityEditorInternal.AnimatorController)AssetDatabase.LoadAssetAtPath(controllerPath, typeof(RuntimeAnimatorController));
-				} else {
-					controller = (UnityEditorInternal.AnimatorController)UnityEditorInternal.AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
-				}
-			} else {
-				controller = (UnityEditorInternal.AnimatorController)UnityEditorInternal.AnimatorController.CreateAnimatorControllerAtPath(controllerPath);
-			}
-		}
-#endif
-
-		skeletonDataAsset.controller = controller;
-		EditorUtility.SetDirty(skeletonDataAsset);
-
-		Object[] objs = AssetDatabase.LoadAllAssetsAtPath(controllerPath);
-
-		Dictionary<string, AnimationClip> clipTable = new Dictionary<string, AnimationClip>();
-		Dictionary<string, Spine.Animation> animTable = new Dictionary<string, Spine.Animation>();
-
-		foreach (var o in objs) {
-			if (o is AnimationClip) {
-				clipTable.Add(o.name, (AnimationClip)o);
-			}
-		}
-
-		foreach (var anim in data.Animations) {
-			string name = anim.Name;
-			animTable.Add(name, anim);
-
-			if (clipTable.ContainsKey(name) == false) {
-				//generate new dummy clip
-				AnimationClip newClip = new AnimationClip();
-				newClip.name = name;
-#if UNITY_5
-#else
-				AnimationUtility.SetAnimationType(newClip, ModelImporterAnimationType.Generic);
-#endif
-
-				AssetDatabase.AddObjectToAsset(newClip, controller);
-				clipTable.Add(name, newClip);
-			}
-
-			AnimationClip clip = clipTable[name];
-
-			clip.SetCurve("", typeof(GameObject), "dummy", AnimationCurve.Linear(0, 0, anim.Duration, 0));
-			var settings = AnimationUtility.GetAnimationClipSettings(clip);
-			settings.stopTime = anim.Duration;
-
-			SetAnimationSettings(clip, settings);
-
-			AnimationUtility.SetAnimationEvents(clip, new AnimationEvent[0]);
-
-			foreach (Timeline t in anim.Timelines) {
-				if (t is EventTimeline) {
-					ParseEventTimeline((EventTimeline)t, clip, SendMessageOptions.DontRequireReceiver);
-				}
-			}
-
-			EditorUtility.SetDirty(clip);
-
-			clipTable.Remove(name);
-		}
-
-		//clear no longer used animations
-		foreach (var clip in clipTable.Values) {
-			AnimationClip.DestroyImmediate(clip, true);
-		}
-
-		AssetDatabase.Refresh();
-		AssetDatabase.SaveAssets();
 	}
 
 	static Bone extractionBone;
@@ -747,17 +767,6 @@ public static class SkeletonBaker {
 		return arr;
 	}
 
-	static void SetAnimationSettings (AnimationClip clip, AnimationClipSettings settings) {
-#if UNITY_5
-		AnimationUtility.SetAnimationClipSettings(clip, settings);
-#else
-		MethodInfo methodInfo = typeof(AnimationUtility).GetMethod("SetAnimationClipSettings", BindingFlags.Static | BindingFlags.NonPublic);
-		methodInfo.Invoke(null, new object[] { clip, settings });
-
-		EditorUtility.SetDirty(clip);
-#endif
-	}
-
 	static AnimationClip ExtractAnimation (string name, SkeletonData skeletonData, Dictionary<int, List<string>> slotLookup, bool bakeIK, SendMessageOptions eventOptions, AnimationClip clip = null) {
 		var animation = skeletonData.FindAnimation(name);
 
@@ -864,7 +873,7 @@ public static class SkeletonBaker {
 			ae.functionName = ev.Data.Name;
 			ae.messageOptions = eventOptions;
 
-			if (ev.String != "" && ev.String != null) {
+			if (!string.IsNullOrEmpty(ev.String)) {
 				ae.stringParameter = ev.String;
 			} else {
 				if (ev.Int == 0 && ev.Float == 0) {
@@ -1447,7 +1456,6 @@ public static class SkeletonBaker {
 		AnimationUtility.SetEditorCurve(clip, yBind, new AnimationCurve());
 		EditorCurveBinding zBind = EditorCurveBinding.FloatCurve(path, typeof(Transform), propertyName + ".z");
 		AnimationUtility.SetEditorCurve(clip, zBind, curve);
-
 	}
 
 	static string GetPath (BoneData b) {
@@ -1461,4 +1469,18 @@ public static class SkeletonBaker {
 
 		return GetPathRecurse(b.Parent) + "/" + b.Name;
 	}
+	#endregion
+
+	static void SetAnimationSettings (AnimationClip clip, AnimationClipSettings settings) {
+#if UNITY_5
+		AnimationUtility.SetAnimationClipSettings(clip, settings);
+#else
+		MethodInfo methodInfo = typeof(AnimationUtility).GetMethod("SetAnimationClipSettings", BindingFlags.Static | BindingFlags.NonPublic);
+		methodInfo.Invoke(null, new object[] { clip, settings });
+
+		EditorUtility.SetDirty(clip);
+#endif
+	}
+
+
 }

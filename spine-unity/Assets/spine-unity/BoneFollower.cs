@@ -40,14 +40,8 @@ using Spine;
 [AddComponentMenu("Spine/BoneFollower")]
 public class BoneFollower : MonoBehaviour {
 
-	[System.NonSerialized]
-	public bool
-		valid;
+	#region Inspector
 	public SkeletonRenderer skeletonRenderer;
-	public Bone bone;
-	public bool followZPosition = true;
-	public bool followBoneRotation = true;
-
 	public SkeletonRenderer SkeletonRenderer {
 		get { return skeletonRenderer; }
 		set {
@@ -55,15 +49,21 @@ public class BoneFollower : MonoBehaviour {
 			Reset();
 		}
 	}
-
-
 	/// <summary>If a bone isn't set, boneName is used to find the bone.</summary>
-
 	[SpineBone(dataField: "skeletonRenderer")]
 	public String boneName;
+
+	public bool followZPosition = true;
+	public bool followBoneRotation = true;
 	public bool resetOnAwake = true;
-	protected Transform cachedTransform;
-	protected Transform skeletonTransform;
+	#endregion
+
+	[NonSerialized]
+	public bool valid;
+
+	[NonSerialized]
+	public Bone bone;
+	Transform skeletonTransform;
 
 	public void HandleResetRenderer (SkeletonRenderer skeletonRenderer) {
 		Reset();
@@ -71,21 +71,21 @@ public class BoneFollower : MonoBehaviour {
 
 	public void Reset () {
 		bone = null;
-		cachedTransform = transform;
 		valid = skeletonRenderer != null && skeletonRenderer.valid;
-		if (!valid)
-			return;
-		skeletonTransform = skeletonRenderer.transform;
 
+		if (!valid) return;
+
+		skeletonTransform = skeletonRenderer.transform;
 		skeletonRenderer.OnRebuild -= HandleResetRenderer;
 		skeletonRenderer.OnRebuild += HandleResetRenderer;
 
+		#if UNITY_EDITOR
 		if (Application.isEditor)
 			DoUpdate();
+		#endif
 	}
 
 	void OnDestroy () {
-		//cleanup
 		if (skeletonRenderer != null)
 			skeletonRenderer.OnRebuild -= HandleResetRenderer;
 	}
@@ -112,33 +112,33 @@ public class BoneFollower : MonoBehaviour {
 			if (bone == null) {
 				Debug.LogError("Bone not found: " + boneName, this);
 				return;
-			} else {
-
 			}
 		}
 
-		Spine.Skeleton skeleton = skeletonRenderer.skeleton;
+		Skeleton skeleton = skeletonRenderer.skeleton;
 		float flipRotation = (skeleton.flipX ^ skeleton.flipY) ? -1f : 1f;
+		Transform thisTransform = this.transform;
 
-		if (cachedTransform.parent == skeletonTransform) {
-			cachedTransform.localPosition = new Vector3(bone.worldX, bone.worldY, followZPosition ? 0f : cachedTransform.localPosition.z);
+		// Recommended setup: Use local transform properties if Spine GameObject is parent
+		if (thisTransform.parent == skeletonTransform) {
+			thisTransform.localPosition = new Vector3(bone.worldX, bone.worldY, followZPosition ? 0f : thisTransform.localPosition.z);
 
 			if (followBoneRotation) {
-				Vector3 rotation = cachedTransform.localRotation.eulerAngles;
-				cachedTransform.localRotation = Quaternion.Euler(rotation.x, rotation.y, bone.WorldRotationX * flipRotation);
+				Vector3 rotation = thisTransform.localRotation.eulerAngles;
+				thisTransform.localRotation = Quaternion.Euler(rotation.x, rotation.y, bone.WorldRotationX * flipRotation);
 			}
 
+		// For special cases: Use transform world properties if transform relationship is complicated
 		} else {
 			Vector3 targetWorldPosition = skeletonTransform.TransformPoint(new Vector3(bone.worldX, bone.worldY, 0f));
 			if (!followZPosition)
-				targetWorldPosition.z = cachedTransform.position.z;
+				targetWorldPosition.z = thisTransform.position.z;
 
-			cachedTransform.position = targetWorldPosition;
+			thisTransform.position = targetWorldPosition;
 
 			if (followBoneRotation) {
-				Vector3 rotation = skeletonTransform.rotation.eulerAngles;
-
-				cachedTransform.rotation = Quaternion.Euler(rotation.x, rotation.y, skeletonTransform.rotation.eulerAngles.z + (bone.WorldRotationX * flipRotation));
+				Vector3 worldRotation = skeletonTransform.rotation.eulerAngles;
+				thisTransform.rotation = Quaternion.Euler(worldRotation.x, worldRotation.y, skeletonTransform.rotation.eulerAngles.z + (bone.WorldRotationX * flipRotation));
 			}
 		}
 

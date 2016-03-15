@@ -1135,10 +1135,13 @@ public class SpineEditorUtilities : AssetPostprocessor {
 	static void EnableTK2D () {
 		bool added = false;
 		foreach (BuildTargetGroup group in System.Enum.GetValues(typeof(BuildTargetGroup))) {
+			if (group == BuildTargetGroup.Unknown)
+				continue;
+			
 			string defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(group);
 			if (!defines.Contains(SPINE_TK2D_DEFINE)) {
 				added = true;
-				if (defines.EndsWith(";"))
+				if (defines.EndsWith(";", System.StringComparison.Ordinal))
 					defines = defines + SPINE_TK2D_DEFINE;
 				else
 					defines = defines + ";" + SPINE_TK2D_DEFINE;

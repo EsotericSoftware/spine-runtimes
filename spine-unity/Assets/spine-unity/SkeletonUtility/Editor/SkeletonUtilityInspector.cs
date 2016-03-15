@@ -94,21 +94,20 @@ public class SkeletonUtilityInspector : Editor {
 
 	}
 
-	void OnDestroy () {
-
-	}
-
 	void OnSceneGUI () {
 		if (skeleton == null) {
 			OnEnable();
 			return;
 		}
 
-		float flipRotation = skeleton.FlipX ? -1 : 1;
+		// MITCH
+		//float flipRotation = skeleton.FlipX ? -1 : 1;
+		const float flipRotation = 1;
 
 		foreach (Bone b in skeleton.Bones) {
 			Vector3 vec = transform.TransformPoint(new Vector3(b.WorldX, b.WorldY, 0));
 
+			// MITCH
 			Quaternion rot = Quaternion.Euler(0, 0, b.WorldRotationX * flipRotation);
 			Vector3 forward = transform.TransformDirection(rot * Vector3.right);
 			forward *= flipRotation;
