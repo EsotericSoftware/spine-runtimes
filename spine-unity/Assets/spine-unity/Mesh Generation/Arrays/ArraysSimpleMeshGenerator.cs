@@ -28,42 +28,30 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
 using UnityEngine;
-using System.Collections;
 
 namespace Spine.Unity.MeshGeneration {
-	public class ArraysSimpleMeshGenerator : ISimpleMeshGenerator {
+	public class ArraysSimpleMeshGenerator : ArraysMeshGenerator, ISimpleMeshGenerator {
 		#region Settings
 		protected float scale = 1f;
 		public float Scale {
 			get { return scale; }
 			set { scale = value; }
 		}
-
-		public bool renderMeshes = true;
-
-		public bool premultiplyVertexColors = true;
-		#endregion
-
-		#region Buffers
-		readonly DoubleBufferedMesh doubleBufferedMesh = new DoubleBufferedMesh();
-		private float[] tempVertices = new float[8];
-		private Vector3[] vertices;
-		private Color32[] colors;
-		private Vector2[] uvs;
-		private int[] triangles;
 		#endregion
 
 		private Mesh lastGeneratedMesh;
 		public Mesh LastGeneratedMesh {	get { return lastGeneratedMesh; } }
 
+		readonly DoubleBufferedMesh doubleBufferedMesh = new DoubleBufferedMesh();
+		int[] triangles;
+		int triangleBufferCount;
+
 		public Mesh GenerateMesh (Skeleton skeleton) {
 			int totalVertexCount = 0; // size of vertex arrays
 			int totalTriangleCount = 0; // size of index array
 
-			// Step 1 : Count verts and tris to determine array sizes.
-			//
+			// STEP 1 : GenerateInstruction(). Count verts and tris to determine array sizes.
 			var drawOrderItems = skeleton.drawOrder.Items;
 			int drawOrderCount = skeleton.drawOrder.Count;
 			for (int i = 0; i < drawOrderCount; i++) {
@@ -75,7 +63,6 @@ namespace Spine.Unity.MeshGeneration {
 					attachmentVertexCount = 4;
 					attachmentTriangleCount = 6;
 				} else {
-					if (!renderMeshes) continue;
 					var meshAttachment = attachment as MeshAttachment;
 					if (meshAttachment != null) {
 						attachmentVertexCount = meshAttachment.vertices.Length >> 1;
@@ -93,33 +80,13 @@ namespace Spine.Unity.MeshGeneration {
 				totalVertexCount += attachmentVertexCount;
 			}
 
-
-			// Step 2 : Prepare vertex arrays.
-			//
-			Vector3[] vertices = this.vertices;
-			bool verticesDontFit = vertices == null || totalVertexCount > vertices.Length;
-			if (verticesDontFit) {
-				// Not enough space, increase size.
-				this.vertices = vertices = new Vector3[totalVertexCount];
-				this.colors = new Color32[totalVertexCount];
-				this.uvs = new Vector2[totalVertexCount];
-
-			} else {
-				// Too many vertices, zero the extra.
-				Vector3 zero = Vector3.zero;
-				for (int i = totalVertexCount, n = vertices.Length; i < n; i++)
-					vertices[i] = zero;
-			}
+			// STEP 2 : Ensure buffers are the correct size
+			ArraysMeshGenerator.EnsureSize(totalVertexCount, ref this.meshVertices, ref this.meshUVs, ref this.meshColors32);
+			this.triangles = this.triangles ?? new int[totalTriangleCount];
 				
-
-			// Step 3 : Push vertices to arrays
-			//
+			// STEP 3 : Update vertex buffer
 			const float zSpacing = 0;
 			const float zFauxHalfThickness = 0.01f;	// Somehow needs this thickness for bounds to work properly in some cases (eg, Unity UI clipping)
-			float[] tempVertices = this.tempVertices;
-			Vector2[] uvs = this.uvs;
-			Color32[] colors = this.colors;
-
 			Vector3 meshBoundsMin;
 			Vector3 meshBoundsMax;
 			if (totalVertexCount == 0) {
@@ -130,98 +97,34 @@ namespace Spine.Unity.MeshGeneration {
 				meshBoundsMin.y = int.MaxValue;
 				meshBoundsMax.x = int.MinValue;
 				meshBoundsMax.y = int.MinValue;
-				meshBoundsMin.z = -zFauxHalfThickness;
-				meshBoundsMax.z = zFauxHalfThickness;
+				meshBoundsMin.z = -zFauxHalfThickness * scale;
+				meshBoundsMax.z = zFauxHalfThickness * scale;
 
 				int vertexIndex = 0;
-				ArraysBuffers.Fill(skeleton, 0, drawOrderCount, zSpacing, this.premultiplyVertexColors, vertices, uvs, colors, ref vertexIndex, ref tempVertices, ref meshBoundsMin, ref meshBoundsMax);
-				this.tempVertices = tempVertices;
+				ArraysMeshGenerator.FillVerts(skeleton, 0, drawOrderCount, zSpacing, this.premultiplyVertexColors, this.meshVertices, this.meshUVs, this.meshColors32, ref vertexIndex, ref this.attachmentVertexBuffer, ref meshBoundsMin, ref meshBoundsMax);
 
 				// Apply scale to vertices
+				meshBoundsMax.x *= scale; meshBoundsMax.y *= scale;
+				meshBoundsMin.x *= scale; meshBoundsMax.y *= scale;
+				var vertices = this.meshVertices;
 				for (int i = 0; i < totalVertexCount; i++) {
-					var v = vertices[i];
-					v.x *= scale;
-					v.y *= scale;
-					vertices[i] = v;
-				}
-
-				meshBoundsMax.x *= scale;
-				meshBoundsMax.y *= scale;
-				meshBoundsMin.x *= scale;
-				meshBoundsMax.y *= scale;
-
-			}
-
-
-			// Step 3 : Ensure correct triangle array size
-			// 
-			var triangles = this.triangles;
-			bool trianglesDontFit = triangles == null || totalTriangleCount > triangles.Length;
-			if (trianglesDontFit) {
-				// Not enough space, increase size
-				this.triangles = triangles = new int[totalTriangleCount];
-			} else {				
-				// Too many indices, zero the extra.
-				for (int i = totalTriangleCount, n = triangles.Length; i < n; i++)
-					triangles[i] = 0;
-			}
-
-
-			// Step 4 : Push triangles to triangle array.
-			//
-			int triangleArrayIndex = 0; // next triangle index. modified by loop
-			int firstAttachmentVertex = 0;
-			for (int i = 0, n = drawOrderCount; i < n; i++) {			
-				Attachment attachment = drawOrderItems[i].attachment;
-
-				if (attachment is RegionAttachment) {
-					triangles[triangleArrayIndex] = firstAttachmentVertex;
-					triangles[triangleArrayIndex + 1] = firstAttachmentVertex + 2;
-					triangles[triangleArrayIndex + 2] = firstAttachmentVertex + 1;
-					triangles[triangleArrayIndex + 3] = firstAttachmentVertex + 2;
-					triangles[triangleArrayIndex + 4] = firstAttachmentVertex + 3;
-					triangles[triangleArrayIndex + 5] = firstAttachmentVertex + 1;
-
-					triangleArrayIndex += 6;
-					firstAttachmentVertex += 4;
-					continue;
-				} else {
-					if (!renderMeshes) continue;
-					int[] attachmentTriangles;
-					int attachmentVertexCount;
-					var meshAttachment = attachment as MeshAttachment;
-					if (meshAttachment != null) {
-						attachmentVertexCount = meshAttachment.vertices.Length >> 1; //  length/2
-						attachmentTriangles = meshAttachment.triangles;
-					} else {
-						var skinnedMeshAttachment = attachment as WeightedMeshAttachment;
-						if (skinnedMeshAttachment != null) {
-							attachmentVertexCount = skinnedMeshAttachment.uvs.Length >> 1; // length/2
-							attachmentTriangles = skinnedMeshAttachment.triangles;
-						} else
-							continue;
-					}
-
-					for (int ii = 0, nn = attachmentTriangles.Length; ii < nn; ii++, triangleArrayIndex++)
-						triangles[triangleArrayIndex] = firstAttachmentVertex + attachmentTriangles[ii];
-
-					firstAttachmentVertex += attachmentVertexCount;
+					Vector3 p = vertices[i];
+					p.x *= scale;
+					p.y *= scale;
+					vertices[i] = p;
 				}
 			}
+				
+			// Step 4 : Update Triangles buffer
+			ArraysMeshGenerator.FillTriangles(skeleton, totalTriangleCount, 0, 0, drawOrderCount, ref this.triangles, ref this.triangleBufferCount, true);
 
-
-			// Step 5 : Push Data To Mesh
-			//
+			// Step 5 : Update Mesh with buffers
 			var mesh = doubleBufferedMesh.GetNextMesh();
-			mesh.vertices = vertices;
-			mesh.colors32 = colors;
-			mesh.uv = uvs;
-
-			Vector3 meshBoundsExtents = (meshBoundsMax - meshBoundsMin) * scale;
-			Vector3 meshCenter = (meshBoundsMin * scale) + meshBoundsExtents * 0.5f;
-			mesh.bounds = new Bounds(meshCenter, meshBoundsExtents);
-
-			mesh.SetTriangles(triangles, 0);
+			mesh.vertices = this.meshVertices;
+			mesh.colors32 = meshColors32;
+			mesh.uv = meshUVs;
+			mesh.bounds = ArraysMeshGenerator.ToBounds(meshBoundsMin, meshBoundsMax);
+			mesh.triangles = triangles;
 
 			lastGeneratedMesh = mesh;
 			return mesh;

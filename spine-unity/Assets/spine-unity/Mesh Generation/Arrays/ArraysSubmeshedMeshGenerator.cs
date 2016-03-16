@@ -1,21 +1,57 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.3
+ * 
+ * Copyright (c) 2013-2015, Esoteric Software
+ * All rights reserved.
+ * 
+ * You are granted a perpetual, non-exclusive, non-sublicensable and
+ * non-transferable license to use, install, execute and perform the Spine
+ * Runtimes Software (the "Software") and derivative works solely for personal
+ * or internal use. Without the written permission of Esoteric Software (see
+ * Section 2 of the Spine Software License Agreement), you may not (a) modify,
+ * translate, adapt or otherwise create derivative works, improvements of the
+ * Software or develop new applications using the Software or (b) remove,
+ * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+//#define SPINE_OPTIONAL_NORMALS
+
+using UnityEngine;
 using System.Collections.Generic;
 
-using Spine;
-using Spine.Unity;
-
 namespace Spine.Unity.MeshGeneration {
-	public class ArraysSubmeshedMeshGenerator : ISubmeshedMeshGenerator {
+	/// <summary>
+	/// Arrays submeshed mesh generator.
+	/// </summary>
+	public class ArraysSubmeshedMeshGenerator : ArraysMeshGenerator, ISubmeshedMeshGenerator {
 
 		readonly List<Slot> separators = new List<Slot>();
 		public List<Slot> Separators { get { return this.separators; } }
 
-		public bool premultiplyVertexColors = true;
 		public float zSpacing = 0f;
+		#if SPINE_OPTIONAL_NORMALS
+		public bool generateNormals;
+		public bool generateTangents;
+		#endif
 
-		//		public bool generateNormals;
-		//		public bool generateTangents;
+		readonly DoubleBuffered<SmartMesh> doubleBufferedSmartMesh = new DoubleBuffered<SmartMesh>();
+		readonly SubmeshedMeshInstruction currentInstructions = new SubmeshedMeshInstruction();
+		readonly ExposedList<SubmeshTriangleBuffer> submeshBuffers = new ExposedList<SubmeshTriangleBuffer>();
+		Material[] sharedMaterials = new Material[0];
 
 		public SubmeshedMeshInstruction GenerateInstruction (Skeleton skeleton) {
 			if (skeleton == null) throw new System.ArgumentNullException("skeleton");
@@ -71,8 +107,8 @@ namespace Spine.Unity.MeshGeneration {
 				var attachmentMaterial = (Material)((AtlasRegion)rendererObject).page.rendererObject;
 
 				// Populate submesh when material changes. (or when forced to separate by a submeshSeparator)
-				if (( runningVertexCount > 0 && lastMaterial.GetInstanceID() != attachmentMaterial.GetInstanceID() ) ||
-					( separatorCount > 0 && separators.Contains(slot) )) {
+				bool separatedBySlot  = ( separatorCount > 0 && separators.Contains(slot) );
+				if (( runningVertexCount > 0 && lastMaterial.GetInstanceID() != attachmentMaterial.GetInstanceID() ) ||	separatedBySlot) {
 
 					instructionList.Add(
 						new SubmeshInstruction {
@@ -82,7 +118,8 @@ namespace Spine.Unity.MeshGeneration {
 							vertexCount = submeshVertexCount,
 							startSlot = submeshStartSlotIndex,
 							endSlot = i,
-							firstVertexIndex = submeshFirstVertex
+							firstVertexIndex = submeshFirstVertex,
+							separatedBySlot = separatedBySlot
 						}
 					);
 
@@ -109,7 +146,8 @@ namespace Spine.Unity.MeshGeneration {
 					vertexCount = submeshVertexCount,
 					startSlot = submeshStartSlotIndex,
 					endSlot = drawOrderCount,
-					firstVertexIndex = submeshFirstVertex
+					firstVertexIndex = submeshFirstVertex,
+					separatedBySlot = false
 				}
 			);
 
@@ -117,50 +155,25 @@ namespace Spine.Unity.MeshGeneration {
 			return currentInstructions;
 		}
 
+		// ISubmeshedMeshGenerator.GenerateMesh
+		/// <summary>Generates a mesh based on SubmeshedMeshInstructions</summary>
 		public MeshAndMaterials GenerateMesh (SubmeshedMeshInstruction meshInstructions) {
 			var smartMesh = doubleBufferedSmartMesh.GetNext();
 			var mesh = smartMesh.mesh;
-
 			int submeshCount = meshInstructions.submeshInstructions.Count;
-
 			var instructionList = meshInstructions.submeshInstructions;
-			float zSpacing = this.zSpacing;
-			float[] attVertBuffer = this.attachmentVertexBuffer;
-			Vector2[] uvs = this.meshUVs;
-			Color32[] colors32 = this.meshColors32;
 
-			// Ensure correct buffer sizes.
+			// STEP 1: Ensure correct buffer sizes.
+			bool submeshBuffersResized = ArraysMeshGenerator.EnsureTriangleBuffersSize(submeshBuffers, submeshCount, instructionList.Items);
+			bool vertBufferResized = ArraysMeshGenerator.EnsureSize(meshInstructions.vertexCount, ref this.meshVertices, ref this.meshUVs, ref this.meshColors32);
 			Vector3[] vertices = this.meshVertices;
 
-			bool newVertices = vertices == null || meshInstructions.vertexCount > vertices.Length;
-			int instructionVertexCount = meshInstructions.vertexCount;
-			if (newVertices) {
-				this.meshVertices = vertices = new Vector3[instructionVertexCount];
-				this.meshColors32 = colors32 = new Color32[instructionVertexCount];
-				this.meshUVs = uvs = new Vector2[instructionVertexCount];
-			} else {
-				var zero = Vector3.zero;
-				for (int i = instructionVertexCount, n = this.meshVertices.Length; i < n; i++)
-					vertices[i] = zero;
-			}
-
-			bool newSubmeshBuffers = submeshBuffers.Count < submeshCount;
-			if (newSubmeshBuffers) {
-				submeshBuffers.GrowIfNeeded(submeshCount);
-				for (int i = submeshBuffers.Count; submeshBuffers.Count < submeshCount; i++) {
-					submeshBuffers.Add(new SubmeshTriangleBuffer(instructionList.Items[i].triangleCount));
-					//submeshBuffers.Items[i] = new SubmeshTriangleBuffer(tc);
-					//submeshBuffers.Count = i;
-				}
-			}
-
+			// STEP 2: Update buffers based on Skeleton.
+			float zSpacing = this.zSpacing;
 			Vector3 meshBoundsMin;
 			Vector3 meshBoundsMax;
-
 			int attachmentCount = meshInstructions.attachmentList.Count;
-
-			// Initial values for manual Mesh Bounds calculation
-			if (meshInstructions.attachmentList.Count <= 0) {
+			if (attachmentCount <= 0) {
 				meshBoundsMin = new Vector3(0, 0, 0);
 				meshBoundsMax = new Vector3(0, 0, 0);
 			} else {
@@ -177,133 +190,59 @@ namespace Spine.Unity.MeshGeneration {
 					meshBoundsMax.z = 0f;
 				}
 			}
-
-			bool structureDoesntMatch = newVertices || newSubmeshBuffers || smartMesh.StructureDoesntMatch(meshInstructions);
-
-			if (structureDoesntMatch) {
-				mesh.Clear();
-
-				if (submeshCount == sharedMaterials.Length)
-					meshInstructions.FillMaterialArray(this.sharedMaterials);
-				else
-					this.sharedMaterials = meshInstructions.GetNewMaterialArray();
-			}
-
-			int vertexIndex = 0;
-
-			// For each submesh, add vertex data from attachments.
+			bool structureDoesntMatch = vertBufferResized || submeshBuffersResized || smartMesh.StructureDoesntMatch(meshInstructions);
+			// For each submesh, add vertex data from attachments. Also triangles, but only if needed.
+			int vertexIndex = 0; // modified by FillVerts
 			for (int submeshIndex = 0; submeshIndex < submeshCount; submeshIndex++) {
-				var currentSubmeshInstruction = instructionList.Items[submeshIndex];
-				var skeleton = currentSubmeshInstruction.skeleton;
-
-				ArraysBuffers.Fill(skeleton, currentSubmeshInstruction.startSlot, currentSubmeshInstruction.endSlot, zSpacing, this.premultiplyVertexColors, vertices, uvs, colors32, ref vertexIndex, ref attVertBuffer, ref meshBoundsMin, ref meshBoundsMax);
-
-				// Push triangles in this submesh
+				var submeshInstruction = instructionList.Items[submeshIndex];
+				int start = submeshInstruction.startSlot;
+				int end = submeshInstruction.endSlot;
+				var skeleton = submeshInstruction.skeleton;
+				ArraysMeshGenerator.FillVerts(skeleton, start, end, zSpacing, this.premultiplyVertexColors, vertices, this.meshUVs, this.meshColors32, ref vertexIndex, ref this.attachmentVertexBuffer, ref meshBoundsMin, ref meshBoundsMax);
 				if (structureDoesntMatch) {
-					smartMesh.mesh.Clear(); // rebuild triangle array.
-
-					var currentSubmesh = submeshBuffers.Items[submeshIndex];
+					var currentBuffer = submeshBuffers.Items[submeshIndex];
 					bool isLastSubmesh = (submeshIndex == submeshCount - 1);
-
-					int triangleCount = currentSubmesh.triangleCount = currentSubmeshInstruction.triangleCount;
-					int trianglesCapacity = currentSubmesh.triangles.Length;
-
-					int[] triangles = currentSubmesh.triangles;
-					if (isLastSubmesh) {
-						if (trianglesCapacity > triangleCount) {
-							for (int i = triangleCount; i < trianglesCapacity; i++)
-								triangles[i] = 0;
-						}
-					} else if (trianglesCapacity != triangleCount) {
-						triangles = currentSubmesh.triangles = new int[triangleCount];
-						currentSubmesh.triangleCount = 0;					 
-					}
-
-					// Iterate through submesh slots and store the triangles. 
-					int triangleIndex = 0;
-					int afv = currentSubmeshInstruction.firstVertexIndex; // attachment first vertex
-					var skeletonDrawOrderItems = skeleton.DrawOrder.Items;
-					for (int i = currentSubmeshInstruction.startSlot, n = currentSubmeshInstruction.endSlot; i < n; i++) {			
-						var attachment = skeletonDrawOrderItems[i].attachment;
-
-						if (attachment is RegionAttachment) {
-							triangles[triangleIndex] = afv; triangles[triangleIndex + 1] = afv + 2; triangles[triangleIndex + 2] = afv + 1;
-							triangles[triangleIndex + 3] = afv + 2; triangles[triangleIndex + 4] = afv + 3; triangles[triangleIndex + 5] = afv + 1;
-
-							triangleIndex += 6;
-							afv += 4;
-						} else {
-							int[] attachmentTriangles;
-							int attachmentVertexCount;
-							var meshAttachment = attachment as MeshAttachment;
-							if (meshAttachment != null) {
-								attachmentVertexCount = meshAttachment.vertices.Length >> 1; //  length/2
-								attachmentTriangles = meshAttachment.triangles;
-							} else {
-								var weightedMeshAttachment = attachment as WeightedMeshAttachment;
-								if (weightedMeshAttachment != null) {
-									attachmentVertexCount = weightedMeshAttachment.uvs.Length >> 1; // length/2
-									attachmentTriangles = weightedMeshAttachment.triangles;
-								} else
-									continue;
-							}
-
-							for (int ii = 0, nn = attachmentTriangles.Length; ii < nn; ii++, triangleIndex++)
-								triangles[triangleIndex] = afv + attachmentTriangles[ii];
-
-							afv += attachmentVertexCount;
-						}
-					} // Done adding current submesh triangles
+					ArraysMeshGenerator.FillTriangles(skeleton, submeshInstruction.triangleCount, submeshInstruction.firstVertexIndex, start, end, ref currentBuffer.triangles, ref currentBuffer.triangleCount, isLastSubmesh);
 				}
 			}
 
-			this.attachmentVertexBuffer = attVertBuffer;
-			Vector3 meshBoundsExtents = (meshBoundsMax - meshBoundsMin);
-			Vector3 meshCenter = meshBoundsMin + meshBoundsExtents * 0.5f;
+			if (structureDoesntMatch) {
+				mesh.Clear();
+				this.sharedMaterials = meshInstructions.GetUpdatedMaterialArray(this.sharedMaterials);
+			}
 
+			// STEP 3: Assign the buffers into the Mesh.
 			smartMesh.Set(this.meshVertices, this.meshUVs, this.meshColors32, meshInstructions);
-			mesh.bounds = new Bounds(meshCenter, meshBoundsExtents);
+			mesh.bounds = ArraysMeshGenerator.ToBounds(meshBoundsMin, meshBoundsMax);
 
 			if (structureDoesntMatch) {
-
-//				if (generateNormals) {
-//					int vertexCount = meshInstructions.vertexCount;
-//					Vector3[] normals = new Vector3[vertexCount];
-//					Vector3 normal = new Vector3(0, 0, -1);
-//					for (int i = 0; i < vertexCount; i++)
-//						normals[i] = normal;			
-//					mesh.normals = normals;
-//
-//					if (generateTangents) {
-//						Vector4[] tangents = new Vector4[vertexCount];
-//						Vector4 tangent = new Vector4(1, 0, 0, -1);
-//						for (int i = 0; i < vertexCount; i++)
-//							tangents[i] = tangent;
-//						mesh.tangents = tangents;
-//					}	
-//				}
-
-				// push new triangles if doesn't match.
+				// Push new triangles if doesn't match.
 				mesh.subMeshCount = submeshCount;
 				for (int i = 0; i < submeshCount; i++)
 					mesh.SetTriangles(submeshBuffers.Items[i].triangles, i);			
+
+				#if SPINE_OPTIONAL_NORMALS
+				if (generateNormals) {
+					int vertexCount = meshInstructions.vertexCount;
+					Vector3[] normals = new Vector3[vertexCount];
+					Vector3 normal = new Vector3(0, 0, -1);
+					for (int i = 0; i < vertexCount; i++)
+						normals[i] = normal;			
+					mesh.normals = normals;
+
+					if (generateTangents) {
+						Vector4[] tangents = new Vector4[vertexCount];
+						Vector4 tangent = new Vector4(1, 0, 0, -1);
+						for (int i = 0; i < vertexCount; i++)
+							tangents[i] = tangent;
+						mesh.tangents = tangents;
+					}	
+				}
+				#endif
 			}
-
-
+				
 			return new MeshAndMaterials(smartMesh.mesh, sharedMaterials);
 		}
-
-		#region Internals
-		readonly DoubleBuffered<SmartMesh> doubleBufferedSmartMesh = new DoubleBuffered<SmartMesh>();
-		readonly SubmeshedMeshInstruction currentInstructions = new SubmeshedMeshInstruction();
-
-		float[] attachmentVertexBuffer = new float[8];
-		Vector3[] meshVertices;
-		Color32[] meshColors32;
-		Vector2[] meshUVs;
-		Material[] sharedMaterials = new Material[0];
-		readonly ExposedList<SubmeshTriangleBuffer> submeshBuffers = new ExposedList<SubmeshTriangleBuffer>();
-		#endregion
 
 		#region Types
 		// A SmartMesh is a Mesh (with submeshes) that knows what attachments and instructions were used to generate it.

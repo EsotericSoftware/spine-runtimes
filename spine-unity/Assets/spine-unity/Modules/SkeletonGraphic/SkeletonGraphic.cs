@@ -28,194 +28,194 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
 #if (UNITY_5_0 || UNITY_5_1 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7)
 #define PREUNITY_5_2
 #endif
 
 using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
 using Spine;
 
-[ExecuteInEditMode, RequireComponent(typeof(CanvasRenderer), typeof(RectTransform)), DisallowMultipleComponent]
-[AddComponentMenu("Spine/SkeletonGraphic (Unity UI Canvas)")]
-public class SkeletonGraphic : MaskableGraphic {
+namespace Spine.Unity {
+	[ExecuteInEditMode, RequireComponent(typeof(CanvasRenderer), typeof(RectTransform)), DisallowMultipleComponent]
+	[AddComponentMenu("Spine/SkeletonGraphic (Unity UI Canvas)")]
+	public class SkeletonGraphic : MaskableGraphic {
 
-	#region Inspector
-	public SkeletonDataAsset skeletonDataAsset;
+		#region Inspector
+		public SkeletonDataAsset skeletonDataAsset;
 
-	[SpineSkin(dataField:"skeletonDataAsset")]
-	public string initialSkinName = "default";
+		[SpineSkin(dataField:"skeletonDataAsset")]
+		public string initialSkinName = "default";
 
-	[SpineAnimation(dataField:"skeletonDataAsset")]
-	public string startingAnimation;
-	public bool startingLoop;
-	public float timeScale = 1f;
-	public bool freeze;
+		[SpineAnimation(dataField:"skeletonDataAsset")]
+		public string startingAnimation;
+		public bool startingLoop;
+		public float timeScale = 1f;
+		public bool freeze;
 
-	#if UNITY_EDITOR
-	protected override void OnValidate () {
-		// This handles Scene View preview.
-		base.OnValidate ();
-		#if !PREUNITY_5_2
-		if (this.IsValid) {
-			if (skeletonDataAsset == null) {
-				Clear();
-				startingAnimation = "";
-			} else if (skeletonDataAsset.GetSkeletonData(true) != skeleton.data) {
-				Clear();
-				Initialize(true);
-				startingAnimation = "";
-				if (skeletonDataAsset.atlasAssets.Length > 1 || skeletonDataAsset.atlasAssets[0].materials.Length > 1) {
-					Debug.LogError("Unity UI does not support multiple textures per Renderer. Your skeleton will not be rendered correctly. Recommend using SkeletonAnimation instead. This requires the use of a Screen space camera canvas.");
+		#if UNITY_EDITOR
+		protected override void OnValidate () {
+			// This handles Scene View preview.
+			base.OnValidate ();
+			#if !PREUNITY_5_2
+			if (this.IsValid) {
+				if (skeletonDataAsset == null) {
+					Clear();
+					startingAnimation = "";
+				} else if (skeletonDataAsset.GetSkeletonData(true) != skeleton.data) {
+					Clear();
+					Initialize(true);
+					startingAnimation = "";
+					if (skeletonDataAsset.atlasAssets.Length > 1 || skeletonDataAsset.atlasAssets[0].materials.Length > 1) {
+						Debug.LogError("Unity UI does not support multiple textures per Renderer. Your skeleton will not be rendered correctly. Recommend using SkeletonAnimation instead. This requires the use of a Screen space camera canvas.");
+					}
+				} else {
+					if (freeze) return;
+					skeleton.SetToSetupPose();
+					if (!string.IsNullOrEmpty(startingAnimation)) {
+						skeleton.PoseWithAnimation(startingAnimation, 0f, false);
+					}
 				}
 			} else {
-				if (freeze) return;
-				skeleton.SetToSetupPose();
-				if (!string.IsNullOrEmpty(startingAnimation)) {
-					skeleton.PoseWithAnimation(startingAnimation, 0f, false);
-				}
+				if (skeletonDataAsset != null)
+					Initialize(true);
 			}
-		} else {
-			if (skeletonDataAsset != null)
-				Initialize(true);
+			#else
+			Debug.LogWarning("SkeletonGraphic requres Unity 5.2 or higher.\nUnityEngine.UI 5.1 and below does not accept meshes and can't be used to render Spine skeletons. You may delete the SkeletonGraphic folder under `Modules` if you want to exclude it from your project." );
+			#endif
+				
 		}
-		#else
-		Debug.LogWarning("SkeletonGraphic requres Unity 5.2 or higher.\nUnityEngine.UI 5.1 and below does not accept meshes and can't be used to render Spine skeletons. You may delete the SkeletonGraphic folder under `Modules` if you want to exclude it from your project." );
+
+		protected override void Reset () {
+			base.Reset();
+			if (canvas == null) {
+				Debug.LogWarningFormat("SkeletonGraphic requires a Canvas to be visible. Move this GameObject ({0}) in the Hierarchy so it becomes a child of a Canvas.", gameObject.name);
+			}
+
+			if (material == null || material.shader != Shader.Find("Spine/SkeletonGraphic (Premultiply Alpha)")) {
+				Debug.LogWarning("SkeletonGraphic works best with the SkeletonGraphic material.");
+			}
+		}
 		#endif
-			
-	}
+		#endregion
 
-	protected override void Reset () {
-		base.Reset();
-		if (canvas == null) {
-			Debug.LogWarningFormat("SkeletonGraphic requires a Canvas to be visible. Move this GameObject ({0}) in the Hierarchy so it becomes a child of a Canvas.", gameObject.name);
+		#if !PREUNITY_5_2
+		#region Internals
+		// This is used by the UI system to determine what to put in the MaterialPropertyBlock.
+		public override Texture mainTexture {
+			get { 
+				// Fail loudly when incorrectly set up.
+				return skeletonDataAsset == null ? null : skeletonDataAsset.atlasAssets[0].materials[0].mainTexture;
+			}
 		}
 
-		if (material == null || material.shader != Shader.Find("Spine/SkeletonGraphic (Premultiply Alpha)")) {
-			Debug.LogWarning("SkeletonGraphic works best with the SkeletonGraphic material.");
+		protected override void Awake () {
+			base.Awake ();
+			if (!this.IsValid) {
+				Initialize(false);
+				Rebuild(CanvasUpdate.PreRender);
+			}
 		}
-	}
-	#endif
-	#endregion
 
-	#if !PREUNITY_5_2
-	#region Internals
-	// This is used by the UI system to determine what to put in the MaterialPropertyBlock.
-	public override Texture mainTexture {
-		get { 
-			// Fail loudly when incorrectly set up.
-			return skeletonDataAsset == null ? null : skeletonDataAsset.atlasAssets[0].materials[0].mainTexture;
+		public override void Rebuild (CanvasUpdate update) {
+			base.Rebuild(update);
+			if (canvasRenderer.cull) return;
+			if (update == CanvasUpdate.PreRender) UpdateMesh();
 		}
-	}
 
-	protected override void Awake () {
-		base.Awake ();
-		if (!this.IsValid) {
-			Initialize(false);
-			Rebuild(CanvasUpdate.PreRender);
+		public virtual void Update () {
+			if (freeze) return;
+			Update(Time.deltaTime);
 		}
-	}
 
-	public override void Rebuild (CanvasUpdate update) {
-		base.Rebuild(update);
-		if (canvasRenderer.cull) return;
-		if (update == CanvasUpdate.PreRender) UpdateMesh();
-	}
+		public virtual void Update (float deltaTime) {
+			if (!this.IsValid) return;
 
-	public virtual void Update () {
-		if (freeze) return;
-		Update(Time.deltaTime);
-	}
+			deltaTime *= timeScale;
+			skeleton.Update(deltaTime);
+			state.Update(deltaTime);
+			state.Apply(skeleton);
 
-	public virtual void Update (float deltaTime) {
-		if (!this.IsValid) return;
+			if (UpdateLocal != null) UpdateLocal(this);
 
-		deltaTime *= timeScale;
-		skeleton.Update(deltaTime);
-		state.Update(deltaTime);
-		state.Apply(skeleton);
-
-		if (UpdateLocal != null) UpdateLocal(this);
-
-		skeleton.UpdateWorldTransform();
-
-		if (UpdateWorld != null) { 
-			UpdateWorld(this);
 			skeleton.UpdateWorldTransform();
+
+			if (UpdateWorld != null) { 
+				UpdateWorld(this);
+				skeleton.UpdateWorldTransform();
+			}
+
+			if (UpdateComplete != null) UpdateComplete(this);
 		}
 
-		if (UpdateComplete != null) UpdateComplete(this);
-	}
+		void LateUpdate () {
+			if (freeze) return;
+			//this.SetVerticesDirty(); // Which is better?
+			UpdateMesh();
+		}
+		#endregion
 
-	void LateUpdate () {
-		if (freeze) return;
-		//this.SetVerticesDirty(); // Which is better?
-		UpdateMesh();
-	}
-	#endregion
+		#region API
+		protected Skeleton skeleton;
+		public Skeleton Skeleton { get { return skeleton; } }
+		public SkeletonData SkeletonData { get { return skeleton == null ? null : skeleton.data; } }
+		public bool IsValid { get { return skeleton != null; } }
 
-	#region API
-	protected Skeleton skeleton;
-	public Skeleton Skeleton { get { return skeleton; } }
-	public SkeletonData SkeletonData { get { return skeleton == null ? null : skeleton.data; } }
-	public bool IsValid { get { return skeleton != null; } }
+		protected Spine.AnimationState state;
+		public Spine.AnimationState AnimationState { get { return state; } }
 
-	protected Spine.AnimationState state;
-	public Spine.AnimationState AnimationState { get { return state; } }
+		// This is any object that can give you a mesh when you give it a skeleton to render.
+		protected Spine.Unity.MeshGeneration.ISimpleMeshGenerator spineMeshGenerator;
+		public Spine.Unity.MeshGeneration.ISimpleMeshGenerator SpineMeshGenerator { get { return this.spineMeshGenerator; } }
 
-	// This is any object that can give you a mesh when you give it a skeleton to render.
-	protected Spine.Unity.ISimpleMeshGenerator spineMeshGenerator;
-	public Spine.Unity.ISimpleMeshGenerator SpineMeshGenerator { get { return this.spineMeshGenerator; } }
+		public delegate void UpdateDelegate (SkeletonGraphic skeletonGraphic);
+		public event UpdateDelegate UpdateLocal;
+		public event UpdateDelegate UpdateWorld;
+		public event UpdateDelegate UpdateComplete;
 
-	public delegate void UpdateDelegate (SkeletonGraphic skeletonGraphic);
-	public event UpdateDelegate UpdateLocal;
-	public event UpdateDelegate UpdateWorld;
-	public event UpdateDelegate UpdateComplete;
-
-	public void Clear () {
-		skeleton = null;
-		canvasRenderer.Clear();
-	}
-
-	public void Initialize (bool overwrite) {
-		if (this.IsValid && !overwrite) return;
-
-		// Make sure none of the stuff is null
-		if (this.skeletonDataAsset == null) return;
-		var skeletonData = this.skeletonDataAsset.GetSkeletonData(false);
-		if (skeletonData == null) return;
-
-		if (skeletonDataAsset.atlasAssets.Length <= 0 || skeletonDataAsset.atlasAssets[0].materials.Length <= 0) return;
-
-		this.state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());
-		if (state == null) {
-			Clear();
-			return;
+		public void Clear () {
+			skeleton = null;
+			canvasRenderer.Clear();
 		}
 
-		this.skeleton = new Skeleton(skeletonData);
-		this.spineMeshGenerator = new Spine.Unity.ArraysSimpleMeshGenerator(); // You can switch this out with any other implementer of ISpineMeshGenerator
+		public void Initialize (bool overwrite) {
+			if (this.IsValid && !overwrite) return;
 
-		// Set the initial Skin and Animation
-		if (!string.IsNullOrEmpty(initialSkinName))
-			skeleton.SetSkin(initialSkinName);
+			// Make sure none of the stuff is null
+			if (this.skeletonDataAsset == null) return;
+			var skeletonData = this.skeletonDataAsset.GetSkeletonData(false);
+			if (skeletonData == null) return;
 
-		if (!string.IsNullOrEmpty(startingAnimation))
-			state.SetAnimation(0, startingAnimation, startingLoop);
-	}
+			if (skeletonDataAsset.atlasAssets.Length <= 0 || skeletonDataAsset.atlasAssets[0].materials.Length <= 0) return;
 
-	public void UpdateMesh () {
-		if (this.IsValid) {
-			skeleton.SetColor(this.color);
-			if (canvas != null)
-				spineMeshGenerator.Scale = canvas.referencePixelsPerUnit; // TODO: move this to a listener to of the canvas?
+			this.state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());
+			if (state == null) {
+				Clear();
+				return;
+			}
 
-			canvasRenderer.SetMesh(spineMeshGenerator.GenerateMesh(skeleton));
-			this.UpdateMaterial();
+			this.skeleton = new Skeleton(skeletonData);
+			this.spineMeshGenerator = new Spine.Unity.MeshGeneration.ArraysSimpleMeshGenerator(); // You can switch this out with any other implementer of Spine.Unity.MeshGeneration.ISimpleMeshGenerator
+
+			// Set the initial Skin and Animation
+			if (!string.IsNullOrEmpty(initialSkinName))
+				skeleton.SetSkin(initialSkinName);
+
+			if (!string.IsNullOrEmpty(startingAnimation))
+				state.SetAnimation(0, startingAnimation, startingLoop);
 		}
+
+		public void UpdateMesh () {
+			if (this.IsValid) {
+				skeleton.SetColor(this.color);
+				if (canvas != null)
+					spineMeshGenerator.Scale = canvas.referencePixelsPerUnit; // TODO: move this to a listener to of the canvas?
+
+				canvasRenderer.SetMesh(spineMeshGenerator.GenerateMesh(skeleton));
+				this.UpdateMaterial();
+			}
+		}
+		#endregion
+		#endif
 	}
-	#endregion
-	#endif
 }

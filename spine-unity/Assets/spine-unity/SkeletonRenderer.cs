@@ -28,6 +28,9 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
+#define SPINE_OPTIONAL_NORMALS
+#define SPINE_OPTIONAL_FRONTFACING
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -46,10 +49,14 @@ public class SkeletonRenderer : MonoBehaviour {
 	public String initialSkinName;
 
 	#region Advanced
+	#if SPINE_OPTIONAL_NORMALS
 	public bool calculateNormals, calculateTangents;
+	#endif
 	public float zSpacing;
 	public bool renderMeshes = true, immutableTriangles;
+	#if SPINE_OPTIONAL_FRONTFACING
 	public bool frontFacing;
+	#endif
 	public bool logErrors = false;
 
 	// Submesh Separation
@@ -83,8 +90,10 @@ public class SkeletonRenderer : MonoBehaviour {
 	readonly ExposedList<Material> submeshMaterials = new ExposedList<Material>();
 	Material[] sharedMaterials = new Material[0];
 
+	#if SPINE_OPTIONAL_NORMALS
 	Vector3[] normals;
 	Vector4[] tangents;
+	#endif
 
 	#region Runtime Instantiation
 	public static T NewSpineGameObject<T> (SkeletonDataAsset skeletonDataAsset) where T : SkeletonRenderer {
@@ -169,7 +178,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		if (!meshRenderer.enabled && GenerateMeshOverride == null)
 			return;
 
-		// Step 1. Determine a SmartMesh.Instruction. Split up instructions into submeshes.
+		// STEP 1. Determine a SmartMesh.Instruction. Split up instructions into submeshes.
 
 		// This method caches several .Items arrays.
 		// Never mutate their overlying ExposedList objects.
@@ -187,12 +196,13 @@ public class SkeletonRenderer : MonoBehaviour {
 		workingAttachments.Count = drawOrderCount;
 		var workingAttachmentsItems = workingInstruction.attachments.Items;
 
-		// SPINE_DETECT_FLIPS
+		#if SPINE_OPTIONAL_FRONTFACING
 		var workingFlips = workingInstruction.attachmentFlips;
 		workingFlips.Clear(false);
 		workingFlips.GrowIfNeeded(drawOrderCount);
 		workingFlips.Count = drawOrderCount;
 		var workingFlipsItems = workingFlips.Items;
+		#endif
 
 		var workingSubmeshInstructions = workingInstruction.submeshInstructions;	// Items array should not be cached. There is dynamic writing to this list.
 		workingSubmeshInstructions.Clear(false);
@@ -209,9 +219,10 @@ public class SkeletonRenderer : MonoBehaviour {
 
 			workingAttachmentsItems[i] = attachment;
 
-			// SPINE_DETECT_FLIPS
+			#if SPINE_OPTIONAL_FRONTFACING
 			bool flip = frontFacing && (slot.bone.WorldSignX != slot.bone.WorldSignY);
 			workingFlipsItems[i] = flip;
+			#endif
 
 			object rendererObject; // An AtlasRegion in plain Spine-Unity. Spine-TK2D hooks into TK2D's system. eventual source of Material object.
 			int attachmentVertexCount, attachmentTriangleCount;
@@ -298,14 +309,16 @@ public class SkeletonRenderer : MonoBehaviour {
 
 		workingInstruction.vertexCount = vertexCount;
 		workingInstruction.immutableTriangles = this.immutableTriangles;
+		#if SPINE_OPTIONAL_FRONTFACING
 		workingInstruction.frontFacing = this.frontFacing;
+		#endif
 
 		if (GenerateMeshOverride != null) {
 			GenerateMeshOverride(workingInstruction);
 			return;
 		}
 
-		// Step 2. Update vertex buffer based on verts from the attachments.
+		// STEP 2. Update vertex buffer based on verts from the attachments.
 		// Uses values that were also stored in workingInstruction.
 		Vector3[] vertices = this.vertices;
 		bool vertexCountIncreased = vertexCount > vertices.Length;	
@@ -315,6 +328,7 @@ public class SkeletonRenderer : MonoBehaviour {
 			this.colors = new Color32[vertexCount];
 			this.uvs = new Vector2[vertexCount];
 
+			#if SPINE_OPTIONAL_NORMALS
 			if (calculateNormals) {
 				Vector3[] localNormals = this.normals = new Vector3[vertexCount];
 				Vector3 normal = new Vector3(0, 0, -1);
@@ -328,6 +342,7 @@ public class SkeletonRenderer : MonoBehaviour {
 						localTangents[i] = tangent;
 				}
 			}
+			#endif
 		} else {
 			Vector3 zero = Vector3.zero;
 			for (int i = vertexCount, n = vertices.Length; i < n; i++)
@@ -526,6 +541,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		currentMesh.colors32 = colors;
 		currentMesh.uv = uvs;
 		var currentSmartMeshInstructionUsed = currentSmartMesh.instructionUsed;
+		#if SPINE_OPTIONAL_NORMALS
 		if (currentSmartMeshInstructionUsed.vertexCount < vertexCount) {
 			if (calculateNormals) {
 				currentMesh.normals = normals;
@@ -534,6 +550,7 @@ public class SkeletonRenderer : MonoBehaviour {
 				}
 			}
 		}
+		#endif
 
 		// Check if the triangles should also be updated.
 		// This thorough structure check is cheaper than updating triangles every frame.
@@ -553,7 +570,11 @@ public class SkeletonRenderer : MonoBehaviour {
 			for (int i = 0, last = submeshCount - 1; i < submeshCount; i++) {
 				var submeshInstruction = workingSubmeshInstructions.Items[i];
 				if (mutableTriangles || i >= oldSubmeshCount)
-					SetSubmesh(i, submeshInstruction, currentInstructions.attachmentFlips, i == last);
+					SetSubmesh(i, submeshInstruction,
+						#if SPINE_OPTIONAL_FRONTFACING
+						currentInstructions.attachmentFlips,
+						#endif
+						i == last);
 				thisSubmeshMaterials.Add(submeshInstruction.material);
 			}
 
@@ -627,7 +648,7 @@ public class SkeletonRenderer : MonoBehaviour {
 				return true;
 		}
 
-		// SPINE_DETECT_FLIPS
+		#if SPINE_OPTIONAL_FRONTFACING
 		if (a.frontFacing != b.frontFacing) { 	// if settings changed
 			return true;
 		} else if (a.frontFacing) { 			// if settings matched, only need to check one.
@@ -638,6 +659,7 @@ public class SkeletonRenderer : MonoBehaviour {
 					return true;
 			}
 		}
+		#endif
 
 		// Submesh count changed
 		int submeshCountA = a.submeshInstructions.Count;
@@ -664,8 +686,12 @@ public class SkeletonRenderer : MonoBehaviour {
 
 		return false;
 	}
-		
+
+	#if SPINE_OPTIONAL_FRONTFACING
 	void SetSubmesh (int submeshIndex, Spine.Unity.MeshGeneration.SubmeshInstruction submeshInstructions, ExposedList<bool> flipStates, bool isLastSubmesh) {
+	#else
+	void SetSubmesh (int submeshIndex, Spine.Unity.MeshGeneration.SubmeshInstruction submeshInstructions, bool isLastSubmesh) {
+	#endif
 		SubmeshTriangleBuffer currentSubmesh = submeshes.Items[submeshIndex];
 		int[] triangles = currentSubmesh.triangles;
 
@@ -686,7 +712,11 @@ public class SkeletonRenderer : MonoBehaviour {
 			currentSubmesh.triangleCount = 0;
 		}
 
+		#if SPINE_OPTIONAL_FRONTFACING
 		if (!this.renderMeshes && !this.frontFacing) {
+		#else
+		if (!this.renderMeshes) {
+		#endif
 			// Use stored triangles if possible.
 			if (currentSubmesh.firstVertex != firstVertex || currentSubmesh.triangleCount < triangleCount) { //|| currentSubmesh.triangleCount == 0
 				currentSubmesh.triangleCount = triangleCount;
@@ -707,20 +737,20 @@ public class SkeletonRenderer : MonoBehaviour {
 		// This method caches several .Items arrays.
 		// Never mutate their overlying ExposedList objects.
 
+		#if SPINE_OPTIONAL_FRONTFACING
+		var flipStatesItems = flipStates.Items;
+		#endif
+
 		// Iterate through all slots and store their triangles. 
 		var drawOrderItems = skeleton.DrawOrder.Items;
-		// SPINE_DETECT_FLIPS
-		var flipStatesItems = flipStates.Items;
-
 		int triangleIndex = 0; // Modified by loop
 		for (int i = submeshInstructions.startSlot, n = submeshInstructions.endSlot; i < n; i++) {			
 			Attachment attachment = drawOrderItems[i].attachment;
-			// SPINE_DETECT_FLIPS
+			#if SPINE_OPTIONAL_FRONTFACING
 			bool flip = frontFacing && flipStatesItems[i];
 
 			// Add RegionAttachment triangles
 			if (attachment is RegionAttachment) {
-				// SPINE_DETECT_FLIPS
 				if (!flip) {
 					triangles[triangleIndex] = firstVertex;
 					triangles[triangleIndex + 1] = firstVertex + 2;
@@ -741,6 +771,20 @@ public class SkeletonRenderer : MonoBehaviour {
 				firstVertex += 4;
 				continue;
 			}
+			#else
+			if (attachment is RegionAttachment) {
+				triangles[triangleIndex] = firstVertex;
+				triangles[triangleIndex + 1] = firstVertex + 2;
+				triangles[triangleIndex + 2] = firstVertex + 1;
+				triangles[triangleIndex + 3] = firstVertex + 2;
+				triangles[triangleIndex + 4] = firstVertex + 3;
+				triangles[triangleIndex + 5] = firstVertex + 1;
+
+				triangleIndex += 6;
+				firstVertex += 4;
+				continue;
+			}
+			#endif
 
 			// Add (Weighted)MeshAttachment triangles
 			int[] attachmentTriangles;
@@ -758,7 +802,7 @@ public class SkeletonRenderer : MonoBehaviour {
 					continue;
 			}
 
-			// SPINE_DETECT_FLIPS
+			#if SPINE_OPTIONAL_FRONTFACING
 			if (flip) {
 				for (int ii = 0, nn = attachmentTriangles.Length; ii < nn; ii += 3, triangleIndex += 3) {
 					triangles[triangleIndex + 2] = firstVertex + attachmentTriangles[ii];
@@ -770,6 +814,12 @@ public class SkeletonRenderer : MonoBehaviour {
 					triangles[triangleIndex] = firstVertex + attachmentTriangles[ii];
 				}
 			}
+			#else
+			for (int ii = 0, nn = attachmentTriangles.Length; ii < nn; ii++, triangleIndex++) {
+				triangles[triangleIndex] = firstVertex + attachmentTriangles[ii];
+			}
+			#endif
+
 			firstVertex += attachmentVertexCount;
 		}
 	}
@@ -797,21 +847,26 @@ public class SkeletonRenderer : MonoBehaviour {
 
 		public class Instruction {
 			public bool immutableTriangles;
-			public bool frontFacing;
 			public int vertexCount = -1;
 			public readonly ExposedList<Attachment> attachments = new ExposedList<Attachment>();
-			public readonly ExposedList<bool> attachmentFlips = new ExposedList<bool>();
 			public readonly ExposedList<Spine.Unity.MeshGeneration.SubmeshInstruction> submeshInstructions = new ExposedList<Spine.Unity.MeshGeneration.SubmeshInstruction>();
+
+			#if SPINE_OPTIONAL_FRONTFACING
+			public bool frontFacing;
+			public readonly ExposedList<bool> attachmentFlips = new ExposedList<bool>();
+			#endif
 
 			public void Clear () {
 				this.attachments.Clear(false);
-				this.attachmentFlips.Clear(false);
 				this.submeshInstructions.Clear(false);
+
+				#if SPINE_OPTIONAL_FRONTFACING
+				this.attachmentFlips.Clear(false);
+				#endif
 			}
 
 			public void Set (Instruction other) {
 				this.immutableTriangles = other.immutableTriangles;
-				this.frontFacing = other.frontFacing;
 				this.vertexCount = other.vertexCount;
 
 				this.attachments.Clear(false);
@@ -819,13 +874,14 @@ public class SkeletonRenderer : MonoBehaviour {
 				this.attachments.Count = other.attachments.Count;
 				other.attachments.CopyTo(this.attachments.Items);
 
-				// SPINE_DETECT_FLIPS
+				#if SPINE_OPTIONAL_FRONTFACING
+				this.frontFacing = other.frontFacing;
 				this.attachmentFlips.Clear(false);
 				this.attachmentFlips.GrowIfNeeded(other.attachmentFlips.Capacity);
 				this.attachmentFlips.Count = other.attachmentFlips.Count;
 				if (this.frontFacing)
 					other.attachmentFlips.CopyTo(this.attachmentFlips.Items);
-
+				#endif
 
 				this.submeshInstructions.Clear(false);
 				this.submeshInstructions.GrowIfNeeded(other.submeshInstructions.Capacity);

@@ -1,65 +1,74 @@
-﻿using UnityEngine;
-using System.Collections;
-using Spine;
+﻿/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.3
+ * 
+ * Copyright (c) 2013-2015, Esoteric Software
+ * All rights reserved.
+ * 
+ * You are granted a perpetual, non-exclusive, non-sublicensable and
+ * non-transferable license to use, install, execute and perform the Spine
+ * Runtimes Software (the "Software") and derivative works solely for personal
+ * or internal use. Without the written permission of Esoteric Software (see
+ * Section 2 of the Spine Software License Agreement), you may not (a) modify,
+ * translate, adapt or otherwise create derivative works, improvements of the
+ * Software or develop new applications using the Software or (b) remove,
+ * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+using UnityEngine;
 
 namespace Spine.Unity.MeshGeneration {
-	public class ArraysSubmeshSetMeshGenerator : ISubmeshSetMeshGenerator {
+	public class ArraysSubmeshSetMeshGenerator : ArraysMeshGenerator, ISubmeshSetMeshGenerator {
+		#region Settings
 		public float zSpacing = 0f;
-		public bool premultiplyVertexColors = true;
+		#endregion
+
+		readonly DoubleBuffered<SmartMesh> doubleBufferedSmartMesh = new DoubleBuffered<SmartMesh>();
+		readonly ExposedList<SubmeshInstruction> currentInstructions = new ExposedList<SubmeshInstruction>();
+		readonly ExposedList<Attachment> currentAttachments = new ExposedList<Attachment>();
+		readonly ExposedList<SubmeshTriangleBuffer> submeshBuffers = new ExposedList<SubmeshTriangleBuffer>();
+		Material[] sharedMaterials = new Material[0];
 
 		public MeshAndMaterials GenerateMesh (ExposedList<SubmeshInstruction> instructions, int startSubmesh, int endSubmesh) {
+			// STEP 0: Prepare instructions.
 			var paramItems = instructions.Items;
 			currentInstructions.Clear(false);
 			for (int i = startSubmesh, n = endSubmesh; i < n; i++) {
 				this.currentInstructions.Add(paramItems[i]);
 			}
-
 			var smartMesh = doubleBufferedSmartMesh.GetNext();
 			var mesh = smartMesh.mesh;
-
 			int submeshCount = currentInstructions.Count;
 			var currentInstructionsItems = currentInstructions.Items;
-
 			int vertexCount = 0;
 			for (int i = 0; i < submeshCount; i++) {
-				// Ensure current instructions have correct cached values.
-				currentInstructionsItems[i].firstVertexIndex = vertexCount;
-
-				// vertexCount will also be used for the rest of this method.
-				vertexCount += currentInstructionsItems[i].vertexCount;
-			}
-				
-			float[] attVertBuffer = this.attachmentVertexBuffer;
-			Vector2[] uvs = this.meshUVs;
-			Color32[] colors32 = this.meshColors32;
-
-			// Ensure correct buffer sizes.
-			Vector3[] vertices = this.meshVertices;
-
-			bool newVertices = vertices == null || vertexCount > vertices.Length;
-			if (newVertices) {
-				this.meshVertices = vertices = new Vector3[vertexCount];
-				this.meshColors32 = colors32 = new Color32[vertexCount];
-				this.meshUVs = uvs = new Vector2[vertexCount];
-			} else {
-				var zero = Vector3.zero;
-				for (int i = vertexCount, n = this.meshVertices.Length; i < n; i++)
-					vertices[i] = zero;
+				currentInstructionsItems[i].firstVertexIndex = vertexCount;// Ensure current instructions have correct cached values.
+				vertexCount += currentInstructionsItems[i].vertexCount; // vertexCount will also be used for the rest of this method.
 			}
 
-			bool newSubmeshBuffers = submeshBuffers.Count < submeshCount;
-			if (newSubmeshBuffers) {
-				submeshBuffers.GrowIfNeeded(submeshCount);
-				for (int i = submeshBuffers.Count; submeshBuffers.Count < submeshCount; i++) {
-					submeshBuffers.Add(new SubmeshTriangleBuffer(currentInstructionsItems[i].triangleCount));
-				}
-			}
+			// STEP 1: Ensure correct buffer sizes.
+			bool vertBufferResized = ArraysMeshGenerator.EnsureSize(vertexCount, ref this.meshVertices, ref this.meshUVs, ref this.meshColors32); 
+			bool submeshBuffersResized = ArraysMeshGenerator.EnsureTriangleBuffersSize(submeshBuffers, submeshCount, currentInstructionsItems);
 
+			// STEP 2: Update buffers based on Skeleton.
+
+			// Initial values for manual Mesh Bounds calculation
 			Vector3 meshBoundsMin;
 			Vector3 meshBoundsMax;
-
 			float zSpacing = this.zSpacing;
-			// Initial values for manual Mesh Bounds calculation
 			if (vertexCount <= 0) {
 				meshBoundsMin = new Vector3(0, 0, 0);
 				meshBoundsMax = new Vector3(0, 0, 0);
@@ -69,250 +78,50 @@ namespace Spine.Unity.MeshGeneration {
 				meshBoundsMax.x = int.MinValue;
 				meshBoundsMax.y = int.MinValue;
 
+				int endSlot = currentInstructionsItems[submeshCount - 1].endSlot;
 				if (zSpacing > 0f) {
 					meshBoundsMin.z = 0f;
-					meshBoundsMax.z = zSpacing * (currentInstructionsItems[submeshCount - 1].endSlot);
+					meshBoundsMax.z = zSpacing * endSlot;
 				} else {
-					meshBoundsMin.z = zSpacing * (currentInstructionsItems[submeshCount - 1].endSlot);
+					meshBoundsMin.z = zSpacing * endSlot;
 					meshBoundsMax.z = 0f;
 				}
 			}
-
-			bool structureDoesntMatch = newVertices || newSubmeshBuffers || smartMesh.StructureDoesntMatch(currentAttachments, currentInstructions);
+				
+			// For each submesh, add vertex data from attachments.
+			var currentAttachments_ = this.currentAttachments;
+			bool structureDoesntMatch = vertBufferResized || submeshBuffersResized || smartMesh.StructureDoesntMatch(currentAttachments_, currentInstructions);
+			currentAttachments_.Clear(false);
+			int vertexIndex = 0; // modified by FillVerts
+			for (int submeshIndex = 0; submeshIndex < submeshCount; submeshIndex++) {
+				var currentInstruction = currentInstructionsItems[submeshIndex];
+				int startSlot = currentInstruction.startSlot;
+				int endSlot = currentInstruction.endSlot;
+				var skeleton = currentInstruction.skeleton;
+				var skeletonDrawOrderItems = skeleton.DrawOrder.Items;
+				for (int i = startSlot; i < endSlot; i++) {
+					var ca = skeletonDrawOrderItems[i].attachment;
+					if (ca != null) currentAttachments_.Add(ca); // Includes BoundingBoxes. This is ok.
+				}
+				ArraysMeshGenerator.FillVerts(skeleton, startSlot, endSlot, zSpacing, this.premultiplyVertexColors, this.meshVertices, this.meshUVs, this.meshColors32, ref vertexIndex, ref this.attachmentVertexBuffer, ref meshBoundsMin, ref meshBoundsMax);
+				if (structureDoesntMatch) {
+					var currentBuffer = submeshBuffers.Items[submeshIndex];
+					bool isLastSubmesh = (submeshIndex == submeshCount - 1);
+					ArraysMeshGenerator.FillTriangles(skeleton, currentInstruction.triangleCount, currentInstruction.firstVertexIndex, startSlot, endSlot, ref currentBuffer.triangles, ref currentBuffer.triangleCount, isLastSubmesh);
+				}
+			}
 
 			if (structureDoesntMatch) {
 				mesh.Clear();
-
-				if (submeshCount == sharedMaterials.Length)
-					currentInstructions.FillMaterialArray(this.sharedMaterials);
-				else
-					this.sharedMaterials = currentInstructions.GetNewMaterialArray();
+				this.sharedMaterials = currentInstructions.GetUpdatedMaterialArray(this.sharedMaterials);
 			}
 
-			currentAttachments.Clear(false);
-			int vertexIndex = 0;
-			// For each submesh, add vertex data from attachments.
-			for (int submeshIndex = 0; submeshIndex < submeshCount; submeshIndex++) {
-				var currentSubmeshInstruction = currentInstructionsItems[submeshIndex];
-				var skeleton = currentSubmeshInstruction.skeleton;
-
-//				for (int slotIndex = currentSubmeshInstruction.startSlot, endSlot = currentSubmeshInstruction.endSlot; slotIndex < endSlot; slotIndex++) {
-//					var slot = skeletonDrawOrderItems[slotIndex];
-//					var attachment = slot.attachment;
-//					float z = slotIndex * zSpacing;
-//
-//					var regionAttachment = attachment as RegionAttachment;
-//					if (regionAttachment != null) {
-//						regionAttachment.ComputeWorldVertices(slot.bone, attVertBuffer);
-//
-//						float x1 = attVertBuffer[RegionAttachment.X1], y1 = attVertBuffer[RegionAttachment.Y1];
-//						float x2 = attVertBuffer[RegionAttachment.X2], y2 = attVertBuffer[RegionAttachment.Y2];
-//						float x3 = attVertBuffer[RegionAttachment.X3], y3 = attVertBuffer[RegionAttachment.Y3];
-//						float x4 = attVertBuffer[RegionAttachment.X4], y4 = attVertBuffer[RegionAttachment.Y4];
-//						vertices[vertexIndex].x = x1; vertices[vertexIndex].y = y1; vertices[vertexIndex].z = z;
-//						vertices[vertexIndex + 1].x = x4; vertices[vertexIndex + 1].y = y4; vertices[vertexIndex + 1].z = z;
-//						vertices[vertexIndex + 2].x = x2; vertices[vertexIndex + 2].y = y2; vertices[vertexIndex + 2].z = z;
-//						vertices[vertexIndex + 3].x = x3; vertices[vertexIndex + 3].y = y3;	vertices[vertexIndex + 3].z = z;
-//
-//						if (premultiplyVertexColors) {
-//							color.a = (byte)(a * slot.a * regionAttachment.a);
-//							color.r = (byte)(r * slot.r * regionAttachment.r * color.a);
-//							color.g = (byte)(g * slot.g * regionAttachment.g * color.a);
-//							color.b = (byte)(b * slot.b * regionAttachment.b * color.a);
-//							if (slot.data.blendMode == BlendMode.additive) color.a = 0;
-//						} else {
-//							color.a = (byte)(a * slot.a * regionAttachment.a);
-//							color.r = (byte)(r * slot.r * regionAttachment.r * 255);
-//							color.g = (byte)(g * slot.g * regionAttachment.g * 255);
-//							color.b = (byte)(b * slot.b * regionAttachment.b * 255);
-//						}
-//
-//						colors32[vertexIndex] = color; colors32[vertexIndex + 1] = color; colors32[vertexIndex + 2] = color; colors32[vertexIndex + 3] = color;
-//
-//						float[] regionUVs = regionAttachment.uvs;
-//						uvs[vertexIndex].x = regionUVs[RegionAttachment.X1]; uvs[vertexIndex].y = regionUVs[RegionAttachment.Y1];
-//						uvs[vertexIndex + 1].x = regionUVs[RegionAttachment.X4]; uvs[vertexIndex + 1].y = regionUVs[RegionAttachment.Y4];
-//						uvs[vertexIndex + 2].x = regionUVs[RegionAttachment.X2]; uvs[vertexIndex + 2].y = regionUVs[RegionAttachment.Y2];
-//						uvs[vertexIndex + 3].x = regionUVs[RegionAttachment.X3]; uvs[vertexIndex + 3].y = regionUVs[RegionAttachment.Y3];
-//
-//						// Calculate min/max X
-//						if (x1 < meshBoundsMin.x) meshBoundsMin.x = x1;
-//						else if (x1 > meshBoundsMax.x) meshBoundsMax.x = x1;
-//						if (x2 < meshBoundsMin.x) meshBoundsMin.x = x2;
-//						else if (x2 > meshBoundsMax.x) meshBoundsMax.x = x2;
-//						if (x3 < meshBoundsMin.x) meshBoundsMin.x = x3;
-//						else if (x3 > meshBoundsMax.x) meshBoundsMax.x = x3;
-//						if (x4 < meshBoundsMin.x) meshBoundsMin.x = x4;
-//						else if (x4 > meshBoundsMax.x) meshBoundsMax.x = x4;
-//
-//						// Calculate min/max Y
-//						if (y1 < meshBoundsMin.y) meshBoundsMin.y = y1;
-//						else if (y1 > meshBoundsMax.y) meshBoundsMax.y = y1;
-//						if (y2 < meshBoundsMin.y) meshBoundsMin.y = y2;
-//						else if (y2 > meshBoundsMax.y) meshBoundsMax.y = y2;
-//						if (y3 < meshBoundsMin.y) meshBoundsMin.y = y3;
-//						else if (y3 > meshBoundsMax.y) meshBoundsMax.y = y3;
-//						if (y4 < meshBoundsMin.y) meshBoundsMin.y = y4;
-//						else if (y4 > meshBoundsMax.y) meshBoundsMax.y = y4;
-//
-//						currentAttachments.Add(regionAttachment);
-//						vertexIndex += 4;
-//					} else {
-//						var meshAttachment = attachment as MeshAttachment;
-//						if (meshAttachment != null) {
-//							int meshVertexCount = meshAttachment.vertices.Length;
-//							if (attVertBuffer.Length < meshVertexCount) this.attachmentVertexBuffer = attVertBuffer = new float[meshVertexCount];
-//							meshAttachment.ComputeWorldVertices(slot, attVertBuffer);
-//
-//							if (premultiplyVertexColors) {
-//								color.a = (byte)(a * slot.a * meshAttachment.a);
-//								color.r = (byte)(r * slot.r * meshAttachment.r * color.a);
-//								color.g = (byte)(g * slot.g * meshAttachment.g * color.a);
-//								color.b = (byte)(b * slot.b * meshAttachment.b * color.a);
-//								if (slot.data.blendMode == BlendMode.additive) color.a = 0;
-//							} else {
-//								color.a = (byte)(a * slot.a * meshAttachment.a);
-//								color.r = (byte)(r * slot.r * meshAttachment.r * 255);
-//								color.g = (byte)(g * slot.g * meshAttachment.g * 255);
-//								color.b = (byte)(b * slot.b * meshAttachment.b * 255);
-//							}
-//
-//							float[] attachmentUVs = meshAttachment.uvs;
-//							for (int iii = 0; iii < meshVertexCount; iii += 2) {
-//								float x = attVertBuffer[iii], y = attVertBuffer[iii + 1];
-//								vertices[vertexIndex].x = x; vertices[vertexIndex].y = y; vertices[vertexIndex].z = z;
-//								colors32[vertexIndex] = color; uvs[vertexIndex].x = attachmentUVs[iii]; uvs[vertexIndex].y = attachmentUVs[iii + 1];
-//
-//								if (x < meshBoundsMin.x) meshBoundsMin.x = x;
-//								else if (x > meshBoundsMax.x) meshBoundsMax.x = x;
-//
-//								if (y < meshBoundsMin.y) meshBoundsMin.y = y;
-//								else if (y > meshBoundsMax.y) meshBoundsMax.y = y;
-//
-//								currentAttachments.Add(meshAttachment);
-//								vertexIndex++;
-//							}
-//						} else {
-//							var weightedMeshAttachment = attachment as WeightedMeshAttachment;
-//							if (weightedMeshAttachment != null) {
-//								int meshVertexCount = weightedMeshAttachment.uvs.Length;
-//								if (attVertBuffer.Length < meshVertexCount) this.attachmentVertexBuffer = attVertBuffer = new float[meshVertexCount];
-//								weightedMeshAttachment.ComputeWorldVertices(slot, attVertBuffer);
-//
-//								if (premultiplyVertexColors) {
-//									color.a = (byte)(a * slot.a * weightedMeshAttachment.a);
-//									color.r = (byte)(r * slot.r * weightedMeshAttachment.r * color.a);
-//									color.g = (byte)(g * slot.g * weightedMeshAttachment.g * color.a);
-//									color.b = (byte)(b * slot.b * weightedMeshAttachment.b * color.a);
-//									if (slot.data.blendMode == BlendMode.additive) color.a = 0;
-//								} else {
-//									color.a = (byte)(a * slot.a * weightedMeshAttachment.a);
-//									color.r = (byte)(r * slot.r * weightedMeshAttachment.r * 255);
-//									color.g = (byte)(g * slot.g * weightedMeshAttachment.g * 255);
-//									color.b = (byte)(b * slot.b * weightedMeshAttachment.b * 255);
-//								}
-//
-//								float[] attachmentUVs = weightedMeshAttachment.uvs;
-//								for (int iii = 0; iii < meshVertexCount; iii += 2) {
-//									float x = attVertBuffer[iii], y = attVertBuffer[iii + 1];
-//									vertices[vertexIndex].x = x; vertices[vertexIndex].y = y; vertices[vertexIndex].z = z;
-//									colors32[vertexIndex] = color;
-//									uvs[vertexIndex].x = attachmentUVs[iii]; uvs[vertexIndex].y = attachmentUVs[iii + 1];
-//
-//									if (x < meshBoundsMin.x) meshBoundsMin.x = x;
-//									else if (x > meshBoundsMax.x) meshBoundsMax.x = x;
-//									if (y < meshBoundsMin.y) meshBoundsMin.y = y;
-//									else if (y > meshBoundsMax.y) meshBoundsMax.y = y;
-//
-//									currentAttachments.Add(weightedMeshAttachment);
-//									vertexIndex++;
-//								}
-//							}
-//						}
-//					}
-//				}
-				var skeletonDrawOrderItems = skeleton.DrawOrder.Items;
-				int startSlot = currentSubmeshInstruction.startSlot;
-				int endSlot = currentSubmeshInstruction.endSlot;
-
-				for (int i = startSlot, n = currentSubmeshInstruction.endSlot; i < n; i++) {
-					var ca = skeletonDrawOrderItems[i].attachment;
-					if (ca != null) {
-						// Includes BoundingBoxes. This is ok.
-						currentAttachments.Add(ca);
-					}
-				}
-
-				ArraysBuffers.Fill(skeleton, startSlot, endSlot, zSpacing, this.premultiplyVertexColors, vertices, uvs, colors32, ref vertexIndex, ref attVertBuffer, ref meshBoundsMin, ref meshBoundsMax);
-
-				// Push triangles in this submesh
-				if (structureDoesntMatch) {
-					smartMesh.mesh.Clear(); // rebuild triangle array.
-
-					var currentSubmesh = submeshBuffers.Items[submeshIndex];
-					bool isLastSubmesh = (submeshIndex == submeshCount - 1);
-
-					int triangleCount = currentSubmesh.triangleCount = currentSubmeshInstruction.triangleCount;
-					int trianglesCapacity = currentSubmesh.triangles.Length;
-
-					int[] triangles = currentSubmesh.triangles;
-					if (isLastSubmesh) {
-						if (trianglesCapacity > triangleCount) {
-							for (int i = triangleCount; i < trianglesCapacity; i++)
-								triangles[i] = 0;
-						}
-					} else if (trianglesCapacity != triangleCount) {
-						triangles = currentSubmesh.triangles = new int[triangleCount];
-						currentSubmesh.triangleCount = 0;					 
-					}
-
-					// Iterate through submesh slots and store the triangles. 
-					int triangleIndex = 0;
-					int afv = currentSubmeshInstruction.firstVertexIndex; // attachment first vertex
-
-					for (int i = currentSubmeshInstruction.startSlot, n = currentSubmeshInstruction.endSlot; i < n; i++) {			
-						var attachment = skeletonDrawOrderItems[i].attachment;
-
-						if (attachment is RegionAttachment) {
-							triangles[triangleIndex] = afv; triangles[triangleIndex + 1] = afv + 2; triangles[triangleIndex + 2] = afv + 1;
-							triangles[triangleIndex + 3] = afv + 2; triangles[triangleIndex + 4] = afv + 3; triangles[triangleIndex + 5] = afv + 1;
-
-							triangleIndex += 6;
-							afv += 4;
-						} else {
-							int[] attachmentTriangles;
-							int attachmentVertexCount;
-							var meshAttachment = attachment as MeshAttachment;
-							if (meshAttachment != null) {
-								attachmentVertexCount = meshAttachment.vertices.Length >> 1; //  length/2
-								attachmentTriangles = meshAttachment.triangles;
-							} else {
-								var weightedMeshAttachment = attachment as WeightedMeshAttachment;
-								if (weightedMeshAttachment != null) {
-									attachmentVertexCount = weightedMeshAttachment.uvs.Length >> 1; // length/2
-									attachmentTriangles = weightedMeshAttachment.triangles;
-								} else
-									continue;
-							}
-
-							for (int ii = 0, nn = attachmentTriangles.Length; ii < nn; ii++, triangleIndex++)
-								triangles[triangleIndex] = afv + attachmentTriangles[ii];
-
-							afv += attachmentVertexCount;
-						}
-					} // Done adding current submesh triangles
-				}
-			}
-
-			this.attachmentVertexBuffer = attVertBuffer;
-			Vector3 meshBoundsExtents = (meshBoundsMax - meshBoundsMin);
-			Vector3 meshCenter = meshBoundsMin + meshBoundsExtents * 0.5f;
-
+			// STEP 3: Assign the buffers into the Mesh.
 			smartMesh.Set(this.meshVertices, this.meshUVs, this.meshColors32, currentAttachments, currentInstructions);
-			mesh.bounds = new Bounds(meshCenter, meshBoundsExtents);
+			mesh.bounds = ArraysMeshGenerator.ToBounds(meshBoundsMin, meshBoundsMax);
 
 			if (structureDoesntMatch) {
-				// push new triangles if doesn't match.
+				// Push new triangles if doesn't match.
 				mesh.subMeshCount = submeshCount;
 				for (int i = 0; i < submeshCount; i++)
 					mesh.SetTriangles(submeshBuffers.Items[i].triangles, i);			
@@ -320,19 +129,6 @@ namespace Spine.Unity.MeshGeneration {
 				
 			return new MeshAndMaterials(smartMesh.mesh, sharedMaterials);
 		}
-
-		#region Internals
-		readonly DoubleBuffered<SmartMesh> doubleBufferedSmartMesh = new DoubleBuffered<SmartMesh>();
-		readonly ExposedList<SubmeshInstruction> currentInstructions = new ExposedList<SubmeshInstruction>();
-		readonly ExposedList<Attachment> currentAttachments = new ExposedList<Attachment>();
-
-		float[] attachmentVertexBuffer = new float[8];
-		Vector3[] meshVertices;
-		Color32[] meshColors32;
-		Vector2[] meshUVs;
-		Material[] sharedMaterials = new Material[0];
-		readonly ExposedList<SubmeshTriangleBuffer> submeshBuffers = new ExposedList<SubmeshTriangleBuffer>();
-		#endregion
 
 		#region Types
 		// A SmartMesh is a Mesh (with submeshes) that knows what attachments and instructions were used to generate it.

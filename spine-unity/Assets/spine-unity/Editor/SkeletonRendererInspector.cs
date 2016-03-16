@@ -87,9 +87,9 @@ public class SkeletonRendererInspector : Editor {
 			String[] skins = new String[component.skeleton.Data.Skins.Count];
 			int skinIndex = 0;
 			for (int i = 0; i < skins.Length; i++) {
-				String name = component.skeleton.Data.Skins.Items[i].Name;
-				skins[i] = name;
-				if (name == initialSkinName.stringValue)
+				String skinNameString = component.skeleton.Data.Skins.Items[i].Name;
+				skins[i] = skinNameString;
+				if (skinNameString == initialSkinName.stringValue)
 					skinIndex = i;
 			}
 
@@ -121,9 +121,15 @@ public class SkeletonRendererInspector : Editor {
 				const float MaxZSpacing = 0f;
 				EditorGUILayout.Slider(zSpacing, MinZSpacing, MaxZSpacing);
 
-				EditorGUILayout.PropertyField(normals);
-				EditorGUILayout.PropertyField(tangents);
-				EditorGUILayout.PropertyField(front);
+				if (normals != null) {
+					EditorGUILayout.PropertyField(normals);
+					EditorGUILayout.PropertyField(tangents);
+				}
+
+				if (front != null) {
+					EditorGUILayout.PropertyField(front);
+				}
+
 				EditorGUILayout.Separator();
 				EditorGUI.indentLevel--;
 			}

@@ -28,18 +28,16 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
 #if (UNITY_5_0 || UNITY_5_1 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7)
 #define PREUNITY_5_2
 #endif
 
 using UnityEngine;
 using System.Collections.Generic;
-using System.Collections;
 
 #if !(PREUNITY_5_2)
-namespace Spine.Unity {
-	/// <summary>This is for testing and educational purposes only. This takes about 10 times longer to render than ArraySpineMeshGenerator.</summary>
+namespace Spine.Unity.MeshGeneration {
+	/// <summary>This is for testing and educational purposes only. This takes about 10 times longer to render than the Arrays implementations.</summary>
 	public class VertexHelperSpineMeshGenerator : ISimpleMeshGenerator {
 
 		public float scale = 1f;
