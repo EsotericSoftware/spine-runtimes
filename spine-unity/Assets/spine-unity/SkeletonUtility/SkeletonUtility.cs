@@ -73,7 +73,23 @@ public class SkeletonUtility : MonoBehaviour {
 		return null;
 	}
 
-	public static PolygonCollider2D AddBoundingBoxAsComponent (BoundingBoxAttachment boundingBox, GameObject gameObject, bool isTrigger = true) {
+    public static Collider AddBoundingBoxAsComponent_3D(BoundingBoxAttachment boundingBox, GameObject gameObject, bool isTrigger = true, float thickness = 0.125f)
+    {
+        if (boundingBox == null)
+            return null;
+
+
+        var collider = gameObject.AddComponent<BoxCollider>();
+        var bounds = SkeletonUtility.GetBoundingBoxBounds((BoundingBoxAttachment)boundingBox, thickness);
+
+        collider.center = bounds.center;
+        collider.size = bounds.size;
+        collider.isTrigger = isTrigger;
+
+        return collider;
+    }
+
+    public static PolygonCollider2D AddBoundingBoxAsComponent (BoundingBoxAttachment boundingBox, GameObject gameObject, bool isTrigger = true) {
 		if (boundingBox == null)
 			return null;
 
