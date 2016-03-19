@@ -137,7 +137,10 @@ namespace Spine {
 
 		protected override void Update (GameTime gameTime) {
 			// TODO: Add your update logic here
-
+#if (!WINDOWS_STOREAPP || WINDOWS_PHONE81) && !IOS	
+			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+					this.Exit();
+#endif
 			base.Update(gameTime);
 		}
 
