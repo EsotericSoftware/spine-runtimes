@@ -30,6 +30,7 @@
  *****************************************************************************/
 #define SPINE_OPTIONAL_NORMALS
 #define SPINE_OPTIONAL_FRONTFACING
+#define SPINE_OPTIONAL_RENDEROVERRIDE
 
 using System;
 using System.Collections.Generic;
@@ -48,29 +49,51 @@ public class SkeletonRenderer : MonoBehaviour {
 	public SkeletonDataAsset skeletonDataAsset;
 	public String initialSkinName;
 
-	#region Advanced
+#region Advanced
 	#if SPINE_OPTIONAL_NORMALS
 	public bool calculateNormals, calculateTangents;
 	#endif
 	public float zSpacing;
 	public bool renderMeshes = true, immutableTriangles;
+	public bool pmaVertexColors = true;
 	#if SPINE_OPTIONAL_FRONTFACING
 	public bool frontFacing;
 	#endif
+
+	#if SPINE_OPTIONAL_RENDEROVERRIDE
+	public bool disableMeshRendererOnOverride = true;
+	public delegate void InstructionDelegate (SkeletonRenderer.SmartMesh.Instruction instruction);
+	event InstructionDelegate MeshOverrideDelegate;
+	public event InstructionDelegate GenerateMeshOverride {
+		add {
+			MeshOverrideDelegate += value;
+			if (disableMeshRendererOnOverride && MeshOverrideDelegate != null) {
+				meshRenderer.enabled = false;
+			}
+		}
+		remove {
+			MeshOverrideDelegate -= value;
+			if (disableMeshRendererOnOverride && MeshOverrideDelegate == null) {
+				meshRenderer.enabled = true;
+			}
+		}
+	}
+
+	#endif
+
 	public bool logErrors = false;
 
 	// Submesh Separation
-	[SpineSlot] public string[] submeshSeparators = new string[0];
-	[System.NonSerialized] public List<Slot> submeshSeparatorSlots = new List<Slot>();
+	[UnityEngine.Serialization.FormerlySerializedAs("submeshSeparators")]
+	[SpineSlot]
+	public string[] separatorSlotNames = new string[0];
+	[System.NonSerialized]
+	public List<Slot> separatorSlots = new List<Slot>();
 
 	// Custom Slot Material
 	[System.NonSerialized] readonly Dictionary<Slot, Material> customSlotMaterials = new Dictionary<Slot, Material>();
 	public Dictionary<Slot, Material> CustomSlotMaterials { get { return customSlotMaterials; } }
-
-	// Custom Mesh Generation Override
-	public delegate void InstructionDelegate (SkeletonRenderer.SmartMesh.Instruction instruction);
-	public event InstructionDelegate GenerateMeshOverride;
-	#endregion
+#endregion
 
 	[System.NonSerialized] public bool valid;
 	[System.NonSerialized] public Skeleton skeleton;
@@ -160,9 +183,9 @@ public class SkeletonRenderer : MonoBehaviour {
 		if (initialSkinName != null && initialSkinName.Length > 0 && initialSkinName != "default")
 			skeleton.SetSkin(initialSkinName);
 
-		submeshSeparatorSlots.Clear();
-		for (int i = 0; i < submeshSeparators.Length; i++) {
-			submeshSeparatorSlots.Add(skeleton.FindSlot(submeshSeparators[i]));
+		separatorSlots.Clear();
+		for (int i = 0; i < separatorSlotNames.Length; i++) {
+			separatorSlots.Add(skeleton.FindSlot(separatorSlotNames[i]));
 		}
 
 		LateUpdate();
@@ -175,7 +198,14 @@ public class SkeletonRenderer : MonoBehaviour {
 		if (!valid)
 			return;
 
-		if (!meshRenderer.enabled && GenerateMeshOverride == null)
+		if (
+			!meshRenderer.enabled
+
+			#if SPINE_OPTIONAL_RENDEROVERRIDE
+			&& MeshOverrideDelegate == null
+			#endif
+
+		)
 			return;
 
 		// STEP 1. Determine a SmartMesh.Instruction. Split up instructions into submeshes.
@@ -185,7 +215,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		ExposedList<Slot> drawOrder = skeleton.drawOrder;
 		var drawOrderItems = drawOrder.Items;
 		int drawOrderCount = drawOrder.Count;
-		int submeshSeparatorSlotsCount = submeshSeparatorSlots.Count;
+		int separatorSlotCount = separatorSlots.Count;
 		bool renderMeshes = this.renderMeshes;
 
 		// Clear last state of attachments and submeshes
@@ -267,7 +297,7 @@ public class SkeletonRenderer : MonoBehaviour {
 			#endif
 
 			// Create a new SubmeshInstruction when material changes. (or when forced to separate by a submeshSeparator)
-			bool separatedBySlot = (submeshSeparatorSlotsCount > 0 && submeshSeparatorSlots.Contains(slot));
+			bool separatedBySlot = (separatorSlotCount > 0 && separatorSlots.Contains(slot));
 			if ((vertexCount > 0 && lastMaterial.GetInstanceID() != material.GetInstanceID()) || separatedBySlot) {
 				workingSubmeshInstructions.Add(
 					new Spine.Unity.MeshGeneration.SubmeshInstruction {
@@ -313,10 +343,11 @@ public class SkeletonRenderer : MonoBehaviour {
 		workingInstruction.frontFacing = this.frontFacing;
 		#endif
 
-		if (GenerateMeshOverride != null) {
-			GenerateMeshOverride(workingInstruction);
-			return;
+		#if SPINE_OPTIONAL_RENDEROVERRIDE
+		if (MeshOverrideDelegate != null) {
+			MeshOverrideDelegate(workingInstruction);
 		}
+		#endif
 
 		// STEP 2. Update vertex buffer based on verts from the attachments.
 		// Uses values that were also stored in workingInstruction.
@@ -334,13 +365,6 @@ public class SkeletonRenderer : MonoBehaviour {
 				Vector3 normal = new Vector3(0, 0, -1);
 				for (int i = 0; i < vertexCount; i++)
 					localNormals[i] = normal;
-
-				if (calculateTangents) {
-					Vector4[] localTangents = this.tangents = new Vector4[vertexCount];
-					Vector4 tangent = new Vector4(1, 0, 0, -1);
-					for (int i = 0; i < vertexCount; i++)
-						localTangents[i] = tangent;
-				}
 			}
 			#endif
 		} else {
@@ -354,6 +378,7 @@ public class SkeletonRenderer : MonoBehaviour {
 		Vector2[] uvs = this.uvs;
 		Color32[] colors = this.colors;
 		int vertexIndex = 0;
+		bool pmaVertexColors = this.pmaVertexColors;
 		Color32 color;
 		float a = skeleton.a * 255, r = skeleton.r, g = skeleton.g, b = skeleton.b;
 
@@ -400,11 +425,19 @@ public class SkeletonRenderer : MonoBehaviour {
 					vertices[vertexIndex + 3].y = y3;
 					vertices[vertexIndex + 3].z = z;
 
-					color.a = (byte)(a * slot.a * regionAttachment.a);
-					color.r = (byte)(r * slot.r * regionAttachment.r * color.a);
-					color.g = (byte)(g * slot.g * regionAttachment.g * color.a);
-					color.b = (byte)(b * slot.b * regionAttachment.b * color.a);
-					if (slot.data.blendMode == BlendMode.additive) color.a = 0;
+					if (pmaVertexColors) {
+						color.a = (byte)(a * slot.a * regionAttachment.a);
+						color.r = (byte)(r * slot.r * regionAttachment.r * color.a);
+						color.g = (byte)(g * slot.g * regionAttachment.g * color.a);
+						color.b = (byte)(b * slot.b * regionAttachment.b * color.a);
+						if (slot.data.blendMode == BlendMode.additive) color.a = 0;
+					} else {
+						color.a = (byte)(a * slot.a * regionAttachment.a);
+						color.r = (byte)(r * slot.r * regionAttachment.r * 255);
+						color.g = (byte)(g * slot.g * regionAttachment.g * 255);
+						color.b = (byte)(b * slot.b * regionAttachment.b * 255);
+					}
+
 					colors[vertexIndex] = color;
 					colors[vertexIndex + 1] = color;
 					colors[vertexIndex + 2] = color;
@@ -467,11 +500,18 @@ public class SkeletonRenderer : MonoBehaviour {
 							this.tempVertices = tempVertices = new float[meshVertexCount];
 						meshAttachment.ComputeWorldVertices(slot, tempVertices);
 
-						color.a = (byte)(a * slot.a * meshAttachment.a);
-						color.r = (byte)(r * slot.r * meshAttachment.r * color.a);
-						color.g = (byte)(g * slot.g * meshAttachment.g * color.a);
-						color.b = (byte)(b * slot.b * meshAttachment.b * color.a);
-						if (slot.data.blendMode == BlendMode.additive) color.a = 0;
+						if (pmaVertexColors) {
+							color.a = (byte)(a * slot.a * meshAttachment.a);
+							color.r = (byte)(r * slot.r * meshAttachment.r * color.a);
+							color.g = (byte)(g * slot.g * meshAttachment.g * color.a);
+							color.b = (byte)(b * slot.b * meshAttachment.b * color.a);
+							if (slot.data.blendMode == BlendMode.additive) color.a = 0;
+						} else {
+							color.a = (byte)(a * slot.a * meshAttachment.a);
+							color.r = (byte)(r * slot.r * meshAttachment.r * 255);
+							color.g = (byte)(g * slot.g * meshAttachment.g * 255);
+							color.b = (byte)(b * slot.b * meshAttachment.b * 255);
+						}
 
 						float[] meshUVs = meshAttachment.uvs;
 						float z = i * zSpacing;
@@ -501,11 +541,18 @@ public class SkeletonRenderer : MonoBehaviour {
 								this.tempVertices = tempVertices = new float[meshVertexCount];
 							weightedMeshAttachment.ComputeWorldVertices(slot, tempVertices);
 
-							color.a = (byte)(a * slot.a * weightedMeshAttachment.a);
-							color.r = (byte)(r * slot.r * weightedMeshAttachment.r * color.a);
-							color.g = (byte)(g * slot.g * weightedMeshAttachment.g * color.a);
-							color.b = (byte)(b * slot.b * weightedMeshAttachment.b * color.a);
-							if (slot.data.blendMode == BlendMode.additive) color.a = 0;
+							if (pmaVertexColors) {
+								color.a = (byte)(a * slot.a * weightedMeshAttachment.a);
+								color.r = (byte)(r * slot.r * weightedMeshAttachment.r * color.a);
+								color.g = (byte)(g * slot.g * weightedMeshAttachment.g * color.a);
+								color.b = (byte)(b * slot.b * weightedMeshAttachment.b * color.a);
+								if (slot.data.blendMode == BlendMode.additive) color.a = 0;
+							} else {
+								color.a = (byte)(a * slot.a * weightedMeshAttachment.a);
+								color.r = (byte)(r * slot.r * weightedMeshAttachment.r * 255);
+								color.g = (byte)(g * slot.g * weightedMeshAttachment.g * 255);
+								color.b = (byte)(b * slot.b * weightedMeshAttachment.b * 255);
+							}
 
 							float[] meshUVs = weightedMeshAttachment.uvs;
 							float z = i * zSpacing;
@@ -545,9 +592,19 @@ public class SkeletonRenderer : MonoBehaviour {
 		if (currentSmartMeshInstructionUsed.vertexCount < vertexCount) {
 			if (calculateNormals) {
 				currentMesh.normals = normals;
-				if (calculateTangents) {
-					currentMesh.tangents = tangents;
+			}
+
+
+			// For dynamic calculated tangents, this needs to be moved out of the if block when replacing the logic.
+			if (calculateTangents) {
+				if (tangents == null || vertexCount > tangents.Length) {
+					Vector4[] localTangents = this.tangents = new Vector4[vertexCount];
+					Vector4 tangent = new Vector4(1, 0, 0, -1);
+					for (int i = 0; i < vertexCount; i++)
+						localTangents[i] = tangent;
 				}
+
+				currentMesh.tangents = this.tangents;
 			}
 		}
 		#endif
@@ -893,6 +950,8 @@ public class SkeletonRenderer : MonoBehaviour {
 
 	class SubmeshTriangleBuffer {
 		public int[] triangles = new int[0];
+
+		// These two fields are used when renderMeshes == false
 		public int triangleCount;
 		public int firstVertex = -1;
 	}

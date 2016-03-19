@@ -202,7 +202,7 @@ namespace Spine.Unity.MeshGeneration {
 				if (structureDoesntMatch) {
 					var currentBuffer = submeshBuffers.Items[submeshIndex];
 					bool isLastSubmesh = (submeshIndex == submeshCount - 1);
-					ArraysMeshGenerator.FillTriangles(skeleton, submeshInstruction.triangleCount, submeshInstruction.firstVertexIndex, start, end, ref currentBuffer.triangles, ref currentBuffer.triangleCount, isLastSubmesh);
+					ArraysMeshGenerator.FillTriangles(skeleton, submeshInstruction.triangleCount, submeshInstruction.firstVertexIndex, start, end, ref currentBuffer.triangles, isLastSubmesh);
 				}
 			}
 

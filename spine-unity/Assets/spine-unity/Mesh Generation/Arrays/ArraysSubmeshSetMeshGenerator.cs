@@ -28,6 +28,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
+#define SPINE_OPTIONAL_NORMALS
 using UnityEngine;
 
 namespace Spine.Unity.MeshGeneration {
@@ -107,7 +108,7 @@ namespace Spine.Unity.MeshGeneration {
 				if (structureDoesntMatch) {
 					var currentBuffer = submeshBuffers.Items[submeshIndex];
 					bool isLastSubmesh = (submeshIndex == submeshCount - 1);
-					ArraysMeshGenerator.FillTriangles(skeleton, currentInstruction.triangleCount, currentInstruction.firstVertexIndex, startSlot, endSlot, ref currentBuffer.triangles, ref currentBuffer.triangleCount, isLastSubmesh);
+					ArraysMeshGenerator.FillTriangles(skeleton, currentInstruction.triangleCount, currentInstruction.firstVertexIndex, startSlot, endSlot, ref currentBuffer.triangles, isLastSubmesh);
 				}
 			}
 
@@ -119,6 +120,9 @@ namespace Spine.Unity.MeshGeneration {
 			// STEP 3: Assign the buffers into the Mesh.
 			smartMesh.Set(this.meshVertices, this.meshUVs, this.meshColors32, currentAttachments, currentInstructions);
 			mesh.bounds = ArraysMeshGenerator.ToBounds(meshBoundsMin, meshBoundsMax);
+			#if SPINE_OPTIONAL_NORMALS
+			this.TryAddNormalsTo(mesh, vertexCount);
+			#endif
 
 			if (structureDoesntMatch) {
 				// Push new triangles if doesn't match.

@@ -116,7 +116,7 @@ namespace Spine.Unity.MeshGeneration {
 			}
 				
 			// Step 4 : Update Triangles buffer
-			ArraysMeshGenerator.FillTriangles(skeleton, totalTriangleCount, 0, 0, drawOrderCount, ref this.triangles, ref this.triangleBufferCount, true);
+			ArraysMeshGenerator.FillTriangles(skeleton, totalTriangleCount, 0, 0, drawOrderCount, ref this.triangles, true);
 
 			// Step 5 : Update Mesh with buffers
 			var mesh = doubleBufferedMesh.GetNextMesh();

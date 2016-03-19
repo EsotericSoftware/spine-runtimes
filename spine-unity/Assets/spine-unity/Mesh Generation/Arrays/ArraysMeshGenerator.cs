@@ -28,6 +28,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
+#define SPINE_OPTIONAL_NORMALS
 using UnityEngine;
 
 namespace Spine.Unity.MeshGeneration {
@@ -41,6 +42,33 @@ namespace Spine.Unity.MeshGeneration {
 		protected Vector3[] meshVertices;
 		protected Color32[] meshColors32;
 		protected Vector2[] meshUVs;
+
+
+		protected bool generateNormals = false;
+		public bool GenerateNormals {
+			get { return generateNormals; }
+			set { generateNormals = value; }
+		}
+
+		Vector3[] meshNormals;
+
+		public void TryAddNormalsTo (Mesh mesh, int targetVertexCount) {
+			#if SPINE_OPTIONAL_NORMALS
+			if (generateNormals) {
+				bool verticesWasResized = this.meshNormals == null || targetVertexCount > meshNormals.Length;
+				if (verticesWasResized) {
+					this.meshNormals = new Vector3[targetVertexCount];
+					Vector3 normal = new Vector3(0, 0, -1);
+					Vector3[] normals = this.meshNormals;
+					for (int i = 0; i < targetVertexCount; i++)
+						normals[i] = normal;
+				}
+
+				mesh.normals = this.meshNormals;
+			}
+			#endif
+		}
+
 
 		public static bool EnsureSize (int targetVertexCount, ref Vector3[] vertices, ref Vector2[] uvs, ref Color32[] colors) {
 			Vector3[] verts = vertices;
@@ -247,23 +275,20 @@ namespace Spine.Unity.MeshGeneration {
 		/// <param name="triangleBuffer">The triangle buffer array to be filled. This reference will be replaced in case the triangle values don't fit.</param>
 		/// <param name="bufferTriangleCount">The current triangle count of the submesh buffer. This is not always equal to triangleBuffer.Length because for last submeshes, length may be larger than needed.</param>
 		/// <param name="isLastSubmesh">If set to <c>true</c>, the triangle buffer is allowed to be larger than needed.</param>
-		public static void FillTriangles (Skeleton skeleton, int triangleCount, int firstVertex, int startSlot, int endSlot, ref int[] triangleBuffer, ref int bufferTriangleCount, bool isLastSubmesh) {
+		public static void FillTriangles (Skeleton skeleton, int triangleCount, int firstVertex, int startSlot, int endSlot, ref int[] triangleBuffer, bool isLastSubmesh) {
 			int trianglesCapacity = triangleBuffer.Length;
 			var tris = triangleBuffer;
 
 			// Ensure triangleBuffer size.
 			if (isLastSubmesh) {
-				bufferTriangleCount = triangleCount;
 				if (trianglesCapacity > triangleCount) {
 					for (int i = triangleCount; i < trianglesCapacity; i++)
 						tris[i] = 0;
 				} else if (trianglesCapacity < triangleCount) {
 					triangleBuffer = tris = new int[triangleCount];
-					bufferTriangleCount = 0;					 
 				}
 			} else if (trianglesCapacity != triangleCount) {
 				triangleBuffer = tris = new int[triangleCount];
-				bufferTriangleCount = 0;					 
 			}
 
 			// Iterate through submesh slots and store the triangles. 
@@ -313,11 +338,10 @@ namespace Spine.Unity.MeshGeneration {
 		#region SubmeshTriangleBuffer
 		public class SubmeshTriangleBuffer {
 			public int[] triangles;
-			public int triangleCount;
+			//public int triangleCount;
 
 			public SubmeshTriangleBuffer (int triangleCount) {
 				triangles = new int[triangleCount];
-				this.triangleCount = triangleCount;
 			}
 		}
 		#endregion

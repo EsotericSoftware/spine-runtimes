@@ -39,7 +39,7 @@ namespace Spine.Unity {
 	public class SkeletonRendererInspector : Editor {
 		protected static bool advancedFoldout;
 
-		protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, submeshSeparators, front, zSpacing;
+		protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, separatorSlotNames, front, zSpacing;
 
 		protected SpineInspectorUtility.SerializedSortingProperties sortingProperties;
 
@@ -51,7 +51,9 @@ namespace Spine.Unity {
 			tangents = serializedObject.FindProperty("calculateTangents");
 			meshes = serializedObject.FindProperty("renderMeshes");
 			immutableTriangles = serializedObject.FindProperty("immutableTriangles");
-			submeshSeparators = serializedObject.FindProperty("submeshSeparators");
+			separatorSlotNames = serializedObject.FindProperty("separatorSlotNames");
+			separatorSlotNames.isExpanded = true;
+
 			front = serializedObject.FindProperty("frontFacing");
 			zSpacing = serializedObject.FindProperty("zSpacing");
 
@@ -108,33 +110,46 @@ namespace Spine.Unity {
 
 			// More Render Options...
 			{
-				advancedFoldout = EditorGUILayout.Foldout(advancedFoldout, "Advanced");
-				if(advancedFoldout) {
+				using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
 					EditorGUI.indentLevel++;
-					EditorGUILayout.PropertyField(submeshSeparators, true);
-					EditorGUILayout.Space();
-					EditorGUILayout.PropertyField(meshes,
-						new GUIContent("Render Mesh Attachments", "Disable to optimize rendering for skeletons that don't use Mesh Attachments"));
-					EditorGUILayout.PropertyField(immutableTriangles,
-						new GUIContent("Immutable Triangles", "Enable to optimize rendering for skeletons that never change attachment visbility"));
-					EditorGUILayout.Space();
+					advancedFoldout = EditorGUILayout.Foldout(advancedFoldout, "Advanced");
+					if(advancedFoldout) {
+						EditorGUI.indentLevel++;
+						SeparatorsField(separatorSlotNames);
+						EditorGUILayout.PropertyField(meshes,
+							new GUIContent("Render Mesh Attachments", "Disable to optimize rendering for skeletons that don't use Mesh Attachments"));
+						EditorGUILayout.PropertyField(immutableTriangles,
+							new GUIContent("Immutable Triangles", "Enable to optimize rendering for skeletons that never change attachment visbility"));
+						EditorGUILayout.Space();
 
-					const float MinZSpacing = -0.1f;
-					const float MaxZSpacing = 0f;
-					EditorGUILayout.Slider(zSpacing, MinZSpacing, MaxZSpacing);
+						const float MinZSpacing = -0.1f;
+						const float MaxZSpacing = 0f;
+						EditorGUILayout.Slider(zSpacing, MinZSpacing, MaxZSpacing);
 
-					if (normals != null) {
-						EditorGUILayout.PropertyField(normals);
-						EditorGUILayout.PropertyField(tangents);
+						if (normals != null) {
+							EditorGUILayout.PropertyField(normals);
+							EditorGUILayout.PropertyField(tangents);
+						}
+
+						if (front != null) {
+							EditorGUILayout.PropertyField(front);
+						}
+						EditorGUI.indentLevel--;
 					}
-
-					if (front != null) {
-						EditorGUILayout.PropertyField(front);
-					}
-
-					EditorGUILayout.Separator();
 					EditorGUI.indentLevel--;
+
 				}
+			}
+		}
+
+		public static void SeparatorsField (SerializedProperty separatorSlotNames) {
+			using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
+				if (separatorSlotNames.isExpanded) {
+					EditorGUILayout.PropertyField(separatorSlotNames, includeChildren: true);
+				} else {
+					EditorGUILayout.PropertyField(separatorSlotNames, new GUIContent(separatorSlotNames.displayName + string.Format(" [{0}]", separatorSlotNames.arraySize)), includeChildren: true);
+				}
+
 			}
 		}
 

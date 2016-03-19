@@ -4,7 +4,9 @@ using Spine.Unity.MeshGeneration;
 
 namespace Spine.Unity {
 	[RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
-	public class SkeletonRenderPart : MonoBehaviour {		
+	public class SkeletonPartsRenderer : MonoBehaviour {
+
+		#region Properties
 		ISubmeshSetMeshGenerator meshGenerator;
 		public ISubmeshSetMeshGenerator MeshGenerator {
 			get {
@@ -28,6 +30,7 @@ namespace Spine.Unity {
 				return meshFilter;
 			}
 		}
+		#endregion
 
 		void LazyIntialize () {
 			if (meshGenerator != null) return;
@@ -37,10 +40,11 @@ namespace Spine.Unity {
 		}
 
 		public void ClearMesh () {
+			LazyIntialize();
 			meshFilter.sharedMesh = null;
 		}
 
-		public void RenderSubmesh (ExposedList<SubmeshInstruction> instructions, int startSubmesh, int endSubmesh) {
+		public void RenderParts (ExposedList<SubmeshInstruction> instructions, int startSubmesh, int endSubmesh) {
 			LazyIntialize();
 			MeshAndMaterials m = meshGenerator.GenerateMesh(instructions, startSubmesh, endSubmesh);
 			meshFilter.sharedMesh = m.mesh;
@@ -52,10 +56,10 @@ namespace Spine.Unity {
 			meshRenderer.SetPropertyBlock(block);
 		}
 
-		public static SkeletonRenderPart NewSubmeshRendererGameObject (Transform parent, string name) {
+		public static SkeletonPartsRenderer NewPartsRendererGameObject (Transform parent, string name) {
 			var go = new GameObject(name, typeof(MeshFilter), typeof(MeshRenderer));
 			go.transform.SetParent(parent, false);
-			var returnComponent = go.AddComponent<SkeletonRenderPart>();
+			var returnComponent = go.AddComponent<SkeletonPartsRenderer>();
 
 			return returnComponent;
 		}

@@ -33,9 +33,18 @@ using UnityEngine;
 using System.Collections;
 using UnityEditor;
 using System.Reflection;
+using System;
 
 namespace Spine.Unity {
 	public static class SpineInspectorUtility {
+
+		public static string Pluralize (int n, string singular, string plural) {
+			return n + " " + (n == 1 ? singular : plural);
+		}
+
+		public static string PluralThenS (int n) {
+			return n == 1 ? "" : "s";
+		}
 
 		#region Sorting Layer Field Helpers
 		static readonly GUIContent SortingLayerLabel = new GUIContent("Sorting Layer");
@@ -45,7 +54,7 @@ namespace Spine.Unity {
 		static MethodInfo SortingLayerFieldMethod {
 			get {
 				if (m_SortingLayerFieldMethod == null)
-					m_SortingLayerFieldMethod = typeof(EditorGUILayout).GetMethod("SortingLayerField", BindingFlags.Static | BindingFlags.NonPublic, null, new System.Type[] { typeof(GUIContent), typeof(SerializedProperty), typeof(GUIStyle) }, null);
+					m_SortingLayerFieldMethod = typeof(EditorGUILayout).GetMethod("SortingLayerField", BindingFlags.Static | BindingFlags.NonPublic, null, new [] { typeof(GUIContent), typeof(SerializedProperty), typeof(GUIStyle) }, null);
 
 				return m_SortingLayerFieldMethod;
 			}

@@ -4,8 +4,13 @@ using System.Collections.Generic;
 using Spine.Unity;
 
 namespace Spine.Unity {
+	
+	[HelpURL("")]
 	[ExecuteInEditMode]
 	public class SkeletonRenderSeparator : MonoBehaviour {
+		public const int DefaultSortingOrderIncrement = 5;
+
+		#region Inspector
 		[SerializeField]
 		protected SkeletonRenderer skeletonRenderer;
 		public SkeletonRenderer SkeletonRenderer {
@@ -13,32 +18,29 @@ namespace Spine.Unity {
 			set {
 				if (skeletonRenderer != null)
 					skeletonRenderer.GenerateMeshOverride -= SeparateSkeletonRender;
+				
 				skeletonRenderer = value;
+				this.enabled = false; // Disable if nulled.
 			}
 		}
 
-		MeshRenderer masterMeshRenderer;
+		MeshRenderer mainMeshRenderer;
+		public bool copyPropertyBlock = false;
+		public bool copyMeshRendererFlags = false;
+		public List<Spine.Unity.SkeletonPartsRenderer> partsRenderers = new List<SkeletonPartsRenderer>();
 
-		[Header("Settings")]
-		public bool propagateMaterialPropertyBlock = false;
-		public bool controlMainMeshRenderer = true;
-
-		[Space(10f)]
-		public List<Spine.Unity.SkeletonRenderPart> renderers = new List<SkeletonRenderPart>();
-
+		#if UNITY_EDITOR
 		void Reset () {
-			if (skeletonRenderer == null) {
+			if (skeletonRenderer == null)
 				skeletonRenderer = GetComponent<SkeletonRenderer>();
-			}
 		}
+		#endif
+		#endregion
 
 		void OnEnable () {
 			if (skeletonRenderer == null) return;
 			if (block == null) block = new MaterialPropertyBlock();	
-			masterMeshRenderer = skeletonRenderer.GetComponent<MeshRenderer>();
-
-			if (controlMainMeshRenderer)
-				masterMeshRenderer.enabled = false;
+			mainMeshRenderer = skeletonRenderer.GetComponent<MeshRenderer>();
 
 			skeletonRenderer.GenerateMeshOverride -= SeparateSkeletonRender;
 			skeletonRenderer.GenerateMeshOverride += SeparateSkeletonRender;
@@ -46,55 +48,85 @@ namespace Spine.Unity {
 
 		void OnDisable () {
 			if (skeletonRenderer == null) return;
-
-			if (controlMainMeshRenderer)
-				masterMeshRenderer.enabled = true;
-
 			skeletonRenderer.GenerateMeshOverride -= SeparateSkeletonRender;
 
-			foreach (var s in renderers)
+			#if UNITY_EDITOR
+			skeletonRenderer.LateUpdate();
+			#endif
+
+			foreach (var s in partsRenderers)
 				s.ClearMesh();		
 		}
 
 		MaterialPropertyBlock block;
 
 		void SeparateSkeletonRender (SkeletonRenderer.SmartMesh.Instruction instruction) {
-			int rendererCount = renderers.Count;
+			int rendererCount = partsRenderers.Count;
 			if (rendererCount <= 0) return;
 
 			int rendererIndex = 0;
 
-			if (propagateMaterialPropertyBlock)
-				masterMeshRenderer.GetPropertyBlock(block);
+			if (copyPropertyBlock)
+				mainMeshRenderer.GetPropertyBlock(block);
 
 			var submeshInstructions = instruction.submeshInstructions;
 			var submeshInstructionsItems = submeshInstructions.Items;
 			int lastSubmeshInstruction = submeshInstructions.Count - 1;
 
-			var currentRenderer = renderers[rendererIndex];
+			var currentRenderer = partsRenderers[rendererIndex];
+			bool skeletonRendererCalculateNormals = skeletonRenderer.calculateNormals;
+
+			bool useLightProbes = false;
+			bool receiveShadows = false;
+
+			if (copyMeshRendererFlags) {
+				useLightProbes = mainMeshRenderer.useLightProbes;
+				receiveShadows = mainMeshRenderer.receiveShadows;
+			}
+				
 			for (int i = 0, start = 0; i <= lastSubmeshInstruction; i++) {
 				if (submeshInstructionsItems[i].separatedBySlot) {
-					//Debug.Log(submeshInstructionsItems[i].endSlot);
-					currentRenderer.RenderSubmesh(instruction.submeshInstructions, start, i + 1);
-					start = i + 1;
-
-					if (propagateMaterialPropertyBlock)
+					currentRenderer.RenderParts(instruction.submeshInstructions, start, i + 1);
+					currentRenderer.MeshGenerator.GenerateNormals = skeletonRendererCalculateNormals;
+					if (copyMeshRendererFlags) {
+						var mr = currentRenderer.MeshRenderer;
+						mr.useLightProbes = useLightProbes;
+						mr.receiveShadows = receiveShadows;
+					}
+					if (copyPropertyBlock)
 						currentRenderer.SetPropertyBlock(block);					
 
+					start = i + 1;
 					rendererIndex++;
 					if (rendererIndex < rendererCount) {
-						currentRenderer = renderers[rendererIndex];
+						currentRenderer = partsRenderers[rendererIndex];
 					} else {
+						// Not enough renderers. Skip the rest of the instructions.
 						break;
 					}
 				} else if (i == lastSubmeshInstruction) {
-					//Debug.Log(submeshInstructionsItems[i].endSlot);
-					currentRenderer.RenderSubmesh(instruction.submeshInstructions, start, i + 1);
-
-					if (propagateMaterialPropertyBlock)
+					currentRenderer.RenderParts(instruction.submeshInstructions, start, i + 1);
+					currentRenderer.MeshGenerator.GenerateNormals = skeletonRendererCalculateNormals;
+					if (copyMeshRendererFlags) {
+						var mr = currentRenderer.MeshRenderer;
+						mr.useLightProbes = useLightProbes;
+						mr.receiveShadows = receiveShadows;
+					}
+					if (copyPropertyBlock)
 						currentRenderer.SetPropertyBlock(block);
+					
+					rendererIndex++;
 				}
 			}
+				
+			// Too many renderers. Clear the rest.
+			if (rendererIndex < rendererCount - 1) {
+				for (int i = rendererIndex; i < rendererCount; i++) {
+					currentRenderer = partsRenderers[i];
+					currentRenderer.ClearMesh();
+				}
+			}
+
 		}
 
 

@@ -51,6 +51,7 @@ namespace Spine.Unity {
 			SpineEditorUtilities.ConfirmInitialization();
 			atlasFile = serializedObject.FindProperty("atlasFile");
 			materials = serializedObject.FindProperty("materials");
+			materials.isExpanded = true;
 			atlasAsset = (AtlasAsset)target;
 			UpdateBakedList();
 		}

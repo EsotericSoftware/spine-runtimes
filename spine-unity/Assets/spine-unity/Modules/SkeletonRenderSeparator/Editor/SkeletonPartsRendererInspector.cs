@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEditor;
 using Spine.Unity;
 
-[CustomEditor(typeof(SkeletonRenderPart))]
+[CustomEditor(typeof(SkeletonPartsRenderer))]
 public class SkeletonRenderPartInspector : Editor {
 	SpineInspectorUtility.SerializedSortingProperties sortingProperties;
 

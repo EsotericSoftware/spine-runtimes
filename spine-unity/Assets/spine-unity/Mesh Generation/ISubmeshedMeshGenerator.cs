@@ -22,6 +22,7 @@ namespace Spine.Unity.MeshGeneration {
 	// Step 4: Put the Mesh in MeshFilter. Put the Materials in MeshRenderer.sharedMaterials.
 	public interface ISubmeshSetMeshGenerator {
 		MeshAndMaterials GenerateMesh (ExposedList<SubmeshInstruction> instructions, int startSubmesh, int endSubmesh);
+		bool GenerateNormals { get; set; }
 	}
 
 	/// <summary>Primarily a collection of Submesh Instructions. This constitutes instructions for how to construct a mesh containing submeshes.</summary>
