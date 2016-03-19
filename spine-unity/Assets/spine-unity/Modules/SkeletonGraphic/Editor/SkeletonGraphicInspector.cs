@@ -149,7 +149,7 @@ namespace Spine.Unity {
 			EditorGUIUtility.PingObject(Selection.activeObject);
 		}
 
-		[MenuItem("Assets/Spine/Instantiate (UnityUI)", false, 0)]
+		[MenuItem("Assets/Spine/Instantiate (UnityUI)", false, 10)]
 		static void InstantiateSkeletonGraphic () {
 			Object[] arr = Selection.objects;
 			foreach (Object o in arr) {
@@ -161,7 +161,7 @@ namespace Spine.Unity {
 			}
 		}
 
-		[MenuItem("Assets/Spine/Instantiate (UnityUI)", true, 0)]
+		[MenuItem("Assets/Spine/Instantiate (UnityUI)", true, 10)]
 		static bool ValidateInstantiateSkeletonGraphic () {
 			Object[] arr = Selection.objects;
 

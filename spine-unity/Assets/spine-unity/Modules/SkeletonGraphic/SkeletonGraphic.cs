@@ -212,7 +212,7 @@ namespace Spine.Unity {
 					spineMeshGenerator.Scale = canvas.referencePixelsPerUnit; // TODO: move this to a listener to of the canvas?
 
 				canvasRenderer.SetMesh(spineMeshGenerator.GenerateMesh(skeleton));
-				this.UpdateMaterial();
+				//this.UpdateMaterial(); // TODO: This allocates memory.
 			}
 		}
 		#endregion

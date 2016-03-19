@@ -34,59 +34,62 @@ using System.Collections;
 using UnityEditor;
 using System.Reflection;
 
-public static class SpineInspectorUtility {
-	
-	#region Sorting Layer Field Helpers
-	static readonly GUIContent SortingLayerLabel = new GUIContent("Sorting Layer");
-	static readonly GUIContent OrderInLayerLabel = new GUIContent("Order in Layer");
+namespace Spine.Unity {
+	public static class SpineInspectorUtility {
 
-	static MethodInfo m_SortingLayerFieldMethod;
-	static MethodInfo SortingLayerFieldMethod {
-		get {
-			if (m_SortingLayerFieldMethod == null)
-				m_SortingLayerFieldMethod = typeof(EditorGUILayout).GetMethod("SortingLayerField", BindingFlags.Static | BindingFlags.NonPublic, null, new System.Type[] { typeof(GUIContent), typeof(SerializedProperty), typeof(GUIStyle) }, null);
+		#region Sorting Layer Field Helpers
+		static readonly GUIContent SortingLayerLabel = new GUIContent("Sorting Layer");
+		static readonly GUIContent OrderInLayerLabel = new GUIContent("Order in Layer");
 
-			return m_SortingLayerFieldMethod;
-		}
-	}
+		static MethodInfo m_SortingLayerFieldMethod;
+		static MethodInfo SortingLayerFieldMethod {
+			get {
+				if (m_SortingLayerFieldMethod == null)
+					m_SortingLayerFieldMethod = typeof(EditorGUILayout).GetMethod("SortingLayerField", BindingFlags.Static | BindingFlags.NonPublic, null, new System.Type[] { typeof(GUIContent), typeof(SerializedProperty), typeof(GUIStyle) }, null);
 
-	public struct SerializedSortingProperties {
-		public SerializedObject renderer;
-		public SerializedProperty sortingLayerID;
-		public SerializedProperty sortingOrder;
-
-		public SerializedSortingProperties (Renderer r) {
-			renderer = new SerializedObject(r);
-			sortingLayerID = renderer.FindProperty("m_SortingLayerID");
-			sortingOrder = renderer.FindProperty("m_SortingOrder");
-		}
-
-		public void ApplyModifiedProperties () {
-			renderer.ApplyModifiedProperties();
-		}
-	}
-
-	public static void SortingPropertyFields (SerializedSortingProperties prop, bool applyModifiedProperties) {
-		if (applyModifiedProperties) {
-			EditorGUI.BeginChangeCheck();
-			SortingPropertyFields(prop.sortingLayerID, prop.sortingOrder);
-			if(EditorGUI.EndChangeCheck()) {
-				prop.ApplyModifiedProperties();
-				EditorUtility.SetDirty(prop.renderer.targetObject);
+				return m_SortingLayerFieldMethod;
 			}
-		} else {
-			SortingPropertyFields(prop.sortingLayerID, prop.sortingOrder);
-		}
-	}
-
-	public static void SortingPropertyFields (SerializedProperty m_SortingLayerID, SerializedProperty m_SortingOrder) {
-		if (SpineInspectorUtility.SortingLayerFieldMethod != null && m_SortingLayerID != null) {
-			SpineInspectorUtility.SortingLayerFieldMethod.Invoke(null, new object[] { SortingLayerLabel, m_SortingLayerID, EditorStyles.popup } );
-		} else {
-			EditorGUILayout.PropertyField(m_SortingLayerID);
 		}
 
-		EditorGUILayout.PropertyField(m_SortingOrder, OrderInLayerLabel);
+		public struct SerializedSortingProperties {
+			public SerializedObject renderer;
+			public SerializedProperty sortingLayerID;
+			public SerializedProperty sortingOrder;
+
+			public SerializedSortingProperties (Renderer r) {
+				renderer = new SerializedObject(r);
+				sortingLayerID = renderer.FindProperty("m_SortingLayerID");
+				sortingOrder = renderer.FindProperty("m_SortingOrder");
+			}
+
+			public void ApplyModifiedProperties () {
+				renderer.ApplyModifiedProperties();
+			}
+		}
+
+		public static void SortingPropertyFields (SerializedSortingProperties prop, bool applyModifiedProperties) {
+			if (applyModifiedProperties) {
+				EditorGUI.BeginChangeCheck();
+				SortingPropertyFields(prop.sortingLayerID, prop.sortingOrder);
+				if(EditorGUI.EndChangeCheck()) {
+					prop.ApplyModifiedProperties();
+					EditorUtility.SetDirty(prop.renderer.targetObject);
+				}
+			} else {
+				SortingPropertyFields(prop.sortingLayerID, prop.sortingOrder);
+			}
+		}
+
+		public static void SortingPropertyFields (SerializedProperty m_SortingLayerID, SerializedProperty m_SortingOrder) {
+			if (SpineInspectorUtility.SortingLayerFieldMethod != null && m_SortingLayerID != null) {
+				SpineInspectorUtility.SortingLayerFieldMethod.Invoke(null, new object[] { SortingLayerLabel, m_SortingLayerID, EditorStyles.popup } );
+			} else {
+				EditorGUILayout.PropertyField(m_SortingLayerID);
+			}
+
+			EditorGUILayout.PropertyField(m_SortingOrder, OrderInLayerLabel);
+		}
+		#endregion
 	}
-	#endregion
+
 }
