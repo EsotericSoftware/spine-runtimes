@@ -827,6 +827,8 @@ public static class SkeletonBaker {
 				ParseAttachmentTimeline(skeleton, (AttachmentTimeline)t, slotLookup, clip);
 			} else if (t is EventTimeline) {
 				ParseEventTimeline((EventTimeline)t, clip, eventOptions);
+			} else if (t is ColorTimeline) {
+				ParseColorTimeline(skeleton, (ColorTimeline)t, slotLookup, clip);
 			}
 
 		}
@@ -855,6 +857,196 @@ public static class SkeletonBaker {
 				high = current;
 			if (low == high) return (low + 1);
 			current = (int)((uint)(low + high) >> 1);
+		}
+	}
+
+	static void ParseColorTimeline (Skeleton skeleton, ColorTimeline timeline, Dictionary<int, List<string>> slotLookup, AnimationClip clip) {
+		var slotData = skeleton.Data.Slots[timeline.SlotIndex];
+		var slot = skeleton.Slots[timeline.SlotIndex];
+
+		AnimationCurve rCurve = new AnimationCurve();
+		AnimationCurve gCurve = new AnimationCurve();
+		AnimationCurve bCurve = new AnimationCurve();
+		AnimationCurve aCurve = new AnimationCurve();
+
+		float endTime = timeline.Frames[(timeline.FrameCount * 5) - 5];
+
+		float currentTime = timeline.Frames[0];
+
+		List<Keyframe> rKeys = new List<Keyframe>();
+		List<Keyframe> gKeys = new List<Keyframe>();
+		List<Keyframe> bKeys = new List<Keyframe>();
+		List<Keyframe> aKeys = new List<Keyframe>();
+
+		rKeys.Add(new Keyframe(timeline.Frames[0], timeline.Frames[1] * slotData.R, 0, 0));
+		gKeys.Add(new Keyframe(timeline.Frames[0], timeline.Frames[2] * slotData.G, 0, 0));
+		bKeys.Add(new Keyframe(timeline.Frames[0], timeline.Frames[3] * slotData.B, 0, 0));
+		aKeys.Add(new Keyframe(timeline.Frames[0], timeline.Frames[4] * slotData.A, 0, 0));
+
+
+		int listIndex = 1;
+		int frameIndex = 1;
+		int f = 5;
+		float[] frames = timeline.Frames;
+		skeleton.SetToSetupPose();
+		float lastTime = 0;
+		while (currentTime < endTime) {
+			int pIndex = listIndex - 1;
+			float curveType = timeline.GetCurveType(frameIndex - 1);
+
+			if (curveType == 0) {
+				//linear
+				Keyframe cr = rKeys[pIndex];
+				Keyframe cg = gKeys[pIndex];
+				Keyframe cb = bKeys[pIndex];
+				Keyframe ca = aKeys[pIndex];
+
+				float time = frames[f];
+				float r = frames[f + 1] * slotData.R;
+				float g = frames[f + 2] * slotData.G;
+				float b = frames[f + 3] * slotData.B;
+				float a = frames[f + 4] * slotData.A;
+
+				float rOut = (r - cr.value) / (time - cr.time);
+				float gOut = (g - cg.value) / (time - cg.time);
+				float bOut = (b - cb.value) / (time - cb.time);
+				float aOut = (a - ca.value) / (time - ca.time);
+
+				cr.outTangent = rOut;
+				cg.outTangent = gOut;
+				cb.outTangent = bOut;
+				ca.outTangent = aOut;
+
+				rKeys.Add(new Keyframe(time, r, rOut, 0));
+				gKeys.Add(new Keyframe(time, g, gOut, 0));
+				bKeys.Add(new Keyframe(time, b, bOut, 0));
+				aKeys.Add(new Keyframe(time, a, aOut, 0));
+
+				rKeys[pIndex] = cr;
+				gKeys[pIndex] = cg;
+				bKeys[pIndex] = cb;
+				aKeys[pIndex] = ca;
+
+				currentTime = time;
+
+				timeline.Apply(skeleton, lastTime, currentTime, null, 1);
+
+				lastTime = time;
+				listIndex++;
+			} else if (curveType == 1) {
+				//stepped
+				Keyframe cr = rKeys[pIndex];
+				Keyframe cg = gKeys[pIndex];
+				Keyframe cb = bKeys[pIndex];
+				Keyframe ca = aKeys[pIndex];
+
+				float time = frames[f];
+				float r = frames[f + 1] * slotData.R;
+				float g = frames[f + 2] * slotData.G;
+				float b = frames[f + 3] * slotData.B;
+				float a = frames[f + 4] * slotData.A;
+
+				float rOut = float.PositiveInfinity;
+				float gOut = float.PositiveInfinity;
+				float bOut = float.PositiveInfinity;
+				float aOut = float.PositiveInfinity;
+
+				cr.outTangent = rOut;
+				cg.outTangent = gOut;
+				cb.outTangent = bOut;
+				ca.outTangent = aOut;
+
+				rKeys.Add(new Keyframe(time, r, rOut, 0));
+				gKeys.Add(new Keyframe(time, g, gOut, 0));
+				bKeys.Add(new Keyframe(time, b, bOut, 0));
+				aKeys.Add(new Keyframe(time, a, aOut, 0));
+
+				rKeys[pIndex] = cr;
+				gKeys[pIndex] = cg;
+				bKeys[pIndex] = cb;
+				aKeys[pIndex] = ca;
+
+				currentTime = time;
+
+				timeline.Apply(skeleton, lastTime, currentTime, null, 1);
+
+				lastTime = time;
+				listIndex++;
+			} else if (curveType == 2) {
+				//bezier
+				Keyframe cr = rKeys[pIndex];
+				Keyframe cg = gKeys[pIndex];
+				Keyframe cb = bKeys[pIndex];
+				Keyframe ca = aKeys[pIndex];
+
+				float time = frames[f];
+
+				int steps = Mathf.FloorToInt((time - cr.time) / bakeIncrement);
+
+				for (int i = 1; i <= steps; i++) {
+					currentTime += bakeIncrement;
+					if (i == steps)
+						currentTime = time;
+
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1);
+
+					cr = rKeys[listIndex - 1];
+					cg = gKeys[listIndex - 1];
+					cb = bKeys[listIndex - 1];
+					ca = aKeys[listIndex - 1];
+
+					float rOut = (slot.R - cr.value) / (currentTime - cr.time);
+					float gOut = (slot.G - cg.value) / (currentTime - cg.time);
+					float bOut = (slot.B - cb.value) / (currentTime - cb.time);
+					float aOut = (slot.A - ca.value) / (currentTime - ca.time);
+
+					cr.outTangent = rOut;
+					cg.outTangent = gOut;
+					cb.outTangent = bOut;
+					ca.outTangent = aOut;
+
+					rKeys.Add(new Keyframe(currentTime, slot.R, rOut, 0));
+					gKeys.Add(new Keyframe(currentTime, slot.G, gOut, 0));
+					bKeys.Add(new Keyframe(currentTime, slot.B, bOut, 0));
+					aKeys.Add(new Keyframe(currentTime, slot.A, aOut, 0));
+
+					rKeys[listIndex - 1] = cr;
+					gKeys[listIndex - 1] = cg;
+					bKeys[listIndex - 1] = cb;
+					aKeys[listIndex - 1] = ca;
+
+					listIndex++;
+					lastTime = currentTime;
+				}
+			}
+
+			frameIndex++;
+			f += 5;
+		}
+
+		rCurve = EnsureCurveKeyCount(new AnimationCurve(rKeys.ToArray()));
+		gCurve = EnsureCurveKeyCount(new AnimationCurve(gKeys.ToArray()));
+		bCurve = EnsureCurveKeyCount(new AnimationCurve(bKeys.ToArray()));
+		aCurve = EnsureCurveKeyCount(new AnimationCurve(aKeys.ToArray()));
+
+		var attachmentNames = slotLookup[timeline.SlotIndex];
+
+		string bonePath = GetPath(skeleton.Slots[timeline.SlotIndex].Bone.Data);
+		string slotPath = bonePath + "/" + slotData.Name;
+
+		Dictionary<string, AnimationCurve> curveTable = new Dictionary<string, AnimationCurve>();
+
+		foreach (string str in attachmentNames) {
+			curveTable.Add(str, new AnimationCurve());
+		}
+
+		string propertyName = "material._Color";
+		foreach (var pair in curveTable) {
+			string path = slotPath + "/" + pair.Key;
+			clip.SetCurve(path, typeof(MeshRenderer), propertyName + ".r", rCurve);
+			clip.SetCurve(path, typeof(MeshRenderer), propertyName + ".g", gCurve);
+			clip.SetCurve(path, typeof(MeshRenderer), propertyName + ".b", bCurve);
+			clip.SetCurve(path, typeof(MeshRenderer), propertyName + ".a", aCurve);
 		}
 	}
 

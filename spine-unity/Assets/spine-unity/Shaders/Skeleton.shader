@@ -2,6 +2,31 @@ Shader "Spine/Skeleton" {
 	Properties {
 		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
 		_MainTex ("Texture to blend", 2D) = "black" {}
+		_Color ("Main Color", COLOR) = (1,1,1,1)
+	}
+	// 3 texture stage GPUs
+	SubShader {
+		Tags { "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
+		LOD 200
+
+		Cull Off
+		ZWrite Off
+		Blend SrcAlpha OneMinusSrcAlpha
+		Lighting Off
+
+		Pass {
+			Lighting Off
+			SeparateSpecular On
+
+			SetTexture [_MainTex] {
+				Combine texture * primary, texture * primary
+			}
+
+			SetTexture [_MainTex] {
+				constantColor [_Color]
+				Combine previous * constant 
+			}
+		}
 	}
 	// 2 texture stage GPUs
 	SubShader {
