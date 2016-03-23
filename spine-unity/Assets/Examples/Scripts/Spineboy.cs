@@ -33,6 +33,7 @@ using UnityEngine;
 using System.Collections;
 using Spine;
 using System;
+using Spine.Unity;
 
 public class Spineboy : MonoBehaviour {
 	SkeletonAnimation skeletonAnimation;

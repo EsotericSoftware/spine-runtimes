@@ -33,60 +33,65 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(BoneFollower))]
-public class BoneFollowerInspector : Editor {
-	SerializedProperty boneName, skeletonRenderer, followZPosition, followBoneRotation;
-	BoneFollower component;
-	bool needsReset;
 
-	void OnEnable () {
-		skeletonRenderer = serializedObject.FindProperty("skeletonRenderer");
-		boneName = serializedObject.FindProperty("boneName");
-		followBoneRotation = serializedObject.FindProperty("followBoneRotation");
-		followZPosition = serializedObject.FindProperty("followZPosition");
-		component = (BoneFollower)target;
-		component.skeletonRenderer.Initialize(false);
-	}
-		
-	override public void OnInspectorGUI () {
-		if (needsReset) {
-			component.Reset();
-			component.DoUpdate();
-			needsReset = false;
-			SceneView.RepaintAll();
+namespace Spine.Unity.Editor {
+	
+	[CustomEditor(typeof(BoneFollower))]
+	public class BoneFollowerInspector : UnityEditor.Editor {
+		SerializedProperty boneName, skeletonRenderer, followZPosition, followBoneRotation;
+		BoneFollower component;
+		bool needsReset;
+
+		void OnEnable () {
+			skeletonRenderer = serializedObject.FindProperty("skeletonRenderer");
+			boneName = serializedObject.FindProperty("boneName");
+			followBoneRotation = serializedObject.FindProperty("followBoneRotation");
+			followZPosition = serializedObject.FindProperty("followZPosition");
+			component = (BoneFollower)target;
+			component.skeletonRenderer.Initialize(false);
 		}
-		serializedObject.Update();
 
-		// FindRenderer()
-		if (skeletonRenderer.objectReferenceValue == null) {
-			SkeletonRenderer parentRenderer = SkeletonUtility.GetInParent<SkeletonRenderer>(component.transform);
+		override public void OnInspectorGUI () {
+			if (needsReset) {
+				component.Reset();
+				component.DoUpdate();
+				needsReset = false;
+				SceneView.RepaintAll();
+			}
+			serializedObject.Update();
 
-			if (parentRenderer != null) {
-				skeletonRenderer.objectReferenceValue = (UnityEngine.Object)parentRenderer;
+			// FindRenderer()
+			if (skeletonRenderer.objectReferenceValue == null) {
+				SkeletonRenderer parentRenderer = SkeletonUtility.GetInParent<SkeletonRenderer>(component.transform);
+
+				if (parentRenderer != null) {
+					skeletonRenderer.objectReferenceValue = (UnityEngine.Object)parentRenderer;
+				}
+			}
+
+			EditorGUILayout.PropertyField(skeletonRenderer);
+
+			if (component.valid) {
+				EditorGUI.BeginChangeCheck();
+				EditorGUILayout.PropertyField(boneName);
+				if (EditorGUI.EndChangeCheck()) {
+					serializedObject.ApplyModifiedProperties();
+					needsReset = true;
+					serializedObject.Update();
+				}
+
+				EditorGUILayout.PropertyField(followBoneRotation);
+				EditorGUILayout.PropertyField(followZPosition);
+			} else {
+				GUILayout.Label("INVALID");
+			}
+
+			if (serializedObject.ApplyModifiedProperties() ||
+				(UnityEngine.Event.current.type == EventType.ValidateCommand && UnityEngine.Event.current.commandName == "UndoRedoPerformed")
+			) {
+				component.Reset();
 			}
 		}
-
-		EditorGUILayout.PropertyField(skeletonRenderer);
-
-		if (component.valid) {
-			EditorGUI.BeginChangeCheck();
-			EditorGUILayout.PropertyField(boneName);
-			if (EditorGUI.EndChangeCheck()) {
-				serializedObject.ApplyModifiedProperties();
-				needsReset = true;
-				serializedObject.Update();
-			}
-				
-			EditorGUILayout.PropertyField(followBoneRotation);
-			EditorGUILayout.PropertyField(followZPosition);
-		} else {
-			GUILayout.Label("INVALID");
-		}
-
-		if (serializedObject.ApplyModifiedProperties() ||
-			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
-	    ) {
-			component.Reset();
-		}
 	}
+
 }

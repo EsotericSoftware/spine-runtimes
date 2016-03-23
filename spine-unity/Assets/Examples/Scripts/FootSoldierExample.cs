@@ -6,6 +6,7 @@
 *****************************************************************************/
 using UnityEngine;
 using System.Collections;
+using Spine.Unity;
 
 public class FootSoldierExample : MonoBehaviour {
 	[SpineAnimation("Idle")]
