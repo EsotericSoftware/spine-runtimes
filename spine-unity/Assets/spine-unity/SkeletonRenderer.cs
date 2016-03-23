@@ -51,45 +51,47 @@ public class SkeletonRenderer : MonoBehaviour {
 	public String initialSkinName;
 
 #region Advanced
-	#if SPINE_OPTIONAL_NORMALS
-	public bool calculateNormals, calculateTangents;
-	#endif
+	// Submesh Separation
+	[UnityEngine.Serialization.FormerlySerializedAs("submeshSeparators")]
+	[SpineSlot]
+	public string[] separatorSlotNames = new string[0];
+	[System.NonSerialized]
+	public readonly List<Slot> separatorSlots = new List<Slot>();
+
 	public float zSpacing;
 	public bool renderMeshes = true, immutableTriangles;
 	public bool pmaVertexColors = true;
+	#if SPINE_OPTIONAL_NORMALS
+	public bool calculateNormals, calculateTangents;
+	#endif
 	#if SPINE_OPTIONAL_FRONTFACING
 	public bool frontFacing;
 	#endif
 
+	public bool logErrors = false;
+
 	#if SPINE_OPTIONAL_RENDEROVERRIDE
-	public bool disableMeshRendererOnOverride = true;
+	public bool disableRenderingOnOverride = true;
 	public delegate void InstructionDelegate (SkeletonRenderer.SmartMesh.Instruction instruction);
-	event InstructionDelegate MeshOverrideDelegate;
+	event InstructionDelegate generateMeshOverride;
 	public event InstructionDelegate GenerateMeshOverride {
 		add {
-			MeshOverrideDelegate += value;
-			if (disableMeshRendererOnOverride && MeshOverrideDelegate != null) {
+			generateMeshOverride += value;
+			if (disableRenderingOnOverride && generateMeshOverride != null) {
+				Initialize(false);
 				meshRenderer.enabled = false;
 			}
 		}
 		remove {
-			MeshOverrideDelegate -= value;
-			if (disableMeshRendererOnOverride && MeshOverrideDelegate == null) {
+			generateMeshOverride -= value;
+			if (disableRenderingOnOverride && generateMeshOverride == null) {
+				Initialize(false);
 				meshRenderer.enabled = true;
 			}
 		}
 	}
 
 	#endif
-
-	public bool logErrors = false;
-
-	// Submesh Separation
-	[UnityEngine.Serialization.FormerlySerializedAs("submeshSeparators")]
-	[SpineSlot]
-	public string[] separatorSlotNames = new string[0];
-	[System.NonSerialized]
-	public List<Slot> separatorSlots = new List<Slot>();
 
 	// Custom Slot Material
 	[System.NonSerialized] readonly Dictionary<Slot, Material> customSlotMaterials = new Dictionary<Slot, Material>();
@@ -200,14 +202,18 @@ public class SkeletonRenderer : MonoBehaviour {
 			return;
 
 		if (
-			!meshRenderer.enabled
-
+			(
+				!meshRenderer.enabled
+			
+			)
 			#if SPINE_OPTIONAL_RENDEROVERRIDE
-			&& MeshOverrideDelegate == null
+			&& this.generateMeshOverride == null
 			#endif
 
 		)
 			return;
+
+
 
 		// STEP 1. Determine a SmartMesh.Instruction. Split up instructions into submeshes.
 
@@ -298,8 +304,8 @@ public class SkeletonRenderer : MonoBehaviour {
 			#endif
 
 			// Create a new SubmeshInstruction when material changes. (or when forced to separate by a submeshSeparator)
-			bool separatedBySlot = (separatorSlotCount > 0 && separatorSlots.Contains(slot));
-			if ((vertexCount > 0 && lastMaterial.GetInstanceID() != material.GetInstanceID()) || separatedBySlot) {
+			bool forceSeparate = (separatorSlotCount > 0 && separatorSlots.Contains(slot));
+			if ((vertexCount > 0 && lastMaterial.GetInstanceID() != material.GetInstanceID()) || forceSeparate) {
 				workingSubmeshInstructions.Add(
 					new Spine.Unity.MeshGeneration.SubmeshInstruction {
 						skeleton = this.skeleton,
@@ -309,7 +315,7 @@ public class SkeletonRenderer : MonoBehaviour {
 						triangleCount = submeshTriangleCount,
 						firstVertexIndex = submeshFirstVertex,
 						vertexCount = submeshVertexCount,
-						separatedBySlot = separatedBySlot
+						forceSeparate = forceSeparate
 					}
 				);
 
@@ -334,7 +340,7 @@ public class SkeletonRenderer : MonoBehaviour {
 				triangleCount = submeshTriangleCount,
 				firstVertexIndex = submeshFirstVertex,
 				vertexCount = submeshVertexCount,
-				separatedBySlot = false
+				forceSeparate = false
 			}
 		);
 
@@ -345,8 +351,12 @@ public class SkeletonRenderer : MonoBehaviour {
 		#endif
 
 		#if SPINE_OPTIONAL_RENDEROVERRIDE
-		if (MeshOverrideDelegate != null) {
-			MeshOverrideDelegate(workingInstruction);
+		if (this.generateMeshOverride != null) {
+			this.generateMeshOverride(workingInstruction);
+
+			if (disableRenderingOnOverride) {
+				return;
+			}
 		}
 		#endif
 
@@ -366,6 +376,14 @@ public class SkeletonRenderer : MonoBehaviour {
 				Vector3 normal = new Vector3(0, 0, -1);
 				for (int i = 0; i < vertexCount; i++)
 					localNormals[i] = normal;
+			}
+
+			// For dynamic tangent calculation, you can remove the tangent-filling logic and add tangent calculation logic below.
+			if (calculateTangents) {
+				Vector4[] localTangents = this.tangents = new Vector4[vertexCount];
+				Vector4 tangent = new Vector4(1, 0, 0, -1);
+				for (int i = 0; i < vertexCount; i++)
+					localTangents[i] = tangent;
 			}
 			#endif
 		} else {
@@ -591,22 +609,12 @@ public class SkeletonRenderer : MonoBehaviour {
 		var currentSmartMeshInstructionUsed = currentSmartMesh.instructionUsed;
 		#if SPINE_OPTIONAL_NORMALS
 		if (currentSmartMeshInstructionUsed.vertexCount < vertexCount) {
-			if (calculateNormals) {
+			if (calculateNormals)
 				currentMesh.normals = normals;
-			}
 
-
-			// For dynamic calculated tangents, this needs to be moved out of the if block when replacing the logic.
-			if (calculateTangents) {
-				if (tangents == null || vertexCount > tangents.Length) {
-					Vector4[] localTangents = this.tangents = new Vector4[vertexCount];
-					Vector4 tangent = new Vector4(1, 0, 0, -1);
-					for (int i = 0; i < vertexCount; i++)
-						localTangents[i] = tangent;
-				}
-
+			// For dynamic calculated tangents, this needs to be moved out of the vertexCount check block when replacing the logic, also ensuring the size.
+			if (calculateTangents)
 				currentMesh.tangents = this.tangents;
-			}
 		}
 		#endif
 
