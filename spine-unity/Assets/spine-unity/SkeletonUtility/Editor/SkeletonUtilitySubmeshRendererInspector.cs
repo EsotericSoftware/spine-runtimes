@@ -28,27 +28,22 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
 using UnityEngine;
-using System.Collections;
+using UnityEditor;
+using Spine.Unity.Editor;
 
-namespace Spine.Unity {
-	[RequireComponent(typeof(SkeletonUtilityBone)), ExecuteInEditMode]
-	public abstract class SkeletonUtilityConstraint : MonoBehaviour {
+namespace Spine.Unity.Modules {
+	[CustomEditor(typeof(SkeletonUtilitySubmeshRenderer))]
+	public class SkeletonUtilitySubmeshRendererInspector : UnityEditor.Editor {
+		public SpineInspectorUtility.SerializedSortingProperties sorting;
 
-		protected SkeletonUtilityBone utilBone;
-		protected SkeletonUtility skeletonUtility;
-
-		protected virtual void OnEnable () {
-			utilBone = GetComponent<SkeletonUtilityBone>();
-			skeletonUtility = SkeletonUtility.GetInParent<SkeletonUtility>(transform);
-			skeletonUtility.RegisterConstraint(this);
+		void OnEnable () {			
+			sorting = new SpineInspectorUtility.SerializedSortingProperties((target as Component).GetComponent<Renderer>());
 		}
 
-		protected virtual void OnDisable () {
-			skeletonUtility.UnregisterConstraint(this);
+		public override void OnInspectorGUI () {
+			EditorGUILayout.HelpBox("SkeletonUtilitySubmeshRenderer is now obsolete. We recommend using SkeletonRenderSeparator.", MessageType.Info);
+			SpineInspectorUtility.SortingPropertyFields(sorting, true);
 		}
-
-		public abstract void DoUpdate ();
 	}
 }

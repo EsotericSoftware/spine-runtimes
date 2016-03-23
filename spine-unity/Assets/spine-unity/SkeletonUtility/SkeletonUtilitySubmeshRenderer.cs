@@ -28,27 +28,44 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
 using UnityEngine;
-using System.Collections;
 
-namespace Spine.Unity {
-	[RequireComponent(typeof(SkeletonUtilityBone)), ExecuteInEditMode]
-	public abstract class SkeletonUtilityConstraint : MonoBehaviour {
+namespace Spine.Unity.Modules {
+	[ExecuteInEditMode]
+	public class SkeletonUtilitySubmeshRenderer : MonoBehaviour {
+		[System.NonSerialized]
+		public Mesh mesh;
+		public int submeshIndex = 0;
+		public Material hiddenPassMaterial;
+		Renderer cachedRenderer;
+		MeshFilter filter;
+		Material[] sharedMaterials;
 
-		protected SkeletonUtilityBone utilBone;
-		protected SkeletonUtility skeletonUtility;
-
-		protected virtual void OnEnable () {
-			utilBone = GetComponent<SkeletonUtilityBone>();
-			skeletonUtility = SkeletonUtility.GetInParent<SkeletonUtility>(transform);
-			skeletonUtility.RegisterConstraint(this);
+		void Awake () {
+			cachedRenderer = GetComponent<Renderer>();
+			filter = GetComponent<MeshFilter>();
+			sharedMaterials = new Material[0];
 		}
 
-		protected virtual void OnDisable () {
-			skeletonUtility.UnregisterConstraint(this);
-		}
+		public void SetMesh (Renderer parentRenderer, Mesh mesh, Material mat) {
+			if (cachedRenderer == null)
+				return;
 
-		public abstract void DoUpdate ();
+			cachedRenderer.enabled = true;
+			filter.sharedMesh = mesh;
+			if (cachedRenderer.sharedMaterials.Length != parentRenderer.sharedMaterials.Length) {
+				sharedMaterials = parentRenderer.sharedMaterials;
+			}
+
+			for (int i = 0; i < sharedMaterials.Length; i++) {
+				if (i == submeshIndex)
+					sharedMaterials[i] = mat;
+				else
+					sharedMaterials[i] = hiddenPassMaterial;
+			}
+
+			cachedRenderer.sharedMaterials = sharedMaterials;
+		}
 	}
+
 }

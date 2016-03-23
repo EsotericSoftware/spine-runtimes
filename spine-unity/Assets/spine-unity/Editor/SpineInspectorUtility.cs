@@ -30,10 +30,8 @@
  *****************************************************************************/
 
 using UnityEngine;
-using System.Collections;
 using UnityEditor;
 using System.Reflection;
-using System;
 
 namespace Spine.Unity.Editor {
 	public static class SpineInspectorUtility {

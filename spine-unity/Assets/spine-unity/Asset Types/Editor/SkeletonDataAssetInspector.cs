@@ -182,10 +182,7 @@ namespace Spine.Unity.Editor {
 				EditorGUI.EndDisabledGroup();
 
 				EditorGUI.indentLevel++;
-				GUILayout.BeginHorizontal();
-				{
-
-
+				using (new EditorGUILayout.HorizontalScope()) {
 					if (GUILayout.Button(new GUIContent("Bake All Skins", SpineEditorUtilities.Icons.unityIcon), GUILayout.Height(32), GUILayout.Width(150)))
 						SkeletonBaker.BakeToPrefab(m_skeletonDataAsset, m_skeletonData.Skins, "", bakeAnimations, bakeIK, bakeEventOptions);
 
@@ -200,35 +197,20 @@ namespace Spine.Unity.Editor {
 						} else
 							skinName = m_skeletonAnimation.skeleton.Skin.Name;
 
-						bool oops = false;
-
-						try {
-							GUILayout.BeginVertical();
+						using (var m = new EditorGUILayout.VerticalScope()) {
 							if (GUILayout.Button(new GUIContent("Bake " + skinName, SpineEditorUtilities.Icons.unityIcon), GUILayout.Height(32), GUILayout.Width(250)))
 								SkeletonBaker.BakeToPrefab(m_skeletonDataAsset, new ExposedList<Skin>(new [] { bakeSkin }), "", bakeAnimations, bakeIK, bakeEventOptions);
-
-							GUILayout.BeginHorizontal();
-							GUILayout.Label(new GUIContent("Skins", SpineEditorUtilities.Icons.skinsRoot), GUILayout.Width(50));
-							if (GUILayout.Button(skinName, EditorStyles.popup, GUILayout.Width(196))) {
-								SelectSkinContext();
+							using (new EditorGUILayout.HorizontalScope()) {
+								GUILayout.Label(new GUIContent("Skins", SpineEditorUtilities.Icons.skinsRoot), GUILayout.Width(50));
+								if (GUILayout.Button(skinName, EditorStyles.popup, GUILayout.Width(196))) {
+									SelectSkinContext();
+								}
 							}
-							GUILayout.EndHorizontal();
 
-
-
-						} catch {
-							oops = true;
-							//GUILayout.BeginVertical();
 						}
-
-
-
-						if (!oops)
-							GUILayout.EndVertical();
 					}
 
 				}
-				GUILayout.EndHorizontal();
 				EditorGUI.indentLevel--;
 				EditorGUI.indentLevel--;
 			}
