@@ -51,7 +51,7 @@ namespace Spine.Unity.MeshGeneration {
 
 		// Vertex index offset. Used by submesh generation if part of a bigger mesh.
 		public int firstVertexIndex;
-		public bool separatedBySlot;
+		public bool forceSeparate;
 
 		/// <summary>The number of slots in this SubmeshInstruction's range. Not necessarily the number of attachments.</summary>
 		public int SlotCount { get { return endSlot - startSlot; } }

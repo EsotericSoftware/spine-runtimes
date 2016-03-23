@@ -5,8 +5,8 @@ using Spine.Unity;
 
 namespace Spine.Unity {
 	
-	[HelpURL("")]
 	[ExecuteInEditMode]
+	[HelpURL("https://github.com/pharan/spine-unity-docs/blob/master/SkeletonRenderSeparator.md")]
 	public class SkeletonRenderSeparator : MonoBehaviour {
 		public const int DefaultSortingOrderIncrement = 5;
 
@@ -17,7 +17,7 @@ namespace Spine.Unity {
 			get { return skeletonRenderer; }
 			set {
 				if (skeletonRenderer != null)
-					skeletonRenderer.GenerateMeshOverride -= SeparateSkeletonRender;
+					skeletonRenderer.GenerateMeshOverride -= HandleRender;
 				
 				skeletonRenderer = value;
 				this.enabled = false; // Disable if nulled.
@@ -26,6 +26,7 @@ namespace Spine.Unity {
 
 		MeshRenderer mainMeshRenderer;
 		public bool copyPropertyBlock = false;
+		[Tooltip("Copies MeshRenderer flags into ")]
 		public bool copyMeshRendererFlags = false;
 		public List<Spine.Unity.SkeletonPartsRenderer> partsRenderers = new List<SkeletonPartsRenderer>();
 
@@ -42,13 +43,28 @@ namespace Spine.Unity {
 			if (block == null) block = new MaterialPropertyBlock();	
 			mainMeshRenderer = skeletonRenderer.GetComponent<MeshRenderer>();
 
-			skeletonRenderer.GenerateMeshOverride -= SeparateSkeletonRender;
-			skeletonRenderer.GenerateMeshOverride += SeparateSkeletonRender;
+			skeletonRenderer.GenerateMeshOverride -= HandleRender;
+			skeletonRenderer.GenerateMeshOverride += HandleRender;
+
+			if (copyMeshRendererFlags) {
+				bool useLightProbes = mainMeshRenderer.useLightProbes;
+				bool receiveShadows = mainMeshRenderer.receiveShadows;
+
+				for (int i = 0; i < partsRenderers.Count; i++) {
+					var currentRenderer = partsRenderers[i];
+					if (currentRenderer == null) continue; // skip null items.
+
+					var mr = currentRenderer.MeshRenderer;
+					mr.useLightProbes = useLightProbes;
+					mr.receiveShadows = receiveShadows;
+				}
+			}
+
 		}
 
 		void OnDisable () {
 			if (skeletonRenderer == null) return;
-			skeletonRenderer.GenerateMeshOverride -= SeparateSkeletonRender;
+			skeletonRenderer.GenerateMeshOverride -= HandleRender;
 
 			#if UNITY_EDITOR
 			skeletonRenderer.LateUpdate();
@@ -60,7 +76,7 @@ namespace Spine.Unity {
 
 		MaterialPropertyBlock block;
 
-		void SeparateSkeletonRender (SkeletonRenderer.SmartMesh.Instruction instruction) {
+		void HandleRender (SkeletonRenderer.SmartMesh.Instruction instruction) {
 			int rendererCount = partsRenderers.Count;
 			if (rendererCount <= 0) return;
 
@@ -75,24 +91,11 @@ namespace Spine.Unity {
 
 			var currentRenderer = partsRenderers[rendererIndex];
 			bool skeletonRendererCalculateNormals = skeletonRenderer.calculateNormals;
-
-			bool useLightProbes = false;
-			bool receiveShadows = false;
-
-			if (copyMeshRendererFlags) {
-				useLightProbes = mainMeshRenderer.useLightProbes;
-				receiveShadows = mainMeshRenderer.receiveShadows;
-			}
 				
 			for (int i = 0, start = 0; i <= lastSubmeshInstruction; i++) {
-				if (submeshInstructionsItems[i].separatedBySlot) {
+				if (submeshInstructionsItems[i].forceSeparate) {
 					currentRenderer.RenderParts(instruction.submeshInstructions, start, i + 1);
 					currentRenderer.MeshGenerator.GenerateNormals = skeletonRendererCalculateNormals;
-					if (copyMeshRendererFlags) {
-						var mr = currentRenderer.MeshRenderer;
-						mr.useLightProbes = useLightProbes;
-						mr.receiveShadows = receiveShadows;
-					}
 					if (copyPropertyBlock)
 						currentRenderer.SetPropertyBlock(block);					
 
@@ -107,19 +110,13 @@ namespace Spine.Unity {
 				} else if (i == lastSubmeshInstruction) {
 					currentRenderer.RenderParts(instruction.submeshInstructions, start, i + 1);
 					currentRenderer.MeshGenerator.GenerateNormals = skeletonRendererCalculateNormals;
-					if (copyMeshRendererFlags) {
-						var mr = currentRenderer.MeshRenderer;
-						mr.useLightProbes = useLightProbes;
-						mr.receiveShadows = receiveShadows;
-					}
 					if (copyPropertyBlock)
 						currentRenderer.SetPropertyBlock(block);
-					
-					rendererIndex++;
 				}
 			}
-				
-			// Too many renderers. Clear the rest.
+
+			// If too many renderers. Clear the rest.
+			rendererIndex++;
 			if (rendererIndex < rendererCount - 1) {
 				for (int i = rendererIndex; i < rendererCount; i++) {
 					currentRenderer = partsRenderers[i];

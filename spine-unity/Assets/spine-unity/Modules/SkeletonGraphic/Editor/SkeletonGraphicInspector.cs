@@ -36,10 +36,10 @@ using UnityEngine;
 using UnityEditor;
 using Spine;
 
-namespace Spine.Unity {
+namespace Spine.Unity.Editor {
 	
 	[CustomEditor(typeof(SkeletonGraphic))]
-	public class SkeletonGraphicInspector : Editor {
+	public class SkeletonGraphicInspector : UnityEditor.Editor {
 		SerializedProperty material_, color_;
 		SerializedProperty skeletonDataAsset_, initialSkinName_;
 		SerializedProperty startingAnimation_, startingLoop_, timeScale_, freeze_;
@@ -133,7 +133,7 @@ namespace Spine.Unity {
 			}
 		}
 
-		[MenuItem("GameObject/Spine/SkeletonGraphic (UnityUI)", false, 10)]
+		[MenuItem("GameObject/Spine/SkeletonGraphic (UnityUI)", false, 15)]
 		static public void SkeletonGraphicCreateMenuItem () {
 			var parentGameObject = Selection.activeObject as GameObject;
 			var parentTransform = parentGameObject == null ? null : parentGameObject.GetComponent<RectTransform>();
@@ -149,7 +149,7 @@ namespace Spine.Unity {
 			EditorGUIUtility.PingObject(Selection.activeObject);
 		}
 
-		[MenuItem("Assets/Spine/Instantiate (UnityUI)", false, 10)]
+		[MenuItem("Assets/Spine/Instantiate (UnityUI)", false, 20)]
 		static void InstantiateSkeletonGraphic () {
 			Object[] arr = Selection.objects;
 			foreach (Object o in arr) {
@@ -161,7 +161,7 @@ namespace Spine.Unity {
 			}
 		}
 
-		[MenuItem("Assets/Spine/Instantiate (UnityUI)", true, 10)]
+		[MenuItem("Assets/Spine/Instantiate (UnityUI)", true, 20)]
 		static bool ValidateInstantiateSkeletonGraphic () {
 			Object[] arr = Selection.objects;
 

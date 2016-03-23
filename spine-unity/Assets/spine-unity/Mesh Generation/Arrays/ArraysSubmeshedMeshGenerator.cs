@@ -119,7 +119,7 @@ namespace Spine.Unity.MeshGeneration {
 							startSlot = submeshStartSlotIndex,
 							endSlot = i,
 							firstVertexIndex = submeshFirstVertex,
-							separatedBySlot = separatedBySlot
+							forceSeparate = separatedBySlot
 						}
 					);
 
@@ -147,7 +147,7 @@ namespace Spine.Unity.MeshGeneration {
 					startSlot = submeshStartSlotIndex,
 					endSlot = drawOrderCount,
 					firstVertexIndex = submeshFirstVertex,
-					separatedBySlot = false
+					forceSeparate = false
 				}
 			);
 
