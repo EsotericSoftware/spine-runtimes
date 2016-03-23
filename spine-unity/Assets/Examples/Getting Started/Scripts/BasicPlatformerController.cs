@@ -7,6 +7,7 @@
 
 using UnityEngine;
 using System.Collections;
+using Spine.Unity;
 
 [RequireComponent(typeof(CharacterController))]
 public class BasicPlatformerController : MonoBehaviour {

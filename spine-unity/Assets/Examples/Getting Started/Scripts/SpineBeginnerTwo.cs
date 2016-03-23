@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Spine.Unity;
 
 public class SpineBeginnerTwo : MonoBehaviour {
 
