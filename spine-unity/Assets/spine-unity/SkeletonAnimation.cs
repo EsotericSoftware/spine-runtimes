@@ -36,6 +36,7 @@ using Spine;
 
 [ExecuteInEditMode]
 [AddComponentMenu("Spine/SkeletonAnimation")]
+[HelpURL("http://esotericsoftware.com/spine-unity-documentation#Controlling-Animation")]
 public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation {
 
 	/// <summary>

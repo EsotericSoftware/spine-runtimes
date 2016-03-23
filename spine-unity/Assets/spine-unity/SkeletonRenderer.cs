@@ -41,6 +41,7 @@ using Spine.Unity.MeshGeneration;
 
 /// <summary>Renders a skeleton.</summary>
 [ExecuteInEditMode, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer)), DisallowMultipleComponent]
+[HelpURL("http://esotericsoftware.com/spine-unity-documentation#Rendering")]
 public class SkeletonRenderer : MonoBehaviour {
 
 	public delegate void SkeletonRendererDelegate (SkeletonRenderer skeletonRenderer);
