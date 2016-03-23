@@ -35,7 +35,7 @@ using UnityEditor;
 using System.Reflection;
 using System;
 
-namespace Spine.Unity {
+namespace Spine.Unity.Editor {
 	public static class SpineInspectorUtility {
 
 		public static string Pluralize (int n, string singular, string plural) {
@@ -100,5 +100,4 @@ namespace Spine.Unity {
 		}
 		#endregion
 	}
-
 }

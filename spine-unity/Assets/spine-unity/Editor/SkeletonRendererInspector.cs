@@ -33,10 +33,10 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace Spine.Unity {
+namespace Spine.Unity.Editor {
 	
 	[CustomEditor(typeof(SkeletonRenderer))]
-	public class SkeletonRendererInspector : Editor {
+	public class SkeletonRendererInspector : UnityEditor.Editor {
 		protected static bool advancedFoldout;
 
 		protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, separatorSlotNames, front, zSpacing;

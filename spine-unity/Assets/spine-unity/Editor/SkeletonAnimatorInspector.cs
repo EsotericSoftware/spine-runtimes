@@ -6,7 +6,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace Spine.Unity {
+namespace Spine.Unity.Editor {
 	[CustomEditor(typeof(SkeletonAnimator))]
 	public class SkeletonAnimatorInspector : SkeletonRendererInspector {
 		protected SerializedProperty layerMixModes;

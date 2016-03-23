@@ -33,7 +33,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace Spine.Unity {
+namespace Spine.Unity.Editor {
 	public static class Menus {
 		[MenuItem("Assets/Create/Spine Atlas")]
 		static public void CreateAtlas () {

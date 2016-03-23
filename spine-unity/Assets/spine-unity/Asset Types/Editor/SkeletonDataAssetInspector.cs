@@ -14,9 +14,9 @@ using UnityEditor.AnimatedValues;
 using UnityEngine;
 using Spine;
 
-namespace Spine.Unity {
+namespace Spine.Unity.Editor {
 	[CustomEditor(typeof(SkeletonDataAsset))]
-	public class SkeletonDataAssetInspector : Editor {
+	public class SkeletonDataAssetInspector : UnityEditor.Editor {
 		static bool showAnimationStateData = true;
 		static bool showAnimationList = true;
 		static bool showSlotList = false;
@@ -50,6 +50,7 @@ namespace Spine.Unity {
 
 			try {
 				atlasAssets = serializedObject.FindProperty("atlasAssets");
+				atlasAssets.isExpanded = true;
 				skeletonJSON = serializedObject.FindProperty("skeletonJSON");
 				scale = serializedObject.FindProperty("scale");
 				fromAnimation = serializedObject.FindProperty("fromAnimation");

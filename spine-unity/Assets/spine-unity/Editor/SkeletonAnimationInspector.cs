@@ -33,7 +33,7 @@ using UnityEditor;
 using UnityEngine;
 using Spine;
 
-namespace Spine.Unity {
+namespace Spine.Unity.Editor {
 	
 	[CustomEditor(typeof(SkeletonAnimation))]
 	public class SkeletonAnimationInspector : SkeletonRendererInspector {

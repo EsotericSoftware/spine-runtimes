@@ -38,10 +38,10 @@ using UnityEditor;
 using UnityEngine;
 using Spine;
 
-namespace Spine.Unity {
+namespace Spine.Unity.Editor {
 	
 	[CustomEditor(typeof(AtlasAsset))]
-	public class AtlasAssetInspector : Editor {
+	public class AtlasAssetInspector : UnityEditor.Editor {
 		private SerializedProperty atlasFile, materials;
 		private AtlasAsset atlasAsset;
 		private List<bool> baked;
