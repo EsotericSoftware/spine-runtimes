@@ -1,5 +1,3 @@
-
-
 /*****************************************************************************
  * Spine Extensions by Mitch Thompson and John Dy
  * Full irrevocable rights and permissions granted to Esoteric Software
@@ -7,7 +5,6 @@
 
 using UnityEngine;
 using Spine;
-using Spine.Unity;
 
 namespace Spine.Unity {
 	public static class SkeletonExtensions {
@@ -124,6 +121,16 @@ namespace Spine.Unity {
 			Spine.Animation animation = skeleton.data.FindAnimation(animationName);
 			if (animation == null) return;
 			animation.Apply(skeleton, 0, time, loop, null);
+		}
+
+		/// <summary>Resets the DrawOrder to the Setup Pose's draw order</summary>
+		public static void SetDrawOrderToSetupPose (this Skeleton skeleton) {
+			var slotsItems = skeleton.slots.Items;
+			var drawOrder = skeleton.drawOrder;
+
+			drawOrder.Clear(false);
+			for (int i = 0, n = skeleton.slots.Count; i < n; i++)
+				drawOrder.Add(slotsItems[i]);
 		}
 		#endregion
 	}
