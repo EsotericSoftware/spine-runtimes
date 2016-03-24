@@ -107,6 +107,7 @@ namespace Spine.Unity {
 				skeletonRenderer = GetComponent<SkeletonRenderer>();
 			}
 
+            skeletonRenderer.Initialize(false);
 			SetCustomMaterialOverrides();
 			SetCustomSlotMaterials();
 		}
