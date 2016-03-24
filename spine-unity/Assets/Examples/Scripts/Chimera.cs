@@ -5,7 +5,7 @@
  * Full irrevocable rights and permissions granted to Esoteric Software
 *****************************************************************************/
 using UnityEngine;
-using System.Collections;
+using Spine.Unity;
 
 public class Chimera : MonoBehaviour {
 

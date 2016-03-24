@@ -32,6 +32,7 @@
 using UnityEngine;
 using System.Collections;
 using Spine;
+using Spine.Unity;
 
 public class Goblins : MonoBehaviour {
 	private bool girlSkin;

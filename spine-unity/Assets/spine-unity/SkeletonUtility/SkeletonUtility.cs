@@ -10,49 +10,76 @@ using System.Collections;
 using System.Collections.Generic;
 using Spine;
 
-[RequireComponent(typeof(ISkeletonAnimation))]
-[ExecuteInEditMode]
-public class SkeletonUtility : MonoBehaviour {
+namespace Spine.Unity {
+	[RequireComponent(typeof(ISkeletonAnimation))]
+	[ExecuteInEditMode]
+	public class SkeletonUtility : MonoBehaviour {
 
-	public static T GetInParent<T> (Transform origin) where T : Component {
-#if UNITY_4_3
-		Transform parent = origin.parent;
-		while(parent.GetComponent<T>() == null){
+		public static T GetInParent<T> (Transform origin) where T : Component {
+			#if UNITY_4_3
+			Transform parent = origin.parent;
+			while(parent.GetComponent<T>() == null){
 			parent = parent.parent;
 			if(parent == null)
-				return default(T);
+			return default(T);
+			}
+
+			return parent.GetComponent<T>();
+			#else
+			return origin.GetComponentInParent<T>();
+			#endif
 		}
 
-		return parent.GetComponent<T>();
-#else
-		return origin.GetComponentInParent<T>();
-#endif
-	}
+		public static PolygonCollider2D AddBoundingBox (Skeleton skeleton, string skinName, string slotName, string attachmentName, Transform parent, bool isTrigger = true) {
+			// List<Attachment> attachments = new List<Attachment>();
+			Skin skin;
 
-	public static PolygonCollider2D AddBoundingBox (Skeleton skeleton, string skinName, string slotName, string attachmentName, Transform parent, bool isTrigger = true) {
-		// List<Attachment> attachments = new List<Attachment>();
-		Skin skin;
+			if (skinName == "")
+				skinName = skeleton.Data.DefaultSkin.Name;
 
-		if (skinName == "")
-			skinName = skeleton.Data.DefaultSkin.Name;
+			skin = skeleton.Data.FindSkin(skinName);
 
-		skin = skeleton.Data.FindSkin(skinName);
+			if (skin == null) {
+				Debug.LogError("Skin " + skinName + " not found!");
+				return null;
+			}
 
-		if (skin == null) {
-			Debug.LogError("Skin " + skinName + " not found!");
+			var attachment = skin.GetAttachment(skeleton.FindSlotIndex(slotName), attachmentName);
+			if (attachment is BoundingBoxAttachment) {
+				GameObject go = new GameObject("[BoundingBox]" + attachmentName);
+				go.transform.parent = parent;
+				go.transform.localPosition = Vector3.zero;
+				go.transform.localRotation = Quaternion.identity;
+				go.transform.localScale = Vector3.one;
+				var collider = go.AddComponent<PolygonCollider2D>();
+				collider.isTrigger = isTrigger;
+				var boundingBox = (BoundingBoxAttachment)attachment;
+				float[] floats = boundingBox.Vertices;
+				int floatCount = floats.Length;
+				int vertCount = floatCount / 2;
+
+				Vector2[] verts = new Vector2[vertCount];
+				int v = 0;
+				for (int i = 0; i < floatCount; i += 2, v++) {
+					verts[v].x = floats[i];
+					verts[v].y = floats[i + 1];
+				}
+
+				collider.SetPath(0, verts);
+
+				return collider;
+
+			}
+
 			return null;
 		}
 
-		var attachment = skin.GetAttachment(skeleton.FindSlotIndex(slotName), attachmentName);
-		if (attachment is BoundingBoxAttachment) {
-			GameObject go = new GameObject("[BoundingBox]" + attachmentName);
-			go.transform.parent = parent;
-			go.transform.localPosition = Vector3.zero;
-			go.transform.localRotation = Quaternion.identity;
-			go.transform.localScale = Vector3.one;
-			var collider = go.AddComponent<PolygonCollider2D>();
+		public static PolygonCollider2D AddBoundingBoxAsComponent (BoundingBoxAttachment boundingBox, GameObject gameObject, bool isTrigger = true) {
+			if (boundingBox == null)
+				return null;
+
+			var collider = gameObject.AddComponent<PolygonCollider2D>();
 			collider.isTrigger = isTrigger;
-			var boundingBox = (BoundingBoxAttachment)attachment;
 			float[] floats = boundingBox.Vertices;
 			int floatCount = floats.Length;
 			int vertCount = floatCount / 2;
@@ -67,338 +94,294 @@ public class SkeletonUtility : MonoBehaviour {
 			collider.SetPath(0, verts);
 
 			return collider;
-
 		}
 
-		return null;
-	}
+		public static Bounds GetBoundingBoxBounds (BoundingBoxAttachment boundingBox, float depth = 0) {
+			float[] floats = boundingBox.Vertices;
+			int floatCount = floats.Length;
 
-	public static PolygonCollider2D AddBoundingBoxAsComponent (BoundingBoxAttachment boundingBox, GameObject gameObject, bool isTrigger = true) {
-		if (boundingBox == null)
-			return null;
+			Bounds bounds = new Bounds();
 
-		var collider = gameObject.AddComponent<PolygonCollider2D>();
-		collider.isTrigger = isTrigger;
-		float[] floats = boundingBox.Vertices;
-		int floatCount = floats.Length;
-		int vertCount = floatCount / 2;
+			bounds.center = new Vector3(floats[0], floats[1], 0);
+			for (int i = 2; i < floatCount; i += 2) {
+				bounds.Encapsulate(new Vector3(floats[i], floats[i + 1], 0));
+			}
+			Vector3 size = bounds.size;
+			size.z = depth;
+			bounds.size = size;
 
-		Vector2[] verts = new Vector2[vertCount];
-		int v = 0;
-		for (int i = 0; i < floatCount; i += 2, v++) {
-			verts[v].x = floats[i];
-			verts[v].y = floats[i + 1];
+			return bounds;
 		}
 
-		collider.SetPath(0, verts);
+		public delegate void SkeletonUtilityDelegate ();
 
-		return collider;
-	}
+		public event SkeletonUtilityDelegate OnReset;
 
-	public static Bounds GetBoundingBoxBounds (BoundingBoxAttachment boundingBox, float depth = 0) {
-		float[] floats = boundingBox.Vertices;
-		int floatCount = floats.Length;
+		public Transform boneRoot;
 
-		Bounds bounds = new Bounds();
+		void Update () {
+			if (boneRoot != null && skeletonRenderer.skeleton != null) {
+				Vector3 flipScale = Vector3.one;
+				if (skeletonRenderer.skeleton.FlipX)
+					flipScale.x = -1;
 
-		bounds.center = new Vector3(floats[0], floats[1], 0);
-		for (int i = 2; i < floatCount; i += 2) {
-			bounds.Encapsulate(new Vector3(floats[i], floats[i + 1], 0));
-		}
-		Vector3 size = bounds.size;
-		size.z = depth;
-		bounds.size = size;
+				if (skeletonRenderer.skeleton.FlipY)
+					flipScale.y = -1;
 
-		return bounds;
-	}
-
-	public delegate void SkeletonUtilityDelegate ();
-
-	public event SkeletonUtilityDelegate OnReset;
-
-	public Transform boneRoot;
-
-	void Update () {
-		if (boneRoot != null && skeletonRenderer.skeleton != null) {
-			Vector3 flipScale = Vector3.one;
-			if (skeletonRenderer.skeleton.FlipX)
-				flipScale.x = -1;
-
-			if (skeletonRenderer.skeleton.FlipY)
-				flipScale.y = -1;
-
-			boneRoot.localScale = flipScale;
-		}
-	}
-
-	[HideInInspector]
-	public SkeletonRenderer skeletonRenderer;
-	[HideInInspector]
-	public ISkeletonAnimation skeletonAnimation;
-	[System.NonSerialized]
-	public List<SkeletonUtilityBone> utilityBones = new List<SkeletonUtilityBone>();
-	[System.NonSerialized]
-	public List<SkeletonUtilityConstraint> utilityConstraints = new List<SkeletonUtilityConstraint>();
-	//	Dictionary<Bone, SkeletonUtilityBone> utilityBoneTable;
-
-	protected bool hasTransformBones;
-	protected bool hasUtilityConstraints;
-	protected bool needToReprocessBones;
-
-	void OnEnable () {
-		if (skeletonRenderer == null) {
-			skeletonRenderer = GetComponent<SkeletonRenderer>();
+				boneRoot.localScale = flipScale;
+			}
 		}
 
-		if (skeletonAnimation == null) {
-			skeletonAnimation = GetComponent<SkeletonAnimation>();
-			if (skeletonAnimation == null)
-				skeletonAnimation = GetComponent<SkeletonAnimator>();
-		}
+		[HideInInspector]
+		public SkeletonRenderer skeletonRenderer;
+		[HideInInspector]
+		public ISkeletonAnimation skeletonAnimation;
+		[System.NonSerialized]
+		public List<SkeletonUtilityBone> utilityBones = new List<SkeletonUtilityBone>();
+		[System.NonSerialized]
+		public List<SkeletonUtilityConstraint> utilityConstraints = new List<SkeletonUtilityConstraint>();
+		//	Dictionary<Bone, SkeletonUtilityBone> utilityBoneTable;
 
-		skeletonRenderer.OnRebuild -= HandleRendererReset;
-		skeletonRenderer.OnRebuild += HandleRendererReset;
+		protected bool hasTransformBones;
+		protected bool hasUtilityConstraints;
+		protected bool needToReprocessBones;
 
-		if (skeletonAnimation != null) {
-			skeletonAnimation.UpdateLocal -= UpdateLocal;
-			skeletonAnimation.UpdateLocal += UpdateLocal;
-		}
-
-
-		CollectBones();
-	}
-
-	void Start () {
-		//recollect because order of operations failure when switching between game mode and edit mode...
-		//		CollectBones();
-	}
-
-	void OnDisable () {
-		skeletonRenderer.OnRebuild -= HandleRendererReset;
-
-		if (skeletonAnimation != null) {
-			skeletonAnimation.UpdateLocal -= UpdateLocal;
-			skeletonAnimation.UpdateWorld -= UpdateWorld;
-			skeletonAnimation.UpdateComplete -= UpdateComplete;
-		}
-	}
-
-	void HandleRendererReset (SkeletonRenderer r) {
-		if (OnReset != null)
-			OnReset();
-
-		CollectBones();
-	}
-
-	public void RegisterBone (SkeletonUtilityBone bone) {
-		if (utilityBones.Contains(bone))
-			return;
-		else {
-			utilityBones.Add(bone);
-			needToReprocessBones = true;
-		}
-	}
-
-	public void UnregisterBone (SkeletonUtilityBone bone) {
-		utilityBones.Remove(bone);
-	}
-
-	public void RegisterConstraint (SkeletonUtilityConstraint constraint) {
-
-		if (utilityConstraints.Contains(constraint))
-			return;
-		else {
-			utilityConstraints.Add(constraint);
-			needToReprocessBones = true;
-		}
-	}
-
-	public void UnregisterConstraint (SkeletonUtilityConstraint constraint) {
-		utilityConstraints.Remove(constraint);
-	}
-
-	public void CollectBones () {
-		if (skeletonRenderer.skeleton == null)
-			return;
-
-		if (boneRoot != null) {
-			List<string> constraintTargetNames = new List<string>();
-
-			ExposedList<IkConstraint> ikConstraints = skeletonRenderer.skeleton.IkConstraints;
-			for (int i = 0, n = ikConstraints.Count; i < n; i++)
-				constraintTargetNames.Add(ikConstraints.Items[i].Target.Data.Name);
-
-			foreach (var b in utilityBones) {
-				if (b.bone == null) {
-					return;
-				}
-				if (b.mode == SkeletonUtilityBone.Mode.Override) {
-					hasTransformBones = true;
-				}
-
-				if (constraintTargetNames.Contains(b.bone.Data.Name)) {
-					hasUtilityConstraints = true;
-				}
+		void OnEnable () {
+			if (skeletonRenderer == null) {
+				skeletonRenderer = GetComponent<SkeletonRenderer>();
 			}
 
-			if (utilityConstraints.Count > 0)
-				hasUtilityConstraints = true;
+			if (skeletonAnimation == null) {
+				skeletonAnimation = GetComponent<SkeletonAnimation>();
+				if (skeletonAnimation == null)
+					skeletonAnimation = GetComponent<SkeletonAnimator>();
+			}
+
+			skeletonRenderer.OnRebuild -= HandleRendererReset;
+			skeletonRenderer.OnRebuild += HandleRendererReset;
 
 			if (skeletonAnimation != null) {
-				skeletonAnimation.UpdateWorld -= UpdateWorld;
-				skeletonAnimation.UpdateComplete -= UpdateComplete;
-
-				if (hasTransformBones || hasUtilityConstraints) {
-					skeletonAnimation.UpdateWorld += UpdateWorld;
-				}
-
-				if (hasUtilityConstraints) {
-					skeletonAnimation.UpdateComplete += UpdateComplete;
-				}
+				skeletonAnimation.UpdateLocal -= UpdateLocal;
+				skeletonAnimation.UpdateLocal += UpdateLocal;
 			}
 
-			needToReprocessBones = false;
-		} else {
-			utilityBones.Clear();
-			utilityConstraints.Clear();
-		}
 
-	}
-
-	void UpdateLocal (ISkeletonAnimation anim) {
-
-		if (needToReprocessBones)
-			CollectBones();
-
-		if (utilityBones == null)
-			return;
-
-		foreach (SkeletonUtilityBone b in utilityBones) {
-			b.transformLerpComplete = false;
-		}
-
-		UpdateAllBones();
-	}
-
-	void UpdateWorld (ISkeletonAnimation anim) {
-		UpdateAllBones();
-
-		foreach (SkeletonUtilityConstraint c in utilityConstraints)
-			c.DoUpdate();
-	}
-
-	void UpdateComplete (ISkeletonAnimation anim) {
-		UpdateAllBones();
-	}
-
-	void UpdateAllBones () {
-		if (boneRoot == null) {
 			CollectBones();
 		}
 
-		if (utilityBones == null)
-			return;
-
-		foreach (SkeletonUtilityBone b in utilityBones) {
-			b.DoUpdate();
+		void Start () {
+			//recollect because order of operations failure when switching between game mode and edit mode...
+			//		CollectBones();
 		}
-	}
 
-	public Transform GetBoneRoot () {
-		if (boneRoot != null)
+		void OnDisable () {
+			skeletonRenderer.OnRebuild -= HandleRendererReset;
+
+			if (skeletonAnimation != null) {
+				skeletonAnimation.UpdateLocal -= UpdateLocal;
+				skeletonAnimation.UpdateWorld -= UpdateWorld;
+				skeletonAnimation.UpdateComplete -= UpdateComplete;
+			}
+		}
+
+		void HandleRendererReset (SkeletonRenderer r) {
+			if (OnReset != null)
+				OnReset();
+
+			CollectBones();
+		}
+
+		public void RegisterBone (SkeletonUtilityBone bone) {
+			if (utilityBones.Contains(bone))
+				return;
+			else {
+				utilityBones.Add(bone);
+				needToReprocessBones = true;
+			}
+		}
+
+		public void UnregisterBone (SkeletonUtilityBone bone) {
+			utilityBones.Remove(bone);
+		}
+
+		public void RegisterConstraint (SkeletonUtilityConstraint constraint) {
+
+			if (utilityConstraints.Contains(constraint))
+				return;
+			else {
+				utilityConstraints.Add(constraint);
+				needToReprocessBones = true;
+			}
+		}
+
+		public void UnregisterConstraint (SkeletonUtilityConstraint constraint) {
+			utilityConstraints.Remove(constraint);
+		}
+
+		public void CollectBones () {
+			if (skeletonRenderer.skeleton == null)
+				return;
+
+			if (boneRoot != null) {
+				List<string> constraintTargetNames = new List<string>();
+
+				ExposedList<IkConstraint> ikConstraints = skeletonRenderer.skeleton.IkConstraints;
+				for (int i = 0, n = ikConstraints.Count; i < n; i++)
+					constraintTargetNames.Add(ikConstraints.Items[i].Target.Data.Name);
+
+				foreach (var b in utilityBones) {
+					if (b.bone == null) {
+						return;
+					}
+					if (b.mode == SkeletonUtilityBone.Mode.Override) {
+						hasTransformBones = true;
+					}
+
+					if (constraintTargetNames.Contains(b.bone.Data.Name)) {
+						hasUtilityConstraints = true;
+					}
+				}
+
+				if (utilityConstraints.Count > 0)
+					hasUtilityConstraints = true;
+
+				if (skeletonAnimation != null) {
+					skeletonAnimation.UpdateWorld -= UpdateWorld;
+					skeletonAnimation.UpdateComplete -= UpdateComplete;
+
+					if (hasTransformBones || hasUtilityConstraints) {
+						skeletonAnimation.UpdateWorld += UpdateWorld;
+					}
+
+					if (hasUtilityConstraints) {
+						skeletonAnimation.UpdateComplete += UpdateComplete;
+					}
+				}
+
+				needToReprocessBones = false;
+			} else {
+				utilityBones.Clear();
+				utilityConstraints.Clear();
+			}
+
+		}
+
+		void UpdateLocal (ISkeletonAnimation anim) {
+
+			if (needToReprocessBones)
+				CollectBones();
+
+			if (utilityBones == null)
+				return;
+
+			foreach (SkeletonUtilityBone b in utilityBones) {
+				b.transformLerpComplete = false;
+			}
+
+			UpdateAllBones();
+		}
+
+		void UpdateWorld (ISkeletonAnimation anim) {
+			UpdateAllBones();
+
+			foreach (SkeletonUtilityConstraint c in utilityConstraints)
+				c.DoUpdate();
+		}
+
+		void UpdateComplete (ISkeletonAnimation anim) {
+			UpdateAllBones();
+		}
+
+		void UpdateAllBones () {
+			if (boneRoot == null) {
+				CollectBones();
+			}
+
+			if (utilityBones == null)
+				return;
+
+			foreach (SkeletonUtilityBone b in utilityBones) {
+				b.DoUpdate();
+			}
+		}
+
+		public Transform GetBoneRoot () {
+			if (boneRoot != null)
+				return boneRoot;
+
+			boneRoot = new GameObject("SkeletonUtility-Root").transform;
+			boneRoot.parent = transform;
+			boneRoot.localPosition = Vector3.zero;
+			boneRoot.localRotation = Quaternion.identity;
+			boneRoot.localScale = Vector3.one;
+
 			return boneRoot;
-
-		boneRoot = new GameObject("SkeletonUtility-Root").transform;
-		boneRoot.parent = transform;
-		boneRoot.localPosition = Vector3.zero;
-		boneRoot.localRotation = Quaternion.identity;
-		boneRoot.localScale = Vector3.one;
-
-		return boneRoot;
-	}
-
-	public GameObject SpawnRoot (SkeletonUtilityBone.Mode mode, bool pos, bool rot, bool sca) {
-		GetBoneRoot();
-		Skeleton skeleton = this.skeletonRenderer.skeleton;
-
-		GameObject go = SpawnBone(skeleton.RootBone, boneRoot, mode, pos, rot, sca);
-
-		CollectBones();
-
-		return go;
-	}
-
-	public GameObject SpawnHierarchy (SkeletonUtilityBone.Mode mode, bool pos, bool rot, bool sca) {
-		GetBoneRoot();
-
-		Skeleton skeleton = this.skeletonRenderer.skeleton;
-
-		GameObject go = SpawnBoneRecursively(skeleton.RootBone, boneRoot, mode, pos, rot, sca);
-
-		CollectBones();
-
-		return go;
-	}
-
-	public GameObject SpawnBoneRecursively (Bone bone, Transform parent, SkeletonUtilityBone.Mode mode, bool pos, bool rot, bool sca) {
-		GameObject go = SpawnBone(bone, parent, mode, pos, rot, sca);
-
-		ExposedList<Bone> childrenBones = bone.Children;
-		for (int i = 0, n = childrenBones.Count; i < n; i++) {
-			Bone child = childrenBones.Items[i];
-			SpawnBoneRecursively(child, go.transform, mode, pos, rot, sca);
 		}
 
-		return go;
-	}
+		public GameObject SpawnRoot (SkeletonUtilityBone.Mode mode, bool pos, bool rot, bool sca) {
+			GetBoneRoot();
+			Skeleton skeleton = this.skeletonRenderer.skeleton;
 
-	public GameObject SpawnBone (Bone bone, Transform parent, SkeletonUtilityBone.Mode mode, bool pos, bool rot, bool sca) {
-		GameObject go = new GameObject(bone.Data.Name);
-		go.transform.parent = parent;
+			GameObject go = SpawnBone(skeleton.RootBone, boneRoot, mode, pos, rot, sca);
 
-		SkeletonUtilityBone b = go.AddComponent<SkeletonUtilityBone>();
-		b.skeletonUtility = this;
-		b.position = pos;
-		b.rotation = rot;
-		b.scale = sca;
-		b.mode = mode;
-		b.zPosition = true;
-		b.Reset();
-		b.bone = bone;
-		b.boneName = bone.Data.Name;
-		b.valid = true;
+			CollectBones();
 
-		if (mode == SkeletonUtilityBone.Mode.Override) {
-			if (rot)
-				go.transform.localRotation = Quaternion.Euler(0, 0, b.bone.AppliedRotation);
-
-			if (pos)
-				go.transform.localPosition = new Vector3(b.bone.X, b.bone.Y, 0);
-
-			go.transform.localScale = new Vector3(b.bone.scaleX, b.bone.scaleY, 0);
+			return go;
 		}
 
-		return go;
-	}
+		public GameObject SpawnHierarchy (SkeletonUtilityBone.Mode mode, bool pos, bool rot, bool sca) {
+			GetBoneRoot();
 
-	public void SpawnSubRenderers (bool disablePrimaryRenderer) {
-		int submeshCount = GetComponent<MeshFilter>().sharedMesh.subMeshCount;
+			Skeleton skeleton = this.skeletonRenderer.skeleton;
 
-		for (int i = 0; i < submeshCount; i++) {
-			GameObject go = new GameObject("Submesh " + i, typeof(MeshFilter), typeof(MeshRenderer));
-			go.transform.parent = transform;
-			go.transform.localPosition = Vector3.zero;
-			go.transform.localRotation = Quaternion.identity;
-			go.transform.localScale = Vector3.one;
+			GameObject go = SpawnBoneRecursively(skeleton.RootBone, boneRoot, mode, pos, rot, sca);
 
-			SkeletonUtilitySubmeshRenderer s = go.AddComponent<SkeletonUtilitySubmeshRenderer>();
-			s.GetComponent<Renderer>().sortingOrder = i * 10;
-			s.submeshIndex = i;
+			CollectBones();
+
+			return go;
 		}
 
-		skeletonRenderer.CollectSubmeshRenderers();
+		public GameObject SpawnBoneRecursively (Bone bone, Transform parent, SkeletonUtilityBone.Mode mode, bool pos, bool rot, bool sca) {
+			GameObject go = SpawnBone(bone, parent, mode, pos, rot, sca);
 
-		if (disablePrimaryRenderer)
-			GetComponent<Renderer>().enabled = false;
+			ExposedList<Bone> childrenBones = bone.Children;
+			for (int i = 0, n = childrenBones.Count; i < n; i++) {
+				Bone child = childrenBones.Items[i];
+				SpawnBoneRecursively(child, go.transform, mode, pos, rot, sca);
+			}
+
+			return go;
+		}
+
+		public GameObject SpawnBone (Bone bone, Transform parent, SkeletonUtilityBone.Mode mode, bool pos, bool rot, bool sca) {
+			GameObject go = new GameObject(bone.Data.Name);
+			go.transform.parent = parent;
+
+			SkeletonUtilityBone b = go.AddComponent<SkeletonUtilityBone>();
+			b.skeletonUtility = this;
+			b.position = pos;
+			b.rotation = rot;
+			b.scale = sca;
+			b.mode = mode;
+			b.zPosition = true;
+			b.Reset();
+			b.bone = bone;
+			b.boneName = bone.Data.Name;
+			b.valid = true;
+
+			if (mode == SkeletonUtilityBone.Mode.Override) {
+				if (rot)
+					go.transform.localRotation = Quaternion.Euler(0, 0, b.bone.AppliedRotation);
+
+				if (pos)
+					go.transform.localPosition = new Vector3(b.bone.X, b.bone.Y, 0);
+
+				go.transform.localScale = new Vector3(b.bone.scaleX, b.bone.scaleY, 0);
+			}
+
+			return go;
+		}
+
 	}
+
 }

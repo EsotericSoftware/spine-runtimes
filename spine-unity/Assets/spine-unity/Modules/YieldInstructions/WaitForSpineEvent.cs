@@ -37,7 +37,7 @@ using UnityEngine;
 using System.Collections;
 using Spine;
 
-namespace Spine {
+namespace Spine.Unity {
 	/// <summary>
 	/// Use this as a condition-blocking yield instruction for Unity Coroutines. 
 	/// The routine will pause until the AnimationState fires an event matching the given event name or EventData reference.</summary>

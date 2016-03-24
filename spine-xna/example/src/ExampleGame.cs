@@ -125,7 +125,7 @@ namespace Spine {
 			}
 
 			skeleton.X = 400;
-			skeleton.Y = 590;
+			skeleton.Y = 690;
 			skeleton.UpdateWorldTransform();
 
 			headSlot = skeleton.FindSlot("head");
@@ -136,13 +136,11 @@ namespace Spine {
 		}
 
 		protected override void Update (GameTime gameTime) {
-			// Allows the game to exit
-#if !WINDOWS_STOREAPP	
-			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-				this.Exit();
-#endif
 			// TODO: Add your update logic here
-
+#if (!WINDOWS_STOREAPP || WINDOWS_PHONE81) && !IOS	
+			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+					this.Exit();
+#endif
 			base.Update(gameTime);
 		}
 

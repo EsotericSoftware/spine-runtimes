@@ -28,52 +28,22 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
 using UnityEngine;
 using UnityEditor;
-using System;
-using System.Collections;
-using System.Reflection;
+using Spine.Unity.Editor;
 
-[CustomEditor(typeof(SkeletonUtilitySubmeshRenderer))]
-public class SkeletonUtilitySubmeshRendererInspector : Editor {
+namespace Spine.Unity.Modules {
+	[CustomEditor(typeof(SkeletonUtilitySubmeshRenderer))]
+	public class SkeletonUtilitySubmeshRendererInspector : UnityEditor.Editor {
+		public SpineInspectorUtility.SerializedSortingProperties sorting;
 
-	private static MethodInfo EditorGUILayoutSortingLayerField;
-	protected SerializedObject rendererSerializedObject;
-	protected SerializedProperty sortingLayerIDProperty;
+		void OnEnable () {			
+			sorting = new SpineInspectorUtility.SerializedSortingProperties((target as Component).GetComponent<Renderer>());
+		}
 
-	SkeletonUtilitySubmeshRenderer component;
-
-	void OnEnable () {
-		component = (SkeletonUtilitySubmeshRenderer)target;
-
-		if (EditorGUILayoutSortingLayerField == null)
-			EditorGUILayoutSortingLayerField = typeof(EditorGUILayout).GetMethod("SortingLayerField", BindingFlags.Static | BindingFlags.NonPublic, null, new Type[] { typeof(GUIContent), typeof(SerializedProperty), typeof(GUIStyle) }, null);
-
-		rendererSerializedObject = new SerializedObject(((SkeletonUtilitySubmeshRenderer)target).GetComponent<Renderer>());
-		sortingLayerIDProperty = rendererSerializedObject.FindProperty("m_SortingLayerID");
-	}
-
-	public override void OnInspectorGUI () {
-		// Sorting Layers
-		{
-			var renderer = component.GetComponent<Renderer>();
-			if (renderer != null) {
-				EditorGUI.BeginChangeCheck();
-
-				if (EditorGUILayoutSortingLayerField != null && sortingLayerIDProperty != null) {
-					EditorGUILayoutSortingLayerField.Invoke(null, new object[] { new GUIContent("Sorting Layer"), sortingLayerIDProperty, EditorStyles.popup });
-				} else {
-					renderer.sortingLayerID = EditorGUILayout.IntField("Sorting Layer ID", renderer.sortingLayerID);
-				}
-
-				renderer.sortingOrder = EditorGUILayout.IntField("Order in Layer", renderer.sortingOrder);
-
-				if (EditorGUI.EndChangeCheck()) {
-					rendererSerializedObject.ApplyModifiedProperties();
-					EditorUtility.SetDirty(renderer);
-				}
-			}
+		public override void OnInspectorGUI () {
+			EditorGUILayout.HelpBox("SkeletonUtilitySubmeshRenderer is now obsolete. We recommend using SkeletonRenderSeparator.", MessageType.Info);
+			SpineInspectorUtility.SortingPropertyFields(sorting, true);
 		}
 	}
 }
