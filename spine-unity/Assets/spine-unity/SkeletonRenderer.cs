@@ -31,6 +31,7 @@
 #define SPINE_OPTIONAL_NORMALS
 #define SPINE_OPTIONAL_FRONTFACING
 #define SPINE_OPTIONAL_RENDEROVERRIDE
+#define SPINE_OPTIONAL_MATERIALOVERRIDE
 //#define SPINE_OPTIONAL_SUBMESHRENDERER // Deprecated
 
 using System;
@@ -96,29 +97,31 @@ namespace Spine.Unity {
 		private Spine.Unity.Modules.SkeletonUtilitySubmeshRenderer[] submeshRenderers;
 		#endif
 
+		#if SPINE_OPTIONAL_MATERIALOVERRIDE
+		[System.NonSerialized] readonly Dictionary<Material, Material> customMaterialOverride = new Dictionary<Material, Material>();
+		public Dictionary<Material, Material> CustomMaterialOverride { get { return customMaterialOverride; } }
+		#endif
+
 		// Custom Slot Material
 		[System.NonSerialized] readonly Dictionary<Slot, Material> customSlotMaterials = new Dictionary<Slot, Material>();
 		public Dictionary<Slot, Material> CustomSlotMaterials { get { return customSlotMaterials; } }
 		#endregion
 
-		[System.NonSerialized] public bool valid;
-		[System.NonSerialized] public Skeleton skeleton;
-
 		MeshRenderer meshRenderer;
 		MeshFilter meshFilter;
+
+		[System.NonSerialized] public bool valid;
+		[System.NonSerialized] public Skeleton skeleton;
 
 		Spine.Unity.DoubleBuffered<SkeletonRenderer.SmartMesh> doubleBufferedMesh;
 		readonly SmartMesh.Instruction currentInstructions = new SmartMesh.Instruction();
 		readonly ExposedList<SubmeshTriangleBuffer> submeshes = new ExposedList<SubmeshTriangleBuffer>();
-
+		readonly ExposedList<Material> submeshMaterials = new ExposedList<Material>();
+		Material[] sharedMaterials = new Material[0];
 		float[] tempVertices = new float[8];
 		Vector3[] vertices;
 		Color32[] colors;
 		Vector2[] uvs;
-
-		readonly ExposedList<Material> submeshMaterials = new ExposedList<Material>();
-		Material[] sharedMaterials = new Material[0];
-
 		#if SPINE_OPTIONAL_NORMALS
 		Vector3[] normals;
 		Vector4[] tangents;
@@ -254,7 +257,7 @@ namespace Spine.Unity {
 			var workingSubmeshInstructions = workingInstruction.submeshInstructions;	// Items array should not be cached. There is dynamic writing to this list.
 			workingSubmeshInstructions.Clear(false);
 
-			bool isCustomMaterialsPopulated = customSlotMaterials.Count > 0;
+			bool isCustomSlotMaterialsPopulated = customSlotMaterials.Count > 0;
 
 			int vertexCount = 0;
 			int submeshVertexCount = 0;
@@ -302,7 +305,7 @@ namespace Spine.Unity {
 				// Material material = (Material)((AtlasRegion)rendererObject).page.rendererObject; // For no customSlotMaterials
 
 				Material material;
-				if (isCustomMaterialsPopulated) {
+				if (isCustomSlotMaterialsPopulated) {
 					if (!customSlotMaterials.TryGetValue(slot, out material)) {
 						material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
 					}
@@ -358,6 +361,24 @@ namespace Spine.Unity {
 			workingInstruction.immutableTriangles = this.immutableTriangles;
 			#if SPINE_OPTIONAL_FRONTFACING
 			workingInstruction.frontFacing = this.frontFacing;
+			#endif
+
+			// STEP 1.9. Post-process workingInstructions.
+
+			#if SPINE_OPTIONAL_MATERIALOVERRIDE
+			// Material overrides are done here so they can be applied per submesh instead of per slot
+			// but they will still be passed through the GenerateMeshOverride delegate,
+			// and will still go through the normal material match check step in STEP 3.
+			if (customMaterialOverride.Count > 0) { // isCustomMaterialOverridePopulated 
+				var workingSubmeshInstructionsItems = workingSubmeshInstructions.Items;
+				for (int i = 0; i < workingSubmeshInstructions.Count; i++) {
+					var m = workingSubmeshInstructionsItems[i].material;
+					Material mo;
+					if (customMaterialOverride.TryGetValue(m, out mo)) {
+						workingSubmeshInstructionsItems[i].material = mo;
+					}
+				}
+			}
 			#endif
 
 			#if SPINE_OPTIONAL_RENDEROVERRIDE
@@ -616,6 +637,11 @@ namespace Spine.Unity {
 			currentMesh.vertices = vertices;
 			currentMesh.colors32 = colors;
 			currentMesh.uv = uvs;
+
+			Vector3 meshBoundsExtents = meshBoundsMax - meshBoundsMin;
+			Vector3 meshBoundsCenter = meshBoundsMin + meshBoundsExtents * 0.5f;
+			currentMesh.bounds = new Bounds(meshBoundsCenter, meshBoundsExtents);
+
 			var currentSmartMeshInstructionUsed = currentSmartMesh.instructionUsed;
 			#if SPINE_OPTIONAL_NORMALS
 			if (currentSmartMeshInstructionUsed.vertexCount < vertexCount) {
@@ -659,10 +685,6 @@ namespace Spine.Unity {
 				for (int i = 0; i < submeshCount; ++i)
 					currentMesh.SetTriangles(submeshes.Items[i].triangles, i);
 			}
-
-			Vector3 meshBoundsExtents = meshBoundsMax - meshBoundsMin;
-			Vector3 meshBoundsCenter = meshBoundsMin + meshBoundsExtents * 0.5f;
-			currentMesh.bounds = new Bounds(meshBoundsCenter, meshBoundsExtents);
 
 			// CheckIfMustUpdateMaterialArray (last pushed materials vs currently parsed materials)
 			// Needs to check against the Working Submesh Instructions Materials instead of the cached submeshMaterials.
