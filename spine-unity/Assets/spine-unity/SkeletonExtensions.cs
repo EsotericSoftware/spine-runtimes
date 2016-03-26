@@ -132,6 +132,88 @@ namespace Spine.Unity {
 			for (int i = 0, n = skeleton.slots.Count; i < n; i++)
 				drawOrder.Add(slotsItems[i]);
 		}
+
+		/// <summary>Resets the color of a slot to Setup Pose value.</summary>
+		public static void SetColorToSetupPose (this Slot slot) {
+			slot.r = slot.data.r;
+			slot.g = slot.data.g;
+			slot.b = slot.data.b;
+			slot.a = slot.data.a;
+		}
+
+		/// <summary>Sets a slot's attachment to setup pose. If you have the slotIndex, Skeleton.SetSlotAttachmentToSetupPose is faster.</summary>
+		public static void SetAttachmentToSetupPose (this Slot slot) {
+			var slotData = slot.data;
+			slot.Attachment = slot.bone.skeleton.GetAttachment(slotData.name, slotData.attachmentName);
+		}
+
+		/// <summary>Resets the attachment of slot at a given slotIndex to setup pose. This is faster than Slot.SetAttachmentToSetupPose.</summary>
+		public static void SetSlotAttachmentToSetupPose (this Skeleton skeleton, int slotIndex) {
+			var slot = skeleton.slots.Items[slotIndex];
+			var attachment = skeleton.GetAttachment(slotIndex, slot.data.attachmentName);
+			slot.Attachment = attachment;
+		}
+
+		/// <summary>Resets Skeleton parts to Setup Pose according to a Spine.Animation's keyed items.</summary>
+		public static void SetKeyedItemsToSetupPose (this Animation animation, Skeleton skeleton) {
+			var timelinesItems = animation.timelines.Items;
+			for (int i = 0, n = timelinesItems.Length; i < n; i++)
+				timelinesItems[i].SetToSetupPose(skeleton);
+		}
+
+		// For each timeline type.
+		// Timelines know how to apply themselves based on skeleton data; They should know how to reset the skeleton back to skeleton data?
+		public static void SetToSetupPose (this Timeline timeline, Skeleton skeleton) {
+			if (timeline != null) {
+				// sorted according to assumed likelihood here
+
+				// Bone stuff
+				if (timeline is RotateTimeline) {
+					var bone = skeleton.bones.Items[((RotateTimeline)timeline).boneIndex];
+					bone.rotation = bone.data.rotation;
+				} else if (timeline is TranslateTimeline) {
+					var bone = skeleton.bones.Items[((TranslateTimeline)timeline).boneIndex];
+					bone.x = bone.data.x;
+					bone.y = bone.data.y;
+				} else if (timeline is ScaleTimeline) {
+					var bone = skeleton.bones.Items[((ScaleTimeline)timeline).boneIndex];
+					bone.scaleX = bone.data.scaleX;
+					bone.scaleY = bone.data.scaleY;
+
+
+				// Attachment stuff. How do you reset FFD?
+				} else if (timeline is FFDTimeline) {
+					var slot = skeleton.slots.Items[((FFDTimeline)timeline).slotIndex];
+					slot.attachmentVerticesCount = 0;	// This causes (Weighted)MeshAttachment.ComputeWorldVertices to use its internal(stateless) vertex array.
+					//slot.attachmentTime = bone.skeleton.time; // Currently inconsequential. (Spine 3.1)
+				
+				// Slot stuff. This is heavy to do every frame. Maybe not do it?
+				} else if (timeline is AttachmentTimeline) {
+					skeleton.SetSlotAttachmentToSetupPose(((AttachmentTimeline)timeline).slotIndex);
+
+				} else if (timeline is ColorTimeline) {
+					skeleton.slots.Items[((ColorTimeline)timeline).slotIndex].SetColorToSetupPose();
+
+
+				// Constraint Stuff
+				} else if (timeline is IkConstraintTimeline) {
+					var ikTimeline = (IkConstraintTimeline)timeline;
+					var ik = skeleton.ikConstraints.Items[ikTimeline.ikConstraintIndex];
+					var data = ik.data;
+					ik.bendDirection = data.bendDirection;
+					ik.mix = data.mix;
+
+				// Skeleton stuff. Skeleton.SetDrawOrderToSetupPose. This is heavy to do every frame. Maybe not do it?
+				} else if (timeline is DrawOrderTimeline) {
+					skeleton.SetDrawOrderToSetupPose();
+
+
+				}
+
+			}
+
+
+		}
 		#endregion
 	}
 }
