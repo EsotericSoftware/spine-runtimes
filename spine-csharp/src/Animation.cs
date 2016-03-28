@@ -582,10 +582,9 @@ namespace Spine {
 			int vertexCount = frameVertices[0].Length;
 
 			float[] vertices = slot.attachmentVertices;
+			if (slot.attachmentVerticesCount != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
 
-			// Don't mix from uninitialized slot vertices.
-			if (slot.attachmentVerticesCount == 0 || vertices.Length != vertexCount) alpha = 1; 
-
+			// Ensure capacity
 			if (vertices.Length < vertexCount) {
 				vertices = new float[vertexCount];
 				slot.attachmentVertices = vertices;
