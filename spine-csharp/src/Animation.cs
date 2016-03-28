@@ -582,11 +582,14 @@ namespace Spine {
 			int vertexCount = frameVertices[0].Length;
 
 			float[] vertices = slot.attachmentVertices;
+
+			// Don't mix from uninitialized slot vertices.
+			if (slot.attachmentVerticesCount == 0 || vertices.Length != vertexCount) alpha = 1; 
+
 			if (vertices.Length < vertexCount) {
 				vertices = new float[vertexCount];
 				slot.attachmentVertices = vertices;
 			}
-			if (vertices.Length != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
 			slot.attachmentVerticesCount = vertexCount;
 
 			if (time >= frames[frames.Length - 1]) { // Time is after last frame.
