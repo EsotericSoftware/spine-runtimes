@@ -651,7 +651,7 @@ void spDrawOrderTimeline_setFrame (spDrawOrderTimeline* self, int frameIndex, fl
 
 void _spFFDTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 		int* eventsCount, float alpha) {
-	int frameIndex, i;
+	int frameIndex, i, vertexCount;
 	float percent, frameTime;
 	const float* prevVertices;
 	const float* nextVertices;
@@ -662,24 +662,25 @@ void _spFFDTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, flo
 
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
-	if (slot->attachmentVerticesCount < self->frameVerticesCount) {
-		if (slot->attachmentVerticesCapacity < self->frameVerticesCount) {
+	vertexCount = self->frameVerticesCount;
+	if (slot->attachmentVerticesCount < vertexCount) {
+		if (slot->attachmentVerticesCapacity < vertexCount) {
 			FREE(slot->attachmentVertices);
-			slot->attachmentVertices = MALLOC(float, self->frameVerticesCount);
-			slot->attachmentVerticesCapacity = self->frameVerticesCount;
+			slot->attachmentVertices = MALLOC(float, vertexCount);
+			slot->attachmentVerticesCapacity = vertexCount;
 		}
 	}
-	if (slot->attachmentVerticesCount != self->frameVerticesCount) alpha = 1; /* Don't mix from uninitialized slot vertices. */
-	slot->attachmentVerticesCount = self->frameVerticesCount;
+	if (slot->attachmentVerticesCount != vertexCount) alpha = 1; /* Don't mix from uninitialized slot vertices. */
+	slot->attachmentVerticesCount = vertexCount;
 
 	if (time >= self->frames[self->framesCount - 1]) {
 		/* Time is after last frame. */
 		const float* lastVertices = self->frameVertices[self->framesCount - 1];
 		if (alpha < 1) {
-			for (i = 0; i < self->frameVerticesCount; ++i)
+			for (i = 0; i < vertexCount; ++i)
 				slot->attachmentVertices[i] += (lastVertices[i] - slot->attachmentVertices[i]) * alpha;
 		} else
-			memcpy(slot->attachmentVertices, lastVertices, self->frameVerticesCount * sizeof(float));
+			memcpy(slot->attachmentVertices, lastVertices, vertexCount * sizeof(float));
 		return;
 	}
 
@@ -693,12 +694,12 @@ void _spFFDTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, flo
 	nextVertices = self->frameVertices[frameIndex];
 
 	if (alpha < 1) {
-		for (i = 0; i < self->frameVerticesCount; ++i) {
+		for (i = 0; i < vertexCount; ++i) {
 			float prev = prevVertices[i];
 			slot->attachmentVertices[i] += (prev + (nextVertices[i] - prev) * percent - slot->attachmentVertices[i]) * alpha;
 		}
 	} else {
-		for (i = 0; i < self->frameVerticesCount; ++i) {
+		for (i = 0; i < vertexCount; ++i) {
 			float prev = prevVertices[i];
 			slot->attachmentVertices[i] = prev + (nextVertices[i] - prev) * percent;
 		}
