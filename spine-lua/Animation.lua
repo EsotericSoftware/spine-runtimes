@@ -612,11 +612,11 @@ function Animation.FfdTimeline.new ()
 		local frameVertices = self.frameVertices
 		local vertexCount = #frameVertices[0]
 		local vertices = slot.attachmentVertices
-		if not vertices or #vertices < vertexCount then
-			vertices = {}
-			slot.attachmentVertices = vertices
-		end
-		if #vertices ~= vertexCount then
+		if not vertices or #vertices ~= vertexCount then
+			if #vertices < vertexCount then
+				vertices = {}
+				slot.attachmentVertices = vertices
+			end
 			alpha = 1 -- Don't mix from uninitialized slot vertices.
 		end
 		slot.attachmentVerticesCount = vertexCount
