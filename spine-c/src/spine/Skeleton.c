@@ -143,27 +143,36 @@ void spSkeleton_updateCache (const spSkeleton* self) {
 
 	FREE(internal->updateCache);
 	FREE(internal->updateCacheType);
-	internal->updateCache = MALLOC(void*, self->bonesCount + self->transformConstraintsCount + self->ikConstraintsCount);
-	internal->updateCacheType = MALLOC(_spUpdateType, self->bonesCount + self->transformConstraintsCount + self->ikConstraintsCount);
+	int capacity = self->bonesCount + self->transformConstraintsCount + self->ikConstraintsCount;
+	internal->updateCache = MALLOC(void*, capacity);
+	internal->updateCacheType = MALLOC(_spUpdateType, capacity);
 	internal->updateCacheCount = 0;
 
 	for (i = 0; i < self->bonesCount; ++i) {
 		spBone* bone = self->bones[i];
 		internal->updateCache[internal->updateCacheCount] = bone;
 		internal->updateCacheType[internal->updateCacheCount++] = SP_UPDATE_BONE;
-		for (ii = 0; ii < self->transformConstraintsCount; ++ii) {
-			spTransformConstraint* transformConstraint = self->transformConstraints[ii];
-			if (bone == transformConstraint->bone) {
-				internal->updateCache[internal->updateCacheCount] = transformConstraint;
-				internal->updateCacheType[internal->updateCacheCount++] = SP_UPDATE_TRANSFORM_CONSTRAINT;
-				break;
-			}
-		}
 		for (ii = 0; ii < self->ikConstraintsCount; ++ii) {
 			spIkConstraint* ikConstraint = self->ikConstraints[ii];
 			if (bone == ikConstraint->bones[ikConstraint->bonesCount - 1]) {
 				internal->updateCache[internal->updateCacheCount] = ikConstraint;
 				internal->updateCacheType[internal->updateCacheCount++] = SP_UPDATE_IK_CONSTRAINT;
+				break;
+			}
+		}
+	}
+
+	for (i = 0; i < self->transformConstraintsCount; ++i) {
+		spTransformConstraint* transformConstraint = self->transformConstraints[i];
+		for (ii = internal->updateCacheCount - 1; ii >= 0; --ii) {
+			void* updatable = internal->updateCache[ii];
+			if (updatable == transformConstraint->bone || updatable == transformConstraint->target) {
+				int blockSize = ((capacity - 2) - (ii + 1));
+				memcpy(internal->updateCache[ii+2], internal->updateCache[ii+1], blockSize * sizeof(void*));
+				memcpy(&(internal->updateCacheType[ii + 2]), &(internal->updateCacheType[ii + 1]), blockSize * sizeof(_spUpdateType));
+				internal->updateCacheCount++;
+				internal->updateCache[ii+1] = transformConstraint;
+				internal->updateCacheType[ii+1] = SP_UPDATE_TRANSFORM_CONSTRAINT;
 				break;
 			}
 		}
