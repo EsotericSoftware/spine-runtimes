@@ -276,8 +276,8 @@ public class SkeletonBinary {
 			region.setScaleX(scaleX);
 			region.setScaleY(scaleY);
 			region.setRotation(rotation);
-			region.setWidth(width);
-			region.setHeight(height);
+			region.setWidth(width * scale);
+			region.setHeight(height * scale);
 			Color.rgba8888ToColor(region.getColor(), color);
 			region.updateOffset();
 			return region;
@@ -390,7 +390,6 @@ public class SkeletonBinary {
 				mesh.setWidth(width * scale);
 				mesh.setHeight(height * scale);
 			}
-			// BOZO - Store to look up source attachment later.
 			return mesh;
 		}
 		case weightedlinkedmesh: {
