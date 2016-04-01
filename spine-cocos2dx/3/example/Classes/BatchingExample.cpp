@@ -29,39 +29,61 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "GoblinsExample.h"
-#include "RaptorExample.h"
+#include "BatchingExample.h"
+#include "SpineboyExample.h"
 
 USING_NS_CC;
 using namespace spine;
 
-Scene* GoblinsExample::scene () {
+Scene* BatchingExample::scene () {
 	Scene *scene = Scene::create();
-	scene->addChild(GoblinsExample::create());
+	scene->addChild(BatchingExample::create());
 	return scene;
 }
 
-bool GoblinsExample::init () {
+bool BatchingExample::init () {
 	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
 
-	skeletonNode = SkeletonAnimation::createWithFile("goblins-mesh.json", "goblins-mesh.atlas", 1.5f);
-	skeletonNode->setAnimation(0, "walk", true);
-	skeletonNode->setSkin("goblin");
+	// Load the texture atlas.
+	spAtlas* atlas = spAtlas_createFromFile("spineboy.atlas", 0);
+	CCASSERT(atlas, "Error reading atlas file.");
+
+	// Load the skeleton data.
+	spSkeletonJson* json = spSkeletonJson_create(atlas);
+	json->scale = 0.6f;
+	spSkeletonData* skeletonData = spSkeletonJson_readSkeletonDataFile(json, "spineboy.json");
+	CCASSERT(skeletonData, json->error ? json->error : "Error reading skeleton data file.");
+	spSkeletonJson_dispose(json);
+
+	// Setup mix times.
+	spAnimationStateData* stateData = spAnimationStateData_create(skeletonData);
+	spAnimationStateData_setMixByName(stateData, "walk", "jump", 0.2f);
+	spAnimationStateData_setMixByName(stateData, "jump", "run", 0.2f);
 
 	Size windowSize = Director::getInstance()->getWinSize();
-	skeletonNode->setPosition(Vec2(windowSize.width / 2, 20));
-	addChild(skeletonNode);
+	int xMin = (int)(windowSize.width * 0.10f), xMax = (int)windowSize.width - xMin;
+	int yMin = 20, yMax = windowSize.height - 350;
+	for (int i = 0; i < 50; i++) {
+		// Each skeleton node shares the same atlas, skeleton data, and mix times.
+		SkeletonAnimation* skeletonNode = SkeletonAnimation::createWithData(skeletonData, false);
+		skeletonNode->setAnimationStateData(stateData);
+
+		skeletonNode->setAnimation(0, "walk", true);
+		skeletonNode->addAnimation(0, "jump", false, 3);
+		skeletonNode->addAnimation(0, "run", true);
+
+		skeletonNode->setPosition(Vec2(
+			RandomHelper::random_int(xMin, xMax),
+			RandomHelper::random_int(yMin, yMax)
+		));
+		addChild(skeletonNode);
+	}
 
 	scheduleUpdate();
-	
+
 	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
 	listener->onTouchBegan = [this] (Touch* touch, Event* event) -> bool {
-		if (!skeletonNode->getDebugBonesEnabled())
-			skeletonNode->setDebugBonesEnabled(true);
-		else if (skeletonNode->getTimeScale() == 1)
-			skeletonNode->setTimeScale(0.3f);
-		else
-			Director::getInstance()->replaceScene(RaptorExample::scene());
+		Director::getInstance()->replaceScene(SpineboyExample::scene());
 		return true;
 	};
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);

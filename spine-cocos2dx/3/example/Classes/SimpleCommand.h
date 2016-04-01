@@ -29,42 +29,23 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "GoblinsExample.h"
-#include "RaptorExample.h"
+#ifndef _SIMPLECOMMAND_H_
+#define _SIMPLECOMMAND_H_
 
-USING_NS_CC;
-using namespace spine;
+#include "cocos2d.h"
 
-Scene* GoblinsExample::scene () {
-	Scene *scene = Scene::create();
-	scene->addChild(GoblinsExample::create());
-	return scene;
-}
 
-bool GoblinsExample::init () {
-	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
+class SimpleCommand : public cocos2d::Node {
+public:
+	static cocos2d::Scene* scene ();
 
-	skeletonNode = SkeletonAnimation::createWithFile("goblins-mesh.json", "goblins-mesh.atlas", 1.5f);
-	skeletonNode->setAnimation(0, "walk", true);
-	skeletonNode->setSkin("goblin");
+	virtual bool init ();
+	virtual void draw (cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformFlags) override;
 
-	Size windowSize = Director::getInstance()->getWinSize();
-	skeletonNode->setPosition(Vec2(windowSize.width / 2, 20));
-	addChild(skeletonNode);
+	CREATE_FUNC (SimpleCommand);
 
-	scheduleUpdate();
-	
-	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
-	listener->onTouchBegan = [this] (Touch* touch, Event* event) -> bool {
-		if (!skeletonNode->getDebugBonesEnabled())
-			skeletonNode->setDebugBonesEnabled(true);
-		else if (skeletonNode->getTimeScale() == 1)
-			skeletonNode->setTimeScale(0.3f);
-		else
-			Director::getInstance()->replaceScene(RaptorExample::scene());
-		return true;
-	};
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+protected:
+	cocos2d::Texture2D* _texture;
+};
 
-	return true;
-}
+#endif // _SIMPLECOMMAND_H_

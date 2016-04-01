@@ -29,36 +29,73 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef SPINE_POLYGONBATCH_H_
-#define SPINE_POLYGONBATCH_H_
+#ifndef SPINE_SKELETONBATCH_H_
+#define SPINE_SKELETONBATCH_H_
 
+#include <spine/spine.h>
 #include "cocos2d.h"
 
 namespace spine {
 
-class PolygonBatch : public cocos2d::Ref {
+/* Batches attachment geometry and issues one or more TrianglesCommands per skeleton. */
+class SkeletonBatch : public cocos2d::Ref {
 public:
-	static PolygonBatch* createWithCapacity (ssize_t capacity);
+	/* Sets the default size of each TrianglesCommand. Best to call before getInstance is called for the first time. Default is 64, 192.
+	 * TrianglesCommands may be larger than the specified sizes if required to hold the geometry for a single attachment. */
+	static void setCommandSize (int maxVertices, int maxTriangles);
+
+	static SkeletonBatch* getInstance ();
+
+	void update (float delta);
+
+	void setRendererState (cocos2d::Renderer* renderer, const cocos2d::Mat4* transform, uint32_t transformFlags,
+		float globalZOrder, cocos2d::GLProgramState* glProgramState, bool premultipliedAlpha);
 
 	void add (const cocos2d::Texture2D* texture,
 		const float* vertices, const float* uvs, int verticesCount,
 		const int* triangles, int trianglesCount,
-		cocos2d::Color4B* color);
-	void flush ();
+		const cocos2d::Color4B& color, spBlendMode blendMode);
+
+	void flush () {
+		flush(_maxVertices, _maxTriangles);
+	}
 
 protected:
-	PolygonBatch();
-	virtual ~PolygonBatch();
-	bool initWithCapacity (ssize_t capacity);
+	SkeletonBatch (int maxVertices, int maxTriangles);
+	virtual ~SkeletonBatch ();
 
-	ssize_t _capacity;
-	cocos2d::V2F_C4B_T2F* _vertices;
-	int _verticesCount;
-	GLushort* _triangles;
-	int _trianglesCount;
+	void flush (int maxVertices, int maxTriangles);
+
+	class Command {
+	public:
+		Command (int maxVertices, int maxTriangles);
+		virtual ~Command ();
+
+		int _maxVertices;
+		int _maxTriangles;
+		cocos2d::TrianglesCommand* _trianglesCommand;
+		cocos2d::TrianglesCommand::Triangles* _triangles;
+		Command* _next;
+	};
+
+	int _maxVertices;
+	int _maxTriangles;
+	Command* _firstCommand;
+	Command* _command;
+
+	// Renderer state.
+	cocos2d::Renderer* _renderer;
+	const cocos2d::Mat4* _transform;
+	uint32_t _transformFlags;
+	float _globalZOrder;
+	cocos2d::GLProgramState* _glProgramState;
+	bool _premultipliedAlpha;
+
+	// Batch state.
 	const cocos2d::Texture2D* _texture;
+	spBlendMode _blendMode;
 };
 
 }
 
-#endif // SPINE_POLYGONBATCH_H_
+#endif // SPINE_SKELETONBATCH_H_

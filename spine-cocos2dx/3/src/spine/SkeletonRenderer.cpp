@@ -32,7 +32,7 @@
 #include <spine/SkeletonRenderer.h>
 #include <spine/spine-cocos2dx.h>
 #include <spine/extension.h>
-#include <spine/PolygonBatch.h>
+#include <spine/SkeletonBatch.h>
 #include <algorithm>
 
 USING_NS_CC;
@@ -64,13 +64,10 @@ SkeletonRenderer* SkeletonRenderer::createWithFile (const std::string& skeletonD
 void SkeletonRenderer::initialize () {
 	_worldVertices = MALLOC(float, 1000); // Max number of vertices per mesh.
 
-	_batch = PolygonBatch::createWithCapacity(2000); // Max number of vertices and triangles per batch.
-	_batch->retain();
-
 	_blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
 	setOpacityModifyRGB(true);
 
-	setGLProgram(ShaderCache::getInstance()->getGLProgram(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR));
+	setGLProgramState(GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP));
 }
 
 void SkeletonRenderer::setSkeletonData (spSkeletonData *skeletonData, bool ownsSkeletonData) {
@@ -101,7 +98,6 @@ SkeletonRenderer::~SkeletonRenderer () {
 	if (_ownsSkeletonData) spSkeletonData_dispose(_skeleton->data);
 	if (_atlas) spAtlas_dispose(_atlas);
 	spSkeleton_dispose(_skeleton);
-	_batch->release();
 	FREE(_worldVertices);
 }
 
@@ -144,13 +140,8 @@ void SkeletonRenderer::update (float deltaTime) {
 }
 
 void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t transformFlags) {
-	_drawCommand.init(_globalZOrder);
-	_drawCommand.func = CC_CALLBACK_0(SkeletonRenderer::drawSkeleton, this, transform, transformFlags);
-	renderer->addCommand(&_drawCommand);
-}
-
-void SkeletonRenderer::drawSkeleton (const Mat4 &transform, uint32_t transformFlags) {
-	getGLProgramState()->apply(transform);
+	SkeletonBatch* batch = SkeletonBatch::getInstance();
+	batch->setRendererState(renderer, &transform, transformFlags, _globalZOrder, getGLProgramState(), _premultipliedAlpha);
 
 	Color3B nodeColor = getColor();
 	_skeleton->r = nodeColor.r / (float)255;
@@ -215,77 +206,68 @@ void SkeletonRenderer::drawSkeleton (const Mat4 &transform, uint32_t transformFl
 		default: ;
 		} 
 		if (texture) {
-			if (slot->data->blendMode != blendMode) {
-				_batch->flush();
-				blendMode = slot->data->blendMode;
-				switch (slot->data->blendMode) {
-				case SP_BLEND_MODE_ADDITIVE:
-					GL::blendFunc(_premultipliedAlpha ? GL_ONE : GL_SRC_ALPHA, GL_ONE);
-					break;
-				case SP_BLEND_MODE_MULTIPLY:
-					GL::blendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
-					break;
-				case SP_BLEND_MODE_SCREEN:
-					GL::blendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
-					break;
-				default:
-					GL::blendFunc(_blendFunc.src, _blendFunc.dst);
-				}
-			}
 			color.a = _skeleton->a * slot->a * a * 255;
 			float multiplier = _premultipliedAlpha ? color.a : 255;
 			color.r = _skeleton->r * slot->r * r * multiplier;
 			color.g = _skeleton->g * slot->g * g * multiplier;
 			color.b = _skeleton->b * slot->b * b * multiplier;
-			_batch->add(texture, _worldVertices, uvs, verticesCount, triangles, trianglesCount, &color);
+			batch->add(texture, _worldVertices, uvs, verticesCount, triangles, trianglesCount, color, slot->data->blendMode);
 		}
 	}
-	_batch->flush();
+	batch->flush();
 
 	if (_debugSlots || _debugBones) {
-		Director* director = Director::getInstance();
-		director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-		director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, transform);
-
-		if (_debugSlots) {
-			// Slots.
-			DrawPrimitives::setDrawColor4B(0, 0, 255, 255);
-			glLineWidth(1);
-			Vec2 points[4];
-			V3F_C4B_T2F_Quad quad;
-			for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
-				spSlot* slot = _skeleton->drawOrder[i];
-				if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION) continue;
-				spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-				spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices);
-				points[0] = Vec2(_worldVertices[0], _worldVertices[1]);
-				points[1] = Vec2(_worldVertices[2], _worldVertices[3]);
-				points[2] = Vec2(_worldVertices[4], _worldVertices[5]);
-				points[3] = Vec2(_worldVertices[6], _worldVertices[7]);
-				DrawPrimitives::drawPoly(points, 4, true);
-			}
-		}
-		if (_debugBones) {
-			// Bone lengths.
-			glLineWidth(2);
-			DrawPrimitives::setDrawColor4B(255, 0, 0, 255);
-			for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
-				spBone *bone = _skeleton->bones[i];
-				float x = bone->data->length * bone->a + bone->worldX;
-				float y = bone->data->length * bone->c + bone->worldY;
-				DrawPrimitives::drawLine(Vec2(bone->worldX, bone->worldY), Vec2(x, y));
-			}
-			// Bone origins.
-			DrawPrimitives::setPointSize(4);
-			DrawPrimitives::setDrawColor4B(0, 0, 255, 255); // Root bone is blue.
-			for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
-				spBone *bone = _skeleton->bones[i];
-				DrawPrimitives::drawPoint(Vec2(bone->worldX, bone->worldY));
-				if (i == 0) DrawPrimitives::setDrawColor4B(0, 255, 0, 255);
-			}
-		}
-		director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+		_debugCommand.init(_globalZOrder);
+		_debugCommand.func = CC_CALLBACK_0(SkeletonRenderer::drawDebug, this, transform, transformFlags);
+		renderer->addCommand(&_debugCommand);
 	}
+}
+
+void SkeletonRenderer::drawDebug (const Mat4 &transform, uint32_t transformFlags) {
+	getGLProgramState()->apply(transform);
+
+	Director* director = Director::getInstance();
+	director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+	director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, transform);
+
+	if (_debugSlots) {
+		// Slots.
+		DrawPrimitives::setDrawColor4B(0, 0, 255, 255);
+		glLineWidth(1);
+		Vec2 points[4];
+		V3F_C4B_T2F_Quad quad;
+		for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
+			spSlot* slot = _skeleton->drawOrder[i];
+			if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION) continue;
+			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
+			spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices);
+			points[0] = Vec2(_worldVertices[0], _worldVertices[1]);
+			points[1] = Vec2(_worldVertices[2], _worldVertices[3]);
+			points[2] = Vec2(_worldVertices[4], _worldVertices[5]);
+			points[3] = Vec2(_worldVertices[6], _worldVertices[7]);
+			DrawPrimitives::drawPoly(points, 4, true);
+		}
+	}
+	if (_debugBones) {
+		// Bone lengths.
+		glLineWidth(2);
+		DrawPrimitives::setDrawColor4B(255, 0, 0, 255);
+		for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
+			spBone *bone = _skeleton->bones[i];
+			float x = bone->data->length * bone->a + bone->worldX;
+			float y = bone->data->length * bone->c + bone->worldY;
+			DrawPrimitives::drawLine(Vec2(bone->worldX, bone->worldY), Vec2(x, y));
+		}
+		// Bone origins.
+		DrawPrimitives::setPointSize(4);
+		DrawPrimitives::setDrawColor4B(0, 0, 255, 255); // Root bone is blue.
+		for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
+			spBone *bone = _skeleton->bones[i];
+			DrawPrimitives::drawPoint(Vec2(bone->worldX, bone->worldY));
+			if (i == 0) DrawPrimitives::setDrawColor4B(0, 255, 0, 255);
+		}
+	}
+	director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
 }
 
 Texture2D* SkeletonRenderer::getTexture (spRegionAttachment* attachment) const {

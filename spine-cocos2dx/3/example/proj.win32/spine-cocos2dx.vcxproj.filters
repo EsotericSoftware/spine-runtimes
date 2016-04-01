@@ -30,9 +30,6 @@
     <ClInclude Include="..\Classes\RaptorExample.h">
       <Filter>Classes</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\spine\PolygonBatch.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\spine\SkeletonAnimation.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -40,6 +37,12 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\spine\spine-cocos2dx.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\BatchingExample.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\spine\SkeletonBatch.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
@@ -59,9 +62,6 @@
     <ClCompile Include="..\Classes\RaptorExample.cpp">
       <Filter>Classes</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\spine\PolygonBatch.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\spine\SkeletonAnimation.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -69,6 +69,12 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\spine\spine-cocos2dx.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\BatchingExample.cpp">
+      <Filter>Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spine\SkeletonBatch.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

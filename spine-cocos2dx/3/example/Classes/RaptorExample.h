@@ -39,9 +39,10 @@ class RaptorExample : public cocos2d::LayerColor {
 public:
 	static cocos2d::Scene* scene ();
 
+	CREATE_FUNC(RaptorExample);
+
 	virtual bool init ();
 
-	CREATE_FUNC (RaptorExample);
 private:
 	spine::SkeletonAnimation* skeletonNode;
 };

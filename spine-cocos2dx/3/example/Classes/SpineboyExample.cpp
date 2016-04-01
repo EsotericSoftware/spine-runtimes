@@ -31,13 +31,9 @@
 
 #include "SpineboyExample.h"
 #include "GoblinsExample.h"
-#include <iostream>
-#include <fstream>
-#include <string.h>
 
 USING_NS_CC;
 using namespace spine;
-using namespace std;
 
 Scene* SpineboyExample::scene () {
 	Scene *scene = Scene::create();

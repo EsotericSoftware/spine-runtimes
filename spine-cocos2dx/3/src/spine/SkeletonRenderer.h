@@ -39,16 +39,17 @@ namespace spine {
 
 class PolygonBatch;
 
-/** Draws a skeleton. */
+/* Draws a skeleton. */
 class SkeletonRenderer: public cocos2d::Node, public cocos2d::BlendProtocol {
 public:
+	CREATE_FUNC(SkeletonRenderer);
 	static SkeletonRenderer* createWithData (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
 	static SkeletonRenderer* createWithFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 1);
 	static SkeletonRenderer* createWithFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1);
 
 	virtual void update (float deltaTime) override;
 	virtual void draw (cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformFlags) override;
-	virtual void drawSkeleton (const cocos2d::Mat4& transform, uint32_t transformFlags);
+	virtual void drawDebug (const cocos2d::Mat4& transform, uint32_t transformFlags);
 	virtual cocos2d::Rect getBoundingBox () const override;
 	virtual void onEnter () override;
 	virtual void onExit () override;
@@ -58,6 +59,7 @@ public:
 	void setTimeScale(float scale);
 	float getTimeScale() const;
 
+	/*  */
 	void setDebugSlotsEnabled(bool enabled);
 	bool getDebugSlotsEnabled() const;
 
@@ -119,9 +121,8 @@ protected:
 
 	bool _ownsSkeletonData;
 	spAtlas* _atlas;
-	cocos2d::CustomCommand _drawCommand;
+	cocos2d::CustomCommand _debugCommand;
 	cocos2d::BlendFunc _blendFunc;
-	PolygonBatch* _batch;
 	float* _worldVertices;
 	bool _premultipliedAlpha;
 	spSkeleton* _skeleton;
