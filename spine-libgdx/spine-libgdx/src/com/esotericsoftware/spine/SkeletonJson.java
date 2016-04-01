@@ -203,6 +203,7 @@ public class SkeletonJson {
 			Skin skin = linkedMesh.skin == null ? skeletonData.getDefaultSkin() : skeletonData.findSkin(linkedMesh.skin);
 			if (skin == null) throw new SerializationException("Skin not found: " + linkedMesh.skin);
 			Attachment parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
+			if (parent == null) throw new SerializationException("Parent mesh not found: " + linkedMesh.parent);
 			if (linkedMesh.mesh instanceof MeshAttachment) {
 				MeshAttachment mesh = (MeshAttachment)linkedMesh.mesh;
 				mesh.setParentMesh((MeshAttachment)parent);
