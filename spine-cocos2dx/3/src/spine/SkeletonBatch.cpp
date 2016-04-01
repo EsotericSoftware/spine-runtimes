@@ -145,7 +145,7 @@ void SkeletonBatch::flush (int maxVertices, int maxTriangles) {
 
 	_command->_trianglesCommand->init(_globalZOrder, _texture->getName(), _glProgramState, blendFunc, *_command->_triangles,
 		*_transform, _transformFlags);
-   _renderer->addCommand(_command->_trianglesCommand);
+	_renderer->addCommand(_command->_trianglesCommand);
 
 	if (!_command->_next) _command->_next = new Command(maxVertices, maxTriangles);
 	_command = _command->_next;
