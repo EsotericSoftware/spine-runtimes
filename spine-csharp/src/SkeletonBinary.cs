@@ -55,6 +55,8 @@ namespace Spine {
 		private char[] chars = new char[32];
 		private byte[] buffer = new byte[4];
 
+		private List<SkeletonJson.LinkedMesh> linkedMeshes = new List<SkeletonJson.LinkedMesh>();
+
 		public SkeletonBinary (params Atlas[] atlasArray)
 			: this(new AtlasAttachmentLoader(atlasArray)) {
 		}
@@ -182,6 +184,25 @@ namespace Spine {
 			for (int i = 0, n = ReadInt(input, true); i < n; i++)
 				skeletonData.skins.Add(ReadSkin(input, ReadString(input), nonessential));
 
+			// Linked meshes.
+			for (int i = 0, n = linkedMeshes.Count; i < n; i++) {
+				SkeletonJson.LinkedMesh linkedMesh = linkedMeshes[i];
+				Skin skin = linkedMesh.skin == null ? skeletonData.DefaultSkin : skeletonData.FindSkin(linkedMesh.skin);
+				if (skin == null) throw new Exception("Skin not found: " + linkedMesh.skin);
+				Attachment parent = skin.GetAttachment(linkedMesh.slotIndex, linkedMesh.parent);
+				if (parent == null) throw new Exception("Parent mesh not found: " + linkedMesh.parent);
+				if (linkedMesh.mesh is MeshAttachment) {
+					MeshAttachment mesh = (MeshAttachment)linkedMesh.mesh;
+					mesh.ParentMesh = (MeshAttachment)parent;
+					mesh.UpdateUVs();
+				} else {
+					WeightedMeshAttachment mesh = (WeightedMeshAttachment)linkedMesh.mesh;
+					mesh.ParentMesh = (WeightedMeshAttachment)parent;
+					mesh.UpdateUVs();
+				}
+			}
+			linkedMeshes.Clear();
+
 			// Events.
 			for (int i = 0, n = ReadInt(input, true); i < n; i++) {
 				EventData eventData = new EventData(ReadString(input));
@@ -213,33 +234,42 @@ namespace Spine {
 				int slotIndex = ReadInt(input, true);
 				for (int ii = 0, nn = ReadInt(input, true); ii < nn; ii++) {
 					String name = ReadString(input);
-					skin.AddAttachment(slotIndex, name, ReadAttachment(input, skin, name, nonessential));
+					skin.AddAttachment(slotIndex, name, ReadAttachment(input, skin, slotIndex, name, nonessential));
 				}
 			}
 			return skin;
 		}
 
-		private Attachment ReadAttachment (Stream input, Skin skin, String attachmentName, bool nonessential) {
+		private Attachment ReadAttachment (Stream input, Skin skin, int slotIndex, String attachmentName, bool nonessential) {
 			float scale = Scale;
 
 			String name = ReadString(input);
 			if (name == null) name = attachmentName;
 
-			switch ((AttachmentType)input.ReadByte()) {
+			AttachmentType type = (AttachmentType)input.ReadByte();
+			switch (type) {
 			case AttachmentType.region: {
 					String path = ReadString(input);
+					float x = ReadFloat(input);
+					float y = ReadFloat(input);
+					float scaleX = ReadFloat(input);
+					float scaleY = ReadFloat(input);
+					float rotation = ReadFloat(input);
+					float width = ReadFloat(input);
+					float height = ReadFloat(input);
+					int color = ReadInt(input);
+
 					if (path == null) path = name;
 					RegionAttachment region = attachmentLoader.NewRegionAttachment(skin, name, path);
 					if (region == null) return null;
 					region.Path = path;
-					region.x = ReadFloat(input) * scale;
-					region.y = ReadFloat(input) * scale;
-					region.scaleX = ReadFloat(input);
-					region.scaleY = ReadFloat(input);
-					region.rotation = ReadFloat(input);
-					region.width = ReadFloat(input) * scale;
-					region.height = ReadFloat(input) * scale;
-					int color = ReadInt(input);
+					region.x = x * scale;
+					region.y = y * scale;
+					region.scaleX = scaleX;
+					region.scaleY = scaleY;
+					region.rotation = rotation;
+					region.width = width * scale;
+					region.height = height * scale;
 					region.r = ((color & 0xff000000) >> 24) / 255f;
 					region.g = ((color & 0x00ff0000) >> 16) / 255f;
 					region.b = ((color & 0x0000ff00) >> 8) / 255f;
@@ -248,43 +278,81 @@ namespace Spine {
 					return region;
 				}
 			case AttachmentType.boundingbox: {
+					float[] vertices = ReadFloatArray(input, scale);
 					BoundingBoxAttachment box = attachmentLoader.NewBoundingBoxAttachment(skin, name);
 					if (box == null) return null;
-					box.vertices = ReadFloatArray(input, scale);
+					box.vertices = vertices;
 					return box;
 				}
 			case AttachmentType.mesh: {
 					String path = ReadString(input);
+					int color = ReadInt(input);
+					int hullLength = 0;
+					float[] uvs = ReadFloatArray(input, 1);
+					int[] triangles = ReadShortArray(input);
+					float[] vertices = ReadFloatArray(input, scale);
+					hullLength = ReadInt(input, true);
+					int[] edges = null;
+					float width = 0, height = 0;
+					if (nonessential) {
+						edges = ReadIntArray(input);
+						width = ReadFloat(input);
+						height = ReadFloat(input);
+					}
+
 					if (path == null) path = name;
 					MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, name, path);
 					if (mesh == null) return null;
 					mesh.Path = path;
-					mesh.regionUVs = ReadFloatArray(input, 1);
-					mesh.triangles = ReadShortArray(input);
-					mesh.vertices = ReadFloatArray(input, scale);
-					mesh.UpdateUVs();
-					int color = ReadInt(input);
 					mesh.r = ((color & 0xff000000) >> 24) / 255f;
 					mesh.g = ((color & 0x00ff0000) >> 16) / 255f;
 					mesh.b = ((color & 0x0000ff00) >> 8) / 255f;
 					mesh.a = ((color & 0x000000ff)) / 255f;
-					mesh.HullLength = ReadInt(input, true) * 2;
+					mesh.vertices = vertices;
+					mesh.triangles = triangles;
+					mesh.regionUVs = uvs;
+					mesh.UpdateUVs();
+					mesh.HullLength = hullLength;
 					if (nonessential) {
-						mesh.Edges = ReadIntArray(input);
-						mesh.Width = ReadFloat(input) * scale;
-						mesh.Height = ReadFloat(input) * scale;
+						mesh.Edges = edges;
+						mesh.Width = width * scale;
+						mesh.Height = height * scale;
 					}
+					return mesh;
+				}
+			case AttachmentType.linkedmesh: {
+					String path = ReadString(input);
+					int color = ReadInt(input);
+					String skinName = ReadString(input);
+					String parent = ReadString(input);
+					bool inheritFFD = ReadBoolean(input);
+					float width = 0, height = 0;
+					if (nonessential) {
+						width = ReadFloat(input);
+						height = ReadFloat(input);
+					}
+
+					if (path == null) path = name;
+					MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, name, path);
+					if (mesh == null) return null;
+					mesh.Path = path;
+					mesh.r = ((color & 0xff000000) >> 24) / 255f;
+					mesh.g = ((color & 0x00ff0000) >> 16) / 255f;
+					mesh.b = ((color & 0x0000ff00) >> 8) / 255f;
+					mesh.a = ((color & 0x000000ff)) / 255f;
+					mesh.inheritFFD = inheritFFD;
+					if (nonessential) {
+						mesh.Width = width * scale;
+						mesh.Height = height * scale;
+					}
+					linkedMeshes.Add(new SkeletonJson.LinkedMesh(mesh, skinName, slotIndex, parent));
 					return mesh;
 				}
 			case AttachmentType.weightedmesh: {
 					String path = ReadString(input);
-					if (path == null) path = name;
-					WeightedMeshAttachment mesh = attachmentLoader.NewWeightedMeshAttachment(skin, name, path);
-					if (mesh == null) return null;
-					mesh.Path = path;
+					int color = ReadInt(input);
 					float[] uvs = ReadFloatArray(input, 1);
 					int[] triangles = ReadShortArray(input);
-
 					int vertexCount = ReadInt(input, true);
 					var weights = new List<float>(uvs.Length * 3 * 3);
 					var bones = new List<int>(uvs.Length * 3);
@@ -298,22 +366,63 @@ namespace Spine {
 							weights.Add(ReadFloat(input));
 						}
 					}
+					int hullLength = ReadInt(input, true);
+					int[] edges = null;
+					float width = 0, height = 0;
+					if (nonessential) {
+						edges = ReadIntArray(input);
+						width = ReadFloat(input);
+						height = ReadFloat(input);
+					}
+
+					if (path == null) path = name;
+					WeightedMeshAttachment mesh = attachmentLoader.NewWeightedMeshAttachment(skin, name, path);
+					if (mesh == null) return null;
+					mesh.Path = path;
+					mesh.r = ((color & 0xff000000) >> 24) / 255f;
+					mesh.g = ((color & 0x00ff0000) >> 16) / 255f;
+					mesh.b = ((color & 0x0000ff00) >> 8) / 255f;
+					mesh.a = ((color & 0x000000ff)) / 255f;
 					mesh.bones = bones.ToArray();
 					mesh.weights = weights.ToArray();
 					mesh.triangles = triangles;
 					mesh.regionUVs = uvs;
 					mesh.UpdateUVs();
+					mesh.HullLength = hullLength * 2;
+					if (nonessential) {
+						mesh.Edges = edges;
+						mesh.Width = width * scale;
+						mesh.Height = height * scale;
+					}
+					//
+					return mesh;
+				}
+			case AttachmentType.weightedlinkedmesh: {
+					String path = ReadString(input);
 					int color = ReadInt(input);
+					String skinName = ReadString(input);
+					String parent = ReadString(input);
+					bool inheritFFD = ReadBoolean(input);
+					float width = 0, height = 0;
+					if (nonessential) {
+						width = ReadFloat(input);
+						height = ReadFloat(input);
+					}
+
+					if (path == null) path = name;
+					WeightedMeshAttachment mesh = attachmentLoader.NewWeightedMeshAttachment(skin, name, path);
+					if (mesh == null) return null;
+					mesh.Path = path;
 					mesh.r = ((color & 0xff000000) >> 24) / 255f;
 					mesh.g = ((color & 0x00ff0000) >> 16) / 255f;
 					mesh.b = ((color & 0x0000ff00) >> 8) / 255f;
 					mesh.a = ((color & 0x000000ff)) / 255f;
-					mesh.HullLength = ReadInt(input, true) * 2;
+					mesh.inheritFFD = inheritFFD;
 					if (nonessential) {
-						mesh.Edges = ReadIntArray(input);
-						mesh.Width = ReadFloat(input) * scale;
-						mesh.Height = ReadFloat(input) * scale;
+						mesh.Width = width * scale;
+						mesh.Height = height * scale;
 					}
+					linkedMeshes.Add(new SkeletonJson.LinkedMesh(mesh, skinName, slotIndex, parent));
 					return mesh;
 				}
 			}
