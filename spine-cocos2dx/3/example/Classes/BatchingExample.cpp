@@ -64,9 +64,8 @@ bool BatchingExample::init () {
 	spAnimationStateData_setMixByName(_stateData, "walk", "jump", 0.2f);
 	spAnimationStateData_setMixByName(_stateData, "jump", "run", 0.2f);
 
-	Size windowSize = Director::getInstance()->getWinSize();
-	int xMin = (int)(windowSize.width * 0.10f), xMax = (int)windowSize.width - xMin;
-	int yMin = 20, yMax = windowSize.height - 350;
+	int xMin = _contentSize.width * 0.10f, xMax = _contentSize.width * 0.90f;
+	int yMin = 0, yMax = _contentSize.height * 0.7f;
 	for (int i = 0; i < 50; i++) {
 		// Each skeleton node shares the same atlas, skeleton data, and mix times.
 		SkeletonAnimation* skeletonNode = SkeletonAnimation::createWithData(_skeletonData, false);
