@@ -622,7 +622,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 						return 0;
 					}
 
-					attachment = spAttachmentLoader_newAttachment(self->attachmentLoader, skin, type, attachmentName, path);
+					attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, attachmentName, path);
 					if (!attachment) {
 						if (self->attachmentLoader->error1) {
 							spSkeletonData_dispose(skeletonData);
@@ -631,6 +631,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 						}
 						continue;
 					}
+					attachment->attachmentLoader = self->attachmentLoader;
 
 					switch (attachment->type) {
 					case SP_ATTACHMENT_REGION: {
@@ -668,9 +669,9 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 
 						entry = Json_getItem(attachmentMap, "triangles");
 						mesh->trianglesCount = entry->size;
-						mesh->triangles = MALLOC(int, entry->size);
+						mesh->triangles = MALLOC(unsigned short, entry->size);
 						for (entry = entry->child, i = 0; entry; entry = entry->next, ++i)
-							mesh->triangles[i] = entry->valueInt;
+							mesh->triangles[i] = (unsigned short)entry->valueInt;
 
 						entry = Json_getItem(attachmentMap, "uvs");
 						mesh->regionUVs = MALLOC(float, entry->size);
@@ -744,9 +745,9 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 
 						entry = Json_getItem(attachmentMap, "triangles");
 						mesh->trianglesCount = entry->size;
-						mesh->triangles = MALLOC(int, entry->size);
+						mesh->triangles = MALLOC(unsigned short, entry->size);
 						for (entry = entry->child, i = 0; entry; entry = entry->next, ++i)
-							mesh->triangles[i] = entry->valueInt;
+							mesh->triangles[i] = (unsigned short)entry->valueInt;
 
 						spWeightedMeshAttachment_updateUVs(mesh);
 
@@ -782,6 +783,8 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 						break;
 					}
 					}
+
+					spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 
 					spSkin_addAttachment(skin, slotIndex, skinAttachmentName, attachment);
 				}

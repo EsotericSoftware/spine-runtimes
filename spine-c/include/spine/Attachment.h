@@ -36,6 +36,8 @@
 extern "C" {
 #endif
 
+struct spAttachmentLoader;
+
 typedef enum {
 	SP_ATTACHMENT_REGION, SP_ATTACHMENT_BOUNDING_BOX, SP_ATTACHMENT_MESH, SP_ATTACHMENT_WEIGHTED_MESH
 } spAttachmentType;
@@ -44,6 +46,7 @@ typedef struct spAttachment {
 	const char* const name;
 	const spAttachmentType type;
 	const void* const vtable;
+	struct spAttachmentLoader* attachmentLoader;
 
 #ifdef __cplusplus
 	spAttachment() :

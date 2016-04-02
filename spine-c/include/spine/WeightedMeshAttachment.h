@@ -50,7 +50,7 @@ typedef struct spWeightedMeshAttachment {
 	float* weights;
 
 	int trianglesCount;
-	int* triangles;
+	unsigned short* triangles;
 
 	int uvsCount;
 	float* regionUVs;

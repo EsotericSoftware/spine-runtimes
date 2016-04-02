@@ -52,7 +52,7 @@ typedef struct spMeshAttachment {
 	float* uvs;
 
 	int trianglesCount;
-	int* triangles;
+	unsigned short* triangles;
 
 	float r, g, b, a;
 
