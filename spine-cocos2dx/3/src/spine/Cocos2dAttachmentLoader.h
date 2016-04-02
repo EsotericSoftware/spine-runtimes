@@ -29,49 +29,20 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef SPINE_SKELETONBATCH_H_
-#define SPINE_SKELETONBATCH_H_
+#ifndef SPINE_COCOS2DATTACHMENTLOADER_H_
+#define SPINE_COCOS2DATTACHMENTLOADER_H_
 
-#include <spine/spine.h>
-#include "cocos2d.h"
+#include <spine/AtlasAttachmentLoader.h>
 
-namespace spine {
+extern "C" {
 
-class SkeletonBatch {
-public:
-	/* Sets the max number of vertices that can be drawn in a single frame. Best to call before getInstance is called for the
-	 * first time. Default is 8192. */
-	static void SkeletonBatch::setBufferSize (int vertexCount);
+typedef struct Cocos2dAttachmentLoader {
+	spAttachmentLoader super;
+	spAtlasAttachmentLoader* atlasAttachmentLoader;
+} Cocos2dAttachmentLoader;
 
-	static SkeletonBatch* getInstance ();
-
-	void update (float delta);
-
-	void addCommand (cocos2d::Renderer* renderer, float globalOrder, GLuint textureID, cocos2d::GLProgramState* glProgramState,
-		cocos2d::BlendFunc blendType, const cocos2d::TrianglesCommand:: Triangles& triangles, const cocos2d::Mat4& mv, uint32_t flags);
-
-protected:
-	SkeletonBatch (int capacity);
-	virtual ~SkeletonBatch ();
-
-	cocos2d::V3F_C4B_T2F* _buffer;
-	int _capacity;
-	int _position;
-
-	class Command {
-	public:
-		Command ();
-		virtual ~Command ();
-
-		cocos2d::TrianglesCommand* _trianglesCommand;
-		cocos2d::TrianglesCommand::Triangles* _triangles;
-		Command* _next;
-	};
-
-	Command* _firstCommand;
-	Command* _command;
-};
+Cocos2dAttachmentLoader* Cocos2dAttachmentLoader_create (spAtlas* atlas);
 
 }
 
-#endif // SPINE_SKELETONBATCH_H_
+#endif /* SPINE_COCOS2DATTACHMENTLOADER_H_ */

@@ -45,28 +45,32 @@ bool BatchingExample::init () {
 	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
 
 	// Load the texture atlas.
-	spAtlas* atlas = spAtlas_createFromFile("spineboy.atlas", 0);
-	CCASSERT(atlas, "Error reading atlas file.");
+	_atlas = spAtlas_createFromFile("spineboy.atlas", 0);
+	CCASSERT(_atlas, "Error reading atlas file.");
+
+	// This attachment loader configures attachments with data needed for cocos2d-x rendering.
+	// Do not dispose the attachment loader until the skeleton data is disposed!
+	_attachmentLoader = (spAttachmentLoader*)Cocos2dAttachmentLoader_create(_atlas);
 
 	// Load the skeleton data.
-	spSkeletonJson* json = spSkeletonJson_create(atlas);
-	json->scale = 0.6f;
-	spSkeletonData* skeletonData = spSkeletonJson_readSkeletonDataFile(json, "spineboy.json");
-	CCASSERT(skeletonData, json->error ? json->error : "Error reading skeleton data file.");
+	spSkeletonJson* json = spSkeletonJson_createWithLoader(_attachmentLoader);
+	json->scale = 0.6f; // Resizes skeleton data to 60% of the size it was in Spine.
+	_skeletonData = spSkeletonJson_readSkeletonDataFile(json, "spineboy.json");
+	CCASSERT(_skeletonData, json->error ? json->error : "Error reading skeleton data file.");
 	spSkeletonJson_dispose(json);
 
 	// Setup mix times.
-	spAnimationStateData* stateData = spAnimationStateData_create(skeletonData);
-	spAnimationStateData_setMixByName(stateData, "walk", "jump", 0.2f);
-	spAnimationStateData_setMixByName(stateData, "jump", "run", 0.2f);
+	_stateData = spAnimationStateData_create(_skeletonData);
+	spAnimationStateData_setMixByName(_stateData, "walk", "jump", 0.2f);
+	spAnimationStateData_setMixByName(_stateData, "jump", "run", 0.2f);
 
 	Size windowSize = Director::getInstance()->getWinSize();
 	int xMin = (int)(windowSize.width * 0.10f), xMax = (int)windowSize.width - xMin;
 	int yMin = 20, yMax = windowSize.height - 350;
 	for (int i = 0; i < 50; i++) {
 		// Each skeleton node shares the same atlas, skeleton data, and mix times.
-		SkeletonAnimation* skeletonNode = SkeletonAnimation::createWithData(skeletonData, false);
-		skeletonNode->setAnimationStateData(stateData);
+		SkeletonAnimation* skeletonNode = SkeletonAnimation::createWithData(_skeletonData, false);
+		skeletonNode->setAnimationStateData(_stateData);
 
 		skeletonNode->setAnimation(0, "walk", true);
 		skeletonNode->addAnimation(0, "jump", false, 3);
@@ -89,4 +93,13 @@ bool BatchingExample::init () {
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
 	return true;
+}
+
+BatchingExample::~BatchingExample () {
+	// SkeletonAnimation instances are cocos2d-x nodes and are disposed of automatically as normal, but the data created
+	// manually to be shared across multiple SkeletonAnimations needs to be disposed of manually.
+	spSkeletonData_dispose(_skeletonData);
+	spAnimationStateData_dispose(_stateData);
+	spAttachmentLoader_dispose(_attachmentLoader);
+	spAtlas_dispose(_atlas);
 }

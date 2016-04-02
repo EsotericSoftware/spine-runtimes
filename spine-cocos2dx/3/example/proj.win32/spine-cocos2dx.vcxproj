@@ -129,6 +129,8 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\spine\AttachmentVertices.h" />
+    <ClInclude Include="..\..\src\spine\Cocos2dAttachmentLoader.h" />
     <ClInclude Include="..\..\src\spine\SkeletonBatch.h" />
     <ClInclude Include="..\..\src\spine\SkeletonAnimation.h" />
     <ClInclude Include="..\..\src\spine\SkeletonRenderer.h" />
@@ -142,6 +144,8 @@
     <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\spine\AttachmentVertices.cpp" />
+    <ClCompile Include="..\..\src\spine\Cocos2dAttachmentLoader.c" />
     <ClCompile Include="..\..\src\spine\SkeletonBatch.cpp" />
     <ClCompile Include="..\..\src\spine\SkeletonAnimation.cpp" />
     <ClCompile Include="..\..\src\spine\SkeletonRenderer.cpp" />

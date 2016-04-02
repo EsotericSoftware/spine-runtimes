@@ -98,8 +98,8 @@ bool AppDelegate::applicationDidFinishLaunching () {
 	director->setAnimationInterval(1.0f / 60);
 
 	// create a scene. it's an autorelease object
-	auto scene = RaptorExample::scene();
-	//auto scene = BatchingExample::scene();
+	//auto scene = RaptorExample::scene();
+	auto scene = BatchingExample::scene();
 
 	// run
 	director->runWithScene(scene);

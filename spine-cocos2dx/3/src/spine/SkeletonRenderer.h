@@ -37,7 +37,7 @@
 
 namespace spine {
 
-class PolygonBatch;
+class AttachmentVertices;
 
 /* Draws a skeleton. */
 class SkeletonRenderer: public cocos2d::Node, public cocos2d::BlendProtocol {
@@ -115,12 +115,13 @@ CC_CONSTRUCTOR_ACCESS:
 
 protected:
 	void setSkeletonData (spSkeletonData* skeletonData, bool ownsSkeletonData);
-	virtual cocos2d::Texture2D* getTexture (spRegionAttachment* attachment) const;
-	virtual cocos2d::Texture2D* getTexture (spMeshAttachment* attachment) const;
-	virtual cocos2d::Texture2D* getTexture (spWeightedMeshAttachment* attachment) const;
+	virtual AttachmentVertices* getAttachmentVertices (spRegionAttachment* attachment) const;
+	virtual AttachmentVertices* getAttachmentVertices (spMeshAttachment* attachment) const;
+	virtual AttachmentVertices* getAttachmentVertices (spWeightedMeshAttachment* attachment) const;
 
 	bool _ownsSkeletonData;
 	spAtlas* _atlas;
+	spAttachmentLoader* _attachmentLoader;
 	cocos2d::CustomCommand _debugCommand;
 	cocos2d::BlendFunc _blendFunc;
 	float* _worldVertices;

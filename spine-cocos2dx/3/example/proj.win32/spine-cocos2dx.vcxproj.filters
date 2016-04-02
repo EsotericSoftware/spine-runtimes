@@ -45,6 +45,12 @@
     <ClInclude Include="..\..\src\spine\SkeletonBatch.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\spine\Cocos2dAttachmentLoader.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\spine\AttachmentVertices.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -75,6 +81,12 @@
       <Filter>Classes</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\spine\SkeletonBatch.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spine\Cocos2dAttachmentLoader.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spine\AttachmentVertices.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

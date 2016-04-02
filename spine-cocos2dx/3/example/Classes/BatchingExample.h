@@ -40,8 +40,15 @@ public:
 	static cocos2d::Scene* scene ();
 
 	CREATE_FUNC(BatchingExample);
+	~BatchingExample ();
 
 	virtual bool init ();
+
+protected:
+	spAtlas* _atlas;
+	spAttachmentLoader* _attachmentLoader;
+	spSkeletonData* _skeletonData;
+	spAnimationStateData* _stateData;
 };
 
 #endif // _BATCHINGEXAMPLE_H_

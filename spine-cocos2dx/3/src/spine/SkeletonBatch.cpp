@@ -34,31 +34,26 @@
 #include <algorithm>
 
 USING_NS_CC;
-using namespace std;
 
 namespace spine {
 
 static SkeletonBatch* instance = nullptr;
 
-void SkeletonBatch::setCommandSize (int maxVertices, int maxTriangles) {
-	// 32767 is max index, so 32767 / 3 - (32767 / 3 % 3) = 10920.
-	CCASSERT(maxTriangles <= 10920, "maxTriangles cannot be > 10920");
-	CCASSERT(maxTriangles >= 0, "maxTriangles cannot be < 0");
+void SkeletonBatch::setBufferSize (int vertexCount) {
 	if (instance) delete instance;
-	instance = new SkeletonBatch(maxVertices, maxTriangles);
+	instance = new SkeletonBatch(vertexCount);
 }
 
 SkeletonBatch* SkeletonBatch::getInstance () {
-	if (!instance) instance = new SkeletonBatch(64, 64 * 3);
+	if (!instance) instance = new SkeletonBatch(8192);
 	return instance;
 }
 
-SkeletonBatch::SkeletonBatch (int maxVertices, int maxTriangles) :
-	_maxVertices(maxVertices), _maxTriangles(maxTriangles),
-	_renderer(nullptr), _transform(nullptr), _transformFlags(0), _globalZOrder(0), _glProgramState(nullptr),
-	_texture(nullptr), _blendMode(SP_BLEND_MODE_NORMAL)
+SkeletonBatch::SkeletonBatch (int capacity) :
+	_capacity(capacity), _position(0)
 {
-	_firstCommand = new Command(maxVertices, maxTriangles);
+	_buffer = new V3F_C4B_T2F[capacity];
+	_firstCommand = new Command();
 	_command = _firstCommand;
 
 	Director::getInstance()->getScheduler()->scheduleUpdate(this, -1, false);
@@ -73,109 +68,44 @@ SkeletonBatch::~SkeletonBatch () {
 		delete command;
 		command = next;
 	}
-}
 
-void SkeletonBatch::setRendererState (Renderer* renderer, const Mat4* transform, uint32_t transformFlags,
-		float globalZOrder, GLProgramState* glProgramState, bool premultipliedAlpha) {
-	_renderer = renderer;
-	_transform = transform;
-	_transformFlags = transformFlags;
-	_globalZOrder = globalZOrder;
-	_glProgramState = glProgramState;
-	_premultipliedAlpha = premultipliedAlpha;
+	delete [] _buffer;
 }
 
 void SkeletonBatch::update (float delta) {
-	// Reuse commands at the beginning of each frame.
+	_position = 0;
 	_command = _firstCommand;
-	_command->_triangles->vertCount = 0;
-	_command->_triangles->indexCount = 0;
 }
 
-void SkeletonBatch::add (const Texture2D* addTexture,
-	const float* addVertices, const float* uvs, int addVerticesCount,
-	const int* addTriangles, int addTrianglesCount,
-	const Color4B& color, spBlendMode blendMode
+void SkeletonBatch::addCommand (cocos2d::Renderer* renderer, float globalZOrder, GLuint textureID, GLProgramState* glProgramState,
+	BlendFunc blendFunc, const TrianglesCommand::Triangles& triangles, const Mat4& transform, uint32_t transformFlags
 ) {
-	if (addTexture != _texture
-		|| blendMode != _blendMode
-		|| _command->_triangles->vertCount + (addVerticesCount >> 1) > _maxVertices
-		|| _command->_triangles->indexCount + addTrianglesCount > _maxTriangles
-	) {
-		this->flush(max(addVerticesCount >> 1, _maxVertices), max(addTrianglesCount, _maxTriangles));
-		_texture = addTexture;
-		_blendMode = blendMode;
-	}
+	CCASSERT(_position + triangles.vertCount < _capacity, "SkeletonBatch capacity is too small");
 
-	TrianglesCommand::Triangles* triangles = _command->_triangles;
-	for (int i = 0; i < addTrianglesCount; ++i, ++triangles->indexCount)
-		triangles->indices[triangles->indexCount] = addTriangles[i] + triangles->vertCount;
+	memcpy(_buffer + _position, triangles.verts, sizeof(V3F_C4B_T2F) * triangles.vertCount);
+	_command->_triangles->verts = _buffer + _position;
+	_position += triangles.vertCount;
 
-	for (int i = 0; i < addVerticesCount; i += 2, ++triangles->vertCount) {
-		V3F_C4B_T2F* vertex = triangles->verts + triangles->vertCount;
-		vertex->vertices.x = addVertices[i];
-		vertex->vertices.y = addVertices[i + 1];
-		vertex->colors = color;
-		vertex->texCoords.u = uvs[i];
-		vertex->texCoords.v = uvs[i + 1];
-	}
-}
+	_command->_triangles->vertCount = triangles.vertCount;
+	_command->_triangles->indexCount = triangles.indexCount;
+	_command->_triangles->indices = triangles.indices;
 
-void SkeletonBatch::flush (int maxVertices, int maxTriangles) {
-	if (!_command->_triangles->vertCount) return;
+	_command->_trianglesCommand->init(globalZOrder, textureID, glProgramState, blendFunc, *_command->_triangles, transform, transformFlags);
+	renderer->addCommand(_command->_trianglesCommand);
 
-	BlendFunc blendFunc;
-	switch (_blendMode) {
-	case SP_BLEND_MODE_ADDITIVE:
-		blendFunc.src = _premultipliedAlpha ? GL_ONE : GL_SRC_ALPHA;
-		blendFunc.dst = GL_ONE;
-		break;
-	case SP_BLEND_MODE_MULTIPLY:
-		blendFunc.src = GL_DST_COLOR;
-		blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
-		break;
-	case SP_BLEND_MODE_SCREEN:
-		blendFunc.src = GL_ONE;
-		blendFunc.dst = GL_ONE_MINUS_SRC_COLOR;
-		break;
-	default:
-		blendFunc.src = _premultipliedAlpha ? GL_ONE : GL_SRC_ALPHA;
-		blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
-	}
-
-	_command->_trianglesCommand->init(_globalZOrder, _texture->getName(), _glProgramState, blendFunc, *_command->_triangles,
-		*_transform, _transformFlags);
-	_renderer->addCommand(_command->_trianglesCommand);
-
-	if (!_command->_next) _command->_next = new Command(maxVertices, maxTriangles);
+	if (!_command->_next) _command->_next = new Command();
 	_command = _command->_next;
-
-	// If not as large as required, insert new command.
-	if (_command->_maxVertices < maxVertices || _command->_maxTriangles < maxTriangles) {
-		Command* next = _command->_next;
-		_command = new Command(maxVertices, maxTriangles);
-		_command->_next = next;
-	}
-
-	_command->_triangles->vertCount = 0;
-	_command->_triangles->indexCount = 0;
 }
 
-SkeletonBatch::Command::Command (int maxVertices, int maxTriangles) :
-	_maxVertices(maxVertices), _maxTriangles(maxTriangles), _next(nullptr)
+SkeletonBatch::Command::Command () :
+	_next(nullptr)
 {
 	_trianglesCommand = new TrianglesCommand();
-
 	_triangles = new TrianglesCommand::Triangles();
-	_triangles->verts = new V3F_C4B_T2F[maxVertices];
-	_triangles->indices = new GLushort[maxTriangles];
 }
 
 SkeletonBatch::Command::~Command () {
-	delete [] _triangles->indices;
-	delete [] _triangles->verts;
 	delete _triangles;
-
 	delete _trianglesCommand;
 }
 
