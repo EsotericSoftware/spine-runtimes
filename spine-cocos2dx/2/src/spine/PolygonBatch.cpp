@@ -67,7 +67,7 @@ PolygonBatch::~PolygonBatch () {
 
 void PolygonBatch::add (CCTexture2D* addTexture,
 		const float* addVertices, const float* uvs, int addVerticesCount,
-		const int* addTriangles, int addTrianglesCount,
+		const unsigned short* addTriangles, int addTrianglesCount,
 		ccColor4B* color) {
 
 	if (

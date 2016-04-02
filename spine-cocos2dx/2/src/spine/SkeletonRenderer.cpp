@@ -41,7 +41,7 @@ using std::max;
 
 namespace spine {
 
-static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
+static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 
 SkeletonRenderer* SkeletonRenderer::createWithData (spSkeletonData* skeletonData, bool ownsSkeletonData) {
 	SkeletonRenderer* node = new SkeletonRenderer(skeletonData, ownsSkeletonData);
@@ -148,7 +148,7 @@ void SkeletonRenderer::draw () {
 	ccColor4B color;
 	const float* uvs = nullptr;
 	int verticesCount = 0;
-	const int* triangles = nullptr;
+	const unsigned short* triangles = nullptr;
 	int trianglesCount = 0;
 	float r = 0, g = 0, b = 0, a = 0;
 	for (int i = 0, n = skeleton->slotsCount; i < n; i++) {
