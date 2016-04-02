@@ -45,6 +45,8 @@ spAttachment* _Cocos2dAttachmentLoader_createAttachment (spAttachmentLoader* loa
 }
 
 void _Cocos2dAttachmentLoader_configureAttachment (spAttachmentLoader* loader, spAttachment* attachment) {
+	attachment->attachmentLoader = loader;
+
 	switch (attachment->type) {
 	case SP_ATTACHMENT_REGION: {
 		spRegionAttachment* regionAttachment = SUB_CAST(spRegionAttachment, attachment);

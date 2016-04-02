@@ -631,7 +631,6 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 						}
 						continue;
 					}
-					attachment->attachmentLoader = self->attachmentLoader;
 
 					switch (attachment->type) {
 					case SP_ATTACHMENT_REGION: {
