@@ -32,10 +32,9 @@
 #import <spine/SkeletonRenderer.h>
 #import <spine/spine-cocos2d-iphone.h>
 #import <spine/extension.h>
-#import "CCNode_Private.h"
 #import "CCDrawNode.h"
 
-static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
+static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 
 @interface SkeletonRenderer (Private)
 - (void) initialize:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData;
@@ -148,7 +147,7 @@ static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	int blendMode = -1;
 	const float* uvs = 0;
 	int verticesCount = 0;
-	const int* triangles = 0;
+	const unsigned short* triangles = 0;
 	int trianglesCount = 0;
 	float r = 0, g = 0, b = 0, a = 0;
 	for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
