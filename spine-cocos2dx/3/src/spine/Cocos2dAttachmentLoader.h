@@ -34,9 +34,7 @@
 
 #include <spine/AtlasAttachmentLoader.h>
 
-#ifdef __cplusplus
 extern "C" {
-#endif
 
 typedef struct Cocos2dAttachmentLoader {
 	spAttachmentLoader super;
@@ -45,8 +43,6 @@ typedef struct Cocos2dAttachmentLoader {
 
 Cocos2dAttachmentLoader* Cocos2dAttachmentLoader_create (spAtlas* atlas);
 
-#ifdef __cplusplus
 }
-#endif
 
 #endif /* SPINE_COCOS2DATTACHMENTLOADER_H_ */

@@ -145,7 +145,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\spine\AttachmentVertices.cpp" />
-    <ClCompile Include="..\..\src\spine\Cocos2dAttachmentLoader.c" />
+    <ClCompile Include="..\..\src\spine\Cocos2dAttachmentLoader.cpp" />
     <ClCompile Include="..\..\src\spine\SkeletonBatch.cpp" />
     <ClCompile Include="..\..\src\spine\SkeletonAnimation.cpp" />
     <ClCompile Include="..\..\src\spine\SkeletonRenderer.cpp" />
