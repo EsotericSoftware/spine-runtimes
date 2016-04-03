@@ -8,6 +8,12 @@ This Spine Runtime may only be used for personal or internal use, typically to e
 
 The Spine Runtimes are developed with the intent to be used with data exported from Spine. By purchasing Spine, `Section 2` of the [Spine Software License](https://esotericsoftware.com/files/license.txt) grants the right to create and distribute derivative works of the Spine Runtimes.
 
+## Spine version
+
+spine-lua works with data exported from Spine 2.1.27. Updating spine-lua to [v3.0](https://trello.com/c/tF8UykBM/72-update-runtimes-to-support-v3-0-skewing-scale) and [v3.1](https://trello.com/c/bERJAFEq/73-update-runtimes-to-support-v3-1-linked-meshes) is in progress.
+
+spine-lua supports all Spine features.
+
 ## Setup
 
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).

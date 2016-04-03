@@ -8,6 +8,12 @@ This Spine Runtime may only be used for personal or internal use, typically to e
 
 The Spine Runtimes are developed with the intent to be used with data exported from Spine. By purchasing Spine, `Section 2` of the [Spine Software License](https://esotericsoftware.com/files/license.txt) grants the right to create and distribute derivative works of the Spine Runtimes.
 
+## Spine version
+
+spine-cocos2dx v3 works with data exported from the latest version of Spine, except linked meshes are [not yet supported](https://trello.com/c/bERJAFEq/73-update-runtimes-to-support-v3-1-linked-meshes).
+
+spine-cocos2dx v3 supports all Spine features.
+
 ## Setup
 
 The setup for cocos2d-x differs from most other Spine Runtimes because the cocos2d-x distribution includes a copy of the Spine Runtime files. This is not ideal because these files may be old and fail to work with the latest Spine editor. Also it means if cocos2d-x is updated, you may get newer Spine Runtime files which can break your application if you are not using the latest Spine editor. For these reasons, we have requested cocos2d-x to cease distributing the Spine Runtime files, but they  continue to do so.

@@ -1,3 +1,32 @@
 # spine-threejs
 
-The spine-threejs runtime is so far just an example of how the integration could be done. NOT stable!
+The spine-threejs runtime provides basic functionality to load and manipulate [Spine](http://esotericsoftware.com) skeletal animation data using [Three.js](http://threejs.org/). spine-threejs is based on [spine-js](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-js).
+
+## Licensing
+
+This Spine Runtime may only be used for personal or internal use, typically to evaluate Spine before purchasing. If you would like to incorporate a Spine Runtime into your applications, distribute software containing a Spine Runtime, or modify a Spine Runtime, then you will need a valid [Spine license](https://esotericsoftware.com/spine-purchase). Please see the [Spine Runtimes Software License](https://github.com/EsotericSoftware/spine-runtimes/blob/master/LICENSE) for detailed information.
+
+The Spine Runtimes are developed with the intent to be used with data exported from Spine. By purchasing Spine, `Section 2` of the [Spine Software License](https://esotericsoftware.com/files/license.txt) grants the right to create and distribute derivative works of the Spine Runtimes.
+
+## Spine version
+
+spine-threejs works with data exported from Spine 2.1.27. Updating spine-threejs to [v3.0](https://trello.com/c/tF8UykBM/72-update-runtimes-to-support-v3-0-skewing-scale) and [v3.1](https://trello.com/c/bERJAFEq/73-update-runtimes-to-support-v3-1-linked-meshes) is in progress.
+
+spine-threejs supports all Spine features except for rendering meshes.
+
+## Setup
+
+To run the example:
+
+1. Copy the contents of `spine-js` to `spine-threejs/spine-js`.
+1. Place the files on a webserver. Images can't be loaded when run from a local directory.
+1. Open `spine-threejs/example/index.html` in a web browser.
+
+## Demos
+
+- [spine-threejs Demo](http://esotericsoftware.com/files/runtimes/spine-threejs/example/index.html)<br>
+  [spine-turbulenz Demo source](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-threejs/example/index.html)
+
+## Notes
+
+- Atlas images should not use premultiplied alpha or rotation.
