@@ -41,7 +41,7 @@ class SkeletonBatch {
 public:
 	/* Sets the max number of vertices that can be drawn in a single frame. Best to call before getInstance is called for the
 	 * first time. Default is 8192. */
-	static void SkeletonBatch::setBufferSize (int vertexCount);
+	static void setBufferSize (int vertexCount);
 
 	static SkeletonBatch* getInstance ();
 
