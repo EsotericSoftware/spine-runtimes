@@ -273,8 +273,8 @@ public class Bone implements Updatable {
 		var x:Number = world[0] - _worldX, y:Number = world[1] - _worldY;
 		var a:Number = _a, b:Number = _b, c:Number = _c, d:Number = _d;
 		var invDet:Number = 1 / (a * d - b * c);
-		world[0] = (x * a * invDet - y * b * invDet);
-		world[1] = (y * d * invDet - x * c * invDet);
+		world[0] = (x * d * invDet - y * b * invDet);
+		world[1] = (y * a * invDet - x * c * invDet);
 	}
 
 	public function localToWorld (local:Vector.<Number>) : void {

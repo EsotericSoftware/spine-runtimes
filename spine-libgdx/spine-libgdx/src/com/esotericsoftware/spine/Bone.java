@@ -356,8 +356,8 @@ public class Bone implements Updatable {
 		float x = world.x - worldX, y = world.y - worldY;
 		float a = this.a, b = this.b, c = this.c, d = this.d;
 		float invDet = 1 / (a * d - b * c);
-		world.x = (x * a * invDet - y * b * invDet);
-		world.y = (y * d * invDet - x * c * invDet);
+		world.x = (x * d * invDet - y * b * invDet);
+		world.y = (y * a * invDet - x * c * invDet);
 		return world;
 	}
 

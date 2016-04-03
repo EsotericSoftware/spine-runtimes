@@ -233,8 +233,8 @@ namespace Spine {
 			float x = worldX - this.worldX, y = worldY - this.worldY;
 			float a = this.a, b = this.b, c = this.c, d = this.d;
 			float invDet = 1 / (a * d - b * c);
-			localX = (x * a * invDet - y * b * invDet);
-			localY = (y * d * invDet - x * c * invDet);
+			localX = (x * d * invDet - y * b * invDet);
+			localY = (y * a * invDet - x * c * invDet);
 		}
 
 		public void LocalToWorld (float localX, float localY, out float worldX, out float worldY) {

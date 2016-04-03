@@ -221,8 +221,8 @@ void spBone_worldToLocal (spBone* self, float worldX, float worldY, float* local
 	float x = worldX - self->worldX, y = worldY - self->worldY;
 	float a = self->a, b = self->b, c = self->c, d = self->d;
 	float invDet = 1 / (a * d - b * c);
-	*localX = (x * a * invDet - y * b * invDet);
-	*localY = (y * d * invDet - x * c * invDet);
+	*localX = (x * d * invDet - y * b * invDet);
+	*localY = (y * a * invDet - x * c * invDet);
 }
 
 void spBone_localToWorld (spBone* self, float localX, float localY, float* worldX, float* worldY) {
