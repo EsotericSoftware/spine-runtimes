@@ -1,6 +1,6 @@
 # spine-threejs
 
-The spine-threejs runtime provides basic functionality to load and manipulate [Spine](http://esotericsoftware.com) skeletal animation data using [Three.js](http://threejs.org/). spine-threejs is based on [spine-js](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-js).
+spine-threejs is a basic example of how to load and manipulate [Spine](http://esotericsoftware.com) skeletal animation data using [Three.js](http://threejs.org/). spine-threejs is based on [spine-js](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-js).
 
 ## Licensing
 

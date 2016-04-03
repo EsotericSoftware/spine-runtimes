@@ -1,6 +1,6 @@
 # spine-turbulenz
 
-The spine-turbulenz runtime provides basic functionality to load and manipulate [Spine](http://esotericsoftware.com) skeletal animation data using [Turbulenz](http://biz.turbulenz.com/developers). spine-turbulenz is based on [spine-js](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-js).
+spine-turbulenz is a basic example of how to load and manipulate [Spine](http://esotericsoftware.com) skeletal animation data using [Turbulenz](http://biz.turbulenz.com/developers). spine-turbulenz is based on [spine-js](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-js).
 
 ## Licensing
 
