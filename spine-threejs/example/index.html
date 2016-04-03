@@ -31,7 +31,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>spine-js</title>
+<title>spine-threejs</title>
 <script src="../spine-js/spine.js"></script>
 <script src="../three.min.js"></script>
 
@@ -39,42 +39,34 @@
 </head>
 <body>
 
-<input type="button" value="Spineboy" onclick="load('spineboy', 0.6)">
-<input type="button" value="Hero" onclick="load('hero', 1)">
-<input type="button" value="Goblins" onclick="load('goblins', 1)">
-<input type="button" value="Gipsy" onclick="load('skeleton', 1)">
- &nbsp; &nbsp; Click to change the animation or skin.
-
-<br>
 <script>
-
 (function () {
 
 	var loadText = function (url, callback) {
-		var req = new XMLHttpRequest ();
-		req.open ("GET", url, true);
+		var req = new XMLHttpRequest();
+		req.open("GET", url, true);
 		req.responseType = 'text';
-		req.addEventListener ('error', function (event) {}, false);
-		req.addEventListener ('abort', function (event) {}, false);
-		req.addEventListener ('load', function (event) { callback (req.response); }, false);
-		req.send ();
+		req.addEventListener('error', function (event) {}, false);
+		req.addEventListener('abort', function (event) {}, false);
+		req.addEventListener('load', function (event) { callback(req.response); }, false);
+		req.send();
 		return req;
 	};
 
 	var loadImage = function (url, callback) {
-		var image = new Image ();
-		image.addEventListener ('error', function (event) {}, false);
-		image.addEventListener ('abort', function (event) {}, false);
-		image.addEventListener ('load', function (event) { callback (image); }, false);
+		var image = new Image();
+		image.addEventListener('error', function (event) {}, false);
+		image.addEventListener('abort', function (event) {}, false);
+		image.addEventListener('load', function (event) { callback (image); }, false);
 		image.src = url;
 		return image;
 	};
 
-	SpineAnimation = function (animation, path, scale) {
+	SpineAnimation = function (name, path, scale) {
 
-		THREE.Object3D.call (this);
+		THREE.Object3D.call(this);
 
-		this.name = animation;
+		this.name = name;
 
 		path = path ? (path +
 			((path.substr(-1) != '/') ? '/' : '')
@@ -82,15 +74,15 @@
 
 		var self = this;
 
-		loadText (path + animation + '.atlas', function (atlasText) {
+		loadText(path + name + '.atlas', function (atlasText) {
 			self.atlas = new spine.Atlas(atlasText, {
 				load: function (page, image, atlas) {
-					loadImage (path + image, function (image) {
+					loadImage(path + image, function (image) {
 						// calculate UVs in atlas regions
 						page.width = image.width;
 						page.height = image.height;
 
-						atlas.updateUVs (page);
+						atlas.updateUVs(page);
 
 						// propagate new UVs to attachments, if they were already created
 						if (self.skeleton) {
@@ -101,18 +93,18 @@
 									var attachment = attachments[k];
 									if (attachment instanceof spine.RegionAttachment) {
 										var region = attachment.rendererObject;
-										attachment.setUVs (region.u, region.v, region.u2, region.v2, region.rotate);
+										attachment.setUVs(region.u, region.v, region.u2, region.v2, region.rotate);
 									}
 								}
 							}
 						}
 
 						// create basic material for the page
-						var texture = new THREE.Texture (image);
+						var texture = new THREE.Texture(image);
 						texture.needsUpdate = true;
 
 						page.rendererObject = [
-							new THREE.MeshBasicMaterial ({
+							new THREE.MeshBasicMaterial({
 								//color: 0xff00, wireframe: true,
 								map : texture, side : THREE.DoubleSide, transparent : true, alphaTest : 0.5
 							})
@@ -125,9 +117,7 @@
 						if (material.meshes) {
 							for (var name in material.meshes) {
 								var mesh = material.meshes[name];
-								if (mesh.parent) {
-									mesh.parent.remove (mesh);
-								}
+								if (mesh.parent) mesh.parent.remove(mesh);
 								mesh.geometry.dispose();
 							}
 						}
@@ -139,15 +129,15 @@
 				}
 			});
 
-			loadText (path + animation + '.json', function (skeletonText) {
-				var json = new spine.SkeletonJson (new spine.AtlasAttachmentLoader (self.atlas));
+			loadText(path + name + '.json', function (skeletonText) {
+				var json = new spine.SkeletonJson(new spine.AtlasAttachmentLoader(self.atlas));
 				json.scale = scale || 1;
 
-				var skeletonData = json.readSkeletonData (JSON.parse (skeletonText));
+				var skeletonData = json.readSkeletonData(JSON.parse(skeletonText));
 
-				self.skeleton = new spine.Skeleton (skeletonData);
-				self.stateData = new spine.AnimationStateData (skeletonData);	
-				self.state = new spine.AnimationState (self.stateData);
+				self.skeleton = new spine.Skeleton(skeletonData);
+				self.stateData = new spine.AnimationStateData(skeletonData);	
+				self.state = new spine.AnimationState(self.stateData);
 
 				self.dispatchEvent({
 					type : SpineAnimation.SKELETON_DATA_LOADED
@@ -155,18 +145,18 @@
 			});
 		});
 
-		var matrix = new THREE.Matrix4 ();
+		var matrix = new THREE.Matrix4();
 
 		// if given, dt must be in ms
 
 		this.update = function (dt, dz) {
 			if (!this.state) return;
 
-			this.state.update (dt || (1.0 / 60));
-			this.state.apply (this.skeleton);
-			this.skeleton.updateWorldTransform ();
+			this.state.update(dt || (1.0 / 60));
+			this.state.apply(this.skeleton);
+			this.skeleton.updateWorldTransform();
 
-			this.traverse (function (object) {
+			this.traverse(function (object) {
 				if (object instanceof THREE.Mesh) {
 					object.visible = false;
 				}
@@ -180,14 +170,12 @@
 				if (!(attachment instanceof spine.RegionAttachment)) continue;
 
 				var materials = attachment.rendererObject.page.rendererObject;
-				if (!materials) {
-					// texture was not loaded yet
-					continue;
-				}
+				// texture was not loaded yet
+				if (!materials) continue;
 
 				if (slot.data.additiveBlending && (materials.length == 1)) {
 					// create separate material for additive blending
-					materials.push (new THREE.MeshBasicMaterial ({
+					materials.push(new THREE.MeshBasicMaterial({
 						map : materials[0].map,
 						side : THREE.DoubleSide,
 						transparent : true,
@@ -209,44 +197,41 @@
 
 					mesh.visible = true;
 				} else {
-					geometry = new THREE.PlaneGeometry (
+					geometry = new THREE.PlaneGeometry(
 						attachment.regionOriginalWidth,
 						attachment.regionOriginalHeight
 					);
-
 					geometry.dynamic = true;
 
-					mesh = new THREE.Mesh (geometry, material);
-
-					material.meshes[slot.data.name] = mesh;
-
+					mesh = new THREE.Mesh(geometry, material);
 					mesh.matrixAutoUpdate = false;
 
-					this.add (mesh);
+					material.meshes[slot.data.name] = mesh;
+					this.add(mesh);
 				}
 
 				if (mesh.attachmentTime && (slot.getAttachmentTime () > mesh.attachmentTime)) {
 					// do nothing
 				} else {
 					// update UVs
-					geometry.faceVertexUvs[0][0][0].set (attachment.uvs[6], 1- attachment.uvs[7]);
-					geometry.faceVertexUvs[0][0][1].set (attachment.uvs[4], 1- attachment.uvs[5]);
-					geometry.faceVertexUvs[0][0][2].set (attachment.uvs[0], 1- attachment.uvs[1]);
-					geometry.faceVertexUvs[0][1][0].set (attachment.uvs[4], 1- attachment.uvs[5]);
-					geometry.faceVertexUvs[0][1][1].set (attachment.uvs[2], 1- attachment.uvs[3]);
-					geometry.faceVertexUvs[0][1][2].set (attachment.uvs[0], 1- attachment.uvs[1]);
+					geometry.faceVertexUvs[0][0][0].set(attachment.uvs[6], 1- attachment.uvs[7]);
+					geometry.faceVertexUvs[0][0][1].set(attachment.uvs[4], 1- attachment.uvs[5]);
+					geometry.faceVertexUvs[0][0][2].set(attachment.uvs[0], 1- attachment.uvs[1]);
+					geometry.faceVertexUvs[0][1][0].set(attachment.uvs[4], 1- attachment.uvs[5]);
+					geometry.faceVertexUvs[0][1][1].set(attachment.uvs[2], 1- attachment.uvs[3]);
+					geometry.faceVertexUvs[0][1][2].set(attachment.uvs[0], 1- attachment.uvs[1]);
 					geometry.uvsNeedUpdate = true;
 
-					geometry.vertices[1].set (attachment.offset[0], attachment.offset[1], 0);
-					geometry.vertices[3].set (attachment.offset[2], attachment.offset[3], 0);
-					geometry.vertices[2].set (attachment.offset[4], attachment.offset[5], 0);
-					geometry.vertices[0].set (attachment.offset[6], attachment.offset[7], 0);
+					geometry.vertices[1].set(attachment.offset[0], attachment.offset[1], 0);
+					geometry.vertices[3].set(attachment.offset[2], attachment.offset[3], 0);
+					geometry.vertices[2].set(attachment.offset[4], attachment.offset[5], 0);
+					geometry.vertices[0].set(attachment.offset[6], attachment.offset[7], 0);
 					geometry.verticesNeedUpdate = true;
 
-					mesh.attachmentTime = slot.getAttachmentTime ();
+					mesh.attachmentTime = slot.getAttachmentTime();
 				}
 
-				matrix.makeTranslation (
+				matrix.makeTranslation(
 					this.skeleton.x + slot.bone.worldX,
 					this.skeleton.y + slot.bone.worldY,
 					(dz || 0.1) * Z++
@@ -255,7 +240,7 @@
 				matrix.elements[0] = slot.bone.m00; matrix.elements[4] = slot.bone.m01;
 				matrix.elements[1] = slot.bone.m10; matrix.elements[5] = slot.bone.m11;
 
-				mesh.matrix.copy (matrix);
+				mesh.matrix.copy(matrix);
 
 				/* TODO slot.r,g,b,a ?? turbulenz example code:
 				batch.add(
@@ -279,135 +264,126 @@
 
 	SpineAnimation.SKELETON_DATA_LOADED = 'skeletonDataLoaded';
 
-	SpineAnimation.prototype = Object.create (THREE.Object3D.prototype);
+	SpineAnimation.prototype = Object.create(THREE.Object3D.prototype);
 
 	SpineAnimation.prototype.dispose = function () {
-		if (this.parent) this.parent.remove (this); this.atlas.dispose ();
+		if (this.parent) this.parent.remove(this); this.atlas.dispose();
 	};
 
 }) ();
 
+var scene, camera, renderer;
+var geometry, material, mesh;
+var anim;
 
+function load (name, scale) {
+	if (anim) anim.dispose();
 
+	anim = new SpineAnimation(name, 'data/', scale);
 
+	anim.addEventListener(SpineAnimation.SKELETON_DATA_LOADED, function () {
+		var canvas = renderer.domElement;
 
+		switch (anim.name) {
+		case 'spineboy':
+			anim.stateData.setMixByName('walk', 'jump', 0.2);
+			anim.stateData.setMixByName('run', 'jump', 0.2);
+			anim.stateData.setMixByName('jump', 'run', 0.2);
+			anim.state.setAnimationByName(0, 'walk', true);
+			canvas.onmousedown = function () {
+				anim.state.setAnimationByName(0, 'jump', false);
+				anim.state.addAnimationByName(0, 'run', true, 0);
+			}
+			break;
+		case 'hero':
+			anim.stateData.defaultMix = 0.2;
+			anim.stateData.setMixByName('Walk', 'Attack', 0);
+			anim.stateData.setMixByName('Attack', 'Run', 0);
+			anim.stateData.setMixByName('Run', 'Attack', 0);
+			anim.state.setAnimationByName(0, 'Idle', true);
+			canvas.onmousedown = function () {
+				var name = anim.state.getCurrent(0).animation.name;
+				if (name == 'Idle')
+					anim.state.setAnimationByName(0, 'Crouch', true);
+				else if (name == 'Crouch')
+					anim.state.setAnimationByName(0, 'Walk', true);
+				else {
+					anim.state.setAnimationByName(0, 'Attack', false);
+					anim.state.addAnimationByName(0, 'Run', true, 0);
+				}
+			}
+			break;
+		case 'goblins':
+			anim.skeleton.setSkinByName('goblingirl'); // TODO - spine.Skeleton.prototype.setSkin doesn't work?
+			anim.skeleton.setSlotsToSetupPose();
+			anim.state.setAnimationByName(0, 'walk', true);
+			canvas.onmousedown = function () {
+				anim.skeleton.setSkinByName(anim.skeleton.skin.name == 'goblin' ? 'goblingirl' : 'goblin');
+				anim.skeleton.setSlotsToSetupPose();
+			}
+			break;
+		case 'skeleton':
+			anim.state.setAnimationByName(0, 'walk test', true);
+			canvas.onmousedown = function () {
+				var name = anim.state.getCurrent(0).animation.name;
+				if (name == 'walk test')
+					anim.state.setAnimationByName(0, 'idle test', true);
+				else
+					anim.state.setAnimationByName(0, 'walk test', true);
+			}
+			break;
+		}
+		//anim.skeleton.y = -200;
+	});
 
-    var scene, camera, renderer;
-    var geometry, material, mesh;
+	mesh.add(anim);
+}
 
-    var test;
+function init() {
+	scene = new THREE.Scene();
 
-    function load(animation, scale) {
-    	if (test) {
-    		test.dispose ();
-    	}
+	camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 3000);
+	camera.position.z = 400;
 
-    	test = new SpineAnimation (animation, 'data/', scale);
+	geometry = new THREE.BoxGeometry(200, 200, 200);
+	material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
 
-        test.addEventListener( SpineAnimation.SKELETON_DATA_LOADED, function () {
-        	var canvas = renderer.domElement;
+	mesh = new THREE.Mesh(geometry, material);
+	scene.add(mesh);
 
-        	switch (test.name) {
-        		case 'spineboy':
-					test.stateData.setMixByName('walk', 'jump', 0.2);
-					test.stateData.setMixByName('run', 'jump', 0.2);
-					test.stateData.setMixByName('jump', 'run', 0.2);
-					test.state.setAnimationByName(0, 'walk', true);
-					canvas.onmousedown = function () {
-						test.state.setAnimationByName(0, 'jump', false);
-						test.state.addAnimationByName(0, 'run', true, 0);
-					}
-					break;
-				case 'hero':
-					test.stateData.defaultMix = 0.2;
-					test.stateData.setMixByName('Walk', 'Attack', 0);
-					test.stateData.setMixByName('Attack', 'Run', 0);
-					test.stateData.setMixByName('Run', 'Attack', 0);
-					test.state.setAnimationByName(0, 'Idle', true);
-					canvas.onmousedown = function () {
-						var name = test.state.getCurrent(0).animation.name;
-						if (name == 'Idle') {
-							test.state.setAnimationByName(0, 'Crouch', true);
-						} else if (name == 'Crouch') {
-							test.state.setAnimationByName(0, 'Walk', true);
-						} else {
-							test.state.setAnimationByName(0, 'Attack', false);
-							test.state.addAnimationByName(0, 'Run', true, 0);
-						}
-					}
-					break;
-				case 'goblins':
-					test.skeleton.setSkinByName('goblingirl'); // TODO find why spine.Skeleton.prototype.setSkin does not work
-					test.skeleton.setSlotsToSetupPose();
-					test.state.setAnimationByName(0, 'walk', true);
-					canvas.onmousedown = function () {
-						test.skeleton.setSkinByName(test.skeleton.skin.name == 'goblin' ? 'goblingirl' : 'goblin');
-						test.skeleton.setSlotsToSetupPose();
-					}
-					break;
-				case 'skeleton':
-					test.state.setAnimationByName(0, 'walk test', true);
-					canvas.onmousedown = function () {
-						var name = test.state.getCurrent(0).animation.name;
-						if (name == 'walk test') {
-							test.state.setAnimationByName(0, 'idle test', true);
-						} else {
-							test.state.setAnimationByName(0, 'walk test', true);
-						}
-					}
-					break;
-        	}
-        	//test.skeleton.y = -200;
-        });
+	load('spineboy', 0.4);
 
-        mesh.add( test );
-    }
+	renderer = new THREE.WebGLRenderer();
+	renderer.setSize(window.innerWidth, window.innerHeight);
 
-    init();
-    animate();
+	document.body.appendChild(renderer.domElement);
+}
 
-    function init() {
-		spine.Bone.yDown = false;
+function animate() {
+	requestAnimationFrame(animate);
 
-        scene = new THREE.Scene();
+	var t = Date.now();
+	var a = Math.sin(t * 6e-4);
+	var b = Math.cos(t * 3e-4);
 
-        camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 3000 );
-        camera.position.z = 400;
+	mesh.rotation.x = a * Math.PI * 0.2;
+	mesh.rotation.y = b * Math.PI * 0.4;
 
-        geometry = new THREE.BoxGeometry( 200, 200, 200 );
-        material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+	anim.update();
 
-        mesh = new THREE.Mesh( geometry, material );
-        scene.add( mesh );
+	renderer.render(scene, camera);
+}
 
-        load( 'spineboy', 0.4 );
-
-        renderer = new THREE.WebGLRenderer();
-        renderer.setSize( window.innerWidth, window.innerHeight );
-
-        document.body.appendChild( renderer.domElement );
-
-    }
-
-    function animate() {
-
-        requestAnimationFrame( animate );
-
-        var t = Date.now ();
-        var a = Math.sin (t * 6e-4);
-        var b = Math.cos (t * 3e-4);
-
-        mesh.rotation.x = a * Math.PI * 0.2;
-        mesh.rotation.y = b * Math.PI * 0.4;
-
-
-        test.update();
-
-        renderer.render( scene, camera );
-
-    }
-
+init();
+animate();
 </script>
+
+<br>
+<input type="button" value="Spineboy" onclick="load('spineboy', 0.6)">
+<input type="button" value="Hero" onclick="load('hero', 1)">
+<input type="button" value="Goblins" onclick="load('goblins', 1)">
+<input type="button" value="Gypsy" onclick="load('gypsy', 1)">
+ &nbsp; &nbsp; Click to change the animation or skin.
 
 </body>
 </html>
