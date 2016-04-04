@@ -145,7 +145,7 @@ static int indexOf (const char** array, int count, Str* str) {
 	int i;
 	for (i = count - 1; i >= 0; i--)
 		if (strncmp(array[i], str->begin, length) == 0) return i;
-	return -1;
+	return 0;
 }
 
 static int equals (Str* str, const char* other) {
