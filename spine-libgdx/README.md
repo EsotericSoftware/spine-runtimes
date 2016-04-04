@@ -29,9 +29,9 @@ Alternatively, the contents of the `spine-libgdx/src` directory can be copied in
 
 ## Examples
 
+* [HTML5 example](http://esotericsoftware.com/files/runtimes/spine-libgdx/raptor/)
+* [Super Spineboy](https://github.com/EsotericSoftware/spine-superspineboy) Full game example done with Spine Essential, includes source code.
 * [Simple example 1](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-libgdx/spine-libgdx-tests/src/com/esotericsoftware/spine/SimpleTest1.java) Simplest possible example, fully commented.
 * [Simple example 2](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-libgdx/spine-libgdx-tests/src/com/esotericsoftware/spine/SimpleTest2.java) Shows events and bounding box hit detection.
 * [Simple example 3](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-libgdx/spine-libgdx-tests/src/com/esotericsoftware/spine/SimpleTest3.java) Shows mesh rendering and IK using the raptor example.
-* [Box2D Example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-libgdx/test/com/esotericsoftware/spine/Box2DExample.java#L56) (written before bounding boxes were available)
-* [Mix Example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-libgdx/test/com/esotericsoftware/spine/MixTest.java#L39)
-* [Super Spineboy](https://github.com/EsotericSoftware/spine-superspineboy) Full game example done with Spine Essential.
+* [More examples](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-libgdx/spine-libgdx-tests/src/com/esotericsoftware/spine/)
