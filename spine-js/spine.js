@@ -82,6 +82,8 @@ spine.Bone = function (boneData, skeleton, parent) {
 	this.data = boneData;
 	this.skeleton = skeleton;
 	this.parent = parent;
+	this.x = boneData.x;
+	this.y = boneData.y;
 	this.setToSetupPose();
 };
 spine.Bone.yDown = false;
@@ -195,6 +197,8 @@ spine.Slot.prototype = {
 		this.g = data.g;
 		this.b = data.b;
 		this.a = data.a;
+
+		this.attachmentVertices = [];
 
 		if (!data.attachmentName)
 			this.setAttachment(null);
@@ -1430,6 +1434,9 @@ spine.SkinnedMeshAttachment.prototype = {
 
 		var w = 0, v = 0, b = 0, f = 0, n = bones.length, nn;
 		var wx, wy, bone, vx, vy, weight;
+
+		if ( slot.vertices == undefined )
+			slot.vertices = [];
 		if (!slot.attachmentVertices.length) {
 			for (; v < n; w += 2) {
 				wx = 0;
@@ -1443,6 +1450,8 @@ spine.SkinnedMeshAttachment.prototype = {
 					wx += (vx * bone.m00 + vy * bone.m01 + bone.worldX) * weight;
 					wy += (vx * bone.m10 + vy * bone.m11 + bone.worldY) * weight;
 				}
+				slot.vertices[w] = wx - slot.bone.worldX;
+				slot.vertices[w + 1] = slot.bone.worldY - wy;
 				worldVertices[w] = wx + x;
 				worldVertices[w + 1] = wy + y;
 			}
@@ -1460,6 +1469,8 @@ spine.SkinnedMeshAttachment.prototype = {
 					wx += (vx * bone.m00 + vy * bone.m01 + bone.worldX) * weight;
 					wy += (vx * bone.m10 + vy * bone.m11 + bone.worldY) * weight;
 				}
+				slot.vertices[w] = wx - slot.bone.worldX;
+				slot.vertices[w + 1] = slot.bone.worldY - wy;
 				worldVertices[w] = wx + x;
 				worldVertices[w + 1] = wy + y;
 			}
@@ -1844,6 +1855,10 @@ spine.SkeletonJson.prototype = {
 			region.rotation = map["rotation"] || 0;
 			region.width = (map["width"] || 0) * scale;
 			region.height = (map["height"] || 0) * scale;
+			region.regionOriginalWidth = region.width;
+			region.regionOriginalHeight = region.height
+			region.regionWidth = region.width;
+			region.regionHeight = region.height;
 
 			var color = map["color"];
 			if (color) {
@@ -1859,6 +1874,8 @@ spine.SkeletonJson.prototype = {
 			var mesh = this.attachmentLoader.newMeshAttachment(skin, name, path);
 			if (!mesh) return null;
 			mesh.path = path; 
+			mesh.x = (map["x"] || 0) * scale;
+			mesh.y = (map["y"] || 0) * scale;
 			mesh.vertices = this.getFloatArray(map, "vertices", scale);
 			mesh.triangles = this.getIntArray(map, "triangles");
 			mesh.regionUVs = this.getFloatArray(map, "uvs", 1);
@@ -2092,12 +2109,16 @@ spine.SkeletonJson.prototype = {
 							else {
 								vertices = [];
 								vertices.length = vertexCount;
+								for (var ii = 0; ii < vertexCount; ii++)
+									vertices[ii] = 0;
 							}
 						} else {
 							var verticesValue = valueMap["vertices"];
 							var vertices = [];
 							vertices.length = vertexCount;
 							var start = valueMap["offset"] || 0;
+							for (var ii = 0; ii < vertexCount; ii++)
+								vertices[ii] = 0;
 							var nn = verticesValue.length;
 							if (this.scale == 1) {
 								for (var ii = 0; ii < nn; ii++)
@@ -2516,7 +2537,7 @@ spine.SkeletonBounds.prototype = {
 		for (var i = 0; i < slotCount; i++) {
 			var slot = slots[i];
 			var boundingBox = slot.attachment;
-			if (boundingBox.type != spine.AttachmentType.boundingbox) continue;
+			//if (boundingBox.type != spine.AttachmentType.boundingbox) continue;
 			boundingBoxes.push(boundingBox);
 
 			var poolCount = polygonPool.length, polygon;
@@ -2526,9 +2547,22 @@ spine.SkeletonBounds.prototype = {
 			} else
 				polygon = [];
 			polygons.push(polygon);
-
-			polygon.length = boundingBox.vertices.length;
-			boundingBox.computeWorldVertices(x, y, slot.bone, polygon);
+			if ( boundingBox && boundingBox.vertices )
+			{
+				polygon.length = boundingBox.vertices.length;
+				boundingBox.computeWorldVertices(x, y, slot.bone, polygon);
+			}
+			else if ( boundingBox && boundingBox.triangles )
+			{
+				polygon.length = boundingBox.edges.length/2;
+				boundingBox.computeWorldVertices(x, y, slot, polygon);
+			}
+			else if ( boundingBox )
+			{
+				boundingBox.updateOffset();
+				polygon.length = 8;
+				boundingBox.computeVertices(x, y, slot.bone, polygon);
+			}
 		}
 
 		if (updateAabb) this.aabbCompute();
