@@ -162,9 +162,15 @@ public class SkeletonSprite extends DisplayObject {
 			}
 			if (image) {
 				a *= skeletonA * slot.a;
-				r *= skeletonR * slot.r * a;
-				g *= skeletonG * slot.g * a;
-				b *= skeletonB * slot.b * a;
+				if (image.texture.premultipliedAlpha) {
+					r *= skeletonR * slot.r * a;
+					g *= skeletonG * slot.g * a;
+					b *= skeletonB * slot.b * a;
+				} else {
+					r *= skeletonR * slot.r;
+					g *= skeletonG * slot.g;
+					b *= skeletonB * slot.b;
+				}
 				polygonBatch.add(image.texture, worldVertices, verticesLength, uvs, triangles, r, g, b, a, slot.data.blendMode, matrix);
 			}
 		}
