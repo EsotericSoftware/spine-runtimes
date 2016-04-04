@@ -104,6 +104,8 @@ spAttachment* _spAtlasAttachmentLoader_createAttachment (spAttachmentLoader* loa
 		_spAttachmentLoader_setUnknownTypeError(loader, type);
 		return 0;
 	}
+
+	UNUSED(skin);
 }
 
 spAtlasAttachmentLoader* spAtlasAttachmentLoader_create (spAtlas* atlas) {

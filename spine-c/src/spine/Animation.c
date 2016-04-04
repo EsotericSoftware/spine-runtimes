@@ -294,6 +294,10 @@ void _spRotateTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 	while (amount < -180)
 		amount += 360;
 	bone->rotation += amount * alpha;
+
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
 }
 
 spRotateTimeline* spRotateTimeline_create (int framesCount) {
@@ -342,6 +346,10 @@ void _spTranslateTimeline_apply (const spTimeline* timeline, spSkeleton* skeleto
 			* alpha;
 	bone->y += (bone->data->y + prevFrameY + (self->frames[frameIndex + TRANSLATE_FRAME_Y] - prevFrameY) * percent - bone->y)
 			* alpha;
+
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
 }
 
 spTranslateTimeline* spTranslateTimeline_create (int framesCount) {
@@ -386,6 +394,10 @@ void _spScaleTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 			- bone->scaleX) * alpha;
 	bone->scaleY += (bone->data->scaleY * (prevFrameY + (self->frames[frameIndex + TRANSLATE_FRAME_Y] - prevFrameY) * percent)
 			- bone->scaleY) * alpha;
+
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
 }
 
 spScaleTimeline* spScaleTimeline_create (int framesCount) {
@@ -449,6 +461,10 @@ void _spColorTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 		slot->b = b;
 		slot->a = a;
 	}
+
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
 }
 
 spColorTimeline* spColorTimeline_create (int framesCount) {
@@ -485,6 +501,10 @@ void _spAttachmentTimeline_apply (const spTimeline* timeline, spSkeleton* skelet
 	attachmentName = self->attachmentNames[frameIndex];
 	spSlot_setAttachment(skeleton->slots[self->slotIndex],
 			attachmentName ? spSkeleton_getAttachmentForSlotIndex(skeleton, self->slotIndex, attachmentName) : 0);
+
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
+	UNUSED(alpha);
 }
 
 void _spAttachmentTimeline_dispose (spTimeline* timeline) {
@@ -608,6 +628,11 @@ void _spDrawOrderTimeline_apply (const spTimeline* timeline, spSkeleton* skeleto
 		for (i = 0; i < self->slotsCount; ++i)
 			skeleton->drawOrder[i] = skeleton->slots[drawOrderToSetupIndex[i]];
 	}
+
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
+	UNUSED(alpha);
 }
 
 void _spDrawOrderTimeline_dispose (spTimeline* timeline) {
@@ -704,6 +729,10 @@ void _spFFDTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, flo
 			slot->attachmentVertices[i] = prev + (nextVertices[i] - prev) * percent;
 		}
 	}
+
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
 }
 
 void _spFFDTimeline_dispose (spTimeline* timeline) {
@@ -776,6 +805,10 @@ void _spIkConstraintTimeline_apply (const spTimeline* timeline, spSkeleton* skel
 	mix = prevFrameMix + (self->frames[frameIndex + IKCONSTRAINT_FRAME_MIX] - prevFrameMix) * percent;
 	ikConstraint->mix += (mix - ikConstraint->mix) * alpha;
 	ikConstraint->bendDirection = (int)self->frames[frameIndex + IKCONSTRAINT_PREV_FRAME_BEND_DIRECTION];
+
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
 }
 
 spIkConstraintTimeline* spIkConstraintTimeline_create (int framesCount) {

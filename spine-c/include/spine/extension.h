@@ -77,6 +77,8 @@
 #define ACOS(A) (float)acos(A)
 #endif
 
+#define UNUSED(x) (void)(x)
+
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
