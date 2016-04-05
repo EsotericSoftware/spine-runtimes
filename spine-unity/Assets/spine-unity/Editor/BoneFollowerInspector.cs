@@ -29,13 +29,10 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using System;
 using UnityEditor;
 using UnityEngine;
 
-
-namespace Spine.Unity.Editor {
-	
+namespace Spine.Unity.Editor {	
 	[CustomEditor(typeof(BoneFollower))]
 	public class BoneFollowerInspector : UnityEditor.Editor {
 		SerializedProperty boneName, skeletonRenderer, followZPosition, followBoneRotation;
@@ -47,8 +44,10 @@ namespace Spine.Unity.Editor {
 			boneName = serializedObject.FindProperty("boneName");
 			followBoneRotation = serializedObject.FindProperty("followBoneRotation");
 			followZPosition = serializedObject.FindProperty("followZPosition");
+
 			component = (BoneFollower)target;
-			component.skeletonRenderer.Initialize(false);
+			if (component.SkeletonRenderer != null)
+				component.SkeletonRenderer.Initialize(false);
 		}
 
 		override public void OnInspectorGUI () {
@@ -62,10 +61,11 @@ namespace Spine.Unity.Editor {
 
 			// FindRenderer()
 			if (skeletonRenderer.objectReferenceValue == null) {
-				SkeletonRenderer parentRenderer = SkeletonUtility.GetInParent<SkeletonRenderer>(component.transform);
+				SkeletonRenderer parentRenderer = BoneFollowerInspector.GetInParent<SkeletonRenderer>(component.transform);
 
 				if (parentRenderer != null) {
-					skeletonRenderer.objectReferenceValue = (UnityEngine.Object)parentRenderer;
+					Debug.Log("Inspector automatically assigned BoneFollower.SkeletonRenderer");
+					skeletonRenderer.objectReferenceValue = parentRenderer;
 				}
 			}
 
@@ -91,6 +91,21 @@ namespace Spine.Unity.Editor {
 			) {
 				component.Reset();
 			}
+		}
+
+		public static T GetInParent<T> (Transform origin) where T : Component {
+			#if UNITY_4_3
+			Transform parent = origin.parent;
+			while(parent.GetComponent<T>() == null){
+			parent = parent.parent;
+			if(parent == null)
+			return default(T);
+			}
+
+			return parent.GetComponent<T>();
+			#else
+			return origin.GetComponentInParent<T>();
+			#endif
 		}
 	}
 
