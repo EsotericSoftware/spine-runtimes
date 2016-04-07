@@ -14,6 +14,8 @@ spine-turbulenz works with data exported from Spine 2.1.27. Updating spine-turbu
 
 spine-turbulenz supports all Spine features except for rendering meshes.
 
+spine-turbulenz does not yet support loading the binary format.
+
 ## Setup
 
 To run the example:

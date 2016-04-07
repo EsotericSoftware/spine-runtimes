@@ -14,6 +14,8 @@ spine-love works with data exported from Spine 2.1.27. Updating spine-love to [v
 
 spine-love supports all Spine features except for rendering meshes.
 
+spine-love does not yet support loading the binary format.
+
 ## Setup
 
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).

@@ -18,6 +18,8 @@ spine-js works with data exported from Spine 2.1.27. Updating spine-js to [v3.0]
 
 spine-js supports all Spine features.
 
+spine-js does not yet support loading the binary format.
+
 ## Setup
 
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
