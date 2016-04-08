@@ -48,32 +48,27 @@ namespace Spine.Unity.Editor {
 
 			SpineEditorUtilities.ConfirmInitialization();
 
-			try {
-				atlasAssets = serializedObject.FindProperty("atlasAssets");
-				atlasAssets.isExpanded = true;
-				skeletonJSON = serializedObject.FindProperty("skeletonJSON");
-				scale = serializedObject.FindProperty("scale");
-				fromAnimation = serializedObject.FindProperty("fromAnimation");
-				toAnimation = serializedObject.FindProperty("toAnimation");
-				duration = serializedObject.FindProperty("duration");
-				defaultMix = serializedObject.FindProperty("defaultMix");
-				#if SPINE_SKELETON_ANIMATOR
-				controller = serializedObject.FindProperty("controller");
-				#endif
-				#if SPINE_TK2D
-				spriteCollection = serializedObject.FindProperty("spriteCollection");
-				#endif
+			atlasAssets = serializedObject.FindProperty("atlasAssets");
+			atlasAssets.isExpanded = true;
+			skeletonJSON = serializedObject.FindProperty("skeletonJSON");
+			scale = serializedObject.FindProperty("scale");
+			fromAnimation = serializedObject.FindProperty("fromAnimation");
+			toAnimation = serializedObject.FindProperty("toAnimation");
+			duration = serializedObject.FindProperty("duration");
+			defaultMix = serializedObject.FindProperty("defaultMix");
+			#if SPINE_SKELETON_ANIMATOR
+			controller = serializedObject.FindProperty("controller");
+			#endif
+			#if SPINE_TK2D
+			spriteCollection = serializedObject.FindProperty("spriteCollection");
+			#endif
 
-				m_skeletonDataAsset = (SkeletonDataAsset)target;
-				m_skeletonDataAssetGUID = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(m_skeletonDataAsset));
+			m_skeletonDataAsset = (SkeletonDataAsset)target;
+			m_skeletonDataAssetGUID = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(m_skeletonDataAsset));
 
-				EditorApplication.update += Update;
-			} catch {
-				// TODO: WARNING: empty catch block supresses errors.
+			EditorApplication.update += Update;
 
-			}
-
-			m_skeletonData = m_skeletonDataAsset.GetSkeletonData(true);
+			m_skeletonData = m_skeletonDataAsset.GetSkeletonData(false);
 
 			showBaking = EditorPrefs.GetBool("SkeletonDataAssetInspector_showUnity", false);
 
@@ -145,18 +140,18 @@ namespace Spine.Unity.Editor {
 				EditorGUI.indentLevel++;
 				EditorGUILayout.PropertyField(controller, new GUIContent("Controller", SpineEditorUtilities.Icons.controllerIcon));		
 				if (controller.objectReferenceValue == null) {
-					GUILayout.BeginHorizontal();
-					GUILayout.Space(32);
-					if (GUILayout.Button(new GUIContent("Generate Mecanim Controller"), GUILayout.Width(195), GUILayout.Height(20)))
-						SkeletonBaker.GenerateMecanimAnimationClips(m_skeletonDataAsset);
-					GUILayout.EndHorizontal();
+					using (new GUILayout.HorizontalScope()) {
+						GUILayout.Space(32);
+						if (GUILayout.Button(new GUIContent("Generate Mecanim Controller"), GUILayout.Width(195), GUILayout.Height(20)))
+							SkeletonBaker.GenerateMecanimAnimationClips(m_skeletonDataAsset);						
+					}
 					EditorGUILayout.LabelField("SkeletonAnimator is the Mecanim alternative to SkeletonAnimation. It is not required.", EditorStyles.miniLabel);
 				} else {
-					GUILayout.BeginHorizontal();
-					GUILayout.Space(32);
-					if (GUILayout.Button(new GUIContent("Update Controller Animations"), GUILayout.Width(195), GUILayout.Height(20)))
-						SkeletonBaker.GenerateMecanimAnimationClips(m_skeletonDataAsset);				
-					GUILayout.EndHorizontal();
+					using (new GUILayout.HorizontalScope()) {
+						GUILayout.Space(32);
+						if (GUILayout.Button(new GUIContent("Update Controller Animations"), GUILayout.Width(195), GUILayout.Height(20)))
+							SkeletonBaker.GenerateMecanimAnimationClips(m_skeletonDataAsset);				
+					}
 				}
 				EditorGUI.indentLevel--;
 			}
@@ -197,7 +192,7 @@ namespace Spine.Unity.Editor {
 						} else
 							skinName = m_skeletonAnimation.skeleton.Skin.Name;
 
-						using (var m = new EditorGUILayout.VerticalScope()) {
+						using (new EditorGUILayout.VerticalScope()) {
 							if (GUILayout.Button(new GUIContent("Bake " + skinName, SpineEditorUtilities.Icons.unityIcon), GUILayout.Height(32), GUILayout.Width(250)))
 								SkeletonBaker.BakeToPrefab(m_skeletonDataAsset, new ExposedList<Skin>(new [] { bakeSkin }), "", bakeAnimations, bakeIK, bakeEventOptions);
 							using (new EditorGUILayout.HorizontalScope()) {
@@ -258,26 +253,26 @@ namespace Spine.Unity.Editor {
 				SerializedProperty from = fromAnimation.GetArrayElementAtIndex(i);
 				SerializedProperty to = toAnimation.GetArrayElementAtIndex(i);
 				SerializedProperty durationProp = duration.GetArrayElementAtIndex(i);
-				EditorGUILayout.BeginHorizontal();
-				from.stringValue = animations[EditorGUILayout.Popup(Math.Max(Array.IndexOf(animations, from.stringValue), 0), animations)];
-				to.stringValue = animations[EditorGUILayout.Popup(Math.Max(Array.IndexOf(animations, to.stringValue), 0), animations)];
-				durationProp.floatValue = EditorGUILayout.FloatField(durationProp.floatValue);
-				if (GUILayout.Button("Delete")) {
-					duration.DeleteArrayElementAtIndex(i);
-					toAnimation.DeleteArrayElementAtIndex(i);
-					fromAnimation.DeleteArrayElementAtIndex(i);
+				using (new EditorGUILayout.HorizontalScope()) {
+					from.stringValue = animations[EditorGUILayout.Popup(Math.Max(Array.IndexOf(animations, from.stringValue), 0), animations)];
+					to.stringValue = animations[EditorGUILayout.Popup(Math.Max(Array.IndexOf(animations, to.stringValue), 0), animations)];
+					durationProp.floatValue = EditorGUILayout.FloatField(durationProp.floatValue);
+					if (GUILayout.Button("Delete")) {
+						duration.DeleteArrayElementAtIndex(i);
+						toAnimation.DeleteArrayElementAtIndex(i);
+						fromAnimation.DeleteArrayElementAtIndex(i);
+					}
 				}
-				EditorGUILayout.EndHorizontal();
 			}
-			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.Space();
-			if (GUILayout.Button("Add Mix")) {
-				duration.arraySize++;
-				toAnimation.arraySize++;
-				fromAnimation.arraySize++;
+			using (new EditorGUILayout.HorizontalScope()) {
+				EditorGUILayout.Space();
+				if (GUILayout.Button("Add Mix")) {
+					duration.arraySize++;
+					toAnimation.arraySize++;
+					fromAnimation.arraySize++;
+				}
+				EditorGUILayout.Space();
 			}
-			EditorGUILayout.Space();
-			EditorGUILayout.EndHorizontal();
 
 			if (EditorGUI.EndChangeCheck()) {
 				m_skeletonDataAsset.FillStateData();
@@ -304,25 +299,24 @@ namespace Spine.Unity.Editor {
 
 			EditorGUILayout.LabelField("Name", "Duration");
 			foreach (Spine.Animation a in m_skeletonData.Animations) {
-				GUILayout.BeginHorizontal();
-
-				if (m_skeletonAnimation != null && m_skeletonAnimation.state != null) {
-					if (m_skeletonAnimation.state.GetCurrent(0) != null && m_skeletonAnimation.state.GetCurrent(0).Animation == a) {
-						GUI.contentColor = Color.red;
-						if (GUILayout.Button("\u25BA", EditorStyles.toolbarButton, GUILayout.Width(24))) {
-							StopAnimation();
+				using (new GUILayout.HorizontalScope()) {
+					if (m_skeletonAnimation != null && m_skeletonAnimation.state != null) {
+						if (m_skeletonAnimation.state.GetCurrent(0) != null && m_skeletonAnimation.state.GetCurrent(0).Animation == a) {
+							GUI.contentColor = Color.red;
+							if (GUILayout.Button("\u25BA", EditorStyles.toolbarButton, GUILayout.Width(24))) {
+								StopAnimation();
+							}
+							GUI.contentColor = Color.white;
+						} else {
+							if (GUILayout.Button("\u25BA", EditorStyles.toolbarButton, GUILayout.Width(24))) {
+								PlayAnimation(a.Name, true);
+							}
 						}
-						GUI.contentColor = Color.white;
 					} else {
-						if (GUILayout.Button("\u25BA", EditorStyles.toolbarButton, GUILayout.Width(24))) {
-							PlayAnimation(a.Name, true);
-						}
+						GUILayout.Label("?", GUILayout.Width(24));
 					}
-				} else {
-					GUILayout.Label("?", GUILayout.Width(24));
+					EditorGUILayout.LabelField(new GUIContent(a.Name, SpineEditorUtilities.Icons.animation), new GUIContent(a.Duration.ToString("f3") + "s" + ("(" + (Mathf.RoundToInt(a.Duration * 30)) + ")").PadLeft(12, ' ')));
 				}
-				EditorGUILayout.LabelField(new GUIContent(a.Name, SpineEditorUtilities.Icons.animation), new GUIContent(a.Duration.ToString("f3") + "s" + ("(" + (Mathf.RoundToInt(a.Duration * 30)) + ")").PadLeft(12, ' ')));
-				GUILayout.EndHorizontal();
 			}
 		}
 
