@@ -55,7 +55,7 @@ public class WeightedMeshAttachment extends Attachment implements FfdAttachment 
 	private boolean inheritFFD;
 
 	// Nonessential.
-	private int[] edges;
+	private short[] edges;
 	private float width, height;
 
 	public WeightedMeshAttachment (String name) {
@@ -220,11 +220,11 @@ public class WeightedMeshAttachment extends Attachment implements FfdAttachment 
 		this.hullLength = hullLength;
 	}
 
-	public void setEdges (int[] edges) {
+	public void setEdges (short[] edges) {
 		this.edges = edges;
 	}
 
-	public int[] getEdges () {
+	public short[] getEdges () {
 		return edges;
 	}
 

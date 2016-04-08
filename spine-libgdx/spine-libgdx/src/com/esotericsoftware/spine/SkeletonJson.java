@@ -300,7 +300,7 @@ public class SkeletonJson {
 				mesh.updateUVs();
 
 				if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() * 2);
-				if (map.has("edges")) mesh.setEdges(map.require("edges").asIntArray());
+				if (map.has("edges")) mesh.setEdges(map.require("edges").asShortArray());
 			} else {
 				mesh.setInheritFFD(map.getBoolean("ffd", true));
 				linkedMeshes.add(new LinkedMesh(mesh, map.getString("skin", null), slotIndex, parent));
@@ -343,7 +343,7 @@ public class SkeletonJson {
 				mesh.updateUVs();
 
 				if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() * 2);
-				if (map.has("edges")) mesh.setEdges(map.require("edges").asIntArray());
+				if (map.has("edges")) mesh.setEdges(map.require("edges").asShortArray());
 			} else {
 				mesh.setInheritFFD(map.getBoolean("ffd", true));
 				linkedMeshes.add(new LinkedMesh(mesh, map.getString("skin", null), slotIndex, parent));
