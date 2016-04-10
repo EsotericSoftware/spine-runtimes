@@ -1,0 +1,10 @@
+{
+  "name": "spine-runtimes",
+  "version": "2.1.25",
+  "main": [
+    "./spine-js/spine.js"
+  ],
+  "ignore": [
+    "**/.*"
+  ]
+}
