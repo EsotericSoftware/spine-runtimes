@@ -131,84 +131,78 @@ public class Bone implements Updatable {
 			b = pa * lb + pb * ld;
 			c = pc * la + pd * lc;
 			d = pc * lb + pd * ld;
-		} else if (data.inheritRotation) { // No scale inheritance.
-			pa = 1;
-			pb = 0;
-			pc = 0;
-			pd = 1;
-			do {
-				cos = MathUtils.cosDeg(parent.appliedRotation);
-				sin = MathUtils.sinDeg(parent.appliedRotation);
-				float temp = pa * cos + pb * sin;
-				pb = pa * -sin + pb * cos;
-				pa = temp;
-				temp = pc * cos + pd * sin;
-				pd = pc * -sin + pd * cos;
-				pc = temp;
-
-				if (!parent.data.inheritRotation) break;
-				parent = parent.parent;
-			} while (parent != null);
-			a = pa * la + pb * lc;
-			b = pa * lb + pb * ld;
-			c = pc * la + pd * lc;
-			d = pc * lb + pd * ld;
-			if (skeleton.flipX) {
-				a = -a;
-				b = -b;
-			}
-			if (skeleton.flipY) {
-				c = -c;
-				d = -d;
-			}
-		} else if (data.inheritScale) { // No rotation inheritance.
-			pa = 1;
-			pb = 0;
-			pc = 0;
-			pd = 1;
-			do {
-				float r = parent.rotation;
-				cos = MathUtils.cosDeg(r);
-				sin = MathUtils.sinDeg(r);
-				float psx = parent.appliedScaleX, psy = parent.appliedScaleY;
-				float za = cos * psx, zb = -sin * psy, zc = sin * psx, zd = cos * psy;
-				float temp = pa * za + pb * zc;
-				pb = pa * zb + pb * zd;
-				pa = temp;
-				temp = pc * za + pd * zc;
-				pd = pc * zb + pd * zd;
-				pc = temp;
-
-				if (psx < 0) r = -r;
-				cos = MathUtils.cosDeg(-r);
-				sin = MathUtils.sinDeg(-r);
-				temp = pa * cos + pb * sin;
-				pb = pa * -sin + pb * cos;
-				pa = temp;
-				temp = pc * cos + pd * sin;
-				pd = pc * -sin + pd * cos;
-				pc = temp;
-
-				if (!parent.data.inheritScale) break;
-				parent = parent.parent;
-			} while (parent != null);
-			a = pa * la + pb * lc;
-			b = pa * lb + pb * ld;
-			c = pc * la + pd * lc;
-			d = pc * lb + pd * ld;
-			if (skeleton.flipX) {
-				a = -a;
-				b = -b;
-			}
-			if (skeleton.flipY) {
-				c = -c;
-				d = -d;
-			}
 		} else {
-			a = la;
-			b = lb;
-			c = lc;
-			d = ld;
+			if (data.inheritRotation) { // No scale inheritance.
+				pa = 1;
+				pb = 0;
+				pc = 0;
+				pd = 1;
+				do {
+					cos = MathUtils.cosDeg(parent.appliedRotation);
+					sin = MathUtils.sinDeg(parent.appliedRotation);
+					float temp = pa * cos + pb * sin;
+					pb = pa * -sin + pb * cos;
+					pa = temp;
+					temp = pc * cos + pd * sin;
+					pd = pc * -sin + pd * cos;
+					pc = temp;
+
+					if (!parent.data.inheritRotation) break;
+					parent = parent.parent;
+				} while (parent != null);
+				a = pa * la + pb * lc;
+				b = pa * lb + pb * ld;
+				c = pc * la + pd * lc;
+				d = pc * lb + pd * ld;
+			} else if (data.inheritScale) { // No rotation inheritance.
+				pa = 1;
+				pb = 0;
+				pc = 0;
+				pd = 1;
+				do {
+					float r = parent.appliedRotation;
+					cos = MathUtils.cosDeg(r);
+					sin = MathUtils.sinDeg(r);
+					float psx = parent.appliedScaleX, psy = parent.appliedScaleY;
+					float za = cos * psx, zb = -sin * psy, zc = sin * psx, zd = cos * psy;
+					float temp = pa * za + pb * zc;
+					pb = pa * zb + pb * zd;
+					pa = temp;
+					temp = pc * za + pd * zc;
+					pd = pc * zb + pd * zd;
+					pc = temp;
+
+					if (psx < 0) r = -r;
+					cos = MathUtils.cosDeg(-r);
+					sin = MathUtils.sinDeg(-r);
+					temp = pa * cos + pb * sin;
+					pb = pa * -sin + pb * cos;
+					pa = temp;
+					temp = pc * cos + pd * sin;
+					pd = pc * -sin + pd * cos;
+					pc = temp;
+
+					if (!parent.data.inheritScale) break;
+					parent = parent.parent;
+				} while (parent != null);
+				a = pa * la + pb * lc;
+				b = pa * lb + pb * ld;
+				c = pc * la + pd * lc;
+				d = pc * lb + pd * ld;
+			} else {
+				a = la;
+				b = lb;
+				c = lc;
+				d = ld;
+			}
+			if (skeleton.flipX) {
+				a = -a;
+				b = -b;
+			}
+			if (skeleton.flipY) {
+				c = -c;
+				d = -d;
+			}
 		}
 	}
 
