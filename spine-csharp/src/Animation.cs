@@ -573,7 +573,8 @@ namespace Spine {
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha) {
 			Slot slot = skeleton.slots.Items[slotIndex];
-			if (slot.attachment != attachment) return;
+			IFfdAttachment ffdAttachment = slot.attachment as IFfdAttachment; // == null if not FfdAttachment.
+			if (ffdAttachment == null || !ffdAttachment.ApplyFFD(attachment)) return;
 
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.

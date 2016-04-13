@@ -33,11 +33,13 @@ using System;
 
 namespace Spine {
 	/// <summary>Attachment that displays a texture region using a mesh.</summary>
-	public class MeshAttachment : Attachment {
+	public class MeshAttachment : Attachment, IFfdAttachment {
 		internal float[] vertices, uvs, regionUVs;
 		internal int[] triangles;
 		internal float regionOffsetX, regionOffsetY, regionWidth, regionHeight, regionOriginalWidth, regionOriginalHeight;
 		internal float r = 1, g = 1, b = 1, a = 1;
+		internal MeshAttachment parentMesh;
+		internal bool inheritFFD;
 
 		public int HullLength { get; set; }
 		public float[] Vertices { get { return vertices; } set { vertices = value; } }
@@ -63,6 +65,21 @@ namespace Spine {
 		public float RegionHeight { get { return regionHeight; } set { regionHeight = value; } } // Unrotated, stripped size.
 		public float RegionOriginalWidth { get { return regionOriginalWidth; } set { regionOriginalWidth = value; } }
 		public float RegionOriginalHeight { get { return regionOriginalHeight; } set { regionOriginalHeight = value; } } // Unrotated, unstripped size.
+
+		public bool InheritFFD { get { return inheritFFD; } set { inheritFFD = value; } }
+
+		public MeshAttachment ParentMesh {
+			get { return parentMesh; }
+			set {
+				parentMesh = value;
+				if (value != null) {
+					vertices = value.vertices;
+					regionUVs = value.regionUVs;
+					triangles = value.triangles;
+					HullLength = value.HullLength;
+				}
+			}
+		}
 
 		// Nonessential.
 		public int[] Edges { get; set; }
@@ -104,6 +121,10 @@ namespace Spine {
 				worldVertices[i] = vx * m00 + vy * m01 + x;
 				worldVertices[i + 1] = vx * m10 + vy * m11 + y;
 			}
+		}
+
+		public bool ApplyFFD (Attachment sourceAttachment) {
+			return this == sourceAttachment || (inheritFFD && parentMesh == sourceAttachment);
 		}
 	}
 }
