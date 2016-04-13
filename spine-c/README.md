@@ -2,6 +2,8 @@
 
 The spine-c runtime provides basic functionality to load and manipulate [Spine](http://esotericsoftware.com) skeletal animation data using ANSI C. It does not perform rendering but can be extended to enable Spine animations for other C-based projects, including C++ or Objective-C projects.
 
+For a pure C++ API, you may consider the third party Spine runtime [Chobolabs/spine-cpp](https://github.com/Chobolabs/spine-cpp).
+
 ## Licensing
 
 This Spine Runtime may only be used for personal or internal use, typically to evaluate Spine before purchasing. If you would like to incorporate a Spine Runtime into your applications, distribute software containing a Spine Runtime, or modify a Spine Runtime, then you will need a valid [Spine license](https://esotericsoftware.com/spine-purchase). Please see the [Spine Runtimes Software License](https://github.com/EsotericSoftware/spine-runtimes/blob/master/LICENSE) for detailed information.
@@ -41,7 +43,7 @@ For example, `AtlasAttachmentLoader` is typically used to load attachments when 
 
 spine-c uses an OOP style of programming where each "class" is made up of a struct and a number of functions prefixed with the struct name. More detals about how this works are available in [extension.h](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-c/include/spine/extension.h#L2). This mechanism allows you to provide your own implementations for `spAttachmentLoader`, `spAttachment` and `spTimeline`, if necessary.
 
-## Runtimes Extending spine-c
+## Runtimes extending spine-c
 
 - [spine-cocos2d-iphone](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2d-iphone)
 - [spine-cocos2dx](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx)
