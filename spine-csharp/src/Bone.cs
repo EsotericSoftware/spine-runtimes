@@ -232,9 +232,8 @@ namespace Spine {
 		}
 
 		public void LocalToWorld (float localX, float localY, out float worldX, out float worldY) {
-			float x = localX, y = localY;
-			worldX = x * a + y * b + this.worldX;
-			worldY = x * c + y * d + this.worldY;
+			worldX = localX * a + localY * b + this.worldX;
+			worldY = localX * c + localY * d + this.worldY;
 		}
 
 		override public String ToString () {
