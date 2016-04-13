@@ -138,18 +138,18 @@ public class IkConstraint implements Updatable {
 	static public void apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, float alpha) {
 		if (alpha == 0) return;
 		float px = parent.x, py = parent.y, psx = parent.scaleX, psy = parent.scaleY;
-		int offset1, offset2, sign2;
+		int os1, os2, s2;
 		if (psx < 0) {
 			psx = -psx;
-			offset1 = 180;
-			sign2 = -1;
+			os1 = 180;
+			s2 = -1;
 		} else {
-			offset1 = 0;
-			sign2 = 1;
+			os1 = 0;
+			s2 = 1;
 		}
 		if (psy < 0) {
 			psy = -psy;
-			sign2 = -sign2;
+			s2 = -s2;
 		}
 		float cx = child.x, cy = child.y, csx = child.appliedScaleX;
 		boolean u = Math.abs(psx - psy) <= 0.0001f;
@@ -160,9 +160,9 @@ public class IkConstraint implements Updatable {
 		}
 		if (csx < 0) {
 			csx = -csx;
-			offset2 = 180;
+			os2 = 180;
 		} else
-			offset2 = 0;
+			os2 = 0;
 		Bone pp = parent.parent;
 		float tx, ty, dx, dy;
 		if (pp == null) {
@@ -248,9 +248,9 @@ public class IkConstraint implements Updatable {
 				a2 = maxAngle * bendDir;
 			}
 		}
-		float o = atan2(cy, cx) * sign2;
-		a1 = (a1 - o) * radDeg + offset1;
-		a2 = (a2 + o) * radDeg * sign2 + offset2;
+		float o = atan2(cy, cx) * s2;
+		a1 = (a1 - o) * radDeg + os1;
+		a2 = (a2 + o) * radDeg * s2 + os2;
 		if (a1 > 180)
 			a1 -= 360;
 		else if (a1 < -180) a1 += 360;

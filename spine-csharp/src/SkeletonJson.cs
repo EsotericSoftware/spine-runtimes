@@ -44,8 +44,9 @@ using Windows.Storage;
 
 namespace Spine {
 	public class SkeletonJson {
-		private AttachmentLoader attachmentLoader;
 		public float Scale { get; set; }
+
+		private AttachmentLoader attachmentLoader;
 		private List<LinkedMesh> linkedMeshes = new List<LinkedMesh>();
 
 		public SkeletonJson (params Atlas[] atlasArray)
@@ -365,12 +366,11 @@ namespace Spine {
 						for (int i = 0, n = vertices.Length; i < n;) {
 							int boneCount = (int)vertices[i++];
 							bones.Add(boneCount);
-							for (int nn = i + boneCount * 4; i < nn;) {
+							for (int nn = i + boneCount * 4; i < nn; i += 4) {
 								bones.Add((int)vertices[i]);
 								weights.Add(vertices[i + 1] * scale);
 								weights.Add(vertices[i + 2] * scale);
 								weights.Add(vertices[i + 3]);
-								i += 4;
 							}
 						}
 						mesh.bones = bones.ToArray();
@@ -576,7 +576,7 @@ namespace Spine {
 						int slotIndex = skeletonData.FindSlotIndex(slotMap.Key);
 						foreach (KeyValuePair<String, Object> meshMap in (Dictionary<String, Object>)slotMap.Value) {
 							var values = (List<Object>)meshMap.Value;
-							var timeline = new FFDTimeline(values.Count);
+							var timeline = new FfdTimeline(values.Count);
 							Attachment attachment = skin.GetAttachment(slotIndex, meshMap.Key);
 							if (attachment == null) throw new Exception("FFD attachment not found: " + meshMap.Key);
 							timeline.slotIndex = slotIndex;

@@ -376,7 +376,7 @@ public class SkeletonBinary {
 			for (int i = 0; i < vertexCount; i++) {
 				int boneCount = (int)input.readFloat();
 				bones.add(boneCount);
-				for (int ii = 0, nn = boneCount; ii < nn; ii++) {
+				for (int ii = 0; ii < boneCount; ii++) {
 					bones.add((int)input.readFloat());
 					weights.add(input.readFloat() * scale);
 					weights.add(input.readFloat() * scale);

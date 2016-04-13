@@ -50,11 +50,10 @@ namespace Spine {
 		public const int CURVE_STEPPED = 1;
 		public const int CURVE_BEZIER = 2;
 
-		private AttachmentLoader attachmentLoader;
 		public float Scale { get; set; }
-		private byte[] bytes = new byte[32];
-		private byte[] buffer = new byte[4];
 
+		private AttachmentLoader attachmentLoader;
+		private byte[] buffer = new byte[32];
 		private List<SkeletonJson.LinkedMesh> linkedMeshes = new List<SkeletonJson.LinkedMesh>();
 
 		public SkeletonBinary (params Atlas[] atlasArray)
@@ -358,7 +357,7 @@ namespace Spine {
 					for (int i = 0; i < vertexCount; i++) {
 						int boneCount = (int)ReadFloat(input);
 						bones.Add(boneCount);
-						for (int ii = 0; i < boneCount; ii++) {
+						for (int ii = 0; ii < boneCount; ii++) {
 							bones.Add((int)ReadFloat(input));
 							weights.Add(ReadFloat(input) * scale);
 							weights.Add(ReadFloat(input) * scale);
@@ -554,7 +553,7 @@ namespace Spine {
 					for (int iii = 0, nnn = ReadVarint(input, true); iii < nnn; iii++) {
 						Attachment attachment = skin.GetAttachment(slotIndex, ReadString(input));
 						int frameCount = ReadVarint(input, true);
-						FFDTimeline timeline = new FFDTimeline(frameCount);
+						FfdTimeline timeline = new FfdTimeline(frameCount);
 						timeline.slotIndex = slotIndex;
 						timeline.attachment = attachment;
 						for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
@@ -698,9 +697,7 @@ namespace Spine {
 					if ((b & 0x80) != 0) {
 						b = input.ReadByte();
 						result |= (b & 0x7F) << 21;
-						if ((b & 0x80) != 0) {
-							result |= (input.ReadByte() & 0x7F) << 28;
-						}
+						if ((b & 0x80) != 0) result |= (input.ReadByte() & 0x7F) << 28;
 					}
 				}
 			}
@@ -716,20 +713,18 @@ namespace Spine {
 				return "";
 			}
 			byteCount--;
-			byte[] bytes = this.bytes;
-			if (bytes.Length < byteCount) bytes = new byte[byteCount];
-			ReadFully(input, bytes, 0, byteCount);
-			return System.Text.Encoding.UTF8.GetString(bytes, 0, byteCount);
+			byte[] buffer = this.buffer;
+			if (buffer.Length < byteCount) buffer = new byte[byteCount];
+			ReadFully(input, buffer, 0, byteCount);
+			return System.Text.Encoding.UTF8.GetString(buffer, 0, byteCount);
 		}
 
-		private static void ReadFully (Stream input, byte[] b, int off, int len) {
-			while (len > 0) {
-				int count = input.Read(b, off, len);
-				if (count <= 0) {
-					throw new EndOfStreamException();
-				}
-				off += count;
-				len -= count;
+		private static void ReadFully (Stream input, byte[] buffer, int offset, int length) {
+			while (length > 0) {
+				int count = input.Read(buffer, offset, length);
+				if (count <= 0) throw new EndOfStreamException();
+				offset += count;
+				length -= count;
 			}
 		}
 	}

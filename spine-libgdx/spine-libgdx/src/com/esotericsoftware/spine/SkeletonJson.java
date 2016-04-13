@@ -328,12 +328,11 @@ public class SkeletonJson {
 				for (int i = 0, n = vertices.length; i < n;) {
 					int boneCount = (int)vertices[i++];
 					bones.add(boneCount);
-					for (int nn = i + boneCount * 4; i < nn;) {
+					for (int nn = i + boneCount * 4; i < nn; i += 4) {
 						bones.add((int)vertices[i]);
 						weights.add(vertices[i + 1] * scale);
 						weights.add(vertices[i + 2] * scale);
 						weights.add(vertices[i + 3]);
-						i += 4;
 					}
 				}
 				mesh.setBones(bones.toArray());

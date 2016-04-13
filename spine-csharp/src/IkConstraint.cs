@@ -99,18 +99,18 @@ namespace Spine {
 		static public void Apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, float alpha) {
 			if (alpha == 0) return;
 			float px = parent.x, py = parent.y, psx = parent.scaleX, psy = parent.scaleY;
-			int offset1, offset2, sign2;
+			int os1, os2, s2;
 			if (psx < 0) {
 				psx = -psx;
-				offset1 = 180;
-				sign2 = -1;
+				os1 = 180;
+				s2 = -1;
 			} else {
-				offset1 = 0;
-				sign2 = 1;
+				os1 = 0;
+				s2 = 1;
 			}
 			if (psy < 0) {
 				psy = -psy;
-				sign2 = -sign2;
+				s2 = -s2;
 			}
 			float cx = child.x, cy = child.y, csx = child.scaleX;
 			bool u = Math.Abs(psx - psy) <= 0.0001f;
@@ -121,9 +121,9 @@ namespace Spine {
 			}
 			if (csx < 0) {
 				csx = -csx;
-				offset2 = 180;
+				os2 = 180;
 			} else
-				offset2 = 0;
+				os2 = 0;
 			Bone pp = parent.parent;
 			float tx, ty, dx, dy;
 			if (pp == null) {
@@ -208,9 +208,9 @@ namespace Spine {
 				}
 			}
 		outer:
-			float oo = MathUtils.Atan2(cy, cx) * sign2;
-			a1 = (a1 - oo) * MathUtils.radDeg + offset1;
-			a2 = (a2 + oo) * MathUtils.radDeg * sign2 + offset2;
+			float os = MathUtils.Atan2(cy, cx) * s2;
+			a1 = (a1 - os) * MathUtils.radDeg + os1;
+			a2 = (a2 + os) * MathUtils.radDeg * s2 + os2;
 			if (a1 > 180) a1 -= 360;
 			else if (a1 < -180) a1 += 360;
 			if (a2 > 180) a2 -= 360;

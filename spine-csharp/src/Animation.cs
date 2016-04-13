@@ -548,7 +548,7 @@ namespace Spine {
 		}
 	}
 
-	public class FFDTimeline : CurveTimeline {
+	public class FfdTimeline : CurveTimeline {
 		internal int slotIndex;
 		internal float[] frames;
 		private float[][] frameVertices;
@@ -559,7 +559,7 @@ namespace Spine {
 		public float[][] Vertices { get { return frameVertices; } set { frameVertices = value; } }
 		public Attachment Attachment { get { return attachment; } set { attachment = value; } }
 
-		public FFDTimeline (int frameCount)
+		public FfdTimeline (int frameCount)
 			: base(frameCount) {
 			frames = new float[frameCount];
 			frameVertices = new float[frameCount][];
@@ -573,7 +573,7 @@ namespace Spine {
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha) {
 			Slot slot = skeleton.slots.Items[slotIndex];
-			IFfdAttachment ffdAttachment = slot.attachment as IFfdAttachment; // == null if not FfdAttachment.
+			IFfdAttachment ffdAttachment = slot.attachment as IFfdAttachment;
 			if (ffdAttachment == null || !ffdAttachment.ApplyFFD(attachment)) return;
 
 			float[] frames = this.frames;

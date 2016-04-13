@@ -70,6 +70,7 @@
     <Compile Include="src\Attachments\AttachmentLoader.cs" />
     <Compile Include="src\Attachments\AttachmentType.cs" />
     <Compile Include="src\Attachments\BoundingBoxAttachment.cs" />
+    <Compile Include="src\Attachments\IFfdAttachment.cs" />
     <Compile Include="src\Attachments\MeshAttachment.cs" />
     <Compile Include="src\Attachments\RegionAttachment.cs" />
     <Compile Include="src\Attachments\WeightedMeshAttachment.cs" />
