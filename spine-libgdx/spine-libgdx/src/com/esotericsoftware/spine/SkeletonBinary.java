@@ -32,7 +32,6 @@
 package com.esotericsoftware.spine;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -105,9 +104,8 @@ public class SkeletonBinary {
 		SkeletonData skeletonData = new SkeletonData();
 		skeletonData.name = file.nameWithoutExtension();
 
-		final Charset utf8 = Charset.forName("UTF-8");
 		DataInput input = new DataInput(file.read(512)) {
-			private byte[] bytes = new byte[32];
+			private char[] chars = new char[32];
 
 			public String readString () throws IOException {
 				int byteCount = readInt(true);
@@ -118,9 +116,27 @@ public class SkeletonBinary {
 					return "";
 				}
 				byteCount--;
-				if (bytes.length < byteCount) bytes = new byte[byteCount];
-				readFully(bytes, 0, byteCount);
-				return new String(bytes, 0, byteCount, utf8);
+				if (chars.length < byteCount) chars = new char[byteCount];
+				char[] chars = this.chars;
+				int charCount = 0;
+				for (int i = 0; i < byteCount;) {
+					int b = read();
+					switch (b >> 4) {
+					case 12:
+					case 13:
+						chars[charCount++] = (char)((b & 0x1F) << 6 | read() & 0x3F);
+						i += 2;
+						break;
+					case 14:
+						chars[charCount++] = (char)((b & 0x0F) << 12 | (read() & 0x3F) << 6 | read() & 0x3F);
+						i += 3;
+						break;
+					default:
+						chars[charCount++] = (char)b;
+						i++;
+					}
+				}
+				return new String(chars, 0, charCount);
 			}
 		};
 		try {
