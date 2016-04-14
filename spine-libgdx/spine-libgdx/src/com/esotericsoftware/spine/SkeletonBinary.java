@@ -613,6 +613,7 @@ public class SkeletonBinary {
 				DrawOrderTimeline timeline = new DrawOrderTimeline(drawOrderCount);
 				int slotCount = skeletonData.slots.size;
 				for (int i = 0; i < drawOrderCount; i++) {
+					float time = input.readFloat();
 					int offsetCount = input.readInt(true);
 					int[] drawOrder = new int[slotCount];
 					for (int ii = slotCount - 1; ii >= 0; ii--)
@@ -633,7 +634,7 @@ public class SkeletonBinary {
 					// Fill in unchanged items.
 					for (int ii = slotCount - 1; ii >= 0; ii--)
 						if (drawOrder[ii] == -1) drawOrder[ii] = unchanged[--unchangedIndex];
-					timeline.setFrame(i, input.readFloat(), drawOrder);
+					timeline.setFrame(i, time, drawOrder);
 				}
 				timelines.add(timeline);
 				duration = Math.max(duration, timeline.getFrames()[drawOrderCount - 1]);

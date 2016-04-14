@@ -605,6 +605,7 @@ namespace Spine {
 				DrawOrderTimeline timeline = new DrawOrderTimeline(drawOrderCount);
 				int slotCount = skeletonData.slots.Count;
 				for (int i = 0; i < drawOrderCount; i++) {
+					float time = ReadFloat(input);
 					int offsetCount = ReadVarint(input, true);
 					int[] drawOrder = new int[slotCount];
 					for (int ii = slotCount - 1; ii >= 0; ii--)
@@ -625,7 +626,7 @@ namespace Spine {
 					// Fill in unchanged items.
 					for (int ii = slotCount - 1; ii >= 0; ii--)
 						if (drawOrder[ii] == -1) drawOrder[ii] = unchanged[--unchangedIndex];
-					timeline.SetFrame(i, ReadFloat(input), drawOrder);
+					timeline.SetFrame(i, time, drawOrder);
 				}
 				timelines.Add(timeline);
 				duration = Math.Max(duration, timeline.frames[drawOrderCount - 1]);
