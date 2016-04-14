@@ -2,6 +2,9 @@
  * SkeletonRendererCustomMaterialsInspector created by Lost Polygon
  * Full irrevocable rights and permissions granted to Esoteric Software
 *****************************************************************************/
+
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEditor;
 using Spine.Unity.Modules;
@@ -9,6 +12,8 @@ using Spine.Unity.Modules;
 namespace Spine.Unity.Editor {
 	[CustomEditor(typeof(SkeletonRendererCustomMaterials))]
 	public class SkeletonRendererCustomMaterialsInspector : UnityEditor.Editor {
+		private List<SkeletonRendererCustomMaterials.AtlasMaterialOverride> _customMaterialOverridesPrev;
+		private List<SkeletonRendererCustomMaterials.SlotMaterialOverride> _customSlotMaterialsPrev;
 
 		#region SkeletonRenderer context menu
 		[MenuItem ("CONTEXT/SkeletonRenderer/Add Basic Serialized Custom Materials")]
@@ -26,19 +31,54 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		public override void OnInspectorGUI() {
-			var component = (SkeletonRendererCustomMaterials)target;
+			var component = (SkeletonRendererCustomMaterials) target;
 			var skeletonRenderer = component.skeletonRenderer;
 
-			// Draw the default inspector and reapply overrides on any change
-			EditorGUI.BeginChangeCheck();
-			{
-				DrawDefaultInspector();
+			// Draw the default inspector
+			DrawDefaultInspector();
+
+			// Fill with current values at start
+			if (_customMaterialOverridesPrev == null || _customSlotMaterialsPrev == null) {
+				_customMaterialOverridesPrev = CopyList(component.CustomMaterialOverrides);
+				_customSlotMaterialsPrev = CopyList(component.CustomSlotMaterials);
 			}
-			if (EditorGUI.EndChangeCheck()) {
-				component.ReapplyOverrides();
+
+			// Compare new values with saved. If change is detected: 
+			// store new values, restore old values, remove overrides, restore new values, restore overrides.
+
+			// 1. Store new values
+			var customMaterialOverridesNew = CopyList(component.CustomMaterialOverrides);
+			var customSlotMaterialsNew = CopyList(component.CustomSlotMaterials);
+			
+			// Detect changes
+			if (!_customMaterialOverridesPrev.SequenceEqual(customMaterialOverridesNew) ||
+				!_customSlotMaterialsPrev.SequenceEqual(customSlotMaterialsNew)) {
+				// 2. Restore old values
+				component.CustomMaterialOverrides.Clear();
+				component.CustomSlotMaterials.Clear();
+				component.CustomMaterialOverrides.AddRange(_customMaterialOverridesPrev);
+				component.CustomSlotMaterials.AddRange(_customSlotMaterialsPrev);
+
+				// 3. Remove overrides
+				component.RemoveCustomMaterialOverrides();
+				component.RemoveCustomSlotMaterials();
+
+				// 4. Restore new values
+				component.CustomMaterialOverrides.Clear();
+				component.CustomSlotMaterials.Clear();
+				component.CustomMaterialOverrides.AddRange(customMaterialOverridesNew);
+				component.CustomSlotMaterials.AddRange(customSlotMaterialsNew);
+
+				// 5. Restore overrides
+				component.SetCustomMaterialOverrides();
+				component.SetCustomSlotMaterials();
+
 				if (skeletonRenderer != null)
 					skeletonRenderer.LateUpdate();
 			}
+
+			_customMaterialOverridesPrev = CopyList(component.CustomMaterialOverrides);
+			_customSlotMaterialsPrev = CopyList(component.CustomSlotMaterials);
 
 			if (GUILayout.Button(new GUIContent("Clear and Reapply Changes", "Removes all non-serialized overrides in the SkeletonRenderer and reapplies the overrides on this component."))) {
 				if (skeletonRenderer != null) {
@@ -49,5 +89,9 @@ namespace Spine.Unity.Editor {
 				}
 			}
 		}
+
+		private static List<T> CopyList<T>(List<T> list) {
+			return list.GetRange(0, list.Count);
+		} 
 	}
 }

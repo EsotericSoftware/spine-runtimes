@@ -60,7 +60,12 @@ namespace Spine.Unity.Modules {
 			SetCustomSlotMaterials();
 		}
 
-		void SetCustomSlotMaterials () {
+		public void SetCustomSlotMaterials () {
+			if (skeletonRenderer == null) {
+				Debug.LogError("skeletonRenderer == null");
+				return;
+			}
+
 			for (int i = 0; i < customSlotMaterials.Count; i++) {
 				SlotMaterialOverride slotMaterialOverride = customSlotMaterials[i];
 				if (slotMaterialOverride.overrideDisabled || string.IsNullOrEmpty(slotMaterialOverride.slotName))
@@ -71,7 +76,12 @@ namespace Spine.Unity.Modules {
 			}
 		}
 
-		void RemoveCustomSlotMaterials () {
+		public void RemoveCustomSlotMaterials () {
+			if (skeletonRenderer == null) {
+				Debug.LogError("skeletonRenderer == null");
+				return;
+			}
+
 			for (int i = 0; i < customSlotMaterials.Count; i++) {
 				SlotMaterialOverride slotMaterialOverride = customSlotMaterials[i];
 				if (string.IsNullOrEmpty(slotMaterialOverride.slotName))
@@ -91,7 +101,12 @@ namespace Spine.Unity.Modules {
 			}
 		}
 
-		void SetCustomMaterialOverrides () {
+		public void SetCustomMaterialOverrides () {
+			if (skeletonRenderer == null) {
+				Debug.LogError("skeletonRenderer == null");
+				return;
+			}
+
 			for (int i = 0; i < customMaterialOverrides.Count; i++) {
 				AtlasMaterialOverride atlasMaterialOverride = customMaterialOverrides[i];
 				if (atlasMaterialOverride.overrideDisabled)
@@ -101,7 +116,12 @@ namespace Spine.Unity.Modules {
 			}
 		}
 
-		void RemoveCustomMaterialOverrides () {
+		public void RemoveCustomMaterialOverrides () {
+			if (skeletonRenderer == null) {
+				Debug.LogError("skeletonRenderer == null");
+				return;
+			}
+
 			for (int i = 0; i < customMaterialOverrides.Count; i++) {
 				AtlasMaterialOverride atlasMaterialOverride = customMaterialOverrides[i];
 				Material currentMaterial;
@@ -126,7 +146,7 @@ namespace Spine.Unity.Modules {
 				return;
 			}
 
-            skeletonRenderer.Initialize(false);
+			skeletonRenderer.Initialize(false);
 			SetCustomMaterialOverrides();
 			SetCustomSlotMaterials();
 		}
@@ -144,21 +164,27 @@ namespace Spine.Unity.Modules {
 		}
 
 		[Serializable]
-		public class MaterialOverride {
+		public struct SlotMaterialOverride : IEquatable<SlotMaterialOverride> {
 			public bool overrideDisabled;
-		}
 
-		[Serializable]
-		public class SlotMaterialOverride : MaterialOverride {
 			[SpineSlot]
 			public string slotName;
 			public Material material;
+
+			public bool Equals(SlotMaterialOverride other) {
+				return overrideDisabled == other.overrideDisabled && slotName == other.slotName && material == other.material;
+			}
 		}
 
 		[Serializable]
-		public class AtlasMaterialOverride : MaterialOverride {
+		public struct AtlasMaterialOverride : IEquatable<AtlasMaterialOverride> {
+			public bool overrideDisabled;
 			public Material originalMaterial;
 			public Material replacementMaterial;
+
+			public bool Equals(AtlasMaterialOverride other) {
+				return overrideDisabled == other.overrideDisabled && originalMaterial == other.originalMaterial && replacementMaterial == other.replacementMaterial;
+			}
 		}
 	}
 }
