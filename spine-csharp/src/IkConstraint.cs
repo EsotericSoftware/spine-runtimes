@@ -90,7 +90,7 @@ namespace Spine {
 				rotationIK = 360 - rotationIK;
 			if (rotationIK > 180) rotationIK -= 360;
 			else if (rotationIK < -180) rotationIK += 360;
-			bone.UpdateWorldTransform(bone.x, bone.y, rotation + (rotationIK - rotation) * alpha, bone.scaleX, bone.scaleY);
+			bone.UpdateWorldTransform(bone.x, bone.y, rotation + (rotationIK - rotation) * alpha, bone.appliedScaleX, bone.appliedScaleY);
 		}
 
 		/// <summary>Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as
@@ -98,7 +98,7 @@ namespace Spine {
 		/// <param name="child">A direct descendant of the parent bone.</param>
 		static public void Apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, float alpha) {
 			if (alpha == 0) return;
-			float px = parent.x, py = parent.y, psx = parent.scaleX, psy = parent.scaleY;
+			float px = parent.x, py = parent.y, psx = parent.appliedScaleX, psy = parent.appliedScaleY;
 			int os1, os2, s2;
 			if (psx < 0) {
 				psx = -psx;
@@ -112,7 +112,7 @@ namespace Spine {
 				psy = -psy;
 				s2 = -s2;
 			}
-			float cx = child.x, cy = child.y, csx = child.scaleX;
+			float cx = child.x, cy = child.y, csx = child.appliedScaleX;
 			bool u = Math.Abs(psx - psy) <= 0.0001f;
 			if (!u && cy != 0) {
 				child.worldX = parent.a * cx + parent.worldX;

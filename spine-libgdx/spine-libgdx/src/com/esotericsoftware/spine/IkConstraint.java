@@ -129,7 +129,8 @@ public class IkConstraint implements Updatable {
 		if (rotationIK > 180)
 			rotationIK -= 360;
 		else if (rotationIK < -180) rotationIK += 360;
-		bone.updateWorldTransform(bone.x, bone.y, rotation + (rotationIK - rotation) * alpha, bone.scaleX, bone.scaleY);
+		bone.updateWorldTransform(bone.x, bone.y, rotation + (rotationIK - rotation) * alpha, bone.appliedScaleX,
+			bone.appliedScaleY);
 	}
 
 	/** Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as possible. The
@@ -137,7 +138,7 @@ public class IkConstraint implements Updatable {
 	 * @param child A direct descendant of the parent bone. */
 	static public void apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, float alpha) {
 		if (alpha == 0) return;
-		float px = parent.x, py = parent.y, psx = parent.scaleX, psy = parent.scaleY;
+		float px = parent.x, py = parent.y, psx = parent.appliedScaleX, psy = parent.appliedScaleY;
 		int os1, os2, s2;
 		if (psx < 0) {
 			psx = -psx;
@@ -248,9 +249,9 @@ public class IkConstraint implements Updatable {
 				a2 = maxAngle * bendDir;
 			}
 		}
-		float o = atan2(cy, cx) * s2;
-		a1 = (a1 - o) * radDeg + os1;
-		a2 = (a2 + o) * radDeg * s2 + os2;
+		float os = atan2(cy, cx) * s2;
+		a1 = (a1 - os) * radDeg + os1;
+		a2 = (a2 + os) * radDeg * s2 + os2;
 		if (a1 > 180)
 			a1 -= 360;
 		else if (a1 < -180) a1 += 360;

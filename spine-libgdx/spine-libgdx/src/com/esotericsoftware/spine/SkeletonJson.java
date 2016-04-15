@@ -594,7 +594,6 @@ public class SkeletonJson {
 		Attachment mesh;
 
 		public LinkedMesh (Attachment mesh, String skin, int slotIndex, String parent) {
-			super();
 			this.mesh = mesh;
 			this.skin = skin;
 			this.slotIndex = slotIndex;
