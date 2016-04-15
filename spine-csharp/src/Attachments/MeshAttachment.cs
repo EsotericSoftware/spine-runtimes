@@ -77,6 +77,9 @@ namespace Spine {
 					regionUVs = value.regionUVs;
 					triangles = value.triangles;
 					HullLength = value.HullLength;
+					Edges = value.Edges;
+					Width = value.Width;
+					Height = value.Height;
 				}
 			}
 		}
