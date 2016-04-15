@@ -169,8 +169,10 @@ void spSkeleton_updateCache (const spSkeleton* self) {
 			if (updatable == transformConstraint->bone || updatable == transformConstraint->target) {
 				int insertIndex = ii + 1;
 				int moveCount = (capacity-2) - insertIndex;
-				memmove(internal->updateCache + (insertIndex+1), internal->updateCache + insertIndex, moveCount * sizeof(void*));
-				memmove(internal->updateCacheType + (insertIndex+1), internal->updateCacheType + insertIndex, moveCount * sizeof(_spUpdateType));
+				if (moveCount > 0) {
+					memmove(internal->updateCache + (insertIndex + 1), internal->updateCache + insertIndex, moveCount * sizeof(void*));
+					memmove(internal->updateCacheType + (insertIndex + 1), internal->updateCacheType + insertIndex, moveCount * sizeof(_spUpdateType));
+				}
 				internal->updateCacheCount++;
 				internal->updateCache[insertIndex] = transformConstraint;
 				internal->updateCacheType[insertIndex] = SP_UPDATE_TRANSFORM_CONSTRAINT;
