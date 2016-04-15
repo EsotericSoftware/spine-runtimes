@@ -683,7 +683,24 @@ void _spFFDTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, flo
 	spFFDTimeline* self = (spFFDTimeline*)timeline;
 
 	spSlot *slot = skeleton->slots[self->slotIndex];
-	if (slot->attachment != self->attachment) return;
+
+	if (slot->attachment != self->attachment) {
+		if (!slot->attachment) return;
+		switch (slot->attachment->type) {
+		case SP_ATTACHMENT_MESH: {
+			spMeshAttachment* mesh = SUB_CAST(spMeshAttachment, slot->attachment);
+			if (!mesh->inheritFFD || mesh->parentMesh != (void*)self->attachment) return;
+			break;
+		}
+		case SP_ATTACHMENT_WEIGHTED_MESH: {
+			spWeightedMeshAttachment* mesh = SUB_CAST(spWeightedMeshAttachment, slot->attachment);
+			if (!mesh->inheritFFD || mesh->parentMesh != (void*)self->attachment) return;
+			break;
+		}
+		default:
+			return;
+		}
+	}
 
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 

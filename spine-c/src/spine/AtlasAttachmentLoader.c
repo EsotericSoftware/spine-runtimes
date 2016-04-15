@@ -54,7 +54,8 @@ spAttachment* _spAtlasAttachmentLoader_createAttachment (spAttachmentLoader* loa
 		attachment->regionOriginalHeight = region->originalHeight;
 		return SUPER(attachment);
 	}
-	case SP_ATTACHMENT_MESH: {
+	case SP_ATTACHMENT_MESH:
+	case SP_ATTACHMENT_LINKED_MESH: {
 		spMeshAttachment* attachment;
 		spAtlasRegion* region = spAtlas_findRegion(self->atlas, path);
 		if (!region) {
@@ -76,7 +77,8 @@ spAttachment* _spAtlasAttachmentLoader_createAttachment (spAttachmentLoader* loa
 		attachment->regionOriginalHeight = region->originalHeight;
 		return SUPER(attachment);
 	}
-	case SP_ATTACHMENT_WEIGHTED_MESH: {
+	case SP_ATTACHMENT_WEIGHTED_MESH:
+	case SP_ATTACHMENT_WEIGHTED_LINKED_MESH: {
 		spWeightedMeshAttachment* attachment;
 		spAtlasRegion* region = spAtlas_findRegion(self->atlas, path);
 		if (!region) {

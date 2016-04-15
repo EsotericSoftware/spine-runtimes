@@ -108,88 +108,82 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 		CONST_CAST(float, self->b) = pa * lb + pb * ld;
 		CONST_CAST(float, self->c) = pc * la + pd * lc;
 		CONST_CAST(float, self->d) = pc * lb + pd * ld;
-	} else if (self->data->inheritRotation) { /* No scale inheritance. */
-		pa = 1;
-		pb = 0;
-		pc = 0;
-		pd = 1;
-		do {
-			cosine = COS(parent->appliedRotation * DEG_RAD);
-			sine = SIN(parent->appliedRotation * DEG_RAD);
-			temp = pa * cosine + pb * sine;
-			pb = pa * -sine + pb * cosine;
-			pa = temp;
-			temp = pc * cosine + pd * sine;
-			pd = pc * -sine + pd * cosine;
-			pc = temp;
-
-			if (!parent->data->inheritRotation) break;
-			parent = parent->parent;
-		} while (parent);
-		CONST_CAST(float, self->a) = pa * la + pb * lc;
-		CONST_CAST(float, self->b) = pa * lb + pb * ld;
-		CONST_CAST(float, self->c) = pc * la + pd * lc;
-		CONST_CAST(float, self->d) = pc * lb + pd * ld;
-		if (self->skeleton->flipX) {
-			CONST_CAST(float, self->a) = -self->a;
-			CONST_CAST(float, self->b) = -self->b;
-		}
-		if (self->skeleton->flipY != yDown) {
-			CONST_CAST(float, self->c) = -self->c;
-			CONST_CAST(float, self->d) = -self->d;
-		}
-	} else if (self->data->inheritScale) { /* No rotation inheritance. */
-		pa = 1;
-		pb = 0;
-		pc = 0;
-		pd = 1;
-		do {
-			float za, zb, zc, zd;
-			float r = parent->rotation;
-			float psx = parent->appliedScaleX, psy = parent->appliedScaleY;
-			cosine = COS(r * DEG_RAD);
-			sine = SIN(r * DEG_RAD);
-			za = cosine * psx;
-			zb = -sine * psy;
-			zc = sine * psx;
-			zd = cosine * psy;
-			temp = pa * za + pb * zc;
-			pb = pa * zb + pb * zd;
-			pa = temp;
-			temp = pc * za + pd * zc;
-			pd = pc * zb + pd * zd;
-			pc = temp;
-
-			if (psx < 0) r = -r;
-			cosine = COS(-r * DEG_RAD);
-			sine = SIN(-r * DEG_RAD);
-			temp = pa * cosine + pb * sine;
-			pb = pa * -sine + pb * cosine;
-			pa = temp;
-			temp = pc * cosine + pd * sine;
-			pd = pc * -sine + pd * cosine;
-			pc = temp;
-
-			if (!parent->data->inheritScale) break;
-			parent = parent->parent;
-		} while (parent);
-		CONST_CAST(float, self->a) = pa * la + pb * lc;
-		CONST_CAST(float, self->b) = pa * lb + pb * ld;
-		CONST_CAST(float, self->c) = pc * la + pd * lc;
-		CONST_CAST(float, self->d) = pc * lb + pd * ld;
-		if (self->skeleton->flipX) {
-			CONST_CAST(float, self->a) = -self->a;
-			CONST_CAST(float, self->b) = -self->b;
-		}
-		if (self->skeleton->flipY != yDown) {
-			CONST_CAST(float, self->c) = -self->c;
-			CONST_CAST(float, self->d) = -self->d;
-		}
 	} else {
-		CONST_CAST(float, self->a) = la;
-		CONST_CAST(float, self->b) = lb;
-		CONST_CAST(float, self->c) = lc;
-		CONST_CAST(float, self->d) = ld;
+		if (self->data->inheritRotation) { /* No scale inheritance. */
+			pa = 1;
+			pb = 0;
+			pc = 0;
+			pd = 1;
+			do {
+				cosine = COS(parent->appliedRotation * DEG_RAD);
+				sine = SIN(parent->appliedRotation * DEG_RAD);
+				temp = pa * cosine + pb * sine;
+				pb = pa * -sine + pb * cosine;
+				pa = temp;
+				temp = pc * cosine + pd * sine;
+				pd = pc * -sine + pd * cosine;
+				pc = temp;
+
+				if (!parent->data->inheritRotation) break;
+				parent = parent->parent;
+			} while (parent);
+			CONST_CAST(float, self->a) = pa * la + pb * lc;
+			CONST_CAST(float, self->b) = pa * lb + pb * ld;
+			CONST_CAST(float, self->c) = pc * la + pd * lc;
+			CONST_CAST(float, self->d) = pc * lb + pd * ld;
+		} else if (self->data->inheritScale) { /* No rotation inheritance. */
+			pa = 1;
+			pb = 0;
+			pc = 0;
+			pd = 1;
+			do {
+				float za, zb, zc, zd;
+				float r = parent->rotation;
+				float psx = parent->appliedScaleX, psy = parent->appliedScaleY;
+				cosine = COS(r * DEG_RAD);
+				sine = SIN(r * DEG_RAD);
+				za = cosine * psx;
+				zb = -sine * psy;
+				zc = sine * psx;
+				zd = cosine * psy;
+				temp = pa * za + pb * zc;
+				pb = pa * zb + pb * zd;
+				pa = temp;
+				temp = pc * za + pd * zc;
+				pd = pc * zb + pd * zd;
+				pc = temp;
+
+				if (psx < 0) r = -r;
+				cosine = COS(-r * DEG_RAD);
+				sine = SIN(-r * DEG_RAD);
+				temp = pa * cosine + pb * sine;
+				pb = pa * -sine + pb * cosine;
+				pa = temp;
+				temp = pc * cosine + pd * sine;
+				pd = pc * -sine + pd * cosine;
+				pc = temp;
+
+				if (!parent->data->inheritScale) break;
+				parent = parent->parent;
+			} while (parent);
+			CONST_CAST(float, self->a) = pa * la + pb * lc;
+			CONST_CAST(float, self->b) = pa * lb + pb * ld;
+			CONST_CAST(float, self->c) = pc * la + pd * lc;
+			CONST_CAST(float, self->d) = pc * lb + pd * ld;
+		} else {
+			CONST_CAST(float, self->a) = la;
+			CONST_CAST(float, self->b) = lb;
+			CONST_CAST(float, self->c) = lc;
+			CONST_CAST(float, self->d) = ld;
+		}
+		if (self->skeleton->flipX) {
+			CONST_CAST(float, self->a) = -self->a;
+			CONST_CAST(float, self->b) = -self->b;
+		}
+		if (self->skeleton->flipY != yDown) {
+			CONST_CAST(float, self->c) = -self->c;
+			CONST_CAST(float, self->d) = -self->d;
+		}
 	}
 }
 

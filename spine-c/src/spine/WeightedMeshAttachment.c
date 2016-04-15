@@ -36,12 +36,14 @@ void _spWeightedMeshAttachment_dispose (spAttachment* attachment) {
 	spWeightedMeshAttachment* self = SUB_CAST(spWeightedMeshAttachment, attachment);
 	_spAttachment_deinit(attachment);
 	FREE(self->path);
-	FREE(self->bones);
-	FREE(self->weights);
-	FREE(self->regionUVs);
 	FREE(self->uvs);
-	FREE(self->triangles);
-	FREE(self->edges);
+	if (!self->parentMesh) {
+		FREE(self->regionUVs);
+		FREE(self->bones);
+		FREE(self->weights);
+		FREE(self->triangles);
+		FREE(self->edges);
+	}
 	FREE(self);
 }
 
@@ -106,5 +108,30 @@ void spWeightedMeshAttachment_computeWorldVertices (spWeightedMeshAttachment* se
 			worldVertices[w] = wx + x;
 			worldVertices[w + 1] = wy + y;
 		}
+	}
+}
+
+void spWeightedMeshAttachment_setParentMesh (spWeightedMeshAttachment* self, spWeightedMeshAttachment* parentMesh) {
+	CONST_CAST(spWeightedMeshAttachment*, self->parentMesh) = parentMesh;
+	if (parentMesh) {
+		self->bones = parentMesh->bones;
+		self->bonesCount = parentMesh->bonesCount;
+
+		self->weights = parentMesh->weights;
+		self->weightsCount = parentMesh->weightsCount;
+
+		self->regionUVs = parentMesh->regionUVs;
+		self->uvsCount = parentMesh->uvsCount;
+
+		self->triangles = parentMesh->triangles;
+		self->trianglesCount = parentMesh->trianglesCount;
+
+		self->hullLength = parentMesh->hullLength;
+
+		self->edges = parentMesh->edges;
+		self->edgesCount = parentMesh->edgesCount;
+
+		self->width = parentMesh->width;
+		self->height = parentMesh->height;
 	}
 }

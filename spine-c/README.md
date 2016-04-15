@@ -12,7 +12,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-c works with data exported from the latest version of Spine, except linked meshes are [not yet supported](https://trello.com/c/bERJAFEq/73-update-runtimes-to-support-v3-1-linked-meshes).
+spine-c works with data exported from the latest version of Spine.
 
 spine-c supports all Spine features.
 
