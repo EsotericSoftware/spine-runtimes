@@ -52,18 +52,18 @@ package spine {
 	import spine.attachments.WeightedMeshAttachment;
 
 	public class SkeletonJson {
-		public var attachmentLoader : AttachmentLoader;
-		public var scale : Number = 1;
+		public var attachmentLoader:AttachmentLoader;
+		public var scale:Number = 1;
 
-		public function SkeletonJson(attachmentLoader : AttachmentLoader = null) {
+		public function SkeletonJson(attachmentLoader:AttachmentLoader = null) {
 			this.attachmentLoader = attachmentLoader;
 		}
 
 		/** @param object A String or ByteArray. */
-		public function readSkeletonData(object : *, name : String = null) : SkeletonData {
+		public function readSkeletonData(object:*, name:String = null) : SkeletonData {
 			if (object == null) throw new ArgumentError("object cannot be null.");
 
-			var root : Object;
+			var root:Object;
 			if (object is String)
 				root = JSON.parse(String(object));
 			else if (object is ByteArray)
@@ -73,11 +73,11 @@ package spine {
 			else
 				throw new ArgumentError("object must be a String, ByteArray or Object.");
 
-			var skeletonData : SkeletonData = new SkeletonData();
+			var skeletonData:SkeletonData = new SkeletonData();
 			skeletonData.name = name;
 
 			// Skeleton.
-			var skeletonMap : Object = root["skeleton"];
+			var skeletonMap:Object = root["skeleton"];
 			if (skeletonMap) {
 				skeletonData.hash = skeletonMap["hash"];
 				skeletonData.version = skeletonMap["spine"];
@@ -86,10 +86,10 @@ package spine {
 			}
 
 			// Bones.
-			var boneData : BoneData;
-			for each (var boneMap : Object in root["bones"]) {
-				var parent : BoneData = null;
-				var parentName : String = boneMap["parent"];
+			var boneData:BoneData;
+			for each (var boneMap:Object in root["bones"]) {
+				var parent:BoneData = null;
+				var parentName:String = boneMap["parent"];
 				if (parentName) {
 					parent = skeletonData.findBone(parentName);
 					if (!parent) throw new Error("Parent bone not found: " + parentName);
@@ -107,11 +107,11 @@ package spine {
 			}
 
 			// IK constraints.
-			for each (var ikMap : Object in root["ik"]) {
-				var ikConstraintData : IkConstraintData = new IkConstraintData(ikMap["name"]);
+			for each (var ikMap:Object in root["ik"]) {
+				var ikConstraintData:IkConstraintData = new IkConstraintData(ikMap["name"]);
 
-				for each (var boneName : String in ikMap["bones"]) {
-					var bone : BoneData = skeletonData.findBone(boneName);
+				for each (var boneName:String in ikMap["bones"]) {
+					var bone:BoneData = skeletonData.findBone(boneName);
 					if (!bone) throw new Error("IK bone not found: " + boneName);
 					ikConstraintData.bones[ikConstraintData.bones.length] = bone;
 				}
@@ -126,8 +126,8 @@ package spine {
 			}
 
 			// Transform constraints.
-			for each (var transformMap : Object in root["transform"]) {
-				var transformConstraintData : TransformConstraintData = new TransformConstraintData(transformMap["name"]);
+			for each (var transformMap:Object in root["transform"]) {
+				var transformConstraintData:TransformConstraintData = new TransformConstraintData(transformMap["name"]);
 
 				transformConstraintData.bone = skeletonData.findBone(transformMap["bone"]);
 				if (!transformConstraintData.bone) throw new Error("Bone not found: " + transformMap["bone"]);
@@ -143,13 +143,13 @@ package spine {
 			}
 
 			// Slots.
-			for each (var slotMap : Object in root["slots"]) {
+			for each (var slotMap:Object in root["slots"]) {
 				boneName = slotMap["bone"];
 				boneData = skeletonData.findBone(boneName);
 				if (!boneData) throw new Error("Slot bone not found: " + boneName);
-				var slotData : SlotData = new SlotData(slotMap["name"], boneData);
+				var slotData:SlotData = new SlotData(slotMap["name"], boneData);
 
-				var color : String = slotMap["color"];
+				var color:String = slotMap["color"];
 				if (color) {
 					slotData.r = toColor(color, 0);
 					slotData.g = toColor(color, 1);
@@ -164,15 +164,15 @@ package spine {
 			}
 
 			// Skins.
-			var skins : Object = root["skins"];
-			for (var skinName : String in skins) {
-				var skinMap : Object = skins[skinName];
-				var skin : Skin = new Skin(skinName);
-				for (var slotName : String in skinMap) {
-					var slotIndex : int = skeletonData.findSlotIndex(slotName);
-					var slotEntry : Object = skinMap[slotName];
-					for (var attachmentName : String in slotEntry) {
-						var attachment : Attachment = readAttachment(skin, attachmentName, slotEntry[attachmentName]);
+			var skins:Object = root["skins"];
+			for (var skinName:String in skins) {
+				var skinMap:Object = skins[skinName];
+				var skin:Skin = new Skin(skinName);
+				for (var slotName:String in skinMap) {
+					var slotIndex:int = skeletonData.findSlotIndex(slotName);
+					var slotEntry:Object = skinMap[slotName];
+					for (var attachmentName:String in slotEntry) {
+						var attachment:Attachment = readAttachment(skin, attachmentName, slotEntry[attachmentName]);
 						if (attachment != null)
 							skin.addAttachment(slotIndex, attachmentName, attachment);
 					}
@@ -183,11 +183,11 @@ package spine {
 			}
 
 			// Events.
-			var events : Object = root["events"];
+			var events:Object = root["events"];
 			if (events) {
-				for (var eventName : String in events) {
-					var eventMap : Object = events[eventName];
-					var eventData : EventData = new EventData(eventName);
+				for (var eventName:String in events) {
+					var eventMap:Object = events[eventName];
+					var eventData:EventData = new EventData(eventName);
 					eventData.intValue = eventMap["int"] || 0;
 					eventData.floatValue = eventMap["float"] || 0;
 					eventData.stringValue = eventMap["string"] || null;
@@ -196,26 +196,26 @@ package spine {
 			}
 
 			// Animations.
-			var animations : Object = root["animations"];
-			for (var animationName : String in animations)
+			var animations:Object = root["animations"];
+			for (var animationName:String in animations)
 				readAnimation(animationName, animations[animationName], skeletonData);
 
 			return skeletonData;
 		}
 
-		private function readAttachment(skin : Skin, name : String, map : Object) : Attachment {
+		private function readAttachment(skin:Skin, name:String, map:Object) : Attachment {
 			name = map["name"] || name;
 
-			var typeName : String = map["type"] || "region";
+			var typeName:String = map["type"] || "region";
 			if (typeName == "skinnedmesh") typeName = "weightedmesh";
-			var type : AttachmentType = AttachmentType[typeName];
-			var path : String = map["path"] || name;
+			var type:AttachmentType = AttachmentType[typeName];
+			var path:String = map["path"] || name;
 
-			var scale : Number = this.scale;
-			var color : String, vertices : Vector.<Number>;
+			var scale:Number = this.scale;
+			var color:String, vertices:Vector.<Number>;
 			switch (type) {
 				case AttachmentType.region:
-					var region : RegionAttachment = attachmentLoader.newRegionAttachment(skin, name, path);
+					var region:RegionAttachment = attachmentLoader.newRegionAttachment(skin, name, path);
 					if (!region) return null;
 					region.path = path;
 					region.x = Number(map["x"] || 0) * scale;
@@ -235,7 +235,7 @@ package spine {
 					region.updateOffset();
 					return region;
 				case AttachmentType.mesh:
-					var mesh : MeshAttachment = attachmentLoader.newMeshAttachment(skin, name, path);
+					var mesh:MeshAttachment = attachmentLoader.newMeshAttachment(skin, name, path);
 					if (!mesh) return null;
 					mesh.path = path;
 					mesh.vertices = getFloatArray(map, "vertices", scale);
@@ -255,17 +255,17 @@ package spine {
 					mesh.height = Number(map["height"] || 0) * scale;
 					return mesh;
 				case AttachmentType.weightedmesh:
-					var weightedMesh : WeightedMeshAttachment = attachmentLoader.newWeightedMeshAttachment(skin, name, path);
+					var weightedMesh:WeightedMeshAttachment = attachmentLoader.newWeightedMeshAttachment(skin, name, path);
 					if (!weightedMesh) return null;
 					weightedMesh.path = path;
-					var uvs : Vector.<Number> = getFloatArray(map, "uvs", 1);
+					var uvs:Vector.<Number> = getFloatArray(map, "uvs", 1);
 					vertices = getFloatArray(map, "vertices", 1);
-					var weights : Vector.<Number> = new Vector.<Number>();
-					var bones : Vector.<int> = new Vector.<int>();
-					for (var i : int = 0, n : int = vertices.length; i < n;) {
-						var boneCount : int = int(vertices[i++]);
+					var weights:Vector.<Number> = new Vector.<Number>();
+					var bones:Vector.<int> = new Vector.<int>();
+					for (var i:int = 0, n:int = vertices.length; i < n;) {
+						var boneCount:int = int(vertices[i++]);
 						bones[bones.length] = boneCount;
-						for (var nn : int = i + boneCount * 4; i < nn;) {
+						for (var nn:int = i + boneCount * 4; i < nn;) {
 							bones[bones.length] = vertices[i];
 							weights[weights.length] = vertices[i + 1] * scale;
 							weights[weights.length] = vertices[i + 2] * scale;
@@ -291,9 +291,9 @@ package spine {
 					weightedMesh.height = Number(map["height"] || 0) * scale;
 					return weightedMesh;
 				case AttachmentType.boundingbox:
-					var box : BoundingBoxAttachment = attachmentLoader.newBoundingBoxAttachment(skin, name);
+					var box:BoundingBoxAttachment = attachmentLoader.newBoundingBoxAttachment(skin, name);
 					vertices = box.vertices;
-					for each (var point : Number in map["vertices"])
+					for each (var point:Number in map["vertices"])
 						vertices[vertices.length] = point * scale;
 					return box;
 			}
@@ -301,16 +301,16 @@ package spine {
 			return null;
 		}
 
-		private function readAnimation(name : String, map : Object, skeletonData : SkeletonData) : void {
-			var timelines : Vector.<Timeline> = new Vector.<Timeline>();
-			var duration : Number = 0;
+		private function readAnimation(name:String, map:Object, skeletonData:SkeletonData) : void {
+			var timelines:Vector.<Timeline> = new Vector.<Timeline>();
+			var duration:Number = 0;
 
-			var slotMap : Object, slotIndex : int, slotName : String;
-			var values : Array, valueMap : Object, frameIndex : int;
-			var i : int;
-			var timelineName : String;
+			var slotMap:Object, slotIndex:int, slotName:String;
+			var values:Array, valueMap:Object, frameIndex:int;
+			var i:int;
+			var timelineName:String;
 
-			var slots : Object = map["slots"];
+			var slots:Object = map["slots"];
 			for (slotName in slots) {
 				slotMap = slots[slotName];
 				slotIndex = skeletonData.findSlotIndex(slotName);
@@ -318,16 +318,16 @@ package spine {
 				for (timelineName in slotMap) {
 					values = slotMap[timelineName];
 					if (timelineName == "color") {
-						var colorTimeline : ColorTimeline = new ColorTimeline(values.length);
+						var colorTimeline:ColorTimeline = new ColorTimeline(values.length);
 						colorTimeline.slotIndex = slotIndex;
 
 						frameIndex = 0;
 						for each (valueMap in values) {
-							var color : String = valueMap["color"];
-							var r : Number = toColor(color, 0);
-							var g : Number = toColor(color, 1);
-							var b : Number = toColor(color, 2);
-							var a : Number = toColor(color, 3);
+							var color:String = valueMap["color"];
+							var r:Number = toColor(color, 0);
+							var g:Number = toColor(color, 1);
+							var b:Number = toColor(color, 2);
+							var a:Number = toColor(color, 3);
 							colorTimeline.setFrame(frameIndex, valueMap["time"], r, g, b, a);
 							readCurve(colorTimeline, frameIndex, valueMap);
 							frameIndex++;
@@ -335,7 +335,7 @@ package spine {
 						timelines[timelines.length] = colorTimeline;
 						duration = Math.max(duration, colorTimeline.frames[colorTimeline.frameCount * 5 - 5]);
 					} else if (timelineName == "attachment") {
-						var attachmentTimeline : AttachmentTimeline = new AttachmentTimeline(values.length);
+						var attachmentTimeline:AttachmentTimeline = new AttachmentTimeline(values.length);
 						attachmentTimeline.slotIndex = slotIndex;
 
 						frameIndex = 0;
@@ -348,16 +348,16 @@ package spine {
 				}
 			}
 
-			var bones : Object = map["bones"];
-			for (var boneName : String in bones) {
-				var boneIndex : int = skeletonData.findBoneIndex(boneName);
+			var bones:Object = map["bones"];
+			for (var boneName:String in bones) {
+				var boneIndex:int = skeletonData.findBoneIndex(boneName);
 				if (boneIndex == -1) throw new Error("Bone not found: " + boneName);
-				var boneMap : Object = bones[boneName];
+				var boneMap:Object = bones[boneName];
 
 				for (timelineName in boneMap) {
 					values = boneMap[timelineName];
 					if (timelineName == "rotate") {
-						var rotateTimeline : RotateTimeline = new RotateTimeline(values.length);
+						var rotateTimeline:RotateTimeline = new RotateTimeline(values.length);
 						rotateTimeline.boneIndex = boneIndex;
 
 						frameIndex = 0;
@@ -369,8 +369,8 @@ package spine {
 						timelines[timelines.length] = rotateTimeline;
 						duration = Math.max(duration, rotateTimeline.frames[rotateTimeline.frameCount * 2 - 2]);
 					} else if (timelineName == "translate" || timelineName == "scale") {
-						var timeline : TranslateTimeline;
-						var timelineScale : Number = 1;
+						var timeline:TranslateTimeline;
+						var timelineScale:Number = 1;
 						if (timelineName == "scale")
 							timeline = new ScaleTimeline(values.length);
 						else {
@@ -381,8 +381,8 @@ package spine {
 
 						frameIndex = 0;
 						for each (valueMap in values) {
-							var x : Number = Number(valueMap["x"] || 0) * timelineScale;
-							var y : Number = Number(valueMap["y"] || 0) * timelineScale;
+							var x:Number = Number(valueMap["x"] || 0) * timelineScale;
+							var y:Number = Number(valueMap["y"] || 0) * timelineScale;
 							timeline.setFrame(frameIndex, valueMap["time"], x, y);
 							readCurve(timeline, frameIndex, valueMap);
 							frameIndex++;
@@ -394,16 +394,16 @@ package spine {
 				}
 			}
 
-			var ikMap : Object = map["ik"];
-			for (var ikConstraintName : String in ikMap) {
-				var ikConstraint : IkConstraintData = skeletonData.findIkConstraint(ikConstraintName);
+			var ikMap:Object = map["ik"];
+			for (var ikConstraintName:String in ikMap) {
+				var ikConstraint:IkConstraintData = skeletonData.findIkConstraint(ikConstraintName);
 				values = ikMap[ikConstraintName];
-				var ikTimeline : IkConstraintTimeline = new IkConstraintTimeline(values.length);
+				var ikTimeline:IkConstraintTimeline = new IkConstraintTimeline(values.length);
 				ikTimeline.ikConstraintIndex = skeletonData.ikConstraints.indexOf(ikConstraint);
 				frameIndex = 0;
 				for each (valueMap in values) {
-					var mix : Number = valueMap.hasOwnProperty("mix") ? valueMap["mix"] : 1;
-					var bendDirection : int = (!valueMap.hasOwnProperty("bendPositive") || valueMap["bendPositive"]) ? 1 : -1;
+					var mix:Number = valueMap.hasOwnProperty("mix") ? valueMap["mix"] : 1;
+					var bendDirection:int = (!valueMap.hasOwnProperty("bendPositive") || valueMap["bendPositive"]) ? 1 : -1;
 					ikTimeline.setFrame(frameIndex, valueMap["time"], mix, bendDirection);
 					readCurve(ikTimeline, frameIndex, valueMap);
 					frameIndex++;
@@ -412,22 +412,22 @@ package spine {
 				duration = Math.max(duration, ikTimeline.frames[ikTimeline.frameCount * 3 - 3]);
 			}
 
-			var ffd : Object = map["ffd"];
-			for (var skinName : String in ffd) {
-				var skin : Skin = skeletonData.findSkin(skinName);
+			var ffd:Object = map["ffd"];
+			for (var skinName:String in ffd) {
+				var skin:Skin = skeletonData.findSkin(skinName);
 				slotMap = ffd[skinName];
 				for (slotName in slotMap) {
 					slotIndex = skeletonData.findSlotIndex(slotName);
-					var meshMap : Object = slotMap[slotName];
-					for (var meshName : String in meshMap) {
+					var meshMap:Object = slotMap[slotName];
+					for (var meshName:String in meshMap) {
 						values = meshMap[meshName];
-						var ffdTimeline : FfdTimeline = new FfdTimeline(values.length);
-						var attachment : Attachment = skin.getAttachment(slotIndex, meshName);
+						var ffdTimeline:FfdTimeline = new FfdTimeline(values.length);
+						var attachment:Attachment = skin.getAttachment(slotIndex, meshName);
 						if (!attachment) throw new Error("FFD attachment not found: " + meshName);
 						ffdTimeline.slotIndex = slotIndex;
 						ffdTimeline.attachment = attachment;
 
-						var vertexCount : int;
+						var vertexCount:int;
 						if (attachment is MeshAttachment)
 							vertexCount = (attachment as MeshAttachment).vertices.length;
 						else
@@ -435,17 +435,17 @@ package spine {
 
 						frameIndex = 0;
 						for each (valueMap in values) {
-							var vertices : Vector.<Number>;
+							var vertices:Vector.<Number>;
 							if (!valueMap["vertices"]) {
 								if (attachment is MeshAttachment)
 									vertices = (attachment as MeshAttachment).vertices;
 								else
 									vertices = new Vector.<Number>(vertexCount, true);
 							} else {
-								var verticesValue : Array = valueMap["vertices"];
+								var verticesValue:Array = valueMap["vertices"];
 								vertices = new Vector.<Number>(vertexCount, true);
-								var start : int = valueMap["offset"] || 0;
-								var n : int = verticesValue.length;
+								var start:int = valueMap["offset"] || 0;
+								var n:int = verticesValue.length;
 								if (scale == 1) {
 									for (i = 0; i < n; i++)
 										vertices[i + start] = verticesValue[i];
@@ -454,7 +454,7 @@ package spine {
 										vertices[i + start] = verticesValue[i] * scale;
 								}
 								if (attachment is MeshAttachment) {
-									var meshVertices : Vector.<Number> = (attachment as MeshAttachment).vertices;
+									var meshVertices:Vector.<Number> = (attachment as MeshAttachment).vertices;
 									for (i = 0; i < vertexCount; i++)
 										vertices[i] += meshVertices[i];
 								}
@@ -470,22 +470,22 @@ package spine {
 				}
 			}
 
-			var drawOrderValues : Array = map["drawOrder"];
+			var drawOrderValues:Array = map["drawOrder"];
 			if (!drawOrderValues) drawOrderValues = map["draworder"];
 			if (drawOrderValues) {
-				var drawOrderTimeline : DrawOrderTimeline = new DrawOrderTimeline(drawOrderValues.length);
-				var slotCount : int = skeletonData.slots.length;
+				var drawOrderTimeline:DrawOrderTimeline = new DrawOrderTimeline(drawOrderValues.length);
+				var slotCount:int = skeletonData.slots.length;
 				frameIndex = 0;
-				for each (var drawOrderMap : Object in drawOrderValues) {
-					var drawOrder : Vector.<int> = null;
+				for each (var drawOrderMap:Object in drawOrderValues) {
+					var drawOrder:Vector.<int> = null;
 					if (drawOrderMap["offsets"]) {
 						drawOrder = new Vector.<int>(slotCount);
 						for (i = slotCount - 1; i >= 0; i--)
 							drawOrder[i] = -1;
-						var offsets : Array = drawOrderMap["offsets"];
-						var unchanged : Vector.<int> = new Vector.<int>(slotCount - offsets.length);
-						var originalIndex : int = 0, unchangedIndex : int = 0;
-						for each (var offsetMap : Object in offsets) {
+						var offsets:Array = drawOrderMap["offsets"];
+						var unchanged:Vector.<int> = new Vector.<int>(slotCount - offsets.length);
+						var originalIndex:int = 0, unchangedIndex:int = 0;
+						for each (var offsetMap:Object in offsets) {
 							slotIndex = skeletonData.findSlotIndex(offsetMap["slot"]);
 							if (slotIndex == -1) throw new Error("Slot not found: " + offsetMap["slot"]);
 							// Collect unchanged items.
@@ -507,14 +507,14 @@ package spine {
 				duration = Math.max(duration, drawOrderTimeline.frames[drawOrderTimeline.frameCount - 1]);
 			}
 
-			var eventsMap : Array = map["events"];
+			var eventsMap:Array = map["events"];
 			if (eventsMap) {
-				var eventTimeline : EventTimeline = new EventTimeline(eventsMap.length);
+				var eventTimeline:EventTimeline = new EventTimeline(eventsMap.length);
 				frameIndex = 0;
-				for each (var eventMap : Object in eventsMap) {
-					var eventData : EventData = skeletonData.findEvent(eventMap["name"]);
+				for each (var eventMap:Object in eventsMap) {
+					var eventData:EventData = skeletonData.findEvent(eventMap["name"]);
 					if (!eventData) throw new Error("Event not found: " + eventMap["name"]);
-					var event : Event = new Event(eventMap["time"], eventData);
+					var event:Event = new Event(eventMap["time"], eventData);
 					event.intValue = eventMap.hasOwnProperty("int") ? eventMap["int"] : eventData.intValue;
 					event.floatValue = eventMap.hasOwnProperty("float") ? eventMap["float"] : eventData.floatValue;
 					event.stringValue = eventMap.hasOwnProperty("string") ? eventMap["string"] : eventData.stringValue;
@@ -527,8 +527,8 @@ package spine {
 			skeletonData.animations[skeletonData.animations.length] = new Animation(name, timelines, duration);
 		}
 
-		static private function readCurve(timeline : CurveTimeline, frameIndex : int, valueMap : Object) : void {
-			var curve : Object = valueMap["curve"];
+		static private function readCurve(timeline:CurveTimeline, frameIndex:int, valueMap:Object) : void {
+			var curve:Object = valueMap["curve"];
 			if (!curve) return;
 			if (curve == "stepped")
 				timeline.setStepped(frameIndex);
@@ -536,15 +536,15 @@ package spine {
 				timeline.setCurve(frameIndex, curve[0], curve[1], curve[2], curve[3]);
 		}
 
-		static private function toColor(hexString : String, colorIndex : int) : Number {
+		static private function toColor(hexString:String, colorIndex:int) : Number {
 			if (hexString.length != 8) throw new ArgumentError("Color hexidecimal length must be 8, recieved: " + hexString);
 			return parseInt(hexString.substring(colorIndex * 2, colorIndex * 2 + 2), 16) / 255;
 		}
 
-		static private function getFloatArray(map : Object, name : String, scale : Number) : Vector.<Number> {
-			var list : Array = map[name];
-			var values : Vector.<Number> = new Vector.<Number>(list.length, true);
-			var i : int = 0, n : int = list.length;
+		static private function getFloatArray(map:Object, name:String, scale:Number) : Vector.<Number> {
+			var list:Array = map[name];
+			var values:Vector.<Number> = new Vector.<Number>(list.length, true);
+			var i:int = 0, n:int = list.length;
 			if (scale == 1) {
 				for (; i < n; i++)
 					values[i] = list[i];
@@ -555,18 +555,18 @@ package spine {
 			return values;
 		}
 
-		static private function getIntArray(map : Object, name : String) : Vector.<int> {
-			var list : Array = map[name];
-			var values : Vector.<int> = new Vector.<int>(list.length, true);
-			for (var i : int = 0, n : int = list.length; i < n; i++)
+		static private function getIntArray(map:Object, name:String) : Vector.<int> {
+			var list:Array = map[name];
+			var values:Vector.<int> = new Vector.<int>(list.length, true);
+			for (var i:int = 0, n:int = list.length; i < n; i++)
 				values[i] = int(list[i]);
 			return values;
 		}
 
-		static private function getUintArray(map : Object, name : String) : Vector.<uint> {
-			var list : Array = map[name];
-			var values : Vector.<uint> = new Vector.<uint>(list.length, true);
-			for (var i : int = 0, n : int = list.length; i < n; i++)
+		static private function getUintArray(map:Object, name:String) : Vector.<uint> {
+			var list:Array = map[name];
+			var values:Vector.<uint> = new Vector.<uint>(list.length, true);
+			for (var i:int = 0, n:int = list.length; i < n; i++)
 				values[i] = int(list[i]);
 			return values;
 		}
