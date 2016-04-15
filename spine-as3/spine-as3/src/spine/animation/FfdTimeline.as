@@ -30,6 +30,7 @@
  *****************************************************************************/
 
 package spine.animation {
+import spine.attachments.FfdAttachment;
 import spine.Event;
 import spine.Skeleton;
 import spine.Slot;
@@ -55,7 +56,8 @@ public class FfdTimeline extends CurveTimeline {
 
 	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
 		var slot:Slot = skeleton.slots[slotIndex];
-		if (slot.attachment != attachment) return;
+		var slotAttachment:FfdAttachment = slot.attachment as FfdAttachment;
+		if (!slotAttachment || !slotAttachment.applyFFD(attachment)) return;
 
 		var frames:Vector.<Number> = this.frames;
 		if (time < frames[0]) return; // Time is before first frame.

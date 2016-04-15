@@ -84,7 +84,7 @@ public class IkConstraint implements Updatable {
 			rotationIK = 360 - rotationIK;
 		if (rotationIK > 180) rotationIK -= 360;
 		else if (rotationIK < -180) rotationIK += 360;
-		bone.updateWorldTransformWith(bone.x, bone.y, rotation + (rotationIK - rotation) * alpha, bone.scaleX, bone.scaleY);
+		bone.updateWorldTransformWith(bone.x, bone.y, rotation + (rotationIK - rotation) * alpha, bone.appliedScaleX, bone.appliedScaleY);
 	}
 
 	/** Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as possible. The
@@ -92,26 +92,32 @@ public class IkConstraint implements Updatable {
 	 * @param child Any descendant bone of the parent. */
 	static public function apply2 (parent:Bone, child:Bone, targetX:Number, targetY:Number, bendDir:int, alpha:Number) : void {
 		if (alpha == 0) return;
-		var px:Number = parent.x, py:Number = parent.y, psx:Number = parent.scaleX, psy:Number = parent.scaleY;
-		var csx:Number = child.scaleX, cy:Number = child.y;
-		var offset1:int, offset2:int, sign2:int;
+		var px:Number = parent.x, py:Number = parent.y, psx:Number = parent.appliedScaleX, psy:Number = parent.appliedScaleY;
+		var o1:int, o2:int, s2:int;
 		if (psx < 0) {
 			psx = -psx;
-			offset1 = 180;
-			sign2 = -1;
+			o1 = 180;
+			s2 = -1;
 		} else {
-			offset1 = 0;
-			sign2 = 1;
+			o1 = 0;
+			s2 = 1;
 		}
 		if (psy < 0) {
 			psy = -psy;
-			sign2 = -sign2;
+			s2 = -s2;
+		}
+		var cx:Number = child.x, cy:Number = child.y, csx:Number = child.appliedScaleX;
+		var u:Boolean = Math.abs(psx - psy) <= 0.0001;
+		if (!u && cy != 0) {
+			child._worldX = parent.a * cx + parent.worldX;
+			child._worldY = parent.c * cx + parent.worldY;
+			cy = 0;
 		}
 		if (csx < 0) {
 			csx = -csx;
-			offset2 = 180;
+			o2 = 180;
 		} else
-			offset2 = 0;
+			o2 = 0;
 		var pp:Bone = parent.parent;
 		var tx:Number, ty:Number, dx:Number, dy:Number;
 		if (!pp) {
@@ -132,7 +138,7 @@ public class IkConstraint implements Updatable {
 		}
 		var l1:Number = Math.sqrt(dx * dx + dy * dy), l2:Number = child.data.length * csx, a1:Number, a2:Number;
 		outer:
-		if (Math.abs(psx - psy) <= 0.0001) {
+		if (u) {
 			l2 *= psx;
 			var cos:Number = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
 			if (cos < -1) cos = -1;
@@ -141,7 +147,6 @@ public class IkConstraint implements Updatable {
 			var ad:Number = l1 + l2 * cos, o:Number = l2 * Math.sin(a2);
 			a1 = Math.atan2(ty * ad - tx * o, tx * ad + ty * o);
 		} else {
-			cy = 0;
 			var a:Number = psx * l2, b:Number = psy * l2, ta:Number = Math.atan2(ty, tx);
 			var aa:Number = a * a, bb:Number = b * b, ll:Number = l1 * l1, dd:Number = tx * tx + ty * ty;
 			var c0:Number = bb * ll + aa * dd - aa * bb, c1:Number = -2 * bb * l1, c2:Number = bb - aa;
@@ -198,17 +203,17 @@ public class IkConstraint implements Updatable {
 				a2 = maxAngle * bendDir;
 			}
 		}
-		var offset:Number = Math.atan2(cy, child.x) * sign2;
-		a1 = (a1 - offset) * MathUtils.radDeg + offset1;
-		a2 = (a2 + offset) * MathUtils.radDeg * sign2 + offset2;
+		var os:Number = Math.atan2(cy, cx) * s2;
+		a1 = (a1 - os) * MathUtils.radDeg + o1;
+		a2 = (a2 + os) * MathUtils.radDeg * s2 + o2;
 		if (a1 > 180) a1 -= 360;
 		else if (a1 < -180) a1 += 360;
 		if (a2 > 180) a2 -= 360;
 		else if (a2 < -180) a2 += 360;
 		var rotation:Number = parent.rotation;
-		parent.updateWorldTransformWith(parent.x, parent.y, rotation + (a1 - rotation) * alpha, parent.scaleX, parent.scaleY);
+		parent.updateWorldTransformWith(px, py, rotation + (a1 - rotation) * alpha, parent.appliedScaleX, parent.appliedScaleY);
 		rotation = child.rotation;
-		child.updateWorldTransformWith(child.x, cy, rotation + (a2 - rotation) * alpha, child.scaleX, child.scaleY);
+		child.updateWorldTransformWith(cx, cy, rotation + (a2 - rotation) * alpha, child.appliedScaleX, child.appliedScaleY);
 	}
 }
 

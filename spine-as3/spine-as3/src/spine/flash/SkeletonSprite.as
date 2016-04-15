@@ -78,7 +78,7 @@ public class SkeletonSprite extends Sprite {
 		for (var i:int = 0, n:int = drawOrder.length; i < n; i++) {
 			var slot:Slot = drawOrder[i];
 			var regionAttachment:RegionAttachment = slot.attachment as RegionAttachment;
-			if (regionAttachment != null) {
+			if (regionAttachment) {
 				var wrapper:Sprite = regionAttachment["wrapper"];
 				var region:AtlasRegion = AtlasRegion(regionAttachment.rendererObject);
 				if (!wrapper) {

@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-as3 works with data exported from the latest version of Spine, except linked meshes are [not yet supported](https://trello.com/c/bERJAFEq/73-update-runtimes-to-support-v3-1-linked-meshes).
+spine-as3 works with data exported from the latest version of Spine.
 
 spine-as3 supports all Spine features, including meshes. If using the `spine.flash` classes for rendering, meshes are not supported.
 

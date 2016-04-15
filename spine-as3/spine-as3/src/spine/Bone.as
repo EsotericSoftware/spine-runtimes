@@ -119,85 +119,79 @@ public class Bone implements Updatable {
 			_b = pa * lb + pb * ld;
 			_c = pc * la + pd * lc;
 			_d = pc * lb + pd * ld;
-		} else if (data.inheritRotation) { // No scale inheritance.
-			pa = 1;
-			pb = 0;
-			pc = 0;
-			pd = 1;
-			do {
-				radians = parent.appliedRotation * MathUtils.degRad;
-				cos = Math.cos(radians);
-				sin = Math.sin(radians);
-				var temp1:Number = pa * cos + pb * sin;
-				pb = pa * -sin + pb * cos;
-				pa = temp1;
-				temp1 = pc * cos + pd * sin;
-				pd = pc * -sin + pd * cos;
-				pc = temp1;
-
-				if (!parent.data.inheritRotation) break;
-				parent = parent.parent;
-			} while (parent != null);
-			_a = pa * la + pb * lc;
-			_b = pa * lb + pb * ld;
-			_c = pc * la + pd * lc;
-			_d = pc * lb + pd * ld;
-			if (_skeleton.flipX) {
-				_a = -_a;
-				_b = -_b;
-			}
-			if (_skeleton.flipY != yDown) {
-				_c = -_c;
-				_d = -_d;
-			}
-		} else if (data.inheritScale) { // No rotation inheritance.
-			pa = 1;
-			pb = 0;
-			pc = 0;
-			pd = 1;
-			do {
-				radians = parent.rotation * MathUtils.degRad;
-				cos = Math.cos(radians);
-				sin = Math.sin(radians);
-				var psx:Number = parent.appliedScaleX, psy:Number = parent.appliedScaleY;
-				var za:Number = cos * psx, zb:Number = -sin * psy, zc:Number = sin * psx, zd:Number = cos * psy;
-				var temp2:Number = pa * za + pb * zc;
-				pb = pa * zb + pb * zd;
-				pa = temp2;
-				temp2 = pc * za + pd * zc;
-				pd = pc * zb + pd * zd;
-				pc = temp2;
-
-				if (psx < 0) radians = -radians;
-				cos = Math.cos(-radians);
-				sin = Math.sin(-radians);
-				temp2 = pa * cos + pb * sin;
-				pb = pa * -sin + pb * cos;
-				pa = temp2;
-				temp2 = pc * cos + pd * sin;
-				pd = pc * -sin + pd * cos;
-				pc = temp2;
-
-				if (!parent.data.inheritScale) break;
-				parent = parent.parent;
-			} while (parent != null);
-			_a = pa * la + pb * lc;
-			_b = pa * lb + pb * ld;
-			_c = pc * la + pd * lc;
-			_d = pc * lb + pd * ld;
-			if (_skeleton.flipX) {
-				_a = -_a;
-				_b = -_b;
-			}
-			if (_skeleton.flipY != yDown) {
-				_c = -_c;
-				_d = -_d;
-			}
 		} else {
-			_a = la;
-			_b = lb;
-			_c = lc;
-			_d = ld;
+			if (data.inheritRotation) { // No scale inheritance.
+				pa = 1;
+				pb = 0;
+				pc = 0;
+				pd = 1;
+				do {
+					radians = parent.appliedRotation * MathUtils.degRad;
+					cos = Math.cos(radians);
+					sin = Math.sin(radians);
+					var temp1:Number = pa * cos + pb * sin;
+					pb = pa * -sin + pb * cos;
+					pa = temp1;
+					temp1 = pc * cos + pd * sin;
+					pd = pc * -sin + pd * cos;
+					pc = temp1;
+	
+					if (!parent.data.inheritRotation) break;
+					parent = parent.parent;
+				} while (parent != null);
+				_a = pa * la + pb * lc;
+				_b = pa * lb + pb * ld;
+				_c = pc * la + pd * lc;
+				_d = pc * lb + pd * ld;
+			} else if (data.inheritScale) { // No rotation inheritance.
+				pa = 1;
+				pb = 0;
+				pc = 0;
+				pd = 1;
+				do {
+					radians = parent.rotation * MathUtils.degRad;
+					cos = Math.cos(radians);
+					sin = Math.sin(radians);
+					var psx:Number = parent.appliedScaleX, psy:Number = parent.appliedScaleY;
+					var za:Number = cos * psx, zb:Number = -sin * psy, zc:Number = sin * psx, zd:Number = cos * psy;
+					var temp2:Number = pa * za + pb * zc;
+					pb = pa * zb + pb * zd;
+					pa = temp2;
+					temp2 = pc * za + pd * zc;
+					pd = pc * zb + pd * zd;
+					pc = temp2;
+	
+					if (psx < 0) radians = -radians;
+					cos = Math.cos(-radians);
+					sin = Math.sin(-radians);
+					temp2 = pa * cos + pb * sin;
+					pb = pa * -sin + pb * cos;
+					pa = temp2;
+					temp2 = pc * cos + pd * sin;
+					pd = pc * -sin + pd * cos;
+					pc = temp2;
+	
+					if (!parent.data.inheritScale) break;
+					parent = parent.parent;
+				} while (parent != null);
+				_a = pa * la + pb * lc;
+				_b = pa * lb + pb * ld;
+				_c = pc * la + pd * lc;
+				_d = pc * lb + pd * ld;
+			} else {
+				_a = la;
+				_b = lb;
+				_c = lc;
+				_d = ld;
+			}
+			if (_skeleton.flipX) {
+				_a = -_a;
+				_b = -_b;
+			}
+			if (_skeleton.flipY != yDown) {
+				_c = -_c;
+				_d = -_d;
+			}
 		}
 	}
 
