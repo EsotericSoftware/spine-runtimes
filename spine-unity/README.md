@@ -14,7 +14,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-unity works with data exported from the latest version of Spine, except linked meshes are [not yet supported](https://trello.com/c/bERJAFEq/73-update-runtimes-to-support-v3-1-linked-meshes).
+spine-unity works with data exported from the latest version of Spine.
 
 spine-unity supports all Spine features.
 
@@ -28,7 +28,7 @@ For advanced uses and specific optimization cases, Spine skeletons can be "baked
 
 The [Spine Unity Features Tutorial](http://esotericsoftware.com/forum/Unity-Feature-Tutorials-4839) forum thread has many videos on how to use spine-unity.
 
-For more documentation, see [spine-unity Documentation](https://github.com/pharan/spine-unity-docs/blob/master/README.md).
+For more documentation, see [spine-unity Documentation](http://esotericsoftware.com/spine-unity).
 
 ## Quick installation
 
