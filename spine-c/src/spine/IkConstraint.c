@@ -99,8 +99,8 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float 
 		psy = -psy;
 		s2 = -s2;
 	}
-	u = psx - psy;
-	u = u < 0 ? -u : u <= 0.0001f;
+	r = psx - psy;
+	u = (r < 0 ? -r : r) <= 0.0001f;
 	if (!u && cy != 0) {
 		cwx = parent->a * cx + parent->worldX;
 		cwy = parent->c * cx + parent->worldY;
