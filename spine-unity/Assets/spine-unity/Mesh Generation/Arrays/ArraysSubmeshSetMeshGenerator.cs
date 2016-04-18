@@ -39,7 +39,7 @@ namespace Spine.Unity.MeshGeneration {
 
 		readonly DoubleBuffered<SmartMesh> doubleBufferedSmartMesh = new DoubleBuffered<SmartMesh>();
 		readonly ExposedList<SubmeshInstruction> currentInstructions = new ExposedList<SubmeshInstruction>();
-		readonly ExposedList<Attachment> currentAttachments = new ExposedList<Attachment>();
+		readonly ExposedList<Attachment> attachmentBuffer = new ExposedList<Attachment>();
 		readonly ExposedList<SubmeshTriangleBuffer> submeshBuffers = new ExposedList<SubmeshTriangleBuffer>();
 		Material[] sharedMaterials = new Material[0];
 
@@ -90,9 +90,8 @@ namespace Spine.Unity.MeshGeneration {
 			}
 				
 			// For each submesh, add vertex data from attachments.
-			var currentAttachments_ = this.currentAttachments;
-			bool structureDoesntMatch = vertBufferResized || submeshBuffersResized || smartMesh.StructureDoesntMatch(currentAttachments_, currentInstructions);
-			currentAttachments_.Clear(false);
+			var workingAttachments = this.attachmentBuffer;
+			workingAttachments.Clear(false);
 			int vertexIndex = 0; // modified by FillVerts
 			for (int submeshIndex = 0; submeshIndex < submeshCount; submeshIndex++) {
 				var currentInstruction = currentInstructionsItems[submeshIndex];
@@ -102,13 +101,18 @@ namespace Spine.Unity.MeshGeneration {
 				var skeletonDrawOrderItems = skeleton.DrawOrder.Items;
 				for (int i = startSlot; i < endSlot; i++) {
 					var ca = skeletonDrawOrderItems[i].attachment;
-					if (ca != null) currentAttachments_.Add(ca); // Includes BoundingBoxes. This is ok.
+					if (ca != null) workingAttachments.Add(ca); // Includes BoundingBoxes. This is ok.
 				}
 				ArraysMeshGenerator.FillVerts(skeleton, startSlot, endSlot, zSpacing, this.premultiplyVertexColors, this.meshVertices, this.meshUVs, this.meshColors32, ref vertexIndex, ref this.attachmentVertexBuffer, ref meshBoundsMin, ref meshBoundsMax);
+			}
+
+			bool structureDoesntMatch = vertBufferResized || submeshBuffersResized || smartMesh.StructureDoesntMatch(workingAttachments, currentInstructions);
+			for (int submeshIndex = 0; submeshIndex < submeshCount; submeshIndex++) {
+				var currentInstruction = currentInstructionsItems[submeshIndex];
 				if (structureDoesntMatch) {
 					var currentBuffer = submeshBuffers.Items[submeshIndex];
 					bool isLastSubmesh = (submeshIndex == submeshCount - 1);
-					ArraysMeshGenerator.FillTriangles(skeleton, currentInstruction.triangleCount, currentInstruction.firstVertexIndex, startSlot, endSlot, ref currentBuffer.triangles, isLastSubmesh);
+					ArraysMeshGenerator.FillTriangles(currentInstruction.skeleton, currentInstruction.triangleCount, currentInstruction.firstVertexIndex, currentInstruction.startSlot, currentInstruction.endSlot, ref currentBuffer.triangles, isLastSubmesh);
 				}
 			}
 
@@ -118,7 +122,7 @@ namespace Spine.Unity.MeshGeneration {
 			}
 
 			// STEP 3: Assign the buffers into the Mesh.
-			smartMesh.Set(this.meshVertices, this.meshUVs, this.meshColors32, currentAttachments, currentInstructions);
+			smartMesh.Set(this.meshVertices, this.meshUVs, this.meshColors32, workingAttachments, currentInstructions);
 			mesh.bounds = ArraysMeshGenerator.ToBounds(meshBoundsMin, meshBoundsMax);
 			#if SPINE_OPTIONAL_NORMALS
 			this.TryAddNormalsTo(mesh, vertexCount);
@@ -184,7 +188,6 @@ namespace Spine.Unity.MeshGeneration {
 					) return true;
 				}
 
-				//Debug.Log("structure matched");
 				return false;
 			}
 		}
