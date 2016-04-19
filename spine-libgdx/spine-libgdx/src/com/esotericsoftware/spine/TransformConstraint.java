@@ -38,9 +38,9 @@ public class TransformConstraint implements Updatable {
 	public void update () {
 		float translateMix = this.translateMix;
 		if (translateMix > 0) {
-			Bone bone = this.bone;
 			Vector2 temp = this.temp;
 			target.localToWorld(temp.set(x, y));
+			Bone bone = this.bone;
 			bone.worldX += (temp.x - bone.worldX) * translateMix;
 			bone.worldY += (temp.y - bone.worldY) * translateMix;
 		}
