@@ -4,7 +4,7 @@ The **spine-unity** runtime provides functionality to load, manipulate and rende
 
 For more documentation, see [spine-unity Documentation](https://github.com/pharan/spine-unity-docs/blob/master/README.md).
 
-While spine-unity can render directly with Unity, without the need for any other plugins, it also works with [2D Toolkit](http://www.unikronsoftware.com/2dtoolkit/) and can render skeletons using a TK2D texture atlas.
+While spine-unity can render directly with Unity, without the need for any other plugins, it also works with [2D Toolkit](http://www.2dtoolkit.com/) and can render skeletons using a TK2D texture atlas.
 
 ## Licensing
 
