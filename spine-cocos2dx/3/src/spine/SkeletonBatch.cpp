@@ -34,6 +34,7 @@
 #include <algorithm>
 
 USING_NS_CC;
+using std::max;
 
 namespace spine {
 
@@ -64,7 +65,7 @@ SkeletonBatch::~SkeletonBatch () {
 
 	Command* command = _firstCommand;
 	while (command) {
-		Command* next = command->_next;
+		Command* next = command->next;
 		delete command;
 		command = next;
 	}
@@ -80,33 +81,49 @@ void SkeletonBatch::update (float delta) {
 void SkeletonBatch::addCommand (cocos2d::Renderer* renderer, float globalZOrder, GLuint textureID, GLProgramState* glProgramState,
 	BlendFunc blendFunc, const TrianglesCommand::Triangles& triangles, const Mat4& transform, uint32_t transformFlags
 ) {
-	CCASSERT(_position + triangles.vertCount < _capacity, "SkeletonBatch capacity is too small");
+	if (_position + triangles.vertCount > _capacity) {
+		int newCapacity = max(_capacity + _capacity / 2, _position + triangles.vertCount);
+		V3F_C4B_T2F* newBuffer = new V3F_C4B_T2F[newCapacity];
+		memcpy(newBuffer, _buffer, _position);
+
+		int newPosition = 0;
+		Command* command = _firstCommand;
+		while (newPosition < _position) {
+			command->triangles->verts = newBuffer + newPosition;
+			newPosition += command->triangles->vertCount;
+			command = command->next;
+		}
+
+		delete [] _buffer;
+		_buffer = newBuffer;
+		_capacity = newCapacity;
+	}
 
 	memcpy(_buffer + _position, triangles.verts, sizeof(V3F_C4B_T2F) * triangles.vertCount);
-	_command->_triangles->verts = _buffer + _position;
+	_command->triangles->verts = _buffer + _position;
 	_position += triangles.vertCount;
 
-	_command->_triangles->vertCount = triangles.vertCount;
-	_command->_triangles->indexCount = triangles.indexCount;
-	_command->_triangles->indices = triangles.indices;
+	_command->triangles->vertCount = triangles.vertCount;
+	_command->triangles->indexCount = triangles.indexCount;
+	_command->triangles->indices = triangles.indices;
 
-	_command->_trianglesCommand->init(globalZOrder, textureID, glProgramState, blendFunc, *_command->_triangles, transform, transformFlags);
-	renderer->addCommand(_command->_trianglesCommand);
+	_command->trianglesCommand->init(globalZOrder, textureID, glProgramState, blendFunc, *_command->triangles, transform, transformFlags);
+	renderer->addCommand(_command->trianglesCommand);
 
-	if (!_command->_next) _command->_next = new Command();
-	_command = _command->_next;
+	if (!_command->next) _command->next = new Command();
+	_command = _command->next;
 }
 
 SkeletonBatch::Command::Command () :
-	_next(nullptr)
+	next(nullptr)
 {
-	_trianglesCommand = new TrianglesCommand();
-	_triangles = new TrianglesCommand::Triangles();
+	trianglesCommand = new TrianglesCommand();
+	triangles = new TrianglesCommand::Triangles();
 }
 
 SkeletonBatch::Command::~Command () {
-	delete _triangles;
-	delete _trianglesCommand;
+	delete triangles;
+	delete trianglesCommand;
 }
 
 }

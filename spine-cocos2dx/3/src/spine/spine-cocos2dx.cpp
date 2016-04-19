@@ -63,7 +63,7 @@ void _spAtlasPage_createTexture (spAtlasPage* self, const char* path) {
 	texture->retain();
 
 	Texture2D::TexParams textureParams = {filter(self->minFilter), filter(self->magFilter), wrap(self->uWrap), wrap(self->vWrap)};
-	texture->setTexParameters(&textureParams);
+	texture->setTexParameters(textureParams);
 
 	self->rendererObject = texture;
 	self->width = texture->getPixelsWide();
