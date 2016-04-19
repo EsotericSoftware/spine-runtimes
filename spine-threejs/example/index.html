@@ -237,8 +237,8 @@
 					(dz || 0.1) * Z++
 				);
 
-				matrix.elements[0] = slot.bone.m00; matrix.elements[4] = slot.bone.m01;
-				matrix.elements[1] = slot.bone.m10; matrix.elements[5] = slot.bone.m11;
+				matrix.elements[0] = slot.bone.a; matrix.elements[4] = slot.bone.b;
+				matrix.elements[1] = slot.bone.c; matrix.elements[5] = slot.bone.d;
 
 				mesh.matrix.copy(matrix);
 
@@ -342,7 +342,8 @@ function load (name, scale) {
 function init() {
 	scene = new THREE.Scene();
 
-	camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 3000);
+	var width = 640, height = 480;
+	camera = new THREE.PerspectiveCamera(75, width / height, 1, 3000);
 	camera.position.z = 400;
 
 	geometry = new THREE.BoxGeometry(200, 200, 200);
@@ -354,11 +355,12 @@ function init() {
 	load('spineboy', 0.4);
 
 	renderer = new THREE.WebGLRenderer();
-	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.setSize(width, height);
 
 	document.body.appendChild(renderer.domElement);
 }
 
+var lastTime = Date.now();
 function animate() {
 	requestAnimationFrame(animate);
 
@@ -369,7 +371,8 @@ function animate() {
 	mesh.rotation.x = a * Math.PI * 0.2;
 	mesh.rotation.y = b * Math.PI * 0.4;
 
-	anim.update();
+	anim.update((t - lastTime) / 1000);
+	lastTime = t;
 
 	renderer.render(scene, camera);
 }
@@ -378,11 +381,10 @@ init();
 animate();
 </script>
 
-<br>
+<br><br>
 <input type="button" value="Spineboy" onclick="load('spineboy', 0.6)">
 <input type="button" value="Hero" onclick="load('hero', 1)">
 <input type="button" value="Goblins" onclick="load('goblins', 1)">
-<input type="button" value="Gypsy" onclick="load('gypsy', 1)">
  &nbsp; &nbsp; Click to change the animation or skin.
 
 </body>
