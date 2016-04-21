@@ -94,8 +94,7 @@ public class Bone implements Updatable {
 		appliedScaleX = scaleX;
 		appliedScaleY = scaleY;
 
-		rotation *= MathUtils.degRad;
-		float cos = (float)Math.cos(rotation), sin = (float)Math.sin(rotation);
+		float cos = MathUtils.cosDeg(rotation), sin = MathUtils.sinDeg(rotation);
 		float la = cos * scaleX, lb = -sin * scaleY, lc = sin * scaleX, ld = cos * scaleY;
 		Bone parent = this.parent;
 		if (parent == null) { // Root bone.
@@ -139,9 +138,8 @@ public class Bone implements Updatable {
 				pc = 0;
 				pd = 1;
 				do {
-					rotation = parent.appliedRotation * MathUtils.degRad;
-					cos = (float)Math.cos(rotation);
-					sin = (float)Math.sin(rotation);
+					cos = MathUtils.cosDeg(parent.appliedRotation);
+					sin = MathUtils.sinDeg(parent.appliedRotation);
 					float temp = pa * cos + pb * sin;
 					pb = pa * -sin + pb * cos;
 					pa = temp;
@@ -162,9 +160,9 @@ public class Bone implements Updatable {
 				pc = 0;
 				pd = 1;
 				do {
-					rotation = parent.appliedRotation * MathUtils.degRad;
-					cos = (float)Math.cos(rotation);
-					sin = (float)Math.sin(rotation);
+					float r = parent.appliedRotation;
+					cos = MathUtils.cosDeg(r);
+					sin = MathUtils.sinDeg(r);
 					float psx = parent.appliedScaleX, psy = parent.appliedScaleY;
 					float za = cos * psx, zb = -sin * psy, zc = sin * psx, zd = cos * psy;
 					float temp = pa * za + pb * zc;
@@ -174,9 +172,9 @@ public class Bone implements Updatable {
 					pd = pc * zb + pd * zd;
 					pc = temp;
 
-					if (psx < 0) rotation = -rotation;
-					cos = (float)Math.cos(-rotation);
-					sin = (float)Math.sin(-rotation);
+					if (psx < 0) r = -r;
+					cos = MathUtils.cosDeg(-r);
+					sin = MathUtils.sinDeg(-r);
 					temp = pa * cos + pb * sin;
 					pb = pa * -sin + pb * cos;
 					pa = temp;
@@ -318,11 +316,11 @@ public class Bone implements Updatable {
 	}
 
 	public float getWorldRotationX () {
-		return (float)Math.atan2(c, a) * MathUtils.radDeg;
+		return MathUtils.atan2(c, a) * MathUtils.radDeg;
 	}
 
 	public float getWorldRotationY () {
-		return (float)Math.atan2(d, b) * MathUtils.radDeg;
+		return MathUtils.atan2(d, b) * MathUtils.radDeg;
 	}
 
 	public float getWorldScaleX () {
