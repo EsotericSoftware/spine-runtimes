@@ -124,7 +124,7 @@ public class IkConstraint implements Updatable {
 	static public void apply (Bone bone, float targetX, float targetY, float alpha) {
 		float parentRotation = bone.parent == null ? 0 : bone.parent.getWorldRotationX();
 		float rotation = bone.rotation;
-		float rotationIK = atan2(targetY - bone.worldY, targetX - bone.worldX) * radDeg - parentRotation;
+		float rotationIK = (float)Math.atan2(targetY - bone.worldY, targetX - bone.worldX) * radDeg - parentRotation;
 		if ((bone.worldSignX != bone.worldSignY) != (bone.skeleton.flipX != bone.skeleton.flipY)) rotationIK = 360 - rotationIK;
 		if (rotationIK > 180)
 			rotationIK -= 360;
@@ -190,10 +190,10 @@ public class IkConstraint implements Updatable {
 				cos = -1;
 			else if (cos > 1) cos = 1;
 			a2 = (float)Math.acos(cos) * bendDir;
-			float a = l1 + l2 * cos, o = l2 * sin(a2);
-			a1 = atan2(ty * a - tx * o, tx * a + ty * o);
+			float a = l1 + l2 * cos, o = l2 * (float)Math.sin(a2);
+			a1 = (float)Math.atan2(ty * a - tx * o, tx * a + ty * o);
 		} else {
-			float a = psx * l2, b = psy * l2, ta = atan2(ty, tx);
+			float a = psx * l2, b = psy * l2, ta = (float)Math.atan2(ty, tx);
 			float aa = a * a, bb = b * b, ll = l1 * l1, dd = tx * tx + ty * ty;
 			float c0 = bb * ll + aa * dd - aa * bb, c1 = -2 * bb * l1, c2 = bb - aa;
 			float d = c1 * c1 - 4 * c2 * c0;
@@ -205,8 +205,8 @@ public class IkConstraint implements Updatable {
 				float r = Math.abs(r0) < Math.abs(r1) ? r0 : r1;
 				if (r * r <= dd) {
 					float y = (float)Math.sqrt(dd - r * r) * bendDir;
-					a1 = ta - atan2(y, r);
-					a2 = atan2(y / psy, (r - l1) / psx);
+					a1 = ta - (float)Math.atan2(y, r);
+					a2 = (float)Math.atan2(y / psy, (r - l1) / psx);
 					break outer;
 				}
 			}
@@ -226,8 +226,8 @@ public class IkConstraint implements Updatable {
 				minX = x;
 			}
 			float angle = (float)Math.acos(-a * l1 / (aa - bb));
-			x = a * cos(angle) + l1;
-			float y = b * sin(angle);
+			x = a * (float)Math.cos(angle) + l1;
+			float y = b * (float)Math.sin(angle);
 			dist = x * x + y * y;
 			if (dist < minDist) {
 				minAngle = angle;
@@ -242,14 +242,14 @@ public class IkConstraint implements Updatable {
 				maxY = y;
 			}
 			if (dd <= (minDist + maxDist) / 2) {
-				a1 = ta - atan2(minY * bendDir, minX);
+				a1 = ta - (float)Math.atan2(minY * bendDir, minX);
 				a2 = minAngle * bendDir;
 			} else {
-				a1 = ta - atan2(maxY * bendDir, maxX);
+				a1 = ta - (float)Math.atan2(maxY * bendDir, maxX);
 				a2 = maxAngle * bendDir;
 			}
 		}
-		float os = atan2(cy, cx) * s2;
+		float os = (float)Math.atan2(cy, cx) * s2;
 		a1 = (a1 - os) * radDeg + os1;
 		a2 = (a2 + os) * radDeg * s2 + os2;
 		if (a1 > 180)
