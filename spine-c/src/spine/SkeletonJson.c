@@ -429,7 +429,7 @@ spSkeletonData* spSkeletonJson_readSkeletonDataFile (spSkeletonJson* self, const
 	int length;
 	spSkeletonData* skeletonData;
 	const char* json = _spUtil_readFile(path, &length);
-	if (!json) {
+	if (length == 0 || !json) {
 		_spSkeletonJson_setError(self, 0, "Unable to read skeleton file: ", path);
 		return 0;
 	}
@@ -692,6 +692,8 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 						}
 
 						spRegionAttachment_updateOffset(region);
+
+						spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 						break;
 					}
 					case SP_ATTACHMENT_MESH:
@@ -741,6 +743,8 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 								for (entry = entry->child, i = 0; entry; entry = entry->next, ++i)
 									mesh->edges[i] = entry->valueInt;
 							}
+
+							spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 						} else {
 							mesh->inheritFFD = Json_getInt(attachmentMap, "ffd", 1);
 							_spSkeletonJson_addLinkedMesh(self, attachment, Json_getString(attachmentMap, "skin", 0), slotIndex,
@@ -820,6 +824,8 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 								for (entry = entry->child, i = 0; entry; entry = entry->next, ++i)
 									mesh->edges[i] = entry->valueInt;
 							}
+
+							spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 						} else {
 							mesh->inheritFFD = Json_getInt(attachmentMap, "ffd", 1);
 							_spSkeletonJson_addLinkedMesh(self, attachment, Json_getString(attachmentMap, "skin", 0), slotIndex,
@@ -834,11 +840,10 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 						box->vertices = MALLOC(float, entry->size);
 						for (entry = entry->child, i = 0; entry; entry = entry->next, ++i)
 							box->vertices[i] = entry->valueFloat * self->scale;
+						spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 						break;
 					}
 					}
-
-					spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 
 					spSkin_addAttachment(skin, slotIndex, skinAttachmentName, attachment);
 				}
@@ -871,6 +876,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 			spWeightedMeshAttachment_setParentMesh(mesh, SUB_CAST(spWeightedMeshAttachment, parent));
 			spWeightedMeshAttachment_updateUVs(mesh);
 		}
+		spAttachmentLoader_configureAttachment(self->attachmentLoader, linkedMesh->mesh);
 	}
 
 	/* Events. */
