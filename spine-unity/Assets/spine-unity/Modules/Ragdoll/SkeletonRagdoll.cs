@@ -423,6 +423,8 @@ namespace Spine.Unity.Modules {
 
 			return a;
 		}
+
+		public class LayerFieldAttribute : PropertyAttribute {}
 	}
 
 }
