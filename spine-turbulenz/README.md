@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-turbulenz works with data exported from the latest version of Spine.
+spine-turbulenz works with data exported from Spine 3.1.08. Updating spine-turbulenz to [v3.2](https://trello.com/c/k7KtGdPW/76-update-runtimes-to-support-v3-2-shearing) is in progress.
 
 spine-turbulenz supports all Spine features except for rendering meshes.
 

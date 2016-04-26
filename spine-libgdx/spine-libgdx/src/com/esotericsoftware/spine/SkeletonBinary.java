@@ -50,7 +50,9 @@ import com.esotericsoftware.spine.Animation.FfdTimeline;
 import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
+import com.esotericsoftware.spine.Animation.ShearTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
+import com.esotericsoftware.spine.Animation.TransformConstraintTimeline;
 import com.esotericsoftware.spine.Animation.TranslateTimeline;
 import com.esotericsoftware.spine.SkeletonJson.LinkedMesh;
 import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
@@ -63,11 +65,12 @@ import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.WeightedMeshAttachment;
 
 public class SkeletonBinary {
-	static public final int TIMELINE_SCALE = 0;
-	static public final int TIMELINE_ROTATE = 1;
-	static public final int TIMELINE_TRANSLATE = 2;
-	static public final int TIMELINE_ATTACHMENT = 3;
-	static public final int TIMELINE_COLOR = 4;
+	static public final int TIMELINE_ROTATE = 0;
+	static public final int TIMELINE_TRANSLATE = 1;
+	static public final int TIMELINE_SCALE = 2;
+	static public final int TIMELINE_SHEAR = 3;
+	static public final int TIMELINE_ATTACHMENT = 4;
+	static public final int TIMELINE_COLOR = 5;
 
 	static public final int CURVE_LINEAR = 0;
 	static public final int CURVE_STEPPED = 1;
@@ -159,14 +162,16 @@ public class SkeletonBinary {
 				String name = input.readString();
 				BoneData parent = i == 0 ? null : skeletonData.bones.get(input.readInt(true));
 				BoneData boneData = new BoneData(name, parent);
+				boneData.rotation = input.readFloat();
 				boneData.x = input.readFloat() * scale;
 				boneData.y = input.readFloat() * scale;
 				boneData.scaleX = input.readFloat();
 				boneData.scaleY = input.readFloat();
-				boneData.rotation = input.readFloat();
+				boneData.shearX = input.readFloat();
+				boneData.shearY = input.readFloat();
 				boneData.length = input.readFloat() * scale;
-				boneData.inheritScale = input.readBoolean();
 				boneData.inheritRotation = input.readBoolean();
+				boneData.inheritScale = input.readBoolean();
 				if (nonessential) Color.rgba8888ToColor(boneData.color, input.readInt());
 				skeletonData.bones.add(boneData);
 			}
@@ -187,9 +192,16 @@ public class SkeletonBinary {
 				TransformConstraintData transformConstraintData = new TransformConstraintData(input.readString());
 				transformConstraintData.bone = skeletonData.bones.get(input.readInt(true));
 				transformConstraintData.target = skeletonData.bones.get(input.readInt(true));
+				transformConstraintData.offsetRotation = input.readFloat();
+				transformConstraintData.offsetX = input.readFloat();
+				transformConstraintData.offsetY = input.readFloat();
+				transformConstraintData.offsetScaleX = input.readFloat();
+				transformConstraintData.offsetScaleY = input.readFloat();
+				transformConstraintData.offsetShearY = input.readFloat();
+				transformConstraintData.rotateMix = input.readFloat();
 				transformConstraintData.translateMix = input.readFloat();
-				transformConstraintData.x = input.readFloat();
-				transformConstraintData.y = input.readFloat();
+				transformConstraintData.scaleMix = input.readFloat();
+				transformConstraintData.shearMix = input.readFloat();
 				skeletonData.transformConstraints.add(transformConstraintData);
 			}
 
@@ -291,11 +303,11 @@ public class SkeletonBinary {
 		switch (type) {
 		case region: {
 			String path = input.readString();
+			float rotation = input.readFloat();
 			float x = input.readFloat();
 			float y = input.readFloat();
 			float scaleX = input.readFloat();
 			float scaleY = input.readFloat();
-			float rotation = input.readFloat();
 			float width = input.readFloat();
 			float height = input.readFloat();
 			int color = input.readInt();
@@ -532,11 +544,14 @@ public class SkeletonBinary {
 						break;
 					}
 					case TIMELINE_TRANSLATE:
-					case TIMELINE_SCALE: {
+					case TIMELINE_SCALE:
+					case TIMELINE_SHEAR: {
 						TranslateTimeline timeline;
 						float timelineScale = 1;
 						if (timelineType == TIMELINE_SCALE)
 							timeline = new ScaleTimeline(frameCount);
+						else if (timelineType == TIMELINE_SHEAR)
+							timeline = new ShearTimeline(frameCount);
 						else {
 							timeline = new TranslateTimeline(frameCount);
 							timelineScale = scale;
@@ -555,18 +570,33 @@ public class SkeletonBinary {
 				}
 			}
 
-			// IK timelines.
+			// IK constraint timelines.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
-				IkConstraintData ikConstraint = skeletonData.ikConstraints.get(input.readInt(true));
+				IkConstraintData constraint = skeletonData.ikConstraints.get(input.readInt(true));
 				int frameCount = input.readInt(true);
 				IkConstraintTimeline timeline = new IkConstraintTimeline(frameCount);
-				timeline.ikConstraintIndex = skeletonData.getIkConstraints().indexOf(ikConstraint, true);
+				timeline.ikConstraintIndex = skeletonData.getIkConstraints().indexOf(constraint, true);
 				for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
 					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readByte());
 					if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
 				}
 				timelines.add(timeline);
 				duration = Math.max(duration, timeline.getFrames()[frameCount * 3 - 3]);
+			}
+
+			// Transform constraint timelines.
+			for (int i = 0, n = input.readInt(true); i < n; i++) {
+				TransformConstraintData constraint = skeletonData.transformConstraints.get(input.readInt(true));
+				int frameCount = input.readInt(true);
+				TransformConstraintTimeline timeline = new TransformConstraintTimeline(frameCount);
+				timeline.transformConstraintIndex = skeletonData.getTransformConstraints().indexOf(constraint, true);
+				for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
+					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readFloat(), input.readFloat(),
+						input.readFloat());
+					if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
+				}
+				timelines.add(timeline);
+				duration = Math.max(duration, timeline.getFrames()[frameCount * 5 - 5]);
 			}
 
 			// FFD timelines.

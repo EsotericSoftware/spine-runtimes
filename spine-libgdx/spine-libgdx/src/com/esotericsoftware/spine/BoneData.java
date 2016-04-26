@@ -37,9 +37,7 @@ public class BoneData {
 	final BoneData parent;
 	final String name;
 	float length;
-	float x, y;
-	float rotation;
-	float scaleX = 1, scaleY = 1;
+	float x, y, rotation, scaleX = 1, scaleY = 1, shearX, shearY;
 	boolean inheritScale = true, inheritRotation = true;
 
 	// Nonessential.
@@ -64,6 +62,8 @@ public class BoneData {
 		rotation = bone.rotation;
 		scaleX = bone.scaleX;
 		scaleY = bone.scaleY;
+		shearX = bone.shearX;
+		shearY = bone.shearY;
 	}
 
 	/** @return May be null. */
@@ -131,6 +131,22 @@ public class BoneData {
 	public void setScale (float scaleX, float scaleY) {
 		this.scaleX = scaleX;
 		this.scaleY = scaleY;
+	}
+
+	public float getShearX () {
+		return shearX;
+	}
+
+	public void setShearX (float shearX) {
+		this.shearX = shearX;
+	}
+
+	public float getShearY () {
+		return shearY;
+	}
+
+	public void setShearY (float shearY) {
+		this.shearY = shearY;
 	}
 
 	public boolean getInheritScale () {
