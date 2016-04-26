@@ -399,7 +399,7 @@ spine.IkConstraint.apply2 = function (parent, child, targetX, targetY, bendDir, 
 		if (cos < -1) cos = -1;
 		else if (cos > 1) cos = 1;
 		a2 = Math.acos(cos) * bendDir;
-		var a = l1 + l2 * cos, o = l2 * sin(a2);
+		var a = l1 + l2 * cos, o = l2 * Math.sin(a2);
 		a1 = Math.atan2(ty * a - tx * o, tx * a + ty * o);
 	} else {
 		var a = psx * l2, b = psy * l2, ta = Math.atan2(ty, tx);
@@ -459,8 +459,8 @@ spine.IkConstraint.apply2 = function (parent, child, targetX, targetY, bendDir, 
 		}
 	}
 	var os = Math.atan2(cy, cx) * s2;
-	a1 = (a1 - os) * radDeg + os1;
-	a2 = (a2 + os) * radDeg * s2 + os2;
+	a1 = (a1 - os) * spine.radDeg + os1;
+	a2 = (a2 + os) * spine.radDeg * s2 + os2;
 	if (a1 > 180) a1 -= 360;
 	else if (a1 < -180) a1 += 360;
 	if (a2 > 180) a2 -= 360;
