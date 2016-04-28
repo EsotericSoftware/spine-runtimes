@@ -154,8 +154,8 @@ namespace Spine {
 				transformConstraintData.bone = skeletonData.bones.Items[ReadVarint(input, true)];
 				transformConstraintData.target = skeletonData.bones.Items[ReadVarint(input, true)];
 				transformConstraintData.offsetRotation = ReadFloat(input);
-				transformConstraintData.offsetX = ReadFloat(input);
-				transformConstraintData.offsetY = ReadFloat(input);
+				transformConstraintData.offsetX = ReadFloat(input) * scale;
+				transformConstraintData.offsetY = ReadFloat(input) * scale;
 				transformConstraintData.offsetScaleX = ReadFloat(input);
 				transformConstraintData.offsetScaleY = ReadFloat(input);
 				transformConstraintData.offsetShearY = ReadFloat(input);

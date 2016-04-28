@@ -372,7 +372,7 @@ namespace Spine {
 			percent = GetCurvePercent(frame / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
 			bone.shearX += (bone.data.shearX + (prevFrameX + (frames[frame + X] - prevFrameX) * percent) - bone.shearX) * alpha;
-			bone.shearY += (bone.data.shearY + (prevFrameY + (frames[frame + X] - prevFrameY) * percent) - bone.shearY) * alpha;
+			bone.shearY += (bone.data.shearY + (prevFrameY + (frames[frame + Y] - prevFrameY) * percent) - bone.shearY) * alpha;
 		}
 	}
 
@@ -672,8 +672,8 @@ namespace Spine {
 			: base(frameCount) {
 			frames = new float[frameCount * 3];
 		}
-
-		/** Sets the time, mix and bend direction of the specified keyframe. */
+			
+		/// <summary>Sets the time, mix and bend direction of the specified keyframe.</summary>
 		public void SetFrame (int frameIndex, float time, float mix, int bendDirection) {
 			frameIndex *= 3;
 			frames[frameIndex] = time;
@@ -762,8 +762,7 @@ namespace Spine {
 			float scale = frames[frame + PREV_SCALE_MIX];
 			float shear = frames[frame + PREV_SHEAR_MIX];
 			constraint.rotateMix += (rotate + (frames[frame + ROTATE_MIX] - rotate) * percent - constraint.rotateMix) * alpha;
-			constraint.translateMix += (translate + (frames[frame + TRANSLATE_MIX] - translate) * percent - constraint.translateMix)
-				* alpha;
+			constraint.translateMix += (translate + (frames[frame + TRANSLATE_MIX] - translate) * percent - constraint.translateMix) * alpha;
 			constraint.scaleMix += (scale + (frames[frame + SCALE_MIX] - scale) * percent - constraint.scaleMix) * alpha;
 			constraint.shearMix += (shear + (frames[frame + SHEAR_MIX] - shear) * percent - constraint.shearMix) * alpha;
 		}

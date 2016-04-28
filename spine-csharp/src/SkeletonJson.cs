@@ -166,9 +166,9 @@ namespace Spine {
 					transformConstraintData.offsetRotation = GetFloat(transformMap, "rotation", 0);
 					transformConstraintData.offsetX = GetFloat(transformMap, "x", 0) * scale;
 					transformConstraintData.offsetY = GetFloat(transformMap, "y", 0) * scale;
-					transformConstraintData.offsetScaleX = GetFloat(transformMap, "scaleX", 0) * scale;
-					transformConstraintData.offsetScaleY = GetFloat(transformMap, "scaleY", 0) * scale;
-					transformConstraintData.offsetShearY = GetFloat(transformMap, "shearY", 0) * scale;
+					transformConstraintData.offsetScaleX = GetFloat(transformMap, "scaleX", 0);
+					transformConstraintData.offsetScaleY = GetFloat(transformMap, "scaleY", 0);
+					transformConstraintData.offsetShearY = GetFloat(transformMap, "shearY", 0);
 
 					transformConstraintData.rotateMix = GetFloat(transformMap, "rotateMix", 1);
 					transformConstraintData.translateMix = GetFloat(transformMap, "translateMix", 1);
@@ -542,8 +542,8 @@ namespace Spine {
 							int frameIndex = 0;
 							foreach (Dictionary<String, Object> valueMap in values) {
 								float time = (float)valueMap["time"];
-								float x = valueMap.ContainsKey("x") ? (float)valueMap["x"] : 0;
-								float y = valueMap.ContainsKey("y") ? (float)valueMap["y"] : 0;
+								float x = GetFloat(valueMap, "x", 0);
+								float y = GetFloat (valueMap, "y", 0);
 								timeline.SetFrame(frameIndex, time, (float)x * timelineScale, (float)y * timelineScale);
 								ReadCurve(timeline, frameIndex, valueMap);
 								frameIndex++;
@@ -567,8 +567,8 @@ namespace Spine {
 					int frameIndex = 0;
 					foreach (Dictionary<String, Object> valueMap in values) {
 						float time = (float)valueMap["time"];
-						float mix = valueMap.ContainsKey("mix") ? (float)valueMap["mix"] : 1;
-						bool bendPositive = valueMap.ContainsKey("bendPositive") ? (bool)valueMap["bendPositive"] : true;
+						float mix = GetFloat(valueMap, "mix", 1);
+						bool bendPositive = GetBoolean(valueMap, "bendPositive", true);
 						timeline.SetFrame(frameIndex, time, mix, bendPositive ? 1 : -1);
 						ReadCurve(timeline, frameIndex, valueMap);
 						frameIndex++;
@@ -588,10 +588,10 @@ namespace Spine {
 					int frameIndex = 0;
 					foreach (Dictionary<String, Object> valueMap in values) {
 						float time = (float)valueMap["time"];
-						float rotateMix = valueMap.ContainsKey("rotateMix") ? (float)valueMap["rotateMix"] : 1;
-						float translateMix = valueMap.ContainsKey("translateMix") ? (float)valueMap["translateMix"] : 1;
-						float scaleMix = valueMap.ContainsKey("scaleMix") ? (float)valueMap["scaleMix"] : 1;
-						float shearMix = valueMap.ContainsKey("shearMix") ? (float)valueMap["shearMix"] : 1;
+						float rotateMix = GetFloat(valueMap, "rotateMix", 1);
+						float translateMix = GetFloat(valueMap, "translateMix", 1);
+						float scaleMix = GetFloat(valueMap, "scaleMix", 1);
+						float shearMix = GetFloat(valueMap, "shearMix", 1);
 						timeline.SetFrame(frameIndex, time, rotateMix, translateMix, scaleMix, shearMix);
 						ReadCurve(timeline, frameIndex, valueMap);
 						frameIndex++;

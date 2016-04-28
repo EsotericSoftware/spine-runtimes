@@ -59,6 +59,14 @@ namespace Spine {
 			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
 			this.data = data;
 			translateMix = data.translateMix;
+			rotateMix = data.rotateMix;
+			scaleMix = data.scaleMix;
+			shearMix = data.shearMix;
+			offsetX = data.offsetX;
+			offsetY = data.offsetY;
+			offsetScaleX = data.offsetScaleX;
+			offsetScaleY = data.offsetScaleY;
+			offsetShearY = data.offsetShearY;
 
 			bone = skeleton.FindBone(data.bone.name);
 			target = skeleton.FindBone(data.target.name);
@@ -108,20 +116,18 @@ namespace Spine {
 				else if (r < -MathUtils.PI) r += MathUtils.PI2;
 				r = by + r * shearMix;
 				float s = (float)Math.Sqrt(b * b + d * d);
-				bone.b = MathUtils.CosDeg(r + offsetShearY) * s;
-				bone.d = MathUtils.SinDeg(r + offsetShearY) * s;
+				bone.b = MathUtils.Cos(r + offsetShearY * MathUtils.degRad) * s;
+				bone.d = MathUtils.Sin(r + offsetShearY * MathUtils.degRad) * s;
 			}
 
 			float translateMix = this.translateMix;
 			if (translateMix > 0) {
 				float tx, ty;
-				target.LocalToWorld(target.x, target.y, out tx, out ty);
+				target.LocalToWorld(offsetX, offsetY, out tx, out ty);
 				bone.worldX += (tx - bone.worldX) * translateMix;
 				bone.worldY += (ty - bone.worldY) * translateMix;
 			}
 		}
-
-
 
 		override public String ToString () {
 			return data.name;

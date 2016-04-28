@@ -150,8 +150,7 @@ namespace Spine {
 					pc = 0;
 					pd = 1;
 					do {
-						float cos = MathUtils.CosDeg(parent.appliedRotation);
-						float sin = MathUtils.SinDeg(parent.appliedRotation);
+						float cos = MathUtils.CosDeg(parent.appliedRotation), sin = MathUtils.SinDeg(parent.appliedRotation);
 						float temp = pa * cos + pb * sin;
 						pb = pa * -sin + pb * cos;
 						pa = temp;
@@ -172,7 +171,7 @@ namespace Spine {
 					pc = 0;
 					pd = 1;
 					do {
-						float r = parent.rotation, cos = MathUtils.CosDeg(r), sin = MathUtils.SinDeg(r);
+						float r = parent.appliedRotation, cos = MathUtils.CosDeg(r), sin = MathUtils.SinDeg(r);
 						float psx = parent.appliedScaleX, psy = parent.appliedScaleY;
 						float za = cos * psx, zb = -sin * psy, zc = sin * psx, zd = cos * psy;
 						float temp = pa * za + pb * zc;

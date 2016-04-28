@@ -166,6 +166,9 @@ namespace Spine {
 				TransformConstraint constraint = transformConstraints.Items[i];
 				TransformConstraintData data = constraint.data;
 				constraint.rotateMix = data.rotateMix;
+				constraint.translateMix = data.translateMix;
+				constraint.scaleMix = data.scaleMix;
+				constraint.shearMix = data.shearMix;
 			}
 		}
 
