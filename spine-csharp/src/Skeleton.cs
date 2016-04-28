@@ -127,8 +127,7 @@ namespace Spine {
 			for (int i = 0; i < transformConstraintsCount; i++) {
 				TransformConstraint transformConstraint = transformConstraints.Items[i];
 				for (int ii = updateCache.Count - 1; i >= 0; ii--) {
-					IUpdatable updateable = updateCache.Items[ii];
-					if (updateable == transformConstraint.bone || updateable == transformConstraint.target) {
+					if (updateCache.Items[ii] == transformConstraint.bone) {
 						updateCache.Insert(ii + 1, transformConstraint);
 						break;
 					}
@@ -165,9 +164,8 @@ namespace Spine {
 			ExposedList<TransformConstraint> transformConstraints = this.transformConstraints;
 			for (int i = 0, n = transformConstraints.Count; i < n; i++) {
 				TransformConstraint constraint = transformConstraints.Items[i];
-				constraint.translateMix = constraint.data.translateMix;
-				constraint.x = constraint.data.x;
-				constraint.y = constraint.data.y;
+				TransformConstraintData data = constraint.data;
+				constraint.rotateMix = data.rotateMix;
 			}
 		}
 

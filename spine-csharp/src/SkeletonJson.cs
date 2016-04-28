@@ -59,9 +59,7 @@ namespace Spine {
 			Scale = 1;
 		}
 
-		#if !(IS_UNITY)
-		#if WINDOWS_STOREAPP
-
+		#if !(IS_UNITY) && WINDOWS_STOREAPP
 		private async Task<SkeletonData> ReadFile(string path) {
 			var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
 			var file = await folder.GetFileAsync(path).AsTask().ConfigureAwait(false);
@@ -88,9 +86,7 @@ namespace Spine {
 				return skeletonData;
 			}
 		}
-
 		#endif // WINDOWS_STOREAPP
-		#endif // !UNITY
 
 		public SkeletonData ReadSkeletonData (TextReader reader) {
 			if (reader == null) throw new ArgumentNullException("reader cannot be null.");
@@ -125,6 +121,8 @@ namespace Spine {
 				boneData.rotation = GetFloat(boneMap, "rotation", 0);
 				boneData.scaleX = GetFloat(boneMap, "scaleX", 1);
 				boneData.scaleY = GetFloat(boneMap, "scaleY", 1);
+				boneData.shearX = GetFloat(boneMap, "shearX", 1);
+				boneData.shearY = GetFloat(boneMap, "shearY", 1);
 				boneData.inheritScale = GetBoolean(boneMap, "inheritScale", true);
 				boneData.inheritRotation = GetBoolean(boneMap, "inheritRotation", true);
 				skeletonData.bones.Add(boneData);
@@ -165,9 +163,17 @@ namespace Spine {
 					transformConstraintData.target = skeletonData.FindBone(targetName);
 					if (transformConstraintData.target == null) throw new Exception("Target bone not found: " + targetName);
 
+					transformConstraintData.offsetRotation = GetFloat(transformMap, "rotation", 0);
+					transformConstraintData.offsetX = GetFloat(transformMap, "x", 0) * scale;
+					transformConstraintData.offsetY = GetFloat(transformMap, "y", 0) * scale;
+					transformConstraintData.offsetScaleX = GetFloat(transformMap, "scaleX", 0) * scale;
+					transformConstraintData.offsetScaleY = GetFloat(transformMap, "scaleY", 0) * scale;
+					transformConstraintData.offsetShearY = GetFloat(transformMap, "shearY", 0) * scale;
+
+					transformConstraintData.rotateMix = GetFloat(transformMap, "rotateMix", 1);
 					transformConstraintData.translateMix = GetFloat(transformMap, "translateMix", 1);
-					transformConstraintData.x = GetFloat(transformMap, "x", 0) * scale;
-					transformConstraintData.y = GetFloat(transformMap, "y", 0) * scale;
+					transformConstraintData.scaleMix = GetFloat(transformMap, "scaleMix", 1);
+					transformConstraintData.shearMix = GetFloat(transformMap, "shearMix", 1);
 
 					skeletonData.transformConstraints.Add(transformConstraintData);
 				}
@@ -520,11 +526,13 @@ namespace Spine {
 							timelines.Add(timeline);
 							duration = Math.Max(duration, timeline.frames[timeline.FrameCount * 2 - 2]);
 
-						} else if (timelineName == "translate" || timelineName == "scale") {
+						} else if (timelineName == "translate" || timelineName == "scale" || timelineName == "shear") {
 							TranslateTimeline timeline;
 							float timelineScale = 1;
 							if (timelineName == "scale")
 								timeline = new ScaleTimeline(values.Count);
+							else if (timelineName == "shear")
+								timeline = new ShearTimeline(values.Count);
 							else {
 								timeline = new TranslateTimeline(values.Count);
 								timelineScale = scale;
@@ -549,12 +557,13 @@ namespace Spine {
 				}
 			}
 
+			// IK timelines.
 			if (map.ContainsKey("ik")) {
-				foreach (KeyValuePair<String, Object> ikMap in (Dictionary<String, Object>)map["ik"]) {
-					IkConstraintData ikConstraint = skeletonData.FindIkConstraint(ikMap.Key);
-					var values = (List<Object>)ikMap.Value;
+				foreach (KeyValuePair<String, Object> constraintMap in (Dictionary<String, Object>)map["ik"]) {
+					IkConstraintData constraint = skeletonData.FindIkConstraint(constraintMap.Key);
+					var values = (List<Object>)constraintMap.Value;
 					var timeline = new IkConstraintTimeline(values.Count);
-					timeline.ikConstraintIndex = skeletonData.ikConstraints.IndexOf(ikConstraint);
+					timeline.ikConstraintIndex = skeletonData.ikConstraints.IndexOf(constraint);
 					int frameIndex = 0;
 					foreach (Dictionary<String, Object> valueMap in values) {
 						float time = (float)valueMap["time"];
@@ -569,6 +578,30 @@ namespace Spine {
 				}
 			}
 
+			// Transform constraint timelines.
+			if (map.ContainsKey("transform")) {
+				foreach (KeyValuePair<String, Object> constraintMap in (Dictionary<String, Object>)map["transform"]) {
+					TransformConstraintData constraint = skeletonData.FindTransformConstraint(constraintMap.Key);
+					var values = (List<Object>)constraintMap.Value;
+					var timeline = new TransformConstraintTimeline(values.Count);
+					timeline.transformConstraintIndex = skeletonData.transformConstraints.IndexOf(constraint);
+					int frameIndex = 0;
+					foreach (Dictionary<String, Object> valueMap in values) {
+						float time = (float)valueMap["time"];
+						float rotateMix = valueMap.ContainsKey("rotateMix") ? (float)valueMap["rotateMix"] : 1;
+						float translateMix = valueMap.ContainsKey("translateMix") ? (float)valueMap["translateMix"] : 1;
+						float scaleMix = valueMap.ContainsKey("scaleMix") ? (float)valueMap["scaleMix"] : 1;
+						float shearMix = valueMap.ContainsKey("shearMix") ? (float)valueMap["shearMix"] : 1;
+						timeline.SetFrame(frameIndex, time, rotateMix, translateMix, scaleMix, shearMix);
+						ReadCurve(timeline, frameIndex, valueMap);
+						frameIndex++;
+					}
+					timelines.Add(timeline);
+					duration = Math.Max(duration, timeline.frames[timeline.FrameCount * 5 - 5]);
+				}
+			}
+
+			// FFD timelines.
 			if (map.ContainsKey("ffd")) {
 				foreach (KeyValuePair<String, Object> ffdMap in (Dictionary<String, Object>)map["ffd"]) {
 					Skin skin = skeletonData.FindSkin(ffdMap.Key);

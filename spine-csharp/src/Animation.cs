@@ -209,14 +209,14 @@ namespace Spine {
 	}
 
 	public class RotateTimeline : CurveTimeline {
-		protected const int PREV_FRAME_TIME = -2;
-		protected const int FRAME_VALUE = 1;
+		internal const int PREV_TIME = -2;
+		internal const int VALUE = 1;
 
 		internal int boneIndex;
 		internal float[] frames;
 
 		public int BoneIndex { get { return boneIndex; } set { boneIndex = value; } }
-		public float[] Frames { get { return frames; } set { frames = value; } } // time, value, ...
+		public float[] Frames { get { return frames; } set { frames = value; } } // time, angle, ...
 
 		public RotateTimeline (int frameCount)
 			: base(frameCount) {
@@ -249,13 +249,13 @@ namespace Spine {
 			}
 
 			// Interpolate between the previous frame and the current frame.
-			int frameIndex = Animation.binarySearch(frames, time, 2);
-			float prevFrameValue = frames[frameIndex - 1];
-			float frameTime = frames[frameIndex];
-			float percent = 1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime);
-			percent = GetCurvePercent((frameIndex >> 1) - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
+			int frame = Animation.binarySearch(frames, time, 2);
+			float prevFrameValue = frames[frame - 1];
+			float frameTime = frames[frame];
+			float percent = 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime);
+			percent = GetCurvePercent((frame >> 1) - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-			amount = frames[frameIndex + FRAME_VALUE] - prevFrameValue;
+			amount = frames[frame + VALUE] - prevFrameValue;
 			while (amount > 180)
 				amount -= 360;
 			while (amount < -180)
@@ -270,9 +270,9 @@ namespace Spine {
 	}
 
 	public class TranslateTimeline : CurveTimeline {
-		protected const int PREV_FRAME_TIME = -3;
-		protected const int FRAME_X = 1;
-		protected const int FRAME_Y = 2;
+		protected const int PREV_TIME = -3;
+		protected const int X = 1;
+		protected const int Y = 2;
 
 		internal int boneIndex;
 		internal float[] frames;
@@ -306,15 +306,15 @@ namespace Spine {
 			}
 
 			// Interpolate between the previous frame and the current frame.
-			int frameIndex = Animation.binarySearch(frames, time, 3);
-			float prevFrameX = frames[frameIndex - 2];
-			float prevFrameY = frames[frameIndex - 1];
-			float frameTime = frames[frameIndex];
-			float percent = 1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime);
-			percent = GetCurvePercent(frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
+			int frame = Animation.binarySearch(frames, time, 3);
+			float prevFrameX = frames[frame - 2];
+			float prevFrameY = frames[frame - 1];
+			float frameTime = frames[frame];
+			float percent = 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime);
+			percent = GetCurvePercent(frame / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-			bone.x += (bone.data.x + prevFrameX + (frames[frameIndex + FRAME_X] - prevFrameX) * percent - bone.x) * alpha;
-			bone.y += (bone.data.y + prevFrameY + (frames[frameIndex + FRAME_Y] - prevFrameY) * percent - bone.y) * alpha;
+			bone.x += (bone.data.x + prevFrameX + (frames[frame + X] - prevFrameX) * percent - bone.x) * alpha;
+			bone.y += (bone.data.y + prevFrameY + (frames[frame + Y] - prevFrameY) * percent - bone.y) * alpha;
 		}
 	}
 
@@ -335,24 +335,53 @@ namespace Spine {
 			}
 
 			// Interpolate between the previous frame and the current frame.
-			int frameIndex = Animation.binarySearch(frames, time, 3);
-			float prevFrameX = frames[frameIndex - 2];
-			float prevFrameY = frames[frameIndex - 1];
-			float frameTime = frames[frameIndex];
-			float percent = 1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime);
-			percent = GetCurvePercent(frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
+			int frame = Animation.binarySearch(frames, time, 3);
+			float prevFrameX = frames[frame - 2];
+			float prevFrameY = frames[frame - 1];
+			float frameTime = frames[frame];
+			float percent = 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime);
+			percent = GetCurvePercent(frame / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-			bone.scaleX += (bone.data.scaleX * (prevFrameX + (frames[frameIndex + FRAME_X] - prevFrameX) * percent) - bone.scaleX) * alpha;
-			bone.scaleY += (bone.data.scaleY * (prevFrameY + (frames[frameIndex + FRAME_Y] - prevFrameY) * percent) - bone.scaleY) * alpha;
+			bone.scaleX += (bone.data.scaleX * (prevFrameX + (frames[frame + X] - prevFrameX) * percent) - bone.scaleX) * alpha;
+			bone.scaleY += (bone.data.scaleY * (prevFrameY + (frames[frame + Y] - prevFrameY) * percent) - bone.scaleY) * alpha;
+		}
+	}
+
+	public class ShearTimeline : TranslateTimeline {
+		public ShearTimeline (int frameCount)
+			: base (frameCount) {
+		}
+
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha) {
+			float[] frames = this.frames;
+			if (time < frames[0]) return; // Time is before first frame.
+
+			Bone bone = skeleton.bones.Items[boneIndex];
+			if (time >= frames[frames.Length - 3]) { // Time is after last frame.
+				bone.shearX += (bone.data.shearX + frames[frames.Length - 2] - bone.shearX) * alpha;
+				bone.shearY += (bone.data.shearY + frames[frames.Length - 1] - bone.shearY) * alpha;
+				return;
+			}
+
+			// Interpolate between the previous frame and the current frame.
+			int frame = Animation.binarySearch(frames, time, 3);
+			float prevFrameX = frames[frame - 2];
+			float prevFrameY = frames[frame - 1];
+			float frameTime = frames[frame];
+			float percent = 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime);
+			percent = GetCurvePercent(frame / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
+
+			bone.shearX += (bone.data.shearX + (prevFrameX + (frames[frame + X] - prevFrameX) * percent) - bone.shearX) * alpha;
+			bone.shearY += (bone.data.shearY + (prevFrameY + (frames[frame + X] - prevFrameY) * percent) - bone.shearY) * alpha;
 		}
 	}
 
 	public class ColorTimeline : CurveTimeline {
-		protected const int PREV_FRAME_TIME = -5;
-		protected const int FRAME_R = 1;
-		protected const int FRAME_G = 2;
-		protected const int FRAME_B = 3;
-		protected const int FRAME_A = 4;
+		protected const int PREV_TIME = -5;
+		protected const int R = 1;
+		protected const int G = 2;
+		protected const int B = 3;
+		protected const int A = 4;
 
 		internal int slotIndex;
 		internal float[] frames;
@@ -380,8 +409,7 @@ namespace Spine {
 			if (time < frames[0]) return; // Time is before first frame.
 
 			float r, g, b, a;
-			if (time >= frames[frames.Length - 5]) {
-				// Time is after last frame.
+			if (time >= frames[frames.Length - 5]) { // Time is after last frame.
 				int i = frames.Length - 1;
 				r = frames[i - 3];
 				g = frames[i - 2];
@@ -389,19 +417,19 @@ namespace Spine {
 				a = frames[i];
 			} else {
 				// Interpolate between the previous frame and the current frame.
-				int frameIndex = Animation.binarySearch(frames, time, 5);
-				float prevFrameR = frames[frameIndex - 4];
-				float prevFrameG = frames[frameIndex - 3];
-				float prevFrameB = frames[frameIndex - 2];
-				float prevFrameA = frames[frameIndex - 1];
-				float frameTime = frames[frameIndex];
-				float percent = 1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime);
-				percent = GetCurvePercent(frameIndex / 5 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
+				int frame = Animation.binarySearch(frames, time, 5);
+				float frameTime = frames[frame];
+				float percent = 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime);
+				percent = GetCurvePercent(frame / 5 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-				r = prevFrameR + (frames[frameIndex + FRAME_R] - prevFrameR) * percent;
-				g = prevFrameG + (frames[frameIndex + FRAME_G] - prevFrameG) * percent;
-				b = prevFrameB + (frames[frameIndex + FRAME_B] - prevFrameB) * percent;
-				a = prevFrameA + (frames[frameIndex + FRAME_A] - prevFrameA) * percent;
+				r = frames[frame - 4];
+				g = frames[frame - 3];
+				b = frames[frame - 2];
+				a = frames[frame - 1];
+				r += (frames[frame + R] - r) * percent;
+				g += (frames[frame + G] - g) * percent;
+				b += (frames[frame + B] - b) * percent;
+				a += (frames[frame + A] - a) * percent;
 			}
 			Slot slot = skeleton.slots.Items[slotIndex];
 			if (alpha < 1) {
@@ -488,19 +516,19 @@ namespace Spine {
 				return;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			int frameIndex;
+			int frame;
 			if (lastTime < frames[0])
-				frameIndex = 0;
+				frame = 0;
 			else {
-				frameIndex = Animation.binarySearch(frames, lastTime);
-				float frame = frames[frameIndex];
-				while (frameIndex > 0) { // Fire multiple events with the same frame.
-					if (frames[frameIndex - 1] != frame) break;
-					frameIndex--;
+				frame = Animation.binarySearch(frames, lastTime);
+				float frameTime = frames[frame];
+				while (frame > 0) { // Fire multiple events with the same frame.
+					if (frames[frame - 1] != frameTime) break;
+					frame--;
 				}
 			}
-			for (; frameIndex < frameCount && time >= frames[frameIndex]; frameIndex++)
-				firedEvents.Add(events[frameIndex]);
+			for (; frame < frameCount && time >= frames[frame]; frame++)
+				firedEvents.Add(events[frame]);
 		}
 	}
 
@@ -528,15 +556,15 @@ namespace Spine {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			int frameIndex;
+			int frame;
 			if (time >= frames[frames.Length - 1]) // Time is after last frame.
-				frameIndex = frames.Length - 1;
+				frame = frames.Length - 1;
 			else
-				frameIndex = Animation.binarySearch(frames, time) - 1;
+				frame = Animation.binarySearch(frames, time) - 1;
 
 			ExposedList<Slot> drawOrder = skeleton.drawOrder;
 			ExposedList<Slot> slots = skeleton.slots;
-			int[] drawOrderToSetupIndex = drawOrders[frameIndex];
+			int[] drawOrderToSetupIndex = drawOrders[frame];
 			if (drawOrderToSetupIndex == null) {
 				drawOrder.Clear();
 				for (int i = 0, n = slots.Count; i < n; i++)
@@ -605,13 +633,13 @@ namespace Spine {
 			}
 
 			// Interpolate between the previous frame and the current frame.
-			int frameIndex = Animation.binarySearch(frames, time);
-			float frameTime = frames[frameIndex];
-			float percent = 1 - (time - frameTime) / (frames[frameIndex - 1] - frameTime);
-			percent = GetCurvePercent(frameIndex - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
+			int frame = Animation.binarySearch(frames, time);
+			float frameTime = frames[frame];
+			float percent = 1 - (time - frameTime) / (frames[frame - 1] - frameTime);
+			percent = GetCurvePercent(frame - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-			float[] prevVertices = frameVertices[frameIndex - 1];
-			float[] nextVertices = frameVertices[frameIndex];
+			float[] prevVertices = frameVertices[frame - 1];
+			float[] nextVertices = frameVertices[frame];
 
 			if (alpha < 1) {
 				for (int i = 0; i < vertexCount; i++) {
@@ -629,10 +657,10 @@ namespace Spine {
 	}
 
 	public class IkConstraintTimeline : CurveTimeline {
-		private const int PREV_FRAME_TIME = -3;
-		private const int PREV_FRAME_MIX = -2;
-		private const int PREV_FRAME_BEND_DIRECTION = -1;
-		private const int FRAME_MIX = 1;
+		private const int PREV_TIME = -3;
+		private const int PREV_MIX = -2;
+		private const int PREV_BEND_DIRECTION = -1;
+		private const int MIX = 1;
 
 		internal int ikConstraintIndex;
 		internal float[] frames;
@@ -657,24 +685,87 @@ namespace Spine {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			IkConstraint ikConstraint = skeleton.ikConstraints.Items[ikConstraintIndex];
+			IkConstraint constraint = skeleton.ikConstraints.Items[ikConstraintIndex];
 
 			if (time >= frames[frames.Length - 3]) { // Time is after last frame.
-				ikConstraint.mix += (frames[frames.Length - 2] - ikConstraint.mix) * alpha;
-				ikConstraint.bendDirection = (int)frames[frames.Length - 1];
+				constraint.mix += (frames[frames.Length + PREV_MIX] - constraint.mix) * alpha;
+				constraint.bendDirection = (int)frames[frames.Length + PREV_BEND_DIRECTION];
 				return;
 			}
 
 			// Interpolate between the previous frame and the current frame.
-			int frameIndex = Animation.binarySearch(frames, time, 3);
-			float prevFrameMix = frames[frameIndex + PREV_FRAME_MIX];
-			float frameTime = frames[frameIndex];
-			float percent = 1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime);
-			percent = GetCurvePercent(frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
+			int frame = Animation.binarySearch(frames, time, 3);
+			float frameTime = frames[frame];
+			float percent = 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime);
+			percent = GetCurvePercent(frame / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
 
-			float mix = prevFrameMix + (frames[frameIndex + FRAME_MIX] - prevFrameMix) * percent;
-			ikConstraint.mix += (mix - ikConstraint.mix) * alpha;
-			ikConstraint.bendDirection = (int)frames[frameIndex + PREV_FRAME_BEND_DIRECTION];
+			float mix = frames[frame + PREV_MIX];
+			constraint.mix += (mix + (frames[frame + MIX] - mix) * percent - constraint.mix) * alpha;
+			constraint.bendDirection = (int)frames[frame + PREV_BEND_DIRECTION];
+		}
+	}
+
+	public class TransformConstraintTimeline : CurveTimeline {
+		private const int PREV_TIME = -5;
+		private const int PREV_ROTATE_MIX = -4;
+		private const int PREV_TRANSLATE_MIX = -3;
+		private const int PREV_SCALE_MIX = -2;
+		private const int PREV_SHEAR_MIX = -1;
+		private const int ROTATE_MIX = 1;
+		private const int TRANSLATE_MIX = 2;
+		private const int SCALE_MIX = 3;
+		private const int SHEAR_MIX = 4;
+
+		internal int transformConstraintIndex;
+		internal float[] frames;
+
+		public int TransformConstraintIndex { get { return transformConstraintIndex; } set { transformConstraintIndex = value; } }
+		public float[] Frames { get { return frames; } set { frames = value; } } // time, rotate mix, translate mix, scale mix, shear mix, ...
+
+		public TransformConstraintTimeline (int frameCount)
+			: base(frameCount) {
+			frames = new float[frameCount * 5];
+		}
+			
+		public void SetFrame (int frameIndex, float time, float rotateMix, float translateMix, float scaleMix, float shearMix) {
+			frameIndex *= 5;
+			frames[frameIndex] = time;
+			frames[frameIndex + 1] = rotateMix;
+			frames[frameIndex + 2] = translateMix;
+			frames[frameIndex + 3] = scaleMix;
+			frames[frameIndex + 4] = shearMix;
+		}
+
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha) {
+			float[] frames = this.frames;
+			if (time < frames[0]) return; // Time is before first frame.
+
+			TransformConstraint constraint = skeleton.transformConstraints.Items[transformConstraintIndex];
+
+			if (time >= frames[frames.Length - 5]) { // Time is after last frame.
+				int i = frames.Length - 1;
+				constraint.rotateMix += (frames[i - 3] - constraint.rotateMix) * alpha;
+				constraint.translateMix += (frames[i - 2] - constraint.translateMix) * alpha;
+				constraint.scaleMix += (frames[i - 1] - constraint.scaleMix) * alpha;
+				constraint.shearMix += (frames[i] - constraint.shearMix) * alpha;
+				return;
+			}
+
+			// Interpolate between the previous frame and the current frame.
+			int frame = Animation.binarySearch(frames, time, 5);
+			float frameTime = frames[frame];
+			float percent = 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime);
+			percent = GetCurvePercent(frame / 5 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
+
+			float rotate = frames[frame + PREV_ROTATE_MIX];
+			float translate = frames[frame + PREV_TRANSLATE_MIX];
+			float scale = frames[frame + PREV_SCALE_MIX];
+			float shear = frames[frame + PREV_SHEAR_MIX];
+			constraint.rotateMix += (rotate + (frames[frame + ROTATE_MIX] - rotate) * percent - constraint.rotateMix) * alpha;
+			constraint.translateMix += (translate + (frames[frame + TRANSLATE_MIX] - translate) * percent - constraint.translateMix)
+				* alpha;
+			constraint.scaleMix += (scale + (frames[frame + SCALE_MIX] - scale) * percent - constraint.scaleMix) * alpha;
+			constraint.shearMix += (shear + (frames[frame + SHEAR_MIX] - shear) * percent - constraint.shearMix) * alpha;
 		}
 	}
 }
