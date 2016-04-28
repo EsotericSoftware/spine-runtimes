@@ -193,8 +193,8 @@ public class SkeletonBinary {
 				transformConstraintData.bone = skeletonData.bones.get(input.readInt(true));
 				transformConstraintData.target = skeletonData.bones.get(input.readInt(true));
 				transformConstraintData.offsetRotation = input.readFloat();
-				transformConstraintData.offsetX = input.readFloat();
-				transformConstraintData.offsetY = input.readFloat();
+				transformConstraintData.offsetX = input.readFloat() * scale;
+				transformConstraintData.offsetY = input.readFloat() * scale;
 				transformConstraintData.offsetScaleX = input.readFloat();
 				transformConstraintData.offsetScaleY = input.readFloat();
 				transformConstraintData.offsetShearY = input.readFloat();
