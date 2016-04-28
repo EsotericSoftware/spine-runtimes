@@ -20,6 +20,9 @@ public class TransformConstraint implements Updatable {
 		shearMix = data.shearMix;
 		offsetX = data.offsetX;
 		offsetY = data.offsetY;
+		offsetScaleX = data.offsetScaleX;
+		offsetScaleY = data.offsetScaleY;
+		offsetShearY = data.offsetShearY;
 
 		if (skeleton != null) {
 			bone = skeleton.findBone(data.bone.name);
@@ -38,6 +41,9 @@ public class TransformConstraint implements Updatable {
 		shearMix = constraint.shearMix;
 		offsetX = constraint.offsetX;
 		offsetY = constraint.offsetY;
+		offsetScaleX = constraint.offsetScaleX;
+		offsetScaleY = constraint.offsetScaleY;
+		offsetShearY = constraint.offsetShearY;
 	}
 
 	public void apply () {
