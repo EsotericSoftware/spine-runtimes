@@ -97,12 +97,12 @@ namespace Spine {
 			if (scaleMix > 0) {
 				float bs = (float)Math.Sqrt(bone.a * bone.a + bone.c * bone.c);
 				float ts = (float)Math.Sqrt(target.a * target.a + target.c * target.c);
-				float s = (bs > 0.00001f ? (bs + (ts - bs) * scaleMix) / bs : 0) + offsetScaleX;
+				float s = (bs > 0.00001f ? (bs + (ts - bs + offsetScaleX) * scaleMix) / bs : 0);
 				bone.a *= s;
 				bone.c *= s;
 				bs = (float)Math.Sqrt(bone.b * bone.b + bone.d * bone.d);
 				ts = (float)Math.Sqrt(target.b * target.b + target.d * target.d);
-				s = (bs > 0.00001f ? (bs + (ts - bs) * scaleMix) / bs : 0) + offsetScaleY;
+				s = (bs > 0.00001f ? (bs + (ts - bs + offsetScaleY) * scaleMix) / bs : 0);
 				bone.b *= s;
 				bone.d *= s;
 			}
@@ -110,14 +110,14 @@ namespace Spine {
 			if (shearMix > 0) {
 				float b = bone.b, d = bone.d;
 				float by = MathUtils.Atan2(d, b);
-				float r = (MathUtils.Atan2(target.d, target.b) - MathUtils.Atan2(target.c, target.a)) - (by - MathUtils.Atan2(bone.c, bone.a));
+				float r = MathUtils.Atan2(target.d, target.b) - MathUtils.Atan2(target.c, target.a) - (by - MathUtils.Atan2(bone.c, bone.a));
 				if (r > MathUtils.PI)
 					r -= MathUtils.PI2;
 				else if (r < -MathUtils.PI) r += MathUtils.PI2;
-				r = by + r * shearMix;
+				r = by + (r + offsetShearY * MathUtils.degRad) * shearMix;
 				float s = (float)Math.Sqrt(b * b + d * d);
-				bone.b = MathUtils.Cos(r + offsetShearY * MathUtils.degRad) * s;
-				bone.d = MathUtils.Sin(r + offsetShearY * MathUtils.degRad) * s;
+				bone.b = MathUtils.Cos(r) * s;
+				bone.d = MathUtils.Sin(r) * s;
 			}
 
 			float translateMix = this.translateMix;
