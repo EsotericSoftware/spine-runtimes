@@ -71,12 +71,12 @@ public class TransformConstraint implements Updatable {
 		if (scaleMix > 0) {
 			float bs = (float)Math.sqrt(bone.a * bone.a + bone.c * bone.c);
 			float ts = (float)Math.sqrt(target.a * target.a + target.c * target.c);
-			float s = (bs > 0.00001f ? (bs + (ts - bs + offsetScaleX) * scaleMix) / bs : 0);
+			float s = bs > 0.00001f ? (bs + (ts - bs + offsetScaleX) * scaleMix) / bs : 0;
 			bone.a *= s;
 			bone.c *= s;
 			bs = (float)Math.sqrt(bone.b * bone.b + bone.d * bone.d);
 			ts = (float)Math.sqrt(target.b * target.b + target.d * target.d);
-			s = (bs > 0.00001f ? (bs + (ts - bs + offsetScaleY) * scaleMix) / bs : 0);
+			s = bs > 0.00001f ? (bs + (ts - bs + offsetScaleY) * scaleMix) / bs : 0;
 			bone.b *= s;
 			bone.d *= s;
 		}
