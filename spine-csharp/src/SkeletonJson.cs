@@ -543,7 +543,7 @@ namespace Spine {
 							foreach (Dictionary<String, Object> valueMap in values) {
 								float time = (float)valueMap["time"];
 								float x = GetFloat(valueMap, "x", 0);
-								float y = GetFloat (valueMap, "y", 0);
+								float y = GetFloat(valueMap, "y", 0);
 								timeline.SetFrame(frameIndex, time, (float)x * timelineScale, (float)y * timelineScale);
 								ReadCurve(timeline, frameIndex, valueMap);
 								frameIndex++;
