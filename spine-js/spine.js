@@ -459,8 +459,8 @@ spine.IkConstraint.apply2 = function (parent, child, targetX, targetY, bendDir, 
 		}
 	}
 	var os = Math.atan2(cy, cx) * s2;
-	a1 = (a1 - os) * radDeg + os1;
-	a2 = (a2 + os) * radDeg * s2 + os2;
+	a1 = (a1 - os) * spine.radDeg + os1;
+	a2 = (a2 + os) * spine.radDeg * s2 + os2;
 	if (a1 > 180) a1 -= 360;
 	else if (a1 < -180) a1 += 360;
 	if (a2 > 180) a2 -= 360;
