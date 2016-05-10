@@ -136,8 +136,19 @@ internal class PolygonBatch {
 		var tl:int = triangles.length;
 		var vc:int = _verticesCount, tc:int = _trianglesCount;
 		var firstVertex:int = vc >> 3;
-		if (firstVertex + (vl >> 1) > _capacity) resize(firstVertex + (vl >> 1) - _capacity);
-		if (tc + tl > _triangles.length) resize((tc + tl - _triangles.length) / 3);
+		var flushed:Boolean = false;
+		if (firstVertex + (vl >> 1) > _capacity) {
+			flushed = resize(firstVertex + (vl >> 1) - _capacity);
+		}
+		if (tc + tl > _triangles.length) {
+			flushed = resize((tc + tl - _triangles.length) / 3);
+		}
+		if (flushed) {
+			tl = triangles.length;
+			vc = _verticesCount;
+			tc = _trianglesCount;
+			firstVertex = vc >> 3;
+		}
 
 		var i:int, t:Vector.<uint> = _triangles;
 		for (i = 0; i < tl; i += 3, tc += 3) {
@@ -176,19 +187,22 @@ internal class PolygonBatch {
 		_verticesCount = vc;
 	}
 
-	private function resize (additional:int) : void {
+	private function resize (additional:int) : Boolean {
 		var newCapacity:int = _capacity + additional;
+		var flushed:Boolean = false;
 		if (newCapacity > maxCapacity) {
 			flush();
+			flushed = true;
 			newCapacity = additional;
-			if (newCapacity < _capacity) return;
+			if (newCapacity < _capacity) return flushed;
 			if (newCapacity > maxCapacity) throw new ArgumentError("Too many vertices: " + newCapacity + " > " + maxCapacity);
 		}
 		_capacity = newCapacity;		
 		_vertices.length = newCapacity << 3;
 		_triangles.length = newCapacity * 3;
 		_verticesBuffer = null;
-		_trianglesBuffer = null;	
+		_trianglesBuffer = null;
+		return flushed;
 	}
 
 	public function flush () : void {
