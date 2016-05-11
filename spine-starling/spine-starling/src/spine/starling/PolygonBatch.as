@@ -76,7 +76,6 @@ internal class PolygonBatch {
 	private var _trianglesBuffer:IndexBuffer3D;
 
 	public function PolygonBatch () {
-		resize(32);
 		Starling.current.stage3D.addEventListener(Event.CONTEXT3D_CREATE, onContextCreated, false, 0, true);
 	}
 
@@ -133,11 +132,19 @@ internal class PolygonBatch {
 			_texture = texture;
 		}
 
-		var tl:int = triangles.length;
-		var vc:int = _verticesCount, tc:int = _trianglesCount;
-		var firstVertex:int = vc >> 3;
-		if (firstVertex + (vl >> 1) > _capacity) resize(firstVertex + (vl >> 1) - _capacity);
-		if (tc + tl > _triangles.length) resize((tc + tl - _triangles.length) / 3);
+		var vc:int = _verticesCount, firstVertex:int = vc >> 3;
+		if (firstVertex + (vl >> 1) > _capacity) {
+			resize(firstVertex + (vl >> 1) - _capacity);
+			vc = _verticesCount;
+			firstVertex = vc >> 3;
+		}
+		var tl:int = triangles.length, tc:int = _trianglesCount;
+		if (tc + tl > _triangles.length) {
+			resize((tc + tl - _triangles.length) / 3);
+			vc = _verticesCount;
+			firstVertex = vc >> 3;
+			tc = _trianglesCount;
+		}
 
 		var i:int, t:Vector.<uint> = _triangles;
 		for (i = 0; i < tl; i += 3, tc += 3) {
@@ -177,14 +184,14 @@ internal class PolygonBatch {
 	}
 
 	private function resize (additional:int) : void {
-		var newCapacity:int = _capacity + additional;
-		if (newCapacity > maxCapacity) {
+		var newCapacity:int = Math.min(maxCapacity, Math.max(_capacity + additional, _capacity * 2));
+		if (newCapacity == maxCapacity) {
 			flush();
 			newCapacity = additional;
 			if (newCapacity < _capacity) return;
 			if (newCapacity > maxCapacity) throw new ArgumentError("Too many vertices: " + newCapacity + " > " + maxCapacity);
 		}
-		_capacity = newCapacity;		
+		_capacity = newCapacity;
 		_vertices.length = newCapacity << 3;
 		_triangles.length = newCapacity * 3;
 		_verticesBuffer = null;
