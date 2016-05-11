@@ -95,11 +95,10 @@ public class SkeletonSprite extends DisplayObject {
 			_polygonBatch.begin(support, alpha, blendMode);
 			addToBatch(_polygonBatch, alpha, transformationMatrix);
 			for(var i:int = parent.getChildIndex(this) + 1, n:int = parent.numChildren; i < n; ++i) {
-				var skeletonSprite:SkeletonSprite = parent.getChildAt(i) as SkeletonSprite;
-				if (!skeletonSprite || !skeletonSprite.batchable || skeletonSprite.blendMode != blendMode
-					|| !skeletonSprite.visible) break;
-				skeletonSprite._batched = true;
-				skeletonSprite.addToBatch(_polygonBatch, alpha, skeletonSprite.transformationMatrix);
+				var sibling:SkeletonSprite = parent.getChildAt(i) as SkeletonSprite;
+				if (!sibling || !sibling.batchable || sibling.blendMode != blendMode || !sibling.visible) break;
+				sibling._batched = true;
+				sibling.addToBatch(_polygonBatch, alpha, sibling.transformationMatrix);
 			}
 			_polygonBatch.end();
 			support.pushMatrix();
