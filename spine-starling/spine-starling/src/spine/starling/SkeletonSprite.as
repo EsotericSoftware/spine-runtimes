@@ -223,7 +223,7 @@ public class SkeletonSprite extends DisplayObject {
 			return null;
 
 		var minX:Number = Number.MAX_VALUE, minY:Number = Number.MAX_VALUE;
-		var maxX:Number = Number.MIN_VALUE, maxY:Number = Number.MIN_VALUE;
+		var maxX:Number = -Number.MAX_VALUE, maxY:Number = -Number.MAX_VALUE;
 		var slots:Vector.<Slot> = skeleton.slots;
 		var worldVertices:Vector.<Number> = _tempVertices;
 		for (var i:int = 0, n:int = slots.length; i < n; ++i) {

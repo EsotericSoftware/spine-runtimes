@@ -71,7 +71,8 @@ public class SkeletonBounds {
 	}
 
 	private function aabbCompute () : void {
-		var minX:Number = int.MAX_VALUE, minY:Number = int.MAX_VALUE, maxX:Number = int.MIN_VALUE, maxY:Number = int.MIN_VALUE;
+		var minX:Number = Number.MAX_VALUE, minY:Number = Number.MAX_VALUE;
+		var maxX:Number = -Number.MAX_VALUE, maxY:Number = -Number.MAX_VALUE;
 		for (var i:int = 0, n:int = polygons.length; i < n; i++) {
 			var polygon:Polygon = polygons[i];
 			var vertices:Vector.<Number> = polygon.vertices;
