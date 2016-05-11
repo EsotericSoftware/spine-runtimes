@@ -96,7 +96,8 @@ public class SkeletonSprite extends DisplayObject {
 			addToBatch(_polygonBatch, alpha, transformationMatrix);
 			for(var i:int = parent.getChildIndex(this) + 1, n:int = parent.numChildren; i < n; ++i) {
 				var skeletonSprite:SkeletonSprite = parent.getChildAt(i) as SkeletonSprite;
-				if (!skeletonSprite || !skeletonSprite.batchable || skeletonSprite.blendMode != blendMode) break;
+				if (!skeletonSprite || !skeletonSprite.batchable || skeletonSprite.blendMode != blendMode
+					|| !skeletonSprite.visible) break;
 				skeletonSprite._batched = true;
 				skeletonSprite.addToBatch(_polygonBatch, alpha, skeletonSprite.transformationMatrix);
 			}
