@@ -253,9 +253,9 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 					if (duration > animation->duration) animation->duration = duration;
 
 				} else {
-					spAnimation_dispose(animation);
-					_spSkeletonJson_setError(self, 0, "Invalid timeline type for a bone: ", timelineArray->name);
-					return 0;
+					//spAnimation_dispose(animation);
+					//_spSkeletonJson_setError(self, 0, "Invalid timeline type for a bone: ", timelineArray->name);
+					//return 0;
 				}
 			}
 		}
