@@ -207,12 +207,17 @@ void spAnimationState_clearTrack (spAnimationState* self, int trackIndex) {
 	current = self->tracks[trackIndex];
 	if (!current) return;
 
-	if (current->listener) current->listener(self, trackIndex, SP_ANIMATION_END, 0, 0);
-	if (self->listener) self->listener(self, trackIndex, SP_ANIMATION_END, 0, 0);
+	spAnimationStateListener tempcurrentlistener = current->listener;
+	spAnimationStateListener tempselflistener = self->listener;
+	
 
 	self->tracks[trackIndex] = 0;
 
 	_spAnimationState_disposeAllEntries(self, current);
+
+	if (tempcurrentlistener) tempcurrentlistener(self, trackIndex, SP_ANIMATION_END, 0, 0);
+	if (tempselflistener) tempselflistener(self, trackIndex, SP_ANIMATION_END, 0, 0);
+
 }
 
 spTrackEntry* _spAnimationState_expandToIndex (spAnimationState* self, int index) {
