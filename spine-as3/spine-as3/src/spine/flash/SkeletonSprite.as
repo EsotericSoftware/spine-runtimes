@@ -30,6 +30,7 @@
  *****************************************************************************/
 
 package spine.flash {
+import flash.utils.Dictionary;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.BlendMode;
@@ -54,6 +55,7 @@ public class SkeletonSprite extends Sprite {
 	private var _skeleton:Skeleton;
 	public var timeScale:Number = 1;
 	private var lastTime:int;
+	private var wrappers:Dictionary = new Dictionary(true);
 
 	public function SkeletonSprite (skeletonData:SkeletonData) {
 		Bone.yDown = true;
@@ -79,7 +81,7 @@ public class SkeletonSprite extends Sprite {
 			var slot:Slot = drawOrder[i];
 			var regionAttachment:RegionAttachment = slot.attachment as RegionAttachment;
 			if (regionAttachment) {
-				var wrapper:Sprite = regionAttachment["wrapper"];
+				var wrapper:Sprite = wrappers[regionAttachment];
 				var region:AtlasRegion = AtlasRegion(regionAttachment.rendererObject);
 				if (!wrapper) {
 					var bitmapData:BitmapData = region.page.rendererObject as BitmapData;
@@ -95,7 +97,6 @@ public class SkeletonSprite extends Sprite {
 					bitmap.rotation = -regionAttachment.rotation;
 					bitmap.scaleX = regionAttachment.scaleX * (regionAttachment.width / region.width);
 					bitmap.scaleY = regionAttachment.scaleY * (regionAttachment.height / region.height);
-					
 
 					// Position using attachment translation, shifted as if scale and rotation were at image center.
 					var radians:Number = -regionAttachment.rotation * Math.PI / 180;
@@ -114,7 +115,7 @@ public class SkeletonSprite extends Sprite {
 					wrapper = new Sprite();
 					wrapper.transform.colorTransform = new ColorTransform();
 					wrapper.addChild(bitmap);
-					regionAttachment["wrapper"] = wrapper;
+					wrappers[regionAttachment] = wrapper;
 				}
 
 				wrapper.blendMode = blendModes[slot.data.blendMode.ordinal];
