@@ -13,12 +13,8 @@ namespace Spine.Unity.Modules {
 
 		#region Inspector
 		public SkeletonRenderer skeletonRenderer;
-
-		[SerializeField]
-		private List<SlotMaterialOverride> customSlotMaterials = new List<SlotMaterialOverride>();
-
-		[SerializeField]
-		private List<AtlasMaterialOverride> customMaterialOverrides = new List<AtlasMaterialOverride>();
+		[SerializeField] List<SlotMaterialOverride> customSlotMaterials = new List<SlotMaterialOverride>();
+		[SerializeField] List<AtlasMaterialOverride> customMaterialOverrides = new List<AtlasMaterialOverride>();
 
 		#if UNITY_EDITOR
 		void Reset () {
@@ -48,19 +44,7 @@ namespace Spine.Unity.Modules {
 		public List<SlotMaterialOverride> CustomSlotMaterials { get { return customSlotMaterials; } }
 		public List<AtlasMaterialOverride> CustomMaterialOverrides { get { return customMaterialOverrides; } }
 
-		public void ReapplyOverrides () {
-			if (skeletonRenderer == null) {
-				Debug.LogError("skeletonRenderer == null");
-				return;
-			}
-
-			RemoveCustomMaterialOverrides();
-			RemoveCustomSlotMaterials();
-			SetCustomMaterialOverrides();
-			SetCustomSlotMaterials();
-		}
-
-		public void SetCustomSlotMaterials () {
+		void SetCustomSlotMaterials () {
 			if (skeletonRenderer == null) {
 				Debug.LogError("skeletonRenderer == null");
 				return;
@@ -76,7 +60,7 @@ namespace Spine.Unity.Modules {
 			}
 		}
 
-		public void RemoveCustomSlotMaterials () {
+		void RemoveCustomSlotMaterials () {
 			if (skeletonRenderer == null) {
 				Debug.LogError("skeletonRenderer == null");
 				return;
@@ -101,7 +85,7 @@ namespace Spine.Unity.Modules {
 			}
 		}
 
-		public void SetCustomMaterialOverrides () {
+		void SetCustomMaterialOverrides () {
 			if (skeletonRenderer == null) {
 				Debug.LogError("skeletonRenderer == null");
 				return;
@@ -116,7 +100,7 @@ namespace Spine.Unity.Modules {
 			}
 		}
 
-		public void RemoveCustomMaterialOverrides () {
+		void RemoveCustomMaterialOverrides () {
 			if (skeletonRenderer == null) {
 				Debug.LogError("skeletonRenderer == null");
 				return;
@@ -136,7 +120,7 @@ namespace Spine.Unity.Modules {
 			}
 		}
 			
-		// OnEnable applies the overrides at runtime and when the editor loads.
+		// OnEnable applies the overrides at runtime, and when the editor loads.
 		void OnEnable () {
 			if (skeletonRenderer == null)
 				skeletonRenderer = GetComponent<SkeletonRenderer>();
@@ -151,8 +135,7 @@ namespace Spine.Unity.Modules {
 			SetCustomSlotMaterials();
 		}
 
-
-		// OnDisable removes the overrides at runtime and in the editor when the component is disabled or destroyed.
+		// OnDisable removes the overrides at runtime, and in the editor when the component is disabled or destroyed.
 		void OnDisable () {
 			if (skeletonRenderer == null) {
 				Debug.LogError("skeletonRenderer == null");
@@ -171,7 +154,7 @@ namespace Spine.Unity.Modules {
 			public string slotName;
 			public Material material;
 
-			public bool Equals(SlotMaterialOverride other) {
+			public bool Equals (SlotMaterialOverride other) {
 				return overrideDisabled == other.overrideDisabled && slotName == other.slotName && material == other.material;
 			}
 		}
@@ -182,7 +165,7 @@ namespace Spine.Unity.Modules {
 			public Material originalMaterial;
 			public Material replacementMaterial;
 
-			public bool Equals(AtlasMaterialOverride other) {
+			public bool Equals (AtlasMaterialOverride other) {
 				return overrideDisabled == other.overrideDisabled && originalMaterial == other.originalMaterial && replacementMaterial == other.replacementMaterial;
 			}
 		}
