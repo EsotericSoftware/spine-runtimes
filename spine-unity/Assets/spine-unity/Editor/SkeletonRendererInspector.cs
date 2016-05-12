@@ -28,6 +28,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
+#define NO_PREFAB_MESH
 
 using System;
 using UnityEditor;
@@ -38,12 +39,14 @@ namespace Spine.Unity.Editor {
 	[CustomEditor(typeof(SkeletonRenderer))]
 	public class SkeletonRendererInspector : UnityEditor.Editor {
 		protected static bool advancedFoldout;
-
-		protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, separatorSlotNames, front, zSpacing;
-
+		protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, separatorSlotNames, frontFacing, zSpacing;
 		protected SpineInspectorUtility.SerializedSortingProperties sortingProperties;
+		protected bool isInspectingPrefab;
+		protected MeshFilter meshFilter;
 
 		protected virtual void OnEnable () {
+			isInspectingPrefab = (PrefabUtility.GetPrefabType(target) == PrefabType.Prefab);
+			
 			SpineEditorUtilities.ConfirmInitialization();
 			skeletonDataAsset = serializedObject.FindProperty("skeletonDataAsset");
 			initialSkinName = serializedObject.FindProperty("initialSkinName");
@@ -54,7 +57,7 @@ namespace Spine.Unity.Editor {
 			separatorSlotNames = serializedObject.FindProperty("separatorSlotNames");
 			separatorSlotNames.isExpanded = true;
 
-			front = serializedObject.FindProperty("frontFacing");
+			frontFacing = serializedObject.FindProperty("frontFacing");
 			zSpacing = serializedObject.FindProperty("zSpacing");
 
 			var renderer = ((SkeletonRenderer)target).GetComponent<Renderer>();
@@ -63,16 +66,17 @@ namespace Spine.Unity.Editor {
 
 		protected virtual void DrawInspectorGUI () {
 			SkeletonRenderer component = (SkeletonRenderer)target;
+
 			EditorGUILayout.BeginHorizontal();
 			EditorGUILayout.PropertyField(skeletonDataAsset);
-			float reloadWidth = GUI.skin.label.CalcSize(new GUIContent("Reload")).x + 20;
-			if (GUILayout.Button("Reload", GUILayout.Width(reloadWidth))) {
+			const string ReloadButtonLabel = "Reload";
+			float reloadWidth = GUI.skin.label.CalcSize(new GUIContent(ReloadButtonLabel)).x + 20;
+			if (GUILayout.Button(ReloadButtonLabel, GUILayout.Width(reloadWidth))) {
 				if (component.skeletonDataAsset != null) {
 					foreach (AtlasAsset aa in component.skeletonDataAsset.atlasAssets) {
 						if (aa != null)
 							aa.Reset();
 					}
-
 					component.skeletonDataAsset.Reset();
 				}
 				component.Initialize(true);
@@ -86,6 +90,14 @@ namespace Spine.Unity.Editor {
 					return;
 			}
 
+			#if NO_PREFAB_MESH
+			if (meshFilter == null)
+				meshFilter = component.GetComponent<MeshFilter>();
+
+			if (isInspectingPrefab)
+				meshFilter.sharedMesh = null;
+			#endif
+
 			// Initial skin name.
 			{
 				String[] skins = new String[component.skeleton.Data.Skins.Count];
@@ -96,7 +108,6 @@ namespace Spine.Unity.Editor {
 					if (skinNameString == initialSkinName.stringValue)
 						skinIndex = i;
 				}
-
 				skinIndex = EditorGUILayout.Popup("Initial Skin", skinIndex, skins);			
 				initialSkinName.stringValue = skins[skinIndex];
 			}
@@ -113,7 +124,7 @@ namespace Spine.Unity.Editor {
 				using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
 					EditorGUI.indentLevel++;
 					advancedFoldout = EditorGUILayout.Foldout(advancedFoldout, "Advanced");
-					if(advancedFoldout) {
+					if (advancedFoldout) {
 						EditorGUI.indentLevel++;
 						SeparatorsField(separatorSlotNames);
 						EditorGUILayout.PropertyField(meshes,
@@ -126,30 +137,27 @@ namespace Spine.Unity.Editor {
 						const float MaxZSpacing = 0f;
 						EditorGUILayout.Slider(zSpacing, MinZSpacing, MaxZSpacing);
 
+						// Optional fields. May be disabled in SkeletonRenderer.
 						if (normals != null) {
 							EditorGUILayout.PropertyField(normals);
 							EditorGUILayout.PropertyField(tangents);
 						}
+						if (frontFacing != null)
+							EditorGUILayout.PropertyField(frontFacing);
 
-						if (front != null) {
-							EditorGUILayout.PropertyField(front);
-						}
 						EditorGUI.indentLevel--;
 					}
 					EditorGUI.indentLevel--;
-
 				}
 			}
 		}
 
 		public static void SeparatorsField (SerializedProperty separatorSlotNames) {
 			using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
-				if (separatorSlotNames.isExpanded) {
+				if (separatorSlotNames.isExpanded)
 					EditorGUILayout.PropertyField(separatorSlotNames, includeChildren: true);
-				} else {
+				else
 					EditorGUILayout.PropertyField(separatorSlotNames, new GUIContent(separatorSlotNames.displayName + string.Format(" [{0}]", separatorSlotNames.arraySize)), includeChildren: true);
-				}
-
 			}
 		}
 
