@@ -2114,8 +2114,8 @@ spine.SkeletonJson.prototype = {
 			if (!map["parent"]) {
 				var uvs = this.getFloatArray(map, "uvs", 1);
 				var vertices = this.getFloatArray(map, "vertices", 1);
-				var weights = new spine.Float32Array(uvs.length * 3 * 3);
-				var bones = new spine.Uint32Array(uvs.length * 3);
+				var weights = []
+				var bones = []
 				for (var i = 0, n = vertices.length; i < n; ) {
 					var boneCount = vertices[i++] | 0;
 					bones[bones.length] = boneCount;
