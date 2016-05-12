@@ -2116,14 +2116,14 @@ spine.SkeletonJson.prototype = {
 				var vertices = this.getFloatArray(map, "vertices", 1);
 				var weights = new spine.Float32Array(uvs.length * 3 * 3);
 				var bones = new spine.Uint32Array(uvs.length * 3);
-				for (var i = 0, n = vertices.length; i < n; ) {
+				for (var i = 0, b = 0, w = 0, n = vertices.length; i < n; ) {
 					var boneCount = vertices[i++] | 0;
-					bones[bones.length] = boneCount;
+					bones[b++] = boneCount;
 					for (var nn = i + boneCount * 4; i < nn; ) {
-						bones[bones.length] = vertices[i];
-						weights[weights.length] = vertices[i + 1] * scale;
-						weights[weights.length] = vertices[i + 2] * scale;
-						weights[weights.length] = vertices[i + 3];
+						bones[b++] = vertices[i];
+						weights[w++] = vertices[i + 1] * scale;
+						weights[w++] = vertices[i + 2] * scale;
+						weights[w++] = vertices[i + 3];
 						i += 4;
 					}
 				}
