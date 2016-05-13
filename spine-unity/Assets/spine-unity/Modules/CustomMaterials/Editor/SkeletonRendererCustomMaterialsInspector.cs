@@ -3,6 +3,7 @@
  * Full irrevocable rights and permissions granted to Esoteric Software
 *****************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -15,9 +16,11 @@ namespace Spine.Unity.Editor {
 	// This script is not intended for use with code. See the readme.txt file in SkeletonRendererCustomMaterials folder to learn more.
 	[CustomEditor(typeof(SkeletonRendererCustomMaterials))]
 	public class SkeletonRendererCustomMaterialsInspector : UnityEditor.Editor {
-		List<SkeletonRendererCustomMaterials.AtlasMaterialOverride> _customMaterialOverridesPrev;
-		List<SkeletonRendererCustomMaterials.SlotMaterialOverride> _customSlotMaterialsPrev;
+		List<SkeletonRendererCustomMaterials.AtlasMaterialOverride> componentCustomMaterialOverrides, _customMaterialOverridesPrev;
+		List<SkeletonRendererCustomMaterials.SlotMaterialOverride> componentCustomSlotMaterials, _customSlotMaterialsPrev;
 		SkeletonRendererCustomMaterials component;
+
+		const BindingFlags PrivateInstance = BindingFlags.Instance | BindingFlags.NonPublic;
 		MethodInfo RemoveCustomMaterialOverrides, RemoveCustomSlotMaterials, SetCustomMaterialOverrides, SetCustomSlotMaterials;
 
 		#region SkeletonRenderer context menu
@@ -36,12 +39,11 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		void OnEnable () {
-			BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
-			System.Type cm = typeof(SkeletonRendererCustomMaterials);
-			RemoveCustomMaterialOverrides = cm.GetMethod("RemoveCustomMaterialOverrides", flags);
-			RemoveCustomSlotMaterials = cm.GetMethod("RemoveCustomSlotMaterials", flags);
-			SetCustomMaterialOverrides = cm.GetMethod("SetCustomMaterialOverrides", flags);
-			SetCustomSlotMaterials = cm.GetMethod("SetCustomSlotMaterials", flags);
+			Type cm = typeof(SkeletonRendererCustomMaterials);
+			RemoveCustomMaterialOverrides = cm.GetMethod("RemoveCustomMaterialOverrides", PrivateInstance);
+			RemoveCustomSlotMaterials = cm.GetMethod("RemoveCustomSlotMaterials", PrivateInstance);
+			SetCustomMaterialOverrides = cm.GetMethod("SetCustomMaterialOverrides", PrivateInstance);
+			SetCustomSlotMaterials = cm.GetMethod("SetCustomSlotMaterials", PrivateInstance);
 		}
 
 		public override void OnInspectorGUI () {
@@ -51,36 +53,49 @@ namespace Spine.Unity.Editor {
 			// Draw the default inspector
 			DrawDefaultInspector();
 
+			if (serializedObject.isEditingMultipleObjects)
+				return;
+
+			if (componentCustomMaterialOverrides == null) {
+				Type cm = typeof(SkeletonRendererCustomMaterials);
+				componentCustomMaterialOverrides = cm.GetField("customMaterialOverrides", PrivateInstance).GetValue(component) as List<SkeletonRendererCustomMaterials.AtlasMaterialOverride>;
+				componentCustomSlotMaterials = cm.GetField("customSlotMaterials", PrivateInstance).GetValue(component) as List<SkeletonRendererCustomMaterials.SlotMaterialOverride>;
+				if (componentCustomMaterialOverrides == null) {
+					Debug.Log("Reflection failed.");
+					return;
+				}
+			}
+
 			// Fill with current values at start
 			if (_customMaterialOverridesPrev == null || _customSlotMaterialsPrev == null) {
-				_customMaterialOverridesPrev = CopyList(component.CustomMaterialOverrides);
-				_customSlotMaterialsPrev = CopyList(component.CustomSlotMaterials);
+				_customMaterialOverridesPrev = CopyList(componentCustomMaterialOverrides);
+				_customSlotMaterialsPrev = CopyList(componentCustomSlotMaterials);
 			}
 
 			// Compare new values with saved. If change is detected: 
 			// store new values, restore old values, remove overrides, restore new values, restore overrides.
 
 			// 1. Store new values
-			var customMaterialOverridesNew = CopyList(component.CustomMaterialOverrides);
-			var customSlotMaterialsNew = CopyList(component.CustomSlotMaterials);
+			var customMaterialOverridesNew = CopyList(componentCustomMaterialOverrides);
+			var customSlotMaterialsNew = CopyList(componentCustomSlotMaterials);
 			
 			// Detect changes
 			if (!_customMaterialOverridesPrev.SequenceEqual(customMaterialOverridesNew) ||
 				!_customSlotMaterialsPrev.SequenceEqual(customSlotMaterialsNew)) {
 				// 2. Restore old values
-				component.CustomMaterialOverrides.Clear();
-				component.CustomSlotMaterials.Clear();
-				component.CustomMaterialOverrides.AddRange(_customMaterialOverridesPrev);
-				component.CustomSlotMaterials.AddRange(_customSlotMaterialsPrev);
+				componentCustomMaterialOverrides.Clear();
+				componentCustomSlotMaterials.Clear();
+				componentCustomMaterialOverrides.AddRange(_customMaterialOverridesPrev);
+				componentCustomSlotMaterials.AddRange(_customSlotMaterialsPrev);
 
 				// 3. Remove overrides
 				RemoveCustomMaterials();
 
 				// 4. Restore new values
-				component.CustomMaterialOverrides.Clear();
-				component.CustomSlotMaterials.Clear();
-				component.CustomMaterialOverrides.AddRange(customMaterialOverridesNew);
-				component.CustomSlotMaterials.AddRange(customSlotMaterialsNew);
+				componentCustomMaterialOverrides.Clear();
+				componentCustomSlotMaterials.Clear();
+				componentCustomMaterialOverrides.AddRange(customMaterialOverridesNew);
+				componentCustomSlotMaterials.AddRange(customSlotMaterialsNew);
 
 				// 5. Restore overrides
 				SetCustomMaterials();
@@ -89,8 +104,8 @@ namespace Spine.Unity.Editor {
 					skeletonRenderer.LateUpdate();
 			}
 
-			_customMaterialOverridesPrev = CopyList(component.CustomMaterialOverrides);
-			_customSlotMaterialsPrev = CopyList(component.CustomSlotMaterials);
+			_customMaterialOverridesPrev = CopyList(componentCustomMaterialOverrides);
+			_customSlotMaterialsPrev = CopyList(componentCustomSlotMaterials);
 
 			if (GUILayout.Button(new GUIContent("Clear and Reapply Changes", "Removes all non-serialized overrides in the SkeletonRenderer and reapplies the overrides on this component."))) {
 				if (skeletonRenderer != null) {

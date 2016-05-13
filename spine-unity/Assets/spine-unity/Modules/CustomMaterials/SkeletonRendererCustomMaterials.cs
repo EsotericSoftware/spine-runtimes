@@ -41,9 +41,6 @@ namespace Spine.Unity.Modules {
 		#endif
 		#endregion
 
-		public List<SlotMaterialOverride> CustomSlotMaterials { get { return customSlotMaterials; } }
-		public List<AtlasMaterialOverride> CustomMaterialOverrides { get { return customMaterialOverrides; } }
-
 		void SetCustomSlotMaterials () {
 			if (skeletonRenderer == null) {
 				Debug.LogError("skeletonRenderer == null");
