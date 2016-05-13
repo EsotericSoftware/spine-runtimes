@@ -711,21 +711,26 @@ namespace Spine.Unity.Editor {
 			try {
 				obj = Json.Deserialize(new StringReader(asset.text));
 			} catch (System.Exception) {
+				
 			}
+
 			if (obj == null) {
 				Debug.LogError("Is not valid JSON");
 				return false;
 			}
 
-			Dictionary<string, object> root = (Dictionary<string, object>)obj;
+			var root = obj as Dictionary<string, object>;
+			if (root == null) {
+				Debug.LogError("Parser returned an incorrect type.");
+				return false;
+			}
 
 			if (!root.ContainsKey("skeleton"))
 				return false;
 
-			Dictionary<string, object> skeletonInfo = (Dictionary<string, object>)root["skeleton"];
-
-			string spineVersion = (string)skeletonInfo["spine"];
-			//TODO:  reject old versions
+//			var skeletonInfo = (Dictionary<string, object>)root["skeleton"];
+//			string spineVersion = (string)skeletonInfo["spine"];
+			// TODO: Warn users of old version incompatibility.
 
 			return true;
 		}
