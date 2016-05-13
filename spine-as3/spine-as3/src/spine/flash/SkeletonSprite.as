@@ -80,64 +80,68 @@ public class SkeletonSprite extends Sprite {
 		for (var i:int = 0, n:int = drawOrder.length; i < n; i++) {
 			var slot:Slot = drawOrder[i];
 			var regionAttachment:RegionAttachment = slot.attachment as RegionAttachment;
-			if (regionAttachment) {
-				var wrapper:Sprite = wrappers[regionAttachment];
+			if (!regionAttachment) continue;
+
+			var wrapper:Sprite = wrappers[regionAttachment];
+			if (!wrapper) {
 				var region:AtlasRegion = AtlasRegion(regionAttachment.rendererObject);
-				if (!wrapper) {
+				var regionHeight:Number = region.rotate ? region.width : region.height;
+				var regionData:BitmapData = region.rendererObject as BitmapData;
+				if (!regionData) {
 					var bitmapData:BitmapData = region.page.rendererObject as BitmapData;
 					var regionWidth:Number = region.rotate ? region.height : region.width;
-					var regionHeight:Number = region.rotate ? region.width : region.height;
-					var regionData:BitmapData = new BitmapData(regionWidth, regionHeight);
+					regionData = new BitmapData(regionWidth, regionHeight);
 					regionData.copyPixels(bitmapData, new Rectangle(region.x, region.y, regionWidth, regionHeight), new Point());
-
-					var bitmap:Bitmap = new Bitmap(regionData);
-					bitmap.smoothing = true;
-
-					// Rotate and scale using default registration point (top left corner, y-down, CW) instead of image center.
-					bitmap.rotation = -regionAttachment.rotation;
-					bitmap.scaleX = regionAttachment.scaleX * (regionAttachment.width / region.width);
-					bitmap.scaleY = regionAttachment.scaleY * (regionAttachment.height / region.height);
-
-					// Position using attachment translation, shifted as if scale and rotation were at image center.
-					var radians:Number = -regionAttachment.rotation * Math.PI / 180;
-					var cos:Number = Math.cos(radians);
-					var sin:Number = Math.sin(radians);
-					var shiftX:Number = -regionAttachment.width / 2 * regionAttachment.scaleX;
-					var shiftY:Number = -regionAttachment.height / 2 * regionAttachment.scaleY;
-					if (region.rotate) {
-						bitmap.rotation += 90;
-						shiftX += regionHeight * (regionAttachment.width / region.width);
-					}
-					bitmap.x = regionAttachment.x + shiftX * cos - shiftY * sin;
-					bitmap.y = -regionAttachment.y + shiftX * sin + shiftY * cos;
-
-					// Use bone as registration point.
-					wrapper = new Sprite();
-					wrapper.transform.colorTransform = new ColorTransform();
-					wrapper.addChild(bitmap);
-					wrappers[regionAttachment] = wrapper;
+					region.rendererObject = regionData;
 				}
 
-				wrapper.blendMode = blendModes[slot.data.blendMode.ordinal];
+				var bitmap:Bitmap = new Bitmap(regionData);
+				bitmap.smoothing = true;
 
-				var colorTransform:ColorTransform = wrapper.transform.colorTransform;
-				colorTransform.redMultiplier = skeleton.r * slot.r * regionAttachment.r;
-				colorTransform.greenMultiplier = skeleton.g * slot.g * regionAttachment.g;
-				colorTransform.blueMultiplier = skeleton.b * slot.b * regionAttachment.b;
-				colorTransform.alphaMultiplier = skeleton.a * slot.a * regionAttachment.a;
-				wrapper.transform.colorTransform = colorTransform;
+				// Rotate and scale using default registration point (top left corner, y-down, CW) instead of image center.
+				bitmap.rotation = -regionAttachment.rotation;
+				bitmap.scaleX = regionAttachment.scaleX * (regionAttachment.width / region.width);
+				bitmap.scaleY = regionAttachment.scaleY * (regionAttachment.height / region.height);
 
-				var bone:Bone = slot.bone;
-				var flipX:int = skeleton.flipX ? -1 : 1;
-				var flipY:int = skeleton.flipY ? -1 : 1;
+				// Position using attachment translation, shifted as if scale and rotation were at image center.
+				var radians:Number = -regionAttachment.rotation * Math.PI / 180;
+				var cos:Number = Math.cos(radians);
+				var sin:Number = Math.sin(radians);
+				var shiftX:Number = -regionAttachment.width / 2 * regionAttachment.scaleX;
+				var shiftY:Number = -regionAttachment.height / 2 * regionAttachment.scaleY;
+				if (region.rotate) {
+					bitmap.rotation += 90;
+					shiftX += regionHeight * (regionAttachment.width / region.width);
+				}
+				bitmap.x = regionAttachment.x + shiftX * cos - shiftY * sin;
+				bitmap.y = -regionAttachment.y + shiftX * sin + shiftY * cos;
 
-				wrapper.x = bone.worldX;
-				wrapper.y = bone.worldY;
-				wrapper.rotation = bone.worldRotationX * flipX * flipY;
-				wrapper.scaleX = bone.worldScaleX * flipX;
-				wrapper.scaleY = bone.worldScaleY * flipY;
-				addChild(wrapper);
+				// Use bone as registration point.
+				wrapper = new Sprite();
+				wrapper.transform.colorTransform = new ColorTransform();
+				wrapper.addChild(bitmap);
+				wrappers[regionAttachment] = wrapper;
 			}
+
+			wrapper.blendMode = blendModes[slot.data.blendMode.ordinal];
+
+			var colorTransform:ColorTransform = wrapper.transform.colorTransform;
+			colorTransform.redMultiplier = skeleton.r * slot.r * regionAttachment.r;
+			colorTransform.greenMultiplier = skeleton.g * slot.g * regionAttachment.g;
+			colorTransform.blueMultiplier = skeleton.b * slot.b * regionAttachment.b;
+			colorTransform.alphaMultiplier = skeleton.a * slot.a * regionAttachment.a;
+			wrapper.transform.colorTransform = colorTransform;
+
+			var bone:Bone = slot.bone;
+			var flipX:int = skeleton.flipX ? -1 : 1;
+			var flipY:int = skeleton.flipY ? -1 : 1;
+
+			wrapper.x = bone.worldX;
+			wrapper.y = bone.worldY;
+			wrapper.rotation = bone.worldRotationX * flipX * flipY;
+			wrapper.scaleX = bone.worldScaleX * flipX;
+			wrapper.scaleY = bone.worldScaleY * flipY;
+			addChild(wrapper);
 		}
 	}
 
