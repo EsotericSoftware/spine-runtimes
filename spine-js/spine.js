@@ -2346,7 +2346,7 @@ spine.SkeletonJson.prototype = {
 					drawOrder = new spine.Uint32Array(slotCount);
 					drawOrder.length = slotCount;
 					for (var ii = slotCount - 1; ii >= 0; ii--)
-						drawOrder[ii] = -1;
+						drawOrder[ii] = 4294967295;
 					var offsets = drawOrderMap["offsets"];
 					var unchanged = new spine.Uint32Array(slotCount - offsets.length);
 					unchanged.length = slotCount - offsets.length;
@@ -2366,7 +2366,7 @@ spine.SkeletonJson.prototype = {
 						unchanged[unchangedIndex++] = originalIndex++;
 					// Fill in unchanged items.
 					for (var ii = slotCount - 1; ii >= 0; ii--)
-						if (drawOrder[ii] == -1) drawOrder[ii] = unchanged[--unchangedIndex];
+						if (drawOrder[ii] == 4294967295) drawOrder[ii] = unchanged[--unchangedIndex];
 				}
 				timeline.setFrame(frameIndex++, drawOrderMap["time"], drawOrder);
 			}
