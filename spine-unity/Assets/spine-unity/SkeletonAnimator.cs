@@ -1,9 +1,9 @@
-
-
 /*****************************************************************************
  * SkeletonAnimator created by Mitch Thompson
  * Full irrevocable rights and permissions granted to Esoteric Software
 *****************************************************************************/
+//#define USE_SPINE_EVENTS // Uncomment this define to use C# events to handle Spine events. (Does not disable Unity AnimationClip Events)
+
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -33,16 +33,20 @@ namespace Spine.Unity {
 		protected event UpdateBonesDelegate _UpdateWorld;
 		protected event UpdateBonesDelegate _UpdateComplete;
 
-		public Skeleton Skeleton {
-			get {
-				return this.skeleton;
-			}
-		}
+		public Skeleton Skeleton { get { return this.skeleton; } }
 
 		readonly Dictionary<int, Spine.Animation> animationTable = new Dictionary<int, Spine.Animation>();
 		readonly Dictionary<AnimationClip, int> clipNameHashCodeTable = new Dictionary<AnimationClip, int>();
 		Animator animator;
 		float lastTime;
+
+		#if USE_SPINE_EVENTS
+		public delegate void SkeletonAnimatorEventDelegate (Spine.Event firedEvent);
+		public event SkeletonAnimatorEventDelegate AnimationEvent;
+		public readonly ExposedList<Spine.Event> events = new ExposedList<Spine.Event>();
+		#else
+		public readonly ExposedList<Spine.Event> events = null;
+		#endif
 
 		public override void Initialize (bool overwrite) {
 			if (valid && !overwrite)
@@ -108,7 +112,7 @@ namespace Spine.Unity {
 							continue;
 
 						float time = stateInfo.normalizedTime * info.clip.length;
-						animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null, weight);
+						animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, events, weight);
 					}
 					#if UNITY_5
 					if (nextStateInfo.fullPathHash != 0) {
@@ -122,7 +126,7 @@ namespace Spine.Unity {
 								continue;
 
 							float time = nextStateInfo.normalizedTime * info.clip.length;
-							animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null, weight);
+							animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, events, weight);
 						}
 					}
 				} else if (mode >= MixMode.MixNext) {
@@ -136,7 +140,7 @@ namespace Spine.Unity {
 							continue;
 
 						float time = stateInfo.normalizedTime * info.clip.length;
-						animationTable[GetAnimationClipNameHashCode(info.clip)].Apply(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null);
+						animationTable[GetAnimationClipNameHashCode(info.clip)].Apply(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, events);
 						break;
 					}
 
@@ -148,7 +152,7 @@ namespace Spine.Unity {
 							continue;
 
 						float time = stateInfo.normalizedTime * info.clip.length;
-						animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, null, weight);
+						animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, events, weight);
 					}
 
 					c = 0;
@@ -166,7 +170,7 @@ namespace Spine.Unity {
 									continue;
 
 								float time = nextStateInfo.normalizedTime * info.clip.length;
-								animationTable[GetAnimationClipNameHashCode(info.clip)].Apply(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null);
+								animationTable[GetAnimationClipNameHashCode(info.clip)].Apply(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, events);
 								break;
 							}
 						}
@@ -179,11 +183,23 @@ namespace Spine.Unity {
 								continue;
 
 							float time = nextStateInfo.normalizedTime * info.clip.length;
-							animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, null, weight);
+							animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, events, weight);
 						}
 					}
 				}
 			}
+
+			#if USE_SPINE_EVENTS
+			int eventsCount = events.Count;
+			if (eventsCount > 0) {
+				var eventsItems = events.Items;
+				for (int i = 0; i < eventsCount; i++) {
+					if (AnimationEvent != null)
+						AnimationEvent(eventsItems[i]);
+				}
+				events.Clear(false);
+			}
+			#endif
 
 			if (_UpdateLocal != null)
 				_UpdateLocal(this);
