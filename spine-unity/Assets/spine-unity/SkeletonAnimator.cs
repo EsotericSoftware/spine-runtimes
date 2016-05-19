@@ -41,7 +41,7 @@ namespace Spine.Unity {
 		float lastTime;
 
 		#if USE_SPINE_EVENTS
-		public delegate void SkeletonAnimatorEventDelegate (Spine.Event firedEvent);
+		public delegate void SkeletonAnimatorEventDelegate (Spine.Event firedEvent, float weight);
 		public event SkeletonAnimatorEventDelegate AnimationEvent;
 		public readonly ExposedList<Spine.Event> events = new ExposedList<Spine.Event>();
 		#else
@@ -113,6 +113,9 @@ namespace Spine.Unity {
 
 						float time = stateInfo.normalizedTime * info.clip.length;
 						animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, events, weight);
+						#if USE_SPINE_EVENTS
+						FireEvents(events, weight, this.AnimationEvent);
+						#endif
 					}
 					#if UNITY_5
 					if (nextStateInfo.fullPathHash != 0) {
@@ -127,6 +130,9 @@ namespace Spine.Unity {
 
 							float time = nextStateInfo.normalizedTime * info.clip.length;
 							animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, events, weight);
+							#if USE_SPINE_EVENTS
+							FireEvents(events, weight, this.AnimationEvent);
+							#endif
 						}
 					}
 				} else if (mode >= MixMode.MixNext) {
@@ -141,6 +147,9 @@ namespace Spine.Unity {
 
 						float time = stateInfo.normalizedTime * info.clip.length;
 						animationTable[GetAnimationClipNameHashCode(info.clip)].Apply(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, events);
+						#if USE_SPINE_EVENTS
+						FireEvents(events, weight, this.AnimationEvent);
+						#endif
 						break;
 					}
 
@@ -153,6 +162,9 @@ namespace Spine.Unity {
 
 						float time = stateInfo.normalizedTime * info.clip.length;
 						animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, stateInfo.loop, events, weight);
+						#if USE_SPINE_EVENTS
+						FireEvents(events, weight, this.AnimationEvent);
+						#endif
 					}
 
 					c = 0;
@@ -171,6 +183,9 @@ namespace Spine.Unity {
 
 								float time = nextStateInfo.normalizedTime * info.clip.length;
 								animationTable[GetAnimationClipNameHashCode(info.clip)].Apply(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, events);
+								#if USE_SPINE_EVENTS
+								FireEvents(events, weight, this.AnimationEvent);
+								#endif
 								break;
 							}
 						}
@@ -184,22 +199,13 @@ namespace Spine.Unity {
 
 							float time = nextStateInfo.normalizedTime * info.clip.length;
 							animationTable[GetAnimationClipNameHashCode(info.clip)].Mix(skeleton, Mathf.Max(0, time - deltaTime), time, nextStateInfo.loop, events, weight);
+							#if USE_SPINE_EVENTS
+							FireEvents(events, weight, this.AnimationEvent);
+							#endif
 						}
 					}
 				}
 			}
-
-			#if USE_SPINE_EVENTS
-			int eventsCount = events.Count;
-			if (eventsCount > 0) {
-				var eventsItems = events.Items;
-				for (int i = 0; i < eventsCount; i++) {
-					if (AnimationEvent != null)
-						AnimationEvent(eventsItems[i]);
-				}
-				events.Clear(false);
-			}
-			#endif
 
 			if (_UpdateLocal != null)
 				_UpdateLocal(this);
@@ -227,5 +233,20 @@ namespace Spine.Unity {
 
 			return clipNameHashCode;
 		}
+
+		#if USE_SPINE_EVENTS
+		static void FireEvents (ExposedList<Spine.Event> eventList, float weight, SkeletonAnimatorEventDelegate callback) {
+			int eventsCount = eventList.Count;
+			if (eventsCount > 0) {
+				var eventListItems = eventList.Items;
+				for (int i = 0; i < eventsCount; i++) {
+					if (callback != null)
+						callback(eventListItems[i], weight);
+				}
+
+				eventList.Clear(false);
+			}
+		}
+		#endif
 	}
 }
