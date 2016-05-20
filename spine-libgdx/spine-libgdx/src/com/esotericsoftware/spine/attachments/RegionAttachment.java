@@ -152,10 +152,10 @@ public class RegionAttachment extends Attachment {
 		Color skeletonColor = skeleton.getColor();
 		Color slotColor = slot.getColor();
 		Color regionColor = color;
-		float a = skeletonColor.a * slotColor.a * regionColor.a * 255;
-		float multiplier = premultipliedAlpha ? a : 255;
+		float alpha = skeletonColor.a * slotColor.a * regionColor.a * 255;
+		float multiplier = premultipliedAlpha ? alpha : 255;
 		float color = NumberUtils.intToFloatColor( //
-			((int)a << 24) //
+			((int)alpha << 24) //
 				| ((int)(skeletonColor.b * slotColor.b * regionColor.b * multiplier) << 16) //
 				| ((int)(skeletonColor.g * slotColor.g * regionColor.g * multiplier) << 8) //
 				| (int)(skeletonColor.r * slotColor.r * regionColor.r * multiplier));
@@ -164,31 +164,31 @@ public class RegionAttachment extends Attachment {
 		float[] offset = this.offset;
 		Bone bone = slot.getBone();
 		float x = skeleton.getX() + bone.getWorldX(), y = skeleton.getY() + bone.getWorldY();
-		float m00 = bone.getA(), m01 = bone.getB(), m10 = bone.getC(), m11 = bone.getD();
+		float a = bone.getA(), b = bone.getB(), c = bone.getC(), d = bone.getD();
 		float offsetX, offsetY;
 
 		offsetX = offset[BRX];
 		offsetY = offset[BRY];
-		vertices[X1] = offsetX * m00 + offsetY * m01 + x; // br
-		vertices[Y1] = offsetX * m10 + offsetY * m11 + y;
+		vertices[X1] = offsetX * a + offsetY * b + x; // br
+		vertices[Y1] = offsetX * c + offsetY * d + y;
 		vertices[C1] = color;
 
 		offsetX = offset[BLX];
 		offsetY = offset[BLY];
-		vertices[X2] = offsetX * m00 + offsetY * m01 + x; // bl
-		vertices[Y2] = offsetX * m10 + offsetY * m11 + y;
+		vertices[X2] = offsetX * a + offsetY * b + x; // bl
+		vertices[Y2] = offsetX * c + offsetY * d + y;
 		vertices[C2] = color;
 
 		offsetX = offset[ULX];
 		offsetY = offset[ULY];
-		vertices[X3] = offsetX * m00 + offsetY * m01 + x; // ul
-		vertices[Y3] = offsetX * m10 + offsetY * m11 + y;
+		vertices[X3] = offsetX * a + offsetY * b + x; // ul
+		vertices[Y3] = offsetX * c + offsetY * d + y;
 		vertices[C3] = color;
 
 		offsetX = offset[URX];
 		offsetY = offset[URY];
-		vertices[X4] = offsetX * m00 + offsetY * m01 + x; // ur
-		vertices[Y4] = offsetX * m10 + offsetY * m11 + y;
+		vertices[X4] = offsetX * a + offsetY * b + x; // ur
+		vertices[Y4] = offsetX * c + offsetY * d + y;
 		vertices[C4] = color;
 		return vertices;
 	}

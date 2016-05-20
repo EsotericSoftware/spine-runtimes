@@ -37,7 +37,6 @@ import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
-import com.esotericsoftware.spine.attachments.WeightedMeshAttachment;
 
 public class Skeleton {
 	final SkeletonData data;
@@ -46,6 +45,7 @@ public class Skeleton {
 	Array<Slot> drawOrder;
 	final Array<IkConstraint> ikConstraints;
 	final Array<TransformConstraint> transformConstraints;
+	final Array<PathConstraint> pathConstraints;
 	private final Array<Updatable> updateCache = new Array();
 	Skin skin;
 	final Color color;
@@ -59,14 +59,21 @@ public class Skeleton {
 
 		bones = new Array(data.bones.size);
 		for (BoneData boneData : data.bones) {
-			Bone parent = boneData.parent == null ? null : bones.get(data.bones.indexOf(boneData.parent, true));
-			bones.add(new Bone(boneData, this, parent));
+			Bone bone;
+			if (boneData.parent == null)
+				bone = new Bone(boneData, this, null);
+			else {
+				Bone parent = bones.get(boneData.parent.index);
+				bone = new Bone(boneData, this, parent);
+				parent.children.add(bone);
+			}
+			bones.add(bone);
 		}
 
 		slots = new Array(data.slots.size);
 		drawOrder = new Array(data.slots.size);
 		for (SlotData slotData : data.slots) {
-			Bone bone = bones.get(data.bones.indexOf(slotData.boneData, true));
+			Bone bone = bones.get(slotData.boneData.index);
 			Slot slot = new Slot(slotData, bone);
 			slots.add(slot);
 			drawOrder.add(slot);
@@ -80,6 +87,10 @@ public class Skeleton {
 		for (TransformConstraintData transformConstraintData : data.transformConstraints)
 			transformConstraints.add(new TransformConstraint(transformConstraintData, this));
 
+		pathConstraints = new Array(data.pathConstraints.size);
+		for (PathConstraintData pathConstraintData : data.pathConstraints)
+			pathConstraints.add(new PathConstraint(pathConstraintData, this));
+
 		color = new Color(1, 1, 1, 1);
 
 		updateCache();
@@ -92,19 +103,19 @@ public class Skeleton {
 
 		bones = new Array(skeleton.bones.size);
 		for (Bone bone : skeleton.bones) {
-			Bone parent = bone.parent == null ? null : bones.get(skeleton.bones.indexOf(bone.parent, true));
+			Bone parent = bone.parent == null ? null : bones.get(bone.parent.data.index);
 			bones.add(new Bone(bone, this, parent));
 		}
 
 		slots = new Array(skeleton.slots.size);
 		for (Slot slot : skeleton.slots) {
-			Bone bone = bones.get(skeleton.bones.indexOf(slot.bone, true));
+			Bone bone = bones.get(slot.bone.data.index);
 			slots.add(new Slot(slot, bone));
 		}
 
 		drawOrder = new Array(slots.size);
 		for (Slot slot : skeleton.drawOrder)
-			drawOrder.add(slots.get(skeleton.slots.indexOf(slot, true)));
+			drawOrder.add(slots.get(slot.data.index));
 
 		ikConstraints = new Array(skeleton.ikConstraints.size);
 		for (IkConstraint ikConstraint : skeleton.ikConstraints)
@@ -113,6 +124,10 @@ public class Skeleton {
 		transformConstraints = new Array(skeleton.transformConstraints.size);
 		for (TransformConstraint transformConstraint : skeleton.transformConstraints)
 			transformConstraints.add(new TransformConstraint(transformConstraint, this));
+
+		pathConstraints = new Array(skeleton.pathConstraints.size);
+		for (PathConstraint pathConstraint : skeleton.pathConstraints)
+			pathConstraints.add(new PathConstraint(pathConstraint, this));
 
 		skin = skeleton.skin;
 		color = new Color(skeleton.color);
@@ -129,8 +144,8 @@ public class Skeleton {
 		Array<Updatable> updateCache = this.updateCache;
 		Array<IkConstraint> ikConstraints = this.ikConstraints;
 		Array<TransformConstraint> transformConstraints = this.transformConstraints;
+		Array<PathConstraint> pathConstraints = this.pathConstraints;
 		int ikConstraintsCount = ikConstraints.size;
-		int transformConstraintsCount = transformConstraints.size;
 		updateCache.clear();
 
 		for (int i = 0, n = bones.size; i < n; i++) {
@@ -145,10 +160,22 @@ public class Skeleton {
 			}
 		}
 
-		for (int i = 0; i < transformConstraintsCount; i++) {
-			TransformConstraint transformConstraint = transformConstraints.get(i);
+		for (int i = 0, n = pathConstraints.size; i < n; i++) {
+			PathConstraint pathConstraint = pathConstraints.get(i);
+			Bone bone = pathConstraint.bone;
 			for (int ii = updateCache.size - 1; ii >= 0; ii--) {
-				if (updateCache.get(ii) == transformConstraint.bone) {
+				if (updateCache.get(ii) == bone) {
+					updateCache.insert(ii + 1, pathConstraint);
+					break;
+				}
+			}
+		}
+
+		for (int i = 0, n = transformConstraints.size; i < n; i++) {
+			TransformConstraint transformConstraint = transformConstraints.get(i);
+			Bone bone = transformConstraint.bone;
+			for (int ii = updateCache.size - 1; ii >= 0; ii--) {
+				if (updateCache.get(ii) == bone) {
 					updateCache.insert(ii + 1, transformConstraint);
 					break;
 				}
@@ -191,13 +218,22 @@ public class Skeleton {
 			constraint.scaleMix = data.scaleMix;
 			constraint.shearMix = data.shearMix;
 		}
+
+		Array<PathConstraint> pathConstraints = this.pathConstraints;
+		for (int i = 0, n = pathConstraints.size; i < n; i++) {
+			PathConstraint constraint = pathConstraints.get(i);
+			PathConstraintData data = constraint.data;
+			constraint.position = data.position;
+			constraint.rotateMix = data.rotateMix;
+			constraint.translateMix = data.translateMix;
+		}
 	}
 
 	public void setSlotsToSetupPose () {
 		Array<Slot> slots = this.slots;
 		System.arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
 		for (int i = 0, n = slots.size; i < n; i++)
-			slots.get(i).setToSetupPose(i);
+			slots.get(i).setToSetupPose();
 	}
 
 	public SkeletonData getData () {
@@ -370,6 +406,21 @@ public class Skeleton {
 		return null;
 	}
 
+	public Array<PathConstraint> getPathConstraints () {
+		return pathConstraints;
+	}
+
+	/** @return May be null. */
+	public PathConstraint findPathConstraint (String constraintName) {
+		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
+		Array<PathConstraint> pathConstraints = this.pathConstraints;
+		for (int i = 0, n = pathConstraints.size; i < n; i++) {
+			PathConstraint constraint = pathConstraints.get(i);
+			if (constraint.data.name.equals(constraintName)) return constraint;
+		}
+		return null;
+	}
+
 	/** Returns the axis aligned bounding box (AABB) of the region, mesh, and skinned mesh attachments for the current pose.
 	 * @param offset The distance from the skeleton origin to the bottom left corner of the AABB.
 	 * @param size The width and height of the AABB. */
@@ -382,12 +433,8 @@ public class Skeleton {
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
 				vertices = ((RegionAttachment)attachment).updateWorldVertices(slot, false);
-
 			} else if (attachment instanceof MeshAttachment) {
 				vertices = ((MeshAttachment)attachment).updateWorldVertices(slot, true);
-
-			} else if (attachment instanceof WeightedMeshAttachment) {
-				vertices = ((WeightedMeshAttachment)attachment).updateWorldVertices(slot, true);
 			}
 			if (vertices != null) {
 				for (int ii = 0, nn = vertices.length; ii < nn; ii += 5) {

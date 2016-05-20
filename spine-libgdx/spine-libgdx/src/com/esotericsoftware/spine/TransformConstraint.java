@@ -9,20 +9,14 @@ public class TransformConstraint implements Updatable {
 	final TransformConstraintData data;
 	Bone bone, target;
 	float rotateMix, translateMix, scaleMix, shearMix;
-	float offsetRotation, offsetX, offsetY, offsetScaleX, offsetScaleY, offsetShearY;
 	final Vector2 temp = new Vector2();
 
 	public TransformConstraint (TransformConstraintData data, Skeleton skeleton) {
 		this.data = data;
-		translateMix = data.translateMix;
 		rotateMix = data.rotateMix;
+		translateMix = data.translateMix;
 		scaleMix = data.scaleMix;
 		shearMix = data.shearMix;
-		offsetX = data.offsetX;
-		offsetY = data.offsetY;
-		offsetScaleX = data.offsetScaleX;
-		offsetScaleY = data.offsetScaleY;
-		offsetShearY = data.offsetShearY;
 
 		if (skeleton != null) {
 			bone = skeleton.findBone(data.bone.name);
@@ -33,17 +27,12 @@ public class TransformConstraint implements Updatable {
 	/** Copy constructor. */
 	public TransformConstraint (TransformConstraint constraint, Skeleton skeleton) {
 		data = constraint.data;
-		bone = skeleton.bones.get(constraint.bone.skeleton.bones.indexOf(constraint.bone, true));
-		target = skeleton.bones.get(constraint.target.skeleton.bones.indexOf(constraint.target, true));
-		translateMix = constraint.translateMix;
+		bone = skeleton.bones.get(constraint.bone.data.index);
+		target = skeleton.bones.get(constraint.target.data.index);
 		rotateMix = constraint.rotateMix;
+		translateMix = constraint.translateMix;
 		scaleMix = constraint.scaleMix;
 		shearMix = constraint.shearMix;
-		offsetX = constraint.offsetX;
-		offsetY = constraint.offsetY;
-		offsetScaleX = constraint.offsetScaleX;
-		offsetScaleY = constraint.offsetScaleY;
-		offsetShearY = constraint.offsetShearY;
 	}
 
 	public void apply () {
@@ -56,7 +45,7 @@ public class TransformConstraint implements Updatable {
 
 		if (rotateMix > 0) {
 			float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-			float r = atan2(target.c, target.a) - atan2(c, a) + offsetRotation * degRad;
+			float r = atan2(target.c, target.a) - atan2(c, a) + data.offsetRotation * degRad;
 			if (r > PI)
 				r -= PI2;
 			else if (r < -PI) r += PI2;
@@ -71,12 +60,12 @@ public class TransformConstraint implements Updatable {
 		if (scaleMix > 0) {
 			float bs = (float)Math.sqrt(bone.a * bone.a + bone.c * bone.c);
 			float ts = (float)Math.sqrt(target.a * target.a + target.c * target.c);
-			float s = bs > 0.00001f ? (bs + (ts - bs + offsetScaleX) * scaleMix) / bs : 0;
+			float s = bs > 0.00001f ? (bs + (ts - bs + data.offsetScaleX) * scaleMix) / bs : 0;
 			bone.a *= s;
 			bone.c *= s;
 			bs = (float)Math.sqrt(bone.b * bone.b + bone.d * bone.d);
 			ts = (float)Math.sqrt(target.b * target.b + target.d * target.d);
-			s = bs > 0.00001f ? (bs + (ts - bs + offsetScaleY) * scaleMix) / bs : 0;
+			s = bs > 0.00001f ? (bs + (ts - bs + data.offsetScaleY) * scaleMix) / bs : 0;
 			bone.b *= s;
 			bone.d *= s;
 		}
@@ -88,7 +77,7 @@ public class TransformConstraint implements Updatable {
 			if (r > PI)
 				r -= PI2;
 			else if (r < -PI) r += PI2;
-			r = by + (r + offsetShearY * degRad) * shearMix;
+			r = by + (r + data.offsetShearY * degRad) * shearMix;
 			float s = (float)Math.sqrt(b * b + d * d);
 			bone.b = cos(r) * s;
 			bone.d = sin(r) * s;
@@ -97,7 +86,7 @@ public class TransformConstraint implements Updatable {
 		float translateMix = this.translateMix;
 		if (translateMix > 0) {
 			Vector2 temp = this.temp;
-			target.localToWorld(temp.set(offsetX, offsetY));
+			target.localToWorld(temp.set(data.offsetX, data.offsetY));
 			bone.worldX += (temp.x - bone.worldX) * translateMix;
 			bone.worldY += (temp.y - bone.worldY) * translateMix;
 		}
@@ -149,54 +138,6 @@ public class TransformConstraint implements Updatable {
 
 	public void setShearMix (float shearMix) {
 		this.shearMix = shearMix;
-	}
-
-	public float getOffsetRotation () {
-		return offsetRotation;
-	}
-
-	public void setOffsetRotation (float offsetRotation) {
-		this.offsetRotation = offsetRotation;
-	}
-
-	public float getOffsetX () {
-		return offsetX;
-	}
-
-	public void setOffsetX (float offsetX) {
-		this.offsetX = offsetX;
-	}
-
-	public float getOffsetY () {
-		return offsetY;
-	}
-
-	public void setOffsetY (float offsetY) {
-		this.offsetY = offsetY;
-	}
-
-	public float getOffsetScaleX () {
-		return offsetScaleX;
-	}
-
-	public void setOffsetScaleX (float offsetScaleX) {
-		this.offsetScaleX = offsetScaleX;
-	}
-
-	public float getOffsetScaleY () {
-		return offsetScaleY;
-	}
-
-	public void setOffsetScaleY (float offsetScaleY) {
-		this.offsetScaleY = offsetScaleY;
-	}
-
-	public float getOffsetShearY () {
-		return offsetShearY;
-	}
-
-	public void setOffsetShearY (float offsetShearY) {
-		this.offsetShearY = offsetShearY;
 	}
 
 	public TransformConstraintData getData () {

@@ -34,20 +34,17 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.graphics.Color;
 
 public class SlotData {
+	final int index;
 	final String name;
 	final BoneData boneData;
 	final Color color = new Color(1, 1, 1, 1);
 	String attachmentName;
 	BlendMode blendMode;
 
-	SlotData () {
-		name = null;
-		boneData = null;
-	}
-
-	public SlotData (String name, BoneData boneData) {
+	public SlotData (int index, String name, BoneData boneData) {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		if (boneData == null) throw new IllegalArgumentException("boneData cannot be null.");
+		this.index = index;
 		this.name = name;
 		this.boneData = boneData;
 	}

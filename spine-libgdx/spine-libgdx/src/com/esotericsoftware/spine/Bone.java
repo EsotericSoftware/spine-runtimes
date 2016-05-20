@@ -36,23 +36,19 @@ import static com.badlogic.gdx.math.Matrix3.*;
 
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 public class Bone implements Updatable {
 	final BoneData data;
 	final Skeleton skeleton;
 	final Bone parent;
+	final Array<Bone> children = new Array();
 	float x, y, rotation, scaleX, scaleY, shearX, shearY;
 	float appliedRotation, appliedScaleX, appliedScaleY;
 
 	float a, b, worldX;
 	float c, d, worldY;
 	float worldSignX, worldSignY;
-
-	Bone (BoneData data) {
-		this.data = data;
-		parent = null;
-		skeleton = null;
-	}
 
 	/** @param parent May be null. */
 	public Bone (BoneData data, Skeleton skeleton, Bone parent) {
@@ -228,6 +224,10 @@ public class Bone implements Updatable {
 
 	public Bone getParent () {
 		return parent;
+	}
+
+	public Array<Bone> getChildren () {
+		return children;
 	}
 
 	public float getX () {

@@ -60,8 +60,8 @@ public class IkConstraint implements Updatable {
 		data = ikConstraint.data;
 		bones = new Array(ikConstraint.bones.size);
 		for (Bone bone : ikConstraint.bones)
-			bones.add(skeleton.bones.get(bone.skeleton.bones.indexOf(bone, true)));
-		target = skeleton.bones.get(ikConstraint.target.skeleton.bones.indexOf(ikConstraint.target, true));
+			bones.add(skeleton.bones.get(bone.data.index));
+		target = skeleton.bones.get(ikConstraint.target.data.index);
 		mix = ikConstraint.mix;
 		bendDirection = ikConstraint.bendDirection;
 	}

@@ -43,6 +43,7 @@ public class SkeletonData {
 	final Array<Animation> animations = new Array();
 	final Array<IkConstraintData> ikConstraints = new Array();
 	final Array<TransformConstraintData> transformConstraints = new Array();
+	final Array<PathConstraintData> pathConstraints = new Array();
 	float width, height;
 	String version, hash, imagesPath;
 
@@ -183,6 +184,23 @@ public class SkeletonData {
 		Array<TransformConstraintData> transformConstraints = this.transformConstraints;
 		for (int i = 0, n = transformConstraints.size; i < n; i++) {
 			TransformConstraintData constraint = transformConstraints.get(i);
+			if (constraint.name.equals(constraintName)) return constraint;
+		}
+		return null;
+	}
+
+	// --- Path constraints
+
+	public Array<PathConstraintData> getPathConstraints () {
+		return pathConstraints;
+	}
+
+	/** @return May be null. */
+	public PathConstraintData findPathConstraint (String constraintName) {
+		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
+		Array<PathConstraintData> pathConstraints = this.pathConstraints;
+		for (int i = 0, n = pathConstraints.size; i < n; i++) {
+			PathConstraintData constraint = pathConstraints.get(i);
 			if (constraint.name.equals(constraintName)) return constraint;
 		}
 		return null;

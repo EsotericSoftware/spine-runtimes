@@ -32,7 +32,7 @@
 package com.esotericsoftware.spine.attachments;
 
 public enum AttachmentType {
-	region, boundingbox, mesh, weightedmesh, linkedmesh, weightedlinkedmesh;
+	region, boundingbox, mesh, linkedmesh, path;
 
 	static public AttachmentType[] values = values();
 }

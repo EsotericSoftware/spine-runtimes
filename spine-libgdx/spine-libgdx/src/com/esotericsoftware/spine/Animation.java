@@ -36,7 +36,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.esotericsoftware.spine.attachments.Attachment;
-import com.esotericsoftware.spine.attachments.FfdAttachment;
+import com.esotericsoftware.spine.attachments.VertexAttachment;
 
 public class Animation {
 	final String name;
@@ -654,13 +654,13 @@ public class Animation {
 		}
 	}
 
-	static public class FfdTimeline extends CurveTimeline {
+	static public class DeformTimeline extends CurveTimeline {
 		private final float[] frames; // time, ...
 		private final float[][] frameVertices;
 		int slotIndex;
-		Attachment attachment;
+		VertexAttachment attachment;
 
-		public FfdTimeline (int frameCount) {
+		public DeformTimeline (int frameCount) {
 			super(frameCount);
 			frames = new float[frameCount];
 			frameVertices = new float[frameCount][];
@@ -674,7 +674,7 @@ public class Animation {
 			return slotIndex;
 		}
 
-		public void setAttachment (Attachment attachment) {
+		public void setAttachment (VertexAttachment attachment) {
 			this.attachment = attachment;
 		}
 
@@ -699,7 +699,7 @@ public class Animation {
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha) {
 			Slot slot = skeleton.slots.get(slotIndex);
 			Attachment slotAttachment = slot.getAttachment();
-			if (!(slotAttachment instanceof FfdAttachment) || !((FfdAttachment)slotAttachment).applyFFD(attachment)) return;
+			if (!(slotAttachment instanceof VertexAttachment) || !((VertexAttachment)slotAttachment).applyDeform(attachment)) return;
 
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
@@ -709,10 +709,7 @@ public class Animation {
 
 			FloatArray verticesArray = slot.getAttachmentVertices();
 			if (verticesArray.size != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
-			verticesArray.size = 0;
-			verticesArray.ensureCapacity(vertexCount);
-			verticesArray.size = vertexCount;
-			float[] vertices = verticesArray.items;
+			float[] vertices = verticesArray.setSize(vertexCount);
 
 			if (time >= frames[frames.length - 1]) { // Time is after last frame.
 				float[] lastVertices = frameVertices[frames.length - 1];
@@ -760,8 +757,8 @@ public class Animation {
 			frames = new float[frameCount * 3];
 		}
 
-		public void setIkConstraintIndex (int ikConstraint) {
-			this.ikConstraintIndex = ikConstraint;
+		public void setIkConstraintIndex (int index) {
+			this.ikConstraintIndex = index;
 		}
 
 		public int getIkConstraintIndex () {
@@ -823,8 +820,8 @@ public class Animation {
 			frames = new float[frameCount * 5];
 		}
 
-		public void setTransformConstraintIndex (int ikConstraint) {
-			this.transformConstraintIndex = ikConstraint;
+		public void setTransformConstraintIndex (int index) {
+			this.transformConstraintIndex = index;
 		}
 
 		public int getTransformConstraintIndex () {
@@ -875,6 +872,74 @@ public class Animation {
 				* alpha;
 			constraint.scaleMix += (scale + (frames[frame + SCALE_MIX] - scale) * percent - constraint.scaleMix) * alpha;
 			constraint.shearMix += (shear + (frames[frame + SHEAR_MIX] - shear) * percent - constraint.shearMix) * alpha;
+		}
+	}
+
+	static public class PathConstraintTimeline extends CurveTimeline {
+		static private final int PREV_TIME = -4;
+		static private final int PREV_POSITION = -3;
+		static private final int PREV_ROTATE_MIX = -2;
+		static private final int PREV_TRANSLATE_MIX = -1;
+		static private final int POSITION = 1;
+		static private final int ROTATE_MIX = 2;
+		static private final int TRANSLATE_MIX = 3;
+
+		int pathConstraintIndex;
+		private final float[] frames; // time, rotate mix, translate mix, scale mix, shear mix, ...
+
+		public PathConstraintTimeline (int frameCount) {
+			super(frameCount);
+			frames = new float[frameCount * 4];
+		}
+
+		public void setPathConstraintIndex (int index) {
+			this.pathConstraintIndex = index;
+		}
+
+		public int getPathConstraintIndex () {
+			return pathConstraintIndex;
+		}
+
+		public float[] getFrames () {
+			return frames;
+		}
+
+		/** Sets the time, position, and mixes of the specified keyframe. */
+		public void setFrame (int frameIndex, float time, float position, float rotateMix, float translateMix) {
+			frameIndex *= 4;
+			frames[frameIndex] = time;
+			frames[frameIndex + 1] = position;
+			frames[frameIndex + 2] = rotateMix;
+			frames[frameIndex + 3] = translateMix;
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha) {
+			float[] frames = this.frames;
+			if (time < frames[0]) return; // Time is before first frame.
+
+			PathConstraint constraint = skeleton.pathConstraints.get(pathConstraintIndex);
+
+			if (time >= frames[frames.length - 4]) { // Time is after last frame.
+				int i = frames.length - 1;
+				constraint.position += (frames[i - 2] - constraint.position) * alpha;
+				constraint.rotateMix += (frames[i - 1] - constraint.rotateMix) * alpha;
+				constraint.translateMix += (frames[i] - constraint.translateMix) * alpha;
+				return;
+			}
+
+			// Interpolate between the previous frame and the current frame.
+			int frame = binarySearch(frames, time, 4);
+			float frameTime = frames[frame];
+			float percent = MathUtils.clamp(1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime), 0, 1);
+			percent = getCurvePercent(frame / 4 - 1, percent);
+
+			float position = frames[frame + PREV_POSITION];
+			float rotate = frames[frame + PREV_ROTATE_MIX];
+			float translate = frames[frame + PREV_TRANSLATE_MIX];
+			constraint.position += (position + (frames[frame + POSITION] - position) * percent - constraint.position) * alpha;
+			constraint.rotateMix += (rotate + (frames[frame + ROTATE_MIX] - rotate) * percent - constraint.rotateMix) * alpha;
+			constraint.translateMix += (translate + (frames[frame + TRANSLATE_MIX] - translate) * percent - constraint.translateMix)
+				* alpha;
 		}
 	}
 }
