@@ -979,7 +979,8 @@ spine.FfdTimeline.prototype = {
 	apply: function (skeleton, lastTime, time, firedEvents, alpha) {
 		var slot = skeleton.slots[this.slotIndex];
 		var slotAttachment = slot.attachment;
-		if (slotAttachment != this.attachment && (!slotAttachment.inheritFFD || slotAttachment.parentMesh != sourceAttachment)) return;
+		if (!slotAttachment) return;
+		if (slotAttachment != this.attachment && (!slotAttachment.inheritFFD || slotAttachment.parentMesh != this.attachment)) return;
 
 		var frames = this.frames;
 		if (time < frames[0]) return; // Time is before first frame.
