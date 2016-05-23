@@ -99,7 +99,7 @@ public class VertexAttachment extends Attachment {
 
 	/** Returns true if a deform originally applied to the specified attachment should be applied to this attachment. */
 	public boolean applyDeform (VertexAttachment sourceAttachment) {
-		return true;
+		return this == sourceAttachment;
 	}
 
 	/** @return May be null if this attachment has no weights. */

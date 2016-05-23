@@ -38,9 +38,8 @@ import com.esotericsoftware.spine.Slot;
 public class PathAttachment extends VertexAttachment {
 	// Nonessential.
 	final Color color = new Color(1, 0.5f, 0, 1);
-	final Vector2 temp = new Vector2();
+
 	float[] worldVertices, lengths;
-	int totalLength;
 	boolean closed;
 
 	public PathAttachment (String name) {
@@ -51,98 +50,115 @@ public class PathAttachment extends VertexAttachment {
 		super.computeWorldVertices(slot, worldVertices);
 	}
 
-	public Vector2 computeWorldPosition (Slot slot, float position) {
+	public void computeWorldPosition (Slot slot, float position, Vector2 out) {
+		// BOZO - Remove check?
+		if (worldVerticesLength < 12) return;
+
 		float[] worldVertices = this.worldVertices;
 		super.computeWorldVertices(slot, worldVertices);
 
+		// Determine curve containing position.
+		float pathLength = pathLengths(worldVertices);
+		float[] lengths = this.lengths;
+		float target = pathLength * position, distance = 0, t = 0;
 		int curve = 0;
-		float t = 0;
-		if (closed) {
-			// BOZO - closed boolean used to turn off fancy calculations for now.
-			int curves = (worldVerticesLength >> 2) - 1;
-			curve = position < 1 ? (int)(curves * position) : curves - 1;
-			t = (position - curve / (float)curves) * curves;
-		} else {
-			// Compute lengths of all curves.
-			totalLength = 0;
-			float[] lengths = this.lengths;
-			float x1 = worldVertices[0], y1 = worldVertices[1];
-			float cx1 = x1 + (x1 - worldVertices[2]), cy1 = y1 + (y1 - worldVertices[3]);
-			for (int i = 0, w = 4, n = worldVerticesLength; w < n; i += 6, w += 4) {
-				float x2 = worldVertices[w], y2 = worldVertices[w + 1];
-				float cx2 = worldVertices[w + 2], cy2 = worldVertices[w + 3];
-				addLengths(i, x1, y1, cx1, cy1, cx2, cy2, x2, y2);
-				x1 = x2;
-				y1 = y2;
-				cx1 = x2 + (x2 - cx2);
-				cy1 = y2 + (y2 - cy2);
+		for (;; curve++) {
+			float length = lengths[curve];
+			float nextDistance = distance + length;
+			if (nextDistance >= target) {
+				t = (target - distance) / length;
+				break;
 			}
+			distance = nextDistance;
+		}
+		curve *= 6;
 
-			// Determine curve containing position.
-			float target = totalLength * position, distance = 0;
-			for (int i = 5;; i += 6) {
-				float curveLength = lengths[i];
-				if (distance + curveLength > target) {
-					curve = i / 6;
-					t = (target - distance) / curveLength;
-					break;
-				}
-				distance += curveLength;
-			}
-
-			// Adjust t for constant speed using lengths of curves as weights.
-			for (int i = curve * 6, n = i + 5; i < n; i++) {
-				float bezierPercent = lengths[i];
-				if (t > bezierPercent) {
-					float linearPercent = 0.75f - 0.25f * (i - curve * 6 - 1);
-					float bezierPercentNext = lengths[i - 1];
-					t = linearPercent + 0.25f * ((t - bezierPercent) / (bezierPercentNext - bezierPercent));
-					break;
-				}
+		// Adjust t for constant speed using lengths of curves as weights.
+		t *= curveLengths(curve, worldVertices);
+		for (int i = 1;; i++) {
+			float length = lengths[i];
+			if (t >= length) {
+				t = 1 - 0.1f * i + 0.1f * (t - length) / (lengths[i - 1] - length);
+				break;
 			}
 		}
 
-		// Calculate bezier point.
-		int i = curve << 2;
-		float x1 = worldVertices[i], y1 = worldVertices[i + 1];
-		float cx1 = x1 + (x1 - worldVertices[i + 2]), cy1 = y1 + (y1 - worldVertices[i + 3]);
-		float x2 = worldVertices[i + 4], y2 = worldVertices[i + 5];
-		float cx2 = worldVertices[i + 6], cy2 = worldVertices[i + 7];
+		// Calculate point.
+		float x1 = worldVertices[curve], y1 = worldVertices[curve + 1];
+		float cx1 = worldVertices[curve + 4], cy1 = worldVertices[curve + 5];
+		float x2 = worldVertices[curve + 6], y2 = worldVertices[curve + 7];
+		float cx2 = worldVertices[curve + 8], cy2 = worldVertices[curve + 9];
 		float tt = t * t, ttt = tt * t, t3 = t * 3;
 		float x = (x1 + t * (-x1 * 3 + t * (3 * x1 - x1 * t))) + t * (3 * cx1 + t * (-6 * cx1 + cx1 * t3))
 			+ tt * (cx2 * 3 - cx2 * t3) + x2 * ttt;
 		float y = (y1 + t * (-y1 * 3 + t * (3 * y1 - y1 * t))) + t * (3 * cy1 + t * (-6 * cy1 + cy1 * t3))
 			+ tt * (cy2 * 3 - cy2 * t3) + y2 * ttt;
-		return temp.set(x, y);
+		out.set(x, y);
 	}
 
-	private void addLengths (int index, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2, float y2) {
-		float tmp1x = x1 - cx1 * 2 + cx2, tmp1y = y1 - cy1 * 2 + cy2;
-		float tmp2x = (cx1 - cx2) * 3 - x1 + x2, tmp2y = (cy1 - cy2) * 3 - y1 + y2;
-		float dfx = (cx1 - x1) * 0.75f + tmp1x * 0.1875f + tmp2x * 0.015625f;
-		float dfy = (cy1 - y1) * 0.75f + tmp1y * 0.1875f + tmp2y * 0.015625f;
-		float ddfx = tmp1x * 0.375f + tmp2x * 0.09375f, ddfy = tmp1y * 0.375f + tmp2y * 0.09375f;
-		float dddfx = tmp2x * 0.09375f, dddfy = tmp2y * 0.09375f;
-		float length0 = (float)Math.sqrt(dfx * dfx + dfy * dfy);
+	private float pathLengths (float[] worldVertices) {
+		float[] lengths = this.lengths;
+		float total = 0;
+		float x1 = worldVertices[0], y1 = worldVertices[1];
+		for (int i = 0, w = 4, n = 4 + worldVerticesLength - 6; w < n; i++, w += 6) {
+			float cx1 = worldVertices[w], cy1 = worldVertices[w + 1];
+			float x2 = worldVertices[w + 2], y2 = worldVertices[w + 3];
+			float cx2 = worldVertices[w + 4], cy2 = worldVertices[w + 5];
+			float tmpx = (x1 - cx1 * 2 + cx2) * 0.1875f, tmpy = (y1 - cy1 * 2 + cy2) * 0.1875f;
+			float dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.09375f, dddfy = ((cy1 - cy2) * 3 - y1 + y2) * 0.09375f;
+			float ddfx = tmpx * 2 + dddfx, ddfy = tmpy * 2 + dddfy;
+			float dfx = (cx1 - x1) * 0.75f + tmpx + dddfx * 0.16666667f, dfy = (cy1 - y1) * 0.75f + tmpy + dddfy * 0.16666667f;
+			float length = (float)Math.sqrt(dfx * dfx + dfy * dfy);
+			dfx += ddfx;
+			dfy += ddfy;
+			ddfx += dddfx;
+			ddfy += dddfy;
+			length += (float)Math.sqrt(dfx * dfx + dfy * dfy);
+			dfx += ddfx;
+			dfy += ddfy;
+			length += (float)Math.sqrt(dfx * dfx + dfy * dfy);
+			dfx += ddfx + dddfx;
+			dfy += ddfy + dddfy;
+			length += (float)Math.sqrt(dfx * dfx + dfy * dfy);
+			total += length;
+			lengths[i] = length;
+			x1 = x2;
+			y1 = y2;
+		}
+		return total;
+	}
+
+	private float curveLengths (int curve, float[] worldVertices) {
+		float x1 = worldVertices[curve], y1 = worldVertices[curve + 1];
+		float cx1 = worldVertices[curve + 4], cy1 = worldVertices[curve + 5];
+		float x2 = worldVertices[curve + 6], y2 = worldVertices[curve + 7];
+		float cx2 = worldVertices[curve + 8], cy2 = worldVertices[curve + 9];
+		float tmpx = (x1 - cx1 * 2 + cx2) * 0.03f, tmpy = (y1 - cy1 * 2 + cy2) * 0.03f;
+		float dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.006f, dddfy = ((cy1 - cy2) * 3 - y1 + y2) * 0.006f;
+		float ddfx = tmpx * 2 + dddfx, ddfy = tmpy * 2 + dddfy;
+		float dfx = (cx1 - x1) * 0.3f + tmpx + dddfx * 0.16666667f, dfy = (cy1 - y1) * 0.3f + tmpy + dddfy * 0.16666667f;
+		float[] lengths = this.lengths;
+		lengths[10] = 0;
+		float total = 0;
+		for (int i = 9; i > 2; i--) {
+			total += (float)Math.sqrt(dfx * dfx + dfy * dfy);
+			lengths[i] = total;
+			dfx += ddfx;
+			dfy += ddfy;
+			ddfx += dddfx;
+			ddfy += dddfy;
+		}
+		total += (float)Math.sqrt(dfx * dfx + dfy * dfy);
+		lengths[2] = total;
 		dfx += ddfx;
 		dfy += ddfy;
-		ddfx += dddfx;
-		ddfy += dddfy;
-		float length1 = length0 + (float)Math.sqrt(dfx * dfx + dfy * dfy);
-		dfx += ddfx;
-		dfy += ddfy;
-		float length2 = length1 + (float)Math.sqrt(dfx * dfx + dfy * dfy);
+		total += (float)Math.sqrt(dfx * dfx + dfy * dfy);
+		lengths[1] = total;
 		dfx += ddfx + dddfx;
 		dfy += ddfy + dddfy;
-		float total = length2 + (float)Math.sqrt(dfx * dfx + dfy * dfy);
-		totalLength += total;
-		float[] lengths = this.lengths;
-		lengths[index] = 1;
-		lengths[index + 1] = length2 / total;
-		lengths[index + 2] = length1 / total;
-		lengths[index + 3] = length0 / total;
-		lengths[index + 4] = 0;
-		lengths[index + 5] = total;
+		total += (float)Math.sqrt(dfx * dfx + dfy * dfy);
+		lengths[0] = total;
+		return total;
 	}
 
 	public Color getColor () {
@@ -159,7 +175,8 @@ public class PathAttachment extends VertexAttachment {
 
 	public void setWorldVerticesLength (int worldVerticesLength) {
 		super.setWorldVerticesLength(worldVerticesLength);
-		worldVertices = new float[worldVerticesLength];
-		lengths = new float[(worldVerticesLength >> 2) * 6];
+		// BOZO! - Don't reallocate for editor.
+		worldVertices = new float[Math.max(2, worldVerticesLength)];
+		lengths = new float[Math.max(11, worldVerticesLength >> 1)];
 	}
 }

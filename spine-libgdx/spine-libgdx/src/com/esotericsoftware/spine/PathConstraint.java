@@ -10,6 +10,7 @@ public class PathConstraint implements Updatable {
 	Bone bone;
 	Slot target;
 	float position, rotateMix, translateMix;
+	final Vector2 temp = new Vector2();
 
 	public PathConstraint (PathConstraintData data, Skeleton skeleton) {
 		this.data = data;
@@ -41,7 +42,7 @@ public class PathConstraint implements Updatable {
 
 		float translateMix = this.translateMix;
 		if (translateMix > 0) {
-			Vector2 temp = path.computeWorldPosition(target, position);
+			path.computeWorldPosition(target, position, temp);
 			bone.worldX += (temp.x - bone.worldX) * translateMix;
 			bone.worldY += (temp.y - bone.worldY) * translateMix;
 		}

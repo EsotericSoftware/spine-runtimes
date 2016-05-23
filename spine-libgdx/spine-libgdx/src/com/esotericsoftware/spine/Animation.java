@@ -154,7 +154,7 @@ public class Animation {
 	/** Base class for frames that use an interpolation bezier curve. */
 	abstract static public class CurveTimeline implements Timeline {
 		static public final float LINEAR = 0, STEPPED = 1, BEZIER = 2;
-		static private final int BEZIER_SEGMENTS = 10, BEZIER_SIZE = BEZIER_SEGMENTS * 2 - 1;
+		static private final int BEZIER_SIZE = 10 * 2 - 1;
 
 		private final float[] curves; // type, x, y, ...
 
@@ -188,12 +188,10 @@ public class Animation {
 		 * cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of
 		 * the difference between the keyframe's values. */
 		public void setCurve (int frameIndex, float cx1, float cy1, float cx2, float cy2) {
-			float subdiv1 = 1f / BEZIER_SEGMENTS, subdiv2 = subdiv1 * subdiv1, subdiv3 = subdiv2 * subdiv1;
-			float pre1 = 3 * subdiv1, pre2 = 3 * subdiv2, pre4 = 6 * subdiv2, pre5 = 6 * subdiv3;
-			float tmp1x = -cx1 * 2 + cx2, tmp1y = -cy1 * 2 + cy2, tmp2x = (cx1 - cx2) * 3 + 1, tmp2y = (cy1 - cy2) * 3 + 1;
-			float dfx = cx1 * pre1 + tmp1x * pre2 + tmp2x * subdiv3, dfy = cy1 * pre1 + tmp1y * pre2 + tmp2y * subdiv3;
-			float ddfx = tmp1x * pre4 + tmp2x * pre5, ddfy = tmp1y * pre4 + tmp2y * pre5;
-			float dddfx = tmp2x * pre5, dddfy = tmp2y * pre5;
+			float tmpx = (-cx1 * 2 + cx2) * 0.03f, tmpy = (-cy1 * 2 + cy2) * 0.03f;
+			float dddfx = ((cx1 - cx2) * 3 + 1) * 0.006f, dddfy = ((cy1 - cy2) * 3 + 1) * 0.006f;
+			float ddfx = tmpx * 2 + dddfx, ddfy = tmpy * 2 + dddfy;
+			float dfx = cx1 * 0.3f + tmpx + dddfx * 0.16666667f, dfy = cy1 * 0.3f + tmpy + dddfy * 0.16666667f;
 
 			int i = frameIndex * BEZIER_SIZE;
 			float[] curves = this.curves;
