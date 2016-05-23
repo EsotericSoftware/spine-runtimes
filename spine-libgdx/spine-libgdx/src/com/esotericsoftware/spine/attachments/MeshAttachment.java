@@ -219,6 +219,9 @@ public class MeshAttachment extends Attachment implements FfdAttachment {
 			regionUVs = parentMesh.regionUVs;
 			triangles = parentMesh.triangles;
 			hullLength = parentMesh.hullLength;
+			edges = parentMesh.edges;
+			width = parentMesh.width;
+			height = parentMesh.height;
 		}
 	}
 

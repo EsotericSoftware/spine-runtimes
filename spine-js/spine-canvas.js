@@ -83,11 +83,10 @@ spine.SkeletonRenderer.prototype = {
 			var attachment = slot.attachment;
 			if (!(attachment instanceof spine.RegionAttachment)) continue;
 			var bone = slot.bone;
-
-			var x = bone.worldX + attachment.x * bone.m00 + attachment.y * bone.m01;
-			var y = bone.worldY + attachment.x * bone.m10 + attachment.y * bone.m11;
-			var rotation = -(bone.worldRotation + attachment.rotation) * Math.PI / 180;
-			var w = attachment.width * bone.worldScaleX, h = attachment.height * bone.worldScaleY;
+			var x = attachment.x * bone.a + attachment.y * bone.b + bone.worldX;
+			var y = attachment.x * bone.c + attachment.y * bone.d + bone.worldY;
+			var rotation = (bone.getWorldRotationX() - attachment.rotation) * Math.PI / 180;
+			var w = attachment.width * bone.getWorldScaleX(), h = attachment.height * bone.getWorldScaleY();
 			context.translate(x, y);
 			context.rotate(rotation);
 			context.drawImage(attachment.rendererObject, -w / 2, -h / 2, w, h);

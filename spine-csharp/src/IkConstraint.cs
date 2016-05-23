@@ -90,7 +90,7 @@ namespace Spine {
 				rotationIK = 360 - rotationIK;
 			if (rotationIK > 180) rotationIK -= 360;
 			else if (rotationIK < -180) rotationIK += 360;
-			bone.UpdateWorldTransform(bone.x, bone.y, rotation + (rotationIK - rotation) * alpha, bone.scaleX, bone.scaleY);
+			bone.UpdateWorldTransform(bone.x, bone.y, rotation + (rotationIK - rotation) * alpha, bone.appliedScaleX, bone.appliedScaleY);
 		}
 
 		/// <summary>Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as
@@ -98,25 +98,32 @@ namespace Spine {
 		/// <param name="child">A direct descendant of the parent bone.</param>
 		static public void Apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, float alpha) {
 			if (alpha == 0) return;
-			float px = parent.x, py = parent.y, psx = parent.scaleX, psy = parent.scaleY, csx = child.scaleX, cy = child.y;
-			int offset1, offset2, sign2;
+			float px = parent.x, py = parent.y, psx = parent.appliedScaleX, psy = parent.appliedScaleY;
+			int os1, os2, s2;
 			if (psx < 0) {
 				psx = -psx;
-				offset1 = 180;
-				sign2 = -1;
+				os1 = 180;
+				s2 = -1;
 			} else {
-				offset1 = 0;
-				sign2 = 1;
+				os1 = 0;
+				s2 = 1;
 			}
 			if (psy < 0) {
 				psy = -psy;
-				sign2 = -sign2;
+				s2 = -s2;
+			}
+			float cx = child.x, cy = child.y, csx = child.appliedScaleX;
+			bool u = Math.Abs(psx - psy) <= 0.0001f;
+			if (!u && cy != 0) {
+				child.worldX = parent.a * cx + parent.worldX;
+				child.worldY = parent.c * cx + parent.worldY;
+				cy = 0;
 			}
 			if (csx < 0) {
 				csx = -csx;
-				offset2 = 180;
+				os2 = 180;
 			} else
-				offset2 = 0;
+				os2 = 0;
 			Bone pp = parent.parent;
 			float tx, ty, dx, dy;
 			if (pp == null) {
@@ -135,7 +142,7 @@ namespace Spine {
 				dy = (y * a - x * c) * invDet - py;
 			}
 			float l1 = (float)Math.Sqrt(dx * dx + dy * dy), l2 = child.data.length * csx, a1, a2;
-			if (Math.Abs(psx - psy) <= 0.0001f) {
+			if (u) {
 				l2 *= psx;
 				float cos = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
 				if (cos < -1) cos = -1;
@@ -144,7 +151,6 @@ namespace Spine {
 				float a = l1 + l2 * cos, o = l2 * MathUtils.Sin(a2);
 				a1 = MathUtils.Atan2(ty * a - tx * o, tx * a + ty * o);
 			} else {
-				cy = 0;
 				float a = psx * l2, b = psy * l2, ta = MathUtils.Atan2(ty, tx);
 				float aa = a * a, bb = b * b, ll = l1 * l1, dd = tx * tx + ty * ty;
 				float c0 = bb * ll + aa * dd - aa * bb, c1 = -2 * bb * l1, c2 = bb - aa;
@@ -202,17 +208,17 @@ namespace Spine {
 				}
 			}
 		outer:
-			float offset = MathUtils.Atan2(cy, child.x) * sign2;
-			a1 = (a1 - offset) * MathUtils.radDeg + offset1;
-			a2 = (a2 + offset) * MathUtils.radDeg * sign2 + offset2;
+			float os = MathUtils.Atan2(cy, cx) * s2;
+			a1 = (a1 - os) * MathUtils.radDeg + os1;
+			a2 = (a2 + os) * MathUtils.radDeg * s2 + os2;
 			if (a1 > 180) a1 -= 360;
 			else if (a1 < -180) a1 += 360;
 			if (a2 > 180) a2 -= 360;
 			else if (a2 < -180) a2 += 360;
 			float rotation = parent.rotation;
-			parent.UpdateWorldTransform(parent.x, parent.y, rotation + (a1 - rotation) * alpha, parent.scaleX, parent.scaleY);
+			parent.UpdateWorldTransform(px, py, rotation + (a1 - rotation) * alpha, parent.appliedScaleX, parent.appliedScaleY);
 			rotation = child.rotation;
-			child.UpdateWorldTransform(child.x, cy, rotation + (a2 - rotation) * alpha, child.scaleX, child.scaleY);
+			child.UpdateWorldTransform(cx, cy, rotation + (a2 - rotation) * alpha, child.appliedScaleX, child.appliedScaleY);
 		}
 	}
 }

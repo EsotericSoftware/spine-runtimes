@@ -38,11 +38,15 @@ typedef enum {
 } _spUpdateType;
 
 typedef struct {
+	_spUpdateType type;
+	void* object;
+} _spUpdate;
+
+typedef struct {
 	spSkeleton super;
 
 	int updateCacheCount;
-	void** updateCache;
-	_spUpdateType* updateCacheType;
+	_spUpdate* updateCache;
 } _spSkeleton;
 
 spSkeleton* spSkeleton_create (spSkeletonData* data) {
@@ -115,7 +119,6 @@ void spSkeleton_dispose (spSkeleton* self) {
 	_spSkeleton* internal = SUB_CAST(_spSkeleton, self);
 
 	FREE(internal->updateCache);
-	FREE(internal->updateCacheType);
 
 	for (i = 0; i < self->bonesCount; ++i)
 		spBone_dispose(self->bones[i]);
@@ -139,31 +142,41 @@ void spSkeleton_dispose (spSkeleton* self) {
 
 void spSkeleton_updateCache (const spSkeleton* self) {
 	int i, ii;
+	_spUpdate* update;
 	_spSkeleton* internal = SUB_CAST(_spSkeleton, self);
+	int capacity = self->bonesCount + self->transformConstraintsCount + self->ikConstraintsCount;
 
 	FREE(internal->updateCache);
-	FREE(internal->updateCacheType);
-	internal->updateCache = MALLOC(void*, self->bonesCount + self->transformConstraintsCount + self->ikConstraintsCount);
-	internal->updateCacheType = MALLOC(_spUpdateType, self->bonesCount + self->transformConstraintsCount + self->ikConstraintsCount);
+	internal->updateCache = MALLOC(_spUpdate, capacity);
 	internal->updateCacheCount = 0;
 
 	for (i = 0; i < self->bonesCount; ++i) {
 		spBone* bone = self->bones[i];
-		internal->updateCache[internal->updateCacheCount] = bone;
-		internal->updateCacheType[internal->updateCacheCount++] = SP_UPDATE_BONE;
-		for (ii = 0; ii < self->transformConstraintsCount; ++ii) {
-			spTransformConstraint* transformConstraint = self->transformConstraints[ii];
-			if (bone == transformConstraint->bone) {
-				internal->updateCache[internal->updateCacheCount] = transformConstraint;
-				internal->updateCacheType[internal->updateCacheCount++] = SP_UPDATE_TRANSFORM_CONSTRAINT;
-				break;
-			}
-		}
+		update = internal->updateCache + internal->updateCacheCount++;
+		update->type = SP_UPDATE_BONE;
+		update->object = bone;
 		for (ii = 0; ii < self->ikConstraintsCount; ++ii) {
 			spIkConstraint* ikConstraint = self->ikConstraints[ii];
 			if (bone == ikConstraint->bones[ikConstraint->bonesCount - 1]) {
-				internal->updateCache[internal->updateCacheCount] = ikConstraint;
-				internal->updateCacheType[internal->updateCacheCount++] = SP_UPDATE_IK_CONSTRAINT;
+				update = internal->updateCache + internal->updateCacheCount++;
+				update->type = SP_UPDATE_IK_CONSTRAINT;
+				update->object = ikConstraint;
+				break;
+			}
+		}
+	}
+
+	for (i = 0; i < self->transformConstraintsCount; ++i) {
+		spTransformConstraint* transformConstraint = self->transformConstraints[i];
+		for (ii = internal->updateCacheCount - 1; ii >= 0; --ii) {
+			void* object = internal->updateCache[ii].object;
+			if (object == transformConstraint->bone || object == transformConstraint->target) {
+				int insertIndex = ii + 1;
+				update = internal->updateCache + insertIndex;
+				memmove(update + 1, update, (internal->updateCacheCount - insertIndex) * sizeof(_spUpdate));
+				update->type = SP_UPDATE_TRANSFORM_CONSTRAINT;
+				update->object = transformConstraint;
+				internal->updateCacheCount++;
 				break;
 			}
 		}
@@ -175,15 +188,16 @@ void spSkeleton_updateWorldTransform (const spSkeleton* self) {
 	_spSkeleton* internal = SUB_CAST(_spSkeleton, self);
 
 	for (i = 0; i < internal->updateCacheCount; ++i) {
-		switch (internal->updateCacheType[i]) {
+		_spUpdate* update = internal->updateCache + i;
+		switch (update->type) {
 		case SP_UPDATE_BONE:
-			spBone_updateWorldTransform((spBone*)internal->updateCache[i]);
+			spBone_updateWorldTransform((spBone*)update->object);
 			break;
 		case SP_UPDATE_IK_CONSTRAINT:
-			spIkConstraint_apply((spIkConstraint*)internal->updateCache[i]);
+			spIkConstraint_apply((spIkConstraint*)update->object);
 			break;
 		case SP_UPDATE_TRANSFORM_CONSTRAINT:
-			spTransformConstraint_apply((spTransformConstraint*)internal->updateCache[i]);
+			spTransformConstraint_apply((spTransformConstraint*)update->object);
 			break;
 		}
 	}

@@ -4,7 +4,7 @@ The spine-js runtime provides functionality to load and manipulate [Spine](http:
 
 # spine-canvas
 
-The spine-canvas runtime extends spine-js to perform rendering using an HTML5 canvas. Because it renders rectangular images, nonuniform scaling and mesh attachments are not supported.
+The spine-canvas runtime extends spine-js and is a basic example of how to perform rendering using an HTML5 canvas. Because spine-canvas renders rectangular images, nonuniform scaling and mesh attachments are not supported.
 
 ## Licensing
 
@@ -14,9 +14,9 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-js works with data exported from Spine 2.1.27. Updating spine-js to [v3.0](https://trello.com/c/tF8UykBM/72-update-runtimes-to-support-v3-0-skewing-scale) and [v3.1](https://trello.com/c/bERJAFEq/73-update-runtimes-to-support-v3-1-linked-meshes) is in progress.
+spine-js works with data exported from Spine 3.1.08. Updating spine-js to [v3.2](https://trello.com/c/k7KtGdPW/76-update-runtimes-to-support-v3-2-shearing) is in progress.
 
-spine-js supports all Spine features.
+spine-js supports all Spine features. spine-canvas does not support color tinting, mesh attachments, or nonuniform scaling.
 
 spine-js does not yet support loading the binary format.
 
@@ -32,3 +32,4 @@ spine-js does not yet support loading the binary format.
 ## Runtimes Extending spine-js
 
 - [spine-turbulenz](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-turbulenz)
+- [spine-threejs](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-threejs)

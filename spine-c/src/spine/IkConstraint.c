@@ -76,51 +76,59 @@ void spIkConstraint_apply1 (spBone* bone, float targetX, float targetY, float al
 		rotationIK = 360 - rotationIK;
 	if (rotationIK > 180) rotationIK -= 360;
 	else if (rotationIK < -180) rotationIK += 360;
-	spBone_updateWorldTransformWith(bone, bone->x, bone->y, rotation + (rotationIK - rotation) * alpha, bone->scaleX, bone->scaleY);
+	spBone_updateWorldTransformWith(bone, bone->x, bone->y, rotation + (rotationIK - rotation) * alpha, bone->appliedScaleX,
+		bone->appliedScaleY);
 }
 
 void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float targetY, int bendDir, float alpha) {
-	float px = parent->x, py = parent->y, psx = parent->scaleX, psy = parent->scaleY, csx = child->scaleX, cy = child->y;
-	int offset1, offset2, sign2;
+	float px = parent->x, py = parent->y, psx = parent->appliedScaleX, psy = parent->appliedScaleY;
+	float cx = child->x, cy = child->y, csx = child->appliedScaleX, cwx = child->worldX, cwy = child->worldY;
+	int o1, o2, s2, u;
 	spBone* pp = parent->parent;
-	float tx, ty, dx, dy, l1, l2, a1, a2, psd, r;
+	float tx, ty, dx, dy, l1, l2, a1, a2, r;
 	if (alpha == 0) return;
 	if (psx < 0) {
 		psx = -psx;
-		offset1 = 180;
-		sign2 = -1;
+		o1 = 180;
+		s2 = -1;
 	} else {
-		offset1 = 0;
-		sign2 = 1;
+		o1 = 0;
+		s2 = 1;
 	}
 	if (psy < 0) {
 		psy = -psy;
-		sign2 = -sign2;
+		s2 = -s2;
+	}
+	r = psx - psy;
+	u = (r < 0 ? -r : r) <= 0.0001f;
+	if (!u && cy != 0) {
+		cwx = parent->a * cx + parent->worldX;
+		cwy = parent->c * cx + parent->worldY;
+		cy = 0;
 	}
 	if (csx < 0) {
 		csx = -csx;
-		offset2 = 180;
+		o2 = 180;
 	} else
-		offset2 = 0;
+		o2 = 0;
 	if (!pp) {
 		tx = targetX - px;
 		ty = targetY - py;
-		dx = child->worldX - px;
-		dy = child->worldY - py;
+		dx = cwx - px;
+		dy = cwy - py;
 	} else {
 		float a = pp->a, b = pp->b, c = pp->c, d = pp->d, invDet = 1 / (a * d - b * c);
 		float wx = pp->worldX, wy = pp->worldY, x = targetX - wx, y = targetY - wy;
 		tx = (x * d - y * b) * invDet - px;
 		ty = (y * a - x * c) * invDet - py;
-		x = child->worldX - wx;
-		y = child->worldY - wy;
+		x = cwx - wx;
+		y = cwy - wy;
 		dx = (x * d - y * b) * invDet - px;
 		dy = (y * a - x * c) * invDet - py;
 	}
 	l1 = SQRT(dx * dx + dy * dy);
 	l2 = child->data->length * csx;
-	psd = psx - psy;
-	if (psd < 0 ? -psd : psd <= 0.0001f) {
+	if (u) {
 		float cos, a, o;
 		l2 *= psx;
 		cos = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
@@ -138,7 +146,6 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float 
 		float minAngle = 0, minDist = FLT_MAX, minX = 0, minY = 0;
 		float maxAngle = 0, maxDist = 0, maxX = 0, maxY = 0;
 		float x = l1 + a, dist = x * x, angle, y;
-		cy = 0;
 		if (d >= 0) {
 			float q = SQRT(d), r0, r1, ar0, ar1;;
 			if (c1 < 0) q = -q;
@@ -192,16 +199,16 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float 
 		}
 	}
 	outer: {
-		float offset = ATAN2(cy, child->x) * sign2;
-		a1 = (a1 - offset) * RAD_DEG + offset1;
-		a2 = (a2 + offset) * RAD_DEG * sign2 + offset2;
+		float os = ATAN2(cy, cx) * s2;
+		a1 = (a1 - os) * RAD_DEG + o1;
+		a2 = (a2 + os) * RAD_DEG * s2 + o2;
 		if (a1 > 180) a1 -= 360;
 		else if (a1 < -180) a1 += 360;
 		if (a2 > 180) a2 -= 360;
 		else if (a2 < -180) a2 += 360;
 		r = parent->rotation;
-		spBone_updateWorldTransformWith(parent, parent->x, parent->y, r + (a1 - r) * alpha, parent->scaleX, parent->scaleY);
+		spBone_updateWorldTransformWith(parent, px, py, r + (a1 - r) * alpha, parent->appliedScaleX, parent->appliedScaleY);
 		r = child->rotation;
-		spBone_updateWorldTransformWith(child, child->x, cy, r + (a2 - r) * alpha, child->scaleX, child->scaleY);
+		spBone_updateWorldTransformWith(child, cx, cy, r + (a2 - r) * alpha, child->appliedScaleX, child->appliedScaleY);
 	}
 }

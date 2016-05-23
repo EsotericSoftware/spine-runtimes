@@ -33,7 +33,7 @@ package spine.attachments {
 import spine.Slot;
 import spine.Bone;
 
-public dynamic class WeightedMeshAttachment extends Attachment {
+public dynamic class WeightedMeshAttachment extends Attachment implements FfdAttachment {
 	public var bones:Vector.<int>;
 	public var weights:Vector.<Number>;
 	public var uvs:Vector.<Number>;
@@ -44,6 +44,8 @@ public dynamic class WeightedMeshAttachment extends Attachment {
 	public var g:Number = 1;
 	public var b:Number = 1;
 	public var a:Number = 1;
+	private var _parentMesh:WeightedMeshAttachment;
+	public var inheritFFD:Boolean;
 
 	public var path:String;
 	public var rendererObject:Object;
@@ -125,6 +127,28 @@ public dynamic class WeightedMeshAttachment extends Attachment {
 				worldVertices[w] = wx + x;
 				worldVertices[int(w + 1)] = wy + y;
 			}
+		}
+	}
+
+	public function applyFFD (sourceAttachment:Attachment) : Boolean {
+		return this == sourceAttachment || (inheritFFD && _parentMesh == sourceAttachment);
+	}
+
+	public function get parentMesh () : WeightedMeshAttachment {
+		return _parentMesh;
+	}
+
+	public function set parentMesh (parentMesh:WeightedMeshAttachment) : void {
+		_parentMesh = parentMesh;
+		if (parentMesh != null) {
+			bones = parentMesh.bones;
+			weights = parentMesh.weights;
+			regionUVs = parentMesh.regionUVs;
+			triangles = parentMesh.triangles;
+			hullLength = parentMesh.hullLength;
+			edges = parentMesh.edges;
+			width = parentMesh.width;
+			height = parentMesh.height;
 		}
 	}
 }

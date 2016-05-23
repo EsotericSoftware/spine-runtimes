@@ -34,9 +34,37 @@
 
 USING_NS_CC;
 
+GLuint wrap (spAtlasWrap wrap) {
+	return wrap == SP_ATLAS_CLAMPTOEDGE ? GL_CLAMP_TO_EDGE : GL_REPEAT;
+}
+
+GLuint filter (spAtlasFilter filter) {
+	switch (filter) {
+	case SP_ATLAS_NEAREST:
+		return GL_NEAREST;
+	case SP_ATLAS_LINEAR:
+		return GL_LINEAR;
+	case SP_ATLAS_MIPMAP:
+		return GL_LINEAR_MIPMAP_LINEAR;
+	case SP_ATLAS_MIPMAP_NEAREST_NEAREST:
+		return GL_NEAREST_MIPMAP_NEAREST;
+	case SP_ATLAS_MIPMAP_LINEAR_NEAREST:
+		return GL_LINEAR_MIPMAP_NEAREST;
+	case SP_ATLAS_MIPMAP_NEAREST_LINEAR:
+		return GL_NEAREST_MIPMAP_LINEAR;
+	case SP_ATLAS_MIPMAP_LINEAR_LINEAR:
+		return GL_LINEAR_MIPMAP_LINEAR;
+	}
+	return GL_LINEAR;
+}
+
 void _spAtlasPage_createTexture (spAtlasPage* self, const char* path) {
 	CCTexture2D* texture = CCTextureCache::sharedTextureCache()->addImage(path);
 	texture->retain();
+
+	ccTexParams textureParams = {filter(self->minFilter), filter(self->magFilter), wrap(self->uWrap), wrap(self->vWrap)};
+	texture->setTexParameters(&textureParams);
+
 	self->rendererObject = texture;
 	self->width = texture->getPixelsWide();
 	self->height = texture->getPixelsHigh();

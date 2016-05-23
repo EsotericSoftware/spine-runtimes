@@ -84,6 +84,7 @@ public class SkeletonMeshRenderer extends SkeletonRenderer<PolygonSpriteBatch> {
 				attachmentSkeleton.setPosition(skeleton.getX() + bone.getWorldX(), skeleton.getY() + bone.getWorldY());
 				// rootBone.setScaleX(1 + bone.getWorldScaleX() - oldScaleX);
 				// rootBone.setScaleY(1 + bone.getWorldScaleY() - oldScaleY);
+				// Set shear.
 				rootBone.setRotation(oldRotation + bone.getWorldRotationX());
 				attachmentSkeleton.updateWorldTransform();
 

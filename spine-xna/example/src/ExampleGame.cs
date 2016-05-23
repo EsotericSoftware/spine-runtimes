@@ -125,7 +125,7 @@ namespace Spine {
 			}
 
 			skeleton.X = 400;
-			skeleton.Y = 690;
+			skeleton.Y = 580;
 			skeleton.UpdateWorldTransform();
 
 			headSlot = skeleton.FindSlot("head");

@@ -4,7 +4,7 @@ The **spine-unity** runtime provides functionality to load, manipulate and rende
 
 For more documentation, see [spine-unity Documentation](https://github.com/pharan/spine-unity-docs/blob/master/README.md).
 
-While spine-unity can render directly with Unity, without the need for any other plugins, it also works with [2D Toolkit](http://www.unikronsoftware.com/2dtoolkit/) and can render skeletons using a TK2D texture atlas.
+While spine-unity can render directly with Unity, without the need for any other plugins, it also works with [2D Toolkit](http://www.2dtoolkit.com/) and can render skeletons using a TK2D texture atlas.
 
 ## Licensing
 
@@ -14,7 +14,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-unity works with data exported from the latest version of Spine, except linked meshes are [not yet supported](https://trello.com/c/bERJAFEq/73-update-runtimes-to-support-v3-1-linked-meshes).
+spine-unity works with data exported from Spine 3.1.08. Updating spine-unity to [v3.2](https://trello.com/c/k7KtGdPW/76-update-runtimes-to-support-v3-2-shearing) is in progress.
 
 spine-unity supports all Spine features.
 
@@ -28,7 +28,7 @@ For advanced uses and specific optimization cases, Spine skeletons can be "baked
 
 The [Spine Unity Features Tutorial](http://esotericsoftware.com/forum/Unity-Feature-Tutorials-4839) forum thread has many videos on how to use spine-unity.
 
-For more documentation, see [spine-unity Documentation](https://github.com/pharan/spine-unity-docs/blob/master/README.md).
+For more documentation, see [spine-unity Documentation](http://esotericsoftware.com/spine-unity).
 
 ## Quick installation
 

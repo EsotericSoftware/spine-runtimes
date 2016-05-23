@@ -34,12 +34,14 @@ using System.Collections.Generic;
 
 namespace Spine {
 	/// <summary>Attachment that displays a texture region using a mesh which can be deformed by bones.</summary>
-	public class WeightedMeshAttachment : Attachment {
+	public class WeightedMeshAttachment : Attachment, IFfdAttachment {
 		internal int[] bones;
 		internal float[] weights, uvs, regionUVs;
 		internal int[] triangles;
 		internal float regionOffsetX, regionOffsetY, regionWidth, regionHeight, regionOriginalWidth, regionOriginalHeight;
 		internal float r = 1, g = 1, b = 1, a = 1;
+		internal WeightedMeshAttachment parentMesh;
+		internal bool inheritFFD;
 
 		public int HullLength { get; set; }
 		public int[] Bones { get { return bones; } set { bones = value; } }
@@ -66,6 +68,25 @@ namespace Spine {
 		public float RegionHeight { get { return regionHeight; } set { regionHeight = value; } } // Unrotated, stripped size.
 		public float RegionOriginalWidth { get { return regionOriginalWidth; } set { regionOriginalWidth = value; } }
 		public float RegionOriginalHeight { get { return regionOriginalHeight; } set { regionOriginalHeight = value; } } // Unrotated, unstripped size.
+
+		public bool InheritFFD { get { return inheritFFD; } set { inheritFFD = value; } }
+
+		public WeightedMeshAttachment ParentMesh {
+			get { return parentMesh; }
+			set {
+				parentMesh = value;
+				if (value != null) {
+					bones = value.bones;
+					weights = value.weights;
+					regionUVs = value.regionUVs;
+					triangles = value.triangles;
+					HullLength = value.HullLength;
+					Edges = value.Edges;
+					Width = value.Width;
+					Height = value.Height;
+				}
+			}
+		}
 
 		// Nonessential.
 		public int[] Edges { get; set; }
@@ -128,6 +149,10 @@ namespace Spine {
 					worldVertices[w + 1] = wy + y;
 				}
 			}
+		}
+
+		public bool ApplyFFD (Attachment sourceAttachment) {
+			return this == sourceAttachment || (inheritFFD && parentMesh == sourceAttachment);
 		}
 	}
 }

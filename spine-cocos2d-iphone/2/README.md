@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-cocos2d-iphone v2 works with data exported from the latest version of Spine, except linked meshes are [not yet supported](https://trello.com/c/bERJAFEq/73-update-runtimes-to-support-v3-1-linked-meshes).
+spine-cocos2d-iphone v2 works with data exported from Spine 3.1.08. Updating spine-cocos2d-iphone v2 to [v3.2](https://trello.com/c/k7KtGdPW/76-update-runtimes-to-support-v3-2-shearing) is in progress.
 
 spine-cocos2d-iphone v2 supports all Spine features.
 

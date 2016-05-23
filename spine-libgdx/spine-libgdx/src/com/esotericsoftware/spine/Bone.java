@@ -31,9 +31,9 @@
 
 package com.esotericsoftware.spine;
 
+import static com.badlogic.gdx.math.MathUtils.*;
 import static com.badlogic.gdx.math.Matrix3.*;
 
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 
@@ -41,7 +41,7 @@ public class Bone implements Updatable {
 	final BoneData data;
 	final Skeleton skeleton;
 	final Bone parent;
-	float x, y, rotation, scaleX, scaleY;
+	float x, y, rotation, scaleX, scaleY, shearX, shearY;
 	float appliedRotation, appliedScaleX, appliedScaleY;
 
 	float a, b, worldX;
@@ -76,26 +76,30 @@ public class Bone implements Updatable {
 		rotation = bone.rotation;
 		scaleX = bone.scaleX;
 		scaleY = bone.scaleY;
+		shearX = bone.shearX;
+		shearY = bone.shearY;
 	}
 
 	/** Same as {@link #updateWorldTransform()}. This method exists for Bone to implement {@link Updatable}. */
 	public void update () {
-		updateWorldTransform(x, y, rotation, scaleX, scaleY);
+		updateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
 	}
 
 	/** Computes the world SRT using the parent bone and this bone's local SRT. */
 	public void updateWorldTransform () {
-		updateWorldTransform(x, y, rotation, scaleX, scaleY);
+		updateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
 	}
 
 	/** Computes the world SRT using the parent bone and the specified local SRT. */
-	public void updateWorldTransform (float x, float y, float rotation, float scaleX, float scaleY) {
+	public void updateWorldTransform (float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY) {
 		appliedRotation = rotation;
 		appliedScaleX = scaleX;
 		appliedScaleY = scaleY;
 
-		float cos = MathUtils.cosDeg(rotation), sin = MathUtils.sinDeg(rotation);
-		float la = cos * scaleX, lb = -sin * scaleY, lc = sin * scaleX, ld = cos * scaleY;
+		float rotationY = rotation + 90 + shearY;
+		float la = cosDeg(rotation + shearX) * scaleX, lb = cosDeg(rotationY) * scaleY;
+		float lc = sinDeg(rotation + shearX) * scaleX, ld = sinDeg(rotationY) * scaleY;
+
 		Bone parent = this.parent;
 		if (parent == null) { // Root bone.
 			Skeleton skeleton = this.skeleton;
@@ -138,8 +142,7 @@ public class Bone implements Updatable {
 				pc = 0;
 				pd = 1;
 				do {
-					cos = MathUtils.cosDeg(parent.appliedRotation);
-					sin = MathUtils.sinDeg(parent.appliedRotation);
+					float cos = cosDeg(parent.appliedRotation), sin = sinDeg(parent.appliedRotation);
 					float temp = pa * cos + pb * sin;
 					pb = pa * -sin + pb * cos;
 					pa = temp;
@@ -160,9 +163,7 @@ public class Bone implements Updatable {
 				pc = 0;
 				pd = 1;
 				do {
-					float r = parent.appliedRotation;
-					cos = MathUtils.cosDeg(r);
-					sin = MathUtils.sinDeg(r);
+					float r = parent.appliedRotation, cos = cosDeg(r), sin = sinDeg(r);
 					float psx = parent.appliedScaleX, psy = parent.appliedScaleY;
 					float za = cos * psx, zb = -sin * psy, zc = sin * psx, zd = cos * psy;
 					float temp = pa * za + pb * zc;
@@ -173,8 +174,8 @@ public class Bone implements Updatable {
 					pc = temp;
 
 					if (psx < 0) r = -r;
-					cos = MathUtils.cosDeg(-r);
-					sin = MathUtils.sinDeg(-r);
+					cos = cosDeg(-r);
+					sin = sinDeg(-r);
 					temp = pa * cos + pb * sin;
 					pb = pa * -sin + pb * cos;
 					pa = temp;
@@ -213,6 +214,8 @@ public class Bone implements Updatable {
 		rotation = data.rotation;
 		scaleX = data.scaleX;
 		scaleY = data.scaleY;
+		shearX = data.shearX;
+		shearY = data.shearY;
 	}
 
 	public BoneData getData () {
@@ -248,7 +251,6 @@ public class Bone implements Updatable {
 		this.y = y;
 	}
 
-	/** Returns the forward kinetics rotation. */
 	public float getRotation () {
 		return rotation;
 	}
@@ -281,6 +283,22 @@ public class Bone implements Updatable {
 	public void setScale (float scale) {
 		scaleX = scale;
 		scaleY = scale;
+	}
+
+	public float getShearX () {
+		return shearX;
+	}
+
+	public void setShearX (float shearX) {
+		this.shearX = shearX;
+	}
+
+	public float getShearY () {
+		return shearY;
+	}
+
+	public void setShearY (float shearY) {
+		this.shearY = shearY;
 	}
 
 	public float getA () {
@@ -316,11 +334,11 @@ public class Bone implements Updatable {
 	}
 
 	public float getWorldRotationX () {
-		return MathUtils.atan2(c, a) * MathUtils.radDeg;
+		return atan2(c, a) * radDeg;
 	}
 
 	public float getWorldRotationY () {
-		return MathUtils.atan2(d, b) * MathUtils.radDeg;
+		return atan2(d, b) * radDeg;
 	}
 
 	public float getWorldScaleX () {

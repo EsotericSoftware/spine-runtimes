@@ -39,8 +39,9 @@ namespace spine {
 
 class SkeletonBatch {
 public:
-	/* Sets the max number of vertices that can be drawn in a single frame. Best to call before getInstance is called for the
-	 * first time. Default is 8192. */
+	/* Sets the max number of vertices that can be drawn in a single frame. The buffer will grow automatically as needed, but
+	 * setting it to the appropriate is more efficient. Best to call before getInstance is called for the first time. Default is
+	 * 8192. */
 	static void setBufferSize (int vertexCount);
 
 	static SkeletonBatch* getInstance ();
@@ -63,9 +64,9 @@ protected:
 		Command ();
 		virtual ~Command ();
 
-		cocos2d::TrianglesCommand* _trianglesCommand;
-		cocos2d::TrianglesCommand::Triangles* _triangles;
-		Command* _next;
+		cocos2d::TrianglesCommand* trianglesCommand;
+		cocos2d::TrianglesCommand::Triangles* triangles;
+		Command* next;
 	};
 
 	Command* _firstCommand;

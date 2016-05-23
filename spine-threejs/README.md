@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-threejs works with data exported from Spine 2.1.27. Updating spine-threejs to [v3.0](https://trello.com/c/tF8UykBM/72-update-runtimes-to-support-v3-0-skewing-scale) and [v3.1](https://trello.com/c/bERJAFEq/73-update-runtimes-to-support-v3-1-linked-meshes) is in progress.
+spine-threejs works with data exported from Spine 3.1.08. Updating spine-threejs to [v3.2](https://trello.com/c/k7KtGdPW/76-update-runtimes-to-support-v3-2-shearing) is in progress.
 
 spine-threejs supports all Spine features except for rendering meshes.
 

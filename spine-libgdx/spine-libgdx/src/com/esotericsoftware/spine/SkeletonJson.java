@@ -49,7 +49,9 @@ import com.esotericsoftware.spine.Animation.FfdTimeline;
 import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
+import com.esotericsoftware.spine.Animation.ShearTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
+import com.esotericsoftware.spine.Animation.TransformConstraintTimeline;
 import com.esotericsoftware.spine.Animation.TranslateTimeline;
 import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
 import com.esotericsoftware.spine.attachments.Attachment;
@@ -117,6 +119,8 @@ public class SkeletonJson {
 			boneData.rotation = boneMap.getFloat("rotation", 0);
 			boneData.scaleX = boneMap.getFloat("scaleX", 1);
 			boneData.scaleY = boneMap.getFloat("scaleY", 1);
+			boneData.shearX = boneMap.getFloat("shearX", 0);
+			boneData.shearY = boneMap.getFloat("shearY", 0);
 			boneData.inheritScale = boneMap.getBoolean("inheritScale", true);
 			boneData.inheritRotation = boneMap.getBoolean("inheritRotation", true);
 
@@ -159,9 +163,17 @@ public class SkeletonJson {
 			transformConstraintData.target = skeletonData.findBone(targetName);
 			if (transformConstraintData.target == null) throw new SerializationException("Target bone not found: " + targetName);
 
+			transformConstraintData.offsetRotation = transformMap.getFloat("rotation", 0);
+			transformConstraintData.offsetX = transformMap.getFloat("x", 0) * scale;
+			transformConstraintData.offsetY = transformMap.getFloat("y", 0) * scale;
+			transformConstraintData.offsetScaleX = transformMap.getFloat("scaleX", 0) * scale;
+			transformConstraintData.offsetScaleY = transformMap.getFloat("scaleY", 0) * scale;
+			transformConstraintData.offsetShearY = transformMap.getFloat("shearY", 0) * scale;
+
+			transformConstraintData.rotateMix = transformMap.getFloat("rotateMix", 1);
 			transformConstraintData.translateMix = transformMap.getFloat("translateMix", 1);
-			transformConstraintData.x = transformMap.getFloat("x", 0) * scale;
-			transformConstraintData.y = transformMap.getFloat("y", 0) * scale;
+			transformConstraintData.scaleMix = transformMap.getFloat("scaleMix", 1);
+			transformConstraintData.shearMix = transformMap.getFloat("shearMix", 1);
 
 			skeletonData.transformConstraints.add(transformConstraintData);
 		}
@@ -328,12 +340,11 @@ public class SkeletonJson {
 				for (int i = 0, n = vertices.length; i < n;) {
 					int boneCount = (int)vertices[i++];
 					bones.add(boneCount);
-					for (int nn = i + boneCount * 4; i < nn;) {
+					for (int nn = i + boneCount * 4; i < nn; i += 4) {
 						bones.add((int)vertices[i]);
 						weights.add(vertices[i + 1] * scale);
 						weights.add(vertices[i + 2] * scale);
 						weights.add(vertices[i + 3]);
-						i += 4;
 					}
 				}
 				mesh.setBones(bones.toArray());
@@ -423,11 +434,13 @@ public class SkeletonJson {
 					timelines.add(timeline);
 					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 2 - 2]);
 
-				} else if (timelineName.equals("translate") || timelineName.equals("scale")) {
+				} else if (timelineName.equals("translate") || timelineName.equals("scale") || timelineName.equals("shear")) {
 					TranslateTimeline timeline;
 					float timelineScale = 1;
 					if (timelineName.equals("scale"))
 						timeline = new ScaleTimeline(timelineMap.size);
+					else if (timelineName.equals("shear"))
+						timeline = new ShearTimeline(timelineMap.size);
 					else {
 						timeline = new TranslateTimeline(timelineMap.size);
 						timelineScale = scale;
@@ -449,20 +462,36 @@ public class SkeletonJson {
 			}
 		}
 
-		// IK timelines.
-		for (JsonValue ikMap = map.getChild("ik"); ikMap != null; ikMap = ikMap.next) {
-			IkConstraintData ikConstraint = skeletonData.findIkConstraint(ikMap.name);
-			IkConstraintTimeline timeline = new IkConstraintTimeline(ikMap.size);
-			timeline.ikConstraintIndex = skeletonData.getIkConstraints().indexOf(ikConstraint, true);
+		// IK constraint timelines.
+		for (JsonValue constraintMap = map.getChild("ik"); constraintMap != null; constraintMap = constraintMap.next) {
+			IkConstraintData constraint = skeletonData.findIkConstraint(constraintMap.name);
+			IkConstraintTimeline timeline = new IkConstraintTimeline(constraintMap.size);
+			timeline.ikConstraintIndex = skeletonData.getIkConstraints().indexOf(constraint, true);
 			int frameIndex = 0;
-			for (JsonValue valueMap = ikMap.child; valueMap != null; valueMap = valueMap.next) {
-				timeline.setFrame(frameIndex, valueMap.getFloat("time"), valueMap.getFloat("mix"),
+			for (JsonValue valueMap = constraintMap.child; valueMap != null; valueMap = valueMap.next) {
+				timeline.setFrame(frameIndex, valueMap.getFloat("time"), valueMap.getFloat("mix", 1),
 					valueMap.getBoolean("bendPositive") ? 1 : -1);
 				readCurve(timeline, frameIndex, valueMap);
 				frameIndex++;
 			}
 			timelines.add(timeline);
 			duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 3 - 3]);
+		}
+
+		// Transform constraint timelines.
+		for (JsonValue constraintMap = map.getChild("transform"); constraintMap != null; constraintMap = constraintMap.next) {
+			TransformConstraintData constraint = skeletonData.findTransformConstraint(constraintMap.name);
+			TransformConstraintTimeline timeline = new TransformConstraintTimeline(constraintMap.size);
+			timeline.transformConstraintIndex = skeletonData.getTransformConstraints().indexOf(constraint, true);
+			int frameIndex = 0;
+			for (JsonValue valueMap = constraintMap.child; valueMap != null; valueMap = valueMap.next) {
+				timeline.setFrame(frameIndex, valueMap.getFloat("time"), valueMap.getFloat("rotateMix", 1),
+					valueMap.getFloat("translateMix", 1), valueMap.getFloat("scaleMix", 1), valueMap.getFloat("shearMix", 1));
+				readCurve(timeline, frameIndex, valueMap);
+				frameIndex++;
+			}
+			timelines.add(timeline);
+			duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 5 - 5]);
 		}
 
 		// FFD timelines.
@@ -595,7 +624,6 @@ public class SkeletonJson {
 		Attachment mesh;
 
 		public LinkedMesh (Attachment mesh, String skin, int slotIndex, String parent) {
-			super();
 			this.mesh = mesh;
 			this.skin = skin;
 			this.slotIndex = slotIndex;

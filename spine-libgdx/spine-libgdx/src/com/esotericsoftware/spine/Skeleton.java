@@ -148,8 +148,7 @@ public class Skeleton {
 		for (int i = 0; i < transformConstraintsCount; i++) {
 			TransformConstraint transformConstraint = transformConstraints.get(i);
 			for (int ii = updateCache.size - 1; ii >= 0; ii--) {
-				Updatable object = updateCache.get(ii);
-				if (object == transformConstraint.bone || object == transformConstraint.target) {
+				if (updateCache.get(ii) == transformConstraint.bone) {
 					updateCache.insert(ii + 1, transformConstraint);
 					break;
 				}
@@ -186,9 +185,11 @@ public class Skeleton {
 		Array<TransformConstraint> transformConstraints = this.transformConstraints;
 		for (int i = 0, n = transformConstraints.size; i < n; i++) {
 			TransformConstraint constraint = transformConstraints.get(i);
-			constraint.translateMix = constraint.data.translateMix;
-			constraint.x = constraint.data.x;
-			constraint.y = constraint.data.y;
+			TransformConstraintData data = constraint.data;
+			constraint.rotateMix = data.rotateMix;
+			constraint.translateMix = data.translateMix;
+			constraint.scaleMix = data.scaleMix;
+			constraint.shearMix = data.shearMix;
 		}
 	}
 

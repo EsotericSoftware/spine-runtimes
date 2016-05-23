@@ -119,16 +119,16 @@ namespace Spine.Unity.Modules {
 			int lastSubmeshInstruction = submeshInstructions.Count - 1;
 
 			var currentRenderer = partsRenderers[rendererIndex];
-			bool skeletonRendererCalculateNormals = skeletonRenderer.calculateNormals;
+			bool useNormals = skeletonRenderer.calculateNormals;
 				
-			for (int i = 0, start = 0; i <= lastSubmeshInstruction; i++) {
-				if (submeshInstructionsItems[i].forceSeparate) {
-					currentRenderer.RenderParts(instruction.submeshInstructions, start, i + 1);
-					currentRenderer.MeshGenerator.GenerateNormals = skeletonRendererCalculateNormals;
+			for (int si = 0, start = 0; si <= lastSubmeshInstruction; si++) {
+				if (submeshInstructionsItems[si].forceSeparate || si == lastSubmeshInstruction) {
+					currentRenderer.RenderParts(instruction.submeshInstructions, start, si + 1);
+					currentRenderer.MeshGenerator.GenerateNormals = useNormals;
 					if (copyPropertyBlock)
 						currentRenderer.SetPropertyBlock(block);					
 
-					start = i + 1;
+					start = si + 1;
 					rendererIndex++;
 					if (rendererIndex < rendererCount) {
 						currentRenderer = partsRenderers[rendererIndex];
@@ -136,26 +136,15 @@ namespace Spine.Unity.Modules {
 						// Not enough renderers. Skip the rest of the instructions.
 						break;
 					}
-				} else if (i == lastSubmeshInstruction) {
-					currentRenderer.RenderParts(instruction.submeshInstructions, start, i + 1);
-					currentRenderer.MeshGenerator.GenerateNormals = skeletonRendererCalculateNormals;
-					if (copyPropertyBlock)
-						currentRenderer.SetPropertyBlock(block);
 				}
 			}
-
-			// If too many renderers. Clear the rest.
-			rendererIndex++;
-			if (rendererIndex < rendererCount - 1) {
-				for (int i = rendererIndex; i < rendererCount; i++) {
-					currentRenderer = partsRenderers[i];
-					currentRenderer.ClearMesh();
-				}
+				
+			// Clear extra renderers if they exist.
+			for (; rendererIndex < rendererCount; rendererIndex++) {
+				partsRenderers[rendererIndex].ClearMesh();
 			}
 
 		}
-
-
 
 	}
 }
