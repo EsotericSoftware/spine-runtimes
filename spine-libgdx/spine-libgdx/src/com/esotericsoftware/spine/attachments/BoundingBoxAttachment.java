@@ -43,7 +43,7 @@ public class BoundingBoxAttachment extends VertexAttachment {
 	}
 
 	public void computeWorldVertices (Slot slot, float[] worldVertices) {
-		super.computeWorldVertices(slot, worldVertices);
+		computeWorldVertices(slot, 0, worldVerticesLength, worldVertices, 0);
 	}
 
 	public Color getColor () {

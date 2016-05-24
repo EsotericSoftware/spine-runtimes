@@ -46,7 +46,7 @@ public class Skeleton {
 	final Array<IkConstraint> ikConstraints;
 	final Array<TransformConstraint> transformConstraints;
 	final Array<PathConstraint> pathConstraints;
-	private final Array<Updatable> updateCache = new Array();
+	final Array<Updatable> updateCache = new Array();
 	Skin skin;
 	final Color color;
 	float time;
