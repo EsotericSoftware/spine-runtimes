@@ -243,18 +243,18 @@ public class IkConstraint implements Updatable {
 			}
 		}
 		float os = atan2(cy, cx) * s2;
-		a1 = (a1 - os) * radDeg + os1;
-		a2 = ((a2 + os) * radDeg - child.shearX) * s2 + os2;
+		float rotation = parent.rotation;
+		a1 = (a1 - os) * radDeg + os1 - rotation;
 		if (a1 > 180)
 			a1 -= 360;
 		else if (a1 < -180) a1 += 360;
+		parent.updateWorldTransform(px, py, rotation + a1 * alpha, parent.appliedScaleX, parent.appliedScaleY, 0, 0);
+		rotation = child.rotation;
+		a2 = ((a2 + os) * radDeg - child.shearX) * s2 + os2 - rotation;
 		if (a2 > 180)
 			a2 -= 360;
 		else if (a2 < -180) a2 += 360;
-		float rotation = parent.rotation;
-		parent.updateWorldTransform(px, py, rotation + (a1 - rotation) * alpha, parent.appliedScaleX, parent.appliedScaleY, 0, 0);
-		rotation = child.rotation;
-		child.updateWorldTransform(cx, cy, rotation + (a2 - rotation) * alpha, child.appliedScaleX, child.appliedScaleY,
-			child.shearX, child.shearY);
+		child.updateWorldTransform(cx, cy, rotation + a2 * alpha, child.appliedScaleX, child.appliedScaleY, child.shearX,
+			child.shearY);
 	}
 }
