@@ -31,7 +31,7 @@
 
 #include <spine/Bone.h>
 #include <spine/extension.h>
-
+#include <stdio.h>
 static int yDown;
 
 void spBone_setYDown (int value) {
@@ -56,14 +56,14 @@ void spBone_dispose (spBone* self) {
 }
 
 void spBone_updateWorldTransform (spBone* self) {
-	spBone_updateWorldTransformWith(self, self->x, self->y, self->rotation, self->scaleX, self->scaleY);
+	spBone_updateWorldTransformWith(self, self->x, self->y, self->rotation, self->scaleX, self->scaleY, self->shearX, self->shearY);
 }
 
-void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rotation, float scaleX, float scaleY) {
-	float radians = rotation * DEG_RAD;
-	float cosine = COS(radians);
-	float sine = SIN(radians);
-	float la = cosine * scaleX, lb = -sine * scaleY, lc = sine * scaleX, ld = cosine * scaleY;
+void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY) {
+	float cosine, sine;
+	float rotationY = rotation + 90 + shearY;
+	float la = COS_DEG(rotation + shearX) * scaleX, lb = COS_DEG(rotationY) * scaleY;
+	float lc = SIN_DEG(rotation + shearX) * scaleX, ld = SIN_DEG(rotationY) * scaleY;
 	float pa, pb, pc, pd, temp;
 	spBone* parent = self->parent;
 
@@ -115,8 +115,7 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 			pc = 0;
 			pd = 1;
 			do {
-				cosine = COS(parent->appliedRotation * DEG_RAD);
-				sine = SIN(parent->appliedRotation * DEG_RAD);
+				cosine = COS_DEG(parent->appliedRotation); sine = SIN_DEG(parent->appliedRotation);
 				temp = pa * cosine + pb * sine;
 				pb = pa * -sine + pb * cosine;
 				pa = temp;
@@ -138,14 +137,10 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 			pd = 1;
 			do {
 				float za, zb, zc, zd;
-				float r = parent->rotation;
-				float psx = parent->appliedScaleX, psy = parent->appliedScaleY;
-				cosine = COS(r * DEG_RAD);
-				sine = SIN(r * DEG_RAD);
-				za = cosine * psx;
-				zb = -sine * psy;
-				zc = sine * psx;
-				zd = cosine * psy;
+				float r = parent->appliedRotation;
+				float psx = parent->appliedScaleX; float psy = parent->appliedScaleY;
+				cosine = COS_DEG(r); sine = SIN_DEG(r);
+				za = cosine * psx; zb = -sine * psy; zc = sine * psx; zd = cosine * psy;
 				temp = pa * za + pb * zc;
 				pb = pa * zb + pb * zd;
 				pa = temp;
@@ -154,8 +149,8 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 				pc = temp;
 
 				if (psx < 0) r = -r;
-				cosine = COS(-r * DEG_RAD);
-				sine = SIN(-r * DEG_RAD);
+				cosine = COS_DEG(-r);
+				sine = SIN_DEG(-r);
 				temp = pa * cosine + pb * sine;
 				pb = pa * -sine + pb * cosine;
 				pa = temp;
@@ -193,6 +188,8 @@ void spBone_setToSetupPose (spBone* self) {
 	self->rotation = self->data->rotation;
 	self->scaleX = self->data->scaleX;
 	self->scaleY = self->data->scaleY;
+	self->shearX = self->data->shearX;
+	self->shearY = self->data->shearY;
 }
 
 float spBone_getWorldRotationX (spBone* self) {

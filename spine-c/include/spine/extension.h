@@ -58,8 +58,13 @@
 #define MALLOC_STR(TO,FROM) strcpy(CONST_CAST(char*, TO) = (char*)MALLOC(char, strlen(FROM) + 1), FROM)
 
 #define PI 3.1415926535897932385f
+#define PI2 (PI * 2)
 #define DEG_RAD (PI / 180)
 #define RAD_DEG (180 / PI)
+
+#define SIN_DEG(A) sinf((A) * DEG_RAD)
+#define COS_DEG(A) cosf((A) * DEG_RAD)
+#define ABS(A) ((A) < 0? -(A): (A))
 
 #ifdef __STDC_VERSION__
 #define FMOD(A,B) fmodf(A, B)
