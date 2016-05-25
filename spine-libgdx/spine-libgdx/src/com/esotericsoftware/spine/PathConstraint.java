@@ -1,6 +1,8 @@
 
 package com.esotericsoftware.spine;
 
+import static com.badlogic.gdx.math.MathUtils.*;
+
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
@@ -10,7 +12,7 @@ public class PathConstraint implements Updatable {
 	Bone bone;
 	Slot target;
 	float position, rotateMix, translateMix;
-	final Vector2 temp = new Vector2();
+	final Vector2 worldPosition = new Vector2(), tangent = new Vector2();
 
 	public PathConstraint (PathConstraintData data, Skeleton skeleton) {
 		this.data = data;
@@ -42,9 +44,21 @@ public class PathConstraint implements Updatable {
 
 		float translateMix = this.translateMix;
 		if (translateMix > 0) {
-			path.computeWorldPosition(target, position, temp);
-			bone.worldX += (temp.x - bone.worldX) * translateMix;
-			bone.worldY += (temp.y - bone.worldY) * translateMix;
+			path.computeWorldPosition(target, position, worldPosition, null);
+			bone.worldX += (worldPosition.x - bone.worldX) * translateMix;
+			bone.worldY += (worldPosition.y - bone.worldY) * translateMix;
+		}
+
+		float rotateMix = this.rotateMix;
+		if (rotateMix > 0) {
+			path.computeWorldPosition(target, position, worldPosition, tangent);
+			float r = worldPosition.sub(tangent).angle() - bone.getWorldRotationX();
+			float cos = cosDeg(r), sin = sinDeg(r);
+			float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
+			bone.a = cos * a - sin * c;
+			bone.b = cos * b - sin * d;
+			bone.c = sin * a + cos * c;
+			bone.d = sin * b + cos * d;
 		}
 	}
 

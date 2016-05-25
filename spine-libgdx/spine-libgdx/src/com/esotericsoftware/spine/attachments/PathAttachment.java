@@ -32,6 +32,7 @@
 package com.esotericsoftware.spine.attachments;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.spine.Slot;
 
@@ -50,22 +51,24 @@ public class PathAttachment extends VertexAttachment {
 		super.computeWorldVertices(slot, worldVertices);
 	}
 
-	public void computeWorldPosition (Slot slot, float position, Vector2 out) {
+	public void computeWorldPosition (Slot slot, float position, Vector2 out, Vector2 tangent) {
 		// BOZO - Remove check?
 		if (worldVerticesLength < 12) return;
 
-		// BOZO - Path constraint rotation.
-		// BOZO - Closed paths.
-		// BOZO - Before/after open paths.
-
 		float x1, y1, cx1, cy1, cx2, cy2, x2, y2;
 		if (!constantSpeed) {
-			int curves = worldVerticesLength / 6 - 1;
+			int curves = worldVerticesLength / 6;
+			if (!closed) curves--;
+			position = MathUtils.clamp(position, 0, 1);
 			int curve = position < 1 ? (int)(curves * position) : curves - 1;
 			position = (position - curve / (float)curves) * curves;
 
 			float[] worldVertices = this.worldVertices;
-			super.computeWorldVertices(slot, curve * 6 + 2, 8, worldVertices, 0);
+			if (closed && curve == curves - 1) {
+				super.computeWorldVertices(slot, curves * 6 - 4, 4, worldVertices, 0);
+				super.computeWorldVertices(slot, 0, 4, worldVertices, 4);
+			} else
+				super.computeWorldVertices(slot, curve * 6 + 2, 8, worldVertices, 0);
 
 			x1 = worldVertices[0];
 			y1 = worldVertices[1];
@@ -76,10 +79,19 @@ public class PathAttachment extends VertexAttachment {
 			x2 = worldVertices[6];
 			y2 = worldVertices[7];
 		} else {
-			// BOZO - Use offset and count for all attachment compute methods.
 			float[] worldVertices = this.worldVertices;
-			int verticesLength = worldVerticesLength - 4;
-			super.computeWorldVertices(slot, 2, verticesLength, worldVertices, 0);
+			int verticesLength;
+			if (closed) {
+				verticesLength = worldVerticesLength;
+				super.computeWorldVertices(slot, 2, verticesLength - 2, worldVertices, 0);
+				super.computeWorldVertices(slot, 0, 2, worldVertices, verticesLength - 2);
+				worldVertices[verticesLength] = worldVertices[0];
+				worldVertices[verticesLength + 1] = worldVertices[1];
+				verticesLength += 2;
+			} else {
+				verticesLength = worldVerticesLength - 4;
+				super.computeWorldVertices(slot, 2, verticesLength, worldVertices, 0);
+			}
 
 			// Curve lengths.
 			float[] lengths = this.lengths;
@@ -118,10 +130,35 @@ public class PathAttachment extends VertexAttachment {
 				x1 = x2;
 				y1 = y2;
 			}
+			position *= length;
+
+			// Outside curve.
+			if (!closed && (position < 0 || position > length)) {
+				if (position < 0) {
+					x1 = worldVertices[0];
+					y1 = worldVertices[1];
+					cx1 = worldVertices[2] - x1;
+					cy1 = worldVertices[3] - y1;
+				} else {
+					x1 = worldVertices[verticesLength - 2];
+					y1 = worldVertices[verticesLength - 1];
+					cx1 = x1 - worldVertices[verticesLength - 4];
+					cy1 = y1 - worldVertices[verticesLength - 3];
+					position -= length;
+				}
+				float r = MathUtils.atan2(cy1, cx1);
+				float cos = MathUtils.cos(r), sin = MathUtils.sin(r);
+				out.x = x1 + cos * position;
+				out.y = y1 + sin * position;
+				if (tangent != null) {
+					tangent.x = out.x - cos;
+					tangent.y = out.y - sin;
+				}
+				return;
+			}
 
 			// Determine curve containing position.
 			int curve;
-			position *= length;
 			length = lengths[0];
 			if (position <= length) {
 				curve = 0;
@@ -191,10 +228,16 @@ public class PathAttachment extends VertexAttachment {
 			}
 		}
 
-		// Calculate point.
-		float ttt = position * position * position, u = 1 - position;
-		float uuu = u * u * u, ut3 = u * position * 3, uut3 = u * ut3, utt3 = position * ut3;
-		out.set(x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt, y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt);
+		// Calculate point and tangent.
+		position += 0.0001f;
+		float tt = position * position, ttt = tt * position, u = 1 - position, uu = u * u, uuu = uu * u;
+		float ut = u * position, ut3 = ut * 3, uut3 = u * ut3, utt3 = ut3 * position;
+		out.x = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt;
+		out.y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt;
+		if (tangent != null) {
+			tangent.x = x1 * uu + cx1 * ut * 2 + cx2 * tt;
+			tangent.y = y1 * uu + cy1 * ut * 2 + cy2 * tt;
+		}
 	}
 
 	public Color getColor () {
@@ -220,7 +263,7 @@ public class PathAttachment extends VertexAttachment {
 	public void setWorldVerticesLength (int worldVerticesLength) {
 		super.setWorldVerticesLength(worldVerticesLength);
 		// BOZO! - Don't reallocate for editor.
-		worldVertices = new float[Math.max(2, worldVerticesLength)];
-		lengths = new float[Math.max(10, worldVerticesLength / 6 - 1)];
+		worldVertices = new float[Math.max(2, worldVerticesLength + 4)];
+		lengths = new float[Math.max(10, worldVerticesLength / 6)];
 	}
 }
