@@ -51,15 +51,17 @@ public class PathAttachment extends VertexAttachment {
 		super.computeWorldVertices(slot, worldVertices);
 	}
 
-	public void computeWorldPosition (Slot slot, float position, Vector2 out, Vector2 tangent) {
-		// BOZO - Remove check?
-		if (worldVerticesLength < 12) return;
-
+	public void computeWorldPosition (Slot slot, float position, Vector2 worldPosition, Vector2 tangent) {
 		float x1, y1, cx1, cy1, cx2, cy2, x2, y2;
 		if (!constantSpeed) {
 			int curves = worldVerticesLength / 6;
-			if (!closed) curves--;
-			position = MathUtils.clamp(position, 0, 1);
+			if (closed) {
+				position = position % 1;
+				if (position < 0) position += 1;
+			} else {
+				position = MathUtils.clamp(position, 0, 1);
+				curves--;
+			}
 			int curve = position < 1 ? (int)(curves * position) : curves - 1;
 			position = (position - curve / (float)curves) * curves;
 
@@ -132,8 +134,10 @@ public class PathAttachment extends VertexAttachment {
 			}
 			position *= length;
 
-			// Outside curve.
-			if (!closed && (position < 0 || position > length)) {
+			if (closed)
+				position = position % length;
+			else if (position < 0 || position > length) {
+				// Outside curve.
 				if (position < 0) {
 					x1 = worldVertices[0];
 					y1 = worldVertices[1];
@@ -148,11 +152,11 @@ public class PathAttachment extends VertexAttachment {
 				}
 				float r = MathUtils.atan2(cy1, cx1);
 				float cos = MathUtils.cos(r), sin = MathUtils.sin(r);
-				out.x = x1 + cos * position;
-				out.y = y1 + sin * position;
+				worldPosition.x = x1 + position * cos;
+				worldPosition.y = y1 + position * sin;
 				if (tangent != null) {
-					tangent.x = out.x - cos;
-					tangent.y = out.y - sin;
+					tangent.x = worldPosition.x - cos;
+					tangent.y = worldPosition.y - sin;
 				}
 				return;
 			}
@@ -232,8 +236,8 @@ public class PathAttachment extends VertexAttachment {
 		position += 0.0001f;
 		float tt = position * position, ttt = tt * position, u = 1 - position, uu = u * u, uuu = uu * u;
 		float ut = u * position, ut3 = ut * 3, uut3 = u * ut3, utt3 = ut3 * position;
-		out.x = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt;
-		out.y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt;
+		worldPosition.x = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt;
+		worldPosition.y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt;
 		if (tangent != null) {
 			tangent.x = x1 * uu + cx1 * ut * 2 + cx2 * tt;
 			tangent.y = y1 * uu + cy1 * ut * 2 + cy2 * tt;
@@ -262,7 +266,6 @@ public class PathAttachment extends VertexAttachment {
 
 	public void setWorldVerticesLength (int worldVerticesLength) {
 		super.setWorldVerticesLength(worldVerticesLength);
-		// BOZO! - Don't reallocate for editor.
 		worldVertices = new float[Math.max(2, worldVerticesLength + 4)];
 		lengths = new float[Math.max(10, worldVerticesLength / 6)];
 	}

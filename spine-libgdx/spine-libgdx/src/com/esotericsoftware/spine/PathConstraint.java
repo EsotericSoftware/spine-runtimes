@@ -42,19 +42,25 @@ public class PathConstraint implements Updatable {
 		if (!(attachment instanceof PathAttachment)) return;
 		PathAttachment path = (PathAttachment)attachment;
 
-		float translateMix = this.translateMix;
+		Vector2 worldPosition = this.worldPosition;
+		Bone bone = this.bone;
+
+		float translateMix = this.translateMix, rotateMix = this.rotateMix;
 		if (translateMix > 0) {
-			path.computeWorldPosition(target, position, worldPosition, null);
+			path.computeWorldPosition(target, position, worldPosition, rotateMix > 0 ? tangent : null);
 			bone.worldX += (worldPosition.x - bone.worldX) * translateMix;
 			bone.worldY += (worldPosition.y - bone.worldY) * translateMix;
 		}
 
-		float rotateMix = this.rotateMix;
 		if (rotateMix > 0) {
-			path.computeWorldPosition(target, position, worldPosition, tangent);
-			float r = worldPosition.sub(tangent).angle() - bone.getWorldRotationX();
-			float cos = cosDeg(r), sin = sinDeg(r);
+			if (translateMix == 0) path.computeWorldPosition(target, position, worldPosition, tangent);
 			float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
+			float r = atan2(worldPosition.y - tangent.y, worldPosition.x - tangent.x) - atan2(c, a) + data.offsetRotation * degRad;
+			if (r > PI)
+				r -= PI2;
+			else if (r < -PI) r += PI2;
+			r *= rotateMix;
+			float cos = cos(r), sin = sin(r);
 			bone.a = cos * a - sin * c;
 			bone.b = cos * b - sin * d;
 			bone.c = sin * a + cos * c;
