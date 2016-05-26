@@ -134,9 +134,10 @@ public class PathAttachment extends VertexAttachment {
 			}
 			position *= length;
 
-			if (closed)
+			if (closed) {
 				position = position % length;
-			else if (position < 0 || position > length) {
+				if (position < 0) position += length;
+			} else if (position < 0 || position > length) {
 				// Outside curve.
 				if (position < 0) {
 					x1 = worldVertices[0];
