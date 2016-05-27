@@ -81,12 +81,12 @@ public class Bone implements Updatable {
 		updateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
 	}
 
-	/** Computes the world SRT using the parent bone and this bone's local SRT. */
+	/** Computes the world transform using the parent bone and this bone's local transform. */
 	public void updateWorldTransform () {
 		updateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
 	}
 
-	/** Computes the world SRT using the parent bone and the specified local SRT. */
+	/** Computes the world transform using the parent bone and the specified local transform. */
 	public void updateWorldTransform (float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY) {
 		appliedRotation = rotation;
 		appliedScaleX = scaleX;
@@ -169,9 +169,7 @@ public class Bone implements Updatable {
 					pd = pc * zb + pd * zd;
 					pc = temp;
 
-					if (psx < 0) r = -r;
-					cos = cosDeg(-r);
-					sin = sinDeg(-r);
+					if (psx >= 0) sin = -sin;
 					temp = pa * cos + pb * sin;
 					pb = pa * -sin + pb * cos;
 					pa = temp;
@@ -201,6 +199,38 @@ public class Bone implements Updatable {
 				d = -d;
 			}
 		}
+	}
+
+	/** Computes the local transform from the world transform. This can be useful to perform processing on the local transform
+	 * after the world transform has been modified directly (eg, by a constraint).
+	 * <p>
+	 * Some redundant information is lost by the world transform, such as -1,-1 scale versus 180 rotation. The computed local
+	 * transform values may differ from the original values but are functionally the same. */
+	public void updateLocalTransform () {
+		Bone parent = this.parent;
+		if (parent != null) {
+			float a = parent.a, b = parent.b, c = parent.c, d = parent.d;
+			float invDet = 1 / (a * d - b * c);
+			float x = worldX - parent.worldX, y = worldY - parent.worldY;
+			x = (x * d * invDet - y * b * invDet);
+			y = (y * a * invDet - x * c * invDet);
+		}
+		shearX = 0;
+		scaleX = (float)Math.sqrt(a * a + c * c);
+		if (scaleX > 0.00001f) {
+			float det = a * d - b * c;
+			shearY = atan2(a * b + c * d, det) * radDeg;
+			scaleY = det / scaleX;
+			rotation = atan2(c, a) * radDeg;
+		} else {
+			scaleX = 0;
+			shearY = 0;
+			scaleY = (float)Math.sqrt(b * b + d * d);
+			rotation = 90 - atan2(d, b) * radDeg;
+		}
+		appliedRotation = rotation;
+		appliedScaleX = scaleX;
+		appliedScaleY = scaleY;
 	}
 
 	public void setToSetupPose () {
@@ -365,9 +395,9 @@ public class Bone implements Updatable {
 	}
 
 	public Vector2 worldToLocal (Vector2 world) {
-		float x = world.x - worldX, y = world.y - worldY;
 		float a = this.a, b = this.b, c = this.c, d = this.d;
 		float invDet = 1 / (a * d - b * c);
+		float x = world.x - worldX, y = world.y - worldY;
 		world.x = (x * d * invDet - y * b * invDet);
 		world.y = (y * a * invDet - x * c * invDet);
 		return world;
