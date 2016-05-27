@@ -123,7 +123,6 @@ public class SkeletonJson {
 			data.scaleY = boneMap.getFloat("scaleY", 1);
 			data.shearX = boneMap.getFloat("shearX", 0);
 			data.shearY = boneMap.getFloat("shearY", 0);
-			data.inheritRotation = boneMap.getBoolean("inheritRotation", true);
 			data.inheritScale = boneMap.getBoolean("inheritScale", true);
 			data.inheritRotation = boneMap.getBoolean("inheritRotation", true);
 
@@ -472,7 +471,7 @@ public class SkeletonJson {
 			int frameIndex = 0;
 			for (JsonValue valueMap = constraintMap.child; valueMap != null; valueMap = valueMap.next) {
 				timeline.setFrame(frameIndex, valueMap.getFloat("time"), valueMap.getFloat("mix", 1),
-					valueMap.getBoolean("bendPositive") ? 1 : -1);
+					valueMap.getBoolean("bendPositive", false) ? 1 : -1);
 				readCurve(valueMap, timeline, frameIndex);
 				frameIndex++;
 			}
