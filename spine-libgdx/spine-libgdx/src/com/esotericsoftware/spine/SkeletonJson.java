@@ -123,8 +123,8 @@ public class SkeletonJson {
 			data.scaleY = boneMap.getFloat("scaleY", 1);
 			data.shearX = boneMap.getFloat("shearX", 0);
 			data.shearY = boneMap.getFloat("shearY", 0);
-			data.inheritScale = boneMap.getBoolean("inheritScale", true);
 			data.inheritRotation = boneMap.getBoolean("inheritRotation", true);
+			data.inheritScale = boneMap.getBoolean("inheritScale", true);
 
 			String color = boneMap.getString("color", null);
 			if (color != null) data.getColor().set(Color.valueOf(color));

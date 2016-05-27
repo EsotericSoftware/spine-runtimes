@@ -39,7 +39,7 @@ public class BoneData {
 	final BoneData parent;
 	float length;
 	float x, y, rotation, scaleX = 1, scaleY = 1, shearX, shearY;
-	boolean inheritScale = true, inheritRotation = true;
+	boolean inheritRotation = true, inheritScale = true;
 
 	// Nonessential.
 	final Color color = new Color(0.61f, 0.61f, 0.61f, 1);
@@ -156,20 +156,20 @@ public class BoneData {
 		this.shearY = shearY;
 	}
 
-	public boolean getInheritScale () {
-		return inheritScale;
-	}
-
-	public void setInheritScale (boolean inheritScale) {
-		this.inheritScale = inheritScale;
-	}
-
 	public boolean getInheritRotation () {
 		return inheritRotation;
 	}
 
 	public void setInheritRotation (boolean inheritRotation) {
 		this.inheritRotation = inheritRotation;
+	}
+
+	public boolean getInheritScale () {
+		return inheritScale;
+	}
+
+	public void setInheritScale (boolean inheritScale) {
+		this.inheritScale = inheritScale;
 	}
 
 	public Color getColor () {
