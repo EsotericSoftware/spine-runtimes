@@ -210,7 +210,8 @@ public class SkeletonBinary {
 			// Path constraints.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				PathConstraintData data = new PathConstraintData(input.readString());
-				data.bone = skeletonData.bones.get(input.readInt(true));
+				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++)
+					data.bones.add(skeletonData.bones.get(input.readInt(true)));
 				data.target = skeletonData.slots.get(input.readInt(true));
 				data.offsetRotation = input.readFloat();
 				data.position = input.readFloat();

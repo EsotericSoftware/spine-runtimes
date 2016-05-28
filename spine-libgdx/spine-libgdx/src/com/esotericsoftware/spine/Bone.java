@@ -233,6 +233,15 @@ public class Bone implements Updatable {
 		appliedScaleY = scaleY;
 	}
 
+	public void rotateWorld (float degrees) {
+		float a = this.a, b = this.b, c = this.c, d = this.d;
+		float cos = cosDeg(degrees), sin = sinDeg(degrees);
+		this.a = cos * a - sin * c;
+		this.b = cos * b - sin * d;
+		this.c = sin * a + cos * c;
+		this.d = sin * b + cos * d;
+	}
+
 	public void setToSetupPose () {
 		BoneData data = this.data;
 		x = data.x;

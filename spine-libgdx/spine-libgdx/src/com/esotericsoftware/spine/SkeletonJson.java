@@ -184,9 +184,12 @@ public class SkeletonJson {
 		for (JsonValue constraintMap = root.getChild("path"); constraintMap != null; constraintMap = constraintMap.next) {
 			PathConstraintData data = new PathConstraintData(constraintMap.getString("name"));
 
-			String boneName = constraintMap.getString("bone");
-			data.bone = skeletonData.findBone(boneName);
-			if (data.bone == null) throw new SerializationException("Bone not found: " + boneName);
+			for (JsonValue boneMap = constraintMap.getChild("bones"); boneMap != null; boneMap = boneMap.next) {
+				String boneName = boneMap.asString();
+				BoneData bone = skeletonData.findBone(boneName);
+				if (bone == null) throw new SerializationException("Path bone not found: " + boneName);
+				data.bones.add(bone);
+			}
 
 			String targetName = constraintMap.getString("target");
 			data.target = skeletonData.findSlot(targetName);

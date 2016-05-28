@@ -162,7 +162,8 @@ public class Skeleton {
 
 		for (int i = 0, n = pathConstraints.size; i < n; i++) {
 			PathConstraint pathConstraint = pathConstraints.get(i);
-			Bone bone = pathConstraint.bone;
+			// BOZO! - Fix update order for multiple bones.
+			Bone bone = pathConstraint.bones.peek();
 			for (int ii = updateCache.size - 1; ii >= 0; ii--) {
 				if (updateCache.get(ii) == bone) {
 					updateCache.insert(ii + 1, pathConstraint);
