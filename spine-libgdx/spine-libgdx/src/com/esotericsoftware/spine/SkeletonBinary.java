@@ -217,6 +217,7 @@ public class SkeletonBinary {
 				data.position = input.readFloat();
 				data.rotateMix = input.readFloat();
 				data.translateMix = input.readFloat();
+				data.scaleMix = input.readFloat();
 				skeletonData.pathConstraints.add(data);
 			}
 
@@ -588,11 +589,12 @@ public class SkeletonBinary {
 				PathConstraintTimeline timeline = new PathConstraintTimeline(frameCount);
 				timeline.pathConstraintIndex = index;
 				for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readFloat(), input.readFloat());
+					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readFloat(), input.readFloat(),
+						input.readFloat());
 					if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
 				}
 				timelines.add(timeline);
-				duration = Math.max(duration, timeline.getFrames()[frameCount * 4 - 4]);
+				duration = Math.max(duration, timeline.getFrames()[frameCount * 5 - 5]);
 			}
 
 			// Deform timelines.

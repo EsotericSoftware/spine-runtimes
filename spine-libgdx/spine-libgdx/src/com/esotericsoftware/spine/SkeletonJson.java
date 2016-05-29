@@ -199,6 +199,7 @@ public class SkeletonJson {
 			data.position = constraintMap.getFloat("position", 0);
 			data.rotateMix = constraintMap.getFloat("rotateMix", 1);
 			data.translateMix = constraintMap.getFloat("translateMix", 1);
+			data.scaleMix = constraintMap.getFloat("scaleMix", 1);
 
 			skeletonData.pathConstraints.add(data);
 		}
@@ -506,12 +507,12 @@ public class SkeletonJson {
 			int frameIndex = 0;
 			for (JsonValue valueMap = constraintMap.child; valueMap != null; valueMap = valueMap.next) {
 				timeline.setFrame(frameIndex, valueMap.getFloat("time"), valueMap.getFloat("scaleMix", 1),
-					valueMap.getFloat("rotateMix", 1), valueMap.getFloat("translateMix", 1));
+					valueMap.getFloat("rotateMix", 1), valueMap.getFloat("translateMix", 1), valueMap.getFloat("scaleMix", 1));
 				readCurve(valueMap, timeline, frameIndex);
 				frameIndex++;
 			}
 			timelines.add(timeline);
-			duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 4 - 4]);
+			duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 5 - 5]);
 		}
 
 		// Deform timelines.

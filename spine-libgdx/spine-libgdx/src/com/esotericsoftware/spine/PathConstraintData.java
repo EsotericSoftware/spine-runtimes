@@ -7,7 +7,7 @@ public class PathConstraintData {
 	final String name;
 	final Array<BoneData> bones = new Array();
 	SlotData target;
-	float position, rotateMix, translateMix;
+	float position, rotateMix, translateMix, scaleMix;
 	float offsetRotation;
 
 	public PathConstraintData (String name) {
@@ -48,6 +48,14 @@ public class PathConstraintData {
 
 	public void setTranslateMix (float translateMix) {
 		this.translateMix = translateMix;
+	}
+
+	public float getScaleMix () {
+		return scaleMix;
+	}
+
+	public void setScaleMix (float scaleMix) {
+		this.scaleMix = scaleMix;
 	}
 
 	public float getOffsetRotation () {

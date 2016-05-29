@@ -227,6 +227,7 @@ public class Skeleton {
 			constraint.position = data.position;
 			constraint.rotateMix = data.rotateMix;
 			constraint.translateMix = data.translateMix;
+			constraint.scaleMix = data.scaleMix;
 		}
 	}
 

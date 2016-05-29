@@ -874,20 +874,23 @@ public class Animation {
 	}
 
 	static public class PathConstraintTimeline extends CurveTimeline {
-		static private final int PREV_TIME = -4;
-		static private final int PREV_POSITION = -3;
-		static private final int PREV_ROTATE_MIX = -2;
-		static private final int PREV_TRANSLATE_MIX = -1;
+		static private final int PREV_TIME = -5;
+		static private final int PREV_POSITION = -4;
+		static private final int PREV_ROTATE_MIX = -3;
+		static private final int PREV_TRANSLATE_MIX = -2;
+		static private final int PREV_SCALE_MIX = -1;
 		static private final int POSITION = 1;
 		static private final int ROTATE_MIX = 2;
 		static private final int TRANSLATE_MIX = 3;
+		static private final int SCALE_MIX = 4;
 
 		int pathConstraintIndex;
+
 		private final float[] frames; // time, rotate mix, translate mix, scale mix, shear mix, ...
 
 		public PathConstraintTimeline (int frameCount) {
 			super(frameCount);
-			frames = new float[frameCount * 4];
+			frames = new float[frameCount * 5];
 		}
 
 		public void setPathConstraintIndex (int index) {
@@ -903,12 +906,13 @@ public class Animation {
 		}
 
 		/** Sets the time, position, and mixes of the specified keyframe. */
-		public void setFrame (int frameIndex, float time, float position, float rotateMix, float translateMix) {
-			frameIndex *= 4;
+		public void setFrame (int frameIndex, float time, float position, float rotateMix, float translateMix, float scaleMix) {
+			frameIndex *= 5;
 			frames[frameIndex] = time;
 			frames[frameIndex + 1] = position;
 			frames[frameIndex + 2] = rotateMix;
 			frames[frameIndex + 3] = translateMix;
+			frames[frameIndex + 4] = scaleMix;
 		}
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha) {
@@ -917,27 +921,30 @@ public class Animation {
 
 			PathConstraint constraint = skeleton.pathConstraints.get(pathConstraintIndex);
 
-			if (time >= frames[frames.length - 4]) { // Time is after last frame.
+			if (time >= frames[frames.length - 5]) { // Time is after last frame.
 				int i = frames.length - 1;
-				constraint.position += (frames[i - 2] - constraint.position) * alpha;
-				constraint.rotateMix += (frames[i - 1] - constraint.rotateMix) * alpha;
-				constraint.translateMix += (frames[i] - constraint.translateMix) * alpha;
+				constraint.position += (frames[i - 3] - constraint.position) * alpha;
+				constraint.rotateMix += (frames[i - 2] - constraint.rotateMix) * alpha;
+				constraint.translateMix += (frames[i - 1] - constraint.translateMix) * alpha;
+				constraint.scaleMix += (frames[i] - constraint.scaleMix) * alpha;
 				return;
 			}
 
 			// Interpolate between the previous frame and the current frame.
-			int frame = binarySearch(frames, time, 4);
+			int frame = binarySearch(frames, time, 5);
 			float frameTime = frames[frame];
 			float percent = MathUtils.clamp(1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime), 0, 1);
-			percent = getCurvePercent(frame / 4 - 1, percent);
+			percent = getCurvePercent(frame / 5 - 1, percent);
 
 			float position = frames[frame + PREV_POSITION];
 			float rotate = frames[frame + PREV_ROTATE_MIX];
 			float translate = frames[frame + PREV_TRANSLATE_MIX];
+			float scale = frames[frame + PREV_SCALE_MIX];
 			constraint.position += (position + (frames[frame + POSITION] - position) * percent - constraint.position) * alpha;
 			constraint.rotateMix += (rotate + (frames[frame + ROTATE_MIX] - rotate) * percent - constraint.rotateMix) * alpha;
 			constraint.translateMix += (translate + (frames[frame + TRANSLATE_MIX] - translate) * percent - constraint.translateMix)
 				* alpha;
+			constraint.scaleMix += (scale + (frames[frame + SCALE_MIX] - scale) * percent - constraint.scaleMix) * alpha;
 		}
 	}
 }
