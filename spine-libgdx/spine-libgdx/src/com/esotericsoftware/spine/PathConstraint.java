@@ -13,8 +13,7 @@ public class PathConstraint implements Updatable {
 	final Array<Bone> bones;
 	Slot target;
 	float position, rotateMix, translateMix, scaleMix;
-	final FloatArray lengths = new FloatArray(), positions = new FloatArray();
-	final FloatArray worldVertices = new FloatArray(), temp = new FloatArray();
+	final FloatArray lengths = new FloatArray(), positions = new FloatArray(), temp = new FloatArray();
 
 	public PathConstraint (PathConstraintData data, Skeleton skeleton) {
 		this.data = data;
@@ -53,24 +52,23 @@ public class PathConstraint implements Updatable {
 
 		float rotateMix = this.rotateMix, translateMix = this.translateMix, scaleMix = this.scaleMix;
 		boolean translate = translateMix > 0, rotate = rotateMix > 0, scale = scaleMix > 0;
-		if (!translate && !rotate) return;
+		if (!translate && !rotate && !scale) return;
 
 		PathAttachment path = (PathAttachment)attachment;
 		FloatArray lengths = this.lengths;
 		lengths.clear();
 		lengths.add(0);
-		positions.clear();
 
 		Array<Bone> bones = this.bones;
 		int boneCount = bones.size;
 		if (boneCount == 1) {
-			computeWorldPositions(path, rotate);
+			float[] positions = computeWorldPositions(path, rotate);
 			Bone bone = bones.first();
-			bone.worldX += (positions.first() - bone.worldX) * translateMix;
-			bone.worldY += (positions.get(1) - bone.worldY) * translateMix;
+			bone.worldX += (positions[0] - bone.worldX) * translateMix;
+			bone.worldY += (positions[1] - bone.worldY) * translateMix;
 			if (rotate) {
 				float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-				float r = positions.get(2) - atan2(c, a) + data.offsetRotation * degRad;
+				float r = positions[2] - atan2(c, a) + data.offsetRotation * degRad;
 				if (r > PI)
 					r -= PI2;
 				else if (r < -PI) r += PI2;
@@ -84,46 +82,48 @@ public class PathConstraint implements Updatable {
 			return;
 		}
 
-		for (int i = 0; i < boneCount; i++)
-			lengths.add(bones.get(i).data.length);
-		computeWorldPositions(path, false);
+		for (int i = 0; i < boneCount; i++) {
+			Bone bone = bones.get(i);
+			float length = bone.data.length;
+			float x = length * bone.a, y = length * bone.c;
+			lengths.add((float)Math.sqrt(x * x + y * y));
+		}
+		float[] positions = computeWorldPositions(path, false);
 
-		float[] positions = this.positions.items;
-		float boneX = positions[0], boneY = positions[1];
+		float boneX = positions[0], boneY = positions[1], offsetRotation = data.offsetRotation;
 		for (int i = 0, p = 2; i < boneCount; i++, p += 2) {
 			Bone bone = bones.get(i);
-			float x = positions[p], y = positions[p + 1];
-
-			if (scale) {
-				float dx = boneX - x, dy = boneY - y, d = (float)Math.sqrt(dx * dx + dy * dy);
-				// BOZO - Length not transformed by bone matrix.
-				float sx = bone.scaleX + (d / bone.data.length - bone.scaleX) * scaleMix;
-				bone.a *= sx;
-				bone.c *= sx;
-			}
-
 			bone.worldX += (boneX - bone.worldX) * translateMix;
 			bone.worldY += (boneY - bone.worldY) * translateMix;
-
-			float r = atan2(y - boneY, x - boneX) + data.offsetRotation * degRad;
-			if (data.offsetRotation != 0) {
+			float x = positions[p], y = positions[p + 1], dx = x - boneX, dy = y - boneY;
+			if (scale) {
+				float s = ((float)Math.sqrt(dx * dx + dy * dy) / lengths.get(i + 1) - 1) * scaleMix + 1;
+				bone.a *= s;
+				bone.c *= s;
+			}
+			if (!rotate) {
 				boneX = x;
 				boneY = y;
 			} else {
-				// BOZO - Doesn't transform by bone matrix.
-				float cos = cos(r), sin = sin(r);
-				float length = bone.data.length, mix = rotateMix * (1 - scaleMix);
-				boneX = x + (length * cos + boneX - x) * mix;
-				boneY = y + (length * sin + boneY - y) * mix;
-			}
-			if (rotate) {
 				float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-				r -= atan2(c, a);
+				float r = atan2(dy, dx) - atan2(c, a) + offsetRotation * degRad, cos, sin;
+				if (offsetRotation != 0) {
+					boneX = x;
+					boneY = y;
+				} else { // Mix between on path and at tip.
+					cos = cos(r);
+					sin = sin(r);
+					float length = bone.data.length;
+					boneX = x + (length * (cos * a - sin * c) - dx) * rotateMix;
+					boneY = y + (length * (sin * a + cos * c) - dy) * rotateMix;
+				}
 				if (r > PI)
 					r -= PI2;
-				else if (r < -PI) r += PI2;
+				else if (r < -PI) //
+					r += PI2;
 				r *= rotateMix;
-				float cos = cos(r), sin = sin(r);
+				cos = cos(r);
+				sin = sin(r);
 				bone.a = cos * a - sin * c;
 				bone.b = cos * b - sin * d;
 				bone.c = sin * a + cos * c;
@@ -132,68 +132,71 @@ public class PathConstraint implements Updatable {
 		}
 	}
 
-	private void computeWorldPositions (PathAttachment path, boolean tangents) {
-		Slot slot = target;
+	private float[] computeWorldPositions (PathAttachment path, boolean tangents) {
+		Slot target = this.target;
 		float position = this.position;
-		FloatArray out = positions;
-		FloatArray lengths = this.lengths;
-
-		int verticesLength = path.getWorldVerticesLength(), curves = verticesLength / 6;
+		int lengthCount = lengths.size;
+		float[] lengths = this.lengths.items;
+		FloatArray positions = this.positions;
+		positions.clear();
 		boolean closed = path.getClosed();
-		float[] vertices;
+		int verticesLength = path.getWorldVerticesLength(), curves = verticesLength / 6;
+		float[] temp;
 
 		if (!path.getConstantSpeed()) {
 			if (!closed) curves--;
 			float pathLength = path.getLength();
-			vertices = worldVertices.setSize(8);
-			for (int i = 0, n = lengths.size; i < n; i++) {
-				position += lengths.get(i) / pathLength;
+			temp = this.temp.setSize(8);
+			for (int i = 0; i < lengthCount; i++) {
+				position += lengths[i] / pathLength;
 				if (closed) {
 					position %= 1;
 					if (position < 0) position += 1;
 				} else if (position < 0 || position > 1) {
-					path.computeWorldVertices(slot, 0, 4, vertices, 0);
-					path.computeWorldVertices(slot, verticesLength - 4, 4, vertices, 4);
-					addOutsidePoint(position * pathLength, vertices, 8, pathLength, out, tangents);
+					path.computeWorldVertices(target, 0, 4, temp, 0);
+					path.computeWorldVertices(target, verticesLength - 4, 4, temp, 4);
+					addOutsidePosition(position * pathLength, temp, 0, 8, pathLength, positions, tangents);
 					continue;
 				}
 				int curve = position < 1 ? (int)(curves * position) : curves - 1;
 				if (closed && curve == curves - 1) {
-					path.computeWorldVertices(slot, verticesLength - 4, 4, vertices, 0);
-					path.computeWorldVertices(slot, 0, 4, vertices, 4);
+					path.computeWorldVertices(target, verticesLength - 4, 4, temp, 0);
+					path.computeWorldVertices(target, 0, 4, temp, 4);
 				} else
-					path.computeWorldVertices(slot, curve * 6 + 2, 8, vertices, 0);
-				addCurvePoint(vertices[0], vertices[1], vertices[2], vertices[3], vertices[4], vertices[5], vertices[6], vertices[7],
-					(position - curve / (float)curves) * curves, tangents, out);
+					path.computeWorldVertices(target, curve * 6 + 2, 8, temp, 0);
+				addCurvePosition((position - curve / (float)curves) * curves, temp[0], temp[1], temp[2], temp[3], temp[4], temp[5],
+					temp[6], temp[7], positions, tangents);
 			}
-			return;
+			return positions.items;
 		}
 
+		// World vertices, verticesStart to verticesStart + verticesLength.
+		int verticesStart = 10 + curves;
+		temp = this.temp.setSize(verticesStart + verticesLength + 2);
 		if (closed) {
 			verticesLength += 2;
-			vertices = worldVertices.setSize(verticesLength);
-			path.computeWorldVertices(slot, 2, verticesLength - 4, vertices, 0);
-			path.computeWorldVertices(slot, 0, 2, vertices, verticesLength - 4);
-			vertices[verticesLength - 2] = vertices[0];
-			vertices[verticesLength - 1] = vertices[1];
+			int verticesEnd = verticesStart + verticesLength;
+			path.computeWorldVertices(target, 2, verticesLength - 4, temp, verticesStart);
+			path.computeWorldVertices(target, 0, 2, temp, verticesEnd - 4);
+			temp[verticesEnd - 2] = temp[verticesStart];
+			temp[verticesEnd - 1] = temp[verticesStart + 1];
 		} else {
+			verticesStart--;
 			verticesLength -= 4;
-			vertices = worldVertices.setSize(verticesLength);
-			path.computeWorldVertices(slot, 2, verticesLength, vertices, 0);
+			path.computeWorldVertices(target, 2, verticesLength, temp, verticesStart);
 		}
 
-		// Curve lengths.
-		temp.setSize(10 + curves); // BOZO - Combine with worldVertices?
-		float[] temp = this.temp.items;
-		float pathLength = 0, x1 = vertices[0], y1 = vertices[1], cx1, cy1, cx2, cy2, x2, y2;
+		// Curve lengths, 10 to verticesStart.
+		float pathLength = 0;
+		float x1 = temp[verticesStart], y1 = temp[verticesStart + 1], cx1 = 0, cy1 = 0, cx2 = 0, cy2 = 0, x2 = 0, y2 = 0;
 		float tmpx, tmpy, dddfx, dddfy, ddfx, ddfy, dfx, dfy;
-		for (int i = 10, w = 2; w < verticesLength; i++, w += 6) {
-			cx1 = vertices[w];
-			cy1 = vertices[w + 1];
-			cx2 = vertices[w + 2];
-			cy2 = vertices[w + 3];
-			x2 = vertices[w + 4];
-			y2 = vertices[w + 5];
+		for (int i = 10, v = verticesStart + 2; i < verticesStart; i++, v += 6) {
+			cx1 = temp[v];
+			cy1 = temp[v + 1];
+			cx2 = temp[v + 2];
+			cy2 = temp[v + 3];
+			x2 = temp[v + 4];
+			y2 = temp[v + 5];
 			tmpx = (x1 - cx1 * 2 + cx2) * 0.1875f;
 			tmpy = (y1 - cy1 * 2 + cy2) * 0.1875f;
 			dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.09375f;
@@ -220,15 +223,17 @@ public class PathConstraint implements Updatable {
 		}
 		position *= pathLength;
 
-		for (int i = 0, n = lengths.size; i < n; i++) {
-			position += lengths.get(i);
+		int lastCurve = 0;
+		float curveLength = 0;
+		for (int i = 0; i < lengthCount; i++) {
+			position += lengths[i];
 			float p = position;
 
 			if (closed) {
 				p %= pathLength;
 				if (p < 0) p += pathLength;
 			} else if (p < 0 || p > pathLength) {
-				addOutsidePoint(p, vertices, verticesLength, pathLength, out, tangents);
+				addOutsidePosition(p, temp, verticesStart, verticesLength, pathLength, positions, tangents);
 				continue;
 			}
 
@@ -236,7 +241,7 @@ public class PathConstraint implements Updatable {
 			int curve;
 			float length = temp[10];
 			if (p <= length) {
-				curve = 0;
+				curve = verticesStart;
 				p /= length;
 			} else {
 				for (curve = 11;; curve++) {
@@ -247,47 +252,50 @@ public class PathConstraint implements Updatable {
 						break;
 					}
 				}
-				curve = (curve - 10) * 6;
+				curve = verticesStart + (curve - 10) * 6;
 			}
 
-			// Curve segment lengths.
-			x1 = vertices[curve];
-			y1 = vertices[curve + 1];
-			cx1 = vertices[curve + 2];
-			cy1 = vertices[curve + 3];
-			cx2 = vertices[curve + 4];
-			cy2 = vertices[curve + 5];
-			x2 = vertices[curve + 6];
-			y2 = vertices[curve + 7];
-			tmpx = (x1 - cx1 * 2 + cx2) * 0.03f;
-			tmpy = (y1 - cy1 * 2 + cy2) * 0.03f;
-			dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.006f;
-			dddfy = ((cy1 - cy2) * 3 - y1 + y2) * 0.006f;
-			ddfx = tmpx * 2 + dddfx;
-			ddfy = tmpy * 2 + dddfy;
-			dfx = (cx1 - x1) * 0.3f + tmpx + dddfx * 0.16666667f;
-			dfy = (cy1 - y1) * 0.3f + tmpy + dddfy * 0.16666667f;
-			length = (float)Math.sqrt(dfx * dfx + dfy * dfy);
-			temp[0] = length;
-			for (int ii = 1; ii < 8; ii++) {
+			// Curve segment lengths, 0 to 10.
+			if (curve != lastCurve) {
+				lastCurve = curve;
+				x1 = temp[curve];
+				y1 = temp[curve + 1];
+				cx1 = temp[curve + 2];
+				cy1 = temp[curve + 3];
+				cx2 = temp[curve + 4];
+				cy2 = temp[curve + 5];
+				x2 = temp[curve + 6];
+				y2 = temp[curve + 7];
+				tmpx = (x1 - cx1 * 2 + cx2) * 0.03f;
+				tmpy = (y1 - cy1 * 2 + cy2) * 0.03f;
+				dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.006f;
+				dddfy = ((cy1 - cy2) * 3 - y1 + y2) * 0.006f;
+				ddfx = tmpx * 2 + dddfx;
+				ddfy = tmpy * 2 + dddfy;
+				dfx = (cx1 - x1) * 0.3f + tmpx + dddfx * 0.16666667f;
+				dfy = (cy1 - y1) * 0.3f + tmpy + dddfy * 0.16666667f;
+				curveLength = (float)Math.sqrt(dfx * dfx + dfy * dfy);
+				temp[0] = curveLength;
+				for (int ii = 1; ii < 8; ii++) {
+					dfx += ddfx;
+					dfy += ddfy;
+					ddfx += dddfx;
+					ddfy += dddfy;
+					curveLength += (float)Math.sqrt(dfx * dfx + dfy * dfy);
+					temp[ii] = curveLength;
+				}
 				dfx += ddfx;
 				dfy += ddfy;
-				ddfx += dddfx;
-				ddfy += dddfy;
-				length += (float)Math.sqrt(dfx * dfx + dfy * dfy);
-				temp[ii] = length;
+				curveLength += (float)Math.sqrt(dfx * dfx + dfy * dfy);
+				temp[8] = curveLength;
+				dfx += ddfx + dddfx;
+				dfy += ddfy + dddfy;
+				curveLength += (float)Math.sqrt(dfx * dfx + dfy * dfy);
+				temp[9] = curveLength;
 			}
-			dfx += ddfx;
-			dfy += ddfy;
-			length += (float)Math.sqrt(dfx * dfx + dfy * dfy);
-			temp[8] = length;
-			dfx += ddfx + dddfx;
-			dfy += ddfy + dddfy;
-			length += (float)Math.sqrt(dfx * dfx + dfy * dfy);
-			temp[9] = length;
 
 			// Weight by segment length.
-			p *= length;
+			p *= curveLength;
 			length = temp[0];
 			if (p <= length)
 				p = 0.1f * p / length;
@@ -302,36 +310,39 @@ public class PathConstraint implements Updatable {
 				}
 			}
 
-			addCurvePoint(x1, y1, cx1, cy1, cx2, cy2, x2, y2, p, tangents, out);
+			addCurvePosition(p, x1, y1, cx1, cy1, cx2, cy2, x2, y2, positions, tangents);
 		}
+
+		return positions.items;
 	}
 
-	private void addOutsidePoint (float position, float[] vertices, int verticesLength, float pathLength, FloatArray out,
-		boolean tangents) {
+	private void addOutsidePosition (float p, float[] temp, int verticesStart, int verticesLength, float pathLength,
+		FloatArray out, boolean tangents) {
 		float x1, y1, x2, y2;
-		if (position < 0) {
-			x1 = vertices[0];
-			y1 = vertices[1];
-			x2 = vertices[2] - x1;
-			y2 = vertices[3] - y1;
+		if (p < 0) {
+			x1 = temp[verticesStart];
+			y1 = temp[verticesStart + 1];
+			x2 = temp[verticesStart + 2] - x1;
+			y2 = temp[verticesStart + 3] - y1;
 		} else {
-			x1 = vertices[verticesLength - 2];
-			y1 = vertices[verticesLength - 1];
-			x2 = x1 - vertices[verticesLength - 4];
-			y2 = y1 - vertices[verticesLength - 3];
-			position -= pathLength;
+			verticesStart += verticesLength;
+			x1 = temp[verticesStart - 2];
+			y1 = temp[verticesStart - 1];
+			x2 = x1 - temp[verticesStart - 4];
+			y2 = y1 - temp[verticesStart - 3];
+			p -= pathLength;
 		}
 		float r = atan2(y2, x2);
-		out.add(x1 + position * cos(r));
-		out.add(y1 + position * sin(r));
+		out.add(x1 + p * cos(r));
+		out.add(y1 + p * sin(r));
 		if (tangents) out.add(r + PI);
 	}
 
-	private void addCurvePoint (float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2, float y2, float position,
-		boolean tangents, FloatArray out) {
-		if (position == 0) position = 0.0001f;
-		float tt = position * position, ttt = tt * position, u = 1 - position, uu = u * u, uuu = uu * u;
-		float ut = u * position, ut3 = ut * 3, uut3 = u * ut3, utt3 = ut3 * position;
+	private void addCurvePosition (float p, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2, float y2,
+		FloatArray out, boolean tangents) {
+		if (p == 0) p = 0.0001f;
+		float tt = p * p, ttt = tt * p, u = 1 - p, uu = u * u, uuu = uu * u;
+		float ut = u * p, ut3 = ut * 3, uut3 = u * ut3, utt3 = ut3 * p;
 		float x = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt, y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt;
 		out.add(x);
 		out.add(y);
