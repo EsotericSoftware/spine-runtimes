@@ -75,6 +75,7 @@ void SkeletonRenderer::initialize () {
 
 void SkeletonRenderer::setSkeletonData (spSkeletonData *skeletonData, bool ownsSkeletonData) {
 	_skeleton = spSkeleton_create(skeletonData);
+	updateWorldTransform();
 	_ownsSkeletonData = ownsSkeletonData;
 }
 
