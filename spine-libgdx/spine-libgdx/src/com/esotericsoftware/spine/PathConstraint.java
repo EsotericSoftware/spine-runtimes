@@ -142,6 +142,7 @@ public class PathConstraint implements Updatable {
 		boolean closed = path.getClosed();
 		int verticesLength = path.getWorldVerticesLength(), curves = verticesLength / 6;
 		float[] temp;
+		int lastCurve = -1;
 
 		if (!path.getConstantSpeed()) {
 			if (!closed) curves--;
@@ -152,18 +153,30 @@ public class PathConstraint implements Updatable {
 				if (closed) {
 					position %= 1;
 					if (position < 0) position += 1;
-				} else if (position < 0 || position > 1) {
-					path.computeWorldVertices(target, 0, 4, temp, 0);
-					path.computeWorldVertices(target, verticesLength - 4, 4, temp, 4);
-					addOutsidePosition(position * pathLength, temp, 0, 8, pathLength, positions, tangents);
+				} else if (position < 0) {
+					if (lastCurve != -2) {
+						lastCurve = -2;
+						path.computeWorldVertices(target, 2, 4, temp, 0);
+					}
+					addBeforePosition(position * pathLength, temp, 0, positions, tangents);
+					continue;
+				} else if (position > 1) {
+					if (lastCurve != -3) {
+						lastCurve = -3;
+						path.computeWorldVertices(target, verticesLength - 6, 4, temp, 0);
+					}
+					addAfterPosition((position - 1) * pathLength, temp, 0, positions, tangents);
 					continue;
 				}
 				int curve = position < 1 ? (int)(curves * position) : curves - 1;
-				if (closed && curve == curves - 1) {
-					path.computeWorldVertices(target, verticesLength - 4, 4, temp, 0);
-					path.computeWorldVertices(target, 0, 4, temp, 4);
-				} else
-					path.computeWorldVertices(target, curve * 6 + 2, 8, temp, 0);
+				if (curve != lastCurve) {
+					lastCurve = curve;
+					if (closed && curve == curves - 1) {
+						path.computeWorldVertices(target, verticesLength - 4, 4, temp, 0);
+						path.computeWorldVertices(target, 0, 4, temp, 4);
+					} else
+						path.computeWorldVertices(target, curve * 6 + 2, 8, temp, 0);
+				}
 				addCurvePosition((position - curve / (float)curves) * curves, temp[0], temp[1], temp[2], temp[3], temp[4], temp[5],
 					temp[6], temp[7], positions, tangents);
 			}
@@ -223,7 +236,6 @@ public class PathConstraint implements Updatable {
 		}
 		position *= pathLength;
 
-		int lastCurve = 0;
 		float curveLength = 0;
 		for (int i = 0; i < lengthCount; i++) {
 			position += lengths[i];
@@ -232,8 +244,11 @@ public class PathConstraint implements Updatable {
 			if (closed) {
 				p %= pathLength;
 				if (p < 0) p += pathLength;
-			} else if (p < 0 || p > pathLength) {
-				addOutsidePosition(p, temp, verticesStart, verticesLength, pathLength, positions, tangents);
+			} else if (p < 0) {
+				addBeforePosition(p, temp, verticesStart, positions, tangents);
+				continue;
+			} else if (p > pathLength) {
+				addAfterPosition(p - pathLength, temp, verticesStart + verticesLength - 4, positions, tangents);
 				continue;
 			}
 
@@ -316,23 +331,15 @@ public class PathConstraint implements Updatable {
 		return positions.items;
 	}
 
-	private void addOutsidePosition (float p, float[] temp, int verticesStart, int verticesLength, float pathLength,
-		FloatArray out, boolean tangents) {
-		float x1, y1, x2, y2;
-		if (p < 0) {
-			x1 = temp[verticesStart];
-			y1 = temp[verticesStart + 1];
-			x2 = temp[verticesStart + 2] - x1;
-			y2 = temp[verticesStart + 3] - y1;
-		} else {
-			verticesStart += verticesLength;
-			x1 = temp[verticesStart - 2];
-			y1 = temp[verticesStart - 1];
-			x2 = x1 - temp[verticesStart - 4];
-			y2 = y1 - temp[verticesStart - 3];
-			p -= pathLength;
-		}
-		float r = atan2(y2, x2);
+	private void addBeforePosition (float p, float[] temp, int i, FloatArray out, boolean tangents) {
+		float x1 = temp[i], y1 = temp[i + 1], dx = temp[i + 2] - x1, dy = temp[i + 3] - y1, r = atan2(dy, dx);
+		out.add(x1 + p * cos(r));
+		out.add(y1 + p * sin(r));
+		if (tangents) out.add(r + PI);
+	}
+
+	private void addAfterPosition (float p, float[] temp, int i, FloatArray out, boolean tangents) {
+		float x1 = temp[i + 2], y1 = temp[i + 3], dx = x1 - temp[i], dy = y1 - temp[i + 1], r = atan2(dy, dx);
 		out.add(x1 + p * cos(r));
 		out.add(y1 + p * sin(r));
 		if (tangents) out.add(r + PI);
