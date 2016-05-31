@@ -403,7 +403,7 @@ public class SkeletonJson {
 						frameIndex++;
 					}
 					timelines.add(timeline);
-					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 5 - 5]);
+					duration = Math.max(duration, timeline.getFrames()[(timeline.getFrameCount() - 1) * ColorTimeline.ENTRIES]);
 
 				} else if (timelineName.equals("attachment")) {
 					AttachmentTimeline timeline = new AttachmentTimeline(timelineMap.size);
@@ -437,7 +437,7 @@ public class SkeletonJson {
 						frameIndex++;
 					}
 					timelines.add(timeline);
-					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 2 - 2]);
+					duration = Math.max(duration, timeline.getFrames()[(timeline.getFrameCount() - 1) * RotateTimeline.ENTRIES]);
 
 				} else if (timelineName.equals("translate") || timelineName.equals("scale") || timelineName.equals("shear")) {
 					TranslateTimeline timeline;
@@ -460,7 +460,7 @@ public class SkeletonJson {
 						frameIndex++;
 					}
 					timelines.add(timeline);
-					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 3 - 3]);
+					duration = Math.max(duration, timeline.getFrames()[(timeline.getFrameCount() - 1) * TranslateTimeline.ENTRIES]);
 
 				} else
 					throw new RuntimeException("Invalid timeline type for a bone: " + timelineName + " (" + boneMap.name + ")");
@@ -480,7 +480,7 @@ public class SkeletonJson {
 				frameIndex++;
 			}
 			timelines.add(timeline);
-			duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 3 - 3]);
+			duration = Math.max(duration, timeline.getFrames()[(timeline.getFrameCount() - 1) * IkConstraintTimeline.ENTRIES]);
 		}
 
 		// Transform constraint timelines.
@@ -496,7 +496,8 @@ public class SkeletonJson {
 				frameIndex++;
 			}
 			timelines.add(timeline);
-			duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 5 - 5]);
+			duration = Math.max(duration,
+				timeline.getFrames()[(timeline.getFrameCount() - 1) * TransformConstraintTimeline.ENTRIES]);
 		}
 
 		// Path constraint timelines.
@@ -512,7 +513,7 @@ public class SkeletonJson {
 				frameIndex++;
 			}
 			timelines.add(timeline);
-			duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() * 5 - 5]);
+			duration = Math.max(duration, timeline.getFrames()[(timeline.getFrameCount() - 1) * PathConstraintTimeline.ENTRIES]);
 		}
 
 		// Deform timelines.

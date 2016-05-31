@@ -493,7 +493,7 @@ public class SkeletonBinary {
 							if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
 						}
 						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getFrames()[frameCount * 5 - 5]);
+						duration = Math.max(duration, timeline.getFrames()[(frameCount - 1) * ColorTimeline.ENTRIES]);
 						break;
 					}
 					case TIMELINE_ATTACHMENT:
@@ -523,7 +523,7 @@ public class SkeletonBinary {
 							if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
 						}
 						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getFrames()[frameCount * 2 - 2]);
+						duration = Math.max(duration, timeline.getFrames()[(frameCount - 1) * RotateTimeline.ENTRIES]);
 						break;
 					}
 					case TIMELINE_TRANSLATE:
@@ -546,7 +546,7 @@ public class SkeletonBinary {
 							if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
 						}
 						timelines.add(timeline);
-						duration = Math.max(duration, timeline.getFrames()[frameCount * 3 - 3]);
+						duration = Math.max(duration, timeline.getFrames()[(frameCount - 1) * TranslateTimeline.ENTRIES]);
 						break;
 					}
 					}
@@ -564,7 +564,7 @@ public class SkeletonBinary {
 					if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
 				}
 				timelines.add(timeline);
-				duration = Math.max(duration, timeline.getFrames()[frameCount * 3 - 3]);
+				duration = Math.max(duration, timeline.getFrames()[(frameCount - 1) * IkConstraintTimeline.ENTRIES]);
 			}
 
 			// Transform constraint timelines.
@@ -579,7 +579,7 @@ public class SkeletonBinary {
 					if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
 				}
 				timelines.add(timeline);
-				duration = Math.max(duration, timeline.getFrames()[frameCount * 5 - 5]);
+				duration = Math.max(duration, timeline.getFrames()[(frameCount - 1) * TransformConstraintTimeline.ENTRIES]);
 			}
 
 			// Path constraint timelines.
@@ -594,7 +594,7 @@ public class SkeletonBinary {
 					if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
 				}
 				timelines.add(timeline);
-				duration = Math.max(duration, timeline.getFrames()[frameCount * 5 - 5]);
+				duration = Math.max(duration, timeline.getFrames()[(frameCount - 1) * PathConstraintTimeline.ENTRIES]);
 			}
 
 			// Deform timelines.
