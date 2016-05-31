@@ -10,8 +10,9 @@ using System.Collections.Generic;
 namespace Spine.Unity.Modules {
 	[RequireComponent(typeof(SkeletonRenderer))]
 	public class SkeletonRagdoll : MonoBehaviour {
-		private static Transform helper;
+		static Transform parentSpaceHelper;
 
+		#region Inspector
 		[Header("Hierarchy")]
 		[SpineBone]
 		public string startingBoneName = "";
@@ -39,46 +40,28 @@ namespace Spine.Unity.Modules {
 		public int colliderLayer = 0;
 		[Range(0, 1)]
 		public float mix = 1;
+		#endregion
 
-		public Rigidbody RootRigidbody {
-			get {
-				return this.rootRigidbody;
-			}
-		}
-
-		public Vector3 RootOffset {
-			get {
-				return this.rootOffset;
-			}
-		}
-
-		public Vector3 EstimatedSkeletonPosition {
-			get {
-				return rootRigidbody.position - rootOffset;
-			}
-		}
-
-		public bool IsActive {
-			get {
-				return this.isActive;
-			}
-		}
-
-		private Rigidbody rootRigidbody;
-		private ISkeletonAnimation skeletonAnim;
-		private Skeleton skeleton;
-		private Dictionary<Bone, Transform> boneTable = new Dictionary<Bone, Transform>();
-		private Bone startingBone;
-		private Transform ragdollRoot;
-		private Vector3 rootOffset;
-		private bool isActive;
+		ISkeletonAnimation targetSkeletonComponent;
+		Skeleton skeleton;
+		Dictionary<Bone, Transform> boneTable = new Dictionary<Bone, Transform>();
+		Transform ragdollRoot;
+		public Rigidbody RootRigidbody { get; private set; }
+		public Bone StartingBone { get; private set; }
+		Vector3 rootOffset;
+		public Vector3 RootOffset { get { return this.rootOffset; } }
+		bool isActive;
+		public bool IsActive { get { return this.isActive; } }
 
 		IEnumerator Start () {
-			skeletonAnim = (ISkeletonAnimation)GetComponent<SkeletonRenderer>();
-			if (helper == null) {
-				helper = (Transform)(new GameObject("Helper")).transform;
-				helper.hideFlags = HideFlags.HideInHierarchy;
+			if (parentSpaceHelper == null) {
+				parentSpaceHelper = (new GameObject("Parent Space Helper")).transform;
+				parentSpaceHelper.hideFlags = HideFlags.HideInHierarchy;
 			}
+
+			targetSkeletonComponent = GetComponent<SkeletonRenderer>() as ISkeletonAnimation;
+			if (targetSkeletonComponent == null) Debug.LogError("Attached Spine component does not implement ISkeletonAnimation. This script is not compatible.");
+			skeleton = targetSkeletonComponent.Skeleton;
 
 			if (applyOnStart) {
 				yield return null;
@@ -86,6 +69,124 @@ namespace Spine.Unity.Modules {
 			}
 		}
 
+		#region API
+		public Rigidbody[] RigidbodyArray {
+			get {
+				if (!isActive)
+					return new Rigidbody[0];
+
+				var rigidBodies = new Rigidbody[boneTable.Count];
+				int i = 0;
+				foreach (Transform t in boneTable.Values) {
+					rigidBodies[i] = t.GetComponent<Rigidbody>();
+					i++;
+				}
+
+				return rigidBodies;
+			}
+		}
+
+		public Vector3 EstimatedSkeletonPosition {
+			get { return RootRigidbody.position - rootOffset; }
+		}
+
+		/// <summary>Instantiates the ragdoll simulation and applies its transforms to the skeleton.</summary>
+		public void Apply () {
+			isActive = true;
+			mix = 1;
+
+			StartingBone = skeleton.FindBone(startingBoneName);
+			RecursivelyCreateBoneProxies(StartingBone);
+
+			RootRigidbody = boneTable[StartingBone].GetComponent<Rigidbody>();
+			RootRigidbody.isKinematic = pinStartBone;
+			RootRigidbody.mass = rootMass;
+			var boneColliders = new List<Collider>();
+			foreach (var pair in boneTable) {
+				var b = pair.Key;
+				var t = pair.Value;
+				Transform parentTransform;
+				boneColliders.Add(t.GetComponent<Collider>());
+				if (b == StartingBone) {
+//					skeletonSpaceTransform = new GameObject("Spine World Space Transform").transform;
+//					skeletonSpaceTransform.hideFlags = HideFlags.NotEditable;
+//					skeletonSpaceTransform.localScale = FlipScale(skeleton.flipX, skeleton.flipY);
+//					skeletonSpaceTransform.SetParent(this.transform, false);
+					ragdollRoot = new GameObject("RagdollRoot").transform;
+					ragdollRoot.SetParent(transform, false);
+					if (b == skeleton.RootBone) { // RagdollRoot is skeleton root.
+						ragdollRoot.localPosition = new Vector3(b.WorldX, b.WorldY, 0);
+						ragdollRoot.localRotation = Quaternion.Euler(0, 0, GetPropagatedRotation(b));
+					} else {
+						ragdollRoot.localPosition = new Vector3(b.Parent.WorldX, b.Parent.WorldY, 0);
+						ragdollRoot.localRotation = Quaternion.Euler(0, 0, GetPropagatedRotation(b.Parent));
+					}
+					parentTransform = ragdollRoot;
+					rootOffset = t.position - transform.position;
+				} else {
+					parentTransform = boneTable[b.Parent];
+				}
+
+				// Add joint and attach to parent.
+				var rbParent = parentTransform.GetComponent<Rigidbody>();
+				if (rbParent != null) {
+					var joint = t.gameObject.AddComponent<HingeJoint>();
+					joint.connectedBody = rbParent;
+					Vector3 localPos = parentTransform.InverseTransformPoint(t.position);
+					localPos.x *= 1;
+					joint.connectedAnchor = localPos;
+					joint.axis = Vector3.forward;
+
+					joint.GetComponent<Rigidbody>().mass = joint.connectedBody.mass * massFalloffFactor;
+					joint.limits = new JointLimits {
+						min = -rotationLimit,
+						max = rotationLimit,
+					};
+					joint.useLimits = true;
+					joint.enableCollision = enableJointCollision;
+				}
+			}
+
+			// Ignore collisions among bones.
+			for (int x = 0; x < boneColliders.Count; x++) {
+				for (int y = 0; y < boneColliders.Count; y++) {
+					if (x == y) continue;
+					Physics.IgnoreCollision(boneColliders[x], boneColliders[y]);
+				}
+			}
+
+			// Destroy existing override-mode SkeletonUtilityBones.
+			var utilityBones = GetComponentsInChildren<SkeletonUtilityBone>();
+			if (utilityBones.Length > 0) {
+				var destroyedUtilityBoneNames = new List<string>();
+				foreach (var ub in utilityBones) {
+					if (ub.mode == SkeletonUtilityBone.Mode.Override) {
+						destroyedUtilityBoneNames.Add(ub.gameObject.name);
+						Destroy(ub.gameObject);
+					}
+				}
+				if (destroyedUtilityBoneNames.Count > 0) {
+					string msg = "Destroyed Utility Bones: ";
+					for (int i = 0; i < destroyedUtilityBoneNames.Count; i++) {
+						msg += destroyedUtilityBoneNames[i];
+						if (i != destroyedUtilityBoneNames.Count - 1) {
+							msg += ",";
+						}
+					}
+					Debug.LogWarning(msg);
+				}
+			}
+
+			// Disable IK constraints.
+			if (disableIK) {
+				foreach (IkConstraint ik in skeleton.IkConstraints)
+					ik.Mix = 0;
+			}
+
+			targetSkeletonComponent.UpdateWorld += UpdateSpineSkeleton;
+		}
+
+		/// <summary>Transitions the mix value from the current value to a target value.</summary>
 		public Coroutine SmoothMix (float target, float duration) {
 			return StartCoroutine(SmoothMixCoroutine(target, duration));
 		}
@@ -99,6 +200,7 @@ namespace Spine.Unity.Modules {
 			}
 		}
 
+		/// <summary>Set the transform world position while preserving the ragdoll parts world position.</summary>
 		public void SetSkeletonPosition (Vector3 worldPosition) {
 			if (!isActive) {
 				Debug.LogWarning("Can't call SetSkeletonPosition while Ragdoll is not active!");
@@ -111,35 +213,11 @@ namespace Spine.Unity.Modules {
 				t.position -= offset;
 			}
 
-			UpdateWorld(null);
+			UpdateSpineSkeleton(null);
 			skeleton.UpdateWorldTransform();
 		}
 
-		public Rigidbody[] GetRigidbodyArray () {
-			if (!isActive)
-				return new Rigidbody[0];
-
-			Rigidbody[] arr = new Rigidbody[boneTable.Count];
-			int i = 0;
-			foreach (Transform t in boneTable.Values) {
-				arr[i] = t.GetComponent<Rigidbody>();
-				i++;
-			}
-
-			return arr;
-		}
-
-		public Rigidbody GetRigidbody (string boneName) {
-			var bone = skeleton.FindBone(boneName);
-			if (bone == null)
-				return null;
-
-			if (boneTable.ContainsKey(bone))
-				return boneTable[bone].GetComponent<Rigidbody>();
-
-			return null;
-		}
-
+		/// <summary>Removes the ragdoll instance and effect from the animated skeleton.</summary>
 		public void Remove () {
 			isActive = false;
 			foreach (var t in boneTable.Values) {
@@ -148,198 +226,120 @@ namespace Spine.Unity.Modules {
 			Destroy(ragdollRoot.gameObject);
 
 			boneTable.Clear();
-			skeletonAnim.UpdateWorld -= UpdateWorld;
+			targetSkeletonComponent.UpdateWorld -= UpdateSpineSkeleton;
 		}
 
-		public void Apply () {
-			isActive = true;
-			skeleton = skeletonAnim.Skeleton;
-			mix = 1;
-
-			var ragdollRootBone = skeleton.FindBone(startingBoneName);
-			startingBone = ragdollRootBone;
-			RecursivelyCreateBoneProxies(ragdollRootBone);
-
-			rootRigidbody = boneTable[ragdollRootBone].GetComponent<Rigidbody>();
-			rootRigidbody.isKinematic = pinStartBone;
-
-			rootRigidbody.mass = rootMass;
-
-			List<Collider> boneColliders = new List<Collider>();
-
-			foreach (var pair in boneTable) {
-				var b = pair.Key;
-				var t = pair.Value;
-				Bone parentBone = null;
-				Transform parentTransform = transform;
-
-				boneColliders.Add(t.GetComponent<Collider>());
-
-				if (b != startingBone) {
-					parentBone = b.Parent;
-					parentTransform = boneTable[parentBone];
-				} else {
-					ragdollRoot = new GameObject("RagdollRoot").transform;
-					ragdollRoot.parent = transform;
-
-					if (b == skeleton.RootBone) {
-						ragdollRoot.localPosition = new Vector3(b.WorldX, b.WorldY, 0);
-						ragdollRoot.localRotation = Quaternion.Euler(0, 0, GetCompensatedRotationIK(b));
-						parentTransform = ragdollRoot;
-					} else {
-						ragdollRoot.localPosition = new Vector3(b.Parent.WorldX, b.Parent.WorldY, 0);
-						ragdollRoot.localRotation = Quaternion.Euler(0, 0, GetCompensatedRotationIK(b.Parent));
-						parentTransform = ragdollRoot;
-					}
-
-					rootOffset = t.position - transform.position;
-				}
-
-				var rbParent = parentTransform.GetComponent<Rigidbody>();
-
-				if (rbParent != null) {
-					var joint = t.gameObject.AddComponent<HingeJoint>();
-					joint.connectedBody = rbParent;
-					Vector3 localPos = parentTransform.InverseTransformPoint(t.position);
-					localPos.x *= 1;
-					joint.connectedAnchor = localPos;
-					joint.axis = Vector3.forward;
-					joint.GetComponent<Rigidbody>().mass = joint.connectedBody.mass * massFalloffFactor;
-					JointLimits limits = new JointLimits();
-					limits.min = -rotationLimit;
-					limits.max = rotationLimit;
-					joint.limits = limits;
-					joint.useLimits = true;
-					joint.enableCollision = enableJointCollision;
-				}
-			}
-
-			for (int x = 0; x < boneColliders.Count; x++) {
-				for (int y = 0; y < boneColliders.Count; y++) {
-					if (x == y) continue;
-					Physics.IgnoreCollision(boneColliders[x], boneColliders[y]);
-				}
-			}
-
-			var utilityBones = GetComponentsInChildren<SkeletonUtilityBone>();
-			if (utilityBones.Length > 0) {
-				List<string> destroyedUtilityBoneNames = new List<string>();
-				foreach (var ub in utilityBones) {
-					if (ub.mode == SkeletonUtilityBone.Mode.Override) {
-						destroyedUtilityBoneNames.Add(ub.gameObject.name);
-						Destroy(ub.gameObject);
-					}
-				}
-
-				if (destroyedUtilityBoneNames.Count > 0) {
-					string msg = "Destroyed Utility Bones: ";
-					for (int i = 0; i < destroyedUtilityBoneNames.Count; i++) {
-						msg += destroyedUtilityBoneNames[i];
-						if (i != destroyedUtilityBoneNames.Count - 1) {
-							msg += ",";
-						}
-					}
-					Debug.LogWarning(msg);
-				}
-			}
-
-			if (disableIK) {
-				foreach (IkConstraint ik in skeleton.IkConstraints) {
-					ik.Mix = 0;
-				}
-			}
-
-			skeletonAnim.UpdateWorld += UpdateWorld;
+		public Rigidbody GetRigidbody (string boneName) {
+			var bone = skeleton.FindBone(boneName);
+			return (bone != null && boneTable.ContainsKey(bone)) ? boneTable[bone].GetComponent<Rigidbody>() : null;
 		}
+		#endregion
 
 		void RecursivelyCreateBoneProxies (Bone b) {
-			if (stopBoneNames.Contains(b.Data.Name))
+			string boneName = b.data.name;
+			if (stopBoneNames.Contains(boneName))
 				return;
 
-			GameObject go = new GameObject(b.Data.Name);
-			go.layer = colliderLayer;
-			Transform t = go.transform;
+			var boneGameObject = new GameObject(boneName);
+			boneGameObject.layer = colliderLayer;
+			Transform t = boneGameObject.transform;
 			boneTable.Add(b, t);
 
 			t.parent = transform;
-
 			t.localPosition = new Vector3(b.WorldX, b.WorldY, 0);
-			// MITCH
-			// t.localRotation = Quaternion.Euler(0, 0, b.WorldFlipX ^ b.WorldFlipY ? -b.WorldRotation : b.WorldRotation);
 			t.localRotation = Quaternion.Euler(0, 0, b.WorldRotationX);
 			t.localScale = new Vector3(b.WorldScaleX, b.WorldScaleY, 1);
 
-			float length = b.Data.Length;
-
+			// MITCH: You left "todo: proper ragdoll branching"
 			var colliders = AttachBoundingBoxRagdollColliders(b);
-
-			if (length == 0) {
-				//physics
-				if (colliders.Count == 0) {
-					var ball = go.AddComponent<SphereCollider>();
-					ball.radius = thickness / 2f;
-				}
-			} else {
-				//physics
-				if (colliders.Count == 0) {
-					var box = go.AddComponent<BoxCollider>();
+			if (colliders.Count == 0) {
+				float length = b.Data.Length;
+				if (length == 0) {
+					var ball = boneGameObject.AddComponent<SphereCollider>();
+					ball.radius = thickness * 0.5f;
+				} else {					
+					var box = boneGameObject.AddComponent<BoxCollider>();
 					box.size = new Vector3(length, thickness, thickness);
-					// MITCH
-					// box.center = new Vector3((b.WorldFlipX ? -length : length) / 2, 0);
-					box.center = new Vector3(length / 2, 0);
+					box.center = new Vector3(length * 0.5f, 0);
 				}
 			}
-
-			var rb = go.AddComponent<Rigidbody>();
+			var rb = boneGameObject.AddComponent<Rigidbody>();
 			rb.constraints = RigidbodyConstraints.FreezePositionZ;
+
 			foreach (Bone child in b.Children) {
 				RecursivelyCreateBoneProxies(child);
 			}
 		}
 
+		void UpdateSpineSkeleton (ISkeletonAnimation skeletonRenderer) {
+			bool flipX = skeleton.flipX;
+			bool flipY = skeleton.flipY;
+			bool flipXOR = flipX ^ flipY;
+			bool flipOR = flipX || flipY;
+
+			foreach (var pair in boneTable) {
+				var b = pair.Key;
+				var t = pair.Value;
+				bool isStartingBone = b == StartingBone;
+				Transform parentTransform = isStartingBone ? ragdollRoot : boneTable[b.Parent];
+				Vector3 parentTransformWorldPosition = parentTransform.position;
+				Quaternion parentTransformWorldRotation = parentTransform.rotation;
+
+				parentSpaceHelper.position = parentTransformWorldPosition;
+				parentSpaceHelper.rotation = parentTransformWorldRotation;
+				parentSpaceHelper.localScale = parentTransform.localScale;
+
+				Vector3 boneWorldPosition = t.position;
+				Vector3 right = parentSpaceHelper.InverseTransformDirection(t.right);
+
+				Vector3 boneLocalPosition = parentSpaceHelper.InverseTransformPoint(boneWorldPosition);
+				float boneLocalRotation = Mathf.Atan2(right.y, right.x) * Mathf.Rad2Deg;
+
+				if (flipOR) {
+					if (isStartingBone) {
+						if (flipX) boneLocalPosition.x *= -1f;
+						if (flipY) boneLocalPosition.y *= -1f;
+
+						boneLocalRotation = boneLocalRotation * (flipXOR ? -1f : 1f);
+						if (flipX) boneLocalRotation += 180;
+					} else {
+						if (flipXOR) {
+							boneLocalRotation *= -1f;
+							boneLocalPosition.y *= -1f; // wtf??
+						}
+					}
+				}
+
+				b.x = Mathf.Lerp(b.x, boneLocalPosition.x, mix);
+				b.y = Mathf.Lerp(b.y, boneLocalPosition.y, mix);
+				b.rotation = Mathf.Lerp(b.rotation, boneLocalRotation, mix);
+				b.appliedRotation = Mathf.Lerp(b.appliedRotation, boneLocalRotation, mix);
+			}
+		}
+
 		List<Collider> AttachBoundingBoxRagdollColliders (Bone b) {
-			List<Collider> colliders = new List<Collider>();
+			const string AttachmentNameMarker = "ragdoll";
+			var colliders = new List<Collider>();
 
 			Transform t = boneTable[b];
 			GameObject go = t.gameObject;
-			var skin = skeleton.Skin;
-			if (skin == null)
-				skin = skeleton.Data.DefaultSkin;
+			var skin = skeleton.Skin ?? skeleton.Data.DefaultSkin;
 
-			// MITCH
-			// bool flipX = b.WorldFlipX;
-			// bool flipY = b.WorldFlipY;
-			bool flipX = false;
-			bool flipY = false;
-
-			List<Attachment> attachments = new List<Attachment>();
+			var attachments = new List<Attachment>();
 			foreach (Slot s in skeleton.Slots) {
 				if (s.Bone == b) {
 					skin.FindAttachmentsForSlot(skeleton.Slots.IndexOf(s), attachments);
 					foreach (var a in attachments) {
-						if (a is BoundingBoxAttachment) {
-							if (!a.Name.ToLower().Contains("ragdoll"))
+						var bbAttachment = a as BoundingBoxAttachment;
+						if (bbAttachment != null) {
+							if (!a.Name.ToLower().Contains(AttachmentNameMarker))
 								continue;
 
-							var collider = go.AddComponent<BoxCollider>();
-							var bounds = SkeletonUtility.GetBoundingBoxBounds((BoundingBoxAttachment)a, thickness);
-
-							collider.center = bounds.center;
-							collider.size = bounds.size;
-
-							if (flipX || flipY) {
-								Vector3 center = collider.center;
-
-								if (flipX)
-									center.x *= -1;
-
-								if (flipY)
-									center.y *= -1;
-
-								collider.center = center;
-							}
-
-							colliders.Add(collider);
+							var bbCollider = go.AddComponent<BoxCollider>();
+							var bounds = SkeletonUtility.GetBoundingBoxBounds(bbAttachment, thickness);
+							bbCollider.center = bounds.center;
+							bbCollider.size = bounds.size;
+							colliders.Add(bbCollider);
 						}
 					}
 				}
@@ -348,81 +348,17 @@ namespace Spine.Unity.Modules {
 			return colliders;
 		}
 
-		void UpdateWorld (ISkeletonAnimation skeletonRenderer) {
-			foreach (var pair in boneTable) {
-				var b = pair.Key;
-				var t = pair.Value;
-				// bool flip = false;
-				bool flipX = false;  //TODO:  deal with negative scale instead of Flip Key for Spine 3.0
-				bool flipY = false;  //TODO:  deal with negative scale instead of Flip Key for Spine 3.0
-				Bone parentBone = null;
-				Transform parentTransform = transform;
-
-				if (b != startingBone) {
-					parentBone = b.Parent;
-					parentTransform = boneTable[parentBone];
-					// MITCH
-					// flipX = parentBone.WorldFlipX;
-					// flipY = parentBone.WorldFlipY;
-
-				} else {
-					parentBone = b.Parent;
-					parentTransform = ragdollRoot;
-					if (b.Parent != null) {
-						// MITCH
-						// flipX = b.worldFlipX;
-						// flipY = b.WorldFlipY;
-					} else {
-						flipX = b.Skeleton.FlipX;
-						flipY = b.Skeleton.FlipY;
-					}
-				}
-
-				//flip = flipX ^ flipY;
-
-				helper.position = parentTransform.position;
-				helper.rotation = parentTransform.rotation;
-				helper.localScale = new Vector3(flipX ? -parentTransform.localScale.x : parentTransform.localScale.x, flipY ? -parentTransform.localScale.y : parentTransform.localScale.y, 1);
-
-
-				Vector3 pos = t.position;
-				pos = helper.InverseTransformPoint(pos);
-				b.X = Mathf.Lerp(b.X, pos.x, mix);
-				b.Y = Mathf.Lerp(b.Y, pos.y, mix);
-
-				Vector3 right = helper.InverseTransformDirection(t.right);
-
-				float a = Mathf.Atan2(right.y, right.x) * Mathf.Rad2Deg;
-
-				// MITCH
-				//if (b.WorldFlipX ^ b.WorldFlipY) {
-				//	a *= -1;
-				//}
-
-				if (parentBone != null) {
-					// MITCH
-					//if ((b.WorldFlipX ^ b.WorldFlipY) != flip) {
-					//	a -= GetCompensatedRotationIK(parentBone) * 2;
-					//}
-				}
-
-				b.Rotation = Mathf.Lerp(b.Rotation, a, mix);
-				// MITCH
-				// b.RotationIK = Mathf.Lerp(b.rotationIK, a, mix);
-			}
-		}
-
-		float GetCompensatedRotationIK (Bone b) {
+		static float GetPropagatedRotation (Bone b) {
 			Bone parent = b.Parent;
-			// MITCH
 			float a = b.AppliedRotation;
 			while (parent != null) {
 				a += parent.AppliedRotation;
 				parent = parent.parent;
 			}
-
 			return a;
 		}
+
+		public class LayerFieldAttribute : PropertyAttribute {}
 	}
 
 }
