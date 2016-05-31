@@ -46,6 +46,7 @@ public class BoneData {
 
 	/** @param parent May be null. */
 	public BoneData (int index, String name, BoneData parent) {
+		if (index < 0) throw new IllegalArgumentException("index must be >= 0.");
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		this.index = index;
 		this.name = name;

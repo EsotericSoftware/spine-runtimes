@@ -64,6 +64,7 @@ public class Bone implements Updatable {
 	 * @param parent May be null. */
 	public Bone (Bone bone, Skeleton skeleton, Bone parent) {
 		if (bone == null) throw new IllegalArgumentException("bone cannot be null.");
+		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		this.skeleton = skeleton;
 		this.parent = parent;
 		data = bone.data;

@@ -16,6 +16,8 @@ public class PathConstraint implements Updatable {
 	final FloatArray lengths = new FloatArray(), positions = new FloatArray(), temp = new FloatArray();
 
 	public PathConstraint (PathConstraintData data, Skeleton skeleton) {
+		if (data == null) throw new IllegalArgumentException("data cannot be null.");
+		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		this.data = data;
 		position = data.position;
 		rotateMix = data.rotateMix;
@@ -31,6 +33,8 @@ public class PathConstraint implements Updatable {
 
 	/** Copy constructor. */
 	public PathConstraint (PathConstraint constraint, Skeleton skeleton) {
+		if (constraint == null) throw new IllegalArgumentException("constraint cannot be null.");
+		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		data = constraint.data;
 		bones = new Array(constraint.bones.size);
 		for (Bone bone : constraint.bones)
@@ -84,8 +88,7 @@ public class PathConstraint implements Updatable {
 
 		for (int i = 0; i < boneCount; i++) {
 			Bone bone = bones.get(i);
-			float length = bone.data.length;
-			float x = length * bone.a, y = length * bone.c;
+			float length = bone.data.length, x = length * bone.a, y = length * bone.c;
 			lengths.add((float)Math.sqrt(x * x + y * y));
 		}
 		float[] positions = computeWorldPositions(path, false);

@@ -104,6 +104,7 @@ public class Slot {
 	}
 
 	public void setAttachmentVertices (FloatArray attachmentVertices) {
+		if (attachmentVertices == null) throw new IllegalArgumentException("attachmentVertices cannot be null.");
 		this.attachmentVertices = attachmentVertices;
 	}
 

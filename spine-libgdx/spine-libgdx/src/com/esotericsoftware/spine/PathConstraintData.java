@@ -11,6 +11,7 @@ public class PathConstraintData {
 	float offsetRotation;
 
 	public PathConstraintData (String name) {
+		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		this.name = name;
 	}
 

@@ -42,6 +42,7 @@ public class SlotData {
 	BlendMode blendMode;
 
 	public SlotData (int index, String name, BoneData boneData) {
+		if (index < 0) throw new IllegalArgumentException("index must be >= 0.");
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		if (boneData == null) throw new IllegalArgumentException("boneData cannot be null.");
 		this.index = index;

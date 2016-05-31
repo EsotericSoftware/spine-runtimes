@@ -8,6 +8,7 @@ public class TransformConstraintData {
 	float offsetRotation, offsetX, offsetY, offsetScaleX, offsetScaleY, offsetShearY;
 
 	public TransformConstraintData (String name) {
+		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		this.name = name;
 	}
 
@@ -20,6 +21,7 @@ public class TransformConstraintData {
 	}
 
 	public void setBone (BoneData bone) {
+		if (bone == null) throw new IllegalArgumentException("bone cannot be null.");
 		this.bone = bone;
 	}
 
@@ -28,6 +30,7 @@ public class TransformConstraintData {
 	}
 
 	public void setTarget (BoneData target) {
+		if (target == null) throw new IllegalArgumentException("target cannot be null.");
 		this.target = target;
 	}
 

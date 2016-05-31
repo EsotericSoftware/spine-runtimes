@@ -89,6 +89,7 @@ public class SkeletonBinary {
 	}
 
 	public SkeletonBinary (AttachmentLoader attachmentLoader) {
+		if (attachmentLoader == null) throw new IllegalArgumentException("attachmentLoader cannot be null.");
 		this.attachmentLoader = attachmentLoader;
 	}
 

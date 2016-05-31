@@ -251,8 +251,9 @@ public class Animation {
 			frames = new float[frameCount << 1];
 		}
 
-		public void setBoneIndex (int boneIndex) {
-			this.boneIndex = boneIndex;
+		public void setBoneIndex (int index) {
+			if (index < 0) throw new IllegalArgumentException("index must be >= 0.");
+			this.boneIndex = index;
 		}
 
 		public int getBoneIndex () {
@@ -319,8 +320,9 @@ public class Animation {
 			frames = new float[frameCount * ENTRIES];
 		}
 
-		public void setBoneIndex (int boneIndex) {
-			this.boneIndex = boneIndex;
+		public void setBoneIndex (int index) {
+			if (index < 0) throw new IllegalArgumentException("index must be >= 0.");
+			this.boneIndex = index;
 		}
 
 		public int getBoneIndex () {
@@ -432,8 +434,9 @@ public class Animation {
 			frames = new float[frameCount * ENTRIES];
 		}
 
-		public void setSlotIndex (int slotIndex) {
-			this.slotIndex = slotIndex;
+		public void setSlotIndex (int index) {
+			if (index < 0) throw new IllegalArgumentException("index must be >= 0.");
+			this.slotIndex = index;
 		}
 
 		public int getSlotIndex () {
@@ -503,12 +506,13 @@ public class Animation {
 			return frames.length;
 		}
 
-		public int getSlotIndex () {
-			return slotIndex;
+		public void setSlotIndex (int index) {
+			if (index < 0) throw new IllegalArgumentException("index must be >= 0.");
+			this.slotIndex = index;
 		}
 
-		public void setSlotIndex (int slotIndex) {
-			this.slotIndex = slotIndex;
+		public int getSlotIndex () {
+			return slotIndex;
 		}
 
 		public float[] getFrames () {
@@ -660,8 +664,9 @@ public class Animation {
 			frameVertices = new float[frameCount][];
 		}
 
-		public void setSlotIndex (int slotIndex) {
-			this.slotIndex = slotIndex;
+		public void setSlotIndex (int index) {
+			if (index < 0) throw new IllegalArgumentException("index must be >= 0.");
+			this.slotIndex = index;
 		}
 
 		public int getSlotIndex () {
@@ -750,6 +755,7 @@ public class Animation {
 		}
 
 		public void setIkConstraintIndex (int index) {
+			if (index < 0) throw new IllegalArgumentException("index must be >= 0.");
 			this.ikConstraintIndex = index;
 		}
 
@@ -806,6 +812,7 @@ public class Animation {
 		}
 
 		public void setTransformConstraintIndex (int index) {
+			if (index < 0) throw new IllegalArgumentException("index must be >= 0.");
 			this.transformConstraintIndex = index;
 		}
 
@@ -874,6 +881,7 @@ public class Animation {
 		}
 
 		public void setPathConstraintIndex (int index) {
+			if (index < 0) throw new IllegalArgumentException("index must be >= 0.");
 			this.pathConstraintIndex = index;
 		}
 

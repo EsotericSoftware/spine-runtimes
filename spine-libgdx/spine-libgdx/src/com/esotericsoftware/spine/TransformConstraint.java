@@ -12,20 +12,22 @@ public class TransformConstraint implements Updatable {
 	final Vector2 temp = new Vector2();
 
 	public TransformConstraint (TransformConstraintData data, Skeleton skeleton) {
+		if (data == null) throw new IllegalArgumentException("data cannot be null.");
+		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		this.data = data;
 		rotateMix = data.rotateMix;
 		translateMix = data.translateMix;
 		scaleMix = data.scaleMix;
 		shearMix = data.shearMix;
 
-		if (skeleton != null) {
-			bone = skeleton.findBone(data.bone.name);
-			target = skeleton.findBone(data.target.name);
-		}
+		bone = skeleton.findBone(data.bone.name);
+		target = skeleton.findBone(data.target.name);
 	}
 
 	/** Copy constructor. */
 	public TransformConstraint (TransformConstraint constraint, Skeleton skeleton) {
+		if (constraint == null) throw new IllegalArgumentException("constraint cannot be null.");
+		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		data = constraint.data;
 		bone = skeleton.bones.get(constraint.bone.data.index);
 		target = skeleton.bones.get(constraint.target.data.index);

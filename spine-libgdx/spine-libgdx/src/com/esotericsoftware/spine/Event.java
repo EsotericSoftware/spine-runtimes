@@ -39,6 +39,7 @@ public class Event {
 	final float time;
 
 	public Event (float time, EventData data) {
+		if (data == null) throw new IllegalArgumentException("data cannot be null.");
 		this.time = time;
 		this.data = data;
 	}

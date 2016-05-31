@@ -303,6 +303,7 @@ public class Skeleton {
 
 	/** Sets the slots and the order they will be drawn. */
 	public void setDrawOrder (Array<Slot> drawOrder) {
+		if (drawOrder == null) throw new IllegalArgumentException("drawOrder cannot be null.");
 		this.drawOrder = drawOrder;
 	}
 
@@ -423,10 +424,12 @@ public class Skeleton {
 		return null;
 	}
 
-	/** Returns the axis aligned bounding box (AABB) of the region, mesh, and skinned mesh attachments for the current pose.
+	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
 	 * @param offset The distance from the skeleton origin to the bottom left corner of the AABB.
 	 * @param size The width and height of the AABB. */
 	public void getBounds (Vector2 offset, Vector2 size) {
+		if (offset == null) throw new IllegalArgumentException("offset cannot be null.");
+		if (size == null) throw new IllegalArgumentException("size cannot be null.");
 		Array<Slot> drawOrder = this.drawOrder;
 		float minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
@@ -458,6 +461,7 @@ public class Skeleton {
 
 	/** A convenience method for setting the skeleton color. The color can also be set by modifying {@link #getColor()}. */
 	public void setColor (Color color) {
+		if (color == null) throw new IllegalArgumentException("color cannot be null.");
 		this.color.set(color);
 	}
 
