@@ -36,38 +36,94 @@ namespace Spine {
 	public class TransformConstraint : IUpdatable {
 		internal TransformConstraintData data;
 		internal Bone bone, target;
-		internal float translateMix;
-		internal float x, y;
+		internal float rotateMix, translateMix, scaleMix, shearMix;
+		internal float offsetRotation, offsetX, offsetY, offsetScaleX, offsetScaleY, offsetShearY;
 
 		public TransformConstraintData Data { get { return data; } }
 		public Bone Bone { get { return bone; } set { bone = value; } }
 		public Bone Target { get { return target; } set { target = value; } }
+		public float RotateMix { get { return rotateMix; } set { rotateMix = value; } }
 		public float TranslateMix { get { return translateMix; } set { translateMix = value; } }
-		public float X { get { return x; } set { x = value; } }
-		public float Y { get { return y; } set { y = value; } }
+		public float ScaleMix { get { return scaleMix; } set { scaleMix = value; } }
+		public float ShearMix { get { return shearMix; } set { shearMix = value; } }
+
+		public float OffsetRotation { get { return offsetRotation; } set { offsetRotation = value; } }
+		public float OffsetX { get { return offsetX; } set { offsetX = value; } }
+		public float OffsetY { get { return offsetY; } set { offsetY = value; } }
+		public float OffsetScaleX { get { return offsetScaleX; } set { offsetScaleX = value; } }
+		public float OffsetScaleY { get { return offsetScaleY; } set { offsetScaleY = value; } }
+		public float OffsetShearY { get { return offsetShearY; } set { offsetShearY = value; } }
 
 		public TransformConstraint (TransformConstraintData data, Skeleton skeleton) {
 			if (data == null) throw new ArgumentNullException("data cannot be null.");
 			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
 			this.data = data;
 			translateMix = data.translateMix;
-			x = data.x;
-			y = data.y;
+			rotateMix = data.rotateMix;
+			scaleMix = data.scaleMix;
+			shearMix = data.shearMix;
+			offsetX = data.offsetX;
+			offsetY = data.offsetY;
+			offsetScaleX = data.offsetScaleX;
+			offsetScaleY = data.offsetScaleY;
+			offsetShearY = data.offsetShearY;
 
 			bone = skeleton.FindBone(data.bone.name);
 			target = skeleton.FindBone(data.target.name);
 		}
 
-		public void Update () {
-			Apply();
+		public void Apply () {
+			Update();
 		}
 
-		public void Apply () {
+		public void Update () {
+			Bone bone = this.bone;
+			Bone target = this.target;
+
+			if (rotateMix > 0) {
+				float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
+				float r = MathUtils.Atan2(target.c, target.a) - MathUtils.Atan2(c, a) + offsetRotation * MathUtils.degRad;
+				if (r > MathUtils.PI)
+					r -= MathUtils.PI2;
+				else if (r < -MathUtils.PI) r += MathUtils.PI2;
+				r *= rotateMix;
+				float cos = MathUtils.Cos(r), sin = MathUtils.Sin(r);
+				bone.a = cos * a - sin * c;
+				bone.b = cos * b - sin * d;
+				bone.c = sin * a + cos * c;
+				bone.d = sin * b + cos * d;
+			}
+
+			if (scaleMix > 0) {
+				float bs = (float)Math.Sqrt(bone.a * bone.a + bone.c * bone.c);
+				float ts = (float)Math.Sqrt(target.a * target.a + target.c * target.c);
+				float s = bs > 0.00001f ? (bs + (ts - bs + offsetScaleX) * scaleMix) / bs : 0;
+				bone.a *= s;
+				bone.c *= s;
+				bs = (float)Math.Sqrt(bone.b * bone.b + bone.d * bone.d);
+				ts = (float)Math.Sqrt(target.b * target.b + target.d * target.d);
+				s = bs > 0.00001f ? (bs + (ts - bs + offsetScaleY) * scaleMix) / bs : 0;
+				bone.b *= s;
+				bone.d *= s;
+			}
+
+			if (shearMix > 0) {
+				float b = bone.b, d = bone.d;
+				float by = MathUtils.Atan2(d, b);
+				float r = MathUtils.Atan2(target.d, target.b) - MathUtils.Atan2(target.c, target.a) - (by - MathUtils.Atan2(bone.c, bone.a));
+				if (r > MathUtils.PI)
+					r -= MathUtils.PI2;
+				else if (r < -MathUtils.PI) r += MathUtils.PI2;
+				r = by + (r + offsetShearY * MathUtils.degRad) * shearMix;
+				float s = (float)Math.Sqrt(b * b + d * d);
+				bone.b = MathUtils.Cos(r) * s;
+				bone.d = MathUtils.Sin(r) * s;
+			}
+
 			float translateMix = this.translateMix;
 			if (translateMix > 0) {
-				Bone bone = this.bone;
 				float tx, ty;
-				target.LocalToWorld(x, y, out tx, out ty);
+				target.LocalToWorld(offsetX, offsetY, out tx, out ty);
 				bone.worldX += (tx - bone.worldX) * translateMix;
 				bone.worldY += (ty - bone.worldY) * translateMix;
 			}
