@@ -137,7 +137,7 @@ public class SkeletonRendererDebug {
 				}
 				if (drawMeshHull && hullLength > 0) {
 					shapes.setColor(attachmentLineColor);
-					hullLength = hullLength / 2 * 5;
+					hullLength = (hullLength >> 1) * 5;
 					float lastX = vertices[hullLength - 5], lastY = vertices[hullLength - 4];
 					for (int ii = 0, nn = hullLength; ii < nn; ii += 5) {
 						float x = vertices[ii], y = vertices[ii + 1];

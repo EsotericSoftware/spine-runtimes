@@ -72,7 +72,7 @@ public class MeshAttachment extends VertexAttachment {
 	public void updateUVs () {
 		float[] regionUVs = this.regionUVs;
 		int verticesLength = regionUVs.length;
-		int worldVerticesLength = verticesLength / 2 * 5;
+		int worldVerticesLength = (verticesLength >> 1) * 5;
 		if (worldVertices == null || worldVertices.length != worldVerticesLength) worldVertices = new float[worldVerticesLength];
 
 		float u, v, width, height;

@@ -19,7 +19,6 @@ public class TransformConstraint implements Updatable {
 		translateMix = data.translateMix;
 		scaleMix = data.scaleMix;
 		shearMix = data.shearMix;
-
 		bone = skeleton.findBone(data.bone.name);
 		target = skeleton.findBone(data.target.name);
 	}
@@ -29,12 +28,12 @@ public class TransformConstraint implements Updatable {
 		if (constraint == null) throw new IllegalArgumentException("constraint cannot be null.");
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		data = constraint.data;
-		bone = skeleton.bones.get(constraint.bone.data.index);
-		target = skeleton.bones.get(constraint.target.data.index);
 		rotateMix = constraint.rotateMix;
 		translateMix = constraint.translateMix;
 		scaleMix = constraint.scaleMix;
 		shearMix = constraint.shearMix;
+		bone = skeleton.bones.get(constraint.bone.data.index);
+		target = skeleton.bones.get(constraint.target.data.index);
 	}
 
 	public void apply () {

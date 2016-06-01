@@ -266,7 +266,7 @@ public class Animation {
 
 		/** Sets the time and angle of the specified keyframe. */
 		public void setFrame (int frameIndex, float time, float degrees) {
-			frameIndex >>= 1;
+			frameIndex <<= 1;
 			frames[frameIndex] = time;
 			frames[frameIndex + ROTATION] = degrees;
 		}
