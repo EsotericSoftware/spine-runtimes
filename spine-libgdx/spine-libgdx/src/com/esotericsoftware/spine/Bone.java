@@ -209,25 +209,42 @@ public class Bone implements Updatable {
 	 * transform values may differ from the original values but are functionally the same. */
 	public void updateLocalTransform () {
 		Bone parent = this.parent;
-		if (parent != null) {
-			float a = parent.a, b = parent.b, c = parent.c, d = parent.d;
-			float invDet = 1 / (a * d - b * c);
-			float x = worldX - parent.worldX, y = worldY - parent.worldY;
-			x = (x * d * invDet - y * b * invDet);
-			y = (y * a * invDet - x * c * invDet);
-		}
-		shearX = 0;
-		scaleX = (float)Math.sqrt(a * a + c * c);
-		if (scaleX > 0.00001f) {
-			float det = a * d - b * c;
-			shearY = atan2(a * b + c * d, det) * radDeg;
-			scaleY = det / scaleX;
+		if (parent == null) {
+			x = worldX;
+			y = worldY;
 			rotation = atan2(c, a) * radDeg;
+			scaleX = (float)Math.sqrt(a * a + c * c);
+			scaleY = (float)Math.sqrt(b * b + d * d);
+			float det = a * d - b * c;
+			shearX = 0;
+			shearY = atan2(a * b + c * d, det) * radDeg;
+			return;
+		}
+		float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
+		float pid = 1 / (pa * pd - pb * pc);
+		float dx = worldX - parent.worldX, dy = worldY - parent.worldY;
+		x = (dx * pd * pid - dy * pb * pid);
+		y = (dy * pa * pid - dx * pc * pid);
+		float ia = pid * pd;
+		float id = pid * pa;
+		float ib = pid * pb;
+		float ic = pid * pc;
+		float ra = ia * a - ib * c;
+		float rb = ia * b - ib * d;
+		float rc = id * c - ic * a;
+		float rd = id * d - ic * b;
+		shearX = 0;
+		scaleX = (float)Math.sqrt(ra * ra + rc * rc);
+		if (scaleX > 0.0001f) {
+			float det = ra * rd - rb * rc;
+			scaleY = det / scaleX;
+			shearY = atan2(ra * rb + rc * rd, det) * radDeg;
+			rotation = atan2(rc, ra) * radDeg;
 		} else {
 			scaleX = 0;
+			scaleY = (float)Math.sqrt(rb * rb + rd * rd);
 			shearY = 0;
-			scaleY = (float)Math.sqrt(b * b + d * d);
-			rotation = 90 - atan2(d, b) * radDeg;
+			rotation = 90 - atan2(rd, rb) * radDeg;
 		}
 		appliedRotation = rotation;
 		appliedScaleX = scaleX;
