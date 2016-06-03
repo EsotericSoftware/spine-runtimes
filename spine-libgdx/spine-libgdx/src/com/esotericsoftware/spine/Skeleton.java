@@ -43,7 +43,7 @@ public class Skeleton {
 	final Array<Bone> bones;
 	final Array<Slot> slots;
 	Array<Slot> drawOrder;
-	final Array<IkConstraint> ikConstraints;
+	final Array<IkConstraint> ikConstraints, ikConstraintsSorted;
 	final Array<TransformConstraint> transformConstraints;
 	final Array<PathConstraint> pathConstraints;
 	final Array<Updatable> updateCache = new Array();
@@ -80,6 +80,7 @@ public class Skeleton {
 		}
 
 		ikConstraints = new Array(data.ikConstraints.size);
+		ikConstraintsSorted = new Array(ikConstraints.size);
 		for (IkConstraintData ikConstraintData : data.ikConstraints)
 			ikConstraints.add(new IkConstraint(ikConstraintData, this));
 
@@ -118,6 +119,7 @@ public class Skeleton {
 			drawOrder.add(slots.get(slot.data.index));
 
 		ikConstraints = new Array(skeleton.ikConstraints.size);
+		ikConstraintsSorted = new Array(ikConstraints.size);
 		for (IkConstraint ikConstraint : skeleton.ikConstraints)
 			ikConstraints.add(new IkConstraint(ikConstraint, this));
 
@@ -147,8 +149,10 @@ public class Skeleton {
 		for (int i = 0, n = bones.size; i < n; i++)
 			bones.get(i).sorted = false;
 
-		// IK first, in hierarchy depth order.
-		Array<IkConstraint> ikConstraints = this.ikConstraints;
+		// IK first, lowest hierarchy depth first.
+		Array<IkConstraint> ikConstraints = this.ikConstraintsSorted;
+		ikConstraints.clear();
+		ikConstraints.addAll(this.ikConstraints);
 		int ikCount = ikConstraints.size;
 		for (int i = 0, level, n = ikCount; i < n; i++) {
 			IkConstraint ik = ikConstraints.get(i);
