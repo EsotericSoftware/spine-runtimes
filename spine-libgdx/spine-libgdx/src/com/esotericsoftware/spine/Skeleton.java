@@ -197,8 +197,9 @@ public class Skeleton {
 
 			updateCache.add(constraint);
 
-			resetChildren(constrained);
 			reset(target.children);
+			for (int ii = 0; ii < boneCount; ii++)
+				reset(constrained.get(ii).children);
 			for (int ii = 0; ii < boneCount; ii++)
 				constrained.get(ii).sorted = true;
 		}
@@ -219,7 +220,8 @@ public class Skeleton {
 
 			updateCache.add(constraint);
 
-			// resetChildren(constrained);
+			// for (int ii = 0; ii < boneCount; ii++)
+			// reset(constrained.get(ii).children);
 			reset(constraint.bone.children); // BOZO - Remove.
 			reset(target.children);
 			// for (int ii = 0; ii < boneCount; ii++)
@@ -237,11 +239,6 @@ public class Skeleton {
 		if (parent != null) sortBone(parent);
 		bone.sorted = true;
 		updateCache.add(bone);
-	}
-
-	private void resetChildren (Array<Bone> bones) {
-		for (int i = 0, n = bones.size; i < n; i++)
-			reset(bones.get(i).children);
 	}
 
 	private void reset (Array<Bone> bones) {
