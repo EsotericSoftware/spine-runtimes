@@ -140,47 +140,115 @@ public class Skeleton {
 
 	/** Caches information about bones and constraints. Must be called if bones or constraints are added or removed. */
 	public void updateCache () {
-		Array<Bone> bones = this.bones;
 		Array<Updatable> updateCache = this.updateCache;
-		Array<IkConstraint> ikConstraints = this.ikConstraints;
-		Array<TransformConstraint> transformConstraints = this.transformConstraints;
-		Array<PathConstraint> pathConstraints = this.pathConstraints;
-		int ikConstraintsCount = ikConstraints.size;
 		updateCache.clear();
 
+		Array<Bone> bones = this.bones;
+		for (int i = 0, n = bones.size; i < n; i++)
+			bones.get(i).sorted = false;
+
+		// IK first, in hierarchy depth order.
+		Array<IkConstraint> ikConstraints = this.ikConstraints;
+		int ikCount = ikConstraints.size;
+		for (int i = 0, level, n = ikCount; i < n; i++) {
+			IkConstraint ik = ikConstraints.get(i);
+			Bone bone = ik.bones.first().parent;
+			for (level = 0; bone != null; level++)
+				bone = bone.parent;
+			ik.level = level;
+		}
+		for (int i = 1, ii; i < ikCount; i++) {
+			IkConstraint ik = ikConstraints.get(i);
+			int level = ik.level;
+			for (ii = i - 1; ii >= 0; ii--) {
+				IkConstraint other = ikConstraints.get(ii);
+				if (other.level < level) break;
+				ikConstraints.set(ii + 1, other);
+			}
+			ikConstraints.set(ii + 1, ik);
+		}
+		for (int i = 0, n = ikConstraints.size; i < n; i++) {
+			IkConstraint constraint = ikConstraints.get(i);
+			Bone target = constraint.target;
+			sortBone(target);
+
+			Array<Bone> constrained = constraint.bones;
+			Bone parent = constrained.first();
+			sortBone(parent);
+
+			updateCache.add(constraint);
+
+			reset(target.children);
+			reset(parent.children);
+			constrained.peek().sorted = true;
+		}
+
+		Array<PathConstraint> pathConstraints = this.pathConstraints;
+		for (int i = 0, n = pathConstraints.size; i < n; i++) {
+			PathConstraint constraint = pathConstraints.get(i);
+
+			Bone target = constraint.target.bone;
+			sortBone(target);
+
+			Array<Bone> constrained = constraint.bones;
+			int boneCount = constrained.size;
+			for (int ii = 0; ii < boneCount; ii++)
+				sortBone(constrained.get(ii));
+
+			updateCache.add(constraint);
+
+			resetChildren(constrained);
+			reset(target.children);
+			for (int ii = 0; ii < boneCount; ii++)
+				constrained.get(ii).sorted = true;
+		}
+
+		Array<TransformConstraint> transformConstraints = this.transformConstraints;
+		for (int i = 0, n = transformConstraints.size; i < n; i++) {
+			TransformConstraint constraint = transformConstraints.get(i);
+
+			Bone target = constraint.target;
+			sortBone(target);
+
+			// BOZO - Update transform constraints to support multiple constrained bones.
+			// Array<Bone> constrained = constraint.bones;
+			// int boneCount = constrained.size;
+			// for (int ii = 0; ii < boneCount; ii++)
+			// sortBone(constrained.get(ii));
+			sortBone(constraint.bone);
+
+			updateCache.add(constraint);
+
+			// resetChildren(constrained);
+			reset(constraint.bone.children); // BOZO - Remove.
+			reset(target.children);
+			// for (int ii = 0; ii < boneCount; ii++)
+			// constrained.get(ii).sorted = true;
+			constraint.bone.sorted = true; // BOZO - Remove.
+		}
+
+		for (int i = 0, n = bones.size; i < n; i++)
+			sortBone(bones.get(i));
+	}
+
+	private void sortBone (Bone bone) {
+		if (bone.sorted) return;
+		Bone parent = bone.parent;
+		if (parent != null) sortBone(parent);
+		bone.sorted = true;
+		updateCache.add(bone);
+	}
+
+	private void resetChildren (Array<Bone> bones) {
+		for (int i = 0, n = bones.size; i < n; i++)
+			reset(bones.get(i).children);
+	}
+
+	private void reset (Array<Bone> bones) {
 		for (int i = 0, n = bones.size; i < n; i++) {
 			Bone bone = bones.get(i);
-			updateCache.add(bone);
-			for (int ii = 0; ii < ikConstraintsCount; ii++) {
-				IkConstraint ikConstraint = ikConstraints.get(ii);
-				if (bone == ikConstraint.bones.peek()) {
-					updateCache.add(ikConstraint);
-					break;
-				}
-			}
-		}
-
-		for (int i = 0, n = pathConstraints.size; i < n; i++) {
-			PathConstraint pathConstraint = pathConstraints.get(i);
-			// BOZO! - Fix update order for multiple bones.
-			Bone bone = pathConstraint.bones.peek();
-			for (int ii = updateCache.size - 1; ii >= 0; ii--) {
-				if (updateCache.get(ii) == bone) {
-					updateCache.insert(ii + 1, pathConstraint);
-					break;
-				}
-			}
-		}
-
-		for (int i = 0, n = transformConstraints.size; i < n; i++) {
-			TransformConstraint transformConstraint = transformConstraints.get(i);
-			Bone bone = transformConstraint.bone;
-			for (int ii = updateCache.size - 1; ii >= 0; ii--) {
-				if (updateCache.get(ii) == bone) {
-					updateCache.insert(ii + 1, transformConstraint);
-					break;
-				}
-			}
+			if (bone.sorted) reset(bone.children);
+			bone.sorted = false;
 		}
 	}
 

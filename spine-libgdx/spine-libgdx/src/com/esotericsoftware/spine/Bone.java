@@ -50,6 +50,8 @@ public class Bone implements Updatable {
 	float c, d, worldY;
 	float worldSignX, worldSignY;
 
+	boolean sorted;
+
 	/** @param parent May be null. */
 	public Bone (BoneData data, Skeleton skeleton, Bone parent) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
