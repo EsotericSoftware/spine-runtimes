@@ -32,10 +32,12 @@
 package com.esotericsoftware.spine.attachments;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.FloatArray;
 import com.esotericsoftware.spine.Slot;
 
 public class PathAttachment extends VertexAttachment {
-	float length;
+	float totalLength;
+	final FloatArray lengths = new FloatArray();
 	boolean closed, constantSpeed;
 
 	// Nonessential.
@@ -69,12 +71,18 @@ public class PathAttachment extends VertexAttachment {
 		this.constantSpeed = constantSpeed;
 	}
 
-	public float getLength () {
-		return length;
+	/** Returns the length of the path in the setup pose. */
+	public float getTotalLength () {
+		return totalLength;
 	}
 
-	public void setLength (float length) {
-		this.length = length;
+	public void setTotalLength (float totalLength) {
+		this.totalLength = totalLength;
+	}
+
+	/** Returns the length of each curve in the setup pose. */
+	public FloatArray getLengths () {
+		return lengths;
 	}
 
 	public Color getColor () {

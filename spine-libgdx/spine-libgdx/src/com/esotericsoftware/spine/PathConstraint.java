@@ -9,6 +9,10 @@ import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 
 public class PathConstraint implements Updatable {
+	static private final int NONE = -1;
+	static private final int BEFORE = -2;
+	static private final int AFTER = -3;
+
 	final PathConstraintData data;
 	final Array<Bone> bones;
 	Slot target;
@@ -98,9 +102,12 @@ public class PathConstraint implements Updatable {
 			bone.worldY += (boneY - bone.worldY) * translateMix;
 			float x = positions[p], y = positions[p + 1], dx = x - boneX, dy = y - boneY;
 			if (scale) {
-				float s = ((float)Math.sqrt(dx * dx + dy * dy) / lengths.get(i + 1) - 1) * scaleMix + 1;
-				bone.a *= s;
-				bone.c *= s;
+				float length = lengths.get(i + 1);
+				if (length != 0) {
+					float s = ((float)Math.sqrt(dx * dx + dy * dy) / length - 1) * scaleMix + 1;
+					bone.a *= s;
+					bone.c *= s;
+				}
 			}
 			if (!rotate) {
 				boneX = x;
@@ -143,11 +150,11 @@ public class PathConstraint implements Updatable {
 		boolean closed = path.getClosed();
 		int verticesLength = path.getWorldVerticesLength(), curves = verticesLength / 6;
 		float[] temp;
-		int lastCurve = -1;
+		int lastCurve = NONE;
 
 		if (!path.getConstantSpeed()) {
 			if (!closed) curves--;
-			float pathLength = path.getLength();
+			float pathLength = path.getTotalLength();
 			temp = this.temp.setSize(8);
 			for (int i = 0; i < lengthCount; i++) {
 				position += lengths[i] / pathLength;
@@ -155,15 +162,15 @@ public class PathConstraint implements Updatable {
 					position %= 1;
 					if (position < 0) position += 1;
 				} else if (position < 0) {
-					if (lastCurve != -2) {
-						lastCurve = -2;
+					if (lastCurve != BEFORE) {
+						lastCurve = BEFORE;
 						path.computeWorldVertices(target, 2, 4, temp, 0);
 					}
 					addBeforePosition(position * pathLength, temp, 0, positions, tangents);
 					continue;
 				} else if (position > 1) {
-					if (lastCurve != -3) {
-						lastCurve = -3;
+					if (lastCurve != AFTER) {
+						lastCurve = AFTER;
 						path.computeWorldVertices(target, verticesLength - 6, 4, temp, 0);
 					}
 					addAfterPosition((position - 1) * pathLength, temp, 0, positions, tangents);
@@ -184,7 +191,7 @@ public class PathConstraint implements Updatable {
 			return positions.items;
 		}
 
-		// World vertices, verticesStart to verticesStart + verticesLength.
+		// World vertices, verticesStart to verticesStart + verticesLength - 1.
 		int verticesStart = 10 + curves;
 		temp = this.temp.setSize(verticesStart + verticesLength + 2);
 		if (closed) {
@@ -200,7 +207,7 @@ public class PathConstraint implements Updatable {
 			path.computeWorldVertices(target, 2, verticesLength, temp, verticesStart);
 		}
 
-		// Curve lengths, 10 to verticesStart.
+		// Curve lengths, 10 to verticesStart - 1.
 		float pathLength = 0;
 		float x1 = temp[verticesStart], y1 = temp[verticesStart + 1], cx1 = 0, cy1 = 0, cx2 = 0, cy2 = 0, x2 = 0, y2 = 0;
 		float tmpx, tmpy, dddfx, dddfy, ddfx, ddfy, dfx, dfy;
@@ -238,6 +245,7 @@ public class PathConstraint implements Updatable {
 		position *= pathLength;
 
 		float curveLength = 0;
+		int curve = 10, segment = 0;
 		for (int i = 0; i < lengthCount; i++) {
 			position += lengths[i];
 			float p = position;
@@ -254,34 +262,30 @@ public class PathConstraint implements Updatable {
 			}
 
 			// Determine curve containing position.
-			int curve;
-			float length = temp[10];
-			if (p <= length) {
-				curve = verticesStart;
-				p /= length;
-			} else {
-				for (curve = 11;; curve++) {
-					length = temp[curve];
-					if (p <= length) {
-						float prev = temp[curve - 1];
-						p = (p - prev) / (length - prev);
-						break;
-					}
+			for (;; curve++) {
+				float length = temp[curve];
+				if (p > length) continue;
+				if (curve == 10)
+					p /= length;
+				else {
+					float prev = temp[curve - 1];
+					p = (p - prev) / (length - prev);
 				}
-				curve = verticesStart + (curve - 10) * 6;
+				break;
 			}
 
-			// Curve segment lengths, 0 to 10.
+			// Curve segment lengths, 0 to 9.
 			if (curve != lastCurve) {
 				lastCurve = curve;
-				x1 = temp[curve];
-				y1 = temp[curve + 1];
-				cx1 = temp[curve + 2];
-				cy1 = temp[curve + 3];
-				cx2 = temp[curve + 4];
-				cy2 = temp[curve + 5];
-				x2 = temp[curve + 6];
-				y2 = temp[curve + 7];
+				int index = verticesStart + (curve - 10) * 6;
+				x1 = temp[index];
+				y1 = temp[index + 1];
+				cx1 = temp[index + 2];
+				cy1 = temp[index + 3];
+				cx2 = temp[index + 4];
+				cy2 = temp[index + 5];
+				x2 = temp[index + 6];
+				y2 = temp[index + 7];
 				tmpx = (x1 - cx1 * 2 + cx2) * 0.03f;
 				tmpy = (y1 - cy1 * 2 + cy2) * 0.03f;
 				dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.006f;
@@ -308,22 +312,21 @@ public class PathConstraint implements Updatable {
 				dfy += ddfy + dddfy;
 				curveLength += (float)Math.sqrt(dfx * dfx + dfy * dfy);
 				temp[9] = curveLength;
+				segment = 0;
 			}
 
 			// Weight by segment length.
 			p *= curveLength;
-			length = temp[0];
-			if (p <= length)
-				p = 0.1f * p / length;
-			else {
-				for (int ii = 1;; ii++) {
-					length = temp[ii];
-					if (p <= length) {
-						float prev = temp[ii - 1];
-						p = 0.1f * (ii + (p - prev) / (length - prev));
-						break;
-					}
+			for (;; segment++) {
+				float length = temp[segment];
+				if (p > length) continue;
+				if (segment == 0)
+					p = 0.1f * p / length;
+				else {
+					float prev = temp[segment - 1];
+					p = 0.1f * (segment + (p - prev) / (length - prev));
 				}
+				break;
 			}
 
 			addCurvePosition(p, x1, y1, cx1, cy1, cx2, cy2, x2, y2, positions, tangents);
