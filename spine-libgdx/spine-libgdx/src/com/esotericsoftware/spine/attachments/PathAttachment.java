@@ -81,7 +81,7 @@ public class PathAttachment extends VertexAttachment {
 	}
 
 	/** Returns the length of each curve in the setup pose. */
-	public FloatArray getLengths () {
+	public FloatArray getCurveLengths () {
 		return lengths;
 	}
 
