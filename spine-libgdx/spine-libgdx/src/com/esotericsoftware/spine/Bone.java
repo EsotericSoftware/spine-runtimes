@@ -44,7 +44,7 @@ public class Bone implements Updatable {
 	final Bone parent;
 	final Array<Bone> children = new Array();
 	float x, y, rotation, scaleX, scaleY, shearX, shearY;
-	float appliedRotation, appliedScaleX, appliedScaleY;
+	float appliedRotation;
 
 	float a, b, worldX;
 	float c, d, worldY;
@@ -92,8 +92,6 @@ public class Bone implements Updatable {
 	/** Computes the world transform using the parent bone and the specified local transform. */
 	public void updateWorldTransform (float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY) {
 		appliedRotation = rotation;
-		appliedScaleX = scaleX;
-		appliedScaleY = scaleY;
 
 		float rotationY = rotation + 90 + shearY;
 		float la = cosDeg(rotation + shearX) * scaleX, lb = cosDeg(rotationY) * scaleY;
@@ -163,7 +161,7 @@ public class Bone implements Updatable {
 				pd = 1;
 				do {
 					float cos = cosDeg(parent.appliedRotation), sin = sinDeg(parent.appliedRotation);
-					float psx = parent.appliedScaleX, psy = parent.appliedScaleY;
+					float psx = parent.scaleX, psy = parent.scaleY;
 					float za = cos * psx, zb = sin * psy, zc = sin * psx, zd = cos * psy;
 					float temp = pa * za + pb * zc;
 					pb = pb * zd - pa * zb;
@@ -418,8 +416,6 @@ public class Bone implements Updatable {
 			rotation = 90 - atan2(rd, rb) * radDeg;
 		}
 		appliedRotation = rotation;
-		appliedScaleX = scaleX;
-		appliedScaleY = scaleY;
 	}
 
 	public Matrix3 getWorldTransform (Matrix3 worldTransform) {

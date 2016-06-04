@@ -135,12 +135,8 @@ public class IkConstraint implements Updatable {
 		if (rotationIK > 180)
 			rotationIK -= 360;
 		else if (rotationIK < -180) rotationIK += 360;
-		bone.updateWorldTransform(bone.x, bone.y, bone.rotation + (rotationIK - bone.rotation) * alpha, bone.appliedScaleX,
-			bone.appliedScaleY, bone.shearX, bone.shearY);
-		/*
-		 * parents of this thing this thing (bone) ik constraint
-		 */
-
+		bone.updateWorldTransform(bone.x, bone.y, bone.rotation + (rotationIK - bone.rotation) * alpha, bone.scaleX, bone.scaleY,
+			bone.shearX, bone.shearY);
 	}
 
 	/** Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as possible. The
@@ -148,7 +144,7 @@ public class IkConstraint implements Updatable {
 	 * @param child A direct descendant of the parent bone. */
 	static public void apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, float alpha) {
 		if (alpha == 0) return;
-		float px = parent.x, py = parent.y, psx = parent.appliedScaleX, psy = parent.appliedScaleY, csx = child.appliedScaleX;
+		float px = parent.x, py = parent.y, psx = parent.scaleX, psy = parent.scaleY, csx = child.scaleX;
 		int os1, os2, s2;
 		if (psx < 0) {
 			psx = -psx;
@@ -266,13 +262,12 @@ public class IkConstraint implements Updatable {
 		if (a1 > 180)
 			a1 -= 360;
 		else if (a1 < -180) a1 += 360;
-		parent.updateWorldTransform(px, py, rotation + a1 * alpha, parent.appliedScaleX, parent.appliedScaleY, 0, 0);
+		parent.updateWorldTransform(px, py, rotation + a1 * alpha, parent.scaleX, parent.scaleY, 0, 0);
 		rotation = child.rotation;
 		a2 = ((a2 + os) * radDeg - child.shearX) * s2 + os2 - rotation;
 		if (a2 > 180)
 			a2 -= 360;
 		else if (a2 < -180) a2 += 360;
-		child.updateWorldTransform(cx, cy, rotation + a2 * alpha, child.appliedScaleX, child.appliedScaleY, child.shearX,
-			child.shearY);
+		child.updateWorldTransform(cx, cy, rotation + a2 * alpha, child.scaleX, child.scaleY, child.shearX, child.shearY);
 	}
 }
