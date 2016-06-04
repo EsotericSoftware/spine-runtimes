@@ -143,7 +143,10 @@ public class IkConstraint implements Updatable {
 	 * target is specified in the world coordinate system.
 	 * @param child A direct descendant of the parent bone. */
 	static public void apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, float alpha) {
-		if (alpha == 0) return;
+		if (alpha == 0) {
+			child.updateWorldTransform();
+			return;
+		}
 		float px = parent.x, py = parent.y, psx = parent.scaleX, psy = parent.scaleY, csx = child.scaleX;
 		int os1, os2, s2;
 		if (psx < 0) {
