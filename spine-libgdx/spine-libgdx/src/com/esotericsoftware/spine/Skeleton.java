@@ -182,8 +182,8 @@ public class Skeleton {
 
 			updateCache.add(constraint);
 
-			reset(target.children);
-			reset(parent.children);
+			sortReset(target.children);
+			sortReset(parent.children);
 			constrained.peek().sorted = true;
 		}
 
@@ -201,9 +201,9 @@ public class Skeleton {
 
 			updateCache.add(constraint);
 
-			reset(target.children);
+			sortReset(target.children);
 			for (int ii = 0; ii < boneCount; ii++)
-				reset(constrained.get(ii).children);
+				sortReset(constrained.get(ii).children);
 			for (int ii = 0; ii < boneCount; ii++)
 				constrained.get(ii).sorted = true;
 		}
@@ -226,8 +226,8 @@ public class Skeleton {
 
 			// for (int ii = 0; ii < boneCount; ii++)
 			// reset(constrained.get(ii).children);
-			reset(constraint.bone.children); // BOZO - Remove.
-			reset(target.children);
+			sortReset(constraint.bone.children); // BOZO - Remove.
+			sortReset(target.children);
 			// for (int ii = 0; ii < boneCount; ii++)
 			// constrained.get(ii).sorted = true;
 			constraint.bone.sorted = true; // BOZO - Remove.
@@ -245,10 +245,10 @@ public class Skeleton {
 		updateCache.add(bone);
 	}
 
-	private void reset (Array<Bone> bones) {
+	private void sortReset (Array<Bone> bones) {
 		for (int i = 0, n = bones.size; i < n; i++) {
 			Bone bone = bones.get(i);
-			if (bone.sorted) reset(bone.children);
+			if (bone.sorted) sortReset(bone.children);
 			bone.sorted = false;
 		}
 	}
@@ -313,6 +313,10 @@ public class Skeleton {
 
 	public Array<Bone> getBones () {
 		return bones;
+	}
+
+	public Array<Updatable> getUpdateCache () {
+		return updateCache;
 	}
 
 	/** @return May return null. */
