@@ -18,7 +18,7 @@ public class PathConstraint implements Updatable {
 	Slot target;
 	float position, spacing, rotateMix, translateMix;
 
-	final FloatArray spaces = new FloatArray(), positions = new FloatArray(), temp = new FloatArray();
+	FloatArray spaces = new FloatArray(), positions = new FloatArray(), temp = new FloatArray();
 
 	public PathConstraint (PathConstraintData data, Skeleton skeleton) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -58,12 +58,19 @@ public class PathConstraint implements Updatable {
 		if (!(attachment instanceof PathAttachment)) return;
 
 		float rotateMix = this.rotateMix, translateMix = this.translateMix;
-		RotateMode rotateMode = data.rotateMode;
-		SpacingMode spacingMode = data.spacingMode;
 		boolean translate = translateMix > 0, rotate = rotateMix > 0;
 		if (!translate && !rotate) return;
 
+		// BOZO!
+		spaces = new FloatArray();
+		positions = new FloatArray();
+		temp = new FloatArray();
+
 		PathAttachment path = (PathAttachment)attachment;
+		PathConstraintData data = this.data;
+		SpacingMode spacingMode = data.spacingMode;
+		RotateMode rotateMode = data.rotateMode;
+		float offsetRotation = data.offsetRotation;
 		FloatArray spacesArray = this.spaces;
 		spacesArray.clear();
 		spacesArray.add(0);
@@ -77,7 +84,7 @@ public class PathConstraint implements Updatable {
 			bone.worldY += (positions[1] - bone.worldY) * translateMix;
 			if (rotate) {
 				float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-				float r = positions[2] - atan2(c, a) + data.offsetRotation * degRad;
+				float r = positions[2] - atan2(c, a) + offsetRotation * degRad;
 				if (r > PI)
 					r -= PI2;
 				else if (r < -PI) r += PI2;
@@ -94,7 +101,7 @@ public class PathConstraint implements Updatable {
 		float[] spaces;
 		float spacing = this.spacing;
 		boolean scale = rotateMode == RotateMode.chainScale, lengthMode = spacingMode == SpacingMode.length;
-		if (!scale || lengthMode) {
+		if (scale || lengthMode) {
 			spaces = spacesArray.setSize(1 + boneCount * 2);
 			for (int i = 0; i < boneCount;) {
 				Bone bone = bones.get(i++);
@@ -112,7 +119,7 @@ public class PathConstraint implements Updatable {
 		boolean tangents = rotateMode == RotateMode.tangent;
 		float[] positions = computeWorldPositions(path, tangents, spacingMode == SpacingMode.percent);
 
-		float boneX = positions[0], boneY = positions[1], offsetRotation = data.offsetRotation;
+		float boneX = positions[0], boneY = positions[1];
 		boolean tip = rotateMode == RotateMode.chain && offsetRotation == 0;
 		for (int i = 0, p = 3; i < boneCount; p += 3) {
 			Bone bone = bones.get(i++);
@@ -321,15 +328,15 @@ public class PathConstraint implements Updatable {
 			// Curve segment lengths, 0 to 9.
 			if (curve != lastCurve) {
 				lastCurve = curve;
-				int index = verticesStart + (curve - 10) * 6;
-				x1 = temp[index];
-				y1 = temp[index + 1];
-				cx1 = temp[index + 2];
-				cy1 = temp[index + 3];
-				cx2 = temp[index + 4];
-				cy2 = temp[index + 5];
-				x2 = temp[index + 6];
-				y2 = temp[index + 7];
+				int ii = verticesStart + (curve - 10) * 6;
+				x1 = temp[ii];
+				y1 = temp[ii + 1];
+				cx1 = temp[ii + 2];
+				cy1 = temp[ii + 3];
+				cx2 = temp[ii + 4];
+				cy2 = temp[ii + 5];
+				x2 = temp[ii + 6];
+				y2 = temp[ii + 7];
 				tmpx = (x1 - cx1 * 2 + cx2) * 0.03f;
 				tmpy = (y1 - cy1 * 2 + cy2) * 0.03f;
 				dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.006f;
@@ -340,7 +347,7 @@ public class PathConstraint implements Updatable {
 				dfy = (cy1 - y1) * 0.3f + tmpy + dddfy * 0.16666667f;
 				curveLength = (float)Math.sqrt(dfx * dfx + dfy * dfy);
 				temp[0] = curveLength;
-				for (int ii = 1; ii < 8; ii++) {
+				for (ii = 1; ii < 8; ii++) {
 					dfx += ddfx;
 					dfy += ddfy;
 					ddfx += dddfx;
@@ -365,17 +372,16 @@ public class PathConstraint implements Updatable {
 				float length = temp[segment];
 				if (p > length) continue;
 				if (segment == 0)
-					p = 0.1f * p / length;
+					p /= length;
 				else {
 					float prev = temp[segment - 1];
-					p = 0.1f * (segment + (p - prev) / (length - prev));
+					p = segment + (p - prev) / (length - prev);
 				}
 				break;
 			}
 
-			addCurvePosition(p, x1, y1, cx1, cy1, cx2, cy2, x2, y2, out, o, tangents || (space == 0 && i > 0));
+			addCurvePosition(p * 0.1f, x1, y1, cx1, cy1, cx2, cy2, x2, y2, out, o, tangents || (space == 0 && i > 0));
 		}
-
 		return out;
 	}
 
