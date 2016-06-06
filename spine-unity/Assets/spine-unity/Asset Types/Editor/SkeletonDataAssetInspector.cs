@@ -77,7 +77,12 @@ namespace Spine.Unity.Editor {
 			showBaking = EditorPrefs.GetBool("SkeletonDataAssetInspector_showUnity", false);
 			#endif
 
-			InitPreview();
+
+			#if !SPINE_TK2D // REVIEW: Better fix.
+			if (m_skeletonData != null)
+				InitPreview();
+			#endif
+
 			RepopulateWarnings();
 		}
 
