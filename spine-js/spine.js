@@ -989,8 +989,11 @@ spine.FfdTimeline.prototype = {
 		var vertexCount = frameVertices[0].length;
 
 		var vertices = slot.attachmentVertices;
-		if (vertices.length != vertexCount) alpha = 1;
-		vertices.length = vertexCount;
+		if (vertices.length != vertexCount) {
+			vertices = slot.attachmentVertices = new spine.Float32Array(vertexCount);
+			vertices.length = vertexCount;
+			alpha = 1;
+		}
 
 		if (time >= frames[frames.length - 1]) { // Time is after last frame.
 			var lastVertices = frameVertices[frames.length - 1];
