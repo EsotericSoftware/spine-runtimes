@@ -55,6 +55,8 @@ import com.esotericsoftware.spine.Animation.ShearTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 import com.esotericsoftware.spine.Animation.TransformConstraintTimeline;
 import com.esotericsoftware.spine.Animation.TranslateTimeline;
+import com.esotericsoftware.spine.PathConstraint.RotateMode;
+import com.esotericsoftware.spine.PathConstraint.SpacingMode;
 import com.esotericsoftware.spine.SkeletonJson.LinkedMesh;
 import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
 import com.esotericsoftware.spine.attachments.Attachment;
@@ -216,9 +218,11 @@ public class SkeletonBinary {
 				data.target = skeletonData.slots.get(input.readInt(true));
 				data.offsetRotation = input.readFloat();
 				data.position = input.readFloat();
+				data.spacing = input.readFloat();
+				data.spacingMode = SpacingMode.values[input.readInt(true)];
+				data.rotateMode = RotateMode.values[input.readInt(true)];
 				data.rotateMix = input.readFloat();
 				data.translateMix = input.readFloat();
-				data.scaleMix = input.readFloat();
 				skeletonData.pathConstraints.add(data);
 			}
 
@@ -590,8 +594,7 @@ public class SkeletonBinary {
 				PathConstraintTimeline timeline = new PathConstraintTimeline(frameCount);
 				timeline.pathConstraintIndex = index;
 				for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readFloat(), input.readFloat(),
-						input.readFloat());
+					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readFloat(), input.readFloat());
 					if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
 				}
 				timelines.add(timeline);

@@ -866,10 +866,11 @@ public class Animation {
 		}
 	}
 
+	// BOZO! - Separate into multiple timelines.
 	static public class PathConstraintTimeline extends CurveTimeline {
 		static public final int ENTRIES = 5;
-		static private final int PREV_TIME = -5, PREV_POSITION = -4, PREV_ROTATE = -3, PREV_TRANSLATE = -2, PREV_SCALE = -1;
-		static private final int POSITION = 1, ROTATE = 2, TRANSLATE = 3, SCALE = 4;
+		static private final int PREV_TIME = -5, PREV_POSITION = -4, PREV_ROTATE = -3, PREV_TRANSLATE = -2;
+		static private final int POSITION = 1, ROTATE = 2, TRANSLATE = 3;
 
 		int pathConstraintIndex;
 
@@ -894,13 +895,12 @@ public class Animation {
 		}
 
 		/** Sets the time, position, and mixes of the specified keyframe. */
-		public void setFrame (int frameIndex, float time, float position, float rotateMix, float translateMix, float scaleMix) {
+		public void setFrame (int frameIndex, float time, float position, float rotateMix, float translateMix) {
 			frameIndex *= ENTRIES;
 			frames[frameIndex] = time;
 			frames[frameIndex + POSITION] = position;
 			frames[frameIndex + ROTATE] = rotateMix;
 			frames[frameIndex + TRANSLATE] = translateMix;
-			frames[frameIndex + SCALE] = scaleMix;
 		}
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha) {
@@ -914,7 +914,6 @@ public class Animation {
 				constraint.position += (frames[i + PREV_POSITION] - constraint.position) * alpha;
 				constraint.rotateMix += (frames[i + PREV_ROTATE] - constraint.rotateMix) * alpha;
 				constraint.translateMix += (frames[i + PREV_TRANSLATE] - constraint.translateMix) * alpha;
-				constraint.scaleMix += (frames[i + PREV_SCALE] - constraint.scaleMix) * alpha;
 				return;
 			}
 
@@ -923,7 +922,6 @@ public class Animation {
 			float position = frames[frame + PREV_POSITION];
 			float rotate = frames[frame + PREV_ROTATE];
 			float translate = frames[frame + PREV_TRANSLATE];
-			float scale = frames[frame + PREV_SCALE];
 			float frameTime = frames[frame];
 			float percent = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
@@ -931,7 +929,6 @@ public class Animation {
 			constraint.rotateMix += (rotate + (frames[frame + ROTATE] - rotate) * percent - constraint.rotateMix) * alpha;
 			constraint.translateMix += (translate + (frames[frame + TRANSLATE] - translate) * percent - constraint.translateMix)
 				* alpha;
-			constraint.scaleMix += (scale + (frames[frame + SCALE] - scale) * percent - constraint.scaleMix) * alpha;
 		}
 	}
 }

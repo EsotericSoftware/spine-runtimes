@@ -54,6 +54,8 @@ import com.esotericsoftware.spine.Animation.ShearTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 import com.esotericsoftware.spine.Animation.TransformConstraintTimeline;
 import com.esotericsoftware.spine.Animation.TranslateTimeline;
+import com.esotericsoftware.spine.PathConstraint.RotateMode;
+import com.esotericsoftware.spine.PathConstraint.SpacingMode;
 import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.AttachmentLoader;
@@ -198,9 +200,11 @@ public class SkeletonJson {
 
 			data.offsetRotation = constraintMap.getFloat("rotation", 0);
 			data.position = constraintMap.getFloat("position", 0);
+			data.spacing = constraintMap.getFloat("spacing", 0);
+			data.spacingMode = SpacingMode.valueOf(constraintMap.getString("spacingMode", "length"));
+			data.rotateMode = RotateMode.valueOf(constraintMap.getString("rotateMode", "tangent"));
 			data.rotateMix = constraintMap.getFloat("rotateMix", 1);
 			data.translateMix = constraintMap.getFloat("translateMix", 1);
-			data.scaleMix = constraintMap.getFloat("scaleMix", 1);
 
 			skeletonData.pathConstraints.add(data);
 		}
@@ -509,7 +513,7 @@ public class SkeletonJson {
 			int frameIndex = 0;
 			for (JsonValue valueMap = constraintMap.child; valueMap != null; valueMap = valueMap.next) {
 				timeline.setFrame(frameIndex, valueMap.getFloat("time"), valueMap.getFloat("scaleMix", 1),
-					valueMap.getFloat("rotateMix", 1), valueMap.getFloat("translateMix", 1), valueMap.getFloat("scaleMix", 1));
+					valueMap.getFloat("rotateMix", 1), valueMap.getFloat("translateMix", 1));
 				readCurve(valueMap, timeline, frameIndex);
 				frameIndex++;
 			}

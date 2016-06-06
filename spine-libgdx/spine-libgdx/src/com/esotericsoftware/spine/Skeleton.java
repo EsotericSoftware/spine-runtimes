@@ -294,9 +294,9 @@ public class Skeleton {
 			PathConstraint constraint = pathConstraints.get(i);
 			PathConstraintData data = constraint.data;
 			constraint.position = data.position;
+			constraint.spacing = data.spacing;
 			constraint.rotateMix = data.rotateMix;
 			constraint.translateMix = data.translateMix;
-			constraint.scaleMix = data.scaleMix;
 		}
 	}
 
