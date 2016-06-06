@@ -2,13 +2,12 @@
 package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.utils.Array;
-import com.esotericsoftware.spine.PathConstraint.RotateMode;
-import com.esotericsoftware.spine.PathConstraint.SpacingMode;
 
 public class PathConstraintData {
 	final String name;
 	final Array<BoneData> bones = new Array();
 	SlotData target;
+	PositionMode positionMode;
 	SpacingMode spacingMode;
 	RotateMode rotateMode;
 	float offsetRotation;
@@ -29,6 +28,14 @@ public class PathConstraintData {
 
 	public void setTarget (SlotData target) {
 		this.target = target;
+	}
+
+	public PositionMode getPositionMode () {
+		return positionMode;
+	}
+
+	public void setPositionMode (PositionMode positionMode) {
+		this.positionMode = positionMode;
 	}
 
 	public SpacingMode getSpacingMode () {
@@ -93,5 +100,23 @@ public class PathConstraintData {
 
 	public String toString () {
 		return name;
+	}
+
+	static public enum PositionMode {
+		fixed, percent;
+
+		static public final PositionMode[] values = PositionMode.values();
+	}
+
+	static public enum SpacingMode {
+		length, fixed, percent;
+
+		static public final SpacingMode[] values = SpacingMode.values();
+	}
+
+	static public enum RotateMode {
+		tangent, chain, chainScale;
+
+		static public final RotateMode[] values = RotateMode.values();
 	}
 }

@@ -5,20 +5,23 @@ import static com.badlogic.gdx.math.MathUtils.*;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
+import com.esotericsoftware.spine.PathConstraintData.PositionMode;
+import com.esotericsoftware.spine.PathConstraintData.RotateMode;
+import com.esotericsoftware.spine.PathConstraintData.SpacingMode;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 
 public class PathConstraint implements Updatable {
-	static private final int NONE = -1;
-	static private final int BEFORE = -2;
-	static private final int AFTER = -3;
+	static private final int NONE = -1, BEFORE = -2, AFTER = -3;
 
 	final PathConstraintData data;
 	final Array<Bone> bones;
 	Slot target;
 	float position, spacing, rotateMix, translateMix;
 
-	FloatArray spaces = new FloatArray(), positions = new FloatArray(), temp = new FloatArray();
+	final FloatArray spaces = new FloatArray(), positions = new FloatArray();
+	final FloatArray world = new FloatArray(), curves = new FloatArray(), lengths = new FloatArray();
+	final float[] segments = new float[10];
 
 	public PathConstraint (PathConstraintData data, Skeleton skeleton) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -53,6 +56,7 @@ public class PathConstraint implements Updatable {
 		update();
 	}
 
+	@SuppressWarnings("null")
 	public void update () {
 		Attachment attachment = target.getAttachment();
 		if (!(attachment instanceof PathAttachment)) return;
@@ -61,70 +65,43 @@ public class PathConstraint implements Updatable {
 		boolean translate = translateMix > 0, rotate = rotateMix > 0;
 		if (!translate && !rotate) return;
 
-		PathAttachment path = (PathAttachment)attachment;
 		PathConstraintData data = this.data;
+		Object[] bones = this.bones.items;
+		int boneCount = this.bones.size;
 		SpacingMode spacingMode = data.spacingMode;
 		RotateMode rotateMode = data.rotateMode;
-		float offsetRotation = data.offsetRotation;
-		FloatArray spacesArray = this.spaces;
-		spacesArray.clear();
-		spacesArray.add(0);
-
-		Array<Bone> bones = this.bones;
-		int boneCount = bones.size;
-		if (boneCount == 1) {
-			float[] positions = computeWorldPositions(path, rotate, spacingMode == SpacingMode.percent);
-			Bone bone = bones.first();
-			bone.worldX += (positions[0] - bone.worldX) * translateMix;
-			bone.worldY += (positions[1] - bone.worldY) * translateMix;
-			if (rotate) {
-				float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-				float r = positions[2] - atan2(c, a) + offsetRotation * degRad;
-				if (r > PI)
-					r -= PI2;
-				else if (r < -PI) r += PI2;
-				r *= rotateMix;
-				float cos = cos(r), sin = sin(r);
-				bone.a = cos * a - sin * c;
-				bone.b = cos * b - sin * d;
-				bone.c = sin * a + cos * c;
-				bone.d = sin * b + cos * d;
-			}
-			return;
-		}
-
-		float[] spaces;
+		boolean tangents = rotateMode == RotateMode.tangent, scale = rotateMode == RotateMode.chainScale;
+		boolean lengthSpacing = spacingMode == SpacingMode.length;
+		int spacesCount = tangents ? boneCount : boneCount + 1;
+		float[] spaces = this.spaces.setSize(spacesCount), lengths = null;
 		float spacing = this.spacing;
-		boolean scale = rotateMode == RotateMode.chainScale, lengthMode = spacingMode == SpacingMode.length;
-		if (scale || lengthMode) {
-			spaces = spacesArray.setSize(1 + boneCount * 2);
+		if (scale || lengthSpacing) {
+			if (scale) lengths = this.lengths.setSize(boneCount);
 			for (int i = 0; i < boneCount;) {
-				Bone bone = bones.get(i++);
+				Bone bone = (Bone)bones[i];
 				float length = bone.data.length, x = length * bone.a, y = length * bone.c;
 				length = (float)Math.sqrt(x * x + y * y);
-				spaces[i] = lengthMode ? Math.max(0, length + spacing) : spacing;
-				spaces[i + boneCount] = length;
+				if (scale) lengths[i] = length;
+				spaces[++i] = lengthSpacing ? Math.max(0, length + spacing) : spacing;
 			}
 		} else {
-			spaces = spacesArray.setSize(1 + boneCount);
-			for (int i = 1; i <= boneCount; i++)
+			for (int i = 1; i <= spacesCount; i++)
 				spaces[i] = spacing;
 		}
 
-		boolean tangents = rotateMode == RotateMode.tangent;
-		float[] positions = computeWorldPositions(path, tangents, spacingMode == SpacingMode.percent);
-
-		float boneX = positions[0], boneY = positions[1];
+		float[] positions = computeWorldPositions((PathAttachment)attachment, spacesCount, tangents,
+			data.positionMode == PositionMode.percent, spacingMode == SpacingMode.percent);
+		float boneX = positions[0], boneY = positions[1], offsetRotation = data.offsetRotation;
 		boolean tip = rotateMode == RotateMode.chain && offsetRotation == 0;
-		for (int i = 0, p = 3; i < boneCount; p += 3) {
-			Bone bone = bones.get(i++);
+		for (int i = 0, p = 3; i < boneCount; i++, p += 3) {
+			Bone bone = (Bone)bones[i];
 			bone.worldX += (boneX - bone.worldX) * translateMix;
 			bone.worldY += (boneY - bone.worldY) * translateMix;
 			float x = positions[p], y = positions[p + 1], dx = x - boneX, dy = y - boneY;
 			if (scale) {
-				float space = spaces[i + boneCount];
-				if (space != 0) {
-					float s = ((float)Math.sqrt(dx * dx + dy * dy) / space - 1) * rotateMix + 1;
+				float length = lengths[i];
+				if (length != 0) {
+					float s = ((float)Math.sqrt(dx * dx + dy * dy) / length - 1) * rotateMix + 1;
 					bone.a *= s;
 					bone.c *= s;
 				}
@@ -135,7 +112,7 @@ public class PathConstraint implements Updatable {
 				float a = bone.a, b = bone.b, c = bone.c, d = bone.d, r, cos, sin;
 				if (tangents)
 					r = positions[p - 1];
-				else if (spaces[i] == 0)
+				else if (spaces[i + 1] == 0)
 					r = positions[p + 2];
 				else
 					r = atan2(dy, dx);
@@ -162,24 +139,24 @@ public class PathConstraint implements Updatable {
 		}
 	}
 
-	private float[] computeWorldPositions (PathAttachment path, boolean tangents, boolean percentSpacing) {
+	private float[] computeWorldPositions (PathAttachment path, int spacesCount, boolean tangents, boolean percentPosition,
+		boolean percentSpacing) {
 		Slot target = this.target;
 		float position = this.position;
-		int verticesLength = path.getWorldVerticesLength(), curves = verticesLength / 6, lastCurve = NONE;
-		int spacesCount = spaces.size;
-		float[] spaces = this.spaces.items, out = this.positions.setSize(spacesCount * 3), temp;
+		int verticesLength = path.getWorldVerticesLength(), curveCount = verticesLength / 6, lastCurve = NONE;
+		float[] spaces = this.spaces.items, out = this.positions.setSize(spacesCount * 3), world;
 		boolean closed = path.getClosed();
 
 		if (!path.getConstantSpeed()) {
 			float pathLength = path.getTotalLength();
-			position *= pathLength;
+			if (percentPosition) position *= pathLength;
 			if (percentSpacing) {
 				for (int i = 0; i < spacesCount; i++)
 					spaces[i] *= pathLength;
 			}
-			curves--;
+			curveCount--;
 			float[] curveLengths = path.getCurveLengths().items;
-			temp = this.temp.setSize(8);
+			world = this.world.setSize(8);
 			for (int i = 0, o = 0, curve = 0; i < spacesCount; i++, o += 3) {
 				float space = spaces[i];
 				position += space;
@@ -192,16 +169,16 @@ public class PathConstraint implements Updatable {
 				} else if (p < 0) {
 					if (lastCurve != BEFORE) {
 						lastCurve = BEFORE;
-						path.computeWorldVertices(target, 2, 4, temp, 0);
+						path.computeWorldVertices(target, 2, 4, world, 0);
 					}
-					addBeforePosition(p, temp, 0, out, o);
+					addBeforePosition(p, world, 0, out, o);
 					continue;
 				} else if (p > pathLength) {
 					if (lastCurve != AFTER) {
 						lastCurve = AFTER;
-						path.computeWorldVertices(target, verticesLength - 6, 4, temp, 0);
+						path.computeWorldVertices(target, verticesLength - 6, 4, world, 0);
 					}
-					addAfterPosition(p - pathLength, temp, 0, out, o);
+					addAfterPosition(p - pathLength, world, 0, out, o);
 					continue;
 				}
 
@@ -220,45 +197,45 @@ public class PathConstraint implements Updatable {
 
 				if (curve != lastCurve) {
 					lastCurve = curve;
-					if (closed && curve == curves) {
-						path.computeWorldVertices(target, verticesLength - 4, 4, temp, 0);
-						path.computeWorldVertices(target, 0, 4, temp, 4);
+					if (closed && curve == curveCount) {
+						path.computeWorldVertices(target, verticesLength - 4, 4, world, 0);
+						path.computeWorldVertices(target, 0, 4, world, 4);
 					} else
-						path.computeWorldVertices(target, curve * 6 + 2, 8, temp, 0);
+						path.computeWorldVertices(target, curve * 6 + 2, 8, world, 0);
 				}
-				addCurvePosition(p, temp[0], temp[1], temp[2], temp[3], temp[4], temp[5], temp[6], temp[7], out, o,
+				addCurvePosition(p, world[0], world[1], world[2], world[3], world[4], world[5], world[6], world[7], out, o,
 					tangents || (space == 0 && i > 0));
 			}
 			return out;
 		}
 
-		// World vertices, verticesStart to verticesStart + verticesLength - 1.
-		int verticesStart = 10 + curves;
-		temp = this.temp.setSize(verticesStart + verticesLength + 2);
+		// World vertices.
 		if (closed) {
 			verticesLength += 2;
-			int verticesEnd = verticesStart + verticesLength;
-			path.computeWorldVertices(target, 2, verticesLength - 4, temp, verticesStart);
-			path.computeWorldVertices(target, 0, 2, temp, verticesEnd - 4);
-			temp[verticesEnd - 2] = temp[verticesStart];
-			temp[verticesEnd - 1] = temp[verticesStart + 1];
+			world = this.world.setSize(verticesLength);
+			path.computeWorldVertices(target, 2, verticesLength - 4, world, 0);
+			path.computeWorldVertices(target, 0, 2, world, verticesLength - 4);
+			world[verticesLength - 2] = world[0];
+			world[verticesLength - 1] = world[1];
 		} else {
-			verticesStart--;
+			curveCount--;
 			verticesLength -= 4;
-			path.computeWorldVertices(target, 2, verticesLength, temp, verticesStart);
+			world = this.world.setSize(verticesLength);
+			path.computeWorldVertices(target, 2, verticesLength, world, 0);
 		}
 
-		// Curve lengths, 10 to verticesStart - 1.
+		// Curve lengths.
+		float[] curves = this.curves.setSize(curveCount);
 		float pathLength = 0;
-		float x1 = temp[verticesStart], y1 = temp[verticesStart + 1], cx1 = 0, cy1 = 0, cx2 = 0, cy2 = 0, x2 = 0, y2 = 0;
+		float x1 = world[0], y1 = world[1], cx1 = 0, cy1 = 0, cx2 = 0, cy2 = 0, x2 = 0, y2 = 0;
 		float tmpx, tmpy, dddfx, dddfy, ddfx, ddfy, dfx, dfy;
-		for (int i = 10, v = verticesStart + 2; i < verticesStart; i++, v += 6) {
-			cx1 = temp[v];
-			cy1 = temp[v + 1];
-			cx2 = temp[v + 2];
-			cy2 = temp[v + 3];
-			x2 = temp[v + 4];
-			y2 = temp[v + 5];
+		for (int i = 0, w = 2; i < curveCount; i++, w += 6) {
+			cx1 = world[w];
+			cy1 = world[w + 1];
+			cx2 = world[w + 2];
+			cy2 = world[w + 3];
+			x2 = world[w + 4];
+			y2 = world[w + 5];
 			tmpx = (x1 - cx1 * 2 + cx2) * 0.1875f;
 			tmpy = (y1 - cy1 * 2 + cy2) * 0.1875f;
 			dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.09375f;
@@ -279,18 +256,19 @@ public class PathConstraint implements Updatable {
 			dfx += ddfx + dddfx;
 			dfy += ddfy + dddfy;
 			pathLength += (float)Math.sqrt(dfx * dfx + dfy * dfy);
-			temp[i] = pathLength;
+			curves[i] = pathLength;
 			x1 = x2;
 			y1 = y2;
 		}
-		position *= pathLength;
+		if (percentPosition) position *= pathLength;
 		if (percentSpacing) {
 			for (int i = 0; i < spacesCount; i++)
 				spaces[i] *= pathLength;
 		}
 
+		float[] segments = this.segments;
 		float curveLength = 0;
-		for (int i = 0, o = 0, curve = 10, segment = 0; i < spacesCount; i++, o += 3) {
+		for (int i = 0, o = 0, curve = 0, segment = 0; i < spacesCount; i++, o += 3) {
 			float space = spaces[i];
 			position += space;
 			float p = position;
@@ -298,23 +276,23 @@ public class PathConstraint implements Updatable {
 			if (closed) {
 				p %= pathLength;
 				if (p < 0) p += pathLength;
-				curve = 10;
+				curve = 0;
 			} else if (p < 0) {
-				addBeforePosition(p, temp, verticesStart, out, o);
+				addBeforePosition(p, world, 0, out, o);
 				continue;
 			} else if (p > pathLength) {
-				addAfterPosition(p - pathLength, temp, verticesStart + verticesLength - 4, out, o);
+				addAfterPosition(p - pathLength, world, verticesLength - 4, out, o);
 				continue;
 			}
 
 			// Determine curve containing position.
 			for (;; curve++) {
-				float length = temp[curve];
+				float length = curves[curve];
 				if (p > length) continue;
-				if (curve == 10)
+				if (curve == 0)
 					p /= length;
 				else {
-					float prev = temp[curve - 1];
+					float prev = curves[curve - 1];
 					p = (p - prev) / (length - prev);
 				}
 				break;
@@ -323,15 +301,15 @@ public class PathConstraint implements Updatable {
 			// Curve segment lengths, 0 to 9.
 			if (curve != lastCurve) {
 				lastCurve = curve;
-				int ii = verticesStart + (curve - 10) * 6;
-				x1 = temp[ii];
-				y1 = temp[ii + 1];
-				cx1 = temp[ii + 2];
-				cy1 = temp[ii + 3];
-				cx2 = temp[ii + 4];
-				cy2 = temp[ii + 5];
-				x2 = temp[ii + 6];
-				y2 = temp[ii + 7];
+				int ii = curve * 6;
+				x1 = world[ii];
+				y1 = world[ii + 1];
+				cx1 = world[ii + 2];
+				cy1 = world[ii + 3];
+				cx2 = world[ii + 4];
+				cy2 = world[ii + 5];
+				x2 = world[ii + 6];
+				y2 = world[ii + 7];
 				tmpx = (x1 - cx1 * 2 + cx2) * 0.03f;
 				tmpy = (y1 - cy1 * 2 + cy2) * 0.03f;
 				dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.006f;
@@ -341,35 +319,35 @@ public class PathConstraint implements Updatable {
 				dfx = (cx1 - x1) * 0.3f + tmpx + dddfx * 0.16666667f;
 				dfy = (cy1 - y1) * 0.3f + tmpy + dddfy * 0.16666667f;
 				curveLength = (float)Math.sqrt(dfx * dfx + dfy * dfy);
-				temp[0] = curveLength;
+				segments[0] = curveLength;
 				for (ii = 1; ii < 8; ii++) {
 					dfx += ddfx;
 					dfy += ddfy;
 					ddfx += dddfx;
 					ddfy += dddfy;
 					curveLength += (float)Math.sqrt(dfx * dfx + dfy * dfy);
-					temp[ii] = curveLength;
+					segments[ii] = curveLength;
 				}
 				dfx += ddfx;
 				dfy += ddfy;
 				curveLength += (float)Math.sqrt(dfx * dfx + dfy * dfy);
-				temp[8] = curveLength;
+				segments[8] = curveLength;
 				dfx += ddfx + dddfx;
 				dfy += ddfy + dddfy;
 				curveLength += (float)Math.sqrt(dfx * dfx + dfy * dfy);
-				temp[9] = curveLength;
+				segments[9] = curveLength;
 				segment = 0;
 			}
 
 			// Weight by segment length.
 			p *= curveLength;
 			for (;; segment++) {
-				float length = temp[segment];
+				float length = segments[segment];
 				if (p > length) continue;
 				if (segment == 0)
 					p /= length;
 				else {
-					float prev = temp[segment - 1];
+					float prev = segments[segment - 1];
 					p = segment + (p - prev) / (length - prev);
 				}
 				break;
@@ -455,17 +433,5 @@ public class PathConstraint implements Updatable {
 
 	public String toString () {
 		return data.name;
-	}
-
-	static public enum RotateMode {
-		tangent, chain, chainScale;
-
-		static public final RotateMode[] values = RotateMode.values();
-	}
-
-	static public enum SpacingMode {
-		length, fixed, percent;
-
-		static public final SpacingMode[] values = SpacingMode.values();
 	}
 }
