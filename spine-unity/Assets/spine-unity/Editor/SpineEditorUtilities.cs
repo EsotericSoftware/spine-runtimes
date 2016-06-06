@@ -80,7 +80,7 @@ namespace Spine.Unity.Editor {
 			public static Texture2D controllerIcon;
 
 			internal static Mesh _boneMesh;
-			public static Mesh boneMesh {
+			public static Mesh BoneMesh {
 				get {
 					if (_boneMesh == null) {
 						_boneMesh = new Mesh();
@@ -100,14 +100,14 @@ namespace Spine.Unity.Editor {
 			}
 
 			internal static Material _boneMaterial;
-			public static Material boneMaterial {
+			public static Material BoneMaterial {
 				get {
 					if (_boneMaterial == null) {
 						#if UNITY_4_3
 						_boneMaterial = new Material(Shader.Find("Particles/Alpha Blended"));
 						_boneMaterial.SetColor("_TintColor", new Color(0.4f, 0.4f, 0.4f, 0.25f));
 						#else
-						_boneMaterial = new Material(Shader.Find("Spine/Bones"));
+						_boneMaterial = new Material(Shader.Find("Hidden/Spine/Bones"));
 						_boneMaterial.SetColor("_Color", new Color(0.4f, 0.4f, 0.4f, 0.25f));
 						#endif
 					}
@@ -354,6 +354,10 @@ namespace Spine.Unity.Editor {
 				}
 
 				string dir = Path.GetDirectoryName(sp);
+
+				#if SPINE_TK2D
+				IngestSpineProject(AssetDatabase.LoadAssetAtPath(sp, typeof(TextAsset)) as TextAsset, null);
+				#else
 				var localAtlases = FindAtlasesAtPath(dir);
 				var requiredPaths = GetRequiredAtlasRegions(sp);
 				var atlasMatch = GetMatchingAtlas(requiredPaths, localAtlases);
@@ -362,8 +366,12 @@ namespace Spine.Unity.Editor {
 				} else {
 					bool resolved = false;
 					while (!resolved) {
-						string atlasNotFoundMessage = "Could not find matching AtlasAsset for " + Path.GetFileNameWithoutExtension(sp);
-						int result = EditorUtility.DisplayDialogComplex("Skeleton JSON Import Error!", atlasNotFoundMessage, "Select", "Skip", "Abort");
+						int result = EditorUtility.DisplayDialogComplex(
+							"Skeleton JSON Import Error!",
+							"Could not find matching AtlasAsset for " + Path.GetFileNameWithoutExtension(sp),
+							"Browse...", "Skip", "Abort"
+						);
+
 						switch (result) {
 						case -1:
 							Debug.Log("Select Atlas");
@@ -378,7 +386,7 @@ namespace Spine.Unity.Editor {
 								}
 							}
 							break;
-						case 0: // Select
+						case 0: // Browse...
 							var atlasList = MultiAtlasDialog(requiredPaths, Path.GetDirectoryName(sp), Path.GetFileNameWithoutExtension(sp));
 							if (atlasList != null)
 								IngestSpineProject(AssetDatabase.LoadAssetAtPath(sp, typeof(TextAsset)) as TextAsset, atlasList.ToArray());
@@ -396,8 +404,10 @@ namespace Spine.Unity.Editor {
 						}
 					}
 				}
+
 				if (abortSkeletonImport)
 					break;
+				#endif
 			}
 			// MITCH: left a todo: any post processing of images
 		}
@@ -465,9 +475,9 @@ namespace Spine.Unity.Editor {
 			string lastAtlasPath = initialDirectory;
 			while (!resolved) {
 
+				// Build dialog box message.
 				var missingRegions = new List<string>(requiredPaths);
 				var dialogText = new StringBuilder();
-				// Build dialog box message.
 				{
 					dialogText.AppendLine(header);
 					dialogText.AppendLine("Atlases:");
@@ -490,17 +500,21 @@ namespace Spine.Unity.Editor {
 						}
 					}
 
-					if (missingRegions.Count == 0)
-						break;			
+					if (missingRegions.Count == 0) break;
 
 					for (int i = 0; i < missingRegions.Count; i++)
 						dialogText.AppendLine("\t" + missingRegions[i]);
 				}
 
 				// Show dialog box.
-				int result = EditorUtility.DisplayDialogComplex("Atlas Selection", dialogText.ToString(), "Select", "Finish", "Abort");
+				int result = EditorUtility.DisplayDialogComplex(
+					"Atlas Selection",
+					dialogText.ToString(),
+					"Browse...", "Ignore and Finish", "Abort"
+				);
+
 				switch (result) {
-				case 0: // Select
+				case 0: // Browse...
 					AtlasAsset selectedAtlasAsset = GetAtlasDialog(lastAtlasPath);
 					if (selectedAtlasAsset != null) {
 						var atlas = selectedAtlasAsset.GetAtlas();
@@ -514,7 +528,7 @@ namespace Spine.Unity.Editor {
 						atlasAssets.Add(selectedAtlasAsset);
 					}
 					break;
-				case 1: // Finish
+				case 1: // Ignore and Finish
 					resolved = true;
 					break;
 				case 2: // Abort
@@ -818,8 +832,29 @@ namespace Spine.Unity.Editor {
 			string assetPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(spineJson));
 			string filePath = assetPath + "/" + primaryName + "_SkeletonData.asset";
 
-			if (spineJson != null && atlasAssets != null) {
+			#if !SPINE_TK2D
+			if (spineJson != null) {
+				SkeletonDataAsset skeletonDataAsset = (SkeletonDataAsset)AssetDatabase.LoadAssetAtPath(filePath, typeof(SkeletonDataAsset));
+				if (skeletonDataAsset == null) {
+					skeletonDataAsset = SkeletonDataAsset.CreateInstance<SkeletonDataAsset>();
+					skeletonDataAsset.skeletonJSON = spineJson;
+					skeletonDataAsset.fromAnimation = new string[0];
+					skeletonDataAsset.toAnimation = new string[0];
+					skeletonDataAsset.duration = new float[0];
+					skeletonDataAsset.defaultMix = defaultMix;
+					skeletonDataAsset.scale = defaultScale;
 
+					AssetDatabase.CreateAsset(skeletonDataAsset, filePath);
+					AssetDatabase.SaveAssets();
+				} else {
+					skeletonDataAsset.Reset();
+					skeletonDataAsset.GetSkeletonData(true);
+				}
+
+				return skeletonDataAsset;
+			}
+			#else
+			if (spineJson != null && atlasAssets != null) {
 				SkeletonDataAsset skelDataAsset = (SkeletonDataAsset)AssetDatabase.LoadAssetAtPath(filePath, typeof(SkeletonDataAsset));
 				if (skelDataAsset == null) {
 					skelDataAsset = SkeletonDataAsset.CreateInstance<SkeletonDataAsset>();
@@ -844,6 +879,7 @@ namespace Spine.Unity.Editor {
 				EditorUtility.DisplayDialog("Error!", "Must specify both Spine JSON and AtlasAsset array", "OK");
 				return null;
 			}
+			#endif
 		}
 		#endregion
 

@@ -38,7 +38,7 @@ namespace Spine.Unity.Modules {
 
 		void Start () {
 			if (ghostShader == null)
-				ghostShader = Shader.Find("Spine/SkeletonGhost");
+				ghostShader = Shader.Find("Spine/Special/SkeletonGhost");
 
 			skeletonRenderer = GetComponent<SkeletonRenderer>();
 			meshFilter = GetComponent<MeshFilter>();

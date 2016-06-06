@@ -52,7 +52,6 @@ namespace Spine.Unity.Editor {
 			SpineEditorUtilities.ConfirmInitialization();
 
 			atlasAssets = serializedObject.FindProperty("atlasAssets");
-			atlasAssets.isExpanded = true;
 			skeletonJSON = serializedObject.FindProperty("skeletonJSON");
 			scale = serializedObject.FindProperty("scale");
 			fromAnimation = serializedObject.FindProperty("fromAnimation");
@@ -65,8 +64,10 @@ namespace Spine.Unity.Editor {
 			#endif
 
 			#if SPINE_TK2D
+			atlasAssets.isExpanded = false;
 			spriteCollection = serializedObject.FindProperty("spriteCollection");
 			#else
+			atlasAssets.isExpanded = true;
 			// REVIEW: Better fix.
 			if (m_skeletonData != null)
 				InitPreview();
@@ -105,8 +106,11 @@ namespace Spine.Unity.Editor {
 			}
 			EditorGUILayout.PropertyField(spriteCollection, true);
 			#endif
+			EditorGUILayout.Space();
 			EditorGUILayout.PropertyField(skeletonJSON);
 			EditorGUILayout.PropertyField(scale);
+			EditorGUILayout.Space();
+
 			if (EditorGUI.EndChangeCheck()) {
 				if (serializedObject.ApplyModifiedProperties()) {
 					if (m_previewUtility != null) {
@@ -155,11 +159,11 @@ namespace Spine.Unity.Editor {
 					
 					// Generate Mecanim Controller Button
 					using (new GUILayout.HorizontalScope()) {
-						GUILayout.Space(32);
-						if (GUILayout.Button(new GUIContent("Generate Mecanim Controller"), GUILayout.Width(195), GUILayout.Height(20)))
+						GUILayout.Space(EditorGUIUtility.labelWidth);
+						if (GUILayout.Button(new GUIContent("Generate Mecanim Controller"), GUILayout.Height(20)))
 							SkeletonBaker.GenerateMecanimAnimationClips(m_skeletonDataAsset);						
 					}
-					EditorGUILayout.LabelField("SkeletonAnimator is the Mecanim alternative to SkeletonAnimation. It is not required.", EditorStyles.miniLabel);
+					EditorGUILayout.HelpBox("SkeletonAnimator is the Mecanim alternative to SkeletonAnimation.\nIt is not required.", MessageType.Info);
 
 				} else {
 					
@@ -183,7 +187,22 @@ namespace Spine.Unity.Editor {
 			
 			if (isBakingExpanded) {
 				EditorGUI.indentLevel++;
-				EditorGUILayout.HelpBox("WARNING!\n\nBaking is NOT the same as SkeletonAnimator!\nDoes not support the following:\n\tInheritScale\n\tColor Keys\n\tDraw Order Keys\n\tAll Constraints.\nCurves are sampled at 60fps and are not realtime.\n\tPlease read SkeletonBaker.cs comments for full details.\n\nThe main use of Baking is to export Spine projects to be used without the Spine Runtime (ie: for sale on the Asset Store, or background objects that are animated only with a wind noise generator)", MessageType.Warning, true);
+				const string BakingWarningMessage =
+					"WARNING!" +
+					"\nBaking is NOT the same as SkeletonAnimator!" +
+
+					"\n\nThe main use of Baking is to export Spine projects to be used without the Spine Runtime (ie: for sale on the Asset Store, or background objects that are animated only with a wind noise generator)" +
+
+					"\n\nBaking also does not support the following:" +
+					"\n\tDisabled transform inheritance" +
+					"\n\tShear" +
+					"\n\tColor Keys" +
+					"\n\tDraw Order Keys" +
+					"\n\tAll Constraint types" +
+
+					"\n\nCurves are sampled at 60fps and are not realtime." +
+					"\nPlease read SkeletonBaker.cs comments for full details.";
+				EditorGUILayout.HelpBox(BakingWarningMessage, MessageType.Warning, true);
 
 				EditorGUI.indentLevel++;
 				bakeAnimations = EditorGUILayout.Toggle("Bake Animations", bakeAnimations);
@@ -420,6 +439,7 @@ namespace Spine.Unity.Editor {
 				if (SpineEditorUtilities.IsValidSpineData((TextAsset)skeletonJSON.objectReferenceValue) == false) {
 					warnings.Add("Skeleton data file is not a valid JSON or binary file.");
 				} else {
+					#if !SPINE_TK2D
 					bool detectedNullAtlasEntry = false;
 					var atlasList = new List<Atlas>();
 					for (int i = 0; i < atlasAssets.arraySize; i++) {
@@ -450,6 +470,7 @@ namespace Spine.Unity.Editor {
 							warnings.Add("Missing Region: '" + str + "'");
 						
 					}
+					#endif
 				}
 			}
 		}

@@ -1,4 +1,4 @@
-Shader "Spine/Bones" {
+Shader "Hidden/Spine/Bones" {
 Properties {
 	_Color ("Color", Color) = (0.5,0.5,0.5,0.5)
 	_MainTex ("Particle Texture", 2D) = "white" {}
@@ -56,7 +56,6 @@ Category {
 			}
 
 			sampler2D_float _CameraDepthTexture;
-
 			
 			fixed4 frag (v2f i) : SV_Target
 			{				
