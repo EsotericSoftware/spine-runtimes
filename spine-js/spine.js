@@ -990,8 +990,7 @@ spine.FfdTimeline.prototype = {
 
 		var vertices = slot.attachmentVertices;
 		if (vertices.length != vertexCount) {
-			vertices = slot.attachmentVertices = new spine.Float32Array(vertexCount);
-			vertices.length = vertexCount;
+			slot.attachmentVertices = vertices = new spine.Float32Array(vertexCount);
 			alpha = 1;
 		}
 
