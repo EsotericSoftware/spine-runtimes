@@ -61,11 +61,6 @@ public class PathConstraint implements Updatable {
 		boolean translate = translateMix > 0, rotate = rotateMix > 0;
 		if (!translate && !rotate) return;
 
-		// BOZO!
-		spaces = new FloatArray();
-		positions = new FloatArray();
-		temp = new FloatArray();
-
 		PathAttachment path = (PathAttachment)attachment;
 		PathConstraintData data = this.data;
 		SpacingMode spacingMode = data.spacingMode;
