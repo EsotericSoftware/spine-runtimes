@@ -48,7 +48,9 @@ import com.esotericsoftware.spine.Animation.DeformTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
-import com.esotericsoftware.spine.Animation.PathConstraintTimeline;
+import com.esotericsoftware.spine.Animation.PathConstraintMixTimeline;
+import com.esotericsoftware.spine.Animation.PathConstraintPositionTimeline;
+import com.esotericsoftware.spine.Animation.PathConstraintSpacingTimeline;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
 import com.esotericsoftware.spine.Animation.ShearTimeline;
@@ -69,12 +71,17 @@ import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
 
 public class SkeletonBinary {
-	static public final int TIMELINE_ROTATE = 0;
-	static public final int TIMELINE_TRANSLATE = 1;
-	static public final int TIMELINE_SCALE = 2;
-	static public final int TIMELINE_SHEAR = 3;
-	static public final int TIMELINE_ATTACHMENT = 4;
-	static public final int TIMELINE_COLOR = 5;
+	static public final int BONE_ROTATE = 0;
+	static public final int BONE_TRANSLATE = 1;
+	static public final int BONE_SCALE = 2;
+	static public final int BONE_SHEAR = 3;
+
+	static public final int SLOT_ATTACHMENT = 0;
+	static public final int SLOT_COLOR = 1;
+
+	static public final int PATH_POSITION = 0;
+	static public final int PATH_SPACING = 1;
+	static public final int PATH_MIX = 2;
 
 	static public final int CURVE_LINEAR = 0;
 	static public final int CURVE_STEPPED = 1;
@@ -488,7 +495,7 @@ public class SkeletonBinary {
 					int timelineType = input.readByte();
 					int frameCount = input.readInt(true);
 					switch (timelineType) {
-					case TIMELINE_COLOR: {
+					case SLOT_COLOR: {
 						ColorTimeline timeline = new ColorTimeline(frameCount);
 						timeline.slotIndex = slotIndex;
 						for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
@@ -501,7 +508,7 @@ public class SkeletonBinary {
 						duration = Math.max(duration, timeline.getFrames()[(frameCount - 1) * ColorTimeline.ENTRIES]);
 						break;
 					}
-					case TIMELINE_ATTACHMENT:
+					case SLOT_ATTACHMENT:
 						AttachmentTimeline timeline = new AttachmentTimeline(frameCount);
 						timeline.slotIndex = slotIndex;
 						for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
@@ -520,7 +527,7 @@ public class SkeletonBinary {
 					int timelineType = input.readByte();
 					int frameCount = input.readInt(true);
 					switch (timelineType) {
-					case TIMELINE_ROTATE: {
+					case BONE_ROTATE: {
 						RotateTimeline timeline = new RotateTimeline(frameCount);
 						timeline.boneIndex = boneIndex;
 						for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
@@ -531,14 +538,14 @@ public class SkeletonBinary {
 						duration = Math.max(duration, timeline.getFrames()[(frameCount - 1) * RotateTimeline.ENTRIES]);
 						break;
 					}
-					case TIMELINE_TRANSLATE:
-					case TIMELINE_SCALE:
-					case TIMELINE_SHEAR: {
+					case BONE_TRANSLATE:
+					case BONE_SCALE:
+					case BONE_SHEAR: {
 						TranslateTimeline timeline;
 						float timelineScale = 1;
-						if (timelineType == TIMELINE_SCALE)
+						if (timelineType == BONE_SCALE)
 							timeline = new ScaleTimeline(frameCount);
-						else if (timelineType == TIMELINE_SHEAR)
+						else if (timelineType == BONE_SHEAR)
 							timeline = new ShearTimeline(frameCount);
 						else {
 							timeline = new TranslateTimeline(frameCount);
@@ -590,15 +597,37 @@ public class SkeletonBinary {
 			// Path constraint timelines.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				int index = input.readInt(true);
-				int frameCount = input.readInt(true);
-				PathConstraintTimeline timeline = new PathConstraintTimeline(frameCount);
-				timeline.pathConstraintIndex = index;
-				for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readFloat(), input.readFloat());
-					if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
+				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
+					int timelineType = input.readByte();
+					int frameCount = input.readInt(true);
+					switch (timelineType) {
+					case PATH_POSITION:
+					case PATH_SPACING: {
+						PathConstraintPositionTimeline timeline;
+						if (timelineType == PATH_SPACING)
+							timeline = new PathConstraintSpacingTimeline(frameCount);
+						else
+							timeline = new PathConstraintPositionTimeline(frameCount);
+						timeline.pathConstraintIndex = index;
+						for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
+							timeline.setFrame(frameIndex, input.readFloat(), input.readFloat());
+							if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
+						}
+						timelines.add(timeline);
+						duration = Math.max(duration, timeline.getFrames()[(frameCount - 1) * PathConstraintPositionTimeline.ENTRIES]);
+					}
+					case PATH_MIX: {
+						PathConstraintMixTimeline timeline = new PathConstraintMixTimeline(frameCount);
+						timeline.pathConstraintIndex = index;
+						for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
+							timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readFloat());
+							if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
+						}
+						timelines.add(timeline);
+						duration = Math.max(duration, timeline.getFrames()[(frameCount - 1) * PathConstraintMixTimeline.ENTRIES]);
+					}
+					}
 				}
-				timelines.add(timeline);
-				duration = Math.max(duration, timeline.getFrames()[(frameCount - 1) * PathConstraintTimeline.ENTRIES]);
 			}
 
 			// Deform timelines.

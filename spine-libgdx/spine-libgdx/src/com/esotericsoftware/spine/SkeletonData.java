@@ -90,7 +90,7 @@ public class SkeletonData {
 		return null;
 	}
 
-	/** @return -1 if the bone was not found. */
+	/** @return -1 if the slot was not found. */
 	public int findSlotIndex (String slotName) {
 		if (slotName == null) throw new IllegalArgumentException("slotName cannot be null.");
 		Array<SlotData> slots = this.slots;
@@ -204,6 +204,15 @@ public class SkeletonData {
 			if (constraint.name.equals(constraintName)) return constraint;
 		}
 		return null;
+	}
+
+	/** @return -1 if the path constraint was not found. */
+	public int findPathConstraintIndex (String pathConstraintName) {
+		if (pathConstraintName == null) throw new IllegalArgumentException("pathConstraintName cannot be null.");
+		Array<PathConstraintData> pathConstraints = this.pathConstraints;
+		for (int i = 0, n = pathConstraints.size; i < n; i++)
+			if (pathConstraints.get(i).name.equals(pathConstraintName)) return i;
+		return -1;
 	}
 
 	// ---

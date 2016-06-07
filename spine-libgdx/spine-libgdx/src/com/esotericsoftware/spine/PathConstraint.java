@@ -144,7 +144,7 @@ public class PathConstraint implements Updatable {
 		Slot target = this.target;
 		float position = this.position;
 		int verticesLength = path.getWorldVerticesLength(), curveCount = verticesLength / 6, lastCurve = NONE;
-		float[] spaces = this.spaces.items, out = this.positions.setSize(spacesCount * 3), world;
+		float[] spaces = this.spaces.items, out = this.positions.setSize(spacesCount * 3 + 2), world;
 		boolean closed = path.getClosed();
 
 		if (!path.getConstantSpeed()) {

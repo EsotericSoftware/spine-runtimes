@@ -47,7 +47,9 @@ import com.esotericsoftware.spine.Animation.DeformTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
-import com.esotericsoftware.spine.Animation.PathConstraintTimeline;
+import com.esotericsoftware.spine.Animation.PathConstraintMixTimeline;
+import com.esotericsoftware.spine.Animation.PathConstraintPositionTimeline;
+import com.esotericsoftware.spine.Animation.PathConstraintSpacingTimeline;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
 import com.esotericsoftware.spine.Animation.ShearTimeline;
@@ -280,7 +282,7 @@ public class SkeletonJson {
 
 		String type = map.getString("type", AttachmentType.region.name());
 
-		// Warning: These types are deprecated and will be removed in the near future.
+		// BOZO - Warning: These types are deprecated and will be removed in the near future.
 		if (type.equals("skinnedmesh")) type = "weightedmesh";
 		if (type.equals("weightedmesh")) type = "mesh";
 		if (type.equals("weightedlinkedmesh")) type = "linkedmesh";
@@ -393,7 +395,6 @@ public class SkeletonJson {
 		for (JsonValue slotMap = map.getChild("slots"); slotMap != null; slotMap = slotMap.next) {
 			int slotIndex = skeletonData.findSlotIndex(slotMap.name);
 			if (slotIndex == -1) throw new SerializationException("Slot not found: " + slotMap.name);
-
 			for (JsonValue timelineMap = slotMap.child; timelineMap != null; timelineMap = timelineMap.next) {
 				String timelineName = timelineMap.name;
 				if (timelineName.equals("color")) {
@@ -428,7 +429,6 @@ public class SkeletonJson {
 		for (JsonValue boneMap = map.getChild("bones"); boneMap != null; boneMap = boneMap.next) {
 			int boneIndex = skeletonData.findBoneIndex(boneMap.name);
 			if (boneIndex == -1) throw new SerializationException("Bone not found: " + boneMap.name);
-
 			for (JsonValue timelineMap = boneMap.child; timelineMap != null; timelineMap = timelineMap.next) {
 				String timelineName = timelineMap.name;
 				if (timelineName.equals("rotate")) {
@@ -506,19 +506,42 @@ public class SkeletonJson {
 		}
 
 		// Path constraint timelines.
-		for (JsonValue constraintMap = map.getChild("path"); constraintMap != null; constraintMap = constraintMap.next) {
-			PathConstraintData constraint = skeletonData.findPathConstraint(constraintMap.name);
-			PathConstraintTimeline timeline = new PathConstraintTimeline(constraintMap.size);
-			timeline.pathConstraintIndex = skeletonData.getPathConstraints().indexOf(constraint, true);
-			int frameIndex = 0;
-			for (JsonValue valueMap = constraintMap.child; valueMap != null; valueMap = valueMap.next) {
-				timeline.setFrame(frameIndex, valueMap.getFloat("time"), valueMap.getFloat("scaleMix", 1),
-					valueMap.getFloat("rotateMix", 1), valueMap.getFloat("translateMix", 1));
-				readCurve(valueMap, timeline, frameIndex);
-				frameIndex++;
+		for (JsonValue constraintMap = map.getChild("paths"); constraintMap != null; constraintMap = constraintMap.next) {
+			int index = skeletonData.findPathConstraintIndex(constraintMap.name);
+			if (index == -1) throw new SerializationException("Path constraint not found: " + constraintMap.name);
+			for (JsonValue timelineMap = constraintMap.child; timelineMap != null; timelineMap = timelineMap.next) {
+				String timelineName = timelineMap.name;
+				if (timelineName.equals("position") || timelineName.equals("spacing")) {
+					PathConstraintPositionTimeline timeline;
+					if (timelineName.equals("spacing"))
+						timeline = new PathConstraintSpacingTimeline(timelineMap.size);
+					else
+						timeline = new PathConstraintPositionTimeline(timelineMap.size);
+					timeline.pathConstraintIndex = index;
+					int frameIndex = 0;
+					for (JsonValue valueMap = constraintMap.child; valueMap != null; valueMap = valueMap.next) {
+						timeline.setFrame(frameIndex, valueMap.getFloat("time"), valueMap.getFloat(timelineName, 1));
+						readCurve(valueMap, timeline, frameIndex);
+						frameIndex++;
+					}
+					timelines.add(timeline);
+					duration = Math.max(duration,
+						timeline.getFrames()[(timeline.getFrameCount() - 1) * PathConstraintPositionTimeline.ENTRIES]);
+				} else if (timelineName.equals("mix")) {
+					PathConstraintMixTimeline timeline = new PathConstraintMixTimeline(timelineMap.size);
+					timeline.pathConstraintIndex = index;
+					int frameIndex = 0;
+					for (JsonValue valueMap = constraintMap.child; valueMap != null; valueMap = valueMap.next) {
+						timeline.setFrame(frameIndex, valueMap.getFloat("time"), valueMap.getFloat("rotateMix", 1),
+							valueMap.getFloat("translateMix", 1));
+						readCurve(valueMap, timeline, frameIndex);
+						frameIndex++;
+					}
+					timelines.add(timeline);
+					duration = Math.max(duration,
+						timeline.getFrames()[(timeline.getFrameCount() - 1) * PathConstraintMixTimeline.ENTRIES]);
+				}
 			}
-			timelines.add(timeline);
-			duration = Math.max(duration, timeline.getFrames()[(timeline.getFrameCount() - 1) * PathConstraintTimeline.ENTRIES]);
 		}
 
 		// Deform timelines.
