@@ -57,7 +57,7 @@ void spAnimation_apply (const spAnimation* self, spSkeleton* skeleton, float las
 
 	if (loop && self->duration) {
 		time = FMOD(time, self->duration);
-		lastTime = FMOD(lastTime, self->duration);
+		if (lastTime > 0) lastTime = FMOD(lastTime, self->duration);
 	}
 
 	for (i = 0; i < n; ++i)
@@ -70,7 +70,7 @@ void spAnimation_mix (const spAnimation* self, spSkeleton* skeleton, float lastT
 
 	if (loop && self->duration) {
 		time = FMOD(time, self->duration);
-		lastTime = FMOD(lastTime, self->duration);
+		if (lastTime > 0) lastTime = FMOD(lastTime, self->duration);
 	}
 
 	for (i = 0; i < n; ++i)
@@ -294,6 +294,10 @@ void _spRotateTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 	while (amount < -180)
 		amount += 360;
 	bone->rotation += amount * alpha;
+
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
 }
 
 spRotateTimeline* spRotateTimeline_create (int framesCount) {
@@ -342,6 +346,10 @@ void _spTranslateTimeline_apply (const spTimeline* timeline, spSkeleton* skeleto
 			* alpha;
 	bone->y += (bone->data->y + prevFrameY + (self->frames[frameIndex + TRANSLATE_FRAME_Y] - prevFrameY) * percent - bone->y)
 			* alpha;
+
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
 }
 
 spTranslateTimeline* spTranslateTimeline_create (int framesCount) {
@@ -386,6 +394,10 @@ void _spScaleTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 			- bone->scaleX) * alpha;
 	bone->scaleY += (bone->data->scaleY * (prevFrameY + (self->frames[frameIndex + TRANSLATE_FRAME_Y] - prevFrameY) * percent)
 			- bone->scaleY) * alpha;
+
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
 }
 
 spScaleTimeline* spScaleTimeline_create (int framesCount) {
@@ -449,6 +461,10 @@ void _spColorTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 		slot->b = b;
 		slot->a = a;
 	}
+
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
 }
 
 spColorTimeline* spColorTimeline_create (int framesCount) {
@@ -485,6 +501,10 @@ void _spAttachmentTimeline_apply (const spTimeline* timeline, spSkeleton* skelet
 	attachmentName = self->attachmentNames[frameIndex];
 	spSlot_setAttachment(skeleton->slots[self->slotIndex],
 			attachmentName ? spSkeleton_getAttachmentForSlotIndex(skeleton, self->slotIndex, attachmentName) : 0);
+
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
+	UNUSED(alpha);
 }
 
 void _spAttachmentTimeline_dispose (spTimeline* timeline) {
@@ -578,8 +598,8 @@ spEventTimeline* spEventTimeline_create (int framesCount) {
 	return self;
 }
 
-void spEventTimeline_setFrame (spEventTimeline* self, int frameIndex, float time, spEvent* event) {
-	self->frames[frameIndex] = time;
+void spEventTimeline_setFrame (spEventTimeline* self, int frameIndex, spEvent* event) {
+	self->frames[frameIndex] = event->time;
 
 	FREE(self->events[frameIndex]);
 	self->events[frameIndex] = event;
@@ -608,6 +628,11 @@ void _spDrawOrderTimeline_apply (const spTimeline* timeline, spSkeleton* skeleto
 		for (i = 0; i < self->slotsCount; ++i)
 			skeleton->drawOrder[i] = skeleton->slots[drawOrderToSetupIndex[i]];
 	}
+
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
+	UNUSED(alpha);
 }
 
 void _spDrawOrderTimeline_dispose (spTimeline* timeline) {
@@ -651,35 +676,53 @@ void spDrawOrderTimeline_setFrame (spDrawOrderTimeline* self, int frameIndex, fl
 
 void _spFFDTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 		int* eventsCount, float alpha) {
-	int frameIndex, i;
+	int frameIndex, i, vertexCount;
 	float percent, frameTime;
 	const float* prevVertices;
 	const float* nextVertices;
 	spFFDTimeline* self = (spFFDTimeline*)timeline;
 
 	spSlot *slot = skeleton->slots[self->slotIndex];
-	if (slot->attachment != self->attachment) return;
+
+	if (slot->attachment != self->attachment) {
+		if (!slot->attachment) return;
+		switch (slot->attachment->type) {
+		case SP_ATTACHMENT_MESH: {
+			spMeshAttachment* mesh = SUB_CAST(spMeshAttachment, slot->attachment);
+			if (!mesh->inheritFFD || mesh->parentMesh != (void*)self->attachment) return;
+			break;
+		}
+		case SP_ATTACHMENT_WEIGHTED_MESH: {
+			spWeightedMeshAttachment* mesh = SUB_CAST(spWeightedMeshAttachment, slot->attachment);
+			if (!mesh->inheritFFD || mesh->parentMesh != (void*)self->attachment) return;
+			break;
+		}
+		default:
+			return;
+		}
+	}
 
 	if (time < self->frames[0]) return; /* Time is before first frame. */
 
-	if (slot->attachmentVerticesCount < self->frameVerticesCount) {
-		if (slot->attachmentVerticesCapacity < self->frameVerticesCount) {
+	vertexCount = self->frameVerticesCount;
+	if (slot->attachmentVerticesCount < vertexCount) {
+		if (slot->attachmentVerticesCapacity < vertexCount) {
 			FREE(slot->attachmentVertices);
-			slot->attachmentVertices = MALLOC(float, self->frameVerticesCount);
-			slot->attachmentVerticesCapacity = self->frameVerticesCount;
+			slot->attachmentVertices = MALLOC(float, vertexCount);
+			slot->attachmentVerticesCapacity = vertexCount;
 		}
 	}
-	if (slot->attachmentVerticesCount != self->frameVerticesCount) alpha = 1; /* Don't mix from uninitialized slot vertices. */
-	slot->attachmentVerticesCount = self->frameVerticesCount;
+	if (slot->attachmentVerticesCount != vertexCount) alpha = 1; /* Don't mix from uninitialized slot vertices. */
+	slot->attachmentVerticesCount = vertexCount;
 
 	if (time >= self->frames[self->framesCount - 1]) {
 		/* Time is after last frame. */
 		const float* lastVertices = self->frameVertices[self->framesCount - 1];
 		if (alpha < 1) {
-			for (i = 0; i < self->frameVerticesCount; ++i)
+			for (i = 0; i < vertexCount; ++i)
 				slot->attachmentVertices[i] += (lastVertices[i] - slot->attachmentVertices[i]) * alpha;
 		} else
-			memcpy(slot->attachmentVertices, lastVertices, self->frameVerticesCount * sizeof(float));
+			memcpy(slot->attachmentVertices, lastVertices, vertexCount * sizeof(float));
 		return;
 	}
 
@@ -693,16 +736,20 @@ void _spFFDTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, flo
 	nextVertices = self->frameVertices[frameIndex];
 
 	if (alpha < 1) {
-		for (i = 0; i < self->frameVerticesCount; ++i) {
+		for (i = 0; i < vertexCount; ++i) {
 			float prev = prevVertices[i];
 			slot->attachmentVertices[i] += (prev + (nextVertices[i] - prev) * percent - slot->attachmentVertices[i]) * alpha;
 		}
 	} else {
-		for (i = 0; i < self->frameVerticesCount; ++i) {
+		for (i = 0; i < vertexCount; ++i) {
 			float prev = prevVertices[i];
 			slot->attachmentVertices[i] = prev + (nextVertices[i] - prev) * percent;
 		}
 	}
+
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
 }
 
 void _spFFDTimeline_dispose (spTimeline* timeline) {
@@ -775,6 +822,10 @@ void _spIkConstraintTimeline_apply (const spTimeline* timeline, spSkeleton* skel
 	mix = prevFrameMix + (self->frames[frameIndex + IKCONSTRAINT_FRAME_MIX] - prevFrameMix) * percent;
 	ikConstraint->mix += (mix - ikConstraint->mix) * alpha;
 	ikConstraint->bendDirection = (int)self->frames[frameIndex + IKCONSTRAINT_PREV_FRAME_BEND_DIRECTION];
+
+	UNUSED(lastTime);
+	UNUSED(firedEvents);
+	UNUSED(eventsCount);
 }
 
 spIkConstraintTimeline* spIkConstraintTimeline_create (int framesCount) {
@@ -786,51 +837,6 @@ void spIkConstraintTimeline_setFrame (spIkConstraintTimeline* self, int frameInd
 	self->frames[frameIndex] = time;
 	self->frames[frameIndex + 1] = mix;
 	self->frames[frameIndex + 2] = (float)bendDirection;
-}
-
-/**/
-
-void _spFlipTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time,
-		spEvent** firedEvents, int* eventsCount, float alpha) {
-	int frameIndex;
-	spFlipTimeline* self = (spFlipTimeline*)timeline;
-
-	if (time < self->frames[0]) {
-		if (lastTime > time) _spFlipTimeline_apply(timeline, skeleton, lastTime, (float)INT_MAX, 0, 0, 0);
-		return;
-	} else if (lastTime > time) /**/
-		lastTime = -1;
-
-	frameIndex = (time >= self->frames[self->framesCount - 2] ?
-		self->framesCount : binarySearch(self->frames, self->framesCount, time, 2)) - 2;
-	if (self->frames[frameIndex] < lastTime) return;
-
-	if (self->x)
-		skeleton->bones[self->boneIndex]->flipX = (int)self->frames[frameIndex + 1];
-	else
-		skeleton->bones[self->boneIndex]->flipY = (int)self->frames[frameIndex + 1];
-}
-
-void _spFlipTimeline_dispose (spTimeline* timeline) {
-	spFlipTimeline* self = SUB_CAST(spFlipTimeline, timeline);
-	_spTimeline_deinit(SUPER(self));
-	FREE(self->frames);
-	FREE(self);
-}
-
-spFlipTimeline* spFlipTimeline_create (int framesCount, int/*bool*/x) {
-	spFlipTimeline* self = NEW(spFlipTimeline);
-	_spTimeline_init(SUPER(self), x ? SP_TIMELINE_FLIPX : SP_TIMELINE_FLIPY, _spFlipTimeline_dispose, _spFlipTimeline_apply);
-	CONST_CAST(int, self->x) = x;
-	CONST_CAST(int, self->framesCount) = framesCount << 1;
-	CONST_CAST(float*, self->frames) = CALLOC(float, self->framesCount);
-	return self;
-}
-
-void spFlipTimeline_setFrame (spFlipTimeline* self, int frameIndex, float time, int/*bool*/flip) {
-	frameIndex <<= 1;
-	self->frames[frameIndex] = time;
-	self->frames[frameIndex + 1] = (float)flip;
 }
 
 /**/

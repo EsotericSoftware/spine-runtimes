@@ -33,7 +33,7 @@ package spine.attachments {
 import spine.Slot;
 import spine.Bone;
 
-public dynamic class MeshAttachment extends Attachment {
+public dynamic class MeshAttachment extends Attachment implements FfdAttachment {
 	public var vertices:Vector.<Number>;
 	public var uvs:Vector.<Number>;
 	public var regionUVs:Vector.<Number>;
@@ -43,6 +43,8 @@ public dynamic class MeshAttachment extends Attachment {
 	public var g:Number = 1;
 	public var b:Number = 1;
 	public var a:Number = 1;
+	private var _parentMesh:MeshAttachment;
+	public var inheritFFD:Boolean;
 
 	public var path:String;
 	public var rendererObject:Object;
@@ -88,10 +90,10 @@ public dynamic class MeshAttachment extends Attachment {
 		var bone:Bone = slot.bone;
 		x += bone.worldX;
 		y += bone.worldY;
-		var m00:Number = bone.m00;
-		var m01:Number = bone.m01;
-		var m10:Number = bone.m10;
-		var m11:Number = bone.m11;
+		var m00:Number = bone.a;
+		var m01:Number = bone.b;
+		var m10:Number = bone.c;
+		var m11:Number = bone.d;
 		var vertices:Vector.<Number> = this.vertices;
 		var verticesCount:int = vertices.length;
 		if (slot.attachmentVertices.length == verticesCount) vertices = slot.attachmentVertices;
@@ -100,6 +102,27 @@ public dynamic class MeshAttachment extends Attachment {
 			var vy:Number = vertices[int(i + 1)];
 			worldVertices[ii] = vx * m00 + vy * m01 + x;
 			worldVertices[int(ii + 1)] = vx * m10 + vy * m11 + y;
+		}
+	}
+
+	public function applyFFD (sourceAttachment:Attachment) : Boolean {
+		return this == sourceAttachment || (inheritFFD && _parentMesh == sourceAttachment);
+	}
+
+	public function get parentMesh () : MeshAttachment {
+		return _parentMesh;
+	}
+
+	public function set parentMesh (parentMesh:MeshAttachment) : void {
+		_parentMesh = parentMesh;
+		if (parentMesh != null) {
+			vertices = parentMesh.vertices;
+			regionUVs = parentMesh.regionUVs;
+			triangles = parentMesh.triangles;
+			hullLength = parentMesh.hullLength;
+			edges = parentMesh.edges;
+			width = parentMesh.width;
+			height = parentMesh.height;
 		}
 	}
 }

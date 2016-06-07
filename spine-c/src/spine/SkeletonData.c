@@ -63,6 +63,10 @@ void spSkeletonData_dispose (spSkeletonData* self) {
 		spIkConstraintData_dispose(self->ikConstraints[i]);
 	FREE(self->ikConstraints);
 
+	for (i = 0; i < self->transformConstraintsCount; ++i)
+		spTransformConstraintData_dispose(self->transformConstraints[i]);
+	FREE(self->transformConstraints);
+
 	FREE(self->hash);
 	FREE(self->version);
 
@@ -118,9 +122,16 @@ spAnimation* spSkeletonData_findAnimation (const spSkeletonData* self, const cha
 	return 0;
 }
 
-spIkConstraintData* spSkeletonData_findIkConstraint (const spSkeletonData* self, const char* ikConstraintName) {
+spIkConstraintData* spSkeletonData_findIkConstraint (const spSkeletonData* self, const char* constraintName) {
 	int i;
 	for (i = 0; i < self->ikConstraintsCount; ++i)
-		if (strcmp(self->ikConstraints[i]->name, ikConstraintName) == 0) return self->ikConstraints[i];
+		if (strcmp(self->ikConstraints[i]->name, constraintName) == 0) return self->ikConstraints[i];
+	return 0;
+}
+
+spTransformConstraintData* spSkeletonData_findTransformConstraint (const spSkeletonData* self, const char* constraintName) {
+	int i;
+	for (i = 0; i < self->transformConstraintsCount; ++i)
+		if (strcmp(self->transformConstraints[i]->name, constraintName) == 0) return self->transformConstraints[i];
 	return 0;
 }

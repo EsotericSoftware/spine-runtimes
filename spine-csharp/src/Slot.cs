@@ -55,6 +55,7 @@ namespace Spine {
 				return attachment;
 			}
 			set {
+				if (attachment == value) return;
 				attachment = value;
 				attachmentTime = bone.skeleton.time;
 				attachmentVerticesCount = 0;
@@ -86,7 +87,12 @@ namespace Spine {
 			g = data.g;
 			b = data.b;
 			a = data.a;
-			Attachment = data.attachmentName == null ? null : bone.skeleton.GetAttachment(slotIndex, data.attachmentName);
+			if (data.attachmentName == null)
+				Attachment = null;
+			else {
+				attachment = null;
+				Attachment = bone.skeleton.GetAttachment(slotIndex, data.attachmentName);
+			}
 		}
 
 		public void SetToSetupPose () {

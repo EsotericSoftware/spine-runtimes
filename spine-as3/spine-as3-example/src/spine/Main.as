@@ -41,13 +41,13 @@ import spine.flash.SkeletonAnimation;
 
 [SWF(width = "800", height = "600", frameRate = "60", backgroundColor = "#dddddd")]
 public class Main extends Sprite {
-	[Embed(source = "spineboy.atlas", mimeType = "application/octet-stream")]
+	[Embed(source = "/spineboy.atlas", mimeType = "application/octet-stream")]
 	static public const SpineboyAtlas:Class;
 
-	[Embed(source = "spineboy.png")]
+	[Embed(source = "/spineboy.png")]
 	static public const SpineboyAtlasTexture:Class;
 
-	[Embed(source = "spineboy.json", mimeType = "application/octet-stream")]
+	[Embed(source = "/spineboy.json", mimeType = "application/octet-stream")]
 	static public const SpineboyJson:Class;
 
 	private var skeleton:SkeletonAnimation;

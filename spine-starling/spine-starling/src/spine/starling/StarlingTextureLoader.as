@@ -30,17 +30,14 @@
  *****************************************************************************/
 
 package spine.starling {
-import flash.display.Bitmap;
-import flash.display.BitmapData;
-import flash.geom.Point;
-import flash.geom.Rectangle;
-
 import spine.atlas.AtlasPage;
 import spine.atlas.AtlasRegion;
 import spine.atlas.TextureLoader;
 
-import starling.textures.SubTexture;
 import starling.textures.Texture;
+
+import flash.display.Bitmap;
+import flash.display.BitmapData;
 
 public class StarlingTextureLoader implements TextureLoader {
 	public var bitmapDatas:Object = {};

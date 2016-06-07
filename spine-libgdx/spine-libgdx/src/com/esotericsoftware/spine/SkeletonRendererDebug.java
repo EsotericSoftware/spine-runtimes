@@ -34,7 +34,7 @@ package com.esotericsoftware.spine;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
-import com.esotericsoftware.spine.attachments.SkinnedMeshAttachment;
+import com.esotericsoftware.spine.attachments.WeightedMeshAttachment;
 
 import static com.badlogic.gdx.graphics.g2d.Batch.*;
 
@@ -128,8 +128,8 @@ public class SkeletonRendererDebug {
 					vertices = mesh.getWorldVertices();
 					triangles = mesh.getTriangles();
 					hullLength = mesh.getHullLength();
-				} else if (attachment instanceof SkinnedMeshAttachment) {
-					SkinnedMeshAttachment mesh = (SkinnedMeshAttachment)attachment;
+				} else if (attachment instanceof WeightedMeshAttachment) {
+					WeightedMeshAttachment mesh = (WeightedMeshAttachment)attachment;
 					mesh.updateWorldVertices(slot, false);
 					vertices = mesh.getWorldVertices();
 					triangles = mesh.getTriangles();

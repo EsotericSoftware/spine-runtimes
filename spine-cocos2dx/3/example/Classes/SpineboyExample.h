@@ -39,10 +39,12 @@ class SpineboyExample : public cocos2d::LayerColor {
 public:
 	static cocos2d::Scene* scene ();
 
+	CREATE_FUNC (SpineboyExample);
+
 	virtual bool init ();
+
 	virtual void update (float deltaTime);
 
-	CREATE_FUNC (SpineboyExample);
 private:
 	spine::SkeletonAnimation* skeletonNode;
 };

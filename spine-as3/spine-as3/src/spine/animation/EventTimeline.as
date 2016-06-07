@@ -32,7 +32,6 @@
 package spine.animation {
 import spine.Event;
 import spine.Skeleton;
-import spine.Slot;
 
 public class EventTimeline implements Timeline {
 	public var frames:Vector.<Number>; // time, ...
@@ -40,7 +39,7 @@ public class EventTimeline implements Timeline {
 
 	public function EventTimeline (frameCount:int) {
 		frames = new Vector.<Number>(frameCount, true);
-		events = new Vector.<Event>(frameCount, true)
+		events = new Vector.<Event>(frameCount, true);
 	}
 
 	public function get frameCount () : int {
@@ -48,8 +47,8 @@ public class EventTimeline implements Timeline {
 	}
 
 	/** Sets the time and value of the specified keyframe. */
-	public function setFrame (frameIndex:int, time:Number, event:Event) : void {
-		frames[frameIndex] = time;
+	public function setFrame (frameIndex:int, event:Event) : void {
+		frames[frameIndex] = event.time;
 		events[frameIndex] = event;
 	}
 

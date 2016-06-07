@@ -64,20 +64,28 @@ public class AnimationState {
 			TrackEntry current = tracks.get(i);
 			if (current == null) continue;
 
+			TrackEntry next = current.next;
+			if (next != null) {
+				float nextTime = current.lastTime - next.delay;
+				if (nextTime >= 0) {
+					float nextDelta = delta * next.timeScale;
+					next.time = nextTime + nextDelta; // For start event to see correct time.
+					current.time += delta * current.timeScale; // For end event to see correct time.
+					setCurrent(i, next);
+					next.time -= nextDelta; // Prevent increasing time twice, below.
+					current = next;
+				}
+			} else if (!current.loop && current.lastTime >= current.endTime) {
+				// End non-looping animation when it reaches its end time and there is no next entry.
+				clearTrack(i);
+				continue;
+			}
+
 			current.time += delta * current.timeScale;
 			if (current.previous != null) {
 				float previousDelta = delta * current.previous.timeScale;
 				current.previous.time += previousDelta;
 				current.mixTime += previousDelta;
-			}
-
-			TrackEntry next = current.next;
-			if (next != null) {
-				next.time = current.lastTime - next.delay;
-				if (next.time >= 0) setCurrent(i, next);
-			} else {
-				// End non-looping animation when it reaches its end time and there is no next entry.
-				if (!current.loop && current.lastTime >= current.endTime) clearTrack(i);
 			}
 		}
 	}

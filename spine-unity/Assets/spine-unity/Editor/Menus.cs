@@ -28,50 +28,57 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
 using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-using Spine;
 
-public class Menus {
-	[MenuItem("Assets/Create/Spine Atlas")]
-	static public void CreateAtlas () {
-		CreateAsset<AtlasAsset>("New Atlas");
-	}
-	
-	[MenuItem("Assets/Create/Spine SkeletonData")]
-	static public void CreateSkeletonData () {
-		CreateAsset<SkeletonDataAsset>("New SkeletonData");
-	}
-	
-	static private void CreateAsset <T> (String name) where T : ScriptableObject {
-		var dir = "Assets/";
-		var selected = Selection.activeObject;
-		if (selected != null) {
-			var assetDir = AssetDatabase.GetAssetPath(selected.GetInstanceID());
-			if (assetDir.Length > 0 && Directory.Exists(assetDir))
-				dir = assetDir + "/";
+namespace Spine.Unity.Editor {
+	public static class Menus {
+		[MenuItem("Assets/Create/Spine Atlas")]
+		static public void CreateAtlas () {
+			CreateAsset<AtlasAsset>("New Atlas");
 		}
-		ScriptableObject asset = ScriptableObject.CreateInstance<T>();
-		AssetDatabase.CreateAsset(asset, dir + name + ".asset");
-		AssetDatabase.SaveAssets();
-		EditorUtility.FocusProjectWindow();
-		Selection.activeObject = asset;
-	}
 
-	[MenuItem("GameObject/Create Other/Spine SkeletonRenderer")]
-	static public void CreateSkeletonRendererGameObject () {
-		GameObject gameObject = new GameObject("New SkeletonRenderer", typeof(SkeletonRenderer));
-		EditorUtility.FocusProjectWindow();
-		Selection.activeObject = gameObject;
-	}
+		[MenuItem("Assets/Create/Spine SkeletonData")]
+		static public void CreateSkeletonData () {
+			CreateAsset<SkeletonDataAsset>("New SkeletonData");
+		}
 
-	[MenuItem("GameObject/Create Other/Spine SkeletonAnimation")]
-	static public void CreateSkeletonAnimationGameObject () {
-		GameObject gameObject = new GameObject("New SkeletonAnimation", typeof(SkeletonAnimation));
-		EditorUtility.FocusProjectWindow();
-		Selection.activeObject = gameObject;
+		static private void CreateAsset <T> (String name) where T : ScriptableObject {
+			var dir = "Assets/";
+			var selected = Selection.activeObject;
+			if (selected != null) {
+				var assetDir = AssetDatabase.GetAssetPath(selected.GetInstanceID());
+				if (assetDir.Length > 0 && Directory.Exists(assetDir))
+					dir = assetDir + "/";
+			}
+			ScriptableObject asset = ScriptableObject.CreateInstance<T>();
+			AssetDatabase.CreateAsset(asset, dir + name + ".asset");
+			AssetDatabase.SaveAssets();
+			EditorUtility.FocusProjectWindow();
+			Selection.activeObject = asset;
+		}
+
+		[MenuItem("GameObject/Spine/SkeletonRenderer", false, 10)]
+		static public void CreateSkeletonRendererGameObject () {
+			CreateSpineGameObject<SkeletonRenderer>("New SkeletonRenderer");
+		}
+
+		[MenuItem("GameObject/Spine/SkeletonAnimation", false, 10)]
+		static public void CreateSkeletonAnimationGameObject () {
+			CreateSpineGameObject<SkeletonAnimation>("New SkeletonAnimation");
+		}
+
+		static public void CreateSpineGameObject<T> (string name) where T : MonoBehaviour {
+			var parentGameObject = Selection.activeObject as GameObject;
+			var parentTransform = parentGameObject == null ? null : parentGameObject.transform;
+
+			var gameObject = new GameObject("New SkeletonRenderer", typeof(T));
+			gameObject.transform.SetParent(parentTransform, false);
+			EditorUtility.FocusProjectWindow();
+			Selection.activeObject = gameObject;
+			EditorGUIUtility.PingObject(Selection.activeObject);
+		}
 	}
 }

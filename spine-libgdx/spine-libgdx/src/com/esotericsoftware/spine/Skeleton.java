@@ -37,7 +37,7 @@ import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
-import com.esotericsoftware.spine.attachments.SkinnedMeshAttachment;
+import com.esotericsoftware.spine.attachments.WeightedMeshAttachment;
 
 public class Skeleton {
 	final SkeletonData data;
@@ -132,20 +132,24 @@ public class Skeleton {
 		int ikConstraintsCount = ikConstraints.size;
 		int transformConstraintsCount = transformConstraints.size;
 		updateCache.clear();
+
 		for (int i = 0, n = bones.size; i < n; i++) {
 			Bone bone = bones.get(i);
 			updateCache.add(bone);
-			for (int ii = 0; ii < transformConstraintsCount; ii++) {
-				TransformConstraint transformConstraint = transformConstraints.get(ii);
-				if (bone == transformConstraint.bone) {
-					updateCache.add(transformConstraint);
-					break;
-				}
-			}
 			for (int ii = 0; ii < ikConstraintsCount; ii++) {
 				IkConstraint ikConstraint = ikConstraints.get(ii);
 				if (bone == ikConstraint.bones.peek()) {
 					updateCache.add(ikConstraint);
+					break;
+				}
+			}
+		}
+
+		for (int i = 0; i < transformConstraintsCount; i++) {
+			TransformConstraint transformConstraint = transformConstraints.get(i);
+			for (int ii = updateCache.size - 1; ii >= 0; ii--) {
+				if (updateCache.get(ii) == transformConstraint.bone) {
+					updateCache.insert(ii + 1, transformConstraint);
 					break;
 				}
 			}
@@ -181,9 +185,11 @@ public class Skeleton {
 		Array<TransformConstraint> transformConstraints = this.transformConstraints;
 		for (int i = 0, n = transformConstraints.size; i < n; i++) {
 			TransformConstraint constraint = transformConstraints.get(i);
-			constraint.translateMix = constraint.data.translateMix;
-			constraint.x = constraint.data.x;
-			constraint.y = constraint.data.y;
+			TransformConstraintData data = constraint.data;
+			constraint.rotateMix = data.rotateMix;
+			constraint.translateMix = data.translateMix;
+			constraint.scaleMix = data.scaleMix;
+			constraint.shearMix = data.shearMix;
 		}
 	}
 
@@ -380,8 +386,8 @@ public class Skeleton {
 			} else if (attachment instanceof MeshAttachment) {
 				vertices = ((MeshAttachment)attachment).updateWorldVertices(slot, true);
 
-			} else if (attachment instanceof SkinnedMeshAttachment) {
-				vertices = ((SkinnedMeshAttachment)attachment).updateWorldVertices(slot, true);
+			} else if (attachment instanceof WeightedMeshAttachment) {
+				vertices = ((WeightedMeshAttachment)attachment).updateWorldVertices(slot, true);
 			}
 			if (vertices != null) {
 				for (int ii = 0, nn = vertices.length; ii < nn; ii += 5) {

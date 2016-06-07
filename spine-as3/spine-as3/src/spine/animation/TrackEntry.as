@@ -30,8 +30,6 @@
  *****************************************************************************/
 
 package spine.animation {
-import spine.Event;
-import spine.Skeleton;
 
 public class TrackEntry {
 	public var next:TrackEntry;

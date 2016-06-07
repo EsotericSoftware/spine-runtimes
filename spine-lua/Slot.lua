@@ -52,6 +52,7 @@ function Slot.new (slotData, bone)
 	end
 
 	function self:setAttachment (attachment)
+		if self.attachment == attachment then return end
 		self.attachment = attachment
 		self.attachmentTime = self.bone.skeleton.time
 		self.attachmentVerticesCount = 0
@@ -70,11 +71,12 @@ function Slot.new (slotData, bone)
 
 		self:setColor(data.r, data.g, data.b, data.a)
 
-		local attachment
-		if data.attachmentName then 
-			attachment = self.bone.skeleton:getAttachment(data.name, data.attachmentName)
+		if not data.attachmentName then 
+			self:setAttachment(nil)
+		else
+			self.attachment = nil
+			self:setAttachment(self.bone.skeleton:getAttachment(data.name, data.attachmentName))
 		end
-		self:setAttachment(attachment)
 	end
 
 	self:setToSetupPose()

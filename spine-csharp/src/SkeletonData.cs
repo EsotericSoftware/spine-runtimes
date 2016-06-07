@@ -42,6 +42,7 @@ namespace Spine {
 		internal ExposedList<EventData> events = new ExposedList<EventData>();
 		internal ExposedList<Animation> animations = new ExposedList<Animation>();
 		internal ExposedList<IkConstraintData> ikConstraints = new ExposedList<IkConstraintData>();
+		internal ExposedList<TransformConstraintData> transformConstraints = new ExposedList<TransformConstraintData>();
 		internal float width, height;
 		internal String version, hash, imagesPath;
 
@@ -140,12 +141,25 @@ namespace Spine {
 		// --- IK constraints.
 
 		/// <returns>May be null.</returns>
-		public IkConstraintData FindIkConstraint (String ikConstraintName) {
-			if (ikConstraintName == null) throw new ArgumentNullException("ikConstraintName cannot be null.");
+		public IkConstraintData FindIkConstraint (String constraintName) {
+			if (constraintName == null) throw new ArgumentNullException("constraintName cannot be null.");
 			ExposedList<IkConstraintData> ikConstraints = this.ikConstraints;
 			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
 				IkConstraintData ikConstraint = ikConstraints.Items[i];
-				if (ikConstraint.name == ikConstraintName) return ikConstraint;
+				if (ikConstraint.name == constraintName) return ikConstraint;
+			}
+			return null;
+		}
+
+		// --- Transform constraints.
+
+		/// <returns>May be null.</returns>
+		public TransformConstraintData FindTransformConstraint (String constraintName) {
+			if (constraintName == null) throw new ArgumentNullException("constraintName cannot be null.");
+			ExposedList<TransformConstraintData> transformConstraints = this.transformConstraints;
+			for (int i = 0, n = transformConstraints.Count; i < n; i++) {
+				TransformConstraintData transformConstraint = transformConstraints.Items[i];
+				if (transformConstraint.name == constraintName) return transformConstraint;
 			}
 			return null;
 		}

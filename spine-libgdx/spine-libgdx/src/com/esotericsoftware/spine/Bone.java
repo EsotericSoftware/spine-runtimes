@@ -34,7 +34,6 @@ package com.esotericsoftware.spine;
 import static com.badlogic.gdx.math.MathUtils.*;
 import static com.badlogic.gdx.math.Matrix3.*;
 
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 
@@ -42,7 +41,7 @@ public class Bone implements Updatable {
 	final BoneData data;
 	final Skeleton skeleton;
 	final Bone parent;
-	float x, y, rotation, scaleX, scaleY;
+	float x, y, rotation, scaleX, scaleY, shearX, shearY;
 	float appliedRotation, appliedScaleX, appliedScaleY;
 
 	float a, b, worldX;
@@ -77,31 +76,42 @@ public class Bone implements Updatable {
 		rotation = bone.rotation;
 		scaleX = bone.scaleX;
 		scaleY = bone.scaleY;
+		shearX = bone.shearX;
+		shearY = bone.shearY;
+	}
+
+	/** Same as {@link #updateWorldTransform()}. This method exists for Bone to implement {@link Updatable}. */
+	public void update () {
+		updateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
 	}
 
 	/** Computes the world SRT using the parent bone and this bone's local SRT. */
 	public void updateWorldTransform () {
-		updateWorldTransform(x, y, rotation, scaleX, scaleY);
+		updateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
 	}
 
 	/** Computes the world SRT using the parent bone and the specified local SRT. */
-	public void updateWorldTransform (float x, float y, float rotation, float scaleX, float scaleY) {
+	public void updateWorldTransform (float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY) {
 		appliedRotation = rotation;
 		appliedScaleX = scaleX;
 		appliedScaleY = scaleY;
 
-		float cos = MathUtils.cosDeg(rotation), sin = MathUtils.sinDeg(rotation);
-		float la = cos * scaleX, lb = -sin * scaleY, lc = sin * scaleX, ld = cos * scaleY;
+		float rotationY = rotation + 90 + shearY;
+		float la = cosDeg(rotation + shearX) * scaleX, lb = cosDeg(rotationY) * scaleY;
+		float lc = sinDeg(rotation + shearX) * scaleX, ld = sinDeg(rotationY) * scaleY;
+
 		Bone parent = this.parent;
 		if (parent == null) { // Root bone.
 			Skeleton skeleton = this.skeleton;
 			if (skeleton.flipX) {
-				scaleX = -scaleX;
 				x = -x;
+				la = -la;
+				lb = -lb;
 			}
 			if (skeleton.flipY) {
-				scaleY = -scaleY;
 				y = -y;
+				lc = -lc;
+				ld = -ld;
 			}
 			a = la;
 			b = lb;
@@ -125,75 +135,76 @@ public class Bone implements Updatable {
 			b = pa * lb + pb * ld;
 			c = pc * la + pd * lc;
 			d = pc * lb + pd * ld;
-		} else if (data.inheritRotation) { // No scale inheritance.
-			Bone p = parent;
-			pa = 1;
-			pb = 0;
-			pc = 0;
-			pd = 1;
-			while (p != null) {
-				cos = MathUtils.cosDeg(p.appliedRotation);
-				sin = MathUtils.sinDeg(p.appliedRotation);
-				float a = pa * cos + pb * sin;
-				float b = pa * -sin + pb * cos;
-				float c = pc * cos + pd * sin;
-				float d = pc * -sin + pd * cos;
-				pa = a;
-				pb = b;
-				pc = c;
-				pd = d;
-				p = p.parent;
-			}
-			a = pa * la + pb * lc;
-			b = pa * lb + pb * ld;
-			c = pc * la + pd * lc;
-			d = pc * lb + pd * ld;
-		} else if (data.inheritScale) { // No rotation inheritance.
-			Bone p = parent;
-			pa = 1;
-			pb = 0;
-			pc = 0;
-			pd = 1;
-			while (p != null) {
-				float r = p.rotation;
-				cos = MathUtils.cosDeg(r);
-				sin = MathUtils.sinDeg(r);
-				float psx = p.appliedScaleX, psy = p.appliedScaleY;
-				float za = cos * psx, zb = -sin * psy, zc = sin * psx, zd = cos * psy;
-				float temp = pa * za + pb * zc;
-				pb = pa * zb + pb * zd;
-				pa = temp;
-				temp = pc * za + pd * zc;
-				pd = pc * zb + pd * zd;
-				pc = temp;
-
-				if (psx < 0) r = PI - r;
-				cos = MathUtils.cosDeg(-r);
-				sin = MathUtils.sinDeg(-r);
-				temp = pa * cos + pb * sin;
-				pb = pa * -sin + pb * cos;
-				pa = temp;
-				temp = pc * cos + pd * sin;
-				pd = pc * -sin + pd * cos;
-				pc = temp;
-
-				p = p.parent;
-			}
-			a = pa * la + pb * lc;
-			b = pa * lb + pb * ld;
-			c = pc * la + pd * lc;
-			d = pc * lb + pd * ld;
 		} else {
-			a = la;
-			b = lb;
-			c = lc;
-			d = ld;
-		}
-	}
+			if (data.inheritRotation) { // No scale inheritance.
+				pa = 1;
+				pb = 0;
+				pc = 0;
+				pd = 1;
+				do {
+					float cos = cosDeg(parent.appliedRotation), sin = sinDeg(parent.appliedRotation);
+					float temp = pa * cos + pb * sin;
+					pb = pa * -sin + pb * cos;
+					pa = temp;
+					temp = pc * cos + pd * sin;
+					pd = pc * -sin + pd * cos;
+					pc = temp;
 
-	/** Same as {@link #updateWorldTransform()}. This method exists for Bone to implement {@link Updatable}. */
-	public void update () {
-		updateWorldTransform(x, y, rotation, scaleX, scaleY);
+					if (!parent.data.inheritRotation) break;
+					parent = parent.parent;
+				} while (parent != null);
+				a = pa * la + pb * lc;
+				b = pa * lb + pb * ld;
+				c = pc * la + pd * lc;
+				d = pc * lb + pd * ld;
+			} else if (data.inheritScale) { // No rotation inheritance.
+				pa = 1;
+				pb = 0;
+				pc = 0;
+				pd = 1;
+				do {
+					float r = parent.appliedRotation, cos = cosDeg(r), sin = sinDeg(r);
+					float psx = parent.appliedScaleX, psy = parent.appliedScaleY;
+					float za = cos * psx, zb = -sin * psy, zc = sin * psx, zd = cos * psy;
+					float temp = pa * za + pb * zc;
+					pb = pa * zb + pb * zd;
+					pa = temp;
+					temp = pc * za + pd * zc;
+					pd = pc * zb + pd * zd;
+					pc = temp;
+
+					if (psx < 0) r = -r;
+					cos = cosDeg(-r);
+					sin = sinDeg(-r);
+					temp = pa * cos + pb * sin;
+					pb = pa * -sin + pb * cos;
+					pa = temp;
+					temp = pc * cos + pd * sin;
+					pd = pc * -sin + pd * cos;
+					pc = temp;
+
+					if (!parent.data.inheritScale) break;
+					parent = parent.parent;
+				} while (parent != null);
+				a = pa * la + pb * lc;
+				b = pa * lb + pb * ld;
+				c = pc * la + pd * lc;
+				d = pc * lb + pd * ld;
+			} else {
+				a = la;
+				b = lb;
+				c = lc;
+				d = ld;
+			}
+			if (skeleton.flipX) {
+				a = -a;
+				b = -b;
+			}
+			if (skeleton.flipY) {
+				c = -c;
+				d = -d;
+			}
+		}
 	}
 
 	public void setToSetupPose () {
@@ -203,6 +214,8 @@ public class Bone implements Updatable {
 		rotation = data.rotation;
 		scaleX = data.scaleX;
 		scaleY = data.scaleY;
+		shearX = data.shearX;
+		shearY = data.shearY;
 	}
 
 	public BoneData getData () {
@@ -238,7 +251,6 @@ public class Bone implements Updatable {
 		this.y = y;
 	}
 
-	/** Returns the forward kinetics rotation. */
 	public float getRotation () {
 		return rotation;
 	}
@@ -273,6 +285,22 @@ public class Bone implements Updatable {
 		scaleY = scale;
 	}
 
+	public float getShearX () {
+		return shearX;
+	}
+
+	public void setShearX (float shearX) {
+		this.shearX = shearX;
+	}
+
+	public float getShearY () {
+		return shearY;
+	}
+
+	public void setShearY (float shearY) {
+		this.shearY = shearY;
+	}
+
 	public float getA () {
 		return a;
 	}
@@ -297,12 +325,20 @@ public class Bone implements Updatable {
 		return worldY;
 	}
 
+	public float getWorldSignX () {
+		return worldSignX;
+	}
+
+	public float getWorldSignY () {
+		return worldSignY;
+	}
+
 	public float getWorldRotationX () {
-		return (float)Math.atan2(c, a) * MathUtils.radDeg;
+		return atan2(c, a) * radDeg;
 	}
 
 	public float getWorldRotationY () {
-		return (float)Math.atan2(d, b) * MathUtils.radDeg;
+		return atan2(d, b) * radDeg;
 	}
 
 	public float getWorldScaleX () {
@@ -311,14 +347,6 @@ public class Bone implements Updatable {
 
 	public float getWorldScaleY () {
 		return (float)Math.sqrt(c * c + d * d) * worldSignY;
-	}
-
-	public float getWorldSignX () {
-		return worldSignX;
-	}
-
-	public float getWorldSignY () {
-		return worldSignY;
 	}
 
 	public Matrix3 getWorldTransform (Matrix3 worldTransform) {
@@ -340,8 +368,8 @@ public class Bone implements Updatable {
 		float x = world.x - worldX, y = world.y - worldY;
 		float a = this.a, b = this.b, c = this.c, d = this.d;
 		float invDet = 1 / (a * d - b * c);
-		world.x = (x * a * invDet - y * b * invDet);
-		world.y = (y * d * invDet - x * c * invDet);
+		world.x = (x * d * invDet - y * b * invDet);
+		world.y = (y * a * invDet - x * c * invDet);
 		return world;
 	}
 

@@ -24,11 +24,13 @@
   			CCSetupShowDebugStats: @YES,
 		}];
     
+    [[CCDirector sharedDirector] runWithScene:[SpineboyExample scene]];
+    
     return YES;
 }
 
-- (CCScene*) startScene {
-    return [SpineboyExample scene];
-}
+//- (CCScene*) startScene {
+//    return [SpineboyExample scene];
+//}
 
 @end

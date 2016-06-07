@@ -32,12 +32,14 @@
 using System;
 
 namespace Spine {
-	/// <summary>Attachment that displays a texture region.</summary>
-	public class MeshAttachment : Attachment {
+	/// <summary>Attachment that displays a texture region using a mesh.</summary>
+	public class MeshAttachment : Attachment, IFfdAttachment {
 		internal float[] vertices, uvs, regionUVs;
 		internal int[] triangles;
 		internal float regionOffsetX, regionOffsetY, regionWidth, regionHeight, regionOriginalWidth, regionOriginalHeight;
 		internal float r = 1, g = 1, b = 1, a = 1;
+		internal MeshAttachment parentMesh;
+		internal bool inheritFFD;
 
 		public int HullLength { get; set; }
 		public float[] Vertices { get { return vertices; } set { vertices = value; } }
@@ -63,6 +65,24 @@ namespace Spine {
 		public float RegionHeight { get { return regionHeight; } set { regionHeight = value; } } // Unrotated, stripped size.
 		public float RegionOriginalWidth { get { return regionOriginalWidth; } set { regionOriginalWidth = value; } }
 		public float RegionOriginalHeight { get { return regionOriginalHeight; } set { regionOriginalHeight = value; } } // Unrotated, unstripped size.
+
+		public bool InheritFFD { get { return inheritFFD; } set { inheritFFD = value; } }
+
+		public MeshAttachment ParentMesh {
+			get { return parentMesh; }
+			set {
+				parentMesh = value;
+				if (value != null) {
+					vertices = value.vertices;
+					regionUVs = value.regionUVs;
+					triangles = value.triangles;
+					HullLength = value.HullLength;
+					Edges = value.Edges;
+					Width = value.Width;
+					Height = value.Height;
+				}
+			}
+		}
 
 		// Nonessential.
 		public int[] Edges { get; set; }
@@ -94,7 +114,7 @@ namespace Spine {
 		public void ComputeWorldVertices (Slot slot, float[] worldVertices) {
 			Bone bone = slot.bone;
 			float x = bone.skeleton.x + bone.worldX, y = bone.skeleton.y + bone.worldY;
-			float m00 = bone.m00, m01 = bone.m01, m10 = bone.m10, m11 = bone.m11;
+			float m00 = bone.a, m01 = bone.b, m10 = bone.c, m11 = bone.d;
 			float[] vertices = this.vertices;
 			int verticesCount = vertices.Length;
 			if (slot.attachmentVerticesCount == verticesCount) vertices = slot.AttachmentVertices;
@@ -104,6 +124,10 @@ namespace Spine {
 				worldVertices[i] = vx * m00 + vy * m01 + x;
 				worldVertices[i + 1] = vx * m10 + vy * m11 + y;
 			}
+		}
+
+		public bool ApplyFFD (Attachment sourceAttachment) {
+			return this == sourceAttachment || (inheritFFD && parentMesh == sourceAttachment);
 		}
 	}
 }

@@ -30,14 +30,10 @@
  *****************************************************************************/
 
 #include "RaptorExample.h"
-#include "SpineboyExample.h"
-#include <iostream>
-#include <fstream>
-#include <string.h>
+#include "BatchingExample.h"
 
 USING_NS_CC;
 using namespace spine;
-using namespace std;
 
 Scene* RaptorExample::scene () {
 	Scene *scene = Scene::create();
@@ -53,8 +49,7 @@ bool RaptorExample::init () {
 	skeletonNode->setAnimation(1, "empty", false);
 	skeletonNode->addAnimation(1, "gungrab", false, 2);
 
-	Size windowSize = Director::getInstance()->getWinSize();
-	skeletonNode->setPosition(Vec2(windowSize.width / 2, 20));
+	skeletonNode->setPosition(Vec2(_contentSize.width / 2, 20));
 	addChild(skeletonNode);
 
 	scheduleUpdate();
@@ -66,7 +61,7 @@ bool RaptorExample::init () {
 		else if (skeletonNode->getTimeScale() == 1)
 			skeletonNode->setTimeScale(0.3f);
 		else
-			Director::getInstance()->replaceScene(SpineboyExample::scene());
+			Director::getInstance()->replaceScene(BatchingExample::scene());
 		return true;
 	};
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);

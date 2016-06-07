@@ -125,10 +125,10 @@ public dynamic class RegionAttachment extends Attachment {
 	public function computeWorldVertices (x:Number, y:Number, bone:Bone, worldVertices:Vector.<Number>) : void {
 		x += bone.worldX;
 		y += bone.worldY;
-		var m00:Number = bone.m00;
-		var m01:Number = bone.m01;
-		var m10:Number = bone.m10;
-		var m11:Number = bone.m11;
+		var m00:Number = bone.a;
+		var m01:Number = bone.b;
+		var m10:Number = bone.c;
+		var m11:Number = bone.d;
 		var x1:Number = offset[X1];
 		var y1:Number = offset[Y1];
 		var x2:Number = offset[X2];

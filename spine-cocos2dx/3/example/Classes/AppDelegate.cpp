@@ -35,6 +35,7 @@
 #include <string>
 
 #include "RaptorExample.h"
+#include "BatchingExample.h"
 #include "AppMacros.h"
 
 USING_NS_CC;
@@ -51,7 +52,7 @@ bool AppDelegate::applicationDidFinishLaunching () {
 	auto director = Director::getInstance();
 	auto glview = director->getOpenGLView();
 	if (!glview) {
-		glview = GLView::create("Spine Example");
+		glview = GLViewImpl::create("Spine Example");
 		director->setOpenGLView(glview);
 	}
 
@@ -87,17 +88,18 @@ bool AppDelegate::applicationDidFinishLaunching () {
 	
 	searchPath.push_back("common");
 	 
-	// set searching path
+	// set search path
 	FileUtils::getInstance()->setSearchPaths(searchPath);
 	
 	// turn on display FPS
 	director->setDisplayStats(true);
 
 	// set FPS. the default value is 1.0/60 if you don't call this
-	director->setAnimationInterval(1.0 / 60);
+	director->setAnimationInterval(1.0f / 60);
 
 	// create a scene. it's an autorelease object
-	auto scene = RaptorExample::scene();
+	//auto scene = RaptorExample::scene();
+	auto scene = BatchingExample::scene();
 
 	// run
 	director->runWithScene(scene);

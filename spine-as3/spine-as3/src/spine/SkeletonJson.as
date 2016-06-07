@@ -28,7 +28,6 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
 package spine {
 import flash.utils.ByteArray;
 
@@ -39,8 +38,6 @@ import spine.animation.CurveTimeline;
 import spine.animation.DrawOrderTimeline;
 import spine.animation.EventTimeline;
 import spine.animation.FfdTimeline;
-import spine.animation.FlipXTimeline;
-import spine.animation.FlipYTimeline;
 import spine.animation.IkConstraintTimeline;
 import spine.animation.RotateTimeline;
 import spine.animation.ScaleTimeline;
@@ -52,11 +49,12 @@ import spine.attachments.AttachmentType;
 import spine.attachments.BoundingBoxAttachment;
 import spine.attachments.MeshAttachment;
 import spine.attachments.RegionAttachment;
-import spine.attachments.SkinnedMeshAttachment;
+import spine.attachments.WeightedMeshAttachment;
 
 public class SkeletonJson {
 	public var attachmentLoader:AttachmentLoader;
 	public var scale:Number = 1;
+	private var linkedMeshes:Vector.<LinkedMesh> = new Vector.<LinkedMesh>();
 
 	public function SkeletonJson (attachmentLoader:AttachmentLoader = null) {
 		this.attachmentLoader = attachmentLoader;
@@ -70,7 +68,7 @@ public class SkeletonJson {
 		if (object is String)
 			root = JSON.parse(String(object));
 		else if (object is ByteArray)
-			root = JSON.parse(object.readUTFBytes(object.length));
+			root = JSON.parse(ByteArray(object).readUTFBytes(ByteArray(object).length));
 		else if (object is Object)
 			root = object;
 		else
@@ -98,14 +96,12 @@ public class SkeletonJson {
 				if (!parent) throw new Error("Parent bone not found: " + parentName);
 			}
 			boneData = new BoneData(boneMap["name"], parent);
-			boneData.length = (boneMap["length"] || 0) * scale;
-			boneData.x = (boneMap["x"] || 0) * scale;
-			boneData.y = (boneMap["y"] || 0) * scale;
+			boneData.length = Number(boneMap["length"] || 0) * scale;
+			boneData.x = Number(boneMap["x"] || 0) * scale;
+			boneData.y = Number(boneMap["y"] || 0) * scale;
 			boneData.rotation = (boneMap["rotation"] || 0);
 			boneData.scaleX = boneMap.hasOwnProperty("scaleX") ? boneMap["scaleX"] : 1;
 			boneData.scaleY = boneMap.hasOwnProperty("scaleY") ? boneMap["scaleY"] : 1;
-			boneData.flipX = boneMap["flipX"] || false;
-			boneData.flipY = boneMap["flipY"] || false;
 			boneData.inheritScale = boneMap.hasOwnProperty("inheritScale") ? boneMap["inheritScale"] : true;
 			boneData.inheritRotation = boneMap.hasOwnProperty("inheritRotation") ? boneMap["inheritRotation"] : true;
 			skeletonData.bones[skeletonData.bones.length] = boneData;
@@ -128,6 +124,23 @@ public class SkeletonJson {
 			ikConstraintData.mix = ikMap.hasOwnProperty("mix") ? ikMap["mix"] : 1;
 
 			skeletonData.ikConstraints[skeletonData.ikConstraints.length] = ikConstraintData;
+		}
+
+		// Transform constraints.
+		for each (var transformMap:Object in root["transform"]) {
+			var transformConstraintData:TransformConstraintData = new TransformConstraintData(transformMap["name"]);
+
+			transformConstraintData.bone = skeletonData.findBone(transformMap["bone"]);
+			if (!transformConstraintData.bone) throw new Error("Bone not found: " + transformMap["bone"]);
+
+			transformConstraintData.target = skeletonData.findBone(transformMap["target"]);
+			if (!transformConstraintData.target) throw new Error("Target bone not found: " + transformMap["target"]);
+
+			transformConstraintData.translateMix = transformMap.hasOwnProperty("translateMix") ? transformMap["translateMix"] : 1;
+			transformConstraintData.x = Number(boneMap["x"] || 0) * scale;
+			transformConstraintData.y = Number(boneMap["y"] || 0) * scale;
+
+			skeletonData.transformConstraints[skeletonData.transformConstraints.length] = transformConstraintData;
 		}
 
 		// Slots.
@@ -160,7 +173,7 @@ public class SkeletonJson {
 				var slotIndex:int = skeletonData.findSlotIndex(slotName);
 				var slotEntry:Object = skinMap[slotName];
 				for (var attachmentName:String in slotEntry) {
-					var attachment:Attachment = readAttachment(skin, attachmentName, slotEntry[attachmentName]);
+					var attachment:Attachment = readAttachment(skin, slotIndex, attachmentName, slotEntry[attachmentName]);
 					if (attachment != null)
 						skin.addAttachment(slotIndex, attachmentName, attachment);
 				}
@@ -169,6 +182,24 @@ public class SkeletonJson {
 			if (skin.name == "default")
 				skeletonData.defaultSkin = skin;
 		}
+
+		// Linked meshes.
+		for each (var linkedMesh:LinkedMesh in linkedMeshes) {
+			var parentSkin:Skin = !linkedMesh.skin ? skeletonData.defaultSkin : skeletonData.findSkin(linkedMesh.skin);
+			if (!parentSkin) throw new Error("Skin not found: " + linkedMesh.skin);
+			var parentMesh:Attachment = parentSkin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
+			if (!parentMesh) throw new Error("Parent mesh not found: " + linkedMesh.parent);
+			if (linkedMesh.mesh is MeshAttachment) {
+				var mesh:MeshAttachment = MeshAttachment(linkedMesh.mesh);
+				mesh.parentMesh = MeshAttachment(parentMesh);
+				mesh.updateUVs();
+			} else {
+				var weightedMesh:WeightedMeshAttachment = WeightedMeshAttachment(linkedMesh.mesh);
+				weightedMesh.parentMesh = WeightedMeshAttachment(parentMesh);
+				weightedMesh.updateUVs();
+			}
+		}
+		linkedMeshes.length = 0;
 
 		// Events.
 		var events:Object = root["events"];
@@ -191,105 +222,120 @@ public class SkeletonJson {
 		return skeletonData;
 	}
 
-	private function readAttachment (skin:Skin, name:String, map:Object) : Attachment {
+	private function readAttachment (skin:Skin, slotIndex:int, name:String, map:Object) : Attachment {
 		name = map["name"] || name;
 
-		var type:AttachmentType = AttachmentType[map["type"] || "region"];
+		var typeName:String = map["type"] || "region";
+		if (typeName == "skinnedmesh") typeName = "weightedmesh";
+		var type:AttachmentType = AttachmentType[typeName];
 		var path:String = map["path"] || name;
 
 		var scale:Number = this.scale;
 		var color:String, vertices:Vector.<Number>;
 		switch (type) {
-		case AttachmentType.region:
-			var region:RegionAttachment = attachmentLoader.newRegionAttachment(skin, name, path);
-			if (!region) return null;
-			region.path = path;
-			region.x = (map["x"] || 0) * scale;
-			region.y = (map["y"] || 0) * scale;
-			region.scaleX = map.hasOwnProperty("scaleX") ? map["scaleX"] : 1;
-			region.scaleY = map.hasOwnProperty("scaleY") ? map["scaleY"] : 1;
-			region.rotation = map["rotation"] || 0;
-			region.width = (map["width"] || 0) * scale;
-			region.height = (map["height"] || 0) * scale;
-			
-			color = map["color"];
-			if (color) {
-				region.r = toColor(color, 0);
-				region.g = toColor(color, 1);
-				region.b = toColor(color, 2);
-				region.a = toColor(color, 3);
-			}
-			
-			region.updateOffset();
-			return region;
-
-		case AttachmentType.mesh:
-			var mesh:MeshAttachment = attachmentLoader.newMeshAttachment(skin, name, path);
-			if (!mesh) return null;
-			mesh.path = path; 
-			mesh.vertices = getFloatArray(map, "vertices", scale);
-			mesh.triangles = getUintArray(map, "triangles");
-			mesh.regionUVs = getFloatArray(map, "uvs", 1);
-			mesh.updateUVs();
-
-			color = map["color"];
-			if (color) {
-				mesh.r = toColor(color, 0);
-				mesh.g = toColor(color, 1);
-				mesh.b = toColor(color, 2);
-				mesh.a = toColor(color, 3);
-			}
-
-			mesh.hullLength = (map["hull"] || 0) * 2;
-			if (map["edges"]) mesh.edges = getIntArray(map, "edges");
-			mesh.width = (map["width"] || 0) * scale;
-			mesh.height = (map["height"] || 0) * scale;
-			return mesh;
-		case AttachmentType.skinnedmesh:
-			var skinnedMesh:SkinnedMeshAttachment = attachmentLoader.newSkinnedMeshAttachment(skin, name, path);
-			if (!skinnedMesh) return null;
-			skinnedMesh.path = path;
-
-			var uvs:Vector.<Number> = getFloatArray(map, "uvs", 1);
-			vertices = getFloatArray(map, "vertices", 1);
-			var weights:Vector.<Number> = new Vector.<Number>();
-			var bones:Vector.<int> = new Vector.<int>();
-			for (var i:int = 0, n:int = vertices.length; i < n; ) {
-				var boneCount:int = int(vertices[i++]);
-				bones[bones.length] = boneCount;
-				for (var nn:int = i + boneCount * 4; i < nn; ) {
-					bones[bones.length] = vertices[i];
-					weights[weights.length] = vertices[i + 1] * scale;
-					weights[weights.length] = vertices[i + 2] * scale;
-					weights[weights.length] = vertices[i + 3];
-					i += 4;
+			case AttachmentType.region:
+				var region:RegionAttachment = attachmentLoader.newRegionAttachment(skin, name, path);
+				if (!region) return null;
+				region.path = path;
+				region.x = Number(map["x"] || 0) * scale;
+				region.y = Number(map["y"] || 0) * scale;
+				region.scaleX = map.hasOwnProperty("scaleX") ? map["scaleX"] : 1;
+				region.scaleY = map.hasOwnProperty("scaleY") ? map["scaleY"] : 1;
+				region.rotation = map["rotation"] || 0;
+				region.width = Number(map["width"] || 0) * scale;
+				region.height = Number(map["height"] || 0) * scale;
+				color = map["color"];
+				if (color) {
+					region.r = toColor(color, 0);
+					region.g = toColor(color, 1);
+					region.b = toColor(color, 2);
+					region.a = toColor(color, 3);
 				}
-			}
-			skinnedMesh.bones = bones;
-			skinnedMesh.weights = weights;
-			skinnedMesh.triangles = getUintArray(map, "triangles");
-			skinnedMesh.regionUVs = uvs;
-			skinnedMesh.updateUVs();
-			
-			color = map["color"];
-			if (color) {
-				skinnedMesh.r = toColor(color, 0);
-				skinnedMesh.g = toColor(color, 1);
-				skinnedMesh.b = toColor(color, 2);
-				skinnedMesh.a = toColor(color, 3);
-			}
-			
-			skinnedMesh.hullLength = (map["hull"] || 0) * 2;
-			if (map["edges"]) skinnedMesh.edges = getIntArray(map, "edges");
-			skinnedMesh.width = (map["width"] || 0) * scale;
-			skinnedMesh.height = (map["height"] || 0) * scale;
-			return skinnedMesh;
-		case AttachmentType.boundingbox:
-			var box:BoundingBoxAttachment = attachmentLoader.newBoundingBoxAttachment(skin, name);
-			vertices = box.vertices;
-			for each (var point:Number in map["vertices"])
-				vertices[vertices.length] = point * scale;
-			return box;
+				region.updateOffset();
+				return region;
+			case AttachmentType.mesh:
+			case AttachmentType.linkedmesh:
+				var mesh:MeshAttachment = attachmentLoader.newMeshAttachment(skin, name, path);
+				if (!mesh) return null;
+				mesh.path = path;
+
+				color = map["color"];
+				if (color) {
+					mesh.r = toColor(color, 0);
+					mesh.g = toColor(color, 1);
+					mesh.b = toColor(color, 2);
+					mesh.a = toColor(color, 3);
+				}
+
+				mesh.width = Number(map["width"] || 0) * scale;
+				mesh.height = Number(map["height"] || 0) * scale;
+
+				if (!map["parent"]) {
+					mesh.vertices = getFloatArray(map, "vertices", scale);
+					mesh.triangles = getUintArray(map, "triangles");
+					mesh.regionUVs = getFloatArray(map, "uvs", 1);
+					mesh.updateUVs();
+
+					mesh.hullLength = int(map["hull"] || 0) * 2;
+					if (map["edges"]) mesh.edges = getIntArray(map, "edges");
+				} else {
+					mesh.inheritFFD = map.hasOwnProperty("ffd") ? map["ffd"] : true;
+					linkedMeshes[linkedMeshes.length] = new LinkedMesh(mesh, map["skin"], slotIndex, map["parent"]);
+				}
+				return mesh;
+			case AttachmentType.weightedmesh:
+			case AttachmentType.weightedlinkedmesh:
+				var weightedMesh:WeightedMeshAttachment = attachmentLoader.newWeightedMeshAttachment(skin, name, path);
+				if (!weightedMesh) return null;
+
+				weightedMesh.path = path;
+
+				color = map["color"];
+				if (color) {
+					weightedMesh.r = toColor(color, 0);
+					weightedMesh.g = toColor(color, 1);
+					weightedMesh.b = toColor(color, 2);
+					weightedMesh.a = toColor(color, 3);
+				}
+
+				weightedMesh.width = Number(map["width"] || 0) * scale;
+				weightedMesh.height = Number(map["height"] || 0) * scale;
+
+				if (!map["parent"]) {
+					var uvs:Vector.<Number> = getFloatArray(map, "uvs", 1);
+					vertices = getFloatArray(map, "vertices", 1);
+					var weights:Vector.<Number> = new Vector.<Number>();
+					var bones:Vector.<int> = new Vector.<int>();
+					for (var i:int = 0, n:int = vertices.length; i < n;) {
+						var boneCount:int = int(vertices[i++]);
+						bones[bones.length] = boneCount;
+						for (var nn:int = i + boneCount * 4; i < nn;) {
+							bones[bones.length] = vertices[i];
+							weights[weights.length] = vertices[i + 1] * scale;
+							weights[weights.length] = vertices[i + 2] * scale;
+							weights[weights.length] = vertices[i + 3];
+							i += 4;
+						}
+					}
+					weightedMesh.bones = bones;
+					weightedMesh.weights = weights;
+					weightedMesh.triangles = getUintArray(map, "triangles");
+					weightedMesh.regionUVs = uvs;
+					weightedMesh.updateUVs();
+
+					weightedMesh.hullLength = int(map["hull"] || 0) * 2;
+					if (map["edges"]) weightedMesh.edges = getIntArray(map, "edges");
+				} else {
+					weightedMesh.inheritFFD = map.hasOwnProperty("ffd") ? map["ffd"] : true;
+					linkedMeshes[linkedMeshes.length] = new LinkedMesh(weightedMesh, map["skin"], slotIndex, map["parent"]);
+				}
+				return weightedMesh;
+			case AttachmentType.boundingbox:
+				var box:BoundingBoxAttachment = attachmentLoader.newBoundingBoxAttachment(skin, name);
+				vertices = box.vertices;
+				for each (var point:Number in map["vertices"])
+					vertices[vertices.length] = point * scale;
+				return box;
 		}
 
 		return null;
@@ -314,7 +360,7 @@ public class SkeletonJson {
 				if (timelineName == "color") {
 					var colorTimeline:ColorTimeline = new ColorTimeline(values.length);
 					colorTimeline.slotIndex = slotIndex;
-					
+
 					frameIndex = 0;
 					for each (valueMap in values) {
 						var color:String = valueMap["color"];
@@ -328,17 +374,15 @@ public class SkeletonJson {
 					}
 					timelines[timelines.length] = colorTimeline;
 					duration = Math.max(duration, colorTimeline.frames[colorTimeline.frameCount * 5 - 5]);
-					
 				} else if (timelineName == "attachment") {
 					var attachmentTimeline:AttachmentTimeline = new AttachmentTimeline(values.length);
 					attachmentTimeline.slotIndex = slotIndex;
-					
+
 					frameIndex = 0;
 					for each (valueMap in values)
 						attachmentTimeline.setFrame(frameIndex++, valueMap["time"], valueMap["name"]);
 					timelines[timelines.length] = attachmentTimeline;
 					duration = Math.max(duration, attachmentTimeline.frames[attachmentTimeline.frameCount - 1]);
-
 				} else
 					throw new Error("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
 			}
@@ -364,7 +408,6 @@ public class SkeletonJson {
 					}
 					timelines[timelines.length] = rotateTimeline;
 					duration = Math.max(duration, rotateTimeline.frames[rotateTimeline.frameCount * 2 - 2]);
-
 				} else if (timelineName == "translate" || timelineName == "scale") {
 					var timeline:TranslateTimeline;
 					var timelineScale:Number = 1;
@@ -378,29 +421,14 @@ public class SkeletonJson {
 
 					frameIndex = 0;
 					for each (valueMap in values) {
-						var x:Number = (valueMap["x"] || 0) * timelineScale;
-						var y:Number = (valueMap["y"] || 0) * timelineScale;
+						var x:Number = Number(valueMap["x"] || 0) * timelineScale;
+						var y:Number = Number(valueMap["y"] || 0) * timelineScale;
 						timeline.setFrame(frameIndex, valueMap["time"], x, y);
 						readCurve(timeline, frameIndex, valueMap);
 						frameIndex++;
 					}
 					timelines[timelines.length] = timeline;
 					duration = Math.max(duration, timeline.frames[timeline.frameCount * 3 - 3]);
-
-				} else if (timelineName == "flipX" || timelineName == "flipY") {
-					var flipX:Boolean = timelineName == "flipX";
-					var flipTimeline:FlipXTimeline = flipX ? new FlipXTimeline(values.length) : new FlipYTimeline(values.length);
-					flipTimeline.boneIndex = boneIndex;
-					
-					var field:String = flipX ? "x" : "y";
-					frameIndex = 0;
-					for each (valueMap in values) {
-						flipTimeline.setFrame(frameIndex, valueMap["time"], valueMap[field] || false);
-						frameIndex++;
-					}
-					timelines[timelines.length] = flipTimeline;
-					duration = Math.max(duration, flipTimeline.frames[flipTimeline.frameCount * 3 - 3]);
-
 				} else
 					throw new Error("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
 			}
@@ -443,7 +471,7 @@ public class SkeletonJson {
 					if (attachment is MeshAttachment)
 						vertexCount = (attachment as MeshAttachment).vertices.length;
 					else
-						vertexCount = (attachment as SkinnedMeshAttachment).weights.length / 3 * 2;
+						vertexCount = (attachment as WeightedMeshAttachment).weights.length / 3 * 2;
 
 					frameIndex = 0;
 					for each (valueMap in values) {
@@ -471,7 +499,7 @@ public class SkeletonJson {
 									vertices[i] += meshVertices[i];
 							}
 						}
-						
+
 						ffdTimeline.setFrame(frameIndex, valueMap["time"], vertices);
 						readCurve(ffdTimeline, frameIndex, valueMap);
 						frameIndex++;
@@ -482,7 +510,7 @@ public class SkeletonJson {
 			}
 		}
 
-		var drawOrderValues:Object = map["drawOrder"];
+		var drawOrderValues:Array = map["drawOrder"];
 		if (!drawOrderValues) drawOrderValues = map["draworder"];
 		if (drawOrderValues) {
 			var drawOrderTimeline:DrawOrderTimeline = new DrawOrderTimeline(drawOrderValues.length);
@@ -494,7 +522,7 @@ public class SkeletonJson {
 					drawOrder = new Vector.<int>(slotCount);
 					for (i = slotCount - 1; i >= 0; i--)
 						drawOrder[i] = -1;
-					var offsets:Object = drawOrderMap["offsets"];
+					var offsets:Array = drawOrderMap["offsets"];
 					var unchanged:Vector.<int> = new Vector.<int>(slotCount - offsets.length);
 					var originalIndex:int = 0, unchangedIndex:int = 0;
 					for each (var offsetMap:Object in offsets) {
@@ -519,18 +547,18 @@ public class SkeletonJson {
 			duration = Math.max(duration, drawOrderTimeline.frames[drawOrderTimeline.frameCount - 1]);
 		}
 
-		var eventsMap:Object = map["events"];
+		var eventsMap:Array = map["events"];
 		if (eventsMap) {
 			var eventTimeline:EventTimeline = new EventTimeline(eventsMap.length);
 			frameIndex = 0;
 			for each (var eventMap:Object in eventsMap) {
 				var eventData:EventData = skeletonData.findEvent(eventMap["name"]);
 				if (!eventData) throw new Error("Event not found: " + eventMap["name"]);
-				var event:Event = new Event(eventData);
+				var event:Event = new Event(eventMap["time"], eventData);
 				event.intValue = eventMap.hasOwnProperty("int") ? eventMap["int"] : eventData.intValue;
 				event.floatValue = eventMap.hasOwnProperty("float") ? eventMap["float"] : eventData.floatValue;
 				event.stringValue = eventMap.hasOwnProperty("string") ? eventMap["string"] : eventData.stringValue;
-				eventTimeline.setFrame(frameIndex++, eventMap["time"], event);
+				eventTimeline.setFrame(frameIndex++, event);
 			}
 			timelines[timelines.length] = eventTimeline;
 			duration = Math.max(duration, eventTimeline.frames[eventTimeline.frameCount - 1]);
@@ -566,7 +594,7 @@ public class SkeletonJson {
 		}
 		return values;
 	}
-	
+
 	static private function getIntArray (map:Object, name:String) : Vector.<int> {
 		var list:Array = map[name];
 		var values:Vector.<int> = new Vector.<int>(list.length, true);
@@ -574,7 +602,7 @@ public class SkeletonJson {
 			values[i] = int(list[i]);
 		return values;
 	}
-	
+
 	static private function getUintArray (map:Object, name:String) : Vector.<uint> {
 		var list:Array = map[name];
 		var values:Vector.<uint> = new Vector.<uint>(list.length, true);
@@ -584,4 +612,19 @@ public class SkeletonJson {
 	}
 }
 
+}
+
+import spine.attachments.Attachment;
+
+internal class LinkedMesh {
+	internal var parent:String, skin:String;
+	internal var slotIndex:int;
+	internal var mesh:Attachment;
+
+	public function LinkedMesh (mesh:Attachment, skin:String, slotIndex:int, parent:String) {
+		this.mesh = mesh;
+		this.skin = skin;
+		this.slotIndex = slotIndex;
+		this.parent = parent;
+	}
 }

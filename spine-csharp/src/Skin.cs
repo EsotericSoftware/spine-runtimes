@@ -61,13 +61,13 @@ namespace Spine {
 		public void FindNamesForSlot (int slotIndex, List<String> names) {
 			if (names == null) throw new ArgumentNullException("names cannot be null.");
 			foreach (AttachmentKeyTuple key in attachments.Keys)
-				if (key.SlotIndex == slotIndex) names.Add(key.Name);
+				if (key.slotIndex == slotIndex) names.Add(key.name);
 		}
 
 		public void FindAttachmentsForSlot (int slotIndex, List<Attachment> attachments) {
 			if (attachments == null) throw new ArgumentNullException("attachments cannot be null.");
 			foreach (KeyValuePair<AttachmentKeyTuple, Attachment> entry in this.attachments)
-				if (entry.Key.SlotIndex == slotIndex) attachments.Add(entry.Value);
+				if (entry.Key.slotIndex == slotIndex) attachments.Add(entry.Value);
 		}
 
 		override public String ToString () {
@@ -77,37 +77,37 @@ namespace Spine {
 		/// <summary>Attach all attachments from this skin if the corresponding attachment from the old skin is currently attached.</summary>
 		internal void AttachAll (Skeleton skeleton, Skin oldSkin) {
 			foreach (KeyValuePair<AttachmentKeyTuple, Attachment> entry in oldSkin.attachments) {
-				int slotIndex = entry.Key.SlotIndex;
+				int slotIndex = entry.Key.slotIndex;
 				Slot slot = skeleton.slots.Items[slotIndex];
 				if (slot.attachment == entry.Value) {
-					Attachment attachment = GetAttachment(slotIndex, entry.Key.Name);
+					Attachment attachment = GetAttachment(slotIndex, entry.Key.name);
 					if (attachment != null) slot.Attachment = attachment;
 				}
 			}
 		}
 
-		// Avoids boxing in the dictionary.
-		private class AttachmentKeyTupleComparer : IEqualityComparer<AttachmentKeyTuple> {
-			internal static readonly AttachmentKeyTupleComparer Instance = new AttachmentKeyTupleComparer();
+		struct AttachmentKeyTuple {
+			public readonly int slotIndex;
+			public readonly string name;
+			internal readonly int nameHashCode;
 
-			bool IEqualityComparer<AttachmentKeyTuple>.Equals (AttachmentKeyTuple o1, AttachmentKeyTuple o2) {
-				return o1.SlotIndex == o2.SlotIndex && o1.NameHashCode == o2.NameHashCode && o1.Name == o2.Name;
-			}
-
-			int IEqualityComparer<AttachmentKeyTuple>.GetHashCode (AttachmentKeyTuple o) {
-				return o.SlotIndex;
+			public AttachmentKeyTuple (int slotIndex, string name) {
+				this.slotIndex = slotIndex;
+				this.name = name;
+				nameHashCode = this.name.GetHashCode();
 			}
 		}
 
-		private class AttachmentKeyTuple {
-			public readonly int SlotIndex;
-			public readonly string Name;
-			public readonly int NameHashCode;
+		// Avoids boxing in the dictionary.
+		class AttachmentKeyTupleComparer : IEqualityComparer<AttachmentKeyTuple> {
+			internal static readonly AttachmentKeyTupleComparer Instance = new AttachmentKeyTupleComparer();
 
-			public AttachmentKeyTuple (int slotIndex, string name) {
-				SlotIndex = slotIndex;
-				Name = name;
-				NameHashCode = Name.GetHashCode();
+			bool IEqualityComparer<AttachmentKeyTuple>.Equals (AttachmentKeyTuple o1, AttachmentKeyTuple o2) {
+				return o1.slotIndex == o2.slotIndex && o1.nameHashCode == o2.nameHashCode && o1.name == o2.name;
+			}
+
+			int IEqualityComparer<AttachmentKeyTuple>.GetHashCode (AttachmentKeyTuple o) {
+				return o.slotIndex;
 			}
 		}
 	}

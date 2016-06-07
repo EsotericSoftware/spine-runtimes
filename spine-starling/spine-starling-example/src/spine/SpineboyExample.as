@@ -30,13 +30,11 @@
  *****************************************************************************/
 
 package spine {
-
 import spine.animation.AnimationStateData;
 import spine.atlas.Atlas;
 import spine.attachments.AtlasAttachmentLoader;
 import spine.attachments.AttachmentLoader;
 import spine.starling.SkeletonAnimation;
-import spine.starling.StarlingAtlasAttachmentLoader;
 import spine.starling.StarlingTextureLoader;
 
 import starling.core.Starling;
@@ -44,17 +42,15 @@ import starling.display.Sprite;
 import starling.events.Touch;
 import starling.events.TouchEvent;
 import starling.events.TouchPhase;
-import starling.textures.Texture;
-import starling.textures.TextureAtlas;
 
 public class SpineboyExample extends Sprite {
-	[Embed(source = "spineboy.json", mimeType = "application/octet-stream")]
+	[Embed(source = "/spineboy.json", mimeType = "application/octet-stream")]
 	static public const SpineboyJson:Class;
 
-	[Embed(source = "spineboy.atlas", mimeType = "application/octet-stream")]
+	[Embed(source = "/spineboy.atlas", mimeType = "application/octet-stream")]
 	static public const SpineboyAtlas:Class;
 
-	[Embed(source = "spineboy.png")]
+	[Embed(source = "/spineboy.png")]
 	static public const SpineboyAtlasTexture:Class;
 
 	private var skeleton:SkeletonAnimation;

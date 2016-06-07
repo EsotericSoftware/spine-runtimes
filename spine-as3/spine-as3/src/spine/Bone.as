@@ -31,7 +31,7 @@
 
 package spine {
 
-public class Bone {
+public class Bone implements Updatable {
 	static public var yDown:Boolean;
 
 	internal var _data:BoneData;
@@ -40,23 +40,20 @@ public class Bone {
 	public var x:Number;
 	public var y:Number;
 	public var rotation:Number;
-	public var rotationIK:Number;
-	public var scaleX:Number
+	public var scaleX:Number;
 	public var scaleY:Number;
-	public var flipX:Boolean;
-	public var flipY:Boolean;
+	public var appliedRotation:Number;
+	public var appliedScaleX:Number;
+	public var appliedScaleY:Number;
 
-	internal var _m00:Number;
-	internal var _m01:Number;
-	internal var _m10:Number;
-	internal var _m11:Number;
+	internal var _a:Number;
+	internal var _b:Number;
+	internal var _c:Number;
+	internal var _d:Number;
 	internal var _worldX:Number;
 	internal var _worldY:Number;
-	internal var _worldRotation:Number;
-	internal var _worldScaleX:Number;
-	internal var _worldScaleY:Number;
-	internal var _worldFlipX:Boolean;
-	internal var _worldFlipY:Boolean;
+	internal var _worldSignX:Number;
+	internal var _worldSignY:Number;
 
 	/** @param parent May be null. */
 	public function Bone (data:BoneData, skeleton:Skeleton, parent:Bone) {
@@ -68,48 +65,133 @@ public class Bone {
 		setToSetupPose();
 	}
 
-	/** Computes the world SRT using the parent bone and the local SRT. */
+	/** Computes the world SRT using the parent bone and this bone's local SRT. */
 	public function updateWorldTransform () : void {
+		updateWorldTransformWith(x, y, rotation, scaleX, scaleY);
+	}
+
+	/** Same as updateWorldTransform(). This method exists for Bone to implement Updatable. */
+	public function update () : void {
+		updateWorldTransformWith(x, y, rotation, scaleX, scaleY);
+	}
+
+	/** Computes the world SRT using the parent bone and the specified local SRT. */
+	public function updateWorldTransformWith (x:Number, y:Number, rotation:Number, scaleX:Number, scaleY:Number) : void {
+		appliedRotation = rotation;
+		appliedScaleX = scaleX;
+		appliedScaleY = scaleY;
+
+		var radians:Number = rotation * MathUtils.degRad;
+		var cos:Number = Math.cos(radians), sin:Number = Math.sin(radians);
+		var la:Number = cos * scaleX, lb:Number = -sin * scaleY, lc:Number = sin * scaleX, ld:Number = cos * scaleY;
 		var parent:Bone = _parent;
-		if (parent) {
-			_worldX = x * parent._m00 + y * parent._m01 + parent._worldX;
-			_worldY = x * parent._m10 + y * parent._m11 + parent._worldY;
-			if (_data.inheritScale) {
-				_worldScaleX = parent._worldScaleX * scaleX;
-				_worldScaleY = parent._worldScaleY * scaleY;
-			} else {
-				_worldScaleX = scaleX;
-				_worldScaleY = scaleY;
+		if (!parent) { // Root bone.
+			var skeleton:Skeleton = _skeleton;
+			if (skeleton.flipX) {
+				x = -x;
+				la = -la;
+				lb = -lb;
 			}
-			_worldRotation = _data.inheritRotation ? parent._worldRotation + rotationIK : rotationIK;
-			_worldFlipX = parent._worldFlipX != flipX;
-			_worldFlipY = parent._worldFlipY != flipY;
-		} else {
-			var skeletonFlipX:Boolean = _skeleton.flipX, skeletonFlipY:Boolean = _skeleton.flipY;
-			_worldX = skeletonFlipX ? -x : x;
-			_worldY = skeletonFlipY != yDown ? -y : y;
-			_worldScaleX = scaleX;
-			_worldScaleY = scaleY;
-			_worldRotation = rotationIK;
-			_worldFlipX = skeletonFlipX != flipX;
-			_worldFlipY = skeletonFlipY != flipY;
+			if (skeleton.flipY != yDown) {
+				y = -y;
+				lc = -lc;
+				ld = -ld;
+			}
+			_a = la;
+			_b = lb;
+			_c = lc;
+			_d = ld;
+			_worldX = x;
+			_worldY = y;
+			_worldSignX = scaleX < 0 ? -1 : 1;
+			_worldSignY = scaleY < 0 ? -1 : 1;
+			return;
 		}
-		var radians:Number = _worldRotation * (Math.PI / 180);
-		var cos:Number = Math.cos(radians);
-		var sin:Number = Math.sin(radians);
-		if (_worldFlipX) {
-			_m00 = -cos * _worldScaleX;
-			_m01 = sin * _worldScaleY;
+
+		var pa:Number = parent._a, pb:Number = parent._b, pc:Number = parent._c, pd:Number = parent._d;
+		_worldX = pa * x + pb * y + parent._worldX;
+		_worldY = pc * x + pd * y + parent._worldY;
+		_worldSignX = parent._worldSignX * (scaleX < 0 ? -1 : 1);
+		_worldSignY = parent._worldSignY * (scaleY < 0 ? -1 : 1);
+
+		if (data.inheritRotation && data.inheritScale) {
+			_a = pa * la + pb * lc;
+			_b = pa * lb + pb * ld;
+			_c = pc * la + pd * lc;
+			_d = pc * lb + pd * ld;
 		} else {
-			_m00 = cos * _worldScaleX;
-			_m01 = -sin * _worldScaleY;
-		}
-		if (_worldFlipY != yDown) {
-			_m10 = -sin * _worldScaleX;
-			_m11 = -cos * _worldScaleY;
-		} else {
-			_m10 = sin * _worldScaleX;
-			_m11 = cos * _worldScaleY;
+			if (data.inheritRotation) { // No scale inheritance.
+				pa = 1;
+				pb = 0;
+				pc = 0;
+				pd = 1;
+				do {
+					radians = parent.appliedRotation * MathUtils.degRad;
+					cos = Math.cos(radians);
+					sin = Math.sin(radians);
+					var temp1:Number = pa * cos + pb * sin;
+					pb = pa * -sin + pb * cos;
+					pa = temp1;
+					temp1 = pc * cos + pd * sin;
+					pd = pc * -sin + pd * cos;
+					pc = temp1;
+	
+					if (!parent.data.inheritRotation) break;
+					parent = parent.parent;
+				} while (parent != null);
+				_a = pa * la + pb * lc;
+				_b = pa * lb + pb * ld;
+				_c = pc * la + pd * lc;
+				_d = pc * lb + pd * ld;
+			} else if (data.inheritScale) { // No rotation inheritance.
+				pa = 1;
+				pb = 0;
+				pc = 0;
+				pd = 1;
+				do {
+					radians = parent.rotation * MathUtils.degRad;
+					cos = Math.cos(radians);
+					sin = Math.sin(radians);
+					var psx:Number = parent.appliedScaleX, psy:Number = parent.appliedScaleY;
+					var za:Number = cos * psx, zb:Number = -sin * psy, zc:Number = sin * psx, zd:Number = cos * psy;
+					var temp2:Number = pa * za + pb * zc;
+					pb = pa * zb + pb * zd;
+					pa = temp2;
+					temp2 = pc * za + pd * zc;
+					pd = pc * zb + pd * zd;
+					pc = temp2;
+	
+					if (psx < 0) radians = -radians;
+					cos = Math.cos(-radians);
+					sin = Math.sin(-radians);
+					temp2 = pa * cos + pb * sin;
+					pb = pa * -sin + pb * cos;
+					pa = temp2;
+					temp2 = pc * cos + pd * sin;
+					pd = pc * -sin + pd * cos;
+					pc = temp2;
+	
+					if (!parent.data.inheritScale) break;
+					parent = parent.parent;
+				} while (parent != null);
+				_a = pa * la + pb * lc;
+				_b = pa * lb + pb * ld;
+				_c = pc * la + pd * lc;
+				_d = pc * lb + pd * ld;
+			} else {
+				_a = la;
+				_b = lb;
+				_c = lc;
+				_d = ld;
+			}
+			if (_skeleton.flipX) {
+				_a = -_a;
+				_b = -_b;
+			}
+			if (_skeleton.flipY != yDown) {
+				_c = -_c;
+				_d = -_d;
+			}
 		}
 	}
 
@@ -117,11 +199,8 @@ public class Bone {
 		x = _data.x;
 		y = _data.y;
 		rotation = _data.rotation;
-		rotationIK = rotation;
 		scaleX = _data.scaleX;
 		scaleY = _data.scaleY;
-		flipX = _data.flipX;
-		flipY = _data.flipY;
 	}
 
 	public function get data () : BoneData {
@@ -136,20 +215,20 @@ public class Bone {
 		return _skeleton;
 	}
 
-	public function get m00 () : Number {
-		return _m00;
+	public function get a () : Number {
+		return _a;
 	}
 
-	public function get m01 () : Number {
-		return _m01;
+	public function get b () : Number {
+		return _b;
 	}
 
-	public function get m10 () : Number {
-		return _m10;
+	public function get c () : Number {
+		return _c;
 	}
 
-	public function get m11 () : Number {
-		return _m11;
+	public function get d () : Number {
+		return _d;
 	}
 
 	public function get worldX () : Number {
@@ -160,42 +239,42 @@ public class Bone {
 		return _worldY;
 	}
 
-	public function get worldRotation () : Number {
-		return _worldRotation;
+	public function get worldSignX () : Number {
+		return _worldSignX;
+	}
+
+	public function get worldSignY () : Number {
+		return _worldSignY;
+	}
+
+	public function get worldRotationX () : Number {
+		return Math.atan2(_c, _a) * MathUtils.radDeg;
+	}
+
+	public function get worldRotationY () : Number {
+		return Math.atan2(_d, _b) * MathUtils.radDeg;
 	}
 
 	public function get worldScaleX () : Number {
-		return _worldScaleX;
+		return Math.sqrt(_a * _a + _b * _b) * _worldSignX;
 	}
 
 	public function get worldScaleY () : Number {
-		return _worldScaleY;
-	}
-	
-	public function get worldFlipX () : Boolean {
-		return _worldFlipX;
-	}
-	
-	public function get worldFlipY () : Boolean {
-		return _worldFlipY;
+		return Math.sqrt(_c * _c + _d * _d) * _worldSignY;
 	}
 
 	public function worldToLocal (world:Vector.<Number>) : void {
-		var dx:Number = world[0] - _worldX, dy:Number = world[1] - _worldY;
-		var m00:Number = _m00, m10:Number = _m10, m01:Number = _m01, m11:Number = _m11;
-		if (_worldFlipX != (_worldFlipY != yDown)) {
-			m00 = -m00;
-			m11 = -m11;
-		}
-		var invDet:Number = 1 / (m00 * m11 - m01 * m10);
-		world[0] = (dx * m00 * invDet - dy * m01 * invDet);
-		world[1] = (dy * m11 * invDet - dx * m10 * invDet);
+		var x:Number = world[0] - _worldX, y:Number = world[1] - _worldY;
+		var a:Number = _a, b:Number = _b, c:Number = _c, d:Number = _d;
+		var invDet:Number = 1 / (a * d - b * c);
+		world[0] = (x * d * invDet - y * b * invDet);
+		world[1] = (y * a * invDet - x * c * invDet);
 	}
 
 	public function localToWorld (local:Vector.<Number>) : void {
 		var localX:Number = local[0], localY:Number = local[1];
-		local[0] = localX * _m00 + localY * _m01 + _worldX;
-		local[1] = localX * _m10 + localY * _m11 + _worldY;
+		local[0] = localX * _a + localY * _b + _worldX;
+		local[1] = localX * _c + localY * _d + _worldY;
 	}
 
 	public function toString () : String {

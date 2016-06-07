@@ -31,13 +31,9 @@
 
 #include "GoblinsExample.h"
 #include "RaptorExample.h"
-#include <iostream>
-#include <fstream>
-#include <string.h>
 
 USING_NS_CC;
 using namespace spine;
-using namespace std;
 
 Scene* GoblinsExample::scene () {
 	Scene *scene = Scene::create();
@@ -52,8 +48,7 @@ bool GoblinsExample::init () {
 	skeletonNode->setAnimation(0, "walk", true);
 	skeletonNode->setSkin("goblin");
 
-	Size windowSize = Director::getInstance()->getWinSize();
-	skeletonNode->setPosition(Vec2(windowSize.width / 2, 20));
+	skeletonNode->setPosition(Vec2(_contentSize.width / 2, 20));
 	addChild(skeletonNode);
 
 	scheduleUpdate();

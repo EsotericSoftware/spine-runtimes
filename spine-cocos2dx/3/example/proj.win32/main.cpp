@@ -15,7 +15,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	AppDelegate app;
 
 	auto director = Director::getInstance();
-	auto glview = GLView::create("Spine Example");
+	auto glview = GLViewImpl::create("Spine Example");
 	glview->setFrameSize(960, 640);
 	director->setOpenGLView(glview);
 	return Application::getInstance()->run();

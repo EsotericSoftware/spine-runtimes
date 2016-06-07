@@ -41,7 +41,7 @@ using std::max;
 
 namespace spine {
 
-static const int quadTriangles[6] = {0, 1, 2, 2, 3, 0};
+static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 
 SkeletonRenderer* SkeletonRenderer::createWithData (spSkeletonData* skeletonData, bool ownsSkeletonData) {
 	SkeletonRenderer* node = new SkeletonRenderer(skeletonData, ownsSkeletonData);
@@ -148,7 +148,7 @@ void SkeletonRenderer::draw () {
 	ccColor4B color;
 	const float* uvs = nullptr;
 	int verticesCount = 0;
-	const int* triangles = nullptr;
+	const unsigned short* triangles = nullptr;
 	int trianglesCount = 0;
 	float r = 0, g = 0, b = 0, a = 0;
 	for (int i = 0, n = skeleton->slotsCount; i < n; i++) {
@@ -184,9 +184,9 @@ void SkeletonRenderer::draw () {
 			a = attachment->a;
 			break;
 		}
-		case SP_ATTACHMENT_SKINNED_MESH: {
-			spSkinnedMeshAttachment* attachment = (spSkinnedMeshAttachment*)slot->attachment;
-			spSkinnedMeshAttachment_computeWorldVertices(attachment, slot, worldVertices);
+		case SP_ATTACHMENT_WEIGHTED_MESH: {
+			spWeightedMeshAttachment* attachment = (spWeightedMeshAttachment*)slot->attachment;
+			spWeightedMeshAttachment_computeWorldVertices(attachment, slot, worldVertices);
 			texture = getTexture(attachment);
 			uvs = attachment->uvs;
 			verticesCount = attachment->uvsCount;
@@ -250,8 +250,8 @@ void SkeletonRenderer::draw () {
 		ccDrawColor4B(255, 0, 0, 255);
 		for (int i = 0, n = skeleton->bonesCount; i < n; i++) {
 			spBone *bone = skeleton->bones[i];
-			float x = bone->data->length * bone->m00 + bone->worldX;
-			float y = bone->data->length * bone->m10 + bone->worldY;
+			float x = bone->data->length * bone->a + bone->worldX;
+			float y = bone->data->length * bone->c + bone->worldY;
 			ccDrawLine(ccp(bone->worldX, bone->worldY), ccp(x, y));
 		}
 		// Bone origins.
@@ -273,7 +273,7 @@ CCTexture2D* SkeletonRenderer::getTexture (spMeshAttachment* attachment) const {
 	return (CCTexture2D*)((spAtlasRegion*)attachment->rendererObject)->page->rendererObject;
 }
 
-CCTexture2D* SkeletonRenderer::getTexture (spSkinnedMeshAttachment* attachment) const {
+CCTexture2D* SkeletonRenderer::getTexture (spWeightedMeshAttachment* attachment) const {
 	return (CCTexture2D*)((spAtlasRegion*)attachment->rendererObject)->page->rendererObject;
 }
 
@@ -292,9 +292,9 @@ CCRect SkeletonRenderer::boundingBox () {
 			spMeshAttachment* mesh = (spMeshAttachment*)slot->attachment;
 			spMeshAttachment_computeWorldVertices(mesh, slot, worldVertices);
 			verticesCount = mesh->verticesCount;
-		} else if (slot->attachment->type == SP_ATTACHMENT_SKINNED_MESH) {
-			spSkinnedMeshAttachment* mesh = (spSkinnedMeshAttachment*)slot->attachment;
-			spSkinnedMeshAttachment_computeWorldVertices(mesh, slot, worldVertices);
+		} else if (slot->attachment->type == SP_ATTACHMENT_WEIGHTED_MESH) {
+			spWeightedMeshAttachment* mesh = (spWeightedMeshAttachment*)slot->attachment;
+			spWeightedMeshAttachment_computeWorldVertices(mesh, slot, worldVertices);
 			verticesCount = mesh->uvsCount;
 		} else
 			continue;

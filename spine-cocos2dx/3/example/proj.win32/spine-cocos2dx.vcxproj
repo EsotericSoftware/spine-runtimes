@@ -129,23 +129,29 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\spine\PolygonBatch.h" />
+    <ClInclude Include="..\..\src\spine\AttachmentVertices.h" />
+    <ClInclude Include="..\..\src\spine\Cocos2dAttachmentLoader.h" />
+    <ClInclude Include="..\..\src\spine\SkeletonBatch.h" />
     <ClInclude Include="..\..\src\spine\SkeletonAnimation.h" />
     <ClInclude Include="..\..\src\spine\SkeletonRenderer.h" />
     <ClInclude Include="..\..\src\spine\spine-cocos2dx.h" />
     <ClInclude Include="..\Classes\AppDelegate.h" />
     <ClInclude Include="..\Classes\AppMacros.h" />
+    <ClInclude Include="..\Classes\BatchingExample.h" />
     <ClInclude Include="..\Classes\GoblinsExample.h" />
     <ClInclude Include="..\Classes\RaptorExample.h" />
     <ClInclude Include="..\Classes\SpineboyExample.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\spine\PolygonBatch.cpp" />
+    <ClCompile Include="..\..\src\spine\AttachmentVertices.cpp" />
+    <ClCompile Include="..\..\src\spine\Cocos2dAttachmentLoader.cpp" />
+    <ClCompile Include="..\..\src\spine\SkeletonBatch.cpp" />
     <ClCompile Include="..\..\src\spine\SkeletonAnimation.cpp" />
     <ClCompile Include="..\..\src\spine\SkeletonRenderer.cpp" />
     <ClCompile Include="..\..\src\spine\spine-cocos2dx.cpp" />
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
+    <ClCompile Include="..\Classes\BatchingExample.cpp" />
     <ClCompile Include="..\Classes\GoblinsExample.cpp" />
     <ClCompile Include="..\Classes\RaptorExample.cpp" />
     <ClCompile Include="..\Classes\SpineboyExample.cpp" />
@@ -155,16 +161,17 @@
     <ProjectReference Include="..\..\..\..\spine-c\spine-c.vcxproj">
       <Project>{5d74934a-7512-45ee-8402-7b95d3642e85}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\cocos2dx\cocos\2d\cocos2d.vcxproj">
+    <ProjectReference Include="..\..\cocos2dx\cocos\2d\libcocos2d.vcxproj">
       <Project>{98a51ba8-fc3a-415b-ac8f-8c7bd464e93e}</Project>
-      <Private>false</Private>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
-      <LinkLibraryDependencies>true</LinkLibraryDependencies>
-      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
-    <ProjectReference Include="..\..\cocos2dx\external\chipmunk\proj.win32\chipmunk.vcxproj">
-      <Project>{207bc7a9-ccf1-4f2f-a04d-45f72242ae25}</Project>
+    <ProjectReference Include="..\..\cocos2dx\external\Box2D\proj.win32\libbox2d.vcxproj">
+      <Project>{929480e7-23c0-4df6-8456-096d71547116}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\cocos2dx\external\bullet\proj.win32\libbullet.vcxproj">
+      <Project>{012dff48-a13f-4f52-b07b-f8b9d21ce95b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\cocos2dx\external\recast\proj.win32\librecast.vcxproj">
+      <Project>{41e34993-647e-4282-8384-4ab1ae31a452}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

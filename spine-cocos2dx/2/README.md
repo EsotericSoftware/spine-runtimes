@@ -8,6 +8,14 @@ This Spine Runtime may only be used for personal or internal use, typically to e
 
 The Spine Runtimes are developed with the intent to be used with data exported from Spine. By purchasing Spine, `Section 2` of the [Spine Software License](https://esotericsoftware.com/files/license.txt) grants the right to create and distribute derivative works of the Spine Runtimes.
 
+## Spine version
+
+spine-cocos2dx v2 works with data exported from Spine 3.1.08. Updating spine-cocos2dx v2 to [v3.2](https://trello.com/c/k7KtGdPW/76-update-runtimes-to-support-v3-2-shearing) is in progress.
+
+spine-cocos2dx v2 supports all Spine features.
+
+spine-cocos2dx v2 does not yet support loading the binary format.
+
 ## Setup
 
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).

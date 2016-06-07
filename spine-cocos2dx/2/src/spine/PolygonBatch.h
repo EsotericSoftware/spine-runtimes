@@ -50,7 +50,7 @@ public:
 	bool initWithCapacity (int capacity);
 	void add (cocos2d::CCTexture2D* texture,
 		const float* vertices, const float* uvs, int verticesCount,
-		const int* triangles, int trianglesCount,
+		const unsigned short* triangles, int trianglesCount,
 		cocos2d::ccColor4B* color);
 	void flush ();
 

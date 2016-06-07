@@ -11,8 +11,8 @@
 
  - Classes intended for inheritance provide init/deinit functions which subclasses must call in their create/dispose functions.
 
- - Polymorphism is done by a base class providing function pointers in its init function. The public API delegates to this
- function.
+ - Polymorphism is done by a base class providing function pointers in its init function. The public API delegates to these
+ function pointers.
 
  - Subclasses do not provide a dispose function, instead the base class' dispose function should be used, which will delegate to
  a dispose function pointer.
@@ -77,6 +77,8 @@
 #define ACOS(A) (float)acos(A)
 #endif
 
+#define UNUSED(x) (void)(x)
+
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -86,7 +88,7 @@
 #include <spine/AttachmentLoader.h>
 #include <spine/RegionAttachment.h>
 #include <spine/MeshAttachment.h>
-#include <spine/SkinnedMeshAttachment.h>
+#include <spine/WeightedMeshAttachment.h>
 #include <spine/BoundingBoxAttachment.h>
 #include <spine/AnimationState.h>
 
@@ -146,11 +148,16 @@ void _spTrackEntry_dispose (spTrackEntry* self);
 
 /**/
 
-void _spAttachmentLoader_init (spAttachmentLoader* self, /**/
-void (*dispose) (spAttachmentLoader* self), /**/
-		spAttachment* (*newAttachment) (spAttachmentLoader* self, spSkin* skin, spAttachmentType type, const char* name,
-				const char* path));
+/* configureAttachment and disposeAttachment may be 0. */
+void _spAttachmentLoader_init (spAttachmentLoader* self,
+	void (*dispose) (spAttachmentLoader* self),
+	spAttachment* (*createAttachment) (spAttachmentLoader* self, spSkin* skin, spAttachmentType type, const char* name,
+		const char* path),
+	void (*configureAttachment) (spAttachmentLoader* self, spAttachment*),
+	void (*disposeAttachment) (spAttachmentLoader* self, spAttachment*)
+);
 void _spAttachmentLoader_deinit (spAttachmentLoader* self);
+/* Can only be called from createAttachment. */
 void _spAttachmentLoader_setError (spAttachmentLoader* self, const char* error1, const char* error2);
 void _spAttachmentLoader_setUnknownTypeError (spAttachmentLoader* self, spAttachmentType type);
 
@@ -163,7 +170,7 @@ void _spAttachmentLoader_setUnknownTypeError (spAttachmentLoader* self, spAttach
 
 /**/
 
-void _spAttachment_init (spAttachment* self, const char* name, spAttachmentType type, /**/
+void _spAttachment_init (spAttachment* self, const char* name, spAttachmentType type,
 void (*dispose) (spAttachment* self));
 void _spAttachment_deinit (spAttachment* self);
 
@@ -174,10 +181,10 @@ void _spAttachment_deinit (spAttachment* self);
 
 /**/
 
-void _spTimeline_init (spTimeline* self, spTimelineType type, /**/
-void (*dispose) (spTimeline* self), /**/
-		void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
-				int* eventsCount, float alpha));
+void _spTimeline_init (spTimeline* self, spTimelineType type,
+	void (*dispose) (spTimeline* self),
+	void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
+		int* eventsCount, float alpha));
 void _spTimeline_deinit (spTimeline* self);
 
 #ifdef SPINE_SHORT_NAMES
@@ -187,10 +194,10 @@ void _spTimeline_deinit (spTimeline* self);
 
 /**/
 
-void _spCurveTimeline_init (spCurveTimeline* self, spTimelineType type, int framesCount, /**/
-void (*dispose) (spTimeline* self), /**/
-		void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
-				int* eventsCount, float alpha));
+void _spCurveTimeline_init (spCurveTimeline* self, spTimelineType type, int framesCount,
+	void (*dispose) (spTimeline* self),
+	void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
+		int* eventsCount, float alpha));
 void _spCurveTimeline_deinit (spCurveTimeline* self);
 
 #ifdef SPINE_SHORT_NAMES

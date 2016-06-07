@@ -30,12 +30,6 @@
  *****************************************************************************/
 
 package spine.starling {
-import flash.display3D.Context3D;
-import flash.display3D.textures.Texture;
-import flash.geom.Matrix;
-import flash.geom.Point;
-import flash.geom.Rectangle;
-
 import spine.Bone;
 import spine.Skeleton;
 import spine.SkeletonData;
@@ -44,15 +38,18 @@ import spine.atlas.AtlasRegion;
 import spine.attachments.Attachment;
 import spine.attachments.MeshAttachment;
 import spine.attachments.RegionAttachment;
-import spine.attachments.SkinnedMeshAttachment;
+import spine.attachments.WeightedMeshAttachment;
 
 import starling.core.RenderSupport;
-import starling.core.Starling;
 import starling.display.BlendMode;
 import starling.display.DisplayObject;
 import starling.utils.Color;
 import starling.utils.MatrixUtil;
 import starling.utils.VertexData;
+
+import flash.geom.Matrix;
+import flash.geom.Point;
+import flash.geom.Rectangle;
 
 public class SkeletonSprite extends DisplayObject {
 	static private var _tempPoint:Point = new Point();
@@ -84,24 +81,24 @@ public class SkeletonSprite extends DisplayObject {
 		if (_polygonBatch)
 			renderMeshes(support, alpha);
 		else
-			renderRegions(support, alpha, originalBlendMode);
+			renderRegions(support, alpha);
 		support.blendMode = originalBlendMode;
 	}
 
 	private function renderMeshes (support:RenderSupport, alpha:Number) : void {
 		if (!batchable) {
 			_polygonBatch.begin(support, alpha, blendMode);
-			addToBatch(_polygonBatch, support, alpha, null);
+			addToBatch(_polygonBatch, alpha, null);
 			_polygonBatch.end();
 		} else if (!_batched) {
 			support.popMatrix();
 			_polygonBatch.begin(support, alpha, blendMode);
-			addToBatch(_polygonBatch, support, alpha, transformationMatrix);
+			addToBatch(_polygonBatch, alpha, transformationMatrix);
 			for(var i:int = parent.getChildIndex(this) + 1, n:int = parent.numChildren; i < n; ++i) {
-				var skeletonSprite:SkeletonSprite = parent.getChildAt(i) as SkeletonSprite;
-				if (!skeletonSprite || !skeletonSprite.batchable || skeletonSprite.blendMode != blendMode) break;
-				skeletonSprite._batched = true;
-				skeletonSprite.addToBatch(_polygonBatch, support, alpha, skeletonSprite.transformationMatrix);
+				var sibling:SkeletonSprite = parent.getChildAt(i) as SkeletonSprite;
+				if (!sibling || !sibling.batchable || sibling.blendMode != blendMode || !sibling.visible) break;
+				sibling._batched = true;
+				sibling.addToBatch(_polygonBatch, alpha, sibling.transformationMatrix);
 			}
 			_polygonBatch.end();
 			support.pushMatrix();
@@ -110,7 +107,7 @@ public class SkeletonSprite extends DisplayObject {
 			_batched = false;
 	}
 
-	private function addToBatch (polygonBatch:PolygonBatch, support:RenderSupport, skeletonA:Number, matrix:Matrix) : void {
+	private function addToBatch (polygonBatch:PolygonBatch, skeletonA:Number, matrix:Matrix) : void {
 		var skeletonR:Number = skeleton.r;
 		var skeletonG:Number = skeleton.g;
 		var skeletonB:Number = skeleton.b;
@@ -149,31 +146,37 @@ public class SkeletonSprite extends DisplayObject {
 				a = mesh.a;
 				image = mesh.rendererObject as SkeletonImage;
 				if (image == null) mesh.rendererObject = image = SkeletonImage(AtlasRegion(mesh.rendererObject).rendererObject);
-			} else if (attachment is SkinnedMeshAttachment) {
-				var skinnedMesh:SkinnedMeshAttachment = SkinnedMeshAttachment(attachment);
-				verticesLength = skinnedMesh.uvs.length;
+			} else if (attachment is WeightedMeshAttachment) {
+				var weightedMesh:WeightedMeshAttachment = WeightedMeshAttachment(attachment);
+				verticesLength = weightedMesh.uvs.length;
 				if (worldVertices.length < verticesLength) worldVertices.length = verticesLength;
-				skinnedMesh.computeWorldVertices(x, y, slot, worldVertices);
-				uvs = skinnedMesh.uvs;
-				triangles = skinnedMesh.triangles;
-				r = skinnedMesh.r;
-				g = skinnedMesh.g;
-				b = skinnedMesh.b;
-				a = skinnedMesh.a;
-				image = skinnedMesh.rendererObject as SkeletonImage;
-				if (image == null) skinnedMesh.rendererObject = image = SkeletonImage(AtlasRegion(skinnedMesh.rendererObject).rendererObject);
+				weightedMesh.computeWorldVertices(x, y, slot, worldVertices);
+				uvs = weightedMesh.uvs;
+				triangles = weightedMesh.triangles;
+				r = weightedMesh.r;
+				g = weightedMesh.g;
+				b = weightedMesh.b;
+				a = weightedMesh.a;
+				image = weightedMesh.rendererObject as SkeletonImage;
+				if (image == null) weightedMesh.rendererObject = image = SkeletonImage(AtlasRegion(weightedMesh.rendererObject).rendererObject);
 			}
 			if (image) {
 				a *= skeletonA * slot.a;
-				r *= skeletonR * slot.r * a;
-				g *= skeletonG * slot.g * a;
-				b *= skeletonB * slot.b * a;
+				if (image.texture.premultipliedAlpha) {
+					r *= skeletonR * slot.r * a;
+					g *= skeletonG * slot.g * a;
+					b *= skeletonB * slot.b * a;
+				} else {
+					r *= skeletonR * slot.r;
+					g *= skeletonG * slot.g;
+					b *= skeletonB * slot.b;
+				}
 				polygonBatch.add(image.texture, worldVertices, verticesLength, uvs, triangles, r, g, b, a, slot.data.blendMode, matrix);
 			}
 		}
 	}
 
-	private function renderRegions (support:RenderSupport, alpha:Number, blendMode:String) : void {
+	private function renderRegions (support:RenderSupport, alpha:Number) : void {
 		var r:Number = skeleton.r * 255;
 		var g:Number = skeleton.g * 255;
 		var b:Number = skeleton.b * 255;
@@ -220,7 +223,7 @@ public class SkeletonSprite extends DisplayObject {
 			return null;
 
 		var minX:Number = Number.MAX_VALUE, minY:Number = Number.MAX_VALUE;
-		var maxX:Number = Number.MIN_VALUE, maxY:Number = Number.MIN_VALUE;
+		var maxX:Number = -Number.MAX_VALUE, maxY:Number = -Number.MAX_VALUE;
 		var slots:Vector.<Slot> = skeleton.slots;
 		var worldVertices:Vector.<Number> = _tempVertices;
 		for (var i:int = 0, n:int = slots.length; i < n; ++i) {
@@ -237,11 +240,11 @@ public class SkeletonSprite extends DisplayObject {
 				verticesLength = mesh.vertices.length;
 				if (worldVertices.length < verticesLength) worldVertices.length = verticesLength;
 				mesh.computeWorldVertices(0, 0, slot, worldVertices);
-			} else if (attachment is SkinnedMeshAttachment) {
-				var skinnedMesh:SkinnedMeshAttachment = SkinnedMeshAttachment(attachment);
-				verticesLength = skinnedMesh.uvs.length;
+			} else if (attachment is WeightedMeshAttachment) {
+				var weightedMesh:WeightedMeshAttachment = WeightedMeshAttachment(attachment);
+				verticesLength = weightedMesh.uvs.length;
 				if (worldVertices.length < verticesLength) worldVertices.length = verticesLength;
-				skinnedMesh.computeWorldVertices(0, 0, slot, worldVertices);
+				weightedMesh.computeWorldVertices(0, 0, slot, worldVertices);
 			} else
 				continue;
 			for (var ii:int = 0; ii < verticesLength; ii += 2) {

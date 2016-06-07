@@ -36,11 +36,13 @@ void _spMeshAttachment_dispose (spAttachment* attachment) {
 	spMeshAttachment* self = SUB_CAST(spMeshAttachment, attachment);
 	_spAttachment_deinit(attachment);
 	FREE(self->path);
-	FREE(self->vertices);
-	FREE(self->regionUVs);
 	FREE(self->uvs);
-	FREE(self->triangles);
-	FREE(self->edges);
+	if (!self->parentMesh) {
+		FREE(self->vertices);
+		FREE(self->regionUVs);
+		FREE(self->triangles);
+		FREE(self->edges);
+	}
 	FREE(self);
 }
 
@@ -80,7 +82,27 @@ void spMeshAttachment_computeWorldVertices (spMeshAttachment* self, spSlot* slot
 	if (slot->attachmentVerticesCount == self->verticesCount) vertices = slot->attachmentVertices;
 	for (i = 0; i < self->verticesCount; i += 2) {
 		const float vx = vertices[i], vy = vertices[i + 1];
-		worldVertices[i] = vx * bone->m00 + vy * bone->m01 + x;
-		worldVertices[i + 1] = vx * bone->m10 + vy * bone->m11 + y;
+		worldVertices[i] = vx * bone->a + vy * bone->b + x;
+		worldVertices[i + 1] = vx * bone->c + vy * bone->d + y;
+	}
+}
+
+void spMeshAttachment_setParentMesh (spMeshAttachment* self, spMeshAttachment* parentMesh) {
+	CONST_CAST(spMeshAttachment*, self->parentMesh) = parentMesh;
+	if (parentMesh) {
+		self->vertices = parentMesh->vertices;
+		self->regionUVs = parentMesh->regionUVs;
+		self->verticesCount = parentMesh->verticesCount;
+
+		self->triangles = parentMesh->triangles;
+		self->trianglesCount = parentMesh->trianglesCount;
+
+		self->hullLength = parentMesh->hullLength;
+
+		self->edges = parentMesh->edges;
+		self->edgesCount = parentMesh->edgesCount;
+
+		self->width = parentMesh->width;
+		self->height = parentMesh->height;
 	}
 }

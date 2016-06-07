@@ -40,7 +40,10 @@ using namespace sf;
 void _AtlasPage_createTexture (AtlasPage* self, const char* path){
 	Texture* texture = new Texture();
 	if (!texture->loadFromFile(path)) return;
-	texture->setSmooth(true);
+
+	if (self->magFilter == SP_ATLAS_LINEAR) texture->setSmooth(true);
+	if (self->uWrap == SP_ATLAS_REPEAT && self->vWrap == SP_ATLAS_REPEAT) texture->setRepeated(true);
+
 	self->rendererObject = texture;
 	Vector2u size = texture->getSize();
 	self->width = size.x;
@@ -196,11 +199,11 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 				vertexArray->append(vertex);
 			}
 
-		} else if (attachment->type == ATTACHMENT_SKINNED_MESH) {
-			SkinnedMeshAttachment* mesh = (SkinnedMeshAttachment*)attachment;
+		} else if (attachment->type == ATTACHMENT_WEIGHTED_MESH) {
+			WeightedMeshAttachment* mesh = (WeightedMeshAttachment*)attachment;
 			if (mesh->uvsCount > SPINE_MESH_VERTEX_COUNT_MAX) continue;
 			texture = (Texture*)((AtlasRegion*)mesh->rendererObject)->page->rendererObject;
-			SkinnedMeshAttachment_computeWorldVertices(mesh, slot, worldVertices);
+			WeightedMeshAttachment_computeWorldVertices(mesh, slot, worldVertices);
 
 			Uint8 r = static_cast<Uint8>(skeleton->r * slot->r * 255);
 			Uint8 g = static_cast<Uint8>(skeleton->g * slot->g * 255);

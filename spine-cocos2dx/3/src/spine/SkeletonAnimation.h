@@ -47,6 +47,7 @@ typedef std::function<void(int trackIndex, spEvent* event)> EventListener;
   * played later. */
 class SkeletonAnimation: public SkeletonRenderer {
 public:
+	CREATE_FUNC(SkeletonAnimation);
 	static SkeletonAnimation* createWithData (spSkeletonData* skeletonData, bool ownsSkeletonData = false);
 	static SkeletonAnimation* createWithFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 1);
 	static SkeletonAnimation* createWithFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1);

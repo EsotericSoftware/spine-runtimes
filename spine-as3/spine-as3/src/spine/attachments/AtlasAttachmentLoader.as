@@ -83,11 +83,11 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 		return attachment;
 	}
 	
-	public function newSkinnedMeshAttachment (skin:Skin, name:String, path:String) : SkinnedMeshAttachment {
+	public function newWeightedMeshAttachment (skin:Skin, name:String, path:String) : WeightedMeshAttachment {
 		var region:AtlasRegion = atlas.findRegion(path);
 		if (region == null)
-			throw new Error("Region not found in atlas: " + path + " (skinned mesh attachment: " + name + ")");
-		var attachment:SkinnedMeshAttachment = new SkinnedMeshAttachment(name);
+			throw new Error("Region not found in atlas: " + path + " (weighted mesh attachment: " + name + ")");
+		var attachment:WeightedMeshAttachment = new WeightedMeshAttachment(name);
 		attachment.rendererObject = region;
 		var scaleX:Number = region.page.width / nextPOT(region.page.width);
 		var scaleY:Number = region.page.height / nextPOT(region.page.height);

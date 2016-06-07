@@ -30,12 +30,10 @@
  *****************************************************************************/
 
 package spine {
-
 import spine.atlas.Atlas;
 import spine.attachments.AtlasAttachmentLoader;
 import spine.attachments.AttachmentLoader;
 import spine.starling.SkeletonAnimation;
-import spine.starling.StarlingAtlasAttachmentLoader;
 import spine.starling.StarlingTextureLoader;
 
 import starling.core.Starling;
@@ -43,17 +41,15 @@ import starling.display.Sprite;
 import starling.events.Touch;
 import starling.events.TouchEvent;
 import starling.events.TouchPhase;
-import starling.textures.Texture;
-import starling.textures.TextureAtlas;
 
 public class RaptorExample extends Sprite {
-	[Embed(source = "raptor.json", mimeType = "application/octet-stream")]
+	[Embed(source = "/raptor.json", mimeType = "application/octet-stream")]
 	static public const RaptorJson:Class;
 	
-	[Embed(source = "raptor.atlas", mimeType = "application/octet-stream")]
+	[Embed(source = "/raptor.atlas", mimeType = "application/octet-stream")]
 	static public const RaptorAtlas:Class;
 	
-	[Embed(source = "raptor.png")]
+	[Embed(source = "/raptor.png")]
 	static public const RaptorAtlasTexture:Class;
 	
 	private var skeleton:SkeletonAnimation;

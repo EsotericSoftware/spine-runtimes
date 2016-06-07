@@ -13,6 +13,8 @@ target
 .DS_Store
 
 spine-c/Debug/*
+spine-c/dist
+spine-c/obj
 
 spine-cpp/Debug/*
 
@@ -42,9 +44,11 @@ spine-csharp/src/*.cs.meta
 
 spine-monogame/xamarinstudio-ios/src/bin
 spine-monogame/xamarinstudio-ios/src/obj
+spine-monogame/xamarinstudio-ios/src/packages
 
 spine-monogame/xamarinstudio-ios/example/bin
 spine-monogame/xamarinstudio-ios/example/obj
+spine-monogame/xamarinstudio-ios/example/packages
 
 spine-monogame/windows8-store/src/bin
 spine-monogame/windows8-store/src/obj
@@ -60,6 +64,8 @@ spine-xna/example/obj
 
 spine-unity/Assets/spine-csharp*
 !spine-unity/Assets/spine-csharp/Place spine-csharp src here.*
+spine-unity/spine-unity.CSharp.csproj
+spine-unity/spine-unity.CSharp.Editor.csproj
 spine-unity/ProjectSettings
 spine-unity/Temp
 spine-unity/Library
@@ -85,13 +91,12 @@ spine-love/spine-lua/
 spine-love/love/
 !spine-love/spine-lua/Place spine-lua here.txt
 
-spine-as3/spine-as3/bin
-spine-as3/spine-as3-example/bin-debug
-spine-as3/spine-as3-example/bin-release
+spine-as3/spine-as3-example/bin
+spine-as3/spine-as3-example/lib/.spine-as3.swc.stamp
 
-spine-starling/spine-starling/bin
-spine-starling/spine-starling-example/bin-debug
-spine-starling/spine-starling-example/bin-release
+spine-starling/spine-starling-example/bin
+spine-starling/spine-starling-example/lib/.spine-starling.swc.stamp
 
 spine-turbulenz/spine-js/spine.js
 spine-cocos2d-iphone/3/.idea/
+spine-threejs/spine-js/spine.js

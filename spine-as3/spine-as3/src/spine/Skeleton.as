@@ -38,7 +38,8 @@ public class Skeleton {
 	public var slots:Vector.<Slot>;
 	public var drawOrder:Vector.<Slot>;
 	public var ikConstraints:Vector.<IkConstraint>;
-	private var _boneCache:Vector.<Vector.<Bone>> = new Vector.<Vector.<Bone>>();
+	public var transformConstraints:Vector.<TransformConstraint>;
+	private var _updateCache:Vector.<Updatable> = new Vector.<Updatable>();
 	private var _skin:Skin;
 	public var r:Number = 1, g:Number = 1, b:Number = 1, a:Number = 1;
 	public var time:Number = 0;
@@ -65,72 +66,58 @@ public class Skeleton {
 			drawOrder[drawOrder.length] = slot;
 		}
 		
-		ikConstraints = new Vector.<IkConstraint>()
+		ikConstraints = new Vector.<IkConstraint>();
 		for each (var ikConstraintData:IkConstraintData in data.ikConstraints)
 			ikConstraints[ikConstraints.length] = new IkConstraint(ikConstraintData, this);
+		
+		transformConstraints = new Vector.<TransformConstraint>();
+		for each (var transformConstraintData:TransformConstraintData in data.transformConstraints)
+			transformConstraints[transformConstraints.length] = new TransformConstraint(transformConstraintData, this);
 
 		updateCache();
 	}
 
-	/** Caches information about bones and IK constraints. Must be called if bones or IK constraints are added or removed. */
+	/** Caches information about bones and constraints. Must be called if bones or constraints are added or removed. */
 	public function updateCache () : void {
-		var ikConstraintsCount:int = ikConstraints.length;
-
-		var arrayCount:int = ikConstraintsCount + 1;
-		if (_boneCache.length > arrayCount) _boneCache.splice(arrayCount, _boneCache.length - arrayCount);
-		for each (var cachedBones:Vector.<Bone> in _boneCache)
-			cachedBones.length = 0;
-		while (_boneCache.length < arrayCount)
-			_boneCache[_boneCache.length] = new Vector.<Bone>();
-
-		var nonIkBones:Vector.<Bone> = _boneCache[0];
-
-		outer:
+		var updateCache:Vector.<Updatable> = _updateCache;
+		var ikConstraints:Vector.<IkConstraint> = this.ikConstraints;
+		var transformConstraints:Vector.<TransformConstraint> = this.transformConstraints;
+		updateCache.length = bones.length + ikConstraints.length;
+		var i:int = 0;
 		for each (var bone:Bone in bones) {
-			var current:Bone = bone;
-			do {
-				var ii:int = 0;
-				for each (var ikConstraint:IkConstraint in ikConstraints) {
-					var parent:Bone = ikConstraint.bones[0];
-					var child:Bone = ikConstraint.bones[int(ikConstraint.bones.length - 1)];
-					while (true) {
-						if (current == child) {
-							_boneCache[ii].push(bone);
-							_boneCache[int(ii + 1)].push(bone);
-							continue outer;
-						}
-						if (child == parent) break;
-						child = child.parent;
-					}
-					ii++;
+			updateCache[i++] = bone;
+			for each (var ikConstraint:IkConstraint in ikConstraints) {
+				if (bone == ikConstraint.bones[ikConstraint.bones.length - 1]) {
+					updateCache[i++] = ikConstraint;
+					break;
 				}
-				current = current.parent;
-			} while (current != null);
-			nonIkBones[nonIkBones.length] = bone;
+			}
+		}
+
+		for each (var transformConstraint:TransformConstraint in transformConstraints) {
+			for (i = updateCache.length - 1; i >= 0; i--) {
+				var updatable:Updatable = updateCache[i];
+				if (updatable == transformConstraint.bone || updatable == transformConstraint.target) {
+					updateCache.splice(i + 1, 0, transformConstraint);
+					break;
+				}
+			}
 		}
 	}
 
-	/** Updates the world transform for each bone and applies IK constraints. */
+	/** Updates the world transform for each bone and applies constraints. */
 	public function updateWorldTransform () : void {
-		var bone:Bone;
-		for each (bone in bones)
-			bone.rotationIK = bone.rotation;
-		var i:int = 0, last:int = _boneCache.length - 1;
-		while (true) {
-			for each (bone in _boneCache[i])
-				bone.updateWorldTransform();
-			if (i == last) break;
-			ikConstraints[i].apply();
-			i++;
-		}
+		for each (var updatable:Updatable in _updateCache)
+			updatable.update();
 	}
 
-	/** Sets the bones and slots to their setup pose values. */
+	/** Sets the bones, constraints, and slots to their setup pose values. */
 	public function setToSetupPose () : void {
 		setBonesToSetupPose();
 		setSlotsToSetupPose();
 	}
 
+	/** Sets the bones and constraints to their setup pose values. */
 	public function setBonesToSetupPose () : void {
 		for each (var bone:Bone in bones)
 			bone.setToSetupPose();
@@ -138,6 +125,12 @@ public class Skeleton {
 		for each (var ikConstraint:IkConstraint in ikConstraints) {
 			ikConstraint.bendDirection = ikConstraint._data.bendDirection;
 			ikConstraint.mix = ikConstraint._data.mix;
+		}
+
+		for each (var transformConstraint:TransformConstraint in transformConstraints) {
+			transformConstraint.translateMix = transformConstraint._data.translateMix;
+			transformConstraint.x = transformConstraint._data.x;
+			transformConstraint.y = transformConstraint._data.y;
 		}
 	}
 
@@ -275,10 +268,18 @@ public class Skeleton {
 	}
 
 	/** @return May be null. */
-	public function findIkConstraint (ikConstraintName:String) : IkConstraint {
-		if (ikConstraintName == null) throw new ArgumentError("ikConstraintName cannot be null.");
+	public function findIkConstraint (constraintName:String) : IkConstraint {
+		if (constraintName == null) throw new ArgumentError("constraintName cannot be null.");
 		for each (var ikConstraint:IkConstraint in ikConstraints)
-			if (ikConstraint._data._name == ikConstraintName) return ikConstraint;
+			if (ikConstraint._data._name == constraintName) return ikConstraint;
+		return null;
+	}
+
+	/** @return May be null. */
+	public function findTransformConstraint (constraintName:String) : TransformConstraint {
+		if (constraintName == null) throw new ArgumentError("constraintName cannot be null.");
+		for each (var transformConstraint:TransformConstraint in transformConstraints)
+			if (transformConstraint._data._name == constraintName) return transformConstraint;
 		return null;
 	}
 

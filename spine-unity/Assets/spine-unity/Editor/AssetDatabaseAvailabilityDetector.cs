@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Spine {
+namespace Spine.Unity.Editor {
 	public static class AssetDatabaseAvailabilityDetector {
 		const string MARKER_RESOURCE_NAME = "SpineAssetDatabaseMarker";
 		private static bool _isMarkerLoaded;

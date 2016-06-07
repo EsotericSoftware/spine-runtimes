@@ -28,119 +28,118 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
 using System;
-using System.IO;
-using System.Collections.Generic;
 using UnityEngine;
-using Spine;
 
-/// <summary>Sets a GameObject's transform to match a bone on a Spine skeleton.</summary>
-[ExecuteInEditMode]
-[AddComponentMenu("Spine/BoneFollower")]
-public class BoneFollower : MonoBehaviour {
+namespace Spine.Unity {
+	/// <summary>Sets a GameObject's transform to match a bone on a Spine skeleton.</summary>
+	[ExecuteInEditMode]
+	[AddComponentMenu("Spine/BoneFollower")]
+	public class BoneFollower : MonoBehaviour {
 
-	[System.NonSerialized]
-	public bool
-		valid;
-	public SkeletonRenderer skeletonRenderer;
-	public Bone bone;
-	public bool followZPosition = true;
-	public bool followBoneRotation = true;
+		#region Inspector
+		public SkeletonRenderer skeletonRenderer;
+		public SkeletonRenderer SkeletonRenderer {
+			get { return skeletonRenderer; }
+			set {
+				skeletonRenderer = value;
+				Reset();
+			}
+		}
+		/// <summary>If a bone isn't set, boneName is used to find the bone.</summary>
+		[SpineBone(dataField: "skeletonRenderer")]
+		public String boneName;
 
-	public SkeletonRenderer SkeletonRenderer {
-		get { return skeletonRenderer; }
-		set {
-			skeletonRenderer = value;
+		public bool followZPosition = true;
+		public bool followBoneRotation = true;
+		public bool resetOnAwake = true;
+		#endregion
+
+		[NonSerialized]
+		public bool valid;
+
+		[NonSerialized]
+		public Bone bone;
+		Transform skeletonTransform;
+
+		public void HandleResetRenderer (SkeletonRenderer skeletonRenderer) {
 			Reset();
 		}
-	}
 
+		public void Reset () {
+			bone = null;
+			valid = skeletonRenderer != null && skeletonRenderer.valid;
 
-	/// <summary>If a bone isn't set, boneName is used to find the bone.</summary>
+			if (!valid) return;
 
-	[SpineBone(dataField: "skeletonRenderer")]
-	public String boneName;
-	public bool resetOnAwake = true;
-	protected Transform cachedTransform;
-	protected Transform skeletonTransform;
+			skeletonTransform = skeletonRenderer.transform;
+			skeletonRenderer.OnRebuild -= HandleResetRenderer;
+			skeletonRenderer.OnRebuild += HandleResetRenderer;
 
-	public void HandleResetRenderer (SkeletonRenderer skeletonRenderer) {
-		Reset();
-	}
+			#if UNITY_EDITOR
+			if (Application.isEditor)
+				DoUpdate();
+			#endif
+		}
 
-	public void Reset () {
-		bone = null;
-		cachedTransform = transform;
-		valid = skeletonRenderer != null && skeletonRenderer.valid;
-		if (!valid)
-			return;
-		skeletonTransform = skeletonRenderer.transform;
+		void OnDestroy () {
+			if (skeletonRenderer != null)
+				skeletonRenderer.OnRebuild -= HandleResetRenderer;
+		}
 
-		skeletonRenderer.OnReset -= HandleResetRenderer;
-		skeletonRenderer.OnReset += HandleResetRenderer;
+		public void Awake () {
+			if (resetOnAwake)
+				Reset();
+		}
 
-		if (Application.isEditor)
+		void LateUpdate () {
 			DoUpdate();
-	}
-
-	void OnDestroy () {
-		//cleanup
-		if (skeletonRenderer != null)
-			skeletonRenderer.OnReset -= HandleResetRenderer;
-	}
-
-	public void Awake () {
-		if (resetOnAwake)
-			Reset();
-	}
-
-	void LateUpdate () {
-		DoUpdate();
-	}
-
-	public void DoUpdate () {
-		if (!valid) {
-			Reset();
-			return;
 		}
 
-		if (bone == null) {
-			if (boneName == null || boneName.Length == 0)
+		public void DoUpdate () {
+			if (!valid) {
+				Reset();
 				return;
-			bone = skeletonRenderer.skeleton.FindBone(boneName);
+			}
+
 			if (bone == null) {
-				Debug.LogError("Bone not found: " + boneName, this);
-				return;
+				if (boneName == null || boneName.Length == 0)
+					return;
+				bone = skeletonRenderer.skeleton.FindBone(boneName);
+				if (bone == null) {
+					Debug.LogError("Bone not found: " + boneName, this);
+					return;
+				}
+			}
+
+			Skeleton skeleton = skeletonRenderer.skeleton;
+			float flipRotation = (skeleton.flipX ^ skeleton.flipY) ? -1f : 1f;
+			Transform thisTransform = this.transform;
+
+			// Recommended setup: Use local transform properties if Spine GameObject is parent
+			if (thisTransform.parent == skeletonTransform) {
+				thisTransform.localPosition = new Vector3(bone.worldX, bone.worldY, followZPosition ? 0f : thisTransform.localPosition.z);
+
+				if (followBoneRotation) {
+					Vector3 rotation = thisTransform.localRotation.eulerAngles;
+					thisTransform.localRotation = Quaternion.Euler(rotation.x, rotation.y, bone.WorldRotationX * flipRotation);
+				}
+
+				// For special cases: Use transform world properties if transform relationship is complicated
 			} else {
+				Vector3 targetWorldPosition = skeletonTransform.TransformPoint(new Vector3(bone.worldX, bone.worldY, 0f));
+				if (!followZPosition)
+					targetWorldPosition.z = thisTransform.position.z;
 
+				thisTransform.position = targetWorldPosition;
+
+				if (followBoneRotation) {
+					Vector3 worldRotation = skeletonTransform.rotation.eulerAngles;
+					thisTransform.rotation = Quaternion.Euler(worldRotation.x, worldRotation.y, skeletonTransform.rotation.eulerAngles.z + (bone.WorldRotationX * flipRotation));
+				}
 			}
+
 		}
-
-		Spine.Skeleton skeleton = skeletonRenderer.skeleton;
-		float flipRotation = (skeleton.flipX ^ skeleton.flipY) ? -1f : 1f;
-
-		if (cachedTransform.parent == skeletonTransform) {
-			cachedTransform.localPosition = new Vector3(bone.worldX, bone.worldY, followZPosition ? 0f : cachedTransform.localPosition.z);
-
-			if (followBoneRotation) {
-				Vector3 rotation = cachedTransform.localRotation.eulerAngles;
-				cachedTransform.localRotation = Quaternion.Euler(rotation.x, rotation.y, bone.worldRotation * flipRotation);
-			}
-
-		} else {
-			Vector3 targetWorldPosition = skeletonTransform.TransformPoint(new Vector3(bone.worldX, bone.worldY, 0f));
-			if (!followZPosition)
-				targetWorldPosition.z = cachedTransform.position.z;
-
-			cachedTransform.position = targetWorldPosition;
-
-			if (followBoneRotation) {
-				Vector3 rotation = skeletonTransform.rotation.eulerAngles;
-
-				cachedTransform.rotation = Quaternion.Euler(rotation.x, rotation.y, skeletonTransform.rotation.eulerAngles.z + (bone.worldRotation * flipRotation));
-			}
-		}
-
 	}
+
 }

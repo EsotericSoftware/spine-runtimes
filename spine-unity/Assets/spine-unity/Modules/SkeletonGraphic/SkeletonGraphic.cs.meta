@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: d85b887af7e6c3f45a2e2d2920d641bc
+timeCreated: 1455576193
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - m_Material: {fileID: 2100000, guid: b66cf7a186d13054989b33a5c90044e4, type: 2}
+  - skeletonDataAsset: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

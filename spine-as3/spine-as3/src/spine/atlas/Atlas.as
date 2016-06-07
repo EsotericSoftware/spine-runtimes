@@ -44,7 +44,7 @@ public class Atlas {
 		if (object is String)
 			load(String(object), textureLoader);
 		else if (object is ByteArray)
-			load(object.readUTFBytes(object.length), textureLoader);
+			load(ByteArray(object).readUTFBytes(ByteArray(object).length), textureLoader);
 		else
 			throw new ArgumentError("object must be a TextureAtlas or AttachmentLoader.");
 	}

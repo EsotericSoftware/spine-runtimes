@@ -28,130 +28,149 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
+#define NO_PREFAB_MESH
 
 using System;
-using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(SkeletonRenderer))]
-public class SkeletonRendererInspector : Editor {
-	protected static bool advancedFoldout;
+namespace Spine.Unity.Editor {
+	
+	[CustomEditor(typeof(SkeletonRenderer))]
+	public class SkeletonRendererInspector : UnityEditor.Editor {
+		protected static bool advancedFoldout;
+		protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, separatorSlotNames, frontFacing, zSpacing;
+		protected SpineInspectorUtility.SerializedSortingProperties sortingProperties;
+		protected bool isInspectingPrefab;
+		protected MeshFilter meshFilter;
 
-	protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, submeshSeparators, front;
+		protected virtual void OnEnable () {
+			isInspectingPrefab = (PrefabUtility.GetPrefabType(target) == PrefabType.Prefab);
+			
+			SpineEditorUtilities.ConfirmInitialization();
+			skeletonDataAsset = serializedObject.FindProperty("skeletonDataAsset");
+			initialSkinName = serializedObject.FindProperty("initialSkinName");
+			normals = serializedObject.FindProperty("calculateNormals");
+			tangents = serializedObject.FindProperty("calculateTangents");
+			meshes = serializedObject.FindProperty("renderMeshes");
+			immutableTriangles = serializedObject.FindProperty("immutableTriangles");
+			separatorSlotNames = serializedObject.FindProperty("separatorSlotNames");
+			separatorSlotNames.isExpanded = true;
 
-	private static MethodInfo EditorGUILayoutSortingLayerField;
-	protected SerializedObject rendererSerializedObject;
-	protected SerializedProperty sortingLayerIDProperty;
+			frontFacing = serializedObject.FindProperty("frontFacing");
+			zSpacing = serializedObject.FindProperty("zSpacing");
 
-	protected virtual void OnEnable () {
-		SpineEditorUtilities.ConfirmInitialization();
-		skeletonDataAsset = serializedObject.FindProperty("skeletonDataAsset");
-		initialSkinName = serializedObject.FindProperty("initialSkinName");
-		normals = serializedObject.FindProperty("calculateNormals");
-		tangents = serializedObject.FindProperty("calculateTangents");
-		meshes = serializedObject.FindProperty("renderMeshes");
-		immutableTriangles = serializedObject.FindProperty("immutableTriangles");
-		submeshSeparators = serializedObject.FindProperty("submeshSeparators");
-		front = serializedObject.FindProperty("frontFacing");
+			var renderer = ((SkeletonRenderer)target).GetComponent<Renderer>();
+			sortingProperties = new SpineInspectorUtility.SerializedSortingProperties(renderer);
+		}
 
-		if(EditorGUILayoutSortingLayerField == null)
-			EditorGUILayoutSortingLayerField = typeof(EditorGUILayout).GetMethod("SortingLayerField", BindingFlags.Static | BindingFlags.NonPublic, null, new Type[] { typeof(GUIContent), typeof(SerializedProperty), typeof(GUIStyle) }, null);
+		protected virtual void DrawInspectorGUI () {
+			SkeletonRenderer component = (SkeletonRenderer)target;
 
-		rendererSerializedObject = new SerializedObject(((SkeletonRenderer)target).GetComponent<Renderer>());
-		sortingLayerIDProperty = rendererSerializedObject.FindProperty("m_SortingLayerID");
-	}
-
-	protected virtual void gui () {
-		SkeletonRenderer component = (SkeletonRenderer)target;
-		EditorGUILayout.BeginHorizontal();
-		EditorGUILayout.PropertyField(skeletonDataAsset);
-		float reloadWidth = GUI.skin.label.CalcSize(new GUIContent("Reload")).x + 20;
-		if (GUILayout.Button("Reload", GUILayout.Width(reloadWidth))) {
-			if (component.skeletonDataAsset != null) {
-				foreach (AtlasAsset aa in component.skeletonDataAsset.atlasAssets) {
-					if (aa != null)
-						aa.Reset();
+			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.PropertyField(skeletonDataAsset);
+			const string ReloadButtonLabel = "Reload";
+			float reloadWidth = GUI.skin.label.CalcSize(new GUIContent(ReloadButtonLabel)).x + 20;
+			if (GUILayout.Button(ReloadButtonLabel, GUILayout.Width(reloadWidth))) {
+				if (component.skeletonDataAsset != null) {
+					foreach (AtlasAsset aa in component.skeletonDataAsset.atlasAssets) {
+						if (aa != null)
+							aa.Reset();
+					}
+					component.skeletonDataAsset.Reset();
 				}
-				
-				component.skeletonDataAsset.Reset();
+				component.Initialize(true);
 			}
-			component.Reset();
-		}
-		EditorGUILayout.EndHorizontal();
+			EditorGUILayout.EndHorizontal();
 
-		if (!component.valid) {
-			component.Reset();
-			component.LateUpdate();
-			if (!component.valid)
-				return;
-		}
-
-		// Initial skin name.
-		{
-			String[] skins = new String[component.skeleton.Data.Skins.Count];
-			int skinIndex = 0;
-			for (int i = 0; i < skins.Length; i++) {
-				String name = component.skeleton.Data.Skins.Items[i].Name;
-				skins[i] = name;
-				if (name == initialSkinName.stringValue)
-					skinIndex = i;
+			if (!component.valid) {
+				component.Initialize(true);
+				component.LateUpdate();
+				if (!component.valid)
+					return;
 			}
 
-			skinIndex = EditorGUILayout.Popup("Initial Skin", skinIndex, skins);			
-			initialSkinName.stringValue = skins[skinIndex];
-		}
+			#if NO_PREFAB_MESH
+			if (meshFilter == null)
+				meshFilter = component.GetComponent<MeshFilter>();
 
-		EditorGUILayout.Space();
+			if (isInspectingPrefab)
+				meshFilter.sharedMesh = null;
+			#endif
 
-		// Sorting Layers
-		{
-			var renderer = component.GetComponent<Renderer>();
-			if(renderer != null) {
-				EditorGUI.BeginChangeCheck();
-
-				if(EditorGUILayoutSortingLayerField != null && sortingLayerIDProperty != null) {
-					EditorGUILayoutSortingLayerField.Invoke(null, new object[] { new GUIContent("Sorting Layer"), sortingLayerIDProperty, EditorStyles.popup } );
-				} else {
-					renderer.sortingLayerID = EditorGUILayout.IntField("Sorting Layer ID", renderer.sortingLayerID);
+			// Initial skin name.
+			{
+				String[] skins = new String[component.skeleton.Data.Skins.Count];
+				int skinIndex = 0;
+				for (int i = 0; i < skins.Length; i++) {
+					String skinNameString = component.skeleton.Data.Skins.Items[i].Name;
+					skins[i] = skinNameString;
+					if (skinNameString == initialSkinName.stringValue)
+						skinIndex = i;
 				}
+				skinIndex = EditorGUILayout.Popup("Initial Skin", skinIndex, skins);			
+				initialSkinName.stringValue = skins[skinIndex];
+			}
 
-				renderer.sortingOrder = EditorGUILayout.IntField("Order in Layer", renderer.sortingOrder);
+			EditorGUILayout.Space();
 
-				if(EditorGUI.EndChangeCheck()) {
-					rendererSerializedObject.ApplyModifiedProperties();
-					EditorUtility.SetDirty(renderer);
+			// Sorting Layers
+			{
+				SpineInspectorUtility.SortingPropertyFields(sortingProperties, applyModifiedProperties: true);
+			}
+
+			// More Render Options...
+			{
+				using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
+					EditorGUI.indentLevel++;
+					advancedFoldout = EditorGUILayout.Foldout(advancedFoldout, "Advanced");
+					if (advancedFoldout) {
+						EditorGUI.indentLevel++;
+						SeparatorsField(separatorSlotNames);
+						EditorGUILayout.PropertyField(meshes,
+							new GUIContent("Render Mesh Attachments", "Disable to optimize rendering for skeletons that don't use Mesh Attachments"));
+						EditorGUILayout.PropertyField(immutableTriangles,
+							new GUIContent("Immutable Triangles", "Enable to optimize rendering for skeletons that never change attachment visbility"));
+						EditorGUILayout.Space();
+
+						const float MinZSpacing = -0.1f;
+						const float MaxZSpacing = 0f;
+						EditorGUILayout.Slider(zSpacing, MinZSpacing, MaxZSpacing);
+
+						// Optional fields. May be disabled in SkeletonRenderer.
+						if (normals != null) {
+							EditorGUILayout.PropertyField(normals);
+							EditorGUILayout.PropertyField(tangents);
+						}
+						if (frontFacing != null)
+							EditorGUILayout.PropertyField(frontFacing);
+
+						EditorGUI.indentLevel--;
+					}
+					EditorGUI.indentLevel--;
 				}
 			}
 		}
 
-		// More Render Options...
-		{
-			advancedFoldout = EditorGUILayout.Foldout(advancedFoldout, "Advanced");
-			if(advancedFoldout) {
-				EditorGUI.indentLevel++;
-				EditorGUILayout.PropertyField(meshes,
-					new GUIContent("Render Meshes", "Disable to optimize rendering for skeletons that don't use meshes"));
-				EditorGUILayout.PropertyField(immutableTriangles,
-					new GUIContent("Immutable Triangles", "Enable to optimize rendering for skeletons that never change attachment visbility"));
-				EditorGUILayout.PropertyField(normals);
-				EditorGUILayout.PropertyField(tangents);
-				EditorGUILayout.PropertyField(front);
-				EditorGUILayout.PropertyField(submeshSeparators, true);
-				EditorGUI.indentLevel--;
+		public static void SeparatorsField (SerializedProperty separatorSlotNames) {
+			using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
+				if (separatorSlotNames.isExpanded)
+					EditorGUILayout.PropertyField(separatorSlotNames, includeChildren: true);
+				else
+					EditorGUILayout.PropertyField(separatorSlotNames, new GUIContent(separatorSlotNames.displayName + string.Format(" [{0}]", separatorSlotNames.arraySize)), includeChildren: true);
 			}
 		}
-	}
 
-	override public void OnInspectorGUI () {
-		serializedObject.Update();
-		gui();
-		if (serializedObject.ApplyModifiedProperties() ||
-			(Event.current.type == EventType.ValidateCommand && Event.current.commandName == "UndoRedoPerformed")
-		) {
-			if (!Application.isPlaying)
-				((SkeletonRenderer)target).Reset();
+		override public void OnInspectorGUI () {
+			serializedObject.Update();
+			DrawInspectorGUI();
+			if (serializedObject.ApplyModifiedProperties() ||
+				(UnityEngine.Event.current.type == EventType.ValidateCommand && UnityEngine.Event.current.commandName == "UndoRedoPerformed")
+			) {
+				if (!Application.isPlaying)
+					((SkeletonRenderer)target).Initialize(true);
+			}
 		}
-	}
 
+	}
 }
