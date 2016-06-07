@@ -62,6 +62,7 @@ namespace Spine {
 			rotateMix = data.rotateMix;
 			scaleMix = data.scaleMix;
 			shearMix = data.shearMix;
+			offsetRotation = data.offsetRotation;
 			offsetX = data.offsetX;
 			offsetY = data.offsetY;
 			offsetScaleX = data.offsetScaleX;
