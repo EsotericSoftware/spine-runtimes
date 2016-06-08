@@ -535,10 +535,15 @@ namespace Spine.Unity.Editor {
 
 		void CreatePreviewInstances () {
 			this.DestroyPreviewInstances();
+
+			var skeletonDataAsset = (SkeletonDataAsset)target;
+			if (skeletonDataAsset.GetSkeletonData(false) == null)
+				return;
+
 			if (this.m_previewInstance == null) {
 				string skinName = EditorPrefs.GetString(m_skeletonDataAssetGUID + "_lastSkin", "");
 
-				m_previewInstance = SpineEditorUtilities.InstantiateSkeletonAnimation((SkeletonDataAsset)target, skinName).gameObject;
+				m_previewInstance = SpineEditorUtilities.InstantiateSkeletonAnimation(skeletonDataAsset, skinName).gameObject;
 				m_previewInstance.hideFlags = HideFlags.HideAndDontSave;
 				m_previewInstance.layer = 0x1f;
 
