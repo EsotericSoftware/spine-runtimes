@@ -19,9 +19,9 @@ public class PathConstraint implements Updatable {
 	Slot target;
 	float position, spacing, rotateMix, translateMix;
 
-	final FloatArray spaces = new FloatArray(), positions = new FloatArray();
-	final FloatArray world = new FloatArray(), curves = new FloatArray(), lengths = new FloatArray();
-	final float[] segments = new float[10];
+	private final FloatArray spaces = new FloatArray(), positions = new FloatArray();
+	private final FloatArray world = new FloatArray(), curves = new FloatArray(), lengths = new FloatArray();
+	private final float[] segments = new float[10];
 
 	public PathConstraint (PathConstraintData data, Skeleton skeleton) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -67,17 +67,16 @@ public class PathConstraint implements Updatable {
 
 		PathConstraintData data = this.data;
 		Object[] bones = this.bones.items;
-		int boneCount = this.bones.size;
 		SpacingMode spacingMode = data.spacingMode;
 		RotateMode rotateMode = data.rotateMode;
 		boolean tangents = rotateMode == RotateMode.tangent, scale = rotateMode == RotateMode.chainScale;
 		boolean lengthSpacing = spacingMode == SpacingMode.length;
-		int spacesCount = tangents ? boneCount : boneCount + 1;
+		int boneCount = this.bones.size, spacesCount = tangents ? boneCount : boneCount + 1;
 		float[] spaces = this.spaces.setSize(spacesCount), lengths = null;
 		float spacing = this.spacing;
 		if (scale || lengthSpacing) {
 			if (scale) lengths = this.lengths.setSize(boneCount);
-			for (int i = 0; i < boneCount;) {
+			for (int i = 0, n = spacesCount - 1; i < n;) {
 				Bone bone = (Bone)bones[i];
 				float length = bone.data.length, x = length * bone.a, y = length * bone.c;
 				length = (float)Math.sqrt(x * x + y * y);
@@ -85,7 +84,7 @@ public class PathConstraint implements Updatable {
 				spaces[++i] = lengthSpacing ? Math.max(0, length + spacing) : spacing;
 			}
 		} else {
-			for (int i = 1; i <= spacesCount; i++)
+			for (int i = 1; i < spacesCount; i++)
 				spaces[i] = spacing;
 		}
 
@@ -298,7 +297,7 @@ public class PathConstraint implements Updatable {
 				break;
 			}
 
-			// Curve segment lengths, 0 to 9.
+			// Curve segment lengths.
 			if (curve != lastCurve) {
 				lastCurve = curve;
 				int ii = curve * 6;
