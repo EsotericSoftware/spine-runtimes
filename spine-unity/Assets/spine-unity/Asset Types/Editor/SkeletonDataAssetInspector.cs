@@ -28,6 +28,7 @@ namespace Spine.Unity.Editor {
 		static bool bakeAnimations = true;
 		static bool bakeIK = true;
 		static SendMessageOptions bakeEventOptions = SendMessageOptions.DontRequireReceiver;
+		const string ShowBakingPrefsKey = "SkeletonDataAssetInspector_showUnity";
 		#endif
 
 		SerializedProperty atlasAssets, skeletonJSON, scale, fromAnimation, toAnimation, duration, defaultMix;
@@ -68,13 +69,10 @@ namespace Spine.Unity.Editor {
 			spriteCollection = serializedObject.FindProperty("spriteCollection");
 			#else
 			atlasAssets.isExpanded = true;
-			// REVIEW: Better fix.
-			if (m_skeletonData != null)
-				InitPreview();
 			#endif
 
 			#if SPINE_BAKING
-			isBakingExpanded = EditorPrefs.GetBool("SkeletonDataAssetInspector_showUnity", false);
+			isBakingExpanded = EditorPrefs.GetBool(ShowBakingPrefsKey, false);
 			#endif
 
 			m_skeletonDataAsset = (SkeletonDataAsset)target;
@@ -183,7 +181,7 @@ namespace Spine.Unity.Editor {
 			bool pre = isBakingExpanded;
 			isBakingExpanded = EditorGUILayout.Foldout(isBakingExpanded, new GUIContent("Baking", SpineEditorUtilities.Icons.unityIcon));
 			if (pre != isBakingExpanded)
-				EditorPrefs.SetBool("SkeletonDataAssetInspector_showUnity", isBakingExpanded);
+				EditorPrefs.SetBool(ShowBakingPrefsKey, isBakingExpanded);
 			
 			if (isBakingExpanded) {
 				EditorGUI.indentLevel++;
@@ -218,7 +216,11 @@ namespace Spine.Unity.Editor {
 					if (GUILayout.Button(new GUIContent("Bake All Skins", SpineEditorUtilities.Icons.unityIcon), GUILayout.Height(32), GUILayout.Width(150)))
 						SkeletonBaker.BakeToPrefab(m_skeletonDataAsset, m_skeletonData.Skins, "", bakeAnimations, bakeIK, bakeEventOptions);
 
-					if (m_skeletonAnimation != null && m_skeletonAnimation.skeleton != null) { // If m_skeletonAnimation is lazy-instantiated, this can cause contents to change between Layout and Repaint events, which can cause scope errors.
+					// If m_skeletonAnimation is lazy-instantiated elsewhere, this can cause contents to change between Layout and Repaint events, causing scope errors.
+					if (m_skeletonData != null && m_skeletonAnimation == null)
+						InitPreview();
+					
+					if (m_skeletonAnimation != null && m_skeletonAnimation.skeleton != null) {
 						Skin bakeSkin = m_skeletonAnimation.skeleton.Skin;
 
 						string skinName = "<No Skin>";
