@@ -472,6 +472,8 @@ namespace Spine.Unity.Editor {
 							warnings.Add("Missing Region: '" + str + "'");
 						
 					}
+					#else
+					warnings.Add("Can't load SkeletonData. Sprite Collection may have missing images.");
 					#endif
 				}
 			}
