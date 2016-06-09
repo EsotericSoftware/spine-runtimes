@@ -31,6 +31,7 @@
 
 package com.esotericsoftware.spine;
 
+import java.io.EOFException;
 import java.io.IOException;
 
 import com.badlogic.gdx.files.FileHandle;
@@ -138,6 +139,8 @@ public class SkeletonBinary {
 				for (int i = 0; i < byteCount;) {
 					int b = read();
 					switch (b >> 4) {
+					case -1:
+						throw new EOFException();
 					case 12:
 					case 13:
 						chars[charCount++] = (char)((b & 0x1F) << 6 | read() & 0x3F);
@@ -442,7 +445,7 @@ public class SkeletonBinary {
 			path.setWorldVerticesLength(vertexCount << 1);
 			path.setVertices(vertices.vertices);
 			path.setBones(vertices.bones);
-			path.getLengths().addAll(lengths);
+			path.setLengths(lengths);
 			if (nonessential) Color.rgba8888ToColor(path.getColor(), color);
 			return path;
 		}
@@ -632,6 +635,7 @@ public class SkeletonBinary {
 						}
 						timelines.add(timeline);
 						duration = Math.max(duration, timeline.getFrames()[(frameCount - 1) * PathConstraintPositionTimeline.ENTRIES]);
+						break;
 					}
 					case PATH_MIX: {
 						PathConstraintMixTimeline timeline = new PathConstraintMixTimeline(frameCount);
@@ -642,6 +646,7 @@ public class SkeletonBinary {
 						}
 						timelines.add(timeline);
 						duration = Math.max(duration, timeline.getFrames()[(frameCount - 1) * PathConstraintMixTimeline.ENTRIES]);
+						break;
 					}
 					}
 				}
@@ -744,11 +749,7 @@ public class SkeletonBinary {
 				timelines.add(timeline);
 				duration = Math.max(duration, timeline.getFrames()[eventCount - 1]);
 			}
-		} catch (
-
-		IOException ex)
-
-		{
+		} catch (IOException ex) {
 			throw new SerializationException("Error reading skeleton file.", ex);
 		}
 

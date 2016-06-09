@@ -359,10 +359,11 @@ public class SkeletonJson {
 			int vertexCount = map.getInt("vertexCount");
 			readVertices(map, path, vertexCount << 1);
 
-			float[] lengths = path.getLengths().setSize(vertexCount / 3);
+			float[] lengths = new float[vertexCount / 3];
 			int i = 0;
 			for (JsonValue curves = map.require("lengths").child; curves != null; curves = curves.next)
 				lengths[i++] = curves.asFloat() * scale;
+			path.setLengths(lengths);
 
 			String color = map.getString("color", null);
 			if (color != null) path.getColor().set(Color.valueOf(color));

@@ -144,18 +144,14 @@ public class PathConstraint implements Updatable {
 		boolean percentSpacing) {
 		Slot target = this.target;
 		float position = this.position;
-		int verticesLength = path.getWorldVerticesLength(), curveCount = verticesLength / 6, lastCurve = NONE;
 		float[] spaces = this.spaces.items, out = this.positions.setSize(spacesCount * 3 + 2), world;
 		boolean closed = path.getClosed();
+		int verticesLength = path.getWorldVerticesLength(), curveCount = verticesLength / 6, prevCurve = NONE;
 
 		if (!path.getConstantSpeed()) {
-			float[] lengths = path.getLengths().items;
-			float pathLength;
-			if (closed) {
-				curveCount--;
-				pathLength = lengths[curveCount];
-			} else
-				pathLength = lengths[curveCount - 2];
+			float[] lengths = path.getLengths();
+			curveCount -= closed ? 1 : 2;
+			float pathLength = lengths[curveCount];
 			if (percentPosition) position *= pathLength;
 			if (percentSpacing) {
 				for (int i = 0; i < spacesCount; i++)
@@ -172,15 +168,15 @@ public class PathConstraint implements Updatable {
 					if (p < 0) p += pathLength;
 					curve = 0;
 				} else if (p < 0) {
-					if (lastCurve != BEFORE) {
-						lastCurve = BEFORE;
+					if (prevCurve != BEFORE) {
+						prevCurve = BEFORE;
 						path.computeWorldVertices(target, 2, 4, world, 0);
 					}
 					addBeforePosition(p, world, 0, out, o);
 					continue;
 				} else if (p > pathLength) {
-					if (lastCurve != AFTER) {
-						lastCurve = AFTER;
+					if (prevCurve != AFTER) {
+						prevCurve = AFTER;
 						path.computeWorldVertices(target, verticesLength - 6, 4, world, 0);
 					}
 					addAfterPosition(p - pathLength, world, 0, out, o);
@@ -199,8 +195,8 @@ public class PathConstraint implements Updatable {
 					}
 					break;
 				}
-				if (curve != lastCurve) {
-					lastCurve = curve;
+				if (curve != prevCurve) {
+					prevCurve = curve;
 					if (closed && curve == curveCount) {
 						path.computeWorldVertices(target, verticesLength - 4, 4, world, 0);
 						path.computeWorldVertices(target, 0, 4, world, 4);
@@ -303,8 +299,8 @@ public class PathConstraint implements Updatable {
 			}
 
 			// Curve segment lengths.
-			if (curve != lastCurve) {
-				lastCurve = curve;
+			if (curve != prevCurve) {
+				prevCurve = curve;
 				int ii = curve * 6;
 				x1 = world[ii];
 				y1 = world[ii + 1];
