@@ -34,8 +34,11 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap.Entry;
+import com.esotericsoftware.spine.Skin.Key;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
+import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 
 public class Skeleton {
@@ -183,7 +186,6 @@ public class Skeleton {
 
 			updateCache.add(constraint);
 
-			sortReset(target.children);
 			sortReset(parent.children);
 			constrained.peek().sorted = true;
 		}
@@ -192,9 +194,19 @@ public class Skeleton {
 		for (int i = 0, n = pathConstraints.size; i < n; i++) {
 			PathConstraint constraint = pathConstraints.get(i);
 
-			// BOZO! - All bones any paths in the target slot are weighted to must come before the path constraint.
-			Bone target = constraint.target.bone;
-			sortBone(target);
+			Slot slot = constraint.target;
+			int slotIndex = slot.getData().index;
+			Bone slotBone = slot.bone;
+			if (skin != null) {
+				for (Entry<Key, Attachment> entry : skin.attachments.entries())
+					if (entry.key.slotIndex == slotIndex) sortPathConstraintAttachment(entry.value, slotBone);
+			}
+			for (int ii = 0, nn = data.skins.size; ii < nn; ii++)
+				for (Entry<Key, Attachment> entry : data.skins.get(i).attachments.entries())
+					if (entry.key.slotIndex == slotIndex) sortPathConstraintAttachment(entry.value, slotBone);
+
+			Attachment attachment = slot.getAttachment();
+			if (attachment instanceof PathAttachment) sortPathConstraintAttachment(attachment, slotBone);
 
 			Array<Bone> constrained = constraint.bones;
 			int boneCount = constrained.size;
@@ -203,7 +215,6 @@ public class Skeleton {
 
 			updateCache.add(constraint);
 
-			sortReset(target.children);
 			for (int ii = 0; ii < boneCount; ii++)
 				sortReset(constrained.get(ii).children);
 			for (int ii = 0; ii < boneCount; ii++)
@@ -214,8 +225,7 @@ public class Skeleton {
 		for (int i = 0, n = transformConstraints.size; i < n; i++) {
 			TransformConstraint constraint = transformConstraints.get(i);
 
-			Bone target = constraint.target;
-			sortBone(target);
+			sortBone(constraint.target);
 
 			// BOZO! - Update transform constraints to support multiple constrained bones.
 			// Array<Bone> constrained = constraint.bones;
@@ -229,7 +239,6 @@ public class Skeleton {
 			// for (int ii = 0; ii < boneCount; ii++)
 			// reset(constrained.get(ii).children);
 			sortReset(constraint.bone.children); // BOZO - Remove.
-			sortReset(target.children);
 			// for (int ii = 0; ii < boneCount; ii++)
 			// constrained.get(ii).sorted = true;
 			constraint.bone.sorted = true; // BOZO - Remove.
@@ -237,6 +246,18 @@ public class Skeleton {
 
 		for (int i = 0, n = bones.size; i < n; i++)
 			sortBone(bones.get(i));
+	}
+
+	private void sortPathConstraintAttachment (Attachment attachment, Bone slotBone) {
+		if (!(attachment instanceof PathAttachment)) return;
+		int[] pathBones = ((PathAttachment)attachment).getBones();
+		if (pathBones == null)
+			sortBone(slotBone);
+		else {
+			Array<Bone> bones = this.bones;
+			for (int boneIndex : pathBones)
+				sortBone(bones.get(boneIndex));
+		}
 	}
 
 	private void sortBone (Bone bone) {
