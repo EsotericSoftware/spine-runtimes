@@ -140,7 +140,8 @@ public class Skeleton {
 		updateCache();
 	}
 
-	/** Caches information about bones and constraints. Must be called if bones or constraints are added or removed. */
+	/** Caches information about bones and constraints. Must be called if bones, constraints, or weighted path attachments are
+	 * added or removed. */
 	public void updateCache () {
 		Array<Updatable> updateCache = this.updateCache;
 		updateCache.clear();
@@ -191,6 +192,7 @@ public class Skeleton {
 		for (int i = 0, n = pathConstraints.size; i < n; i++) {
 			PathConstraint constraint = pathConstraints.get(i);
 
+			// BOZO! - All bones any paths in the target slot are weighted to must come before the path constraint.
 			Bone target = constraint.target.bone;
 			sortBone(target);
 
@@ -215,7 +217,7 @@ public class Skeleton {
 			Bone target = constraint.target;
 			sortBone(target);
 
-			// BOZO - Update transform constraints to support multiple constrained bones.
+			// BOZO! - Update transform constraints to support multiple constrained bones.
 			// Array<Bone> constrained = constraint.bones;
 			// int boneCount = constrained.size;
 			// for (int ii = 0; ii < boneCount; ii++)
@@ -235,6 +237,8 @@ public class Skeleton {
 
 		for (int i = 0, n = bones.size; i < n; i++)
 			sortBone(bones.get(i));
+
+		System.out.println(updateCache);
 	}
 
 	private void sortBone (Bone bone) {

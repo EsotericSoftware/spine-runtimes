@@ -90,12 +90,14 @@ public class PathConstraint implements Updatable {
 
 		float[] positions = computeWorldPositions((PathAttachment)attachment, spacesCount, tangents,
 			data.positionMode == PositionMode.percent, spacingMode == SpacingMode.percent);
+		Skeleton skeleton = target.getSkeleton();
+		float skeletonX = skeleton.x, skeletonY = skeleton.y;
 		float boneX = positions[0], boneY = positions[1], offsetRotation = data.offsetRotation;
 		boolean tip = rotateMode == RotateMode.chain && offsetRotation == 0;
 		for (int i = 0, p = 3; i < boneCount; i++, p += 3) {
 			Bone bone = (Bone)bones[i];
-			bone.worldX += (boneX - bone.worldX) * translateMix;
-			bone.worldY += (boneY - bone.worldY) * translateMix;
+			bone.worldX += (boneX - bone.worldX) * translateMix - skeletonX;
+			bone.worldY += (boneY - bone.worldY) * translateMix - skeletonY;
 			float x = positions[p], y = positions[p + 1], dx = x - boneX, dy = y - boneY;
 			if (scale) {
 				float length = lengths[i];
@@ -147,7 +149,7 @@ public class PathConstraint implements Updatable {
 		boolean closed = path.getClosed();
 
 		if (!path.getConstantSpeed()) {
-			float pathLength = path.getTotalLength();
+			float pathLength = path.getLength();
 			if (percentPosition) position *= pathLength;
 			if (percentSpacing) {
 				for (int i = 0; i < spacesCount; i++)
@@ -203,7 +205,7 @@ public class PathConstraint implements Updatable {
 						path.computeWorldVertices(target, curve * 6 + 2, 8, world, 0);
 				}
 				addCurvePosition(p, world[0], world[1], world[2], world[3], world[4], world[5], world[6], world[7], out, o,
-					tangents || (space == 0 && i > 0));
+					tangents || (i > 0 && space == 0));
 			}
 			return out;
 		}
@@ -351,8 +353,7 @@ public class PathConstraint implements Updatable {
 				}
 				break;
 			}
-
-			addCurvePosition(p * 0.1f, x1, y1, cx1, cy1, cx2, cy2, x2, y2, out, o, tangents || (space == 0 && i > 0));
+			addCurvePosition(p * 0.1f, x1, y1, cx1, cy1, cx2, cy2, x2, y2, out, o, tangents || (i > 0 && space == 0));
 		}
 		return out;
 	}

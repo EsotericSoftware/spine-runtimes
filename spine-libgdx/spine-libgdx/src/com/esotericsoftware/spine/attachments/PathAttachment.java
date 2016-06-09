@@ -36,7 +36,7 @@ import com.badlogic.gdx.utils.FloatArray;
 import com.esotericsoftware.spine.Slot;
 
 public class PathAttachment extends VertexAttachment {
-	float totalLength;
+	float length;
 	final FloatArray lengths = new FloatArray();
 	boolean closed, constantSpeed;
 
@@ -72,15 +72,15 @@ public class PathAttachment extends VertexAttachment {
 	}
 
 	/** Returns the length of the path in the setup pose. */
-	public float getTotalLength () {
-		return totalLength;
+	public float getLength () {
+		return length;
 	}
 
-	public void setTotalLength (float totalLength) {
-		this.totalLength = totalLength;
+	public void setLength (float totalLength) {
+		this.length = totalLength;
 	}
 
-	/** Returns the length of each curve in the setup pose. */
+	/** Returns the distance in the setup pose from the start of the path to the end of each curve. */
 	public FloatArray getCurveLengths () {
 		return lengths;
 	}

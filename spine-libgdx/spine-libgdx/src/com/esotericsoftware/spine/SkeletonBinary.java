@@ -57,6 +57,7 @@ import com.esotericsoftware.spine.Animation.ShearTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 import com.esotericsoftware.spine.Animation.TransformConstraintTimeline;
 import com.esotericsoftware.spine.Animation.TranslateTimeline;
+import com.esotericsoftware.spine.PathConstraintData.PositionMode;
 import com.esotericsoftware.spine.PathConstraintData.RotateMode;
 import com.esotericsoftware.spine.PathConstraintData.SpacingMode;
 import com.esotericsoftware.spine.SkeletonJson.LinkedMesh;
@@ -188,6 +189,17 @@ public class SkeletonBinary {
 				skeletonData.bones.add(data);
 			}
 
+			// Slots.
+			for (int i = 0, n = input.readInt(true); i < n; i++) {
+				String slotName = input.readString();
+				BoneData boneData = skeletonData.bones.get(input.readInt(true));
+				SlotData data = new SlotData(i, slotName, boneData);
+				Color.rgba8888ToColor(data.color, input.readInt());
+				data.attachmentName = input.readString();
+				data.blendMode = BlendMode.values[input.readInt(true)];
+				skeletonData.slots.add(data);
+			}
+
 			// IK constraints.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				IkConstraintData data = new IkConstraintData(input.readString());
@@ -223,25 +235,15 @@ public class SkeletonBinary {
 				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++)
 					data.bones.add(skeletonData.bones.get(input.readInt(true)));
 				data.target = skeletonData.slots.get(input.readInt(true));
+				data.positionMode = PositionMode.values[input.readInt(true)];
+				data.spacingMode = SpacingMode.values[input.readInt(true)];
+				data.rotateMode = RotateMode.values[input.readInt(true)];
 				data.offsetRotation = input.readFloat();
 				data.position = input.readFloat();
 				data.spacing = input.readFloat();
-				data.spacingMode = SpacingMode.values[input.readInt(true)];
-				data.rotateMode = RotateMode.values[input.readInt(true)];
 				data.rotateMix = input.readFloat();
 				data.translateMix = input.readFloat();
 				skeletonData.pathConstraints.add(data);
-			}
-
-			// Slots.
-			for (int i = 0, n = input.readInt(true); i < n; i++) {
-				String slotName = input.readString();
-				BoneData boneData = skeletonData.bones.get(input.readInt(true));
-				SlotData data = new SlotData(i, slotName, boneData);
-				Color.rgba8888ToColor(data.color, input.readInt());
-				data.attachmentName = input.readString();
-				data.blendMode = BlendMode.values[input.readInt(true)];
-				skeletonData.slots.add(data);
 			}
 
 			// Default skin.
@@ -422,15 +424,25 @@ public class SkeletonBinary {
 			return mesh;
 		}
 		case path: {
+			boolean closed = input.readBoolean();
+			boolean constantSpeed = input.readBoolean();
 			int vertexCount = input.readInt(true);
 			Vertices vertices = readVertices(input, vertexCount);
+			float length = input.readFloat();
+			float[] curveLengths = new float[vertexCount / 3];
+			for (int i = 0, n = curveLengths.length; i < n; i++)
+				curveLengths[i] = input.readFloat();
 			int color = nonessential ? input.readInt() : 0;
 
 			PathAttachment path = attachmentLoader.newPathAttachment(skin, name);
 			if (path == null) return null;
+			path.setClosed(closed);
+			path.setConstantSpeed(constantSpeed);
+			path.setLength(length);
 			path.setWorldVerticesLength(vertexCount << 1);
 			path.setVertices(vertices.vertices);
 			path.setBones(vertices.bones);
+			path.getCurveLengths().addAll(curveLengths);
 			if (nonessential) Color.rgba8888ToColor(path.getColor(), color);
 			return path;
 		}

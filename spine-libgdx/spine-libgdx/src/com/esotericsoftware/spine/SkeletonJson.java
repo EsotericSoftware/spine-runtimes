@@ -56,6 +56,7 @@ import com.esotericsoftware.spine.Animation.ShearTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 import com.esotericsoftware.spine.Animation.TransformConstraintTimeline;
 import com.esotericsoftware.spine.Animation.TranslateTimeline;
+import com.esotericsoftware.spine.PathConstraintData.PositionMode;
 import com.esotericsoftware.spine.PathConstraintData.RotateMode;
 import com.esotericsoftware.spine.PathConstraintData.SpacingMode;
 import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
@@ -137,6 +138,22 @@ public class SkeletonJson {
 			skeletonData.bones.add(data);
 		}
 
+		// Slots.
+		for (JsonValue slotMap = root.getChild("slots"); slotMap != null; slotMap = slotMap.next) {
+			String slotName = slotMap.getString("name");
+			String boneName = slotMap.getString("bone");
+			BoneData boneData = skeletonData.findBone(boneName);
+			if (boneData == null) throw new SerializationException("Slot bone not found: " + boneName);
+			SlotData data = new SlotData(skeletonData.slots.size, slotName, boneData);
+
+			String color = slotMap.getString("color", null);
+			if (color != null) data.getColor().set(Color.valueOf(color));
+
+			data.attachmentName = slotMap.getString("attachment", null);
+			data.blendMode = BlendMode.valueOf(slotMap.getString("blend", BlendMode.normal.name()));
+			skeletonData.slots.add(data);
+		}
+
 		// IK constraints.
 		for (JsonValue constraintMap = root.getChild("ik"); constraintMap != null; constraintMap = constraintMap.next) {
 			IkConstraintData data = new IkConstraintData(constraintMap.getString("name"));
@@ -200,31 +217,16 @@ public class SkeletonJson {
 			data.target = skeletonData.findSlot(targetName);
 			if (data.target == null) throw new SerializationException("Target slot not found: " + targetName);
 
+			data.positionMode = PositionMode.valueOf(constraintMap.getString("positionMode", "percent"));
+			data.spacingMode = SpacingMode.valueOf(constraintMap.getString("spacingMode", "length"));
+			data.rotateMode = RotateMode.valueOf(constraintMap.getString("rotateMode", "tangent"));
 			data.offsetRotation = constraintMap.getFloat("rotation", 0);
 			data.position = constraintMap.getFloat("position", 0);
 			data.spacing = constraintMap.getFloat("spacing", 0);
-			data.spacingMode = SpacingMode.valueOf(constraintMap.getString("spacingMode", "length"));
-			data.rotateMode = RotateMode.valueOf(constraintMap.getString("rotateMode", "tangent"));
 			data.rotateMix = constraintMap.getFloat("rotateMix", 1);
 			data.translateMix = constraintMap.getFloat("translateMix", 1);
 
 			skeletonData.pathConstraints.add(data);
-		}
-
-		// Slots.
-		for (JsonValue slotMap = root.getChild("slots"); slotMap != null; slotMap = slotMap.next) {
-			String slotName = slotMap.getString("name");
-			String boneName = slotMap.getString("bone");
-			BoneData boneData = skeletonData.findBone(boneName);
-			if (boneData == null) throw new SerializationException("Slot bone not found: " + boneName);
-			SlotData data = new SlotData(skeletonData.slots.size, slotName, boneData);
-
-			String color = slotMap.getString("color", null);
-			if (color != null) data.getColor().set(Color.valueOf(color));
-
-			data.attachmentName = slotMap.getString("attachment", null);
-			data.blendMode = BlendMode.valueOf(slotMap.getString("blend", BlendMode.normal.name()));
-			skeletonData.slots.add(data);
 		}
 
 		// Skins.
@@ -349,7 +351,17 @@ public class SkeletonJson {
 		case path: {
 			PathAttachment path = attachmentLoader.newPathAttachment(skin, name);
 			if (path == null) return null;
-			readVertices(map, path, map.getInt("vertexCount") << 1);
+			path.setClosed(map.getBoolean("closed", false));
+			path.setConstantSpeed(map.getBoolean("constantSpeed", true));
+			path.setLength(map.getFloat("length"));
+
+			int vertexCount = map.getInt("vertexCount");
+			readVertices(map, path, vertexCount << 1);
+
+			float[] curveLengths = path.getCurveLengths().setSize(vertexCount / 3);
+			int i = 0;
+			for (JsonValue curves = map.get("curves").child; curves != null; curves = curves.next)
+				curveLengths[i++] = curves.asFloat();
 
 			String color = map.getString("color", null);
 			if (color != null) path.getColor().set(Color.valueOf(color));
@@ -519,8 +531,8 @@ public class SkeletonJson {
 						timeline = new PathConstraintPositionTimeline(timelineMap.size);
 					timeline.pathConstraintIndex = index;
 					int frameIndex = 0;
-					for (JsonValue valueMap = constraintMap.child; valueMap != null; valueMap = valueMap.next) {
-						timeline.setFrame(frameIndex, valueMap.getFloat("time"), valueMap.getFloat(timelineName, 1));
+					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next) {
+						timeline.setFrame(frameIndex, valueMap.getFloat("time"), valueMap.getFloat(timelineName, 0));
 						readCurve(valueMap, timeline, frameIndex);
 						frameIndex++;
 					}
@@ -531,7 +543,7 @@ public class SkeletonJson {
 					PathConstraintMixTimeline timeline = new PathConstraintMixTimeline(timelineMap.size);
 					timeline.pathConstraintIndex = index;
 					int frameIndex = 0;
-					for (JsonValue valueMap = constraintMap.child; valueMap != null; valueMap = valueMap.next) {
+					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next) {
 						timeline.setFrame(frameIndex, valueMap.getFloat("time"), valueMap.getFloat("rotateMix", 1),
 							valueMap.getFloat("translateMix", 1));
 						readCurve(valueMap, timeline, frameIndex);
