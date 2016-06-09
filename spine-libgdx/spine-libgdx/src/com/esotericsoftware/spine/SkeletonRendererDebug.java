@@ -171,18 +171,32 @@ public class SkeletonRendererDebug {
 				if (!(attachment instanceof PathAttachment)) continue;
 				PathAttachment path = (PathAttachment)attachment;
 				int nn = path.getWorldVerticesLength();
-				float[] worldVertices = temp.setSize(nn);
-				path.computeWorldVertices(slot, worldVertices);
-				shapes.setColor(path.getColor());
-				float x1 = worldVertices[0], y1 = worldVertices[1];
-				float cx1 = x1 + (x1 - worldVertices[2]), cy1 = y1 + (y1 - worldVertices[3]);
-				for (int ii = 4; ii < nn; ii += 4) {
-					float x2 = worldVertices[ii], y2 = worldVertices[ii + 1], cx2 = worldVertices[ii + 2], cy2 = worldVertices[ii + 3];
+				float[] world = temp.setSize(nn);
+				path.computeWorldVertices(slot, world);
+				Color color = path.getColor();
+				float x1 = world[2], y1 = world[3], x2 = 0, y2 = 0;
+				if (path.getClosed()) {
+					shapes.setColor(color);
+					float cx1 = world[0], cy1 = world[1], cx2 = world[nn - 2], cy2 = world[nn - 1];
+					x2 = world[nn - 4];
+					y2 = world[nn - 3];
 					shapes.curve(x1, y1, cx1, cy1, cx2, cy2, x2, y2, 32);
+					shapes.setColor(Color.LIGHT_GRAY);
+					shapes.line(x1, y1, cx1, cy1);
+					shapes.line(x2, y2, cx2, cy2);
+				}
+				nn -= 4;
+				for (int ii = 4; ii < nn; ii += 6) {
+					float cx1 = world[ii], cy1 = world[ii + 1], cx2 = world[ii + 2], cy2 = world[ii + 3];
+					x2 = world[ii + 4];
+					y2 = world[ii + 5];
+					shapes.setColor(color);
+					shapes.curve(x1, y1, cx1, cy1, cx2, cy2, x2, y2, 32);
+					shapes.setColor(Color.LIGHT_GRAY);
+					shapes.line(x1, y1, cx1, cy1);
+					shapes.line(x2, y2, cx2, cy2);
 					x1 = x2;
 					y1 = y2;
-					cx1 = x2 + (x2 - cx2);
-					cy1 = y2 + (y2 - cy2);
 				}
 			}
 		}
