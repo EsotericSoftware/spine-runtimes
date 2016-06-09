@@ -50,6 +50,10 @@ public class SlotData {
 		this.boneData = boneData;
 	}
 
+	public int getIndex () {
+		return index;
+	}
+
 	public String getName () {
 		return name;
 	}
