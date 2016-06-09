@@ -222,7 +222,9 @@ public class SkeletonJson {
 			data.rotateMode = RotateMode.valueOf(constraintMap.getString("rotateMode", "tangent"));
 			data.offsetRotation = constraintMap.getFloat("rotation", 0);
 			data.position = constraintMap.getFloat("position", 0);
+			if (data.positionMode == PositionMode.fixed) data.position *= scale;
 			data.spacing = constraintMap.getFloat("spacing", 0);
+			if (data.spacingMode == SpacingMode.length || data.spacingMode == SpacingMode.fixed) data.spacing *= scale;
 			data.rotateMix = constraintMap.getFloat("rotateMix", 1);
 			data.translateMix = constraintMap.getFloat("translateMix", 1);
 
@@ -353,15 +355,14 @@ public class SkeletonJson {
 			if (path == null) return null;
 			path.setClosed(map.getBoolean("closed", false));
 			path.setConstantSpeed(map.getBoolean("constantSpeed", true));
-			path.setLength(map.getFloat("length"));
 
 			int vertexCount = map.getInt("vertexCount");
 			readVertices(map, path, vertexCount << 1);
 
-			float[] curveLengths = path.getCurveLengths().setSize(vertexCount / 3);
+			float[] lengths = path.getLengths().setSize(vertexCount / 3);
 			int i = 0;
-			for (JsonValue curves = map.get("curves").child; curves != null; curves = curves.next)
-				curveLengths[i++] = curves.asFloat();
+			for (JsonValue curves = map.require("lengths").child; curves != null; curves = curves.next)
+				lengths[i++] = curves.asFloat() * scale;
 
 			String color = map.getString("color", null);
 			if (color != null) path.getColor().set(Color.valueOf(color));
@@ -521,18 +522,23 @@ public class SkeletonJson {
 		for (JsonValue constraintMap = map.getChild("paths"); constraintMap != null; constraintMap = constraintMap.next) {
 			int index = skeletonData.findPathConstraintIndex(constraintMap.name);
 			if (index == -1) throw new SerializationException("Path constraint not found: " + constraintMap.name);
+			PathConstraintData data = skeletonData.getPathConstraints().get(index);
 			for (JsonValue timelineMap = constraintMap.child; timelineMap != null; timelineMap = timelineMap.next) {
 				String timelineName = timelineMap.name;
 				if (timelineName.equals("position") || timelineName.equals("spacing")) {
 					PathConstraintPositionTimeline timeline;
-					if (timelineName.equals("spacing"))
+					float timelineScale = 1;
+					if (timelineName.equals("spacing")) {
 						timeline = new PathConstraintSpacingTimeline(timelineMap.size);
-					else
+						if (data.spacingMode == SpacingMode.length || data.spacingMode == SpacingMode.fixed) timelineScale = scale;
+					} else {
 						timeline = new PathConstraintPositionTimeline(timelineMap.size);
+						if (data.positionMode == PositionMode.fixed) timelineScale = scale;
+					}
 					timeline.pathConstraintIndex = index;
 					int frameIndex = 0;
 					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next) {
-						timeline.setFrame(frameIndex, valueMap.getFloat("time"), valueMap.getFloat(timelineName, 0));
+						timeline.setFrame(frameIndex, valueMap.getFloat("time"), valueMap.getFloat(timelineName, 0) * timelineScale);
 						readCurve(valueMap, timeline, frameIndex);
 						frameIndex++;
 					}

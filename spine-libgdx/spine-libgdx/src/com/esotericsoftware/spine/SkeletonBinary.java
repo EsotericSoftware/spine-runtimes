@@ -240,7 +240,9 @@ public class SkeletonBinary {
 				data.rotateMode = RotateMode.values[input.readInt(true)];
 				data.offsetRotation = input.readFloat();
 				data.position = input.readFloat();
+				if (data.positionMode == PositionMode.fixed) data.position *= scale;
 				data.spacing = input.readFloat();
+				if (data.spacingMode == SpacingMode.length || data.spacingMode == SpacingMode.fixed) data.spacing *= scale;
 				data.rotateMix = input.readFloat();
 				data.translateMix = input.readFloat();
 				skeletonData.pathConstraints.add(data);
@@ -428,21 +430,19 @@ public class SkeletonBinary {
 			boolean constantSpeed = input.readBoolean();
 			int vertexCount = input.readInt(true);
 			Vertices vertices = readVertices(input, vertexCount);
-			float length = input.readFloat();
-			float[] curveLengths = new float[vertexCount / 3];
-			for (int i = 0, n = curveLengths.length; i < n; i++)
-				curveLengths[i] = input.readFloat();
+			float[] lengths = new float[vertexCount / 3];
+			for (int i = 0, n = lengths.length; i < n; i++)
+				lengths[i] = input.readFloat() * scale;
 			int color = nonessential ? input.readInt() : 0;
 
 			PathAttachment path = attachmentLoader.newPathAttachment(skin, name);
 			if (path == null) return null;
 			path.setClosed(closed);
 			path.setConstantSpeed(constantSpeed);
-			path.setLength(length);
 			path.setWorldVerticesLength(vertexCount << 1);
 			path.setVertices(vertices.vertices);
 			path.setBones(vertices.bones);
-			path.getCurveLengths().addAll(curveLengths);
+			path.getLengths().addAll(lengths);
 			if (nonessential) Color.rgba8888ToColor(path.getColor(), color);
 			return path;
 		}
@@ -609,6 +609,7 @@ public class SkeletonBinary {
 			// Path constraint timelines.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				int index = input.readInt(true);
+				PathConstraintData data = skeletonData.getPathConstraints().get(index);
 				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 					int timelineType = input.readByte();
 					int frameCount = input.readInt(true);
@@ -616,13 +617,17 @@ public class SkeletonBinary {
 					case PATH_POSITION:
 					case PATH_SPACING: {
 						PathConstraintPositionTimeline timeline;
-						if (timelineType == PATH_SPACING)
+						float timelineScale = 1;
+						if (timelineType == PATH_SPACING) {
 							timeline = new PathConstraintSpacingTimeline(frameCount);
-						else
+							if (data.spacingMode == SpacingMode.length || data.spacingMode == SpacingMode.fixed) timelineScale = scale;
+						} else {
 							timeline = new PathConstraintPositionTimeline(frameCount);
+							if (data.positionMode == PositionMode.fixed) timelineScale = scale;
+						}
 						timeline.pathConstraintIndex = index;
 						for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-							timeline.setFrame(frameIndex, input.readFloat(), input.readFloat());
+							timeline.setFrame(frameIndex, input.readFloat(), input.readFloat() * timelineScale);
 							if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
 						}
 						timelines.add(timeline);

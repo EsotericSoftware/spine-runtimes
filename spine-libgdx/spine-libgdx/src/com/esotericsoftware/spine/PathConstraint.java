@@ -66,12 +66,12 @@ public class PathConstraint implements Updatable {
 		if (!translate && !rotate) return;
 
 		PathConstraintData data = this.data;
-		Object[] bones = this.bones.items;
 		SpacingMode spacingMode = data.spacingMode;
+		boolean lengthSpacing = spacingMode == SpacingMode.length;
 		RotateMode rotateMode = data.rotateMode;
 		boolean tangents = rotateMode == RotateMode.tangent, scale = rotateMode == RotateMode.chainScale;
-		boolean lengthSpacing = spacingMode == SpacingMode.length;
 		int boneCount = this.bones.size, spacesCount = tangents ? boneCount : boneCount + 1;
+		Object[] bones = this.bones.items;
 		float[] spaces = this.spaces.setSize(spacesCount), lengths = null;
 		float spacing = this.spacing;
 		if (scale || lengthSpacing) {
@@ -96,8 +96,8 @@ public class PathConstraint implements Updatable {
 		boolean tip = rotateMode == RotateMode.chain && offsetRotation == 0;
 		for (int i = 0, p = 3; i < boneCount; i++, p += 3) {
 			Bone bone = (Bone)bones[i];
-			bone.worldX += (boneX - bone.worldX) * translateMix - skeletonX;
-			bone.worldY += (boneY - bone.worldY) * translateMix - skeletonY;
+			bone.worldX += (boneX - skeletonX - bone.worldX) * translateMix;
+			bone.worldY += (boneY - skeletonY - bone.worldY) * translateMix;
 			float x = positions[p], y = positions[p + 1], dx = x - boneX, dy = y - boneY;
 			if (scale) {
 				float length = lengths[i];
@@ -149,14 +149,18 @@ public class PathConstraint implements Updatable {
 		boolean closed = path.getClosed();
 
 		if (!path.getConstantSpeed()) {
-			float pathLength = path.getLength();
+			float[] lengths = path.getLengths().items;
+			float pathLength;
+			if (closed) {
+				curveCount--;
+				pathLength = lengths[curveCount];
+			} else
+				pathLength = lengths[curveCount - 2];
 			if (percentPosition) position *= pathLength;
 			if (percentSpacing) {
 				for (int i = 0; i < spacesCount; i++)
 					spaces[i] *= pathLength;
 			}
-			curveCount--;
-			float[] curveLengths = path.getCurveLengths().items;
 			world = this.world.setSize(8);
 			for (int i = 0, o = 0, curve = 0; i < spacesCount; i++, o += 3) {
 				float space = spaces[i];
@@ -185,17 +189,16 @@ public class PathConstraint implements Updatable {
 
 				// Determine curve containing position.
 				for (;; curve++) {
-					float length = curveLengths[curve];
+					float length = lengths[curve];
 					if (p > length) continue;
 					if (curve == 0)
 						p /= length;
 					else {
-						float prev = curveLengths[curve - 1];
+						float prev = lengths[curve - 1];
 						p = (p - prev) / (length - prev);
 					}
 					break;
 				}
-
 				if (curve != lastCurve) {
 					lastCurve = curve;
 					if (closed && curve == curveCount) {

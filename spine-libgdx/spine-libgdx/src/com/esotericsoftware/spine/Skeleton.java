@@ -237,8 +237,6 @@ public class Skeleton {
 
 		for (int i = 0, n = bones.size; i < n; i++)
 			sortBone(bones.get(i));
-
-		System.out.println(updateCache);
 	}
 
 	private void sortBone (Bone bone) {
