@@ -217,7 +217,8 @@ public class SkeletonBinary {
 			// Transform constraints.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				TransformConstraintData data = new TransformConstraintData(input.readString());
-				data.bone = skeletonData.bones.get(input.readInt(true));
+				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++)
+					data.bones.add(skeletonData.bones.get(input.readInt(true)));
 				data.target = skeletonData.bones.get(input.readInt(true));
 				data.offsetRotation = input.readFloat();
 				data.offsetX = input.readFloat() * scale;

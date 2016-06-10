@@ -227,21 +227,17 @@ public class Skeleton {
 
 			sortBone(constraint.target);
 
-			// BOZO! - Update transform constraints to support multiple constrained bones.
-			// Array<Bone> constrained = constraint.bones;
-			// int boneCount = constrained.size;
-			// for (int ii = 0; ii < boneCount; ii++)
-			// sortBone(constrained.get(ii));
-			sortBone(constraint.bone);
+			Array<Bone> constrained = constraint.bones;
+			int boneCount = constrained.size;
+			for (int ii = 0; ii < boneCount; ii++)
+				sortBone(constrained.get(ii));
 
 			updateCache.add(constraint);
 
-			// for (int ii = 0; ii < boneCount; ii++)
-			// reset(constrained.get(ii).children);
-			sortReset(constraint.bone.children); // BOZO - Remove.
-			// for (int ii = 0; ii < boneCount; ii++)
-			// constrained.get(ii).sorted = true;
-			constraint.bone.sorted = true; // BOZO - Remove.
+			for (int ii = 0; ii < boneCount; ii++)
+				sortReset(constrained.get(ii).children);
+			for (int ii = 0; ii < boneCount; ii++)
+				constrained.get(ii).sorted = true;
 		}
 
 		for (int i = 0, n = bones.size; i < n; i++)
