@@ -197,13 +197,11 @@ public class Skeleton {
 			Slot slot = constraint.target;
 			int slotIndex = slot.getData().index;
 			Bone slotBone = slot.bone;
-			if (skin != null) {
-				for (Entry<Key, Attachment> entry : skin.attachments.entries())
-					if (entry.key.slotIndex == slotIndex) sortPathConstraintAttachment(entry.value, slotBone);
-			}
+			if (skin != null) sortPathConstraintAttachment(skin, slotIndex, slotBone);
+			if (data.defaultSkin != null && data.defaultSkin != skin)
+				sortPathConstraintAttachment(data.defaultSkin, slotIndex, slotBone);
 			for (int ii = 0, nn = data.skins.size; ii < nn; ii++)
-				for (Entry<Key, Attachment> entry : data.skins.get(i).attachments.entries())
-					if (entry.key.slotIndex == slotIndex) sortPathConstraintAttachment(entry.value, slotBone);
+				sortPathConstraintAttachment(data.skins.get(ii), slotIndex, slotBone);
 
 			Attachment attachment = slot.getAttachment();
 			if (attachment instanceof PathAttachment) sortPathConstraintAttachment(attachment, slotBone);
@@ -242,6 +240,11 @@ public class Skeleton {
 
 		for (int i = 0, n = bones.size; i < n; i++)
 			sortBone(bones.get(i));
+	}
+
+	private void sortPathConstraintAttachment (Skin skin, int slotIndex, Bone slotBone) {
+		for (Entry<Key, Attachment> entry : skin.attachments.entries())
+			if (entry.key.slotIndex == slotIndex) sortPathConstraintAttachment(entry.value, slotBone);
 	}
 
 	private void sortPathConstraintAttachment (Attachment attachment, Bone slotBone) {
