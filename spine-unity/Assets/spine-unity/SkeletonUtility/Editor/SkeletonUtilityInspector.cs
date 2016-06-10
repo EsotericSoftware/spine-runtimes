@@ -114,8 +114,8 @@ namespace Spine.Unity.Editor {
 				Vector3 forward = transform.TransformDirection(rot * Vector3.right);
 				forward *= flipRotation;
 
-				SpineEditorUtilities.Icons.boneMaterial.SetPass(0);
-				Graphics.DrawMeshNow(SpineEditorUtilities.Icons.boneMesh, Matrix4x4.TRS(vec, Quaternion.LookRotation(transform.forward, forward), Vector3.one * b.Data.Length * b.WorldScaleX));
+				SpineEditorUtilities.Icons.BoneMaterial.SetPass(0);
+				Graphics.DrawMeshNow(SpineEditorUtilities.Icons.BoneMesh, Matrix4x4.TRS(vec, Quaternion.LookRotation(transform.forward, forward), Vector3.one * b.Data.Length * b.WorldScaleX));
 			}
 		}
 
