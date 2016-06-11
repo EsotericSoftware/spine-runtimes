@@ -199,28 +199,25 @@ function AnimationState.new (data)
 	-- Adds an animation to be played delay seconds after the current or last queued animation.
 	-- @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay.
 	function self:addAnimation (trackIndex, animation, loop, delay)
-		local entry = AnimationState.TrackEntry.new()
-		entry.animation = animation
-		entry.loop = loop
-		entry.endTime = animation.duration
-
 		local last = self.tracks[trackIndex]
 		if last then
 			while (last.next) do
 				last = last.next
 			end
-			last.next = entry
-		else
-			self.tracks[trackIndex] = entry
-		end
+        else
+            return self:setAnimation(trackIndex, animation, loop, delay)
+        end
+
+        local entry = AnimationState.TrackEntry.new()
+        entry.animation = animation
+        entry.loop = loop
+        entry.endTime = animation.duration
+
+		last.next = entry
 
 		delay = delay or 0
 		if delay <= 0 then
-			if last then
-				delay = delay + last.endTime - self.data:getMix(last.animation.name, animation.name)
-			else
-				delay = 0
-			end
+			delay = delay + last.endTime - self.data:getMix(last.animation.name, animation.name)
 		end
 		entry.delay = delay
 
