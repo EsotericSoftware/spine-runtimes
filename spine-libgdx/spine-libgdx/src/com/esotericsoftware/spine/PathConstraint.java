@@ -148,7 +148,7 @@ public class PathConstraint implements Updatable {
 		boolean closed = path.getClosed();
 		int verticesLength = path.getWorldVerticesLength(), curveCount = verticesLength / 6, prevCurve = NONE;
 
-		if (!path.getConstantSpeed()) {
+		if (!path.getAccurate()) {
 			float[] lengths = path.getLengths();
 			curveCount -= closed ? 1 : 2;
 			float pathLength = lengths[curveCount];

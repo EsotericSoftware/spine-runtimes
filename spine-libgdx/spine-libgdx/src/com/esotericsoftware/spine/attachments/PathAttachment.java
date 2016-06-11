@@ -36,7 +36,7 @@ import com.esotericsoftware.spine.Slot;
 
 public class PathAttachment extends VertexAttachment {
 	float[] lengths;
-	boolean closed, constantSpeed;
+	boolean closed, accurate;
 
 	// Nonessential.
 	final Color color = new Color(1, 0.5f, 0, 1);
@@ -61,12 +61,12 @@ public class PathAttachment extends VertexAttachment {
 		this.closed = closed;
 	}
 
-	public boolean getConstantSpeed () {
-		return constantSpeed;
+	public boolean getAccurate () {
+		return accurate;
 	}
 
-	public void setConstantSpeed (boolean constantSpeed) {
-		this.constantSpeed = constantSpeed;
+	public void setAccurate (boolean accurate) {
+		this.accurate = accurate;
 	}
 
 	/** Returns the length in the setup pose from the start of the path to the end of each curve. */

@@ -357,7 +357,7 @@ public class SkeletonJson {
 			PathAttachment path = attachmentLoader.newPathAttachment(skin, name);
 			if (path == null) return null;
 			path.setClosed(map.getBoolean("closed", false));
-			path.setConstantSpeed(map.getBoolean("constantSpeed", true));
+			path.setAccurate(map.getBoolean("accurate", true));
 
 			int vertexCount = map.getInt("vertexCount");
 			readVertices(map, path, vertexCount << 1);
