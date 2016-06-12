@@ -431,7 +431,7 @@ public class SkeletonBinary {
 		}
 		case path: {
 			boolean closed = input.readBoolean();
-			boolean accurate = input.readBoolean();
+			boolean constantSpeed = input.readBoolean();
 			int vertexCount = input.readInt(true);
 			Vertices vertices = readVertices(input, vertexCount);
 			float[] lengths = new float[vertexCount / 3];
@@ -442,7 +442,7 @@ public class SkeletonBinary {
 			PathAttachment path = attachmentLoader.newPathAttachment(skin, name);
 			if (path == null) return null;
 			path.setClosed(closed);
-			path.setAccurate(accurate);
+			path.setConstantSpeed(constantSpeed);
 			path.setWorldVerticesLength(vertexCount << 1);
 			path.setVertices(vertices.vertices);
 			path.setBones(vertices.bones);
