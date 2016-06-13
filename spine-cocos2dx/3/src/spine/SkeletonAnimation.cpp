@@ -91,6 +91,7 @@ SkeletonAnimation* SkeletonAnimation::createWithFile (const std::string& skeleto
 
 void SkeletonAnimation::initialize () {
 	_ownsAnimationStateData = true;
+    _isAnimationPaused = false;
 	_state = spAnimationState_create(spAnimationStateData_create(_skeleton->data));
 	_state->rendererObject = this;
 	_state->listener = animationCallback;
@@ -127,6 +128,11 @@ void SkeletonAnimation::update (float deltaTime) {
 	super::update(deltaTime);
 
 	deltaTime *= _timeScale;
+    
+    if (_isAnimationPaused) {
+        deltaTime = 0;
+    }
+    
 	spAnimationState_update(_state, deltaTime);
 	spAnimationState_apply(_state, _skeleton);
 	spSkeleton_updateWorldTransform(_skeleton);
@@ -249,6 +255,32 @@ void SkeletonAnimation::setTrackEventListener (spTrackEntry* entry, const EventL
 
 spAnimationState* SkeletonAnimation::getState() const {
 	return _state;
+}
+    
+void SkeletonAnimation::gotoAndPlay(int frame) {
+    spTrackEntry* entry = getCurrent();
+    if (!entry) {
+        return;
+    }
+    entry->time = (float)frame / 30.0;
+    resumeAnimation();
+}
+
+void SkeletonAnimation::gotoAndStop(int frame) {
+    spTrackEntry* entry = getCurrent();
+    if (!entry) {
+        return;
+    }
+    entry->time = (float)frame / 30.0;
+    pauseAnimation();
+}
+
+void SkeletonAnimation::pauseAnimation() {
+    _isAnimationPaused = true;
+}
+
+void SkeletonAnimation::resumeAnimation() {
+    _isAnimationPaused = false;
 }
 
 }
