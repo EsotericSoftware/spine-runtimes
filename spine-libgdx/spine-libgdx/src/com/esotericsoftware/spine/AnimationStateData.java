@@ -41,6 +41,7 @@ public class AnimationStateData {
 	float defaultMix;
 
 	public AnimationStateData (SkeletonData skeletonData) {
+		if (skeletonData == null) throw new IllegalArgumentException("skeletonData cannot be null.");
 		this.skeletonData = skeletonData;
 	}
 

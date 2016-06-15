@@ -36,23 +36,21 @@ import static com.badlogic.gdx.math.Matrix3.*;
 
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 public class Bone implements Updatable {
 	final BoneData data;
 	final Skeleton skeleton;
 	final Bone parent;
+	final Array<Bone> children = new Array();
 	float x, y, rotation, scaleX, scaleY, shearX, shearY;
-	float appliedRotation, appliedScaleX, appliedScaleY;
+	float appliedRotation;
 
 	float a, b, worldX;
 	float c, d, worldY;
 	float worldSignX, worldSignY;
 
-	Bone (BoneData data) {
-		this.data = data;
-		parent = null;
-		skeleton = null;
-	}
+	boolean sorted;
 
 	/** @param parent May be null. */
 	public Bone (BoneData data, Skeleton skeleton, Bone parent) {
@@ -68,6 +66,7 @@ public class Bone implements Updatable {
 	 * @param parent May be null. */
 	public Bone (Bone bone, Skeleton skeleton, Bone parent) {
 		if (bone == null) throw new IllegalArgumentException("bone cannot be null.");
+		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		this.skeleton = skeleton;
 		this.parent = parent;
 		data = bone.data;
@@ -85,16 +84,14 @@ public class Bone implements Updatable {
 		updateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
 	}
 
-	/** Computes the world SRT using the parent bone and this bone's local SRT. */
+	/** Computes the world transform using the parent bone and this bone's local transform. */
 	public void updateWorldTransform () {
 		updateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
 	}
 
-	/** Computes the world SRT using the parent bone and the specified local SRT. */
+	/** Computes the world transform using the parent bone and the specified local transform. */
 	public void updateWorldTransform (float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY) {
 		appliedRotation = rotation;
-		appliedScaleX = scaleX;
-		appliedScaleY = scaleY;
 
 		float rotationY = rotation + 90 + shearY;
 		float la = cosDeg(rotation + shearX) * scaleX, lb = cosDeg(rotationY) * scaleY;
@@ -144,10 +141,10 @@ public class Bone implements Updatable {
 				do {
 					float cos = cosDeg(parent.appliedRotation), sin = sinDeg(parent.appliedRotation);
 					float temp = pa * cos + pb * sin;
-					pb = pa * -sin + pb * cos;
+					pb = pb * cos - pa * sin;
 					pa = temp;
 					temp = pc * cos + pd * sin;
-					pd = pc * -sin + pd * cos;
+					pd = pd * cos - pc * sin;
 					pc = temp;
 
 					if (!parent.data.inheritRotation) break;
@@ -163,24 +160,22 @@ public class Bone implements Updatable {
 				pc = 0;
 				pd = 1;
 				do {
-					float r = parent.appliedRotation, cos = cosDeg(r), sin = sinDeg(r);
-					float psx = parent.appliedScaleX, psy = parent.appliedScaleY;
-					float za = cos * psx, zb = -sin * psy, zc = sin * psx, zd = cos * psy;
+					float cos = cosDeg(parent.appliedRotation), sin = sinDeg(parent.appliedRotation);
+					float psx = parent.scaleX, psy = parent.scaleY;
+					float za = cos * psx, zb = sin * psy, zc = sin * psx, zd = cos * psy;
 					float temp = pa * za + pb * zc;
-					pb = pa * zb + pb * zd;
+					pb = pb * zd - pa * zb;
 					pa = temp;
 					temp = pc * za + pd * zc;
-					pd = pc * zb + pd * zd;
+					pd = pd * zd - pc * zb;
 					pc = temp;
 
-					if (psx < 0) r = -r;
-					cos = cosDeg(-r);
-					sin = sinDeg(-r);
+					if (psx >= 0) sin = -sin;
 					temp = pa * cos + pb * sin;
-					pb = pa * -sin + pb * cos;
+					pb = pb * cos - pa * sin;
 					pa = temp;
 					temp = pc * cos + pd * sin;
-					pd = pc * -sin + pd * cos;
+					pd = pd * cos - pc * sin;
 					pc = temp;
 
 					if (!parent.data.inheritScale) break;
@@ -228,6 +223,10 @@ public class Bone implements Updatable {
 
 	public Bone getParent () {
 		return parent;
+	}
+
+	public Array<Bone> getChildren () {
+		return children;
 	}
 
 	public float getX () {
@@ -349,6 +348,76 @@ public class Bone implements Updatable {
 		return (float)Math.sqrt(c * c + d * d) * worldSignY;
 	}
 
+	public float worldToLocalRotationX () {
+		Bone parent = this.parent;
+		if (parent == null) return rotation;
+		float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d, a = this.a, c = this.c;
+		return atan2(pa * c - pc * a, pd * a - pb * c) * radDeg;
+	}
+
+	public float worldToLocalRotationY () {
+		Bone parent = this.parent;
+		if (parent == null) return rotation;
+		float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d, b = this.b, d = this.d;
+		return atan2(pa * d - pc * b, pd * b - pb * d) * radDeg;
+	}
+
+	public void rotateWorld (float degrees) {
+		float a = this.a, b = this.b, c = this.c, d = this.d;
+		float cos = cosDeg(degrees), sin = sinDeg(degrees);
+		this.a = cos * a - sin * c;
+		this.b = cos * b - sin * d;
+		this.c = sin * a + cos * c;
+		this.d = sin * b + cos * d;
+	}
+
+	/** Computes the local transform from the world transform. This can be useful to perform processing on the local transform
+	 * after the world transform has been modified directly (eg, by a constraint).
+	 * <p>
+	 * Some redundant information is lost by the world transform, such as -1,-1 scale versus 180 rotation. The computed local
+	 * transform values may differ from the original values but are functionally the same. */
+	public void updateLocalTransform () {
+		Bone parent = this.parent;
+		if (parent == null) {
+			x = worldX;
+			y = worldY;
+			rotation = atan2(c, a) * radDeg;
+			scaleX = (float)Math.sqrt(a * a + c * c);
+			scaleY = (float)Math.sqrt(b * b + d * d);
+			float det = a * d - b * c;
+			shearX = 0;
+			shearY = atan2(a * b + c * d, det) * radDeg;
+			return;
+		}
+		float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
+		float pid = 1 / (pa * pd - pb * pc);
+		float dx = worldX - parent.worldX, dy = worldY - parent.worldY;
+		x = (dx * pd * pid - dy * pb * pid);
+		y = (dy * pa * pid - dx * pc * pid);
+		float ia = pid * pd;
+		float id = pid * pa;
+		float ib = pid * pb;
+		float ic = pid * pc;
+		float ra = ia * a - ib * c;
+		float rb = ia * b - ib * d;
+		float rc = id * c - ic * a;
+		float rd = id * d - ic * b;
+		shearX = 0;
+		scaleX = (float)Math.sqrt(ra * ra + rc * rc);
+		if (scaleX > 0.0001f) {
+			float det = ra * rd - rb * rc;
+			scaleY = det / scaleX;
+			shearY = atan2(ra * rb + rc * rd, det) * radDeg;
+			rotation = atan2(rc, ra) * radDeg;
+		} else {
+			scaleX = 0;
+			scaleY = (float)Math.sqrt(rb * rb + rd * rd);
+			shearY = 0;
+			rotation = 90 - atan2(rd, rb) * radDeg;
+		}
+		appliedRotation = rotation;
+	}
+
 	public Matrix3 getWorldTransform (Matrix3 worldTransform) {
 		if (worldTransform == null) throw new IllegalArgumentException("worldTransform cannot be null.");
 		float[] val = worldTransform.val;
@@ -365,9 +434,9 @@ public class Bone implements Updatable {
 	}
 
 	public Vector2 worldToLocal (Vector2 world) {
-		float x = world.x - worldX, y = world.y - worldY;
 		float a = this.a, b = this.b, c = this.c, d = this.d;
 		float invDet = 1 / (a * d - b * c);
+		float x = world.x - worldX, y = world.y - worldY;
 		world.x = (x * d * invDet - y * b * invDet);
 		world.y = (y * a * invDet - x * c * invDet);
 		return world;

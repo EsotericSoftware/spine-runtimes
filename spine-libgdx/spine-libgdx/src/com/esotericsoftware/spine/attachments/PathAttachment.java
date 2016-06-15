@@ -31,71 +31,54 @@
 
 package com.esotericsoftware.spine.attachments;
 
+import com.badlogic.gdx.graphics.Color;
 import com.esotericsoftware.spine.Slot;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
+public class PathAttachment extends VertexAttachment {
+	float[] lengths;
+	boolean closed, constantSpeed;
 
-/** Attachment that displays various texture regions over time. */
-public class RegionSequenceAttachment extends RegionAttachment {
-	private Mode mode;
-	private float frameTime;
-	private TextureRegion[] regions;
+	// Nonessential.
+	final Color color = new Color(1, 0.5f, 0, 1);
 
-	public RegionSequenceAttachment (String name) {
+	public PathAttachment (String name) {
 		super(name);
 	}
 
-	public float[] updateWorldVertices (Slot slot, boolean premultipliedAlpha) {
-		if (regions == null) throw new IllegalStateException("Regions have not been set: " + this);
-
-		int frameIndex = (int)(slot.getAttachmentTime() / frameTime);
-		switch (mode) {
-		case forward:
-			frameIndex = Math.min(regions.length - 1, frameIndex);
-			break;
-		case forwardLoop:
-			frameIndex = frameIndex % regions.length;
-			break;
-		case pingPong:
-			frameIndex = frameIndex % (regions.length << 1);
-			if (frameIndex >= regions.length) frameIndex = regions.length - 1 - (frameIndex - regions.length);
-			break;
-		case random:
-			frameIndex = MathUtils.random(regions.length - 1);
-			break;
-		case backward:
-			frameIndex = Math.max(regions.length - frameIndex - 1, 0);
-			break;
-		case backwardLoop:
-			frameIndex = frameIndex % regions.length;
-			frameIndex = regions.length - frameIndex - 1;
-			break;
-		}
-		setRegion(regions[frameIndex]);
-
-		return super.updateWorldVertices(slot, premultipliedAlpha);
+	public void computeWorldVertices (Slot slot, float[] worldVertices) {
+		super.computeWorldVertices(slot, worldVertices);
 	}
 
-	public TextureRegion[] getRegions () {
-		if (regions == null) throw new IllegalStateException("Regions have not been set: " + this);
-		return regions;
+	public void computeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset) {
+		super.computeWorldVertices(slot, start, count, worldVertices, offset);
 	}
 
-	public void setRegions (TextureRegion[] regions) {
-		this.regions = regions;
+	public boolean getClosed () {
+		return closed;
 	}
 
-	/** Sets the time in seconds each frame is shown. */
-	public void setFrameTime (float frameTime) {
-		this.frameTime = frameTime;
+	public void setClosed (boolean closed) {
+		this.closed = closed;
 	}
 
-	public void setMode (Mode mode) {
-		this.mode = mode;
+	public boolean getConstantSpeed () {
+		return constantSpeed;
 	}
 
-	static public enum Mode {
-		forward, backward, forwardLoop, backwardLoop, pingPong, random
+	public void setConstantSpeed (boolean constantSpeed) {
+		this.constantSpeed = constantSpeed;
+	}
+
+	/** Returns the length in the setup pose from the start of the path to the end of each curve. */
+	public float[] getLengths () {
+		return lengths;
+	}
+
+	public void setLengths (float[] lengths) {
+		this.lengths = lengths;
+	}
+
+	public Color getColor () {
+		return color;
 	}
 }

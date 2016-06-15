@@ -1,13 +1,17 @@
 
 package com.esotericsoftware.spine;
 
+import com.badlogic.gdx.utils.Array;
+
 public class TransformConstraintData {
 	final String name;
-	BoneData bone, target;
+	final Array<BoneData> bones = new Array();
+	BoneData target;
 	float rotateMix, translateMix, scaleMix, shearMix;
 	float offsetRotation, offsetX, offsetY, offsetScaleX, offsetScaleY, offsetShearY;
 
 	public TransformConstraintData (String name) {
+		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		this.name = name;
 	}
 
@@ -15,12 +19,8 @@ public class TransformConstraintData {
 		return name;
 	}
 
-	public BoneData getBone () {
-		return bone;
-	}
-
-	public void setBone (BoneData bone) {
-		this.bone = bone;
+	public Array<BoneData> getBones () {
+		return bones;
 	}
 
 	public BoneData getTarget () {
@@ -28,6 +28,7 @@ public class TransformConstraintData {
 	}
 
 	public void setTarget (BoneData target) {
+		if (target == null) throw new IllegalArgumentException("target cannot be null.");
 		this.target = target;
 	}
 
