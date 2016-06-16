@@ -113,13 +113,19 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	self = [super init];
 	if (!self) return nil;
 
-	_atlas = spAtlas_createFromFile([atlasFile UTF8String], 0);
+  @synchronized(self.class) {
+    _atlas = spAtlas_createFromFile([atlasFile UTF8String], 0);
+  };
 	NSAssert(_atlas, ([NSString stringWithFormat:@"Error reading atlas file: %@", atlasFile]));
 	if (!_atlas) return 0;
 
 	spSkeletonJson* json = spSkeletonJson_create(_atlas);
 	json->scale = scale;
-	spSkeletonData* skeletonData = spSkeletonJson_readSkeletonDataFile(json, [skeletonDataFile UTF8String]);
+  spSkeletonData* skeletonData;
+  @synchronized(self.class) {
+    skeletonData = spSkeletonJson_readSkeletonDataFile(json, [skeletonDataFile UTF8String]);
+  };
+  
 	NSAssert(skeletonData, ([NSString stringWithFormat:@"Error reading skeleton data file: %@\nError: %s", skeletonDataFile, json->error]));
 	spSkeletonJson_dispose(json);
 	if (!skeletonData) return 0;
@@ -231,7 +237,7 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 			CGSize size = texture.contentSize;
 			GLKVector2 center = GLKVector2Make(size.width / 2.0, size.height / 2.0);
 			GLKVector2 extents = GLKVector2Make(size.width / 2.0, size.height / 2.0);
-			if (CCRenderCheckVisbility(transform, center, extents)) {
+			if (_skipVisibilityCheck || CCRenderCheckVisbility(transform, center, extents)) {
 				CCRenderBuffer buffer = [renderer enqueueTriangles:(trianglesCount / 3) andVertexes:verticesCount withState:self.renderState globalSortOrder:0];
 				for (int i = 0; i * 2 < verticesCount; ++i) {
 					CCVertex vertex;
@@ -243,7 +249,7 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 				for (int j = 0; j * 3 < trianglesCount; ++j) {
 					CCRenderBufferSetTriangle(buffer, j, triangles[j * 3], triangles[j * 3 + 1], triangles[j * 3 + 2]);
 				}
-			}
+      }
 		}
 	}
 	[_drawNode clear];
