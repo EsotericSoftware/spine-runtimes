@@ -43,68 +43,61 @@ namespace Spine.Unity {
 			get { return skeletonRenderer; }
 			set {
 				skeletonRenderer = value;
-				Reset();
+				Initialize();
 			}
 		}
+
 		/// <summary>If a bone isn't set, boneName is used to find the bone.</summary>
 		[SpineBone(dataField: "skeletonRenderer")]
 		public String boneName;
 
 		public bool followZPosition = true;
 		public bool followBoneRotation = true;
-		public bool resetOnAwake = true;
+		[UnityEngine.Serialization.FormerlySerializedAs("resetOnAwake")]
+		public bool initializeOnAwake = true;
 		#endregion
 
-		[NonSerialized]
-		public bool valid;
-
-		[NonSerialized]
-		public Bone bone;
+		[NonSerialized] public bool valid;
+		[NonSerialized] public Bone bone;
 		Transform skeletonTransform;
 
-		public void HandleResetRenderer (SkeletonRenderer skeletonRenderer) {
-			Reset();
+		public void Awake () {
+			if (initializeOnAwake) Initialize();
 		}
 
-		public void Reset () {
+		public void HandleRebuildRenderer (SkeletonRenderer skeletonRenderer) {
+			Initialize();
+		}
+
+		public void Initialize () {
 			bone = null;
 			valid = skeletonRenderer != null && skeletonRenderer.valid;
-
 			if (!valid) return;
 
 			skeletonTransform = skeletonRenderer.transform;
-			skeletonRenderer.OnRebuild -= HandleResetRenderer;
-			skeletonRenderer.OnRebuild += HandleResetRenderer;
+			skeletonRenderer.OnRebuild -= HandleRebuildRenderer;
+			skeletonRenderer.OnRebuild += HandleRebuildRenderer;
 
 			#if UNITY_EDITOR
 			if (Application.isEditor)
-				DoUpdate();
+				LateUpdate();
 			#endif
 		}
 
 		void OnDestroy () {
 			if (skeletonRenderer != null)
-				skeletonRenderer.OnRebuild -= HandleResetRenderer;
+				skeletonRenderer.OnRebuild -= HandleRebuildRenderer;
 		}
 
-		public void Awake () {
-			if (resetOnAwake)
-				Reset();
-		}
-
-		void LateUpdate () {
-			DoUpdate();
-		}
-
-		public void DoUpdate () {
+		public void LateUpdate () {
 			if (!valid) {
-				Reset();
+				Initialize();
 				return;
 			}
 
 			if (bone == null) {
-				if (boneName == null || boneName.Length == 0)
-					return;
+				if (string.IsNullOrEmpty(boneName)) return;
+				
 				bone = skeletonRenderer.skeleton.FindBone(boneName);
 				if (bone == null) {
 					Debug.LogError("Bone not found: " + boneName, this);
@@ -112,33 +105,23 @@ namespace Spine.Unity {
 				}
 			}
 
-			Skeleton skeleton = skeletonRenderer.skeleton;
-			float flipRotation = (skeleton.flipX ^ skeleton.flipY) ? -1f : 1f;
 			Transform thisTransform = this.transform;
-
-			// Recommended setup: Use local transform properties if Spine GameObject is parent
 			if (thisTransform.parent == skeletonTransform) {
+				// Recommended setup: Use local transform properties if Spine GameObject is the immediate parent
 				thisTransform.localPosition = new Vector3(bone.worldX, bone.worldY, followZPosition ? 0f : thisTransform.localPosition.z);
-
-				if (followBoneRotation) {
-					Vector3 rotation = thisTransform.localRotation.eulerAngles;
-					thisTransform.localRotation = Quaternion.Euler(rotation.x, rotation.y, bone.WorldRotationX * flipRotation);
-				}
-
-				// For special cases: Use transform world properties if transform relationship is complicated
+				if (followBoneRotation) thisTransform.localRotation = Quaternion.Euler(0f, 0f, bone.WorldRotationX);
+			
 			} else {
+				// For special cases: Use transform world properties if transform relationship is complicated
 				Vector3 targetWorldPosition = skeletonTransform.TransformPoint(new Vector3(bone.worldX, bone.worldY, 0f));
-				if (!followZPosition)
-					targetWorldPosition.z = thisTransform.position.z;
-
+				if (!followZPosition) targetWorldPosition.z = thisTransform.position.z;
 				thisTransform.position = targetWorldPosition;
 
 				if (followBoneRotation) {
 					Vector3 worldRotation = skeletonTransform.rotation.eulerAngles;
-					thisTransform.rotation = Quaternion.Euler(worldRotation.x, worldRotation.y, skeletonTransform.rotation.eulerAngles.z + (bone.WorldRotationX * flipRotation));
+					thisTransform.rotation = Quaternion.Euler(worldRotation.x, worldRotation.y, skeletonTransform.rotation.eulerAngles.z + bone.WorldRotationX);
 				}
 			}
-
 		}
 	}
 
