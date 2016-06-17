@@ -241,8 +241,12 @@ public class SkeletonJson {
 				int slotIndex = skeletonData.findSlotIndex(slotEntry.name);
 				if (slotIndex == -1) throw new SerializationException("Slot not found: " + slotEntry.name);
 				for (JsonValue entry = slotEntry.child; entry != null; entry = entry.next) {
-					Attachment attachment = readAttachment(entry, skin, slotIndex, entry.name);
-					if (attachment != null) skin.addAttachment(slotIndex, entry.name, attachment);
+					try {
+						Attachment attachment = readAttachment(entry, skin, slotIndex, entry.name);
+						if (attachment != null) skin.addAttachment(slotIndex, entry.name, attachment);
+					} catch (Exception ex) {
+						throw new SerializationException("Error reading attachment: " + entry.name + ", skin: " + skin, ex);
+					}
 				}
 			}
 			skeletonData.skins.add(skin);
@@ -271,8 +275,13 @@ public class SkeletonJson {
 		}
 
 		// Animations.
-		for (JsonValue animationMap = root.getChild("animations"); animationMap != null; animationMap = animationMap.next)
-			readAnimation(animationMap, animationMap.name, skeletonData);
+		for (JsonValue animationMap = root.getChild("animations"); animationMap != null; animationMap = animationMap.next) {
+			try {
+				readAnimation(animationMap, animationMap.name, skeletonData);
+			} catch (Exception ex) {
+				throw new SerializationException("Error reading animation: " + animationMap.name, ex);
+			}
+		}
 
 		skeletonData.bones.shrink();
 		skeletonData.slots.shrink();
@@ -497,7 +506,7 @@ public class SkeletonJson {
 			int frameIndex = 0;
 			for (JsonValue valueMap = constraintMap.child; valueMap != null; valueMap = valueMap.next) {
 				timeline.setFrame(frameIndex, valueMap.getFloat("time"), valueMap.getFloat("mix", 1),
-					valueMap.getBoolean("bendPositive", false) ? 1 : -1);
+					valueMap.getBoolean("bendPositive", true) ? 1 : -1);
 				readCurve(valueMap, timeline, frameIndex);
 				frameIndex++;
 			}
