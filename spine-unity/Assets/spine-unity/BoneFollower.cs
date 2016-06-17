@@ -62,8 +62,7 @@ namespace Spine.Unity {
 		Transform skeletonTransform;
 
 		public void Awake () {
-			if (initializeOnAwake)
-				Initialize();
+			if (initializeOnAwake) Initialize();
 		}
 
 		public void HandleRebuildRenderer (SkeletonRenderer skeletonRenderer) {
@@ -73,7 +72,6 @@ namespace Spine.Unity {
 		public void Initialize () {
 			bone = null;
 			valid = skeletonRenderer != null && skeletonRenderer.valid;
-
 			if (!valid) return;
 
 			skeletonTransform = skeletonRenderer.transform;
@@ -98,8 +96,7 @@ namespace Spine.Unity {
 			}
 
 			if (bone == null) {
-				if (string.IsNullOrEmpty(boneName))
-					return;
+				if (string.IsNullOrEmpty(boneName)) return;
 				
 				bone = skeletonRenderer.skeleton.FindBone(boneName);
 				if (bone == null) {
@@ -108,32 +105,21 @@ namespace Spine.Unity {
 				}
 			}
 
-			// Flip rotation
-			float boneRotation = bone.WorldRotationX;
-			{
-				Skeleton skeleton = skeletonRenderer.skeleton;
-				bool flipX = skeleton.flipX;
-				if (flipX ^ skeleton.flipY) boneRotation *= -1f;
-				if (flipX) boneRotation += 180f;
-			}
-
 			Transform thisTransform = this.transform;
-			// Recommended setup: Use local transform properties if Spine GameObject is parent
 			if (thisTransform.parent == skeletonTransform) {
+				// Recommended setup: Use local transform properties if Spine GameObject is the immediate parent
 				thisTransform.localPosition = new Vector3(bone.worldX, bone.worldY, followZPosition ? 0f : thisTransform.localPosition.z);
-				if (followBoneRotation)
-					thisTransform.localRotation = Quaternion.Euler(0f, 0f, boneRotation);
-
-			// For special cases: Use transform world properties if transform relationship is complicated
+				if (followBoneRotation) thisTransform.localRotation = Quaternion.Euler(0f, 0f, bone.WorldRotationX);
+			
 			} else {
+				// For special cases: Use transform world properties if transform relationship is complicated
 				Vector3 targetWorldPosition = skeletonTransform.TransformPoint(new Vector3(bone.worldX, bone.worldY, 0f));
-				if (!followZPosition)
-					targetWorldPosition.z = thisTransform.position.z;
-
+				if (!followZPosition) targetWorldPosition.z = thisTransform.position.z;
 				thisTransform.position = targetWorldPosition;
+
 				if (followBoneRotation) {
 					Vector3 worldRotation = skeletonTransform.rotation.eulerAngles;
-					thisTransform.rotation = Quaternion.Euler(worldRotation.x, worldRotation.y, skeletonTransform.rotation.eulerAngles.z + boneRotation);
+					thisTransform.rotation = Quaternion.Euler(worldRotation.x, worldRotation.y, skeletonTransform.rotation.eulerAngles.z + bone.WorldRotationX);
 				}
 			}
 		}
