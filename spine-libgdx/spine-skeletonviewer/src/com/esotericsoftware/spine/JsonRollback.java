@@ -19,8 +19,9 @@ import com.badlogic.gdx.utils.JsonWriter.OutputType;
  * the runtime is updated to support a newer Spine version should animators update their Spine editor version to match. */
 public class JsonRollback {
 	static public void main (String[] args) throws Exception {
+		args = new String[] {"C:/test/CoilGrapple.json", "C:/test/CoilGrapple-fixed.json"};
 		if (args.length == 0) {
-			System.out.println("Usage: <inputJSON> [outputJSON]");
+			System.out.println("Usage: <inputFile> [outputFile]");
 			System.exit(0);
 		}
 
@@ -35,9 +36,18 @@ public class JsonRollback {
 		// In 3.3 ffd was renamed to deform.
 		rename(root, "animations/*/deform", "ffd");
 
-		// In 3.3 mesh are now a single type, previously they were skinnedmesh if they had weights.
+		// In 3.3 mesh is now a single type, previously they were skinnedmesh if they had weights.
 		for (JsonValue value : find(root, "skins/*/*/*/type/mesh".split("/"), 0, new Array()))
 			if (value.parent.get("uvs").size != value.parent.get("vertices").size) value.set("skinnedmesh");
+
+		// In 3.3 linkedmesh is now a single type, previously they were linkedweightedmesh if they had weights.
+		for (JsonValue value : find(root, "skins/*/*/*/type/linkedmesh".split("/"), 0, new Array())) {
+			String slot = value.parent.parent.name.replaceAll("", "");
+			String skinName = value.parent.getString("skin", "default");
+			String parentName = value.parent.getString("parent");
+			if (find(root, ("skins~~" + skinName + "~~" + slot + "~~" + parentName + "~~type~~skinnedmesh").split("~~"), 0,
+				new Array()).size > 0) value.set("weightedlinkedmesh");
+		}
 
 		// In 3.3 bounding boxes can be weighted.
 		for (JsonValue value : find(root, "skins/*/*/*/type/boundingbox".split("/"), 0, new Array()))
@@ -53,7 +63,7 @@ public class JsonRollback {
 			delete(root, "animations/*/ffd/*/" + slot + "/" + attachment);
 		}
 
-		// In 3.3 IK constraints no longer require bendPositive.
+		// In 3.3 IK constraint timelines no longer require bendPositive.
 		for (JsonValue value : find(root, "animations/*/ik/*".split("/"), 0, new Array()))
 			for (JsonValue child = value.child; child != null; child = child.next)
 				if (!child.has("bendPositive")) child.addChild("bendPositive", new JsonValue(true));
