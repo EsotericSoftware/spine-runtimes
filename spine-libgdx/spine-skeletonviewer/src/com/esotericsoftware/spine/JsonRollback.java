@@ -28,43 +28,44 @@ public class JsonRollback {
 		JsonValue root = new Json().fromJson(null, new FileHandle(args[0]));
 
 		// In 3.2 skinnedmesh was renamed to weightedmesh.
-		setValue(root, "skins/*/*/*/type/weightedmesh", "skinnedmesh");
+		setValue(root, "skinnedmesh", "skins", "*", "*", "*", "type", "weightedmesh");
 
 		// In 3.2 shear was added.
-		delete(root, "animations/*/bones/*/shear");
+		delete(root, "animations", "*", "bones", "*", "shear");
 
 		// In 3.3 ffd was renamed to deform.
-		rename(root, "animations/*/deform", "ffd");
+		rename(root, "ffd", "animations", "*", "deform");
 
 		// In 3.3 mesh is now a single type, previously they were skinnedmesh if they had weights.
-		for (JsonValue value : find(root, "skins/*/*/*/type/mesh".split("/"), 0, new Array()))
+		for (JsonValue value : find(root, new Array(), 0, "skins", "*", "*", "*", "type", "mesh"))
 			if (value.parent.get("uvs").size != value.parent.get("vertices").size) value.set("skinnedmesh");
 
 		// In 3.3 linkedmesh is now a single type, previously they were linkedweightedmesh if they had weights.
-		for (JsonValue value : find(root, "skins/*/*/*/type/linkedmesh".split("/"), 0, new Array())) {
+		for (JsonValue value : find(root, new Array(), 0, "skins", "*", "*", "*", "type", "linkedmesh")) {
 			String slot = value.parent.parent.name.replaceAll("", "");
 			String skinName = value.parent.getString("skin", "default");
 			String parentName = value.parent.getString("parent");
-			if (find(root, ("skins~~" + skinName + "~~" + slot + "~~" + parentName + "~~type~~skinnedmesh").split("~~"), 0,
-				new Array()).size > 0) value.set("weightedlinkedmesh");
+			if (find(root, new Array(), 0,
+				("skins~~" + skinName + "~~" + slot + "~~" + parentName + "~~type~~skinnedmesh").split("~~")).size > 0)
+				value.set("weightedlinkedmesh");
 		}
 
 		// In 3.3 bounding boxes can be weighted.
-		for (JsonValue value : find(root, "skins/*/*/*/type/boundingbox".split("/"), 0, new Array()))
+		for (JsonValue value : find(root, new Array(), 0, "skins", "*", "*", "*", "type", "boundingbox"))
 			if (value.parent.getInt("vertexCount") * 2 != value.parent.get("vertices").size)
 				value.parent.parent.remove(value.parent.name);
 
 		// In 3.3 paths were added.
-		for (JsonValue value : find(root, "skins/*/*/*/type/path".split("/"), 0, new Array())) {
+		for (JsonValue value : find(root, new Array(), 0, "skins", "*", "*", "*", "type", "path")) {
 			String attachment = value.parent.name;
 			value.parent.parent.remove(attachment);
 			String slot = value.parent.parent.name;
-			// Remove path deform timelines.
-			delete(root, "animations/*/ffd/*/" + slot + "/" + attachment);
+			// Also remove path deform timelines.
+			delete(root, "animations", "*", "ffd", "*", slot, attachment);
 		}
 
 		// In 3.3 IK constraint timelines no longer require bendPositive.
-		for (JsonValue value : find(root, "animations/*/ik/*".split("/"), 0, new Array()))
+		for (JsonValue value : find(root, new Array(), 0, "animations", "*", "ik", "*"))
 			for (JsonValue child = value.child; child != null; child = child.next)
 				if (!child.has("bendPositive")) child.addChild("bendPositive", new JsonValue(true));
 
@@ -80,33 +81,33 @@ public class JsonRollback {
 			System.out.println(root.prettyPrint(OutputType.json, 130));
 	}
 
-	static void setValue (JsonValue root, String path, String newValue) {
-		for (JsonValue value : find(root, path.split("/"), 0, new Array()))
+	static void setValue (JsonValue root, String newValue, String... path) {
+		for (JsonValue value : find(root, new Array(), 0, path))
 			value.set(newValue);
 	}
 
-	static void rename (JsonValue root, String path, String newName) {
-		for (JsonValue value : find(root, path.split("/"), 0, new Array()))
+	static void rename (JsonValue root, String newName, String... path) {
+		for (JsonValue value : find(root, new Array(), 0, path))
 			value.name = newName;
 	}
 
-	static void delete (JsonValue root, String path) {
-		for (JsonValue value : find(root, path.split("/"), 0, new Array()))
+	static void delete (JsonValue root, String... path) {
+		for (JsonValue value : find(root, new Array(), 0, path))
 			value.parent.remove(value.name);
 	}
 
-	static Array<JsonValue> find (JsonValue current, String[] path, int index, Array<JsonValue> values) {
+	static Array<JsonValue> find (JsonValue current, Array<JsonValue> values, int index, String... path) {
 		String name = path[index];
 		if (current.name == null) {
 			if (name.equals("*") && index == path.length - 1)
 				values.add(current);
-			else if (current.has(name)) return find(current.get(name), path, index, values);
+			else if (current.has(name)) return find(current.get(name), values, index, path);
 		} else if (name.equals("*") || current.name.equals(name)) {
 			if (++index == path.length || (index == path.length - 1 && current.isString() && current.asString().equals(path[index])))
 				values.add(current);
 			else {
 				for (JsonValue child = current.child; child != null; child = child.next)
-					find(child, path, index, values);
+					find(child, values, index, path);
 			}
 		}
 		return values;
