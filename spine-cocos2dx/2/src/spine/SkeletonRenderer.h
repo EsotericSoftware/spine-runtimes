@@ -59,6 +59,7 @@ public:
 
 	virtual ~SkeletonRenderer ();
 
+	virtual void onEnter ();
 	virtual void update (float deltaTime);
 	virtual void draw ();
 	virtual cocos2d::CCRect boundingBox ();

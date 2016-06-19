@@ -72,7 +72,6 @@ void SkeletonRenderer::initialize () {
 	setOpacityModifyRGB(true);
 
 	setShaderProgram(CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor));
-	scheduleUpdate();
 }
 
 void SkeletonRenderer::setSkeletonData (spSkeletonData *skeletonData, bool ownsSkeletonData) {
@@ -128,6 +127,11 @@ SkeletonRenderer::~SkeletonRenderer () {
 	spSkeleton_dispose(skeleton);
 	FREE(worldVertices);
 	batch->release();
+}
+
+void SkeletonRenderer::onEnter () {
+	cocos2d::CCNodeRGBA::onEnter();  
+	scheduleUpdate();
 }
 
 void SkeletonRenderer::update (float deltaTime) {
