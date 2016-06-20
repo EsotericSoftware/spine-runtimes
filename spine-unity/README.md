@@ -14,7 +14,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-unity works with data exported from the latest version of Spine.
+spine-unity works with data exported from Spine 3.2.01. Updating spine-unity to [v3.3](https://github.com/EsotericSoftware/spine-runtimes/issues/613) is in progress.
 
 spine-unity supports all Spine features.
 
