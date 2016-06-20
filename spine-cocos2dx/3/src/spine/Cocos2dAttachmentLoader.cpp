@@ -111,9 +111,15 @@ void _Cocos2dAttachmentLoader_disposeAttachment (spAttachmentLoader* loader, spA
 	}
 }
 
+void _Cocos2dAttachmentLoader_dispose (spAttachmentLoader* loader) {
+	Cocos2dAttachmentLoader* self = SUB_CAST(Cocos2dAttachmentLoader, loader);
+	spAttachmentLoader_dispose(SUPER_CAST(spAttachmentLoader, self->atlasAttachmentLoader));
+	_spAttachmentLoader_deinit(loader);
+}
+
 Cocos2dAttachmentLoader* Cocos2dAttachmentLoader_create (spAtlas* atlas) {
 	Cocos2dAttachmentLoader* self = NEW(Cocos2dAttachmentLoader);
-	_spAttachmentLoader_init(SUPER(self), _spAttachmentLoader_deinit, _Cocos2dAttachmentLoader_createAttachment,
+	_spAttachmentLoader_init(SUPER(self), _Cocos2dAttachmentLoader_dispose, _Cocos2dAttachmentLoader_createAttachment,
 		_Cocos2dAttachmentLoader_configureAttachment, _Cocos2dAttachmentLoader_disposeAttachment);
 	self->atlasAttachmentLoader = spAtlasAttachmentLoader_create(atlas);
 	return self;

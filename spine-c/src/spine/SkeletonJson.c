@@ -126,7 +126,7 @@ static void _spSkeletonJson_addLinkedMesh (spSkeletonJson* self, spAttachment* m
 		internal->linkedMeshCapacity *= 2;
 		if (internal->linkedMeshCapacity < 8) internal->linkedMeshCapacity = 8;
 		linkedMeshes = MALLOC(_spLinkedMesh, internal->linkedMeshCapacity);
-		memcpy(linkedMeshes, internal->linkedMeshes, internal->linkedMeshCount);
+		memcpy(linkedMeshes, internal->linkedMeshes, sizeof(_spLinkedMesh) * internal->linkedMeshCount);
 		FREE(internal->linkedMeshes);
 		internal->linkedMeshes = linkedMeshes;
 	}

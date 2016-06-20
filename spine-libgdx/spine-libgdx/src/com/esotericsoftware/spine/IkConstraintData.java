@@ -41,6 +41,7 @@ public class IkConstraintData {
 	float mix = 1;
 
 	public IkConstraintData (String name) {
+		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		this.name = name;
 	}
 
@@ -57,6 +58,7 @@ public class IkConstraintData {
 	}
 
 	public void setTarget (BoneData target) {
+		if (target == null) throw new IllegalArgumentException("target cannot be null.");
 		this.target = target;
 	}
 

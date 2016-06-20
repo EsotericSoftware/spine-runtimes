@@ -37,13 +37,13 @@ import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.AnimationState.AnimationStateListener;
 import com.esotericsoftware.spine.attachments.AttachmentLoader;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
-import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
-import com.esotericsoftware.spine.attachments.WeightedMeshAttachment;
+import com.esotericsoftware.spine.attachments.MeshAttachment;
+import com.esotericsoftware.spine.attachments.PathAttachment;
 
 public class AnimationStateTest {
 	final SkeletonJson json = new SkeletonJson(new AttachmentLoader() {
-		public WeightedMeshAttachment newWeightedMeshAttachment (Skin skin, String name, String path) {
+		public MeshAttachment newMeshAttachment (Skin skin, String name, String path) {
 			return null;
 		}
 
@@ -51,11 +51,11 @@ public class AnimationStateTest {
 			return null;
 		}
 
-		public MeshAttachment newMeshAttachment (Skin skin, String name, String path) {
+		public BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String name) {
 			return null;
 		}
 
-		public BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String name) {
+		public PathAttachment newPathAttachment (Skin skin, String name) {
 			return null;
 		}
 	});

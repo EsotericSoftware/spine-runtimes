@@ -52,8 +52,8 @@ namespace Spine.Unity.Editor {
 
 		override public void OnInspectorGUI () {
 			if (needsReset) {
-				component.Reset();
-				component.DoUpdate();
+				component.Initialize();
+				component.LateUpdate();
 				needsReset = false;
 				SceneView.RepaintAll();
 			}
@@ -89,17 +89,17 @@ namespace Spine.Unity.Editor {
 			if (serializedObject.ApplyModifiedProperties() ||
 				(UnityEngine.Event.current.type == EventType.ValidateCommand && UnityEngine.Event.current.commandName == "UndoRedoPerformed")
 			) {
-				component.Reset();
+				component.Initialize();
 			}
 		}
 
 		public static T GetInParent<T> (Transform origin) where T : Component {
 			#if UNITY_4_3
 			Transform parent = origin.parent;
-			while(parent.GetComponent<T>() == null){
-			parent = parent.parent;
-			if(parent == null)
-			return default(T);
+			while (parent.GetComponent<T>() == null) {
+				parent = parent.parent;
+				if(parent == null)
+					return default(T);
 			}
 
 			return parent.GetComponent<T>();

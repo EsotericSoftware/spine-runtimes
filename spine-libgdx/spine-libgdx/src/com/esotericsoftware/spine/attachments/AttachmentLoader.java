@@ -41,8 +41,8 @@ public interface AttachmentLoader {
 	public MeshAttachment newMeshAttachment (Skin skin, String name, String path);
 
 	/** @return May be null to not load any attachment. */
-	public WeightedMeshAttachment newWeightedMeshAttachment (Skin skin, String name, String path);
+	public BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String name);
 
 	/** @return May be null to not load any attachment. */
-	public BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String name);
+	public PathAttachment newPathAttachment (Skin skin, String name);
 }

@@ -31,37 +31,22 @@
 
 package com.esotericsoftware.spine.attachments;
 
-import com.esotericsoftware.spine.Bone;
-import com.esotericsoftware.spine.Skeleton;
+import com.badlogic.gdx.graphics.Color;
+import com.esotericsoftware.spine.Slot;
 
-public class BoundingBoxAttachment extends Attachment {
-	private float[] vertices;
+public class BoundingBoxAttachment extends VertexAttachment {
+	// Nonessential.
+	final Color color = new Color(0.38f, 0.94f, 0, 1);
 
 	public BoundingBoxAttachment (String name) {
 		super(name);
 	}
 
-	public void computeWorldVertices (Bone bone, float[] worldVertices) {
-		Skeleton skeleton = bone.getSkeleton();
-		float x = skeleton.getX() + bone.getWorldX(), y = skeleton.getY() + bone.getWorldY();
-		float m00 = bone.getA();
-		float m01 = bone.getB();
-		float m10 = bone.getC();
-		float m11 = bone.getD();
-		float[] vertices = this.vertices;
-		for (int i = 0, n = vertices.length; i < n; i += 2) {
-			float px = vertices[i];
-			float py = vertices[i + 1];
-			worldVertices[i] = px * m00 + py * m01 + x;
-			worldVertices[i + 1] = px * m10 + py * m11 + y;
-		}
+	public void computeWorldVertices (Slot slot, float[] worldVertices) {
+		computeWorldVertices(slot, 0, worldVerticesLength, worldVertices, 0);
 	}
 
-	public float[] getVertices () {
-		return vertices;
-	}
-
-	public void setVertices (float[] vertices) {
-		this.vertices = vertices;
+	public Color getColor () {
+		return color;
 	}
 }

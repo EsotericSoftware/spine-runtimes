@@ -13,6 +13,8 @@ target
 .DS_Store
 
 spine-c/Debug/*
+spine-c/dist
+spine-c/obj
 
 spine-cpp/Debug/*
 

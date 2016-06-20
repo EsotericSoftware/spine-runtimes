@@ -44,12 +44,6 @@ public class Slot {
 	private float attachmentTime;
 	private FloatArray attachmentVertices = new FloatArray();
 
-	Slot (SlotData data) {
-		this.data = data;
-		bone = null;
-		color = new Color(1, 1, 1, 1);
-	}
-
 	public Slot (SlotData data, Bone bone) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
 		if (bone == null) throw new IllegalArgumentException("bone cannot be null.");
@@ -110,6 +104,7 @@ public class Slot {
 	}
 
 	public void setAttachmentVertices (FloatArray attachmentVertices) {
+		if (attachmentVertices == null) throw new IllegalArgumentException("attachmentVertices cannot be null.");
 		this.attachmentVertices = attachmentVertices;
 	}
 
@@ -117,18 +112,14 @@ public class Slot {
 		return attachmentVertices;
 	}
 
-	void setToSetupPose (int slotIndex) {
+	public void setToSetupPose () {
 		color.set(data.color);
 		if (data.attachmentName == null)
 			setAttachment(null);
 		else {
 			attachment = null;
-			setAttachment(bone.skeleton.getAttachment(slotIndex, data.attachmentName));
+			setAttachment(bone.skeleton.getAttachment(data.index, data.attachmentName));
 		}
-	}
-
-	public void setToSetupPose () {
-		setToSetupPose(bone.skeleton.data.slots.indexOf(data, true));
 	}
 
 	public String toString () {

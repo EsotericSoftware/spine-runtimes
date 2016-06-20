@@ -84,6 +84,13 @@ function spine.Skeleton.new (skeletonData, group)
 		return display.newImage(attachment.name .. ".png")
 	end
 
+	-- Customizes where images are found.
+	function self:createMesh (attachment, meshParameters)
+		local mesh = display.newMesh(meshParameters)
+		mesh.fill = {type="image", filename=attachment.name .. ".png"}
+		return mesh
+	end
+
 	-- Customizes what happens when an image changes, return false to recreate the image.
 	function self:modifyImage (attachment)
 		return false
@@ -200,6 +207,69 @@ function spine.Skeleton.new (skeletonData, group)
 					
 					self.group:insert(image)
 				end
+			elseif attachment.type == spine.AttachmentType.mesh or attachment.type == spine.AttachmentType.skinnedmesh then
+
+				if image and image.attachment ~= attachment then -- Attachment image has changed.
+					if self:modifyImage(image, attachment) then
+						image.lastR, image.lastA = nil, nil
+						image.attachment = attachment
+					else -- If not modified, remove the image and it will be recreated.
+						display.remove(image)
+						images[slot] = nil
+						image = nil
+					end
+				end
+
+				local worldVertices = {}
+				attachment:updateUVs()
+				attachment:computeWorldVertices(0, 0, slot, worldVertices)
+
+				for i = 2, #worldVertices, 2 do
+					worldVertices[i] = -worldVertices[i]
+				end
+
+				if not image then
+					local meshParameters = {
+						mode = "indexed",
+						vertices =  worldVertices,
+						indices = attachment.triangles,
+						uvs = attachment.uvs,
+						zeroBasedIndices = true,
+					}
+					image = self:createMesh(attachment, meshParameters)
+					if image then
+						if slot.data.blendMode == spine.BlendMode.normal then
+							image.blendMode = "normal"
+						elseif slot.data.blendMode == spine.BlendMode.additive then
+							image.blendMode = "add"
+						elseif slot.data.blendMode == spine.BlendMode.multiply then
+							image.blendMode = "multiply"
+						elseif slot.data.blendMode == spine.BlendMode.screen then
+							image.blendMode = "screen"
+						end
+						self.images[slot] = image
+						image:translate( image.path:getVertexOffset() )
+					end
+				else
+					for i = 1, #worldVertices, 2 do
+						image.path:setVertex( 1+ 0.5*(i-1), worldVertices[i], worldVertices[i+1])
+					end
+				end
+
+				if image then
+					local r, g, b = skeletonR * slot.r, skeletonG * slot.g, skeletonB * slot.b
+					if image.lastR ~= r or image.lastG ~= g or image.lastB ~= b or not image.lastR then
+						image:setFillColor(r, g, b)
+						image.lastR, image.lastG, image.lastB = r, g, b
+					end
+					local a = skeletonA * slot.a
+					if a and (image.lastA ~= a or not image.lastA) then
+						image.lastA = a
+						image.alpha = image.lastA
+					end
+					self.group:insert(image)
+				end
+
 			end
 		end
 

@@ -29,38 +29,56 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using System;
+package com.esotericsoftware.spine.attachments;
 
-namespace Spine {
-	public class BoneData {
-		internal BoneData parent;
-		internal String name;
-		internal float length, x, y, rotation, scaleX = 1, scaleY = 1, shearX, shearY;
-		internal bool inheritScale = true, inheritRotation = true;
+import com.badlogic.gdx.graphics.Color;
+import com.esotericsoftware.spine.Slot;
 
-		/// <summary>May be null.</summary>
-		public BoneData Parent { get { return parent; } }
-		public String Name { get { return name; } }
-		public float Length { get { return length; } set { length = value; } }
-		public float X { get { return x; } set { x = value; } }
-		public float Y { get { return y; } set { y = value; } }
-		public float Rotation { get { return rotation; } set { rotation = value; } }
-		public float ScaleX { get { return scaleX; } set { scaleX = value; } }
-		public float ScaleY { get { return scaleY; } set { scaleY = value; } }
-		public float ShearX { get { return shearX; } set { shearX = value; } }
-		public float ShearY { get { return shearY; } set { shearY = value; } }
-		public bool InheritScale { get { return inheritScale; } set { inheritScale = value; } }
-		public bool InheritRotation { get { return inheritRotation; } set { inheritRotation = value; } }
+public class PathAttachment extends VertexAttachment {
+	float[] lengths;
+	boolean closed, constantSpeed;
 
-		/// <param name="parent">May be null.</param>
-		public BoneData (String name, BoneData parent) {
-			if (name == null) throw new ArgumentNullException("name cannot be null.");
-			this.name = name;
-			this.parent = parent;
-		}
+	// Nonessential.
+	final Color color = new Color(1, 0.5f, 0, 1);
 
-		override public String ToString () {
-			return name;
-		}
+	public PathAttachment (String name) {
+		super(name);
+	}
+
+	public void computeWorldVertices (Slot slot, float[] worldVertices) {
+		super.computeWorldVertices(slot, worldVertices);
+	}
+
+	public void computeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset) {
+		super.computeWorldVertices(slot, start, count, worldVertices, offset);
+	}
+
+	public boolean getClosed () {
+		return closed;
+	}
+
+	public void setClosed (boolean closed) {
+		this.closed = closed;
+	}
+
+	public boolean getConstantSpeed () {
+		return constantSpeed;
+	}
+
+	public void setConstantSpeed (boolean constantSpeed) {
+		this.constantSpeed = constantSpeed;
+	}
+
+	/** Returns the length in the setup pose from the start of the path to the end of each curve. */
+	public float[] getLengths () {
+		return lengths;
+	}
+
+	public void setLengths (float[] lengths) {
+		this.lengths = lengths;
+	}
+
+	public Color getColor () {
+		return color;
 	}
 }

@@ -46,10 +46,10 @@ public class AttachmentTimelineTests {
 	public AttachmentTimelineTests () {
 		skeletonData = new SkeletonData();
 
-		BoneData boneData = new BoneData("bone", null);
+		BoneData boneData = new BoneData(0, "bone", null);
 		skeletonData.getBones().add(boneData);
 
-		skeletonData.getSlots().add(new SlotData("slot", boneData));
+		skeletonData.getSlots().add(new SlotData(0, "slot", boneData));
 
 		Attachment attachment1 = new Attachment("attachment1") {};
 		Attachment attachment2 = new Attachment("attachment2") {};
