@@ -180,16 +180,6 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 			color.a = attachment->a;
 			break;
 		}
-		case SP_ATTACHMENT_WEIGHTED_MESH: {
-			spWeightedMeshAttachment* attachment = (spWeightedMeshAttachment*)slot->attachment;
-			spWeightedMeshAttachment_computeWorldVertices(attachment, slot, _worldVertices);
-			attachmentVertices = getAttachmentVertices(attachment);
-			color.r = attachment->r;
-			color.g = attachment->g;
-			color.b = attachment->b;
-			color.a = attachment->a;
-			break;
-		}
 		default:
 			continue;
 		}
@@ -292,10 +282,6 @@ AttachmentVertices* SkeletonRenderer::getAttachmentVertices (spMeshAttachment* a
 	return (AttachmentVertices*)attachment->rendererObject;
 }
 
-AttachmentVertices* SkeletonRenderer::getAttachmentVertices (spWeightedMeshAttachment* attachment) const {
-	return (AttachmentVertices*)attachment->rendererObject;
-}
-
 Rect SkeletonRenderer::getBoundingBox () const {
 	float minX = FLT_MAX, minY = FLT_MAX, maxX = FLT_MIN, maxY = FLT_MIN;
 	float scaleX = getScaleX(), scaleY = getScaleY();
@@ -310,11 +296,7 @@ Rect SkeletonRenderer::getBoundingBox () const {
 		} else if (slot->attachment->type == SP_ATTACHMENT_MESH) {
 			spMeshAttachment* mesh = (spMeshAttachment*)slot->attachment;
 			spMeshAttachment_computeWorldVertices(mesh, slot, _worldVertices);
-			verticesCount = mesh->verticesCount;
-		} else if (slot->attachment->type == SP_ATTACHMENT_WEIGHTED_MESH) {
-			spWeightedMeshAttachment* mesh = (spWeightedMeshAttachment*)slot->attachment;
-			spWeightedMeshAttachment_computeWorldVertices(mesh, slot, _worldVertices);
-			verticesCount = mesh->uvsCount;
+			verticesCount = mesh->super.worldVerticesLength;
 		} else
 			continue;
 		for (int ii = 0; ii < verticesCount; ii += 2) {

@@ -117,7 +117,6 @@ protected:
 	void setSkeletonData (spSkeletonData* skeletonData, bool ownsSkeletonData);
 	virtual AttachmentVertices* getAttachmentVertices (spRegionAttachment* attachment) const;
 	virtual AttachmentVertices* getAttachmentVertices (spMeshAttachment* attachment) const;
-	virtual AttachmentVertices* getAttachmentVertices (spWeightedMeshAttachment* attachment) const;
 
 	bool _ownsSkeletonData;
 	spAtlas* _atlas;
