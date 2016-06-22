@@ -34,11 +34,11 @@ The Spine SFML example works on Windows, Linux and Mac OS X.
 4. Run CMake GUI from the start menu
 5. Click `Browse Source` and select the directory `spine-runtimes`
 6. Click `Browse Build` and select the `spine-runtimes/spine-sfml/build` directory. You can create the `build` folder directly in the file dialog via `New Folder`.
-7. Click `Configure`. This will create a Visual Studio 2015 solution file called `spine.sln` in `spine-runtimes/spine-sfml/build` and also download the SFML dependencies.
+7. Click `Configure`. Then click `Generate`. This will create a Visual Studio 2015 solution file called `spine.sln` in `spine-runtimes/spine-sfml/build` and also download the SFML dependencies.
 8. Open the `spine.sln` file in Visual Studio 2015
-9. Right click the `spine-sfml` project in the solution explorer and select `Set as Startup Project` from the context menu
-10. Right click the `spine-sfml` project in the solution explorer and select `Properties` from the context menu
-11. Select `Debugging` in the left-hand list, then set `Working Directory` to `${OutputDir}`
+9. Right click the `spine-sfml-example` project in the solution explorer and select `Set as Startup Project` from the context menu
+10. Right click the `spine-sfml-example` project in the solution explorer and select `Properties` from the context menu
+11. Select `Debugging` in the left-hand list, then set `Working Directory` to `$(OutputPath)`
 12. Click `Local Windows Debugger` to run the example
 
 The entire example code is contained in [main.cpp](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-sfml/example/main.cpp#L61)
