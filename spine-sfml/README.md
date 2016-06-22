@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-sfml works with data exported from Spine version 3.2.x.
+spine-sfml works with data exported from Spine version 3.2.01.
 
 spine-sfml supports all Spine features.
 

@@ -19,7 +19,6 @@ import com.badlogic.gdx.utils.JsonWriter.OutputType;
  * the runtime is updated to support a newer Spine version should animators update their Spine editor version to match. */
 public class JsonRollback {
 	static public void main (String[] args) throws Exception {
-		args = new String[] {"C:/test/CoilGrapple.json", "C:/test/CoilGrapple-fixed.json"};
 		if (args.length == 0) {
 			System.out.println("Usage: <inputFile> [outputFile]");
 			System.exit(0);
