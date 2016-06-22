@@ -108,7 +108,8 @@ void SkeletonRenderer::initWithData (spSkeletonData* skeletonData, bool ownsSkel
 }
 
 void SkeletonRenderer::initWithFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale) {
-	_attachmentLoader = SUPER(Cocos2dAttachmentLoader_create(_atlas));
+    _atlas = atlas;
+    _attachmentLoader = SUPER(Cocos2dAttachmentLoader_create(_atlas));
 
 	spSkeletonJson* json = spSkeletonJson_createWithLoader(_attachmentLoader);
 	json->scale = scale;
