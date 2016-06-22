@@ -33,6 +33,7 @@
 #define SPINE_MESHATTACHMENT_H_
 
 #include <spine/Attachment.h>
+#include <spine/VertexAttachment.h>
 #include <spine/Atlas.h>
 #include <spine/Slot.h>
 
@@ -42,11 +43,10 @@ extern "C" {
 
 typedef struct spMeshAttachment spMeshAttachment;
 struct spMeshAttachment {
-	spAttachment super;
+	spVertexAttachment super;
 	const char* path;
 
-	int verticesCount;
-	float* vertices;
+	int worldVerticesCount;
 	int hullLength;
 
 	float* regionUVs;
@@ -56,7 +56,7 @@ struct spMeshAttachment {
 	unsigned short* triangles;
 
 	spMeshAttachment* const parentMesh;
-	int/*bool*/inheritFFD;
+	int/*bool*/inheritDeform;
 
 	float r, g, b, a;
 

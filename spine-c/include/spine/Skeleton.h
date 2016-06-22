@@ -55,6 +55,7 @@ typedef struct spSkeleton {
 
 	int ikConstraintsCount;
 	spIkConstraint** ikConstraints;
+	spIkConstraint** ikConstraintsSorted;
 
 	int transformConstraintsCount;
 	spTransformConstraint** transformConstraints;
@@ -77,6 +78,7 @@ typedef struct spSkeleton {
 
 		ikConstraintsCount(0),
 		ikConstraints(0),
+		ikConstraintsSorted(0),
 
 		transformConstraintsCount(0),
 		transformConstraints(0),

@@ -66,8 +66,6 @@ float spSlot_getAttachmentTime (const spSlot* self) {
 }
 
 void spSlot_setToSetupPose (spSlot* self) {
-	spAttachment* attachment = 0;
-
 	self->r = self->data->r;
 	self->g = self->data->g;
 	self->b = self->data->b;
@@ -76,14 +74,8 @@ void spSlot_setToSetupPose (spSlot* self) {
 	if (!self->data->attachmentName)
 		spSlot_setAttachment(self, 0);
 	else {
-		/* Find slot index. */
-		int i;
-		for (i = 0; i < self->bone->skeleton->data->slotsCount; ++i) {
-			if (self->data == self->bone->skeleton->data->slots[i]) {
-				attachment = spSkeleton_getAttachmentForSlotIndex(self->bone->skeleton, i, self->data->attachmentName);
-				break;
-			}
-		}
+		spAttachment* attachment = spSkeleton_getAttachmentForSlotIndex(
+				self->bone->skeleton, self->data->index, self->data->attachmentName);
 		CONST_CAST(spAttachment*, self->attachment) = 0;
 		spSlot_setAttachment(self, attachment);
 	}

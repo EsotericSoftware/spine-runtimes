@@ -34,11 +34,10 @@
 
 void _spMeshAttachment_dispose (spAttachment* attachment) {
 	spMeshAttachment* self = SUB_CAST(spMeshAttachment, attachment);
-	_spAttachment_deinit(attachment);
+	_spVertexAttachment_deinit(SUPER(self));
 	FREE(self->path);
 	FREE(self->uvs);
 	if (!self->parentMesh) {
-		FREE(self->vertices);
 		FREE(self->regionUVs);
 		FREE(self->triangles);
 		FREE(self->edges);
@@ -60,14 +59,14 @@ void spMeshAttachment_updateUVs (spMeshAttachment* self) {
 	int i;
 	float width = self->regionU2 - self->regionU, height = self->regionV2 - self->regionV;
 	FREE(self->uvs);
-	self->uvs = MALLOC(float, self->verticesCount);
+	self->uvs = MALLOC(float, self->super.verticesCount);
 	if (self->regionRotate) {
-		for (i = 0; i < self->verticesCount; i += 2) {
+		for (i = 0; i < self->super.verticesCount; i += 2) {
 			self->uvs[i] = self->regionU + self->regionUVs[i + 1] * width;
 			self->uvs[i + 1] = self->regionV + height - self->regionUVs[i] * height;
 		}
 	} else {
-		for (i = 0; i < self->verticesCount; i += 2) {
+		for (i = 0; i < self->super.verticesCount; i += 2) {
 			self->uvs[i] = self->regionU + self->regionUVs[i] * width;
 			self->uvs[i + 1] = self->regionV + self->regionUVs[i + 1] * height;
 		}
@@ -76,23 +75,69 @@ void spMeshAttachment_updateUVs (spMeshAttachment* self) {
 
 void spMeshAttachment_computeWorldVertices (spMeshAttachment* self, spSlot* slot, float* worldVertices) {
 	int i;
-	float* vertices = self->vertices;
-	const spBone* bone = slot->bone;
-	float x = bone->skeleton->x + bone->worldX, y = bone->skeleton->y + bone->worldY;
-	if (slot->attachmentVerticesCount == self->verticesCount) vertices = slot->attachmentVertices;
-	for (i = 0; i < self->verticesCount; i += 2) {
-		const float vx = vertices[i], vy = vertices[i + 1];
-		worldVertices[i] = vx * bone->a + vy * bone->b + x;
-		worldVertices[i + 1] = vx * bone->c + vy * bone->d + y;
+	spSkeleton* skeleton = slot->bone->skeleton;
+	float x = skeleton->x, y = skeleton->y;
+	float* deform = slot->attachmentVertices;
+	spVertexAttachment* vertexAttachment = SUPER(self);
+	float* vertices = vertexAttachment->vertices;
+	int* bones = vertexAttachment->bones;
+	if (!bones) {
+		int verticesLength = vertexAttachment->verticesCount;
+		spBone* bone;
+		int v, w;
+		if (slot->attachmentVerticesCount > 0) vertices = deform;
+		bone = slot->bone;
+		x += bone->worldX;
+		y += bone->worldY;
+		for (v = 0, w = 0; v < verticesLength; v += 2, w += 2) {
+			float vx = vertices[v], vy = vertices[v + 1];
+			worldVertices[w] = vx * bone->a + vy * bone->b + x;
+			worldVertices[w + 1] = vx * bone->c + vy * bone->d + y;
+		}
+	} else {
+		spBone** skeletonBones = skeleton->bones;
+		if (slot->attachmentVerticesCount == 0) {
+			int w, v, b, n;
+			for (w = 0, v = 0, b = 0, n = skeleton->bonesCount; v < n; w += 2) {
+				float wx = x, wy = y;
+				int nn = bones[v++] + v;
+				for (; v < nn; v++, b += 3) {
+					spBone* bone = skeletonBones[bones[v]];
+					float vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
+					wx += (vx * bone->a + vy * bone->b + bone->worldX) * weight;
+					wy += (vx * bone->c + vy * bone->d + bone->worldY) * weight;
+				}
+				worldVertices[w] = wx;
+				worldVertices[w + 1] = wy;
+			}
+		} else {
+			int w, v, b, f, n;
+			for (w = 0, v = 0, b = 0, f = 0, n = skeleton->bonesCount; v < n; w += 2) {
+				float wx = x, wy = y;
+				int nn = bones[v++] + v;
+				for (; v < nn; v++, b += 3, f += 2) {
+					spBone* bone = skeletonBones[bones[v]];
+					float vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
+					wx += (vx * bone->a + vy * bone->b + bone->worldX) * weight;
+					wy += (vx * bone->c + vy * bone->d + bone->worldY) * weight;
+				}
+				worldVertices[w] = wx;
+				worldVertices[w + 1] = wy;
+			}
+ 		}
 	}
 }
 
 void spMeshAttachment_setParentMesh (spMeshAttachment* self, spMeshAttachment* parentMesh) {
 	CONST_CAST(spMeshAttachment*, self->parentMesh) = parentMesh;
 	if (parentMesh) {
-		self->vertices = parentMesh->vertices;
+		self->super.bones = parentMesh->super.bones;
+		self->super.bonesCount = parentMesh->super.bonesCount;
+
+		self->super.vertices = parentMesh->super.vertices;
+		self->super.verticesCount = parentMesh->super.verticesCount;
+
 		self->regionUVs = parentMesh->regionUVs;
-		self->verticesCount = parentMesh->verticesCount;
 
 		self->triangles = parentMesh->triangles;
 		self->trianglesCount = parentMesh->trianglesCount;

@@ -52,6 +52,7 @@ spBone* spBone_create (spBoneData* data, spSkeleton* skeleton, spBone* parent) {
 }
 
 void spBone_dispose (spBone* self) {
+	FREE(self->children);
 	FREE(self);
 }
 
@@ -68,8 +69,6 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 	spBone* parent = self->parent;
 
 	CONST_CAST(float, self->appliedRotation) = rotation;
-	CONST_CAST(float, self->appliedScaleX) = scaleX;
-	CONST_CAST(float, self->appliedScaleY) = scaleY;
 
 	if (!parent) { /* Root bone. */
 		if (self->skeleton->flipX) {
@@ -137,25 +136,23 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 			pd = 1;
 			do {
 				float za, zb, zc, zd;
-				float r = parent->appliedRotation;
-				float psx = parent->appliedScaleX; float psy = parent->appliedScaleY;
-				cosine = COS_DEG(r); sine = SIN_DEG(r);
-				za = cosine * psx; zb = -sine * psy; zc = sine * psx; zd = cosine * psy;
+				float psx = parent->scaleX, psy = parent->scaleY;
+				cosine = COS(parent->appliedRotation * DEG_RAD);
+				sine = SIN(parent->appliedRotation * DEG_RAD);
+				za = cosine * psx; zb = sine * psy; zc = sine * psx; zd = cosine * psy;
 				temp = pa * za + pb * zc;
-				pb = pa * zb + pb * zd;
+				pb = pb * zd - pa * zb;
 				pa = temp;
 				temp = pc * za + pd * zc;
-				pd = pc * zb + pd * zd;
+				pd = pd * zd - pc * zb;
 				pc = temp;
 
-				if (psx < 0) r = -r;
-				cosine = COS_DEG(-r);
-				sine = SIN_DEG(-r);
+				if (psx >= 0) sine = -sine;
 				temp = pa * cosine + pb * sine;
-				pb = pa * -sine + pb * cosine;
+				pb = pb * cosine - pa * sine;
 				pa = temp;
 				temp = pc * cosine + pd * sine;
-				pd = pc * -sine + pd * cosine;
+				pd = pd * cosine - pc * sine;
 				pc = temp;
 
 				if (!parent->data->inheritScale) break;
@@ -209,9 +206,9 @@ float spBone_getWorldScaleY (spBone* self) {
 }
 
 void spBone_worldToLocal (spBone* self, float worldX, float worldY, float* localX, float* localY) {
-	float x = worldX - self->worldX, y = worldY - self->worldY;
 	float a = self->a, b = self->b, c = self->c, d = self->d;
 	float invDet = 1 / (a * d - b * c);
+	float x = worldX - self->worldX, y = worldY - self->worldY;
 	*localX = (x * d * invDet - y * b * invDet);
 	*localY = (y * a * invDet - x * c * invDet);
 }

@@ -77,29 +77,6 @@ spAttachment* _spAtlasAttachmentLoader_createAttachment (spAttachmentLoader* loa
 		attachment->regionOriginalHeight = region->originalHeight;
 		return SUPER(attachment);
 	}
-	case SP_ATTACHMENT_WEIGHTED_MESH:
-	case SP_ATTACHMENT_WEIGHTED_LINKED_MESH: {
-		spWeightedMeshAttachment* attachment;
-		spAtlasRegion* region = spAtlas_findRegion(self->atlas, path);
-		if (!region) {
-			_spAttachmentLoader_setError(loader, "Region not found: ", path);
-			return 0;
-		}
-		attachment = spWeightedMeshAttachment_create(name);
-		attachment->rendererObject = region;
-		attachment->regionU = region->u;
-		attachment->regionV = region->v;
-		attachment->regionU2 = region->u2;
-		attachment->regionV2 = region->v2;
-		attachment->regionRotate = region->rotate;
-		attachment->regionOffsetX = region->offsetX;
-		attachment->regionOffsetY = region->offsetY;
-		attachment->regionWidth = region->width;
-		attachment->regionHeight = region->height;
-		attachment->regionOriginalWidth = region->originalWidth;
-		attachment->regionOriginalHeight = region->originalHeight;
-		return SUPER(attachment);
-	}
 	case SP_ATTACHMENT_BOUNDING_BOX:
 		return SUPER(spBoundingBoxAttachment_create(name));
 	default:

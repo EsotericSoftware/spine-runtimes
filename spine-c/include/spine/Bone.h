@@ -45,24 +45,31 @@ struct spBone {
 	spBoneData* const data;
 	struct spSkeleton* const skeleton;
 	spBone* const parent;
+	int childrenCount;
+	spBone** const children;
 	float x, y, rotation, scaleX, scaleY, shearX, shearY;
-	float appliedRotation, appliedScaleX, appliedScaleY;
+	float appliedRotation;
 
 	float const a, b, worldX;
 	float const c, d, worldY;
 	float const worldSignX, worldSignY;
+
+	int/*bool*/ sorted;
 
 #ifdef __cplusplus
 	spBone() :
 		data(0),
 		skeleton(0),
 		parent(0),
+		childrenCount(0), children(0),
 		x(0), y(0), rotation(0), scaleX(0), scaleY(0),
-		appliedRotation(0), appliedScaleX(0), appliedScaleY(0),
+		appliedRotation(0),
 
 		a(0), b(0), worldX(0),
 		c(0), d(0), worldY(0),
-		worldSignX(0), worldSignY(0) {
+		worldSignX(0), worldSignY(0),
+		
+		sorted(0) {
 	}
 #endif
 };
