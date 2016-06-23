@@ -147,79 +147,77 @@ namespace Spine {
 			y = cwy - pp.worldY;
 			float dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
 			float l1 = (float)Math.Sqrt(dx * dx + dy * dy), l2 = child.data.length * csx, a1, a2;
-			while (true) {
-				if (u) {
-					l2 *= psx;
-					float cos = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
-					if (cos < -1)
-						cos = -1;
-					else if (cos > 1) cos = 1;
-					a2 = (float)Math.Acos(cos) * bendDir;
-					a = l1 + l2 * cos;
-					b = l2 * Math.Sin(a2);
-					a1 = MathUtils.Atan2(ty * a - tx * b, tx * a + ty * b);
-				} else {
-					a = psx * l2;
-					b = psy * l2;
-					float aa = a * a, bb = b * b, dd = tx * tx + ty * ty, ta = MathUtils.Atan2(ty, tx);
-					c = bb * l1 * l1 + aa * dd - aa * bb;
-					float c1 = -2 * bb * l1, c2 = bb - aa;
-					d = c1 * c1 - 4 * c2 * c;
-					if (d >= 0) {
-						float q = (float)Math.Sqrt(d);
-						if (c1 < 0) q = -q;
-						q = -(c1 + q) / 2;
-						float r0 = q / c2, r1 = c / q;
-						float r = Math.Abs(r0) < Math.Abs(r1) ? r0 : r1;
-						if (r * r <= dd) {
-							y = (float)Math.Sqrt(dd - r * r) * bendDir;
-							a1 = ta - MathUtils.Atan2(y, r);
-							a2 = MathUtils.Atan2(y / psy, (r - l1) / psx);
-							continue;
-						}
-					}
-					float minAngle = 0, minDist = float.MaxValue, minX = 0, minY = 0;
-					float maxAngle = 0, maxDist = 0, maxX = 0, maxY = 0;
-					x = l1 + a;
-					d = x * x;
-					if (d > maxDist) {
-						maxAngle = 0;
-						maxDist = d;
-						maxX = x;
-					}
-					x = l1 - a;
-					d = x * x;
-					if (d < minDist) {
-						minAngle = MathUtils.PI;
-						minDist = d;
-						minX = x;
-					}
-					float angle = (float)Math.Acos(-a * l1 / (aa - bb));
-					x = a * MathUtils.Cos(angle) + l1;
-					y = b * MathUtils.Sin(angle);
-					d = x * x + y * y;
-					if (d < minDist) {
-						minAngle = angle;
-						minDist = d;
-						minX = x;
-						minY = y;
-					}
-					if (d > maxDist) {
-						maxAngle = angle;
-						maxDist = d;
-						maxX = x;
-						maxY = y;
-					}
-					if (dd <= (minDist + maxDist) / 2) {
-						a1 = ta - MathUtils.Atan2(minY * bendDir, minX);
-						a2 = minAngle * bendDir;
-					} else {
-						a1 = ta - MathUtils.Atan2(maxY * bendDir, maxX);
-						a2 = maxAngle * bendDir;
+			if (u) {
+				l2 *= psx;
+				float cos = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
+				if (cos < -1)
+					cos = -1;
+				else if (cos > 1) cos = 1;
+				a2 = (float)Math.Acos(cos) * bendDir;
+				a = l1 + l2 * cos;
+				b = l2 * Math.Sin(a2);
+				a1 = MathUtils.Atan2(ty * a - tx * b, tx * a + ty * b);
+			} else {
+				a = psx * l2;
+				b = psy * l2;
+				float aa = a * a, bb = b * b, dd = tx * tx + ty * ty, ta = MathUtils.Atan2(ty, tx);
+				c = bb * l1 * l1 + aa * dd - aa * bb;
+				float c1 = -2 * bb * l1, c2 = bb - aa;
+				d = c1 * c1 - 4 * c2 * c;
+				if (d >= 0) {
+					float q = (float)Math.Sqrt(d);
+					if (c1 < 0) q = -q;
+					q = -(c1 + q) / 2;
+					float r0 = q / c2, r1 = c / q;
+					float r = Math.Abs(r0) < Math.Abs(r1) ? r0 : r1;
+					if (r * r <= dd) {
+						y = (float)Math.Sqrt(dd - r * r) * bendDir;
+						a1 = ta - MathUtils.Atan2(y, r);
+						a2 = MathUtils.Atan2(y / psy, (r - l1) / psx);
+						goto outer;
 					}
 				}
-				break;
+				float minAngle = 0, minDist = float.MaxValue, minX = 0, minY = 0;
+				float maxAngle = 0, maxDist = 0, maxX = 0, maxY = 0;
+				x = l1 + a;
+				d = x * x;
+				if (d > maxDist) {
+					maxAngle = 0;
+					maxDist = d;
+					maxX = x;
+				}
+				x = l1 - a;
+				d = x * x;
+				if (d < minDist) {
+					minAngle = MathUtils.PI;
+					minDist = d;
+					minX = x;
+				}
+				float angle = (float)Math.Acos(-a * l1 / (aa - bb));
+				x = a * MathUtils.Cos(angle) + l1;
+				y = b * MathUtils.Sin(angle);
+				d = x * x + y * y;
+				if (d < minDist) {
+					minAngle = angle;
+					minDist = d;
+					minX = x;
+					minY = y;
+				}
+				if (d > maxDist) {
+					maxAngle = angle;
+					maxDist = d;
+					maxX = x;
+					maxY = y;
+				}
+				if (dd <= (minDist + maxDist) / 2) {
+					a1 = ta - MathUtils.Atan2(minY * bendDir, minX);
+					a2 = minAngle * bendDir;
+				} else {
+					a1 = ta - MathUtils.Atan2(maxY * bendDir, maxX);
+					a2 = maxAngle * bendDir;
+				}
 			}
+			outer:
 			float os = MathUtils.Atan2(cy, cx) * s2;
 			float rotation = parent.rotation;
 			a1 = (a1 - os) * MathUtils.radDeg + os1 - rotation;
