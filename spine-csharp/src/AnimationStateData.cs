@@ -42,6 +42,7 @@ namespace Spine {
 		public float DefaultMix { get { return defaultMix; } set { defaultMix = value; } }
 
 		public AnimationStateData (SkeletonData skeletonData) {
+			if (skeletonData == null) throw new ArgumentException ("skeletonData cannot be null.");
 			this.skeletonData = skeletonData;
 		}
 
