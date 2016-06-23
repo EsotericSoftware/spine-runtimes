@@ -1,4 +1,5 @@
 require "examples.spineboy.spineboy"
+-- require "examples.spineboy-atlas.spineboy"
 -- require "examples.spineboy.spineboy-mesh"
 -- require "examples.goblins.goblins"
 -- require "examples.dragon.dragon"
