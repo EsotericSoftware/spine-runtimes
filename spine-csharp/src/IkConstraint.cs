@@ -37,8 +37,10 @@ namespace Spine {
 		internal IkConstraintData data;
 		internal ExposedList<Bone> bones = new ExposedList<Bone>();
 		internal Bone target;
-		internal int bendDirection;
 		internal float mix;
+		internal int bendDirection;
+
+		int level;
 
 		public IkConstraintData Data { get { return data; } }
 		public ExposedList<Bone> Bones { get { return bones; } }
@@ -92,16 +94,19 @@ namespace Spine {
 			if (rotationIK > 180)
 				rotationIK -= 360;
 			else if (rotationIK < -180) rotationIK += 360;
-			bone.UpdateWorldTransform(bone.x, bone.y, bone.rotation + (rotationIK - bone.rotation) * alpha, bone.appliedScaleX,
-				bone.appliedScaleY, bone.shearX, bone.shearY);
+			bone.UpdateWorldTransform(bone.x, bone.y, bone.rotation + (rotationIK - bone.rotation) * alpha, bone.scaleX, bone.scaleY,
+				bone.shearX, bone.shearY);
 		}
 
 		/// <summary>Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as
 		/// possible. The target is specified in the world coordinate system.</summary>
 		/// <param name="child">A direct descendant of the parent bone.</param>
 		static public void Apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, float alpha) {
-			if (alpha == 0) return;
-			float px = parent.x, py = parent.y, psx = parent.appliedScaleX, psy = parent.appliedScaleY;
+			if (alpha == 0) {
+				child.UpdateWorldTransform ();
+				return;
+			}
+			float px = parent.x, py = parent.y, psx = parent.scaleX, psy = parent.scaleY, csx = child.scaleX;
 			int os1, os2, s2;
 			if (psx < 0) {
 				psx = -psx;
@@ -115,104 +120,119 @@ namespace Spine {
 				psy = -psy;
 				s2 = -s2;
 			}
-			float cx = child.x, cy = child.y, csx = child.appliedScaleX;
-			bool u = Math.Abs(psx - psy) <= 0.0001f;
-			if (!u && cy != 0) {
-				child.worldX = parent.a * cx + parent.worldX;
-				child.worldY = parent.c * cx + parent.worldY;
-				cy = 0;
-			}
 			if (csx < 0) {
 				csx = -csx;
 				os2 = 180;
 			} else
 				os2 = 0;
-			Bone pp = parent.parent;
-			float ppa = pp.a, ppb = pp.b, ppc = pp.c, ppd = pp.d, id = 1 / (ppa * ppd - ppb * ppc);
-			float x = targetX - pp.worldX, y = targetY - pp.worldY;
-			float tx = (x * ppd - y * ppb) * id - px, ty = (y * ppa - x * ppc) * id - py;
-			x = child.worldX - pp.worldX;
-			y = child.worldY - pp.worldY;
-			float dx = (x * ppd - y * ppb) * id - px, dy = (y * ppa - x * ppc) * id - py;
-			float l1 = (float)Math.Sqrt(dx * dx + dy * dy), l2 = child.data.length * csx, a1, a2;
-			if (u) {
-				l2 *= psx;
-				float cos = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
-				if (cos < -1) cos = -1;
-				else if (cos > 1) cos = 1;
-				a2 = (float)Math.Acos(cos) * bendDir;
-				float a = l1 + l2 * cos, o = l2 * MathUtils.Sin(a2);
-				a1 = MathUtils.Atan2(ty * a - tx * o, tx * a + ty * o);
+			float cx = child.x, cy, cwx, cwy, a = parent.a, b = parent.b, c = parent.c, d = parent.d;
+			bool u = Math.Abs(psx - psy) <= 0.0001f;
+			if (!u) {
+				cy = 0;
+				cwx = a * cx + parent.worldX;
+				cwy = c * cx + parent.worldY;
 			} else {
-				float a = psx * l2, b = psy * l2, ta = MathUtils.Atan2(ty, tx);
-				float aa = a * a, bb = b * b, ll = l1 * l1, dd = tx * tx + ty * ty;
-				float c0 = bb * ll + aa * dd - aa * bb, c1 = -2 * bb * l1, c2 = bb - aa;
-				float d = c1 * c1 - 4 * c2 * c0;
-				if (d >= 0) {
-					float q = (float)Math.Sqrt(d);
-					if (c1 < 0) q = -q;
-					q = -(c1 + q) / 2;
-					float r0 = q / c2, r1 = c0 / q;
-					float r = Math.Abs(r0) < Math.Abs(r1) ? r0 : r1;
-					if (r * r <= dd) {
-						y = (float)Math.Sqrt(dd - r * r) * bendDir;
-						a1 = ta - MathUtils.Atan2(y, r);
-						a2 = MathUtils.Atan2(y / psy, (r - l1) / psx);
-						goto outer;
+				cy = child.y;
+				cwx = a * cx + b * cy + parent.worldX;
+				cwy = c * cx + d * cy + parent.worldY;
+			}
+			Bone pp = parent.parent;
+			a = pp.a;
+			b = pp.b;
+			c = pp.c;
+			d = pp.d;
+			float id = 1 / (a * d - b * c), x = targetX - pp.worldX, y = targetY - pp.worldY;
+			float tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py;
+			x = cwx - pp.worldX;
+			y = cwy - pp.worldY;
+			float dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
+			float l1 = (float)Math.Sqrt(dx * dx + dy * dy), l2 = child.data.length * csx, a1, a2;
+			while (true) {
+				if (u) {
+					l2 *= psx;
+					float cos = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
+					if (cos < -1)
+						cos = -1;
+					else if (cos > 1) cos = 1;
+					a2 = (float)Math.Acos(cos) * bendDir;
+					a = l1 + l2 * cos;
+					b = l2 * Math.Sin(a2);
+					a1 = MathUtils.Atan2(ty * a - tx * b, tx * a + ty * b);
+				} else {
+					a = psx * l2;
+					b = psy * l2;
+					float aa = a * a, bb = b * b, dd = tx * tx + ty * ty, ta = MathUtils.Atan2(ty, tx);
+					c = bb * l1 * l1 + aa * dd - aa * bb;
+					float c1 = -2 * bb * l1, c2 = bb - aa;
+					d = c1 * c1 - 4 * c2 * c;
+					if (d >= 0) {
+						float q = (float)Math.Sqrt(d);
+						if (c1 < 0) q = -q;
+						q = -(c1 + q) / 2;
+						float r0 = q / c2, r1 = c / q;
+						float r = Math.Abs(r0) < Math.Abs(r1) ? r0 : r1;
+						if (r * r <= dd) {
+							y = (float)Math.Sqrt(dd - r * r) * bendDir;
+							a1 = ta - MathUtils.Atan2(y, r);
+							a2 = MathUtils.Atan2(y / psy, (r - l1) / psx);
+							continue;
+						}
+					}
+					float minAngle = 0, minDist = float.MaxValue, minX = 0, minY = 0;
+					float maxAngle = 0, maxDist = 0, maxX = 0, maxY = 0;
+					x = l1 + a;
+					d = x * x;
+					if (d > maxDist) {
+						maxAngle = 0;
+						maxDist = d;
+						maxX = x;
+					}
+					x = l1 - a;
+					d = x * x;
+					if (d < minDist) {
+						minAngle = MathUtils.PI;
+						minDist = d;
+						minX = x;
+					}
+					float angle = (float)Math.Acos(-a * l1 / (aa - bb));
+					x = a * MathUtils.Cos(angle) + l1;
+					y = b * MathUtils.Sin(angle);
+					d = x * x + y * y;
+					if (d < minDist) {
+						minAngle = angle;
+						minDist = d;
+						minX = x;
+						minY = y;
+					}
+					if (d > maxDist) {
+						maxAngle = angle;
+						maxDist = d;
+						maxX = x;
+						maxY = y;
+					}
+					if (dd <= (minDist + maxDist) / 2) {
+						a1 = ta - MathUtils.Atan2(minY * bendDir, minX);
+						a2 = minAngle * bendDir;
+					} else {
+						a1 = ta - MathUtils.Atan2(maxY * bendDir, maxX);
+						a2 = maxAngle * bendDir;
 					}
 				}
-				float minAngle = 0, minDist = float.MaxValue, minX = 0, minY = 0;
-				float maxAngle = 0, maxDist = 0, maxX = 0, maxY = 0;
-				x = l1 + a;
-				d = x * x;
-				if (d > maxDist) {
-					maxAngle = 0;
-					maxDist = d;
-					maxX = x;
-				}
-				x = l1 - a;
-				d = x * x;
-				if (d < minDist) {
-					minAngle = MathUtils.PI;
-					minDist = d;
-					minX = x;
-				}
-				float angle = (float)Math.Acos(-a * l1 / (aa - bb));
-				x = a * MathUtils.Cos(angle) + l1;
-				y = b * MathUtils.Sin(angle);
-				d = x * x + y * y;
-				if (d < minDist) {
-					minAngle = angle;
-					minDist = d;
-					minX = x;
-					minY = y;
-				}
-				if (d > maxDist) {
-					maxAngle = angle;
-					maxDist = d;
-					maxX = x;
-					maxY = y;
-				}
-				if (dd <= (minDist + maxDist) / 2) {
-					a1 = ta - MathUtils.Atan2(minY * bendDir, minX);
-					a2 = minAngle * bendDir;
-				} else {
-					a1 = ta - MathUtils.Atan2(maxY * bendDir, maxX);
-					a2 = maxAngle * bendDir;
-				}
+				break;
 			}
-		outer:
 			float os = MathUtils.Atan2(cy, cx) * s2;
-			a1 = (a1 - os) * MathUtils.radDeg + os1;
-			a2 = ((a2 + os) * MathUtils.radDeg - child.shearX) * s2 + os2;
-			if (a1 > 180) a1 -= 360;
-			else if (a1 < -180) a1 += 360;
-			if (a2 > 180) a2 -= 360;
-			else if (a2 < -180) a2 += 360;
 			float rotation = parent.rotation;
-			parent.UpdateWorldTransform(px, py, rotation + (a1 - rotation) * alpha, parent.appliedScaleX, parent.appliedScaleY, 0, 0);
+			a1 = (a1 - os) * MathUtils.radDeg + os1 - rotation;
+			if (a1 > 180)
+				a1 -= 360;
+			else if (a1 < -180) a1 += 360;
+			parent.UpdateWorldTransform(px, py, rotation + a1 * alpha, parent.scaleX, parent.scaleY, 0, 0);
 			rotation = child.rotation;
-			child.UpdateWorldTransform(cx, cy, rotation + (a2 - rotation) * alpha, child.appliedScaleX, child.appliedScaleY, child.shearX, child.shearY);
+			a2 = ((a2 + os) * MathUtils.radDeg - child.shearX) * s2 + os2 - rotation;
+			if (a2 > 180)
+				a2 -= 360;
+			else if (a2 < -180) a2 += 360;
+			child.UpdateWorldTransform(cx, cy, rotation + a2 * alpha, child.scaleX, child.scaleY, child.shearX, child.shearY);
 		}
 	}
 }
