@@ -89,12 +89,14 @@ typedef enum {
 	SP_TIMELINE_SCALE,
 	SP_TIMELINE_ROTATE,
 	SP_TIMELINE_TRANSLATE,
+	SP_TIMELINE_SHEAR,
 	SP_TIMELINE_COLOR,
 	SP_TIMELINE_ATTACHMENT,
 	SP_TIMELINE_EVENT,
 	SP_TIMELINE_DRAWORDER,
 	SP_TIMELINE_FFD,
-	SP_TIMELINE_IKCONSTRAINT
+	SP_TIMELINE_IKCONSTRAINT,
+	SP_TIMELINE_TRANSFORMCONSTRAINT
 } spTimelineType;
 
 struct spTimeline {
@@ -215,6 +217,20 @@ void spScaleTimeline_setFrame (spScaleTimeline* self, int frameIndex, float time
 typedef spScaleTimeline ScaleTimeline;
 #define ScaleTimeline_create(...) spScaleTimeline_create(__VA_ARGS__)
 #define ScaleTimeline_setFrame(...) spScaleTimeline_setFrame(__VA_ARGS__)
+#endif
+
+/**/
+
+typedef struct spBaseTimeline spShearTimeline;
+
+spShearTimeline* spShearTimeline_create (int framesCount);
+
+void spShearTimeline_setFrame (spShearTimeline* self, int frameIndex, float time, float x, float y);
+
+#ifdef SPINE_SHORT_NAMES
+typedef spShearTimeline ShearTimeline;
+#define ShearTimeline_create(...) spShearTimeline_create(__VA_ARGS__)
+#define ShearTimeline_setFrame(...) spShearTimeline_setFrame(__VA_ARGS__)
 #endif
 
 /**/
@@ -387,13 +403,40 @@ typedef struct spIkConstraintTimeline {
 
 spIkConstraintTimeline* spIkConstraintTimeline_create (int framesCount);
 
-/* @param attachmentName May be 0. */
 void spIkConstraintTimeline_setFrame (spIkConstraintTimeline* self, int frameIndex, float time, float mix, int bendDirection);
 
 #ifdef SPINE_SHORT_NAMES
 typedef spIkConstraintTimeline IkConstraintTimeline;
 #define IkConstraintTimeline_create(...) spIkConstraintTimeline_create(__VA_ARGS__)
 #define IkConstraintTimeline_setFrame(...) spIkConstraintTimeline_setFrame(__VA_ARGS__)
+#endif
+
+/**/
+
+typedef struct spTransformConstraintTimeline {
+	spCurveTimeline super;
+	int const framesCount;
+	float* const frames; /* time, mix, bendDirection, ... */
+	int transformConstraintIndex;
+
+#ifdef __cplusplus
+	spTransformConstraintTimeline() :
+		super(),
+		framesCount(0),
+		frames(0),
+		transformConstraintIndex(0) {
+	}
+#endif
+} spTransformConstraintTimeline;
+
+spTransformConstraintTimeline* spTransformConstraintTimeline_create (int framesCount);
+
+void spTransformConstraintTimeline_setFrame (spTransformConstraintTimeline* self, int frameIndex, float time, float rotateMix, float translateMix, float scaleMix, float shearMix);
+
+#ifdef SPINE_SHORT_NAMES
+typedef spTransformConstraintTimeline TransformConstraintTimeline;
+#define TransformConstraintTimeline_create(...) spTransformConstraintTimeline_create(__VA_ARGS__)
+#define TransformConstraintTimeline_setFrame(...) spTransformConstraintTimeline_setFrame(__VA_ARGS__)
 #endif
 
 /**/

@@ -1,0 +1,250 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{76A39BB2-9B84-4C65-98A5-654D86B86F2A}</ProjectGuid>
+    <RootNamespace>test_win32</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset Condition="'$(VisualStudioVersion)' == '12.0'">v120</PlatformToolset>
+    <PlatformToolset Condition="'$(VisualStudioVersion)' == '12.0' and exists('$(MSBuildProgramFiles32)\Microsoft SDKs\Windows\v7.1A')">v120_xp</PlatformToolset>
+    <PlatformToolset Condition="'$(VisualStudioVersion)' == '14.0'">v140</PlatformToolset>
+    <PlatformToolset Condition="'$(VisualStudioVersion)' == '14.0' and exists('$(MSBuildProgramFiles32)\Microsoft SDKs\Windows\v7.1A')">v140_xp</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset Condition="'$(VisualStudioVersion)' == '12.0'">v120</PlatformToolset>
+    <PlatformToolset Condition="'$(VisualStudioVersion)' == '12.0' and exists('$(MSBuildProgramFiles32)\Microsoft SDKs\Windows\v7.1A')">v120_xp</PlatformToolset>
+    <PlatformToolset Condition="'$(VisualStudioVersion)' == '14.0'">v140</PlatformToolset>
+    <PlatformToolset Condition="'$(VisualStudioVersion)' == '14.0' and exists('$(MSBuildProgramFiles32)\Microsoft SDKs\Windows\v7.1A')">v140_xp</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\cocos2d\cocos\2d\cocos2dx.props" />
+    <Import Project="..\cocos2d\cocos\2d\cocos2d_headers.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\cocos2d\cocos\2d\cocos2dx.props" />
+    <Import Project="..\cocos2d\cocos\2d\cocos2d_headers.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration).win32\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration).win32\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration).win32\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration).win32\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LibraryPath>$(MSBuildProgramFiles32)\Microsoft SDKs\Windows\v7.1A\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSdk_71A_IncludePath);</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LibraryPath>$(MSBuildProgramFiles32)\Microsoft SDKs\Windows\v7.1A\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(EngineRoot)external;$(EngineRoot)cocos\audio\include;$(EngineRoot)external\chipmunk\include\chipmunk;$(EngineRoot)extensions;..\Classes;..;%(AdditionalIncludeDirectories);$(_COCOS_HEADER_WIN32_BEGIN);$(_COCOS_HEADER_WIN32_END);$(SolutionDir)..\..\..\spine-c\include;$(SolutionDir)..\..\src;$(IncludePath)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USE_MATH_DEFINES;GL_GLEXT_PROTOTYPES;CC_ENABLE_CHIPMUNK_INTEGRATION=1;COCOS2D_DEBUG=1;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DisableSpecificWarnings>4267;4251;4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>%(AdditionalDependencies);$(_COCOS_LIB_WIN32_BEGIN);$(_COCOS_LIB_WIN32_END)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories);$(_COCOS_LIB_PATH_WIN32_BEGIN);$(_COCOS_LIB_PATH_WIN32_END)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+    <PreLinkEvent>
+      <Command>
+      </Command>
+    </PreLinkEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <CustomBuildStep>
+      <Command>if not exist "$(OutDir)" mkdir "$(OutDir)"
+xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
+      </Command>
+      <Outputs>$(TargetName).cab</Outputs>
+      <Inputs>$(TargetFileName)</Inputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(EngineRoot)external;$(EngineRoot)cocos\audio\include;$(EngineRoot)external\chipmunk\include\chipmunk;$(EngineRoot)extensions;..\Classes;..;%(AdditionalIncludeDirectories);$(_COCOS_HEADER_WIN32_BEGIN);$(_COCOS_HEADER_WIN32_END)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USE_MATH_DEFINES;GL_GLEXT_PROTOTYPES;CC_ENABLE_CHIPMUNK_INTEGRATION=1;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4267;4251;4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libcurl_imp.lib;websockets.lib;%(AdditionalDependencies);$(_COCOS_LIB_WIN32_BEGIN);$(_COCOS_LIB_WIN32_END)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories);$(_COCOS_LIB_PATH_WIN32_BEGIN);$(_COCOS_LIB_PATH_WIN32_END)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+    <PreLinkEvent>
+      <Command>
+      </Command>
+    </PreLinkEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\spine-c\src\spine\Animation.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\AnimationState.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\AnimationStateData.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\Atlas.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\AtlasAttachmentLoader.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\Attachment.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\AttachmentLoader.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\Bone.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\BoneData.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\BoundingBoxAttachment.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\Event.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\EventData.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\extension.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\IkConstraint.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\IkConstraintData.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\Json.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\MeshAttachment.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\RegionAttachment.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\Skeleton.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\SkeletonBounds.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\SkeletonData.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\SkeletonJson.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\Skin.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\Slot.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\SlotData.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\TransformConstraint.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\TransformConstraintData.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\WeightedMeshAttachment.c" />
+    <ClCompile Include="..\..\src\spine\AttachmentVertices.cpp" />
+    <ClCompile Include="..\..\src\spine\Cocos2dAttachmentLoader.cpp" />
+    <ClCompile Include="..\..\src\spine\SkeletonAnimation.cpp" />
+    <ClCompile Include="..\..\src\spine\SkeletonBatch.cpp" />
+    <ClCompile Include="..\..\src\spine\SkeletonRenderer.cpp" />
+    <ClCompile Include="..\..\src\spine\spine-cocos2dx.cpp" />
+    <ClCompile Include="..\Classes\AppDelegate.cpp" />
+    <ClCompile Include="..\Classes\BatchingExample.cpp" />
+    <ClCompile Include="..\Classes\GoblinsExample.cpp" />
+    <ClCompile Include="..\Classes\RaptorExample.cpp" />
+    <ClCompile Include="..\Classes\SimpleCommand.cpp" />
+    <ClCompile Include="..\Classes\SpineboyExample.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\spine-c\include\spine\Animation.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\AnimationState.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\AnimationStateData.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\Atlas.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\AtlasAttachmentLoader.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\Attachment.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\AttachmentLoader.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\Bone.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\BoneData.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\BoundingBoxAttachment.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\Event.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\EventData.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\extension.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\IkConstraint.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\IkConstraintData.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\MeshAttachment.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\RegionAttachment.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\Skeleton.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\SkeletonBounds.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\SkeletonData.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\SkeletonJson.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\Skin.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\Slot.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\SlotData.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\spine.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\TransformConstraint.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\TransformConstraintData.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\WeightedMeshAttachment.h" />
+    <ClInclude Include="..\..\..\spine-c\src\spine\Json.h" />
+    <ClInclude Include="..\..\src\spine\AttachmentVertices.h" />
+    <ClInclude Include="..\..\src\spine\Cocos2dAttachmentLoader.h" />
+    <ClInclude Include="..\..\src\spine\SkeletonAnimation.h" />
+    <ClInclude Include="..\..\src\spine\SkeletonBatch.h" />
+    <ClInclude Include="..\..\src\spine\SkeletonRenderer.h" />
+    <ClInclude Include="..\..\src\spine\spine-cocos2dx.h" />
+    <ClInclude Include="..\Classes\AppDelegate.h" />
+    <ClInclude Include="..\Classes\AppMacros.h" />
+    <ClInclude Include="..\Classes\BatchingExample.h" />
+    <ClInclude Include="..\Classes\GoblinsExample.h" />
+    <ClInclude Include="..\Classes\RaptorExample.h" />
+    <ClInclude Include="..\Classes\SimpleCommand.h" />
+    <ClInclude Include="..\Classes\SpineboyExample.h" />
+    <ClInclude Include="main.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\cocos2d\cocos\2d\libcocos2d.vcxproj">
+      <Project>{98a51ba8-fc3a-415b-ac8f-8c7bd464e93e}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\cocos2d\external\Box2D\proj.win32\libbox2d.vcxproj">
+      <Project>{929480e7-23c0-4df6-8456-096d71547116}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="game.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

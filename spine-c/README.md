@@ -12,7 +12,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-c works with data exported from Spine 3.1.08. Updating spine-c to [v3.2](https://github.com/EsotericSoftware/spine-runtimes/issues/586) and [v3.3](https://github.com/EsotericSoftware/spine-runtimes/issues/613) is in progress.
+spine-c works with data exported from Spine version 3.2.01.
 
 spine-c supports all Spine features.
 

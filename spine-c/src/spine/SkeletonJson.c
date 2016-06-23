@@ -148,10 +148,11 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 	Json* bones = Json_getItem(root, "bones");
 	Json* slots = Json_getItem(root, "slots");
 	Json* ik = Json_getItem(root, "ik");
+	Json* transform = Json_getItem(root, "transform");
 	Json* ffd = Json_getItem(root, "ffd");
 	Json* drawOrder = Json_getItem(root, "drawOrder");
 	Json* events = Json_getItem(root, "events");
-	Json *boneMap, *slotMap, *ikMap, *ffdMap;
+	Json *boneMap, *slotMap, *constraintMap, *ffdMap;
 	if (!drawOrder) drawOrder = Json_getItem(root, "draworder");
 
 	for (boneMap = bones ? bones->child : 0; boneMap; boneMap = boneMap->next)
@@ -238,10 +239,15 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 
 			} else {
 				int isScale = strcmp(timelineArray->name, "scale") == 0;
-				if (isScale || strcmp(timelineArray->name, "translate") == 0) {
-					float scale = isScale ? 1 : self->scale;
-					spTranslateTimeline *timeline =
-							isScale ? spScaleTimeline_create(timelineArray->size) : spTranslateTimeline_create(timelineArray->size);
+				int isTranslate = strcmp(timelineArray->name, "translate") == 0;
+				int isShear = strcmp(timelineArray->name, "shear") == 0;
+				if (isScale || isTranslate || isShear) {
+					float scale = isTranslate ? self->scale: 1;
+					spTranslateTimeline *timeline = 0;
+					if (isScale) timeline = spScaleTimeline_create(timelineArray->size);
+					else if (isTranslate) timeline = spTranslateTimeline_create(timelineArray->size);
+					else if (isShear) timeline = spShearTimeline_create(timelineArray->size);
+
 					timeline->boneIndex = boneIndex;
 					for (frame = timelineArray->child, i = 0; frame; frame = frame->next, ++i) {
 						spTranslateTimeline_setFrame(timeline, i, Json_getFloat(frame, "time", 0), Json_getFloat(frame, "x", 0) * scale,
@@ -261,23 +267,43 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 		}
 	}
 
-	/* IK timelines. */
-	for (ikMap = ik ? ik->child : 0; ikMap; ikMap = ikMap->next) {
-		spIkConstraintData* ikConstraint = spSkeletonData_findIkConstraint(skeletonData, ikMap->name);
-		spIkConstraintTimeline* timeline = spIkConstraintTimeline_create(ikMap->size);
+	/* IK constraint timelines. */
+	for (constraintMap = ik ? ik->child : 0; constraintMap; constraintMap = constraintMap->next) {
+		spIkConstraintData* constraint = spSkeletonData_findIkConstraint(skeletonData, constraintMap->name);
+		spIkConstraintTimeline* timeline = spIkConstraintTimeline_create(constraintMap->size);
 		for (i = 0; i < skeletonData->ikConstraintsCount; ++i) {
-			if (ikConstraint == skeletonData->ikConstraints[i]) {
+			if (constraint == skeletonData->ikConstraints[i]) {
 				timeline->ikConstraintIndex = i;
 				break;
 			}
 		}
-		for (frame = ikMap->child, i = 0; frame; frame = frame->next, ++i) {
-			spIkConstraintTimeline_setFrame(timeline, i, Json_getFloat(frame, "time", 0), Json_getFloat(frame, "mix", 0),
+		for (frame = constraintMap->child, i = 0; frame; frame = frame->next, ++i) {
+			spIkConstraintTimeline_setFrame(timeline, i, Json_getFloat(frame, "time", 0), Json_getFloat(frame, "mix", 1),
 					Json_getInt(frame, "bendPositive", 1) ? 1 : -1);
 			readCurve(SUPER(timeline), i, frame);
 		}
 		animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
-		duration = timeline->frames[ikMap->size * 3 - 3];
+		duration = timeline->frames[constraintMap->size * 3 - 3];
+		if (duration > animation->duration) animation->duration = duration;
+	}
+
+	/* Transform constraint timelines. */
+	for (constraintMap = transform ? transform->child : 0; constraintMap; constraintMap = constraintMap->next) {
+		spTransformConstraintData* constraint = spSkeletonData_findTransformConstraint(skeletonData, constraintMap->name);
+		spTransformConstraintTimeline* timeline = spTransformConstraintTimeline_create(constraintMap->size);
+		for (i = 0; i < skeletonData->transformConstraintsCount; ++i) {
+			if (constraint == skeletonData->transformConstraints[i]) {
+				timeline->transformConstraintIndex = i;
+				break;
+			}
+		}
+		for (frame = constraintMap->child, i = 0; frame; frame = frame->next, ++i) {
+			spTransformConstraintTimeline_setFrame(timeline, i, Json_getFloat(frame, "time", 0), Json_getFloat(frame, "rotateMix", 1),
+												   Json_getFloat(frame, "translateMix", 1), Json_getFloat(frame, "scaleMix", 1), Json_getFloat(frame, "shearMix", 1));
+			readCurve(SUPER(timeline), i, frame);
+		}
+		animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
+		duration = timeline->frames[constraintMap->size * 5 - 5];
 		if (duration > animation->duration) animation->duration = duration;
 	}
 
@@ -491,6 +517,8 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 		boneData->rotation = Json_getFloat(boneMap, "rotation", 0);
 		boneData->scaleX = Json_getFloat(boneMap, "scaleX", 1);
 		boneData->scaleY = Json_getFloat(boneMap, "scaleY", 1);
+		boneData->shearX = Json_getFloat(boneMap, "shearX", 0);
+		boneData->shearY = Json_getFloat(boneMap, "shearY", 0);
 		boneData->inheritScale = Json_getInt(boneMap, "inheritScale", 1);
 		boneData->inheritRotation = Json_getInt(boneMap, "inheritRotation", 1);
 
@@ -562,9 +590,16 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 				return 0;
 			}
 
+			transformConstraintData->offsetRotation = Json_getFloat(transformMap, "rotation", 0);
+			transformConstraintData->offsetX = Json_getFloat(transformMap, "x", 0) * self->scale;
+			transformConstraintData->offsetY = Json_getFloat(transformMap, "y", 0) * self->scale;
+			transformConstraintData->offsetScaleX = Json_getFloat(transformMap, "scaleX", 0) * self->scale;
+			transformConstraintData->offsetScaleY = Json_getFloat(transformMap, "scaleY", 0) * self->scale;
+			transformConstraintData->offsetShearY = Json_getFloat(transformMap, "shearY", 0) * self->scale;
+			transformConstraintData->rotateMix = Json_getFloat(transformMap, "rotateMix", 1);
 			transformConstraintData->translateMix = Json_getFloat(transformMap, "translateMix", 1);
-			transformConstraintData->x = Json_getFloat(transformMap, "x", 0) * self->scale;
-			transformConstraintData->y = Json_getFloat(transformMap, "y", 0) * self->scale;
+			transformConstraintData->scaleMix = Json_getFloat(transformMap, "scaleMix", 1);
+			transformConstraintData->shearMix = Json_getFloat(transformMap, "shearMix", 1);
 
 			skeletonData->transformConstraints[i] = transformConstraintData;
 		}

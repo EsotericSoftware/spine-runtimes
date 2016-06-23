@@ -45,7 +45,7 @@ struct spBone {
 	spBoneData* const data;
 	struct spSkeleton* const skeleton;
 	spBone* const parent;
-	float x, y, rotation, scaleX, scaleY;
+	float x, y, rotation, scaleX, scaleY, shearX, shearY;
 	float appliedRotation, appliedScaleX, appliedScaleY;
 
 	float const a, b, worldX;
@@ -77,7 +77,7 @@ void spBone_dispose (spBone* self);
 void spBone_setToSetupPose (spBone* self);
 
 void spBone_updateWorldTransform (spBone* self);
-void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rotation, float scaleX, float scaleY);
+void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY);
 
 float spBone_getWorldRotationX (spBone* self);
 float spBone_getWorldRotationY (spBone* self);

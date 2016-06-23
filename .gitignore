@@ -12,31 +12,30 @@ target
 *.user
 .DS_Store
 
+.idea/
+build/
+
 spine-c/Debug/*
-spine-c/dist
-spine-c/obj
 
 spine-cpp/Debug/*
 
 spine-sfml/Debug/*
 spine-sfml/SFML
+spine-sfml/dependencies
 
 spine-libgdx/spine-libgdx/bin/*
 spine-libgdx/spine-libgdx-tests/bin/*
 spine-libgdx/spine-skeletonviewer/bin/*
 
-spine-cocos2dx/2/cocos2dx/
-!spine-cocos2dx/2/cocos2dx/Place cocos2dx here.txt
-spine-cocos2dx/2/example/proj.win32/Debug
-spine-cocos2dx/3/cocos2dx/
-!spine-cocos2dx/3/cocos2dx/Place cocos2dx here.txt
-spine-cocos2dx/3/example/proj.win32/Debug
-xcuserdata
+spine-cocos2dx/dependencies
+spine-cocos2dx/example/cocos2dx.zip
+spine-cocos2dx/example/__MACOSX
+spine-cocos2dx/example/cocos2d
+spine-cocos2dx/example/proj.win32/spine-cocos2d-x.VC.opendb
+xcuserdata/
 
-spine-cocos2d-iphone/2/cocos2d/*
-!spine-cocos2d-iphone/2/cocos2d/Place cocos2d here.txt
-spine-cocos2d-iphone/3/cocos2d/*
-!spine-cocos2d-iphone/3/cocos2d/Place cocos2d here.txt
+spine-cocos2d-iphone/cocos2d/*
+spine-cocos2d-iphone/spine-cocos2d-iphone-ios.xcodeproj/project.xcworkspace/xcshareddata/
 
 spine-csharp/bin
 spine-csharp/obj

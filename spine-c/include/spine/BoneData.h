@@ -41,9 +41,7 @@ struct spBoneData {
 	const char* const name;
 	spBoneData* const parent;
 	float length;
-	float x, y;
-	float rotation;
-	float scaleX, scaleY;
+	float x, y, rotation, scaleX, scaleY, shearX, shearY;
 	int/*bool*/inheritScale, inheritRotation;
 
 #ifdef __cplusplus
