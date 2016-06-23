@@ -91,5 +91,11 @@ namespace Spine {
 			atan = PI / 2 - z / (z * z + 0.28f);
 			return y < 0f ? atan - PI : atan;
 		}
+
+		static public float Clamp (float value, float min, float max) {
+			if (value < min) return min;
+			if (value > max) return max;
+			return value;
+		}
 	}
 }
