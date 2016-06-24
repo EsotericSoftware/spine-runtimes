@@ -40,13 +40,14 @@ namespace Spine {
 		internal float mix;
 		internal int bendDirection;
 
-		int level;
+		internal int level;
 
 		public IkConstraintData Data { get { return data; } }
 		public ExposedList<Bone> Bones { get { return bones; } }
 		public Bone Target { get { return target; } set { target = value; } }
 		public int BendDirection { get { return bendDirection; } set { bendDirection = value; } }
 		public float Mix { get { return mix; } set { mix = value; } }
+		public int Level { get { return level; } set { level = value; } }
 
 		public IkConstraint (IkConstraintData data, Skeleton skeleton) {
 			if (data == null) throw new ArgumentNullException("data cannot be null.");
@@ -155,7 +156,7 @@ namespace Spine {
 				else if (cos > 1) cos = 1;
 				a2 = (float)Math.Acos(cos) * bendDir;
 				a = l1 + l2 * cos;
-				b = l2 * Math.Sin(a2);
+				b = l2 * MathUtils.Sin(a2);
 				a1 = MathUtils.Atan2(ty * a - tx * b, tx * a + ty * b);
 			} else {
 				a = psx * l2;

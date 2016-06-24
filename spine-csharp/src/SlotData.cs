@@ -33,12 +33,14 @@ using System;
 
 namespace Spine {
 	public class SlotData {
+		internal int index;
 		internal String name;
 		internal BoneData boneData;
 		internal float r = 1, g = 1, b = 1, a = 1;
 		internal String attachmentName;
 		internal BlendMode blendMode;
 
+		public int Index { get { return index; } }
 		public String Name { get { return name; } }
 		public BoneData BoneData { get { return boneData; } }
 		public float R { get { return r; } set { r = value; } }
@@ -49,7 +51,8 @@ namespace Spine {
 		public String AttachmentName { get { return attachmentName; } set { attachmentName = value; } }
 		public BlendMode BlendMode { get { return blendMode; } set { blendMode = value; } }
 
-		public SlotData (String name, BoneData boneData) {
+		public SlotData (int index, String name, BoneData boneData) {
+			if (index < 0) throw new ArgumentException ("index must be >= 0.");
 			if (name == null) throw new ArgumentNullException("name cannot be null.");
 			if (boneData == null) throw new ArgumentNullException("boneData cannot be null.");
 			this.name = name;

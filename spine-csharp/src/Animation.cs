@@ -755,8 +755,8 @@ namespace Spine {
 
 	public class PathConstraintPositionTimeline: CurveTimeline {
 		public const int ENTRIES = 2;
-		private const int PREV_TIME = -2, PREV_VALUE = -1;
-		private const int VALUE = 1;
+		protected const int PREV_TIME = -2, PREV_VALUE = -1;
+		protected const int VALUE = 1;
 
 		internal int pathConstraintIndex;
 		internal float[] frames; // time, position, ...
@@ -776,7 +776,7 @@ namespace Spine {
 			frames[frameIndex + VALUE] = value;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha) {
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -804,7 +804,7 @@ namespace Spine {
 			: base(frameCount) {
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha) {
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -826,7 +826,7 @@ namespace Spine {
 		}
 	}
 
-	static public class PathConstraintMixTimeline: CurveTimeline {
+	public class PathConstraintMixTimeline: CurveTimeline {
 		public const int ENTRIES = 3;
 		private const int PREV_TIME = -3, PREV_ROTATE = -2, PREV_TRANSLATE = -1;
 		private const int ROTATE = 1, TRANSLATE = 2;
@@ -843,14 +843,14 @@ namespace Spine {
 		}			
 
 		/** Sets the time and mixes of the specified keyframe. */
-		public void setFrame (int frameIndex, float time, float rotateMix, float translateMix) {
+		public void SetFrame (int frameIndex, float time, float rotateMix, float translateMix) {
 			frameIndex *= ENTRIES;
 			frames[frameIndex] = time;
 			frames[frameIndex + ROTATE] = rotateMix;
 			frames[frameIndex + TRANSLATE] = translateMix;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha) {
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 

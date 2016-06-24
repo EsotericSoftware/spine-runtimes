@@ -35,12 +35,13 @@ using System.Collections.Generic;
 namespace Spine {
 	public class TransformConstraintData {
 		internal String name;
-		internal BoneData bone, target;
+		internal ExposedList<BoneData> bones = new ExposedList<BoneData>();
+		internal BoneData target;
 		internal float rotateMix, translateMix, scaleMix, shearMix;
 		internal float offsetRotation, offsetX, offsetY, offsetScaleX, offsetScaleY, offsetShearY;
 
 		public String Name { get { return name; } }
-		public BoneData Bone { get { return bone; } set { bone = value; } }
+		public ExposedList<BoneData> Bones { get { return bones; } }
 		public BoneData Target { get { return target; } set { target = value; } }
 		public float RotateMix { get { return rotateMix; } set { rotateMix = value; } }
 		public float TranslateMix { get { return translateMix; } set { translateMix = value; } }

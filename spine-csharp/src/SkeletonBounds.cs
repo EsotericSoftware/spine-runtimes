@@ -80,7 +80,7 @@ namespace Spine {
 				int count = boundingBox.Vertices.Length;
 				polygon.Count = count;
 				if (polygon.Vertices.Length < count) polygon.Vertices = new float[count];
-				boundingBox.ComputeWorldVertices(slot.bone, polygon.Vertices);
+				boundingBox.ComputeWorldVertices(slot, polygon.Vertices);
 			}
 
 			if (updateAabb) aabbCompute();

@@ -43,6 +43,7 @@ namespace Spine {
 		internal ExposedList<Animation> animations = new ExposedList<Animation>();
 		internal ExposedList<IkConstraintData> ikConstraints = new ExposedList<IkConstraintData>();
 		internal ExposedList<TransformConstraintData> transformConstraints = new ExposedList<TransformConstraintData>();
+		internal ExposedList<PathConstraintData> pathConstraints = new ExposedList<PathConstraintData>();
 		internal float width, height;
 		internal String version, hash, imagesPath;
 
@@ -55,6 +56,8 @@ namespace Spine {
 		public ExposedList<EventData> Events { get { return events; } set { events = value; } }
 		public ExposedList<Animation> Animations { get { return animations; } set { animations = value; } }
 		public ExposedList<IkConstraintData> IkConstraints { get { return ikConstraints; } set { ikConstraints = value; } }
+		public ExposedList<TransformConstraintData> TransformConstraints { get { return transformConstraints; } set { transformConstraints = value; } }
+		public ExposedList<PathConstraintData> PathConstraints { get { return pathConstraints; } set { pathConstraints = value; } }
 		public float Width { get { return width; } set { width = value; } }
 		public float Height { get { return height; } set { height = value; } }
 		/// <summary>The Spine version used to export this data.</summary>
@@ -96,7 +99,7 @@ namespace Spine {
 			return null;
 		}
 
-		/// <returns>-1 if the bone was not found.</returns>
+		/// <returns>-1 if the slot was not found.</returns>
 		public int FindSlotIndex (String slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
 			ExposedList<SlotData> slots = this.slots;
@@ -162,6 +165,27 @@ namespace Spine {
 				if (transformConstraint.name == constraintName) return transformConstraint;
 			}
 			return null;
+		}
+
+		// --- Path constraints
+		/** @return May be null. */
+		public PathConstraintData FindPathConstraint (String constraintName) {
+			if (constraintName == null) throw new ArgumentException("constraintName cannot be null.");
+			ExposedList<PathConstraintData> pathConstraints = this.pathConstraints;
+			for (int i = 0, n = pathConstraints.Count; i < n; i++) {
+				PathConstraintData constraint = pathConstraints.Items[i];
+				if (constraint.name.Equals(constraintName)) return constraint;
+			}
+			return null;
+		}
+
+		/** @return -1 if the path constraint was not found. */
+		public int FindPathConstraintIndex (String pathConstraintName) {
+			if (pathConstraintName == null) throw new ArgumentException("pathConstraintName cannot be null.");
+			ExposedList<PathConstraintData> pathConstraints = this.pathConstraints;
+			for (int i = 0, n = pathConstraints.Count; i < n; i++)
+				if (pathConstraints.Items[i].name.Equals(pathConstraintName)) return i;
+			return -1;
 		}
 
 		// ---

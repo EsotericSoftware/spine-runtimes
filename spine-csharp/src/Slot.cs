@@ -82,7 +82,7 @@ namespace Spine {
 			SetToSetupPose();
 		}
 
-		internal void SetToSetupPose (int slotIndex) {
+		public void SetToSetupPose () {
 			r = data.r;
 			g = data.g;
 			b = data.b;
@@ -91,12 +91,8 @@ namespace Spine {
 				Attachment = null;
 			else {
 				attachment = null;
-				Attachment = bone.skeleton.GetAttachment(slotIndex, data.attachmentName);
+				Attachment = bone.skeleton.GetAttachment(data.index, data.attachmentName);
 			}
-		}
-
-		public void SetToSetupPose () {
-			SetToSetupPose(bone.skeleton.data.slots.IndexOf(data));
 		}
 
 		override public String ToString () {

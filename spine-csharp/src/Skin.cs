@@ -40,6 +40,7 @@ namespace Spine {
 			new Dictionary<AttachmentKeyTuple, Attachment>(AttachmentKeyTupleComparer.Instance);
 
 		public String Name { get { return name; } }
+		public Dictionary<AttachmentKeyTuple, Attachment> Attachments { get { return attachments; } }
 
 		public Skin (String name) {
 			if (name == null) throw new ArgumentNullException("name cannot be null.");
@@ -86,7 +87,7 @@ namespace Spine {
 			}
 		}
 
-		struct AttachmentKeyTuple {
+		public struct AttachmentKeyTuple {
 			public readonly int slotIndex;
 			public readonly string name;
 			internal readonly int nameHashCode;
