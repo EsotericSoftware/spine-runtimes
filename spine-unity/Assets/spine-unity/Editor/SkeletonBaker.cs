@@ -371,6 +371,7 @@ namespace Spine.Unity.Editor {
 						float rotation = 0;
 						Mesh mesh = null;
 						Material material = null;
+						bool isWeightedMesh = false;
 
 						if (meshTable.ContainsKey(attachmentMeshName))
 							mesh = meshTable[attachmentMeshName];
@@ -386,16 +387,22 @@ namespace Spine.Unity.Editor {
 								AssetDatabase.AddObjectToAsset(mesh, prefab);
 						} else if (attachment is MeshAttachment) {
 							var meshAttachment = (MeshAttachment)attachment;
+							isWeightedMesh = (meshAttachment.Bones != null);
 							offset.x = 0;
 							offset.y = 0;
 							rotation = 0;
-							mesh = meshAttachment.Bones == null ? ExtractMeshAttachment(attachmentMeshName, meshAttachment, mesh) : ExtractWeightedMeshAttachment(attachmentMeshName, meshAttachment, i, skeletonData, boneList, mesh);
+
+							if (isWeightedMesh)
+								mesh = ExtractWeightedMeshAttachment(attachmentMeshName, meshAttachment, i, skeletonData, boneList, mesh);
+							else
+								mesh = ExtractMeshAttachment(attachmentMeshName, meshAttachment, mesh);
+							
 							material = ExtractMaterial(attachment);
 							unusedMeshNames.Remove(attachmentMeshName);
 							if (newPrefab || meshTable.ContainsKey(attachmentMeshName) == false)
 								AssetDatabase.AddObjectToAsset(mesh, prefab);
 						} else
-							continue;  //disregard unsupported types for now
+							continue;
 
 						Transform attachmentTransform = new GameObject(attachmentName).transform;
 
@@ -403,8 +410,7 @@ namespace Spine.Unity.Editor {
 						attachmentTransform.localPosition = offset;
 						attachmentTransform.localRotation = Quaternion.Euler(0, 0, rotation);
 
-						var masht = attachment as MeshAttachment;
-						if (masht != null && masht.Bones != null) { // is a Weighted Mesh
+						if (isWeightedMesh) {
 							attachmentTransform.position = Vector3.zero;
 							attachmentTransform.rotation = Quaternion.identity;
 							var skinnedMeshRenderer = attachmentTransform.gameObject.AddComponent<SkinnedMeshRenderer>();
@@ -827,6 +833,7 @@ namespace Spine.Unity.Editor {
 
 			return clip;
 		}
+
 		static int BinarySearch (float[] values, float target) {
 			int low = 0;
 			int high = values.Length - 2;
@@ -951,6 +958,7 @@ namespace Spine.Unity.Editor {
 
 			return angle;
 		}
+
 		static void BakeBone (Bone bone, Spine.Animation animation, AnimationClip clip) {
 			Skeleton skeleton = bone.Skeleton;
 			bool inheritRotation = bone.Data.InheritRotation;
