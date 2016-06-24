@@ -293,13 +293,7 @@ namespace Spine.Unity {
 						attachmentVertexCount = meshAttachment.vertices.Length >> 1;
 						attachmentTriangleCount = meshAttachment.triangles.Length;
 					} else {
-						var skinnedMeshAttachment = attachment as WeightedMeshAttachment;
-						if (skinnedMeshAttachment != null) {
-							rendererObject = skinnedMeshAttachment.RendererObject;
-							attachmentVertexCount = skinnedMeshAttachment.uvs.Length >> 1;
-							attachmentTriangleCount = skinnedMeshAttachment.triangles.Length;
-						} else
-							continue;
+						continue;
 					}
 				}
 
@@ -587,48 +581,6 @@ namespace Spine.Unity {
 								else if (y > meshBoundsMax.y)
 									meshBoundsMax.y = y;
 							}
-						} else {
-							WeightedMeshAttachment weightedMeshAttachment = attachment as WeightedMeshAttachment;
-							if (weightedMeshAttachment != null) {
-								int meshVertexCount = weightedMeshAttachment.uvs.Length;
-								if (tempVertices.Length < meshVertexCount)
-									this.tempVertices = tempVertices = new float[meshVertexCount];
-								weightedMeshAttachment.ComputeWorldVertices(slot, tempVertices);
-
-								if (pmaVertexColors) {
-									color.a = (byte)(a * slot.a * weightedMeshAttachment.a);
-									color.r = (byte)(r * slot.r * weightedMeshAttachment.r * color.a);
-									color.g = (byte)(g * slot.g * weightedMeshAttachment.g * color.a);
-									color.b = (byte)(b * slot.b * weightedMeshAttachment.b * color.a);
-									if (slot.data.blendMode == BlendMode.additive) color.a = 0;
-								} else {
-									color.a = (byte)(a * slot.a * weightedMeshAttachment.a);
-									color.r = (byte)(r * slot.r * weightedMeshAttachment.r * 255);
-									color.g = (byte)(g * slot.g * weightedMeshAttachment.g * 255);
-									color.b = (byte)(b * slot.b * weightedMeshAttachment.b * 255);
-								}
-
-								float[] meshUVs = weightedMeshAttachment.uvs;
-								float z = i * zSpacing;
-								for (int ii = 0; ii < meshVertexCount; ii += 2, vertexIndex++) {
-									float x = tempVertices[ii], y = tempVertices[ii + 1];
-									vertices[vertexIndex].x = x;
-									vertices[vertexIndex].y = y;
-									vertices[vertexIndex].z = z;
-									colors[vertexIndex] = color;
-									uvs[vertexIndex].x = meshUVs[ii];
-									uvs[vertexIndex].y = meshUVs[ii + 1];
-
-									if (x < meshBoundsMin.x)
-										meshBoundsMin.x = x;
-									else if (x > meshBoundsMax.x)
-										meshBoundsMax.x = x;
-									if (y < meshBoundsMin.y)
-										meshBoundsMin.y = y;
-									else if (y > meshBoundsMax.y)
-										meshBoundsMax.y = y;
-								}
-							}
 						}
 					}
 				} while (++i < drawOrderCount);
@@ -908,12 +860,7 @@ namespace Spine.Unity {
 					attachmentVertexCount = meshAttachment.vertices.Length >> 1; // length/2
 					attachmentTriangles = meshAttachment.triangles;
 				} else {
-					var weightedMeshAttachment = attachment as WeightedMeshAttachment;
-					if (weightedMeshAttachment != null) {
-						attachmentVertexCount = weightedMeshAttachment.uvs.Length >> 1; // length/2
-						attachmentTriangles = weightedMeshAttachment.triangles;
-					} else
-						continue;
+					continue;
 				}
 
 				#if SPINE_OPTIONAL_FRONTFACING

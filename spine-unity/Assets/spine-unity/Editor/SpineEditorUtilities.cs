@@ -552,7 +552,6 @@ namespace Spine.Unity.Editor {
 
 		static AtlasAsset GetAtlasDialog (string dirPath) {
 			string path = EditorUtility.OpenFilePanel("Select AtlasAsset...", dirPath, "asset");
-
 			if (path == "") return null; // Canceled or closed by user.
 
 			int subLen = Application.dataPath.Length - 6;
@@ -633,6 +632,7 @@ namespace Spine.Unity.Editor {
 
 		public class AtlasRequirementLoader : AttachmentLoader {
 			List<string> requirementList;
+
 			public AtlasRequirementLoader (List<string> requirementList) {
 				this.requirementList = requirementList;
 			}
@@ -647,13 +647,12 @@ namespace Spine.Unity.Editor {
 				return new MeshAttachment(name);
 			}
 
-			public WeightedMeshAttachment NewWeightedMeshAttachment(Skin skin, string name, string path) {
-				requirementList.Add(path);
-				return new WeightedMeshAttachment(name);
-			}
-
 			public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, string name) {
 				return new BoundingBoxAttachment(name);
+			}
+
+			public PathAttachment NewPathAttachment (Skin skin, string name) {
+				return new PathAttachment(name);
 			}
 		}
 		#endregion

@@ -15,7 +15,6 @@ namespace Spine.Unity {
 		public static Color GetColor (this Skeleton s) { return new Color(s.r, s.g, s.b, s.a); }
 		public static Color GetColor (this RegionAttachment a) { return new Color(a.r, a.g, a.b, a.a); }
 		public static Color GetColor (this MeshAttachment a) { return new Color(a.r, a.g, a.b, a.a); }
-		public static Color GetColor (this WeightedMeshAttachment a) { return new Color(a.r, a.g, a.b, a.a);	}
 
 		public static void SetColor (this Skeleton skeleton, Color color) {
 			skeleton.A = color.a;
@@ -72,20 +71,6 @@ namespace Spine.Unity {
 			attachment.G = color.g * ByteToFloat;
 			attachment.B = color.b * ByteToFloat;
 		}
-
-		public static void SetColor (this WeightedMeshAttachment attachment, Color color) {
-			attachment.A = color.a;
-			attachment.R = color.r;
-			attachment.G = color.g;
-			attachment.B = color.b;
-		}
-
-		public static void SetColor (this WeightedMeshAttachment attachment, Color32 color) {
-			attachment.A = color.a * ByteToFloat;
-			attachment.R = color.r * ByteToFloat;
-			attachment.G = color.g * ByteToFloat;
-			attachment.B = color.b * ByteToFloat;
-		}
 		#endregion
 
 		#region Bone Position
@@ -108,6 +93,11 @@ namespace Spine.Unity {
 		}
 		#endregion
 
+	}
+}
+
+namespace Spine {
+	public static class SkeletonExtensions {
 		#region Posing
 		/// <summary>
 		/// Shortcut for posing a skeleton at a specific time. Time is in seconds. (frameNumber / 30f) will give you seconds.
@@ -181,8 +171,8 @@ namespace Spine.Unity {
 
 
 				// Attachment
-				} else if (timeline is FfdTimeline) {
-					var slot = skeleton.slots.Items[((FfdTimeline)timeline).slotIndex];
+				} else if (timeline is DeformTimeline) {
+					var slot = skeleton.slots.Items[((DeformTimeline)timeline).slotIndex];
 					slot.attachmentVerticesCount = 0;
 				
 				// Slot

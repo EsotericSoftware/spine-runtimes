@@ -125,25 +125,25 @@ namespace Spine.Unity.Modules {
 			int instanceId = tex.GetInstanceID();
 			AtlasRegion atlasRegion;
 
-			//check cache first
+			// Check cache first
 			if (atlasTable.ContainsKey(instanceId)) {
 				atlasRegion = atlasTable[instanceId];
 			} else {
-				//Setup new material
-				Material mat = new Material(shader);
+				// Setup new material.
+				var material = new Material(shader);
 				if (sprite.packed)
-					mat.name = "Unity Packed Sprite Material";
+					material.name = "Unity Packed Sprite Material";
 				else
-					mat.name = sprite.name + " Sprite Material";
-				mat.mainTexture = tex;
+					material.name = sprite.name + " Sprite Material";
+				material.mainTexture = tex;
 
-				//create faux-region to play nice with SkeletonRenderer
+				// Create faux-region to play nice with SkeletonRenderer.
 				atlasRegion = new AtlasRegion();
 				AtlasPage page = new AtlasPage();
-				page.rendererObject = mat;
+				page.rendererObject = material;
 				atlasRegion.page = page;
 
-				//cache it
+				// Cache it.
 				atlasTable[instanceId] = atlasRegion;
 			}
 
@@ -158,12 +158,11 @@ namespace Spine.Unity.Modules {
 			Bounds bounds = sprite.bounds;
 			Vector3 size = bounds.size;
 
-			//TODO: make sure this rotation thing actually works
+			//MITCH: left todo: make sure this rotation thing actually works
 			bool rotated = false;
 			if (sprite.packed)
 				rotated = sprite.packingRotation == SpritePackingRotation.Any;
 
-			//do some math and assign UVs and sizes
 			attachment.SetUVs(texRect.xMin, texRect.yMax, texRect.xMax, texRect.yMin, rotated);
 			attachment.RendererObject = atlasRegion;
 			attachment.SetColor(Color.white);
@@ -183,15 +182,15 @@ namespace Spine.Unity.Modules {
 		}
 
 		public MeshAttachment NewMeshAttachment (Skin skin, string name, string path) {
-			//TODO:  Unity 5 only
-			throw new System.NotImplementedException();
-		}
-
-		public WeightedMeshAttachment NewWeightedMeshAttachment(Skin skin, string name, string path) {
+			//MITCH : Left todo: Unity 5 only
 			throw new System.NotImplementedException();
 		}
 
 		public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, string name) {
+			throw new System.NotImplementedException();
+		}
+
+		public PathAttachment NewPathAttachment (Skin skin, string name) {
 			throw new System.NotImplementedException();
 		}
 	}
