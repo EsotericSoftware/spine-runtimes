@@ -169,8 +169,8 @@ namespace Spine.Unity.Modules {
 			attachment.SetColor(Color.white);
 			attachment.ScaleX = 1;
 			attachment.ScaleY = 1;
-			attachment.RegionOffsetX = sprite.rect.width * (0.5f - Mathf.InverseLerp(bounds.min.x, bounds.max.x, 0)) / sprite.pixelsPerUnit;
-			attachment.RegionOffsetY = sprite.rect.height * (0.5f - Mathf.InverseLerp(bounds.min.y, bounds.max.y, 0)) / sprite.pixelsPerUnit;
+			attachment.RegionOffsetX = sprite.rect.width * (0.5f - InverseLerp(bounds.min.x, bounds.max.x, 0)) / sprite.pixelsPerUnit;
+			attachment.RegionOffsetY = sprite.rect.height * (0.5f - InverseLerp(bounds.min.y, bounds.max.y, 0)) / sprite.pixelsPerUnit;
 			attachment.Width = size.x;
 			attachment.Height = size.y;
 			attachment.RegionWidth = size.x;
@@ -193,6 +193,11 @@ namespace Spine.Unity.Modules {
 
 		public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, string name) {
 			throw new System.NotImplementedException();
+		}
+		
+		private float InverseLerp(float a, float b, float value)
+		{
+			return (value - a) / (b - a);
 		}
 	}
 
