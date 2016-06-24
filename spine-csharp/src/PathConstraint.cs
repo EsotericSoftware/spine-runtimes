@@ -78,7 +78,7 @@ namespace Spine {
 			bool tangents = rotateMode == RotateMode.Tangent, scale = rotateMode == RotateMode.ChainScale;
 			int boneCount = this.bones.Count, spacesCount = tangents ? boneCount : boneCount + 1;
 			Bone[] bones = this.bones.Items;
-			ExposedList<float>[] spaces = this.spaces.Resize(spacesCount), lengths = null;
+			ExposedList<float> spaces = this.spaces.Resize(spacesCount), lengths = null;
 			float spacing = this.spacing;
 			if (scale || lengthSpacing) {
 				if (scale) lengths = this.lengths.Resize(boneCount);
@@ -86,12 +86,12 @@ namespace Spine {
 					Bone bone = bones[i];
 					float length = bone.data.length, x = length * bone.a, y = length * bone.c;
 					length = (float)Math.Sqrt(x * x + y * y);
-					if (scale) lengths[i] = length;
-					spaces[++i] = lengthSpacing ? Math.Max(0, length + spacing) : spacing;
+					if (scale) lengths.Items[i] = length;
+					spaces.Items[++i] = lengthSpacing ? Math.Max(0, length + spacing) : spacing;
 				}
 			} else {
 				for (int i = 1; i < spacesCount; i++)
-					spaces[i] = spacing;
+					spaces.Items[i] = spacing;
 			}
 
 			float[] positions = ComputeWorldPositions(attachment, spacesCount, tangents,
@@ -106,7 +106,7 @@ namespace Spine {
 				bone.worldY += (boneY - skeletonY - bone.worldY) * translateMix;
 				float x = positions[p], y = positions[p + 1], dx = x - boneX, dy = y - boneY;
 				if (scale) {
-					float length = lengths[i];
+					float length = lengths.Items[i];
 					if (length != 0) {
 						float s = ((float)Math.Sqrt(dx * dx + dy * dy) / length - 1) * rotateMix + 1;
 						bone.a *= s;
@@ -119,14 +119,14 @@ namespace Spine {
 					float a = bone.a, b = bone.b, c = bone.c, d = bone.d, r, cos, sin;
 					if (tangents)
 						r = positions[p - 1];
-					else if (spaces[i + 1] == 0)
+					else if (spaces.Items[i + 1] == 0)
 						r = positions[p + 2];
 					else
 						r = MathUtils.Atan2(dy, dx);
 					r -= MathUtils.Atan2(c, a) - offsetRotation * MathUtils.degRad;
 					if (tip) {
-						cos = cos(r);
-						sin = sin(r);
+						cos = MathUtils.Cos(r);
+						sin = MathUtils.Sin(r);
 						float length = bone.data.length;
 						boneX += (length * (cos * a - sin * c) - dx) * rotateMix;
 						boneY += (length * (sin * a + cos * c) - dy) * rotateMix;
@@ -136,8 +136,8 @@ namespace Spine {
 					else if (r < -MathUtils.PI) //
 						r += MathUtils.PI2;
 					r *= rotateMix;
-					cos = cos(r);
-					sin = sin(r);
+					cos = MathUtils.Cos(r);
+					sin = MathUtils.Sin(r);
 					bone.a = cos * a - sin * c;
 					bone.b = cos * b - sin * d;
 					bone.c = sin * a + cos * c;
@@ -150,20 +150,21 @@ namespace Spine {
 			bool percentSpacing) {
 			Slot target = this.target;
 			float position = this.position;
-			float[] spaces = this.spaces.Items, output = this.positions.Capacity = spacesCount * 3 + 2, world;
+			float[] spaces = this.spaces.Items, output = this.positions.Resize(spacesCount * 3 + 2).Items, world;
 			bool closed = path.Closed;
-			int verticesLength = path.WorldVerticesLength(), curveCount = verticesLength / 6, prevCurve = NONE;
+			int verticesLength = path.WorldVerticesLength, curveCount = verticesLength / 6, prevCurve = NONE;
 
+			float pathLength;
 			if (!path.ConstantSpeed) {
 				float[] lengths = path.Lengths;
 				curveCount -= closed ? 1 : 2;
-				float pathLength = lengths[curveCount];
+				pathLength = lengths[curveCount];
 				if (percentPosition) position *= pathLength;
 				if (percentSpacing) {
 					for (int i = 0; i < spacesCount; i++)
 						spaces[i] *= pathLength;
 				}
-				world = this.world.Resize(8);
+				world = this.world.Resize(8).Items;
 				for (int i = 0, o = 0, curve = 0; i < spacesCount; i++, o += 3) {
 					float space = spaces[i];
 					position += space;
@@ -218,7 +219,7 @@ namespace Spine {
 			// World vertices.
 			if (closed) {
 				verticesLength += 2;
-				world = this.world.Resize(verticesLength);
+				world = this.world.Resize(verticesLength).Items;
 				path.ComputeWorldVertices(target, 2, verticesLength - 4, world, 0);
 				path.ComputeWorldVertices(target, 0, 2, world, verticesLength - 4);
 				world[verticesLength - 2] = world[0];
@@ -226,7 +227,7 @@ namespace Spine {
 			} else {
 				curveCount--;
 				verticesLength -= 4;
-				world = this.world.Resize(verticesLength);
+				world = this.world.Resize(verticesLength).Items;
 				path.ComputeWorldVertices(target, 2, verticesLength, world, 0);
 			}
 
@@ -358,7 +359,7 @@ namespace Spine {
 					}
 					break;
 				}
-				addCurvePosition(p * 0.1f, x1, y1, cx1, cy1, cx2, cy2, x2, y2, output, o, tangents || (i > 0 && space == 0));
+				AddCurvePosition(p * 0.1f, x1, y1, cx1, cy1, cx2, cy2, x2, y2, output, o, tangents || (i > 0 && space == 0));
 			}
 			return output;
 		}
@@ -385,7 +386,7 @@ namespace Spine {
 			float x = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt, y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt;
 			output[o] = x;
 			output[o + 1] = y;
-			if (tangents) output[o + 2] = Math.Atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+			if (tangents) output[o + 2] = (float)Math.Atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
 		}
 
 		public float Position { get { return position; } set { position = value; } }
