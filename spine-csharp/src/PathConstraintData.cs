@@ -43,11 +43,6 @@ namespace Spine {
 		internal float offsetRotation;
 		internal float position, spacing, rotateMix, translateMix;
 
-		public PathConstraintData (String name) {
-			if (name == null) throw new ArgumentException("name cannot be null.");
-			this.name = name;
-		}
-
 		public ExposedList<BoneData> Bones { get { return bones; } }
 		public SlotData Target { get { return target; } set { target = value; } }			
 		public PositionMode PositionMode { get { return positionMode; } set { positionMode = value; } }
@@ -59,6 +54,11 @@ namespace Spine {
 		public float RotateMix { get { return rotateMix; } set { rotateMix = value; } }
 		public float TranslateMix { get { return translateMix; } set { translateMix = value; } }
 		public String Name { get { return name; } }
+
+		public PathConstraintData (String name) {
+			if (name == null) throw new ArgumentException("name cannot be null.");
+			this.name = name;
+		}
 	}
 
 	public enum PositionMode {

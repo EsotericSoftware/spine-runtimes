@@ -167,7 +167,8 @@ namespace Spine {
 			return null;
 		}
 
-		// --- Path constraints
+		// --- Path constraints.
+
 		/** @return May be null. */
 		public PathConstraintData FindPathConstraint (String constraintName) {
 			if (constraintName == null) throw new ArgumentException("constraintName cannot be null.");

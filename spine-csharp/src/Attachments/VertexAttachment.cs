@@ -34,7 +34,7 @@ using System.Collections.Generic;
 
 namespace Spine {
 	/// <summary>>An attachment with vertices that are transformed by one or more bones and can be deformed by a slot's vertices.</summary> 
-	public class VertexAttachment: Attachment {
+	public class VertexAttachment : Attachment {
 		internal int[] bones;
 		internal float[] vertices;
 		internal int worldVerticesLength;
@@ -44,14 +44,14 @@ namespace Spine {
 		public int WorldVerticesLength { get { return worldVerticesLength; } set { worldVerticesLength = value; } }
 
 		public VertexAttachment (String name)
-			:base(name) {
+			: base(name) {
 		}
 
-		virtual public void ComputeWorldVertices (Slot slot, float[] worldVertices) {
+		public void ComputeWorldVertices (Slot slot, float[] worldVertices) {
 			ComputeWorldVertices(slot, 0, worldVerticesLength, worldVertices, 0);
 		}
 
-		virtual public void ComputeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset) {
+		public void ComputeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset) {
 			count += offset;
 			Skeleton skeleton = slot.Skeleton;
 			float x = skeleton.X, y = skeleton.Y;
@@ -71,7 +71,7 @@ namespace Spine {
 				}
 				return;
 			}
-			int v = 0; int skip = 0;
+			int v = 0, skip = 0;
 			for (int i = 0; i < start; i += 2) {
 				int n = bones[v];
 				v += n + 1;

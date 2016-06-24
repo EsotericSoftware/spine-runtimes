@@ -33,8 +33,8 @@ using System;
 using System.Collections.Generic;
 
 namespace Spine {
-	public class PathConstraint: IUpdatable {
-		protected const int NONE = -1, BEFORE = -2, AFTER = -3;
+	public class PathConstraint : IUpdatable {
+		private const int NONE = -1, BEFORE = -2, AFTER = -3;
 
 		internal PathConstraintData data;
 		internal ExposedList<Bone> bones;
@@ -44,6 +44,14 @@ namespace Spine {
 		internal ExposedList<float> spaces = new ExposedList<float>(), positions = new ExposedList<float>();
 		internal ExposedList<float> world = new ExposedList<float>(), curves = new ExposedList<float>(), lengths = new ExposedList<float>();
 		internal float[] segments = new float[10];
+
+		public float Position { get { return position; } set { position = value; } }
+		public float Spacing { get { return spacing; } set { spacing = value; } }
+		public float RotateMix { get { return rotateMix; } set { rotateMix = value; } }
+		public float TranslateMix { get { return translateMix; } set { translateMix = value; } }
+		public ExposedList<Bone> Bones { get { return bones; } }
+		public Slot Target { get { return target; } set { target = value; } }
+		public PathConstraintData Data { get { return data; } }
 
 		public PathConstraint (PathConstraintData data, Skeleton skeleton) {
 			if (data == null) throw new ArgumentException("data cannot be null.");
@@ -148,6 +156,7 @@ namespace Spine {
 
 		float[] ComputeWorldPositions (PathAttachment path, int spacesCount, bool tangents, bool percentPosition,
 			bool percentSpacing) {
+
 			Slot target = this.target;
 			float position = this.position;
 			float[] spaces = this.spaces.Items, output = this.positions.Resize(spacesCount * 3 + 2).Items, world;
@@ -388,14 +397,6 @@ namespace Spine {
 			output[o + 1] = y;
 			if (tangents) output[o + 2] = (float)Math.Atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
 		}
-
-		public float Position { get { return position; } set { position = value; } }
-		public float Spacing { get { return spacing; } set { spacing = value; } }
-		public float RotateMix { get { return rotateMix; } set { rotateMix = value; } }
-		public float TranslateMix { get { return translateMix; } set { translateMix = value; } }
-		public ExposedList<Bone> Bones { get { return bones; } }
-		public Slot Target { get { return target; } set { target = value; } }
-		public PathConstraintData Data { get { return data; } }
 	}
 }
 

@@ -90,7 +90,7 @@ namespace Spine {
 		}
 
 		public ExposedList<T> Resize (int newSize) {
-			if (newSize > Items.Length) Array.Resize (ref Items, newSize);
+			if (newSize > Items.Length) Array.Resize(ref Items, newSize);
 			Count = newSize;
 			return this;
 		}

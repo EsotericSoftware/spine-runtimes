@@ -50,7 +50,7 @@ namespace Spine {
 
 		public SkeletonData Data { get { return data; } }
 		public ExposedList<Bone> Bones { get { return bones; } }
-		public ExposedList<IUpdatable> GetUpdateCache { get { return updateCache; } }
+		public ExposedList<IUpdatable> UpdateCacheList { get { return updateCache; } }
 		public ExposedList<Slot> Slots { get { return slots; } }
 		public ExposedList<Slot> DrawOrder { get { return drawOrder; } }
 		public ExposedList<IkConstraint> IkConstraints { get { return ikConstraints; } set { ikConstraints = value; } }
@@ -119,31 +119,29 @@ namespace Spine {
 		/// or removed.</summary>
 		public void UpdateCache () {
 			ExposedList<IUpdatable> updateCache = this.updateCache;
-			updateCache.Clear ();
+			updateCache.Clear();
 
 			ExposedList<Bone> bones = this.bones;
-			for (int i = 0, n = bones.Count; i < n; i++) {
-				bones.Items [i].Sorted = false;
-			}
+			for (int i = 0, n = bones.Count; i < n; i++)
+				bones.Items [i].sorted = false;
 
 			ExposedList<IkConstraint> ikConstraints = this.ikConstraintsSorted;
-			ikConstraints.Clear ();
+			ikConstraints.Clear();
 			ikConstraints.AddRange(this.ikConstraints);
 			int ikCount = ikConstraints.Count;
 			for (int i = 0, level, n = ikCount; i < n; i++) {
 				IkConstraint ik = ikConstraints.Items[i];
-				Bone bone = ik.bones.Items [0].Parent;
-				for (level = 0; bone != null; level++) {
+				Bone bone = ik.bones.Items[0].Parent;
+				for (level = 0; bone != null; level++)
 					bone = bone.Parent;
-				}
-				ik.Level = level;
+				ik.level = level;
 			}
 			for (int i = 1, ii; i < ikCount; i++) {
 				IkConstraint ik = ikConstraints.Items [i];
-				int level = ik.Level;
+				int level = ik.level;
 				for (ii = i - 1; ii >= 0; ii--) {
 					IkConstraint other = ikConstraints.Items[ii];
-					if (other.Level < level) break;
+					if (other.level < level) break;
 					ikConstraints.Items[ii + 1] = other;
 				}
 				ikConstraints.Items[ii + 1] = ik;
@@ -189,7 +187,7 @@ namespace Spine {
 				for (int ii = 0; ii < boneCount; ii++)
 					SortReset(constrained.Items[ii].children);
 				for (int ii = 0; ii < boneCount; ii++)
-					constrained.Items[ii].Sorted = true;
+					constrained.Items[ii].sorted = true;
 			}
 
 			ExposedList<TransformConstraint> transformConstraints = this.transformConstraints;
@@ -208,7 +206,7 @@ namespace Spine {
 				for (int ii = 0; ii < boneCount; ii++)
 					SortReset(constrained.Items[ii].children);
 				for (int ii = 0; ii < boneCount; ii++)
-					constrained.Items[ii].Sorted = true;
+					constrained.Items[ii].sorted = true;
 			}
 
 			for (int i = 0, n = bones.Count; i < n; i++)
@@ -228,8 +226,8 @@ namespace Spine {
 				SortBone(slotBone);
 			else {
 				ExposedList<Bone> bones = this.bones;
-				foreach (int boneIndex in pathBones)
-					SortBone(bones.Items[boneIndex]);
+				for (int i = 0, n = pathBones.Length; i < n; i++)
+					SortBone(bones.Items[pathBones[i]]);
 			}
 		}
 

@@ -47,7 +47,6 @@ namespace Spine {
 		public Bone Target { get { return target; } set { target = value; } }
 		public int BendDirection { get { return bendDirection; } set { bendDirection = value; } }
 		public float Mix { get { return mix; } set { mix = value; } }
-		public int Level { get { return level; } set { level = value; } }
 
 		public IkConstraint (IkConstraintData data, Skeleton skeleton) {
 			if (data == null) throw new ArgumentNullException("data cannot be null.");

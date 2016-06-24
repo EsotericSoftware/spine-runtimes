@@ -226,7 +226,7 @@ namespace Spine {
 
 		/// <summary>Sets the time and value of the specified keyframe.</summary>
 		public void SetFrame (int frameIndex, float time, float degrees) {
-			frameIndex <<= 2;
+			frameIndex <<= 1;
 			frames[frameIndex] = time;
 			frames[frameIndex + ROTATION] = degrees;
 		}
@@ -711,7 +711,7 @@ namespace Spine {
 			: base(frameCount) {
 			frames = new float[frameCount * ENTRIES];
 		}
-			
+
 		public void SetFrame (int frameIndex, float time, float rotateMix, float translateMix, float scaleMix, float shearMix) {
 			frameIndex *= ENTRIES;
 			frames[frameIndex] = time;
@@ -753,21 +753,21 @@ namespace Spine {
 		}
 	}
 
-	public class PathConstraintPositionTimeline: CurveTimeline {
+	public class PathConstraintPositionTimeline : CurveTimeline {
 		public const int ENTRIES = 2;
 		protected const int PREV_TIME = -2, PREV_VALUE = -1;
 		protected const int VALUE = 1;
 
 		internal int pathConstraintIndex;
-		internal float[] frames; // time, position, ...
+		internal float[] frames;
 
 		public PathConstraintPositionTimeline (int frameCount)
-			: base(frameCount) {		
+			: base(frameCount) {
 			frames = new float[frameCount * ENTRIES];
 		}
 
 		public int PathConstraintIndex { get { return pathConstraintIndex; } set { pathConstraintIndex = value; } }
-		public float[] Frames { get { return frames; } set { frames = value; } } // time, position
+		public float[] Frames { get { return frames; } set { frames = value; } } // time, position, ...
 
 		/** Sets the time and value of the specified keyframe. */
 		public void SetFrame (int frameIndex, float time, float value) {
@@ -798,8 +798,7 @@ namespace Spine {
 		}
 	}
 
-	public class PathConstraintSpacingTimeline: PathConstraintPositionTimeline {
-		
+	public class PathConstraintSpacingTimeline : PathConstraintPositionTimeline {
 		public PathConstraintSpacingTimeline (int frameCount)
 			: base(frameCount) {
 		}
@@ -826,16 +825,16 @@ namespace Spine {
 		}
 	}
 
-	public class PathConstraintMixTimeline: CurveTimeline {
+	public class PathConstraintMixTimeline : CurveTimeline {
 		public const int ENTRIES = 3;
 		private const int PREV_TIME = -3, PREV_ROTATE = -2, PREV_TRANSLATE = -1;
 		private const int ROTATE = 1, TRANSLATE = 2;
 
 		internal int pathConstraintIndex;
-		internal float[] frames; // time, rotate mix, translate mix, ...
+		internal float[] frames;
 
 		public int PathConstraintIndex { get { return pathConstraintIndex; } set { pathConstraintIndex = value; } }
-		public float[] Frames { get { return frames; } set { frames = value; } } // time, position
+		public float[] Frames { get { return frames; } set { frames = value; } } // time, rotate mix, translate mix, ...
 
 		public PathConstraintMixTimeline (int frameCount)
 			: base(frameCount) {

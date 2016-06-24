@@ -33,7 +33,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Spine {
-	public class PathAttachment: VertexAttachment {
+	public class PathAttachment : VertexAttachment {
 		internal float[] lengths;
 		internal bool closed, constantSpeed;
 
@@ -42,7 +42,7 @@ namespace Spine {
 		public bool ConstantSpeed { get { return constantSpeed; } set { constantSpeed = value; } }
 
 		public PathAttachment (String name)
-			:base (name) {
+			: base (name) {
 		}			
 	}
 }

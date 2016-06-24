@@ -112,23 +112,6 @@ namespace Spine {
 			}
 		}
 
-		override public void ComputeWorldVertices (Slot slot, float[] worldVertices) {
-			Skeleton skeleton = slot.Skeleton;
-
-			Bone bone = slot.bone;
-			float x = bone.skeleton.x + bone.worldX, y = bone.skeleton.y + bone.worldY;
-			float m00 = bone.a, m01 = bone.b, m10 = bone.c, m11 = bone.d;
-			float[] vertices = this.vertices;
-			int verticesCount = vertices.Length;
-			if (slot.attachmentVerticesCount == verticesCount) vertices = slot.AttachmentVertices;
-			for (int i = 0; i < verticesCount; i += 2) {
-				float vx = vertices[i];
-				float vy = vertices[i + 1];
-				worldVertices[i] = vx * m00 + vy * m01 + x;
-				worldVertices[i + 1] = vx * m10 + vy * m11 + y;
-			}
-		}
-
 		public bool ApplyFFD (Attachment sourceAttachment) {
 			return this == sourceAttachment || (inheritDeform && parentMesh == sourceAttachment);
 		}

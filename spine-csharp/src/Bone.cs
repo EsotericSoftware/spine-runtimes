@@ -76,8 +76,6 @@ namespace Spine {
 		public float WorldScaleX { get { return (float)Math.Sqrt(a * a + b * b) * worldSignX; } }
 		public float WorldScaleY { get { return (float)Math.Sqrt(c * c + d * d) * worldSignY; } }
 
-		public bool Sorted { get { return sorted; } set { sorted = value; } }
-
 		/// <param name="parent">May be null.</param>
 		public Bone (BoneData data, Skeleton skeleton, Bone parent) {
 			if (data == null) throw new ArgumentNullException("data cannot be null.");
