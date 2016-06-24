@@ -298,11 +298,6 @@ public class SkeletonJson {
 
 		String type = map.getString("type", AttachmentType.region.name());
 
-		// BOZO - Warning: These types are deprecated and will be removed in the near future.
-		if (type.equals("skinnedmesh")) type = "weightedmesh";
-		if (type.equals("weightedmesh")) type = "mesh";
-		if (type.equals("weightedlinkedmesh")) type = "linkedmesh";
-
 		switch (AttachmentType.valueOf(type)) {
 		case region: {
 			String path = map.getString("path", name);
