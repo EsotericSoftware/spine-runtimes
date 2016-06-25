@@ -123,7 +123,7 @@ namespace Spine {
 
 			ExposedList<Bone> bones = this.bones;
 			for (int i = 0, n = bones.Count; i < n; i++)
-				bones.Items [i].sorted = false;
+				bones.Items[i].sorted = false;
 
 			ExposedList<IkConstraint> ikConstraints = this.ikConstraintsSorted;
 			ikConstraints.Clear();

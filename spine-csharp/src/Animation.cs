@@ -347,7 +347,7 @@ namespace Spine {
 
 	public class ShearTimeline : TranslateTimeline {
 		public ShearTimeline (int frameCount)
-			: base (frameCount) {
+			: base(frameCount) {
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha) {

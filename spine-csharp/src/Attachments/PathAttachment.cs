@@ -42,7 +42,7 @@ namespace Spine {
 		public bool ConstantSpeed { get { return constantSpeed; } set { constantSpeed = value; } }
 
 		public PathAttachment (String name)
-			: base (name) {
+			: base(name) {
 		}			
 	}
 }
