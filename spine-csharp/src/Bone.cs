@@ -85,7 +85,7 @@ namespace Spine {
 			SetToSetupPose();
 		}
 
-		/// <summary>Same as {@link #updateWorldTransform()}. This method exists for Bone to implement {@link Updatable}.</summary>
+		/// <summary>Same as <see cref="UpdateWorldTransform"/>. This method exists for Bone to implement <see cref="Spine.IUpdatable"/>.</summary>
 		public void Update () {
 			UpdateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
 		}
@@ -226,14 +226,14 @@ namespace Spine {
 			return MathUtils.Atan2(pa * c - pc * a, pd * a - pb * c) * MathUtils.radDeg;
 		}
 
-		public float worldToLocalRotationY () {
+		public float WorldToLocalRotationY () {
 			Bone parent = this.parent;
 			if (parent == null) return rotation;
 			float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d, b = this.b, d = this.d;
 			return MathUtils.Atan2(pa * d - pc * b, pd * b - pb * d) * MathUtils.radDeg;
 		}
 
-		public void rotateWorld (float degrees) {
+		public void RotateWorld (float degrees) {
 			float a = this.a, b = this.b, c = this.c, d = this.d;
 			float cos = MathUtils.CosDeg(degrees), sin = MathUtils.SinDeg(degrees);
 			this.a = cos * a - sin * c;
@@ -249,7 +249,7 @@ namespace Spine {
 		/// Some redundant information is lost by the world transform, such as -1,-1 scale versus 180 rotation. The computed local
 		/// transform values may differ from the original values but are functionally the same.
 		/// </summary>
-		public void updateLocalTransform () {
+		public void UpdateLocalTransform () {
 			Bone parent = this.parent;
 			if (parent == null) {
 				x = worldX;

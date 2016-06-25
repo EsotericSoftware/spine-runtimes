@@ -169,7 +169,7 @@ namespace Spine {
 
 		// --- Path constraints.
 
-		/** @return May be null. */
+		/// <returns>May be null.</returns>
 		public PathConstraintData FindPathConstraint (String constraintName) {
 			if (constraintName == null) throw new ArgumentException("constraintName cannot be null.");
 			ExposedList<PathConstraintData> pathConstraints = this.pathConstraints;
@@ -180,7 +180,7 @@ namespace Spine {
 			return null;
 		}
 
-		/** @return -1 if the path constraint was not found. */
+		/// <returns>-1 if the path constraint was not found.</returns>
 		public int FindPathConstraintIndex (String pathConstraintName) {
 			if (pathConstraintName == null) throw new ArgumentException("pathConstraintName cannot be null.");
 			ExposedList<PathConstraintData> pathConstraints = this.pathConstraints;
