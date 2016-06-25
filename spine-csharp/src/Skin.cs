@@ -43,12 +43,12 @@ namespace Spine {
 		public Dictionary<AttachmentKeyTuple, Attachment> Attachments { get { return attachments; } }
 
 		public Skin (String name) {
-			if (name == null) throw new ArgumentNullException("name cannot be null.");
+			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
 			this.name = name;
 		}
 
 		public void AddAttachment (int slotIndex, String name, Attachment attachment) {
-			if (attachment == null) throw new ArgumentNullException("attachment cannot be null.");
+			if (attachment == null) throw new ArgumentNullException("attachment", "attachment cannot be null.");
 			attachments[new AttachmentKeyTuple(slotIndex, name)] = attachment;
 		}
 
@@ -60,13 +60,13 @@ namespace Spine {
 		}
 
 		public void FindNamesForSlot (int slotIndex, List<String> names) {
-			if (names == null) throw new ArgumentNullException("names cannot be null.");
+			if (names == null) throw new ArgumentNullException("names", "names cannot be null.");
 			foreach (AttachmentKeyTuple key in attachments.Keys)
 				if (key.slotIndex == slotIndex) names.Add(key.name);
 		}
 
 		public void FindAttachmentsForSlot (int slotIndex, List<Attachment> attachments) {
-			if (attachments == null) throw new ArgumentNullException("attachments cannot be null.");
+			if (attachments == null) throw new ArgumentNullException("attachments", "attachments cannot be null.");
 			foreach (KeyValuePair<AttachmentKeyTuple, Attachment> entry in this.attachments)
 				if (entry.Key.slotIndex == slotIndex) attachments.Add(entry.Value);
 		}

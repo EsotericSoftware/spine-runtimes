@@ -55,7 +55,7 @@ namespace Spine {
 		public float OffsetShearY { get { return offsetShearY; } set { offsetShearY = value; } }
 
 		public TransformConstraintData (String name) {
-			if (name == null) throw new ArgumentNullException("name cannot be null.");
+			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
 			this.name = name;
 		}
 

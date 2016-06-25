@@ -47,8 +47,8 @@ namespace Spine {
 		public float ShearMix { get { return shearMix; } set { shearMix = value; } }
 
 		public TransformConstraint (TransformConstraintData data, Skeleton skeleton) {
-			if (data == null) throw new ArgumentNullException("data cannot be null.");
-			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
+			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
+			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
 			this.data = data;
 			rotateMix = data.rotateMix;
 			translateMix = data.translateMix;

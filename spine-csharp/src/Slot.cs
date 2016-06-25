@@ -75,8 +75,8 @@ namespace Spine {
 		public int AttachmentVerticesCount { get { return attachmentVerticesCount; } set { attachmentVerticesCount = value; } }
 
 		public Slot (SlotData data, Bone bone) {
-			if (data == null) throw new ArgumentNullException("data cannot be null.");
-			if (bone == null) throw new ArgumentNullException("bone cannot be null.");
+			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
+			if (bone == null) throw new ArgumentNullException("bone", "bone cannot be null.");
 			this.data = data;
 			this.bone = bone;
 			SetToSetupPose();

@@ -77,8 +77,8 @@ namespace Spine {
 
 		/// <param name="parent">May be null.</param>
 		public Bone (BoneData data, Skeleton skeleton, Bone parent) {
-			if (data == null) throw new ArgumentNullException("data cannot be null.");
-			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
+			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
+			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
 			this.data = data;
 			this.skeleton = skeleton;
 			this.parent = parent;

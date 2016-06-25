@@ -53,8 +53,8 @@ namespace Spine {
 		public PathConstraintData Data { get { return data; } }
 
 		public PathConstraint (PathConstraintData data, Skeleton skeleton) {
-			if (data == null) throw new ArgumentException("data cannot be null.");
-			if (skeleton == null) throw new ArgumentException("skeleton cannot be null.");
+			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
+			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
 			this.data = data;
 			bones = new ExposedList<Bone>(data.Bones.Count);
 			foreach (BoneData boneData in data.bones)

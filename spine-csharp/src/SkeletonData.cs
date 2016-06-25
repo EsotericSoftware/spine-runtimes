@@ -30,7 +30,6 @@
  *****************************************************************************/
 
 using System;
-using System.Collections.Generic;
 
 namespace Spine {
 	public class SkeletonData {
@@ -68,7 +67,7 @@ namespace Spine {
 
 		/// <returns>May be null.</returns>
 		public BoneData FindBone (String boneName) {
-			if (boneName == null) throw new ArgumentNullException("boneName cannot be null.");
+			if (boneName == null) throw new ArgumentNullException("boneName", "boneName cannot be null.");
 			ExposedList<BoneData> bones = this.bones;
 			for (int i = 0, n = bones.Count; i < n; i++) {
 				BoneData bone = bones.Items[i];
@@ -79,7 +78,7 @@ namespace Spine {
 
 		/// <returns>-1 if the bone was not found.</returns>
 		public int FindBoneIndex (String boneName) {
-			if (boneName == null) throw new ArgumentNullException("boneName cannot be null.");
+			if (boneName == null) throw new ArgumentNullException("boneName", "boneName cannot be null.");
 			ExposedList<BoneData> bones = this.bones;
 			for (int i = 0, n = bones.Count; i < n; i++)
 				if (bones.Items[i].name == boneName) return i;
@@ -90,7 +89,7 @@ namespace Spine {
 
 		/// <returns>May be null.</returns>
 		public SlotData FindSlot (String slotName) {
-			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
+			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
 			ExposedList<SlotData> slots = this.slots;
 			for (int i = 0, n = slots.Count; i < n; i++) {
 				SlotData slot = slots.Items[i];
@@ -101,7 +100,7 @@ namespace Spine {
 
 		/// <returns>-1 if the slot was not found.</returns>
 		public int FindSlotIndex (String slotName) {
-			if (slotName == null) throw new ArgumentNullException("slotName cannot be null.");
+			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
 			ExposedList<SlotData> slots = this.slots;
 			for (int i = 0, n = slots.Count; i < n; i++)
 				if (slots.Items[i].name == slotName) return i;
@@ -112,7 +111,7 @@ namespace Spine {
 
 		/// <returns>May be null.</returns>
 		public Skin FindSkin (String skinName) {
-			if (skinName == null) throw new ArgumentNullException("skinName cannot be null.");
+			if (skinName == null) throw new ArgumentNullException("skinName", "skinName cannot be null.");
 			foreach (Skin skin in skins)
 				if (skin.name == skinName) return skin;
 			return null;
@@ -122,7 +121,7 @@ namespace Spine {
 
 		/// <returns>May be null.</returns>
 		public EventData FindEvent (String eventDataName) {
-			if (eventDataName == null) throw new ArgumentNullException("eventDataName cannot be null.");
+			if (eventDataName == null) throw new ArgumentNullException("eventDataName", "eventDataName cannot be null.");
 			foreach (EventData eventData in events)
 				if (eventData.name == eventDataName) return eventData;
 			return null;
@@ -132,7 +131,7 @@ namespace Spine {
 
 		/// <returns>May be null.</returns>
 		public Animation FindAnimation (String animationName) {
-			if (animationName == null) throw new ArgumentNullException("animationName cannot be null.");
+			if (animationName == null) throw new ArgumentNullException("animationName", "animationName cannot be null.");
 			ExposedList<Animation> animations = this.animations;
 			for (int i = 0, n = animations.Count; i < n; i++) {
 				Animation animation = animations.Items[i];
@@ -145,7 +144,7 @@ namespace Spine {
 
 		/// <returns>May be null.</returns>
 		public IkConstraintData FindIkConstraint (String constraintName) {
-			if (constraintName == null) throw new ArgumentNullException("constraintName cannot be null.");
+			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
 			ExposedList<IkConstraintData> ikConstraints = this.ikConstraints;
 			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
 				IkConstraintData ikConstraint = ikConstraints.Items[i];
@@ -158,7 +157,7 @@ namespace Spine {
 
 		/// <returns>May be null.</returns>
 		public TransformConstraintData FindTransformConstraint (String constraintName) {
-			if (constraintName == null) throw new ArgumentNullException("constraintName cannot be null.");
+			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
 			ExposedList<TransformConstraintData> transformConstraints = this.transformConstraints;
 			for (int i = 0, n = transformConstraints.Count; i < n; i++) {
 				TransformConstraintData transformConstraint = transformConstraints.Items[i];
@@ -171,7 +170,7 @@ namespace Spine {
 
 		/// <returns>May be null.</returns>
 		public PathConstraintData FindPathConstraint (String constraintName) {
-			if (constraintName == null) throw new ArgumentException("constraintName cannot be null.");
+			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
 			ExposedList<PathConstraintData> pathConstraints = this.pathConstraints;
 			for (int i = 0, n = pathConstraints.Count; i < n; i++) {
 				PathConstraintData constraint = pathConstraints.Items[i];
@@ -182,7 +181,7 @@ namespace Spine {
 
 		/// <returns>-1 if the path constraint was not found.</returns>
 		public int FindPathConstraintIndex (String pathConstraintName) {
-			if (pathConstraintName == null) throw new ArgumentException("pathConstraintName cannot be null.");
+			if (pathConstraintName == null) throw new ArgumentNullException("pathConstraintName", "pathConstraintName cannot be null.");
 			ExposedList<PathConstraintData> pathConstraints = this.pathConstraints;
 			for (int i = 0, n = pathConstraints.Count; i < n; i++)
 				if (pathConstraints.Items[i].name.Equals(pathConstraintName)) return i;

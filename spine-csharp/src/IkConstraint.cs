@@ -48,8 +48,8 @@ namespace Spine {
 		public float Mix { get { return mix; } set { mix = value; } }
 
 		public IkConstraint (IkConstraintData data, Skeleton skeleton) {
-			if (data == null) throw new ArgumentNullException("data cannot be null.");
-			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
+			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
+			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
 			this.data = data;
 			mix = data.mix;
 			bendDirection = data.bendDirection;

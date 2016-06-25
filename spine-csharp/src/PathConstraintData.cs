@@ -55,7 +55,7 @@ namespace Spine {
 		public String Name { get { return name; } }
 
 		public PathConstraintData (String name) {
-			if (name == null) throw new ArgumentException("name cannot be null.");
+			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
 			this.name = name;
 		}
 	}
