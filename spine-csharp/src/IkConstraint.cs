@@ -88,12 +88,12 @@ namespace Spine {
 			float id = 1 / (pp.a * pp.d - pp.b * pp.c);
 			float x = targetX - pp.worldX, y = targetY - pp.worldY;
 			float tx = (x * pp.d - y * pp.b) * id - bone.x, ty = (y * pp.a - x * pp.c) * id - bone.y;
-			float rotationIK = MathUtils.Atan2(ty, tx) * MathUtils.radDeg - bone.shearX;
+			float rotationIK = MathUtils.Atan2(ty, tx) * MathUtils.radDeg - bone.shearX - bone.rotation;
 			if (bone.scaleX < 0) rotationIK += 180;
 			if (rotationIK > 180)
 				rotationIK -= 360;
 			else if (rotationIK < -180) rotationIK += 360;
-			bone.UpdateWorldTransform(bone.x, bone.y, bone.rotation + (rotationIK - bone.rotation) * alpha, bone.scaleX, bone.scaleY,
+			bone.UpdateWorldTransform(bone.x, bone.y, bone.rotation + rotationIK * alpha, bone.scaleX, bone.scaleY,
 				bone.shearX, bone.shearY);
 		}
 
