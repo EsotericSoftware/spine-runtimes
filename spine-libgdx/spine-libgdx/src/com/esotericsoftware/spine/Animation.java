@@ -531,18 +531,16 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha) {
 			float[] frames = this.frames;
-			if (time < frames[0]) {
-				if (lastTime > time) apply(skeleton, lastTime, Integer.MAX_VALUE, null, 0);
-				return;
-			} else if (lastTime > time) //
-				lastTime = -1;
+			if (time < frames[0]) return; // Time is before first frame.
 
-			int frame = (time >= frames[frames.length - 1] ? frames.length : binarySearch(frames, time)) - 1;
-			if (frames[frame] < lastTime) return;
+			int frameIndex;
+			if (time >= frames[frames.length - 1]) // Time is after last frame.
+				frameIndex = frames.length - 1;
+			else
+				frameIndex = binarySearch(frames, time, 1) - 1;
 
-			String attachmentName = attachmentNames[frame];
-			skeleton.slots.get(slotIndex)
-				.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slotIndex, attachmentName));
+			String attachmentName = attachmentNames[frameIndex];
+			skeleton.slots.get(slotIndex).attachmentName = attachmentName;
 		}
 	}
 

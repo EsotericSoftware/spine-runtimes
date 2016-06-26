@@ -102,7 +102,7 @@ public class SkeletonRendererDebug {
 			Array<Slot> slots = skeleton.getSlots();
 			for (int i = 0, n = slots.size; i < n; i++) {
 				Slot slot = slots.get(i);
-				Attachment attachment = slot.attachment;
+				Attachment attachment = slot.getAttachment();
 				if (attachment instanceof RegionAttachment) {
 					RegionAttachment regionAttachment = (RegionAttachment)attachment;
 					float[] vertices = regionAttachment.updateWorldVertices(slot, false);
@@ -118,7 +118,7 @@ public class SkeletonRendererDebug {
 			Array<Slot> slots = skeleton.getSlots();
 			for (int i = 0, n = slots.size; i < n; i++) {
 				Slot slot = slots.get(i);
-				Attachment attachment = slot.attachment;
+				Attachment attachment = slot.getAttachment();
 				if (!(attachment instanceof MeshAttachment)) continue;
 				MeshAttachment mesh = (MeshAttachment)attachment;
 				mesh.updateWorldVertices(slot, false);
@@ -167,7 +167,7 @@ public class SkeletonRendererDebug {
 			Array<Slot> slots = skeleton.getSlots();
 			for (int i = 0, n = slots.size; i < n; i++) {
 				Slot slot = slots.get(i);
-				Attachment attachment = slot.attachment;
+				Attachment attachment = slot.getAttachment();
 				if (!(attachment instanceof PathAttachment)) continue;
 				PathAttachment path = (PathAttachment)attachment;
 				int nn = path.getWorldVerticesLength();
