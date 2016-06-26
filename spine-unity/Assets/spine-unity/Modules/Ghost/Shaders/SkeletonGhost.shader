@@ -1,5 +1,5 @@
 ﻿//Shader written by Alex Dixon
-Shader "Spine/SkeletonGhost" 
+Shader "Spine/Special/SkeletonGhost" 
 {
     Properties 
     {
@@ -32,14 +32,12 @@ Shader "Spine/SkeletonGhost"
                		float4 vertex : POSITION;
                		float2 texcoord : TEXCOORD0;
 					float4 color : COLOR;
-
                	};
                 
                 struct vertex_output
                 {
                     float4  pos         : SV_POSITION;
                     float2  uv          : TEXCOORD0;
-
 					float4 color : COLOR;
                 };
                 

@@ -828,10 +828,10 @@ public class Animation {
 		public void setFrame (int frameIndex, float time, float rotateMix, float translateMix, float scaleMix, float shearMix) {
 			frameIndex *= ENTRIES;
 			frames[frameIndex] = time;
-			frames[frameIndex + 1] = rotateMix;
-			frames[frameIndex + 2] = translateMix;
-			frames[frameIndex + 3] = scaleMix;
-			frames[frameIndex + 4] = shearMix;
+			frames[frameIndex + ROTATE] = rotateMix;
+			frames[frameIndex + TRANSLATE] = translateMix;
+			frames[frameIndex + SCALE] = scaleMix;
+			frames[frameIndex + SHEAR] = shearMix;
 		}
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha) {

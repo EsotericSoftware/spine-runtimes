@@ -34,6 +34,7 @@ using System;
 namespace Spine {
 	public static class MathUtils {
 		public const float PI = 3.1415927f;
+		public const float PI2 = PI * 2;
 		public const float radDeg = 180f / PI;
 		public const float degRad = PI / 180;
 

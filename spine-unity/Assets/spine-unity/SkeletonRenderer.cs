@@ -257,7 +257,9 @@ namespace Spine.Unity {
 			var workingSubmeshInstructions = workingInstruction.submeshInstructions;	// Items array should not be cached. There is dynamic writing to this list.
 			workingSubmeshInstructions.Clear(false);
 
+			#if !SPINE_TK2D
 			bool isCustomSlotMaterialsPopulated = customSlotMaterials.Count > 0;
+			#endif
 
 			int vertexCount = 0;
 			int submeshVertexCount = 0;

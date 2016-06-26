@@ -90,10 +90,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			UpdateAttachments();
-
-			if (PrefabUtility.GetPrefabType(this.target) == PrefabType.Prefab)
-				isPrefab = true;
-
+			isPrefab |= PrefabUtility.GetPrefabType(this.target) == PrefabType.Prefab;
 		}
 
 		void OnSceneGUI () {
@@ -101,21 +98,14 @@ namespace Spine.Unity.Editor {
 				OnEnable();
 				return;
 			}
-
-			// MITCH
-			//float flipRotation = skeleton.FlipX ? -1 : 1;
-			const float flipRotation = 1;
-
+				
 			foreach (Bone b in skeleton.Bones) {
-				Vector3 vec = transform.TransformPoint(new Vector3(b.WorldX, b.WorldY, 0));
+				Vector3 pos = new Vector3(b.WorldX, b.WorldY, 0);
+				Quaternion rot = Quaternion.Euler(0, 0, b.WorldRotationX - 90f);
+				Vector3 scale = Vector3.one * b.Data.Length * b.WorldScaleX;
 
-				// MITCH
-				Quaternion rot = Quaternion.Euler(0, 0, b.WorldRotationX * flipRotation);
-				Vector3 forward = transform.TransformDirection(rot * Vector3.right);
-				forward *= flipRotation;
-
-				SpineEditorUtilities.Icons.boneMaterial.SetPass(0);
-				Graphics.DrawMeshNow(SpineEditorUtilities.Icons.boneMesh, Matrix4x4.TRS(vec, Quaternion.LookRotation(transform.forward, forward), Vector3.one * b.Data.Length * b.WorldScaleX));
+				SpineEditorUtilities.Icons.BoneMaterial.SetPass(0);
+				Graphics.DrawMeshNow(SpineEditorUtilities.Icons.BoneMesh, transform.localToWorldMatrix * Matrix4x4.TRS(pos, rot, scale));
 			}
 		}
 
