@@ -102,13 +102,10 @@ public class AnimationState {
 			TrackEntry current = tracks.get(i);
 			if (current == null) continue;
 
-			float time = current.time;
-			float lastTime = current.lastTime;
-			float endTime = current.endTime;
+			float time = current.time, lastTime = current.lastTime, endTime = current.endTime, mix = current.mix;
 			boolean loop = current.loop;
 			if (!loop && time > endTime) time = endTime;
 
-			float alpha = current.mix;
 			TrackEntry previous = current.previous;
 			if (previous != null) {
 				float previousTime = previous.time;
@@ -117,14 +114,14 @@ public class AnimationState {
 				queueEvents(previous, previous.lastTime, previousTime, previous.endTime);
 				previous.lastTime = previousTime;
 
-				alpha *= current.mixTime / current.mixDuration;
-				if (alpha >= 1) {
-					alpha = 1;
+				mix *= current.mixTime / current.mixDuration;
+				if (mix >= 1) {
+					mix = 1;
 					queue.end(current.previous);
 					current.previous = null;
 				}
 			}
-			current.animation.mix(skeleton, lastTime, time, loop, events, alpha);
+			current.animation.mix(skeleton, lastTime, time, loop, events, mix);
 			queueEvents(current, lastTime, time, endTime);
 
 			current.lastTime = current.time;
@@ -166,17 +163,16 @@ public class AnimationState {
 		if (trackIndex >= tracks.size) return;
 		TrackEntry current = tracks.get(trackIndex);
 		if (current == null) return;
+		freeAll(current.next);
 
-		if (current.listener != null) current.listener.end(current);
-		for (int i = 0, n = listeners.size; i < n; i++)
-			listeners.get(i).end(current);
+		queue.end(current);
+		if (current.previous != null) queue.end(current.previous);
+		queue.drain();
 
 		tracks.set(trackIndex, null);
-
-		freeAll(current);
-		if (current.previous != null) trackEntryPool.free(current.previous);
 	}
 
+	/** @param entry May be null. */
 	private void freeAll (TrackEntry entry) {
 		while (entry != null) {
 			TrackEntry next = entry.next;
