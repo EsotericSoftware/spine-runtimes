@@ -102,7 +102,7 @@ public class Skin {
 		for (Entry<Key, Attachment> entry : oldSkin.attachments.entries()) {
 			int slotIndex = entry.key.slotIndex;
 			Slot slot = skeleton.slots.get(slotIndex);
-			if (slot.attachment == entry.value) {
+			if (slot.getAttachment() == entry.value) {
 				Attachment attachment = getAttachment(slotIndex, entry.key.name);
 				if (attachment != null) slot.setAttachment(attachment);
 			}

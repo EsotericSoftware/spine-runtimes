@@ -48,7 +48,7 @@ public class SkeletonRenderer<T extends Batch> {
 		Array<Slot> drawOrder = skeleton.drawOrder;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder.get(i);
-			Attachment attachment = slot.attachment;
+			Attachment attachment = slot.getAttachment();
 			if (attachment instanceof RegionAttachment) {
 				RegionAttachment regionAttachment = (RegionAttachment)attachment;
 				float[] vertices = regionAttachment.updateWorldVertices(slot, premultipliedAlpha);

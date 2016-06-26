@@ -31,18 +31,18 @@
 
 package com.esotericsoftware.spine;
 
-import com.esotericsoftware.spine.attachments.Attachment;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.FloatArray;
+import com.esotericsoftware.spine.attachments.Attachment;
 
 public class Slot {
 	final SlotData data;
 	final Bone bone;
 	final Color color;
-	Attachment attachment;
+	private Attachment attachment;
 	private float attachmentTime;
 	private FloatArray attachmentVertices = new FloatArray();
+	String attachmentName;
 
 	public Slot (SlotData data, Bone bone) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -82,6 +82,10 @@ public class Slot {
 
 	/** @return May be null. */
 	public Attachment getAttachment () {
+		if (attachmentName != null) {
+			attachment = bone.skeleton.getAttachment(data.index, attachmentName);
+			attachmentName = null;
+		}
 		return attachment;
 	}
 

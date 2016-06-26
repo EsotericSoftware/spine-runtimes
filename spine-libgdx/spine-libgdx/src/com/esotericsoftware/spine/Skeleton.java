@@ -530,7 +530,7 @@ public class Skeleton {
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder.get(i);
 			float[] vertices = null;
-			Attachment attachment = slot.attachment;
+			Attachment attachment = slot.getAttachment();
 			if (attachment instanceof RegionAttachment)
 				vertices = ((RegionAttachment)attachment).updateWorldVertices(slot, false);
 			else if (attachment instanceof MeshAttachment) //

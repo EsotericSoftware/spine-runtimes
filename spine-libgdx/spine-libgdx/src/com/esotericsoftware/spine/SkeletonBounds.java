@@ -61,7 +61,7 @@ public class SkeletonBounds {
 
 		for (int i = 0; i < slotCount; i++) {
 			Slot slot = slots.get(i);
-			Attachment attachment = slot.attachment;
+			Attachment attachment = slot.getAttachment();
 			if (attachment instanceof BoundingBoxAttachment) {
 				BoundingBoxAttachment boundingBox = (BoundingBoxAttachment)attachment;
 				boundingBoxes.add(boundingBox);
