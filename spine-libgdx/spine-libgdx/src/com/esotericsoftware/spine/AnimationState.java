@@ -120,7 +120,7 @@ public class AnimationState {
 				alpha *= current.mixTime / current.mixDuration;
 				if (alpha >= 1) {
 					alpha = 1;
-					queue.queueEnd(current.previous);
+					queue.end(current.previous);
 					current.previous = null;
 				}
 			}
@@ -143,16 +143,16 @@ public class AnimationState {
 		for (; i < n; i++) {
 			Event event = events.get(i);
 			if (events.get(i).time < lastTimeWrapped) break;
-			queue.queueEvent(entry, event);
+			queue.event(entry, event);
 		}
 
 		// Queue complete if completed the animation or a loop iteration.
 		if (entry.loop ? (lastTime % endTime > time % endTime) : (lastTime < endTime && time >= endTime))
-			queue.queueComplete(entry, (int)(time / endTime));
+			queue.complete(entry, (int)(time / endTime));
 
 		// Queue events after complete.
 		for (; i < n; i++)
-			queue.queueEvent(entry, events.get(i));
+			queue.event(entry, events.get(i));
 		events.clear();
 	}
 
@@ -197,13 +197,13 @@ public class AnimationState {
 
 		tracks.set(index, entry);
 
-		queue.fireStart(entry);
+		queue.start(entry);
 
 		if (current != null) {
 			TrackEntry previous = current.previous;
 			current.previous = null;
 
-			queue.fireInterrupt(current);
+			queue.interrupt(current);
 
 			entry.mixDuration = data.getMix(current.animation, entry.animation);
 			if (entry.mixDuration > 0) {
@@ -216,10 +216,12 @@ public class AnimationState {
 					entry.previous = current;
 				}
 			} else
-				queue.fireEnd(current);
+				queue.end(current);
 
-			if (previous != null) queue.fireEnd(previous);
+			if (previous != null) queue.end(previous);
 		}
+
+		queue.drain();
 	}
 
 	/** @see #setAnimation(int, Animation, boolean) */
@@ -296,6 +298,10 @@ public class AnimationState {
 
 	public void clearListeners () {
 		listeners.clear();
+	}
+
+	public void clearEvents () {
+		queue.clear();
 	}
 
 	public float getTimeScale () {
@@ -446,74 +452,85 @@ public class AnimationState {
 	}
 
 	class EventQueue {
-		static private final int EVENT = 0, END = -1;
+		static private final int START = -3, EVENT = -2, INTERRUPT = -1, END = 0;
 
+		boolean draining;
 		final Array objects = new Array();
-		final IntArray loopCounts = new IntArray();
+		final IntArray eventTypes = new IntArray(); // If > 0 it's loop count for a complete event.
 
-		public void queueEvent (TrackEntry entry, Event event) {
+		public void start (TrackEntry entry) {
+			objects.add(entry);
+			eventTypes.add(START);
+		}
+
+		public void event (TrackEntry entry, Event event) {
 			objects.add(entry);
 			objects.add(event);
-			loopCounts.add(EVENT);
+			eventTypes.add(EVENT);
 		}
 
-		public void queueComplete (TrackEntry entry, int loopCount) {
+		public void complete (TrackEntry entry, int loopCount) {
 			objects.add(entry);
-			objects.add(null);
-			loopCounts.add(loopCount);
+			eventTypes.add(loopCount);
 		}
 
-		public void queueEnd (TrackEntry entry) {
+		public void interrupt (TrackEntry entry) {
 			objects.add(entry);
-			objects.add(null);
-			loopCounts.add(END);
+			eventTypes.add(INTERRUPT);
+		}
+
+		public void end (TrackEntry entry) {
+			objects.add(entry);
+			eventTypes.add(END);
 		}
 
 		public void drain () {
+			if (draining) return; // Not reentrant.
+			draining = true;
+
 			Array objects = this.objects;
-			IntArray loopCounts = this.loopCounts;
+			IntArray eventTypes = this.eventTypes;
 			Array<AnimationStateListener> listeners = AnimationState.this.listeners;
-			int listenerCount = listeners.size;
-			for (int i = 0, ii = 0, n = loopCounts.size; i < n; i++, ii += 2) {
-				TrackEntry entry = (TrackEntry)objects.get(ii);
-				int loopCount = loopCounts.get(i);
-				switch (loopCount) {
+			for (int e = 0, o = 0; e < eventTypes.size; e++, o++) {
+				TrackEntry entry = (TrackEntry)objects.get(o);
+				int eventType = eventTypes.get(e);
+				switch (eventType) {
+				case START:
+					if (entry.listener != null) entry.listener.end(entry);
+					for (int i = 0; i < listeners.size; i++)
+						listeners.get(i).start(entry);
+					break;
 				case EVENT:
-					Event event = (Event)objects.get(ii + 1);
+					Event event = (Event)objects.get(++o);
 					if (entry.listener != null) entry.listener.event(entry, event);
-					for (int iii = 0; iii < listenerCount; iii++)
-						listeners.get(iii).event(entry, event);
+					for (int i = 0; i < listeners.size; i++)
+						listeners.get(i).event(entry, event);
+					break;
+				case INTERRUPT:
+					if (entry.listener != null) entry.listener.end(entry);
+					for (int i = 0; i < listeners.size; i++)
+						listeners.get(i).interrupt(entry);
 					break;
 				case END:
-					fireEnd(entry);
+					if (entry.listener != null) entry.listener.end(entry);
+					for (int i = 0; i < listeners.size; i++)
+						listeners.get(i).end(entry);
+					trackEntryPool.free(entry);
 					break;
 				default:
-					if (entry.listener != null) entry.listener.complete(entry, loopCount);
-					for (int iii = 0; iii < listenerCount; iii++)
-						listeners.get(iii).complete(entry, loopCount);
+					if (entry.listener != null) entry.listener.complete(entry, eventType);
+					for (int i = 0; i < listeners.size; i++)
+						listeners.get(i).complete(entry, eventType);
 				}
 			}
+			clear();
+
+			draining = false;
+		}
+
+		public void clear () {
 			objects.clear();
-			loopCounts.clear();
-		}
-
-		public void fireStart (TrackEntry entry) {
-			if (entry.listener != null) entry.listener.start(entry);
-			for (int i = 0, n = listeners.size; i < n; i++)
-				listeners.get(i).start(entry);
-		}
-
-		public void fireEnd (TrackEntry entry) {
-			if (entry.listener != null) entry.listener.end(entry);
-			for (int i = 0, n = listeners.size; i < n; i++)
-				listeners.get(i).end(entry);
-			trackEntryPool.free(entry);
-		}
-
-		public void fireInterrupt (TrackEntry entry) {
-			if (entry.listener != null) entry.listener.interrupt(entry);
-			for (int i = 0, n = listeners.size; i < n; i++)
-				listeners.get(i).interrupt(entry);
+			eventTypes.clear();
 		}
 	}
 

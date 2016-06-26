@@ -67,6 +67,8 @@ public class AnimationStateData {
 	}
 
 	public float getMix (Animation from, Animation to) {
+		if (from == null) throw new IllegalArgumentException("from cannot be null.");
+		if (to == null) throw new IllegalArgumentException("to cannot be null.");
 		tempKey.a1 = from;
 		tempKey.a2 = to;
 		return animationToMixTime.get(tempKey, defaultMix);
