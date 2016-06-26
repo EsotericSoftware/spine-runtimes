@@ -35,19 +35,20 @@ import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.backends.lwjgl.LwjglFileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.AnimationState.AnimationStateListener;
+import com.esotericsoftware.spine.AnimationState.TrackEntry;
 import com.esotericsoftware.spine.attachments.AttachmentLoader;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
-import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
+import com.esotericsoftware.spine.attachments.RegionAttachment;
 
 public class AnimationStateTest {
 	final SkeletonJson json = new SkeletonJson(new AttachmentLoader() {
-		public MeshAttachment newMeshAttachment (Skin skin, String name, String path) {
+		public RegionAttachment newRegionAttachment (Skin skin, String name, String path) {
 			return null;
 		}
 
-		public RegionAttachment newRegionAttachment (Skin skin, String name, String path) {
+		public MeshAttachment newMeshAttachment (Skin skin, String name, String path) {
 			return null;
 		}
 
@@ -60,154 +61,274 @@ public class AnimationStateTest {
 		}
 	});
 
-	AnimationStateListener stateListener = new AnimationStateListener() {
-		public void start (int trackIndex) {
-			actual.add(new Result("start", null));
+	final AnimationStateListener stateListener = new AnimationStateListener() {
+		public void start (TrackEntry entry) {
+			add(actual("start", entry));
 		}
 
-		public void event (int trackIndex, Event event) {
-			actual.add(new Result("event", event.getString()));
+		public void event (TrackEntry entry, Event event) {
+			add(actual("event " + event.getString(), entry));
 		}
 
-		public void complete (int trackIndex, int loopCount) {
-			actual.add(new Result("complete", null));
+		public void interrupt (TrackEntry entry) {
+			add(actual("interrupt", entry));
 		}
 
-		public void end (int trackIndex) {
-			actual.add(new Result("end", null));
+		public void complete (TrackEntry entry, int loopCount) {
+			add(actual("complete " + loopCount, entry));
+		}
+
+		public void end (TrackEntry entry) {
+			add(actual("end", entry));
+		}
+
+		private void add (Result result) {
+			String error = "PASS";
+			if (actual.size >= expected.size) {
+				error = "FAIL: <none>";
+				fail = true;
+			} else if (!expected.get(actual.size).equals(result)) {
+				error = "FAIL: " + expected.get(actual.size);
+				fail = true;
+			}
+			buffer.append(result.toString());
+			buffer.append(error);
+			buffer.append('\n');
+			actual.add(result);
 		}
 	};
 
 	final SkeletonData skeletonData;
 	final AnimationStateData stateData;
 	final Array<Result> actual = new Array();
+	final Array<Result> expected = new Array();
+	final StringBuilder buffer = new StringBuilder(512);
 
-	public AnimationStateTest () {
+	AnimationState state;
+	float time = 0;
+	boolean fail;
+	int test;
+
+	AnimationStateTest () {
 		skeletonData = json.readSkeletonData(new LwjglFileHandle("test/test.json", FileType.Internal));
 		stateData = new AnimationStateData(skeletonData);
 
-		AnimationState state;
-
-		state = newState();
-		state.setAnimation(0, "events", false);
-		test(state, 1 / 60f, 1000, //
-			new Result("start", null), //
-			new Result("event", "0"), //
-			new Result("event", "14"), //
-			new Result("event", "30"), //
-			new Result("complete", null), //
-			new Result("end", null) //
+		setup( // 1
+			expect("start", 0, 0, 0), //
+			expect("event 0", 0, 0, 0), //
+			expect("event 14", 0, 0.5f, 0.5f), //
+			expect("event 30", 0, 1, 1), //
+			expect("complete 1", 0, 1, 1), //
+			expect("end", 0, 1, 1.1f) //
 		);
+		state.setAnimation(0, "events1", false);
+		run(0.1f, 1000);
 
-		state = newState();
-		state.setAnimation(0, "events", false);
-		test(state, 30, 1000, //
-			new Result("start", null), //
-			new Result("event", "0"), //
-			new Result("event", "14"), //
-			new Result("event", "30"), //
-			new Result("complete", null), //
-			new Result("end", null) //
+		setup( // 2
+			expect("start", 0, 0, 0), //
+			expect("event 0", 0, 0, 0), //
+			expect("event 14", 0, 0.467f, 0.467f), //
+			expect("event 30", 0, 1.017f, 1.017f), //
+			expect("complete 1", 0, 1.017f, 1.017f), //
+			expect("end", 0, 1.017f, 1.033f) //
 		);
+		state.setAnimation(0, "events1", false);
+		run(1 / 60f, 1000);
 
-		state = newState();
-		state.setAnimation(0, "events", false);
-		test(state, 1, 1.01f, //
-			new Result("start", null), //
-			new Result("event", "0"), //
-			new Result("event", "14"), //
-			new Result("event", "30"), //
-			new Result("complete", null), //
-			new Result("end", null) //
+		setup( // 3
+			expect("start", 0, 0, 0), //
+			expect("event 0", 0, 0, 0), //
+			expect("event 14", 0, 30, 30), //
+			expect("event 30", 0, 30, 30), //
+			expect("complete 1", 0, 30, 30), //
+			expect("end", 0, 30, 60) //
 		);
+		state.setAnimation(0, "events1", false);
+		run(30, 1000);
 
-		state = newState();
-		state.setAnimation(0, "events", false);
-		state.addAnimation(0, "events", false, 0);
-		test(state, 0.1f, 3f, //
-			new Result("start", null), //
-			new Result("event", "0"), //
-			new Result("event", "14"), //
-			new Result("event", "30"), //
-			new Result("complete", null), //
-			new Result("end", null), //
-			new Result("start", null), //
-			new Result("event", "0"), //
-			new Result("event", "14"), //
-			new Result("event", "30"), //
-			new Result("complete", null), //
-			new Result("end", null) //
+		setup( // 4
+			expect("start", 0, 0, 0), //
+			expect("event 0", 0, 0, 0), //
+			expect("event 14", 0, 1, 1), //
+			expect("event 30", 0, 1, 1), //
+			expect("complete 1", 0, 1, 1), //
+			expect("end", 0, 1, 2) //
 		);
+		state.setAnimation(0, "events1", false);
+		run(1, 1.01f);
+
+		setup( // 5
+			expect("start", 0, 0, 0), //
+			expect("event 0", 0, 0, 0), //
+			expect("event 14", 0, 0.5f, 0.5f), //
+			expect("event 30", 0, 1, 1), //
+			expect("complete 1", 0, 1, 1), //
+			expect("event 0", 0, 1, 1), //
+			expect("event 14", 0, 1.5f, 1.5f), //
+			expect("event 30", 0, 2, 2), //
+			expect("complete 2", 0, 2, 2), //
+			expect("event 0", 0, 2, 2) //
+		);
+		state.setAnimation(0, "events1", true);
+		run(0.1f, 2.3f);
+
+		setup( // 6
+			expect("start", 0, 0, 0), //
+			expect("event 0", 0, 0, 0), //
+			expect("event 14", 0, 0.5f, 0.5f), //
+			expect("event 30", 0, 1, 1), //
+			expect("complete 1", 0, 1, 1), //
+
+			expect("start", 1, 0.1f, 1.1f), //
+
+			expect("interrupt", 0, 1.1f, 1.1f), //
+			expect("end", 0, 1.1f, 1.1f), //
+
+			expect("event 0", 1, 0.1f, 1.1f), //
+			expect("event 14", 1, 0.5f, 1.5f), //
+			expect("event 30", 1, 1, 2), //
+			expect("complete 1", 1, 1, 2), //
+
+			expect("start", 0, 0.1f, 2.1f), //
+
+			expect("interrupt", 1, 1.1f, 2.1f), //
+			expect("end", 1, 1.1f, 2.1f), //
+
+			expect("event 0", 0, 0.1f, 2.1f), //
+			expect("event 14", 0, 0.5f, 2.5f), //
+			expect("event 30", 0, 1, 3), //
+			expect("complete 1", 0, 1, 3), //
+			expect("end", 0, 1, 3.1f) //
+		);
+		state.setAnimation(0, "events1", false);
+		state.addAnimation(0, "events2", false, 0);
+		state.addAnimation(0, "events1", false, 0);
+		run(0.1f, 4f);
+
+		setup( // 7
+			expect("start", 0, 0, 0), //
+			expect("event 0", 0, 0, 0), //
+			expect("event 14", 0, 0.5f, 0.5f), //
+
+			expect("start", 1, 0.1f, 0.6f), //
+
+			expect("interrupt", 0, 0.6f, 0.6f), //
+			expect("end", 0, 0.6f, 0.6f), //
+
+			expect("event 0", 1, 0.1f, 0.6f), //
+			expect("event 14", 1, 0.5f, 1.0f), //
+			expect("event 30", 1, 1, 1.5f), //
+			expect("complete 1", 1, 1, 1.5f), //
+			expect("end", 1, 1, 1.6f) //
+		);
+		state.setAnimation(0, "events1", false);
+		state.addAnimation(0, "events2", false, 0.5f);
+		run(0.1f, 1000);
+
+		setup( // 8
+			expect("start", 0, 0, 0), //
+			expect("event 0", 0, 0, 0), //
+			expect("event 14", 0, 0.5f, 0.5f), //
+
+			expect("start", 1, 0.1f, 1), //
+
+			expect("interrupt", 0, 1, 1), //
+			expect("event 30", 0, 1, 1), //
+			expect("complete 1", 0, 1, 1), //
+			expect("event 0", 0, 1, 1), //
+
+			expect("event 0", 1, 0.1f, 1), //
+			expect("event 14", 1, 0.5f, 1.4f), //
+
+			expect("event 14", 0, 1.5f, 1.5f), //
+			expect("end", 0, 1.6f, 1.6f), //
+
+			expect("event 30", 1, 1, 1.9f), //
+			expect("complete 1", 1, 1, 1.9f), //
+			expect("end", 1, 1, 2) //
+		);
+		stateData.setMix("events1", "events2", 0.7f);
+		state.setAnimation(0, "events1", true);
+		state.addAnimation(0, "events2", false, 0.9f);
+		run(0.1f, 1000);
+
+		System.out.println("AnimationState tests passed.");
 	}
 
-	private AnimationState newState () {
-		AnimationState state = new AnimationState(stateData);
+	void setup (Result... expectedArray) {
+		test++;
+		expected.addAll(expectedArray);
+		state = new AnimationState(stateData);
 		state.addListener(stateListener);
-		return state;
+		time = 0;
+		fail = false;
+		buffer.setLength(0);
+		buffer.append(String.format("%-12s%-8s%-8s%-8s%s\n", "", "anim", "track", "total", "result"));
 	}
 
-	private void test (AnimationState state, float incr, float endTime, Result... expectedArray) {
-		Array expected = new Array(expectedArray);
-
+	void run (float incr, float endTime) {
 		Skeleton skeleton = new Skeleton(skeletonData);
-
-		for (int i = 0; i < endTime; i++) {
+		state.apply(skeleton);
+		while (time < endTime) {
+			time += incr;
 			skeleton.update(incr);
 			state.update(incr);
 			state.apply(skeleton);
 		}
-
-		if (expected.equals(actual)) {
-			actual.clear();
-			return;
+		actual.clear();
+		expected.clear();
+		if (fail) {
+			System.out.println("Test failed: " + test);
+			System.out.println(buffer);
+			System.exit(0);
 		}
-		int i = 0;
-		for (int n = expected.size; i < n; i++) {
-			System.out.print(expected.get(i) + " == " + (i < actual.size ? actual.get(i) : ""));
-			if (i >= actual.size || !actual.get(i).equals(expected.get(i)))
-				System.out.println(" <- FAIL");
-			else
-				System.out.println();
-		}
-		for (int n = actual.size; i < n; i++)
-			System.out.print(" == " + actual.get(i) + " <- FAIL");
-		System.exit(0);
+		System.out.println(buffer);
 	}
 
-	static public class Result {
-		String eventName;
-		String payload;
+	Result expect (String name, int animationIndex, float trackTime, float totalTime) {
+		Result result = new Result();
+		result.name = name;
+		result.animationIndex = animationIndex;
+		result.trackTime = trackTime;
+		result.totalTime = totalTime;
+		return result;
+	}
 
-		public Result (String eventName, String payload) {
-			this.eventName = eventName;
-			this.payload = payload;
-		}
+	Result actual (String name, TrackEntry entry) {
+		Result result = new Result();
+		result.name = name;
+		result.animationIndex = skeletonData.getAnimations().indexOf(entry.animation, true);
+		result.trackTime = Math.round(entry.time * 1000) / 1000f;
+		result.totalTime = Math.round(time * 1000) / 1000f;
+		return result;
+	}
+
+	class Result {
+		String name;
+		int animationIndex;
+		float trackTime, totalTime;
 
 		public int hashCode () {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((eventName == null) ? 0 : eventName.hashCode());
-			result = prime * result + ((payload == null) ? 0 : payload.hashCode());
+			int result = 31 + animationIndex;
+			result = 31 * result + name.hashCode();
+			result = 31 * result + Float.floatToIntBits(totalTime);
+			result = 31 * result + Float.floatToIntBits(trackTime);
 			return result;
 		}
 
 		public boolean equals (Object obj) {
-			if (this == obj) return true;
-			if (obj == null) return false;
-			if (getClass() != obj.getClass()) return false;
 			Result other = (Result)obj;
-			if (eventName == null) {
-				if (other.eventName != null) return false;
-			} else if (!eventName.equals(other.eventName)) return false;
-			if (payload == null) {
-				if (other.payload != null) return false;
-			} else if (!payload.equals(other.payload)) return false;
+			if (animationIndex != other.animationIndex) return false;
+			if (!name.equals(other.name)) return false;
+			if (totalTime != other.totalTime) return false;
+			if (trackTime != other.trackTime) return false;
 			return true;
 		}
 
 		public String toString () {
-			return "[" + eventName + ", " + payload + "]";
+			return String.format("%-12s%-8s%-8s%-8s", name, "" + animationIndex, "" + trackTime, "" + totalTime);
 		}
+
 	}
 
 	static public void main (String[] args) throws Exception {
