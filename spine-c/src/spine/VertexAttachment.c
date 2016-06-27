@@ -39,7 +39,7 @@ void _spVertexAttachment_deinit (spVertexAttachment* attachment) {
 }
 
 void spVertexAttachment_computeWorldVertices (spVertexAttachment* self, spSlot* slot, float* worldVertices) {
-	spVertexAttachment_computeWorldVertices(self, slot, 0, self->worldVerticesLength, worldVertices, 0);
+	spVertexAttachment_computeWorldVertices1(self, 0, self->worldVerticesLength, slot, worldVertices, 0);
 }
 
 void spVertexAttachment_computeWorldVertices1 (spVertexAttachment* self, int start, int count, spSlot* slot, float* worldVertices, int offset) {
