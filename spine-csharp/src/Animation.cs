@@ -209,7 +209,7 @@ namespace Spine {
 	}
 
 	public class RotateTimeline : CurveTimeline {
-		internal const int ENTRIES = 2;
+		public const int ENTRIES = 2;
 		internal const int PREV_TIME = -2, PREV_ROTATION = -1;
 		internal const int ROTATION = 1;
 
@@ -270,7 +270,7 @@ namespace Spine {
 	}
 
 	public class TranslateTimeline : CurveTimeline {
-		protected const int ENTRIES = 3;
+		public const int ENTRIES = 3;
 		protected const int PREV_TIME = -3, PREV_X = -2, PREV_Y = -1;
 		protected const int X = 1, Y = 2;
 
@@ -374,7 +374,7 @@ namespace Spine {
 	}
 
 	public class ColorTimeline : CurveTimeline {
-		protected const int ENTRIES = 5;
+		public const int ENTRIES = 5;
 		protected const int PREV_TIME = -5, PREV_R = -4, PREV_G = -3, PREV_B = -2, PREV_A = -1;
 		protected const int R = 1, G = 2, B = 3, A = 4;
 
