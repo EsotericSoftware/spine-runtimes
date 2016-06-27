@@ -59,9 +59,9 @@ namespace Spine {
 			this.name = name;
 		}
 	}
-
-	public enum PositionMode {
-		Fixed, Percent				
+    
+    public enum PositionMode {
+		Fixed, Percent        
 	}
 
 	public enum SpacingMode {
