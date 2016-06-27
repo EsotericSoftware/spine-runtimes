@@ -339,12 +339,11 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 					Json* vertices = Json_getItem(frame, "vertices");
 					float* deform;
 					if (!vertices) {
-						if (weighted)
-							deform = attachment->vertices;
-						else {
+						if (weighted) {
 							deform = tempDeform;
 							memset(deform, 0, sizeof(float) * deformLength);
-						}
+						} else
+							deform = attachment->vertices;
 					} else {
 						int v, start = Json_getInt(frame, "offset", 0);
 						Json* vertex;
