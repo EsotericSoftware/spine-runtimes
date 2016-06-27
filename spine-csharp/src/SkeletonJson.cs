@@ -251,7 +251,7 @@ namespace Spine {
                             } catch (Exception e) {
                                 throw new Exception("Error reading attachment: " + entry.Key + ", skin: " + skin, e);
                             }
-						}
+						} 
 					}
 					skeletonData.skins.Add(skin);
 					if (skin.name == "default") skeletonData.defaultSkin = skin;
