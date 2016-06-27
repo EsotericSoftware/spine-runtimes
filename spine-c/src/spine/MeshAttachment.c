@@ -74,58 +74,7 @@ void spMeshAttachment_updateUVs (spMeshAttachment* self) {
 }
 
 void spMeshAttachment_computeWorldVertices (spMeshAttachment* self, spSlot* slot, float* worldVertices) {
-	int i;
-	spSkeleton* skeleton = slot->bone->skeleton;
-	float x = skeleton->x, y = skeleton->y;
-	float* deform = slot->attachmentVertices;
-	spVertexAttachment* vertexAttachment = SUPER(self);
-	float* vertices = vertexAttachment->vertices;
-	int* bones = vertexAttachment->bones;
-	if (!bones) {
-		int verticesLength = vertexAttachment->verticesCount;
-		spBone* bone;
-		int v, w;
-		if (slot->attachmentVerticesCount > 0) vertices = deform;
-		bone = slot->bone;
-		x += bone->worldX;
-		y += bone->worldY;
-		for (v = 0, w = 0; v < verticesLength; v += 2, w += 2) {
-			float vx = vertices[v], vy = vertices[v + 1];
-			worldVertices[w] = vx * bone->a + vy * bone->b + x;
-			worldVertices[w + 1] = vx * bone->c + vy * bone->d + y;
-		}
-	} else {
-		spBone** skeletonBones = skeleton->bones;
-		if (slot->attachmentVerticesCount == 0) {
-			int w, v, b, n;
-			for (w = 0, v = 0, b = 0, n = skeleton->bonesCount; v < n; w += 2) {
-				float wx = x, wy = y;
-				int nn = bones[v++] + v;
-				for (; v < nn; v++, b += 3) {
-					spBone* bone = skeletonBones[bones[v]];
-					float vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
-					wx += (vx * bone->a + vy * bone->b + bone->worldX) * weight;
-					wy += (vx * bone->c + vy * bone->d + bone->worldY) * weight;
-				}
-				worldVertices[w] = wx;
-				worldVertices[w + 1] = wy;
-			}
-		} else {
-			int w, v, b, f, n;
-			for (w = 0, v = 0, b = 0, f = 0, n = skeleton->bonesCount; v < n; w += 2) {
-				float wx = x, wy = y;
-				int nn = bones[v++] + v;
-				for (; v < nn; v++, b += 3, f += 2) {
-					spBone* bone = skeletonBones[bones[v]];
-					float vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
-					wx += (vx * bone->a + vy * bone->b + bone->worldX) * weight;
-					wy += (vx * bone->c + vy * bone->d + bone->worldY) * weight;
-				}
-				worldVertices[w] = wx;
-				worldVertices[w + 1] = wy;
-			}
- 		}
-	}
+	spVertexAttachment_computeWorldVertices(SUPER(self), slot, worldVertices);
 }
 
 void spMeshAttachment_setParentMesh (spMeshAttachment* self, spMeshAttachment* parentMesh) {
