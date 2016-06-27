@@ -47,6 +47,5 @@ spBoundingBoxAttachment* spBoundingBoxAttachment_create (const char* name) {
 }
 
 void spBoundingBoxAttachment_computeWorldVertices (spBoundingBoxAttachment* self, spSlot* slot, float* worldVertices) {
-	spVertexAttachment* vertexAttachment = SUPER(self);
-	spVertexAttachment_computeWorldVertices1(vertexAttachment, 0, vertexAttachment->worldVerticesLength, slot, worldVertices, 0);
+	spVertexAttachment_computeWorldVertices(SUPER(self), slot, worldVertices);
 }
