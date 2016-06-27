@@ -181,10 +181,10 @@ void spSkeleton_updateCache (const spSkeleton* self) {
 	int i, ii, level;
 	_spUpdate* update;
 	_spSkeleton* internal = SUB_CAST(_spSkeleton, self);
-	int capacity = self->bonesCount + self->ikConstraintsCount + self->transformConstraintsCount;
+	internal->updateCacheCapacity = self->bonesCount + self->ikConstraintsCount + self->transformConstraintsCount;
 
 	FREE(internal->updateCache);
-	internal->updateCache = MALLOC(_spUpdate, capacity);
+	internal->updateCache = MALLOC(_spUpdate, internal->updateCacheCapacity);
 	internal->updateCacheCount = 0;
 
 	for (i = 0; i < self->bonesCount; ++i)
