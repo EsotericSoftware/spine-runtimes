@@ -205,6 +205,74 @@ float spBone_getWorldScaleY (spBone* self) {
 	return SQRT(self->c * self->c + self->d * self->d) * self->worldSignY;
 }
 
+float spBone_worldToLocalRotationX (spBone* self) {
+	spBone* parent = self->parent;
+	if (!parent) return self->rotation;
+	return ATAN2(parent->a * self->c - parent->c * self->a, parent->d * self->a - parent->b * self->c) * RAD_DEG;
+}
+
+float spBone_worldToLocalRotationY (spBone* self) {
+	spBone* parent = self->parent;
+	if (self->parent) return self->rotation;
+	return ATAN2(parent->a * self->d - parent->c * self->b, parent->d * self->b - parent->b * self->d) * RAD_DEG;
+}
+
+void spBone_rotateWorld (spBone* self, float degrees) {
+	float a = self->a, b = self->b, c = self->c, d = self->d;
+	float cosine = COS_DEG(degrees), sine = SIN_DEG(degrees);
+	CONST_CAST(float, self->a) = cosine * a - sine * c;
+	CONST_CAST(float, self->b) = cosine * b - sine * d;
+	CONST_CAST(float, self->c) = sine * a + cosine * c;
+	CONST_CAST(float, self->d) = sine * b + cosine * d;
+}
+
+/** Computes the local transform from the world transform. This can be useful to perform processing on the local transform
+ * after the world transform has been modified directly (eg, by a constraint).
+ * <p>
+ * Some redundant information is lost by the world transform, such as -1,-1 scale versus 180 rotation. The computed local
+ * transform values may differ from the original values but are functionally the same. */
+void spBone_updateLocalTransform (spBone* self) {
+	spBone* parent = self->parent;
+	if (!parent) {
+		float det = self->a * self->d - self->b * self->c;
+		self->x = self->worldX;
+		self->y = self->worldY;
+		self->rotation = ATAN2(self->c, self->a) * RAD_DEG;
+		self->scaleX = SQRT(self->a * self->a + self->c * self->c);
+		self->scaleY = SQRT(self->b * self->b + self->d * self->d);
+		self->shearX = 0;
+		self->shearY = ATAN2(self->a * self->b + self->c * self->d, det) * RAD_DEG;
+	} else {
+		float pa = parent->a, pb = parent->b, pc = parent->c, pd = parent->d;
+		float pid = 1 / (pa * pd - pb * pc);
+		float dx = self->worldX - parent->worldX, dy = self->worldY - parent->worldY;
+		float ia = pid * pd;
+		float id = pid * pa;
+		float ib = pid * pb;
+		float ic = pid * pc;
+		float ra = ia * self->a - ib * self->c;
+		float rb = ia * self->b - ib * self->d;
+		float rc = id * self->c - ic * self->a;
+		float rd = id * self->d - ic * self->b;
+		self->x = (dx * pd * pid - dy * pb * pid);
+		self->y = (dy * pa * pid - dx * pc * pid);
+		self->shearX = 0;
+		self->scaleX = SQRT(ra * ra + rc * rc);
+		if (self->scaleX > 0.0001f) {
+			float det = ra * rd - rb * rc;
+			self->scaleY = det / self->scaleX;
+			self->shearY = ATAN2(ra * rb + rc * rd, det) * RAD_DEG;
+			self->rotation = ATAN2(rc, ra) * RAD_DEG;
+		} else {
+			self->scaleX = 0;
+			self->scaleY = SQRT(rb * rb + rd * rd);
+			self->shearY = 0;
+			self->rotation = 90 - ATAN2(rd, rb) * RAD_DEG;
+		}
+		self->appliedRotation = self->rotation;
+	}
+}
+
 void spBone_worldToLocal (spBone* self, float worldX, float worldY, float* localX, float* localY) {
 	float a = self->a, b = self->b, c = self->c, d = self->d;
 	float invDet = 1 / (a * d - b * c);

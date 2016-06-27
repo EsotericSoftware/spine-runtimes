@@ -91,6 +91,11 @@ float spBone_getWorldRotationY (spBone* self);
 float spBone_getWorldScaleX (spBone* self);
 float spBone_getWorldScaleY (spBone* self);
 
+float spBone_worldToLocalRotationX (spBone* self);
+float spBone_worldToLocalRotationY (spBone* self);
+void spBone_rotateWorld (spBone* self, float degrees);
+void spBone_updateLocalTransform (spBone* self);
+
 void spBone_worldToLocal (spBone* self, float worldX, float worldY, float* localX, float* localY);
 void spBone_localToWorld (spBone* self, float localX, float localY, float* worldX, float* worldY);
 
@@ -107,6 +112,10 @@ typedef spBone Bone;
 #define Bone_getWorldRotationY(...) spBone_getWorldRotationY(__VA_ARGS__)
 #define Bone_getWorldScaleX(...) spBone_getWorldScaleX(__VA_ARGS__)
 #define Bone_getWorldScaleY(...) spBone_getWorldScaleY(__VA_ARGS__)
+#define Bone_worldToLocalRotationX(...) spBone_worldToLocalRotationX(__VA_ARGS__)
+#define Bone_worldToLocalRotationY(...) spBone_worldToLocalRotationY(__VA_ARGS__)
+#define Bone_rotateWorld(...) spBone_rotateWorld(__VA_ARGS__)
+#define Bone_updateLocalTransform(...) spBone_updateLocalTransform(__VA_ARGS__)
 #define Bone_worldToLocal(...) spBone_worldToLocal(__VA_ARGS__)
 #define Bone_localToWorld(...) spBone_localToWorld(__VA_ARGS__)
 #endif
