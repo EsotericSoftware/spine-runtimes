@@ -35,6 +35,7 @@
 #include "Json.h"
 #include <spine/extension.h>
 #include <spine/AtlasAttachmentLoader.h>
+#include <spine/Animation.h>
 
 typedef struct {
 	const char* parent;
@@ -235,7 +236,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 					readCurve(frame, SUPER(timeline), i);
 				}
 				animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
-				duration = timeline->frames[timelineArray->size * 2 - 2];
+				duration = timeline->frames[(timelineArray->size - 1) * ROTATE_ENTRIES];
 				if (duration > animation->duration) animation->duration = duration;
 
 			} else {
@@ -256,7 +257,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 						readCurve(frame, SUPER(timeline), i);
 					}
 					animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
-					duration = timeline->frames[timelineArray->size * 3 - 3];
+					duration = timeline->frames[(timelineArray->size - 1) * TRANSLATE_ENTRIES];
 					if (duration > animation->duration) animation->duration = duration;
 
 				} else {
@@ -284,7 +285,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 			readCurve(frame, SUPER(timeline), i);
 		}
 		animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
-		duration = timeline->frames[constraintMap->size * 3 - 3];
+		duration = timeline->frames[(constraintMap->size - 1) * IKCONSTRAINT_ENTRIES];
 		if (duration > animation->duration) animation->duration = duration;
 	}
 
@@ -304,7 +305,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 			readCurve(frame, SUPER(timeline), i);
 		}
 		animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
-		duration = timeline->frames[constraintMap->size * 3 - 3];
+		duration = timeline->frames[(constraintMap->size - 1) * TRANSFORMCONSTRAINT_ENTRIES];
 		if (duration > animation->duration) animation->duration = duration;
 	}
 

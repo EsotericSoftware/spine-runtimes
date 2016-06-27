@@ -250,7 +250,6 @@ struct spBaseTimeline* _spBaseTimeline_create (int framesCount, spTimelineType t
 
 /**/
 
-static const int ROTATE_ENTRIES = 2;
 static const int ROTATE_PREV_TIME = -2, ROTATE_PREV_ROTATION = -1;
 static const int ROTATE_ROTATION = 1;
 
@@ -311,7 +310,6 @@ void spRotateTimeline_setFrame (spRotateTimeline* self, int frameIndex, float ti
 
 /**/
 
-static const int TRANSLATE_ENTRIES = 3;
 static const int TRANSLATE_PREV_TIME = -3, TRANSLATE_PREV_X = -2, TRANSLATE_PREV_Y = -1;
 static const int TRANSLATE_X = 1, TRANSLATE_Y = 2;
 
@@ -819,7 +817,6 @@ void spDeformTimeline_setFrame (spDeformTimeline* self, int frameIndex, float ti
 
 /**/
 
-static const int IKCONSTRAINT_ENTRIES = 3;
 static const int IKCONSTRAINT_PREV_TIME = -3, IKCONSTRAINT_PREV_MIX = -2, IKCONSTRAINT_PREV_BEND_DIRECTION = -1;
 static const int IKCONSTRAINT_MIX = 1, IKCONSTRAINT_BEND_DIRECTION = 2;
 
@@ -866,7 +863,6 @@ void spIkConstraintTimeline_setFrame (spIkConstraintTimeline* self, int frameInd
 }
 
 /**/
-static const int TRANSFORMCONSTRAINT_ENTRIES = 5;
 static const int TRANSFORMCONSTRAINT_PREV_TIME = -5;
 static const int TRANSFORMCONSTRAINT_PREV_ROTATE_MIX = -4;
 static const int TRANSFORMCONSTRAINT_PREV_TRANSLATE_MIX = -3;

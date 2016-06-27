@@ -179,6 +179,8 @@ typedef struct spBaseTimeline {
 
 /**/
 
+static const int ROTATE_ENTRIES = 2;
+
 typedef struct spBaseTimeline spRotateTimeline;
 
 spRotateTimeline* spRotateTimeline_create (int framesCount);
@@ -192,6 +194,8 @@ typedef spRotateTimeline RotateTimeline;
 #endif
 
 /**/
+
+static const int TRANSLATE_ENTRIES = 3;
 
 typedef struct spBaseTimeline spTranslateTimeline;
 
@@ -385,6 +389,8 @@ typedef spDeformTimeline DeformTimeline;
 
 /**/
 
+static const int IKCONSTRAINT_ENTRIES = 3;
+
 typedef struct spIkConstraintTimeline {
 	spCurveTimeline super;
 	int const framesCount;
@@ -412,6 +418,8 @@ typedef spIkConstraintTimeline IkConstraintTimeline;
 #endif
 
 /**/
+
+static const int TRANSFORMCONSTRAINT_ENTRIES = 5;
 
 typedef struct spTransformConstraintTimeline {
 	spCurveTimeline super;
