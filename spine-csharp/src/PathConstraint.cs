@@ -398,4 +398,3 @@ namespace Spine {
 		}
 	}
 }
-

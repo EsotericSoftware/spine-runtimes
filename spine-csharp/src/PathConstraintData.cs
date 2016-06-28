@@ -59,8 +59,8 @@ namespace Spine {
 			this.name = name;
 		}
 	}
-    
-    public enum PositionMode {
+	
+	public enum PositionMode {
 		Fixed, Percent        
 	}
 
@@ -72,4 +72,3 @@ namespace Spine {
 		Tangent, Chain, ChainScale
 	}
 }
-
