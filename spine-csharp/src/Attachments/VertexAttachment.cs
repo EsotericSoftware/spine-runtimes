@@ -107,7 +107,7 @@ namespace Spine {
 		}
 
 		/// <summary>Returns true if a deform originally applied to the specified attachment should be applied to this attachment.</summary>
-		public bool ApplyDeform (VertexAttachment sourceAttachment) {
+		virtual public bool ApplyDeform (VertexAttachment sourceAttachment) {
 			return this == sourceAttachment;
 		}			
 	}
