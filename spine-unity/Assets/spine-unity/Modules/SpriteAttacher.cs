@@ -70,7 +70,7 @@ namespace Spine.Unity.Modules {
 
 	public class SpriteAttachmentLoader : AttachmentLoader {
 
-		//TODO:  Memory cleanup functions
+		//MITCH: left a todo:  Memory cleanup functions
 
 		//IMPORTANT:  Make sure you clear this when you don't need it anymore. Goodluck.
 		public static Dictionary<int, AtlasRegion> atlasTable = new Dictionary<int, AtlasRegion>();
@@ -183,15 +183,15 @@ namespace Spine.Unity.Modules {
 
 		public MeshAttachment NewMeshAttachment (Skin skin, string name, string path) {
 			//MITCH : Left todo: Unity 5 only
-			throw new System.NotImplementedException();
+			return null;
 		}
 
-		public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, string name) {
-			throw new System.NotImplementedException();
+		public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, string name) {			
+			return null;
 		}
 
 		public PathAttachment NewPathAttachment (Skin skin, string name) {
-			throw new System.NotImplementedException();
+			return null;
 		}
 	}
 

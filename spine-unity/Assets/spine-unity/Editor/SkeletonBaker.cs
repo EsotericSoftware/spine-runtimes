@@ -859,7 +859,7 @@ namespace Spine.Unity.Editor {
 				var ev = events[i];
 
 				AnimationEvent ae = new AnimationEvent();
-				//TODO:  Deal with Mecanim's zero-time missed event
+				//MITCH: left todo:  Deal with Mecanim's zero-time missed event
 				ae.time = frames[i];
 				ae.functionName = ev.Data.Name;
 				ae.messageOptions = eventOptions;

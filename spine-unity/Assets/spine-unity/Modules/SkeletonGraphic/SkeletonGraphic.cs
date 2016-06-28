@@ -209,7 +209,7 @@ namespace Spine.Unity {
 			if (this.IsValid) {
 				skeleton.SetColor(this.color);
 				if (canvas != null)
-					spineMeshGenerator.Scale = canvas.referencePixelsPerUnit; // TODO: move this to a listener to of the canvas?
+					spineMeshGenerator.Scale = canvas.referencePixelsPerUnit; //JOHN: left a todo: move this to a listener to of the canvas?
 
 				canvasRenderer.SetMesh(spineMeshGenerator.GenerateMesh(skeleton));
 				//this.UpdateMaterial(); // TODO: This allocates memory.

@@ -932,7 +932,7 @@ namespace Spine.Unity.Editor {
 
 			return root.ContainsKey("skeleton");
 
-			// TODO: Warn users of old version incompatibility.
+			// JOHN: left todo: Warn users of old version incompatibility.
 			//			var skeletonInfo = (Dictionary<string, object>)root["skeleton"];
 			//			string spineVersion = (string)skeletonInfo["spine"];
 		}
