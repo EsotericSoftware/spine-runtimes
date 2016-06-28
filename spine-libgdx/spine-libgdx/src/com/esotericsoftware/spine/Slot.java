@@ -84,12 +84,6 @@ public class Slot {
 		return attachment;
 	}
 
-	/** Sets the name of the attachment which will be used to find the attachment in the skin the next time
-	 * {@link #getAttachment()} is called. */
-	public void setAttachmentName (String attachmentName) {
-		this.attachmentName = attachmentName;
-	}
-
 	/** Sets the attachment and if it changed, resets {@link #getAttachmentTime()} and clears {@link #getAttachmentVertices()}.
 	 * @param attachment May be null. */
 	public void setAttachment (Attachment attachment) {
