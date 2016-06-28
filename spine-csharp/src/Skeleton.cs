@@ -68,9 +68,7 @@ namespace Spine {
 		public bool FlipY { get { return flipY; } set { flipY = value; } }
 
 		public Bone RootBone {
-			get {
-				return bones.Count == 0 ? null : bones.Items[0];
-			}
+			get { return bones.Count == 0 ? null : bones.Items[0]; }
 		}
 
 		public Skeleton (SkeletonData data) {
@@ -348,7 +346,7 @@ namespace Spine {
 		/// <summary>Sets a skin by name (see SetSkin).</summary>
 		public void SetSkin (String skinName) {
 			Skin skin = data.FindSkin(skinName);
-			if (skin == null) throw new ArgumentException("Skin not found: " + skinName);
+			if (skin == null) throw new ArgumentException("Skin not found: " + skinName, "skinName");
 			SetSkin(skin);
 		}
 

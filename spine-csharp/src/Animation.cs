@@ -43,8 +43,8 @@ namespace Spine {
 		public float Duration { get { return duration; } set { duration = value; } }
 
 		public Animation (String name, ExposedList<Timeline> timelines, float duration) {
-			if (name == null) throw new ArgumentNullException("name cannot be null.");
-			if (timelines == null) throw new ArgumentNullException("timelines cannot be null.");
+			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
+			if (timelines == null) throw new ArgumentNullException("timelines", "timelines cannot be null.");
 			this.name = name;
 			this.timelines = timelines;
 			this.duration = duration;
@@ -54,7 +54,7 @@ namespace Spine {
 		/// <param name="lastTime">The last time the animation was applied.</param>
 		/// <param name="events">Any triggered events are added. May be null.</param>
 		public void Apply (Skeleton skeleton, float lastTime, float time, bool loop, ExposedList<Event> events) {
-			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
+			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
 
 			if (loop && duration != 0) {
 				time %= duration;
@@ -71,7 +71,7 @@ namespace Spine {
 		/// <param name="events">Any triggered events are added. May be null.</param>
 		/// <param name="alpha">The amount of this animation that affects the current pose.</param>
 		public void Mix (Skeleton skeleton, float lastTime, float time, bool loop, ExposedList<Event> events, float alpha) {
-			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
+			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
 
 			if (loop && duration != 0) {
 				time %= duration;
@@ -137,7 +137,7 @@ namespace Spine {
 		public int FrameCount { get { return curves.Length / BEZIER_SIZE + 1; } }
 
 		public CurveTimeline (int frameCount) {
-			if (frameCount <= 0) throw new ArgumentException ("frameCount must be > 0: " + frameCount);
+			if (frameCount <= 0) throw new ArgumentException("frameCount must be > 0: " + frameCount, "frameCount");
 			curves = new float[(frameCount - 1) * BEZIER_SIZE];
 		}
 
@@ -497,7 +497,7 @@ namespace Spine {
 			events[frameIndex] = e;
 		}
 
-		/// <summary>Fires events for frames > lastTime and <= time.</summary>
+		/// <summary>Fires events for frames &gt; lastTime and &lt;= time.</summary>
 		public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha) {
 			if (firedEvents == null) return;
 			float[] frames = this.frames;
@@ -768,7 +768,7 @@ namespace Spine {
 		public int PathConstraintIndex { get { return pathConstraintIndex; } set { pathConstraintIndex = value; } }
 		public float[] Frames { get { return frames; } set { frames = value; } } // time, position, ...
 
-		/** Sets the time and value of the specified keyframe. */
+		/// <summary>Sets the time and value of the specified keyframe.</summary>
 		public void SetFrame (int frameIndex, float time, float value) {
 			frameIndex *= ENTRIES;
 			frames[frameIndex] = time;

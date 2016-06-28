@@ -55,10 +55,10 @@ namespace Spine {
 			scaleMix = data.scaleMix;
 			shearMix = data.shearMix;
 
-			bones = new ExposedList<Bone> ();
-			foreach (BoneData boneData in data.bones) {
+			bones = new ExposedList<Bone>();
+			foreach (BoneData boneData in data.bones)
 				bones.Add (skeleton.FindBone (boneData.name));
-			}
+			
 			target = skeleton.FindBone(data.target.name);
 		}
 
@@ -89,10 +89,10 @@ namespace Spine {
 				}
 
 				if (translateMix > 0) {
-					float tx, ty;
-					target.LocalToWorld(data.offsetX, data.offsetY, out tx, out ty);
-					bone.worldX += (tx - bone.worldX) * translateMix;
-					bone.worldY += (ty - bone.worldY) * translateMix;
+					float tempx, tempy;
+					target.LocalToWorld(data.offsetX, data.offsetY, out tempx, out tempy);
+					bone.worldX += (tempx - bone.worldX) * translateMix;
+					bone.worldY += (tempy - bone.worldY) * translateMix;
 				}
 
 				if (scaleMix > 0) {

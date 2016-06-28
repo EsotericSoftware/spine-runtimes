@@ -63,12 +63,8 @@ namespace Spine {
 		}
 
 		public float AttachmentTime {
-			get {
-				return bone.skeleton.time - attachmentTime;
-			}
-			set {
-				attachmentTime = bone.skeleton.time - value;
-			}
+			get { return bone.skeleton.time - attachmentTime; }
+			set { attachmentTime = bone.skeleton.time - value; }
 		}
 
 		public float[] AttachmentVertices { get { return attachmentVertices; } set { attachmentVertices = value; } }

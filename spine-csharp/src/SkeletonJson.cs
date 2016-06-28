@@ -54,7 +54,7 @@ namespace Spine {
 		}
 
 		public SkeletonJson (AttachmentLoader attachmentLoader) {
-			if (attachmentLoader == null) throw new ArgumentNullException("attachmentLoader cannot be null.");
+			if (attachmentLoader == null) throw new ArgumentNullException("attachmentLoader", "attachmentLoader cannot be null.");
 			this.attachmentLoader = attachmentLoader;
 			Scale = 1;
 		}
@@ -79,7 +79,7 @@ namespace Spine {
 			Stream stream = Microsoft.Xna.Framework.TitleContainer.OpenStream(path);
 			using (StreamReader reader = new StreamReader(stream)) {
 		#else
-			using (StreamReader reader = new StreamReader(path)) {
+			using (var reader = new StreamReader(path)) {
 		#endif // WINDOWS_PHONE
 				SkeletonData skeletonData = ReadSkeletonData(reader);
 				skeletonData.name = Path.GetFileNameWithoutExtension(path);
@@ -89,7 +89,7 @@ namespace Spine {
 		#endif // WINDOWS_STOREAPP
 
 		public SkeletonData ReadSkeletonData (TextReader reader) {
-			if (reader == null) throw new ArgumentNullException("reader cannot be null.");
+			if (reader == null) throw new ArgumentNullException("reader", "reader cannot be null.");
 
 			var scale = this.Scale;
 			var skeletonData = new SkeletonData();
@@ -419,22 +419,21 @@ namespace Spine {
 					weights.Add(vertices[i + 3]);
 				}
 			}
-			            
 			attachment.bones = bones.ToArray();
 			attachment.vertices = weights.ToArray();
 		}
 
 		private void ReadAnimation (Dictionary<String, Object> map, String name, SkeletonData skeletonData) {
+			var scale = this.Scale;
 			var timelines = new ExposedList<Timeline>();
 			float duration = 0;
-			var scale = this.Scale;
 
+			// Slot timelines.
 			if (map.ContainsKey("slots")) {
 				foreach (KeyValuePair<String, Object> entry in (Dictionary<String, Object>)map["slots"]) {
 					String slotName = entry.Key;
 					int slotIndex = skeletonData.FindSlotIndex(slotName);
 					var timelineMap = (Dictionary<String, Object>)entry.Value;
-
 					foreach (KeyValuePair<String, Object> timelineEntry in timelineMap) {
 						var values = (List<Object>)timelineEntry.Value;
 						var timelineName = (String)timelineEntry.Key;
@@ -471,12 +470,12 @@ namespace Spine {
 				}
 			}
 
+			// Bone timelines.
 			if (map.ContainsKey("bones")) {
 				foreach (KeyValuePair<String, Object> entry in (Dictionary<String, Object>)map["bones"]) {
 					String boneName = entry.Key;
 					int boneIndex = skeletonData.FindBoneIndex(boneName);
 					if (boneIndex == -1) throw new Exception("Bone not found: " + boneName);
-
 					var timelineMap = (Dictionary<String, Object>)entry.Value;
 					foreach (KeyValuePair<String, Object> timelineEntry in timelineMap) {
 						var values = (List<Object>)timelineEntry.Value;
@@ -525,7 +524,7 @@ namespace Spine {
 				}
 			}
 
-			// IK timelines.
+			// IK constraint timelines.
 			if (map.ContainsKey("ik")) {
 				foreach (KeyValuePair<String, Object> constraintMap in (Dictionary<String, Object>)map["ik"]) {
 					IkConstraintData constraint = skeletonData.FindIkConstraint(constraintMap.Key);
@@ -569,11 +568,11 @@ namespace Spine {
 				}
 			}
 
-			// Path constraint timelines
+			// Path constraint timelines.
 			if (map.ContainsKey("paths")) {
 				foreach (KeyValuePair<String, Object> constraintMap in (Dictionary<String, Object>)map["paths"]) {
 					int index = skeletonData.FindPathConstraintIndex(constraintMap.Key);
-					if (index == -1) throw new Exception("Path constraint not found: " + constraintMap.Key);
+                    if (index == -1) throw new Exception("Path constraint not found: " + constraintMap.Key);
 					PathConstraintData data = skeletonData.pathConstraints.Items[index];
 					var timelineMap = (Dictionary<String, Object>)constraintMap.Value;
 					foreach (KeyValuePair<String, Object> timelineEntry in timelineMap) {
@@ -667,6 +666,7 @@ namespace Spine {
 				}
 			}
 
+			// Draw order timeline.
 			if (map.ContainsKey("drawOrder") || map.ContainsKey("draworder")) {
 				var values = (List<Object>)map[map.ContainsKey("drawOrder") ? "drawOrder" : "draworder"];
 				var timeline = new DrawOrderTimeline(values.Count);
@@ -704,6 +704,7 @@ namespace Spine {
 				duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1]);
 			}
 
+			// Event timeline.
 			if (map.ContainsKey("events")) {
 				var eventsMap = (List<Object>)map["events"];
 				var timeline = new EventTimeline(eventsMap.Count);
@@ -725,7 +726,7 @@ namespace Spine {
 			skeletonData.animations.Add(new Animation(name, timelines, duration));
 		}
 
-		private void ReadCurve (Dictionary<String, Object> valueMap, CurveTimeline timeline, int frameIndex) {
+		static void ReadCurve (Dictionary<String, Object> valueMap, CurveTimeline timeline, int frameIndex) {
 			if (!valueMap.ContainsKey("curve"))
 				return;
 			Object curveObject = valueMap["curve"];
