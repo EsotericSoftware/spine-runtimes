@@ -807,7 +807,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 							for (entry = entry->child, i = 0; entry; entry = entry->next, ++i)
 								mesh->regionUVs[i] = entry->valueFloat;
 
-							_readVertices(self, attachmentMap, mesh, verticesLength);
+							_readVertices(self, attachmentMap, SUPER(mesh), verticesLength);
 
 							spMeshAttachment_updateUVs(mesh);
 
@@ -831,7 +831,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 					}
 					case SP_ATTACHMENT_BOUNDING_BOX: {
 						spBoundingBoxAttachment* box = SUB_CAST(spBoundingBoxAttachment, attachment);
-						_readVertices(self, attachmentMap, box, Json_getInt(attachmentMap, "vertexCount", 0) << 1);
+						_readVertices(self, attachmentMap, SUPER(box), Json_getInt(attachmentMap, "vertexCount", 0) << 1);
 						spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 						break;
 					}
