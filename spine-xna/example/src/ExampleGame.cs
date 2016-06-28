@@ -76,7 +76,8 @@ namespace Spine {
 
 			// String name = "spineboy";
 			// String name = "goblins-mesh";
-			String name = "raptor";
+			// String name = "raptor";
+			String name = "tank";
 			// String name = "star";
 			bool binaryData = true;
 
@@ -85,6 +86,7 @@ namespace Spine {
 			float scale = 1;
 			if (name == "spineboy") scale = 0.6f;
 			if (name == "raptor") scale = 0.5f;
+			if (name == "tank") scale = 0.3f;			
 
 			SkeletonData skeletonData;
 			if (binaryData) {
@@ -119,16 +121,19 @@ namespace Spine {
 				state.AddAnimation(0, "run", true, 0);
 			}
 			else if (name == "raptor") {
-				state.SetAnimation(0, "walk", true);				
+				state.SetAnimation(0, "walk", true);
 				state.AddAnimation(1, "gungrab", false, 2);
 			}
 			else if (name == "star") {
 				// no animation in star
+			}
+			else if (name == "tank") {
+				state.SetAnimation(0, "drive", true);
 			} else {
 				state.SetAnimation(0, "walk", true);
 			}
 
-			skeleton.X = 400;
+			skeleton.X = 400 + (name == "tank" ? 300: 0);
 			skeleton.Y = 580;
 			skeleton.UpdateWorldTransform();
 
