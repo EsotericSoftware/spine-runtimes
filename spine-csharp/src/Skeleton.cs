@@ -41,7 +41,7 @@ namespace Spine {
 		internal ExposedList<IkConstraint> ikConstraints, ikConstraintsSorted;
 		internal ExposedList<TransformConstraint> transformConstraints;
 		internal ExposedList<PathConstraint> pathConstraints;
-		private ExposedList<IUpdatable> updateCache = new ExposedList<IUpdatable>();
+		internal ExposedList<IUpdatable> updateCache = new ExposedList<IUpdatable>();
 		internal Skin skin;
 		internal float r = 1, g = 1, b = 1, a = 1;
 		internal float time;
@@ -53,8 +53,9 @@ namespace Spine {
 		public ExposedList<IUpdatable> UpdateCacheList { get { return updateCache; } }
 		public ExposedList<Slot> Slots { get { return slots; } }
 		public ExposedList<Slot> DrawOrder { get { return drawOrder; } }
-		public ExposedList<IkConstraint> IkConstraints { get { return ikConstraints; } set { ikConstraints = value; } }
-		public ExposedList<PathConstraint> PathConstraints { get { return pathConstraints; } set { pathConstraints = value; } }
+		public ExposedList<IkConstraint> IkConstraints { get { return ikConstraints; } }
+		public ExposedList<PathConstraint> PathConstraints { get { return pathConstraints; } }
+		public ExposedList<TransformConstraint> TransformConstraints { get { return transformConstraints; } }
 		public Skin Skin { get { return skin; } set { skin = value; } }
 		public float R { get { return r; } set { r = value; } }
 		public float G { get { return g; } set { g = value; } }

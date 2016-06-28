@@ -112,7 +112,7 @@ namespace Spine {
 			}
 		}
 
-		public bool ApplyFFD (Attachment sourceAttachment) {
+		override public bool ApplyDeform (VertexAttachment sourceAttachment) {
 			return this == sourceAttachment || (inheritDeform && parentMesh == sourceAttachment);
 		}
 	}
