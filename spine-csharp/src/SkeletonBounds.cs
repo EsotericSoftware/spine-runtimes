@@ -63,7 +63,7 @@ namespace Spine {
 
 			for (int i = 0; i < slotCount; i++) {
 				Slot slot = slots.Items[i];
-				BoundingBoxAttachment boundingBox = slot.attachment as BoundingBoxAttachment;
+				BoundingBoxAttachment boundingBox = slot.Attachment as BoundingBoxAttachment;
 				if (boundingBox == null) continue;
 				boundingBoxes.Add(boundingBox);
 
