@@ -111,9 +111,9 @@ namespace Spine {
 			float localY = -height / 2 * scaleY + regionOffsetY * regionScaleY;
 			float localX2 = localX + regionWidth * regionScaleX;
 			float localY2 = localY + regionHeight * regionScaleY;
-			float radians = rotation * (float)Math.PI / 180;
-			float cos = (float)Math.Cos(radians);
-			float sin = (float)Math.Sin(radians);
+			float rotation = this.rotation;
+			float cos = MathUtils.CosDeg(rotation);
+			float sin = MathUtils.SinDeg(rotation);
 			float x = this.x;
 			float y = this.y;
 			float localXCos = localX * cos + x;
@@ -136,7 +136,8 @@ namespace Spine {
 		}
 
 		public void ComputeWorldVertices (Bone bone, float[] worldVertices) {
-			float x = bone.skeleton.x + bone.worldX, y = bone.skeleton.y + bone.worldY;			
+			Skeleton skeleton = bone.skeleton;
+			float x = skeleton.x + bone.worldX, y = skeleton.y + bone.worldY;			
 			float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
 			float[] offset = this.offset;
 			worldVertices[X1] = offset[X1] * a + offset[Y1] * b + x;

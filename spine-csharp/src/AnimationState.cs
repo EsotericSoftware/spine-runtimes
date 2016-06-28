@@ -41,6 +41,8 @@ namespace Spine {
 		private float timeScale = 1;
 
 		public AnimationStateData Data { get { return data; } }
+		/// <summary>A list of tracks that have animations, which may contain nulls.</summary>
+		public ExposedList<TrackEntry> Tracks { get { return tracks; } }
 		public float TimeScale { get { return timeScale; } set { timeScale = value; } }
 
 		public delegate void StartEndDelegate (AnimationState state, int trackIndex);

@@ -54,13 +54,13 @@ namespace Spine {
 		public void ComputeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset) {
 			count += offset;
 			Skeleton skeleton = slot.Skeleton;
-			float x = skeleton.X, y = skeleton.Y;
-			float[] deformArray = slot.AttachmentVertices;
+			float x = skeleton.x, y = skeleton.y;
+			var deformArray = slot.attachmentVertices;
 			float[] vertices = this.vertices;
 			int[] bones = this.bones;
 			if (bones == null) {
-				if (deformArray.Length > 0) vertices = deformArray;
-				Bone bone = slot.Bone;
+				if (deformArray.Count > 0) vertices = deformArray.Items;
+				Bone bone = slot.bone;
 				x += bone.worldX;
 				y += bone.worldY;
 				float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
@@ -78,11 +78,11 @@ namespace Spine {
 				skip += n;
 			}
 			Bone[] skeletonBones = skeleton.Bones.Items;
-			if (deformArray.Length == 0) {
+			if (deformArray.Count == 0) {
 				for (int w = offset, b = skip * 3; w < count; w += 2) {
 					float wx = x, wy = y;
 					for (int n = bones[v++] + v; v < n; v++, b += 3) {
-						Bone bone = (Bone)skeletonBones[bones[v]];
+						Bone bone = skeletonBones[bones[v]];
 						float vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
 						wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
 						wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
@@ -91,11 +91,11 @@ namespace Spine {
 					worldVertices[w + 1] = wy;
 				}
 			} else {
-				float[] deform = deformArray;
+				float[] deform = deformArray.Items;
 				for (int w = offset, b = skip * 3, f = skip << 1; w < count; w += 2) {
 					float wx = x, wy = y;
 					for (int n = bones[v++] + v; v < n; v++, b += 3, f += 2) {
-						Bone bone = (Bone)skeletonBones[bones[v]];
+						Bone bone = skeletonBones[bones[v]];
 						float vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
 						wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
 						wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;

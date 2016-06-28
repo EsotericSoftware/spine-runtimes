@@ -38,8 +38,7 @@ namespace Spine {
 		internal float r, g, b, a;
 		internal Attachment attachment;
 		internal float attachmentTime;
-		internal float[] attachmentVertices = new float[0];
-		internal int attachmentVerticesCount;
+		internal ExposedList<float> attachmentVertices = new ExposedList<float>();
 
 		public SlotData Data { get { return data; } }
 		public Bone Bone { get { return bone; } }
@@ -51,14 +50,12 @@ namespace Spine {
 
 		/// <summary>May be null.</summary>
 		public Attachment Attachment {
-			get {
-				return attachment;
-			}
+			get { return attachment; }
 			set {
 				if (attachment == value) return;
 				attachment = value;
 				attachmentTime = bone.skeleton.time;
-				attachmentVerticesCount = 0;
+				attachmentVertices.Clear(false);
 			}
 		}
 
@@ -67,8 +64,7 @@ namespace Spine {
 			set { attachmentTime = bone.skeleton.time - value; }
 		}
 
-		public float[] AttachmentVertices { get { return attachmentVertices; } set { attachmentVertices = value; } }
-		public int AttachmentVerticesCount { get { return attachmentVerticesCount; } set { attachmentVerticesCount = value; } }
+		public ExposedList<float> AttachmentVertices { get { return attachmentVertices; } set { attachmentVertices = value; } }
 
 		public Slot (SlotData data, Bone bone) {
 			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");

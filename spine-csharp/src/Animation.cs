@@ -604,15 +604,12 @@ namespace Spine {
 			float[][] frameVertices = this.frameVertices;
 			int vertexCount = frameVertices[0].Length;
 
-			float[] vertices = slot.attachmentVertices;
-			if (slot.attachmentVerticesCount != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
-
-			// Ensure capacity
-			if (vertices.Length < vertexCount) {
-				vertices = new float[vertexCount];
-				slot.attachmentVertices = vertices;
-			}
-			slot.attachmentVerticesCount = vertexCount;
+			var verticesArray = slot.attachmentVertices;
+			if (verticesArray.Count != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
+			// verticesArray.SetSize(vertexCount) // Ensure size and preemptively set count.
+			if (verticesArray.Capacity < vertexCount) verticesArray.Capacity = vertexCount;
+			verticesArray.Count = vertexCount;
+			float[] vertices = verticesArray.Items;
 
 			if (time >= frames[frames.Length - 1]) { // Time is after last frame.
 				float[] lastVertices = frameVertices[frames.Length - 1];

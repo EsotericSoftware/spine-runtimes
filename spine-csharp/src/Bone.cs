@@ -219,18 +219,22 @@ namespace Spine {
 			shearY = data.shearY;
 		}
 
-		public float WorldToLocalRotationX () {
-			Bone parent = this.parent;
-			if (parent == null) return rotation;
-			float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d, a = this.a, c = this.c;
-			return MathUtils.Atan2(pa * c - pc * a, pd * a - pb * c) * MathUtils.radDeg;
+		public float WorldToLocalRotationX {
+			get {
+				Bone parent = this.parent;
+				if (parent == null) return rotation;
+				float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d, a = this.a, c = this.c;
+				return MathUtils.Atan2(pa * c - pc * a, pd * a - pb * c) * MathUtils.radDeg;
+			}
 		}
 
-		public float WorldToLocalRotationY () {
-			Bone parent = this.parent;
-			if (parent == null) return rotation;
-			float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d, b = this.b, d = this.d;
-			return MathUtils.Atan2(pa * d - pc * b, pd * b - pb * d) * MathUtils.radDeg;
+		public float WorldToLocalRotationY {
+			get {
+				Bone parent = this.parent;
+				if (parent == null) return rotation;
+				float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d, b = this.b, d = this.d;
+				return MathUtils.Atan2(pa * d - pc * b, pd * b - pb * d) * MathUtils.radDeg;
+			}
 		}
 
 		public void RotateWorld (float degrees) {
