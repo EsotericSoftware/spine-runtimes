@@ -55,6 +55,7 @@ namespace Spine {
 			if (index < 0) throw new ArgumentException ("index must be >= 0.");
 			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
 			if (boneData == null) throw new ArgumentNullException("boneData", "boneData cannot be null.");
+			this.index = index;
 			this.name = name;
 			this.boneData = boneData;
 		}

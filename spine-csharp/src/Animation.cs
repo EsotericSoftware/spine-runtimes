@@ -137,7 +137,7 @@ namespace Spine {
 		public int FrameCount { get { return curves.Length / BEZIER_SIZE + 1; } }
 
 		public CurveTimeline (int frameCount) {
-			if (frameCount >= 0) throw new ArgumentException ("frameCount must be > 0: " + frameCount);
+			if (frameCount <= 0) throw new ArgumentException ("frameCount must be > 0: " + frameCount);
 			curves = new float[(frameCount - 1) * BEZIER_SIZE];
 		}
 

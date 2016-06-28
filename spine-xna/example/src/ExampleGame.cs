@@ -74,10 +74,11 @@ namespace Spine {
 			skeletonRenderer = new SkeletonMeshRenderer(GraphicsDevice);
 			skeletonRenderer.PremultipliedAlpha = true;
 
-			// String name = "spineboy";
+			String name = "spineboy";
 			// String name = "goblins-mesh";
-			String name = "raptor";
-			bool binaryData = true;
+			// String name = "raptor";
+			// String name = "star";
+			bool binaryData = false;
 
 			Atlas atlas = new Atlas(assetsFolder + name + ".atlas", new XnaTextureLoader(GraphicsDevice));
 
@@ -116,10 +117,14 @@ namespace Spine {
 				TrackEntry entry = state.AddAnimation(0, "jump", false, 0);
 				entry.End += End; // Event handling for queued animations.
 				state.AddAnimation(0, "run", true, 0);
-			} else if (name == "raptor") {
+			}
+			else if (name == "raptor") {
 				state.SetAnimation(0, "walk", true);
 				state.SetAnimation(1, "empty", false);
 				state.AddAnimation(1, "gungrab", false, 2);
+			}
+			else if (name == "star") {
+				// no animation in star
 			} else {
 				state.SetAnimation(0, "walk", true);
 			}
@@ -148,7 +153,7 @@ namespace Spine {
 			GraphicsDevice.Clear(Color.Black);
 
 			state.Update(gameTime.ElapsedGameTime.Milliseconds / 1000f);
-			state.Apply(skeleton);
+			state.Apply(skeleton);			
 			skeleton.UpdateWorldTransform();
 			skeletonRenderer.Begin();
 			skeletonRenderer.Draw(skeleton);

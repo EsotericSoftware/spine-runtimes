@@ -312,7 +312,7 @@ namespace Spine {
 			if (typeName == "weightedlinkedmesh")typeName = "linkedmesh";
 			var type = (AttachmentType)Enum.Parse(typeof(AttachmentType), typeName , false);
 
-			String path = GetString(map, "path", name);
+			 String path = GetString(map, "path", name);
 
 			switch (type) {
 			case AttachmentType.region:
@@ -368,7 +368,7 @@ namespace Spine {
 					}
 
 					float[] uvs = GetFloatArray(map, "uvs", 1);
-					ReadVertices(map, mesh, mesh.regionUVs.Length);
+					ReadVertices(map, mesh, uvs.Length);
 					mesh.triangles = GetIntArray(map, "triangles");
 					mesh.regionUVs = uvs;
 					mesh.UpdateUVs();
@@ -488,7 +488,7 @@ namespace Spine {
 								frameIndex++;
 							}
 							timelines.Add(timeline);
-							duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1] * RotateTimeline.ENTRIES);
+							duration = Math.Max(duration, timeline.frames[(timeline.FrameCount - 1) * RotateTimeline.ENTRIES]);
 
 						} else if (timelineName == "translate" || timelineName == "scale" || timelineName == "shear") {
 							TranslateTimeline timeline;
@@ -513,7 +513,7 @@ namespace Spine {
 								frameIndex++;
 							}
 							timelines.Add(timeline);
-							duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1] * TranslateTimeline.ENTRIES);
+							duration = Math.Max(duration, timeline.frames[(timeline.FrameCount - 1) * TranslateTimeline.ENTRIES]);
 
 						} else
 							throw new Exception("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
@@ -538,7 +538,7 @@ namespace Spine {
 						frameIndex++;
 					}
 					timelines.Add(timeline);
-					duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1] * IkConstraintTimeline.ENTRIES);
+					duration = Math.Max(duration, timeline.frames[(timeline.FrameCount - 1) * IkConstraintTimeline.ENTRIES]);
 				}
 			}
 
@@ -561,7 +561,7 @@ namespace Spine {
 						frameIndex++;
 					}
 					timelines.Add(timeline);
-					duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1] * TransformConstraintTimeline.ENTRIES);
+					duration = Math.Max(duration, timeline.frames[(timeline.FrameCount - 1) * TransformConstraintTimeline.ENTRIES]);
 				}
 			}
 
@@ -594,7 +594,7 @@ namespace Spine {
                                 frameIndex++;
                             }
                             timelines.Add(timeline);
-                            duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1] * PathConstraintPositionTimeline.ENTRIES);
+                            duration = Math.Max(duration, timeline.frames[(timeline.FrameCount - 1) * PathConstraintPositionTimeline.ENTRIES]);
                         }
                         else if (timelineName == "mix") {
                             PathConstraintMixTimeline timeline = new PathConstraintMixTimeline(values.Count);
@@ -606,7 +606,7 @@ namespace Spine {
                                 frameIndex++;
                             }
                             timelines.Add(timeline);
-                            duration = Math.Max(duration, timeline.frames[timeline.FrameCount - 1] * PathConstraintMixTimeline.ENTRIES);
+                            duration = Math.Max(duration, timeline.frames[(timeline.FrameCount - 1) * PathConstraintMixTimeline.ENTRIES]);
                         }
 					}
 				}
