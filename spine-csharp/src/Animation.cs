@@ -405,7 +405,7 @@ namespace Spine {
 
 			float r, g, b, a;
 			if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
-				int i = frames.Length - 1;
+				int i = frames.Length;
 				r = frames[i + PREV_R];
 				g = frames[i + PREV_G];
 				b = frames[i + PREV_B];
