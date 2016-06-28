@@ -469,6 +469,8 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		#region Match SkeletonData with Atlases
+		static readonly AttachmentType[] NonAtlasTypes = { AttachmentType.boundingbox, AttachmentType.path };
+
 		static List<AtlasAsset> MultiAtlasDialog (List<string> requiredPaths, string initialDirectory, string filename = "") {
 			List<AtlasAsset> atlasAssets = new List<AtlasAsset>();
 			bool resolved = false;
@@ -584,15 +586,20 @@ namespace Spine.Unity.Editor {
 			StringReader reader = new StringReader(spineJson.text);
 			var root = Json.Deserialize(reader) as Dictionary<string, object>;
 
+
 			foreach (KeyValuePair<string, object> entry in (Dictionary<string, object>)root["skins"]) {
 				foreach (KeyValuePair<string, object> slotEntry in (Dictionary<string, object>)entry.Value) {
 
 					foreach (KeyValuePair<string, object> attachmentEntry in ((Dictionary<string, object>)slotEntry.Value)) {
 						var data = ((Dictionary<string, object>)attachmentEntry.Value);
+
+						// Ignore non-atlas-requiring types.
 						if (data.ContainsKey("type")) {
-							if ((string)data["type"] == "boundingbox")
+							AttachmentType attachmentType = (AttachmentType)System.Enum.Parse(typeof(AttachmentType), (string)data["type"], true);
+							if (NonAtlasTypes.Contains(attachmentType))
 								continue;
 						}
+
 						if (data.ContainsKey("path"))
 							requiredPaths.Add((string)data["path"]);
 						else if (data.ContainsKey("name"))
