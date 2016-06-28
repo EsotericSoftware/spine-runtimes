@@ -39,10 +39,9 @@ public class Slot {
 	final SlotData data;
 	final Bone bone;
 	final Color color;
-	private Attachment attachment;
+	Attachment attachment;
 	private float attachmentTime;
 	private FloatArray attachmentVertices = new FloatArray();
-	String attachmentName;
 
 	public Slot (SlotData data, Bone bone) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -82,10 +81,6 @@ public class Slot {
 
 	/** @return May be null. */
 	public Attachment getAttachment () {
-		if (attachmentName != null) {
-			setAttachment(bone.skeleton.getAttachment(data.index, attachmentName));
-			attachmentName = null;
-		}
 		return attachment;
 	}
 

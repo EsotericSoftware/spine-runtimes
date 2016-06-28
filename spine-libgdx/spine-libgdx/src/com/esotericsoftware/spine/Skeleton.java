@@ -203,7 +203,7 @@ public class Skeleton {
 			for (int ii = 0, nn = data.skins.size; ii < nn; ii++)
 				sortPathConstraintAttachment(data.skins.get(ii), slotIndex, slotBone);
 
-			Attachment attachment = slot.getAttachment();
+			Attachment attachment = slot.attachment;
 			if (attachment instanceof PathAttachment) sortPathConstraintAttachment(attachment, slotBone);
 
 			Array<Bone> constrained = constraint.bones;
@@ -530,7 +530,7 @@ public class Skeleton {
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder.get(i);
 			float[] vertices = null;
-			Attachment attachment = slot.getAttachment();
+			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment)
 				vertices = ((RegionAttachment)attachment).updateWorldVertices(slot, false);
 			else if (attachment instanceof MeshAttachment) //
