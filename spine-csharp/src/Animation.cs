@@ -464,16 +464,18 @@ namespace Spine {
 
 		public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha) {
 			float[] frames = this.frames;
-			if (time < frames[0]) return; // Time is before first frame.
+			if (time < frames[0]) {
+				if (lastTime > time) Apply(skeleton, lastTime, int.MaxValue, null, 0);
+				return;
+			} else if (lastTime > time) //
+				lastTime = -1;
 
-			int frameIndex;
-			if (time >= frames[frames.Length - 1]) // Time is after last frame.
-				frameIndex = frames.Length - 1;
-			else
-				frameIndex = Animation.binarySearch(frames, time, 1) - 1;
+			int frameIndex = (time >= frames[frames.Length - 1] ? frames.Length : Animation.binarySearch(frames, time)) - 1;
+			if (frames[frameIndex] < lastTime) return;
 
 			String attachmentName = attachmentNames[frameIndex];
-			skeleton.slots.Items[slotIndex].attachmentName = attachmentName;
+			skeleton.slots.Items[slotIndex].Attachment =
+				attachmentName == null ? null : skeleton.GetAttachment(slotIndex, attachmentName);
 		}
 	}
 
@@ -594,7 +596,7 @@ namespace Spine {
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha) {
 			Slot slot = skeleton.slots.Items[slotIndex];
-			VertexAttachment slotAttachment = slot.Attachment as VertexAttachment;
+			VertexAttachment slotAttachment = slot.attachment as VertexAttachment;
 			if (slotAttachment == null || !slotAttachment.ApplyDeform(attachment)) return;
 
 			float[] frames = this.frames;

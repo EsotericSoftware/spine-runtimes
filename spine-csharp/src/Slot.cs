@@ -36,9 +36,8 @@ namespace Spine {
 		internal SlotData data;
 		internal Bone bone;
 		internal float r, g, b, a;
-		private Attachment attachment;		
+		internal Attachment attachment;
 		internal float attachmentTime;
-		internal String attachmentName;
 		internal float[] attachmentVertices = new float[0];
 		internal int attachmentVerticesCount;
 
@@ -53,10 +52,6 @@ namespace Spine {
 		/// <summary>May be null.</summary>
 		public Attachment Attachment {
 			get {
-				if (attachmentName != null) {
-					Attachment = bone.skeleton.GetAttachment(data.index, attachmentName);
-					attachmentName = null;
-				}
 				return attachment;
 			}
 			set {
@@ -66,8 +61,6 @@ namespace Spine {
 				attachmentVerticesCount = 0;
 			}
 		}
-
-		public String AttachmentName { set { attachmentName = value; } }
 
 		public float AttachmentTime {
 			get {
