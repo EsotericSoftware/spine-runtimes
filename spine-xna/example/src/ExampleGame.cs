@@ -74,11 +74,11 @@ namespace Spine {
 			skeletonRenderer = new SkeletonMeshRenderer(GraphicsDevice);
 			skeletonRenderer.PremultipliedAlpha = true;
 
-			String name = "spineboy";
+			// String name = "spineboy";
 			// String name = "goblins-mesh";
-			// String name = "raptor";
+			String name = "raptor";
 			// String name = "star";
-			bool binaryData = false;
+			bool binaryData = true;
 
 			Atlas atlas = new Atlas(assetsFolder + name + ".atlas", new XnaTextureLoader(GraphicsDevice));
 
@@ -119,8 +119,7 @@ namespace Spine {
 				state.AddAnimation(0, "run", true, 0);
 			}
 			else if (name == "raptor") {
-				state.SetAnimation(0, "walk", true);
-				state.SetAnimation(1, "empty", false);
+				state.SetAnimation(0, "walk", true);				
 				state.AddAnimation(1, "gungrab", false, 2);
 			}
 			else if (name == "star") {
