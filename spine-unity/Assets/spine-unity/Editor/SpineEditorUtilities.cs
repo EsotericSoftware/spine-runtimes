@@ -28,7 +28,6 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-
 #pragma warning disable 0219
 
 /*****************************************************************************
@@ -38,7 +37,6 @@
 #define SPINE_SKELETONANIMATOR
 using UnityEngine;
 using UnityEditor;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -471,6 +469,8 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		#region Match SkeletonData with Atlases
+		static readonly AttachmentType[] NonAtlasTypes = { AttachmentType.boundingbox, AttachmentType.path };
+
 		static List<AtlasAsset> MultiAtlasDialog (List<string> requiredPaths, string initialDirectory, string filename = "") {
 			List<AtlasAsset> atlasAssets = new List<AtlasAsset>();
 			bool resolved = false;
@@ -586,15 +586,20 @@ namespace Spine.Unity.Editor {
 			StringReader reader = new StringReader(spineJson.text);
 			var root = Json.Deserialize(reader) as Dictionary<string, object>;
 
+
 			foreach (KeyValuePair<string, object> entry in (Dictionary<string, object>)root["skins"]) {
 				foreach (KeyValuePair<string, object> slotEntry in (Dictionary<string, object>)entry.Value) {
 
 					foreach (KeyValuePair<string, object> attachmentEntry in ((Dictionary<string, object>)slotEntry.Value)) {
 						var data = ((Dictionary<string, object>)attachmentEntry.Value);
+
+						// Ignore non-atlas-requiring types.
 						if (data.ContainsKey("type")) {
-							if ((string)data["type"] == "boundingbox")
+							AttachmentType attachmentType = (AttachmentType)System.Enum.Parse(typeof(AttachmentType), (string)data["type"], true);
+							if (NonAtlasTypes.Contains(attachmentType))
 								continue;
 						}
+
 						if (data.ContainsKey("path"))
 							requiredPaths.Add((string)data["path"]);
 						else if (data.ContainsKey("name"))
@@ -932,7 +937,7 @@ namespace Spine.Unity.Editor {
 
 			return root.ContainsKey("skeleton");
 
-			// TODO: Warn users of old version incompatibility.
+			// JOHN: left todo: Warn users of old version incompatibility.
 			//			var skeletonInfo = (Dictionary<string, object>)root["skeleton"];
 			//			string spineVersion = (string)skeletonInfo["spine"];
 		}
@@ -973,24 +978,6 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static SkeletonAnimation InstantiateSkeletonAnimation (SkeletonDataAsset skeletonDataAsset, Skin skin = null) {
-			string spineGameObjectName = string.Format("Spine GameObject ({0})", skeletonDataAsset.name.Replace("_SkeletonData", ""));
-			GameObject go = new GameObject(spineGameObjectName, typeof(MeshFilter), typeof(MeshRenderer), typeof(SkeletonAnimation));
-			SkeletonAnimation newSkeletonAnimation = go.GetComponent<SkeletonAnimation>();
-			newSkeletonAnimation.skeletonDataAsset = skeletonDataAsset;
-
-			bool requiresNormals = false;
-
-			foreach (AtlasAsset atlasAsset in newSkeletonAnimation.skeletonDataAsset.atlasAssets) {
-				foreach (Material m in atlasAsset.materials) {
-					if (m.shader.name.Contains("Lit")) {
-						requiresNormals = true;
-						break;
-					}
-				}
-			}
-				
-			newSkeletonAnimation.calculateNormals = requiresNormals;
-
 			SkeletonData data = skeletonDataAsset.GetSkeletonData(true);
 
 			if (data == null) {
@@ -1002,17 +989,38 @@ namespace Spine.Unity.Editor {
 			}
 
 			if (data == null) {
-				Debug.LogWarning("Tried to instantiate a skeleton from an invalid SkeletonDataAsset.");
+				Debug.LogWarning("InstantiateSkeletonAnimation tried to instantiate a skeleton from an invalid SkeletonDataAsset.");
 				return null;
 			}
 
-			if (skin == null)
-				skin = data.DefaultSkin;
+			if (skin == null) skin = data.DefaultSkin;
+			if (skin == null) skin = data.Skins.Items[0];
 
-			if (skin == null)
-				skin = data.Skins.Items[0];
+			string spineGameObjectName = string.Format("Spine GameObject ({0})", skeletonDataAsset.name.Replace("_SkeletonData", ""));
+			GameObject go = new GameObject(spineGameObjectName, typeof(MeshFilter), typeof(MeshRenderer), typeof(SkeletonAnimation));
+			SkeletonAnimation newSkeletonAnimation = go.GetComponent<SkeletonAnimation>();
+			newSkeletonAnimation.skeletonDataAsset = skeletonDataAsset;
 
-			newSkeletonAnimation.Initialize(false);
+			{
+				bool requiresNormals = false;
+				foreach (AtlasAsset atlasAsset in skeletonDataAsset.atlasAssets) {
+					foreach (Material m in atlasAsset.materials) {
+						if (m.shader.name.Contains("Lit")) {
+							requiresNormals = true;
+							break;
+						}
+					}
+				}
+				newSkeletonAnimation.calculateNormals = requiresNormals;
+			}
+
+			try {
+				newSkeletonAnimation.Initialize(false);
+			} catch (System.Exception e) {
+				Debug.LogWarning("Editor-instantiated SkeletonAnimation threw an Exception. Destroying GameObject to prevent orphaned GameObject.");
+				GameObject.DestroyImmediate(go);
+				throw e;
+			}
 
 			newSkeletonAnimation.skeleton.SetSkin(skin);
 			newSkeletonAnimation.initialSkinName = skin.Name;

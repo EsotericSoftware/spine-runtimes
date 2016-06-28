@@ -151,7 +151,7 @@ namespace Spine {
 			for (int i = 0, n = timelinesItems.Length; i < n; i++)
 				timelinesItems[i].SetToSetupPose(skeleton);
 		}
-			
+
 		public static void SetToSetupPose (this Timeline timeline, Skeleton skeleton) {
 			if (timeline != null) {
 				// sorted according to assumed likelihood here
@@ -174,7 +174,7 @@ namespace Spine {
 				} else if (timeline is DeformTimeline) {
 					var slot = skeleton.slots.Items[((DeformTimeline)timeline).slotIndex];
 					slot.attachmentVerticesCount = 0;
-				
+
 				// Slot
 				} else if (timeline is AttachmentTimeline) {
 					skeleton.SetSlotAttachmentToSetupPose(((AttachmentTimeline)timeline).slotIndex);

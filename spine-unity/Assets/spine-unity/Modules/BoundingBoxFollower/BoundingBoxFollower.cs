@@ -40,36 +40,20 @@ namespace Spine.Unity {
 		[SpineSlot(dataField: "skeletonRenderer", containsBoundingBoxes: true)]
 		public string slotName;
 
-		//TODO:  not this
-		[Tooltip("LOL JK, Someone else do it!")]
-		public bool use3DMeshCollider;
-
-		private Slot slot;
-		private BoundingBoxAttachment currentAttachment;
-		private PolygonCollider2D currentCollider;
-		private string currentAttachmentName;
-		private bool valid = false;
-		private bool hasReset;
+		Slot slot;
+		BoundingBoxAttachment currentAttachment;
+		PolygonCollider2D currentCollider;
+		string currentAttachmentName;
+		bool valid = false;
+		bool hasReset;
 
 		public Dictionary<BoundingBoxAttachment, PolygonCollider2D> colliderTable = new Dictionary<BoundingBoxAttachment, PolygonCollider2D>();
 		public Dictionary<BoundingBoxAttachment, string> attachmentNameTable = new Dictionary<BoundingBoxAttachment, string>();
 
-		public string CurrentAttachmentName {
-			get { return currentAttachmentName;	}
-		}
-
-		public BoundingBoxAttachment CurrentAttachment {
-			get { return currentAttachment;	}
-		}
-
-		public PolygonCollider2D CurrentCollider {
-			get { return currentCollider; }
-		}
-
-		public Slot Slot {
-			get { return slot; }
-		}
-
+		public string CurrentAttachmentName { get { return currentAttachmentName; } }
+		public BoundingBoxAttachment CurrentAttachment { get { return currentAttachment; } }
+		public PolygonCollider2D CurrentCollider { get { return currentCollider; } }
+		public Slot Slot { get { return slot; } }
 
 		void OnEnable () {
 			ClearColliders();
@@ -96,7 +80,7 @@ namespace Spine.Unity {
 		}
 
 		public void HandleReset (SkeletonRenderer renderer) {
-			if (slotName == null || slotName == "")
+			if (string.IsNullOrEmpty(slotName))
 				return;
 
 			hasReset = true;
@@ -110,31 +94,28 @@ namespace Spine.Unity {
 				skeletonRenderer.OnRebuild += HandleReset;
 			}
 
-
 			var skeleton = skeletonRenderer.skeleton;
 			slot = skeleton.FindSlot(slotName);
 			int slotIndex = skeleton.FindSlotIndex(slotName);
 
 			foreach (var skin in skeleton.Data.Skins) {
-				List<string> attachmentNames = new List<string>();
+				var attachmentNames = new List<string>();
 				skin.FindNamesForSlot(slotIndex, attachmentNames);
 
-				foreach (var name in attachmentNames) {
-					var attachment = skin.GetAttachment(slotIndex, name);
-					if (attachment is BoundingBoxAttachment) {
-						var collider = SkeletonUtility.AddBoundingBoxAsComponent((BoundingBoxAttachment)attachment, gameObject, true);
-						collider.enabled = false;
-						collider.hideFlags = HideFlags.HideInInspector;
-						colliderTable.Add((BoundingBoxAttachment)attachment, collider);
-						attachmentNameTable.Add((BoundingBoxAttachment)attachment, name);
+				foreach (var attachmentName in attachmentNames) {
+					var attachment = skin.GetAttachment(slotIndex, attachmentName);
+					var boundingBoxAttachment = attachment as BoundingBoxAttachment;
+					if (boundingBoxAttachment != null) {
+						var bbCollider = SkeletonUtility.AddBoundingBoxAsComponent(boundingBoxAttachment, gameObject, true);
+						bbCollider.enabled = false;
+						bbCollider.hideFlags = HideFlags.HideInInspector;
+						colliderTable.Add(boundingBoxAttachment, bbCollider);
+						attachmentNameTable.Add(boundingBoxAttachment, attachmentName);
 					}
 				}
 			}
 
-			if (colliderTable.Count == 0)
-				valid = false;
-			else
-				valid = true;
+			valid = colliderTable.Count != 0;
 
 			if (!valid)
 				Debug.LogWarning("Bounding Box Follower not valid! Slot [" + slotName + "] does not contain any Bounding Box Attachments!");
@@ -143,13 +124,11 @@ namespace Spine.Unity {
 		void ClearColliders () {
 			var colliders = GetComponents<PolygonCollider2D>();
 			if (Application.isPlaying) {
-				foreach (var c in colliders) {
+				foreach (var c in colliders)
 					Destroy(c);
-				}
 			} else {
-				foreach (var c in colliders) {
+				foreach (var c in colliders)
 					DestroyImmediate(c);
-				}
 			}
 
 			colliderTable.Clear();
@@ -178,7 +157,6 @@ namespace Spine.Unity {
 			}
 
 			currentAttachment = attachment;
-
 			currentAttachmentName = currentAttachment == null ? null : attachmentNameTable[attachment];
 		}
 	}
