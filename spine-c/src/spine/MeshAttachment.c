@@ -52,7 +52,7 @@ spMeshAttachment* spMeshAttachment_create (const char* name) {
 	self->g = 1;
 	self->b = 1;
 	self->a = 1;
-	_spAttachment_init(SUPER(self), name, SP_ATTACHMENT_MESH, _spMeshAttachment_dispose);
+	_spAttachment_init(SUPER(SUPER(self)), name, SP_ATTACHMENT_MESH, _spMeshAttachment_dispose);
 	return self;
 }
 

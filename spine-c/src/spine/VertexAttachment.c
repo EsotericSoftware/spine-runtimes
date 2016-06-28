@@ -33,7 +33,7 @@
 #include <spine/extension.h>
 
 void _spVertexAttachment_deinit (spVertexAttachment* attachment) {
-	_spAttachment_deinit(attachment);
+	_spAttachment_deinit(SUPER(attachment));
 	FREE(attachment->bones);
 	FREE(attachment->vertices);
 }

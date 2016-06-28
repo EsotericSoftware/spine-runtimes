@@ -52,7 +52,7 @@ typedef struct {
 } _spSkeleton;
 
 spSkeleton* spSkeleton_create (spSkeletonData* data) {
-	int i, ii;
+	int i;
 	int* childrenCounts;
 
 	_spSkeleton* internal = NEW(_spSkeleton);
@@ -161,7 +161,7 @@ static void _addToUpdateCache(_spSkeleton* const internal, _spUpdateType type, v
 	++internal->updateCacheCount;
 }
 
-static void _sortBone(const _spSkeleton* internal, spBone* bone) {
+static void _sortBone(_spSkeleton* const internal, spBone* bone) {
 	if (bone->sorted) return;
 	if (bone->parent) _sortBone(internal, bone->parent);
 	bone->sorted = 1;
@@ -179,7 +179,6 @@ static void _sortReset(spBone** bones, int bonesCount) {
 
 void spSkeleton_updateCache (const spSkeleton* self) {
 	int i, ii, level;
-	_spUpdate* update;
 	_spSkeleton* internal = SUB_CAST(_spSkeleton, self);
 	internal->updateCacheCapacity = self->bonesCount + self->ikConstraintsCount + self->transformConstraintsCount;
 

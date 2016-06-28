@@ -34,7 +34,7 @@
 
 spBoneData* spBoneData_create (int index, const char* name, spBoneData* parent) {
 	spBoneData* self = NEW(spBoneData);
-	CONST_CAST(spBoneData*, self->index) = index;
+	CONST_CAST(int, self->index) = index;
 	MALLOC_STR(self->name, name);
 	CONST_CAST(spBoneData*, self->parent) = parent;
 	self->scaleX = 1;

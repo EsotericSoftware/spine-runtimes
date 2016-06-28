@@ -317,7 +317,6 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 			Json* timelineArray;
 			for (timelineArray = slotMap->child; timelineArray; timelineArray = timelineArray->next) {
 				Json* frame;
-				int verticesCount = 0;
 				float* tempDeform;
 				spDeformTimeline *timeline;
 				int weighted, deformLength;
@@ -334,7 +333,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 
 				timeline = spDeformTimeline_create(timelineArray->size, deformLength);
 				timeline->slotIndex = slotIndex;
-				timeline->attachment = attachment;
+				timeline->attachment = SUPER(attachment);
 
 				for (frame = timelineArray->child, i = 0; frame; frame = frame->next, ++i) {
 					Json* vertices = Json_getItem(frame, "vertices");
@@ -861,7 +860,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 		}
 		spMeshAttachment_setParentMesh(linkedMesh->mesh, SUB_CAST(spMeshAttachment, parent));
 		spMeshAttachment_updateUVs(linkedMesh->mesh);
-		spAttachmentLoader_configureAttachment(self->attachmentLoader, linkedMesh->mesh);
+		spAttachmentLoader_configureAttachment(self->attachmentLoader, SUPER(SUPER(linkedMesh->mesh)));
 	}
 
 	/* Events. */

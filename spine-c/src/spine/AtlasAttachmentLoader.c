@@ -75,10 +75,10 @@ spAttachment* _spAtlasAttachmentLoader_createAttachment (spAttachmentLoader* loa
 		attachment->regionHeight = region->height;
 		attachment->regionOriginalWidth = region->originalWidth;
 		attachment->regionOriginalHeight = region->originalHeight;
-		return SUPER(attachment);
+		return SUPER(SUPER(attachment));
 	}
 	case SP_ATTACHMENT_BOUNDING_BOX:
-		return SUPER(spBoundingBoxAttachment_create(name));
+		return SUPER(SUPER(spBoundingBoxAttachment_create(name)));
 	default:
 		_spAttachmentLoader_setUnknownTypeError(loader, type);
 		return 0;
