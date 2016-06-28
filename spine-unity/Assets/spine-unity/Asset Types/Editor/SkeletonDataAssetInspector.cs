@@ -415,6 +415,7 @@ namespace Spine.Unity.Editor {
 							icon = SpineEditorUtilities.Icons.boundingBox;
 						else
 							icon = SpineEditorUtilities.Icons.warning;
+						//JOHN: left todo: Icon for paths. Generic icon for unidentified attachments.
 
 						// MITCH: left todo:  Waterboard Nate
 						//if (name != attachment.Name)
@@ -560,20 +561,19 @@ namespace Spine.Unity.Editor {
 
 			if (this.m_previewInstance == null) {
 				string skinName = EditorPrefs.GetString(m_skeletonDataAssetGUID + "_lastSkin", "");
-
 				m_previewInstance = SpineEditorUtilities.InstantiateSkeletonAnimation(skeletonDataAsset, skinName).gameObject;
-				m_previewInstance.hideFlags = HideFlags.HideAndDontSave;
-				m_previewInstance.layer = 0x1f;
 
-				m_skeletonAnimation = m_previewInstance.GetComponent<SkeletonAnimation>();
-				m_skeletonAnimation.initialSkinName = skinName;
-				m_skeletonAnimation.LateUpdate();
+				if (m_previewInstance != null) {
+					m_previewInstance.hideFlags = HideFlags.HideAndDontSave;
+					m_previewInstance.layer = 0x1f;
+					m_skeletonAnimation = m_previewInstance.GetComponent<SkeletonAnimation>();
+					m_skeletonAnimation.initialSkinName = skinName;
+					m_skeletonAnimation.LateUpdate();
+					m_skeletonData = m_skeletonAnimation.skeletonDataAsset.GetSkeletonData(true);
+					m_previewInstance.GetComponent<Renderer>().enabled = false;
+					m_initialized = true;
+				}
 
-				m_skeletonData = m_skeletonAnimation.skeletonDataAsset.GetSkeletonData(true);
-
-				m_previewInstance.GetComponent<Renderer>().enabled = false;
-
-				m_initialized = true;
 				AdjustCameraGoals(true);
 			}
 		}
