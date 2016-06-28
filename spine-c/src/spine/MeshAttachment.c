@@ -34,14 +34,15 @@
 
 void _spMeshAttachment_dispose (spAttachment* attachment) {
 	spMeshAttachment* self = SUB_CAST(spMeshAttachment, attachment);
-	_spVertexAttachment_deinit(SUPER(self));
 	FREE(self->path);
 	FREE(self->uvs);
 	if (!self->parentMesh) {
+		_spVertexAttachment_deinit(SUPER(self));
 		FREE(self->regionUVs);
 		FREE(self->triangles);
 		FREE(self->edges);
-	}
+	} else
+		_spAttachment_deinit(attachment);
 	FREE(self);
 }
 
