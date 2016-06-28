@@ -310,12 +310,12 @@ namespace Spine {
 			if (typeName == "skinnedmesh") typeName = "weightedmesh";
 			if (typeName == "weightedmesh") typeName = "mesh";
 			if (typeName == "weightedlinkedmesh")typeName = "linkedmesh";
-			var type = (AttachmentType)Enum.Parse(typeof(AttachmentType), typeName , false);
+			var type = (AttachmentType)Enum.Parse(typeof(AttachmentType), typeName, true);
 
 			 String path = GetString(map, "path", name);
 
 			switch (type) {
-			case AttachmentType.region:
+			case AttachmentType.Region:
 				RegionAttachment region = attachmentLoader.NewRegionAttachment(skin, name, path);
 				if (region == null) return null;
 				region.Path = path;
@@ -338,13 +338,13 @@ namespace Spine {
 
 				region.UpdateOffset();
 				return region;
-			case AttachmentType.boundingbox:
+			case AttachmentType.Boundingbox:
 				BoundingBoxAttachment box = attachmentLoader.NewBoundingBoxAttachment(skin, name);
 				if (box == null) return null;
 				ReadVertices(map, box, GetInt(map, "vertexCount", 0) << 1);
 				return box;
-			case AttachmentType.mesh:
-			case AttachmentType.linkedmesh: {
+			case AttachmentType.Mesh:
+			case AttachmentType.Linkedmesh: {
 					MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, name, path);
 					if (mesh == null) return null;
 					mesh.Path = path;
@@ -377,7 +377,7 @@ namespace Spine {
 					if (map.ContainsKey("edges")) mesh.Edges = GetIntArray(map, "edges");
 					return mesh;
 				}
-			case AttachmentType.path: {
+			case AttachmentType.Path: {
 					PathAttachment pathAttachment = attachmentLoader.NewPathAttachment(skin, name);
 					if (pathAttachment == null) return null;
 					pathAttachment.closed = GetBoolean(map, "closed", false);

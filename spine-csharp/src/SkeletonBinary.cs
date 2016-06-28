@@ -275,7 +275,7 @@ namespace Spine {
 
 			AttachmentType type = (AttachmentType)input.ReadByte();
 			switch (type) {
-			case AttachmentType.region: {
+			case AttachmentType.Region: {
 					String path = ReadString(input);
 					float rotation = ReadFloat(input);		
 					float x = ReadFloat(input);
@@ -304,7 +304,7 @@ namespace Spine {
 					region.UpdateOffset();
 					return region;
 				}
-			case AttachmentType.boundingbox: {
+			case AttachmentType.Boundingbox: {
 					int vertexCount = ReadVarint(input, true);
 					Vertices vertices = ReadVertices(input, vertexCount);
 					int color = nonessential ? ReadInt(input) : 0;
@@ -316,7 +316,7 @@ namespace Spine {
 					box.bones = vertices.bones;                    
 					return box;
 				}
-			case AttachmentType.mesh: {
+			case AttachmentType.Mesh: {
 					String path = ReadString(input);
 					int color = ReadInt(input);
 					int vertexCount = ReadVarint(input, true);					
@@ -354,7 +354,7 @@ namespace Spine {
 					}
 					return mesh;
 				}
-			case AttachmentType.linkedmesh: {
+			case AttachmentType.Linkedmesh: {
 					String path = ReadString(input);
 					int color = ReadInt(input);
 					String skinName = ReadString(input);
@@ -382,7 +382,7 @@ namespace Spine {
 					linkedMeshes.Add(new SkeletonJson.LinkedMesh(mesh, skinName, slotIndex, parent));
 					return mesh;
 				}
-			case AttachmentType.path: {
+			case AttachmentType.Path: {
 					bool closed = ReadBoolean(input);
 					bool constantSpeed = ReadBoolean(input);
 					int vertexCount = ReadVarint(input, true);
