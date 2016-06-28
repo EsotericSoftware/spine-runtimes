@@ -154,7 +154,7 @@ namespace Spine {
 					itemVertices[TR].TextureCoordinate.Y = uvs[RegionAttachment.Y4];
 				} else if (attachment is MeshAttachment) {
 					MeshAttachment mesh = (MeshAttachment)attachment;
-					int vertexCount = mesh.Vertices.Length;
+					int vertexCount = mesh.WorldVerticesLength;
 					if (vertices.Length < vertexCount) vertices = new float[vertexCount];
 					mesh.ComputeWorldVertices(slot, vertices);
 

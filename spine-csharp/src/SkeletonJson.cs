@@ -397,14 +397,18 @@ namespace Spine {
 		private void ReadVertices (Dictionary<String, Object> map, VertexAttachment attachment, int verticesLength) {
 			attachment.WorldVerticesLength = verticesLength;
 			float[] vertices = GetFloatArray(map, "vertices", 1);
+			float scale = Scale;
 			if (verticesLength == vertices.Length) {
+				if (scale != 1) {
+					for (int i = 0; i < vertices.Length; i++) {
+						vertices[i] *= scale;
+					}
+				}
 				attachment.vertices = vertices;
 				return;
 			}
-			ExposedList<float> weights = new ExposedList<float>();
-			weights.Resize (verticesLength * 3 * 3);
-			ExposedList<int> bones = new ExposedList<int>();
-			bones.Resize (verticesLength * 3);
+			ExposedList<float> weights = new ExposedList<float>(verticesLength * 3 * 3);
+			ExposedList<int> bones = new ExposedList<int>(verticesLength * 3);		
 			for (int i = 0, n = vertices.Length; i < n;) {
 				int boneCount = (int)vertices[i++];
 				bones.Add(boneCount);
