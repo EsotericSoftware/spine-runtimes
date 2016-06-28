@@ -540,8 +540,8 @@ public class Animation {
 				frameIndex = binarySearch(frames, time, 1) - 1;
 
 			String attachmentName = attachmentNames[frameIndex];
-			Slot slot = skeleton.slots.get(slotIndex);
-			slot.setAttachment(skeleton.getAttachment(slot.data.index, attachmentName));
+			skeleton.slots.get(slotIndex)
+				.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slotIndex, attachmentName));
 		}
 	}
 
