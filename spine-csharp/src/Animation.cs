@@ -564,8 +564,10 @@ namespace Spine {
 				for (int i = 0, n = slots.Count; i < n; i++)
 					drawOrder.Add(slots.Items[i]);
 			} else {
+				var drawOrderItems = drawOrder.Items;
+				var slotsItems = slots.Items;
 				for (int i = 0, n = drawOrderToSetupIndex.Length; i < n; i++)
-					drawOrder.Items[i] = slots.Items[drawOrderToSetupIndex[i]];
+					drawOrderItems[i] = slotsItems[drawOrderToSetupIndex[i]];
 			}
 		}
 	}

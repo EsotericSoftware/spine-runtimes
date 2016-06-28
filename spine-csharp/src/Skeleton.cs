@@ -213,18 +213,18 @@ namespace Spine {
 		}
 
 		private void SortPathConstraintAttachment (Skin skin, int slotIndex, Bone slotBone) {
-			foreach (KeyValuePair<Skin.AttachmentKeyTuple, Attachment> entry in skin.Attachments)
+			foreach (var entry in skin.Attachments)
 				if (entry.Key.slotIndex == slotIndex) SortPathConstraintAttachment(entry.Value, slotBone);
 		}
 
 		private void SortPathConstraintAttachment (Attachment attachment, Bone slotBone) {
-			PathAttachment pathAttachment = attachment as PathAttachment;
+			var pathAttachment = attachment as PathAttachment;
 			if (pathAttachment == null) return;
-			int[] pathBones = pathAttachment.Bones;
+			int[] pathBones = pathAttachment.bones;
 			if (pathBones == null)
 				SortBone(slotBone);
 			else {
-				ExposedList<Bone> bones = this.bones;
+				var bones = this.bones;
 				for (int i = 0, n = pathBones.Length; i < n; i++)
 					SortBone(bones.Items[pathBones[i]]);
 			}
@@ -239,8 +239,9 @@ namespace Spine {
 		}
 
 		private void SortReset (ExposedList<Bone> bones) {
+			var bonesItems = bones.Items;
 			for (int i = 0, n = bones.Count; i < n; i++) {
-				Bone bone = bones.Items[i];
+				Bone bone = bonesItems[i];
 				if (bone.sorted) SortReset(bone.children);
 				bone.sorted = false;
 			}
@@ -248,7 +249,7 @@ namespace Spine {
 
 		/// <summary>Updates the world transform for each bone and applies constraints.</summary>
 		public void UpdateWorldTransform () {
-			ExposedList<IUpdatable> updateCache = this.updateCache;
+			var updateCache = this.updateCache;
 			for (int i = 0, n = updateCache.Count; i < n; i++)
 				updateCache.Items[i].Update();
 		}
@@ -261,20 +262,20 @@ namespace Spine {
 
 		/// <summary>Sets the bones and constraints to their setup pose values.</summary>
 		public void SetBonesToSetupPose () {
-			ExposedList<Bone> bones = this.bones;
+			var bonesItems = this.bones.Items;
 			for (int i = 0, n = bones.Count; i < n; i++)
-				bones.Items[i].SetToSetupPose();
+				bonesItems[i].SetToSetupPose();
 
-			ExposedList<IkConstraint> ikConstraints = this.ikConstraints;
+			var ikConstraintsItems = this.ikConstraints.Items;
 			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
-				IkConstraint constraint = ikConstraints.Items[i];
+				IkConstraint constraint = ikConstraintsItems[i];
 				constraint.bendDirection = constraint.data.bendDirection;
 				constraint.mix = constraint.data.mix;
 			}
 
-			ExposedList<TransformConstraint> transformConstraints = this.transformConstraints;
+			var transformConstraintsItems = this.transformConstraints.Items;
 			for (int i = 0, n = transformConstraints.Count; i < n; i++) {
-				TransformConstraint constraint = transformConstraints.Items[i];
+				TransformConstraint constraint = transformConstraintsItems[i];
 				TransformConstraintData data = constraint.data;
 				constraint.rotateMix = data.rotateMix;
 				constraint.translateMix = data.translateMix;
@@ -282,7 +283,7 @@ namespace Spine {
 				constraint.shearMix = data.shearMix;
 			}
 
-			ExposedList<PathConstraint> pathConstraints = this.pathConstraints;
+			var pathConstraints = this.pathConstraints;
 			for (int i = 0, n = pathConstraints.Count; i < n; i++) {
 				PathConstraint constraint = pathConstraints.Items[i];
 				PathConstraintData data = constraint.data;
@@ -294,21 +295,23 @@ namespace Spine {
 		}
 
 		public void SetSlotsToSetupPose () {
-			ExposedList<Slot> slots = this.slots;
+			var slots = this.slots;
+			var slotsItems = slots.Items;
 			drawOrder.Clear();
 			for (int i = 0, n = slots.Count; i < n; i++)
-				drawOrder.Add(slots.Items[i]);
+				drawOrder.Add(slotsItems[i]);
 
 			for (int i = 0, n = slots.Count; i < n; i++)
-				slots.Items[i].SetToSetupPose();
+				slotsItems[i].SetToSetupPose();
 		}
 
 		/// <returns>May be null.</returns>
 		public Bone FindBone (String boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName", "boneName cannot be null.");
-			ExposedList<Bone> bones = this.bones;
+			var bones = this.bones;
+			var bonesItems = bones.Items;
 			for (int i = 0, n = bones.Count; i < n; i++) {
-				Bone bone = bones.Items[i];
+				Bone bone = bonesItems[i];
 				if (bone.data.name == boneName) return bone;
 			}
 			return null;
@@ -317,18 +320,20 @@ namespace Spine {
 		/// <returns>-1 if the bone was not found.</returns>
 		public int FindBoneIndex (String boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName", "boneName cannot be null.");
-			ExposedList<Bone> bones = this.bones;
+			var bones = this.bones;
+			var bonesItems = bones.Items;
 			for (int i = 0, n = bones.Count; i < n; i++)
-				if (bones.Items[i].data.name == boneName) return i;
+				if (bonesItems[i].data.name == boneName) return i;
 			return -1;
 		}
 
 		/// <returns>May be null.</returns>
 		public Slot FindSlot (String slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
-			ExposedList<Slot> slots = this.slots;
+			var slots = this.slots;
+			var slotsItems = slots.Items;
 			for (int i = 0, n = slots.Count; i < n; i++) {
-				Slot slot = slots.Items[i];
+				Slot slot = slotsItems[i];
 				if (slot.data.name == slotName) return slot;
 			}
 			return null;
@@ -337,9 +342,10 @@ namespace Spine {
 		/// <returns>-1 if the bone was not found.</returns>
 		public int FindSlotIndex (String slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
-			ExposedList<Slot> slots = this.slots;
+			var slots = this.slots;
+			var slotsItems = slots.Items;
 			for (int i = 0, n = slots.Count; i < n; i++)
-				if (slots.Items[i].data.name.Equals(slotName)) return i;
+				if (slotsItems[i].data.name.Equals(slotName)) return i;
 			return -1;
 		}
 
