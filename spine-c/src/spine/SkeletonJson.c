@@ -640,9 +640,9 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 			transformConstraintData->offsetRotation = Json_getFloat(transformMap, "rotation", 0);
 			transformConstraintData->offsetX = Json_getFloat(transformMap, "x", 0) * self->scale;
 			transformConstraintData->offsetY = Json_getFloat(transformMap, "y", 0) * self->scale;
-			transformConstraintData->offsetScaleX = Json_getFloat(transformMap, "scaleX", 0) * self->scale;
-			transformConstraintData->offsetScaleY = Json_getFloat(transformMap, "scaleY", 0) * self->scale;
-			transformConstraintData->offsetShearY = Json_getFloat(transformMap, "shearY", 0) * self->scale;
+			transformConstraintData->offsetScaleX = Json_getFloat(transformMap, "scaleX", 0);
+			transformConstraintData->offsetScaleY = Json_getFloat(transformMap, "scaleY", 0);
+			transformConstraintData->offsetShearY = Json_getFloat(transformMap, "shearY", 0);
 			transformConstraintData->rotateMix = Json_getFloat(transformMap, "rotateMix", 1);
 			transformConstraintData->translateMix = Json_getFloat(transformMap, "translateMix", 1);
 			transformConstraintData->scaleMix = Json_getFloat(transformMap, "scaleMix", 1);
