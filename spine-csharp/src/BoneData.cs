@@ -33,14 +33,17 @@ using System;
 
 namespace Spine {
 	public class BoneData {
-		internal BoneData parent;
+		internal int index;
 		internal String name;
-		internal float length, x, y, rotation, scaleX = 1, scaleY = 1, shearX, shearY;
-		internal bool inheritScale = true, inheritRotation = true;
+		internal BoneData parent;
+		internal float length;
+		internal float x, y, rotation, scaleX = 1, scaleY = 1, shearX, shearY;
+		internal bool inheritRotation = true, inheritScale = true;
 
 		/// <summary>May be null.</summary>
-		public BoneData Parent { get { return parent; } }
+		public int Index { get { return index; } }
 		public String Name { get { return name; } }
+		public BoneData Parent { get { return parent; } }
 		public float Length { get { return length; } set { length = value; } }
 		public float X { get { return x; } set { x = value; } }
 		public float Y { get { return y; } set { y = value; } }
@@ -49,12 +52,14 @@ namespace Spine {
 		public float ScaleY { get { return scaleY; } set { scaleY = value; } }
 		public float ShearX { get { return shearX; } set { shearX = value; } }
 		public float ShearY { get { return shearY; } set { shearY = value; } }
-		public bool InheritScale { get { return inheritScale; } set { inheritScale = value; } }
 		public bool InheritRotation { get { return inheritRotation; } set { inheritRotation = value; } }
+		public bool InheritScale { get { return inheritScale; } set { inheritScale = value; } }
 
 		/// <param name="parent">May be null.</param>
-		public BoneData (String name, BoneData parent) {
-			if (name == null) throw new ArgumentNullException("name cannot be null.");
+		public BoneData (int index, String name, BoneData parent) {
+			if (index < 0) throw new ArgumentException("index must be >= 0", "index");
+			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
+			this.index = index;
 			this.name = name;
 			this.parent = parent;
 		}

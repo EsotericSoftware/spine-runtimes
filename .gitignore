@@ -12,6 +12,7 @@ target
 *.user
 .DS_Store
 
+
 .idea/
 build/
 
@@ -39,7 +40,9 @@ spine-cocos2d-iphone/spine-cocos2d-iphone-ios.xcodeproj/project.xcworkspace/xcsh
 
 spine-csharp/bin
 spine-csharp/obj
+spine-csharp/src/*.meta
 spine-csharp/src/*.cs.meta
+spine-csharp/src/Attachments/*.cs.meta
 
 spine-monogame/xamarinstudio-ios/src/bin
 spine-monogame/xamarinstudio-ios/src/obj

@@ -29,9 +29,9 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 #define SPINE_OPTIONAL_NORMALS
-#define SPINE_OPTIONAL_FRONTFACING
 #define SPINE_OPTIONAL_RENDEROVERRIDE
 #define SPINE_OPTIONAL_MATERIALOVERRIDE
+//#define SPINE_OPTIONAL_FRONTFACING
 //#define SPINE_OPTIONAL_SUBMESHRENDERER // Deprecated
 
 using System;
@@ -290,16 +290,10 @@ namespace Spine.Unity {
 					var meshAttachment = attachment as MeshAttachment;
 					if (meshAttachment != null) {
 						rendererObject = meshAttachment.RendererObject;
-						attachmentVertexCount = meshAttachment.vertices.Length >> 1;
+						attachmentVertexCount = meshAttachment.worldVerticesLength >> 1;
 						attachmentTriangleCount = meshAttachment.triangles.Length;
 					} else {
-						var skinnedMeshAttachment = attachment as WeightedMeshAttachment;
-						if (skinnedMeshAttachment != null) {
-							rendererObject = skinnedMeshAttachment.RendererObject;
-							attachmentVertexCount = skinnedMeshAttachment.uvs.Length >> 1;
-							attachmentTriangleCount = skinnedMeshAttachment.triangles.Length;
-						} else
-							continue;
+						continue;
 					}
 				}
 
@@ -549,7 +543,7 @@ namespace Spine.Unity {
 							continue;
 						MeshAttachment meshAttachment = attachment as MeshAttachment;
 						if (meshAttachment != null) {
-							int meshVertexCount = meshAttachment.vertices.Length;
+							int meshVertexCount = meshAttachment.worldVerticesLength;
 							if (tempVertices.Length < meshVertexCount)
 								this.tempVertices = tempVertices = new float[meshVertexCount];
 							meshAttachment.ComputeWorldVertices(slot, tempVertices);
@@ -586,48 +580,6 @@ namespace Spine.Unity {
 									meshBoundsMin.y = y;
 								else if (y > meshBoundsMax.y)
 									meshBoundsMax.y = y;
-							}
-						} else {
-							WeightedMeshAttachment weightedMeshAttachment = attachment as WeightedMeshAttachment;
-							if (weightedMeshAttachment != null) {
-								int meshVertexCount = weightedMeshAttachment.uvs.Length;
-								if (tempVertices.Length < meshVertexCount)
-									this.tempVertices = tempVertices = new float[meshVertexCount];
-								weightedMeshAttachment.ComputeWorldVertices(slot, tempVertices);
-
-								if (pmaVertexColors) {
-									color.a = (byte)(a * slot.a * weightedMeshAttachment.a);
-									color.r = (byte)(r * slot.r * weightedMeshAttachment.r * color.a);
-									color.g = (byte)(g * slot.g * weightedMeshAttachment.g * color.a);
-									color.b = (byte)(b * slot.b * weightedMeshAttachment.b * color.a);
-									if (slot.data.blendMode == BlendMode.additive) color.a = 0;
-								} else {
-									color.a = (byte)(a * slot.a * weightedMeshAttachment.a);
-									color.r = (byte)(r * slot.r * weightedMeshAttachment.r * 255);
-									color.g = (byte)(g * slot.g * weightedMeshAttachment.g * 255);
-									color.b = (byte)(b * slot.b * weightedMeshAttachment.b * 255);
-								}
-
-								float[] meshUVs = weightedMeshAttachment.uvs;
-								float z = i * zSpacing;
-								for (int ii = 0; ii < meshVertexCount; ii += 2, vertexIndex++) {
-									float x = tempVertices[ii], y = tempVertices[ii + 1];
-									vertices[vertexIndex].x = x;
-									vertices[vertexIndex].y = y;
-									vertices[vertexIndex].z = z;
-									colors[vertexIndex] = color;
-									uvs[vertexIndex].x = meshUVs[ii];
-									uvs[vertexIndex].y = meshUVs[ii + 1];
-
-									if (x < meshBoundsMin.x)
-										meshBoundsMin.x = x;
-									else if (x > meshBoundsMax.x)
-										meshBoundsMax.x = x;
-									if (y < meshBoundsMin.y)
-										meshBoundsMin.y = y;
-									else if (y > meshBoundsMax.y)
-										meshBoundsMax.y = y;
-								}
 							}
 						}
 					}
@@ -887,16 +839,16 @@ namespace Spine.Unity {
 				}
 				#else
 				if (attachment is RegionAttachment) {
-				triangles[triangleIndex] = firstVertex;
-				triangles[triangleIndex + 1] = firstVertex + 2;
-				triangles[triangleIndex + 2] = firstVertex + 1;
-				triangles[triangleIndex + 3] = firstVertex + 2;
-				triangles[triangleIndex + 4] = firstVertex + 3;
-				triangles[triangleIndex + 5] = firstVertex + 1;
+					triangles[triangleIndex] = firstVertex;
+					triangles[triangleIndex + 1] = firstVertex + 2;
+					triangles[triangleIndex + 2] = firstVertex + 1;
+					triangles[triangleIndex + 3] = firstVertex + 2;
+					triangles[triangleIndex + 4] = firstVertex + 3;
+					triangles[triangleIndex + 5] = firstVertex + 1;
 
-				triangleIndex += 6;
-				firstVertex += 4;
-				continue;
+					triangleIndex += 6;
+					firstVertex += 4;
+					continue;
 				}
 				#endif
 
@@ -905,15 +857,10 @@ namespace Spine.Unity {
 				int attachmentVertexCount;
 				var meshAttachment = attachment as MeshAttachment;
 				if (meshAttachment != null) {
-					attachmentVertexCount = meshAttachment.vertices.Length >> 1; // length/2
+					attachmentVertexCount = meshAttachment.worldVerticesLength >> 1; // length/2
 					attachmentTriangles = meshAttachment.triangles;
 				} else {
-					var weightedMeshAttachment = attachment as WeightedMeshAttachment;
-					if (weightedMeshAttachment != null) {
-						attachmentVertexCount = weightedMeshAttachment.uvs.Length >> 1; // length/2
-						attachmentTriangles = weightedMeshAttachment.triangles;
-					} else
-						continue;
+					continue;
 				}
 
 				#if SPINE_OPTIONAL_FRONTFACING

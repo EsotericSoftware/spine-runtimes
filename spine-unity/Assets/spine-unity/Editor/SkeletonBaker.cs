@@ -1,5 +1,3 @@
-
-
 /*****************************************************************************
  * SkeletonBaker added by Mitch Thompson
  * Full irrevocable rights and permissions granted to Esoteric Software
@@ -373,6 +371,7 @@ namespace Spine.Unity.Editor {
 						float rotation = 0;
 						Mesh mesh = null;
 						Material material = null;
+						bool isWeightedMesh = false;
 
 						if (meshTable.ContainsKey(attachmentMeshName))
 							mesh = meshTable[attachmentMeshName];
@@ -382,32 +381,28 @@ namespace Spine.Unity.Editor {
 							offset.y = regionAttachment.Y;
 							rotation = regionAttachment.Rotation;
 							mesh = ExtractRegionAttachment(attachmentMeshName, regionAttachment, mesh);
-							material = ExtractMaterial((RegionAttachment)attachment);
+							material = ExtractMaterial(attachment);
 							unusedMeshNames.Remove(attachmentMeshName);
 							if (newPrefab || meshTable.ContainsKey(attachmentMeshName) == false)
 								AssetDatabase.AddObjectToAsset(mesh, prefab);
 						} else if (attachment is MeshAttachment) {
 							var meshAttachment = (MeshAttachment)attachment;
+							isWeightedMesh = (meshAttachment.Bones != null);
 							offset.x = 0;
 							offset.y = 0;
 							rotation = 0;
-							mesh = ExtractMeshAttachment(attachmentMeshName, meshAttachment, mesh);
-							material = ExtractMaterial((MeshAttachment)attachment);
-							unusedMeshNames.Remove(attachmentMeshName);
-							if (newPrefab || meshTable.ContainsKey(attachmentMeshName) == false)
-								AssetDatabase.AddObjectToAsset(mesh, prefab);
-						} else if (attachment is WeightedMeshAttachment) {
-							var meshAttachment = (WeightedMeshAttachment)attachment;
-							offset.x = 0;
-							offset.y = 0;
-							rotation = 0;
-							mesh = ExtractSkinnedMeshAttachment(attachmentMeshName, meshAttachment, i, skeletonData, boneList, mesh);
-							material = ExtractMaterial((WeightedMeshAttachment)attachment);
+
+							if (isWeightedMesh)
+								mesh = ExtractWeightedMeshAttachment(attachmentMeshName, meshAttachment, i, skeletonData, boneList, mesh);
+							else
+								mesh = ExtractMeshAttachment(attachmentMeshName, meshAttachment, mesh);
+							
+							material = ExtractMaterial(attachment);
 							unusedMeshNames.Remove(attachmentMeshName);
 							if (newPrefab || meshTable.ContainsKey(attachmentMeshName) == false)
 								AssetDatabase.AddObjectToAsset(mesh, prefab);
 						} else
-							continue;  //disregard unsupported types for now
+							continue;
 
 						Transform attachmentTransform = new GameObject(attachmentName).transform;
 
@@ -415,14 +410,13 @@ namespace Spine.Unity.Editor {
 						attachmentTransform.localPosition = offset;
 						attachmentTransform.localRotation = Quaternion.Euler(0, 0, rotation);
 
-						if (attachment is WeightedMeshAttachment) {
+						if (isWeightedMesh) {
 							attachmentTransform.position = Vector3.zero;
 							attachmentTransform.rotation = Quaternion.identity;
 							var skinnedMeshRenderer = attachmentTransform.gameObject.AddComponent<SkinnedMeshRenderer>();
 							skinnedMeshRenderer.rootBone = boneList[0];
 							skinnedMeshRenderer.bones = boneList.ToArray();
 							skinnedMeshRenderer.sharedMesh = mesh;
-
 						} else {
 							attachmentTransform.gameObject.AddComponent<MeshFilter>().sharedMesh = mesh;
 							attachmentTransform.gameObject.AddComponent<MeshRenderer>();
@@ -482,7 +476,7 @@ namespace Spine.Unity.Editor {
 				return extractionBone;
 
 			SkeletonData skelData = new SkeletonData();
-			BoneData data = new BoneData("temp", null);
+			BoneData data = new BoneData(0, "temp", null);
 			data.ScaleX = 1;
 			data.ScaleY = 1;
 			data.Length = 100;
@@ -505,7 +499,7 @@ namespace Spine.Unity.Editor {
 
 			Bone bone = GetExtractionBone();
 
-			SlotData data = new SlotData("temp", bone.Data);
+			SlotData data = new SlotData(0, "temp", bone.Data);
 			Slot slot = new Slot(data, bone);
 			extractionSlot = slot;
 			return extractionSlot;
@@ -520,9 +514,6 @@ namespace Spine.Unity.Editor {
 				return (Material)((AtlasRegion)att.RendererObject).page.rendererObject;
 			} else if (attachment is MeshAttachment) {
 				var att = (MeshAttachment)attachment;
-				return (Material)((AtlasRegion)att.RendererObject).page.rendererObject;
-			} else if (attachment is WeightedMeshAttachment) {
-				var att = (WeightedMeshAttachment)attachment;
 				return (Material)((AtlasRegion)att.RendererObject).page.rendererObject;
 			} else {
 				return null;
@@ -573,7 +564,7 @@ namespace Spine.Unity.Editor {
 			slot.Bone.UpdateWorldTransform();
 
 			Vector2[] uvs = ExtractUV(attachment.UVs);
-			float[] floatVerts = new float[attachment.Vertices.Length];
+			float[] floatVerts = new float[attachment.WorldVerticesLength];
 			attachment.ComputeWorldVertices(slot, floatVerts);
 			Vector3[] verts = ExtractVerts(floatVerts);
 
@@ -630,12 +621,14 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-		static Mesh ExtractSkinnedMeshAttachment (string name, WeightedMeshAttachment attachment, int slotIndex, SkeletonData skeletonData, List<Transform> boneList, Mesh mesh = null) {
+		static Mesh ExtractWeightedMeshAttachment (string name, MeshAttachment attachment, int slotIndex, SkeletonData skeletonData, List<Transform> boneList, Mesh mesh = null) {
+			if (attachment.Bones == null)
+				throw new System.ArgumentException("Mesh is not weighted.", "attachment");
 
 			Skeleton skeleton = new Skeleton(skeletonData);
 			skeleton.UpdateWorldTransform();
 
-			float[] floatVerts = new float[attachment.UVs.Length];
+			float[] floatVerts = new float[attachment.WorldVerticesLength];
 			attachment.ComputeWorldVertices(skeleton.Slots.Items[slotIndex], floatVerts);
 
 			Vector2[] uvs = ExtractUV(attachment.UVs);
@@ -644,8 +637,7 @@ namespace Spine.Unity.Editor {
 			int[] triangles = attachment.Triangles;
 			Color color = new Color(attachment.R, attachment.G, attachment.B, attachment.A);
 
-			if (mesh == null)
-				mesh = new Mesh();
+			mesh = mesh ?? new Mesh();
 
 			mesh.triangles = new int[0];
 
@@ -661,21 +653,18 @@ namespace Spine.Unity.Editor {
 			mesh.RecalculateNormals();
 			mesh.RecalculateBounds();
 
-			//Handle weights and binding
-			Dictionary<int, BoneWeightContainer> weightTable = new Dictionary<int, BoneWeightContainer>();
-			System.Text.StringBuilder warningBuilder = new System.Text.StringBuilder();
+			// Handle weights and binding
+			var weightTable = new Dictionary<int, BoneWeightContainer>();
+			var warningBuilder = new System.Text.StringBuilder();
 
 			int[] bones = attachment.Bones;
-			float[] weights = attachment.Weights;
+			float[] weights = attachment.Vertices;
 			for (int w = 0, v = 0, b = 0, n = bones.Length; v < n; w += 2) {
 
 				int nn = bones[v++] + v;
 				for (; v < nn; v++, b += 3) {
 					Transform boneTransform = boneList[bones[v]];
 					int vIndex = w / 2;
-
-					float weight = weights[b + 2];
-
 					BoneWeightContainer container;
 					if (weightTable.ContainsKey(vIndex))
 						container = weightTable[vIndex];
@@ -684,7 +673,7 @@ namespace Spine.Unity.Editor {
 						weightTable.Add(vIndex, container);
 					}
 
-
+					float weight = weights[b + 2];
 					container.Add(boneTransform, weight);
 				}
 			}
@@ -700,7 +689,7 @@ namespace Spine.Unity.Editor {
 				for (int b = 0; b < pairs.Count; b++) {
 					if (b > 3) {
 						if (warningBuilder.Length == 0)
-							warningBuilder.Insert(0, "[SkinnedMeshAttachment " + name + "]\r\nUnity only supports 4 weight influences per vertex!  The 4 strongest influences will be used.\r\n");
+							warningBuilder.Insert(0, "[Weighted Mesh: " + name + "]\r\nUnity only supports 4 weight influences per vertex!  The 4 strongest influences will be used.\r\n");
 
 						warningBuilder.AppendFormat("{0} ignored on vertex {1}!\r\n", pairs[b].bone.name, i);
 						continue;
@@ -844,6 +833,7 @@ namespace Spine.Unity.Editor {
 
 			return clip;
 		}
+
 		static int BinarySearch (float[] values, float target) {
 			int low = 0;
 			int high = values.Length - 2;
@@ -869,7 +859,7 @@ namespace Spine.Unity.Editor {
 				var ev = events[i];
 
 				AnimationEvent ae = new AnimationEvent();
-				//TODO:  Deal with Mecanim's zero-time missed event
+				//MITCH: left todo:  Deal with Mecanim's zero-time missed event
 				ae.time = frames[i];
 				ae.functionName = ev.Data.Name;
 				ae.messageOptions = eventOptions;
@@ -968,6 +958,7 @@ namespace Spine.Unity.Editor {
 
 			return angle;
 		}
+
 		static void BakeBone (Bone bone, Spine.Animation animation, AnimationClip clip) {
 			Skeleton skeleton = bone.Skeleton;
 			bool inheritRotation = bone.Data.InheritRotation;
@@ -1178,7 +1169,7 @@ namespace Spine.Unity.Editor {
 
 
 			string path = GetPath(boneData);
-			string propertyName = "localPosition";
+			const string propertyName = "localPosition";
 
 			clip.SetCurve(path, typeof(Transform), propertyName + ".x", xCurve);
 			clip.SetCurve(path, typeof(Transform), propertyName + ".y", yCurve);

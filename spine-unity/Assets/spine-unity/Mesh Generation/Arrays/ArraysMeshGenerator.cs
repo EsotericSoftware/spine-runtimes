@@ -186,7 +186,7 @@ namespace Spine.Unity.MeshGeneration {
 				} else {
 					var meshAttachment = attachment as MeshAttachment;
 					if (meshAttachment != null) {
-						int meshVertexCount = meshAttachment.vertices.Length;
+						int meshVertexCount = meshAttachment.worldVerticesLength;
 						if (tempVerts.Length < meshVertexCount) tempVerts = new float[meshVertexCount];
 						meshAttachment.ComputeWorldVertices(slot, tempVerts);
 
@@ -216,41 +216,6 @@ namespace Spine.Unity.MeshGeneration {
 							else if (y > bmax.y) bmax.y = y;
 
 							vi++;
-						}
-					} else {
-						var weightedMeshAttachment = attachment as WeightedMeshAttachment;
-						if (weightedMeshAttachment != null) {
-							int meshVertexCount = weightedMeshAttachment.uvs.Length;
-							if (tempVerts.Length < meshVertexCount) tempVerts = new float[meshVertexCount];
-							weightedMeshAttachment.ComputeWorldVertices(slot, tempVerts);
-
-							if (pmaColors) {
-								color.a = (byte)(a * slot.a * weightedMeshAttachment.a);
-								color.r = (byte)(r * slot.r * weightedMeshAttachment.r * color.a);
-								color.g = (byte)(g * slot.g * weightedMeshAttachment.g * color.a);
-								color.b = (byte)(b * slot.b * weightedMeshAttachment.b * color.a);
-								if (slot.data.blendMode == BlendMode.additive) color.a = 0;
-							} else {
-								color.a = (byte)(a * slot.a * weightedMeshAttachment.a);
-								color.r = (byte)(r * slot.r * weightedMeshAttachment.r * 255);
-								color.g = (byte)(g * slot.g * weightedMeshAttachment.g * 255);
-								color.b = (byte)(b * slot.b * weightedMeshAttachment.b * 255);
-							}
-
-							float[] attachmentUVs = weightedMeshAttachment.uvs;
-							for (int iii = 0; iii < meshVertexCount; iii += 2) {
-								float x = tempVerts[iii], y = tempVerts[iii + 1];
-								verts[vi].x = x; verts[vi].y = y; verts[vi].z = z;
-								colors[vi] = color;
-								uvs[vi].x = attachmentUVs[iii]; uvs[vi].y = attachmentUVs[iii + 1];
-
-								if (x < bmin.x) bmin.x = x;
-								else if (x > bmax.x) bmax.x = x;
-								if (y < bmin.y) bmin.y = y;
-								else if (y > bmax.y) bmax.y = y;
-
-								vi++;
-							}
 						}
 					}
 				}
@@ -301,7 +266,6 @@ namespace Spine.Unity.MeshGeneration {
 				if (attachment is RegionAttachment) {
 					tris[triangleIndex] = afv; tris[triangleIndex + 1] = afv + 2; tris[triangleIndex + 2] = afv + 1;
 					tris[triangleIndex + 3] = afv + 2; tris[triangleIndex + 4] = afv + 3; tris[triangleIndex + 5] = afv + 1;
-
 					triangleIndex += 6;
 					afv += 4;
 				} else {
@@ -309,21 +273,13 @@ namespace Spine.Unity.MeshGeneration {
 					int attachmentVertexCount;
 					var meshAttachment = attachment as MeshAttachment;
 					if (meshAttachment != null) {
-						attachmentVertexCount = meshAttachment.vertices.Length >> 1; //  length/2
+						attachmentVertexCount = meshAttachment.worldVerticesLength >> 1; //  length/2
 						attachmentTriangles = meshAttachment.triangles;
-					} else {
-						var weightedMeshAttachment = attachment as WeightedMeshAttachment;
-						if (weightedMeshAttachment != null) {
-							attachmentVertexCount = weightedMeshAttachment.uvs.Length >> 1; // length/2
-							attachmentTriangles = weightedMeshAttachment.triangles;
-						} else
-							continue;
+						for (int ii = 0, nn = attachmentTriangles.Length; ii < nn; ii++, triangleIndex++)
+							tris[triangleIndex] = afv + attachmentTriangles[ii];
+
+						afv += attachmentVertexCount;
 					}
-
-					for (int ii = 0, nn = attachmentTriangles.Length; ii < nn; ii++, triangleIndex++)
-						tris[triangleIndex] = afv + attachmentTriangles[ii];
-
-					afv += attachmentVertexCount;
 				}
 			} // Done adding current submesh triangles
 		}

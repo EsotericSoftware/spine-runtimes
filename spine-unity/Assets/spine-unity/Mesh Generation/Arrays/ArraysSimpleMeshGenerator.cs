@@ -65,15 +65,10 @@ namespace Spine.Unity.MeshGeneration {
 				} else {
 					var meshAttachment = attachment as MeshAttachment;
 					if (meshAttachment != null) {
-						attachmentVertexCount = meshAttachment.vertices.Length >> 1;
+						attachmentVertexCount = meshAttachment.worldVerticesLength >> 1;
 						attachmentTriangleCount = meshAttachment.triangles.Length;
 					} else {
-						var skinnedMeshAttachment = attachment as WeightedMeshAttachment;
-						if (skinnedMeshAttachment != null) {
-							attachmentVertexCount = skinnedMeshAttachment.uvs.Length >> 1;
-							attachmentTriangleCount = skinnedMeshAttachment.triangles.Length;
-						} else
-							continue;
+						continue;
 					}
 				}
 				totalTriangleCount += attachmentTriangleCount;

@@ -33,29 +33,9 @@ using System;
 
 namespace Spine {
 	/// <summary>Attachment that has a polygon for bounds checking.</summary>
-	public class BoundingBoxAttachment : Attachment {
-		internal float[] vertices;
-
-		public float[] Vertices { get { return vertices; } set { vertices = value; } }
-
+	public class BoundingBoxAttachment : VertexAttachment {
 		public BoundingBoxAttachment (string name)
 			: base(name) {
-		}
-
-		/// <param name="worldVertices">Must have at least the same length as this attachment's vertices.</param>
-		public void ComputeWorldVertices (Bone bone, float[] worldVertices) {
-			float x = bone.skeleton.x + bone.worldX, y = bone.skeleton.y + bone.worldY;
-			float m00 = bone.a;
-			float m01 = bone.b;
-			float m10 = bone.c;
-			float m11 = bone.d;
-			float[] vertices = this.vertices;
-			for (int i = 0, n = vertices.Length; i < n; i += 2) {
-				float px = vertices[i];
-				float py = vertices[i + 1];
-				worldVertices[i] = px * m00 + py * m01 + x;
-				worldVertices[i + 1] = px * m10 + py * m11 + y;
-			}
 		}
 	}
 }

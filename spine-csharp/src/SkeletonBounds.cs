@@ -30,7 +30,6 @@
  *****************************************************************************/
 
 using System;
-using System.Collections.Generic;
 
 namespace Spine {
 	public class SkeletonBounds {
@@ -80,7 +79,7 @@ namespace Spine {
 				int count = boundingBox.Vertices.Length;
 				polygon.Count = count;
 				if (polygon.Vertices.Length < count) polygon.Vertices = new float[count];
-				boundingBox.ComputeWorldVertices(slot.bone, polygon.Vertices);
+				boundingBox.ComputeWorldVertices(slot, polygon.Vertices);
 			}
 
 			if (updateAabb) aabbCompute();
