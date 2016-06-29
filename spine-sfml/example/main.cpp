@@ -95,13 +95,10 @@ void spineboy () {
 	Slot* headSlot = Skeleton_findSlot(skeleton, "head");
 
 	drawable->state->listener = callback;
-	if (false) {
-		AnimationState_setAnimationByName(drawable->state, 0, "test", true);
-	} else {
-		AnimationState_setAnimationByName(drawable->state, 0, "walk", true);
-		AnimationState_addAnimationByName(drawable->state, 0, "jump", false, 3);
-		AnimationState_addAnimationByName(drawable->state, 0, "run", true, 0);
-	}
+	AnimationState_setAnimationByName(drawable->state, 0, "test", true);
+	AnimationState_addAnimationByName(drawable->state, 0, "walk", true, 0);
+	AnimationState_addAnimationByName(drawable->state, 0, "jump", false, 3);
+	AnimationState_addAnimationByName(drawable->state, 0, "run", true, 0);
 
 	sf::RenderWindow window(sf::VideoMode(640, 480), "Spine SFML - spineboy");
 	window.setFramerateLimit(60);
