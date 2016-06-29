@@ -327,7 +327,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 					_spSkeletonJson_setError(self, 0, "Attachment not found: ", timelineArray->name);
 					return 0;
 				}
-				weighted = attachment->bones;
+				weighted = attachment->bones != 0;
 				deformLength = weighted ? attachment->verticesCount / 3 * 2 : attachment->verticesCount;
 				tempDeform = MALLOC(float, deformLength);
 
