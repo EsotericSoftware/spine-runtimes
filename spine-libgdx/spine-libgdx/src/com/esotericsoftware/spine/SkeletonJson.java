@@ -193,9 +193,9 @@ public class SkeletonJson {
 			data.offsetRotation = constraintMap.getFloat("rotation", 0);
 			data.offsetX = constraintMap.getFloat("x", 0) * scale;
 			data.offsetY = constraintMap.getFloat("y", 0) * scale;
-			data.offsetScaleX = constraintMap.getFloat("scaleX", 0) * scale;
-			data.offsetScaleY = constraintMap.getFloat("scaleY", 0) * scale;
-			data.offsetShearY = constraintMap.getFloat("shearY", 0) * scale;
+			data.offsetScaleX = constraintMap.getFloat("scaleX", 0);
+			data.offsetScaleY = constraintMap.getFloat("scaleY", 0);
+			data.offsetShearY = constraintMap.getFloat("shearY", 0);
 
 			data.rotateMix = constraintMap.getFloat("rotateMix", 1);
 			data.translateMix = constraintMap.getFloat("translateMix", 1);
