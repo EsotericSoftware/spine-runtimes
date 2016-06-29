@@ -186,7 +186,7 @@ namespace Spine.Unity.MeshGeneration {
 				} else {
 					var meshAttachment = attachment as MeshAttachment;
 					if (meshAttachment != null) {
-						int meshVertexCount = meshAttachment.vertices.Length;
+						int meshVertexCount = meshAttachment.worldVerticesLength;
 						if (tempVerts.Length < meshVertexCount) tempVerts = new float[meshVertexCount];
 						meshAttachment.ComputeWorldVertices(slot, tempVerts);
 
@@ -273,7 +273,7 @@ namespace Spine.Unity.MeshGeneration {
 					int attachmentVertexCount;
 					var meshAttachment = attachment as MeshAttachment;
 					if (meshAttachment != null) {
-						attachmentVertexCount = meshAttachment.vertices.Length >> 1; //  length/2
+						attachmentVertexCount = meshAttachment.worldVerticesLength >> 1; //  length/2
 						attachmentTriangles = meshAttachment.triangles;
 						for (int ii = 0, nn = attachmentTriangles.Length; ii < nn; ii++, triangleIndex++)
 							tris[triangleIndex] = afv + attachmentTriangles[ii];

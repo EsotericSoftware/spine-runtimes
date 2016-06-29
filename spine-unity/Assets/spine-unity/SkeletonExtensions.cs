@@ -73,7 +73,7 @@ namespace Spine.Unity {
 		}
 		#endregion
 
-		#region Bone Position
+		#region Bone
 		public static void SetPosition (this Bone bone, Vector2 position) {
 			bone.X = position.x;
 			bone.Y = position.y;
@@ -90,6 +90,14 @@ namespace Spine.Unity {
 
 		public static Vector3 GetWorldPosition (this Bone bone, UnityEngine.Transform parentTransform) {		
 			return parentTransform.TransformPoint(new Vector3(bone.worldX, bone.worldY));
+		}
+
+		public static Matrix4x4 GetMatrix4x4 (this Bone bone) {
+			return new Matrix4x4 {
+				m00 = bone.a, m01 = bone.b, m03 = bone.worldX,
+				m10 = bone.c, m11 = bone.d, m13 = bone.worldY,
+				m33 = 1
+			};
 		}
 		#endregion
 
@@ -173,7 +181,7 @@ namespace Spine {
 				// Attachment
 				} else if (timeline is DeformTimeline) {
 					var slot = skeleton.slots.Items[((DeformTimeline)timeline).slotIndex];
-					slot.attachmentVerticesCount = 0;
+					slot.attachmentVertices.Clear(false);
 
 				// Slot
 				} else if (timeline is AttachmentTimeline) {

@@ -367,9 +367,9 @@ namespace Spine.Unity.Editor {
 
 						var filename = Path.GetFileNameWithoutExtension(sp);
 						int result = EditorUtility.DisplayDialogComplex(
-							string.Format("Missing AtlasAsset for \"{0}\"", filename),
-							string.Format("Could not find matching AtlasAsset for \"{0}\"", filename),
-							"Choose AtlaseAssets...", "Skip this", "Stop importing all"
+							string.Format("AtlasAsset for \"{0}\"", filename),
+							string.Format("Could not automatically set the AtlasAsset for \"{0}\". You may set it manually.", filename),
+							"Choose AtlasAssets...", "Skip this", "Stop importing all"
 						);
 
 						switch (result) {
@@ -386,7 +386,7 @@ namespace Spine.Unity.Editor {
 								}
 							}
 							break;
-						case 0: // Choose AtlaseAssets...
+						case 0: // Choose AtlasAssets...
 							var atlasList = MultiAtlasDialog(requiredPaths, Path.GetDirectoryName(sp), Path.GetFileNameWithoutExtension(sp));
 							if (atlasList != null)
 								IngestSpineProject(AssetDatabase.LoadAssetAtPath(sp, typeof(TextAsset)) as TextAsset, atlasList.ToArray());
@@ -469,7 +469,7 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		#region Match SkeletonData with Atlases
-		static readonly AttachmentType[] NonAtlasTypes = { AttachmentType.boundingbox, AttachmentType.path };
+		static readonly AttachmentType[] NonAtlasTypes = { AttachmentType.Boundingbox, AttachmentType.Path };
 
 		static List<AtlasAsset> MultiAtlasDialog (List<string> requiredPaths, string initialDirectory, string filename = "") {
 			List<AtlasAsset> atlasAssets = new List<AtlasAsset>();
@@ -595,7 +595,16 @@ namespace Spine.Unity.Editor {
 
 						// Ignore non-atlas-requiring types.
 						if (data.ContainsKey("type")) {
-							AttachmentType attachmentType = (AttachmentType)System.Enum.Parse(typeof(AttachmentType), (string)data["type"], true);
+							AttachmentType attachmentType;
+							string typeString = (string)data["type"];
+							try {
+								attachmentType = (AttachmentType)System.Enum.Parse(typeof(AttachmentType), typeString, true);
+							} catch (System.ArgumentException e) {
+								// For more info, visit: http://esotericsoftware.com/forum/Spine-editor-and-runtime-version-management-6534
+								Debug.LogWarning(string.Format("Unidentified Attachment type: \"{0}\". Skeleton may have been exported from an incompatible Spine version.", typeString));
+								throw e;
+							}
+
 							if (NonAtlasTypes.Contains(attachmentType))
 								continue;
 						}
@@ -901,6 +910,8 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		#region Checking Methods
+		static int[] runtimeVersion = { 3, 3 };
+
 		static bool CheckForValidSkeletonData (string skeletonJSONPath) {
 			string dir = Path.GetDirectoryName(skeletonJSONPath);
 			TextAsset textAsset = (TextAsset)AssetDatabase.LoadAssetAtPath(skeletonJSONPath, typeof(TextAsset));
@@ -935,11 +946,23 @@ namespace Spine.Unity.Editor {
 				return false;
 			}
 
+			// Version warning
+			{
+				var skeletonInfo = (Dictionary<string, object>)root["skeleton"];
+				string spineVersion = (string)skeletonInfo["spine"];
+				if (!string.IsNullOrEmpty(spineVersion)) {
+					var splitVersion = spineVersion.Split('.');
+					bool primaryMismatch = runtimeVersion[0] != int.Parse(splitVersion[0]);
+					bool secondaryMismatch = runtimeVersion[1] != int.Parse(splitVersion[1]);
+					if (primaryMismatch || secondaryMismatch)
+						Debug.LogWarning(string.Format("Skeleton '{0}' (exported with Spine {1}) may be incompatible with your runtime version: spine-unity v{2}", asset.name, spineVersion, runtimeVersion[0] + "." + runtimeVersion[1]));
+				}
+			}
+
+
 			return root.ContainsKey("skeleton");
 
-			// JOHN: left todo: Warn users of old version incompatibility.
-			//			var skeletonInfo = (Dictionary<string, object>)root["skeleton"];
-			//			string spineVersion = (string)skeletonInfo["spine"];
+
 		}
 		#endregion
 
@@ -951,7 +974,7 @@ namespace Spine.Unity.Editor {
 				string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(o));
 				string skinName = EditorPrefs.GetString(guid + "_lastSkin", "");
 
-				InstantiateSkeletonAnimation((SkeletonDataAsset)o, skinName);
+				InstantiateSkeletonAnimation((SkeletonDataAsset)o, skinName, false);
 				SceneView.RepaintAll();
 			}
 		}
@@ -971,13 +994,13 @@ namespace Spine.Unity.Editor {
 			return true;
 		}
 
-		public static SkeletonAnimation InstantiateSkeletonAnimation (SkeletonDataAsset skeletonDataAsset, string skinName) {
+		public static SkeletonAnimation InstantiateSkeletonAnimation (SkeletonDataAsset skeletonDataAsset, string skinName, bool destroyInvalid = true) {
 			var skeletonData = skeletonDataAsset.GetSkeletonData(true);
 			var skin = skeletonData != null ? skeletonData.FindSkin(skinName) : null;
-			return InstantiateSkeletonAnimation(skeletonDataAsset, skin);
+			return InstantiateSkeletonAnimation(skeletonDataAsset, skin, destroyInvalid);
 		}
 
-		public static SkeletonAnimation InstantiateSkeletonAnimation (SkeletonDataAsset skeletonDataAsset, Skin skin = null) {
+		public static SkeletonAnimation InstantiateSkeletonAnimation (SkeletonDataAsset skeletonDataAsset, Skin skin = null, bool destroyInvalid = true) {
 			SkeletonData data = skeletonDataAsset.GetSkeletonData(true);
 
 			if (data == null) {
@@ -1017,8 +1040,10 @@ namespace Spine.Unity.Editor {
 			try {
 				newSkeletonAnimation.Initialize(false);
 			} catch (System.Exception e) {
-				Debug.LogWarning("Editor-instantiated SkeletonAnimation threw an Exception. Destroying GameObject to prevent orphaned GameObject.");
-				GameObject.DestroyImmediate(go);
+				if (destroyInvalid) {
+					Debug.LogWarning("Editor-instantiated SkeletonAnimation threw an Exception. Destroying GameObject to prevent orphaned GameObject.");
+					GameObject.DestroyImmediate(go);
+				}
 				throw e;
 			}
 

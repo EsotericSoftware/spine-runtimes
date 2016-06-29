@@ -564,7 +564,7 @@ namespace Spine.Unity.Editor {
 			slot.Bone.UpdateWorldTransform();
 
 			Vector2[] uvs = ExtractUV(attachment.UVs);
-			float[] floatVerts = new float[attachment.Vertices.Length];
+			float[] floatVerts = new float[attachment.WorldVerticesLength];
 			attachment.ComputeWorldVertices(slot, floatVerts);
 			Vector3[] verts = ExtractVerts(floatVerts);
 
@@ -628,7 +628,7 @@ namespace Spine.Unity.Editor {
 			Skeleton skeleton = new Skeleton(skeletonData);
 			skeleton.UpdateWorldTransform();
 
-			float[] floatVerts = new float[attachment.UVs.Length];
+			float[] floatVerts = new float[attachment.WorldVerticesLength];
 			attachment.ComputeWorldVertices(skeleton.Slots.Items[slotIndex], floatVerts);
 
 			Vector2[] uvs = ExtractUV(attachment.UVs);
