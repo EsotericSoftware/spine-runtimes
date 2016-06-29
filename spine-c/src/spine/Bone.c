@@ -116,10 +116,10 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 			do {
 				cosine = COS_DEG(parent->appliedRotation); sine = SIN_DEG(parent->appliedRotation);
 				temp = pa * cosine + pb * sine;
-				pb = pa * -sine + pb * cosine;
+				pb = pb * cosine - pa * sine;
 				pa = temp;
 				temp = pc * cosine + pd * sine;
-				pd = pc * -sine + pd * cosine;
+				pd = pd * cosine - pc * sine;
 				pc = temp;
 
 				if (!parent->data->inheritRotation) break;

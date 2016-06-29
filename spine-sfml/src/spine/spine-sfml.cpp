@@ -176,7 +176,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 
 		} else if (attachment->type == ATTACHMENT_MESH) {
 			MeshAttachment* mesh = (MeshAttachment*)attachment;
-			if (mesh->worldVerticesCount > SPINE_MESH_VERTEX_COUNT_MAX) continue;
+			if (mesh->super.worldVerticesLength > SPINE_MESH_VERTEX_COUNT_MAX) continue;
 			texture = (Texture*)((AtlasRegion*)mesh->rendererObject)->page->rendererObject;
 			MeshAttachment_computeWorldVertices(mesh, slot, worldVertices);
 

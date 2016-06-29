@@ -72,11 +72,11 @@ void spIkConstraint_apply1 (spBone* bone, float targetX, float targetY, float al
 	float id = 1 / (pp->a * pp->d - pp->b * pp->c);
 	float x = targetX - pp->worldX, y = targetY - pp->worldY;
 	float tx = (x * pp->d - y * pp->b) * id - bone->x, ty = (y * pp->a - x * pp->c) * id - bone->y;
-	float rotationIK = ATAN2(ty, tx) * RAD_DEG - bone->shearX;
+	float rotationIK = ATAN2(ty, tx) * RAD_DEG - bone->shearX - bone->rotation;
 	if (bone->scaleX < 0) rotationIK += 180;
 	if (rotationIK > 180) rotationIK -= 360;
 	else if (rotationIK < -180) rotationIK += 360;
-	spBone_updateWorldTransformWith(bone, bone->x, bone->y, bone->rotation + (rotationIK - bone->rotation) * alpha, bone->scaleX,
+	spBone_updateWorldTransformWith(bone, bone->x, bone->y, bone->rotation + rotationIK * alpha, bone->scaleX,
 		bone->scaleY, bone->shearX, bone->shearY);
 }
 

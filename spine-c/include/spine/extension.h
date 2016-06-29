@@ -82,6 +82,8 @@
 #define ACOS(A) (float)acos(A)
 #endif
 
+#define CLAMP(x, min, max) (x < min ? min : (x > max ? max : x))
+
 #define UNUSED(x) (void)(x)
 
 #include <stdlib.h>
@@ -95,6 +97,7 @@
 #include <spine/RegionAttachment.h>
 #include <spine/MeshAttachment.h>
 #include <spine/BoundingBoxAttachment.h>
+#include <spine/PathAttachment.h>
 #include <spine/AnimationState.h>
 
 #ifdef __cplusplus

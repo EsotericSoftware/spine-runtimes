@@ -79,6 +79,8 @@ spAttachment* _spAtlasAttachmentLoader_createAttachment (spAttachmentLoader* loa
 	}
 	case SP_ATTACHMENT_BOUNDING_BOX:
 		return SUPER(SUPER(spBoundingBoxAttachment_create(name)));
+	case SP_ATTACHMENT_PATH:
+		return SUPER(SUPER(spPathAttachment_create(name)));
 	default:
 		_spAttachmentLoader_setUnknownTypeError(loader, type);
 		return 0;

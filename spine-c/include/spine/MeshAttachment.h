@@ -44,21 +44,6 @@ extern "C" {
 typedef struct spMeshAttachment spMeshAttachment;
 struct spMeshAttachment {
 	spVertexAttachment super;
-	const char* path;
-
-	int worldVerticesCount;
-	int hullLength;
-
-	float* regionUVs;
-	float* uvs;
-
-	int trianglesCount;
-	unsigned short* triangles;
-
-	spMeshAttachment* const parentMesh;
-	int/*bool*/inheritDeform;
-
-	float r, g, b, a;
 
 	void* rendererObject;
 	int regionOffsetX, regionOffsetY; /* Pixels stripped from the bottom left, unrotated. */
@@ -66,6 +51,21 @@ struct spMeshAttachment {
 	int regionOriginalWidth, regionOriginalHeight; /* Unrotated, unstripped pixel size. */
 	float regionU, regionV, regionU2, regionV2;
 	int/*bool*/regionRotate;
+
+	const char* path;
+
+	float* regionUVs;
+	float* uvs;
+
+	int trianglesCount;
+	unsigned short* triangles;
+
+	float r, g, b, a;
+
+	int hullLength;
+
+	spMeshAttachment* const parentMesh;
+	int/*bool*/inheritDeform;
 
 	/* Nonessential. */
 	int edgesCount;
