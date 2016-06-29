@@ -54,8 +54,7 @@
 	{ "name": "goggles", "bone": "head", "attachment": "goggles" },
 	{ "name": "front_bracer", "bone": "front_bracer", "attachment": "front_bracer" },
 	{ "name": "front_fist", "bone": "front_fist", "attachment": "front_fist_closed" },
-	{ "name": "muzzle", "bone": "gunTip", "additive": true },
-	{ "name": "head-bb", "bone": "head", "attachment": "head" }
+	{ "name": "muzzle", "bone": "gunTip", "additive": true }
 ],
 "skins": {
 	"default": {
@@ -92,12 +91,6 @@
 		},
 		"head": {
 			"head": { "x": 128.95, "y": 0.29, "rotation": -70.63, "width": 271, "height": 298 }
-		},
-		"head-bb": {
-			"head": {
-				"type": "boundingbox",
-				"vertices": [ -19.143097, -70.30209, 40.80313, -118.074234, 257.77155, -115.61827, 285.16193, 57.18005, 120.77191, 164.95125, -5.067627, 76.94907 ]
-			}
 		},
 		"mouth": {
 			"mouth_grind": { "x": 23.68, "y": -32.23, "rotation": -70.63, "width": 93, "height": 59 },
