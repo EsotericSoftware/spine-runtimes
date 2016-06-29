@@ -91,9 +91,9 @@
 #include <spine/Animation.h>
 #include <spine/Atlas.h>
 #include <spine/AttachmentLoader.h>
+#include <spine/VertexAttachment.h>
 #include <spine/RegionAttachment.h>
 #include <spine/MeshAttachment.h>
-#include <spine/WeightedMeshAttachment.h>
 #include <spine/BoundingBoxAttachment.h>
 #include <spine/AnimationState.h>
 
@@ -178,10 +178,12 @@ void _spAttachmentLoader_setUnknownTypeError (spAttachmentLoader* self, spAttach
 void _spAttachment_init (spAttachment* self, const char* name, spAttachmentType type,
 void (*dispose) (spAttachment* self));
 void _spAttachment_deinit (spAttachment* self);
+void _spVertexAttachment_deinit (spVertexAttachment* self);
 
 #ifdef SPINE_SHORT_NAMES
 #define _Attachment_init(...) _spAttachment_init(__VA_ARGS__)
 #define _Attachment_deinit(...) _spAttachment_deinit(__VA_ARGS__)
+#define _VertexAttachment_deinit(...) _spVertexAttachment_deinit(__VA_ARGS__)
 #endif
 
 /**/

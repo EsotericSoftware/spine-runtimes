@@ -94,7 +94,7 @@ typedef enum {
 	SP_TIMELINE_ATTACHMENT,
 	SP_TIMELINE_EVENT,
 	SP_TIMELINE_DRAWORDER,
-	SP_TIMELINE_FFD,
+	SP_TIMELINE_DEFORM,
 	SP_TIMELINE_IKCONSTRAINT,
 	SP_TIMELINE_TRANSFORMCONSTRAINT
 } spTimelineType;
@@ -179,6 +179,8 @@ typedef struct spBaseTimeline {
 
 /**/
 
+static const int ROTATE_ENTRIES = 2;
+
 typedef struct spBaseTimeline spRotateTimeline;
 
 spRotateTimeline* spRotateTimeline_create (int framesCount);
@@ -192,6 +194,8 @@ typedef spRotateTimeline RotateTimeline;
 #endif
 
 /**/
+
+static const int TRANSLATE_ENTRIES = 3;
 
 typedef struct spBaseTimeline spTranslateTimeline;
 
@@ -352,7 +356,7 @@ typedef spDrawOrderTimeline DrawOrderTimeline;
 
 /**/
 
-typedef struct spFFDTimeline {
+typedef struct spDeformTimeline {
 	spCurveTimeline super;
 	int const framesCount;
 	float* const frames; /* time, ... */
@@ -362,7 +366,7 @@ typedef struct spFFDTimeline {
 	spAttachment* attachment;
 
 #ifdef __cplusplus
-	spFFDTimeline() :
+	spDeformTimeline() :
 		super(),
 		framesCount(0),
 		frames(0),
@@ -371,19 +375,21 @@ typedef struct spFFDTimeline {
 		slotIndex(0) {
 	}
 #endif
-} spFFDTimeline;
+} spDeformTimeline;
 
-spFFDTimeline* spFFDTimeline_create (int framesCount, int frameVerticesCount);
+spDeformTimeline* spDeformTimeline_create (int framesCount, int frameVerticesCount);
 
-void spFFDTimeline_setFrame (spFFDTimeline* self, int frameIndex, float time, float* vertices);
+void spDeformTimeline_setFrame (spDeformTimeline* self, int frameIndex, float time, float* vertices);
 
 #ifdef SPINE_SHORT_NAMES
-typedef spFFDTimeline FFDTimeline;
-#define FFDTimeline_create(...) spFFDTimeline_create(__VA_ARGS__)
-#define FFDTimeline_setFrame(...) spFFDTimeline_setFrame(__VA_ARGS__)
+typedef spDeformTimeline DeformTimeline;
+#define DeformTimeline_create(...) spDeformTimeline_create(__VA_ARGS__)
+#define DeformTimeline_setFrame(...) spDeformTimeline_setFrame(__VA_ARGS__)
 #endif
 
 /**/
+
+static const int IKCONSTRAINT_ENTRIES = 3;
 
 typedef struct spIkConstraintTimeline {
 	spCurveTimeline super;
@@ -413,10 +419,12 @@ typedef spIkConstraintTimeline IkConstraintTimeline;
 
 /**/
 
+static const int TRANSFORMCONSTRAINT_ENTRIES = 5;
+
 typedef struct spTransformConstraintTimeline {
 	spCurveTimeline super;
 	int const framesCount;
-	float* const frames; /* time, mix, bendDirection, ... */
+	float* const frames; /* time, rotate mix, translate mix, scale mix, shear mix, ... */
 	int transformConstraintIndex;
 
 #ifdef __cplusplus
