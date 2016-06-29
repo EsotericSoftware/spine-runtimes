@@ -264,9 +264,9 @@ namespace Spine {
 				Skin skin = linkedMesh.skin == null ? skeletonData.defaultSkin : skeletonData.FindSkin(linkedMesh.skin);
 				if (skin == null) throw new Exception("Slot not found: " + linkedMesh.skin);
 				Attachment parent = skin.GetAttachment(linkedMesh.slotIndex, linkedMesh.parent);
-				if (parent == null) throw new Exception("Parent mesh not found: " + linkedMesh.parent);				
+				if (parent == null) throw new Exception("Parent mesh not found: " + linkedMesh.parent);
 				linkedMesh.mesh.ParentMesh = (MeshAttachment)parent;
-				linkedMesh.mesh.UpdateUVs();				
+				linkedMesh.mesh.UpdateUVs();
 			}
 			linkedMeshes.Clear();
 
@@ -408,7 +408,7 @@ namespace Spine {
 				return;
 			}
 			ExposedList<float> weights = new ExposedList<float>(verticesLength * 3 * 3);
-			ExposedList<int> bones = new ExposedList<int>(verticesLength * 3);		
+			ExposedList<int> bones = new ExposedList<int>(verticesLength * 3);
 			for (int i = 0, n = vertices.Length; i < n;) {
 				int boneCount = (int)vertices[i++];
 				bones.Add(boneCount);
@@ -485,7 +485,7 @@ namespace Spine {
 							timeline.boneIndex = boneIndex;
 
 							int frameIndex = 0;
-							foreach (Dictionary<String, Object> valueMap in values) {								
+							foreach (Dictionary<String, Object> valueMap in values) {
 								timeline.SetFrame(frameIndex, (float)valueMap["time"], (float)valueMap["angle"]);
 								ReadCurve(valueMap, timeline, frameIndex);
 								frameIndex++;
@@ -572,7 +572,7 @@ namespace Spine {
 			if (map.ContainsKey("paths")) {
 				foreach (KeyValuePair<String, Object> constraintMap in (Dictionary<String, Object>)map["paths"]) {
 					int index = skeletonData.FindPathConstraintIndex(constraintMap.Key);
-                    if (index == -1) throw new Exception("Path constraint not found: " + constraintMap.Key);
+					if (index == -1) throw new Exception("Path constraint not found: " + constraintMap.Key);
 					PathConstraintData data = skeletonData.pathConstraints.Items[index];
 					var timelineMap = (Dictionary<String, Object>)constraintMap.Value;
 					foreach (KeyValuePair<String, Object> timelineEntry in timelineMap) {
@@ -636,11 +636,11 @@ namespace Spine {
 							
 							int frameIndex = 0;
 							foreach (Dictionary<String, Object> valueMap in values) {
-								float[] deform;                                
+								float[] deform;
 								if (!valueMap.ContainsKey("vertices")) {
 									deform = weighted ? new float[deformLength] : vertices;
-								} else {                                    
-									deform = new float[deformLength];																		
+								} else {
+									deform = new float[deformLength];
 									int start = GetInt(valueMap, "offset", 0);
 									float[] verticesValue = GetFloatArray(valueMap, "vertices", 1);
 									Array.Copy(verticesValue, 0, deform, start, verticesValue.Length);
@@ -652,7 +652,7 @@ namespace Spine {
 									if (!weighted) {
 										for (int i = 0; i < deformLength; i++)
 											deform[i] += vertices[i];
-									}									
+									}
 								}
 
 								timeline.SetFrame(frameIndex, (float)valueMap["time"], deform);
