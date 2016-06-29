@@ -252,7 +252,8 @@ namespace Spine {
 			return skeletonData;
 		}
 
-		/** @return May be null. */
+
+		/// <returns>May be null.</returns>
 		private Skin ReadSkin (Stream input, String skinName, bool nonessential) {
 			int slotCount = ReadVarint(input, true);
 			if (slotCount == 0) return null;
@@ -307,7 +308,7 @@ namespace Spine {
 			case AttachmentType.Boundingbox: {
 					int vertexCount = ReadVarint(input, true);
 					Vertices vertices = ReadVertices(input, vertexCount);
-					int color = nonessential ? ReadInt(input) : 0;
+					if (nonessential) ReadInt(input); //int color = nonessential ? ReadInt(input) : 0; // Avoid unused local warning.
 					
 					BoundingBoxAttachment box = attachmentLoader.NewBoundingBoxAttachment(skin, name);
 					if (box == null) return null;
@@ -390,7 +391,7 @@ namespace Spine {
 					float[] lengths = new float[vertexCount / 3];
 					for (int i = 0, n = lengths.Length; i < n; i++)
 						lengths[i] = ReadFloat(input) * scale;
-					int color = nonessential ? ReadInt(input) : 0;
+					if (nonessential) ReadInt(input); //int color = nonessential ? ReadInt(input) : 0; // Avoid unused local warning.
 
 					PathAttachment path = attachmentLoader.NewPathAttachment(skin, name);
 					if (path == null) return null;

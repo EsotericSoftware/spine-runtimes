@@ -195,9 +195,9 @@ namespace Spine {
 					data.offsetRotation = GetFloat(constraintMap, "rotation", 0);
 					data.offsetX = GetFloat(constraintMap, "x", 0) * scale;
 					data.offsetY = GetFloat(constraintMap, "y", 0) * scale;
-					data.offsetScaleX = GetFloat(constraintMap, "scaleX", 0) * scale;
-					data.offsetScaleY = GetFloat(constraintMap, "scaleY", 0) * scale;
-					data.offsetShearY = GetFloat(constraintMap, "shearY", 0) * scale;
+					data.offsetScaleX = GetFloat(constraintMap, "scaleX", 0);
+					data.offsetScaleY = GetFloat(constraintMap, "scaleY", 0);
+					data.offsetShearY = GetFloat(constraintMap, "shearY", 0);
 
 					data.rotateMix = GetFloat(constraintMap, "rotateMix", 1);
 					data.translateMix = GetFloat(constraintMap, "translateMix", 1);
@@ -223,9 +223,9 @@ namespace Spine {
 					data.target = skeletonData.FindSlot(targetName);
 					if (data.target == null) throw new Exception("Target slot not found: " + targetName);
 
-					data.positionMode = (PositionMode)Enum.Parse(typeof(PositionMode), GetString(constraintMap, "positionMode", "percent"), false);
-					data.spacingMode = (SpacingMode)Enum.Parse(typeof(SpacingMode), GetString(constraintMap, "spacingMode", "length"), false);
-					data.rotateMode = (RotateMode)Enum.Parse(typeof(RotateMode), GetString(constraintMap, "rotateMode", "tangent"), false);
+					data.positionMode = (PositionMode)Enum.Parse(typeof(PositionMode), GetString(constraintMap, "positionMode", "percent"), true);
+					data.spacingMode = (SpacingMode)Enum.Parse(typeof(SpacingMode), GetString(constraintMap, "spacingMode", "length"), true);
+					data.rotateMode = (RotateMode)Enum.Parse(typeof(RotateMode), GetString(constraintMap, "rotateMode", "tangent"), true);
 					data.offsetRotation = GetFloat(constraintMap, "rotation", 0);
 					data.position = GetFloat(constraintMap, "position", 0);
 					if (data.positionMode == PositionMode.Fixed) data.position *= scale;
@@ -309,10 +309,10 @@ namespace Spine {
 			var typeName = GetString(map, "type", "region");
 			if (typeName == "skinnedmesh") typeName = "weightedmesh";
 			if (typeName == "weightedmesh") typeName = "mesh";
-			if (typeName == "weightedlinkedmesh")typeName = "linkedmesh";
+			if (typeName == "weightedlinkedmesh") typeName = "linkedmesh";
 			var type = (AttachmentType)Enum.Parse(typeof(AttachmentType), typeName, true);
 
-			 String path = GetString(map, "path", name);
+			String path = GetString(map, "path", name);
 
 			switch (type) {
 			case AttachmentType.Region:
@@ -357,8 +357,8 @@ namespace Spine {
 						mesh.a = ToColor(color, 3);
 					}
 
-					mesh.Width = GetInt(map, "width", 0) * scale;
-					mesh.Height = GetInt(map, "height", 0) * scale;
+					mesh.Width = GetFloat(map, "width", 0) * scale;
+					mesh.Height = GetFloat(map, "height", 0) * scale;
 
 					String parent = GetString(map, "parent", null);
 					if (parent != null) {
@@ -511,7 +511,7 @@ namespace Spine {
 								float time = (float)valueMap["time"];
 								float x = GetFloat(valueMap, "x", 0);
 								float y = GetFloat(valueMap, "y", 0);
-								timeline.SetFrame(frameIndex, time, (float)x * timelineScale, (float)y * timelineScale);
+								timeline.SetFrame(frameIndex, time, x * timelineScale, y * timelineScale);
 								ReadCurve(valueMap, timeline, frameIndex);
 								frameIndex++;
 							}
@@ -732,9 +732,10 @@ namespace Spine {
 			Object curveObject = valueMap["curve"];
 			if (curveObject.Equals("stepped"))
 				timeline.SetStepped(frameIndex);
-			else if (curveObject is List<Object>) {
-				var curve = (List<Object>)curveObject;
-				timeline.SetCurve(frameIndex, (float)curve[0], (float)curve[1], (float)curve[2], (float)curve[3]);
+			else {
+				var curve = curveObject as List<Object>;
+				if (curve != null)
+					timeline.SetCurve(frameIndex, (float)curve[0], (float)curve[1], (float)curve[2], (float)curve[3]);
 			}
 		}
 
@@ -751,24 +752,20 @@ namespace Spine {
 			}
 		}
 
-		private float[] GetFloatArray(Dictionary<String, Object> map, String name, float scale)
-		{
+		static float[] GetFloatArray(Dictionary<String, Object> map, String name, float scale) {
 			var list = (List<Object>)map[name];
 			var values = new float[list.Count];
-			if (scale == 1)
-			{
+			if (scale == 1) {
 				for (int i = 0, n = list.Count; i < n; i++)
 					values[i] = (float)list[i];
-			}
-			else {
+			} else {
 				for (int i = 0, n = list.Count; i < n; i++)
 					values[i] = (float)list[i] * scale;
 			}
 			return values;
 		}
 
-		private int[] GetIntArray(Dictionary<String, Object> map, String name)
-		{
+		static int[] GetIntArray(Dictionary<String, Object> map, String name) {
 			var list = (List<Object>)map[name];
 			var values = new int[list.Count];
 			for (int i = 0, n = list.Count; i < n; i++)
@@ -776,38 +773,33 @@ namespace Spine {
 			return values;
 		}
 
-		private float GetFloat(Dictionary<String, Object> map, String name, float defaultValue)
-		{
+		static float GetFloat(Dictionary<String, Object> map, String name, float defaultValue) {
 			if (!map.ContainsKey(name))
 				return defaultValue;
 			return (float)map[name];
 		}
 
-		private int GetInt(Dictionary<String, Object> map, String name, int defaultValue)
-		{
+		static int GetInt(Dictionary<String, Object> map, String name, int defaultValue) {
 			if (!map.ContainsKey(name))
 				return defaultValue;
 			return (int)(float)map[name];
 		}
 
-		private bool GetBoolean(Dictionary<String, Object> map, String name, bool defaultValue)
-		{
+		static bool GetBoolean(Dictionary<String, Object> map, String name, bool defaultValue) {
 			if (!map.ContainsKey(name))
 				return defaultValue;
 			return (bool)map[name];
 		}
 
-		private String GetString(Dictionary<String, Object> map, String name, String defaultValue)
-		{
+		static String GetString(Dictionary<String, Object> map, String name, String defaultValue) {
 			if (!map.ContainsKey(name))
 				return defaultValue;
 			return (String)map[name];
 		}
 
-		private float ToColor(String hexString, int colorIndex)
-		{
+		static float ToColor(String hexString, int colorIndex) {
 			if (hexString.Length != 8)
-				throw new ArgumentException("Color hexidecimal length must be 8, recieved: " + hexString);
+				throw new ArgumentException("Color hexidecimal length must be 8, recieved: " + hexString, "hexString");
 			return Convert.ToInt32(hexString.Substring(colorIndex * 2, 2), 16) / (float)255;
 		}
 	}
