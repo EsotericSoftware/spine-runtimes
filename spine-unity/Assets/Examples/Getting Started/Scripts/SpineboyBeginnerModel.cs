@@ -50,9 +50,27 @@ public class SpineboyBeginnerModel : MonoBehaviour {
 	IEnumerator JumpRoutine () {
 		if (state == SpineBeginnerBodyState.Jumping) yield break;	// Don't jump when already jumping.
 
-		// Fake jumping.
 		state = SpineBeginnerBodyState.Jumping;
-		yield return new WaitForSeconds(1.2f); 
+
+		// Terribly-coded Fake jumping.
+		{
+			var pos = transform.localPosition;
+			const float jumpTime = 1.2f;
+			const float half = jumpTime * 0.5f;
+			const float jumpPower = 20f;
+			for (float t = 0; t < half; t += Time.deltaTime) {
+				float d = jumpPower * (half - t);
+				transform.Translate((d * Time.deltaTime) * Vector3.up);
+				yield return null;
+			}
+			for (float t = 0; t < half; t += Time.deltaTime) {
+				float d = jumpPower * t;
+				transform.Translate((d * Time.deltaTime) * Vector3.down);
+				yield return null;
+			}
+			transform.localPosition = pos;
+		}
+
 		state = SpineBeginnerBodyState.Idle;
 	}
 
