@@ -111,7 +111,7 @@ void spTimeline_apply (const spTimeline* self, spSkeleton* skeleton, float lastT
 /**/
 
 static const float CURVE_LINEAR = 0, CURVE_STEPPED = 1, CURVE_BEZIER = 2;
-static const int BEZIER_SEGMENTS = 10, BEZIER_SIZE = 10 * 2 - 1;
+static const int BEZIER_SIZE = 10 * 2 - 1;
 
 void _spCurveTimeline_init (spCurveTimeline* self, spTimelineType type, int framesCount, /**/
 void (*dispose) (spTimeline* self), /**/
@@ -858,8 +858,8 @@ spIkConstraintTimeline* spIkConstraintTimeline_create (int framesCount) {
 void spIkConstraintTimeline_setFrame (spIkConstraintTimeline* self, int frameIndex, float time, float mix, int bendDirection) {
 	frameIndex *= IKCONSTRAINT_ENTRIES;
 	self->frames[frameIndex] = time;
-	self->frames[frameIndex + 1] = mix;
-	self->frames[frameIndex + 2] = (float)bendDirection;
+	self->frames[frameIndex + IKCONSTRAINT_MIX] = mix;
+	self->frames[frameIndex + IKCONSTRAINT_BEND_DIRECTION] = (float)bendDirection;
 }
 
 /**/
