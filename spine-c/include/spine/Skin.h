@@ -64,6 +64,9 @@ const char* spSkin_getAttachmentName (const spSkin* self, int slotIndex, int att
 /** Attach each attachment in this skin if the corresponding attachment in oldSkin is currently attached. */
 void spSkin_attachAll (const spSkin* self, struct spSkeleton* skeleton, const spSkin* oldspSkin);
 
+/** Calls the provided function for each attachment in the skin. Stops iterating if the function returns 0. **/
+void spSKin_iterate(const spSkin* self, int iter(int slotIndex, const char* name, spAttachment* attachment));
+
 #ifdef SPINE_SHORT_NAMES
 typedef spSkin Skin;
 #define Skin_create(...) spSkin_create(__VA_ARGS__)

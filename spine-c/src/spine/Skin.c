@@ -118,3 +118,11 @@ void spSkin_attachAll (const spSkin* self, spSkeleton* skeleton, const spSkin* o
 		entry = entry->next;
 	}
 }
+
+void spSKin_iterate(const spSkin* self, int/*bool*/ iter(int, const char*, spAttachment*)) {
+	const _Entry *entry = SUB_CAST(_spSkin, self)->entries;
+	while (entry) {
+		if(!iter(entry->slotIndex, entry->name, entry->attachment)) return;
+		entry = entry->next;
+	}
+}
