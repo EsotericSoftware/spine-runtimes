@@ -99,11 +99,6 @@ spSkeleton* spSkeleton_create (spSkeletonData* data) {
 	self->drawOrder = MALLOC(spSlot*, self->slotsCount);
 	memcpy(self->drawOrder, self->slots, sizeof(spSlot*) * self->slotsCount);
 
-	self->r = 1;
-	self->g = 1;
-	self->b = 1;
-	self->a = 1;
-
 	self->ikConstraintsCount = data->ikConstraintsCount;
 	self->ikConstraints = MALLOC(spIkConstraint*, self->ikConstraintsCount);
 	self->ikConstraintsSorted = MALLOC(spIkConstraint*, self->ikConstraintsCount);
@@ -114,6 +109,8 @@ spSkeleton* spSkeleton_create (spSkeletonData* data) {
 	self->transformConstraints = MALLOC(spTransformConstraint*, self->transformConstraintsCount);
 	for (i = 0; i < self->data->transformConstraintsCount; ++i)
 		self->transformConstraints[i] = spTransformConstraint_create(self->data->transformConstraints[i], self);
+
+	self->r = 1; self->g = 1; self->b = 1; self->a = 1;
 
 	spSkeleton_updateCache(self);
 
