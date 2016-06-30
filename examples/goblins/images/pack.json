@@ -1,0 +1,10 @@
+{
+	pot: true,
+	paddingX: 2,
+	paddingY: 2,
+	duplicatePadding: false,
+	filterMin: Linear,
+	filterMag: Linear,
+	combineSubdirectories: true,
+	rotation: true,
+}
