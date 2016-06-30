@@ -82,6 +82,8 @@ void spMeshAttachment_computeWorldVertices (spMeshAttachment* self, spSlot* slot
 void spMeshAttachment_setParentMesh (spMeshAttachment* self, spMeshAttachment* parentMesh) {
 	CONST_CAST(spMeshAttachment*, self->parentMesh) = parentMesh;
 	if (parentMesh) {
+		self->super.worldVerticesLength = parentMesh->super.worldVerticesLength;
+
 		self->super.bones = parentMesh->super.bones;
 		self->super.bonesCount = parentMesh->super.bonesCount;
 
