@@ -14,7 +14,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-js works with data exported from Spine 3.1.08. Updating spine-js to [v3.2](https://trello.com/c/k7KtGdPW/76-update-runtimes-to-support-v3-2-shearing) is in progress.
+spine-js works with data exported from Spine 3.1.08. Updating spine-js to [v3.2](https://github.com/EsotericSoftware/spine-runtimes/issues/586) and [v3.3](https://github.com/EsotericSoftware/spine-runtimes/issues/613) is in progress.
 
 spine-js supports all Spine features. spine-canvas does not support color tinting, mesh attachments, or nonuniform scaling.
 

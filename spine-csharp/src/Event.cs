@@ -40,6 +40,7 @@ namespace Spine {
 		public float Time { get; private set; }
 
 		public Event (float time, EventData data) {
+			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
 			Time = time;
 			Data = data;
 		}

@@ -47,7 +47,7 @@ namespace Spine {
 		public float Mix { get { return mix; } set { mix = value; } }
 
 		public IkConstraintData (String name) {
-			if (name == null) throw new ArgumentNullException("name cannot be null.");
+			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
 			this.name = name;
 		}
 

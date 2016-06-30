@@ -32,11 +32,13 @@ namespace Spine.Unity.Modules {
 
 		[Header("Parameters")]
 		public bool applyOnStart;
+		[Tooltip("Warning!  You will have to re-enable and tune mix values manually if attempting to remove the ragdoll system.")]
+		public bool disableIK = true;
+		public bool disableOtherConstraints = false;
+		[Space]
 		[Tooltip("Set RootRigidbody IsKinematic to true when Apply is called.")]
 		public bool pinStartBone;
 		public float gravityScale = 1;
-		[Tooltip("Warning!  You will have to re-enable and tune mix values manually if attempting to remove the ragdoll system.")]
-		public bool disableIK = true;
 		[Tooltip("If no BoundingBox Attachment is attached to a bone, this becomes the default Width or Radius of a Bone's ragdoll Rigidbody")]
 		public float thickness = 0.125f;
 		[Tooltip("Default rotational limit value.  Min is negative this value, Max is this value.")]
@@ -62,7 +64,6 @@ namespace Spine.Unity.Modules {
 		public Vector3 RootOffset { get { return this.rootOffset; } }
 		bool isActive;
 		public bool IsActive { get { return this.isActive; } }
-//		public Transform skeletonSpaceTransform;
 
 		IEnumerator Start () {
 			if (parentSpaceHelper == null) {
@@ -129,10 +130,6 @@ namespace Spine.Unity.Modules {
 				Transform parentTransform;
 				boneColliders.Add(t.GetComponent<Collider2D>());
 				if (b == startingBone) {
-//					skeletonSpaceTransform = new GameObject("Spine World Space Transform").transform;
-//					skeletonSpaceTransform.hideFlags = HideFlags.NotEditable;
-//					skeletonSpaceTransform.localScale = FlipScale(skeleton.flipX, skeleton.flipY);
-//					skeletonSpaceTransform.SetParent(this.transform, false);
 					ragdollRoot = new GameObject("RagdollRoot").transform;
 					ragdollRoot.SetParent(transform, false);
 					if (b == skeleton.RootBone) { // RagdollRoot is skeleton root.
@@ -194,11 +191,30 @@ namespace Spine.Unity.Modules {
 					Debug.LogWarning(msg);
 				}
 			}
-			// Disable IK constraints.
+
+			// Disable skeleton constraints.
 			if (disableIK) {
-				foreach (IkConstraint ik in skeleton.IkConstraints)
-					ik.Mix = 0;
+				var ikConstraints = skeleton.IkConstraints;
+				for (int i = 0, n = ikConstraints.Count; i < n; i++)
+					ikConstraints.Items[i].mix = 0;
 			}
+
+			if (disableOtherConstraints) {
+				var transformConstraints = skeleton.transformConstraints;
+				for (int i = 0, n = transformConstraints.Count; i < n; i++) {
+					transformConstraints.Items[i].rotateMix = 0;
+					transformConstraints.Items[i].scaleMix = 0;
+					transformConstraints.Items[i].shearMix = 0;
+					transformConstraints.Items[i].translateMix = 0;
+				}
+
+				var pathConstraints = skeleton.pathConstraints;
+				for (int i = 0, n = pathConstraints.Count; i < n; i++) {
+					pathConstraints.Items[i].rotateMix = 0;
+					pathConstraints.Items[i].translateMix = 0;
+				}
+			}
+
 			targetSkeletonComponent.UpdateWorld += UpdateSpineSkeleton;
 		}
 
@@ -222,11 +238,12 @@ namespace Spine.Unity.Modules {
 				Debug.LogWarning("Can't call SetSkeletonPosition while Ragdoll is not active!");
 				return;
 			}
+
 			Vector3 offset = worldPosition - transform.position;
 			transform.position = worldPosition;
-			foreach (Transform t in boneTable.Values) {
+			foreach (Transform t in boneTable.Values)
 				t.position -= offset;
-			}
+
 			UpdateSpineSkeleton(null);
 			skeleton.UpdateWorldTransform();
 		}
@@ -234,9 +251,9 @@ namespace Spine.Unity.Modules {
 		/// <summary>Removes the ragdoll instance and effect from the animated skeleton.</summary>
 		public void Remove () {
 			isActive = false;
-			foreach (var t in boneTable.Values) {
+			foreach (var t in boneTable.Values)
 				Destroy(t.gameObject);
-			}
+
 			Destroy(ragdollRoot.gameObject);
 			boneTable.Clear();
 			targetSkeletonComponent.UpdateWorld -= UpdateSpineSkeleton;
@@ -261,7 +278,7 @@ namespace Spine.Unity.Modules {
 
 			t.parent = transform;
 			t.localPosition = new Vector3(b.WorldX, b.WorldY, 0);
-			t.localRotation = Quaternion.Euler(0, 0, b.WorldRotationX);
+			t.localRotation = Quaternion.Euler(0, 0, b.WorldRotationX - b.shearX);
 			t.localScale = new Vector3(b.WorldScaleX, b.WorldScaleY, 0);
 
 			// MITCH: You left "todo: proper ragdoll branching"
@@ -284,9 +301,8 @@ namespace Spine.Unity.Modules {
 			rb.isKinematic = spawnKinematic;
 			#endif
 
-			foreach (Bone child in b.Children) {
+			foreach (Bone child in b.Children)
 				RecursivelyCreateBoneProxies(child);
-			}
 		}
 
 		/// <summary>Performed every skeleton animation update to translate Unity Transforms positions into Spine bone transforms.</summary>
@@ -337,19 +353,6 @@ namespace Spine.Unity.Modules {
 				b.y = Mathf.Lerp(b.y, boneLocalPosition.y, mix);
 				b.rotation = Mathf.Lerp(b.rotation, boneLocalRotation, mix);
 				b.appliedRotation = Mathf.Lerp(b.appliedRotation, boneLocalRotation, mix);
-
-//				Mitch Original Code:
-//				Vector3 right = parentSpaceHelper.InverseTransformDirection(t.right);
-//				float a = Mathf.Atan2(right.y, right.x) * Mathf.Rad2Deg;
-//				if (b.worldSignX ^ b.worldSignY) {
-//					a *= -1;
-//				}
-//				if (parentBone != null) {
-//					if ((b.WorldFlipX ^ b.WorldFlipY) != flip) {
-//						a -= GetCompensatedRotationIK(parentBone) * 2;
-//					}
-//				}
-//				b.Rotation = Mathf.Lerp(b.Rotation, a, mix);
 			}
 		}
 

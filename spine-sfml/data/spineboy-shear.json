@@ -1,0 +1,183 @@
+{
+"skeleton": { "hash": "8JOt0KF63FuqjG/j+ncweKjt3Vc", "spine": "9.0.01", "width": 505.42, "height": 723.02, "images": "./images/" },
+"bones": [
+	{ "name": "root" },
+	{ "name": "hip", "parent": "root", "length": 338.72, "y": 247.47 },
+	{ "name": "shoot target", "parent": "root", "rotation": 1.22, "x": 578.73, "y": 350.08, "color": "ff3f00ff" },
+	{ "name": "aimer", "parent": "hip", "length": 350.93, "rotation": 1.57, "x": -5.73, "y": 98.76 },
+	{ "name": "aiming gun target", "parent": "aimer", "rotation": 0.33, "x": 317.91, "y": -78.74, "color": "ff3f00ff" },
+	{ "name": "free gun bone", "parent": "root", "rotation": -37.23, "x": 41.13, "y": 276.2 },
+	{ "name": "torso", "parent": "hip", "length": 127.55, "rotation": 103.82, "x": -1.61, "y": 4.9, "color": "e0da19ff" },
+	{ "name": "front_upper_arm", "parent": "torso", "length": 69.45, "rotation": 168.37, "x": 103.75, "y": 19.32, "color": "00ff04ff" },
+	{
+		"name": "front_bracer",
+		"parent": "front_upper_arm",
+		"length": 40.57,
+		"rotation": 18.29,
+		"x": 68.8,
+		"y": -0.68,
+		"color": "00ff04ff"
+	},
+	{ "name": "front_fist", "parent": "front_bracer", "length": 65.38, "rotation": 29.28, "x": 40.56, "y": 0.19, "color": "00ff04ff" },
+	{ "name": "front_thigh", "parent": "hip", "length": 74.8, "rotation": -95.51, "x": -17.45, "y": -11.64, "color": "00ff04ff" },
+	{
+		"name": "front_shin",
+		"parent": "front_thigh",
+		"length": 128.76,
+		"rotation": -2.21,
+		"x": 78.69,
+		"y": 1.6,
+		"inheritScale": false,
+		"color": "00ff04ff"
+	},
+	{ "name": "front_foot", "parent": "front_shin", "length": 91.34, "rotation": 77.9, "x": 128.75, "y": -0.33, "color": "00ff04ff" },
+	{ "name": "rear_upper_arm", "parent": "torso", "length": 51.93, "rotation": -169.55, "x": 92.35, "y": -19.22, "color": "ff000dff" },
+	{ "name": "rear_bracer", "parent": "rear_upper_arm", "length": 34.55, "rotation": 23.15, "x": 51.35, "color": "ff000dff" },
+	{ "name": "gun", "parent": "rear_bracer", "length": 43.1, "rotation": 5.34, "x": 34.42, "y": -0.45, "color": "ff000dff" },
+	{ "name": "gunTip", "parent": "gun", "rotation": 6.83, "x": 201.03, "y": 52.12, "color": "ff000dff" },
+	{ "name": "neck", "parent": "torso", "length": 25.45, "rotation": -31.53, "x": 127.49, "y": -0.3, "color": "e0da19ff" },
+	{ "name": "head", "parent": "neck", "length": 263.57, "rotation": 23.18, "x": 27.66, "y": -0.25, "color": "e0da19ff" },
+	{ "name": "rear_thigh", "parent": "hip", "length": 85.71, "rotation": -72.54, "x": 8.91, "y": -5.62, "color": "ff000dff" },
+	{ "name": "rear_shin", "parent": "rear_thigh", "length": 121.87, "rotation": -19.83, "x": 86.1, "y": -1.32, "color": "ff000dff" },
+	{ "name": "rear_foot", "parent": "rear_shin", "length": 82.57, "rotation": 69.3, "x": 121.45, "y": -0.75, "color": "ff000dff" }
+],
+"ik": [
+	{
+		"name": "aiming constraint",
+		"bones": [ "aimer" ],
+		"target": "shoot target",
+		"mix": 0
+	},
+	{
+		"name": "aiming gun constraint",
+		"bones": [ "rear_upper_arm", "rear_bracer" ],
+		"target": "aiming gun target",
+		"mix": 0
+	}
+],
+"transform": [
+	{ "name": "gun flying", "bone": "gun", "target": "free gun bone", "rotateMix": 0, "translateMix": 0, "scaleMix": 0, "shearMix": 0 }
+],
+"slots": [
+	{ "name": "rear_upper_arm", "bone": "rear_upper_arm", "attachment": "rear_upper_arm" },
+	{ "name": "rear_bracer", "bone": "rear_bracer", "attachment": "rear_bracer" },
+	{ "name": "gun", "bone": "gun", "attachment": "gun" },
+	{ "name": "rear_foot", "bone": "rear_foot", "attachment": "rear_foot" },
+	{ "name": "rear_thigh", "bone": "rear_thigh", "attachment": "rear_thigh" },
+	{ "name": "rear_shin", "bone": "rear_shin", "attachment": "rear_shin" },
+	{ "name": "neck", "bone": "neck", "attachment": "neck" },
+	{ "name": "torso", "bone": "torso", "attachment": "torso" },
+	{ "name": "front_upper_arm", "bone": "front_upper_arm", "attachment": "front_upper_arm" },
+	{ "name": "head", "bone": "head", "attachment": "head" },
+	{ "name": "eye", "bone": "head", "attachment": "eye_indifferent" },
+	{ "name": "front_thigh", "bone": "front_thigh", "attachment": "front_thigh" },
+	{ "name": "front_foot", "bone": "front_foot", "attachment": "front_foot" },
+	{ "name": "front_shin", "bone": "front_shin", "attachment": "front_shin" },
+	{ "name": "mouth", "bone": "head", "attachment": "mouth_smile" },
+	{ "name": "goggles", "bone": "head", "attachment": "goggles" },
+	{ "name": "front_bracer", "bone": "front_bracer", "attachment": "front_bracer" },
+	{ "name": "front_fist", "bone": "front_fist", "attachment": "front_fist_closed" },
+	{ "name": "muzzle", "bone": "gunTip", "blend": "additive" },
+	{ "name": "head-bb", "bone": "head" }
+],
+"skins": {
+	"default": {
+		"eye": {
+			"eye_indifferent": { "x": 85.72, "y": -28.18, "rotation": -70.63, "width": 93, "height": 89 },
+			"eye_surprised": { "x": 85.72, "y": -28.18, "rotation": -70.63, "width": 93, "height": 89 }
+		},
+		"front_bracer": {
+			"front_bracer": { "x": 12.03, "y": -1.67, "rotation": 79.59, "width": 58, "height": 80 }
+		},
+		"front_fist": {
+			"front_fist_closed": { "x": 35.71, "y": -4.54, "rotation": 50.3, "width": 75, "height": 82 },
+			"front_fist_open": { "x": 40.11, "y": -4.04, "rotation": 50.3, "width": 86, "height": 87 }
+		},
+		"front_foot": {
+			"front_foot": { "x": 29.51, "y": 7.83, "rotation": 18.68, "width": 126, "height": 69 },
+			"front_foot_bend1": { "x": 29.51, "y": 7.83, "rotation": 18.68, "width": 128, "height": 70 },
+			"front_foot_bend2": { "x": 16.07, "y": 13.83, "rotation": 18.68, "width": 108, "height": 93 }
+		},
+		"front_shin": {
+			"front_shin": { "x": 55.11, "y": -3.54, "rotation": 96.59, "width": 82, "height": 184 }
+		},
+		"front_thigh": {
+			"front_thigh": { "x": 42.47, "y": 4.44, "rotation": 84.86, "width": 48, "height": 112 }
+		},
+		"front_upper_arm": {
+			"front_upper_arm": { "x": 28.3, "y": 7.37, "rotation": 97.89, "width": 54, "height": 97 }
+		},
+		"goggles": {
+			"goggles": { "x": 97.07, "y": 6.54, "rotation": -70.63, "width": 261, "height": 166 }
+		},
+		"gun": {
+			"gun": { "x": 77.29, "y": 16.39, "rotation": 60.82, "width": 210, "height": 203 }
+		},
+		"head": {
+			"head": { "x": 128.95, "y": 0.29, "rotation": -70.63, "width": 271, "height": 298 }
+		},
+		"head-bb": {
+			"head": {
+				"type": "boundingbox",
+				"vertexCount": 6,
+				"vertices": [ -19.14, -70.3, 40.8, -118.07, 257.77, -115.61, 285.16, 57.18, 120.77, 164.95, -5.06, 76.94 ]
+			}
+		},
+		"mouth": {
+			"mouth_grind": { "x": 23.68, "y": -32.23, "rotation": -70.63, "width": 93, "height": 59 },
+			"mouth_oooo": { "x": 23.68, "y": -32.23, "rotation": -70.63, "width": 93, "height": 59 },
+			"mouth_smile": { "x": 23.68, "y": -32.23, "rotation": -70.63, "width": 93, "height": 59 }
+		},
+		"muzzle": {
+			"muzzle": { "x": 18.25, "y": 5.44, "rotation": 0.15, "width": 462, "height": 400 }
+		},
+		"neck": {
+			"neck": { "x": 9.76, "y": -3.01, "rotation": -55.22, "width": 36, "height": 41 }
+		},
+		"rear_bracer": {
+			"rear_bracer": { "x": 11.15, "y": -2.2, "rotation": 66.17, "width": 56, "height": 72 }
+		},
+		"rear_foot": {
+			"rear_foot": { "x": 31.51, "y": 3.57, "rotation": 23.07, "width": 113, "height": 60 },
+			"rear_foot_bend1": { "x": 34.39, "y": 4.8, "rotation": 23.07, "width": 117, "height": 66 },
+			"rear_foot_bend2": { "x": 30.38, "y": 12.62, "rotation": 23.07, "width": 103, "height": 83 }
+		},
+		"rear_shin": {
+			"rear_shin": { "x": 58.29, "y": -2.75, "rotation": 92.37, "width": 75, "height": 178 }
+		},
+		"rear_thigh": {
+			"rear_thigh": { "x": 33.1, "y": -4.11, "rotation": 72.54, "width": 65, "height": 104 }
+		},
+		"rear_upper_arm": {
+			"rear_upper_arm": { "x": 21.12, "y": 4.08, "rotation": 89.32, "width": 47, "height": 87 }
+		},
+		"torso": {
+			"torso": { "x": 63.61, "y": 7.12, "rotation": -94.53, "width": 98, "height": 180 }
+		}
+	}
+},
+"events": {
+	"footstep": {},
+	"headAttach": { "int": 3, "float": 4 },
+	"headBehind": { "int": 5, "float": 6, "string": "setup" },
+	"headPop": { "int": 1, "float": 2 }
+},
+"animations": {
+	"shear": {
+		"bones": {
+			"head": {
+				"shear": [
+					{ "time": 0, "x": 0, "y": 0 },
+					{ "time": 0.5, "x": 45, "y": 0 },
+					{ "time": 1, "x": 0.59, "y": 0 }
+				]
+			}
+		},
+		"transform": {
+			"gun flying": [
+				{ "time": 0 }
+			]
+		}
+	}
+}
+}

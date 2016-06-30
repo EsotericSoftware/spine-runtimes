@@ -531,16 +531,15 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha) {
 			float[] frames = this.frames;
-			if (time < frames[0]) {
-				if (lastTime > time) apply(skeleton, lastTime, Integer.MAX_VALUE, null, 0);
-				return;
-			} else if (lastTime > time) //
-				lastTime = -1;
+			if (time < frames[0]) return; // Time is before first frame.
 
-			int frame = (time >= frames[frames.length - 1] ? frames.length : binarySearch(frames, time)) - 1;
-			if (frames[frame] < lastTime) return;
+			int frameIndex;
+			if (time >= frames[frames.length - 1]) // Time is after last frame.
+				frameIndex = frames.length - 1;
+			else
+				frameIndex = binarySearch(frames, time, 1) - 1;
 
-			String attachmentName = attachmentNames[frame];
+			String attachmentName = attachmentNames[frameIndex];
 			skeleton.slots.get(slotIndex)
 				.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slotIndex, attachmentName));
 		}
@@ -697,7 +696,7 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha) {
 			Slot slot = skeleton.slots.get(slotIndex);
-			Attachment slotAttachment = slot.getAttachment();
+			Attachment slotAttachment = slot.attachment;
 			if (!(slotAttachment instanceof VertexAttachment) || !((VertexAttachment)slotAttachment).applyDeform(attachment)) return;
 
 			float[] frames = this.frames;
@@ -828,10 +827,10 @@ public class Animation {
 		public void setFrame (int frameIndex, float time, float rotateMix, float translateMix, float scaleMix, float shearMix) {
 			frameIndex *= ENTRIES;
 			frames[frameIndex] = time;
-			frames[frameIndex + 1] = rotateMix;
-			frames[frameIndex + 2] = translateMix;
-			frames[frameIndex + 3] = scaleMix;
-			frames[frameIndex + 4] = shearMix;
+			frames[frameIndex + ROTATE] = rotateMix;
+			frames[frameIndex + TRANSLATE] = translateMix;
+			frames[frameIndex + SCALE] = scaleMix;
+			frames[frameIndex + SHEAR] = shearMix;
 		}
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha) {

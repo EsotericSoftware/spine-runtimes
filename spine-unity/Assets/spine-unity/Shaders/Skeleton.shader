@@ -8,6 +8,7 @@ Shader "Spine/Skeleton" {
 		Tags { "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
 		LOD 100
 
+		Fog { Mode Off }
 		Cull Off
 		ZWrite Off
 		Blend One OneMinusSrcAlpha
@@ -24,8 +25,7 @@ Shader "Spine/Skeleton" {
 			Name "Caster"
 			Tags { "LightMode"="ShadowCaster" }
 			Offset 1, 1
-			
-			Fog { Mode Off }
+
 			ZWrite On
 			ZTest LEqual
 			Cull Off

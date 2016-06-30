@@ -89,6 +89,12 @@ namespace Spine {
 				Capacity = Math.Max(Math.Max(Capacity * 2, DefaultCapacity), minimumSize);
 		}
 
+		public ExposedList<T> Resize (int newSize) {
+			if (newSize > Items.Length) Array.Resize(ref Items, newSize);
+			Count = newSize;
+			return this;
+		}
+
 		private void CheckRange (int idx, int count) {
 			if (idx < 0)
 				throw new ArgumentOutOfRangeException("index");

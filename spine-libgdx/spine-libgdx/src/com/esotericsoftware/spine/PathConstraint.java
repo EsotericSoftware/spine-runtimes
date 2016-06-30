@@ -58,7 +58,7 @@ public class PathConstraint implements Updatable {
 
 	@SuppressWarnings("null")
 	public void update () {
-		Attachment attachment = target.getAttachment();
+		Attachment attachment = target.attachment;
 		if (!(attachment instanceof PathAttachment)) return;
 
 		float rotateMix = this.rotateMix, translateMix = this.translateMix;
@@ -140,7 +140,7 @@ public class PathConstraint implements Updatable {
 		}
 	}
 
-	private float[] computeWorldPositions (PathAttachment path, int spacesCount, boolean tangents, boolean percentPosition,
+	float[] computeWorldPositions (PathAttachment path, int spacesCount, boolean tangents, boolean percentPosition,
 		boolean percentSpacing) {
 		Slot target = this.target;
 		float position = this.position;

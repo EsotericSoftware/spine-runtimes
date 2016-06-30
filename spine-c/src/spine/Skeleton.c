@@ -169,8 +169,7 @@ void spSkeleton_updateCache (const spSkeleton* self) {
 	for (i = 0; i < self->transformConstraintsCount; ++i) {
 		spTransformConstraint* transformConstraint = self->transformConstraints[i];
 		for (ii = internal->updateCacheCount - 1; ii >= 0; --ii) {
-			void* object = internal->updateCache[ii].object;
-			if (object == transformConstraint->bone || object == transformConstraint->target) {
+			if (internal->updateCache[ii].object == transformConstraint->bone) {
 				int insertIndex = ii + 1;
 				update = internal->updateCache + insertIndex;
 				memmove(update + 1, update, (internal->updateCacheCount - insertIndex) * sizeof(_spUpdate));
@@ -220,10 +219,12 @@ void spSkeleton_setBonesToSetupPose (const spSkeleton* self) {
 	}
 
 	for (i = 0; i < self->transformConstraintsCount; ++i) {
-		spTransformConstraint* transformConstraint = self->transformConstraints[i];
-		transformConstraint->translateMix = transformConstraint->data->translateMix;
-		transformConstraint->x = transformConstraint->data->x;
-		transformConstraint->y = transformConstraint->data->y;
+		spTransformConstraint* constraint = self->transformConstraints[i];
+		spTransformConstraintData* data = constraint->data;
+		constraint->rotateMix = data->rotateMix;
+		constraint->translateMix = data->translateMix;
+		constraint->scaleMix = data->scaleMix;
+		constraint->shearMix = data->shearMix;
 	}
 }
 

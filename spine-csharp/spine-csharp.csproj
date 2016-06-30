@@ -70,10 +70,10 @@
     <Compile Include="src\Attachments\AttachmentLoader.cs" />
     <Compile Include="src\Attachments\AttachmentType.cs" />
     <Compile Include="src\Attachments\BoundingBoxAttachment.cs" />
-    <Compile Include="src\Attachments\IFfdAttachment.cs" />
     <Compile Include="src\Attachments\MeshAttachment.cs" />
+    <Compile Include="src\Attachments\PathAttachment.cs" />
     <Compile Include="src\Attachments\RegionAttachment.cs" />
-    <Compile Include="src\Attachments\WeightedMeshAttachment.cs" />
+    <Compile Include="src\Attachments\VertexAttachment.cs" />
     <Compile Include="src\BlendMode.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -105,6 +105,8 @@
     <Compile Include="src\MathUtils.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="src\PathConstraint.cs" />
+    <Compile Include="src\PathConstraintData.cs" />
     <Compile Include="src\Skeleton.cs">
       <SubType>Code</SubType>
     </Compile>

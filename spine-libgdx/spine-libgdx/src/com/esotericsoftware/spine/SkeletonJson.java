@@ -167,7 +167,7 @@ public class SkeletonJson {
 
 			String targetName = constraintMap.getString("target");
 			data.target = skeletonData.findBone(targetName);
-			if (data.target == null) throw new SerializationException("Target bone not found: " + targetName);
+			if (data.target == null) throw new SerializationException("IK target bone not found: " + targetName);
 
 			data.bendDirection = constraintMap.getBoolean("bendPositive", true) ? 1 : -1;
 			data.mix = constraintMap.getFloat("mix", 1);
@@ -182,20 +182,20 @@ public class SkeletonJson {
 			for (JsonValue boneMap = constraintMap.getChild("bones"); boneMap != null; boneMap = boneMap.next) {
 				String boneName = boneMap.asString();
 				BoneData bone = skeletonData.findBone(boneName);
-				if (bone == null) throw new SerializationException("Path bone not found: " + boneName);
+				if (bone == null) throw new SerializationException("Transform constraint bone not found: " + boneName);
 				data.bones.add(bone);
 			}
 
 			String targetName = constraintMap.getString("target");
 			data.target = skeletonData.findBone(targetName);
-			if (data.target == null) throw new SerializationException("Target bone not found: " + targetName);
+			if (data.target == null) throw new SerializationException("Transform constraint target bone not found: " + targetName);
 
 			data.offsetRotation = constraintMap.getFloat("rotation", 0);
 			data.offsetX = constraintMap.getFloat("x", 0) * scale;
 			data.offsetY = constraintMap.getFloat("y", 0) * scale;
-			data.offsetScaleX = constraintMap.getFloat("scaleX", 0) * scale;
-			data.offsetScaleY = constraintMap.getFloat("scaleY", 0) * scale;
-			data.offsetShearY = constraintMap.getFloat("shearY", 0) * scale;
+			data.offsetScaleX = constraintMap.getFloat("scaleX", 0);
+			data.offsetScaleY = constraintMap.getFloat("scaleY", 0);
+			data.offsetShearY = constraintMap.getFloat("shearY", 0);
 
 			data.rotateMix = constraintMap.getFloat("rotateMix", 1);
 			data.translateMix = constraintMap.getFloat("translateMix", 1);
@@ -218,7 +218,7 @@ public class SkeletonJson {
 
 			String targetName = constraintMap.getString("target");
 			data.target = skeletonData.findSlot(targetName);
-			if (data.target == null) throw new SerializationException("Target slot not found: " + targetName);
+			if (data.target == null) throw new SerializationException("Path target slot not found: " + targetName);
 
 			data.positionMode = PositionMode.valueOf(constraintMap.getString("positionMode", "percent"));
 			data.spacingMode = SpacingMode.valueOf(constraintMap.getString("spacingMode", "length"));
@@ -297,11 +297,6 @@ public class SkeletonJson {
 		name = map.getString("name", name);
 
 		String type = map.getString("type", AttachmentType.region.name());
-
-		// BOZO - Warning: These types are deprecated and will be removed in the near future.
-		if (type.equals("skinnedmesh")) type = "weightedmesh";
-		if (type.equals("weightedmesh")) type = "mesh";
-		if (type.equals("weightedlinkedmesh")) type = "linkedmesh";
 
 		switch (AttachmentType.valueOf(type)) {
 		case region: {
