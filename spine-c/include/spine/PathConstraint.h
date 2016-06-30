@@ -91,6 +91,8 @@ typedef struct spPathConstraint {
 #endif
 } spPathConstraint;
 
+#define SP_PATHCONSTRAINT_
+
 spPathConstraint* spPathConstraint_create (spPathConstraintData* data, const struct spSkeleton* skeleton);
 void spPathConstraint_dispose (spPathConstraint* self);
 

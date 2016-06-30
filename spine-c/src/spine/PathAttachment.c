@@ -50,3 +50,7 @@ spPathAttachment* spPathAttachment_create (const char* name) {
 void spPathAttachment_computeWorldVertices (spPathAttachment* self, spSlot* slot, float* worldVertices) {
 	spVertexAttachment_computeWorldVertices(SUPER(self), slot, worldVertices);
 }
+
+void spPathAttachment_computeWorldVertices1 (spPathAttachment* self, spSlot* slot, int start, int count, float* worldVertices, int offset) {
+	spVertexAttachment_computeWorldVertices1(SUPER(self), start, count, slot, worldVertices, offset);
+}

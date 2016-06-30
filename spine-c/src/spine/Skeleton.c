@@ -110,6 +110,11 @@ spSkeleton* spSkeleton_create (spSkeletonData* data) {
 	for (i = 0; i < self->data->transformConstraintsCount; ++i)
 		self->transformConstraints[i] = spTransformConstraint_create(self->data->transformConstraints[i], self);
 
+	self->pathConstraintsCount = data->pathConstraintsCount;
+	self->pathConstraints = MALLOC(spPathConstraint*, self->pathConstraintsCount);
+	for (i = 0; i < self->data->pathConstraintsCount; i++)
+		self->pathConstraints[i] = spPathConstraint_create(self->data->pathConstraints[i], self);
+
 	self->r = 1; self->g = 1; self->b = 1; self->a = 1;
 
 	spSkeleton_updateCache(self);
@@ -142,6 +147,10 @@ void spSkeleton_dispose (spSkeleton* self) {
 		spTransformConstraint_dispose(self->transformConstraints[i]);
 	FREE(self->transformConstraints);
 
+	for (i = 0; i < self->pathConstraintsCount; i++)
+		spPathConstraint_dispose(self->pathConstraints[i]);
+	FREE(self->pathConstraints);
+
 	FREE(self->drawOrder);
 	FREE(self);
 }
@@ -163,6 +172,9 @@ static void _sortBone(_spSkeleton* const internal, spBone* bone) {
 	if (bone->parent) _sortBone(internal, bone->parent);
 	bone->sorted = 1;
 	_addToUpdateCache(internal, SP_UPDATE_BONE, bone);
+}
+
+static void _sortPathConstraintAttachment(spSkin* skin, int slotIndex, spBone* slotBone) {
 }
 
 static void _sortReset(spBone** bones, int bonesCount) {

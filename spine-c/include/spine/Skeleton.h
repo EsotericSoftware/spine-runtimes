@@ -37,6 +37,7 @@
 #include <spine/Skin.h>
 #include <spine/IkConstraint.h>
 #include <spine/TransformConstraint.h>
+#include <spine/PathConstraint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,6 +60,9 @@ typedef struct spSkeleton {
 
 	int transformConstraintsCount;
 	spTransformConstraint** transformConstraints;
+
+	int pathConstraintsCount;
+	spPathConstraint** pathConstraints;
 
 	spSkin* const skin;
 	float r, g, b, a;
