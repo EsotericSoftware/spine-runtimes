@@ -41,6 +41,8 @@ namespace Spine {
 		private float timeScale = 1;
 
 		public AnimationStateData Data { get { return data; } }
+		/// <summary>A list of tracks that have animations, which may contain nulls.</summary>
+		public ExposedList<TrackEntry> Tracks { get { return tracks; } }
 		public float TimeScale { get { return timeScale; } set { timeScale = value; } }
 
 		public delegate void StartEndDelegate (AnimationState state, int trackIndex);
@@ -54,7 +56,7 @@ namespace Spine {
 		public event CompleteDelegate Complete;
 
 		public AnimationState (AnimationStateData data) {
-			if (data == null) throw new ArgumentNullException("data cannot be null.");
+			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
 			this.data = data;
 		}
 
@@ -187,15 +189,16 @@ namespace Spine {
 			if (Start != null) Start(this, index);
 		}
 
+		/// <seealso cref="SetAnimation(int, Animation, bool)" />
 		public TrackEntry SetAnimation (int trackIndex, String animationName, bool loop) {
 			Animation animation = data.skeletonData.FindAnimation(animationName);
-			if (animation == null) throw new ArgumentException("Animation not found: " + animationName);
+			if (animation == null) throw new ArgumentException("Animation not found: " + animationName, "animationName");
 			return SetAnimation(trackIndex, animation, loop);
 		}
 
 		/// <summary>Set the current animation. Any queued animations are cleared.</summary>
 		public TrackEntry SetAnimation (int trackIndex, Animation animation, bool loop) {
-			if (animation == null) throw new ArgumentException("animation cannot be null.");
+			if (animation == null) throw new ArgumentNullException("animation", "animation cannot be null.");
 			TrackEntry entry = new TrackEntry();
 			entry.animation = animation;
 			entry.loop = loop;
@@ -205,16 +208,17 @@ namespace Spine {
 			return entry;
 		}
 
+		/// <seealso cref="AddAnimation(int, Animation, bool, float)" />
 		public TrackEntry AddAnimation (int trackIndex, String animationName, bool loop, float delay) {
 			Animation animation = data.skeletonData.FindAnimation(animationName);
-			if (animation == null) throw new ArgumentException("Animation not found: " + animationName);
+			if (animation == null) throw new ArgumentException("Animation not found: " + animationName, "animationName");
 			return AddAnimation(trackIndex, animation, loop, delay);
 		}
 
 		/// <summary>Adds an animation to be played delay seconds after the current or last queued animation.</summary>
-		/// <param name="delay">May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay.</param>
+		/// <param name="delay">May be &lt;= 0 to use duration of previous animation minus any mix duration plus the negative delay.</param>
 		public TrackEntry AddAnimation (int trackIndex, Animation animation, bool loop, float delay) {
-			if (animation == null) throw new ArgumentException("animation cannot be null.");
+			if (animation == null) throw new ArgumentNullException("animation", "animation cannot be null.");
 			TrackEntry entry = new TrackEntry();
 			entry.animation = animation;
 			entry.loop = loop;

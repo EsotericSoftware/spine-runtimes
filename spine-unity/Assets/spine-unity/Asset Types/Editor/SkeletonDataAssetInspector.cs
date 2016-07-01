@@ -411,10 +411,11 @@ namespace Spine.Unity.Editor {
 							icon = SpineEditorUtilities.Icons.mesh;
 						else if (type == typeof(BoundingBoxAttachment))
 							icon = SpineEditorUtilities.Icons.boundingBox;
-						else if (type == typeof(WeightedMeshAttachment))
-							icon = SpineEditorUtilities.Icons.weights;
+						else if (type == typeof(PathAttachment))
+							icon = SpineEditorUtilities.Icons.boundingBox;
 						else
 							icon = SpineEditorUtilities.Icons.warning;
+						//JOHN: left todo: Icon for paths. Generic icon for unidentified attachments.
 
 						// MITCH: left todo:  Waterboard Nate
 						//if (name != attachment.Name)
@@ -560,20 +561,19 @@ namespace Spine.Unity.Editor {
 
 			if (this.m_previewInstance == null) {
 				string skinName = EditorPrefs.GetString(m_skeletonDataAssetGUID + "_lastSkin", "");
-
 				m_previewInstance = SpineEditorUtilities.InstantiateSkeletonAnimation(skeletonDataAsset, skinName).gameObject;
-				m_previewInstance.hideFlags = HideFlags.HideAndDontSave;
-				m_previewInstance.layer = 0x1f;
 
-				m_skeletonAnimation = m_previewInstance.GetComponent<SkeletonAnimation>();
-				m_skeletonAnimation.initialSkinName = skinName;
-				m_skeletonAnimation.LateUpdate();
+				if (m_previewInstance != null) {
+					m_previewInstance.hideFlags = HideFlags.HideAndDontSave;
+					m_previewInstance.layer = 0x1f;
+					m_skeletonAnimation = m_previewInstance.GetComponent<SkeletonAnimation>();
+					m_skeletonAnimation.initialSkinName = skinName;
+					m_skeletonAnimation.LateUpdate();
+					m_skeletonData = m_skeletonAnimation.skeletonDataAsset.GetSkeletonData(true);
+					m_previewInstance.GetComponent<Renderer>().enabled = false;
+					m_initialized = true;
+				}
 
-				m_skeletonData = m_skeletonAnimation.skeletonDataAsset.GetSkeletonData(true);
-
-				m_previewInstance.GetComponent<Renderer>().enabled = false;
-
-				m_initialized = true;
 				AdjustCameraGoals(true);
 			}
 		}
@@ -694,7 +694,7 @@ namespace Spine.Unity.Editor {
 					foreach (var slot in m_skeletonAnimation.skeleton.Slots) {
 						var boundingBoxAttachment = slot.Attachment as BoundingBoxAttachment;
 						if (boundingBoxAttachment != null)
-							DrawBoundingBox (slot.Bone, boundingBoxAttachment);
+							DrawBoundingBox (slot, boundingBoxAttachment);
 					}
 				}
 
@@ -703,11 +703,11 @@ namespace Spine.Unity.Editor {
 				
 		}
 
-		static void DrawBoundingBox (Bone bone, BoundingBoxAttachment box) {
+		static void DrawBoundingBox (Slot slot, BoundingBoxAttachment box) {
 			if (box.Vertices.Length <= 0) return; // Handle cases where user creates a BoundingBoxAttachment but doesn't actually define it.
 
 			var worldVerts = new float[box.Vertices.Length];
-			box.ComputeWorldVertices(bone, worldVerts);
+			box.ComputeWorldVertices(slot, worldVerts);
 
 			Handles.color = Color.green;
 			Vector3 lastVert = Vector3.back;
