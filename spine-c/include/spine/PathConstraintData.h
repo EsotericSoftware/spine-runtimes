@@ -33,6 +33,7 @@
 #define SPINE_PATHCONSTRAINTDATA_H_
 
 #include <spine/BoneData.h>
+#include <spine/SlotData.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,7 +55,7 @@ typedef struct spPathConstraintData {
 	const char* const name;
 	int bonesCount;
 	spBoneData** const bones;
-	spBoneData* target;
+	spSlotData* target;
 	spPositionMode positionMode;
 	spSpacingMode spacingMode;
 	spRotateMode rotateMode;

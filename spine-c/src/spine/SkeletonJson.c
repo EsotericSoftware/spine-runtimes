@@ -510,7 +510,7 @@ spSkeletonData* spSkeletonJson_readSkeletonDataFile (spSkeletonJson* self, const
 spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const char* json) {
 	int i, ii;
 	spSkeletonData* skeletonData;
-	Json *root, *skeleton, *bones, *boneMap, *ik, *transform, *slots, *skins, *animations, *events;
+	Json *root, *skeleton, *bones, *boneMap, *ik, *transform, *path, *slots, *skins, *animations, *events;
 	char* oldLocale;
 	_spSkeletonJson* internal = SUB_CAST(_spSkeletonJson, self);
 
@@ -662,14 +662,14 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 		for (constraintMap = transform->child, i = 0; constraintMap; constraintMap = constraintMap->next, ++i) {
 			const char* name;
 
-			spTransformConstraintData* transformConstraintData = spTransformConstraintData_create(Json_getString(constraintMap, "name", 0));
+			spTransformConstraintData* data = spTransformConstraintData_create(Json_getString(constraintMap, "name", 0));
 
 			boneMap = Json_getItem(constraintMap, "bones");
-			transformConstraintData->bonesCount = boneMap->size;
-			CONST_CAST(spBoneData**, transformConstraintData->bones) = MALLOC(spBoneData*, boneMap->size);
+			data->bonesCount = boneMap->size;
+			CONST_CAST(spBoneData**, data->bones) = MALLOC(spBoneData*, boneMap->size);
 			for (boneMap = boneMap->child, ii = 0; boneMap; boneMap = boneMap->next, ++ii) {
-				transformConstraintData->bones[ii] = spSkeletonData_findBone(skeletonData, boneMap->valueString);
-				if (!transformConstraintData->bones[ii]) {
+				data->bones[ii] = spSkeletonData_findBone(skeletonData, boneMap->valueString);
+				if (!data->bones[ii]) {
 					spSkeletonData_dispose(skeletonData);
 					_spSkeletonJson_setError(self, root, "Transform bone not found: ", boneMap->valueString);
 					return 0;
@@ -677,41 +677,100 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 			}
 
 			name = Json_getString(constraintMap, "target", 0);
-			transformConstraintData->target = spSkeletonData_findBone(skeletonData, name);
-			if (!transformConstraintData->target) {
+			data->target = spSkeletonData_findBone(skeletonData, name);
+			if (!data->target) {
 				spSkeletonData_dispose(skeletonData);
 				_spSkeletonJson_setError(self, root, "Target bone not found: ", boneMap->name);
 				return 0;
 			}
 
-			transformConstraintData->offsetRotation = Json_getFloat(constraintMap, "rotation", 0);
-			transformConstraintData->offsetX = Json_getFloat(constraintMap, "x", 0) * self->scale;
-			transformConstraintData->offsetY = Json_getFloat(constraintMap, "y", 0) * self->scale;
-			transformConstraintData->offsetScaleX = Json_getFloat(constraintMap, "scaleX", 0);
-			transformConstraintData->offsetScaleY = Json_getFloat(constraintMap, "scaleY", 0);
-			transformConstraintData->offsetShearY = Json_getFloat(constraintMap, "shearY", 0);
-			transformConstraintData->rotateMix = Json_getFloat(constraintMap, "rotateMix", 1);
-			transformConstraintData->translateMix = Json_getFloat(constraintMap, "translateMix", 1);
-			transformConstraintData->scaleMix = Json_getFloat(constraintMap, "scaleMix", 1);
-			transformConstraintData->shearMix = Json_getFloat(constraintMap, "shearMix", 1);
+			data->offsetRotation = Json_getFloat(constraintMap, "rotation", 0);
+			data->offsetX = Json_getFloat(constraintMap, "x", 0) * self->scale;
+			data->offsetY = Json_getFloat(constraintMap, "y", 0) * self->scale;
+			data->offsetScaleX = Json_getFloat(constraintMap, "scaleX", 0);
+			data->offsetScaleY = Json_getFloat(constraintMap, "scaleY", 0);
+			data->offsetShearY = Json_getFloat(constraintMap, "shearY", 0);
 
-			skeletonData->transformConstraints[i] = transformConstraintData;
+			data->rotateMix = Json_getFloat(constraintMap, "rotateMix", 1);
+			data->translateMix = Json_getFloat(constraintMap, "translateMix", 1);
+			data->scaleMix = Json_getFloat(constraintMap, "scaleMix", 1);
+			data->shearMix = Json_getFloat(constraintMap, "shearMix", 1);
+
+			skeletonData->transformConstraints[i] = data;
+		}
+	}
+
+	/* Path constraints */
+	path = Json_getItem(root, "path");
+	if (path) {
+		Json *constraintMap;
+		skeletonData->pathConstraintsCount = path->size;
+		skeletonData->pathConstraints = MALLOC(spPathConstraintData*, path->size);
+		for (constraintMap = path->child, i = 0; constraintMap; constraintMap = constraintMap->next, ++i) {
+			const char* name;
+			const char* item;
+
+			spPathConstraintData* data = spPathConstraintData_create(Json_getString(constraintMap, "name", 0));
+
+			boneMap = Json_getItem(constraintMap, "bones");
+			data->bonesCount = boneMap->size;
+			CONST_CAST(spBoneData**, data->bones) = MALLOC(spBoneData*, boneMap->size);
+			for (boneMap = boneMap->child, ii = 0; boneMap; boneMap = boneMap->next, ++ii) {
+				data->bones[ii] = spSkeletonData_findBone(skeletonData, boneMap->valueString);
+				if (!data->bones[ii]) {
+					spSkeletonData_dispose(skeletonData);
+					_spSkeletonJson_setError(self, root, "Path bone not found: ", boneMap->valueString);
+					return 0;
+				}
+			}
+
+			name = Json_getString(constraintMap, "target", 0);
+			data->target = spSkeletonData_findSlot(skeletonData, name);
+			if (!data->target) {
+				spSkeletonData_dispose(skeletonData);
+				_spSkeletonJson_setError(self, root, "Target slot not found: ", boneMap->name);
+				return 0;
+			}
+
+			item = Json_getString(constraintMap, "positionMode", "percent");
+			if (strcmp(item, "fixed") == 0) data->positionMode = SP_POSITION_MODE_FIXED;
+			else if (strcmp(item, "percent")) data->positionMode = SP_POSITION_MODE_PERCENT;
+
+			item = Json_getString(constraintMap, "spacingMode", "length");
+			if (strcmp(item, "length") == 0) data->spacingMode = SP_SPACING_MODE_LENGTH;
+			else if (strcmp(item, "fixed")) data->spacingMode = SP_SPACING_MODE_FIXED;
+			else if (strcmp(item, "percent")) data->spacingMode = SP_SPACING_MODE_PERCENT;
+
+			item = Json_getString(constraintMap, "rotateMode", "tangent");
+			if (strcmp(item, "tangent") == 0) data->rotateMode = SP_ROTATE_MODE_TANGENT;
+			else if (strcmp(item, "chain")) data->rotateMode = SP_ROTATE_MODE_CHAIN;
+			else if (strcmp(item, "chainScale")) data->rotateMode = SP_ROTATE_MODE_CHAIN_SCALE;
+
+			data->offsetRotation = Json_getFloat(constraintMap, "rotation", 0);
+			data->position = Json_getFloat(constraintMap, "position", 0);
+			if (data->positionMode == SP_POSITION_MODE_FIXED) data->position *= self->scale;
+			data->spacing = Json_getFloat(constraintMap, "spacing", 0);
+			if (data->spacingMode == SP_SPACING_MODE_LENGTH || data->spacingMode == SP_SPACING_MODE_FIXED) data->spacing *= self->scale;
+			data->rotateMix = Json_getFloat(constraintMap, "rotateMix", 1);
+			data->translateMix = Json_getFloat(constraintMap, "translateMix", 1);
+
+			skeletonData->pathConstraints[i] = data;
 		}
 	}
 
 	/* Skins. */
 	skins = Json_getItem(root, "skins");
 	if (skins) {
-		Json *slotMap;
+		Json *skinMap;
 		skeletonData->skins = MALLOC(spSkin*, skins->size);
-		for (slotMap = skins->child, i = 0; slotMap; slotMap = slotMap->next, ++i) {
+		for (skinMap = skins->child, i = 0; skinMap; skinMap = skinMap->next, ++i) {
 			Json *attachmentsMap;
-			spSkin *skin = spSkin_create(slotMap->name);
+			spSkin *skin = spSkin_create(skinMap->name);
 
 			skeletonData->skins[skeletonData->skinsCount++] = skin;
-			if (strcmp(slotMap->name, "default") == 0) skeletonData->defaultSkin = skin;
+			if (strcmp(skinMap->name, "default") == 0) skeletonData->defaultSkin = skin;
 
-			for (attachmentsMap = slotMap->child; attachmentsMap; attachmentsMap = attachmentsMap->next) {
+			for (attachmentsMap = skinMap->child; attachmentsMap; attachmentsMap = attachmentsMap->next) {
 				int slotIndex = spSkeletonData_findSlotIndex(skeletonData, attachmentsMap->name);
 				Json *attachmentMap;
 
@@ -734,6 +793,8 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 						type = SP_ATTACHMENT_LINKED_MESH;
 					else if (strcmp(typeString, "boundingbox") == 0)
 						type = SP_ATTACHMENT_BOUNDING_BOX;
+					else if (strcmp(typeString, "path") == 0)
+						type = SP_ATTACHMENT_PATH;
 					else {
 						spSkeletonData_dispose(skeletonData);
 						_spSkeletonJson_setError(self, root, "Unknown attachment type: ", typeString);
@@ -833,6 +894,19 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 						spBoundingBoxAttachment* box = SUB_CAST(spBoundingBoxAttachment, attachment);
 						_readVertices(self, attachmentMap, SUPER(box), Json_getInt(attachmentMap, "vertexCount", 0) << 1);
 						spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
+						break;
+					}
+					case SP_ATTACHMENT_PATH: {
+						spPathAttachment* path = SUB_CAST(spPathAttachment, attachment);
+						int vertexCount = 0;
+						path->closed = Json_getInt(attachmentMap, "closed", 0);
+						path->constantSpeed = Json_getInt(attachmentMap, "constantSpeed", 1);
+						vertexCount = Json_getInt(attachmentMap, "vertexCount", 0);
+						_readVertices(self, attachmentMap, SUPER(path), vertexCount << 1);
+
+						path->lengthsLength = vertexCount / 3;
+						path->lengths = MALLOC(float, path->lengthsLength);
+
 						break;
 					}
 					}

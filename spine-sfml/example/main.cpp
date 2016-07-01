@@ -204,7 +204,6 @@ void raptor () {
 	Skeleton_updateWorldTransform(skeleton);
 
 	AnimationState_setAnimationByName(drawable->state, 0, "walk", true);
-	AnimationState_setAnimationByName(drawable->state, 1, "empty", false);
 	AnimationState_addAnimationByName(drawable->state, 1, "gungrab", false, 2);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - raptor");
