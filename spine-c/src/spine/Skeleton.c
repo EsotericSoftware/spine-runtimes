@@ -33,9 +33,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <spine/extension.h>
+#include <spine/Skin.h>
 
 typedef enum {
-	SP_UPDATE_BONE, SP_UPDATE_IK_CONSTRAINT, SP_UPDATE_TRANSFORM_CONSTRAINT
+	SP_UPDATE_BONE, SP_UPDATE_IK_CONSTRAINT, SP_UPDATE_PATH_CONSTRAINT, SP_UPDATE_TRANSFORM_CONSTRAINT
 } _spUpdateType;
 
 typedef struct {
@@ -174,7 +175,27 @@ static void _sortBone(_spSkeleton* const internal, spBone* bone) {
 	_addToUpdateCache(internal, SP_UPDATE_BONE, bone);
 }
 
-static void _sortPathConstraintAttachment(spSkin* skin, int slotIndex, spBone* slotBone) {
+static void _sortPathConstraintAttachmentBones(_spSkeleton* const internal, spAttachment* attachment, spBone* slotBone) {
+	spPathAttachment* pathAttachment = (spPathAttachment*)attachment;
+	if (pathAttachment->super.super.type != SP_ATTACHMENT_PATH) return;
+	int* pathBones = pathAttachment->super.bones;
+	int pathBonesCount = pathAttachment->super.bonesCount;
+	if (pathBones == 0)
+		_sortBone(internal, slotBone);
+	else {
+		spBone** bones = internal->super.bones;
+		int i;
+		for (i = 0; i < pathBonesCount; i++)
+			_sortBone(internal, bones[pathBones[i]]);
+	}
+}
+
+static void _sortPathConstraintAttachment(_spSkeleton* const internal, spSkin* skin, int slotIndex, spBone* slotBone) {
+	_Entry* entry = SUB_CAST(_spSkin, skin)->entries;
+	while (entry) {
+		if (entry->slotIndex == slotIndex) _sortPathConstraintAttachmentBones(internal, entry, slotBone);
+		entry = entry->next;
+	}
 }
 
 static void _sortReset(spBone** bones, int bonesCount) {
@@ -187,7 +208,7 @@ static void _sortReset(spBone** bones, int bonesCount) {
 }
 
 void spSkeleton_updateCache (spSkeleton* self) {
-	int i, ii, ikCount, level;
+	int i, ii, n, nn, ikCount, level;
 	_spSkeleton* internal = SUB_CAST(_spSkeleton, self);
 	internal->updateCacheCapacity = self->bonesCount + self->ikConstraintsCount + self->transformConstraintsCount + self->pathConstraintsCount;
 
@@ -238,8 +259,34 @@ void spSkeleton_updateCache (spSkeleton* self) {
 		constrained[constraint->bonesCount - 1]->sorted = 1;
 	}
 
-	Add path constraint sorting
-	Fix transform constraint sortin
+	spPathConstraint** pathConstraints = self->pathConstraints;
+	for (i = 0, n = self->pathConstraintsCount; i < n; i++) {
+		spPathConstraint* constraint = pathConstraints[i];
+
+		spSlot* slot = constraint->target;
+		int slotIndex = slot->data->index;
+		spBone* slotBone = slot->bone;
+		if (self->skin) _sortPathConstraintAttachment(internal, self->skin, slotIndex, slotBone);
+		if (self->data->defaultSkin && self->data->defaultSkin != self->skin)
+			_sortPathConstraintAttachment(internal, self->data->defaultSkin, slotIndex, slotBone);
+		for (ii = 0, nn = self->data->skinsCount; ii < nn; ii++)
+			_sortPathConstraintAttachment(internal, self->data->skins[ii], slotIndex, slotBone);
+
+		spAttachment* attachment = slot->attachment;
+		if (attachment->type == SP_ATTACHMENT_PATH) _sortPathConstraintAttachmentBones(internal, attachment, slotBone);
+
+		spBone** constrained = constraint->bones;
+		int boneCount = constraint->bonesCount;
+		for (int ii = 0; ii < boneCount; ii++)
+			_sortBone(internal, constrained[ii]);
+
+		_addToUpdateCache(internal, SP_UPDATE_PATH_CONSTRAINT, constraint);
+
+		for (int ii = 0; ii < boneCount; ii++)
+			_sortReset(constrained[ii]->children, constrained[ii]->childrenCount);
+		for (int ii = 0; ii < boneCount; ii++)
+			constrained[ii]->sorted = 1;
+	}
 
 	for (i = 0; i < self->transformConstraintsCount; ++i) {
 		spTransformConstraint* constraint = self->transformConstraints[i];

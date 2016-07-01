@@ -32,14 +32,6 @@
 #include <spine/Skin.h>
 #include <spine/extension.h>
 
-typedef struct _Entry _Entry;
-struct _Entry {
-	int slotIndex;
-	const char* name;
-	spAttachment* attachment;
-	_Entry* next;
-};
-
 _Entry* _Entry_create (int slotIndex, const char* name, spAttachment* attachment) {
 	_Entry* self = NEW(_Entry);
 	self->slotIndex = slotIndex;
@@ -55,11 +47,6 @@ void _Entry_dispose (_Entry* self) {
 }
 
 /**/
-
-typedef struct {
-	spSkin super;
-	_Entry* entries;
-} _spSkin;
 
 spSkin* spSkin_create (const char* name) {
 	spSkin* self = SUPER(NEW(_spSkin));
@@ -115,14 +102,6 @@ void spSkin_attachAll (const spSkin* self, spSkeleton* skeleton, const spSkin* o
 			spAttachment *attachment = spSkin_getAttachment(self, entry->slotIndex, entry->name);
 			if (attachment) spSlot_setAttachment(slot, attachment);
 		}
-		entry = entry->next;
-	}
-}
-
-void spSKin_iterate(const spSkin* self, int/*bool*/ iter(int, const char*, spAttachment*)) {
-	const _Entry *entry = SUB_CAST(_spSkin, self)->entries;
-	while (entry) {
-		if(!iter(entry->slotIndex, entry->name, entry->attachment)) return;
 		entry = entry->next;
 	}
 }
