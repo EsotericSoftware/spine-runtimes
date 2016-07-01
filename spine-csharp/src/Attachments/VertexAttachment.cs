@@ -81,7 +81,9 @@ namespace Spine {
 			if (deformArray.Count == 0) {
 				for (int w = offset, b = skip * 3; w < count; w += 2) {
 					float wx = x, wy = y;
-					for (int n = bones[v++] + v; v < n; v++, b += 3) {
+					int n = bones[v++];
+					n += v;
+					for (; v < n; v++, b += 3) {
 						Bone bone = skeletonBones[bones[v]];
 						float vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
 						wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
@@ -94,7 +96,9 @@ namespace Spine {
 				float[] deform = deformArray.Items;
 				for (int w = offset, b = skip * 3, f = skip << 1; w < count; w += 2) {
 					float wx = x, wy = y;
-					for (int n = bones[v++] + v; v < n; v++, b += 3, f += 2) {
+					int n = bones[v++];
+					n += v;
+					for (; v < n; v++, b += 3, f += 2) {
 						Bone bone = skeletonBones[bones[v]];
 						float vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
 						wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
