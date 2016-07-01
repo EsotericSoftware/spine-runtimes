@@ -144,6 +144,9 @@ spIkConstraint* spSkeleton_findIkConstraint (const spSkeleton* self, const char*
 /* Returns 0 if the transform constraint was not found. */
 spTransformConstraint* spSkeleton_findTransformConstraint (const spSkeleton* self, const char* constraintName);
 
+/* Returns 0 if the path constraint was not found. */
+spPathConstraint* spSkeleton_findPathConstraint (const spSkeleton* self, const char* constraintName);
+
 void spSkeleton_update (spSkeleton* self, float deltaTime);
 
 #ifdef SPINE_SHORT_NAMES
