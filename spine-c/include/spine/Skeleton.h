@@ -100,8 +100,9 @@ typedef struct spSkeleton {
 spSkeleton* spSkeleton_create (spSkeletonData* data);
 void spSkeleton_dispose (spSkeleton* self);
 
-/* Caches information about bones and constraints. Must be called if bones or constraints are added or removed. */
-void spSkeleton_updateCache (const spSkeleton* self);
+/* Caches information about bones and constraints. Must be called if bones or constraints, or weighted path attachments
+ * are added or removed. */
+void spSkeleton_updateCache (spSkeleton* self);
 void spSkeleton_updateWorldTransform (const spSkeleton* self);
 
 /* Sets the bones, constraints, and slots to their setup pose values. */

@@ -186,44 +186,50 @@ static void _sortReset(spBone** bones, int bonesCount) {
 	}
 }
 
-void spSkeleton_updateCache (const spSkeleton* self) {
-	int i, ii, level;
+void spSkeleton_updateCache (spSkeleton* self) {
+	int i, ii, ikCount, level;
 	_spSkeleton* internal = SUB_CAST(_spSkeleton, self);
-	internal->updateCacheCapacity = self->bonesCount + self->ikConstraintsCount + self->transformConstraintsCount;
+	internal->updateCacheCapacity = self->bonesCount + self->ikConstraintsCount + self->transformConstraintsCount + self->pathConstraintsCount;
 
 	FREE(internal->updateCache);
 	internal->updateCache = MALLOC(_spUpdate, internal->updateCacheCapacity);
 	internal->updateCacheCount = 0;
 
+	spBone** bones = self->bones;
 	for (i = 0; i < self->bonesCount; ++i)
-		self->bones[i]->sorted = 0;
+		bones[i]->sorted = 0;
 
 	/* IK first, lowest hierarchy depth first. */
-	for (i = 0; i < self->ikConstraintsCount; ++i)
-		self->ikConstraintsSorted[i] = self->ikConstraints[i];
-	for (i = 0; i < self->ikConstraintsCount; ++i) {
-		spIkConstraint* ik = self->ikConstraintsSorted[i];
+	if (self->ikConstraintsSorted) FREE(self->ikConstraintsSorted);
+	self->ikConstraintsSorted = MALLOC(spIkConstraint*, self->ikConstraintsCount);
+	spIkConstraint** ikConstraints = self->ikConstraintsSorted;
+	ikCount = self->ikConstraintsCount;
+	for (i = 0; i < ikCount; ++i)
+		ikConstraints[i] = self->ikConstraints[i];
+	for (i = 0; i < ikCount; ++i) {
+		spIkConstraint* ik = ikConstraints[i];
 		spBone* bone = ik->bones[0]->parent;
 		for (level = 0; bone; ++level)
 			bone = bone->parent;
 		ik->level = level;
 	}
-	for (i = 1; i < self->ikConstraintsCount; ++i) {
-		spIkConstraint* ik = self->ikConstraintsSorted[i];
+	for (i = 1; i < ikCount; ++i) {
+		spIkConstraint* ik = ikConstraints[i];
+		level = ik->level;
 		for (ii = i - 1; ii >= 0; --ii) {
-			spIkConstraint* other = self->ikConstraintsSorted[ii];
-			if (other->level < ik->level) break;
-			self->ikConstraintsSorted[ii + 1] = other;
+			spIkConstraint* other = ikConstraints[ii];
+			if (other->level < level) break;
+			ikConstraints[ii + 1] = other;
 		}
-		self->ikConstraintsSorted[ii + 1] = ik;
+		ikConstraints[ii + 1] = ik;
 	}
-	for (i = 0; i < self->ikConstraintsCount; ++i) {
-		spIkConstraint* constraint = self->ikConstraintsSorted[i];
+	for (i = 0; i < ikCount; ++i) {
+		spIkConstraint* constraint = ikConstraints[i];
+		spBone** target = constraint->target;
+		_sortBone(internal, target);
+
 		spBone** constrained = constraint->bones;
 		spBone* parent = constrained[0];
-
-		_sortBone(internal, constraint->target);
-
 		_sortBone(internal, parent);
 
 		_addToUpdateCache(internal, SP_UPDATE_IK_CONSTRAINT, constraint);
@@ -231,6 +237,9 @@ void spSkeleton_updateCache (const spSkeleton* self) {
 		_sortReset(parent->children, parent->childrenCount);
 		constrained[constraint->bonesCount - 1]->sorted = 1;
 	}
+
+	Add path constraint sorting
+	Fix transform constraint sortin
 
 	for (i = 0; i < self->transformConstraintsCount; ++i) {
 		spTransformConstraint* constraint = self->transformConstraints[i];
