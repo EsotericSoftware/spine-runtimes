@@ -79,7 +79,7 @@ namespace Spine {
 			foreach (BoneData boneData in data.bones) {
 				Bone bone;
 				if (boneData.parent == null) {
-					bone = new Bone (boneData, this, null);				
+					bone = new Bone(boneData, this, null);				
 				} else {
 					Bone parent = bones.Items[boneData.parent.index];
 					bone = new Bone (boneData, this, parent);
@@ -130,13 +130,13 @@ namespace Spine {
 			int ikCount = ikConstraints.Count;
 			for (int i = 0, level, n = ikCount; i < n; i++) {
 				IkConstraint ik = ikConstraints.Items[i];
-				Bone bone = ik.bones.Items[0].Parent;
+				Bone bone = ik.bones.Items[0].parent;
 				for (level = 0; bone != null; level++)
-					bone = bone.Parent;
+					bone = bone.parent;
 				ik.level = level;
 			}
 			for (int i = 1, ii; i < ikCount; i++) {
-				IkConstraint ik = ikConstraints.Items [i];
+				IkConstraint ik = ikConstraints.Items[i];
 				int level = ik.level;
 				for (ii = i - 1; ii >= 0; ii--) {
 					IkConstraint other = ikConstraints.Items[ii];
@@ -151,7 +151,7 @@ namespace Spine {
 				SortBone(target);
 
 				ExposedList<Bone> constrained = constraint.bones;
-				Bone parent = constrained.Items [0];
+				Bone parent = constrained.Items[0];
 				SortBone(parent);
 
 				updateCache.Add(constraint);
