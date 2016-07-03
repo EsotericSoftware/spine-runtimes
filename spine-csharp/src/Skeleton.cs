@@ -164,7 +164,7 @@ namespace Spine {
 			for (int i = 0, n = pathConstraints.Count; i < n; i++) {
 				PathConstraint constraint = pathConstraints.Items[i];
 
-				Slot slot = constraint.Target;
+				Slot slot = constraint.target;
 				int slotIndex = slot.data.index;
 				Bone slotBone = slot.bone;
 				if (skin != null) SortPathConstraintAttachment(skin, slotIndex, slotBone);
@@ -249,9 +249,9 @@ namespace Spine {
 
 		/// <summary>Updates the world transform for each bone and applies constraints.</summary>
 		public void UpdateWorldTransform () {
-			var updateCache = this.updateCache;
+			var updateItems = this.updateCache.Items;
 			for (int i = 0, n = updateCache.Count; i < n; i++)
-				updateCache.Items[i].Update();
+				updateItems[i].Update();
 		}
 
 		/// <summary>Sets the bones, constraints, and slots to their setup pose values.</summary>
@@ -283,9 +283,9 @@ namespace Spine {
 				constraint.shearMix = data.shearMix;
 			}
 
-			var pathConstraints = this.pathConstraints;
+			var pathConstraintItems = this.pathConstraints.Items;
 			for (int i = 0, n = pathConstraints.Count; i < n; i++) {
-				PathConstraint constraint = pathConstraints.Items[i];
+				PathConstraint constraint = pathConstraintItems[i];
 				PathConstraintData data = constraint.data;
 				constraint.position = data.position;
 				constraint.spacing = data.spacing;
