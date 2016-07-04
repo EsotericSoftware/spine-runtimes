@@ -82,8 +82,8 @@ namespace Spine {
 					bone = new Bone(boneData, this, null);				
 				} else {
 					Bone parent = bones.Items[boneData.parent.index];
-					bone = new Bone (boneData, this, parent);
-					parent.children.Add (bone);
+					bone = new Bone(boneData, this, parent);
+					parent.children.Add(bone);
 				}
 				bones.Add(bone);
 			}
