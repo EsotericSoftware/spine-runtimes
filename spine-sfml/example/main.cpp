@@ -228,7 +228,52 @@ void raptor () {
 	Atlas_dispose(atlas);
 }
 
+void tank () {
+	// Load atlas, skeleton, and animations.
+	Atlas* atlas = Atlas_createFromFile("data/tank.atlas", 0);
+	SkeletonJson* json = SkeletonJson_create(atlas);
+	json->scale = 0.2f;
+	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/tank.json");
+	if (!skeletonData) {
+		printf("Error: %s\n", json->error);
+		exit(0);
+	}
+	SkeletonJson_dispose(json);
+
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+
+	Skeleton* skeleton = drawable->skeleton;
+	skeleton->x = 500;
+	skeleton->y = 590;
+	Skeleton_updateWorldTransform(skeleton);
+
+	AnimationState_setAnimationByName(drawable->state, 0, "drive", true);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - tank");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		drawable->update(delta);
+
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
+
+	SkeletonData_dispose(skeletonData);
+	Atlas_dispose(atlas);
+}
+
 int main () {
+	tank();
 	raptor();
 	spineboy();
 	goblins();

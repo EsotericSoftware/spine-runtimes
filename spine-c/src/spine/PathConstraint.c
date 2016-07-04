@@ -60,7 +60,7 @@ spPathConstraint* spPathConstraint_create (spPathConstraintData* data, const spS
 	self->curves = 0;
 	self->lengthsCount = 0;
 	self->lengths = 0;
-	return 0;
+	return self;
 }
 
 void spPathConstraint_dispose (spPathConstraint* self) {
