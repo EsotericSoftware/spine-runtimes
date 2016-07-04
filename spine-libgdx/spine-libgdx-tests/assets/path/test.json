@@ -1,5 +1,5 @@
 {
-"skeleton": { "hash": "0Q7DoWcTWte5ktl7uwfBBbpPuT4", "spine": "3.3.07", "width": 83.23, "height": 83.23, "images": "./images/" },
+"skeleton": { "hash": "XCHjZ6CXxuRTpodKRwdOuXKgOx4", "spine": "3.3.07", "width": 78.98, "height": 78.98, "images": "./images/" },
 "bones": [
 	{ "name": "root" },
 	{ "name": "image", "parent": "root", "length": 100, "x": 91.84 },
@@ -13,7 +13,8 @@
 	{
 		"name": "pathConstraint",
 		"bones": [ "image" ],
-		"target": "path"
+		"target": "path",
+		"rotateMode": "chain"
 	}
 ],
 "skins": {

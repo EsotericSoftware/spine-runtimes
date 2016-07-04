@@ -301,7 +301,7 @@ void spSkeleton_updateCache (spSkeleton* self) {
 	transformConstraints = self->transformConstraints;
 	for (i = 0, n = self->transformConstraintsCount; i < n; ++i) {
 		spTransformConstraint* constraint = transformConstraints[i];
-		spBone** constrained = self->bones;
+		spBone** constrained = constraint->bones;
 
 		_sortBone(internal, constraint->target);
 

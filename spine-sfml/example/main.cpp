@@ -261,7 +261,7 @@ void tank () {
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
-		drawable->update(delta);
+		drawable->update(0);
 
 		window.clear();
 		window.draw(*drawable);
@@ -323,7 +323,7 @@ void test () {
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
-		drawable->update(0.10f);
+		drawable->update(delta);
 
 		window.clear();
 		window.draw(*drawable);
@@ -335,7 +335,7 @@ void test () {
 }
 
 int main () {
-	test();
+	// test();
 	tank();
 	raptor();
 	spineboy();

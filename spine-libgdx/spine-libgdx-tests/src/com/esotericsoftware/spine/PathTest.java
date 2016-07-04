@@ -11,16 +11,16 @@ public class PathTest extends ApplicationAdapter {
 	
 	@Override
 	public void create () {
-		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("path/test.atlas"));
+		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("path/tank.atlas"));
 		SkeletonJson json = new SkeletonJson(atlas);
-		SkeletonData data = json.readSkeletonData(Gdx.files.internal("path/test.json"));
+		SkeletonData data = json.readSkeletonData(Gdx.files.internal("path/tank.json"));
 		Skeleton skeleton = new Skeleton(data);
 		skeleton.x = 0;
 		skeleton.y = 0;
 		AnimationStateData animData = new AnimationStateData(data);
 		AnimationState animState = new AnimationState(animData);
-		Bone bone = skeleton.findBone("image");
-		animState.setAnimation(0, "test", true);
+		Bone bone = skeleton.findBone("tread");
+		animState.setAnimation(0, "drive", true);
 		
 		float d = 0;
 		for (int i = 0; i < 20; i++) {
