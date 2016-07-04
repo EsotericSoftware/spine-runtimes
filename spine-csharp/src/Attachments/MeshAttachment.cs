@@ -73,6 +73,7 @@ namespace Spine {
 			set {
 				parentMesh = value;
 				if (value != null) {
+					bones = value.bones;
 					vertices = value.vertices;
 					worldVerticesLength = value.worldVerticesLength;
 					regionUVs = value.regionUVs;
