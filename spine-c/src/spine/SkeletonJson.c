@@ -472,10 +472,17 @@ static void _readVertices(spSkeletonJson* self, Json* attachmentMap, spVertexAtt
 		attachment->bonesCount = 0;
 		attachment->bones = 0;
 	} else {
-		attachment->verticesCount = verticesLength * 3 * 3;
-		attachment->vertices = MALLOC(float, attachment->verticesCount);
+		attachment->verticesCount = 0;
+		attachment->bonesCount = 0;
 
-		attachment->bonesCount = verticesLength * 3;
+		for (i = 0, b = 0, w = 0; i < entrySize;) {
+			int bonesCount = (int)vertices[i];
+			attachment->bonesCount += 1 + bonesCount;
+			attachment->verticesCount += 3 * bonesCount;
+			i += 1 + bonesCount * 4;
+		}
+
+		attachment->vertices = MALLOC(float, attachment->verticesCount);
 		attachment->bones = MALLOC(int, attachment->bonesCount);
 
 		for (i = 0, b = 0, w = 0; i < entrySize;) {
