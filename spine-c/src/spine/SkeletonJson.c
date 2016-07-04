@@ -143,7 +143,6 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 	int frameIndex;
 	spAnimation* animation;
 	Json* valueMap;
-	float duration;
 	int timelinesCount = 0;
 
 	Json* bones = Json_getItem(root, "bones");
@@ -305,13 +304,58 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 			readCurve(valueMap, SUPER(timeline), frameIndex);
 		}
 		animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
-		duration = timeline->frames[(constraintMap->size - 1) * TRANSFORMCONSTRAINT_ENTRIES];
-		if (duration > animation->duration) animation->duration = duration;
+		animation->duration = MAX(animation->duration, timeline->frames[(constraintMap->size - 1) * TRANSFORMCONSTRAINT_ENTRIES]);
 	}
 
 	/** Path constraint timelines. */
 	for(constraintMap = paths ? paths->child : 0; constraintMap; constraintMap = constraintMap->next ) {
+		int constraintIndex, i;
+		Json* timelineMap;
 
+		spPathConstraintData* data = spSkeletonData_findPathConstraint(skeletonData, constraintMap->name);
+		if (!data) {
+			spAnimation_dispose(animation);
+			_spSkeletonJson_setError(self, root, "Path constraint not found: ", constraintMap->name);
+			return 0;
+		}
+		for (i = 0; i < skeletonData->pathConstraintsCount; i++) {
+			if (skeletonData->pathConstraints[i] == data) {
+				constraintIndex = i;
+				break;
+			}
+		}
+
+		for (timelineMap = constraintMap->child; timelineMap; timelineMap = timelineMap->next) {
+			const char* timelineName = timelineMap->name;
+			if (strcmp(timelineName, "position") == 0 || strcmp(timelineName, "spacing") == 0) {
+				spPathConstraintPositionTimeline* timeline;
+				float timelineScale = 1;
+				if (strcmp(timelineName, "spacing") == 0) {
+					timeline = (spPathConstraintPositionTimeline*)spPathConstraintSpacingTimeline_create(timelineMap->size);
+					if (data->spacingMode == SP_SPACING_MODE_LENGTH || data->spacingMode == SP_SPACING_MODE_FIXED) timelineScale = self->scale;
+				} else {
+					timeline = spPathConstraintPositionTimeline_create(timelineMap->size);
+					if (data->positionMode == SP_POSITION_MODE_FIXED) timelineScale = self->scale;
+				}
+				timeline->pathConstraintIndex = constraintIndex;
+				for (valueMap = timelineMap->child, frameIndex = 0; valueMap; valueMap = valueMap->next, ++frameIndex) {
+					spPathConstraintPositionTimeline_setFrame(timeline, frameIndex, Json_getFloat(valueMap, "time", 0), Json_getFloat(valueMap, timelineName, 0) * timelineScale);
+					readCurve(valueMap, SUPER(timeline), frameIndex);
+				}
+				animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
+				animation->duration = MAX(animation->duration, timeline->frames[(timelineMap->size - 1) * PATHCONSTRAINTPOSITION_ENTRIES]);
+			} else if (strcmp(timelineName, "mix")) {
+				spPathConstraintMixTimeline* timeline = spPathConstraintMixTimeline_create(timelineMap->size);
+				timeline->pathConstraintIndex = constraintIndex;
+				for (valueMap = timelineMap->child, frameIndex = 0; valueMap; valueMap = valueMap->next, ++frameIndex) {
+					spPathConstraintMixTimeline_setFrame(timeline, frameIndex, Json_getFloat(valueMap, "time", 0),
+														 Json_getFloat(valueMap, "rotateMix", 1), Json_getFloat(valueMap, "translateMix", 1));
+					readCurve(valueMap, SUPER(timeline), frameIndex);
+				}
+				animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
+				animation->duration = MAX(animation->duration, timeline->frames[(timelineMap->size - 1) * PATHCONSTRAINTMIX_ENTRIES]);
+			}
+		}
 	}
 
 	/* Deform timelines. */
@@ -475,7 +519,7 @@ static void _readVertices(spSkeletonJson* self, Json* attachmentMap, spVertexAtt
 		attachment->verticesCount = 0;
 		attachment->bonesCount = 0;
 
-		for (i = 0, b = 0, w = 0; i < entrySize;) {
+		for (i = 0; i < entrySize;) {
 			int bonesCount = (int)vertices[i];
 			attachment->bonesCount += 1 + bonesCount;
 			attachment->verticesCount += 3 * bonesCount;
