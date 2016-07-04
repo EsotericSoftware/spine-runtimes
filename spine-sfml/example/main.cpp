@@ -272,7 +272,70 @@ void tank () {
 	Atlas_dispose(atlas);
 }
 
+void test () {
+	// Load atlas, skeleton, and animations.
+	Atlas* atlas = Atlas_createFromFile("data/test.atlas", 0);
+	SkeletonJson* json = SkeletonJson_create(atlas);
+	json->scale = 1;
+	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/test.json");
+	if (!skeletonData) {
+		printf("Error: %s\n", json->error);
+		exit(0);
+	}
+	SkeletonJson_dispose(json);
+
+	spSkeleton* skl = Skeleton_create(skeletonData);
+	spAnimationStateData* animData = spAnimationStateData_create(skeletonData);
+	spAnimationState* animState = spAnimationState_create(animData);
+	spBone* bone = spSkeleton_findBone(skl, "image");
+	spAnimationState_setAnimationByName(animState, 0, "test", true);
+
+
+	float d = 0;
+	for (int i = 0; i < 20; i++) {
+		spSkeleton_update(skl, d);
+		spAnimationState_update(animState, d);
+		spAnimationState_apply(animState, skl);
+		spSkeleton_updateWorldTransform(skl);
+		printf("%f %f %f %f %f %f\n", bone->a, bone->b, bone->c, bone->d, bone->worldX, bone->worldY);
+		d += 0.1f;
+	}
+
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+
+	Skeleton* skeleton = drawable->skeleton;
+	skeleton->x = 300;
+	skeleton->y = 590;
+	Skeleton_updateWorldTransform(skeleton);
+
+	AnimationState_setAnimationByName(drawable->state, 0, "test", true);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - test");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		drawable->update(0.10f);
+
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
+
+	SkeletonData_dispose(skeletonData);
+	Atlas_dispose(atlas);
+}
+
 int main () {
+	test();
 	tank();
 	raptor();
 	spineboy();

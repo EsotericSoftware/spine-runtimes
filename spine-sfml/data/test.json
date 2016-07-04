@@ -1,0 +1,47 @@
+{
+"skeleton": { "hash": "0Q7DoWcTWte5ktl7uwfBBbpPuT4", "spine": "3.3.07", "width": 83.23, "height": 83.23, "images": "./images/" },
+"bones": [
+	{ "name": "root" },
+	{ "name": "image", "parent": "root", "length": 100, "x": 91.84 },
+	{ "name": "pathbone", "parent": "root" }
+],
+"slots": [
+	{ "name": "badlogic", "bone": "image", "attachment": "badlogic" },
+	{ "name": "path", "bone": "pathbone", "attachment": "path" }
+],
+"path": [
+	{
+		"name": "pathConstraint",
+		"bones": [ "image" ],
+		"target": "path"
+	}
+],
+"skins": {
+	"default": {
+		"badlogic": {
+			"badlogic": { "x": -2.94, "y": 0.53, "scaleX": 0.129, "scaleY": 0.129, "width": 460, "height": 460 }
+		},
+		"path": {
+			"path": {
+				"type": "path",
+				"closed": true,
+				"lengths": [ 172.76, 358.01, 486.73, 700.2 ],
+				"vertexCount": 12,
+				"vertices": [ 2.23, 110.87, 47.15, 79.55, 67.76, 64.62, 172.59, 6.71, 207.52, 47.95, 242.44, 89.19, 231.71, 187.91, 207.52, 225.7, 183.32, 263.49, 122.11, 245.01, 86.65, 236.76, -123.64, 188.65 ]
+			}
+		}
+	}
+},
+"animations": {
+	"test": {
+		"paths": {
+			"pathConstraint": {
+				"position": [
+					{ "time": 0 },
+					{ "time": 3.3333, "position": 1 }
+				]
+			}
+		}
+	}
+}
+}

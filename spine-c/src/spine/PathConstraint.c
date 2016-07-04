@@ -205,9 +205,9 @@ static void _addCurvePosition (float p, float x1, float y1, float cx1, float cy1
 }
 
 float* spPathConstraint_computeWorldPositions(spPathConstraint* self, spPathAttachment* path, int spacesCount, int/*bool*/ tangents, int/*bool*/percentPosition, int/**/percentSpacing) {
-	int i, o, w, curve, segment, p, pathLength, /*bool*/closed, verticesLength, curveCount, prevCurve, curveLength;
+	int i, o, w, curve, segment, /*bool*/closed, verticesLength, curveCount, prevCurve;
 	float* out, *curves, *segments;
-	float tmpx, tmpy, dddfx, dddfy, ddfx, ddfy, dfx, dfy;
+	float tmpx, tmpy, dddfx, dddfy, ddfx, ddfy, dfx, dfy, pathLength, curveLength, p;
 	float x1, y1, cx1, cy1, cx2, cy2, x2, y2;
 	spSlot* target = self->target;
 	float position = self->position;
@@ -215,7 +215,7 @@ float* spPathConstraint_computeWorldPositions(spPathConstraint* self, spPathAtta
 	if (self->positionsCount != spacesCount * 3 + 2) {
 		if (self->positions) FREE(self->positions);
 		self->positions = MALLOC(float, spacesCount * 3 + 2);
-		self->spacesCount = spacesCount * 3 + 2;
+		self->positionsCount = spacesCount * 3 + 2;
 	}
 	out = self->positions;
 	closed = path->closed;
