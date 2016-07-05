@@ -35,8 +35,8 @@ spine-cocos2dx/example/cocos2d
 spine-cocos2dx/example/proj.win32/spine-cocos2d-x.VC.opendb
 xcuserdata/
 
-spine-cocos2d-iphone/cocos2d/*
-spine-cocos2d-iphone/spine-cocos2d-iphone-ios.xcodeproj/project.xcworkspace/xcshareddata/
+spine-cocos2d-objc/cocos2d/*
+spine-cocos2d-objc/spine-cocos2d-iphone-objc.xcodeproj/project.xcworkspace/xcshareddata/
 
 spine-csharp/bin
 spine-csharp/obj
