@@ -232,7 +232,7 @@ void tank () {
 	// Load atlas, skeleton, and animations.
 	Atlas* atlas = Atlas_createFromFile("data/tank.atlas", 0);
 	SkeletonJson* json = SkeletonJson_create(atlas);
-	json->scale = 0.3f;
+	json->scale = 0.2f;
 	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/tank.json");
 	if (!skeletonData) {
 		printf("Error: %s\n", json->error);
@@ -271,6 +271,9 @@ void tank () {
 	Atlas_dispose(atlas);
 }
 
+/**
+ * Used for debugging purposes during runtime development
+ */
 void test () {
 	// Load atlas, skeleton, and animations.
 	Atlas* atlas = Atlas_createFromFile("data/tank.atlas", 0);
