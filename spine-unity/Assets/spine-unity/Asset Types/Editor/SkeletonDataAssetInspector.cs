@@ -62,10 +62,6 @@ namespace Spine.Unity.Editor {
 			duration = serializedObject.FindProperty("duration");
 			defaultMix = serializedObject.FindProperty("defaultMix");
 
-			idlePlayButtonStyle = new GUIStyle(EditorStyles.toolbarButton);
-			activePlayButtonStyle = new GUIStyle(EditorStyles.toolbarButton);
-			activePlayButtonStyle.normal.textColor = Color.red;
-
 			#if SPINE_SKELETON_ANIMATOR
 			controller = serializedObject.FindProperty("controller");
 			#endif
@@ -99,6 +95,16 @@ namespace Spine.Unity.Editor {
 		}
 
 		override public void OnInspectorGUI () {
+			// Lazy initialization
+			{ 
+				// Accessing EditorStyles values in OnEnable during a recompile causes UnityEditor to throw null exceptions. (Unity 5.3.5)
+				idlePlayButtonStyle = idlePlayButtonStyle ?? new GUIStyle(EditorStyles.toolbarButton);
+				if (activePlayButtonStyle == null) {
+					activePlayButtonStyle = new GUIStyle(EditorStyles.toolbarButton);
+					activePlayButtonStyle.normal.textColor = Color.red;
+				}
+			}
+
 			serializedObject.Update();
 
 			EditorGUI.BeginChangeCheck();
@@ -115,7 +121,6 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.PropertyField(skeletonJSON);
 			EditorGUILayout.PropertyField(scale);
 			EditorGUILayout.Space();
-
 			if (EditorGUI.EndChangeCheck()) {
 				if (serializedObject.ApplyModifiedProperties()) {
 					if (m_previewUtility != null) {
@@ -133,9 +138,7 @@ namespace Spine.Unity.Editor {
 				DrawAnimationList();
 				DrawSlotList();
 				DrawUnityTools();
-
 			} else {
-
 				#if !SPINE_TK2D
 				// Reimport Button
 				using (new EditorGUI.DisabledGroupScope(skeletonJSON.objectReferenceValue == null)) {
@@ -154,7 +157,7 @@ namespace Spine.Unity.Editor {
 				
 			}
 
-			if(!Application.isPlaying)
+			if (!Application.isPlaying)
 				serializedObject.ApplyModifiedProperties();
 		}
 
@@ -830,7 +833,7 @@ namespace Spine.Unity.Editor {
 			switch (current.GetTypeForControl(controlID)) {
 			case EventType.ScrollWheel:
 				if (position.Contains(current.mousePosition)) {
-					m_orthoGoal += current.delta.y;
+					m_orthoGoal += current.delta.y * 0.06f;
 					m_orthoGoal = Mathf.Max(0.01f, m_orthoGoal);
 					GUIUtility.hotControl = controlID;
 					current.Use();
