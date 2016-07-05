@@ -29,19 +29,40 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef  _APPDELEGATE_H_
-#define  _APPDELEGATE_H_
+#include "TankExample.h"
+#include "BatchingExample.h"
 
-#include "cocos2d.h"
+USING_NS_CC;
+using namespace spine;
 
-class AppDelegate: private cocos2d::Application {
-public:
-	AppDelegate ();
-	virtual ~AppDelegate ();
+Scene* TankExample::scene () {
+	Scene *scene = Scene::create();
+	scene->addChild(TankExample::create());
+	return scene;
+}
 
-	virtual bool applicationDidFinishLaunching ();
-	virtual void applicationDidEnterBackground ();
-	virtual void applicationWillEnterForeground ();    
-};
+bool TankExample::init () {
+	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
 
-#endif // _APPDELEGATE_H_
+	skeletonNode = SkeletonAnimation::createWithFile("tank.json", "tank.atlas", 0.5f);
+	skeletonNode->setAnimation(0, "drive", true);
+
+	skeletonNode->setPosition(Vec2(_contentSize.width / 2 + 400, 20));
+	addChild(skeletonNode);
+
+	scheduleUpdate();
+	
+	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
+	listener->onTouchBegan = [this] (Touch* touch, Event* event) -> bool {
+		if (!skeletonNode->getDebugBonesEnabled())
+			skeletonNode->setDebugBonesEnabled(true);
+		else if (skeletonNode->getTimeScale() == 1)
+			skeletonNode->setTimeScale(0.3f);
+		else
+			Director::getInstance()->replaceScene(BatchingExample::scene());
+		return true;
+	};
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+
+	return true;
+}

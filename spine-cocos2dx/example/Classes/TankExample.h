@@ -29,19 +29,22 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef  _APPDELEGATE_H_
-#define  _APPDELEGATE_H_
+#ifndef _TANKEXAMPLE_H_
+#define _TANKEXAMPLE_H_
 
 #include "cocos2d.h"
+#include <spine/spine-cocos2dx.h>
 
-class AppDelegate: private cocos2d::Application {
+class TankExample : public cocos2d::LayerColor {
 public:
-	AppDelegate ();
-	virtual ~AppDelegate ();
+	static cocos2d::Scene* scene ();
 
-	virtual bool applicationDidFinishLaunching ();
-	virtual void applicationDidEnterBackground ();
-	virtual void applicationWillEnterForeground ();    
+	CREATE_FUNC(TankExample);
+
+	virtual bool init ();
+
+private:
+	spine::SkeletonAnimation* skeletonNode;
 };
 
-#endif // _APPDELEGATE_H_
+#endif // _TANKEXAMPLE_H_
