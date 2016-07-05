@@ -29,44 +29,13 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#import "GoblinsExample.h"
-#import "RaptorExample.h"
+#import "cocos2d.h"
+#import <spine/spine-cocos2d-objc.h>
 
-@implementation GoblinsExample
-
-+ (CCScene*) scene {
-	CCScene *scene = [CCScene node];
-	[scene addChild:[GoblinsExample node]];
-	return scene;
+@interface RaptorExample : CCNode {
+	SkeletonAnimation* skeletonNode;
 }
 
--(id) init {
-	self = [super init];
-	if (!self) return nil;
-
-	skeletonNode = [SkeletonAnimation skeletonWithFile:@"goblins-mesh.json" atlasFile:@"goblins-mesh.atlas" scale:1];
-	[skeletonNode setSkin:@"goblin"];
-	[skeletonNode setAnimationForTrack:0 name:@"walk" loop:YES];
-
-	CGSize windowSize = [[CCDirector sharedDirector] viewSize];
-	[skeletonNode setPosition:ccp(windowSize.width / 2, 20)];
-	[self addChild:skeletonNode];
-
-	self.userInteractionEnabled = YES;
-    self.contentSize = windowSize;
-    
-	return self;
-}
-
-#if ( TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR )
-- (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event {
-	if (!skeletonNode.debugBones)
-		skeletonNode.debugBones = true;
-	else if (skeletonNode.timeScale == 1)
-		skeletonNode.timeScale = 0.3f;
-	else
-		[[CCDirector sharedDirector] replaceScene:[RaptorExample scene]];
-}
-#endif
++ (CCScene*) scene;
 
 @end

@@ -1,10 +1,10 @@
 /******************************************************************************
  * Spine Runtimes Software License
  * Version 2.3
- * 
+ *
  * Copyright (c) 2013-2015, Esoteric Software
  * All rights reserved.
- * 
+ *
  * You are granted a perpetual, non-exclusive, non-sublicensable and
  * non-transferable license to use, install, execute and perform the Spine
  * Runtimes Software (the "Software") and derivative works solely for personal
@@ -16,7 +16,7 @@
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -29,43 +29,42 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#import "GoblinsExample.h"
 #import "RaptorExample.h"
+#import "TankExample.h"
 
-@implementation GoblinsExample
+@implementation RaptorExample
 
 + (CCScene*) scene {
-	CCScene *scene = [CCScene node];
-	[scene addChild:[GoblinsExample node]];
-	return scene;
+    CCScene *scene = [CCScene node];
+    [scene addChild:[RaptorExample node]];
+    return scene;
 }
 
 -(id) init {
-	self = [super init];
-	if (!self) return nil;
-
-	skeletonNode = [SkeletonAnimation skeletonWithFile:@"goblins-mesh.json" atlasFile:@"goblins-mesh.atlas" scale:1];
-	[skeletonNode setSkin:@"goblin"];
-	[skeletonNode setAnimationForTrack:0 name:@"walk" loop:YES];
-
-	CGSize windowSize = [[CCDirector sharedDirector] viewSize];
-	[skeletonNode setPosition:ccp(windowSize.width / 2, 20)];
-	[self addChild:skeletonNode];
-
-	self.userInteractionEnabled = YES;
+    self = [super init];
+    if (!self) return nil;
+    
+    skeletonNode = [SkeletonAnimation skeletonWithFile:@"raptor.json" atlasFile:@"raptor.atlas" scale:0.3f];
+    [skeletonNode setAnimationForTrack:0 name:@"walk" loop:YES];
+    
+    CGSize windowSize = [[CCDirector sharedDirector] viewSize];
+    [skeletonNode setPosition:ccp(windowSize.width / 2, 20)];
+    [self addChild:skeletonNode];
+    
+    self.userInteractionEnabled = YES;
     self.contentSize = windowSize;
     
-	return self;
+    return self;
 }
 
 #if ( TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR )
 - (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event {
-	if (!skeletonNode.debugBones)
-		skeletonNode.debugBones = true;
-	else if (skeletonNode.timeScale == 1)
-		skeletonNode.timeScale = 0.3f;
-	else
-		[[CCDirector sharedDirector] replaceScene:[RaptorExample scene]];
+    if (!skeletonNode.debugBones)
+        skeletonNode.debugBones = true;
+    else if (skeletonNode.timeScale == 1)
+        skeletonNode.timeScale = 0.3f;
+    else
+        [[CCDirector sharedDirector] replaceScene:[TankExample scene]];
 }
 #endif
 

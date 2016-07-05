@@ -57,7 +57,6 @@
 
 - (CCTexture*) getTextureForRegion:(spRegionAttachment*)attachment;
 - (CCTexture*) getTextureForMesh:(spMeshAttachment*)attachment;
-- (CCTexture*) getTextureForWeightedMesh:(spWeightedMeshAttachment*)attachment;
 
 // --- Convenience methods for common Skeleton_* functions.
 - (void) updateWorldTransform;

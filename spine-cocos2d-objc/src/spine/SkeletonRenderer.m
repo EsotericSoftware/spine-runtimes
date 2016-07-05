@@ -174,21 +174,7 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 			spMeshAttachment_computeWorldVertices(attachment, slot, _worldVertices);
 			texture = [self getTextureForMesh:attachment];
 			uvs = attachment->uvs;
-			verticesCount = attachment->verticesCount;
-			triangles = attachment->triangles;
-			trianglesCount = attachment->trianglesCount;
-			r = attachment->r;
-			g = attachment->g;
-			b = attachment->b;
-			a = attachment->a;
-			break;
-		}
-		case SP_ATTACHMENT_WEIGHTED_MESH: {
-			spWeightedMeshAttachment* attachment = (spWeightedMeshAttachment*)slot->attachment;
-			spWeightedMeshAttachment_computeWorldVertices(attachment, slot, _worldVertices);
-			texture = [self getTextureForWeightedMesh:attachment];
-			uvs = attachment->uvs;
-			verticesCount = attachment->uvsCount;
+			verticesCount = attachment->super.worldVerticesLength;
 			triangles = attachment->triangles;
 			trianglesCount = attachment->trianglesCount;
 			r = attachment->r;
@@ -288,10 +274,6 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	return (CCTexture*)((spAtlasRegion*)attachment->rendererObject)->page->rendererObject;
 }
 
-- (CCTexture*) getTextureForWeightedMesh:(spWeightedMeshAttachment*)attachment {
-	return (CCTexture*)((spAtlasRegion*)attachment->rendererObject)->page->rendererObject;
-}
-
 - (CGRect) boundingBox {
 	float minX = FLT_MAX, minY = FLT_MAX, maxX = FLT_MIN, maxY = FLT_MIN;
 	float scaleX = self.scaleX, scaleY = self.scaleY;
@@ -306,11 +288,7 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 		} else if (slot->attachment->type == SP_ATTACHMENT_MESH) {
 			spMeshAttachment* mesh = (spMeshAttachment*)slot->attachment;
 			spMeshAttachment_computeWorldVertices(mesh, slot, _worldVertices);
-			verticesCount = mesh->verticesCount;
-		} else if (slot->attachment->type == SP_ATTACHMENT_WEIGHTED_MESH) {
-			spWeightedMeshAttachment* mesh = (spWeightedMeshAttachment*)slot->attachment;
-			spWeightedMeshAttachment_computeWorldVertices(mesh, slot, _worldVertices);
-			verticesCount = mesh->uvsCount;
+			verticesCount = mesh->super.worldVerticesLength;
 		} else
 			continue;
 		for (int ii = 0; ii < verticesCount; ii += 2) {
