@@ -74,14 +74,15 @@ void spPathConstraint_dispose (spPathConstraint* self) {
 }
 
 void spPathConstraint_apply (spPathConstraint* self) {
-	int i, p, n, length, x, y, dx, dy, s;
+	int i, p, n;
+	float length, x, y, dx, dy, s;
 	float* spaces, *lengths, *positions;
 	float spacing;
 	spSkeleton* skeleton;
 	float skeletonX, skeletonY, boneX, boneY, offsetRotation;
 	int/*bool*/tip;
 	float rotateMix = self->rotateMix, translateMix = self->translateMix;
-	int translate = translateMix > 0, rotate = rotateMix > 0;
+	int/*bool*/ translate = translateMix > 0, rotate = rotateMix > 0;
 	spPathAttachment* attachment = (spPathAttachment*)self->target->attachment;
 	spPathConstraintData* data = self->data;
 	spSpacingMode spacingMode = data->spacingMode;
