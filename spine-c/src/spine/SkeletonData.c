@@ -67,6 +67,10 @@ void spSkeletonData_dispose (spSkeletonData* self) {
 		spTransformConstraintData_dispose(self->transformConstraints[i]);
 	FREE(self->transformConstraints);
 
+	for (i = 0; i < self->pathConstraintsCount; i++)
+		spPathConstraintData_dispose(self->pathConstraints[i]);
+	FREE(self->pathConstraints);
+
 	FREE(self->hash);
 	FREE(self->version);
 
@@ -133,5 +137,12 @@ spTransformConstraintData* spSkeletonData_findTransformConstraint (const spSkele
 	int i;
 	for (i = 0; i < self->transformConstraintsCount; ++i)
 		if (strcmp(self->transformConstraints[i]->name, constraintName) == 0) return self->transformConstraints[i];
+	return 0;
+}
+
+spPathConstraintData* spSkeletonData_findPathConstraint (const spSkeletonData* self, const char* constraintName) {
+	int i;
+	for (i = 0; i < self->pathConstraintsCount; ++i)
+		if (strcmp(self->pathConstraints[i]->name, constraintName) == 0) return self->pathConstraints[i];
 	return 0;
 }

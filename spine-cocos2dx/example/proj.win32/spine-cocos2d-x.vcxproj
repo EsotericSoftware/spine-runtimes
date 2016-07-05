@@ -162,6 +162,9 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\..\..\spine-c\src\spine\IkConstraintData.c" />
     <ClCompile Include="..\..\..\spine-c\src\spine\Json.c" />
     <ClCompile Include="..\..\..\spine-c\src\spine\MeshAttachment.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\PathAttachment.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\PathConstraint.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\PathConstraintData.c" />
     <ClCompile Include="..\..\..\spine-c\src\spine\RegionAttachment.c" />
     <ClCompile Include="..\..\..\spine-c\src\spine\Skeleton.c" />
     <ClCompile Include="..\..\..\spine-c\src\spine\SkeletonBounds.c" />
@@ -172,7 +175,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\..\..\spine-c\src\spine\SlotData.c" />
     <ClCompile Include="..\..\..\spine-c\src\spine\TransformConstraint.c" />
     <ClCompile Include="..\..\..\spine-c\src\spine\TransformConstraintData.c" />
-    <ClCompile Include="..\..\..\spine-c\src\spine\WeightedMeshAttachment.c" />
+    <ClCompile Include="..\..\..\spine-c\src\spine\VertexAttachment.c" />
     <ClCompile Include="..\..\src\spine\AttachmentVertices.cpp" />
     <ClCompile Include="..\..\src\spine\Cocos2dAttachmentLoader.cpp" />
     <ClCompile Include="..\..\src\spine\SkeletonAnimation.cpp" />
@@ -185,6 +188,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\RaptorExample.cpp" />
     <ClCompile Include="..\Classes\SimpleCommand.cpp" />
     <ClCompile Include="..\Classes\SpineboyExample.cpp" />
+    <ClCompile Include="..\Classes\TankExample.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -204,6 +208,9 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\..\..\spine-c\include\spine\IkConstraint.h" />
     <ClInclude Include="..\..\..\spine-c\include\spine\IkConstraintData.h" />
     <ClInclude Include="..\..\..\spine-c\include\spine\MeshAttachment.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\PathAttachment.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\PathConstraint.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\PathConstraintData.h" />
     <ClInclude Include="..\..\..\spine-c\include\spine\RegionAttachment.h" />
     <ClInclude Include="..\..\..\spine-c\include\spine\Skeleton.h" />
     <ClInclude Include="..\..\..\spine-c\include\spine\SkeletonBounds.h" />
@@ -215,7 +222,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\..\..\spine-c\include\spine\spine.h" />
     <ClInclude Include="..\..\..\spine-c\include\spine\TransformConstraint.h" />
     <ClInclude Include="..\..\..\spine-c\include\spine\TransformConstraintData.h" />
-    <ClInclude Include="..\..\..\spine-c\include\spine\WeightedMeshAttachment.h" />
+    <ClInclude Include="..\..\..\spine-c\include\spine\VertexAttachment.h" />
     <ClInclude Include="..\..\..\spine-c\src\spine\Json.h" />
     <ClInclude Include="..\..\src\spine\AttachmentVertices.h" />
     <ClInclude Include="..\..\src\spine\Cocos2dAttachmentLoader.h" />
@@ -230,6 +237,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\RaptorExample.h" />
     <ClInclude Include="..\Classes\SimpleCommand.h" />
     <ClInclude Include="..\Classes\SpineboyExample.h" />
+    <ClInclude Include="..\Classes\TankExample.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>

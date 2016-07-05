@@ -40,5 +40,6 @@ spTransformConstraintData* spTransformConstraintData_create (const char* name) {
 
 void spTransformConstraintData_dispose (spTransformConstraintData* self) {
 	FREE(self->name);
+	FREE(self->bones);
 	FREE(self);
 }

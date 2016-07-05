@@ -37,6 +37,7 @@
 #include <spine/Skin.h>
 #include <spine/IkConstraint.h>
 #include <spine/TransformConstraint.h>
+#include <spine/PathConstraint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,9 +56,13 @@ typedef struct spSkeleton {
 
 	int ikConstraintsCount;
 	spIkConstraint** ikConstraints;
+	spIkConstraint** ikConstraintsSorted;
 
 	int transformConstraintsCount;
 	spTransformConstraint** transformConstraints;
+
+	int pathConstraintsCount;
+	spPathConstraint** pathConstraints;
 
 	spSkin* const skin;
 	float r, g, b, a;
@@ -77,6 +82,7 @@ typedef struct spSkeleton {
 
 		ikConstraintsCount(0),
 		ikConstraints(0),
+		ikConstraintsSorted(0),
 
 		transformConstraintsCount(0),
 		transformConstraints(0),
@@ -94,8 +100,9 @@ typedef struct spSkeleton {
 spSkeleton* spSkeleton_create (spSkeletonData* data);
 void spSkeleton_dispose (spSkeleton* self);
 
-/* Caches information about bones and constraints. Must be called if bones or constraints are added or removed. */
-void spSkeleton_updateCache (const spSkeleton* self);
+/* Caches information about bones and constraints. Must be called if bones or constraints, or weighted path attachments
+ * are added or removed. */
+void spSkeleton_updateCache (spSkeleton* self);
 void spSkeleton_updateWorldTransform (const spSkeleton* self);
 
 /* Sets the bones, constraints, and slots to their setup pose values. */
@@ -136,6 +143,9 @@ spIkConstraint* spSkeleton_findIkConstraint (const spSkeleton* self, const char*
 
 /* Returns 0 if the transform constraint was not found. */
 spTransformConstraint* spSkeleton_findTransformConstraint (const spSkeleton* self, const char* constraintName);
+
+/* Returns 0 if the path constraint was not found. */
+spPathConstraint* spSkeleton_findPathConstraint (const spSkeleton* self, const char* constraintName);
 
 void spSkeleton_update (spSkeleton* self, float deltaTime);
 

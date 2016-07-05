@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-cocos2dx works with data exported from Spine version 3.2.01.
+spine-cocos2dx works with data exported from Spine version 3.3.07.
 
 spine-cocos2dx supports all Spine features.
 
@@ -40,6 +40,7 @@ The Spine cocos2d-x example works on Windows and Mac OS X.
 7. Click `Configure`. This will download the cocos2d-x dependency and wire it up with the example source code in `spine-runtimes/spine-cocos2dx/example`. The download is 400mb, so get yourself a cup of tea.
 8. Open the `spine-runtimes/spine-cocos2dx/example/proj.win32/spine-cocos2d-x.sln` file in Visual Studio 2015. Visual Studio may ask you to install the Windows XP/7 SDK, which you should install.
 9. Expand the cocos2d_libs sub project and delete the `editor-support/spine` group. This will remove the outdated Spine cocos2d-x runtime shipped by cocos2d-x from your build.
+9. Expand `References` of the cocos2d_libs sub project, and remove the entry for `libSpine`, which should be marked with an error.
 9. Right click the `spine-cocos2d-x` project in the solution explorer and select `Set as Startup Project` from the context menu
 10. Click `Local Windows Debugger` to run the example
 
@@ -51,7 +52,7 @@ The Spine cocos2d-x example works on Windows and Mac OS X.
 4. Open a terminal, and `cd` into the `spine-runtimes/spine-cocos2dx` folder
 5. Type `mkdir build && cd build && cmake ../..`. This will download the cocos2d-x dependency and wire it up with the example source code in `spine-runtimes/spine-cocos2dx/example`. The download is 400mb, so get yourself a cup of tea.
 6. Open the Xcode project in `spine-runtimes/spine-cocos2dx/example/proj.ios_mac`
-7. Expand the `cocos2d_libs.xcodeproj` sub project, delete the group `editor-support/spine`. This will remove the 
+7. Expand the `cocos2d_libs.xcodeproj` sub project, delete the group `editor-support/spine`. This will remove the outdated Spine cocos2d-x runtime shipped by cocos2d-x.
 8. Click the `Run` button or type `CMD+R` to run the example
 
 ## Notes

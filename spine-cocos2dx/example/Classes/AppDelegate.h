@@ -41,7 +41,7 @@ public:
 
 	virtual bool applicationDidFinishLaunching ();
 	virtual void applicationDidEnterBackground ();
-	virtual void applicationWillEnterForeground ();
+	virtual void applicationWillEnterForeground ();    
 };
 
 #endif // _APPDELEGATE_H_
