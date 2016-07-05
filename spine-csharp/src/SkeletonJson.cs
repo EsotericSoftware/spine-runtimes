@@ -450,7 +450,7 @@ namespace Spine {
 								frameIndex++;
 							}
 							timelines.Add(timeline);
-							duration = Math.Max(duration, timeline.frames[(timeline.FrameCount -1) * ColorTimeline.ENTRIES];
+							duration = Math.Max(duration, timeline.frames[(timeline.FrameCount - 1) * ColorTimeline.ENTRIES]);
 
 						} else if (timelineName == "attachment") {
 							var timeline = new AttachmentTimeline(values.Count);

@@ -138,28 +138,12 @@ namespace Spine.Unity.TK2D {
 			return mesh;
 		}
 
-		public WeightedMeshAttachment NewWeightedMeshAttachment (Skin skin, String name, String path) {
-			ProcessSpriteDefinition(path);
-
-			WeightedMeshAttachment mesh = new WeightedMeshAttachment(name);
-			mesh.Path = path;
-			mesh.RendererObject = material;
-			mesh.RegionU = u;
-			mesh.RegionV = v;
-			mesh.RegionU2 = u2;
-			mesh.RegionV2 = v2;
-			mesh.RegionRotate = regionRotated;
-			mesh.RegionOriginalWidth = regionOriginalWidth;
-			mesh.RegionOriginalHeight = regionOriginalHeight;
-			mesh.RegionWidth = regionWidth;
-			mesh.RegionHeight = regionHeight;
-			mesh.RegionOffsetX = regionOffsetX;
-			mesh.RegionOffsetY = regionOffsetY;
-			return mesh;
-		}
-
 		public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, String name) {
 			return new BoundingBoxAttachment(name);
+		}
+
+		public PathAttachment NewPathAttachment (Skin skin, string name) {
+			return new PathAttachment(name);
 		}
 	}
 }

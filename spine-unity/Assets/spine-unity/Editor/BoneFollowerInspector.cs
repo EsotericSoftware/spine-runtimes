@@ -36,7 +36,7 @@ namespace Spine.Unity.Editor {
 	[CustomEditor(typeof(BoneFollower))]
 	public class BoneFollowerInspector : UnityEditor.Editor {
 		SerializedProperty boneName, skeletonRenderer, followZPosition, followBoneRotation;
-		BoneFollower component;
+		BoneFollower targetBoneFollower;
 		bool needsReset;
 
 		void OnEnable () {
@@ -45,24 +45,23 @@ namespace Spine.Unity.Editor {
 			followBoneRotation = serializedObject.FindProperty("followBoneRotation");
 			followZPosition = serializedObject.FindProperty("followZPosition");
 
-			component = (BoneFollower)target;
-			if (component.SkeletonRenderer != null)
-				component.SkeletonRenderer.Initialize(false);
+			targetBoneFollower = (BoneFollower)target;
+			if (targetBoneFollower.SkeletonRenderer != null)
+				targetBoneFollower.SkeletonRenderer.Initialize(false);
 		}
 
 		override public void OnInspectorGUI () {
 			if (needsReset) {
-				component.Initialize();
-				component.LateUpdate();
+				targetBoneFollower.Initialize();
+				targetBoneFollower.LateUpdate();
 				needsReset = false;
 				SceneView.RepaintAll();
 			}
 			serializedObject.Update();
 
-			// FindRenderer()
+			// Find Renderer
 			if (skeletonRenderer.objectReferenceValue == null) {
-				SkeletonRenderer parentRenderer = BoneFollowerInspector.GetInParent<SkeletonRenderer>(component.transform);
-
+				SkeletonRenderer parentRenderer = BoneFollowerInspector.GetInParent<SkeletonRenderer>(targetBoneFollower.transform);
 				if (parentRenderer != null) {
 					Debug.Log("Inspector automatically assigned BoneFollower.SkeletonRenderer");
 					skeletonRenderer.objectReferenceValue = parentRenderer;
@@ -71,7 +70,7 @@ namespace Spine.Unity.Editor {
 
 			EditorGUILayout.PropertyField(skeletonRenderer);
 
-			if (component.valid) {
+			if (targetBoneFollower.valid) {
 				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(boneName);
 				if (EditorGUI.EndChangeCheck()) {
@@ -79,18 +78,27 @@ namespace Spine.Unity.Editor {
 					needsReset = true;
 					serializedObject.Update();
 				}
-
 				EditorGUILayout.PropertyField(followBoneRotation);
 				EditorGUILayout.PropertyField(followZPosition);
 			} else {
-				GUILayout.Label("INVALID");
+				var boneFollowerSkeletonRenderer = targetBoneFollower.skeletonRenderer;
+				if (boneFollowerSkeletonRenderer == null) {
+					EditorGUILayout.HelpBox("SkeletonRenderer is unassigned. Please assign a SkeletonRenderer (SkeletonAnimation or SkeletonAnimator).", MessageType.Warning);
+				} else {
+					boneFollowerSkeletonRenderer.Initialize(false);
+
+					if (boneFollowerSkeletonRenderer.skeletonDataAsset == null)
+						EditorGUILayout.HelpBox("Assigned SkeletonRenderer does not have SkeletonData assigned to it.", MessageType.Warning);
+					
+					if (!boneFollowerSkeletonRenderer.valid)
+						EditorGUILayout.HelpBox("Assigned SkeletonRenderer is invalid. Check target SkeletonRenderer, its SkeletonDataAsset or the console for other errors.", MessageType.Warning);
+				}
 			}
 
-			if (serializedObject.ApplyModifiedProperties() ||
-				(UnityEngine.Event.current.type == EventType.ValidateCommand && UnityEngine.Event.current.commandName == "UndoRedoPerformed")
-			) {
-				component.Initialize();
-			}
+			var current = UnityEngine.Event.current;
+			bool wasUndo = (current.type == EventType.ValidateCommand && current.commandName == "UndoRedoPerformed");
+			if (serializedObject.ApplyModifiedProperties() || wasUndo)
+				targetBoneFollower.Initialize();
 		}
 
 		public static T GetInParent<T> (Transform origin) where T : Component {
@@ -101,7 +109,6 @@ namespace Spine.Unity.Editor {
 				if(parent == null)
 					return default(T);
 			}
-
 			return parent.GetComponent<T>();
 			#else
 			return origin.GetComponentInParent<T>();

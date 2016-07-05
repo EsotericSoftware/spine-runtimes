@@ -154,7 +154,11 @@ namespace Spine.Unity.Editor {
 		static Dictionary<int, BoundingBoxFollower> boundingBoxFollowerTable;
 
 		const string DEFAULT_MIX_KEY = "SPINE_DEFAULT_MIX";
+		#if SPINE_TK2D
+		public static float defaultScale = 1f;
+		#else
 		public static float defaultScale = 0.01f;
+		#endif
 		public static float defaultMix = 0.2f;
 		public static string defaultShader = "Spine/Skeleton";
 

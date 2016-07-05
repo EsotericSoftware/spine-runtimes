@@ -79,11 +79,11 @@ namespace Spine {
 			foreach (BoneData boneData in data.bones) {
 				Bone bone;
 				if (boneData.parent == null) {
-					bone = new Bone (boneData, this, null);				
+					bone = new Bone(boneData, this, null);				
 				} else {
 					Bone parent = bones.Items[boneData.parent.index];
-					bone = new Bone (boneData, this, parent);
-					parent.children.Add (bone);
+					bone = new Bone(boneData, this, parent);
+					parent.children.Add(bone);
 				}
 				bones.Add(bone);
 			}
@@ -130,13 +130,13 @@ namespace Spine {
 			int ikCount = ikConstraints.Count;
 			for (int i = 0, level, n = ikCount; i < n; i++) {
 				IkConstraint ik = ikConstraints.Items[i];
-				Bone bone = ik.bones.Items[0].Parent;
+				Bone bone = ik.bones.Items[0].parent;
 				for (level = 0; bone != null; level++)
-					bone = bone.Parent;
+					bone = bone.parent;
 				ik.level = level;
 			}
 			for (int i = 1, ii; i < ikCount; i++) {
-				IkConstraint ik = ikConstraints.Items [i];
+				IkConstraint ik = ikConstraints.Items[i];
 				int level = ik.level;
 				for (ii = i - 1; ii >= 0; ii--) {
 					IkConstraint other = ikConstraints.Items[ii];
@@ -151,7 +151,7 @@ namespace Spine {
 				SortBone(target);
 
 				ExposedList<Bone> constrained = constraint.bones;
-				Bone parent = constrained.Items [0];
+				Bone parent = constrained.Items[0];
 				SortBone(parent);
 
 				updateCache.Add(constraint);
@@ -164,7 +164,7 @@ namespace Spine {
 			for (int i = 0, n = pathConstraints.Count; i < n; i++) {
 				PathConstraint constraint = pathConstraints.Items[i];
 
-				Slot slot = constraint.Target;
+				Slot slot = constraint.target;
 				int slotIndex = slot.data.index;
 				Bone slotBone = slot.bone;
 				if (skin != null) SortPathConstraintAttachment(skin, slotIndex, slotBone);
@@ -249,9 +249,9 @@ namespace Spine {
 
 		/// <summary>Updates the world transform for each bone and applies constraints.</summary>
 		public void UpdateWorldTransform () {
-			var updateCache = this.updateCache;
+			var updateItems = this.updateCache.Items;
 			for (int i = 0, n = updateCache.Count; i < n; i++)
-				updateCache.Items[i].Update();
+				updateItems[i].Update();
 		}
 
 		/// <summary>Sets the bones, constraints, and slots to their setup pose values.</summary>
@@ -283,9 +283,9 @@ namespace Spine {
 				constraint.shearMix = data.shearMix;
 			}
 
-			var pathConstraints = this.pathConstraints;
+			var pathConstraintItems = this.pathConstraints.Items;
 			for (int i = 0, n = pathConstraints.Count; i < n; i++) {
-				PathConstraint constraint = pathConstraints.Items[i];
+				PathConstraint constraint = pathConstraintItems[i];
 				PathConstraintData data = constraint.data;
 				constraint.position = data.position;
 				constraint.spacing = data.spacing;
