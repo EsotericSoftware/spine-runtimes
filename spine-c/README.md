@@ -48,4 +48,3 @@ spine-c uses an OOP style of programming where each "class" is made up of a stru
 - [spine-cocos2d-iphone](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2d-iphone)
 - [spine-cocos2dx](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx)
 - [spine-sfml](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-sfml)
-- [spine-torque2d](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-torque2d)
