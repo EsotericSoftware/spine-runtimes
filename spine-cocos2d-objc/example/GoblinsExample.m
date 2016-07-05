@@ -30,7 +30,7 @@
  *****************************************************************************/
 
 #import "GoblinsExample.h"
-#import "SpineboyExample.h"
+#import "RaptorExample.h"
 
 @implementation GoblinsExample
 
@@ -65,7 +65,7 @@
 	else if (skeletonNode.timeScale == 1)
 		skeletonNode.timeScale = 0.3f;
 	else
-		[[CCDirector sharedDirector] replaceScene:[SpineboyExample scene]];
+		[[CCDirector sharedDirector] replaceScene:[RaptorExample scene]];
 }
 #endif
 

@@ -176,7 +176,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 
 		} else if (attachment->type == ATTACHMENT_MESH) {
 			MeshAttachment* mesh = (MeshAttachment*)attachment;
-			if (mesh->verticesCount > SPINE_MESH_VERTEX_COUNT_MAX) continue;
+			if (mesh->super.worldVerticesLength > SPINE_MESH_VERTEX_COUNT_MAX) continue;
 			texture = (Texture*)((AtlasRegion*)mesh->rendererObject)->page->rendererObject;
 			MeshAttachment_computeWorldVertices(mesh, slot, worldVertices);
 
@@ -199,30 +199,6 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 				vertexArray->append(vertex);
 			}
 
-		} else if (attachment->type == ATTACHMENT_WEIGHTED_MESH) {
-			WeightedMeshAttachment* mesh = (WeightedMeshAttachment*)attachment;
-			if (mesh->uvsCount > SPINE_MESH_VERTEX_COUNT_MAX) continue;
-			texture = (Texture*)((AtlasRegion*)mesh->rendererObject)->page->rendererObject;
-			WeightedMeshAttachment_computeWorldVertices(mesh, slot, worldVertices);
-
-			Uint8 r = static_cast<Uint8>(skeleton->r * slot->r * 255);
-			Uint8 g = static_cast<Uint8>(skeleton->g * slot->g * 255);
-			Uint8 b = static_cast<Uint8>(skeleton->b * slot->b * 255);
-			Uint8 a = static_cast<Uint8>(skeleton->a * slot->a * 255);
-			vertex.color.r = r;
-			vertex.color.g = g;
-			vertex.color.b = b;
-			vertex.color.a = a;
-
-			Vector2u size = texture->getSize();
-			for (int i = 0; i < mesh->trianglesCount; ++i) {
-				int index = mesh->triangles[i] << 1;
-				vertex.position.x = worldVertices[index];
-				vertex.position.y = worldVertices[index + 1];
-				vertex.texCoords.x = mesh->uvs[index] * size.x;
-				vertex.texCoords.y = mesh->uvs[index + 1] * size.y;
-				vertexArray->append(vertex);
-			}
 		}
 
 		if (texture) {

@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 2.8)
 set(EXAMPLE_DIR "${CMAKE_CURRENT_LIST_DIR}/example")
 if (NOT EXISTS ${EXAMPLE_DIR}/cocos2d)
 	message("Downloading cocos2dx, this may take some time!")
