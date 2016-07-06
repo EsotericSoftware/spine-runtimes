@@ -82,9 +82,9 @@
 
 #define SIN_DEG(A) SIN((A) * DEG_RAD)
 #define COS_DEG(A) COS((A) * DEG_RAD)
-#define CLAMP(x, min, max) (x < min ? min : (x > max ? max : x))
-#define MIN(x, y) (x < y ? x : y)
-#define MAX(x, y) (x > y ? x : y)
+#define CLAMP(x, min, max) ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)))
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
+#define MAX(x, y) ((x) > (y) ? (x) : (y))
 
 #define UNUSED(x) (void)(x)
 
