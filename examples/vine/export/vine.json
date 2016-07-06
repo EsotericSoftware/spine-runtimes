@@ -1,5 +1,5 @@
 {
-"skeleton": { "hash": "y5p9P3dq5PmDy9I9gZQQVTBFfyc", "spine": "99.9.9-dev", "width": 0, "height": 0, "images": "" },
+"skeleton": { "hash": "y5p9P3dq5PmDy9I9gZQQVTBFfyc", "spine": "3.4.00", "width": 0, "height": 0, "images": "" },
 "bones": [
 	{ "name": "root" },
 	{ "name": "vine1", "parent": "root", "length": 74, "rotation": 90, "x": 339.09, "y": -467.15, "color": "f700ffff" },

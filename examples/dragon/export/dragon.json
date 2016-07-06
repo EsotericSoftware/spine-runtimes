@@ -1,5 +1,5 @@
 {
-"skeleton": { "hash": "9MKo2cmJTDc3IPV4B3LRJxWbl04", "spine": "99.9.9-dev", "width": 0, "height": 0, "images": "./images/" },
+"skeleton": { "hash": "9MKo2cmJTDc3IPV4B3LRJxWbl04", "spine": "3.4.00", "width": 0, "height": 0, "images": "./images/" },
 "bones": [
 	{ "name": "root", "y": -176.12 },
 	{ "name": "COG", "parent": "root", "y": 176.12 },
