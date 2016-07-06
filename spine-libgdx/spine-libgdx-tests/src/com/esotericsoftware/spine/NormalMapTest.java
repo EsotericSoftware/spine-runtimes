@@ -37,6 +37,7 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -89,10 +90,12 @@ public class NormalMapTest extends ApplicationAdapter {
 		batch.setShader(program);
 		renderer = new SkeletonRenderer();
 
-		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(skeletonPath + "-diffuse.atlas"));
+		FileHandle file = Gdx.files.internal(skeletonPath + "-diffuse.atlas");
+		TextureAtlas atlas = new TextureAtlas(file);
 		atlasTexture = atlas.getRegions().first().getTexture();
-		normalMapTexture = new Texture(Gdx.files.internal(skeletonPath + "-normal.png"));
 
+		normalMapTexture = new Texture(Gdx.files.internal(skeletonPath + "-normal.png"));
+	
 		SkeletonJson json = new SkeletonJson(atlas);
 		skeletonData = json.readSkeletonData(Gdx.files.internal(skeletonPath + ".json"));
 		if (animationName != null) animation = skeletonData.findAnimation(animationName);
@@ -373,7 +376,7 @@ public class NormalMapTest extends ApplicationAdapter {
 
 	public static void main (String[] args) throws Exception {
 		if (args.length == 0)
-			args = new String[] {"spineboy/spineboy-old", "walk"};
+			args = new String[] {"spineboy-old/spineboy-old", "walk"};
 		else if (args.length == 1) //
 			args = new String[] {args[0], null};
 
