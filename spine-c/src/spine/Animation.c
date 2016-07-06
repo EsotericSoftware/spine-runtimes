@@ -521,6 +521,7 @@ void _spAttachmentTimeline_apply (const spTimeline* timeline, spSkeleton* skelet
 	spSlot_setAttachment(skeleton->slots[self->slotIndex],
 			attachmentName ? spSkeleton_getAttachmentForSlotIndex(skeleton, self->slotIndex, attachmentName) : 0);
 
+	UNUSED(lastTime);
 	UNUSED(firedEvents);
 	UNUSED(eventsCount);
 	UNUSED(alpha);
