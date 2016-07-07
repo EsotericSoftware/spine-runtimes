@@ -16,7 +16,7 @@ del /q ..\vine\export\*
 
 echo.
 echo Exporting...
-"C:\Program Files (x86)\Spine\Spine.com" -u 3.4.00 ^
+"C:\Program Files (x86)\Spine\Spine.com" ^
 -i ../alien/alien.spine -o ../alien/export -e json.json ^
 -i ../alien/alien.spine -o ../alien/export -e binary.json ^
 -i ../alien/images -o ../alien/export -n alien -p atlas-0.5.json ^
