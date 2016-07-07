@@ -31,7 +31,6 @@
 
 using UnityEngine;
 using UnityEditor;
-using System.Collections;
 
 namespace Spine.Unity.Editor {
 	
@@ -39,7 +38,8 @@ namespace Spine.Unity.Editor {
 	public class BoundingBoxFollowerInspector : UnityEditor.Editor {
 		SerializedProperty skeletonRenderer, slotName;
 		BoundingBoxFollower follower;
-		bool needToReset = false;
+		bool rebuildRequired = false;
+		bool addBoneFollower = false;
 
 		void OnEnable () {
 			skeletonRenderer = serializedObject.FindProperty("skeletonRenderer");
@@ -48,41 +48,63 @@ namespace Spine.Unity.Editor {
 		}
 
 		public override void OnInspectorGUI () {
-			if (needToReset) {
-				follower.HandleReset(null);
-				needToReset = false;
+			bool isInspectingPrefab = (PrefabUtility.GetPrefabType(target) == PrefabType.Prefab);
+			bool repaintEvent = UnityEngine.Event.current.type == EventType.Repaint;
+
+			if (rebuildRequired) {
+				follower.HandleRebuild(null);
+				rebuildRequired = false;
 			}
+
 			EditorGUI.BeginChangeCheck();
 			EditorGUILayout.PropertyField(skeletonRenderer);
 			EditorGUILayout.PropertyField(slotName, new GUIContent("Slot"));
-
-			if (EditorGUI.EndChangeCheck()){
+			if (EditorGUI.EndChangeCheck()) {
 				serializedObject.ApplyModifiedProperties();
-				needToReset = true;
+				if (!isInspectingPrefab)
+					rebuildRequired = true;
 			}
 
-			bool hasBone = follower.GetComponent<BoneFollower>() != null;
-
-			EditorGUI.BeginDisabledGroup(hasBone || follower.Slot == null);
-			{
+			bool hasBoneFollower = follower.GetComponent<BoneFollower>() != null;
+			using (new EditorGUI.DisabledGroupScope(hasBoneFollower || follower.Slot == null)) {
 				if (GUILayout.Button(new GUIContent("Add Bone Follower", SpineEditorUtilities.Icons.bone))) {
-					var boneFollower = follower.gameObject.AddComponent<BoneFollower>();
-					boneFollower.boneName = follower.Slot.Data.BoneData.Name;
+					addBoneFollower = true;
 				}
 			}
-			EditorGUI.EndDisabledGroup();
 
+			if (isInspectingPrefab) {
+				follower.colliderTable.Clear();
+				follower.attachmentNameTable.Clear();
+				EditorGUILayout.HelpBox("BoundingBoxAttachments cannot be previewed in prefabs.", MessageType.Info);
 
+				// How do you prevent components from being saved into the prefab? No such HideFlag. DontSaveInEditor | DontSaveInBuild does not work. DestroyImmediate does not work.
+				var collider = follower.GetComponent<PolygonCollider2D>();
+				if (collider != null) Debug.LogWarning("Found BoundingBoxFollower collider components in prefab. These are disposed and regenerated at runtime.");
 
-			//GUILayout.Space(20);
-			GUILayout.Label("Attachment Names", EditorStyles.boldLabel);
-			foreach (var kp in follower.attachmentNameTable) {
-				string name = kp.Value;
-				var collider = follower.colliderTable[kp.Key];
-				bool isPlaceholder = name != kp.Key.Name;
-				collider.enabled = EditorGUILayout.ToggleLeft(new GUIContent(!isPlaceholder ? name : name + " [" + kp.Key.Name + "]", isPlaceholder ? SpineEditorUtilities.Icons.skinPlaceholder : SpineEditorUtilities.Icons.boundingBox), collider.enabled);
+			} else {				
+				EditorGUILayout.LabelField(string.Format("Attachment Names ({0} PolygonCollider2D)", follower.colliderTable.Count), EditorStyles.boldLabel);
+				EditorGUI.BeginChangeCheck();
+				foreach (var kp in follower.attachmentNameTable) {
+					string attachmentName = kp.Value;
+					var collider = follower.colliderTable[kp.Key];
+					bool isPlaceholder = attachmentName != kp.Key.Name;
+					collider.enabled = EditorGUILayout.ToggleLeft(new GUIContent(!isPlaceholder ? attachmentName : attachmentName + " [" + kp.Key.Name + "]", isPlaceholder ? SpineEditorUtilities.Icons.skinPlaceholder : SpineEditorUtilities.Icons.boundingBox), collider.enabled);
+				}
+				if (EditorGUI.EndChangeCheck()) {
+					SceneView.RepaintAll();
+				}
+
+				if (!Application.isPlaying)
+					EditorGUILayout.HelpBox("\nAt runtime, BoundingBoxFollower enables and disables PolygonCollider2Ds based on the currently active attachment in the slot.\n\nCheckboxes in Edit Mode are only for preview. Checkbox states are not saved.\n", MessageType.Info);
+			}
+
+			if (addBoneFollower && repaintEvent) {
+				var boneFollower = follower.gameObject.AddComponent<BoneFollower>();
+				boneFollower.boneName = follower.Slot.Data.BoneData.Name;
+				addBoneFollower = false;
 			}
 		}
+
 	}
 
 }
