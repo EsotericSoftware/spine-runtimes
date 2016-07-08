@@ -62,8 +62,6 @@
 #define DEG_RAD (PI / 180)
 #define RAD_DEG (180 / PI)
 
-#define SIN_DEG(A) sinf((A) * DEG_RAD)
-#define COS_DEG(A) cosf((A) * DEG_RAD)
 #define ABS(A) ((A) < 0? -(A): (A))
 
 #ifdef __STDC_VERSION__
@@ -82,6 +80,12 @@
 #define ACOS(A) (float)acos(A)
 #endif
 
+#define SIN_DEG(A) SIN((A) * DEG_RAD)
+#define COS_DEG(A) COS((A) * DEG_RAD)
+#define CLAMP(x, min, max) ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)))
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
+#define MAX(x, y) ((x) > (y) ? (x) : (y))
+
 #define UNUSED(x) (void)(x)
 
 #include <stdlib.h>
@@ -91,10 +95,11 @@
 #include <spine/Animation.h>
 #include <spine/Atlas.h>
 #include <spine/AttachmentLoader.h>
+#include <spine/VertexAttachment.h>
 #include <spine/RegionAttachment.h>
 #include <spine/MeshAttachment.h>
-#include <spine/WeightedMeshAttachment.h>
 #include <spine/BoundingBoxAttachment.h>
+#include <spine/PathAttachment.h>
 #include <spine/AnimationState.h>
 
 #ifdef __cplusplus
@@ -178,10 +183,12 @@ void _spAttachmentLoader_setUnknownTypeError (spAttachmentLoader* self, spAttach
 void _spAttachment_init (spAttachment* self, const char* name, spAttachmentType type,
 void (*dispose) (spAttachment* self));
 void _spAttachment_deinit (spAttachment* self);
+void _spVertexAttachment_deinit (spVertexAttachment* self);
 
 #ifdef SPINE_SHORT_NAMES
 #define _Attachment_init(...) _spAttachment_init(__VA_ARGS__)
 #define _Attachment_deinit(...) _spAttachment_deinit(__VA_ARGS__)
+#define _VertexAttachment_deinit(...) _spVertexAttachment_deinit(__VA_ARGS__)
 #endif
 
 /**/

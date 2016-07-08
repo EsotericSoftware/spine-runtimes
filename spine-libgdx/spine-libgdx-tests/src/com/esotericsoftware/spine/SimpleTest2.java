@@ -63,7 +63,7 @@ public class SimpleTest2 extends ApplicationAdapter {
 		renderer.setPremultipliedAlpha(true);
 		debugRenderer = new SkeletonRendererDebug();
 
-		atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy.atlas"));
+		atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy-pma.atlas"));
 		SkeletonJson json = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
 		json.setScale(0.6f); // Load the skeleton at 60% the size it was in Spine.
 		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy/spineboy.json"));

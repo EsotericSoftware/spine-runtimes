@@ -1,3 +1,6 @@
+@echo off
+
+echo Cleaning...
 del /q ..\alien\export\*
 del /q ..\dragon\export\*
 del /q ..\goblins\export\*
@@ -11,6 +14,8 @@ del /q ..\raptor\export\*
 del /q ..\tank\export\*
 del /q ..\vine\export\*
 
+echo.
+echo Exporting...
 "C:\Program Files (x86)\Spine\Spine.com" ^
 -i ../alien/alien.spine -o ../alien/export -e json.json ^
 -i ../alien/alien.spine -o ../alien/export -e binary.json ^
@@ -24,11 +29,15 @@ del /q ..\vine\export\*
 
 -i ../goblins/goblins.spine -o ../goblins/export -e json.json ^
 -i ../goblins/goblins.spine -o ../goblins/export -e binary.json ^
+-i ../goblins/goblins-mesh.spine -o ../goblins/export -e json.json ^
+-i ../goblins/goblins-mesh.spine -o ../goblins/export -e binary.json ^
 -i ../goblins/images -o ../goblins/export -n goblins -p atlas-1.0.json ^
 -i ../goblins/images -o ../goblins/export -n goblins-pma -p atlas-1.0-pma.json ^
 
 -i ../hero/hero.spine -o ../hero/export -e json.json ^
 -i ../hero/hero.spine -o ../hero/export -e binary.json ^
+-i ../hero/hero-mesh.spine -o ../hero/export -e json.json ^
+-i ../hero/hero-mesh.spine -o ../hero/export -e binary.json ^
 -i ../hero/images -o ../hero/export -n hero -p atlas-1.0.json ^
 -i ../hero/images -o ../hero/export -n hero-pma -p atlas-1.0-pma.json ^
 
@@ -44,6 +53,8 @@ del /q ..\vine\export\*
 
 -i ../spineboy/spineboy.spine -o ../spineboy/export -e json.json ^
 -i ../spineboy/spineboy.spine -o ../spineboy/export -e binary.json ^
+-i ../spineboy/spineboy-mesh.spine -o ../spineboy/export -e json.json ^
+-i ../spineboy/spineboy-mesh.spine -o ../spineboy/export -e binary.json ^
 -i ../spineboy/images -o ../spineboy/export -n spineboy -p atlas-1.0.json ^
 -i ../spineboy/images -o ../spineboy/export -n spineboy-pma -p atlas-1.0-pma.json ^
 
@@ -51,12 +62,14 @@ del /q ..\vine\export\*
 -i ../spineboy-old/spineboy-old.spine -o ../spineboy-old/export -e binary.json ^
 -i ../spineboy-old/images -o ../spineboy-old/export -n spineboy-old -p atlas-1.0.json ^
 -i ../spineboy-old/images -o ../spineboy-old/export -n spineboy-old-pma -p atlas-1.0-pma.json ^
+-i ../spineboy-old/normal -o ../spineboy-old/export -n spineboy-old-normal -p atlas-1.0.json ^
+-i ../spineboy-old/diffuse -o ../spineboy-old/export -n spineboy-old-diffuse -p atlas-1.0.json ^
 
 -i ../spinosaurus/spinosaurus.spine -o ../spinosaurus/export -e json.json ^
 -i ../spinosaurus/spinosaurus.spine -o ../spinosaurus/export -e binary.json ^
 
 -i ../raptor/raptor.spine -o ../raptor/export -e json.json ^
--i ../raptor/raptor.spine -o ../tank/export -e binary.json ^
+-i ../raptor/raptor.spine -o ../raptor/export -e binary.json ^
 -i ../raptor/images -o ../raptor/export -n raptor -p atlas-0.5.json ^
 -i ../raptor/images -o ../raptor/export -n raptor-pma -p atlas-0.5-pma.json ^
 
@@ -68,4 +81,6 @@ del /q ..\vine\export\*
 -i ../vine/vine.spine -o ../vine/export -e json.json ^
 -i ../vine/vine.spine -o ../vine/export -e binary.json ^
 -i ../vine/images -o ../vine/export -n vine -p atlas-1.0.json ^
--i ../vine/images -o ../vine/export -n vine-pma -p atlas-1.0-pma.json ^
+-i ../vine/images -o ../vine/export -n vine-pma -p atlas-1.0-pma.json
+
+del /q ..\spineboy-old\export\*-normal.atlas

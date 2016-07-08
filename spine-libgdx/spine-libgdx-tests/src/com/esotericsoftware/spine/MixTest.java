@@ -60,7 +60,7 @@ public class MixTest extends ApplicationAdapter {
 
 		final String name = "spineboy/spineboy";
 
-		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(name + ".atlas"));
+		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(name + "-pma.atlas"));
 
 		if (true) {
 			SkeletonJson json = new SkeletonJson(atlas);

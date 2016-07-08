@@ -80,7 +80,7 @@ public class Box2DExample extends ApplicationAdapter {
 		skeletonRenderer = new SkeletonRenderer();
 		skeletonRenderer.setPremultipliedAlpha(true);
 
-		atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy.atlas"));
+		atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy-pma.atlas"));
 
 		// This loader creates Box2dAttachments instead of RegionAttachments for an easy way to keep
 		// track of the Box2D body for each attachment.

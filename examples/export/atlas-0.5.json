@@ -27,7 +27,7 @@
 "silent": false,
 "combineSubdirectories": false,
 "flattenPaths": false,
-"premultiplyAlpha": true,
+"premultiplyAlpha": false,
 "useIndexes": false,
 "bleed": false,
 "limitMemory": false,

@@ -59,7 +59,7 @@ public class SimpleTest3 extends ApplicationAdapter {
 		debugRenderer.setRegionAttachments(false);
 		debugRenderer.setMeshHull(false);
 
-		atlas = new TextureAtlas(Gdx.files.internal("raptor/raptor.atlas"));
+		atlas = new TextureAtlas(Gdx.files.internal("raptor/raptor-pma.atlas"));
 		SkeletonJson json = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
 		json.setScale(0.5f); // Load the skeleton at 50% the size it was in Spine.
 		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("raptor/raptor.json"));
