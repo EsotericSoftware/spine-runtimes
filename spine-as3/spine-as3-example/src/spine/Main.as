@@ -68,7 +68,7 @@ public class Main extends Sprite {
 		skeleton.y = 560;
 		
 		skeleton.state.onStart.add(function (trackIndex:int) : void {
-			trace(trackIndex + " start: " + skeleton.state.getCurrent(trackIndex));
+			trace(trackIndex + " fuu start: " + skeleton.state.getCurrent(trackIndex));
 		});
 		skeleton.state.onEnd.add(function (trackIndex:int) : void {
 			trace(trackIndex + " end: " + skeleton.state.getCurrent(trackIndex));
