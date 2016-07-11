@@ -107,6 +107,12 @@ namespace Spine.Unity {
 					foreach (var attachmentName in attachmentNames) {
 						var attachment = skin.GetAttachment(slotIndex, attachmentName);
 						var boundingBoxAttachment = attachment as BoundingBoxAttachment;
+
+#if UNITY_EDITOR
+						if (attachment != null && boundingBoxAttachment == null)
+							Debug.Log("BoundingBoxFollower tried to follow a slot that contains non-boundingbox attachments.");
+#endif
+
 						if (boundingBoxAttachment != null) {
 							var bbCollider = SkeletonUtility.AddBoundingBoxAsComponent(boundingBoxAttachment, gameObject, true);
 							bbCollider.enabled = false;
@@ -127,7 +133,6 @@ namespace Spine.Unity {
 					Debug.LogWarning("Bounding Box Follower tried to rebuild as a prefab.");
 			}
 #endif
-				
 		}
 
 		void ClearColliders () {
@@ -159,22 +164,31 @@ namespace Spine.Unity {
 				return;
 
 			if (slot != null && slot.Attachment != currentAttachment)
-				SetCurrent((BoundingBoxAttachment)slot.Attachment);
+				MatchAttachment(slot.Attachment);
 		}
 
-		void SetCurrent (BoundingBoxAttachment attachment) {
+		/// <summary>Sets the current collider to match attachment.</summary>
+		/// <param name="attachment">If the attachment is not a bounding box, it will be treated as null.</param>
+		void MatchAttachment (Attachment attachment) {
+			var bbAttachment = attachment as BoundingBoxAttachment;
+
+#if UNITY_EDITOR
+			if (attachment != null && bbAttachment == null)
+				Debug.LogWarning("BoundingBoxFollower tried to match a non-boundingbox attachment. It will treat it as null.");
+#endif
+
 			if (currentCollider != null)
 				currentCollider.enabled = false;
 
-			if (attachment == null) {
+			if (bbAttachment == null) {
 				currentCollider = null;
 			} else {
-				currentCollider = colliderTable[attachment];
+				currentCollider = colliderTable[bbAttachment];
 				currentCollider.enabled = true;
 			}
 
-			currentAttachment = attachment;
-			currentAttachmentName = currentAttachment == null ? null : attachmentNameTable[attachment];
+			currentAttachment = bbAttachment;
+			currentAttachmentName = currentAttachment == null ? null : attachmentNameTable[bbAttachment];
 		}
 	}
 
