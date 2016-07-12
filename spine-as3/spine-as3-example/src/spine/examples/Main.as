@@ -29,50 +29,47 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine {
+package spine.examples {
+
+import flash.display.Sprite;
+
+import spine.*;
 import spine.animation.AnimationStateData;
 import spine.atlas.Atlas;
 import spine.attachments.AtlasAttachmentLoader;
-import spine.attachments.AttachmentLoader;
-import spine.starling.SkeletonAnimation;
-import spine.starling.StarlingTextureLoader;
+import spine.flash.FlashTextureLoader;
+import spine.flash.SkeletonAnimation;
 
-import starling.core.Starling;
-import starling.display.Sprite;
-import starling.events.Touch;
-import starling.events.TouchEvent;
-import starling.events.TouchPhase;
-
-public class SpineboyExample extends Sprite {
-	[Embed(source = "/spineboy.json", mimeType = "application/octet-stream")]
-	static public const SpineboyJson:Class;
-
+[SWF(width = "800", height = "600", frameRate = "60", backgroundColor = "#dddddd")]
+public class Main extends Sprite {
 	[Embed(source = "/spineboy.atlas", mimeType = "application/octet-stream")]
 	static public const SpineboyAtlas:Class;
 
 	[Embed(source = "/spineboy.png")]
 	static public const SpineboyAtlasTexture:Class;
 
+	[Embed(source = "/spineboy.json", mimeType = "application/octet-stream")]
+	static public const SpineboyJson:Class;
+
 	private var skeleton:SkeletonAnimation;
 
-	public function SpineboyExample () {
-		var spineAtlas:Atlas = new Atlas(new SpineboyAtlas(), new StarlingTextureLoader(new SpineboyAtlasTexture()));
-		var attachmentLoader:AttachmentLoader = new AtlasAttachmentLoader(spineAtlas);
-		var json:SkeletonJson = new SkeletonJson(attachmentLoader);
+	public function Main () {
+		var atlas:Atlas = new Atlas(new SpineboyAtlas(), new FlashTextureLoader(new SpineboyAtlasTexture()));
+		var json:SkeletonJson = new SkeletonJson(new AtlasAttachmentLoader(atlas));
 		json.scale = 0.6;
 		var skeletonData:SkeletonData = json.readSkeletonData(new SpineboyJson());
 
 		var stateData:AnimationStateData = new AnimationStateData(skeletonData);
-		stateData.setMixByName("run", "jump", 0.2);
+		stateData.setMixByName("walk", "jump", 0.2);
 		stateData.setMixByName("jump", "run", 0.4);
 		stateData.setMixByName("jump", "jump", 0.2);
 
-		skeleton = new SkeletonAnimation(skeletonData, false, stateData);
+		skeleton = new SkeletonAnimation(skeletonData, stateData);
 		skeleton.x = 400;
 		skeleton.y = 560;
 		
 		skeleton.state.onStart.add(function (trackIndex:int) : void {
-			trace(trackIndex + " start: " + skeleton.state.getCurrent(trackIndex));
+			trace(trackIndex + " fuu start: " + skeleton.state.getCurrent(trackIndex));
 		});
 		skeleton.state.onEnd.add(function (trackIndex:int) : void {
 			trace(trackIndex + " end: " + skeleton.state.getCurrent(trackIndex));
@@ -84,23 +81,17 @@ public class SpineboyExample extends Sprite {
 			trace(trackIndex + " event: " + skeleton.state.getCurrent(trackIndex) + ", "
 				+ event.data.name + ": " + event.intValue + ", " + event.floatValue + ", " + event.stringValue);
 		});
-
-		skeleton.state.setAnimationByName(0, "run", true);
-		skeleton.state.addAnimationByName(0, "jump", false, 3);
-		skeleton.state.addAnimationByName(0, "run", true, 0);
-
-		addChild(skeleton);
-		Starling.juggler.add(skeleton);
-
-		addEventListener(TouchEvent.TOUCH, onClick);
-	}
-
-	private function onClick (event:TouchEvent) : void {
-		var touch:Touch = event.getTouch(this);
-		if (touch && touch.phase == TouchPhase.BEGAN) {
-			skeleton.state.setAnimationByName(0, "jump", false);
+		
+		if (false) {
+			skeleton.state.setAnimationByName(0, "test", true);
+		} else {
+			skeleton.state.setAnimationByName(0, "walk", true);
+			skeleton.state.addAnimationByName(0, "jump", false, 3);
 			skeleton.state.addAnimationByName(0, "run", true, 0);
 		}
+
+		addChild(skeleton);
 	}
 }
+
 }

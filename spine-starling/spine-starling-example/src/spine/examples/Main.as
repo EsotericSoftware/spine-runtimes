@@ -29,7 +29,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine {
+package spine.examples {
 
 import flash.display.Sprite;
 
@@ -41,13 +41,14 @@ public class Main extends Sprite {
 
 	public function Main () {
 		var example:Class;
-		//example = SpineboyExample;
-		//example = GoblinsExample;
+		// example = SpineboyExample;
+		// example = GoblinsExample;
 		example = RaptorExample;
 
 		_starling = new Starling(example, stage);
 		_starling.enableErrorChecking = true;
 		_starling.showStats = true;
+		_starling.skipUnchangedFrames = false;
 		_starling.start();
 	}
 }

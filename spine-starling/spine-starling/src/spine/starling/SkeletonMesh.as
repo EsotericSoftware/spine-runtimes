@@ -29,61 +29,27 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine {
-import spine.atlas.Atlas;
-import spine.attachments.AtlasAttachmentLoader;
-import spine.attachments.AttachmentLoader;
-import spine.starling.SkeletonAnimation;
-import spine.starling.StarlingTextureLoader;
+package spine.starling {
+import starling.textures.Texture;
+import starling.styles.MeshStyle;
+import starling.rendering.IndexData;
+import starling.rendering.VertexData;
+import starling.display.Mesh;
 
-import starling.core.Starling;
-import starling.display.Sprite;
-import starling.events.Touch;
-import starling.events.TouchEvent;
-import starling.events.TouchPhase;
-
-public class RaptorExample extends Sprite {
-	[Embed(source = "/raptor.json", mimeType = "application/octet-stream")]
-	static public const RaptorJson:Class;
+public class SkeletonMesh extends Mesh {
 	
-	[Embed(source = "/raptor.atlas", mimeType = "application/octet-stream")]
-	static public const RaptorAtlas:Class;
+	public function SkeletonMesh(texture:Texture, vertexData:VertexData = null, indexData:IndexData = null, style:MeshStyle=null) {
+        super(vertexData == null? new VertexData(): vertexData, indexData == null? new IndexData(): indexData, style);
+		this.texture = texture;
+    }
 	
-	[Embed(source = "/raptor.png")]
-	static public const RaptorAtlasTexture:Class;
-	
-	private var skeleton:SkeletonAnimation;
-	private var gunGrabbed:Boolean;
-
-	public function RaptorExample () {
-		var attachmentLoader:AttachmentLoader;
-		var spineAtlas:Atlas = new Atlas(new RaptorAtlas(), new StarlingTextureLoader(new RaptorAtlasTexture()));
-		attachmentLoader = new AtlasAttachmentLoader(spineAtlas);
-
-		var json:SkeletonJson = new SkeletonJson(attachmentLoader);
-		json.scale = 0.5;
-		var skeletonData:SkeletonData = json.readSkeletonData(new RaptorJson());
-
-		skeleton = new SkeletonAnimation(skeletonData, true);
-		skeleton.x = 400;
-		skeleton.y = 560;
-		skeleton.state.setAnimationByName(0, "walk", true);
-
-		addChild(skeleton);
-		Starling.juggler.add(skeleton);
-
-		addEventListener(TouchEvent.TOUCH, onClick);
+	public function getVertexData(): VertexData {
+		return this.vertexData;
 	}
-
-	private function onClick (event:TouchEvent) : void {
-		var touch:Touch = event.getTouch(this);
-		if (touch && touch.phase == TouchPhase.BEGAN) {
-			if (gunGrabbed)
-				skeleton.skeleton.setToSetupPose();
-			else
-				skeleton.state.setAnimationByName(1, "gungrab", false);
-			gunGrabbed = !gunGrabbed;
-		}
+	
+	public function getIndexData(): IndexData {
+		return this.indexData;
 	}
 }
+
 }

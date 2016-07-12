@@ -29,28 +29,62 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine.starling {
+package spine.examples {
+import spine.atlas.Atlas;
+import spine.*;
+import spine.attachments.AtlasAttachmentLoader;
+import spine.attachments.AttachmentLoader;
+import spine.starling.SkeletonAnimation;
+import spine.starling.StarlingTextureLoader;
 
-import starling.display.Image;
-import starling.textures.Texture;
-import starling.utils.VertexData;
+import starling.core.Starling;
+import starling.display.Sprite;
+import starling.events.Touch;
+import starling.events.TouchEvent;
+import starling.events.TouchPhase;
 
-public class SkeletonImage extends Image {
-	public function SkeletonImage (texture:Texture) {
-		super(texture);
+public class RaptorExample extends Sprite {
+	[Embed(source = "/raptor.json", mimeType = "application/octet-stream")]
+	static public const RaptorJson:Class;
+	
+	[Embed(source = "/raptor.atlas", mimeType = "application/octet-stream")]
+	static public const RaptorAtlas:Class;
+	
+	[Embed(source = "/raptor.png")]
+	static public const RaptorAtlasTexture:Class;
+	
+	private var skeleton:SkeletonAnimation;
+	private var gunGrabbed:Boolean;
+
+	public function RaptorExample () {
+		var attachmentLoader:AttachmentLoader;
+		var spineAtlas:Atlas = new Atlas(new RaptorAtlas(), new StarlingTextureLoader(new RaptorAtlasTexture()));
+		attachmentLoader = new AtlasAttachmentLoader(spineAtlas);
+
+		var json:SkeletonJson = new SkeletonJson(attachmentLoader);
+		json.scale = 0.5;
+		var skeletonData:SkeletonData = json.readSkeletonData(new RaptorJson());
+
+		skeleton = new SkeletonAnimation(skeletonData);
+		skeleton.x = 400;
+		skeleton.y = 560;
+		skeleton.state.setAnimationByName(0, "walk", true);
+
+		addChild(skeleton);
+		Starling.juggler.add(skeleton);
+
+		addEventListener(TouchEvent.TOUCH, onClick);
 	}
 
-	public function get vertexData () : VertexData {
-		return mVertexData;
-	}
-
-	public function updateVertices () : void {
-		onVertexDataChanged();
-	}
-
-	override public function get tinted () : Boolean {
-		return true;
+	private function onClick (event:TouchEvent) : void {
+		var touch:Touch = event.getTouch(this);
+		if (touch && touch.phase == TouchPhase.BEGAN) {
+			if (gunGrabbed)
+				skeleton.skeleton.setToSetupPose();
+			else
+				skeleton.state.setAnimationByName(1, "gungrab", false);
+			gunGrabbed = !gunGrabbed;
+		}
 	}
 }
-
 }

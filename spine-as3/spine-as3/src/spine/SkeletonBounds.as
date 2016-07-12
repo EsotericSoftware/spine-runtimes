@@ -38,6 +38,9 @@ public class SkeletonBounds {
 	public var boundingBoxes:Vector.<BoundingBoxAttachment> = new Vector.<BoundingBoxAttachment>();
 	public var polygons:Vector.<Polygon> = new Vector.<Polygon>();
 	public var minX:Number, minY:Number, maxX:Number, maxY:Number;
+	
+	public function SkeletonBounds () {		
+	}
 
 	public function update (skeleton:Skeleton, updateAabb:Boolean) : void {
 		var slots:Vector.<Slot> = skeleton.slots;

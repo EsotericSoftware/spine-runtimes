@@ -45,6 +45,9 @@ public class SkeletonData {
 	public var transformConstraints:Vector.<TransformConstraintData> = new Vector.<TransformConstraintData>();
 	public var width:Number, height:Number;
 	public var version:String, hash:String;
+	
+	public function SkeletonData () {		
+	}
 
 	// --- Bones.
 
