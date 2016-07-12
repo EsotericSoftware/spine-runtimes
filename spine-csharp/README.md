@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-csharp works with data exported from Spine 3.3.07.
+spine-csharp works with data exported from the latest version of Spine.
 
 spine-csharp supports all Spine features.
 
