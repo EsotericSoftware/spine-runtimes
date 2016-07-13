@@ -235,7 +235,6 @@ namespace Spine.Unity {
 			ExposedList<Slot> drawOrder = skeleton.drawOrder;
 			var drawOrderItems = drawOrder.Items;
 			int drawOrderCount = drawOrder.Count;
-			int separatorSlotCount = separatorSlots.Count;
 			bool renderMeshes = this.renderMeshes;
 
 			// Clear last state of attachments and submeshes
@@ -298,9 +297,7 @@ namespace Spine.Unity {
 				}
 
 				#if !SPINE_TK2D
-				// Material material = (Material)((AtlasRegion)rendererObject).page.rendererObject; // For no customSlotMaterials
-
-				Material material;
+				Material material; //= (Material)((AtlasRegion)rendererObject).page.rendererObject; // For no customSlotMaterials
 				if (isCustomSlotMaterialsPopulated) {
 					if (!customSlotMaterials.TryGetValue(slot, out material)) {
 						material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
@@ -313,8 +310,8 @@ namespace Spine.Unity {
 				#endif
 
 				// Create a new SubmeshInstruction when material changes. (or when forced to separate by a submeshSeparator)
-				bool forceSeparate = (separatorSlotCount > 0 && separatorSlots.Contains(slot));
-				if ((vertexCount > 0 && lastMaterial.GetInstanceID() != material.GetInstanceID()) || forceSeparate) {
+				bool forceSeparate = (separatorSlots.Count > 0 && separatorSlots.Contains(slot));
+				if (vertexCount > 0 && (lastMaterial.GetInstanceID() != material.GetInstanceID() || forceSeparate)) {
 					workingSubmeshInstructions.Add(
 						new Spine.Unity.MeshGeneration.SubmeshInstruction {
 							skeleton = this.skeleton,
@@ -327,14 +324,13 @@ namespace Spine.Unity {
 							forceSeparate = forceSeparate
 						}
 					);
-
 					submeshTriangleCount = 0;
 					submeshVertexCount = 0;
 					submeshFirstVertex = vertexCount;
 					submeshStartSlotIndex = i;
 				}
+				// Update state for the next iteration.
 				lastMaterial = material;
-
 				submeshTriangleCount += attachmentTriangleCount;
 				vertexCount += attachmentVertexCount;
 				submeshVertexCount += attachmentVertexCount;
@@ -382,10 +378,7 @@ namespace Spine.Unity {
 			#if SPINE_OPTIONAL_RENDEROVERRIDE
 			if (this.generateMeshOverride != null) {
 				this.generateMeshOverride(workingInstruction);
-
-				if (disableRenderingOnOverride) {
-					return;
-				}
+				if (disableRenderingOnOverride) return;
 			}
 			#endif
 
@@ -876,9 +869,8 @@ namespace Spine.Unity {
 					}
 				}
 				#else
-				for (int ii = 0, nn = attachmentTriangles.Length; ii < nn; ii++, triangleIndex++) {
-				triangles[triangleIndex] = firstVertex + attachmentTriangles[ii];
-				}
+				for (int ii = 0, nn = attachmentTriangles.Length; ii < nn; ii++, triangleIndex++)
+					triangles[triangleIndex] = firstVertex + attachmentTriangles[ii];
 				#endif
 
 				firstVertex += attachmentVertexCount;

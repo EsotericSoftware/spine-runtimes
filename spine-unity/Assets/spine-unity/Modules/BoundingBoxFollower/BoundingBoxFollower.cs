@@ -32,28 +32,30 @@ using UnityEngine;
 using System.Collections.Generic;
 
 namespace Spine.Unity {
+
 	[ExecuteInEditMode]
 	public class BoundingBoxFollower : MonoBehaviour {
-		
+		#region Inspector
 		public SkeletonRenderer skeletonRenderer;
-
 		[SpineSlot(dataField: "skeletonRenderer", containsBoundingBoxes: true)]
 		public string slotName;
+		#endregion
 
 		Slot slot;
 		BoundingBoxAttachment currentAttachment;
-		PolygonCollider2D currentCollider;
 		string currentAttachmentName;
+		PolygonCollider2D currentCollider;
+
 		bool valid = false;
 		bool hasReset;
 
-		public Dictionary<BoundingBoxAttachment, PolygonCollider2D> colliderTable = new Dictionary<BoundingBoxAttachment, PolygonCollider2D>();
-		public Dictionary<BoundingBoxAttachment, string> attachmentNameTable = new Dictionary<BoundingBoxAttachment, string>();
+		public readonly Dictionary<BoundingBoxAttachment, PolygonCollider2D> colliderTable = new Dictionary<BoundingBoxAttachment, PolygonCollider2D>();
+		public readonly Dictionary<BoundingBoxAttachment, string> attachmentNameTable = new Dictionary<BoundingBoxAttachment, string>();
 
-		public string CurrentAttachmentName { get { return currentAttachmentName; } }
-		public BoundingBoxAttachment CurrentAttachment { get { return currentAttachment; } }
-		public PolygonCollider2D CurrentCollider { get { return currentCollider; } }
 		public Slot Slot { get { return slot; } }
+		public BoundingBoxAttachment CurrentAttachment { get { return currentAttachment; } }
+		public string CurrentAttachmentName { get { return currentAttachmentName; } }
+		public PolygonCollider2D CurrentCollider { get { return currentCollider; } }
 
 		void OnEnable () {
 			ClearColliders();
@@ -62,74 +64,96 @@ namespace Spine.Unity {
 				skeletonRenderer = GetComponentInParent<SkeletonRenderer>();
 
 			if (skeletonRenderer != null) {
-				skeletonRenderer.OnRebuild -= HandleReset;
-				skeletonRenderer.OnRebuild += HandleReset;
+				skeletonRenderer.OnRebuild -= HandleRebuild;
+				skeletonRenderer.OnRebuild += HandleRebuild;
 
 				if (hasReset)
-					HandleReset(skeletonRenderer);
+					HandleRebuild(skeletonRenderer);
 			}
 		}
 
 		void OnDisable () {
-			skeletonRenderer.OnRebuild -= HandleReset;
+			skeletonRenderer.OnRebuild -= HandleRebuild;
 		}
 
 		void Start () {
 			if (!hasReset && skeletonRenderer != null)
-				HandleReset(skeletonRenderer);
+				HandleRebuild(skeletonRenderer);
 		}
 
-		public void HandleReset (SkeletonRenderer renderer) {
+		public void HandleRebuild (SkeletonRenderer renderer) {
 			if (string.IsNullOrEmpty(slotName))
 				return;
 
 			hasReset = true;
-
 			ClearColliders();
 			colliderTable.Clear();
 
 			if (skeletonRenderer.skeleton == null) {
-				skeletonRenderer.OnRebuild -= HandleReset;
+				skeletonRenderer.OnRebuild -= HandleRebuild;
 				skeletonRenderer.Initialize(false);
-				skeletonRenderer.OnRebuild += HandleReset;
+				skeletonRenderer.OnRebuild += HandleRebuild;
 			}
 
 			var skeleton = skeletonRenderer.skeleton;
 			slot = skeleton.FindSlot(slotName);
 			int slotIndex = skeleton.FindSlotIndex(slotName);
 
-			foreach (var skin in skeleton.Data.Skins) {
-				var attachmentNames = new List<string>();
-				skin.FindNamesForSlot(slotIndex, attachmentNames);
+			if (this.gameObject.activeInHierarchy) {
+				foreach (var skin in skeleton.Data.Skins) {
+					var attachmentNames = new List<string>();
+					skin.FindNamesForSlot(slotIndex, attachmentNames);
 
-				foreach (var attachmentName in attachmentNames) {
-					var attachment = skin.GetAttachment(slotIndex, attachmentName);
-					var boundingBoxAttachment = attachment as BoundingBoxAttachment;
-					if (boundingBoxAttachment != null) {
-						var bbCollider = SkeletonUtility.AddBoundingBoxAsComponent(boundingBoxAttachment, gameObject, true);
-						bbCollider.enabled = false;
-						bbCollider.hideFlags = HideFlags.HideInInspector;
-						colliderTable.Add(boundingBoxAttachment, bbCollider);
-						attachmentNameTable.Add(boundingBoxAttachment, attachmentName);
+					foreach (var attachmentName in attachmentNames) {
+						var attachment = skin.GetAttachment(slotIndex, attachmentName);
+						var boundingBoxAttachment = attachment as BoundingBoxAttachment;
+
+#if UNITY_EDITOR
+						if (attachment != null && boundingBoxAttachment == null)
+							Debug.Log("BoundingBoxFollower tried to follow a slot that contains non-boundingbox attachments.");
+#endif
+
+						if (boundingBoxAttachment != null) {
+							var bbCollider = SkeletonUtility.AddBoundingBoxAsComponent(boundingBoxAttachment, gameObject, true);
+							bbCollider.enabled = false;
+							bbCollider.hideFlags = HideFlags.NotEditable;
+							colliderTable.Add(boundingBoxAttachment, bbCollider);
+							attachmentNameTable.Add(boundingBoxAttachment, attachmentName);
+						}
 					}
 				}
 			}
 
+#if UNITY_EDITOR
 			valid = colliderTable.Count != 0;
-
-			if (!valid)
-				Debug.LogWarning("Bounding Box Follower not valid! Slot [" + slotName + "] does not contain any Bounding Box Attachments!");
+			if (!valid) {
+				if (this.gameObject.activeInHierarchy)
+					Debug.LogWarning("Bounding Box Follower not valid! Slot [" + slotName + "] does not contain any Bounding Box Attachments!");
+				else 
+					Debug.LogWarning("Bounding Box Follower tried to rebuild as a prefab.");
+			}
+#endif
 		}
 
 		void ClearColliders () {
 			var colliders = GetComponents<PolygonCollider2D>();
+			if (colliders.Length == 0) return;
+
+#if UNITY_EDITOR
 			if (Application.isPlaying) {
-				foreach (var c in colliders)
-					Destroy(c);
+				foreach (var c in colliders) {
+					if (c != null)
+						Destroy(c);
+				}
 			} else {
 				foreach (var c in colliders)
 					DestroyImmediate(c);
 			}
+#else
+			foreach (var c in colliders)
+				if (c != null)
+					Destroy(c);
+#endif
 
 			colliderTable.Clear();
 			attachmentNameTable.Clear();
@@ -139,25 +163,32 @@ namespace Spine.Unity {
 			if (!skeletonRenderer.valid)
 				return;
 
-			if (slot != null) {
-				if (slot.Attachment != currentAttachment)
-					SetCurrent((BoundingBoxAttachment)slot.Attachment);
-			}
+			if (slot != null && slot.Attachment != currentAttachment)
+				MatchAttachment(slot.Attachment);
 		}
 
-		void SetCurrent (BoundingBoxAttachment attachment) {
-			if (currentCollider)
+		/// <summary>Sets the current collider to match attachment.</summary>
+		/// <param name="attachment">If the attachment is not a bounding box, it will be treated as null.</param>
+		void MatchAttachment (Attachment attachment) {
+			var bbAttachment = attachment as BoundingBoxAttachment;
+
+#if UNITY_EDITOR
+			if (attachment != null && bbAttachment == null)
+				Debug.LogWarning("BoundingBoxFollower tried to match a non-boundingbox attachment. It will treat it as null.");
+#endif
+
+			if (currentCollider != null)
 				currentCollider.enabled = false;
 
-			if (attachment != null) {
-				currentCollider = colliderTable[attachment];
-				currentCollider.enabled = true;
-			} else {
+			if (bbAttachment == null) {
 				currentCollider = null;
+			} else {
+				currentCollider = colliderTable[bbAttachment];
+				currentCollider.enabled = true;
 			}
 
-			currentAttachment = attachment;
-			currentAttachmentName = currentAttachment == null ? null : attachmentNameTable[attachment];
+			currentAttachment = bbAttachment;
+			currentAttachmentName = currentAttachment == null ? null : attachmentNameTable[bbAttachment];
 		}
 	}
 
