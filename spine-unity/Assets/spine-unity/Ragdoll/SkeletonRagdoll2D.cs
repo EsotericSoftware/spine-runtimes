@@ -280,7 +280,7 @@ public class SkeletonRagdoll2D : MonoBehaviour {
 			if (colliders.Count == 0) {
 				var box = go.AddComponent<BoxCollider2D>();
 				box.size = new Vector2(length, thickness);
-#if UNITY_5_0
+#if UNITY_5
 				box.offset = new Vector2((b.WorldFlipX ? -length : length) / 2, 0);
 #else
 				box.center = new Vector2((b.WorldFlipX ? -length : length) / 2, 0);

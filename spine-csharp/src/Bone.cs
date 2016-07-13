@@ -39,7 +39,7 @@ namespace Spine {
 		internal BoneData data;
 		internal Skeleton skeleton;
 		internal Bone parent;
-		internal List<Bone> children = new List<Bone>();
+		internal ExposedList<Bone> children = new ExposedList<Bone>();
 		internal float x, y, rotation, rotationIK, scaleX, scaleY;
 		internal bool flipX, flipY;
 		internal float m00, m01, m10, m11;
@@ -49,7 +49,7 @@ namespace Spine {
 		public BoneData Data { get { return data; } }
 		public Skeleton Skeleton { get { return skeleton; } }
 		public Bone Parent { get { return parent; } }
-		public List<Bone> Children { get { return children; } }
+		public ExposedList<Bone> Children { get { return children; } }
 		public float X { get { return x; } set { x = value; } }
 		public float Y { get { return y; } set { y = value; } }
 		/// <summary>The forward kinetics rotation.</summary>

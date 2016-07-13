@@ -224,9 +224,9 @@ public class SkeletonUtility : MonoBehaviour {
 		if (boneRoot != null) {
 			List<string> constraintTargetNames = new List<string>();
 
-			foreach (IkConstraint c in skeletonRenderer.skeleton.IkConstraints) {
-				constraintTargetNames.Add(c.Target.Data.Name);
-			}
+			ExposedList<IkConstraint> ikConstraints = skeletonRenderer.skeleton.IkConstraints;
+			for (int i = 0, n = ikConstraints.Count; i < n; i++)
+				constraintTargetNames.Add(ikConstraints.Items[i].Target.Data.Name);
 
 			foreach (var b in utilityBones) {
 				if (b.bone == null) {
@@ -343,7 +343,9 @@ public class SkeletonUtility : MonoBehaviour {
 	public GameObject SpawnBoneRecursively (Bone bone, Transform parent, SkeletonUtilityBone.Mode mode, bool pos, bool rot, bool sca) {
 		GameObject go = SpawnBone(bone, parent, mode, pos, rot, sca);
 
-		foreach (Bone child in bone.Children) {
+		ExposedList<Bone> childrenBones = bone.Children;
+		for (int i = 0, n = childrenBones.Count; i < n; i++) {
+			Bone child = childrenBones.Items[i];
 			SpawnBoneRecursively(child, go.transform, mode, pos, rot, sca);
 		}
 

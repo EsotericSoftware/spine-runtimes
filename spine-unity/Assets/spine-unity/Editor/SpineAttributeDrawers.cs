@@ -85,7 +85,7 @@ public class SpineSlotDrawer : PropertyDrawer {
 		menu.AddSeparator("");
 
 		for (int i = 0; i < data.Slots.Count; i++) {
-			string name = data.Slots[i].Name;
+			string name = data.Slots.Items[i].Name;
 			if (name.StartsWith(attrib.startsWith)) {
 				if (attrib.containsBoundingBoxes) {
 
@@ -190,7 +190,7 @@ public class SpineSkinDrawer : PropertyDrawer {
 		menu.AddSeparator("");
 
 		for (int i = 0; i < data.Skins.Count; i++) {
-			string name = data.Skins[i].Name;
+			string name = data.Skins.Items[i].Name;
 			if (name.StartsWith(attrib.startsWith))
 				menu.AddItem(new GUIContent(name), name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
 		}
@@ -330,7 +330,7 @@ public class SpineAnimationDrawer : PropertyDrawer {
 
 		var animations = skeletonDataAsset.GetAnimationStateData().SkeletonData.Animations;
 		for (int i = 0; i < animations.Count; i++) {
-			string name = animations[i].Name;
+			string name = animations.Items[i].Name;
 			if (name.StartsWith(attrib.startsWith))
 				menu.AddItem(new GUIContent(name), name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
 		}
@@ -416,7 +416,7 @@ public class SpineAttachmentDrawer : PropertyDrawer {
 			if (skeletonRenderer.skeleton.Skin != null) {
 				validSkins.Add(skeletonRenderer.skeleton.Skin);
 			} else {
-				validSkins.Add(data.Skins[0]);
+				validSkins.Add(data.Skins.Items[0]);
 			}
 		} else {
 			foreach (Skin skin in data.Skins) {
@@ -440,7 +440,7 @@ public class SpineAttachmentDrawer : PropertyDrawer {
 		menu.AddItem(new GUIContent("Null"), property.stringValue == "", HandleSelect, new SpineDrawerValuePair("", property));
 		menu.AddSeparator("");
 
-		Skin defaultSkin = data.Skins[0];
+		Skin defaultSkin = data.Skins.Items[0];
 
 		SerializedProperty slotProperty = property.serializedObject.FindProperty(attrib.slotField);
 		string slotMatch = "";
@@ -457,7 +457,7 @@ public class SpineAttachmentDrawer : PropertyDrawer {
 				prefix = skinPrefix;
 
 			for (int i = 0; i < data.Slots.Count; i++) {
-				if (slotMatch.Length > 0 && data.Slots[i].Name.ToLower().Contains(slotMatch) == false)
+				if (slotMatch.Length > 0 && data.Slots.Items[i].Name.ToLower().Contains(slotMatch) == false)
 					continue;
 
 				attachmentNames.Clear();
@@ -473,11 +473,11 @@ public class SpineAttachmentDrawer : PropertyDrawer {
 				for (int a = 0; a < attachmentNames.Count; a++) {
 					
 					string attachmentPath = attachmentNames[a];
-					string menuPath = prefix + data.Slots[i].Name + "/" + attachmentPath;
+					string menuPath = prefix + data.Slots.Items[i].Name + "/" + attachmentPath;
 					string name = attachmentNames[a];
 
 					if (attrib.returnAttachmentPath)
-						name = skin.Name + "/" + data.Slots[i].Name + "/" + attachmentPath;
+						name = skin.Name + "/" + data.Slots.Items[i].Name + "/" + attachmentPath;
 
 					if (attrib.placeholdersOnly && placeholderNames.Contains(attachmentPath) == false) {
 						menu.AddDisabledItem(new GUIContent(menuPath));
@@ -564,7 +564,7 @@ public class SpineBoneDrawer : PropertyDrawer {
 		menu.AddSeparator("");
 
 		for (int i = 0; i < data.Bones.Count; i++) {
-			string name = data.Bones[i].Name;
+			string name = data.Bones.Items[i].Name;
 			if (name.StartsWith(attrib.startsWith))
 				menu.AddItem(new GUIContent(name), name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
 		}
