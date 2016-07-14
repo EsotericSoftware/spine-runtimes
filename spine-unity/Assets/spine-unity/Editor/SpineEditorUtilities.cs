@@ -914,7 +914,8 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		#region Checking Methods
-		static int[] runtimeVersion = { 3, 3 };
+		static int[][] compatibleVersions = { new[] {3, 4, 0}, new[] {3, 3, 0} };
+		static bool isFixVersionRequired = false;
 
 		static bool CheckForValidSkeletonData (string skeletonJSONPath) {
 			string dir = Path.GetDirectoryName(skeletonJSONPath);
@@ -953,13 +954,27 @@ namespace Spine.Unity.Editor {
 			// Version warning
 			{
 				var skeletonInfo = (Dictionary<string, object>)root["skeleton"];
-				string spineVersion = (string)skeletonInfo["spine"];
-				if (!string.IsNullOrEmpty(spineVersion)) {
-					var splitVersion = spineVersion.Split('.');
-					bool primaryMismatch = runtimeVersion[0] != int.Parse(splitVersion[0]);
-					bool secondaryMismatch = runtimeVersion[1] != int.Parse(splitVersion[1]);
-					if (primaryMismatch || secondaryMismatch)
-						Debug.LogWarning(string.Format("Skeleton '{0}' (exported with Spine {1}) may be incompatible with your runtime version: spine-unity v{2}", asset.name, spineVersion, runtimeVersion[0] + "." + runtimeVersion[1]));
+				string jsonVersion = (string)skeletonInfo["spine"];
+				if (!string.IsNullOrEmpty(jsonVersion)) {
+					string[] jsonVersionSplit = jsonVersion.Split('.');
+					bool match = false;
+					foreach (var version in compatibleVersions) {
+						bool primaryMatch = version[0] == int.Parse(jsonVersionSplit[0]);
+						bool secondaryMatch = version[1] == int.Parse(jsonVersionSplit[1]);
+
+						if (isFixVersionRequired)
+							secondaryMatch &= version[2] <= int.Parse(jsonVersionSplit[2]);
+						
+						if (primaryMatch && secondaryMatch) {
+							match = true;
+							break;
+						}
+					}
+
+					if (!match) {
+						string runtimeVersion = compatibleVersions[0][0] + "." + compatibleVersions[0][1];
+						Debug.LogWarning(string.Format("Skeleton '{0}' (exported with Spine {1}) may be incompatible with your runtime version: spine-unity v{2}", asset.name, jsonVersion, runtimeVersion));
+					}
 				}
 			}
 
