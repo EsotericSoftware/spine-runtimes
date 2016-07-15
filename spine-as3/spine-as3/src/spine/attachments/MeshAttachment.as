@@ -30,21 +30,19 @@
  *****************************************************************************/
 
 package spine.attachments {
-import spine.Slot;
-import spine.Bone;
 
-public dynamic class MeshAttachment extends Attachment implements FfdAttachment {
-	public var vertices:Vector.<Number>;
+public dynamic class MeshAttachment extends VertexAttachment {
+	public var worldVertices:Vector.<Number>;
 	public var uvs:Vector.<Number>;
 	public var regionUVs:Vector.<Number>;
-	public var triangles:Vector.<uint>;
-	public var hullLength:int;
+	public var triangles:Vector.<uint>;	
 	public var r:Number = 1;
 	public var g:Number = 1;
 	public var b:Number = 1;
 	public var a:Number = 1;
+	public var hullLength:int;
 	private var _parentMesh:MeshAttachment;
-	public var inheritFFD:Boolean;
+	public var inheritDeform:Boolean;
 
 	public var path:String;
 	public var rendererObject:Object;
@@ -86,27 +84,8 @@ public dynamic class MeshAttachment extends Attachment implements FfdAttachment 
 		}
 	}
 
-	public function computeWorldVertices (x:Number, y:Number, slot:Slot, worldVertices:Vector.<Number>) : void {
-		var bone:Bone = slot.bone;
-		x += bone.worldX;
-		y += bone.worldY;
-		var m00:Number = bone.a;
-		var m01:Number = bone.b;
-		var m10:Number = bone.c;
-		var m11:Number = bone.d;
-		var vertices:Vector.<Number> = this.vertices;
-		var verticesCount:int = vertices.length;
-		if (slot.attachmentVertices.length == verticesCount) vertices = slot.attachmentVertices;
-		for (var i:int = 0, ii:int = 0; i < verticesCount; i += 2, ii += 2) {
-			var vx:Number = vertices[i];
-			var vy:Number = vertices[int(i + 1)];
-			worldVertices[ii] = vx * m00 + vy * m01 + x;
-			worldVertices[int(ii + 1)] = vx * m10 + vy * m11 + y;
-		}
-	}
-
 	public function applyFFD (sourceAttachment:Attachment) : Boolean {
-		return this == sourceAttachment || (inheritFFD && _parentMesh == sourceAttachment);
+		return this == sourceAttachment || (inheritDeform && _parentMesh == sourceAttachment);
 	}
 
 	public function get parentMesh () : MeshAttachment {
@@ -116,7 +95,9 @@ public dynamic class MeshAttachment extends Attachment implements FfdAttachment 
 	public function set parentMesh (parentMesh:MeshAttachment) : void {
 		_parentMesh = parentMesh;
 		if (parentMesh != null) {
+			bones = parentMesh.bones;
 			vertices = parentMesh.vertices;
+			worldVerticesLength = parentMesh.worldVerticesLength;
 			regionUVs = parentMesh.regionUVs;
 			triangles = parentMesh.triangles;
 			hullLength = parentMesh.hullLength;

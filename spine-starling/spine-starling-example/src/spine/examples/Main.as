@@ -29,27 +29,28 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine.starling {
+package spine.examples {
 
-import starling.display.Image;
-import starling.textures.Texture;
-import starling.utils.VertexData;
+import flash.display.Sprite;
 
-public class SkeletonImage extends Image {
-	public function SkeletonImage (texture:Texture) {
-		super(texture);
-	}
+import starling.core.Starling;
 
-	public function get vertexData () : VertexData {
-		return mVertexData;
-	}
+[SWF(width = "800", height = "600", frameRate = "60", backgroundColor = "#dddddd")]
+public class Main extends Sprite {
+	private var _starling:Starling;
 
-	public function updateVertices () : void {
-		onVertexDataChanged();
-	}
+	public function Main () {
+		var example:Class;
+		// example = SpineboyExample;
+		// example = GoblinsExample;
+		// example = RaptorExample;
+		example = TankExample;
 
-	override public function get tinted () : Boolean {
-		return true;
+		_starling = new Starling(example, stage);
+		_starling.enableErrorChecking = true;
+		_starling.showStats = true;
+		_starling.skipUnchangedFrames = false;
+		_starling.start();
 	}
 }
 

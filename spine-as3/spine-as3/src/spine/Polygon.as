@@ -34,6 +34,9 @@ package spine {
 public class Polygon {
 	public var vertices:Vector.<Number> = new Vector.<Number>();
 	
+	public function Polygon () {		
+	}
+	
 	/** Returns true if the polygon contains the point. */
 	public function containsPoint (x:Number, y:Number) : Boolean {
 		var nn:int = vertices.length;

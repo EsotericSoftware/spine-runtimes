@@ -82,31 +82,13 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 		attachment.regionOriginalHeight = region.originalHeight;
 		return attachment;
 	}
-	
-	public function newWeightedMeshAttachment (skin:Skin, name:String, path:String) : WeightedMeshAttachment {
-		var region:AtlasRegion = atlas.findRegion(path);
-		if (region == null)
-			throw new Error("Region not found in atlas: " + path + " (weighted mesh attachment: " + name + ")");
-		var attachment:WeightedMeshAttachment = new WeightedMeshAttachment(name);
-		attachment.rendererObject = region;
-		var scaleX:Number = region.page.width / nextPOT(region.page.width);
-		var scaleY:Number = region.page.height / nextPOT(region.page.height);
-		attachment.regionU = region.u * scaleX;
-		attachment.regionV = region.v * scaleY;
-		attachment.regionU2 = region.u2 * scaleX;
-		attachment.regionV2 = region.v2 * scaleY;
-		attachment.regionRotate = region.rotate;
-		attachment.regionOffsetX = region.offsetX;
-		attachment.regionOffsetY = region.offsetY;
-		attachment.regionWidth = region.width;
-		attachment.regionHeight = region.height;
-		attachment.regionOriginalWidth = region.originalWidth;
-		attachment.regionOriginalHeight = region.originalHeight;
-		return attachment;
-	}
 
 	public function newBoundingBoxAttachment (skin:Skin, name:String) : BoundingBoxAttachment {
 		return new BoundingBoxAttachment(name);
+	}
+	
+	public function newPathAttachment(skin:Skin, name:String) : PathAttachment {
+		return new PathAttachment(name);
 	}
 
 	static public function nextPOT (value:int) : int {

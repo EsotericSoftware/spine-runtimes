@@ -38,11 +38,13 @@ public class SkeletonBounds {
 	public var boundingBoxes:Vector.<BoundingBoxAttachment> = new Vector.<BoundingBoxAttachment>();
 	public var polygons:Vector.<Polygon> = new Vector.<Polygon>();
 	public var minX:Number, minY:Number, maxX:Number, maxY:Number;
+	
+	public function SkeletonBounds () {		
+	}
 
 	public function update (skeleton:Skeleton, updateAabb:Boolean) : void {
 		var slots:Vector.<Slot> = skeleton.slots;
-		var slotCount:int = slots.length;
-		var x:Number = skeleton.x, y:Number = skeleton.y;
+		var slotCount:int = slots.length;		
 
 		boundingBoxes.length = 0;
 		for each (var polygon:Polygon in polygons)
@@ -63,8 +65,8 @@ public class SkeletonBounds {
 				polygon = new Polygon();
 			polygons[polygons.length] = polygon;
 
-			polygon.vertices.length = boundingBox.vertices.length;
-			boundingBox.computeWorldVertices(x, y, slot.bone, polygon.vertices);
+			polygon.vertices.length = boundingBox.worldVerticesLength;
+			boundingBox.computeWorldVertices(slot, polygon.vertices);
 		}
 
 		if (updateAabb) aabbCompute();

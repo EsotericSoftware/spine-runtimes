@@ -63,19 +63,19 @@ public class EventTimeline implements Timeline {
 			return;
 		if (time < frames[0]) return; // Time is before first frame.
 		
-		var frameIndex:int;
+		var frame:int;
 		if (lastTime < frames[0])
-			frameIndex = 0;
+			frame = 0;
 		else {
-			frameIndex = Animation.binarySearch1(frames, lastTime);
-			var frame:Number = frames[frameIndex];
-			while (frameIndex > 0) { // Fire multiple events with the same frame.
-				if (frames[int(frameIndex - 1)] != frame) break;
-				frameIndex--;
+			frame = Animation.binarySearch1(frames, lastTime);
+			var frameTime:Number = frames[frame];
+			while (frame > 0) { // Fire multiple events with the same frame.
+				if (frames[int(frame - 1)] != frameTime) break;
+				frame--;
 			}
 		}
-		for (; frameIndex < frameCount && time >= frames[frameIndex]; frameIndex++)
-			firedEvents[firedEvents.length] = events[frameIndex];
+		for (; frame < frameCount && time >= frames[frame]; frame++)
+			firedEvents[firedEvents.length] = events[frame];
 	}
 }
 

@@ -41,6 +41,9 @@ public class AtlasPage {
 	public var rendererObject:Object;
 	public var width:int;
 	public var height:int;
+	
+	public function AtlasPage () {		
+	}
 }
 
 }

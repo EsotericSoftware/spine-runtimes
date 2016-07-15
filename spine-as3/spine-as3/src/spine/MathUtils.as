@@ -34,6 +34,20 @@ package spine {
 public class MathUtils {
 	static public var radDeg:Number = 180 / Math.PI;
 	static public var degRad:Number = Math.PI / 180;
+	
+	static public function cosDeg(degrees:Number): Number {
+		return Math.cos(degrees * degRad);
+	}
+	
+	static public function sinDeg(degrees:Number): Number {
+		return Math.sin(degrees * degRad);
+	}
+	
+	static public function clamp (value:Number, min:Number, max:Number) : Number {
+		if (value < min) return min;
+		if (value > max) return max;
+		return value;
+	}
 }
 
 }

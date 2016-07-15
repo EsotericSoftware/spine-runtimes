@@ -10,18 +10,32 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-as3 works with data exported from Spine 3.1.08. Updating spine-as3 to [v3.2](https://github.com/EsotericSoftware/spine-runtimes/issues/586) and [v3.3](https://github.com/EsotericSoftware/spine-runtimes/issues/613) is in progress.
+spine-as3 works with data exported from the latest Spine version.
 
 spine-as3 supports all Spine features, including meshes. If using the `spine.flash` classes for rendering, meshes are not supported.
 
 spine-as3 does not yet support loading the binary format.
 
-## Setup
+## Usage
+1. Create a new Flex or Adobe AIR project in your preferred IDE.
+2. Download the Spine Runtimes source using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip)
+3. Add the sources from `spine-as3/spine-as3/src/` to your project
 
-1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
-1. Using [FDT](http://fdt.powerflasher.com/), import the spine-as3 project by choosing File -> Import -> Existing projects. For other IDEs you will need to create a new project and import the source.
+## Example
+The Spine AS3 example works on Windows, Linux and Mac OS X. This guide assumes you are using [FDT Free](http://fdt.powerflasher.com/) as your development environment.
 
-Alternatively, the contents of the `spine-as3/src` directory can be copied into your project.
+1. Download [FDT free](http://fdt.powerflasher.com/buy-download/) for your operating system.
+3. Download and install Adobe Flash Player 22 with debugging support](https://www.adobe.com/support/flashplayer/debug_downloads.html#fp15)
+2. Download the latest [Flex SDK](http://www.adobe.com/devnet/flex/flex-sdk-download.html). We assume it will be installed to some folder on your disk called `flex_sdk`.
+3. Download the latest [Adobe AIR SDK](http://www.adobe.com/devnet/air/air-sdk-download.html)
+4. Extract the AIR SDK contents, and copy them to your `flex_sdk` folder. This will replace the Adobe AIR version shipped with Flex.
+5. Open FDT, go to `Preferences -> FDT -> Installed SDKs`
+6. Click `Add` and browse to `flex_sdk`
+7. Go to `File -> Import -> General -> Existing Projects into Workspace`
+6. Browse to `spine-as3/`. You should see both the `spine-as3` and `spine-as3-example` project in the import dialog. Click `Finish`
+8. Right click the `Main.as` file in `spine-as3-example/src/spine` in the FDT explorer and select `Debug As -> FDT SWF Application`
+
+**Note**: FDT Free does not allow project dependencies. If you modify the sources of `spine-as3`, you will have to compile the project to an `.swc` and place it in `spine-as3-example/libs`.
 
 ## Demos
 

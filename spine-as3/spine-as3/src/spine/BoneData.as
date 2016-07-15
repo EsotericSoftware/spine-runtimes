@@ -32,6 +32,7 @@
 package spine {
 
 public class BoneData {
+	internal var _index:int;
 	internal var _name:String;
 	internal var _parent:BoneData;
 	public var length:Number;
@@ -40,14 +41,22 @@ public class BoneData {
 	public var rotation:Number;
 	public var scaleX:Number = 1;
 	public var scaleY:Number = 1;
-	public var inheritScale:Boolean = true;
+	public var shearX:Number;
+	public var shearY:Number;	
 	public var inheritRotation:Boolean = true;
+	public var inheritScale:Boolean = true;
 
 	/** @param parent May be null. */
-	public function BoneData (name:String, parent:BoneData) {
+	public function BoneData (index:int, name:String, parent:BoneData) {
+		if (index < 0) throw new ArgumentError("index must be >= 0");
 		if (name == null) throw new ArgumentError("name cannot be null.");
+		_index = index;
 		_name = name;
 		_parent = parent;
+	}
+	
+	public function get index () : int {
+		return _index;
 	}
 
 	public function get name () : String {

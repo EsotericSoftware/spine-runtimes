@@ -33,42 +33,96 @@ package spine {
 
 public class TransformConstraint implements Updatable {
 	internal var _data:TransformConstraintData;
-	public var bone:Bone;
+	internal var _bones:Vector.<Bone>;
 	public var target:Bone;
+	public var rotateMix:Number;	
 	public var translateMix:Number;
-	public var x:Number;
-	public var y:Number;
+	public var scaleMix:Number;
+	public var shearMix:Number;
+	internal var _temp:Vector.<Number> = new Vector.<Number>(2);
 
 	public function TransformConstraint (data:TransformConstraintData, skeleton:Skeleton) {
 		if (data == null) throw new ArgumentError("data cannot be null.");
 		if (skeleton == null) throw new ArgumentError("skeleton cannot be null.");
 		_data = data;
+		rotateMix = data.rotateMix;
 		translateMix = data.translateMix;
-		x = data.x;
-		y = data.y;
-
-		bone = skeleton.findBone(data.bone._name);
+		scaleMix = data.scaleMix;
+		shearMix = data.shearMix;
+		_bones = new Vector.<Bone>();		
+		for each (var boneData:BoneData in data.bones)
+			_bones.push(skeleton.findBone(boneData.name));		
 		target = skeleton.findBone(data.target._name);
-	}
+	}		
 
 	public function apply () : void {
 		update();
 	}
 
 	public function update () : void {
-		var translateMix:Number = translateMix;
-		if (translateMix > 0) {
-			var local:Vector.<Number> = new Vector.<Number>(2, true);
-			local[0] = x;
-			local[1] = y;
-			target.localToWorld(local);
-			bone._worldX += (local[0] - bone._worldX) * translateMix;
-			bone._worldY += (local[1] - bone._worldY) * translateMix;
+		var rotateMix:Number = this.rotateMix, translateMix:Number = this.translateMix, scaleMix:Number = this.scaleMix, shearMix:Number = this.shearMix;
+		var target:Bone = this.target;
+		var ta:Number = target.a, tb:Number = target.b, tc:Number = target.c, td:Number = target.d;
+		var bones:Vector.<Bone> = this._bones;
+		for (var i:int = 0, n:int = bones.length; i < n; i++) {
+			var bone:Bone = bones[i];
+
+			if (rotateMix > 0) {
+				var a:Number = bone.a, b:Number = bone.b, c:Number = bone.c, d:Number = bone.d;
+				var r:Number = Math.atan2(tc, ta) - Math.atan2(c, a) + data.offsetRotation * MathUtils.degRad;
+				if (r > Math.PI)
+					r -= Math.PI * 2;
+				else if (r < -Math.PI) r += Math.PI * 2;
+				r *= rotateMix;
+				var cos:Number = Math.cos(r), sin:Number = Math.sin(r);
+				bone._a = cos * a - sin * c;
+				bone._b = cos * b - sin * d;
+				bone._c = sin * a + cos * c;
+				bone._d = sin * b + cos * d;
+			}
+
+			if (translateMix > 0) {
+				_temp[0] = data.offsetX;
+				_temp[1] = data.offsetY;
+				target.localToWorld(_temp);
+				bone._worldX += (_temp[0] - bone.worldX) * translateMix;
+				bone._worldY += (_temp[1] - bone.worldY) * translateMix;
+			}
+
+			if (scaleMix > 0) {
+				var bs:Number = Math.sqrt(bone.a * bone.a + bone.c * bone.c);
+				var ts:Number = Math.sqrt(ta * ta + tc * tc);
+				var s:Number = bs > 0.00001 ? (bs + (ts - bs + data.offsetScaleX) * scaleMix) / bs : 0;
+				bone._a *= s;
+				bone._c *= s;
+				bs = Math.sqrt(bone.b * bone.b + bone.d * bone.d);
+				ts = Math.sqrt(tb * tb + td * td);
+				s = bs > 0.00001 ? (bs + (ts - bs + data.offsetScaleY) * scaleMix) / bs : 0;
+				bone._b *= s;
+				bone._d *= s;
+			}
+
+			if (shearMix > 0) {
+				b = bone.b, d = bone.d;
+				var by:Number = Math.atan2(d, b);
+				r = Math.atan2(td, tb) - Math.atan2(tc, ta) - (by - Math.atan2(bone.c, bone.a));
+				if (r > Math.PI)
+					r -= Math.PI * 2;
+				else if (r < -Math.PI) r += Math.PI * 2;
+				r = by + (r + data.offsetShearY * MathUtils.degRad) * shearMix;
+				s = Math.sqrt(b * b + d * d);
+				bone._b = Math.cos(r) * s;
+				bone._d = Math.sin(r) * s;
+			}
 		}
 	}
 
 	public function get data () : TransformConstraintData {
 		return _data;
+	}
+	
+	public function get bones () : Vector.<Bone> {
+		return _bones;
 	}
 
 	public function toString () : String {
