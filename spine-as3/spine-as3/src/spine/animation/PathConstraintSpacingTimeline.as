@@ -29,21 +29,34 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine.attachments {
-import spine.Skin;
+package spine.animation {
+import spine.Skeleton;
+import spine.Event;
+import spine.PathConstraint;
 
-public interface AttachmentLoader {
-	/** @return May be null to not load an attachment. */
-	function newRegionAttachment (skin:Skin, name:String, path:String) : RegionAttachment;
+public class PathConstraintSpacingTimeline extends PathConstraintPositionTimeline {
+	public function PathConstraintSpacingTimeline (frameCount:int) {
+		super(frameCount);
+	}
 
-	/** @return May be null to not load an attachment. */
-	function newMeshAttachment (skin:Skin, name:String, path:String) : MeshAttachment;
+	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {		
+		if (time < frames[0]) return; // Time is before first frame.
 
-	/** @return May be null to not load an attachment. */
-	function newBoundingBoxAttachment (skin:Skin, name:String) : BoundingBoxAttachment;
-	
-	/** @return May be null to not load an attachment */
-	function newPathAttachment(skin:Skin, name:String): PathAttachment;
+		var constraint:PathConstraint = skeleton.pathConstraints[pathConstraintIndex];
+
+		if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
+			var i:int = frames.length;
+			constraint.spacing += (frames[i + PREV_VALUE] - constraint.spacing) * alpha;
+			return;
+		}
+
+		// Interpolate between the previous frame and the current frame.
+		var frame:int = Animation.binarySearch(frames, time, ENTRIES);
+		var spacing:Number = frames[frame + PREV_VALUE];
+		var frameTime:Number = frames[frame];
+		var percent:Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+
+		constraint.spacing += (spacing + (frames[frame + VALUE] - spacing) * percent - constraint.spacing) * alpha;
+	}
 }
-
 }

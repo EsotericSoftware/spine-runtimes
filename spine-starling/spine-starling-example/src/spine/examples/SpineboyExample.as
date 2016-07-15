@@ -86,6 +86,7 @@ public class SpineboyExample extends Sprite {
 				+ event.data.name + ": " + event.intValue + ", " + event.floatValue + ", " + event.stringValue);
 		});
 
+		skeleton.skeleton.setToSetupPose();
 		skeleton.state.setAnimationByName(0, "run", true);
 		skeleton.state.addAnimationByName(0, "jump", false, 3);
 		skeleton.state.addAnimationByName(0, "run", true, 0);

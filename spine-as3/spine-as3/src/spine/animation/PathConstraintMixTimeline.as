@@ -31,50 +31,53 @@
 
 package spine.animation {
 import spine.Event;
-import spine.IkConstraint;
 import spine.Skeleton;
+import spine.PathConstraint;
 
-public class IkConstraintTimeline extends CurveTimeline {
+public class PathConstraintMixTimeline extends CurveTimeline {
 	static public const ENTRIES:int = 3;
-	static internal const PREV_TIME:int = -3, PREV_MIX:int = -2, PREV_BEND_DIRECTION:int = -1;
-	static internal const MIX:int = 1, BEND_DIRECTION:int = 2;
+	static internal const PREV_TIME:int = -3, PREV_ROTATE:int = -2, PREV_TRANSLATE:int = -1;
+	static internal const ROTATE:int = 1, TRANSLATE:int = 2;
 
-	public var ikConstraintIndex:int;
-	public var frames:Vector.<Number>; // time, mix, bendDirection, ...
+	public var pathConstraintIndex:int;
+	
+	public var frames:Vector.<Number>; // time, rotate mix, translate mix, ...
 
-	public function IkConstraintTimeline (frameCount:int) {
+	public function PathConstraintMixTimeline (frameCount:int) {
 		super(frameCount);
 		frames = new Vector.<Number>(frameCount * ENTRIES, true);
-	}
+	}	
 
-	/** Sets the time, mix and bend direction of the specified keyframe. */
-	public function setFrame (frameIndex:int, time:Number, mix:Number, bendDirection:int) : void {
+	/** Sets the time and mixes of the specified keyframe. */
+	public function setFrame (frameIndex:int, time:Number, rotateMix:Number, translateMix:Number) : void {
 		frameIndex *= ENTRIES;
 		frames[frameIndex] = time;
-		frames[int(frameIndex + MIX)] = mix;
-		frames[int(frameIndex + BEND_DIRECTION)] = bendDirection;
+		frames[frameIndex + ROTATE] = rotateMix;
+		frames[frameIndex + TRANSLATE] = translateMix;
 	}
 
-	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
+	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {		
 		if (time < frames[0]) return; // Time is before first frame.
 
-		var constraint:IkConstraint = skeleton.ikConstraints[ikConstraintIndex];
+		var constraint:PathConstraint = skeleton.pathConstraints[pathConstraintIndex];
 
-		if (time >= frames[int(frames.length - ENTRIES)]) { // Time is after last frame.
-			constraint.mix += (frames[int(frames.length + PREV_MIX)] - constraint.mix) * alpha;
-			constraint.bendDirection = int(frames[int(frames.length + PREV_BEND_DIRECTION)]);
+		if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
+			var i:int = frames.length;
+			constraint.rotateMix += (frames[i + PREV_ROTATE] - constraint.rotateMix) * alpha;
+			constraint.translateMix += (frames[i + PREV_TRANSLATE] - constraint.translateMix) * alpha;
 			return;
 		}
 
 		// Interpolate between the previous frame and the current frame.
 		var frame:int = Animation.binarySearch(frames, time, ENTRIES);
-		var mix:Number = frames[int(frame + PREV_MIX)];
+		var rotate:Number = frames[frame + PREV_ROTATE];
+		var translate:Number = frames[frame + PREV_TRANSLATE];
 		var frameTime:Number = frames[frame];
 		var percent:Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-		constraint.mix += (mix + (frames[frame + MIX] - mix) * percent - constraint.mix) * alpha;
-		constraint.bendDirection = int(frames[frame + PREV_BEND_DIRECTION]);
+		constraint.rotateMix += (rotate + (frames[frame + ROTATE] - rotate) * percent - constraint.rotateMix) * alpha;
+		constraint.translateMix += (translate + (frames[frame + TRANSLATE] - translate) * percent - constraint.translateMix)
+			* alpha;
 	}
 }
-
 }

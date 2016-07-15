@@ -31,50 +31,60 @@
 
 package spine.animation {
 import spine.Event;
-import spine.IkConstraint;
 import spine.Skeleton;
+import spine.TransformConstraint;
 
-public class IkConstraintTimeline extends CurveTimeline {
-	static public const ENTRIES:int = 3;
-	static internal const PREV_TIME:int = -3, PREV_MIX:int = -2, PREV_BEND_DIRECTION:int = -1;
-	static internal const MIX:int = 1, BEND_DIRECTION:int = 2;
+public class TransformConstraintTimeline extends CurveTimeline {
+	static public const ENTRIES:int = 5;
+	static internal const PREV_TIME:int = -5, PREV_ROTATE:int = -4, PREV_TRANSLATE:int = -3, PREV_SCALE:int = -2, PREV_SHEAR:int = -1;
+	static internal const ROTATE:int = 1, TRANSLATE:int = 2, SCALE:int = 3, SHEAR:int = 4;
 
-	public var ikConstraintIndex:int;
-	public var frames:Vector.<Number>; // time, mix, bendDirection, ...
+	public var transformConstraintIndex:int;
+	public var frames:Vector.<Number>; // time, rotate mix, translate mix, scale mix, shear mix, ...
 
-	public function IkConstraintTimeline (frameCount:int) {
+	public function TransformConstraintTimeline (frameCount:int) {
 		super(frameCount);
 		frames = new Vector.<Number>(frameCount * ENTRIES, true);
 	}
-
-	/** Sets the time, mix and bend direction of the specified keyframe. */
-	public function setFrame (frameIndex:int, time:Number, mix:Number, bendDirection:int) : void {
+	
+	/** Sets the time and mixes of the specified keyframe. */
+	public function setFrame (frameIndex:int, time:Number, rotateMix:Number, translateMix:Number, scaleMix:Number, shearMix:Number) : void {
 		frameIndex *= ENTRIES;
 		frames[frameIndex] = time;
-		frames[int(frameIndex + MIX)] = mix;
-		frames[int(frameIndex + BEND_DIRECTION)] = bendDirection;
+		frames[frameIndex + ROTATE] = rotateMix;
+		frames[frameIndex + TRANSLATE] = translateMix;
+		frames[frameIndex + SCALE] = scaleMix;
+		frames[frameIndex + SHEAR] = shearMix;
 	}
 
 	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
 		if (time < frames[0]) return; // Time is before first frame.
 
-		var constraint:IkConstraint = skeleton.ikConstraints[ikConstraintIndex];
+		var constraint:TransformConstraint = skeleton.transformConstraints[transformConstraintIndex];
 
-		if (time >= frames[int(frames.length - ENTRIES)]) { // Time is after last frame.
-			constraint.mix += (frames[int(frames.length + PREV_MIX)] - constraint.mix) * alpha;
-			constraint.bendDirection = int(frames[int(frames.length + PREV_BEND_DIRECTION)]);
+		if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
+			var i:int = frames.length;
+			constraint.rotateMix += (frames[i + PREV_ROTATE] - constraint.rotateMix) * alpha;
+			constraint.translateMix += (frames[i + PREV_TRANSLATE] - constraint.translateMix) * alpha;
+			constraint.scaleMix += (frames[i + PREV_SCALE] - constraint.scaleMix) * alpha;
+			constraint.shearMix += (frames[i + PREV_SHEAR] - constraint.shearMix) * alpha;
 			return;
 		}
 
 		// Interpolate between the previous frame and the current frame.
 		var frame:int = Animation.binarySearch(frames, time, ENTRIES);
-		var mix:Number = frames[int(frame + PREV_MIX)];
 		var frameTime:Number = frames[frame];
 		var percent:Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-		constraint.mix += (mix + (frames[frame + MIX] - mix) * percent - constraint.mix) * alpha;
-		constraint.bendDirection = int(frames[frame + PREV_BEND_DIRECTION]);
+		var rotate:Number = frames[frame + PREV_ROTATE];
+		var translate:Number = frames[frame + PREV_TRANSLATE];
+		var scale:Number = frames[frame + PREV_SCALE];
+		var shear:Number = frames[frame + PREV_SHEAR];
+		constraint.rotateMix += (rotate + (frames[frame + ROTATE] - rotate) * percent - constraint.rotateMix) * alpha;
+		constraint.translateMix += (translate + (frames[frame + TRANSLATE] - translate) * percent - constraint.translateMix)
+			* alpha;
+		constraint.scaleMix += (scale + (frames[frame + SCALE] - scale) * percent - constraint.scaleMix) * alpha;
+		constraint.shearMix += (shear + (frames[frame + SHEAR] - shear) * percent - constraint.shearMix) * alpha;
 	}
 }
-
 }

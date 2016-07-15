@@ -65,7 +65,7 @@ public class GoblinsExample extends Sprite {
 	private var skeleton:SkeletonAnimation;
 
 	public function GoblinsExample () {
-		var useStarlingAtlas:Boolean = true;
+		var useStarlingAtlas:Boolean = false;
 
 		var attachmentLoader:AttachmentLoader;
 		if (useStarlingAtlas) {

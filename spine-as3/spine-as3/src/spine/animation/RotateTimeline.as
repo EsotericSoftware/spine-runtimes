@@ -35,8 +35,9 @@ import spine.Event;
 import spine.Skeleton;
 
 public class RotateTimeline extends CurveTimeline {
-	static private const PREV_FRAME_TIME:int = -2;
-	static private const FRAME_VALUE:int = 1;
+	static public const ENTRIES:int = 2;
+	static private const PREV_TIME:int = -2, PREV_ROTATION:int = -1;
+	static private const ROTATION:int = 1;
 
 	public var boneIndex:int;
 	public var frames:Vector.<Number>; // time, value, ...
@@ -47,10 +48,10 @@ public class RotateTimeline extends CurveTimeline {
 	}
 
 	/** Sets the time and angle of the specified keyframe. */
-	public function setFrame (frameIndex:int, time:Number, angle:Number) : void {
-		frameIndex *= 2;
+	public function setFrame (frameIndex:int, time:Number, degrees:Number) : void {
+		frameIndex <<= 1;
 		frames[frameIndex] = time;
-		frames[int(frameIndex + 1)] = angle;
+		frames[int(frameIndex + ROTATION)] = degrees;
 	}
 
 	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
@@ -58,10 +59,9 @@ public class RotateTimeline extends CurveTimeline {
 			return; // Time is before first frame.
 
 		var bone:Bone = skeleton.bones[boneIndex];
-
-		var amount:Number;
+		
 		if (time >= frames[int(frames.length - 2)]) { // Time is after last frame.
-			amount = bone.data.rotation + frames[int(frames.length - 1)] - bone.rotation;
+			var amount:Number = bone.data.rotation + frames[int(frames.length + PREV_ROTATION)] - bone.rotation;
 			while (amount > 180)
 				amount -= 360;
 			while (amount < -180)
@@ -71,18 +71,17 @@ public class RotateTimeline extends CurveTimeline {
 		}
 
 		// Interpolate between the previous frame and the current frame.
-		var frameIndex:int = Animation.binarySearch(frames, time, 2);
-		var prevFrameValue:Number = frames[int(frameIndex - 1)];
-		var frameTime:Number = frames[frameIndex];
-		var percent:Number = 1 - (time - frameTime) / (frames[int(frameIndex + PREV_FRAME_TIME)] - frameTime);
-		percent = getCurvePercent(frameIndex / 2 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
+		var frame:int = Animation.binarySearch(frames, time, ENTRIES);
+		var prevRotation:Number = frames[int(frame + PREV_ROTATION)];
+		var frameTime:Number = frames[frame];		
+		var percent:Number = getCurvePercent((frame >> 1) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-		amount = frames[int(frameIndex + FRAME_VALUE)] - prevFrameValue;
+		amount = frames[int(frame + ROTATION)] - prevRotation;
 		while (amount > 180)
 			amount -= 360;
 		while (amount < -180)
 			amount += 360;
-		amount = bone.data.rotation + (prevFrameValue + amount * percent) - bone.rotation;
+		amount = bone.data.rotation + (prevRotation + amount * percent) - bone.rotation;
 		while (amount > 180)
 			amount -= 360;
 		while (amount < -180)

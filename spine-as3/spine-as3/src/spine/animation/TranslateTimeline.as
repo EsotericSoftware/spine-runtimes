@@ -35,24 +35,24 @@ import spine.Event;
 import spine.Skeleton;
 
 public class TranslateTimeline extends CurveTimeline {
-	static internal const PREV_FRAME_TIME:int = -3;
-	static internal const FRAME_X:int = 1;
-	static internal const FRAME_Y:int = 2;
+	static public const ENTRIES:int = 3;
+	static internal const PREV_TIME:int = -3, PREV_X:int = -2, PREV_Y:int = -1;
+	static internal const X:int = 1, Y:int = 2;
 
 	public var boneIndex:int;
 	public var frames:Vector.<Number>; // time, value, value, ...
 
 	public function TranslateTimeline (frameCount:int) {
 		super(frameCount);
-		frames = new Vector.<Number>(frameCount * 3, true);
+		frames = new Vector.<Number>(frameCount * ENTRIES, true);
 	}
 
 	/** Sets the time and value of the specified keyframe. */
 	public function setFrame (frameIndex:int, time:Number, x:Number, y:Number) : void {
-		frameIndex *= 3;
+		frameIndex *= ENTRIES;
 		frames[frameIndex] = time;
-		frames[int(frameIndex + 1)] = x;
-		frames[int(frameIndex + 2)] = y;
+		frames[int(frameIndex + X)] = x;
+		frames[int(frameIndex + Y)] = y;
 	}
 
 	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
@@ -61,22 +61,21 @@ public class TranslateTimeline extends CurveTimeline {
 
 		var bone:Bone = skeleton.bones[boneIndex];
 
-		if (time >= frames[int(frames.length - 3)]) { // Time is after last frame.
-			bone.x += (bone.data.x + frames[int(frames.length - 2)] - bone.x) * alpha;
-			bone.y += (bone.data.y + frames[int(frames.length - 1)] - bone.y) * alpha;
+		if (time >= frames[int(frames.length - ENTRIES)]) { // Time is after last frame.
+			bone.x += (bone.data.x + frames[int(frames.length + PREV_X)] - bone.x) * alpha;
+			bone.y += (bone.data.y + frames[int(frames.length + PREV_Y)] - bone.y) * alpha;
 			return;
 		}
 
 		// Interpolate between the previous frame and the current frame.
-		var frameIndex:int = Animation.binarySearch(frames, time, 3);
-		var prevFrameX:Number = frames[int(frameIndex - 2)];
-		var prevFrameY:Number = frames[int(frameIndex - 1)];
-		var frameTime:Number = frames[frameIndex];
-		var percent:Number = 1 - (time - frameTime) / (frames[int(frameIndex + PREV_FRAME_TIME)] - frameTime);
-		percent = getCurvePercent(frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
+		var frame:int = Animation.binarySearch(frames, time, ENTRIES);
+		var prevX:Number = frames[frame + PREV_X];
+		var prevY:Number = frames[frame + PREV_Y];
+		var frameTime:Number = frames[frame];
+		var percent:Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-		bone.x += (bone.data.x + prevFrameX + (frames[int(frameIndex + FRAME_X)] - prevFrameX) * percent - bone.x) * alpha;
-		bone.y += (bone.data.y + prevFrameY + (frames[int(frameIndex + FRAME_Y)] - prevFrameY) * percent - bone.y) * alpha;
+		bone.x += (bone.data.x + prevX + (frames[frame + X] - prevX) * percent - bone.x) * alpha;
+		bone.y += (bone.data.y + prevY + (frames[frame + Y] - prevY) * percent - bone.y) * alpha;
 	}
 }
 

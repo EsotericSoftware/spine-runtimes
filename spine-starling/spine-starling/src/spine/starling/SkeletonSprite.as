@@ -38,7 +38,6 @@ import spine.atlas.AtlasRegion;
 import spine.attachments.Attachment;
 import spine.attachments.MeshAttachment;
 import spine.attachments.RegionAttachment;
-import spine.attachments.WeightedMeshAttachment;
 
 import starling.display.BlendMode;
 import starling.display.DisplayObject;
@@ -124,10 +123,10 @@ public class SkeletonSprite extends DisplayObject {
 				painter.batchMesh(image);				
 			} else if (slot.attachment is MeshAttachment) {
 				var meshAttachment:MeshAttachment = MeshAttachment(slot.attachment);
-				verticesLength  = meshAttachment.vertices.length;
+				verticesLength  = meshAttachment.worldVerticesLength;
 				verticesCount = verticesLength >> 1;				
 				if (worldVertices.length < verticesLength) worldVertices.length = verticesLength;
-				meshAttachment.computeWorldVertices(x, y, slot, worldVertices);
+				meshAttachment.computeWorldVertices(slot, worldVertices);
 				mesh = meshAttachment.rendererObject as SkeletonMesh;
 				if (mesh == null) {
 					if (meshAttachment.rendererObject is Image) 
@@ -165,50 +164,6 @@ public class SkeletonSprite extends DisplayObject {
 				vertexData.numVertices = verticesCount;
 				// FIXME set smoothing/filter
 				painter.batchMesh(mesh);																		
-			} else if (slot.attachment is WeightedMeshAttachment) {
-				var weightedMeshAttachment:WeightedMeshAttachment = WeightedMeshAttachment(slot.attachment);
-				verticesLength = weightedMeshAttachment.uvs.length;
-				verticesCount = verticesLength >> 1;				
-				if (worldVertices.length < verticesLength) worldVertices.length = verticesLength;
-				weightedMeshAttachment.computeWorldVertices(x, y, slot, worldVertices);
-				mesh = weightedMeshAttachment.rendererObject as SkeletonMesh;
-				if (mesh == null) {
-					if (weightedMeshAttachment.rendererObject is Image) 
-						weightedMeshAttachment.rendererObject = mesh = new SkeletonMesh(Image(weightedMeshAttachment.rendererObject).texture);
-					else if (weightedMeshAttachment.rendererObject is AtlasRegion)				
-						weightedMeshAttachment.rendererObject = mesh = new SkeletonMesh(Image(AtlasRegion(weightedMeshAttachment.rendererObject).rendererObject).texture);
-					else throw new Error("Unknown rendererObject");
-				}
-								
-				if (mesh.numIndices != weightedMeshAttachment.triangles.length) {
-					indexData = mesh.getIndexData();
-					indices = weightedMeshAttachment.triangles;
-					indicesLength = weightedMeshAttachment.triangles.length;
-					for (ii = 0; ii < indicesLength; ii++) {
-						indexData.setIndex(ii, indices[ii]);
-					}
-					indexData.numIndices = indicesLength;
-					indexData.trim();
-				}
-				
-				// FIXME pre-multiplied alpha?				
-				a = slot.a * weightedMeshAttachment.a;
-				rgb = Color.rgb(
-					r * slot.r * weightedMeshAttachment.r,
-					g * slot.g * weightedMeshAttachment.g,
-					b * slot.b * weightedMeshAttachment.b);	
-					
-				vertexData = mesh.getVertexData();
-				uvs = weightedMeshAttachment.uvs;
-				for (ii = 0, iii = 0; ii < verticesCount; ii++, iii+=2) {
-					mesh.setVertexPosition(ii, worldVertices[iii], worldVertices[iii+1]);
-					mesh.setTexCoords(ii, uvs[iii], uvs[iii+1]);
-					mesh.setVertexColor(ii, rgb);
-					mesh.setVertexAlpha(ii, alpha);				
-				}
-				vertexData.numVertices = verticesCount;
-				// FIXME set smoothing/filter
-				painter.batchMesh(mesh);
 			}
 		}
 		painter.state.blendMode = originalBlendMode;
@@ -234,14 +189,9 @@ public class SkeletonSprite extends DisplayObject {
 				region.computeWorldVertices(0, 0, slot.bone, worldVertices);
 			} else if (attachment is MeshAttachment) {
 				var mesh:MeshAttachment = MeshAttachment(attachment);
-				verticesLength = mesh.vertices.length;
+				verticesLength = mesh.worldVerticesLength;
 				if (worldVertices.length < verticesLength) worldVertices.length = verticesLength;
-				mesh.computeWorldVertices(0, 0, slot, worldVertices);
-			} else if (attachment is WeightedMeshAttachment) {
-				var weightedMesh:WeightedMeshAttachment = WeightedMeshAttachment(attachment);
-				verticesLength = weightedMesh.uvs.length;
-				if (worldVertices.length < verticesLength) worldVertices.length = verticesLength;
-				weightedMesh.computeWorldVertices(0, 0, slot, worldVertices);
+				mesh.computeWorldVertices(slot, worldVertices);			
 			} else
 				continue;
 			for (var ii:int = 0; ii < verticesLength; ii += 2) {

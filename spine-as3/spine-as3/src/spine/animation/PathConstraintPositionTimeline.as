@@ -29,21 +29,50 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine.attachments {
-import spine.Skin;
-
-public interface AttachmentLoader {
-	/** @return May be null to not load an attachment. */
-	function newRegionAttachment (skin:Skin, name:String, path:String) : RegionAttachment;
-
-	/** @return May be null to not load an attachment. */
-	function newMeshAttachment (skin:Skin, name:String, path:String) : MeshAttachment;
-
-	/** @return May be null to not load an attachment. */
-	function newBoundingBoxAttachment (skin:Skin, name:String) : BoundingBoxAttachment;
+package spine.animation {
+import spine.PathConstraint;
+import spine.Event;
+import spine.Skeleton;
 	
-	/** @return May be null to not load an attachment */
-	function newPathAttachment(skin:Skin, name:String): PathAttachment;
-}
+public class PathConstraintPositionTimeline extends CurveTimeline {
+	static public const ENTRIES:int = 2;
+	static internal const PREV_TIME:int = -2, PREV_VALUE:int = -1;
+	static internal const VALUE:int = 1;
 
+	public var pathConstraintIndex:int;
+
+	public var frames:Vector.<Number>; // time, position, ...
+
+	public function PathConstraintPositionTimeline (frameCount:int) {
+		super(frameCount);
+		frames = new Vector.<Number>(frameCount * ENTRIES, true);
+	}
+
+	/** Sets the time and value of the specified keyframe. */
+	public function setFrame (frameIndex:int, time:Number, value:Number) : void {
+		frameIndex *= ENTRIES;
+		frames[frameIndex] = time;
+		frames[frameIndex + VALUE] = value;
+	}
+
+	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {		
+		if (time < frames[0]) return; // Time is before first frame.
+
+		var constraint:PathConstraint = skeleton.pathConstraints[pathConstraintIndex];
+
+		if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
+			var i:int = frames.length;
+			constraint.position += (frames[i + PREV_VALUE] - constraint.position) * alpha;
+			return;
+		}
+
+		// Interpolate between the previous frame and the current frame.
+		var frame:int = Animation.binarySearch(frames, time, ENTRIES);
+		var position:Number = frames[frame + PREV_VALUE];
+		var frameTime:Number = frames[frame];
+		var percent:Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+
+		constraint.position += (position + (frames[frame + VALUE] - position) * percent - constraint.position) * alpha;
+	}
+}
 }

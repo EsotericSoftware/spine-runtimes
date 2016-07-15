@@ -30,20 +30,14 @@
  *****************************************************************************/
 
 package spine.attachments {
-import spine.Skin;
 
-public interface AttachmentLoader {
-	/** @return May be null to not load an attachment. */
-	function newRegionAttachment (skin:Skin, name:String, path:String) : RegionAttachment;
+public dynamic class PathAttachment extends VertexAttachment {
+	public var lengths:Vector.<Number>;
+	public var closed:Boolean, constantSpeed:Boolean;
 
-	/** @return May be null to not load an attachment. */
-	function newMeshAttachment (skin:Skin, name:String, path:String) : MeshAttachment;
-
-	/** @return May be null to not load an attachment. */
-	function newBoundingBoxAttachment (skin:Skin, name:String) : BoundingBoxAttachment;
-	
-	/** @return May be null to not load an attachment */
-	function newPathAttachment(skin:Skin, name:String): PathAttachment;
+	public function PathAttachment (name:String) {
+		super(name);
+	}
 }
 
 }

@@ -29,21 +29,12 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine.attachments {
-import spine.Skin;
+package spine {
 
-public interface AttachmentLoader {
-	/** @return May be null to not load an attachment. */
-	function newRegionAttachment (skin:Skin, name:String, path:String) : RegionAttachment;
-
-	/** @return May be null to not load an attachment. */
-	function newMeshAttachment (skin:Skin, name:String, path:String) : MeshAttachment;
-
-	/** @return May be null to not load an attachment. */
-	function newBoundingBoxAttachment (skin:Skin, name:String) : BoundingBoxAttachment;
-	
-	/** @return May be null to not load an attachment */
-	function newPathAttachment(skin:Skin, name:String): PathAttachment;
+public class RotateMode {
+	public static const tangent:RotateMode = new RotateMode();
+	public static const chain:RotateMode = new RotateMode();
+	public static const chainScale:RotateMode = new RotateMode();
 }
 
 }

@@ -29,21 +29,45 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine.attachments {
-import spine.Skin;
+package spine.examples {
+import spine.atlas.Atlas;
+import spine.*;
+import spine.attachments.AtlasAttachmentLoader;
+import spine.attachments.AttachmentLoader;
+import spine.starling.SkeletonAnimation;
+import spine.starling.StarlingTextureLoader;
 
-public interface AttachmentLoader {
-	/** @return May be null to not load an attachment. */
-	function newRegionAttachment (skin:Skin, name:String, path:String) : RegionAttachment;
+import starling.core.Starling;
+import starling.display.Sprite;
 
-	/** @return May be null to not load an attachment. */
-	function newMeshAttachment (skin:Skin, name:String, path:String) : MeshAttachment;
-
-	/** @return May be null to not load an attachment. */
-	function newBoundingBoxAttachment (skin:Skin, name:String) : BoundingBoxAttachment;
+public class TankExample extends Sprite {
+	[Embed(source = "/tank.json", mimeType = "application/octet-stream")]
+	static public const TankJson:Class;
 	
-	/** @return May be null to not load an attachment */
-	function newPathAttachment(skin:Skin, name:String): PathAttachment;
-}
+	[Embed(source = "/tank.atlas", mimeType = "application/octet-stream")]
+	static public const TankAtlas:Class;
+	
+	[Embed(source = "/tank.png")]
+	static public const TankAtlasTexture:Class;
+	
+	private var skeleton:SkeletonAnimation;	
 
+	public function TankExample () {
+		var attachmentLoader:AttachmentLoader;
+		var spineAtlas:Atlas = new Atlas(new TankAtlas(), new StarlingTextureLoader(new TankAtlasTexture()));
+		attachmentLoader = new AtlasAttachmentLoader(spineAtlas);
+
+		var json:SkeletonJson = new SkeletonJson(attachmentLoader);
+		json.scale = 0.5;
+		var skeletonData:SkeletonData = json.readSkeletonData(new TankJson());
+
+		skeleton = new SkeletonAnimation(skeletonData);
+		skeleton.x = 400;
+		skeleton.y = 560;
+		skeleton.state.setAnimationByName(0, "drive", true);
+
+		addChild(skeleton);
+		Starling.juggler.add(skeleton);	
+	}	
+}
 }
