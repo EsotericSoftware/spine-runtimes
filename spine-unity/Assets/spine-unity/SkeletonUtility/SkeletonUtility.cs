@@ -229,17 +229,15 @@ namespace Spine.Unity {
 				for (int i = 0, n = ikConstraints.Count; i < n; i++)
 					constraintTargetNames.Add(ikConstraints.Items[i].Target.Data.Name);
 
-				foreach (var b in utilityBones) {
-					if (b.bone == null) {
-						return;
-					}
-					if (b.mode == SkeletonUtilityBone.Mode.Override) {
+				var utilityBones = this.utilityBones;
+				for (int i = 0, n = utilityBones.Count; i < n; i++) {
+					var b = utilityBones[i];
+					if (b.bone == null) return;
+					if (b.mode == SkeletonUtilityBone.Mode.Override)
 						hasTransformBones = true;
-					}
 
-					if (constraintTargetNames.Contains(b.bone.Data.Name)) {
+					if (constraintTargetNames.Contains(b.bone.Data.Name))
 						hasUtilityConstraints = true;
-					}
 				}
 
 				if (utilityConstraints.Count > 0)
@@ -267,25 +265,21 @@ namespace Spine.Unity {
 		}
 
 		void UpdateLocal (ISkeletonAnimation anim) {
-
 			if (needToReprocessBones)
 				CollectBones();
 
-			if (utilityBones == null)
-				return;
-
-			foreach (SkeletonUtilityBone b in utilityBones) {
-				b.transformLerpComplete = false;
-			}
+			var utilityBones = this.utilityBones;
+			if (utilityBones == null) return;
+			for (int i = 0, n = utilityBones.Count; i < n; i++)
+				utilityBones[i].transformLerpComplete = false;
 
 			UpdateAllBones();
 		}
 
 		void UpdateWorld (ISkeletonAnimation anim) {
 			UpdateAllBones();
-
-			foreach (SkeletonUtilityConstraint c in utilityConstraints)
-				c.DoUpdate();
+			for (int i = 0, n = utilityConstraints.Count; i < n; i++)
+				utilityConstraints[i].DoUpdate();
 		}
 
 		void UpdateComplete (ISkeletonAnimation anim) {
@@ -293,16 +287,13 @@ namespace Spine.Unity {
 		}
 
 		void UpdateAllBones () {
-			if (boneRoot == null) {
+			if (boneRoot == null)
 				CollectBones();
-			}
-
-			if (utilityBones == null)
-				return;
-
-			foreach (SkeletonUtilityBone b in utilityBones) {
-				b.DoUpdate();
-			}
+				
+			var utilityBones = this.utilityBones;
+			if (utilityBones == null) return;
+			for (int i = 0, n = utilityBones.Count; i < n; i++)
+				utilityBones[i].DoUpdate();
 		}
 
 		public Transform GetBoneRoot () {
