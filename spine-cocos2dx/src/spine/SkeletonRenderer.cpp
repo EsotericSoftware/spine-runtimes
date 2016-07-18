@@ -308,6 +308,7 @@ Rect SkeletonRenderer::getBoundingBox () const {
 		}
 	}
 	Vec2 position = getPosition();
+    if (minX == FLT_MAX) minX = minY = maxX = maxY = 0;    
 	return Rect(position.x + minX, position.y + minY, maxX - minX, maxY - minY);
 }
 
