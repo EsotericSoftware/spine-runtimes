@@ -30,29 +30,44 @@
  *****************************************************************************/
 
 package spine.examples {
-
-import flash.display.Sprite;
+import spine.*;
+import spine.atlas.Atlas;
+import spine.attachments.AtlasAttachmentLoader;
+import spine.attachments.AttachmentLoader;
+import spine.starling.SkeletonAnimation;
+import spine.starling.StarlingTextureLoader;
 
 import starling.core.Starling;
+import starling.display.Sprite;
 
-[SWF(width = "800", height = "600", frameRate = "60", backgroundColor = "#dddddd")]
-public class Main extends Sprite {
-	private var _starling:Starling;
+public class VineExample extends Sprite {
+	[Embed(source = "/vine.json", mimeType = "application/octet-stream")]
+	static public const VineJson:Class;
+	
+	[Embed(source = "/vine.atlas", mimeType = "application/octet-stream")]
+	static public const VineAtlas:Class;
+	
+	[Embed(source = "/vine.png")]
+	static public const VineAtlasTexture:Class;
+	
+	private var skeleton:SkeletonAnimation;	
 
-	public function Main () {
-		var example:Class;
-		// example = SpineboyExample;
-		// example = GoblinsExample;
-		// example = RaptorExample;
-		// example = TankExample;
-		example = VineExample;
+	public function VineExample () {
+		var attachmentLoader:AttachmentLoader;
+		var spineAtlas:Atlas = new Atlas(new VineAtlas(), new StarlingTextureLoader(new VineAtlasTexture()));
+		attachmentLoader = new AtlasAttachmentLoader(spineAtlas);
 
-		_starling = new Starling(example, stage);
-		_starling.enableErrorChecking = true;
-		_starling.showStats = true;
-		_starling.skipUnchangedFrames = false;
-		_starling.start();
-	}
+		var json:SkeletonJson = new SkeletonJson(attachmentLoader);
+		json.scale = 0.5;
+		var skeletonData:SkeletonData = json.readSkeletonData(new VineJson());
+
+		skeleton = new SkeletonAnimation(skeletonData);
+		skeleton.x = 400;
+		skeleton.y = 560;
+		skeleton.state.setAnimationByName(0, "animation", true);
+
+		addChild(skeleton);
+		Starling.juggler.add(skeleton);		
+	}	
 }
-
 }
