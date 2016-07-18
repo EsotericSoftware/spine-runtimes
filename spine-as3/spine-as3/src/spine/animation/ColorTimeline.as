@@ -75,7 +75,7 @@ public class ColorTimeline extends CurveTimeline {
 			r = frames[int(frame + PREV_R)];
 			g = frames[int(frame + PREV_G)];
 			b = frames[int(frame + PREV_B)];
-			b = frames[int(frame + PREV_A)];
+			a = frames[int(frame + PREV_A)];
 			var frameTime:Number = frames[frame];
 			var percent:Number = getCurvePercent(frame / ENTRIES - 1,
 					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
