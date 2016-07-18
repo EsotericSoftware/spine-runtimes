@@ -309,6 +309,7 @@ float* spPathConstraint_computeWorldPositions(spPathConstraint* self, spPathAtta
 			self->world = MALLOC(float, verticesLength);
 			self->worldCount = verticesLength;
 		}
+		world = self->world;
 		spPathAttachment_computeWorldVertices1(path, target, 2, verticesLength, world, 0);
 	}
 

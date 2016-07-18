@@ -271,6 +271,50 @@ void tank () {
 	Atlas_dispose(atlas);
 }
 
+void vine () {
+	// Load atlas, skeleton, and animations.
+	Atlas* atlas = Atlas_createFromFile("data/vine.atlas", 0);
+	SkeletonJson* json = SkeletonJson_create(atlas);
+	json->scale = 0.5f;
+	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/vine.json");
+	if (!skeletonData) {
+		printf("Error: %s\n", json->error);
+		exit(0);
+	}
+	SkeletonJson_dispose(json);
+
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+
+	Skeleton* skeleton = drawable->skeleton;
+	skeleton->x = 320;
+	skeleton->y = 590;
+	Skeleton_updateWorldTransform(skeleton);
+
+	AnimationState_setAnimationByName(drawable->state, 0, "animation", true);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - vine");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		drawable->update(delta);
+
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
+
+	SkeletonData_dispose(skeletonData);
+	Atlas_dispose(atlas);
+}
+
 /**
  * Used for debugging purposes during runtime development
  */
@@ -313,6 +357,7 @@ void test () {
 
 int main () {
 	test();
+	vine();
 	tank();
 	raptor();
 	spineboy();
