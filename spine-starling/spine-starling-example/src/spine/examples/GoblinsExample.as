@@ -29,8 +29,8 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine {
-
+package spine.examples {
+import spine.*;
 import spine.atlas.Atlas;
 import spine.attachments.AtlasAttachmentLoader;
 import spine.attachments.AttachmentLoader;
@@ -65,7 +65,7 @@ public class GoblinsExample extends Sprite {
 	private var skeleton:SkeletonAnimation;
 
 	public function GoblinsExample () {
-		var useStarlingAtlas:Boolean = true;
+		var useStarlingAtlas:Boolean = false;
 
 		var attachmentLoader:AttachmentLoader;
 		if (useStarlingAtlas) {
@@ -81,7 +81,7 @@ public class GoblinsExample extends Sprite {
 		var json:SkeletonJson = new SkeletonJson(attachmentLoader);
 		var skeletonData:SkeletonData = json.readSkeletonData(new GoblinsJson());
 
-		skeleton = new SkeletonAnimation(skeletonData, true);
+		skeleton = new SkeletonAnimation(skeletonData);
 		skeleton.x = 320;
 		skeleton.y = 420;
 		skeleton.skeleton.skinName = "goblin";

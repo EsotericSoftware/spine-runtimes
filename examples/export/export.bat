@@ -10,6 +10,7 @@ del /q ..\speedy\export\*
 del /q ..\spineboy\export\*
 del /q ..\spineboy-old\export\*
 del /q ..\spinosaurus\export\*
+del /q ..\stretchyman\export\*
 del /q ..\raptor\export\*
 del /q ..\tank\export\*
 del /q ..\vine\export\*
@@ -67,6 +68,11 @@ echo Exporting...
 
 -i ../spinosaurus/spinosaurus.spine -o ../spinosaurus/export -e json.json ^
 -i ../spinosaurus/spinosaurus.spine -o ../spinosaurus/export -e binary.json ^
+
+-i ../stretchyman/stretchyman.spine -o ../stretchyman/export -e json.json ^
+-i ../stretchyman/stretchyman.spine -o ../stretchyman/export -e binary.json ^
+-i ../stretchyman/images -o ../stretchyman/export -n stretchyman -p atlas-1.0.json ^
+-i ../stretchyman/images -o ../stretchyman/export -n stretchyman-pma -p atlas-1.0-pma.json ^
 
 -i ../raptor/raptor.spine -o ../raptor/export -e json.json ^
 -i ../raptor/raptor.spine -o ../raptor/export -e binary.json ^

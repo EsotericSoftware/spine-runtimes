@@ -30,19 +30,18 @@
  *****************************************************************************/
 
 package spine.animation {
-import spine.attachments.FfdAttachment;
+import spine.attachments.VertexAttachment;
 import spine.Event;
 import spine.Skeleton;
 import spine.Slot;
-import spine.attachments.Attachment;
 
-public class FfdTimeline extends CurveTimeline {
+public class DeformTimeline extends CurveTimeline {
 	public var slotIndex:int;
 	public var frames:Vector.<Number>;
 	public var frameVertices:Vector.<Vector.<Number>>;
-	public var attachment:Attachment;
+	public var attachment:VertexAttachment;
 
-	public function FfdTimeline (frameCount:int) {
+	public function DeformTimeline (frameCount:int) {
 		super(frameCount);
 		frames = new Vector.<Number>(frameCount, true);
 		frameVertices = new Vector.<Vector.<Number>>(frameCount, true);
@@ -56,8 +55,8 @@ public class FfdTimeline extends CurveTimeline {
 
 	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
 		var slot:Slot = skeleton.slots[slotIndex];
-		var slotAttachment:FfdAttachment = slot.attachment as FfdAttachment;
-		if (!slotAttachment || !slotAttachment.applyFFD(attachment)) return;
+		var slotAttachment:VertexAttachment = slot.attachment as VertexAttachment;
+		if (!slotAttachment || !slotAttachment.applyDeform(attachment)) return;
 
 		var frames:Vector.<Number> = this.frames;
 		if (time < frames[0]) return; // Time is before first frame.
@@ -83,13 +82,11 @@ public class FfdTimeline extends CurveTimeline {
 		}
 
 		// Interpolate between the previous frame and the current frame.
-		var frameIndex:int = Animation.binarySearch1(frames, time);
-		var frameTime:Number = frames[frameIndex];
-		var percent:Number = 1 - (time - frameTime) / (frames[int(frameIndex - 1)] - frameTime);
-		percent = getCurvePercent(frameIndex - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
-
-		var prevVertices:Vector.<Number> = frameVertices[int(frameIndex - 1)];
-		var nextVertices:Vector.<Number> = frameVertices[frameIndex];
+		var frame:int = Animation.binarySearch1(frames, time);
+		var prevVertices:Vector.<Number> = frameVertices[int(frame - 1)];
+		var nextVertices:Vector.<Number> = frameVertices[frame];
+		var frameTime:Number = frames[frame];		
+		var percent:Number = getCurvePercent(frame - 1, 1 - (time - frameTime) / (frames[frame - 1] - frameTime));		
 
 		var prev:Number;
 		if (alpha < 1) {

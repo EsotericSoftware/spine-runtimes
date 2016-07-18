@@ -108,6 +108,7 @@ namespace Spine.Unity.Editor {
 			var skeletonGraphic = (SkeletonGraphic)command.context;
 			var mesh = skeletonGraphic.SpineMeshGenerator.LastGeneratedMesh;
 
+			mesh.RecalculateBounds();
 			var bounds = mesh.bounds;
 			var size = bounds.size;
 			var center = bounds.center;
@@ -118,19 +119,6 @@ namespace Spine.Unity.Editor {
 
 			skeletonGraphic.rectTransform.sizeDelta = size;
 			skeletonGraphic.rectTransform.pivot = p;
-		}
-
-		public static Material DefaultSkeletonGraphicMaterial {
-			get {
-				var guids = AssetDatabase.FindAssets("SkeletonGraphicDefault t:material");
-				if (guids.Length <= 0)
-					return null;
-				var firstAssetPath = AssetDatabase.GUIDToAssetPath(guids[0]);
-				if (string.IsNullOrEmpty(firstAssetPath))
-					return null;
-				var firstMaterial = AssetDatabase.LoadAssetAtPath<Material>(firstAssetPath);
-				return firstMaterial;
-			}
 		}
 
 		[MenuItem("GameObject/Spine/SkeletonGraphic (UnityUI)", false, 15)]
@@ -217,6 +205,19 @@ namespace Spine.Unity.Editor {
 			var graphic = go.GetComponent<SkeletonGraphic>();
 			graphic.material = SkeletonGraphicInspector.DefaultSkeletonGraphicMaterial;
 			return go;
+		}
+
+		public static Material DefaultSkeletonGraphicMaterial {
+			get {
+				var guids = AssetDatabase.FindAssets("SkeletonGraphicDefault t:material");
+				if (guids.Length <= 0) return null;
+
+				var firstAssetPath = AssetDatabase.GUIDToAssetPath(guids[0]);
+				if (string.IsNullOrEmpty(firstAssetPath)) return null;
+
+				var firstMaterial = AssetDatabase.LoadAssetAtPath<Material>(firstAssetPath);
+				return firstMaterial;
+			}
 		}
 
 		#endregion

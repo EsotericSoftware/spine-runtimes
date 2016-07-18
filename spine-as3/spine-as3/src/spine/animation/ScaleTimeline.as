@@ -44,22 +44,21 @@ public class ScaleTimeline extends TranslateTimeline {
 			return; // Time is before first frame.
 
 		var bone:Bone = skeleton.bones[boneIndex];
-		if (time >= frames[int(frames.length - 3)]) { // Time is after last frame.
-			bone.scaleX += (bone.data.scaleX * frames[int(frames.length - 2)] - bone.scaleX) * alpha;
-			bone.scaleY += (bone.data.scaleY * frames[int(frames.length - 1)] - bone.scaleY) * alpha;
+		if (time >= frames[int(frames.length - ENTRIES)]) { // Time is after last frame.
+			bone.scaleX += (bone.data.scaleX * frames[int(frames.length + PREV_X)] - bone.scaleX) * alpha;
+			bone.scaleY += (bone.data.scaleY * frames[int(frames.length + PREV_Y)] - bone.scaleY) * alpha;
 			return;
 		}
 
 		// Interpolate between the previous frame and the current frame.
-		var frameIndex:int = Animation.binarySearch(frames, time, 3);
-		var prevFrameX:Number = frames[int(frameIndex - 2)];
-		var prevFrameY:Number = frames[int(frameIndex - 1)];
-		var frameTime:Number = frames[frameIndex];
-		var percent:Number = 1 - (time - frameTime) / (frames[int(frameIndex + PREV_FRAME_TIME)] - frameTime);
-		percent = getCurvePercent(frameIndex / 3 - 1, percent < 0 ? 0 : (percent > 1 ? 1 : percent));
+		var frame:int = Animation.binarySearch(frames, time, ENTRIES);
+		var prevX:Number = frames[frame + PREV_X];
+		var prevY:Number = frames[frame + PREV_Y];
+		var frameTime:Number = frames[frame];
+		var percent:Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-		bone.scaleX += (bone.data.scaleX * (prevFrameX + (frames[int(frameIndex + FRAME_X)] - prevFrameX) * percent) - bone.scaleX) * alpha;
-		bone.scaleY += (bone.data.scaleY * (prevFrameY + (frames[int(frameIndex + FRAME_Y)] - prevFrameY) * percent) - bone.scaleY) * alpha;
+		bone.scaleX += (bone.data.scaleX * (prevX + (frames[frame + X] - prevX) * percent) - bone.scaleX) * alpha;
+		bone.scaleY += (bone.data.scaleY * (prevY + (frames[frame + Y] - prevY) * percent) - bone.scaleY) * alpha;
 	}
 }
 

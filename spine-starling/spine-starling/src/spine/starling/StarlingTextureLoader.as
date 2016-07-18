@@ -30,6 +30,7 @@
  *****************************************************************************/
 
 package spine.starling {
+	import starling.display.Image;
 import spine.atlas.AtlasPage;
 import spine.atlas.AtlasRegion;
 import spine.atlas.TextureLoader;
@@ -78,17 +79,17 @@ public class StarlingTextureLoader implements TextureLoader {
 	}
 
 	public function loadRegion (region:AtlasRegion) : void {
-		var image:SkeletonImage = new SkeletonImage(Texture(region.page.rendererObject));
-		if (region.rotate) {
-			image.setTexCoordsTo(0, region.u, region.v2);
-			image.setTexCoordsTo(1, region.u, region.v);
-			image.setTexCoordsTo(2, region.u2, region.v2);
-			image.setTexCoordsTo(3, region.u2, region.v);
+		var image:Image = new Image(Texture(region.page.rendererObject));
+		if (region.rotate) {			
+			image.setTexCoords(0, region.u, region.v2);
+			image.setTexCoords(1, region.u, region.v);
+			image.setTexCoords(2, region.u2, region.v2);
+			image.setTexCoords(3, region.u2, region.v);
 		} else {
-			image.setTexCoordsTo(0, region.u, region.v);
-			image.setTexCoordsTo(1, region.u2, region.v);
-			image.setTexCoordsTo(2, region.u, region.v2);
-			image.setTexCoordsTo(3, region.u2, region.v2);
+			image.setTexCoords(0, region.u, region.v);
+			image.setTexCoords(1, region.u2, region.v);
+			image.setTexCoords(2, region.u, region.v2);
+			image.setTexCoords(3, region.u2, region.v2);
 		}
 		region.rendererObject = image;
 	}

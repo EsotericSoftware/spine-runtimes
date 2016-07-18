@@ -13,7 +13,7 @@
 <booleanAttribute key="FORCE_FRESH_COMPILATION" value="false"/>
 <booleanAttribute key="KILL_PREVIOUS_VIEWER" value="true"/>
 <stringAttribute key="LAUNCHER_DEPENDENCIES" value="[Self]"/>
-<stringAttribute key="MAIN_CLASS" value="src/spine/Main.as"/>
+<stringAttribute key="MAIN_CLASS" value="src/spine/examples/Main.as"/>
 <stringAttribute key="MOBILE_PRESET" value=""/>
 <booleanAttribute key="NEW_WINDOW_EACH_LAUNCH" value="false"/>
 <stringAttribute key="OUTPUT" value="bin/spine-as3-example.swf"/>

@@ -1,3 +1,5 @@
+// This is a premultiply-alpha adaptation of the built-in Unity shader "UI/Default" to allow Unity UI stencil masking.
+
 Shader "Spine/SkeletonGraphic (Premultiply Alpha)"
 {
 	Properties
@@ -84,7 +86,7 @@ Shader "Spine/SkeletonGraphic (Premultiply Alpha)"
 			fixed4 frag(v2f IN) : SV_Target
 			{
 				half4 color = tex2D(_MainTex, IN.texcoord) * IN.color;
-				clip (color.a - 0.01);
+				//clip(color.a - 0.01);
 				return color;
 			}
 		ENDCG

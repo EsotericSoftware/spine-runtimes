@@ -37,14 +37,15 @@ public class Bone implements Updatable {
 	internal var _data:BoneData;
 	internal var _skeleton:Skeleton;
 	internal var _parent:Bone;
+	internal var _children:Vector.<Bone> = new Vector.<Bone>();
 	public var x:Number;
 	public var y:Number;
 	public var rotation:Number;
 	public var scaleX:Number;
 	public var scaleY:Number;
-	public var appliedRotation:Number;
-	public var appliedScaleX:Number;
-	public var appliedScaleY:Number;
+	public var shearX:Number;
+	public var shearY:Number;
+	public var appliedRotation:Number;	
 
 	internal var _a:Number;
 	internal var _b:Number;
@@ -54,6 +55,8 @@ public class Bone implements Updatable {
 	internal var _worldY:Number;
 	internal var _worldSignX:Number;
 	internal var _worldSignY:Number;
+	
+	internal var _sorted:Boolean;
 
 	/** @param parent May be null. */
 	public function Bone (data:BoneData, skeleton:Skeleton, parent:Bone) {
@@ -64,26 +67,25 @@ public class Bone implements Updatable {
 		_parent = parent;
 		setToSetupPose();
 	}
+	
+	/** Same as updateWorldTransform(). This method exists for Bone to implement Updatable. */
+	public function update () : void {
+		updateWorldTransformWith(x, y, rotation, scaleX, scaleY, shearX, shearY);
+	}
 
 	/** Computes the world SRT using the parent bone and this bone's local SRT. */
 	public function updateWorldTransform () : void {
-		updateWorldTransformWith(x, y, rotation, scaleX, scaleY);
-	}
-
-	/** Same as updateWorldTransform(). This method exists for Bone to implement Updatable. */
-	public function update () : void {
-		updateWorldTransformWith(x, y, rotation, scaleX, scaleY);
+		updateWorldTransformWith(x, y, rotation, scaleX, scaleY, shearX, shearY);
 	}
 
 	/** Computes the world SRT using the parent bone and the specified local SRT. */
-	public function updateWorldTransformWith (x:Number, y:Number, rotation:Number, scaleX:Number, scaleY:Number) : void {
+	public function updateWorldTransformWith (x:Number, y:Number, rotation:Number, scaleX:Number, scaleY:Number, shearX:Number, shearY:Number) : void {
 		appliedRotation = rotation;
-		appliedScaleX = scaleX;
-		appliedScaleY = scaleY;
 
-		var radians:Number = rotation * MathUtils.degRad;
-		var cos:Number = Math.cos(radians), sin:Number = Math.sin(radians);
-		var la:Number = cos * scaleX, lb:Number = -sin * scaleY, lc:Number = sin * scaleX, ld:Number = cos * scaleY;
+		var rotationY:Number = rotation + 90 + shearY;
+		var la:Number = MathUtils.cosDeg(rotation + shearX) * scaleX, lb:Number = MathUtils.cosDeg(rotationY) * scaleY;
+		var lc:Number = MathUtils.sinDeg(rotation + shearX) * scaleX, ld:Number = MathUtils.sinDeg(rotationY) * scaleY;
+		
 		var parent:Bone = _parent;
 		if (!parent) { // Root bone.
 			var skeleton:Skeleton = _skeleton;
@@ -126,15 +128,13 @@ public class Bone implements Updatable {
 				pc = 0;
 				pd = 1;
 				do {
-					radians = parent.appliedRotation * MathUtils.degRad;
-					cos = Math.cos(radians);
-					sin = Math.sin(radians);
-					var temp1:Number = pa * cos + pb * sin;
-					pb = pa * -sin + pb * cos;
-					pa = temp1;
-					temp1 = pc * cos + pd * sin;
-					pd = pc * -sin + pd * cos;
-					pc = temp1;
+					var cos:Number = MathUtils.cosDeg(parent.appliedRotation), sin:Number = MathUtils.sinDeg(parent.appliedRotation);
+					var temp:Number = pa * cos + pb * sin;
+					pb = pb * cos - pa * sin;
+					pa = temp;
+					temp = pc * cos + pd * sin;
+					pd = pd * cos - pc * sin;
+					pc = temp;
 	
 					if (!parent.data.inheritRotation) break;
 					parent = parent.parent;
@@ -149,27 +149,23 @@ public class Bone implements Updatable {
 				pc = 0;
 				pd = 1;
 				do {
-					radians = parent.rotation * MathUtils.degRad;
-					cos = Math.cos(radians);
-					sin = Math.sin(radians);
-					var psx:Number = parent.appliedScaleX, psy:Number = parent.appliedScaleY;
-					var za:Number = cos * psx, zb:Number = -sin * psy, zc:Number = sin * psx, zd:Number = cos * psy;
-					var temp2:Number = pa * za + pb * zc;
-					pb = pa * zb + pb * zd;
-					pa = temp2;
-					temp2 = pc * za + pd * zc;
-					pd = pc * zb + pd * zd;
-					pc = temp2;
-	
-					if (psx < 0) radians = -radians;
-					cos = Math.cos(-radians);
-					sin = Math.sin(-radians);
-					temp2 = pa * cos + pb * sin;
-					pb = pa * -sin + pb * cos;
-					pa = temp2;
-					temp2 = pc * cos + pd * sin;
-					pd = pc * -sin + pd * cos;
-					pc = temp2;
+					cos = MathUtils.cosDeg(parent.appliedRotation), sin = MathUtils.sinDeg(parent.appliedRotation);
+					var psx:Number = parent.scaleX, psy:Number = parent.scaleY;
+					var za:Number = cos * psx, zb:Number = sin * psy, zc:Number = sin * psx, zd:Number = cos * psy;
+					temp = pa * za + pb * zc;
+					pb = pb * zd - pa * zb;
+					pa = temp;
+					temp = pc * za + pd * zc;
+					pd = pd * zd - pc * zb;
+					pc = temp;
+
+					if (psx >= 0) sin = -sin;
+					temp = pa * cos + pb * sin;
+					pb = pb * cos - pa * sin;
+					pa = temp;
+					temp = pc * cos + pd * sin;
+					pd = pd * cos - pc * sin;
+					pc = temp;
 	
 					if (!parent.data.inheritScale) break;
 					parent = parent.parent;
@@ -201,18 +197,24 @@ public class Bone implements Updatable {
 		rotation = _data.rotation;
 		scaleX = _data.scaleX;
 		scaleY = _data.scaleY;
+		shearX = _data.shearX;
+		shearY = _data.shearY;
 	}
 
 	public function get data () : BoneData {
 		return _data;
 	}
 	
+	public function get skeleton () : Skeleton {
+		return _skeleton;
+	}
+	
 	public function get parent () : Bone {
 		return _parent;
 	}
 	
-	public function get skeleton () : Skeleton {
-		return _skeleton;
+	public function get children () : Vector.<Bone> {;
+		return _children;
 	}
 
 	public function get a () : Number {
@@ -262,11 +264,81 @@ public class Bone implements Updatable {
 	public function get worldScaleY () : Number {
 		return Math.sqrt(_c * _c + _d * _d) * _worldSignY;
 	}
+	
+	public function worldToLocalRotationX () : Number {
+		var parent:Bone = _parent;
+		if (parent == null) return rotation;
+		var pa:Number = parent.a, pb:Number = parent.b, pc:Number = parent.c, pd:Number = parent.d, a:Number = this.a, c:Number = this.c;
+		return Math.atan2(pa * c - pc * a, pd * a - pb * c) * MathUtils.radDeg;
+	}
+
+	public function worldToLocalRotationY () : Number {
+		var parent:Bone = _parent;
+		if (parent == null) return rotation;
+		var pa:Number = parent.a, pb:Number = parent.b, pc:Number = parent.c, pd:Number = parent.d, b:Number = this.b, d:Number = this.d;
+		return Math.atan2(pa * d - pc * b, pd * b - pb * d) * MathUtils.radDeg;
+	}
+
+	public function rotateWorld (degrees:Number) : void {
+		var a:Number = this.a, b:Number = this.b, c:Number = this.c, d:Number = this.d;
+		var cos:Number = MathUtils.cosDeg(degrees), sin:Number = MathUtils.sinDeg(degrees);
+		this._a = cos * a - sin * c;
+		this._b = cos * b - sin * d;
+		this._c = sin * a + cos * c;
+		this._d = sin * b + cos * d;
+	}
+
+	/** Computes the local transform from the world transform. This can be useful to perform processing on the local transform
+	 * after the world transform has been modified directly (eg, by a constraint).
+	 * <p>
+	 * Some redundant information is lost by the world transform, such as -1,-1 scale versus 180 rotation. The computed local
+	 * transform values may differ from the original values but are functionally the same. */
+	public function updateLocalTransform () : void {
+		var parent:Bone = this.parent;
+		if (parent == null) {
+			x = worldX;
+			y = worldY;
+			rotation = Math.atan2(c, a) * MathUtils.radDeg;
+			scaleX = Math.sqrt(a * a + c * c);
+			scaleY = Math.sqrt(b * b + d * d);
+			var det:Number = a * d - b * c;
+			shearX = 0;
+			shearY = Math.atan2(a * b + c * d, det) * MathUtils.radDeg;
+			return;
+		}
+		var pa:Number = parent.a, pb:Number = parent.b, pc:Number = parent.c, pd:Number = parent.d;
+		var pid:Number = 1 / (pa * pd - pb * pc);
+		var dx:Number = worldX - parent.worldX, dy:Number = worldY - parent.worldY;
+		x = (dx * pd * pid - dy * pb * pid);
+		y = (dy * pa * pid - dx * pc * pid);
+		var ia:Number = pid * pd;
+		var id:Number = pid * pa;
+		var ib:Number = pid * pb;
+		var ic:Number = pid * pc;
+		var ra:Number = ia * a - ib * c;
+		var rb:Number = ia * b - ib * d;
+		var rc:Number = id * c - ic * a;
+		var rd:Number = id * d - ic * b;
+		shearX = 0;
+		scaleX = Math.sqrt(ra * ra + rc * rc);
+		if (scaleX > 0.0001) {
+			det = ra * rd - rb * rc;
+			scaleY = det / scaleX;
+			shearY = Math.atan2(ra * rb + rc * rd, det) * MathUtils.radDeg;
+			rotation = Math.atan2(rc, ra) * MathUtils.radDeg;
+		} else {
+			scaleX = 0;
+			scaleY = Math.sqrt(rb * rb + rd * rd);
+			shearY = 0;
+			rotation = 90 - Math.atan2(rd, rb) * MathUtils.radDeg;
+		}
+		appliedRotation = rotation;
+	}
 
 	public function worldToLocal (world:Vector.<Number>) : void {
-		var x:Number = world[0] - _worldX, y:Number = world[1] - _worldY;
 		var a:Number = _a, b:Number = _b, c:Number = _c, d:Number = _d;
 		var invDet:Number = 1 / (a * d - b * c);
+		var x:Number = world[0] - _worldX, y:Number = world[1] - _worldY;				
 		world[0] = (x * d * invDet - y * b * invDet);
 		world[1] = (y * a * invDet - x * c * invDet);
 	}

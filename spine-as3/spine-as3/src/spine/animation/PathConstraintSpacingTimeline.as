@@ -29,27 +29,34 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine {
+package spine.animation {
+import spine.Skeleton;
+import spine.Event;
+import spine.PathConstraint;
 
-import flash.display.Sprite;
+public class PathConstraintSpacingTimeline extends PathConstraintPositionTimeline {
+	public function PathConstraintSpacingTimeline (frameCount:int) {
+		super(frameCount);
+	}
 
-import starling.core.Starling;
+	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {		
+		if (time < frames[0]) return; // Time is before first frame.
 
-[SWF(width = "800", height = "600", frameRate = "60", backgroundColor = "#dddddd")]
-public class Main extends Sprite {
-	private var _starling:Starling;
+		var constraint:PathConstraint = skeleton.pathConstraints[pathConstraintIndex];
 
-	public function Main () {
-		var example:Class;
-		//example = SpineboyExample;
-		//example = GoblinsExample;
-		example = RaptorExample;
+		if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
+			var i:int = frames.length;
+			constraint.spacing += (frames[i + PREV_VALUE] - constraint.spacing) * alpha;
+			return;
+		}
 
-		_starling = new Starling(example, stage);
-		_starling.enableErrorChecking = true;
-		_starling.showStats = true;
-		_starling.start();
+		// Interpolate between the previous frame and the current frame.
+		var frame:int = Animation.binarySearch(frames, time, ENTRIES);
+		var spacing:Number = frames[frame + PREV_VALUE];
+		var frameTime:Number = frames[frame];
+		var percent:Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+
+		constraint.spacing += (spacing + (frames[frame + VALUE] - spacing) * percent - constraint.spacing) * alpha;
 	}
 }
-
 }

@@ -51,6 +51,9 @@ public class AtlasRegion {
 	public var splits:Vector.<int>;
 	public var pads:Vector.<int>;
 	public var rendererObject:Object;
+	
+	public function AtlasRegion () {		
+	}
 }
 
 }

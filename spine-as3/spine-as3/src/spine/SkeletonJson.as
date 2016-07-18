@@ -29,6 +29,13 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 package spine {
+import spine.animation.PathConstraintMixTimeline;
+import spine.animation.PathConstraintSpacingTimeline;
+import spine.animation.PathConstraintPositionTimeline;
+import spine.animation.TransformConstraintTimeline;
+import spine.animation.ShearTimeline;
+import spine.attachments.PathAttachment;
+import spine.attachments.VertexAttachment;
 import flash.utils.ByteArray;
 
 import spine.animation.Animation;
@@ -37,7 +44,7 @@ import spine.animation.ColorTimeline;
 import spine.animation.CurveTimeline;
 import spine.animation.DrawOrderTimeline;
 import spine.animation.EventTimeline;
-import spine.animation.FfdTimeline;
+import spine.animation.DeformTimeline;
 import spine.animation.IkConstraintTimeline;
 import spine.animation.RotateTimeline;
 import spine.animation.ScaleTimeline;
@@ -49,7 +56,6 @@ import spine.attachments.AttachmentType;
 import spine.attachments.BoundingBoxAttachment;
 import spine.attachments.MeshAttachment;
 import spine.attachments.RegionAttachment;
-import spine.attachments.WeightedMeshAttachment;
 
 public class SkeletonJson {
 	public var attachmentLoader:AttachmentLoader;
@@ -83,8 +89,8 @@ public class SkeletonJson {
 			skeletonData.hash = skeletonMap["hash"];
 			skeletonData.version = skeletonMap["spine"];
 			skeletonData.width = skeletonMap["width"] || 0;
-			skeletonData.height = skeletonMap["height"] || 0;
-		}
+			skeletonData.height = skeletonMap["height"] || 0;			
+		}			
 
 		// Bones.
 		var boneData:BoneData;
@@ -95,60 +101,27 @@ public class SkeletonJson {
 				parent = skeletonData.findBone(parentName);
 				if (!parent) throw new Error("Parent bone not found: " + parentName);
 			}
-			boneData = new BoneData(boneMap["name"], parent);
+			boneData = new BoneData(skeletonData.bones.length, boneMap["name"], parent);
 			boneData.length = Number(boneMap["length"] || 0) * scale;
 			boneData.x = Number(boneMap["x"] || 0) * scale;
 			boneData.y = Number(boneMap["y"] || 0) * scale;
 			boneData.rotation = (boneMap["rotation"] || 0);
 			boneData.scaleX = boneMap.hasOwnProperty("scaleX") ? boneMap["scaleX"] : 1;
 			boneData.scaleY = boneMap.hasOwnProperty("scaleY") ? boneMap["scaleY"] : 1;
-			boneData.inheritScale = boneMap.hasOwnProperty("inheritScale") ? boneMap["inheritScale"] : true;
-			boneData.inheritRotation = boneMap.hasOwnProperty("inheritRotation") ? boneMap["inheritRotation"] : true;
-			skeletonData.bones[skeletonData.bones.length] = boneData;
+			boneData.shearX = Number(boneMap["shearX"] || 0);
+			boneData.shearY = Number(boneMap["shearY"] || 0);
+			boneData.inheritRotation = boneMap.hasOwnProperty("inheritRotation") ? Boolean(boneMap["inheritRotation"]) : true;
+			boneData.inheritScale = boneMap.hasOwnProperty("inheritScale") ? Boolean(boneMap["inheritScale"]) : true;			
+			skeletonData.bones.push(boneData);
 		}
-
-		// IK constraints.
-		for each (var ikMap:Object in root["ik"]) {
-			var ikConstraintData:IkConstraintData = new IkConstraintData(ikMap["name"]);
-
-			for each (var boneName:String in ikMap["bones"]) {
-				var bone:BoneData = skeletonData.findBone(boneName);
-				if (!bone) throw new Error("IK bone not found: " + boneName);
-				ikConstraintData.bones[ikConstraintData.bones.length] = bone;
-			}
-
-			ikConstraintData.target = skeletonData.findBone(ikMap["target"]);
-			if (!ikConstraintData.target) throw new Error("Target bone not found: " + ikMap["target"]);
-
-			ikConstraintData.bendDirection = (!ikMap.hasOwnProperty("bendPositive") || ikMap["bendPositive"]) ? 1 : -1;
-			ikConstraintData.mix = ikMap.hasOwnProperty("mix") ? ikMap["mix"] : 1;
-
-			skeletonData.ikConstraints[skeletonData.ikConstraints.length] = ikConstraintData;
-		}
-
-		// Transform constraints.
-		for each (var transformMap:Object in root["transform"]) {
-			var transformConstraintData:TransformConstraintData = new TransformConstraintData(transformMap["name"]);
-
-			transformConstraintData.bone = skeletonData.findBone(transformMap["bone"]);
-			if (!transformConstraintData.bone) throw new Error("Bone not found: " + transformMap["bone"]);
-
-			transformConstraintData.target = skeletonData.findBone(transformMap["target"]);
-			if (!transformConstraintData.target) throw new Error("Target bone not found: " + transformMap["target"]);
-
-			transformConstraintData.translateMix = transformMap.hasOwnProperty("translateMix") ? transformMap["translateMix"] : 1;
-			transformConstraintData.x = Number(boneMap["x"] || 0) * scale;
-			transformConstraintData.y = Number(boneMap["y"] || 0) * scale;
-
-			skeletonData.transformConstraints[skeletonData.transformConstraints.length] = transformConstraintData;
-		}
-
+		
 		// Slots.
 		for each (var slotMap:Object in root["slots"]) {
-			boneName = slotMap["bone"];
+			var slotName:String = slotMap["name"];
+			var boneName:String = slotMap["bone"];
 			boneData = skeletonData.findBone(boneName);
 			if (!boneData) throw new Error("Slot bone not found: " + boneName);
-			var slotData:SlotData = new SlotData(slotMap["name"], boneData);
+			var slotData:SlotData = new SlotData(skeletonData.slots.length, slotName, boneData);
 
 			var color:String = slotMap["color"];
 			if (color) {
@@ -160,8 +133,81 @@ public class SkeletonJson {
 
 			slotData.attachmentName = slotMap["attachment"];
 			slotData.blendMode = BlendMode[slotMap["blend"] || "normal"];
+			skeletonData.slots.push(slotData);
+		}
 
-			skeletonData.slots[skeletonData.slots.length] = slotData;
+		// IK constraints.
+		for each (var constraintMap:Object in root["ik"]) {
+			var ikConstraintData:IkConstraintData = new IkConstraintData(constraintMap["name"]);
+
+			for each (boneName in constraintMap["bones"]) {
+				var bone:BoneData = skeletonData.findBone(boneName);
+				if (!bone) throw new Error("IK constraint bone not found: " + boneName);
+				ikConstraintData.bones.push(bone);
+			}
+
+			ikConstraintData.target = skeletonData.findBone(constraintMap["target"]);
+			if (!ikConstraintData.target) throw new Error("Target bone not found: " + constraintMap["target"]);
+
+			ikConstraintData.bendDirection = (!constraintMap.hasOwnProperty("bendPositive") || constraintMap["bendPositive"]) ? 1 : -1;
+			ikConstraintData.mix = constraintMap.hasOwnProperty("mix") ? constraintMap["mix"] : 1;
+
+			skeletonData.ikConstraints.push(ikConstraintData);
+		}
+
+		// Transform constraints.
+		for each (constraintMap in root["transform"]) {
+			var transformConstraintData:TransformConstraintData = new TransformConstraintData(constraintMap["name"]);
+
+			for each (boneName in constraintMap["bones"]) {
+				bone = skeletonData.findBone(boneName);
+				if (!bone) throw new Error("Transform constraint bone not found: " + boneName);
+				transformConstraintData.bones.push(bone);
+			}
+		
+			transformConstraintData.target = skeletonData.findBone(constraintMap["target"]);
+			if (!transformConstraintData.target) throw new Error("Target bone not found: " + constraintMap["target"]);
+			
+			transformConstraintData.offsetRotation = Number(constraintMap["rotation"] || 0);
+			transformConstraintData.offsetX = Number(constraintMap["x"] || 0) * scale;
+			transformConstraintData.offsetY = Number(constraintMap["y"] || 0) * scale;
+			transformConstraintData.offsetScaleX = Number(constraintMap["scaleX"] || 0);
+			transformConstraintData.offsetScaleY = Number(constraintMap["scaleY"] || 0);
+			transformConstraintData.offsetShearY = Number(constraintMap["shearY"] || 0);
+			
+			transformConstraintData.rotateMix = constraintMap.hasOwnProperty("rotateMix") ? constraintMap["rotateMix"] : 1;
+			transformConstraintData.translateMix = constraintMap.hasOwnProperty("translateMix") ? constraintMap["translateMix"] : 1;
+			transformConstraintData.scaleMix = constraintMap.hasOwnProperty("scaleMix") ? constraintMap["scaleMix"] : 1;
+			transformConstraintData.shearMix = constraintMap.hasOwnProperty("shearMix") ? constraintMap["shearMix"] : 1;
+
+			skeletonData.transformConstraints.push(transformConstraintData);
+		}
+		
+		// Path constraints.
+		for each (constraintMap in root["path"]) {
+			var pathConstraintData:PathConstraintData = new PathConstraintData(constraintMap["name"]);
+
+			for each (boneName in constraintMap["bones"]) {
+				bone = skeletonData.findBone(boneName);
+				if (!bone) throw new Error("Path constraint bone not found: " + boneName);
+				pathConstraintData.bones.push(bone);
+			}
+		
+			pathConstraintData.target = skeletonData.findSlot(constraintMap["target"]);
+			if (!pathConstraintData.target) throw new Error("Path target slot not found: " + constraintMap["target"]);
+
+			pathConstraintData.positionMode = PositionMode[constraintMap["positionMode"] || "percent"];
+			pathConstraintData.spacingMode = SpacingMode[constraintMap["spacingMode"] || "length"];
+			pathConstraintData.rotateMode = RotateMode[constraintMap["rotateMode"] || "rotateMode"];
+			pathConstraintData.offsetRotation = Number(constraintMap["rotation"] || 0);
+			pathConstraintData.position = Number(constraintMap["position"] || 0);
+			if (pathConstraintData.positionMode == PositionMode.fixed) pathConstraintData.position *= scale;
+			pathConstraintData.spacing = Number(constraintMap["spacing"] || 0);
+			if (pathConstraintData.spacingMode == SpacingMode.length || pathConstraintData.spacingMode == SpacingMode.fixed) pathConstraintData.spacing *= scale;
+			pathConstraintData.rotateMix = constraintMap.hasOwnProperty("rotateMix") ? constraintMap["rotateMix"] : 1;
+			pathConstraintData.translateMix = constraintMap.hasOwnProperty("translateMix") ? constraintMap["translateMix"] : 1;
+
+			skeletonData.pathConstraints.push(pathConstraintData);
 		}
 
 		// Skins.
@@ -169,11 +215,11 @@ public class SkeletonJson {
 		for (var skinName:String in skins) {
 			var skinMap:Object = skins[skinName];
 			var skin:Skin = new Skin(skinName);
-			for (var slotName:String in skinMap) {
+			for (slotName in skinMap) {
 				var slotIndex:int = skeletonData.findSlotIndex(slotName);
 				var slotEntry:Object = skinMap[slotName];
 				for (var attachmentName:String in slotEntry) {
-					var attachment:Attachment = readAttachment(skin, slotIndex, attachmentName, slotEntry[attachmentName]);
+					var attachment:Attachment = readAttachment(slotEntry[attachmentName], skin, slotIndex, attachmentName);
 					if (attachment != null)
 						skin.addAttachment(slotIndex, attachmentName, attachment);
 				}
@@ -184,20 +230,14 @@ public class SkeletonJson {
 		}
 
 		// Linked meshes.
+		var linkedMeshes:Vector.<LinkedMesh> = this.linkedMeshes;
 		for each (var linkedMesh:LinkedMesh in linkedMeshes) {
 			var parentSkin:Skin = !linkedMesh.skin ? skeletonData.defaultSkin : skeletonData.findSkin(linkedMesh.skin);
 			if (!parentSkin) throw new Error("Skin not found: " + linkedMesh.skin);
 			var parentMesh:Attachment = parentSkin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
 			if (!parentMesh) throw new Error("Parent mesh not found: " + linkedMesh.parent);
-			if (linkedMesh.mesh is MeshAttachment) {
-				var mesh:MeshAttachment = MeshAttachment(linkedMesh.mesh);
-				mesh.parentMesh = MeshAttachment(parentMesh);
-				mesh.updateUVs();
-			} else {
-				var weightedMesh:WeightedMeshAttachment = WeightedMeshAttachment(linkedMesh.mesh);
-				weightedMesh.parentMesh = WeightedMeshAttachment(parentMesh);
-				weightedMesh.updateUVs();
-			}
+			linkedMesh.mesh.parentMesh = MeshAttachment(parentMesh);
+			linkedMesh.mesh.updateUVs();
 		}
 		linkedMeshes.length = 0;
 
@@ -210,33 +250,31 @@ public class SkeletonJson {
 				eventData.intValue = eventMap["int"] || 0;
 				eventData.floatValue = eventMap["float"] || 0;
 				eventData.stringValue = eventMap["string"] || null;
-				skeletonData.events[skeletonData.events.length] = eventData;
+				skeletonData.events.push(eventData);
 			}
 		}
 
 		// Animations.
 		var animations:Object = root["animations"];
 		for (var animationName:String in animations)
-			readAnimation(animationName, animations[animationName], skeletonData);
+			readAnimation(animations[animationName], animationName, skeletonData);
 
 		return skeletonData;
 	}
 
-	private function readAttachment (skin:Skin, slotIndex:int, name:String, map:Object) : Attachment {
+	private function readAttachment (map:Object, skin:Skin, slotIndex:int, name:String) : Attachment {
 		name = map["name"] || name;
 
-		var typeName:String = map["type"] || "region";
-		if (typeName == "skinnedmesh") typeName = "weightedmesh";
-		var type:AttachmentType = AttachmentType[typeName];
-		var path:String = map["path"] || name;
+		var typeName:String = map["type"] || "region";		
+		var type:AttachmentType = AttachmentType[typeName];		
 
 		var scale:Number = this.scale;
-		var color:String, vertices:Vector.<Number>;
+		var color:String;
 		switch (type) {
 			case AttachmentType.region:
-				var region:RegionAttachment = attachmentLoader.newRegionAttachment(skin, name, path);
+				var region:RegionAttachment = attachmentLoader.newRegionAttachment(skin, name, map["path"] || name);
 				if (!region) return null;
-				region.path = path;
+				region.path = map["path"] || name;
 				region.x = Number(map["x"] || 0) * scale;
 				region.y = Number(map["y"] || 0) * scale;
 				region.scaleX = map.hasOwnProperty("scaleX") ? map["scaleX"] : 1;
@@ -255,9 +293,9 @@ public class SkeletonJson {
 				return region;
 			case AttachmentType.mesh:
 			case AttachmentType.linkedmesh:
-				var mesh:MeshAttachment = attachmentLoader.newMeshAttachment(skin, name, path);
+				var mesh:MeshAttachment = attachmentLoader.newMeshAttachment(skin, name, map["path"] || name);
 				if (!mesh) return null;
-				mesh.path = path;
+				mesh.path = map["path"] || name;
 
 				color = map["color"];
 				if (color) {
@@ -270,78 +308,79 @@ public class SkeletonJson {
 				mesh.width = Number(map["width"] || 0) * scale;
 				mesh.height = Number(map["height"] || 0) * scale;
 
-				if (!map["parent"]) {
-					mesh.vertices = getFloatArray(map, "vertices", scale);
-					mesh.triangles = getUintArray(map, "triangles");
-					mesh.regionUVs = getFloatArray(map, "uvs", 1);
-					mesh.updateUVs();
-
-					mesh.hullLength = int(map["hull"] || 0) * 2;
-					if (map["edges"]) mesh.edges = getIntArray(map, "edges");
-				} else {
-					mesh.inheritFFD = map.hasOwnProperty("ffd") ? map["ffd"] : true;
-					linkedMeshes[linkedMeshes.length] = new LinkedMesh(mesh, map["skin"], slotIndex, map["parent"]);
+				if (map["parent"]) {
+					mesh.inheritDeform = map.hasOwnProperty("deform") ? Boolean(map["deform"]) : true;
+					linkedMeshes.push(new LinkedMesh(mesh, map["skin"], slotIndex, map["parent"]));
+					return mesh;
 				}
-				return mesh;
-			case AttachmentType.weightedmesh:
-			case AttachmentType.weightedlinkedmesh:
-				var weightedMesh:WeightedMeshAttachment = attachmentLoader.newWeightedMeshAttachment(skin, name, path);
-				if (!weightedMesh) return null;
+				
+				var uvs:Vector.<Number> = getFloatArray(map, "uvs", 1);
+				readVertices(map, mesh, uvs.length);			
+				mesh.triangles = getUintArray(map, "triangles");	
+				mesh.regionUVs = uvs;									
+				mesh.updateUVs();
 
-				weightedMesh.path = path;
-
-				color = map["color"];
-				if (color) {
-					weightedMesh.r = toColor(color, 0);
-					weightedMesh.g = toColor(color, 1);
-					weightedMesh.b = toColor(color, 2);
-					weightedMesh.a = toColor(color, 3);
-				}
-
-				weightedMesh.width = Number(map["width"] || 0) * scale;
-				weightedMesh.height = Number(map["height"] || 0) * scale;
-
-				if (!map["parent"]) {
-					var uvs:Vector.<Number> = getFloatArray(map, "uvs", 1);
-					vertices = getFloatArray(map, "vertices", 1);
-					var weights:Vector.<Number> = new Vector.<Number>();
-					var bones:Vector.<int> = new Vector.<int>();
-					for (var i:int = 0, n:int = vertices.length; i < n;) {
-						var boneCount:int = int(vertices[i++]);
-						bones[bones.length] = boneCount;
-						for (var nn:int = i + boneCount * 4; i < nn;) {
-							bones[bones.length] = vertices[i];
-							weights[weights.length] = vertices[i + 1] * scale;
-							weights[weights.length] = vertices[i + 2] * scale;
-							weights[weights.length] = vertices[i + 3];
-							i += 4;
-						}
-					}
-					weightedMesh.bones = bones;
-					weightedMesh.weights = weights;
-					weightedMesh.triangles = getUintArray(map, "triangles");
-					weightedMesh.regionUVs = uvs;
-					weightedMesh.updateUVs();
-
-					weightedMesh.hullLength = int(map["hull"] || 0) * 2;
-					if (map["edges"]) weightedMesh.edges = getIntArray(map, "edges");
-				} else {
-					weightedMesh.inheritFFD = map.hasOwnProperty("ffd") ? map["ffd"] : true;
-					linkedMeshes[linkedMeshes.length] = new LinkedMesh(weightedMesh, map["skin"], slotIndex, map["parent"]);
-				}
-				return weightedMesh;
+				mesh.hullLength = int(map["hull"] || 0) * 2;
+				if (map["edges"]) mesh.edges = getIntArray(map, "edges");
+				return mesh;			
 			case AttachmentType.boundingbox:
 				var box:BoundingBoxAttachment = attachmentLoader.newBoundingBoxAttachment(skin, name);
-				vertices = box.vertices;
-				for each (var point:Number in map["vertices"])
-					vertices[vertices.length] = point * scale;
+				if (!box) return null;
+				readVertices(map, box, int(map["vertexCount"]) << 1);								
 				return box;
+			case AttachmentType.path:
+				var path:PathAttachment = attachmentLoader.newPathAttachment(skin, name);
+				if (!path) return null;
+				path.closed = map.hasOwnProperty("closed") ? Boolean(map["closed"]) : false;
+				path.constantSpeed = map.hasOwnProperty("constantSpeed") ? Boolean(map["constantSpeed"]) : true;
+				
+				var vertexCount:int = int(map["vertexCount"]);
+				readVertices(map, path, vertexCount << 1);
+				
+				var lengths:Vector.<Number> = new Vector.<Number>();							
+				for each (var curves:Object in map["lengths"]) {
+					lengths.push(Number(curves) * scale);
+				}
+				path.lengths = lengths;				
+				return path;
 		}
 
 		return null;
 	}
+	
+	private function readVertices(map:Object, attachment:VertexAttachment, verticesLength:int) : void {
+		attachment.worldVerticesLength = verticesLength;
+		var vertices:Vector.<Number> = getFloatArray(map, "vertices", 1);
+		if (verticesLength == vertices.length) {
+			if (scale != 1) {
+				for (var i:int = 0, n:int = vertices.length; i < n; i++) {
+					vertices[i] *= scale;
+				}
+			}
+			attachment.vertices = vertices;
+			return;
+		}
+		
+		var weights:Vector.<Number> = new Vector.<Number>(verticesLength * 3 * 3);
+		weights.length = 0;
+		var bones:Vector.<int> = new Vector.<int>(verticesLength * 3);
+		bones.length = 0;
+		for (i = 0, n = vertices.length; i < n;) {
+			 var boneCount:int = int(vertices[i++]);
+			 bones.push(boneCount);
+			 for (var nn:int = i + boneCount * 4; i < nn; i+=4) {
+				bones.push(int(vertices[i]));
+				weights.push(vertices[i + 1] * scale);
+				weights.push(vertices[i + 2] * scale);
+				weights.push(vertices[i + 3]);
+			 }
+		}
+		attachment.bones = bones;
+		attachment.vertices = weights;
+	}
 
-	private function readAnimation (name:String, map:Object, skeletonData:SkeletonData) : void {
+	private function readAnimation (map:Object, name:String, skeletonData:SkeletonData) : void {
+		var scale:Number = this.scale;
 		var timelines:Vector.<Timeline> = new Vector.<Timeline>();
 		var duration:Number = 0;
 
@@ -369,11 +408,11 @@ public class SkeletonJson {
 						var b:Number = toColor(color, 2);
 						var a:Number = toColor(color, 3);
 						colorTimeline.setFrame(frameIndex, valueMap["time"], r, g, b, a);
-						readCurve(colorTimeline, frameIndex, valueMap);
+						readCurve(valueMap, colorTimeline, frameIndex);
 						frameIndex++;
 					}
 					timelines[timelines.length] = colorTimeline;
-					duration = Math.max(duration, colorTimeline.frames[colorTimeline.frameCount * 5 - 5]);
+					duration = Math.max(duration, colorTimeline.frames[(colorTimeline.frameCount - 1) * ColorTimeline.ENTRIES]);
 				} else if (timelineName == "attachment") {
 					var attachmentTimeline:AttachmentTimeline = new AttachmentTimeline(values.length);
 					attachmentTimeline.slotIndex = slotIndex;
@@ -403,32 +442,34 @@ public class SkeletonJson {
 					frameIndex = 0;
 					for each (valueMap in values) {
 						rotateTimeline.setFrame(frameIndex, valueMap["time"], valueMap["angle"]);
-						readCurve(rotateTimeline, frameIndex, valueMap);
+						readCurve(valueMap, rotateTimeline, frameIndex);
 						frameIndex++;
 					}
 					timelines[timelines.length] = rotateTimeline;
-					duration = Math.max(duration, rotateTimeline.frames[rotateTimeline.frameCount * 2 - 2]);
-				} else if (timelineName == "translate" || timelineName == "scale") {
-					var timeline:TranslateTimeline;
+					duration = Math.max(duration, rotateTimeline.frames[(rotateTimeline.frameCount - 1) * RotateTimeline.ENTRIES]);
+				} else if (timelineName == "translate" || timelineName == "scale" || timelineName == "shear") {
+					var translateTimeline:TranslateTimeline;
 					var timelineScale:Number = 1;
 					if (timelineName == "scale")
-						timeline = new ScaleTimeline(values.length);
+						translateTimeline = new ScaleTimeline(values.length);
+					else if (timelineName == "shear")
+						translateTimeline = new ShearTimeline(values.length);
 					else {
-						timeline = new TranslateTimeline(values.length);
+						translateTimeline = new TranslateTimeline(values.length);
 						timelineScale = scale;
 					}
-					timeline.boneIndex = boneIndex;
+					translateTimeline.boneIndex = boneIndex;
 
 					frameIndex = 0;
 					for each (valueMap in values) {
 						var x:Number = Number(valueMap["x"] || 0) * timelineScale;
 						var y:Number = Number(valueMap["y"] || 0) * timelineScale;
-						timeline.setFrame(frameIndex, valueMap["time"], x, y);
-						readCurve(timeline, frameIndex, valueMap);
+						translateTimeline.setFrame(frameIndex, valueMap["time"], x, y);
+						readCurve(valueMap, translateTimeline, frameIndex);
 						frameIndex++;
 					}
-					timelines[timelines.length] = timeline;
-					duration = Math.max(duration, timeline.frames[timeline.frameCount * 3 - 3]);
+					timelines[timelines.length] = translateTimeline;
+					duration = Math.max(duration, translateTimeline.frames[(translateTimeline.frameCount - 1) * TranslateTimeline.ENTRIES]);
 				} else
 					throw new Error("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
 			}
@@ -445,67 +486,133 @@ public class SkeletonJson {
 				var mix:Number = valueMap.hasOwnProperty("mix") ? valueMap["mix"] : 1;
 				var bendDirection:int = (!valueMap.hasOwnProperty("bendPositive") || valueMap["bendPositive"]) ? 1 : -1;
 				ikTimeline.setFrame(frameIndex, valueMap["time"], mix, bendDirection);
-				readCurve(ikTimeline, frameIndex, valueMap);
+				readCurve(valueMap, ikTimeline, frameIndex);
 				frameIndex++;
 			}
 			timelines[timelines.length] = ikTimeline;
-			duration = Math.max(duration, ikTimeline.frames[ikTimeline.frameCount * 3 - 3]);
+			duration = Math.max(duration, ikTimeline.frames[(ikTimeline.frameCount - 1) * IkConstraintTimeline.ENTRIES]);
 		}
-
-		var ffd:Object = map["ffd"];
-		for (var skinName:String in ffd) {
+		
+		var transformMap:Object = map["transform"];
+		for (var transformName:String in transformMap) {
+			var transformConstraint:TransformConstraintData = skeletonData.findTransformConstraint(transformName);
+			values = transformMap[transformName];
+			var transformTimeline:TransformConstraintTimeline = new TransformConstraintTimeline(values.length);
+			transformTimeline.transformConstraintIndex = skeletonData.transformConstraints.indexOf(transformConstraint);
+			frameIndex = 0;
+			for each (valueMap in values) {
+				var rotateMix:Number = valueMap.hasOwnProperty("rotateMix") ? valueMap["rotateMix"] : 1;
+				var translateMix:Number = valueMap.hasOwnProperty("translateMix") ? valueMap["translateMix"] : 1;
+				var scaleMix:Number = valueMap.hasOwnProperty("scaleMix") ? valueMap["scaleMix"] : 1;
+				var shearMix:Number = valueMap.hasOwnProperty("shearMix") ? valueMap["shearMix"] : 1;
+				transformTimeline.setFrame(frameIndex, valueMap["time"], rotateMix, translateMix, scaleMix, shearMix);
+				readCurve(valueMap, transformTimeline, frameIndex);
+				frameIndex++;
+			}
+			timelines.push(transformTimeline);
+			duration = Math.max(duration, transformTimeline.frames[(transformTimeline.frameCount - 1) * TransformConstraintTimeline.ENTRIES]);
+		}
+				
+		// Path constraint timelines.
+		var paths:Object = map["paths"];
+		for (var pathName:String in paths) {
+			var index:int = skeletonData.findPathConstraintIndex(pathName);
+			if (index == -1) throw new Error("Path constraint not found: " + pathName);
+			var data:PathConstraintData = skeletonData.pathConstraints[index];
+			
+			var pathMap:Object = paths[pathName];
+			for (timelineName in pathMap) {
+				values = pathMap[timelineName];
+				
+				if (timelineName == "position" || timelineName == "spacing") {
+					var pathTimeline:PathConstraintPositionTimeline;
+					timelineScale = 1;
+					if (timelineName == "spacing") {
+						pathTimeline = new PathConstraintSpacingTimeline(values.length);
+						if (data.spacingMode == SpacingMode.length || data.spacingMode == SpacingMode.fixed) timelineScale = scale;
+					} else {
+						pathTimeline = new PathConstraintPositionTimeline(values.length);
+						if (data.positionMode == PositionMode.fixed) timelineScale = scale;
+					}
+					pathTimeline.pathConstraintIndex = index;
+					frameIndex = 0;
+					for each (valueMap in values) {
+						var value:Number = valueMap[timelineName] || 0;
+						pathTimeline.setFrame(frameIndex, valueMap["time"], value * timelineScale);
+						readCurve(valueMap, pathTimeline, frameIndex);
+						frameIndex++;
+					}
+					timelines.push(pathTimeline);
+					duration = Math.max(duration,
+						pathTimeline.frames[(pathTimeline.frameCount - 1) * PathConstraintPositionTimeline.ENTRIES]);
+				} else if (timelineName == "mix") {
+					var pathMixTimeline:PathConstraintMixTimeline = new PathConstraintMixTimeline(values.length);
+					pathMixTimeline.pathConstraintIndex = index;
+					frameIndex = 0;
+					for each (valueMap in values) {
+						rotateMix = valueMap.hasOwnProperty("rotateMix") ? valueMap["rotateMix"] : 1;
+						translateMix = valueMap.hasOwnProperty("translateMix") ? valueMap["translateMix"] : 1;
+						pathMixTimeline.setFrame(frameIndex, valueMap["time"], rotateMix, translateMix);
+						readCurve(valueMap, pathMixTimeline, frameIndex);
+						frameIndex++;
+					}
+					timelines.push(pathMixTimeline);
+					duration = Math.max(duration,
+						pathMixTimeline.frames[(pathMixTimeline.frameCount - 1) * PathConstraintMixTimeline.ENTRIES]);
+				}
+			}
+		}
+		
+		var deformMap:Object = map["deform"];
+		for (var skinName:String in deformMap) {
 			var skin:Skin = skeletonData.findSkin(skinName);
-			slotMap = ffd[skinName];
+			slotMap = deformMap[skinName];
 			for (slotName in slotMap) {
 				slotIndex = skeletonData.findSlotIndex(slotName);
-				var meshMap:Object = slotMap[slotName];
-				for (var meshName:String in meshMap) {
-					values = meshMap[meshName];
-					var ffdTimeline:FfdTimeline = new FfdTimeline(values.length);
-					var attachment:Attachment = skin.getAttachment(slotIndex, meshName);
-					if (!attachment) throw new Error("FFD attachment not found: " + meshName);
-					ffdTimeline.slotIndex = slotIndex;
-					ffdTimeline.attachment = attachment;
+				var timelineMap:Object = slotMap[slotName];
+				for (timelineName in timelineMap) {
+					values = timelineMap[timelineName];
 
-					var vertexCount:int;
-					if (attachment is MeshAttachment)
-						vertexCount = (attachment as MeshAttachment).vertices.length;
-					else
-						vertexCount = (attachment as WeightedMeshAttachment).weights.length / 3 * 2;
+					var attachment:VertexAttachment = skin.getAttachment(slotIndex, timelineName) as VertexAttachment;
+					if (attachment == null) throw new Error("Deform attachment not found: " + timelineName);
+					var weighted:Boolean = attachment.bones != null;
+					var vertices:Vector.<Number> = attachment.vertices;
+					var deformLength:int = weighted ? vertices.length / 3 * 2 : vertices.length;
+
+					var deformTimeline:DeformTimeline = new DeformTimeline(values.length);
+					deformTimeline.slotIndex = slotIndex;
+					deformTimeline.attachment = attachment;
 
 					frameIndex = 0;
 					for each (valueMap in values) {
-						var vertices:Vector.<Number>;
-						if (!valueMap["vertices"]) {
-							if (attachment is MeshAttachment)
-								vertices = (attachment as MeshAttachment).vertices;
-							else
-								vertices = new Vector.<Number>(vertexCount, true);
-						} else {
-							var verticesValue:Array = valueMap["vertices"];
-							vertices = new Vector.<Number>(vertexCount, true);
-							var start:int = valueMap["offset"] || 0;
-							var n:int = verticesValue.length;
-							if (scale == 1) {
-								for (i = 0; i < n; i++)
-									vertices[i + start] = verticesValue[i];
-							} else {
-								for (i = 0; i < n; i++)
-									vertices[i + start] = verticesValue[i] * scale;
+						var deform:Vector.<Number>;
+						var verticesValue:Object = valueMap["vertices"];
+						if (verticesValue == null)
+							deform = weighted ? new Vector.<Number>(deformLength, true) : vertices;
+						else {
+							deform = new Vector.<Number>(deformLength, true);
+							var start:int = Number(valueMap["offset"] || 0);
+							var temp:Vector.<Number> = getFloatArray(valueMap, "vertices", 1);
+							for (i = 0; i < temp.length; i++) {
+								deform[start + i] = temp[i];
+							}							
+							if (scale != 1) {
+								var n:int;
+								for (i = start, n = i + temp.length; i < n; i++)
+									deform[i] *= scale;
 							}
-							if (attachment is MeshAttachment) {
-								var meshVertices:Vector.<Number> = (attachment as MeshAttachment).vertices;
-								for (i = 0; i < vertexCount; i++)
-									vertices[i] += meshVertices[i];
+							if (!weighted) {
+								for (i = 0; i < deformLength; i++)
+									deform[i] += vertices[i];
 							}
 						}
 
-						ffdTimeline.setFrame(frameIndex, valueMap["time"], vertices);
-						readCurve(ffdTimeline, frameIndex, valueMap);
+						deformTimeline.setFrame(frameIndex, valueMap["time"], deform);
+						readCurve(valueMap, deformTimeline, frameIndex);
 						frameIndex++;
 					}
-					timelines[timelines.length] = ffdTimeline;
-					duration = Math.max(duration, ffdTimeline.frames[ffdTimeline.frameCount - 1]);
+					timelines[timelines.length] = deformTimeline;
+					duration = Math.max(duration, deformTimeline.frames[deformTimeline.frameCount - 1]);
 				}
 			}
 		}
@@ -567,8 +674,8 @@ public class SkeletonJson {
 		skeletonData.animations[skeletonData.animations.length] = new Animation(name, timelines, duration);
 	}
 
-	static private function readCurve (timeline:CurveTimeline, frameIndex:int, valueMap:Object) : void {
-		var curve:Object = valueMap["curve"];
+	static private function readCurve (map:Object, timeline:CurveTimeline, frameIndex:int) : void {
+		var curve:Object = map["curve"];
 		if (!curve) return;
 		if (curve == "stepped")
 			timeline.setStepped(frameIndex);
@@ -614,14 +721,14 @@ public class SkeletonJson {
 
 }
 
-import spine.attachments.Attachment;
+import spine.attachments.MeshAttachment;
 
 internal class LinkedMesh {
 	internal var parent:String, skin:String;
 	internal var slotIndex:int;
-	internal var mesh:Attachment;
+	internal var mesh:MeshAttachment;
 
-	public function LinkedMesh (mesh:Attachment, skin:String, slotIndex:int, parent:String) {
+	public function LinkedMesh (mesh:MeshAttachment, skin:String, slotIndex:int, parent:String) {
 		this.mesh = mesh;
 		this.skin = skin;
 		this.slotIndex = slotIndex;

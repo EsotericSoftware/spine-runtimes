@@ -47,12 +47,16 @@ namespace Spine.Unity {
 			}
 		}
 
-		/// <summary>If a bone isn't set, boneName is used to find the bone.</summary>
+		/// <summary>If a bone isn't set in code, boneName is used to find the bone.</summary>
 		[SpineBone(dataField: "skeletonRenderer")]
 		public String boneName;
 
 		public bool followZPosition = true;
 		public bool followBoneRotation = true;
+
+		[Tooltip("Follows the skeleton's flip state by controlling this Transform's local scale.")]
+		public bool followSkeletonFlip = false;
+
 		[UnityEngine.Serialization.FormerlySerializedAs("resetOnAwake")]
 		public bool initializeOnAwake = true;
 		#endregion
@@ -121,6 +125,11 @@ namespace Spine.Unity {
 					Vector3 worldRotation = skeletonTransform.rotation.eulerAngles;
 					thisTransform.rotation = Quaternion.Euler(worldRotation.x, worldRotation.y, skeletonTransform.rotation.eulerAngles.z + bone.WorldRotationX);
 				}
+			}
+
+			if (followSkeletonFlip) {
+				float flipScaleY = bone.skeleton.flipX ^ bone.skeleton.flipY ? -1f : 1f;
+				thisTransform.localScale = new Vector3(1f, flipScaleY, 1f);
 			}
 		}
 	}
