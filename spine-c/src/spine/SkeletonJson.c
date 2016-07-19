@@ -162,7 +162,8 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 		timelinesCount += slotMap->size;
 	timelinesCount += ik ? ik->size : 0;
 	timelinesCount += transform ? transform->size : 0;
-	timelinesCount += paths ? paths->size : 0;
+	for (constraintMap = paths ? paths->child : 0; constraintMap; constraintMap = constraintMap->next)
+		timelinesCount += constraintMap->size;
 	for (constraintMap = deform ? deform->child : 0; constraintMap; constraintMap = constraintMap->next)
 		for (slotMap = constraintMap->child; slotMap; slotMap = slotMap->next)
 			timelinesCount += slotMap->size;
