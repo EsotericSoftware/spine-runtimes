@@ -69,7 +69,7 @@ namespace Spine.Unity.Modules {
 
 		void OnEnable () {
 			if (skeletonRenderer == null) return;
-			if (block == null) block = new MaterialPropertyBlock();	
+			if (copiedBlock == null) copiedBlock = new MaterialPropertyBlock();	
 			mainMeshRenderer = skeletonRenderer.GetComponent<MeshRenderer>();
 
 			skeletonRenderer.GenerateMeshOverride -= HandleRender;
@@ -103,7 +103,7 @@ namespace Spine.Unity.Modules {
 				s.ClearMesh();		
 		}
 
-		MaterialPropertyBlock block;
+		MaterialPropertyBlock copiedBlock;
 
 		void HandleRender (SkeletonRenderer.SmartMesh.Instruction instruction) {
 			int rendererCount = partsRenderers.Count;
@@ -112,21 +112,27 @@ namespace Spine.Unity.Modules {
 			int rendererIndex = 0;
 
 			if (copyPropertyBlock)
-				mainMeshRenderer.GetPropertyBlock(block);
+				mainMeshRenderer.GetPropertyBlock(copiedBlock);
 
 			var submeshInstructions = instruction.submeshInstructions;
 			var submeshInstructionsItems = submeshInstructions.Items;
 			int lastSubmeshInstruction = submeshInstructions.Count - 1;
 
 			var currentRenderer = partsRenderers[rendererIndex];
-			bool useNormals = skeletonRenderer.calculateNormals;
+			bool addNormals = skeletonRenderer.calculateNormals;
+			bool addTangents = skeletonRenderer.calculateTangents;
 				
 			for (int si = 0, start = 0; si <= lastSubmeshInstruction; si++) {
 				if (submeshInstructionsItems[si].forceSeparate || si == lastSubmeshInstruction) {
-					currentRenderer.RenderParts(instruction.submeshInstructions, start, si + 1);
-					currentRenderer.MeshGenerator.GenerateNormals = useNormals;
+					// Apply properties
+					var meshGenerator = currentRenderer.MeshGenerator;
+					meshGenerator.AddNormals = addNormals;
+					meshGenerator.AddTangents = addTangents;
 					if (copyPropertyBlock)
-						currentRenderer.SetPropertyBlock(block);					
+						currentRenderer.SetPropertyBlock(copiedBlock);
+
+					// Render
+					currentRenderer.RenderParts(instruction.submeshInstructions, start, si + 1);
 
 					start = si + 1;
 					rendererIndex++;
