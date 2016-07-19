@@ -404,8 +404,6 @@ namespace Spine.Unity.MeshGeneration {
 					float reciprocalMagnitude = 1f/magnitude;
 					t.x *= reciprocalMagnitude;
 					t.y *= reciprocalMagnitude;
-				} else {
-					t = Vector2.zero;
 				}
 
 				Vector2 t2 = tempTanBuffer[vertexCount + i];
