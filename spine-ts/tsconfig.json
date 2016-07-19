@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "module": "none",
+        "noImplicitAny": true,
+        "removeComments": false,
+        "preserveConstEnums": true,
+        "outFile": "build/spine.js",
+        "sourceMap": true,
+        "declaration": true
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "build",
+        "build/spine.d.ts"        
+    ]
+}
