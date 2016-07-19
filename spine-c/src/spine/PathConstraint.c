@@ -101,6 +101,7 @@ void spPathConstraint_apply (spPathConstraint* self) {
 		self->spacesCount = spacesCount;
 	}
 	spaces = self->spaces;
+	spaces[0] = 0;
 	lengths = 0;
 	spacing = self->spacing;
 	if (scale || lengthSpacing) {
