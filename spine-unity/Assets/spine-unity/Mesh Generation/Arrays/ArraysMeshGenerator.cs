@@ -393,14 +393,27 @@ namespace Spine.Unity.MeshGeneration {
 		/// <param name="tempTanBuffer">A temporary Vector3[] for calculating tangents.</param>
 		/// <param name="vertexCount">Vertex count.</param>
 		public static void SolveTangents2DBuffer (Vector4[] tangents, Vector2[] tempTanBuffer, int vertexCount) {
-			
+
+			Vector4 tangent;
 			for (int i = 0; i < vertexCount; ++i) {
-				Vector3 t = tempTanBuffer[i].normalized; // Performance gain if the vertex shader can normalize t.x and t.y.
+				Vector2 t = tempTanBuffer[i]; 
+
+				// t.Normalized() (aggressively inlined). Even better if offloaded to GPU via vertex shader.
+				float magnitude = Mathf.Sqrt(t.x * t.x + t.y * t.y);
+				if (magnitude > 1E-05) {
+					float reciprocalMagnitude = 1f/magnitude;
+					t.x *= reciprocalMagnitude;
+					t.y *= reciprocalMagnitude;
+				} else {
+					t = Vector2.zero;
+				}
+
 				Vector2 t2 = tempTanBuffer[vertexCount + i];
-				tangents[i].x = t.x;
-				tangents[i].y = t.y;
-				tangents[i].z = 0;
-				tangents[i].w = (t.y * t2.x > t.x * t2.y) ? 1 : -1; // 2D direction calculation.
+				tangent.x = t.x;
+				tangent.y = t.y;
+				tangent.z = 0;
+				tangent.w = (t.y * t2.x > t.x * t2.y) ? 1 : -1; // 2D direction calculation. Used for binormals.
+				tangents[i] = tangent;
 			}
 
 		}
