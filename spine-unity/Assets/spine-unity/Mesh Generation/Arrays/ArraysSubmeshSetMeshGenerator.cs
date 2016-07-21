@@ -28,7 +28,6 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
-#define SPINE_OPTIONAL_NORMALS
 using UnityEngine;
 
 namespace Spine.Unity.MeshGeneration {
