@@ -30,7 +30,6 @@
  *****************************************************************************/
 #define NO_PREFAB_MESH
 
-using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -137,7 +136,7 @@ namespace Spine.Unity.Editor {
 
 					// Optional fields. May be disabled in SkeletonRenderer.
 					if (normals != null) EditorGUILayout.PropertyField(normals, new GUIContent("Add Normals"));
-					if (tangents != null) EditorGUILayout.PropertyField(tangents, new GUIContent("Add Tangents"));
+					if (tangents != null) EditorGUILayout.PropertyField(tangents, new GUIContent("Solve Tangents"));
 					if (frontFacing != null) EditorGUILayout.PropertyField(frontFacing);
 
 					EditorGUI.indentLevel--;

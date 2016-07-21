@@ -375,7 +375,6 @@ namespace Spine.Unity {
 				}
 			}
 			#endif
-
 			#if SPINE_OPTIONAL_RENDEROVERRIDE
 			if (this.generateMeshOverride != null) {
 				this.generateMeshOverride(workingInstruction);

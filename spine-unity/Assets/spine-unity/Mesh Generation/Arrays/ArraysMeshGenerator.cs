@@ -319,10 +319,12 @@ namespace Spine.Unity.MeshGeneration {
 		}
 
 		#region TangentSolver2D
+		// Thanks to contributions from forum user ToddRivers
+
 		/// <summary>Step 1 of solving tangents. Ensure you have buffers of the correct size.</summary>
 		/// <param name="tangentBuffer">Eventual Vector4[] tangent buffer to assign to Mesh.tangents.</param>
 		/// <param name="tempTanBuffer">Temporary Vector2 buffer for calculating directions.</param>
-		/// <param name="vertexCount">Vertex count.</param>
+		/// <param name="vertexCount">Number of vertices that require tangents (or the size of the vertex array)</param>
 		public static void SolveTangents2DEnsureSize (ref Vector4[] tangentBuffer, ref Vector2[] tempTanBuffer, int vertexCount) {
 			if (tangentBuffer == null || tangentBuffer.Length < vertexCount)
 				tangentBuffer = new Vector4[vertexCount];
@@ -336,8 +338,8 @@ namespace Spine.Unity.MeshGeneration {
 		/// <param name="vertices">The mesh's current vertex position buffer.</param>
 		/// <param name="triangles">The mesh's current triangles buffer.</param>
 		/// <param name="uvs">The mesh's current uvs buffer.</param>
-		/// <param name="vertexCount">Vertex count.</param>
-		/// <param name = "triangleCount">Triangle count</param>
+		/// <param name="vertexCount">Number of vertices that require tangents (or the size of the vertex array)</param>
+		/// <param name = "triangleCount">The number of triangle indexes in the triangle array to be used.</param>
 		public static void SolveTangents2DTriangles (Vector2[] tempTanBuffer, int[] triangles, int triangleCount, Vector3[] vertices, Vector2[] uvs, int vertexCount) {
 			Vector2 sdir;
 			Vector2 tdir;
@@ -369,36 +371,26 @@ namespace Spine.Unity.MeshGeneration {
 
 				sdir.x = (t2 * x1 - t1 * x2) * r;
 				sdir.y = (t2 * y1 - t1 * y2) * r;
+				tempTanBuffer[i1] = tempTanBuffer[i2] = tempTanBuffer[i3] = sdir;
+
 				tdir.x = (s1 * x2 - s2 * x1) * r;
 				tdir.y = (s1 * y2 - s2 * y1) * r;
-
-				// Avoid Vector2 addition method overhead.
-				tempTanBuffer[i1].x = sdir.x;
-				tempTanBuffer[i1].y = sdir.y;
-				tempTanBuffer[i2].x = sdir.x;
-				tempTanBuffer[i2].y = sdir.y;
-				tempTanBuffer[i3].x = sdir.x;
-				tempTanBuffer[i3].y = sdir.y;
-				tempTanBuffer[vertexCount + i1].x = tdir.x;
-				tempTanBuffer[vertexCount + i1].y = tdir.y;
-				tempTanBuffer[vertexCount + i2].x = tdir.x;
-				tempTanBuffer[vertexCount + i2].y = tdir.y;
-				tempTanBuffer[vertexCount + i3].x = tdir.x;
-				tempTanBuffer[vertexCount + i3].y = tdir.y;
+				tempTanBuffer[vertexCount + i1] = tempTanBuffer[vertexCount + i2] = tempTanBuffer[vertexCount + i3] = tdir;
 			}
 		}
 
 		/// <summary>Step 3 of solving tangents. Fills a Vector4[] tangents array according to values calculated in step 2.</summary>
 		/// <param name="tangents">A Vector4[] that will eventually be used to set Mesh.tangents</param>
 		/// <param name="tempTanBuffer">A temporary Vector3[] for calculating tangents.</param>
-		/// <param name="vertexCount">Vertex count.</param>
+		/// <param name="vertexCount">Number of vertices that require tangents (or the size of the vertex array)</param>
 		public static void SolveTangents2DBuffer (Vector4[] tangents, Vector2[] tempTanBuffer, int vertexCount) {
 
 			Vector4 tangent;
+			tangent.z = 0;
 			for (int i = 0; i < vertexCount; ++i) {
 				Vector2 t = tempTanBuffer[i]; 
 
-				// t.Normalized() (aggressively inlined). Even better if offloaded to GPU via vertex shader.
+				// t.Normalize() (aggressively inlined). Even better if offloaded to GPU via vertex shader.
 				float magnitude = Mathf.Sqrt(t.x * t.x + t.y * t.y);
 				if (magnitude > 1E-05) {
 					float reciprocalMagnitude = 1f/magnitude;
@@ -409,7 +401,7 @@ namespace Spine.Unity.MeshGeneration {
 				Vector2 t2 = tempTanBuffer[vertexCount + i];
 				tangent.x = t.x;
 				tangent.y = t.y;
-				tangent.z = 0;
+				//tangent.z = 0;
 				tangent.w = (t.y * t2.x > t.x * t2.y) ? 1 : -1; // 2D direction calculation. Used for binormals.
 				tangents[i] = tangent;
 			}
