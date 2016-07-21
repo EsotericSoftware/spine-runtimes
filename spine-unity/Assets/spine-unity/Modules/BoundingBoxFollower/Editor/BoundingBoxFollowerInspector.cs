@@ -60,7 +60,7 @@ namespace Spine.Unity.Editor {
 			EditorGUI.BeginChangeCheck();
 			EditorGUILayout.PropertyField(skeletonRenderer);
 			EditorGUILayout.PropertyField(slotName, new GUIContent("Slot"));
-			EditorGUILayout.PropertyField(isTrigger, new GUIContent ("IsTrigger"));
+			EditorGUILayout.PropertyField(isTrigger);
 
 			if (EditorGUI.EndChangeCheck()) {
 				serializedObject.ApplyModifiedProperties();

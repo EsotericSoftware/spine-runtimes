@@ -112,7 +112,7 @@ namespace Spine.Unity {
 
 #if UNITY_EDITOR
 						if (attachment != null && boundingBoxAttachment == null)
-							Debug.Log("BoundingBoxFollower tried to follow a slot that contains non-boundingbox attachments.");
+							Debug.Log("BoundingBoxFollower tried to follow a slot that contains non-boundingbox attachments: " + slotName);
 #endif
 
 						if (boundingBoxAttachment != null) {
