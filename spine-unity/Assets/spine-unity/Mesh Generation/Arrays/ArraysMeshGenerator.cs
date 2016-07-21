@@ -37,7 +37,7 @@ namespace Spine.Unity.MeshGeneration {
 		public bool PremultiplyVertexColors { get; set; }
 		protected bool addNormals;
 		public bool AddNormals { get { return addNormals; } set { addNormals = value; } }
-		protected bool addTangents { get; set; }
+		protected bool addTangents;
 		public bool AddTangents { get { return addTangents; } set { addTangents = value; } }
 		#endregion
 
