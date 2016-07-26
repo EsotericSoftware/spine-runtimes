@@ -38,10 +38,10 @@ namespace Spine.Unity.Editor {
 			if (dataProperty != null) {
 				if (dataProperty.objectReferenceValue is SkeletonDataAsset) {
 					skeletonDataAsset = (SkeletonDataAsset)dataProperty.objectReferenceValue;
-				} else if (dataProperty.objectReferenceValue is SkeletonRenderer) {
-					var renderer = (SkeletonRenderer)dataProperty.objectReferenceValue;
-					if (renderer != null)
-						skeletonDataAsset = renderer.skeletonDataAsset;
+				} else if (dataProperty.objectReferenceValue is ISkeletonComponent) {
+					var skeletonComponent = (ISkeletonComponent)dataProperty.objectReferenceValue;
+					if (skeletonComponent != null)
+						skeletonDataAsset = skeletonComponent.SkeletonDataAsset;
 				} else {
 					EditorGUI.LabelField(position, "ERROR:", "Invalid reference type");
 					return;
@@ -49,10 +49,9 @@ namespace Spine.Unity.Editor {
 
 			} else if (property.serializedObject.targetObject is Component) {
 				var component = (Component)property.serializedObject.targetObject;
-				if (component.GetComponentInChildren<SkeletonRenderer>() != null) {
-					var skeletonRenderer = component.GetComponentInChildren<SkeletonRenderer>();
-					skeletonDataAsset = skeletonRenderer.skeletonDataAsset;
-				}
+				ISkeletonComponent skeletonComponent = component.GetComponentInChildren(typeof(ISkeletonComponent)) as ISkeletonComponent;
+				if (skeletonComponent != null)
+					skeletonDataAsset = skeletonComponent.SkeletonDataAsset;
 			}
 
 			if (skeletonDataAsset == null) {

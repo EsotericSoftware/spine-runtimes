@@ -39,10 +39,11 @@ using Spine;
 namespace Spine.Unity {
 	[ExecuteInEditMode, RequireComponent(typeof(CanvasRenderer), typeof(RectTransform)), DisallowMultipleComponent]
 	[AddComponentMenu("Spine/SkeletonGraphic (Unity UI Canvas)")]
-	public class SkeletonGraphic : MaskableGraphic {
+	public class SkeletonGraphic : MaskableGraphic, ISkeletonComponent, IAnimationStateComponent {
 
 		#region Inspector
 		public SkeletonDataAsset skeletonDataAsset;
+		public SkeletonDataAsset SkeletonDataAsset { get { return skeletonDataAsset; } }
 
 		[SpineSkin(dataField:"skeletonDataAsset")]
 		public string initialSkinName = "default";
