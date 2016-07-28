@@ -155,11 +155,10 @@ public class SkeletonSprite extends DisplayObject {
 					
 				vertexData = mesh.getVertexData();
 				uvs = meshAttachment.uvs;
+				vertexData.colorize("color", rgb, a);
 				for (ii = 0, iii = 0; ii < verticesCount; ii++, iii+=2) {
 					mesh.setVertexPosition(ii, worldVertices[iii], worldVertices[iii+1]);
-					mesh.setTexCoords(ii, uvs[iii], uvs[iii+1]);
-					mesh.setVertexColor(ii, rgb);
-					mesh.setVertexAlpha(ii, alpha);				
+					mesh.setTexCoords(ii, uvs[iii], uvs[iii+1]);			
 				}
 				vertexData.numVertices = verticesCount;
 				// FIXME set smoothing/filter
