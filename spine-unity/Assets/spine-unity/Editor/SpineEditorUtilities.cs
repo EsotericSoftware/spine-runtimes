@@ -188,6 +188,9 @@ namespace Spine.Unity.Editor {
 				defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, DEFAULT_DEFAULT_SHADER);	
 			}
 
+			SceneView.onSceneGUIDelegate -= OnSceneGUI;
+			SceneView.onSceneGUIDelegate += OnSceneGUI;
+
 			DirectoryInfo rootDir = new DirectoryInfo(Application.dataPath);
 			FileInfo[] files = rootDir.GetFiles("SpineEditorUtilities.cs", SearchOption.AllDirectories);
 			editorPath = Path.GetDirectoryName(files[0].FullName.Replace("\\", "/").Replace(Application.dataPath, "Assets"));
@@ -252,6 +255,70 @@ namespace Spine.Unity.Editor {
 			if (GUILayout.Button("Disable", GUILayout.Width(64)))
 				DisableTK2D();
 			GUILayout.EndHorizontal();
+		}
+		#endregion
+
+		#region Drag and Drop to Scene View
+		private static System.Type EditorSpawnType = typeof(SkeletonAnimation);
+
+		static void OnSceneGUI (SceneView sceneview) {
+			var current = UnityEngine.Event.current;
+			var references = DragAndDrop.objectReferences;
+
+			// Allow drag and drop of one SkeletonDataAsset.
+			if (references.Length == 1) {
+				var skeletonDataAsset = references[0] as SkeletonDataAsset;
+				if (skeletonDataAsset != null) {
+					DragAndDrop.visualMode = DragAndDropVisualMode.Move;
+					var mousePos = current.mousePosition;
+
+					Handles.BeginGUI();
+					GUI.Label(new Rect(mousePos + new Vector2(20f, 20f), new Vector2(400f, 20f)), new GUIContent(string.Format("Create Spine GameObject ({0})", skeletonDataAsset.skeletonJSON.name), SpineEditorUtilities.Icons.spine));
+					Handles.EndGUI();
+
+					if (current.type == EventType.DragPerform) {
+						var spawnPoint = MousePointToWorldPoint2D(mousePos, sceneview.camera);	
+						try {
+							GameObject newGameObject = null;
+
+							if (EditorSpawnType == typeof(SkeletonAnimation)) {
+								var newSkeletonAnimation = InstantiateSkeletonAnimation(skeletonDataAsset);
+								newGameObject = newSkeletonAnimation.gameObject;
+							}
+//							else if (EditorSpawnType == typeof(SkeletonAnimator)) {
+//								var newSkeletonAnimator = InstantiateSkeletonAnimator(skeletonDataAsset);
+//								newGameObject = newSkeletonAnimator.gameObject;
+//							}
+
+							newGameObject.transform.position = RoundVector(spawnPoint, 2);
+							Selection.activeGameObject = newGameObject;
+							Undo.RegisterCreatedObjectUndo(newGameObject, "Spawn Skeleton as SkeletonAnimation");
+						} catch {
+							Debug.LogError("Could not create Spine GameObject. Make sure your SkeletonData asset is valid.");
+						}
+					}
+				}
+			}
+
+		}
+
+		/// <summary>
+		/// Rounds off vector components to a number of decimal digits.
+		/// </summary>
+		public static Vector3 RoundVector (Vector3 vector, int digits) {
+			vector.x = (float)System.Math.Round(vector.x, digits);
+			vector.y = (float)System.Math.Round(vector.y, digits);
+			vector.z = (float)System.Math.Round(vector.z, digits);
+			return vector;
+		}
+
+		static Vector3 MousePointToWorldPoint2D (Vector2 mousePosition, Camera camera) {
+			var plane2D = new Plane(Vector3.back, Vector3.zero);
+			var screenPos = new Vector3(mousePosition.x, camera.pixelHeight - mousePosition.y, 0f);
+			var ray = camera.ScreenPointToRay(screenPos);
+			float distance;
+			bool hit = plane2D.Raycast(ray, out distance);
+			return ray.GetPoint(distance);
 		}
 		#endregion
 
