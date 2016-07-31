@@ -259,7 +259,23 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		#region Drag and Drop to Scene View
-		private static System.Type EditorSpawnType = typeof(SkeletonAnimation);
+
+		public delegate Component InstantiateDelegate (SkeletonDataAsset skeletonDataAsset);
+
+		struct SpawnMenuData {
+			public Vector3 spawnPoint;
+			public SkeletonDataAsset skeletonDataAsset;
+			public InstantiateDelegate instantiateDelegate;
+			public bool isUI;
+		}
+
+		public class SkeletonComponentSpawnType {
+			public string menuLabel;
+			public InstantiateDelegate instantiateDelegate;
+			public bool isUI;
+		}
+
+		public static readonly List<SkeletonComponentSpawnType> additionalSpawnTypes = new List<SkeletonComponentSpawnType>();
 
 		static void OnSceneGUI (SceneView sceneview) {
 			var current = UnityEngine.Event.current;
@@ -277,27 +293,62 @@ namespace Spine.Unity.Editor {
 					Handles.EndGUI();
 
 					if (current.type == EventType.DragPerform) {
-						var spawnPoint = MousePointToWorldPoint2D(mousePos, sceneview.camera);	
-						try {
-							GameObject newGameObject = null;
+						var spawnPoint = MousePointToWorldPoint2D(mousePos, sceneview.camera);
 
-							if (EditorSpawnType == typeof(SkeletonAnimation)) {
-								var newSkeletonAnimation = InstantiateSkeletonAnimation(skeletonDataAsset);
-								newGameObject = newSkeletonAnimation.gameObject;
-							}
-//							else if (EditorSpawnType == typeof(SkeletonAnimator)) {
-//								var newSkeletonAnimator = InstantiateSkeletonAnimator(skeletonDataAsset);
-//								newGameObject = newSkeletonAnimator.gameObject;
-//							}
+						var menu = new GenericMenu();
+						// JOHN: todo: Get rect space spawnPoint if RectTransform is selected.
+						menu.AddItem(new GUIContent("SkeletonAnimation"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
+							skeletonDataAsset = skeletonDataAsset,
+							spawnPoint = spawnPoint,
+							instantiateDelegate = (data) => InstantiateSkeletonAnimation(data)
+						});
 
-							newGameObject.transform.position = RoundVector(spawnPoint, 2);
-							Selection.activeGameObject = newGameObject;
-							Undo.RegisterCreatedObjectUndo(newGameObject, "Spawn Skeleton as SkeletonAnimation");
-						} catch {
-							Debug.LogError("Could not create Spine GameObject. Make sure your SkeletonData asset is valid.");
+						foreach (var spawnType in additionalSpawnTypes) {
+							menu.AddItem(new GUIContent(spawnType.menuLabel), false, HandleSkeletonComponentDrop, new SpawnMenuData {
+								skeletonDataAsset = skeletonDataAsset,
+								spawnPoint = spawnPoint,
+								instantiateDelegate = spawnType.instantiateDelegate,
+								isUI = spawnType.isUI
+							});
 						}
+
+						#if SPINE_SKELETONANIMATOR
+						menu.AddSeparator("");
+
+						menu.AddItem(new GUIContent("SkeletonAnimator"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
+							skeletonDataAsset = skeletonDataAsset,
+							spawnPoint = spawnPoint,
+							instantiateDelegate = (data) => InstantiateSkeletonAnimator(data)
+						});
+						#endif
+
+						menu.ShowAsContext();
 					}
 				}
+			}
+
+		}
+
+		public static void HandleSkeletonComponentDrop (object menuData) {
+			var data = (SpawnMenuData)menuData;
+
+			try {
+				GameObject newGameObject = null;
+				Component newSkeletonComponent = data.instantiateDelegate.Invoke(data.skeletonDataAsset);
+				newGameObject = newSkeletonComponent.gameObject;
+				newGameObject.transform.position = RoundVector(data.spawnPoint, 2);
+
+				var activeGameObject = Selection.activeGameObject;
+				if (activeGameObject != null)
+					newGameObject.transform.SetParent(activeGameObject.transform, true);
+
+				if (data.isUI && (activeGameObject == null || activeGameObject.GetComponent<RectTransform>() == null))
+					Debug.Log("Created a UI Skeleton GameObject not under a RectTransform. It may not be visible until you parent it to a canvas.");
+
+				Selection.activeGameObject = newGameObject;
+				Undo.RegisterCreatedObjectUndo(newGameObject, "Spawn Spine Skeleton");
+			} catch {
+				Debug.LogError("Could not create Spine GameObject. Make sure your SkeletonData asset is valid.");
 			}
 
 		}
@@ -1223,6 +1274,7 @@ namespace Spine.Unity.Editor {
 
 			if (skeletonDataAsset.controller == null) {
 				SkeletonBaker.GenerateMecanimAnimationClips(skeletonDataAsset);
+				Debug.Log(string.Format("Mecanim controller was automatically generated and assigned for {0}", skeletonDataAsset.name));
 			}
 
 			go.GetComponent<Animator>().runtimeAnimatorController = skeletonDataAsset.controller;
