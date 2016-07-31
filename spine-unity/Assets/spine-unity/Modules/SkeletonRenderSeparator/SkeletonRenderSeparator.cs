@@ -75,8 +75,23 @@ namespace Spine.Unity.Modules {
 			skeletonRenderer.GenerateMeshOverride -= HandleRender;
 			skeletonRenderer.GenerateMeshOverride += HandleRender;
 
+			#if UNITY_5_4_OR_NEWER
 			if (copyMeshRendererFlags) {
-				bool useLightProbes = mainMeshRenderer.useLightProbes;
+				var lightProbeUsage = mainMeshRenderer.lightProbeUsage;
+				bool receiveShadows = mainMeshRenderer.receiveShadows;
+
+				for (int i = 0; i < partsRenderers.Count; i++) {
+					var currentRenderer = partsRenderers[i];
+					if (currentRenderer == null) continue; // skip null items.
+
+					var mr = currentRenderer.MeshRenderer;
+					mr.lightProbeUsage = lightProbeUsage;
+					mr.receiveShadows = receiveShadows;
+				}
+			}
+			#else
+			if (copyMeshRendererFlags) {
+				var useLightProbes = mainMeshRenderer.useLightProbes;
 				bool receiveShadows = mainMeshRenderer.receiveShadows;
 
 				for (int i = 0; i < partsRenderers.Count; i++) {
@@ -88,6 +103,7 @@ namespace Spine.Unity.Modules {
 					mr.receiveShadows = receiveShadows;
 				}
 			}
+			#endif
 
 		}
 
