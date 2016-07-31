@@ -148,19 +148,33 @@ namespace Spine.Unity.Editor {
 		public static string editorGUIPath = "";
 		public static bool initialized;
 
+		/// This list keeps the asset reference temporarily during importing.
+		/// 
+		/// In cases of very large projects/sufficient RAM pressure, when AssetDatabase.SaveAssets is called,
+		/// Unity can mistakenly unload assets whose references are only on the stack.
+		/// This leads to MissingReferenceException and other errors.
+		static readonly List<ScriptableObject> protectFromStackGarbageCollection = new List<ScriptableObject>();
+
 		static HashSet<string> assetsImportedInWrongState;
 		static Dictionary<int, GameObject> skeletonRendererTable;
 		static Dictionary<int, SkeletonUtilityBone> skeletonUtilityBoneTable;
 		static Dictionary<int, BoundingBoxFollower> boundingBoxFollowerTable;
 
-		const string DEFAULT_MIX_KEY = "SPINE_DEFAULT_MIX";
 		#if SPINE_TK2D
-		public static float defaultScale = 1f;
+		const float DEFAULT_DEFAULT_SCALE = 1f;
 		#else
-		public static float defaultScale = 0.01f;
+		const float DEFAULT_DEFAULT_SCALE = 0.01f;
 		#endif
-		public static float defaultMix = 0.2f;
-		public static string defaultShader = "Spine/Skeleton";
+		const string DEFAULT_SCALE_KEY = "SPINE_DEFAULT_SCALE";
+		public static float defaultScale = DEFAULT_DEFAULT_SCALE;
+
+		const float DEFAULT_DEFAULT_MIX = 0.2f;
+		const string DEFAULT_MIX_KEY = "SPINE_DEFAULT_MIX";
+		public static float defaultMix = DEFAULT_DEFAULT_MIX;
+
+		const string DEFAULT_DEFAULT_SHADER = "Spine/Skeleton";
+		const string DEFAULT_SHADER_KEY = "SPINE_DEFAULT_SHADER";
+		public static string defaultShader = DEFAULT_DEFAULT_SHADER;
 
 		#region Initialization
 		static SpineEditorUtilities () {
@@ -168,7 +182,11 @@ namespace Spine.Unity.Editor {
 		}
 
 		static void Initialize () {
-			defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, 0.2f);
+			{
+				defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, DEFAULT_DEFAULT_MIX);
+				defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, DEFAULT_DEFAULT_SCALE);
+				defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, DEFAULT_DEFAULT_SHADER);	
+			}
 
 			DirectoryInfo rootDir = new DirectoryInfo(Application.dataPath);
 			FileInfo[] files = rootDir.GetFiles("SpineEditorUtilities.cs", SearchOption.AllDirectories);
@@ -202,16 +220,28 @@ namespace Spine.Unity.Editor {
 		static void PreferencesGUI () {
 			if (!preferencesLoaded) {
 				preferencesLoaded = true;
-				defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, 0.2f);
+				defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, DEFAULT_DEFAULT_MIX);
+				defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, DEFAULT_DEFAULT_SCALE);
+				defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, DEFAULT_DEFAULT_SHADER);
 			}
 
-
 			EditorGUILayout.LabelField("Auto-Import Settings", EditorStyles.boldLabel);
+
 			EditorGUI.BeginChangeCheck();
 			defaultMix = EditorGUILayout.FloatField("Default Mix", defaultMix);
-			if (EditorGUI.EndChangeCheck())
+			if (EditorGUI.EndChangeCheck()) 
 				EditorPrefs.SetFloat(DEFAULT_MIX_KEY, defaultMix);
 
+			EditorGUI.BeginChangeCheck();
+			defaultScale = EditorGUILayout.FloatField("Default SkeletonData Scale", defaultScale);
+			if (EditorGUI.EndChangeCheck())
+				EditorPrefs.SetFloat(DEFAULT_SCALE_KEY, defaultScale);
+
+			EditorGUI.BeginChangeCheck();
+			defaultShader = EditorGUILayout.DelayedTextField("Default shader for auto-generated materials", defaultShader);
+			if (EditorGUI.EndChangeCheck())
+				EditorPrefs.SetString(DEFAULT_SHADER_KEY, defaultShader);
+			
 			GUILayout.Space(20);
 			EditorGUILayout.LabelField("3rd Party Settings", EditorStyles.boldLabel);
 			GUILayout.BeginHorizontal();
@@ -310,9 +340,9 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void ImportSpineContent (string[] imported, bool reimport = false) {
-			List<string> atlasPaths = new List<string>();
-			List<string> imagePaths = new List<string>();
-			List<string> skeletonPaths = new List<string>();
+			var atlasPaths = new List<string>();
+			var imagePaths = new List<string>();
+			var skeletonPaths = new List<string>();
 
 			foreach (string str in imported) {
 				string extension = Path.GetExtension(str).ToLower();
@@ -714,6 +744,7 @@ namespace Spine.Unity.Editor {
 					vestigialMaterials.Add(m);
 			}
 
+			protectFromStackGarbageCollection.Add(atlasAsset);
 			atlasAsset.atlasFile = atlasText;
 
 			//strip CR
@@ -802,6 +833,7 @@ namespace Spine.Unity.Editor {
 				AssetDatabase.Refresh();
 			}
 
+			protectFromStackGarbageCollection.Remove(atlasAsset);
 			return (AtlasAsset)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(AtlasAsset));
 		}
 		#endregion
