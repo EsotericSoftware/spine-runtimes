@@ -33,13 +33,12 @@ namespace Spine.Unity.Editor {
 				return;
 			}
 
-			var dataProperty = property.serializedObject.FindProperty(TargetAttribute.dataField);
-
-			if (dataProperty != null) {
-				if (dataProperty.objectReferenceValue is SkeletonDataAsset) {
-					skeletonDataAsset = (SkeletonDataAsset)dataProperty.objectReferenceValue;
-				} else if (dataProperty.objectReferenceValue is ISkeletonComponent) {
-					var skeletonComponent = (ISkeletonComponent)dataProperty.objectReferenceValue;
+			var dataField = property.serializedObject.FindProperty(TargetAttribute.dataField);
+			if (dataField != null) {
+				if (dataField.objectReferenceValue is SkeletonDataAsset) {
+					skeletonDataAsset = (SkeletonDataAsset)dataField.objectReferenceValue;
+				} else if (dataField.objectReferenceValue is ISkeletonComponent) {
+					var skeletonComponent = (ISkeletonComponent)dataField.objectReferenceValue;
 					if (skeletonComponent != null)
 						skeletonDataAsset = skeletonComponent.SkeletonDataAsset;
 				} else {
@@ -49,7 +48,7 @@ namespace Spine.Unity.Editor {
 
 			} else if (property.serializedObject.targetObject is Component) {
 				var component = (Component)property.serializedObject.targetObject;
-				ISkeletonComponent skeletonComponent = component.GetComponentInChildren(typeof(ISkeletonComponent)) as ISkeletonComponent;
+				var skeletonComponent = component.GetComponentInChildren(typeof(ISkeletonComponent)) as ISkeletonComponent;
 				if (skeletonComponent != null)
 					skeletonDataAsset = skeletonComponent.SkeletonDataAsset;
 			}
@@ -62,28 +61,42 @@ namespace Spine.Unity.Editor {
 			position = EditorGUI.PrefixLabel(position, label);
 
 			var propertyStringValue = property.stringValue;
-			if (GUI.Button(position, string.IsNullOrEmpty(propertyStringValue) ? NoneLabel : propertyStringValue, EditorStyles.popup)) {
+			if (GUI.Button(position, string.IsNullOrEmpty(propertyStringValue) ? NoneLabel : propertyStringValue, EditorStyles.popup))
 				Selector(property);
+
+		}
+
+		public ISkeletonComponent GetTargetSkeletonComponent (SerializedProperty property) {
+			var dataField = property.serializedObject.FindProperty(TargetAttribute.dataField);
+
+			if (dataField != null) {
+				var skeletonComponent = dataField.objectReferenceValue as ISkeletonComponent;
+				if (dataField.objectReferenceValue != null && skeletonComponent != null) // note the overloaded UnityEngine.Object == null check. Do not simplify.
+					return skeletonComponent;
+			} else {
+				var component = property.serializedObject.targetObject as Component;
+				if (component != null)					
+					return component.GetComponentInChildren(typeof(ISkeletonComponent)) as ISkeletonComponent;
 			}
 
+			return null;
 		}
 
 		protected virtual void Selector (SerializedProperty property) {
 			SkeletonData data = skeletonDataAsset.GetSkeletonData(true);
-			if (data == null)
-				return;
+			if (data == null) return;
 
-			GenericMenu menu = new GenericMenu();
+			var menu = new GenericMenu();
 			PopulateMenu(menu, property, this.TargetAttribute, data);
 			menu.ShowAsContext();
 		}
 
 		protected abstract void PopulateMenu (GenericMenu menu, SerializedProperty property, T targetAttribute, SkeletonData data);
 
-		protected virtual void HandleSelect (object val) {
-			var pair = (SpineDrawerValuePair)val;
-			pair.property.stringValue = pair.str;
-			pair.property.serializedObject.ApplyModifiedProperties();
+		protected virtual void HandleSelect (object menuItemObject) {
+			var clickedItem = (SpineDrawerValuePair)menuItemObject;
+			clickedItem.property.stringValue = clickedItem.str;
+			clickedItem.property.serializedObject.ApplyModifiedProperties();
 		}
 
 		public override float GetPropertyHeight (SerializedProperty property, GUIContent label) {
@@ -99,14 +112,12 @@ namespace Spine.Unity.Editor {
 			for (int i = 0; i < data.Slots.Count; i++) {
 				string name = data.Slots.Items[i].Name;
 				if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal)) {
+					
 					if (targetAttribute.containsBoundingBoxes) {
-
 						int slotIndex = i;
-
-						List<Attachment> attachments = new List<Attachment>();
-						foreach (var skin in data.Skins) {
+						var attachments = new List<Attachment>();
+						foreach (var skin in data.Skins)
 							skin.FindAttachmentsForSlot(slotIndex, attachments);
-						}
 
 						bool hasBoundingBox = false;
 						foreach (var attachment in attachments) {
@@ -119,7 +130,6 @@ namespace Spine.Unity.Editor {
 
 						if (!hasBoundingBox)
 							menu.AddDisabledItem(new GUIContent(name));
-
 
 					} else {
 						menu.AddItem(new GUIContent(name), name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
@@ -169,6 +179,10 @@ namespace Spine.Unity.Editor {
 	public class SpineEventNameDrawer : SpineTreeItemDrawerBase<SpineEvent> {
 		protected override void PopulateMenu (GenericMenu menu, SerializedProperty property, SpineEvent targetAttribute, SkeletonData data) {
 			var events = skeletonDataAsset.GetSkeletonData(false).Events;
+
+			// <None> item
+			menu.AddItem(new GUIContent(NoneLabel), string.IsNullOrEmpty(property.stringValue), HandleSelect, new SpineDrawerValuePair("", property));
+
 			for (int i = 0; i < events.Count; i++) {
 				string name = events.Items[i].Name;
 				if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal))
@@ -181,45 +195,32 @@ namespace Spine.Unity.Editor {
 	[CustomPropertyDrawer(typeof(SpineAttachment))]
 	public class SpineAttachmentDrawer : SpineTreeItemDrawerBase<SpineAttachment> {
 		protected override void PopulateMenu (GenericMenu menu, SerializedProperty property, SpineAttachment targetAttribute, SkeletonData data) {
-			List<Skin> validSkins = new List<Skin>();
-			SkeletonRenderer skeletonRenderer = null;
+			ISkeletonComponent skeletonComponent = GetTargetSkeletonComponent(property);
+			var validSkins = new List<Skin>();
 
-			var component = property.serializedObject.targetObject as Component;
-			if (component != null) {
-				if (component.GetComponentInChildren<SkeletonRenderer>() != null) {
-					skeletonRenderer = component.GetComponentInChildren<SkeletonRenderer>();
-					//if (skeletonDataAsset != skeletonRenderer.skeletonDataAsset) Debug.LogWarning("DataField SkeletonDataAsset and SkeletonRenderer/SkeletonAnimation's SkeletonDataAsset do not match. Remove the explicit dataField parameter of your [SpineAttachment] field.");
-					skeletonDataAsset = skeletonRenderer.skeletonDataAsset;
-				}
-			}
-
-			if (skeletonRenderer != null && targetAttribute.currentSkinOnly) {
-				if (skeletonRenderer.skeleton.Skin != null) {
-					validSkins.Add(skeletonRenderer.skeleton.Skin);
-				} else {
+			if (skeletonComponent != null && targetAttribute.currentSkinOnly) {
+				var currentSkin = skeletonComponent.Skeleton.Skin;
+				if (currentSkin != null)
+					validSkins.Add(currentSkin);
+				else
 					validSkins.Add(data.Skins.Items[0]);
-				}
+					
 			} else {
-				foreach (Skin skin in data.Skins) {
-					if (skin != null)
-						validSkins.Add(skin);
-				}
+				foreach (Skin skin in data.Skins)
+					if (skin != null) validSkins.Add(skin);
 			}
 
-			List<string> attachmentNames = new List<string>();
-			List<string> placeholderNames = new List<string>();
-
+			var attachmentNames = new List<string>();
+			var placeholderNames = new List<string>();
 			string prefix = "";
 
-			if (skeletonRenderer != null && targetAttribute.currentSkinOnly)
-				menu.AddDisabledItem(new GUIContent(skeletonRenderer.gameObject.name + " (SkeletonRenderer)"));
+			if (skeletonComponent != null && targetAttribute.currentSkinOnly)
+				menu.AddDisabledItem(new GUIContent((skeletonComponent as Component).gameObject.name + " (Skeleton)"));
 			else
 				menu.AddDisabledItem(new GUIContent(skeletonDataAsset.name));
 
 			menu.AddSeparator("");
-
 			menu.AddItem(new GUIContent("Null"), property.stringValue == "", HandleSelect, new SpineDrawerValuePair("", property));
-
 			menu.AddSeparator("");
 
 			Skin defaultSkin = data.Skins.Items[0];
@@ -239,7 +240,7 @@ namespace Spine.Unity.Editor {
 					prefix = skinPrefix;
 
 				for (int i = 0; i < data.Slots.Count; i++) {
-					if (slotMatch.Length > 0 && data.Slots.Items[i].Name.ToLower().Contains(slotMatch) == false)
+					if (slotMatch.Length > 0 && !(data.Slots.Items[i].Name.ToLower().Contains(slotMatch)))
 						continue;
 
 					attachmentNames.Clear();
@@ -251,9 +252,7 @@ namespace Spine.Unity.Editor {
 						skin.FindNamesForSlot(i, placeholderNames);
 					}
 
-
 					for (int a = 0; a < attachmentNames.Count; a++) {
-
 						string attachmentPath = attachmentNames[a];
 						string menuPath = prefix + data.Slots.Items[i].Name + "/" + attachmentPath;
 						string name = attachmentNames[a];
@@ -261,14 +260,13 @@ namespace Spine.Unity.Editor {
 						if (targetAttribute.returnAttachmentPath)
 							name = skin.Name + "/" + data.Slots.Items[i].Name + "/" + attachmentPath;
 
-						if (targetAttribute.placeholdersOnly && placeholderNames.Contains(attachmentPath) == false) {
+						if (targetAttribute.placeholdersOnly && !placeholderNames.Contains(attachmentPath)) {
 							menu.AddDisabledItem(new GUIContent(menuPath));
 						} else {
 							menu.AddItem(new GUIContent(menuPath), name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
 						}
-
-
 					}
+
 				}
 			}
 		}
@@ -284,7 +282,7 @@ namespace Spine.Unity.Editor {
 
 			for (int i = 0; i < data.Bones.Count; i++) {
 				string name = data.Bones.Items[i].Name;
-				if (name.StartsWith(targetAttribute.startsWith))
+				if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal))
 					menu.AddItem(new GUIContent(name), name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
 			}
 		}
@@ -303,12 +301,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			component = (Component)property.serializedObject.targetObject;
-
-			if (component != null)
-				atlasProp = property.serializedObject.FindProperty("atlasAsset");
-			else
-				atlasProp = null;
-
+			atlasProp = component != null ? property.serializedObject.FindProperty("atlasAsset") : null;
 
 			if (atlasProp == null) {
 				EditorGUI.LabelField(position, "ERROR:", "Must have AtlasAsset variable!");
@@ -322,9 +315,8 @@ namespace Spine.Unity.Editor {
 
 			position = EditorGUI.PrefixLabel(position, label);
 
-			if (GUI.Button(position, property.stringValue, EditorStyles.popup)) {
+			if (GUI.Button(position, property.stringValue, EditorStyles.popup))
 				Selector(property);
-			}
 
 		}
 
@@ -332,14 +324,13 @@ namespace Spine.Unity.Editor {
 			GenericMenu menu = new GenericMenu();
 			AtlasAsset atlasAsset = (AtlasAsset)atlasProp.objectReferenceValue;
 			Atlas atlas = atlasAsset.GetAtlas();
-			FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic);
+			FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 			List<AtlasRegion> regions = (List<AtlasRegion>)field.GetValue(atlas);
 
 			for (int i = 0; i < regions.Count; i++) {
 				string name = regions[i].name;
 				menu.AddItem(new GUIContent(name), name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
 			}
-
 
 			menu.ShowAsContext();
 		}
