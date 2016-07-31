@@ -887,6 +887,7 @@ namespace Spine.Unity.Editor {
 				texImporter.textureFormat = TextureImporterFormat.AutomaticTruecolor;
 				texImporter.mipmapEnabled = false;
 				texImporter.alphaIsTransparency = false;
+				texImporter.spriteImportMode = SpriteImportMode.None;
 				texImporter.maxTextureSize = 2048;
 
 				EditorUtility.SetDirty(texImporter);
