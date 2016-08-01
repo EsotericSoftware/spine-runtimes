@@ -15,10 +15,22 @@ var spine;
     var webgl;
     (function (webgl) {
         var Mesh = (function () {
-            function Mesh(_attributes) {
+            function Mesh(_attributes, maxVertices, maxIndices) {
                 this._attributes = _attributes;
+                this._elementsPerVertex = 0;
+                for (var i = 0; i < _attributes.length; i++) {
+                    this._elementsPerVertex += _attributes[i].numElements;
+                }
+                this._vertices = new Float32Array(maxVertices * this._elementsPerVertex);
+                this._indices = new Int16Array(maxIndices);
             }
             Mesh.prototype.attributes = function () { return this._attributes; };
+            Mesh.prototype.vertices = function () { return this._vertices; };
+            Mesh.prototype.maxVertices = function () { return this._vertices.length / this._elementsPerVertex; };
+            Mesh.prototype.indices = function () { return this._indices; };
+            Mesh.prototype.maxIndices = function () { return this._indices.length; };
+            Mesh.prototype.renderWithOffset = function (shader, primitiveType, offset, count) {
+            };
             return Mesh;
         }());
         webgl.Mesh = Mesh;
@@ -62,6 +74,9 @@ var spine;
                 this._program = null;
                 this.compile();
             }
+            Shader.prototype.program = function () { return this._program; };
+            Shader.prototype.vertexShader = function () { return this._vertexShader; };
+            Shader.prototype.fragmentShader = function () { return this._fragmentShader; };
             Shader.prototype.compile = function () {
                 var gl = spine.webgl.gl;
                 try {
@@ -111,9 +126,6 @@ var spine;
                     this._program = null;
                 }
             };
-            Shader.prototype.program = function () { return this._program; };
-            Shader.prototype.vertexShader = function () { return this._vertexShader; };
-            Shader.prototype.fragmentShader = function () { return this._fragmentShader; };
             Shader.newDefaultShader = function () {
                 var vs = "attribute vec4 " + Shader.POSITION + ";\n" //
                     + "attribute vec4 " + Shader.COLOR + ";\n" //

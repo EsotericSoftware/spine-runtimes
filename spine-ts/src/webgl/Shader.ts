@@ -6,7 +6,11 @@ module spine.webgl {
 
         private _vs: WebGLShader = null;
         private _fs: WebGLShader = null;
-        private _program: WebGLProgram = null;        
+        private _program: WebGLProgram = null;
+
+        public program() { return this._program; }
+        public vertexShader() { return this._vertexShader; }
+        public fragmentShader() { return this._fragmentShader; }        
 
         constructor(private _vertexShader: string, private _fragmentShader: string) {           
             this.compile();
@@ -66,10 +70,6 @@ module spine.webgl {
                 this._program = null;
             }
         }
-
-        public program() { return this._program; }
-        public vertexShader() { return this._vertexShader; }
-        public fragmentShader() { return this._fragmentShader; }
 
         public static newDefaultShader(): Shader {
             let vs = "attribute vec4 " + Shader.POSITION + ";\n" //

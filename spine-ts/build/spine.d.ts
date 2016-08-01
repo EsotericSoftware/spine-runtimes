@@ -5,8 +5,16 @@ declare module spine.webgl {
 declare module spine.webgl {
     class Mesh {
         private _attributes;
-        constructor(_attributes: VertexAttribute[]);
+        private _vertices;
+        private _indices;
+        private _elementsPerVertex;
         attributes(): VertexAttribute[];
+        vertices(): Float32Array;
+        maxVertices(): number;
+        indices(): Int16Array;
+        maxIndices(): number;
+        constructor(_attributes: VertexAttribute[], maxVertices: number, maxIndices: number);
+        renderWithOffset(shader: Shader, primitiveType: number, offset: number, count: number): void;
     }
     class VertexAttribute {
         name: string;
@@ -32,14 +40,14 @@ declare module spine.webgl {
         private _vs;
         private _fs;
         private _program;
+        program(): WebGLProgram;
+        vertexShader(): string;
+        fragmentShader(): string;
         constructor(_vertexShader: string, _fragmentShader: string);
         private compile();
         private compileShader(type, source);
         private compileProgram(vs, fs);
         dispose(): void;
-        program(): WebGLProgram;
-        vertexShader(): string;
-        fragmentShader(): string;
         static newDefaultShader(): Shader;
     }
 }
