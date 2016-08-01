@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "2D892964804FC420554A2636A248A5D6BBA5CC59",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "5D7004AFA0F8477414D2D2070527EE503A955943" : 0,
+    "2D892964804FC420554A2636A248A5D6BBA5CC59" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "6AF501EA-FB25-4406-800C-FDCAC3FA6B92",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "5D7004AFA0F8477414D2D2070527EE503A955943" : "spine-runtimes\/spine-cocos2d-objc\/cocos2d\/",
+    "2D892964804FC420554A2636A248A5D6BBA5CC59" : "spine-runtimes\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "spine-cocos2d-objc",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "spine-cocos2d-objc\/spine-cocos2d-objc.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/EsotericSoftware\/spine-runtimes\/",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "2D892964804FC420554A2636A248A5D6BBA5CC59"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/cocos2d\/cocos2d-objc",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "5D7004AFA0F8477414D2D2070527EE503A955943"
+    }
+  ]
+}

@@ -1,34 +1,32 @@
 /******************************************************************************
- * Spine Runtime Software License - Version 1.1
+ * Spine Runtimes Software License
+ * Version 2.3
  * 
- * Copyright (c) 2013, Esoteric Software
+ * Copyright (c) 2013-2015, Esoteric Software
  * All rights reserved.
  * 
- * Redistribution and use in source and binary forms in whole or in part, with
- * or without modification, are permitted provided that the following conditions
- * are met:
+ * You are granted a perpetual, non-exclusive, non-sublicensable and
+ * non-transferable license to use, install, execute and perform the Spine
+ * Runtimes Software (the "Software") and derivative works solely for personal
+ * or internal use. Without the written permission of Esoteric Software (see
+ * Section 2 of the Spine Software License Agreement), you may not (a) modify,
+ * translate, adapt or otherwise create derivative works, improvements of the
+ * Software or develop new applications using the Software or (b) remove,
+ * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
  * 
- * 1. A Spine Essential, Professional, Enterprise, or Education License must
- *    be purchased from Esoteric Software and the license must remain valid:
- *    http://esotericsoftware.com/
- * 2. Redistributions of source code must retain this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer.
- * 3. Redistributions in binary form must reproduce this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer, in the documentation and/or other materials provided with the
- *    distribution.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 package spine.animation {
@@ -41,10 +39,8 @@ public class Animation {
 	public var duration:Number;
 
 	public function Animation (name:String, timelines:Vector.<Timeline>, duration:Number) {
-		if (name == null)
-			throw new ArgumentError("name cannot be null.");
-		if (timelines == null)
-			throw new ArgumentError("timelines cannot be null.");
+		if (name == null) throw new ArgumentError("name cannot be null.");
+		if (timelines == null) throw new ArgumentError("timelines cannot be null.");
 		_name = name;
 		_timelines = timelines;
 		this.duration = duration;
@@ -56,12 +52,11 @@ public class Animation {
 
 	/** Poses the skeleton at the specified time for this animation. */
 	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, loop:Boolean, events:Vector.<Event>) : void {
-		if (skeleton == null)
-			throw new ArgumentError("skeleton cannot be null.");
+		if (skeleton == null) throw new ArgumentError("skeleton cannot be null.");
 
 		if (loop && duration != 0) {
 			time %= duration;
-			lastTime %= duration;
+			if (lastTime > 0) lastTime %= duration;
 		}
 
 		for (var i:int = 0, n:int = timelines.length; i < n; i++)
@@ -71,12 +66,11 @@ public class Animation {
 	/** Poses the skeleton at the specified time for this animation mixed with the current pose.
 	 * @param alpha The amount of this animation that affects the current pose. */
 	public function mix (skeleton:Skeleton, lastTime:Number, time:Number, loop:Boolean, events:Vector.<Event>, alpha:Number) : void {
-		if (skeleton == null)
-			throw new ArgumentError("skeleton cannot be null.");
+		if (skeleton == null) throw new ArgumentError("skeleton cannot be null.");
 
 		if (loop && duration != 0) {
 			time %= duration;
-			lastTime %= duration;
+			if (lastTime > 0) lastTime %= duration;
 		}
 
 		for (var i:int = 0, n:int = timelines.length; i < n; i++)
@@ -99,7 +93,7 @@ public class Animation {
 			return step;
 		var current:int = high >>> 1;
 		while (true) {
-			if (values[(current + 1) * step] <= target)
+			if (values[int((current + 1) * step)] <= target)
 				low = current + 1;
 			else
 				high = current;
@@ -110,6 +104,25 @@ public class Animation {
 		return 0; // Can't happen.
 	}
 
+	/** @param target After the first and before the last entry. */
+	static public function binarySearch1 (values:Vector.<Number>, target:Number) : int {
+		var low:int = 0;
+		var high:int = values.length - 2;
+		if (high == 0)
+			return 1;
+		var current:int = high >>> 1;
+		while (true) {
+			if (values[int(current + 1)] <= target)
+				low = current + 1;
+			else
+				high = current;
+			if (low == high)
+				return low + 1;
+			current = (low + high) >>> 1;
+		}
+		return 0; // Can't happen.
+	}
+	
 	static public function linearSearch (values:Vector.<Number>, target:Number, step:int) : int {
 		for (var i:int = 0, last:int = values.length - step; i <= last; i += step)
 			if (values[i] > target)

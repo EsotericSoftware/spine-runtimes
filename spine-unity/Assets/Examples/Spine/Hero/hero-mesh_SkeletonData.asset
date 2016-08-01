@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1b3b4b945939a54ea0b23d3396115fb, type: 3}
+  m_Name: hero-mesh_SkeletonData
+  m_EditorClassIdentifier: 
+  atlasAssets:
+  - {fileID: 11400000, guid: 54d41b08afeefd44292ae69c4a235aa9, type: 2}
+  skeletonJSON: {fileID: 4900000, guid: 1d300d9a4480c99409d838b49f344f7a, type: 3}
+  scale: 0.01
+  fromAnimation: []
+  toAnimation: []
+  duration: []
+  defaultMix: 0.15
+  controller: {fileID: 9100000, guid: 867430a8599276b4e901c8f84e1bf590, type: 2}

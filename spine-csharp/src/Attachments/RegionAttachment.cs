@@ -1,34 +1,32 @@
 /******************************************************************************
- * Spine Runtime Software License - Version 1.1
+ * Spine Runtimes Software License
+ * Version 2.3
  * 
- * Copyright (c) 2013, Esoteric Software
+ * Copyright (c) 2013-2015, Esoteric Software
  * All rights reserved.
  * 
- * Redistribution and use in source and binary forms in whole or in part, with
- * or without modification, are permitted provided that the following conditions
- * are met:
+ * You are granted a perpetual, non-exclusive, non-sublicensable and
+ * non-transferable license to use, install, execute and perform the Spine
+ * Runtimes Software (the "Software") and derivative works solely for personal
+ * or internal use. Without the written permission of Esoteric Software (see
+ * Section 2 of the Spine Software License Agreement), you may not (a) modify,
+ * translate, adapt or otherwise create derivative works, improvements of the
+ * Software or develop new applications using the Software or (b) remove,
+ * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
  * 
- * 1. A Spine Essential, Professional, Enterprise, or Education License must
- *    be purchased from Esoteric Software and the license must remain valid:
- *    http://esotericsoftware.com/
- * 2. Redistributions of source code must retain this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer.
- * 3. Redistributions in binary form must reproduce this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer, in the documentation and/or other materials provided with the
- *    distribution.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 using System;
@@ -48,6 +46,7 @@ namespace Spine {
 		internal float x, y, rotation, scaleX = 1, scaleY = 1, width, height;
 		internal float regionOffsetX, regionOffsetY, regionWidth, regionHeight, regionOriginalWidth, regionOriginalHeight;
 		internal float[] offset = new float[8], uvs = new float[8];
+		internal float r = 1, g = 1, b = 1, a = 1;
 
 		public float X { get { return x; } set { x = value; } }
 		public float Y { get { return y; } set { y = value; } }
@@ -57,6 +56,12 @@ namespace Spine {
 		public float Width { get { return width; } set { width = value; } }
 		public float Height { get { return height; } set { height = value; } }
 
+		public float R { get { return r; } set { r = value; } }
+		public float G { get { return g; } set { g = value; } }
+		public float B { get { return b; } set { b = value; } }
+		public float A { get { return a; } set { a = value; } }
+
+		public String Path { get; set; }
 		public Object RendererObject { get; set; }
 		public float RegionOffsetX { get { return regionOffsetX; } set { regionOffsetX = value; } }
 		public float RegionOffsetY { get { return regionOffsetY; } set { regionOffsetY = value; } } // Pixels stripped from the bottom left, unrotated.
@@ -106,9 +111,9 @@ namespace Spine {
 			float localY = -height / 2 * scaleY + regionOffsetY * regionScaleY;
 			float localX2 = localX + regionWidth * regionScaleX;
 			float localY2 = localY + regionHeight * regionScaleY;
-			float radians = rotation * (float)Math.PI / 180;
-			float cos = (float)Math.Cos(radians);
-			float sin = (float)Math.Sin(radians);
+			float rotation = this.rotation;
+			float cos = MathUtils.CosDeg(rotation);
+			float sin = MathUtils.SinDeg(rotation);
 			float x = this.x;
 			float y = this.y;
 			float localXCos = localX * cos + x;
@@ -130,22 +135,19 @@ namespace Spine {
 			offset[Y4] = localYCos + localX2Sin;
 		}
 
-		public void ComputeWorldVertices (float x, float y, Bone bone, float[] vertices) {
-			x += bone.worldX;
-			y += bone.worldY;
-			float m00 = bone.m00;
-			float m01 = bone.m01;
-			float m10 = bone.m10;
-			float m11 = bone.m11;
+		public void ComputeWorldVertices (Bone bone, float[] worldVertices) {
+			Skeleton skeleton = bone.skeleton;
+			float x = skeleton.x + bone.worldX, y = skeleton.y + bone.worldY;			
+			float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
 			float[] offset = this.offset;
-			vertices[X1] = offset[X1] * m00 + offset[Y1] * m01 + x;
-			vertices[Y1] = offset[X1] * m10 + offset[Y1] * m11 + y;
-			vertices[X2] = offset[X2] * m00 + offset[Y2] * m01 + x;
-			vertices[Y2] = offset[X2] * m10 + offset[Y2] * m11 + y;
-			vertices[X3] = offset[X3] * m00 + offset[Y3] * m01 + x;
-			vertices[Y3] = offset[X3] * m10 + offset[Y3] * m11 + y;
-			vertices[X4] = offset[X4] * m00 + offset[Y4] * m01 + x;
-			vertices[Y4] = offset[X4] * m10 + offset[Y4] * m11 + y;
+			worldVertices[X1] = offset[X1] * a + offset[Y1] * b + x;
+			worldVertices[Y1] = offset[X1] * c + offset[Y1] * d + y;
+			worldVertices[X2] = offset[X2] * a + offset[Y2] * b + x;
+			worldVertices[Y2] = offset[X2] * c + offset[Y2] * d + y;
+			worldVertices[X3] = offset[X3] * a + offset[Y3] * b + x;
+			worldVertices[Y3] = offset[X3] * c + offset[Y3] * d + y;
+			worldVertices[X4] = offset[X4] * a + offset[Y4] * b + x;
+			worldVertices[Y4] = offset[X4] * c + offset[Y4] * d + y;
 		}
 	}
 }

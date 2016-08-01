@@ -1,4 +1,33 @@
-
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.3
+ * 
+ * Copyright (c) 2013-2015, Esoteric Software
+ * All rights reserved.
+ * 
+ * You are granted a perpetual, non-exclusive, non-sublicensable and
+ * non-transferable license to use, install, execute and perform the Spine
+ * Runtimes Software (the "Software") and derivative works solely for personal
+ * or internal use. Without the written permission of Esoteric Software (see
+ * Section 2 of the Spine Software License Agreement), you may not (a) modify,
+ * translate, adapt or otherwise create derivative works, improvements of the
+ * Software or develop new applications using the Software or (b) remove,
+ * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 
 #ifndef _APPMACROS_H_
 #define _APPMACROS_H_
@@ -34,28 +63,28 @@
 #define TARGET_DESIGN_RESOLUTION_SIZE  DESIGN_RESOLUTION_960x640
 
 typedef struct tagResource {
-	cocos2d::CCSize size;
+	cocos2d::Size size;
 	char directory[100];
 } Resource;
 
-static Resource smallResource = {cocos2d::CCSizeMake(480, 320), "iphone"};
-static Resource mediumResource = {cocos2d::CCSizeMake(960, 640), "iphone-retina"};
-static Resource largeResource = {cocos2d::CCSizeMake(1024, 768), "iphone"};
-static Resource extralargeResource = {cocos2d::CCSizeMake(2048, 1536), "iphone-retina"};
+static Resource smallResource = {cocos2d::Size(480, 320), "iphone"};
+static Resource mediumResource = {cocos2d::Size(960, 640), "iphone-retina"};
+static Resource largeResource = {cocos2d::Size(1024, 768), "ipad"};
+static Resource extralargeResource = {cocos2d::Size(2048, 1536), "ipad-retina"};
 
 #if (TARGET_DESIGN_RESOLUTION_SIZE == DESIGN_RESOLUTION_480X320)
-static cocos2d::CCSize designResolutionSize = cocos2d::CCSizeMake(480, 320);
+static cocos2d::Size designResolutionSize = cocos2d::Size(480, 320);
 #elif (TARGET_DESIGN_RESOLUTION_SIZE == DESIGN_RESOLUTION_960x640)
-static cocos2d::CCSize designResolutionSize = cocos2d::CCSizeMake(960, 640);
+static cocos2d::Size designResolutionSize = cocos2d::Size(960, 640);
 #elif (TARGET_DESIGN_RESOLUTION_SIZE == DESIGN_RESOLUTION_1024X768)
-static cocos2d::CCSize designResolutionSize = cocos2d::CCSizeMake(1024, 768);
+static cocos2d::Size designResolutionSize = cocos2d::Size(1024, 768);
 #elif (TARGET_DESIGN_RESOLUTION_SIZE == DESIGN_RESOLUTION_2048X1536)
-static cocos2d::CCSize designResolutionSize = cocos2d::CCSizeMake(2048, 1536);
+static cocos2d::Size designResolutionSize = cocos2d::Size(2048, 1536);
 #else
 #error unknown target design resolution!
 #endif
 
 // The font size 24 is designed for small resolution, so we should change it to fit for current design resolution
-#define TITLE_FONT_SIZE  (cocos2d::CCEGLView::sharedOpenGLView()->getDesignResolutionSize().width / smallResource.size.width * 24)
+#define TITLE_FONT_SIZE (cocos2d::Director::getInstance()->getOpenGLView()->getDesignResolutionSize().width / smallResource.size.width * 24)
 
 #endif /* _APPMACROS_H_ */

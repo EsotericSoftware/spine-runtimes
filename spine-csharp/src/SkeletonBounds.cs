@@ -1,46 +1,43 @@
 /******************************************************************************
- * Spine Runtime Software License - Version 1.1
+ * Spine Runtimes Software License
+ * Version 2.3
  * 
- * Copyright (c) 2013, Esoteric Software
+ * Copyright (c) 2013-2015, Esoteric Software
  * All rights reserved.
  * 
- * Redistribution and use in source and binary forms in whole or in part, with
- * or without modification, are permitted provided that the following conditions
- * are met:
+ * You are granted a perpetual, non-exclusive, non-sublicensable and
+ * non-transferable license to use, install, execute and perform the Spine
+ * Runtimes Software (the "Software") and derivative works solely for personal
+ * or internal use. Without the written permission of Esoteric Software (see
+ * Section 2 of the Spine Software License Agreement), you may not (a) modify,
+ * translate, adapt or otherwise create derivative works, improvements of the
+ * Software or develop new applications using the Software or (b) remove,
+ * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
  * 
- * 1. A Spine Essential, Professional, Enterprise, or Education License must
- *    be purchased from Esoteric Software and the license must remain valid:
- *    http://esotericsoftware.com/
- * 2. Redistributions of source code must retain this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer.
- * 3. Redistributions in binary form must reproduce this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer, in the documentation and/or other materials provided with the
- *    distribution.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 using System;
-using System.Collections.Generic;
 
 namespace Spine {
 	public class SkeletonBounds {
-		private List<Polygon> polygonPool = new List<Polygon>();
+		private ExposedList<Polygon> polygonPool = new ExposedList<Polygon>();
 		private float minX, minY, maxX, maxY;
 
-		public List<BoundingBoxAttachment> BoundingBoxes { get; private set; }
-		public List<Polygon> Polygons { get; private set; }
+		public ExposedList<BoundingBoxAttachment> BoundingBoxes { get; private set; }
+		public ExposedList<Polygon> Polygons { get; private set; }
 		public float MinX { get { return minX; } set { minX = value; } }
 		public float MinY { get { return minY; } set { minY = value; } }
 		public float MaxX { get { return maxX; } set { maxX = value; } }
@@ -49,24 +46,23 @@ namespace Spine {
 		public float Height { get { return maxY - minY; } }
 
 		public SkeletonBounds () {
-			BoundingBoxes = new List<BoundingBoxAttachment>();
-			Polygons = new List<Polygon>();
+			BoundingBoxes = new ExposedList<BoundingBoxAttachment>();
+			Polygons = new ExposedList<Polygon>();
 		}
 
 		public void Update (Skeleton skeleton, bool updateAabb) {
-			List<BoundingBoxAttachment> boundingBoxes = BoundingBoxes;
-			List<Polygon> polygons = Polygons;
-			List<Slot> slots = skeleton.slots;
+			ExposedList<BoundingBoxAttachment> boundingBoxes = BoundingBoxes;
+			ExposedList<Polygon> polygons = Polygons;
+			ExposedList<Slot> slots = skeleton.slots;
 			int slotCount = slots.Count;
-			float x = skeleton.x, y = skeleton.y;
 
 			boundingBoxes.Clear();
-			foreach (Polygon polygon in polygons)
-				polygonPool.Add(polygon);
+			for (int i = 0, n = polygons.Count; i < n; i++)
+				polygonPool.Add(polygons.Items[i]);
 			polygons.Clear();
 
 			for (int i = 0; i < slotCount; i++) {
-				Slot slot = slots[i];
+				Slot slot = slots.Items[i];
 				BoundingBoxAttachment boundingBox = slot.attachment as BoundingBoxAttachment;
 				if (boundingBox == null) continue;
 				boundingBoxes.Add(boundingBox);
@@ -74,7 +70,7 @@ namespace Spine {
 				Polygon polygon = null;
 				int poolCount = polygonPool.Count;
 				if (poolCount > 0) {
-					polygon = polygonPool[poolCount - 1];
+					polygon = polygonPool.Items[poolCount - 1];
 					polygonPool.RemoveAt(poolCount - 1);
 				} else
 					polygon = new Polygon();
@@ -83,7 +79,7 @@ namespace Spine {
 				int count = boundingBox.Vertices.Length;
 				polygon.Count = count;
 				if (polygon.Vertices.Length < count) polygon.Vertices = new float[count];
-				boundingBox.ComputeWorldVertices(x, y, slot.bone, polygon.Vertices);
+				boundingBox.ComputeWorldVertices(slot, polygon.Vertices);
 			}
 
 			if (updateAabb) aabbCompute();
@@ -91,9 +87,9 @@ namespace Spine {
 
 		private void aabbCompute () {
 			float minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
-			List<Polygon> polygons = Polygons;
+			ExposedList<Polygon> polygons = Polygons;
 			for (int i = 0, n = polygons.Count; i < n; i++) {
-				Polygon polygon = polygons[i];
+				Polygon polygon = polygons.Items[i];
 				float[] vertices = polygon.Vertices;
 				for (int ii = 0, nn = polygon.Count; ii < nn; ii += 2) {
 					float x = vertices[ii];
@@ -163,18 +159,18 @@ namespace Spine {
 		/// <summary>Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
 		/// efficient to only call this method if {@link #aabbContainsPoint(float, float)} returns true.</summary>
 		public BoundingBoxAttachment ContainsPoint (float x, float y) {
-			List<Polygon> polygons = Polygons;
+			ExposedList<Polygon> polygons = Polygons;
 			for (int i = 0, n = polygons.Count; i < n; i++)
-				if (ContainsPoint(polygons[i], x, y)) return BoundingBoxes[i];
+				if (ContainsPoint(polygons.Items[i], x, y)) return BoundingBoxes.Items[i];
 			return null;
 		}
 
 		/// <summary>Returns the first bounding box attachment that contains the line segment, or null. When doing many checks, it is usually
 		/// more efficient to only call this method if {@link #aabbIntersectsSegment(float, float, float, float)} returns true.</summary>
 		public BoundingBoxAttachment IntersectsSegment (float x1, float y1, float x2, float y2) {
-			List<Polygon> polygons = Polygons;
+			ExposedList<Polygon> polygons = Polygons;
 			for (int i = 0, n = polygons.Count; i < n; i++)
-				if (IntersectsSegment(polygons[i], x1, y1, x2, y2)) return BoundingBoxes[i];
+				if (IntersectsSegment(polygons.Items[i], x1, y1, x2, y2)) return BoundingBoxes.Items[i];
 			return null;
 		}
 
@@ -204,16 +200,16 @@ namespace Spine {
 
 		public Polygon getPolygon (BoundingBoxAttachment attachment) {
 			int index = BoundingBoxes.IndexOf(attachment);
-			return index == -1 ? null : Polygons[index];
+			return index == -1 ? null : Polygons.Items[index];
 		}
 	}
-}
 
-public class Polygon {
-	public float[] Vertices { get; set; }
-	public int Count { get; set; }
+	public class Polygon {
+		public float[] Vertices { get; set; }
+		public int Count { get; set; }
 
-	public Polygon () {
-		Vertices = new float[16];
+		public Polygon () {
+			Vertices = new float[16];
+		}
 	}
 }

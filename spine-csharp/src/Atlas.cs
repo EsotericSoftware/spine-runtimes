@@ -1,34 +1,32 @@
 /******************************************************************************
- * Spine Runtime Software License - Version 1.1
+ * Spine Runtimes Software License
+ * Version 2.3
  * 
- * Copyright (c) 2013, Esoteric Software
+ * Copyright (c) 2013-2015, Esoteric Software
  * All rights reserved.
  * 
- * Redistribution and use in source and binary forms in whole or in part, with
- * or without modification, are permitted provided that the following conditions
- * are met:
+ * You are granted a perpetual, non-exclusive, non-sublicensable and
+ * non-transferable license to use, install, execute and perform the Spine
+ * Runtimes Software (the "Software") and derivative works solely for personal
+ * or internal use. Without the written permission of Esoteric Software (see
+ * Section 2 of the Spine Software License Agreement), you may not (a) modify,
+ * translate, adapt or otherwise create derivative works, improvements of the
+ * Software or develop new applications using the Software or (b) remove,
+ * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
  * 
- * 1. A Spine Essential, Professional, Enterprise, or Education License must
- *    be purchased from Esoteric Software and the license must remain valid:
- *    http://esotericsoftware.com/
- * 2. Redistributions of source code must retain this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer.
- * 3. Redistributions in binary form must reproduce this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer, in the documentation and/or other materials provided with the
- *    distribution.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 using System;
@@ -47,7 +45,8 @@ namespace Spine {
 		List<AtlasRegion> regions = new List<AtlasRegion>();
 		TextureLoader textureLoader;
 
-#if WINDOWS_STOREAPP
+		#if !(UNITY_5 || UNITY_4 || UNITY_WSA || UNITY_WP8 || UNITY_WP8_1) // !UNITY
+		#if WINDOWS_STOREAPP
 		private async Task ReadFile(string path, TextureLoader textureLoader) {
 			var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
 			var file = await folder.GetFileAsync(path).AsTask().ConfigureAwait(false);
@@ -63,24 +62,28 @@ namespace Spine {
 		public Atlas(String path, TextureLoader textureLoader) {
 			this.ReadFile(path, textureLoader).Wait();
 		}
-#else
+		#else
+
 		public Atlas (String path, TextureLoader textureLoader) {
 
-#if WINDOWS_PHONE
-            Stream stream = Microsoft.Xna.Framework.TitleContainer.OpenStream(path);
-            using (StreamReader reader = new StreamReader(stream))
-            {
-#else
-            using (StreamReader reader = new StreamReader(path)) {
-#endif
+			#if WINDOWS_PHONE
+			Stream stream = Microsoft.Xna.Framework.TitleContainer.OpenStream(path);
+			using (StreamReader reader = new StreamReader(stream)) {
+			#else
+			using (StreamReader reader = new StreamReader(path)) {
+			#endif // WINDOWS_PHONE
+
 				try {
 					Load(reader, Path.GetDirectoryName(path), textureLoader);
 				} catch (Exception ex) {
 					throw new Exception("Error reading atlas file: " + path, ex);
 				}
+
 			}
 		}
-#endif
+		#endif // WINDOWS_STOREAPP
+
+		#endif // !(UNITY)
 
 		public Atlas (TextReader reader, String dir, TextureLoader textureLoader) {
 			Load(reader, dir, textureLoader);
@@ -107,13 +110,18 @@ namespace Spine {
 					page = new AtlasPage();
 					page.name = line;
 
-					page.format = (Format)Enum.Parse(typeof(Format), readValue(reader), false);
+					if (ReadTuple(reader, tuple) == 2) { // size is only optional for an atlas packed with an old TexturePacker.
+						page.width = int.Parse(tuple[0]);
+						page.height = int.Parse(tuple[1]);
+						ReadTuple(reader, tuple);
+					}
+					page.format = (Format)Enum.Parse(typeof(Format), tuple[0], false);
 
-					readTuple(reader, tuple);
+					ReadTuple(reader, tuple);
 					page.minFilter = (TextureFilter)Enum.Parse(typeof(TextureFilter), tuple[0], false);
 					page.magFilter = (TextureFilter)Enum.Parse(typeof(TextureFilter), tuple[1], false);
 
-					String direction = readValue(reader);
+					String direction = ReadValue(reader);
 					page.uWrap = TextureWrap.ClampToEdge;
 					page.vWrap = TextureWrap.ClampToEdge;
 					if (direction == "x")
@@ -132,13 +140,13 @@ namespace Spine {
 					region.name = line;
 					region.page = page;
 
-					region.rotate = Boolean.Parse(readValue(reader));
+					region.rotate = Boolean.Parse(ReadValue(reader));
 
-					readTuple(reader, tuple);
+					ReadTuple(reader, tuple);
 					int x = int.Parse(tuple[0]);
 					int y = int.Parse(tuple[1]);
 
-					readTuple(reader, tuple);
+					ReadTuple(reader, tuple);
 					int width = int.Parse(tuple[0]);
 					int height = int.Parse(tuple[1]);
 
@@ -156,56 +164,61 @@ namespace Spine {
 					region.width = Math.Abs(width);
 					region.height = Math.Abs(height);
 
-					if (readTuple(reader, tuple) == 4) { // split is optional
+					if (ReadTuple(reader, tuple) == 4) { // split is optional
 						region.splits = new int[] {int.Parse(tuple[0]), int.Parse(tuple[1]),
 								int.Parse(tuple[2]), int.Parse(tuple[3])};
 
-						if (readTuple(reader, tuple) == 4) { // pad is optional, but only present with splits
+						if (ReadTuple(reader, tuple) == 4) { // pad is optional, but only present with splits
 							region.pads = new int[] {int.Parse(tuple[0]), int.Parse(tuple[1]),
 									int.Parse(tuple[2]), int.Parse(tuple[3])};
 
-							readTuple(reader, tuple);
+							ReadTuple(reader, tuple);
 						}
 					}
 
 					region.originalWidth = int.Parse(tuple[0]);
 					region.originalHeight = int.Parse(tuple[1]);
 
-					readTuple(reader, tuple);
+					ReadTuple(reader, tuple);
 					region.offsetX = int.Parse(tuple[0]);
 					region.offsetY = int.Parse(tuple[1]);
 
-					region.index = int.Parse(readValue(reader));
+					region.index = int.Parse(ReadValue(reader));
 
 					regions.Add(region);
 				}
 			}
 		}
 
-		static String readValue (TextReader reader) {
+		static String ReadValue (TextReader reader) {
 			String line = reader.ReadLine();
 			int colon = line.IndexOf(':');
 			if (colon == -1) throw new Exception("Invalid line: " + line);
 			return line.Substring(colon + 1).Trim();
 		}
 
-		/// <summary>Returns the number of tuple values read (2 or 4).</summary>
-		static int readTuple (TextReader reader, String[] tuple) {
+		/// <summary>Returns the number of tuple values read (1, 2 or 4).</summary>
+		static int ReadTuple (TextReader reader, String[] tuple) {
 			String line = reader.ReadLine();
 			int colon = line.IndexOf(':');
 			if (colon == -1) throw new Exception("Invalid line: " + line);
 			int i = 0, lastMatch = colon + 1;
 			for (; i < 3; i++) {
 				int comma = line.IndexOf(',', lastMatch);
-				if (comma == -1) {
-					if (i == 0) throw new Exception("Invalid line: " + line);
-					break;
-				}
+				if (comma == -1) break;
 				tuple[i] = line.Substring(lastMatch, comma - lastMatch).Trim();
 				lastMatch = comma + 1;
 			}
 			tuple[i] = line.Substring(lastMatch).Trim();
 			return i + 1;
+		}
+
+		public void FlipV () {
+			for (int i = 0, n = regions.Count; i < n; i++) {
+				AtlasRegion region = regions[i];
+				region.v = 1 - region.v;
+				region.v2 = 1 - region.v2;
+			}
 		}
 
 		/// <summary>Returns the first region found with the specified name. This method uses string comparison to find the region, so the result

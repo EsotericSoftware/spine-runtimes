@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="com.powerflasher.fdt.ui.CompcGroup">
+<booleanAttribute key="ADVANCED_TELEMTRY" value="false"/>
+<stringAttribute key="ARGUMENTS" value=" -target-player={playerVersion}"/>
+<listAttribute key="COMPILER_CONSTANTS"/>
+<stringAttribute key="COMPILER_TECHNOLOGY" value="Flex SDK"/>
+<booleanAttribute key="FORCE_FRESH_COMPILATION" value="false"/>
+<stringAttribute key="LAUNCHER_DEPENDENCIES" value="[Self]"/>
+<stringAttribute key="MAIN_CLASS" value=""/>
+<stringAttribute key="OUTPUT" value="../spine-as3-example/lib/spine-as3.swc"/>
+<booleanAttribute key="PASS_CP" value="true"/>
+<booleanAttribute key="PASS_DEFINES" value="true"/>
+<booleanAttribute key="PASS_EXTERNS" value="true"/>
+<booleanAttribute key="PASS_MANIFESTS" value="true"/>
+<booleanAttribute key="PASS_SWCS" value="true"/>
+<stringAttribute key="PROJECT_NAME" value="spine-as3"/>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/spine-as3"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="4"/>
+</listAttribute>
+</launchConfiguration>

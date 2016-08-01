@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SpineMonogameWindows8Store")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("spine-monogame-win8store-example")]
+[assembly: AssemblyProduct("spine-monogame-win8store-example")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SpineMonogameWindows8Store")]
-[assembly: AssemblyCopyright("Copyright ©  2013")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyCompany("Esoteric Software")]
+[assembly: AssemblyCopyright("Copyright © Esoteric Software 2013-2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

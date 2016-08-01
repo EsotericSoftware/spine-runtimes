@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="com.powerflasher.fdt.ui.MxmlcGroup">
+<stringAttribute key="ADL_DESCRIPTOR_FILE" value=""/>
+<stringAttribute key="ADOBE_FLASH_PLAYER_EXECUTABLE" value=""/>
+<booleanAttribute key="ADOBE_FLASH_PLAYER_USE_EXECUTABLE" value="false"/>
+<booleanAttribute key="ADVANCED_TELEMTRY" value="false"/>
+<intAttribute key="AIR_VIEWER_CONF" value="0"/>
+<stringAttribute key="APP_ARGUMENTS" value=""/>
+<stringAttribute key="ARGUMENTS" value="-static-link-runtime-shared-libraries=true&#10;-target-player={playerVersion}&#10;-library-path+=&quot;{flexSDK}/frameworks/locale/en_US&quot;&#10;-default-size=550,400"/>
+<listAttribute key="COMPILER_CONSTANTS"/>
+<stringAttribute key="COMPILER_TECHNOLOGY" value="Flex SDK"/>
+<booleanAttribute key="DISABLE_COMPILE_PROCESS" value="false"/>
+<booleanAttribute key="FORCE_FRESH_COMPILATION" value="false"/>
+<booleanAttribute key="KILL_PREVIOUS_VIEWER" value="true"/>
+<stringAttribute key="LAUNCHER_DEPENDENCIES" value="[Self]"/>
+<stringAttribute key="MAIN_CLASS" value="src/spine/examples/Main.as"/>
+<stringAttribute key="MOBILE_PRESET" value=""/>
+<booleanAttribute key="NEW_WINDOW_EACH_LAUNCH" value="false"/>
+<stringAttribute key="OUTPUT" value="bin/spine-as3-example.swf"/>
+<booleanAttribute key="PASS_CP" value="true"/>
+<booleanAttribute key="PASS_DEFINES" value="true"/>
+<booleanAttribute key="PASS_EXTERNS" value="false"/>
+<booleanAttribute key="PASS_MAIN_CLASS" value="true"/>
+<booleanAttribute key="PASS_MANIFESTS" value="true"/>
+<booleanAttribute key="PASS_RSLS" value="false"/>
+<booleanAttribute key="PASS_SWCS" value="true"/>
+<intAttribute key="PLAYER_HEIGHT" value="400"/>
+<booleanAttribute key="PLAYER_SET_SIZE" value="false"/>
+<intAttribute key="PLAYER_WIDTH" value="550"/>
+<stringAttribute key="POST_COMPILE_ANT" value=""/>
+<stringAttribute key="PREFERRED_BROWSER" value=""/>
+<stringAttribute key="PRE_COMPILE_ANT" value=""/>
+<stringAttribute key="PROJECT_NAME" value="spine-as3-example"/>
+<stringAttribute key="PUBLISHER_ID" value=""/>
+<booleanAttribute key="START_DEBUGGER" value="true"/>
+<booleanAttribute key="START_SWF_ENABLED" value="true"/>
+<stringAttribute key="START_SWF_LOCATION" value="bin/spine-as3-example.swf"/>
+<stringAttribute key="START_SWF_WITH" value="Adobe Flash Player"/>
+<booleanAttribute key="SUPPRESS_EXCEPTION_POPUP" value="false"/>
+<booleanAttribute key="USE_PROJECT_COMPILER_ARGUMENTS" value="false"/>
+<booleanAttribute key="WAITING_DIALOG_PLUGIN" value="false"/>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/spine-as3-example"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="4"/>
+</listAttribute>
+</launchConfiguration>

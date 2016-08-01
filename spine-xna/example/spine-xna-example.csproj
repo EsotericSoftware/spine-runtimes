@@ -116,9 +116,8 @@
     <Compile Include="src\ExampleProgram.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="data\goblins.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="data\goblins-ffd.png" />
+    <Content Include="data\raptor.png" />
     <Content Include="data\spineboy.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -126,9 +125,9 @@
     <Content Include="GameThumbnail.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\spine-csharp\spine-csharp_xna.csproj">
-      <Project>{DF7AAFE1-401E-4278-8F9A-3DD2B8CC3D0A}</Project>
-      <Name>spine-csharp_xna</Name>
+    <ProjectReference Include="..\..\spine-csharp\spine-csharp.csproj">
+      <Project>{94144e22-2431-4a8f-ac04-dec22f7edd8f}</Project>
+      <Name>spine-csharp</Name>
     </ProjectReference>
     <ProjectReference Include="..\spine-xna.csproj">
       <Project>{7F8F2327-C016-49C8-BB4D-F3F77971961E}</Project>
@@ -163,12 +162,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="data\goblins.atlas">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="data\goblins.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="data\goblins-ffd.atlas" />
+    <None Include="data\goblins-ffd.json" />
+    <None Include="data\raptor.atlas" />
+    <None Include="data\raptor.json" />
     <None Include="data\spineboy.atlas">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

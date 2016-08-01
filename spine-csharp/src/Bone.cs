@@ -1,109 +1,210 @@
 /******************************************************************************
- * Spine Runtime Software License - Version 1.1
+ * Spine Runtimes Software License
+ * Version 2.3
  * 
- * Copyright (c) 2013, Esoteric Software
+ * Copyright (c) 2013-2015, Esoteric Software
  * All rights reserved.
  * 
- * Redistribution and use in source and binary forms in whole or in part, with
- * or without modification, are permitted provided that the following conditions
- * are met:
+ * You are granted a perpetual, non-exclusive, non-sublicensable and
+ * non-transferable license to use, install, execute and perform the Spine
+ * Runtimes Software (the "Software") and derivative works solely for personal
+ * or internal use. Without the written permission of Esoteric Software (see
+ * Section 2 of the Spine Software License Agreement), you may not (a) modify,
+ * translate, adapt or otherwise create derivative works, improvements of the
+ * Software or develop new applications using the Software or (b) remove,
+ * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
  * 
- * 1. A Spine Essential, Professional, Enterprise, or Education License must
- *    be purchased from Esoteric Software and the license must remain valid:
- *    http://esotericsoftware.com/
- * 2. Redistributions of source code must retain this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer.
- * 3. Redistributions in binary form must reproduce this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer, in the documentation and/or other materials provided with the
- *    distribution.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 using System;
 
 namespace Spine {
-	public class Bone {
+	public class Bone : IUpdatable {
 		static public bool yDown;
 
 		internal BoneData data;
+		internal Skeleton skeleton;
 		internal Bone parent;
-		internal float x, y, rotation, scaleX, scaleY;
-		internal float m00, m01, m10, m11;
-		internal float worldX, worldY, worldRotation, worldScaleX, worldScaleY;
+		internal ExposedList<Bone> children = new ExposedList<Bone>();
+		internal float x, y, rotation, scaleX, scaleY, shearX, shearY;
+		internal float appliedRotation;
+
+		internal float a, b, worldX;
+		internal float c, d, worldY;
+		internal float worldSignX, worldSignY;
+
+		internal bool sorted;
 
 		public BoneData Data { get { return data; } }
+		public Skeleton Skeleton { get { return skeleton; } }
 		public Bone Parent { get { return parent; } }
+		public ExposedList<Bone> Children { get { return children; } }
 		public float X { get { return x; } set { x = value; } }
 		public float Y { get { return y; } set { y = value; } }
 		public float Rotation { get { return rotation; } set { rotation = value; } }
+		/// <summary>The rotation, as calculated by any constraints.</summary>
+		public float AppliedRotation { get { return appliedRotation; } set { appliedRotation = value; } }
 		public float ScaleX { get { return scaleX; } set { scaleX = value; } }
 		public float ScaleY { get { return scaleY; } set { scaleY = value; } }
+		public float ShearX { get { return shearX; } set { shearX = value; } }
+		public float ShearY { get { return shearY; } set { shearY = value; } }
 
-		public float M00 { get { return m00; } }
-		public float M01 { get { return m01; } }
-		public float M10 { get { return m10; } }
-		public float M11 { get { return m11; } }
+		public float A { get { return a; } }
+		public float B { get { return b; } }
+		public float C { get { return c; } }
+		public float D { get { return d; } }
 		public float WorldX { get { return worldX; } }
 		public float WorldY { get { return worldY; } }
-		public float WorldRotation { get { return worldRotation; } }
-		public float WorldScaleX { get { return worldScaleX; } }
-		public float WorldScaleY { get { return worldScaleY; } }
+		public float WorldSignX { get { return worldSignX; } }
+		public float WorldSignY { get { return worldSignY; } }
+		public float WorldRotationX { get { return MathUtils.Atan2(c, a) * MathUtils.radDeg; } }
+		public float WorldRotationY { get { return MathUtils.Atan2(d, b) * MathUtils.radDeg; } }
+		public float WorldScaleX { get { return (float)Math.Sqrt(a * a + b * b) * worldSignX; } }
+		public float WorldScaleY { get { return (float)Math.Sqrt(c * c + d * d) * worldSignY; } }
 
 		/// <param name="parent">May be null.</param>
-		public Bone (BoneData data, Bone parent) {
-			if (data == null) throw new ArgumentNullException("data cannot be null.");
+		public Bone (BoneData data, Skeleton skeleton, Bone parent) {
+			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
+			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
 			this.data = data;
+			this.skeleton = skeleton;
 			this.parent = parent;
 			SetToSetupPose();
 		}
 
-		/// <summary>Computes the world SRT using the parent bone and the local SRT.</summary>
-		public void UpdateWorldTransform (bool flipX, bool flipY) {
+		/// <summary>Same as <see cref="UpdateWorldTransform"/>. This method exists for Bone to implement <see cref="Spine.IUpdatable"/>.</summary>
+		public void Update () {
+			UpdateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
+		}
+
+		/// <summary>Computes the world transform using the parent bone and this bone's local transform.</summary>
+		public void UpdateWorldTransform () {
+			UpdateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
+		}
+
+		/// <summary>Computes the world transform using the parent bone and the specified local transform.</summary>
+		public void UpdateWorldTransform (float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY) {
+			appliedRotation = rotation;
+
+			float rotationY = rotation + 90 + shearY;
+			float la = MathUtils.CosDeg(rotation + shearX) * scaleX, lb = MathUtils.CosDeg(rotationY) * scaleY;
+			float lc = MathUtils.SinDeg(rotation + shearX) * scaleX, ld = MathUtils.SinDeg(rotationY) * scaleY;
+
 			Bone parent = this.parent;
-			if (parent != null) {
-				worldX = x * parent.m00 + y * parent.m01 + parent.worldX;
-				worldY = x * parent.m10 + y * parent.m11 + parent.worldY;
-				if (data.inheritScale) {
-					worldScaleX = parent.worldScaleX * scaleX;
-					worldScaleY = parent.worldScaleY * scaleY;
-				} else {
-					worldScaleX = scaleX;
-					worldScaleY = scaleY;
+			if (parent == null) { // Root bone.
+				Skeleton skeleton = this.skeleton;
+				if (skeleton.flipX) {
+					x = -x;
+					la = -la;
+					lb = -lb;
 				}
-				worldRotation = data.inheritRotation ? parent.worldRotation + rotation : rotation;
+				if (skeleton.flipY != yDown) {
+					y = -y;
+					lc = -lc;
+					ld = -ld;
+				}
+				a = la;
+				b = lb;
+				c = lc;
+				d = ld;
+				worldX = x;
+				worldY = y;
+				worldSignX = Math.Sign(scaleX);
+				worldSignY = Math.Sign(scaleY);
+				return;
+			}
+
+			float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
+			worldX = pa * x + pb * y + parent.worldX;
+			worldY = pc * x + pd * y + parent.worldY;
+			worldSignX = parent.worldSignX * Math.Sign(scaleX);
+			worldSignY = parent.worldSignY * Math.Sign(scaleY);
+
+			if (data.inheritRotation && data.inheritScale) {
+				a = pa * la + pb * lc;
+				b = pa * lb + pb * ld;
+				c = pc * la + pd * lc;
+				d = pc * lb + pd * ld;
 			} else {
-				worldX = flipX ? -x : x;
-				worldY = flipY ? -y : y;
-				worldScaleX = scaleX;
-				worldScaleY = scaleY;
-				worldRotation = rotation;
-			}
-			float radians = worldRotation * (float)Math.PI / 180;
-			float cos = (float)Math.Cos(radians);
-			float sin = (float)Math.Sin(radians);
-			m00 = cos * worldScaleX;
-			m10 = sin * worldScaleX;
-			m01 = -sin * worldScaleY;
-			m11 = cos * worldScaleY;
-			if (flipX) {
-				m00 = -m00;
-				m01 = -m01;
-			}
-			if (flipY != yDown) {
-				m10 = -m10;
-				m11 = -m11;
+				if (data.inheritRotation) { // No scale inheritance.
+					pa = 1;
+					pb = 0;
+					pc = 0;
+					pd = 1;
+					do {
+						float cos = MathUtils.CosDeg(parent.appliedRotation), sin = MathUtils.SinDeg(parent.appliedRotation);
+						float temp = pa * cos + pb * sin;
+						pb = pb * cos - pa * sin;
+						pa = temp;
+						temp = pc * cos + pd * sin;
+						pd = pd * cos - pc * sin;
+						pc = temp;
+
+						if (!parent.data.inheritRotation) break;
+						parent = parent.parent;
+					} while (parent != null);
+					a = pa * la + pb * lc;
+					b = pa * lb + pb * ld;
+					c = pc * la + pd * lc;
+					d = pc * lb + pd * ld;
+				} else if (data.inheritScale) { // No rotation inheritance.
+					pa = 1;
+					pb = 0;
+					pc = 0;
+					pd = 1;
+					do {
+						float cos = MathUtils.CosDeg(parent.appliedRotation), sin = MathUtils.SinDeg(parent.appliedRotation);
+						float psx = parent.scaleX, psy = parent.scaleY;
+						float za = cos * psx, zb = sin * psy, zc = sin * psx, zd = cos * psy;
+						float temp = pa * za + pb * zc;
+						pb = pb * zd - pa * zb;
+						pa = temp;
+						temp = pc * za + pd * zc;
+						pd = pd * zd - pc * zb;
+						pc = temp;
+
+						if (psx >= 0) sin = -sin;
+						temp = pa * cos + pb * sin;
+						pb = pb * cos - pa * sin;
+						pa = temp;
+						temp = pc * cos + pd * sin;
+						pd = pd * cos - pc * sin;
+						pc = temp;
+
+						if (!parent.data.inheritScale) break;
+						parent = parent.parent;
+					} while (parent != null);
+					a = pa * la + pb * lc;
+					b = pa * lb + pb * ld;
+					c = pc * la + pd * lc;
+					d = pc * lb + pd * ld;
+				} else {
+					a = la;
+					b = lb;
+					c = lc;
+					d = ld;
+				}
+				if (skeleton.flipX) {
+					a = -a;
+					b = -b;
+				}
+				if (skeleton.flipY != yDown) {
+					c = -c;
+					d = -d;
+				}
 			}
 		}
 
@@ -114,6 +215,97 @@ namespace Spine {
 			rotation = data.rotation;
 			scaleX = data.scaleX;
 			scaleY = data.scaleY;
+			shearX = data.shearX;
+			shearY = data.shearY;
+		}
+
+		public float WorldToLocalRotationX {
+			get {
+				Bone parent = this.parent;
+				if (parent == null) return rotation;
+				float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d, a = this.a, c = this.c;
+				return MathUtils.Atan2(pa * c - pc * a, pd * a - pb * c) * MathUtils.radDeg;
+			}
+		}
+
+		public float WorldToLocalRotationY {
+			get {
+				Bone parent = this.parent;
+				if (parent == null) return rotation;
+				float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d, b = this.b, d = this.d;
+				return MathUtils.Atan2(pa * d - pc * b, pd * b - pb * d) * MathUtils.radDeg;
+			}
+		}
+
+		public void RotateWorld (float degrees) {
+			float a = this.a, b = this.b, c = this.c, d = this.d;
+			float cos = MathUtils.CosDeg(degrees), sin = MathUtils.SinDeg(degrees);
+			this.a = cos * a - sin * c;
+			this.b = cos * b - sin * d;
+			this.c = sin * a + cos * c;
+			this.d = sin * b + cos * d;
+		}
+
+		/// <summary>
+		/// Computes the local transform from the world transform. This can be useful to perform processing on the local transform
+		/// after the world transform has been modified directly (eg, by a constraint).
+		/// 
+		/// Some redundant information is lost by the world transform, such as -1,-1 scale versus 180 rotation. The computed local
+		/// transform values may differ from the original values but are functionally the same.
+		/// </summary>
+		public void UpdateLocalTransform () {
+			Bone parent = this.parent;
+			if (parent == null) {
+				x = worldX;
+				y = worldY;
+				rotation = MathUtils.Atan2(c, a) * MathUtils.radDeg;
+				scaleX = (float)Math.Sqrt(a * a + c * c);
+				scaleY = (float)Math.Sqrt(b * b + d * d);
+				float det = a * d - b * c;
+				shearX = 0;
+				shearY = MathUtils.Atan2(a * b + c * d, det) * MathUtils.radDeg;
+				return;
+			}
+			float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
+			float pid = 1 / (pa * pd - pb * pc);
+			float dx = worldX - parent.worldX, dy = worldY - parent.worldY;
+			x = (dx * pd * pid - dy * pb * pid);
+			y = (dy * pa * pid - dx * pc * pid);
+			float ia = pid * pd;
+			float id = pid * pa;
+			float ib = pid * pb;
+			float ic = pid * pc;
+			float ra = ia * a - ib * c;
+			float rb = ia * b - ib * d;
+			float rc = id * c - ic * a;
+			float rd = id * d - ic * b;
+			shearX = 0;
+			scaleX = (float)Math.Sqrt(ra * ra + rc * rc);
+			if (scaleX > 0.0001f) {
+				float det = ra * rd - rb * rc;
+				scaleY = det / scaleX;
+				shearY = MathUtils.Atan2(ra * rb + rc * rd, det) * MathUtils.radDeg;
+				rotation = MathUtils.Atan2(rc, ra) * MathUtils.radDeg;
+			} else {
+				scaleX = 0;
+				scaleY = (float)Math.Sqrt(rb * rb + rd * rd);
+				shearY = 0;
+				rotation = 90 - MathUtils.Atan2(rd, rb) * MathUtils.radDeg;
+			}
+			appliedRotation = rotation;
+		}
+
+		public void WorldToLocal (float worldX, float worldY, out float localX, out float localY) {			
+			float a = this.a, b = this.b, c = this.c, d = this.d;
+			float invDet = 1 / (a * d - b * c);
+			float x = worldX - this.worldX, y = worldY - this.worldY;
+			localX = (x * d * invDet - y * b * invDet);
+			localY = (y * a * invDet - x * c * invDet);
+		}
+
+		public void LocalToWorld (float localX, float localY, out float worldX, out float worldY) {
+			worldX = localX * a + localY * b + this.worldX;
+			worldY = localX * c + localY * d + this.worldY;
 		}
 
 		override public String ToString () {

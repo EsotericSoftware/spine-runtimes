@@ -1,66 +1,75 @@
 /******************************************************************************
- * Spine Runtime Software License - Version 1.1
+ * Spine Runtimes Software License
+ * Version 2.3
  * 
- * Copyright (c) 2013, Esoteric Software
+ * Copyright (c) 2013-2015, Esoteric Software
  * All rights reserved.
  * 
- * Redistribution and use in source and binary forms in whole or in part, with
- * or without modification, are permitted provided that the following conditions
- * are met:
+ * You are granted a perpetual, non-exclusive, non-sublicensable and
+ * non-transferable license to use, install, execute and perform the Spine
+ * Runtimes Software (the "Software") and derivative works solely for personal
+ * or internal use. Without the written permission of Esoteric Software (see
+ * Section 2 of the Spine Software License Agreement), you may not (a) modify,
+ * translate, adapt or otherwise create derivative works, improvements of the
+ * Software or develop new applications using the Software or (b) remove,
+ * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
  * 
- * 1. A Spine Essential, Professional, Enterprise, or Education License must
- *    be purchased from Esoteric Software and the license must remain valid:
- *    http://esotericsoftware.com/
- * 2. Redistributions of source code must retain this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer.
- * 3. Redistributions in binary form must reproduce this license, which is the
- *    above copyright notice, this declaration of conditions and the following
- *    disclaimer, in the documentation and/or other materials provided with the
- *    distribution.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #include <spine/RegionAttachment.h>
 #include <spine/extension.h>
 
+void _spRegionAttachment_dispose (spAttachment* attachment) {
+	spRegionAttachment* self = SUB_CAST(spRegionAttachment, attachment);
+	_spAttachment_deinit(attachment);
+	FREE(self->path);
+	FREE(self);
+}
+
 spRegionAttachment* spRegionAttachment_create (const char* name) {
 	spRegionAttachment* self = NEW(spRegionAttachment);
 	self->scaleX = 1;
 	self->scaleY = 1;
-	_spAttachment_init(SUPER(self), name, ATTACHMENT_REGION, _spAttachment_deinit);
+	self->r = 1;
+	self->g = 1;
+	self->b = 1;
+	self->a = 1;
+	_spAttachment_init(SUPER(self), name, SP_ATTACHMENT_REGION, _spRegionAttachment_dispose);
 	return self;
 }
 
 void spRegionAttachment_setUVs (spRegionAttachment* self, float u, float v, float u2, float v2, int/*bool*/rotate) {
 	if (rotate) {
-		self->uvs[VERTEX_X2] = u;
-		self->uvs[VERTEX_Y2] = v2;
-		self->uvs[VERTEX_X3] = u;
-		self->uvs[VERTEX_Y3] = v;
-		self->uvs[VERTEX_X4] = u2;
-		self->uvs[VERTEX_Y4] = v;
-		self->uvs[VERTEX_X1] = u2;
-		self->uvs[VERTEX_Y1] = v2;
+		self->uvs[SP_VERTEX_X2] = u;
+		self->uvs[SP_VERTEX_Y2] = v2;
+		self->uvs[SP_VERTEX_X3] = u;
+		self->uvs[SP_VERTEX_Y3] = v;
+		self->uvs[SP_VERTEX_X4] = u2;
+		self->uvs[SP_VERTEX_Y4] = v;
+		self->uvs[SP_VERTEX_X1] = u2;
+		self->uvs[SP_VERTEX_Y1] = v2;
 	} else {
-		self->uvs[VERTEX_X1] = u;
-		self->uvs[VERTEX_Y1] = v2;
-		self->uvs[VERTEX_X2] = u;
-		self->uvs[VERTEX_Y2] = v;
-		self->uvs[VERTEX_X3] = u2;
-		self->uvs[VERTEX_Y3] = v;
-		self->uvs[VERTEX_X4] = u2;
-		self->uvs[VERTEX_Y4] = v2;
+		self->uvs[SP_VERTEX_X1] = u;
+		self->uvs[SP_VERTEX_Y1] = v2;
+		self->uvs[SP_VERTEX_X2] = u;
+		self->uvs[SP_VERTEX_Y2] = v;
+		self->uvs[SP_VERTEX_X3] = u2;
+		self->uvs[SP_VERTEX_Y3] = v;
+		self->uvs[SP_VERTEX_X4] = u2;
+		self->uvs[SP_VERTEX_Y4] = v2;
 	}
 }
 
@@ -71,14 +80,8 @@ void spRegionAttachment_updateOffset (spRegionAttachment* self) {
 	float localY = -self->height / 2 * self->scaleY + self->regionOffsetY * regionScaleY;
 	float localX2 = localX + self->regionWidth * regionScaleX;
 	float localY2 = localY + self->regionHeight * regionScaleY;
-	float radians = (float)(self->rotation * 3.1415926535897932385 / 180);
-#ifdef __STDC_VERSION__
-	float cosine = cosf(radians);
-	float sine = sinf(radians);
-#else
-	float cosine = (float)cos(radians);
-	float sine = (float)sin(radians);
-#endif
+	float radians = self->rotation * DEG_RAD;
+	float cosine = COS(radians), sine = SIN(radians);
 	float localXCos = localX * cosine + self->x;
 	float localXSin = localX * sine;
 	float localYCos = localY * cosine + self->y;
@@ -87,26 +90,25 @@ void spRegionAttachment_updateOffset (spRegionAttachment* self) {
 	float localX2Sin = localX2 * sine;
 	float localY2Cos = localY2 * cosine + self->y;
 	float localY2Sin = localY2 * sine;
-	self->offset[VERTEX_X1] = localXCos - localYSin;
-	self->offset[VERTEX_Y1] = localYCos + localXSin;
-	self->offset[VERTEX_X2] = localXCos - localY2Sin;
-	self->offset[VERTEX_Y2] = localY2Cos + localXSin;
-	self->offset[VERTEX_X3] = localX2Cos - localY2Sin;
-	self->offset[VERTEX_Y3] = localY2Cos + localX2Sin;
-	self->offset[VERTEX_X4] = localX2Cos - localYSin;
-	self->offset[VERTEX_Y4] = localYCos + localX2Sin;
+	self->offset[SP_VERTEX_X1] = localXCos - localYSin;
+	self->offset[SP_VERTEX_Y1] = localYCos + localXSin;
+	self->offset[SP_VERTEX_X2] = localXCos - localY2Sin;
+	self->offset[SP_VERTEX_Y2] = localY2Cos + localXSin;
+	self->offset[SP_VERTEX_X3] = localX2Cos - localY2Sin;
+	self->offset[SP_VERTEX_Y3] = localY2Cos + localX2Sin;
+	self->offset[SP_VERTEX_X4] = localX2Cos - localYSin;
+	self->offset[SP_VERTEX_Y4] = localYCos + localX2Sin;
 }
 
-void spRegionAttachment_computeWorldVertices (spRegionAttachment* self, float x, float y, spBone* bone, float* vertices) {
-	float* offset = self->offset;
-	x += bone->worldX;
-	y += bone->worldY;
-	vertices[VERTEX_X1] = offset[VERTEX_X1] * bone->m00 + offset[VERTEX_Y1] * bone->m01 + x;
-	vertices[VERTEX_Y1] = offset[VERTEX_X1] * bone->m10 + offset[VERTEX_Y1] * bone->m11 + y;
-	vertices[VERTEX_X2] = offset[VERTEX_X2] * bone->m00 + offset[VERTEX_Y2] * bone->m01 + x;
-	vertices[VERTEX_Y2] = offset[VERTEX_X2] * bone->m10 + offset[VERTEX_Y2] * bone->m11 + y;
-	vertices[VERTEX_X3] = offset[VERTEX_X3] * bone->m00 + offset[VERTEX_Y3] * bone->m01 + x;
-	vertices[VERTEX_Y3] = offset[VERTEX_X3] * bone->m10 + offset[VERTEX_Y3] * bone->m11 + y;
-	vertices[VERTEX_X4] = offset[VERTEX_X4] * bone->m00 + offset[VERTEX_Y4] * bone->m01 + x;
-	vertices[VERTEX_Y4] = offset[VERTEX_X4] * bone->m10 + offset[VERTEX_Y4] * bone->m11 + y;
+void spRegionAttachment_computeWorldVertices (spRegionAttachment* self, spBone* bone, float* vertices) {
+	const float* offset = self->offset;
+	float x = bone->skeleton->x + bone->worldX, y = bone->skeleton->y + bone->worldY;
+	vertices[SP_VERTEX_X1] = offset[SP_VERTEX_X1] * bone->a + offset[SP_VERTEX_Y1] * bone->b + x;
+	vertices[SP_VERTEX_Y1] = offset[SP_VERTEX_X1] * bone->c + offset[SP_VERTEX_Y1] * bone->d + y;
+	vertices[SP_VERTEX_X2] = offset[SP_VERTEX_X2] * bone->a + offset[SP_VERTEX_Y2] * bone->b + x;
+	vertices[SP_VERTEX_Y2] = offset[SP_VERTEX_X2] * bone->c + offset[SP_VERTEX_Y2] * bone->d + y;
+	vertices[SP_VERTEX_X3] = offset[SP_VERTEX_X3] * bone->a + offset[SP_VERTEX_Y3] * bone->b + x;
+	vertices[SP_VERTEX_Y3] = offset[SP_VERTEX_X3] * bone->c + offset[SP_VERTEX_Y3] * bone->d + y;
+	vertices[SP_VERTEX_X4] = offset[SP_VERTEX_X4] * bone->a + offset[SP_VERTEX_Y4] * bone->b + x;
+	vertices[SP_VERTEX_Y4] = offset[SP_VERTEX_X4] * bone->c + offset[SP_VERTEX_Y4] * bone->d + y;
 }
