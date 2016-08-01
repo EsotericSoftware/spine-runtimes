@@ -45,6 +45,8 @@ public:
 	static void setBufferSize (int vertexCount);
 
 	static SkeletonBatch* getInstance ();
+    
+    static void destroyInstance ();
 
 	void update (float delta);
 
