@@ -52,6 +52,9 @@ namespace Spine.Unity.Editor {
 		static SpineEditorUtilities.InstantiateDelegate instantiateDelegate;
 
 		static SkeletonGraphicInspector () {
+			if (!SpineEditorUtilities.initialized)
+				return;
+
 			if (instantiateDelegate == null)
 				instantiateDelegate = new SpineEditorUtilities.InstantiateDelegate(SpawnSkeletonGraphicFromDrop);
 			
@@ -158,9 +161,8 @@ namespace Spine.Unity.Editor {
 			var parentGameObject = Selection.activeObject as GameObject;
 			var parentTransform = parentGameObject == null ? null : parentGameObject.GetComponent<RectTransform>();
 
-			if (parentTransform == null) {
+			if (parentTransform == null)
 				Debug.LogWarning("Your new SkeletonGraphic will not be visible until it is placed under a Canvas");
-			}
 
 			var gameObject = NewSkeletonGraphicGameObject("New SkeletonGraphic");
 			gameObject.transform.SetParent(parentTransform, false);

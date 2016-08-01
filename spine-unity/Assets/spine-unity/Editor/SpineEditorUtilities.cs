@@ -285,45 +285,56 @@ namespace Spine.Unity.Editor {
 			if (references.Length == 1) {
 				var skeletonDataAsset = references[0] as SkeletonDataAsset;
 				if (skeletonDataAsset != null) {
-					DragAndDrop.visualMode = DragAndDropVisualMode.Move;
 					var mousePos = current.mousePosition;
 
-					Handles.BeginGUI();
-					GUI.Label(new Rect(mousePos + new Vector2(20f, 20f), new Vector2(400f, 20f)), new GUIContent(string.Format("Create Spine GameObject ({0})", skeletonDataAsset.skeletonJSON.name), SpineEditorUtilities.Icons.spine));
-					Handles.EndGUI();
+					bool invalidSkeletonData = skeletonDataAsset.GetSkeletonData(true) == null;
+					if (invalidSkeletonData) {
+						DragAndDrop.visualMode = DragAndDropVisualMode.Rejected;
+						Handles.BeginGUI();
+						GUI.Label(new Rect(mousePos + new Vector2(20f, 20f), new Vector2(400f, 40f)), new GUIContent(string.Format("{0} is invalid.\nCannot create new Spine GameObject.", skeletonDataAsset.name), SpineEditorUtilities.Icons.warning));
+						Handles.EndGUI();
+						return;
+					} else {
+						DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+						Handles.BeginGUI();
+						GUI.Label(new Rect(mousePos + new Vector2(20f, 20f), new Vector2(400f, 20f)), new GUIContent(string.Format("Create Spine GameObject ({0})", skeletonDataAsset.skeletonJSON.name), SpineEditorUtilities.Icons.spine));
+						Handles.EndGUI();
 
-					if (current.type == EventType.DragPerform) {
-						var spawnPoint = MousePointToWorldPoint2D(mousePos, sceneview.camera);
+						if (current.type == EventType.DragPerform) {
+							RectTransform rectTransform = (Selection.activeGameObject == null) ? null : Selection.activeGameObject.GetComponent<RectTransform>();
+							Plane plane = (rectTransform == null) ? new Plane(Vector3.back, Vector3.zero) : new Plane(-rectTransform.forward, rectTransform.position);
+							Vector3 spawnPoint = MousePointToWorldPoint2D(mousePos, sceneview.camera, plane);
 
-						var menu = new GenericMenu();
-						// JOHN: todo: Get rect space spawnPoint if RectTransform is selected.
-						menu.AddItem(new GUIContent("SkeletonAnimation"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
-							skeletonDataAsset = skeletonDataAsset,
-							spawnPoint = spawnPoint,
-							instantiateDelegate = (data) => InstantiateSkeletonAnimation(data)
-						});
-
-						foreach (var spawnType in additionalSpawnTypes) {
-							menu.AddItem(new GUIContent(spawnType.menuLabel), false, HandleSkeletonComponentDrop, new SpawnMenuData {
+							var menu = new GenericMenu();
+							menu.AddItem(new GUIContent("SkeletonAnimation"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
 								skeletonDataAsset = skeletonDataAsset,
 								spawnPoint = spawnPoint,
-								instantiateDelegate = spawnType.instantiateDelegate,
-								isUI = spawnType.isUI
+								instantiateDelegate = (data) => InstantiateSkeletonAnimation(data)
 							});
+
+							foreach (var spawnType in additionalSpawnTypes) {
+								menu.AddItem(new GUIContent(spawnType.menuLabel), false, HandleSkeletonComponentDrop, new SpawnMenuData {
+									skeletonDataAsset = skeletonDataAsset,
+									spawnPoint = spawnPoint,
+									instantiateDelegate = spawnType.instantiateDelegate,
+									isUI = spawnType.isUI
+								});
+							}
+
+							#if SPINE_SKELETONANIMATOR
+							menu.AddSeparator("");
+
+							menu.AddItem(new GUIContent("SkeletonAnimator"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
+								skeletonDataAsset = skeletonDataAsset,
+								spawnPoint = spawnPoint,
+								instantiateDelegate = (data) => InstantiateSkeletonAnimator(data)
+							});
+							#endif
+
+							menu.ShowAsContext();
 						}
-
-						#if SPINE_SKELETONANIMATOR
-						menu.AddSeparator("");
-
-						menu.AddItem(new GUIContent("SkeletonAnimator"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
-							skeletonDataAsset = skeletonDataAsset,
-							spawnPoint = spawnPoint,
-							instantiateDelegate = (data) => InstantiateSkeletonAnimator(data)
-						});
-						#endif
-
-						menu.ShowAsContext();
 					}
+
 				}
 			}
 
@@ -332,25 +343,32 @@ namespace Spine.Unity.Editor {
 		public static void HandleSkeletonComponentDrop (object menuData) {
 			var data = (SpawnMenuData)menuData;
 
-			try {
-				GameObject newGameObject = null;
-				Component newSkeletonComponent = data.instantiateDelegate.Invoke(data.skeletonDataAsset);
-				newGameObject = newSkeletonComponent.gameObject;
-				newGameObject.transform.position = RoundVector(data.spawnPoint, 2);
-
-				var activeGameObject = Selection.activeGameObject;
-				if (activeGameObject != null)
-					newGameObject.transform.SetParent(activeGameObject.transform, true);
-
-				if (data.isUI && (activeGameObject == null || activeGameObject.GetComponent<RectTransform>() == null))
-					Debug.Log("Created a UI Skeleton GameObject not under a RectTransform. It may not be visible until you parent it to a canvas.");
-
-				Selection.activeGameObject = newGameObject;
-				Undo.RegisterCreatedObjectUndo(newGameObject, "Spawn Spine Skeleton");
-			} catch {
-				Debug.LogError("Could not create Spine GameObject. Make sure your SkeletonData asset is valid.");
+			if (data.skeletonDataAsset.GetSkeletonData(true) == null) {
+				EditorUtility.DisplayDialog("Invalid SkeletonDataAsset", "Unable to create Spine GameObject.\n\nPlease check your SkeletonDataAsset.", "Ok");
+				return;
 			}
 
+			bool isUI = data.isUI;
+
+			GameObject newGameObject = null;
+			Component newSkeletonComponent = data.instantiateDelegate.Invoke(data.skeletonDataAsset);
+			newGameObject = newSkeletonComponent.gameObject;
+			var transform = newGameObject.transform;
+
+			var activeGameObject = Selection.activeGameObject;
+			if (activeGameObject != null)
+				transform.SetParent(activeGameObject.transform, false);
+
+			newGameObject.transform.position = isUI ? data.spawnPoint : RoundVector(data.spawnPoint, 2);
+
+			if (isUI && (activeGameObject == null || activeGameObject.GetComponent<RectTransform>() == null))
+				Debug.Log("Created a UI Skeleton GameObject not under a RectTransform. It may not be visible until you parent it to a canvas.");
+
+			if (!isUI && activeGameObject != null && activeGameObject.transform.localScale != Vector3.one)
+				Debug.Log("New Spine GameObject was parented to a scaled Transform. It may not be the intended size.");
+
+			Selection.activeGameObject = newGameObject;
+			Undo.RegisterCreatedObjectUndo(newGameObject, "Create Spine GameObject");
 		}
 
 		/// <summary>
@@ -363,12 +381,14 @@ namespace Spine.Unity.Editor {
 			return vector;
 		}
 
-		static Vector3 MousePointToWorldPoint2D (Vector2 mousePosition, Camera camera) {
-			var plane2D = new Plane(Vector3.back, Vector3.zero);
+		/// <summary>
+		/// Converts a mouse point to a world point on a plane.
+		/// </summary>
+		static Vector3 MousePointToWorldPoint2D (Vector2 mousePosition, Camera camera, Plane plane) {
 			var screenPos = new Vector3(mousePosition.x, camera.pixelHeight - mousePosition.y, 0f);
 			var ray = camera.ScreenPointToRay(screenPos);
 			float distance;
-			bool hit = plane2D.Raycast(ray, out distance);
+			bool hit = plane.Raycast(ray, out distance);
 			return ray.GetPoint(distance);
 		}
 		#endregion
@@ -889,6 +909,7 @@ namespace Spine.Unity.Editor {
 				texImporter.alphaIsTransparency = false;
 				texImporter.spriteImportMode = SpriteImportMode.None;
 				texImporter.maxTextureSize = 2048;
+
 
 				EditorUtility.SetDirty(texImporter);
 				AssetDatabase.ImportAsset(texturePath);
