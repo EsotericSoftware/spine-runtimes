@@ -1,5 +1,5 @@
 module spine.webgl {
-    export class AssetManager {
+    export class AssetManager implements Disposable {
         private _assets: Map<string | Texture> = {};        
         private _errors: Map<string> = {};
         private _toLoad = 0;
@@ -53,10 +53,17 @@ module spine.webgl {
 
         remove(path: string) {
             let asset = this._assets[path];
+            if (asset instanceof Texture) {
+                asset.dispose();
+            }
             this._assets[path] = null; 
         }
 
         removeAll() {
+            for (var key in this._assets) {
+                let asset = this._assets[key];
+                if (asset instanceof Texture) asset.dispose();                
+            }            
             this._assets = {};
         }
 
@@ -71,5 +78,9 @@ module spine.webgl {
         loaded(): number {
             return this._loaded;
         }
+
+        dispose() {
+            this.removeAll();
+        }  
     }
 }

@@ -1,5 +1,5 @@
 module spine.webgl {
-    export class Shader {
+    export class Shader implements Disposable {
         public static MVP_MATRIX = "u_projTrans";
         public static POSITION = "a_position";
         public static COLOR = "a_color";

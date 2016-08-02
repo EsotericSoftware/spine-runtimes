@@ -1,5 +1,5 @@
 module spine.webgl {
-    export class Mesh {        
+    export class Mesh implements Disposable {        
         private _vertices:Float32Array;
         private _verticesBuffer: WebGLBuffer;
         private _numVertices: number = 0;
@@ -92,6 +92,11 @@ module spine.webgl {
                 gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this._indices.subarray(0, this._numIndices), gl.STATIC_DRAW);
                 this._dirtyIndices = false;
             }
+        }
+
+        dispose() {
+            gl.deleteBuffer(this._verticesBuffer);
+            gl.deleteBuffer(this._indicesBuffer);
         }
     }
 

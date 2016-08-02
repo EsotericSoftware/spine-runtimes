@@ -56,9 +56,17 @@ var spine;
             };
             AssetManager.prototype.remove = function (path) {
                 var asset = this._assets[path];
+                if (asset instanceof webgl.Texture) {
+                    asset.dispose();
+                }
                 this._assets[path] = null;
             };
             AssetManager.prototype.removeAll = function () {
+                for (var key in this._assets) {
+                    var asset = this._assets[key];
+                    if (asset instanceof webgl.Texture)
+                        asset.dispose();
+                }
                 this._assets = {};
             };
             AssetManager.prototype.isLoadingComplete = function () {
@@ -69,6 +77,9 @@ var spine;
             };
             AssetManager.prototype.loaded = function () {
                 return this._loaded;
+            };
+            AssetManager.prototype.dispose = function () {
+                this.removeAll();
             };
             return AssetManager;
         }());
@@ -453,6 +464,10 @@ var spine;
                     this._dirtyIndices = false;
                 }
             };
+            Mesh.prototype.dispose = function () {
+                webgl.gl.deleteBuffer(this._verticesBuffer);
+                webgl.gl.deleteBuffer(this._indicesBuffer);
+            };
             return Mesh;
         }());
         webgl.Mesh = Mesh;
@@ -664,6 +679,16 @@ var spine;
             Texture.prototype.getImage = function () {
                 return this._image;
             };
+            Texture.prototype.setFilters = function (minFilter, magFilter) {
+                this.bind();
+                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_MIN_FILTER, minFilter);
+                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_MAG_FILTER, magFilter);
+            };
+            Texture.prototype.setWraps = function (uWrap, vWrap) {
+                this.bind();
+                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_WRAP_S, uWrap);
+                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_WRAP_T, vWrap);
+            };
             Texture.prototype.update = function (useMipMaps) {
                 this.bind();
                 webgl.gl.texImage2D(webgl.gl.TEXTURE_2D, 0, webgl.gl.RGBA, webgl.gl.RGBA, webgl.gl.UNSIGNED_BYTE, this._image);
@@ -673,7 +698,6 @@ var spine;
                 webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_WRAP_T, webgl.gl.CLAMP_TO_EDGE);
                 if (useMipMaps)
                     webgl.gl.generateMipmap(webgl.gl.TEXTURE_2D);
-                this.unbind();
             };
             Texture.prototype.bind = function (unit) {
                 if (unit === void 0) { unit = 0; }
@@ -688,9 +712,205 @@ var spine;
             Texture.prototype.dispose = function () {
                 webgl.gl.deleteTexture(this._texture);
             };
+            Texture.filterFromString = function (text) {
+                switch (text.toLowerCase()) {
+                    case "nearest": return TextureFilter.Nearest;
+                    case "linear": return TextureFilter.Linear;
+                    case "mipmap": return TextureFilter.MipMap;
+                    case "mipmapnearestnearest": return TextureFilter.MipMapNearestNearest;
+                    case "mipmaplinearnearest": return TextureFilter.MipMapLinearNearest;
+                    case "mipmapnearestlinear": return TextureFilter.MipMapNearestLinear;
+                    case "mipmaplinearlinear": return TextureFilter.MipMapLinearLinear;
+                    default: throw new Error("Unknown texture filter " + text);
+                }
+            };
+            Texture.wrapFromString = function (text) {
+                switch (text.toLowerCase()) {
+                    case "mirroredtepeat": return TextureWrap.MirroredRepeat;
+                    case "clamptoedge": return TextureWrap.ClampToEdge;
+                    case "repeat": return TextureWrap.Repeat;
+                    default: throw new Error("Unknown texture wrap " + text);
+                }
+            };
             return Texture;
         }());
         webgl.Texture = Texture;
+        (function (TextureFilter) {
+            TextureFilter[TextureFilter["Nearest"] = WebGLRenderingContext.NEAREST] = "Nearest";
+            TextureFilter[TextureFilter["Linear"] = WebGLRenderingContext.LINEAR] = "Linear";
+            TextureFilter[TextureFilter["MipMap"] = WebGLRenderingContext.LINEAR_MIPMAP_LINEAR] = "MipMap";
+            TextureFilter[TextureFilter["MipMapNearestNearest"] = WebGLRenderingContext.NEAREST_MIPMAP_NEAREST] = "MipMapNearestNearest";
+            TextureFilter[TextureFilter["MipMapLinearNearest"] = WebGLRenderingContext.LINEAR_MIPMAP_NEAREST] = "MipMapLinearNearest";
+            TextureFilter[TextureFilter["MipMapNearestLinear"] = WebGLRenderingContext.NEAREST_MIPMAP_LINEAR] = "MipMapNearestLinear";
+            TextureFilter[TextureFilter["MipMapLinearLinear"] = WebGLRenderingContext.LINEAR_MIPMAP_LINEAR] = "MipMapLinearLinear";
+        })(webgl.TextureFilter || (webgl.TextureFilter = {}));
+        var TextureFilter = webgl.TextureFilter;
+        (function (TextureWrap) {
+            TextureWrap[TextureWrap["MirroredRepeat"] = WebGLRenderingContext.MIRRORED_REPEAT] = "MirroredRepeat";
+            TextureWrap[TextureWrap["ClampToEdge"] = WebGLRenderingContext.CLAMP_TO_EDGE] = "ClampToEdge";
+            TextureWrap[TextureWrap["Repeat"] = WebGLRenderingContext.REPEAT] = "Repeat";
+        })(webgl.TextureWrap || (webgl.TextureWrap = {}));
+        var TextureWrap = webgl.TextureWrap;
+    })(webgl = spine.webgl || (spine.webgl = {}));
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var webgl;
+    (function (webgl) {
+        var TextureAtlas = (function () {
+            function TextureAtlas(atlasText, textureLoader) {
+                this.pages = new Array();
+                this.regions = new Array();
+                this.load(atlasText, textureLoader);
+            }
+            TextureAtlas.prototype.load = function (atlasText, textureLoader) {
+                if (textureLoader == null)
+                    throw new Error("textureLoader cannot be null.");
+                var reader = new TextureAtlasReader(atlasText);
+                var tuple = new Array(4);
+                var page = null;
+                while (true) {
+                    var line = reader.readLine();
+                    if (line == null)
+                        break;
+                    line = line.trim();
+                    if (line.length == 0)
+                        page = null;
+                    else if (!page) {
+                        page = new TextureAtlasPage();
+                        page.name = line;
+                        if (reader.readTuple(tuple) == 2) {
+                            page.width = parseInt(tuple[0]);
+                            page.height = parseInt(tuple[1]);
+                            reader.readTuple(tuple);
+                        }
+                        // page.format = Format[tuple[0]]; we don't need format in WebGL
+                        reader.readTuple(tuple);
+                        page.minFilter = webgl.Texture.filterFromString(tuple[0]);
+                        page.magFilter = webgl.Texture.filterFromString(tuple[1]);
+                        var direction = reader.readValue();
+                        page.uWrap = webgl.TextureWrap.ClampToEdge;
+                        page.vWrap = webgl.TextureWrap.ClampToEdge;
+                        if (direction == "x")
+                            page.uWrap = webgl.TextureWrap.Repeat;
+                        else if (direction == "y")
+                            page.vWrap = webgl.TextureWrap.Repeat;
+                        else if (direction == "xy")
+                            page.uWrap = page.vWrap = webgl.TextureWrap.Repeat;
+                        page.texture = textureLoader(line);
+                        page.texture.setFilters(page.minFilter, page.magFilter);
+                        page.texture.setWraps(page.uWrap, page.vWrap);
+                        page.width = page.texture.getImage().width;
+                        page.height = page.texture.getImage().height;
+                        this.pages.push(page);
+                    }
+                    else {
+                        var region = new TextureAtlasRegion();
+                        region.name = line;
+                        region.page = page;
+                        region.rotate = reader.readValue() == "true";
+                        reader.readTuple(tuple);
+                        var x = parseInt(tuple[0]);
+                        var y = parseInt(tuple[1]);
+                        reader.readTuple(tuple);
+                        var width = parseInt(tuple[0]);
+                        var height = parseInt(tuple[1]);
+                        region.u = x / page.width;
+                        region.v = y / page.height;
+                        if (region.rotate) {
+                            region.u2 = (x + height) / page.width;
+                            region.v2 = (y + width) / page.height;
+                        }
+                        else {
+                            region.u2 = (x + width) / page.width;
+                            region.v2 = (y + height) / page.height;
+                        }
+                        region.x = x;
+                        region.y = y;
+                        region.width = Math.abs(width);
+                        region.height = Math.abs(height);
+                        if (reader.readTuple(tuple) == 4) {
+                            // region.splits = new Vector.<int>(parseInt(tuple[0]), parseInt(tuple[1]), parseInt(tuple[2]), parseInt(tuple[3]));
+                            if (reader.readTuple(tuple) == 4) {
+                                //region.pads = Vector.<int>(parseInt(tuple[0]), parseInt(tuple[1]), parseInt(tuple[2]), parseInt(tuple[3]));
+                                reader.readTuple(tuple);
+                            }
+                        }
+                        region.originalWidth = parseInt(tuple[0]);
+                        region.originalHeight = parseInt(tuple[1]);
+                        reader.readTuple(tuple);
+                        region.offsetX = parseInt(tuple[0]);
+                        region.offsetY = parseInt(tuple[1]);
+                        region.index = parseInt(reader.readValue());
+                        // FIXME
+                        // textureLoader.loadRegion(region);
+                        this.regions.push(region);
+                    }
+                }
+            };
+            TextureAtlas.prototype.findRegion = function (name) {
+                for (var i = 0; i < this.regions.length; i++) {
+                    if (this.regions[i].name == name) {
+                        return this.regions[i];
+                    }
+                }
+                return null;
+            };
+            TextureAtlas.prototype.dispose = function () {
+                for (var i = 0; i < this.pages.length; i++) {
+                    this.pages[i].texture.dispose();
+                }
+            };
+            return TextureAtlas;
+        }());
+        webgl.TextureAtlas = TextureAtlas;
+        var TextureAtlasReader = (function () {
+            function TextureAtlasReader(text) {
+                this.index = 0;
+                this.lines = text.split(/\r\n|\r|\n/);
+            }
+            TextureAtlasReader.prototype.readLine = function () {
+                if (this.index >= this.lines.length)
+                    return null;
+                return this.lines[this.index++];
+            };
+            TextureAtlasReader.prototype.readValue = function () {
+                var line = this.readLine();
+                var colon = line.indexOf(":");
+                if (colon == -1)
+                    throw new Error("Invalid line: " + line);
+                return line.substring(colon + 1).trim();
+            };
+            TextureAtlasReader.prototype.readTuple = function (tuple) {
+                var line = this.readLine();
+                var colon = line.indexOf(":");
+                if (colon == -1)
+                    throw new Error("Invalid line: " + line);
+                var i = 0, lastMatch = colon + 1;
+                for (; i < 3; i++) {
+                    var comma = line.indexOf(",", lastMatch);
+                    if (comma == -1)
+                        break;
+                    tuple[i] = line.substr(lastMatch, comma - lastMatch).trim();
+                    lastMatch = comma + 1;
+                }
+                tuple[i] = line.substring(lastMatch).trim();
+                return i + 1;
+            };
+            return TextureAtlasReader;
+        }());
+        var TextureAtlasPage = (function () {
+            function TextureAtlasPage() {
+            }
+            return TextureAtlasPage;
+        }());
+        webgl.TextureAtlasPage = TextureAtlasPage;
+        var TextureAtlasRegion = (function () {
+            function TextureAtlasRegion() {
+            }
+            return TextureAtlasRegion;
+        }());
+        webgl.TextureAtlasRegion = TextureAtlasRegion;
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
 var spine;

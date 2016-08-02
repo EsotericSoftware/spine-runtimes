@@ -13,6 +13,7 @@ var gl = null;
 var mvp = new spine.webgl.Matrix4();
 var assetManager = new spine.webgl.AssetManager();
 var texture = null;
+var atlas = null;
 
 function init() {    
     // setup canvas and WebGL context
@@ -48,6 +49,11 @@ function init() {
 function load() {
     if (assetManager.isLoadingComplete()) {
         texture = assetManager.get("resources/spineboy.png");
+
+        atlas = new spine.webgl.TextureAtlas(assetManager.get("resources/spineboy.atlas"), function(path) {
+            return assetManager.get("resources/" + path);
+        });
+
         requestAnimationFrame(render);
     }
     else requestAnimationFrame(load);
@@ -68,7 +74,9 @@ function render() {
     requestAnimationFrame(render);
 }
 
-init();
+(function() {
+    init();
+})();
 
 </script>
 </html>

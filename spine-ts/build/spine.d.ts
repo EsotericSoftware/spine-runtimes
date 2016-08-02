@@ -1,5 +1,5 @@
 declare module spine.webgl {
-    class AssetManager {
+    class AssetManager implements Disposable {
         private _assets;
         private _errors;
         private _toLoad;
@@ -12,6 +12,12 @@ declare module spine.webgl {
         isLoadingComplete(): boolean;
         toLoad(): number;
         loaded(): number;
+        dispose(): void;
+    }
+}
+declare module spine.webgl {
+    interface Disposable {
+        dispose(): void;
     }
 }
 declare module spine.webgl {
@@ -50,7 +56,7 @@ declare module spine.webgl {
     }
 }
 declare module spine.webgl {
-    class Mesh {
+    class Mesh implements Disposable {
         private _attributes;
         private _vertices;
         private _verticesBuffer;
@@ -74,6 +80,7 @@ declare module spine.webgl {
         bind(shader: Shader): void;
         unbind(shader: Shader): void;
         private update();
+        dispose(): void;
     }
     class VertexAttribute {
         name: string;
@@ -102,7 +109,7 @@ declare module spine.webgl {
     }
 }
 declare module spine.webgl {
-    class Shader {
+    class Shader implements Disposable {
         private _vertexShader;
         private _fragmentShader;
         static MVP_MATRIX: string;
@@ -141,16 +148,73 @@ declare module spine.webgl {
     }
 }
 declare module spine.webgl {
-    class Texture {
+    class Texture implements Disposable {
         private _texture;
         private _image;
         private _boundUnit;
         constructor(image: HTMLImageElement, useMipMaps?: boolean);
         getImage(): HTMLImageElement;
+        setFilters(minFilter: TextureFilter, magFilter: TextureFilter): void;
+        setWraps(uWrap: TextureWrap, vWrap: TextureWrap): void;
         update(useMipMaps: boolean): void;
         bind(unit?: number): void;
         unbind(): void;
         dispose(): void;
+        static filterFromString(text: string): TextureFilter;
+        static wrapFromString(text: string): TextureWrap;
+    }
+    enum TextureFilter {
+        Nearest,
+        Linear,
+        MipMap,
+        MipMapNearestNearest,
+        MipMapLinearNearest,
+        MipMapNearestLinear,
+        MipMapLinearLinear,
+    }
+    enum TextureWrap {
+        MirroredRepeat,
+        ClampToEdge,
+        Repeat,
+    }
+}
+declare module spine.webgl {
+    class TextureAtlas implements Disposable {
+        pages: TextureAtlasPage[];
+        regions: TextureAtlasRegion[];
+        constructor(atlasText: string, textureLoader: (path: string) => Texture);
+        private load(atlasText, textureLoader);
+        findRegion(name: string): TextureAtlasRegion;
+        dispose(): void;
+    }
+    class TextureAtlasPage {
+        name: string;
+        minFilter: TextureFilter;
+        magFilter: TextureFilter;
+        uWrap: TextureWrap;
+        vWrap: TextureWrap;
+        texture: Texture;
+        width: number;
+        height: number;
+    }
+    class TextureAtlasRegion {
+        page: TextureAtlasPage;
+        name: string;
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+        u: number;
+        v: number;
+        u2: number;
+        v2: number;
+        offsetX: number;
+        offsetY: number;
+        originalWidth: number;
+        originalHeight: number;
+        index: number;
+        rotate: boolean;
+        texture: Texture;
     }
 }
 declare module spine.webgl {
