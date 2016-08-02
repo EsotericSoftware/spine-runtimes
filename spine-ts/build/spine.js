@@ -2,12 +2,77 @@ var spine;
 (function (spine) {
     var webgl;
     (function (webgl) {
-        var AssetLoader = (function () {
-            function AssetLoader() {
+        var AssetManager = (function () {
+            function AssetManager() {
+                this._assets = {};
+                this._errors = {};
+                this._toLoad = 0;
+                this._loaded = 0;
             }
-            return AssetLoader;
+            AssetManager.prototype.loadText = function (path, success, error) {
+                var _this = this;
+                this._toLoad++;
+                var request = new XMLHttpRequest();
+                request.onreadystatechange = function () {
+                    if (request.readyState == XMLHttpRequest.DONE) {
+                        if (request.status >= 200 && request.status < 300) {
+                            if (success)
+                                success(path, request.responseText);
+                            _this._assets[path] = request.responseText;
+                        }
+                        else {
+                            if (error)
+                                error(path, "Couldn't load text " + path + ": status " + request.status + ", " + request.responseBody);
+                            _this._errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseBody;
+                        }
+                        _this._toLoad--;
+                        _this._loaded++;
+                    }
+                };
+                request.open("GET", path, true);
+                request.send();
+            };
+            AssetManager.prototype.loadTexture = function (path, success, error) {
+                var _this = this;
+                this._toLoad++;
+                var img = new Image();
+                img.src = path;
+                img.onload = function (ev) {
+                    if (success)
+                        success(path, img);
+                    var texture = new webgl.Texture(img);
+                    _this._assets[path] = texture;
+                    _this._toLoad--;
+                    _this._loaded++;
+                };
+                img.onerror = function (ev) {
+                    _this._errors[path] = "Couldn't load image " + path;
+                    _this._toLoad--;
+                    _this._loaded++;
+                };
+            };
+            AssetManager.prototype.get = function (path) {
+                return this._assets[path];
+            };
+            AssetManager.prototype.remove = function (path) {
+                var asset = this._assets[path];
+                this._assets[path] = null;
+            };
+            AssetManager.prototype.removeAll = function () {
+                this._assets = {};
+            };
+            AssetManager.prototype.isLoadingComplete = function () {
+                return this._toLoad == 0;
+            };
+            AssetManager.prototype.toLoad = function () {
+                return this._toLoad;
+            };
+            AssetManager.prototype.loaded = function () {
+                return this._loaded;
+            };
+            return AssetManager;
         }());
-        webgl.AssetLoader = AssetLoader;
+        webgl.AssetManager = AssetManager;
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
 var spine;
@@ -419,7 +484,8 @@ var spine;
         var TexCoordAttribute = (function (_super) {
             __extends(TexCoordAttribute, _super);
             function TexCoordAttribute(unit) {
-                _super.call(this, webgl.Shader.TEXCOORD + (unit == 0 ? "" : unit), VertexAttributeType.Float, 2);
+                if (unit === void 0) { unit = 0; }
+                _super.call(this, webgl.Shader.TEXCOORDS + (unit == 0 ? "" : unit), VertexAttributeType.Float, 2);
             }
             return TexCoordAttribute;
         }(VertexAttribute));
@@ -510,6 +576,9 @@ var spine;
             Shader.prototype.unbind = function () {
                 webgl.gl.useProgram(null);
             };
+            Shader.prototype.setUniformi = function (uniform, value) {
+                webgl.gl.uniform1i(this.getUniformLocation(uniform), value);
+            };
             Shader.prototype.setUniformf = function (uniform, value) {
                 webgl.gl.uniform1f(this.getUniformLocation(uniform), value);
             };
@@ -561,7 +630,7 @@ var spine;
                 }
             };
             Shader.newColoredTextured = function () {
-                var vs = "\n                attribute vec4 " + Shader.POSITION + ";\n                attribute vec4 " + Shader.COLOR + ";\n                attribute vec2 " + Shader.TEXCOORD + ";\n                uniform mat4 " + Shader.MVP_MATRIX + ";\n                varying vec4 v_color;\n                varying vec2 v_texCoords;\n            \n                void main() {                    \n                    v_color = " + Shader.COLOR + ";                    \n                    v_texCoords = " + Shader.TEXCOORD + ";\n                    gl_Position =  " + Shader.MVP_MATRIX + " * " + Shader.POSITION + ";\n                }\n            ";
+                var vs = "\n                attribute vec4 " + Shader.POSITION + ";\n                attribute vec4 " + Shader.COLOR + ";\n                attribute vec2 " + Shader.TEXCOORDS + ";\n                uniform mat4 " + Shader.MVP_MATRIX + ";\n                varying vec4 v_color;\n                varying vec2 v_texCoords;\n            \n                void main() {                    \n                    v_color = " + Shader.COLOR + ";                    \n                    v_texCoords = " + Shader.TEXCOORDS + ";\n                    gl_Position =  " + Shader.MVP_MATRIX + " * " + Shader.POSITION + ";\n                }\n            ";
                 var fs = "\n                #ifdef GL_ES\n\t\t\t        #define LOWP lowp\n\t\t\t        precision mediump float;\n\t\t\t    #else\n\t\t\t        #define LOWP \n\t\t\t    #endif\n\t\t\t    varying LOWP vec4 v_color;\n\t\t\t    varying vec2 v_texCoords;\n\t\t\t    uniform sampler2D u_texture;\n\n\t\t\t    void main() {\t\t\t    \n\t\t\t        gl_FragColor = v_color * texture2D(u_texture, v_texCoords);\n\t\t\t    }\n            ";
                 return new Shader(vs, fs);
             };
@@ -573,10 +642,55 @@ var spine;
             Shader.MVP_MATRIX = "u_projTrans";
             Shader.POSITION = "a_position";
             Shader.COLOR = "a_color";
-            Shader.TEXCOORD = "a_texCoords";
+            Shader.TEXCOORDS = "a_texCoords";
+            Shader.SAMPLER = "u_texture";
             return Shader;
         }());
         webgl.Shader = Shader;
+    })(webgl = spine.webgl || (spine.webgl = {}));
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var webgl;
+    (function (webgl) {
+        var Texture = (function () {
+            function Texture(image, useMipMaps) {
+                if (useMipMaps === void 0) { useMipMaps = false; }
+                this._boundUnit = 0;
+                this._texture = webgl.gl.createTexture();
+                this._image = image;
+                this.update(useMipMaps);
+            }
+            Texture.prototype.getImage = function () {
+                return this._image;
+            };
+            Texture.prototype.update = function (useMipMaps) {
+                this.bind();
+                webgl.gl.texImage2D(webgl.gl.TEXTURE_2D, 0, webgl.gl.RGBA, webgl.gl.RGBA, webgl.gl.UNSIGNED_BYTE, this._image);
+                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_MAG_FILTER, webgl.gl.LINEAR);
+                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_MIN_FILTER, useMipMaps ? webgl.gl.LINEAR_MIPMAP_LINEAR : webgl.gl.LINEAR);
+                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_WRAP_S, webgl.gl.CLAMP_TO_EDGE);
+                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_WRAP_T, webgl.gl.CLAMP_TO_EDGE);
+                if (useMipMaps)
+                    webgl.gl.generateMipmap(webgl.gl.TEXTURE_2D);
+                this.unbind();
+            };
+            Texture.prototype.bind = function (unit) {
+                if (unit === void 0) { unit = 0; }
+                this._boundUnit = unit;
+                webgl.gl.activeTexture(webgl.gl.TEXTURE0 + unit);
+                webgl.gl.bindTexture(webgl.gl.TEXTURE_2D, this._texture);
+            };
+            Texture.prototype.unbind = function () {
+                webgl.gl.activeTexture(webgl.gl.TEXTURE0 + this._boundUnit);
+                webgl.gl.bindTexture(webgl.gl.TEXTURE_2D, null);
+            };
+            Texture.prototype.dispose = function () {
+                webgl.gl.deleteTexture(this._texture);
+            };
+            return Texture;
+        }());
+        webgl.Texture = Texture;
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
 var spine;

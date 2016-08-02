@@ -1,5 +1,17 @@
 declare module spine.webgl {
-    class AssetLoader {
+    class AssetManager {
+        private _assets;
+        private _errors;
+        private _toLoad;
+        private _loaded;
+        loadText(path: string, success: (path: string, text: string) => void, error: (path: string, error: string) => void): void;
+        loadTexture(path: string, success: (path: string, image: HTMLImageElement) => void, error: (path: string, error: string) => void): void;
+        get(path: string): string | Texture;
+        remove(path: string): void;
+        removeAll(): void;
+        isLoadingComplete(): boolean;
+        toLoad(): number;
+        loaded(): number;
     }
 }
 declare module spine.webgl {
@@ -76,7 +88,7 @@ declare module spine.webgl {
         constructor();
     }
     class TexCoordAttribute extends VertexAttribute {
-        constructor(unit: number);
+        constructor(unit?: number);
     }
     class ColorAttribute extends VertexAttribute {
         constructor();
@@ -96,7 +108,8 @@ declare module spine.webgl {
         static MVP_MATRIX: string;
         static POSITION: string;
         static COLOR: string;
-        static TEXCOORD: string;
+        static TEXCOORDS: string;
+        static SAMPLER: string;
         private _vs;
         private _fs;
         private _program;
@@ -112,6 +125,7 @@ declare module spine.webgl {
         private compileProgram(vs, fs);
         bind(): void;
         unbind(): void;
+        setUniformi(uniform: string, value: number): void;
         setUniformf(uniform: string, value: number): void;
         setUniform2f(uniform: string, value: number, value2: number): void;
         setUniform3f(uniform: string, value: number, value2: number, value3: number): void;
@@ -124,6 +138,19 @@ declare module spine.webgl {
         dispose(): void;
         static newColoredTextured(): Shader;
         static newColored(): Shader;
+    }
+}
+declare module spine.webgl {
+    class Texture {
+        private _texture;
+        private _image;
+        private _boundUnit;
+        constructor(image: HTMLImageElement, useMipMaps?: boolean);
+        getImage(): HTMLImageElement;
+        update(useMipMaps: boolean): void;
+        bind(unit?: number): void;
+        unbind(): void;
+        dispose(): void;
     }
 }
 declare module spine.webgl {
@@ -145,6 +172,9 @@ declare module spine.webgl {
     }
 }
 declare module spine.webgl {
+    interface Map<T> {
+        [key: string]: T;
+    }
     var gl: WebGLRenderingContext;
     function init(gl: WebGLRenderingContext): void;
 }

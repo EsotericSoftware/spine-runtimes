@@ -1,4 +1,8 @@
 module spine.webgl {
+    export interface Map<T> {
+        [key: string]: T;
+    }
+
     export var gl: WebGLRenderingContext;
 
     export function init(gl: WebGLRenderingContext) {

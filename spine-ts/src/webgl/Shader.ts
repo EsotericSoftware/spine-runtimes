@@ -3,7 +3,8 @@ module spine.webgl {
         public static MVP_MATRIX = "u_projTrans";
         public static POSITION = "a_position";
         public static COLOR = "a_color";
-        public static TEXCOORD = "a_texCoords";
+        public static TEXCOORDS = "a_texCoords";
+        public static SAMPLER = "u_texture";
                 
         private _vs: WebGLShader = null;
         private _fs: WebGLShader = null;
@@ -64,6 +65,10 @@ module spine.webgl {
 
         public unbind() {
             gl.useProgram(null);            
+        }
+
+        public setUniformi(uniform: string, value: number) {
+            gl.uniform1i(this.getUniformLocation(uniform), value);
         }
 
         public setUniformf(uniform: string, value: number) {
@@ -130,14 +135,14 @@ module spine.webgl {
             let vs = `
                 attribute vec4 ${Shader.POSITION};
                 attribute vec4 ${Shader.COLOR};
-                attribute vec2 ${Shader.TEXCOORD};
+                attribute vec2 ${Shader.TEXCOORDS};
                 uniform mat4 ${Shader.MVP_MATRIX};
                 varying vec4 v_color;
                 varying vec2 v_texCoords;
             
                 void main() {                    
                     v_color = ${Shader.COLOR};                    
-                    v_texCoords = ${Shader.TEXCOORD};
+                    v_texCoords = ${Shader.TEXCOORDS};
                     gl_Position =  ${Shader.MVP_MATRIX} * ${Shader.POSITION};
                 }
             `;
