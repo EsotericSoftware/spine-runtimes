@@ -37,6 +37,7 @@
 #define SPINE_SKELETONANIMATOR
 using UnityEngine;
 using UnityEditor;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -44,9 +45,11 @@ using System.Linq;
 using System.Reflection;
 using Spine;
 
+using Object = UnityEngine.Object;
+
 namespace Spine.Unity.Editor {
-	
-	// Analysis disable once ConvertToStaticType
+
+    // Analysis disable once ConvertToStaticType
 	[InitializeOnLoad]
 	public class SpineEditorUtilities : AssetPostprocessor {
 
@@ -176,8 +179,12 @@ namespace Spine.Unity.Editor {
 		const string DEFAULT_SHADER_KEY = "SPINE_DEFAULT_SHADER";
 		public static string defaultShader = DEFAULT_DEFAULT_SHADER;
 
-		#region Initialization
-		static SpineEditorUtilities () {
+        const int DEFAULT_DEFAULT_TEXTUREFORMAT = (int)TextureImporterFormat.AutomaticTruecolor;
+        const string DEFAULT_TEXTUREFORMAT_KEY = "SPINE_DEFAULT_TEXTUREFORMAT";
+        public static TextureImporterFormat defaultTextureFormat = (TextureImporterFormat)DEFAULT_DEFAULT_TEXTUREFORMAT;
+
+        #region Initialization
+        static SpineEditorUtilities () {
 			Initialize();
 		}
 
@@ -185,8 +192,9 @@ namespace Spine.Unity.Editor {
 			{
 				defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, DEFAULT_DEFAULT_MIX);
 				defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, DEFAULT_DEFAULT_SCALE);
-				defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, DEFAULT_DEFAULT_SHADER);	
-			}
+				defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, DEFAULT_DEFAULT_SHADER);
+                defaultTextureFormat = (TextureImporterFormat)EditorPrefs.GetInt(DEFAULT_TEXTUREFORMAT_KEY, DEFAULT_DEFAULT_TEXTUREFORMAT);
+            }
 
 			SceneView.onSceneGUIDelegate -= OnSceneGUI;
 			SceneView.onSceneGUIDelegate += OnSceneGUI;
@@ -226,6 +234,7 @@ namespace Spine.Unity.Editor {
 				defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, DEFAULT_DEFAULT_MIX);
 				defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, DEFAULT_DEFAULT_SCALE);
 				defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, DEFAULT_DEFAULT_SHADER);
+			    defaultTextureFormat = (TextureImporterFormat)EditorPrefs.GetInt(DEFAULT_TEXTUREFORMAT_KEY);
 			}
 
 			EditorGUILayout.LabelField("Auto-Import Settings", EditorStyles.boldLabel);
@@ -244,8 +253,13 @@ namespace Spine.Unity.Editor {
 			defaultShader = EditorGUILayout.DelayedTextField("Default shader for auto-generated materials", defaultShader);
 			if (EditorGUI.EndChangeCheck())
 				EditorPrefs.SetString(DEFAULT_SHADER_KEY, defaultShader);
-			
-			GUILayout.Space(20);
+
+            EditorGUI.BeginChangeCheck();
+            defaultTextureFormat = (TextureImporterFormat)EditorGUILayout.EnumPopup("Default texture format for imported atlas", (Enum)defaultTextureFormat, GUILayout.ExpandWidth(true));
+            if (EditorGUI.EndChangeCheck())
+                EditorPrefs.SetInt(DEFAULT_TEXTUREFORMAT_KEY, (int)defaultTextureFormat);
+
+            GUILayout.Space(20);
 			EditorGUILayout.LabelField("3rd Party Settings", EditorStyles.boldLabel);
 			GUILayout.BeginHorizontal();
 			EditorGUILayout.PrefixLabel("TK2D");
@@ -904,7 +918,7 @@ namespace Spine.Unity.Editor {
 
 				TextureImporter texImporter = (TextureImporter)TextureImporter.GetAtPath(texturePath);
 				texImporter.textureType = TextureImporterType.Advanced;
-				texImporter.textureFormat = TextureImporterFormat.AutomaticTruecolor;
+				texImporter.textureFormat = defaultTextureFormat;
 				texImporter.mipmapEnabled = false;
 				texImporter.alphaIsTransparency = false;
 				texImporter.spriteImportMode = SpriteImportMode.None;
