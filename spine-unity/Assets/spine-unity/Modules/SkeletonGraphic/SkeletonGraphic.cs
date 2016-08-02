@@ -209,6 +209,11 @@ namespace Spine.Unity {
 			}
 		}
 		#endregion
+		#else
+		public Skeleton Skeleton { get { return null; } }
+		public AnimationState AnimationState { get { return null; } }
+		public event UpdateBonesDelegate UpdateLocal, UpdateWorld, UpdateComplete;
+		public void LateUpdate () { }
 		#endif
 	}
 }
