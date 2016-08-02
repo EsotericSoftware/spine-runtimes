@@ -998,4 +998,4 @@ var spine;
         webgl.init = init;
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
-//# sourceMappingURL=spine.js.map
+//# sourceMappingURL=spine-all.js.map
