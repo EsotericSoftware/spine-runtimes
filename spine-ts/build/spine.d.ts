@@ -1,3 +1,11 @@
+declare module spine {
+    interface Map<T> {
+        [key: string]: T;
+    }
+    interface Disposable {
+        dispose(): void;
+    }
+}
 declare module spine.webgl {
     class AssetManager implements Disposable {
         private _assets;
@@ -12,11 +20,6 @@ declare module spine.webgl {
         isLoadingComplete(): boolean;
         toLoad(): number;
         loaded(): number;
-        dispose(): void;
-    }
-}
-declare module spine.webgl {
-    interface Disposable {
         dispose(): void;
     }
 }
@@ -236,9 +239,6 @@ declare module spine.webgl {
     }
 }
 declare module spine.webgl {
-    interface Map<T> {
-        [key: string]: T;
-    }
     var gl: WebGLRenderingContext;
     function init(gl: WebGLRenderingContext): void;
 }

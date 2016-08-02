@@ -4,13 +4,12 @@
         "noImplicitAny": true,
         "removeComments": false,
         "preserveConstEnums": true,
-        "outFile": "build/spine-all.js",
+        "outFile": "build/spine-core.js",
         "sourceMap": true,
         "declaration": true
     },
     "include": [
-        "core/src/**/*",
-        "webgl/src/**/*"
+        "core/src/**/*"        
     ],
     "exclude": [
         "build",

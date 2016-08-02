@@ -1,5 +1,5 @@
 <html>
-<script src="../../build/spine.js"></script>
+<script src="../../build/spine-webgl.js"></script>
 <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
 <body>
 <canvas id="canvas" style="width: 640; height: 480"></canvas>
@@ -40,18 +40,18 @@ function init() {
 
     // Tell AssetManager to load a few resources, then
     // hand control to load() function
-    assetManager.loadText("resources/spineboy.json");
-    assetManager.loadText("resources/spineboy.atlas");
-    assetManager.loadTexture("resources/spineboy.png");
+    assetManager.loadText("assets/spineboy.json");
+    assetManager.loadText("assets/spineboy.atlas");
+    assetManager.loadTexture("assets/spineboy.png");
     requestAnimationFrame(load);
 }
 
 function load() {
     if (assetManager.isLoadingComplete()) {
-        texture = assetManager.get("resources/spineboy.png");
+        texture = assetManager.get("assets/spineboy.png");
 
-        atlas = new spine.webgl.TextureAtlas(assetManager.get("resources/spineboy.atlas"), function(path) {
-            return assetManager.get("resources/" + path);
+        atlas = new spine.webgl.TextureAtlas(assetManager.get("assets/spineboy.atlas"), function(path) {
+            return assetManager.get("assets/" + path);
         });
 
         requestAnimationFrame(render);
