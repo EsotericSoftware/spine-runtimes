@@ -8,20 +8,40 @@
 
 var canvas = null;
 var shader = null;
+var mesh = null;
 var gl = null;
+var mvp = new spine.webgl.Matrix4();
 
 function init() {    
     canvas = document.getElementById("canvas");
+    canvas.width = 640;
+    canvas.height = 480;
+
     gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");        
     spine.webgl.init(gl);
-    shader = spine.webgl.Shader.newDefaultShader();
-
+    
+    shader = spine.webgl.Shader.newColored();
+    mesh = new spine.webgl.Mesh([new spine.webgl.Position2Attribute(), new spine.webgl.ColorAttribute()], 3, 3);
+    mesh.setVertices([
+         0, 0, 1, 0, 0, 1,
+         639, 0, 0, 1, 0, 1,
+         320,  479, 0, 0, 1, 1
+    ]);
+    mesh.setIndices([
+        0, 1, 2
+    ]);
+    mvp.ortho2d(0, 0, 640, 480)
     requestAnimationFrame(render);
 }
 
 function render() {
     gl.clearColor(0, 1, 0, 1);
     gl.clear(gl.COLOR_BUFFER_BIT);
+
+    shader.bind();
+    shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, mvp.values);
+    mesh.render(shader, gl.TRIANGLES);
+    shader.unbind();    
 
     requestAnimationFrame(render);
 }
