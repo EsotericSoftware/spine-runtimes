@@ -132,7 +132,10 @@ namespace Spine.Unity.Editor {
 					return;
 				}
 			}
-				
+
+			// Some code depends on the existence of m_skeletonAnimation instance.
+			// If m_skeletonAnimation is lazy-instantiated elsewhere, this can cause contents to change between Layout and Repaint events, causing GUILayout control count errors.
+			InitPreview();
 			if (m_skeletonData != null) {
 				DrawAnimationStateInfo();
 				DrawAnimationList();
@@ -229,10 +232,6 @@ namespace Spine.Unity.Editor {
 				using (new GUILayout.HorizontalScope()) {
 					if (GUILayout.Button(new GUIContent("Bake All Skins", SpineEditorUtilities.Icons.unityIcon), GUILayout.Height(32), GUILayout.Width(150)))
 						SkeletonBaker.BakeToPrefab(m_skeletonDataAsset, m_skeletonData.Skins, "", bakeAnimations, bakeIK, bakeEventOptions);
-
-					// If m_skeletonAnimation is lazy-instantiated elsewhere, this can cause contents to change between Layout and Repaint events, causing scope errors.
-					if (m_skeletonData != null && m_skeletonAnimation == null)
-						InitPreview();
 					
 					if (m_skeletonAnimation != null && m_skeletonAnimation.skeleton != null) {
 						Skin bakeSkin = m_skeletonAnimation.skeleton.Skin;
