@@ -3,17 +3,20 @@
 <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
 <body>
 <canvas id="canvas" style="width: 640; height: 480"></canvas>
+<div id="info"></div>
 </body>
 <script>
 
 var canvas = null;
 var shader = null;
-var mesh = null;
+var batcher = null;
 var gl = null;
 var mvp = new spine.webgl.Matrix4();
 var assetManager = new spine.webgl.AssetManager();
 var texture = null;
 var atlas = null;
+var polygons = [];
+var info = $("#info");
 
 function init() {    
     // setup canvas and WebGL context
@@ -25,17 +28,7 @@ function init() {
     
     // Create a simple shader, mesh and MVP matrix
     shader = spine.webgl.Shader.newColoredTextured();
-    mesh = new spine.webgl.Mesh([new spine.webgl.Position2Attribute(), 
-                                 new spine.webgl.ColorAttribute(), 
-                                 new spine.webgl.TexCoordAttribute()],
-                                4, 6);
-    mesh.setVertices([
-         0, 0, 1, 1, 1, 1, 0, 0,
-         639, 0, 1, 1, 1, 1, 1, 0,
-         639, 479, 1, 1, 1, 1, 1, 1,
-         0, 479, 1, 1, 1, 1, 0, 1
-    ]);
-    mesh.setIndices([0, 1, 2, 2, 3, 0]);
+    batcher = new spine.webgl.PolygonBatcher();    
     mvp.ortho2d(0, 0, 639, 479);
 
     // Tell AssetManager to load a few resources, then
@@ -44,6 +37,11 @@ function init() {
     assetManager.loadText("assets/spineboy.atlas");
     assetManager.loadTexture("assets/spineboy.png");
     requestAnimationFrame(load);
+
+    // Create a bunch of x/y/width/height polies
+    for (var i = 0; i < 10; i++) {
+        polygons.push({ x: Math.random() * 600, y: Math.random() * 400, w: Math.random() * 50, h: Math.random() * 50});
+    }
 }
 
 function load() {
@@ -65,11 +63,23 @@ function render() {
 
     shader.bind();
     shader.setUniformi(spine.webgl.Shader.SAMPLER, 0);
-    shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, mvp.values);
-    texture.bind();
-    mesh.render(shader, gl.TRIANGLES);
-    texture.unbind();
+    shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, mvp.values);        
+
+    batcher.begin(shader);
+    for (var i = 0; i < polygons.length; i++) {
+        var p = polygons[i];        
+        batcher.draw(texture, [
+            p.x, p.y, 1, 1, 1, 1, 0, 0,
+            p.x + p.w, p.y, 1, 1, 1, 1, 1, 0,
+            p.x + p.w, p.y + p.h, 1, 1, 1, 1, 1, 1,
+            p.x, p.y + p.h, 1, 1, 1, 1, 0, 1
+        ], [0, 1, 2, 2, 3, 0]);
+    }
+    batcher.end();
+    
     shader.unbind();    
+
+    info.html("drawcalls: " + batcher.drawCalls());
 
     requestAnimationFrame(render);
 }

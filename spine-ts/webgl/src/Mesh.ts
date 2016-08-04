@@ -2,19 +2,31 @@ module spine.webgl {
     export class Mesh implements Disposable {        
         private _vertices:Float32Array;
         private _verticesBuffer: WebGLBuffer;
-        private _numVertices: number = 0;
+        private _verticesLength: number = 0;
         private _dirtyVertices: boolean = false;
         private _indices:Uint16Array;
         private _indicesBuffer: WebGLBuffer;
-        private _numIndices: number = 0;
+        private _indicesLength: number = 0;
         private _dirtyIndices: boolean = false;
         private _elementsPerVertex: number = 0;        
 
         attributes(): VertexAttribute[] { return this._attributes; }        
+        
         maxVertices(): number { return this._vertices.length / this._elementsPerVertex; }
-        numVertices(): number { return this._numVertices / this._elementsPerVertex; }  
+        numVertices(): number { return this._verticesLength / this._elementsPerVertex; }
+        setVerticesLength(length: number) {
+            this._dirtyVertices = true;
+            this._verticesLength = length;
+        }
+        vertices(): Float32Array { return this._vertices; }
+
         maxIndices(): number { return this._indices.length; }
-        numIndices(): number { return this._numIndices; }
+        numIndices(): number { return this._indicesLength; }
+        setIndicesLength(length: number) {
+            this._dirtyIndices = true;
+            this._indicesLength = length;
+        }
+        indices(): Uint16Array { return this._indices };
         
         constructor(private _attributes: VertexAttribute[], maxVertices: number, maxIndices: number) {
             this._elementsPerVertex = 0;            
@@ -29,24 +41,24 @@ module spine.webgl {
             this._dirtyVertices = true;
             if (vertices.length > this._vertices.length) throw Error("Mesh can't store more than " + this.maxVertices() + " vertices");
             this._vertices.set(vertices, 0);
-            this._numVertices = vertices.length;                        
+            this._verticesLength = vertices.length;                        
         }
 
         setIndices(indices: Array<number>) {
             this._dirtyIndices = true;
             if (indices.length > this._indices.length) throw Error("Mesh can't store more than " + this.maxIndices() + " indices");
             this._indices.set(indices, 0);
-            this._numIndices = indices.length;                                    
+            this._indicesLength = indices.length;                                    
         }
 
-        render(shader: Shader, primitiveType: number) {
-            this.renderWithOffset(shader, primitiveType, 0, this._numIndices > 0? this._numIndices: this._numVertices);
+        draw(shader: Shader, primitiveType: number) {
+            this.drawWithOffset(shader, primitiveType, 0, this._indicesLength > 0? this._indicesLength: this._verticesLength);
         }
 
-        renderWithOffset(shader: Shader, primitiveType: number, offset: number, count: number) {
+        drawWithOffset(shader: Shader, primitiveType: number, offset: number, count: number) {
             if (this._dirtyVertices || this._dirtyIndices) this.update();                            
             this.bind(shader);
-            if (this._numIndices > 0) gl.drawElements(primitiveType, count, gl.UNSIGNED_SHORT, offset * 2);
+            if (this._indicesLength > 0) gl.drawElements(primitiveType, count, gl.UNSIGNED_SHORT, offset * 2);
             else gl.drawArrays(primitiveType, offset, count);
             this.unbind(shader);                  
         }
@@ -61,7 +73,7 @@ module spine.webgl {
                 gl.vertexAttribPointer(location, attrib.numElements, gl.FLOAT, false, this._elementsPerVertex * 4, offset * 4);
                 offset += attrib.numElements;
             }
-            if (this._numIndices > 0) gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
+            if (this._indicesLength > 0) gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
         }
 
         unbind(shader: Shader) {
@@ -71,7 +83,7 @@ module spine.webgl {
                 gl.disableVertexAttribArray(location);
             }
             gl.bindBuffer(gl.ARRAY_BUFFER, null);
-            if (this._numIndices > 0) gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+            if (this._indicesLength > 0) gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
         }
 
         private update() {
@@ -80,7 +92,7 @@ module spine.webgl {
                     this._verticesBuffer = gl.createBuffer();                    
                 }
                 gl.bindBuffer(gl.ARRAY_BUFFER, this._verticesBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, this._vertices.subarray(0, this._numVertices), gl.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, this._vertices.subarray(0, this._verticesLength), gl.STATIC_DRAW);
                 this._dirtyVertices = false;               
             }
 
@@ -89,7 +101,7 @@ module spine.webgl {
                     this._indicesBuffer = gl.createBuffer();                    
                 }
                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
-                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this._indices.subarray(0, this._numIndices), gl.STATIC_DRAW);
+                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this._indices.subarray(0, this._indicesLength), gl.STATIC_DRAW);
                 this._dirtyIndices = false;
             }
         }

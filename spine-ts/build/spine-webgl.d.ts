@@ -1,4 +1,12 @@
 declare module spine {
+    enum BlendMode {
+        Normal = 0,
+        Additive = 1,
+        Multiply = 2,
+        Screen = 3,
+    }
+}
+declare module spine {
     interface Map<T> {
         [key: string]: T;
     }
@@ -63,23 +71,27 @@ declare module spine.webgl {
         private _attributes;
         private _vertices;
         private _verticesBuffer;
-        private _numVertices;
+        private _verticesLength;
         private _dirtyVertices;
         private _indices;
         private _indicesBuffer;
-        private _numIndices;
+        private _indicesLength;
         private _dirtyIndices;
         private _elementsPerVertex;
         attributes(): VertexAttribute[];
         maxVertices(): number;
         numVertices(): number;
+        setVerticesLength(length: number): void;
+        vertices(): Float32Array;
         maxIndices(): number;
         numIndices(): number;
+        setIndicesLength(length: number): void;
+        indices(): Uint16Array;
         constructor(_attributes: VertexAttribute[], maxVertices: number, maxIndices: number);
         setVertices(vertices: Array<number>): void;
         setIndices(indices: Array<number>): void;
-        render(shader: Shader, primitiveType: number): void;
-        renderWithOffset(shader: Shader, primitiveType: number, offset: number, count: number): void;
+        draw(shader: Shader, primitiveType: number): void;
+        drawWithOffset(shader: Shader, primitiveType: number, offset: number, count: number): void;
         bind(shader: Shader): void;
         unbind(shader: Shader): void;
         private update();
@@ -108,7 +120,23 @@ declare module spine.webgl {
     }
 }
 declare module spine.webgl {
-    class PolygonBatch {
+    class PolygonBatcher {
+        private _drawCalls;
+        private _drawing;
+        private _mesh;
+        private _shader;
+        private _lastTexture;
+        private _verticesLength;
+        private _indicesLength;
+        private _srcBlend;
+        private _dstBlend;
+        constructor(maxVertices?: number);
+        begin(shader: Shader): void;
+        setBlendMode(srcBlend: number, dstBlend: number): void;
+        draw(texture: Texture, vertices: Array<number>, indices: Array<number>): void;
+        private flush();
+        end(): void;
+        drawCalls(): number;
     }
 }
 declare module spine.webgl {
@@ -241,4 +269,6 @@ declare module spine.webgl {
 declare module spine.webgl {
     var gl: WebGLRenderingContext;
     function init(gl: WebGLRenderingContext): void;
+    function getSourceGLBlendMode(blendMode: BlendMode, premultipliedAlpha?: boolean): number;
+    function getDestGLBlendMode(blendMode: BlendMode): number;
 }

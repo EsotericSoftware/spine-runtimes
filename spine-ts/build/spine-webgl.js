@@ -1,5 +1,15 @@
 var spine;
 (function (spine) {
+    (function (BlendMode) {
+        BlendMode[BlendMode["Normal"] = 0] = "Normal";
+        BlendMode[BlendMode["Additive"] = 1] = "Additive";
+        BlendMode[BlendMode["Multiply"] = 2] = "Multiply";
+        BlendMode[BlendMode["Screen"] = 3] = "Screen";
+    })(spine.BlendMode || (spine.BlendMode = {}));
+    var BlendMode = spine.BlendMode;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
     var webgl;
     (function (webgl) {
         var AssetManager = (function () {
@@ -379,9 +389,9 @@ var spine;
         var Mesh = (function () {
             function Mesh(_attributes, maxVertices, maxIndices) {
                 this._attributes = _attributes;
-                this._numVertices = 0;
+                this._verticesLength = 0;
                 this._dirtyVertices = false;
-                this._numIndices = 0;
+                this._indicesLength = 0;
                 this._dirtyIndices = false;
                 this._elementsPerVertex = 0;
                 this._elementsPerVertex = 0;
@@ -393,31 +403,42 @@ var spine;
             }
             Mesh.prototype.attributes = function () { return this._attributes; };
             Mesh.prototype.maxVertices = function () { return this._vertices.length / this._elementsPerVertex; };
-            Mesh.prototype.numVertices = function () { return this._numVertices / this._elementsPerVertex; };
+            Mesh.prototype.numVertices = function () { return this._verticesLength / this._elementsPerVertex; };
+            Mesh.prototype.setVerticesLength = function (length) {
+                this._dirtyVertices = true;
+                this._verticesLength = length;
+            };
+            Mesh.prototype.vertices = function () { return this._vertices; };
             Mesh.prototype.maxIndices = function () { return this._indices.length; };
-            Mesh.prototype.numIndices = function () { return this._numIndices; };
+            Mesh.prototype.numIndices = function () { return this._indicesLength; };
+            Mesh.prototype.setIndicesLength = function (length) {
+                this._dirtyIndices = true;
+                this._indicesLength = length;
+            };
+            Mesh.prototype.indices = function () { return this._indices; };
+            ;
             Mesh.prototype.setVertices = function (vertices) {
                 this._dirtyVertices = true;
                 if (vertices.length > this._vertices.length)
                     throw Error("Mesh can't store more than " + this.maxVertices() + " vertices");
                 this._vertices.set(vertices, 0);
-                this._numVertices = vertices.length;
+                this._verticesLength = vertices.length;
             };
             Mesh.prototype.setIndices = function (indices) {
                 this._dirtyIndices = true;
                 if (indices.length > this._indices.length)
                     throw Error("Mesh can't store more than " + this.maxIndices() + " indices");
                 this._indices.set(indices, 0);
-                this._numIndices = indices.length;
+                this._indicesLength = indices.length;
             };
-            Mesh.prototype.render = function (shader, primitiveType) {
-                this.renderWithOffset(shader, primitiveType, 0, this._numIndices > 0 ? this._numIndices : this._numVertices);
+            Mesh.prototype.draw = function (shader, primitiveType) {
+                this.drawWithOffset(shader, primitiveType, 0, this._indicesLength > 0 ? this._indicesLength : this._verticesLength);
             };
-            Mesh.prototype.renderWithOffset = function (shader, primitiveType, offset, count) {
+            Mesh.prototype.drawWithOffset = function (shader, primitiveType, offset, count) {
                 if (this._dirtyVertices || this._dirtyIndices)
                     this.update();
                 this.bind(shader);
-                if (this._numIndices > 0)
+                if (this._indicesLength > 0)
                     webgl.gl.drawElements(primitiveType, count, webgl.gl.UNSIGNED_SHORT, offset * 2);
                 else
                     webgl.gl.drawArrays(primitiveType, offset, count);
@@ -433,7 +454,7 @@ var spine;
                     webgl.gl.vertexAttribPointer(location_1, attrib.numElements, webgl.gl.FLOAT, false, this._elementsPerVertex * 4, offset * 4);
                     offset += attrib.numElements;
                 }
-                if (this._numIndices > 0)
+                if (this._indicesLength > 0)
                     webgl.gl.bindBuffer(webgl.gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
             };
             Mesh.prototype.unbind = function (shader) {
@@ -443,7 +464,7 @@ var spine;
                     webgl.gl.disableVertexAttribArray(location_2);
                 }
                 webgl.gl.bindBuffer(webgl.gl.ARRAY_BUFFER, null);
-                if (this._numIndices > 0)
+                if (this._indicesLength > 0)
                     webgl.gl.bindBuffer(webgl.gl.ELEMENT_ARRAY_BUFFER, null);
             };
             Mesh.prototype.update = function () {
@@ -452,7 +473,7 @@ var spine;
                         this._verticesBuffer = webgl.gl.createBuffer();
                     }
                     webgl.gl.bindBuffer(webgl.gl.ARRAY_BUFFER, this._verticesBuffer);
-                    webgl.gl.bufferData(webgl.gl.ARRAY_BUFFER, this._vertices.subarray(0, this._numVertices), webgl.gl.STATIC_DRAW);
+                    webgl.gl.bufferData(webgl.gl.ARRAY_BUFFER, this._vertices.subarray(0, this._verticesLength), webgl.gl.STATIC_DRAW);
                     this._dirtyVertices = false;
                 }
                 if (this._dirtyIndices) {
@@ -460,7 +481,7 @@ var spine;
                         this._indicesBuffer = webgl.gl.createBuffer();
                     }
                     webgl.gl.bindBuffer(webgl.gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
-                    webgl.gl.bufferData(webgl.gl.ELEMENT_ARRAY_BUFFER, this._indices.subarray(0, this._numIndices), webgl.gl.STATIC_DRAW);
+                    webgl.gl.bufferData(webgl.gl.ELEMENT_ARRAY_BUFFER, this._indices.subarray(0, this._indicesLength), webgl.gl.STATIC_DRAW);
                     this._dirtyIndices = false;
                 }
             };
@@ -523,12 +544,84 @@ var spine;
 (function (spine) {
     var webgl;
     (function (webgl) {
-        var PolygonBatch = (function () {
-            function PolygonBatch() {
+        var PolygonBatcher = (function () {
+            function PolygonBatcher(maxVertices) {
+                if (maxVertices === void 0) { maxVertices = 10920; }
+                this._drawCalls = 0;
+                this._drawing = false;
+                this._shader = null;
+                this._lastTexture = null;
+                this._verticesLength = 0;
+                this._indicesLength = 0;
+                this._srcBlend = webgl.gl.SRC_ALPHA;
+                this._dstBlend = webgl.gl.ONE_MINUS_SRC_ALPHA;
+                if (maxVertices > 10920)
+                    throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
+                this._mesh = new webgl.Mesh([new webgl.Position2Attribute(), new webgl.ColorAttribute(), new webgl.TexCoordAttribute()], maxVertices, maxVertices * 3);
             }
-            return PolygonBatch;
+            PolygonBatcher.prototype.begin = function (shader) {
+                if (this._drawing)
+                    throw new Error("PolygonBatch is already drawing. Call PolygonBatch.end() before calling PolygonBatch.begin()");
+                this._drawCalls = 0;
+                this._shader = shader;
+                this._lastTexture = null;
+                this._drawing = true;
+                webgl.gl.enable(webgl.gl.BLEND);
+                webgl.gl.blendFunc(this._srcBlend, this._dstBlend);
+            };
+            PolygonBatcher.prototype.setBlendMode = function (srcBlend, dstBlend) {
+                this._srcBlend = srcBlend;
+                this._dstBlend = dstBlend;
+                if (this._drawing) {
+                    this.flush();
+                    webgl.gl.blendFunc(this._srcBlend, this._dstBlend);
+                }
+            };
+            PolygonBatcher.prototype.draw = function (texture, vertices, indices) {
+                if (texture != this._lastTexture) {
+                    this.flush();
+                    this._lastTexture = texture;
+                    texture.bind();
+                }
+                else if (this._verticesLength + vertices.length > this._mesh.vertices().length ||
+                    this._indicesLength + indices.length > this._mesh.indices().length) {
+                    this.flush();
+                }
+                var indexStart = this._mesh.numVertices();
+                this._mesh.vertices().set(vertices, this._verticesLength);
+                this._verticesLength += vertices.length;
+                this._mesh.setVerticesLength(this._verticesLength);
+                var indicesArray = this._mesh.indices();
+                for (var i = this._indicesLength, j = 0; j < indices.length; i++, j++) {
+                    indicesArray[i] = indices[j] + indexStart;
+                }
+                this._indicesLength += indices.length;
+                this._mesh.setIndicesLength(this._indicesLength);
+            };
+            PolygonBatcher.prototype.flush = function () {
+                if (this._verticesLength == 0)
+                    return;
+                this._mesh.draw(this._shader, webgl.gl.TRIANGLES);
+                this._verticesLength = 0;
+                this._indicesLength = 0;
+                this._mesh.setVerticesLength(0);
+                this._mesh.setIndicesLength(0);
+                this._drawCalls++;
+            };
+            PolygonBatcher.prototype.end = function () {
+                if (!this._drawing)
+                    throw new Error("PolygonBatch is not drawing. Call PolygonBatch.begin() before calling PolygonBatch.end()");
+                if (this._verticesLength > 0 || this._indicesLength > 0)
+                    this.flush();
+                this._shader = null;
+                this._lastTexture = null;
+                this._drawing = false;
+                webgl.gl.disable(webgl.gl.BLEND);
+            };
+            PolygonBatcher.prototype.drawCalls = function () { return this._drawCalls; };
+            return PolygonBatcher;
         }());
-        webgl.PolygonBatch = PolygonBatch;
+        webgl.PolygonBatcher = PolygonBatcher;
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
 var spine;
@@ -996,6 +1089,27 @@ var spine;
             spine.webgl.gl = gl;
         }
         webgl.init = init;
+        function getSourceGLBlendMode(blendMode, premultipliedAlpha) {
+            if (premultipliedAlpha === void 0) { premultipliedAlpha = false; }
+            switch (blendMode) {
+                case spine.BlendMode.Normal: return premultipliedAlpha ? webgl.gl.ONE : webgl.gl.SRC_ALPHA;
+                case spine.BlendMode.Additive: return premultipliedAlpha ? webgl.gl.ONE : webgl.gl.SRC_ALPHA;
+                case spine.BlendMode.Multiply: return webgl.gl.DST_COLOR;
+                case spine.BlendMode.Screen: return webgl.gl.ONE;
+                default: throw new Error("Unknown blend mode: " + blendMode);
+            }
+        }
+        webgl.getSourceGLBlendMode = getSourceGLBlendMode;
+        function getDestGLBlendMode(blendMode) {
+            switch (blendMode) {
+                case spine.BlendMode.Normal: return webgl.gl.ONE_MINUS_SRC_ALPHA;
+                case spine.BlendMode.Additive: return webgl.gl.ONE;
+                case spine.BlendMode.Multiply: return webgl.gl.ONE_MINUS_SRC_ALPHA;
+                case spine.BlendMode.Screen: return webgl.gl.ONE_MINUS_SRC_ALPHA;
+                default: throw new Error("Unknown blend mode: " + blendMode);
+            }
+        }
+        webgl.getDestGLBlendMode = getDestGLBlendMode;
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
 //# sourceMappingURL=spine-webgl.js.map
