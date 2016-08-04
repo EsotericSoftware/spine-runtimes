@@ -134,26 +134,26 @@ public class Bone implements Updatable {
 			d = pc * lb + pd * ld;
 		} else {
 			if (data.inheritRotation) { // No scale inheritance.
-				pa = 1;
-				pb = 0;
-				pc = 0;
-				pd = 1;
-				do {
-					float cos = cosDeg(parent.appliedRotation), sin = sinDeg(parent.appliedRotation);
-					float temp = pa * cos + pb * sin;
-					pb = pb * cos - pa * sin;
-					pa = temp;
-					temp = pc * cos + pd * sin;
-					pd = pd * cos - pc * sin;
-					pc = temp;
-
-					if (!parent.data.inheritRotation) break;
-					parent = parent.parent;
-				} while (parent != null);
 				a = pa * la + pb * lc;
 				b = pa * lb + pb * ld;
 				c = pc * la + pd * lc;
 				d = pc * lb + pd * ld;
+				float bs = (float)Math.sqrt(a * a + c * c), s = bs > 0.00001f ? 1 / bs : 0;
+				a *= s;
+				c *= s;
+				bs = (float)Math.sqrt(b * b + d * d);
+				s = bs > 0.00001f ? 1 / bs : 0;
+				b *= s;
+				d *= s;
+				float by = atan2(d, b);
+				float r = PI / 2 - (by - atan2(c, a));
+				if (r > PI)
+					r -= PI2;
+				else if (r < -PI) r += PI2;
+				r += by;
+				s = (float)Math.sqrt(b * b + d * d);
+				b = cos(r) * s;
+				d = sin(r) * s;
 			} else if (data.inheritScale) { // No rotation inheritance.
 				pa = 1;
 				pb = 0;
