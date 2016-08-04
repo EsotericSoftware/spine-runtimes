@@ -82,14 +82,20 @@ public class SkeletonRendererDebug {
 
 		Array<Bone> bones = skeleton.getBones();
 		if (drawBones) {
-			shapes.setColor(boneLineColor);
 			shapes.begin(ShapeType.Filled);
 			for (int i = 0, n = bones.size; i < n; i++) {
 				Bone bone = bones.get(i);
 				if (bone.parent == null) continue;
-				float x = skeletonX + bone.data.length * bone.a + bone.worldX;
-				float y = skeletonY + bone.data.length * bone.c + bone.worldY;
-				shapes.rectLine(skeletonX + bone.worldX, skeletonY + bone.worldY, x, y, boneWidth * scale);
+				float length = bone.data.length, width = boneWidth;
+				if (length == 0) {
+					length = 8;
+					width /= 2;
+					shapes.setColor(boneOriginColor);
+				} else
+					shapes.setColor(boneLineColor);
+				float x = skeletonX + length * bone.a + bone.worldX;
+				float y = skeletonY + length * bone.c + bone.worldY;
+				shapes.rectLine(skeletonX + bone.worldX, skeletonY + bone.worldY, x, y, width * scale);
 			}
 			shapes.end();
 			shapes.begin(ShapeType.Line);
