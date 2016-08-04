@@ -4,14 +4,14 @@ module spine {
     }
 
     export interface Disposable {
-        dispose(): void;
+        dispose (): void;
     }
 
     export class Color {        
-        constructor(public r: number, public g: number, public b: number, public a: number) {            
+        constructor( public r: number, public g: number, public b: number, public a: number) {            
         }
 
-        set(r: number, g: number, b: number, a: number) {
+        set (r: number, g: number, b: number, a: number) {
             this.r = r;
             this.g = g;
             this.b = b;
@@ -19,7 +19,7 @@ module spine {
             this.clamp();
         }
 
-        add(r: number, g: number, b: number, a: number) {
+        add (r: number, g: number, b: number, a: number) {
             this.r += r;
             this.g += g;
             this.b += b;
@@ -27,7 +27,7 @@ module spine {
             this.clamp();
         }
 
-        clamp() {
+        clamp () {
             if (this.r < 0)
                 this.r = 0;
             else if (this.r > 1) this.r = 1;
@@ -48,21 +48,40 @@ module spine {
     }
 
     export class MathUtils {
-        static clamp(value: number, min: number, max: number) {
+        static PI = 3.1415927;
+	    static PI2 = MathUtils.PI * 2;        	
+	    static radiansToDegrees = 180 / MathUtils.PI;
+	    static radDeg = MathUtils.radiansToDegrees;	
+	    static degreesToRadians = MathUtils.PI / 180;
+	    static degRad = MathUtils.degreesToRadians;
+
+        static clamp (value: number, min: number, max: number) {
             if (value < min) return min;
             if (value > max) return max;
             return value;
         }
+
+        static cosDeg (degrees: number) {
+            return Math.cos(degrees * MathUtils.degRad);
+        }
+
+        static sinDeg (degrees: number) {
+            return Math.sin(degrees * MathUtils.degRad);
+        }
+
+        static signum (value: number): number {
+            return value >= 0? 1: -1;            
+        }
     }
 
     export class Utils {
-        static arrayCopy(source: Array<number>, sourceStart: number, dest: Array<Number>, destStart: number, numElements: number) {
+        static arrayCopy (source: Array<number>, sourceStart: number, dest: Array<Number>, destStart: number, numElements: number) {
             for (var i = sourceStart, j = destStart; i < sourceStart + numElements; i++, j++) {
                 dest[j] = source[i];
             }
         }  
 
-        static setArraySize(array: Array<number>, size: number): Array<number> {
+        static setArraySize (array: Array<number>, size: number): Array<number> {
             let oldSize = array.length;
             array.length = size;
             if (oldSize < size) {
@@ -70,5 +89,16 @@ module spine {
             }
             return array;
         } 
+    }
+
+    export class Vector2 {        
+        constructor (public x = 0, public y = 0) {            
+        }
+
+        set (x: number, y: number): Vector2 {
+            this.x = x;
+            this.y = y;
+            return this;
+        }        
     }
 }
