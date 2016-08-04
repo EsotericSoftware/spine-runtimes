@@ -7,11 +7,69 @@ declare module spine {
     }
 }
 declare module spine {
+    class BoneData {
+        index: number;
+        name: string;
+        parent: BoneData;
+        length: number;
+        x: number;
+        y: number;
+        rotation: number;
+        scaleX: number;
+        scaleY: number;
+        shearX: number;
+        shearY: number;
+        inheritRotation: boolean;
+        inheritScale: boolean;
+        BoneData(index: number, name: string, parent: BoneData): void;
+    }
+}
+declare module spine {
+    class SlotData {
+        index: number;
+        name: string;
+        boneData: BoneData;
+        color: Color;
+        attachmentName: string;
+        blendMode: BlendMode;
+    }
+}
+declare module spine {
+    class TransformConstraintData {
+        name: string;
+        bones: BoneData[];
+        target: BoneData;
+        rotateMix: number;
+        translateMix: number;
+        scaleMix: number;
+        shearMix: number;
+        offsetRotation: number;
+        offsetX: number;
+        offsetY: number;
+        offsetScaleX: number;
+        offsetScaleY: number;
+        offsetShearY: number;
+        constructor(name: string);
+    }
+}
+declare module spine {
+    interface Updatable {
+        update(): void;
+    }
+}
+declare module spine {
     interface Map<T> {
         [key: string]: T;
     }
     interface Disposable {
         dispose(): void;
+    }
+    class Color {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+        constructor(r: number, g: number, b: number, a: number);
     }
 }
 declare module spine.webgl {

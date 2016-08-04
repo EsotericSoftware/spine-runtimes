@@ -1,3 +1,529 @@
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var spine;
+(function (spine) {
+    var Animation = (function () {
+        function Animation(name, timelines, duration) {
+            if (name == null)
+                throw new Error("name cannot be null.");
+            if (timelines == null)
+                throw new Error("timelines cannot be null.");
+            this.name = name;
+            this.timelines = timelines;
+            this.duration = duration;
+        }
+        Animation.prototype.apply = function (skeleton, lastTime, time, loop, events) {
+            if (skeleton == null)
+                throw new Error("skeleton cannot be null.");
+            if (loop && this.duration != 0) {
+                time %= this.duration;
+                if (lastTime > 0)
+                    lastTime %= this.duration;
+            }
+            var timelines = this.timelines;
+            for (var i = 0, n = timelines.length; i < n; i++)
+                timelines[i].apply(skeleton, lastTime, time, events, 1);
+        };
+        Animation.prototype.mix = function (skeleton, lastTime, time, loop, events, alpha) {
+            if (skeleton == null)
+                throw new Error("skeleton cannot be null.");
+            if (loop && this.duration != 0) {
+                time %= this.duration;
+                if (lastTime > 0)
+                    lastTime %= this.duration;
+            }
+            var timelines = this.timelines;
+            for (var i = 0, n = timelines.length; i < n; i++)
+                timelines[i].apply(skeleton, lastTime, time, events, alpha);
+        };
+        Animation.binarySearch = function (values, target, step) {
+            if (step === void 0) { step = 1; }
+            var low = 0;
+            var high = values.length / step - 2;
+            if (high == 0)
+                return step;
+            var current = high >>> 1;
+            while (true) {
+                if (values[(current + 1) * step] <= target)
+                    low = current + 1;
+                else
+                    high = current;
+                if (low == high)
+                    return (low + 1) * step;
+                current = (low + high) >>> 1;
+            }
+        };
+        Animation.linearSearch = function (values, target, step) {
+            for (var i = 0, last = values.length - step; i <= last; i += step)
+                if (values[i] > target)
+                    return i;
+            return -1;
+        };
+        return Animation;
+    }());
+    spine.Animation = Animation;
+    var CurveTimeline = (function () {
+        function CurveTimeline(frameCount) {
+            if (frameCount <= 0)
+                throw new Error("frameCount must be > 0: " + frameCount);
+            this.curves = new Array((frameCount - 1) * CurveTimeline.BEZIER_SIZE);
+        }
+        CurveTimeline.prototype.getFrameCount = function () {
+            return this.curves.length / CurveTimeline.BEZIER_SIZE + 1;
+        };
+        CurveTimeline.prototype.setLinear = function (frameIndex) {
+            this.curves[frameIndex * CurveTimeline.BEZIER_SIZE] = CurveTimeline.LINEAR;
+        };
+        CurveTimeline.prototype.setStepped = function (frameIndex) {
+            this.curves[frameIndex * CurveTimeline.BEZIER_SIZE] = CurveTimeline.STEPPED;
+        };
+        CurveTimeline.prototype.getCurveType = function (frameIndex) {
+            var index = frameIndex * CurveTimeline.BEZIER_SIZE;
+            if (index == this.curves.length)
+                return CurveTimeline.LINEAR;
+            var type = this.curves[index];
+            if (type == CurveTimeline.LINEAR)
+                return CurveTimeline.LINEAR;
+            if (type == CurveTimeline.STEPPED)
+                return CurveTimeline.STEPPED;
+            return CurveTimeline.BEZIER;
+        };
+        /** Sets the control handle positions for an interpolation bezier curve used to transition from this keyframe to the next.
+         * cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of
+         * the difference between the keyframe's values. */
+        CurveTimeline.prototype.setCurve = function (frameIndex, cx1, cy1, cx2, cy2) {
+            var tmpx = (-cx1 * 2 + cx2) * 0.03, tmpy = (-cy1 * 2 + cy2) * 0.03;
+            var dddfx = ((cx1 - cx2) * 3 + 1) * 0.006, dddfy = ((cy1 - cy2) * 3 + 1) * 0.006;
+            var ddfx = tmpx * 2 + dddfx, ddfy = tmpy * 2 + dddfy;
+            var dfx = cx1 * 0.3 + tmpx + dddfx * 0.16666667, dfy = cy1 * 0.3 + tmpy + dddfy * 0.16666667;
+            var i = frameIndex * CurveTimeline.BEZIER_SIZE;
+            var curves = this.curves;
+            curves[i++] = CurveTimeline.BEZIER;
+            var x = dfx, y = dfy;
+            for (var n = i + CurveTimeline.BEZIER_SIZE - 1; i < n; i += 2) {
+                curves[i] = x;
+                curves[i + 1] = y;
+                dfx += ddfx;
+                dfy += ddfy;
+                ddfx += dddfx;
+                ddfy += dddfy;
+                x += dfx;
+                y += dfy;
+            }
+        };
+        CurveTimeline.prototype.getCurvePercent = function (frameIndex, percent) {
+            percent = spine.MathUtils.clamp(percent, 0, 1);
+            var curves = this.curves;
+            var i = frameIndex * CurveTimeline.BEZIER_SIZE;
+            var type = curves[i];
+            if (type == CurveTimeline.LINEAR)
+                return percent;
+            if (type == CurveTimeline.STEPPED)
+                return 0;
+            i++;
+            var x = 0;
+            for (var start = i, n = i + CurveTimeline.BEZIER_SIZE - 1; i < n; i += 2) {
+                x = curves[i];
+                if (x >= percent) {
+                    var prevX, prevY;
+                    if (i == start) {
+                        prevX = 0;
+                        prevY = 0;
+                    }
+                    else {
+                        prevX = curves[i - 2];
+                        prevY = curves[i - 1];
+                    }
+                    return prevY + (curves[i + 1] - prevY) * (percent - prevX) / (x - prevX);
+                }
+            }
+            var y = curves[i - 1];
+            return y + (1 - y) * (percent - x) / (1 - x); // Last point is 1,1.
+        };
+        CurveTimeline.LINEAR = 0;
+        CurveTimeline.STEPPED = 1;
+        CurveTimeline.BEZIER = 2;
+        CurveTimeline.BEZIER_SIZE = 10 * 2 - 1;
+        return CurveTimeline;
+    }());
+    spine.CurveTimeline = CurveTimeline;
+    var RotateTimeline = (function (_super) {
+        __extends(RotateTimeline, _super);
+        function RotateTimeline(frameCount) {
+            _super.call(this, frameCount);
+            this.frames = new Array(frameCount << 1);
+        }
+        /** Sets the time and angle of the specified keyframe. */
+        RotateTimeline.prototype.setFrame = function (frameIndex, time, degrees) {
+            frameIndex <<= 1;
+            this.frames[frameIndex] = time;
+            this.frames[frameIndex + RotateTimeline.ROTATION] = degrees;
+        };
+        RotateTimeline.prototype.apply = function (skeleton, lastTime, time, events, alpha) {
+            var frames = this.frames;
+            if (time < frames[0])
+                return; // Time is before first frame.
+            var bone = skeleton.bones.get(this.boneIndex);
+            if (time >= frames[frames.length - RotateTimeline.ENTRIES]) {
+                var amount_1 = bone.data.rotation + frames[frames.length + RotateTimeline.PREV_ROTATION] - bone.rotation;
+                while (amount_1 > 180)
+                    amount_1 -= 360;
+                while (amount_1 < -180)
+                    amount_1 += 360;
+                bone.rotation += amount_1 * alpha;
+                return;
+            }
+            // Interpolate between the previous frame and the current frame.
+            var frame = Animation.binarySearch(frames, time, RotateTimeline.ENTRIES);
+            var prevRotation = frames[frame + RotateTimeline.PREV_ROTATION];
+            var frameTime = frames[frame];
+            var percent = this.getCurvePercent((frame >> 1) - 1, 1 - (time - frameTime) / (frames[frame + RotateTimeline.PREV_TIME] - frameTime));
+            var amount = frames[frame + RotateTimeline.ROTATION] - prevRotation;
+            while (amount > 180)
+                amount -= 360;
+            while (amount < -180)
+                amount += 360;
+            amount = bone.data.rotation + (prevRotation + amount * percent) - bone.rotation;
+            while (amount > 180)
+                amount -= 360;
+            while (amount < -180)
+                amount += 360;
+            bone.rotation += amount * alpha;
+        };
+        RotateTimeline.ENTRIES = 2;
+        RotateTimeline.PREV_TIME = -2;
+        RotateTimeline.PREV_ROTATION = -1;
+        RotateTimeline.ROTATION = 1;
+        return RotateTimeline;
+    }(CurveTimeline));
+    spine.RotateTimeline = RotateTimeline;
+    var TranslateTimeline = (function (_super) {
+        __extends(TranslateTimeline, _super);
+        function TranslateTimeline(frameCount) {
+            _super.call(this, frameCount);
+            this.frames = new Array(frameCount * TranslateTimeline.ENTRIES);
+        }
+        /** Sets the time and value of the specified keyframe. */
+        TranslateTimeline.prototype.setFrame = function (frameIndex, time, x, y) {
+            frameIndex *= TranslateTimeline.ENTRIES;
+            this.frames[frameIndex] = time;
+            this.frames[frameIndex + TranslateTimeline.X] = x;
+            this.frames[frameIndex + TranslateTimeline.Y] = y;
+        };
+        TranslateTimeline.prototype.apply = function (skeleton, lastTime, time, events, alpha) {
+            var frames = this.frames;
+            if (time < frames[0])
+                return; // Time is before first frame.
+            var bone = skeleton.bones.get(this.boneIndex);
+            if (time >= frames[frames.length - TranslateTimeline.ENTRIES]) {
+                bone.x += (bone.data.x + frames[frames.length + TranslateTimeline.PREV_X] - bone.x) * alpha;
+                bone.y += (bone.data.y + frames[frames.length + TranslateTimeline.PREV_Y] - bone.y) * alpha;
+                return;
+            }
+            // Interpolate between the previous frame and the current frame.
+            var frame = Animation.binarySearch(frames, time, TranslateTimeline.ENTRIES);
+            var prevX = frames[frame + TranslateTimeline.PREV_X];
+            var prevY = frames[frame + TranslateTimeline.PREV_Y];
+            var frameTime = frames[frame];
+            var percent = this.getCurvePercent(frame / TranslateTimeline.ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + TranslateTimeline.PREV_TIME] - frameTime));
+            bone.x += (bone.data.x + prevX + (frames[frame + TranslateTimeline.X] - prevX) * percent - bone.x) * alpha;
+            bone.y += (bone.data.y + prevY + (frames[frame + TranslateTimeline.Y] - prevY) * percent - bone.y) * alpha;
+        };
+        TranslateTimeline.ENTRIES = 3;
+        TranslateTimeline.PREV_TIME = -3;
+        TranslateTimeline.PREV_X = -2;
+        TranslateTimeline.PREV_Y = -1;
+        TranslateTimeline.X = 1;
+        TranslateTimeline.Y = 2;
+        return TranslateTimeline;
+    }(CurveTimeline));
+    spine.TranslateTimeline = TranslateTimeline;
+    var ScaleTimeline = (function (_super) {
+        __extends(ScaleTimeline, _super);
+        function ScaleTimeline(frameCount) {
+            _super.call(this, frameCount);
+        }
+        ScaleTimeline.prototype.apply = function (skeleton, lastTime, time, events, alpha) {
+            var frames = this.frames;
+            if (time < frames[0])
+                return; // Time is before first frame.
+            var bone = skeleton.bones.get(this.boneIndex);
+            if (time >= frames[frames.length - ScaleTimeline.ENTRIES]) {
+                bone.scaleX += (bone.data.scaleX * frames[frames.length + ScaleTimeline.PREV_X] - bone.scaleX) * alpha;
+                bone.scaleY += (bone.data.scaleY * frames[frames.length + ScaleTimeline.PREV_Y] - bone.scaleY) * alpha;
+                return;
+            }
+            // Interpolate between the previous frame and the current frame.
+            var frame = Animation.binarySearch(frames, time, ScaleTimeline.ENTRIES);
+            var prevX = frames[frame + ScaleTimeline.PREV_X];
+            var prevY = frames[frame + ScaleTimeline.PREV_Y];
+            var frameTime = frames[frame];
+            var percent = this.getCurvePercent(frame / ScaleTimeline.ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + ScaleTimeline.PREV_TIME] - frameTime));
+            bone.scaleX += (bone.data.scaleX * (prevX + (frames[frame + ScaleTimeline.X] - prevX) * percent) - bone.scaleX) * alpha;
+            bone.scaleY += (bone.data.scaleY * (prevY + (frames[frame + ScaleTimeline.Y] - prevY) * percent) - bone.scaleY) * alpha;
+        };
+        return ScaleTimeline;
+    }(TranslateTimeline));
+    spine.ScaleTimeline = ScaleTimeline;
+    var ShearTimeline = (function (_super) {
+        __extends(ShearTimeline, _super);
+        function ShearTimeline(frameCount) {
+            _super.call(this, frameCount);
+        }
+        ShearTimeline.prototype.apply = function (skeleton, lastTime, time, events, alpha) {
+            var frames = this.frames;
+            if (time < frames[0])
+                return; // Time is before first frame.
+            var bone = skeleton.bones.get(this.boneIndex);
+            if (time >= frames[frames.length - ShearTimeline.ENTRIES]) {
+                bone.shearX += (bone.data.shearX + frames[frames.length + ShearTimeline.PREV_X] - bone.shearX) * alpha;
+                bone.shearY += (bone.data.shearY + frames[frames.length + ShearTimeline.PREV_Y] - bone.shearY) * alpha;
+                return;
+            }
+            // Interpolate between the previous frame and the current frame.
+            var frame = Animation.binarySearch(frames, time, ShearTimeline.ENTRIES);
+            var prevX = frames[frame + ShearTimeline.PREV_X];
+            var prevY = frames[frame + ShearTimeline.PREV_Y];
+            var frameTime = frames[frame];
+            var percent = this.getCurvePercent(frame / ShearTimeline.ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + ShearTimeline.PREV_TIME] - frameTime));
+            bone.shearX += (bone.data.shearX + (prevX + (frames[frame + ShearTimeline.X] - prevX) * percent) - bone.shearX) * alpha;
+            bone.shearY += (bone.data.shearY + (prevY + (frames[frame + ShearTimeline.Y] - prevY) * percent) - bone.shearY) * alpha;
+        };
+        return ShearTimeline;
+    }(TranslateTimeline));
+    spine.ShearTimeline = ShearTimeline;
+    var ColorTimeline = (function (_super) {
+        __extends(ColorTimeline, _super);
+        function ColorTimeline(frameCount) {
+            _super.call(this, frameCount);
+            this.frames = new Array(frameCount * ColorTimeline.ENTRIES);
+        }
+        /** Sets the time and value of the specified keyframe. */
+        ColorTimeline.prototype.setFrame = function (frameIndex, time, r, g, b, a) {
+            frameIndex *= ColorTimeline.ENTRIES;
+            this.frames[frameIndex] = time;
+            this.frames[frameIndex + ColorTimeline.R] = r;
+            this.frames[frameIndex + ColorTimeline.G] = g;
+            this.frames[frameIndex + ColorTimeline.B] = b;
+            this.frames[frameIndex + ColorTimeline.A] = a;
+        };
+        ColorTimeline.prototype.apply = function (skeleton, lastTime, time, events, alpha) {
+            var frames = this.frames;
+            if (time < frames[0])
+                return; // Time is before first frame.
+            var r = 0, g = 0, b = 0, a = 0;
+            if (time >= frames[frames.length - ColorTimeline.ENTRIES]) {
+                var i = frames.length;
+                r = frames[i + ColorTimeline.PREV_R];
+                g = frames[i + ColorTimeline.PREV_G];
+                b = frames[i + ColorTimeline.PREV_B];
+                a = frames[i + ColorTimeline.PREV_A];
+            }
+            else {
+                // Interpolate between the previous frame and the current frame.
+                var frame = Animation.binarySearch(frames, time, ColorTimeline.ENTRIES);
+                r = frames[frame + ColorTimeline.PREV_R];
+                g = frames[frame + ColorTimeline.PREV_G];
+                b = frames[frame + ColorTimeline.PREV_B];
+                a = frames[frame + ColorTimeline.PREV_A];
+                var frameTime = frames[frame];
+                var percent = this.getCurvePercent(frame / ColorTimeline.ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + ColorTimeline.PREV_TIME] - frameTime));
+                r += (frames[frame + ColorTimeline.R] - r) * percent;
+                g += (frames[frame + ColorTimeline.G] - g) * percent;
+                b += (frames[frame + ColorTimeline.B] - b) * percent;
+                a += (frames[frame + ColorTimeline.A] - a) * percent;
+            }
+            var color = skeleton.slots.get(this.slotIndex).color;
+            if (alpha < 1)
+                color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
+            else
+                color.set(r, g, b, a);
+        };
+        ColorTimeline.ENTRIES = 5;
+        ColorTimeline.PREV_TIME = -5;
+        ColorTimeline.PREV_R = -4;
+        ColorTimeline.PREV_G = -3;
+        ColorTimeline.PREV_B = -2;
+        ColorTimeline.PREV_A = -1;
+        ColorTimeline.R = 1;
+        ColorTimeline.G = 2;
+        ColorTimeline.B = 3;
+        ColorTimeline.A = 4;
+        return ColorTimeline;
+    }(CurveTimeline));
+    spine.ColorTimeline = ColorTimeline;
+    var AttachmentTimeline = (function () {
+        function AttachmentTimeline(frameCount) {
+            this.frames = new Array(frameCount);
+            this.attachmentNames = new Array(frameCount);
+        }
+        AttachmentTimeline.prototype.getFrameCount = function () {
+            return this.frames.length;
+        };
+        /** Sets the time and value of the specified keyframe. */
+        AttachmentTimeline.prototype.setFrame = function (frameIndex, time, attachmentName) {
+            this.frames[frameIndex] = time;
+            this.attachmentNames[frameIndex] = attachmentName;
+        };
+        AttachmentTimeline.prototype.apply = function (skeleton, lastTime, time, events, alpha) {
+            var frames = this.frames;
+            if (time < frames[0])
+                return; // Time is before first frame.
+            var frameIndex = 0;
+            if (time >= frames[frames.length - 1])
+                frameIndex = frames.length - 1;
+            else
+                frameIndex = Animation.binarySearch(frames, time, 1) - 1;
+            var attachmentName = this.attachmentNames[frameIndex];
+            skeleton.slots.get(this.slotIndex)
+                .setAttachment(attachmentName == null ? null : skeleton.getAttachment(this.slotIndex, attachmentName));
+        };
+        return AttachmentTimeline;
+    }());
+    spine.AttachmentTimeline = AttachmentTimeline;
+    var EventTimeline = (function () {
+        function EventTimeline(frameCount) {
+            this.frames = new Array(frameCount);
+            this.events = new Array(frameCount);
+        }
+        EventTimeline.prototype.getFrameCount = function () {
+            return frames.length;
+        };
+        /** Sets the time of the specified keyframe. */
+        EventTimeline.prototype.setFrame = function (frameIndex, event) {
+            this.frames[frameIndex] = event.time;
+            this.events[frameIndex] = event;
+        };
+        /** Fires events for frames > lastTime and <= time. */
+        EventTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha) {
+            if (firedEvents == null)
+                return;
+            var frames = this.frames;
+            var frameCount = frames.length;
+            if (lastTime > time) {
+                this.apply(skeleton, lastTime, Number.MAX_VALUE, firedEvents, alpha);
+                lastTime = -1;
+            }
+            else if (lastTime >= frames[frameCount - 1])
+                return;
+            if (time < frames[0])
+                return; // Time is before first frame.
+            var frame = 0;
+            if (lastTime < frames[0])
+                frame = 0;
+            else {
+                frame = Animation.binarySearch(frames, lastTime);
+                var frameTime = frames[frame];
+                while (frame > 0) {
+                    if (frames[frame - 1] != frameTime)
+                        break;
+                    frame--;
+                }
+            }
+            for (; frame < frameCount && time >= frames[frame]; frame++)
+                firedEvents.push(this.events[frame]);
+        };
+        return EventTimeline;
+    }());
+    spine.EventTimeline = EventTimeline;
+    var DrawOrderTimeline = (function () {
+        function DrawOrderTimeline(frameCount) {
+            this.frames = new Array(frameCount);
+            this.drawOrders = new Array(frameCount);
+        }
+        DrawOrderTimeline.prototype.getFrameCount = function () {
+            return frames.length;
+        };
+        /** Sets the time of the specified keyframe.
+         * @param drawOrder May be null to use bind pose draw order. */
+        DrawOrderTimeline.prototype.setFrame = function (frameIndex, time, drawOrder) {
+            this.frames[frameIndex] = time;
+            this.drawOrders[frameIndex] = drawOrder;
+        };
+        DrawOrderTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha) {
+            var frames = this.frames;
+            if (time < frames[0])
+                return; // Time is before first frame.
+            var frame = 0;
+            if (time >= frames[frames.length - 1])
+                frame = frames.length - 1;
+            else
+                frame = Animation.binarySearch(frames, time) - 1;
+            var drawOrder = skeleton.drawOrder;
+            var slots = skeleton.slots;
+            var drawOrderToSetupIndex = this.drawOrders[frame];
+            if (drawOrderToSetupIndex == null)
+                spine.Utils.arrayCopy(slots, 0, drawOrder, 0, slots.length);
+            else {
+                for (var i = 0, n = drawOrderToSetupIndex.length; i < n; i++)
+                    drawOrder[i] = slots[drawOrderToSetupIndex[i]];
+            }
+        };
+        return DrawOrderTimeline;
+    }());
+    spine.DrawOrderTimeline = DrawOrderTimeline;
+    var DeformTimeline = (function (_super) {
+        __extends(DeformTimeline, _super);
+        function DeformTimeline(frameCount) {
+            _super.call(this, frameCount);
+            this.frames = new Array(frameCount);
+            this.frameVertices = new Array(frameCount);
+        }
+        /** Sets the time of the specified keyframe. */
+        DeformTimeline.prototype.setFrame = function (frameIndex, time, vertices) {
+            this.frames[frameIndex] = time;
+            this.frameVertices[frameIndex] = vertices;
+        };
+        DeformTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha) {
+            var slot = skeleton.slots.get(this.slotIndex);
+            var slotAttachment = slot.attachment;
+            // FIXME
+            // if (!(slotAttachment instanceof VertexAttachment) || !((VertexAttachment)slotAttachment).applyDeform(attachment)) return;
+            var frames = this.frames;
+            if (time < frames[0])
+                return; // Time is before first frame.
+            var frameVertices = this.frameVertices;
+            var vertexCount = frameVertices[0].length;
+            var verticesArray = slot.getAttachmentVertices();
+            if (verticesArray.length != vertexCount)
+                alpha = 1; // Don't mix from uninitialized slot vertices.
+            var vertices = spine.Utils.setArraySize(verticesArray, vertexCount);
+            if (time >= frames[frames.length - 1]) {
+                var lastVertices = frameVertices[frames.length - 1];
+                if (alpha < 1) {
+                    for (var i = 0; i < vertexCount; i++)
+                        vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
+                }
+                else
+                    spine.Utils.arrayCopy(lastVertices, 0, vertices, 0, vertexCount);
+                return;
+            }
+            // Interpolate between the previous frame and the current frame.
+            var frame = Animation.binarySearch(frames, time);
+            var prevVertices = frameVertices[frame - 1];
+            var nextVertices = frameVertices[frame];
+            var frameTime = frames[frame];
+            var percent = this.getCurvePercent(frame - 1, 1 - (time - frameTime) / (frames[frame - 1] - frameTime));
+            if (alpha < 1) {
+                for (var i = 0; i < vertexCount; i++) {
+                    var prev = prevVertices[i];
+                    vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
+                }
+            }
+            else {
+                for (var i = 0; i < vertexCount; i++) {
+                    var prev = prevVertices[i];
+                    vertices[i] = prev + (nextVertices[i] - prev) * percent;
+                }
+            }
+        };
+        return DeformTimeline;
+    }(CurveTimeline));
+    spine.DeformTimeline = DeformTimeline;
+})(spine || (spine = {}));
 var spine;
 (function (spine) {
     (function (BlendMode) {
@@ -7,6 +533,223 @@ var spine;
         BlendMode[BlendMode["Screen"] = 3] = "Screen";
     })(spine.BlendMode || (spine.BlendMode = {}));
     var BlendMode = spine.BlendMode;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var BoneData = (function () {
+        function BoneData() {
+            this.x = 0;
+            this.y = 0;
+            this.rotation = 0;
+            this.scaleX = 1;
+            this.scaleY = 1;
+            this.shearX = 0;
+            this.shearY = 0;
+            this.inheritRotation = true;
+            this.inheritScale = true;
+        }
+        BoneData.prototype.BoneData = function (index, name, parent) {
+            if (index < 0)
+                throw new Error("index must be >= 0.");
+            if (name == null)
+                throw new Error("name cannot be null.");
+            this.index = index;
+            this.name = name;
+            this.parent = parent;
+        };
+        return BoneData;
+    }());
+    spine.BoneData = BoneData;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var Event = (function () {
+        function Event(time, data) {
+            if (data == null)
+                throw new Error("data cannot be null.");
+            this.time = time;
+            this.data = data;
+        }
+        return Event;
+    }());
+    spine.Event = Event;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var EventData = (function () {
+        function EventData() {
+        }
+        return EventData;
+    }());
+    spine.EventData = EventData;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var IkConstraintData = (function () {
+        function IkConstraintData() {
+            this.bones = new Array();
+            this.bendDirection = 1;
+            this.mix = 1;
+        }
+        return IkConstraintData;
+    }());
+    spine.IkConstraintData = IkConstraintData;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var PathConstraintData = (function () {
+        function PathConstraintData() {
+            this.bones = new Array();
+        }
+        return PathConstraintData;
+    }());
+    spine.PathConstraintData = PathConstraintData;
+    (function (PositionMode) {
+        PositionMode[PositionMode["Fixed"] = 0] = "Fixed";
+        PositionMode[PositionMode["Percent"] = 1] = "Percent";
+    })(spine.PositionMode || (spine.PositionMode = {}));
+    var PositionMode = spine.PositionMode;
+    (function (SpacingMode) {
+        SpacingMode[SpacingMode["Length"] = 0] = "Length";
+        SpacingMode[SpacingMode["Fixed"] = 1] = "Fixed";
+        SpacingMode[SpacingMode["Percent"] = 2] = "Percent";
+    })(spine.SpacingMode || (spine.SpacingMode = {}));
+    var SpacingMode = spine.SpacingMode;
+    (function (RotateMode) {
+        RotateMode[RotateMode["Tangent"] = 0] = "Tangent";
+        RotateMode[RotateMode["Chain"] = 1] = "Chain";
+        RotateMode[RotateMode["ChainScale"] = 2] = "ChainScale";
+    })(spine.RotateMode || (spine.RotateMode = {}));
+    var RotateMode = spine.RotateMode;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var SkeletonData = (function () {
+        function SkeletonData() {
+            this.bones = new Array(); // Ordered parents first.
+            this.slots = new Array(); // Setup pose draw order.
+            this.skins = new Array();
+            this.events = new Array();
+            this.animations = new Array();
+            this.ikConstraints = new Array();
+            this.transformConstraints = new Array();
+            this.pathConstraints = new Array();
+        }
+        return SkeletonData;
+    }());
+    spine.SkeletonData = SkeletonData;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var SlotData = (function () {
+        function SlotData() {
+            this.color = new spine.Color(1, 1, 1, 1);
+        }
+        return SlotData;
+    }());
+    spine.SlotData = SlotData;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var TransformConstraintData = (function () {
+        function TransformConstraintData(name) {
+            this.bones = new Array();
+            this.rotateMix = 0;
+            this.translateMix = 0;
+            this.scaleMix = 0;
+            this.shearMix = 0;
+            this.offsetRotation = 0;
+            this.offsetX = 0;
+            this.offsetY = 0;
+            this.offsetScaleX = 0;
+            this.offsetScaleY = 0;
+            this.offsetShearY = 0;
+            if (name == null)
+                throw new Error("name cannot be null.");
+            this.name = name;
+        }
+        return TransformConstraintData;
+    }());
+    spine.TransformConstraintData = TransformConstraintData;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var Color = (function () {
+        function Color(r, g, b, a) {
+            this.r = r;
+            this.g = g;
+            this.b = b;
+            this.a = a;
+        }
+        Color.prototype.set = function (r, g, b, a) {
+            this.r = r;
+            this.g = g;
+            this.b = b;
+            this.a = a;
+            this.clamp();
+        };
+        Color.prototype.add = function (r, g, b, a) {
+            this.r += r;
+            this.g += g;
+            this.b += b;
+            this.a += a;
+            this.clamp();
+        };
+        Color.prototype.clamp = function () {
+            if (this.r < 0)
+                this.r = 0;
+            else if (this.r > 1)
+                this.r = 1;
+            if (this.g < 0)
+                this.g = 0;
+            else if (this.g > 1)
+                this.g = 1;
+            if (this.b < 0)
+                this.b = 0;
+            else if (this.b > 1)
+                this.b = 1;
+            if (this.a < 0)
+                this.a = 0;
+            else if (this.a > 1)
+                this.a = 1;
+            return this;
+        };
+        return Color;
+    }());
+    spine.Color = Color;
+    var MathUtils = (function () {
+        function MathUtils() {
+        }
+        MathUtils.clamp = function (value, min, max) {
+            if (value < min)
+                return min;
+            if (value > max)
+                return max;
+            return value;
+        };
+        return MathUtils;
+    }());
+    spine.MathUtils = MathUtils;
+    var Utils = (function () {
+        function Utils() {
+        }
+        Utils.arrayCopy = function (source, sourceStart, dest, destStart, numElements) {
+            for (var i = sourceStart, j = destStart; i < sourceStart + numElements; i++, j++) {
+                dest[j] = source[i];
+            }
+        };
+        Utils.setArraySize = function (array, size) {
+            var oldSize = array.length;
+            array.length = size;
+            if (oldSize < size) {
+                for (var i = oldSize; i < size; i++)
+                    array[i] = 0;
+            }
+            return array;
+        };
+        return Utils;
+    }());
+    spine.Utils = Utils;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
@@ -377,11 +1120,6 @@ var spine;
         webgl.Matrix4 = Matrix4;
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var spine;
 (function (spine) {
     var webgl;
