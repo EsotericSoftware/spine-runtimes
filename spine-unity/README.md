@@ -2,7 +2,7 @@
 
 The **spine-unity** runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Unity](http://unity3d.com/). spine-unity is based on [spine-csharp](https://github.com/EsotericSoftware/spine-runtimes/tree/master/spine-csharp).
 
-For more documentation, see [spine-unity Documentation](https://github.com/pharan/spine-unity-docs/blob/master/README.md).
+For more documentation, see [spine-unity Documentation](http://esotericsoftware.com/spine-unity).
 
 While spine-unity can render directly with Unity, without the need for any other plugins, it also works with [2D Toolkit](http://www.2dtoolkit.com/) and can render skeletons using a TK2D texture atlas.
 
@@ -14,7 +14,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-unity works with data exported from Spine 3.2.01. Updating spine-unity to [v3.3](https://github.com/EsotericSoftware/spine-runtimes/issues/613) is in progress.
+spine-unity works with data exported from the latest version of Spine.
 
 spine-unity supports all Spine features.
 
@@ -32,9 +32,7 @@ For more documentation, see [spine-unity Documentation](http://esotericsoftware.
 
 ## Quick installation
 
-Download and run this Unity package:
-
-[spine-unity.unitypackage](http://esotericsoftware.com/files/runtimes/unity/spine-unity.unitypackage)
+Download the latest Spine-Unity unitypackage from the download page: http://esotericsoftware.com/spine-unity-download/
 
 In the `Assets/Examples/Scenes` folder you will find many example scenes that demonstrate various spine-unity features.
 
@@ -52,23 +50,13 @@ You can also choose to setup and run from the Git files:
 > - `Gizmos` is a [special folder](http://docs.unity3d.com/Manual/SpecialFolders.html) in Unity. It needs to be at the root of your assets folder to function correctly. (ie. `Assets/Gizmos`
 - `spine-csharp` and `spine-unity` can be placed in any subfolder you want.
 
+For more information on importing the runtime into your Unity project, see the documentation sections on  [installing](http://esotericsoftware.com/spine-unity#Installing) and [updating](http://esotericsoftware.com/spine-unity#Updating-Your-Projects-SpineUnity-Runtime),
+
 ----------
 
-## Importing skeleton data
-
-1. Add your `.json`, `.atlas.txt` and `.png` into your Unity project.
-	- You can do this through Unity's Project View: Drag and drop a folder containing the `.json`, `.atlas.txt` and `.png` files exported from Spine directly into the Unity Project view.
-	- ... or you can opt to do this through Windows File Explorer or OSX Finder. Move or copy your `.json`, `.atlas.txt` and `.png` files into your Unity project's `Assets` folder, ideally in its own subfolder.
-2. spine-unity will automatically detect the `.json` and `.atlas.txt` and attempt to generate the necessary spine-unity assets.
-3. To start using your Spine assets, right-click on the SkeletonDataAsset (the asset with the orange Spine logo on it) and choose `Spine > Instantiate(SkeletonAnimation)`. This will add a GameObject with a `SkeletonAnimation` component on it.
-	-  If you are more familiar with Mecanim, you may choose `Spine > Instantiate(Mecanim)` instead.
-4. For more info on how to control the animation, see the [spine-unity Animation Control documentation](https://github.com/pharan/spine-unity-docs/blob/master/Animation.md).
-
-> The original [manual setup video](https://www.youtube.com/watch?v=-V84OIvZdQc) to shows which assets belong where and what spine-unity's automatic import actually does for you under the hood. In case you have a specialized asset setup, this video will be useful for understanding how assets fit together.
-
 > More resources:
-- [Drag and drop video](http://www.youtube.com/watch?v=-Gk_zJsY1Ms)
-- [readme PDF](https://raw.githubusercontent.com/EsotericSoftware/spine-runtimes/master/spine-unity/README.pdf)
+- [Spine-Unity Documentation](http://esotericsoftware.com/spine-unity)
+- [Importing Spine Skeletons into Unity](http://esotericsoftware.com/spine-unity#Importing-into-Unity)
 
 ----------
 

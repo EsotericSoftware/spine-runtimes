@@ -41,7 +41,7 @@ namespace Spine {
 		public String String { get; set; }
 
 		public EventData (String name) {
-			if (name == null) throw new ArgumentNullException("name cannot be null.");
+			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
 			this.name = name;
 		}
 

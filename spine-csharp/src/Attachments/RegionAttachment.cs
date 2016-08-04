@@ -111,9 +111,9 @@ namespace Spine {
 			float localY = -height / 2 * scaleY + regionOffsetY * regionScaleY;
 			float localX2 = localX + regionWidth * regionScaleX;
 			float localY2 = localY + regionHeight * regionScaleY;
-			float radians = rotation * (float)Math.PI / 180;
-			float cos = (float)Math.Cos(radians);
-			float sin = (float)Math.Sin(radians);
+			float rotation = this.rotation;
+			float cos = MathUtils.CosDeg(rotation);
+			float sin = MathUtils.SinDeg(rotation);
 			float x = this.x;
 			float y = this.y;
 			float localXCos = localX * cos + x;
@@ -136,17 +136,18 @@ namespace Spine {
 		}
 
 		public void ComputeWorldVertices (Bone bone, float[] worldVertices) {
-			float x = bone.skeleton.x + bone.worldX, y = bone.skeleton.y + bone.worldY;
-			float m00 = bone.a, m01 = bone.b, m10 = bone.c, m11 = bone.d;
+			Skeleton skeleton = bone.skeleton;
+			float x = skeleton.x + bone.worldX, y = skeleton.y + bone.worldY;			
+			float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
 			float[] offset = this.offset;
-			worldVertices[X1] = offset[X1] * m00 + offset[Y1] * m01 + x;
-			worldVertices[Y1] = offset[X1] * m10 + offset[Y1] * m11 + y;
-			worldVertices[X2] = offset[X2] * m00 + offset[Y2] * m01 + x;
-			worldVertices[Y2] = offset[X2] * m10 + offset[Y2] * m11 + y;
-			worldVertices[X3] = offset[X3] * m00 + offset[Y3] * m01 + x;
-			worldVertices[Y3] = offset[X3] * m10 + offset[Y3] * m11 + y;
-			worldVertices[X4] = offset[X4] * m00 + offset[Y4] * m01 + x;
-			worldVertices[Y4] = offset[X4] * m10 + offset[Y4] * m11 + y;
+			worldVertices[X1] = offset[X1] * a + offset[Y1] * b + x;
+			worldVertices[Y1] = offset[X1] * c + offset[Y1] * d + y;
+			worldVertices[X2] = offset[X2] * a + offset[Y2] * b + x;
+			worldVertices[Y2] = offset[X2] * c + offset[Y2] * d + y;
+			worldVertices[X3] = offset[X3] * a + offset[Y3] * b + x;
+			worldVertices[Y3] = offset[X3] * c + offset[Y3] * d + y;
+			worldVertices[X4] = offset[X4] * a + offset[Y4] * b + x;
+			worldVertices[Y4] = offset[X4] * c + offset[Y4] * d + y;
 		}
 	}
 }

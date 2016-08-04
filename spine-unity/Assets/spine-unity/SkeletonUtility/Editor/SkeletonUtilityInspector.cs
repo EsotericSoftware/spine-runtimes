@@ -211,7 +211,7 @@ namespace Spine.Unity.Editor {
 
 						Texture2D icon = null;
 
-						if (attachment is MeshAttachment || attachment is WeightedMeshAttachment)
+						if (attachment is MeshAttachment)
 							icon = SpineEditorUtilities.Icons.mesh;
 						else
 							icon = SpineEditorUtilities.Icons.image;

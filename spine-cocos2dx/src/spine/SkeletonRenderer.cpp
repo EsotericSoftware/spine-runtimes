@@ -108,6 +108,7 @@ void SkeletonRenderer::initWithData (spSkeletonData* skeletonData, bool ownsSkel
 }
 
 void SkeletonRenderer::initWithFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale) {
+    _atlas = atlas;
 	_attachmentLoader = SUPER(Cocos2dAttachmentLoader_create(_atlas));
 
 	spSkeletonJson* json = spSkeletonJson_createWithLoader(_attachmentLoader);
@@ -151,9 +152,8 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 	_skeleton->g = nodeColor.g / (float)255;
 	_skeleton->b = nodeColor.b / (float)255;
 	_skeleton->a = getDisplayedOpacity() / (float)255;
-
-	Color4B color;
-	int vertexCount = 0;
+    
+    Color4F color;
 	AttachmentVertices* attachmentVertices = nullptr;
 	for (int i = 0, n = _skeleton->slotsCount; i < n; ++i) {
 		spSlot* slot = _skeleton->drawOrder[i];
@@ -164,7 +164,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
 			spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices);
 			attachmentVertices = getAttachmentVertices(attachment);
-			color.r = attachment->r;
+            color.r = attachment->r;
 			color.g = attachment->g;
 			color.b = attachment->b;
 			color.a = attachment->a;
@@ -174,20 +174,10 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 			spMeshAttachment* attachment = (spMeshAttachment*)slot->attachment;
 			spMeshAttachment_computeWorldVertices(attachment, slot, _worldVertices);
 			attachmentVertices = getAttachmentVertices(attachment);
-			color.r = attachment->r;
-			color.g = attachment->g;
-			color.b = attachment->b;
-			color.a = attachment->a;
-			break;
-		}
-		case SP_ATTACHMENT_WEIGHTED_MESH: {
-			spWeightedMeshAttachment* attachment = (spWeightedMeshAttachment*)slot->attachment;
-			spWeightedMeshAttachment_computeWorldVertices(attachment, slot, _worldVertices);
-			attachmentVertices = getAttachmentVertices(attachment);
-			color.r = attachment->r;
-			color.g = attachment->g;
-			color.b = attachment->b;
-			color.a = attachment->a;
+            color.r = attachment->r;
+            color.g = attachment->g;
+            color.b = attachment->b;
+            color.a = attachment->a;
 			break;
 		}
 		default:
@@ -199,12 +189,17 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		color.r *= _skeleton->r * slot->r * multiplier;
 		color.g *= _skeleton->g * slot->g * multiplier;
 		color.b *= _skeleton->b * slot->b * multiplier;
-
+        
+        
+        
 		for (int v = 0, w = 0, vn = attachmentVertices->_triangles->vertCount; v < vn; ++v, w += 2) {
 			V3F_C4B_T2F* vertex = attachmentVertices->_triangles->verts + v;
 			vertex->vertices.x = _worldVertices[w];
 			vertex->vertices.y = _worldVertices[w + 1];
-			vertex->colors = color;
+            vertex->colors.r = (GLubyte)color.r;
+            vertex->colors.g = (GLubyte)color.g;
+            vertex->colors.b = (GLubyte)color.b;
+            vertex->colors.a = (GLubyte)color.a;
 		}
 
 		BlendFunc blendFunc;
@@ -231,57 +226,56 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 	}
 
 	if (_debugSlots || _debugBones) {
-		_debugCommand.init(_globalZOrder);
-		_debugCommand.func = CC_CALLBACK_0(SkeletonRenderer::drawDebug, this, transform, transformFlags);
-		renderer->addCommand(&_debugCommand);
+        drawDebug(renderer, transform, transformFlags);
 	}
 }
 
-void SkeletonRenderer::drawDebug (const Mat4 &transform, uint32_t transformFlags) {
-	getGLProgramState()->apply(transform);
+void SkeletonRenderer::drawDebug (Renderer* renderer, const Mat4 &transform, uint32_t transformFlags) {
 
-	Director* director = Director::getInstance();
-	director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-	director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, transform);
-
-	if (_debugSlots) {
-		// Slots.
-		DrawPrimitives::setDrawColor4B(0, 0, 255, 255);
-		glLineWidth(1);
-		Vec2 points[4];
-		V3F_C4B_T2F_Quad quad;
-		for (int i = 0, n = _skeleton->slotsCount; i < n; ++i) {
-			spSlot* slot = _skeleton->drawOrder[i];
-			if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION) continue;
-			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-			spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices);
-			points[0] = Vec2(_worldVertices[0], _worldVertices[1]);
-			points[1] = Vec2(_worldVertices[2], _worldVertices[3]);
-			points[2] = Vec2(_worldVertices[4], _worldVertices[5]);
-			points[3] = Vec2(_worldVertices[6], _worldVertices[7]);
-			DrawPrimitives::drawPoly(points, 4, true);
-		}
-	}
-	if (_debugBones) {
-		// Bone lengths.
-		glLineWidth(2);
-		DrawPrimitives::setDrawColor4B(255, 0, 0, 255);
-		for (int i = 0, n = _skeleton->bonesCount; i < n; ++i) {
-			spBone *bone = _skeleton->bones[i];
-			float x = bone->data->length * bone->a + bone->worldX;
-			float y = bone->data->length * bone->c + bone->worldY;
-			DrawPrimitives::drawLine(Vec2(bone->worldX, bone->worldY), Vec2(x, y));
-		}
-		// Bone origins.
-		DrawPrimitives::setPointSize(4);
-		DrawPrimitives::setDrawColor4B(0, 0, 255, 255); // Root bone is blue.
-		for (int i = 0, n = _skeleton->bonesCount; i < n; ++i) {
-			spBone *bone = _skeleton->bones[i];
-			DrawPrimitives::drawPoint(Vec2(bone->worldX, bone->worldY));
-			if (i == 0) DrawPrimitives::setDrawColor4B(0, 255, 0, 255);
-		}
-	}
-	director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+    Director* director = Director::getInstance();
+    director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+    director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, transform);
+    
+    DrawNode* drawNode = DrawNode::create();
+    
+    if (_debugSlots) {
+        // Slots.
+        // DrawPrimitives::setDrawColor4B(0, 0, 255, 255);
+        glLineWidth(1);
+        Vec2 points[4];
+        V3F_C4B_T2F_Quad quad;
+        for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
+            spSlot* slot = _skeleton->drawOrder[i];
+            if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION) continue;
+            spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
+            spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices);
+            points[0] = Vec2(_worldVertices[0], _worldVertices[1]);
+            points[1] = Vec2(_worldVertices[2], _worldVertices[3]);
+            points[2] = Vec2(_worldVertices[4], _worldVertices[5]);
+            points[3] = Vec2(_worldVertices[6], _worldVertices[7]);
+            drawNode->drawPoly(points, 4, true, Color4F::BLUE);
+        }
+    }
+    if (_debugBones) {
+        // Bone lengths.
+        glLineWidth(2);
+        for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
+            spBone *bone = _skeleton->bones[i];
+            float x = bone->data->length * bone->a + bone->worldX;
+            float y = bone->data->length * bone->c + bone->worldY;
+            drawNode->drawLine(Vec2(bone->worldX, bone->worldY), Vec2(x, y), Color4F::RED);
+        }
+        // Bone origins.
+        auto color = Color4F::BLUE; // Root bone is blue.
+        for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
+            spBone *bone = _skeleton->bones[i];
+            drawNode->drawPoint(Vec2(bone->worldX, bone->worldY), 4, color);
+            if (i == 0) color = Color4F::GREEN;
+        }
+    }
+    
+    drawNode->draw(renderer, transform, transformFlags);
+    director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
 }
 
 AttachmentVertices* SkeletonRenderer::getAttachmentVertices (spRegionAttachment* attachment) const {
@@ -289,10 +283,6 @@ AttachmentVertices* SkeletonRenderer::getAttachmentVertices (spRegionAttachment*
 }
 
 AttachmentVertices* SkeletonRenderer::getAttachmentVertices (spMeshAttachment* attachment) const {
-	return (AttachmentVertices*)attachment->rendererObject;
-}
-
-AttachmentVertices* SkeletonRenderer::getAttachmentVertices (spWeightedMeshAttachment* attachment) const {
 	return (AttachmentVertices*)attachment->rendererObject;
 }
 
@@ -310,11 +300,7 @@ Rect SkeletonRenderer::getBoundingBox () const {
 		} else if (slot->attachment->type == SP_ATTACHMENT_MESH) {
 			spMeshAttachment* mesh = (spMeshAttachment*)slot->attachment;
 			spMeshAttachment_computeWorldVertices(mesh, slot, _worldVertices);
-			verticesCount = mesh->verticesCount;
-		} else if (slot->attachment->type == SP_ATTACHMENT_WEIGHTED_MESH) {
-			spWeightedMeshAttachment* mesh = (spWeightedMeshAttachment*)slot->attachment;
-			spWeightedMeshAttachment_computeWorldVertices(mesh, slot, _worldVertices);
-			verticesCount = mesh->uvsCount;
+			verticesCount = mesh->super.worldVerticesLength;
 		} else
 			continue;
 		for (int ii = 0; ii < verticesCount; ii += 2) {
@@ -326,6 +312,7 @@ Rect SkeletonRenderer::getBoundingBox () const {
 		}
 	}
 	Vec2 position = getPosition();
+    if (minX == FLT_MAX) minX = minY = maxX = maxY = 0;    
 	return Rect(position.x + minX, position.y + minY, maxX - minX, maxY - minY);
 }
 

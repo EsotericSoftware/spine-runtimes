@@ -55,14 +55,13 @@ public class AttachmentTimeline implements Timeline {
 
 	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
 		var frames:Vector.<Number> = this.frames;
-		if (time < frames[0]) {
-			if (lastTime > time) apply(skeleton, lastTime, int.MAX_VALUE, null, 0);
-			return;
-		} else if (lastTime > time) //
-			lastTime = -1;
+		if (time < frames[0]) return; // Time is before first frame.
 
-		var frameIndex:int = time >= frames[frames.length - 1] ? frames.length - 1 : Animation.binarySearch1(frames, time) - 1;
-		if (frames[frameIndex] < lastTime) return;
+		var frameIndex:int;
+		if (time >= frames[frames.length - 1]) // Time is after last frame.
+			frameIndex = frames.length - 1;
+		else
+			frameIndex = Animation.binarySearch(frames, time, 1) - 1;
 
 		var attachmentName:String = attachmentNames[frameIndex];
 		skeleton.slots[slotIndex].attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slotIndex, attachmentName);

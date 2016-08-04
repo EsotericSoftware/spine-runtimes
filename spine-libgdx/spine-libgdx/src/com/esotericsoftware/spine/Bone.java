@@ -62,7 +62,7 @@ public class Bone implements Updatable {
 		setToSetupPose();
 	}
 
-	/** Copy constructor.
+	/** Copy constructor. Does not copy the children bones.
 	 * @param parent May be null. */
 	public Bone (Bone bone, Skeleton skeleton, Bone parent) {
 		if (bone == null) throw new IllegalArgumentException("bone cannot be null.");

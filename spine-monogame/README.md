@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-monogame works with data exported from Spine 3.2.01. Updating spine-monogame to [v3.3](https://github.com/EsotericSoftware/spine-runtimes/issues/613) is in progress.
+spine-monogame works with data exported from from the latest version of Spine.
 
 spine-monogame supports all Spine features.
 

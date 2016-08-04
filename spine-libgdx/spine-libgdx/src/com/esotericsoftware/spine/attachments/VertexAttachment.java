@@ -85,7 +85,9 @@ public class VertexAttachment extends Attachment {
 		if (deformArray.size == 0) {
 			for (int w = offset, b = skip * 3; w < count; w += 2) {
 				float wx = x, wy = y;
-				for (int n = bones[v++] + v; v < n; v++, b += 3) {
+				int n = bones[v++];
+				n += v;
+				for (; v < n; v++, b += 3) {
 					Bone bone = (Bone)skeletonBones[bones[v]];
 					float vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
 					wx += (vx * bone.getA() + vy * bone.getB() + bone.getWorldX()) * weight;
@@ -98,7 +100,9 @@ public class VertexAttachment extends Attachment {
 			float[] deform = deformArray.items;
 			for (int w = offset, b = skip * 3, f = skip << 1; w < count; w += 2) {
 				float wx = x, wy = y;
-				for (int n = bones[v++] + v; v < n; v++, b += 3, f += 2) {
+				int n = bones[v++];
+				n += v;
+				for (; v < n; v++, b += 3, f += 2) {
 					Bone bone = (Bone)skeletonBones[bones[v]];
 					float vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
 					wx += (vx * bone.getA() + vy * bone.getB() + bone.getWorldX()) * weight;

@@ -34,18 +34,15 @@ namespace Spine.Unity.MeshGeneration {
 	public class ArraysSimpleMeshGenerator : ArraysMeshGenerator, ISimpleMeshGenerator {
 		#region Settings
 		protected float scale = 1f;
-		public float Scale {
-			get { return scale; }
-			set { scale = value; }
-		}
+		public float Scale { get { return scale; } set { scale = value; } }
+		public float ZSpacing { get; set; }
 		#endregion
 
-		private Mesh lastGeneratedMesh;
+		protected Mesh lastGeneratedMesh;
 		public Mesh LastGeneratedMesh {	get { return lastGeneratedMesh; } }
 
 		readonly DoubleBufferedMesh doubleBufferedMesh = new DoubleBufferedMesh();
 		int[] triangles;
-		int triangleBufferCount;
 
 		public Mesh GenerateMesh (Skeleton skeleton) {
 			int totalVertexCount = 0; // size of vertex arrays
@@ -65,15 +62,10 @@ namespace Spine.Unity.MeshGeneration {
 				} else {
 					var meshAttachment = attachment as MeshAttachment;
 					if (meshAttachment != null) {
-						attachmentVertexCount = meshAttachment.vertices.Length >> 1;
+						attachmentVertexCount = meshAttachment.worldVerticesLength >> 1;
 						attachmentTriangleCount = meshAttachment.triangles.Length;
 					} else {
-						var skinnedMeshAttachment = attachment as WeightedMeshAttachment;
-						if (skinnedMeshAttachment != null) {
-							attachmentVertexCount = skinnedMeshAttachment.uvs.Length >> 1;
-							attachmentTriangleCount = skinnedMeshAttachment.triangles.Length;
-						} else
-							continue;
+						continue;
 					}
 				}
 				totalTriangleCount += attachmentTriangleCount;
@@ -85,7 +77,6 @@ namespace Spine.Unity.MeshGeneration {
 			this.triangles = this.triangles ?? new int[totalTriangleCount];
 				
 			// STEP 3 : Update vertex buffer
-			const float zSpacing = 0;
 			const float zFauxHalfThickness = 0.01f;	// Somehow needs this thickness for bounds to work properly in some cases (eg, Unity UI clipping)
 			Vector3 meshBoundsMin;
 			Vector3 meshBoundsMax;
@@ -101,7 +92,7 @@ namespace Spine.Unity.MeshGeneration {
 				meshBoundsMax.z = zFauxHalfThickness * scale;
 
 				int vertexIndex = 0;
-				ArraysMeshGenerator.FillVerts(skeleton, 0, drawOrderCount, zSpacing, this.premultiplyVertexColors, this.meshVertices, this.meshUVs, this.meshColors32, ref vertexIndex, ref this.attachmentVertexBuffer, ref meshBoundsMin, ref meshBoundsMax);
+				ArraysMeshGenerator.FillVerts(skeleton, 0, drawOrderCount, this.ZSpacing, this.PremultiplyVertexColors, this.meshVertices, this.meshUVs, this.meshColors32, ref vertexIndex, ref this.attachmentVertexBuffer, ref meshBoundsMin, ref meshBoundsMax);
 
 				// Apply scale to vertices
 				meshBoundsMax.x *= scale; meshBoundsMax.y *= scale;
@@ -116,7 +107,7 @@ namespace Spine.Unity.MeshGeneration {
 			}
 				
 			// Step 4 : Update Triangles buffer
-			ArraysMeshGenerator.FillTriangles(skeleton, totalTriangleCount, 0, 0, drawOrderCount, ref this.triangles, true);
+			ArraysMeshGenerator.FillTriangles(ref this.triangles, skeleton, totalTriangleCount, 0, 0, drawOrderCount, true);
 
 			// Step 5 : Update Mesh with buffers
 			var mesh = doubleBufferedMesh.GetNextMesh();
@@ -125,6 +116,13 @@ namespace Spine.Unity.MeshGeneration {
 			mesh.uv = meshUVs;
 			mesh.bounds = ArraysMeshGenerator.ToBounds(meshBoundsMin, meshBoundsMax);
 			mesh.triangles = triangles;
+			TryAddNormalsTo(mesh, totalVertexCount);
+
+			if (addTangents) { 
+				SolveTangents2DEnsureSize(ref this.meshTangents, ref this.tempTanBuffer, totalVertexCount);
+				SolveTangents2DTriangles(this.tempTanBuffer, triangles, totalTriangleCount, meshVertices, meshUVs, totalVertexCount);
+				SolveTangents2DBuffer(this.meshTangents, this.tempTanBuffer, totalVertexCount);
+			}
 
 			lastGeneratedMesh = mesh;
 			return mesh;

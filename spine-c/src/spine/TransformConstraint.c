@@ -34,73 +34,79 @@
 #include <spine/extension.h>
 
 spTransformConstraint* spTransformConstraint_create (spTransformConstraintData* data, const spSkeleton* skeleton) {
+	int i;
 	spTransformConstraint* self = NEW(spTransformConstraint);
 	CONST_CAST(spTransformConstraintData*, self->data) = data;
-	self->translateMix = data->translateMix;
 	self->rotateMix = data->rotateMix;
+	self->translateMix = data->translateMix;
 	self->scaleMix = data->scaleMix;
 	self->shearMix = data->shearMix;
-	self->offsetX = data->offsetX;
-	self->offsetY = data->offsetY;
-	self->bone = spSkeleton_findBone(skeleton, self->data->bone->name);
+	self->bonesCount = data->bonesCount;
+	CONST_CAST(spBone**, self->bones) = MALLOC(spBone*, self->bonesCount);
+	for (i = 0; i < self->bonesCount; ++i)
+		self->bones[i] = spSkeleton_findBone(skeleton, self->data->bones[i]->name);
 	self->target = spSkeleton_findBone(skeleton, self->data->target->name);
 	return self;
 }
 
 void spTransformConstraint_dispose (spTransformConstraint* self) {
+	FREE(self->bones);
 	FREE(self);
 }
 
 void spTransformConstraint_apply (spTransformConstraint* self) {
-	spBone* bone = self->bone;
+	float rotateMix = self->rotateMix, translateMix = self->translateMix, scaleMix = self->scaleMix, shearMix = self->shearMix;
 	spBone* target = self->target;
+	float ta = target->a, tb = target->b, tc = target->c, td = target->d;
+	int i;
+	for (i = 0; i < self->bonesCount; ++i) {
+		spBone* bone = self->bones[i];
 
-	if (self->rotateMix > 0) {
-		float cosine, sine;
-		float a = bone->a, b = bone->b, c = bone->c, d = bone->d;
-		float r = atan2(target->c, target->a) - atan2(c, a) + self->offsetRotation * DEG_RAD;
-		if (r > PI)
-			r -= PI2;
-		else if (r < -PI) r += PI2;
-		r *= self->rotateMix;
-		cosine = COS(r); sine = SIN(r);
-		CONST_CAST(float, bone->a) = cosine * a - sine * c;
-		CONST_CAST(float, bone->b) = cosine * b - sine * d;
-		CONST_CAST(float, bone->c) = sine * a + cosine * c;
-		CONST_CAST(float, bone->d) = sine * b + cosine * d;
-	}
+		if (rotateMix > 0) {
+			float a = bone->a, b = bone->b, c = bone->c, d = bone->d;
+			float r = ATAN2(tc, ta) - ATAN2(c, a) + self->data->offsetRotation * DEG_RAD;
+			float cosine, sine;
+			if (r > PI) r -= PI2;
+			else if (r < -PI) r += PI2;
+			r *= rotateMix;
+			cosine = COS(r);
+			sine = SIN(r);
+			CONST_CAST(float, bone->a) = cosine * a - sine * c;
+			CONST_CAST(float, bone->b) = cosine * b - sine * d;
+			CONST_CAST(float, bone->c) = sine * a + cosine * c;
+			CONST_CAST(float, bone->d) = sine * b + cosine * d;
+		}
 
-	if (self->scaleMix > 0) {
-		float bs = (float)SQRT(bone->a * bone->a + bone->c * bone->c);
-		float ts = (float)SQRT(target->a * target->a + target->c * target->c);
-		float s = bs > 0.00001f ? (bs + (ts - bs + self->offsetScaleX) * self->scaleMix) / bs : 0;
-		CONST_CAST(float, bone->a) *= s;
-		CONST_CAST(float, bone->c) *= s;
-		bs = (float)SQRT(bone->b * bone->b + bone->d * bone->d);
-		ts = (float)SQRT(target->b * target->b + target->d * target->d);
-		s = bs > 0.00001f ? (bs + (ts - bs + self->offsetScaleY) * self->scaleMix) / bs : 0;
-		CONST_CAST(float, bone->b) *= s;
-		CONST_CAST(float, bone->d) *= s;
-	}
+		if (translateMix > 0) {
+			float x, y;
+			spBone_localToWorld(target, self->data->offsetX, self->data->offsetY, &x, &y);
+			CONST_CAST(float, bone->worldX) += (x - bone->worldX) * translateMix;
+			CONST_CAST(float, bone->worldY) += (y - bone->worldY) * translateMix;
+		}
 
-	if (self->shearMix > 0) {
-		float b = bone->b, d = bone->d;
-		float by = atan2(d, b);
-		float r = atan2(target->d, target->b) - atan2(target->c, target->a) - (by - atan2(bone->c, bone->a));
-		float s;
-		if (r > PI)
-			r -= PI2;
-		else if (r < -PI) r += PI2;
-		r = by + (r + self->offsetShearY * DEG_RAD) * self->shearMix;
-		s = (float)SQRT(b * b + d * d);
-		CONST_CAST(float, bone->b) = COS(r) * s;
-		CONST_CAST(float, bone->d) = SIN(r) * s;
-	}
+		if (scaleMix > 0) {
+			float bs = SQRT(bone->a * bone->a + bone->c * bone->c);
+			float ts = SQRT(ta * ta + tc * tc);
+			float s = bs > 0.00001f ? (bs + (ts - bs + self->data->offsetScaleX) * scaleMix) / bs : 0;
+			CONST_CAST(float, bone->a) *= s;
+			CONST_CAST(float, bone->c) *= s;
+			bs = SQRT(bone->b * bone->b + bone->d * bone->d);
+			ts = SQRT(tb * tb + td * td);
+			s = bs > 0.00001f ? (bs + (ts - bs + self->data->offsetScaleY) * scaleMix) / bs : 0;
+			CONST_CAST(float, bone->b) *= s;
+			CONST_CAST(float, bone->d) *= s;
+		}
 
-	if (self->translateMix > 0) {
-		float tx, ty;
-		spBone_localToWorld(self->target, self->offsetX, self->offsetY, &tx, &ty);
-		CONST_CAST(float, self->bone->worldX) += (tx - self->bone->worldX) * self->translateMix;
-		CONST_CAST(float, self->bone->worldY) += (ty - self->bone->worldY) * self->translateMix;
+		if (shearMix > 0) {
+			float b = bone->b, d = bone->d;
+			float by = ATAN2(d, b);
+			float r = ATAN2(td, tb) - ATAN2(tc, ta) - (by - ATAN2(bone->c, bone->a));
+			float s = SQRT(b * b + d * d);
+			if (r > PI) r -= PI2;
+			else if (r < -PI) r += PI2;
+			r = by + (r + self->data->offsetShearY * DEG_RAD) * shearMix;
+			CONST_CAST(float, bone->b) = COS(r) * s;
+			CONST_CAST(float, bone->d) = SIN(r) * s;
+		}
 	}
 }

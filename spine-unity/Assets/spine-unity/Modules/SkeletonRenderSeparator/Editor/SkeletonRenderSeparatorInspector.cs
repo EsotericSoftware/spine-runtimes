@@ -76,7 +76,7 @@ namespace Spine.Unity.Modules {
 		}
 
 		public override void OnInspectorGUI () {
-			// TODO: Add Undo support
+			//JOHN: left todo: Add Undo support
 			var componentRenderers = component.partsRenderers;
 			int totalParts;
 

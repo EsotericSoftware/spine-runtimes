@@ -540,7 +540,8 @@ public class Animation {
 				frameIndex = binarySearch(frames, time, 1) - 1;
 
 			String attachmentName = attachmentNames[frameIndex];
-			skeleton.slots.get(slotIndex).attachmentName = attachmentName;
+			skeleton.slots.get(slotIndex)
+				.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slotIndex, attachmentName));
 		}
 	}
 
@@ -695,7 +696,7 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha) {
 			Slot slot = skeleton.slots.get(slotIndex);
-			Attachment slotAttachment = slot.getAttachment();
+			Attachment slotAttachment = slot.attachment;
 			if (!(slotAttachment instanceof VertexAttachment) || !((VertexAttachment)slotAttachment).applyDeform(attachment)) return;
 
 			float[] frames = this.frames;

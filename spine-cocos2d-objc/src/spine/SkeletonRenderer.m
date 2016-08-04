@@ -99,7 +99,11 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 
 	spSkeletonJson* json = spSkeletonJson_create(atlas);
 	json->scale = scale;
-	spSkeletonData* skeletonData = spSkeletonJson_readSkeletonDataFile(json, [skeletonDataFile UTF8String]);
+    spSkeletonData* skeletonData = nil;
+    
+    @synchronized(self.class) {
+        spSkeletonJson_readSkeletonDataFile(json, [skeletonDataFile UTF8String]);
+    }
 	NSAssert(skeletonData, ([NSString stringWithFormat:@"Error reading skeleton data file: %@\nError: %s", skeletonDataFile, json->error]));
 	spSkeletonJson_dispose(json);
 	if (!skeletonData) return 0;
@@ -113,13 +117,19 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	self = [super init];
 	if (!self) return nil;
 
-	_atlas = spAtlas_createFromFile([atlasFile UTF8String], 0);
+    @synchronized(self.class) {
+        _atlas = spAtlas_createFromFile([atlasFile UTF8String], 0);
+    }
 	NSAssert(_atlas, ([NSString stringWithFormat:@"Error reading atlas file: %@", atlasFile]));
 	if (!_atlas) return 0;
 
 	spSkeletonJson* json = spSkeletonJson_create(_atlas);
 	json->scale = scale;
-	spSkeletonData* skeletonData = spSkeletonJson_readSkeletonDataFile(json, [skeletonDataFile UTF8String]);
+    spSkeletonData* skeletonData;
+    
+    @synchronized(self.class) {
+        skeletonData = spSkeletonJson_readSkeletonDataFile(json, [skeletonDataFile UTF8String]);
+    }
 	NSAssert(skeletonData, ([NSString stringWithFormat:@"Error reading skeleton data file: %@\nError: %s", skeletonDataFile, json->error]));
 	spSkeletonJson_dispose(json);
 	if (!skeletonData) return 0;
@@ -174,21 +184,7 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 			spMeshAttachment_computeWorldVertices(attachment, slot, _worldVertices);
 			texture = [self getTextureForMesh:attachment];
 			uvs = attachment->uvs;
-			verticesCount = attachment->verticesCount;
-			triangles = attachment->triangles;
-			trianglesCount = attachment->trianglesCount;
-			r = attachment->r;
-			g = attachment->g;
-			b = attachment->b;
-			a = attachment->a;
-			break;
-		}
-		case SP_ATTACHMENT_WEIGHTED_MESH: {
-			spWeightedMeshAttachment* attachment = (spWeightedMeshAttachment*)slot->attachment;
-			spWeightedMeshAttachment_computeWorldVertices(attachment, slot, _worldVertices);
-			texture = [self getTextureForWeightedMesh:attachment];
-			uvs = attachment->uvs;
-			verticesCount = attachment->uvsCount;
+			verticesCount = attachment->super.worldVerticesLength;
 			triangles = attachment->triangles;
 			trianglesCount = attachment->trianglesCount;
 			r = attachment->r;
@@ -231,7 +227,7 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 			CGSize size = texture.contentSize;
 			GLKVector2 center = GLKVector2Make(size.width / 2.0, size.height / 2.0);
 			GLKVector2 extents = GLKVector2Make(size.width / 2.0, size.height / 2.0);
-			if (CCRenderCheckVisbility(transform, center, extents)) {
+			if (_skipVisibilityCheck || CCRenderCheckVisbility(transform, center, extents)) {
 				CCRenderBuffer buffer = [renderer enqueueTriangles:(trianglesCount / 3) andVertexes:verticesCount withState:self.renderState globalSortOrder:0];
 				for (int i = 0; i * 2 < verticesCount; ++i) {
 					CCVertex vertex;
@@ -288,10 +284,6 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 	return (CCTexture*)((spAtlasRegion*)attachment->rendererObject)->page->rendererObject;
 }
 
-- (CCTexture*) getTextureForWeightedMesh:(spWeightedMeshAttachment*)attachment {
-	return (CCTexture*)((spAtlasRegion*)attachment->rendererObject)->page->rendererObject;
-}
-
 - (CGRect) boundingBox {
 	float minX = FLT_MAX, minY = FLT_MAX, maxX = FLT_MIN, maxY = FLT_MIN;
 	float scaleX = self.scaleX, scaleY = self.scaleY;
@@ -306,11 +298,7 @@ static const unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 		} else if (slot->attachment->type == SP_ATTACHMENT_MESH) {
 			spMeshAttachment* mesh = (spMeshAttachment*)slot->attachment;
 			spMeshAttachment_computeWorldVertices(mesh, slot, _worldVertices);
-			verticesCount = mesh->verticesCount;
-		} else if (slot->attachment->type == SP_ATTACHMENT_WEIGHTED_MESH) {
-			spWeightedMeshAttachment* mesh = (spWeightedMeshAttachment*)slot->attachment;
-			spWeightedMeshAttachment_computeWorldVertices(mesh, slot, _worldVertices);
-			verticesCount = mesh->uvsCount;
+			verticesCount = mesh->super.worldVerticesLength;
 		} else
 			continue;
 		for (int ii = 0; ii < verticesCount; ii += 2) {

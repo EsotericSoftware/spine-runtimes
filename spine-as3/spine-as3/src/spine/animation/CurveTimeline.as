@@ -30,6 +30,7 @@
  *****************************************************************************/
 
 package spine.animation {
+	import spine.MathUtils;
 import spine.Event;
 import spine.Skeleton;
 
@@ -37,9 +38,8 @@ import spine.Skeleton;
 public class CurveTimeline implements Timeline {
 	static private const LINEAR:Number = 0;
 	static private const STEPPED:Number = 1;
-	static private const BEZIER:Number = 2;
-	static private const BEZIER_SEGMENTS:int = 10;
-	static private const BEZIER_SIZE:int = BEZIER_SEGMENTS * 2 - 1;
+	static private const BEZIER:Number = 2;	
+	static private const BEZIER_SIZE:int = 10 * 2 - 1;
 
 	private var curves:Vector.<Number>; // type, x, y, ...
 
@@ -66,12 +66,10 @@ public class CurveTimeline implements Timeline {
 	 * cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of
 	 * the difference between the keyframe's values. */
 	public function setCurve (frameIndex:int, cx1:Number, cy1:Number, cx2:Number, cy2:Number) : void {
-		var subdiv1:Number = 1 / BEZIER_SEGMENTS, subdiv2:Number = subdiv1 * subdiv1, subdiv3:Number = subdiv2 * subdiv1;
-		var pre1:Number = 3 * subdiv1, pre2:Number = 3 * subdiv2, pre4:Number = 6 * subdiv2, pre5:Number = 6 * subdiv3;
-		var tmp1x:Number = -cx1 * 2 + cx2, tmp1y:Number = -cy1 * 2 + cy2, tmp2x:Number = (cx1 - cx2) * 3 + 1, tmp2y:Number = (cy1 - cy2) * 3 + 1;
-		var dfx:Number = cx1 * pre1 + tmp1x * pre2 + tmp2x * subdiv3, dfy:Number = cy1 * pre1 + tmp1y * pre2 + tmp2y * subdiv3;
-		var ddfx:Number = tmp1x * pre4 + tmp2x * pre5, ddfy:Number = tmp1y * pre4 + tmp2y * pre5;
-		var dddfx:Number = tmp2x * pre5, dddfy:Number = tmp2y * pre5;
+		var tmpx:Number = (-cx1 * 2 + cx2) * 0.03, tmpy:Number = (-cy1 * 2 + cy2) * 0.03;
+		var dddfx:Number = ((cx1 - cx2) * 3 + 1) * 0.006, dddfy:Number = ((cy1 - cy2) * 3 + 1) * 0.006;
+		var ddfx:Number = tmpx * 2 + dddfx, ddfy:Number = tmpy * 2 + dddfy;
+		var dfx:Number = cx1 * 0.3 + tmpx + dddfx * 0.16666667, dfy:Number = cy1 * 0.3 + tmpy + dddfy * 0.16666667;
 
 		var i:int = frameIndex * BEZIER_SIZE;
 		var curves:Vector.<Number> = this.curves;
@@ -91,6 +89,7 @@ public class CurveTimeline implements Timeline {
 	}
 
 	public function getCurvePercent (frameIndex:int, percent:Number) : Number {
+		percent = MathUtils.clamp(percent, 0, 1);
 		var curves:Vector.<Number> = this.curves;
 		var i:int = frameIndex * BEZIER_SIZE;
 		var type:Number = curves[i];

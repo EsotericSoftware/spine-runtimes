@@ -3,7 +3,7 @@
     <AS3LibraryFolder>lib</AS3LibraryFolder>
     <AS3Classpath generateProblems="true" sdkBased="true" type="lib" useAsSharedCode="false">frameworks/libs/player/{playerVersion}/playerglobal.swc</AS3Classpath>
     <AS3Classpath generateProblems="true" sdkBased="false" type="source" useAsSharedCode="false">src</AS3Classpath>
-    <AS3Classpath generateProblems="true" sdkBased="false" type="lib" useAsSharedCode="false">lib/spine-starling.swc</AS3Classpath>
+    <AS3Classpath generateProblems="true" sdkBased="false" type="lib" useAsSharedCode="false">lib/starling-2.0.1.swc</AS3Classpath>
     <AS3Classpath generateProblems="true" sdkBased="false" type="lib" useAsSharedCode="false">lib/spine-as3.swc</AS3Classpath>
-    <AS3Classpath generateProblems="true" sdkBased="false" type="lib" useAsSharedCode="false">lib/starling-1.7.swc</AS3Classpath>
+    <AS3Classpath generateProblems="true" sdkBased="false" type="lib" useAsSharedCode="false">lib/spine-starling.swc</AS3Classpath>
 </AS3Classpath>

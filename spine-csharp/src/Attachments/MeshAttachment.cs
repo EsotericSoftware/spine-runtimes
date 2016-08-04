@@ -33,16 +33,16 @@ using System;
 
 namespace Spine {
 	/// <summary>Attachment that displays a texture region using a mesh.</summary>
-	public class MeshAttachment : Attachment, IFfdAttachment {
-		internal float[] vertices, uvs, regionUVs;
-		internal int[] triangles;
+	public class MeshAttachment : VertexAttachment {
 		internal float regionOffsetX, regionOffsetY, regionWidth, regionHeight, regionOriginalWidth, regionOriginalHeight;
+		internal float[] uvs, regionUVs;
+		internal int[] triangles;
 		internal float r = 1, g = 1, b = 1, a = 1;
+		internal int hulllength;
 		internal MeshAttachment parentMesh;
-		internal bool inheritFFD;
+		internal bool inheritDeform;
 
-		public int HullLength { get; set; }
-		public float[] Vertices { get { return vertices; } set { vertices = value; } }
+		public int HullLength { get { return hulllength; } set { hulllength = value; } }
 		public float[] RegionUVs { get { return regionUVs; } set { regionUVs = value; } }
 		public float[] UVs { get { return uvs; } set { uvs = value; } }
 		public int[] Triangles { get { return triangles; } set { triangles = value; } }
@@ -66,14 +66,16 @@ namespace Spine {
 		public float RegionOriginalWidth { get { return regionOriginalWidth; } set { regionOriginalWidth = value; } }
 		public float RegionOriginalHeight { get { return regionOriginalHeight; } set { regionOriginalHeight = value; } } // Unrotated, unstripped size.
 
-		public bool InheritFFD { get { return inheritFFD; } set { inheritFFD = value; } }
+		public bool InheritDeform { get { return inheritDeform; } set { inheritDeform = value; } }
 
 		public MeshAttachment ParentMesh {
 			get { return parentMesh; }
 			set {
 				parentMesh = value;
 				if (value != null) {
+					bones = value.bones;
 					vertices = value.vertices;
+					worldVerticesLength = value.worldVerticesLength;
 					regionUVs = value.regionUVs;
 					triangles = value.triangles;
 					HullLength = value.HullLength;
@@ -111,23 +113,8 @@ namespace Spine {
 			}
 		}
 
-		public void ComputeWorldVertices (Slot slot, float[] worldVertices) {
-			Bone bone = slot.bone;
-			float x = bone.skeleton.x + bone.worldX, y = bone.skeleton.y + bone.worldY;
-			float m00 = bone.a, m01 = bone.b, m10 = bone.c, m11 = bone.d;
-			float[] vertices = this.vertices;
-			int verticesCount = vertices.Length;
-			if (slot.attachmentVerticesCount == verticesCount) vertices = slot.AttachmentVertices;
-			for (int i = 0; i < verticesCount; i += 2) {
-				float vx = vertices[i];
-				float vy = vertices[i + 1];
-				worldVertices[i] = vx * m00 + vy * m01 + x;
-				worldVertices[i + 1] = vx * m10 + vy * m11 + y;
-			}
-		}
-
-		public bool ApplyFFD (Attachment sourceAttachment) {
-			return this == sourceAttachment || (inheritFFD && parentMesh == sourceAttachment);
+		override public bool ApplyDeform (VertexAttachment sourceAttachment) {
+			return this == sourceAttachment || (inheritDeform && parentMesh == sourceAttachment);
 		}
 	}
 }

@@ -1,18 +1,18 @@
 {
-"skeleton": { "hash": "uZfvh80BNvvngM3EGMfAkHebg00", "spine": "2.1.08", "width": 147.68, "height": 268.92, "images": "./images/" },
+"skeleton": { "hash": "Nxia9637znam+9FXwv6fILb3hpo", "spine": "3.3.07", "width": 0, "height": 0, "images": "./images/" },
 "bones": [
 	{ "name": "Root" },
 	{ "name": "Hip", "parent": "Root", "x": -0.93, "y": 73.4 },
-	{ "name": "Body", "parent": "Hip", "length": 60.98, "x": 2.46, "y": -7.69, "rotation": 89.52 },
-	{ "name": "Leg", "parent": "Hip", "length": 31.39, "x": -20.32, "y": -13.85, "rotation": -105.82 },
-	{ "name": "Leg2", "parent": "Hip", "length": 31.09, "x": 22.48, "y": -12.01, "rotation": -74.17 },
-	{ "name": "Arm", "parent": "Body", "length": 51.63, "x": 49.91, "y": 37.35, "rotation": 166.67 },
-	{ "name": "Arm2", "parent": "Body", "length": 52.61, "x": 53.81, "y": -28.52, "rotation": -157.17 },
-	{ "name": "Feet", "parent": "Leg", "length": 15.4, "x": 39.56, "y": 1.59, "rotation": 14.56 },
-	{ "name": "Feet2", "parent": "Leg2", "length": 12.32, "x": 41.33, "y": 0.12, "rotation": -17.19 },
-	{ "name": "Head", "parent": "Body", "length": 65.29, "x": 73.6, "y": 1.09, "rotation": -88.23 },
-	{ "name": "Shield", "parent": "Arm", "x": 45.01, "y": -2.1, "rotation": 123.56 },
-	{ "name": "Weapon", "parent": "Arm2", "length": 137.65, "x": 48.2, "y": 12.78, "rotation": 92.5 }
+	{ "name": "Body", "parent": "Hip", "length": 60.98, "rotation": 89.52, "x": 2.46, "y": -7.69 },
+	{ "name": "Arm", "parent": "Body", "length": 51.63, "rotation": 166.67, "x": 49.91, "y": 37.34 },
+	{ "name": "Arm2", "parent": "Body", "length": 52.61, "rotation": -157.17, "x": 53.81, "y": -28.52 },
+	{ "name": "Leg", "parent": "Hip", "length": 31.39, "rotation": -105.82, "x": -20.32, "y": -13.85 },
+	{ "name": "Feet", "parent": "Leg", "length": 15.4, "rotation": 14.56, "x": 39.56, "y": 1.59 },
+	{ "name": "Leg2", "parent": "Hip", "length": 31.09, "rotation": -74.17, "x": 22.48, "y": -12.01 },
+	{ "name": "Feet2", "parent": "Leg2", "length": 12.32, "rotation": -17.19, "x": 41.33, "y": 0.12 },
+	{ "name": "Head", "parent": "Body", "length": 65.29, "rotation": -88.23, "x": 73.6, "y": 1.09 },
+	{ "name": "Shield", "parent": "Arm", "rotation": 123.56, "x": 45.01, "y": -2.09 },
+	{ "name": "Weapon", "parent": "Arm2", "length": 137.64, "rotation": 92.5, "x": 48.2, "y": 12.78 }
 ],
 "slots": [
 	{ "name": "Arm2", "bone": "Arm2", "attachment": "Arm2" },
@@ -61,7 +61,7 @@
 			"Leg": { "name": "leg", "path": "White/leg", "x": 16.86, "y": -4.3, "rotation": 104.82, "width": 48, "height": 55 }
 		},
 		"Leg2": {
-			"Leg2": { "name": "leg 2", "path": "White/leg 2", "x": 16.44, "y": -2.11, "rotation": 74.17, "width": 50, "height": 58 }
+			"Leg2": { "name": "leg 2", "path": "White/leg 2", "x": 16.44, "y": -2.1, "rotation": 74.17, "width": 50, "height": 58 }
 		},
 		"Mouth": {
 			"Closed": { "path": "White/mouth", "x": 10.96, "y": 3.69, "rotation": -1.29, "width": 28, "height": 21 }
@@ -239,11 +239,11 @@
 						"curve": [ 0.25, 0, 0.75, 1 ]
 					},
 					{ "time": 0.3333, "x": 4.5, "y": -0.72 },
-					{ "time": 0.4666, "x": -1.04, "y": -2.35, "curve": "stepped" },
+					{ "time": 0.4666, "x": -1.04, "y": -2.34, "curve": "stepped" },
 					{
 						"time": 0.6,
 						"x": -1.04,
-						"y": -2.35,
+						"y": -2.34,
 						"curve": [ 0.25, 0, 0.75, 1 ]
 					},
 					{ "time": 0.8333, "x": 0, "y": 0 }
@@ -345,7 +345,7 @@
 				"translate": [
 					{ "time": 0, "x": 0, "y": 0 },
 					{ "time": 0.2, "x": -50.02, "y": -6.59 },
-					{ "time": 0.3333, "x": -83.36, "y": -37.67 }
+					{ "time": 0.3333, "x": -83.36, "y": -37.66 }
 				]
 			},
 			"Body": {
@@ -491,7 +491,7 @@
 						"y": 0,
 						"curve": [ 0.25, 0, 0.758, 0.67 ]
 					},
-					{ "time": 0.3333, "x": -4.47, "y": 3.29 }
+					{ "time": 0.3333, "x": -4.46, "y": 3.29 }
 				]
 			},
 			"Leg2": {
@@ -686,7 +686,7 @@
 					},
 					{
 						"time": 0.3666,
-						"angle": -2.34,
+						"angle": -2.33,
 						"curve": [ 0.25, 0, 0.75, 1 ]
 					},
 					{ "time": 0.8666, "angle": 0 },
@@ -1518,17 +1518,17 @@
 					{
 						"time": 0,
 						"x": -0.84,
-						"y": -4.45,
+						"y": -4.44,
 						"curve": [ 0.25, 0, 0.75, 1 ]
 					},
-					{ "time": 0.2, "x": -1.03, "y": -4.7, "curve": "stepped" },
+					{ "time": 0.2, "x": -1.03, "y": -4.69, "curve": "stepped" },
 					{
 						"time": 0.5333,
 						"x": -1.03,
-						"y": -4.7,
+						"y": -4.69,
 						"curve": [ 0.25, 0, 0.75, 1 ]
 					},
-					{ "time": 0.6666, "x": -0.84, "y": -4.45 }
+					{ "time": 0.6666, "x": -0.84, "y": -4.44 }
 				]
 			},
 			"Feet2": {

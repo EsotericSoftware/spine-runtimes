@@ -51,6 +51,8 @@ typedef struct spIkConstraint {
 	int bendDirection;
 	float mix;
 
+	int level;
+
 #ifdef __cplusplus
 	spIkConstraint() :
 		data(0),
@@ -58,7 +60,8 @@ typedef struct spIkConstraint {
 		bones(0),
 		target(0),
 		bendDirection(0),
-		mix(0) {
+		mix(0),
+		level(0) {
 	}
 #endif
 } spIkConstraint;

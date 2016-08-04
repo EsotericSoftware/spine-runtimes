@@ -34,6 +34,7 @@
 #include <algorithm>
 
 USING_NS_CC;
+#define EVENT_AFTER_DRAW_RESET_POSITION "director_after_draw"
 using std::max;
 
 namespace spine {
@@ -49,6 +50,13 @@ SkeletonBatch* SkeletonBatch::getInstance () {
 	if (!instance) instance = new SkeletonBatch(8192);
 	return instance;
 }
+    
+void SkeletonBatch::destroyInstance () {
+    if (instance) {
+        delete instance;
+        instance = nullptr;
+    }
+}
 
 SkeletonBatch::SkeletonBatch (int capacity) :
 	_capacity(capacity), _position(0)
@@ -57,11 +65,13 @@ SkeletonBatch::SkeletonBatch (int capacity) :
 	_firstCommand = new Command();
 	_command = _firstCommand;
 
-	Director::getInstance()->getScheduler()->scheduleUpdate(this, -1, false);
+    Director::getInstance()->getEventDispatcher()->addCustomEventListener(EVENT_AFTER_DRAW_RESET_POSITION, [this](EventCustom* eventCustom){
+        this->update(0);
+    });;
 }
 
 SkeletonBatch::~SkeletonBatch () {
-	Director::getInstance()->getScheduler()->unscheduleUpdate(this);
+	Director::getInstance()->getEventDispatcher()->removeCustomEventListeners(EVENT_AFTER_DRAW_RESET_POSITION);
 
 	Command* command = _firstCommand;
 	while (command) {

@@ -39,6 +39,7 @@
 	bool _debugSlots;
 	bool _debugBones;
 	bool _premultipliedAlpha;
+    bool _skipVisibilityCheck;
 	ccBlendFunc _blendFunc;
 	CCDrawNode* _drawNode;
 	bool _ownsSkeletonData;
@@ -57,7 +58,6 @@
 
 - (CCTexture*) getTextureForRegion:(spRegionAttachment*)attachment;
 - (CCTexture*) getTextureForMesh:(spMeshAttachment*)attachment;
-- (CCTexture*) getTextureForWeightedMesh:(spWeightedMeshAttachment*)attachment;
 
 // --- Convenience methods for common Skeleton_* functions.
 - (void) updateWorldTransform;
@@ -86,6 +86,7 @@
 @property (nonatomic, readonly) spSkeleton* skeleton;
 @property (nonatomic) bool debugSlots;
 @property (nonatomic) bool debugBones;
+@property (nonatomic) bool skipVisibilityCheck;
 @property (nonatomic) spBone* rootBone;
 
 @end

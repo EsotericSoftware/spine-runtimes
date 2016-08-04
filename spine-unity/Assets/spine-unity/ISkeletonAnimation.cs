@@ -31,7 +31,9 @@
 using UnityEngine;
 
 namespace Spine.Unity {
-	public delegate void UpdateBonesDelegate (ISkeletonAnimation skeletonRenderer);
+	public delegate void UpdateBonesDelegate (ISkeletonAnimation animatedSkeletonComponent);
+
+	/// <summary>A Spine-Unity Component that animates a Skeleton but not necessarily with a Spine.AnimationState.</summary>
 	public interface ISkeletonAnimation {
 		event UpdateBonesDelegate UpdateLocal;
 		event UpdateBonesDelegate UpdateWorld;
@@ -39,5 +41,20 @@ namespace Spine.Unity {
 
 		void LateUpdate ();
 		Skeleton Skeleton { get; }
-	}	
+	}
+
+	/// <summary>A Spine-Unity Component that manages a Spine.Skeleton instance, instantiated from a SkeletonDataAsset.</summary>
+	public interface ISkeletonComponent {
+		/// <summary>Gets the SkeletonDataAsset of the Spine Component.</summary>
+		SkeletonDataAsset SkeletonDataAsset { get; }
+
+		/// <summary>Gets the Spine.Skeleton instance of the Spine Component. This is equivalent to SkeletonRenderer's .skeleton.</summary>
+		Skeleton Skeleton { get; }
+	}
+
+	/// <summary>A Spine-Unity Component that uses a Spine.AnimationState to animate its skeleton.</summary>
+	public interface IAnimationStateComponent {
+		/// <summary>Gets the Spine.AnimationState of the animated Spine Component. This is equivalent to SkeletonAnimation.state.</summary>
+		AnimationState AnimationState { get; }
+	}
 }

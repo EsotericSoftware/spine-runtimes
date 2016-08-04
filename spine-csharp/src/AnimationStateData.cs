@@ -42,6 +42,7 @@ namespace Spine {
 		public float DefaultMix { get { return defaultMix; } set { defaultMix = value; } }
 
 		public AnimationStateData (SkeletonData skeletonData) {
+			if (skeletonData == null) throw new ArgumentException ("skeletonData cannot be null.");
 			this.skeletonData = skeletonData;
 		}
 
@@ -54,8 +55,8 @@ namespace Spine {
 		}
 
 		public void SetMix (Animation from, Animation to, float duration) {
-			if (from == null) throw new ArgumentNullException("from cannot be null.");
-			if (to == null) throw new ArgumentNullException("to cannot be null.");
+			if (from == null) throw new ArgumentNullException("from", "from cannot be null.");
+			if (to == null) throw new ArgumentNullException("to", "to cannot be null.");
 			AnimationPair key = new AnimationPair(from, to);
 			animationToMixTime.Remove(key);
 			animationToMixTime.Add(key, duration);

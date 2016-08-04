@@ -54,6 +54,7 @@ spine.EventData = require "spine-lua.EventData"
 spine.Event = require "spine-lua.Event"
 spine.SkeletonBounds = require "spine-lua.SkeletonBounds"
 spine.BlendMode = require "spine-lua.BlendMode"
+spine.Atlas = require "spine-lua.Atlas"
 
 spine.utils.readFile = function (fileName, base)
 	if not base then base = system.ResourceDirectory end
@@ -325,6 +326,93 @@ function spine.Skeleton.new (skeletonData, group)
 		end
 	end
 	return self
+end
+
+
+function spine.GetAtlasSprites ( name, location )
+	
+	local dir = name
+	if dir:match(".-/.-") then
+		dir = string.gsub(dir, "(.*/)(.*)", "%1")
+	end
+
+	if string.sub(dir, -1) ~= "/" then
+		dir = dir .. "/"
+	end
+
+	local pages = spine.Atlas.parse( name, location )
+
+	local sprites = {}
+
+	for _,page in ipairs(pages) do
+		local options = { frames={} }
+		if page.size then
+			options.sheetContentWidth, options.sheetContentHeight = unpack( page.size )
+		end
+		for i,region in ipairs(page.regions) do
+			sprites[region.name] = { frame=i, region=region, page=page }
+			local frame = {	}
+			frame.x, frame.y = unpack(region.xy)
+			frame.width, frame.height = unpack(region.size)
+			if region.rotate then
+				frame.width, frame.height = frame.height, frame.width
+			end
+			if region.offset[1] ~= 0 or region.offset[2] ~= 0 or region.size[1]  ~= region.orig[1] or region.size[2]  ~= region.orig[2] then
+				print("WARNING: Corona currently does not srtipping whitespaces in Spine atlases (atlas: " .. name .. ", sprite: " .. region.name .. ")")
+			end
+			table.insert( options.frames, frame )
+		end
+
+		local oldMag, oldMin = display.getDefault( "magTextureFilter" ), display.getDefault( "minTextureFilter" )
+		local newMag, newMin = "linear", "linear"
+		if string.find("Nearest", page.filter[1]) then
+			newMin = "nearest"
+		end
+		if string.find("Nearest", page.filter[2]) then
+			newMag = "nearest"
+		end
+		display.setDefault( "magTextureFilter", newMag )
+		display.setDefault( "minTextureFilter", newMin )
+		page.sheet = graphics.newImageSheet( dir..page.name, options )
+		display.setDefault( "magTextureFilter", oldMag )
+		display.setDefault( "minTextureFilter", oldMin )
+	end
+	
+	function sprites.ATLAS_HELPER_createImage(_, attachment)
+		local sprite = sprites[attachment.name]
+		local obj = display.newRect( 0, 0, 100, 100 ) 
+		if sprite then
+			obj.fill = { type="image", sheet=sprite.page.sheet, frame=sprite.frame}
+			if sprite.region.rotate then
+				local fill = obj.fill
+				if fill then
+					fill.rotation = 90
+				end
+			end
+		end
+		return obj
+	end
+	function sprites.ATLAS_HELPER_createMesh(_, attachment, meshParameters)
+		local sprite = sprites[attachment.name]
+		local obj = display.newMesh(meshParameters) 
+		if sprite then
+			obj.fill = { type="image", sheet=sprite.page.sheet, frame=sprite.frame}
+			if sprite.region.rotate then
+				local fill = obj.fill
+				if fill then
+					fill.rotation = 90
+				end
+			end
+		end
+		return obj
+	end
+
+	function sprites.ATLAS_HELPER_setup(skeleton)
+		skeleton.createImage = sprites.ATLAS_HELPER_createImage
+		skeleton.createMesh = sprites.ATLAS_HELPER_createMesh
+	end
+
+	return sprites
 end
 
 return spine

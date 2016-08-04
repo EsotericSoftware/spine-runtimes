@@ -154,44 +154,7 @@ namespace Spine {
 					itemVertices[TR].TextureCoordinate.Y = uvs[RegionAttachment.Y4];
 				} else if (attachment is MeshAttachment) {
 					MeshAttachment mesh = (MeshAttachment)attachment;
-					int vertexCount = mesh.Vertices.Length;
-					if (vertices.Length < vertexCount) vertices = new float[vertexCount];
-					mesh.ComputeWorldVertices(slot, vertices);
-
-					int[] triangles = mesh.Triangles;
-					MeshItem item = batcher.NextItem(vertexCount, triangles.Length);
-					item.triangles = triangles;
-
-					AtlasRegion region = (AtlasRegion)mesh.RendererObject;
-					item.texture = (Texture2D)region.page.rendererObject;
-
-					Color color;
-					float a = skeletonA * slot.A * mesh.A;
-					if (premultipliedAlpha) {
-						color = new Color(
-								skeletonR * slot.R * mesh.R * a,
-								skeletonG * slot.G * mesh.G * a,
-								skeletonB * slot.B * mesh.B * a, a);
-					} else {
-						color = new Color(
-								skeletonR * slot.R * mesh.R,
-								skeletonG * slot.G * mesh.G,
-								skeletonB * slot.B * mesh.B, a);
-					}
-
-					float[] uvs = mesh.UVs;
-					VertexPositionColorTexture[] itemVertices = item.vertices;
-					for (int ii = 0, v = 0; v < vertexCount; ii++, v += 2) {
-						itemVertices[ii].Color = color;
-						itemVertices[ii].Position.X = vertices[v];
-						itemVertices[ii].Position.Y = vertices[v + 1];
-						itemVertices[ii].Position.Z = 0;
-						itemVertices[ii].TextureCoordinate.X = uvs[v];
-						itemVertices[ii].TextureCoordinate.Y = uvs[v + 1];
-					}
-				} else if (attachment is WeightedMeshAttachment) {
-					WeightedMeshAttachment mesh = (WeightedMeshAttachment)attachment;
-					int vertexCount = mesh.UVs.Length;
+					int vertexCount = mesh.WorldVerticesLength;
 					if (vertices.Length < vertexCount) vertices = new float[vertexCount];
 					mesh.ComputeWorldVertices(slot, vertices);
 

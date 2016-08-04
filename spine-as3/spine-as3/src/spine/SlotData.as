@@ -32,6 +32,7 @@
 package spine {
 
 public class SlotData {
+	internal var _index:int;
 	internal var _name:String;
 	internal var _boneData:BoneData;
 	public var r:Number = 1;
@@ -41,11 +42,17 @@ public class SlotData {
 	public var attachmentName:String;
 	public var blendMode:BlendMode;
 
-	public function SlotData (name:String, boneData:BoneData) {
+	public function SlotData (index:int, name:String, boneData:BoneData) {
+		if (index < 0) throw new ArgumentError("index must be >= 0.");
 		if (name == null) throw new ArgumentError("name cannot be null.");
 		if (boneData == null) throw new ArgumentError("boneData cannot be null.");
+		_index = index;
 		_name = name;
 		_boneData = boneData;
+	}
+	
+	public function get index () : int {
+		return _index;
 	}
 
 	public function get name () : String {

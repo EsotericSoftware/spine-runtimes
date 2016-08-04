@@ -30,7 +30,7 @@
  *****************************************************************************/
 
 #include "RaptorExample.h"
-#include "BatchingExample.h"
+#include "TankExample.h"
 
 USING_NS_CC;
 using namespace spine;
@@ -61,7 +61,7 @@ bool RaptorExample::init () {
 		else if (skeletonNode->getTimeScale() == 1)
 			skeletonNode->setTimeScale(0.3f);
 		else
-			Director::getInstance()->replaceScene(BatchingExample::scene());
+			Director::getInstance()->replaceScene(TankExample::scene());
 		return true;
 	};
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);

@@ -170,8 +170,7 @@ namespace Spine.Unity {
 	}
 
 	public class SpineAtlasRegion : PropertyAttribute {
-		//TODO:  Standardize with Skeleton attributes
-		//NOTE:  For now, relies on locally scoped field named "atlasAsset" for source.
+	
 	}
 
 }

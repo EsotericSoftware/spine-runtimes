@@ -40,6 +40,8 @@ GLuint wrap (spAtlasWrap wrap) {
 
 GLuint filter (spAtlasFilter filter) {
 	switch (filter) {
+	case SP_ATLAS_UNKNOWN_FILTER:
+		break;
 	case SP_ATLAS_NEAREST:
 		return GL_NEAREST;
 	case SP_ATLAS_LINEAR:
@@ -75,10 +77,11 @@ void _spAtlasPage_disposeTexture (spAtlasPage* self) {
 }
 
 char* _spUtil_readFile (const char* path, int* length) {
-	Data data = FileUtils::getInstance()->getDataFromFile(
-			FileUtils::getInstance()->fullPathForFilename(path).c_str());
-	*length = data.getSize();
-	char* bytes = MALLOC(char, *length);
-	memcpy(bytes, data.getBytes(), *length);
-	return bytes;
+    Data data = FileUtils::getInstance()->getDataFromFile(
+			FileUtils::getInstance()->fullPathForFilename(path));
+    if (data.isNull()) return 0;
+    *length = static_cast<int>(data.getSize());
+    char* bytes = MALLOC(char, *length);
+    memcpy(bytes, data.getBytes(), *length);
+    return bytes;
 }

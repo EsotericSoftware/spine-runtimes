@@ -107,8 +107,15 @@ public class Skeleton {
 
 		bones = new Array(skeleton.bones.size);
 		for (Bone bone : skeleton.bones) {
-			Bone parent = bone.parent == null ? null : bones.get(bone.parent.data.index);
-			bones.add(new Bone(bone, this, parent));
+			Bone copy;
+			if (bone.parent == null)
+				copy = new Bone(bone, this, null);
+			else {
+				Bone parent = bones.get(bone.parent.data.index);
+				copy = new Bone(bone, this, parent);
+				parent.children.add(copy);
+			}
+			bones.add(copy);
 		}
 
 		slots = new Array(skeleton.slots.size);
@@ -203,7 +210,7 @@ public class Skeleton {
 			for (int ii = 0, nn = data.skins.size; ii < nn; ii++)
 				sortPathConstraintAttachment(data.skins.get(ii), slotIndex, slotBone);
 
-			Attachment attachment = slot.getAttachment();
+			Attachment attachment = slot.attachment;
 			if (attachment instanceof PathAttachment) sortPathConstraintAttachment(attachment, slotBone);
 
 			Array<Bone> constrained = constraint.bones;

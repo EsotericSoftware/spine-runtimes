@@ -43,8 +43,12 @@ public class SkeletonData {
 	public var animations:Vector.<Animation> = new Vector.<Animation>();
 	public var ikConstraints:Vector.<IkConstraintData> = new Vector.<IkConstraintData>();
 	public var transformConstraints:Vector.<TransformConstraintData> = new Vector.<TransformConstraintData>();
+	public var pathConstraints:Vector.<PathConstraintData> = new Vector.<PathConstraintData>();
 	public var width:Number, height:Number;
 	public var version:String, hash:String;
+	
+	public function SkeletonData () {		
+	}
 
 	// --- Bones.
 
@@ -134,6 +138,37 @@ public class SkeletonData {
 		for each (var transformConstraintData:TransformConstraintData in transformConstraints)
 			if (transformConstraintData._name == constraintName) return transformConstraintData;
 		return null;
+	}
+	
+	/** @return -1 if the transform constraint was not found. */
+	public function findTransformConstraintIndex (transformConstraintName:String) : int {
+		if (transformConstraintName == null) throw new ArgumentError("transformConstraintName cannot be null.");
+		var transformConstraints:Vector.<TransformConstraintData> = this.transformConstraints;
+		for (var i:int = 0, n:int = transformConstraints.length; i < n; i++)
+			if (transformConstraints[i].name == transformConstraintName) return i;
+		return -1;
+	}
+	
+	// --- Path constraints.
+	
+		/** @return May be null. */
+	public function findPathConstraint (constraintName:String) : PathConstraintData {
+		if (constraintName == null) throw new ArgumentError("constraintName cannot be null.");
+		var pathConstraints:Vector.<PathConstraintData> = this.pathConstraints;
+		for (var i:int = 0, n:int = pathConstraints.length; i < n; i++) {
+			var constraint:PathConstraintData = pathConstraints[i];
+			if (constraint.name == constraintName) return constraint;
+		}
+		return null;
+	}
+
+	/** @return -1 if the path constraint was not found. */
+	public function findPathConstraintIndex (pathConstraintName:String) : int {
+		if (pathConstraintName == null) throw new ArgumentError("pathConstraintName cannot be null.");
+		var pathConstraints:Vector.<PathConstraintData> = this.pathConstraints;
+		for (var i:int = 0, n:int = pathConstraints.length; i < n; i++)
+			if (pathConstraints[i].name == pathConstraintName) return i;
+		return -1;
 	}
 
 	// ---
