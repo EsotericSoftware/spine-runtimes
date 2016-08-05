@@ -63,6 +63,27 @@ namespace Spine.Unity.Editor {
 			sortingProperties = new SpineInspectorUtility.SerializedSortingProperties(renderer);
 		}
 
+		public static void ReapplySeparatorSlotNames (SkeletonRenderer skeletonRenderer) {
+			if (!skeletonRenderer.valid) return;
+
+			var separatorSlots = skeletonRenderer.separatorSlots;
+			var separatorSlotNames = skeletonRenderer.separatorSlotNames;
+			var skeleton = skeletonRenderer.skeleton;
+
+			separatorSlots.Clear();
+			for (int i = 0, n = separatorSlotNames.Length; i < n; i++) {
+				var slot = skeleton.FindSlot(separatorSlotNames[i]);
+				if (slot != null) {
+					separatorSlots.Add(slot);
+					//Debug.Log(slot + " added as separator.");
+				} else {
+					Debug.LogWarning(separatorSlotNames[i] + " is not a slot in " + skeletonRenderer.skeletonDataAsset.skeletonJSON.name);				
+				}
+			}
+
+			//Debug.Log("Reapplied Separator Slot Names. Count is now: " + separatorSlots.Count);
+		}
+
 		protected virtual void DrawInspectorGUI () {
 			// JOHN: todo: support multiediting.
 			SkeletonRenderer component = (SkeletonRenderer)target;
