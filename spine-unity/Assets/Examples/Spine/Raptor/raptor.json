@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "TWhM3jMRTJdDA0rvXsx/iqdbWpQ",
-	"spine": "3.3.07",
+	"hash": "MdV0IZSAvD5AddKCxR+b1ZqSro0",
+	"spine": "3.4.01",
 	"width": 1223.75,
 	"height": 1053.54,
 	"images": "C:/Program Files (x86)/Spine/examples/raptor/images/"
@@ -494,6 +494,9 @@
 			"visor": { "x": 99.13, "y": 6.51, "rotation": -70.57, "width": 261, "height": 168 }
 		}
 	}
+},
+"events": {
+	"footstep": {}
 },
 "animations": {
 	"Jump": {
@@ -2717,7 +2720,11 @@
 					]
 				}
 			}
-		}
+		},
+		"events": [
+			{ "time": 0.0333, "name": "footstep" },
+			{ "time": 0.5333, "name": "footstep" }
+		]
 	}
 }
 }

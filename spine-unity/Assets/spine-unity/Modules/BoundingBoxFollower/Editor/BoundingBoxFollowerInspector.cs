@@ -36,7 +36,7 @@ namespace Spine.Unity.Editor {
 	
 	[CustomEditor(typeof(BoundingBoxFollower))]
 	public class BoundingBoxFollowerInspector : UnityEditor.Editor {
-		SerializedProperty skeletonRenderer, slotName;
+		SerializedProperty skeletonRenderer, slotName, isTrigger;
 		BoundingBoxFollower follower;
 		bool rebuildRequired = false;
 		bool addBoneFollower = false;
@@ -44,6 +44,7 @@ namespace Spine.Unity.Editor {
 		void OnEnable () {
 			skeletonRenderer = serializedObject.FindProperty("skeletonRenderer");
 			slotName = serializedObject.FindProperty("slotName");
+			isTrigger = serializedObject.FindProperty("isTrigger");
 			follower = (BoundingBoxFollower)target;
 		}
 
@@ -59,6 +60,8 @@ namespace Spine.Unity.Editor {
 			EditorGUI.BeginChangeCheck();
 			EditorGUILayout.PropertyField(skeletonRenderer);
 			EditorGUILayout.PropertyField(slotName, new GUIContent("Slot"));
+			EditorGUILayout.PropertyField(isTrigger);
+
 			if (EditorGUI.EndChangeCheck()) {
 				serializedObject.ApplyModifiedProperties();
 				if (!isInspectingPrefab)

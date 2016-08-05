@@ -61,6 +61,7 @@ The Spine cocos2d-x example works on Windows and Mac OS X.
 
 ## Examples
 
-- [Raptor](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx/3/example/Classes/RaptorExample.cpp)
-- [Spineboy](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx/3/example/Classes/SpineboyExample.cpp)
-- [Golbins](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx/3/example/Classes/GoblinsExample.cpp)
+- [Raptor](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx/example/Classes/RaptorExample.cpp)
+- [Spineboy](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx/example/Classes/SpineboyExample.cpp)
+- [Golbins](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx/example/Classes/GoblinsExample.cpp)
+

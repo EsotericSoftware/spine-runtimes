@@ -39,6 +39,7 @@ namespace Spine.Unity {
 		public SkeletonRenderer skeletonRenderer;
 		[SpineSlot(dataField: "skeletonRenderer", containsBoundingBoxes: true)]
 		public string slotName;
+		public bool isTrigger;
 		#endregion
 
 		Slot slot;
@@ -56,6 +57,7 @@ namespace Spine.Unity {
 		public BoundingBoxAttachment CurrentAttachment { get { return currentAttachment; } }
 		public string CurrentAttachmentName { get { return currentAttachmentName; } }
 		public PolygonCollider2D CurrentCollider { get { return currentCollider; } }
+		public bool IsTrigger { get { return isTrigger; } }
 
 		void OnEnable () {
 			ClearColliders();
@@ -110,13 +112,14 @@ namespace Spine.Unity {
 
 #if UNITY_EDITOR
 						if (attachment != null && boundingBoxAttachment == null)
-							Debug.Log("BoundingBoxFollower tried to follow a slot that contains non-boundingbox attachments.");
+							Debug.Log("BoundingBoxFollower tried to follow a slot that contains non-boundingbox attachments: " + slotName);
 #endif
 
 						if (boundingBoxAttachment != null) {
 							var bbCollider = SkeletonUtility.AddBoundingBoxAsComponent(boundingBoxAttachment, gameObject, true);
 							bbCollider.enabled = false;
 							bbCollider.hideFlags = HideFlags.NotEditable;
+							bbCollider.isTrigger = IsTrigger;
 							colliderTable.Add(boundingBoxAttachment, bbCollider);
 							attachmentNameTable.Add(boundingBoxAttachment, attachmentName);
 						}

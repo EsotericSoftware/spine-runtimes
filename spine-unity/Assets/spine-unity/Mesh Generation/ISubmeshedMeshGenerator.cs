@@ -12,6 +12,10 @@ namespace Spine.Unity.MeshGeneration {
 		SubmeshedMeshInstruction GenerateInstruction (Skeleton skeleton);
 		MeshAndMaterials GenerateMesh (SubmeshedMeshInstruction wholeMeshInstruction);
 		List<Slot> Separators { get; }
+
+		float ZSpacing { get; set; }
+		bool AddNormals { get; set; }
+		bool AddTangents { get; set; }
 	}
 
 	// ISubmeshSetMeshGenerator
@@ -22,7 +26,10 @@ namespace Spine.Unity.MeshGeneration {
 	// Step 4: Put the Mesh in MeshFilter. Put the Materials in MeshRenderer.sharedMaterials.
 	public interface ISubmeshSetMeshGenerator {
 		MeshAndMaterials GenerateMesh (ExposedList<SubmeshInstruction> instructions, int startSubmesh, int endSubmesh);
-		bool GenerateNormals { get; set; }
+
+		float ZSpacing { get; set; }
+		bool AddNormals { get; set; }
+		bool AddTangents { get; set; }
 	}
 
 	/// <summary>Primarily a collection of Submesh Instructions. This constitutes instructions for how to construct a mesh containing submeshes.</summary>

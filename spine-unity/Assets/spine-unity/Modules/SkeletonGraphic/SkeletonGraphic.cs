@@ -39,10 +39,11 @@ using Spine;
 namespace Spine.Unity {
 	[ExecuteInEditMode, RequireComponent(typeof(CanvasRenderer), typeof(RectTransform)), DisallowMultipleComponent]
 	[AddComponentMenu("Spine/SkeletonGraphic (Unity UI Canvas)")]
-	public class SkeletonGraphic : MaskableGraphic {
+	public class SkeletonGraphic : MaskableGraphic, ISkeletonComponent, IAnimationStateComponent, ISkeletonAnimation {
 
 		#region Inspector
 		public SkeletonDataAsset skeletonDataAsset;
+		public SkeletonDataAsset SkeletonDataAsset { get { return skeletonDataAsset; } }
 
 		[SpineSkin(dataField:"skeletonDataAsset")]
 		public string initialSkinName = "default";
@@ -66,15 +67,13 @@ namespace Spine.Unity {
 					Clear();
 					Initialize(true);
 					startingAnimation = "";
-					if (skeletonDataAsset.atlasAssets.Length > 1 || skeletonDataAsset.atlasAssets[0].materials.Length > 1) {
+					if (skeletonDataAsset.atlasAssets.Length > 1 || skeletonDataAsset.atlasAssets[0].materials.Length > 1)
 						Debug.LogError("Unity UI does not support multiple textures per Renderer. Your skeleton will not be rendered correctly. Recommend using SkeletonAnimation instead. This requires the use of a Screen space camera canvas.");
-					}
 				} else {
 					if (freeze) return;
 					skeleton.SetToSetupPose();
-					if (!string.IsNullOrEmpty(startingAnimation)) {
+					if (!string.IsNullOrEmpty(startingAnimation))
 						skeleton.PoseWithAnimation(startingAnimation, 0f, false);
-					}
 				}
 			} else {
 				if (skeletonDataAsset != null)
@@ -88,13 +87,8 @@ namespace Spine.Unity {
 
 		protected override void Reset () {
 			base.Reset();
-			if (canvas == null) {
-				Debug.LogWarningFormat("SkeletonGraphic requires a Canvas to be visible. Move this GameObject ({0}) in the Hierarchy so it becomes a child of a Canvas.", gameObject.name);
-			}
-
-			if (material == null || material.shader != Shader.Find("Spine/SkeletonGraphic (Premultiply Alpha)")) {
-				Debug.LogWarning("SkeletonGraphic works best with the SkeletonGraphic material.");
-			}
+			if (material == null || material.shader != Shader.Find("Spine/SkeletonGraphic (Premultiply Alpha)"))
+				Debug.LogWarning("SkeletonGraphic works best with the SkeletonGraphic material.");			
 		}
 		#endif
 		#endregion
@@ -148,7 +142,7 @@ namespace Spine.Unity {
 			if (UpdateComplete != null) UpdateComplete(this);
 		}
 
-		void LateUpdate () {
+		public void LateUpdate () {
 			if (freeze) return;
 			//this.SetVerticesDirty(); // Which is better?
 			UpdateMesh();
@@ -168,10 +162,9 @@ namespace Spine.Unity {
 		protected Spine.Unity.MeshGeneration.ISimpleMeshGenerator spineMeshGenerator;
 		public Spine.Unity.MeshGeneration.ISimpleMeshGenerator SpineMeshGenerator { get { return this.spineMeshGenerator; } }
 
-		public delegate void UpdateDelegate (SkeletonGraphic skeletonGraphic);
-		public event UpdateDelegate UpdateLocal;
-		public event UpdateDelegate UpdateWorld;
-		public event UpdateDelegate UpdateComplete;
+		public event UpdateBonesDelegate UpdateLocal;
+		public event UpdateBonesDelegate UpdateWorld;
+		public event UpdateBonesDelegate UpdateComplete;
 
 		public void Clear () {
 			skeleton = null;
@@ -216,6 +209,11 @@ namespace Spine.Unity {
 			}
 		}
 		#endregion
+		#else
+		public Skeleton Skeleton { get { return null; } }
+		public AnimationState AnimationState { get { return null; } }
+		public event UpdateBonesDelegate UpdateLocal, UpdateWorld, UpdateComplete;
+		public void LateUpdate () { }
 		#endif
 	}
 }

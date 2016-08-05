@@ -34,8 +34,11 @@ using UnityEngine;
 namespace Spine.Unity.MeshGeneration {
 	public class ArraysMeshGenerator {
 		#region Settings
-		protected bool premultiplyVertexColors = true;
-		public bool PremultiplyVertexColors { get { return this.premultiplyVertexColors; } set { this.premultiplyVertexColors = value; } }
+		public bool PremultiplyVertexColors { get; set; }
+		protected bool addNormals;
+		public bool AddNormals { get { return addNormals; } set { addNormals = value; } }
+		protected bool addTangents;
+		public bool AddTangents { get { return addTangents; } set { addTangents = value; } }
 		#endregion
 
 		protected float[] attachmentVertexBuffer = new float[8];
@@ -43,25 +46,22 @@ namespace Spine.Unity.MeshGeneration {
 		protected Color32[] meshColors32;
 		protected Vector2[] meshUVs;
 
-
-		protected bool generateNormals = false;
-		public bool GenerateNormals {
-			get { return generateNormals; }
-			set { generateNormals = value; }
-		}
-
-		Vector3[] meshNormals;
+		#if SPINE_OPTIONAL_NORMALS
+		protected Vector3[] meshNormals;
+		#endif
+		protected Vector4[] meshTangents;
+		protected Vector2[] tempTanBuffer;
 
 		public void TryAddNormalsTo (Mesh mesh, int targetVertexCount) {
 			#if SPINE_OPTIONAL_NORMALS
-			if (generateNormals) {
-				bool verticesWasResized = this.meshNormals == null || targetVertexCount > meshNormals.Length;
+			if (addNormals) {
+				bool verticesWasResized = this.meshNormals == null || meshNormals.Length < targetVertexCount;
 				if (verticesWasResized) {
 					this.meshNormals = new Vector3[targetVertexCount];
-					Vector3 normal = new Vector3(0, 0, -1);
+					Vector3 fixedNormal = new Vector3(0, 0, -1f);
 					Vector3[] normals = this.meshNormals;
 					for (int i = 0; i < targetVertexCount; i++)
-						normals[i] = normal;
+						normals[i] = fixedNormal;
 				}
 
 				mesh.normals = this.meshNormals;
@@ -69,7 +69,8 @@ namespace Spine.Unity.MeshGeneration {
 			#endif
 		}
 
-
+		/// <summary>Ensures the sizes of the passed array references. If they are not the correct size, a new array will be assigned to the references.</summary>
+		/// <returns><c>true</c>, if a resize occurred, <c>false</c> otherwise.</returns>
 		public static bool EnsureSize (int targetVertexCount, ref Vector3[] vertices, ref Vector2[] uvs, ref Color32[] colors) {
 			Vector3[] verts = vertices;
 			bool verticesWasResized = verts == null || targetVertexCount > verts.Length;
@@ -97,12 +98,10 @@ namespace Spine.Unity.MeshGeneration {
 			return submeshBuffersWasResized;
 		}
 
-		/// <summary>
-		/// Fills vertex arrays.
-		/// </summary>
+		/// <summary>Fills Unity vertex data buffers with verts from the Spine Skeleton.</summary>
 		/// <param name="skeleton">Spine.Skeleton source of the drawOrder array</param>
 		/// <param name="startSlot">Slot index of the first slot.</param>
-		/// <param name="endSlot">The index bounding the slot list. endSlot - 1 is the last slot to be added.</param>
+		/// <param name="endSlot">The index bounding the slot list. [endSlot - 1] is the last slot to be added.</param>
 		/// <param name="zSpacing">Spacing along the z-axis between attachments.</param>
 		/// <param name="pmaColors">If set to <c>true</c>, vertex colors will be premultiplied. This will also enable additive.</param>
 		/// <param name="verts">Vertex positions array. </param>
@@ -112,7 +111,8 @@ namespace Spine.Unity.MeshGeneration {
 		/// <param name="tempVertBuffer">A temporary vertex position buffer for attachment position values.</param>
 		/// <param name="boundsMin">Reference to the running calculated minimum bounds.</param>
 		/// <param name="boundsMax">Reference to the running calculated maximum bounds.</param>
-		public static void FillVerts (Skeleton skeleton, int startSlot, int endSlot, float zSpacing, bool pmaColors, Vector3[] verts, Vector2[] uvs, Color32[] colors, ref int vertexIndex, ref float[] tempVertBuffer, ref Vector3 boundsMin, ref Vector3 boundsMax) {
+		/// <param name = "renderMeshes">Include MeshAttachments. If false, it will ignore MeshAttachments.</param>
+		public static void FillVerts (Skeleton skeleton, int startSlot, int endSlot, float zSpacing, bool pmaColors, Vector3[] verts, Vector2[] uvs, Color32[] colors, ref int vertexIndex, ref float[] tempVertBuffer, ref Vector3 boundsMin, ref Vector3 boundsMax, bool renderMeshes = true) {
 			Color32 color;
 			var skeletonDrawOrderItems = skeleton.DrawOrder.Items;
 			float a = skeleton.a * 255, r = skeleton.r, g = skeleton.g, b = skeleton.b;
@@ -183,7 +183,7 @@ namespace Spine.Unity.MeshGeneration {
 					else if (y4 > bmax.y) bmax.y = y4;
 
 					vi += 4;
-				} else {
+				} else if (renderMeshes) {
 					var meshAttachment = attachment as MeshAttachment;
 					if (meshAttachment != null) {
 						int meshVertexCount = meshAttachment.worldVerticesLength;
@@ -229,22 +229,18 @@ namespace Spine.Unity.MeshGeneration {
 		}
 
 
-		/// <summary>
-		/// Fills a submesh triangle buffer array.
-		/// </summary>
+		/// <summary>Fills a submesh triangle buffer array.</summary>
 		/// <param name="skeleton">Spine.Skeleton source of draw order slots.</param>
 		/// <param name="triangleCount">The target triangle count.</param>
 		/// <param name="firstVertex">First vertex of this submesh.</param>
 		/// <param name="startSlot">Start slot.</param>
 		/// <param name="endSlot">End slot.</param>
 		/// <param name="triangleBuffer">The triangle buffer array to be filled. This reference will be replaced in case the triangle values don't fit.</param>
-		/// <param name="bufferTriangleCount">The current triangle count of the submesh buffer. This is not always equal to triangleBuffer.Length because for last submeshes, length may be larger than needed.</param>
 		/// <param name="isLastSubmesh">If set to <c>true</c>, the triangle buffer is allowed to be larger than needed.</param>
-		public static void FillTriangles (Skeleton skeleton, int triangleCount, int firstVertex, int startSlot, int endSlot, ref int[] triangleBuffer, bool isLastSubmesh) {
+		public static void FillTriangles (ref int[] triangleBuffer, Skeleton skeleton, int triangleCount, int firstVertex, int startSlot, int endSlot, bool isLastSubmesh) {
 			int trianglesCapacity = triangleBuffer.Length;
-			var tris = triangleBuffer;
+			int[] tris = triangleBuffer;
 
-			// Ensure triangleBuffer size.
 			if (isLastSubmesh) {
 				if (trianglesCapacity > triangleCount) {
 					for (int i = triangleCount; i < trianglesCapacity; i++)
@@ -256,45 +252,170 @@ namespace Spine.Unity.MeshGeneration {
 				triangleBuffer = tris = new int[triangleCount];
 			}
 
-			// Iterate through submesh slots and store the triangles. 
-			int triangleIndex = 0;
-			int afv = firstVertex; // attachment first vertex
 			var skeletonDrawOrderItems = skeleton.drawOrder.Items;
-			for (int i = startSlot, n = endSlot; i < n; i++) {			
+			for (int i = startSlot, n = endSlot, ti = 0, afv = firstVertex; i < n; i++) {			
 				var attachment = skeletonDrawOrderItems[i].attachment;
 
+				// RegionAttachment
 				if (attachment is RegionAttachment) {
-					tris[triangleIndex] = afv; tris[triangleIndex + 1] = afv + 2; tris[triangleIndex + 2] = afv + 1;
-					tris[triangleIndex + 3] = afv + 2; tris[triangleIndex + 4] = afv + 3; tris[triangleIndex + 5] = afv + 1;
-					triangleIndex += 6;
+					tris[ti] = afv;
+					tris[ti + 1] = afv + 2;
+					tris[ti + 2] = afv + 1;
+					tris[ti + 3] = afv + 2;
+					tris[ti + 4] = afv + 3;
+					tris[ti + 5] = afv + 1;
+					ti += 6;
 					afv += 4;
-				} else {
-					int[] attachmentTriangles;
-					int attachmentVertexCount;
-					var meshAttachment = attachment as MeshAttachment;
-					if (meshAttachment != null) {
-						attachmentVertexCount = meshAttachment.worldVerticesLength >> 1; //  length/2
-						attachmentTriangles = meshAttachment.triangles;
-						for (int ii = 0, nn = attachmentTriangles.Length; ii < nn; ii++, triangleIndex++)
-							tris[triangleIndex] = afv + attachmentTriangles[ii];
-
-						afv += attachmentVertexCount;
-					}
+					continue;
 				}
-			} // Done adding current submesh triangles
+
+				// MeshAttachment
+				var meshAttachment = attachment as MeshAttachment;
+				if (meshAttachment != null) {
+					int[] attachmentTriangles = meshAttachment.triangles;
+					for (int ii = 0, nn = attachmentTriangles.Length; ii < nn; ii++, ti++)
+						tris[ti] = afv + attachmentTriangles[ii];
+
+					afv += meshAttachment.worldVerticesLength >> 1; // length/2;
+				}
+
+			}
 		}
 
+		public static void FillTrianglesQuads (ref int[] triangleBuffer, ref int storedTriangleCount, ref int storedFirstVertex, int instructionsFirstVertex, int instructionTriangleCount, bool isLastSubmesh) {
+			int trianglesCapacity = triangleBuffer.Length;
 
+			if (isLastSubmesh && trianglesCapacity > instructionTriangleCount) {
+				for (int i = instructionTriangleCount; i < trianglesCapacity; i++)
+					triangleBuffer[i] = 0;
+				storedTriangleCount = instructionTriangleCount;
+			} else if (trianglesCapacity != instructionTriangleCount) {
+				triangleBuffer = new int[instructionTriangleCount];
+				storedTriangleCount = 0;
+			}
+
+			// Use stored quad triangles if possible.
+			int[] tris = triangleBuffer;
+			if (storedFirstVertex != instructionsFirstVertex || storedTriangleCount < instructionTriangleCount) { //|| storedTriangleCount == 0
+				storedTriangleCount = instructionTriangleCount;
+				storedFirstVertex = instructionsFirstVertex;
+				int afv = instructionsFirstVertex; // attachment first vertex
+				for (int ti = 0; ti < instructionTriangleCount; ti += 6, afv += 4) {
+					tris[ti] = afv;
+					tris[ti + 1] = afv + 2;
+					tris[ti + 2] = afv + 1;
+					tris[ti + 3] = afv + 2;
+					tris[ti + 4] = afv + 3;
+					tris[ti + 5] = afv + 1;
+				}
+			}
+		}
+
+		/// <summary>Creates a UnityEngine.Bounds struct from minimum and maximum value vectors.</summary>
 		public static Bounds ToBounds (Vector3 boundsMin, Vector3 boundsMax) {
 			Vector3 size = (boundsMax - boundsMin);
 			Vector3 center = boundsMin + size * 0.5f;
 			return new Bounds(center, size);
 		}
 
+		#region TangentSolver2D
+		// Thanks to contributions from forum user ToddRivers
+
+		/// <summary>Step 1 of solving tangents. Ensure you have buffers of the correct size.</summary>
+		/// <param name="tangentBuffer">Eventual Vector4[] tangent buffer to assign to Mesh.tangents.</param>
+		/// <param name="tempTanBuffer">Temporary Vector2 buffer for calculating directions.</param>
+		/// <param name="vertexCount">Number of vertices that require tangents (or the size of the vertex array)</param>
+		public static void SolveTangents2DEnsureSize (ref Vector4[] tangentBuffer, ref Vector2[] tempTanBuffer, int vertexCount) {
+			if (tangentBuffer == null || tangentBuffer.Length < vertexCount)
+				tangentBuffer = new Vector4[vertexCount];
+			
+			if (tempTanBuffer == null || tempTanBuffer.Length < vertexCount * 2)
+				tempTanBuffer = new Vector2[vertexCount * 2]; // two arrays in one.
+		}
+
+		/// <summary>Step 2 of solving tangents. Fills (part of) a temporary tangent-solution buffer based on the vertices and uvs defined by a submesh's triangle buffer. Only needs to be called once for single-submesh meshes.</summary>
+		/// <param name="tempTanBuffer">A temporary Vector3[] for calculating tangents.</param>
+		/// <param name="vertices">The mesh's current vertex position buffer.</param>
+		/// <param name="triangles">The mesh's current triangles buffer.</param>
+		/// <param name="uvs">The mesh's current uvs buffer.</param>
+		/// <param name="vertexCount">Number of vertices that require tangents (or the size of the vertex array)</param>
+		/// <param name = "triangleCount">The number of triangle indexes in the triangle array to be used.</param>
+		public static void SolveTangents2DTriangles (Vector2[] tempTanBuffer, int[] triangles, int triangleCount, Vector3[] vertices, Vector2[] uvs, int vertexCount) {
+			Vector2 sdir;
+			Vector2 tdir;
+			for (int t = 0; t < triangleCount; t += 3) {
+				int i1 = triangles[t + 0];
+				int i2 = triangles[t + 1];
+				int i3 = triangles[t + 2];
+
+				Vector3 v1 = vertices[i1];
+				Vector3 v2 = vertices[i2];
+				Vector3 v3 = vertices[i3];
+
+				Vector2 w1 = uvs[i1];
+				Vector2 w2 = uvs[i2];
+				Vector2 w3 = uvs[i3];
+
+				float x1 = v2.x - v1.x;
+				float x2 = v3.x - v1.x;
+				float y1 = v2.y - v1.y;
+				float y2 = v3.y - v1.y;
+
+				float s1 = w2.x - w1.x;
+				float s2 = w3.x - w1.x;
+				float t1 = w2.y - w1.y;
+				float t2 = w3.y - w1.y;
+
+				float div = s1 * t2 - s2 * t1;
+				float r = (div == 0f) ? 0f : 1f / div;
+
+				sdir.x = (t2 * x1 - t1 * x2) * r;
+				sdir.y = (t2 * y1 - t1 * y2) * r;
+				tempTanBuffer[i1] = tempTanBuffer[i2] = tempTanBuffer[i3] = sdir;
+
+				tdir.x = (s1 * x2 - s2 * x1) * r;
+				tdir.y = (s1 * y2 - s2 * y1) * r;
+				tempTanBuffer[vertexCount + i1] = tempTanBuffer[vertexCount + i2] = tempTanBuffer[vertexCount + i3] = tdir;
+			}
+		}
+
+		/// <summary>Step 3 of solving tangents. Fills a Vector4[] tangents array according to values calculated in step 2.</summary>
+		/// <param name="tangents">A Vector4[] that will eventually be used to set Mesh.tangents</param>
+		/// <param name="tempTanBuffer">A temporary Vector3[] for calculating tangents.</param>
+		/// <param name="vertexCount">Number of vertices that require tangents (or the size of the vertex array)</param>
+		public static void SolveTangents2DBuffer (Vector4[] tangents, Vector2[] tempTanBuffer, int vertexCount) {
+
+			Vector4 tangent;
+			tangent.z = 0;
+			for (int i = 0; i < vertexCount; ++i) {
+				Vector2 t = tempTanBuffer[i]; 
+
+				// t.Normalize() (aggressively inlined). Even better if offloaded to GPU via vertex shader.
+				float magnitude = Mathf.Sqrt(t.x * t.x + t.y * t.y);
+				if (magnitude > 1E-05) {
+					float reciprocalMagnitude = 1f/magnitude;
+					t.x *= reciprocalMagnitude;
+					t.y *= reciprocalMagnitude;
+				}
+
+				Vector2 t2 = tempTanBuffer[vertexCount + i];
+				tangent.x = t.x;
+				tangent.y = t.y;
+				//tangent.z = 0;
+				tangent.w = (t.y * t2.x > t.x * t2.y) ? 1 : -1; // 2D direction calculation. Used for binormals.
+				tangents[i] = tangent;
+			}
+
+		}
+		#endregion
+
 		#region SubmeshTriangleBuffer
 		public class SubmeshTriangleBuffer {
 			public int[] triangles;
-			//public int triangleCount;
+			public int triangleCount; // for last/single submeshes with potentially zeroed triangles.
+			public int firstVertex = -1; // for !renderMeshes.
+
+			public SubmeshTriangleBuffer () { }
 
 			public SubmeshTriangleBuffer (int triangleCount) {
 				triangles = new int[triangleCount];

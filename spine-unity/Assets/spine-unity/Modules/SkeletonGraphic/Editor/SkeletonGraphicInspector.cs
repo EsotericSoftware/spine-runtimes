@@ -37,7 +37,8 @@ using UnityEditor;
 using Spine;
 
 namespace Spine.Unity.Editor {
-	
+
+	[InitializeOnLoad]
 	[CustomEditor(typeof(SkeletonGraphic))]
 	public class SkeletonGraphicInspector : UnityEditor.Editor {
 		SerializedProperty material_, color_;
@@ -47,6 +48,40 @@ namespace Spine.Unity.Editor {
 		SerializedProperty raycastTarget_;
 
 		SkeletonGraphic thisSkeletonGraphic;
+
+		static SpineEditorUtilities.InstantiateDelegate instantiateDelegate;
+
+		static SkeletonGraphicInspector () {
+			if (!SpineEditorUtilities.initialized)
+				return;
+
+			if (instantiateDelegate == null)
+				instantiateDelegate = new SpineEditorUtilities.InstantiateDelegate(SpawnSkeletonGraphicFromDrop);
+			
+			// Drag and Drop Instantiate menu item
+			var spawnTypes = SpineEditorUtilities.additionalSpawnTypes;
+			UnityEngine.Assertions.Assert.IsFalse(spawnTypes == null);
+			bool menuItemExists = false;
+			foreach (var spawnType in spawnTypes) {
+				if (spawnType.instantiateDelegate == SkeletonGraphicInspector.instantiateDelegate) {
+					menuItemExists = true;
+					break;
+				}
+			}
+
+			if (!menuItemExists) {
+				SpineEditorUtilities.additionalSpawnTypes.Add(new SpineEditorUtilities.SkeletonComponentSpawnType {
+					menuLabel = "SkeletonGraphic (UI)",
+					instantiateDelegate = SkeletonGraphicInspector.instantiateDelegate,
+					isUI = true
+				});
+			}
+			
+		}
+
+		static public Component SpawnSkeletonGraphicFromDrop (SkeletonDataAsset data) {
+			return InstantiateSkeletonGraphic(data);
+		}
 
 		void OnEnable () {
 			var so = this.serializedObject;
@@ -126,9 +161,8 @@ namespace Spine.Unity.Editor {
 			var parentGameObject = Selection.activeObject as GameObject;
 			var parentTransform = parentGameObject == null ? null : parentGameObject.GetComponent<RectTransform>();
 
-			if (parentTransform == null) {
+			if (parentTransform == null)
 				Debug.LogWarning("Your new SkeletonGraphic will not be visible until it is placed under a Canvas");
-			}
 
 			var gameObject = NewSkeletonGraphicGameObject("New SkeletonGraphic");
 			gameObject.transform.SetParent(parentTransform, false);
