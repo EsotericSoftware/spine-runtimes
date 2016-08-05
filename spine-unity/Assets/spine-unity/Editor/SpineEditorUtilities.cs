@@ -35,6 +35,7 @@
  * Full irrevocable rights and permissions granted to Esoteric Software
 *****************************************************************************/
 #define SPINE_SKELETONANIMATOR
+#define SPINE_HIERARCHY_ICONS
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -203,8 +204,12 @@ namespace Spine.Unity.Editor {
 			skeletonUtilityBoneTable = new Dictionary<int, SkeletonUtilityBone>();
 			boundingBoxFollowerTable = new Dictionary<int, BoundingBoxFollower>();
 
+			#if SPINE_HIERARCHY_ICONS
+			EditorApplication.hierarchyWindowChanged -= HierarchyWindowChanged;
 			EditorApplication.hierarchyWindowChanged += HierarchyWindowChanged;
+			EditorApplication.hierarchyWindowItemOnGUI -= HierarchyWindowItemOnGUI;
 			EditorApplication.hierarchyWindowItemOnGUI += HierarchyWindowItemOnGUI;
+			#endif
 
 			HierarchyWindowChanged();
 			initialized = true;
@@ -394,6 +399,7 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		#region Hierarchy Icons
+		#if SPINE_HIERARCHY_ICONS
 		static void HierarchyWindowChanged () {
 			skeletonRendererTable.Clear();
 			skeletonUtilityBoneTable.Clear();
@@ -445,6 +451,7 @@ namespace Spine.Unity.Editor {
 				}
 			}
 		}
+		#endif
 		#endregion
 
 		#region Auto-Import Entry Point
