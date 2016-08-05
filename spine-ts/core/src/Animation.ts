@@ -177,7 +177,7 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			let bone = skeleton.bones.get(this.boneIndex);
+			let bone = skeleton.bones[this.boneIndex];
 
 			if (time >= frames[frames.length - RotateTimeline.ENTRIES]) { // Time is after last frame.
 				let amount = bone.data.rotation + frames[frames.length + RotateTimeline.PREV_ROTATION] - bone.rotation;
@@ -234,7 +234,7 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			let bone = skeleton.bones.get(this.boneIndex);
+			let bone = skeleton.bones[this.boneIndex];
 
 			if (time >= frames[frames.length - TranslateTimeline.ENTRIES]) { // Time is after last frame.
 				bone.x += (bone.data.x + frames[frames.length + TranslateTimeline.PREV_X] - bone.x) * alpha;
@@ -263,7 +263,7 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			let bone = skeleton.bones.get(this.boneIndex);
+			let bone = skeleton.bones[this.boneIndex];
 			if (time >= frames[frames.length - ScaleTimeline.ENTRIES]) { // Time is after last frame.
 				bone.scaleX += (bone.data.scaleX * frames[frames.length + ScaleTimeline.PREV_X] - bone.scaleX) * alpha;
 				bone.scaleY += (bone.data.scaleY * frames[frames.length + ScaleTimeline.PREV_Y] - bone.scaleY) * alpha;
@@ -291,7 +291,7 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			let bone = skeleton.bones.get(this.boneIndex);
+			let bone = skeleton.bones[this.boneIndex];
 			if (time >= frames[frames.length - ShearTimeline.ENTRIES]) { // Time is after last frame.
 				bone.shearX += (bone.data.shearX + frames[frames.length + ShearTimeline.PREV_X] - bone.shearX) * alpha;
 				bone.shearY += (bone.data.shearY + frames[frames.length + ShearTimeline.PREV_Y] - bone.shearY) * alpha;
@@ -360,7 +360,7 @@ module spine {
 				b += (frames[frame + ColorTimeline.B] - b) * percent;
 				a += (frames[frame + ColorTimeline.A] - a) * percent;
 			}
-			let color: Color = skeleton.slots.get(this.slotIndex).color;
+			let color: Color = skeleton.slots[this.slotIndex].color;
 			if (alpha < 1)
 				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
 			else
@@ -399,7 +399,7 @@ module spine {
 				frameIndex = Animation.binarySearch(frames, time, 1) - 1;
 
 			let attachmentName = this.attachmentNames[frameIndex];
-			skeleton.slots.get(this.slotIndex)
+			skeleton.slots[this.slotIndex]
 				.setAttachment(attachmentName == null ? null : skeleton.getAttachment(this.slotIndex, attachmentName));
 		}
     }
@@ -513,10 +513,9 @@ module spine {
 		}
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number) {
-			let slot: Slot = skeleton.slots.get(this.slotIndex);
-			let slotAttachment: Attachment = slot.attachment;
-            FIXME
-			// if (!(slotAttachment instanceof VertexAttachment) || !((VertexAttachment)slotAttachment).applyDeform(attachment)) return;
+			let slot: Slot = skeleton.slots[this.slotIndex];
+			let slotAttachment: Attachment = slot.getAttachment();            
+			if (!(slotAttachment instanceof VertexAttachment) || !(<VertexAttachment>slotAttachment).applyDeform(this.attachment)) return;
 
 			let frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
@@ -524,7 +523,7 @@ module spine {
 			let frameVertices = this.frameVertices;
 			let vertexCount = frameVertices[0].length;
 
-			let verticesArray: Array<number> = slot.getAttachmentVertices();
+			let verticesArray: Array<number> = slot.attachmentVertices;
 			if (verticesArray.length != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
 			let vertices: Array<number> = Utils.setArraySize(verticesArray, vertexCount);
             
@@ -584,7 +583,7 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			let constraint: IkConstraint = skeleton.ikConstraints.get(ikConstraintIndex);
+			let constraint: IkConstraint = skeleton.ikConstraints[this.ikConstraintIndex];
 
 			if (time >= frames[frames.length - IkConstraintTimeline.ENTRIES]) { // Time is after last frame.
 				constraint.mix += (frames[frames.length + IkConstraintTimeline.PREV_MIX] - constraint.mix) * alpha;
@@ -630,7 +629,7 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			let constraint: TransformConstraint = skeleton.transformConstraints.get(this.transformConstraintIndex);
+			let constraint: TransformConstraint = skeleton.transformConstraints[this.transformConstraintIndex];
 
 			if (time >= frames[frames.length - TransformConstraintTimeline.ENTRIES]) { // Time is after last frame.
 				let i = frames.length;
@@ -683,7 +682,7 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			let constraint: PathConstraint = skeleton.pathConstraints.get(this.pathConstraintIndex);
+			let constraint: PathConstraint = skeleton.pathConstraints[this.pathConstraintIndex];
 
 			if (time >= frames[frames.length - PathConstraintPositionTimeline.ENTRIES]) { // Time is after last frame.
 				let i = frames.length;
@@ -710,7 +709,7 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			let constraint: PathConstraint = skeleton.pathConstraints.get(pathConstraintIndex);
+			let constraint: PathConstraint = skeleton.pathConstraints[this.pathConstraintIndex];
 
 			if (time >= frames[frames.length - PathConstraintSpacingTimeline.ENTRIES]) { // Time is after last frame.
 				let i = frames.length;
@@ -754,7 +753,7 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			let constraint: PathConstraint = skeleton.pathConstraints.get(pathConstraintIndex);
+			let constraint: PathConstraint = skeleton.pathConstraints[this.pathConstraintIndex];
 
 			if (time >= frames[frames.length - PathConstraintMixTimeline.ENTRIES]) { // Time is after last frame.
 				let i = frames.length;

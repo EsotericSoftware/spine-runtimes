@@ -33,14 +33,14 @@ module spine.webgl {
             this._toLoad++;
             let img = new Image();
             img.src = path;
-            img.onload = (ev:Event) => {
+            img.onload = (ev) => {
                 if (success) success(path, img);
                 let texture = new Texture(img);
                 this._assets[path] = texture; 
                 this._toLoad--;
                 this._loaded++;
             }
-            img.onerror = (ev:Event) => {
+            img.onerror = (ev) => {
                 this._errors[path] =  `Couldn't load image ${path}`;
                 this._toLoad--;
                 this._loaded++;

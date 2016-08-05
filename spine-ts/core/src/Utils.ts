@@ -8,7 +8,7 @@ module spine {
     }
 
     export class Color {        
-        constructor( public r: number, public g: number, public b: number, public a: number) {            
+        constructor( public r: number = 0, public g: number = 0, public b: number = 0, public a: number = 0) {            
         }
 
         set (r: number, g: number, b: number, a: number) {
@@ -17,6 +17,13 @@ module spine {
             this.b = b;
             this.a = a;
             this.clamp();
+        }
+
+        setFromColor(c: Color) {
+            this.r = c.r;
+            this.g = c.g;
+            this.b = c.b;
+            this.a = c.a;
         }
 
         add (r: number, g: number, b: number, a: number) {
@@ -75,14 +82,15 @@ module spine {
     }
 
     export class Utils {
-        static arrayCopy (source: Array<number>, sourceStart: number, dest: Array<Number>, destStart: number, numElements: number) {
+        static arrayCopy<T> (source: Array<T>, sourceStart: number, dest: Array<T>, destStart: number, numElements: number) {
             for (var i = sourceStart, j = destStart; i < sourceStart + numElements; i++, j++) {
                 dest[j] = source[i];
             }
         }  
 
-        static setArraySize (array: Array<number>, size: number): Array<number> {
+        static setArraySize (array: Array<number>, size: number): Array<number> {            
             let oldSize = array.length;
+            if (oldSize == size) return;
             array.length = size;
             if (oldSize < size) {
                 for (var i = oldSize; i < size; i++) array[i] = 0;
