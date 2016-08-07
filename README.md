@@ -8,6 +8,10 @@ The Spine Runtimes may only be used for personal or internal use, typically to e
 
 The Spine Runtimes are developed with the intent to be used with data exported from Spine. By purchasing Spine, `Section 2` of the [Spine Software License](https://esotericsoftware.com/files/license.txt) grants the right to create and distribute derivative works of the Spine Runtimes.
 
+## Bugs, enhancements, and tasks
+
+Review our backlog of bugs, enhancements, and tasks in the [spine-runtimes](https://github.com/EsotericSoftware/spine-runtimes/issues) and [spine-editor](https://github.com/EsotericSoftware/spine-editor/issues) issue trackers. However, you may find it more convenient to use the [spine-runtimes waffle](https://waffle.io/EsotericSoftware/spine-runtimes) and [spine-editor waffle](https://waffle.io/EsotericSoftware/spine-editor), which provide a nicer view of the same issue tracker information.
+
 ## Documentation
 
 See the Spine [runtime documentation](http://esotericsoftware.com/spine-documentation#runtimesTitle) for documentation applicable to all runtimes. See each runtime's `README.md` for runtime specific documentation.
