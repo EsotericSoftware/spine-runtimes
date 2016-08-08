@@ -48,6 +48,7 @@ namespace Spine.Unity.Modules {
 		SerializedObject skeletonRendererSerializedObject;
 		SerializedProperty separatorNamesProp;
 		static bool skeletonRendererExpanded = true;
+		bool slotsReapplyRequired = false;
 
 		void OnEnable () {
 			if (component == null)
@@ -133,8 +134,14 @@ namespace Spine.Unity.Modules {
 						EditorGUILayout.HelpBox("Separators are empty. Change the size to 1 and choose a slot if you want the render to be separated.", MessageType.Info);
 					}
 				}
-				if (EditorGUI.EndChangeCheck())
+
+				if (EditorGUI.EndChangeCheck()) {
 					skeletonRendererSerializedObject.ApplyModifiedProperties();
+
+					if (!Application.isPlaying)
+						slotsReapplyRequired = true;
+				}
+					
 
 				totalParts = separatorCount + 1;
 				var counterStyle = skeletonRendererExpanded ? EditorStyles.label : EditorStyles.miniLabel;
@@ -197,6 +204,13 @@ namespace Spine.Unity.Modules {
 			}
 
 			serializedObject.ApplyModifiedProperties();
+
+			if (slotsReapplyRequired && UnityEngine.Event.current.type == EventType.Repaint) {
+				SkeletonRendererInspector.ReapplySeparatorSlotNames(component.SkeletonRenderer);
+				component.SkeletonRenderer.LateUpdate();
+				SceneView.RepaintAll();
+				slotsReapplyRequired = false;
+			}
 		}
 
 		public void AddPartsRenderer (int count) {

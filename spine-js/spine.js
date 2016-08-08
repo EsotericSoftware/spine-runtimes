@@ -2743,11 +2743,11 @@ spine.SkeletonBounds.prototype = {
 			if (poolCount > 0) {
 				polygon = polygonPool[poolCount - 1];
 				polygonPool.splice(poolCount - 1, 1);
+				polygon.length = boundingBox.vertices.length;
 			} else
-				polygon = new spine.Float32Array();
+				polygon = new Array(boundingBox.vertices.length);
 			polygons[polygons.length] = polygon;
 
-			polygon.length = boundingBox.vertices.length;
 			boundingBox.computeWorldVertices(x, y, slot.bone, polygon);
 		}
 
