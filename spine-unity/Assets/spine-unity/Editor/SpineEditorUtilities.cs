@@ -35,7 +35,6 @@
  * Full irrevocable rights and permissions granted to Esoteric Software
 *****************************************************************************/
 #define SPINE_SKELETONANIMATOR
-#define SPINE_HIERARCHY_ICONS
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -177,6 +176,10 @@ namespace Spine.Unity.Editor {
 		const string DEFAULT_SHADER_KEY = "SPINE_DEFAULT_SHADER";
 		public static string defaultShader = DEFAULT_DEFAULT_SHADER;
 
+		const bool DEFAULT_SHOW_HIERARCHY_ICONS = true;
+		const string SHOW_HIERARCHY_ICONS_KEY = "SPINE_SHOW_HIERARCHY_ICONS";
+		public static bool showHierarchyIcons = DEFAULT_SHOW_HIERARCHY_ICONS;
+
 		#region Initialization
 		static SpineEditorUtilities () {
 			Initialize();
@@ -187,6 +190,7 @@ namespace Spine.Unity.Editor {
 				defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, DEFAULT_DEFAULT_MIX);
 				defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, DEFAULT_DEFAULT_SCALE);
 				defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, DEFAULT_DEFAULT_SHADER);	
+				showHierarchyIcons = EditorPrefs.GetBool(SHOW_HIERARCHY_ICONS_KEY, DEFAULT_SHOW_HIERARCHY_ICONS);
 			}
 
 			SceneView.onSceneGUIDelegate -= OnSceneGUI;
@@ -231,7 +235,19 @@ namespace Spine.Unity.Editor {
 				defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, DEFAULT_DEFAULT_MIX);
 				defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, DEFAULT_DEFAULT_SCALE);
 				defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, DEFAULT_DEFAULT_SHADER);
+				showHierarchyIcons = EditorPrefs.GetBool(SHOW_HIERARCHY_ICONS_KEY, DEFAULT_SHOW_HIERARCHY_ICONS);
 			}
+
+
+			EditorGUI.BeginChangeCheck();
+			showHierarchyIcons = EditorGUILayout.Toggle(new GUIContent("Show Hierarchy Icons", "Show relevant icons on GameObjects with Spine Components on them. Disable this if you have large, complex scenes."), showHierarchyIcons);
+			if (EditorGUI.EndChangeCheck()) {
+				EditorPrefs.SetBool(SHOW_HIERARCHY_ICONS_KEY, showHierarchyIcons);
+				HierarchyWindowChanged();				
+			} 
+				
+
+			EditorGUILayout.Separator();
 
 			EditorGUILayout.LabelField("Auto-Import Settings", EditorStyles.boldLabel);
 
@@ -246,7 +262,7 @@ namespace Spine.Unity.Editor {
 				EditorPrefs.SetFloat(DEFAULT_SCALE_KEY, defaultScale);
 
 			EditorGUI.BeginChangeCheck();
-			defaultShader = EditorGUILayout.DelayedTextField("Default shader for auto-generated materials", defaultShader);
+			defaultShader = EditorGUILayout.DelayedTextField(new GUIContent("Default shader", "Default shader for materials auto-generated on import."), defaultShader);
 			if (EditorGUI.EndChangeCheck())
 				EditorPrefs.SetString(DEFAULT_SHADER_KEY, defaultShader);
 			
@@ -399,59 +415,61 @@ namespace Spine.Unity.Editor {
 		#endregion
 
 		#region Hierarchy Icons
-		#if SPINE_HIERARCHY_ICONS
 		static void HierarchyWindowChanged () {
-			skeletonRendererTable.Clear();
-			skeletonUtilityBoneTable.Clear();
-			boundingBoxFollowerTable.Clear();
+			if (showHierarchyIcons) {
+				skeletonRendererTable.Clear();
+				skeletonUtilityBoneTable.Clear();
+				boundingBoxFollowerTable.Clear();
 
-			SkeletonRenderer[] arr = Object.FindObjectsOfType<SkeletonRenderer>();
-			foreach (SkeletonRenderer r in arr)
-				skeletonRendererTable.Add(r.gameObject.GetInstanceID(), r.gameObject);
+				SkeletonRenderer[] arr = Object.FindObjectsOfType<SkeletonRenderer>();
+				foreach (SkeletonRenderer r in arr)
+					skeletonRendererTable.Add(r.gameObject.GetInstanceID(), r.gameObject);
 
-			SkeletonUtilityBone[] boneArr = Object.FindObjectsOfType<SkeletonUtilityBone>();
-			foreach (SkeletonUtilityBone b in boneArr)
-				skeletonUtilityBoneTable.Add(b.gameObject.GetInstanceID(), b);
+				SkeletonUtilityBone[] boneArr = Object.FindObjectsOfType<SkeletonUtilityBone>();
+				foreach (SkeletonUtilityBone b in boneArr)
+					skeletonUtilityBoneTable.Add(b.gameObject.GetInstanceID(), b);
 
-			BoundingBoxFollower[] bbfArr = Object.FindObjectsOfType<BoundingBoxFollower>();
-			foreach (BoundingBoxFollower bbf in bbfArr)
-				boundingBoxFollowerTable.Add(bbf.gameObject.GetInstanceID(), bbf);
+				BoundingBoxFollower[] bbfArr = Object.FindObjectsOfType<BoundingBoxFollower>();
+				foreach (BoundingBoxFollower bbf in bbfArr)
+					boundingBoxFollowerTable.Add(bbf.gameObject.GetInstanceID(), bbf);
+			}
 		}
 
 		static void HierarchyWindowItemOnGUI (int instanceId, Rect selectionRect) {
-			if (skeletonRendererTable.ContainsKey(instanceId)) {
+			if (showHierarchyIcons) {
+				
 				Rect r = new Rect(selectionRect);
-				r.x = r.width - 15;
-				r.width = 15;
-				GUI.Label(r, Icons.spine);
-			} else if (skeletonUtilityBoneTable.ContainsKey(instanceId)) {
-				Rect r = new Rect(selectionRect);
-				r.x -= 26;
-				if (skeletonUtilityBoneTable[instanceId] != null) {
-					if (skeletonUtilityBoneTable[instanceId].transform.childCount == 0)
-						r.x += 13;
-					r.y += 2;
-					r.width = 13;
-					r.height = 13;
-					if (skeletonUtilityBoneTable[instanceId].mode == SkeletonUtilityBone.Mode.Follow)
-						GUI.DrawTexture(r, Icons.bone);
-					else
-						GUI.DrawTexture(r, Icons.poseBones);
+				if (skeletonRendererTable.ContainsKey(instanceId)) {
+					r.x = r.width - 15;
+					r.width = 15;
+					GUI.Label(r, Icons.spine);
+				} else if (skeletonUtilityBoneTable.ContainsKey(instanceId)) {
+					r.x -= 26;
+					if (skeletonUtilityBoneTable[instanceId] != null) {
+						if (skeletonUtilityBoneTable[instanceId].transform.childCount == 0)
+							r.x += 13;
+						r.y += 2;
+						r.width = 13;
+						r.height = 13;
+						if (skeletonUtilityBoneTable[instanceId].mode == SkeletonUtilityBone.Mode.Follow)
+							GUI.DrawTexture(r, Icons.bone);
+						else
+							GUI.DrawTexture(r, Icons.poseBones);
+					}
+				} else if (boundingBoxFollowerTable.ContainsKey(instanceId)) {
+					r.x -= 26;
+					if (boundingBoxFollowerTable[instanceId] != null) {
+						if (boundingBoxFollowerTable[instanceId].transform.childCount == 0)
+							r.x += 13;
+						r.y += 2;
+						r.width = 13;
+						r.height = 13;
+						GUI.DrawTexture(r, Icons.boundingBox);
+					}
 				}
-			} else if (boundingBoxFollowerTable.ContainsKey(instanceId)) {
-				Rect r = new Rect(selectionRect);
-				r.x -= 26;
-				if (boundingBoxFollowerTable[instanceId] != null) {
-					if (boundingBoxFollowerTable[instanceId].transform.childCount == 0)
-						r.x += 13;
-					r.y += 2;
-					r.width = 13;
-					r.height = 13;
-					GUI.DrawTexture(r, Icons.boundingBox);
-				}
+
 			}
 		}
-		#endif
 		#endregion
 
 		#region Auto-Import Entry Point
