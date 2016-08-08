@@ -2896,7 +2896,7 @@ var spine;
                         var unchanged = new Array(slotCount - offsets.length);
                         var originalIndex = 0, unchangedIndex = 0;
                         for (var i = 0; i < offsets.length; i++) {
-                            var offsetMap = offsets[j];
+                            var offsetMap = offsets[i];
                             var slotIndex = skeletonData.findSlotIndex(offsetMap.slot);
                             if (slotIndex == -1)
                                 throw new Error("Slot not found: " + offsetMap.slot);

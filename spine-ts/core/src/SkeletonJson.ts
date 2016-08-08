@@ -578,7 +578,7 @@ module spine {
                         let unchanged = new Array<number>(slotCount - offsets.length);
                         let originalIndex = 0, unchangedIndex = 0;
                         for (var i = 0; i < offsets.length; i++) {
-                            let offsetMap = offsets[j];
+                            let offsetMap = offsets[i];
                             let slotIndex = skeletonData.findSlotIndex(offsetMap.slot);
                             if (slotIndex == -1) throw new Error("Slot not found: " + offsetMap.slot);
                             // Collect unchanged items.
