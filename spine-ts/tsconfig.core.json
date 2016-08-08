@@ -12,6 +12,7 @@
         "core/src/**/*"        
     ],
     "exclude": [
+        "webgl/src/*.ts",
         "build",
         "build/*.d.ts"        
     ]

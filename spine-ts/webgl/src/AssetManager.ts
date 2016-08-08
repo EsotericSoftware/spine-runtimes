@@ -16,8 +16,8 @@ module spine.webgl {
                         if (success) success(path, request.responseText);                        
                         this._assets[path] = request.responseText;
                     } else {
-                        if (error) error(path, `Couldn't load text ${path}: status ${request.status}, ${request.responseBody}`);                        
-                        this._errors[path] = `Couldn't load text ${path}: status ${request.status}, ${request.responseBody}`;
+                        if (error) error(path, `Couldn't load text ${path}: status ${request.status}, ${request.responseText}`);                        
+                        this._errors[path] = `Couldn't load text ${path}: status ${request.status}, ${request.responseText}`;
                     }
                     this._toLoad--;
                     this._loaded++;

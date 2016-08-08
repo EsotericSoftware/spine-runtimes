@@ -726,6 +726,449 @@ var spine;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
+    var Attachment = (function () {
+        function Attachment(name) {
+            if (name == null)
+                throw new Error("name cannot be null.");
+            this.name = name;
+        }
+        return Attachment;
+    }());
+    spine.Attachment = Attachment;
+    var VertexAttachment = (function (_super) {
+        __extends(VertexAttachment, _super);
+        function VertexAttachment(name) {
+            _super.call(this, name);
+            this.worldVerticesLength = 0;
+        }
+        VertexAttachment.prototype.computeWorldVertices = function (slot, worldVertices) {
+            this.computeWorldVerticesWith(slot, 0, this.worldVerticesLength, worldVertices, 0);
+        };
+        /** Transforms local vertices to world coordinates.
+         * @param start The index of the first local vertex value to transform. Each vertex has 2 values, x and y.
+         * @param count The number of world vertex values to output. Must be <= {@link #getWorldVerticesLength()} - start.
+         * @param worldVertices The output world vertices. Must have a length >= offset + count.
+         * @param offset The worldVertices index to begin writing values. */
+        VertexAttachment.prototype.computeWorldVerticesWith = function (slot, start, count, worldVertices, offset) {
+            count += offset;
+            var skeleton = slot.bone.skeleton;
+            var x = skeleton.x, y = skeleton.y;
+            var deformArray = slot.attachmentVertices;
+            var vertices = this.vertices;
+            var bones = this.bones;
+            if (bones == null) {
+                if (deformArray.length > 0)
+                    vertices = deformArray;
+                var bone = slot.bone;
+                x += bone.worldX;
+                y += bone.worldY;
+                var a = bone.a, b_1 = bone.b, c = bone.c, d = bone.d;
+                for (var v = start, w = offset; w < count; v += 2, w += 2) {
+                    var vx = vertices[v], vy = vertices[v + 1];
+                    worldVertices[w] = vx * a + vy * b_1 + x;
+                    worldVertices[w + 1] = vx * c + vy * d + y;
+                }
+                return;
+            }
+            var v = 0, skip = 0;
+            for (var i = 0; i < start; i += 2) {
+                var n = bones[v];
+                v += n + 1;
+                skip += n;
+            }
+            var skeletonBones = skeleton.bones;
+            if (deformArray.length == 0) {
+                for (var w = offset, b = skip * 3; w < count; w += 2) {
+                    var wx = x, wy = y;
+                    var n = bones[v++];
+                    n += v;
+                    for (; v < n; v++, b += 3) {
+                        var bone = skeletonBones[bones[v]];
+                        var vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
+                        wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
+                        wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
+                    }
+                    worldVertices[w] = wx;
+                    worldVertices[w + 1] = wy;
+                }
+            }
+            else {
+                var deform = deformArray;
+                for (var w = offset, b = skip * 3, f = skip << 1; w < count; w += 2) {
+                    var wx = x, wy = y;
+                    var n = bones[v++];
+                    n += v;
+                    for (; v < n; v++, b += 3, f += 2) {
+                        var bone = skeletonBones[bones[v]];
+                        var vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
+                        wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
+                        wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
+                    }
+                    worldVertices[w] = wx;
+                    worldVertices[w + 1] = wy;
+                }
+            }
+        };
+        /** Returns true if a deform originally applied to the specified attachment should be applied to this attachment. */
+        VertexAttachment.prototype.applyDeform = function (sourceAttachment) {
+            return this == sourceAttachment;
+        };
+        return VertexAttachment;
+    }(Attachment));
+    spine.VertexAttachment = VertexAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    (function (AttachmentType) {
+        AttachmentType[AttachmentType["Region"] = 0] = "Region";
+        AttachmentType[AttachmentType["BoundingBox"] = 1] = "BoundingBox";
+        AttachmentType[AttachmentType["Mesh"] = 2] = "Mesh";
+        AttachmentType[AttachmentType["LinkedMesh"] = 3] = "LinkedMesh";
+        AttachmentType[AttachmentType["Path"] = 4] = "Path";
+    })(spine.AttachmentType || (spine.AttachmentType = {}));
+    var AttachmentType = spine.AttachmentType;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var BoundingBoxAttachment = (function (_super) {
+        __extends(BoundingBoxAttachment, _super);
+        function BoundingBoxAttachment(name) {
+            _super.call(this, name);
+        }
+        return BoundingBoxAttachment;
+    }(spine.VertexAttachment));
+    spine.BoundingBoxAttachment = BoundingBoxAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var MeshAttachment = (function (_super) {
+        __extends(MeshAttachment, _super);
+        function MeshAttachment(name) {
+            _super.call(this, name);
+            this.color = new spine.Color(1, 1, 1, 1);
+            this.inheritDeform = false;
+            this.tempColor = new spine.Color(0, 0, 0, 0);
+        }
+        MeshAttachment.prototype.updateUVs = function () {
+            var regionUVs = this.regionUVs;
+            var verticesLength = regionUVs.length;
+            var worldVerticesLength = (verticesLength >> 1) * 5;
+            if (this.worldVertices == null || this.worldVertices.length != worldVerticesLength) {
+                this.worldVertices = new Array(worldVerticesLength);
+            }
+            var u = 0, v = 0, width = 0, height = 0;
+            if (this.region == null) {
+                u = v = 0;
+                width = height = 1;
+            }
+            else {
+                u = this.region.u;
+                v = this.region.v;
+                width = this.region.u2 - u;
+                height = this.region.v2 - v;
+            }
+            if (this.region.rotate) {
+                for (var i = 0, w = 6; i < verticesLength; i += 2, w += 8) {
+                    this.worldVertices[w] = u + regionUVs[i + 1] * width;
+                    this.worldVertices[w + 1] = v + height - regionUVs[i] * height;
+                }
+            }
+            else {
+                for (var i = 0, w = 6; i < verticesLength; i += 2, w += 8) {
+                    this.worldVertices[w] = u + regionUVs[i] * width;
+                    this.worldVertices[w + 1] = v + regionUVs[i + 1] * height;
+                }
+            }
+        };
+        /** @return The updated world vertices. */
+        MeshAttachment.prototype.updateWorldVertices = function (slot, premultipliedAlpha) {
+            var skeleton = slot.bone.skeleton;
+            var skeletonColor = skeleton.color, slotColor = slot.color, meshColor = this.color;
+            var alpha = skeletonColor.a * slotColor.a * meshColor.a;
+            var multiplier = premultipliedAlpha ? alpha : 1;
+            var color = this.tempColor;
+            color.set(skeletonColor.r * slotColor.r * meshColor.r * multiplier, skeletonColor.g * slotColor.g * meshColor.g * multiplier, skeletonColor.b * slotColor.b * meshColor.b * multiplier, alpha);
+            var x = skeleton.x, y = skeleton.y;
+            var deformArray = slot.attachmentVertices;
+            var vertices = this.vertices, worldVertices = this.worldVertices;
+            var bones = this.bones;
+            if (bones == null) {
+                var verticesLength = vertices.length;
+                if (deformArray.length > 0)
+                    vertices = deformArray;
+                var bone = slot.bone;
+                x += bone.worldX;
+                y += bone.worldY;
+                var a = bone.a, b_2 = bone.b, c = bone.c, d = bone.d;
+                for (var v = 0, w = 0; v < verticesLength; v += 2, w += 8) {
+                    var vx = vertices[v], vy = vertices[v + 1];
+                    worldVertices[w] = vx * a + vy * b_2 + x;
+                    worldVertices[w + 1] = vx * c + vy * d + y;
+                    worldVertices[w + 2] = color.r;
+                    worldVertices[w + 3] = color.g;
+                    worldVertices[w + 4] = color.b;
+                    worldVertices[w + 5] = color.a;
+                }
+                return worldVertices;
+            }
+            var skeletonBones = skeleton.bones;
+            if (deformArray.length == 0) {
+                for (var w = 0, v = 0, b = 0, n = bones.length; v < n; w += 8) {
+                    var wx = x, wy = y;
+                    var nn = bones[v++] + v;
+                    for (; v < nn; v++, b += 3) {
+                        var bone = skeletonBones[bones[v]];
+                        var vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
+                        wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
+                        wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
+                    }
+                    worldVertices[w] = wx;
+                    worldVertices[w + 1] = wy;
+                    worldVertices[w + 2] = color.r;
+                    worldVertices[w + 3] = color.g;
+                    worldVertices[w + 4] = color.b;
+                    worldVertices[w + 5] = color.a;
+                }
+            }
+            else {
+                var deform = deformArray;
+                for (var w = 0, v = 0, b = 0, f = 0, n = bones.length; v < n; w += 8) {
+                    var wx = x, wy = y;
+                    var nn = bones[v++] + v;
+                    for (; v < nn; v++, b += 3, f += 2) {
+                        var bone = skeletonBones[bones[v]];
+                        var vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
+                        wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
+                        wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
+                    }
+                    worldVertices[w] = wx;
+                    worldVertices[w + 1] = wy;
+                    worldVertices[w + 2] = color.r;
+                    worldVertices[w + 3] = color.g;
+                    worldVertices[w + 4] = color.b;
+                    worldVertices[w + 5] = color.a;
+                }
+            }
+            return worldVertices;
+        };
+        MeshAttachment.prototype.applyDeform = function (sourceAttachment) {
+            return this == sourceAttachment || (this.inheritDeform && this._parentMesh == sourceAttachment);
+        };
+        MeshAttachment.prototype.getParentMesh = function () {
+            return this._parentMesh;
+        };
+        /** @param parentMesh May be null. */
+        MeshAttachment.prototype.setParentMesh = function (parentMesh) {
+            this._parentMesh = parentMesh;
+            if (parentMesh != null) {
+                this.bones = parentMesh.bones;
+                this.vertices = parentMesh.vertices;
+                this.regionUVs = parentMesh.regionUVs;
+                this.triangles = parentMesh.triangles;
+                this.hullLength = parentMesh.hullLength;
+            }
+        };
+        return MeshAttachment;
+    }(spine.VertexAttachment));
+    spine.MeshAttachment = MeshAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var PathAttachment = (function (_super) {
+        __extends(PathAttachment, _super);
+        function PathAttachment(name) {
+            _super.call(this, name);
+            this.closed = false;
+            this.constantSpeed = false;
+        }
+        return PathAttachment;
+    }(spine.VertexAttachment));
+    spine.PathAttachment = PathAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var RegionAttachment = (function (_super) {
+        __extends(RegionAttachment, _super);
+        function RegionAttachment(name) {
+            _super.call(this, name);
+            this.x = 0;
+            this.y = 0;
+            this.scaleX = 1;
+            this.scaleY = 1;
+            this.rotation = 0;
+            this.width = 0;
+            this.height = 0;
+            this.color = new spine.Color(1, 1, 1, 1);
+            this.offset = new Array(8);
+            this.vertices = new Array(8 * 4);
+            this.tempColor = new spine.Color(1, 1, 1, 1);
+        }
+        RegionAttachment.prototype.setRegion = function (region) {
+            var vertices = this.vertices;
+            if (region.rotate) {
+                vertices[RegionAttachment.U2] = region.u;
+                vertices[RegionAttachment.V2] = region.v2;
+                vertices[RegionAttachment.U3] = region.u;
+                vertices[RegionAttachment.V3] = region.v;
+                vertices[RegionAttachment.U4] = region.u2;
+                vertices[RegionAttachment.V4] = region.v;
+                vertices[RegionAttachment.U1] = region.u2;
+                vertices[RegionAttachment.V1] = region.v2;
+            }
+            else {
+                vertices[RegionAttachment.U1] = region.u;
+                vertices[RegionAttachment.V1] = region.v2;
+                vertices[RegionAttachment.U2] = region.u;
+                vertices[RegionAttachment.V2] = region.v;
+                vertices[RegionAttachment.U3] = region.u2;
+                vertices[RegionAttachment.V3] = region.v;
+                vertices[RegionAttachment.U4] = region.u2;
+                vertices[RegionAttachment.V4] = region.v2;
+            }
+        };
+        RegionAttachment.prototype.updateOffset = function () {
+            var regionScaleX = this.width / this.region.originalWidth * this.scaleX;
+            var regionScaleY = this.height / this.region.originalHeight * this.scaleY;
+            var localX = -this.width / 2 * this.scaleX + this.region.offsetX * regionScaleX;
+            var localY = -this.height / 2 * this.scaleY + this.region.offsetY * regionScaleY;
+            var localX2 = localX + this.region.width * regionScaleX;
+            var localY2 = localY + this.region.height * regionScaleY;
+            var radians = this.rotation * Math.PI / 180;
+            var cos = Math.cos(radians);
+            var sin = Math.sin(radians);
+            var localXCos = localX * cos + this.x;
+            var localXSin = localX * sin;
+            var localYCos = localY * cos + this.y;
+            var localYSin = localY * sin;
+            var localX2Cos = localX2 * cos + this.x;
+            var localX2Sin = localX2 * sin;
+            var localY2Cos = localY2 * cos + this.y;
+            var localY2Sin = localY2 * sin;
+            var offset = this.offset;
+            offset[RegionAttachment.OX1] = localXCos - localYSin;
+            offset[RegionAttachment.OY1] = localYCos + localXSin;
+            offset[RegionAttachment.OX2] = localXCos - localY2Sin;
+            offset[RegionAttachment.OY2] = localY2Cos + localXSin;
+            offset[RegionAttachment.OX3] = localX2Cos - localY2Sin;
+            offset[RegionAttachment.OY3] = localY2Cos + localX2Sin;
+            offset[RegionAttachment.OX4] = localX2Cos - localYSin;
+            offset[RegionAttachment.OY4] = localYCos + localX2Sin;
+        };
+        RegionAttachment.prototype.updateWorldVertices = function (slot, premultipliedAlpha) {
+            var skeleton = slot.bone.skeleton;
+            var skeletonColor = skeleton.color;
+            var slotColor = slot.color;
+            var regionColor = this.color;
+            var alpha = skeletonColor.a * slotColor.a * regionColor.a;
+            var multiplier = premultipliedAlpha ? alpha : 1;
+            var color = this.tempColor;
+            color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier, skeletonColor.g * slotColor.g * regionColor.g * multiplier, skeletonColor.b * slotColor.b * regionColor.b * multiplier, alpha);
+            var vertices = this.vertices;
+            var offset = this.offset;
+            var bone = slot.bone;
+            var x = skeleton.x + bone.worldX, y = skeleton.y + bone.worldY;
+            var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
+            var offsetX = 0, offsetY = 0;
+            offsetX = offset[RegionAttachment.OX1];
+            offsetY = offset[RegionAttachment.OY1];
+            vertices[RegionAttachment.X1] = offsetX * a + offsetY * b + x; // br
+            vertices[RegionAttachment.Y1] = offsetX * c + offsetY * d + y;
+            vertices[RegionAttachment.C1R] = color.r;
+            vertices[RegionAttachment.C1G] = color.g;
+            vertices[RegionAttachment.C1B] = color.b;
+            vertices[RegionAttachment.C1A] = color.a;
+            offsetX = offset[RegionAttachment.OX2];
+            offsetY = offset[RegionAttachment.OY2];
+            vertices[RegionAttachment.X2] = offsetX * a + offsetY * b + x; // bl
+            vertices[RegionAttachment.Y2] = offsetX * c + offsetY * d + y;
+            vertices[RegionAttachment.C2R] = color.r;
+            vertices[RegionAttachment.C2G] = color.g;
+            vertices[RegionAttachment.C2B] = color.b;
+            vertices[RegionAttachment.C2A] = color.a;
+            offsetX = offset[RegionAttachment.OX3];
+            offsetY = offset[RegionAttachment.OY3];
+            vertices[RegionAttachment.X3] = offsetX * a + offsetY * b + x; // ul
+            vertices[RegionAttachment.Y3] = offsetX * c + offsetY * d + y;
+            vertices[RegionAttachment.C3R] = color.r;
+            vertices[RegionAttachment.C3G] = color.g;
+            vertices[RegionAttachment.C3B] = color.b;
+            vertices[RegionAttachment.C3A] = color.a;
+            offsetX = offset[RegionAttachment.OX4];
+            offsetY = offset[RegionAttachment.OY4];
+            vertices[RegionAttachment.X4] = offsetX * a + offsetY * b + x; // ur
+            vertices[RegionAttachment.Y4] = offsetX * c + offsetY * d + y;
+            vertices[RegionAttachment.C4R] = color.r;
+            vertices[RegionAttachment.C4G] = color.g;
+            vertices[RegionAttachment.C4B] = color.b;
+            vertices[RegionAttachment.C4A] = color.a;
+            return vertices;
+        };
+        RegionAttachment.OX1 = 0;
+        RegionAttachment.OY1 = 1;
+        RegionAttachment.OX2 = 2;
+        RegionAttachment.OY2 = 3;
+        RegionAttachment.OX3 = 4;
+        RegionAttachment.OY3 = 5;
+        RegionAttachment.OX4 = 6;
+        RegionAttachment.OY4 = 7;
+        RegionAttachment.X1 = 0;
+        RegionAttachment.Y1 = 1;
+        RegionAttachment.X2 = 8;
+        RegionAttachment.Y2 = 9;
+        RegionAttachment.X3 = 16;
+        RegionAttachment.Y3 = 17;
+        RegionAttachment.X4 = 24;
+        RegionAttachment.Y4 = 25;
+        RegionAttachment.U1 = 6;
+        RegionAttachment.V1 = 7;
+        RegionAttachment.U2 = 14;
+        RegionAttachment.V2 = 15;
+        RegionAttachment.U3 = 22;
+        RegionAttachment.V3 = 23;
+        RegionAttachment.U4 = 30;
+        RegionAttachment.V4 = 31;
+        RegionAttachment.C1R = 3;
+        RegionAttachment.C1G = 4;
+        RegionAttachment.C1B = 5;
+        RegionAttachment.C1A = 6;
+        RegionAttachment.C2R = 10;
+        RegionAttachment.C2G = 11;
+        RegionAttachment.C2B = 12;
+        RegionAttachment.C2A = 13;
+        RegionAttachment.C3R = 18;
+        RegionAttachment.C3G = 19;
+        RegionAttachment.C3B = 20;
+        RegionAttachment.C3A = 21;
+        RegionAttachment.C4R = 26;
+        RegionAttachment.C4G = 27;
+        RegionAttachment.C4B = 28;
+        RegionAttachment.C4A = 29;
+        return RegionAttachment;
+    }(spine.Attachment));
+    spine.RegionAttachment = RegionAttachment;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var TextureRegion = (function () {
+        function TextureRegion() {
+            this.u = 0;
+            this.v = 0;
+            this.u2 = 0;
+            this.v2 = 0;
+            this.width = 0;
+            this.height = 0;
+            this.rotate = false;
+            this.offsetX = 0;
+            this.offsetY = 0;
+            this.originalWidth = 0;
+            this.originalHeight = 0;
+        }
+        return TextureRegion;
+    }());
+    spine.TextureRegion = TextureRegion;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
     (function (BlendMode) {
         BlendMode[BlendMode["Normal"] = 0] = "Normal";
         BlendMode[BlendMode["Additive"] = 1] = "Additive";
@@ -2691,452 +3134,6 @@ var spine;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
-    var Attachment = (function () {
-        function Attachment(name) {
-            if (name == null)
-                throw new Error("name cannot be null.");
-            this.name = name;
-        }
-        return Attachment;
-    }());
-    spine.Attachment = Attachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    (function (AttachmentType) {
-        AttachmentType[AttachmentType["Region"] = 0] = "Region";
-        AttachmentType[AttachmentType["BoundingBox"] = 1] = "BoundingBox";
-        AttachmentType[AttachmentType["Mesh"] = 2] = "Mesh";
-        AttachmentType[AttachmentType["LinkedMesh"] = 3] = "LinkedMesh";
-        AttachmentType[AttachmentType["Path"] = 4] = "Path";
-    })(spine.AttachmentType || (spine.AttachmentType = {}));
-    var AttachmentType = spine.AttachmentType;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var BoundingBoxAttachment = (function (_super) {
-        __extends(BoundingBoxAttachment, _super);
-        function BoundingBoxAttachment(name) {
-            _super.call(this, name);
-        }
-        return BoundingBoxAttachment;
-    }(spine.VertexAttachment));
-    spine.BoundingBoxAttachment = BoundingBoxAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var MeshAttachment = (function (_super) {
-        __extends(MeshAttachment, _super);
-        function MeshAttachment(name) {
-            _super.call(this, name);
-            this.color = new spine.Color(1, 1, 1, 1);
-            this.inheritDeform = false;
-            this.tempColor = new spine.Color(0, 0, 0, 0);
-        }
-        MeshAttachment.prototype.updateUVs = function () {
-            var regionUVs = this.regionUVs;
-            var verticesLength = regionUVs.length;
-            var worldVerticesLength = (verticesLength >> 1) * 5;
-            if (this.worldVertices == null || this.worldVertices.length != worldVerticesLength) {
-                this.worldVertices = new Array(worldVerticesLength);
-            }
-            var u = 0, v = 0, width = 0, height = 0;
-            if (this.region == null) {
-                u = v = 0;
-                width = height = 1;
-            }
-            else {
-                u = this.region.u;
-                v = this.region.v;
-                width = this.region.u2 - u;
-                height = this.region.v2 - v;
-            }
-            if (this.region.rotate) {
-                for (var i = 0, w = 6; i < verticesLength; i += 2, w += 8) {
-                    this.worldVertices[w] = u + regionUVs[i + 1] * width;
-                    this.worldVertices[w + 1] = v + height - regionUVs[i] * height;
-                }
-            }
-            else {
-                for (var i = 0, w = 6; i < verticesLength; i += 2, w += 8) {
-                    this.worldVertices[w] = u + regionUVs[i] * width;
-                    this.worldVertices[w + 1] = v + regionUVs[i + 1] * height;
-                }
-            }
-        };
-        /** @return The updated world vertices. */
-        MeshAttachment.prototype.updateWorldVertices = function (slot, premultipliedAlpha) {
-            var skeleton = slot.bone.skeleton;
-            var skeletonColor = skeleton.color, slotColor = slot.color, meshColor = this.color;
-            var alpha = skeletonColor.a * slotColor.a * meshColor.a;
-            var multiplier = premultipliedAlpha ? alpha : 1;
-            var color = this.tempColor;
-            color.set(skeletonColor.r * slotColor.r * meshColor.r * multiplier, skeletonColor.g * slotColor.g * meshColor.g * multiplier, skeletonColor.b * slotColor.b * meshColor.b * multiplier, alpha);
-            var x = skeleton.x, y = skeleton.y;
-            var deformArray = slot.attachmentVertices;
-            var vertices = this.vertices, worldVertices = this.worldVertices;
-            var bones = this.bones;
-            if (bones == null) {
-                var verticesLength = vertices.length;
-                if (deformArray.length > 0)
-                    vertices = deformArray;
-                var bone = slot.bone;
-                x += bone.worldX;
-                y += bone.worldY;
-                var a = bone.a, b_1 = bone.b, c = bone.c, d = bone.d;
-                for (var v = 0, w = 0; v < verticesLength; v += 2, w += 8) {
-                    var vx = vertices[v], vy = vertices[v + 1];
-                    worldVertices[w] = vx * a + vy * b_1 + x;
-                    worldVertices[w + 1] = vx * c + vy * d + y;
-                    worldVertices[w + 2] = color.r;
-                    worldVertices[w + 3] = color.g;
-                    worldVertices[w + 4] = color.b;
-                    worldVertices[w + 5] = color.a;
-                }
-                return worldVertices;
-            }
-            var skeletonBones = skeleton.bones;
-            if (deformArray.length == 0) {
-                for (var w = 0, v = 0, b = 0, n = bones.length; v < n; w += 8) {
-                    var wx = x, wy = y;
-                    var nn = bones[v++] + v;
-                    for (; v < nn; v++, b += 3) {
-                        var bone = skeletonBones[bones[v]];
-                        var vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
-                        wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
-                        wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
-                    }
-                    worldVertices[w] = wx;
-                    worldVertices[w + 1] = wy;
-                    worldVertices[w + 2] = color.r;
-                    worldVertices[w + 3] = color.g;
-                    worldVertices[w + 4] = color.b;
-                    worldVertices[w + 5] = color.a;
-                }
-            }
-            else {
-                var deform = deformArray;
-                for (var w = 0, v = 0, b = 0, f = 0, n = bones.length; v < n; w += 8) {
-                    var wx = x, wy = y;
-                    var nn = bones[v++] + v;
-                    for (; v < nn; v++, b += 3, f += 2) {
-                        var bone = skeletonBones[bones[v]];
-                        var vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
-                        wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
-                        wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
-                    }
-                    worldVertices[w] = wx;
-                    worldVertices[w + 1] = wy;
-                    worldVertices[w + 2] = color.r;
-                    worldVertices[w + 3] = color.g;
-                    worldVertices[w + 4] = color.b;
-                    worldVertices[w + 5] = color.a;
-                }
-            }
-            return worldVertices;
-        };
-        MeshAttachment.prototype.applyDeform = function (sourceAttachment) {
-            return this == sourceAttachment || (this.inheritDeform && this._parentMesh == sourceAttachment);
-        };
-        MeshAttachment.prototype.getParentMesh = function () {
-            return this._parentMesh;
-        };
-        /** @param parentMesh May be null. */
-        MeshAttachment.prototype.setParentMesh = function (parentMesh) {
-            this._parentMesh = parentMesh;
-            if (parentMesh != null) {
-                this.bones = parentMesh.bones;
-                this.vertices = parentMesh.vertices;
-                this.regionUVs = parentMesh.regionUVs;
-                this.triangles = parentMesh.triangles;
-                this.hullLength = parentMesh.hullLength;
-            }
-        };
-        return MeshAttachment;
-    }(spine.VertexAttachment));
-    spine.MeshAttachment = MeshAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var PathAttachment = (function (_super) {
-        __extends(PathAttachment, _super);
-        function PathAttachment(name) {
-            _super.call(this, name);
-            this.closed = false;
-            this.constantSpeed = false;
-        }
-        return PathAttachment;
-    }(spine.VertexAttachment));
-    spine.PathAttachment = PathAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var RegionAttachment = (function (_super) {
-        __extends(RegionAttachment, _super);
-        function RegionAttachment(name) {
-            _super.call(this, name);
-            this.x = 0;
-            this.y = 0;
-            this.scaleX = 1;
-            this.scaleY = 1;
-            this.rotation = 0;
-            this.width = 0;
-            this.height = 0;
-            this.color = new spine.Color(1, 1, 1, 1);
-            this.offset = new Array(8);
-            this.vertices = new Array(8 * 4);
-            this.tempColor = new spine.Color(1, 1, 1, 1);
-        }
-        RegionAttachment.prototype.setRegion = function (region) {
-            var vertices = this.vertices;
-            if (region.rotate) {
-                vertices[RegionAttachment.U2] = region.u;
-                vertices[RegionAttachment.V2] = region.v2;
-                vertices[RegionAttachment.U3] = region.u;
-                vertices[RegionAttachment.V3] = region.v;
-                vertices[RegionAttachment.U4] = region.u2;
-                vertices[RegionAttachment.V4] = region.v;
-                vertices[RegionAttachment.U1] = region.u2;
-                vertices[RegionAttachment.V1] = region.v2;
-            }
-            else {
-                vertices[RegionAttachment.U1] = region.u;
-                vertices[RegionAttachment.V1] = region.v2;
-                vertices[RegionAttachment.U2] = region.u;
-                vertices[RegionAttachment.V2] = region.v;
-                vertices[RegionAttachment.U3] = region.u2;
-                vertices[RegionAttachment.V3] = region.v;
-                vertices[RegionAttachment.U4] = region.u2;
-                vertices[RegionAttachment.V4] = region.v2;
-            }
-        };
-        RegionAttachment.prototype.updateOffset = function () {
-            var regionScaleX = this.width / this.region.originalWidth * this.scaleX;
-            var regionScaleY = this.height / this.region.originalHeight * this.scaleY;
-            var localX = -this.width / 2 * this.scaleX + this.region.offsetX * regionScaleX;
-            var localY = -this.height / 2 * this.scaleY + this.region.offsetY * regionScaleY;
-            var localX2 = localX + this.region.width * regionScaleX;
-            var localY2 = localY + this.region.height * regionScaleY;
-            var radians = this.rotation * Math.PI / 180;
-            var cos = Math.cos(radians);
-            var sin = Math.sin(radians);
-            var localXCos = localX * cos + this.x;
-            var localXSin = localX * sin;
-            var localYCos = localY * cos + this.y;
-            var localYSin = localY * sin;
-            var localX2Cos = localX2 * cos + this.x;
-            var localX2Sin = localX2 * sin;
-            var localY2Cos = localY2 * cos + this.y;
-            var localY2Sin = localY2 * sin;
-            var offset = this.offset;
-            offset[RegionAttachment.OX1] = localXCos - localYSin;
-            offset[RegionAttachment.OY1] = localYCos + localXSin;
-            offset[RegionAttachment.OX2] = localXCos - localY2Sin;
-            offset[RegionAttachment.OY2] = localY2Cos + localXSin;
-            offset[RegionAttachment.OX3] = localX2Cos - localY2Sin;
-            offset[RegionAttachment.OY3] = localY2Cos + localX2Sin;
-            offset[RegionAttachment.OX4] = localX2Cos - localYSin;
-            offset[RegionAttachment.OY4] = localYCos + localX2Sin;
-        };
-        RegionAttachment.prototype.updateWorldVertices = function (slot, premultipliedAlpha) {
-            var skeleton = slot.bone.skeleton;
-            var skeletonColor = skeleton.color;
-            var slotColor = slot.color;
-            var regionColor = this.color;
-            var alpha = skeletonColor.a * slotColor.a * regionColor.a;
-            var multiplier = premultipliedAlpha ? alpha : 1;
-            var color = this.tempColor;
-            color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier, skeletonColor.g * slotColor.g * regionColor.g * multiplier, skeletonColor.b * slotColor.b * regionColor.b * multiplier, alpha);
-            var vertices = this.vertices;
-            var offset = this.offset;
-            var bone = slot.bone;
-            var x = skeleton.x + bone.worldX, y = skeleton.y + bone.worldY;
-            var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-            var offsetX = 0, offsetY = 0;
-            offsetX = offset[RegionAttachment.OX1];
-            offsetY = offset[RegionAttachment.OY1];
-            vertices[RegionAttachment.X1] = offsetX * a + offsetY * b + x; // br
-            vertices[RegionAttachment.Y1] = offsetX * c + offsetY * d + y;
-            vertices[RegionAttachment.C1R] = color.r;
-            vertices[RegionAttachment.C1G] = color.g;
-            vertices[RegionAttachment.C1B] = color.b;
-            vertices[RegionAttachment.C1A] = color.a;
-            offsetX = offset[RegionAttachment.OX2];
-            offsetY = offset[RegionAttachment.OY2];
-            vertices[RegionAttachment.X2] = offsetX * a + offsetY * b + x; // bl
-            vertices[RegionAttachment.Y2] = offsetX * c + offsetY * d + y;
-            vertices[RegionAttachment.C2R] = color.r;
-            vertices[RegionAttachment.C2G] = color.g;
-            vertices[RegionAttachment.C2B] = color.b;
-            vertices[RegionAttachment.C2A] = color.a;
-            offsetX = offset[RegionAttachment.OX3];
-            offsetY = offset[RegionAttachment.OY3];
-            vertices[RegionAttachment.X3] = offsetX * a + offsetY * b + x; // ul
-            vertices[RegionAttachment.Y3] = offsetX * c + offsetY * d + y;
-            vertices[RegionAttachment.C3R] = color.r;
-            vertices[RegionAttachment.C3G] = color.g;
-            vertices[RegionAttachment.C3B] = color.b;
-            vertices[RegionAttachment.C3A] = color.a;
-            offsetX = offset[RegionAttachment.OX4];
-            offsetY = offset[RegionAttachment.OY4];
-            vertices[RegionAttachment.X4] = offsetX * a + offsetY * b + x; // ur
-            vertices[RegionAttachment.Y4] = offsetX * c + offsetY * d + y;
-            vertices[RegionAttachment.C4R] = color.r;
-            vertices[RegionAttachment.C4G] = color.g;
-            vertices[RegionAttachment.C4B] = color.b;
-            vertices[RegionAttachment.C4A] = color.a;
-            return vertices;
-        };
-        RegionAttachment.OX1 = 0;
-        RegionAttachment.OY1 = 1;
-        RegionAttachment.OX2 = 2;
-        RegionAttachment.OY2 = 3;
-        RegionAttachment.OX3 = 4;
-        RegionAttachment.OY3 = 5;
-        RegionAttachment.OX4 = 6;
-        RegionAttachment.OY4 = 7;
-        RegionAttachment.X1 = 0;
-        RegionAttachment.Y1 = 1;
-        RegionAttachment.X2 = 8;
-        RegionAttachment.Y2 = 9;
-        RegionAttachment.X3 = 16;
-        RegionAttachment.Y3 = 17;
-        RegionAttachment.X4 = 24;
-        RegionAttachment.Y4 = 25;
-        RegionAttachment.U1 = 6;
-        RegionAttachment.V1 = 7;
-        RegionAttachment.U2 = 14;
-        RegionAttachment.V2 = 15;
-        RegionAttachment.U3 = 22;
-        RegionAttachment.V3 = 23;
-        RegionAttachment.U4 = 30;
-        RegionAttachment.V4 = 31;
-        RegionAttachment.C1R = 3;
-        RegionAttachment.C1G = 4;
-        RegionAttachment.C1B = 5;
-        RegionAttachment.C1A = 6;
-        RegionAttachment.C2R = 10;
-        RegionAttachment.C2G = 11;
-        RegionAttachment.C2B = 12;
-        RegionAttachment.C2A = 13;
-        RegionAttachment.C3R = 18;
-        RegionAttachment.C3G = 19;
-        RegionAttachment.C3B = 20;
-        RegionAttachment.C3A = 21;
-        RegionAttachment.C4R = 26;
-        RegionAttachment.C4G = 27;
-        RegionAttachment.C4B = 28;
-        RegionAttachment.C4A = 29;
-        return RegionAttachment;
-    }(spine.Attachment));
-    spine.RegionAttachment = RegionAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var TextureRegion = (function () {
-        function TextureRegion() {
-            this.u = 0;
-            this.v = 0;
-            this.u2 = 0;
-            this.v2 = 0;
-            this.width = 0;
-            this.height = 0;
-            this.rotate = false;
-            this.offsetX = 0;
-            this.offsetY = 0;
-            this.originalWidth = 0;
-            this.originalHeight = 0;
-        }
-        return TextureRegion;
-    }());
-    spine.TextureRegion = TextureRegion;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var VertexAttachment = (function (_super) {
-        __extends(VertexAttachment, _super);
-        function VertexAttachment(name) {
-            _super.call(this, name);
-            this.worldVerticesLength = 0;
-        }
-        VertexAttachment.prototype.computeWorldVertices = function (slot, worldVertices) {
-            this.computeWorldVerticesWith(slot, 0, this.worldVerticesLength, worldVertices, 0);
-        };
-        /** Transforms local vertices to world coordinates.
-         * @param start The index of the first local vertex value to transform. Each vertex has 2 values, x and y.
-         * @param count The number of world vertex values to output. Must be <= {@link #getWorldVerticesLength()} - start.
-         * @param worldVertices The output world vertices. Must have a length >= offset + count.
-         * @param offset The worldVertices index to begin writing values. */
-        VertexAttachment.prototype.computeWorldVerticesWith = function (slot, start, count, worldVertices, offset) {
-            count += offset;
-            var skeleton = slot.bone.skeleton;
-            var x = skeleton.x, y = skeleton.y;
-            var deformArray = slot.attachmentVertices;
-            var vertices = this.vertices;
-            var bones = this.bones;
-            if (bones == null) {
-                if (deformArray.length > 0)
-                    vertices = deformArray;
-                var bone = slot.bone;
-                x += bone.worldX;
-                y += bone.worldY;
-                var a = bone.a, b_2 = bone.b, c = bone.c, d = bone.d;
-                for (var v = start, w = offset; w < count; v += 2, w += 2) {
-                    var vx = vertices[v], vy = vertices[v + 1];
-                    worldVertices[w] = vx * a + vy * b_2 + x;
-                    worldVertices[w + 1] = vx * c + vy * d + y;
-                }
-                return;
-            }
-            var v = 0, skip = 0;
-            for (var i = 0; i < start; i += 2) {
-                var n = bones[v];
-                v += n + 1;
-                skip += n;
-            }
-            var skeletonBones = skeleton.bones;
-            if (deformArray.length == 0) {
-                for (var w = offset, b = skip * 3; w < count; w += 2) {
-                    var wx = x, wy = y;
-                    var n = bones[v++];
-                    n += v;
-                    for (; v < n; v++, b += 3) {
-                        var bone = skeletonBones[bones[v]];
-                        var vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
-                        wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
-                        wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
-                    }
-                    worldVertices[w] = wx;
-                    worldVertices[w + 1] = wy;
-                }
-            }
-            else {
-                var deform = deformArray;
-                for (var w = offset, b = skip * 3, f = skip << 1; w < count; w += 2) {
-                    var wx = x, wy = y;
-                    var n = bones[v++];
-                    n += v;
-                    for (; v < n; v++, b += 3, f += 2) {
-                        var bone = skeletonBones[bones[v]];
-                        var vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
-                        wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
-                        wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
-                    }
-                    worldVertices[w] = wx;
-                    worldVertices[w + 1] = wy;
-                }
-            }
-        };
-        /** Returns true if a deform originally applied to the specified attachment should be applied to this attachment. */
-        VertexAttachment.prototype.applyDeform = function (sourceAttachment) {
-            return this == sourceAttachment;
-        };
-        return VertexAttachment;
-    }(spine.Attachment));
-    spine.VertexAttachment = VertexAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
     var webgl;
     (function (webgl) {
         var AssetManager = (function () {
@@ -3159,8 +3156,8 @@ var spine;
                         }
                         else {
                             if (error)
-                                error(path, "Couldn't load text " + path + ": status " + request.status + ", " + request.responseBody);
-                            _this._errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseBody;
+                                error(path, "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText);
+                            _this._errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
                         }
                         _this._toLoad--;
                         _this._loaded++;

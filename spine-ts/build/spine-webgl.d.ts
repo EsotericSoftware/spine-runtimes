@@ -186,6 +186,161 @@ declare module spine {
     }
 }
 declare module spine {
+    abstract class Attachment {
+        name: string;
+        constructor(name: string);
+    }
+    abstract class VertexAttachment extends Attachment {
+        bones: Array<number>;
+        vertices: Array<number>;
+        worldVerticesLength: number;
+        constructor(name: string);
+        computeWorldVertices(slot: Slot, worldVertices: Array<number>): void;
+        /** Transforms local vertices to world coordinates.
+         * @param start The index of the first local vertex value to transform. Each vertex has 2 values, x and y.
+         * @param count The number of world vertex values to output. Must be <= {@link #getWorldVerticesLength()} - start.
+         * @param worldVertices The output world vertices. Must have a length >= offset + count.
+         * @param offset The worldVertices index to begin writing values. */
+        computeWorldVerticesWith(slot: Slot, start: number, count: number, worldVertices: Array<number>, offset: number): void;
+        /** Returns true if a deform originally applied to the specified attachment should be applied to this attachment. */
+        applyDeform(sourceAttachment: VertexAttachment): boolean;
+    }
+}
+declare module spine {
+    interface AttachmentLoader {
+        /** @return May be null to not load an attachment. */
+        newRegionAttachment(skin: Skin, name: string, path: string): RegionAttachment;
+        /** @return May be null to not load an attachment. */
+        newMeshAttachment(skin: Skin, name: string, path: string): MeshAttachment;
+        /** @return May be null to not load an attachment. */
+        newBoundingBoxAttachment(skin: Skin, name: string): BoundingBoxAttachment;
+        /** @return May be null to not load an attachment */
+        newPathAttachment(skin: Skin, name: string): PathAttachment;
+    }
+}
+declare module spine {
+    enum AttachmentType {
+        Region = 0,
+        BoundingBox = 1,
+        Mesh = 2,
+        LinkedMesh = 3,
+        Path = 4,
+    }
+}
+declare module spine {
+    class BoundingBoxAttachment extends VertexAttachment {
+        constructor(name: string);
+    }
+}
+declare module spine {
+    class MeshAttachment extends VertexAttachment {
+        region: TextureRegion;
+        path: string;
+        regionUVs: Array<number>;
+        worldVertices: Array<number>;
+        triangles: Array<number>;
+        color: Color;
+        hullLength: number;
+        private _parentMesh;
+        inheritDeform: boolean;
+        tempColor: Color;
+        constructor(name: string);
+        updateUVs(): void;
+        /** @return The updated world vertices. */
+        updateWorldVertices(slot: Slot, premultipliedAlpha: boolean): number[];
+        applyDeform(sourceAttachment: VertexAttachment): boolean;
+        getParentMesh(): MeshAttachment;
+        /** @param parentMesh May be null. */
+        setParentMesh(parentMesh: MeshAttachment): void;
+    }
+}
+declare module spine {
+    class PathAttachment extends VertexAttachment {
+        lengths: Array<number>;
+        closed: boolean;
+        constantSpeed: boolean;
+        constructor(name: string);
+    }
+}
+declare module spine {
+    class RegionAttachment extends Attachment {
+        static OX1: number;
+        static OY1: number;
+        static OX2: number;
+        static OY2: number;
+        static OX3: number;
+        static OY3: number;
+        static OX4: number;
+        static OY4: number;
+        static X1: number;
+        static Y1: number;
+        static X2: number;
+        static Y2: number;
+        static X3: number;
+        static Y3: number;
+        static X4: number;
+        static Y4: number;
+        static U1: number;
+        static V1: number;
+        static U2: number;
+        static V2: number;
+        static U3: number;
+        static V3: number;
+        static U4: number;
+        static V4: number;
+        static C1R: number;
+        static C1G: number;
+        static C1B: number;
+        static C1A: number;
+        static C2R: number;
+        static C2G: number;
+        static C2B: number;
+        static C2A: number;
+        static C3R: number;
+        static C3G: number;
+        static C3B: number;
+        static C3A: number;
+        static C4R: number;
+        static C4G: number;
+        static C4B: number;
+        static C4A: number;
+        x: number;
+        y: number;
+        scaleX: number;
+        scaleY: number;
+        rotation: number;
+        width: number;
+        height: number;
+        color: Color;
+        path: string;
+        rendererObject: any;
+        region: TextureRegion;
+        offset: number[];
+        vertices: number[];
+        tempColor: Color;
+        constructor(name: string);
+        setRegion(region: TextureRegion): void;
+        updateOffset(): void;
+        updateWorldVertices(slot: Slot, premultipliedAlpha: boolean): number[];
+    }
+}
+declare module spine {
+    class TextureRegion {
+        renderObject: any;
+        u: number;
+        v: number;
+        u2: number;
+        v2: number;
+        width: number;
+        height: number;
+        rotate: boolean;
+        offsetX: number;
+        offsetY: number;
+        originalWidth: number;
+        originalHeight: number;
+    }
+}
+declare module spine {
     enum BlendMode {
         Normal = 0,
         Additive = 1,
@@ -612,163 +767,6 @@ declare module spine {
         y: number;
         constructor(x?: number, y?: number);
         set(x: number, y: number): Vector2;
-    }
-}
-declare module spine {
-    abstract class Attachment {
-        name: string;
-        constructor(name: string);
-    }
-}
-declare module spine {
-    interface AttachmentLoader {
-        /** @return May be null to not load an attachment. */
-        newRegionAttachment(skin: Skin, name: string, path: string): RegionAttachment;
-        /** @return May be null to not load an attachment. */
-        newMeshAttachment(skin: Skin, name: string, path: string): MeshAttachment;
-        /** @return May be null to not load an attachment. */
-        newBoundingBoxAttachment(skin: Skin, name: string): BoundingBoxAttachment;
-        /** @return May be null to not load an attachment */
-        newPathAttachment(skin: Skin, name: string): PathAttachment;
-    }
-}
-declare module spine {
-    enum AttachmentType {
-        Region = 0,
-        BoundingBox = 1,
-        Mesh = 2,
-        LinkedMesh = 3,
-        Path = 4,
-    }
-}
-declare module spine {
-    class BoundingBoxAttachment extends VertexAttachment {
-        constructor(name: string);
-    }
-}
-declare module spine {
-    class MeshAttachment extends VertexAttachment {
-        region: TextureRegion;
-        path: string;
-        regionUVs: Array<number>;
-        worldVertices: Array<number>;
-        triangles: Array<number>;
-        color: Color;
-        hullLength: number;
-        private _parentMesh;
-        inheritDeform: boolean;
-        tempColor: Color;
-        constructor(name: string);
-        updateUVs(): void;
-        /** @return The updated world vertices. */
-        updateWorldVertices(slot: Slot, premultipliedAlpha: boolean): number[];
-        applyDeform(sourceAttachment: VertexAttachment): boolean;
-        getParentMesh(): MeshAttachment;
-        /** @param parentMesh May be null. */
-        setParentMesh(parentMesh: MeshAttachment): void;
-    }
-}
-declare module spine {
-    class PathAttachment extends VertexAttachment {
-        lengths: Array<number>;
-        closed: boolean;
-        constantSpeed: boolean;
-        constructor(name: string);
-    }
-}
-declare module spine {
-    class RegionAttachment extends Attachment {
-        static OX1: number;
-        static OY1: number;
-        static OX2: number;
-        static OY2: number;
-        static OX3: number;
-        static OY3: number;
-        static OX4: number;
-        static OY4: number;
-        static X1: number;
-        static Y1: number;
-        static X2: number;
-        static Y2: number;
-        static X3: number;
-        static Y3: number;
-        static X4: number;
-        static Y4: number;
-        static U1: number;
-        static V1: number;
-        static U2: number;
-        static V2: number;
-        static U3: number;
-        static V3: number;
-        static U4: number;
-        static V4: number;
-        static C1R: number;
-        static C1G: number;
-        static C1B: number;
-        static C1A: number;
-        static C2R: number;
-        static C2G: number;
-        static C2B: number;
-        static C2A: number;
-        static C3R: number;
-        static C3G: number;
-        static C3B: number;
-        static C3A: number;
-        static C4R: number;
-        static C4G: number;
-        static C4B: number;
-        static C4A: number;
-        x: number;
-        y: number;
-        scaleX: number;
-        scaleY: number;
-        rotation: number;
-        width: number;
-        height: number;
-        color: Color;
-        path: string;
-        rendererObject: any;
-        region: TextureRegion;
-        offset: number[];
-        vertices: number[];
-        tempColor: Color;
-        constructor(name: string);
-        setRegion(region: TextureRegion): void;
-        updateOffset(): void;
-        updateWorldVertices(slot: Slot, premultipliedAlpha: boolean): number[];
-    }
-}
-declare module spine {
-    class TextureRegion {
-        renderObject: any;
-        u: number;
-        v: number;
-        u2: number;
-        v2: number;
-        width: number;
-        height: number;
-        rotate: boolean;
-        offsetX: number;
-        offsetY: number;
-        originalWidth: number;
-        originalHeight: number;
-    }
-}
-declare module spine {
-    class VertexAttachment extends Attachment {
-        bones: Array<number>;
-        vertices: Array<number>;
-        worldVerticesLength: number;
-        constructor(name: string);
-        computeWorldVertices(slot: Slot, worldVertices: Array<number>): void;
-        /** Transforms local vertices to world coordinates.
-         * @param start The index of the first local vertex value to transform. Each vertex has 2 values, x and y.
-         * @param count The number of world vertex values to output. Must be <= {@link #getWorldVerticesLength()} - start.
-         * @param worldVertices The output world vertices. Must have a length >= offset + count.
-         * @param offset The worldVertices index to begin writing values. */
-        computeWorldVerticesWith(slot: Slot, start: number, count: number, worldVertices: Array<number>, offset: number): void;
-        /** Returns true if a deform originally applied to the specified attachment should be applied to this attachment. */
-        applyDeform(sourceAttachment: VertexAttachment): boolean;
     }
 }
 declare module spine.webgl {
