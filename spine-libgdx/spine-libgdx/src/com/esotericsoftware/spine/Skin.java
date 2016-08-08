@@ -31,6 +31,8 @@
 
 package com.esotericsoftware.spine;
 
+import java.util.Iterator;
+
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
@@ -91,6 +93,10 @@ public class Skin {
 
 	public String getName () {
 		return name;
+	}
+
+	public Iterator<Attachment> attachments () {
+		return attachments.values().iterator();
 	}
 
 	public String toString () {
