@@ -186,6 +186,457 @@ declare module spine {
     }
 }
 declare module spine {
+    enum BlendMode {
+        Normal = 0,
+        Additive = 1,
+        Multiply = 2,
+        Screen = 3,
+    }
+}
+declare module spine {
+    class Bone implements Updatable {
+        data: BoneData;
+        skeleton: Skeleton;
+        parent: Bone;
+        children: Bone[];
+        x: number;
+        y: number;
+        rotation: number;
+        scaleX: number;
+        scaleY: number;
+        shearX: number;
+        shearY: number;
+        appliedRotation: number;
+        a: number;
+        b: number;
+        worldX: number;
+        c: number;
+        d: number;
+        worldY: number;
+        worldSignX: number;
+        worldSignY: number;
+        sorted: boolean;
+        /** @param parent May be null. */
+        constructor(data: BoneData, skeleton: Skeleton, parent: Bone);
+        /** Same as {@link #updateWorldTransform()}. This method exists for Bone to implement {@link Updatable}. */
+        update(): void;
+        /** Computes the world transform using the parent bone and this bone's local transform. */
+        updateWorldTransform(): void;
+        /** Computes the world transform using the parent bone and the specified local transform. */
+        updateWorldTransformWith(x: number, y: number, rotation: number, scaleX: number, scaleY: number, shearX: number, shearY: number): void;
+        setToSetupPose(): void;
+        getWorldRotationX(): number;
+        getWorldRotationY(): number;
+        getWorldScaleX(): number;
+        getWorldScaleY(): number;
+        worldToLocalRotationX(): number;
+        worldToLocalRotationY(): number;
+        rotateWorld(degrees: number): void;
+        /** Computes the local transform from the world transform. This can be useful to perform processing on the local transform
+         * after the world transform has been modified directly (eg, by a constraint).
+         * <p>
+         * Some redundant information is lost by the world transform, such as -1,-1 scale versus 180 rotation. The computed local
+         * transform values may differ from the original values but are functionally the same. */
+        updateLocalTransform(): void;
+        worldToLocal(world: Vector2): Vector2;
+        localToWorld(local: Vector2): Vector2;
+    }
+}
+declare module spine {
+    class BoneData {
+        index: number;
+        name: string;
+        parent: BoneData;
+        length: number;
+        x: number;
+        y: number;
+        rotation: number;
+        scaleX: number;
+        scaleY: number;
+        shearX: number;
+        shearY: number;
+        inheritRotation: boolean;
+        inheritScale: boolean;
+        constructor(index: number, name: string, parent: BoneData);
+    }
+}
+declare module spine {
+    class Event {
+        data: EventData;
+        intValue: number;
+        floatValue: number;
+        stringValue: string;
+        time: number;
+        constructor(time: number, data: EventData);
+    }
+}
+declare module spine {
+    class EventData {
+        name: string;
+        intValue: number;
+        floatValue: number;
+        stringValue: string;
+        constructor(name: string);
+    }
+}
+declare module spine {
+    class IkConstraint implements Updatable {
+        data: IkConstraintData;
+        bones: Array<Bone>;
+        target: Bone;
+        mix: number;
+        bendDirection: number;
+        level: number;
+        constructor(data: IkConstraintData, skeleton: Skeleton);
+        apply(): void;
+        update(): void;
+        /** Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified in the world
+         * coordinate system. */
+        applyShort(bone: Bone, targetX: number, targetY: number, alpha: number): void;
+        /** Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as possible. The
+         * target is specified in the world coordinate system.
+         * @param child A direct descendant of the parent bone. */
+        applyWith(parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, alpha: number): void;
+    }
+}
+declare module spine {
+    class IkConstraintData {
+        name: string;
+        bones: BoneData[];
+        target: BoneData;
+        bendDirection: number;
+        mix: number;
+        constructor(name: string);
+    }
+}
+declare module spine {
+    class PathConstraint implements Updatable {
+        static NONE: number;
+        static BEFORE: number;
+        static AFTER: number;
+        data: PathConstraintData;
+        bones: Array<Bone>;
+        target: Slot;
+        position: number;
+        spacing: number;
+        rotateMix: number;
+        translateMix: number;
+        spaces: number[];
+        positions: number[];
+        world: number[];
+        curves: number[];
+        lengths: number[];
+        segments: number[];
+        constructor(data: PathConstraintData, skeleton: Skeleton);
+        apply(): void;
+        update(): void;
+        computeWorldPositions(path: PathAttachment, spacesCount: number, tangents: boolean, percentPosition: boolean, percentSpacing: boolean): number[];
+        addBeforePosition(p: number, temp: Array<number>, i: number, out: Array<number>, o: number): void;
+        addAfterPosition(p: number, temp: Array<number>, i: number, out: Array<number>, o: number): void;
+        addCurvePosition(p: number, x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number, out: Array<number>, o: number, tangents: boolean): void;
+    }
+}
+declare module spine {
+    class PathConstraintData {
+        name: string;
+        bones: BoneData[];
+        target: SlotData;
+        positionMode: PositionMode;
+        spacingMode: SpacingMode;
+        rotateMode: RotateMode;
+        offsetRotation: number;
+        position: number;
+        spacing: number;
+        rotateMix: number;
+        translateMix: number;
+        constructor(name: string);
+    }
+    enum PositionMode {
+        Fixed = 0,
+        Percent = 1,
+    }
+    enum SpacingMode {
+        Length = 0,
+        Fixed = 1,
+        Percent = 2,
+    }
+    enum RotateMode {
+        Tangent = 0,
+        Chain = 1,
+        ChainScale = 2,
+    }
+}
+declare module spine {
+    class Skeleton {
+        data: SkeletonData;
+        bones: Array<Bone>;
+        slots: Array<Slot>;
+        drawOrder: Array<Slot>;
+        ikConstraints: Array<IkConstraint>;
+        ikConstraintsSorted: Array<IkConstraint>;
+        transformConstraints: Array<TransformConstraint>;
+        pathConstraints: Array<PathConstraint>;
+        _updateCache: Updatable[];
+        skin: Skin;
+        color: Color;
+        time: number;
+        flipX: boolean;
+        flipY: boolean;
+        x: number;
+        y: number;
+        constructor(data: SkeletonData);
+        updateCache(): void;
+        sortPathConstraintAttachment(skin: Skin, slotIndex: number, slotBone: Bone): void;
+        sortPathConstraintAttachmentWith(attachment: Attachment, slotBone: Bone): void;
+        sortBone(bone: Bone): void;
+        sortReset(bones: Array<Bone>): void;
+        /** Updates the world transform for each bone and applies constraints. */
+        updateWorldTransform(): void;
+        /** Sets the bones, constraints, and slots to their setup pose values. */
+        setToSetupPose(): void;
+        /** Sets the bones and constraints to their setup pose values. */
+        setBonesToSetupPose(): void;
+        setSlotsToSetupPose(): void;
+        /** @return May return null. */
+        getRootBone(): Bone;
+        /** @return May be null. */
+        findBone(boneName: string): Bone;
+        /** @return -1 if the bone was not found. */
+        findBoneIndex(boneName: string): number;
+        /** @return May be null. */
+        findSlot(slotName: string): Slot;
+        /** @return -1 if the bone was not found. */
+        findSlotIndex(slotName: string): number;
+        /** Sets a skin by name.
+         * @see #setSkin(Skin) */
+        setSkinByName(skinName: string): void;
+        /** Sets the skin used to look up attachments before looking in the {@link SkeletonData#getDefaultSkin() default skin}.
+         * Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was no
+         * old skin, each slot's setup mode attachment is attached from the new skin.
+         * @param newSkin May be null. */
+        setSkin(newSkin: Skin): void;
+        /** @return May be null. */
+        getAttachmentByName(slotName: string, attachmentName: string): Attachment;
+        /** @return May be null. */
+        getAttachment(slotIndex: number, attachmentName: string): Attachment;
+        /** @param attachmentName May be null. */
+        setAttachment(slotName: string, attachmentName: string): void;
+        /** @return May be null. */
+        findIkConstraint(constraintName: string): IkConstraint;
+        /** @return May be null. */
+        findTransformConstraint(constraintName: string): TransformConstraint;
+        /** @return May be null. */
+        findPathConstraint(constraintName: string): PathConstraint;
+        /** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
+         * @param offset The distance from the skeleton origin to the bottom left corner of the AABB.
+         * @param size The width and height of the AABB. */
+        getBounds(offset: Vector2, size: Vector2): void;
+        update(delta: number): void;
+    }
+}
+declare module spine {
+    class SkeletonBounds {
+        minX: number;
+        minY: number;
+        maxX: number;
+        maxY: number;
+        boundingBoxes: BoundingBoxAttachment[];
+        polygons: number[][];
+        update(skeleton: Skeleton, updateAabb: boolean): void;
+        aabbCompute(): void;
+        /** Returns true if the axis aligned bounding box contains the point. */
+        aabbContainsPoint(x: number, y: number): boolean;
+        /** Returns true if the axis aligned bounding box intersects the line segment. */
+        aabbIntersectsSegment(x1: number, y1: number, x2: number, y2: number): boolean;
+        /** Returns true if the axis aligned bounding box intersects the axis aligned bounding box of the specified bounds. */
+        aabbIntersectsSkeleton(bounds: SkeletonBounds): boolean;
+        /** Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
+         * efficient to only call this method if {@link #aabbContainsPoint(float, float)} returns true. */
+        containsPoint(x: number, y: number): BoundingBoxAttachment;
+        /** Returns true if the polygon contains the point. */
+        containsPointPolygon(polygon: Array<number>, x: number, y: number): boolean;
+        /** Returns the first bounding box attachment that contains any part of the line segment, or null. When doing many checks, it
+         * is usually more efficient to only call this method if {@link #aabbIntersectsSegment(float, float, float, float)} returns
+         * true. */
+        intersectsSegment(x1: number, y1: number, x2: number, y2: number): BoundingBoxAttachment;
+        /** Returns true if the polygon contains any part of the line segment. */
+        intersectsSegmentPolygon(polygon: Array<number>, x1: number, y1: number, x2: number, y2: number): boolean;
+        /** Returns the polygon for the specified bounding box, or null. */
+        getPolygon(boundingBox: BoundingBoxAttachment): number[];
+    }
+}
+declare module spine {
+    class SkeletonData {
+        name: string;
+        bones: BoneData[];
+        slots: SlotData[];
+        skins: Skin[];
+        defaultSkin: Skin;
+        events: EventData[];
+        animations: Animation[];
+        ikConstraints: IkConstraintData[];
+        transformConstraints: TransformConstraintData[];
+        pathConstraints: PathConstraintData[];
+        width: number;
+        height: number;
+        version: string;
+        hash: string;
+        imagesPath: string;
+        findBone(boneName: string): BoneData;
+        findBoneIndex(boneName: string): number;
+        findSlot(slotName: string): SlotData;
+        findSlotIndex(slotName: string): number;
+        findSkin(skinName: string): Skin;
+        findEvent(eventDataName: string): EventData;
+        findAnimation(animationName: string): Animation;
+        findIkConstraint(constraintName: string): IkConstraintData;
+        findTransformConstraint(constraintName: string): TransformConstraintData;
+        findPathConstraint(constraintName: string): PathConstraintData;
+        findPathConstraintIndex(pathConstraintName: string): number;
+    }
+}
+declare module spine {
+    class SkeletonJson {
+        attachmentLoader: AttachmentLoader;
+        scale: number;
+        private linkedMeshes;
+        constructor(attachmentLoader: AttachmentLoader);
+        readSkeletonData(json: string): SkeletonData;
+        readAttachment(map: any, skin: Skin, slotIndex: number, name: string): Attachment;
+        readVertices(map: any, attachment: VertexAttachment, verticesLength: number): void;
+        readAnimation(map: any, name: string, skeletonData: SkeletonData): void;
+        readCurve(map: any, timeline: CurveTimeline, frameIndex: number): void;
+        getValue(map: any, prop: string, defaultValue: any): any;
+        static blendModeFromString(str: string): BlendMode;
+        static positionModeFromString(str: string): PositionMode;
+        static spacingModeFromString(str: string): SpacingMode;
+        static rotateModeFromString(str: string): RotateMode;
+    }
+}
+declare module spine {
+    class Skin {
+        name: string;
+        attachments: Map<Attachment>[];
+        constructor(name: string);
+        addAttachment(slotIndex: number, name: string, attachment: Attachment): void;
+        /** @return May be null. */
+        getAttachment(slotIndex: number, name: string): Attachment;
+        /** Attach each attachment in this skin if the corresponding attachment in the old skin is currently attached. */
+        attachAll(skeleton: Skeleton, oldSkin: Skin): void;
+    }
+}
+declare module spine {
+    class Slot {
+        data: SlotData;
+        bone: Bone;
+        color: Color;
+        private attachment;
+        private attachmentTime;
+        attachmentVertices: number[];
+        constructor(data: SlotData, bone: Bone);
+        /** @return May be null. */
+        getAttachment(): Attachment;
+        /** Sets the attachment and if it changed, resets {@link #getAttachmentTime()} and clears {@link #getAttachmentVertices()}.
+         * @param attachment May be null. */
+        setAttachment(attachment: Attachment): void;
+        setAttachmentTime(time: number): void;
+        /** Returns the time since the attachment was set. */
+        getAttachmentTime(): number;
+        setToSetupPose(): void;
+    }
+}
+declare module spine {
+    class SlotData {
+        index: number;
+        name: string;
+        boneData: BoneData;
+        color: Color;
+        attachmentName: string;
+        blendMode: BlendMode;
+        constructor(index: number, name: string, boneData: BoneData);
+    }
+}
+declare module spine {
+    class TransformConstraint implements Updatable {
+        data: TransformConstraintData;
+        bones: Array<Bone>;
+        target: Bone;
+        rotateMix: number;
+        translateMix: number;
+        scaleMix: number;
+        shearMix: number;
+        temp: Vector2;
+        constructor(data: TransformConstraintData, skeleton: Skeleton);
+        apply(): void;
+        update(): void;
+    }
+}
+declare module spine {
+    class TransformConstraintData {
+        name: string;
+        bones: BoneData[];
+        target: BoneData;
+        rotateMix: number;
+        translateMix: number;
+        scaleMix: number;
+        shearMix: number;
+        offsetRotation: number;
+        offsetX: number;
+        offsetY: number;
+        offsetScaleX: number;
+        offsetScaleY: number;
+        offsetShearY: number;
+        constructor(name: string);
+    }
+}
+declare module spine {
+    interface Updatable {
+        update(): void;
+    }
+}
+declare module spine {
+    interface Map<T> {
+        [key: string]: T;
+    }
+    interface Disposable {
+        dispose(): void;
+    }
+    class Color {
+        r: number;
+        g: number;
+        b: number;
+        a: number;
+        constructor(r?: number, g?: number, b?: number, a?: number);
+        set(r: number, g: number, b: number, a: number): void;
+        setFromColor(c: Color): void;
+        setFromString(hex: string): void;
+        add(r: number, g: number, b: number, a: number): void;
+        clamp(): this;
+    }
+    class MathUtils {
+        static PI: number;
+        static PI2: number;
+        static radiansToDegrees: number;
+        static radDeg: number;
+        static degreesToRadians: number;
+        static degRad: number;
+        static clamp(value: number, min: number, max: number): number;
+        static cosDeg(degrees: number): number;
+        static sinDeg(degrees: number): number;
+        static signum(value: number): number;
+    }
+    class Utils {
+        static arrayCopy<T>(source: Array<T>, sourceStart: number, dest: Array<T>, destStart: number, numElements: number): void;
+        static setArraySize(array: Array<number>, size: number): Array<number>;
+    }
+    class Vector2 {
+        x: number;
+        y: number;
+        constructor(x?: number, y?: number);
+        set(x: number, y: number): Vector2;
+    }
+}
+declare module spine {
     abstract class Attachment {
         name: string;
         constructor(name: string);
@@ -338,435 +789,6 @@ declare module spine {
         offsetY: number;
         originalWidth: number;
         originalHeight: number;
-    }
-}
-declare module spine {
-    enum BlendMode {
-        Normal = 0,
-        Additive = 1,
-        Multiply = 2,
-        Screen = 3,
-    }
-}
-declare module spine {
-    class Bone implements Updatable {
-        data: BoneData;
-        skeleton: Skeleton;
-        parent: Bone;
-        children: Bone[];
-        x: number;
-        y: number;
-        rotation: number;
-        scaleX: number;
-        scaleY: number;
-        shearX: number;
-        shearY: number;
-        appliedRotation: number;
-        a: number;
-        b: number;
-        worldX: number;
-        c: number;
-        d: number;
-        worldY: number;
-        worldSignX: number;
-        worldSignY: number;
-        sorted: boolean;
-        /** @param parent May be null. */
-        constructor(data: BoneData, skeleton: Skeleton, parent: Bone);
-        /** Same as {@link #updateWorldTransform()}. This method exists for Bone to implement {@link Updatable}. */
-        update(): void;
-        /** Computes the world transform using the parent bone and this bone's local transform. */
-        updateWorldTransform(): void;
-        /** Computes the world transform using the parent bone and the specified local transform. */
-        updateWorldTransformWith(x: number, y: number, rotation: number, scaleX: number, scaleY: number, shearX: number, shearY: number): void;
-        setToSetupPose(): void;
-        getWorldRotationX(): number;
-        getWorldRotationY(): number;
-        getWorldScaleX(): number;
-        getWorldScaleY(): number;
-        worldToLocalRotationX(): number;
-        worldToLocalRotationY(): number;
-        rotateWorld(degrees: number): void;
-        /** Computes the local transform from the world transform. This can be useful to perform processing on the local transform
-         * after the world transform has been modified directly (eg, by a constraint).
-         * <p>
-         * Some redundant information is lost by the world transform, such as -1,-1 scale versus 180 rotation. The computed local
-         * transform values may differ from the original values but are functionally the same. */
-        updateLocalTransform(): void;
-        worldToLocal(world: Vector2): Vector2;
-        localToWorld(local: Vector2): Vector2;
-    }
-}
-declare module spine {
-    class BoneData {
-        index: number;
-        name: string;
-        parent: BoneData;
-        length: number;
-        x: number;
-        y: number;
-        rotation: number;
-        scaleX: number;
-        scaleY: number;
-        shearX: number;
-        shearY: number;
-        inheritRotation: boolean;
-        inheritScale: boolean;
-        BoneData(index: number, name: string, parent: BoneData): void;
-    }
-}
-declare module spine {
-    class Event {
-        data: EventData;
-        intValue: number;
-        floatValue: number;
-        stringValue: string;
-        time: number;
-        constructor(time: number, data: EventData);
-    }
-}
-declare module spine {
-    class EventData {
-        name: string;
-        intValue: number;
-        floatValue: number;
-        stringValue: string;
-    }
-}
-declare module spine {
-    class IkConstraint implements Updatable {
-        data: IkConstraintData;
-        bones: Array<Bone>;
-        target: Bone;
-        mix: number;
-        bendDirection: number;
-        level: number;
-        constructor(data: IkConstraintData, skeleton: Skeleton);
-        apply(): void;
-        update(): void;
-        /** Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified in the world
-         * coordinate system. */
-        applyShort(bone: Bone, targetX: number, targetY: number, alpha: number): void;
-        /** Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as possible. The
-         * target is specified in the world coordinate system.
-         * @param child A direct descendant of the parent bone. */
-        applyWith(parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, alpha: number): void;
-    }
-}
-declare module spine {
-    class IkConstraintData {
-        name: string;
-        bones: BoneData[];
-        target: BoneData;
-        bendDirection: number;
-        mix: number;
-    }
-}
-declare module spine {
-    class PathConstraint implements Updatable {
-        static NONE: number;
-        static BEFORE: number;
-        static AFTER: number;
-        data: PathConstraintData;
-        bones: Array<Bone>;
-        target: Slot;
-        position: number;
-        spacing: number;
-        rotateMix: number;
-        translateMix: number;
-        spaces: number[];
-        positions: number[];
-        world: number[];
-        curves: number[];
-        lengths: number[];
-        segments: number[];
-        constructor(data: PathConstraintData, skeleton: Skeleton);
-        apply(): void;
-        update(): void;
-        computeWorldPositions(path: PathAttachment, spacesCount: number, tangents: boolean, percentPosition: boolean, percentSpacing: boolean): number[];
-        addBeforePosition(p: number, temp: Array<number>, i: number, out: Array<number>, o: number): void;
-        addAfterPosition(p: number, temp: Array<number>, i: number, out: Array<number>, o: number): void;
-        addCurvePosition(p: number, x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number, out: Array<number>, o: number, tangents: boolean): void;
-    }
-}
-declare module spine {
-    class PathConstraintData {
-        name: string;
-        bones: BoneData[];
-        target: SlotData;
-        positionMode: PositionMode;
-        spacingMode: SpacingMode;
-        rotateMode: RotateMode;
-        offsetRotation: number;
-        position: number;
-        spacing: number;
-        rotateMix: number;
-        translateMix: number;
-    }
-    enum PositionMode {
-        Fixed = 0,
-        Percent = 1,
-    }
-    enum SpacingMode {
-        Length = 0,
-        Fixed = 1,
-        Percent = 2,
-    }
-    enum RotateMode {
-        Tangent = 0,
-        Chain = 1,
-        ChainScale = 2,
-    }
-}
-declare module spine {
-    class Skeleton {
-        data: SkeletonData;
-        bones: Array<Bone>;
-        slots: Array<Slot>;
-        drawOrder: Array<Slot>;
-        ikConstraints: Array<IkConstraint>;
-        ikConstraintsSorted: Array<IkConstraint>;
-        transformConstraints: Array<TransformConstraint>;
-        pathConstraints: Array<PathConstraint>;
-        _updateCache: Updatable[];
-        skin: Skin;
-        color: Color;
-        time: number;
-        flipX: boolean;
-        flipY: boolean;
-        x: number;
-        y: number;
-        constructor(data: SkeletonData);
-        updateCache(): void;
-        sortPathConstraintAttachment(skin: Skin, slotIndex: number, slotBone: Bone): void;
-        sortPathConstraintAttachmentWith(attachment: Attachment, slotBone: Bone): void;
-        sortBone(bone: Bone): void;
-        sortReset(bones: Array<Bone>): void;
-        /** Updates the world transform for each bone and applies constraints. */
-        updateWorldTransform(): void;
-        /** Sets the bones, constraints, and slots to their setup pose values. */
-        setToSetupPose(): void;
-        /** Sets the bones and constraints to their setup pose values. */
-        setBonesToSetupPose(): void;
-        setSlotsToSetupPose(): void;
-        /** @return May return null. */
-        getRootBone(): Bone;
-        /** @return May be null. */
-        findBone(boneName: string): Bone;
-        /** @return -1 if the bone was not found. */
-        findBoneIndex(boneName: string): number;
-        /** @return May be null. */
-        findSlot(slotName: string): Slot;
-        /** @return -1 if the bone was not found. */
-        findSlotIndex(slotName: string): number;
-        /** Sets a skin by name.
-         * @see #setSkin(Skin) */
-        setSkinByName(skinName: string): void;
-        /** Sets the skin used to look up attachments before looking in the {@link SkeletonData#getDefaultSkin() default skin}.
-         * Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was no
-         * old skin, each slot's setup mode attachment is attached from the new skin.
-         * @param newSkin May be null. */
-        setSkin(newSkin: Skin): void;
-        /** @return May be null. */
-        getAttachmentByName(slotName: string, attachmentName: string): Attachment;
-        /** @return May be null. */
-        getAttachment(slotIndex: number, attachmentName: string): Attachment;
-        /** @param attachmentName May be null. */
-        setAttachment(slotName: string, attachmentName: string): void;
-        /** @return May be null. */
-        findIkConstraint(constraintName: string): IkConstraint;
-        /** @return May be null. */
-        findTransformConstraint(constraintName: string): TransformConstraint;
-        /** @return May be null. */
-        findPathConstraint(constraintName: string): PathConstraint;
-        /** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
-         * @param offset The distance from the skeleton origin to the bottom left corner of the AABB.
-         * @param size The width and height of the AABB. */
-        getBounds(offset: Vector2, size: Vector2): void;
-        update(delta: number): void;
-    }
-}
-declare module spine {
-    class SkeletonBounds {
-        minX: number;
-        minY: number;
-        maxX: number;
-        maxY: number;
-        boundingBoxes: BoundingBoxAttachment[];
-        polygons: number[][];
-        update(skeleton: Skeleton, updateAabb: boolean): void;
-        aabbCompute(): void;
-        /** Returns true if the axis aligned bounding box contains the point. */
-        aabbContainsPoint(x: number, y: number): boolean;
-        /** Returns true if the axis aligned bounding box intersects the line segment. */
-        aabbIntersectsSegment(x1: number, y1: number, x2: number, y2: number): boolean;
-        /** Returns true if the axis aligned bounding box intersects the axis aligned bounding box of the specified bounds. */
-        aabbIntersectsSkeleton(bounds: SkeletonBounds): boolean;
-        /** Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
-         * efficient to only call this method if {@link #aabbContainsPoint(float, float)} returns true. */
-        containsPoint(x: number, y: number): BoundingBoxAttachment;
-        /** Returns true if the polygon contains the point. */
-        containsPointPolygon(polygon: Array<number>, x: number, y: number): boolean;
-        /** Returns the first bounding box attachment that contains any part of the line segment, or null. When doing many checks, it
-         * is usually more efficient to only call this method if {@link #aabbIntersectsSegment(float, float, float, float)} returns
-         * true. */
-        intersectsSegment(x1: number, y1: number, x2: number, y2: number): BoundingBoxAttachment;
-        /** Returns true if the polygon contains any part of the line segment. */
-        intersectsSegmentPolygon(polygon: Array<number>, x1: number, y1: number, x2: number, y2: number): boolean;
-        /** Returns the polygon for the specified bounding box, or null. */
-        getPolygon(boundingBox: BoundingBoxAttachment): number[];
-    }
-}
-declare module spine {
-    class SkeletonData {
-        name: string;
-        bones: BoneData[];
-        slots: SlotData[];
-        skins: Skin[];
-        defaultSkin: Skin;
-        events: EventData[];
-        animations: Animation[];
-        ikConstraints: IkConstraintData[];
-        transformConstraints: TransformConstraintData[];
-        pathConstraints: PathConstraintData[];
-        width: number;
-        height: number;
-        version: string;
-        hash: string;
-        imagesPath: string;
-        findBone(boneName: string): BoneData;
-        findBoneIndex(boneName: string): number;
-        findSlot(slotName: string): SlotData;
-        findSlotIndex(slotName: string): number;
-        findSkin(skinName: string): Skin;
-        findEvent(eventDataName: string): EventData;
-        findAnimation(animationName: string): Animation;
-        findIkConstraint(constraintName: string): IkConstraintData;
-        findTransformConstraint(constraintName: string): TransformConstraintData;
-        findPathConstraint(constraintName: string): PathConstraintData;
-        findPathConstraintIndex(pathConstraintName: string): number;
-    }
-}
-declare module spine {
-    class Skin {
-        name: string;
-        attachments: Map<Attachment>[];
-        constructor(name: string);
-        addAttachment(slotIndex: number, name: string, attachment: Attachment): void;
-        /** @return May be null. */
-        getAttachment(slotIndex: number, name: string): Attachment;
-        /** Attach each attachment in this skin if the corresponding attachment in the old skin is currently attached. */
-        attachAll(skeleton: Skeleton, oldSkin: Skin): void;
-    }
-}
-declare module spine {
-    class Slot {
-        data: SlotData;
-        bone: Bone;
-        color: Color;
-        private attachment;
-        private attachmentTime;
-        attachmentVertices: number[];
-        constructor(data: SlotData, bone: Bone);
-        /** @return May be null. */
-        getAttachment(): Attachment;
-        /** Sets the attachment and if it changed, resets {@link #getAttachmentTime()} and clears {@link #getAttachmentVertices()}.
-         * @param attachment May be null. */
-        setAttachment(attachment: Attachment): void;
-        setAttachmentTime(time: number): void;
-        /** Returns the time since the attachment was set. */
-        getAttachmentTime(): number;
-        setToSetupPose(): void;
-    }
-}
-declare module spine {
-    class SlotData {
-        index: number;
-        name: string;
-        boneData: BoneData;
-        color: Color;
-        attachmentName: string;
-        blendMode: BlendMode;
-        constructor(index: number, name: string, boneData: BoneData);
-    }
-}
-declare module spine {
-    class TransformConstraint implements Updatable {
-        data: TransformConstraintData;
-        bones: Array<Bone>;
-        target: Bone;
-        rotateMix: number;
-        translateMix: number;
-        scaleMix: number;
-        shearMix: number;
-        temp: Vector2;
-        constructor(data: TransformConstraintData, skeleton: Skeleton);
-        apply(): void;
-        update(): void;
-    }
-}
-declare module spine {
-    class TransformConstraintData {
-        name: string;
-        bones: BoneData[];
-        target: BoneData;
-        rotateMix: number;
-        translateMix: number;
-        scaleMix: number;
-        shearMix: number;
-        offsetRotation: number;
-        offsetX: number;
-        offsetY: number;
-        offsetScaleX: number;
-        offsetScaleY: number;
-        offsetShearY: number;
-        constructor(name: string);
-    }
-}
-declare module spine {
-    interface Updatable {
-        update(): void;
-    }
-}
-declare module spine {
-    interface Map<T> {
-        [key: string]: T;
-    }
-    interface Disposable {
-        dispose(): void;
-    }
-    class Color {
-        r: number;
-        g: number;
-        b: number;
-        a: number;
-        constructor(r?: number, g?: number, b?: number, a?: number);
-        set(r: number, g: number, b: number, a: number): void;
-        setFromColor(c: Color): void;
-        add(r: number, g: number, b: number, a: number): void;
-        clamp(): this;
-    }
-    class MathUtils {
-        static PI: number;
-        static PI2: number;
-        static radiansToDegrees: number;
-        static radDeg: number;
-        static degreesToRadians: number;
-        static degRad: number;
-        static clamp(value: number, min: number, max: number): number;
-        static cosDeg(degrees: number): number;
-        static sinDeg(degrees: number): number;
-        static signum(value: number): number;
-    }
-    class Utils {
-        static arrayCopy<T>(source: Array<T>, sourceStart: number, dest: Array<T>, destStart: number, numElements: number): void;
-        static setArraySize(array: Array<number>, size: number): Array<number>;
-    }
-    class Vector2 {
-        x: number;
-        y: number;
-        constructor(x?: number, y?: number);
-        set(x: number, y: number): Vector2;
     }
 }
 declare module spine.webgl {
@@ -983,24 +1005,28 @@ declare module spine.webgl {
         width: number;
         height: number;
     }
-    class TextureAtlasRegion {
+    class TextureAtlasRegion extends TextureRegion {
         page: TextureAtlasPage;
         name: string;
         x: number;
         y: number;
-        width: number;
-        height: number;
-        u: number;
-        v: number;
-        u2: number;
-        v2: number;
-        offsetX: number;
-        offsetY: number;
-        originalWidth: number;
-        originalHeight: number;
         index: number;
         rotate: boolean;
         texture: Texture;
+    }
+}
+declare module spine.webgl {
+    class TextureAtlasAttachmentLoader implements AttachmentLoader {
+        atlas: TextureAtlas;
+        constructor(atlas: TextureAtlas);
+        /** @return May be null to not load an attachment. */
+        newRegionAttachment(skin: Skin, name: string, path: string): RegionAttachment;
+        /** @return May be null to not load an attachment. */
+        newMeshAttachment(skin: Skin, name: string, path: string): MeshAttachment;
+        /** @return May be null to not load an attachment. */
+        newBoundingBoxAttachment(skin: Skin, name: string): BoundingBoxAttachment;
+        /** @return May be null to not load an attachment */
+        newPathAttachment(skin: Skin, name: string): PathAttachment;
     }
 }
 declare module spine.webgl {

@@ -26,6 +26,14 @@ module spine {
             this.a = c.a;
         }
 
+        setFromString(hex: string) {
+            hex = hex.charAt(0) == '#' ? hex.substr(1) : hex;
+            this.r = parseInt(hex.substr(0, 2), 16) / 255.0;
+            this.g = parseInt(hex.substr(2, 2), 16) / 255.0;
+            this.b = parseInt(hex.substr(4, 2), 16) / 255.0;
+            this.a = (hex.length != 8? 255: parseInt(hex.substr(6, 2), 16)) / 255.0;
+        }
+
         add (r: number, g: number, b: number, a: number) {
             this.r += r;
             this.g += g;

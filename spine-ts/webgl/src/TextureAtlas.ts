@@ -171,21 +171,11 @@ module spine.webgl {
         height: number;
     }
 
-    export class TextureAtlasRegion {
+    export class TextureAtlasRegion extends TextureRegion {
         page: TextureAtlasPage;
         name: string;
         x: number;
         y: number;
-        width: number;
-        height: number;
-        u: number;
-        v: number;
-        u2: number;
-        v2: number;
-        offsetX: number;
-        offsetY: number;
-        originalWidth: number;
-        originalHeight: number;
         index: number;
         rotate: boolean;
         texture: Texture;

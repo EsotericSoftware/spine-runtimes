@@ -36,6 +36,12 @@ function init() {
     assetManager.loadText("assets/spineboy.json");
     assetManager.loadText("assets/spineboy.atlas");
     assetManager.loadTexture("assets/spineboy.png");
+    assetManager.loadText("assets/raptor.json");
+    assetManager.loadText("assets/raptor.atlas");
+    assetManager.loadTexture("assets/raptor.png");
+    assetManager.loadText("assets/tank.json");
+    assetManager.loadText("assets/tank.atlas");
+    assetManager.loadTexture("assets/tank.png");
     requestAnimationFrame(load);
 
     // Create a bunch of x/y/width/height polies
@@ -46,15 +52,21 @@ function init() {
 
 function load() {
     if (assetManager.isLoadingComplete()) {
-        texture = assetManager.get("assets/spineboy.png");
-
-        atlas = new spine.webgl.TextureAtlas(assetManager.get("assets/spineboy.atlas"), function(path) {
-            return assetManager.get("assets/" + path);
-        });
-
+        texture = assetManager.get("assets/spineboy.png");  
+        var skeletonData = loadSkeletonJson("tank");
+        loadSkeletonJson("spineboy");
+        loadSkeletonJson("raptor");
         requestAnimationFrame(render);
     }
     else requestAnimationFrame(load);
+}
+
+function loadSkeletonJson(name) {    
+    atlas = new spine.webgl.TextureAtlas(assetManager.get("assets/" + name + ".atlas"), function(path) {
+        return assetManager.get("assets/" + path);
+    });
+    atlasLoader = new spine.webgl.TextureAtlasAttachmentLoader(atlas);
+    return new spine.SkeletonJson(atlasLoader).readSkeletonData(assetManager.get("assets/" + name + ".json"));
 }
 
 function render() {

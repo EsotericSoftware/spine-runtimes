@@ -4,5 +4,9 @@ module spine {
 	    intValue: number;
 	    floatValue: number;
 	    stringValue: string;
+
+        constructor (name: string) {
+            this.name = name;
+        }
     }
 }

@@ -8,6 +8,10 @@ module spine {
         rotateMode: RotateMode;
         offsetRotation: number;
         position: number; spacing: number; rotateMix: number; translateMix: number;
+
+        constructor (name: string) {
+            this.name = name;
+        }
     }
 
     export enum PositionMode {
