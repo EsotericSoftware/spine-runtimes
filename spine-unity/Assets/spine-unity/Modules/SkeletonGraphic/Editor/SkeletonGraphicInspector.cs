@@ -49,40 +49,6 @@ namespace Spine.Unity.Editor {
 
 		SkeletonGraphic thisSkeletonGraphic;
 
-		static SpineEditorUtilities.InstantiateDelegate instantiateDelegate;
-
-		static SkeletonGraphicInspector () {
-			if (!SpineEditorUtilities.initialized)
-				return;
-
-			if (instantiateDelegate == null)
-				instantiateDelegate = new SpineEditorUtilities.InstantiateDelegate(SpawnSkeletonGraphicFromDrop);
-			
-			// Drag and Drop Instantiate menu item
-			var spawnTypes = SpineEditorUtilities.additionalSpawnTypes;
-			UnityEngine.Assertions.Assert.IsFalse(spawnTypes == null);
-			bool menuItemExists = false;
-			foreach (var spawnType in spawnTypes) {
-				if (spawnType.instantiateDelegate == SkeletonGraphicInspector.instantiateDelegate) {
-					menuItemExists = true;
-					break;
-				}
-			}
-
-			if (!menuItemExists) {
-				SpineEditorUtilities.additionalSpawnTypes.Add(new SpineEditorUtilities.SkeletonComponentSpawnType {
-					menuLabel = "SkeletonGraphic (UI)",
-					instantiateDelegate = SkeletonGraphicInspector.instantiateDelegate,
-					isUI = true
-				});
-			}
-			
-		}
-
-		static public Component SpawnSkeletonGraphicFromDrop (SkeletonDataAsset data) {
-			return InstantiateSkeletonGraphic(data);
-		}
-
 		void OnEnable () {
 			var so = this.serializedObject;
 			thisSkeletonGraphic = target as SkeletonGraphic;
@@ -196,6 +162,11 @@ namespace Spine.Unity.Editor {
 			}
 
 			return true;
+		}
+
+		// SpineEditorUtilities.InstantiateDelegate. Used by drag and drop.
+		public static Component SpawnSkeletonGraphicFromDrop (SkeletonDataAsset data) {
+			return InstantiateSkeletonGraphic(data);
 		}
 
 		public static SkeletonGraphic InstantiateSkeletonGraphic (SkeletonDataAsset skeletonDataAsset, string skinName) {

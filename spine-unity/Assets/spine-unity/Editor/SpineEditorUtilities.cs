@@ -208,12 +208,10 @@ namespace Spine.Unity.Editor {
 			skeletonUtilityBoneTable = new Dictionary<int, SkeletonUtilityBone>();
 			boundingBoxFollowerTable = new Dictionary<int, BoundingBoxFollower>();
 
-			#if SPINE_HIERARCHY_ICONS
 			EditorApplication.hierarchyWindowChanged -= HierarchyWindowChanged;
 			EditorApplication.hierarchyWindowChanged += HierarchyWindowChanged;
 			EditorApplication.hierarchyWindowItemOnGUI -= HierarchyWindowItemOnGUI;
 			EditorApplication.hierarchyWindowItemOnGUI += HierarchyWindowItemOnGUI;
-			#endif
 
 			HierarchyWindowChanged();
 			initialized = true;
@@ -327,24 +325,31 @@ namespace Spine.Unity.Editor {
 							Vector3 spawnPoint = MousePointToWorldPoint2D(mousePos, sceneview.camera, plane);
 
 							var menu = new GenericMenu();
+							// SkeletonAnimation
 							menu.AddItem(new GUIContent("SkeletonAnimation"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
 								skeletonDataAsset = skeletonDataAsset,
 								spawnPoint = spawnPoint,
-								instantiateDelegate = (data) => InstantiateSkeletonAnimation(data)
+								instantiateDelegate = (data) => InstantiateSkeletonAnimation(data),
+								isUI = false
 							});
 
-							foreach (var spawnType in additionalSpawnTypes) {
-								menu.AddItem(new GUIContent(spawnType.menuLabel), false, HandleSkeletonComponentDrop, new SpawnMenuData {
-									skeletonDataAsset = skeletonDataAsset,
-									spawnPoint = spawnPoint,
-									instantiateDelegate = spawnType.instantiateDelegate,
-									isUI = spawnType.isUI
-								});
+							// SkeletonGraphic
+							var skeletonGraphicInspectorType = System.Type.GetType("Spine.Unity.Editor.SkeletonGraphicInspector");
+							if (skeletonGraphicInspectorType != null) {
+								var graphicInstantiateDelegate = skeletonGraphicInspectorType.GetMethod("SpawnSkeletonGraphicFromDrop", BindingFlags.Static | BindingFlags.Public);
+								if (graphicInstantiateDelegate != null)
+									menu.AddItem(new GUIContent("SkeletonGraphic (UI)"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
+										skeletonDataAsset = skeletonDataAsset,
+										spawnPoint = spawnPoint,
+										instantiateDelegate = System.Delegate.CreateDelegate(typeof(InstantiateDelegate), graphicInstantiateDelegate) as InstantiateDelegate,
+										isUI = true
+									});
 							}
+
 
 							#if SPINE_SKELETONANIMATOR
 							menu.AddSeparator("");
-
+							// SkeletonAnimator
 							menu.AddItem(new GUIContent("SkeletonAnimator"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
 								skeletonDataAsset = skeletonDataAsset,
 								spawnPoint = spawnPoint,
