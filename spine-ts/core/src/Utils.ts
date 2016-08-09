@@ -87,6 +87,10 @@ module spine {
         static signum (value: number): number {
             return value >= 0? 1: -1;            
         }
+
+        static toInt(x: number) {
+            return x > 0 ? Math.floor(x) : Math.ceil(x);
+        }
     }
 
     export class Utils {
@@ -96,15 +100,21 @@ module spine {
             }
         }  
 
-        static setArraySize (array: Array<number>, size: number): Array<number> {            
+        static setArraySize<T> (array: Array<T>, size: number, value: any = 0): Array<T> {            
             let oldSize = array.length;
             if (oldSize == size) return;
             array.length = size;
             if (oldSize < size) {
-                for (var i = oldSize; i < size; i++) array[i] = 0;
+                for (var i = oldSize; i < size; i++) array[i] = value;
             }
             return array;
-        } 
+        }
+
+        static newArray<T> (size: number, defaultValue: T): Array<T> {
+            let array = new Array<T>(size);
+            for (var i = 0; i < size; i++) array[i] = defaultValue;
+            return array;
+        }
     }
 
     export class Vector2 {        

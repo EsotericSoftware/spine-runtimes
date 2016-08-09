@@ -1,0 +1,13 @@
+
+simple.png
+size: 512,512
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+images/badlogic
+  rotate: false
+  xy: 2, 196
+  size: 313, 119
+  orig: 313, 119
+  offset: 0, 0
+  index: -1

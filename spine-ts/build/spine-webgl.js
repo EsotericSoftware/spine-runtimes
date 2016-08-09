@@ -71,6 +71,9 @@ var spine;
             if (frameCount <= 0)
                 throw new Error("frameCount must be > 0: " + frameCount);
             this.curves = new Array((frameCount - 1) * CurveTimeline.BEZIER_SIZE);
+            for (var i = 0; i < this.curves.length; i++) {
+                this.curves[i] = 0;
+            }
         }
         CurveTimeline.prototype.getFrameCount = function () {
             return this.curves.length / CurveTimeline.BEZIER_SIZE + 1;
@@ -723,6 +726,308 @@ var spine;
         return PathConstraintMixTimeline;
     }(CurveTimeline));
     spine.PathConstraintMixTimeline = PathConstraintMixTimeline;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var AnimationState = (function () {
+        function AnimationState(data) {
+            if (data === void 0) { data = null; }
+            this.tracks = new Array();
+            this.events = new Array();
+            this.listeners = new Array();
+            this.timeScale = 1;
+            if (data == null)
+                throw new Error("data cannot be null.");
+            this.data = data;
+        }
+        AnimationState.prototype.update = function (delta) {
+            delta *= this.timeScale;
+            for (var i = 0; i < this.tracks.length; i++) {
+                var current = this.tracks[i];
+                if (current == null)
+                    continue;
+                var next = current.next;
+                if (next != null) {
+                    var nextTime = current.lastTime - next.delay;
+                    if (nextTime >= 0) {
+                        var nextDelta = delta * next.timeScale;
+                        next.time = nextTime + nextDelta; // For start event to see correct time.
+                        current.time += delta * current.timeScale; // For end event to see correct time.
+                        this.setCurrent(i, next);
+                        next.time -= nextDelta; // Prevent increasing time twice, below.
+                        current = next;
+                    }
+                }
+                else if (!current.loop && current.lastTime >= current.endTime) {
+                    // End non-looping animation when it reaches its end time and there is no next entry.
+                    this.clearTrack(i);
+                    continue;
+                }
+                current.time += delta * current.timeScale;
+                if (current.previous != null) {
+                    var previousDelta = delta * current.previous.timeScale;
+                    current.previous.time += previousDelta;
+                    current.mixTime += previousDelta;
+                }
+            }
+        };
+        AnimationState.prototype.apply = function (skeleton) {
+            var events = this.events;
+            var listenerCount = this.listeners.length;
+            for (var i = 0; i < this.tracks.length; i++) {
+                var current = this.tracks[i];
+                if (current == null)
+                    continue;
+                events.length = 0;
+                var time = current.time;
+                var lastTime = current.lastTime;
+                var endTime = current.endTime;
+                var loop = current.loop;
+                if (!loop && time > endTime)
+                    time = endTime;
+                var previous = current.previous;
+                if (previous == null)
+                    current.animation.mix(skeleton, lastTime, time, loop, events, current.mix);
+                else {
+                    var previousTime = previous.time;
+                    if (!previous.loop && previousTime > previous.endTime)
+                        previousTime = previous.endTime;
+                    previous.animation.apply(skeleton, previousTime, previousTime, previous.loop, null);
+                    var alpha = current.mixTime / current.mixDuration * current.mix;
+                    if (alpha >= 1) {
+                        alpha = 1;
+                        current.previous = null;
+                    }
+                    current.animation.mix(skeleton, lastTime, time, loop, events, alpha);
+                }
+                for (var ii = 0, nn = events.length; ii < nn; ii++) {
+                    var event_1 = events[ii];
+                    if (current.listener != null)
+                        current.listener.event(i, event_1);
+                    for (var iii = 0; iii < listenerCount; iii++)
+                        this.listeners[iii].event(i, event_1);
+                }
+                // Check if completed the animation or a loop iteration.
+                if (loop ? (lastTime % endTime > time % endTime) : (lastTime < endTime && time >= endTime)) {
+                    var count = spine.MathUtils.toInt(time / endTime);
+                    if (current.listener != null)
+                        current.listener.complete(i, count);
+                    for (var ii = 0, nn = this.listeners.length; ii < nn; ii++)
+                        this.listeners[ii].complete(i, count);
+                }
+                current.lastTime = current.time;
+            }
+        };
+        AnimationState.prototype.clearTracks = function () {
+            for (var i = 0, n = this.tracks.length; i < n; i++)
+                this.clearTrack(i);
+            this.tracks.length = 0;
+        };
+        AnimationState.prototype.clearTrack = function (trackIndex) {
+            if (trackIndex >= this.tracks.length)
+                return;
+            var current = this.tracks[trackIndex];
+            if (current == null)
+                return;
+            if (current.listener != null)
+                current.listener.end(trackIndex);
+            for (var i = 0, n = this.listeners.length; i < n; i++)
+                this.listeners[i].end(trackIndex);
+            this.tracks[trackIndex] = null;
+            this.freeAll(current);
+        };
+        AnimationState.prototype.freeAll = function (entry) {
+            while (entry != null) {
+                var next = entry.next;
+                entry = next;
+            }
+        };
+        AnimationState.prototype.expandToIndex = function (index) {
+            if (index < this.tracks.length)
+                return this.tracks[index];
+            spine.Utils.setArraySize(this.tracks, index - this.tracks.length + 1, null);
+            this.tracks.length = index + 1;
+            return null;
+        };
+        AnimationState.prototype.setCurrent = function (index, entry) {
+            var current = this.expandToIndex(index);
+            if (current != null) {
+                var previous = current.previous;
+                current.previous = null;
+                if (current.listener != null)
+                    current.listener.end(index);
+                for (var i = 0, n = this.listeners.length; i < n; i++)
+                    this.listeners[i].end(index);
+                entry.mixDuration = this.data.getMix(current.animation, entry.animation);
+                if (entry.mixDuration > 0) {
+                    entry.mixTime = 0;
+                    // If a mix is in progress, mix from the closest animation.
+                    if (previous != null && current.mixTime / current.mixDuration < 0.5) {
+                        entry.previous = previous;
+                        previous = current;
+                    }
+                    else
+                        entry.previous = current;
+                }
+            }
+            this.tracks[index] = entry;
+            if (entry.listener != null)
+                entry.listener.start(index);
+            for (var i = 0, n = this.listeners.length; i < n; i++)
+                this.listeners[i].start(index);
+        };
+        /** @see #setAnimation(int, Animation, boolean) */
+        AnimationState.prototype.setAnimation = function (trackIndex, animationName, loop) {
+            var animation = this.data.skeletonData.findAnimation(animationName);
+            if (animation == null)
+                throw new Error("Animation not found: " + animationName);
+            return this.setAnimationWith(trackIndex, animation, loop);
+        };
+        /** Set the current animation. Any queued animations are cleared. */
+        AnimationState.prototype.setAnimationWith = function (trackIndex, animation, loop) {
+            var current = this.expandToIndex(trackIndex);
+            if (current != null)
+                this.freeAll(current.next);
+            var entry = new TrackEntry();
+            entry.animation = animation;
+            entry.loop = loop;
+            entry.endTime = animation.duration;
+            this.setCurrent(trackIndex, entry);
+            return entry;
+        };
+        /** {@link #addAnimation(int, Animation, boolean, float)} */
+        AnimationState.prototype.addAnimation = function (trackIndex, animationName, loop, delay) {
+            var animation = this.data.skeletonData.findAnimation(animationName);
+            if (animation == null)
+                throw new Error("Animation not found: " + animationName);
+            return this.addAnimationWith(trackIndex, animation, loop, delay);
+        };
+        /** Adds an animation to be played delay seconds after the current or last queued animation.
+         * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay. */
+        AnimationState.prototype.addAnimationWith = function (trackIndex, animation, loop, delay) {
+            var entry = new TrackEntry();
+            entry.animation = animation;
+            entry.loop = loop;
+            entry.endTime = animation.duration;
+            var last = this.expandToIndex(trackIndex);
+            if (last != null) {
+                while (last.next != null)
+                    last = last.next;
+                last.next = entry;
+            }
+            else
+                this.tracks[trackIndex] = entry;
+            if (delay <= 0) {
+                if (last != null)
+                    delay += last.endTime - this.data.getMix(last.animation, animation);
+                else
+                    delay = 0;
+            }
+            entry.delay = delay;
+            return entry;
+        };
+        /** @return May be null. */
+        AnimationState.prototype.getCurrent = function (trackIndex) {
+            if (trackIndex >= this.tracks.length)
+                return null;
+            return this.tracks[trackIndex];
+        };
+        /** Adds a listener to receive events for all animations. */
+        AnimationState.prototype.addListener = function (listener) {
+            if (listener == null)
+                throw new Error("listener cannot be null.");
+            this.listeners.push(listener);
+        };
+        /** Removes the listener added with {@link #addListener(AnimationStateListener)}. */
+        AnimationState.prototype.removeListener = function (listener) {
+            var index = this.listeners.indexOf(listener);
+            if (index >= 0)
+                this.listeners.splice(index, 1);
+        };
+        AnimationState.prototype.clearListeners = function () {
+            this.listeners.length = 0;
+        };
+        return AnimationState;
+    }());
+    spine.AnimationState = AnimationState;
+    var TrackEntry = (function () {
+        function TrackEntry() {
+            this.loop = false;
+            this.delay = 0;
+            this.time = 0;
+            this.lastTime = -1;
+            this.endTime = 0;
+            this.timeScale = 1;
+            this.mixTime = 0;
+            this.mixDuration = 0;
+            this.mix = 1;
+        }
+        TrackEntry.prototype.reset = function () {
+            this.next = null;
+            this.previous = null;
+            this.animation = null;
+            this.listener = null;
+            this.timeScale = 1;
+            this.lastTime = -1; // Trigger events on frame zero.
+            this.time = 0;
+        };
+        /** Returns true if the current time is greater than the end time, regardless of looping. */
+        TrackEntry.prototype.isComplete = function () {
+            return this.time >= this.endTime;
+        };
+        return TrackEntry;
+    }());
+    spine.TrackEntry = TrackEntry;
+    var AnimationStateAdapter = (function () {
+        function AnimationStateAdapter() {
+        }
+        AnimationStateAdapter.prototype.event = function (trackIndex, event) {
+        };
+        AnimationStateAdapter.prototype.complete = function (trackIndex, loopCount) {
+        };
+        AnimationStateAdapter.prototype.start = function (trackIndex) {
+        };
+        AnimationStateAdapter.prototype.end = function (trackIndex) {
+        };
+        return AnimationStateAdapter;
+    }());
+    spine.AnimationStateAdapter = AnimationStateAdapter;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var AnimationStateData = (function () {
+        function AnimationStateData(skeletonData) {
+            this.animationToMixTime = {};
+            this.defaultMix = 0;
+            if (skeletonData == null)
+                throw new Error("skeletonData cannot be null.");
+            this.skeletonData = skeletonData;
+        }
+        AnimationStateData.prototype.setMix = function (fromName, toName, duration) {
+            var from = this.skeletonData.findAnimation(fromName);
+            if (from == null)
+                throw new Error("Animation not found: " + fromName);
+            var to = this.skeletonData.findAnimation(toName);
+            if (to == null)
+                throw new Error("Animation not found: " + toName);
+            this.setMixWith(from, to, duration);
+        };
+        AnimationStateData.prototype.setMixWith = function (from, to, duration) {
+            if (from == null)
+                throw new Error("from cannot be null.");
+            if (to == null)
+                throw new Error("to cannot be null.");
+            var key = from.name + to.name;
+            this.animationToMixTime[key] = duration;
+        };
+        AnimationStateData.prototype.getMix = function (from, to) {
+            var key = from.name + to.name;
+            var value = this.animationToMixTime[key];
+            return value === undefined ? this.defaultMix : value;
+        };
+        return AnimationStateData;
+    }());
+    spine.AnimationStateData = AnimationStateData;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
@@ -1811,7 +2116,7 @@ var spine;
         };
         Skeleton.prototype.sortReset = function (bones) {
             for (var i = 0, n = bones.length; i < n; i++) {
-                var bone = bones[6];
+                var bone = bones[i];
                 if (bone.sorted)
                     this.sortReset(bone.children);
                 bone.sorted = false;
@@ -2282,9 +2587,9 @@ var spine;
                 throw new Error("eventDataName cannot be null.");
             var events = this.events;
             for (var i = 0, n = events.length; i < n; i++) {
-                var event_1 = events[i];
-                if (event_1.name == eventDataName)
-                    return event_1;
+                var event_2 = events[i];
+                if (event_2.name == eventDataName)
+                    return event_2;
             }
             return null;
         };
@@ -2608,7 +2913,7 @@ var spine;
                     path.constantSpeed = this.getValue(map, "constantSpeed", true);
                     var vertexCount = map.vertexCount;
                     this.readVertices(map, path, vertexCount << 1);
-                    var lengths = new Array(vertexCount / 3);
+                    var lengths = spine.Utils.newArray(vertexCount / 3, 0);
                     for (var i = 0; i < map.lengths.length; i++)
                         lengths[i++] = map.lengths[i] * scale;
                     path.lengths = lengths;
@@ -2853,9 +3158,9 @@ var spine;
                                 var deform;
                                 var verticesValue = this.getValue(valueMap, "vertices", null);
                                 if (verticesValue == null)
-                                    deform = weighted ? new Array(deformLength) : vertices;
+                                    deform = weighted ? spine.Utils.newArray(deformLength, 0) : vertices;
                                 else {
-                                    deform = new Array(deformLength);
+                                    deform = spine.Utils.newArray(deformLength, 0);
                                     var start = this.getValue(valueMap, "offset", 0);
                                     spine.Utils.arrayCopy(verticesValue, 0, deform, start, verticesValue.length);
                                     if (scale != 1) {
@@ -2890,10 +3195,8 @@ var spine;
                     var drawOrder = null;
                     var offsets = this.getValue(drawOrderMap, "offsets", null);
                     if (offsets != null) {
-                        drawOrder = new Array(slotCount);
-                        for (var i = slotCount - 1; i >= 0; i--)
-                            drawOrder[i] = -1;
-                        var unchanged = new Array(slotCount - offsets.length);
+                        drawOrder = spine.Utils.newArray(slotCount, -1);
+                        var unchanged = spine.Utils.newArray(slotCount - offsets.length, 0);
                         var originalIndex = 0, unchangedIndex = 0;
                         for (var i = 0; i < offsets.length; i++) {
                             var offsetMap = offsets[i];
@@ -2928,11 +3231,11 @@ var spine;
                     var eventData = skeletonData.findEvent(eventMap.name);
                     if (eventData == null)
                         throw new Error("Event not found: " + eventMap.name);
-                    var event_2 = new spine.Event(eventMap.time, eventData);
-                    event_2.intValue = this.getValue(eventMap, "int", eventData.intValue);
-                    event_2.floatValue = this.getValue(eventMap, "float", eventData.floatValue);
-                    event_2.stringValue = this.getValue(eventMap, "string", eventData.stringValue);
-                    timeline_9.setFrame(frameIndex_4++, event_2);
+                    var event_3 = new spine.Event(eventMap.time, eventData);
+                    event_3.intValue = this.getValue(eventMap, "int", eventData.intValue);
+                    event_3.floatValue = this.getValue(eventMap, "float", eventData.floatValue);
+                    event_3.stringValue = this.getValue(eventMap, "string", eventData.stringValue);
+                    timeline_9.setFrame(frameIndex_4++, event_3);
                 }
                 timelines.push(timeline_9);
                 duration = Math.max(duration, timeline_9.frames[timeline_9.getFrameCount() - 1]);
@@ -3310,6 +3613,9 @@ var spine;
         MathUtils.signum = function (value) {
             return value >= 0 ? 1 : -1;
         };
+        MathUtils.toInt = function (x) {
+            return x > 0 ? Math.floor(x) : Math.ceil(x);
+        };
         MathUtils.PI = 3.1415927;
         MathUtils.PI2 = MathUtils.PI * 2;
         MathUtils.radiansToDegrees = 180 / MathUtils.PI;
@@ -3327,15 +3633,22 @@ var spine;
                 dest[j] = source[i];
             }
         };
-        Utils.setArraySize = function (array, size) {
+        Utils.setArraySize = function (array, size, value) {
+            if (value === void 0) { value = 0; }
             var oldSize = array.length;
             if (oldSize == size)
                 return;
             array.length = size;
             if (oldSize < size) {
                 for (var i = oldSize; i < size; i++)
-                    array[i] = 0;
+                    array[i] = value;
             }
+            return array;
+        };
+        Utils.newArray = function (size, defaultValue) {
+            var array = new Array(size);
+            for (var i = 0; i < size; i++)
+                array[i] = defaultValue;
             return array;
         };
         return Utils;
@@ -3487,7 +3800,7 @@ var spine;
             var verticesLength = regionUVs.length;
             var worldVerticesLength = (verticesLength >> 1) * 5;
             if (this.worldVertices == null || this.worldVertices.length != worldVerticesLength) {
-                this.worldVertices = new Array(worldVerticesLength);
+                this.worldVertices = spine.Utils.newArray(worldVerticesLength, 0);
             }
             var u = 0, v = 0, width = 0, height = 0;
             if (this.region == null) {
@@ -3632,8 +3945,8 @@ var spine;
             this.width = 0;
             this.height = 0;
             this.color = new spine.Color(1, 1, 1, 1);
-            this.offset = new Array(8);
-            this.vertices = new Array(8 * 4);
+            this.offset = spine.Utils.newArray(8, 0);
+            this.vertices = spine.Utils.newArray(8 * 4, 0);
             this.tempColor = new spine.Color(1, 1, 1, 1);
         }
         RegionAttachment.prototype.setRegion = function (region) {
@@ -3746,36 +4059,36 @@ var spine;
         RegionAttachment.OY4 = 7;
         RegionAttachment.X1 = 0;
         RegionAttachment.Y1 = 1;
-        RegionAttachment.X2 = 8;
-        RegionAttachment.Y2 = 9;
-        RegionAttachment.X3 = 16;
-        RegionAttachment.Y3 = 17;
-        RegionAttachment.X4 = 24;
-        RegionAttachment.Y4 = 25;
+        RegionAttachment.C1R = 2;
+        RegionAttachment.C1G = 3;
+        RegionAttachment.C1B = 4;
+        RegionAttachment.C1A = 5;
         RegionAttachment.U1 = 6;
         RegionAttachment.V1 = 7;
-        RegionAttachment.U2 = 14;
-        RegionAttachment.V2 = 15;
-        RegionAttachment.U3 = 22;
-        RegionAttachment.V3 = 23;
-        RegionAttachment.U4 = 30;
-        RegionAttachment.V4 = 31;
-        RegionAttachment.C1R = 3;
-        RegionAttachment.C1G = 4;
-        RegionAttachment.C1B = 5;
-        RegionAttachment.C1A = 6;
+        RegionAttachment.X2 = 8;
+        RegionAttachment.Y2 = 9;
         RegionAttachment.C2R = 10;
         RegionAttachment.C2G = 11;
         RegionAttachment.C2B = 12;
         RegionAttachment.C2A = 13;
+        RegionAttachment.U2 = 14;
+        RegionAttachment.V2 = 15;
+        RegionAttachment.X3 = 16;
+        RegionAttachment.Y3 = 17;
         RegionAttachment.C3R = 18;
         RegionAttachment.C3G = 19;
         RegionAttachment.C3B = 20;
         RegionAttachment.C3A = 21;
+        RegionAttachment.U3 = 22;
+        RegionAttachment.V3 = 23;
+        RegionAttachment.X4 = 24;
+        RegionAttachment.Y4 = 25;
         RegionAttachment.C4R = 26;
         RegionAttachment.C4G = 27;
         RegionAttachment.C4B = 28;
         RegionAttachment.C4A = 29;
+        RegionAttachment.U4 = 30;
+        RegionAttachment.V4 = 31;
         return RegionAttachment;
     }(spine.Attachment));
     spine.RegionAttachment = RegionAttachment;
@@ -4548,6 +4861,52 @@ var spine;
 (function (spine) {
     var webgl;
     (function (webgl) {
+        var SkeletonRenderer = (function () {
+            function SkeletonRenderer() {
+                this.premultipliedAlpha = false;
+            }
+            SkeletonRenderer.prototype.draw = function (batcher, skeleton) {
+                var premultipliedAlpha = this.premultipliedAlpha;
+                var blendMode = null;
+                var vertices = null;
+                var triangles = null;
+                var drawOrder = skeleton.drawOrder;
+                for (var i = 0, n = drawOrder.length; i < n; i++) {
+                    var slot = drawOrder[i];
+                    var attachment = slot.getAttachment();
+                    var texture = null;
+                    if (attachment instanceof spine.RegionAttachment) {
+                        var region = attachment;
+                        vertices = region.updateWorldVertices(slot, premultipliedAlpha);
+                        triangles = SkeletonRenderer.QUAD_TRIANGLES;
+                        texture = region.region.renderObject.texture;
+                    }
+                    else if (attachment instanceof spine.MeshAttachment) {
+                        var mesh = attachment;
+                        vertices = mesh.updateWorldVertices(slot, premultipliedAlpha);
+                        triangles = mesh.triangles;
+                        texture = mesh.region.renderObject.texture;
+                    }
+                    if (texture != null) {
+                        var slotBlendMode = slot.data.blendMode;
+                        if (slotBlendMode != blendMode) {
+                            blendMode = slotBlendMode;
+                            batcher.setBlendMode(webgl.getSourceGLBlendMode(blendMode, premultipliedAlpha), webgl.getDestGLBlendMode(blendMode));
+                        }
+                        batcher.draw(texture, vertices, triangles);
+                    }
+                }
+            };
+            SkeletonRenderer.QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
+            return SkeletonRenderer;
+        }());
+        webgl.SkeletonRenderer = SkeletonRenderer;
+    })(webgl = spine.webgl || (spine.webgl = {}));
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var webgl;
+    (function (webgl) {
         var Texture = (function () {
             function Texture(image, useMipMaps) {
                 if (useMipMaps === void 0) { useMipMaps = false; }
@@ -4722,8 +5081,7 @@ var spine;
                         region.offsetX = parseInt(tuple[0]);
                         region.offsetY = parseInt(tuple[1]);
                         region.index = parseInt(reader.readValue());
-                        // FIXME
-                        // textureLoader.loadRegion(region);
+                        region.texture = page.texture;
                         this.regions.push(region);
                     }
                 }
@@ -4806,15 +5164,18 @@ var spine;
             /** @return May be null to not load an attachment. */
             TextureAtlasAttachmentLoader.prototype.newRegionAttachment = function (skin, name, path) {
                 var region = this.atlas.findRegion(path);
+                region.renderObject = region;
                 if (region == null)
                     throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
                 var attachment = new spine.RegionAttachment(name);
+                attachment.setRegion(region);
                 attachment.region = region;
                 return attachment;
             };
             /** @return May be null to not load an attachment. */
             TextureAtlasAttachmentLoader.prototype.newMeshAttachment = function (skin, name, path) {
                 var region = this.atlas.findRegion(path);
+                region.renderObject = region;
                 if (region == null)
                     throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
                 var attachment = new spine.MeshAttachment(name);

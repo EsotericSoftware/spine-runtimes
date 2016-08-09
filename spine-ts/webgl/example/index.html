@@ -13,9 +13,9 @@ var batcher = null;
 var gl = null;
 var mvp = new spine.webgl.Matrix4();
 var assetManager = new spine.webgl.AssetManager();
-var texture = null;
-var atlas = null;
-var polygons = [];
+var skeletonRenderer = null;
+var skeleton = null;
+var animationState = null;
 var info = $("#info");
 
 function init() {    
@@ -26,10 +26,12 @@ function init() {
     gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");        
     spine.webgl.init(gl);
     
-    // Create a simple shader, mesh and MVP matrix
+    // Create a simple shader, mesh, model-view-projection matrix
+    // and SkeletonRenderer
     shader = spine.webgl.Shader.newColoredTextured();
-    batcher = new spine.webgl.PolygonBatcher();    
+    batcher = new spine.webgl.PolygonBatcher();
     mvp.ortho2d(0, 0, 639, 479);
+    skeletonRenderer = new spine.webgl.SkeletonRenderer();
 
     // Tell AssetManager to load a few resources, then
     // hand control to load() function
@@ -42,23 +44,25 @@ function init() {
     assetManager.loadText("assets/tank.json");
     assetManager.loadText("assets/tank.atlas");
     assetManager.loadTexture("assets/tank.png");
+    assetManager.loadText("assets/simple.json");
+    assetManager.loadText("assets/simple.atlas");
+    assetManager.loadTexture("assets/simple.png");
     requestAnimationFrame(load);
-
-    // Create a bunch of x/y/width/height polies
-    for (var i = 0; i < 10; i++) {
-        polygons.push({ x: Math.random() * 600, y: Math.random() * 400, w: Math.random() * 50, h: Math.random() * 50});
-    }
 }
 
 function load() {
-    if (assetManager.isLoadingComplete()) {
-        texture = assetManager.get("assets/spineboy.png");  
-        var skeletonData = loadSkeletonJson("tank");
-        loadSkeletonJson("spineboy");
-        loadSkeletonJson("raptor");
+    if (assetManager.isLoadingComplete()) {  
+        var skeletonData = loadSkeletonJson("raptor");
+        skeleton = new spine.Skeleton(skeletonData);
+        skeleton.x = 320;
+        skeleton.y = 20;        
+        animationState = new spine.AnimationState(new spine.AnimationStateData(skeletonData));
+        animationState.setAnimation(0, "walk", true);       
+
         requestAnimationFrame(render);
-    }
-    else requestAnimationFrame(load);
+    } else {
+        requestAnimationFrame(load);
+    } 
 }
 
 function loadSkeletonJson(name) {    
@@ -66,27 +70,28 @@ function loadSkeletonJson(name) {
         return assetManager.get("assets/" + path);
     });
     atlasLoader = new spine.webgl.TextureAtlasAttachmentLoader(atlas);
-    return new spine.SkeletonJson(atlasLoader).readSkeletonData(assetManager.get("assets/" + name + ".json"));
+    var skeletonJson = new spine.SkeletonJson(atlasLoader);
+    skeletonJson.scale = 0.5;   
+    return skeletonJson.readSkeletonData(assetManager.get("assets/" + name + ".json"));
 }
 
 function render() {
-    gl.clearColor(0, 1, 0, 1);
+    gl.clearColor(0.3, 0.3, 0.3, 1);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
+     // apply the animation state based on the delta time
+    animationState.update(0.016);
+    animationState.apply(skeleton);
+    skeleton.updateWorldTransform();
+
+    // bind the shader and set the texture
+    // and model-view-projection matrix
     shader.bind();
     shader.setUniformi(spine.webgl.Shader.SAMPLER, 0);
     shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, mvp.values);        
 
-    batcher.begin(shader);
-    for (var i = 0; i < polygons.length; i++) {
-        var p = polygons[i];        
-        batcher.draw(texture, [
-            p.x, p.y, 1, 1, 1, 1, 0, 0,
-            p.x + p.w, p.y, 1, 1, 1, 1, 1, 0,
-            p.x + p.w, p.y + p.h, 1, 1, 1, 1, 1, 1,
-            p.x, p.y + p.h, 1, 1, 1, 1, 0, 1
-        ], [0, 1, 2, 2, 3, 0]);
-    }
+    batcher.begin(shader);    
+    skeletonRenderer.draw(batcher, skeleton);
     batcher.end();
     
     shader.unbind();    

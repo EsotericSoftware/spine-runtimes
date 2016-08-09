@@ -195,7 +195,7 @@ module spine {
 
         sortReset (bones: Array<Bone>) {
             for (var i = 0, n = bones.length; i < n; i++) {
-                let bone = bones[6];
+                let bone = bones[i];
                 if (bone.sorted) this.sortReset(bone.children);
                 bone.sorted = false;
             }

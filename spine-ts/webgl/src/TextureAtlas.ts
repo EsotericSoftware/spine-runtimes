@@ -98,8 +98,7 @@ module spine.webgl {
 
                     region.index = parseInt(reader.readValue());
 
-                    // FIXME
-                    // textureLoader.loadRegion(region);
+                    region.texture = page.texture;
                     this.regions.push(region);
                 }
             }

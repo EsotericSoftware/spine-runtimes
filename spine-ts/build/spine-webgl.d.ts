@@ -186,6 +186,85 @@ declare module spine {
     }
 }
 declare module spine {
+    class AnimationState {
+        data: AnimationStateData;
+        tracks: TrackEntry[];
+        events: Event[];
+        listeners: AnimationStateListener[];
+        timeScale: number;
+        constructor(data?: AnimationStateData);
+        update(delta: number): void;
+        apply(skeleton: Skeleton): void;
+        clearTracks(): void;
+        clearTrack(trackIndex: number): void;
+        freeAll(entry: TrackEntry): void;
+        expandToIndex(index: number): TrackEntry;
+        setCurrent(index: number, entry: TrackEntry): void;
+        /** @see #setAnimation(int, Animation, boolean) */
+        setAnimation(trackIndex: number, animationName: string, loop: boolean): TrackEntry;
+        /** Set the current animation. Any queued animations are cleared. */
+        setAnimationWith(trackIndex: number, animation: Animation, loop: boolean): TrackEntry;
+        /** {@link #addAnimation(int, Animation, boolean, float)} */
+        addAnimation(trackIndex: number, animationName: string, loop: boolean, delay: number): TrackEntry;
+        /** Adds an animation to be played delay seconds after the current or last queued animation.
+         * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay. */
+        addAnimationWith(trackIndex: number, animation: Animation, loop: boolean, delay: number): TrackEntry;
+        /** @return May be null. */
+        getCurrent(trackIndex: number): TrackEntry;
+        /** Adds a listener to receive events for all animations. */
+        addListener(listener: AnimationStateListener): void;
+        /** Removes the listener added with {@link #addListener(AnimationStateListener)}. */
+        removeListener(listener: AnimationStateListener): void;
+        clearListeners(): void;
+    }
+    class TrackEntry {
+        next: TrackEntry;
+        previous: TrackEntry;
+        animation: Animation;
+        loop: boolean;
+        delay: number;
+        time: number;
+        lastTime: number;
+        endTime: number;
+        timeScale: number;
+        mixTime: number;
+        mixDuration: number;
+        listener: AnimationStateListener;
+        mix: number;
+        reset(): void;
+        /** Returns true if the current time is greater than the end time, regardless of looping. */
+        isComplete(): boolean;
+    }
+    abstract class AnimationStateAdapter implements AnimationStateListener {
+        event(trackIndex: number, event: Event): void;
+        complete(trackIndex: number, loopCount: number): void;
+        start(trackIndex: number): void;
+        end(trackIndex: number): void;
+    }
+    interface AnimationStateListener {
+        /** Invoked when the current animation triggers an event. */
+        event(trackIndex: number, event: Event): void;
+        /** Invoked when the current animation has completed.
+         * @param loopCount The number of times the animation reached the end. */
+        complete(trackIndex: number, loopCount: number): void;
+        /** Invoked just after the current animation is set. */
+        start(trackIndex: number): void;
+        /** Invoked just before the current animation is replaced. */
+        end(trackIndex: number): void;
+    }
+}
+declare module spine {
+    class AnimationStateData {
+        skeletonData: SkeletonData;
+        animationToMixTime: Map<number>;
+        defaultMix: number;
+        constructor(skeletonData: SkeletonData);
+        setMix(fromName: string, toName: string, duration: number): void;
+        setMixWith(from: Animation, to: Animation, duration: number): void;
+        getMix(from: Animation, to: Animation): number;
+    }
+}
+declare module spine {
     enum BlendMode {
         Normal = 0,
         Additive = 1,
@@ -624,10 +703,12 @@ declare module spine {
         static cosDeg(degrees: number): number;
         static sinDeg(degrees: number): number;
         static signum(value: number): number;
+        static toInt(x: number): number;
     }
     class Utils {
         static arrayCopy<T>(source: Array<T>, sourceStart: number, dest: Array<T>, destStart: number, numElements: number): void;
-        static setArraySize(array: Array<number>, size: number): Array<number>;
+        static setArraySize<T>(array: Array<T>, size: number, value?: any): Array<T>;
+        static newArray<T>(size: number, defaultValue: T): Array<T>;
     }
     class Vector2 {
         x: number;
@@ -725,36 +806,36 @@ declare module spine {
         static OY4: number;
         static X1: number;
         static Y1: number;
-        static X2: number;
-        static Y2: number;
-        static X3: number;
-        static Y3: number;
-        static X4: number;
-        static Y4: number;
-        static U1: number;
-        static V1: number;
-        static U2: number;
-        static V2: number;
-        static U3: number;
-        static V3: number;
-        static U4: number;
-        static V4: number;
         static C1R: number;
         static C1G: number;
         static C1B: number;
         static C1A: number;
+        static U1: number;
+        static V1: number;
+        static X2: number;
+        static Y2: number;
         static C2R: number;
         static C2G: number;
         static C2B: number;
         static C2A: number;
+        static U2: number;
+        static V2: number;
+        static X3: number;
+        static Y3: number;
         static C3R: number;
         static C3G: number;
         static C3B: number;
         static C3A: number;
+        static U3: number;
+        static V3: number;
+        static X4: number;
+        static Y4: number;
         static C4R: number;
         static C4G: number;
         static C4B: number;
         static C4A: number;
+        static U4: number;
+        static V4: number;
         x: number;
         y: number;
         scaleX: number;
@@ -953,6 +1034,13 @@ declare module spine.webgl {
         dispose(): void;
         static newColoredTextured(): Shader;
         static newColored(): Shader;
+    }
+}
+declare module spine.webgl {
+    class SkeletonRenderer {
+        static QUAD_TRIANGLES: number[];
+        premultipliedAlpha: boolean;
+        draw(batcher: PolygonBatcher, skeleton: Skeleton): void;
     }
 }
 declare module spine.webgl {

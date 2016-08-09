@@ -11,36 +11,39 @@ module spine {
 
         static X1 = 0;
         static Y1 = 1;
-        static X2 = 8;
-        static Y2 = 9;
-        static X3 = 16;
-        static Y3 = 17;
-        static X4 = 24;
-        static Y4 = 25;
+        static C1R = 2;
+        static C1G = 3;
+        static C1B = 4;
+        static C1A = 5;
         static U1 = 6;
         static V1 = 7;
-        static U2 = 14
-        static V2 = 15;
-        static U3 = 22;
-        static V3 = 23;
-        static U4 = 30;
-        static V4 = 31;
-        static C1R = 3;
-        static C1G = 4;
-        static C1B = 5;
-        static C1A = 6;
+
+        static X2 = 8;
+        static Y2 = 9;
         static C2R = 10;
         static C2G = 11;
         static C2B = 12;
         static C2A = 13;
+        static U2 = 14;
+        static V2 = 15;
+
+        static X3 = 16;
+        static Y3 = 17;
         static C3R = 18;
         static C3G = 19;
         static C3B = 20;
         static C3A = 21;
+        static U3 = 22;
+        static V3 = 23;
+
+        static X4 = 24;
+        static Y4 = 25;
         static C4R = 26;
         static C4G = 27;
         static C4B = 28;
         static C4A = 29;
+        static U4 = 30;
+        static V4 = 31;
 
         x = 0; y = 0; scaleX = 1; scaleY = 1; rotation = 0; width = 0; height = 0;
         color = new Color(1, 1, 1, 1);
@@ -49,8 +52,8 @@ module spine {
         rendererObject: any;
         region: TextureRegion;
 
-        offset = new Array<number>(8);        
-        vertices = new Array<number>(8 * 4);
+        offset = Utils.newArray<number>(8, 0);        
+        vertices = Utils.newArray<number>(8 * 4, 0);
 
         tempColor = new Color(1, 1, 1, 1);
 

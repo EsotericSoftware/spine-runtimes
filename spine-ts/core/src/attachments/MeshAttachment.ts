@@ -19,7 +19,7 @@ module spine {
             let verticesLength = regionUVs.length;
             let worldVerticesLength = (verticesLength >> 1) * 5;
             if (this.worldVertices == null || this.worldVertices.length != worldVerticesLength) {
-                this.worldVertices = new Array<number>(worldVerticesLength);                
+                this.worldVertices = Utils.newArray<number>(worldVerticesLength, 0);                
             }
 
             var u = 0, v = 0, width = 0, height = 0;

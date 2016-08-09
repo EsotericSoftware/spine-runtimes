@@ -280,7 +280,7 @@ module spine {
                     let vertexCount = map.vertexCount;
                     this.readVertices(map, path, vertexCount << 1);
 
-                    let lengths: Array<number> = new Array<number>(vertexCount / 3);                    
+                    let lengths: Array<number> = Utils.newArray(vertexCount / 3, 0);                    
                     for (var i = 0; i < map.lengths.length; i++)
                         lengths[i++] = map.lengths[i] * scale;
                     path.lengths = lengths;                    
@@ -534,9 +534,9 @@ module spine {
                                 var deform: Array<number>;
                                 let verticesValue: Array<Number> = this.getValue(valueMap, "vertices", null);
                                 if (verticesValue == null)
-                                    deform = weighted ? new Array<number>(deformLength) : vertices;
+                                    deform = weighted ? Utils.newArray<number>(deformLength, 0) : vertices;
                                 else {
-                                    deform = new Array<number>(deformLength);
+                                    deform = Utils.newArray<number>(deformLength, 0);
                                     let start = <number>this.getValue(valueMap, "offset", 0);
                                     Utils.arrayCopy(verticesValue, 0, deform, start, verticesValue.length);                                    
                                     if (scale != 1) {
@@ -572,10 +572,8 @@ module spine {
                     var drawOrder: Array<number> = null;
                     let offsets = this.getValue(drawOrderMap, "offsets", null);
                     if (offsets != null) {
-                        drawOrder = new Array<number>(slotCount);
-                        for (var i = slotCount - 1; i >= 0; i--)
-                            drawOrder[i] = -1;
-                        let unchanged = new Array<number>(slotCount - offsets.length);
+                        drawOrder = Utils.newArray<number>(slotCount, -1);                        
+                        let unchanged = Utils.newArray<number>(slotCount - offsets.length, 0);
                         let originalIndex = 0, unchangedIndex = 0;
                         for (var i = 0; i < offsets.length; i++) {
                             let offsetMap = offsets[i];

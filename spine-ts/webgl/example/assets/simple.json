@@ -1,0 +1,44 @@
+{
+"skeleton": { "hash": "AZdOIZ4IYl0GpKNTjsLzQt0DmGs", "spine": "3.4.02", "width": 313, "height": 119, "images": "" },
+"bones": [
+	{ "name": "root" }
+],
+"slots": [
+	{ "name": "image", "bone": "root", "attachment": "images/badlogic" }
+],
+"skins": {
+	"default": {
+		"image": {
+			"images/badlogic": { "width": 313, "height": 119 }
+		}
+	}
+},
+"animations": {
+	"test": {
+		"bones": {
+			"root": {
+				"rotate": [
+					{ "time": 0, "angle": 0 },
+					{ "time": 1, "angle": 32.79 },
+					{ "time": 2, "angle": 0 }
+				],
+				"translate": [
+					{ "time": 0, "x": 0, "y": 0 },
+					{ "time": 1, "x": 298, "y": 226.99 },
+					{ "time": 2, "x": 0, "y": 0 }
+				],
+				"scale": [
+					{ "time": 0, "x": 1, "y": 1 },
+					{ "time": 1, "x": 1, "y": 0.239 },
+					{ "time": 2, "x": 1, "y": 1 }
+				],
+				"shear": [
+					{ "time": 0, "x": 0, "y": 0 },
+					{ "time": 1, "x": 30.3, "y": 55.8 },
+					{ "time": 2, "x": 0, "y": 0 }
+				]
+			}
+		}
+	}
+}
+}

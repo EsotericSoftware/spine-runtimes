@@ -9,8 +9,10 @@ module spine.webgl {
         /** @return May be null to not load an attachment. */
         newRegionAttachment (skin: Skin, name: string, path: string): RegionAttachment {
             let region = this.atlas.findRegion(path);
+            region.renderObject = region;
 		    if (region == null) throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
 		    let attachment = new RegionAttachment(name);
+            attachment.setRegion(region);
 		    attachment.region = region;
 		    return attachment;
         }
@@ -18,8 +20,9 @@ module spine.webgl {
         /** @return May be null to not load an attachment. */
         newMeshAttachment (skin: Skin, name: string, path: string) : MeshAttachment {
             let region = this.atlas.findRegion(path);
+            region.renderObject = region;
 		    if (region == null) throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
-		    let attachment = new MeshAttachment(name);
+		    let attachment = new MeshAttachment(name);            
 		    attachment.region = region;
 		    return attachment;
         } 
