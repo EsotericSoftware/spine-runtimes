@@ -44,7 +44,8 @@ public class Bone implements Updatable {
 	final Bone parent;
 	final Array<Bone> children = new Array();
 	float x, y, rotation, scaleX, scaleY, shearX, shearY;
-	float appliedRotation;
+	float ax, ay, arotation, ascaleX, ascaleY, ashearX, ashearY;
+	boolean appliedValid; // BOZO! - Use everywhere.
 
 	float a, b, worldX;
 	float c, d, worldY;
@@ -91,7 +92,13 @@ public class Bone implements Updatable {
 
 	/** Computes the world transform using the parent bone and the specified local transform. */
 	public void updateWorldTransform (float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY) {
-		appliedRotation = rotation;
+		ax = x;
+		ay = y;
+		arotation = rotation;
+		ascaleX = scaleX;
+		ascaleY = scaleY;
+		ashearX = shearX;
+		ashearY = shearY;
 
 		float rotationY = rotation + 90 + shearY;
 		float la = cosDeg(rotation + shearX) * scaleX, lb = cosDeg(rotationY) * scaleY;
@@ -160,8 +167,8 @@ public class Bone implements Updatable {
 				pc = 0;
 				pd = 1;
 				do {
-					float cos = cosDeg(parent.appliedRotation), sin = sinDeg(parent.appliedRotation);
-					float psx = parent.scaleX, psy = parent.scaleY;
+					float cos = cosDeg(parent.arotation), sin = sinDeg(parent.arotation);
+					float psx = parent.ascaleX, psy = parent.ascaleY;
 					float za = cos * psx, zb = sin * psy, zc = sin * psx, zd = cos * psy;
 					float temp = pa * za + pb * zc;
 					pb = pb * zd - pa * zb;
@@ -170,7 +177,8 @@ public class Bone implements Updatable {
 					pd = pd * zd - pc * zb;
 					pc = temp;
 
-					if (psx >= 0) sin = -sin;
+					if (psx >= 0) // BOZO! - Why? Should always do this? Fix in new code?
+						sin = -sin;
 					temp = pa * cos + pb * sin;
 					pb = pb * cos - pa * sin;
 					pa = temp;
@@ -350,14 +358,14 @@ public class Bone implements Updatable {
 
 	public float worldToLocalRotationX () {
 		Bone parent = this.parent;
-		if (parent == null) return rotation;
+		if (parent == null) return arotation;
 		float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d, a = this.a, c = this.c;
 		return atan2(pa * c - pc * a, pd * a - pb * c) * radDeg;
 	}
 
 	public float worldToLocalRotationY () {
 		Bone parent = this.parent;
-		if (parent == null) return rotation;
+		if (parent == null) return arotation;
 		float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d, b = this.b, d = this.d;
 		return atan2(pa * d - pc * b, pd * b - pb * d) * radDeg;
 	}
@@ -371,29 +379,27 @@ public class Bone implements Updatable {
 		this.d = sin * b + cos * d;
 	}
 
-	/** Computes the local transform from the world transform. This can be useful to perform processing on the local transform
-	 * after the world transform has been modified directly (eg, by a constraint).
+	/** Computes the individual applied transform values from the world transform. This can be useful to perform processing using
+	 * the applied transform after the world transform has been modified directly (eg, by a constraint).
 	 * <p>
-	 * Some redundant information is lost by the world transform, such as -1,-1 scale versus 180 rotation. The computed local
-	 * transform values may differ from the original values but are functionally the same. */
-	public void updateLocalTransform () {
+	 * Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. */
+	public void updateAppliedTransform () {
 		Bone parent = this.parent;
 		if (parent == null) {
-			x = worldX;
-			y = worldY;
-			rotation = atan2(c, a) * radDeg;
-			scaleX = (float)Math.sqrt(a * a + c * c);
-			scaleY = (float)Math.sqrt(b * b + d * d);
-			float det = a * d - b * c;
-			shearX = 0;
-			shearY = atan2(a * b + c * d, det) * radDeg;
+			ax = worldX;
+			ay = worldY;
+			arotation = atan2(c, a) * radDeg;
+			ascaleX = (float)Math.sqrt(a * a + c * c);
+			ascaleY = (float)Math.sqrt(b * b + d * d);
+			ashearX = 0;
+			ashearY = atan2(a * b + c * d, a * d - b * c) * radDeg;
 			return;
 		}
 		float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
 		float pid = 1 / (pa * pd - pb * pc);
 		float dx = worldX - parent.worldX, dy = worldY - parent.worldY;
-		x = (dx * pd * pid - dy * pb * pid);
-		y = (dy * pa * pid - dx * pc * pid);
+		ax = (dx * pd * pid - dy * pb * pid);
+		ay = (dy * pa * pid - dx * pc * pid);
 		float ia = pid * pd;
 		float id = pid * pa;
 		float ib = pid * pb;
@@ -402,20 +408,19 @@ public class Bone implements Updatable {
 		float rb = ia * b - ib * d;
 		float rc = id * c - ic * a;
 		float rd = id * d - ic * b;
-		shearX = 0;
-		scaleX = (float)Math.sqrt(ra * ra + rc * rc);
-		if (scaleX > 0.0001f) {
+		ashearX = 0;
+		ascaleX = (float)Math.sqrt(ra * ra + rc * rc);
+		if (ascaleX > 0.0001f) {
 			float det = ra * rd - rb * rc;
-			scaleY = det / scaleX;
-			shearY = atan2(ra * rb + rc * rd, det) * radDeg;
-			rotation = atan2(rc, ra) * radDeg;
+			ascaleY = det / ascaleX;
+			ashearY = atan2(ra * rb + rc * rd, det) * radDeg;
+			arotation = atan2(rc, ra) * radDeg;
 		} else {
-			scaleX = 0;
-			scaleY = (float)Math.sqrt(rb * rb + rd * rd);
-			shearY = 0;
-			rotation = 90 - atan2(rd, rb) * radDeg;
+			ascaleX = 0;
+			ascaleY = (float)Math.sqrt(rb * rb + rd * rd);
+			ashearY = 0;
+			arotation = 90 - atan2(rd, rb) * radDeg;
 		}
-		appliedRotation = rotation;
 	}
 
 	public Matrix3 getWorldTransform (Matrix3 worldTransform) {

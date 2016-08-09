@@ -206,6 +206,7 @@ public class SkeletonBinary {
 			// IK constraints.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				IkConstraintData data = new IkConstraintData(input.readString());
+				data.order = input.readInt(true);
 				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++)
 					data.bones.add(skeletonData.bones.get(input.readInt(true)));
 				data.target = skeletonData.bones.get(input.readInt(true));
@@ -217,6 +218,7 @@ public class SkeletonBinary {
 			// Transform constraints.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				TransformConstraintData data = new TransformConstraintData(input.readString());
+				data.order = input.readInt(true);
 				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++)
 					data.bones.add(skeletonData.bones.get(input.readInt(true)));
 				data.target = skeletonData.bones.get(input.readInt(true));
@@ -236,6 +238,7 @@ public class SkeletonBinary {
 			// Path constraints.
 			for (int i = 0, n = input.readInt(true); i < n; i++) {
 				PathConstraintData data = new PathConstraintData(input.readString());
+				data.order = input.readInt(true);
 				for (int ii = 0, nn = input.readInt(true); ii < nn; ii++)
 					data.bones.add(skeletonData.bones.get(input.readInt(true)));
 				data.target = skeletonData.slots.get(input.readInt(true));

@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Array;
 
 public class PathConstraintData {
 	final String name;
+	int order;
 	final Array<BoneData> bones = new Array();
 	SlotData target;
 	PositionMode positionMode;
@@ -16,6 +17,18 @@ public class PathConstraintData {
 	public PathConstraintData (String name) {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		this.name = name;
+	}
+
+	public String getName () {
+		return name;
+	}
+
+	public int getOrder () {
+		return order;
+	}
+
+	public void setOrder (int order) {
+		this.order = order;
 	}
 
 	public Array<BoneData> getBones () {
@@ -92,10 +105,6 @@ public class PathConstraintData {
 
 	public void setTranslateMix (float translateMix) {
 		this.translateMix = translateMix;
-	}
-
-	public String getName () {
-		return name;
 	}
 
 	public String toString () {

@@ -35,6 +35,7 @@ import com.badlogic.gdx.utils.Array;
 
 public class IkConstraintData {
 	final String name;
+	int order;
 	final Array<BoneData> bones = new Array();
 	BoneData target;
 	int bendDirection = 1;
@@ -47,6 +48,14 @@ public class IkConstraintData {
 
 	public String getName () {
 		return name;
+	}
+
+	public int getOrder () {
+		return order;
+	}
+
+	public void setOrder (int order) {
+		this.order = order;
 	}
 
 	public Array<BoneData> getBones () {

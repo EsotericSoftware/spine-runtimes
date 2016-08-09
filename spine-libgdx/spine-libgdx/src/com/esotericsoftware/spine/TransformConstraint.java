@@ -6,7 +6,7 @@ import static com.badlogic.gdx.math.MathUtils.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
-public class TransformConstraint implements Updatable {
+public class TransformConstraint implements Constraint {
 	final TransformConstraintData data;
 	final Array<Bone> bones;
 	Bone target;
@@ -54,7 +54,7 @@ public class TransformConstraint implements Updatable {
 		for (int i = 0, n = bones.size; i < n; i++) {
 			Bone bone = bones.get(i);
 
-			if (rotateMix > 0) {
+			if (rotateMix != 0) {
 				float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
 				float r = atan2(tc, ta) - atan2(c, a) + data.offsetRotation * degRad;
 				if (r > PI)
@@ -68,7 +68,7 @@ public class TransformConstraint implements Updatable {
 				bone.d = sin * b + cos * d;
 			}
 
-			if (translateMix > 0) {
+			if (translateMix != 0) {
 				Vector2 temp = this.temp;
 				target.localToWorld(temp.set(data.offsetX, data.offsetY));
 				bone.worldX += (temp.x - bone.worldX) * translateMix;
@@ -101,6 +101,10 @@ public class TransformConstraint implements Updatable {
 				bone.d = sin(r) * s;
 			}
 		}
+	}
+
+	public int getOrder () {
+		return data.order;
 	}
 
 	public Array<Bone> getBones () {

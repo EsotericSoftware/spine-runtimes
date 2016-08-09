@@ -157,6 +157,7 @@ public class SkeletonJson {
 		// IK constraints.
 		for (JsonValue constraintMap = root.getChild("ik"); constraintMap != null; constraintMap = constraintMap.next) {
 			IkConstraintData data = new IkConstraintData(constraintMap.getString("name"));
+			data.order = constraintMap.getInt("order", 0);
 
 			for (JsonValue boneMap = constraintMap.getChild("bones"); boneMap != null; boneMap = boneMap.next) {
 				String boneName = boneMap.asString();
@@ -178,6 +179,7 @@ public class SkeletonJson {
 		// Transform constraints.
 		for (JsonValue constraintMap = root.getChild("transform"); constraintMap != null; constraintMap = constraintMap.next) {
 			TransformConstraintData data = new TransformConstraintData(constraintMap.getString("name"));
+			data.order = constraintMap.getInt("order", 0);
 
 			for (JsonValue boneMap = constraintMap.getChild("bones"); boneMap != null; boneMap = boneMap.next) {
 				String boneName = boneMap.asString();
@@ -208,6 +210,7 @@ public class SkeletonJson {
 		// Path constraints.
 		for (JsonValue constraintMap = root.getChild("path"); constraintMap != null; constraintMap = constraintMap.next) {
 			PathConstraintData data = new PathConstraintData(constraintMap.getString("name"));
+			data.order = constraintMap.getInt("order", 0);
 
 			for (JsonValue boneMap = constraintMap.getChild("bones"); boneMap != null; boneMap = boneMap.next) {
 				String boneName = boneMap.asString();

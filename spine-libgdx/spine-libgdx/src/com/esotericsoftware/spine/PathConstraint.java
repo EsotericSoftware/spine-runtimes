@@ -11,7 +11,7 @@ import com.esotericsoftware.spine.PathConstraintData.SpacingMode;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 
-public class PathConstraint implements Updatable {
+public class PathConstraint implements Constraint {
 	static private final int NONE = -1, BEFORE = -2, AFTER = -3;
 
 	final PathConstraintData data;
@@ -380,6 +380,10 @@ public class PathConstraint implements Updatable {
 		out[o] = x;
 		out[o + 1] = y;
 		if (tangents) out[o + 2] = atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+	}
+
+	public int getOrder () {
+		return data.order;
 	}
 
 	public float getPosition () {

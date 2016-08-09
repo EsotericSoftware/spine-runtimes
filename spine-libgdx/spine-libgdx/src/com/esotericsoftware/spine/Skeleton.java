@@ -31,6 +31,8 @@
 
 package com.esotericsoftware.spine;
 
+import java.util.Comparator;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -46,15 +48,19 @@ public class Skeleton {
 	final Array<Bone> bones;
 	final Array<Slot> slots;
 	Array<Slot> drawOrder;
-	final Array<IkConstraint> ikConstraints, ikConstraintsSorted;
+	final Array<IkConstraint> ikConstraints;
 	final Array<TransformConstraint> transformConstraints;
 	final Array<PathConstraint> pathConstraints;
+	final Array<Constraint> sortedConstraints = new Array();
 	final Array<Updatable> updateCache = new Array();
 	Skin skin;
 	final Color color;
 	float time;
 	boolean flipX, flipY;
 	float x, y;
+
+	final Comparator<Constraint> constraintComparator = new Comparator<Constraint>() {
+		public int compare (Constraint o1,Constraint o2){return o1.getOrder()-o2.getOrder();}};
 
 	public Skeleton (SkeletonData data) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -83,7 +89,6 @@ public class Skeleton {
 		}
 
 		ikConstraints = new Array(data.ikConstraints.size);
-		ikConstraintsSorted = new Array(ikConstraints.size);
 		for (IkConstraintData ikConstraintData : data.ikConstraints)
 			ikConstraints.add(new IkConstraint(ikConstraintData, this));
 
@@ -107,15 +112,8 @@ public class Skeleton {
 
 		bones = new Array(skeleton.bones.size);
 		for (Bone bone : skeleton.bones) {
-			Bone copy;
-			if (bone.parent == null)
-				copy = new Bone(bone, this, null);
-			else {
-				Bone parent = bones.get(bone.parent.data.index);
-				copy = new Bone(bone, this, parent);
-				parent.children.add(copy);
-			}
-			bones.add(copy);
+			Bone parent = bone.parent == null ? null : bones.get(bone.parent.data.index);
+			bones.add(new Bone(bone, this, parent));
 		}
 
 		slots = new Array(skeleton.slots.size);
@@ -129,7 +127,6 @@ public class Skeleton {
 			drawOrder.add(slots.get(slot.data.index));
 
 		ikConstraints = new Array(skeleton.ikConstraints.size);
-		ikConstraintsSorted = new Array(ikConstraints.size);
 		for (IkConstraint ikConstraint : skeleton.ikConstraints)
 			ikConstraints.add(new IkConstraint(ikConstraint, this));
 
@@ -155,98 +152,85 @@ public class Skeleton {
 	public void updateCache () {
 		Array<Updatable> updateCache = this.updateCache;
 		updateCache.clear();
-
+	
 		Array<Bone> bones = this.bones;
 		for (int i = 0, n = bones.size; i < n; i++)
 			bones.get(i).sorted = false;
-
-		// IK first, lowest hierarchy depth first.
-		Array<IkConstraint> ikConstraints = this.ikConstraintsSorted;
-		ikConstraints.clear();
-		ikConstraints.addAll(this.ikConstraints);
-		int ikCount = ikConstraints.size;
-		for (int i = 0, level, n = ikCount; i < n; i++) {
-			IkConstraint ik = ikConstraints.get(i);
-			Bone bone = ik.bones.first().parent;
-			for (level = 0; bone != null; level++)
-				bone = bone.parent;
-			ik.level = level;
+	
+		Array<Constraint> constraints = sortedConstraints;
+		constraints.addAll(ikConstraints);
+		constraints.addAll(transformConstraints);
+		constraints.addAll(pathConstraints);
+		constraints.sort(constraintComparator);
+		for (int i = 0, n = constraints.size; i < n; i++) {
+			Constraint constraint = constraints.get(i);
+			if (constraint instanceof IkConstraint)
+				sortIkConstraint((IkConstraint)constraint);
+			else if (constraint instanceof TransformConstraint)
+				sortTransformConstraint((TransformConstraint)constraint);
+			else
+				sortPathConstraint((PathConstraint)constraint);
 		}
-		for (int i = 1, ii; i < ikCount; i++) {
-			IkConstraint ik = ikConstraints.get(i);
-			int level = ik.level;
-			for (ii = i - 1; ii >= 0; ii--) {
-				IkConstraint other = ikConstraints.get(ii);
-				if (other.level < level) break;
-				ikConstraints.set(ii + 1, other);
-			}
-			ikConstraints.set(ii + 1, ik);
-		}
-		for (int i = 0, n = ikConstraints.size; i < n; i++) {
-			IkConstraint constraint = ikConstraints.get(i);
-			Bone target = constraint.target;
-			sortBone(target);
-
-			Array<Bone> constrained = constraint.bones;
-			Bone parent = constrained.first();
-			sortBone(parent);
-
-			updateCache.add(constraint);
-
-			sortReset(parent.children);
-			constrained.peek().sorted = true;
-		}
-
-		Array<PathConstraint> pathConstraints = this.pathConstraints;
-		for (int i = 0, n = pathConstraints.size; i < n; i++) {
-			PathConstraint constraint = pathConstraints.get(i);
-
-			Slot slot = constraint.target;
-			int slotIndex = slot.getData().index;
-			Bone slotBone = slot.bone;
-			if (skin != null) sortPathConstraintAttachment(skin, slotIndex, slotBone);
-			if (data.defaultSkin != null && data.defaultSkin != skin)
-				sortPathConstraintAttachment(data.defaultSkin, slotIndex, slotBone);
-			for (int ii = 0, nn = data.skins.size; ii < nn; ii++)
-				sortPathConstraintAttachment(data.skins.get(ii), slotIndex, slotBone);
-
-			Attachment attachment = slot.attachment;
-			if (attachment instanceof PathAttachment) sortPathConstraintAttachment(attachment, slotBone);
-
-			Array<Bone> constrained = constraint.bones;
-			int boneCount = constrained.size;
-			for (int ii = 0; ii < boneCount; ii++)
-				sortBone(constrained.get(ii));
-
-			updateCache.add(constraint);
-
-			for (int ii = 0; ii < boneCount; ii++)
-				sortReset(constrained.get(ii).children);
-			for (int ii = 0; ii < boneCount; ii++)
-				constrained.get(ii).sorted = true;
-		}
-
-		Array<TransformConstraint> transformConstraints = this.transformConstraints;
-		for (int i = 0, n = transformConstraints.size; i < n; i++) {
-			TransformConstraint constraint = transformConstraints.get(i);
-
-			sortBone(constraint.target);
-
-			Array<Bone> constrained = constraint.bones;
-			int boneCount = constrained.size;
-			for (int ii = 0; ii < boneCount; ii++)
-				sortBone(constrained.get(ii));
-
-			updateCache.add(constraint);
-
-			for (int ii = 0; ii < boneCount; ii++)
-				sortReset(constrained.get(ii).children);
-			for (int ii = 0; ii < boneCount; ii++)
-				constrained.get(ii).sorted = true;
-		}
-
+		constraints.clear();
+	
 		for (int i = 0, n = bones.size; i < n; i++)
 			sortBone(bones.get(i));
+	}
+
+	private void sortIkConstraint (IkConstraint constraint) {
+		Bone target = constraint.target;
+		sortBone(target);
+
+		Array<Bone> constrained = constraint.bones;
+		Bone parent = constrained.first();
+		sortBone(parent);
+
+		updateCache.add(constraint);
+
+		sortReset(parent.children);
+		constrained.peek().sorted = true;
+	}
+
+	private void sortPathConstraint (PathConstraint constraint) {
+		Slot slot = constraint.target;
+		int slotIndex = slot.getData().index;
+		Bone slotBone = slot.bone;
+		if (skin != null) sortPathConstraintAttachment(skin, slotIndex, slotBone);
+		if (data.defaultSkin != null && data.defaultSkin != skin)
+			sortPathConstraintAttachment(data.defaultSkin, slotIndex, slotBone);
+		for (int ii = 0, nn = data.skins.size; ii < nn; ii++)
+			sortPathConstraintAttachment(data.skins.get(ii), slotIndex, slotBone);
+
+		Attachment attachment = slot.attachment;
+		if (attachment instanceof PathAttachment) sortPathConstraintAttachment(attachment, slotBone);
+
+		Array<Bone> constrained = constraint.bones;
+		int boneCount = constrained.size;
+		for (int ii = 0; ii < boneCount; ii++)
+			sortBone(constrained.get(ii));
+
+		updateCache.add(constraint);
+
+		for (int ii = 0; ii < boneCount; ii++)
+			sortReset(constrained.get(ii).children);
+		for (int ii = 0; ii < boneCount; ii++)
+			constrained.get(ii).sorted = true;
+	}
+
+	private void sortTransformConstraint (TransformConstraint constraint) {
+		sortBone(constraint.target);
+
+		Array<Bone> constrained = constraint.bones;
+		int boneCount = constrained.size;
+		for (int ii = 0; ii < boneCount; ii++)
+			sortBone(constrained.get(ii));
+
+		updateCache.add(constraint);
+
+		for (int ii = 0; ii < boneCount; ii++)
+			sortReset(constrained.get(ii).children);
+		for (int ii = 0; ii < boneCount; ii++)
+			constrained.get(ii).sorted = true;
 	}
 
 	private void sortPathConstraintAttachment (Skin skin, int slotIndex, Bone slotBone) {
