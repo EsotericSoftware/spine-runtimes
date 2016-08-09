@@ -2963,30 +2963,30 @@ var spine;
                     for (var timelineName in slotMap) {
                         var timelineMap = slotMap[timelineName];
                         if (timelineName == "color") {
-                            var timeline_1 = new spine.ColorTimeline(timelineMap.length); // FIXME
-                            timeline_1.slotIndex = slotIndex;
+                            var timeline = new spine.ColorTimeline(timelineMap.length); // FIXME
+                            timeline.slotIndex = slotIndex;
                             var frameIndex = 0;
                             for (var i = 0; i < timelineMap.length; i++) {
                                 var valueMap = timelineMap[i];
                                 var color = new spine.Color();
                                 color.setFromString(valueMap.color);
-                                timeline_1.setFrame(frameIndex, valueMap.time, color.r, color.g, color.b, color.a);
-                                this.readCurve(valueMap, timeline_1, frameIndex);
+                                timeline.setFrame(frameIndex, valueMap.time, color.r, color.g, color.b, color.a);
+                                this.readCurve(valueMap, timeline, frameIndex);
                                 frameIndex++;
                             }
-                            timelines.push(timeline_1);
-                            duration = Math.max(duration, timeline_1.frames[(timeline_1.getFrameCount() - 1) * spine.ColorTimeline.ENTRIES]);
+                            timelines.push(timeline);
+                            duration = Math.max(duration, timeline.frames[(timeline.getFrameCount() - 1) * spine.ColorTimeline.ENTRIES]);
                         }
                         else if (timelineName = "attachment") {
-                            var timeline_2 = new spine.AttachmentTimeline(timelineMap.length);
-                            timeline_2.slotIndex = slotIndex;
+                            var timeline = new spine.AttachmentTimeline(timelineMap.length);
+                            timeline.slotIndex = slotIndex;
                             var frameIndex_1 = 0;
                             for (var i = 0; i < timelineMap.length; i++) {
                                 var valueMap = timelineMap[i];
-                                timeline_2.setFrame(frameIndex_1++, valueMap.time, valueMap.name);
+                                timeline.setFrame(frameIndex_1++, valueMap.time, valueMap.name);
                             }
-                            timelines.push(timeline_2);
-                            duration = Math.max(duration, timeline_2.frames[timeline_2.getFrameCount() - 1]);
+                            timelines.push(timeline);
+                            duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);
                         }
                         else
                             throw new Error("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
@@ -3003,17 +3003,17 @@ var spine;
                     for (var timelineName in boneMap) {
                         var timelineMap = boneMap[timelineName];
                         if (timelineName === "rotate") {
-                            var timeline_3 = new spine.RotateTimeline(timelineMap.length);
-                            timeline_3.boneIndex = boneIndex;
+                            var timeline = new spine.RotateTimeline(timelineMap.length);
+                            timeline.boneIndex = boneIndex;
                             var frameIndex = 0;
                             for (var i = 0; i < timelineMap.length; i++) {
                                 var valueMap = timelineMap[i];
-                                timeline_3.setFrame(frameIndex, valueMap.time, valueMap.angle);
-                                this.readCurve(valueMap, timeline_3, frameIndex);
+                                timeline.setFrame(frameIndex, valueMap.time, valueMap.angle);
+                                this.readCurve(valueMap, timeline, frameIndex);
                                 frameIndex++;
                             }
-                            timelines.push(timeline_3);
-                            duration = Math.max(duration, timeline_3.frames[(timeline_3.getFrameCount() - 1) * spine.RotateTimeline.ENTRIES]);
+                            timelines.push(timeline);
+                            duration = Math.max(duration, timeline.frames[(timeline.getFrameCount() - 1) * spine.RotateTimeline.ENTRIES]);
                         }
                         else if (timelineName === "translate" || timelineName === "scale" || timelineName === "shear") {
                             var timeline = null;
@@ -3048,17 +3048,17 @@ var spine;
                 for (var constraintName in map.ik) {
                     var constraintMap = map.ik[constraintName];
                     var constraint = skeletonData.findIkConstraint(constraintName);
-                    var timeline_4 = new spine.IkConstraintTimeline(constraintMap.length);
-                    timeline_4.ikConstraintIndex = skeletonData.ikConstraints.indexOf(constraint);
+                    var timeline = new spine.IkConstraintTimeline(constraintMap.length);
+                    timeline.ikConstraintIndex = skeletonData.ikConstraints.indexOf(constraint);
                     var frameIndex = 0;
                     for (var i = 0; i < constraintMap.length; i++) {
                         var valueMap = constraintMap[i];
-                        timeline_4.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, "mix", 1), this.getValue(valueMap, "bendPositive", true) ? 1 : -1);
-                        this.readCurve(valueMap, timeline_4, frameIndex);
+                        timeline.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, "mix", 1), this.getValue(valueMap, "bendPositive", true) ? 1 : -1);
+                        this.readCurve(valueMap, timeline, frameIndex);
                         frameIndex++;
                     }
-                    timelines.push(timeline_4);
-                    duration = Math.max(duration, timeline_4.frames[(timeline_4.getFrameCount() - 1) * spine.IkConstraintTimeline.ENTRIES]);
+                    timelines.push(timeline);
+                    duration = Math.max(duration, timeline.frames[(timeline.getFrameCount() - 1) * spine.IkConstraintTimeline.ENTRIES]);
                 }
             }
             // Transform constraint timelines.
@@ -3066,17 +3066,17 @@ var spine;
                 for (var constraintName in map.transform) {
                     var constraintMap = map.transform[constraintName];
                     var constraint = skeletonData.findTransformConstraint(constraintName);
-                    var timeline_5 = new spine.TransformConstraintTimeline(constraintMap.length);
-                    timeline_5.transformConstraintIndex = skeletonData.transformConstraints.indexOf(constraint);
+                    var timeline = new spine.TransformConstraintTimeline(constraintMap.length);
+                    timeline.transformConstraintIndex = skeletonData.transformConstraints.indexOf(constraint);
                     var frameIndex = 0;
                     for (var i = 0; i < constraintMap.length; i++) {
                         var valueMap = constraintMap[i];
-                        timeline_5.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, "rotateMix", 1), this.getValue(valueMap, "translateMix", 1), this.getValue(valueMap, "scaleMix", 1), this.getValue(valueMap, "shearMix", 1));
-                        this.readCurve(valueMap, timeline_5, frameIndex);
+                        timeline.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, "rotateMix", 1), this.getValue(valueMap, "translateMix", 1), this.getValue(valueMap, "scaleMix", 1), this.getValue(valueMap, "shearMix", 1));
+                        this.readCurve(valueMap, timeline, frameIndex);
                         frameIndex++;
                     }
-                    timelines.push(timeline_5);
-                    duration = Math.max(duration, timeline_5.frames[(timeline_5.getFrameCount() - 1) * spine.TransformConstraintTimeline.ENTRIES]);
+                    timelines.push(timeline);
+                    duration = Math.max(duration, timeline.frames[(timeline.getFrameCount() - 1) * spine.TransformConstraintTimeline.ENTRIES]);
                 }
             }
             // Path constraint timelines.
@@ -3090,23 +3090,23 @@ var spine;
                     for (var timelineName in constraintMap) {
                         var timelineMap = constraintMap[timelineName];
                         if (timelineName === "position" || timelineName === "spacing") {
-                            var pathTimeline = null;
+                            var timeline = null;
                             var timelineScale = 1;
                             if (timelineName === "spacing") {
-                                pathTimeline = new spine.PathConstraintSpacingTimeline(timelineMap.length);
+                                timeline = new spine.PathConstraintSpacingTimeline(timelineMap.length);
                                 if (data.spacingMode == spine.SpacingMode.Length || data.spacingMode == spine.SpacingMode.Fixed)
                                     timelineScale = scale;
                             }
                             else {
-                                pathTimeline = new spine.PathConstraintPositionTimeline(timelineMap.length);
+                                timeline = new spine.PathConstraintPositionTimeline(timelineMap.length);
                                 if (data.positionMode == spine.PositionMode.Fixed)
                                     timelineScale = scale;
                             }
-                            pathTimeline.pathConstraintIndex = index;
+                            timeline.pathConstraintIndex = index;
                             var frameIndex = 0;
                             for (var i = 0; i < timelineMap.length; i++) {
                                 var valueMap = timelineMap[i];
-                                pathTimeline.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, timelineName, 0) * timelineScale);
+                                timeline.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, timelineName, 0) * timelineScale);
                                 this.readCurve(valueMap, timeline, frameIndex);
                                 frameIndex++;
                             }
@@ -3114,17 +3114,17 @@ var spine;
                             duration = Math.max(duration, timeline.frames[(timeline.getFrameCount() - 1) * spine.PathConstraintPositionTimeline.ENTRIES]);
                         }
                         else if (timelineName === "mix") {
-                            var timeline_6 = new spine.PathConstraintMixTimeline(timelineMap.length);
-                            timeline_6.pathConstraintIndex = index;
+                            var timeline = new spine.PathConstraintMixTimeline(timelineMap.length);
+                            timeline.pathConstraintIndex = index;
                             var frameIndex = 0;
                             for (var i = 0; i < timelineMap.length; i++) {
                                 var valueMap = timelineMap[i];
-                                timeline_6.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, "rotateMix", 1), this.getValue(valueMap, "translateMix", 1));
-                                this.readCurve(valueMap, timeline_6, frameIndex);
+                                timeline.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, "rotateMix", 1), this.getValue(valueMap, "translateMix", 1));
+                                this.readCurve(valueMap, timeline, frameIndex);
                                 frameIndex++;
                             }
-                            timelines.push(timeline_6);
-                            duration = Math.max(duration, timeline_6.frames[(timeline_6.getFrameCount() - 1) * spine.PathConstraintMixTimeline.ENTRIES]);
+                            timelines.push(timeline);
+                            duration = Math.max(duration, timeline.frames[(timeline.getFrameCount() - 1) * spine.PathConstraintMixTimeline.ENTRIES]);
                         }
                     }
                 }
@@ -3149,9 +3149,9 @@ var spine;
                             var weighted = attachment.bones != null;
                             var vertices = attachment.vertices;
                             var deformLength = weighted ? vertices.length / 3 * 2 : vertices.length;
-                            var timeline_7 = new spine.DeformTimeline(timelineMap.length);
-                            timeline_7.slotIndex = slotIndex;
-                            timeline_7.attachment = attachment;
+                            var timeline = new spine.DeformTimeline(timelineMap.length);
+                            timeline.slotIndex = slotIndex;
+                            timeline.attachment = attachment;
                             var frameIndex_3 = 0;
                             for (var j = 0; j < timelineMap.length; j++) {
                                 var valueMap = timelineMap[j];
@@ -3172,12 +3172,12 @@ var spine;
                                             deform[i] += vertices[i];
                                     }
                                 }
-                                timeline_7.setFrame(frameIndex_3, valueMap.time, deform);
-                                this.readCurve(valueMap, timeline_7, frameIndex_3);
+                                timeline.setFrame(frameIndex_3, valueMap.time, deform);
+                                this.readCurve(valueMap, timeline, frameIndex_3);
                                 frameIndex_3++;
                             }
-                            timelines.push(timeline_7);
-                            duration = Math.max(duration, timeline_7.frames[timeline_7.getFrameCount() - 1]);
+                            timelines.push(timeline);
+                            duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);
                         }
                     }
                 }
@@ -3187,7 +3187,7 @@ var spine;
             if (drawOrderNode == null)
                 drawOrderNode = map.draworder;
             if (drawOrderNode != null) {
-                var timeline_8 = new spine.DrawOrderTimeline(drawOrderNode.length);
+                var timeline = new spine.DrawOrderTimeline(drawOrderNode.length);
                 var slotCount = skeletonData.slots.length;
                 var frameIndex = 0;
                 for (var j = 0; j < drawOrderNode.length; j++) {
@@ -3217,14 +3217,14 @@ var spine;
                             if (drawOrder[i] == -1)
                                 drawOrder[i] = unchanged[--unchangedIndex];
                     }
-                    timeline_8.setFrame(frameIndex++, drawOrderMap.time, drawOrder);
+                    timeline.setFrame(frameIndex++, drawOrderMap.time, drawOrder);
                 }
-                timelines.push(timeline_8);
-                duration = Math.max(duration, timeline_8.frames[timeline_8.getFrameCount() - 1]);
+                timelines.push(timeline);
+                duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);
             }
             // Event timeline.
             if (map.events) {
-                var timeline_9 = new spine.EventTimeline(map.events.length);
+                var timeline = new spine.EventTimeline(map.events.length);
                 var frameIndex_4 = 0;
                 for (var i = 0; i < map.events.length; i++) {
                     var eventMap = map.events[i];
@@ -3235,10 +3235,10 @@ var spine;
                     event_3.intValue = this.getValue(eventMap, "int", eventData.intValue);
                     event_3.floatValue = this.getValue(eventMap, "float", eventData.floatValue);
                     event_3.stringValue = this.getValue(eventMap, "string", eventData.stringValue);
-                    timeline_9.setFrame(frameIndex_4++, event_3);
+                    timeline.setFrame(frameIndex_4++, event_3);
                 }
-                timelines.push(timeline_9);
-                duration = Math.max(duration, timeline_9.frames[timeline_9.getFrameCount() - 1]);
+                timelines.push(timeline);
+                duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);
             }
             skeletonData.animations.push(new spine.Animation(name, timelines, duration));
         };
@@ -3637,7 +3637,7 @@ var spine;
             if (value === void 0) { value = 0; }
             var oldSize = array.length;
             if (oldSize == size)
-                return;
+                return array;
             array.length = size;
             if (oldSize < size) {
                 for (var i = oldSize; i < size; i++)

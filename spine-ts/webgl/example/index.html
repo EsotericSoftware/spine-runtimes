@@ -52,12 +52,12 @@ function init() {
 
 function load() {
     if (assetManager.isLoadingComplete()) {  
-        var skeletonData = loadSkeletonJson("spineboy");
+        var skeletonData = loadSkeletonJson("tank");
         skeleton = new spine.Skeleton(skeletonData);
         skeleton.x = 320;
         skeleton.y = 20;        
         animationState = new spine.AnimationState(new spine.AnimationStateData(skeletonData));
-        animationState.setAnimation(0, "walk", true);       
+        animationState.setAnimation(0, "drive", true);       
 
         requestAnimationFrame(render);
     } else {
@@ -71,7 +71,7 @@ function loadSkeletonJson(name) {
     });
     atlasLoader = new spine.webgl.TextureAtlasAttachmentLoader(atlas);
     var skeletonJson = new spine.SkeletonJson(atlasLoader);
-    skeletonJson.scale = 0.5;   
+    skeletonJson.scale = 0.2;   
     return skeletonJson.readSkeletonData(assetManager.get("assets/" + name + ".json"));
 }
 

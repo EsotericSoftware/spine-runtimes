@@ -387,7 +387,7 @@ module spine {
                             duration = Math.max(duration, timeline.frames[(timeline.getFrameCount() - 1) * RotateTimeline.ENTRIES]);
 
                         } else if (timelineName === "translate" || timelineName === "scale" || timelineName === "shear") {
-                            var timeline: TranslateTimeline = null;
+                            let timeline: TranslateTimeline = null;
                             let timelineScale = 1;
                             if (timelineName === "scale")
                                 timeline = new ScaleTimeline(timelineMap.length);
@@ -467,20 +467,20 @@ module spine {
                     for (var timelineName in constraintMap) {
                         let timelineMap = constraintMap[timelineName];
                         if (timelineName === "position" || timelineName === "spacing") {
-                            var pathTimeline: PathConstraintPositionTimeline = null;
+                            let timeline: PathConstraintPositionTimeline = null;
                             var timelineScale = 1;
                             if (timelineName === "spacing") {
-                                pathTimeline = new PathConstraintSpacingTimeline(timelineMap.length);
+                                timeline = new PathConstraintSpacingTimeline(timelineMap.length);
                                 if (data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed) timelineScale = scale;
                             } else {
-                                pathTimeline = new PathConstraintPositionTimeline(timelineMap.length);
+                                timeline = new PathConstraintPositionTimeline(timelineMap.length);
                                 if (data.positionMode == PositionMode.Fixed) timelineScale = scale;
                             }
-                            pathTimeline.pathConstraintIndex = index;
+                            timeline.pathConstraintIndex = index;
                             var frameIndex = 0;
                             for (var i = 0; i < timelineMap.length; i++) {
                                 let valueMap = timelineMap[i];
-                                pathTimeline.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, timelineName, 0) * timelineScale);
+                                timeline.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, timelineName, 0) * timelineScale);
                                 this.readCurve(valueMap, timeline, frameIndex);
                                 frameIndex++;
                             }

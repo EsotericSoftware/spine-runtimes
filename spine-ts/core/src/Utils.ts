@@ -102,7 +102,7 @@ module spine {
 
         static setArraySize<T> (array: Array<T>, size: number, value: any = 0): Array<T> {            
             let oldSize = array.length;
-            if (oldSize == size) return;
+            if (oldSize == size) return array;
             array.length = size;
             if (oldSize < size) {
                 for (var i = oldSize; i < size; i++) array[i] = value;

@@ -1,41 +1,43 @@
 {
-"skeleton": { "hash": "AZdOIZ4IYl0GpKNTjsLzQt0DmGs", "spine": "3.4.02", "width": 313, "height": 119, "images": "" },
+"skeleton": { "hash": "uwG1zYqkYBiVHHPeS/hAWhSBZhg", "spine": "3.4.02", "width": 333.58, "height": 199.81, "images": "" },
 "bones": [
-	{ "name": "root" }
+	{ "name": "root" },
+	{ "name": "bone", "parent": "root" }
 ],
 "slots": [
-	{ "name": "image", "bone": "root", "attachment": "images/badlogic" }
+	{ "name": "image", "bone": "bone", "attachment": "images/badlogic" },
+	{ "name": "path", "bone": "root", "attachment": "path" }
+],
+"path": [
+	{
+		"name": "constraint",
+		"bones": [ "bone" ],
+		"target": "path"
+	}
 ],
 "skins": {
 	"default": {
 		"image": {
 			"images/badlogic": { "width": 313, "height": 119 }
+		},
+		"path": {
+			"path": {
+				"type": "path",
+				"closed": true,
+				"lengths": [ 212.9, 394.69, 591.21, 784.98, 877.98 ],
+				"vertexCount": 15,
+				"vertices": [ -55.59, 37.8, 39, 9, 130.9, -17.03, 175.06, -4.8, 219, 74, 262.93, 152.8, 262.65, 173.92, 200, 233, 137.34, 292.07, 95.78, 284.8, 19, 255, -57.78, 225.19, -105.59, 166.9, -50.99, 112, 3.6, 57.1 ]
+			}
 		}
 	}
 },
 "animations": {
 	"test": {
-		"bones": {
-			"root": {
-				"rotate": [
-					{ "time": 0, "angle": 0 },
-					{ "time": 1, "angle": 32.79 },
-					{ "time": 2, "angle": 0 }
-				],
-				"translate": [
-					{ "time": 0, "x": 0, "y": 0 },
-					{ "time": 1, "x": 298, "y": 226.99 },
-					{ "time": 2, "x": 0, "y": 0 }
-				],
-				"scale": [
-					{ "time": 0, "x": 1, "y": 1 },
-					{ "time": 1, "x": 1, "y": 0.239 },
-					{ "time": 2, "x": 1, "y": 1 }
-				],
-				"shear": [
-					{ "time": 0, "x": 0, "y": 0 },
-					{ "time": 1, "x": 30.3, "y": 55.8 },
-					{ "time": 2, "x": 0, "y": 0 }
+		"paths": {
+			"constraint": {
+				"position": [
+					{ "time": 0 },
+					{ "time": 2, "position": 1 }
 				]
 			}
 		}
