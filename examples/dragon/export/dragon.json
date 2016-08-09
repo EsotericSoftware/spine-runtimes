@@ -1,5 +1,5 @@
 {
-"skeleton": { "hash": "9MKo2cmJTDc3IPV4B3LRJxWbl04", "spine": "3.4.00", "width": 897, "height": 716.36, "images": "./images/" },
+"skeleton": { "hash": "9MKo2cmJTDc3IPV4B3LRJxWbl04", "spine": "3.4.02", "width": 897, "height": 716.36, "images": "./images/" },
 "bones": [
 	{ "name": "root", "y": -176.12 },
 	{ "name": "COG", "parent": "root", "y": 176.12 },
