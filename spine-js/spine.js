@@ -1644,7 +1644,6 @@ spine.WeightedMeshAttachment.prototype = {
 
 spine.BoundingBoxAttachment = function (name) {
 	this.name = name;
-	this.vertices = new spine.Float32Array();
 };
 spine.BoundingBoxAttachment.prototype = {
 	type: spine.AttachmentType.boundingbox,
@@ -2146,6 +2145,7 @@ spine.SkeletonJson.prototype = {
 		case spine.AttachmentType.boundingbox:
 			var attachment = this.attachmentLoader.newBoundingBoxAttachment(skin, name);
 			var vertices = map["vertices"];
+			attachment.vertices = new spine.Float32Array(vertices.length);
 			for (var i = 0, n = vertices.length; i < n; i++)
 				attachment.vertices[i] = vertices[i] * scale;
 			return attachment;
