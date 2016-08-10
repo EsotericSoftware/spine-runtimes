@@ -417,7 +417,7 @@ module spine {
 		}
 
 		getFrameCount () {
-			return frames.length;
+			return this.frames.length;
 		}		
 
 		/** Sets the time of the specified keyframe. */
@@ -430,7 +430,7 @@ module spine {
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number) {
 			if (firedEvents == null) return;
 			let frames = this.frames;
-			let frameCount = frames.length;
+			let frameCount = this.frames.length;
 
 			if (lastTime > time) { // Fire events after last time for looped animations.
 				this.apply(skeleton, lastTime, Number.MAX_VALUE, firedEvents, alpha);
@@ -465,7 +465,7 @@ module spine {
 		}
 
 	    getFrameCount () {
-			return frames.length;
+			return this.frames.length;
 		}
 
 		/** Sets the time of the specified keyframe.

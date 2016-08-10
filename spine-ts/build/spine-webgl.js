@@ -394,7 +394,7 @@ var spine;
             this.events = new Array(frameCount);
         }
         EventTimeline.prototype.getFrameCount = function () {
-            return frames.length;
+            return this.frames.length;
         };
         /** Sets the time of the specified keyframe. */
         EventTimeline.prototype.setFrame = function (frameIndex, event) {
@@ -406,7 +406,7 @@ var spine;
             if (firedEvents == null)
                 return;
             var frames = this.frames;
-            var frameCount = frames.length;
+            var frameCount = this.frames.length;
             if (lastTime > time) {
                 this.apply(skeleton, lastTime, Number.MAX_VALUE, firedEvents, alpha);
                 lastTime = -1;
@@ -439,7 +439,7 @@ var spine;
             this.drawOrders = new Array(frameCount);
         }
         DrawOrderTimeline.prototype.getFrameCount = function () {
-            return frames.length;
+            return this.frames.length;
         };
         /** Sets the time of the specified keyframe.
          * @param drawOrder May be null to use bind pose draw order. */
@@ -3239,6 +3239,9 @@ var spine;
                 }
                 timelines.push(timeline);
                 duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);
+            }
+            if (isNaN(duration)) {
+                throw new Error("Error while parsing animation, duration is NaN");
             }
             skeletonData.animations.push(new spine.Animation(name, timelines, duration));
         };

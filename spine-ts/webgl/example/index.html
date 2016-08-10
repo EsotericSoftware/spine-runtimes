@@ -70,11 +70,11 @@ function load() {
     // wait until the AssetManager has loaded
     // all resources, then load the skeletons
     if (assetManager.isLoadingComplete()) {  
-        skeletons["spineboy"] = loadSkeleton("spineboy", 0.5, "walk", 320, 20, false);
+        skeletons["spineboy"] = loadSkeleton("spineboy", 0.5, "test", 320, 20, false);
         skeletons["raptor"] = loadSkeleton("raptor", 0.4, "walk", 320, 20, false);
         skeletons["tank"] = loadSkeleton("tank", 0.3, "drive", 400, 20, false);
         skeletons["goblins"] = loadSkeleton("goblins-mesh", 1, "walk", 320, 20, true);
-        skeletons["vine"] = loadSkeleton("vine", 0.5, "animation", 320, 20, false);
+        skeletons["vine"] = loadSkeleton("vine", 0.5, "animation", 320, 20, false);        
         setupUI();
         requestAnimationFrame(render);
     } else {

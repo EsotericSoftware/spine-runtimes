@@ -616,6 +616,10 @@ module spine {
                 duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);                
             }
 
+            if (isNaN(duration)) {
+                throw new Error("Error while parsing animation, duration is NaN");
+            }
+
             skeletonData.animations.push(new Animation(name, timelines, duration));
         }
 
