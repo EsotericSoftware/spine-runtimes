@@ -1396,11 +1396,12 @@ declare module spine {
         static toInt(x: number): number;
     }
     class Utils {
+        static SUPPORTS_TYPED_ARRAYS: boolean;
         static arrayCopy<T>(source: ArrayLike<T>, sourceStart: number, dest: ArrayLike<T>, destStart: number, numElements: number): void;
         static setArraySize<T>(array: Array<T>, size: number, value?: any): Array<T>;
         static newArray<T>(size: number, defaultValue: T): Array<T>;
         static newFloatArray(size: number): ArrayLike<number>;
-        static toFloatArray(array: Array<number>): Float32Array;
+        static toFloatArray(array: Array<number>): Float32Array | number[];
     }
     class Vector2 {
         x: number;

@@ -4344,12 +4344,12 @@ var spine;
             return array;
         };
         Utils.newFloatArray = function (size) {
-            var array = new Float32Array(size);
-            return array;
+            return Utils.SUPPORTS_TYPED_ARRAYS ? new Float32Array(size) : new Array(size);
         };
         Utils.toFloatArray = function (array) {
-            return new Float32Array(array);
+            return Utils.SUPPORTS_TYPED_ARRAYS ? new Float32Array(array) : array;
         };
+        Utils.SUPPORTS_TYPED_ARRAYS = 'ArrayBuffer' in window;
         return Utils;
     }());
     spine.Utils = Utils;
