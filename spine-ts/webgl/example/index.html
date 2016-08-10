@@ -73,7 +73,7 @@ function load() {
         skeletons["spineboy"] = loadSkeleton("spineboy", 0.5, "test", 320, 20, false);
         skeletons["raptor"] = loadSkeleton("raptor", 0.4, "walk", 320, 20, false);
         skeletons["tank"] = loadSkeleton("tank", 0.3, "drive", 400, 20, false);
-        skeletons["goblins"] = loadSkeleton("goblins-mesh", 1, "walk", 320, 20, true);
+        skeletons["goblins"] = loadSkeleton("goblins-mesh", 1, "walk", 320, 20, true, "goblin");
         skeletons["vine"] = loadSkeleton("vine", 0.5, "animation", 320, 20, false);        
         setupUI();
         requestAnimationFrame(render);
@@ -164,10 +164,12 @@ function setupUI() {
         var skinList = $("#skinList");
         skinList.empty();
         var skeleton = skeletons[activeSkeleton].skeleton;
+        var activeSkin = skeleton.skin == null ? "default" : skeleton.skin.name;
         for (var i = 0; i < skeleton.data.skins.length; i++) {
             var name = skeleton.data.skins[i].name;
             var option = $("<option></option>");
             option.attr("value", name).text(name);
+            if (name === activeSkin) option.attr("selected", "selected");
             skinList.append(option);
         }
 
