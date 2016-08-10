@@ -71,7 +71,6 @@ var spine;
         };
         Animation.binarySearch = function (values, target, step) {
             if (step === void 0) { step = 1; }
-            // FIXME this relies on integer math, may break
             var low = 0;
             var high = values.length / step - 2;
             if (high == 0)
@@ -100,7 +99,7 @@ var spine;
         function CurveTimeline(frameCount) {
             if (frameCount <= 0)
                 throw new Error("frameCount must be > 0: " + frameCount);
-            this.curves = new Array((frameCount - 1) * CurveTimeline.BEZIER_SIZE);
+            this.curves = spine.Utils.newFloatArray((frameCount - 1) * CurveTimeline.BEZIER_SIZE);
             for (var i = 0; i < this.curves.length; i++) {
                 this.curves[i] = 0;
             }
@@ -188,7 +187,7 @@ var spine;
         __extends(RotateTimeline, _super);
         function RotateTimeline(frameCount) {
             _super.call(this, frameCount);
-            this.frames = new Array(frameCount << 1);
+            this.frames = spine.Utils.newFloatArray(frameCount << 1);
         }
         /** Sets the time and angle of the specified keyframe. */
         RotateTimeline.prototype.setFrame = function (frameIndex, time, degrees) {
@@ -238,7 +237,7 @@ var spine;
         __extends(TranslateTimeline, _super);
         function TranslateTimeline(frameCount) {
             _super.call(this, frameCount);
-            this.frames = new Array(frameCount * TranslateTimeline.ENTRIES);
+            this.frames = spine.Utils.newFloatArray(frameCount * TranslateTimeline.ENTRIES);
         }
         /** Sets the time and value of the specified keyframe. */
         TranslateTimeline.prototype.setFrame = function (frameIndex, time, x, y) {
@@ -333,7 +332,7 @@ var spine;
         __extends(ColorTimeline, _super);
         function ColorTimeline(frameCount) {
             _super.call(this, frameCount);
-            this.frames = new Array(frameCount * ColorTimeline.ENTRIES);
+            this.frames = spine.Utils.newFloatArray(frameCount * ColorTimeline.ENTRIES);
         }
         /** Sets the time and value of the specified keyframe. */
         ColorTimeline.prototype.setFrame = function (frameIndex, time, r, g, b, a) {
@@ -391,7 +390,7 @@ var spine;
     spine.ColorTimeline = ColorTimeline;
     var AttachmentTimeline = (function () {
         function AttachmentTimeline(frameCount) {
-            this.frames = new Array(frameCount);
+            this.frames = spine.Utils.newFloatArray(frameCount);
             this.attachmentNames = new Array(frameCount);
         }
         AttachmentTimeline.prototype.getFrameCount = function () {
@@ -420,7 +419,7 @@ var spine;
     spine.AttachmentTimeline = AttachmentTimeline;
     var EventTimeline = (function () {
         function EventTimeline(frameCount) {
-            this.frames = new Array(frameCount);
+            this.frames = spine.Utils.newFloatArray(frameCount);
             this.events = new Array(frameCount);
         }
         EventTimeline.prototype.getFrameCount = function () {
@@ -465,7 +464,7 @@ var spine;
     spine.EventTimeline = EventTimeline;
     var DrawOrderTimeline = (function () {
         function DrawOrderTimeline(frameCount) {
-            this.frames = new Array(frameCount);
+            this.frames = spine.Utils.newFloatArray(frameCount);
             this.drawOrders = new Array(frameCount);
         }
         DrawOrderTimeline.prototype.getFrameCount = function () {
@@ -503,7 +502,7 @@ var spine;
         __extends(DeformTimeline, _super);
         function DeformTimeline(frameCount) {
             _super.call(this, frameCount);
-            this.frames = new Array(frameCount);
+            this.frames = spine.Utils.newFloatArray(frameCount);
             this.frameVertices = new Array(frameCount);
         }
         /** Sets the time of the specified keyframe. */
@@ -561,7 +560,7 @@ var spine;
         __extends(IkConstraintTimeline, _super);
         function IkConstraintTimeline(frameCount) {
             _super.call(this, frameCount);
-            this.frames = new Array(frameCount * IkConstraintTimeline.ENTRIES);
+            this.frames = spine.Utils.newFloatArray(frameCount * IkConstraintTimeline.ENTRIES);
         }
         /** Sets the time, mix and bend direction of the specified keyframe. */
         IkConstraintTimeline.prototype.setFrame = function (frameIndex, time, mix, bendDirection) {
@@ -601,7 +600,7 @@ var spine;
         __extends(TransformConstraintTimeline, _super);
         function TransformConstraintTimeline(frameCount) {
             _super.call(this, frameCount);
-            this.frames = new Array(frameCount * TransformConstraintTimeline.ENTRIES);
+            this.frames = spine.Utils.newFloatArray(frameCount * TransformConstraintTimeline.ENTRIES);
         }
         /** Sets the time and mixes of the specified keyframe. */
         TransformConstraintTimeline.prototype.setFrame = function (frameIndex, time, rotateMix, translateMix, scaleMix, shearMix) {
@@ -656,7 +655,7 @@ var spine;
         __extends(PathConstraintPositionTimeline, _super);
         function PathConstraintPositionTimeline(frameCount) {
             _super.call(this, frameCount);
-            this.frames = new Array(frameCount * PathConstraintPositionTimeline.ENTRIES);
+            this.frames = spine.Utils.newFloatArray(frameCount * PathConstraintPositionTimeline.ENTRIES);
         }
         /** Sets the time and value of the specified keyframe. */
         PathConstraintPositionTimeline.prototype.setFrame = function (frameIndex, time, value) {
@@ -717,7 +716,7 @@ var spine;
         __extends(PathConstraintMixTimeline, _super);
         function PathConstraintMixTimeline(frameCount) {
             _super.call(this, frameCount);
-            this.frames = new Array(frameCount * PathConstraintMixTimeline.ENTRIES);
+            this.frames = spine.Utils.newFloatArray(frameCount * PathConstraintMixTimeline.ENTRIES);
         }
         /** Sets the time and mixes of the specified keyframe. */
         PathConstraintMixTimeline.prototype.setFrame = function (frameIndex, time, rotateMix, translateMix) {
@@ -4344,6 +4343,10 @@ var spine;
                 array[i] = defaultValue;
             return array;
         };
+        Utils.newFloatArray = function (size) {
+            var array = new Float32Array(size);
+            return array;
+        };
         return Utils;
     }());
     spine.Utils = Utils;
@@ -5218,131 +5221,139 @@ var spine;
             function Matrix4() {
                 this.temp = new Float32Array(16);
                 this.values = new Float32Array(16);
-                this.values[webgl.M00] = 1;
-                this.values[webgl.M11] = 1;
-                this.values[webgl.M22] = 1;
-                this.values[webgl.M33] = 1;
+                var v = this.values;
+                v[webgl.M00] = 1;
+                v[webgl.M11] = 1;
+                v[webgl.M22] = 1;
+                v[webgl.M33] = 1;
             }
             Matrix4.prototype.set = function (values) {
                 this.values.set(values);
                 return this;
             };
             Matrix4.prototype.transpose = function () {
-                this.temp[webgl.M00] = this.values[webgl.M00];
-                this.temp[webgl.M01] = this.values[webgl.M10];
-                this.temp[webgl.M02] = this.values[webgl.M20];
-                this.temp[webgl.M03] = this.values[webgl.M30];
-                this.temp[webgl.M10] = this.values[webgl.M01];
-                this.temp[webgl.M11] = this.values[webgl.M11];
-                this.temp[webgl.M12] = this.values[webgl.M21];
-                this.temp[webgl.M13] = this.values[webgl.M31];
-                this.temp[webgl.M20] = this.values[webgl.M02];
-                this.temp[webgl.M21] = this.values[webgl.M12];
-                this.temp[webgl.M22] = this.values[webgl.M22];
-                this.temp[webgl.M23] = this.values[webgl.M32];
-                this.temp[webgl.M30] = this.values[webgl.M03];
-                this.temp[webgl.M31] = this.values[webgl.M13];
-                this.temp[webgl.M32] = this.values[webgl.M23];
-                this.temp[webgl.M33] = this.values[webgl.M33];
-                return this.set(this.temp);
+                var t = this.temp;
+                var v = this.values;
+                t[webgl.M00] = v[webgl.M00];
+                t[webgl.M01] = v[webgl.M10];
+                t[webgl.M02] = v[webgl.M20];
+                t[webgl.M03] = v[webgl.M30];
+                t[webgl.M10] = v[webgl.M01];
+                t[webgl.M11] = v[webgl.M11];
+                t[webgl.M12] = v[webgl.M21];
+                t[webgl.M13] = v[webgl.M31];
+                t[webgl.M20] = v[webgl.M02];
+                t[webgl.M21] = v[webgl.M12];
+                t[webgl.M22] = v[webgl.M22];
+                t[webgl.M23] = v[webgl.M32];
+                t[webgl.M30] = v[webgl.M03];
+                t[webgl.M31] = v[webgl.M13];
+                t[webgl.M32] = v[webgl.M23];
+                t[webgl.M33] = v[webgl.M33];
+                return this.set(t);
             };
             Matrix4.prototype.identity = function () {
-                this.values[webgl.M00] = 1;
-                this.values[webgl.M01] = 0;
-                this.values[webgl.M02] = 0;
-                this.values[webgl.M03] = 0;
-                this.values[webgl.M10] = 0;
-                this.values[webgl.M11] = 1;
-                this.values[webgl.M12] = 0;
-                this.values[webgl.M13] = 0;
-                this.values[webgl.M20] = 0;
-                this.values[webgl.M21] = 0;
-                this.values[webgl.M22] = 1;
-                this.values[webgl.M23] = 0;
-                this.values[webgl.M30] = 0;
-                this.values[webgl.M31] = 0;
-                this.values[webgl.M32] = 0;
-                this.values[webgl.M33] = 1;
+                var v = this.values;
+                v[webgl.M00] = 1;
+                v[webgl.M01] = 0;
+                v[webgl.M02] = 0;
+                v[webgl.M03] = 0;
+                v[webgl.M10] = 0;
+                v[webgl.M11] = 1;
+                v[webgl.M12] = 0;
+                v[webgl.M13] = 0;
+                v[webgl.M20] = 0;
+                v[webgl.M21] = 0;
+                v[webgl.M22] = 1;
+                v[webgl.M23] = 0;
+                v[webgl.M30] = 0;
+                v[webgl.M31] = 0;
+                v[webgl.M32] = 0;
+                v[webgl.M33] = 1;
                 return this;
             };
             Matrix4.prototype.invert = function () {
-                var l_det = this.values[webgl.M30] * this.values[webgl.M21] * this.values[webgl.M12] * this.values[webgl.M03] - this.values[webgl.M20] * this.values[webgl.M31] * this.values[webgl.M12] * this.values[webgl.M03] - this.values[webgl.M30] * this.values[webgl.M11]
-                    * this.values[webgl.M22] * this.values[webgl.M03] + this.values[webgl.M10] * this.values[webgl.M31] * this.values[webgl.M22] * this.values[webgl.M03] + this.values[webgl.M20] * this.values[webgl.M11] * this.values[webgl.M32] * this.values[webgl.M03] - this.values[webgl.M10]
-                    * this.values[webgl.M21] * this.values[webgl.M32] * this.values[webgl.M03] - this.values[webgl.M30] * this.values[webgl.M21] * this.values[webgl.M02] * this.values[webgl.M13] + this.values[webgl.M20] * this.values[webgl.M31] * this.values[webgl.M02] * this.values[webgl.M13]
-                    + this.values[webgl.M30] * this.values[webgl.M01] * this.values[webgl.M22] * this.values[webgl.M13] - this.values[webgl.M00] * this.values[webgl.M31] * this.values[webgl.M22] * this.values[webgl.M13] - this.values[webgl.M20] * this.values[webgl.M01] * this.values[webgl.M32]
-                    * this.values[webgl.M13] + this.values[webgl.M00] * this.values[webgl.M21] * this.values[webgl.M32] * this.values[webgl.M13] + this.values[webgl.M30] * this.values[webgl.M11] * this.values[webgl.M02] * this.values[webgl.M23] - this.values[webgl.M10] * this.values[webgl.M31]
-                    * this.values[webgl.M02] * this.values[webgl.M23] - this.values[webgl.M30] * this.values[webgl.M01] * this.values[webgl.M12] * this.values[webgl.M23] + this.values[webgl.M00] * this.values[webgl.M31] * this.values[webgl.M12] * this.values[webgl.M23] + this.values[webgl.M10]
-                    * this.values[webgl.M01] * this.values[webgl.M32] * this.values[webgl.M23] - this.values[webgl.M00] * this.values[webgl.M11] * this.values[webgl.M32] * this.values[webgl.M23] - this.values[webgl.M20] * this.values[webgl.M11] * this.values[webgl.M02] * this.values[webgl.M33]
-                    + this.values[webgl.M10] * this.values[webgl.M21] * this.values[webgl.M02] * this.values[webgl.M33] + this.values[webgl.M20] * this.values[webgl.M01] * this.values[webgl.M12] * this.values[webgl.M33] - this.values[webgl.M00] * this.values[webgl.M21] * this.values[webgl.M12]
-                    * this.values[webgl.M33] - this.values[webgl.M10] * this.values[webgl.M01] * this.values[webgl.M22] * this.values[webgl.M33] + this.values[webgl.M00] * this.values[webgl.M11] * this.values[webgl.M22] * this.values[webgl.M33];
+                var v = this.values;
+                var t = this.temp;
+                var l_det = v[webgl.M30] * v[webgl.M21] * v[webgl.M12] * v[webgl.M03] - v[webgl.M20] * v[webgl.M31] * v[webgl.M12] * v[webgl.M03] - v[webgl.M30] * v[webgl.M11]
+                    * v[webgl.M22] * v[webgl.M03] + v[webgl.M10] * v[webgl.M31] * v[webgl.M22] * v[webgl.M03] + v[webgl.M20] * v[webgl.M11] * v[webgl.M32] * v[webgl.M03] - v[webgl.M10]
+                    * v[webgl.M21] * v[webgl.M32] * v[webgl.M03] - v[webgl.M30] * v[webgl.M21] * v[webgl.M02] * v[webgl.M13] + v[webgl.M20] * v[webgl.M31] * v[webgl.M02] * v[webgl.M13]
+                    + v[webgl.M30] * v[webgl.M01] * v[webgl.M22] * v[webgl.M13] - v[webgl.M00] * v[webgl.M31] * v[webgl.M22] * v[webgl.M13] - v[webgl.M20] * v[webgl.M01] * v[webgl.M32]
+                    * v[webgl.M13] + v[webgl.M00] * v[webgl.M21] * v[webgl.M32] * v[webgl.M13] + v[webgl.M30] * v[webgl.M11] * v[webgl.M02] * v[webgl.M23] - v[webgl.M10] * v[webgl.M31]
+                    * v[webgl.M02] * v[webgl.M23] - v[webgl.M30] * v[webgl.M01] * v[webgl.M12] * v[webgl.M23] + v[webgl.M00] * v[webgl.M31] * v[webgl.M12] * v[webgl.M23] + v[webgl.M10]
+                    * v[webgl.M01] * v[webgl.M32] * v[webgl.M23] - v[webgl.M00] * v[webgl.M11] * v[webgl.M32] * v[webgl.M23] - v[webgl.M20] * v[webgl.M11] * v[webgl.M02] * v[webgl.M33]
+                    + v[webgl.M10] * v[webgl.M21] * v[webgl.M02] * v[webgl.M33] + v[webgl.M20] * v[webgl.M01] * v[webgl.M12] * v[webgl.M33] - v[webgl.M00] * v[webgl.M21] * v[webgl.M12]
+                    * v[webgl.M33] - v[webgl.M10] * v[webgl.M01] * v[webgl.M22] * v[webgl.M33] + v[webgl.M00] * v[webgl.M11] * v[webgl.M22] * v[webgl.M33];
                 if (l_det == 0)
                     throw new Error("non-invertible matrix");
                 var inv_det = 1.0 / l_det;
-                this.temp[webgl.M00] = this.values[webgl.M12] * this.values[webgl.M23] * this.values[webgl.M31] - this.values[webgl.M13] * this.values[webgl.M22] * this.values[webgl.M31] + this.values[webgl.M13] * this.values[webgl.M21] * this.values[webgl.M32] - this.values[webgl.M11]
-                    * this.values[webgl.M23] * this.values[webgl.M32] - this.values[webgl.M12] * this.values[webgl.M21] * this.values[webgl.M33] + this.values[webgl.M11] * this.values[webgl.M22] * this.values[webgl.M33];
-                this.temp[webgl.M01] = this.values[webgl.M03] * this.values[webgl.M22] * this.values[webgl.M31] - this.values[webgl.M02] * this.values[webgl.M23] * this.values[webgl.M31] - this.values[webgl.M03] * this.values[webgl.M21] * this.values[webgl.M32] + this.values[webgl.M01]
-                    * this.values[webgl.M23] * this.values[webgl.M32] + this.values[webgl.M02] * this.values[webgl.M21] * this.values[webgl.M33] - this.values[webgl.M01] * this.values[webgl.M22] * this.values[webgl.M33];
-                this.temp[webgl.M02] = this.values[webgl.M02] * this.values[webgl.M13] * this.values[webgl.M31] - this.values[webgl.M03] * this.values[webgl.M12] * this.values[webgl.M31] + this.values[webgl.M03] * this.values[webgl.M11] * this.values[webgl.M32] - this.values[webgl.M01]
-                    * this.values[webgl.M13] * this.values[webgl.M32] - this.values[webgl.M02] * this.values[webgl.M11] * this.values[webgl.M33] + this.values[webgl.M01] * this.values[webgl.M12] * this.values[webgl.M33];
-                this.temp[webgl.M03] = this.values[webgl.M03] * this.values[webgl.M12] * this.values[webgl.M21] - this.values[webgl.M02] * this.values[webgl.M13] * this.values[webgl.M21] - this.values[webgl.M03] * this.values[webgl.M11] * this.values[webgl.M22] + this.values[webgl.M01]
-                    * this.values[webgl.M13] * this.values[webgl.M22] + this.values[webgl.M02] * this.values[webgl.M11] * this.values[webgl.M23] - this.values[webgl.M01] * this.values[webgl.M12] * this.values[webgl.M23];
-                this.temp[webgl.M10] = this.values[webgl.M13] * this.values[webgl.M22] * this.values[webgl.M30] - this.values[webgl.M12] * this.values[webgl.M23] * this.values[webgl.M30] - this.values[webgl.M13] * this.values[webgl.M20] * this.values[webgl.M32] + this.values[webgl.M10]
-                    * this.values[webgl.M23] * this.values[webgl.M32] + this.values[webgl.M12] * this.values[webgl.M20] * this.values[webgl.M33] - this.values[webgl.M10] * this.values[webgl.M22] * this.values[webgl.M33];
-                this.temp[webgl.M11] = this.values[webgl.M02] * this.values[webgl.M23] * this.values[webgl.M30] - this.values[webgl.M03] * this.values[webgl.M22] * this.values[webgl.M30] + this.values[webgl.M03] * this.values[webgl.M20] * this.values[webgl.M32] - this.values[webgl.M00]
-                    * this.values[webgl.M23] * this.values[webgl.M32] - this.values[webgl.M02] * this.values[webgl.M20] * this.values[webgl.M33] + this.values[webgl.M00] * this.values[webgl.M22] * this.values[webgl.M33];
-                this.temp[webgl.M12] = this.values[webgl.M03] * this.values[webgl.M12] * this.values[webgl.M30] - this.values[webgl.M02] * this.values[webgl.M13] * this.values[webgl.M30] - this.values[webgl.M03] * this.values[webgl.M10] * this.values[webgl.M32] + this.values[webgl.M00]
-                    * this.values[webgl.M13] * this.values[webgl.M32] + this.values[webgl.M02] * this.values[webgl.M10] * this.values[webgl.M33] - this.values[webgl.M00] * this.values[webgl.M12] * this.values[webgl.M33];
-                this.temp[webgl.M13] = this.values[webgl.M02] * this.values[webgl.M13] * this.values[webgl.M20] - this.values[webgl.M03] * this.values[webgl.M12] * this.values[webgl.M20] + this.values[webgl.M03] * this.values[webgl.M10] * this.values[webgl.M22] - this.values[webgl.M00]
-                    * this.values[webgl.M13] * this.values[webgl.M22] - this.values[webgl.M02] * this.values[webgl.M10] * this.values[webgl.M23] + this.values[webgl.M00] * this.values[webgl.M12] * this.values[webgl.M23];
-                this.temp[webgl.M20] = this.values[webgl.M11] * this.values[webgl.M23] * this.values[webgl.M30] - this.values[webgl.M13] * this.values[webgl.M21] * this.values[webgl.M30] + this.values[webgl.M13] * this.values[webgl.M20] * this.values[webgl.M31] - this.values[webgl.M10]
-                    * this.values[webgl.M23] * this.values[webgl.M31] - this.values[webgl.M11] * this.values[webgl.M20] * this.values[webgl.M33] + this.values[webgl.M10] * this.values[webgl.M21] * this.values[webgl.M33];
-                this.temp[webgl.M21] = this.values[webgl.M03] * this.values[webgl.M21] * this.values[webgl.M30] - this.values[webgl.M01] * this.values[webgl.M23] * this.values[webgl.M30] - this.values[webgl.M03] * this.values[webgl.M20] * this.values[webgl.M31] + this.values[webgl.M00]
-                    * this.values[webgl.M23] * this.values[webgl.M31] + this.values[webgl.M01] * this.values[webgl.M20] * this.values[webgl.M33] - this.values[webgl.M00] * this.values[webgl.M21] * this.values[webgl.M33];
-                this.temp[webgl.M22] = this.values[webgl.M01] * this.values[webgl.M13] * this.values[webgl.M30] - this.values[webgl.M03] * this.values[webgl.M11] * this.values[webgl.M30] + this.values[webgl.M03] * this.values[webgl.M10] * this.values[webgl.M31] - this.values[webgl.M00]
-                    * this.values[webgl.M13] * this.values[webgl.M31] - this.values[webgl.M01] * this.values[webgl.M10] * this.values[webgl.M33] + this.values[webgl.M00] * this.values[webgl.M11] * this.values[webgl.M33];
-                this.temp[webgl.M23] = this.values[webgl.M03] * this.values[webgl.M11] * this.values[webgl.M20] - this.values[webgl.M01] * this.values[webgl.M13] * this.values[webgl.M20] - this.values[webgl.M03] * this.values[webgl.M10] * this.values[webgl.M21] + this.values[webgl.M00]
-                    * this.values[webgl.M13] * this.values[webgl.M21] + this.values[webgl.M01] * this.values[webgl.M10] * this.values[webgl.M23] - this.values[webgl.M00] * this.values[webgl.M11] * this.values[webgl.M23];
-                this.temp[webgl.M30] = this.values[webgl.M12] * this.values[webgl.M21] * this.values[webgl.M30] - this.values[webgl.M11] * this.values[webgl.M22] * this.values[webgl.M30] - this.values[webgl.M12] * this.values[webgl.M20] * this.values[webgl.M31] + this.values[webgl.M10]
-                    * this.values[webgl.M22] * this.values[webgl.M31] + this.values[webgl.M11] * this.values[webgl.M20] * this.values[webgl.M32] - this.values[webgl.M10] * this.values[webgl.M21] * this.values[webgl.M32];
-                this.temp[webgl.M31] = this.values[webgl.M01] * this.values[webgl.M22] * this.values[webgl.M30] - this.values[webgl.M02] * this.values[webgl.M21] * this.values[webgl.M30] + this.values[webgl.M02] * this.values[webgl.M20] * this.values[webgl.M31] - this.values[webgl.M00]
-                    * this.values[webgl.M22] * this.values[webgl.M31] - this.values[webgl.M01] * this.values[webgl.M20] * this.values[webgl.M32] + this.values[webgl.M00] * this.values[webgl.M21] * this.values[webgl.M32];
-                this.temp[webgl.M32] = this.values[webgl.M02] * this.values[webgl.M11] * this.values[webgl.M30] - this.values[webgl.M01] * this.values[webgl.M12] * this.values[webgl.M30] - this.values[webgl.M02] * this.values[webgl.M10] * this.values[webgl.M31] + this.values[webgl.M00]
-                    * this.values[webgl.M12] * this.values[webgl.M31] + this.values[webgl.M01] * this.values[webgl.M10] * this.values[webgl.M32] - this.values[webgl.M00] * this.values[webgl.M11] * this.values[webgl.M32];
-                this.temp[webgl.M33] = this.values[webgl.M01] * this.values[webgl.M12] * this.values[webgl.M20] - this.values[webgl.M02] * this.values[webgl.M11] * this.values[webgl.M20] + this.values[webgl.M02] * this.values[webgl.M10] * this.values[webgl.M21] - this.values[webgl.M00]
-                    * this.values[webgl.M12] * this.values[webgl.M21] - this.values[webgl.M01] * this.values[webgl.M10] * this.values[webgl.M22] + this.values[webgl.M00] * this.values[webgl.M11] * this.values[webgl.M22];
-                this.values[webgl.M00] = this.temp[webgl.M00] * inv_det;
-                this.values[webgl.M01] = this.temp[webgl.M01] * inv_det;
-                this.values[webgl.M02] = this.temp[webgl.M02] * inv_det;
-                this.values[webgl.M03] = this.temp[webgl.M03] * inv_det;
-                this.values[webgl.M10] = this.temp[webgl.M10] * inv_det;
-                this.values[webgl.M11] = this.temp[webgl.M11] * inv_det;
-                this.values[webgl.M12] = this.temp[webgl.M12] * inv_det;
-                this.values[webgl.M13] = this.temp[webgl.M13] * inv_det;
-                this.values[webgl.M20] = this.temp[webgl.M20] * inv_det;
-                this.values[webgl.M21] = this.temp[webgl.M21] * inv_det;
-                this.values[webgl.M22] = this.temp[webgl.M22] * inv_det;
-                this.values[webgl.M23] = this.temp[webgl.M23] * inv_det;
-                this.values[webgl.M30] = this.temp[webgl.M30] * inv_det;
-                this.values[webgl.M31] = this.temp[webgl.M31] * inv_det;
-                this.values[webgl.M32] = this.temp[webgl.M32] * inv_det;
-                this.values[webgl.M33] = this.temp[webgl.M33] * inv_det;
+                t[webgl.M00] = v[webgl.M12] * v[webgl.M23] * v[webgl.M31] - v[webgl.M13] * v[webgl.M22] * v[webgl.M31] + v[webgl.M13] * v[webgl.M21] * v[webgl.M32] - v[webgl.M11]
+                    * v[webgl.M23] * v[webgl.M32] - v[webgl.M12] * v[webgl.M21] * v[webgl.M33] + v[webgl.M11] * v[webgl.M22] * v[webgl.M33];
+                t[webgl.M01] = v[webgl.M03] * v[webgl.M22] * v[webgl.M31] - v[webgl.M02] * v[webgl.M23] * v[webgl.M31] - v[webgl.M03] * v[webgl.M21] * v[webgl.M32] + v[webgl.M01]
+                    * v[webgl.M23] * v[webgl.M32] + v[webgl.M02] * v[webgl.M21] * v[webgl.M33] - v[webgl.M01] * v[webgl.M22] * v[webgl.M33];
+                t[webgl.M02] = v[webgl.M02] * v[webgl.M13] * v[webgl.M31] - v[webgl.M03] * v[webgl.M12] * v[webgl.M31] + v[webgl.M03] * v[webgl.M11] * v[webgl.M32] - v[webgl.M01]
+                    * v[webgl.M13] * v[webgl.M32] - v[webgl.M02] * v[webgl.M11] * v[webgl.M33] + v[webgl.M01] * v[webgl.M12] * v[webgl.M33];
+                t[webgl.M03] = v[webgl.M03] * v[webgl.M12] * v[webgl.M21] - v[webgl.M02] * v[webgl.M13] * v[webgl.M21] - v[webgl.M03] * v[webgl.M11] * v[webgl.M22] + v[webgl.M01]
+                    * v[webgl.M13] * v[webgl.M22] + v[webgl.M02] * v[webgl.M11] * v[webgl.M23] - v[webgl.M01] * v[webgl.M12] * v[webgl.M23];
+                t[webgl.M10] = v[webgl.M13] * v[webgl.M22] * v[webgl.M30] - v[webgl.M12] * v[webgl.M23] * v[webgl.M30] - v[webgl.M13] * v[webgl.M20] * v[webgl.M32] + v[webgl.M10]
+                    * v[webgl.M23] * v[webgl.M32] + v[webgl.M12] * v[webgl.M20] * v[webgl.M33] - v[webgl.M10] * v[webgl.M22] * v[webgl.M33];
+                t[webgl.M11] = v[webgl.M02] * v[webgl.M23] * v[webgl.M30] - v[webgl.M03] * v[webgl.M22] * v[webgl.M30] + v[webgl.M03] * v[webgl.M20] * v[webgl.M32] - v[webgl.M00]
+                    * v[webgl.M23] * v[webgl.M32] - v[webgl.M02] * v[webgl.M20] * v[webgl.M33] + v[webgl.M00] * v[webgl.M22] * v[webgl.M33];
+                t[webgl.M12] = v[webgl.M03] * v[webgl.M12] * v[webgl.M30] - v[webgl.M02] * v[webgl.M13] * v[webgl.M30] - v[webgl.M03] * v[webgl.M10] * v[webgl.M32] + v[webgl.M00]
+                    * v[webgl.M13] * v[webgl.M32] + v[webgl.M02] * v[webgl.M10] * v[webgl.M33] - v[webgl.M00] * v[webgl.M12] * v[webgl.M33];
+                t[webgl.M13] = v[webgl.M02] * v[webgl.M13] * v[webgl.M20] - v[webgl.M03] * v[webgl.M12] * v[webgl.M20] + v[webgl.M03] * v[webgl.M10] * v[webgl.M22] - v[webgl.M00]
+                    * v[webgl.M13] * v[webgl.M22] - v[webgl.M02] * v[webgl.M10] * v[webgl.M23] + v[webgl.M00] * v[webgl.M12] * v[webgl.M23];
+                t[webgl.M20] = v[webgl.M11] * v[webgl.M23] * v[webgl.M30] - v[webgl.M13] * v[webgl.M21] * v[webgl.M30] + v[webgl.M13] * v[webgl.M20] * v[webgl.M31] - v[webgl.M10]
+                    * v[webgl.M23] * v[webgl.M31] - v[webgl.M11] * v[webgl.M20] * v[webgl.M33] + v[webgl.M10] * v[webgl.M21] * v[webgl.M33];
+                t[webgl.M21] = v[webgl.M03] * v[webgl.M21] * v[webgl.M30] - v[webgl.M01] * v[webgl.M23] * v[webgl.M30] - v[webgl.M03] * v[webgl.M20] * v[webgl.M31] + v[webgl.M00]
+                    * v[webgl.M23] * v[webgl.M31] + v[webgl.M01] * v[webgl.M20] * v[webgl.M33] - v[webgl.M00] * v[webgl.M21] * v[webgl.M33];
+                t[webgl.M22] = v[webgl.M01] * v[webgl.M13] * v[webgl.M30] - v[webgl.M03] * v[webgl.M11] * v[webgl.M30] + v[webgl.M03] * v[webgl.M10] * v[webgl.M31] - v[webgl.M00]
+                    * v[webgl.M13] * v[webgl.M31] - v[webgl.M01] * v[webgl.M10] * v[webgl.M33] + v[webgl.M00] * v[webgl.M11] * v[webgl.M33];
+                t[webgl.M23] = v[webgl.M03] * v[webgl.M11] * v[webgl.M20] - v[webgl.M01] * v[webgl.M13] * v[webgl.M20] - v[webgl.M03] * v[webgl.M10] * v[webgl.M21] + v[webgl.M00]
+                    * v[webgl.M13] * v[webgl.M21] + v[webgl.M01] * v[webgl.M10] * v[webgl.M23] - v[webgl.M00] * v[webgl.M11] * v[webgl.M23];
+                t[webgl.M30] = v[webgl.M12] * v[webgl.M21] * v[webgl.M30] - v[webgl.M11] * v[webgl.M22] * v[webgl.M30] - v[webgl.M12] * v[webgl.M20] * v[webgl.M31] + v[webgl.M10]
+                    * v[webgl.M22] * v[webgl.M31] + v[webgl.M11] * v[webgl.M20] * v[webgl.M32] - v[webgl.M10] * v[webgl.M21] * v[webgl.M32];
+                t[webgl.M31] = v[webgl.M01] * v[webgl.M22] * v[webgl.M30] - v[webgl.M02] * v[webgl.M21] * v[webgl.M30] + v[webgl.M02] * v[webgl.M20] * v[webgl.M31] - v[webgl.M00]
+                    * v[webgl.M22] * v[webgl.M31] - v[webgl.M01] * v[webgl.M20] * v[webgl.M32] + v[webgl.M00] * v[webgl.M21] * v[webgl.M32];
+                t[webgl.M32] = v[webgl.M02] * v[webgl.M11] * v[webgl.M30] - v[webgl.M01] * v[webgl.M12] * v[webgl.M30] - v[webgl.M02] * v[webgl.M10] * v[webgl.M31] + v[webgl.M00]
+                    * v[webgl.M12] * v[webgl.M31] + v[webgl.M01] * v[webgl.M10] * v[webgl.M32] - v[webgl.M00] * v[webgl.M11] * v[webgl.M32];
+                t[webgl.M33] = v[webgl.M01] * v[webgl.M12] * v[webgl.M20] - v[webgl.M02] * v[webgl.M11] * v[webgl.M20] + v[webgl.M02] * v[webgl.M10] * v[webgl.M21] - v[webgl.M00]
+                    * v[webgl.M12] * v[webgl.M21] - v[webgl.M01] * v[webgl.M10] * v[webgl.M22] + v[webgl.M00] * v[webgl.M11] * v[webgl.M22];
+                v[webgl.M00] = t[webgl.M00] * inv_det;
+                v[webgl.M01] = t[webgl.M01] * inv_det;
+                v[webgl.M02] = t[webgl.M02] * inv_det;
+                v[webgl.M03] = t[webgl.M03] * inv_det;
+                v[webgl.M10] = t[webgl.M10] * inv_det;
+                v[webgl.M11] = t[webgl.M11] * inv_det;
+                v[webgl.M12] = t[webgl.M12] * inv_det;
+                v[webgl.M13] = t[webgl.M13] * inv_det;
+                v[webgl.M20] = t[webgl.M20] * inv_det;
+                v[webgl.M21] = t[webgl.M21] * inv_det;
+                v[webgl.M22] = t[webgl.M22] * inv_det;
+                v[webgl.M23] = t[webgl.M23] * inv_det;
+                v[webgl.M30] = t[webgl.M30] * inv_det;
+                v[webgl.M31] = t[webgl.M31] * inv_det;
+                v[webgl.M32] = t[webgl.M32] * inv_det;
+                v[webgl.M33] = t[webgl.M33] * inv_det;
                 return this;
             };
             Matrix4.prototype.determinant = function () {
-                return this.values[webgl.M30] * this.values[webgl.M21] * this.values[webgl.M12] * this.values[webgl.M03] - this.values[webgl.M20] * this.values[webgl.M31] * this.values[webgl.M12] * this.values[webgl.M03] - this.values[webgl.M30] * this.values[webgl.M11]
-                    * this.values[webgl.M22] * this.values[webgl.M03] + this.values[webgl.M10] * this.values[webgl.M31] * this.values[webgl.M22] * this.values[webgl.M03] + this.values[webgl.M20] * this.values[webgl.M11] * this.values[webgl.M32] * this.values[webgl.M03] - this.values[webgl.M10]
-                    * this.values[webgl.M21] * this.values[webgl.M32] * this.values[webgl.M03] - this.values[webgl.M30] * this.values[webgl.M21] * this.values[webgl.M02] * this.values[webgl.M13] + this.values[webgl.M20] * this.values[webgl.M31] * this.values[webgl.M02] * this.values[webgl.M13]
-                    + this.values[webgl.M30] * this.values[webgl.M01] * this.values[webgl.M22] * this.values[webgl.M13] - this.values[webgl.M00] * this.values[webgl.M31] * this.values[webgl.M22] * this.values[webgl.M13] - this.values[webgl.M20] * this.values[webgl.M01] * this.values[webgl.M32]
-                    * this.values[webgl.M13] + this.values[webgl.M00] * this.values[webgl.M21] * this.values[webgl.M32] * this.values[webgl.M13] + this.values[webgl.M30] * this.values[webgl.M11] * this.values[webgl.M02] * this.values[webgl.M23] - this.values[webgl.M10] * this.values[webgl.M31]
-                    * this.values[webgl.M02] * this.values[webgl.M23] - this.values[webgl.M30] * this.values[webgl.M01] * this.values[webgl.M12] * this.values[webgl.M23] + this.values[webgl.M00] * this.values[webgl.M31] * this.values[webgl.M12] * this.values[webgl.M23] + this.values[webgl.M10]
-                    * this.values[webgl.M01] * this.values[webgl.M32] * this.values[webgl.M23] - this.values[webgl.M00] * this.values[webgl.M11] * this.values[webgl.M32] * this.values[webgl.M23] - this.values[webgl.M20] * this.values[webgl.M11] * this.values[webgl.M02] * this.values[webgl.M33]
-                    + this.values[webgl.M10] * this.values[webgl.M21] * this.values[webgl.M02] * this.values[webgl.M33] + this.values[webgl.M20] * this.values[webgl.M01] * this.values[webgl.M12] * this.values[webgl.M33] - this.values[webgl.M00] * this.values[webgl.M21] * this.values[webgl.M12]
-                    * this.values[webgl.M33] - this.values[webgl.M10] * this.values[webgl.M01] * this.values[webgl.M22] * this.values[webgl.M33] + this.values[webgl.M00] * this.values[webgl.M11] * this.values[webgl.M22] * this.values[webgl.M33];
+                var v = this.values;
+                return v[webgl.M30] * v[webgl.M21] * v[webgl.M12] * v[webgl.M03] - v[webgl.M20] * v[webgl.M31] * v[webgl.M12] * v[webgl.M03] - v[webgl.M30] * v[webgl.M11]
+                    * v[webgl.M22] * v[webgl.M03] + v[webgl.M10] * v[webgl.M31] * v[webgl.M22] * v[webgl.M03] + v[webgl.M20] * v[webgl.M11] * v[webgl.M32] * v[webgl.M03] - v[webgl.M10]
+                    * v[webgl.M21] * v[webgl.M32] * v[webgl.M03] - v[webgl.M30] * v[webgl.M21] * v[webgl.M02] * v[webgl.M13] + v[webgl.M20] * v[webgl.M31] * v[webgl.M02] * v[webgl.M13]
+                    + v[webgl.M30] * v[webgl.M01] * v[webgl.M22] * v[webgl.M13] - v[webgl.M00] * v[webgl.M31] * v[webgl.M22] * v[webgl.M13] - v[webgl.M20] * v[webgl.M01] * v[webgl.M32]
+                    * v[webgl.M13] + v[webgl.M00] * v[webgl.M21] * v[webgl.M32] * v[webgl.M13] + v[webgl.M30] * v[webgl.M11] * v[webgl.M02] * v[webgl.M23] - v[webgl.M10] * v[webgl.M31]
+                    * v[webgl.M02] * v[webgl.M23] - v[webgl.M30] * v[webgl.M01] * v[webgl.M12] * v[webgl.M23] + v[webgl.M00] * v[webgl.M31] * v[webgl.M12] * v[webgl.M23] + v[webgl.M10]
+                    * v[webgl.M01] * v[webgl.M32] * v[webgl.M23] - v[webgl.M00] * v[webgl.M11] * v[webgl.M32] * v[webgl.M23] - v[webgl.M20] * v[webgl.M11] * v[webgl.M02] * v[webgl.M33]
+                    + v[webgl.M10] * v[webgl.M21] * v[webgl.M02] * v[webgl.M33] + v[webgl.M20] * v[webgl.M01] * v[webgl.M12] * v[webgl.M33] - v[webgl.M00] * v[webgl.M21] * v[webgl.M12]
+                    * v[webgl.M33] - v[webgl.M10] * v[webgl.M01] * v[webgl.M22] * v[webgl.M33] + v[webgl.M00] * v[webgl.M11] * v[webgl.M22] * v[webgl.M33];
             };
             Matrix4.prototype.translate = function (x, y, z) {
-                this.values[webgl.M03] += x;
-                this.values[webgl.M13] += y;
-                this.values[webgl.M23] += z;
+                var v = this.values;
+                v[webgl.M03] += x;
+                v[webgl.M13] += y;
+                v[webgl.M23] += z;
                 return this;
             };
             Matrix4.prototype.copy = function () {
@@ -5353,22 +5364,23 @@ var spine;
                 var l_fd = (1.0 / Math.tan((fovy * (Math.PI / 180)) / 2.0));
                 var l_a1 = (far + near) / (near - far);
                 var l_a2 = (2 * far * near) / (near - far);
-                this.values[webgl.M00] = l_fd / aspectRatio;
-                this.values[webgl.M10] = 0;
-                this.values[webgl.M20] = 0;
-                this.values[webgl.M30] = 0;
-                this.values[webgl.M01] = 0;
-                this.values[webgl.M11] = l_fd;
-                this.values[webgl.M21] = 0;
-                this.values[webgl.M31] = 0;
-                this.values[webgl.M02] = 0;
-                this.values[webgl.M12] = 0;
-                this.values[webgl.M22] = l_a1;
-                this.values[webgl.M32] = -1;
-                this.values[webgl.M03] = 0;
-                this.values[webgl.M13] = 0;
-                this.values[webgl.M23] = l_a2;
-                this.values[webgl.M33] = 0;
+                var v = this.values;
+                v[webgl.M00] = l_fd / aspectRatio;
+                v[webgl.M10] = 0;
+                v[webgl.M20] = 0;
+                v[webgl.M30] = 0;
+                v[webgl.M01] = 0;
+                v[webgl.M11] = l_fd;
+                v[webgl.M21] = 0;
+                v[webgl.M31] = 0;
+                v[webgl.M02] = 0;
+                v[webgl.M12] = 0;
+                v[webgl.M22] = l_a1;
+                v[webgl.M32] = -1;
+                v[webgl.M03] = 0;
+                v[webgl.M13] = 0;
+                v[webgl.M23] = l_a2;
+                v[webgl.M33] = 0;
                 return this;
             };
             Matrix4.prototype.ortho2d = function (x, y, width, height) {
@@ -5382,92 +5394,67 @@ var spine;
                 var tx = -(right + left) / (right - left);
                 var ty = -(top + bottom) / (top - bottom);
                 var tz = -(far + near) / (far - near);
-                this.values[webgl.M00] = x_orth;
-                this.values[webgl.M10] = 0;
-                this.values[webgl.M20] = 0;
-                this.values[webgl.M30] = 0;
-                this.values[webgl.M01] = 0;
-                this.values[webgl.M11] = y_orth;
-                this.values[webgl.M21] = 0;
-                this.values[webgl.M31] = 0;
-                this.values[webgl.M02] = 0;
-                this.values[webgl.M12] = 0;
-                this.values[webgl.M22] = z_orth;
-                this.values[webgl.M32] = 0;
-                this.values[webgl.M03] = tx;
-                this.values[webgl.M13] = ty;
-                this.values[webgl.M23] = tz;
-                this.values[webgl.M33] = 1;
+                var v = this.values;
+                v[webgl.M00] = x_orth;
+                v[webgl.M10] = 0;
+                v[webgl.M20] = 0;
+                v[webgl.M30] = 0;
+                v[webgl.M01] = 0;
+                v[webgl.M11] = y_orth;
+                v[webgl.M21] = 0;
+                v[webgl.M31] = 0;
+                v[webgl.M02] = 0;
+                v[webgl.M12] = 0;
+                v[webgl.M22] = z_orth;
+                v[webgl.M32] = 0;
+                v[webgl.M03] = tx;
+                v[webgl.M13] = ty;
+                v[webgl.M23] = tz;
+                v[webgl.M33] = 1;
                 return this;
             };
             Matrix4.prototype.multiply = function (matrix) {
-                this.temp[webgl.M00] = this.values[webgl.M00] * matrix.values[webgl.M00] + this.values[webgl.M01] * matrix.values[webgl.M10] + this.values[webgl.M02] * matrix.values[webgl.M20] + this.values[webgl.M03]
-                    * matrix.values[webgl.M30];
-                this.temp[webgl.M01] = this.values[webgl.M00] * matrix.values[webgl.M01] + this.values[webgl.M01] * matrix.values[webgl.M11] + this.values[webgl.M02] * matrix.values[webgl.M21] + this.values[webgl.M03]
-                    * matrix.values[webgl.M31];
-                this.temp[webgl.M02] = this.values[webgl.M00] * matrix.values[webgl.M02] + this.values[webgl.M01] * matrix.values[webgl.M12] + this.values[webgl.M02] * matrix.values[webgl.M22] + this.values[webgl.M03]
-                    * matrix.values[webgl.M32];
-                this.temp[webgl.M03] = this.values[webgl.M00] * matrix.values[webgl.M03] + this.values[webgl.M01] * matrix.values[webgl.M13] + this.values[webgl.M02] * matrix.values[webgl.M23] + this.values[webgl.M03]
-                    * matrix.values[webgl.M33];
-                this.temp[webgl.M10] = this.values[webgl.M10] * matrix.values[webgl.M00] + this.values[webgl.M11] * matrix.values[webgl.M10] + this.values[webgl.M12] * matrix.values[webgl.M20] + this.values[webgl.M13]
-                    * matrix.values[webgl.M30];
-                this.temp[webgl.M11] = this.values[webgl.M10] * matrix.values[webgl.M01] + this.values[webgl.M11] * matrix.values[webgl.M11] + this.values[webgl.M12] * matrix.values[webgl.M21] + this.values[webgl.M13]
-                    * matrix.values[webgl.M31];
-                this.temp[webgl.M12] = this.values[webgl.M10] * matrix.values[webgl.M02] + this.values[webgl.M11] * matrix.values[webgl.M12] + this.values[webgl.M12] * matrix.values[webgl.M22] + this.values[webgl.M13]
-                    * matrix.values[webgl.M32];
-                this.temp[webgl.M13] = this.values[webgl.M10] * matrix.values[webgl.M03] + this.values[webgl.M11] * matrix.values[webgl.M13] + this.values[webgl.M12] * matrix.values[webgl.M23] + this.values[webgl.M13]
-                    * matrix.values[webgl.M33];
-                this.temp[webgl.M20] = this.values[webgl.M20] * matrix.values[webgl.M00] + this.values[webgl.M21] * matrix.values[webgl.M10] + this.values[webgl.M22] * matrix.values[webgl.M20] + this.values[webgl.M23]
-                    * matrix.values[webgl.M30];
-                this.temp[webgl.M21] = this.values[webgl.M20] * matrix.values[webgl.M01] + this.values[webgl.M21] * matrix.values[webgl.M11] + this.values[webgl.M22] * matrix.values[webgl.M21] + this.values[webgl.M23]
-                    * matrix.values[webgl.M31];
-                this.temp[webgl.M22] = this.values[webgl.M20] * matrix.values[webgl.M02] + this.values[webgl.M21] * matrix.values[webgl.M12] + this.values[webgl.M22] * matrix.values[webgl.M22] + this.values[webgl.M23]
-                    * matrix.values[webgl.M32];
-                this.temp[webgl.M23] = this.values[webgl.M20] * matrix.values[webgl.M03] + this.values[webgl.M21] * matrix.values[webgl.M13] + this.values[webgl.M22] * matrix.values[webgl.M23] + this.values[webgl.M23]
-                    * matrix.values[webgl.M33];
-                this.temp[webgl.M30] = this.values[webgl.M30] * matrix.values[webgl.M00] + this.values[webgl.M31] * matrix.values[webgl.M10] + this.values[webgl.M32] * matrix.values[webgl.M20] + this.values[webgl.M33]
-                    * matrix.values[webgl.M30];
-                this.temp[webgl.M31] = this.values[webgl.M30] * matrix.values[webgl.M01] + this.values[webgl.M31] * matrix.values[webgl.M11] + this.values[webgl.M32] * matrix.values[webgl.M21] + this.values[webgl.M33]
-                    * matrix.values[webgl.M31];
-                this.temp[webgl.M32] = this.values[webgl.M30] * matrix.values[webgl.M02] + this.values[webgl.M31] * matrix.values[webgl.M12] + this.values[webgl.M32] * matrix.values[webgl.M22] + this.values[webgl.M33]
-                    * matrix.values[webgl.M32];
-                this.temp[webgl.M33] = this.values[webgl.M30] * matrix.values[webgl.M03] + this.values[webgl.M31] * matrix.values[webgl.M13] + this.values[webgl.M32] * matrix.values[webgl.M23] + this.values[webgl.M33]
-                    * matrix.values[webgl.M33];
+                var t = this.temp;
+                var v = this.values;
+                var m = matrix.values;
+                t[webgl.M00] = v[webgl.M00] * m[webgl.M00] + v[webgl.M01] * m[webgl.M10] + v[webgl.M02] * m[webgl.M20] + v[webgl.M03] * m[webgl.M30];
+                t[webgl.M01] = v[webgl.M00] * m[webgl.M01] + v[webgl.M01] * m[webgl.M11] + v[webgl.M02] * m[webgl.M21] + v[webgl.M03] * m[webgl.M31];
+                t[webgl.M02] = v[webgl.M00] * m[webgl.M02] + v[webgl.M01] * m[webgl.M12] + v[webgl.M02] * m[webgl.M22] + v[webgl.M03] * m[webgl.M32];
+                t[webgl.M03] = v[webgl.M00] * m[webgl.M03] + v[webgl.M01] * m[webgl.M13] + v[webgl.M02] * m[webgl.M23] + v[webgl.M03] * m[webgl.M33];
+                t[webgl.M10] = v[webgl.M10] * m[webgl.M00] + v[webgl.M11] * m[webgl.M10] + v[webgl.M12] * m[webgl.M20] + v[webgl.M13] * m[webgl.M30];
+                t[webgl.M11] = v[webgl.M10] * m[webgl.M01] + v[webgl.M11] * m[webgl.M11] + v[webgl.M12] * m[webgl.M21] + v[webgl.M13] * m[webgl.M31];
+                t[webgl.M12] = v[webgl.M10] * m[webgl.M02] + v[webgl.M11] * m[webgl.M12] + v[webgl.M12] * m[webgl.M22] + v[webgl.M13] * m[webgl.M32];
+                t[webgl.M13] = v[webgl.M10] * m[webgl.M03] + v[webgl.M11] * m[webgl.M13] + v[webgl.M12] * m[webgl.M23] + v[webgl.M13] * m[webgl.M33];
+                t[webgl.M20] = v[webgl.M20] * m[webgl.M00] + v[webgl.M21] * m[webgl.M10] + v[webgl.M22] * m[webgl.M20] + v[webgl.M23] * m[webgl.M30];
+                t[webgl.M21] = v[webgl.M20] * m[webgl.M01] + v[webgl.M21] * m[webgl.M11] + v[webgl.M22] * m[webgl.M21] + v[webgl.M23] * m[webgl.M31];
+                t[webgl.M22] = v[webgl.M20] * m[webgl.M02] + v[webgl.M21] * m[webgl.M12] + v[webgl.M22] * m[webgl.M22] + v[webgl.M23] * m[webgl.M32];
+                t[webgl.M23] = v[webgl.M20] * m[webgl.M03] + v[webgl.M21] * m[webgl.M13] + v[webgl.M22] * m[webgl.M23] + v[webgl.M23] * m[webgl.M33];
+                t[webgl.M30] = v[webgl.M30] * m[webgl.M00] + v[webgl.M31] * m[webgl.M10] + v[webgl.M32] * m[webgl.M20] + v[webgl.M33] * m[webgl.M30];
+                t[webgl.M31] = v[webgl.M30] * m[webgl.M01] + v[webgl.M31] * m[webgl.M11] + v[webgl.M32] * m[webgl.M21] + v[webgl.M33] * m[webgl.M31];
+                t[webgl.M32] = v[webgl.M30] * m[webgl.M02] + v[webgl.M31] * m[webgl.M12] + v[webgl.M32] * m[webgl.M22] + v[webgl.M33] * m[webgl.M32];
+                t[webgl.M33] = v[webgl.M30] * m[webgl.M03] + v[webgl.M31] * m[webgl.M13] + v[webgl.M32] * m[webgl.M23] + v[webgl.M33] * m[webgl.M33];
                 return this.set(this.temp);
             };
             Matrix4.prototype.multiplyLeft = function (matrix) {
-                this.temp[webgl.M00] = matrix.values[webgl.M00] * this.values[webgl.M00] + matrix.values[webgl.M01] * this.values[webgl.M10] + matrix.values[webgl.M02] * this.values[webgl.M20] + matrix.values[webgl.M03]
-                    * this.values[webgl.M30];
-                this.temp[webgl.M01] = matrix.values[webgl.M00] * this.values[webgl.M01] + matrix.values[webgl.M01] * this.values[webgl.M11] + matrix.values[webgl.M02] * this.values[webgl.M21] + matrix.values[webgl.M03]
-                    * this.values[webgl.M31];
-                this.temp[webgl.M02] = matrix.values[webgl.M00] * this.values[webgl.M02] + matrix.values[webgl.M01] * this.values[webgl.M12] + matrix.values[webgl.M02] * this.values[webgl.M22] + matrix.values[webgl.M03]
-                    * this.values[webgl.M32];
-                this.temp[webgl.M03] = matrix.values[webgl.M00] * this.values[webgl.M03] + matrix.values[webgl.M01] * this.values[webgl.M13] + matrix.values[webgl.M02] * this.values[webgl.M23] + matrix.values[webgl.M03]
-                    * this.values[webgl.M33];
-                this.temp[webgl.M10] = matrix.values[webgl.M10] * this.values[webgl.M00] + matrix.values[webgl.M11] * this.values[webgl.M10] + matrix.values[webgl.M12] * this.values[webgl.M20] + matrix.values[webgl.M13]
-                    * this.values[webgl.M30];
-                this.temp[webgl.M11] = matrix.values[webgl.M10] * this.values[webgl.M01] + matrix.values[webgl.M11] * this.values[webgl.M11] + matrix.values[webgl.M12] * this.values[webgl.M21] + matrix.values[webgl.M13]
-                    * this.values[webgl.M31];
-                this.temp[webgl.M12] = matrix.values[webgl.M10] * this.values[webgl.M02] + matrix.values[webgl.M11] * this.values[webgl.M12] + matrix.values[webgl.M12] * this.values[webgl.M22] + matrix.values[webgl.M13]
-                    * this.values[webgl.M32];
-                this.temp[webgl.M13] = matrix.values[webgl.M10] * this.values[webgl.M03] + matrix.values[webgl.M11] * this.values[webgl.M13] + matrix.values[webgl.M12] * this.values[webgl.M23] + matrix.values[webgl.M13]
-                    * this.values[webgl.M33];
-                this.temp[webgl.M20] = matrix.values[webgl.M20] * this.values[webgl.M00] + matrix.values[webgl.M21] * this.values[webgl.M10] + matrix.values[webgl.M22] * this.values[webgl.M20] + matrix.values[webgl.M23]
-                    * this.values[webgl.M30];
-                this.temp[webgl.M21] = matrix.values[webgl.M20] * this.values[webgl.M01] + matrix.values[webgl.M21] * this.values[webgl.M11] + matrix.values[webgl.M22] * this.values[webgl.M21] + matrix.values[webgl.M23]
-                    * this.values[webgl.M31];
-                this.temp[webgl.M22] = matrix.values[webgl.M20] * this.values[webgl.M02] + matrix.values[webgl.M21] * this.values[webgl.M12] + matrix.values[webgl.M22] * this.values[webgl.M22] + matrix.values[webgl.M23]
-                    * this.values[webgl.M32];
-                this.temp[webgl.M23] = matrix.values[webgl.M20] * this.values[webgl.M03] + matrix.values[webgl.M21] * this.values[webgl.M13] + matrix.values[webgl.M22] * this.values[webgl.M23] + matrix.values[webgl.M23]
-                    * this.values[webgl.M33];
-                this.temp[webgl.M30] = matrix.values[webgl.M30] * this.values[webgl.M00] + matrix.values[webgl.M31] * this.values[webgl.M10] + matrix.values[webgl.M32] * this.values[webgl.M20] + matrix.values[webgl.M33]
-                    * this.values[webgl.M30];
-                this.temp[webgl.M31] = matrix.values[webgl.M30] * this.values[webgl.M01] + matrix.values[webgl.M31] * this.values[webgl.M11] + matrix.values[webgl.M32] * this.values[webgl.M21] + matrix.values[webgl.M33]
-                    * this.values[webgl.M31];
-                this.temp[webgl.M32] = matrix.values[webgl.M30] * this.values[webgl.M02] + matrix.values[webgl.M31] * this.values[webgl.M12] + matrix.values[webgl.M32] * this.values[webgl.M22] + matrix.values[webgl.M33]
-                    * this.values[webgl.M32];
-                this.temp[webgl.M33] = matrix.values[webgl.M30] * this.values[webgl.M03] + matrix.values[webgl.M31] * this.values[webgl.M13] + matrix.values[webgl.M32] * this.values[webgl.M23] + matrix.values[webgl.M33]
-                    * this.values[webgl.M33];
+                var t = this.temp;
+                var v = this.values;
+                var m = matrix.values;
+                t[webgl.M00] = m[webgl.M00] * v[webgl.M00] + m[webgl.M01] * v[webgl.M10] + m[webgl.M02] * v[webgl.M20] + m[webgl.M03] * v[webgl.M30];
+                t[webgl.M01] = m[webgl.M00] * v[webgl.M01] + m[webgl.M01] * v[webgl.M11] + m[webgl.M02] * v[webgl.M21] + m[webgl.M03] * v[webgl.M31];
+                t[webgl.M02] = m[webgl.M00] * v[webgl.M02] + m[webgl.M01] * v[webgl.M12] + m[webgl.M02] * v[webgl.M22] + m[webgl.M03] * v[webgl.M32];
+                t[webgl.M03] = m[webgl.M00] * v[webgl.M03] + m[webgl.M01] * v[webgl.M13] + m[webgl.M02] * v[webgl.M23] + m[webgl.M03] * v[webgl.M33];
+                t[webgl.M10] = m[webgl.M10] * v[webgl.M00] + m[webgl.M11] * v[webgl.M10] + m[webgl.M12] * v[webgl.M20] + m[webgl.M13] * v[webgl.M30];
+                t[webgl.M11] = m[webgl.M10] * v[webgl.M01] + m[webgl.M11] * v[webgl.M11] + m[webgl.M12] * v[webgl.M21] + m[webgl.M13] * v[webgl.M31];
+                t[webgl.M12] = m[webgl.M10] * v[webgl.M02] + m[webgl.M11] * v[webgl.M12] + m[webgl.M12] * v[webgl.M22] + m[webgl.M13] * v[webgl.M32];
+                t[webgl.M13] = m[webgl.M10] * v[webgl.M03] + m[webgl.M11] * v[webgl.M13] + m[webgl.M12] * v[webgl.M23] + m[webgl.M13] * v[webgl.M33];
+                t[webgl.M20] = m[webgl.M20] * v[webgl.M00] + m[webgl.M21] * v[webgl.M10] + m[webgl.M22] * v[webgl.M20] + m[webgl.M23] * v[webgl.M30];
+                t[webgl.M21] = m[webgl.M20] * v[webgl.M01] + m[webgl.M21] * v[webgl.M11] + m[webgl.M22] * v[webgl.M21] + m[webgl.M23] * v[webgl.M31];
+                t[webgl.M22] = m[webgl.M20] * v[webgl.M02] + m[webgl.M21] * v[webgl.M12] + m[webgl.M22] * v[webgl.M22] + m[webgl.M23] * v[webgl.M32];
+                t[webgl.M23] = m[webgl.M20] * v[webgl.M03] + m[webgl.M21] * v[webgl.M13] + m[webgl.M22] * v[webgl.M23] + m[webgl.M23] * v[webgl.M33];
+                t[webgl.M30] = m[webgl.M30] * v[webgl.M00] + m[webgl.M31] * v[webgl.M10] + m[webgl.M32] * v[webgl.M20] + m[webgl.M33] * v[webgl.M30];
+                t[webgl.M31] = m[webgl.M30] * v[webgl.M01] + m[webgl.M31] * v[webgl.M11] + m[webgl.M32] * v[webgl.M21] + m[webgl.M33] * v[webgl.M31];
+                t[webgl.M32] = m[webgl.M30] * v[webgl.M02] + m[webgl.M31] * v[webgl.M12] + m[webgl.M32] * v[webgl.M22] + m[webgl.M33] * v[webgl.M32];
+                t[webgl.M33] = m[webgl.M30] * v[webgl.M03] + m[webgl.M31] * v[webgl.M13] + m[webgl.M32] * v[webgl.M23] + m[webgl.M33] * v[webgl.M33];
                 return this.set(this.temp);
             };
             return Matrix4;

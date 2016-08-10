@@ -125,7 +125,7 @@ module spine {
 	}
 
 	export class Utils {
-		static arrayCopy<T> (source: Array<T>, sourceStart: number, dest: Array<T>, destStart: number, numElements: number) {
+		static arrayCopy<T> (source: ArrayLike<T>, sourceStart: number, dest: ArrayLike<T>, destStart: number, numElements: number) {
 			for (var i = sourceStart, j = destStart; i < sourceStart + numElements; i++, j++) {
 				dest[j] = source[i];
 			}
@@ -144,6 +144,11 @@ module spine {
 		static newArray<T> (size: number, defaultValue: T): Array<T> {
 			let array = new Array<T>(size);
 			for (var i = 0; i < size; i++) array[i] = defaultValue;
+			return array;
+		}
+
+		static newFloatArray (size: number): ArrayLike<number> {
+			let array = new Float32Array(size);
 			return array;
 		}
 	}

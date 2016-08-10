@@ -112,16 +112,16 @@ function loadSkeleton(name, scale, initialAnimation, positionX, positionY, premu
     animationState.setAnimation(0, initialAnimation, true);
     animationState.addListener({
         event: function(trackIndex, event) {
-            console.log("Event on track " + trackIndex + ": " + JSON.stringify(event));
+            // console.log("Event on track " + trackIndex + ": " + JSON.stringify(event));
         },
         complete: function(trackIndex, loopCount) {
-            console.log("Animation on track " + trackIndex + " completed, loop count: " + loopCount);
+            // console.log("Animation on track " + trackIndex + " completed, loop count: " + loopCount);
         },
         start: function(trackIndex) {
-            console.log("Animation on track " + trackIndex + " started");
+            // console.log("Animation on track " + trackIndex + " started");
         },
         end: function(trackIndex) {
-            console.log("Animation on track " + trackIndex + " ended");
+            // console.log("Animation on track " + trackIndex + " ended");
         }
     })
 

@@ -52,10 +52,11 @@ module spine.webgl {
 		values: Float32Array = new Float32Array(16);
 
 		constructor() {
-			this.values[M00] = 1;
-			this.values[M11] = 1;
-			this.values[M22] = 1;
-			this.values[M33] = 1;
+			let v = this.values;
+			v[M00] = 1;
+			v[M11] = 1;
+			v[M22] = 1;
+			v[M33] = 1;
 		}
 
 		set(values: Float32Array | Array<number>): Matrix4 {
@@ -64,124 +65,131 @@ module spine.webgl {
 		}
 
 		transpose(): Matrix4 {
-			this.temp[M00] = this.values[M00];
-			this.temp[M01] = this.values[M10];
-			this.temp[M02] = this.values[M20];
-			this.temp[M03] = this.values[M30];
-			this.temp[M10] = this.values[M01];
-			this.temp[M11] = this.values[M11];
-			this.temp[M12] = this.values[M21];
-			this.temp[M13] = this.values[M31];
-			this.temp[M20] = this.values[M02];
-			this.temp[M21] = this.values[M12];
-			this.temp[M22] = this.values[M22];
-			this.temp[M23] = this.values[M32];
-			this.temp[M30] = this.values[M03];
-			this.temp[M31] = this.values[M13];
-			this.temp[M32] = this.values[M23];
-			this.temp[M33] = this.values[M33];
-			return this.set(this.temp);
+			let t = this.temp;
+			let v = this.values;
+			t[M00] = v[M00];
+			t[M01] = v[M10];
+			t[M02] = v[M20];
+			t[M03] = v[M30];
+			t[M10] = v[M01];
+			t[M11] = v[M11];
+			t[M12] = v[M21];
+			t[M13] = v[M31];
+			t[M20] = v[M02];
+			t[M21] = v[M12];
+			t[M22] = v[M22];
+			t[M23] = v[M32];
+			t[M30] = v[M03];
+			t[M31] = v[M13];
+			t[M32] = v[M23];
+			t[M33] = v[M33];
+			return this.set(t);
 		}
 
-		identity(): Matrix4 {            
-			this.values[M00] = 1;
-			this.values[M01] = 0;
-			this.values[M02] = 0;
-			this.values[M03] = 0;
-			this.values[M10] = 0;
-			this.values[M11] = 1;
-			this.values[M12] = 0;
-			this.values[M13] = 0;
-			this.values[M20] = 0;
-			this.values[M21] = 0;
-			this.values[M22] = 1;
-			this.values[M23] = 0;
-			this.values[M30] = 0;
-			this.values[M31] = 0;
-			this.values[M32] = 0;
-			this.values[M33] = 1;
+		identity(): Matrix4 {
+			let v = this.values;          
+			v[M00] = 1;
+			v[M01] = 0;
+			v[M02] = 0;
+			v[M03] = 0;
+			v[M10] = 0;
+			v[M11] = 1;
+			v[M12] = 0;
+			v[M13] = 0;
+			v[M20] = 0;
+			v[M21] = 0;
+			v[M22] = 1;
+			v[M23] = 0;
+			v[M30] = 0;
+			v[M31] = 0;
+			v[M32] = 0;
+			v[M33] = 1;
 			return this;
 		}
 
 		invert(): Matrix4 {
-			let l_det = this.values[M30] * this.values[M21] * this.values[M12] * this.values[M03] - this.values[M20] * this.values[M31] * this.values[M12] * this.values[M03] - this.values[M30] * this.values[M11]
-				* this.values[M22] * this.values[M03] + this.values[M10] * this.values[M31] * this.values[M22] * this.values[M03] + this.values[M20] * this.values[M11] * this.values[M32] * this.values[M03] - this.values[M10]
-				* this.values[M21] * this.values[M32] * this.values[M03] - this.values[M30] * this.values[M21] * this.values[M02] * this.values[M13] + this.values[M20] * this.values[M31] * this.values[M02] * this.values[M13]
-				+ this.values[M30] * this.values[M01] * this.values[M22] * this.values[M13] - this.values[M00] * this.values[M31] * this.values[M22] * this.values[M13] - this.values[M20] * this.values[M01] * this.values[M32]
-				* this.values[M13] + this.values[M00] * this.values[M21] * this.values[M32] * this.values[M13] + this.values[M30] * this.values[M11] * this.values[M02] * this.values[M23] - this.values[M10] * this.values[M31]
-				* this.values[M02] * this.values[M23] - this.values[M30] * this.values[M01] * this.values[M12] * this.values[M23] + this.values[M00] * this.values[M31] * this.values[M12] * this.values[M23] + this.values[M10]
-				* this.values[M01] * this.values[M32] * this.values[M23] - this.values[M00] * this.values[M11] * this.values[M32] * this.values[M23] - this.values[M20] * this.values[M11] * this.values[M02] * this.values[M33]
-				+ this.values[M10] * this.values[M21] * this.values[M02] * this.values[M33] + this.values[M20] * this.values[M01] * this.values[M12] * this.values[M33] - this.values[M00] * this.values[M21] * this.values[M12]
-				* this.values[M33] - this.values[M10] * this.values[M01] * this.values[M22] * this.values[M33] + this.values[M00] * this.values[M11] * this.values[M22] * this.values[M33];
+			let v = this.values;
+			let t = this.temp;
+			let l_det = v[M30] * v[M21] * v[M12] * v[M03] - v[M20] * v[M31] * v[M12] * v[M03] - v[M30] * v[M11]
+				* v[M22] * v[M03] + v[M10] * v[M31] * v[M22] * v[M03] + v[M20] * v[M11] * v[M32] * v[M03] - v[M10]
+				* v[M21] * v[M32] * v[M03] - v[M30] * v[M21] * v[M02] * v[M13] + v[M20] * v[M31] * v[M02] * v[M13]
+				+ v[M30] * v[M01] * v[M22] * v[M13] - v[M00] * v[M31] * v[M22] * v[M13] - v[M20] * v[M01] * v[M32]
+				* v[M13] + v[M00] * v[M21] * v[M32] * v[M13] + v[M30] * v[M11] * v[M02] * v[M23] - v[M10] * v[M31]
+				* v[M02] * v[M23] - v[M30] * v[M01] * v[M12] * v[M23] + v[M00] * v[M31] * v[M12] * v[M23] + v[M10]
+				* v[M01] * v[M32] * v[M23] - v[M00] * v[M11] * v[M32] * v[M23] - v[M20] * v[M11] * v[M02] * v[M33]
+				+ v[M10] * v[M21] * v[M02] * v[M33] + v[M20] * v[M01] * v[M12] * v[M33] - v[M00] * v[M21] * v[M12]
+				* v[M33] - v[M10] * v[M01] * v[M22] * v[M33] + v[M00] * v[M11] * v[M22] * v[M33];
 			if (l_det == 0) throw new Error("non-invertible matrix");
 			let inv_det = 1.0 / l_det;
-			this.temp[M00] = this.values[M12] * this.values[M23] * this.values[M31] - this.values[M13] * this.values[M22] * this.values[M31] + this.values[M13] * this.values[M21] * this.values[M32] - this.values[M11]
-				* this.values[M23] * this.values[M32] - this.values[M12] * this.values[M21] * this.values[M33] + this.values[M11] * this.values[M22] * this.values[M33];
-			this.temp[M01] = this.values[M03] * this.values[M22] * this.values[M31] - this.values[M02] * this.values[M23] * this.values[M31] - this.values[M03] * this.values[M21] * this.values[M32] + this.values[M01]
-				* this.values[M23] * this.values[M32] + this.values[M02] * this.values[M21] * this.values[M33] - this.values[M01] * this.values[M22] * this.values[M33];
-			this.temp[M02] = this.values[M02] * this.values[M13] * this.values[M31] - this.values[M03] * this.values[M12] * this.values[M31] + this.values[M03] * this.values[M11] * this.values[M32] - this.values[M01]
-				* this.values[M13] * this.values[M32] - this.values[M02] * this.values[M11] * this.values[M33] + this.values[M01] * this.values[M12] * this.values[M33];
-			this.temp[M03] = this.values[M03] * this.values[M12] * this.values[M21] - this.values[M02] * this.values[M13] * this.values[M21] - this.values[M03] * this.values[M11] * this.values[M22] + this.values[M01]
-				* this.values[M13] * this.values[M22] + this.values[M02] * this.values[M11] * this.values[M23] - this.values[M01] * this.values[M12] * this.values[M23];
-			this.temp[M10] = this.values[M13] * this.values[M22] * this.values[M30] - this.values[M12] * this.values[M23] * this.values[M30] - this.values[M13] * this.values[M20] * this.values[M32] + this.values[M10]
-				* this.values[M23] * this.values[M32] + this.values[M12] * this.values[M20] * this.values[M33] - this.values[M10] * this.values[M22] * this.values[M33];
-			this.temp[M11] = this.values[M02] * this.values[M23] * this.values[M30] - this.values[M03] * this.values[M22] * this.values[M30] + this.values[M03] * this.values[M20] * this.values[M32] - this.values[M00]
-				* this.values[M23] * this.values[M32] - this.values[M02] * this.values[M20] * this.values[M33] + this.values[M00] * this.values[M22] * this.values[M33];
-			this.temp[M12] = this.values[M03] * this.values[M12] * this.values[M30] - this.values[M02] * this.values[M13] * this.values[M30] - this.values[M03] * this.values[M10] * this.values[M32] + this.values[M00]
-				* this.values[M13] * this.values[M32] + this.values[M02] * this.values[M10] * this.values[M33] - this.values[M00] * this.values[M12] * this.values[M33];
-			this.temp[M13] = this.values[M02] * this.values[M13] * this.values[M20] - this.values[M03] * this.values[M12] * this.values[M20] + this.values[M03] * this.values[M10] * this.values[M22] - this.values[M00]
-				* this.values[M13] * this.values[M22] - this.values[M02] * this.values[M10] * this.values[M23] + this.values[M00] * this.values[M12] * this.values[M23];
-			this.temp[M20] = this.values[M11] * this.values[M23] * this.values[M30] - this.values[M13] * this.values[M21] * this.values[M30] + this.values[M13] * this.values[M20] * this.values[M31] - this.values[M10]
-				* this.values[M23] * this.values[M31] - this.values[M11] * this.values[M20] * this.values[M33] + this.values[M10] * this.values[M21] * this.values[M33];
-			this.temp[M21] = this.values[M03] * this.values[M21] * this.values[M30] - this.values[M01] * this.values[M23] * this.values[M30] - this.values[M03] * this.values[M20] * this.values[M31] + this.values[M00]
-				* this.values[M23] * this.values[M31] + this.values[M01] * this.values[M20] * this.values[M33] - this.values[M00] * this.values[M21] * this.values[M33];
-			this.temp[M22] = this.values[M01] * this.values[M13] * this.values[M30] - this.values[M03] * this.values[M11] * this.values[M30] + this.values[M03] * this.values[M10] * this.values[M31] - this.values[M00]
-				* this.values[M13] * this.values[M31] - this.values[M01] * this.values[M10] * this.values[M33] + this.values[M00] * this.values[M11] * this.values[M33];
-			this.temp[M23] = this.values[M03] * this.values[M11] * this.values[M20] - this.values[M01] * this.values[M13] * this.values[M20] - this.values[M03] * this.values[M10] * this.values[M21] + this.values[M00]
-				* this.values[M13] * this.values[M21] + this.values[M01] * this.values[M10] * this.values[M23] - this.values[M00] * this.values[M11] * this.values[M23];
-			this.temp[M30] = this.values[M12] * this.values[M21] * this.values[M30] - this.values[M11] * this.values[M22] * this.values[M30] - this.values[M12] * this.values[M20] * this.values[M31] + this.values[M10]
-				* this.values[M22] * this.values[M31] + this.values[M11] * this.values[M20] * this.values[M32] - this.values[M10] * this.values[M21] * this.values[M32];
-			this.temp[M31] = this.values[M01] * this.values[M22] * this.values[M30] - this.values[M02] * this.values[M21] * this.values[M30] + this.values[M02] * this.values[M20] * this.values[M31] - this.values[M00]
-				* this.values[M22] * this.values[M31] - this.values[M01] * this.values[M20] * this.values[M32] + this.values[M00] * this.values[M21] * this.values[M32];
-			this.temp[M32] = this.values[M02] * this.values[M11] * this.values[M30] - this.values[M01] * this.values[M12] * this.values[M30] - this.values[M02] * this.values[M10] * this.values[M31] + this.values[M00]
-				* this.values[M12] * this.values[M31] + this.values[M01] * this.values[M10] * this.values[M32] - this.values[M00] * this.values[M11] * this.values[M32];
-			this.temp[M33] = this.values[M01] * this.values[M12] * this.values[M20] - this.values[M02] * this.values[M11] * this.values[M20] + this.values[M02] * this.values[M10] * this.values[M21] - this.values[M00]
-				* this.values[M12] * this.values[M21] - this.values[M01] * this.values[M10] * this.values[M22] + this.values[M00] * this.values[M11] * this.values[M22];
-			this.values[M00] = this.temp[M00] * inv_det;
-			this.values[M01] = this.temp[M01] * inv_det;
-			this.values[M02] = this.temp[M02] * inv_det;
-			this.values[M03] = this.temp[M03] * inv_det;
-			this.values[M10] = this.temp[M10] * inv_det;
-			this.values[M11] = this.temp[M11] * inv_det;
-			this.values[M12] = this.temp[M12] * inv_det;
-			this.values[M13] = this.temp[M13] * inv_det;
-			this.values[M20] = this.temp[M20] * inv_det;
-			this.values[M21] = this.temp[M21] * inv_det;
-			this.values[M22] = this.temp[M22] * inv_det;
-			this.values[M23] = this.temp[M23] * inv_det;
-			this.values[M30] = this.temp[M30] * inv_det;
-			this.values[M31] = this.temp[M31] * inv_det;
-			this.values[M32] = this.temp[M32] * inv_det;
-			this.values[M33] = this.temp[M33] * inv_det;
+			t[M00] = v[M12] * v[M23] * v[M31] - v[M13] * v[M22] * v[M31] + v[M13] * v[M21] * v[M32] - v[M11]
+				* v[M23] * v[M32] - v[M12] * v[M21] * v[M33] + v[M11] * v[M22] * v[M33];
+			t[M01] = v[M03] * v[M22] * v[M31] - v[M02] * v[M23] * v[M31] - v[M03] * v[M21] * v[M32] + v[M01]
+				* v[M23] * v[M32] + v[M02] * v[M21] * v[M33] - v[M01] * v[M22] * v[M33];
+			t[M02] = v[M02] * v[M13] * v[M31] - v[M03] * v[M12] * v[M31] + v[M03] * v[M11] * v[M32] - v[M01]
+				* v[M13] * v[M32] - v[M02] * v[M11] * v[M33] + v[M01] * v[M12] * v[M33];
+			t[M03] = v[M03] * v[M12] * v[M21] - v[M02] * v[M13] * v[M21] - v[M03] * v[M11] * v[M22] + v[M01]
+				* v[M13] * v[M22] + v[M02] * v[M11] * v[M23] - v[M01] * v[M12] * v[M23];
+			t[M10] = v[M13] * v[M22] * v[M30] - v[M12] * v[M23] * v[M30] - v[M13] * v[M20] * v[M32] + v[M10]
+				* v[M23] * v[M32] + v[M12] * v[M20] * v[M33] - v[M10] * v[M22] * v[M33];
+			t[M11] = v[M02] * v[M23] * v[M30] - v[M03] * v[M22] * v[M30] + v[M03] * v[M20] * v[M32] - v[M00]
+				* v[M23] * v[M32] - v[M02] * v[M20] * v[M33] + v[M00] * v[M22] * v[M33];
+			t[M12] = v[M03] * v[M12] * v[M30] - v[M02] * v[M13] * v[M30] - v[M03] * v[M10] * v[M32] + v[M00]
+				* v[M13] * v[M32] + v[M02] * v[M10] * v[M33] - v[M00] * v[M12] * v[M33];
+			t[M13] = v[M02] * v[M13] * v[M20] - v[M03] * v[M12] * v[M20] + v[M03] * v[M10] * v[M22] - v[M00]
+				* v[M13] * v[M22] - v[M02] * v[M10] * v[M23] + v[M00] * v[M12] * v[M23];
+			t[M20] = v[M11] * v[M23] * v[M30] - v[M13] * v[M21] * v[M30] + v[M13] * v[M20] * v[M31] - v[M10]
+				* v[M23] * v[M31] - v[M11] * v[M20] * v[M33] + v[M10] * v[M21] * v[M33];
+			t[M21] = v[M03] * v[M21] * v[M30] - v[M01] * v[M23] * v[M30] - v[M03] * v[M20] * v[M31] + v[M00]
+				* v[M23] * v[M31] + v[M01] * v[M20] * v[M33] - v[M00] * v[M21] * v[M33];
+			t[M22] = v[M01] * v[M13] * v[M30] - v[M03] * v[M11] * v[M30] + v[M03] * v[M10] * v[M31] - v[M00]
+				* v[M13] * v[M31] - v[M01] * v[M10] * v[M33] + v[M00] * v[M11] * v[M33];
+			t[M23] = v[M03] * v[M11] * v[M20] - v[M01] * v[M13] * v[M20] - v[M03] * v[M10] * v[M21] + v[M00]
+				* v[M13] * v[M21] + v[M01] * v[M10] * v[M23] - v[M00] * v[M11] * v[M23];
+			t[M30] = v[M12] * v[M21] * v[M30] - v[M11] * v[M22] * v[M30] - v[M12] * v[M20] * v[M31] + v[M10]
+				* v[M22] * v[M31] + v[M11] * v[M20] * v[M32] - v[M10] * v[M21] * v[M32];
+			t[M31] = v[M01] * v[M22] * v[M30] - v[M02] * v[M21] * v[M30] + v[M02] * v[M20] * v[M31] - v[M00]
+				* v[M22] * v[M31] - v[M01] * v[M20] * v[M32] + v[M00] * v[M21] * v[M32];
+			t[M32] = v[M02] * v[M11] * v[M30] - v[M01] * v[M12] * v[M30] - v[M02] * v[M10] * v[M31] + v[M00]
+				* v[M12] * v[M31] + v[M01] * v[M10] * v[M32] - v[M00] * v[M11] * v[M32];
+			t[M33] = v[M01] * v[M12] * v[M20] - v[M02] * v[M11] * v[M20] + v[M02] * v[M10] * v[M21] - v[M00]
+				* v[M12] * v[M21] - v[M01] * v[M10] * v[M22] + v[M00] * v[M11] * v[M22];
+			v[M00] = t[M00] * inv_det;
+			v[M01] = t[M01] * inv_det;
+			v[M02] = t[M02] * inv_det;
+			v[M03] = t[M03] * inv_det;
+			v[M10] = t[M10] * inv_det;
+			v[M11] = t[M11] * inv_det;
+			v[M12] = t[M12] * inv_det;
+			v[M13] = t[M13] * inv_det;
+			v[M20] = t[M20] * inv_det;
+			v[M21] = t[M21] * inv_det;
+			v[M22] = t[M22] * inv_det;
+			v[M23] = t[M23] * inv_det;
+			v[M30] = t[M30] * inv_det;
+			v[M31] = t[M31] * inv_det;
+			v[M32] = t[M32] * inv_det;
+			v[M33] = t[M33] * inv_det;
 			return this;
 		}
 
 		determinant(): number {	
-			return this.values[M30] * this.values[M21] * this.values[M12] * this.values[M03] - this.values[M20] * this.values[M31] * this.values[M12] * this.values[M03] - this.values[M30] * this.values[M11]
-				* this.values[M22] * this.values[M03] + this.values[M10] * this.values[M31] * this.values[M22] * this.values[M03] + this.values[M20] * this.values[M11] * this.values[M32] * this.values[M03] - this.values[M10]
-				* this.values[M21] * this.values[M32] * this.values[M03] - this.values[M30] * this.values[M21] * this.values[M02] * this.values[M13] + this.values[M20] * this.values[M31] * this.values[M02] * this.values[M13]
-				+ this.values[M30] * this.values[M01] * this.values[M22] * this.values[M13] - this.values[M00] * this.values[M31] * this.values[M22] * this.values[M13] - this.values[M20] * this.values[M01] * this.values[M32]
-				* this.values[M13] + this.values[M00] * this.values[M21] * this.values[M32] * this.values[M13] + this.values[M30] * this.values[M11] * this.values[M02] * this.values[M23] - this.values[M10] * this.values[M31]
-				* this.values[M02] * this.values[M23] - this.values[M30] * this.values[M01] * this.values[M12] * this.values[M23] + this.values[M00] * this.values[M31] * this.values[M12] * this.values[M23] + this.values[M10]
-				* this.values[M01] * this.values[M32] * this.values[M23] - this.values[M00] * this.values[M11] * this.values[M32] * this.values[M23] - this.values[M20] * this.values[M11] * this.values[M02] * this.values[M33]
-				+ this.values[M10] * this.values[M21] * this.values[M02] * this.values[M33] + this.values[M20] * this.values[M01] * this.values[M12] * this.values[M33] - this.values[M00] * this.values[M21] * this.values[M12]
-				* this.values[M33] - this.values[M10] * this.values[M01] * this.values[M22] * this.values[M33] + this.values[M00] * this.values[M11] * this.values[M22] * this.values[M33];	
+			let v = this.values;
+			return v[M30] * v[M21] * v[M12] * v[M03] - v[M20] * v[M31] * v[M12] * v[M03] - v[M30] * v[M11]
+				* v[M22] * v[M03] + v[M10] * v[M31] * v[M22] * v[M03] + v[M20] * v[M11] * v[M32] * v[M03] - v[M10]
+				* v[M21] * v[M32] * v[M03] - v[M30] * v[M21] * v[M02] * v[M13] + v[M20] * v[M31] * v[M02] * v[M13]
+				+ v[M30] * v[M01] * v[M22] * v[M13] - v[M00] * v[M31] * v[M22] * v[M13] - v[M20] * v[M01] * v[M32]
+				* v[M13] + v[M00] * v[M21] * v[M32] * v[M13] + v[M30] * v[M11] * v[M02] * v[M23] - v[M10] * v[M31]
+				* v[M02] * v[M23] - v[M30] * v[M01] * v[M12] * v[M23] + v[M00] * v[M31] * v[M12] * v[M23] + v[M10]
+				* v[M01] * v[M32] * v[M23] - v[M00] * v[M11] * v[M32] * v[M23] - v[M20] * v[M11] * v[M02] * v[M33]
+				+ v[M10] * v[M21] * v[M02] * v[M33] + v[M20] * v[M01] * v[M12] * v[M33] - v[M00] * v[M21] * v[M12]
+				* v[M33] - v[M10] * v[M01] * v[M22] * v[M33] + v[M00] * v[M11] * v[M22] * v[M33];	
 		}
 
 		translate(x: number, y: number, z: number): Matrix4 {
-			this.values[M03] += x;
-			this.values[M13] += y;
-			this.values[M23] += z;
+			let v = this.values;
+			v[M03] += x;
+			v[M13] += y;
+			v[M23] += z;
 			return this;
 	    }
 
@@ -194,22 +202,23 @@ module spine.webgl {
 			let l_fd = (1.0 / Math.tan((fovy * (Math.PI / 180)) / 2.0));
 			let l_a1 = (far + near) / (near - far);
 			let l_a2 = (2 * far * near) / (near - far);
-			this.values[M00] = l_fd / aspectRatio;
-			this.values[M10] = 0;
-			this.values[M20] = 0;
-			this.values[M30] = 0;
-			this.values[M01] = 0;
-			this.values[M11] = l_fd;
-			this.values[M21] = 0;
-			this.values[M31] = 0;
-			this.values[M02] = 0;
-			this.values[M12] = 0;
-			this.values[M22] = l_a1;
-			this.values[M32] = -1;
-			this.values[M03] = 0;
-			this.values[M13] = 0;
-			this.values[M23] = l_a2;
-			this.values[M33] = 0;
+			let v = this.values;
+			v[M00] = l_fd / aspectRatio;
+			v[M10] = 0;
+			v[M20] = 0;
+			v[M30] = 0;
+			v[M01] = 0;
+			v[M11] = l_fd;
+			v[M21] = 0;
+			v[M31] = 0;
+			v[M02] = 0;
+			v[M12] = 0;
+			v[M22] = l_a1;
+			v[M32] = -1;
+			v[M03] = 0;
+			v[M13] = 0;
+			v[M23] = l_a2;
+			v[M33] = 0;
 
 			return this;
 		}
@@ -228,95 +237,70 @@ module spine.webgl {
 			let ty = -(top + bottom) / (top - bottom);
 			let tz = -(far + near) / (far - near);
 
-			this.values[M00] = x_orth;
-			this.values[M10] = 0;
-			this.values[M20] = 0;
-			this.values[M30] = 0;
-			this.values[M01] = 0;
-			this.values[M11] = y_orth;
-			this.values[M21] = 0;
-			this.values[M31] = 0;
-			this.values[M02] = 0;
-			this.values[M12] = 0;
-			this.values[M22] = z_orth;
-			this.values[M32] = 0;
-			this.values[M03] = tx;
-			this.values[M13] = ty;
-			this.values[M23] = tz;
-			this.values[M33] = 1;
+			let v = this.values;
+			v[M00] = x_orth;
+			v[M10] = 0;
+			v[M20] = 0;
+			v[M30] = 0;
+			v[M01] = 0;
+			v[M11] = y_orth;
+			v[M21] = 0;
+			v[M31] = 0;
+			v[M02] = 0;
+			v[M12] = 0;
+			v[M22] = z_orth;
+			v[M32] = 0;
+			v[M03] = tx;
+			v[M13] = ty;
+			v[M23] = tz;
+			v[M33] = 1;
 		
 			return this;
 		}
 
 		multiply(matrix: Matrix4): Matrix4 {
-			this.temp[M00] = this.values[M00] * matrix.values[M00] + this.values[M01] * matrix.values[M10] + this.values[M02] * matrix.values[M20] + this.values[M03]
-				* matrix.values[M30];
-			this.temp[M01] = this.values[M00] * matrix.values[M01] + this.values[M01] * matrix.values[M11] + this.values[M02] * matrix.values[M21] + this.values[M03]
-				* matrix.values[M31];
-			this.temp[M02] = this.values[M00] * matrix.values[M02] + this.values[M01] * matrix.values[M12] + this.values[M02] * matrix.values[M22] + this.values[M03]
-				* matrix.values[M32];
-			this.temp[M03] = this.values[M00] * matrix.values[M03] + this.values[M01] * matrix.values[M13] + this.values[M02] * matrix.values[M23] + this.values[M03]
-				* matrix.values[M33];
-			this.temp[M10] = this.values[M10] * matrix.values[M00] + this.values[M11] * matrix.values[M10] + this.values[M12] * matrix.values[M20] + this.values[M13]
-				* matrix.values[M30];
-			this.temp[M11] = this.values[M10] * matrix.values[M01] + this.values[M11] * matrix.values[M11] + this.values[M12] * matrix.values[M21] + this.values[M13]
-				* matrix.values[M31];
-			this.temp[M12] = this.values[M10] * matrix.values[M02] + this.values[M11] * matrix.values[M12] + this.values[M12] * matrix.values[M22] + this.values[M13]
-				* matrix.values[M32];
-			this.temp[M13] = this.values[M10] * matrix.values[M03] + this.values[M11] * matrix.values[M13] + this.values[M12] * matrix.values[M23] + this.values[M13]
-				* matrix.values[M33];
-			this.temp[M20] = this.values[M20] * matrix.values[M00] + this.values[M21] * matrix.values[M10] + this.values[M22] * matrix.values[M20] + this.values[M23]
-				* matrix.values[M30];
-			this.temp[M21] = this.values[M20] * matrix.values[M01] + this.values[M21] * matrix.values[M11] + this.values[M22] * matrix.values[M21] + this.values[M23]
-				* matrix.values[M31];
-			this.temp[M22] = this.values[M20] * matrix.values[M02] + this.values[M21] * matrix.values[M12] + this.values[M22] * matrix.values[M22] + this.values[M23]
-				* matrix.values[M32];
-			this.temp[M23] = this.values[M20] * matrix.values[M03] + this.values[M21] * matrix.values[M13] + this.values[M22] * matrix.values[M23] + this.values[M23]
-				* matrix.values[M33];
-			this.temp[M30] = this.values[M30] * matrix.values[M00] + this.values[M31] * matrix.values[M10] + this.values[M32] * matrix.values[M20] + this.values[M33]
-				* matrix.values[M30];
-			this.temp[M31] = this.values[M30] * matrix.values[M01] + this.values[M31] * matrix.values[M11] + this.values[M32] * matrix.values[M21] + this.values[M33]
-				* matrix.values[M31];
-			this.temp[M32] = this.values[M30] * matrix.values[M02] + this.values[M31] * matrix.values[M12] + this.values[M32] * matrix.values[M22] + this.values[M33]
-				* matrix.values[M32];
-			this.temp[M33] = this.values[M30] * matrix.values[M03] + this.values[M31] * matrix.values[M13] + this.values[M32] * matrix.values[M23] + this.values[M33]
-				* matrix.values[M33];
+			let t = this.temp;
+			let v = this.values;
+			let m = matrix.values;
+			t[M00] = v[M00] * m[M00] + v[M01] * m[M10] + v[M02] * m[M20] + v[M03] * m[M30];
+			t[M01] = v[M00] * m[M01] + v[M01] * m[M11] + v[M02] * m[M21] + v[M03] * m[M31];
+			t[M02] = v[M00] * m[M02] + v[M01] * m[M12] + v[M02] * m[M22] + v[M03] * m[M32];
+			t[M03] = v[M00] * m[M03] + v[M01] * m[M13] + v[M02] * m[M23] + v[M03] * m[M33];
+			t[M10] = v[M10] * m[M00] + v[M11] * m[M10] + v[M12] * m[M20] + v[M13] * m[M30];
+			t[M11] = v[M10] * m[M01] + v[M11] * m[M11] + v[M12] * m[M21] + v[M13] * m[M31];
+			t[M12] = v[M10] * m[M02] + v[M11] * m[M12] + v[M12] * m[M22] + v[M13] * m[M32];
+			t[M13] = v[M10] * m[M03] + v[M11] * m[M13] + v[M12] * m[M23] + v[M13] * m[M33];
+			t[M20] = v[M20] * m[M00] + v[M21] * m[M10] + v[M22] * m[M20] + v[M23] * m[M30];
+			t[M21] = v[M20] * m[M01] + v[M21] * m[M11] + v[M22] * m[M21] + v[M23] * m[M31];
+			t[M22] = v[M20] * m[M02] + v[M21] * m[M12] + v[M22] * m[M22] + v[M23] * m[M32];
+			t[M23] = v[M20] * m[M03] + v[M21] * m[M13] + v[M22] * m[M23] + v[M23] * m[M33];
+			t[M30] = v[M30] * m[M00] + v[M31] * m[M10] + v[M32] * m[M20] + v[M33] * m[M30];
+			t[M31] = v[M30] * m[M01] + v[M31] * m[M11] + v[M32] * m[M21] + v[M33] * m[M31];
+			t[M32] = v[M30] * m[M02] + v[M31] * m[M12] + v[M32] * m[M22] + v[M33] * m[M32];
+			t[M33] = v[M30] * m[M03] + v[M31] * m[M13] + v[M32] * m[M23] + v[M33] * m[M33];
 			return this.set(this.temp);
 		}
 
 		multiplyLeft(matrix: Matrix4): Matrix4 {
-			this.temp[M00] = matrix.values[M00] * this.values[M00] + matrix.values[M01] * this.values[M10] + matrix.values[M02] * this.values[M20] + matrix.values[M03]
-				* this.values[M30];
-			this.temp[M01] = matrix.values[M00] * this.values[M01] + matrix.values[M01] * this.values[M11] + matrix.values[M02] * this.values[M21] + matrix.values[M03]
-				* this.values[M31];
-			this.temp[M02] = matrix.values[M00] * this.values[M02] + matrix.values[M01] * this.values[M12] + matrix.values[M02] * this.values[M22] + matrix.values[M03]
-				* this.values[M32];
-			this.temp[M03] = matrix.values[M00] * this.values[M03] + matrix.values[M01] * this.values[M13] + matrix.values[M02] * this.values[M23] + matrix.values[M03]
-				* this.values[M33];
-			this.temp[M10] = matrix.values[M10] * this.values[M00] + matrix.values[M11] * this.values[M10] + matrix.values[M12] * this.values[M20] + matrix.values[M13]
-				* this.values[M30];
-			this.temp[M11] = matrix.values[M10] * this.values[M01] + matrix.values[M11] * this.values[M11] + matrix.values[M12] * this.values[M21] + matrix.values[M13]
-				* this.values[M31];
-			this.temp[M12] = matrix.values[M10] * this.values[M02] + matrix.values[M11] * this.values[M12] + matrix.values[M12] * this.values[M22] + matrix.values[M13]
-				* this.values[M32];
-			this.temp[M13] = matrix.values[M10] * this.values[M03] + matrix.values[M11] * this.values[M13] + matrix.values[M12] * this.values[M23] + matrix.values[M13]
-				* this.values[M33];
-			this.temp[M20] = matrix.values[M20] * this.values[M00] + matrix.values[M21] * this.values[M10] + matrix.values[M22] * this.values[M20] + matrix.values[M23]
-				* this.values[M30];
-			this.temp[M21] = matrix.values[M20] * this.values[M01] + matrix.values[M21] * this.values[M11] + matrix.values[M22] * this.values[M21] + matrix.values[M23]
-				* this.values[M31];
-			this.temp[M22] = matrix.values[M20] * this.values[M02] + matrix.values[M21] * this.values[M12] + matrix.values[M22] * this.values[M22] + matrix.values[M23]
-				* this.values[M32];
-			this.temp[M23] = matrix.values[M20] * this.values[M03] + matrix.values[M21] * this.values[M13] + matrix.values[M22] * this.values[M23] + matrix.values[M23]
-				* this.values[M33];
-			this.temp[M30] = matrix.values[M30] * this.values[M00] + matrix.values[M31] * this.values[M10] + matrix.values[M32] * this.values[M20] + matrix.values[M33]
-				* this.values[M30];
-			this.temp[M31] = matrix.values[M30] * this.values[M01] + matrix.values[M31] * this.values[M11] + matrix.values[M32] * this.values[M21] + matrix.values[M33]
-				* this.values[M31];
-			this.temp[M32] = matrix.values[M30] * this.values[M02] + matrix.values[M31] * this.values[M12] + matrix.values[M32] * this.values[M22] + matrix.values[M33]
-				* this.values[M32];
-			this.temp[M33] = matrix.values[M30] * this.values[M03] + matrix.values[M31] * this.values[M13] + matrix.values[M32] * this.values[M23] + matrix.values[M33]
-				* this.values[M33];
+			let t = this.temp;
+			let v = this.values;
+			let m = matrix.values;
+			t[M00] = m[M00] * v[M00] + m[M01] * v[M10] + m[M02] * v[M20] + m[M03] * v[M30];
+			t[M01] = m[M00] * v[M01] + m[M01] * v[M11] + m[M02] * v[M21] + m[M03] * v[M31];
+			t[M02] = m[M00] * v[M02] + m[M01] * v[M12] + m[M02] * v[M22] + m[M03] * v[M32];
+			t[M03] = m[M00] * v[M03] + m[M01] * v[M13] + m[M02] * v[M23] + m[M03] * v[M33];
+			t[M10] = m[M10] * v[M00] + m[M11] * v[M10] + m[M12] * v[M20] + m[M13] * v[M30];
+			t[M11] = m[M10] * v[M01] + m[M11] * v[M11] + m[M12] * v[M21] + m[M13] * v[M31];
+			t[M12] = m[M10] * v[M02] + m[M11] * v[M12] + m[M12] * v[M22] + m[M13] * v[M32];
+			t[M13] = m[M10] * v[M03] + m[M11] * v[M13] + m[M12] * v[M23] + m[M13] * v[M33];
+			t[M20] = m[M20] * v[M00] + m[M21] * v[M10] + m[M22] * v[M20] + m[M23] * v[M30];
+			t[M21] = m[M20] * v[M01] + m[M21] * v[M11] + m[M22] * v[M21] + m[M23] * v[M31];
+			t[M22] = m[M20] * v[M02] + m[M21] * v[M12] + m[M22] * v[M22] + m[M23] * v[M32];
+			t[M23] = m[M20] * v[M03] + m[M21] * v[M13] + m[M22] * v[M23] + m[M23] * v[M33];
+			t[M30] = m[M30] * v[M00] + m[M31] * v[M10] + m[M32] * v[M20] + m[M33] * v[M30];
+			t[M31] = m[M30] * v[M01] + m[M31] * v[M11] + m[M32] * v[M21] + m[M33] * v[M31];
+			t[M32] = m[M30] * v[M02] + m[M31] * v[M12] + m[M32] * v[M22] + m[M33] * v[M32];
+			t[M33] = m[M30] * v[M03] + m[M31] * v[M13] + m[M32] * v[M23] + m[M33] * v[M33];
 			return this.set(this.temp);
 		}
 	}

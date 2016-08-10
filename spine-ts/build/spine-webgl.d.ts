@@ -36,8 +36,8 @@ declare module spine {
         constructor(name: string, timelines: Array<Timeline>, duration: number);
         apply(skeleton: Skeleton, lastTime: number, time: number, loop: boolean, events: Array<Event>): void;
         mix(skeleton: Skeleton, lastTime: number, time: number, loop: boolean, events: Array<Event>, alpha: number): void;
-        static binarySearch(values: Array<number>, target: number, step?: number): number;
-        static linearSearch(values: Array<number>, target: number, step: number): number;
+        static binarySearch(values: ArrayLike<number>, target: number, step?: number): number;
+        static linearSearch(values: ArrayLike<number>, target: number, step: number): number;
     }
     interface Timeline {
         apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number): void;
@@ -66,7 +66,7 @@ declare module spine {
         static PREV_ROTATION: number;
         static ROTATION: number;
         boneIndex: number;
-        frames: Array<number>;
+        frames: ArrayLike<number>;
         constructor(frameCount: number);
         /** Sets the time and angle of the specified keyframe. */
         setFrame(frameIndex: number, time: number, degrees: number): void;
@@ -80,7 +80,7 @@ declare module spine {
         static X: number;
         static Y: number;
         boneIndex: number;
-        frames: Array<number>;
+        frames: ArrayLike<number>;
         constructor(frameCount: number);
         /** Sets the time and value of the specified keyframe. */
         setFrame(frameIndex: number, time: number, x: number, y: number): void;
@@ -106,7 +106,7 @@ declare module spine {
         static B: number;
         static A: number;
         slotIndex: number;
-        frames: Array<number>;
+        frames: ArrayLike<number>;
         constructor(frameCount: number);
         /** Sets the time and value of the specified keyframe. */
         setFrame(frameIndex: number, time: number, r: number, g: number, b: number, a: number): void;
@@ -114,7 +114,7 @@ declare module spine {
     }
     class AttachmentTimeline implements Timeline {
         slotIndex: number;
-        frames: Array<number>;
+        frames: ArrayLike<number>;
         attachmentNames: Array<string>;
         constructor(frameCount: number);
         getFrameCount(): number;
@@ -123,7 +123,7 @@ declare module spine {
         apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number): void;
     }
     class EventTimeline implements Timeline {
-        frames: Array<number>;
+        frames: ArrayLike<number>;
         events: Array<Event>;
         constructor(frameCount: number);
         getFrameCount(): number;
@@ -133,7 +133,7 @@ declare module spine {
         apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number): void;
     }
     class DrawOrderTimeline implements Timeline {
-        frames: Array<number>;
+        frames: ArrayLike<number>;
         drawOrders: Array<Array<number>>;
         constructor(frameCount: number);
         getFrameCount(): number;
@@ -143,7 +143,7 @@ declare module spine {
         apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number): void;
     }
     class DeformTimeline extends CurveTimeline {
-        frames: Array<number>;
+        frames: ArrayLike<number>;
         frameVertices: Array<Array<number>>;
         slotIndex: number;
         attachment: VertexAttachment;
@@ -160,7 +160,7 @@ declare module spine {
         static MIX: number;
         static BEND_DIRECTION: number;
         ikConstraintIndex: number;
-        frames: Array<number>;
+        frames: ArrayLike<number>;
         constructor(frameCount: number);
         /** Sets the time, mix and bend direction of the specified keyframe. */
         setFrame(frameIndex: number, time: number, mix: number, bendDirection: number): void;
@@ -178,7 +178,7 @@ declare module spine {
         static SCALE: number;
         static SHEAR: number;
         transformConstraintIndex: number;
-        frames: Array<number>;
+        frames: ArrayLike<number>;
         constructor(frameCount: number);
         /** Sets the time and mixes of the specified keyframe. */
         setFrame(frameIndex: number, time: number, rotateMix: number, translateMix: number, scaleMix: number, shearMix: number): void;
@@ -190,7 +190,7 @@ declare module spine {
         static PREV_VALUE: number;
         static VALUE: number;
         pathConstraintIndex: number;
-        frames: Array<number>;
+        frames: ArrayLike<number>;
         constructor(frameCount: number);
         /** Sets the time and value of the specified keyframe. */
         setFrame(frameIndex: number, time: number, value: number): void;
@@ -208,7 +208,7 @@ declare module spine {
         static ROTATE: number;
         static TRANSLATE: number;
         pathConstraintIndex: number;
-        frames: Array<number>;
+        frames: ArrayLike<number>;
         constructor(frameCount: number);
         /** Sets the time and mixes of the specified keyframe. */
         setFrame(frameIndex: number, time: number, rotateMix: number, translateMix: number): void;
@@ -1396,9 +1396,10 @@ declare module spine {
         static toInt(x: number): number;
     }
     class Utils {
-        static arrayCopy<T>(source: Array<T>, sourceStart: number, dest: Array<T>, destStart: number, numElements: number): void;
+        static arrayCopy<T>(source: ArrayLike<T>, sourceStart: number, dest: ArrayLike<T>, destStart: number, numElements: number): void;
         static setArraySize<T>(array: Array<T>, size: number, value?: any): Array<T>;
         static newArray<T>(size: number, defaultValue: T): Array<T>;
+        static newFloatArray(size: number): ArrayLike<number>;
     }
     class Vector2 {
         x: number;

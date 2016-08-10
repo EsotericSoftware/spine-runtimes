@@ -69,8 +69,7 @@ module spine {
 				timelines[i].apply(skeleton, lastTime, time, events, alpha);
 	    }
 
-		static binarySearch (values: Array<number>, target: number, step: number = 1) {
-			// FIXME this relies on integer math, may break
+		static binarySearch (values: ArrayLike<number>, target: number, step: number = 1) {			
 			let low = 0;
 			let high = values.length / step - 2;
 			if (high == 0) return step;
@@ -85,7 +84,7 @@ module spine {
 			}
 		}
 
-		static linearSearch (values: Array<number>, target: number, step: number) {
+		static linearSearch (values: ArrayLike<number>, target: number, step: number) {
 			for (var i = 0, last = values.length - step; i <= last; i += step)
 				if (values[i] > target) return i;
 			return -1;
@@ -100,11 +99,11 @@ module spine {
 		static LINEAR = 0; static STEPPED = 1; static BEZIER = 2;
 		static BEZIER_SIZE = 10 * 2 - 1;
 
-		private curves: Array<number>; // type, x, y, ...
+		private curves: ArrayLike<number>; // type, x, y, ...
 
 		constructor (frameCount: number) {
 			if (frameCount <= 0) throw new Error("frameCount must be > 0: " + frameCount);
-			this.curves = new Array<number>((frameCount - 1) * CurveTimeline.BEZIER_SIZE);
+			this.curves = Utils.newFloatArray((frameCount - 1) * CurveTimeline.BEZIER_SIZE);
 			for (var i = 0; i < this.curves.length; i++) {
 				this.curves[i] = 0;
 			}			
@@ -193,11 +192,11 @@ module spine {
 		static ROTATION = 1;
 
 		boneIndex: number;
-		frames: Array<number>; // time, degrees, ...
+		frames: ArrayLike<number>; // time, degrees, ...
 
 		constructor (frameCount: number) {
 			super(frameCount);
-			this.frames = new Array<number>(frameCount << 1);
+			this.frames = Utils.newFloatArray(frameCount << 1);
 		}		
 
 		/** Sets the time and angle of the specified keyframe. */
@@ -249,11 +248,11 @@ module spine {
 		static X = 1; static Y = 2;
 
 		boneIndex: number;
-		frames: Array<number>; // time, x, y, ...
+		frames: ArrayLike<number>; // time, x, y, ...
 
 		constructor (frameCount: number) {
 			super(frameCount);
-			this.frames = new Array<number>(frameCount * TranslateTimeline.ENTRIES);
+			this.frames = Utils.newFloatArray(frameCount * TranslateTimeline.ENTRIES);
 		}		
 
 		/** Sets the time and value of the specified keyframe. */
@@ -350,11 +349,11 @@ module spine {
 		static R = 1; static G = 2; static B = 3; static A = 4;
 
 		slotIndex: number;
-		frames: Array<number>; // time, r, g, b, a, ...
+		frames: ArrayLike<number>; // time, r, g, b, a, ...
 
 		constructor (frameCount: number) {
 			super(frameCount);
-			this.frames = new Array<number>(frameCount * ColorTimeline.ENTRIES);
+			this.frames = Utils.newFloatArray(frameCount * ColorTimeline.ENTRIES);
 		}	
 
 		/** Sets the time and value of the specified keyframe. */
@@ -404,11 +403,11 @@ module spine {
 
 	export class AttachmentTimeline implements Timeline {
 		slotIndex: number;
-		frames: Array<number>; // time, ...
+		frames: ArrayLike<number> // time, ...
 		attachmentNames: Array<string>;
 
 		constructor (frameCount: number) {
-			this.frames = new Array<number>(frameCount);
+			this.frames = Utils.newFloatArray(frameCount);
 			this.attachmentNames = new Array<string>(frameCount);
 		}
 
@@ -439,11 +438,11 @@ module spine {
 	}
 
 	export class EventTimeline implements Timeline {
-		frames: Array<number>; // time, ...
+		frames: ArrayLike<number>; // time, ...
 		events: Array<Event>;
 
 		constructor (frameCount: number) {
-			this.frames = new Array<number>(frameCount);
+			this.frames = Utils.newFloatArray(frameCount);
 			this.events = new Array<Event>(frameCount);
 		}
 
@@ -487,11 +486,11 @@ module spine {
 	}
 
 	export class DrawOrderTimeline implements Timeline {
-		frames:  Array<number>; // time, ...
+		frames:  ArrayLike<number>; // time, ...
 		drawOrders: Array<Array<number>>;
 
 		constructor (frameCount: number) {
-			this.frames = new Array<number>(frameCount);
+			this.frames = Utils.newFloatArray(frameCount);
 			this.drawOrders = new Array<Array<number>>(frameCount);
 		}
 
@@ -529,14 +528,14 @@ module spine {
 	}
 
 	export class DeformTimeline extends CurveTimeline {
-		frames: Array<number>; // time, ...
+		frames: ArrayLike<number>; // time, ...
 		frameVertices: Array<Array<number>>;
 		slotIndex: number;
 		attachment: VertexAttachment;
 
 		constructor (frameCount: number) {
 			super(frameCount);
-			this.frames = new Array<number>(frameCount);
+			this.frames = Utils.newFloatArray(frameCount);
 			this.frameVertices = new Array<Array<number>>(frameCount);
 		}
 
@@ -598,11 +597,11 @@ module spine {
 		static MIX = 1; static BEND_DIRECTION = 2;
 
 		ikConstraintIndex: number;
-		frames: Array<number>; // time, mix, bendDirection, ...
+		frames: ArrayLike<number>; // time, mix, bendDirection, ...
 
 		constructor (frameCount: number) {
 			super(frameCount);
-			this.frames = new Array<number>(frameCount * IkConstraintTimeline.ENTRIES);
+			this.frames = Utils.newFloatArray(frameCount * IkConstraintTimeline.ENTRIES);
 		}		
 
 		/** Sets the time, mix and bend direction of the specified keyframe. */
@@ -642,11 +641,11 @@ module spine {
 		static ROTATE = 1; static TRANSLATE = 2; static SCALE = 3; static SHEAR = 4;
 
 		transformConstraintIndex: number;
-		frames: Array<number>; // time, rotate mix, translate mix, scale mix, shear mix, ...
+		frames: ArrayLike<number>; // time, rotate mix, translate mix, scale mix, shear mix, ...
 
 		constructor (frameCount: number) {
 			super(frameCount);
-			this.frames = new Array<number>(frameCount * TransformConstraintTimeline.ENTRIES);
+			this.frames = Utils.newFloatArray(frameCount * TransformConstraintTimeline.ENTRIES);
 		}
 
 		/** Sets the time and mixes of the specified keyframe. */
@@ -698,11 +697,11 @@ module spine {
 
 		pathConstraintIndex: number;
 
-		frames: Array<number>; // time, position, ...
+		frames: ArrayLike<number>; // time, position, ...
 
 		constructor (frameCount: number) {
 			super(frameCount);
-			this.frames = new Array<number>(frameCount * PathConstraintPositionTimeline.ENTRIES);
+			this.frames = Utils.newFloatArray(frameCount * PathConstraintPositionTimeline.ENTRIES);
 		}		
 
 		/** Sets the time and value of the specified keyframe. */
@@ -768,11 +767,11 @@ module spine {
 
 		pathConstraintIndex: number;
 
-		frames: Array<number>; // time, rotate mix, translate mix, ...
+		frames: ArrayLike<number>; // time, rotate mix, translate mix, ...
 
 		constructor (frameCount: number) {
 			super(frameCount);
-			this.frames = new Array<number>(frameCount * PathConstraintMixTimeline.ENTRIES);
+			this.frames = Utils.newFloatArray(frameCount * PathConstraintMixTimeline.ENTRIES);
 		}		
 
 		/** Sets the time and mixes of the specified keyframe. */
