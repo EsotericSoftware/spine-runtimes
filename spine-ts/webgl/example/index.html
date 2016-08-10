@@ -110,6 +110,20 @@ function loadSkeleton(name, scale, initialAnimation, positionX, positionY, premu
     // Create an AnimationState, and set the initial animation in looping mode.
     var animationState = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
     animationState.setAnimation(0, initialAnimation, true);
+    animationState.addListener({
+        event: function(trackIndex, event) {
+            console.log("Event on track " + trackIndex + ": " + JSON.stringify(event));
+        },
+        complete: function(trackIndex, loopCount) {
+            console.log("Animation on track " + trackIndex + " completed, loop count: " + loopCount);
+        },
+        start: function(trackIndex) {
+            console.log("Animation on track " + trackIndex + " started");
+        },
+        end: function(trackIndex) {
+            console.log("Animation on track " + trackIndex + " ended");
+        }
+    })
 
     // pack everything up and return to caller
     return { skeleton: skeleton, state: animationState, premultipliedAlpha: premultipliedAlpha };
