@@ -1400,6 +1400,7 @@ declare module spine {
         static setArraySize<T>(array: Array<T>, size: number, value?: any): Array<T>;
         static newArray<T>(size: number, defaultValue: T): Array<T>;
         static newFloatArray(size: number): ArrayLike<number>;
+        static toFloatArray(array: Array<number>): Float32Array;
     }
     class Vector2 {
         x: number;
@@ -1609,7 +1610,7 @@ declare module spine {
     class MeshAttachment extends VertexAttachment {
         region: TextureRegion;
         path: string;
-        regionUVs: Array<number>;
+        regionUVs: ArrayLike<number>;
         worldVertices: ArrayLike<number>;
         triangles: Array<number>;
         color: Color;

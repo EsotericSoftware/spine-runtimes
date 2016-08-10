@@ -330,7 +330,7 @@ module spine {
 					for (var i = 0, n = vertices.length; i < n; i++)
 						vertices[i] *= scale;
 				}
-				attachment.vertices = vertices;
+				attachment.vertices = Utils.toFloatArray(vertices);
 				return;
 			}
 			let weights = new Array<number>();
@@ -346,7 +346,7 @@ module spine {
 				}
 			}
 			attachment.bones = bones;
-			attachment.vertices = weights;
+			attachment.vertices = Utils.toFloatArray(weights);
 		}
 
 		readAnimation(map: any, name: string, skeletonData: SkeletonData) {

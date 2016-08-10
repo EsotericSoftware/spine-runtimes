@@ -33,7 +33,7 @@ module spine {
 	export class MeshAttachment extends VertexAttachment {
 		region: TextureRegion;
 		path: string;
-		regionUVs: Array<number>; worldVertices: ArrayLike<number>;
+		regionUVs: ArrayLike<number>; worldVertices: ArrayLike<number>;
 		triangles: Array<number>;
 		color = new Color(1, 1, 1, 1);
 		hullLength: number;
@@ -48,9 +48,9 @@ module spine {
 		updateUVs () {
 			let regionUVs = this.regionUVs;
 			let verticesLength = regionUVs.length;
-			let worldVerticesLength = (verticesLength >> 1) * 5;
+			let worldVerticesLength = (verticesLength >> 1) * 8;
 			if (this.worldVertices == null || this.worldVertices.length != worldVerticesLength) {
-				this.worldVertices = Utils.newArray<number>(worldVerticesLength, 0);				           
+				this.worldVertices = Utils.newFloatArray(worldVerticesLength);				           
 			}
 
 			var u = 0, v = 0, width = 0, height = 0;

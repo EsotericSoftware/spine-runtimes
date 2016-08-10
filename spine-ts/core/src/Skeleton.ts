@@ -442,7 +442,7 @@ module spine {
 			let minX = Number.POSITIVE_INFINITY, minY = Number.POSITIVE_INFINITY, maxX = Number.NEGATIVE_INFINITY, maxY = Number.NEGATIVE_INFINITY;
 			for (var i = 0, n = drawOrder.length; i < n; i++) {
 				let slot = drawOrder[i];
-				var vertices: Array<number> = null;
+				var vertices: ArrayLike<number> = null;
 				let attachment = slot.getAttachment();
 				if (attachment instanceof RegionAttachment)
 					vertices = (<RegionAttachment>attachment).updateWorldVertices(slot, false);

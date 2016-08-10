@@ -151,6 +151,10 @@ module spine {
 			let array = new Float32Array(size);
 			return array;
 		}
+
+		static toFloatArray (array: Array<number>) {
+			return new Float32Array(array);	
+		}
 	}
 
 	export class Vector2 {        

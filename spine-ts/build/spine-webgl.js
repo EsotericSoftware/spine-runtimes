@@ -3410,7 +3410,7 @@ var spine;
                     for (var i = 0, n = vertices.length; i < n; i++)
                         vertices[i] *= scale;
                 }
-                attachment.vertices = vertices;
+                attachment.vertices = spine.Utils.toFloatArray(vertices);
                 return;
             }
             var weights = new Array();
@@ -3426,7 +3426,7 @@ var spine;
                 }
             }
             attachment.bones = bones;
-            attachment.vertices = weights;
+            attachment.vertices = spine.Utils.toFloatArray(weights);
         };
         SkeletonJson.prototype.readAnimation = function (map, name, skeletonData) {
             var scale = this.scale;
@@ -4347,6 +4347,9 @@ var spine;
             var array = new Float32Array(size);
             return array;
         };
+        Utils.toFloatArray = function (array) {
+            return new Float32Array(array);
+        };
         return Utils;
     }());
     spine.Utils = Utils;
@@ -4644,9 +4647,9 @@ var spine;
         MeshAttachment.prototype.updateUVs = function () {
             var regionUVs = this.regionUVs;
             var verticesLength = regionUVs.length;
-            var worldVerticesLength = (verticesLength >> 1) * 5;
+            var worldVerticesLength = (verticesLength >> 1) * 8;
             if (this.worldVertices == null || this.worldVertices.length != worldVerticesLength) {
-                this.worldVertices = spine.Utils.newArray(worldVerticesLength, 0);
+                this.worldVertices = spine.Utils.newFloatArray(worldVerticesLength);
             }
             var u = 0, v = 0, width = 0, height = 0;
             if (this.region == null) {
