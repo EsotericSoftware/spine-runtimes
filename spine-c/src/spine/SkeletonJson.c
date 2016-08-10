@@ -944,7 +944,9 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 					}
 					case SP_ATTACHMENT_BOUNDING_BOX: {
 						spBoundingBoxAttachment* box = SUB_CAST(spBoundingBoxAttachment, attachment);
-						_readVertices(self, attachmentMap, SUPER(box), Json_getInt(attachmentMap, "vertexCount", 0) << 1);
+						int vertexCount = Json_getInt(attachmentMap, "vertexCount", 0) << 1;
+						_readVertices(self, attachmentMap, SUPER(box), vertexCount);
+						box->super.verticesCount = vertexCount;
 						spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 						break;
 					}
@@ -955,6 +957,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 						path->constantSpeed = Json_getInt(attachmentMap, "constantSpeed", 1);
 						vertexCount = Json_getInt(attachmentMap, "vertexCount", 0);
 						_readVertices(self, attachmentMap, SUPER(path), vertexCount << 1);
+						path->super.verticesCount = vertexCount;
 
 						path->lengthsLength = vertexCount / 3;
 						path->lengths = MALLOC(float, path->lengthsLength);
