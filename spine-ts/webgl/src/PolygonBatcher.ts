@@ -67,7 +67,7 @@ module spine.webgl {
 			}            
 		}
 
-		draw (texture: Texture, vertices: Array<number>, indices: Array<number>) {
+		draw (texture: Texture, vertices: ArrayLike<number>, indices: Array<number>) {
 			if (texture != this._lastTexture) {
 				this.flush();
 				this._lastTexture = texture;

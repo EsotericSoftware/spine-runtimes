@@ -562,12 +562,12 @@ module spine {
 							let frameIndex = 0;
 							for (var j = 0; j < timelineMap.length; j++) {
 								let valueMap = timelineMap[j];
-								var deform: Array<number>;
+								var deform: ArrayLike<number>;
 								let verticesValue: Array<Number> = this.getValue(valueMap, "vertices", null);
 								if (verticesValue == null)
-									deform = weighted ? Utils.newArray<number>(deformLength, 0) : vertices;
+									deform = weighted ? Utils.newFloatArray(deformLength) : vertices;
 								else {
-									deform = Utils.newArray<number>(deformLength, 0);
+									deform = Utils.newFloatArray(deformLength);
 									let start = <number>this.getValue(valueMap, "offset", 0);
 									Utils.arrayCopy(verticesValue, 0, deform, start, verticesValue.length);                                    
 									if (scale != 1) {

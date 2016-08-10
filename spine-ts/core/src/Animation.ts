@@ -529,18 +529,18 @@ module spine {
 
 	export class DeformTimeline extends CurveTimeline {
 		frames: ArrayLike<number>; // time, ...
-		frameVertices: Array<Array<number>>;
+		frameVertices: Array<ArrayLike<number>>;
 		slotIndex: number;
 		attachment: VertexAttachment;
 
 		constructor (frameCount: number) {
 			super(frameCount);
 			this.frames = Utils.newFloatArray(frameCount);
-			this.frameVertices = new Array<Array<number>>(frameCount);
+			this.frameVertices = new Array<ArrayLike<number>>(frameCount);
 		}
 
 		/** Sets the time of the specified keyframe. */
-		setFrame (frameIndex: number, time: number, vertices: Array<number>) {
+		setFrame (frameIndex: number, time: number, vertices: ArrayLike<number>) {
 			this.frames[frameIndex] = time;
 			this.frameVertices[frameIndex] = vertices;
 		}

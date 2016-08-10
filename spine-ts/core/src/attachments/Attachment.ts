@@ -41,7 +41,7 @@ module spine {
 
 	export abstract class VertexAttachment extends Attachment {
 		bones: Array<number>;
-		vertices: Array<number>;
+		vertices: ArrayLike<number>;
 		worldVerticesLength = 0;
 
 		constructor (name: string) {

@@ -144,12 +144,12 @@ declare module spine {
     }
     class DeformTimeline extends CurveTimeline {
         frames: ArrayLike<number>;
-        frameVertices: Array<Array<number>>;
+        frameVertices: Array<ArrayLike<number>>;
         slotIndex: number;
         attachment: VertexAttachment;
         constructor(frameCount: number);
         /** Sets the time of the specified keyframe. */
-        setFrame(frameIndex: number, time: number, vertices: Array<number>): void;
+        setFrame(frameIndex: number, time: number, vertices: ArrayLike<number>): void;
         apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number): void;
     }
     class IkConstraintTimeline extends CurveTimeline {
@@ -1445,7 +1445,7 @@ declare module spine {
     }
     abstract class VertexAttachment extends Attachment {
         bones: Array<number>;
-        vertices: Array<number>;
+        vertices: ArrayLike<number>;
         worldVerticesLength: number;
         constructor(name: string);
         computeWorldVertices(slot: Slot, worldVertices: Array<number>): void;
@@ -1610,7 +1610,7 @@ declare module spine {
         region: TextureRegion;
         path: string;
         regionUVs: Array<number>;
-        worldVertices: Array<number>;
+        worldVertices: ArrayLike<number>;
         triangles: Array<number>;
         color: Color;
         hullLength: number;
@@ -1620,7 +1620,7 @@ declare module spine {
         constructor(name: string);
         updateUVs(): void;
         /** @return The updated world vertices. */
-        updateWorldVertices(slot: Slot, premultipliedAlpha: boolean): number[];
+        updateWorldVertices(slot: Slot, premultipliedAlpha: boolean): ArrayLike<number>;
         applyDeform(sourceAttachment: VertexAttachment): boolean;
         getParentMesh(): MeshAttachment;
         /** @param parentMesh May be null. */
@@ -2042,7 +2042,7 @@ declare module spine.webgl {
         constructor(maxVertices?: number);
         begin(shader: Shader): void;
         setBlendMode(srcBlend: number, dstBlend: number): void;
-        draw(texture: Texture, vertices: Array<number>, indices: Array<number>): void;
+        draw(texture: Texture, vertices: ArrayLike<number>, indices: Array<number>): void;
         private flush();
         end(): void;
         drawCalls(): number;

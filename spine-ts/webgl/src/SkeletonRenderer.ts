@@ -39,7 +39,7 @@ module spine.webgl {
 			let premultipliedAlpha = this.premultipliedAlpha;
 			var blendMode: BlendMode = null;
 
-			var vertices: Array<number> = null;
+			var vertices: ArrayLike<number> = null;
 			var triangles: Array<number>  = null;
 			var drawOrder = skeleton.drawOrder;
 			for (var i = 0, n = drawOrder.length; i < n; i++) {

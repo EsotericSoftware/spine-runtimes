@@ -3637,9 +3637,9 @@ var spine;
                                 var deform;
                                 var verticesValue = this.getValue(valueMap, "vertices", null);
                                 if (verticesValue == null)
-                                    deform = weighted ? spine.Utils.newArray(deformLength, 0) : vertices;
+                                    deform = weighted ? spine.Utils.newFloatArray(deformLength) : vertices;
                                 else {
-                                    deform = spine.Utils.newArray(deformLength, 0);
+                                    deform = spine.Utils.newFloatArray(deformLength);
                                     var start = this.getValue(valueMap, "offset", 0);
                                     spine.Utils.arrayCopy(verticesValue, 0, deform, start, verticesValue.length);
                                     if (scale != 1) {
