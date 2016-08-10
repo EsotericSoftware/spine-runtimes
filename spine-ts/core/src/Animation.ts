@@ -1,72 +1,72 @@
 module spine {
-    export class Animation {
-        name: string;
-        timelines: Array<Timeline>;
-        duration: number;
+	export class Animation {
+		name: string;
+		timelines: Array<Timeline>;
+		duration: number;
 
 	    constructor (name: string, timelines: Array<Timeline>, duration: number) {
-            if (name == null) throw new Error("name cannot be null.");
-            if (timelines == null) throw new Error("timelines cannot be null.");
-            this.name = name;
-            this.timelines = timelines;
-            this.duration = duration;
-        }
+			if (name == null) throw new Error("name cannot be null.");
+			if (timelines == null) throw new Error("timelines cannot be null.");
+			this.name = name;
+			this.timelines = timelines;
+			this.duration = duration;
+		}
 
-        apply (skeleton: Skeleton, lastTime: number, time: number, loop: boolean, events: Array<Event>) {
-            if (skeleton == null) throw new Error("skeleton cannot be null.");
+		apply (skeleton: Skeleton, lastTime: number, time: number, loop: boolean, events: Array<Event>) {
+			if (skeleton == null) throw new Error("skeleton cannot be null.");
 
-            if (loop && this.duration != 0) {
-                time %= this.duration;
-                if (lastTime > 0) lastTime %= this.duration;
-            }
+			if (loop && this.duration != 0) {
+				time %= this.duration;
+				if (lastTime > 0) lastTime %= this.duration;
+			}
 
-            let timelines = this.timelines;
-            for (var i = 0, n = timelines.length; i < n; i++)
-                timelines[i].apply(skeleton, lastTime, time, events, 1);
-        }
+			let timelines = this.timelines;
+			for (var i = 0, n = timelines.length; i < n; i++)
+				timelines[i].apply(skeleton, lastTime, time, events, 1);
+		}
 
-        mix (skeleton: Skeleton, lastTime: number, time: number, loop: boolean, events: Array<Event>, alpha: number) {
-            if (skeleton == null) throw new Error("skeleton cannot be null.");
+		mix (skeleton: Skeleton, lastTime: number, time: number, loop: boolean, events: Array<Event>, alpha: number) {
+			if (skeleton == null) throw new Error("skeleton cannot be null.");
 
-            if (loop && this.duration != 0) {
-                time %= this.duration;
-                if (lastTime > 0) lastTime %= this.duration;
-            }
+			if (loop && this.duration != 0) {
+				time %= this.duration;
+				if (lastTime > 0) lastTime %= this.duration;
+			}
 
-            let timelines = this.timelines;
-            for (var i = 0, n = timelines.length; i < n; i++)
-                timelines[i].apply(skeleton, lastTime, time, events, alpha);
+			let timelines = this.timelines;
+			for (var i = 0, n = timelines.length; i < n; i++)
+				timelines[i].apply(skeleton, lastTime, time, events, alpha);
 	    }
 
-        static binarySearch (values: Array<number>, target: number, step: number = 1) {
-            // FIXME this relies on integer math, may break
-            let low = 0;
-            let high = values.length / step - 2;
-            if (high == 0) return step;
-            let current = high >>> 1;
-            while (true) {
-                if (values[(current + 1) * step] <= target)
-                    low = current + 1;
-                else
-                    high = current;
-                if (low == high) return (low + 1) * step;
-                current = (low + high) >>> 1;
-            }
-        }
+		static binarySearch (values: Array<number>, target: number, step: number = 1) {
+			// FIXME this relies on integer math, may break
+			let low = 0;
+			let high = values.length / step - 2;
+			if (high == 0) return step;
+			let current = high >>> 1;
+			while (true) {
+				if (values[(current + 1) * step] <= target)
+					low = current + 1;
+				else
+					high = current;
+				if (low == high) return (low + 1) * step;
+				current = (low + high) >>> 1;
+			}
+		}
 
-        static linearSearch (values: Array<number>, target: number, step: number) {
-            for (var i = 0, last = values.length - step; i <= last; i += step)
-                if (values[i] > target) return i;
-            return -1;
-        }
+		static linearSearch (values: Array<number>, target: number, step: number) {
+			for (var i = 0, last = values.length - step; i <= last; i += step)
+				if (values[i] > target) return i;
+			return -1;
+		}
 	}
 
-    export interface Timeline {
-        apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number): void;
-    }
+	export interface Timeline {
+		apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number): void;
+	}
 
-    export abstract class CurveTimeline implements Timeline {
-        static LINEAR = 0; static STEPPED = 1; static BEZIER = 2;
+	export abstract class CurveTimeline implements Timeline {
+		static LINEAR = 0; static STEPPED = 1; static BEZIER = 2;
 		static BEZIER_SIZE = 10 * 2 - 1;
 
 		private curves: Array<number>; // type, x, y, ...
@@ -153,11 +153,11 @@ module spine {
 			return y + (1 - y) * (percent - x) / (1 - x); // Last point is 1,1.
 		}
 
-        abstract apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number): void;
-    }
+		abstract apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number): void;
+	}
 
-    export class RotateTimeline extends CurveTimeline {
-        static ENTRIES = 2;
+	export class RotateTimeline extends CurveTimeline {
+		static ENTRIES = 2;
 		static PREV_TIME = -2; static PREV_ROTATION = -1;
 		static ROTATION = 1;
 
@@ -210,10 +210,10 @@ module spine {
 				amount += 360;
 			bone.rotation += amount * alpha;
 		}
-    }
+	}
 
-    export class TranslateTimeline extends CurveTimeline {
-        static ENTRIES = 3;
+	export class TranslateTimeline extends CurveTimeline {
+		static ENTRIES = 3;
 		static PREV_TIME = -3; static PREV_X = -2; static PREV_Y = -1;
 		static X = 1; static Y = 2;
 
@@ -255,10 +255,10 @@ module spine {
 			bone.x += (bone.data.x + prevX + (frames[frame + TranslateTimeline.X] - prevX) * percent - bone.x) * alpha;
 			bone.y += (bone.data.y + prevY + (frames[frame + TranslateTimeline.Y] - prevY) * percent - bone.y) * alpha;
 		}
-    }
+	}
 
-    export class ScaleTimeline extends TranslateTimeline {
-        constructor (frameCount: number) {
+	export class ScaleTimeline extends TranslateTimeline {
+		constructor (frameCount: number) {
 			super(frameCount);
 		}
 
@@ -283,10 +283,10 @@ module spine {
 			bone.scaleX += (bone.data.scaleX * (prevX + (frames[frame + ScaleTimeline.X] - prevX) * percent) - bone.scaleX) * alpha;
 			bone.scaleY += (bone.data.scaleY * (prevY + (frames[frame + ScaleTimeline.Y] - prevY) * percent) - bone.scaleY) * alpha;
 		}
-    }
+	}
 
-    export class ShearTimeline extends TranslateTimeline {
-        constructor (frameCount: number) {
+	export class ShearTimeline extends TranslateTimeline {
+		constructor (frameCount: number) {
 			super(frameCount);
 		}
 
@@ -311,9 +311,9 @@ module spine {
 			bone.shearX += (bone.data.shearX + (prevX + (frames[frame + ShearTimeline.X] - prevX) * percent) - bone.shearX) * alpha;
 			bone.shearY += (bone.data.shearY + (prevY + (frames[frame + ShearTimeline.Y] - prevY) * percent) - bone.shearY) * alpha;
 		}
-    }
+	}
 
-    export class ColorTimeline extends CurveTimeline {
+	export class ColorTimeline extends CurveTimeline {
 		static ENTRIES = 5;
 		static PREV_TIME = -5; static PREV_R = -4; static PREV_G = -3; static PREV_B = -2; static PREV_A = -1;
 		static R = 1; static G = 2; static B = 3; static A = 4;
@@ -371,7 +371,7 @@ module spine {
 		}
 	}
 
-    export class AttachmentTimeline implements Timeline {
+	export class AttachmentTimeline implements Timeline {
 		slotIndex: number;
 		frames: Array<number>; // time, ...
 		attachmentNames: Array<string>;
@@ -405,9 +405,9 @@ module spine {
 			skeleton.slots[this.slotIndex]
 				.setAttachment(attachmentName == null ? null : skeleton.getAttachment(this.slotIndex, attachmentName));
 		}
-    }
+	}
 
-    export class EventTimeline implements Timeline {
+	export class EventTimeline implements Timeline {
 		frames: Array<number>; // time, ...
 		events: Array<Event>;
 
@@ -455,7 +455,7 @@ module spine {
 		}
 	}
 
-    export class DrawOrderTimeline implements Timeline {
+	export class DrawOrderTimeline implements Timeline {
 		frames:  Array<number>; // time, ...
 		drawOrders: Array<Array<number>>;
 
@@ -489,7 +489,7 @@ module spine {
 			let slots: Array<Slot> = skeleton.slots;
 			let drawOrderToSetupIndex = this.drawOrders[frame];
 			if (drawOrderToSetupIndex == null)
-                Utils.arrayCopy(slots, 0, drawOrder, 0, slots.length);				
+				Utils.arrayCopy(slots, 0, drawOrder, 0, slots.length);				
 			else {
 				for (var i = 0, n = drawOrderToSetupIndex.length; i < n; i++)
 					drawOrder[i] = slots[drawOrderToSetupIndex[i]];
@@ -497,7 +497,7 @@ module spine {
 		}
 	}
 
-    export class DeformTimeline extends CurveTimeline {
+	export class DeformTimeline extends CurveTimeline {
 		frames: Array<number>; // time, ...
 		frameVertices: Array<Array<number>>;
 		slotIndex: number;
@@ -529,7 +529,7 @@ module spine {
 			let verticesArray: Array<number> = slot.attachmentVertices;
 			if (verticesArray.length != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
 			let vertices: Array<number> = Utils.setArraySize(verticesArray, vertexCount);
-            
+			
 			if (time >= frames[frames.length - 1]) { // Time is after last frame.
 				let lastVertices = frameVertices[frames.length - 1];
 				if (alpha < 1) {
@@ -561,7 +561,7 @@ module spine {
 		}
 	}
 
-    export class IkConstraintTimeline extends CurveTimeline {
+	export class IkConstraintTimeline extends CurveTimeline {
 		static ENTRIES = 3;
 		static PREV_TIME = -3; static PREV_MIX = -2; static PREV_BEND_DIRECTION = -1;
 		static MIX = 1; static BEND_DIRECTION = 2;
@@ -605,7 +605,7 @@ module spine {
 		}
 	}
 
-    export class TransformConstraintTimeline extends CurveTimeline {
+	export class TransformConstraintTimeline extends CurveTimeline {
 		static ENTRIES = 5;
 		static PREV_TIME = -5; static PREV_ROTATE = -4; static PREV_TRANSLATE = -3; static PREV_SCALE = -2; static PREV_SHEAR = -1;
 		static ROTATE = 1; static TRANSLATE = 2; static SCALE = 3; static SHEAR = 4;
@@ -660,7 +660,7 @@ module spine {
 		}
 	}
 
-    export class PathConstraintPositionTimeline extends CurveTimeline {
+	export class PathConstraintPositionTimeline extends CurveTimeline {
 		static ENTRIES = 2;
 		static PREV_TIME = -2; static PREV_VALUE = -1;
 		static VALUE = 1;
@@ -703,7 +703,7 @@ module spine {
 		}
 	}
 
-    export class PathConstraintSpacingTimeline extends PathConstraintPositionTimeline {
+	export class PathConstraintSpacingTimeline extends PathConstraintPositionTimeline {
 		constructor (frameCount: number) {
 			super(frameCount);
 		}
@@ -730,7 +730,7 @@ module spine {
 		}
 	}
 
-    export class PathConstraintMixTimeline extends CurveTimeline {
+	export class PathConstraintMixTimeline extends CurveTimeline {
 		static ENTRIES = 3;
 		static PREV_TIME = -3; static PREV_ROTATE = -2; static PREV_TRANSLATE = -1;
 		static ROTATE = 1; static TRANSLATE = 2;

@@ -1,28 +1,28 @@
 module spine {
-    export class PathConstraintData {
-        name: string;
-        bones = new Array<BoneData>();
-        target: SlotData;
-        positionMode: PositionMode;
-        spacingMode: SpacingMode;
-        rotateMode: RotateMode;
-        offsetRotation: number;
-        position: number; spacing: number; rotateMix: number; translateMix: number;
+	export class PathConstraintData {
+		name: string;
+		bones = new Array<BoneData>();
+		target: SlotData;
+		positionMode: PositionMode;
+		spacingMode: SpacingMode;
+		rotateMode: RotateMode;
+		offsetRotation: number;
+		position: number; spacing: number; rotateMix: number; translateMix: number;
 
-        constructor (name: string) {
-            this.name = name;
-        }
-    }
+		constructor (name: string) {
+			this.name = name;
+		}
+	}
 
-    export enum PositionMode {
-        Fixed, Percent
-    }
+	export enum PositionMode {
+		Fixed, Percent
+	}
 
-    export enum SpacingMode {
-        Length, Fixed, Percent
-    }
+	export enum SpacingMode {
+		Length, Fixed, Percent
+	}
 
-    export enum RotateMode {
-        Tangent, Chain, ChainScale
-    }
+	export enum RotateMode {
+		Tangent, Chain, ChainScale
+	}
 }

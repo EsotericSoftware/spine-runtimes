@@ -1,5 +1,5 @@
 module spine {
-    export interface Updatable {
-        update(): void;
-    }
+	export interface Updatable {
+		update(): void;
+	}
 }
