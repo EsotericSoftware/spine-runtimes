@@ -4854,8 +4854,8 @@ var spine;
             this.width = 0;
             this.height = 0;
             this.color = new spine.Color(1, 1, 1, 1);
-            this.offset = spine.Utils.newArray(8, 0);
-            this.vertices = spine.Utils.newArray(8 * 4, 0);
+            this.offset = spine.Utils.newFloatArray(8);
+            this.vertices = spine.Utils.newFloatArray(8 * 4);
             this.tempColor = new spine.Color(1, 1, 1, 1);
         }
         RegionAttachment.prototype.setRegion = function (region) {

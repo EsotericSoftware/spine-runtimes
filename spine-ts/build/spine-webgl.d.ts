@@ -1749,13 +1749,13 @@ declare module spine {
         path: string;
         rendererObject: any;
         region: TextureRegion;
-        offset: number[];
-        vertices: number[];
+        offset: ArrayLike<number>;
+        vertices: ArrayLike<number>;
         tempColor: Color;
         constructor(name: string);
         setRegion(region: TextureRegion): void;
         updateOffset(): void;
-        updateWorldVertices(slot: Slot, premultipliedAlpha: boolean): number[];
+        updateWorldVertices(slot: Slot, premultipliedAlpha: boolean): ArrayLike<number>;
     }
 }
 /******************************************************************************

@@ -134,6 +134,7 @@ function setupUI() {
     for (var skeletonName in skeletons) {
         var option = $("<option></option>");
         option.attr("value", skeletonName).text(skeletonName);
+        if (skeletonName === activeSkeleton) option.attr("selected", "selected");
         skeletonList.append(option);
     }
     var setupAnimationUI = function() {

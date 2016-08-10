@@ -83,8 +83,8 @@ module spine {
 		rendererObject: any;
 		region: TextureRegion;
 
-		offset = Utils.newArray<number>(8, 0);        
-		vertices = Utils.newArray<number>(8 * 4, 0);
+		offset = Utils.newFloatArray(8);        
+		vertices = Utils.newFloatArray(8 * 4);
 
 		tempColor = new Color(1, 1, 1, 1);
 
