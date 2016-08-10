@@ -511,7 +511,7 @@ static void _readVertices(spSkeletonJson* self, Json* attachmentMap, spVertexAtt
 		if (self->scale != 1)
 			for (i = 0; i < entrySize; ++i)
 				vertices[i] *= self->scale;
-		attachment->verticesCount = verticesLength;
+		attachment->verticesCount = verticesLength >> 1;
 		attachment->vertices = vertices;
 
 		attachment->bonesCount = 0;
