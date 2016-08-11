@@ -52,7 +52,7 @@ module spine {
 			this.skeleton = skeleton;
 			this.parent = parent;
 			this.setToSetupPose();
-		}        
+		}
 
 		/** Same as {@link #updateWorldTransform()}. This method exists for Bone to implement {@link Updatable}. */
 		update () {
@@ -186,13 +186,13 @@ module spine {
 			this.scaleY = data.scaleY;
 			this.shearX = data.shearX;
 			this.shearY = data.shearY;
-		}                
+		}
 
 		getWorldRotationX () {
 			return Math.atan2(this.c, this.a) * MathUtils.radDeg;
 		}
 
-		 getWorldRotationY () {
+		getWorldRotationY () {
 			return Math.atan2(this.d, this.b) * MathUtils.radDeg;
 		}
 
@@ -273,7 +273,7 @@ module spine {
 			}
 			this.appliedRotation = this.rotation;
 		}
-		
+
 		worldToLocal (world: Vector2) {
 			let a = this.a, b = this.b, c = this.c, d = this.d;
 			let invDet = 1 / (a * d - b * c);

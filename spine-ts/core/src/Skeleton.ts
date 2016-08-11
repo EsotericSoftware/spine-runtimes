@@ -199,7 +199,7 @@ module spine {
 			if (!attachments) return;
 			for (var key in attachments) {
 				this.sortPathConstraintAttachmentWith(attachments[key], slotBone);
-			}            
+			}
 		}
 
 		sortPathConstraintAttachmentWith (attachment: Attachment, slotBone: Bone) {
@@ -281,7 +281,7 @@ module spine {
 
 		setSlotsToSetupPose () {
 			let slots = this.slots;
-			Utils.arrayCopy(slots, 0, this.drawOrder, 0, slots.length);            
+			Utils.arrayCopy(slots, 0, this.drawOrder, 0, slots.length);
 			for (var i = 0, n = slots.length; i < n; i++)
 				slots[i].setToSetupPose();
 		}
@@ -397,7 +397,7 @@ module spine {
 				}
 			}
 			throw new Error("Slot not found: " + slotName);
-		}       
+		}
 
 		/** @return May be null. */
 		findIkConstraint (constraintName: string) {

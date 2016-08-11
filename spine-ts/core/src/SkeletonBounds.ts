@@ -42,12 +42,12 @@ module spine {
 			let slots = skeleton.slots;
 			let slotCount = slots.length;
 
-			boundingBoxes.length = 0;            
+			boundingBoxes.length = 0;
 			polygons.length = 0;
 
 			for (var i = 0; i < slotCount; i++) {
 				let slot = slots[i];
-				let attachment = slot.getAttachment();                
+				let attachment = slot.getAttachment();
 				if (attachment instanceof BoundingBoxAttachment) {
 					let boundingBox = attachment as BoundingBoxAttachment;
 					boundingBoxes.push(boundingBox);
@@ -172,7 +172,7 @@ module spine {
 				y3 = y4;
 			}
 			return false;
-		}        
+		}
 
 		/** Returns the polygon for the specified bounding box, or null. */
 		getPolygon (boundingBox: BoundingBoxAttachment) {

@@ -119,6 +119,6 @@ module spine {
 		/** Returns true if a deform originally applied to the specified attachment should be applied to this attachment. */
 		applyDeform (sourceAttachment: VertexAttachment) {
 			return this == sourceAttachment;
-		}        
+		}
 	}
 }

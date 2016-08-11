@@ -83,13 +83,13 @@ module spine {
 		rendererObject: any;
 		region: TextureRegion;
 
-		offset = Utils.newFloatArray(8);        
+		offset = Utils.newFloatArray(8);
 		vertices = Utils.newFloatArray(8 * 4);
 
 		tempColor = new Color(1, 1, 1, 1);
 
 		constructor (name:string) {
-			super(name);		
+			super(name);
 		}
 
 		setRegion (region: TextureRegion) : void {
@@ -153,9 +153,9 @@ module spine {
 			let multiplier = premultipliedAlpha ? alpha : 1;
 			let color = this.tempColor;
 			color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier,
-						  skeletonColor.g * slotColor.g * regionColor.g * multiplier,
-						  skeletonColor.b * slotColor.b * regionColor.b * multiplier,
-						  alpha); 
+				skeletonColor.g * slotColor.g * regionColor.g * multiplier,
+				skeletonColor.b * slotColor.b * regionColor.b * multiplier,
+				alpha);
 
 			let vertices = this.vertices;
 			let offset = this.offset;
@@ -201,6 +201,6 @@ module spine {
 			vertices[RegionAttachment.C4A] = color.a;
 
 			return vertices;
-	    }
+		}
 	}
 }

@@ -39,11 +39,11 @@ module spine {
 			this.attachmentLoader = attachmentLoader;
 		}
 
-		readSkeletonData(json: string): SkeletonData {
+		readSkeletonData (json: string): SkeletonData {
 			let scale = this.scale;
-		    let skeletonData = new SkeletonData();
-		    // FIXME skeletonData.name = file.nameWithoutExtension();
-		    let root = JSON.parse(json);
+			let skeletonData = new SkeletonData();
+			// FIXME skeletonData.name = file.nameWithoutExtension();
+			let root = JSON.parse(json);
 
 			// Skeleton
 			let skeletonMap = root.skeleton;
@@ -56,7 +56,7 @@ module spine {
 			}
 
 			// Bones
-			if (root.bones) {          		
+			if (root.bones) {
 				for (var i = 0; i < root.bones.length; i++) {
 					let boneMap = root.bones[i];
 
@@ -76,7 +76,7 @@ module spine {
 					data.shearX = this.getValue(boneMap, "shearX", 0);
 					data.shearY = this.getValue(boneMap, "shearY", 0);
 					data.inheritRotation = this.getValue(boneMap, "inheritRotation", true);
-					data.inheritScale = this.getValue(boneMap, "inheritScale", true)                
+					data.inheritScale = this.getValue(boneMap, "inheritScale", true);
 
 					skeletonData.bones.push(data);
 				}
@@ -107,7 +107,7 @@ module spine {
 					let constraintMap = root.ik[i];
 					let data = new IkConstraintData(constraintMap.name);
 
-					for (var j = 0; j < constraintMap.bones.length; j++) {                    
+					for (var j = 0; j < constraintMap.bones.length; j++) {
 						let boneName = constraintMap.bones[j];
 						let bone = skeletonData.findBone(boneName);
 						if (bone == null) throw new Error("IK bone not found: " + boneName);
@@ -131,7 +131,7 @@ module spine {
 					let constraintMap = root.transform[i];
 					let data = new TransformConstraintData(constraintMap.name);
 
-					for (var j = 0; j < constraintMap.bones.length; j++) {                    
+					for (var j = 0; j < constraintMap.bones.length; j++) {
 						let boneName = constraintMap.bones[j];
 						let bone = skeletonData.findBone(boneName);
 						if (bone == null) throw new Error("Transform constraint bone not found: " + boneName);
@@ -164,7 +164,7 @@ module spine {
 					let constraintMap = root.path[i];
 					let data = new PathConstraintData(constraintMap.name);
 
-					for (var j = 0; j < constraintMap.bones.length; j++) {                    
+					for (var j = 0; j < constraintMap.bones.length; j++) {
 						let boneName = constraintMap.bones[j];
 						let bone = skeletonData.findBone(boneName);
 						if (bone == null) throw new Error("Transform constraint bone not found: " + boneName);
@@ -199,7 +199,7 @@ module spine {
 						let slotIndex = skeletonData.findSlotIndex(slotName);
 						if (slotIndex == -1) throw new Error("Slot not found: " + slotName);
 						let slotMap = skinMap[slotName];
-						for (var entryName in slotMap) {                        
+						for (var entryName in slotMap) {
 							let attachment = this.readAttachment(slotMap[entryName], skin, slotIndex, entryName);
 							if (attachment != null) skin.addAttachment(slotIndex, entryName, attachment);
 						}
@@ -209,7 +209,7 @@ module spine {
 				}
 			}
 
-			// Linked meshes.            
+			// Linked meshes.
 			for (var i = 0, n = this.linkedMeshes.length; i < n; i++) {
 				let linkedMesh = this.linkedMeshes[i];
 				let skin = linkedMesh.skin == null ? skeletonData.defaultSkin : skeletonData.findSkin(linkedMesh.skin);
@@ -236,12 +236,12 @@ module spine {
 			// Animations.
 			if (root.animations) {
 				for (var animationName in root.animations) {
-					let animationMap = root.animations[animationName];        
-					this.readAnimation(animationMap, animationName, skeletonData);                
+					let animationMap = root.animations[animationName];
+					this.readAnimation(animationMap, animationName, skeletonData);
 				}
 			}
 
-			return skeletonData;            
+			return skeletonData;
 		}
 
 		readAttachment (map: any, skin: Skin, slotIndex: number, name: string): Attachment {
@@ -273,7 +273,7 @@ module spine {
 				case "boundingbox": {
 					let box = this.attachmentLoader.newBoundingBoxAttachment(skin, name);
 					if (box == null) return null;
-					this.readVertices(map, box, map.vertexCount << 1);                    
+					this.readVertices(map, box, map.vertexCount << 1);
 					return box;
 				}
 				case "mesh":
@@ -284,7 +284,7 @@ module spine {
 					mesh.path = path;
 
 					let color = this.getValue(map, "color", null);
-					if (color != null) mesh.color.setFromString(color);                    
+					if (color != null) mesh.color.setFromString(color);
 
 					let parent: string = this.getValue(map, "parent", null);
 					if (parent != null) {
@@ -299,7 +299,7 @@ module spine {
 					mesh.regionUVs = uvs;
 					mesh.updateUVs();
 
-					mesh.hullLength = this.getValue(map, "hull", 0) * 2; 
+					mesh.hullLength = this.getValue(map, "hull", 0) * 2;
 					return mesh;
 				}
 				case "path": {
@@ -311,17 +311,17 @@ module spine {
 					let vertexCount = map.vertexCount;
 					this.readVertices(map, path, vertexCount << 1);
 
-					let lengths: Array<number> = Utils.newArray(vertexCount / 3, 0);                    
+					let lengths: Array<number> = Utils.newArray(vertexCount / 3, 0);
 					for (var i = 0; i < map.lengths.length; i++)
 						lengths[i++] = map.lengths[i] * scale;
-					path.lengths = lengths;                    
+					path.lengths = lengths;
 					return path;
 				}
 			}
 			return null;
 		}
 
-		readVertices(map: any, attachment: VertexAttachment, verticesLength: number) {
+		readVertices (map: any, attachment: VertexAttachment, verticesLength: number) {
 			let scale = this.scale;
 			attachment.worldVerticesLength = verticesLength;
 			let vertices: Array<number> = map.vertices;
@@ -349,7 +349,7 @@ module spine {
 			attachment.vertices = Utils.toFloatArray(weights);
 		}
 
-		readAnimation(map: any, name: string, skeletonData: SkeletonData) {
+		readAnimation (map: any, name: string, skeletonData: SkeletonData) {
 			let scale = this.scale;
 			let timelines = new Array<Timeline>();
 			var duration = 0;
@@ -450,7 +450,7 @@ module spine {
 			// IK constraint timelines.
 			if (map.ik) {
 				for (var constraintName in map.ik) {
-					let constraintMap = map.ik[constraintName];                    
+					let constraintMap = map.ik[constraintName];
 					let constraint = skeletonData.findIkConstraint(constraintName);
 					let timeline = new IkConstraintTimeline(constraintMap.length);
 					timeline.ikConstraintIndex = skeletonData.ikConstraints.indexOf(constraint);
@@ -534,7 +534,7 @@ module spine {
 								timeline.frames[(timeline.getFrameCount() - 1) * PathConstraintMixTimeline.ENTRIES]);
 						}
 					}
-				}                
+				}
 			}
 
 			// Deform timelines.
@@ -569,7 +569,7 @@ module spine {
 								else {
 									deform = Utils.newFloatArray(deformLength);
 									let start = <number>this.getValue(valueMap, "offset", 0);
-									Utils.arrayCopy(verticesValue, 0, deform, start, verticesValue.length);                                    
+									Utils.arrayCopy(verticesValue, 0, deform, start, verticesValue.length);
 									if (scale != 1) {
 										for (var i = start, n = i + verticesValue.length; i < n; i++)
 											deform[i] *= scale;
@@ -591,7 +591,7 @@ module spine {
 				}
 			}
 
-			// Draw order timeline.            
+			// Draw order timeline.
 			var drawOrderNode = map.drawOrder;
 			if (drawOrderNode == null) drawOrderNode = map.draworder;
 			if (drawOrderNode != null) {
@@ -603,7 +603,7 @@ module spine {
 					var drawOrder: Array<number> = null;
 					let offsets = this.getValue(drawOrderMap, "offsets", null);
 					if (offsets != null) {
-						drawOrder = Utils.newArray<number>(slotCount, -1);                        
+						drawOrder = Utils.newArray<number>(slotCount, -1);
 						let unchanged = Utils.newArray<number>(slotCount - offsets.length, 0);
 						let originalIndex = 0, unchangedIndex = 0;
 						for (var i = 0; i < offsets.length; i++) {
@@ -630,11 +630,11 @@ module spine {
 			}
 
 			// Event timeline.
-			if (map.events) {                
+			if (map.events) {
 				let timeline = new EventTimeline(map.events.length);
 				let frameIndex = 0;
 				for (var i = 0; i < map.events.length; i++) {
-					let eventMap = map.events[i];                
+					let eventMap = map.events[i];
 					let eventData = skeletonData.findEvent(eventMap.name);
 					if (eventData == null) throw new Error("Event not found: " + eventMap.name);
 					let event = new Event(eventMap.time, eventData);
@@ -644,7 +644,7 @@ module spine {
 					timeline.setFrame(frameIndex++, event);
 				}
 				timelines.push(timeline);
-				duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);                
+				duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);
 			}
 
 			if (isNaN(duration)) {
@@ -654,7 +654,7 @@ module spine {
 			skeletonData.animations.push(new Animation(name, timelines, duration));
 		}
 
-		readCurve (map: any, timeline: CurveTimeline, frameIndex: number) {            
+		readCurve (map: any, timeline: CurveTimeline, frameIndex: number) {
 			if (!map.curve) return;
 			if (map.curve === "stepped")
 				timeline.setStepped(frameIndex);
@@ -666,7 +666,7 @@ module spine {
 
 		getValue (map: any, prop: string, defaultValue: any) {
 			return map[prop] !== undefined ? map[prop] : defaultValue;
-		} 
+		}
 
 		static blendModeFromString (str: string) {
 			str = str.toLowerCase();
@@ -677,28 +677,28 @@ module spine {
 			throw new Error(`Unknown blend mode: ${str}`);
 		}
 
-		static positionModeFromString(str: string) {
+		static positionModeFromString (str: string) {
 			str = str.toLowerCase();
 			if (str == "fixed") return PositionMode.Fixed;
-			if (str == "percent") return PositionMode.Percent;            
+			if (str == "percent") return PositionMode.Percent;
 			throw new Error(`Unknown position mode: ${str}`);
 		}
 
-		static spacingModeFromString(str: string) {
+		static spacingModeFromString (str: string) {
 			str = str.toLowerCase();
 			if (str == "length") return SpacingMode.Length;
 			if (str == "fixed") return SpacingMode.Fixed;
-			if (str == "percent") return SpacingMode.Percent;            
+			if (str == "percent") return SpacingMode.Percent;
 			throw new Error(`Unknown position mode: ${str}`);
 		}
 
-		static rotateModeFromString(str: string) {
+		static rotateModeFromString (str: string) {
 			str = str.toLowerCase();
 			if (str == "tangent") return RotateMode.Tangent;
 			if (str == "chain") return RotateMode.Chain;
-			if (str == "chainscale") return RotateMode.ChainScale;            
+			if (str == "chainscale") return RotateMode.ChainScale;
 			throw new Error(`Unknown rotate mode: ${str}`);
-		}        
+		}
 	}
 
 	class LinkedMesh {

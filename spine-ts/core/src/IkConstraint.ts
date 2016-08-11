@@ -46,11 +46,11 @@ module spine {
 			this.mix = data.mix;
 			this.bendDirection = data.bendDirection;
 
-			this.bones = new Array<Bone>();            
+			this.bones = new Array<Bone>();
 			for (var i = 0; i < data.bones.length; i++)
 				this.bones.push(skeleton.findBone(data.bones[i].name));
 			this.target = skeleton.findBone(data.target.name);
-		}        
+		}
 
 		apply () {
 			this.update();

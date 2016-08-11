@@ -46,7 +46,7 @@ module spine {
 			if (data == null) throw new Error("data cannot be null.");
 			if (skeleton == null) throw new Error("skeleton cannot be null.");
 			this.data = data;
-			this.bones = new Array<Bone>();            
+			this.bones = new Array<Bone>();
 			for (var i = 0, n = data.bones.length; i < n; i++) {
 				this.bones.push(skeleton.findBone(data.bones[i].name));
 			}
@@ -60,7 +60,7 @@ module spine {
 		apply () {
 			this.update();
 		}
-		
+
 		update () {
 			let attachment = this.target.getAttachment();
 			if (!(attachment instanceof PathAttachment)) return;
@@ -384,6 +384,6 @@ module spine {
 			out[o] = x;
 			out[o + 1] = y;
 			if (tangents) out[o + 2] = Math.atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
-		}        
+		}
 	}
 }

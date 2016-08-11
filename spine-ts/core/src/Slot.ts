@@ -46,7 +46,7 @@ module spine {
 			this.color = new Color();
 			this.setToSetupPose();
 		}
-		
+
 		/** @return May be null. */
 		getAttachment (): Attachment {
 			return this.attachment;
@@ -78,6 +78,6 @@ module spine {
 				this.attachment = null;
 				this.setAttachment(this.bone.skeleton.getAttachment(this.data.index, this.data.attachmentName));
 			}
-		}        
+		}
 	}
 }

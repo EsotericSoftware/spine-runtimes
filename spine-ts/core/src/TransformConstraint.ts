@@ -35,7 +35,7 @@ module spine {
 		bones: Array<Bone>;
 		target: Bone;
 		rotateMix = 0; translateMix = 0; scaleMix = 0; shearMix = 0;
-		temp = new Vector2();   
+		temp = new Vector2();
 
 		constructor (data: TransformConstraintData, skeleton: Skeleton) {
 			if (data == null) throw new Error("data cannot be null.");
@@ -46,7 +46,7 @@ module spine {
 			this.scaleMix = data.scaleMix;
 			this.shearMix = data.shearMix;
 			this.bones = new Array<Bone>();
-			for (var i = 0; i < data.bones.length; i++)            
+			for (var i = 0; i < data.bones.length; i++)
 				this.bones.push(skeleton.findBone(data.bones[i].name));
 			this.target = skeleton.findBone(data.target.name);
 		}
@@ -110,6 +110,6 @@ module spine {
 					bone.d = Math.sin(r) * s;
 				}
 			}
-		}        
+		}
 	}
 }

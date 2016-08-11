@@ -50,7 +50,7 @@ module spine {
 			let verticesLength = regionUVs.length;
 			let worldVerticesLength = (verticesLength >> 1) * 8;
 			if (this.worldVertices == null || this.worldVertices.length != worldVerticesLength) {
-				this.worldVertices = Utils.newFloatArray(worldVerticesLength);				           
+				this.worldVertices = Utils.newFloatArray(worldVerticesLength);
 			}
 
 			var u = 0, v = 0, width = 0, height = 0;
@@ -84,9 +84,9 @@ module spine {
 			let multiplier = premultipliedAlpha ? alpha : 1;
 			let color = this.tempColor;
 			color.set(skeletonColor.r * slotColor.r * meshColor.r * multiplier,
-						  skeletonColor.g * slotColor.g * meshColor.g * multiplier,
-						  skeletonColor.b * slotColor.b * meshColor.b * multiplier,
-						  alpha);                    
+				skeletonColor.g * slotColor.g * meshColor.g * multiplier,
+				skeletonColor.b * slotColor.b * meshColor.b * multiplier,
+				alpha);
 
 			let x = skeleton.x, y = skeleton.y;
 			let deformArray = slot.attachmentVertices;
@@ -152,11 +152,11 @@ module spine {
 
 		applyDeform (sourceAttachment: VertexAttachment): boolean {
 			return this == sourceAttachment || (this.inheritDeform && this._parentMesh == sourceAttachment);
-		}       
+		}
 
-		getParentMesh() {
+		getParentMesh () {
 			return this._parentMesh;
-		} 
+		}
 
 		/** @param parentMesh May be null. */
 		setParentMesh (parentMesh: MeshAttachment) {
@@ -166,9 +166,9 @@ module spine {
 				this.vertices = parentMesh.vertices;
 				this.regionUVs = parentMesh.regionUVs;
 				this.triangles = parentMesh.triangles;
-				this.hullLength = parentMesh.hullLength;                
+				this.hullLength = parentMesh.hullLength;
 			}
-		}        
+		}
 	}
 
 }

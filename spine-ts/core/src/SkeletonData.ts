@@ -84,7 +84,7 @@ module spine {
 			if (skinName == null) throw new Error("skinName cannot be null.");
 			let skins = this.skins;
 			for (var i = 0, n = skins.length; i < n; i++) {
-				let skin = skins[i];            
+				let skin = skins[i];
 				if (skin.name == skinName) return skin;
 			}
 			return null;

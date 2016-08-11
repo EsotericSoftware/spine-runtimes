@@ -32,7 +32,7 @@
 module spine {
 	export class AnimationStateData {
 		skeletonData: SkeletonData;
-		animationToMixTime: Map<number> = { };        
+		animationToMixTime: Map<number> = { };
 		defaultMix = 0;
 
 		constructor (skeletonData: SkeletonData) {
@@ -51,12 +51,12 @@ module spine {
 		setMixWith (from: Animation, to: Animation, duration: number) {
 			if (from == null) throw new Error("from cannot be null.");
 			if (to == null) throw new Error("to cannot be null.");
-			let key = from.name + to.name;     
+			let key = from.name + to.name;
 			this.animationToMixTime[key] = duration;
 		}
 
 		getMix (from: Animation, to: Animation) {
-			let key = from.name + to.name;            
+			let key = from.name + to.name;
 			let value = this.animationToMixTime[key];
 			return value === undefined ? this.defaultMix : value;
 		}

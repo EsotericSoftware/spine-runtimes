@@ -39,8 +39,8 @@ module spine {
 
 		constructor (time: number, data: EventData) {
 			if (data == null) throw new Error("data cannot be null.");
-		    this.time = time;
-		    this.data = data;
+			this.time = time;
+			this.data = data;
 		}
 	}
 }

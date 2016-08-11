@@ -35,7 +35,7 @@ module spine {
 		tracks = new Array<TrackEntry>();
 		events = new Array<Event>();
 		listeners = new Array<AnimationStateListener>();
-		timeScale = 1;        
+		timeScale = 1;
 
 		constructor (data: AnimationStateData = null) {
 			if (data == null) throw new Error("data cannot be null.");
@@ -100,7 +100,7 @@ module spine {
 
 					let alpha = current.mixTime / current.mixDuration * current.mix;
 					if (alpha >= 1) {
-						alpha = 1;                        
+						alpha = 1;
 						current.previous = null;
 					}
 					current.animation.mix(skeleton, lastTime, time, loop, events, alpha);
@@ -142,12 +142,12 @@ module spine {
 
 			this.tracks[trackIndex] = null;
 
-			this.freeAll(current);            
+			this.freeAll(current);
 		}
 
 		freeAll (entry: TrackEntry) {
 			while (entry != null) {
-				let next = entry.next;                
+				let next = entry.next;
 				entry = next;
 			}
 		}
@@ -178,7 +178,7 @@ module spine {
 						previous = current;
 					} else
 						entry.previous = current;
-				}                
+				}
 			}
 
 			this.tracks[index] = entry;

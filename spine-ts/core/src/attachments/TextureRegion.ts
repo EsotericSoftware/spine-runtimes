@@ -37,6 +37,6 @@ module spine {
 		width = 0; height = 0;
 		rotate = false;
 		offsetX = 0; offsetY = 0;
-		originalWidth = 0; originalHeight = 0;        
+		originalWidth = 0; originalHeight = 0;
 	}
 }

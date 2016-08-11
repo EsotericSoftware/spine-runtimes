@@ -35,7 +35,7 @@ module spine {
 		timelines: Array<Timeline>;
 		duration: number;
 
-	    constructor (name: string, timelines: Array<Timeline>, duration: number) {
+		constructor (name: string, timelines: Array<Timeline>, duration: number) {
 			if (name == null) throw new Error("name cannot be null.");
 			if (timelines == null) throw new Error("timelines cannot be null.");
 			this.name = name;
@@ -67,9 +67,9 @@ module spine {
 			let timelines = this.timelines;
 			for (var i = 0, n = timelines.length; i < n; i++)
 				timelines[i].apply(skeleton, lastTime, time, events, alpha);
-	    }
+		}
 
-		static binarySearch (values: ArrayLike<number>, target: number, step: number = 1) {			
+		static binarySearch (values: ArrayLike<number>, target: number, step: number = 1) {
 			let low = 0;
 			let high = values.length / step - 2;
 			if (high == 0) return step;
@@ -106,7 +106,7 @@ module spine {
 			this.curves = Utils.newFloatArray((frameCount - 1) * CurveTimeline.BEZIER_SIZE);
 			for (var i = 0; i < this.curves.length; i++) {
 				this.curves[i] = 0;
-			}			
+			}
 		}
 
 		getFrameCount () {
@@ -197,7 +197,7 @@ module spine {
 		constructor (frameCount: number) {
 			super(frameCount);
 			this.frames = Utils.newFloatArray(frameCount << 1);
-		}		
+		}
 
 		/** Sets the time and angle of the specified keyframe. */
 		setFrame (frameIndex: number, time: number, degrees: number) {
@@ -226,7 +226,8 @@ module spine {
 			let frame = Animation.binarySearch(frames, time, RotateTimeline.ENTRIES);
 			let prevRotation = frames[frame + RotateTimeline.PREV_ROTATION];
 			let frameTime = frames[frame];
-			let percent = this.getCurvePercent((frame >> 1) - 1, 1 - (time - frameTime) / (frames[frame + RotateTimeline.PREV_TIME] - frameTime));
+			let percent = this.getCurvePercent((frame >> 1) - 1,
+				1 - (time - frameTime) / (frames[frame + RotateTimeline.PREV_TIME] - frameTime));
 
 			let amount = frames[frame + RotateTimeline.ROTATION] - prevRotation;
 			while (amount > 180)
@@ -253,7 +254,7 @@ module spine {
 		constructor (frameCount: number) {
 			super(frameCount);
 			this.frames = Utils.newFloatArray(frameCount * TranslateTimeline.ENTRIES);
-		}		
+		}
 
 		/** Sets the time and value of the specified keyframe. */
 		setFrame (frameIndex: number, time: number, x: number, y: number) {
@@ -280,7 +281,8 @@ module spine {
 			let prevX = frames[frame + TranslateTimeline.PREV_X];
 			let prevY = frames[frame + TranslateTimeline.PREV_Y];
 			let frameTime = frames[frame];
-			let percent = this.getCurvePercent(frame / TranslateTimeline.ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + TranslateTimeline.PREV_TIME] - frameTime));
+			let percent = this.getCurvePercent(frame / TranslateTimeline.ENTRIES - 1,
+				1 - (time - frameTime) / (frames[frame + TranslateTimeline.PREV_TIME] - frameTime));
 
 			bone.x += (bone.data.x + prevX + (frames[frame + TranslateTimeline.X] - prevX) * percent - bone.x) * alpha;
 			bone.y += (bone.data.y + prevY + (frames[frame + TranslateTimeline.Y] - prevY) * percent - bone.y) * alpha;
@@ -308,7 +310,8 @@ module spine {
 			let prevX = frames[frame + ScaleTimeline.PREV_X];
 			let prevY = frames[frame + ScaleTimeline.PREV_Y];
 			let frameTime = frames[frame];
-			let percent = this.getCurvePercent(frame / ScaleTimeline.ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + ScaleTimeline.PREV_TIME] - frameTime));
+			let percent = this.getCurvePercent(frame / ScaleTimeline.ENTRIES - 1,
+				1 - (time - frameTime) / (frames[frame + ScaleTimeline.PREV_TIME] - frameTime));
 
 			bone.scaleX += (bone.data.scaleX * (prevX + (frames[frame + ScaleTimeline.X] - prevX) * percent) - bone.scaleX) * alpha;
 			bone.scaleY += (bone.data.scaleY * (prevY + (frames[frame + ScaleTimeline.Y] - prevY) * percent) - bone.scaleY) * alpha;
@@ -336,7 +339,8 @@ module spine {
 			let prevX = frames[frame + ShearTimeline.PREV_X];
 			let prevY = frames[frame + ShearTimeline.PREV_Y];
 			let frameTime = frames[frame];
-			let percent = this.getCurvePercent(frame / ShearTimeline.ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + ShearTimeline.PREV_TIME] - frameTime));
+			let percent = this.getCurvePercent(frame / ShearTimeline.ENTRIES - 1,
+				1 - (time - frameTime) / (frames[frame + ShearTimeline.PREV_TIME] - frameTime));
 
 			bone.shearX += (bone.data.shearX + (prevX + (frames[frame + ShearTimeline.X] - prevX) * percent) - bone.shearX) * alpha;
 			bone.shearY += (bone.data.shearY + (prevY + (frames[frame + ShearTimeline.Y] - prevY) * percent) - bone.shearY) * alpha;
@@ -354,7 +358,7 @@ module spine {
 		constructor (frameCount: number) {
 			super(frameCount);
 			this.frames = Utils.newFloatArray(frameCount * ColorTimeline.ENTRIES);
-		}	
+		}
 
 		/** Sets the time and value of the specified keyframe. */
 		setFrame (frameIndex: number, time: number, r: number, g: number, b: number, a: number) {
@@ -384,7 +388,7 @@ module spine {
 				g = frames[frame + ColorTimeline.PREV_G];
 				b = frames[frame + ColorTimeline.PREV_B];
 				a = frames[frame + ColorTimeline.PREV_A];
-			    let frameTime = frames[frame];
+				let frameTime = frames[frame];
 				let percent = this.getCurvePercent(frame / ColorTimeline.ENTRIES - 1,
 					1 - (time - frameTime) / (frames[frame + ColorTimeline.PREV_TIME] - frameTime));
 
@@ -413,7 +417,7 @@ module spine {
 
 		getFrameCount () {
 			return this.frames.length;
-		}		
+		}
 
 		/** Sets the time and value of the specified keyframe. */
 		setFrame (frameIndex: number, time: number, attachmentName: string) {
@@ -448,7 +452,7 @@ module spine {
 
 		getFrameCount () {
 			return this.frames.length;
-		}		
+		}
 
 		/** Sets the time of the specified keyframe. */
 		setFrame (frameIndex: number, event: Event) {
@@ -486,7 +490,7 @@ module spine {
 	}
 
 	export class DrawOrderTimeline implements Timeline {
-		frames:  ArrayLike<number>; // time, ...
+		frames: ArrayLike<number>; // time, ...
 		drawOrders: Array<Array<number>>;
 
 		constructor (frameCount: number) {
@@ -494,7 +498,7 @@ module spine {
 			this.drawOrders = new Array<Array<number>>(frameCount);
 		}
 
-	    getFrameCount () {
+		getFrameCount () {
 			return this.frames.length;
 		}
 
@@ -519,7 +523,7 @@ module spine {
 			let slots: Array<Slot> = skeleton.slots;
 			let drawOrderToSetupIndex = this.drawOrders[frame];
 			if (drawOrderToSetupIndex == null)
-				Utils.arrayCopy(slots, 0, drawOrder, 0, slots.length);				
+				Utils.arrayCopy(slots, 0, drawOrder, 0, slots.length);
 			else {
 				for (var i = 0, n = drawOrderToSetupIndex.length; i < n; i++)
 					drawOrder[i] = slots[drawOrderToSetupIndex[i]];
@@ -547,7 +551,7 @@ module spine {
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number) {
 			let slot: Slot = skeleton.slots[this.slotIndex];
-			let slotAttachment: Attachment = slot.getAttachment();            
+			let slotAttachment: Attachment = slot.getAttachment();
 			if (!(slotAttachment instanceof VertexAttachment) || !(<VertexAttachment>slotAttachment).applyDeform(this.attachment)) return;
 
 			let frames = this.frames;
@@ -559,7 +563,7 @@ module spine {
 			let verticesArray: Array<number> = slot.attachmentVertices;
 			if (verticesArray.length != vertexCount) alpha = 1; // Don't mix from uninitialized slot vertices.
 			let vertices: Array<number> = Utils.setArraySize(verticesArray, vertexCount);
-			
+
 			if (time >= frames[frames.length - 1]) { // Time is after last frame.
 				let lastVertices = frameVertices[frames.length - 1];
 				if (alpha < 1) {
@@ -602,7 +606,7 @@ module spine {
 		constructor (frameCount: number) {
 			super(frameCount);
 			this.frames = Utils.newFloatArray(frameCount * IkConstraintTimeline.ENTRIES);
-		}		
+		}
 
 		/** Sets the time, mix and bend direction of the specified keyframe. */
 		setFrame (frameIndex: number, time: number, mix: number, bendDirection: number) {
@@ -628,7 +632,8 @@ module spine {
 			let frame = Animation.binarySearch(frames, time, IkConstraintTimeline.ENTRIES);
 			let mix = frames[frame + IkConstraintTimeline.PREV_MIX];
 			let frameTime = frames[frame];
-			let percent = this.getCurvePercent(frame / IkConstraintTimeline.ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + IkConstraintTimeline.PREV_TIME] - frameTime));
+			let percent = this.getCurvePercent(frame / IkConstraintTimeline.ENTRIES - 1,
+				1 - (time - frameTime) / (frames[frame + IkConstraintTimeline.PREV_TIME] - frameTime));
 
 			constraint.mix += (mix + (frames[frame + IkConstraintTimeline.MIX] - mix) * percent - constraint.mix) * alpha;
 			constraint.bendDirection = Math.floor(frames[frame + IkConstraintTimeline.PREV_BEND_DIRECTION]);
@@ -676,7 +681,8 @@ module spine {
 			// Interpolate between the previous frame and the current frame.
 			let frame = Animation.binarySearch(frames, time, TransformConstraintTimeline.ENTRIES);
 			let frameTime = frames[frame];
-			let percent = this.getCurvePercent(frame / TransformConstraintTimeline.ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + TransformConstraintTimeline.PREV_TIME] - frameTime));
+			let percent = this.getCurvePercent(frame / TransformConstraintTimeline.ENTRIES - 1,
+				1 - (time - frameTime) / (frames[frame + TransformConstraintTimeline.PREV_TIME] - frameTime));
 
 			let rotate = frames[frame + TransformConstraintTimeline.PREV_ROTATE];
 			let translate = frames[frame + TransformConstraintTimeline.PREV_TRANSLATE];
@@ -702,7 +708,7 @@ module spine {
 		constructor (frameCount: number) {
 			super(frameCount);
 			this.frames = Utils.newFloatArray(frameCount * PathConstraintPositionTimeline.ENTRIES);
-		}		
+		}
 
 		/** Sets the time and value of the specified keyframe. */
 		setFrame (frameIndex: number, time: number, value: number) {
@@ -727,7 +733,8 @@ module spine {
 			let frame = Animation.binarySearch(frames, time, PathConstraintPositionTimeline.ENTRIES);
 			let position = frames[frame + PathConstraintPositionTimeline.PREV_VALUE];
 			let frameTime = frames[frame];
-			let percent = this.getCurvePercent(frame / PathConstraintPositionTimeline.ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PathConstraintPositionTimeline.PREV_TIME] - frameTime));
+			let percent = this.getCurvePercent(frame / PathConstraintPositionTimeline.ENTRIES - 1,
+				1 - (time - frameTime) / (frames[frame + PathConstraintPositionTimeline.PREV_TIME] - frameTime));
 
 			constraint.position += (position + (frames[frame + PathConstraintPositionTimeline.VALUE] - position) * percent - constraint.position) * alpha;
 		}
@@ -754,7 +761,8 @@ module spine {
 			let frame = Animation.binarySearch(frames, time, PathConstraintSpacingTimeline.ENTRIES);
 			let spacing = frames[frame + PathConstraintSpacingTimeline.PREV_VALUE];
 			let frameTime = frames[frame];
-			let percent = this.getCurvePercent(frame / PathConstraintSpacingTimeline.ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PathConstraintSpacingTimeline.PREV_TIME] - frameTime));
+			let percent = this.getCurvePercent(frame / PathConstraintSpacingTimeline.ENTRIES - 1,
+				1 - (time - frameTime) / (frames[frame + PathConstraintSpacingTimeline.PREV_TIME] - frameTime));
 
 			constraint.spacing += (spacing + (frames[frame + PathConstraintSpacingTimeline.VALUE] - spacing) * percent - constraint.spacing) * alpha;
 		}
@@ -772,7 +780,7 @@ module spine {
 		constructor (frameCount: number) {
 			super(frameCount);
 			this.frames = Utils.newFloatArray(frameCount * PathConstraintMixTimeline.ENTRIES);
-		}		
+		}
 
 		/** Sets the time and mixes of the specified keyframe. */
 		setFrame (frameIndex: number, time: number, rotateMix: number, translateMix: number) {
@@ -800,7 +808,8 @@ module spine {
 			let rotate = frames[frame + PathConstraintMixTimeline.PREV_ROTATE];
 			let translate = frames[frame + PathConstraintMixTimeline.PREV_TRANSLATE];
 			let frameTime = frames[frame];
-			let percent = this.getCurvePercent(frame / PathConstraintMixTimeline.ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PathConstraintMixTimeline.PREV_TIME] - frameTime));
+			let percent = this.getCurvePercent(frame / PathConstraintMixTimeline.ENTRIES - 1,
+				1 - (time - frameTime) / (frames[frame + PathConstraintMixTimeline.PREV_TIME] - frameTime));
 
 			constraint.rotateMix += (rotate + (frames[frame + PathConstraintMixTimeline.ROTATE] - rotate) * percent - constraint.rotateMix) * alpha;
 			constraint.translateMix += (translate + (frames[frame + PathConstraintMixTimeline.TRANSLATE] - translate) * percent - constraint.translateMix)
