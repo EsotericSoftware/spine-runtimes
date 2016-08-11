@@ -47,9 +47,8 @@ module spine {
 			if (skeleton == null) throw new Error("skeleton cannot be null.");
 			this.data = data;
 			this.bones = new Array<Bone>();
-			for (var i = 0, n = data.bones.length; i < n; i++) {
+			for (let i = 0, n = data.bones.length; i < n; i++)
 				this.bones.push(skeleton.findBone(data.bones[i].name));
-			}
 			this.target = skeleton.findSlot(data.target.name);
 			this.position = data.position;
 			this.spacing = data.spacing;
@@ -80,7 +79,7 @@ module spine {
 			let spacing = this.spacing;
 			if (scale || lengthSpacing) {
 				if (scale) lengths = Utils.setArraySize(this.lengths, boneCount);
-				for (var i = 0, n = spacesCount - 1; i < n;) {
+				for (let i = 0, n = spacesCount - 1; i < n;) {
 					let bone = bones[i];
 					let length = bone.data.length, x = length * bone.a, y = length * bone.c;
 					length = Math.sqrt(x * x + y * y);
@@ -88,7 +87,7 @@ module spine {
 					spaces[++i] = lengthSpacing ? Math.max(0, length + spacing) : spacing;
 				}
 			} else {
-				for (var i = 1; i < spacesCount; i++)
+				for (let i = 1; i < spacesCount; i++)
 					spaces[i] = spacing;
 			}
 
@@ -98,7 +97,7 @@ module spine {
 			let skeletonX = skeleton.x, skeletonY = skeleton.y;
 			let boneX = positions[0], boneY = positions[1], offsetRotation = data.offsetRotation;
 			let tip = rotateMode == RotateMode.Chain && offsetRotation == 0;
-			for (var i = 0, p = 3; i < boneCount; i++, p += 3) {
+			for (let i = 0, p = 3; i < boneCount; i++, p += 3) {
 				let bone = bones[i];
 				bone.worldX += (boneX - skeletonX - bone.worldX) * translateMix;
 				bone.worldY += (boneY - skeletonY - bone.worldY) * translateMix;
@@ -114,7 +113,7 @@ module spine {
 				boneX = x;
 				boneY = y;
 				if (rotate) {
-					var a = bone.a, b = bone.b, c = bone.c, d = bone.d, r = 0, cos = 0, sin = 0;
+					let a = bone.a, b = bone.b, c = bone.c, d = bone.d, r = 0, cos = 0, sin = 0;
 					if (tangents)
 						r = positions[p - 1];
 					else if (spaces[i + 1] == 0)
@@ -158,11 +157,11 @@ module spine {
 				let pathLength = lengths[curveCount];
 				if (percentPosition) position *= pathLength;
 				if (percentSpacing) {
-					for (var i = 0; i < spacesCount; i++)
+					for (let i = 0; i < spacesCount; i++)
 						spaces[i] *= pathLength;
 				}
 				world = Utils.setArraySize(this.world, 8);
-				for (var i = 0, o = 0, curve = 0; i < spacesCount; i++, o += 3) {
+				for (let i = 0, o = 0, curve = 0; i < spacesCount; i++, o += 3) {
 					let space = spaces[i];
 					position += space;
 					let p = position;
@@ -232,8 +231,8 @@ module spine {
 			let curves = Utils.setArraySize(this.curves, curveCount);
 			let pathLength = 0;
 			let x1 = world[0], y1 = world[1], cx1 = 0, cy1 = 0, cx2 = 0, cy2 = 0, x2 = 0, y2 = 0;
-			var tmpx = 0, tmpy = 0, dddfx = 0, dddfy = 0, ddfx = 0, ddfy = 0, dfx = 0, dfy = 0;
-			for (var i = 0, w = 2; i < curveCount; i++, w += 6) {
+			let tmpx = 0, tmpy = 0, dddfx = 0, dddfy = 0, ddfx = 0, ddfy = 0, dfx = 0, dfy = 0;
+			for (let i = 0, w = 2; i < curveCount; i++, w += 6) {
 				cx1 = world[w];
 				cy1 = world[w + 1];
 				cx2 = world[w + 2];
@@ -266,13 +265,13 @@ module spine {
 			}
 			if (percentPosition) position *= pathLength;
 			if (percentSpacing) {
-				for (var i = 0; i < spacesCount; i++)
+				for (let i = 0; i < spacesCount; i++)
 					spaces[i] *= pathLength;
 			}
 
 			let segments = this.segments;
-			var curveLength = 0;
-			for (var i = 0, o = 0, curve = 0, segment = 0; i < spacesCount; i++, o += 3) {
+			let curveLength = 0;
+			for (let i = 0, o = 0, curve = 0, segment = 0; i < spacesCount; i++, o += 3) {
 				let space = spaces[i];
 				position += space;
 				let p = position;

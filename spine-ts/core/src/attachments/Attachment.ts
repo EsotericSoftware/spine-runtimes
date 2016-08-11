@@ -62,7 +62,7 @@ module spine {
 			let skeleton = slot.bone.skeleton;
 			let x = skeleton.x, y = skeleton.y;
 			let deformArray = slot.attachmentVertices;
-			var vertices = this.vertices;
+			let vertices = this.vertices;
 			let bones = this.bones;
 			if (bones == null) {
 				if (deformArray.length > 0) vertices = deformArray;
@@ -70,22 +70,22 @@ module spine {
 				x += bone.worldX;
 				y += bone.worldY;
 				let a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-				for (var v = start, w = offset; w < count; v += 2, w += 2) {
+				for (let v = start, w = offset; w < count; v += 2, w += 2) {
 					let vx = vertices[v], vy = vertices[v + 1];
 					worldVertices[w] = vx * a + vy * b + x;
 					worldVertices[w + 1] = vx * c + vy * d + y;
 				}
 				return;
 			}
-			var v = 0, skip = 0;
-			for (var i = 0; i < start; i += 2) {
+			let v = 0, skip = 0;
+			for (let i = 0; i < start; i += 2) {
 				let n = bones[v];
 				v += n + 1;
 				skip += n;
 			}
 			let skeletonBones = skeleton.bones;
 			if (deformArray.length == 0) {
-				for (var w = offset, b = skip * 3; w < count; w += 2) {
+				for (let w = offset, b = skip * 3; w < count; w += 2) {
 					let wx = x, wy = y;
 					let n = bones[v++];
 					n += v;
@@ -100,7 +100,7 @@ module spine {
 				}
 			} else {
 				let deform = deformArray;
-				for (var w = offset, b = skip * 3, f = skip << 1; w < count; w += 2) {
+				for (let w = offset, b = skip * 3, f = skip << 1; w < count; w += 2) {
 					let wx = x, wy = y;
 					let n = bones[v++];
 					n += v;

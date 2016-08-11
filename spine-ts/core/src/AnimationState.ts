@@ -44,7 +44,7 @@ module spine {
 
 		update (delta: number) {
 			delta *= this.timeScale;
-			for (var i = 0; i < this.tracks.length; i++) {
+			for (let i = 0; i < this.tracks.length; i++) {
 				let current = this.tracks[i];
 				if (current == null) continue;
 
@@ -78,7 +78,7 @@ module spine {
 			let events = this.events;
 			let listenerCount = this.listeners.length;
 
-			for (var i = 0; i < this.tracks.length; i++) {
+			for (let i = 0; i < this.tracks.length; i++) {
 				let current = this.tracks[i];
 				if (current == null) continue;
 
@@ -106,10 +106,10 @@ module spine {
 					current.animation.mix(skeleton, lastTime, time, loop, events, alpha);
 				}
 
-				for (var ii = 0, nn = events.length; ii < nn; ii++) {
+				for (let ii = 0, nn = events.length; ii < nn; ii++) {
 					let event = events[ii];
 					if (current.listener != null) current.listener.event(i, event);
-					for (var iii = 0; iii < listenerCount; iii++)
+					for (let iii = 0; iii < listenerCount; iii++)
 						this.listeners[iii].event(i, event);
 				}
 
@@ -117,7 +117,7 @@ module spine {
 				if (loop ? (lastTime % endTime > time % endTime) : (lastTime < endTime && time >= endTime)) {
 					let count = MathUtils.toInt(time / endTime);
 					if (current.listener != null) current.listener.complete(i, count);
-					for (var ii = 0, nn = this.listeners.length; ii < nn; ii++)
+					for (let ii = 0, nn = this.listeners.length; ii < nn; ii++)
 						this.listeners[ii].complete(i, count);
 				}
 
@@ -126,7 +126,7 @@ module spine {
 		}
 
 		clearTracks () {
-			for (var i = 0, n = this.tracks.length; i < n; i++)
+			for (let i = 0, n = this.tracks.length; i < n; i++)
 				this.clearTrack(i);
 			this.tracks.length = 0;
 		}
@@ -137,7 +137,7 @@ module spine {
 			if (current == null) return;
 
 			if (current.listener != null) current.listener.end(trackIndex);
-			for (var i = 0, n = this.listeners.length; i < n; i++)
+			for (let i = 0, n = this.listeners.length; i < n; i++)
 				this.listeners[i].end(trackIndex);
 
 			this.tracks[trackIndex] = null;
@@ -166,7 +166,7 @@ module spine {
 				current.previous = null;
 
 				if (current.listener != null) current.listener.end(index);
-				for (var i = 0, n = this.listeners.length; i < n; i++)
+				for (let i = 0, n = this.listeners.length; i < n; i++)
 					this.listeners[i].end(index);
 
 				entry.mixDuration = this.data.getMix(current.animation, entry.animation);
@@ -184,7 +184,7 @@ module spine {
 			this.tracks[index] = entry;
 
 			if (entry.listener != null) entry.listener.start(index);
-			for (var i = 0, n = this.listeners.length; i < n; i++)
+			for (let i = 0, n = this.listeners.length; i < n; i++)
 				this.listeners[i].start(index);
 		}
 

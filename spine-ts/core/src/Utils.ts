@@ -124,7 +124,7 @@ module spine {
 		static SUPPORTS_TYPED_ARRAYS = 'ArrayBuffer' in window;
 
 		static arrayCopy<T> (source: ArrayLike<T>, sourceStart: number, dest: ArrayLike<T>, destStart: number, numElements: number) {
-			for (var i = sourceStart, j = destStart; i < sourceStart + numElements; i++, j++) {
+			for (let i = sourceStart, j = destStart; i < sourceStart + numElements; i++, j++) {
 				dest[j] = source[i];
 			}
 		}
@@ -134,14 +134,14 @@ module spine {
 			if (oldSize == size) return array;
 			array.length = size;
 			if (oldSize < size) {
-				for (var i = oldSize; i < size; i++) array[i] = value;
+				for (let i = oldSize; i < size; i++) array[i] = value;
 			}
 			return array;
 		}
 
 		static newArray<T> (size: number, defaultValue: T): Array<T> {
 			let array = new Array<T>(size);
-			for (var i = 0; i < size; i++) array[i] = defaultValue;
+			for (let i = 0; i < size; i++) array[i] = defaultValue;
 			return array;
 		}
 

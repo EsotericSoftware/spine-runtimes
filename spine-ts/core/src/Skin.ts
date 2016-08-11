@@ -56,14 +56,14 @@ module spine {
 
 		/** Attach each attachment in this skin if the corresponding attachment in the old skin is currently attached. */
 		attachAll (skeleton: Skeleton, oldSkin: Skin) {
-			var slotIndex = 0;
-			for (var i = 0; i < skeleton.slots.length; i++) {
+			let slotIndex = 0;
+			for (let i = 0; i < skeleton.slots.length; i++) {
 				let slot = skeleton.slots[i];
 				let slotAttachment = slot.getAttachment();
 				if (slotAttachment && slotIndex < oldSkin.attachments.length) {
 					let dictionary = oldSkin.attachments[slotIndex];
-					for (var key in dictionary) {
-						var skinAttachment:Attachment = dictionary[key];
+					for (let key in dictionary) {
+						let skinAttachment:Attachment = dictionary[key];
 						if (slotAttachment == skinAttachment) {
 							let attachment = this.getAttachment(slotIndex, name);
 							if (attachment != null) slot.setAttachment(attachment);

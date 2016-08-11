@@ -45,7 +45,7 @@ module spine {
 			boundingBoxes.length = 0;
 			polygons.length = 0;
 
-			for (var i = 0; i < slotCount; i++) {
+			for (let i = 0; i < slotCount; i++) {
 				let slot = slots[i];
 				let attachment = slot.getAttachment();
 				if (attachment instanceof BoundingBoxAttachment) {
@@ -62,12 +62,12 @@ module spine {
 		}
 
 		aabbCompute () {
-			var minX = Number.POSITIVE_INFINITY, minY = Number.POSITIVE_INFINITY, maxX = Number.NEGATIVE_INFINITY, maxY = Number.NEGATIVE_INFINITY;
+			let minX = Number.POSITIVE_INFINITY, minY = Number.POSITIVE_INFINITY, maxX = Number.NEGATIVE_INFINITY, maxY = Number.NEGATIVE_INFINITY;
 			let polygons = this.polygons;
-			for (var i = 0, n = polygons.length; i < n; i++) {
+			for (let i = 0, n = polygons.length; i < n; i++) {
 				let polygon = polygons[i];
 				let vertices = polygon;
-				for (var ii = 0, nn = polygon.length; ii < nn; ii += 2) {
+				for (let ii = 0, nn = polygon.length; ii < nn; ii += 2) {
 					let x = vertices[ii];
 					let y = vertices[ii + 1];
 					minX = Math.min(minX, x);
@@ -116,7 +116,7 @@ module spine {
 		 * efficient to only call this method if {@link #aabbContainsPoint(float, float)} returns true. */
 		containsPoint (x: number, y: number): BoundingBoxAttachment {
 			let polygons = this.polygons;
-			for (var i = 0, n = polygons.length; i < n; i++)
+			for (let i = 0, n = polygons.length; i < n; i++)
 				if (this.containsPointPolygon(polygons[i], x, y)) return this.boundingBoxes[i];
 			return null;
 		}
@@ -127,8 +127,8 @@ module spine {
 			let nn = polygon.length;
 
 			let prevIndex = nn - 2;
-			var inside = false;
-			for (var ii = 0; ii < nn; ii += 2) {
+			let inside = false;
+			for (let ii = 0; ii < nn; ii += 2) {
 				let vertexY = vertices[ii + 1];
 				let prevY = vertices[prevIndex + 1];
 				if ((vertexY < y && prevY >= y) || (prevY < y && vertexY >= y)) {
@@ -145,7 +145,7 @@ module spine {
 		 * true. */
 		intersectsSegment (x1: number, y1: number, x2: number, y2: number) {
 			let polygons = this.polygons;
-			for (var i = 0, n = polygons.length; i < n; i++)
+			for (let i = 0, n = polygons.length; i < n; i++)
 				if (this.intersectsSegmentPolygon(polygons[i], x1, y1, x2, y2)) return this.boundingBoxes[i];
 			return null;
 		}
@@ -158,7 +158,7 @@ module spine {
 			let width12 = x1 - x2, height12 = y1 - y2;
 			let det1 = x1 * y2 - y1 * x2;
 			let x3 = vertices[nn - 2], y3 = vertices[nn - 1];
-			for (var ii = 0; ii < nn; ii += 2) {
+			for (let ii = 0; ii < nn; ii += 2) {
 				let x4 = vertices[ii], y4 = vertices[ii + 1];
 				let det2 = x3 * y4 - y3 * x4;
 				let width34 = x3 - x4, height34 = y3 - y4;

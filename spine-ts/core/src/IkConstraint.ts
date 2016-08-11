@@ -47,7 +47,7 @@ module spine {
 			this.bendDirection = data.bendDirection;
 
 			this.bones = new Array<Bone>();
-			for (var i = 0; i < data.bones.length; i++)
+			for (let i = 0; i < data.bones.length; i++)
 				this.bones.push(skeleton.findBone(data.bones[i].name));
 			this.target = skeleton.findBone(data.target.name);
 		}
@@ -94,7 +94,7 @@ module spine {
 				return;
 			}
 			let px = parent.x, py = parent.y, psx = parent.scaleX, psy = parent.scaleY, csx = child.scaleX;
-			var os1 = 0, os2 = 0, s2 = 0;
+			let os1 = 0, os2 = 0, s2 = 0;
 			if (psx < 0) {
 				psx = -psx;
 				os1 = 180;
@@ -112,7 +112,7 @@ module spine {
 				os2 = 180;
 			} else
 				os2 = 0;
-			var cx = child.x, cy = 0, cwx = 0, cwy = 0, a = parent.a, b = parent.b, c = parent.c, d = parent.d;
+			let cx = child.x, cy = 0, cwx = 0, cwy = 0, a = parent.a, b = parent.b, c = parent.c, d = parent.d;
 			let u = Math.abs(psx - psy) <= 0.0001;
 			if (!u) {
 				cy = 0;
@@ -133,7 +133,7 @@ module spine {
 			x = cwx - pp.worldX;
 			y = cwy - pp.worldY;
 			let dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
-			var l1 = Math.sqrt(dx * dx + dy * dy), l2 = child.data.length * csx, a1 = 0, a2 = 0;
+			let l1 = Math.sqrt(dx * dx + dy * dy), l2 = child.data.length * csx, a1 = 0, a2 = 0;
 			outer:
 			if (u) {
 				l2 *= psx;
@@ -165,8 +165,8 @@ module spine {
 						break outer;
 					}
 				}
-				var minAngle = 0, minDist = Number.MAX_VALUE, minX = 0, minY = 0;
-				var maxAngle = 0, maxDist = 0, maxX = 0, maxY = 0;
+				let minAngle = 0, minDist = Number.MAX_VALUE, minX = 0, minY = 0;
+				let maxAngle = 0, maxDist = 0, maxX = 0, maxY = 0;
 				x = l1 + a;
 				d = x * x;
 				if (d > maxDist) {

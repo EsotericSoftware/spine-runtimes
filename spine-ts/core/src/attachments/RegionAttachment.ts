@@ -162,7 +162,7 @@ module spine {
 			let bone = slot.bone;
 			let x = skeleton.x + bone.worldX, y = skeleton.y + bone.worldY;
 			let a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-			var offsetX = 0, offsetY = 0;
+			let offsetX = 0, offsetY = 0;
 
 			offsetX = offset[RegionAttachment.OX1];
 			offsetY = offset[RegionAttachment.OY1];

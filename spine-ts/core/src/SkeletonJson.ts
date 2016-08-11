@@ -57,10 +57,10 @@ module spine {
 
 			// Bones
 			if (root.bones) {
-				for (var i = 0; i < root.bones.length; i++) {
+				for (let i = 0; i < root.bones.length; i++) {
 					let boneMap = root.bones[i];
 
-					var parent: BoneData = null;
+					let parent: BoneData = null;
 					let parentName: string = this.getValue(boneMap, "parent", null);
 					if (parentName != null) {
 						parent = skeletonData.findBone(parentName);
@@ -84,7 +84,7 @@ module spine {
 
 			// Slots.
 			if (root.slots) {
-				for (var i = 0; i < root.slots.length; i++) {
+				for (let i = 0; i < root.slots.length; i++) {
 					let slotMap = root.slots[i];
 					let slotName: string = slotMap.name;
 					let boneName: string = slotMap.bone;
@@ -103,11 +103,11 @@ module spine {
 
 			// IK constraints
 			if (root.ik) {
-				for (var i = 0; i < root.ik.length; i++) {
+				for (let i = 0; i < root.ik.length; i++) {
 					let constraintMap = root.ik[i];
 					let data = new IkConstraintData(constraintMap.name);
 
-					for (var j = 0; j < constraintMap.bones.length; j++) {
+					for (let j = 0; j < constraintMap.bones.length; j++) {
 						let boneName = constraintMap.bones[j];
 						let bone = skeletonData.findBone(boneName);
 						if (bone == null) throw new Error("IK bone not found: " + boneName);
@@ -127,11 +127,11 @@ module spine {
 
 			// Transform constraints.
 			if (root.transform) {
-				for (var i = 0; i < root.transform.length; i++) {
+				for (let i = 0; i < root.transform.length; i++) {
 					let constraintMap = root.transform[i];
 					let data = new TransformConstraintData(constraintMap.name);
 
-					for (var j = 0; j < constraintMap.bones.length; j++) {
+					for (let j = 0; j < constraintMap.bones.length; j++) {
 						let boneName = constraintMap.bones[j];
 						let bone = skeletonData.findBone(boneName);
 						if (bone == null) throw new Error("Transform constraint bone not found: " + boneName);
@@ -160,11 +160,11 @@ module spine {
 
 			// Path constraints.
 			if (root.path) {
-				for (var i = 0; i < root.path.length; i++) {
+				for (let i = 0; i < root.path.length; i++) {
 					let constraintMap = root.path[i];
 					let data = new PathConstraintData(constraintMap.name);
 
-					for (var j = 0; j < constraintMap.bones.length; j++) {
+					for (let j = 0; j < constraintMap.bones.length; j++) {
 						let boneName = constraintMap.bones[j];
 						let bone = skeletonData.findBone(boneName);
 						if (bone == null) throw new Error("Transform constraint bone not found: " + boneName);
@@ -192,14 +192,14 @@ module spine {
 
 			// Skins.
 			if (root.skins) {
-				for (var skinName in root.skins) {
+				for (let skinName in root.skins) {
 					let skinMap = root.skins[skinName]
 					let skin = new Skin(skinName);
-					for (var slotName in skinMap) {
+					for (let slotName in skinMap) {
 						let slotIndex = skeletonData.findSlotIndex(slotName);
 						if (slotIndex == -1) throw new Error("Slot not found: " + slotName);
 						let slotMap = skinMap[slotName];
-						for (var entryName in slotMap) {
+						for (let entryName in slotMap) {
 							let attachment = this.readAttachment(slotMap[entryName], skin, slotIndex, entryName);
 							if (attachment != null) skin.addAttachment(slotIndex, entryName, attachment);
 						}
@@ -210,7 +210,7 @@ module spine {
 			}
 
 			// Linked meshes.
-			for (var i = 0, n = this.linkedMeshes.length; i < n; i++) {
+			for (let i = 0, n = this.linkedMeshes.length; i < n; i++) {
 				let linkedMesh = this.linkedMeshes[i];
 				let skin = linkedMesh.skin == null ? skeletonData.defaultSkin : skeletonData.findSkin(linkedMesh.skin);
 				if (skin == null) throw new Error("Skin not found: " + linkedMesh.skin);
@@ -223,7 +223,7 @@ module spine {
 
 			// Events.
 			if (root.events) {
-				for (var eventName in root.events) {
+				for (let eventName in root.events) {
 					let eventMap = root.events[eventName];
 					let data = new EventData(eventName);
 					data.intValue = this.getValue(eventMap, "int", 0);
@@ -235,7 +235,7 @@ module spine {
 
 			// Animations.
 			if (root.animations) {
-				for (var animationName in root.animations) {
+				for (let animationName in root.animations) {
 					let animationMap = root.animations[animationName];
 					this.readAnimation(animationMap, animationName, skeletonData);
 				}
@@ -312,7 +312,7 @@ module spine {
 					this.readVertices(map, path, vertexCount << 1);
 
 					let lengths: Array<number> = Utils.newArray(vertexCount / 3, 0);
-					for (var i = 0; i < map.lengths.length; i++)
+					for (let i = 0; i < map.lengths.length; i++)
 						lengths[i++] = map.lengths[i] * scale;
 					path.lengths = lengths;
 					return path;
@@ -327,7 +327,7 @@ module spine {
 			let vertices: Array<number> = map.vertices;
 			if (verticesLength == vertices.length) {
 				if (scale != 1) {
-					for (var i = 0, n = vertices.length; i < n; i++)
+					for (let i = 0, n = vertices.length; i < n; i++)
 						vertices[i] *= scale;
 				}
 				attachment.vertices = Utils.toFloatArray(vertices);
@@ -335,10 +335,10 @@ module spine {
 			}
 			let weights = new Array<number>();
 			let bones = new Array<number>();
-			for (var i = 0, n = vertices.length; i < n;) {
+			for (let i = 0, n = vertices.length; i < n;) {
 				let boneCount = vertices[i++];
 				bones.push(boneCount);
-				for (var nn = i + boneCount * 4; i < nn; i += 4) {
+				for (let nn = i + boneCount * 4; i < nn; i += 4) {
 					bones.push(vertices[i]);
 					weights.push(vertices[i + 1] * scale);
 					weights.push(vertices[i + 2] * scale);
@@ -352,22 +352,22 @@ module spine {
 		readAnimation (map: any, name: string, skeletonData: SkeletonData) {
 			let scale = this.scale;
 			let timelines = new Array<Timeline>();
-			var duration = 0;
+			let duration = 0;
 
 			// Slot timelines.
 			if (map.slots) {
-				for (var slotName in map.slots) {
+				for (let slotName in map.slots) {
 					let slotMap = map.slots[slotName];
 					let slotIndex = skeletonData.findSlotIndex(slotName);
 					if (slotIndex == -1) throw new Error("Slot not found: " + slotName);
-					for (var timelineName in slotMap) {
+					for (let timelineName in slotMap) {
 						let timelineMap = slotMap[timelineName];
 						if (timelineName == "color") {
 							let timeline = new ColorTimeline(timelineMap.length); // FIXME
 							timeline.slotIndex = slotIndex;
 
-							var frameIndex = 0;
-							for (var i = 0; i < timelineMap.length; i++) {
+							let frameIndex = 0;
+							for (let i = 0; i < timelineMap.length; i++) {
 								let valueMap = timelineMap[i];
 								let color = new Color();
 								color.setFromString(valueMap.color);
@@ -383,7 +383,7 @@ module spine {
 							timeline.slotIndex = slotIndex;
 
 							let frameIndex = 0;
-							for (var i = 0; i < timelineMap.length; i++) {
+							for (let i = 0; i < timelineMap.length; i++) {
 								let valueMap = timelineMap[i];
 								timeline.setFrame(frameIndex++, valueMap.time, valueMap.name);
 							}
@@ -397,18 +397,18 @@ module spine {
 
 			// Bone timelines.
 			if (map.bones) {
-				for (var boneName in map.bones) {
+				for (let boneName in map.bones) {
 					let boneMap = map.bones[boneName];
 					let boneIndex = skeletonData.findBoneIndex(boneName);
 					if (boneIndex == -1) throw new Error("Bone not found: " + boneName);
-					for (var timelineName in boneMap) {
+					for (let timelineName in boneMap) {
 						let timelineMap = boneMap[timelineName];
 						if (timelineName === "rotate") {
 							let timeline = new RotateTimeline(timelineMap.length);
 							timeline.boneIndex = boneIndex;
 
-							var frameIndex = 0;
-							for (var i = 0; i < timelineMap.length; i++) {
+							let frameIndex = 0;
+							for (let i = 0; i < timelineMap.length; i++) {
 								let valueMap = timelineMap[i];
 								timeline.setFrame(frameIndex, valueMap.time, valueMap.angle);
 								this.readCurve(valueMap, timeline, frameIndex);
@@ -431,7 +431,7 @@ module spine {
 							timeline.boneIndex = boneIndex;
 
 							let frameIndex = 0;
-							for (var i = 0; i < timelineMap.length; i++) {
+							for (let i = 0; i < timelineMap.length; i++) {
 								let valueMap = timelineMap[i];
 								let x = this.getValue(valueMap, "x", 0), y = this.getValue(valueMap, "y", 0);
 								timeline.setFrame(frameIndex, valueMap.time, x * timelineScale, y * timelineScale);
@@ -449,13 +449,13 @@ module spine {
 
 			// IK constraint timelines.
 			if (map.ik) {
-				for (var constraintName in map.ik) {
+				for (let constraintName in map.ik) {
 					let constraintMap = map.ik[constraintName];
 					let constraint = skeletonData.findIkConstraint(constraintName);
 					let timeline = new IkConstraintTimeline(constraintMap.length);
 					timeline.ikConstraintIndex = skeletonData.ikConstraints.indexOf(constraint);
-					var frameIndex = 0;
-					for (var i = 0; i < constraintMap.length; i++) {
+					let frameIndex = 0;
+					for (let i = 0; i < constraintMap.length; i++) {
 						let valueMap = constraintMap[i];
 						timeline.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, "mix", 1),
 							this.getValue(valueMap, "bendPositive", true) ? 1 : -1);
@@ -469,13 +469,13 @@ module spine {
 
 			// Transform constraint timelines.
 			if (map.transform) {
-				for (var constraintName in map.transform) {
+				for (let constraintName in map.transform) {
 					let constraintMap = map.transform[constraintName];
 					let constraint = skeletonData.findTransformConstraint(constraintName);
 					let timeline = new TransformConstraintTimeline(constraintMap.length);
 					timeline.transformConstraintIndex = skeletonData.transformConstraints.indexOf(constraint);
-					var frameIndex = 0;
-					for (var i = 0; i < constraintMap.length; i++) {
+					let frameIndex = 0;
+					for (let i = 0; i < constraintMap.length; i++) {
 						let valueMap = constraintMap[i];
 						timeline.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, "rotateMix", 1),
 							this.getValue(valueMap, "translateMix", 1), this.getValue(valueMap, "scaleMix", 1), this.getValue(valueMap, "shearMix", 1));
@@ -490,16 +490,16 @@ module spine {
 
 			// Path constraint timelines.
 			if (map.paths) {
-				for (var constraintName in map.paths) {
+				for (let constraintName in map.paths) {
 					let constraintMap = map.paths[constraintName];
 					let index = skeletonData.findPathConstraintIndex(constraintName);
 					if (index == -1) throw new Error("Path constraint not found: " + constraintName);
 					let data = skeletonData.pathConstraints[index];
-					for (var timelineName in constraintMap) {
+					for (let timelineName in constraintMap) {
 						let timelineMap = constraintMap[timelineName];
 						if (timelineName === "position" || timelineName === "spacing") {
 							let timeline: PathConstraintPositionTimeline = null;
-							var timelineScale = 1;
+							let timelineScale = 1;
 							if (timelineName === "spacing") {
 								timeline = new PathConstraintSpacingTimeline(timelineMap.length);
 								if (data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed) timelineScale = scale;
@@ -508,8 +508,8 @@ module spine {
 								if (data.positionMode == PositionMode.Fixed) timelineScale = scale;
 							}
 							timeline.pathConstraintIndex = index;
-							var frameIndex = 0;
-							for (var i = 0; i < timelineMap.length; i++) {
+							let frameIndex = 0;
+							for (let i = 0; i < timelineMap.length; i++) {
 								let valueMap = timelineMap[i];
 								timeline.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, timelineName, 0) * timelineScale);
 								this.readCurve(valueMap, timeline, frameIndex);
@@ -521,8 +521,8 @@ module spine {
 						} else if (timelineName === "mix") {
 							let timeline = new PathConstraintMixTimeline(timelineMap.length);
 							timeline.pathConstraintIndex = index;
-							var frameIndex = 0;
-							for (var i = 0; i < timelineMap.length; i++) {
+							let frameIndex = 0;
+							for (let i = 0; i < timelineMap.length; i++) {
 								let valueMap = timelineMap[i];
 								timeline.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, "rotateMix", 1),
 									this.getValue(valueMap, "translateMix", 1));
@@ -539,15 +539,15 @@ module spine {
 
 			// Deform timelines.
 			if (map.deform) {
-				for (var deformName in map.deform) {
+				for (let deformName in map.deform) {
 					let deformMap = map.deform[deformName];
 					let skin = skeletonData.findSkin(deformName);
 					if (skin == null) throw new Error("Skin not found: " + deformName);
-					for (var slotName in deformMap) {
+					for (let slotName in deformMap) {
 						let slotMap = deformMap[slotName];
 						let slotIndex = skeletonData.findSlotIndex(slotName);
 						if (slotIndex == -1) throw new Error("Slot not found: " + slotMap.name);
-						for (var timelineName in slotMap) {
+						for (let timelineName in slotMap) {
 							let timelineMap = slotMap[timelineName];
 							let attachment = <VertexAttachment>skin.getAttachment(slotIndex, timelineName);
 							if (attachment == null) throw new Error("Deform attachment not found: " + timelineMap.name);
@@ -560,9 +560,9 @@ module spine {
 							timeline.attachment = attachment;
 
 							let frameIndex = 0;
-							for (var j = 0; j < timelineMap.length; j++) {
+							for (let j = 0; j < timelineMap.length; j++) {
 								let valueMap = timelineMap[j];
-								var deform: ArrayLike<number>;
+								let deform: ArrayLike<number>;
 								let verticesValue: Array<Number> = this.getValue(valueMap, "vertices", null);
 								if (verticesValue == null)
 									deform = weighted ? Utils.newFloatArray(deformLength) : vertices;
@@ -571,11 +571,11 @@ module spine {
 									let start = <number>this.getValue(valueMap, "offset", 0);
 									Utils.arrayCopy(verticesValue, 0, deform, start, verticesValue.length);
 									if (scale != 1) {
-										for (var i = start, n = i + verticesValue.length; i < n; i++)
+										for (let i = start, n = i + verticesValue.length; i < n; i++)
 											deform[i] *= scale;
 									}
 									if (!weighted) {
-										for (var i = 0; i < deformLength; i++)
+										for (let i = 0; i < deformLength; i++)
 											deform[i] += vertices[i];
 									}
 								}
@@ -592,21 +592,21 @@ module spine {
 			}
 
 			// Draw order timeline.
-			var drawOrderNode = map.drawOrder;
+			let drawOrderNode = map.drawOrder;
 			if (drawOrderNode == null) drawOrderNode = map.draworder;
 			if (drawOrderNode != null) {
 				let timeline = new DrawOrderTimeline(drawOrderNode.length);
 				let slotCount = skeletonData.slots.length;
-				var frameIndex = 0;
-				for (var j = 0; j < drawOrderNode.length; j++) {
+				let frameIndex = 0;
+				for (let j = 0; j < drawOrderNode.length; j++) {
 					let drawOrderMap = drawOrderNode[j];
-					var drawOrder: Array<number> = null;
+					let drawOrder: Array<number> = null;
 					let offsets = this.getValue(drawOrderMap, "offsets", null);
 					if (offsets != null) {
 						drawOrder = Utils.newArray<number>(slotCount, -1);
 						let unchanged = Utils.newArray<number>(slotCount - offsets.length, 0);
 						let originalIndex = 0, unchangedIndex = 0;
-						for (var i = 0; i < offsets.length; i++) {
+						for (let i = 0; i < offsets.length; i++) {
 							let offsetMap = offsets[i];
 							let slotIndex = skeletonData.findSlotIndex(offsetMap.slot);
 							if (slotIndex == -1) throw new Error("Slot not found: " + offsetMap.slot);
@@ -620,7 +620,7 @@ module spine {
 						while (originalIndex < slotCount)
 							unchanged[unchangedIndex++] = originalIndex++;
 						// Fill in unchanged items.
-						for (var i = slotCount - 1; i >= 0; i--)
+						for (let i = slotCount - 1; i >= 0; i--)
 							if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
 					}
 					timeline.setFrame(frameIndex++, drawOrderMap.time, drawOrder);
@@ -633,7 +633,7 @@ module spine {
 			if (map.events) {
 				let timeline = new EventTimeline(map.events.length);
 				let frameIndex = 0;
-				for (var i = 0; i < map.events.length; i++) {
+				for (let i = 0; i < map.events.length; i++) {
 					let eventMap = map.events[i];
 					let eventData = skeletonData.findEvent(eventMap.name);
 					if (eventData == null) throw new Error("Event not found: " + eventMap.name);

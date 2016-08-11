@@ -52,7 +52,7 @@ module spine {
 			}
 
 			let timelines = this.timelines;
-			for (var i = 0, n = timelines.length; i < n; i++)
+			for (let i = 0, n = timelines.length; i < n; i++)
 				timelines[i].apply(skeleton, lastTime, time, events, 1);
 		}
 
@@ -65,7 +65,7 @@ module spine {
 			}
 
 			let timelines = this.timelines;
-			for (var i = 0, n = timelines.length; i < n; i++)
+			for (let i = 0, n = timelines.length; i < n; i++)
 				timelines[i].apply(skeleton, lastTime, time, events, alpha);
 		}
 
@@ -85,7 +85,7 @@ module spine {
 		}
 
 		static linearSearch (values: ArrayLike<number>, target: number, step: number) {
-			for (var i = 0, last = values.length - step; i <= last; i += step)
+			for (let i = 0, last = values.length - step; i <= last; i += step)
 				if (values[i] > target) return i;
 			return -1;
 		}
@@ -104,7 +104,7 @@ module spine {
 		constructor (frameCount: number) {
 			if (frameCount <= 0) throw new Error("frameCount must be > 0: " + frameCount);
 			this.curves = Utils.newFloatArray((frameCount - 1) * CurveTimeline.BEZIER_SIZE);
-			for (var i = 0; i < this.curves.length; i++) {
+			for (let i = 0; i < this.curves.length; i++) {
 				this.curves[i] = 0;
 			}
 		}
@@ -139,12 +139,12 @@ module spine {
 			let ddfx = tmpx * 2 + dddfx, ddfy = tmpy * 2 + dddfy;
 			let dfx = cx1 * 0.3 + tmpx + dddfx * 0.16666667, dfy = cy1 * 0.3 + tmpy + dddfy * 0.16666667;
 
-			var i = frameIndex * CurveTimeline.BEZIER_SIZE;
+			let i = frameIndex * CurveTimeline.BEZIER_SIZE;
 			let curves = this.curves;
 			curves[i++] = CurveTimeline.BEZIER;
 
 			let x = dfx, y = dfy;
-			for (var n = i + CurveTimeline.BEZIER_SIZE - 1; i < n; i += 2) {
+			for (let n = i + CurveTimeline.BEZIER_SIZE - 1; i < n; i += 2) {
 				curves[i] = x;
 				curves[i + 1] = y;
 				dfx += ddfx;
@@ -159,16 +159,16 @@ module spine {
 		getCurvePercent (frameIndex: number, percent: number) {
 			percent = MathUtils.clamp(percent, 0, 1);
 			let curves = this.curves;
-			var i = frameIndex * CurveTimeline.BEZIER_SIZE;
+			let i = frameIndex * CurveTimeline.BEZIER_SIZE;
 			let type = curves[i];
 			if (type == CurveTimeline.LINEAR) return percent;
 			if (type == CurveTimeline.STEPPED) return 0;
 			i++;
-			var x = 0;
-			for (var start = i, n = i + CurveTimeline.BEZIER_SIZE - 1; i < n; i += 2) {
+			let x = 0;
+			for (let start = i, n = i + CurveTimeline.BEZIER_SIZE - 1; i < n; i += 2) {
 				x = curves[i];
 				if (x >= percent) {
-					var prevX: number, prevY: number;
+					let prevX: number, prevY: number;
 					if (i == start) {
 						prevX = 0;
 						prevY = 0;
@@ -429,7 +429,7 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			var frameIndex = 0;
+			let frameIndex = 0;
 			if (time >= frames[frames.length - 1]) // Time is after last frame.
 				frameIndex = frames.length - 1;
 			else
@@ -473,7 +473,7 @@ module spine {
 				return;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			var frame = 0;
+			let frame = 0;
 			if (lastTime < frames[0])
 				frame = 0;
 			else {
@@ -513,7 +513,7 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			var frame = 0;
+			let frame = 0;
 			if (time >= frames[frames.length - 1]) // Time is after last frame.
 				frame = frames.length - 1;
 			else
@@ -525,7 +525,7 @@ module spine {
 			if (drawOrderToSetupIndex == null)
 				Utils.arrayCopy(slots, 0, drawOrder, 0, slots.length);
 			else {
-				for (var i = 0, n = drawOrderToSetupIndex.length; i < n; i++)
+				for (let i = 0, n = drawOrderToSetupIndex.length; i < n; i++)
 					drawOrder[i] = slots[drawOrderToSetupIndex[i]];
 			}
 		}
@@ -567,7 +567,7 @@ module spine {
 			if (time >= frames[frames.length - 1]) { // Time is after last frame.
 				let lastVertices = frameVertices[frames.length - 1];
 				if (alpha < 1) {
-					for (var i = 0; i < vertexCount; i++)
+					for (let i = 0; i < vertexCount; i++)
 						vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
 				} else
 					Utils.arrayCopy(lastVertices, 0, vertices, 0, vertexCount);
@@ -582,12 +582,12 @@ module spine {
 			let percent = this.getCurvePercent(frame - 1, 1 - (time - frameTime) / (frames[frame - 1] - frameTime));
 
 			if (alpha < 1) {
-				for (var i = 0; i < vertexCount; i++) {
+				for (let i = 0; i < vertexCount; i++) {
 					let prev = prevVertices[i];
 					vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
 				}
 			} else {
-				for (var i = 0; i < vertexCount; i++) {
+				for (let i = 0; i < vertexCount; i++) {
 					let prev = prevVertices[i];
 					vertices[i] = prev + (nextVertices[i] - prev) * percent;
 				}

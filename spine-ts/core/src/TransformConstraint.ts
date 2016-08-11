@@ -46,7 +46,7 @@ module spine {
 			this.scaleMix = data.scaleMix;
 			this.shearMix = data.shearMix;
 			this.bones = new Array<Bone>();
-			for (var i = 0; i < data.bones.length; i++)
+			for (let i = 0; i < data.bones.length; i++)
 				this.bones.push(skeleton.findBone(data.bones[i].name));
 			this.target = skeleton.findBone(data.target.name);
 		}
@@ -60,7 +60,7 @@ module spine {
 			let target = this.target;
 			let ta = target.a, tb = target.b, tc = target.c, td = target.d;
 			let bones = this.bones;
-			for (var i = 0, n = bones.length; i < n; i++) {
+			for (let i = 0, n = bones.length; i < n; i++) {
 				let bone = bones[i];
 
 				if (rotateMix > 0) {
@@ -87,7 +87,7 @@ module spine {
 				if (scaleMix > 0) {
 					let bs = Math.sqrt(bone.a * bone.a + bone.c * bone.c);
 					let ts = Math.sqrt(ta * ta + tc * tc);
-					var s = bs > 0.00001 ? (bs + (ts - bs + this.data.offsetScaleX) * scaleMix) / bs : 0;
+					let s = bs > 0.00001 ? (bs + (ts - bs + this.data.offsetScaleX) * scaleMix) / bs : 0;
 					bone.a *= s;
 					bone.c *= s;
 					bs = Math.sqrt(bone.b * bone.b + bone.d * bone.d);
