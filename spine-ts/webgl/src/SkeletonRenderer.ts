@@ -35,17 +35,17 @@ module spine.webgl {
 
 		premultipliedAlpha = false;
 
-		draw(batcher: PolygonBatcher, skeleton: Skeleton) {
+		draw (batcher: PolygonBatcher, skeleton: Skeleton) {
 			let premultipliedAlpha = this.premultipliedAlpha;
-			var blendMode: BlendMode = null;
+			let blendMode: BlendMode = null;
 
-			var vertices: ArrayLike<number> = null;
-			var triangles: Array<number>  = null;
-			var drawOrder = skeleton.drawOrder;
-			for (var i = 0, n = drawOrder.length; i < n; i++) {
+			let vertices: ArrayLike<number> = null;
+			let triangles: Array<number>  = null;
+			let drawOrder = skeleton.drawOrder;
+			for (let i = 0, n = drawOrder.length; i < n; i++) {
 				let slot = drawOrder[i];
 				let attachment = slot.getAttachment();
-				var texture: Texture = null;
+				let texture: Texture = null;
 				if (attachment instanceof RegionAttachment) {
 					let region = <RegionAttachment>attachment;
 					vertices = region.updateWorldVertices(slot, premultipliedAlpha);

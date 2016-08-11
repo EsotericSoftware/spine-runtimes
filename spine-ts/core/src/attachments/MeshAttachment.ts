@@ -49,9 +49,8 @@ module spine {
 			let regionUVs = this.regionUVs;
 			let verticesLength = regionUVs.length;
 			let worldVerticesLength = (verticesLength >> 1) * 8;
-			if (this.worldVertices == null || this.worldVertices.length != worldVerticesLength) {
+			if (this.worldVertices == null || this.worldVertices.length != worldVerticesLength)
 				this.worldVertices = Utils.newFloatArray(worldVerticesLength);
-			}
 
 			let u = 0, v = 0, width = 0, height = 0;
 			if (this.region == null) {

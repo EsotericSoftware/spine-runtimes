@@ -34,17 +34,17 @@ module spine.webgl {
 		pages = new Array<TextureAtlasPage>();
 		regions = new Array<TextureAtlasRegion>();
 
-		constructor(atlasText: string, textureLoader: (path: string) => Texture) {
+		constructor (atlasText: string, textureLoader: (path: string) => Texture) {
 			this.load(atlasText, textureLoader);
 		}
 
-		private load(atlasText: string, textureLoader: (path: string) => Texture) {
+		private load (atlasText: string, textureLoader: (path: string) => Texture) {
 			if (textureLoader == null)
-				throw new Error("textureLoader cannot be null.");            
+				throw new Error("textureLoader cannot be null.");
 
 			let reader = new TextureAtlasReader(atlasText);
-			let tuple = new Array<string>(4);            
-			var page:TextureAtlasPage = null;
+			let tuple = new Array<string>(4);
+			let page:TextureAtlasPage = null;
 			while (true) {
 				let line = reader.readLine();
 				if (line == null)
@@ -81,10 +81,10 @@ module spine.webgl {
 					page.texture.setFilters(page.minFilter, page.magFilter);
 					page.texture.setWraps(page.uWrap, page.vWrap);
 					page.width = page.texture.getImage().width;
-					page.height = page.texture.getImage().height; 
+					page.height = page.texture.getImage().height;
 					this.pages.push(page);
 				} else {
-					var region:TextureAtlasRegion = new TextureAtlasRegion();
+					let region:TextureAtlasRegion = new TextureAtlasRegion();
 					region.name = line;
 					region.page = page;
 
@@ -135,8 +135,8 @@ module spine.webgl {
 			}
 		}
 
-		findRegion(name: string): TextureAtlasRegion {
-			for (var i = 0; i < this.regions.length; i++) {
+		findRegion (name: string): TextureAtlasRegion {
+			for (let i = 0; i < this.regions.length; i++) {
 				if (this.regions[i].name == name) {
 					return this.regions[i];
 				}
@@ -144,8 +144,8 @@ module spine.webgl {
 			return null;
 		}
 
-		dispose() {
-			for (var i = 0; i < this.pages.length; i++) {
+		dispose () {
+			for (let i = 0; i < this.pages.length; i++) {
 				this.pages[i].texture.dispose();
 			}
 		}
@@ -155,17 +155,17 @@ module spine.webgl {
 		lines: Array<string>;
 		index: number = 0;
 
-		constructor(text: string) {
+		constructor (text: string) {
 			this.lines = text.split(/\r\n|\r|\n/);
 		}
 
-		readLine(): string {
+		readLine (): string {
 			if (this.index >= this.lines.length)
 				return null;
 			return this.lines[this.index++];
 		}
 
-		readValue(): string {
+		readValue (): string {
 			let line = this.readLine();
 			let colon= line.indexOf(":");
 			if (colon == -1)
@@ -173,12 +173,12 @@ module spine.webgl {
 			return line.substring(colon + 1).trim();
 		}
 
-		readTuple(tuple: Array<string>): number {
+		readTuple (tuple: Array<string>): number {
 			let line = this.readLine();
 			let colon = line.indexOf(":");
 			if (colon == -1)
 				throw new Error("Invalid line: " + line);
-			var i = 0, lastMatch = colon + 1;
+			let i = 0, lastMatch = colon + 1;
 			for (; i < 3; i++) {
 				let comma = line.indexOf(",", lastMatch);
 				if (comma == -1) break;

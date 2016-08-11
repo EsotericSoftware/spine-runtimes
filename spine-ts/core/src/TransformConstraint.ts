@@ -68,7 +68,8 @@ module spine {
 					let r = Math.atan2(tc, ta) - Math.atan2(c, a) + this.data.offsetRotation * MathUtils.degRad;
 					if (r > MathUtils.PI)
 						r -= MathUtils.PI2;
-					else if (r < -MathUtils.PI) r += MathUtils.PI2;
+					else if (r < -MathUtils.PI)
+						r += MathUtils.PI2;
 					r *= rotateMix;
 					let cos = Math.cos(r), sin = Math.sin(r);
 					bone.a = cos * a - sin * c;
@@ -103,7 +104,8 @@ module spine {
 					let r = Math.atan2(td, tb) - Math.atan2(tc, ta) - (by - Math.atan2(bone.c, bone.a));
 					if (r > MathUtils.PI)
 						r -= MathUtils.PI2;
-					else if (r < -MathUtils.PI) r += MathUtils.PI2;
+					else if (r < -MathUtils.PI)
+						r += MathUtils.PI2;
 					r = by + (r + this.data.offsetShearY * MathUtils.degRad) * shearMix;
 					let s = Math.sqrt(b * b + d * d);
 					bone.b = Math.cos(r) * s;
