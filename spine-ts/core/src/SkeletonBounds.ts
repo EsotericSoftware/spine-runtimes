@@ -33,16 +33,21 @@ module spine {
 	export class SkeletonBounds {
 		minX = 0; minY = 0; maxX = 0; maxY = 0;
 		boundingBoxes = new Array<BoundingBoxAttachment>();
-		polygons = new Array<Array<number>>();		
+		polygons = new Array<ArrayLike<number>>();
+		private _polygonPool = new Pool<ArrayLike<number>>(() => {
+			return Utils.newFloatArray(16);
+		});
 
 		update (skeleton: Skeleton, updateAabb: boolean) {
 			if (skeleton == null) throw new Error("skeleton cannot be null.");
 			let boundingBoxes = this.boundingBoxes;
 			let polygons = this.polygons;
+			let polygonPool = this._polygonPool;
 			let slots = skeleton.slots;
 			let slotCount = slots.length;
 
 			boundingBoxes.length = 0;
+			polygonPool.freeAll(polygons);
 			polygons.length = 0;
 
 			for (let i = 0; i < slotCount; i++) {
@@ -52,9 +57,12 @@ module spine {
 					let boundingBox = attachment as BoundingBoxAttachment;
 					boundingBoxes.push(boundingBox);
 
-					let polygon = new Array<number>();
+					let polygon = polygonPool.obtain();
+					if (polygon.length != boundingBox.worldVerticesLength) {
+						polygon = Utils.newFloatArray(boundingBox.worldVerticesLength);
+					}
 					polygons.push(polygon);
-					boundingBox.computeWorldVertices(slot, Utils.setArraySize(polygon, boundingBox.worldVerticesLength));
+					boundingBox.computeWorldVertices(slot, polygon);
 				}
 			}
 
@@ -122,7 +130,7 @@ module spine {
 		}
 
 		/** Returns true if the polygon contains the point. */
-		containsPointPolygon (polygon: Array<number>, x: number, y: number) {
+		containsPointPolygon (polygon: ArrayLike<number>, x: number, y: number) {
 			let vertices = polygon;
 			let nn = polygon.length;
 
@@ -151,7 +159,7 @@ module spine {
 		}
 
 		/** Returns true if the polygon contains any part of the line segment. */
-		intersectsSegmentPolygon (polygon: Array<number>, x1: number, y1: number, x2: number, y2: number) {
+		intersectsSegmentPolygon (polygon: ArrayLike<number>, x1: number, y1: number, x2: number, y2: number) {
 			let vertices = polygon;
 			let nn = polygon.length;
 

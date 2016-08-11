@@ -940,7 +940,8 @@ declare module spine {
         maxX: number;
         maxY: number;
         boundingBoxes: BoundingBoxAttachment[];
-        polygons: number[][];
+        polygons: ArrayLike<number>[];
+        private _polygonPool;
         update(skeleton: Skeleton, updateAabb: boolean): void;
         aabbCompute(): void;
         /** Returns true if the axis aligned bounding box contains the point. */
@@ -953,15 +954,15 @@ declare module spine {
          * efficient to only call this method if {@link #aabbContainsPoint(float, float)} returns true. */
         containsPoint(x: number, y: number): BoundingBoxAttachment;
         /** Returns true if the polygon contains the point. */
-        containsPointPolygon(polygon: Array<number>, x: number, y: number): boolean;
+        containsPointPolygon(polygon: ArrayLike<number>, x: number, y: number): boolean;
         /** Returns the first bounding box attachment that contains any part of the line segment, or null. When doing many checks, it
          * is usually more efficient to only call this method if {@link #aabbIntersectsSegment(float, float, float, float)} returns
          * true. */
         intersectsSegment(x1: number, y1: number, x2: number, y2: number): BoundingBoxAttachment;
         /** Returns true if the polygon contains any part of the line segment. */
-        intersectsSegmentPolygon(polygon: Array<number>, x1: number, y1: number, x2: number, y2: number): boolean;
+        intersectsSegmentPolygon(polygon: ArrayLike<number>, x1: number, y1: number, x2: number, y2: number): boolean;
         /** Returns the polygon for the specified bounding box, or null. */
-        getPolygon(boundingBox: BoundingBoxAttachment): number[];
+        getPolygon(boundingBox: BoundingBoxAttachment): ArrayLike<number>;
     }
 }
 /******************************************************************************
@@ -1459,13 +1460,13 @@ declare module spine {
         vertices: ArrayLike<number>;
         worldVerticesLength: number;
         constructor(name: string);
-        computeWorldVertices(slot: Slot, worldVertices: Array<number>): void;
+        computeWorldVertices(slot: Slot, worldVertices: ArrayLike<number>): void;
         /** Transforms local vertices to world coordinates.
          * @param start The index of the first local vertex value to transform. Each vertex has 2 values, x and y.
          * @param count The number of world vertex values to output. Must be <= {@link #getWorldVerticesLength()} - start.
          * @param worldVertices The output world vertices. Must have a length >= offset + count.
          * @param offset The worldVertices index to begin writing values. */
-        computeWorldVerticesWith(slot: Slot, start: number, count: number, worldVertices: Array<number>, offset: number): void;
+        computeWorldVerticesWith(slot: Slot, start: number, count: number, worldVertices: ArrayLike<number>, offset: number): void;
         /** Returns true if a deform originally applied to the specified attachment should be applied to this attachment. */
         applyDeform(sourceAttachment: VertexAttachment): boolean;
     }

@@ -48,7 +48,7 @@ module spine {
 			super(name);
 		}
 
-		computeWorldVertices (slot: Slot, worldVertices: Array<number>) {
+		computeWorldVertices (slot: Slot, worldVertices: ArrayLike<number>) {
 			this.computeWorldVerticesWith(slot, 0, this.worldVerticesLength, worldVertices, 0);
 		}
 
@@ -57,7 +57,7 @@ module spine {
 		 * @param count The number of world vertex values to output. Must be <= {@link #getWorldVerticesLength()} - start.
 		 * @param worldVertices The output world vertices. Must have a length >= offset + count.
 		 * @param offset The worldVertices index to begin writing values. */
-		computeWorldVerticesWith (slot: Slot, start: number, count: number, worldVertices: Array<number>, offset: number) {
+		computeWorldVerticesWith (slot: Slot, start: number, count: number, worldVertices: ArrayLike<number>, offset: number) {
 			count += offset;
 			let skeleton = slot.bone.skeleton;
 			let x = skeleton.x, y = skeleton.y;

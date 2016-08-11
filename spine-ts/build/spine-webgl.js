@@ -2789,15 +2789,20 @@ var spine;
             this.maxY = 0;
             this.boundingBoxes = new Array();
             this.polygons = new Array();
+            this._polygonPool = new spine.Pool(function () {
+                return spine.Utils.newFloatArray(16);
+            });
         }
         SkeletonBounds.prototype.update = function (skeleton, updateAabb) {
             if (skeleton == null)
                 throw new Error("skeleton cannot be null.");
             var boundingBoxes = this.boundingBoxes;
             var polygons = this.polygons;
+            var polygonPool = this._polygonPool;
             var slots = skeleton.slots;
             var slotCount = slots.length;
             boundingBoxes.length = 0;
+            polygonPool.freeAll(polygons);
             polygons.length = 0;
             for (var i = 0; i < slotCount; i++) {
                 var slot = slots[i];
@@ -2805,9 +2810,12 @@ var spine;
                 if (attachment instanceof spine.BoundingBoxAttachment) {
                     var boundingBox = attachment;
                     boundingBoxes.push(boundingBox);
-                    var polygon = new Array();
+                    var polygon = polygonPool.obtain();
+                    if (polygon.length != boundingBox.worldVerticesLength) {
+                        polygon = spine.Utils.newFloatArray(boundingBox.worldVerticesLength);
+                    }
                     polygons.push(polygon);
-                    boundingBox.computeWorldVertices(slot, spine.Utils.setArraySize(polygon, boundingBox.worldVerticesLength));
+                    boundingBox.computeWorldVertices(slot, polygon);
                 }
             }
             if (updateAabb)
