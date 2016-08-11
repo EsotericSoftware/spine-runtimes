@@ -184,8 +184,7 @@ module spine {
 
 		/** Returns the polygon for the specified bounding box, or null. */
 		getPolygon (boundingBox: BoundingBoxAttachment) {
-			if (boundingBox == null) throw new Error("boundingBox cannot be null.");
-			// FIXME identity equals used in indexOf?
+			if (boundingBox == null) throw new Error("boundingBox cannot be null.");			
 			let index = this.boundingBoxes.indexOf(boundingBox);
 			return index == -1 ? null : this.polygons[index];
 		}

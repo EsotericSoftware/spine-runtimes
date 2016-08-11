@@ -40,8 +40,7 @@ var spine;
                 timelines[i].apply(skeleton, lastTime, time, events, alpha);
         };
         Animation.binarySearch = function (values, target, step) {
-            if (step === void 0) { step = 1; }
-            // FIXME this relies on integer math, may break
+            if (step === void 0) { step = 1; }            
             var low = 0;
             var high = values.length / step - 2;
             if (high == 0)
@@ -2646,8 +2645,7 @@ var spine;
         /** Returns the polygon for the specified bounding box, or null. */
         SkeletonBounds.prototype.getPolygon = function (boundingBox) {
             if (boundingBox == null)
-                throw new Error("boundingBox cannot be null.");
-            // FIXME identity equals used in indexOf?
+                throw new Error("boundingBox cannot be null.");            
             var index = this.boundingBoxes.indexOf(boundingBox);
             return index == -1 ? null : this.polygons[index];
         };

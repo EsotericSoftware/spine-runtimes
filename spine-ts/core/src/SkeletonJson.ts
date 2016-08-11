@@ -41,8 +41,7 @@ module spine {
 
 		readSkeletonData (json: string): SkeletonData {
 			let scale = this.scale;
-			let skeletonData = new SkeletonData();
-			// FIXME skeletonData.name = file.nameWithoutExtension();
+			let skeletonData = new SkeletonData();			
 			let root = JSON.parse(json);
 
 			// Skeleton
@@ -363,7 +362,7 @@ module spine {
 					for (let timelineName in slotMap) {
 						let timelineMap = slotMap[timelineName];
 						if (timelineName == "color") {
-							let timeline = new ColorTimeline(timelineMap.length); // FIXME
+							let timeline = new ColorTimeline(timelineMap.length);
 							timeline.slotIndex = slotIndex;
 
 							let frameIndex = 0;

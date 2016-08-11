@@ -2936,7 +2936,6 @@ var spine;
         SkeletonBounds.prototype.getPolygon = function (boundingBox) {
             if (boundingBox == null)
                 throw new Error("boundingBox cannot be null.");
-            // FIXME identity equals used in indexOf?
             var index = this.boundingBoxes.indexOf(boundingBox);
             return index == -1 ? null : this.polygons[index];
         };
@@ -3147,7 +3146,6 @@ var spine;
         SkeletonJson.prototype.readSkeletonData = function (json) {
             var scale = this.scale;
             var skeletonData = new spine.SkeletonData();
-            // FIXME skeletonData.name = file.nameWithoutExtension();
             var root = JSON.parse(json);
             // Skeleton
             var skeletonMap = root.skeleton;
@@ -3449,7 +3447,7 @@ var spine;
                     for (var timelineName in slotMap) {
                         var timelineMap = slotMap[timelineName];
                         if (timelineName == "color") {
-                            var timeline = new spine.ColorTimeline(timelineMap.length); // FIXME
+                            var timeline = new spine.ColorTimeline(timelineMap.length);
                             timeline.slotIndex = slotIndex;
                             var frameIndex = 0;
                             for (var i = 0; i < timelineMap.length; i++) {
@@ -3848,8 +3846,6 @@ var spine;
         };
         /** @return May be null. */
         Skin.prototype.getAttachment = function (slotIndex, name) {
-            if (slotIndex >= this.attachments.length)
-                return null;
             var dictionary = this.attachments[slotIndex];
             return dictionary ? dictionary[name] : null;
         };
