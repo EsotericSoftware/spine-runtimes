@@ -61,17 +61,17 @@ module spine {
 			let bones = this.bones;
 			switch (bones.length) {
 			case 1:
-				this.applyShort(bones[0], target.worldX, target.worldY, this.mix);
+				this.apply1(bones[0], target.worldX, target.worldY, this.mix);
 				break;
 			case 2:
-				this.applyWith(bones[0], bones[1], target.worldX, target.worldY, this.bendDirection, this.mix);
+				this.apply2(bones[0], bones[1], target.worldX, target.worldY, this.bendDirection, this.mix);
 				break;
 			}
 		}
 
 		/** Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified in the world
 		 * coordinate system. */
-		applyShort (bone: Bone, targetX: number, targetY: number, alpha: number) {
+		apply1 (bone: Bone, targetX: number, targetY: number, alpha: number) {
 			let pp = bone.parent;
 			let id = 1 / (pp.a * pp.d - pp.b * pp.c);
 			let x = targetX - pp.worldX, y = targetY - pp.worldY;
@@ -88,7 +88,7 @@ module spine {
 		/** Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as possible. The
 		 * target is specified in the world coordinate system.
 		 * @param child A direct descendant of the parent bone. */
-		applyWith (parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, alpha: number) {
+		apply2 (parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, alpha: number) {
 			if (alpha == 0) {
 				child.updateWorldTransform();
 				return;
