@@ -31,14 +31,19 @@
 
 module spine.webgl {
 	export class AssetManager implements Disposable {
+		private _gl: WebGLRenderingContext;
 		private _assets: Map<string | Texture> = {};
 		private _errors: Map<string> = {};
 		private _toLoad = 0;
 		private _loaded = 0;
 
+		constructor (gl: WebGLRenderingContext) {
+			this._gl = gl;
+		}
+
 		loadText(path: string,
-			success: (path: string, text: string) => void,
-			error: (path: string, error: string) => void
+			success: (path: string, text: string) => void = null,
+			error: (path: string, error: string) => void = null
 		) {
 			this._toLoad++;
 			let request = new XMLHttpRequest();
@@ -60,20 +65,21 @@ module spine.webgl {
 		}
 
 		loadTexture (path: string,
-			success: (path: string, image: HTMLImageElement) => void,
-			error: (path: string, error: string) => void
+			success: (path: string, image: HTMLImageElement) => void = null,
+			error: (path: string, error: string) => void = null
 		) {
 			this._toLoad++;
 			let img = new Image();
 			img.src = path;
 			img.onload = (ev) => {
 				if (success) success(path, img);
-				let texture = new Texture(img);
+				let texture = new Texture(this._gl, img);
 				this._assets[path] = texture;
 				this._toLoad--;
 				this._loaded++;
 			}
 			img.onerror = (ev) => {
+				if (error) error(path, `Couldn't load image ${path}`);
 				this._errors[path] =  `Couldn't load image ${path}`;
 				this._toLoad--;
 				this._loaded++;
@@ -114,6 +120,14 @@ module spine.webgl {
 
 		dispose () {
 			this.removeAll();
+		}
+
+		hasErrors() {
+			return Object.keys(this._errors).length > 0;
+		}
+
+		errors() {
+			return this._errors;
 		}
 	}
 }

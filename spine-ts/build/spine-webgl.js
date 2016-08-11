@@ -5118,14 +5118,17 @@ var spine;
     var webgl;
     (function (webgl) {
         var AssetManager = (function () {
-            function AssetManager() {
+            function AssetManager(gl) {
                 this._assets = {};
                 this._errors = {};
                 this._toLoad = 0;
                 this._loaded = 0;
+                this._gl = gl;
             }
             AssetManager.prototype.loadText = function (path, success, error) {
                 var _this = this;
+                if (success === void 0) { success = null; }
+                if (error === void 0) { error = null; }
                 this._toLoad++;
                 var request = new XMLHttpRequest();
                 request.onreadystatechange = function () {
@@ -5149,18 +5152,22 @@ var spine;
             };
             AssetManager.prototype.loadTexture = function (path, success, error) {
                 var _this = this;
+                if (success === void 0) { success = null; }
+                if (error === void 0) { error = null; }
                 this._toLoad++;
                 var img = new Image();
                 img.src = path;
                 img.onload = function (ev) {
                     if (success)
                         success(path, img);
-                    var texture = new webgl.Texture(img);
+                    var texture = new webgl.Texture(_this._gl, img);
                     _this._assets[path] = texture;
                     _this._toLoad--;
                     _this._loaded++;
                 };
                 img.onerror = function (ev) {
+                    if (error)
+                        error(path, "Couldn't load image " + path);
                     _this._errors[path] = "Couldn't load image " + path;
                     _this._toLoad--;
                     _this._loaded++;
@@ -5529,13 +5536,14 @@ var spine;
     var webgl;
     (function (webgl) {
         var Mesh = (function () {
-            function Mesh(_attributes, maxVertices, maxIndices) {
+            function Mesh(gl, _attributes, maxVertices, maxIndices) {
                 this._attributes = _attributes;
                 this._verticesLength = 0;
                 this._dirtyVertices = false;
                 this._indicesLength = 0;
                 this._dirtyIndices = false;
                 this._elementsPerVertex = 0;
+                this._gl = gl;
                 this._elementsPerVertex = 0;
                 for (var i = 0; i < _attributes.length; i++) {
                     this._elementsPerVertex += _attributes[i].numElements;
@@ -5577,59 +5585,64 @@ var spine;
                 this.drawWithOffset(shader, primitiveType, 0, this._indicesLength > 0 ? this._indicesLength : this._verticesLength);
             };
             Mesh.prototype.drawWithOffset = function (shader, primitiveType, offset, count) {
+                var gl = this._gl;
                 if (this._dirtyVertices || this._dirtyIndices)
                     this.update();
                 this.bind(shader);
                 if (this._indicesLength > 0)
-                    webgl.gl.drawElements(primitiveType, count, webgl.gl.UNSIGNED_SHORT, offset * 2);
+                    gl.drawElements(primitiveType, count, gl.UNSIGNED_SHORT, offset * 2);
                 else
-                    webgl.gl.drawArrays(primitiveType, offset, count);
+                    gl.drawArrays(primitiveType, offset, count);
                 this.unbind(shader);
             };
             Mesh.prototype.bind = function (shader) {
-                webgl.gl.bindBuffer(webgl.gl.ARRAY_BUFFER, this._verticesBuffer);
+                var gl = this._gl;
+                gl.bindBuffer(gl.ARRAY_BUFFER, this._verticesBuffer);
                 var offset = 0;
                 for (var i = 0; i < this._attributes.length; i++) {
                     var attrib = this._attributes[i];
                     var location_1 = shader.getAttributeLocation(attrib.name);
-                    webgl.gl.enableVertexAttribArray(location_1);
-                    webgl.gl.vertexAttribPointer(location_1, attrib.numElements, webgl.gl.FLOAT, false, this._elementsPerVertex * 4, offset * 4);
+                    gl.enableVertexAttribArray(location_1);
+                    gl.vertexAttribPointer(location_1, attrib.numElements, gl.FLOAT, false, this._elementsPerVertex * 4, offset * 4);
                     offset += attrib.numElements;
                 }
                 if (this._indicesLength > 0)
-                    webgl.gl.bindBuffer(webgl.gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
+                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
             };
             Mesh.prototype.unbind = function (shader) {
+                var gl = this._gl;
                 for (var i = 0; i < this._attributes.length; i++) {
                     var attrib = this._attributes[i];
                     var location_2 = shader.getAttributeLocation(attrib.name);
-                    webgl.gl.disableVertexAttribArray(location_2);
+                    gl.disableVertexAttribArray(location_2);
                 }
-                webgl.gl.bindBuffer(webgl.gl.ARRAY_BUFFER, null);
+                gl.bindBuffer(gl.ARRAY_BUFFER, null);
                 if (this._indicesLength > 0)
-                    webgl.gl.bindBuffer(webgl.gl.ELEMENT_ARRAY_BUFFER, null);
+                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
             };
             Mesh.prototype.update = function () {
+                var gl = this._gl;
                 if (this._dirtyVertices) {
                     if (!this._verticesBuffer) {
-                        this._verticesBuffer = webgl.gl.createBuffer();
+                        this._verticesBuffer = gl.createBuffer();
                     }
-                    webgl.gl.bindBuffer(webgl.gl.ARRAY_BUFFER, this._verticesBuffer);
-                    webgl.gl.bufferData(webgl.gl.ARRAY_BUFFER, this._vertices.subarray(0, this._verticesLength), webgl.gl.STATIC_DRAW);
+                    gl.bindBuffer(gl.ARRAY_BUFFER, this._verticesBuffer);
+                    gl.bufferData(gl.ARRAY_BUFFER, this._vertices.subarray(0, this._verticesLength), gl.STATIC_DRAW);
                     this._dirtyVertices = false;
                 }
                 if (this._dirtyIndices) {
                     if (!this._indicesBuffer) {
-                        this._indicesBuffer = webgl.gl.createBuffer();
+                        this._indicesBuffer = gl.createBuffer();
                     }
-                    webgl.gl.bindBuffer(webgl.gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
-                    webgl.gl.bufferData(webgl.gl.ELEMENT_ARRAY_BUFFER, this._indices.subarray(0, this._indicesLength), webgl.gl.STATIC_DRAW);
+                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
+                    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this._indices.subarray(0, this._indicesLength), gl.STATIC_DRAW);
                     this._dirtyIndices = false;
                 }
             };
             Mesh.prototype.dispose = function () {
-                webgl.gl.deleteBuffer(this._verticesBuffer);
-                webgl.gl.deleteBuffer(this._indicesBuffer);
+                var gl = this._gl;
+                gl.deleteBuffer(this._verticesBuffer);
+                gl.deleteBuffer(this._indicesBuffer);
             };
             return Mesh;
         }());
@@ -5717,35 +5730,38 @@ var spine;
     var webgl;
     (function (webgl) {
         var PolygonBatcher = (function () {
-            function PolygonBatcher(maxVertices) {
+            function PolygonBatcher(gl, maxVertices) {
                 if (maxVertices === void 0) { maxVertices = 10920; }
                 this._drawing = false;
                 this._shader = null;
                 this._lastTexture = null;
                 this._verticesLength = 0;
                 this._indicesLength = 0;
-                this._srcBlend = webgl.gl.SRC_ALPHA;
-                this._dstBlend = webgl.gl.ONE_MINUS_SRC_ALPHA;
+                this._srcBlend = WebGLRenderingContext.SRC_ALPHA;
+                this._dstBlend = WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
                 if (maxVertices > 10920)
                     throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
-                this._mesh = new webgl.Mesh([new webgl.Position2Attribute(), new webgl.ColorAttribute(), new webgl.TexCoordAttribute()], maxVertices, maxVertices * 3);
+                this._gl = gl;
+                this._mesh = new webgl.Mesh(gl, [new webgl.Position2Attribute(), new webgl.ColorAttribute(), new webgl.TexCoordAttribute()], maxVertices, maxVertices * 3);
             }
             PolygonBatcher.prototype.begin = function (shader) {
+                var gl = this._gl;
                 if (this._drawing)
                     throw new Error("PolygonBatch is already drawing. Call PolygonBatch.end() before calling PolygonBatch.begin()");
                 this._drawCalls = 0;
                 this._shader = shader;
                 this._lastTexture = null;
                 this._drawing = true;
-                webgl.gl.enable(webgl.gl.BLEND);
-                webgl.gl.blendFunc(this._srcBlend, this._dstBlend);
+                gl.enable(gl.BLEND);
+                gl.blendFunc(this._srcBlend, this._dstBlend);
             };
             PolygonBatcher.prototype.setBlendMode = function (srcBlend, dstBlend) {
+                var gl = this._gl;
                 this._srcBlend = srcBlend;
                 this._dstBlend = dstBlend;
                 if (this._drawing) {
                     this.flush();
-                    webgl.gl.blendFunc(this._srcBlend, this._dstBlend);
+                    gl.blendFunc(this._srcBlend, this._dstBlend);
                 }
             };
             PolygonBatcher.prototype.draw = function (texture, vertices, indices) {
@@ -5769,9 +5785,10 @@ var spine;
                 this._mesh.setIndicesLength(this._indicesLength);
             };
             PolygonBatcher.prototype.flush = function () {
+                var gl = this._gl;
                 if (this._verticesLength == 0)
                     return;
-                this._mesh.draw(this._shader, webgl.gl.TRIANGLES);
+                this._mesh.draw(this._shader, gl.TRIANGLES);
                 this._verticesLength = 0;
                 this._indicesLength = 0;
                 this._mesh.setVerticesLength(0);
@@ -5779,6 +5796,7 @@ var spine;
                 this._drawCalls++;
             };
             PolygonBatcher.prototype.end = function () {
+                var gl = this._gl;
                 if (!this._drawing)
                     throw new Error("PolygonBatch is not drawing. Call PolygonBatch.begin() before calling PolygonBatch.end()");
                 if (this._verticesLength > 0 || this._indicesLength > 0)
@@ -5786,7 +5804,7 @@ var spine;
                 this._shader = null;
                 this._lastTexture = null;
                 this._drawing = false;
-                webgl.gl.disable(webgl.gl.BLEND);
+                gl.disable(gl.BLEND);
             };
             PolygonBatcher.prototype.drawCalls = function () { return this._drawCalls; };
             return PolygonBatcher;
@@ -5829,7 +5847,7 @@ var spine;
     var webgl;
     (function (webgl) {
         var Shader = (function () {
-            function Shader(_vertexShader, _fragmentShader) {
+            function Shader(gl, _vertexShader, _fragmentShader) {
                 this._vertexShader = _vertexShader;
                 this._fragmentShader = _fragmentShader;
                 this._vs = null;
@@ -5838,13 +5856,14 @@ var spine;
                 this._tmp2x2 = new Float32Array(2 * 2);
                 this._tmp3x3 = new Float32Array(3 * 3);
                 this._tmp4x4 = new Float32Array(4 * 4);
+                this._gl = gl;
                 this.compile();
             }
             Shader.prototype.program = function () { return this._program; };
             Shader.prototype.vertexShader = function () { return this._vertexShader; };
             Shader.prototype.fragmentShader = function () { return this._fragmentShader; };
             Shader.prototype.compile = function () {
-                var gl = spine.webgl.gl;
+                var gl = this._gl;
                 try {
                     this._vs = this.compileShader(gl.VERTEX_SHADER, this._vertexShader);
                     this._fs = this.compileShader(gl.FRAGMENT_SHADER, this._fragmentShader);
@@ -5856,96 +5875,104 @@ var spine;
                 }
             };
             Shader.prototype.compileShader = function (type, source) {
-                var shader = webgl.gl.createShader(type);
-                webgl.gl.shaderSource(shader, source);
-                webgl.gl.compileShader(shader);
-                if (!webgl.gl.getShaderParameter(shader, webgl.gl.COMPILE_STATUS)) {
-                    var error = "Couldn't compile shader: " + webgl.gl.getShaderInfoLog(shader);
-                    webgl.gl.deleteShader(shader);
+                var gl = this._gl;
+                var shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    var error = "Couldn't compile shader: " + gl.getShaderInfoLog(shader);
+                    gl.deleteShader(shader);
                     throw new Error(error);
                 }
                 return shader;
             };
             Shader.prototype.compileProgram = function (vs, fs) {
-                var program = webgl.gl.createProgram();
-                webgl.gl.attachShader(program, vs);
-                webgl.gl.attachShader(program, fs);
-                webgl.gl.linkProgram(program);
-                if (!webgl.gl.getProgramParameter(program, webgl.gl.LINK_STATUS)) {
-                    var error = "Couldn't compile shader program: " + webgl.gl.getProgramInfoLog(program);
-                    webgl.gl.deleteProgram(program);
+                var gl = this._gl;
+                var program = gl.createProgram();
+                gl.attachShader(program, vs);
+                gl.attachShader(program, fs);
+                gl.linkProgram(program);
+                if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+                    var error = "Couldn't compile shader program: " + gl.getProgramInfoLog(program);
+                    gl.deleteProgram(program);
                     throw new Error(error);
                 }
                 return program;
             };
             Shader.prototype.bind = function () {
-                webgl.gl.useProgram(this._program);
+                this._gl.useProgram(this._program);
             };
             Shader.prototype.unbind = function () {
-                webgl.gl.useProgram(null);
+                this._gl.useProgram(null);
             };
             Shader.prototype.setUniformi = function (uniform, value) {
-                webgl.gl.uniform1i(this.getUniformLocation(uniform), value);
+                this._gl.uniform1i(this.getUniformLocation(uniform), value);
             };
             Shader.prototype.setUniformf = function (uniform, value) {
-                webgl.gl.uniform1f(this.getUniformLocation(uniform), value);
+                this._gl.uniform1f(this.getUniformLocation(uniform), value);
             };
             Shader.prototype.setUniform2f = function (uniform, value, value2) {
-                webgl.gl.uniform2f(this.getUniformLocation(uniform), value, value2);
+                this._gl.uniform2f(this.getUniformLocation(uniform), value, value2);
             };
             Shader.prototype.setUniform3f = function (uniform, value, value2, value3) {
-                webgl.gl.uniform3f(this.getUniformLocation(uniform), value, value2, value3);
+                this._gl.uniform3f(this.getUniformLocation(uniform), value, value2, value3);
             };
             Shader.prototype.setUniform4f = function (uniform, value, value2, value3, value4) {
-                webgl.gl.uniform4f(this.getUniformLocation(uniform), value, value2, value3, value4);
+                this._gl.uniform4f(this.getUniformLocation(uniform), value, value2, value3, value4);
             };
             Shader.prototype.setUniform2x2f = function (uniform, value) {
+                var gl = this._gl;
                 this._tmp2x2.set(value);
-                webgl.gl.uniformMatrix2fv(this.getUniformLocation(uniform), false, this._tmp2x2);
+                gl.uniformMatrix2fv(this.getUniformLocation(uniform), false, this._tmp2x2);
             };
             Shader.prototype.setUniform3x3f = function (uniform, value) {
+                var gl = this._gl;
                 this._tmp3x3.set(value);
-                webgl.gl.uniformMatrix3fv(this.getUniformLocation(uniform), false, this._tmp3x3);
+                gl.uniformMatrix3fv(this.getUniformLocation(uniform), false, this._tmp3x3);
             };
             Shader.prototype.setUniform4x4f = function (uniform, value) {
+                var gl = this._gl;
                 this._tmp4x4.set(value);
-                webgl.gl.uniformMatrix4fv(this.getUniformLocation(uniform), false, this._tmp4x4);
+                gl.uniformMatrix4fv(this.getUniformLocation(uniform), false, this._tmp4x4);
             };
             Shader.prototype.getUniformLocation = function (uniform) {
-                var location = webgl.gl.getUniformLocation(this._program, uniform);
+                var gl = this._gl;
+                var location = gl.getUniformLocation(this._program, uniform);
                 if (!location)
                     throw new Error("Couldn't find location for uniform " + uniform);
                 return location;
             };
             Shader.prototype.getAttributeLocation = function (attribute) {
-                var location = webgl.gl.getAttribLocation(this._program, attribute);
+                var gl = this._gl;
+                var location = gl.getAttribLocation(this._program, attribute);
                 if (location == -1)
                     throw new Error("Couldn't find location for attribute " + attribute);
                 return location;
             };
             Shader.prototype.dispose = function () {
+                var gl = this._gl;
                 if (this._vs) {
-                    webgl.gl.deleteShader(this._vs);
+                    gl.deleteShader(this._vs);
                     this._vs = null;
                 }
                 if (this._fs) {
-                    webgl.gl.deleteShader(this._fs);
+                    gl.deleteShader(this._fs);
                     this._fs = null;
                 }
                 if (this._program) {
-                    webgl.gl.deleteProgram(this._program);
+                    gl.deleteProgram(this._program);
                     this._program = null;
                 }
             };
-            Shader.newColoredTextured = function () {
+            Shader.newColoredTextured = function (gl) {
                 var vs = "\n\t\t\t\tattribute vec4 " + Shader.POSITION + ";\n\t\t\t\tattribute vec4 " + Shader.COLOR + ";\n\t\t\t\tattribute vec2 " + Shader.TEXCOORDS + ";\n\t\t\t\tuniform mat4 " + Shader.MVP_MATRIX + ";\n\t\t\t\tvarying vec4 v_color;\n\t\t\t\tvarying vec2 v_texCoords;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tv_color = " + Shader.COLOR + ";\n\t\t\t\t\tv_texCoords = " + Shader.TEXCOORDS + ";\n\t\t\t\t\tgl_Position =  " + Shader.MVP_MATRIX + " * " + Shader.POSITION + ";\n\t\t\t\t}\n\t\t\t";
                 var fs = "\n\t\t\t\t#ifdef GL_ES\n\t\t\t\t\t#define LOWP lowp\n\t\t\t\t\tprecision mediump float;\n\t\t\t\t#else\n\t\t\t\t\t#define LOWP\n\t\t\t\t#endif\n\t\t\t\tvarying LOWP vec4 v_color;\n\t\t\t\tvarying vec2 v_texCoords;\n\t\t\t\tuniform sampler2D u_texture;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tgl_FragColor = v_color * texture2D(u_texture, v_texCoords);\n\t\t\t\t}\n\t\t\t";
-                return new Shader(vs, fs);
+                return new Shader(gl, vs, fs);
             };
-            Shader.newColored = function () {
+            Shader.newColored = function (gl) {
                 var vs = "\n\t\t\t\tattribute vec4 " + Shader.POSITION + ";\n\t\t\t\tattribute vec4 " + Shader.COLOR + ";\n\t\t\t\tuniform mat4 " + Shader.MVP_MATRIX + ";\n\t\t\t\tvarying vec4 v_color;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tv_color = " + Shader.COLOR + ";\n\t\t\t\t\tgl_Position =  " + Shader.MVP_MATRIX + " * " + Shader.POSITION + ";\n\t\t\t\t}\n\t\t\t";
                 var fs = "\n\t\t\t\t#ifdef GL_ES\n\t\t\t\t\t#define LOWP lowp\n\t\t\t\t\tprecision mediump float;\n\t\t\t\t#else\n\t\t\t\t\t#define LOWP\n\t\t\t\t#endif\n\t\t\t\tvarying LOWP vec4 v_color;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tgl_FragColor = v_color;\n\t\t\t\t}\n\t\t\t";
-                return new Shader(vs, fs);
+                return new Shader(gl, vs, fs);
             };
             Shader.MVP_MATRIX = "u_projTrans";
             Shader.POSITION = "a_position";
@@ -5992,8 +6019,9 @@ var spine;
     var webgl;
     (function (webgl) {
         var SkeletonRenderer = (function () {
-            function SkeletonRenderer() {
+            function SkeletonRenderer(gl) {
                 this.premultipliedAlpha = false;
+                this._gl = gl;
             }
             SkeletonRenderer.prototype.draw = function (batcher, skeleton) {
                 var premultipliedAlpha = this.premultipliedAlpha;
@@ -6021,7 +6049,7 @@ var spine;
                         var slotBlendMode = slot.data.blendMode;
                         if (slotBlendMode != blendMode) {
                             blendMode = slotBlendMode;
-                            batcher.setBlendMode(webgl.getSourceGLBlendMode(blendMode, premultipliedAlpha), webgl.getDestGLBlendMode(blendMode));
+                            batcher.setBlendMode(webgl.getSourceGLBlendMode(this._gl, blendMode, premultipliedAlpha), webgl.getDestGLBlendMode(this._gl, blendMode));
                         }
                         batcher.draw(texture, vertices, triangles);
                     }
@@ -6068,10 +6096,11 @@ var spine;
     var webgl;
     (function (webgl) {
         var Texture = (function () {
-            function Texture(image, useMipMaps) {
+            function Texture(gl, image, useMipMaps) {
                 if (useMipMaps === void 0) { useMipMaps = false; }
                 this._boundUnit = 0;
-                this._texture = webgl.gl.createTexture();
+                this._gl = gl;
+                this._texture = gl.createTexture();
                 this._image = image;
                 this.update(useMipMaps);
             }
@@ -6079,37 +6108,43 @@ var spine;
                 return this._image;
             };
             Texture.prototype.setFilters = function (minFilter, magFilter) {
+                var gl = this._gl;
                 this.bind();
-                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_MIN_FILTER, minFilter);
-                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_MAG_FILTER, magFilter);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter);
             };
             Texture.prototype.setWraps = function (uWrap, vWrap) {
+                var gl = this._gl;
                 this.bind();
-                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_WRAP_S, uWrap);
-                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_WRAP_T, vWrap);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, uWrap);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, vWrap);
             };
             Texture.prototype.update = function (useMipMaps) {
+                var gl = this._gl;
                 this.bind();
-                webgl.gl.texImage2D(webgl.gl.TEXTURE_2D, 0, webgl.gl.RGBA, webgl.gl.RGBA, webgl.gl.UNSIGNED_BYTE, this._image);
-                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_MAG_FILTER, webgl.gl.LINEAR);
-                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_MIN_FILTER, useMipMaps ? webgl.gl.LINEAR_MIPMAP_LINEAR : webgl.gl.LINEAR);
-                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_WRAP_S, webgl.gl.CLAMP_TO_EDGE);
-                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_WRAP_T, webgl.gl.CLAMP_TO_EDGE);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this._image);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, useMipMaps ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
                 if (useMipMaps)
-                    webgl.gl.generateMipmap(webgl.gl.TEXTURE_2D);
+                    gl.generateMipmap(gl.TEXTURE_2D);
             };
             Texture.prototype.bind = function (unit) {
                 if (unit === void 0) { unit = 0; }
+                var gl = this._gl;
                 this._boundUnit = unit;
-                webgl.gl.activeTexture(webgl.gl.TEXTURE0 + unit);
-                webgl.gl.bindTexture(webgl.gl.TEXTURE_2D, this._texture);
+                gl.activeTexture(gl.TEXTURE0 + unit);
+                gl.bindTexture(gl.TEXTURE_2D, this._texture);
             };
             Texture.prototype.unbind = function () {
-                webgl.gl.activeTexture(webgl.gl.TEXTURE0 + this._boundUnit);
-                webgl.gl.bindTexture(webgl.gl.TEXTURE_2D, null);
+                var gl = this._gl;
+                gl.activeTexture(gl.TEXTURE0 + this._boundUnit);
+                gl.bindTexture(gl.TEXTURE_2D, null);
             };
             Texture.prototype.dispose = function () {
-                webgl.gl.deleteTexture(this._texture);
+                var gl = this._gl;
+                gl.deleteTexture(this._texture);
             };
             Texture.filterFromString = function (text) {
                 switch (text.toLowerCase()) {
@@ -6552,33 +6587,67 @@ var spine;
 (function (spine) {
     var webgl;
     (function (webgl) {
-        function init(gl) {
-            if (!gl || !(gl instanceof WebGLRenderingContext))
-                throw Error("Expected a WebGLRenderingContext");
-            spine.webgl.gl = gl;
-        }
-        webgl.init = init;
-        function getSourceGLBlendMode(blendMode, premultipliedAlpha) {
+        function getSourceGLBlendMode(gl, blendMode, premultipliedAlpha) {
             if (premultipliedAlpha === void 0) { premultipliedAlpha = false; }
             switch (blendMode) {
-                case spine.BlendMode.Normal: return premultipliedAlpha ? webgl.gl.ONE : webgl.gl.SRC_ALPHA;
-                case spine.BlendMode.Additive: return premultipliedAlpha ? webgl.gl.ONE : webgl.gl.SRC_ALPHA;
-                case spine.BlendMode.Multiply: return webgl.gl.DST_COLOR;
-                case spine.BlendMode.Screen: return webgl.gl.ONE;
+                case spine.BlendMode.Normal: return premultipliedAlpha ? gl.ONE : gl.SRC_ALPHA;
+                case spine.BlendMode.Additive: return premultipliedAlpha ? gl.ONE : gl.SRC_ALPHA;
+                case spine.BlendMode.Multiply: return gl.DST_COLOR;
+                case spine.BlendMode.Screen: return gl.ONE;
                 default: throw new Error("Unknown blend mode: " + blendMode);
             }
         }
         webgl.getSourceGLBlendMode = getSourceGLBlendMode;
-        function getDestGLBlendMode(blendMode) {
+        function getDestGLBlendMode(gl, blendMode) {
             switch (blendMode) {
-                case spine.BlendMode.Normal: return webgl.gl.ONE_MINUS_SRC_ALPHA;
-                case spine.BlendMode.Additive: return webgl.gl.ONE;
-                case spine.BlendMode.Multiply: return webgl.gl.ONE_MINUS_SRC_ALPHA;
-                case spine.BlendMode.Screen: return webgl.gl.ONE_MINUS_SRC_ALPHA;
+                case spine.BlendMode.Normal: return gl.ONE_MINUS_SRC_ALPHA;
+                case spine.BlendMode.Additive: return gl.ONE;
+                case spine.BlendMode.Multiply: return gl.ONE_MINUS_SRC_ALPHA;
+                case spine.BlendMode.Screen: return gl.ONE_MINUS_SRC_ALPHA;
                 default: throw new Error("Unknown blend mode: " + blendMode);
             }
         }
         webgl.getDestGLBlendMode = getDestGLBlendMode;
     })(webgl = spine.webgl || (spine.webgl = {}));
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var widget;
+    (function (widget) {
+        var SpineWidget = (function () {
+            function SpineWidget(element, config) {
+                if (!element)
+                    throw new Error("Please provide a DOM element, e.g. document.getElementById('myelement')");
+                if (!config)
+                    throw new Error("Please provide a configuration, specifying at least the json file, atlas file and animation name");
+                if (!config.atlas)
+                    throw new Error("Please specify config.atlas");
+                if (!config.json)
+                    throw new Error("Please specify config.json");
+                if (!config.animationName)
+                    throw new Error("Please specify config.animationName");
+                var assets = new spine.webgl.AssetManager();
+                assets.loadText(config.atlas);
+                assets.loadText(config.json);
+                assets.loadTexture(config.atlas.replace(".atlas", ".png"));
+            }
+            return SpineWidget;
+        }());
+        widget.SpineWidget = SpineWidget;
+        var SpineWidgetConfig = (function () {
+            function SpineWidgetConfig() {
+                this.scale = 1.0;
+                this.skin = "default";
+                this.loop = true;
+                this.x = 0;
+                this.y = 0;
+                this.width = 640;
+                this.height = 480;
+                this.background = "#555555";
+            }
+            return SpineWidgetConfig;
+        }());
+        widget.SpineWidgetConfig = SpineWidgetConfig;
+    })(widget = spine.widget || (spine.widget = {}));
 })(spine || (spine = {}));
 //# sourceMappingURL=spine-webgl.js.map

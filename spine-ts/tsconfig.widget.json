@@ -4,7 +4,7 @@
 		"noImplicitAny": true,
 		"removeComments": false,
 		"preserveConstEnums": true,
-		"outFile": "build/spine-all.js",
+		"outFile": "build/spine-widget.js",
 		"sourceMap": true,
 		"declaration": true
 	},
@@ -14,9 +14,9 @@
 		"widget/src/**/*"
 	],
 	"exclude": [
-		"build",		
-		"build/*.js",
+		"build",
 		"build/*.d.ts",
-		"build/*.js.map"		 
+		"build/*.js",
+		"build/*.js.map"	 
 	]
 }

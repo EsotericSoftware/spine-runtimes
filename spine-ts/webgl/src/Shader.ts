@@ -37,6 +37,7 @@ module spine.webgl {
 		public static TEXCOORDS = "a_texCoords";
 		public static SAMPLER = "u_texture";
 
+		private _gl: WebGLRenderingContext;
 		private _vs: WebGLShader = null;
 		private _fs: WebGLShader = null;
 		private _program: WebGLProgram = null;
@@ -48,12 +49,13 @@ module spine.webgl {
 		public vertexShader () { return this._vertexShader; }
 		public fragmentShader () { return this._fragmentShader; }
 
-		constructor (private _vertexShader: string, private _fragmentShader: string) {
+		constructor (gl: WebGLRenderingContext, private _vertexShader: string, private _fragmentShader: string) {
+			this._gl = gl;
 			this.compile();
 		}
 
 		private compile () {
-			let gl = spine.webgl.gl;
+			let gl = this._gl;
 			try {
 				this._vs = this.compileShader(gl.VERTEX_SHADER, this._vertexShader);
 				this._fs = this.compileShader(gl.FRAGMENT_SHADER, this._fragmentShader);
@@ -65,6 +67,7 @@ module spine.webgl {
 		}
 
 		private compileShader (type: number, source: string) {
+			let gl = this._gl;
 			let shader = gl.createShader(type);
 			gl.shaderSource(shader, source);
 			gl.compileShader(shader);
@@ -77,6 +80,7 @@ module spine.webgl {
 		}
 
 		private compileProgram (vs: WebGLShader, fs: WebGLShader) {
+			let gl = this._gl;
 			let program = gl.createProgram();
 			gl.attachShader(program, vs);
 			gl.attachShader(program, fs);
@@ -91,61 +95,67 @@ module spine.webgl {
 		}
 
 		public bind () {
-			gl.useProgram(this._program);
+			this._gl.useProgram(this._program);
 		}
 
 		public unbind () {
-			gl.useProgram(null);
+			this._gl.useProgram(null);
 		}
 
 		public setUniformi (uniform: string, value: number) {
-			gl.uniform1i(this.getUniformLocation(uniform), value);
+			this._gl.uniform1i(this.getUniformLocation(uniform), value);
 		}
 
 		public setUniformf (uniform: string, value: number) {
-			gl.uniform1f(this.getUniformLocation(uniform), value);
+			this._gl.uniform1f(this.getUniformLocation(uniform), value);
 		}
 
 		public setUniform2f (uniform: string, value: number, value2: number) {
-			gl.uniform2f(this.getUniformLocation(uniform), value, value2);
+			this._gl.uniform2f(this.getUniformLocation(uniform), value, value2);
 		}
 
 		public setUniform3f (uniform: string, value: number, value2: number, value3: number) {
-			gl.uniform3f(this.getUniformLocation(uniform), value, value2, value3);
+			this._gl.uniform3f(this.getUniformLocation(uniform), value, value2, value3);
 		}
 
 		public setUniform4f (uniform: string, value: number, value2: number, value3: number, value4: number) {
-			gl.uniform4f(this.getUniformLocation(uniform), value, value2, value3, value4);
+			this._gl.uniform4f(this.getUniformLocation(uniform), value, value2, value3, value4);
 		}
 
 		public setUniform2x2f (uniform: string, value: ArrayLike<number>) {
+			let gl = this._gl;
 			this._tmp2x2.set(value);
 			gl.uniformMatrix2fv(this.getUniformLocation(uniform), false, this._tmp2x2);
 		}
 
 		public setUniform3x3f (uniform: string, value: ArrayLike<number>) {
+			let gl = this._gl;
 			this._tmp3x3.set(value);
 			gl.uniformMatrix3fv(this.getUniformLocation(uniform), false, this._tmp3x3);
 		}
 
 		public setUniform4x4f (uniform: string, value: ArrayLike<number>) {
+			let gl = this._gl;
 			this._tmp4x4.set(value);
 			gl.uniformMatrix4fv(this.getUniformLocation(uniform), false, this._tmp4x4);
 		}
 
 		public getUniformLocation (uniform: string): WebGLUniformLocation {
+			let gl = this._gl;
 			let location = gl.getUniformLocation(this._program, uniform);
 			if (!location) throw new Error(`Couldn't find location for uniform ${uniform}`);
 			return location;
 		}
 
 		public getAttributeLocation (attribute: string): number {
+			let gl = this._gl;
 			let location = gl.getAttribLocation(this._program, attribute);
 			if (location == -1) throw new Error(`Couldn't find location for attribute ${attribute}`);
 			return location;
 		}
 
 		public dispose () {
+			let gl = this._gl;
 			if (this._vs) {
 				gl.deleteShader(this._vs);
 				this._vs = null;
@@ -162,7 +172,7 @@ module spine.webgl {
 			}
 		}
 
-		public static newColoredTextured (): Shader {
+		public static newColoredTextured (gl: WebGLRenderingContext): Shader {
 			let vs = `
 				attribute vec4 ${Shader.POSITION};
 				attribute vec4 ${Shader.COLOR};
@@ -194,10 +204,10 @@ module spine.webgl {
 				}
 			`;
 
-			return new Shader(vs, fs);
+			return new Shader(gl, vs, fs);
 		}
 
-		public static newColored (): Shader {
+		public static newColored (gl: WebGLRenderingContext): Shader {
 			let vs = `
 				attribute vec4 ${Shader.POSITION};
 				attribute vec4 ${Shader.COLOR};
@@ -224,7 +234,7 @@ module spine.webgl {
 				}
 			`;
 
-			return new Shader(vs, fs);
+			return new Shader(gl, vs, fs);
 		}
 	}
 }

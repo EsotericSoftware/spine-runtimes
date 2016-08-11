@@ -31,6 +31,7 @@
 
 module spine.webgl {
 	export class PolygonBatcher {
+		private _gl: WebGLRenderingContext;
 		private _drawCalls: number;
 		private _drawing = false;
 		private _mesh: Mesh;
@@ -38,15 +39,17 @@ module spine.webgl {
 		private _lastTexture: Texture = null;
 		private _verticesLength = 0;
 		private _indicesLength = 0;
-		private _srcBlend: number = gl.SRC_ALPHA;
-		private _dstBlend: number = gl.ONE_MINUS_SRC_ALPHA;
+		private _srcBlend: number = WebGLRenderingContext.SRC_ALPHA;
+		private _dstBlend: number = WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
 
-		constructor (maxVertices: number = 10920) {
+		constructor (gl: WebGLRenderingContext, maxVertices: number = 10920) {
 			if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
-			this._mesh = new Mesh([new Position2Attribute(), new ColorAttribute(), new TexCoordAttribute()], maxVertices, maxVertices * 3);
+			this._gl = gl;
+			this._mesh = new Mesh(gl, [new Position2Attribute(), new ColorAttribute(), new TexCoordAttribute()], maxVertices, maxVertices * 3);
 		}
 
 		begin (shader: Shader) {
+			let gl = this._gl;
 			if (this._drawing) throw new Error("PolygonBatch is already drawing. Call PolygonBatch.end() before calling PolygonBatch.begin()");
 			this._drawCalls = 0;
 			this._shader = shader;
@@ -58,6 +61,7 @@ module spine.webgl {
 		}
 
 		setBlendMode (srcBlend: number, dstBlend: number) {
+			let gl = this._gl;
 			this._srcBlend = srcBlend;
 			this._dstBlend = dstBlend;
 			if (this._drawing) {
@@ -89,6 +93,7 @@ module spine.webgl {
 		}
 
 		private flush () {
+			let gl = this._gl;
 			if (this._verticesLength == 0) return;
 
 			this._mesh.draw(this._shader, gl.TRIANGLES);
@@ -101,6 +106,7 @@ module spine.webgl {
 		}
 
 		end () {
+			let gl = this._gl;
 			if (!this._drawing) throw new Error("PolygonBatch is not drawing. Call PolygonBatch.begin() before calling PolygonBatch.end()");
 			if (this._verticesLength > 0 || this._indicesLength > 0) this.flush();
 			this._shader = null;

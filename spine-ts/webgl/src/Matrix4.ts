@@ -30,22 +30,22 @@
  *****************************************************************************/
 
 module spine.webgl {
-	export let M00 = 0;
-	export let M01 = 4;
-	export let M02 = 8;
-	export let M03 = 12;
-	export let M10 = 1;
-	export let M11 = 5;
-	export let M12 = 9;
-	export let M13 = 13;
-	export let M20 = 2;
-	export let M21 = 6;
-	export let M22 = 10;
-	export let M23 = 14;
-	export let M30 = 3;
-	export let M31 = 7;
-	export let M32 = 11;
-	export let M33 = 15;
+	export const M00 = 0;
+	export const M01 = 4;
+	export const M02 = 8;
+	export const M03 = 12;
+	export const M10 = 1;
+	export const M11 = 5;
+	export const M12 = 9;
+	export const M13 = 13;
+	export const M20 = 2;
+	export const M21 = 6;
+	export const M22 = 10;
+	export const M23 = 14;
+	export const M30 = 3;
+	export const M31 = 7;
+	export const M32 = 11;
+	export const M33 = 15;
 
 	export class Matrix4 {
 		temp: Float32Array = new Float32Array(16);

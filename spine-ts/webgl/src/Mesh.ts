@@ -31,6 +31,7 @@
 
 module spine.webgl {
 	export class Mesh implements Disposable {
+		private _gl: WebGLRenderingContext;
 		private _vertices:Float32Array;
 		private _verticesBuffer: WebGLBuffer;
 		private _verticesLength = 0;
@@ -59,7 +60,8 @@ module spine.webgl {
 		}
 		indices (): Uint16Array { return this._indices };
 
-		constructor (private _attributes: VertexAttribute[], maxVertices: number, maxIndices: number) {
+		constructor (gl: WebGLRenderingContext, private _attributes: VertexAttribute[], maxVertices: number, maxIndices: number) {
+			this._gl = gl;
 			this._elementsPerVertex = 0;
 			for (let i = 0; i < _attributes.length; i++) {
 				this._elementsPerVertex += _attributes[i].numElements;
@@ -87,6 +89,7 @@ module spine.webgl {
 		}
 
 		drawWithOffset (shader: Shader, primitiveType: number, offset: number, count: number) {
+			let gl = this._gl;
 			if (this._dirtyVertices || this._dirtyIndices) this.update();
 			this.bind(shader);
 			if (this._indicesLength > 0) gl.drawElements(primitiveType, count, gl.UNSIGNED_SHORT, offset * 2);
@@ -95,6 +98,7 @@ module spine.webgl {
 		}
 
 		bind (shader: Shader) {
+			let gl = this._gl;
 			gl.bindBuffer(gl.ARRAY_BUFFER, this._verticesBuffer);
 			let offset = 0;
 			for (let i = 0; i < this._attributes.length; i++) {
@@ -108,6 +112,7 @@ module spine.webgl {
 		}
 
 		unbind (shader: Shader) {
+			let gl = this._gl;
 			for (let i = 0; i < this._attributes.length; i++) {
 				let attrib = this._attributes[i];
 				let location = shader.getAttributeLocation(attrib.name);
@@ -118,6 +123,7 @@ module spine.webgl {
 		}
 
 		private update () {
+			let gl = this._gl;
 			if (this._dirtyVertices) {
 				if (!this._verticesBuffer) {
 					this._verticesBuffer = gl.createBuffer();
@@ -138,6 +144,7 @@ module spine.webgl {
 		}
 
 		dispose () {
+			let gl = this._gl;
 			gl.deleteBuffer(this._verticesBuffer);
 			gl.deleteBuffer(this._indicesBuffer);
 		}

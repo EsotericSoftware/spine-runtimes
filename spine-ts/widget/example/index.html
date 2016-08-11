@@ -1,0 +1,37 @@
+<html>
+<script src="../../build/spine-widget.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<body>
+<center>
+<div id="spine-widget" style="margin-bottom: 20px"></div>
+<div id="other-widget"></div>
+</center>
+</body>
+<script>
+	new spine.SpineWidget(document.getElementById("spine-widget"), {
+		json: "assets/raptor.json",
+		atlas: "assets/raptor.atlas",		
+		animationName: "walk",
+		scale: 0.4,
+		backgroundColor: "#000000",
+		success: function (widget) {
+			var animIndex = 0;
+			widget.canvas.onclick = function () {				
+				animIndex++;
+				let animations = widget.skeleton.data.animations;
+				if (animIndex >= animations.length) animIndex = 0;
+				widget.setAnimation(animations[animIndex].name);
+			}
+		}
+	});
+
+	new spine.SpineWidget(document.getElementById("other-widget"), {
+		json: "assets/raptor.json",
+		atlas: "assets/raptor.atlas",		
+		animationName: "Jump",
+		scale: 0.2,
+		x: 100
+	});
+</script>
+</body>
+</html>

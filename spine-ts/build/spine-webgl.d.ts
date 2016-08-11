@@ -1847,12 +1847,14 @@ declare module spine {
  *****************************************************************************/
 declare module spine.webgl {
     class AssetManager implements Disposable {
+        private _gl;
         private _assets;
         private _errors;
         private _toLoad;
         private _loaded;
-        loadText(path: string, success: (path: string, text: string) => void, error: (path: string, error: string) => void): void;
-        loadTexture(path: string, success: (path: string, image: HTMLImageElement) => void, error: (path: string, error: string) => void): void;
+        constructor(gl: WebGLRenderingContext);
+        loadText(path: string, success?: (path: string, text: string) => void, error?: (path: string, error: string) => void): void;
+        loadTexture(path: string, success?: (path: string, image: HTMLImageElement) => void, error?: (path: string, error: string) => void): void;
         get(path: string): string | Texture;
         remove(path: string): void;
         removeAll(): void;
@@ -1893,22 +1895,22 @@ declare module spine.webgl {
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 declare module spine.webgl {
-    let M00: number;
-    let M01: number;
-    let M02: number;
-    let M03: number;
-    let M10: number;
-    let M11: number;
-    let M12: number;
-    let M13: number;
-    let M20: number;
-    let M21: number;
-    let M22: number;
-    let M23: number;
-    let M30: number;
-    let M31: number;
-    let M32: number;
-    let M33: number;
+    const M00: number;
+    const M01: number;
+    const M02: number;
+    const M03: number;
+    const M10: number;
+    const M11: number;
+    const M12: number;
+    const M13: number;
+    const M20: number;
+    const M21: number;
+    const M22: number;
+    const M23: number;
+    const M30: number;
+    const M31: number;
+    const M32: number;
+    const M33: number;
     class Matrix4 {
         temp: Float32Array;
         values: Float32Array;
@@ -1960,6 +1962,7 @@ declare module spine.webgl {
 declare module spine.webgl {
     class Mesh implements Disposable {
         private _attributes;
+        private _gl;
         private _vertices;
         private _verticesBuffer;
         private _verticesLength;
@@ -1978,7 +1981,7 @@ declare module spine.webgl {
         numIndices(): number;
         setIndicesLength(length: number): void;
         indices(): Uint16Array;
-        constructor(_attributes: VertexAttribute[], maxVertices: number, maxIndices: number);
+        constructor(gl: WebGLRenderingContext, _attributes: VertexAttribute[], maxVertices: number, maxIndices: number);
         setVertices(vertices: Array<number>): void;
         setIndices(indices: Array<number>): void;
         draw(shader: Shader, primitiveType: number): void;
@@ -2042,6 +2045,7 @@ declare module spine.webgl {
  *****************************************************************************/
 declare module spine.webgl {
     class PolygonBatcher {
+        private _gl;
         private _drawCalls;
         private _drawing;
         private _mesh;
@@ -2051,7 +2055,7 @@ declare module spine.webgl {
         private _indicesLength;
         private _srcBlend;
         private _dstBlend;
-        constructor(maxVertices?: number);
+        constructor(gl: WebGLRenderingContext, maxVertices?: number);
         begin(shader: Shader): void;
         setBlendMode(srcBlend: number, dstBlend: number): void;
         draw(texture: Texture, vertices: ArrayLike<number>, indices: Array<number>): void;
@@ -2099,6 +2103,7 @@ declare module spine.webgl {
         static COLOR: string;
         static TEXCOORDS: string;
         static SAMPLER: string;
+        private _gl;
         private _vs;
         private _fs;
         private _program;
@@ -2108,7 +2113,7 @@ declare module spine.webgl {
         program(): WebGLProgram;
         vertexShader(): string;
         fragmentShader(): string;
-        constructor(_vertexShader: string, _fragmentShader: string);
+        constructor(gl: WebGLRenderingContext, _vertexShader: string, _fragmentShader: string);
         private compile();
         private compileShader(type, source);
         private compileProgram(vs, fs);
@@ -2125,8 +2130,8 @@ declare module spine.webgl {
         getUniformLocation(uniform: string): WebGLUniformLocation;
         getAttributeLocation(attribute: string): number;
         dispose(): void;
-        static newColoredTextured(): Shader;
-        static newColored(): Shader;
+        static newColoredTextured(gl: WebGLRenderingContext): Shader;
+        static newColored(gl: WebGLRenderingContext): Shader;
     }
 }
 /******************************************************************************
@@ -2163,6 +2168,8 @@ declare module spine.webgl {
     class SkeletonRenderer {
         static QUAD_TRIANGLES: number[];
         premultipliedAlpha: boolean;
+        private _gl;
+        constructor(gl: WebGLRenderingContext);
         draw(batcher: PolygonBatcher, skeleton: Skeleton): void;
     }
 }
@@ -2198,10 +2205,11 @@ declare module spine.webgl {
  *****************************************************************************/
 declare module spine.webgl {
     class Texture implements Disposable {
+        private _gl;
         private _texture;
         private _image;
         private _boundUnit;
-        constructor(image: HTMLImageElement, useMipMaps?: boolean);
+        constructor(gl: WebGLRenderingContext, image: HTMLImageElement, useMipMaps?: boolean);
         getImage(): HTMLImageElement;
         setFilters(minFilter: TextureFilter, magFilter: TextureFilter): void;
         setWraps(uWrap: TextureWrap, vWrap: TextureWrap): void;
@@ -2409,8 +2417,33 @@ declare module spine.webgl {
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 declare module spine.webgl {
-    var gl: WebGLRenderingContext;
-    function init(gl: WebGLRenderingContext): void;
-    function getSourceGLBlendMode(blendMode: BlendMode, premultipliedAlpha?: boolean): number;
-    function getDestGLBlendMode(blendMode: BlendMode): number;
+    function getSourceGLBlendMode(gl: WebGLRenderingContext, blendMode: BlendMode, premultipliedAlpha?: boolean): number;
+    function getDestGLBlendMode(gl: WebGLRenderingContext, blendMode: BlendMode): number;
+}
+declare module spine.widget {
+    class SpineWidget {
+        skeleton: Skeleton;
+        state: AnimationState;
+        gl: WebGLRenderingContext;
+        canvas: HTMLCanvasElement;
+        private _assetManager;
+        private _batcher;
+        constructor(element: HTMLElement, config: SpineWidgetConfig);
+    }
+    class SpineWidgetConfig {
+        json: string;
+        atlas: string;
+        animationName: string;
+        scale: number;
+        skin: string;
+        loop: boolean;
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+        background: string;
+        finishedLoading: () => void;
+        success: () => void;
+        error: (msg: string) => void;
+    }
 }

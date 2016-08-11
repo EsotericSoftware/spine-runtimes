@@ -31,11 +31,13 @@
 
 module spine.webgl {
 	export class Texture implements Disposable {
+		private _gl: WebGLRenderingContext;
 		private _texture: WebGLTexture;
 		private _image: HTMLImageElement;
 		private _boundUnit = 0;
 
-		constructor (image: HTMLImageElement, useMipMaps: boolean = false) {
+		constructor (gl: WebGLRenderingContext, image: HTMLImageElement, useMipMaps: boolean = false) {
+			this._gl = gl;			
 			this._texture = gl.createTexture();
 			this._image = image;
 			this.update(useMipMaps);
@@ -46,18 +48,21 @@ module spine.webgl {
 		}
 
 		setFilters (minFilter: TextureFilter, magFilter: TextureFilter) {
+			let gl = this._gl;
 			this.bind();
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter);
 		}
 
 		setWraps (uWrap: TextureWrap, vWrap: TextureWrap) {
+			let gl = this._gl;
 			this.bind();
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, uWrap);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, vWrap);
 		}
 
 		update (useMipMaps: boolean) {
+			let gl = this._gl;
 			this.bind();
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this._image);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -68,17 +73,20 @@ module spine.webgl {
 		}
 
 		bind (unit: number = 0) {
+			let gl = this._gl;
 			this._boundUnit = unit;
 			gl.activeTexture(gl.TEXTURE0 + unit);
 			gl.bindTexture(gl.TEXTURE_2D, this._texture);
 		}
 
 		unbind () {
+			let gl = this._gl;
 			gl.activeTexture(gl.TEXTURE0 + this._boundUnit);
 			gl.bindTexture(gl.TEXTURE_2D, null);
 		}
 
 		dispose () {
+			let gl = this._gl;
 			gl.deleteTexture(this._texture);
 		}
 
