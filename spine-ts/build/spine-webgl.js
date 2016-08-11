@@ -4360,6 +4360,27 @@ var spine;
         return Utils;
     }());
     spine.Utils = Utils;
+    var Pool = (function () {
+        function Pool(instantiator) {
+            this._items = new Array(16);
+            this._instantiator = instantiator;
+        }
+        Pool.prototype.obtain = function () {
+            return this._items.length > 0 ? this._items.pop() : this._instantiator();
+        };
+        Pool.prototype.free = function (item) {
+            this._items.push(item);
+        };
+        Pool.prototype.freeAll = function (items) {
+            for (var i = 0; i < items.length; i++)
+                this._items[i] = items[i];
+        };
+        Pool.prototype.clear = function () {
+            this._items.length = 0;
+        };
+        return Pool;
+    }());
+    spine.Pool = Pool;
     var Vector2 = (function () {
         function Vector2(x, y) {
             if (x === void 0) { x = 0; }
@@ -5697,6 +5718,8 @@ var spine;
                 this._drawing = false;
                 this._shader = null;
                 this._lastTexture = null;
+                this._verticesLength = 0;
+                this._indicesLength = 0;
                 this._srcBlend = webgl.gl.SRC_ALPHA;
                 this._dstBlend = webgl.gl.ONE_MINUS_SRC_ALPHA;
                 if (maxVertices > 10920)

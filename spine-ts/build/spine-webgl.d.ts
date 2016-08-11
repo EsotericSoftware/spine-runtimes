@@ -1403,6 +1403,15 @@ declare module spine {
         static newFloatArray(size: number): ArrayLike<number>;
         static toFloatArray(array: Array<number>): Float32Array | number[];
     }
+    class Pool<T> {
+        private _items;
+        private _instantiator;
+        constructor(instantiator: () => T);
+        obtain(): T;
+        free(item: T): void;
+        freeAll(items: ArrayLike<T>): void;
+        clear(): void;
+    }
     class Vector2 {
         x: number;
         y: number;

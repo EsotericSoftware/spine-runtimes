@@ -160,6 +160,31 @@ module spine {
 		}
 	}
 
+	export class Pool<T> {
+		private _items = new Array<T>(16);
+		private _instantiator: () => T;
+
+		constructor (instantiator: () => T) {
+			this._instantiator = instantiator;
+		}
+
+		obtain () {
+			return this._items.length > 0 ? this._items.pop() : this._instantiator();
+		}
+
+		free (item: T) {
+			this._items.push(item);
+		}
+
+		freeAll (items: ArrayLike<T>) {
+			for (let i = 0; i < items.length; i++) this._items[i] = items[i];
+		}
+
+		clear () {
+			this._items.length = 0;
+		}
+	}
+
 	export class Vector2 {
 		constructor (public x = 0, public y = 0) {
 		}

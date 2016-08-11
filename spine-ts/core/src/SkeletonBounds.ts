@@ -33,7 +33,7 @@ module spine {
 	export class SkeletonBounds {
 		minX = 0; minY = 0; maxX = 0; maxY = 0;
 		boundingBoxes = new Array<BoundingBoxAttachment>();
-		polygons = new Array<Array<number>>();
+		polygons = new Array<Array<number>>();		
 
 		update (skeleton: Skeleton, updateAabb: boolean) {
 			if (skeleton == null) throw new Error("skeleton cannot be null.");

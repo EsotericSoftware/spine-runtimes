@@ -36,8 +36,8 @@ module spine.webgl {
 		private _mesh: Mesh;
 		private _shader: Shader = null;
 		private _lastTexture: Texture = null;
-		private _verticesLength: number;
-		private _indicesLength: number;
+		private _verticesLength = 0;
+		private _indicesLength = 0;
 		private _srcBlend: number = gl.SRC_ALPHA;
 		private _dstBlend: number = gl.ONE_MINUS_SRC_ALPHA;
 
