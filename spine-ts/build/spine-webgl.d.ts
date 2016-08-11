@@ -641,11 +641,11 @@ declare module spine {
         update(): void;
         /** Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified in the world
          * coordinate system. */
-        applyShort(bone: Bone, targetX: number, targetY: number, alpha: number): void;
+        apply1(bone: Bone, targetX: number, targetY: number, alpha: number): void;
         /** Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as possible. The
          * target is specified in the world coordinate system.
          * @param child A direct descendant of the parent bone. */
-        applyWith(parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, alpha: number): void;
+        apply2(parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, alpha: number): void;
     }
 }
 /******************************************************************************
@@ -1903,7 +1903,7 @@ declare module spine.webgl {
         temp: Float32Array;
         values: Float32Array;
         constructor();
-        set(values: Float32Array | Array<number>): Matrix4;
+        set(values: ArrayLike<number>): Matrix4;
         transpose(): Matrix4;
         identity(): Matrix4;
         invert(): Matrix4;
@@ -2109,9 +2109,9 @@ declare module spine.webgl {
         setUniform2f(uniform: string, value: number, value2: number): void;
         setUniform3f(uniform: string, value: number, value2: number, value3: number): void;
         setUniform4f(uniform: string, value: number, value2: number, value3: number, value4: number): void;
-        setUniform2x2f(uniform: string, value: Array<number> | Float32Array): void;
-        setUniform3x3f(uniform: string, value: Array<number> | Float32Array): void;
-        setUniform4x4f(uniform: string, value: Array<number> | Float32Array): void;
+        setUniform2x2f(uniform: string, value: ArrayLike<number>): void;
+        setUniform3x3f(uniform: string, value: ArrayLike<number>): void;
+        setUniform4x4f(uniform: string, value: ArrayLike<number>): void;
         getUniformLocation(uniform: string): WebGLUniformLocation;
         getAttributeLocation(attribute: string): number;
         dispose(): void;

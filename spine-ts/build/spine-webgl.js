@@ -161,7 +161,7 @@ var spine;
             for (var start = i, n = i + CurveTimeline.BEZIER_SIZE - 1; i < n; i += 2) {
                 x = curves[i];
                 if (x >= percent) {
-                    var prevX, prevY;
+                    var prevX = void 0, prevY = void 0;
                     if (i == start) {
                         prevX = 0;
                         prevY = 0;
@@ -1643,16 +1643,16 @@ var spine;
             var bones = this.bones;
             switch (bones.length) {
                 case 1:
-                    this.applyShort(bones[0], target.worldX, target.worldY, this.mix);
+                    this.apply1(bones[0], target.worldX, target.worldY, this.mix);
                     break;
                 case 2:
-                    this.applyWith(bones[0], bones[1], target.worldX, target.worldY, this.bendDirection, this.mix);
+                    this.apply2(bones[0], bones[1], target.worldX, target.worldY, this.bendDirection, this.mix);
                     break;
             }
         };
         /** Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified in the world
          * coordinate system. */
-        IkConstraint.prototype.applyShort = function (bone, targetX, targetY, alpha) {
+        IkConstraint.prototype.apply1 = function (bone, targetX, targetY, alpha) {
             var pp = bone.parent;
             var id = 1 / (pp.a * pp.d - pp.b * pp.c);
             var x = targetX - pp.worldX, y = targetY - pp.worldY;
@@ -1669,7 +1669,7 @@ var spine;
         /** Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as possible. The
          * target is specified in the world coordinate system.
          * @param child A direct descendant of the parent bone. */
-        IkConstraint.prototype.applyWith = function (parent, child, targetX, targetY, bendDir, alpha) {
+        IkConstraint.prototype.apply2 = function (parent, child, targetX, targetY, bendDir, alpha) {
             if (alpha == 0) {
                 child.updateWorldTransform();
                 return;
@@ -1905,9 +1905,8 @@ var spine;
                 throw new Error("skeleton cannot be null.");
             this.data = data;
             this.bones = new Array();
-            for (var i = 0, n = data.bones.length; i < n; i++) {
+            for (var i = 0, n = data.bones.length; i < n; i++)
                 this.bones.push(skeleton.findBone(data.bones[i].name));
-            }
             this.target = skeleton.findSlot(data.target.name);
             this.position = data.position;
             this.spacing = data.spacing;
@@ -2351,7 +2350,7 @@ var spine;
             this.bones = new Array();
             for (var i = 0; i < data.bones.length; i++) {
                 var boneData = data.bones[i];
-                var bone;
+                var bone = void 0;
                 if (boneData.parent == null)
                     bone = new spine.Bone(boneData, this, null);
                 else {
@@ -2365,8 +2364,8 @@ var spine;
             this.drawOrder = new Array();
             for (var i = 0; i < data.slots.length; i++) {
                 var slotData = data.slots[i];
-                var bone_1 = this.bones[slotData.boneData.index];
-                var slot = new spine.Slot(slotData, bone_1);
+                var bone = this.bones[slotData.boneData.index];
+                var slot = new spine.Slot(slotData, bone);
                 this.slots.push(slot);
                 this.drawOrder.push(slot);
             }
@@ -2410,10 +2409,10 @@ var spine;
             }
             for (var i = 1, ii = 0; i < ikCount; i++) {
                 var ik = ikConstraints[i];
-                var level_1 = ik.level;
+                var level = ik.level;
                 for (ii = i - 1; ii >= 0; ii--) {
                     var other = ikConstraints[ii];
-                    if (other.level < level_1)
+                    if (other.level < level)
                         break;
                     ikConstraints[ii + 1] = other;
                 }
@@ -3155,14 +3154,14 @@ var spine;
             if (root.bones) {
                 for (var i = 0; i < root.bones.length; i++) {
                     var boneMap = root.bones[i];
-                    var parent = null;
+                    var parent_3 = null;
                     var parentName = this.getValue(boneMap, "parent", null);
                     if (parentName != null) {
-                        parent = skeletonData.findBone(parentName);
-                        if (parent == null)
+                        parent_3 = skeletonData.findBone(parentName);
+                        if (parent_3 == null)
                             throw new Error("Parent bone not found: " + parentName);
                     }
-                    var data = new spine.BoneData(skeletonData.bones.length, boneMap.name, parent);
+                    var data = new spine.BoneData(skeletonData.bones.length, boneMap.name, parent_3);
                     data.length = this.getValue(boneMap, "length", 0) * scale;
                     data.x = this.getValue(boneMap, "x", 0) * scale;
                     data.y = this.getValue(boneMap, "y", 0) * scale;
@@ -3180,12 +3179,12 @@ var spine;
             if (root.slots) {
                 for (var i = 0; i < root.slots.length; i++) {
                     var slotMap = root.slots[i];
-                    var slotName_1 = slotMap.name;
+                    var slotName = slotMap.name;
                     var boneName = slotMap.bone;
                     var boneData = skeletonData.findBone(boneName);
                     if (boneData == null)
                         throw new Error("Slot bone not found: " + boneName);
-                    var data = new spine.SlotData(skeletonData.slots.length, slotName_1, boneData);
+                    var data = new spine.SlotData(skeletonData.slots.length, slotName, boneData);
                     var color = slotMap.color ? slotMap.color : null;
                     if (color != null)
                         data.color.setFromString(color);
@@ -3296,16 +3295,16 @@ var spine;
                         skeletonData.defaultSkin = skin;
                 }
             }
-            // Linked meshes.            
+            // Linked meshes.
             for (var i = 0, n = this.linkedMeshes.length; i < n; i++) {
                 var linkedMesh = this.linkedMeshes[i];
                 var skin = linkedMesh.skin == null ? skeletonData.defaultSkin : skeletonData.findSkin(linkedMesh.skin);
                 if (skin == null)
                     throw new Error("Skin not found: " + linkedMesh.skin);
-                var parent_3 = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
-                if (parent_3 == null)
+                var parent_4 = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
+                if (parent_4 == null)
                     throw new Error("Parent mesh not found: " + linkedMesh.parent);
-                linkedMesh.mesh.setParentMesh(parent_3);
+                linkedMesh.mesh.setParentMesh(parent_4);
                 linkedMesh.mesh.updateUVs();
             }
             this.linkedMeshes.length = 0;
@@ -3370,10 +3369,10 @@ var spine;
                     var color = this.getValue(map, "color", null);
                     if (color != null)
                         mesh.color.setFromString(color);
-                    var parent_4 = this.getValue(map, "parent", null);
-                    if (parent_4 != null) {
+                    var parent_5 = this.getValue(map, "parent", null);
+                    if (parent_5 != null) {
                         mesh.inheritDeform = this.getValue(map, "deform", true);
-                        this.linkedMeshes.push(new LinkedMesh(mesh, this.getValue(map, "skin", null), slotIndex, parent_4));
+                        this.linkedMeshes.push(new LinkedMesh(mesh, this.getValue(map, "skin", null), slotIndex, parent_5));
                         return mesh;
                     }
                     var uvs = map.uvs;
@@ -3459,10 +3458,10 @@ var spine;
                         else if (timelineName = "attachment") {
                             var timeline = new spine.AttachmentTimeline(timelineMap.length);
                             timeline.slotIndex = slotIndex;
-                            var frameIndex_1 = 0;
+                            var frameIndex = 0;
                             for (var i = 0; i < timelineMap.length; i++) {
                                 var valueMap = timelineMap[i];
-                                timeline.setFrame(frameIndex_1++, valueMap.time, valueMap.name);
+                                timeline.setFrame(frameIndex++, valueMap.time, valueMap.name);
                             }
                             timelines.push(timeline);
                             duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);
@@ -3496,23 +3495,23 @@ var spine;
                         }
                         else if (timelineName === "translate" || timelineName === "scale" || timelineName === "shear") {
                             var timeline = null;
-                            var timelineScale_1 = 1;
+                            var timelineScale = 1;
                             if (timelineName === "scale")
                                 timeline = new spine.ScaleTimeline(timelineMap.length);
                             else if (timelineName === "shear")
                                 timeline = new spine.ShearTimeline(timelineMap.length);
                             else {
                                 timeline = new spine.TranslateTimeline(timelineMap.length);
-                                timelineScale_1 = scale;
+                                timelineScale = scale;
                             }
                             timeline.boneIndex = boneIndex;
-                            var frameIndex_2 = 0;
+                            var frameIndex = 0;
                             for (var i = 0; i < timelineMap.length; i++) {
                                 var valueMap = timelineMap[i];
                                 var x = this.getValue(valueMap, "x", 0), y = this.getValue(valueMap, "y", 0);
-                                timeline.setFrame(frameIndex_2, valueMap.time, x * timelineScale_1, y * timelineScale_1);
-                                this.readCurve(valueMap, timeline, frameIndex_2);
-                                frameIndex_2++;
+                                timeline.setFrame(frameIndex, valueMap.time, x * timelineScale, y * timelineScale);
+                                this.readCurve(valueMap, timeline, frameIndex);
+                                frameIndex++;
                             }
                             timelines.push(timeline);
                             duration = Math.max(duration, timeline.frames[(timeline.getFrameCount() - 1) * spine.TranslateTimeline.ENTRIES]);
@@ -3631,10 +3630,10 @@ var spine;
                             var timeline = new spine.DeformTimeline(timelineMap.length);
                             timeline.slotIndex = slotIndex;
                             timeline.attachment = attachment;
-                            var frameIndex_3 = 0;
+                            var frameIndex = 0;
                             for (var j = 0; j < timelineMap.length; j++) {
                                 var valueMap = timelineMap[j];
-                                var deform;
+                                var deform = void 0;
                                 var verticesValue = this.getValue(valueMap, "vertices", null);
                                 if (verticesValue == null)
                                     deform = weighted ? spine.Utils.newFloatArray(deformLength) : vertices;
@@ -3651,9 +3650,9 @@ var spine;
                                             deform[i] += vertices[i];
                                     }
                                 }
-                                timeline.setFrame(frameIndex_3, valueMap.time, deform);
-                                this.readCurve(valueMap, timeline, frameIndex_3);
-                                frameIndex_3++;
+                                timeline.setFrame(frameIndex, valueMap.time, deform);
+                                this.readCurve(valueMap, timeline, frameIndex);
+                                frameIndex++;
                             }
                             timelines.push(timeline);
                             duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);
@@ -3661,7 +3660,7 @@ var spine;
                     }
                 }
             }
-            // Draw order timeline.            
+            // Draw order timeline.
             var drawOrderNode = map.drawOrder;
             if (drawOrderNode == null)
                 drawOrderNode = map.draworder;
@@ -3704,7 +3703,7 @@ var spine;
             // Event timeline.
             if (map.events) {
                 var timeline = new spine.EventTimeline(map.events.length);
-                var frameIndex_4 = 0;
+                var frameIndex = 0;
                 for (var i = 0; i < map.events.length; i++) {
                     var eventMap = map.events[i];
                     var eventData = skeletonData.findEvent(eventMap.name);
@@ -3714,7 +3713,7 @@ var spine;
                     event_3.intValue = this.getValue(eventMap, "int", eventData.intValue);
                     event_3.floatValue = this.getValue(eventMap, "float", eventData.floatValue);
                     event_3.stringValue = this.getValue(eventMap, "string", eventData.stringValue);
-                    timeline.setFrame(frameIndex_4++, event_3);
+                    timeline.setFrame(frameIndex++, event_3);
                 }
                 timelines.push(timeline);
                 duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);
@@ -4101,9 +4100,9 @@ var spine;
                     else if (r < -spine.MathUtils.PI)
                         r += spine.MathUtils.PI2;
                     r = by + (r + this.data.offsetShearY * spine.MathUtils.degRad) * shearMix;
-                    var s_1 = Math.sqrt(b * b + d * d);
-                    bone.b = Math.cos(r) * s_1;
-                    bone.d = Math.sin(r) * s_1;
+                    var s = Math.sqrt(b * b + d * d);
+                    bone.b = Math.cos(r) * s;
+                    bone.d = Math.sin(r) * s;
                 }
             }
         };
@@ -4437,10 +4436,10 @@ var spine;
                 var bone = slot.bone;
                 x += bone.worldX;
                 y += bone.worldY;
-                var a = bone.a, b_1 = bone.b, c = bone.c, d = bone.d;
-                for (var v = start, w = offset; w < count; v += 2, w += 2) {
-                    var vx = vertices[v], vy = vertices[v + 1];
-                    worldVertices[w] = vx * a + vy * b_1 + x;
+                var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
+                for (var v_1 = start, w = offset; w < count; v_1 += 2, w += 2) {
+                    var vx = vertices[v_1], vy = vertices[v_1 + 1];
+                    worldVertices[w] = vx * a + vy * b + x;
                     worldVertices[w + 1] = vx * c + vy * d + y;
                 }
                 return;
@@ -4648,9 +4647,8 @@ var spine;
             var regionUVs = this.regionUVs;
             var verticesLength = regionUVs.length;
             var worldVerticesLength = (verticesLength >> 1) * 8;
-            if (this.worldVertices == null || this.worldVertices.length != worldVerticesLength) {
+            if (this.worldVertices == null || this.worldVertices.length != worldVerticesLength)
                 this.worldVertices = spine.Utils.newFloatArray(worldVerticesLength);
-            }
             var u = 0, v = 0, width = 0, height = 0;
             if (this.region == null) {
                 u = v = 0;
@@ -4694,10 +4692,10 @@ var spine;
                 var bone = slot.bone;
                 x += bone.worldX;
                 y += bone.worldY;
-                var a = bone.a, b_2 = bone.b, c = bone.c, d = bone.d;
+                var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
                 for (var v = 0, w = 0; v < verticesLength; v += 2, w += 8) {
                     var vx = vertices[v], vy = vertices[v + 1];
-                    worldVertices[w] = vx * a + vy * b_2 + x;
+                    worldVertices[w] = vx * a + vy * b + x;
                     worldVertices[w + 1] = vx * c + vy * d + y;
                     worldVertices[w + 2] = color.r;
                     worldVertices[w + 3] = color.g;
@@ -5278,50 +5276,49 @@ var spine;
             Matrix4.prototype.invert = function () {
                 var v = this.values;
                 var t = this.temp;
-                var l_det = v[webgl.M30] * v[webgl.M21] * v[webgl.M12] * v[webgl.M03] - v[webgl.M20] * v[webgl.M31] * v[webgl.M12] * v[webgl.M03] - v[webgl.M30] * v[webgl.M11]
-                    * v[webgl.M22] * v[webgl.M03] + v[webgl.M10] * v[webgl.M31] * v[webgl.M22] * v[webgl.M03] + v[webgl.M20] * v[webgl.M11] * v[webgl.M32] * v[webgl.M03] - v[webgl.M10]
-                    * v[webgl.M21] * v[webgl.M32] * v[webgl.M03] - v[webgl.M30] * v[webgl.M21] * v[webgl.M02] * v[webgl.M13] + v[webgl.M20] * v[webgl.M31] * v[webgl.M02] * v[webgl.M13]
-                    + v[webgl.M30] * v[webgl.M01] * v[webgl.M22] * v[webgl.M13] - v[webgl.M00] * v[webgl.M31] * v[webgl.M22] * v[webgl.M13] - v[webgl.M20] * v[webgl.M01] * v[webgl.M32]
-                    * v[webgl.M13] + v[webgl.M00] * v[webgl.M21] * v[webgl.M32] * v[webgl.M13] + v[webgl.M30] * v[webgl.M11] * v[webgl.M02] * v[webgl.M23] - v[webgl.M10] * v[webgl.M31]
-                    * v[webgl.M02] * v[webgl.M23] - v[webgl.M30] * v[webgl.M01] * v[webgl.M12] * v[webgl.M23] + v[webgl.M00] * v[webgl.M31] * v[webgl.M12] * v[webgl.M23] + v[webgl.M10]
-                    * v[webgl.M01] * v[webgl.M32] * v[webgl.M23] - v[webgl.M00] * v[webgl.M11] * v[webgl.M32] * v[webgl.M23] - v[webgl.M20] * v[webgl.M11] * v[webgl.M02] * v[webgl.M33]
-                    + v[webgl.M10] * v[webgl.M21] * v[webgl.M02] * v[webgl.M33] + v[webgl.M20] * v[webgl.M01] * v[webgl.M12] * v[webgl.M33] - v[webgl.M00] * v[webgl.M21] * v[webgl.M12]
-                    * v[webgl.M33] - v[webgl.M10] * v[webgl.M01] * v[webgl.M22] * v[webgl.M33] + v[webgl.M00] * v[webgl.M11] * v[webgl.M22] * v[webgl.M33];
+                var l_det = v[webgl.M30] * v[webgl.M21] * v[webgl.M12] * v[webgl.M03] - v[webgl.M20] * v[webgl.M31] * v[webgl.M12] * v[webgl.M03] - v[webgl.M30] * v[webgl.M11] * v[webgl.M22] * v[webgl.M03]
+                    + v[webgl.M10] * v[webgl.M31] * v[webgl.M22] * v[webgl.M03] + v[webgl.M20] * v[webgl.M11] * v[webgl.M32] * v[webgl.M03] - v[webgl.M10] * v[webgl.M21] * v[webgl.M32] * v[webgl.M03]
+                    - v[webgl.M30] * v[webgl.M21] * v[webgl.M02] * v[webgl.M13] + v[webgl.M20] * v[webgl.M31] * v[webgl.M02] * v[webgl.M13] + v[webgl.M30] * v[webgl.M01] * v[webgl.M22] * v[webgl.M13]
+                    - v[webgl.M00] * v[webgl.M31] * v[webgl.M22] * v[webgl.M13] - v[webgl.M20] * v[webgl.M01] * v[webgl.M32] * v[webgl.M13] + v[webgl.M00] * v[webgl.M21] * v[webgl.M32] * v[webgl.M13]
+                    + v[webgl.M30] * v[webgl.M11] * v[webgl.M02] * v[webgl.M23] - v[webgl.M10] * v[webgl.M31] * v[webgl.M02] * v[webgl.M23] - v[webgl.M30] * v[webgl.M01] * v[webgl.M12] * v[webgl.M23]
+                    + v[webgl.M00] * v[webgl.M31] * v[webgl.M12] * v[webgl.M23] + v[webgl.M10] * v[webgl.M01] * v[webgl.M32] * v[webgl.M23] - v[webgl.M00] * v[webgl.M11] * v[webgl.M32] * v[webgl.M23]
+                    - v[webgl.M20] * v[webgl.M11] * v[webgl.M02] * v[webgl.M33] + v[webgl.M10] * v[webgl.M21] * v[webgl.M02] * v[webgl.M33] + v[webgl.M20] * v[webgl.M01] * v[webgl.M12] * v[webgl.M33]
+                    - v[webgl.M00] * v[webgl.M21] * v[webgl.M12] * v[webgl.M33] - v[webgl.M10] * v[webgl.M01] * v[webgl.M22] * v[webgl.M33] + v[webgl.M00] * v[webgl.M11] * v[webgl.M22] * v[webgl.M33];
                 if (l_det == 0)
                     throw new Error("non-invertible matrix");
                 var inv_det = 1.0 / l_det;
-                t[webgl.M00] = v[webgl.M12] * v[webgl.M23] * v[webgl.M31] - v[webgl.M13] * v[webgl.M22] * v[webgl.M31] + v[webgl.M13] * v[webgl.M21] * v[webgl.M32] - v[webgl.M11]
-                    * v[webgl.M23] * v[webgl.M32] - v[webgl.M12] * v[webgl.M21] * v[webgl.M33] + v[webgl.M11] * v[webgl.M22] * v[webgl.M33];
-                t[webgl.M01] = v[webgl.M03] * v[webgl.M22] * v[webgl.M31] - v[webgl.M02] * v[webgl.M23] * v[webgl.M31] - v[webgl.M03] * v[webgl.M21] * v[webgl.M32] + v[webgl.M01]
-                    * v[webgl.M23] * v[webgl.M32] + v[webgl.M02] * v[webgl.M21] * v[webgl.M33] - v[webgl.M01] * v[webgl.M22] * v[webgl.M33];
-                t[webgl.M02] = v[webgl.M02] * v[webgl.M13] * v[webgl.M31] - v[webgl.M03] * v[webgl.M12] * v[webgl.M31] + v[webgl.M03] * v[webgl.M11] * v[webgl.M32] - v[webgl.M01]
-                    * v[webgl.M13] * v[webgl.M32] - v[webgl.M02] * v[webgl.M11] * v[webgl.M33] + v[webgl.M01] * v[webgl.M12] * v[webgl.M33];
-                t[webgl.M03] = v[webgl.M03] * v[webgl.M12] * v[webgl.M21] - v[webgl.M02] * v[webgl.M13] * v[webgl.M21] - v[webgl.M03] * v[webgl.M11] * v[webgl.M22] + v[webgl.M01]
-                    * v[webgl.M13] * v[webgl.M22] + v[webgl.M02] * v[webgl.M11] * v[webgl.M23] - v[webgl.M01] * v[webgl.M12] * v[webgl.M23];
-                t[webgl.M10] = v[webgl.M13] * v[webgl.M22] * v[webgl.M30] - v[webgl.M12] * v[webgl.M23] * v[webgl.M30] - v[webgl.M13] * v[webgl.M20] * v[webgl.M32] + v[webgl.M10]
-                    * v[webgl.M23] * v[webgl.M32] + v[webgl.M12] * v[webgl.M20] * v[webgl.M33] - v[webgl.M10] * v[webgl.M22] * v[webgl.M33];
-                t[webgl.M11] = v[webgl.M02] * v[webgl.M23] * v[webgl.M30] - v[webgl.M03] * v[webgl.M22] * v[webgl.M30] + v[webgl.M03] * v[webgl.M20] * v[webgl.M32] - v[webgl.M00]
-                    * v[webgl.M23] * v[webgl.M32] - v[webgl.M02] * v[webgl.M20] * v[webgl.M33] + v[webgl.M00] * v[webgl.M22] * v[webgl.M33];
-                t[webgl.M12] = v[webgl.M03] * v[webgl.M12] * v[webgl.M30] - v[webgl.M02] * v[webgl.M13] * v[webgl.M30] - v[webgl.M03] * v[webgl.M10] * v[webgl.M32] + v[webgl.M00]
-                    * v[webgl.M13] * v[webgl.M32] + v[webgl.M02] * v[webgl.M10] * v[webgl.M33] - v[webgl.M00] * v[webgl.M12] * v[webgl.M33];
-                t[webgl.M13] = v[webgl.M02] * v[webgl.M13] * v[webgl.M20] - v[webgl.M03] * v[webgl.M12] * v[webgl.M20] + v[webgl.M03] * v[webgl.M10] * v[webgl.M22] - v[webgl.M00]
-                    * v[webgl.M13] * v[webgl.M22] - v[webgl.M02] * v[webgl.M10] * v[webgl.M23] + v[webgl.M00] * v[webgl.M12] * v[webgl.M23];
-                t[webgl.M20] = v[webgl.M11] * v[webgl.M23] * v[webgl.M30] - v[webgl.M13] * v[webgl.M21] * v[webgl.M30] + v[webgl.M13] * v[webgl.M20] * v[webgl.M31] - v[webgl.M10]
-                    * v[webgl.M23] * v[webgl.M31] - v[webgl.M11] * v[webgl.M20] * v[webgl.M33] + v[webgl.M10] * v[webgl.M21] * v[webgl.M33];
-                t[webgl.M21] = v[webgl.M03] * v[webgl.M21] * v[webgl.M30] - v[webgl.M01] * v[webgl.M23] * v[webgl.M30] - v[webgl.M03] * v[webgl.M20] * v[webgl.M31] + v[webgl.M00]
-                    * v[webgl.M23] * v[webgl.M31] + v[webgl.M01] * v[webgl.M20] * v[webgl.M33] - v[webgl.M00] * v[webgl.M21] * v[webgl.M33];
-                t[webgl.M22] = v[webgl.M01] * v[webgl.M13] * v[webgl.M30] - v[webgl.M03] * v[webgl.M11] * v[webgl.M30] + v[webgl.M03] * v[webgl.M10] * v[webgl.M31] - v[webgl.M00]
-                    * v[webgl.M13] * v[webgl.M31] - v[webgl.M01] * v[webgl.M10] * v[webgl.M33] + v[webgl.M00] * v[webgl.M11] * v[webgl.M33];
-                t[webgl.M23] = v[webgl.M03] * v[webgl.M11] * v[webgl.M20] - v[webgl.M01] * v[webgl.M13] * v[webgl.M20] - v[webgl.M03] * v[webgl.M10] * v[webgl.M21] + v[webgl.M00]
-                    * v[webgl.M13] * v[webgl.M21] + v[webgl.M01] * v[webgl.M10] * v[webgl.M23] - v[webgl.M00] * v[webgl.M11] * v[webgl.M23];
-                t[webgl.M30] = v[webgl.M12] * v[webgl.M21] * v[webgl.M30] - v[webgl.M11] * v[webgl.M22] * v[webgl.M30] - v[webgl.M12] * v[webgl.M20] * v[webgl.M31] + v[webgl.M10]
-                    * v[webgl.M22] * v[webgl.M31] + v[webgl.M11] * v[webgl.M20] * v[webgl.M32] - v[webgl.M10] * v[webgl.M21] * v[webgl.M32];
-                t[webgl.M31] = v[webgl.M01] * v[webgl.M22] * v[webgl.M30] - v[webgl.M02] * v[webgl.M21] * v[webgl.M30] + v[webgl.M02] * v[webgl.M20] * v[webgl.M31] - v[webgl.M00]
-                    * v[webgl.M22] * v[webgl.M31] - v[webgl.M01] * v[webgl.M20] * v[webgl.M32] + v[webgl.M00] * v[webgl.M21] * v[webgl.M32];
-                t[webgl.M32] = v[webgl.M02] * v[webgl.M11] * v[webgl.M30] - v[webgl.M01] * v[webgl.M12] * v[webgl.M30] - v[webgl.M02] * v[webgl.M10] * v[webgl.M31] + v[webgl.M00]
-                    * v[webgl.M12] * v[webgl.M31] + v[webgl.M01] * v[webgl.M10] * v[webgl.M32] - v[webgl.M00] * v[webgl.M11] * v[webgl.M32];
-                t[webgl.M33] = v[webgl.M01] * v[webgl.M12] * v[webgl.M20] - v[webgl.M02] * v[webgl.M11] * v[webgl.M20] + v[webgl.M02] * v[webgl.M10] * v[webgl.M21] - v[webgl.M00]
-                    * v[webgl.M12] * v[webgl.M21] - v[webgl.M01] * v[webgl.M10] * v[webgl.M22] + v[webgl.M00] * v[webgl.M11] * v[webgl.M22];
+                t[webgl.M00] = v[webgl.M12] * v[webgl.M23] * v[webgl.M31] - v[webgl.M13] * v[webgl.M22] * v[webgl.M31] + v[webgl.M13] * v[webgl.M21] * v[webgl.M32]
+                    - v[webgl.M11] * v[webgl.M23] * v[webgl.M32] - v[webgl.M12] * v[webgl.M21] * v[webgl.M33] + v[webgl.M11] * v[webgl.M22] * v[webgl.M33];
+                t[webgl.M01] = v[webgl.M03] * v[webgl.M22] * v[webgl.M31] - v[webgl.M02] * v[webgl.M23] * v[webgl.M31] - v[webgl.M03] * v[webgl.M21] * v[webgl.M32]
+                    + v[webgl.M01] * v[webgl.M23] * v[webgl.M32] + v[webgl.M02] * v[webgl.M21] * v[webgl.M33] - v[webgl.M01] * v[webgl.M22] * v[webgl.M33];
+                t[webgl.M02] = v[webgl.M02] * v[webgl.M13] * v[webgl.M31] - v[webgl.M03] * v[webgl.M12] * v[webgl.M31] + v[webgl.M03] * v[webgl.M11] * v[webgl.M32]
+                    - v[webgl.M01] * v[webgl.M13] * v[webgl.M32] - v[webgl.M02] * v[webgl.M11] * v[webgl.M33] + v[webgl.M01] * v[webgl.M12] * v[webgl.M33];
+                t[webgl.M03] = v[webgl.M03] * v[webgl.M12] * v[webgl.M21] - v[webgl.M02] * v[webgl.M13] * v[webgl.M21] - v[webgl.M03] * v[webgl.M11] * v[webgl.M22]
+                    + v[webgl.M01] * v[webgl.M13] * v[webgl.M22] + v[webgl.M02] * v[webgl.M11] * v[webgl.M23] - v[webgl.M01] * v[webgl.M12] * v[webgl.M23];
+                t[webgl.M10] = v[webgl.M13] * v[webgl.M22] * v[webgl.M30] - v[webgl.M12] * v[webgl.M23] * v[webgl.M30] - v[webgl.M13] * v[webgl.M20] * v[webgl.M32]
+                    + v[webgl.M10] * v[webgl.M23] * v[webgl.M32] + v[webgl.M12] * v[webgl.M20] * v[webgl.M33] - v[webgl.M10] * v[webgl.M22] * v[webgl.M33];
+                t[webgl.M11] = v[webgl.M02] * v[webgl.M23] * v[webgl.M30] - v[webgl.M03] * v[webgl.M22] * v[webgl.M30] + v[webgl.M03] * v[webgl.M20] * v[webgl.M32]
+                    - v[webgl.M00] * v[webgl.M23] * v[webgl.M32] - v[webgl.M02] * v[webgl.M20] * v[webgl.M33] + v[webgl.M00] * v[webgl.M22] * v[webgl.M33];
+                t[webgl.M12] = v[webgl.M03] * v[webgl.M12] * v[webgl.M30] - v[webgl.M02] * v[webgl.M13] * v[webgl.M30] - v[webgl.M03] * v[webgl.M10] * v[webgl.M32]
+                    + v[webgl.M00] * v[webgl.M13] * v[webgl.M32] + v[webgl.M02] * v[webgl.M10] * v[webgl.M33] - v[webgl.M00] * v[webgl.M12] * v[webgl.M33];
+                t[webgl.M13] = v[webgl.M02] * v[webgl.M13] * v[webgl.M20] - v[webgl.M03] * v[webgl.M12] * v[webgl.M20] + v[webgl.M03] * v[webgl.M10] * v[webgl.M22]
+                    - v[webgl.M00] * v[webgl.M13] * v[webgl.M22] - v[webgl.M02] * v[webgl.M10] * v[webgl.M23] + v[webgl.M00] * v[webgl.M12] * v[webgl.M23];
+                t[webgl.M20] = v[webgl.M11] * v[webgl.M23] * v[webgl.M30] - v[webgl.M13] * v[webgl.M21] * v[webgl.M30] + v[webgl.M13] * v[webgl.M20] * v[webgl.M31]
+                    - v[webgl.M10] * v[webgl.M23] * v[webgl.M31] - v[webgl.M11] * v[webgl.M20] * v[webgl.M33] + v[webgl.M10] * v[webgl.M21] * v[webgl.M33];
+                t[webgl.M21] = v[webgl.M03] * v[webgl.M21] * v[webgl.M30] - v[webgl.M01] * v[webgl.M23] * v[webgl.M30] - v[webgl.M03] * v[webgl.M20] * v[webgl.M31]
+                    + v[webgl.M00] * v[webgl.M23] * v[webgl.M31] + v[webgl.M01] * v[webgl.M20] * v[webgl.M33] - v[webgl.M00] * v[webgl.M21] * v[webgl.M33];
+                t[webgl.M22] = v[webgl.M01] * v[webgl.M13] * v[webgl.M30] - v[webgl.M03] * v[webgl.M11] * v[webgl.M30] + v[webgl.M03] * v[webgl.M10] * v[webgl.M31]
+                    - v[webgl.M00] * v[webgl.M13] * v[webgl.M31] - v[webgl.M01] * v[webgl.M10] * v[webgl.M33] + v[webgl.M00] * v[webgl.M11] * v[webgl.M33];
+                t[webgl.M23] = v[webgl.M03] * v[webgl.M11] * v[webgl.M20] - v[webgl.M01] * v[webgl.M13] * v[webgl.M20] - v[webgl.M03] * v[webgl.M10] * v[webgl.M21]
+                    + v[webgl.M00] * v[webgl.M13] * v[webgl.M21] + v[webgl.M01] * v[webgl.M10] * v[webgl.M23] - v[webgl.M00] * v[webgl.M11] * v[webgl.M23];
+                t[webgl.M30] = v[webgl.M12] * v[webgl.M21] * v[webgl.M30] - v[webgl.M11] * v[webgl.M22] * v[webgl.M30] - v[webgl.M12] * v[webgl.M20] * v[webgl.M31]
+                    + v[webgl.M10] * v[webgl.M22] * v[webgl.M31] + v[webgl.M11] * v[webgl.M20] * v[webgl.M32] - v[webgl.M10] * v[webgl.M21] * v[webgl.M32];
+                t[webgl.M31] = v[webgl.M01] * v[webgl.M22] * v[webgl.M30] - v[webgl.M02] * v[webgl.M21] * v[webgl.M30] + v[webgl.M02] * v[webgl.M20] * v[webgl.M31]
+                    - v[webgl.M00] * v[webgl.M22] * v[webgl.M31] - v[webgl.M01] * v[webgl.M20] * v[webgl.M32] + v[webgl.M00] * v[webgl.M21] * v[webgl.M32];
+                t[webgl.M32] = v[webgl.M02] * v[webgl.M11] * v[webgl.M30] - v[webgl.M01] * v[webgl.M12] * v[webgl.M30] - v[webgl.M02] * v[webgl.M10] * v[webgl.M31]
+                    + v[webgl.M00] * v[webgl.M12] * v[webgl.M31] + v[webgl.M01] * v[webgl.M10] * v[webgl.M32] - v[webgl.M00] * v[webgl.M11] * v[webgl.M32];
+                t[webgl.M33] = v[webgl.M01] * v[webgl.M12] * v[webgl.M20] - v[webgl.M02] * v[webgl.M11] * v[webgl.M20] + v[webgl.M02] * v[webgl.M10] * v[webgl.M21]
+                    - v[webgl.M00] * v[webgl.M12] * v[webgl.M21] - v[webgl.M01] * v[webgl.M10] * v[webgl.M22] + v[webgl.M00] * v[webgl.M11] * v[webgl.M22];
                 v[webgl.M00] = t[webgl.M00] * inv_det;
                 v[webgl.M01] = t[webgl.M01] * inv_det;
                 v[webgl.M02] = t[webgl.M02] * inv_det;
@@ -5342,15 +5339,14 @@ var spine;
             };
             Matrix4.prototype.determinant = function () {
                 var v = this.values;
-                return v[webgl.M30] * v[webgl.M21] * v[webgl.M12] * v[webgl.M03] - v[webgl.M20] * v[webgl.M31] * v[webgl.M12] * v[webgl.M03] - v[webgl.M30] * v[webgl.M11]
-                    * v[webgl.M22] * v[webgl.M03] + v[webgl.M10] * v[webgl.M31] * v[webgl.M22] * v[webgl.M03] + v[webgl.M20] * v[webgl.M11] * v[webgl.M32] * v[webgl.M03] - v[webgl.M10]
-                    * v[webgl.M21] * v[webgl.M32] * v[webgl.M03] - v[webgl.M30] * v[webgl.M21] * v[webgl.M02] * v[webgl.M13] + v[webgl.M20] * v[webgl.M31] * v[webgl.M02] * v[webgl.M13]
-                    + v[webgl.M30] * v[webgl.M01] * v[webgl.M22] * v[webgl.M13] - v[webgl.M00] * v[webgl.M31] * v[webgl.M22] * v[webgl.M13] - v[webgl.M20] * v[webgl.M01] * v[webgl.M32]
-                    * v[webgl.M13] + v[webgl.M00] * v[webgl.M21] * v[webgl.M32] * v[webgl.M13] + v[webgl.M30] * v[webgl.M11] * v[webgl.M02] * v[webgl.M23] - v[webgl.M10] * v[webgl.M31]
-                    * v[webgl.M02] * v[webgl.M23] - v[webgl.M30] * v[webgl.M01] * v[webgl.M12] * v[webgl.M23] + v[webgl.M00] * v[webgl.M31] * v[webgl.M12] * v[webgl.M23] + v[webgl.M10]
-                    * v[webgl.M01] * v[webgl.M32] * v[webgl.M23] - v[webgl.M00] * v[webgl.M11] * v[webgl.M32] * v[webgl.M23] - v[webgl.M20] * v[webgl.M11] * v[webgl.M02] * v[webgl.M33]
-                    + v[webgl.M10] * v[webgl.M21] * v[webgl.M02] * v[webgl.M33] + v[webgl.M20] * v[webgl.M01] * v[webgl.M12] * v[webgl.M33] - v[webgl.M00] * v[webgl.M21] * v[webgl.M12]
-                    * v[webgl.M33] - v[webgl.M10] * v[webgl.M01] * v[webgl.M22] * v[webgl.M33] + v[webgl.M00] * v[webgl.M11] * v[webgl.M22] * v[webgl.M33];
+                return v[webgl.M30] * v[webgl.M21] * v[webgl.M12] * v[webgl.M03] - v[webgl.M20] * v[webgl.M31] * v[webgl.M12] * v[webgl.M03] - v[webgl.M30] * v[webgl.M11] * v[webgl.M22] * v[webgl.M03]
+                    + v[webgl.M10] * v[webgl.M31] * v[webgl.M22] * v[webgl.M03] + v[webgl.M20] * v[webgl.M11] * v[webgl.M32] * v[webgl.M03] - v[webgl.M10] * v[webgl.M21] * v[webgl.M32] * v[webgl.M03]
+                    - v[webgl.M30] * v[webgl.M21] * v[webgl.M02] * v[webgl.M13] + v[webgl.M20] * v[webgl.M31] * v[webgl.M02] * v[webgl.M13] + v[webgl.M30] * v[webgl.M01] * v[webgl.M22] * v[webgl.M13]
+                    - v[webgl.M00] * v[webgl.M31] * v[webgl.M22] * v[webgl.M13] - v[webgl.M20] * v[webgl.M01] * v[webgl.M32] * v[webgl.M13] + v[webgl.M00] * v[webgl.M21] * v[webgl.M32] * v[webgl.M13]
+                    + v[webgl.M30] * v[webgl.M11] * v[webgl.M02] * v[webgl.M23] - v[webgl.M10] * v[webgl.M31] * v[webgl.M02] * v[webgl.M23] - v[webgl.M30] * v[webgl.M01] * v[webgl.M12] * v[webgl.M23]
+                    + v[webgl.M00] * v[webgl.M31] * v[webgl.M12] * v[webgl.M23] + v[webgl.M10] * v[webgl.M01] * v[webgl.M32] * v[webgl.M23] - v[webgl.M00] * v[webgl.M11] * v[webgl.M32] * v[webgl.M23]
+                    - v[webgl.M20] * v[webgl.M11] * v[webgl.M02] * v[webgl.M33] + v[webgl.M10] * v[webgl.M21] * v[webgl.M02] * v[webgl.M33] + v[webgl.M20] * v[webgl.M01] * v[webgl.M12] * v[webgl.M33]
+                    - v[webgl.M00] * v[webgl.M21] * v[webgl.M12] * v[webgl.M33] - v[webgl.M10] * v[webgl.M01] * v[webgl.M22] * v[webgl.M33] + v[webgl.M00] * v[webgl.M11] * v[webgl.M22] * v[webgl.M33];
             };
             Matrix4.prototype.translate = function (x, y, z) {
                 var v = this.values;
@@ -5690,12 +5686,9 @@ var spine;
         var PolygonBatcher = (function () {
             function PolygonBatcher(maxVertices) {
                 if (maxVertices === void 0) { maxVertices = 10920; }
-                this._drawCalls = 0;
                 this._drawing = false;
                 this._shader = null;
                 this._lastTexture = null;
-                this._verticesLength = 0;
-                this._indicesLength = 0;
                 this._srcBlend = webgl.gl.SRC_ALPHA;
                 this._dstBlend = webgl.gl.ONE_MINUS_SRC_ALPHA;
                 if (maxVertices > 10920)
@@ -5735,9 +5728,8 @@ var spine;
                 this._verticesLength += vertices.length;
                 this._mesh.setVerticesLength(this._verticesLength);
                 var indicesArray = this._mesh.indices();
-                for (var i = this._indicesLength, j = 0; j < indices.length; i++, j++) {
+                for (var i = this._indicesLength, j = 0; j < indices.length; i++, j++)
                     indicesArray[i] = indices[j] + indexStart;
-                }
                 this._indicesLength += indices.length;
                 this._mesh.setIndicesLength(this._indicesLength);
             };
@@ -5911,13 +5903,13 @@ var spine;
                 }
             };
             Shader.newColoredTextured = function () {
-                var vs = "\n\t\t\t\tattribute vec4 " + Shader.POSITION + ";\n\t\t\t\tattribute vec4 " + Shader.COLOR + ";\n\t\t\t\tattribute vec2 " + Shader.TEXCOORDS + ";\n\t\t\t\tuniform mat4 " + Shader.MVP_MATRIX + ";\n\t\t\t\tvarying vec4 v_color;\n\t\t\t\tvarying vec2 v_texCoords;\n\t\t\t\n\t\t\t\tvoid main() {                    \n\t\t\t\t\tv_color = " + Shader.COLOR + ";                    \n\t\t\t\t\tv_texCoords = " + Shader.TEXCOORDS + ";\n\t\t\t\t\tgl_Position =  " + Shader.MVP_MATRIX + " * " + Shader.POSITION + ";\n\t\t\t\t}\n\t\t\t";
-                var fs = "\n\t\t\t\t#ifdef GL_ES\n\t\t\t        #define LOWP lowp\n\t\t\t        precision mediump float;\n\t\t\t    #else\n\t\t\t        #define LOWP \n\t\t\t    #endif\n\t\t\t    varying LOWP vec4 v_color;\n\t\t\t    varying vec2 v_texCoords;\n\t\t\t    uniform sampler2D u_texture;\n\n\t\t\t    void main() {\t\t\t    \n\t\t\t        gl_FragColor = v_color * texture2D(u_texture, v_texCoords);\n\t\t\t    }\n\t\t\t";
+                var vs = "\n\t\t\t\tattribute vec4 " + Shader.POSITION + ";\n\t\t\t\tattribute vec4 " + Shader.COLOR + ";\n\t\t\t\tattribute vec2 " + Shader.TEXCOORDS + ";\n\t\t\t\tuniform mat4 " + Shader.MVP_MATRIX + ";\n\t\t\t\tvarying vec4 v_color;\n\t\t\t\tvarying vec2 v_texCoords;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tv_color = " + Shader.COLOR + ";\n\t\t\t\t\tv_texCoords = " + Shader.TEXCOORDS + ";\n\t\t\t\t\tgl_Position =  " + Shader.MVP_MATRIX + " * " + Shader.POSITION + ";\n\t\t\t\t}\n\t\t\t";
+                var fs = "\n\t\t\t\t#ifdef GL_ES\n\t\t\t\t\t#define LOWP lowp\n\t\t\t\t\tprecision mediump float;\n\t\t\t\t#else\n\t\t\t\t\t#define LOWP\n\t\t\t\t#endif\n\t\t\t\tvarying LOWP vec4 v_color;\n\t\t\t\tvarying vec2 v_texCoords;\n\t\t\t\tuniform sampler2D u_texture;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tgl_FragColor = v_color * texture2D(u_texture, v_texCoords);\n\t\t\t\t}\n\t\t\t";
                 return new Shader(vs, fs);
             };
             Shader.newColored = function () {
-                var vs = "\n\t\t\t\tattribute vec4 " + Shader.POSITION + ";\n\t\t\t\tattribute vec4 " + Shader.COLOR + ";            \n\t\t\t\tuniform mat4 " + Shader.MVP_MATRIX + ";\n\t\t\t\tvarying vec4 v_color;                \n\t\t\t\n\t\t\t\tvoid main() {                    \n\t\t\t\t\tv_color = " + Shader.COLOR + ";                    \n\t\t\t\t\tgl_Position =  " + Shader.MVP_MATRIX + " * " + Shader.POSITION + ";\n\t\t\t\t}\n\t\t\t";
-                var fs = "\n\t\t\t\t#ifdef GL_ES\n\t\t\t        #define LOWP lowp\n\t\t\t        precision mediump float;\n\t\t\t    #else\n\t\t\t        #define LOWP\n\t\t\t    #endif\n\t\t\t    varying LOWP vec4 v_color;\t\t\t    \t\t\t    \n\n\t\t\t    void main() {\t\t\t    \n\t\t\t        gl_FragColor = v_color;\n\t\t\t    }\n\t\t\t";
+                var vs = "\n\t\t\t\tattribute vec4 " + Shader.POSITION + ";\n\t\t\t\tattribute vec4 " + Shader.COLOR + ";\n\t\t\t\tuniform mat4 " + Shader.MVP_MATRIX + ";\n\t\t\t\tvarying vec4 v_color;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tv_color = " + Shader.COLOR + ";\n\t\t\t\t\tgl_Position =  " + Shader.MVP_MATRIX + " * " + Shader.POSITION + ";\n\t\t\t\t}\n\t\t\t";
+                var fs = "\n\t\t\t\t#ifdef GL_ES\n\t\t\t\t\t#define LOWP lowp\n\t\t\t\t\tprecision mediump float;\n\t\t\t\t#else\n\t\t\t\t\t#define LOWP\n\t\t\t\t#endif\n\t\t\t\tvarying LOWP vec4 v_color;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tgl_FragColor = v_color;\n\t\t\t\t}\n\t\t\t";
                 return new Shader(vs, fs);
             };
             Shader.MVP_MATRIX = "u_projTrans";

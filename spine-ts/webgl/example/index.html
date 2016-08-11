@@ -11,7 +11,7 @@
 </body>
 <script>
 
-var lastFrameTime;
+var lastFrameTime = Date.now() / 1000;
 var canvas;
 var shader;
 var batcher;
@@ -181,7 +181,7 @@ function setupUI () {
 
 function render () {
 	var now = Date.now() / 1000;
-	var delta = lastFrameTime === null ? 0 : now - lastFrameTime;
+	var delta = now - lastFrameTime;
 	lastFrameTime = now;
 
 	gl.clearColor(0.3, 0.3, 0.3, 1);

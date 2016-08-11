@@ -59,7 +59,7 @@ module spine.webgl {
 			v[M33] = 1;
 		}
 
-		set (values: Float32Array | Array<number>): Matrix4 {
+		set (values: ArrayLike<number>): Matrix4 {
 			this.values.set(values);
 			return this;
 		}

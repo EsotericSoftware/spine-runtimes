@@ -33,8 +33,8 @@ module spine.webgl {
 	export class AssetManager implements Disposable {
 		private _assets: Map<string | Texture> = {};
 		private _errors: Map<string> = {};
-		private _toLoad: number;
-		private _loaded: number;
+		private _toLoad = 0;
+		private _loaded = 0;
 
 		loadText(path: string,
 			success: (path: string, text: string) => void,

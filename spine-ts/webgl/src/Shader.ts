@@ -37,9 +37,9 @@ module spine.webgl {
 		public static TEXCOORDS = "a_texCoords";
 		public static SAMPLER = "u_texture";
 
-		private _vs: WebGLShader;
-		private _fs: WebGLShader;
-		private _program: WebGLProgram;
+		private _vs: WebGLShader = null;
+		private _fs: WebGLShader = null;
+		private _program: WebGLProgram = null;
 		private _tmp2x2: Float32Array = new Float32Array(2 * 2);
 		private _tmp3x3: Float32Array = new Float32Array(3 * 3);
 		private _tmp4x4: Float32Array = new Float32Array(4 * 4);
@@ -118,17 +118,17 @@ module spine.webgl {
 			gl.uniform4f(this.getUniformLocation(uniform), value, value2, value3, value4);
 		}
 
-		public setUniform2x2f (uniform: string, value: Array<number> | Float32Array) {
+		public setUniform2x2f (uniform: string, value: ArrayLike<number>) {
 			this._tmp2x2.set(value);
 			gl.uniformMatrix2fv(this.getUniformLocation(uniform), false, this._tmp2x2);
 		}
 
-		public setUniform3x3f (uniform: string, value: Array<number> | Float32Array) {
+		public setUniform3x3f (uniform: string, value: ArrayLike<number>) {
 			this._tmp3x3.set(value);
 			gl.uniformMatrix3fv(this.getUniformLocation(uniform), false, this._tmp3x3);
 		}
 
-		public setUniform4x4f (uniform: string, value: Array<number> | Float32Array) {
+		public setUniform4x4f (uniform: string, value: ArrayLike<number>) {
 			this._tmp4x4.set(value);
 			gl.uniformMatrix4fv(this.getUniformLocation(uniform), false, this._tmp4x4);
 		}

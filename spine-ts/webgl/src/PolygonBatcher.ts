@@ -32,10 +32,10 @@
 module spine.webgl {
 	export class PolygonBatcher {
 		private _drawCalls: number;
-		private _drawing;
+		private _drawing = false;
 		private _mesh: Mesh;
-		private _shader: Shader;
-		private _lastTexture: Texture;
+		private _shader: Shader = null;
+		private _lastTexture: Texture = null;
 		private _verticesLength: number;
 		private _indicesLength: number;
 		private _srcBlend: number = gl.SRC_ALPHA;
