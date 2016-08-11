@@ -37,9 +37,9 @@ module spine.webgl {
 		public static TEXCOORDS = "a_texCoords";
 		public static SAMPLER = "u_texture";
 
-		private _vs: WebGLShader = null;
-		private _fs: WebGLShader = null;
-		private _program: WebGLProgram = null;
+		private _vs: WebGLShader;
+		private _fs: WebGLShader;
+		private _program: WebGLProgram;
 		private _tmp2x2: Float32Array = new Float32Array(2 * 2);
 		private _tmp3x3: Float32Array = new Float32Array(3 * 3);
 		private _tmp4x4: Float32Array = new Float32Array(4 * 4);
@@ -123,7 +123,7 @@ module spine.webgl {
 			gl.uniformMatrix2fv(this.getUniformLocation(uniform), false, this._tmp2x2);
 		}
 
-		public setUniform3x3f (uniform: string, value: Array<number> | Float32Array ) {
+		public setUniform3x3f (uniform: string, value: Array<number> | Float32Array) {
 			this._tmp3x3.set(value);
 			gl.uniformMatrix3fv(this.getUniformLocation(uniform), false, this._tmp3x3);
 		}

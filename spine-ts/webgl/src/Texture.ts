@@ -33,7 +33,7 @@ module spine.webgl {
 	export class Texture implements Disposable {
 		private _texture: WebGLTexture;
 		private _image: HTMLImageElement;
-		private _boundUnit: number = 0;
+		private _boundUnit: number;
 
 		constructor (image: HTMLImageElement, useMipMaps: boolean = false) {
 			this._texture = gl.createTexture();

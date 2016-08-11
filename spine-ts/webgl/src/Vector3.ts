@@ -31,9 +31,9 @@
 
 module spine.webgl {
 	export class Vector3 {
-		x: number = 0;
-		y: number = 0;
-		z: number = 0;
+		x: number;
+		y: number;
+		z: number;
 
 		set (x: number, y: number, z: number): Vector3 {
 			this.x = x;

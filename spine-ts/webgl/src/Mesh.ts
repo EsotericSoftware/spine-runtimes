@@ -33,13 +33,13 @@ module spine.webgl {
 	export class Mesh implements Disposable {
 		private _vertices:Float32Array;
 		private _verticesBuffer: WebGLBuffer;
-		private _verticesLength: number = 0;
-		private _dirtyVertices: boolean = false;
+		private _verticesLength: number;
+		private _dirtyVertices: boolean;
 		private _indices:Uint16Array;
 		private _indicesBuffer: WebGLBuffer;
-		private _indicesLength: number = 0;
-		private _dirtyIndices: boolean = false;
-		private _elementsPerVertex: number = 0;
+		private _indicesLength: number;
+		private _dirtyIndices: boolean;
+		private _elementsPerVertex: number;
 
 		attributes (): VertexAttribute[] { return this._attributes; }
 
