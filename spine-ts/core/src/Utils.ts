@@ -121,7 +121,7 @@ module spine {
 	}
 
 	export class Utils {
-		static SUPPORTS_TYPED_ARRAYS = 'ArrayBuffer' in window;
+		static SUPPORTS_TYPED_ARRAYS = typeof(Float32Array) !== "undefined";
 
 		static arrayCopy<T> (source: ArrayLike<T>, sourceStart: number, dest: ArrayLike<T>, destStart: number, numElements: number) {
 			for (let i = sourceStart, j = destStart; i < sourceStart + numElements; i++, j++) {
@@ -146,7 +146,13 @@ module spine {
 		}
 
 		static newFloatArray (size: number): ArrayLike<number> {
-			return Utils.SUPPORTS_TYPED_ARRAYS ? new Float32Array(size) : new Array<number>(size);
+			if (Utils.SUPPORTS_TYPED_ARRAYS) {
+				return new Float32Array(size)
+			} else {
+				 let array = new Array<number>(size);
+				 for (let i = 0; i < array.length; i++) array[i] = 0;
+				 return array;
+			}
 		}
 
 		static toFloatArray (array: Array<number>) {

@@ -4343,12 +4343,20 @@ var spine;
             return array;
         };
         Utils.newFloatArray = function (size) {
-            return Utils.SUPPORTS_TYPED_ARRAYS ? new Float32Array(size) : new Array(size);
+            if (Utils.SUPPORTS_TYPED_ARRAYS) {
+                return new Float32Array(size);
+            }
+            else {
+                var array = new Array(size);
+                for (var i = 0; i < array.length; i++)
+                    array[i] = 0;
+                return array;
+            }
         };
         Utils.toFloatArray = function (array) {
             return Utils.SUPPORTS_TYPED_ARRAYS ? new Float32Array(array) : array;
         };
-        Utils.SUPPORTS_TYPED_ARRAYS = 'ArrayBuffer' in window;
+        Utils.SUPPORTS_TYPED_ARRAYS = typeof (Float32Array) !== "undefined";
         return Utils;
     }());
     spine.Utils = Utils;
