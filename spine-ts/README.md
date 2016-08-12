@@ -52,9 +52,9 @@ setup a development environment, follow these steps.
 3. Install [Visual Studio Code](https://code.visualstudio.com/)
 4. On the command line, change into the `spine-ts` directory
 5. Start the TypeScript compiler in watcher mode for the backend you want to work on:
-  a. **Core**: `tsc -w -p tsconfig.core.json`, builds `core/src`, outputs `build/spine-core.js|d.ts|js.map`
-  a. **WebGL**: `tsc -w -p tsconfig.webgl.json`, builds `core/src` and `webgl/src`, outputs `build/spine-webgl.js|d.ts|js.map`
-  a. **Widget**: `tsc -w -p tsconfig.widget.json`, builds `core/src` and `widget/src`, outputs `build/spine-widget.js|d.ts|js.map`
+  1. **Core**: `tsc -w -p tsconfig.core.json`, builds `core/src`, outputs `build/spine-core.js|d.ts|js.map`
+  2. **WebGL**: `tsc -w -p tsconfig.webgl.json`, builds `core/src` and `webgl/src`, outputs `build/spine-webgl.js|d.ts|js.map`
+  3. **Widget**: `tsc -w -p tsconfig.widget.json`, builds `core/src` and `widget/src`, outputs `build/spine-widget.js|d.ts|js.map`
 6. Open the `spine-ts` folder in Visual Studio Code. VS Code will use the `tsconfig.json` file all source files from core and all 
 backends for your development pleasure. The actual JavaScript output is still created by the command line TypeScript compiler process from the previous step.  
 
