@@ -4,14 +4,15 @@
 <body>
 <center>
 <div id="spine-widget" style="margin-bottom: 20px"></div>
-<div id="other-widget"></div>
+<div style="margin-bottom: 20px" class="spine-widget" data-json="assets/raptor.json" data-atlas="assets/raptor.atlas" data-animation="Jump" data-scale="0.25" data-x="40"></div>
+<div style="margin-bottom: 20px" class="spine-widget" data-json="assets/raptor.json" data-atlas="assets/raptor.atlas" data-animation="walk" data-scale="0.2" data-width="320" data-height="240" data-background-color="#cc0000"></div>
 </center>
 </body>
 <script>
-	new spine.SpineWidget(document.getElementById("spine-widget"), {
+	new spine.SpineWidget("spine-widget", {
 		json: "assets/raptor.json",
 		atlas: "assets/raptor.atlas",		
-		animationName: "walk",
+		animation: "walk",
 		scale: 0.4,
 		backgroundColor: "#000000",
 		success: function (widget) {
@@ -23,15 +24,7 @@
 				widget.setAnimation(animations[animIndex].name);
 			}
 		}
-	});
-
-	new spine.SpineWidget(document.getElementById("other-widget"), {
-		json: "assets/raptor.json",
-		atlas: "assets/raptor.atlas",		
-		animationName: "Jump",
-		scale: 0.2,
-		x: 100
-	});
+	});	
 </script>
 </body>
 </html>

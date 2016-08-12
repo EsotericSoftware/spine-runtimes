@@ -34,7 +34,7 @@ module spine {
 		skeleton: Skeleton;
 		state: AnimationState;
 		gl: WebGLRenderingContext;
-		canvas: HTMLCanvasElement;
+		canvas: HTMLCanvasElement;		
 
 		private _config: SpineWidgetConfig;
 		private _assetManager: spine.webgl.AssetManager;
@@ -47,16 +47,20 @@ module spine {
 		private _backgroundColor = new Color();
 		private _loaded = false;
 
-		constructor (element: HTMLElement, config: SpineWidgetConfig) {
-			if (!element) throw new Error ("Please provide a DOM element, e.g. document.getElementById('myelement')");
-			if (!config) throw new Error ("Please provide a configuration, specifying at least the json file, atlas file and animation name");
+		constructor (element: Element | string, config: SpineWidgetConfig) {
+			if (!element) throw new Error("Please provide a DOM element, e.g. document.getElementById('myelement')");
+			if (!config) throw new Error("Please provide a configuration, specifying at least the json file, atlas file and animation name");
+
+			let elementId = element as string;
+			if (typeof(element) === "string") element = document.getElementById(element as string);
+			if (element == null) throw new Error(`Element ${elementId} does not exist`);
 
 			this.validateConfig(config);
 
 			let canvas = this.canvas = document.createElement("canvas");
-			element.appendChild(canvas);
-			canvas.width = 640;
-			canvas.height = 480;
+			(<Element> element).appendChild(canvas);
+			canvas.width = config.width;
+			canvas.height = config.height;
 			var webglConfig = { alpha: false };
 			let gl = this.gl = <WebGLRenderingContext> (canvas.getContext("webgl", webglConfig) || canvas.getContext("experimental-webgl", webglConfig));	
 
@@ -75,15 +79,14 @@ module spine {
 		private validateConfig (config: SpineWidgetConfig) {
 			if (!config.atlas) throw new Error("Please specify config.atlas");
 			if (!config.json) throw new Error("Please specify config.json");
-			if (!config.animationName) throw new Error("Please specify config.animationName");
+			if (!config.animation) throw new Error("Please specify config.animationName");
 
 			if (!config.scale) config.scale = 1.0;
 			if (!config.skin) config.skin = "default";
 			if (config.loop === undefined) config.loop = true;			
 			if (!config.y) config.y = 20;
 			if (!config.width) config.width = 640;
-			if (!config.height) config.height = 480;
-			if (config.fitToCanvas === undefined) config.fitToCanvas = false;
+			if (!config.height) config.height = 480;			
 			if (!config.x) config.x = config.width / 2;
 			if (!config.backgroundColor) config.backgroundColor = "#555555";
 			if (!config.imagesPath) {
@@ -122,15 +125,10 @@ module spine {
 				var skeleton = this.skeleton = new spine.Skeleton(skeletonData);
 				skeleton.x = config.x;
 				skeleton.y = config.y;
-
-				if (config.fitToCanvas) {
-					// FIXME
-				}
-
 				skeleton.setSkinByName(config.skin);
 
 				var animationState = this.state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
-				animationState.setAnimation(0, config.animationName, true);
+				animationState.setAnimation(0, config.animation, true);
 				if (config.success) config.success(this);
 				this._loaded = true;
 				requestAnimationFrame(() => { this.render(); });
@@ -194,24 +192,98 @@ module spine {
 			this.skeleton.setToSetupPose();
 			this.state.setAnimation(0, animationName, this._config.loop);
 		}
+
+
+		static loadWidgets() {
+			let widgets = document.getElementsByClassName("spine-widget");
+			for (var i = 0; i < widgets.length; i++) {
+				SpineWidget.loadWidget(widgets[i]);				
+			}
+		}
+
+		static loadWidget(widget: Element) {
+			let config = new SpineWidgetConfig();
+			config.atlas = widget.getAttribute("data-atlas");
+			config.json = widget.getAttribute("data-json");
+			config.animation = widget.getAttribute("data-animation");
+			if (widget.getAttribute("data-images-path")) config.imagesPath = widget.getAttribute("data-images-path");			
+			if (widget.getAttribute("data-skin")) config.skin = widget.getAttribute("data-skin");
+			if (widget.getAttribute("data-loop")) config.loop = widget.getAttribute("data-loop") === "true";
+			if (widget.getAttribute("data-scale")) config.scale = parseFloat(widget.getAttribute("data-scale"));
+			if (widget.getAttribute("data-x")) config.x = parseFloat(widget.getAttribute("data-x"));
+			if (widget.getAttribute("data-y")) config.x = parseFloat(widget.getAttribute("data-y"));
+			if (widget.getAttribute("data-width")) config.width = parseInt(widget.getAttribute("data-width"));
+			if (widget.getAttribute("data-height")) config.height = parseInt(widget.getAttribute("data-height"));			
+			if (widget.getAttribute("data-background-color")) config.backgroundColor = widget.getAttribute("data-background-color");
+			if (widget.getAttribute("data-premultiplied-alpha")) config.premultipliedAlpha = widget.getAttribute("data-premultiplied-alpha") === "true";			
+
+			new spine.SpineWidget(widget, config);
+		}
 	}
 
 	export class SpineWidgetConfig {
 		json: string;
 		atlas: string;
-		animationName: string;
-		imagesPath: string;
-		scale = 1.0;
+		animation: string;
+		imagesPath: string;		
 		skin = "default";		
 		loop = true;
+		scale = 1.0;
 		x = 0;
 		y = 0;
 		width = 640;
-		height = 480;
-		fitToCanvas = false;
+		height = 480;		
 		backgroundColor = "#555555";
 		premultipliedAlpha = false;		
 		success: (widget: SpineWidget) => void;
 		error: (widget: SpineWidget, msg: string) => void;		
 	}
 }
+
+(function(funcName: any, baseObj: any) {
+    "use strict";
+    funcName = funcName || "docReady";
+    baseObj = baseObj || window;
+    var readyList: any[] = [];
+    var readyFired = false;
+    var readyEventHandlersInstalled = false;
+    
+    function ready() {
+        if (!readyFired) {            
+            readyFired = true;
+            for (var i = 0; i < readyList.length; i++) {                
+                readyList[i].fn.call(window, readyList[i].ctx);
+            }            
+            readyList = [];
+        }
+    }
+    
+    function readyStateChange() {
+        if ( document.readyState === "complete" ) ready();        
+    }
+    
+    baseObj[funcName] = function(callback: any, context: any) {        
+        if (readyFired) {
+            setTimeout(function() {callback(context);}, 1);
+            return;
+        } else {            
+            readyList.push({fn: callback, ctx: context});
+        }        
+        if (document.readyState === "complete" || (!(<any>document).attachEvent && document.readyState === "interactive")) {
+            setTimeout(ready, 1);
+        } else if (!readyEventHandlersInstalled) {         
+            if (document.addEventListener) {                
+                document.addEventListener("DOMContentLoaded", ready, false);                
+                window.addEventListener("load", ready, false);
+            } else {                
+                (<any>document).attachEvent("onreadystatechange", readyStateChange);
+                (<any>window).attachEvent("onload", ready);
+            }
+            readyEventHandlersInstalled = true;
+        }
+    }
+})("docReady", window);
+
+(<any>window).docReady(function() {
+	spine.SpineWidget.loadWidgets();
+})
