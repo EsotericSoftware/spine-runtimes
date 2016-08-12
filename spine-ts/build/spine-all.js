@@ -1,3 +1,33 @@
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -40,7 +70,7 @@ var spine;
                 timelines[i].apply(skeleton, lastTime, time, events, alpha);
         };
         Animation.binarySearch = function (values, target, step) {
-            if (step === void 0) { step = 1; }            
+            if (step === void 0) { step = 1; }
             var low = 0;
             var high = values.length / step - 2;
             if (high == 0)
@@ -69,7 +99,7 @@ var spine;
         function CurveTimeline(frameCount) {
             if (frameCount <= 0)
                 throw new Error("frameCount must be > 0: " + frameCount);
-            this.curves = new Array((frameCount - 1) * CurveTimeline.BEZIER_SIZE);
+            this.curves = spine.Utils.newFloatArray((frameCount - 1) * CurveTimeline.BEZIER_SIZE);
         }
         CurveTimeline.prototype.getFrameCount = function () {
             return this.curves.length / CurveTimeline.BEZIER_SIZE + 1;
@@ -128,7 +158,7 @@ var spine;
             for (var start = i, n = i + CurveTimeline.BEZIER_SIZE - 1; i < n; i += 2) {
                 x = curves[i];
                 if (x >= percent) {
-                    var prevX, prevY;
+                    var prevX = void 0, prevY = void 0;
                     if (i == start) {
                         prevX = 0;
                         prevY = 0;
@@ -154,7 +184,7 @@ var spine;
         __extends(RotateTimeline, _super);
         function RotateTimeline(frameCount) {
             _super.call(this, frameCount);
-            this.frames = new Array(frameCount << 1);
+            this.frames = spine.Utils.newFloatArray(frameCount << 1);
         }
         /** Sets the time and angle of the specified keyframe. */
         RotateTimeline.prototype.setFrame = function (frameIndex, time, degrees) {
@@ -204,7 +234,7 @@ var spine;
         __extends(TranslateTimeline, _super);
         function TranslateTimeline(frameCount) {
             _super.call(this, frameCount);
-            this.frames = new Array(frameCount * TranslateTimeline.ENTRIES);
+            this.frames = spine.Utils.newFloatArray(frameCount * TranslateTimeline.ENTRIES);
         }
         /** Sets the time and value of the specified keyframe. */
         TranslateTimeline.prototype.setFrame = function (frameIndex, time, x, y) {
@@ -299,7 +329,7 @@ var spine;
         __extends(ColorTimeline, _super);
         function ColorTimeline(frameCount) {
             _super.call(this, frameCount);
-            this.frames = new Array(frameCount * ColorTimeline.ENTRIES);
+            this.frames = spine.Utils.newFloatArray(frameCount * ColorTimeline.ENTRIES);
         }
         /** Sets the time and value of the specified keyframe. */
         ColorTimeline.prototype.setFrame = function (frameIndex, time, r, g, b, a) {
@@ -357,7 +387,7 @@ var spine;
     spine.ColorTimeline = ColorTimeline;
     var AttachmentTimeline = (function () {
         function AttachmentTimeline(frameCount) {
-            this.frames = new Array(frameCount);
+            this.frames = spine.Utils.newFloatArray(frameCount);
             this.attachmentNames = new Array(frameCount);
         }
         AttachmentTimeline.prototype.getFrameCount = function () {
@@ -386,11 +416,11 @@ var spine;
     spine.AttachmentTimeline = AttachmentTimeline;
     var EventTimeline = (function () {
         function EventTimeline(frameCount) {
-            this.frames = new Array(frameCount);
+            this.frames = spine.Utils.newFloatArray(frameCount);
             this.events = new Array(frameCount);
         }
         EventTimeline.prototype.getFrameCount = function () {
-            return frames.length;
+            return this.frames.length;
         };
         /** Sets the time of the specified keyframe. */
         EventTimeline.prototype.setFrame = function (frameIndex, event) {
@@ -402,7 +432,7 @@ var spine;
             if (firedEvents == null)
                 return;
             var frames = this.frames;
-            var frameCount = frames.length;
+            var frameCount = this.frames.length;
             if (lastTime > time) {
                 this.apply(skeleton, lastTime, Number.MAX_VALUE, firedEvents, alpha);
                 lastTime = -1;
@@ -431,11 +461,11 @@ var spine;
     spine.EventTimeline = EventTimeline;
     var DrawOrderTimeline = (function () {
         function DrawOrderTimeline(frameCount) {
-            this.frames = new Array(frameCount);
+            this.frames = spine.Utils.newFloatArray(frameCount);
             this.drawOrders = new Array(frameCount);
         }
         DrawOrderTimeline.prototype.getFrameCount = function () {
-            return frames.length;
+            return this.frames.length;
         };
         /** Sets the time of the specified keyframe.
          * @param drawOrder May be null to use bind pose draw order. */
@@ -469,7 +499,7 @@ var spine;
         __extends(DeformTimeline, _super);
         function DeformTimeline(frameCount) {
             _super.call(this, frameCount);
-            this.frames = new Array(frameCount);
+            this.frames = spine.Utils.newFloatArray(frameCount);
             this.frameVertices = new Array(frameCount);
         }
         /** Sets the time of the specified keyframe. */
@@ -527,7 +557,7 @@ var spine;
         __extends(IkConstraintTimeline, _super);
         function IkConstraintTimeline(frameCount) {
             _super.call(this, frameCount);
-            this.frames = new Array(frameCount * IkConstraintTimeline.ENTRIES);
+            this.frames = spine.Utils.newFloatArray(frameCount * IkConstraintTimeline.ENTRIES);
         }
         /** Sets the time, mix and bend direction of the specified keyframe. */
         IkConstraintTimeline.prototype.setFrame = function (frameIndex, time, mix, bendDirection) {
@@ -567,7 +597,7 @@ var spine;
         __extends(TransformConstraintTimeline, _super);
         function TransformConstraintTimeline(frameCount) {
             _super.call(this, frameCount);
-            this.frames = new Array(frameCount * TransformConstraintTimeline.ENTRIES);
+            this.frames = spine.Utils.newFloatArray(frameCount * TransformConstraintTimeline.ENTRIES);
         }
         /** Sets the time and mixes of the specified keyframe. */
         TransformConstraintTimeline.prototype.setFrame = function (frameIndex, time, rotateMix, translateMix, scaleMix, shearMix) {
@@ -622,7 +652,7 @@ var spine;
         __extends(PathConstraintPositionTimeline, _super);
         function PathConstraintPositionTimeline(frameCount) {
             _super.call(this, frameCount);
-            this.frames = new Array(frameCount * PathConstraintPositionTimeline.ENTRIES);
+            this.frames = spine.Utils.newFloatArray(frameCount * PathConstraintPositionTimeline.ENTRIES);
         }
         /** Sets the time and value of the specified keyframe. */
         PathConstraintPositionTimeline.prototype.setFrame = function (frameIndex, time, value) {
@@ -683,7 +713,7 @@ var spine;
         __extends(PathConstraintMixTimeline, _super);
         function PathConstraintMixTimeline(frameCount) {
             _super.call(this, frameCount);
-            this.frames = new Array(frameCount * PathConstraintMixTimeline.ENTRIES);
+            this.frames = spine.Utils.newFloatArray(frameCount * PathConstraintMixTimeline.ENTRIES);
         }
         /** Sets the time and mixes of the specified keyframe. */
         PathConstraintMixTimeline.prototype.setFrame = function (frameIndex, time, rotateMix, translateMix) {
@@ -723,449 +753,398 @@ var spine;
     }(CurveTimeline));
     spine.PathConstraintMixTimeline = PathConstraintMixTimeline;
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
-    var Attachment = (function () {
-        function Attachment(name) {
-            if (name == null)
-                throw new Error("name cannot be null.");
-            this.name = name;
+    var AnimationState = (function () {
+        function AnimationState(data) {
+            if (data === void 0) { data = null; }
+            this.tracks = new Array();
+            this.events = new Array();
+            this.listeners = new Array();
+            this.timeScale = 1;
+            if (data == null)
+                throw new Error("data cannot be null.");
+            this.data = data;
         }
-        return Attachment;
-    }());
-    spine.Attachment = Attachment;
-    var VertexAttachment = (function (_super) {
-        __extends(VertexAttachment, _super);
-        function VertexAttachment(name) {
-            _super.call(this, name);
-            this.worldVerticesLength = 0;
-        }
-        VertexAttachment.prototype.computeWorldVertices = function (slot, worldVertices) {
-            this.computeWorldVerticesWith(slot, 0, this.worldVerticesLength, worldVertices, 0);
-        };
-        /** Transforms local vertices to world coordinates.
-         * @param start The index of the first local vertex value to transform. Each vertex has 2 values, x and y.
-         * @param count The number of world vertex values to output. Must be <= {@link #getWorldVerticesLength()} - start.
-         * @param worldVertices The output world vertices. Must have a length >= offset + count.
-         * @param offset The worldVertices index to begin writing values. */
-        VertexAttachment.prototype.computeWorldVerticesWith = function (slot, start, count, worldVertices, offset) {
-            count += offset;
-            var skeleton = slot.bone.skeleton;
-            var x = skeleton.x, y = skeleton.y;
-            var deformArray = slot.attachmentVertices;
-            var vertices = this.vertices;
-            var bones = this.bones;
-            if (bones == null) {
-                if (deformArray.length > 0)
-                    vertices = deformArray;
-                var bone = slot.bone;
-                x += bone.worldX;
-                y += bone.worldY;
-                var a = bone.a, b_1 = bone.b, c = bone.c, d = bone.d;
-                for (var v = start, w = offset; w < count; v += 2, w += 2) {
-                    var vx = vertices[v], vy = vertices[v + 1];
-                    worldVertices[w] = vx * a + vy * b_1 + x;
-                    worldVertices[w + 1] = vx * c + vy * d + y;
+        AnimationState.prototype.update = function (delta) {
+            delta *= this.timeScale;
+            for (var i = 0; i < this.tracks.length; i++) {
+                var current = this.tracks[i];
+                if (current == null)
+                    continue;
+                var next = current.next;
+                if (next != null) {
+                    var nextTime = current.lastTime - next.delay;
+                    if (nextTime >= 0) {
+                        var nextDelta = delta * next.timeScale;
+                        next.time = nextTime + nextDelta; // For start event to see correct time.
+                        current.time += delta * current.timeScale; // For end event to see correct time.
+                        this.setCurrent(i, next);
+                        next.time -= nextDelta; // Prevent increasing time twice, below.
+                        current = next;
+                    }
                 }
+                else if (!current.loop && current.lastTime >= current.endTime) {
+                    // End non-looping animation when it reaches its end time and there is no next entry.
+                    this.clearTrack(i);
+                    continue;
+                }
+                current.time += delta * current.timeScale;
+                if (current.previous != null) {
+                    var previousDelta = delta * current.previous.timeScale;
+                    current.previous.time += previousDelta;
+                    current.mixTime += previousDelta;
+                }
+            }
+        };
+        AnimationState.prototype.apply = function (skeleton) {
+            var events = this.events;
+            var listenerCount = this.listeners.length;
+            for (var i = 0; i < this.tracks.length; i++) {
+                var current = this.tracks[i];
+                if (current == null)
+                    continue;
+                events.length = 0;
+                var time = current.time;
+                var lastTime = current.lastTime;
+                var endTime = current.endTime;
+                var loop = current.loop;
+                if (!loop && time > endTime)
+                    time = endTime;
+                var previous = current.previous;
+                if (previous == null)
+                    current.animation.mix(skeleton, lastTime, time, loop, events, current.mix);
+                else {
+                    var previousTime = previous.time;
+                    if (!previous.loop && previousTime > previous.endTime)
+                        previousTime = previous.endTime;
+                    previous.animation.apply(skeleton, previousTime, previousTime, previous.loop, null);
+                    var alpha = current.mixTime / current.mixDuration * current.mix;
+                    if (alpha >= 1) {
+                        alpha = 1;
+                        current.previous = null;
+                    }
+                    current.animation.mix(skeleton, lastTime, time, loop, events, alpha);
+                }
+                for (var ii = 0, nn = events.length; ii < nn; ii++) {
+                    var event_1 = events[ii];
+                    if (current.listener != null)
+                        current.listener.event(i, event_1);
+                    for (var iii = 0; iii < listenerCount; iii++)
+                        this.listeners[iii].event(i, event_1);
+                }
+                // Check if completed the animation or a loop iteration.
+                if (loop ? (lastTime % endTime > time % endTime) : (lastTime < endTime && time >= endTime)) {
+                    var count = spine.MathUtils.toInt(time / endTime);
+                    if (current.listener != null)
+                        current.listener.complete(i, count);
+                    for (var ii = 0, nn = this.listeners.length; ii < nn; ii++)
+                        this.listeners[ii].complete(i, count);
+                }
+                current.lastTime = current.time;
+            }
+        };
+        AnimationState.prototype.clearTracks = function () {
+            for (var i = 0, n = this.tracks.length; i < n; i++)
+                this.clearTrack(i);
+            this.tracks.length = 0;
+        };
+        AnimationState.prototype.clearTrack = function (trackIndex) {
+            if (trackIndex >= this.tracks.length)
                 return;
+            var current = this.tracks[trackIndex];
+            if (current == null)
+                return;
+            if (current.listener != null)
+                current.listener.end(trackIndex);
+            for (var i = 0, n = this.listeners.length; i < n; i++)
+                this.listeners[i].end(trackIndex);
+            this.tracks[trackIndex] = null;
+            this.freeAll(current);
+        };
+        AnimationState.prototype.freeAll = function (entry) {
+            while (entry != null) {
+                var next = entry.next;
+                entry = next;
             }
-            var v = 0, skip = 0;
-            for (var i = 0; i < start; i += 2) {
-                var n = bones[v];
-                v += n + 1;
-                skip += n;
-            }
-            var skeletonBones = skeleton.bones;
-            if (deformArray.length == 0) {
-                for (var w = offset, b = skip * 3; w < count; w += 2) {
-                    var wx = x, wy = y;
-                    var n = bones[v++];
-                    n += v;
-                    for (; v < n; v++, b += 3) {
-                        var bone = skeletonBones[bones[v]];
-                        var vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
-                        wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
-                        wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
+        };
+        AnimationState.prototype.expandToIndex = function (index) {
+            if (index < this.tracks.length)
+                return this.tracks[index];
+            spine.Utils.setArraySize(this.tracks, index - this.tracks.length + 1, null);
+            this.tracks.length = index + 1;
+            return null;
+        };
+        AnimationState.prototype.setCurrent = function (index, entry) {
+            var current = this.expandToIndex(index);
+            if (current != null) {
+                var previous = current.previous;
+                current.previous = null;
+                if (current.listener != null)
+                    current.listener.end(index);
+                for (var i = 0, n = this.listeners.length; i < n; i++)
+                    this.listeners[i].end(index);
+                entry.mixDuration = this.data.getMix(current.animation, entry.animation);
+                if (entry.mixDuration > 0) {
+                    entry.mixTime = 0;
+                    // If a mix is in progress, mix from the closest animation.
+                    if (previous != null && current.mixTime / current.mixDuration < 0.5) {
+                        entry.previous = previous;
+                        previous = current;
                     }
-                    worldVertices[w] = wx;
-                    worldVertices[w + 1] = wy;
+                    else
+                        entry.previous = current;
                 }
             }
-            else {
-                var deform = deformArray;
-                for (var w = offset, b = skip * 3, f = skip << 1; w < count; w += 2) {
-                    var wx = x, wy = y;
-                    var n = bones[v++];
-                    n += v;
-                    for (; v < n; v++, b += 3, f += 2) {
-                        var bone = skeletonBones[bones[v]];
-                        var vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
-                        wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
-                        wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
-                    }
-                    worldVertices[w] = wx;
-                    worldVertices[w + 1] = wy;
-                }
-            }
+            this.tracks[index] = entry;
+            if (entry.listener != null)
+                entry.listener.start(index);
+            for (var i = 0, n = this.listeners.length; i < n; i++)
+                this.listeners[i].start(index);
         };
-        /** Returns true if a deform originally applied to the specified attachment should be applied to this attachment. */
-        VertexAttachment.prototype.applyDeform = function (sourceAttachment) {
-            return this == sourceAttachment;
+        /** @see #setAnimation(int, Animation, boolean) */
+        AnimationState.prototype.setAnimation = function (trackIndex, animationName, loop) {
+            var animation = this.data.skeletonData.findAnimation(animationName);
+            if (animation == null)
+                throw new Error("Animation not found: " + animationName);
+            return this.setAnimationWith(trackIndex, animation, loop);
         };
-        return VertexAttachment;
-    }(Attachment));
-    spine.VertexAttachment = VertexAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    (function (AttachmentType) {
-        AttachmentType[AttachmentType["Region"] = 0] = "Region";
-        AttachmentType[AttachmentType["BoundingBox"] = 1] = "BoundingBox";
-        AttachmentType[AttachmentType["Mesh"] = 2] = "Mesh";
-        AttachmentType[AttachmentType["LinkedMesh"] = 3] = "LinkedMesh";
-        AttachmentType[AttachmentType["Path"] = 4] = "Path";
-    })(spine.AttachmentType || (spine.AttachmentType = {}));
-    var AttachmentType = spine.AttachmentType;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var BoundingBoxAttachment = (function (_super) {
-        __extends(BoundingBoxAttachment, _super);
-        function BoundingBoxAttachment(name) {
-            _super.call(this, name);
-        }
-        return BoundingBoxAttachment;
-    }(spine.VertexAttachment));
-    spine.BoundingBoxAttachment = BoundingBoxAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var MeshAttachment = (function (_super) {
-        __extends(MeshAttachment, _super);
-        function MeshAttachment(name) {
-            _super.call(this, name);
-            this.color = new spine.Color(1, 1, 1, 1);
-            this.inheritDeform = false;
-            this.tempColor = new spine.Color(0, 0, 0, 0);
-        }
-        MeshAttachment.prototype.updateUVs = function () {
-            var regionUVs = this.regionUVs;
-            var verticesLength = regionUVs.length;
-            var worldVerticesLength = (verticesLength >> 1) * 5;
-            if (this.worldVertices == null || this.worldVertices.length != worldVerticesLength) {
-                this.worldVertices = new Array(worldVerticesLength);
-            }
-            var u = 0, v = 0, width = 0, height = 0;
-            if (this.region == null) {
-                u = v = 0;
-                width = height = 1;
-            }
-            else {
-                u = this.region.u;
-                v = this.region.v;
-                width = this.region.u2 - u;
-                height = this.region.v2 - v;
-            }
-            if (this.region.rotate) {
-                for (var i = 0, w = 6; i < verticesLength; i += 2, w += 8) {
-                    this.worldVertices[w] = u + regionUVs[i + 1] * width;
-                    this.worldVertices[w + 1] = v + height - regionUVs[i] * height;
-                }
-            }
-            else {
-                for (var i = 0, w = 6; i < verticesLength; i += 2, w += 8) {
-                    this.worldVertices[w] = u + regionUVs[i] * width;
-                    this.worldVertices[w + 1] = v + regionUVs[i + 1] * height;
-                }
-            }
+        /** Set the current animation. Any queued animations are cleared. */
+        AnimationState.prototype.setAnimationWith = function (trackIndex, animation, loop) {
+            var current = this.expandToIndex(trackIndex);
+            if (current != null)
+                this.freeAll(current.next);
+            var entry = new TrackEntry();
+            entry.animation = animation;
+            entry.loop = loop;
+            entry.endTime = animation.duration;
+            this.setCurrent(trackIndex, entry);
+            return entry;
         };
-        /** @return The updated world vertices. */
-        MeshAttachment.prototype.updateWorldVertices = function (slot, premultipliedAlpha) {
-            var skeleton = slot.bone.skeleton;
-            var skeletonColor = skeleton.color, slotColor = slot.color, meshColor = this.color;
-            var alpha = skeletonColor.a * slotColor.a * meshColor.a;
-            var multiplier = premultipliedAlpha ? alpha : 1;
-            var color = this.tempColor;
-            color.set(skeletonColor.r * slotColor.r * meshColor.r * multiplier, skeletonColor.g * slotColor.g * meshColor.g * multiplier, skeletonColor.b * slotColor.b * meshColor.b * multiplier, alpha);
-            var x = skeleton.x, y = skeleton.y;
-            var deformArray = slot.attachmentVertices;
-            var vertices = this.vertices, worldVertices = this.worldVertices;
-            var bones = this.bones;
-            if (bones == null) {
-                var verticesLength = vertices.length;
-                if (deformArray.length > 0)
-                    vertices = deformArray;
-                var bone = slot.bone;
-                x += bone.worldX;
-                y += bone.worldY;
-                var a = bone.a, b_2 = bone.b, c = bone.c, d = bone.d;
-                for (var v = 0, w = 0; v < verticesLength; v += 2, w += 8) {
-                    var vx = vertices[v], vy = vertices[v + 1];
-                    worldVertices[w] = vx * a + vy * b_2 + x;
-                    worldVertices[w + 1] = vx * c + vy * d + y;
-                    worldVertices[w + 2] = color.r;
-                    worldVertices[w + 3] = color.g;
-                    worldVertices[w + 4] = color.b;
-                    worldVertices[w + 5] = color.a;
-                }
-                return worldVertices;
+        /** {@link #addAnimation(int, Animation, boolean, float)} */
+        AnimationState.prototype.addAnimation = function (trackIndex, animationName, loop, delay) {
+            var animation = this.data.skeletonData.findAnimation(animationName);
+            if (animation == null)
+                throw new Error("Animation not found: " + animationName);
+            return this.addAnimationWith(trackIndex, animation, loop, delay);
+        };
+        /** Adds an animation to be played delay seconds after the current or last queued animation.
+         * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay. */
+        AnimationState.prototype.addAnimationWith = function (trackIndex, animation, loop, delay) {
+            var entry = new TrackEntry();
+            entry.animation = animation;
+            entry.loop = loop;
+            entry.endTime = animation.duration;
+            var last = this.expandToIndex(trackIndex);
+            if (last != null) {
+                while (last.next != null)
+                    last = last.next;
+                last.next = entry;
             }
-            var skeletonBones = skeleton.bones;
-            if (deformArray.length == 0) {
-                for (var w = 0, v = 0, b = 0, n = bones.length; v < n; w += 8) {
-                    var wx = x, wy = y;
-                    var nn = bones[v++] + v;
-                    for (; v < nn; v++, b += 3) {
-                        var bone = skeletonBones[bones[v]];
-                        var vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
-                        wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
-                        wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
-                    }
-                    worldVertices[w] = wx;
-                    worldVertices[w + 1] = wy;
-                    worldVertices[w + 2] = color.r;
-                    worldVertices[w + 3] = color.g;
-                    worldVertices[w + 4] = color.b;
-                    worldVertices[w + 5] = color.a;
-                }
+            else
+                this.tracks[trackIndex] = entry;
+            if (delay <= 0) {
+                if (last != null)
+                    delay += last.endTime - this.data.getMix(last.animation, animation);
+                else
+                    delay = 0;
             }
-            else {
-                var deform = deformArray;
-                for (var w = 0, v = 0, b = 0, f = 0, n = bones.length; v < n; w += 8) {
-                    var wx = x, wy = y;
-                    var nn = bones[v++] + v;
-                    for (; v < nn; v++, b += 3, f += 2) {
-                        var bone = skeletonBones[bones[v]];
-                        var vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
-                        wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
-                        wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
-                    }
-                    worldVertices[w] = wx;
-                    worldVertices[w + 1] = wy;
-                    worldVertices[w + 2] = color.r;
-                    worldVertices[w + 3] = color.g;
-                    worldVertices[w + 4] = color.b;
-                    worldVertices[w + 5] = color.a;
-                }
-            }
-            return worldVertices;
+            entry.delay = delay;
+            return entry;
         };
-        MeshAttachment.prototype.applyDeform = function (sourceAttachment) {
-            return this == sourceAttachment || (this.inheritDeform && this._parentMesh == sourceAttachment);
+        /** @return May be null. */
+        AnimationState.prototype.getCurrent = function (trackIndex) {
+            if (trackIndex >= this.tracks.length)
+                return null;
+            return this.tracks[trackIndex];
         };
-        MeshAttachment.prototype.getParentMesh = function () {
-            return this._parentMesh;
+        /** Adds a listener to receive events for all animations. */
+        AnimationState.prototype.addListener = function (listener) {
+            if (listener == null)
+                throw new Error("listener cannot be null.");
+            this.listeners.push(listener);
         };
-        /** @param parentMesh May be null. */
-        MeshAttachment.prototype.setParentMesh = function (parentMesh) {
-            this._parentMesh = parentMesh;
-            if (parentMesh != null) {
-                this.bones = parentMesh.bones;
-                this.vertices = parentMesh.vertices;
-                this.regionUVs = parentMesh.regionUVs;
-                this.triangles = parentMesh.triangles;
-                this.hullLength = parentMesh.hullLength;
-            }
+        /** Removes the listener added with {@link #addListener(AnimationStateListener)}. */
+        AnimationState.prototype.removeListener = function (listener) {
+            var index = this.listeners.indexOf(listener);
+            if (index >= 0)
+                this.listeners.splice(index, 1);
         };
-        return MeshAttachment;
-    }(spine.VertexAttachment));
-    spine.MeshAttachment = MeshAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var PathAttachment = (function (_super) {
-        __extends(PathAttachment, _super);
-        function PathAttachment(name) {
-            _super.call(this, name);
-            this.closed = false;
-            this.constantSpeed = false;
-        }
-        return PathAttachment;
-    }(spine.VertexAttachment));
-    spine.PathAttachment = PathAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var RegionAttachment = (function (_super) {
-        __extends(RegionAttachment, _super);
-        function RegionAttachment(name) {
-            _super.call(this, name);
-            this.x = 0;
-            this.y = 0;
-            this.scaleX = 1;
-            this.scaleY = 1;
-            this.rotation = 0;
-            this.width = 0;
-            this.height = 0;
-            this.color = new spine.Color(1, 1, 1, 1);
-            this.offset = new Array(8);
-            this.vertices = new Array(8 * 4);
-            this.tempColor = new spine.Color(1, 1, 1, 1);
-        }
-        RegionAttachment.prototype.setRegion = function (region) {
-            var vertices = this.vertices;
-            if (region.rotate) {
-                vertices[RegionAttachment.U2] = region.u;
-                vertices[RegionAttachment.V2] = region.v2;
-                vertices[RegionAttachment.U3] = region.u;
-                vertices[RegionAttachment.V3] = region.v;
-                vertices[RegionAttachment.U4] = region.u2;
-                vertices[RegionAttachment.V4] = region.v;
-                vertices[RegionAttachment.U1] = region.u2;
-                vertices[RegionAttachment.V1] = region.v2;
-            }
-            else {
-                vertices[RegionAttachment.U1] = region.u;
-                vertices[RegionAttachment.V1] = region.v2;
-                vertices[RegionAttachment.U2] = region.u;
-                vertices[RegionAttachment.V2] = region.v;
-                vertices[RegionAttachment.U3] = region.u2;
-                vertices[RegionAttachment.V3] = region.v;
-                vertices[RegionAttachment.U4] = region.u2;
-                vertices[RegionAttachment.V4] = region.v2;
-            }
+        AnimationState.prototype.clearListeners = function () {
+            this.listeners.length = 0;
         };
-        RegionAttachment.prototype.updateOffset = function () {
-            var regionScaleX = this.width / this.region.originalWidth * this.scaleX;
-            var regionScaleY = this.height / this.region.originalHeight * this.scaleY;
-            var localX = -this.width / 2 * this.scaleX + this.region.offsetX * regionScaleX;
-            var localY = -this.height / 2 * this.scaleY + this.region.offsetY * regionScaleY;
-            var localX2 = localX + this.region.width * regionScaleX;
-            var localY2 = localY + this.region.height * regionScaleY;
-            var radians = this.rotation * Math.PI / 180;
-            var cos = Math.cos(radians);
-            var sin = Math.sin(radians);
-            var localXCos = localX * cos + this.x;
-            var localXSin = localX * sin;
-            var localYCos = localY * cos + this.y;
-            var localYSin = localY * sin;
-            var localX2Cos = localX2 * cos + this.x;
-            var localX2Sin = localX2 * sin;
-            var localY2Cos = localY2 * cos + this.y;
-            var localY2Sin = localY2 * sin;
-            var offset = this.offset;
-            offset[RegionAttachment.OX1] = localXCos - localYSin;
-            offset[RegionAttachment.OY1] = localYCos + localXSin;
-            offset[RegionAttachment.OX2] = localXCos - localY2Sin;
-            offset[RegionAttachment.OY2] = localY2Cos + localXSin;
-            offset[RegionAttachment.OX3] = localX2Cos - localY2Sin;
-            offset[RegionAttachment.OY3] = localY2Cos + localX2Sin;
-            offset[RegionAttachment.OX4] = localX2Cos - localYSin;
-            offset[RegionAttachment.OY4] = localYCos + localX2Sin;
-        };
-        RegionAttachment.prototype.updateWorldVertices = function (slot, premultipliedAlpha) {
-            var skeleton = slot.bone.skeleton;
-            var skeletonColor = skeleton.color;
-            var slotColor = slot.color;
-            var regionColor = this.color;
-            var alpha = skeletonColor.a * slotColor.a * regionColor.a;
-            var multiplier = premultipliedAlpha ? alpha : 1;
-            var color = this.tempColor;
-            color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier, skeletonColor.g * slotColor.g * regionColor.g * multiplier, skeletonColor.b * slotColor.b * regionColor.b * multiplier, alpha);
-            var vertices = this.vertices;
-            var offset = this.offset;
-            var bone = slot.bone;
-            var x = skeleton.x + bone.worldX, y = skeleton.y + bone.worldY;
-            var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
-            var offsetX = 0, offsetY = 0;
-            offsetX = offset[RegionAttachment.OX1];
-            offsetY = offset[RegionAttachment.OY1];
-            vertices[RegionAttachment.X1] = offsetX * a + offsetY * b + x; // br
-            vertices[RegionAttachment.Y1] = offsetX * c + offsetY * d + y;
-            vertices[RegionAttachment.C1R] = color.r;
-            vertices[RegionAttachment.C1G] = color.g;
-            vertices[RegionAttachment.C1B] = color.b;
-            vertices[RegionAttachment.C1A] = color.a;
-            offsetX = offset[RegionAttachment.OX2];
-            offsetY = offset[RegionAttachment.OY2];
-            vertices[RegionAttachment.X2] = offsetX * a + offsetY * b + x; // bl
-            vertices[RegionAttachment.Y2] = offsetX * c + offsetY * d + y;
-            vertices[RegionAttachment.C2R] = color.r;
-            vertices[RegionAttachment.C2G] = color.g;
-            vertices[RegionAttachment.C2B] = color.b;
-            vertices[RegionAttachment.C2A] = color.a;
-            offsetX = offset[RegionAttachment.OX3];
-            offsetY = offset[RegionAttachment.OY3];
-            vertices[RegionAttachment.X3] = offsetX * a + offsetY * b + x; // ul
-            vertices[RegionAttachment.Y3] = offsetX * c + offsetY * d + y;
-            vertices[RegionAttachment.C3R] = color.r;
-            vertices[RegionAttachment.C3G] = color.g;
-            vertices[RegionAttachment.C3B] = color.b;
-            vertices[RegionAttachment.C3A] = color.a;
-            offsetX = offset[RegionAttachment.OX4];
-            offsetY = offset[RegionAttachment.OY4];
-            vertices[RegionAttachment.X4] = offsetX * a + offsetY * b + x; // ur
-            vertices[RegionAttachment.Y4] = offsetX * c + offsetY * d + y;
-            vertices[RegionAttachment.C4R] = color.r;
-            vertices[RegionAttachment.C4G] = color.g;
-            vertices[RegionAttachment.C4B] = color.b;
-            vertices[RegionAttachment.C4A] = color.a;
-            return vertices;
-        };
-        RegionAttachment.OX1 = 0;
-        RegionAttachment.OY1 = 1;
-        RegionAttachment.OX2 = 2;
-        RegionAttachment.OY2 = 3;
-        RegionAttachment.OX3 = 4;
-        RegionAttachment.OY3 = 5;
-        RegionAttachment.OX4 = 6;
-        RegionAttachment.OY4 = 7;
-        RegionAttachment.X1 = 0;
-        RegionAttachment.Y1 = 1;
-        RegionAttachment.X2 = 8;
-        RegionAttachment.Y2 = 9;
-        RegionAttachment.X3 = 16;
-        RegionAttachment.Y3 = 17;
-        RegionAttachment.X4 = 24;
-        RegionAttachment.Y4 = 25;
-        RegionAttachment.U1 = 6;
-        RegionAttachment.V1 = 7;
-        RegionAttachment.U2 = 14;
-        RegionAttachment.V2 = 15;
-        RegionAttachment.U3 = 22;
-        RegionAttachment.V3 = 23;
-        RegionAttachment.U4 = 30;
-        RegionAttachment.V4 = 31;
-        RegionAttachment.C1R = 3;
-        RegionAttachment.C1G = 4;
-        RegionAttachment.C1B = 5;
-        RegionAttachment.C1A = 6;
-        RegionAttachment.C2R = 10;
-        RegionAttachment.C2G = 11;
-        RegionAttachment.C2B = 12;
-        RegionAttachment.C2A = 13;
-        RegionAttachment.C3R = 18;
-        RegionAttachment.C3G = 19;
-        RegionAttachment.C3B = 20;
-        RegionAttachment.C3A = 21;
-        RegionAttachment.C4R = 26;
-        RegionAttachment.C4G = 27;
-        RegionAttachment.C4B = 28;
-        RegionAttachment.C4A = 29;
-        return RegionAttachment;
-    }(spine.Attachment));
-    spine.RegionAttachment = RegionAttachment;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var TextureRegion = (function () {
-        function TextureRegion() {
-            this.u = 0;
-            this.v = 0;
-            this.u2 = 0;
-            this.v2 = 0;
-            this.width = 0;
-            this.height = 0;
-            this.rotate = false;
-            this.offsetX = 0;
-            this.offsetY = 0;
-            this.originalWidth = 0;
-            this.originalHeight = 0;
-        }
-        return TextureRegion;
+        return AnimationState;
     }());
-    spine.TextureRegion = TextureRegion;
+    spine.AnimationState = AnimationState;
+    var TrackEntry = (function () {
+        function TrackEntry() {
+            this.loop = false;
+            this.delay = 0;
+            this.time = 0;
+            this.lastTime = -1;
+            this.endTime = 0;
+            this.timeScale = 1;
+            this.mixTime = 0;
+            this.mixDuration = 0;
+            this.mix = 1;
+        }
+        TrackEntry.prototype.reset = function () {
+            this.next = null;
+            this.previous = null;
+            this.animation = null;
+            this.listener = null;
+            this.timeScale = 1;
+            this.lastTime = -1; // Trigger events on frame zero.
+            this.time = 0;
+        };
+        /** Returns true if the current time is greater than the end time, regardless of looping. */
+        TrackEntry.prototype.isComplete = function () {
+            return this.time >= this.endTime;
+        };
+        return TrackEntry;
+    }());
+    spine.TrackEntry = TrackEntry;
+    var AnimationStateAdapter = (function () {
+        function AnimationStateAdapter() {
+        }
+        AnimationStateAdapter.prototype.event = function (trackIndex, event) {
+        };
+        AnimationStateAdapter.prototype.complete = function (trackIndex, loopCount) {
+        };
+        AnimationStateAdapter.prototype.start = function (trackIndex) {
+        };
+        AnimationStateAdapter.prototype.end = function (trackIndex) {
+        };
+        return AnimationStateAdapter;
+    }());
+    spine.AnimationStateAdapter = AnimationStateAdapter;
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+var spine;
+(function (spine) {
+    var AnimationStateData = (function () {
+        function AnimationStateData(skeletonData) {
+            this.animationToMixTime = {};
+            this.defaultMix = 0;
+            if (skeletonData == null)
+                throw new Error("skeletonData cannot be null.");
+            this.skeletonData = skeletonData;
+        }
+        AnimationStateData.prototype.setMix = function (fromName, toName, duration) {
+            var from = this.skeletonData.findAnimation(fromName);
+            if (from == null)
+                throw new Error("Animation not found: " + fromName);
+            var to = this.skeletonData.findAnimation(toName);
+            if (to == null)
+                throw new Error("Animation not found: " + toName);
+            this.setMixWith(from, to, duration);
+        };
+        AnimationStateData.prototype.setMixWith = function (from, to, duration) {
+            if (from == null)
+                throw new Error("from cannot be null.");
+            if (to == null)
+                throw new Error("to cannot be null.");
+            var key = from.name + to.name;
+            this.animationToMixTime[key] = duration;
+        };
+        AnimationStateData.prototype.getMix = function (from, to) {
+            var key = from.name + to.name;
+            var value = this.animationToMixTime[key];
+            return value === undefined ? this.defaultMix : value;
+        };
+        return AnimationStateData;
+    }());
+    spine.AnimationStateData = AnimationStateData;
+})(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     (function (BlendMode) {
@@ -1176,6 +1155,36 @@ var spine;
     })(spine.BlendMode || (spine.BlendMode = {}));
     var BlendMode = spine.BlendMode;
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var Bone = (function () {
@@ -1436,10 +1445,40 @@ var spine;
     }());
     spine.Bone = Bone;
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var BoneData = (function () {
-        function BoneData() {
+        function BoneData(index, name, parent) {
             this.x = 0;
             this.y = 0;
             this.rotation = 0;
@@ -1449,8 +1488,6 @@ var spine;
             this.shearY = 0;
             this.inheritRotation = true;
             this.inheritScale = true;
-        }
-        BoneData.prototype.BoneData = function (index, name, parent) {
             if (index < 0)
                 throw new Error("index must be >= 0.");
             if (name == null)
@@ -1458,11 +1495,41 @@ var spine;
             this.index = index;
             this.name = name;
             this.parent = parent;
-        };
+        }
         return BoneData;
     }());
     spine.BoneData = BoneData;
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var Event = (function () {
@@ -1476,15 +1543,76 @@ var spine;
     }());
     spine.Event = Event;
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var EventData = (function () {
-        function EventData() {
+        function EventData(name) {
+            this.name = name;
         }
         return EventData;
     }());
     spine.EventData = EventData;
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var IkConstraint = (function () {
@@ -1512,16 +1640,16 @@ var spine;
             var bones = this.bones;
             switch (bones.length) {
                 case 1:
-                    this.applyShort(bones[0], target.worldX, target.worldY, this.mix);
+                    this.apply1(bones[0], target.worldX, target.worldY, this.mix);
                     break;
                 case 2:
-                    this.applyWith(bones[0], bones[1], target.worldX, target.worldY, this.bendDirection, this.mix);
+                    this.apply2(bones[0], bones[1], target.worldX, target.worldY, this.bendDirection, this.mix);
                     break;
             }
         };
         /** Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified in the world
          * coordinate system. */
-        IkConstraint.prototype.applyShort = function (bone, targetX, targetY, alpha) {
+        IkConstraint.prototype.apply1 = function (bone, targetX, targetY, alpha) {
             var pp = bone.parent;
             var id = 1 / (pp.a * pp.d - pp.b * pp.c);
             var x = targetX - pp.worldX, y = targetY - pp.worldY;
@@ -1538,7 +1666,7 @@ var spine;
         /** Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as possible. The
          * target is specified in the world coordinate system.
          * @param child A direct descendant of the parent bone. */
-        IkConstraint.prototype.applyWith = function (parent, child, targetX, targetY, bendDir, alpha) {
+        IkConstraint.prototype.apply2 = function (parent, child, targetX, targetY, bendDir, alpha) {
             if (alpha == 0) {
                 child.updateWorldTransform();
                 return;
@@ -1681,18 +1809,79 @@ var spine;
     }());
     spine.IkConstraint = IkConstraint;
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var IkConstraintData = (function () {
-        function IkConstraintData() {
+        function IkConstraintData(name) {
             this.bones = new Array();
             this.bendDirection = 1;
             this.mix = 1;
+            this.name = name;
         }
         return IkConstraintData;
     }());
     spine.IkConstraintData = IkConstraintData;
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var PathConstraint = (function () {
@@ -1713,9 +1902,8 @@ var spine;
                 throw new Error("skeleton cannot be null.");
             this.data = data;
             this.bones = new Array();
-            for (var i = 0, n = data.bones.length; i < n; i++) {
+            for (var i = 0, n = data.bones.length; i < n; i++)
                 this.bones.push(skeleton.findBone(data.bones[i].name));
-            }
             this.target = skeleton.findSlot(data.target.name);
             this.position = data.position;
             this.spacing = data.spacing;
@@ -2055,11 +2243,42 @@ var spine;
     }());
     spine.PathConstraint = PathConstraint;
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var PathConstraintData = (function () {
-        function PathConstraintData() {
+        function PathConstraintData(name) {
             this.bones = new Array();
+            this.name = name;
         }
         return PathConstraintData;
     }());
@@ -2082,6 +2301,36 @@ var spine;
     })(spine.RotateMode || (spine.RotateMode = {}));
     var RotateMode = spine.RotateMode;
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var Skeleton = (function () {
@@ -2098,7 +2347,7 @@ var spine;
             this.bones = new Array();
             for (var i = 0; i < data.bones.length; i++) {
                 var boneData = data.bones[i];
-                var bone;
+                var bone = void 0;
                 if (boneData.parent == null)
                     bone = new spine.Bone(boneData, this, null);
                 else {
@@ -2112,8 +2361,8 @@ var spine;
             this.drawOrder = new Array();
             for (var i = 0; i < data.slots.length; i++) {
                 var slotData = data.slots[i];
-                var bone_1 = this.bones[slotData.boneData.index];
-                var slot = new spine.Slot(slotData, bone_1);
+                var bone = this.bones[slotData.boneData.index];
+                var slot = new spine.Slot(slotData, bone);
                 this.slots.push(slot);
                 this.drawOrder.push(slot);
             }
@@ -2157,10 +2406,10 @@ var spine;
             }
             for (var i = 1, ii = 0; i < ikCount; i++) {
                 var ik = ikConstraints[i];
-                var level_1 = ik.level;
+                var level = ik.level;
                 for (ii = i - 1; ii >= 0; ii--) {
                     var other = ikConstraints[ii];
-                    if (other.level < level_1)
+                    if (other.level < level)
                         break;
                     ikConstraints[ii + 1] = other;
                 }
@@ -2252,7 +2501,7 @@ var spine;
         };
         Skeleton.prototype.sortReset = function (bones) {
             for (var i = 0, n = bones.length; i < n; i++) {
-                var bone = bones[6];
+                var bone = bones[i];
                 if (bone.sorted)
                     this.sortReset(bone.children);
                 bone.sorted = false;
@@ -2497,6 +2746,36 @@ var spine;
     }());
     spine.Skeleton = Skeleton;
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var SkeletonBounds = (function () {
@@ -2507,15 +2786,20 @@ var spine;
             this.maxY = 0;
             this.boundingBoxes = new Array();
             this.polygons = new Array();
+            this._polygonPool = new spine.Pool(function () {
+                return spine.Utils.newFloatArray(16);
+            });
         }
         SkeletonBounds.prototype.update = function (skeleton, updateAabb) {
             if (skeleton == null)
                 throw new Error("skeleton cannot be null.");
             var boundingBoxes = this.boundingBoxes;
             var polygons = this.polygons;
+            var polygonPool = this._polygonPool;
             var slots = skeleton.slots;
             var slotCount = slots.length;
             boundingBoxes.length = 0;
+            polygonPool.freeAll(polygons);
             polygons.length = 0;
             for (var i = 0; i < slotCount; i++) {
                 var slot = slots[i];
@@ -2523,9 +2807,12 @@ var spine;
                 if (attachment instanceof spine.BoundingBoxAttachment) {
                     var boundingBox = attachment;
                     boundingBoxes.push(boundingBox);
-                    var polygon = new Array();
+                    var polygon = polygonPool.obtain();
+                    if (polygon.length != boundingBox.worldVerticesLength) {
+                        polygon = spine.Utils.newFloatArray(boundingBox.worldVerticesLength);
+                    }
                     polygons.push(polygon);
-                    boundingBox.computeWorldVertices(slot, spine.Utils.setArraySize(polygon, boundingBox.worldVerticesLength));
+                    boundingBox.computeWorldVertices(slot, polygon);
                 }
             }
             if (updateAabb)
@@ -2645,7 +2932,7 @@ var spine;
         /** Returns the polygon for the specified bounding box, or null. */
         SkeletonBounds.prototype.getPolygon = function (boundingBox) {
             if (boundingBox == null)
-                throw new Error("boundingBox cannot be null.");            
+                throw new Error("boundingBox cannot be null.");
             var index = this.boundingBoxes.indexOf(boundingBox);
             return index == -1 ? null : this.polygons[index];
         };
@@ -2653,6 +2940,36 @@ var spine;
     }());
     spine.SkeletonBounds = SkeletonBounds;
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var SkeletonData = (function () {
@@ -2722,9 +3039,9 @@ var spine;
                 throw new Error("eventDataName cannot be null.");
             var events = this.events;
             for (var i = 0, n = events.length; i < n; i++) {
-                var event_1 = events[i];
-                if (event_1.name == eventDataName)
-                    return event_1;
+                var event_2 = events[i];
+                if (event_2.name == eventDataName)
+                    return event_2;
             }
             return null;
         };
@@ -2785,6 +3102,726 @@ var spine;
     }());
     spine.SkeletonData = SkeletonData;
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+var spine;
+(function (spine) {
+    var SkeletonJson = (function () {
+        function SkeletonJson(attachmentLoader) {
+            this.scale = 1;
+            this.linkedMeshes = new Array();
+            this.attachmentLoader = attachmentLoader;
+        }
+        SkeletonJson.prototype.readSkeletonData = function (json) {
+            var scale = this.scale;
+            var skeletonData = new spine.SkeletonData();
+            var root = JSON.parse(json);
+            // Skeleton
+            var skeletonMap = root.skeleton;
+            if (skeletonMap != null) {
+                skeletonData.hash = skeletonMap.hash;
+                skeletonData.version = skeletonMap.spine;
+                skeletonData.width = skeletonMap.width;
+                skeletonData.height = skeletonMap.height;
+                skeletonData.imagesPath = skeletonMap.images;
+            }
+            // Bones
+            if (root.bones) {
+                for (var i = 0; i < root.bones.length; i++) {
+                    var boneMap = root.bones[i];
+                    var parent_3 = null;
+                    var parentName = this.getValue(boneMap, "parent", null);
+                    if (parentName != null) {
+                        parent_3 = skeletonData.findBone(parentName);
+                        if (parent_3 == null)
+                            throw new Error("Parent bone not found: " + parentName);
+                    }
+                    var data = new spine.BoneData(skeletonData.bones.length, boneMap.name, parent_3);
+                    data.length = this.getValue(boneMap, "length", 0) * scale;
+                    data.x = this.getValue(boneMap, "x", 0) * scale;
+                    data.y = this.getValue(boneMap, "y", 0) * scale;
+                    data.rotation = this.getValue(boneMap, "rotation", 0);
+                    data.scaleX = this.getValue(boneMap, "scaleX", 1);
+                    data.scaleY = this.getValue(boneMap, "scaleY", 1);
+                    data.shearX = this.getValue(boneMap, "shearX", 0);
+                    data.shearY = this.getValue(boneMap, "shearY", 0);
+                    data.inheritRotation = this.getValue(boneMap, "inheritRotation", true);
+                    data.inheritScale = this.getValue(boneMap, "inheritScale", true);
+                    skeletonData.bones.push(data);
+                }
+            }
+            // Slots.
+            if (root.slots) {
+                for (var i = 0; i < root.slots.length; i++) {
+                    var slotMap = root.slots[i];
+                    var slotName = slotMap.name;
+                    var boneName = slotMap.bone;
+                    var boneData = skeletonData.findBone(boneName);
+                    if (boneData == null)
+                        throw new Error("Slot bone not found: " + boneName);
+                    var data = new spine.SlotData(skeletonData.slots.length, slotName, boneData);
+                    var color = slotMap.color ? slotMap.color : null;
+                    if (color != null)
+                        data.color.setFromString(color);
+                    data.attachmentName = this.getValue(slotMap, "attachment", null);
+                    data.blendMode = SkeletonJson.blendModeFromString(this.getValue(slotMap, "blend", "normal"));
+                    skeletonData.slots.push(data);
+                }
+            }
+            // IK constraints
+            if (root.ik) {
+                for (var i = 0; i < root.ik.length; i++) {
+                    var constraintMap = root.ik[i];
+                    var data = new spine.IkConstraintData(constraintMap.name);
+                    for (var j = 0; j < constraintMap.bones.length; j++) {
+                        var boneName = constraintMap.bones[j];
+                        var bone = skeletonData.findBone(boneName);
+                        if (bone == null)
+                            throw new Error("IK bone not found: " + boneName);
+                        data.bones.push(bone);
+                    }
+                    var targetName = constraintMap.target;
+                    data.target = skeletonData.findBone(targetName);
+                    if (data.target == null)
+                        throw new Error("IK target bone not found: " + targetName);
+                    data.bendDirection = this.getValue(constraintMap, "bendPositive", true) ? 1 : -1;
+                    data.mix = constraintMap.mix ? constraintMap.mix : 1;
+                    skeletonData.ikConstraints.push(data);
+                }
+            }
+            // Transform constraints.
+            if (root.transform) {
+                for (var i = 0; i < root.transform.length; i++) {
+                    var constraintMap = root.transform[i];
+                    var data = new spine.TransformConstraintData(constraintMap.name);
+                    for (var j = 0; j < constraintMap.bones.length; j++) {
+                        var boneName = constraintMap.bones[j];
+                        var bone = skeletonData.findBone(boneName);
+                        if (bone == null)
+                            throw new Error("Transform constraint bone not found: " + boneName);
+                        data.bones.push(bone);
+                    }
+                    var targetName = constraintMap.target;
+                    data.target = skeletonData.findBone(targetName);
+                    if (data.target == null)
+                        throw new Error("Transform constraint target bone not found: " + targetName);
+                    data.offsetRotation = this.getValue(constraintMap, "rotation", 0);
+                    data.offsetX = this.getValue(constraintMap, "x", 0) * scale;
+                    data.offsetY = this.getValue(constraintMap, "y", 0) * scale;
+                    data.offsetScaleX = this.getValue(constraintMap, "scaleX", 0);
+                    data.offsetScaleY = this.getValue(constraintMap, "scaleY", 0);
+                    data.offsetShearY = this.getValue(constraintMap, "shearY", 0);
+                    data.rotateMix = this.getValue(constraintMap, "rotateMix", 1);
+                    data.translateMix = this.getValue(constraintMap, "translateMix", 1);
+                    data.scaleMix = this.getValue(constraintMap, "scaleMix", 1);
+                    data.shearMix = this.getValue(constraintMap, "shearMix", 1);
+                    skeletonData.transformConstraints.push(data);
+                }
+            }
+            // Path constraints.
+            if (root.path) {
+                for (var i = 0; i < root.path.length; i++) {
+                    var constraintMap = root.path[i];
+                    var data = new spine.PathConstraintData(constraintMap.name);
+                    for (var j = 0; j < constraintMap.bones.length; j++) {
+                        var boneName = constraintMap.bones[j];
+                        var bone = skeletonData.findBone(boneName);
+                        if (bone == null)
+                            throw new Error("Transform constraint bone not found: " + boneName);
+                        data.bones.push(bone);
+                    }
+                    var targetName = constraintMap.target;
+                    data.target = skeletonData.findSlot(targetName);
+                    if (data.target == null)
+                        throw new Error("Path target slot not found: " + targetName);
+                    data.positionMode = SkeletonJson.positionModeFromString(this.getValue(constraintMap, "positionMode", "percent"));
+                    data.spacingMode = SkeletonJson.spacingModeFromString(this.getValue(constraintMap, "spacingMode", "length"));
+                    data.rotateMode = SkeletonJson.rotateModeFromString(this.getValue(constraintMap, "rotateMode", "tangent"));
+                    data.offsetRotation = this.getValue(constraintMap, "rotation", 0);
+                    data.position = this.getValue(constraintMap, "position", 0);
+                    if (data.positionMode == spine.PositionMode.Fixed)
+                        data.position *= scale;
+                    data.spacing = this.getValue(constraintMap, "spacing", 0);
+                    if (data.spacingMode == spine.SpacingMode.Length || data.spacingMode == spine.SpacingMode.Fixed)
+                        data.spacing *= scale;
+                    data.rotateMix = this.getValue(constraintMap, "rotateMix", 1);
+                    data.translateMix = this.getValue(constraintMap, "translateMix", 1);
+                    skeletonData.pathConstraints.push(data);
+                }
+            }
+            // Skins.
+            if (root.skins) {
+                for (var skinName in root.skins) {
+                    var skinMap = root.skins[skinName];
+                    var skin = new spine.Skin(skinName);
+                    for (var slotName in skinMap) {
+                        var slotIndex = skeletonData.findSlotIndex(slotName);
+                        if (slotIndex == -1)
+                            throw new Error("Slot not found: " + slotName);
+                        var slotMap = skinMap[slotName];
+                        for (var entryName in slotMap) {
+                            var attachment = this.readAttachment(slotMap[entryName], skin, slotIndex, entryName);
+                            if (attachment != null)
+                                skin.addAttachment(slotIndex, entryName, attachment);
+                        }
+                    }
+                    skeletonData.skins.push(skin);
+                    if (skin.name == "default")
+                        skeletonData.defaultSkin = skin;
+                }
+            }
+            // Linked meshes.
+            for (var i = 0, n = this.linkedMeshes.length; i < n; i++) {
+                var linkedMesh = this.linkedMeshes[i];
+                var skin = linkedMesh.skin == null ? skeletonData.defaultSkin : skeletonData.findSkin(linkedMesh.skin);
+                if (skin == null)
+                    throw new Error("Skin not found: " + linkedMesh.skin);
+                var parent_4 = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
+                if (parent_4 == null)
+                    throw new Error("Parent mesh not found: " + linkedMesh.parent);
+                linkedMesh.mesh.setParentMesh(parent_4);
+                linkedMesh.mesh.updateUVs();
+            }
+            this.linkedMeshes.length = 0;
+            // Events.
+            if (root.events) {
+                for (var eventName in root.events) {
+                    var eventMap = root.events[eventName];
+                    var data = new spine.EventData(eventName);
+                    data.intValue = this.getValue(eventMap, "int", 0);
+                    data.floatValue = this.getValue(eventMap, "float", 0);
+                    data.stringValue = this.getValue(eventMap, "string", null);
+                    skeletonData.events.push(data);
+                }
+            }
+            // Animations.
+            if (root.animations) {
+                for (var animationName in root.animations) {
+                    var animationMap = root.animations[animationName];
+                    this.readAnimation(animationMap, animationName, skeletonData);
+                }
+            }
+            return skeletonData;
+        };
+        SkeletonJson.prototype.readAttachment = function (map, skin, slotIndex, name) {
+            var scale = this.scale;
+            name = this.getValue(map, "name", name);
+            var type = this.getValue(map, "type", "region");
+            switch (type) {
+                case "region": {
+                    var path = this.getValue(map, "path", name);
+                    var region = this.attachmentLoader.newRegionAttachment(skin, name, path);
+                    if (region == null)
+                        return null;
+                    region.path = path;
+                    region.x = this.getValue(map, "x", 0) * scale;
+                    region.y = this.getValue(map, "y", 0) * scale;
+                    region.scaleX = this.getValue(map, "scaleX", 1);
+                    region.scaleY = this.getValue(map, "scaleY", 1);
+                    region.rotation = this.getValue(map, "rotation", 0);
+                    region.width = map.width * scale;
+                    region.height = map.height * scale;
+                    var color = this.getValue(map, "color", null);
+                    if (color != null)
+                        region.color.setFromString(color);
+                    region.updateOffset();
+                    return region;
+                }
+                case "boundingbox": {
+                    var box = this.attachmentLoader.newBoundingBoxAttachment(skin, name);
+                    if (box == null)
+                        return null;
+                    this.readVertices(map, box, map.vertexCount << 1);
+                    return box;
+                }
+                case "mesh":
+                case "linkedmesh": {
+                    var path = this.getValue(map, "path", name);
+                    var mesh = this.attachmentLoader.newMeshAttachment(skin, name, path);
+                    if (mesh == null)
+                        return null;
+                    mesh.path = path;
+                    var color = this.getValue(map, "color", null);
+                    if (color != null)
+                        mesh.color.setFromString(color);
+                    var parent_5 = this.getValue(map, "parent", null);
+                    if (parent_5 != null) {
+                        mesh.inheritDeform = this.getValue(map, "deform", true);
+                        this.linkedMeshes.push(new LinkedMesh(mesh, this.getValue(map, "skin", null), slotIndex, parent_5));
+                        return mesh;
+                    }
+                    var uvs = map.uvs;
+                    this.readVertices(map, mesh, uvs.length);
+                    mesh.triangles = map.triangles;
+                    mesh.regionUVs = uvs;
+                    mesh.updateUVs();
+                    mesh.hullLength = this.getValue(map, "hull", 0) * 2;
+                    return mesh;
+                }
+                case "path": {
+                    var path = this.attachmentLoader.newPathAttachment(skin, name);
+                    if (path == null)
+                        return null;
+                    path.closed = this.getValue(map, "closed", false);
+                    path.constantSpeed = this.getValue(map, "constantSpeed", true);
+                    var vertexCount = map.vertexCount;
+                    this.readVertices(map, path, vertexCount << 1);
+                    var lengths = spine.Utils.newArray(vertexCount / 3, 0);
+                    for (var i = 0; i < map.lengths.length; i++)
+                        lengths[i++] = map.lengths[i] * scale;
+                    path.lengths = lengths;
+                    return path;
+                }
+            }
+            return null;
+        };
+        SkeletonJson.prototype.readVertices = function (map, attachment, verticesLength) {
+            var scale = this.scale;
+            attachment.worldVerticesLength = verticesLength;
+            var vertices = map.vertices;
+            if (verticesLength == vertices.length) {
+                if (scale != 1) {
+                    for (var i = 0, n = vertices.length; i < n; i++)
+                        vertices[i] *= scale;
+                }
+                attachment.vertices = spine.Utils.toFloatArray(vertices);
+                return;
+            }
+            var weights = new Array();
+            var bones = new Array();
+            for (var i = 0, n = vertices.length; i < n;) {
+                var boneCount = vertices[i++];
+                bones.push(boneCount);
+                for (var nn = i + boneCount * 4; i < nn; i += 4) {
+                    bones.push(vertices[i]);
+                    weights.push(vertices[i + 1] * scale);
+                    weights.push(vertices[i + 2] * scale);
+                    weights.push(vertices[i + 3]);
+                }
+            }
+            attachment.bones = bones;
+            attachment.vertices = spine.Utils.toFloatArray(weights);
+        };
+        SkeletonJson.prototype.readAnimation = function (map, name, skeletonData) {
+            var scale = this.scale;
+            var timelines = new Array();
+            var duration = 0;
+            // Slot timelines.
+            if (map.slots) {
+                for (var slotName in map.slots) {
+                    var slotMap = map.slots[slotName];
+                    var slotIndex = skeletonData.findSlotIndex(slotName);
+                    if (slotIndex == -1)
+                        throw new Error("Slot not found: " + slotName);
+                    for (var timelineName in slotMap) {
+                        var timelineMap = slotMap[timelineName];
+                        if (timelineName == "color") {
+                            var timeline = new spine.ColorTimeline(timelineMap.length);
+                            timeline.slotIndex = slotIndex;
+                            var frameIndex = 0;
+                            for (var i = 0; i < timelineMap.length; i++) {
+                                var valueMap = timelineMap[i];
+                                var color = new spine.Color();
+                                color.setFromString(valueMap.color);
+                                timeline.setFrame(frameIndex, valueMap.time, color.r, color.g, color.b, color.a);
+                                this.readCurve(valueMap, timeline, frameIndex);
+                                frameIndex++;
+                            }
+                            timelines.push(timeline);
+                            duration = Math.max(duration, timeline.frames[(timeline.getFrameCount() - 1) * spine.ColorTimeline.ENTRIES]);
+                        }
+                        else if (timelineName = "attachment") {
+                            var timeline = new spine.AttachmentTimeline(timelineMap.length);
+                            timeline.slotIndex = slotIndex;
+                            var frameIndex = 0;
+                            for (var i = 0; i < timelineMap.length; i++) {
+                                var valueMap = timelineMap[i];
+                                timeline.setFrame(frameIndex++, valueMap.time, valueMap.name);
+                            }
+                            timelines.push(timeline);
+                            duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);
+                        }
+                        else
+                            throw new Error("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
+                    }
+                }
+            }
+            // Bone timelines.
+            if (map.bones) {
+                for (var boneName in map.bones) {
+                    var boneMap = map.bones[boneName];
+                    var boneIndex = skeletonData.findBoneIndex(boneName);
+                    if (boneIndex == -1)
+                        throw new Error("Bone not found: " + boneName);
+                    for (var timelineName in boneMap) {
+                        var timelineMap = boneMap[timelineName];
+                        if (timelineName === "rotate") {
+                            var timeline = new spine.RotateTimeline(timelineMap.length);
+                            timeline.boneIndex = boneIndex;
+                            var frameIndex = 0;
+                            for (var i = 0; i < timelineMap.length; i++) {
+                                var valueMap = timelineMap[i];
+                                timeline.setFrame(frameIndex, valueMap.time, valueMap.angle);
+                                this.readCurve(valueMap, timeline, frameIndex);
+                                frameIndex++;
+                            }
+                            timelines.push(timeline);
+                            duration = Math.max(duration, timeline.frames[(timeline.getFrameCount() - 1) * spine.RotateTimeline.ENTRIES]);
+                        }
+                        else if (timelineName === "translate" || timelineName === "scale" || timelineName === "shear") {
+                            var timeline = null;
+                            var timelineScale = 1;
+                            if (timelineName === "scale")
+                                timeline = new spine.ScaleTimeline(timelineMap.length);
+                            else if (timelineName === "shear")
+                                timeline = new spine.ShearTimeline(timelineMap.length);
+                            else {
+                                timeline = new spine.TranslateTimeline(timelineMap.length);
+                                timelineScale = scale;
+                            }
+                            timeline.boneIndex = boneIndex;
+                            var frameIndex = 0;
+                            for (var i = 0; i < timelineMap.length; i++) {
+                                var valueMap = timelineMap[i];
+                                var x = this.getValue(valueMap, "x", 0), y = this.getValue(valueMap, "y", 0);
+                                timeline.setFrame(frameIndex, valueMap.time, x * timelineScale, y * timelineScale);
+                                this.readCurve(valueMap, timeline, frameIndex);
+                                frameIndex++;
+                            }
+                            timelines.push(timeline);
+                            duration = Math.max(duration, timeline.frames[(timeline.getFrameCount() - 1) * spine.TranslateTimeline.ENTRIES]);
+                        }
+                        else
+                            throw new Error("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
+                    }
+                }
+            }
+            // IK constraint timelines.
+            if (map.ik) {
+                for (var constraintName in map.ik) {
+                    var constraintMap = map.ik[constraintName];
+                    var constraint = skeletonData.findIkConstraint(constraintName);
+                    var timeline = new spine.IkConstraintTimeline(constraintMap.length);
+                    timeline.ikConstraintIndex = skeletonData.ikConstraints.indexOf(constraint);
+                    var frameIndex = 0;
+                    for (var i = 0; i < constraintMap.length; i++) {
+                        var valueMap = constraintMap[i];
+                        timeline.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, "mix", 1), this.getValue(valueMap, "bendPositive", true) ? 1 : -1);
+                        this.readCurve(valueMap, timeline, frameIndex);
+                        frameIndex++;
+                    }
+                    timelines.push(timeline);
+                    duration = Math.max(duration, timeline.frames[(timeline.getFrameCount() - 1) * spine.IkConstraintTimeline.ENTRIES]);
+                }
+            }
+            // Transform constraint timelines.
+            if (map.transform) {
+                for (var constraintName in map.transform) {
+                    var constraintMap = map.transform[constraintName];
+                    var constraint = skeletonData.findTransformConstraint(constraintName);
+                    var timeline = new spine.TransformConstraintTimeline(constraintMap.length);
+                    timeline.transformConstraintIndex = skeletonData.transformConstraints.indexOf(constraint);
+                    var frameIndex = 0;
+                    for (var i = 0; i < constraintMap.length; i++) {
+                        var valueMap = constraintMap[i];
+                        timeline.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, "rotateMix", 1), this.getValue(valueMap, "translateMix", 1), this.getValue(valueMap, "scaleMix", 1), this.getValue(valueMap, "shearMix", 1));
+                        this.readCurve(valueMap, timeline, frameIndex);
+                        frameIndex++;
+                    }
+                    timelines.push(timeline);
+                    duration = Math.max(duration, timeline.frames[(timeline.getFrameCount() - 1) * spine.TransformConstraintTimeline.ENTRIES]);
+                }
+            }
+            // Path constraint timelines.
+            if (map.paths) {
+                for (var constraintName in map.paths) {
+                    var constraintMap = map.paths[constraintName];
+                    var index = skeletonData.findPathConstraintIndex(constraintName);
+                    if (index == -1)
+                        throw new Error("Path constraint not found: " + constraintName);
+                    var data = skeletonData.pathConstraints[index];
+                    for (var timelineName in constraintMap) {
+                        var timelineMap = constraintMap[timelineName];
+                        if (timelineName === "position" || timelineName === "spacing") {
+                            var timeline = null;
+                            var timelineScale = 1;
+                            if (timelineName === "spacing") {
+                                timeline = new spine.PathConstraintSpacingTimeline(timelineMap.length);
+                                if (data.spacingMode == spine.SpacingMode.Length || data.spacingMode == spine.SpacingMode.Fixed)
+                                    timelineScale = scale;
+                            }
+                            else {
+                                timeline = new spine.PathConstraintPositionTimeline(timelineMap.length);
+                                if (data.positionMode == spine.PositionMode.Fixed)
+                                    timelineScale = scale;
+                            }
+                            timeline.pathConstraintIndex = index;
+                            var frameIndex = 0;
+                            for (var i = 0; i < timelineMap.length; i++) {
+                                var valueMap = timelineMap[i];
+                                timeline.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, timelineName, 0) * timelineScale);
+                                this.readCurve(valueMap, timeline, frameIndex);
+                                frameIndex++;
+                            }
+                            timelines.push(timeline);
+                            duration = Math.max(duration, timeline.frames[(timeline.getFrameCount() - 1) * spine.PathConstraintPositionTimeline.ENTRIES]);
+                        }
+                        else if (timelineName === "mix") {
+                            var timeline = new spine.PathConstraintMixTimeline(timelineMap.length);
+                            timeline.pathConstraintIndex = index;
+                            var frameIndex = 0;
+                            for (var i = 0; i < timelineMap.length; i++) {
+                                var valueMap = timelineMap[i];
+                                timeline.setFrame(frameIndex, valueMap.time, this.getValue(valueMap, "rotateMix", 1), this.getValue(valueMap, "translateMix", 1));
+                                this.readCurve(valueMap, timeline, frameIndex);
+                                frameIndex++;
+                            }
+                            timelines.push(timeline);
+                            duration = Math.max(duration, timeline.frames[(timeline.getFrameCount() - 1) * spine.PathConstraintMixTimeline.ENTRIES]);
+                        }
+                    }
+                }
+            }
+            // Deform timelines.
+            if (map.deform) {
+                for (var deformName in map.deform) {
+                    var deformMap = map.deform[deformName];
+                    var skin = skeletonData.findSkin(deformName);
+                    if (skin == null)
+                        throw new Error("Skin not found: " + deformName);
+                    for (var slotName in deformMap) {
+                        var slotMap = deformMap[slotName];
+                        var slotIndex = skeletonData.findSlotIndex(slotName);
+                        if (slotIndex == -1)
+                            throw new Error("Slot not found: " + slotMap.name);
+                        for (var timelineName in slotMap) {
+                            var timelineMap = slotMap[timelineName];
+                            var attachment = skin.getAttachment(slotIndex, timelineName);
+                            if (attachment == null)
+                                throw new Error("Deform attachment not found: " + timelineMap.name);
+                            var weighted = attachment.bones != null;
+                            var vertices = attachment.vertices;
+                            var deformLength = weighted ? vertices.length / 3 * 2 : vertices.length;
+                            var timeline = new spine.DeformTimeline(timelineMap.length);
+                            timeline.slotIndex = slotIndex;
+                            timeline.attachment = attachment;
+                            var frameIndex = 0;
+                            for (var j = 0; j < timelineMap.length; j++) {
+                                var valueMap = timelineMap[j];
+                                var deform = void 0;
+                                var verticesValue = this.getValue(valueMap, "vertices", null);
+                                if (verticesValue == null)
+                                    deform = weighted ? spine.Utils.newFloatArray(deformLength) : vertices;
+                                else {
+                                    deform = spine.Utils.newFloatArray(deformLength);
+                                    var start = this.getValue(valueMap, "offset", 0);
+                                    spine.Utils.arrayCopy(verticesValue, 0, deform, start, verticesValue.length);
+                                    if (scale != 1) {
+                                        for (var i = start, n = i + verticesValue.length; i < n; i++)
+                                            deform[i] *= scale;
+                                    }
+                                    if (!weighted) {
+                                        for (var i = 0; i < deformLength; i++)
+                                            deform[i] += vertices[i];
+                                    }
+                                }
+                                timeline.setFrame(frameIndex, valueMap.time, deform);
+                                this.readCurve(valueMap, timeline, frameIndex);
+                                frameIndex++;
+                            }
+                            timelines.push(timeline);
+                            duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);
+                        }
+                    }
+                }
+            }
+            // Draw order timeline.
+            var drawOrderNode = map.drawOrder;
+            if (drawOrderNode == null)
+                drawOrderNode = map.draworder;
+            if (drawOrderNode != null) {
+                var timeline = new spine.DrawOrderTimeline(drawOrderNode.length);
+                var slotCount = skeletonData.slots.length;
+                var frameIndex = 0;
+                for (var j = 0; j < drawOrderNode.length; j++) {
+                    var drawOrderMap = drawOrderNode[j];
+                    var drawOrder = null;
+                    var offsets = this.getValue(drawOrderMap, "offsets", null);
+                    if (offsets != null) {
+                        drawOrder = spine.Utils.newArray(slotCount, -1);
+                        var unchanged = spine.Utils.newArray(slotCount - offsets.length, 0);
+                        var originalIndex = 0, unchangedIndex = 0;
+                        for (var i = 0; i < offsets.length; i++) {
+                            var offsetMap = offsets[i];
+                            var slotIndex = skeletonData.findSlotIndex(offsetMap.slot);
+                            if (slotIndex == -1)
+                                throw new Error("Slot not found: " + offsetMap.slot);
+                            // Collect unchanged items.
+                            while (originalIndex != slotIndex)
+                                unchanged[unchangedIndex++] = originalIndex++;
+                            // Set changed items.
+                            drawOrder[originalIndex + offsetMap.offset] = originalIndex++;
+                        }
+                        // Collect remaining unchanged items.
+                        while (originalIndex < slotCount)
+                            unchanged[unchangedIndex++] = originalIndex++;
+                        // Fill in unchanged items.
+                        for (var i = slotCount - 1; i >= 0; i--)
+                            if (drawOrder[i] == -1)
+                                drawOrder[i] = unchanged[--unchangedIndex];
+                    }
+                    timeline.setFrame(frameIndex++, drawOrderMap.time, drawOrder);
+                }
+                timelines.push(timeline);
+                duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);
+            }
+            // Event timeline.
+            if (map.events) {
+                var timeline = new spine.EventTimeline(map.events.length);
+                var frameIndex = 0;
+                for (var i = 0; i < map.events.length; i++) {
+                    var eventMap = map.events[i];
+                    var eventData = skeletonData.findEvent(eventMap.name);
+                    if (eventData == null)
+                        throw new Error("Event not found: " + eventMap.name);
+                    var event_3 = new spine.Event(eventMap.time, eventData);
+                    event_3.intValue = this.getValue(eventMap, "int", eventData.intValue);
+                    event_3.floatValue = this.getValue(eventMap, "float", eventData.floatValue);
+                    event_3.stringValue = this.getValue(eventMap, "string", eventData.stringValue);
+                    timeline.setFrame(frameIndex++, event_3);
+                }
+                timelines.push(timeline);
+                duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);
+            }
+            if (isNaN(duration)) {
+                throw new Error("Error while parsing animation, duration is NaN");
+            }
+            skeletonData.animations.push(new spine.Animation(name, timelines, duration));
+        };
+        SkeletonJson.prototype.readCurve = function (map, timeline, frameIndex) {
+            if (!map.curve)
+                return;
+            if (map.curve === "stepped")
+                timeline.setStepped(frameIndex);
+            else if (Object.prototype.toString.call(map.curve) === '[object Array]') {
+                var curve = map.curve;
+                timeline.setCurve(frameIndex, curve[0], curve[1], curve[2], curve[3]);
+            }
+        };
+        SkeletonJson.prototype.getValue = function (map, prop, defaultValue) {
+            return map[prop] !== undefined ? map[prop] : defaultValue;
+        };
+        SkeletonJson.blendModeFromString = function (str) {
+            str = str.toLowerCase();
+            if (str == "normal")
+                return spine.BlendMode.Normal;
+            if (str == "additive")
+                return spine.BlendMode.Additive;
+            if (str == "multiply")
+                return spine.BlendMode.Multiply;
+            if (str == "screen")
+                return spine.BlendMode.Screen;
+            throw new Error("Unknown blend mode: " + str);
+        };
+        SkeletonJson.positionModeFromString = function (str) {
+            str = str.toLowerCase();
+            if (str == "fixed")
+                return spine.PositionMode.Fixed;
+            if (str == "percent")
+                return spine.PositionMode.Percent;
+            throw new Error("Unknown position mode: " + str);
+        };
+        SkeletonJson.spacingModeFromString = function (str) {
+            str = str.toLowerCase();
+            if (str == "length")
+                return spine.SpacingMode.Length;
+            if (str == "fixed")
+                return spine.SpacingMode.Fixed;
+            if (str == "percent")
+                return spine.SpacingMode.Percent;
+            throw new Error("Unknown position mode: " + str);
+        };
+        SkeletonJson.rotateModeFromString = function (str) {
+            str = str.toLowerCase();
+            if (str == "tangent")
+                return spine.RotateMode.Tangent;
+            if (str == "chain")
+                return spine.RotateMode.Chain;
+            if (str == "chainscale")
+                return spine.RotateMode.ChainScale;
+            throw new Error("Unknown rotate mode: " + str);
+        };
+        return SkeletonJson;
+    }());
+    spine.SkeletonJson = SkeletonJson;
+    var LinkedMesh = (function () {
+        function LinkedMesh(mesh, skin, slotIndex, parent) {
+            this.mesh = mesh;
+            this.skin = skin;
+            this.slotIndex = slotIndex;
+            this.parent = parent;
+        }
+        return LinkedMesh;
+    }());
+})(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var Skin = (function () {
@@ -2806,8 +3843,6 @@ var spine;
         };
         /** @return May be null. */
         Skin.prototype.getAttachment = function (slotIndex, name) {
-            if (slotIndex >= this.attachments.length)
-                return null;
             var dictionary = this.attachments[slotIndex];
             return dictionary ? dictionary[name] : null;
         };
@@ -2836,6 +3871,36 @@ var spine;
     }());
     spine.Skin = Skin;
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var Slot = (function () {
@@ -2883,6 +3948,36 @@ var spine;
     }());
     spine.Slot = Slot;
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var SlotData = (function () {
@@ -2902,6 +3997,36 @@ var spine;
     }());
     spine.SlotData = SlotData;
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var TransformConstraint = (function () {
@@ -2976,9 +4101,9 @@ var spine;
                     else if (r < -spine.MathUtils.PI)
                         r += spine.MathUtils.PI2;
                     r = by + (r + this.data.offsetShearY * spine.MathUtils.degRad) * shearMix;
-                    var s_1 = Math.sqrt(b * b + d * d);
-                    bone.b = Math.cos(r) * s_1;
-                    bone.d = Math.sin(r) * s_1;
+                    var s = Math.sqrt(b * b + d * d);
+                    bone.b = Math.cos(r) * s;
+                    bone.d = Math.sin(r) * s;
                 }
             }
         };
@@ -2986,6 +4111,36 @@ var spine;
     }());
     spine.TransformConstraint = TransformConstraint;
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var TransformConstraintData = (function () {
@@ -3009,6 +4164,66 @@ var spine;
     }());
     spine.TransformConstraintData = TransformConstraintData;
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var Color = (function () {
@@ -3034,6 +4249,13 @@ var spine;
             this.g = c.g;
             this.b = c.b;
             this.a = c.a;
+        };
+        Color.prototype.setFromString = function (hex) {
+            hex = hex.charAt(0) == '#' ? hex.substr(1) : hex;
+            this.r = parseInt(hex.substr(0, 2), 16) / 255.0;
+            this.g = parseInt(hex.substr(2, 2), 16) / 255.0;
+            this.b = parseInt(hex.substr(4, 2), 16) / 255.0;
+            this.a = (hex.length != 8 ? 255 : parseInt(hex.substr(6, 2), 16)) / 255.0;
         };
         Color.prototype.add = function (r, g, b, a) {
             this.r += r;
@@ -3083,6 +4305,9 @@ var spine;
         MathUtils.signum = function (value) {
             return value >= 0 ? 1 : -1;
         };
+        MathUtils.toInt = function (x) {
+            return x > 0 ? Math.floor(x) : Math.ceil(x);
+        };
         MathUtils.PI = 3.1415927;
         MathUtils.PI2 = MathUtils.PI * 2;
         MathUtils.radiansToDegrees = 180 / MathUtils.PI;
@@ -3100,20 +4325,63 @@ var spine;
                 dest[j] = source[i];
             }
         };
-        Utils.setArraySize = function (array, size) {
+        Utils.setArraySize = function (array, size, value) {
+            if (value === void 0) { value = 0; }
             var oldSize = array.length;
             if (oldSize == size)
-                return;
+                return array;
             array.length = size;
             if (oldSize < size) {
                 for (var i = oldSize; i < size; i++)
-                    array[i] = 0;
+                    array[i] = value;
             }
             return array;
         };
+        Utils.newArray = function (size, defaultValue) {
+            var array = new Array(size);
+            for (var i = 0; i < size; i++)
+                array[i] = defaultValue;
+            return array;
+        };
+        Utils.newFloatArray = function (size) {
+            if (Utils.SUPPORTS_TYPED_ARRAYS) {
+                return new Float32Array(size);
+            }
+            else {
+                var array = new Array(size);
+                for (var i = 0; i < array.length; i++)
+                    array[i] = 0;
+                return array;
+            }
+        };
+        Utils.toFloatArray = function (array) {
+            return Utils.SUPPORTS_TYPED_ARRAYS ? new Float32Array(array) : array;
+        };
+        Utils.SUPPORTS_TYPED_ARRAYS = typeof (Float32Array) !== "undefined";
         return Utils;
     }());
     spine.Utils = Utils;
+    var Pool = (function () {
+        function Pool(instantiator) {
+            this._items = new Array(16);
+            this._instantiator = instantiator;
+        }
+        Pool.prototype.obtain = function () {
+            return this._items.length > 0 ? this._items.pop() : this._instantiator();
+        };
+        Pool.prototype.free = function (item) {
+            this._items.push(item);
+        };
+        Pool.prototype.freeAll = function (items) {
+            for (var i = 0; i < items.length; i++)
+                this._items[i] = items[i];
+        };
+        Pool.prototype.clear = function () {
+            this._items.length = 0;
+        };
+        return Pool;
+    }());
+    spine.Pool = Pool;
     var Vector2 = (function () {
         function Vector2(x, y) {
             if (x === void 0) { x = 0; }
@@ -3130,19 +4398,734 @@ var spine;
     }());
     spine.Vector2 = Vector2;
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+var spine;
+(function (spine) {
+    var Attachment = (function () {
+        function Attachment(name) {
+            if (name == null)
+                throw new Error("name cannot be null.");
+            this.name = name;
+        }
+        return Attachment;
+    }());
+    spine.Attachment = Attachment;
+    var VertexAttachment = (function (_super) {
+        __extends(VertexAttachment, _super);
+        function VertexAttachment(name) {
+            _super.call(this, name);
+            this.worldVerticesLength = 0;
+        }
+        VertexAttachment.prototype.computeWorldVertices = function (slot, worldVertices) {
+            this.computeWorldVerticesWith(slot, 0, this.worldVerticesLength, worldVertices, 0);
+        };
+        /** Transforms local vertices to world coordinates.
+         * @param start The index of the first local vertex value to transform. Each vertex has 2 values, x and y.
+         * @param count The number of world vertex values to output. Must be <= {@link #getWorldVerticesLength()} - start.
+         * @param worldVertices The output world vertices. Must have a length >= offset + count.
+         * @param offset The worldVertices index to begin writing values. */
+        VertexAttachment.prototype.computeWorldVerticesWith = function (slot, start, count, worldVertices, offset) {
+            count += offset;
+            var skeleton = slot.bone.skeleton;
+            var x = skeleton.x, y = skeleton.y;
+            var deformArray = slot.attachmentVertices;
+            var vertices = this.vertices;
+            var bones = this.bones;
+            if (bones == null) {
+                if (deformArray.length > 0)
+                    vertices = deformArray;
+                var bone = slot.bone;
+                x += bone.worldX;
+                y += bone.worldY;
+                var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
+                for (var v_1 = start, w = offset; w < count; v_1 += 2, w += 2) {
+                    var vx = vertices[v_1], vy = vertices[v_1 + 1];
+                    worldVertices[w] = vx * a + vy * b + x;
+                    worldVertices[w + 1] = vx * c + vy * d + y;
+                }
+                return;
+            }
+            var v = 0, skip = 0;
+            for (var i = 0; i < start; i += 2) {
+                var n = bones[v];
+                v += n + 1;
+                skip += n;
+            }
+            var skeletonBones = skeleton.bones;
+            if (deformArray.length == 0) {
+                for (var w = offset, b = skip * 3; w < count; w += 2) {
+                    var wx = x, wy = y;
+                    var n = bones[v++];
+                    n += v;
+                    for (; v < n; v++, b += 3) {
+                        var bone = skeletonBones[bones[v]];
+                        var vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
+                        wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
+                        wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
+                    }
+                    worldVertices[w] = wx;
+                    worldVertices[w + 1] = wy;
+                }
+            }
+            else {
+                var deform = deformArray;
+                for (var w = offset, b = skip * 3, f = skip << 1; w < count; w += 2) {
+                    var wx = x, wy = y;
+                    var n = bones[v++];
+                    n += v;
+                    for (; v < n; v++, b += 3, f += 2) {
+                        var bone = skeletonBones[bones[v]];
+                        var vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
+                        wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
+                        wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
+                    }
+                    worldVertices[w] = wx;
+                    worldVertices[w + 1] = wy;
+                }
+            }
+        };
+        /** Returns true if a deform originally applied to the specified attachment should be applied to this attachment. */
+        VertexAttachment.prototype.applyDeform = function (sourceAttachment) {
+            return this == sourceAttachment;
+        };
+        return VertexAttachment;
+    }(Attachment));
+    spine.VertexAttachment = VertexAttachment;
+})(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+var spine;
+(function (spine) {
+    (function (AttachmentType) {
+        AttachmentType[AttachmentType["Region"] = 0] = "Region";
+        AttachmentType[AttachmentType["BoundingBox"] = 1] = "BoundingBox";
+        AttachmentType[AttachmentType["Mesh"] = 2] = "Mesh";
+        AttachmentType[AttachmentType["LinkedMesh"] = 3] = "LinkedMesh";
+        AttachmentType[AttachmentType["Path"] = 4] = "Path";
+    })(spine.AttachmentType || (spine.AttachmentType = {}));
+    var AttachmentType = spine.AttachmentType;
+})(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+var spine;
+(function (spine) {
+    var BoundingBoxAttachment = (function (_super) {
+        __extends(BoundingBoxAttachment, _super);
+        function BoundingBoxAttachment(name) {
+            _super.call(this, name);
+        }
+        return BoundingBoxAttachment;
+    }(spine.VertexAttachment));
+    spine.BoundingBoxAttachment = BoundingBoxAttachment;
+})(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+var spine;
+(function (spine) {
+    var MeshAttachment = (function (_super) {
+        __extends(MeshAttachment, _super);
+        function MeshAttachment(name) {
+            _super.call(this, name);
+            this.color = new spine.Color(1, 1, 1, 1);
+            this.inheritDeform = false;
+            this.tempColor = new spine.Color(0, 0, 0, 0);
+        }
+        MeshAttachment.prototype.updateUVs = function () {
+            var regionUVs = this.regionUVs;
+            var verticesLength = regionUVs.length;
+            var worldVerticesLength = (verticesLength >> 1) * 8;
+            if (this.worldVertices == null || this.worldVertices.length != worldVerticesLength)
+                this.worldVertices = spine.Utils.newFloatArray(worldVerticesLength);
+            var u = 0, v = 0, width = 0, height = 0;
+            if (this.region == null) {
+                u = v = 0;
+                width = height = 1;
+            }
+            else {
+                u = this.region.u;
+                v = this.region.v;
+                width = this.region.u2 - u;
+                height = this.region.v2 - v;
+            }
+            if (this.region.rotate) {
+                for (var i = 0, w = 6; i < verticesLength; i += 2, w += 8) {
+                    this.worldVertices[w] = u + regionUVs[i + 1] * width;
+                    this.worldVertices[w + 1] = v + height - regionUVs[i] * height;
+                }
+            }
+            else {
+                for (var i = 0, w = 6; i < verticesLength; i += 2, w += 8) {
+                    this.worldVertices[w] = u + regionUVs[i] * width;
+                    this.worldVertices[w + 1] = v + regionUVs[i + 1] * height;
+                }
+            }
+        };
+        /** @return The updated world vertices. */
+        MeshAttachment.prototype.updateWorldVertices = function (slot, premultipliedAlpha) {
+            var skeleton = slot.bone.skeleton;
+            var skeletonColor = skeleton.color, slotColor = slot.color, meshColor = this.color;
+            var alpha = skeletonColor.a * slotColor.a * meshColor.a;
+            var multiplier = premultipliedAlpha ? alpha : 1;
+            var color = this.tempColor;
+            color.set(skeletonColor.r * slotColor.r * meshColor.r * multiplier, skeletonColor.g * slotColor.g * meshColor.g * multiplier, skeletonColor.b * slotColor.b * meshColor.b * multiplier, alpha);
+            var x = skeleton.x, y = skeleton.y;
+            var deformArray = slot.attachmentVertices;
+            var vertices = this.vertices, worldVertices = this.worldVertices;
+            var bones = this.bones;
+            if (bones == null) {
+                var verticesLength = vertices.length;
+                if (deformArray.length > 0)
+                    vertices = deformArray;
+                var bone = slot.bone;
+                x += bone.worldX;
+                y += bone.worldY;
+                var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
+                for (var v = 0, w = 0; v < verticesLength; v += 2, w += 8) {
+                    var vx = vertices[v], vy = vertices[v + 1];
+                    worldVertices[w] = vx * a + vy * b + x;
+                    worldVertices[w + 1] = vx * c + vy * d + y;
+                    worldVertices[w + 2] = color.r;
+                    worldVertices[w + 3] = color.g;
+                    worldVertices[w + 4] = color.b;
+                    worldVertices[w + 5] = color.a;
+                }
+                return worldVertices;
+            }
+            var skeletonBones = skeleton.bones;
+            if (deformArray.length == 0) {
+                for (var w = 0, v = 0, b = 0, n = bones.length; v < n; w += 8) {
+                    var wx = x, wy = y;
+                    var nn = bones[v++] + v;
+                    for (; v < nn; v++, b += 3) {
+                        var bone = skeletonBones[bones[v]];
+                        var vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
+                        wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
+                        wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
+                    }
+                    worldVertices[w] = wx;
+                    worldVertices[w + 1] = wy;
+                    worldVertices[w + 2] = color.r;
+                    worldVertices[w + 3] = color.g;
+                    worldVertices[w + 4] = color.b;
+                    worldVertices[w + 5] = color.a;
+                }
+            }
+            else {
+                var deform = deformArray;
+                for (var w = 0, v = 0, b = 0, f = 0, n = bones.length; v < n; w += 8) {
+                    var wx = x, wy = y;
+                    var nn = bones[v++] + v;
+                    for (; v < nn; v++, b += 3, f += 2) {
+                        var bone = skeletonBones[bones[v]];
+                        var vx = vertices[b] + deform[f], vy = vertices[b + 1] + deform[f + 1], weight = vertices[b + 2];
+                        wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
+                        wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
+                    }
+                    worldVertices[w] = wx;
+                    worldVertices[w + 1] = wy;
+                    worldVertices[w + 2] = color.r;
+                    worldVertices[w + 3] = color.g;
+                    worldVertices[w + 4] = color.b;
+                    worldVertices[w + 5] = color.a;
+                }
+            }
+            return worldVertices;
+        };
+        MeshAttachment.prototype.applyDeform = function (sourceAttachment) {
+            return this == sourceAttachment || (this.inheritDeform && this._parentMesh == sourceAttachment);
+        };
+        MeshAttachment.prototype.getParentMesh = function () {
+            return this._parentMesh;
+        };
+        /** @param parentMesh May be null. */
+        MeshAttachment.prototype.setParentMesh = function (parentMesh) {
+            this._parentMesh = parentMesh;
+            if (parentMesh != null) {
+                this.bones = parentMesh.bones;
+                this.vertices = parentMesh.vertices;
+                this.regionUVs = parentMesh.regionUVs;
+                this.triangles = parentMesh.triangles;
+                this.hullLength = parentMesh.hullLength;
+            }
+        };
+        return MeshAttachment;
+    }(spine.VertexAttachment));
+    spine.MeshAttachment = MeshAttachment;
+})(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+var spine;
+(function (spine) {
+    var PathAttachment = (function (_super) {
+        __extends(PathAttachment, _super);
+        function PathAttachment(name) {
+            _super.call(this, name);
+            this.closed = false;
+            this.constantSpeed = false;
+        }
+        return PathAttachment;
+    }(spine.VertexAttachment));
+    spine.PathAttachment = PathAttachment;
+})(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+var spine;
+(function (spine) {
+    var RegionAttachment = (function (_super) {
+        __extends(RegionAttachment, _super);
+        function RegionAttachment(name) {
+            _super.call(this, name);
+            this.x = 0;
+            this.y = 0;
+            this.scaleX = 1;
+            this.scaleY = 1;
+            this.rotation = 0;
+            this.width = 0;
+            this.height = 0;
+            this.color = new spine.Color(1, 1, 1, 1);
+            this.offset = spine.Utils.newFloatArray(8);
+            this.vertices = spine.Utils.newFloatArray(8 * 4);
+            this.tempColor = new spine.Color(1, 1, 1, 1);
+        }
+        RegionAttachment.prototype.setRegion = function (region) {
+            var vertices = this.vertices;
+            if (region.rotate) {
+                vertices[RegionAttachment.U2] = region.u;
+                vertices[RegionAttachment.V2] = region.v2;
+                vertices[RegionAttachment.U3] = region.u;
+                vertices[RegionAttachment.V3] = region.v;
+                vertices[RegionAttachment.U4] = region.u2;
+                vertices[RegionAttachment.V4] = region.v;
+                vertices[RegionAttachment.U1] = region.u2;
+                vertices[RegionAttachment.V1] = region.v2;
+            }
+            else {
+                vertices[RegionAttachment.U1] = region.u;
+                vertices[RegionAttachment.V1] = region.v2;
+                vertices[RegionAttachment.U2] = region.u;
+                vertices[RegionAttachment.V2] = region.v;
+                vertices[RegionAttachment.U3] = region.u2;
+                vertices[RegionAttachment.V3] = region.v;
+                vertices[RegionAttachment.U4] = region.u2;
+                vertices[RegionAttachment.V4] = region.v2;
+            }
+        };
+        RegionAttachment.prototype.updateOffset = function () {
+            var regionScaleX = this.width / this.region.originalWidth * this.scaleX;
+            var regionScaleY = this.height / this.region.originalHeight * this.scaleY;
+            var localX = -this.width / 2 * this.scaleX + this.region.offsetX * regionScaleX;
+            var localY = -this.height / 2 * this.scaleY + this.region.offsetY * regionScaleY;
+            var localX2 = localX + this.region.width * regionScaleX;
+            var localY2 = localY + this.region.height * regionScaleY;
+            var radians = this.rotation * Math.PI / 180;
+            var cos = Math.cos(radians);
+            var sin = Math.sin(radians);
+            var localXCos = localX * cos + this.x;
+            var localXSin = localX * sin;
+            var localYCos = localY * cos + this.y;
+            var localYSin = localY * sin;
+            var localX2Cos = localX2 * cos + this.x;
+            var localX2Sin = localX2 * sin;
+            var localY2Cos = localY2 * cos + this.y;
+            var localY2Sin = localY2 * sin;
+            var offset = this.offset;
+            offset[RegionAttachment.OX1] = localXCos - localYSin;
+            offset[RegionAttachment.OY1] = localYCos + localXSin;
+            offset[RegionAttachment.OX2] = localXCos - localY2Sin;
+            offset[RegionAttachment.OY2] = localY2Cos + localXSin;
+            offset[RegionAttachment.OX3] = localX2Cos - localY2Sin;
+            offset[RegionAttachment.OY3] = localY2Cos + localX2Sin;
+            offset[RegionAttachment.OX4] = localX2Cos - localYSin;
+            offset[RegionAttachment.OY4] = localYCos + localX2Sin;
+        };
+        RegionAttachment.prototype.updateWorldVertices = function (slot, premultipliedAlpha) {
+            var skeleton = slot.bone.skeleton;
+            var skeletonColor = skeleton.color;
+            var slotColor = slot.color;
+            var regionColor = this.color;
+            var alpha = skeletonColor.a * slotColor.a * regionColor.a;
+            var multiplier = premultipliedAlpha ? alpha : 1;
+            var color = this.tempColor;
+            color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier, skeletonColor.g * slotColor.g * regionColor.g * multiplier, skeletonColor.b * slotColor.b * regionColor.b * multiplier, alpha);
+            var vertices = this.vertices;
+            var offset = this.offset;
+            var bone = slot.bone;
+            var x = skeleton.x + bone.worldX, y = skeleton.y + bone.worldY;
+            var a = bone.a, b = bone.b, c = bone.c, d = bone.d;
+            var offsetX = 0, offsetY = 0;
+            offsetX = offset[RegionAttachment.OX1];
+            offsetY = offset[RegionAttachment.OY1];
+            vertices[RegionAttachment.X1] = offsetX * a + offsetY * b + x; // br
+            vertices[RegionAttachment.Y1] = offsetX * c + offsetY * d + y;
+            vertices[RegionAttachment.C1R] = color.r;
+            vertices[RegionAttachment.C1G] = color.g;
+            vertices[RegionAttachment.C1B] = color.b;
+            vertices[RegionAttachment.C1A] = color.a;
+            offsetX = offset[RegionAttachment.OX2];
+            offsetY = offset[RegionAttachment.OY2];
+            vertices[RegionAttachment.X2] = offsetX * a + offsetY * b + x; // bl
+            vertices[RegionAttachment.Y2] = offsetX * c + offsetY * d + y;
+            vertices[RegionAttachment.C2R] = color.r;
+            vertices[RegionAttachment.C2G] = color.g;
+            vertices[RegionAttachment.C2B] = color.b;
+            vertices[RegionAttachment.C2A] = color.a;
+            offsetX = offset[RegionAttachment.OX3];
+            offsetY = offset[RegionAttachment.OY3];
+            vertices[RegionAttachment.X3] = offsetX * a + offsetY * b + x; // ul
+            vertices[RegionAttachment.Y3] = offsetX * c + offsetY * d + y;
+            vertices[RegionAttachment.C3R] = color.r;
+            vertices[RegionAttachment.C3G] = color.g;
+            vertices[RegionAttachment.C3B] = color.b;
+            vertices[RegionAttachment.C3A] = color.a;
+            offsetX = offset[RegionAttachment.OX4];
+            offsetY = offset[RegionAttachment.OY4];
+            vertices[RegionAttachment.X4] = offsetX * a + offsetY * b + x; // ur
+            vertices[RegionAttachment.Y4] = offsetX * c + offsetY * d + y;
+            vertices[RegionAttachment.C4R] = color.r;
+            vertices[RegionAttachment.C4G] = color.g;
+            vertices[RegionAttachment.C4B] = color.b;
+            vertices[RegionAttachment.C4A] = color.a;
+            return vertices;
+        };
+        RegionAttachment.OX1 = 0;
+        RegionAttachment.OY1 = 1;
+        RegionAttachment.OX2 = 2;
+        RegionAttachment.OY2 = 3;
+        RegionAttachment.OX3 = 4;
+        RegionAttachment.OY3 = 5;
+        RegionAttachment.OX4 = 6;
+        RegionAttachment.OY4 = 7;
+        RegionAttachment.X1 = 0;
+        RegionAttachment.Y1 = 1;
+        RegionAttachment.C1R = 2;
+        RegionAttachment.C1G = 3;
+        RegionAttachment.C1B = 4;
+        RegionAttachment.C1A = 5;
+        RegionAttachment.U1 = 6;
+        RegionAttachment.V1 = 7;
+        RegionAttachment.X2 = 8;
+        RegionAttachment.Y2 = 9;
+        RegionAttachment.C2R = 10;
+        RegionAttachment.C2G = 11;
+        RegionAttachment.C2B = 12;
+        RegionAttachment.C2A = 13;
+        RegionAttachment.U2 = 14;
+        RegionAttachment.V2 = 15;
+        RegionAttachment.X3 = 16;
+        RegionAttachment.Y3 = 17;
+        RegionAttachment.C3R = 18;
+        RegionAttachment.C3G = 19;
+        RegionAttachment.C3B = 20;
+        RegionAttachment.C3A = 21;
+        RegionAttachment.U3 = 22;
+        RegionAttachment.V3 = 23;
+        RegionAttachment.X4 = 24;
+        RegionAttachment.Y4 = 25;
+        RegionAttachment.C4R = 26;
+        RegionAttachment.C4G = 27;
+        RegionAttachment.C4B = 28;
+        RegionAttachment.C4A = 29;
+        RegionAttachment.U4 = 30;
+        RegionAttachment.V4 = 31;
+        return RegionAttachment;
+    }(spine.Attachment));
+    spine.RegionAttachment = RegionAttachment;
+})(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+var spine;
+(function (spine) {
+    var TextureRegion = (function () {
+        function TextureRegion() {
+            this.u = 0;
+            this.v = 0;
+            this.u2 = 0;
+            this.v2 = 0;
+            this.width = 0;
+            this.height = 0;
+            this.rotate = false;
+            this.offsetX = 0;
+            this.offsetY = 0;
+            this.originalWidth = 0;
+            this.originalHeight = 0;
+        }
+        return TextureRegion;
+    }());
+    spine.TextureRegion = TextureRegion;
+})(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var webgl;
     (function (webgl) {
         var AssetManager = (function () {
-            function AssetManager() {
+            function AssetManager(gl) {
                 this._assets = {};
                 this._errors = {};
                 this._toLoad = 0;
                 this._loaded = 0;
+                this._gl = gl;
             }
             AssetManager.prototype.loadText = function (path, success, error) {
                 var _this = this;
+                if (success === void 0) { success = null; }
+                if (error === void 0) { error = null; }
                 this._toLoad++;
                 var request = new XMLHttpRequest();
                 request.onreadystatechange = function () {
@@ -3166,18 +5149,22 @@ var spine;
             };
             AssetManager.prototype.loadTexture = function (path, success, error) {
                 var _this = this;
+                if (success === void 0) { success = null; }
+                if (error === void 0) { error = null; }
                 this._toLoad++;
                 var img = new Image();
                 img.src = path;
                 img.onload = function (ev) {
                     if (success)
                         success(path, img);
-                    var texture = new webgl.Texture(img);
+                    var texture = new webgl.Texture(_this._gl, img);
                     _this._assets[path] = texture;
                     _this._toLoad--;
                     _this._loaded++;
                 };
                 img.onerror = function (ev) {
+                    if (error)
+                        error(path, "Couldn't load image " + path);
                     _this._errors[path] = "Couldn't load image " + path;
                     _this._toLoad--;
                     _this._loaded++;
@@ -3213,11 +5200,47 @@ var spine;
             AssetManager.prototype.dispose = function () {
                 this.removeAll();
             };
+            AssetManager.prototype.hasErrors = function () {
+                return Object.keys(this._errors).length > 0;
+            };
+            AssetManager.prototype.errors = function () {
+                return this._errors;
+            };
             return AssetManager;
         }());
         webgl.AssetManager = AssetManager;
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var webgl;
@@ -3242,131 +5265,137 @@ var spine;
             function Matrix4() {
                 this.temp = new Float32Array(16);
                 this.values = new Float32Array(16);
-                this.values[webgl.M00] = 1;
-                this.values[webgl.M11] = 1;
-                this.values[webgl.M22] = 1;
-                this.values[webgl.M33] = 1;
+                var v = this.values;
+                v[webgl.M00] = 1;
+                v[webgl.M11] = 1;
+                v[webgl.M22] = 1;
+                v[webgl.M33] = 1;
             }
             Matrix4.prototype.set = function (values) {
                 this.values.set(values);
                 return this;
             };
             Matrix4.prototype.transpose = function () {
-                this.temp[webgl.M00] = this.values[webgl.M00];
-                this.temp[webgl.M01] = this.values[webgl.M10];
-                this.temp[webgl.M02] = this.values[webgl.M20];
-                this.temp[webgl.M03] = this.values[webgl.M30];
-                this.temp[webgl.M10] = this.values[webgl.M01];
-                this.temp[webgl.M11] = this.values[webgl.M11];
-                this.temp[webgl.M12] = this.values[webgl.M21];
-                this.temp[webgl.M13] = this.values[webgl.M31];
-                this.temp[webgl.M20] = this.values[webgl.M02];
-                this.temp[webgl.M21] = this.values[webgl.M12];
-                this.temp[webgl.M22] = this.values[webgl.M22];
-                this.temp[webgl.M23] = this.values[webgl.M32];
-                this.temp[webgl.M30] = this.values[webgl.M03];
-                this.temp[webgl.M31] = this.values[webgl.M13];
-                this.temp[webgl.M32] = this.values[webgl.M23];
-                this.temp[webgl.M33] = this.values[webgl.M33];
-                return this.set(this.temp);
+                var t = this.temp;
+                var v = this.values;
+                t[webgl.M00] = v[webgl.M00];
+                t[webgl.M01] = v[webgl.M10];
+                t[webgl.M02] = v[webgl.M20];
+                t[webgl.M03] = v[webgl.M30];
+                t[webgl.M10] = v[webgl.M01];
+                t[webgl.M11] = v[webgl.M11];
+                t[webgl.M12] = v[webgl.M21];
+                t[webgl.M13] = v[webgl.M31];
+                t[webgl.M20] = v[webgl.M02];
+                t[webgl.M21] = v[webgl.M12];
+                t[webgl.M22] = v[webgl.M22];
+                t[webgl.M23] = v[webgl.M32];
+                t[webgl.M30] = v[webgl.M03];
+                t[webgl.M31] = v[webgl.M13];
+                t[webgl.M32] = v[webgl.M23];
+                t[webgl.M33] = v[webgl.M33];
+                return this.set(t);
             };
             Matrix4.prototype.identity = function () {
-                this.values[webgl.M00] = 1;
-                this.values[webgl.M01] = 0;
-                this.values[webgl.M02] = 0;
-                this.values[webgl.M03] = 0;
-                this.values[webgl.M10] = 0;
-                this.values[webgl.M11] = 1;
-                this.values[webgl.M12] = 0;
-                this.values[webgl.M13] = 0;
-                this.values[webgl.M20] = 0;
-                this.values[webgl.M21] = 0;
-                this.values[webgl.M22] = 1;
-                this.values[webgl.M23] = 0;
-                this.values[webgl.M30] = 0;
-                this.values[webgl.M31] = 0;
-                this.values[webgl.M32] = 0;
-                this.values[webgl.M33] = 1;
+                var v = this.values;
+                v[webgl.M00] = 1;
+                v[webgl.M01] = 0;
+                v[webgl.M02] = 0;
+                v[webgl.M03] = 0;
+                v[webgl.M10] = 0;
+                v[webgl.M11] = 1;
+                v[webgl.M12] = 0;
+                v[webgl.M13] = 0;
+                v[webgl.M20] = 0;
+                v[webgl.M21] = 0;
+                v[webgl.M22] = 1;
+                v[webgl.M23] = 0;
+                v[webgl.M30] = 0;
+                v[webgl.M31] = 0;
+                v[webgl.M32] = 0;
+                v[webgl.M33] = 1;
                 return this;
             };
             Matrix4.prototype.invert = function () {
-                var l_det = this.values[webgl.M30] * this.values[webgl.M21] * this.values[webgl.M12] * this.values[webgl.M03] - this.values[webgl.M20] * this.values[webgl.M31] * this.values[webgl.M12] * this.values[webgl.M03] - this.values[webgl.M30] * this.values[webgl.M11]
-                    * this.values[webgl.M22] * this.values[webgl.M03] + this.values[webgl.M10] * this.values[webgl.M31] * this.values[webgl.M22] * this.values[webgl.M03] + this.values[webgl.M20] * this.values[webgl.M11] * this.values[webgl.M32] * this.values[webgl.M03] - this.values[webgl.M10]
-                    * this.values[webgl.M21] * this.values[webgl.M32] * this.values[webgl.M03] - this.values[webgl.M30] * this.values[webgl.M21] * this.values[webgl.M02] * this.values[webgl.M13] + this.values[webgl.M20] * this.values[webgl.M31] * this.values[webgl.M02] * this.values[webgl.M13]
-                    + this.values[webgl.M30] * this.values[webgl.M01] * this.values[webgl.M22] * this.values[webgl.M13] - this.values[webgl.M00] * this.values[webgl.M31] * this.values[webgl.M22] * this.values[webgl.M13] - this.values[webgl.M20] * this.values[webgl.M01] * this.values[webgl.M32]
-                    * this.values[webgl.M13] + this.values[webgl.M00] * this.values[webgl.M21] * this.values[webgl.M32] * this.values[webgl.M13] + this.values[webgl.M30] * this.values[webgl.M11] * this.values[webgl.M02] * this.values[webgl.M23] - this.values[webgl.M10] * this.values[webgl.M31]
-                    * this.values[webgl.M02] * this.values[webgl.M23] - this.values[webgl.M30] * this.values[webgl.M01] * this.values[webgl.M12] * this.values[webgl.M23] + this.values[webgl.M00] * this.values[webgl.M31] * this.values[webgl.M12] * this.values[webgl.M23] + this.values[webgl.M10]
-                    * this.values[webgl.M01] * this.values[webgl.M32] * this.values[webgl.M23] - this.values[webgl.M00] * this.values[webgl.M11] * this.values[webgl.M32] * this.values[webgl.M23] - this.values[webgl.M20] * this.values[webgl.M11] * this.values[webgl.M02] * this.values[webgl.M33]
-                    + this.values[webgl.M10] * this.values[webgl.M21] * this.values[webgl.M02] * this.values[webgl.M33] + this.values[webgl.M20] * this.values[webgl.M01] * this.values[webgl.M12] * this.values[webgl.M33] - this.values[webgl.M00] * this.values[webgl.M21] * this.values[webgl.M12]
-                    * this.values[webgl.M33] - this.values[webgl.M10] * this.values[webgl.M01] * this.values[webgl.M22] * this.values[webgl.M33] + this.values[webgl.M00] * this.values[webgl.M11] * this.values[webgl.M22] * this.values[webgl.M33];
+                var v = this.values;
+                var t = this.temp;
+                var l_det = v[webgl.M30] * v[webgl.M21] * v[webgl.M12] * v[webgl.M03] - v[webgl.M20] * v[webgl.M31] * v[webgl.M12] * v[webgl.M03] - v[webgl.M30] * v[webgl.M11] * v[webgl.M22] * v[webgl.M03]
+                    + v[webgl.M10] * v[webgl.M31] * v[webgl.M22] * v[webgl.M03] + v[webgl.M20] * v[webgl.M11] * v[webgl.M32] * v[webgl.M03] - v[webgl.M10] * v[webgl.M21] * v[webgl.M32] * v[webgl.M03]
+                    - v[webgl.M30] * v[webgl.M21] * v[webgl.M02] * v[webgl.M13] + v[webgl.M20] * v[webgl.M31] * v[webgl.M02] * v[webgl.M13] + v[webgl.M30] * v[webgl.M01] * v[webgl.M22] * v[webgl.M13]
+                    - v[webgl.M00] * v[webgl.M31] * v[webgl.M22] * v[webgl.M13] - v[webgl.M20] * v[webgl.M01] * v[webgl.M32] * v[webgl.M13] + v[webgl.M00] * v[webgl.M21] * v[webgl.M32] * v[webgl.M13]
+                    + v[webgl.M30] * v[webgl.M11] * v[webgl.M02] * v[webgl.M23] - v[webgl.M10] * v[webgl.M31] * v[webgl.M02] * v[webgl.M23] - v[webgl.M30] * v[webgl.M01] * v[webgl.M12] * v[webgl.M23]
+                    + v[webgl.M00] * v[webgl.M31] * v[webgl.M12] * v[webgl.M23] + v[webgl.M10] * v[webgl.M01] * v[webgl.M32] * v[webgl.M23] - v[webgl.M00] * v[webgl.M11] * v[webgl.M32] * v[webgl.M23]
+                    - v[webgl.M20] * v[webgl.M11] * v[webgl.M02] * v[webgl.M33] + v[webgl.M10] * v[webgl.M21] * v[webgl.M02] * v[webgl.M33] + v[webgl.M20] * v[webgl.M01] * v[webgl.M12] * v[webgl.M33]
+                    - v[webgl.M00] * v[webgl.M21] * v[webgl.M12] * v[webgl.M33] - v[webgl.M10] * v[webgl.M01] * v[webgl.M22] * v[webgl.M33] + v[webgl.M00] * v[webgl.M11] * v[webgl.M22] * v[webgl.M33];
                 if (l_det == 0)
                     throw new Error("non-invertible matrix");
                 var inv_det = 1.0 / l_det;
-                this.temp[webgl.M00] = this.values[webgl.M12] * this.values[webgl.M23] * this.values[webgl.M31] - this.values[webgl.M13] * this.values[webgl.M22] * this.values[webgl.M31] + this.values[webgl.M13] * this.values[webgl.M21] * this.values[webgl.M32] - this.values[webgl.M11]
-                    * this.values[webgl.M23] * this.values[webgl.M32] - this.values[webgl.M12] * this.values[webgl.M21] * this.values[webgl.M33] + this.values[webgl.M11] * this.values[webgl.M22] * this.values[webgl.M33];
-                this.temp[webgl.M01] = this.values[webgl.M03] * this.values[webgl.M22] * this.values[webgl.M31] - this.values[webgl.M02] * this.values[webgl.M23] * this.values[webgl.M31] - this.values[webgl.M03] * this.values[webgl.M21] * this.values[webgl.M32] + this.values[webgl.M01]
-                    * this.values[webgl.M23] * this.values[webgl.M32] + this.values[webgl.M02] * this.values[webgl.M21] * this.values[webgl.M33] - this.values[webgl.M01] * this.values[webgl.M22] * this.values[webgl.M33];
-                this.temp[webgl.M02] = this.values[webgl.M02] * this.values[webgl.M13] * this.values[webgl.M31] - this.values[webgl.M03] * this.values[webgl.M12] * this.values[webgl.M31] + this.values[webgl.M03] * this.values[webgl.M11] * this.values[webgl.M32] - this.values[webgl.M01]
-                    * this.values[webgl.M13] * this.values[webgl.M32] - this.values[webgl.M02] * this.values[webgl.M11] * this.values[webgl.M33] + this.values[webgl.M01] * this.values[webgl.M12] * this.values[webgl.M33];
-                this.temp[webgl.M03] = this.values[webgl.M03] * this.values[webgl.M12] * this.values[webgl.M21] - this.values[webgl.M02] * this.values[webgl.M13] * this.values[webgl.M21] - this.values[webgl.M03] * this.values[webgl.M11] * this.values[webgl.M22] + this.values[webgl.M01]
-                    * this.values[webgl.M13] * this.values[webgl.M22] + this.values[webgl.M02] * this.values[webgl.M11] * this.values[webgl.M23] - this.values[webgl.M01] * this.values[webgl.M12] * this.values[webgl.M23];
-                this.temp[webgl.M10] = this.values[webgl.M13] * this.values[webgl.M22] * this.values[webgl.M30] - this.values[webgl.M12] * this.values[webgl.M23] * this.values[webgl.M30] - this.values[webgl.M13] * this.values[webgl.M20] * this.values[webgl.M32] + this.values[webgl.M10]
-                    * this.values[webgl.M23] * this.values[webgl.M32] + this.values[webgl.M12] * this.values[webgl.M20] * this.values[webgl.M33] - this.values[webgl.M10] * this.values[webgl.M22] * this.values[webgl.M33];
-                this.temp[webgl.M11] = this.values[webgl.M02] * this.values[webgl.M23] * this.values[webgl.M30] - this.values[webgl.M03] * this.values[webgl.M22] * this.values[webgl.M30] + this.values[webgl.M03] * this.values[webgl.M20] * this.values[webgl.M32] - this.values[webgl.M00]
-                    * this.values[webgl.M23] * this.values[webgl.M32] - this.values[webgl.M02] * this.values[webgl.M20] * this.values[webgl.M33] + this.values[webgl.M00] * this.values[webgl.M22] * this.values[webgl.M33];
-                this.temp[webgl.M12] = this.values[webgl.M03] * this.values[webgl.M12] * this.values[webgl.M30] - this.values[webgl.M02] * this.values[webgl.M13] * this.values[webgl.M30] - this.values[webgl.M03] * this.values[webgl.M10] * this.values[webgl.M32] + this.values[webgl.M00]
-                    * this.values[webgl.M13] * this.values[webgl.M32] + this.values[webgl.M02] * this.values[webgl.M10] * this.values[webgl.M33] - this.values[webgl.M00] * this.values[webgl.M12] * this.values[webgl.M33];
-                this.temp[webgl.M13] = this.values[webgl.M02] * this.values[webgl.M13] * this.values[webgl.M20] - this.values[webgl.M03] * this.values[webgl.M12] * this.values[webgl.M20] + this.values[webgl.M03] * this.values[webgl.M10] * this.values[webgl.M22] - this.values[webgl.M00]
-                    * this.values[webgl.M13] * this.values[webgl.M22] - this.values[webgl.M02] * this.values[webgl.M10] * this.values[webgl.M23] + this.values[webgl.M00] * this.values[webgl.M12] * this.values[webgl.M23];
-                this.temp[webgl.M20] = this.values[webgl.M11] * this.values[webgl.M23] * this.values[webgl.M30] - this.values[webgl.M13] * this.values[webgl.M21] * this.values[webgl.M30] + this.values[webgl.M13] * this.values[webgl.M20] * this.values[webgl.M31] - this.values[webgl.M10]
-                    * this.values[webgl.M23] * this.values[webgl.M31] - this.values[webgl.M11] * this.values[webgl.M20] * this.values[webgl.M33] + this.values[webgl.M10] * this.values[webgl.M21] * this.values[webgl.M33];
-                this.temp[webgl.M21] = this.values[webgl.M03] * this.values[webgl.M21] * this.values[webgl.M30] - this.values[webgl.M01] * this.values[webgl.M23] * this.values[webgl.M30] - this.values[webgl.M03] * this.values[webgl.M20] * this.values[webgl.M31] + this.values[webgl.M00]
-                    * this.values[webgl.M23] * this.values[webgl.M31] + this.values[webgl.M01] * this.values[webgl.M20] * this.values[webgl.M33] - this.values[webgl.M00] * this.values[webgl.M21] * this.values[webgl.M33];
-                this.temp[webgl.M22] = this.values[webgl.M01] * this.values[webgl.M13] * this.values[webgl.M30] - this.values[webgl.M03] * this.values[webgl.M11] * this.values[webgl.M30] + this.values[webgl.M03] * this.values[webgl.M10] * this.values[webgl.M31] - this.values[webgl.M00]
-                    * this.values[webgl.M13] * this.values[webgl.M31] - this.values[webgl.M01] * this.values[webgl.M10] * this.values[webgl.M33] + this.values[webgl.M00] * this.values[webgl.M11] * this.values[webgl.M33];
-                this.temp[webgl.M23] = this.values[webgl.M03] * this.values[webgl.M11] * this.values[webgl.M20] - this.values[webgl.M01] * this.values[webgl.M13] * this.values[webgl.M20] - this.values[webgl.M03] * this.values[webgl.M10] * this.values[webgl.M21] + this.values[webgl.M00]
-                    * this.values[webgl.M13] * this.values[webgl.M21] + this.values[webgl.M01] * this.values[webgl.M10] * this.values[webgl.M23] - this.values[webgl.M00] * this.values[webgl.M11] * this.values[webgl.M23];
-                this.temp[webgl.M30] = this.values[webgl.M12] * this.values[webgl.M21] * this.values[webgl.M30] - this.values[webgl.M11] * this.values[webgl.M22] * this.values[webgl.M30] - this.values[webgl.M12] * this.values[webgl.M20] * this.values[webgl.M31] + this.values[webgl.M10]
-                    * this.values[webgl.M22] * this.values[webgl.M31] + this.values[webgl.M11] * this.values[webgl.M20] * this.values[webgl.M32] - this.values[webgl.M10] * this.values[webgl.M21] * this.values[webgl.M32];
-                this.temp[webgl.M31] = this.values[webgl.M01] * this.values[webgl.M22] * this.values[webgl.M30] - this.values[webgl.M02] * this.values[webgl.M21] * this.values[webgl.M30] + this.values[webgl.M02] * this.values[webgl.M20] * this.values[webgl.M31] - this.values[webgl.M00]
-                    * this.values[webgl.M22] * this.values[webgl.M31] - this.values[webgl.M01] * this.values[webgl.M20] * this.values[webgl.M32] + this.values[webgl.M00] * this.values[webgl.M21] * this.values[webgl.M32];
-                this.temp[webgl.M32] = this.values[webgl.M02] * this.values[webgl.M11] * this.values[webgl.M30] - this.values[webgl.M01] * this.values[webgl.M12] * this.values[webgl.M30] - this.values[webgl.M02] * this.values[webgl.M10] * this.values[webgl.M31] + this.values[webgl.M00]
-                    * this.values[webgl.M12] * this.values[webgl.M31] + this.values[webgl.M01] * this.values[webgl.M10] * this.values[webgl.M32] - this.values[webgl.M00] * this.values[webgl.M11] * this.values[webgl.M32];
-                this.temp[webgl.M33] = this.values[webgl.M01] * this.values[webgl.M12] * this.values[webgl.M20] - this.values[webgl.M02] * this.values[webgl.M11] * this.values[webgl.M20] + this.values[webgl.M02] * this.values[webgl.M10] * this.values[webgl.M21] - this.values[webgl.M00]
-                    * this.values[webgl.M12] * this.values[webgl.M21] - this.values[webgl.M01] * this.values[webgl.M10] * this.values[webgl.M22] + this.values[webgl.M00] * this.values[webgl.M11] * this.values[webgl.M22];
-                this.values[webgl.M00] = this.temp[webgl.M00] * inv_det;
-                this.values[webgl.M01] = this.temp[webgl.M01] * inv_det;
-                this.values[webgl.M02] = this.temp[webgl.M02] * inv_det;
-                this.values[webgl.M03] = this.temp[webgl.M03] * inv_det;
-                this.values[webgl.M10] = this.temp[webgl.M10] * inv_det;
-                this.values[webgl.M11] = this.temp[webgl.M11] * inv_det;
-                this.values[webgl.M12] = this.temp[webgl.M12] * inv_det;
-                this.values[webgl.M13] = this.temp[webgl.M13] * inv_det;
-                this.values[webgl.M20] = this.temp[webgl.M20] * inv_det;
-                this.values[webgl.M21] = this.temp[webgl.M21] * inv_det;
-                this.values[webgl.M22] = this.temp[webgl.M22] * inv_det;
-                this.values[webgl.M23] = this.temp[webgl.M23] * inv_det;
-                this.values[webgl.M30] = this.temp[webgl.M30] * inv_det;
-                this.values[webgl.M31] = this.temp[webgl.M31] * inv_det;
-                this.values[webgl.M32] = this.temp[webgl.M32] * inv_det;
-                this.values[webgl.M33] = this.temp[webgl.M33] * inv_det;
+                t[webgl.M00] = v[webgl.M12] * v[webgl.M23] * v[webgl.M31] - v[webgl.M13] * v[webgl.M22] * v[webgl.M31] + v[webgl.M13] * v[webgl.M21] * v[webgl.M32]
+                    - v[webgl.M11] * v[webgl.M23] * v[webgl.M32] - v[webgl.M12] * v[webgl.M21] * v[webgl.M33] + v[webgl.M11] * v[webgl.M22] * v[webgl.M33];
+                t[webgl.M01] = v[webgl.M03] * v[webgl.M22] * v[webgl.M31] - v[webgl.M02] * v[webgl.M23] * v[webgl.M31] - v[webgl.M03] * v[webgl.M21] * v[webgl.M32]
+                    + v[webgl.M01] * v[webgl.M23] * v[webgl.M32] + v[webgl.M02] * v[webgl.M21] * v[webgl.M33] - v[webgl.M01] * v[webgl.M22] * v[webgl.M33];
+                t[webgl.M02] = v[webgl.M02] * v[webgl.M13] * v[webgl.M31] - v[webgl.M03] * v[webgl.M12] * v[webgl.M31] + v[webgl.M03] * v[webgl.M11] * v[webgl.M32]
+                    - v[webgl.M01] * v[webgl.M13] * v[webgl.M32] - v[webgl.M02] * v[webgl.M11] * v[webgl.M33] + v[webgl.M01] * v[webgl.M12] * v[webgl.M33];
+                t[webgl.M03] = v[webgl.M03] * v[webgl.M12] * v[webgl.M21] - v[webgl.M02] * v[webgl.M13] * v[webgl.M21] - v[webgl.M03] * v[webgl.M11] * v[webgl.M22]
+                    + v[webgl.M01] * v[webgl.M13] * v[webgl.M22] + v[webgl.M02] * v[webgl.M11] * v[webgl.M23] - v[webgl.M01] * v[webgl.M12] * v[webgl.M23];
+                t[webgl.M10] = v[webgl.M13] * v[webgl.M22] * v[webgl.M30] - v[webgl.M12] * v[webgl.M23] * v[webgl.M30] - v[webgl.M13] * v[webgl.M20] * v[webgl.M32]
+                    + v[webgl.M10] * v[webgl.M23] * v[webgl.M32] + v[webgl.M12] * v[webgl.M20] * v[webgl.M33] - v[webgl.M10] * v[webgl.M22] * v[webgl.M33];
+                t[webgl.M11] = v[webgl.M02] * v[webgl.M23] * v[webgl.M30] - v[webgl.M03] * v[webgl.M22] * v[webgl.M30] + v[webgl.M03] * v[webgl.M20] * v[webgl.M32]
+                    - v[webgl.M00] * v[webgl.M23] * v[webgl.M32] - v[webgl.M02] * v[webgl.M20] * v[webgl.M33] + v[webgl.M00] * v[webgl.M22] * v[webgl.M33];
+                t[webgl.M12] = v[webgl.M03] * v[webgl.M12] * v[webgl.M30] - v[webgl.M02] * v[webgl.M13] * v[webgl.M30] - v[webgl.M03] * v[webgl.M10] * v[webgl.M32]
+                    + v[webgl.M00] * v[webgl.M13] * v[webgl.M32] + v[webgl.M02] * v[webgl.M10] * v[webgl.M33] - v[webgl.M00] * v[webgl.M12] * v[webgl.M33];
+                t[webgl.M13] = v[webgl.M02] * v[webgl.M13] * v[webgl.M20] - v[webgl.M03] * v[webgl.M12] * v[webgl.M20] + v[webgl.M03] * v[webgl.M10] * v[webgl.M22]
+                    - v[webgl.M00] * v[webgl.M13] * v[webgl.M22] - v[webgl.M02] * v[webgl.M10] * v[webgl.M23] + v[webgl.M00] * v[webgl.M12] * v[webgl.M23];
+                t[webgl.M20] = v[webgl.M11] * v[webgl.M23] * v[webgl.M30] - v[webgl.M13] * v[webgl.M21] * v[webgl.M30] + v[webgl.M13] * v[webgl.M20] * v[webgl.M31]
+                    - v[webgl.M10] * v[webgl.M23] * v[webgl.M31] - v[webgl.M11] * v[webgl.M20] * v[webgl.M33] + v[webgl.M10] * v[webgl.M21] * v[webgl.M33];
+                t[webgl.M21] = v[webgl.M03] * v[webgl.M21] * v[webgl.M30] - v[webgl.M01] * v[webgl.M23] * v[webgl.M30] - v[webgl.M03] * v[webgl.M20] * v[webgl.M31]
+                    + v[webgl.M00] * v[webgl.M23] * v[webgl.M31] + v[webgl.M01] * v[webgl.M20] * v[webgl.M33] - v[webgl.M00] * v[webgl.M21] * v[webgl.M33];
+                t[webgl.M22] = v[webgl.M01] * v[webgl.M13] * v[webgl.M30] - v[webgl.M03] * v[webgl.M11] * v[webgl.M30] + v[webgl.M03] * v[webgl.M10] * v[webgl.M31]
+                    - v[webgl.M00] * v[webgl.M13] * v[webgl.M31] - v[webgl.M01] * v[webgl.M10] * v[webgl.M33] + v[webgl.M00] * v[webgl.M11] * v[webgl.M33];
+                t[webgl.M23] = v[webgl.M03] * v[webgl.M11] * v[webgl.M20] - v[webgl.M01] * v[webgl.M13] * v[webgl.M20] - v[webgl.M03] * v[webgl.M10] * v[webgl.M21]
+                    + v[webgl.M00] * v[webgl.M13] * v[webgl.M21] + v[webgl.M01] * v[webgl.M10] * v[webgl.M23] - v[webgl.M00] * v[webgl.M11] * v[webgl.M23];
+                t[webgl.M30] = v[webgl.M12] * v[webgl.M21] * v[webgl.M30] - v[webgl.M11] * v[webgl.M22] * v[webgl.M30] - v[webgl.M12] * v[webgl.M20] * v[webgl.M31]
+                    + v[webgl.M10] * v[webgl.M22] * v[webgl.M31] + v[webgl.M11] * v[webgl.M20] * v[webgl.M32] - v[webgl.M10] * v[webgl.M21] * v[webgl.M32];
+                t[webgl.M31] = v[webgl.M01] * v[webgl.M22] * v[webgl.M30] - v[webgl.M02] * v[webgl.M21] * v[webgl.M30] + v[webgl.M02] * v[webgl.M20] * v[webgl.M31]
+                    - v[webgl.M00] * v[webgl.M22] * v[webgl.M31] - v[webgl.M01] * v[webgl.M20] * v[webgl.M32] + v[webgl.M00] * v[webgl.M21] * v[webgl.M32];
+                t[webgl.M32] = v[webgl.M02] * v[webgl.M11] * v[webgl.M30] - v[webgl.M01] * v[webgl.M12] * v[webgl.M30] - v[webgl.M02] * v[webgl.M10] * v[webgl.M31]
+                    + v[webgl.M00] * v[webgl.M12] * v[webgl.M31] + v[webgl.M01] * v[webgl.M10] * v[webgl.M32] - v[webgl.M00] * v[webgl.M11] * v[webgl.M32];
+                t[webgl.M33] = v[webgl.M01] * v[webgl.M12] * v[webgl.M20] - v[webgl.M02] * v[webgl.M11] * v[webgl.M20] + v[webgl.M02] * v[webgl.M10] * v[webgl.M21]
+                    - v[webgl.M00] * v[webgl.M12] * v[webgl.M21] - v[webgl.M01] * v[webgl.M10] * v[webgl.M22] + v[webgl.M00] * v[webgl.M11] * v[webgl.M22];
+                v[webgl.M00] = t[webgl.M00] * inv_det;
+                v[webgl.M01] = t[webgl.M01] * inv_det;
+                v[webgl.M02] = t[webgl.M02] * inv_det;
+                v[webgl.M03] = t[webgl.M03] * inv_det;
+                v[webgl.M10] = t[webgl.M10] * inv_det;
+                v[webgl.M11] = t[webgl.M11] * inv_det;
+                v[webgl.M12] = t[webgl.M12] * inv_det;
+                v[webgl.M13] = t[webgl.M13] * inv_det;
+                v[webgl.M20] = t[webgl.M20] * inv_det;
+                v[webgl.M21] = t[webgl.M21] * inv_det;
+                v[webgl.M22] = t[webgl.M22] * inv_det;
+                v[webgl.M23] = t[webgl.M23] * inv_det;
+                v[webgl.M30] = t[webgl.M30] * inv_det;
+                v[webgl.M31] = t[webgl.M31] * inv_det;
+                v[webgl.M32] = t[webgl.M32] * inv_det;
+                v[webgl.M33] = t[webgl.M33] * inv_det;
                 return this;
             };
             Matrix4.prototype.determinant = function () {
-                return this.values[webgl.M30] * this.values[webgl.M21] * this.values[webgl.M12] * this.values[webgl.M03] - this.values[webgl.M20] * this.values[webgl.M31] * this.values[webgl.M12] * this.values[webgl.M03] - this.values[webgl.M30] * this.values[webgl.M11]
-                    * this.values[webgl.M22] * this.values[webgl.M03] + this.values[webgl.M10] * this.values[webgl.M31] * this.values[webgl.M22] * this.values[webgl.M03] + this.values[webgl.M20] * this.values[webgl.M11] * this.values[webgl.M32] * this.values[webgl.M03] - this.values[webgl.M10]
-                    * this.values[webgl.M21] * this.values[webgl.M32] * this.values[webgl.M03] - this.values[webgl.M30] * this.values[webgl.M21] * this.values[webgl.M02] * this.values[webgl.M13] + this.values[webgl.M20] * this.values[webgl.M31] * this.values[webgl.M02] * this.values[webgl.M13]
-                    + this.values[webgl.M30] * this.values[webgl.M01] * this.values[webgl.M22] * this.values[webgl.M13] - this.values[webgl.M00] * this.values[webgl.M31] * this.values[webgl.M22] * this.values[webgl.M13] - this.values[webgl.M20] * this.values[webgl.M01] * this.values[webgl.M32]
-                    * this.values[webgl.M13] + this.values[webgl.M00] * this.values[webgl.M21] * this.values[webgl.M32] * this.values[webgl.M13] + this.values[webgl.M30] * this.values[webgl.M11] * this.values[webgl.M02] * this.values[webgl.M23] - this.values[webgl.M10] * this.values[webgl.M31]
-                    * this.values[webgl.M02] * this.values[webgl.M23] - this.values[webgl.M30] * this.values[webgl.M01] * this.values[webgl.M12] * this.values[webgl.M23] + this.values[webgl.M00] * this.values[webgl.M31] * this.values[webgl.M12] * this.values[webgl.M23] + this.values[webgl.M10]
-                    * this.values[webgl.M01] * this.values[webgl.M32] * this.values[webgl.M23] - this.values[webgl.M00] * this.values[webgl.M11] * this.values[webgl.M32] * this.values[webgl.M23] - this.values[webgl.M20] * this.values[webgl.M11] * this.values[webgl.M02] * this.values[webgl.M33]
-                    + this.values[webgl.M10] * this.values[webgl.M21] * this.values[webgl.M02] * this.values[webgl.M33] + this.values[webgl.M20] * this.values[webgl.M01] * this.values[webgl.M12] * this.values[webgl.M33] - this.values[webgl.M00] * this.values[webgl.M21] * this.values[webgl.M12]
-                    * this.values[webgl.M33] - this.values[webgl.M10] * this.values[webgl.M01] * this.values[webgl.M22] * this.values[webgl.M33] + this.values[webgl.M00] * this.values[webgl.M11] * this.values[webgl.M22] * this.values[webgl.M33];
+                var v = this.values;
+                return v[webgl.M30] * v[webgl.M21] * v[webgl.M12] * v[webgl.M03] - v[webgl.M20] * v[webgl.M31] * v[webgl.M12] * v[webgl.M03] - v[webgl.M30] * v[webgl.M11] * v[webgl.M22] * v[webgl.M03]
+                    + v[webgl.M10] * v[webgl.M31] * v[webgl.M22] * v[webgl.M03] + v[webgl.M20] * v[webgl.M11] * v[webgl.M32] * v[webgl.M03] - v[webgl.M10] * v[webgl.M21] * v[webgl.M32] * v[webgl.M03]
+                    - v[webgl.M30] * v[webgl.M21] * v[webgl.M02] * v[webgl.M13] + v[webgl.M20] * v[webgl.M31] * v[webgl.M02] * v[webgl.M13] + v[webgl.M30] * v[webgl.M01] * v[webgl.M22] * v[webgl.M13]
+                    - v[webgl.M00] * v[webgl.M31] * v[webgl.M22] * v[webgl.M13] - v[webgl.M20] * v[webgl.M01] * v[webgl.M32] * v[webgl.M13] + v[webgl.M00] * v[webgl.M21] * v[webgl.M32] * v[webgl.M13]
+                    + v[webgl.M30] * v[webgl.M11] * v[webgl.M02] * v[webgl.M23] - v[webgl.M10] * v[webgl.M31] * v[webgl.M02] * v[webgl.M23] - v[webgl.M30] * v[webgl.M01] * v[webgl.M12] * v[webgl.M23]
+                    + v[webgl.M00] * v[webgl.M31] * v[webgl.M12] * v[webgl.M23] + v[webgl.M10] * v[webgl.M01] * v[webgl.M32] * v[webgl.M23] - v[webgl.M00] * v[webgl.M11] * v[webgl.M32] * v[webgl.M23]
+                    - v[webgl.M20] * v[webgl.M11] * v[webgl.M02] * v[webgl.M33] + v[webgl.M10] * v[webgl.M21] * v[webgl.M02] * v[webgl.M33] + v[webgl.M20] * v[webgl.M01] * v[webgl.M12] * v[webgl.M33]
+                    - v[webgl.M00] * v[webgl.M21] * v[webgl.M12] * v[webgl.M33] - v[webgl.M10] * v[webgl.M01] * v[webgl.M22] * v[webgl.M33] + v[webgl.M00] * v[webgl.M11] * v[webgl.M22] * v[webgl.M33];
             };
             Matrix4.prototype.translate = function (x, y, z) {
-                this.values[webgl.M03] += x;
-                this.values[webgl.M13] += y;
-                this.values[webgl.M23] += z;
+                var v = this.values;
+                v[webgl.M03] += x;
+                v[webgl.M13] += y;
+                v[webgl.M23] += z;
                 return this;
             };
             Matrix4.prototype.copy = function () {
@@ -3377,22 +5406,23 @@ var spine;
                 var l_fd = (1.0 / Math.tan((fovy * (Math.PI / 180)) / 2.0));
                 var l_a1 = (far + near) / (near - far);
                 var l_a2 = (2 * far * near) / (near - far);
-                this.values[webgl.M00] = l_fd / aspectRatio;
-                this.values[webgl.M10] = 0;
-                this.values[webgl.M20] = 0;
-                this.values[webgl.M30] = 0;
-                this.values[webgl.M01] = 0;
-                this.values[webgl.M11] = l_fd;
-                this.values[webgl.M21] = 0;
-                this.values[webgl.M31] = 0;
-                this.values[webgl.M02] = 0;
-                this.values[webgl.M12] = 0;
-                this.values[webgl.M22] = l_a1;
-                this.values[webgl.M32] = -1;
-                this.values[webgl.M03] = 0;
-                this.values[webgl.M13] = 0;
-                this.values[webgl.M23] = l_a2;
-                this.values[webgl.M33] = 0;
+                var v = this.values;
+                v[webgl.M00] = l_fd / aspectRatio;
+                v[webgl.M10] = 0;
+                v[webgl.M20] = 0;
+                v[webgl.M30] = 0;
+                v[webgl.M01] = 0;
+                v[webgl.M11] = l_fd;
+                v[webgl.M21] = 0;
+                v[webgl.M31] = 0;
+                v[webgl.M02] = 0;
+                v[webgl.M12] = 0;
+                v[webgl.M22] = l_a1;
+                v[webgl.M32] = -1;
+                v[webgl.M03] = 0;
+                v[webgl.M13] = 0;
+                v[webgl.M23] = l_a2;
+                v[webgl.M33] = 0;
                 return this;
             };
             Matrix4.prototype.ortho2d = function (x, y, width, height) {
@@ -3406,92 +5436,67 @@ var spine;
                 var tx = -(right + left) / (right - left);
                 var ty = -(top + bottom) / (top - bottom);
                 var tz = -(far + near) / (far - near);
-                this.values[webgl.M00] = x_orth;
-                this.values[webgl.M10] = 0;
-                this.values[webgl.M20] = 0;
-                this.values[webgl.M30] = 0;
-                this.values[webgl.M01] = 0;
-                this.values[webgl.M11] = y_orth;
-                this.values[webgl.M21] = 0;
-                this.values[webgl.M31] = 0;
-                this.values[webgl.M02] = 0;
-                this.values[webgl.M12] = 0;
-                this.values[webgl.M22] = z_orth;
-                this.values[webgl.M32] = 0;
-                this.values[webgl.M03] = tx;
-                this.values[webgl.M13] = ty;
-                this.values[webgl.M23] = tz;
-                this.values[webgl.M33] = 1;
+                var v = this.values;
+                v[webgl.M00] = x_orth;
+                v[webgl.M10] = 0;
+                v[webgl.M20] = 0;
+                v[webgl.M30] = 0;
+                v[webgl.M01] = 0;
+                v[webgl.M11] = y_orth;
+                v[webgl.M21] = 0;
+                v[webgl.M31] = 0;
+                v[webgl.M02] = 0;
+                v[webgl.M12] = 0;
+                v[webgl.M22] = z_orth;
+                v[webgl.M32] = 0;
+                v[webgl.M03] = tx;
+                v[webgl.M13] = ty;
+                v[webgl.M23] = tz;
+                v[webgl.M33] = 1;
                 return this;
             };
             Matrix4.prototype.multiply = function (matrix) {
-                this.temp[webgl.M00] = this.values[webgl.M00] * matrix.values[webgl.M00] + this.values[webgl.M01] * matrix.values[webgl.M10] + this.values[webgl.M02] * matrix.values[webgl.M20] + this.values[webgl.M03]
-                    * matrix.values[webgl.M30];
-                this.temp[webgl.M01] = this.values[webgl.M00] * matrix.values[webgl.M01] + this.values[webgl.M01] * matrix.values[webgl.M11] + this.values[webgl.M02] * matrix.values[webgl.M21] + this.values[webgl.M03]
-                    * matrix.values[webgl.M31];
-                this.temp[webgl.M02] = this.values[webgl.M00] * matrix.values[webgl.M02] + this.values[webgl.M01] * matrix.values[webgl.M12] + this.values[webgl.M02] * matrix.values[webgl.M22] + this.values[webgl.M03]
-                    * matrix.values[webgl.M32];
-                this.temp[webgl.M03] = this.values[webgl.M00] * matrix.values[webgl.M03] + this.values[webgl.M01] * matrix.values[webgl.M13] + this.values[webgl.M02] * matrix.values[webgl.M23] + this.values[webgl.M03]
-                    * matrix.values[webgl.M33];
-                this.temp[webgl.M10] = this.values[webgl.M10] * matrix.values[webgl.M00] + this.values[webgl.M11] * matrix.values[webgl.M10] + this.values[webgl.M12] * matrix.values[webgl.M20] + this.values[webgl.M13]
-                    * matrix.values[webgl.M30];
-                this.temp[webgl.M11] = this.values[webgl.M10] * matrix.values[webgl.M01] + this.values[webgl.M11] * matrix.values[webgl.M11] + this.values[webgl.M12] * matrix.values[webgl.M21] + this.values[webgl.M13]
-                    * matrix.values[webgl.M31];
-                this.temp[webgl.M12] = this.values[webgl.M10] * matrix.values[webgl.M02] + this.values[webgl.M11] * matrix.values[webgl.M12] + this.values[webgl.M12] * matrix.values[webgl.M22] + this.values[webgl.M13]
-                    * matrix.values[webgl.M32];
-                this.temp[webgl.M13] = this.values[webgl.M10] * matrix.values[webgl.M03] + this.values[webgl.M11] * matrix.values[webgl.M13] + this.values[webgl.M12] * matrix.values[webgl.M23] + this.values[webgl.M13]
-                    * matrix.values[webgl.M33];
-                this.temp[webgl.M20] = this.values[webgl.M20] * matrix.values[webgl.M00] + this.values[webgl.M21] * matrix.values[webgl.M10] + this.values[webgl.M22] * matrix.values[webgl.M20] + this.values[webgl.M23]
-                    * matrix.values[webgl.M30];
-                this.temp[webgl.M21] = this.values[webgl.M20] * matrix.values[webgl.M01] + this.values[webgl.M21] * matrix.values[webgl.M11] + this.values[webgl.M22] * matrix.values[webgl.M21] + this.values[webgl.M23]
-                    * matrix.values[webgl.M31];
-                this.temp[webgl.M22] = this.values[webgl.M20] * matrix.values[webgl.M02] + this.values[webgl.M21] * matrix.values[webgl.M12] + this.values[webgl.M22] * matrix.values[webgl.M22] + this.values[webgl.M23]
-                    * matrix.values[webgl.M32];
-                this.temp[webgl.M23] = this.values[webgl.M20] * matrix.values[webgl.M03] + this.values[webgl.M21] * matrix.values[webgl.M13] + this.values[webgl.M22] * matrix.values[webgl.M23] + this.values[webgl.M23]
-                    * matrix.values[webgl.M33];
-                this.temp[webgl.M30] = this.values[webgl.M30] * matrix.values[webgl.M00] + this.values[webgl.M31] * matrix.values[webgl.M10] + this.values[webgl.M32] * matrix.values[webgl.M20] + this.values[webgl.M33]
-                    * matrix.values[webgl.M30];
-                this.temp[webgl.M31] = this.values[webgl.M30] * matrix.values[webgl.M01] + this.values[webgl.M31] * matrix.values[webgl.M11] + this.values[webgl.M32] * matrix.values[webgl.M21] + this.values[webgl.M33]
-                    * matrix.values[webgl.M31];
-                this.temp[webgl.M32] = this.values[webgl.M30] * matrix.values[webgl.M02] + this.values[webgl.M31] * matrix.values[webgl.M12] + this.values[webgl.M32] * matrix.values[webgl.M22] + this.values[webgl.M33]
-                    * matrix.values[webgl.M32];
-                this.temp[webgl.M33] = this.values[webgl.M30] * matrix.values[webgl.M03] + this.values[webgl.M31] * matrix.values[webgl.M13] + this.values[webgl.M32] * matrix.values[webgl.M23] + this.values[webgl.M33]
-                    * matrix.values[webgl.M33];
+                var t = this.temp;
+                var v = this.values;
+                var m = matrix.values;
+                t[webgl.M00] = v[webgl.M00] * m[webgl.M00] + v[webgl.M01] * m[webgl.M10] + v[webgl.M02] * m[webgl.M20] + v[webgl.M03] * m[webgl.M30];
+                t[webgl.M01] = v[webgl.M00] * m[webgl.M01] + v[webgl.M01] * m[webgl.M11] + v[webgl.M02] * m[webgl.M21] + v[webgl.M03] * m[webgl.M31];
+                t[webgl.M02] = v[webgl.M00] * m[webgl.M02] + v[webgl.M01] * m[webgl.M12] + v[webgl.M02] * m[webgl.M22] + v[webgl.M03] * m[webgl.M32];
+                t[webgl.M03] = v[webgl.M00] * m[webgl.M03] + v[webgl.M01] * m[webgl.M13] + v[webgl.M02] * m[webgl.M23] + v[webgl.M03] * m[webgl.M33];
+                t[webgl.M10] = v[webgl.M10] * m[webgl.M00] + v[webgl.M11] * m[webgl.M10] + v[webgl.M12] * m[webgl.M20] + v[webgl.M13] * m[webgl.M30];
+                t[webgl.M11] = v[webgl.M10] * m[webgl.M01] + v[webgl.M11] * m[webgl.M11] + v[webgl.M12] * m[webgl.M21] + v[webgl.M13] * m[webgl.M31];
+                t[webgl.M12] = v[webgl.M10] * m[webgl.M02] + v[webgl.M11] * m[webgl.M12] + v[webgl.M12] * m[webgl.M22] + v[webgl.M13] * m[webgl.M32];
+                t[webgl.M13] = v[webgl.M10] * m[webgl.M03] + v[webgl.M11] * m[webgl.M13] + v[webgl.M12] * m[webgl.M23] + v[webgl.M13] * m[webgl.M33];
+                t[webgl.M20] = v[webgl.M20] * m[webgl.M00] + v[webgl.M21] * m[webgl.M10] + v[webgl.M22] * m[webgl.M20] + v[webgl.M23] * m[webgl.M30];
+                t[webgl.M21] = v[webgl.M20] * m[webgl.M01] + v[webgl.M21] * m[webgl.M11] + v[webgl.M22] * m[webgl.M21] + v[webgl.M23] * m[webgl.M31];
+                t[webgl.M22] = v[webgl.M20] * m[webgl.M02] + v[webgl.M21] * m[webgl.M12] + v[webgl.M22] * m[webgl.M22] + v[webgl.M23] * m[webgl.M32];
+                t[webgl.M23] = v[webgl.M20] * m[webgl.M03] + v[webgl.M21] * m[webgl.M13] + v[webgl.M22] * m[webgl.M23] + v[webgl.M23] * m[webgl.M33];
+                t[webgl.M30] = v[webgl.M30] * m[webgl.M00] + v[webgl.M31] * m[webgl.M10] + v[webgl.M32] * m[webgl.M20] + v[webgl.M33] * m[webgl.M30];
+                t[webgl.M31] = v[webgl.M30] * m[webgl.M01] + v[webgl.M31] * m[webgl.M11] + v[webgl.M32] * m[webgl.M21] + v[webgl.M33] * m[webgl.M31];
+                t[webgl.M32] = v[webgl.M30] * m[webgl.M02] + v[webgl.M31] * m[webgl.M12] + v[webgl.M32] * m[webgl.M22] + v[webgl.M33] * m[webgl.M32];
+                t[webgl.M33] = v[webgl.M30] * m[webgl.M03] + v[webgl.M31] * m[webgl.M13] + v[webgl.M32] * m[webgl.M23] + v[webgl.M33] * m[webgl.M33];
                 return this.set(this.temp);
             };
             Matrix4.prototype.multiplyLeft = function (matrix) {
-                this.temp[webgl.M00] = matrix.values[webgl.M00] * this.values[webgl.M00] + matrix.values[webgl.M01] * this.values[webgl.M10] + matrix.values[webgl.M02] * this.values[webgl.M20] + matrix.values[webgl.M03]
-                    * this.values[webgl.M30];
-                this.temp[webgl.M01] = matrix.values[webgl.M00] * this.values[webgl.M01] + matrix.values[webgl.M01] * this.values[webgl.M11] + matrix.values[webgl.M02] * this.values[webgl.M21] + matrix.values[webgl.M03]
-                    * this.values[webgl.M31];
-                this.temp[webgl.M02] = matrix.values[webgl.M00] * this.values[webgl.M02] + matrix.values[webgl.M01] * this.values[webgl.M12] + matrix.values[webgl.M02] * this.values[webgl.M22] + matrix.values[webgl.M03]
-                    * this.values[webgl.M32];
-                this.temp[webgl.M03] = matrix.values[webgl.M00] * this.values[webgl.M03] + matrix.values[webgl.M01] * this.values[webgl.M13] + matrix.values[webgl.M02] * this.values[webgl.M23] + matrix.values[webgl.M03]
-                    * this.values[webgl.M33];
-                this.temp[webgl.M10] = matrix.values[webgl.M10] * this.values[webgl.M00] + matrix.values[webgl.M11] * this.values[webgl.M10] + matrix.values[webgl.M12] * this.values[webgl.M20] + matrix.values[webgl.M13]
-                    * this.values[webgl.M30];
-                this.temp[webgl.M11] = matrix.values[webgl.M10] * this.values[webgl.M01] + matrix.values[webgl.M11] * this.values[webgl.M11] + matrix.values[webgl.M12] * this.values[webgl.M21] + matrix.values[webgl.M13]
-                    * this.values[webgl.M31];
-                this.temp[webgl.M12] = matrix.values[webgl.M10] * this.values[webgl.M02] + matrix.values[webgl.M11] * this.values[webgl.M12] + matrix.values[webgl.M12] * this.values[webgl.M22] + matrix.values[webgl.M13]
-                    * this.values[webgl.M32];
-                this.temp[webgl.M13] = matrix.values[webgl.M10] * this.values[webgl.M03] + matrix.values[webgl.M11] * this.values[webgl.M13] + matrix.values[webgl.M12] * this.values[webgl.M23] + matrix.values[webgl.M13]
-                    * this.values[webgl.M33];
-                this.temp[webgl.M20] = matrix.values[webgl.M20] * this.values[webgl.M00] + matrix.values[webgl.M21] * this.values[webgl.M10] + matrix.values[webgl.M22] * this.values[webgl.M20] + matrix.values[webgl.M23]
-                    * this.values[webgl.M30];
-                this.temp[webgl.M21] = matrix.values[webgl.M20] * this.values[webgl.M01] + matrix.values[webgl.M21] * this.values[webgl.M11] + matrix.values[webgl.M22] * this.values[webgl.M21] + matrix.values[webgl.M23]
-                    * this.values[webgl.M31];
-                this.temp[webgl.M22] = matrix.values[webgl.M20] * this.values[webgl.M02] + matrix.values[webgl.M21] * this.values[webgl.M12] + matrix.values[webgl.M22] * this.values[webgl.M22] + matrix.values[webgl.M23]
-                    * this.values[webgl.M32];
-                this.temp[webgl.M23] = matrix.values[webgl.M20] * this.values[webgl.M03] + matrix.values[webgl.M21] * this.values[webgl.M13] + matrix.values[webgl.M22] * this.values[webgl.M23] + matrix.values[webgl.M23]
-                    * this.values[webgl.M33];
-                this.temp[webgl.M30] = matrix.values[webgl.M30] * this.values[webgl.M00] + matrix.values[webgl.M31] * this.values[webgl.M10] + matrix.values[webgl.M32] * this.values[webgl.M20] + matrix.values[webgl.M33]
-                    * this.values[webgl.M30];
-                this.temp[webgl.M31] = matrix.values[webgl.M30] * this.values[webgl.M01] + matrix.values[webgl.M31] * this.values[webgl.M11] + matrix.values[webgl.M32] * this.values[webgl.M21] + matrix.values[webgl.M33]
-                    * this.values[webgl.M31];
-                this.temp[webgl.M32] = matrix.values[webgl.M30] * this.values[webgl.M02] + matrix.values[webgl.M31] * this.values[webgl.M12] + matrix.values[webgl.M32] * this.values[webgl.M22] + matrix.values[webgl.M33]
-                    * this.values[webgl.M32];
-                this.temp[webgl.M33] = matrix.values[webgl.M30] * this.values[webgl.M03] + matrix.values[webgl.M31] * this.values[webgl.M13] + matrix.values[webgl.M32] * this.values[webgl.M23] + matrix.values[webgl.M33]
-                    * this.values[webgl.M33];
+                var t = this.temp;
+                var v = this.values;
+                var m = matrix.values;
+                t[webgl.M00] = m[webgl.M00] * v[webgl.M00] + m[webgl.M01] * v[webgl.M10] + m[webgl.M02] * v[webgl.M20] + m[webgl.M03] * v[webgl.M30];
+                t[webgl.M01] = m[webgl.M00] * v[webgl.M01] + m[webgl.M01] * v[webgl.M11] + m[webgl.M02] * v[webgl.M21] + m[webgl.M03] * v[webgl.M31];
+                t[webgl.M02] = m[webgl.M00] * v[webgl.M02] + m[webgl.M01] * v[webgl.M12] + m[webgl.M02] * v[webgl.M22] + m[webgl.M03] * v[webgl.M32];
+                t[webgl.M03] = m[webgl.M00] * v[webgl.M03] + m[webgl.M01] * v[webgl.M13] + m[webgl.M02] * v[webgl.M23] + m[webgl.M03] * v[webgl.M33];
+                t[webgl.M10] = m[webgl.M10] * v[webgl.M00] + m[webgl.M11] * v[webgl.M10] + m[webgl.M12] * v[webgl.M20] + m[webgl.M13] * v[webgl.M30];
+                t[webgl.M11] = m[webgl.M10] * v[webgl.M01] + m[webgl.M11] * v[webgl.M11] + m[webgl.M12] * v[webgl.M21] + m[webgl.M13] * v[webgl.M31];
+                t[webgl.M12] = m[webgl.M10] * v[webgl.M02] + m[webgl.M11] * v[webgl.M12] + m[webgl.M12] * v[webgl.M22] + m[webgl.M13] * v[webgl.M32];
+                t[webgl.M13] = m[webgl.M10] * v[webgl.M03] + m[webgl.M11] * v[webgl.M13] + m[webgl.M12] * v[webgl.M23] + m[webgl.M13] * v[webgl.M33];
+                t[webgl.M20] = m[webgl.M20] * v[webgl.M00] + m[webgl.M21] * v[webgl.M10] + m[webgl.M22] * v[webgl.M20] + m[webgl.M23] * v[webgl.M30];
+                t[webgl.M21] = m[webgl.M20] * v[webgl.M01] + m[webgl.M21] * v[webgl.M11] + m[webgl.M22] * v[webgl.M21] + m[webgl.M23] * v[webgl.M31];
+                t[webgl.M22] = m[webgl.M20] * v[webgl.M02] + m[webgl.M21] * v[webgl.M12] + m[webgl.M22] * v[webgl.M22] + m[webgl.M23] * v[webgl.M32];
+                t[webgl.M23] = m[webgl.M20] * v[webgl.M03] + m[webgl.M21] * v[webgl.M13] + m[webgl.M22] * v[webgl.M23] + m[webgl.M23] * v[webgl.M33];
+                t[webgl.M30] = m[webgl.M30] * v[webgl.M00] + m[webgl.M31] * v[webgl.M10] + m[webgl.M32] * v[webgl.M20] + m[webgl.M33] * v[webgl.M30];
+                t[webgl.M31] = m[webgl.M30] * v[webgl.M01] + m[webgl.M31] * v[webgl.M11] + m[webgl.M32] * v[webgl.M21] + m[webgl.M33] * v[webgl.M31];
+                t[webgl.M32] = m[webgl.M30] * v[webgl.M02] + m[webgl.M31] * v[webgl.M12] + m[webgl.M32] * v[webgl.M22] + m[webgl.M33] * v[webgl.M32];
+                t[webgl.M33] = m[webgl.M30] * v[webgl.M03] + m[webgl.M31] * v[webgl.M13] + m[webgl.M32] * v[webgl.M23] + m[webgl.M33] * v[webgl.M33];
                 return this.set(this.temp);
             };
             return Matrix4;
@@ -3499,18 +5504,49 @@ var spine;
         webgl.Matrix4 = Matrix4;
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var webgl;
     (function (webgl) {
         var Mesh = (function () {
-            function Mesh(_attributes, maxVertices, maxIndices) {
+            function Mesh(gl, _attributes, maxVertices, maxIndices) {
                 this._attributes = _attributes;
                 this._verticesLength = 0;
                 this._dirtyVertices = false;
                 this._indicesLength = 0;
                 this._dirtyIndices = false;
                 this._elementsPerVertex = 0;
+                this._gl = gl;
                 this._elementsPerVertex = 0;
                 for (var i = 0; i < _attributes.length; i++) {
                     this._elementsPerVertex += _attributes[i].numElements;
@@ -3552,59 +5588,64 @@ var spine;
                 this.drawWithOffset(shader, primitiveType, 0, this._indicesLength > 0 ? this._indicesLength : this._verticesLength);
             };
             Mesh.prototype.drawWithOffset = function (shader, primitiveType, offset, count) {
+                var gl = this._gl;
                 if (this._dirtyVertices || this._dirtyIndices)
                     this.update();
                 this.bind(shader);
                 if (this._indicesLength > 0)
-                    webgl.gl.drawElements(primitiveType, count, webgl.gl.UNSIGNED_SHORT, offset * 2);
+                    gl.drawElements(primitiveType, count, gl.UNSIGNED_SHORT, offset * 2);
                 else
-                    webgl.gl.drawArrays(primitiveType, offset, count);
+                    gl.drawArrays(primitiveType, offset, count);
                 this.unbind(shader);
             };
             Mesh.prototype.bind = function (shader) {
-                webgl.gl.bindBuffer(webgl.gl.ARRAY_BUFFER, this._verticesBuffer);
+                var gl = this._gl;
+                gl.bindBuffer(gl.ARRAY_BUFFER, this._verticesBuffer);
                 var offset = 0;
                 for (var i = 0; i < this._attributes.length; i++) {
                     var attrib = this._attributes[i];
                     var location_1 = shader.getAttributeLocation(attrib.name);
-                    webgl.gl.enableVertexAttribArray(location_1);
-                    webgl.gl.vertexAttribPointer(location_1, attrib.numElements, webgl.gl.FLOAT, false, this._elementsPerVertex * 4, offset * 4);
+                    gl.enableVertexAttribArray(location_1);
+                    gl.vertexAttribPointer(location_1, attrib.numElements, gl.FLOAT, false, this._elementsPerVertex * 4, offset * 4);
                     offset += attrib.numElements;
                 }
                 if (this._indicesLength > 0)
-                    webgl.gl.bindBuffer(webgl.gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
+                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
             };
             Mesh.prototype.unbind = function (shader) {
+                var gl = this._gl;
                 for (var i = 0; i < this._attributes.length; i++) {
                     var attrib = this._attributes[i];
                     var location_2 = shader.getAttributeLocation(attrib.name);
-                    webgl.gl.disableVertexAttribArray(location_2);
+                    gl.disableVertexAttribArray(location_2);
                 }
-                webgl.gl.bindBuffer(webgl.gl.ARRAY_BUFFER, null);
+                gl.bindBuffer(gl.ARRAY_BUFFER, null);
                 if (this._indicesLength > 0)
-                    webgl.gl.bindBuffer(webgl.gl.ELEMENT_ARRAY_BUFFER, null);
+                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
             };
             Mesh.prototype.update = function () {
+                var gl = this._gl;
                 if (this._dirtyVertices) {
                     if (!this._verticesBuffer) {
-                        this._verticesBuffer = webgl.gl.createBuffer();
+                        this._verticesBuffer = gl.createBuffer();
                     }
-                    webgl.gl.bindBuffer(webgl.gl.ARRAY_BUFFER, this._verticesBuffer);
-                    webgl.gl.bufferData(webgl.gl.ARRAY_BUFFER, this._vertices.subarray(0, this._verticesLength), webgl.gl.STATIC_DRAW);
+                    gl.bindBuffer(gl.ARRAY_BUFFER, this._verticesBuffer);
+                    gl.bufferData(gl.ARRAY_BUFFER, this._vertices.subarray(0, this._verticesLength), gl.STATIC_DRAW);
                     this._dirtyVertices = false;
                 }
                 if (this._dirtyIndices) {
                     if (!this._indicesBuffer) {
-                        this._indicesBuffer = webgl.gl.createBuffer();
+                        this._indicesBuffer = gl.createBuffer();
                     }
-                    webgl.gl.bindBuffer(webgl.gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
-                    webgl.gl.bufferData(webgl.gl.ELEMENT_ARRAY_BUFFER, this._indices.subarray(0, this._indicesLength), webgl.gl.STATIC_DRAW);
+                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
+                    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this._indices.subarray(0, this._indicesLength), gl.STATIC_DRAW);
                     this._dirtyIndices = false;
                 }
             };
             Mesh.prototype.dispose = function () {
-                webgl.gl.deleteBuffer(this._verticesBuffer);
-                webgl.gl.deleteBuffer(this._indicesBuffer);
+                var gl = this._gl;
+                gl.deleteBuffer(this._verticesBuffer);
+                gl.deleteBuffer(this._indicesBuffer);
             };
             return Mesh;
         }());
@@ -3657,41 +5698,73 @@ var spine;
         var VertexAttributeType = webgl.VertexAttributeType;
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var webgl;
     (function (webgl) {
         var PolygonBatcher = (function () {
-            function PolygonBatcher(maxVertices) {
+            function PolygonBatcher(gl, maxVertices) {
                 if (maxVertices === void 0) { maxVertices = 10920; }
-                this._drawCalls = 0;
                 this._drawing = false;
                 this._shader = null;
                 this._lastTexture = null;
                 this._verticesLength = 0;
                 this._indicesLength = 0;
-                this._srcBlend = webgl.gl.SRC_ALPHA;
-                this._dstBlend = webgl.gl.ONE_MINUS_SRC_ALPHA;
+                this._srcBlend = WebGLRenderingContext.SRC_ALPHA;
+                this._dstBlend = WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
                 if (maxVertices > 10920)
                     throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
-                this._mesh = new webgl.Mesh([new webgl.Position2Attribute(), new webgl.ColorAttribute(), new webgl.TexCoordAttribute()], maxVertices, maxVertices * 3);
+                this._gl = gl;
+                this._mesh = new webgl.Mesh(gl, [new webgl.Position2Attribute(), new webgl.ColorAttribute(), new webgl.TexCoordAttribute()], maxVertices, maxVertices * 3);
             }
             PolygonBatcher.prototype.begin = function (shader) {
+                var gl = this._gl;
                 if (this._drawing)
                     throw new Error("PolygonBatch is already drawing. Call PolygonBatch.end() before calling PolygonBatch.begin()");
                 this._drawCalls = 0;
                 this._shader = shader;
                 this._lastTexture = null;
                 this._drawing = true;
-                webgl.gl.enable(webgl.gl.BLEND);
-                webgl.gl.blendFunc(this._srcBlend, this._dstBlend);
+                gl.enable(gl.BLEND);
+                gl.blendFunc(this._srcBlend, this._dstBlend);
             };
             PolygonBatcher.prototype.setBlendMode = function (srcBlend, dstBlend) {
+                var gl = this._gl;
                 this._srcBlend = srcBlend;
                 this._dstBlend = dstBlend;
                 if (this._drawing) {
                     this.flush();
-                    webgl.gl.blendFunc(this._srcBlend, this._dstBlend);
+                    gl.blendFunc(this._srcBlend, this._dstBlend);
                 }
             };
             PolygonBatcher.prototype.draw = function (texture, vertices, indices) {
@@ -3709,16 +5782,16 @@ var spine;
                 this._verticesLength += vertices.length;
                 this._mesh.setVerticesLength(this._verticesLength);
                 var indicesArray = this._mesh.indices();
-                for (var i = this._indicesLength, j = 0; j < indices.length; i++, j++) {
+                for (var i = this._indicesLength, j = 0; j < indices.length; i++, j++)
                     indicesArray[i] = indices[j] + indexStart;
-                }
                 this._indicesLength += indices.length;
                 this._mesh.setIndicesLength(this._indicesLength);
             };
             PolygonBatcher.prototype.flush = function () {
+                var gl = this._gl;
                 if (this._verticesLength == 0)
                     return;
-                this._mesh.draw(this._shader, webgl.gl.TRIANGLES);
+                this._mesh.draw(this._shader, gl.TRIANGLES);
                 this._verticesLength = 0;
                 this._indicesLength = 0;
                 this._mesh.setVerticesLength(0);
@@ -3726,6 +5799,7 @@ var spine;
                 this._drawCalls++;
             };
             PolygonBatcher.prototype.end = function () {
+                var gl = this._gl;
                 if (!this._drawing)
                     throw new Error("PolygonBatch is not drawing. Call PolygonBatch.begin() before calling PolygonBatch.end()");
                 if (this._verticesLength > 0 || this._indicesLength > 0)
@@ -3733,7 +5807,7 @@ var spine;
                 this._shader = null;
                 this._lastTexture = null;
                 this._drawing = false;
-                webgl.gl.disable(webgl.gl.BLEND);
+                gl.disable(gl.BLEND);
             };
             PolygonBatcher.prototype.drawCalls = function () { return this._drawCalls; };
             return PolygonBatcher;
@@ -3741,12 +5815,42 @@ var spine;
         webgl.PolygonBatcher = PolygonBatcher;
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var webgl;
     (function (webgl) {
         var Shader = (function () {
-            function Shader(_vertexShader, _fragmentShader) {
+            function Shader(gl, _vertexShader, _fragmentShader) {
                 this._vertexShader = _vertexShader;
                 this._fragmentShader = _fragmentShader;
                 this._vs = null;
@@ -3755,13 +5859,14 @@ var spine;
                 this._tmp2x2 = new Float32Array(2 * 2);
                 this._tmp3x3 = new Float32Array(3 * 3);
                 this._tmp4x4 = new Float32Array(4 * 4);
+                this._gl = gl;
                 this.compile();
             }
             Shader.prototype.program = function () { return this._program; };
             Shader.prototype.vertexShader = function () { return this._vertexShader; };
             Shader.prototype.fragmentShader = function () { return this._fragmentShader; };
             Shader.prototype.compile = function () {
-                var gl = spine.webgl.gl;
+                var gl = this._gl;
                 try {
                     this._vs = this.compileShader(gl.VERTEX_SHADER, this._vertexShader);
                     this._fs = this.compileShader(gl.FRAGMENT_SHADER, this._fragmentShader);
@@ -3773,96 +5878,104 @@ var spine;
                 }
             };
             Shader.prototype.compileShader = function (type, source) {
-                var shader = webgl.gl.createShader(type);
-                webgl.gl.shaderSource(shader, source);
-                webgl.gl.compileShader(shader);
-                if (!webgl.gl.getShaderParameter(shader, webgl.gl.COMPILE_STATUS)) {
-                    var error = "Couldn't compile shader: " + webgl.gl.getShaderInfoLog(shader);
-                    webgl.gl.deleteShader(shader);
+                var gl = this._gl;
+                var shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    var error = "Couldn't compile shader: " + gl.getShaderInfoLog(shader);
+                    gl.deleteShader(shader);
                     throw new Error(error);
                 }
                 return shader;
             };
             Shader.prototype.compileProgram = function (vs, fs) {
-                var program = webgl.gl.createProgram();
-                webgl.gl.attachShader(program, vs);
-                webgl.gl.attachShader(program, fs);
-                webgl.gl.linkProgram(program);
-                if (!webgl.gl.getProgramParameter(program, webgl.gl.LINK_STATUS)) {
-                    var error = "Couldn't compile shader program: " + webgl.gl.getProgramInfoLog(program);
-                    webgl.gl.deleteProgram(program);
+                var gl = this._gl;
+                var program = gl.createProgram();
+                gl.attachShader(program, vs);
+                gl.attachShader(program, fs);
+                gl.linkProgram(program);
+                if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+                    var error = "Couldn't compile shader program: " + gl.getProgramInfoLog(program);
+                    gl.deleteProgram(program);
                     throw new Error(error);
                 }
                 return program;
             };
             Shader.prototype.bind = function () {
-                webgl.gl.useProgram(this._program);
+                this._gl.useProgram(this._program);
             };
             Shader.prototype.unbind = function () {
-                webgl.gl.useProgram(null);
+                this._gl.useProgram(null);
             };
             Shader.prototype.setUniformi = function (uniform, value) {
-                webgl.gl.uniform1i(this.getUniformLocation(uniform), value);
+                this._gl.uniform1i(this.getUniformLocation(uniform), value);
             };
             Shader.prototype.setUniformf = function (uniform, value) {
-                webgl.gl.uniform1f(this.getUniformLocation(uniform), value);
+                this._gl.uniform1f(this.getUniformLocation(uniform), value);
             };
             Shader.prototype.setUniform2f = function (uniform, value, value2) {
-                webgl.gl.uniform2f(this.getUniformLocation(uniform), value, value2);
+                this._gl.uniform2f(this.getUniformLocation(uniform), value, value2);
             };
             Shader.prototype.setUniform3f = function (uniform, value, value2, value3) {
-                webgl.gl.uniform3f(this.getUniformLocation(uniform), value, value2, value3);
+                this._gl.uniform3f(this.getUniformLocation(uniform), value, value2, value3);
             };
             Shader.prototype.setUniform4f = function (uniform, value, value2, value3, value4) {
-                webgl.gl.uniform4f(this.getUniformLocation(uniform), value, value2, value3, value4);
+                this._gl.uniform4f(this.getUniformLocation(uniform), value, value2, value3, value4);
             };
             Shader.prototype.setUniform2x2f = function (uniform, value) {
+                var gl = this._gl;
                 this._tmp2x2.set(value);
-                webgl.gl.uniformMatrix2fv(this.getUniformLocation(uniform), false, this._tmp2x2);
+                gl.uniformMatrix2fv(this.getUniformLocation(uniform), false, this._tmp2x2);
             };
             Shader.prototype.setUniform3x3f = function (uniform, value) {
+                var gl = this._gl;
                 this._tmp3x3.set(value);
-                webgl.gl.uniformMatrix3fv(this.getUniformLocation(uniform), false, this._tmp3x3);
+                gl.uniformMatrix3fv(this.getUniformLocation(uniform), false, this._tmp3x3);
             };
             Shader.prototype.setUniform4x4f = function (uniform, value) {
+                var gl = this._gl;
                 this._tmp4x4.set(value);
-                webgl.gl.uniformMatrix4fv(this.getUniformLocation(uniform), false, this._tmp4x4);
+                gl.uniformMatrix4fv(this.getUniformLocation(uniform), false, this._tmp4x4);
             };
             Shader.prototype.getUniformLocation = function (uniform) {
-                var location = webgl.gl.getUniformLocation(this._program, uniform);
+                var gl = this._gl;
+                var location = gl.getUniformLocation(this._program, uniform);
                 if (!location)
                     throw new Error("Couldn't find location for uniform " + uniform);
                 return location;
             };
             Shader.prototype.getAttributeLocation = function (attribute) {
-                var location = webgl.gl.getAttribLocation(this._program, attribute);
+                var gl = this._gl;
+                var location = gl.getAttribLocation(this._program, attribute);
                 if (location == -1)
                     throw new Error("Couldn't find location for attribute " + attribute);
                 return location;
             };
             Shader.prototype.dispose = function () {
+                var gl = this._gl;
                 if (this._vs) {
-                    webgl.gl.deleteShader(this._vs);
+                    gl.deleteShader(this._vs);
                     this._vs = null;
                 }
                 if (this._fs) {
-                    webgl.gl.deleteShader(this._fs);
+                    gl.deleteShader(this._fs);
                     this._fs = null;
                 }
                 if (this._program) {
-                    webgl.gl.deleteProgram(this._program);
+                    gl.deleteProgram(this._program);
                     this._program = null;
                 }
             };
-            Shader.newColoredTextured = function () {
-                var vs = "\n                attribute vec4 " + Shader.POSITION + ";\n                attribute vec4 " + Shader.COLOR + ";\n                attribute vec2 " + Shader.TEXCOORDS + ";\n                uniform mat4 " + Shader.MVP_MATRIX + ";\n                varying vec4 v_color;\n                varying vec2 v_texCoords;\n            \n                void main() {                    \n                    v_color = " + Shader.COLOR + ";                    \n                    v_texCoords = " + Shader.TEXCOORDS + ";\n                    gl_Position =  " + Shader.MVP_MATRIX + " * " + Shader.POSITION + ";\n                }\n            ";
-                var fs = "\n                #ifdef GL_ES\n\t\t\t        #define LOWP lowp\n\t\t\t        precision mediump float;\n\t\t\t    #else\n\t\t\t        #define LOWP \n\t\t\t    #endif\n\t\t\t    varying LOWP vec4 v_color;\n\t\t\t    varying vec2 v_texCoords;\n\t\t\t    uniform sampler2D u_texture;\n\n\t\t\t    void main() {\t\t\t    \n\t\t\t        gl_FragColor = v_color * texture2D(u_texture, v_texCoords);\n\t\t\t    }\n            ";
-                return new Shader(vs, fs);
+            Shader.newColoredTextured = function (gl) {
+                var vs = "\n\t\t\t\tattribute vec4 " + Shader.POSITION + ";\n\t\t\t\tattribute vec4 " + Shader.COLOR + ";\n\t\t\t\tattribute vec2 " + Shader.TEXCOORDS + ";\n\t\t\t\tuniform mat4 " + Shader.MVP_MATRIX + ";\n\t\t\t\tvarying vec4 v_color;\n\t\t\t\tvarying vec2 v_texCoords;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tv_color = " + Shader.COLOR + ";\n\t\t\t\t\tv_texCoords = " + Shader.TEXCOORDS + ";\n\t\t\t\t\tgl_Position =  " + Shader.MVP_MATRIX + " * " + Shader.POSITION + ";\n\t\t\t\t}\n\t\t\t";
+                var fs = "\n\t\t\t\t#ifdef GL_ES\n\t\t\t\t\t#define LOWP lowp\n\t\t\t\t\tprecision mediump float;\n\t\t\t\t#else\n\t\t\t\t\t#define LOWP\n\t\t\t\t#endif\n\t\t\t\tvarying LOWP vec4 v_color;\n\t\t\t\tvarying vec2 v_texCoords;\n\t\t\t\tuniform sampler2D u_texture;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tgl_FragColor = v_color * texture2D(u_texture, v_texCoords);\n\t\t\t\t}\n\t\t\t";
+                return new Shader(gl, vs, fs);
             };
-            Shader.newColored = function () {
-                var vs = "\n                attribute vec4 " + Shader.POSITION + ";\n                attribute vec4 " + Shader.COLOR + ";            \n                uniform mat4 " + Shader.MVP_MATRIX + ";\n                varying vec4 v_color;                \n            \n                void main() {                    \n                    v_color = " + Shader.COLOR + ";                    \n                    gl_Position =  " + Shader.MVP_MATRIX + " * " + Shader.POSITION + ";\n                }\n            ";
-                var fs = "\n                #ifdef GL_ES\n\t\t\t        #define LOWP lowp\n\t\t\t        precision mediump float;\n\t\t\t    #else\n\t\t\t        #define LOWP\n\t\t\t    #endif\n\t\t\t    varying LOWP vec4 v_color;\t\t\t    \t\t\t    \n\n\t\t\t    void main() {\t\t\t    \n\t\t\t        gl_FragColor = v_color;\n\t\t\t    }\n            ";
-                return new Shader(vs, fs);
+            Shader.newColored = function (gl) {
+                var vs = "\n\t\t\t\tattribute vec4 " + Shader.POSITION + ";\n\t\t\t\tattribute vec4 " + Shader.COLOR + ";\n\t\t\t\tuniform mat4 " + Shader.MVP_MATRIX + ";\n\t\t\t\tvarying vec4 v_color;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tv_color = " + Shader.COLOR + ";\n\t\t\t\t\tgl_Position =  " + Shader.MVP_MATRIX + " * " + Shader.POSITION + ";\n\t\t\t\t}\n\t\t\t";
+                var fs = "\n\t\t\t\t#ifdef GL_ES\n\t\t\t\t\t#define LOWP lowp\n\t\t\t\t\tprecision mediump float;\n\t\t\t\t#else\n\t\t\t\t\t#define LOWP\n\t\t\t\t#endif\n\t\t\t\tvarying LOWP vec4 v_color;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tgl_FragColor = v_color;\n\t\t\t\t}\n\t\t\t";
+                return new Shader(gl, vs, fs);
             };
             Shader.MVP_MATRIX = "u_projTrans";
             Shader.POSITION = "a_position";
@@ -3874,15 +5987,123 @@ var spine;
         webgl.Shader = Shader;
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+var spine;
+(function (spine) {
+    var webgl;
+    (function (webgl) {
+        var SkeletonRenderer = (function () {
+            function SkeletonRenderer(gl) {
+                this.premultipliedAlpha = false;
+                this._gl = gl;
+            }
+            SkeletonRenderer.prototype.draw = function (batcher, skeleton) {
+                var premultipliedAlpha = this.premultipliedAlpha;
+                var blendMode = null;
+                var vertices = null;
+                var triangles = null;
+                var drawOrder = skeleton.drawOrder;
+                for (var i = 0, n = drawOrder.length; i < n; i++) {
+                    var slot = drawOrder[i];
+                    var attachment = slot.getAttachment();
+                    var texture = null;
+                    if (attachment instanceof spine.RegionAttachment) {
+                        var region = attachment;
+                        vertices = region.updateWorldVertices(slot, premultipliedAlpha);
+                        triangles = SkeletonRenderer.QUAD_TRIANGLES;
+                        texture = region.region.renderObject.texture;
+                    }
+                    else if (attachment instanceof spine.MeshAttachment) {
+                        var mesh = attachment;
+                        vertices = mesh.updateWorldVertices(slot, premultipliedAlpha);
+                        triangles = mesh.triangles;
+                        texture = mesh.region.renderObject.texture;
+                    }
+                    if (texture != null) {
+                        var slotBlendMode = slot.data.blendMode;
+                        if (slotBlendMode != blendMode) {
+                            blendMode = slotBlendMode;
+                            batcher.setBlendMode(webgl.getSourceGLBlendMode(this._gl, blendMode, premultipliedAlpha), webgl.getDestGLBlendMode(this._gl, blendMode));
+                        }
+                        batcher.draw(texture, vertices, triangles);
+                    }
+                }
+            };
+            SkeletonRenderer.QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
+            return SkeletonRenderer;
+        }());
+        webgl.SkeletonRenderer = SkeletonRenderer;
+    })(webgl = spine.webgl || (spine.webgl = {}));
+})(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var webgl;
     (function (webgl) {
         var Texture = (function () {
-            function Texture(image, useMipMaps) {
+            function Texture(gl, image, useMipMaps) {
                 if (useMipMaps === void 0) { useMipMaps = false; }
                 this._boundUnit = 0;
-                this._texture = webgl.gl.createTexture();
+                this._gl = gl;
+                this._texture = gl.createTexture();
                 this._image = image;
                 this.update(useMipMaps);
             }
@@ -3890,37 +6111,43 @@ var spine;
                 return this._image;
             };
             Texture.prototype.setFilters = function (minFilter, magFilter) {
+                var gl = this._gl;
                 this.bind();
-                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_MIN_FILTER, minFilter);
-                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_MAG_FILTER, magFilter);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter);
             };
             Texture.prototype.setWraps = function (uWrap, vWrap) {
+                var gl = this._gl;
                 this.bind();
-                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_WRAP_S, uWrap);
-                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_WRAP_T, vWrap);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, uWrap);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, vWrap);
             };
             Texture.prototype.update = function (useMipMaps) {
+                var gl = this._gl;
                 this.bind();
-                webgl.gl.texImage2D(webgl.gl.TEXTURE_2D, 0, webgl.gl.RGBA, webgl.gl.RGBA, webgl.gl.UNSIGNED_BYTE, this._image);
-                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_MAG_FILTER, webgl.gl.LINEAR);
-                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_MIN_FILTER, useMipMaps ? webgl.gl.LINEAR_MIPMAP_LINEAR : webgl.gl.LINEAR);
-                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_WRAP_S, webgl.gl.CLAMP_TO_EDGE);
-                webgl.gl.texParameteri(webgl.gl.TEXTURE_2D, webgl.gl.TEXTURE_WRAP_T, webgl.gl.CLAMP_TO_EDGE);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this._image);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, useMipMaps ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
                 if (useMipMaps)
-                    webgl.gl.generateMipmap(webgl.gl.TEXTURE_2D);
+                    gl.generateMipmap(gl.TEXTURE_2D);
             };
             Texture.prototype.bind = function (unit) {
                 if (unit === void 0) { unit = 0; }
+                var gl = this._gl;
                 this._boundUnit = unit;
-                webgl.gl.activeTexture(webgl.gl.TEXTURE0 + unit);
-                webgl.gl.bindTexture(webgl.gl.TEXTURE_2D, this._texture);
+                gl.activeTexture(gl.TEXTURE0 + unit);
+                gl.bindTexture(gl.TEXTURE_2D, this._texture);
             };
             Texture.prototype.unbind = function () {
-                webgl.gl.activeTexture(webgl.gl.TEXTURE0 + this._boundUnit);
-                webgl.gl.bindTexture(webgl.gl.TEXTURE_2D, null);
+                var gl = this._gl;
+                gl.activeTexture(gl.TEXTURE0 + this._boundUnit);
+                gl.bindTexture(gl.TEXTURE_2D, null);
             };
             Texture.prototype.dispose = function () {
-                webgl.gl.deleteTexture(this._texture);
+                var gl = this._gl;
+                gl.deleteTexture(this._texture);
             };
             Texture.filterFromString = function (text) {
                 switch (text.toLowerCase()) {
@@ -3963,6 +6190,36 @@ var spine;
         var TextureWrap = webgl.TextureWrap;
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var webgl;
@@ -4052,8 +6309,7 @@ var spine;
                         region.offsetX = parseInt(tuple[0]);
                         region.offsetY = parseInt(tuple[1]);
                         region.index = parseInt(reader.readValue());
-                        // FIXME
-                        // textureLoader.loadRegion(region);
+                        region.texture = page.texture;
                         this.regions.push(region);
                     }
                 }
@@ -4115,14 +6371,118 @@ var spine;
             return TextureAtlasPage;
         }());
         webgl.TextureAtlasPage = TextureAtlasPage;
-        var TextureAtlasRegion = (function () {
+        var TextureAtlasRegion = (function (_super) {
+            __extends(TextureAtlasRegion, _super);
             function TextureAtlasRegion() {
+                _super.apply(this, arguments);
             }
             return TextureAtlasRegion;
-        }());
+        }(spine.TextureRegion));
         webgl.TextureAtlasRegion = TextureAtlasRegion;
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+var spine;
+(function (spine) {
+    var webgl;
+    (function (webgl) {
+        var TextureAtlasAttachmentLoader = (function () {
+            function TextureAtlasAttachmentLoader(atlas) {
+                this.atlas = atlas;
+            }
+            /** @return May be null to not load an attachment. */
+            TextureAtlasAttachmentLoader.prototype.newRegionAttachment = function (skin, name, path) {
+                var region = this.atlas.findRegion(path);
+                region.renderObject = region;
+                if (region == null)
+                    throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
+                var attachment = new spine.RegionAttachment(name);
+                attachment.setRegion(region);
+                attachment.region = region;
+                return attachment;
+            };
+            /** @return May be null to not load an attachment. */
+            TextureAtlasAttachmentLoader.prototype.newMeshAttachment = function (skin, name, path) {
+                var region = this.atlas.findRegion(path);
+                region.renderObject = region;
+                if (region == null)
+                    throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
+                var attachment = new spine.MeshAttachment(name);
+                attachment.region = region;
+                return attachment;
+            };
+            /** @return May be null to not load an attachment. */
+            TextureAtlasAttachmentLoader.prototype.newBoundingBoxAttachment = function (skin, name) {
+                return new spine.BoundingBoxAttachment(name);
+            };
+            /** @return May be null to not load an attachment */
+            TextureAtlasAttachmentLoader.prototype.newPathAttachment = function (skin, name) {
+                return new spine.PathAttachment(name);
+            };
+            return TextureAtlasAttachmentLoader;
+        }());
+        webgl.TextureAtlasAttachmentLoader = TextureAtlasAttachmentLoader;
+    })(webgl = spine.webgl || (spine.webgl = {}));
+})(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var webgl;
@@ -4196,37 +6556,322 @@ var spine;
         webgl.Vector3 = Vector3;
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 var spine;
 (function (spine) {
     var webgl;
     (function (webgl) {
-        function init(gl) {
-            if (!gl || !(gl instanceof WebGLRenderingContext))
-                throw Error("Expected a WebGLRenderingContext");
-            spine.webgl.gl = gl;
-        }
-        webgl.init = init;
-        function getSourceGLBlendMode(blendMode, premultipliedAlpha) {
+        function getSourceGLBlendMode(gl, blendMode, premultipliedAlpha) {
             if (premultipliedAlpha === void 0) { premultipliedAlpha = false; }
             switch (blendMode) {
-                case spine.BlendMode.Normal: return premultipliedAlpha ? webgl.gl.ONE : webgl.gl.SRC_ALPHA;
-                case spine.BlendMode.Additive: return premultipliedAlpha ? webgl.gl.ONE : webgl.gl.SRC_ALPHA;
-                case spine.BlendMode.Multiply: return webgl.gl.DST_COLOR;
-                case spine.BlendMode.Screen: return webgl.gl.ONE;
+                case spine.BlendMode.Normal: return premultipliedAlpha ? gl.ONE : gl.SRC_ALPHA;
+                case spine.BlendMode.Additive: return premultipliedAlpha ? gl.ONE : gl.SRC_ALPHA;
+                case spine.BlendMode.Multiply: return gl.DST_COLOR;
+                case spine.BlendMode.Screen: return gl.ONE;
                 default: throw new Error("Unknown blend mode: " + blendMode);
             }
         }
         webgl.getSourceGLBlendMode = getSourceGLBlendMode;
-        function getDestGLBlendMode(blendMode) {
+        function getDestGLBlendMode(gl, blendMode) {
             switch (blendMode) {
-                case spine.BlendMode.Normal: return webgl.gl.ONE_MINUS_SRC_ALPHA;
-                case spine.BlendMode.Additive: return webgl.gl.ONE;
-                case spine.BlendMode.Multiply: return webgl.gl.ONE_MINUS_SRC_ALPHA;
-                case spine.BlendMode.Screen: return webgl.gl.ONE_MINUS_SRC_ALPHA;
+                case spine.BlendMode.Normal: return gl.ONE_MINUS_SRC_ALPHA;
+                case spine.BlendMode.Additive: return gl.ONE;
+                case spine.BlendMode.Multiply: return gl.ONE_MINUS_SRC_ALPHA;
+                case spine.BlendMode.Screen: return gl.ONE_MINUS_SRC_ALPHA;
                 default: throw new Error("Unknown blend mode: " + blendMode);
             }
         }
         webgl.getDestGLBlendMode = getDestGLBlendMode;
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+var spine;
+(function (spine) {
+    var SpineWidget = (function () {
+        function SpineWidget(element, config) {
+            var _this = this;
+            this._mvp = new spine.webgl.Matrix4();
+            this._paused = false;
+            this._lastFrameTime = Date.now() / 1000.0;
+            this._backgroundColor = new spine.Color();
+            this._loaded = false;
+            if (!element)
+                throw new Error("Please provide a DOM element, e.g. document.getElementById('myelement')");
+            if (!config)
+                throw new Error("Please provide a configuration, specifying at least the json file, atlas file and animation name");
+            var elementId = element;
+            if (typeof (element) === "string")
+                element = document.getElementById(element);
+            if (element == null)
+                throw new Error("Element " + elementId + " does not exist");
+            this.validateConfig(config);
+            var canvas = this.canvas = document.createElement("canvas");
+            element.appendChild(canvas);
+            canvas.width = config.width;
+            canvas.height = config.height;
+            var webglConfig = { alpha: false };
+            var gl = this.gl = (canvas.getContext("webgl", webglConfig) || canvas.getContext("experimental-webgl", webglConfig));
+            this._shader = spine.webgl.Shader.newColoredTextured(gl);
+            this._batcher = new spine.webgl.PolygonBatcher(gl);
+            this._mvp.ortho2d(0, 0, 639, 479);
+            this._skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);
+            var assets = this._assetManager = new spine.webgl.AssetManager(gl);
+            assets.loadText(config.atlas);
+            assets.loadText(config.json);
+            assets.loadTexture(config.atlas.replace(".atlas", ".png"));
+            requestAnimationFrame(function () { _this.load(); });
+        }
+        SpineWidget.prototype.validateConfig = function (config) {
+            if (!config.atlas)
+                throw new Error("Please specify config.atlas");
+            if (!config.json)
+                throw new Error("Please specify config.json");
+            if (!config.animation)
+                throw new Error("Please specify config.animationName");
+            if (!config.scale)
+                config.scale = 1.0;
+            if (!config.skin)
+                config.skin = "default";
+            if (config.loop === undefined)
+                config.loop = true;
+            if (!config.y)
+                config.y = 20;
+            if (!config.width)
+                config.width = 640;
+            if (!config.height)
+                config.height = 480;
+            if (!config.x)
+                config.x = config.width / 2;
+            if (!config.backgroundColor)
+                config.backgroundColor = "#555555";
+            if (!config.imagesPath) {
+                var index = config.atlas.lastIndexOf("/");
+                if (index != -1) {
+                    config.imagesPath = config.atlas.substr(0, index) + "/";
+                }
+                else {
+                    config.imagesPath = "";
+                }
+            }
+            if (!config.premultipliedAlpha === undefined)
+                config.premultipliedAlpha = false;
+            this._backgroundColor.setFromString(config.backgroundColor);
+            this._config = config;
+        };
+        SpineWidget.prototype.load = function () {
+            var _this = this;
+            var assetManager = this._assetManager;
+            var imagesPath = this._config.imagesPath;
+            var config = this._config;
+            if (assetManager.isLoadingComplete()) {
+                if (assetManager.hasErrors()) {
+                    if (config.error)
+                        config.error(this, "Failed to load assets: " + JSON.stringify(assetManager.errors));
+                    else
+                        throw new Error("Failed to load assets: " + JSON.stringify(assetManager.errors));
+                }
+                var atlas = new spine.webgl.TextureAtlas(this._assetManager.get(this._config.atlas), function (path) {
+                    return assetManager.get(imagesPath + path);
+                });
+                var atlasLoader = new spine.webgl.TextureAtlasAttachmentLoader(atlas);
+                var skeletonJson = new spine.SkeletonJson(atlasLoader);
+                // Set the scale to apply during parsing, parse the file, and create a new skeleton.
+                skeletonJson.scale = config.scale;
+                var skeletonData = skeletonJson.readSkeletonData(assetManager.get(config.json));
+                var skeleton = this.skeleton = new spine.Skeleton(skeletonData);
+                skeleton.x = config.x;
+                skeleton.y = config.y;
+                skeleton.setSkinByName(config.skin);
+                var animationState = this.state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
+                animationState.setAnimation(0, config.animation, true);
+                if (config.success)
+                    config.success(this);
+                this._loaded = true;
+                requestAnimationFrame(function () { _this.render(); });
+            }
+            else
+                requestAnimationFrame(function () { _this.load(); });
+        };
+        SpineWidget.prototype.render = function () {
+            var _this = this;
+            var now = Date.now() / 1000;
+            var delta = now - this._lastFrameTime;
+            if (delta > 0.1)
+                delta = 0;
+            this._lastFrameTime = now;
+            var gl = this.gl;
+            var color = this._backgroundColor;
+            gl.clearColor(color.r, color.g, color.b, color.a);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            // Apply the animation state based on the delta time.
+            var state = this.state;
+            var skeleton = this.skeleton;
+            var premultipliedAlpha = this._config.premultipliedAlpha;
+            state.update(delta);
+            state.apply(skeleton);
+            skeleton.updateWorldTransform();
+            // Bind the shader and set the texture and model-view-projection matrix.
+            var shader = this._shader;
+            shader.bind();
+            shader.setUniformi(spine.webgl.Shader.SAMPLER, 0);
+            shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, this._mvp.values);
+            // Start the batch and tell the SkeletonRenderer to render the active skeleton.
+            var batcher = this._batcher;
+            var skeletonRenderer = this._skeletonRenderer;
+            batcher.begin(shader);
+            skeletonRenderer.premultipliedAlpha = premultipliedAlpha;
+            skeletonRenderer.draw(batcher, skeleton);
+            batcher.end();
+            shader.unbind();
+            if (!this._paused)
+                requestAnimationFrame(function () { _this.render(); });
+        };
+        SpineWidget.prototype.pause = function () {
+            this._paused = true;
+        };
+        SpineWidget.prototype.play = function () {
+            var _this = this;
+            this._paused = false;
+            requestAnimationFrame(function () { _this.render(); });
+        };
+        SpineWidget.prototype.isPlaying = function () {
+            return !this._paused;
+        };
+        SpineWidget.prototype.setAnimation = function (animationName) {
+            if (!this._loaded)
+                throw new Error("Widget isn't loaded yet");
+            this.skeleton.setToSetupPose();
+            this.state.setAnimation(0, animationName, this._config.loop);
+        };
+        SpineWidget.loadWidgets = function () {
+            var widgets = document.getElementsByClassName("spine-widget");
+            for (var i = 0; i < widgets.length; i++) {
+                SpineWidget.loadWidget(widgets[i]);
+            }
+        };
+        SpineWidget.loadWidget = function (widget) {
+            var config = new SpineWidgetConfig();
+            config.atlas = widget.getAttribute("data-atlas");
+            config.json = widget.getAttribute("data-json");
+            config.animation = widget.getAttribute("data-animation");
+            if (widget.getAttribute("data-images-path"))
+                config.imagesPath = widget.getAttribute("data-images-path");
+            if (widget.getAttribute("data-skin"))
+                config.skin = widget.getAttribute("data-skin");
+            if (widget.getAttribute("data-loop"))
+                config.loop = widget.getAttribute("data-loop") === "true";
+            if (widget.getAttribute("data-scale"))
+                config.scale = parseFloat(widget.getAttribute("data-scale"));
+            if (widget.getAttribute("data-x"))
+                config.x = parseFloat(widget.getAttribute("data-x"));
+            if (widget.getAttribute("data-y"))
+                config.x = parseFloat(widget.getAttribute("data-y"));
+            if (widget.getAttribute("data-width"))
+                config.width = parseInt(widget.getAttribute("data-width"));
+            if (widget.getAttribute("data-height"))
+                config.height = parseInt(widget.getAttribute("data-height"));
+            if (widget.getAttribute("data-background-color"))
+                config.backgroundColor = widget.getAttribute("data-background-color");
+            if (widget.getAttribute("data-premultiplied-alpha"))
+                config.premultipliedAlpha = widget.getAttribute("data-premultiplied-alpha") === "true";
+            new spine.SpineWidget(widget, config);
+        };
+        SpineWidget.ready = function () {
+            if (SpineWidget.pageLoaded)
+                return;
+            SpineWidget.pageLoaded = true;
+            SpineWidget.loadWidgets();
+        };
+        SpineWidget.setupDOMListener = function () {
+            if (document.addEventListener) {
+                document.addEventListener("DOMContentLoaded", SpineWidget.ready, false);
+                window.addEventListener("load", SpineWidget.ready, false);
+            }
+            else {
+                document.attachEvent("onreadystatechange", function readyStateChange() {
+                    if (document.readyState === "complete")
+                        SpineWidget.ready();
+                });
+                window.attachEvent("onload", SpineWidget.ready);
+            }
+        };
+        SpineWidget.pageLoaded = false;
+        return SpineWidget;
+    }());
+    spine.SpineWidget = SpineWidget;
+    var SpineWidgetConfig = (function () {
+        function SpineWidgetConfig() {
+            this.skin = "default";
+            this.loop = true;
+            this.scale = 1.0;
+            this.x = 0;
+            this.y = 0;
+            this.width = 640;
+            this.height = 480;
+            this.backgroundColor = "#555555";
+            this.premultipliedAlpha = false;
+        }
+        return SpineWidgetConfig;
+    }());
+    spine.SpineWidgetConfig = SpineWidgetConfig;
+})(spine || (spine = {}));
+spine.SpineWidget.setupDOMListener();
 //# sourceMappingURL=spine-all.js.map

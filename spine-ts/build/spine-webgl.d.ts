@@ -1862,6 +1862,8 @@ declare module spine.webgl {
         toLoad(): number;
         loaded(): number;
         dispose(): void;
+        hasErrors(): boolean;
+        errors(): Map<string>;
     }
 }
 /******************************************************************************
@@ -2420,30 +2422,81 @@ declare module spine.webgl {
     function getSourceGLBlendMode(gl: WebGLRenderingContext, blendMode: BlendMode, premultipliedAlpha?: boolean): number;
     function getDestGLBlendMode(gl: WebGLRenderingContext, blendMode: BlendMode): number;
 }
-declare module spine.widget {
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+declare module spine {
     class SpineWidget {
         skeleton: Skeleton;
         state: AnimationState;
         gl: WebGLRenderingContext;
         canvas: HTMLCanvasElement;
+        private _config;
         private _assetManager;
+        private _shader;
         private _batcher;
-        constructor(element: HTMLElement, config: SpineWidgetConfig);
+        private _mvp;
+        private _skeletonRenderer;
+        private _paused;
+        private _lastFrameTime;
+        private _backgroundColor;
+        private _loaded;
+        constructor(element: Element | string, config: SpineWidgetConfig);
+        private validateConfig(config);
+        private load();
+        private render();
+        pause(): void;
+        play(): void;
+        isPlaying(): boolean;
+        setAnimation(animationName: string): void;
+        static loadWidgets(): void;
+        static loadWidget(widget: Element): void;
+        static pageLoaded: boolean;
+        private static ready();
+        static setupDOMListener(): void;
     }
     class SpineWidgetConfig {
         json: string;
         atlas: string;
-        animationName: string;
-        scale: number;
+        animation: string;
+        imagesPath: string;
         skin: string;
         loop: boolean;
+        scale: number;
         x: number;
         y: number;
         width: number;
         height: number;
-        background: string;
-        finishedLoading: () => void;
-        success: () => void;
-        error: (msg: string) => void;
+        backgroundColor: string;
+        premultipliedAlpha: boolean;
+        success: (widget: SpineWidget) => void;
+        error: (widget: SpineWidget, msg: string) => void;
     }
 }
