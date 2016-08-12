@@ -219,6 +219,25 @@ module spine {
 
 			new spine.SpineWidget(widget, config);
 		}
+
+		static pageLoaded = false;
+		private static ready () {
+			if (SpineWidget.pageLoaded) return;
+			SpineWidget.pageLoaded = true;
+			SpineWidget.loadWidgets();
+		}
+
+		static setupDOMListener() {
+			if (document.addEventListener) {
+				document.addEventListener("DOMContentLoaded", SpineWidget.ready, false);
+				window.addEventListener("load", SpineWidget.ready, false);
+			} else {
+				(<any>document).attachEvent("onreadystatechange", function readyStateChange() {
+					if (document.readyState === "complete" ) SpineWidget.ready();
+				});
+				(<any>window).attachEvent("onload", SpineWidget.ready);
+			}
+		}
 	}
 
 	export class SpineWidgetConfig {
@@ -239,51 +258,4 @@ module spine {
 		error: (widget: SpineWidget, msg: string) => void;		
 	}
 }
-
-(function(funcName: any, baseObj: any) {
-    "use strict";
-    funcName = funcName || "docReady";
-    baseObj = baseObj || window;
-    var readyList: any[] = [];
-    var readyFired = false;
-    var readyEventHandlersInstalled = false;
-    
-    function ready() {
-        if (!readyFired) {            
-            readyFired = true;
-            for (var i = 0; i < readyList.length; i++) {                
-                readyList[i].fn.call(window, readyList[i].ctx);
-            }            
-            readyList = [];
-        }
-    }
-    
-    function readyStateChange() {
-        if ( document.readyState === "complete" ) ready();        
-    }
-    
-    baseObj[funcName] = function(callback: any, context: any) {        
-        if (readyFired) {
-            setTimeout(function() {callback(context);}, 1);
-            return;
-        } else {            
-            readyList.push({fn: callback, ctx: context});
-        }        
-        if (document.readyState === "complete" || (!(<any>document).attachEvent && document.readyState === "interactive")) {
-            setTimeout(ready, 1);
-        } else if (!readyEventHandlersInstalled) {         
-            if (document.addEventListener) {                
-                document.addEventListener("DOMContentLoaded", ready, false);                
-                window.addEventListener("load", ready, false);
-            } else {                
-                (<any>document).attachEvent("onreadystatechange", readyStateChange);
-                (<any>window).attachEvent("onload", ready);
-            }
-            readyEventHandlersInstalled = true;
-        }
-    }
-})("docReady", window);
-
-(<any>window).docReady(function() {
-	spine.SpineWidget.loadWidgets();
-})
+spine.SpineWidget.setupDOMListener();
