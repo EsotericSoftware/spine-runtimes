@@ -43,7 +43,6 @@ public class SkeletonRenderer<T extends Batch> {
 
 	public void draw (T batch, Skeleton skeleton) {
 		boolean premultipliedAlpha = this.premultipliedAlpha;
-		BlendMode blendMode = null;
 
 		Array<Slot> drawOrder = skeleton.drawOrder;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
@@ -52,11 +51,8 @@ public class SkeletonRenderer<T extends Batch> {
 			if (attachment instanceof RegionAttachment) {
 				RegionAttachment regionAttachment = (RegionAttachment)attachment;
 				float[] vertices = regionAttachment.updateWorldVertices(slot, premultipliedAlpha);
-				BlendMode slotBlendMode = slot.data.getBlendMode();
-				if (slotBlendMode != blendMode) {
-					blendMode = slotBlendMode;
-					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
-				}
+				BlendMode blendMode = slot.data.getBlendMode();
+				batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
 				batch.draw(regionAttachment.getRegion().getTexture(), vertices, 0, 20);
 
 			} else if (attachment instanceof MeshAttachment) {
