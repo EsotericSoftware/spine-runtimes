@@ -13,6 +13,7 @@
 	],
 	"exclude": [
 		"webgl/src/*.ts",
+		"widget/src/*.ts",
 		"build",
 		"build/*.d.ts"		  
 	]
