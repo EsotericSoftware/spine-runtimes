@@ -49,7 +49,6 @@ public class Bone implements Updatable {
 
 	float a, b, worldX;
 	float c, d, worldY;
-	float worldSignX, worldSignY;
 
 	boolean sorted;
 
@@ -124,16 +123,12 @@ public class Bone implements Updatable {
 			d = ld;
 			worldX = x;
 			worldY = y;
-			worldSignX = Math.signum(scaleX);
-			worldSignY = Math.signum(scaleY);
 			return;
 		}
 
 		float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
 		worldX = pa * x + pb * y + parent.worldX;
 		worldY = pc * x + pd * y + parent.worldY;
-		worldSignX = parent.worldSignX * Math.signum(scaleX);
-		worldSignY = parent.worldSignY * Math.signum(scaleY);
 
 		if (data.inheritRotation && data.inheritScale) {
 			a = pa * la + pb * lc;
@@ -367,14 +362,6 @@ public class Bone implements Updatable {
 		return worldY;
 	}
 
-	public float getWorldSignX () {
-		return worldSignX;
-	}
-
-	public float getWorldSignY () {
-		return worldSignY;
-	}
-
 	public float getWorldRotationX () {
 		return atan2(c, a) * radDeg;
 	}
@@ -383,12 +370,14 @@ public class Bone implements Updatable {
 		return atan2(d, b) * radDeg;
 	}
 
+	/** Returns the magnitude (always positive) of the world scale X. */
 	public float getWorldScaleX () {
-		return (float)Math.sqrt(a * a + b * b) * worldSignX;
+		return (float)Math.sqrt(a * a + b * b);
 	}
 
+	/** Returns the magnitude (always positive) of the world scale Y. */
 	public float getWorldScaleY () {
-		return (float)Math.sqrt(c * c + d * d) * worldSignY;
+		return (float)Math.sqrt(c * c + d * d);
 	}
 
 	public float worldToLocalRotationX () {
