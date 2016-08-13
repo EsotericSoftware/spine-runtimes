@@ -53,6 +53,7 @@ public class Skeleton {
 	final Array<PathConstraint> pathConstraints;
 	final Array<Constraint> sortedConstraints = new Array();
 	final Array<Updatable> updateCache = new Array();
+	final Array<Bone> updateCacheReset = new Array();
 	Skin skin;
 	final Color color;
 	float time;
@@ -160,31 +161,38 @@ public class Skeleton {
 		for (int i = 0, n = bones.size; i < n; i++)
 			bones.get(i).sorted = false;
 
-		Array<Constraint> constraints = sortedConstraints;
-		constraints.addAll(ikConstraints);
-		constraints.addAll(transformConstraints);
-		constraints.addAll(pathConstraints);
-		constraints.sort(constraintComparator);
-		for (int i = 0, n = constraints.size; i < n; i++) {
-			Constraint constraint = constraints.get(i);
-			if (constraint instanceof IkConstraint)
-				sortIkConstraint((IkConstraint)constraint);
-			else if (constraint instanceof TransformConstraint)
-				sortTransformConstraint((TransformConstraint)constraint);
-			else
-				sortPathConstraint((PathConstraint)constraint);
+		Array<IkConstraint> ikConstraints = this.ikConstraints;
+		Array<TransformConstraint> transformConstraints = this.transformConstraints;
+		Array<PathConstraint> pathConstraints = this.pathConstraints;
+		int ikCount = ikConstraints.size, transformCount = transformConstraints.size, pathCount = pathConstraints.size;
+		int constraintCount = ikCount + transformCount + pathCount;
+		outer:
+		for (int i = 0; i < constraintCount; i++) {
+			for (int ii = 0; ii < ikCount; ii++) {
+				IkConstraint constraint = ikConstraints.get(ii);
+				if (constraint.data.order == i) {
+					sortIkConstraint(constraint);
+					continue outer;
+				}
+			}
+			for (int ii = 0; ii < transformCount; ii++) {
+				TransformConstraint constraint = transformConstraints.get(ii);
+				if (constraint.data.order == i) {
+					sortTransformConstraint(constraint);
+					continue outer;
+				}
+			}
+			for (int ii = 0; ii < pathCount; ii++) {
+				PathConstraint constraint = pathConstraints.get(ii);
+				if (constraint.data.order == i) {
+					sortPathConstraint(constraint);
+					continue outer;
+				}
+			}
 		}
-		constraints.clear();
 
 		for (int i = 0, n = bones.size; i < n; i++)
 			sortBone(bones.get(i));
-
-		// BOZO
-//		for (int i = 0, n = updateCache.size; i < n; i++) {
-//			Updatable item = updateCache.get(i);
-//			if (item instanceof Constraint) System.out.print(item + ", ");
-//		}
-//		System.out.println();
 	}
 
 	private void sortIkConstraint (IkConstraint constraint) {
@@ -194,6 +202,11 @@ public class Skeleton {
 		Array<Bone> constrained = constraint.bones;
 		Bone parent = constrained.first();
 		sortBone(parent);
+
+		if (constrained.size > 1) {
+			Bone child = constrained.peek();
+			if (!updateCache.contains(child, true)) updateCacheReset.add(child);
+		}
 
 		updateCache.add(constraint);
 
@@ -278,6 +291,18 @@ public class Skeleton {
 
 	/** Updates the world transform for each bone and applies constraints. */
 	public void updateWorldTransform () {
+		Array<Bone> updateCacheReset = this.updateCacheReset;
+		for (int i = 0, n = updateCacheReset.size; i < n; i++) {
+			Bone bone = updateCacheReset.get(i);
+			bone.ax = bone.x;
+			bone.ay = bone.y;
+			bone.arotation = bone.rotation;
+			bone.ascaleX = bone.scaleX;
+			bone.ascaleY = bone.scaleY;
+			bone.ashearX = bone.shearX;
+			bone.ashearY = bone.shearY;
+			bone.appliedValid = true;
+		}
 		Array<Updatable> updateCache = this.updateCache;
 		for (int i = 0, n = updateCache.size; i < n; i++)
 			updateCache.get(i).update();
