@@ -53,6 +53,7 @@ public class TransformConstraint implements Constraint {
 		Array<Bone> bones = this.bones;
 		for (int i = 0, n = bones.size; i < n; i++) {
 			Bone bone = bones.get(i);
+			boolean modified = false;
 
 			if (rotateMix != 0) {
 				float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
@@ -66,6 +67,7 @@ public class TransformConstraint implements Constraint {
 				bone.b = cos * b - sin * d;
 				bone.c = sin * a + cos * c;
 				bone.d = sin * b + cos * d;
+				modified = true;
 			}
 
 			if (translateMix != 0) {
@@ -73,6 +75,7 @@ public class TransformConstraint implements Constraint {
 				target.localToWorld(temp.set(data.offsetX, data.offsetY));
 				bone.worldX += (temp.x - bone.worldX) * translateMix;
 				bone.worldY += (temp.y - bone.worldY) * translateMix;
+				modified = true;
 			}
 
 			if (scaleMix > 0) {
@@ -86,6 +89,7 @@ public class TransformConstraint implements Constraint {
 				s = bs > 0.00001f ? (bs + (ts - bs + data.offsetScaleY) * scaleMix) / bs : 0;
 				bone.b *= s;
 				bone.d *= s;
+				modified = true;
 			}
 
 			if (shearMix > 0) {
@@ -99,7 +103,10 @@ public class TransformConstraint implements Constraint {
 				float s = (float)Math.sqrt(b * b + d * d);
 				bone.b = cos(r) * s;
 				bone.d = sin(r) * s;
+				modified = true;
 			}
+
+			if (modified) bone.appliedValid = false;
 		}
 	}
 

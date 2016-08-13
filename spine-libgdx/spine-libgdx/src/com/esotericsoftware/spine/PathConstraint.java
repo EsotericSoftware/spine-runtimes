@@ -137,6 +137,7 @@ public class PathConstraint implements Constraint {
 				bone.c = sin * a + cos * c;
 				bone.d = sin * b + cos * d;
 			}
+			bone.appliedValid = false;
 		}
 	}
 

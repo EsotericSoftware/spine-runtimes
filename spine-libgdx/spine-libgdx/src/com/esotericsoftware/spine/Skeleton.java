@@ -60,7 +60,10 @@ public class Skeleton {
 	float x, y;
 
 	final Comparator<Constraint> constraintComparator = new Comparator<Constraint>() {
-		public int compare (Constraint o1,Constraint o2){return o1.getOrder()-o2.getOrder();}};
+		public int compare (Constraint o1, Constraint o2) {
+			return o1.getOrder() - o2.getOrder();
+		}
+	};
 
 	public Skeleton (SkeletonData data) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -152,11 +155,11 @@ public class Skeleton {
 	public void updateCache () {
 		Array<Updatable> updateCache = this.updateCache;
 		updateCache.clear();
-	
+
 		Array<Bone> bones = this.bones;
 		for (int i = 0, n = bones.size; i < n; i++)
 			bones.get(i).sorted = false;
-	
+
 		Array<Constraint> constraints = sortedConstraints;
 		constraints.addAll(ikConstraints);
 		constraints.addAll(transformConstraints);
@@ -172,9 +175,16 @@ public class Skeleton {
 				sortPathConstraint((PathConstraint)constraint);
 		}
 		constraints.clear();
-	
+
 		for (int i = 0, n = bones.size; i < n; i++)
 			sortBone(bones.get(i));
+
+		// BOZO
+//		for (int i = 0, n = updateCache.size; i < n; i++) {
+//			Updatable item = updateCache.get(i);
+//			if (item instanceof Constraint) System.out.print(item + ", ");
+//		}
+//		System.out.println();
 	}
 
 	private void sortIkConstraint (IkConstraint constraint) {
