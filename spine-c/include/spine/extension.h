@@ -138,7 +138,9 @@ void _setFree (void (*_free) (void* ptr));
 
 char* _readFile (const char* path, int* length);
 
-/**/
+/*
+ * Override Track Entry Creation
+ */
 
 typedef struct _spAnimationState {
 	spAnimationState super;
@@ -159,6 +161,9 @@ typedef struct _spAnimationState {
 
 spTrackEntry* _spTrackEntry_create (spAnimationState* self);
 void _spTrackEntry_dispose (spTrackEntry* self);
+
+void _spSetAnimationState_createTrackEntry(spTrackEntry* (*animationState_createTrackEntry) (spAnimationState* self));
+void _spSetAnimationState_disposeTrackEntry(void (*animationState_disposeTrackEntry) (spAnimationState* self, spTrackEntry* entry));
 
 /**/
 

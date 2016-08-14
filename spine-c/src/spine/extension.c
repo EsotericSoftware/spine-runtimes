@@ -77,3 +77,48 @@ char* _readFile (const char* path, int* length) {
 
 	return data;
 }
+
+/*
+ * Default TrackEntry create/dispose implementations
+ */
+spTrackEntry* _spDefaultAnimationState_createTrackEntry (spAnimationState* self){return _spTrackEntry_create();}
+void _spDefaultAnimationState_disposeTrackEntry (spAnimationState* self, spTrackEntry* entry){_spTrackEntry_dispose(entry);}
+
+/*
+ * TrackEntry create/dispose function pointers
+ */
+spTrackEntry* (*_spAnimationState_createTrackEntryFunc) (spAnimationState* self) = _spDefaultAnimationState_createTrackEntry;
+void (*_spAnimationState_disposeTrackEntryFunc) (spAnimationState* self, spTrackEntry* entry) = _spDefaultAnimationState_disposeTrackEntry;
+
+/*
+ * TrackEntry create/dispose function setters
+ *
+ * Use these methods to override the default implementation of TrackEntry creation
+ * to include renderObject(s)* on the TrackEntry created within the context of the
+ * renderObject* on the spAnimationState.
+ */
+void _spSetAnimationState_createTrackEntry( spTrackEntry* (*animationState_createTrackEntry) (spAnimationState* self) ){
+	if(animationState_createTrackEntry)
+		_spAnimationState_createTrackEntryFunc = animationState_createTrackEntry;
+	else
+		_spAnimationState_createTrackEntryFunc = _spDefaultAnimationState_createTrackEntry;
+}
+
+void _spSetAnimationState_disposeTrackEntry( void (*animationState_disposeTrackEntry) (spAnimationState* self, spTrackEntry* entry) ){
+	if(animationState_disposeTrackEntry)
+		_spAnimationState_disposeTrackEntryFunc = animationState_disposeTrackEntry;
+	else
+		_spAnimationState_disposeTrackEntryFunc = _spDefaultAnimationState_disposeTrackEntry;
+}
+
+
+/*
+ * Concrete TrackEntry create/dispose Functions
+ */
+spTrackEntry* _spAnimationState_createTrackEntry( spAnimationState* self ){
+	return _spAnimationState_createTrackEntryFunc(self);
+}
+
+void _spAnimationState_disposeTrackEntry( spAnimationState* self, spTrackEntry* entry ){
+	_spAnimationState_disposeTrackEntryFunc(self, entry);
+}
