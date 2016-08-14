@@ -304,7 +304,7 @@ spTrackEntry* spAnimationState_addAnimation (spAnimationState* self, int trackIn
 			last = last->next;
 		last->next = entry;
 	} else
-		self->tracks[trackIndex] = entry;
+		_spAnimationState_setCurrent(self, trackIndex, entry);
 
 	if (delay <= 0) {
 		if (last)
