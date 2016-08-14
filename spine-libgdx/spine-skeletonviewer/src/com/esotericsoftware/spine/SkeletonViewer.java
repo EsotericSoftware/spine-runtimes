@@ -168,7 +168,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		skeleton = new Skeleton(skeletonData);
 		skeleton.setToSetupPose();
-		skeleton = new Skeleton(skeleton);
+		skeleton = new Skeleton(skeleton); // Tests copy constructors.
 		skeleton.updateWorldTransform();
 
 		state = new AnimationState(new AnimationStateData(skeletonData));

@@ -31,8 +31,6 @@
 
 package com.esotericsoftware.spine;
 
-import java.util.Comparator;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -51,7 +49,6 @@ public class Skeleton {
 	final Array<IkConstraint> ikConstraints;
 	final Array<TransformConstraint> transformConstraints;
 	final Array<PathConstraint> pathConstraints;
-	final Array<Constraint> sortedConstraints = new Array();
 	final Array<Updatable> updateCache = new Array();
 	final Array<Bone> updateCacheReset = new Array();
 	Skin skin;
@@ -59,12 +56,6 @@ public class Skeleton {
 	float time;
 	boolean flipX, flipY;
 	float x, y;
-
-	final Comparator<Constraint> constraintComparator = new Comparator<Constraint>() {
-		public int compare (Constraint o1, Constraint o2) {
-			return o1.getOrder() - o2.getOrder();
-		}
-	};
 
 	public Skeleton (SkeletonData data) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -116,8 +107,15 @@ public class Skeleton {
 
 		bones = new Array(skeleton.bones.size);
 		for (Bone bone : skeleton.bones) {
-			Bone parent = bone.parent == null ? null : bones.get(bone.parent.data.index);
-			bones.add(new Bone(bone, this, parent));
+			Bone newBone;
+			if (bone.parent == null)
+				newBone = new Bone(bone, this, null);
+			else {
+				Bone parent = bones.get(bone.parent.data.index);
+				newBone = new Bone(bone, this, parent);
+				parent.children.add(newBone);
+			}
+			bones.add(newBone);
 		}
 
 		slots = new Array(skeleton.slots.size);
