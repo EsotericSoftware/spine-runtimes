@@ -120,7 +120,7 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 	int i, ii;
 	int eventsCount;
 	int entryChanged;
-	float time;
+	float time, lastTime;
 	spTrackEntry* previous;
 	for (i = 0; i < self->tracksCount; ++i) {
 		spTrackEntry* current = self->tracks[i];
@@ -131,13 +131,16 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 		time = current->time;
 		if (!current->loop && time > current->endTime) time = current->endTime;
 
+		lastTime = current->lastTime;
+		if (!current->loop && lastTime > current->endTime) lastTime = current->endTime;
+
 		previous = current->previous;
 		if (!previous) {
 			if (current->mix == 1) {
-				spAnimation_apply(current->animation, skeleton, current->lastTime, time,
+				spAnimation_apply(current->animation, skeleton, lastTime, time,
 					current->loop, internal->events, &eventsCount);
 			} else {
-				spAnimation_mix(current->animation, skeleton, current->lastTime, time,
+				spAnimation_mix(current->animation, skeleton, lastTime, time,
 					current->loop, internal->events, &eventsCount, current->mix);
 			}
 		} else {
@@ -152,7 +155,7 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 				internal->disposeTrackEntry(current->previous);
 				current->previous = 0;
 			}
-			spAnimation_mix(current->animation, skeleton, current->lastTime, time,
+			spAnimation_mix(current->animation, skeleton, lastTime, time,
 				current->loop, internal->events, &eventsCount, alpha);
 		}
 
@@ -177,8 +180,8 @@ void spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 		if (entryChanged) continue;
 
 		/* Check if completed the animation or a loop iteration. */
-		if (current->loop ? (FMOD(current->lastTime, current->endTime) > FMOD(time, current->endTime))
-				: (current->lastTime < current->endTime && time >= current->endTime)) {
+		if (current->loop ? (FMOD(lastTime, current->endTime) > FMOD(time, current->endTime))
+				: (lastTime < current->endTime && time >= current->endTime)) {
 			int count = (int)(time / current->endTime);
 			if (current->listener) {
 				current->listener(self, i, SP_ANIMATION_COMPLETE, 0, count);
