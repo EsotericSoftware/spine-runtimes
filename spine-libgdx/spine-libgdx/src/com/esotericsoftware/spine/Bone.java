@@ -158,71 +158,63 @@ public class Bone implements Updatable {
 				b = cos(r) * s;
 				d = sin(r) * s;
 			} else if (data.inheritScale) { // No rotation inheritance.
-				// float psx = (float)Math.sqrt(pa * pa + pc * pc), psy, pr;
-				// if (psx > 0.0001f) {
-				// float det = pa * pd - pb * pc;
-				// psy = det / psx;
-				// rotationY = atan2(pa * pb + pc * pd, det) * radDeg + 90;
-				// pr = atan2(pc, pa) * radDeg;
-				// } else {
-				// psx = 0;
-				// psy = (float)Math.sqrt(pb * pb + pd * pd);
-				// rotationY = 90;
-				// pr = 90 - atan2(pd, pb) * radDeg;
-				// }
-				//
-				// float blend;
-				// if (pr < -90)
-				// blend = 1 + (pr + 90) / 90;
-				// else if (pr < 0)
-				// blend = -pr / 90;
-				// else if (pr < 90)
-				// blend = pr / 90;
-				// else
-				// blend = 1f - (pr - 90) / 90;
-				//
-				// pa = lerp(psx, Math.abs(psy) * Math.signum(psx), blend);
-				// psy = lerp(psy, Math.abs(psx) * Math.signum(psy), blend);
-				// pb = cosDeg(rotationY) * psy;
-				// pc = 0;
-				// pd = sinDeg(rotationY) * psy;
-				//
-				// a = pa * la + pb * lc;
-				// b = pa * lb + pb * ld;
-				// c = pc * la + pd * lc;
-				// d = pc * lb + pd * ld;
+				float psx = (float)Math.sqrt(pa * pa + pc * pc), psy, pr;
+				if (psx > 0.0001f) {
+					float det = pa * pd - pb * pc;
+					psy = det / psx;
+					pr = atan2(pc, pa) * radDeg;
+				} else {
+					psx = 0;
+					psy = (float)Math.sqrt(pb * pb + pd * pd);
+					pr = 90 - atan2(pd, pb) * radDeg;
+				}
+				float blend;
+				if (pr < -90)
+					blend = 1 + (pr + 90) / 90;
+				else if (pr < 0)
+					blend = -pr / 90;
+				else if (pr < 90)
+					blend = pr / 90;
+				else
+					blend = 1 - (pr - 90) / 90;
+				pa = lerp(psx, Math.abs(psy) * Math.signum(psx), blend);
+				pd = lerp(psy, Math.abs(psx) * Math.signum(psy), blend);
+				a = pa * la;
+				b = pa * lb;
+				c = pd * lc;
+				d = pd * ld;
 
-				pa = 1;
-				pb = 0;
-				pc = 0;
-				pd = 1;
-				do {
-					float cos = cosDeg(parent.arotation), sin = sinDeg(parent.arotation);
-					float psx = parent.ascaleX, psy = parent.ascaleY;
-					float za = cos * psx, zb = sin * psy, zc = sin * psx, zd = cos * psy;
-					float temp = pa * za + pb * zc;
-					pb = pb * zd - pa * zb;
-					pa = temp;
-					temp = pc * za + pd * zc;
-					pd = pd * zd - pc * zb;
-					pc = temp;
-
-					if (psx >= 0) // BOZO! - Why? Should always do this? Fix in new code?
-						sin = -sin;
-					temp = pa * cos + pb * sin;
-					pb = pb * cos - pa * sin;
-					pa = temp;
-					temp = pc * cos + pd * sin;
-					pd = pd * cos - pc * sin;
-					pc = temp;
-
-					if (!parent.data.inheritScale) break;
-					parent = parent.parent;
-				} while (parent != null);
-				a = pa * la + pb * lc;
-				b = pa * lb + pb * ld;
-				c = pc * la + pd * lc;
-				d = pc * lb + pd * ld;
+// pa = 1;
+// pb = 0;
+// pc = 0;
+// pd = 1;
+// do {
+// if (!parent.appliedValid) parent.updateAppliedTransform();
+// float cos = cosDeg(parent.arotation), sin = sinDeg(parent.arotation);
+// float psx = parent.ascaleX, psy = parent.ascaleY;
+// float za = cos * psx, zb = sin * psy, zc = sin * psx, zd = cos * psy;
+// float temp = pa * za + pb * zc;
+// pb = pb * zd - pa * zb;
+// pa = temp;
+// temp = pc * za + pd * zc;
+// pd = pd * zd - pc * zb;
+// pc = temp;
+//
+// if (psx >= 0) sin = -sin;
+// temp = pa * cos + pb * sin;
+// pb = pb * cos - pa * sin;
+// pa = temp;
+// temp = pc * cos + pd * sin;
+// pd = pd * cos - pc * sin;
+// pc = temp;
+//
+// if (!parent.data.inheritScale) break;
+// parent = parent.parent;
+// } while (parent != null);
+// a = pa * la + pb * lc;
+// b = pa * lb + pb * ld;
+// c = pc * la + pd * lc;
+// d = pc * lb + pd * ld;
 			} else {
 				a = la;
 				b = lb;
