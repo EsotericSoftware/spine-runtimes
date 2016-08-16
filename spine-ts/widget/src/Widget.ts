@@ -37,7 +37,7 @@ module spine {
 		canvas: HTMLCanvasElement;		
 
 		private _config: SpineWidgetConfig;
-		private _assetManager: spine.AssetManager;
+		private _assetManager: spine.webgl.AssetManager;
 		private _shader: spine.webgl.Shader;
 		private _batcher: spine.webgl.PolygonBatcher;
 		private _mvp = new spine.webgl.Matrix4();
@@ -69,9 +69,7 @@ module spine {
 			this._mvp.ortho2d(0, 0, 639, 479);
 			this._skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);
 
-			let assets = this._assetManager = new spine.AssetManager((image: HTMLImageElement) => { 
-				return new spine.webgl.GLTexture(gl, image);
-			});
+			let assets = this._assetManager = new spine.webgl.AssetManager(gl);
 			assets.loadText(config.atlas);
 			assets.loadText(config.json);
 			assets.loadTexture(config.atlas.replace(".atlas", ".png"));

@@ -4357,6 +4357,20 @@ var spine;
 (function (spine) {
     var webgl;
     (function (webgl) {
+        var AssetManager = (function (_super) {
+            __extends(AssetManager, _super);
+            function AssetManager(gl) {
+                _super.call(this, function (image) { return new spine.webgl.GLTexture(gl, image); });
+            }
+            return AssetManager;
+        }(spine.AssetManager));
+        webgl.AssetManager = AssetManager;
+    })(webgl = spine.webgl || (spine.webgl = {}));
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var webgl;
+    (function (webgl) {
         var GLTexture = (function (_super) {
             __extends(GLTexture, _super);
             function GLTexture(gl, image, useMipMaps) {

@@ -4357,6 +4357,20 @@ var spine;
 (function (spine) {
     var webgl;
     (function (webgl) {
+        var AssetManager = (function (_super) {
+            __extends(AssetManager, _super);
+            function AssetManager(gl) {
+                _super.call(this, function (image) { return new spine.webgl.GLTexture(gl, image); });
+            }
+            return AssetManager;
+        }(spine.AssetManager));
+        webgl.AssetManager = AssetManager;
+    })(webgl = spine.webgl || (spine.webgl = {}));
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var webgl;
+    (function (webgl) {
         var GLTexture = (function (_super) {
             __extends(GLTexture, _super);
             function GLTexture(gl, image, useMipMaps) {
@@ -5246,9 +5260,7 @@ var spine;
             this._batcher = new spine.webgl.PolygonBatcher(gl);
             this._mvp.ortho2d(0, 0, 639, 479);
             this._skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);
-            var assets = this._assetManager = new spine.AssetManager(function (image) {
-                return new spine.webgl.GLTexture(gl, image);
-            });
+            var assets = this._assetManager = new spine.webgl.AssetManager(gl);
             assets.loadText(config.atlas);
             assets.loadText(config.json);
             assets.loadTexture(config.atlas.replace(".atlas", ".png"));

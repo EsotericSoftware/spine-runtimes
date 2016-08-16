@@ -874,6 +874,11 @@ declare module spine {
     }
 }
 declare module spine.webgl {
+    class AssetManager extends spine.AssetManager {
+        constructor(gl: WebGLRenderingContext);
+    }
+}
+declare module spine.webgl {
     class GLTexture extends Texture implements Disposable {
         private _gl;
         private _texture;

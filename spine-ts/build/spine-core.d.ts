@@ -1,4 +1,30 @@
 declare module spine {
+    class AssetManager implements Disposable {
+        private _textureLoader;
+        private _assets;
+        private _errors;
+        private _toLoad;
+        private _loaded;
+        constructor(textureLoader: (image: HTMLImageElement) => any);
+        loadText(path: string, success?: (path: string, text: string) => void, error?: (path: string, error: string) => void): void;
+        loadTexture(path: string, success?: (path: string, image: HTMLImageElement) => void, error?: (path: string, error: string) => void): void;
+        get(path: string): any;
+        remove(path: string): void;
+        removeAll(): void;
+        isLoadingComplete(): boolean;
+        toLoad(): number;
+        loaded(): number;
+        dispose(): void;
+        hasErrors(): boolean;
+        errors(): Map<string>;
+    }
+}
+declare module spine.canvas {
+    class AssetManager extends spine.AssetManager {
+        constructor();
+    }
+}
+declare module spine {
     abstract class Texture {
         protected _image: HTMLImageElement;
         constructor(image: HTMLImageElement);
@@ -50,8 +76,8 @@ declare module spine.canvas {
     class SkeletonRenderer {
         static QUAD_TRIANGLES: number[];
         private _ctx;
-        useTriangleRendering: boolean;
-        useDebugRendering: boolean;
+        triangleRendering: boolean;
+        debugRendering: boolean;
         constructor(context: CanvasRenderingContext2D);
         draw(skeleton: Skeleton): void;
         private drawImages(skeleton);
@@ -293,27 +319,6 @@ declare module spine {
         setMix(fromName: string, toName: string, duration: number): void;
         setMixWith(from: Animation, to: Animation, duration: number): void;
         getMix(from: Animation, to: Animation): number;
-    }
-}
-declare module spine {
-    class AssetManager implements Disposable {
-        private _textureLoader;
-        private _assets;
-        private _errors;
-        private _toLoad;
-        private _loaded;
-        constructor(textureLoader: (image: HTMLImageElement) => any);
-        loadText(path: string, success?: (path: string, text: string) => void, error?: (path: string, error: string) => void): void;
-        loadTexture(path: string, success?: (path: string, image: HTMLImageElement) => void, error?: (path: string, error: string) => void): void;
-        get(path: string): any;
-        remove(path: string): void;
-        removeAll(): void;
-        isLoadingComplete(): boolean;
-        toLoad(): number;
-        loaded(): number;
-        dispose(): void;
-        hasErrors(): boolean;
-        errors(): Map<string>;
     }
 }
 declare module spine {

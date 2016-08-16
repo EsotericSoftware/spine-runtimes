@@ -1,5 +1,121 @@
 var spine;
 (function (spine) {
+    var AssetManager = (function () {
+        function AssetManager(textureLoader) {
+            this._assets = {};
+            this._errors = {};
+            this._toLoad = 0;
+            this._loaded = 0;
+            this._textureLoader = textureLoader;
+        }
+        AssetManager.prototype.loadText = function (path, success, error) {
+            var _this = this;
+            if (success === void 0) { success = null; }
+            if (error === void 0) { error = null; }
+            this._toLoad++;
+            var request = new XMLHttpRequest();
+            request.onreadystatechange = function () {
+                if (request.readyState == XMLHttpRequest.DONE) {
+                    if (request.status >= 200 && request.status < 300) {
+                        if (success)
+                            success(path, request.responseText);
+                        _this._assets[path] = request.responseText;
+                    }
+                    else {
+                        if (error)
+                            error(path, "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText);
+                        _this._errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
+                    }
+                    _this._toLoad--;
+                    _this._loaded++;
+                }
+            };
+            request.open("GET", path, true);
+            request.send();
+        };
+        AssetManager.prototype.loadTexture = function (path, success, error) {
+            var _this = this;
+            if (success === void 0) { success = null; }
+            if (error === void 0) { error = null; }
+            this._toLoad++;
+            var img = new Image();
+            img.src = path;
+            img.onload = function (ev) {
+                if (success)
+                    success(path, img);
+                var texture = _this._textureLoader(img);
+                _this._assets[path] = texture;
+                _this._toLoad--;
+                _this._loaded++;
+            };
+            img.onerror = function (ev) {
+                if (error)
+                    error(path, "Couldn't load image " + path);
+                _this._errors[path] = "Couldn't load image " + path;
+                _this._toLoad--;
+                _this._loaded++;
+            };
+        };
+        AssetManager.prototype.get = function (path) {
+            return this._assets[path];
+        };
+        AssetManager.prototype.remove = function (path) {
+            var asset = this._assets[path];
+            if (asset.dispose)
+                asset.dispose();
+            this._assets[path] = null;
+        };
+        AssetManager.prototype.removeAll = function () {
+            for (var key in this._assets) {
+                var asset = this._assets[key];
+                if (asset.dispose)
+                    asset.dispose();
+            }
+            this._assets = {};
+        };
+        AssetManager.prototype.isLoadingComplete = function () {
+            return this._toLoad == 0;
+        };
+        AssetManager.prototype.toLoad = function () {
+            return this._toLoad;
+        };
+        AssetManager.prototype.loaded = function () {
+            return this._loaded;
+        };
+        AssetManager.prototype.dispose = function () {
+            this.removeAll();
+        };
+        AssetManager.prototype.hasErrors = function () {
+            return Object.keys(this._errors).length > 0;
+        };
+        AssetManager.prototype.errors = function () {
+            return this._errors;
+        };
+        return AssetManager;
+    }());
+    spine.AssetManager = AssetManager;
+})(spine || (spine = {}));
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var spine;
+(function (spine) {
+    var canvas;
+    (function (canvas) {
+        var AssetManager = (function (_super) {
+            __extends(AssetManager, _super);
+            function AssetManager() {
+                _super.call(this, function (image) { return new spine.canvas.CanvasTexture(image); });
+            }
+            return AssetManager;
+        }(spine.AssetManager));
+        canvas.AssetManager = AssetManager;
+    })(canvas = spine.canvas || (spine.canvas = {}));
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
     var Texture = (function () {
         function Texture(image) {
             this._image = image;
@@ -64,11 +180,6 @@ var spine;
     }());
     spine.TextureRegion = TextureRegion;
 })(spine || (spine = {}));
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var spine;
 (function (spine) {
     var canvas;
@@ -92,12 +203,12 @@ var spine;
     (function (canvas) {
         var SkeletonRenderer = (function () {
             function SkeletonRenderer(context) {
-                this.useTriangleRendering = false;
-                this.useDebugRendering = false;
+                this.triangleRendering = false;
+                this.debugRendering = false;
                 this._ctx = context;
             }
             SkeletonRenderer.prototype.draw = function (skeleton) {
-                if (this.useTriangleRendering)
+                if (this.triangleRendering)
                     this.drawTriangles(skeleton);
                 else
                     this.drawImages(skeleton);
@@ -105,7 +216,7 @@ var spine;
             SkeletonRenderer.prototype.drawImages = function (skeleton) {
                 var ctx = this._ctx;
                 var drawOrder = skeleton.drawOrder;
-                if (this.useDebugRendering)
+                if (this.debugRendering)
                     ctx.strokeStyle = "green";
                 for (var i = 0, n = drawOrder.length; i < n; i++) {
                     var slot = drawOrder[i];
@@ -141,7 +252,7 @@ var spine;
                     else {
                         ctx.drawImage(image, region.x, region.y, region.width, region.height, 0, 0, w, h);
                     }
-                    if (this.useDebugRendering)
+                    if (this.debugRendering)
                         ctx.strokeRect(0, 0, w, h);
                     ctx.rotate(-rotation);
                     ctx.translate(-x, -y);
@@ -184,7 +295,7 @@ var spine;
                             var x1 = vertices[t2], y1 = vertices[t2 + 1], u1 = vertices[t2 + 6], v1 = vertices[t2 + 7];
                             var x2 = vertices[t3], y2 = vertices[t3 + 1], u2 = vertices[t3 + 6], v2 = vertices[t3 + 7];
                             this.drawTriangle(texture, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2);
-                            if (this.useDebugRendering) {
+                            if (this.debugRendering) {
                                 ctx.strokeStyle = "green";
                                 ctx.beginPath();
                                 ctx.moveTo(x0, y0);
@@ -1213,103 +1324,6 @@ var spine;
         return AnimationStateData;
     }());
     spine.AnimationStateData = AnimationStateData;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var AssetManager = (function () {
-        function AssetManager(textureLoader) {
-            this._assets = {};
-            this._errors = {};
-            this._toLoad = 0;
-            this._loaded = 0;
-            this._textureLoader = textureLoader;
-        }
-        AssetManager.prototype.loadText = function (path, success, error) {
-            var _this = this;
-            if (success === void 0) { success = null; }
-            if (error === void 0) { error = null; }
-            this._toLoad++;
-            var request = new XMLHttpRequest();
-            request.onreadystatechange = function () {
-                if (request.readyState == XMLHttpRequest.DONE) {
-                    if (request.status >= 200 && request.status < 300) {
-                        if (success)
-                            success(path, request.responseText);
-                        _this._assets[path] = request.responseText;
-                    }
-                    else {
-                        if (error)
-                            error(path, "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText);
-                        _this._errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
-                    }
-                    _this._toLoad--;
-                    _this._loaded++;
-                }
-            };
-            request.open("GET", path, true);
-            request.send();
-        };
-        AssetManager.prototype.loadTexture = function (path, success, error) {
-            var _this = this;
-            if (success === void 0) { success = null; }
-            if (error === void 0) { error = null; }
-            this._toLoad++;
-            var img = new Image();
-            img.src = path;
-            img.onload = function (ev) {
-                if (success)
-                    success(path, img);
-                var texture = _this._textureLoader(img);
-                _this._assets[path] = texture;
-                _this._toLoad--;
-                _this._loaded++;
-            };
-            img.onerror = function (ev) {
-                if (error)
-                    error(path, "Couldn't load image " + path);
-                _this._errors[path] = "Couldn't load image " + path;
-                _this._toLoad--;
-                _this._loaded++;
-            };
-        };
-        AssetManager.prototype.get = function (path) {
-            return this._assets[path];
-        };
-        AssetManager.prototype.remove = function (path) {
-            var asset = this._assets[path];
-            if (asset.dispose)
-                asset.dispose();
-            this._assets[path] = null;
-        };
-        AssetManager.prototype.removeAll = function () {
-            for (var key in this._assets) {
-                var asset = this._assets[key];
-                if (asset.dispose)
-                    asset.dispose();
-            }
-            this._assets = {};
-        };
-        AssetManager.prototype.isLoadingComplete = function () {
-            return this._toLoad == 0;
-        };
-        AssetManager.prototype.toLoad = function () {
-            return this._toLoad;
-        };
-        AssetManager.prototype.loaded = function () {
-            return this._loaded;
-        };
-        AssetManager.prototype.dispose = function () {
-            this.removeAll();
-        };
-        AssetManager.prototype.hasErrors = function () {
-            return Object.keys(this._errors).length > 0;
-        };
-        AssetManager.prototype.errors = function () {
-            return this._errors;
-        };
-        return AssetManager;
-    }());
-    spine.AssetManager = AssetManager;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {

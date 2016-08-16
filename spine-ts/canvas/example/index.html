@@ -24,13 +24,11 @@ function init () {
 
 	skeletonRenderer = new spine.canvas.SkeletonRenderer(context);
 	// enable debug rendering
-	skeletonRenderer.useDebugRendering = true;
+	skeletonRenderer.debugRendering = true;
 	// enable the triangle renderer, supports meshes, but may produce artifacts in some browsers
-	skeletonRenderer.useTriangleRendering = true;
+	skeletonRenderer.triangleRendering = true;
 
-	assetManager = new spine.AssetManager(function(image) {
-		return new spine.canvas.CanvasTexture(image);
-	});
+	assetManager = new spine.canvas.AssetManager();	
 
 	assetManager.loadText("assets/spineboy.json");
 	assetManager.loadText("assets/spineboy.atlas");
