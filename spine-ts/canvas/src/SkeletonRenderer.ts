@@ -35,15 +35,15 @@ module spine.canvas {
 		
 		private _ctx: CanvasRenderingContext2D;
 
-		public useTriangleRendering = false;
-		public useDebugRendering = false;
+		public triangleRendering = false;
+		public debugRendering = false;
 		
 		constructor (context: CanvasRenderingContext2D) {
 			this._ctx = context;
 		}
 
 		draw (skeleton: Skeleton) {
-			if (this.useTriangleRendering) this.drawTriangles(skeleton);
+			if (this.triangleRendering) this.drawTriangles(skeleton);
 			else this.drawImages(skeleton);
 		}
 
@@ -51,7 +51,7 @@ module spine.canvas {
 			let ctx = this._ctx;
 			let drawOrder = skeleton.drawOrder;
 
-			if (this.useDebugRendering) ctx.strokeStyle = "green";			
+			if (this.debugRendering) ctx.strokeStyle = "green";			
 
 			for (let i = 0, n = drawOrder.length; i < n; i++) {				
 				let slot = drawOrder[i];
@@ -86,7 +86,7 @@ module spine.canvas {
 				} else {
 					ctx.drawImage(image, region.x, region.y, region.width, region.height, 0, 0, w, h);
 				}
-				if (this.useDebugRendering) ctx.strokeRect(0, 0, w, h);
+				if (this.debugRendering) ctx.strokeRect(0, 0, w, h);
 				ctx.rotate(-rotation);
 				ctx.translate(-x, -y);				
 			}			
@@ -135,7 +135,7 @@ module spine.canvas {
 
 						this.drawTriangle(texture, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2);
 
-						if (this.useDebugRendering) {
+						if (this.debugRendering) {
 							ctx.strokeStyle = "green";
 							ctx.beginPath();
 							ctx.moveTo(x0, y0);
