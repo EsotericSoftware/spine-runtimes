@@ -1855,7 +1855,7 @@ spine.AnimationState.prototype = {
 				last = last.next;
 			last.next = entry;
 		} else
-			this.tracks[trackIndex] = entry;
+			this.setCurrent(trackIndex, entry);
 
 		if (delay <= 0) {
 			if (last)
