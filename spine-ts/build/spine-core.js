@@ -1,38 +1,236 @@
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
+var spine;
+(function (spine) {
+    var Texture = (function () {
+        function Texture(image) {
+            this._image = image;
+        }
+        Texture.prototype.getImage = function () {
+            return this._image;
+        };
+        Texture.filterFromString = function (text) {
+            switch (text.toLowerCase()) {
+                case "nearest": return TextureFilter.Nearest;
+                case "linear": return TextureFilter.Linear;
+                case "mipmap": return TextureFilter.MipMap;
+                case "mipmapnearestnearest": return TextureFilter.MipMapNearestNearest;
+                case "mipmaplinearnearest": return TextureFilter.MipMapLinearNearest;
+                case "mipmapnearestlinear": return TextureFilter.MipMapNearestLinear;
+                case "mipmaplinearlinear": return TextureFilter.MipMapLinearLinear;
+                default: throw new Error("Unknown texture filter " + text);
+            }
+        };
+        Texture.wrapFromString = function (text) {
+            switch (text.toLowerCase()) {
+                case "mirroredtepeat": return TextureWrap.MirroredRepeat;
+                case "clamptoedge": return TextureWrap.ClampToEdge;
+                case "repeat": return TextureWrap.Repeat;
+                default: throw new Error("Unknown texture wrap " + text);
+            }
+        };
+        return Texture;
+    }());
+    spine.Texture = Texture;
+    (function (TextureFilter) {
+        TextureFilter[TextureFilter["Nearest"] = 9728] = "Nearest";
+        TextureFilter[TextureFilter["Linear"] = 9729] = "Linear";
+        TextureFilter[TextureFilter["MipMap"] = 9987] = "MipMap";
+        TextureFilter[TextureFilter["MipMapNearestNearest"] = 9984] = "MipMapNearestNearest";
+        TextureFilter[TextureFilter["MipMapLinearNearest"] = 9985] = "MipMapLinearNearest";
+        TextureFilter[TextureFilter["MipMapNearestLinear"] = 9986] = "MipMapNearestLinear";
+        TextureFilter[TextureFilter["MipMapLinearLinear"] = 9987] = "MipMapLinearLinear";
+    })(spine.TextureFilter || (spine.TextureFilter = {}));
+    var TextureFilter = spine.TextureFilter;
+    (function (TextureWrap) {
+        TextureWrap[TextureWrap["MirroredRepeat"] = 33648] = "MirroredRepeat";
+        TextureWrap[TextureWrap["ClampToEdge"] = 33071] = "ClampToEdge";
+        TextureWrap[TextureWrap["Repeat"] = 10497] = "Repeat";
+    })(spine.TextureWrap || (spine.TextureWrap = {}));
+    var TextureWrap = spine.TextureWrap;
+    var TextureRegion = (function () {
+        function TextureRegion() {
+            this.u = 0;
+            this.v = 0;
+            this.u2 = 0;
+            this.v2 = 0;
+            this.width = 0;
+            this.height = 0;
+            this.rotate = false;
+            this.offsetX = 0;
+            this.offsetY = 0;
+            this.originalWidth = 0;
+            this.originalHeight = 0;
+        }
+        return TextureRegion;
+    }());
+    spine.TextureRegion = TextureRegion;
+})(spine || (spine = {}));
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var spine;
+(function (spine) {
+    var canvas;
+    (function (canvas) {
+        var CanvasTexture = (function (_super) {
+            __extends(CanvasTexture, _super);
+            function CanvasTexture(image) {
+                _super.call(this, image);
+            }
+            CanvasTexture.prototype.setFilters = function (minFilter, magFilter) { };
+            CanvasTexture.prototype.setWraps = function (uWrap, vWrap) { };
+            CanvasTexture.prototype.dispose = function () { };
+            return CanvasTexture;
+        }(spine.Texture));
+        canvas.CanvasTexture = CanvasTexture;
+    })(canvas = spine.canvas || (spine.canvas = {}));
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var canvas;
+    (function (canvas) {
+        var SkeletonRenderer = (function () {
+            function SkeletonRenderer(context) {
+                this.useTriangleRendering = false;
+                this.useDebugRendering = false;
+                this._ctx = context;
+            }
+            SkeletonRenderer.prototype.draw = function (skeleton) {
+                if (this.useTriangleRendering)
+                    this.drawTriangles(skeleton);
+                else
+                    this.drawImages(skeleton);
+            };
+            SkeletonRenderer.prototype.drawImages = function (skeleton) {
+                var ctx = this._ctx;
+                var drawOrder = skeleton.drawOrder;
+                if (this.useDebugRendering)
+                    ctx.strokeStyle = "green";
+                for (var i = 0, n = drawOrder.length; i < n; i++) {
+                    var slot = drawOrder[i];
+                    var attachment = slot.getAttachment();
+                    var region = null;
+                    var image = null;
+                    var vertices = null;
+                    if (attachment instanceof spine.RegionAttachment) {
+                        var regionAttachment = attachment;
+                        vertices = regionAttachment.updateWorldVertices(slot, false);
+                        region = regionAttachment.region;
+                        image = (region).texture.getImage();
+                    }
+                    else
+                        continue;
+                    var att = attachment;
+                    var bone = slot.bone;
+                    var x = vertices[0];
+                    var y = vertices[1];
+                    var rotation = (bone.getWorldRotationX() - att.rotation) * Math.PI / 180;
+                    var xx = vertices[24] - vertices[0];
+                    var xy = vertices[25] - vertices[1];
+                    var yx = vertices[8] - vertices[0];
+                    var yy = vertices[9] - vertices[1];
+                    var w = Math.sqrt(xx * xx + xy * xy), h = -Math.sqrt(yx * yx + yy * yy);
+                    ctx.translate(x, y);
+                    ctx.rotate(rotation);
+                    if (region.rotate) {
+                        ctx.rotate(Math.PI / 2);
+                        ctx.drawImage(image, region.x, region.y, region.height, region.width, 0, 0, h, -w);
+                        ctx.rotate(-Math.PI / 2);
+                    }
+                    else {
+                        ctx.drawImage(image, region.x, region.y, region.width, region.height, 0, 0, w, h);
+                    }
+                    if (this.useDebugRendering)
+                        ctx.strokeRect(0, 0, w, h);
+                    ctx.rotate(-rotation);
+                    ctx.translate(-x, -y);
+                }
+            };
+            SkeletonRenderer.prototype.drawTriangles = function (skeleton) {
+                var blendMode = null;
+                var vertices = null;
+                var triangles = null;
+                var drawOrder = skeleton.drawOrder;
+                for (var i = 0, n = drawOrder.length; i < n; i++) {
+                    var slot = drawOrder[i];
+                    var attachment = slot.getAttachment();
+                    var texture = null;
+                    var region = null;
+                    if (attachment instanceof spine.RegionAttachment) {
+                        var regionAttachment = attachment;
+                        vertices = regionAttachment.updateWorldVertices(slot, false);
+                        triangles = SkeletonRenderer.QUAD_TRIANGLES;
+                        region = regionAttachment.region;
+                        texture = region.texture.getImage();
+                    }
+                    else if (attachment instanceof spine.MeshAttachment) {
+                        var mesh = attachment;
+                        vertices = mesh.updateWorldVertices(slot, false);
+                        triangles = mesh.triangles;
+                        texture = mesh.region.renderObject.texture.getImage();
+                    }
+                    else
+                        continue;
+                    if (texture != null) {
+                        var slotBlendMode = slot.data.blendMode;
+                        if (slotBlendMode != blendMode) {
+                            blendMode = slotBlendMode;
+                        }
+                        var ctx = this._ctx;
+                        for (var j = 0; j < triangles.length; j += 3) {
+                            var t1 = triangles[j] * 8, t2 = triangles[j + 1] * 8, t3 = triangles[j + 2] * 8;
+                            var x0 = vertices[t1], y0 = vertices[t1 + 1], u0 = vertices[t1 + 6], v0 = vertices[t1 + 7];
+                            var x1 = vertices[t2], y1 = vertices[t2 + 1], u1 = vertices[t2 + 6], v1 = vertices[t2 + 7];
+                            var x2 = vertices[t3], y2 = vertices[t3 + 1], u2 = vertices[t3 + 6], v2 = vertices[t3 + 7];
+                            this.drawTriangle(texture, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2);
+                            if (this.useDebugRendering) {
+                                ctx.strokeStyle = "green";
+                                ctx.beginPath();
+                                ctx.moveTo(x0, y0);
+                                ctx.lineTo(x1, y1);
+                                ctx.lineTo(x2, y2);
+                                ctx.lineTo(x0, y0);
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                }
+            };
+            SkeletonRenderer.prototype.drawTriangle = function (img, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2) {
+                var ctx = this._ctx;
+                u0 *= img.width;
+                v0 *= img.height;
+                u1 *= img.width;
+                v1 *= img.height;
+                u2 *= img.width;
+                v2 *= img.height;
+                ctx.beginPath();
+                ctx.moveTo(x0, y0);
+                ctx.lineTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.closePath();
+                x1 -= x0;
+                y1 -= y0;
+                x2 -= x0;
+                y2 -= y0;
+                u1 -= u0;
+                v1 -= v0;
+                u2 -= u0;
+                v2 -= v0;
+                var det = 1 / (u1 * v2 - u2 * v1), a = (v2 * x1 - v1 * x2) * det, b = (v2 * y1 - v1 * y2) * det, c = (u1 * x2 - u2 * x1) * det, d = (u1 * y2 - u2 * y1) * det, e = x0 - a * u0 - c * v0, f = y0 - b * u0 - d * v0;
+                ctx.save();
+                ctx.transform(a, b, c, d, e, f);
+                ctx.clip();
+                ctx.drawImage(img, 0, 0);
+                ctx.restore();
+            };
+            SkeletonRenderer.QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
+            return SkeletonRenderer;
+        }());
+        canvas.SkeletonRenderer = SkeletonRenderer;
+    })(canvas = spine.canvas || (spine.canvas = {}));
+})(spine || (spine = {}));
 var spine;
 (function (spine) {
     var Animation = (function () {
@@ -121,9 +319,6 @@ var spine;
                 return CurveTimeline.STEPPED;
             return CurveTimeline.BEZIER;
         };
-        /** Sets the control handle positions for an interpolation bezier curve used to transition from this keyframe to the next.
-         * cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of
-         * the difference between the keyframe's values. */
         CurveTimeline.prototype.setCurve = function (frameIndex, cx1, cy1, cx2, cy2) {
             var tmpx = (-cx1 * 2 + cx2) * 0.03, tmpy = (-cy1 * 2 + cy2) * 0.03;
             var dddfx = ((cx1 - cx2) * 3 + 1) * 0.006, dddfy = ((cy1 - cy2) * 3 + 1) * 0.006;
@@ -171,7 +366,7 @@ var spine;
                 }
             }
             var y = curves[i - 1];
-            return y + (1 - y) * (percent - x) / (1 - x); // Last point is 1,1.
+            return y + (1 - y) * (percent - x) / (1 - x);
         };
         CurveTimeline.LINEAR = 0;
         CurveTimeline.STEPPED = 1;
@@ -186,7 +381,6 @@ var spine;
             _super.call(this, frameCount);
             this.frames = spine.Utils.newFloatArray(frameCount << 1);
         }
-        /** Sets the time and angle of the specified keyframe. */
         RotateTimeline.prototype.setFrame = function (frameIndex, time, degrees) {
             frameIndex <<= 1;
             this.frames[frameIndex] = time;
@@ -195,7 +389,7 @@ var spine;
         RotateTimeline.prototype.apply = function (skeleton, lastTime, time, events, alpha) {
             var frames = this.frames;
             if (time < frames[0])
-                return; // Time is before first frame.
+                return;
             var bone = skeleton.bones[this.boneIndex];
             if (time >= frames[frames.length - RotateTimeline.ENTRIES]) {
                 var amount_1 = bone.data.rotation + frames[frames.length + RotateTimeline.PREV_ROTATION] - bone.rotation;
@@ -206,7 +400,6 @@ var spine;
                 bone.rotation += amount_1 * alpha;
                 return;
             }
-            // Interpolate between the previous frame and the current frame.
             var frame = Animation.binarySearch(frames, time, RotateTimeline.ENTRIES);
             var prevRotation = frames[frame + RotateTimeline.PREV_ROTATION];
             var frameTime = frames[frame];
@@ -236,7 +429,6 @@ var spine;
             _super.call(this, frameCount);
             this.frames = spine.Utils.newFloatArray(frameCount * TranslateTimeline.ENTRIES);
         }
-        /** Sets the time and value of the specified keyframe. */
         TranslateTimeline.prototype.setFrame = function (frameIndex, time, x, y) {
             frameIndex *= TranslateTimeline.ENTRIES;
             this.frames[frameIndex] = time;
@@ -246,14 +438,13 @@ var spine;
         TranslateTimeline.prototype.apply = function (skeleton, lastTime, time, events, alpha) {
             var frames = this.frames;
             if (time < frames[0])
-                return; // Time is before first frame.
+                return;
             var bone = skeleton.bones[this.boneIndex];
             if (time >= frames[frames.length - TranslateTimeline.ENTRIES]) {
                 bone.x += (bone.data.x + frames[frames.length + TranslateTimeline.PREV_X] - bone.x) * alpha;
                 bone.y += (bone.data.y + frames[frames.length + TranslateTimeline.PREV_Y] - bone.y) * alpha;
                 return;
             }
-            // Interpolate between the previous frame and the current frame.
             var frame = Animation.binarySearch(frames, time, TranslateTimeline.ENTRIES);
             var prevX = frames[frame + TranslateTimeline.PREV_X];
             var prevY = frames[frame + TranslateTimeline.PREV_Y];
@@ -279,14 +470,13 @@ var spine;
         ScaleTimeline.prototype.apply = function (skeleton, lastTime, time, events, alpha) {
             var frames = this.frames;
             if (time < frames[0])
-                return; // Time is before first frame.
+                return;
             var bone = skeleton.bones[this.boneIndex];
             if (time >= frames[frames.length - ScaleTimeline.ENTRIES]) {
                 bone.scaleX += (bone.data.scaleX * frames[frames.length + ScaleTimeline.PREV_X] - bone.scaleX) * alpha;
                 bone.scaleY += (bone.data.scaleY * frames[frames.length + ScaleTimeline.PREV_Y] - bone.scaleY) * alpha;
                 return;
             }
-            // Interpolate between the previous frame and the current frame.
             var frame = Animation.binarySearch(frames, time, ScaleTimeline.ENTRIES);
             var prevX = frames[frame + ScaleTimeline.PREV_X];
             var prevY = frames[frame + ScaleTimeline.PREV_Y];
@@ -306,14 +496,13 @@ var spine;
         ShearTimeline.prototype.apply = function (skeleton, lastTime, time, events, alpha) {
             var frames = this.frames;
             if (time < frames[0])
-                return; // Time is before first frame.
+                return;
             var bone = skeleton.bones[this.boneIndex];
             if (time >= frames[frames.length - ShearTimeline.ENTRIES]) {
                 bone.shearX += (bone.data.shearX + frames[frames.length + ShearTimeline.PREV_X] - bone.shearX) * alpha;
                 bone.shearY += (bone.data.shearY + frames[frames.length + ShearTimeline.PREV_Y] - bone.shearY) * alpha;
                 return;
             }
-            // Interpolate between the previous frame and the current frame.
             var frame = Animation.binarySearch(frames, time, ShearTimeline.ENTRIES);
             var prevX = frames[frame + ShearTimeline.PREV_X];
             var prevY = frames[frame + ShearTimeline.PREV_Y];
@@ -331,7 +520,6 @@ var spine;
             _super.call(this, frameCount);
             this.frames = spine.Utils.newFloatArray(frameCount * ColorTimeline.ENTRIES);
         }
-        /** Sets the time and value of the specified keyframe. */
         ColorTimeline.prototype.setFrame = function (frameIndex, time, r, g, b, a) {
             frameIndex *= ColorTimeline.ENTRIES;
             this.frames[frameIndex] = time;
@@ -343,7 +531,7 @@ var spine;
         ColorTimeline.prototype.apply = function (skeleton, lastTime, time, events, alpha) {
             var frames = this.frames;
             if (time < frames[0])
-                return; // Time is before first frame.
+                return;
             var r = 0, g = 0, b = 0, a = 0;
             if (time >= frames[frames.length - ColorTimeline.ENTRIES]) {
                 var i = frames.length;
@@ -353,7 +541,6 @@ var spine;
                 a = frames[i + ColorTimeline.PREV_A];
             }
             else {
-                // Interpolate between the previous frame and the current frame.
                 var frame = Animation.binarySearch(frames, time, ColorTimeline.ENTRIES);
                 r = frames[frame + ColorTimeline.PREV_R];
                 g = frames[frame + ColorTimeline.PREV_G];
@@ -393,7 +580,6 @@ var spine;
         AttachmentTimeline.prototype.getFrameCount = function () {
             return this.frames.length;
         };
-        /** Sets the time and value of the specified keyframe. */
         AttachmentTimeline.prototype.setFrame = function (frameIndex, time, attachmentName) {
             this.frames[frameIndex] = time;
             this.attachmentNames[frameIndex] = attachmentName;
@@ -401,7 +587,7 @@ var spine;
         AttachmentTimeline.prototype.apply = function (skeleton, lastTime, time, events, alpha) {
             var frames = this.frames;
             if (time < frames[0])
-                return; // Time is before first frame.
+                return;
             var frameIndex = 0;
             if (time >= frames[frames.length - 1])
                 frameIndex = frames.length - 1;
@@ -422,12 +608,10 @@ var spine;
         EventTimeline.prototype.getFrameCount = function () {
             return this.frames.length;
         };
-        /** Sets the time of the specified keyframe. */
         EventTimeline.prototype.setFrame = function (frameIndex, event) {
             this.frames[frameIndex] = event.time;
             this.events[frameIndex] = event;
         };
-        /** Fires events for frames > lastTime and <= time. */
         EventTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha) {
             if (firedEvents == null)
                 return;
@@ -440,7 +624,7 @@ var spine;
             else if (lastTime >= frames[frameCount - 1])
                 return;
             if (time < frames[0])
-                return; // Time is before first frame.
+                return;
             var frame = 0;
             if (lastTime < frames[0])
                 frame = 0;
@@ -467,8 +651,6 @@ var spine;
         DrawOrderTimeline.prototype.getFrameCount = function () {
             return this.frames.length;
         };
-        /** Sets the time of the specified keyframe.
-         * @param drawOrder May be null to use bind pose draw order. */
         DrawOrderTimeline.prototype.setFrame = function (frameIndex, time, drawOrder) {
             this.frames[frameIndex] = time;
             this.drawOrders[frameIndex] = drawOrder;
@@ -476,7 +658,7 @@ var spine;
         DrawOrderTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha) {
             var frames = this.frames;
             if (time < frames[0])
-                return; // Time is before first frame.
+                return;
             var frame = 0;
             if (time >= frames[frames.length - 1])
                 frame = frames.length - 1;
@@ -502,7 +684,6 @@ var spine;
             this.frames = spine.Utils.newFloatArray(frameCount);
             this.frameVertices = new Array(frameCount);
         }
-        /** Sets the time of the specified keyframe. */
         DeformTimeline.prototype.setFrame = function (frameIndex, time, vertices) {
             this.frames[frameIndex] = time;
             this.frameVertices[frameIndex] = vertices;
@@ -514,12 +695,12 @@ var spine;
                 return;
             var frames = this.frames;
             if (time < frames[0])
-                return; // Time is before first frame.
+                return;
             var frameVertices = this.frameVertices;
             var vertexCount = frameVertices[0].length;
             var verticesArray = slot.attachmentVertices;
             if (verticesArray.length != vertexCount)
-                alpha = 1; // Don't mix from uninitialized slot vertices.
+                alpha = 1;
             var vertices = spine.Utils.setArraySize(verticesArray, vertexCount);
             if (time >= frames[frames.length - 1]) {
                 var lastVertices = frameVertices[frames.length - 1];
@@ -531,7 +712,6 @@ var spine;
                     spine.Utils.arrayCopy(lastVertices, 0, vertices, 0, vertexCount);
                 return;
             }
-            // Interpolate between the previous frame and the current frame.
             var frame = Animation.binarySearch(frames, time);
             var prevVertices = frameVertices[frame - 1];
             var nextVertices = frameVertices[frame];
@@ -559,7 +739,6 @@ var spine;
             _super.call(this, frameCount);
             this.frames = spine.Utils.newFloatArray(frameCount * IkConstraintTimeline.ENTRIES);
         }
-        /** Sets the time, mix and bend direction of the specified keyframe. */
         IkConstraintTimeline.prototype.setFrame = function (frameIndex, time, mix, bendDirection) {
             frameIndex *= IkConstraintTimeline.ENTRIES;
             this.frames[frameIndex] = time;
@@ -569,14 +748,13 @@ var spine;
         IkConstraintTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha) {
             var frames = this.frames;
             if (time < frames[0])
-                return; // Time is before first frame.
+                return;
             var constraint = skeleton.ikConstraints[this.ikConstraintIndex];
             if (time >= frames[frames.length - IkConstraintTimeline.ENTRIES]) {
                 constraint.mix += (frames[frames.length + IkConstraintTimeline.PREV_MIX] - constraint.mix) * alpha;
                 constraint.bendDirection = Math.floor(frames[frames.length + IkConstraintTimeline.PREV_BEND_DIRECTION]);
                 return;
             }
-            // Interpolate between the previous frame and the current frame.
             var frame = Animation.binarySearch(frames, time, IkConstraintTimeline.ENTRIES);
             var mix = frames[frame + IkConstraintTimeline.PREV_MIX];
             var frameTime = frames[frame];
@@ -599,7 +777,6 @@ var spine;
             _super.call(this, frameCount);
             this.frames = spine.Utils.newFloatArray(frameCount * TransformConstraintTimeline.ENTRIES);
         }
-        /** Sets the time and mixes of the specified keyframe. */
         TransformConstraintTimeline.prototype.setFrame = function (frameIndex, time, rotateMix, translateMix, scaleMix, shearMix) {
             frameIndex *= TransformConstraintTimeline.ENTRIES;
             this.frames[frameIndex] = time;
@@ -611,7 +788,7 @@ var spine;
         TransformConstraintTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha) {
             var frames = this.frames;
             if (time < frames[0])
-                return; // Time is before first frame.
+                return;
             var constraint = skeleton.transformConstraints[this.transformConstraintIndex];
             if (time >= frames[frames.length - TransformConstraintTimeline.ENTRIES]) {
                 var i = frames.length;
@@ -621,7 +798,6 @@ var spine;
                 constraint.shearMix += (frames[i + TransformConstraintTimeline.PREV_SHEAR] - constraint.shearMix) * alpha;
                 return;
             }
-            // Interpolate between the previous frame and the current frame.
             var frame = Animation.binarySearch(frames, time, TransformConstraintTimeline.ENTRIES);
             var frameTime = frames[frame];
             var percent = this.getCurvePercent(frame / TransformConstraintTimeline.ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + TransformConstraintTimeline.PREV_TIME] - frameTime));
@@ -654,7 +830,6 @@ var spine;
             _super.call(this, frameCount);
             this.frames = spine.Utils.newFloatArray(frameCount * PathConstraintPositionTimeline.ENTRIES);
         }
-        /** Sets the time and value of the specified keyframe. */
         PathConstraintPositionTimeline.prototype.setFrame = function (frameIndex, time, value) {
             frameIndex *= PathConstraintPositionTimeline.ENTRIES;
             this.frames[frameIndex] = time;
@@ -663,14 +838,13 @@ var spine;
         PathConstraintPositionTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha) {
             var frames = this.frames;
             if (time < frames[0])
-                return; // Time is before first frame.
+                return;
             var constraint = skeleton.pathConstraints[this.pathConstraintIndex];
             if (time >= frames[frames.length - PathConstraintPositionTimeline.ENTRIES]) {
                 var i = frames.length;
                 constraint.position += (frames[i + PathConstraintPositionTimeline.PREV_VALUE] - constraint.position) * alpha;
                 return;
             }
-            // Interpolate between the previous frame and the current frame.
             var frame = Animation.binarySearch(frames, time, PathConstraintPositionTimeline.ENTRIES);
             var position = frames[frame + PathConstraintPositionTimeline.PREV_VALUE];
             var frameTime = frames[frame];
@@ -692,14 +866,13 @@ var spine;
         PathConstraintSpacingTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha) {
             var frames = this.frames;
             if (time < frames[0])
-                return; // Time is before first frame.
+                return;
             var constraint = skeleton.pathConstraints[this.pathConstraintIndex];
             if (time >= frames[frames.length - PathConstraintSpacingTimeline.ENTRIES]) {
                 var i = frames.length;
                 constraint.spacing += (frames[i + PathConstraintSpacingTimeline.PREV_VALUE] - constraint.spacing) * alpha;
                 return;
             }
-            // Interpolate between the previous frame and the current frame.
             var frame = Animation.binarySearch(frames, time, PathConstraintSpacingTimeline.ENTRIES);
             var spacing = frames[frame + PathConstraintSpacingTimeline.PREV_VALUE];
             var frameTime = frames[frame];
@@ -715,7 +888,6 @@ var spine;
             _super.call(this, frameCount);
             this.frames = spine.Utils.newFloatArray(frameCount * PathConstraintMixTimeline.ENTRIES);
         }
-        /** Sets the time and mixes of the specified keyframe. */
         PathConstraintMixTimeline.prototype.setFrame = function (frameIndex, time, rotateMix, translateMix) {
             frameIndex *= PathConstraintMixTimeline.ENTRIES;
             this.frames[frameIndex] = time;
@@ -725,7 +897,7 @@ var spine;
         PathConstraintMixTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha) {
             var frames = this.frames;
             if (time < frames[0])
-                return; // Time is before first frame.
+                return;
             var constraint = skeleton.pathConstraints[this.pathConstraintIndex];
             if (time >= frames[frames.length - PathConstraintMixTimeline.ENTRIES]) {
                 var i = frames.length;
@@ -733,7 +905,6 @@ var spine;
                 constraint.translateMix += (frames[i + PathConstraintMixTimeline.PREV_TRANSLATE] - constraint.translateMix) * alpha;
                 return;
             }
-            // Interpolate between the previous frame and the current frame.
             var frame = Animation.binarySearch(frames, time, PathConstraintMixTimeline.ENTRIES);
             var rotate = frames[frame + PathConstraintMixTimeline.PREV_ROTATE];
             var translate = frames[frame + PathConstraintMixTimeline.PREV_TRANSLATE];
@@ -753,36 +924,6 @@ var spine;
     }(CurveTimeline));
     spine.PathConstraintMixTimeline = PathConstraintMixTimeline;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var AnimationState = (function () {
@@ -807,15 +948,14 @@ var spine;
                     var nextTime = current.lastTime - next.delay;
                     if (nextTime >= 0) {
                         var nextDelta = delta * next.timeScale;
-                        next.time = nextTime + nextDelta; // For start event to see correct time.
-                        current.time += delta * current.timeScale; // For end event to see correct time.
+                        next.time = nextTime + nextDelta;
+                        current.time += delta * current.timeScale;
                         this.setCurrent(i, next);
-                        next.time -= nextDelta; // Prevent increasing time twice, below.
+                        next.time -= nextDelta;
                         current = next;
                     }
                 }
                 else if (!current.loop && current.lastTime >= current.endTime) {
-                    // End non-looping animation when it reaches its end time and there is no next entry.
                     this.clearTrack(i);
                     continue;
                 }
@@ -863,7 +1003,6 @@ var spine;
                     for (var iii = 0; iii < listenerCount; iii++)
                         this.listeners[iii].event(i, event_1);
                 }
-                // Check if completed the animation or a loop iteration.
                 if (loop ? (lastTime % endTime > time % endTime) : (lastTime < endTime && time >= endTime)) {
                     var count = spine.MathUtils.toInt(time / endTime);
                     if (current.listener != null)
@@ -917,7 +1056,6 @@ var spine;
                 entry.mixDuration = this.data.getMix(current.animation, entry.animation);
                 if (entry.mixDuration > 0) {
                     entry.mixTime = 0;
-                    // If a mix is in progress, mix from the closest animation.
                     if (previous != null && current.mixTime / current.mixDuration < 0.5) {
                         entry.previous = previous;
                         previous = current;
@@ -932,14 +1070,12 @@ var spine;
             for (var i = 0, n = this.listeners.length; i < n; i++)
                 this.listeners[i].start(index);
         };
-        /** @see #setAnimation(int, Animation, boolean) */
         AnimationState.prototype.setAnimation = function (trackIndex, animationName, loop) {
             var animation = this.data.skeletonData.findAnimation(animationName);
             if (animation == null)
                 throw new Error("Animation not found: " + animationName);
             return this.setAnimationWith(trackIndex, animation, loop);
         };
-        /** Set the current animation. Any queued animations are cleared. */
         AnimationState.prototype.setAnimationWith = function (trackIndex, animation, loop) {
             var current = this.expandToIndex(trackIndex);
             if (current != null)
@@ -951,15 +1087,12 @@ var spine;
             this.setCurrent(trackIndex, entry);
             return entry;
         };
-        /** {@link #addAnimation(int, Animation, boolean, float)} */
         AnimationState.prototype.addAnimation = function (trackIndex, animationName, loop, delay) {
             var animation = this.data.skeletonData.findAnimation(animationName);
             if (animation == null)
                 throw new Error("Animation not found: " + animationName);
             return this.addAnimationWith(trackIndex, animation, loop, delay);
         };
-        /** Adds an animation to be played delay seconds after the current or last queued animation.
-         * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay. */
         AnimationState.prototype.addAnimationWith = function (trackIndex, animation, loop, delay) {
             var entry = new TrackEntry();
             entry.animation = animation;
@@ -982,19 +1115,16 @@ var spine;
             entry.delay = delay;
             return entry;
         };
-        /** @return May be null. */
         AnimationState.prototype.getCurrent = function (trackIndex) {
             if (trackIndex >= this.tracks.length)
                 return null;
             return this.tracks[trackIndex];
         };
-        /** Adds a listener to receive events for all animations. */
         AnimationState.prototype.addListener = function (listener) {
             if (listener == null)
                 throw new Error("listener cannot be null.");
             this.listeners.push(listener);
         };
-        /** Removes the listener added with {@link #addListener(AnimationStateListener)}. */
         AnimationState.prototype.removeListener = function (listener) {
             var index = this.listeners.indexOf(listener);
             if (index >= 0)
@@ -1024,10 +1154,9 @@ var spine;
             this.animation = null;
             this.listener = null;
             this.timeScale = 1;
-            this.lastTime = -1; // Trigger events on frame zero.
+            this.lastTime = -1;
             this.time = 0;
         };
-        /** Returns true if the current time is greater than the end time, regardless of looping. */
         TrackEntry.prototype.isComplete = function () {
             return this.time >= this.endTime;
         };
@@ -1049,36 +1178,6 @@ var spine;
     }());
     spine.AnimationStateAdapter = AnimationStateAdapter;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var AnimationStateData = (function () {
@@ -1115,36 +1214,103 @@ var spine;
     }());
     spine.AnimationStateData = AnimationStateData;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
+var spine;
+(function (spine) {
+    var AssetManager = (function () {
+        function AssetManager(textureLoader) {
+            this._assets = {};
+            this._errors = {};
+            this._toLoad = 0;
+            this._loaded = 0;
+            this._textureLoader = textureLoader;
+        }
+        AssetManager.prototype.loadText = function (path, success, error) {
+            var _this = this;
+            if (success === void 0) { success = null; }
+            if (error === void 0) { error = null; }
+            this._toLoad++;
+            var request = new XMLHttpRequest();
+            request.onreadystatechange = function () {
+                if (request.readyState == XMLHttpRequest.DONE) {
+                    if (request.status >= 200 && request.status < 300) {
+                        if (success)
+                            success(path, request.responseText);
+                        _this._assets[path] = request.responseText;
+                    }
+                    else {
+                        if (error)
+                            error(path, "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText);
+                        _this._errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
+                    }
+                    _this._toLoad--;
+                    _this._loaded++;
+                }
+            };
+            request.open("GET", path, true);
+            request.send();
+        };
+        AssetManager.prototype.loadTexture = function (path, success, error) {
+            var _this = this;
+            if (success === void 0) { success = null; }
+            if (error === void 0) { error = null; }
+            this._toLoad++;
+            var img = new Image();
+            img.src = path;
+            img.onload = function (ev) {
+                if (success)
+                    success(path, img);
+                var texture = _this._textureLoader(img);
+                _this._assets[path] = texture;
+                _this._toLoad--;
+                _this._loaded++;
+            };
+            img.onerror = function (ev) {
+                if (error)
+                    error(path, "Couldn't load image " + path);
+                _this._errors[path] = "Couldn't load image " + path;
+                _this._toLoad--;
+                _this._loaded++;
+            };
+        };
+        AssetManager.prototype.get = function (path) {
+            return this._assets[path];
+        };
+        AssetManager.prototype.remove = function (path) {
+            var asset = this._assets[path];
+            if (asset.dispose)
+                asset.dispose();
+            this._assets[path] = null;
+        };
+        AssetManager.prototype.removeAll = function () {
+            for (var key in this._assets) {
+                var asset = this._assets[key];
+                if (asset.dispose)
+                    asset.dispose();
+            }
+            this._assets = {};
+        };
+        AssetManager.prototype.isLoadingComplete = function () {
+            return this._toLoad == 0;
+        };
+        AssetManager.prototype.toLoad = function () {
+            return this._toLoad;
+        };
+        AssetManager.prototype.loaded = function () {
+            return this._loaded;
+        };
+        AssetManager.prototype.dispose = function () {
+            this.removeAll();
+        };
+        AssetManager.prototype.hasErrors = function () {
+            return Object.keys(this._errors).length > 0;
+        };
+        AssetManager.prototype.errors = function () {
+            return this._errors;
+        };
+        return AssetManager;
+    }());
+    spine.AssetManager = AssetManager;
+})(spine || (spine = {}));
 var spine;
 (function (spine) {
     (function (BlendMode) {
@@ -1155,40 +1321,9 @@ var spine;
     })(spine.BlendMode || (spine.BlendMode = {}));
     var BlendMode = spine.BlendMode;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var Bone = (function () {
-        /** @param parent May be null. */
         function Bone(data, skeleton, parent) {
             this.children = new Array();
             this.x = 0;
@@ -1217,15 +1352,12 @@ var spine;
             this.parent = parent;
             this.setToSetupPose();
         }
-        /** Same as {@link #updateWorldTransform()}. This method exists for Bone to implement {@link Updatable}. */
         Bone.prototype.update = function () {
             this.updateWorldTransformWith(this.x, this.y, this.rotation, this.scaleX, this.scaleY, this.shearX, this.shearY);
         };
-        /** Computes the world transform using the parent bone and this bone's local transform. */
         Bone.prototype.updateWorldTransform = function () {
             this.updateWorldTransformWith(this.x, this.y, this.rotation, this.scaleX, this.scaleY, this.shearX, this.shearY);
         };
-        /** Computes the world transform using the parent bone and the specified local transform. */
         Bone.prototype.updateWorldTransformWith = function (x, y, rotation, scaleX, scaleY, shearX, shearY) {
             this.appliedRotation = rotation;
             var rotationY = rotation + 90 + shearY;
@@ -1380,11 +1512,6 @@ var spine;
             this.c = sin * a + cos * c;
             this.d = sin * b + cos * d;
         };
-        /** Computes the local transform from the world transform. This can be useful to perform processing on the local transform
-         * after the world transform has been modified directly (eg, by a constraint).
-         * <p>
-         * Some redundant information is lost by the world transform, such as -1,-1 scale versus 180 rotation. The computed local
-         * transform values may differ from the original values but are functionally the same. */
         Bone.prototype.updateLocalTransform = function () {
             var parent = this.parent;
             if (parent == null) {
@@ -1445,36 +1572,6 @@ var spine;
     }());
     spine.Bone = Bone;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var BoneData = (function () {
@@ -1500,36 +1597,6 @@ var spine;
     }());
     spine.BoneData = BoneData;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var Event = (function () {
@@ -1543,36 +1610,6 @@ var spine;
     }());
     spine.Event = Event;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var EventData = (function () {
@@ -1583,36 +1620,6 @@ var spine;
     }());
     spine.EventData = EventData;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var IkConstraint = (function () {
@@ -1647,8 +1654,6 @@ var spine;
                     break;
             }
         };
-        /** Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified in the world
-         * coordinate system. */
         IkConstraint.prototype.apply1 = function (bone, targetX, targetY, alpha) {
             var pp = bone.parent;
             var id = 1 / (pp.a * pp.d - pp.b * pp.c);
@@ -1663,9 +1668,6 @@ var spine;
                 rotationIK += 360;
             bone.updateWorldTransformWith(bone.x, bone.y, bone.rotation + rotationIK * alpha, bone.scaleX, bone.scaleY, bone.shearX, bone.shearY);
         };
-        /** Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as possible. The
-         * target is specified in the world coordinate system.
-         * @param child A direct descendant of the parent bone. */
         IkConstraint.prototype.apply2 = function (parent, child, targetX, targetY, bendDir, alpha) {
             if (alpha == 0) {
                 child.updateWorldTransform();
@@ -1809,36 +1811,6 @@ var spine;
     }());
     spine.IkConstraint = IkConstraint;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var IkConstraintData = (function () {
@@ -1852,36 +1824,6 @@ var spine;
     }());
     spine.IkConstraintData = IkConstraintData;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var PathConstraint = (function () {
@@ -2039,7 +1981,6 @@ var spine;
                         this.addAfterPosition(p - pathLength_1, world, 0, out, o);
                         continue;
                     }
-                    // Determine curve containing position.
                     for (;; curve++) {
                         var length_4 = lengths[curve];
                         if (p > length_4)
@@ -2065,7 +2006,6 @@ var spine;
                 }
                 return out;
             }
-            // World vertices.
             if (closed) {
                 verticesLength += 2;
                 world = spine.Utils.setArraySize(this.world, verticesLength);
@@ -2080,7 +2020,6 @@ var spine;
                 world = spine.Utils.setArraySize(this.world, verticesLength);
                 path.computeWorldVerticesWith(target, 2, verticesLength, world, 0);
             }
-            // Curve lengths.
             var curves = spine.Utils.setArraySize(this.curves, curveCount);
             var pathLength = 0;
             var x1 = world[0], y1 = world[1], cx1 = 0, cy1 = 0, cx2 = 0, cy2 = 0, x2 = 0, y2 = 0;
@@ -2142,7 +2081,6 @@ var spine;
                     this.addAfterPosition(p - pathLength, world, verticesLength - 4, out, o);
                     continue;
                 }
-                // Determine curve containing position.
                 for (;; curve++) {
                     var length_5 = curves[curve];
                     if (p > length_5)
@@ -2155,7 +2093,6 @@ var spine;
                     }
                     break;
                 }
-                // Curve segment lengths.
                 if (curve != prevCurve) {
                     prevCurve = curve;
                     var ii = curve * 6;
@@ -2195,7 +2132,6 @@ var spine;
                     segments[9] = curveLength;
                     segment = 0;
                 }
-                // Weight by segment length.
                 p *= curveLength;
                 for (;; segment++) {
                     var length_6 = segments[segment];
@@ -2243,36 +2179,6 @@ var spine;
     }());
     spine.PathConstraint = PathConstraint;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var PathConstraintData = (function () {
@@ -2301,36 +2207,6 @@ var spine;
     })(spine.RotateMode || (spine.RotateMode = {}));
     var RotateMode = spine.RotateMode;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var Skeleton = (function () {
@@ -2391,7 +2267,6 @@ var spine;
             var bones = this.bones;
             for (var i = 0, n = bones.length; i < n; i++)
                 bones[i].sorted = false;
-            // IK first, lowest hierarchy depth first.
             var ikConstraints = this.ikConstraintsSorted;
             ikConstraints.length = 0;
             for (var i = 0; i < this.ikConstraints.length; i++)
@@ -2507,18 +2382,15 @@ var spine;
                 bone.sorted = false;
             }
         };
-        /** Updates the world transform for each bone and applies constraints. */
         Skeleton.prototype.updateWorldTransform = function () {
             var updateCache = this._updateCache;
             for (var i = 0, n = updateCache.length; i < n; i++)
                 updateCache[i].update();
         };
-        /** Sets the bones, constraints, and slots to their setup pose values. */
         Skeleton.prototype.setToSetupPose = function () {
             this.setBonesToSetupPose();
             this.setSlotsToSetupPose();
         };
-        /** Sets the bones and constraints to their setup pose values. */
         Skeleton.prototype.setBonesToSetupPose = function () {
             var bones = this.bones;
             for (var i = 0, n = bones.length; i < n; i++)
@@ -2554,13 +2426,11 @@ var spine;
             for (var i = 0, n = slots.length; i < n; i++)
                 slots[i].setToSetupPose();
         };
-        /** @return May return null. */
         Skeleton.prototype.getRootBone = function () {
             if (this.bones.length == 0)
                 return null;
             return this.bones[0];
         };
-        /** @return May be null. */
         Skeleton.prototype.findBone = function (boneName) {
             if (boneName == null)
                 throw new Error("boneName cannot be null.");
@@ -2572,7 +2442,6 @@ var spine;
             }
             return null;
         };
-        /** @return -1 if the bone was not found. */
         Skeleton.prototype.findBoneIndex = function (boneName) {
             if (boneName == null)
                 throw new Error("boneName cannot be null.");
@@ -2582,7 +2451,6 @@ var spine;
                     return i;
             return -1;
         };
-        /** @return May be null. */
         Skeleton.prototype.findSlot = function (slotName) {
             if (slotName == null)
                 throw new Error("slotName cannot be null.");
@@ -2594,7 +2462,6 @@ var spine;
             }
             return null;
         };
-        /** @return -1 if the bone was not found. */
         Skeleton.prototype.findSlotIndex = function (slotName) {
             if (slotName == null)
                 throw new Error("slotName cannot be null.");
@@ -2604,18 +2471,12 @@ var spine;
                     return i;
             return -1;
         };
-        /** Sets a skin by name.
-         * @see #setSkin(Skin) */
         Skeleton.prototype.setSkinByName = function (skinName) {
             var skin = this.data.findSkin(skinName);
             if (skin == null)
                 throw new Error("Skin not found: " + skinName);
             this.setSkin(skin);
         };
-        /** Sets the skin used to look up attachments before looking in the {@link SkeletonData#getDefaultSkin() default skin}.
-         * Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was no
-         * old skin, each slot's setup mode attachment is attached from the new skin.
-         * @param newSkin May be null. */
         Skeleton.prototype.setSkin = function (newSkin) {
             if (newSkin != null) {
                 if (this.skin != null)
@@ -2635,11 +2496,9 @@ var spine;
             }
             this.skin = newSkin;
         };
-        /** @return May be null. */
         Skeleton.prototype.getAttachmentByName = function (slotName, attachmentName) {
             return this.getAttachment(this.data.findSlotIndex(slotName), attachmentName);
         };
-        /** @return May be null. */
         Skeleton.prototype.getAttachment = function (slotIndex, attachmentName) {
             if (attachmentName == null)
                 throw new Error("attachmentName cannot be null.");
@@ -2652,7 +2511,6 @@ var spine;
                 return this.data.defaultSkin.getAttachment(slotIndex, attachmentName);
             return null;
         };
-        /** @param attachmentName May be null. */
         Skeleton.prototype.setAttachment = function (slotName, attachmentName) {
             if (slotName == null)
                 throw new Error("slotName cannot be null.");
@@ -2672,7 +2530,6 @@ var spine;
             }
             throw new Error("Slot not found: " + slotName);
         };
-        /** @return May be null. */
         Skeleton.prototype.findIkConstraint = function (constraintName) {
             if (constraintName == null)
                 throw new Error("constraintName cannot be null.");
@@ -2684,7 +2541,6 @@ var spine;
             }
             return null;
         };
-        /** @return May be null. */
         Skeleton.prototype.findTransformConstraint = function (constraintName) {
             if (constraintName == null)
                 throw new Error("constraintName cannot be null.");
@@ -2696,7 +2552,6 @@ var spine;
             }
             return null;
         };
-        /** @return May be null. */
         Skeleton.prototype.findPathConstraint = function (constraintName) {
             if (constraintName == null)
                 throw new Error("constraintName cannot be null.");
@@ -2708,9 +2563,6 @@ var spine;
             }
             return null;
         };
-        /** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
-         * @param offset The distance from the skeleton origin to the bottom left corner of the AABB.
-         * @param size The width and height of the AABB. */
         Skeleton.prototype.getBounds = function (offset, size) {
             if (offset == null)
                 throw new Error("offset cannot be null.");
@@ -2746,36 +2598,6 @@ var spine;
     }());
     spine.Skeleton = Skeleton;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var SkeletonBounds = (function () {
@@ -2838,11 +2660,9 @@ var spine;
             this.maxX = maxX;
             this.maxY = maxY;
         };
-        /** Returns true if the axis aligned bounding box contains the point. */
         SkeletonBounds.prototype.aabbContainsPoint = function (x, y) {
             return x >= this.minX && x <= this.maxX && y >= this.minY && y <= this.maxY;
         };
-        /** Returns true if the axis aligned bounding box intersects the line segment. */
         SkeletonBounds.prototype.aabbIntersectsSegment = function (x1, y1, x2, y2) {
             var minX = this.minX;
             var minY = this.minY;
@@ -2865,12 +2685,9 @@ var spine;
                 return true;
             return false;
         };
-        /** Returns true if the axis aligned bounding box intersects the axis aligned bounding box of the specified bounds. */
         SkeletonBounds.prototype.aabbIntersectsSkeleton = function (bounds) {
             return this.minX < bounds.maxX && this.maxX > bounds.minX && this.minY < bounds.maxY && this.maxY > bounds.minY;
         };
-        /** Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
-         * efficient to only call this method if {@link #aabbContainsPoint(float, float)} returns true. */
         SkeletonBounds.prototype.containsPoint = function (x, y) {
             var polygons = this.polygons;
             for (var i = 0, n = polygons.length; i < n; i++)
@@ -2878,7 +2695,6 @@ var spine;
                     return this.boundingBoxes[i];
             return null;
         };
-        /** Returns true if the polygon contains the point. */
         SkeletonBounds.prototype.containsPointPolygon = function (polygon, x, y) {
             var vertices = polygon;
             var nn = polygon.length;
@@ -2896,9 +2712,6 @@ var spine;
             }
             return inside;
         };
-        /** Returns the first bounding box attachment that contains any part of the line segment, or null. When doing many checks, it
-         * is usually more efficient to only call this method if {@link #aabbIntersectsSegment(float, float, float, float)} returns
-         * true. */
         SkeletonBounds.prototype.intersectsSegment = function (x1, y1, x2, y2) {
             var polygons = this.polygons;
             for (var i = 0, n = polygons.length; i < n; i++)
@@ -2906,7 +2719,6 @@ var spine;
                     return this.boundingBoxes[i];
             return null;
         };
-        /** Returns true if the polygon contains any part of the line segment. */
         SkeletonBounds.prototype.intersectsSegmentPolygon = function (polygon, x1, y1, x2, y2) {
             var vertices = polygon;
             var nn = polygon.length;
@@ -2929,7 +2741,6 @@ var spine;
             }
             return false;
         };
-        /** Returns the polygon for the specified bounding box, or null. */
         SkeletonBounds.prototype.getPolygon = function (boundingBox) {
             if (boundingBox == null)
                 throw new Error("boundingBox cannot be null.");
@@ -2940,42 +2751,12 @@ var spine;
     }());
     spine.SkeletonBounds = SkeletonBounds;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var SkeletonData = (function () {
         function SkeletonData() {
-            this.bones = new Array(); // Ordered parents first.
-            this.slots = new Array(); // Setup pose draw order.
+            this.bones = new Array();
+            this.slots = new Array();
             this.skins = new Array();
             this.events = new Array();
             this.animations = new Array();
@@ -3102,36 +2883,6 @@ var spine;
     }());
     spine.SkeletonData = SkeletonData;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var SkeletonJson = (function () {
@@ -3144,7 +2895,6 @@ var spine;
             var scale = this.scale;
             var skeletonData = new spine.SkeletonData();
             var root = JSON.parse(json);
-            // Skeleton
             var skeletonMap = root.skeleton;
             if (skeletonMap != null) {
                 skeletonData.hash = skeletonMap.hash;
@@ -3153,7 +2903,6 @@ var spine;
                 skeletonData.height = skeletonMap.height;
                 skeletonData.imagesPath = skeletonMap.images;
             }
-            // Bones
             if (root.bones) {
                 for (var i = 0; i < root.bones.length; i++) {
                     var boneMap = root.bones[i];
@@ -3178,7 +2927,6 @@ var spine;
                     skeletonData.bones.push(data);
                 }
             }
-            // Slots.
             if (root.slots) {
                 for (var i = 0; i < root.slots.length; i++) {
                     var slotMap = root.slots[i];
@@ -3196,7 +2944,6 @@ var spine;
                     skeletonData.slots.push(data);
                 }
             }
-            // IK constraints
             if (root.ik) {
                 for (var i = 0; i < root.ik.length; i++) {
                     var constraintMap = root.ik[i];
@@ -3217,7 +2964,6 @@ var spine;
                     skeletonData.ikConstraints.push(data);
                 }
             }
-            // Transform constraints.
             if (root.transform) {
                 for (var i = 0; i < root.transform.length; i++) {
                     var constraintMap = root.transform[i];
@@ -3246,7 +2992,6 @@ var spine;
                     skeletonData.transformConstraints.push(data);
                 }
             }
-            // Path constraints.
             if (root.path) {
                 for (var i = 0; i < root.path.length; i++) {
                     var constraintMap = root.path[i];
@@ -3277,7 +3022,6 @@ var spine;
                     skeletonData.pathConstraints.push(data);
                 }
             }
-            // Skins.
             if (root.skins) {
                 for (var skinName in root.skins) {
                     var skinMap = root.skins[skinName];
@@ -3298,7 +3042,6 @@ var spine;
                         skeletonData.defaultSkin = skin;
                 }
             }
-            // Linked meshes.
             for (var i = 0, n = this.linkedMeshes.length; i < n; i++) {
                 var linkedMesh = this.linkedMeshes[i];
                 var skin = linkedMesh.skin == null ? skeletonData.defaultSkin : skeletonData.findSkin(linkedMesh.skin);
@@ -3311,7 +3054,6 @@ var spine;
                 linkedMesh.mesh.updateUVs();
             }
             this.linkedMeshes.length = 0;
-            // Events.
             if (root.events) {
                 for (var eventName in root.events) {
                     var eventMap = root.events[eventName];
@@ -3322,7 +3064,6 @@ var spine;
                     skeletonData.events.push(data);
                 }
             }
-            // Animations.
             if (root.animations) {
                 for (var animationName in root.animations) {
                     var animationMap = root.animations[animationName];
@@ -3434,7 +3175,6 @@ var spine;
             var scale = this.scale;
             var timelines = new Array();
             var duration = 0;
-            // Slot timelines.
             if (map.slots) {
                 for (var slotName in map.slots) {
                     var slotMap = map.slots[slotName];
@@ -3474,7 +3214,6 @@ var spine;
                     }
                 }
             }
-            // Bone timelines.
             if (map.bones) {
                 for (var boneName in map.bones) {
                     var boneMap = map.bones[boneName];
@@ -3524,7 +3263,6 @@ var spine;
                     }
                 }
             }
-            // IK constraint timelines.
             if (map.ik) {
                 for (var constraintName in map.ik) {
                     var constraintMap = map.ik[constraintName];
@@ -3542,7 +3280,6 @@ var spine;
                     duration = Math.max(duration, timeline.frames[(timeline.getFrameCount() - 1) * spine.IkConstraintTimeline.ENTRIES]);
                 }
             }
-            // Transform constraint timelines.
             if (map.transform) {
                 for (var constraintName in map.transform) {
                     var constraintMap = map.transform[constraintName];
@@ -3560,7 +3297,6 @@ var spine;
                     duration = Math.max(duration, timeline.frames[(timeline.getFrameCount() - 1) * spine.TransformConstraintTimeline.ENTRIES]);
                 }
             }
-            // Path constraint timelines.
             if (map.paths) {
                 for (var constraintName in map.paths) {
                     var constraintMap = map.paths[constraintName];
@@ -3610,7 +3346,6 @@ var spine;
                     }
                 }
             }
-            // Deform timelines.
             if (map.deform) {
                 for (var deformName in map.deform) {
                     var deformMap = map.deform[deformName];
@@ -3663,7 +3398,6 @@ var spine;
                     }
                 }
             }
-            // Draw order timeline.
             var drawOrderNode = map.drawOrder;
             if (drawOrderNode == null)
                 drawOrderNode = map.draworder;
@@ -3684,16 +3418,12 @@ var spine;
                             var slotIndex = skeletonData.findSlotIndex(offsetMap.slot);
                             if (slotIndex == -1)
                                 throw new Error("Slot not found: " + offsetMap.slot);
-                            // Collect unchanged items.
                             while (originalIndex != slotIndex)
                                 unchanged[unchangedIndex++] = originalIndex++;
-                            // Set changed items.
                             drawOrder[originalIndex + offsetMap.offset] = originalIndex++;
                         }
-                        // Collect remaining unchanged items.
                         while (originalIndex < slotCount)
                             unchanged[unchangedIndex++] = originalIndex++;
-                        // Fill in unchanged items.
                         for (var i = slotCount - 1; i >= 0; i--)
                             if (drawOrder[i] == -1)
                                 drawOrder[i] = unchanged[--unchangedIndex];
@@ -3703,7 +3433,6 @@ var spine;
                 timelines.push(timeline);
                 duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);
             }
-            // Event timeline.
             if (map.events) {
                 var timeline = new spine.EventTimeline(map.events.length);
                 var frameIndex = 0;
@@ -3792,36 +3521,6 @@ var spine;
         return LinkedMesh;
     }());
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var Skin = (function () {
@@ -3841,12 +3540,10 @@ var spine;
                 attachments[slotIndex] = {};
             attachments[slotIndex][name] = attachment;
         };
-        /** @return May be null. */
         Skin.prototype.getAttachment = function (slotIndex, name) {
             var dictionary = this.attachments[slotIndex];
             return dictionary ? dictionary[name] : null;
         };
-        /** Attach each attachment in this skin if the corresponding attachment in the old skin is currently attached. */
         Skin.prototype.attachAll = function (skeleton, oldSkin) {
             var slotIndex = 0;
             for (var i = 0; i < skeleton.slots.length; i++) {
@@ -3871,36 +3568,6 @@ var spine;
     }());
     spine.Skin = Skin;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var Slot = (function () {
@@ -3915,12 +3582,9 @@ var spine;
             this.color = new spine.Color();
             this.setToSetupPose();
         }
-        /** @return May be null. */
         Slot.prototype.getAttachment = function () {
             return this.attachment;
         };
-        /** Sets the attachment and if it changed, resets {@link #getAttachmentTime()} and clears {@link #getAttachmentVertices()}.
-         * @param attachment May be null. */
         Slot.prototype.setAttachment = function (attachment) {
             if (this.attachment == attachment)
                 return;
@@ -3931,7 +3595,6 @@ var spine;
         Slot.prototype.setAttachmentTime = function (time) {
             this.attachmentTime = this.bone.skeleton.time - time;
         };
-        /** Returns the time since the attachment was set. */
         Slot.prototype.getAttachmentTime = function () {
             return this.bone.skeleton.time - this.attachmentTime;
         };
@@ -3948,36 +3611,6 @@ var spine;
     }());
     spine.Slot = Slot;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var SlotData = (function () {
@@ -3997,36 +3630,196 @@ var spine;
     }());
     spine.SlotData = SlotData;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
+var spine;
+(function (spine) {
+    var TextureAtlas = (function () {
+        function TextureAtlas(atlasText, textureLoader) {
+            this.pages = new Array();
+            this.regions = new Array();
+            this.load(atlasText, textureLoader);
+        }
+        TextureAtlas.prototype.load = function (atlasText, textureLoader) {
+            if (textureLoader == null)
+                throw new Error("textureLoader cannot be null.");
+            var reader = new TextureAtlasReader(atlasText);
+            var tuple = new Array(4);
+            var page = null;
+            while (true) {
+                var line = reader.readLine();
+                if (line == null)
+                    break;
+                line = line.trim();
+                if (line.length == 0)
+                    page = null;
+                else if (!page) {
+                    page = new TextureAtlasPage();
+                    page.name = line;
+                    if (reader.readTuple(tuple) == 2) {
+                        page.width = parseInt(tuple[0]);
+                        page.height = parseInt(tuple[1]);
+                        reader.readTuple(tuple);
+                    }
+                    reader.readTuple(tuple);
+                    page.minFilter = spine.Texture.filterFromString(tuple[0]);
+                    page.magFilter = spine.Texture.filterFromString(tuple[1]);
+                    var direction = reader.readValue();
+                    page.uWrap = spine.TextureWrap.ClampToEdge;
+                    page.vWrap = spine.TextureWrap.ClampToEdge;
+                    if (direction == "x")
+                        page.uWrap = spine.TextureWrap.Repeat;
+                    else if (direction == "y")
+                        page.vWrap = spine.TextureWrap.Repeat;
+                    else if (direction == "xy")
+                        page.uWrap = page.vWrap = spine.TextureWrap.Repeat;
+                    page.texture = textureLoader(line);
+                    page.texture.setFilters(page.minFilter, page.magFilter);
+                    page.texture.setWraps(page.uWrap, page.vWrap);
+                    page.width = page.texture.getImage().width;
+                    page.height = page.texture.getImage().height;
+                    this.pages.push(page);
+                }
+                else {
+                    var region = new TextureAtlasRegion();
+                    region.name = line;
+                    region.page = page;
+                    region.rotate = reader.readValue() == "true";
+                    reader.readTuple(tuple);
+                    var x = parseInt(tuple[0]);
+                    var y = parseInt(tuple[1]);
+                    reader.readTuple(tuple);
+                    var width = parseInt(tuple[0]);
+                    var height = parseInt(tuple[1]);
+                    region.u = x / page.width;
+                    region.v = y / page.height;
+                    if (region.rotate) {
+                        region.u2 = (x + height) / page.width;
+                        region.v2 = (y + width) / page.height;
+                    }
+                    else {
+                        region.u2 = (x + width) / page.width;
+                        region.v2 = (y + height) / page.height;
+                    }
+                    region.x = x;
+                    region.y = y;
+                    region.width = Math.abs(width);
+                    region.height = Math.abs(height);
+                    if (reader.readTuple(tuple) == 4) {
+                        if (reader.readTuple(tuple) == 4) {
+                            reader.readTuple(tuple);
+                        }
+                    }
+                    region.originalWidth = parseInt(tuple[0]);
+                    region.originalHeight = parseInt(tuple[1]);
+                    reader.readTuple(tuple);
+                    region.offsetX = parseInt(tuple[0]);
+                    region.offsetY = parseInt(tuple[1]);
+                    region.index = parseInt(reader.readValue());
+                    region.texture = page.texture;
+                    this.regions.push(region);
+                }
+            }
+        };
+        TextureAtlas.prototype.findRegion = function (name) {
+            for (var i = 0; i < this.regions.length; i++) {
+                if (this.regions[i].name == name) {
+                    return this.regions[i];
+                }
+            }
+            return null;
+        };
+        TextureAtlas.prototype.dispose = function () {
+            for (var i = 0; i < this.pages.length; i++) {
+                this.pages[i].texture.dispose();
+            }
+        };
+        return TextureAtlas;
+    }());
+    spine.TextureAtlas = TextureAtlas;
+    var TextureAtlasReader = (function () {
+        function TextureAtlasReader(text) {
+            this.index = 0;
+            this.lines = text.split(/\r\n|\r|\n/);
+        }
+        TextureAtlasReader.prototype.readLine = function () {
+            if (this.index >= this.lines.length)
+                return null;
+            return this.lines[this.index++];
+        };
+        TextureAtlasReader.prototype.readValue = function () {
+            var line = this.readLine();
+            var colon = line.indexOf(":");
+            if (colon == -1)
+                throw new Error("Invalid line: " + line);
+            return line.substring(colon + 1).trim();
+        };
+        TextureAtlasReader.prototype.readTuple = function (tuple) {
+            var line = this.readLine();
+            var colon = line.indexOf(":");
+            if (colon == -1)
+                throw new Error("Invalid line: " + line);
+            var i = 0, lastMatch = colon + 1;
+            for (; i < 3; i++) {
+                var comma = line.indexOf(",", lastMatch);
+                if (comma == -1)
+                    break;
+                tuple[i] = line.substr(lastMatch, comma - lastMatch).trim();
+                lastMatch = comma + 1;
+            }
+            tuple[i] = line.substring(lastMatch).trim();
+            return i + 1;
+        };
+        return TextureAtlasReader;
+    }());
+    var TextureAtlasPage = (function () {
+        function TextureAtlasPage() {
+        }
+        return TextureAtlasPage;
+    }());
+    spine.TextureAtlasPage = TextureAtlasPage;
+    var TextureAtlasRegion = (function (_super) {
+        __extends(TextureAtlasRegion, _super);
+        function TextureAtlasRegion() {
+            _super.apply(this, arguments);
+        }
+        return TextureAtlasRegion;
+    }(spine.TextureRegion));
+    spine.TextureAtlasRegion = TextureAtlasRegion;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var TextureAtlasAttachmentLoader = (function () {
+        function TextureAtlasAttachmentLoader(atlas) {
+            this.atlas = atlas;
+        }
+        TextureAtlasAttachmentLoader.prototype.newRegionAttachment = function (skin, name, path) {
+            var region = this.atlas.findRegion(path);
+            region.renderObject = region;
+            if (region == null)
+                throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
+            var attachment = new spine.RegionAttachment(name);
+            attachment.setRegion(region);
+            attachment.region = region;
+            return attachment;
+        };
+        TextureAtlasAttachmentLoader.prototype.newMeshAttachment = function (skin, name, path) {
+            var region = this.atlas.findRegion(path);
+            region.renderObject = region;
+            if (region == null)
+                throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
+            var attachment = new spine.MeshAttachment(name);
+            attachment.region = region;
+            return attachment;
+        };
+        TextureAtlasAttachmentLoader.prototype.newBoundingBoxAttachment = function (skin, name) {
+            return new spine.BoundingBoxAttachment(name);
+        };
+        TextureAtlasAttachmentLoader.prototype.newPathAttachment = function (skin, name) {
+            return new spine.PathAttachment(name);
+        };
+        return TextureAtlasAttachmentLoader;
+    }());
+    spine.TextureAtlasAttachmentLoader = TextureAtlasAttachmentLoader;
+})(spine || (spine = {}));
 var spine;
 (function (spine) {
     var TransformConstraint = (function () {
@@ -4111,36 +3904,6 @@ var spine;
     }());
     spine.TransformConstraint = TransformConstraint;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var TransformConstraintData = (function () {
@@ -4164,66 +3927,6 @@ var spine;
     }());
     spine.TransformConstraintData = TransformConstraintData;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var Color = (function () {
@@ -4398,36 +4101,6 @@ var spine;
     }());
     spine.Vector2 = Vector2;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var Attachment = (function () {
@@ -4448,11 +4121,6 @@ var spine;
         VertexAttachment.prototype.computeWorldVertices = function (slot, worldVertices) {
             this.computeWorldVerticesWith(slot, 0, this.worldVerticesLength, worldVertices, 0);
         };
-        /** Transforms local vertices to world coordinates.
-         * @param start The index of the first local vertex value to transform. Each vertex has 2 values, x and y.
-         * @param count The number of world vertex values to output. Must be <= {@link #getWorldVerticesLength()} - start.
-         * @param worldVertices The output world vertices. Must have a length >= offset + count.
-         * @param offset The worldVertices index to begin writing values. */
         VertexAttachment.prototype.computeWorldVerticesWith = function (slot, start, count, worldVertices, offset) {
             count += offset;
             var skeleton = slot.bone.skeleton;
@@ -4513,7 +4181,6 @@ var spine;
                 }
             }
         };
-        /** Returns true if a deform originally applied to the specified attachment should be applied to this attachment. */
         VertexAttachment.prototype.applyDeform = function (sourceAttachment) {
             return this == sourceAttachment;
         };
@@ -4521,66 +4188,6 @@ var spine;
     }(Attachment));
     spine.VertexAttachment = VertexAttachment;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     (function (AttachmentType) {
@@ -4592,36 +4199,6 @@ var spine;
     })(spine.AttachmentType || (spine.AttachmentType = {}));
     var AttachmentType = spine.AttachmentType;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var BoundingBoxAttachment = (function (_super) {
@@ -4633,36 +4210,6 @@ var spine;
     }(spine.VertexAttachment));
     spine.BoundingBoxAttachment = BoundingBoxAttachment;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var MeshAttachment = (function (_super) {
@@ -4703,7 +4250,6 @@ var spine;
                 }
             }
         };
-        /** @return The updated world vertices. */
         MeshAttachment.prototype.updateWorldVertices = function (slot, premultipliedAlpha) {
             var skeleton = slot.bone.skeleton;
             var skeletonColor = skeleton.color, slotColor = slot.color, meshColor = this.color;
@@ -4780,7 +4326,6 @@ var spine;
         MeshAttachment.prototype.getParentMesh = function () {
             return this._parentMesh;
         };
-        /** @param parentMesh May be null. */
         MeshAttachment.prototype.setParentMesh = function (parentMesh) {
             this._parentMesh = parentMesh;
             if (parentMesh != null) {
@@ -4795,36 +4340,6 @@ var spine;
     }(spine.VertexAttachment));
     spine.MeshAttachment = MeshAttachment;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var PathAttachment = (function (_super) {
@@ -4838,36 +4353,6 @@ var spine;
     }(spine.VertexAttachment));
     spine.PathAttachment = PathAttachment;
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
 var spine;
 (function (spine) {
     var RegionAttachment = (function (_super) {
@@ -4954,7 +4439,7 @@ var spine;
             var offsetX = 0, offsetY = 0;
             offsetX = offset[RegionAttachment.OX1];
             offsetY = offset[RegionAttachment.OY1];
-            vertices[RegionAttachment.X1] = offsetX * a + offsetY * b + x; // br
+            vertices[RegionAttachment.X1] = offsetX * a + offsetY * b + x;
             vertices[RegionAttachment.Y1] = offsetX * c + offsetY * d + y;
             vertices[RegionAttachment.C1R] = color.r;
             vertices[RegionAttachment.C1G] = color.g;
@@ -4962,7 +4447,7 @@ var spine;
             vertices[RegionAttachment.C1A] = color.a;
             offsetX = offset[RegionAttachment.OX2];
             offsetY = offset[RegionAttachment.OY2];
-            vertices[RegionAttachment.X2] = offsetX * a + offsetY * b + x; // bl
+            vertices[RegionAttachment.X2] = offsetX * a + offsetY * b + x;
             vertices[RegionAttachment.Y2] = offsetX * c + offsetY * d + y;
             vertices[RegionAttachment.C2R] = color.r;
             vertices[RegionAttachment.C2G] = color.g;
@@ -4970,7 +4455,7 @@ var spine;
             vertices[RegionAttachment.C2A] = color.a;
             offsetX = offset[RegionAttachment.OX3];
             offsetY = offset[RegionAttachment.OY3];
-            vertices[RegionAttachment.X3] = offsetX * a + offsetY * b + x; // ul
+            vertices[RegionAttachment.X3] = offsetX * a + offsetY * b + x;
             vertices[RegionAttachment.Y3] = offsetX * c + offsetY * d + y;
             vertices[RegionAttachment.C3R] = color.r;
             vertices[RegionAttachment.C3G] = color.g;
@@ -4978,7 +4463,7 @@ var spine;
             vertices[RegionAttachment.C3A] = color.a;
             offsetX = offset[RegionAttachment.OX4];
             offsetY = offset[RegionAttachment.OY4];
-            vertices[RegionAttachment.X4] = offsetX * a + offsetY * b + x; // ur
+            vertices[RegionAttachment.X4] = offsetX * a + offsetY * b + x;
             vertices[RegionAttachment.Y4] = offsetX * c + offsetY * d + y;
             vertices[RegionAttachment.C4R] = color.r;
             vertices[RegionAttachment.C4G] = color.g;
@@ -5029,55 +4514,5 @@ var spine;
         return RegionAttachment;
     }(spine.Attachment));
     spine.RegionAttachment = RegionAttachment;
-})(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
-var spine;
-(function (spine) {
-    var TextureRegion = (function () {
-        function TextureRegion() {
-            this.u = 0;
-            this.v = 0;
-            this.u2 = 0;
-            this.v2 = 0;
-            this.width = 0;
-            this.height = 0;
-            this.rotate = false;
-            this.offsetX = 0;
-            this.offsetY = 0;
-            this.originalWidth = 0;
-            this.originalHeight = 0;
-        }
-        return TextureRegion;
-    }());
-    spine.TextureRegion = TextureRegion;
 })(spine || (spine = {}));
 //# sourceMappingURL=spine-core.js.map

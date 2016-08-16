@@ -23,6 +23,10 @@ function init () {
 	context = canvas.getContext("2d");
 
 	skeletonRenderer = new spine.canvas.SkeletonRenderer(context);
+	// enable debug rendering
+	skeletonRenderer.useDebugRendering = true;
+	// enable the triangle renderer, supports meshes, but may produce artifacts in some browsers
+	skeletonRenderer.useTriangleRendering = true;
 
 	assetManager = new spine.AssetManager(function(image) {
 		return new spine.canvas.CanvasTexture(image);
@@ -43,7 +47,7 @@ function init () {
 
 function load () {
 	if (assetManager.isLoadingComplete()) {
-		var data = loadSkeleton("raptor", 0.3, "walk", 320, 20, "default");
+		var data = loadSkeleton("spineboy", 0.7, "walk", 320, 460, "default");
 		skeleton = data.skeleton;
 		state = data.state;		
 		requestAnimationFrame(render);
@@ -73,6 +77,7 @@ function loadSkeleton (name, scale, initialAnimation, positionX, positionY, skin
 	var skeleton = new spine.Skeleton(skeletonData);
 	skeleton.x = positionX;
 	skeleton.y = positionY;
+	skeleton.flipY = true;
 	skeleton.setSkinByName(skin);
 
 	// Create an AnimationState, and set the initial animation in looping mode.

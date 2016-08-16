@@ -114,14 +114,12 @@ module spine {
 					else throw new Error("Failed to load assets: " + JSON.stringify(assetManager.errors));
 				}
 
-				let atlas = new spine.TextureAtlas(this._assetManager.get(this._config.atlas) as string, (path: string, minFilter: TextureFilter, magFilter: TextureFilter, uWrap: TextureWrap, vWrap: TextureWrap) => {
+				let atlas = new spine.TextureAtlas(this._assetManager.get(this._config.atlas) as string, (path: string) => {
 					let texture = assetManager.get(imagesPath + path) as spine.webgl.GLTexture;
-					texture.setFilters(minFilter, magFilter);
-					texture.setWraps(uWrap, vWrap);
 					return texture;
 				});
 				
-				let atlasLoader = new spine.webgl.TextureAtlasAttachmentLoader(atlas);				
+				let atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);				
 				var skeletonJson = new spine.SkeletonJson(atlasLoader);
 				
 				// Set the scale to apply during parsing, parse the file, and create a new skeleton.
