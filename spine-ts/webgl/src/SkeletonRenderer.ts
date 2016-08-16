@@ -62,7 +62,7 @@ module spine.webgl {
 					vertices = mesh.updateWorldVertices(slot, premultipliedAlpha);
 					triangles = mesh.triangles;
 					texture = <GLTexture>(<TextureAtlasRegion>mesh.region.renderObject).texture;
-				}
+				} else continue;
 
 				if (texture != null) {
 					let slotBlendMode = slot.data.blendMode;

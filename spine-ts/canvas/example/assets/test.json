@@ -1,0 +1,19 @@
+{
+"skeleton": { "hash": "lDI/ipVg9yXAdln1ZwTDAuXPGng", "spine": "3.4.02", "width": 650.27, "height": 650.27, "images": "./images/" },
+"bones": [
+	{ "name": "root" }
+],
+"slots": [
+	{ "name": "badlogic", "bone": "root", "attachment": "badlogic" }
+],
+"skins": {
+	"default": {
+		"badlogic": {
+			"badlogic": { "rotation": 43.36, "width": 460, "height": 460 }
+		}
+	}
+},
+"animations": {
+	"animation": {}
+}
+}

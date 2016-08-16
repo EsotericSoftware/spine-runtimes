@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-module spine.webgl {
+module spine {
 	export class TextureAtlasAttachmentLoader implements AttachmentLoader {
 		atlas: TextureAtlas;
 

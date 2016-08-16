@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"module": "none",
 		"noImplicitAny": true,
-		"removeComments": false,
+		"removeComments": true,
 		"preserveConstEnums": true,
 		"outFile": "build/spine-all.js",
 		"sourceMap": true,

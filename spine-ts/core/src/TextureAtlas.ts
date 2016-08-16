@@ -34,11 +34,11 @@ module spine {
 		pages = new Array<TextureAtlasPage>();
 		regions = new Array<TextureAtlasRegion>();
 
-		constructor (atlasText: string, textureLoader: (path: string, minFilter: TextureFilter, magFilter: TextureFilter, uWrap: TextureWrap, vWrap: TextureWrap) => any) {
+		constructor (atlasText: string, textureLoader: (path: string) => any) {
 			this.load(atlasText, textureLoader);
 		}
 
-		private load (atlasText: string, textureLoader: (path: string, minFilter: TextureFilter, magFilter: TextureFilter, uWrap: TextureWrap, vWrap: TextureWrap) => any) {
+		private load (atlasText: string, textureLoader: (path: string) => any) {
 			if (textureLoader == null)
 				throw new Error("textureLoader cannot be null.");
 
@@ -77,7 +77,9 @@ module spine {
 					else if (direction == "xy")
 						page.uWrap = page.vWrap = TextureWrap.Repeat;
 
-					page.texture = textureLoader(line, page.minFilter, page.magFilter, page.uWrap, page.vWrap);					
+					page.texture = textureLoader(line);
+					page.texture.setFilters(page.minFilter, page.magFilter);
+					page.texture.setWraps(page.uWrap, page.vWrap);					
 					page.width = page.texture.getImage().width;
 					page.height = page.texture.getImage().height;
 					this.pages.push(page);

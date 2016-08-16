@@ -80,15 +80,12 @@ function loadSkeleton (name, scale, initialAnimation, positionX, positionY, prem
 
 	// Load the texture atlas using name.atlas and name.png from the AssetManager.
 	// The function passed to TextureAtlas is used to resolve relative paths.
-	atlas = new spine.TextureAtlas(assetManager.get("assets/" + name + ".atlas"), function(path, minFilter, magFilter, uWrap, vWrap) {
-		var texture = assetManager.get("assets/" + path);
-		texture.setFilters(minFilter, magFilter);
-		texture.setWraps(uWrap, vWrap);
-		return texture;
+	atlas = new spine.TextureAtlas(assetManager.get("assets/" + name + ".atlas"), function(path) {
+		return assetManager.get("assets/" + path);		
 	});
 
-	// Create a TextureAtlasAttachmentLoader, which is specific to the WebGL backend.
-	atlasLoader = new spine.webgl.TextureAtlasAttachmentLoader(atlas);
+	// Create a TextureAtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
+	atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
 
 	// Create a SkeletonJson instance for parsing the .json file.
 	var skeletonJson = new spine.SkeletonJson(atlasLoader);

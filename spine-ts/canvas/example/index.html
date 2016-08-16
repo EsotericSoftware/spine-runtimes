@@ -10,13 +10,108 @@
 
 var lastFrameTime = Date.now() / 1000;
 var canvas;
+var context;
 var assetManager;
+var skeleton;
+var state;
 var skeletonRenderer;
 
 function init () {
+	canvas = document.getElementById("canvas");
+	canvas.width = 640;
+	canvas.height = 480;
+	context = canvas.getContext("2d");
+
+	skeletonRenderer = new spine.canvas.SkeletonRenderer(context);
+
 	assetManager = new spine.AssetManager(function(image) {
-		return CanvasTexture(image);
+		return new spine.canvas.CanvasTexture(image);
 	});
+
+	assetManager.loadText("assets/spineboy.json");
+	assetManager.loadText("assets/spineboy.atlas");
+	assetManager.loadTexture("assets/spineboy.png");
+	assetManager.loadText("assets/test.json");
+	assetManager.loadText("assets/test.atlas");
+	assetManager.loadTexture("assets/test.png");
+	assetManager.loadText("assets/raptor.json");
+	assetManager.loadText("assets/raptor.atlas");
+	assetManager.loadTexture("assets/raptor.png");
+
+	requestAnimationFrame(load);
+}
+
+function load () {
+	if (assetManager.isLoadingComplete()) {
+		var data = loadSkeleton("raptor", 0.3, "walk", 320, 20, "default");
+		skeleton = data.skeleton;
+		state = data.state;		
+		requestAnimationFrame(render);
+	} else {
+		requestAnimationFrame(load);
+	}
+}
+
+function loadSkeleton (name, scale, initialAnimation, positionX, positionY, skin) {
+	if (skin === undefined) skin = "default";
+
+	// Load the texture atlas using name.atlas and name.png from the AssetManager.
+	// The function passed to TextureAtlas is used to resolve relative paths.
+	atlas = new spine.TextureAtlas(assetManager.get("assets/" + name + ".atlas"), function(path) {
+		return assetManager.get("assets/" + path);				
+	});
+
+	// Create a TextureAtlasAttachmentLoader, which is specific to the WebGL backend.
+	atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
+
+	// Create a SkeletonJson instance for parsing the .json file.
+	var skeletonJson = new spine.SkeletonJson(atlasLoader);
+	
+	// Set the scale to apply during parsing, parse the file, and create a new skeleton.
+	skeletonJson.scale = scale;
+	var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/" + name + ".json"));
+	var skeleton = new spine.Skeleton(skeletonData);
+	skeleton.x = positionX;
+	skeleton.y = positionY;
+	skeleton.setSkinByName(skin);
+
+	// Create an AnimationState, and set the initial animation in looping mode.
+	var animationState = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
+	animationState.setAnimation(0, initialAnimation, true);
+	animationState.addListener({
+		event: function(trackIndex, event) {
+			// console.log("Event on track " + trackIndex + ": " + JSON.stringify(event));
+		},
+		complete: function(trackIndex, loopCount) {
+			// console.log("Animation on track " + trackIndex + " completed, loop count: " + loopCount);
+		},
+		start: function(trackIndex) {
+			// console.log("Animation on track " + trackIndex + " started");
+		},
+		end: function(trackIndex) {
+			// console.log("Animation on track " + trackIndex + " ended");
+		}
+	})
+
+	// Pack everything up and return to caller.
+	return { skeleton: skeleton, state: animationState };
+}
+
+function render () {
+	var now = Date.now() / 1000;
+	var delta = now - lastFrameTime;
+	lastFrameTime = now;
+	
+	state.update(delta);
+	state.apply(skeleton);
+	skeleton.updateWorldTransform();
+
+	context.fillStyle = "#cccccc";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+
+	skeletonRenderer.draw(skeleton);
+
+	requestAnimationFrame(render);
 }
 
 (function() {

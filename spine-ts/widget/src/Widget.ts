@@ -37,7 +37,7 @@ module spine {
 		canvas: HTMLCanvasElement;		
 
 		private _config: SpineWidgetConfig;
-		private _assetManager: spine.webgl.AssetManager;
+		private _assetManager: spine.AssetManager;
 		private _shader: spine.webgl.Shader;
 		private _batcher: spine.webgl.PolygonBatcher;
 		private _mvp = new spine.webgl.Matrix4();
@@ -69,7 +69,9 @@ module spine {
 			this._mvp.ortho2d(0, 0, 639, 479);
 			this._skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);
 
-			let assets = this._assetManager = new spine.webgl.AssetManager(gl);
+			let assets = this._assetManager = new spine.AssetManager((image: HTMLImageElement) => { 
+				return new spine.webgl.GLTexture(gl, image);
+			});
 			assets.loadText(config.atlas);
 			assets.loadText(config.json);
 			assets.loadTexture(config.atlas.replace(".atlas", ".png"));
@@ -112,8 +114,11 @@ module spine {
 					else throw new Error("Failed to load assets: " + JSON.stringify(assetManager.errors));
 				}
 
-				let atlas = new spine.webgl.TextureAtlas(this._assetManager.get(this._config.atlas) as string, (path) => {
-					return assetManager.get(imagesPath + path) as spine.webgl.Texture;
+				let atlas = new spine.TextureAtlas(this._assetManager.get(this._config.atlas) as string, (path: string, minFilter: TextureFilter, magFilter: TextureFilter, uWrap: TextureWrap, vWrap: TextureWrap) => {
+					let texture = assetManager.get(imagesPath + path) as spine.webgl.GLTexture;
+					texture.setFilters(minFilter, magFilter);
+					texture.setWraps(uWrap, vWrap);
+					return texture;
 				});
 				
 				let atlasLoader = new spine.webgl.TextureAtlasAttachmentLoader(atlas);				
