@@ -13,11 +13,8 @@
 		"canvas/src/**/*"
 	],
 	"exclude": [
-		"webgl/src/*.ts",
-		"widget/src/*.ts",
-		"build",
-		"build/*.d.ts",
-		"build/*.js",
-		"build/*.js.map"	 
+		"webgl",
+		"widget",
+		"build"			 
 	]
 }

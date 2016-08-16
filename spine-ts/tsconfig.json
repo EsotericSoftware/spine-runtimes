@@ -10,13 +10,11 @@
 	},
 	"include": [
 		"core/src/**/*",
+		"canvas/src/**/*",
 		"webgl/src/**/*",
 		"widget/src/**/*"
 	],
-	"exclude": [
-		"build",		
-		"build/*.js",
-		"build/*.d.ts",
-		"build/*.js.map"		 
+	"exclude": [		
+		"build"				 
 	]
 }

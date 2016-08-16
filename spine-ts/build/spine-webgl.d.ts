@@ -384,6 +384,57 @@ declare module spine {
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
+declare module spine.webgl {
+    class AssetManager implements Disposable {
+        private _textureLoader;
+        private _assets;
+        private _errors;
+        private _toLoad;
+        private _loaded;
+        constructor(textureLoader: (image: HTMLImageElement) => any);
+        loadText(path: string, success?: (path: string, text: string) => void, error?: (path: string, error: string) => void): void;
+        loadTexture(path: string, success?: (path: string, image: HTMLImageElement) => void, error?: (path: string, error: string) => void): void;
+        get(path: string): any;
+        remove(path: string): void;
+        removeAll(): void;
+        isLoadingComplete(): boolean;
+        toLoad(): number;
+        loaded(): number;
+        dispose(): void;
+        hasErrors(): boolean;
+        errors(): Map<string>;
+    }
+}
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
 declare module spine {
     enum BlendMode {
         Normal = 0,
@@ -1206,6 +1257,91 @@ declare module spine {
         constructor(index: number, name: string, boneData: BoneData);
     }
 }
+declare module spine {
+    abstract class Texture {
+        protected _image: HTMLImageElement;
+        constructor(image: HTMLImageElement);
+        getImage(): HTMLImageElement;
+        abstract setFilters(minFilter: TextureFilter, magFilter: TextureFilter): void;
+        abstract setWraps(uWrap: TextureWrap, vWrap: TextureWrap): void;
+        abstract dispose(): void;
+        static filterFromString(text: string): TextureFilter;
+        static wrapFromString(text: string): TextureWrap;
+    }
+    enum TextureFilter {
+        Nearest = 9728,
+        Linear = 9729,
+        MipMap = 9987,
+        MipMapNearestNearest = 9984,
+        MipMapLinearNearest = 9985,
+        MipMapNearestLinear = 9986,
+        MipMapLinearLinear = 9987,
+    }
+    enum TextureWrap {
+        MirroredRepeat = 33648,
+        ClampToEdge = 33071,
+        Repeat = 10497,
+    }
+}
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+declare module spine.webgl {
+    class TextureAtlas implements Disposable {
+        pages: TextureAtlasPage[];
+        regions: TextureAtlasRegion[];
+        constructor(atlasText: string, textureLoader: (path: string, minFilter: TextureFilter, magFilter: TextureFilter, uWrap: TextureWrap, vWrap: TextureWrap) => any);
+        private load(atlasText, textureLoader);
+        findRegion(name: string): TextureAtlasRegion;
+        dispose(): void;
+    }
+    class TextureAtlasPage {
+        name: string;
+        minFilter: TextureFilter;
+        magFilter: TextureFilter;
+        uWrap: TextureWrap;
+        vWrap: TextureWrap;
+        texture: Texture;
+        width: number;
+        height: number;
+    }
+    class TextureAtlasRegion extends TextureRegion {
+        page: TextureAtlasPage;
+        name: string;
+        x: number;
+        y: number;
+        index: number;
+        rotate: boolean;
+        texture: Texture;
+    }
+}
 /******************************************************************************
  * Spine Runtimes Software License
  * Version 2.5
@@ -1846,24 +1982,17 @@ declare module spine {
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 declare module spine.webgl {
-    class AssetManager implements Disposable {
+    class GLTexture extends Texture implements Disposable {
         private _gl;
-        private _assets;
-        private _errors;
-        private _toLoad;
-        private _loaded;
-        constructor(gl: WebGLRenderingContext);
-        loadText(path: string, success?: (path: string, text: string) => void, error?: (path: string, error: string) => void): void;
-        loadTexture(path: string, success?: (path: string, image: HTMLImageElement) => void, error?: (path: string, error: string) => void): void;
-        get(path: string): string | Texture;
-        remove(path: string): void;
-        removeAll(): void;
-        isLoadingComplete(): boolean;
-        toLoad(): number;
-        loaded(): number;
+        private _texture;
+        private _boundUnit;
+        constructor(gl: WebGLRenderingContext, image: HTMLImageElement, useMipMaps?: boolean);
+        setFilters(minFilter: TextureFilter, magFilter: TextureFilter): void;
+        setWraps(uWrap: TextureWrap, vWrap: TextureWrap): void;
+        update(useMipMaps: boolean): void;
+        bind(unit?: number): void;
+        unbind(): void;
         dispose(): void;
-        hasErrors(): boolean;
-        errors(): Map<string>;
     }
 }
 /******************************************************************************
@@ -2060,7 +2189,7 @@ declare module spine.webgl {
         constructor(gl: WebGLRenderingContext, maxVertices?: number);
         begin(shader: Shader): void;
         setBlendMode(srcBlend: number, dstBlend: number): void;
-        draw(texture: Texture, vertices: ArrayLike<number>, indices: Array<number>): void;
+        draw(texture: GLTexture, vertices: ArrayLike<number>, indices: Array<number>): void;
         private flush();
         end(): void;
         drawCalls(): number;
@@ -2206,127 +2335,6 @@ declare module spine.webgl {
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 declare module spine.webgl {
-    class Texture implements Disposable {
-        private _gl;
-        private _texture;
-        private _image;
-        private _boundUnit;
-        constructor(gl: WebGLRenderingContext, image: HTMLImageElement, useMipMaps?: boolean);
-        getImage(): HTMLImageElement;
-        setFilters(minFilter: TextureFilter, magFilter: TextureFilter): void;
-        setWraps(uWrap: TextureWrap, vWrap: TextureWrap): void;
-        update(useMipMaps: boolean): void;
-        bind(unit?: number): void;
-        unbind(): void;
-        dispose(): void;
-        static filterFromString(text: string): TextureFilter;
-        static wrapFromString(text: string): TextureWrap;
-    }
-    enum TextureFilter {
-        Nearest,
-        Linear,
-        MipMap,
-        MipMapNearestNearest,
-        MipMapLinearNearest,
-        MipMapNearestLinear,
-        MipMapLinearLinear,
-    }
-    enum TextureWrap {
-        MirroredRepeat,
-        ClampToEdge,
-        Repeat,
-    }
-}
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
-declare module spine.webgl {
-    class TextureAtlas implements Disposable {
-        pages: TextureAtlasPage[];
-        regions: TextureAtlasRegion[];
-        constructor(atlasText: string, textureLoader: (path: string) => Texture);
-        private load(atlasText, textureLoader);
-        findRegion(name: string): TextureAtlasRegion;
-        dispose(): void;
-    }
-    class TextureAtlasPage {
-        name: string;
-        minFilter: TextureFilter;
-        magFilter: TextureFilter;
-        uWrap: TextureWrap;
-        vWrap: TextureWrap;
-        texture: Texture;
-        width: number;
-        height: number;
-    }
-    class TextureAtlasRegion extends TextureRegion {
-        page: TextureAtlasPage;
-        name: string;
-        x: number;
-        y: number;
-        index: number;
-        rotate: boolean;
-        texture: Texture;
-    }
-}
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
-declare module spine.webgl {
     class TextureAtlasAttachmentLoader implements AttachmentLoader {
         atlas: TextureAtlas;
         constructor(atlas: TextureAtlas);
@@ -2421,82 +2429,4 @@ declare module spine.webgl {
 declare module spine.webgl {
     function getSourceGLBlendMode(gl: WebGLRenderingContext, blendMode: BlendMode, premultipliedAlpha?: boolean): number;
     function getDestGLBlendMode(gl: WebGLRenderingContext, blendMode: BlendMode): number;
-}
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
-declare module spine {
-    class SpineWidget {
-        skeleton: Skeleton;
-        state: AnimationState;
-        gl: WebGLRenderingContext;
-        canvas: HTMLCanvasElement;
-        private _config;
-        private _assetManager;
-        private _shader;
-        private _batcher;
-        private _mvp;
-        private _skeletonRenderer;
-        private _paused;
-        private _lastFrameTime;
-        private _backgroundColor;
-        private _loaded;
-        constructor(element: Element | string, config: SpineWidgetConfig);
-        private validateConfig(config);
-        private load();
-        private render();
-        pause(): void;
-        play(): void;
-        isPlaying(): boolean;
-        setAnimation(animationName: string): void;
-        static loadWidgets(): void;
-        static loadWidget(widget: Element): void;
-        static pageLoaded: boolean;
-        private static ready();
-        static setupDOMListener(): void;
-    }
-    class SpineWidgetConfig {
-        json: string;
-        atlas: string;
-        animation: string;
-        imagesPath: string;
-        skin: string;
-        loop: boolean;
-        scale: number;
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-        backgroundColor: string;
-        premultipliedAlpha: boolean;
-        success: (widget: SpineWidget) => void;
-        error: (widget: SpineWidget, msg: string) => void;
-    }
 }

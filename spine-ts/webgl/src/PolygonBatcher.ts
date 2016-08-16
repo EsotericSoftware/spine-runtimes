@@ -36,7 +36,7 @@ module spine.webgl {
 		private _drawing = false;
 		private _mesh: Mesh;
 		private _shader: Shader = null;
-		private _lastTexture: Texture = null;
+		private _lastTexture: GLTexture = null;
 		private _verticesLength = 0;
 		private _indicesLength = 0;
 		private _srcBlend: number = WebGLRenderingContext.SRC_ALPHA;
@@ -70,7 +70,7 @@ module spine.webgl {
 			}
 		}
 
-		draw (texture: Texture, vertices: ArrayLike<number>, indices: Array<number>) {
+		draw (texture: GLTexture, vertices: ArrayLike<number>, indices: Array<number>) {
 			if (texture != this._lastTexture) {
 				this.flush();
 				this._lastTexture = texture;

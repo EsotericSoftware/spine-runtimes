@@ -31,14 +31,14 @@
 
 module spine.webgl {
 	export class AssetManager implements Disposable {
-		private _gl: WebGLRenderingContext;
-		private _assets: Map<string | Texture> = {};
+		private _textureLoader: (image: HTMLImageElement) => any;
+		private _assets: Map<any> = {};
 		private _errors: Map<string> = {};
 		private _toLoad = 0;
 		private _loaded = 0;
 
-		constructor (gl: WebGLRenderingContext) {
-			this._gl = gl;
+		constructor (textureLoader: (image: HTMLImageElement) => any) {
+			this._textureLoader = textureLoader;
 		}
 
 		loadText(path: string,
@@ -73,7 +73,7 @@ module spine.webgl {
 			img.src = path;
 			img.onload = (ev) => {
 				if (success) success(path, img);
-				let texture = new Texture(this._gl, img);
+				let texture = this._textureLoader(img);
 				this._assets[path] = texture;
 				this._toLoad--;
 				this._loaded++;
@@ -92,16 +92,14 @@ module spine.webgl {
 
 		remove (path: string) {
 			let asset = this._assets[path];
-			if (asset instanceof Texture) {
-				asset.dispose();
-			}
+			if ((<any>asset).dispose) (<any>asset).dispose();			
 			this._assets[path] = null;
 		}
 
 		removeAll () {
 			for (let key in this._assets) {
 				let asset = this._assets[key];
-				if (asset instanceof Texture) asset.dispose();
+				if ((<any>asset).dispose) (<any>asset).dispose();
 			}
 			this._assets = {};
 		}

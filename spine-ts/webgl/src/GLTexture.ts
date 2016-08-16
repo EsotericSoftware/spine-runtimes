@@ -30,21 +30,16 @@
  *****************************************************************************/
 
 module spine.webgl {
-	export class Texture implements Disposable {
+	export class GLTexture extends Texture implements Disposable {
 		private _gl: WebGLRenderingContext;
-		private _texture: WebGLTexture;
-		private _image: HTMLImageElement;
+		private _texture: WebGLTexture;		
 		private _boundUnit = 0;
 
 		constructor (gl: WebGLRenderingContext, image: HTMLImageElement, useMipMaps: boolean = false) {
+			super(image);
 			this._gl = gl;			
-			this._texture = gl.createTexture();
-			this._image = image;
+			this._texture = gl.createTexture();			
 			this.update(useMipMaps);
-		}
-
-		getImage (): HTMLImageElement {
-			return this._image;
 		}
 
 		setFilters (minFilter: TextureFilter, magFilter: TextureFilter) {
@@ -89,43 +84,5 @@ module spine.webgl {
 			let gl = this._gl;
 			gl.deleteTexture(this._texture);
 		}
-
-		public static filterFromString (text: string): TextureFilter {
-			switch (text.toLowerCase()) {
-				case "nearest": return TextureFilter.Nearest;
-				case "linear": return TextureFilter.Linear;
-				case "mipmap": return TextureFilter.MipMap;
-				case "mipmapnearestnearest": return TextureFilter.MipMapNearestNearest;
-				case "mipmaplinearnearest": return TextureFilter.MipMapLinearNearest;
-				case "mipmapnearestlinear": return TextureFilter.MipMapNearestLinear;
-				case "mipmaplinearlinear": return TextureFilter.MipMapLinearLinear;
-				default: throw new Error(`Unknown texture filter ${text}`);
-			}
-		}
-
-		public static wrapFromString (text: string): TextureWrap {
-			switch (text.toLowerCase()) {
-				case "mirroredtepeat": return TextureWrap.MirroredRepeat;
-				case "clamptoedge": return TextureWrap.ClampToEdge;
-				case "repeat": return TextureWrap.Repeat;
-				default: throw new Error(`Unknown texture wrap ${text}`);
-			}
-		}
-	}
-
-	export enum TextureFilter {
-		Nearest = WebGLRenderingContext.NEAREST,
-		Linear = WebGLRenderingContext.LINEAR,
-		MipMap = WebGLRenderingContext.LINEAR_MIPMAP_LINEAR,
-		MipMapNearestNearest = WebGLRenderingContext.NEAREST_MIPMAP_NEAREST,
-		MipMapLinearNearest = WebGLRenderingContext.LINEAR_MIPMAP_NEAREST,
-		MipMapNearestLinear = WebGLRenderingContext.NEAREST_MIPMAP_LINEAR,
-		MipMapLinearLinear = WebGLRenderingContext.LINEAR_MIPMAP_LINEAR
-	}
-
-	export enum TextureWrap {
-		MirroredRepeat = WebGLRenderingContext.MIRRORED_REPEAT,
-		ClampToEdge = WebGLRenderingContext.CLAMP_TO_EDGE,
-		Repeat = WebGLRenderingContext.REPEAT
 	}
 }

@@ -1147,6 +1147,136 @@ var spine;
  *****************************************************************************/
 var spine;
 (function (spine) {
+    var webgl;
+    (function (webgl) {
+        var AssetManager = (function () {
+            function AssetManager(textureLoader) {
+                this._assets = {};
+                this._errors = {};
+                this._toLoad = 0;
+                this._loaded = 0;
+                this._textureLoader = textureLoader;
+            }
+            AssetManager.prototype.loadText = function (path, success, error) {
+                var _this = this;
+                if (success === void 0) { success = null; }
+                if (error === void 0) { error = null; }
+                this._toLoad++;
+                var request = new XMLHttpRequest();
+                request.onreadystatechange = function () {
+                    if (request.readyState == XMLHttpRequest.DONE) {
+                        if (request.status >= 200 && request.status < 300) {
+                            if (success)
+                                success(path, request.responseText);
+                            _this._assets[path] = request.responseText;
+                        }
+                        else {
+                            if (error)
+                                error(path, "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText);
+                            _this._errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
+                        }
+                        _this._toLoad--;
+                        _this._loaded++;
+                    }
+                };
+                request.open("GET", path, true);
+                request.send();
+            };
+            AssetManager.prototype.loadTexture = function (path, success, error) {
+                var _this = this;
+                if (success === void 0) { success = null; }
+                if (error === void 0) { error = null; }
+                this._toLoad++;
+                var img = new Image();
+                img.src = path;
+                img.onload = function (ev) {
+                    if (success)
+                        success(path, img);
+                    var texture = _this._textureLoader(img);
+                    _this._assets[path] = texture;
+                    _this._toLoad--;
+                    _this._loaded++;
+                };
+                img.onerror = function (ev) {
+                    if (error)
+                        error(path, "Couldn't load image " + path);
+                    _this._errors[path] = "Couldn't load image " + path;
+                    _this._toLoad--;
+                    _this._loaded++;
+                };
+            };
+            AssetManager.prototype.get = function (path) {
+                return this._assets[path];
+            };
+            AssetManager.prototype.remove = function (path) {
+                var asset = this._assets[path];
+                if (asset.dispose)
+                    asset.dispose();
+                this._assets[path] = null;
+            };
+            AssetManager.prototype.removeAll = function () {
+                for (var key in this._assets) {
+                    var asset = this._assets[key];
+                    if (asset.dispose)
+                        asset.dispose();
+                }
+                this._assets = {};
+            };
+            AssetManager.prototype.isLoadingComplete = function () {
+                return this._toLoad == 0;
+            };
+            AssetManager.prototype.toLoad = function () {
+                return this._toLoad;
+            };
+            AssetManager.prototype.loaded = function () {
+                return this._loaded;
+            };
+            AssetManager.prototype.dispose = function () {
+                this.removeAll();
+            };
+            AssetManager.prototype.hasErrors = function () {
+                return Object.keys(this._errors).length > 0;
+            };
+            AssetManager.prototype.errors = function () {
+                return this._errors;
+            };
+            return AssetManager;
+        }());
+        webgl.AssetManager = AssetManager;
+    })(webgl = spine.webgl || (spine.webgl = {}));
+})(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+var spine;
+(function (spine) {
     (function (BlendMode) {
         BlendMode[BlendMode["Normal"] = 0] = "Normal";
         BlendMode[BlendMode["Additive"] = 1] = "Additive";
@@ -3997,6 +4127,244 @@ var spine;
     }());
     spine.SlotData = SlotData;
 })(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var Texture = (function () {
+        function Texture(image) {
+            this._image = image;
+        }
+        Texture.prototype.getImage = function () {
+            return this._image;
+        };
+        Texture.filterFromString = function (text) {
+            switch (text.toLowerCase()) {
+                case "nearest": return TextureFilter.Nearest;
+                case "linear": return TextureFilter.Linear;
+                case "mipmap": return TextureFilter.MipMap;
+                case "mipmapnearestnearest": return TextureFilter.MipMapNearestNearest;
+                case "mipmaplinearnearest": return TextureFilter.MipMapLinearNearest;
+                case "mipmapnearestlinear": return TextureFilter.MipMapNearestLinear;
+                case "mipmaplinearlinear": return TextureFilter.MipMapLinearLinear;
+                default: throw new Error("Unknown texture filter " + text);
+            }
+        };
+        Texture.wrapFromString = function (text) {
+            switch (text.toLowerCase()) {
+                case "mirroredtepeat": return TextureWrap.MirroredRepeat;
+                case "clamptoedge": return TextureWrap.ClampToEdge;
+                case "repeat": return TextureWrap.Repeat;
+                default: throw new Error("Unknown texture wrap " + text);
+            }
+        };
+        return Texture;
+    }());
+    spine.Texture = Texture;
+    (function (TextureFilter) {
+        TextureFilter[TextureFilter["Nearest"] = 9728] = "Nearest";
+        TextureFilter[TextureFilter["Linear"] = 9729] = "Linear";
+        TextureFilter[TextureFilter["MipMap"] = 9987] = "MipMap";
+        TextureFilter[TextureFilter["MipMapNearestNearest"] = 9984] = "MipMapNearestNearest";
+        TextureFilter[TextureFilter["MipMapLinearNearest"] = 9985] = "MipMapLinearNearest";
+        TextureFilter[TextureFilter["MipMapNearestLinear"] = 9986] = "MipMapNearestLinear";
+        TextureFilter[TextureFilter["MipMapLinearLinear"] = 9987] = "MipMapLinearLinear"; // WebGLRenderingContext.LINEAR_MIPMAP_LINEAR
+    })(spine.TextureFilter || (spine.TextureFilter = {}));
+    var TextureFilter = spine.TextureFilter;
+    (function (TextureWrap) {
+        TextureWrap[TextureWrap["MirroredRepeat"] = 33648] = "MirroredRepeat";
+        TextureWrap[TextureWrap["ClampToEdge"] = 33071] = "ClampToEdge";
+        TextureWrap[TextureWrap["Repeat"] = 10497] = "Repeat"; // WebGLRenderingContext.REPEAT
+    })(spine.TextureWrap || (spine.TextureWrap = {}));
+    var TextureWrap = spine.TextureWrap;
+})(spine || (spine = {}));
+/******************************************************************************
+ * Spine Runtimes Software License
+ * Version 2.5
+ *
+ * Copyright (c) 2013-2016, Esoteric Software
+ * All rights reserved.
+ *
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
+ * or other intellectual property or proprietary rights notices on or in the
+ * Software, including any copy thereof. Redistributions in binary or source
+ * form must include this license and terms.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+var spine;
+(function (spine) {
+    var webgl;
+    (function (webgl) {
+        var TextureAtlas = (function () {
+            function TextureAtlas(atlasText, textureLoader) {
+                this.pages = new Array();
+                this.regions = new Array();
+                this.load(atlasText, textureLoader);
+            }
+            TextureAtlas.prototype.load = function (atlasText, textureLoader) {
+                if (textureLoader == null)
+                    throw new Error("textureLoader cannot be null.");
+                var reader = new TextureAtlasReader(atlasText);
+                var tuple = new Array(4);
+                var page = null;
+                while (true) {
+                    var line = reader.readLine();
+                    if (line == null)
+                        break;
+                    line = line.trim();
+                    if (line.length == 0)
+                        page = null;
+                    else if (!page) {
+                        page = new TextureAtlasPage();
+                        page.name = line;
+                        if (reader.readTuple(tuple) == 2) {
+                            page.width = parseInt(tuple[0]);
+                            page.height = parseInt(tuple[1]);
+                            reader.readTuple(tuple);
+                        }
+                        // page.format = Format[tuple[0]]; we don't need format in WebGL
+                        reader.readTuple(tuple);
+                        page.minFilter = spine.Texture.filterFromString(tuple[0]);
+                        page.magFilter = spine.Texture.filterFromString(tuple[1]);
+                        var direction = reader.readValue();
+                        page.uWrap = spine.TextureWrap.ClampToEdge;
+                        page.vWrap = spine.TextureWrap.ClampToEdge;
+                        if (direction == "x")
+                            page.uWrap = spine.TextureWrap.Repeat;
+                        else if (direction == "y")
+                            page.vWrap = spine.TextureWrap.Repeat;
+                        else if (direction == "xy")
+                            page.uWrap = page.vWrap = spine.TextureWrap.Repeat;
+                        page.texture = textureLoader(line, page.minFilter, page.magFilter, page.uWrap, page.vWrap);
+                        page.width = page.texture.getImage().width;
+                        page.height = page.texture.getImage().height;
+                        this.pages.push(page);
+                    }
+                    else {
+                        var region = new TextureAtlasRegion();
+                        region.name = line;
+                        region.page = page;
+                        region.rotate = reader.readValue() == "true";
+                        reader.readTuple(tuple);
+                        var x = parseInt(tuple[0]);
+                        var y = parseInt(tuple[1]);
+                        reader.readTuple(tuple);
+                        var width = parseInt(tuple[0]);
+                        var height = parseInt(tuple[1]);
+                        region.u = x / page.width;
+                        region.v = y / page.height;
+                        if (region.rotate) {
+                            region.u2 = (x + height) / page.width;
+                            region.v2 = (y + width) / page.height;
+                        }
+                        else {
+                            region.u2 = (x + width) / page.width;
+                            region.v2 = (y + height) / page.height;
+                        }
+                        region.x = x;
+                        region.y = y;
+                        region.width = Math.abs(width);
+                        region.height = Math.abs(height);
+                        if (reader.readTuple(tuple) == 4) {
+                            // region.splits = new Vector.<int>(parseInt(tuple[0]), parseInt(tuple[1]), parseInt(tuple[2]), parseInt(tuple[3]));
+                            if (reader.readTuple(tuple) == 4) {
+                                //region.pads = Vector.<int>(parseInt(tuple[0]), parseInt(tuple[1]), parseInt(tuple[2]), parseInt(tuple[3]));
+                                reader.readTuple(tuple);
+                            }
+                        }
+                        region.originalWidth = parseInt(tuple[0]);
+                        region.originalHeight = parseInt(tuple[1]);
+                        reader.readTuple(tuple);
+                        region.offsetX = parseInt(tuple[0]);
+                        region.offsetY = parseInt(tuple[1]);
+                        region.index = parseInt(reader.readValue());
+                        region.texture = page.texture;
+                        this.regions.push(region);
+                    }
+                }
+            };
+            TextureAtlas.prototype.findRegion = function (name) {
+                for (var i = 0; i < this.regions.length; i++) {
+                    if (this.regions[i].name == name) {
+                        return this.regions[i];
+                    }
+                }
+                return null;
+            };
+            TextureAtlas.prototype.dispose = function () {
+                for (var i = 0; i < this.pages.length; i++) {
+                    this.pages[i].texture.dispose();
+                }
+            };
+            return TextureAtlas;
+        }());
+        webgl.TextureAtlas = TextureAtlas;
+        var TextureAtlasReader = (function () {
+            function TextureAtlasReader(text) {
+                this.index = 0;
+                this.lines = text.split(/\r\n|\r|\n/);
+            }
+            TextureAtlasReader.prototype.readLine = function () {
+                if (this.index >= this.lines.length)
+                    return null;
+                return this.lines[this.index++];
+            };
+            TextureAtlasReader.prototype.readValue = function () {
+                var line = this.readLine();
+                var colon = line.indexOf(":");
+                if (colon == -1)
+                    throw new Error("Invalid line: " + line);
+                return line.substring(colon + 1).trim();
+            };
+            TextureAtlasReader.prototype.readTuple = function (tuple) {
+                var line = this.readLine();
+                var colon = line.indexOf(":");
+                if (colon == -1)
+                    throw new Error("Invalid line: " + line);
+                var i = 0, lastMatch = colon + 1;
+                for (; i < 3; i++) {
+                    var comma = line.indexOf(",", lastMatch);
+                    if (comma == -1)
+                        break;
+                    tuple[i] = line.substr(lastMatch, comma - lastMatch).trim();
+                    lastMatch = comma + 1;
+                }
+                tuple[i] = line.substring(lastMatch).trim();
+                return i + 1;
+            };
+            return TextureAtlasReader;
+        }());
+        var TextureAtlasPage = (function () {
+            function TextureAtlasPage() {
+            }
+            return TextureAtlasPage;
+        }());
+        webgl.TextureAtlasPage = TextureAtlasPage;
+        var TextureAtlasRegion = (function (_super) {
+            __extends(TextureAtlasRegion, _super);
+            function TextureAtlasRegion() {
+                _super.apply(this, arguments);
+            }
+            return TextureAtlasRegion;
+        }(spine.TextureRegion));
+        webgl.TextureAtlasRegion = TextureAtlasRegion;
+    })(webgl = spine.webgl || (spine.webgl = {}));
+})(spine || (spine = {}));
 /******************************************************************************
  * Spine Runtimes Software License
  * Version 2.5
@@ -5114,101 +5482,58 @@ var spine;
 (function (spine) {
     var webgl;
     (function (webgl) {
-        var AssetManager = (function () {
-            function AssetManager(gl) {
-                this._assets = {};
-                this._errors = {};
-                this._toLoad = 0;
-                this._loaded = 0;
+        var GLTexture = (function (_super) {
+            __extends(GLTexture, _super);
+            function GLTexture(gl, image, useMipMaps) {
+                if (useMipMaps === void 0) { useMipMaps = false; }
+                _super.call(this, image);
+                this._boundUnit = 0;
                 this._gl = gl;
+                this._texture = gl.createTexture();
+                this.update(useMipMaps);
             }
-            AssetManager.prototype.loadText = function (path, success, error) {
-                var _this = this;
-                if (success === void 0) { success = null; }
-                if (error === void 0) { error = null; }
-                this._toLoad++;
-                var request = new XMLHttpRequest();
-                request.onreadystatechange = function () {
-                    if (request.readyState == XMLHttpRequest.DONE) {
-                        if (request.status >= 200 && request.status < 300) {
-                            if (success)
-                                success(path, request.responseText);
-                            _this._assets[path] = request.responseText;
-                        }
-                        else {
-                            if (error)
-                                error(path, "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText);
-                            _this._errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
-                        }
-                        _this._toLoad--;
-                        _this._loaded++;
-                    }
-                };
-                request.open("GET", path, true);
-                request.send();
+            GLTexture.prototype.setFilters = function (minFilter, magFilter) {
+                var gl = this._gl;
+                this.bind();
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter);
             };
-            AssetManager.prototype.loadTexture = function (path, success, error) {
-                var _this = this;
-                if (success === void 0) { success = null; }
-                if (error === void 0) { error = null; }
-                this._toLoad++;
-                var img = new Image();
-                img.src = path;
-                img.onload = function (ev) {
-                    if (success)
-                        success(path, img);
-                    var texture = new webgl.Texture(_this._gl, img);
-                    _this._assets[path] = texture;
-                    _this._toLoad--;
-                    _this._loaded++;
-                };
-                img.onerror = function (ev) {
-                    if (error)
-                        error(path, "Couldn't load image " + path);
-                    _this._errors[path] = "Couldn't load image " + path;
-                    _this._toLoad--;
-                    _this._loaded++;
-                };
+            GLTexture.prototype.setWraps = function (uWrap, vWrap) {
+                var gl = this._gl;
+                this.bind();
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, uWrap);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, vWrap);
             };
-            AssetManager.prototype.get = function (path) {
-                return this._assets[path];
+            GLTexture.prototype.update = function (useMipMaps) {
+                var gl = this._gl;
+                this.bind();
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this._image);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, useMipMaps ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                if (useMipMaps)
+                    gl.generateMipmap(gl.TEXTURE_2D);
             };
-            AssetManager.prototype.remove = function (path) {
-                var asset = this._assets[path];
-                if (asset instanceof webgl.Texture) {
-                    asset.dispose();
-                }
-                this._assets[path] = null;
+            GLTexture.prototype.bind = function (unit) {
+                if (unit === void 0) { unit = 0; }
+                var gl = this._gl;
+                this._boundUnit = unit;
+                gl.activeTexture(gl.TEXTURE0 + unit);
+                gl.bindTexture(gl.TEXTURE_2D, this._texture);
             };
-            AssetManager.prototype.removeAll = function () {
-                for (var key in this._assets) {
-                    var asset = this._assets[key];
-                    if (asset instanceof webgl.Texture)
-                        asset.dispose();
-                }
-                this._assets = {};
+            GLTexture.prototype.unbind = function () {
+                var gl = this._gl;
+                gl.activeTexture(gl.TEXTURE0 + this._boundUnit);
+                gl.bindTexture(gl.TEXTURE_2D, null);
             };
-            AssetManager.prototype.isLoadingComplete = function () {
-                return this._toLoad == 0;
+            GLTexture.prototype.dispose = function () {
+                var gl = this._gl;
+                gl.deleteTexture(this._texture);
             };
-            AssetManager.prototype.toLoad = function () {
-                return this._toLoad;
-            };
-            AssetManager.prototype.loaded = function () {
-                return this._loaded;
-            };
-            AssetManager.prototype.dispose = function () {
-                this.removeAll();
-            };
-            AssetManager.prototype.hasErrors = function () {
-                return Object.keys(this._errors).length > 0;
-            };
-            AssetManager.prototype.errors = function () {
-                return this._errors;
-            };
-            return AssetManager;
-        }());
-        webgl.AssetManager = AssetManager;
+            return GLTexture;
+        }(spine.Texture));
+        webgl.GLTexture = GLTexture;
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
 /******************************************************************************
@@ -6098,323 +6423,6 @@ var spine;
 (function (spine) {
     var webgl;
     (function (webgl) {
-        var Texture = (function () {
-            function Texture(gl, image, useMipMaps) {
-                if (useMipMaps === void 0) { useMipMaps = false; }
-                this._boundUnit = 0;
-                this._gl = gl;
-                this._texture = gl.createTexture();
-                this._image = image;
-                this.update(useMipMaps);
-            }
-            Texture.prototype.getImage = function () {
-                return this._image;
-            };
-            Texture.prototype.setFilters = function (minFilter, magFilter) {
-                var gl = this._gl;
-                this.bind();
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter);
-            };
-            Texture.prototype.setWraps = function (uWrap, vWrap) {
-                var gl = this._gl;
-                this.bind();
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, uWrap);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, vWrap);
-            };
-            Texture.prototype.update = function (useMipMaps) {
-                var gl = this._gl;
-                this.bind();
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this._image);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, useMipMaps ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                if (useMipMaps)
-                    gl.generateMipmap(gl.TEXTURE_2D);
-            };
-            Texture.prototype.bind = function (unit) {
-                if (unit === void 0) { unit = 0; }
-                var gl = this._gl;
-                this._boundUnit = unit;
-                gl.activeTexture(gl.TEXTURE0 + unit);
-                gl.bindTexture(gl.TEXTURE_2D, this._texture);
-            };
-            Texture.prototype.unbind = function () {
-                var gl = this._gl;
-                gl.activeTexture(gl.TEXTURE0 + this._boundUnit);
-                gl.bindTexture(gl.TEXTURE_2D, null);
-            };
-            Texture.prototype.dispose = function () {
-                var gl = this._gl;
-                gl.deleteTexture(this._texture);
-            };
-            Texture.filterFromString = function (text) {
-                switch (text.toLowerCase()) {
-                    case "nearest": return TextureFilter.Nearest;
-                    case "linear": return TextureFilter.Linear;
-                    case "mipmap": return TextureFilter.MipMap;
-                    case "mipmapnearestnearest": return TextureFilter.MipMapNearestNearest;
-                    case "mipmaplinearnearest": return TextureFilter.MipMapLinearNearest;
-                    case "mipmapnearestlinear": return TextureFilter.MipMapNearestLinear;
-                    case "mipmaplinearlinear": return TextureFilter.MipMapLinearLinear;
-                    default: throw new Error("Unknown texture filter " + text);
-                }
-            };
-            Texture.wrapFromString = function (text) {
-                switch (text.toLowerCase()) {
-                    case "mirroredtepeat": return TextureWrap.MirroredRepeat;
-                    case "clamptoedge": return TextureWrap.ClampToEdge;
-                    case "repeat": return TextureWrap.Repeat;
-                    default: throw new Error("Unknown texture wrap " + text);
-                }
-            };
-            return Texture;
-        }());
-        webgl.Texture = Texture;
-        (function (TextureFilter) {
-            TextureFilter[TextureFilter["Nearest"] = WebGLRenderingContext.NEAREST] = "Nearest";
-            TextureFilter[TextureFilter["Linear"] = WebGLRenderingContext.LINEAR] = "Linear";
-            TextureFilter[TextureFilter["MipMap"] = WebGLRenderingContext.LINEAR_MIPMAP_LINEAR] = "MipMap";
-            TextureFilter[TextureFilter["MipMapNearestNearest"] = WebGLRenderingContext.NEAREST_MIPMAP_NEAREST] = "MipMapNearestNearest";
-            TextureFilter[TextureFilter["MipMapLinearNearest"] = WebGLRenderingContext.LINEAR_MIPMAP_NEAREST] = "MipMapLinearNearest";
-            TextureFilter[TextureFilter["MipMapNearestLinear"] = WebGLRenderingContext.NEAREST_MIPMAP_LINEAR] = "MipMapNearestLinear";
-            TextureFilter[TextureFilter["MipMapLinearLinear"] = WebGLRenderingContext.LINEAR_MIPMAP_LINEAR] = "MipMapLinearLinear";
-        })(webgl.TextureFilter || (webgl.TextureFilter = {}));
-        var TextureFilter = webgl.TextureFilter;
-        (function (TextureWrap) {
-            TextureWrap[TextureWrap["MirroredRepeat"] = WebGLRenderingContext.MIRRORED_REPEAT] = "MirroredRepeat";
-            TextureWrap[TextureWrap["ClampToEdge"] = WebGLRenderingContext.CLAMP_TO_EDGE] = "ClampToEdge";
-            TextureWrap[TextureWrap["Repeat"] = WebGLRenderingContext.REPEAT] = "Repeat";
-        })(webgl.TextureWrap || (webgl.TextureWrap = {}));
-        var TextureWrap = webgl.TextureWrap;
-    })(webgl = spine.webgl || (spine.webgl = {}));
-})(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
-var spine;
-(function (spine) {
-    var webgl;
-    (function (webgl) {
-        var TextureAtlas = (function () {
-            function TextureAtlas(atlasText, textureLoader) {
-                this.pages = new Array();
-                this.regions = new Array();
-                this.load(atlasText, textureLoader);
-            }
-            TextureAtlas.prototype.load = function (atlasText, textureLoader) {
-                if (textureLoader == null)
-                    throw new Error("textureLoader cannot be null.");
-                var reader = new TextureAtlasReader(atlasText);
-                var tuple = new Array(4);
-                var page = null;
-                while (true) {
-                    var line = reader.readLine();
-                    if (line == null)
-                        break;
-                    line = line.trim();
-                    if (line.length == 0)
-                        page = null;
-                    else if (!page) {
-                        page = new TextureAtlasPage();
-                        page.name = line;
-                        if (reader.readTuple(tuple) == 2) {
-                            page.width = parseInt(tuple[0]);
-                            page.height = parseInt(tuple[1]);
-                            reader.readTuple(tuple);
-                        }
-                        // page.format = Format[tuple[0]]; we don't need format in WebGL
-                        reader.readTuple(tuple);
-                        page.minFilter = webgl.Texture.filterFromString(tuple[0]);
-                        page.magFilter = webgl.Texture.filterFromString(tuple[1]);
-                        var direction = reader.readValue();
-                        page.uWrap = webgl.TextureWrap.ClampToEdge;
-                        page.vWrap = webgl.TextureWrap.ClampToEdge;
-                        if (direction == "x")
-                            page.uWrap = webgl.TextureWrap.Repeat;
-                        else if (direction == "y")
-                            page.vWrap = webgl.TextureWrap.Repeat;
-                        else if (direction == "xy")
-                            page.uWrap = page.vWrap = webgl.TextureWrap.Repeat;
-                        page.texture = textureLoader(line);
-                        page.texture.setFilters(page.minFilter, page.magFilter);
-                        page.texture.setWraps(page.uWrap, page.vWrap);
-                        page.width = page.texture.getImage().width;
-                        page.height = page.texture.getImage().height;
-                        this.pages.push(page);
-                    }
-                    else {
-                        var region = new TextureAtlasRegion();
-                        region.name = line;
-                        region.page = page;
-                        region.rotate = reader.readValue() == "true";
-                        reader.readTuple(tuple);
-                        var x = parseInt(tuple[0]);
-                        var y = parseInt(tuple[1]);
-                        reader.readTuple(tuple);
-                        var width = parseInt(tuple[0]);
-                        var height = parseInt(tuple[1]);
-                        region.u = x / page.width;
-                        region.v = y / page.height;
-                        if (region.rotate) {
-                            region.u2 = (x + height) / page.width;
-                            region.v2 = (y + width) / page.height;
-                        }
-                        else {
-                            region.u2 = (x + width) / page.width;
-                            region.v2 = (y + height) / page.height;
-                        }
-                        region.x = x;
-                        region.y = y;
-                        region.width = Math.abs(width);
-                        region.height = Math.abs(height);
-                        if (reader.readTuple(tuple) == 4) {
-                            // region.splits = new Vector.<int>(parseInt(tuple[0]), parseInt(tuple[1]), parseInt(tuple[2]), parseInt(tuple[3]));
-                            if (reader.readTuple(tuple) == 4) {
-                                //region.pads = Vector.<int>(parseInt(tuple[0]), parseInt(tuple[1]), parseInt(tuple[2]), parseInt(tuple[3]));
-                                reader.readTuple(tuple);
-                            }
-                        }
-                        region.originalWidth = parseInt(tuple[0]);
-                        region.originalHeight = parseInt(tuple[1]);
-                        reader.readTuple(tuple);
-                        region.offsetX = parseInt(tuple[0]);
-                        region.offsetY = parseInt(tuple[1]);
-                        region.index = parseInt(reader.readValue());
-                        region.texture = page.texture;
-                        this.regions.push(region);
-                    }
-                }
-            };
-            TextureAtlas.prototype.findRegion = function (name) {
-                for (var i = 0; i < this.regions.length; i++) {
-                    if (this.regions[i].name == name) {
-                        return this.regions[i];
-                    }
-                }
-                return null;
-            };
-            TextureAtlas.prototype.dispose = function () {
-                for (var i = 0; i < this.pages.length; i++) {
-                    this.pages[i].texture.dispose();
-                }
-            };
-            return TextureAtlas;
-        }());
-        webgl.TextureAtlas = TextureAtlas;
-        var TextureAtlasReader = (function () {
-            function TextureAtlasReader(text) {
-                this.index = 0;
-                this.lines = text.split(/\r\n|\r|\n/);
-            }
-            TextureAtlasReader.prototype.readLine = function () {
-                if (this.index >= this.lines.length)
-                    return null;
-                return this.lines[this.index++];
-            };
-            TextureAtlasReader.prototype.readValue = function () {
-                var line = this.readLine();
-                var colon = line.indexOf(":");
-                if (colon == -1)
-                    throw new Error("Invalid line: " + line);
-                return line.substring(colon + 1).trim();
-            };
-            TextureAtlasReader.prototype.readTuple = function (tuple) {
-                var line = this.readLine();
-                var colon = line.indexOf(":");
-                if (colon == -1)
-                    throw new Error("Invalid line: " + line);
-                var i = 0, lastMatch = colon + 1;
-                for (; i < 3; i++) {
-                    var comma = line.indexOf(",", lastMatch);
-                    if (comma == -1)
-                        break;
-                    tuple[i] = line.substr(lastMatch, comma - lastMatch).trim();
-                    lastMatch = comma + 1;
-                }
-                tuple[i] = line.substring(lastMatch).trim();
-                return i + 1;
-            };
-            return TextureAtlasReader;
-        }());
-        var TextureAtlasPage = (function () {
-            function TextureAtlasPage() {
-            }
-            return TextureAtlasPage;
-        }());
-        webgl.TextureAtlasPage = TextureAtlasPage;
-        var TextureAtlasRegion = (function (_super) {
-            __extends(TextureAtlasRegion, _super);
-            function TextureAtlasRegion() {
-                _super.apply(this, arguments);
-            }
-            return TextureAtlasRegion;
-        }(spine.TextureRegion));
-        webgl.TextureAtlasRegion = TextureAtlasRegion;
-    })(webgl = spine.webgl || (spine.webgl = {}));
-})(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
-var spine;
-(function (spine) {
-    var webgl;
-    (function (webgl) {
         var TextureAtlasAttachmentLoader = (function () {
             function TextureAtlasAttachmentLoader(atlas) {
                 this.atlas = atlas;
@@ -6613,265 +6621,4 @@ var spine;
         webgl.getDestGLBlendMode = getDestGLBlendMode;
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
-/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.5
- *
- * Copyright (c) 2013-2016, Esoteric Software
- * All rights reserved.
- *
- * You are granted a perpetual, non-exclusive, non-sublicensable, and
- * non-transferable license to use, install, execute, and perform the Spine
- * Runtimes software and derivative works solely for personal or internal
- * use. Without the written permission of Esoteric Software (see Section 2 of
- * the Spine Software License Agreement), you may not (a) modify, translate,
- * adapt, or develop new applications using the Spine Runtimes or otherwise
- * create derivative works or improvements of the Spine Runtimes or (b) remove,
- * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
- * or other intellectual property or proprietary rights notices on or in the
- * Software, including any copy thereof. Redistributions in binary or source
- * form must include this license and terms.
- *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
- * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
-var spine;
-(function (spine) {
-    var SpineWidget = (function () {
-        function SpineWidget(element, config) {
-            var _this = this;
-            this._mvp = new spine.webgl.Matrix4();
-            this._paused = false;
-            this._lastFrameTime = Date.now() / 1000.0;
-            this._backgroundColor = new spine.Color();
-            this._loaded = false;
-            if (!element)
-                throw new Error("Please provide a DOM element, e.g. document.getElementById('myelement')");
-            if (!config)
-                throw new Error("Please provide a configuration, specifying at least the json file, atlas file and animation name");
-            var elementId = element;
-            if (typeof (element) === "string")
-                element = document.getElementById(element);
-            if (element == null)
-                throw new Error("Element " + elementId + " does not exist");
-            this.validateConfig(config);
-            var canvas = this.canvas = document.createElement("canvas");
-            element.appendChild(canvas);
-            canvas.width = config.width;
-            canvas.height = config.height;
-            var webglConfig = { alpha: false };
-            var gl = this.gl = (canvas.getContext("webgl", webglConfig) || canvas.getContext("experimental-webgl", webglConfig));
-            this._shader = spine.webgl.Shader.newColoredTextured(gl);
-            this._batcher = new spine.webgl.PolygonBatcher(gl);
-            this._mvp.ortho2d(0, 0, 639, 479);
-            this._skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);
-            var assets = this._assetManager = new spine.webgl.AssetManager(gl);
-            assets.loadText(config.atlas);
-            assets.loadText(config.json);
-            assets.loadTexture(config.atlas.replace(".atlas", ".png"));
-            requestAnimationFrame(function () { _this.load(); });
-        }
-        SpineWidget.prototype.validateConfig = function (config) {
-            if (!config.atlas)
-                throw new Error("Please specify config.atlas");
-            if (!config.json)
-                throw new Error("Please specify config.json");
-            if (!config.animation)
-                throw new Error("Please specify config.animationName");
-            if (!config.scale)
-                config.scale = 1.0;
-            if (!config.skin)
-                config.skin = "default";
-            if (config.loop === undefined)
-                config.loop = true;
-            if (!config.y)
-                config.y = 20;
-            if (!config.width)
-                config.width = 640;
-            if (!config.height)
-                config.height = 480;
-            if (!config.x)
-                config.x = config.width / 2;
-            if (!config.backgroundColor)
-                config.backgroundColor = "#555555";
-            if (!config.imagesPath) {
-                var index = config.atlas.lastIndexOf("/");
-                if (index != -1) {
-                    config.imagesPath = config.atlas.substr(0, index) + "/";
-                }
-                else {
-                    config.imagesPath = "";
-                }
-            }
-            if (!config.premultipliedAlpha === undefined)
-                config.premultipliedAlpha = false;
-            this._backgroundColor.setFromString(config.backgroundColor);
-            this._config = config;
-        };
-        SpineWidget.prototype.load = function () {
-            var _this = this;
-            var assetManager = this._assetManager;
-            var imagesPath = this._config.imagesPath;
-            var config = this._config;
-            if (assetManager.isLoadingComplete()) {
-                if (assetManager.hasErrors()) {
-                    if (config.error)
-                        config.error(this, "Failed to load assets: " + JSON.stringify(assetManager.errors));
-                    else
-                        throw new Error("Failed to load assets: " + JSON.stringify(assetManager.errors));
-                }
-                var atlas = new spine.webgl.TextureAtlas(this._assetManager.get(this._config.atlas), function (path) {
-                    return assetManager.get(imagesPath + path);
-                });
-                var atlasLoader = new spine.webgl.TextureAtlasAttachmentLoader(atlas);
-                var skeletonJson = new spine.SkeletonJson(atlasLoader);
-                // Set the scale to apply during parsing, parse the file, and create a new skeleton.
-                skeletonJson.scale = config.scale;
-                var skeletonData = skeletonJson.readSkeletonData(assetManager.get(config.json));
-                var skeleton = this.skeleton = new spine.Skeleton(skeletonData);
-                skeleton.x = config.x;
-                skeleton.y = config.y;
-                skeleton.setSkinByName(config.skin);
-                var animationState = this.state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
-                animationState.setAnimation(0, config.animation, true);
-                if (config.success)
-                    config.success(this);
-                this._loaded = true;
-                requestAnimationFrame(function () { _this.render(); });
-            }
-            else
-                requestAnimationFrame(function () { _this.load(); });
-        };
-        SpineWidget.prototype.render = function () {
-            var _this = this;
-            var now = Date.now() / 1000;
-            var delta = now - this._lastFrameTime;
-            if (delta > 0.1)
-                delta = 0;
-            this._lastFrameTime = now;
-            var gl = this.gl;
-            var color = this._backgroundColor;
-            gl.clearColor(color.r, color.g, color.b, color.a);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            // Apply the animation state based on the delta time.
-            var state = this.state;
-            var skeleton = this.skeleton;
-            var premultipliedAlpha = this._config.premultipliedAlpha;
-            state.update(delta);
-            state.apply(skeleton);
-            skeleton.updateWorldTransform();
-            // Bind the shader and set the texture and model-view-projection matrix.
-            var shader = this._shader;
-            shader.bind();
-            shader.setUniformi(spine.webgl.Shader.SAMPLER, 0);
-            shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, this._mvp.values);
-            // Start the batch and tell the SkeletonRenderer to render the active skeleton.
-            var batcher = this._batcher;
-            var skeletonRenderer = this._skeletonRenderer;
-            batcher.begin(shader);
-            skeletonRenderer.premultipliedAlpha = premultipliedAlpha;
-            skeletonRenderer.draw(batcher, skeleton);
-            batcher.end();
-            shader.unbind();
-            if (!this._paused)
-                requestAnimationFrame(function () { _this.render(); });
-        };
-        SpineWidget.prototype.pause = function () {
-            this._paused = true;
-        };
-        SpineWidget.prototype.play = function () {
-            var _this = this;
-            this._paused = false;
-            requestAnimationFrame(function () { _this.render(); });
-        };
-        SpineWidget.prototype.isPlaying = function () {
-            return !this._paused;
-        };
-        SpineWidget.prototype.setAnimation = function (animationName) {
-            if (!this._loaded)
-                throw new Error("Widget isn't loaded yet");
-            this.skeleton.setToSetupPose();
-            this.state.setAnimation(0, animationName, this._config.loop);
-        };
-        SpineWidget.loadWidgets = function () {
-            var widgets = document.getElementsByClassName("spine-widget");
-            for (var i = 0; i < widgets.length; i++) {
-                SpineWidget.loadWidget(widgets[i]);
-            }
-        };
-        SpineWidget.loadWidget = function (widget) {
-            var config = new SpineWidgetConfig();
-            config.atlas = widget.getAttribute("data-atlas");
-            config.json = widget.getAttribute("data-json");
-            config.animation = widget.getAttribute("data-animation");
-            if (widget.getAttribute("data-images-path"))
-                config.imagesPath = widget.getAttribute("data-images-path");
-            if (widget.getAttribute("data-skin"))
-                config.skin = widget.getAttribute("data-skin");
-            if (widget.getAttribute("data-loop"))
-                config.loop = widget.getAttribute("data-loop") === "true";
-            if (widget.getAttribute("data-scale"))
-                config.scale = parseFloat(widget.getAttribute("data-scale"));
-            if (widget.getAttribute("data-x"))
-                config.x = parseFloat(widget.getAttribute("data-x"));
-            if (widget.getAttribute("data-y"))
-                config.x = parseFloat(widget.getAttribute("data-y"));
-            if (widget.getAttribute("data-width"))
-                config.width = parseInt(widget.getAttribute("data-width"));
-            if (widget.getAttribute("data-height"))
-                config.height = parseInt(widget.getAttribute("data-height"));
-            if (widget.getAttribute("data-background-color"))
-                config.backgroundColor = widget.getAttribute("data-background-color");
-            if (widget.getAttribute("data-premultiplied-alpha"))
-                config.premultipliedAlpha = widget.getAttribute("data-premultiplied-alpha") === "true";
-            new spine.SpineWidget(widget, config);
-        };
-        SpineWidget.ready = function () {
-            if (SpineWidget.pageLoaded)
-                return;
-            SpineWidget.pageLoaded = true;
-            SpineWidget.loadWidgets();
-        };
-        SpineWidget.setupDOMListener = function () {
-            if (document.addEventListener) {
-                document.addEventListener("DOMContentLoaded", SpineWidget.ready, false);
-                window.addEventListener("load", SpineWidget.ready, false);
-            }
-            else {
-                document.attachEvent("onreadystatechange", function readyStateChange() {
-                    if (document.readyState === "complete")
-                        SpineWidget.ready();
-                });
-                window.attachEvent("onload", SpineWidget.ready);
-            }
-        };
-        SpineWidget.pageLoaded = false;
-        return SpineWidget;
-    }());
-    spine.SpineWidget = SpineWidget;
-    var SpineWidgetConfig = (function () {
-        function SpineWidgetConfig() {
-            this.skin = "default";
-            this.loop = true;
-            this.scale = 1.0;
-            this.x = 0;
-            this.y = 0;
-            this.width = 640;
-            this.height = 480;
-            this.backgroundColor = "#555555";
-            this.premultipliedAlpha = false;
-        }
-        return SpineWidgetConfig;
-    }());
-    spine.SpineWidgetConfig = SpineWidgetConfig;
-})(spine || (spine = {}));
-spine.SpineWidget.setupDOMListener();
 //# sourceMappingURL=spine-webgl.js.map

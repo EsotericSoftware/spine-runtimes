@@ -14,9 +14,7 @@
 		"widget/src/**/*"
 	],
 	"exclude": [
-		"build",
-		"build/*.d.ts",
-		"build/*.js",
-		"build/*.js.map"	 
+		"canvas",
+		"build"	 
 	]
 }

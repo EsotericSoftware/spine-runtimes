@@ -13,9 +13,8 @@
 		"webgl/src/**/*"
 	],
 	"exclude": [
-		"build",
-		"build/*.d.ts",
-		"build/*.js",
-		"build/*.js.map"	 
+		"canvas",
+		"widget",
+		"build"	 
 	]
 }

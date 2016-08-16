@@ -50,18 +50,18 @@ module spine.webgl {
 			for (let i = 0, n = drawOrder.length; i < n; i++) {
 				let slot = drawOrder[i];
 				let attachment = slot.getAttachment();
-				let texture: Texture = null;
+				let texture: GLTexture = null;
 				if (attachment instanceof RegionAttachment) {
 					let region = <RegionAttachment>attachment;
 					vertices = region.updateWorldVertices(slot, premultipliedAlpha);
 					triangles = SkeletonRenderer.QUAD_TRIANGLES;
-					texture = (<TextureAtlasRegion>region.region.renderObject).texture;
+					texture = <GLTexture>(<TextureAtlasRegion>region.region.renderObject).texture;
 
 				} else if (attachment instanceof MeshAttachment) {
 					let mesh = <MeshAttachment>attachment;
 					vertices = mesh.updateWorldVertices(slot, premultipliedAlpha);
 					triangles = mesh.triangles;
-					texture = (<TextureAtlasRegion>mesh.region.renderObject).texture;
+					texture = <GLTexture>(<TextureAtlasRegion>mesh.region.renderObject).texture;
 				}
 
 				if (texture != null) {
