@@ -32,7 +32,7 @@
 module spine.canvas {
 	export class SkeletonRenderer {
 		static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
-
+		
 		private _ctx: CanvasRenderingContext2D;
 		
 		constructor (context: CanvasRenderingContext2D) {
@@ -80,7 +80,7 @@ module spine.canvas {
 		}
 
 		drawTriangles(texture: HTMLImageElement, vertices: ArrayLike<number>, triangles: ArrayLike<number>) {
-			let ctx = this._ctx;
+			let ctx = this._ctx;		
 
 			for (var i = 0; i < triangles.length; i+=3) {
 				let t1 = triangles[i] * 8, t2 = triangles[i+1] * 8, t3 = triangles[i+2] * 8;
@@ -93,6 +93,8 @@ module spine.canvas {
 			}
 		}
 
+		// Adapted from http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
+		// Apache 2 licensed
 		drawTriangle(img: HTMLImageElement, x0: number, y0: number, u0: number, v0: number,
 						x1: number, y1: number, u1: number, v1: number,
 						x2: number, y2: number, u2: number, v2: number) {
