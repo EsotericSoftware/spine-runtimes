@@ -8,5 +8,20 @@
 </body>
 <script>
 
+var lastFrameTime = Date.now() / 1000;
+var canvas;
+var assetManager;
+var skeletonRenderer;
+
+function init () {
+	assetManager = new spine.AssetManager(function(image) {
+		return CanvasTexture(image);
+	});
+}
+
+(function() {
+	init();
+}());
+
 </script>
 </html>

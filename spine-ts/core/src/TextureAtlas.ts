@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-module spine.webgl {
+module spine {
 	export class TextureAtlas implements Disposable {
 		pages = new Array<TextureAtlasPage>();
 		regions = new Array<TextureAtlasRegion>();

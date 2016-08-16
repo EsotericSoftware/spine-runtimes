@@ -36,7 +36,9 @@ function init () {
 	batcher = new spine.webgl.PolygonBatcher(gl);
 	mvp.ortho2d(0, 0, 639, 479);
 	skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);
-	assetManager = new spine.webgl.AssetManager(gl);
+	assetManager = new spine.AssetManager(function(image) {
+		return new spine.webgl.GLTexture(gl, image);
+	});
 
 	// Tell AssetManager to load the resources for each model, including the exported .json file, the .atlas file and the .png
 	// file for the atlas. We then wait until all resources are loaded in the load() method.
@@ -78,10 +80,11 @@ function loadSkeleton (name, scale, initialAnimation, positionX, positionY, prem
 
 	// Load the texture atlas using name.atlas and name.png from the AssetManager.
 	// The function passed to TextureAtlas is used to resolve relative paths.
-	atlas = new spine.webgl.TextureAtlas(assetManager.get("assets/" + name + ".atlas"), function(path, minFilter, magFilter, uWrap, vWrap) {
+	atlas = new spine.TextureAtlas(assetManager.get("assets/" + name + ".atlas"), function(path, minFilter, magFilter, uWrap, vWrap) {
 		var texture = assetManager.get("assets/" + path);
 		texture.setFilters(minFilter, magFilter);
 		texture.setWraps(uWrap, vWrap);
+		return texture;
 	});
 
 	// Create a TextureAtlasAttachmentLoader, which is specific to the WebGL backend.

@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-module spine.webgl {
+module spine {
 	export class AssetManager implements Disposable {
 		private _textureLoader: (image: HTMLImageElement) => any;
 		private _assets: Map<any> = {};
