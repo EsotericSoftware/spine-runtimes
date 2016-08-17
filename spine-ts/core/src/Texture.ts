@@ -11,7 +11,7 @@ module spine {
 		}
 
 		abstract setFilters (minFilter: TextureFilter, magFilter: TextureFilter): void;
-		abstract  setWraps (uWrap: TextureWrap, vWrap: TextureWrap): void;		
+		abstract setWraps (uWrap: TextureWrap, vWrap: TextureWrap): void;		
 		abstract dispose (): void;
 		
 

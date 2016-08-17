@@ -1,0 +1,102 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<title>spine-threejs</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.js"></script>
+<script src="../../build/spine-threejs.js"></script>
+
+<style>body, input { font-family: tahoma; font-size: 11pt }</style>
+</head>
+<body>
+
+<script>
+
+var scene, camera, renderer;
+var geometry, material, mesh, skeletonMesh;
+var assetManager;
+var lastFrameTime = Date.now();
+
+function init () {
+	scene = new THREE.Scene();
+
+	var width = 640, height = 480;
+	camera = new THREE.PerspectiveCamera(75, width / height, 1, 3000);
+	camera.position.z = 400;
+
+	geometry = new THREE.BoxGeometry(200, 200, 200);
+	material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
+
+	mesh = new THREE.Mesh(geometry, material);
+	scene.add(mesh);	
+
+	renderer = new THREE.WebGLRenderer();
+	renderer.setSize(width, height);
+
+	document.body.appendChild(renderer.domElement);
+
+	assetManager = new spine.threejs.AssetManager();
+	assetManager.loadText("assets/raptor.json");
+	assetManager.loadText("assets/raptor.atlas");
+	assetManager.loadTexture("assets/raptor.png");
+
+	requestAnimationFrame(load);
+}
+
+function load (name, scale) {
+	if (assetManager.isLoadingComplete()) {
+		// Load the texture atlas using name.atlas and name.png from the AssetManager.
+		// The function passed to TextureAtlas is used to resolve relative paths.
+		atlas = new spine.TextureAtlas(assetManager.get("assets/raptor.atlas"), function(path) {
+			return assetManager.get("assets/" + path);		
+		});
+
+		var skeletonData = loadSkeleton("raptor", 0.4);
+		skeletonMesh = new spine.threejs.SkeletonMesh(skeletonData);
+		skeletonMesh.state.setAnimation(0, "walk", true);
+		mesh.add(skeletonMesh);
+		requestAnimationFrame(render);
+	} else requestAnimationFrame(load);
+}
+
+function loadSkeleton (name, scale) {	
+	// Load the texture atlas using name.atlas and name.png from the AssetManager.
+	// The function passed to TextureAtlas is used to resolve relative paths.
+	atlas = new spine.TextureAtlas(assetManager.get("assets/" + name + ".atlas"), function(path) {
+		return assetManager.get("assets/" + path);		
+	});
+
+	// Create a TextureAtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
+	atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
+
+	// Create a SkeletonJson instance for parsing the .json file.
+	var skeletonJson = new spine.SkeletonJson(atlasLoader);
+	
+	// Set the scale to apply during parsing, parse the file, and create a new skeleton.
+	skeletonJson.scale = scale;
+	var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/" + name + ".json"));
+	return skeletonData;
+}
+
+var lastTime = Date.now();
+function render() {
+	var now = Date.now() / 1000;
+	var delta = now - lastFrameTime;
+	lastFrameTime = now;
+	
+	var a = Math.sin(now);
+	var b = Math.cos(now);
+
+	mesh.rotation.x = a * Math.PI * 0.2;
+	mesh.rotation.y = b * Math.PI * 0.4;
+
+	skeletonMesh.update(delta);
+	renderer.render(scene, camera);
+
+	requestAnimationFrame(render);
+}
+(function() {
+	init();
+}());
+</script>
+</body>
+</html>
