@@ -6,6 +6,8 @@ module spine.threejs {
 
 		private _vertexBuffer: THREE.InterleavedBuffer;
 
+		static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
+
 		constructor (skeletonData: SkeletonData) {
 			super();
 
@@ -42,10 +44,60 @@ module spine.threejs {
 
 		private updateGeometry() {
 			let geometry = <THREE.BufferGeometry>this.geometry;
+			var numVertices = 0;
+			var verticesLength = 0;
+			var indicesLength = 0;
+			
+			let blendMode: BlendMode = null;
+
+			let vertices: ArrayLike<number> = null;
+			let triangles: Array<number>  = null;
+			let drawOrder = this.skeleton.drawOrder;
+			for (let i = 0, n = drawOrder.length; i < n; i++) {
+				let slot = drawOrder[i];
+				let attachment = slot.getAttachment();
+				let texture: ThreeJsTexture = null;
+				if (attachment instanceof RegionAttachment) {
+					let region = <RegionAttachment>attachment;
+					vertices = region.updateWorldVertices(slot, false);
+					triangles = SkeletonMesh.QUAD_TRIANGLES;
+					texture = <ThreeJsTexture>(<TextureAtlasRegion>region.region.renderObject).texture;
+
+				} else if (attachment instanceof MeshAttachment) {
+					let mesh = <MeshAttachment>attachment;
+					vertices = mesh.updateWorldVertices(slot, false);
+					triangles = mesh.triangles;
+					texture = <ThreeJsTexture>(<TextureAtlasRegion>mesh.region.renderObject).texture;
+				} else continue;
+
+				if (texture != null) {
+					(<THREE.MeshBasicMaterial>this.material).map = texture.texture;
+					// FIXME
+					//let slotBlendMode = slot.data.blendMode;					
+					//if (slotBlendMode != blendMode) {
+					//	blendMode = slotBlendMode;
+					//	batcher.setBlendMode(getSourceGLBlendMode(this._gl, blendMode, premultipliedAlpha), getDestGLBlendMode(this._gl, blendMode));
+					//}
+					
+					let indexStart = verticesLength / 8;
+					(<Float32Array>this._vertexBuffer.array).set(vertices, verticesLength);
+					verticesLength += vertices.length;									
+
+					let indicesArray = geometry.getIndex().array;
+					for (let i = indicesLength, j = 0; j < triangles.length; i++, j++)
+						indicesArray[i] = triangles[j] + indexStart;
+					indicesLength += triangles.length;					
+				}
+			}
+
 			geometry.drawRange.start = 0;
-			geometry.drawRange.count = 0;
-			this._vertexBuffer.needsUpdate = true;			
+			geometry.drawRange.count = indicesLength;
+			this._vertexBuffer.needsUpdate = true;
+			this._vertexBuffer.updateRange.offset = 0;
+			this._vertexBuffer.updateRange.count = verticesLength;		
 			geometry.getIndex().needsUpdate = true;
+			geometry.getIndex().updateRange.offset = 0;
+			geometry.getIndex().updateRange.count = indicesLength;
 		}
 	}
 }
