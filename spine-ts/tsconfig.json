@@ -12,6 +12,7 @@
 		"core/src/**/*",
 		"canvas/src/**/*",
 		"webgl/src/**/*",
+		"threejs/src/**/*",
 		"widget/src/**/*"
 	],
 	"exclude": [		

@@ -4,18 +4,18 @@
 		"noImplicitAny": true,
 		"removeComments": true,
 		"preserveConstEnums": true,
-		"outFile": "build/spine-canvas.js",
+		"outFile": "build/spine-threejs.js",
 		"sourceMap": true,
 		"declaration": true
 	},
 	"include": [
-		"core/src/**/*",
-		"canvas/src/**/*"
+		"core/src/**/*",		
+		"threejs/src/**/*"
 	],
 	"exclude": [
+		"canvas",
 		"webgl",
 		"widget",
-		"threejs",
-		"build"			 
+		"build"	 
 	]
 }
