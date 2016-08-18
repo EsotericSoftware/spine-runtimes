@@ -6,6 +6,7 @@ up into multiple modules:
 1. **Core**: `core/`, the core classes to load and process Spine models
 1. **WebGL**: `webgl/`, a self-contained WebGL backend, build on the core classes
 1. **Canvas**: `canvas/`, a self-contained Canvas backend, build on the core classes
+1. **THREE.JS**: `threejs/`, a self-contained THREE.JS backend, build on the core classes
 1. **Widget**: `widget/`, a self-contained widget to easily display Spine animations on your website, build on core classes & WebGL backend.
 
 While the source code for the core library and backends is written in TypeScript, all code is compiled to easily consumable JavaScript.
@@ -19,7 +20,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 spine-ts works with data exported from the latest Spine version.
 
-spine-ts WebGL & Widget backends supports all Spine features. The spine-ts Canvas backend does not support color tinting, mesh attachments or shearing. Mesh attachments are supported by setting `spine.canvas.SkeletonRenderer.useTriangleRendering` to true. Note that this method is slow and may lead to artifacts on some browsers.
+spine-ts WebGL & Widget backends supports all Spine features. The spine-ts Canvas backend does not support color tinting, mesh attachments or shearing. Mesh attachments are supported by setting `spine.canvas.SkeletonRenderer.useTriangleRendering` to true. Note that this method is slow and may lead to artifacts on some browsers. The spine-ts THREE.JS backend does not support color tinting and blend modes. The THREE.JS backend provides `SkeletonMesh.zOffset` to avoid z-fighting. Adjust to your near/far plane settings.
 
 spine-ts does not yet support loading the binary format.
 
@@ -29,6 +30,7 @@ spine-ts does not yet support loading the binary format.
 3. To use the WebGL backend, include the `spine-webgl.js` file in your project.
 3. To use the Canvas backend, include the `spine-canvas.js` file in your project.
 4. To use the Widget, include `spine-widget.js` file in your project.
+5. To use the THREE.JS backend, include the `spine-threejs.js` file in your project. THREE.JS must be loaded first.
 
 All `*.js` files are self-contained and include both the core and respective backend classes.
 
@@ -43,7 +45,7 @@ cd spine-ts
 python -m SimpleHTTPServer
 ````
 
-Then open `http://localhost:8000/webgl/example`, `http://localhost:8000/canvas/example` or `http://localhost:8000/widget/example` in your browser.
+Then open `http://localhost:8000/webgl/example`, `http://localhost:8000/canvas/example`, `https://localhost:8000/threejs/example` or `http://localhost:8000/widget/example` in your browser.
 
 ## Development Setup
 The spine-ts runtime and the various backends are implemented in TypeScript for greater maintainability and better tooling support. To
@@ -57,7 +59,8 @@ setup a development environment, follow these steps.
   * **Core**: `tsc -w -p tsconfig.core.json`, builds `core/src`, outputs `build/spine-core.js|d.ts|js.map`
   * **WebGL**: `tsc -w -p tsconfig.webgl.json`, builds `core/src` and `webgl/src`, outputs `build/spine-webgl.js|d.ts|js.map`
   * **WebGL**: `tsc -w -p tsconfig.canvas.json`, builds `core/src` and `canvas/src`, outputs `build/spine-canvas.js|d.ts|js.map`
-  * **Widget**: `tsc -w -p tsconfig.widget.json`, builds `core/src` and `widget/src`, outputs `build/spine-widget.js|d.ts|js.map`
+  * **THREE.JS**: `tsc -w -p tsconfig.threejs.json`, builds `core/src` and `threejs/src`, outputs `build/spine-threejs.js|d.ts|js.map`
+  * **Widget**: `tsc -w -p tsconfig.widget.json`, builds `core/src` and `widget/src`, outputs `build/spine-widget.js|d.ts|js.map` 
 6. Open the `spine-ts` folder in Visual Studio Code. VS Code will use the `tsconfig.json` file all source files from core and all 
 backends for your development pleasure. The actual JavaScript output is still created by the command line TypeScript compiler process from the previous step.
 
@@ -69,4 +72,4 @@ cd spine-ts
 python -m SimpleHTTPServer
 ```
 
-Then navigate to `http://localhost:8000/webgl/example`, `http://localhost:8000/canvas/example` or `http://localhost:8000/widget/example`
+Then navigate to `http://localhost:8000/webgl/example`, `http://localhost:8000/canvas/example`, `http://localhost:8000/threejs/example` or `http://localhost:8000/widget/example`
