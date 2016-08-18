@@ -35,6 +35,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
+import com.esotericsoftware.spine.Animation.AttachmentTimeline;
+import com.esotericsoftware.spine.Animation.Timeline;
 
 /** Stores state for an animation and automatically mixes between animations. */
 public class AnimationState {
@@ -44,7 +46,7 @@ public class AnimationState {
 	private final EventQueue queue = new EventQueue();
 	final Array<AnimationStateListener> listeners = new Array();
 	private float timeScale = 1;
-	private float defaultEventThreshold = 1;
+	private float defaultEventThreshold, defaultAttachmentThreshold;
 
 	final Pool<TrackEntry> trackEntryPool = new Pool() {
 		protected Object newObject () {
@@ -103,21 +105,13 @@ public class AnimationState {
 			TrackEntry current = tracks.get(i);
 			if (current == null) continue;
 
-			float time = current.time, lastTime = current.lastTime, endTime = current.endTime, mix = current.mix;
+			float time = current.time, lastTime = current.lastTime, endTime = current.endTime, mix = current.alpha;
 			boolean loop = current.loop;
 			if (!loop && time > endTime) time = endTime;
 
-			TrackEntry previous = current.previous;
-			if (previous != null) {
+			if (current.previous != null) {
 				mix *= current.mixTime / current.mixDuration;
-				Array<Event> previousEvents = mix < previous.eventThreshold ? events : null;
-
-				float previousTime = previous.time;
-				if (!previous.loop && previousTime > previous.endTime) previousTime = previous.endTime;
-				previous.animation.mix(skeleton, previous.lastTime, previousTime, previous.loop, previousEvents, previous.mix);
-				queueEvents(previous, previous.lastTime, previousTime, previous.endTime);
-				previous.lastTime = previousTime;
-
+				applyPrevious(current.previous, skeleton, mix);
 				if (mix >= 1) {
 					mix = 1;
 					queue.end(current.previous);
@@ -131,6 +125,35 @@ public class AnimationState {
 		}
 
 		queue.drain();
+	}
+
+	private void applyPrevious (TrackEntry previous, Skeleton skeleton, float mix) {
+		float previousTime = previous.time;
+		if (!previous.loop && previousTime > previous.endTime) previousTime = previous.endTime;
+
+		float lastTime = previous.lastTime, time = previousTime, alpha = previous.alpha;
+		Animation animation = previous.animation;
+		if (previous.loop && animation.duration != 0) {
+			time %= animation.duration;
+			if (lastTime > 0) lastTime %= animation.duration;
+		}
+
+		Array<Event> events = mix < previous.eventThreshold ? this.events : null;
+
+		Array<Timeline> timelines = animation.timelines;
+		if (mix < previous.attachmentThreshold) {
+			for (int i = 0, n = timelines.size; i < n; i++)
+				timelines.get(i).apply(skeleton, lastTime, time, events, alpha);
+		} else {
+			for (int i = 0, n = timelines.size; i < n; i++) {
+				Timeline timeline = timelines.get(i);
+				if (timeline instanceof AttachmentTimeline) continue;
+				timeline.apply(skeleton, lastTime, time, events, alpha);
+			}
+		}
+
+		queueEvents(previous, previous.lastTime, previousTime, previous.endTime);
+		previous.lastTime = previousTime;
 	}
 
 	private void queueEvents (TrackEntry entry, float lastTime, float time, float endTime) {
@@ -240,6 +263,7 @@ public class AnimationState {
 		entry.loop = loop;
 		entry.endTime = animation.getDuration();
 		entry.eventThreshold = defaultEventThreshold;
+		entry.attachmentThreshold = defaultAttachmentThreshold;
 
 		setCurrent(trackIndex, entry);
 		queue.drain();
@@ -261,6 +285,7 @@ public class AnimationState {
 		entry.loop = loop;
 		entry.endTime = animation.getDuration();
 		entry.eventThreshold = defaultEventThreshold;
+		entry.attachmentThreshold = defaultAttachmentThreshold;
 
 		TrackEntry last = expandToIndex(trackIndex);
 		if (last != null) {
@@ -322,6 +347,14 @@ public class AnimationState {
 		this.defaultEventThreshold = defaultEventThreshold;
 	}
 
+	public float getDefaultAttachmentThreshold () {
+		return defaultAttachmentThreshold;
+	}
+
+	public void setDefaultAttachmentThreshold (float defaultAttachmentThreshold) {
+		this.defaultAttachmentThreshold = defaultAttachmentThreshold;
+	}
+
 	public AnimationStateData getData () {
 		return data;
 	}
@@ -352,10 +385,10 @@ public class AnimationState {
 		TrackEntry next, previous;
 		Animation animation;
 		boolean loop;
-		float delay, time, lastTime = -1, endTime, timeScale = 1, eventThreshold;
+		float delay, time, lastTime = -1, endTime, timeScale = 1, eventThreshold, attachmentThreshold;
 		float mixTime, mixDuration;
 		AnimationStateListener listener;
-		float mix = 1;
+		float alpha = 1;
 
 		public void reset () {
 			next = null;
@@ -424,11 +457,11 @@ public class AnimationState {
 		}
 
 		public float getMix () {
-			return mix;
+			return alpha;
 		}
 
 		public void setMix (float mix) {
-			this.mix = mix;
+			this.alpha = mix;
 		}
 
 		public float getTimeScale () {
@@ -445,6 +478,14 @@ public class AnimationState {
 
 		public void setEventThreshold (float eventThreshold) {
 			this.eventThreshold = eventThreshold;
+		}
+
+		public float getAttachmentThreshold () {
+			return attachmentThreshold;
+		}
+
+		public void setAttachmentThreshold (float attachmentThreshold) {
+			this.attachmentThreshold = attachmentThreshold;
 		}
 
 		public TrackEntry getNext () {

@@ -233,14 +233,11 @@ public class AnimationStateTest {
 			expect(1, "start", 0.1f, 1), //
 
 			expect(0, "interrupt", 1, 1), //
-			expect(0, "event 30", 1, 1), //
 			expect(0, "complete 1", 1, 1), //
-			expect(0, "event 0", 1, 1), //
 
 			expect(1, "event 0", 0.1f, 1), //
 			expect(1, "event 14", 0.5f, 1.4f), //
 
-			expect(0, "event 14", 1.5f, 1.5f), //
 			expect(0, "end", 1.6f, 1.6f), //
 
 			expect(1, "event 30", 1, 1.9f), //
@@ -259,12 +256,10 @@ public class AnimationStateTest {
 			expect(1, "start", 0.1f, 0.5f), //
 
 			expect(0, "interrupt", 0.5f, 0.5f), //
-			expect(0, "event 14", 0.5f, 0.5f), //
 
 			expect(1, "event 0", 0.1f, 0.5f), //
 			expect(1, "event 14", 0.5f, 0.9f), //
 
-			expect(0, "event 30", 1, 1), //
 			expect(0, "complete 1", 1, 1), //
 			expect(0, "end", 1.1f, 1.1f), //
 
@@ -307,10 +302,12 @@ public class AnimationStateTest {
 			expect(1, "start", 0.1f, 0.5f), //
 
 			expect(0, "interrupt", 0.5f, 0.5f), //
+			expect(0, "event 14", 0.5f, 0.5f), //
 
 			expect(1, "event 0", 0.1f, 0.5f), //
 			expect(1, "event 14", 0.5f, 0.9f), //
 
+			expect(0, "event 30", 1, 1), //
 			expect(0, "complete 1", 1, 1), //
 			expect(0, "end", 1.1f, 1.1f), //
 
@@ -318,7 +315,7 @@ public class AnimationStateTest {
 			expect(1, "complete 1", 1, 1.4f), //
 			expect(1, "end", 1, 1.5f) //
 		);
-		state.setDefaultEventThreshold(0f);
+		state.setDefaultEventThreshold(1);
 		state.setAnimation(0, "events1", false);
 		state.addAnimation(0, "events2", false, 0.4f);
 		run(0.1f, 1000);
@@ -334,7 +331,7 @@ public class AnimationStateTest {
 		time = 0;
 		fail = false;
 		buffer.setLength(0);
-		buffer.append(String.format("%-12s%-8s%-8s%-8s%s\n", "", "anim", "track", "total", "result"));
+		buffer.append(String.format("%-12s%-8s%-8s%-8s%s\n", "#" + test, "anim", "track", "total", "result"));
 	}
 
 	void run (float incr, float endTime) {
@@ -349,8 +346,8 @@ public class AnimationStateTest {
 		actual.clear();
 		expected.clear();
 		if (fail) {
-			System.out.println("Test failed: " + test);
 			System.out.println(buffer);
+			System.out.println("TEST FAILED!");
 			System.exit(0);
 		}
 		System.out.println(buffer);

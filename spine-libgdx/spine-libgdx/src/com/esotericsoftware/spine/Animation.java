@@ -40,8 +40,8 @@ import com.esotericsoftware.spine.attachments.VertexAttachment;
 
 public class Animation {
 	final String name;
-	private final Array<Timeline> timelines;
-	private float duration;
+	final Array<Timeline> timelines;
+	float duration;
 
 	public Animation (String name, Array<Timeline> timelines, float duration) {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
