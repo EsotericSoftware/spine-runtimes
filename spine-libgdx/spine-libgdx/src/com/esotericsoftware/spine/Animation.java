@@ -375,21 +375,32 @@ public class Animation {
 			if (time < frames[0]) return; // Time is before first frame.
 
 			Bone bone = skeleton.bones.get(boneIndex);
+			float x, y;
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
-				bone.scaleX += (bone.data.scaleX * frames[frames.length + PREV_X] - bone.scaleX) * alpha;
-				bone.scaleY += (bone.data.scaleY * frames[frames.length + PREV_Y] - bone.scaleY) * alpha;
-				return;
+				x = frames[frames.length + PREV_X];
+				y = frames[frames.length + PREV_Y];
+			} else {
+				// Interpolate between the previous frame and the current frame.
+				int frame = binarySearch(frames, time, ENTRIES);
+				float prevX = frames[frame + PREV_X];
+				float prevY = frames[frame + PREV_Y];
+				float frameTime = frames[frame];
+				float percent = getCurvePercent(frame / ENTRIES - 1,
+					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+
+				x = prevX + (frames[frame + X] - prevX) * percent;
+				y = prevY + (frames[frame + Y] - prevY) * percent;
 			}
-
-			// Interpolate between the previous frame and the current frame.
-			int frame = binarySearch(frames, time, ENTRIES);
-			float prevX = frames[frame + PREV_X];
-			float prevY = frames[frame + PREV_Y];
-			float frameTime = frames[frame];
-			float percent = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
-			bone.scaleX += (bone.data.scaleX * (prevX + (frames[frame + X] - prevX) * percent) - bone.scaleX) * alpha;
-			bone.scaleY += (bone.data.scaleY * (prevY + (frames[frame + Y] - prevY) * percent) - bone.scaleY) * alpha;
+			if (alpha == 1) {
+				bone.scaleX = x * bone.data.scaleX;
+				bone.scaleY = y * bone.data.scaleY;
+			} else {
+				x *= bone.data.scaleX;
+				y *= bone.data.scaleY;
+				float bx = Math.abs(bone.scaleX), by = Math.abs(bone.scaleY);
+				bone.scaleX = (bx + (Math.abs(x) - bx) * alpha) * Math.signum(x);
+				bone.scaleY = (by + (Math.abs(y) - by) * alpha) * Math.signum(y);
+			}
 		}
 	}
 
