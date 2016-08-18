@@ -364,12 +364,12 @@ public class Bone implements Updatable {
 
 	/** Returns the magnitude (always positive) of the world scale X. */
 	public float getWorldScaleX () {
-		return (float)Math.sqrt(a * a + b * b);
+		return (float)Math.sqrt(a * a + c * c);
 	}
 
 	/** Returns the magnitude (always positive) of the world scale Y. */
 	public float getWorldScaleY () {
-		return (float)Math.sqrt(c * c + d * d);
+		return (float)Math.sqrt(b * b + d * d);
 	}
 
 	public float worldToLocalRotationX () {
