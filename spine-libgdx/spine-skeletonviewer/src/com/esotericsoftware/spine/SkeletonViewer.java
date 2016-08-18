@@ -76,6 +76,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.esotericsoftware.spine.AnimationState.AnimationStateAdapter;
 import com.esotericsoftware.spine.AnimationState.TrackEntry;
 
 public class SkeletonViewer extends ApplicationAdapter {
@@ -172,6 +173,11 @@ public class SkeletonViewer extends ApplicationAdapter {
 		skeleton.updateWorldTransform();
 
 		state = new AnimationState(new AnimationStateData(skeletonData));
+		state.addListener(new AnimationStateAdapter() {
+			public void event (TrackEntry entry, Event event) {
+				ui.toast(event.getData().getName());
+			}
+		});
 
 		this.skeletonFile = skeletonFile;
 		Preferences prefs = Gdx.app.getPreferences("spine-skeletonviewer");
