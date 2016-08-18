@@ -1,347 +1,8 @@
-var spine;
-(function (spine) {
-    var AssetManager = (function () {
-        function AssetManager(textureLoader) {
-            this._assets = {};
-            this._errors = {};
-            this._toLoad = 0;
-            this._loaded = 0;
-            this._textureLoader = textureLoader;
-        }
-        AssetManager.prototype.loadText = function (path, success, error) {
-            var _this = this;
-            if (success === void 0) { success = null; }
-            if (error === void 0) { error = null; }
-            this._toLoad++;
-            var request = new XMLHttpRequest();
-            request.onreadystatechange = function () {
-                if (request.readyState == XMLHttpRequest.DONE) {
-                    if (request.status >= 200 && request.status < 300) {
-                        if (success)
-                            success(path, request.responseText);
-                        _this._assets[path] = request.responseText;
-                    }
-                    else {
-                        if (error)
-                            error(path, "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText);
-                        _this._errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
-                    }
-                    _this._toLoad--;
-                    _this._loaded++;
-                }
-            };
-            request.open("GET", path, true);
-            request.send();
-        };
-        AssetManager.prototype.loadTexture = function (path, success, error) {
-            var _this = this;
-            if (success === void 0) { success = null; }
-            if (error === void 0) { error = null; }
-            this._toLoad++;
-            var img = new Image();
-            img.src = path;
-            img.onload = function (ev) {
-                if (success)
-                    success(path, img);
-                var texture = _this._textureLoader(img);
-                _this._assets[path] = texture;
-                _this._toLoad--;
-                _this._loaded++;
-            };
-            img.onerror = function (ev) {
-                if (error)
-                    error(path, "Couldn't load image " + path);
-                _this._errors[path] = "Couldn't load image " + path;
-                _this._toLoad--;
-                _this._loaded++;
-            };
-        };
-        AssetManager.prototype.get = function (path) {
-            return this._assets[path];
-        };
-        AssetManager.prototype.remove = function (path) {
-            var asset = this._assets[path];
-            if (asset.dispose)
-                asset.dispose();
-            this._assets[path] = null;
-        };
-        AssetManager.prototype.removeAll = function () {
-            for (var key in this._assets) {
-                var asset = this._assets[key];
-                if (asset.dispose)
-                    asset.dispose();
-            }
-            this._assets = {};
-        };
-        AssetManager.prototype.isLoadingComplete = function () {
-            return this._toLoad == 0;
-        };
-        AssetManager.prototype.toLoad = function () {
-            return this._toLoad;
-        };
-        AssetManager.prototype.loaded = function () {
-            return this._loaded;
-        };
-        AssetManager.prototype.dispose = function () {
-            this.removeAll();
-        };
-        AssetManager.prototype.hasErrors = function () {
-            return Object.keys(this._errors).length > 0;
-        };
-        AssetManager.prototype.errors = function () {
-            return this._errors;
-        };
-        return AssetManager;
-    }());
-    spine.AssetManager = AssetManager;
-})(spine || (spine = {}));
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var spine;
-(function (spine) {
-    var canvas;
-    (function (canvas) {
-        var AssetManager = (function (_super) {
-            __extends(AssetManager, _super);
-            function AssetManager() {
-                _super.call(this, function (image) { return new spine.canvas.CanvasTexture(image); });
-            }
-            return AssetManager;
-        }(spine.AssetManager));
-        canvas.AssetManager = AssetManager;
-    })(canvas = spine.canvas || (spine.canvas = {}));
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var Texture = (function () {
-        function Texture(image) {
-            this._image = image;
-        }
-        Texture.prototype.getImage = function () {
-            return this._image;
-        };
-        Texture.filterFromString = function (text) {
-            switch (text.toLowerCase()) {
-                case "nearest": return TextureFilter.Nearest;
-                case "linear": return TextureFilter.Linear;
-                case "mipmap": return TextureFilter.MipMap;
-                case "mipmapnearestnearest": return TextureFilter.MipMapNearestNearest;
-                case "mipmaplinearnearest": return TextureFilter.MipMapLinearNearest;
-                case "mipmapnearestlinear": return TextureFilter.MipMapNearestLinear;
-                case "mipmaplinearlinear": return TextureFilter.MipMapLinearLinear;
-                default: throw new Error("Unknown texture filter " + text);
-            }
-        };
-        Texture.wrapFromString = function (text) {
-            switch (text.toLowerCase()) {
-                case "mirroredtepeat": return TextureWrap.MirroredRepeat;
-                case "clamptoedge": return TextureWrap.ClampToEdge;
-                case "repeat": return TextureWrap.Repeat;
-                default: throw new Error("Unknown texture wrap " + text);
-            }
-        };
-        return Texture;
-    }());
-    spine.Texture = Texture;
-    (function (TextureFilter) {
-        TextureFilter[TextureFilter["Nearest"] = 9728] = "Nearest";
-        TextureFilter[TextureFilter["Linear"] = 9729] = "Linear";
-        TextureFilter[TextureFilter["MipMap"] = 9987] = "MipMap";
-        TextureFilter[TextureFilter["MipMapNearestNearest"] = 9984] = "MipMapNearestNearest";
-        TextureFilter[TextureFilter["MipMapLinearNearest"] = 9985] = "MipMapLinearNearest";
-        TextureFilter[TextureFilter["MipMapNearestLinear"] = 9986] = "MipMapNearestLinear";
-        TextureFilter[TextureFilter["MipMapLinearLinear"] = 9987] = "MipMapLinearLinear";
-    })(spine.TextureFilter || (spine.TextureFilter = {}));
-    var TextureFilter = spine.TextureFilter;
-    (function (TextureWrap) {
-        TextureWrap[TextureWrap["MirroredRepeat"] = 33648] = "MirroredRepeat";
-        TextureWrap[TextureWrap["ClampToEdge"] = 33071] = "ClampToEdge";
-        TextureWrap[TextureWrap["Repeat"] = 10497] = "Repeat";
-    })(spine.TextureWrap || (spine.TextureWrap = {}));
-    var TextureWrap = spine.TextureWrap;
-    var TextureRegion = (function () {
-        function TextureRegion() {
-            this.u = 0;
-            this.v = 0;
-            this.u2 = 0;
-            this.v2 = 0;
-            this.width = 0;
-            this.height = 0;
-            this.rotate = false;
-            this.offsetX = 0;
-            this.offsetY = 0;
-            this.originalWidth = 0;
-            this.originalHeight = 0;
-        }
-        return TextureRegion;
-    }());
-    spine.TextureRegion = TextureRegion;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var canvas;
-    (function (canvas) {
-        var CanvasTexture = (function (_super) {
-            __extends(CanvasTexture, _super);
-            function CanvasTexture(image) {
-                _super.call(this, image);
-            }
-            CanvasTexture.prototype.setFilters = function (minFilter, magFilter) { };
-            CanvasTexture.prototype.setWraps = function (uWrap, vWrap) { };
-            CanvasTexture.prototype.dispose = function () { };
-            return CanvasTexture;
-        }(spine.Texture));
-        canvas.CanvasTexture = CanvasTexture;
-    })(canvas = spine.canvas || (spine.canvas = {}));
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var canvas;
-    (function (canvas) {
-        var SkeletonRenderer = (function () {
-            function SkeletonRenderer(context) {
-                this.triangleRendering = false;
-                this.debugRendering = false;
-                this._ctx = context;
-            }
-            SkeletonRenderer.prototype.draw = function (skeleton) {
-                if (this.triangleRendering)
-                    this.drawTriangles(skeleton);
-                else
-                    this.drawImages(skeleton);
-            };
-            SkeletonRenderer.prototype.drawImages = function (skeleton) {
-                var ctx = this._ctx;
-                var drawOrder = skeleton.drawOrder;
-                if (this.debugRendering)
-                    ctx.strokeStyle = "green";
-                for (var i = 0, n = drawOrder.length; i < n; i++) {
-                    var slot = drawOrder[i];
-                    var attachment = slot.getAttachment();
-                    var region = null;
-                    var image = null;
-                    var vertices = null;
-                    if (attachment instanceof spine.RegionAttachment) {
-                        var regionAttachment = attachment;
-                        vertices = regionAttachment.updateWorldVertices(slot, false);
-                        region = regionAttachment.region;
-                        image = (region).texture.getImage();
-                    }
-                    else
-                        continue;
-                    var att = attachment;
-                    var bone = slot.bone;
-                    var x = vertices[0];
-                    var y = vertices[1];
-                    var rotation = (bone.getWorldRotationX() - att.rotation) * Math.PI / 180;
-                    var xx = vertices[24] - vertices[0];
-                    var xy = vertices[25] - vertices[1];
-                    var yx = vertices[8] - vertices[0];
-                    var yy = vertices[9] - vertices[1];
-                    var w = Math.sqrt(xx * xx + xy * xy), h = -Math.sqrt(yx * yx + yy * yy);
-                    ctx.translate(x, y);
-                    ctx.rotate(rotation);
-                    if (region.rotate) {
-                        ctx.rotate(Math.PI / 2);
-                        ctx.drawImage(image, region.x, region.y, region.height, region.width, 0, 0, h, -w);
-                        ctx.rotate(-Math.PI / 2);
-                    }
-                    else {
-                        ctx.drawImage(image, region.x, region.y, region.width, region.height, 0, 0, w, h);
-                    }
-                    if (this.debugRendering)
-                        ctx.strokeRect(0, 0, w, h);
-                    ctx.rotate(-rotation);
-                    ctx.translate(-x, -y);
-                }
-            };
-            SkeletonRenderer.prototype.drawTriangles = function (skeleton) {
-                var blendMode = null;
-                var vertices = null;
-                var triangles = null;
-                var drawOrder = skeleton.drawOrder;
-                for (var i = 0, n = drawOrder.length; i < n; i++) {
-                    var slot = drawOrder[i];
-                    var attachment = slot.getAttachment();
-                    var texture = null;
-                    var region = null;
-                    if (attachment instanceof spine.RegionAttachment) {
-                        var regionAttachment = attachment;
-                        vertices = regionAttachment.updateWorldVertices(slot, false);
-                        triangles = SkeletonRenderer.QUAD_TRIANGLES;
-                        region = regionAttachment.region;
-                        texture = region.texture.getImage();
-                    }
-                    else if (attachment instanceof spine.MeshAttachment) {
-                        var mesh = attachment;
-                        vertices = mesh.updateWorldVertices(slot, false);
-                        triangles = mesh.triangles;
-                        texture = mesh.region.renderObject.texture.getImage();
-                    }
-                    else
-                        continue;
-                    if (texture != null) {
-                        var slotBlendMode = slot.data.blendMode;
-                        if (slotBlendMode != blendMode) {
-                            blendMode = slotBlendMode;
-                        }
-                        var ctx = this._ctx;
-                        for (var j = 0; j < triangles.length; j += 3) {
-                            var t1 = triangles[j] * 8, t2 = triangles[j + 1] * 8, t3 = triangles[j + 2] * 8;
-                            var x0 = vertices[t1], y0 = vertices[t1 + 1], u0 = vertices[t1 + 6], v0 = vertices[t1 + 7];
-                            var x1 = vertices[t2], y1 = vertices[t2 + 1], u1 = vertices[t2 + 6], v1 = vertices[t2 + 7];
-                            var x2 = vertices[t3], y2 = vertices[t3 + 1], u2 = vertices[t3 + 6], v2 = vertices[t3 + 7];
-                            this.drawTriangle(texture, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2);
-                            if (this.debugRendering) {
-                                ctx.strokeStyle = "green";
-                                ctx.beginPath();
-                                ctx.moveTo(x0, y0);
-                                ctx.lineTo(x1, y1);
-                                ctx.lineTo(x2, y2);
-                                ctx.lineTo(x0, y0);
-                                ctx.stroke();
-                            }
-                        }
-                    }
-                }
-            };
-            SkeletonRenderer.prototype.drawTriangle = function (img, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2) {
-                var ctx = this._ctx;
-                u0 *= img.width;
-                v0 *= img.height;
-                u1 *= img.width;
-                v1 *= img.height;
-                u2 *= img.width;
-                v2 *= img.height;
-                ctx.beginPath();
-                ctx.moveTo(x0, y0);
-                ctx.lineTo(x1, y1);
-                ctx.lineTo(x2, y2);
-                ctx.closePath();
-                x1 -= x0;
-                y1 -= y0;
-                x2 -= x0;
-                y2 -= y0;
-                u1 -= u0;
-                v1 -= v0;
-                u2 -= u0;
-                v2 -= v0;
-                var det = 1 / (u1 * v2 - u2 * v1), a = (v2 * x1 - v1 * x2) * det, b = (v2 * y1 - v1 * y2) * det, c = (u1 * x2 - u2 * x1) * det, d = (u1 * y2 - u2 * y1) * det, e = x0 - a * u0 - c * v0, f = y0 - b * u0 - d * v0;
-                ctx.save();
-                ctx.transform(a, b, c, d, e, f);
-                ctx.clip();
-                ctx.drawImage(img, 0, 0);
-                ctx.restore();
-            };
-            SkeletonRenderer.QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
-            return SkeletonRenderer;
-        }());
-        canvas.SkeletonRenderer = SkeletonRenderer;
-    })(canvas = spine.canvas || (spine.canvas = {}));
-})(spine || (spine = {}));
 var spine;
 (function (spine) {
     var Animation = (function () {
@@ -1324,6 +985,103 @@ var spine;
         return AnimationStateData;
     }());
     spine.AnimationStateData = AnimationStateData;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var AssetManager = (function () {
+        function AssetManager(textureLoader) {
+            this._assets = {};
+            this._errors = {};
+            this._toLoad = 0;
+            this._loaded = 0;
+            this._textureLoader = textureLoader;
+        }
+        AssetManager.prototype.loadText = function (path, success, error) {
+            var _this = this;
+            if (success === void 0) { success = null; }
+            if (error === void 0) { error = null; }
+            this._toLoad++;
+            var request = new XMLHttpRequest();
+            request.onreadystatechange = function () {
+                if (request.readyState == XMLHttpRequest.DONE) {
+                    if (request.status >= 200 && request.status < 300) {
+                        if (success)
+                            success(path, request.responseText);
+                        _this._assets[path] = request.responseText;
+                    }
+                    else {
+                        if (error)
+                            error(path, "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText);
+                        _this._errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
+                    }
+                    _this._toLoad--;
+                    _this._loaded++;
+                }
+            };
+            request.open("GET", path, true);
+            request.send();
+        };
+        AssetManager.prototype.loadTexture = function (path, success, error) {
+            var _this = this;
+            if (success === void 0) { success = null; }
+            if (error === void 0) { error = null; }
+            this._toLoad++;
+            var img = new Image();
+            img.src = path;
+            img.onload = function (ev) {
+                if (success)
+                    success(path, img);
+                var texture = _this._textureLoader(img);
+                _this._assets[path] = texture;
+                _this._toLoad--;
+                _this._loaded++;
+            };
+            img.onerror = function (ev) {
+                if (error)
+                    error(path, "Couldn't load image " + path);
+                _this._errors[path] = "Couldn't load image " + path;
+                _this._toLoad--;
+                _this._loaded++;
+            };
+        };
+        AssetManager.prototype.get = function (path) {
+            return this._assets[path];
+        };
+        AssetManager.prototype.remove = function (path) {
+            var asset = this._assets[path];
+            if (asset.dispose)
+                asset.dispose();
+            this._assets[path] = null;
+        };
+        AssetManager.prototype.removeAll = function () {
+            for (var key in this._assets) {
+                var asset = this._assets[key];
+                if (asset.dispose)
+                    asset.dispose();
+            }
+            this._assets = {};
+        };
+        AssetManager.prototype.isLoadingComplete = function () {
+            return this._toLoad == 0;
+        };
+        AssetManager.prototype.toLoad = function () {
+            return this._toLoad;
+        };
+        AssetManager.prototype.loaded = function () {
+            return this._loaded;
+        };
+        AssetManager.prototype.dispose = function () {
+            this.removeAll();
+        };
+        AssetManager.prototype.hasErrors = function () {
+            return Object.keys(this._errors).length > 0;
+        };
+        AssetManager.prototype.errors = function () {
+            return this._errors;
+        };
+        return AssetManager;
+    }());
+    spine.AssetManager = AssetManager;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
@@ -3646,6 +3404,72 @@ var spine;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
+    var Texture = (function () {
+        function Texture(image) {
+            this._image = image;
+        }
+        Texture.prototype.getImage = function () {
+            return this._image;
+        };
+        Texture.filterFromString = function (text) {
+            switch (text.toLowerCase()) {
+                case "nearest": return TextureFilter.Nearest;
+                case "linear": return TextureFilter.Linear;
+                case "mipmap": return TextureFilter.MipMap;
+                case "mipmapnearestnearest": return TextureFilter.MipMapNearestNearest;
+                case "mipmaplinearnearest": return TextureFilter.MipMapLinearNearest;
+                case "mipmapnearestlinear": return TextureFilter.MipMapNearestLinear;
+                case "mipmaplinearlinear": return TextureFilter.MipMapLinearLinear;
+                default: throw new Error("Unknown texture filter " + text);
+            }
+        };
+        Texture.wrapFromString = function (text) {
+            switch (text.toLowerCase()) {
+                case "mirroredtepeat": return TextureWrap.MirroredRepeat;
+                case "clamptoedge": return TextureWrap.ClampToEdge;
+                case "repeat": return TextureWrap.Repeat;
+                default: throw new Error("Unknown texture wrap " + text);
+            }
+        };
+        return Texture;
+    }());
+    spine.Texture = Texture;
+    (function (TextureFilter) {
+        TextureFilter[TextureFilter["Nearest"] = 9728] = "Nearest";
+        TextureFilter[TextureFilter["Linear"] = 9729] = "Linear";
+        TextureFilter[TextureFilter["MipMap"] = 9987] = "MipMap";
+        TextureFilter[TextureFilter["MipMapNearestNearest"] = 9984] = "MipMapNearestNearest";
+        TextureFilter[TextureFilter["MipMapLinearNearest"] = 9985] = "MipMapLinearNearest";
+        TextureFilter[TextureFilter["MipMapNearestLinear"] = 9986] = "MipMapNearestLinear";
+        TextureFilter[TextureFilter["MipMapLinearLinear"] = 9987] = "MipMapLinearLinear";
+    })(spine.TextureFilter || (spine.TextureFilter = {}));
+    var TextureFilter = spine.TextureFilter;
+    (function (TextureWrap) {
+        TextureWrap[TextureWrap["MirroredRepeat"] = 33648] = "MirroredRepeat";
+        TextureWrap[TextureWrap["ClampToEdge"] = 33071] = "ClampToEdge";
+        TextureWrap[TextureWrap["Repeat"] = 10497] = "Repeat";
+    })(spine.TextureWrap || (spine.TextureWrap = {}));
+    var TextureWrap = spine.TextureWrap;
+    var TextureRegion = (function () {
+        function TextureRegion() {
+            this.u = 0;
+            this.v = 0;
+            this.u2 = 0;
+            this.v2 = 0;
+            this.width = 0;
+            this.height = 0;
+            this.rotate = false;
+            this.offsetX = 0;
+            this.offsetY = 0;
+            this.originalWidth = 0;
+            this.originalHeight = 0;
+        }
+        return TextureRegion;
+    }());
+    spine.TextureRegion = TextureRegion;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
     var TextureAtlas = (function () {
         function TextureAtlas(atlasText, textureLoader) {
             this.pages = new Array();
@@ -4774,1109 +4598,4 @@ var spine;
         threejs.ThreeJsTexture = ThreeJsTexture;
     })(threejs = spine.threejs || (spine.threejs = {}));
 })(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var webgl;
-    (function (webgl) {
-        var AssetManager = (function (_super) {
-            __extends(AssetManager, _super);
-            function AssetManager(gl) {
-                _super.call(this, function (image) { return new spine.webgl.GLTexture(gl, image); });
-            }
-            return AssetManager;
-        }(spine.AssetManager));
-        webgl.AssetManager = AssetManager;
-    })(webgl = spine.webgl || (spine.webgl = {}));
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var webgl;
-    (function (webgl) {
-        var GLTexture = (function (_super) {
-            __extends(GLTexture, _super);
-            function GLTexture(gl, image, useMipMaps) {
-                if (useMipMaps === void 0) { useMipMaps = false; }
-                _super.call(this, image);
-                this._boundUnit = 0;
-                this._gl = gl;
-                this._texture = gl.createTexture();
-                this.update(useMipMaps);
-            }
-            GLTexture.prototype.setFilters = function (minFilter, magFilter) {
-                var gl = this._gl;
-                this.bind();
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter);
-            };
-            GLTexture.prototype.setWraps = function (uWrap, vWrap) {
-                var gl = this._gl;
-                this.bind();
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, uWrap);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, vWrap);
-            };
-            GLTexture.prototype.update = function (useMipMaps) {
-                var gl = this._gl;
-                this.bind();
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this._image);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, useMipMaps ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                if (useMipMaps)
-                    gl.generateMipmap(gl.TEXTURE_2D);
-            };
-            GLTexture.prototype.bind = function (unit) {
-                if (unit === void 0) { unit = 0; }
-                var gl = this._gl;
-                this._boundUnit = unit;
-                gl.activeTexture(gl.TEXTURE0 + unit);
-                gl.bindTexture(gl.TEXTURE_2D, this._texture);
-            };
-            GLTexture.prototype.unbind = function () {
-                var gl = this._gl;
-                gl.activeTexture(gl.TEXTURE0 + this._boundUnit);
-                gl.bindTexture(gl.TEXTURE_2D, null);
-            };
-            GLTexture.prototype.dispose = function () {
-                var gl = this._gl;
-                gl.deleteTexture(this._texture);
-            };
-            return GLTexture;
-        }(spine.Texture));
-        webgl.GLTexture = GLTexture;
-    })(webgl = spine.webgl || (spine.webgl = {}));
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var webgl;
-    (function (webgl) {
-        webgl.M00 = 0;
-        webgl.M01 = 4;
-        webgl.M02 = 8;
-        webgl.M03 = 12;
-        webgl.M10 = 1;
-        webgl.M11 = 5;
-        webgl.M12 = 9;
-        webgl.M13 = 13;
-        webgl.M20 = 2;
-        webgl.M21 = 6;
-        webgl.M22 = 10;
-        webgl.M23 = 14;
-        webgl.M30 = 3;
-        webgl.M31 = 7;
-        webgl.M32 = 11;
-        webgl.M33 = 15;
-        var Matrix4 = (function () {
-            function Matrix4() {
-                this.temp = new Float32Array(16);
-                this.values = new Float32Array(16);
-                var v = this.values;
-                v[webgl.M00] = 1;
-                v[webgl.M11] = 1;
-                v[webgl.M22] = 1;
-                v[webgl.M33] = 1;
-            }
-            Matrix4.prototype.set = function (values) {
-                this.values.set(values);
-                return this;
-            };
-            Matrix4.prototype.transpose = function () {
-                var t = this.temp;
-                var v = this.values;
-                t[webgl.M00] = v[webgl.M00];
-                t[webgl.M01] = v[webgl.M10];
-                t[webgl.M02] = v[webgl.M20];
-                t[webgl.M03] = v[webgl.M30];
-                t[webgl.M10] = v[webgl.M01];
-                t[webgl.M11] = v[webgl.M11];
-                t[webgl.M12] = v[webgl.M21];
-                t[webgl.M13] = v[webgl.M31];
-                t[webgl.M20] = v[webgl.M02];
-                t[webgl.M21] = v[webgl.M12];
-                t[webgl.M22] = v[webgl.M22];
-                t[webgl.M23] = v[webgl.M32];
-                t[webgl.M30] = v[webgl.M03];
-                t[webgl.M31] = v[webgl.M13];
-                t[webgl.M32] = v[webgl.M23];
-                t[webgl.M33] = v[webgl.M33];
-                return this.set(t);
-            };
-            Matrix4.prototype.identity = function () {
-                var v = this.values;
-                v[webgl.M00] = 1;
-                v[webgl.M01] = 0;
-                v[webgl.M02] = 0;
-                v[webgl.M03] = 0;
-                v[webgl.M10] = 0;
-                v[webgl.M11] = 1;
-                v[webgl.M12] = 0;
-                v[webgl.M13] = 0;
-                v[webgl.M20] = 0;
-                v[webgl.M21] = 0;
-                v[webgl.M22] = 1;
-                v[webgl.M23] = 0;
-                v[webgl.M30] = 0;
-                v[webgl.M31] = 0;
-                v[webgl.M32] = 0;
-                v[webgl.M33] = 1;
-                return this;
-            };
-            Matrix4.prototype.invert = function () {
-                var v = this.values;
-                var t = this.temp;
-                var l_det = v[webgl.M30] * v[webgl.M21] * v[webgl.M12] * v[webgl.M03] - v[webgl.M20] * v[webgl.M31] * v[webgl.M12] * v[webgl.M03] - v[webgl.M30] * v[webgl.M11] * v[webgl.M22] * v[webgl.M03]
-                    + v[webgl.M10] * v[webgl.M31] * v[webgl.M22] * v[webgl.M03] + v[webgl.M20] * v[webgl.M11] * v[webgl.M32] * v[webgl.M03] - v[webgl.M10] * v[webgl.M21] * v[webgl.M32] * v[webgl.M03]
-                    - v[webgl.M30] * v[webgl.M21] * v[webgl.M02] * v[webgl.M13] + v[webgl.M20] * v[webgl.M31] * v[webgl.M02] * v[webgl.M13] + v[webgl.M30] * v[webgl.M01] * v[webgl.M22] * v[webgl.M13]
-                    - v[webgl.M00] * v[webgl.M31] * v[webgl.M22] * v[webgl.M13] - v[webgl.M20] * v[webgl.M01] * v[webgl.M32] * v[webgl.M13] + v[webgl.M00] * v[webgl.M21] * v[webgl.M32] * v[webgl.M13]
-                    + v[webgl.M30] * v[webgl.M11] * v[webgl.M02] * v[webgl.M23] - v[webgl.M10] * v[webgl.M31] * v[webgl.M02] * v[webgl.M23] - v[webgl.M30] * v[webgl.M01] * v[webgl.M12] * v[webgl.M23]
-                    + v[webgl.M00] * v[webgl.M31] * v[webgl.M12] * v[webgl.M23] + v[webgl.M10] * v[webgl.M01] * v[webgl.M32] * v[webgl.M23] - v[webgl.M00] * v[webgl.M11] * v[webgl.M32] * v[webgl.M23]
-                    - v[webgl.M20] * v[webgl.M11] * v[webgl.M02] * v[webgl.M33] + v[webgl.M10] * v[webgl.M21] * v[webgl.M02] * v[webgl.M33] + v[webgl.M20] * v[webgl.M01] * v[webgl.M12] * v[webgl.M33]
-                    - v[webgl.M00] * v[webgl.M21] * v[webgl.M12] * v[webgl.M33] - v[webgl.M10] * v[webgl.M01] * v[webgl.M22] * v[webgl.M33] + v[webgl.M00] * v[webgl.M11] * v[webgl.M22] * v[webgl.M33];
-                if (l_det == 0)
-                    throw new Error("non-invertible matrix");
-                var inv_det = 1.0 / l_det;
-                t[webgl.M00] = v[webgl.M12] * v[webgl.M23] * v[webgl.M31] - v[webgl.M13] * v[webgl.M22] * v[webgl.M31] + v[webgl.M13] * v[webgl.M21] * v[webgl.M32]
-                    - v[webgl.M11] * v[webgl.M23] * v[webgl.M32] - v[webgl.M12] * v[webgl.M21] * v[webgl.M33] + v[webgl.M11] * v[webgl.M22] * v[webgl.M33];
-                t[webgl.M01] = v[webgl.M03] * v[webgl.M22] * v[webgl.M31] - v[webgl.M02] * v[webgl.M23] * v[webgl.M31] - v[webgl.M03] * v[webgl.M21] * v[webgl.M32]
-                    + v[webgl.M01] * v[webgl.M23] * v[webgl.M32] + v[webgl.M02] * v[webgl.M21] * v[webgl.M33] - v[webgl.M01] * v[webgl.M22] * v[webgl.M33];
-                t[webgl.M02] = v[webgl.M02] * v[webgl.M13] * v[webgl.M31] - v[webgl.M03] * v[webgl.M12] * v[webgl.M31] + v[webgl.M03] * v[webgl.M11] * v[webgl.M32]
-                    - v[webgl.M01] * v[webgl.M13] * v[webgl.M32] - v[webgl.M02] * v[webgl.M11] * v[webgl.M33] + v[webgl.M01] * v[webgl.M12] * v[webgl.M33];
-                t[webgl.M03] = v[webgl.M03] * v[webgl.M12] * v[webgl.M21] - v[webgl.M02] * v[webgl.M13] * v[webgl.M21] - v[webgl.M03] * v[webgl.M11] * v[webgl.M22]
-                    + v[webgl.M01] * v[webgl.M13] * v[webgl.M22] + v[webgl.M02] * v[webgl.M11] * v[webgl.M23] - v[webgl.M01] * v[webgl.M12] * v[webgl.M23];
-                t[webgl.M10] = v[webgl.M13] * v[webgl.M22] * v[webgl.M30] - v[webgl.M12] * v[webgl.M23] * v[webgl.M30] - v[webgl.M13] * v[webgl.M20] * v[webgl.M32]
-                    + v[webgl.M10] * v[webgl.M23] * v[webgl.M32] + v[webgl.M12] * v[webgl.M20] * v[webgl.M33] - v[webgl.M10] * v[webgl.M22] * v[webgl.M33];
-                t[webgl.M11] = v[webgl.M02] * v[webgl.M23] * v[webgl.M30] - v[webgl.M03] * v[webgl.M22] * v[webgl.M30] + v[webgl.M03] * v[webgl.M20] * v[webgl.M32]
-                    - v[webgl.M00] * v[webgl.M23] * v[webgl.M32] - v[webgl.M02] * v[webgl.M20] * v[webgl.M33] + v[webgl.M00] * v[webgl.M22] * v[webgl.M33];
-                t[webgl.M12] = v[webgl.M03] * v[webgl.M12] * v[webgl.M30] - v[webgl.M02] * v[webgl.M13] * v[webgl.M30] - v[webgl.M03] * v[webgl.M10] * v[webgl.M32]
-                    + v[webgl.M00] * v[webgl.M13] * v[webgl.M32] + v[webgl.M02] * v[webgl.M10] * v[webgl.M33] - v[webgl.M00] * v[webgl.M12] * v[webgl.M33];
-                t[webgl.M13] = v[webgl.M02] * v[webgl.M13] * v[webgl.M20] - v[webgl.M03] * v[webgl.M12] * v[webgl.M20] + v[webgl.M03] * v[webgl.M10] * v[webgl.M22]
-                    - v[webgl.M00] * v[webgl.M13] * v[webgl.M22] - v[webgl.M02] * v[webgl.M10] * v[webgl.M23] + v[webgl.M00] * v[webgl.M12] * v[webgl.M23];
-                t[webgl.M20] = v[webgl.M11] * v[webgl.M23] * v[webgl.M30] - v[webgl.M13] * v[webgl.M21] * v[webgl.M30] + v[webgl.M13] * v[webgl.M20] * v[webgl.M31]
-                    - v[webgl.M10] * v[webgl.M23] * v[webgl.M31] - v[webgl.M11] * v[webgl.M20] * v[webgl.M33] + v[webgl.M10] * v[webgl.M21] * v[webgl.M33];
-                t[webgl.M21] = v[webgl.M03] * v[webgl.M21] * v[webgl.M30] - v[webgl.M01] * v[webgl.M23] * v[webgl.M30] - v[webgl.M03] * v[webgl.M20] * v[webgl.M31]
-                    + v[webgl.M00] * v[webgl.M23] * v[webgl.M31] + v[webgl.M01] * v[webgl.M20] * v[webgl.M33] - v[webgl.M00] * v[webgl.M21] * v[webgl.M33];
-                t[webgl.M22] = v[webgl.M01] * v[webgl.M13] * v[webgl.M30] - v[webgl.M03] * v[webgl.M11] * v[webgl.M30] + v[webgl.M03] * v[webgl.M10] * v[webgl.M31]
-                    - v[webgl.M00] * v[webgl.M13] * v[webgl.M31] - v[webgl.M01] * v[webgl.M10] * v[webgl.M33] + v[webgl.M00] * v[webgl.M11] * v[webgl.M33];
-                t[webgl.M23] = v[webgl.M03] * v[webgl.M11] * v[webgl.M20] - v[webgl.M01] * v[webgl.M13] * v[webgl.M20] - v[webgl.M03] * v[webgl.M10] * v[webgl.M21]
-                    + v[webgl.M00] * v[webgl.M13] * v[webgl.M21] + v[webgl.M01] * v[webgl.M10] * v[webgl.M23] - v[webgl.M00] * v[webgl.M11] * v[webgl.M23];
-                t[webgl.M30] = v[webgl.M12] * v[webgl.M21] * v[webgl.M30] - v[webgl.M11] * v[webgl.M22] * v[webgl.M30] - v[webgl.M12] * v[webgl.M20] * v[webgl.M31]
-                    + v[webgl.M10] * v[webgl.M22] * v[webgl.M31] + v[webgl.M11] * v[webgl.M20] * v[webgl.M32] - v[webgl.M10] * v[webgl.M21] * v[webgl.M32];
-                t[webgl.M31] = v[webgl.M01] * v[webgl.M22] * v[webgl.M30] - v[webgl.M02] * v[webgl.M21] * v[webgl.M30] + v[webgl.M02] * v[webgl.M20] * v[webgl.M31]
-                    - v[webgl.M00] * v[webgl.M22] * v[webgl.M31] - v[webgl.M01] * v[webgl.M20] * v[webgl.M32] + v[webgl.M00] * v[webgl.M21] * v[webgl.M32];
-                t[webgl.M32] = v[webgl.M02] * v[webgl.M11] * v[webgl.M30] - v[webgl.M01] * v[webgl.M12] * v[webgl.M30] - v[webgl.M02] * v[webgl.M10] * v[webgl.M31]
-                    + v[webgl.M00] * v[webgl.M12] * v[webgl.M31] + v[webgl.M01] * v[webgl.M10] * v[webgl.M32] - v[webgl.M00] * v[webgl.M11] * v[webgl.M32];
-                t[webgl.M33] = v[webgl.M01] * v[webgl.M12] * v[webgl.M20] - v[webgl.M02] * v[webgl.M11] * v[webgl.M20] + v[webgl.M02] * v[webgl.M10] * v[webgl.M21]
-                    - v[webgl.M00] * v[webgl.M12] * v[webgl.M21] - v[webgl.M01] * v[webgl.M10] * v[webgl.M22] + v[webgl.M00] * v[webgl.M11] * v[webgl.M22];
-                v[webgl.M00] = t[webgl.M00] * inv_det;
-                v[webgl.M01] = t[webgl.M01] * inv_det;
-                v[webgl.M02] = t[webgl.M02] * inv_det;
-                v[webgl.M03] = t[webgl.M03] * inv_det;
-                v[webgl.M10] = t[webgl.M10] * inv_det;
-                v[webgl.M11] = t[webgl.M11] * inv_det;
-                v[webgl.M12] = t[webgl.M12] * inv_det;
-                v[webgl.M13] = t[webgl.M13] * inv_det;
-                v[webgl.M20] = t[webgl.M20] * inv_det;
-                v[webgl.M21] = t[webgl.M21] * inv_det;
-                v[webgl.M22] = t[webgl.M22] * inv_det;
-                v[webgl.M23] = t[webgl.M23] * inv_det;
-                v[webgl.M30] = t[webgl.M30] * inv_det;
-                v[webgl.M31] = t[webgl.M31] * inv_det;
-                v[webgl.M32] = t[webgl.M32] * inv_det;
-                v[webgl.M33] = t[webgl.M33] * inv_det;
-                return this;
-            };
-            Matrix4.prototype.determinant = function () {
-                var v = this.values;
-                return v[webgl.M30] * v[webgl.M21] * v[webgl.M12] * v[webgl.M03] - v[webgl.M20] * v[webgl.M31] * v[webgl.M12] * v[webgl.M03] - v[webgl.M30] * v[webgl.M11] * v[webgl.M22] * v[webgl.M03]
-                    + v[webgl.M10] * v[webgl.M31] * v[webgl.M22] * v[webgl.M03] + v[webgl.M20] * v[webgl.M11] * v[webgl.M32] * v[webgl.M03] - v[webgl.M10] * v[webgl.M21] * v[webgl.M32] * v[webgl.M03]
-                    - v[webgl.M30] * v[webgl.M21] * v[webgl.M02] * v[webgl.M13] + v[webgl.M20] * v[webgl.M31] * v[webgl.M02] * v[webgl.M13] + v[webgl.M30] * v[webgl.M01] * v[webgl.M22] * v[webgl.M13]
-                    - v[webgl.M00] * v[webgl.M31] * v[webgl.M22] * v[webgl.M13] - v[webgl.M20] * v[webgl.M01] * v[webgl.M32] * v[webgl.M13] + v[webgl.M00] * v[webgl.M21] * v[webgl.M32] * v[webgl.M13]
-                    + v[webgl.M30] * v[webgl.M11] * v[webgl.M02] * v[webgl.M23] - v[webgl.M10] * v[webgl.M31] * v[webgl.M02] * v[webgl.M23] - v[webgl.M30] * v[webgl.M01] * v[webgl.M12] * v[webgl.M23]
-                    + v[webgl.M00] * v[webgl.M31] * v[webgl.M12] * v[webgl.M23] + v[webgl.M10] * v[webgl.M01] * v[webgl.M32] * v[webgl.M23] - v[webgl.M00] * v[webgl.M11] * v[webgl.M32] * v[webgl.M23]
-                    - v[webgl.M20] * v[webgl.M11] * v[webgl.M02] * v[webgl.M33] + v[webgl.M10] * v[webgl.M21] * v[webgl.M02] * v[webgl.M33] + v[webgl.M20] * v[webgl.M01] * v[webgl.M12] * v[webgl.M33]
-                    - v[webgl.M00] * v[webgl.M21] * v[webgl.M12] * v[webgl.M33] - v[webgl.M10] * v[webgl.M01] * v[webgl.M22] * v[webgl.M33] + v[webgl.M00] * v[webgl.M11] * v[webgl.M22] * v[webgl.M33];
-            };
-            Matrix4.prototype.translate = function (x, y, z) {
-                var v = this.values;
-                v[webgl.M03] += x;
-                v[webgl.M13] += y;
-                v[webgl.M23] += z;
-                return this;
-            };
-            Matrix4.prototype.copy = function () {
-                return new Matrix4().set(this.values);
-            };
-            Matrix4.prototype.projection = function (near, far, fovy, aspectRatio) {
-                this.identity();
-                var l_fd = (1.0 / Math.tan((fovy * (Math.PI / 180)) / 2.0));
-                var l_a1 = (far + near) / (near - far);
-                var l_a2 = (2 * far * near) / (near - far);
-                var v = this.values;
-                v[webgl.M00] = l_fd / aspectRatio;
-                v[webgl.M10] = 0;
-                v[webgl.M20] = 0;
-                v[webgl.M30] = 0;
-                v[webgl.M01] = 0;
-                v[webgl.M11] = l_fd;
-                v[webgl.M21] = 0;
-                v[webgl.M31] = 0;
-                v[webgl.M02] = 0;
-                v[webgl.M12] = 0;
-                v[webgl.M22] = l_a1;
-                v[webgl.M32] = -1;
-                v[webgl.M03] = 0;
-                v[webgl.M13] = 0;
-                v[webgl.M23] = l_a2;
-                v[webgl.M33] = 0;
-                return this;
-            };
-            Matrix4.prototype.ortho2d = function (x, y, width, height) {
-                return this.ortho(x, x + width, y, y + height, 0, 1);
-            };
-            Matrix4.prototype.ortho = function (left, right, bottom, top, near, far) {
-                this.identity();
-                var x_orth = 2 / (right - left);
-                var y_orth = 2 / (top - bottom);
-                var z_orth = -2 / (far - near);
-                var tx = -(right + left) / (right - left);
-                var ty = -(top + bottom) / (top - bottom);
-                var tz = -(far + near) / (far - near);
-                var v = this.values;
-                v[webgl.M00] = x_orth;
-                v[webgl.M10] = 0;
-                v[webgl.M20] = 0;
-                v[webgl.M30] = 0;
-                v[webgl.M01] = 0;
-                v[webgl.M11] = y_orth;
-                v[webgl.M21] = 0;
-                v[webgl.M31] = 0;
-                v[webgl.M02] = 0;
-                v[webgl.M12] = 0;
-                v[webgl.M22] = z_orth;
-                v[webgl.M32] = 0;
-                v[webgl.M03] = tx;
-                v[webgl.M13] = ty;
-                v[webgl.M23] = tz;
-                v[webgl.M33] = 1;
-                return this;
-            };
-            Matrix4.prototype.multiply = function (matrix) {
-                var t = this.temp;
-                var v = this.values;
-                var m = matrix.values;
-                t[webgl.M00] = v[webgl.M00] * m[webgl.M00] + v[webgl.M01] * m[webgl.M10] + v[webgl.M02] * m[webgl.M20] + v[webgl.M03] * m[webgl.M30];
-                t[webgl.M01] = v[webgl.M00] * m[webgl.M01] + v[webgl.M01] * m[webgl.M11] + v[webgl.M02] * m[webgl.M21] + v[webgl.M03] * m[webgl.M31];
-                t[webgl.M02] = v[webgl.M00] * m[webgl.M02] + v[webgl.M01] * m[webgl.M12] + v[webgl.M02] * m[webgl.M22] + v[webgl.M03] * m[webgl.M32];
-                t[webgl.M03] = v[webgl.M00] * m[webgl.M03] + v[webgl.M01] * m[webgl.M13] + v[webgl.M02] * m[webgl.M23] + v[webgl.M03] * m[webgl.M33];
-                t[webgl.M10] = v[webgl.M10] * m[webgl.M00] + v[webgl.M11] * m[webgl.M10] + v[webgl.M12] * m[webgl.M20] + v[webgl.M13] * m[webgl.M30];
-                t[webgl.M11] = v[webgl.M10] * m[webgl.M01] + v[webgl.M11] * m[webgl.M11] + v[webgl.M12] * m[webgl.M21] + v[webgl.M13] * m[webgl.M31];
-                t[webgl.M12] = v[webgl.M10] * m[webgl.M02] + v[webgl.M11] * m[webgl.M12] + v[webgl.M12] * m[webgl.M22] + v[webgl.M13] * m[webgl.M32];
-                t[webgl.M13] = v[webgl.M10] * m[webgl.M03] + v[webgl.M11] * m[webgl.M13] + v[webgl.M12] * m[webgl.M23] + v[webgl.M13] * m[webgl.M33];
-                t[webgl.M20] = v[webgl.M20] * m[webgl.M00] + v[webgl.M21] * m[webgl.M10] + v[webgl.M22] * m[webgl.M20] + v[webgl.M23] * m[webgl.M30];
-                t[webgl.M21] = v[webgl.M20] * m[webgl.M01] + v[webgl.M21] * m[webgl.M11] + v[webgl.M22] * m[webgl.M21] + v[webgl.M23] * m[webgl.M31];
-                t[webgl.M22] = v[webgl.M20] * m[webgl.M02] + v[webgl.M21] * m[webgl.M12] + v[webgl.M22] * m[webgl.M22] + v[webgl.M23] * m[webgl.M32];
-                t[webgl.M23] = v[webgl.M20] * m[webgl.M03] + v[webgl.M21] * m[webgl.M13] + v[webgl.M22] * m[webgl.M23] + v[webgl.M23] * m[webgl.M33];
-                t[webgl.M30] = v[webgl.M30] * m[webgl.M00] + v[webgl.M31] * m[webgl.M10] + v[webgl.M32] * m[webgl.M20] + v[webgl.M33] * m[webgl.M30];
-                t[webgl.M31] = v[webgl.M30] * m[webgl.M01] + v[webgl.M31] * m[webgl.M11] + v[webgl.M32] * m[webgl.M21] + v[webgl.M33] * m[webgl.M31];
-                t[webgl.M32] = v[webgl.M30] * m[webgl.M02] + v[webgl.M31] * m[webgl.M12] + v[webgl.M32] * m[webgl.M22] + v[webgl.M33] * m[webgl.M32];
-                t[webgl.M33] = v[webgl.M30] * m[webgl.M03] + v[webgl.M31] * m[webgl.M13] + v[webgl.M32] * m[webgl.M23] + v[webgl.M33] * m[webgl.M33];
-                return this.set(this.temp);
-            };
-            Matrix4.prototype.multiplyLeft = function (matrix) {
-                var t = this.temp;
-                var v = this.values;
-                var m = matrix.values;
-                t[webgl.M00] = m[webgl.M00] * v[webgl.M00] + m[webgl.M01] * v[webgl.M10] + m[webgl.M02] * v[webgl.M20] + m[webgl.M03] * v[webgl.M30];
-                t[webgl.M01] = m[webgl.M00] * v[webgl.M01] + m[webgl.M01] * v[webgl.M11] + m[webgl.M02] * v[webgl.M21] + m[webgl.M03] * v[webgl.M31];
-                t[webgl.M02] = m[webgl.M00] * v[webgl.M02] + m[webgl.M01] * v[webgl.M12] + m[webgl.M02] * v[webgl.M22] + m[webgl.M03] * v[webgl.M32];
-                t[webgl.M03] = m[webgl.M00] * v[webgl.M03] + m[webgl.M01] * v[webgl.M13] + m[webgl.M02] * v[webgl.M23] + m[webgl.M03] * v[webgl.M33];
-                t[webgl.M10] = m[webgl.M10] * v[webgl.M00] + m[webgl.M11] * v[webgl.M10] + m[webgl.M12] * v[webgl.M20] + m[webgl.M13] * v[webgl.M30];
-                t[webgl.M11] = m[webgl.M10] * v[webgl.M01] + m[webgl.M11] * v[webgl.M11] + m[webgl.M12] * v[webgl.M21] + m[webgl.M13] * v[webgl.M31];
-                t[webgl.M12] = m[webgl.M10] * v[webgl.M02] + m[webgl.M11] * v[webgl.M12] + m[webgl.M12] * v[webgl.M22] + m[webgl.M13] * v[webgl.M32];
-                t[webgl.M13] = m[webgl.M10] * v[webgl.M03] + m[webgl.M11] * v[webgl.M13] + m[webgl.M12] * v[webgl.M23] + m[webgl.M13] * v[webgl.M33];
-                t[webgl.M20] = m[webgl.M20] * v[webgl.M00] + m[webgl.M21] * v[webgl.M10] + m[webgl.M22] * v[webgl.M20] + m[webgl.M23] * v[webgl.M30];
-                t[webgl.M21] = m[webgl.M20] * v[webgl.M01] + m[webgl.M21] * v[webgl.M11] + m[webgl.M22] * v[webgl.M21] + m[webgl.M23] * v[webgl.M31];
-                t[webgl.M22] = m[webgl.M20] * v[webgl.M02] + m[webgl.M21] * v[webgl.M12] + m[webgl.M22] * v[webgl.M22] + m[webgl.M23] * v[webgl.M32];
-                t[webgl.M23] = m[webgl.M20] * v[webgl.M03] + m[webgl.M21] * v[webgl.M13] + m[webgl.M22] * v[webgl.M23] + m[webgl.M23] * v[webgl.M33];
-                t[webgl.M30] = m[webgl.M30] * v[webgl.M00] + m[webgl.M31] * v[webgl.M10] + m[webgl.M32] * v[webgl.M20] + m[webgl.M33] * v[webgl.M30];
-                t[webgl.M31] = m[webgl.M30] * v[webgl.M01] + m[webgl.M31] * v[webgl.M11] + m[webgl.M32] * v[webgl.M21] + m[webgl.M33] * v[webgl.M31];
-                t[webgl.M32] = m[webgl.M30] * v[webgl.M02] + m[webgl.M31] * v[webgl.M12] + m[webgl.M32] * v[webgl.M22] + m[webgl.M33] * v[webgl.M32];
-                t[webgl.M33] = m[webgl.M30] * v[webgl.M03] + m[webgl.M31] * v[webgl.M13] + m[webgl.M32] * v[webgl.M23] + m[webgl.M33] * v[webgl.M33];
-                return this.set(this.temp);
-            };
-            return Matrix4;
-        }());
-        webgl.Matrix4 = Matrix4;
-    })(webgl = spine.webgl || (spine.webgl = {}));
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var webgl;
-    (function (webgl) {
-        var Mesh = (function () {
-            function Mesh(gl, _attributes, maxVertices, maxIndices) {
-                this._attributes = _attributes;
-                this._verticesLength = 0;
-                this._dirtyVertices = false;
-                this._indicesLength = 0;
-                this._dirtyIndices = false;
-                this._elementsPerVertex = 0;
-                this._gl = gl;
-                this._elementsPerVertex = 0;
-                for (var i = 0; i < _attributes.length; i++) {
-                    this._elementsPerVertex += _attributes[i].numElements;
-                }
-                this._vertices = new Float32Array(maxVertices * this._elementsPerVertex);
-                this._indices = new Uint16Array(maxIndices);
-            }
-            Mesh.prototype.attributes = function () { return this._attributes; };
-            Mesh.prototype.maxVertices = function () { return this._vertices.length / this._elementsPerVertex; };
-            Mesh.prototype.numVertices = function () { return this._verticesLength / this._elementsPerVertex; };
-            Mesh.prototype.setVerticesLength = function (length) {
-                this._dirtyVertices = true;
-                this._verticesLength = length;
-            };
-            Mesh.prototype.vertices = function () { return this._vertices; };
-            Mesh.prototype.maxIndices = function () { return this._indices.length; };
-            Mesh.prototype.numIndices = function () { return this._indicesLength; };
-            Mesh.prototype.setIndicesLength = function (length) {
-                this._dirtyIndices = true;
-                this._indicesLength = length;
-            };
-            Mesh.prototype.indices = function () { return this._indices; };
-            ;
-            Mesh.prototype.setVertices = function (vertices) {
-                this._dirtyVertices = true;
-                if (vertices.length > this._vertices.length)
-                    throw Error("Mesh can't store more than " + this.maxVertices() + " vertices");
-                this._vertices.set(vertices, 0);
-                this._verticesLength = vertices.length;
-            };
-            Mesh.prototype.setIndices = function (indices) {
-                this._dirtyIndices = true;
-                if (indices.length > this._indices.length)
-                    throw Error("Mesh can't store more than " + this.maxIndices() + " indices");
-                this._indices.set(indices, 0);
-                this._indicesLength = indices.length;
-            };
-            Mesh.prototype.draw = function (shader, primitiveType) {
-                this.drawWithOffset(shader, primitiveType, 0, this._indicesLength > 0 ? this._indicesLength : this._verticesLength);
-            };
-            Mesh.prototype.drawWithOffset = function (shader, primitiveType, offset, count) {
-                var gl = this._gl;
-                if (this._dirtyVertices || this._dirtyIndices)
-                    this.update();
-                this.bind(shader);
-                if (this._indicesLength > 0)
-                    gl.drawElements(primitiveType, count, gl.UNSIGNED_SHORT, offset * 2);
-                else
-                    gl.drawArrays(primitiveType, offset, count);
-                this.unbind(shader);
-            };
-            Mesh.prototype.bind = function (shader) {
-                var gl = this._gl;
-                gl.bindBuffer(gl.ARRAY_BUFFER, this._verticesBuffer);
-                var offset = 0;
-                for (var i = 0; i < this._attributes.length; i++) {
-                    var attrib = this._attributes[i];
-                    var location_1 = shader.getAttributeLocation(attrib.name);
-                    gl.enableVertexAttribArray(location_1);
-                    gl.vertexAttribPointer(location_1, attrib.numElements, gl.FLOAT, false, this._elementsPerVertex * 4, offset * 4);
-                    offset += attrib.numElements;
-                }
-                if (this._indicesLength > 0)
-                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
-            };
-            Mesh.prototype.unbind = function (shader) {
-                var gl = this._gl;
-                for (var i = 0; i < this._attributes.length; i++) {
-                    var attrib = this._attributes[i];
-                    var location_2 = shader.getAttributeLocation(attrib.name);
-                    gl.disableVertexAttribArray(location_2);
-                }
-                gl.bindBuffer(gl.ARRAY_BUFFER, null);
-                if (this._indicesLength > 0)
-                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-            };
-            Mesh.prototype.update = function () {
-                var gl = this._gl;
-                if (this._dirtyVertices) {
-                    if (!this._verticesBuffer) {
-                        this._verticesBuffer = gl.createBuffer();
-                    }
-                    gl.bindBuffer(gl.ARRAY_BUFFER, this._verticesBuffer);
-                    gl.bufferData(gl.ARRAY_BUFFER, this._vertices.subarray(0, this._verticesLength), gl.STATIC_DRAW);
-                    this._dirtyVertices = false;
-                }
-                if (this._dirtyIndices) {
-                    if (!this._indicesBuffer) {
-                        this._indicesBuffer = gl.createBuffer();
-                    }
-                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
-                    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this._indices.subarray(0, this._indicesLength), gl.STATIC_DRAW);
-                    this._dirtyIndices = false;
-                }
-            };
-            Mesh.prototype.dispose = function () {
-                var gl = this._gl;
-                gl.deleteBuffer(this._verticesBuffer);
-                gl.deleteBuffer(this._indicesBuffer);
-            };
-            return Mesh;
-        }());
-        webgl.Mesh = Mesh;
-        var VertexAttribute = (function () {
-            function VertexAttribute(name, type, numElements) {
-                this.name = name;
-                this.type = type;
-                this.numElements = numElements;
-            }
-            return VertexAttribute;
-        }());
-        webgl.VertexAttribute = VertexAttribute;
-        var Position2Attribute = (function (_super) {
-            __extends(Position2Attribute, _super);
-            function Position2Attribute() {
-                _super.call(this, webgl.Shader.POSITION, VertexAttributeType.Float, 2);
-            }
-            return Position2Attribute;
-        }(VertexAttribute));
-        webgl.Position2Attribute = Position2Attribute;
-        var Position3Attribute = (function (_super) {
-            __extends(Position3Attribute, _super);
-            function Position3Attribute() {
-                _super.call(this, webgl.Shader.POSITION, VertexAttributeType.Float, 3);
-            }
-            return Position3Attribute;
-        }(VertexAttribute));
-        webgl.Position3Attribute = Position3Attribute;
-        var TexCoordAttribute = (function (_super) {
-            __extends(TexCoordAttribute, _super);
-            function TexCoordAttribute(unit) {
-                if (unit === void 0) { unit = 0; }
-                _super.call(this, webgl.Shader.TEXCOORDS + (unit == 0 ? "" : unit), VertexAttributeType.Float, 2);
-            }
-            return TexCoordAttribute;
-        }(VertexAttribute));
-        webgl.TexCoordAttribute = TexCoordAttribute;
-        var ColorAttribute = (function (_super) {
-            __extends(ColorAttribute, _super);
-            function ColorAttribute() {
-                _super.call(this, webgl.Shader.COLOR, VertexAttributeType.Float, 4);
-            }
-            return ColorAttribute;
-        }(VertexAttribute));
-        webgl.ColorAttribute = ColorAttribute;
-        (function (VertexAttributeType) {
-            VertexAttributeType[VertexAttributeType["Float"] = 0] = "Float";
-        })(webgl.VertexAttributeType || (webgl.VertexAttributeType = {}));
-        var VertexAttributeType = webgl.VertexAttributeType;
-    })(webgl = spine.webgl || (spine.webgl = {}));
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var webgl;
-    (function (webgl) {
-        var PolygonBatcher = (function () {
-            function PolygonBatcher(gl, maxVertices) {
-                if (maxVertices === void 0) { maxVertices = 10920; }
-                this._drawing = false;
-                this._shader = null;
-                this._lastTexture = null;
-                this._verticesLength = 0;
-                this._indicesLength = 0;
-                this._srcBlend = WebGLRenderingContext.SRC_ALPHA;
-                this._dstBlend = WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
-                if (maxVertices > 10920)
-                    throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
-                this._gl = gl;
-                this._mesh = new webgl.Mesh(gl, [new webgl.Position2Attribute(), new webgl.ColorAttribute(), new webgl.TexCoordAttribute()], maxVertices, maxVertices * 3);
-            }
-            PolygonBatcher.prototype.begin = function (shader) {
-                var gl = this._gl;
-                if (this._drawing)
-                    throw new Error("PolygonBatch is already drawing. Call PolygonBatch.end() before calling PolygonBatch.begin()");
-                this._drawCalls = 0;
-                this._shader = shader;
-                this._lastTexture = null;
-                this._drawing = true;
-                gl.enable(gl.BLEND);
-                gl.blendFunc(this._srcBlend, this._dstBlend);
-            };
-            PolygonBatcher.prototype.setBlendMode = function (srcBlend, dstBlend) {
-                var gl = this._gl;
-                this._srcBlend = srcBlend;
-                this._dstBlend = dstBlend;
-                if (this._drawing) {
-                    this.flush();
-                    gl.blendFunc(this._srcBlend, this._dstBlend);
-                }
-            };
-            PolygonBatcher.prototype.draw = function (texture, vertices, indices) {
-                if (texture != this._lastTexture) {
-                    this.flush();
-                    this._lastTexture = texture;
-                    texture.bind();
-                }
-                else if (this._verticesLength + vertices.length > this._mesh.vertices().length ||
-                    this._indicesLength + indices.length > this._mesh.indices().length) {
-                    this.flush();
-                }
-                var indexStart = this._mesh.numVertices();
-                this._mesh.vertices().set(vertices, this._verticesLength);
-                this._verticesLength += vertices.length;
-                this._mesh.setVerticesLength(this._verticesLength);
-                var indicesArray = this._mesh.indices();
-                for (var i = this._indicesLength, j = 0; j < indices.length; i++, j++)
-                    indicesArray[i] = indices[j] + indexStart;
-                this._indicesLength += indices.length;
-                this._mesh.setIndicesLength(this._indicesLength);
-            };
-            PolygonBatcher.prototype.flush = function () {
-                var gl = this._gl;
-                if (this._verticesLength == 0)
-                    return;
-                this._mesh.draw(this._shader, gl.TRIANGLES);
-                this._verticesLength = 0;
-                this._indicesLength = 0;
-                this._mesh.setVerticesLength(0);
-                this._mesh.setIndicesLength(0);
-                this._drawCalls++;
-            };
-            PolygonBatcher.prototype.end = function () {
-                var gl = this._gl;
-                if (!this._drawing)
-                    throw new Error("PolygonBatch is not drawing. Call PolygonBatch.begin() before calling PolygonBatch.end()");
-                if (this._verticesLength > 0 || this._indicesLength > 0)
-                    this.flush();
-                this._shader = null;
-                this._lastTexture = null;
-                this._drawing = false;
-                gl.disable(gl.BLEND);
-            };
-            PolygonBatcher.prototype.drawCalls = function () { return this._drawCalls; };
-            return PolygonBatcher;
-        }());
-        webgl.PolygonBatcher = PolygonBatcher;
-    })(webgl = spine.webgl || (spine.webgl = {}));
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var webgl;
-    (function (webgl) {
-        var Shader = (function () {
-            function Shader(gl, _vertexShader, _fragmentShader) {
-                this._vertexShader = _vertexShader;
-                this._fragmentShader = _fragmentShader;
-                this._vs = null;
-                this._fs = null;
-                this._program = null;
-                this._tmp2x2 = new Float32Array(2 * 2);
-                this._tmp3x3 = new Float32Array(3 * 3);
-                this._tmp4x4 = new Float32Array(4 * 4);
-                this._gl = gl;
-                this.compile();
-            }
-            Shader.prototype.program = function () { return this._program; };
-            Shader.prototype.vertexShader = function () { return this._vertexShader; };
-            Shader.prototype.fragmentShader = function () { return this._fragmentShader; };
-            Shader.prototype.compile = function () {
-                var gl = this._gl;
-                try {
-                    this._vs = this.compileShader(gl.VERTEX_SHADER, this._vertexShader);
-                    this._fs = this.compileShader(gl.FRAGMENT_SHADER, this._fragmentShader);
-                    this._program = this.compileProgram(this._vs, this._fs);
-                }
-                catch (e) {
-                    this.dispose();
-                    throw e;
-                }
-            };
-            Shader.prototype.compileShader = function (type, source) {
-                var gl = this._gl;
-                var shader = gl.createShader(type);
-                gl.shaderSource(shader, source);
-                gl.compileShader(shader);
-                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-                    var error = "Couldn't compile shader: " + gl.getShaderInfoLog(shader);
-                    gl.deleteShader(shader);
-                    throw new Error(error);
-                }
-                return shader;
-            };
-            Shader.prototype.compileProgram = function (vs, fs) {
-                var gl = this._gl;
-                var program = gl.createProgram();
-                gl.attachShader(program, vs);
-                gl.attachShader(program, fs);
-                gl.linkProgram(program);
-                if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-                    var error = "Couldn't compile shader program: " + gl.getProgramInfoLog(program);
-                    gl.deleteProgram(program);
-                    throw new Error(error);
-                }
-                return program;
-            };
-            Shader.prototype.bind = function () {
-                this._gl.useProgram(this._program);
-            };
-            Shader.prototype.unbind = function () {
-                this._gl.useProgram(null);
-            };
-            Shader.prototype.setUniformi = function (uniform, value) {
-                this._gl.uniform1i(this.getUniformLocation(uniform), value);
-            };
-            Shader.prototype.setUniformf = function (uniform, value) {
-                this._gl.uniform1f(this.getUniformLocation(uniform), value);
-            };
-            Shader.prototype.setUniform2f = function (uniform, value, value2) {
-                this._gl.uniform2f(this.getUniformLocation(uniform), value, value2);
-            };
-            Shader.prototype.setUniform3f = function (uniform, value, value2, value3) {
-                this._gl.uniform3f(this.getUniformLocation(uniform), value, value2, value3);
-            };
-            Shader.prototype.setUniform4f = function (uniform, value, value2, value3, value4) {
-                this._gl.uniform4f(this.getUniformLocation(uniform), value, value2, value3, value4);
-            };
-            Shader.prototype.setUniform2x2f = function (uniform, value) {
-                var gl = this._gl;
-                this._tmp2x2.set(value);
-                gl.uniformMatrix2fv(this.getUniformLocation(uniform), false, this._tmp2x2);
-            };
-            Shader.prototype.setUniform3x3f = function (uniform, value) {
-                var gl = this._gl;
-                this._tmp3x3.set(value);
-                gl.uniformMatrix3fv(this.getUniformLocation(uniform), false, this._tmp3x3);
-            };
-            Shader.prototype.setUniform4x4f = function (uniform, value) {
-                var gl = this._gl;
-                this._tmp4x4.set(value);
-                gl.uniformMatrix4fv(this.getUniformLocation(uniform), false, this._tmp4x4);
-            };
-            Shader.prototype.getUniformLocation = function (uniform) {
-                var gl = this._gl;
-                var location = gl.getUniformLocation(this._program, uniform);
-                if (!location)
-                    throw new Error("Couldn't find location for uniform " + uniform);
-                return location;
-            };
-            Shader.prototype.getAttributeLocation = function (attribute) {
-                var gl = this._gl;
-                var location = gl.getAttribLocation(this._program, attribute);
-                if (location == -1)
-                    throw new Error("Couldn't find location for attribute " + attribute);
-                return location;
-            };
-            Shader.prototype.dispose = function () {
-                var gl = this._gl;
-                if (this._vs) {
-                    gl.deleteShader(this._vs);
-                    this._vs = null;
-                }
-                if (this._fs) {
-                    gl.deleteShader(this._fs);
-                    this._fs = null;
-                }
-                if (this._program) {
-                    gl.deleteProgram(this._program);
-                    this._program = null;
-                }
-            };
-            Shader.newColoredTextured = function (gl) {
-                var vs = "\n\t\t\t\tattribute vec4 " + Shader.POSITION + ";\n\t\t\t\tattribute vec4 " + Shader.COLOR + ";\n\t\t\t\tattribute vec2 " + Shader.TEXCOORDS + ";\n\t\t\t\tuniform mat4 " + Shader.MVP_MATRIX + ";\n\t\t\t\tvarying vec4 v_color;\n\t\t\t\tvarying vec2 v_texCoords;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tv_color = " + Shader.COLOR + ";\n\t\t\t\t\tv_texCoords = " + Shader.TEXCOORDS + ";\n\t\t\t\t\tgl_Position =  " + Shader.MVP_MATRIX + " * " + Shader.POSITION + ";\n\t\t\t\t}\n\t\t\t";
-                var fs = "\n\t\t\t\t#ifdef GL_ES\n\t\t\t\t\t#define LOWP lowp\n\t\t\t\t\tprecision mediump float;\n\t\t\t\t#else\n\t\t\t\t\t#define LOWP\n\t\t\t\t#endif\n\t\t\t\tvarying LOWP vec4 v_color;\n\t\t\t\tvarying vec2 v_texCoords;\n\t\t\t\tuniform sampler2D u_texture;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tgl_FragColor = v_color * texture2D(u_texture, v_texCoords);\n\t\t\t\t}\n\t\t\t";
-                return new Shader(gl, vs, fs);
-            };
-            Shader.newColored = function (gl) {
-                var vs = "\n\t\t\t\tattribute vec4 " + Shader.POSITION + ";\n\t\t\t\tattribute vec4 " + Shader.COLOR + ";\n\t\t\t\tuniform mat4 " + Shader.MVP_MATRIX + ";\n\t\t\t\tvarying vec4 v_color;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tv_color = " + Shader.COLOR + ";\n\t\t\t\t\tgl_Position =  " + Shader.MVP_MATRIX + " * " + Shader.POSITION + ";\n\t\t\t\t}\n\t\t\t";
-                var fs = "\n\t\t\t\t#ifdef GL_ES\n\t\t\t\t\t#define LOWP lowp\n\t\t\t\t\tprecision mediump float;\n\t\t\t\t#else\n\t\t\t\t\t#define LOWP\n\t\t\t\t#endif\n\t\t\t\tvarying LOWP vec4 v_color;\n\n\t\t\t\tvoid main () {\n\t\t\t\t\tgl_FragColor = v_color;\n\t\t\t\t}\n\t\t\t";
-                return new Shader(gl, vs, fs);
-            };
-            Shader.MVP_MATRIX = "u_projTrans";
-            Shader.POSITION = "a_position";
-            Shader.COLOR = "a_color";
-            Shader.TEXCOORDS = "a_texCoords";
-            Shader.SAMPLER = "u_texture";
-            return Shader;
-        }());
-        webgl.Shader = Shader;
-    })(webgl = spine.webgl || (spine.webgl = {}));
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var webgl;
-    (function (webgl) {
-        var SkeletonRenderer = (function () {
-            function SkeletonRenderer(gl) {
-                this.premultipliedAlpha = false;
-                this._gl = gl;
-            }
-            SkeletonRenderer.prototype.draw = function (batcher, skeleton) {
-                var premultipliedAlpha = this.premultipliedAlpha;
-                var blendMode = null;
-                var vertices = null;
-                var triangles = null;
-                var drawOrder = skeleton.drawOrder;
-                for (var i = 0, n = drawOrder.length; i < n; i++) {
-                    var slot = drawOrder[i];
-                    var attachment = slot.getAttachment();
-                    var texture = null;
-                    if (attachment instanceof spine.RegionAttachment) {
-                        var region = attachment;
-                        vertices = region.updateWorldVertices(slot, premultipliedAlpha);
-                        triangles = SkeletonRenderer.QUAD_TRIANGLES;
-                        texture = region.region.renderObject.texture;
-                    }
-                    else if (attachment instanceof spine.MeshAttachment) {
-                        var mesh = attachment;
-                        vertices = mesh.updateWorldVertices(slot, premultipliedAlpha);
-                        triangles = mesh.triangles;
-                        texture = mesh.region.renderObject.texture;
-                    }
-                    else
-                        continue;
-                    if (texture != null) {
-                        var slotBlendMode = slot.data.blendMode;
-                        if (slotBlendMode != blendMode) {
-                            blendMode = slotBlendMode;
-                            batcher.setBlendMode(webgl.getSourceGLBlendMode(this._gl, blendMode, premultipliedAlpha), webgl.getDestGLBlendMode(this._gl, blendMode));
-                        }
-                        batcher.draw(texture, vertices, triangles);
-                    }
-                }
-            };
-            SkeletonRenderer.QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
-            return SkeletonRenderer;
-        }());
-        webgl.SkeletonRenderer = SkeletonRenderer;
-    })(webgl = spine.webgl || (spine.webgl = {}));
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var webgl;
-    (function (webgl) {
-        var Vector3 = (function () {
-            function Vector3() {
-                this.x = 0;
-                this.y = 0;
-                this.z = 0;
-            }
-            Vector3.prototype.set = function (x, y, z) {
-                this.x = x;
-                this.y = y;
-                this.z = z;
-                return this;
-            };
-            Vector3.prototype.add = function (v) {
-                this.x += v.x;
-                this.y += v.y;
-                this.z += v.z;
-                return this;
-            };
-            Vector3.prototype.sub = function (v) {
-                this.x -= v.x;
-                this.y -= v.y;
-                this.z -= v.z;
-                return this;
-            };
-            Vector3.prototype.scale = function (s) {
-                this.x *= s;
-                this.y *= s;
-                this.z *= s;
-                return this;
-            };
-            Vector3.prototype.normalize = function () {
-                var len = this.length();
-                if (len == 0)
-                    return this;
-                len = 1 / len;
-                this.x *= len;
-                this.y *= len;
-                this.z *= len;
-                return this;
-            };
-            Vector3.prototype.cross = function (v) {
-                return this.set(this.y * v.z - this.z * v.y, this.z * v.x - this.x * v.z, this.x * v.y - this.y * v.x);
-            };
-            Vector3.prototype.multiply = function (matrix) {
-                var l_mat = matrix.values;
-                return this.set(this.x * l_mat[webgl.M00] + this.y * l_mat[webgl.M01] + this.z * l_mat[webgl.M02] + l_mat[webgl.M03], this.x * l_mat[webgl.M10] + this.y * l_mat[webgl.M11] + this.z * l_mat[webgl.M12] + l_mat[webgl.M13], this.x * l_mat[webgl.M20] + this.y * l_mat[webgl.M21] + this.z * l_mat[webgl.M22] + l_mat[webgl.M23]);
-            };
-            Vector3.prototype.project = function (matrix) {
-                var l_mat = matrix.values;
-                var l_w = 1 / (this.x * l_mat[webgl.M30] + this.y * l_mat[webgl.M31] + this.z * l_mat[webgl.M32] + l_mat[webgl.M33]);
-                return this.set((this.x * l_mat[webgl.M00] + this.y * l_mat[webgl.M01] + this.z * l_mat[webgl.M02] + l_mat[webgl.M03]) * l_w, (this.x * l_mat[webgl.M10] + this.y * l_mat[webgl.M11] + this.z * l_mat[webgl.M12] + l_mat[webgl.M13]) * l_w, (this.x * l_mat[webgl.M20] + this.y * l_mat[webgl.M21] + this.z * l_mat[webgl.M22] + l_mat[webgl.M23]) * l_w);
-            };
-            Vector3.prototype.dot = function (v) {
-                return this.x * v.x + this.y * v.y + this.z * v.z;
-            };
-            Vector3.prototype.length = function () {
-                return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
-            };
-            Vector3.prototype.distance = function (v) {
-                var a = v.x - this.x;
-                var b = v.y - this.y;
-                var c = v.z - this.z;
-                return Math.sqrt(a * a + b * b + c * c);
-            };
-            return Vector3;
-        }());
-        webgl.Vector3 = Vector3;
-    })(webgl = spine.webgl || (spine.webgl = {}));
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var webgl;
-    (function (webgl) {
-        function getSourceGLBlendMode(gl, blendMode, premultipliedAlpha) {
-            if (premultipliedAlpha === void 0) { premultipliedAlpha = false; }
-            switch (blendMode) {
-                case spine.BlendMode.Normal: return premultipliedAlpha ? gl.ONE : gl.SRC_ALPHA;
-                case spine.BlendMode.Additive: return premultipliedAlpha ? gl.ONE : gl.SRC_ALPHA;
-                case spine.BlendMode.Multiply: return gl.DST_COLOR;
-                case spine.BlendMode.Screen: return gl.ONE;
-                default: throw new Error("Unknown blend mode: " + blendMode);
-            }
-        }
-        webgl.getSourceGLBlendMode = getSourceGLBlendMode;
-        function getDestGLBlendMode(gl, blendMode) {
-            switch (blendMode) {
-                case spine.BlendMode.Normal: return gl.ONE_MINUS_SRC_ALPHA;
-                case spine.BlendMode.Additive: return gl.ONE;
-                case spine.BlendMode.Multiply: return gl.ONE_MINUS_SRC_ALPHA;
-                case spine.BlendMode.Screen: return gl.ONE_MINUS_SRC_ALPHA;
-                default: throw new Error("Unknown blend mode: " + blendMode);
-            }
-        }
-        webgl.getDestGLBlendMode = getDestGLBlendMode;
-    })(webgl = spine.webgl || (spine.webgl = {}));
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var SpineWidget = (function () {
-        function SpineWidget(element, config) {
-            var _this = this;
-            this._mvp = new spine.webgl.Matrix4();
-            this._paused = false;
-            this._lastFrameTime = Date.now() / 1000.0;
-            this._backgroundColor = new spine.Color();
-            this._loaded = false;
-            if (!element)
-                throw new Error("Please provide a DOM element, e.g. document.getElementById('myelement')");
-            if (!config)
-                throw new Error("Please provide a configuration, specifying at least the json file, atlas file and animation name");
-            var elementId = element;
-            if (typeof (element) === "string")
-                element = document.getElementById(element);
-            if (element == null)
-                throw new Error("Element " + elementId + " does not exist");
-            this.validateConfig(config);
-            var canvas = this.canvas = document.createElement("canvas");
-            element.appendChild(canvas);
-            canvas.width = config.width;
-            canvas.height = config.height;
-            var webglConfig = { alpha: false };
-            var gl = this.gl = (canvas.getContext("webgl", webglConfig) || canvas.getContext("experimental-webgl", webglConfig));
-            this._shader = spine.webgl.Shader.newColoredTextured(gl);
-            this._batcher = new spine.webgl.PolygonBatcher(gl);
-            this._mvp.ortho2d(0, 0, 639, 479);
-            this._skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);
-            var assets = this._assetManager = new spine.webgl.AssetManager(gl);
-            assets.loadText(config.atlas);
-            assets.loadText(config.json);
-            assets.loadTexture(config.atlas.replace(".atlas", ".png"));
-            requestAnimationFrame(function () { _this.load(); });
-        }
-        SpineWidget.prototype.validateConfig = function (config) {
-            if (!config.atlas)
-                throw new Error("Please specify config.atlas");
-            if (!config.json)
-                throw new Error("Please specify config.json");
-            if (!config.animation)
-                throw new Error("Please specify config.animationName");
-            if (!config.scale)
-                config.scale = 1.0;
-            if (!config.skin)
-                config.skin = "default";
-            if (config.loop === undefined)
-                config.loop = true;
-            if (!config.y)
-                config.y = 20;
-            if (!config.width)
-                config.width = 640;
-            if (!config.height)
-                config.height = 480;
-            if (!config.x)
-                config.x = config.width / 2;
-            if (!config.backgroundColor)
-                config.backgroundColor = "#555555";
-            if (!config.imagesPath) {
-                var index = config.atlas.lastIndexOf("/");
-                if (index != -1) {
-                    config.imagesPath = config.atlas.substr(0, index) + "/";
-                }
-                else {
-                    config.imagesPath = "";
-                }
-            }
-            if (!config.premultipliedAlpha === undefined)
-                config.premultipliedAlpha = false;
-            this._backgroundColor.setFromString(config.backgroundColor);
-            this._config = config;
-        };
-        SpineWidget.prototype.load = function () {
-            var _this = this;
-            var assetManager = this._assetManager;
-            var imagesPath = this._config.imagesPath;
-            var config = this._config;
-            if (assetManager.isLoadingComplete()) {
-                if (assetManager.hasErrors()) {
-                    if (config.error)
-                        config.error(this, "Failed to load assets: " + JSON.stringify(assetManager.errors));
-                    else
-                        throw new Error("Failed to load assets: " + JSON.stringify(assetManager.errors));
-                }
-                var atlas = new spine.TextureAtlas(this._assetManager.get(this._config.atlas), function (path) {
-                    var texture = assetManager.get(imagesPath + path);
-                    return texture;
-                });
-                var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
-                var skeletonJson = new spine.SkeletonJson(atlasLoader);
-                skeletonJson.scale = config.scale;
-                var skeletonData = skeletonJson.readSkeletonData(assetManager.get(config.json));
-                var skeleton = this.skeleton = new spine.Skeleton(skeletonData);
-                skeleton.x = config.x;
-                skeleton.y = config.y;
-                skeleton.setSkinByName(config.skin);
-                var animationState = this.state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
-                animationState.setAnimation(0, config.animation, true);
-                if (config.success)
-                    config.success(this);
-                this._loaded = true;
-                requestAnimationFrame(function () { _this.render(); });
-            }
-            else
-                requestAnimationFrame(function () { _this.load(); });
-        };
-        SpineWidget.prototype.render = function () {
-            var _this = this;
-            var now = Date.now() / 1000;
-            var delta = now - this._lastFrameTime;
-            if (delta > 0.1)
-                delta = 0;
-            this._lastFrameTime = now;
-            var gl = this.gl;
-            var color = this._backgroundColor;
-            gl.clearColor(color.r, color.g, color.b, color.a);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            var state = this.state;
-            var skeleton = this.skeleton;
-            var premultipliedAlpha = this._config.premultipliedAlpha;
-            state.update(delta);
-            state.apply(skeleton);
-            skeleton.updateWorldTransform();
-            var shader = this._shader;
-            shader.bind();
-            shader.setUniformi(spine.webgl.Shader.SAMPLER, 0);
-            shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, this._mvp.values);
-            var batcher = this._batcher;
-            var skeletonRenderer = this._skeletonRenderer;
-            batcher.begin(shader);
-            skeletonRenderer.premultipliedAlpha = premultipliedAlpha;
-            skeletonRenderer.draw(batcher, skeleton);
-            batcher.end();
-            shader.unbind();
-            if (!this._paused)
-                requestAnimationFrame(function () { _this.render(); });
-        };
-        SpineWidget.prototype.pause = function () {
-            this._paused = true;
-        };
-        SpineWidget.prototype.play = function () {
-            var _this = this;
-            this._paused = false;
-            requestAnimationFrame(function () { _this.render(); });
-        };
-        SpineWidget.prototype.isPlaying = function () {
-            return !this._paused;
-        };
-        SpineWidget.prototype.setAnimation = function (animationName) {
-            if (!this._loaded)
-                throw new Error("Widget isn't loaded yet");
-            this.skeleton.setToSetupPose();
-            this.state.setAnimation(0, animationName, this._config.loop);
-        };
-        SpineWidget.loadWidgets = function () {
-            var widgets = document.getElementsByClassName("spine-widget");
-            for (var i = 0; i < widgets.length; i++) {
-                SpineWidget.loadWidget(widgets[i]);
-            }
-        };
-        SpineWidget.loadWidget = function (widget) {
-            var config = new SpineWidgetConfig();
-            config.atlas = widget.getAttribute("data-atlas");
-            config.json = widget.getAttribute("data-json");
-            config.animation = widget.getAttribute("data-animation");
-            if (widget.getAttribute("data-images-path"))
-                config.imagesPath = widget.getAttribute("data-images-path");
-            if (widget.getAttribute("data-skin"))
-                config.skin = widget.getAttribute("data-skin");
-            if (widget.getAttribute("data-loop"))
-                config.loop = widget.getAttribute("data-loop") === "true";
-            if (widget.getAttribute("data-scale"))
-                config.scale = parseFloat(widget.getAttribute("data-scale"));
-            if (widget.getAttribute("data-x"))
-                config.x = parseFloat(widget.getAttribute("data-x"));
-            if (widget.getAttribute("data-y"))
-                config.x = parseFloat(widget.getAttribute("data-y"));
-            if (widget.getAttribute("data-width"))
-                config.width = parseInt(widget.getAttribute("data-width"));
-            if (widget.getAttribute("data-height"))
-                config.height = parseInt(widget.getAttribute("data-height"));
-            if (widget.getAttribute("data-background-color"))
-                config.backgroundColor = widget.getAttribute("data-background-color");
-            if (widget.getAttribute("data-premultiplied-alpha"))
-                config.premultipliedAlpha = widget.getAttribute("data-premultiplied-alpha") === "true";
-            new spine.SpineWidget(widget, config);
-        };
-        SpineWidget.ready = function () {
-            if (SpineWidget.pageLoaded)
-                return;
-            SpineWidget.pageLoaded = true;
-            SpineWidget.loadWidgets();
-        };
-        SpineWidget.setupDOMListener = function () {
-            if (document.addEventListener) {
-                document.addEventListener("DOMContentLoaded", SpineWidget.ready, false);
-                window.addEventListener("load", SpineWidget.ready, false);
-            }
-            else {
-                document.attachEvent("onreadystatechange", function readyStateChange() {
-                    if (document.readyState === "complete")
-                        SpineWidget.ready();
-                });
-                window.attachEvent("onload", SpineWidget.ready);
-            }
-        };
-        SpineWidget.pageLoaded = false;
-        return SpineWidget;
-    }());
-    spine.SpineWidget = SpineWidget;
-    var SpineWidgetConfig = (function () {
-        function SpineWidgetConfig() {
-            this.skin = "default";
-            this.loop = true;
-            this.scale = 1.0;
-            this.x = 0;
-            this.y = 0;
-            this.width = 640;
-            this.height = 480;
-            this.backgroundColor = "#555555";
-            this.premultipliedAlpha = false;
-        }
-        return SpineWidgetConfig;
-    }());
-    spine.SpineWidgetConfig = SpineWidgetConfig;
-})(spine || (spine = {}));
-spine.SpineWidget.setupDOMListener();
-//# sourceMappingURL=spine-all.js.map
+//# sourceMappingURL=spine-threejs.js.map

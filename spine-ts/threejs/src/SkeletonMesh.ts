@@ -3,8 +3,9 @@ module spine.threejs {
 
 		skeleton: Skeleton;
 		state: AnimationState;
+		zOffset: number = 0.1;
 
-		private _vertexBuffer: THREE.InterleavedBuffer;
+		private _batcher: MeshBatcher;
 
 		static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 
@@ -15,20 +16,11 @@ module spine.threejs {
 			let animData = new AnimationStateData(skeletonData);
 			this.state = new AnimationState(animData);
 
-			this.material = new THREE.MeshBasicMaterial();
-			this.material.vertexColors = THREE.VertexColors;
-
-			let geometry: THREE.BufferGeometry = this.geometry = new THREE.BufferGeometry();
-			let vertexBuffer = this._vertexBuffer = new THREE.InterleavedBuffer(new Float32Array(8 * 3 * 10920), 8);
-			vertexBuffer.setDynamic(true);
-			geometry.addAttribute("position", new THREE.InterleavedBufferAttribute(vertexBuffer, 2, 0, false));
-			geometry.addAttribute("color", new THREE.InterleavedBufferAttribute(vertexBuffer, 4, 2, false));
-			geometry.addAttribute("uv", new THREE.InterleavedBufferAttribute(vertexBuffer, 2, 6, false));
-
-			let indexBuffer = new Uint16Array(3 * 10920);	
-			geometry.setIndex(new THREE.BufferAttribute(indexBuffer, 1));
-			geometry.getIndex().dynamic = true;			
-			this.update(0);
+			let material = this.material = new THREE.MeshBasicMaterial();
+			material.side = THREE.DoubleSide;
+			material.transparent = true;
+			material.alphaTest = 0.5;									
+			this._batcher = new MeshBatcher(this);			
 		}
 
 		update(deltaTime: number) {
@@ -53,6 +45,10 @@ module spine.threejs {
 			let vertices: ArrayLike<number> = null;
 			let triangles: Array<number>  = null;
 			let drawOrder = this.skeleton.drawOrder;
+			let batcher = this._batcher;
+			batcher.begin();
+			let z = 0;
+			let zOffset = this.zOffset;
 			for (let i = 0, n = drawOrder.length; i < n; i++) {
 				let slot = drawOrder[i];
 				let attachment = slot.getAttachment();
@@ -71,7 +67,11 @@ module spine.threejs {
 				} else continue;
 
 				if (texture != null) {
-					(<THREE.MeshBasicMaterial>this.material).map = texture.texture;
+					if (!(<THREE.MeshBasicMaterial>this.material).map) {
+						let mat = <THREE.MeshBasicMaterial>this.material;						
+						mat.map = texture.texture;
+						mat.needsUpdate = true;						
+					}
 					// FIXME
 					//let slotBlendMode = slot.data.blendMode;					
 					//if (slotBlendMode != blendMode) {
@@ -79,25 +79,43 @@ module spine.threejs {
 					//	batcher.setBlendMode(getSourceGLBlendMode(this._gl, blendMode, premultipliedAlpha), getDestGLBlendMode(this._gl, blendMode));
 					//}
 					
-					let indexStart = verticesLength / 8;
-					(<Float32Array>this._vertexBuffer.array).set(vertices, verticesLength);
-					verticesLength += vertices.length;									
-
-					let indicesArray = geometry.getIndex().array;
-					for (let i = indicesLength, j = 0; j < triangles.length; i++, j++)
-						indicesArray[i] = triangles[j] + indexStart;
-					indicesLength += triangles.length;					
+					this._batcher.batch(vertices, triangles, z);
+					z += zOffset;				
 				}
 			}
 
-			geometry.drawRange.start = 0;
-			geometry.drawRange.count = indicesLength;
-			this._vertexBuffer.needsUpdate = true;
-			this._vertexBuffer.updateRange.offset = 0;
-			this._vertexBuffer.updateRange.count = verticesLength;		
-			geometry.getIndex().needsUpdate = true;
-			geometry.getIndex().updateRange.offset = 0;
-			geometry.getIndex().updateRange.count = indicesLength;
+			batcher.end();
+		}
+
+		static createMesh(map: THREE.Texture) {
+			let geo = new THREE.BufferGeometry();
+			let vertices = new Float32Array(1024);
+			vertices.set([
+				-200, -200, 1, 0, 0, 1, 0, 0,
+				200, -200, 0, 1, 0, 1, 1, 0,
+				200, 200, 0, 0, 1, 1, 1, 1,
+				-200, 200, 1, 1, 0, 0.1, 0, 1
+			], 0);
+			let vb = new THREE.InterleavedBuffer(vertices, 8);
+			var positions = new THREE.InterleavedBufferAttribute(vb, 2, 0, false);
+			geo.addAttribute("position", positions);
+			var colors = new THREE.InterleavedBufferAttribute(vb, 4, 2, false);
+			geo.addAttribute("color", colors);
+			var uvs = new THREE.InterleavedBufferAttribute(vb, 2, 6, false);
+			geo.addAttribute("uv", colors);
+
+			var indices = new Uint16Array(1024);
+			indices.set([0, 1, 2, 2, 3, 0], 0);
+			geo.setIndex(new THREE.BufferAttribute(indices, 1));
+			geo.drawRange.start = 0;
+			geo.drawRange.count = 6;
+
+			let mat = new THREE.MeshBasicMaterial();
+			mat.vertexColors = THREE.VertexColors;
+			mat.transparent = true;
+			mat.map = map;		
+			let mesh = new THREE.Mesh(geo, mat);
+			return mesh; 
 		}
 	}
 }

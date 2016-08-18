@@ -1,91 +1,4 @@
 declare module spine {
-    class AssetManager implements Disposable {
-        private _textureLoader;
-        private _assets;
-        private _errors;
-        private _toLoad;
-        private _loaded;
-        constructor(textureLoader: (image: HTMLImageElement) => any);
-        loadText(path: string, success?: (path: string, text: string) => void, error?: (path: string, error: string) => void): void;
-        loadTexture(path: string, success?: (path: string, image: HTMLImageElement) => void, error?: (path: string, error: string) => void): void;
-        get(path: string): any;
-        remove(path: string): void;
-        removeAll(): void;
-        isLoadingComplete(): boolean;
-        toLoad(): number;
-        loaded(): number;
-        dispose(): void;
-        hasErrors(): boolean;
-        errors(): Map<string>;
-    }
-}
-declare module spine.canvas {
-    class AssetManager extends spine.AssetManager {
-        constructor();
-    }
-}
-declare module spine {
-    abstract class Texture {
-        protected _image: HTMLImageElement;
-        constructor(image: HTMLImageElement);
-        getImage(): HTMLImageElement;
-        abstract setFilters(minFilter: TextureFilter, magFilter: TextureFilter): void;
-        abstract setWraps(uWrap: TextureWrap, vWrap: TextureWrap): void;
-        abstract dispose(): void;
-        static filterFromString(text: string): TextureFilter;
-        static wrapFromString(text: string): TextureWrap;
-    }
-    enum TextureFilter {
-        Nearest = 9728,
-        Linear = 9729,
-        MipMap = 9987,
-        MipMapNearestNearest = 9984,
-        MipMapLinearNearest = 9985,
-        MipMapNearestLinear = 9986,
-        MipMapLinearLinear = 9987,
-    }
-    enum TextureWrap {
-        MirroredRepeat = 33648,
-        ClampToEdge = 33071,
-        Repeat = 10497,
-    }
-    class TextureRegion {
-        renderObject: any;
-        u: number;
-        v: number;
-        u2: number;
-        v2: number;
-        width: number;
-        height: number;
-        rotate: boolean;
-        offsetX: number;
-        offsetY: number;
-        originalWidth: number;
-        originalHeight: number;
-    }
-}
-declare module spine.canvas {
-    class CanvasTexture extends Texture {
-        constructor(image: HTMLImageElement);
-        setFilters(minFilter: TextureFilter, magFilter: TextureFilter): void;
-        setWraps(uWrap: TextureWrap, vWrap: TextureWrap): void;
-        dispose(): void;
-    }
-}
-declare module spine.canvas {
-    class SkeletonRenderer {
-        static QUAD_TRIANGLES: number[];
-        private _ctx;
-        triangleRendering: boolean;
-        debugRendering: boolean;
-        constructor(context: CanvasRenderingContext2D);
-        draw(skeleton: Skeleton): void;
-        private drawImages(skeleton);
-        private drawTriangles(skeleton);
-        private drawTriangle(img, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2);
-    }
-}
-declare module spine {
     class Animation {
         name: string;
         timelines: Array<Timeline>;
@@ -319,6 +232,27 @@ declare module spine {
         setMix(fromName: string, toName: string, duration: number): void;
         setMixWith(from: Animation, to: Animation, duration: number): void;
         getMix(from: Animation, to: Animation): number;
+    }
+}
+declare module spine {
+    class AssetManager implements Disposable {
+        private _textureLoader;
+        private _assets;
+        private _errors;
+        private _toLoad;
+        private _loaded;
+        constructor(textureLoader: (image: HTMLImageElement) => any);
+        loadText(path: string, success?: (path: string, text: string) => void, error?: (path: string, error: string) => void): void;
+        loadTexture(path: string, success?: (path: string, image: HTMLImageElement) => void, error?: (path: string, error: string) => void): void;
+        get(path: string): any;
+        remove(path: string): void;
+        removeAll(): void;
+        isLoadingComplete(): boolean;
+        toLoad(): number;
+        loaded(): number;
+        dispose(): void;
+        hasErrors(): boolean;
+        errors(): Map<string>;
     }
 }
 declare module spine {
@@ -640,6 +574,46 @@ declare module spine {
     }
 }
 declare module spine {
+    abstract class Texture {
+        protected _image: HTMLImageElement;
+        constructor(image: HTMLImageElement);
+        getImage(): HTMLImageElement;
+        abstract setFilters(minFilter: TextureFilter, magFilter: TextureFilter): void;
+        abstract setWraps(uWrap: TextureWrap, vWrap: TextureWrap): void;
+        abstract dispose(): void;
+        static filterFromString(text: string): TextureFilter;
+        static wrapFromString(text: string): TextureWrap;
+    }
+    enum TextureFilter {
+        Nearest = 9728,
+        Linear = 9729,
+        MipMap = 9987,
+        MipMapNearestNearest = 9984,
+        MipMapLinearNearest = 9985,
+        MipMapNearestLinear = 9986,
+        MipMapLinearLinear = 9987,
+    }
+    enum TextureWrap {
+        MirroredRepeat = 33648,
+        ClampToEdge = 33071,
+        Repeat = 10497,
+    }
+    class TextureRegion {
+        renderObject: any;
+        u: number;
+        v: number;
+        u2: number;
+        v2: number;
+        width: number;
+        height: number;
+        rotate: boolean;
+        offsetX: number;
+        offsetY: number;
+        originalWidth: number;
+        originalHeight: number;
+    }
+}
+declare module spine {
     class TextureAtlas implements Disposable {
         pages: TextureAtlasPage[];
         regions: TextureAtlasRegion[];
@@ -941,253 +915,5 @@ declare module spine.threejs {
         dispose(): void;
         static toThreeJsTextureFilter(filter: TextureFilter): THREE.TextureFilter;
         static toThreeJsTextureWrap(wrap: TextureWrap): THREE.Wrapping;
-    }
-}
-declare module spine.webgl {
-    class AssetManager extends spine.AssetManager {
-        constructor(gl: WebGLRenderingContext);
-    }
-}
-declare module spine.webgl {
-    class GLTexture extends Texture implements Disposable {
-        private _gl;
-        private _texture;
-        private _boundUnit;
-        constructor(gl: WebGLRenderingContext, image: HTMLImageElement, useMipMaps?: boolean);
-        setFilters(minFilter: TextureFilter, magFilter: TextureFilter): void;
-        setWraps(uWrap: TextureWrap, vWrap: TextureWrap): void;
-        update(useMipMaps: boolean): void;
-        bind(unit?: number): void;
-        unbind(): void;
-        dispose(): void;
-    }
-}
-declare module spine.webgl {
-    const M00: number;
-    const M01: number;
-    const M02: number;
-    const M03: number;
-    const M10: number;
-    const M11: number;
-    const M12: number;
-    const M13: number;
-    const M20: number;
-    const M21: number;
-    const M22: number;
-    const M23: number;
-    const M30: number;
-    const M31: number;
-    const M32: number;
-    const M33: number;
-    class Matrix4 {
-        temp: Float32Array;
-        values: Float32Array;
-        constructor();
-        set(values: ArrayLike<number>): Matrix4;
-        transpose(): Matrix4;
-        identity(): Matrix4;
-        invert(): Matrix4;
-        determinant(): number;
-        translate(x: number, y: number, z: number): Matrix4;
-        copy(): Matrix4;
-        projection(near: number, far: number, fovy: number, aspectRatio: number): Matrix4;
-        ortho2d(x: number, y: number, width: number, height: number): Matrix4;
-        ortho(left: number, right: number, bottom: number, top: number, near: number, far: number): Matrix4;
-        multiply(matrix: Matrix4): Matrix4;
-        multiplyLeft(matrix: Matrix4): Matrix4;
-    }
-}
-declare module spine.webgl {
-    class Mesh implements Disposable {
-        private _attributes;
-        private _gl;
-        private _vertices;
-        private _verticesBuffer;
-        private _verticesLength;
-        private _dirtyVertices;
-        private _indices;
-        private _indicesBuffer;
-        private _indicesLength;
-        private _dirtyIndices;
-        private _elementsPerVertex;
-        attributes(): VertexAttribute[];
-        maxVertices(): number;
-        numVertices(): number;
-        setVerticesLength(length: number): void;
-        vertices(): Float32Array;
-        maxIndices(): number;
-        numIndices(): number;
-        setIndicesLength(length: number): void;
-        indices(): Uint16Array;
-        constructor(gl: WebGLRenderingContext, _attributes: VertexAttribute[], maxVertices: number, maxIndices: number);
-        setVertices(vertices: Array<number>): void;
-        setIndices(indices: Array<number>): void;
-        draw(shader: Shader, primitiveType: number): void;
-        drawWithOffset(shader: Shader, primitiveType: number, offset: number, count: number): void;
-        bind(shader: Shader): void;
-        unbind(shader: Shader): void;
-        private update();
-        dispose(): void;
-    }
-    class VertexAttribute {
-        name: string;
-        type: VertexAttributeType;
-        numElements: number;
-        constructor(name: string, type: VertexAttributeType, numElements: number);
-    }
-    class Position2Attribute extends VertexAttribute {
-        constructor();
-    }
-    class Position3Attribute extends VertexAttribute {
-        constructor();
-    }
-    class TexCoordAttribute extends VertexAttribute {
-        constructor(unit?: number);
-    }
-    class ColorAttribute extends VertexAttribute {
-        constructor();
-    }
-    enum VertexAttributeType {
-        Float = 0,
-    }
-}
-declare module spine.webgl {
-    class PolygonBatcher {
-        private _gl;
-        private _drawCalls;
-        private _drawing;
-        private _mesh;
-        private _shader;
-        private _lastTexture;
-        private _verticesLength;
-        private _indicesLength;
-        private _srcBlend;
-        private _dstBlend;
-        constructor(gl: WebGLRenderingContext, maxVertices?: number);
-        begin(shader: Shader): void;
-        setBlendMode(srcBlend: number, dstBlend: number): void;
-        draw(texture: GLTexture, vertices: ArrayLike<number>, indices: Array<number>): void;
-        private flush();
-        end(): void;
-        drawCalls(): number;
-    }
-}
-declare module spine.webgl {
-    class Shader implements Disposable {
-        private _vertexShader;
-        private _fragmentShader;
-        static MVP_MATRIX: string;
-        static POSITION: string;
-        static COLOR: string;
-        static TEXCOORDS: string;
-        static SAMPLER: string;
-        private _gl;
-        private _vs;
-        private _fs;
-        private _program;
-        private _tmp2x2;
-        private _tmp3x3;
-        private _tmp4x4;
-        program(): WebGLProgram;
-        vertexShader(): string;
-        fragmentShader(): string;
-        constructor(gl: WebGLRenderingContext, _vertexShader: string, _fragmentShader: string);
-        private compile();
-        private compileShader(type, source);
-        private compileProgram(vs, fs);
-        bind(): void;
-        unbind(): void;
-        setUniformi(uniform: string, value: number): void;
-        setUniformf(uniform: string, value: number): void;
-        setUniform2f(uniform: string, value: number, value2: number): void;
-        setUniform3f(uniform: string, value: number, value2: number, value3: number): void;
-        setUniform4f(uniform: string, value: number, value2: number, value3: number, value4: number): void;
-        setUniform2x2f(uniform: string, value: ArrayLike<number>): void;
-        setUniform3x3f(uniform: string, value: ArrayLike<number>): void;
-        setUniform4x4f(uniform: string, value: ArrayLike<number>): void;
-        getUniformLocation(uniform: string): WebGLUniformLocation;
-        getAttributeLocation(attribute: string): number;
-        dispose(): void;
-        static newColoredTextured(gl: WebGLRenderingContext): Shader;
-        static newColored(gl: WebGLRenderingContext): Shader;
-    }
-}
-declare module spine.webgl {
-    class SkeletonRenderer {
-        static QUAD_TRIANGLES: number[];
-        premultipliedAlpha: boolean;
-        private _gl;
-        constructor(gl: WebGLRenderingContext);
-        draw(batcher: PolygonBatcher, skeleton: Skeleton): void;
-    }
-}
-declare module spine.webgl {
-    class Vector3 {
-        x: number;
-        y: number;
-        z: number;
-        set(x: number, y: number, z: number): Vector3;
-        add(v: Vector3): Vector3;
-        sub(v: Vector3): Vector3;
-        scale(s: number): Vector3;
-        normalize(): Vector3;
-        cross(v: Vector3): Vector3;
-        multiply(matrix: Matrix4): Vector3;
-        project(matrix: Matrix4): Vector3;
-        dot(v: Vector3): number;
-        length(): number;
-        distance(v: Vector3): number;
-    }
-}
-declare module spine.webgl {
-    function getSourceGLBlendMode(gl: WebGLRenderingContext, blendMode: BlendMode, premultipliedAlpha?: boolean): number;
-    function getDestGLBlendMode(gl: WebGLRenderingContext, blendMode: BlendMode): number;
-}
-declare module spine {
-    class SpineWidget {
-        skeleton: Skeleton;
-        state: AnimationState;
-        gl: WebGLRenderingContext;
-        canvas: HTMLCanvasElement;
-        private _config;
-        private _assetManager;
-        private _shader;
-        private _batcher;
-        private _mvp;
-        private _skeletonRenderer;
-        private _paused;
-        private _lastFrameTime;
-        private _backgroundColor;
-        private _loaded;
-        constructor(element: Element | string, config: SpineWidgetConfig);
-        private validateConfig(config);
-        private load();
-        private render();
-        pause(): void;
-        play(): void;
-        isPlaying(): boolean;
-        setAnimation(animationName: string): void;
-        static loadWidgets(): void;
-        static loadWidget(widget: Element): void;
-        static pageLoaded: boolean;
-        private static ready();
-        static setupDOMListener(): void;
-    }
-    class SpineWidgetConfig {
-        json: string;
-        atlas: string;
-        animation: string;
-        imagesPath: string;
-        skin: string;
-        loop: boolean;
-        scale: number;
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-        backgroundColor: string;
-        premultipliedAlpha: boolean;
-        success: (widget: SpineWidget) => void;
-        error: (widget: SpineWidget, msg: string) => void;
     }
 }

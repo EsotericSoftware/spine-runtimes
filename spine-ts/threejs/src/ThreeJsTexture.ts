@@ -5,6 +5,8 @@ module spine.threejs {
 		constructor (image: HTMLImageElement) {
 			super(image);
 			this.texture = new THREE.Texture(image);
+			this.texture.flipY = false;
+			this.texture.needsUpdate = true;
 		}
 
 		setFilters (minFilter: TextureFilter, magFilter: TextureFilter) {

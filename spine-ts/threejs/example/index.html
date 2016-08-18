@@ -14,20 +14,16 @@
 var scene, camera, renderer;
 var geometry, material, mesh, skeletonMesh;
 var assetManager;
-var lastFrameTime = Date.now();
+var lastFrameTime = Date.now() / 1000;
+var dynMesh;
+var batcher;
 
 function init () {
 	scene = new THREE.Scene();
 
 	var width = 640, height = 480;
 	camera = new THREE.PerspectiveCamera(75, width / height, 1, 3000);
-	camera.position.z = 400;
-
-	geometry = new THREE.BoxGeometry(200, 200, 200);
-	material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
-
-	mesh = new THREE.Mesh(geometry, material);
-	scene.add(mesh);	
+	camera.position.z = 400;	
 
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize(width, height);
@@ -43,17 +39,23 @@ function init () {
 }
 
 function load (name, scale) {
-	if (assetManager.isLoadingComplete()) {
+	if (assetManager.isLoadingComplete()) {	
+		// Add a box to the scene to which we attach the skeleton mesh
+		geometry = new THREE.BoxGeometry(200, 200, 200);
+		material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
+		mesh = new THREE.Mesh(geometry, material);
+		scene.add(mesh);
+
 		// Load the texture atlas using name.atlas and name.png from the AssetManager.
 		// The function passed to TextureAtlas is used to resolve relative paths.
 		atlas = new spine.TextureAtlas(assetManager.get("assets/raptor.atlas"), function(path) {
 			return assetManager.get("assets/" + path);		
 		});
-
 		var skeletonData = loadSkeleton("raptor", 0.4);
 		skeletonMesh = new spine.threejs.SkeletonMesh(skeletonData);
 		skeletonMesh.state.setAnimation(0, "walk", true);
 		mesh.add(skeletonMesh);
+
 		requestAnimationFrame(render);
 	} else requestAnimationFrame(load);
 }
