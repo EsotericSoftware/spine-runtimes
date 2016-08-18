@@ -290,7 +290,7 @@ public class AnimationStateTest {
 			expect(1, "complete 1", 1, 1.4f), //
 			expect(1, "end", 1, 1.5f) //
 		);
-		state.setDefaultEventThreshold(0.5f);
+		state.setEventThreshold(0.5f);
 		state.setAnimation(0, "events1", false);
 		state.addAnimation(0, "events2", false, 0.4f);
 		run(0.1f, 1000);
@@ -315,7 +315,7 @@ public class AnimationStateTest {
 			expect(1, "complete 1", 1, 1.4f), //
 			expect(1, "end", 1, 1.5f) //
 		);
-		state.setDefaultEventThreshold(1);
+		state.setEventThreshold(1);
 		state.setAnimation(0, "events1", false);
 		state.addAnimation(0, "events2", false, 0.4f);
 		run(0.1f, 1000);

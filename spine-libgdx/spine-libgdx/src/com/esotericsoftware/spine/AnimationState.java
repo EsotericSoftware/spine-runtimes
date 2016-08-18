@@ -36,6 +36,7 @@ import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
+import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 
 /** Stores state for an animation and automatically mixes between animations. */
@@ -46,7 +47,7 @@ public class AnimationState {
 	private final EventQueue queue = new EventQueue();
 	final Array<AnimationStateListener> listeners = new Array();
 	private float timeScale = 1;
-	private float defaultEventThreshold, defaultAttachmentThreshold;
+	private float eventThreshold, attachmentThreshold, drawOrderThreshold;
 
 	final Pool<TrackEntry> trackEntryPool = new Pool() {
 		protected Object newObject () {
@@ -141,13 +142,15 @@ public class AnimationState {
 		Array<Event> events = mix < previous.eventThreshold ? this.events : null;
 
 		Array<Timeline> timelines = animation.timelines;
-		if (mix < previous.attachmentThreshold) {
+		boolean attachments = mix < previous.attachmentThreshold, drawOrder = mix < previous.drawOrderThreshold;
+		if (attachments && drawOrder) {
 			for (int i = 0, n = timelines.size; i < n; i++)
 				timelines.get(i).apply(skeleton, lastTime, time, events, alpha);
 		} else {
 			for (int i = 0, n = timelines.size; i < n; i++) {
 				Timeline timeline = timelines.get(i);
-				if (timeline instanceof AttachmentTimeline) continue;
+				if (!attachments && timeline instanceof AttachmentTimeline) continue;
+				if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
 				timeline.apply(skeleton, lastTime, time, events, alpha);
 			}
 		}
@@ -262,8 +265,9 @@ public class AnimationState {
 		entry.animation = animation;
 		entry.loop = loop;
 		entry.endTime = animation.getDuration();
-		entry.eventThreshold = defaultEventThreshold;
-		entry.attachmentThreshold = defaultAttachmentThreshold;
+		entry.eventThreshold = eventThreshold;
+		entry.attachmentThreshold = attachmentThreshold;
+		entry.drawOrderThreshold = drawOrderThreshold;
 
 		setCurrent(trackIndex, entry);
 		queue.drain();
@@ -284,8 +288,9 @@ public class AnimationState {
 		entry.animation = animation;
 		entry.loop = loop;
 		entry.endTime = animation.getDuration();
-		entry.eventThreshold = defaultEventThreshold;
-		entry.attachmentThreshold = defaultAttachmentThreshold;
+		entry.eventThreshold = eventThreshold;
+		entry.attachmentThreshold = attachmentThreshold;
+		entry.drawOrderThreshold = drawOrderThreshold;
 
 		TrackEntry last = expandToIndex(trackIndex);
 		if (last != null) {
@@ -339,20 +344,28 @@ public class AnimationState {
 		this.timeScale = timeScale;
 	}
 
-	public float getDefaultEventThreshold () {
-		return defaultEventThreshold;
+	public float getEventThreshold () {
+		return eventThreshold;
 	}
 
-	public void setDefaultEventThreshold (float defaultEventThreshold) {
-		this.defaultEventThreshold = defaultEventThreshold;
+	public void setEventThreshold (float eventThreshold) {
+		this.eventThreshold = eventThreshold;
 	}
 
-	public float getDefaultAttachmentThreshold () {
-		return defaultAttachmentThreshold;
+	public float getAttachmentThreshold () {
+		return attachmentThreshold;
 	}
 
-	public void setDefaultAttachmentThreshold (float defaultAttachmentThreshold) {
-		this.defaultAttachmentThreshold = defaultAttachmentThreshold;
+	public void setAttachmentThreshold (float attachmentThreshold) {
+		this.attachmentThreshold = attachmentThreshold;
+	}
+
+	public float getDrawOrderThreshold () {
+		return drawOrderThreshold;
+	}
+
+	public void setDrawOrderThreshold (float drawOrderThreshold) {
+		this.drawOrderThreshold = drawOrderThreshold;
 	}
 
 	public AnimationStateData getData () {
@@ -385,7 +398,8 @@ public class AnimationState {
 		TrackEntry next, previous;
 		Animation animation;
 		boolean loop;
-		float delay, time, lastTime = -1, endTime, timeScale = 1, eventThreshold, attachmentThreshold;
+		float delay, time, lastTime = -1, endTime, timeScale = 1;
+		float eventThreshold, attachmentThreshold, drawOrderThreshold;
 		float mixTime, mixDuration;
 		AnimationStateListener listener;
 		float alpha = 1;
@@ -486,6 +500,14 @@ public class AnimationState {
 
 		public void setAttachmentThreshold (float attachmentThreshold) {
 			this.attachmentThreshold = attachmentThreshold;
+		}
+
+		public float getDrawOrderThreshold () {
+			return drawOrderThreshold;
+		}
+
+		public void setDrawOrderThreshold (float drawOrderThreshold) {
+			this.drawOrderThreshold = drawOrderThreshold;
 		}
 
 		public TrackEntry getNext () {
