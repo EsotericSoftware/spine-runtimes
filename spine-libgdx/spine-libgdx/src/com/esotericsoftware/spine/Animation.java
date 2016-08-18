@@ -397,9 +397,9 @@ public class Animation {
 			} else {
 				x *= bone.data.scaleX;
 				y *= bone.data.scaleY;
-				float bx = Math.abs(bone.scaleX), by = Math.abs(bone.scaleY);
-				bone.scaleX = (bx + (Math.abs(x) - bx) * alpha) * Math.signum(x);
-				bone.scaleY = (by + (Math.abs(y) - by) * alpha) * Math.signum(y);
+				float bx = Math.abs(bone.scaleX) * Math.signum(x), by = Math.abs(bone.scaleY) * Math.signum(y);
+				bone.scaleX = (bx + (x - bx) * alpha);
+				bone.scaleY = (by + (y - by) * alpha);
 			}
 		}
 	}
