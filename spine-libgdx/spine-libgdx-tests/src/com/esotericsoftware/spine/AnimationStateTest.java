@@ -114,91 +114,91 @@ public class AnimationStateTest {
 		stateData = new AnimationStateData(skeletonData);
 
 		setup( // 1
-			expect("start", 0, 0, 0), //
-			expect("event 0", 0, 0, 0), //
-			expect("event 14", 0, 0.5f, 0.5f), //
-			expect("event 30", 0, 1, 1), //
-			expect("complete 1", 0, 1, 1), //
-			expect("end", 0, 1, 1.1f) //
+			expect(0, "start", 0, 0), //
+			expect(0, "event 0", 0, 0), //
+			expect(0, "event 14", 0.5f, 0.5f), //
+			expect(0, "event 30", 1, 1), //
+			expect(0, "complete 1", 1, 1), //
+			expect(0, "end", 1, 1.1f) //
 		);
 		state.setAnimation(0, "events1", false);
 		run(0.1f, 1000);
 
 		setup( // 2
-			expect("start", 0, 0, 0), //
-			expect("event 0", 0, 0, 0), //
-			expect("event 14", 0, 0.467f, 0.467f), //
-			expect("event 30", 0, 1.017f, 1.017f), //
-			expect("complete 1", 0, 1.017f, 1.017f), //
-			expect("end", 0, 1.017f, 1.033f) //
+			expect(0, "start", 0, 0), //
+			expect(0, "event 0", 0, 0), //
+			expect(0, "event 14", 0.467f, 0.467f), //
+			expect(0, "event 30", 1.017f, 1.017f), //
+			expect(0, "complete 1", 1.017f, 1.017f), //
+			expect(0, "end", 1.017f, 1.033f) //
 		);
 		state.setAnimation(0, "events1", false);
 		run(1 / 60f, 1000);
 
 		setup( // 3
-			expect("start", 0, 0, 0), //
-			expect("event 0", 0, 0, 0), //
-			expect("event 14", 0, 30, 30), //
-			expect("event 30", 0, 30, 30), //
-			expect("complete 1", 0, 30, 30), //
-			expect("end", 0, 30, 60) //
+			expect(0, "start", 0, 0), //
+			expect(0, "event 0", 0, 0), //
+			expect(0, "event 14", 30, 30), //
+			expect(0, "event 30", 30, 30), //
+			expect(0, "complete 1", 30, 30), //
+			expect(0, "end", 30, 60) //
 		);
 		state.setAnimation(0, "events1", false);
 		run(30, 1000);
 
 		setup( // 4
-			expect("start", 0, 0, 0), //
-			expect("event 0", 0, 0, 0), //
-			expect("event 14", 0, 1, 1), //
-			expect("event 30", 0, 1, 1), //
-			expect("complete 1", 0, 1, 1), //
-			expect("end", 0, 1, 2) //
+			expect(0, "start", 0, 0), //
+			expect(0, "event 0", 0, 0), //
+			expect(0, "event 14", 1, 1), //
+			expect(0, "event 30", 1, 1), //
+			expect(0, "complete 1", 1, 1), //
+			expect(0, "end", 1, 2) //
 		);
 		state.setAnimation(0, "events1", false);
 		run(1, 1.01f);
 
 		setup( // 5
-			expect("start", 0, 0, 0), //
-			expect("event 0", 0, 0, 0), //
-			expect("event 14", 0, 0.5f, 0.5f), //
-			expect("event 30", 0, 1, 1), //
-			expect("complete 1", 0, 1, 1), //
-			expect("event 0", 0, 1, 1), //
-			expect("event 14", 0, 1.5f, 1.5f), //
-			expect("event 30", 0, 2, 2), //
-			expect("complete 2", 0, 2, 2), //
-			expect("event 0", 0, 2, 2) //
+			expect(0, "start", 0, 0), //
+			expect(0, "event 0", 0, 0), //
+			expect(0, "event 14", 0.5f, 0.5f), //
+			expect(0, "event 30", 1, 1), //
+			expect(0, "complete 1", 1, 1), //
+			expect(0, "event 0", 1, 1), //
+			expect(0, "event 14", 1.5f, 1.5f), //
+			expect(0, "event 30", 2, 2), //
+			expect(0, "complete 2", 2, 2), //
+			expect(0, "event 0", 2, 2) //
 		);
 		state.setAnimation(0, "events1", true);
 		run(0.1f, 2.3f);
 
 		setup( // 6
-			expect("start", 0, 0, 0), //
-			expect("event 0", 0, 0, 0), //
-			expect("event 14", 0, 0.5f, 0.5f), //
-			expect("event 30", 0, 1, 1), //
-			expect("complete 1", 0, 1, 1), //
+			expect(0, "start", 0, 0), //
+			expect(0, "event 0", 0, 0), //
+			expect(0, "event 14", 0.5f, 0.5f), //
+			expect(0, "event 30", 1, 1), //
+			expect(0, "complete 1", 1, 1), //
 
-			expect("start", 1, 0.1f, 1.1f), //
+			expect(1, "start", 0.1f, 1.1f), //
 
-			expect("interrupt", 0, 1.1f, 1.1f), //
-			expect("end", 0, 1.1f, 1.1f), //
+			expect(0, "interrupt", 1.1f, 1.1f), //
+			expect(0, "end", 1.1f, 1.1f), //
 
-			expect("event 0", 1, 0.1f, 1.1f), //
-			expect("event 14", 1, 0.5f, 1.5f), //
-			expect("event 30", 1, 1, 2), //
-			expect("complete 1", 1, 1, 2), //
+			expect(1, "event 0", 0.1f, 1.1f), //
+			expect(1, "event 14", 0.5f, 1.5f), //
+			expect(1, "event 30", 1, 2), //
+			expect(1, "complete 1", 1, 2), //
 
-			expect("start", 0, 0.1f, 2.1f), //
+			expect(0, "start", 0.1f, 2.1f), //
 
-			expect("interrupt", 1, 1.1f, 2.1f), //
-			expect("end", 1, 1.1f, 2.1f), //
+			expect(1, "interrupt", 1.1f, 2.1f), //
+			expect(1, "end", 1.1f, 2.1f), //
 
-			expect("event 0", 0, 0.1f, 2.1f), //
-			expect("event 14", 0, 0.5f, 2.5f), //
-			expect("event 30", 0, 1, 3), //
-			expect("complete 1", 0, 1, 3), //
-			expect("end", 0, 1, 3.1f) //
+			expect(0, "event 0", 0.1f, 2.1f), //
+			expect(0, "event 14", 0.5f, 2.5f), //
+			expect(0, "event 30", 1, 3), //
+			expect(0, "complete 1", 1, 3), //
+			expect(0, "end", 1, 3.1f) //
 		);
 		state.setAnimation(0, "events1", false);
 		state.addAnimation(0, "events2", false, 0);
@@ -206,50 +206,121 @@ public class AnimationStateTest {
 		run(0.1f, 4f);
 
 		setup( // 7
-			expect("start", 0, 0, 0), //
-			expect("event 0", 0, 0, 0), //
-			expect("event 14", 0, 0.5f, 0.5f), //
+			expect(0, "start", 0, 0), //
+			expect(0, "event 0", 0, 0), //
+			expect(0, "event 14", 0.5f, 0.5f), //
 
-			expect("start", 1, 0.1f, 0.6f), //
+			expect(1, "start", 0.1f, 0.6f), //
 
-			expect("interrupt", 0, 0.6f, 0.6f), //
-			expect("end", 0, 0.6f, 0.6f), //
+			expect(0, "interrupt", 0.6f, 0.6f), //
+			expect(0, "end", 0.6f, 0.6f), //
 
-			expect("event 0", 1, 0.1f, 0.6f), //
-			expect("event 14", 1, 0.5f, 1.0f), //
-			expect("event 30", 1, 1, 1.5f), //
-			expect("complete 1", 1, 1, 1.5f), //
-			expect("end", 1, 1, 1.6f) //
+			expect(1, "event 0", 0.1f, 0.6f), //
+			expect(1, "event 14", 0.5f, 1.0f), //
+			expect(1, "event 30", 1, 1.5f), //
+			expect(1, "complete 1", 1, 1.5f), //
+			expect(1, "end", 1, 1.6f) //
 		);
 		state.setAnimation(0, "events1", false);
 		state.addAnimation(0, "events2", false, 0.5f);
 		run(0.1f, 1000);
 
 		setup( // 8
-			expect("start", 0, 0, 0), //
-			expect("event 0", 0, 0, 0), //
-			expect("event 14", 0, 0.5f, 0.5f), //
+			expect(0, "start", 0, 0), //
+			expect(0, "event 0", 0, 0), //
+			expect(0, "event 14", 0.5f, 0.5f), //
 
-			expect("start", 1, 0.1f, 1), //
+			expect(1, "start", 0.1f, 1), //
 
-			expect("interrupt", 0, 1, 1), //
-			expect("event 30", 0, 1, 1), //
-			expect("complete 1", 0, 1, 1), //
-			expect("event 0", 0, 1, 1), //
+			expect(0, "interrupt", 1, 1), //
+			expect(0, "event 30", 1, 1), //
+			expect(0, "complete 1", 1, 1), //
+			expect(0, "event 0", 1, 1), //
 
-			expect("event 0", 1, 0.1f, 1), //
-			expect("event 14", 1, 0.5f, 1.4f), //
+			expect(1, "event 0", 0.1f, 1), //
+			expect(1, "event 14", 0.5f, 1.4f), //
 
-			expect("event 14", 0, 1.5f, 1.5f), //
-			expect("end", 0, 1.6f, 1.6f), //
+			expect(0, "event 14", 1.5f, 1.5f), //
+			expect(0, "end", 1.6f, 1.6f), //
 
-			expect("event 30", 1, 1, 1.9f), //
-			expect("complete 1", 1, 1, 1.9f), //
-			expect("end", 1, 1, 2) //
+			expect(1, "event 30", 1, 1.9f), //
+			expect(1, "complete 1", 1, 1.9f), //
+			expect(1, "end", 1, 2) //
 		);
 		stateData.setMix("events1", "events2", 0.7f);
 		state.setAnimation(0, "events1", true);
 		state.addAnimation(0, "events2", false, 0.9f);
+		run(0.1f, 1000);
+
+		setup( // 9, first animation's events fire during mix
+			expect(0, "start", 0, 0), //
+			expect(0, "event 0", 0, 0), //
+
+			expect(1, "start", 0.1f, 0.5f), //
+
+			expect(0, "interrupt", 0.5f, 0.5f), //
+			expect(0, "event 14", 0.5f, 0.5f), //
+
+			expect(1, "event 0", 0.1f, 0.5f), //
+			expect(1, "event 14", 0.5f, 0.9f), //
+
+			expect(0, "event 30", 1, 1), //
+			expect(0, "complete 1", 1, 1), //
+			expect(0, "end", 1.1f, 1.1f), //
+
+			expect(1, "event 30", 1, 1.4f), //
+			expect(1, "complete 1", 1, 1.4f), //
+			expect(1, "end", 1, 1.5f) //
+		);
+		state.setAnimation(0, "events1", false);
+		state.addAnimation(0, "events2", false, 0.4f);
+		run(0.1f, 1000);
+
+		setup( // 10, only some of first animation's events fire during mix due to event threshold
+			expect(0, "start", 0, 0), //
+			expect(0, "event 0", 0, 0), //
+
+			expect(1, "start", 0.1f, 0.5f), //
+
+			expect(0, "interrupt", 0.5f, 0.5f), //
+			expect(0, "event 14", 0.5f, 0.5f), //
+
+			expect(1, "event 0", 0.1f, 0.5f), //
+			expect(1, "event 14", 0.5f, 0.9f), //
+
+			expect(0, "complete 1", 1, 1), //
+			expect(0, "end", 1.1f, 1.1f), //
+
+			expect(1, "event 30", 1, 1.4f), //
+			expect(1, "complete 1", 1, 1.4f), //
+			expect(1, "end", 1, 1.5f) //
+		);
+		state.setDefaultEventThreshold(0.5f);
+		state.setAnimation(0, "events1", false);
+		state.addAnimation(0, "events2", false, 0.4f);
+		run(0.1f, 1000);
+
+		setup( // 11, first animation's events do not fire during mix due to event threshold
+			expect(0, "start", 0, 0), //
+			expect(0, "event 0", 0, 0), //
+
+			expect(1, "start", 0.1f, 0.5f), //
+
+			expect(0, "interrupt", 0.5f, 0.5f), //
+
+			expect(1, "event 0", 0.1f, 0.5f), //
+			expect(1, "event 14", 0.5f, 0.9f), //
+
+			expect(0, "complete 1", 1, 1), //
+			expect(0, "end", 1.1f, 1.1f), //
+
+			expect(1, "event 30", 1, 1.4f), //
+			expect(1, "complete 1", 1, 1.4f), //
+			expect(1, "end", 1, 1.5f) //
+		);
+		state.setDefaultEventThreshold(0f);
+		state.setAnimation(0, "events1", false);
+		state.addAnimation(0, "events2", false, 0.4f);
 		run(0.1f, 1000);
 
 		System.out.println("AnimationState tests passed.");
@@ -285,7 +356,7 @@ public class AnimationStateTest {
 		System.out.println(buffer);
 	}
 
-	Result expect (String name, int animationIndex, float trackTime, float totalTime) {
+	Result expect (int animationIndex, String name, float trackTime, float totalTime) {
 		Result result = new Result();
 		result.name = name;
 		result.animationIndex = animationIndex;

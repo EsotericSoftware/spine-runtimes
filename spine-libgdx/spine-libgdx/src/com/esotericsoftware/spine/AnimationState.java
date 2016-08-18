@@ -44,6 +44,7 @@ public class AnimationState {
 	private final EventQueue queue = new EventQueue();
 	final Array<AnimationStateListener> listeners = new Array();
 	private float timeScale = 1;
+	private float defaultEventThreshold = 1;
 
 	final Pool<TrackEntry> trackEntryPool = new Pool() {
 		protected Object newObject () {
@@ -108,13 +109,15 @@ public class AnimationState {
 
 			TrackEntry previous = current.previous;
 			if (previous != null) {
+				mix *= current.mixTime / current.mixDuration;
+				Array<Event> previousEvents = mix < previous.eventThreshold ? events : null;
+
 				float previousTime = previous.time;
 				if (!previous.loop && previousTime > previous.endTime) previousTime = previous.endTime;
-				previous.animation.mix(skeleton, previous.lastTime, previousTime, previous.loop, events, previous.mix);
+				previous.animation.mix(skeleton, previous.lastTime, previousTime, previous.loop, previousEvents, previous.mix);
 				queueEvents(previous, previous.lastTime, previousTime, previous.endTime);
 				previous.lastTime = previousTime;
 
-				mix *= current.mixTime / current.mixDuration;
 				if (mix >= 1) {
 					mix = 1;
 					queue.end(current.previous);
@@ -236,6 +239,8 @@ public class AnimationState {
 		entry.animation = animation;
 		entry.loop = loop;
 		entry.endTime = animation.getDuration();
+		entry.eventThreshold = defaultEventThreshold;
+
 		setCurrent(trackIndex, entry);
 		queue.drain();
 		return entry;
@@ -255,6 +260,7 @@ public class AnimationState {
 		entry.animation = animation;
 		entry.loop = loop;
 		entry.endTime = animation.getDuration();
+		entry.eventThreshold = defaultEventThreshold;
 
 		TrackEntry last = expandToIndex(trackIndex);
 		if (last != null) {
@@ -308,6 +314,14 @@ public class AnimationState {
 		this.timeScale = timeScale;
 	}
 
+	public float getDefaultEventThreshold () {
+		return defaultEventThreshold;
+	}
+
+	public void setDefaultEventThreshold (float defaultEventThreshold) {
+		this.defaultEventThreshold = defaultEventThreshold;
+	}
+
 	public AnimationStateData getData () {
 		return data;
 	}
@@ -338,7 +352,7 @@ public class AnimationState {
 		TrackEntry next, previous;
 		Animation animation;
 		boolean loop;
-		float delay, time, lastTime = -1, endTime, timeScale = 1;
+		float delay, time, lastTime = -1, endTime, timeScale = 1, eventThreshold;
 		float mixTime, mixDuration;
 		AnimationStateListener listener;
 		float mix = 1;
@@ -423,6 +437,14 @@ public class AnimationState {
 
 		public void setTimeScale (float timeScale) {
 			this.timeScale = timeScale;
+		}
+
+		public float getEventThreshold () {
+			return eventThreshold;
+		}
+
+		public void setEventThreshold (float eventThreshold) {
+			this.eventThreshold = eventThreshold;
 		}
 
 		public TrackEntry getNext () {
