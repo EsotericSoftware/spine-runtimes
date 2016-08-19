@@ -101,5 +101,9 @@ public class AnimationStateData {
 			} else if (!a2.equals(other.a2)) return false;
 			return true;
 		}
+
+		public String toString () {
+			return a1.name + "->" + a2.name;
+		}
 	}
 }
