@@ -328,11 +328,22 @@ public class AnimationStateTest {
 			expect(0, "event 0", 0, 0), //
 			expect(0, "event 14", 0.5f, 0.5f), //
 			expect(0, "event 30", 1, 1), //
-			expect(0, "complete 1", 1, 1) //
+			expect(0, "complete 1", 1, 1), //
+
+			expect(1, "start", 0.1f, 2.1f), //
+
+			expect(0, "interrupt", 2.1f, 2.1f), //
+			expect(0, "end", 2.1f, 2.1f), //
+
+			expect(1, "event 0", 0.1f, 2.1f), //
+			expect(1, "event 14", 0.5f, 2.5f), //
+			expect(1, "event 30", 1, 3), //
+			expect(1, "complete 1", 1, 3), //
+			expect(1, "end", 1, 3.1f) //
 		);
 		state.setAnimation(0, "events1", false);
 		state.addAnimation(0, "events2", false, 2);
-		run(0.1f, 1.9f);
+		run(0.1f, 4f);
 
 		setup("interrupt animation after first loop complete", // 13
 			expect(0, "start", 0, 0), //
@@ -375,6 +386,17 @@ public class AnimationStateTest {
 		state.addAnimation(0, "events1", false, 0);
 		run(0.1f, 1.9f);
 
+		setup("end time beyond non-looping animation duration", // 15
+			expect(0, "start", 0, 0), //
+			expect(0, "event 0", 0, 0), //
+			expect(0, "event 14", 0.5f, 0.5f), //
+			expect(0, "event 30", 1, 1), //
+			expect(0, "complete 1", 9.1f, 9.1f), //
+			expect(0, "end", 9.1f, 9.2f) //
+		);
+		state.setAnimation(0, "events1", false).endTime = 9;
+		run(0.1f, 10);
+
 		System.out.println("AnimationState tests passed.");
 	}
 
@@ -404,6 +426,12 @@ public class AnimationStateTest {
 			skeleton.update(incr);
 			state.update(incr);
 			state.apply(skeleton);
+		}
+		// Expecting more than actual is a failure.
+		for (int i = actual.size, n = expected.size; i < n; i++) {
+			buffer.append(String.format("%-29s", "<none>"));
+			buffer.append("FAIL: " + expected.get(i) + "\n");
+			fail = true;
 		}
 		actual.clear();
 		expected.clear();
