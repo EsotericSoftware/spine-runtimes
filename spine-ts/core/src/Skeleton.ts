@@ -449,7 +449,7 @@ module spine {
 				else if (attachment instanceof MeshAttachment) //
 					vertices = (<MeshAttachment>attachment).updateWorldVertices(slot, true);
 				if (vertices != null) {
-					for (let ii = 0, nn = vertices.length; ii < nn; ii += 5) {
+					for (let ii = 0, nn = vertices.length; ii < nn; ii += 8) {
 						let x = vertices[ii], y = vertices[ii + 1];
 						minX = Math.min(minX, x);
 						minY = Math.min(minY, y);

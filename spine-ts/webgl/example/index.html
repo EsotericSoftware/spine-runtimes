@@ -1,12 +1,19 @@
 <html>
 <script src="../../build/spine-webgl.js"></script>
 <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<style>
+	* { margin: 0; padding: 0; }
+	body, html { height: 100% }
+	canvas { position: absolute; width: 100% ;height: 100%; }
+</style>
 <body>
+<canvas id="canvas"></canvas>
 <center>
-<canvas id="canvas" style="width: 640; height: 480"></canvas></br>
+<div style="color: #fff; position: fixed; top: 0; width: 100%">
 <span>Skeleton:</span><select id="skeletonList"></select>
 <span>Animation:</span><select id="animationList"></select>
 <span>Skin:</span><select id="skinList"></select>
+<div>
 </center>
 </body>
 <script>
@@ -20,21 +27,21 @@ var mvp = new spine.webgl.Matrix4();
 var assetManager;
 var skeletonRenderer;
 var skeletons = {};
-var activeSkeleton = "raptor";
+var activeSkeleton = "spineboy";
 
 function init () {
 	// Setup canvas and WebGL context. We pass alpha: false to canvas.getContext() so we don't use premultiplied alpha when
 	// loading textures. That is handled separately by PolygonBatcher.
 	canvas = document.getElementById("canvas");
-	canvas.width = 640;
-	canvas.height = 480;
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
 	var config = { alpha: false };
 	gl = canvas.getContext("webgl", config) || canvas.getContext("experimental-webgl", config);	
 	
 	// Create a simple shader, mesh, model-view-projection matrix and SkeletonRenderer.
 	shader = spine.webgl.Shader.newColoredTextured(gl);
 	batcher = new spine.webgl.PolygonBatcher(gl);
-	mvp.ortho2d(0, 0, 639, 479);
+	mvp.ortho2d(0, 0, canvas.width - 1, canvas.height - 1);
 	skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);
 	assetManager = new spine.webgl.AssetManager(gl);
 
@@ -61,11 +68,11 @@ function init () {
 function load () {
 	// Wait until the AssetManager has loaded all resources, then load the skeletons.
 	if (assetManager.isLoadingComplete()) {
-		skeletons["spineboy"] = loadSkeleton("spineboy", 0.5, "test", 320, 20, false);
-		skeletons["raptor"] = loadSkeleton("raptor", 0.4, "walk", 320, 20, false);
-		skeletons["tank"] = loadSkeleton("tank", 0.3, "drive", 400, 20, false);
-		skeletons["goblins"] = loadSkeleton("goblins-mesh", 1, "walk", 320, 20, true, "goblin");
-		skeletons["vine"] = loadSkeleton("vine", 0.5, "animation", 320, 20, false);
+		skeletons["spineboy"] = loadSkeleton("spineboy", "run", false);
+		skeletons["raptor"] = loadSkeleton("raptor", "walk", false);
+		skeletons["tank"] = loadSkeleton("tank", "drive", false);
+		skeletons["goblins"] = loadSkeleton("goblins-mesh", "walk", true, "goblin");
+		skeletons["vine"] = loadSkeleton("vine", "animation", false);
 		setupUI();
 		requestAnimationFrame(render);
 	} else {
@@ -73,7 +80,7 @@ function load () {
 	}
 }
 
-function loadSkeleton (name, scale, initialAnimation, positionX, positionY, premultipliedAlpha, skin) {
+function loadSkeleton (name, initialAnimation, premultipliedAlpha, skin) {
 	if (skin === undefined) skin = "default";
 
 	// Load the texture atlas using name.atlas and name.png from the AssetManager.
@@ -88,12 +95,10 @@ function loadSkeleton (name, scale, initialAnimation, positionX, positionY, prem
 	// Create a SkeletonJson instance for parsing the .json file.
 	var skeletonJson = new spine.SkeletonJson(atlasLoader);
 	
-	// Set the scale to apply during parsing, parse the file, and create a new skeleton.
-	skeletonJson.scale = scale;
+	// Set the scale to apply during parsing, parse the file, and create a new skeleton.	
 	var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/" + name + ".json"));
 	var skeleton = new spine.Skeleton(skeletonData);
-	skeleton.x = positionX;
-	skeleton.y = positionY;
+	var bounds = calculateBounds(skeleton);
 	skeleton.setSkinByName(skin);
 
 	// Create an AnimationState, and set the initial animation in looping mode.
@@ -115,7 +120,17 @@ function loadSkeleton (name, scale, initialAnimation, positionX, positionY, prem
 	})
 
 	// Pack everything up and return to caller.
-	return { skeleton: skeleton, state: animationState, premultipliedAlpha: premultipliedAlpha };
+	return { skeleton: skeleton, state: animationState, bounds: bounds, premultipliedAlpha: premultipliedAlpha };
+}
+
+function calculateBounds(skeleton) {
+	var data = skeleton.data;
+	skeleton.setToSetupPose();
+	skeleton.updateWorldTransform();
+	var offset = new spine.Vector2();
+	var size = new spine.Vector2();
+	skeleton.getBounds(offset, size);
+	return { offset: offset, size: size };
 }
 
 function setupUI () {
@@ -146,6 +161,7 @@ function setupUI () {
 			var animationName = $("#animationList option:selected").text();
 			skeleton.setToSetupPose();
 			state.setAnimation(0, animationName, true);
+			scaleAndCenter(skeleton);
 		})
 	}
 
@@ -184,6 +200,9 @@ function render () {
 	var delta = now - lastFrameTime;
 	lastFrameTime = now;
 
+	// Update the MVP matrix to adjust for canvas size changes
+	resize();
+
 	gl.clearColor(0.3, 0.3, 0.3, 1);
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -209,6 +228,29 @@ function render () {
 	shader.unbind();
 
 	requestAnimationFrame(render);
+}
+
+function resize () {
+	var w = canvas.clientWidth;
+	var h = canvas.clientHeight;
+	var bounds = skeletons[activeSkeleton].bounds;
+	if (canvas.width != w || canvas.height != h) {
+		canvas.width = w;
+		canvas.height = h;
+	}
+
+	// magic
+	var centerX = bounds.offset.x + bounds.size.x / 2;
+	var centerY = bounds.offset.y + bounds.size.y / 2;
+	var scaleX = bounds.size.x / canvas.width;
+	var scaleY = bounds.size.y / canvas.height;
+	var scale = Math.max(scaleX, scaleY) * 1.2;
+	if (scale < 1) scale = 1;
+	var width = canvas.width * scale;
+	var height = canvas.height * scale;
+
+	mvp.ortho2d(centerX - width / 2, centerY - height / 2, width, height);
+	gl.viewport(0, 0, canvas.width, canvas.height);
 }
 
 (function() {

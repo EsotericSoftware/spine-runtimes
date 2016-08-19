@@ -5,23 +5,31 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.js"></script>
 <script src="../../build/spine-threejs.js"></script>
 </head>
+<style>
+	* { margin: 0; padding: 0; }
+	body, html { height: 100% }
+	canvas { position: absolute; width: 100% ;height: 100%; }
+</style>
 <body>
 <script>
 
 var scene, camera, renderer;
 var geometry, material, mesh, skeletonMesh;
 var assetManager;
+var canvas;
 var lastFrameTime = Date.now() / 1000;
 
 function init () {
 	// create the THREE.JS camera, scene and renderer (WebGL)
-	var width = 640, height = 480;
+	var width = window.innerWidth, height = window.innerHeight;	
 	camera = new THREE.PerspectiveCamera(75, width / height, 1, 3000);
+	camera.position.y = 100;
 	camera.position.z = 400;	
 	scene = new THREE.Scene();
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize(width, height);
 	document.body.appendChild(renderer.domElement);
+	canvas = renderer.domElement;
 
 	// load the assets required to display the Raptor model
 	assetManager = new spine.threejs.AssetManager();
@@ -82,6 +90,9 @@ function render() {
 	var delta = now - lastFrameTime;
 	lastFrameTime = now;
 	
+	// resize canvas to use full page, adjust camera/renderer
+	resize();
+
 	// rotate the cube
 	mesh.rotation.x = Math.sin(now) * Math.PI * 0.2;
 	mesh.rotation.y = Math.cos(now) * Math.PI * 0.4;
@@ -94,6 +105,21 @@ function render() {
 
 	requestAnimationFrame(render);
 }
+
+function resize () {
+	var w = window.innerWidth;
+	var h = window.innerHeight;	
+	if (canvas.width != w || canvas.height != h) {
+		canvas.width = w;
+		canvas.height = h;
+	}
+
+	camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(w, h);
+}
+
 (function() {
 	init();
 }());
