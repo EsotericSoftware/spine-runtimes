@@ -108,7 +108,10 @@ public class AnimationState {
 
 			float time = current.time, lastTime = current.lastTime, endTime = current.endTime, mix = current.alpha;
 			boolean loop = current.loop;
-			if (!loop && time > endTime) time = endTime;
+			if (!loop) {
+				if (time > endTime) time = endTime;
+				if (lastTime > endTime) lastTime = endTime;
+			}
 
 			if (current.previous != null) {
 				mix *= current.mixTime / current.mixDuration;
