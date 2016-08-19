@@ -72,8 +72,8 @@ namespace Spine {
 		public float WorldSignY { get { return worldSignY; } }
 		public float WorldRotationX { get { return MathUtils.Atan2(c, a) * MathUtils.radDeg; } }
 		public float WorldRotationY { get { return MathUtils.Atan2(d, b) * MathUtils.radDeg; } }
-		public float WorldScaleX { get { return (float)Math.Sqrt(a * a + b * b) * worldSignX; } }
-		public float WorldScaleY { get { return (float)Math.Sqrt(c * c + d * d) * worldSignY; } }
+		public float WorldScaleX { get { return (float)Math.Sqrt(a * a + c * c) * worldSignX; } }
+		public float WorldScaleY { get { return (float)Math.Sqrt(b * b + d * d) * worldSignY; } }
 
 		/// <param name="parent">May be null.</param>
 		public Bone (BoneData data, Skeleton skeleton, Bone parent) {
