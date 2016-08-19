@@ -364,6 +364,17 @@ public class AnimationStateTest {
 			}
 		});
 
+		setup("add animation on empty track", // 14
+			expect(0, "start", 0, 0), // s
+			expect(0, "event 0", 0, 0), //
+			expect(0, "event 14", 0.5f, 0.5f), //
+			expect(0, "event 30", 1, 1), //
+			expect(0, "complete 1", 1, 1), //
+			expect(0, "end", 1, 1.1f) //
+		);
+		state.addAnimation(0, "events1", false, 0);
+		run(0.1f, 1.9f);
+
 		System.out.println("AnimationState tests passed.");
 	}
 

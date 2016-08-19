@@ -301,7 +301,7 @@ public class AnimationState {
 				last = last.next;
 			last.next = entry;
 		} else
-			tracks.set(trackIndex, entry);
+			setCurrent(trackIndex, entry);
 
 		if (delay <= 0) {
 			if (last != null)
