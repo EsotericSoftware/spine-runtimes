@@ -302,7 +302,7 @@ public class AnimationState {
 
 		if (delay <= 0) {
 			if (last != null)
-				delay += last.endTime - data.getMix(last.animation, animation);
+				delay += last.endTime * (1 + (int)(last.time / last.endTime)) - data.getMix(last.animation, animation);
 			else
 				delay = 0;
 		}
