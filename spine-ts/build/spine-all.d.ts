@@ -1,10 +1,10 @@
 declare module spine {
     class AssetManager implements Disposable {
-        private _textureLoader;
-        private _assets;
-        private _errors;
-        private _toLoad;
-        private _loaded;
+        private textureLoader;
+        private assets;
+        private errors;
+        private toLoad;
+        private loaded;
         constructor(textureLoader: (image: HTMLImageElement) => any);
         loadText(path: string, success?: (path: string, text: string) => void, error?: (path: string, error: string) => void): void;
         loadTexture(path: string, success?: (path: string, image: HTMLImageElement) => void, error?: (path: string, error: string) => void): void;
@@ -12,11 +12,11 @@ declare module spine {
         remove(path: string): void;
         removeAll(): void;
         isLoadingComplete(): boolean;
-        toLoad(): number;
-        loaded(): number;
+        getToLoad(): number;
+        getLoaded(): number;
         dispose(): void;
         hasErrors(): boolean;
-        errors(): Map<string>;
+        getErrors(): Map<string>;
     }
 }
 declare module spine.canvas {
@@ -75,7 +75,7 @@ declare module spine.canvas {
 declare module spine.canvas {
     class SkeletonRenderer {
         static QUAD_TRIANGLES: number[];
-        private _ctx;
+        private ctx;
         triangleRendering: boolean;
         debugRendering: boolean;
         constructor(context: CanvasRenderingContext2D);
@@ -541,7 +541,7 @@ declare module spine {
         maxY: number;
         boundingBoxes: BoundingBoxAttachment[];
         polygons: ArrayLike<number>[];
-        private _polygonPool;
+        private polygonPool;
         update(skeleton: Skeleton, updateAabb: boolean): void;
         aabbCompute(): void;
         aabbContainsPoint(x: number, y: number): boolean;
@@ -757,8 +757,8 @@ declare module spine {
         static toFloatArray(array: Array<number>): Float32Array | number[];
     }
     class Pool<T> {
-        private _items;
-        private _instantiator;
+        private items;
+        private instantiator;
         constructor(instantiator: () => T);
         obtain(): T;
         free(item: T): void;
@@ -818,7 +818,7 @@ declare module spine {
         triangles: Array<number>;
         color: Color;
         hullLength: number;
-        private _parentMesh;
+        private parentMesh;
         inheritDeform: boolean;
         tempColor: Color;
         constructor(name: string);
@@ -908,11 +908,11 @@ declare module spine.threejs {
     class MeshBatcher {
         mesh: THREE.Mesh;
         private static VERTEX_SIZE;
-        private _vertexBuffer;
-        private _vertices;
-        private _verticesLength;
-        private _indices;
-        private _indicesLength;
+        private vertexBuffer;
+        private vertices;
+        private verticesLength;
+        private indices;
+        private indicesLength;
         constructor(mesh: THREE.Mesh, maxVertices?: number);
         begin(): void;
         batch(vertices: ArrayLike<number>, indices: ArrayLike<number>, z?: number): void;
@@ -924,7 +924,7 @@ declare module spine.threejs {
         skeleton: Skeleton;
         state: AnimationState;
         zOffset: number;
-        private _batcher;
+        private batcher;
         static QUAD_TRIANGLES: number[];
         constructor(skeletonData: SkeletonData);
         update(deltaTime: number): void;
@@ -950,9 +950,9 @@ declare module spine.webgl {
 }
 declare module spine.webgl {
     class GLTexture extends Texture implements Disposable {
-        private _gl;
-        private _texture;
-        private _boundUnit;
+        private gl;
+        private texture;
+        private boundUnit;
         constructor(gl: WebGLRenderingContext, image: HTMLImageElement, useMipMaps?: boolean);
         setFilters(minFilter: TextureFilter, magFilter: TextureFilter): void;
         setWraps(uWrap: TextureWrap, vWrap: TextureWrap): void;
@@ -999,27 +999,27 @@ declare module spine.webgl {
 }
 declare module spine.webgl {
     class Mesh implements Disposable {
-        private _attributes;
-        private _gl;
-        private _vertices;
-        private _verticesBuffer;
-        private _verticesLength;
-        private _dirtyVertices;
-        private _indices;
-        private _indicesBuffer;
-        private _indicesLength;
-        private _dirtyIndices;
-        private _elementsPerVertex;
-        attributes(): VertexAttribute[];
+        private attributes;
+        private gl;
+        private vertices;
+        private verticesBuffer;
+        private verticesLength;
+        private dirtyVertices;
+        private indices;
+        private indicesBuffer;
+        private indicesLength;
+        private dirtyIndices;
+        private elementsPerVertex;
+        getAttributes(): VertexAttribute[];
         maxVertices(): number;
         numVertices(): number;
         setVerticesLength(length: number): void;
-        vertices(): Float32Array;
+        getVertices(): Float32Array;
         maxIndices(): number;
         numIndices(): number;
         setIndicesLength(length: number): void;
-        indices(): Uint16Array;
-        constructor(gl: WebGLRenderingContext, _attributes: VertexAttribute[], maxVertices: number, maxIndices: number);
+        getIndices(): Uint16Array;
+        constructor(gl: WebGLRenderingContext, attributes: VertexAttribute[], maxVertices: number, maxIndices: number);
         setVertices(vertices: Array<number>): void;
         setIndices(indices: Array<number>): void;
         draw(shader: Shader, primitiveType: number): void;
@@ -1053,45 +1053,45 @@ declare module spine.webgl {
 }
 declare module spine.webgl {
     class PolygonBatcher {
-        private _gl;
-        private _drawCalls;
-        private _drawing;
-        private _mesh;
-        private _shader;
-        private _lastTexture;
-        private _verticesLength;
-        private _indicesLength;
-        private _srcBlend;
-        private _dstBlend;
+        private gl;
+        private drawCalls;
+        private drawing;
+        private mesh;
+        private shader;
+        private lastTexture;
+        private verticesLength;
+        private indicesLength;
+        private srcBlend;
+        private dstBlend;
         constructor(gl: WebGLRenderingContext, maxVertices?: number);
         begin(shader: Shader): void;
         setBlendMode(srcBlend: number, dstBlend: number): void;
         draw(texture: GLTexture, vertices: ArrayLike<number>, indices: Array<number>): void;
         private flush();
         end(): void;
-        drawCalls(): number;
+        getDrawCalls(): number;
     }
 }
 declare module spine.webgl {
     class Shader implements Disposable {
-        private _vertexShader;
-        private _fragmentShader;
+        private vertexShader;
+        private fragmentShader;
         static MVP_MATRIX: string;
         static POSITION: string;
         static COLOR: string;
         static TEXCOORDS: string;
         static SAMPLER: string;
-        private _gl;
-        private _vs;
-        private _fs;
-        private _program;
-        private _tmp2x2;
-        private _tmp3x3;
-        private _tmp4x4;
-        program(): WebGLProgram;
-        vertexShader(): string;
-        fragmentShader(): string;
-        constructor(gl: WebGLRenderingContext, _vertexShader: string, _fragmentShader: string);
+        private gl;
+        private vs;
+        private fs;
+        private program;
+        private tmp2x2;
+        private tmp3x3;
+        private tmp4x4;
+        getProgram(): WebGLProgram;
+        getVertexShader(): string;
+        getFragmentShader(): string;
+        constructor(gl: WebGLRenderingContext, vertexShader: string, fragmentShader: string);
         private compile();
         private compileShader(type, source);
         private compileProgram(vs, fs);
@@ -1116,7 +1116,7 @@ declare module spine.webgl {
     class SkeletonRenderer {
         static QUAD_TRIANGLES: number[];
         premultipliedAlpha: boolean;
-        private _gl;
+        private gl;
         constructor(gl: WebGLRenderingContext);
         draw(batcher: PolygonBatcher, skeleton: Skeleton): void;
     }
@@ -1149,26 +1149,28 @@ declare module spine {
         state: AnimationState;
         gl: WebGLRenderingContext;
         canvas: HTMLCanvasElement;
-        private _config;
-        private _assetManager;
-        private _shader;
-        private _batcher;
-        private _mvp;
-        private _skeletonRenderer;
-        private _paused;
-        private _lastFrameTime;
-        private _backgroundColor;
-        private _loaded;
-        constructor(element: Element | string, config: SpineWidgetConfig);
+        private config;
+        private assetManager;
+        private shader;
+        private batcher;
+        private mvp;
+        private skeletonRenderer;
+        private paused;
+        private lastFrameTime;
+        private backgroundColor;
+        private loaded;
+        private bounds;
+        constructor(element: HTMLElement | string, config: SpineWidgetConfig);
         private validateConfig(config);
         private load();
         private render();
+        private resize();
         pause(): void;
         play(): void;
         isPlaying(): boolean;
         setAnimation(animationName: string): void;
         static loadWidgets(): void;
-        static loadWidget(widget: Element): void;
+        static loadWidget(widget: HTMLElement): void;
         static pageLoaded: boolean;
         private static ready();
         static setupDOMListener(): void;
@@ -1183,8 +1185,7 @@ declare module spine {
         scale: number;
         x: number;
         y: number;
-        width: number;
-        height: number;
+        fitToCanvas: boolean;
         backgroundColor: string;
         premultipliedAlpha: boolean;
         success: (widget: SpineWidget) => void;

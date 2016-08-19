@@ -1,10 +1,10 @@
 declare module spine {
     class AssetManager implements Disposable {
-        private _textureLoader;
-        private _assets;
-        private _errors;
-        private _toLoad;
-        private _loaded;
+        private textureLoader;
+        private assets;
+        private errors;
+        private toLoad;
+        private loaded;
         constructor(textureLoader: (image: HTMLImageElement) => any);
         loadText(path: string, success?: (path: string, text: string) => void, error?: (path: string, error: string) => void): void;
         loadTexture(path: string, success?: (path: string, image: HTMLImageElement) => void, error?: (path: string, error: string) => void): void;
@@ -12,11 +12,11 @@ declare module spine {
         remove(path: string): void;
         removeAll(): void;
         isLoadingComplete(): boolean;
-        toLoad(): number;
-        loaded(): number;
+        getToLoad(): number;
+        getLoaded(): number;
         dispose(): void;
         hasErrors(): boolean;
-        errors(): Map<string>;
+        getErrors(): Map<string>;
     }
 }
 declare module spine.canvas {
@@ -75,7 +75,7 @@ declare module spine.canvas {
 declare module spine.canvas {
     class SkeletonRenderer {
         static QUAD_TRIANGLES: number[];
-        private _ctx;
+        private ctx;
         triangleRendering: boolean;
         debugRendering: boolean;
         constructor(context: CanvasRenderingContext2D);
@@ -541,7 +541,7 @@ declare module spine {
         maxY: number;
         boundingBoxes: BoundingBoxAttachment[];
         polygons: ArrayLike<number>[];
-        private _polygonPool;
+        private polygonPool;
         update(skeleton: Skeleton, updateAabb: boolean): void;
         aabbCompute(): void;
         aabbContainsPoint(x: number, y: number): boolean;
@@ -757,8 +757,8 @@ declare module spine {
         static toFloatArray(array: Array<number>): Float32Array | number[];
     }
     class Pool<T> {
-        private _items;
-        private _instantiator;
+        private items;
+        private instantiator;
         constructor(instantiator: () => T);
         obtain(): T;
         free(item: T): void;
@@ -818,7 +818,7 @@ declare module spine {
         triangles: Array<number>;
         color: Color;
         hullLength: number;
-        private _parentMesh;
+        private parentMesh;
         inheritDeform: boolean;
         tempColor: Color;
         constructor(name: string);

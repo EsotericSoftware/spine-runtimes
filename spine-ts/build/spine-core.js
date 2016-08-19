@@ -2,32 +2,32 @@ var spine;
 (function (spine) {
     var AssetManager = (function () {
         function AssetManager(textureLoader) {
-            this._assets = {};
-            this._errors = {};
-            this._toLoad = 0;
-            this._loaded = 0;
-            this._textureLoader = textureLoader;
+            this.assets = {};
+            this.errors = {};
+            this.toLoad = 0;
+            this.loaded = 0;
+            this.textureLoader = textureLoader;
         }
         AssetManager.prototype.loadText = function (path, success, error) {
             var _this = this;
             if (success === void 0) { success = null; }
             if (error === void 0) { error = null; }
-            this._toLoad++;
+            this.toLoad++;
             var request = new XMLHttpRequest();
             request.onreadystatechange = function () {
                 if (request.readyState == XMLHttpRequest.DONE) {
                     if (request.status >= 200 && request.status < 300) {
                         if (success)
                             success(path, request.responseText);
-                        _this._assets[path] = request.responseText;
+                        _this.assets[path] = request.responseText;
                     }
                     else {
                         if (error)
                             error(path, "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText);
-                        _this._errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
+                        _this.errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
                     }
-                    _this._toLoad--;
-                    _this._loaded++;
+                    _this.toLoad--;
+                    _this.loaded++;
                 }
             };
             request.open("GET", path, true);
@@ -37,59 +37,59 @@ var spine;
             var _this = this;
             if (success === void 0) { success = null; }
             if (error === void 0) { error = null; }
-            this._toLoad++;
+            this.toLoad++;
             var img = new Image();
             img.src = path;
             img.onload = function (ev) {
                 if (success)
                     success(path, img);
-                var texture = _this._textureLoader(img);
-                _this._assets[path] = texture;
-                _this._toLoad--;
-                _this._loaded++;
+                var texture = _this.textureLoader(img);
+                _this.assets[path] = texture;
+                _this.toLoad--;
+                _this.loaded++;
             };
             img.onerror = function (ev) {
                 if (error)
                     error(path, "Couldn't load image " + path);
-                _this._errors[path] = "Couldn't load image " + path;
-                _this._toLoad--;
-                _this._loaded++;
+                _this.errors[path] = "Couldn't load image " + path;
+                _this.toLoad--;
+                _this.loaded++;
             };
         };
         AssetManager.prototype.get = function (path) {
-            return this._assets[path];
+            return this.assets[path];
         };
         AssetManager.prototype.remove = function (path) {
-            var asset = this._assets[path];
+            var asset = this.assets[path];
             if (asset.dispose)
                 asset.dispose();
-            this._assets[path] = null;
+            this.assets[path] = null;
         };
         AssetManager.prototype.removeAll = function () {
-            for (var key in this._assets) {
-                var asset = this._assets[key];
+            for (var key in this.assets) {
+                var asset = this.assets[key];
                 if (asset.dispose)
                     asset.dispose();
             }
-            this._assets = {};
+            this.assets = {};
         };
         AssetManager.prototype.isLoadingComplete = function () {
-            return this._toLoad == 0;
+            return this.toLoad == 0;
         };
-        AssetManager.prototype.toLoad = function () {
-            return this._toLoad;
+        AssetManager.prototype.getToLoad = function () {
+            return this.toLoad;
         };
-        AssetManager.prototype.loaded = function () {
-            return this._loaded;
+        AssetManager.prototype.getLoaded = function () {
+            return this.loaded;
         };
         AssetManager.prototype.dispose = function () {
             this.removeAll();
         };
         AssetManager.prototype.hasErrors = function () {
-            return Object.keys(this._errors).length > 0;
+            return Object.keys(this.errors).length > 0;
         };
-        AssetManager.prototype.errors = function () {
-            return this._errors;
+        AssetManager.prototype.getErrors = function () {
+            return this.errors;
         };
         return AssetManager;
     }());
@@ -205,7 +205,7 @@ var spine;
             function SkeletonRenderer(context) {
                 this.triangleRendering = false;
                 this.debugRendering = false;
-                this._ctx = context;
+                this.ctx = context;
             }
             SkeletonRenderer.prototype.draw = function (skeleton) {
                 if (this.triangleRendering)
@@ -214,7 +214,7 @@ var spine;
                     this.drawImages(skeleton);
             };
             SkeletonRenderer.prototype.drawImages = function (skeleton) {
-                var ctx = this._ctx;
+                var ctx = this.ctx;
                 var drawOrder = skeleton.drawOrder;
                 if (this.debugRendering)
                     ctx.strokeStyle = "green";
@@ -288,7 +288,7 @@ var spine;
                         if (slotBlendMode != blendMode) {
                             blendMode = slotBlendMode;
                         }
-                        var ctx = this._ctx;
+                        var ctx = this.ctx;
                         for (var j = 0; j < triangles.length; j += 3) {
                             var t1 = triangles[j] * 8, t2 = triangles[j + 1] * 8, t3 = triangles[j + 2] * 8;
                             var x0 = vertices[t1], y0 = vertices[t1 + 1], u0 = vertices[t1 + 6], v0 = vertices[t1 + 7];
@@ -309,7 +309,7 @@ var spine;
                 }
             };
             SkeletonRenderer.prototype.drawTriangle = function (img, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2) {
-                var ctx = this._ctx;
+                var ctx = this.ctx;
                 u0 *= img.width;
                 v0 *= img.height;
                 u1 *= img.width;
@@ -2622,7 +2622,7 @@ var spine;
             this.maxY = 0;
             this.boundingBoxes = new Array();
             this.polygons = new Array();
-            this._polygonPool = new spine.Pool(function () {
+            this.polygonPool = new spine.Pool(function () {
                 return spine.Utils.newFloatArray(16);
             });
         }
@@ -2631,7 +2631,7 @@ var spine;
                 throw new Error("skeleton cannot be null.");
             var boundingBoxes = this.boundingBoxes;
             var polygons = this.polygons;
-            var polygonPool = this._polygonPool;
+            var polygonPool = this.polygonPool;
             var slots = skeleton.slots;
             var slotCount = slots.length;
             boundingBoxes.length = 0;
@@ -4080,21 +4080,21 @@ var spine;
     spine.Utils = Utils;
     var Pool = (function () {
         function Pool(instantiator) {
-            this._items = new Array(16);
-            this._instantiator = instantiator;
+            this.items = new Array(16);
+            this.instantiator = instantiator;
         }
         Pool.prototype.obtain = function () {
-            return this._items.length > 0 ? this._items.pop() : this._instantiator();
+            return this.items.length > 0 ? this.items.pop() : this.instantiator();
         };
         Pool.prototype.free = function (item) {
-            this._items.push(item);
+            this.items.push(item);
         };
         Pool.prototype.freeAll = function (items) {
             for (var i = 0; i < items.length; i++)
-                this._items[i] = items[i];
+                this.items[i] = items[i];
         };
         Pool.prototype.clear = function () {
-            this._items.length = 0;
+            this.items.length = 0;
         };
         return Pool;
     }());
@@ -4335,13 +4335,13 @@ var spine;
             return worldVertices;
         };
         MeshAttachment.prototype.applyDeform = function (sourceAttachment) {
-            return this == sourceAttachment || (this.inheritDeform && this._parentMesh == sourceAttachment);
+            return this == sourceAttachment || (this.inheritDeform && this.parentMesh == sourceAttachment);
         };
         MeshAttachment.prototype.getParentMesh = function () {
-            return this._parentMesh;
+            return this.parentMesh;
         };
         MeshAttachment.prototype.setParentMesh = function (parentMesh) {
-            this._parentMesh = parentMesh;
+            this.parentMesh = parentMesh;
             if (parentMesh != null) {
                 this.bones = parentMesh.bones;
                 this.vertices = parentMesh.vertices;

@@ -161,27 +161,27 @@ module spine {
 	}
 
 	export class Pool<T> {
-		private _items = new Array<T>(16);
-		private _instantiator: () => T;
+		private items = new Array<T>(16);
+		private instantiator: () => T;
 
 		constructor (instantiator: () => T) {
-			this._instantiator = instantiator;
+			this.instantiator = instantiator;
 		}
 
 		obtain () {
-			return this._items.length > 0 ? this._items.pop() : this._instantiator();
+			return this.items.length > 0 ? this.items.pop() : this.instantiator();
 		}
 
 		free (item: T) {
-			this._items.push(item);
+			this.items.push(item);
 		}
 
 		freeAll (items: ArrayLike<T>) {
-			for (let i = 0; i < items.length; i++) this._items[i] = items[i];
+			for (let i = 0; i < items.length; i++) this.items[i] = items[i];
 		}
 
 		clear () {
-			this._items.length = 0;
+			this.items.length = 0;
 		}
 	}
 

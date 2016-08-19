@@ -31,33 +31,33 @@
 
 module spine.webgl {
 	export class GLTexture extends Texture implements Disposable {
-		private _gl: WebGLRenderingContext;
-		private _texture: WebGLTexture;		
-		private _boundUnit = 0;
+		private gl: WebGLRenderingContext;
+		private texture: WebGLTexture;		
+		private boundUnit = 0;
 
 		constructor (gl: WebGLRenderingContext, image: HTMLImageElement, useMipMaps: boolean = false) {
 			super(image);
-			this._gl = gl;			
-			this._texture = gl.createTexture();			
+			this.gl = gl;			
+			this.texture = gl.createTexture();			
 			this.update(useMipMaps);
 		}
 
 		setFilters (minFilter: TextureFilter, magFilter: TextureFilter) {
-			let gl = this._gl;
+			let gl = this.gl;
 			this.bind();
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter);
 		}
 
 		setWraps (uWrap: TextureWrap, vWrap: TextureWrap) {
-			let gl = this._gl;
+			let gl = this.gl;
 			this.bind();
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, uWrap);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, vWrap);
 		}
 
 		update (useMipMaps: boolean) {
-			let gl = this._gl;
+			let gl = this.gl;
 			this.bind();
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this._image);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -68,21 +68,21 @@ module spine.webgl {
 		}
 
 		bind (unit: number = 0) {
-			let gl = this._gl;
-			this._boundUnit = unit;
+			let gl = this.gl;
+			this.boundUnit = unit;
 			gl.activeTexture(gl.TEXTURE0 + unit);
-			gl.bindTexture(gl.TEXTURE_2D, this._texture);
+			gl.bindTexture(gl.TEXTURE_2D, this.texture);
 		}
 
 		unbind () {
-			let gl = this._gl;
-			gl.activeTexture(gl.TEXTURE0 + this._boundUnit);
+			let gl = this.gl;
+			gl.activeTexture(gl.TEXTURE0 + this.boundUnit);
 			gl.bindTexture(gl.TEXTURE_2D, null);
 		}
 
 		dispose () {
-			let gl = this._gl;
-			gl.deleteTexture(this._texture);
+			let gl = this.gl;
+			gl.deleteTexture(this.texture);
 		}
 	}
 }

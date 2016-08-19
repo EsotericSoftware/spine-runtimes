@@ -37,29 +37,29 @@ module spine.webgl {
 		public static TEXCOORDS = "a_texCoords";
 		public static SAMPLER = "u_texture";
 
-		private _gl: WebGLRenderingContext;
-		private _vs: WebGLShader = null;
-		private _fs: WebGLShader = null;
-		private _program: WebGLProgram = null;
-		private _tmp2x2: Float32Array = new Float32Array(2 * 2);
-		private _tmp3x3: Float32Array = new Float32Array(3 * 3);
-		private _tmp4x4: Float32Array = new Float32Array(4 * 4);
+		private gl: WebGLRenderingContext;
+		private vs: WebGLShader = null;
+		private fs: WebGLShader = null;
+		private program: WebGLProgram = null;
+		private tmp2x2: Float32Array = new Float32Array(2 * 2);
+		private tmp3x3: Float32Array = new Float32Array(3 * 3);
+		private tmp4x4: Float32Array = new Float32Array(4 * 4);
 
-		public program () { return this._program; }
-		public vertexShader () { return this._vertexShader; }
-		public fragmentShader () { return this._fragmentShader; }
+		public getProgram () { return this.program; }
+		public getVertexShader () { return this.vertexShader; }
+		public getFragmentShader () { return this.fragmentShader; }
 
-		constructor (gl: WebGLRenderingContext, private _vertexShader: string, private _fragmentShader: string) {
-			this._gl = gl;
+		constructor (gl: WebGLRenderingContext, private vertexShader: string, private fragmentShader: string) {
+			this.gl = gl;
 			this.compile();
 		}
 
 		private compile () {
-			let gl = this._gl;
+			let gl = this.gl;
 			try {
-				this._vs = this.compileShader(gl.VERTEX_SHADER, this._vertexShader);
-				this._fs = this.compileShader(gl.FRAGMENT_SHADER, this._fragmentShader);
-				this._program = this.compileProgram(this._vs, this._fs);
+				this.vs = this.compileShader(gl.VERTEX_SHADER, this.vertexShader);
+				this.fs = this.compileShader(gl.FRAGMENT_SHADER, this.fragmentShader);
+				this.program = this.compileProgram(this.vs, this.fs);
 			} catch (e) {
 				this.dispose();
 				throw e;
@@ -67,7 +67,7 @@ module spine.webgl {
 		}
 
 		private compileShader (type: number, source: string) {
-			let gl = this._gl;
+			let gl = this.gl;
 			let shader = gl.createShader(type);
 			gl.shaderSource(shader, source);
 			gl.compileShader(shader);
@@ -80,7 +80,7 @@ module spine.webgl {
 		}
 
 		private compileProgram (vs: WebGLShader, fs: WebGLShader) {
-			let gl = this._gl;
+			let gl = this.gl;
 			let program = gl.createProgram();
 			gl.attachShader(program, vs);
 			gl.attachShader(program, fs);
@@ -95,80 +95,80 @@ module spine.webgl {
 		}
 
 		public bind () {
-			this._gl.useProgram(this._program);
+			this.gl.useProgram(this.program);
 		}
 
 		public unbind () {
-			this._gl.useProgram(null);
+			this.gl.useProgram(null);
 		}
 
 		public setUniformi (uniform: string, value: number) {
-			this._gl.uniform1i(this.getUniformLocation(uniform), value);
+			this.gl.uniform1i(this.getUniformLocation(uniform), value);
 		}
 
 		public setUniformf (uniform: string, value: number) {
-			this._gl.uniform1f(this.getUniformLocation(uniform), value);
+			this.gl.uniform1f(this.getUniformLocation(uniform), value);
 		}
 
 		public setUniform2f (uniform: string, value: number, value2: number) {
-			this._gl.uniform2f(this.getUniformLocation(uniform), value, value2);
+			this.gl.uniform2f(this.getUniformLocation(uniform), value, value2);
 		}
 
 		public setUniform3f (uniform: string, value: number, value2: number, value3: number) {
-			this._gl.uniform3f(this.getUniformLocation(uniform), value, value2, value3);
+			this.gl.uniform3f(this.getUniformLocation(uniform), value, value2, value3);
 		}
 
 		public setUniform4f (uniform: string, value: number, value2: number, value3: number, value4: number) {
-			this._gl.uniform4f(this.getUniformLocation(uniform), value, value2, value3, value4);
+			this.gl.uniform4f(this.getUniformLocation(uniform), value, value2, value3, value4);
 		}
 
 		public setUniform2x2f (uniform: string, value: ArrayLike<number>) {
-			let gl = this._gl;
-			this._tmp2x2.set(value);
-			gl.uniformMatrix2fv(this.getUniformLocation(uniform), false, this._tmp2x2);
+			let gl = this.gl;
+			this.tmp2x2.set(value);
+			gl.uniformMatrix2fv(this.getUniformLocation(uniform), false, this.tmp2x2);
 		}
 
 		public setUniform3x3f (uniform: string, value: ArrayLike<number>) {
-			let gl = this._gl;
-			this._tmp3x3.set(value);
-			gl.uniformMatrix3fv(this.getUniformLocation(uniform), false, this._tmp3x3);
+			let gl = this.gl;
+			this.tmp3x3.set(value);
+			gl.uniformMatrix3fv(this.getUniformLocation(uniform), false, this.tmp3x3);
 		}
 
 		public setUniform4x4f (uniform: string, value: ArrayLike<number>) {
-			let gl = this._gl;
-			this._tmp4x4.set(value);
-			gl.uniformMatrix4fv(this.getUniformLocation(uniform), false, this._tmp4x4);
+			let gl = this.gl;
+			this.tmp4x4.set(value);
+			gl.uniformMatrix4fv(this.getUniformLocation(uniform), false, this.tmp4x4);
 		}
 
 		public getUniformLocation (uniform: string): WebGLUniformLocation {
-			let gl = this._gl;
-			let location = gl.getUniformLocation(this._program, uniform);
+			let gl = this.gl;
+			let location = gl.getUniformLocation(this.program, uniform);
 			if (!location) throw new Error(`Couldn't find location for uniform ${uniform}`);
 			return location;
 		}
 
 		public getAttributeLocation (attribute: string): number {
-			let gl = this._gl;
-			let location = gl.getAttribLocation(this._program, attribute);
+			let gl = this.gl;
+			let location = gl.getAttribLocation(this.program, attribute);
 			if (location == -1) throw new Error(`Couldn't find location for attribute ${attribute}`);
 			return location;
 		}
 
 		public dispose () {
-			let gl = this._gl;
-			if (this._vs) {
-				gl.deleteShader(this._vs);
-				this._vs = null;
+			let gl = this.gl;
+			if (this.vs) {
+				gl.deleteShader(this.vs);
+				this.vs = null;
 			}
 
-			if (this._fs) {
-				gl.deleteShader(this._fs);
-				this._fs = null;
+			if (this.fs) {
+				gl.deleteShader(this.fs);
+				this.fs = null;
 			}
 
-			if (this._program) {
-				gl.deleteProgram(this._program);
-				this._program = null;
+			if (this.program) {
+				gl.deleteProgram(this.program);
+				this.program = null;
 			}
 		}
 

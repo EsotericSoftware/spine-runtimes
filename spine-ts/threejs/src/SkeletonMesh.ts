@@ -36,7 +36,7 @@ module spine.threejs {
 		state: AnimationState;
 		zOffset: number = 0.1;
 
-		private _batcher: MeshBatcher;
+		private batcher: MeshBatcher;
 
 		static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 
@@ -51,7 +51,7 @@ module spine.threejs {
 			material.side = THREE.DoubleSide;
 			material.transparent = true;
 			material.alphaTest = 0.5;									
-			this._batcher = new MeshBatcher(this);			
+			this.batcher = new MeshBatcher(this);			
 		}
 
 		update(deltaTime: number) {
@@ -76,7 +76,7 @@ module spine.threejs {
 			let vertices: ArrayLike<number> = null;
 			let triangles: Array<number>  = null;
 			let drawOrder = this.skeleton.drawOrder;
-			let batcher = this._batcher;
+			let batcher = this.batcher;
 			batcher.begin();
 			let z = 0;
 			let zOffset = this.zOffset;
@@ -110,7 +110,7 @@ module spine.threejs {
 					//	batcher.setBlendMode(getSourceGLBlendMode(this._gl, blendMode, premultipliedAlpha), getDestGLBlendMode(this._gl, blendMode));
 					//}
 					
-					this._batcher.batch(vertices, triangles, z);
+					this.batcher.batch(vertices, triangles, z);
 					z += zOffset;				
 				}
 			}

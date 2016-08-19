@@ -34,7 +34,7 @@ module spine {
 		minX = 0; minY = 0; maxX = 0; maxY = 0;
 		boundingBoxes = new Array<BoundingBoxAttachment>();
 		polygons = new Array<ArrayLike<number>>();
-		private _polygonPool = new Pool<ArrayLike<number>>(() => {
+		private polygonPool = new Pool<ArrayLike<number>>(() => {
 			return Utils.newFloatArray(16);
 		});
 
@@ -42,7 +42,7 @@ module spine {
 			if (skeleton == null) throw new Error("skeleton cannot be null.");
 			let boundingBoxes = this.boundingBoxes;
 			let polygons = this.polygons;
-			let polygonPool = this._polygonPool;
+			let polygonPool = this.polygonPool;
 			let slots = skeleton.slots;
 			let slotCount = slots.length;
 

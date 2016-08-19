@@ -34,10 +34,10 @@ module spine.webgl {
 		static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 
 		premultipliedAlpha = false;
-		private _gl: WebGLRenderingContext;
+		private gl: WebGLRenderingContext;
 
 		constructor (gl: WebGLRenderingContext) {
-			this._gl = gl;
+			this.gl = gl;
 		}		
 
 		draw (batcher: PolygonBatcher, skeleton: Skeleton) {
@@ -68,7 +68,7 @@ module spine.webgl {
 					let slotBlendMode = slot.data.blendMode;
 					if (slotBlendMode != blendMode) {
 						blendMode = slotBlendMode;
-						batcher.setBlendMode(getSourceGLBlendMode(this._gl, blendMode, premultipliedAlpha), getDestGLBlendMode(this._gl, blendMode));
+						batcher.setBlendMode(getSourceGLBlendMode(this.gl, blendMode, premultipliedAlpha), getDestGLBlendMode(this.gl, blendMode));
 					}
 					batcher.draw(texture, vertices, triangles);
 				}

@@ -990,32 +990,32 @@ var spine;
 (function (spine) {
     var AssetManager = (function () {
         function AssetManager(textureLoader) {
-            this._assets = {};
-            this._errors = {};
-            this._toLoad = 0;
-            this._loaded = 0;
-            this._textureLoader = textureLoader;
+            this.assets = {};
+            this.errors = {};
+            this.toLoad = 0;
+            this.loaded = 0;
+            this.textureLoader = textureLoader;
         }
         AssetManager.prototype.loadText = function (path, success, error) {
             var _this = this;
             if (success === void 0) { success = null; }
             if (error === void 0) { error = null; }
-            this._toLoad++;
+            this.toLoad++;
             var request = new XMLHttpRequest();
             request.onreadystatechange = function () {
                 if (request.readyState == XMLHttpRequest.DONE) {
                     if (request.status >= 200 && request.status < 300) {
                         if (success)
                             success(path, request.responseText);
-                        _this._assets[path] = request.responseText;
+                        _this.assets[path] = request.responseText;
                     }
                     else {
                         if (error)
                             error(path, "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText);
-                        _this._errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
+                        _this.errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
                     }
-                    _this._toLoad--;
-                    _this._loaded++;
+                    _this.toLoad--;
+                    _this.loaded++;
                 }
             };
             request.open("GET", path, true);
@@ -1025,59 +1025,59 @@ var spine;
             var _this = this;
             if (success === void 0) { success = null; }
             if (error === void 0) { error = null; }
-            this._toLoad++;
+            this.toLoad++;
             var img = new Image();
             img.src = path;
             img.onload = function (ev) {
                 if (success)
                     success(path, img);
-                var texture = _this._textureLoader(img);
-                _this._assets[path] = texture;
-                _this._toLoad--;
-                _this._loaded++;
+                var texture = _this.textureLoader(img);
+                _this.assets[path] = texture;
+                _this.toLoad--;
+                _this.loaded++;
             };
             img.onerror = function (ev) {
                 if (error)
                     error(path, "Couldn't load image " + path);
-                _this._errors[path] = "Couldn't load image " + path;
-                _this._toLoad--;
-                _this._loaded++;
+                _this.errors[path] = "Couldn't load image " + path;
+                _this.toLoad--;
+                _this.loaded++;
             };
         };
         AssetManager.prototype.get = function (path) {
-            return this._assets[path];
+            return this.assets[path];
         };
         AssetManager.prototype.remove = function (path) {
-            var asset = this._assets[path];
+            var asset = this.assets[path];
             if (asset.dispose)
                 asset.dispose();
-            this._assets[path] = null;
+            this.assets[path] = null;
         };
         AssetManager.prototype.removeAll = function () {
-            for (var key in this._assets) {
-                var asset = this._assets[key];
+            for (var key in this.assets) {
+                var asset = this.assets[key];
                 if (asset.dispose)
                     asset.dispose();
             }
-            this._assets = {};
+            this.assets = {};
         };
         AssetManager.prototype.isLoadingComplete = function () {
-            return this._toLoad == 0;
+            return this.toLoad == 0;
         };
-        AssetManager.prototype.toLoad = function () {
-            return this._toLoad;
+        AssetManager.prototype.getToLoad = function () {
+            return this.toLoad;
         };
-        AssetManager.prototype.loaded = function () {
-            return this._loaded;
+        AssetManager.prototype.getLoaded = function () {
+            return this.loaded;
         };
         AssetManager.prototype.dispose = function () {
             this.removeAll();
         };
         AssetManager.prototype.hasErrors = function () {
-            return Object.keys(this._errors).length > 0;
+            return Object.keys(this.errors).length > 0;
         };
-        AssetManager.prototype.errors = function () {
-            return this._errors;
+        AssetManager.prototype.getErrors = function () {
+            return this.errors;
         };
         return AssetManager;
     }());
@@ -2380,7 +2380,7 @@ var spine;
             this.maxY = 0;
             this.boundingBoxes = new Array();
             this.polygons = new Array();
-            this._polygonPool = new spine.Pool(function () {
+            this.polygonPool = new spine.Pool(function () {
                 return spine.Utils.newFloatArray(16);
             });
         }
@@ -2389,7 +2389,7 @@ var spine;
                 throw new Error("skeleton cannot be null.");
             var boundingBoxes = this.boundingBoxes;
             var polygons = this.polygons;
-            var polygonPool = this._polygonPool;
+            var polygonPool = this.polygonPool;
             var slots = skeleton.slots;
             var slotCount = slots.length;
             boundingBoxes.length = 0;
@@ -3904,21 +3904,21 @@ var spine;
     spine.Utils = Utils;
     var Pool = (function () {
         function Pool(instantiator) {
-            this._items = new Array(16);
-            this._instantiator = instantiator;
+            this.items = new Array(16);
+            this.instantiator = instantiator;
         }
         Pool.prototype.obtain = function () {
-            return this._items.length > 0 ? this._items.pop() : this._instantiator();
+            return this.items.length > 0 ? this.items.pop() : this.instantiator();
         };
         Pool.prototype.free = function (item) {
-            this._items.push(item);
+            this.items.push(item);
         };
         Pool.prototype.freeAll = function (items) {
             for (var i = 0; i < items.length; i++)
-                this._items[i] = items[i];
+                this.items[i] = items[i];
         };
         Pool.prototype.clear = function () {
-            this._items.length = 0;
+            this.items.length = 0;
         };
         return Pool;
     }());
@@ -4159,13 +4159,13 @@ var spine;
             return worldVertices;
         };
         MeshAttachment.prototype.applyDeform = function (sourceAttachment) {
-            return this == sourceAttachment || (this.inheritDeform && this._parentMesh == sourceAttachment);
+            return this == sourceAttachment || (this.inheritDeform && this.parentMesh == sourceAttachment);
         };
         MeshAttachment.prototype.getParentMesh = function () {
-            return this._parentMesh;
+            return this.parentMesh;
         };
         MeshAttachment.prototype.setParentMesh = function (parentMesh) {
-            this._parentMesh = parentMesh;
+            this.parentMesh = parentMesh;
             if (parentMesh != null) {
                 this.bones = parentMesh.bones;
                 this.vertices = parentMesh.vertices;
@@ -4376,25 +4376,25 @@ var spine;
             function GLTexture(gl, image, useMipMaps) {
                 if (useMipMaps === void 0) { useMipMaps = false; }
                 _super.call(this, image);
-                this._boundUnit = 0;
-                this._gl = gl;
-                this._texture = gl.createTexture();
+                this.boundUnit = 0;
+                this.gl = gl;
+                this.texture = gl.createTexture();
                 this.update(useMipMaps);
             }
             GLTexture.prototype.setFilters = function (minFilter, magFilter) {
-                var gl = this._gl;
+                var gl = this.gl;
                 this.bind();
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter);
             };
             GLTexture.prototype.setWraps = function (uWrap, vWrap) {
-                var gl = this._gl;
+                var gl = this.gl;
                 this.bind();
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, uWrap);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, vWrap);
             };
             GLTexture.prototype.update = function (useMipMaps) {
-                var gl = this._gl;
+                var gl = this.gl;
                 this.bind();
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this._image);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -4406,19 +4406,19 @@ var spine;
             };
             GLTexture.prototype.bind = function (unit) {
                 if (unit === void 0) { unit = 0; }
-                var gl = this._gl;
-                this._boundUnit = unit;
+                var gl = this.gl;
+                this.boundUnit = unit;
                 gl.activeTexture(gl.TEXTURE0 + unit);
-                gl.bindTexture(gl.TEXTURE_2D, this._texture);
+                gl.bindTexture(gl.TEXTURE_2D, this.texture);
             };
             GLTexture.prototype.unbind = function () {
-                var gl = this._gl;
-                gl.activeTexture(gl.TEXTURE0 + this._boundUnit);
+                var gl = this.gl;
+                gl.activeTexture(gl.TEXTURE0 + this.boundUnit);
                 gl.bindTexture(gl.TEXTURE_2D, null);
             };
             GLTexture.prototype.dispose = function () {
-                var gl = this._gl;
-                gl.deleteTexture(this._texture);
+                var gl = this.gl;
+                gl.deleteTexture(this.texture);
             };
             return GLTexture;
         }(spine.Texture));
@@ -4693,113 +4693,113 @@ var spine;
     var webgl;
     (function (webgl) {
         var Mesh = (function () {
-            function Mesh(gl, _attributes, maxVertices, maxIndices) {
-                this._attributes = _attributes;
-                this._verticesLength = 0;
-                this._dirtyVertices = false;
-                this._indicesLength = 0;
-                this._dirtyIndices = false;
-                this._elementsPerVertex = 0;
-                this._gl = gl;
-                this._elementsPerVertex = 0;
-                for (var i = 0; i < _attributes.length; i++) {
-                    this._elementsPerVertex += _attributes[i].numElements;
+            function Mesh(gl, attributes, maxVertices, maxIndices) {
+                this.attributes = attributes;
+                this.verticesLength = 0;
+                this.dirtyVertices = false;
+                this.indicesLength = 0;
+                this.dirtyIndices = false;
+                this.elementsPerVertex = 0;
+                this.gl = gl;
+                this.elementsPerVertex = 0;
+                for (var i = 0; i < attributes.length; i++) {
+                    this.elementsPerVertex += attributes[i].numElements;
                 }
-                this._vertices = new Float32Array(maxVertices * this._elementsPerVertex);
-                this._indices = new Uint16Array(maxIndices);
+                this.vertices = new Float32Array(maxVertices * this.elementsPerVertex);
+                this.indices = new Uint16Array(maxIndices);
             }
-            Mesh.prototype.attributes = function () { return this._attributes; };
-            Mesh.prototype.maxVertices = function () { return this._vertices.length / this._elementsPerVertex; };
-            Mesh.prototype.numVertices = function () { return this._verticesLength / this._elementsPerVertex; };
+            Mesh.prototype.getAttributes = function () { return this.attributes; };
+            Mesh.prototype.maxVertices = function () { return this.vertices.length / this.elementsPerVertex; };
+            Mesh.prototype.numVertices = function () { return this.verticesLength / this.elementsPerVertex; };
             Mesh.prototype.setVerticesLength = function (length) {
-                this._dirtyVertices = true;
-                this._verticesLength = length;
+                this.dirtyVertices = true;
+                this.verticesLength = length;
             };
-            Mesh.prototype.vertices = function () { return this._vertices; };
-            Mesh.prototype.maxIndices = function () { return this._indices.length; };
-            Mesh.prototype.numIndices = function () { return this._indicesLength; };
+            Mesh.prototype.getVertices = function () { return this.vertices; };
+            Mesh.prototype.maxIndices = function () { return this.indices.length; };
+            Mesh.prototype.numIndices = function () { return this.indicesLength; };
             Mesh.prototype.setIndicesLength = function (length) {
-                this._dirtyIndices = true;
-                this._indicesLength = length;
+                this.dirtyIndices = true;
+                this.indicesLength = length;
             };
-            Mesh.prototype.indices = function () { return this._indices; };
+            Mesh.prototype.getIndices = function () { return this.indices; };
             ;
             Mesh.prototype.setVertices = function (vertices) {
-                this._dirtyVertices = true;
-                if (vertices.length > this._vertices.length)
+                this.dirtyVertices = true;
+                if (vertices.length > this.vertices.length)
                     throw Error("Mesh can't store more than " + this.maxVertices() + " vertices");
-                this._vertices.set(vertices, 0);
-                this._verticesLength = vertices.length;
+                this.vertices.set(vertices, 0);
+                this.verticesLength = vertices.length;
             };
             Mesh.prototype.setIndices = function (indices) {
-                this._dirtyIndices = true;
-                if (indices.length > this._indices.length)
+                this.dirtyIndices = true;
+                if (indices.length > this.indices.length)
                     throw Error("Mesh can't store more than " + this.maxIndices() + " indices");
-                this._indices.set(indices, 0);
-                this._indicesLength = indices.length;
+                this.indices.set(indices, 0);
+                this.indicesLength = indices.length;
             };
             Mesh.prototype.draw = function (shader, primitiveType) {
-                this.drawWithOffset(shader, primitiveType, 0, this._indicesLength > 0 ? this._indicesLength : this._verticesLength);
+                this.drawWithOffset(shader, primitiveType, 0, this.indicesLength > 0 ? this.indicesLength : this.verticesLength);
             };
             Mesh.prototype.drawWithOffset = function (shader, primitiveType, offset, count) {
-                var gl = this._gl;
-                if (this._dirtyVertices || this._dirtyIndices)
+                var gl = this.gl;
+                if (this.dirtyVertices || this.dirtyIndices)
                     this.update();
                 this.bind(shader);
-                if (this._indicesLength > 0)
+                if (this.indicesLength > 0)
                     gl.drawElements(primitiveType, count, gl.UNSIGNED_SHORT, offset * 2);
                 else
                     gl.drawArrays(primitiveType, offset, count);
                 this.unbind(shader);
             };
             Mesh.prototype.bind = function (shader) {
-                var gl = this._gl;
-                gl.bindBuffer(gl.ARRAY_BUFFER, this._verticesBuffer);
+                var gl = this.gl;
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesBuffer);
                 var offset = 0;
-                for (var i = 0; i < this._attributes.length; i++) {
-                    var attrib = this._attributes[i];
+                for (var i = 0; i < this.attributes.length; i++) {
+                    var attrib = this.attributes[i];
                     var location_1 = shader.getAttributeLocation(attrib.name);
                     gl.enableVertexAttribArray(location_1);
-                    gl.vertexAttribPointer(location_1, attrib.numElements, gl.FLOAT, false, this._elementsPerVertex * 4, offset * 4);
+                    gl.vertexAttribPointer(location_1, attrib.numElements, gl.FLOAT, false, this.elementsPerVertex * 4, offset * 4);
                     offset += attrib.numElements;
                 }
-                if (this._indicesLength > 0)
-                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
+                if (this.indicesLength > 0)
+                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
             };
             Mesh.prototype.unbind = function (shader) {
-                var gl = this._gl;
-                for (var i = 0; i < this._attributes.length; i++) {
-                    var attrib = this._attributes[i];
+                var gl = this.gl;
+                for (var i = 0; i < this.attributes.length; i++) {
+                    var attrib = this.attributes[i];
                     var location_2 = shader.getAttributeLocation(attrib.name);
                     gl.disableVertexAttribArray(location_2);
                 }
                 gl.bindBuffer(gl.ARRAY_BUFFER, null);
-                if (this._indicesLength > 0)
+                if (this.indicesLength > 0)
                     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
             };
             Mesh.prototype.update = function () {
-                var gl = this._gl;
-                if (this._dirtyVertices) {
-                    if (!this._verticesBuffer) {
-                        this._verticesBuffer = gl.createBuffer();
+                var gl = this.gl;
+                if (this.dirtyVertices) {
+                    if (!this.verticesBuffer) {
+                        this.verticesBuffer = gl.createBuffer();
                     }
-                    gl.bindBuffer(gl.ARRAY_BUFFER, this._verticesBuffer);
-                    gl.bufferData(gl.ARRAY_BUFFER, this._vertices.subarray(0, this._verticesLength), gl.STATIC_DRAW);
-                    this._dirtyVertices = false;
+                    gl.bindBuffer(gl.ARRAY_BUFFER, this.verticesBuffer);
+                    gl.bufferData(gl.ARRAY_BUFFER, this.vertices.subarray(0, this.verticesLength), gl.STATIC_DRAW);
+                    this.dirtyVertices = false;
                 }
-                if (this._dirtyIndices) {
-                    if (!this._indicesBuffer) {
-                        this._indicesBuffer = gl.createBuffer();
+                if (this.dirtyIndices) {
+                    if (!this.indicesBuffer) {
+                        this.indicesBuffer = gl.createBuffer();
                     }
-                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
-                    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this._indices.subarray(0, this._indicesLength), gl.STATIC_DRAW);
-                    this._dirtyIndices = false;
+                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
+                    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices.subarray(0, this.indicesLength), gl.STATIC_DRAW);
+                    this.dirtyIndices = false;
                 }
             };
             Mesh.prototype.dispose = function () {
-                var gl = this._gl;
-                gl.deleteBuffer(this._verticesBuffer);
-                gl.deleteBuffer(this._indicesBuffer);
+                var gl = this.gl;
+                gl.deleteBuffer(this.verticesBuffer);
+                gl.deleteBuffer(this.indicesBuffer);
             };
             return Mesh;
         }());
@@ -4859,81 +4859,81 @@ var spine;
         var PolygonBatcher = (function () {
             function PolygonBatcher(gl, maxVertices) {
                 if (maxVertices === void 0) { maxVertices = 10920; }
-                this._drawing = false;
-                this._shader = null;
-                this._lastTexture = null;
-                this._verticesLength = 0;
-                this._indicesLength = 0;
-                this._srcBlend = WebGLRenderingContext.SRC_ALPHA;
-                this._dstBlend = WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
+                this.drawing = false;
+                this.shader = null;
+                this.lastTexture = null;
+                this.verticesLength = 0;
+                this.indicesLength = 0;
+                this.srcBlend = WebGLRenderingContext.SRC_ALPHA;
+                this.dstBlend = WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
                 if (maxVertices > 10920)
                     throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
-                this._gl = gl;
-                this._mesh = new webgl.Mesh(gl, [new webgl.Position2Attribute(), new webgl.ColorAttribute(), new webgl.TexCoordAttribute()], maxVertices, maxVertices * 3);
+                this.gl = gl;
+                this.mesh = new webgl.Mesh(gl, [new webgl.Position2Attribute(), new webgl.ColorAttribute(), new webgl.TexCoordAttribute()], maxVertices, maxVertices * 3);
             }
             PolygonBatcher.prototype.begin = function (shader) {
-                var gl = this._gl;
-                if (this._drawing)
+                var gl = this.gl;
+                if (this.drawing)
                     throw new Error("PolygonBatch is already drawing. Call PolygonBatch.end() before calling PolygonBatch.begin()");
-                this._drawCalls = 0;
-                this._shader = shader;
-                this._lastTexture = null;
-                this._drawing = true;
+                this.drawCalls = 0;
+                this.shader = shader;
+                this.lastTexture = null;
+                this.drawing = true;
                 gl.enable(gl.BLEND);
-                gl.blendFunc(this._srcBlend, this._dstBlend);
+                gl.blendFunc(this.srcBlend, this.dstBlend);
             };
             PolygonBatcher.prototype.setBlendMode = function (srcBlend, dstBlend) {
-                var gl = this._gl;
-                this._srcBlend = srcBlend;
-                this._dstBlend = dstBlend;
-                if (this._drawing) {
+                var gl = this.gl;
+                this.srcBlend = srcBlend;
+                this.dstBlend = dstBlend;
+                if (this.drawing) {
                     this.flush();
-                    gl.blendFunc(this._srcBlend, this._dstBlend);
+                    gl.blendFunc(this.srcBlend, this.dstBlend);
                 }
             };
             PolygonBatcher.prototype.draw = function (texture, vertices, indices) {
-                if (texture != this._lastTexture) {
+                if (texture != this.lastTexture) {
                     this.flush();
-                    this._lastTexture = texture;
+                    this.lastTexture = texture;
                     texture.bind();
                 }
-                else if (this._verticesLength + vertices.length > this._mesh.vertices().length ||
-                    this._indicesLength + indices.length > this._mesh.indices().length) {
+                else if (this.verticesLength + vertices.length > this.mesh.getVertices().length ||
+                    this.indicesLength + indices.length > this.mesh.getIndices().length) {
                     this.flush();
                 }
-                var indexStart = this._mesh.numVertices();
-                this._mesh.vertices().set(vertices, this._verticesLength);
-                this._verticesLength += vertices.length;
-                this._mesh.setVerticesLength(this._verticesLength);
-                var indicesArray = this._mesh.indices();
-                for (var i = this._indicesLength, j = 0; j < indices.length; i++, j++)
+                var indexStart = this.mesh.numVertices();
+                this.mesh.getVertices().set(vertices, this.verticesLength);
+                this.verticesLength += vertices.length;
+                this.mesh.setVerticesLength(this.verticesLength);
+                var indicesArray = this.mesh.getIndices();
+                for (var i = this.indicesLength, j = 0; j < indices.length; i++, j++)
                     indicesArray[i] = indices[j] + indexStart;
-                this._indicesLength += indices.length;
-                this._mesh.setIndicesLength(this._indicesLength);
+                this.indicesLength += indices.length;
+                this.mesh.setIndicesLength(this.indicesLength);
             };
             PolygonBatcher.prototype.flush = function () {
-                var gl = this._gl;
-                if (this._verticesLength == 0)
+                var gl = this.gl;
+                if (this.verticesLength == 0)
                     return;
-                this._mesh.draw(this._shader, gl.TRIANGLES);
-                this._verticesLength = 0;
-                this._indicesLength = 0;
-                this._mesh.setVerticesLength(0);
-                this._mesh.setIndicesLength(0);
-                this._drawCalls++;
+                this.mesh.draw(this.shader, gl.TRIANGLES);
+                this.verticesLength = 0;
+                this.indicesLength = 0;
+                this.mesh.setVerticesLength(0);
+                this.mesh.setIndicesLength(0);
+                this.drawCalls++;
             };
             PolygonBatcher.prototype.end = function () {
-                var gl = this._gl;
-                if (!this._drawing)
+                var gl = this.gl;
+                if (!this.drawing)
                     throw new Error("PolygonBatch is not drawing. Call PolygonBatch.begin() before calling PolygonBatch.end()");
-                if (this._verticesLength > 0 || this._indicesLength > 0)
+                if (this.verticesLength > 0 || this.indicesLength > 0)
                     this.flush();
-                this._shader = null;
-                this._lastTexture = null;
-                this._drawing = false;
+                this.shader = null;
+                this.lastTexture = null;
+                this.drawing = false;
                 gl.disable(gl.BLEND);
             };
-            PolygonBatcher.prototype.drawCalls = function () { return this._drawCalls; };
+            PolygonBatcher.prototype.getDrawCalls = function () { return this.drawCalls; };
             return PolygonBatcher;
         }());
         webgl.PolygonBatcher = PolygonBatcher;
@@ -4944,27 +4944,27 @@ var spine;
     var webgl;
     (function (webgl) {
         var Shader = (function () {
-            function Shader(gl, _vertexShader, _fragmentShader) {
-                this._vertexShader = _vertexShader;
-                this._fragmentShader = _fragmentShader;
-                this._vs = null;
-                this._fs = null;
-                this._program = null;
-                this._tmp2x2 = new Float32Array(2 * 2);
-                this._tmp3x3 = new Float32Array(3 * 3);
-                this._tmp4x4 = new Float32Array(4 * 4);
-                this._gl = gl;
+            function Shader(gl, vertexShader, fragmentShader) {
+                this.vertexShader = vertexShader;
+                this.fragmentShader = fragmentShader;
+                this.vs = null;
+                this.fs = null;
+                this.program = null;
+                this.tmp2x2 = new Float32Array(2 * 2);
+                this.tmp3x3 = new Float32Array(3 * 3);
+                this.tmp4x4 = new Float32Array(4 * 4);
+                this.gl = gl;
                 this.compile();
             }
-            Shader.prototype.program = function () { return this._program; };
-            Shader.prototype.vertexShader = function () { return this._vertexShader; };
-            Shader.prototype.fragmentShader = function () { return this._fragmentShader; };
+            Shader.prototype.getProgram = function () { return this.program; };
+            Shader.prototype.getVertexShader = function () { return this.vertexShader; };
+            Shader.prototype.getFragmentShader = function () { return this.fragmentShader; };
             Shader.prototype.compile = function () {
-                var gl = this._gl;
+                var gl = this.gl;
                 try {
-                    this._vs = this.compileShader(gl.VERTEX_SHADER, this._vertexShader);
-                    this._fs = this.compileShader(gl.FRAGMENT_SHADER, this._fragmentShader);
-                    this._program = this.compileProgram(this._vs, this._fs);
+                    this.vs = this.compileShader(gl.VERTEX_SHADER, this.vertexShader);
+                    this.fs = this.compileShader(gl.FRAGMENT_SHADER, this.fragmentShader);
+                    this.program = this.compileProgram(this.vs, this.fs);
                 }
                 catch (e) {
                     this.dispose();
@@ -4972,7 +4972,7 @@ var spine;
                 }
             };
             Shader.prototype.compileShader = function (type, source) {
-                var gl = this._gl;
+                var gl = this.gl;
                 var shader = gl.createShader(type);
                 gl.shaderSource(shader, source);
                 gl.compileShader(shader);
@@ -4984,7 +4984,7 @@ var spine;
                 return shader;
             };
             Shader.prototype.compileProgram = function (vs, fs) {
-                var gl = this._gl;
+                var gl = this.gl;
                 var program = gl.createProgram();
                 gl.attachShader(program, vs);
                 gl.attachShader(program, fs);
@@ -4997,68 +4997,68 @@ var spine;
                 return program;
             };
             Shader.prototype.bind = function () {
-                this._gl.useProgram(this._program);
+                this.gl.useProgram(this.program);
             };
             Shader.prototype.unbind = function () {
-                this._gl.useProgram(null);
+                this.gl.useProgram(null);
             };
             Shader.prototype.setUniformi = function (uniform, value) {
-                this._gl.uniform1i(this.getUniformLocation(uniform), value);
+                this.gl.uniform1i(this.getUniformLocation(uniform), value);
             };
             Shader.prototype.setUniformf = function (uniform, value) {
-                this._gl.uniform1f(this.getUniformLocation(uniform), value);
+                this.gl.uniform1f(this.getUniformLocation(uniform), value);
             };
             Shader.prototype.setUniform2f = function (uniform, value, value2) {
-                this._gl.uniform2f(this.getUniformLocation(uniform), value, value2);
+                this.gl.uniform2f(this.getUniformLocation(uniform), value, value2);
             };
             Shader.prototype.setUniform3f = function (uniform, value, value2, value3) {
-                this._gl.uniform3f(this.getUniformLocation(uniform), value, value2, value3);
+                this.gl.uniform3f(this.getUniformLocation(uniform), value, value2, value3);
             };
             Shader.prototype.setUniform4f = function (uniform, value, value2, value3, value4) {
-                this._gl.uniform4f(this.getUniformLocation(uniform), value, value2, value3, value4);
+                this.gl.uniform4f(this.getUniformLocation(uniform), value, value2, value3, value4);
             };
             Shader.prototype.setUniform2x2f = function (uniform, value) {
-                var gl = this._gl;
-                this._tmp2x2.set(value);
-                gl.uniformMatrix2fv(this.getUniformLocation(uniform), false, this._tmp2x2);
+                var gl = this.gl;
+                this.tmp2x2.set(value);
+                gl.uniformMatrix2fv(this.getUniformLocation(uniform), false, this.tmp2x2);
             };
             Shader.prototype.setUniform3x3f = function (uniform, value) {
-                var gl = this._gl;
-                this._tmp3x3.set(value);
-                gl.uniformMatrix3fv(this.getUniformLocation(uniform), false, this._tmp3x3);
+                var gl = this.gl;
+                this.tmp3x3.set(value);
+                gl.uniformMatrix3fv(this.getUniformLocation(uniform), false, this.tmp3x3);
             };
             Shader.prototype.setUniform4x4f = function (uniform, value) {
-                var gl = this._gl;
-                this._tmp4x4.set(value);
-                gl.uniformMatrix4fv(this.getUniformLocation(uniform), false, this._tmp4x4);
+                var gl = this.gl;
+                this.tmp4x4.set(value);
+                gl.uniformMatrix4fv(this.getUniformLocation(uniform), false, this.tmp4x4);
             };
             Shader.prototype.getUniformLocation = function (uniform) {
-                var gl = this._gl;
-                var location = gl.getUniformLocation(this._program, uniform);
+                var gl = this.gl;
+                var location = gl.getUniformLocation(this.program, uniform);
                 if (!location)
                     throw new Error("Couldn't find location for uniform " + uniform);
                 return location;
             };
             Shader.prototype.getAttributeLocation = function (attribute) {
-                var gl = this._gl;
-                var location = gl.getAttribLocation(this._program, attribute);
+                var gl = this.gl;
+                var location = gl.getAttribLocation(this.program, attribute);
                 if (location == -1)
                     throw new Error("Couldn't find location for attribute " + attribute);
                 return location;
             };
             Shader.prototype.dispose = function () {
-                var gl = this._gl;
-                if (this._vs) {
-                    gl.deleteShader(this._vs);
-                    this._vs = null;
+                var gl = this.gl;
+                if (this.vs) {
+                    gl.deleteShader(this.vs);
+                    this.vs = null;
                 }
-                if (this._fs) {
-                    gl.deleteShader(this._fs);
-                    this._fs = null;
+                if (this.fs) {
+                    gl.deleteShader(this.fs);
+                    this.fs = null;
                 }
-                if (this._program) {
-                    gl.deleteProgram(this._program);
-                    this._program = null;
+                if (this.program) {
+                    gl.deleteProgram(this.program);
+                    this.program = null;
                 }
             };
             Shader.newColoredTextured = function (gl) {
@@ -5088,7 +5088,7 @@ var spine;
         var SkeletonRenderer = (function () {
             function SkeletonRenderer(gl) {
                 this.premultipliedAlpha = false;
-                this._gl = gl;
+                this.gl = gl;
             }
             SkeletonRenderer.prototype.draw = function (batcher, skeleton) {
                 var premultipliedAlpha = this.premultipliedAlpha;
@@ -5118,7 +5118,7 @@ var spine;
                         var slotBlendMode = slot.data.blendMode;
                         if (slotBlendMode != blendMode) {
                             blendMode = slotBlendMode;
-                            batcher.setBlendMode(webgl.getSourceGLBlendMode(this._gl, blendMode, premultipliedAlpha), webgl.getDestGLBlendMode(this._gl, blendMode));
+                            batcher.setBlendMode(webgl.getSourceGLBlendMode(this.gl, blendMode, premultipliedAlpha), webgl.getDestGLBlendMode(this.gl, blendMode));
                         }
                         batcher.draw(texture, vertices, triangles);
                     }

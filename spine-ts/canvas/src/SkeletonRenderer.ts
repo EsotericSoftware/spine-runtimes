@@ -33,13 +33,13 @@ module spine.canvas {
 	export class SkeletonRenderer {
 		static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 		
-		private _ctx: CanvasRenderingContext2D;
+		private ctx: CanvasRenderingContext2D;
 
 		public triangleRendering = false;
 		public debugRendering = false;
 		
 		constructor (context: CanvasRenderingContext2D) {
-			this._ctx = context;
+			this.ctx = context;
 		}
 
 		draw (skeleton: Skeleton) {
@@ -48,7 +48,7 @@ module spine.canvas {
 		}
 
 		private drawImages (skeleton: Skeleton) {
-			let ctx = this._ctx;
+			let ctx = this.ctx;
 			let drawOrder = skeleton.drawOrder;
 
 			if (this.debugRendering) ctx.strokeStyle = "green";			
@@ -124,7 +124,7 @@ module spine.canvas {
 						blendMode = slotBlendMode;						
 					}
 
-					let ctx = this._ctx;		
+					let ctx = this.ctx;		
 
 					for (var j = 0; j < triangles.length; j+=3) {
 						let t1 = triangles[j] * 8, t2 = triangles[j+1] * 8, t3 = triangles[j+2] * 8;
@@ -154,7 +154,7 @@ module spine.canvas {
 		private drawTriangle(img: HTMLImageElement, x0: number, y0: number, u0: number, v0: number,
 						x1: number, y1: number, u1: number, v1: number,
 						x2: number, y2: number, u2: number, v2: number) {
-			let ctx = this._ctx;
+			let ctx = this.ctx;
 
 			u0 *= img.width;
 			v0 *= img.height;

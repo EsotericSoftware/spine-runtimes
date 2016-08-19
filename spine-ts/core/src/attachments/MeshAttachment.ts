@@ -37,7 +37,7 @@ module spine {
 		triangles: Array<number>;
 		color = new Color(1, 1, 1, 1);
 		hullLength: number;
-		private _parentMesh: MeshAttachment;
+		private parentMesh: MeshAttachment;
 		inheritDeform = false;
 		tempColor = new Color(0, 0, 0, 0);
 
@@ -150,16 +150,16 @@ module spine {
 		}
 
 		applyDeform (sourceAttachment: VertexAttachment): boolean {
-			return this == sourceAttachment || (this.inheritDeform && this._parentMesh == sourceAttachment);
+			return this == sourceAttachment || (this.inheritDeform && this.parentMesh == sourceAttachment);
 		}
 
 		getParentMesh () {
-			return this._parentMesh;
+			return this.parentMesh;
 		}
 
 		/** @param parentMesh May be null. */
 		setParentMesh (parentMesh: MeshAttachment) {
-			this._parentMesh = parentMesh;
+			this.parentMesh = parentMesh;
 			if (parentMesh != null) {
 				this.bones = parentMesh.bones;
 				this.vertices = parentMesh.vertices;

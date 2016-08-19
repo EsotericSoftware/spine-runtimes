@@ -990,32 +990,32 @@ var spine;
 (function (spine) {
     var AssetManager = (function () {
         function AssetManager(textureLoader) {
-            this._assets = {};
-            this._errors = {};
-            this._toLoad = 0;
-            this._loaded = 0;
-            this._textureLoader = textureLoader;
+            this.assets = {};
+            this.errors = {};
+            this.toLoad = 0;
+            this.loaded = 0;
+            this.textureLoader = textureLoader;
         }
         AssetManager.prototype.loadText = function (path, success, error) {
             var _this = this;
             if (success === void 0) { success = null; }
             if (error === void 0) { error = null; }
-            this._toLoad++;
+            this.toLoad++;
             var request = new XMLHttpRequest();
             request.onreadystatechange = function () {
                 if (request.readyState == XMLHttpRequest.DONE) {
                     if (request.status >= 200 && request.status < 300) {
                         if (success)
                             success(path, request.responseText);
-                        _this._assets[path] = request.responseText;
+                        _this.assets[path] = request.responseText;
                     }
                     else {
                         if (error)
                             error(path, "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText);
-                        _this._errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
+                        _this.errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
                     }
-                    _this._toLoad--;
-                    _this._loaded++;
+                    _this.toLoad--;
+                    _this.loaded++;
                 }
             };
             request.open("GET", path, true);
@@ -1025,59 +1025,59 @@ var spine;
             var _this = this;
             if (success === void 0) { success = null; }
             if (error === void 0) { error = null; }
-            this._toLoad++;
+            this.toLoad++;
             var img = new Image();
             img.src = path;
             img.onload = function (ev) {
                 if (success)
                     success(path, img);
-                var texture = _this._textureLoader(img);
-                _this._assets[path] = texture;
-                _this._toLoad--;
-                _this._loaded++;
+                var texture = _this.textureLoader(img);
+                _this.assets[path] = texture;
+                _this.toLoad--;
+                _this.loaded++;
             };
             img.onerror = function (ev) {
                 if (error)
                     error(path, "Couldn't load image " + path);
-                _this._errors[path] = "Couldn't load image " + path;
-                _this._toLoad--;
-                _this._loaded++;
+                _this.errors[path] = "Couldn't load image " + path;
+                _this.toLoad--;
+                _this.loaded++;
             };
         };
         AssetManager.prototype.get = function (path) {
-            return this._assets[path];
+            return this.assets[path];
         };
         AssetManager.prototype.remove = function (path) {
-            var asset = this._assets[path];
+            var asset = this.assets[path];
             if (asset.dispose)
                 asset.dispose();
-            this._assets[path] = null;
+            this.assets[path] = null;
         };
         AssetManager.prototype.removeAll = function () {
-            for (var key in this._assets) {
-                var asset = this._assets[key];
+            for (var key in this.assets) {
+                var asset = this.assets[key];
                 if (asset.dispose)
                     asset.dispose();
             }
-            this._assets = {};
+            this.assets = {};
         };
         AssetManager.prototype.isLoadingComplete = function () {
-            return this._toLoad == 0;
+            return this.toLoad == 0;
         };
-        AssetManager.prototype.toLoad = function () {
-            return this._toLoad;
+        AssetManager.prototype.getToLoad = function () {
+            return this.toLoad;
         };
-        AssetManager.prototype.loaded = function () {
-            return this._loaded;
+        AssetManager.prototype.getLoaded = function () {
+            return this.loaded;
         };
         AssetManager.prototype.dispose = function () {
             this.removeAll();
         };
         AssetManager.prototype.hasErrors = function () {
-            return Object.keys(this._errors).length > 0;
+            return Object.keys(this.errors).length > 0;
         };
-        AssetManager.prototype.errors = function () {
-            return this._errors;
+        AssetManager.prototype.getErrors = function () {
+            return this.errors;
         };
         return AssetManager;
     }());
@@ -2380,7 +2380,7 @@ var spine;
             this.maxY = 0;
             this.boundingBoxes = new Array();
             this.polygons = new Array();
-            this._polygonPool = new spine.Pool(function () {
+            this.polygonPool = new spine.Pool(function () {
                 return spine.Utils.newFloatArray(16);
             });
         }
@@ -2389,7 +2389,7 @@ var spine;
                 throw new Error("skeleton cannot be null.");
             var boundingBoxes = this.boundingBoxes;
             var polygons = this.polygons;
-            var polygonPool = this._polygonPool;
+            var polygonPool = this.polygonPool;
             var slots = skeleton.slots;
             var slotCount = slots.length;
             boundingBoxes.length = 0;
@@ -3904,21 +3904,21 @@ var spine;
     spine.Utils = Utils;
     var Pool = (function () {
         function Pool(instantiator) {
-            this._items = new Array(16);
-            this._instantiator = instantiator;
+            this.items = new Array(16);
+            this.instantiator = instantiator;
         }
         Pool.prototype.obtain = function () {
-            return this._items.length > 0 ? this._items.pop() : this._instantiator();
+            return this.items.length > 0 ? this.items.pop() : this.instantiator();
         };
         Pool.prototype.free = function (item) {
-            this._items.push(item);
+            this.items.push(item);
         };
         Pool.prototype.freeAll = function (items) {
             for (var i = 0; i < items.length; i++)
-                this._items[i] = items[i];
+                this.items[i] = items[i];
         };
         Pool.prototype.clear = function () {
-            this._items.length = 0;
+            this.items.length = 0;
         };
         return Pool;
     }());
@@ -4159,13 +4159,13 @@ var spine;
             return worldVertices;
         };
         MeshAttachment.prototype.applyDeform = function (sourceAttachment) {
-            return this == sourceAttachment || (this.inheritDeform && this._parentMesh == sourceAttachment);
+            return this == sourceAttachment || (this.inheritDeform && this.parentMesh == sourceAttachment);
         };
         MeshAttachment.prototype.getParentMesh = function () {
-            return this._parentMesh;
+            return this.parentMesh;
         };
         MeshAttachment.prototype.setParentMesh = function (parentMesh) {
-            this._parentMesh = parentMesh;
+            this.parentMesh = parentMesh;
             if (parentMesh != null) {
                 this.bones = parentMesh.bones;
                 this.vertices = parentMesh.vertices;
@@ -4376,15 +4376,15 @@ var spine;
         var MeshBatcher = (function () {
             function MeshBatcher(mesh, maxVertices) {
                 if (maxVertices === void 0) { maxVertices = 10920; }
-                this._verticesLength = 0;
-                this._indicesLength = 0;
+                this.verticesLength = 0;
+                this.indicesLength = 0;
                 if (maxVertices > 10920)
                     throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
-                var vertices = this._vertices = new Float32Array(maxVertices * MeshBatcher.VERTEX_SIZE);
-                var indices = this._indices = new Uint16Array(maxVertices * 3);
+                var vertices = this.vertices = new Float32Array(maxVertices * MeshBatcher.VERTEX_SIZE);
+                var indices = this.indices = new Uint16Array(maxVertices * 3);
                 this.mesh = mesh;
                 var geo = new THREE.BufferGeometry();
-                var vertexBuffer = this._vertexBuffer = new THREE.InterleavedBuffer(vertices, MeshBatcher.VERTEX_SIZE);
+                var vertexBuffer = this.vertexBuffer = new THREE.InterleavedBuffer(vertices, MeshBatcher.VERTEX_SIZE);
                 vertexBuffer.dynamic = true;
                 geo.addAttribute("position", new THREE.InterleavedBufferAttribute(vertexBuffer, 3, 0, false));
                 geo.addAttribute("color", new THREE.InterleavedBufferAttribute(vertexBuffer, 4, 3, false));
@@ -4396,14 +4396,14 @@ var spine;
                 mesh.geometry = geo;
             }
             MeshBatcher.prototype.begin = function () {
-                this._verticesLength = 0;
-                this._indicesLength = 0;
+                this.verticesLength = 0;
+                this.indicesLength = 0;
             };
             MeshBatcher.prototype.batch = function (vertices, indices, z) {
                 if (z === void 0) { z = 0; }
-                var indexStart = this._verticesLength / MeshBatcher.VERTEX_SIZE;
-                var vertexBuffer = this._vertices;
-                var i = this._verticesLength;
+                var indexStart = this.verticesLength / MeshBatcher.VERTEX_SIZE;
+                var vertexBuffer = this.vertices;
+                var i = this.verticesLength;
                 var j = 0;
                 for (; j < vertices.length;) {
                     vertexBuffer[i++] = vertices[j++];
@@ -4416,22 +4416,22 @@ var spine;
                     vertexBuffer[i++] = vertices[j++];
                     vertexBuffer[i++] = vertices[j++];
                 }
-                this._verticesLength = i;
-                var indicesArray = this._indices;
-                for (i = this._indicesLength, j = 0; j < indices.length; i++, j++)
+                this.verticesLength = i;
+                var indicesArray = this.indices;
+                for (i = this.indicesLength, j = 0; j < indices.length; i++, j++)
                     indicesArray[i] = indices[j] + indexStart;
-                this._indicesLength += indices.length;
+                this.indicesLength += indices.length;
             };
             MeshBatcher.prototype.end = function () {
-                this._vertexBuffer.needsUpdate = true;
-                this._vertexBuffer.updateRange.offset = 0;
-                this._vertexBuffer.updateRange.count = this._verticesLength;
+                this.vertexBuffer.needsUpdate = true;
+                this.vertexBuffer.updateRange.offset = 0;
+                this.vertexBuffer.updateRange.count = this.verticesLength;
                 var geo = this.mesh.geometry;
                 geo.getIndex().needsUpdate = true;
                 geo.getIndex().updateRange.offset = 0;
-                geo.getIndex().updateRange.count = this._indicesLength;
+                geo.getIndex().updateRange.count = this.indicesLength;
                 geo.drawRange.start = 0;
-                geo.drawRange.count = this._indicesLength;
+                geo.drawRange.count = this.indicesLength;
             };
             MeshBatcher.VERTEX_SIZE = 9;
             return MeshBatcher;
@@ -4455,7 +4455,7 @@ var spine;
                 material.side = THREE.DoubleSide;
                 material.transparent = true;
                 material.alphaTest = 0.5;
-                this._batcher = new threejs.MeshBatcher(this);
+                this.batcher = new threejs.MeshBatcher(this);
             }
             SkeletonMesh.prototype.update = function (deltaTime) {
                 var state = this.state;
@@ -4474,7 +4474,7 @@ var spine;
                 var vertices = null;
                 var triangles = null;
                 var drawOrder = this.skeleton.drawOrder;
-                var batcher = this._batcher;
+                var batcher = this.batcher;
                 batcher.begin();
                 var z = 0;
                 var zOffset = this.zOffset;
@@ -4502,7 +4502,7 @@ var spine;
                             mat.map = texture.texture;
                             mat.needsUpdate = true;
                         }
-                        this._batcher.batch(vertices, triangles, z);
+                        this.batcher.batch(vertices, triangles, z);
                         z += zOffset;
                     }
                 }

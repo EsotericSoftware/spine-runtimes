@@ -123,8 +123,7 @@ function loadSkeleton (name, initialAnimation, premultipliedAlpha, skin) {
 	return { skeleton: skeleton, state: animationState, bounds: bounds, premultipliedAlpha: premultipliedAlpha };
 }
 
-function calculateBounds(skeleton) {
-	var data = skeleton.data;
+function calculateBounds(skeleton) {	
 	skeleton.setToSetupPose();
 	skeleton.updateWorldTransform();
 	var offset = new spine.Vector2();

@@ -31,91 +31,91 @@
 
 module spine.webgl {
 	export class PolygonBatcher {
-		private _gl: WebGLRenderingContext;
-		private _drawCalls: number;
-		private _drawing = false;
-		private _mesh: Mesh;
-		private _shader: Shader = null;
-		private _lastTexture: GLTexture = null;
-		private _verticesLength = 0;
-		private _indicesLength = 0;
-		private _srcBlend: number = WebGLRenderingContext.SRC_ALPHA;
-		private _dstBlend: number = WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
+		private gl: WebGLRenderingContext;
+		private drawCalls: number;
+		private drawing = false;
+		private mesh: Mesh;
+		private shader: Shader = null;
+		private lastTexture: GLTexture = null;
+		private verticesLength = 0;
+		private indicesLength = 0;
+		private srcBlend: number = WebGLRenderingContext.SRC_ALPHA;
+		private dstBlend: number = WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
 
 		constructor (gl: WebGLRenderingContext, maxVertices: number = 10920) {
 			if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
-			this._gl = gl;
-			this._mesh = new Mesh(gl, [new Position2Attribute(), new ColorAttribute(), new TexCoordAttribute()], maxVertices, maxVertices * 3);
+			this.gl = gl;
+			this.mesh = new Mesh(gl, [new Position2Attribute(), new ColorAttribute(), new TexCoordAttribute()], maxVertices, maxVertices * 3);
 		}
 
 		begin (shader: Shader) {
-			let gl = this._gl;
-			if (this._drawing) throw new Error("PolygonBatch is already drawing. Call PolygonBatch.end() before calling PolygonBatch.begin()");
-			this._drawCalls = 0;
-			this._shader = shader;
-			this._lastTexture = null;
-			this._drawing = true;
+			let gl = this.gl;
+			if (this.drawing) throw new Error("PolygonBatch is already drawing. Call PolygonBatch.end() before calling PolygonBatch.begin()");
+			this.drawCalls = 0;
+			this.shader = shader;
+			this.lastTexture = null;
+			this.drawing = true;
 
 			gl.enable(gl.BLEND);
-			gl.blendFunc(this._srcBlend, this._dstBlend);
+			gl.blendFunc(this.srcBlend, this.dstBlend);
 		}
 
 		setBlendMode (srcBlend: number, dstBlend: number) {
-			let gl = this._gl;
-			this._srcBlend = srcBlend;
-			this._dstBlend = dstBlend;
-			if (this._drawing) {
+			let gl = this.gl;
+			this.srcBlend = srcBlend;
+			this.dstBlend = dstBlend;
+			if (this.drawing) {
 				this.flush();
-				gl.blendFunc(this._srcBlend, this._dstBlend);
+				gl.blendFunc(this.srcBlend, this.dstBlend);
 			}
 		}
 
 		draw (texture: GLTexture, vertices: ArrayLike<number>, indices: Array<number>) {
-			if (texture != this._lastTexture) {
+			if (texture != this.lastTexture) {
 				this.flush();
-				this._lastTexture = texture;
+				this.lastTexture = texture;
 				texture.bind();
-			} else if (this._verticesLength + vertices.length > this._mesh.vertices().length ||
-					this._indicesLength + indices.length > this._mesh.indices().length) {
+			} else if (this.verticesLength + vertices.length > this.mesh.getVertices().length ||
+					this.indicesLength + indices.length > this.mesh.getIndices().length) {
 				this.flush();
 			}
 
-			let indexStart = this._mesh.numVertices();
-			this._mesh.vertices().set(vertices, this._verticesLength);
-			this._verticesLength += vertices.length;
-			this._mesh.setVerticesLength(this._verticesLength)
+			let indexStart = this.mesh.numVertices();
+			this.mesh.getVertices().set(vertices, this.verticesLength);
+			this.verticesLength += vertices.length;
+			this.mesh.setVerticesLength(this.verticesLength)
 
-			let indicesArray = this._mesh.indices();
-			for (let i = this._indicesLength, j = 0; j < indices.length; i++, j++)
+			let indicesArray = this.mesh.getIndices();
+			for (let i = this.indicesLength, j = 0; j < indices.length; i++, j++)
 				indicesArray[i] = indices[j] + indexStart;
-			this._indicesLength += indices.length;
-			this._mesh.setIndicesLength(this._indicesLength);
+			this.indicesLength += indices.length;
+			this.mesh.setIndicesLength(this.indicesLength);
 		}
 
 		private flush () {
-			let gl = this._gl;
-			if (this._verticesLength == 0) return;
+			let gl = this.gl;
+			if (this.verticesLength == 0) return;
 
-			this._mesh.draw(this._shader, gl.TRIANGLES);
+			this.mesh.draw(this.shader, gl.TRIANGLES);
 
-			this._verticesLength = 0;
-			this._indicesLength = 0;
-			this._mesh.setVerticesLength(0);
-			this._mesh.setIndicesLength(0);
-			this._drawCalls++;
+			this.verticesLength = 0;
+			this.indicesLength = 0;
+			this.mesh.setVerticesLength(0);
+			this.mesh.setIndicesLength(0);
+			this.drawCalls++;
 		}
 
 		end () {
-			let gl = this._gl;
-			if (!this._drawing) throw new Error("PolygonBatch is not drawing. Call PolygonBatch.begin() before calling PolygonBatch.end()");
-			if (this._verticesLength > 0 || this._indicesLength > 0) this.flush();
-			this._shader = null;
-			this._lastTexture = null;
-			this._drawing = false;
+			let gl = this.gl;
+			if (!this.drawing) throw new Error("PolygonBatch is not drawing. Call PolygonBatch.begin() before calling PolygonBatch.end()");
+			if (this.verticesLength > 0 || this.indicesLength > 0) this.flush();
+			this.shader = null;
+			this.lastTexture = null;
+			this.drawing = false;
 
 			gl.disable(gl.BLEND);
 		}
 
-		drawCalls () { return this._drawCalls; }
+		getDrawCalls () { return this.drawCalls; }
 	}
 }

@@ -34,20 +34,21 @@ module spine {
 		skeleton: Skeleton;
 		state: AnimationState;
 		gl: WebGLRenderingContext;
-		canvas: HTMLCanvasElement;		
+		canvas: HTMLCanvasElement;			
 
-		private _config: SpineWidgetConfig;
-		private _assetManager: spine.webgl.AssetManager;
-		private _shader: spine.webgl.Shader;
-		private _batcher: spine.webgl.PolygonBatcher;
-		private _mvp = new spine.webgl.Matrix4();
-		private _skeletonRenderer: spine.webgl.SkeletonRenderer;		
-		private _paused = false;
-		private _lastFrameTime = Date.now() / 1000.0;
-		private _backgroundColor = new Color();
-		private _loaded = false;
+		private config: SpineWidgetConfig;
+		private assetManager: spine.webgl.AssetManager;
+		private shader: spine.webgl.Shader;
+		private batcher: spine.webgl.PolygonBatcher;
+		private mvp = new spine.webgl.Matrix4();
+		private skeletonRenderer: spine.webgl.SkeletonRenderer;		
+		private paused = false;
+		private lastFrameTime = Date.now() / 1000.0;
+		private backgroundColor = new Color();
+		private loaded = false;
+		private bounds = { offset: new Vector2(), size: new Vector2() };
 
-		constructor (element: Element | string, config: SpineWidgetConfig) {
+		constructor (element: HTMLElement | string, config: SpineWidgetConfig) {
 			if (!element) throw new Error("Please provide a DOM element, e.g. document.getElementById('myelement')");
 			if (!config) throw new Error("Please provide a configuration, specifying at least the json file, atlas file and animation name");
 
@@ -58,18 +59,20 @@ module spine {
 			this.validateConfig(config);
 
 			let canvas = this.canvas = document.createElement("canvas");
-			(<Element> element).appendChild(canvas);
-			canvas.width = config.width;
-			canvas.height = config.height;
+			canvas.style.width = "100%";
+			canvas.style.height = "100%";
+			(<HTMLElement> element).appendChild(canvas);
+			canvas.width = (<HTMLElement>element).clientWidth;
+			canvas.height = (<HTMLElement>element).clientHeight;
 			var webglConfig = { alpha: false };
 			let gl = this.gl = <WebGLRenderingContext> (canvas.getContext("webgl", webglConfig) || canvas.getContext("experimental-webgl", webglConfig));	
 
-			this._shader = spine.webgl.Shader.newColoredTextured(gl);
-			this._batcher = new spine.webgl.PolygonBatcher(gl);
-			this._mvp.ortho2d(0, 0, 639, 479);
-			this._skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);
+			this.shader = spine.webgl.Shader.newColoredTextured(gl);
+			this.batcher = new spine.webgl.PolygonBatcher(gl);
+			this.mvp.ortho2d(0, 0, canvas.width - 1, canvas.height - 1);
+			this.skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);
 
-			let assets = this._assetManager = new spine.webgl.AssetManager(gl);
+			let assets = this.assetManager = new spine.webgl.AssetManager(gl);
 			assets.loadText(config.atlas);
 			assets.loadText(config.json);
 			assets.loadTexture(config.atlas.replace(".atlas", ".png"));
@@ -83,11 +86,10 @@ module spine {
 
 			if (!config.scale) config.scale = 1.0;
 			if (!config.skin) config.skin = "default";
-			if (config.loop === undefined) config.loop = true;			
-			if (!config.y) config.y = 20;
-			if (!config.width) config.width = 640;
-			if (!config.height) config.height = 480;			
-			if (!config.x) config.x = config.width / 2;
+			if (config.loop === undefined) config.loop = true;
+			if (!config.x) config.x = 0;		
+			if (!config.y) config.y = 0;									
+			if (config.fitToCanvas === undefined) config.fitToCanvas = true;
 			if (!config.backgroundColor) config.backgroundColor = "#555555";
 			if (!config.imagesPath) {
 				let index = config.atlas.lastIndexOf("/");
@@ -98,21 +100,21 @@ module spine {
 				}
 			}
 			if (!config.premultipliedAlpha === undefined) config.premultipliedAlpha = false;
-			this._backgroundColor.setFromString(config.backgroundColor);
-			this._config = config;		
+			this.backgroundColor.setFromString(config.backgroundColor);
+			this.config = config;		
 		}
 
 		private load () {
-			let assetManager = this._assetManager;
-			let imagesPath = this._config.imagesPath;
-			let config = this._config;
+			let assetManager = this.assetManager;
+			let imagesPath = this.config.imagesPath;
+			let config = this.config;
 			if (assetManager.isLoadingComplete()) {
 				if (assetManager.hasErrors()) {
-					if (config.error) config.error(this, "Failed to load assets: " + JSON.stringify(assetManager.errors));
-					else throw new Error("Failed to load assets: " + JSON.stringify(assetManager.errors));
+					if (config.error) config.error(this, "Failed to load assets: " + JSON.stringify(assetManager.getErrors()));
+					else throw new Error("Failed to load assets: " + JSON.stringify(assetManager.getErrors()));
 				}
 
-				let atlas = new spine.TextureAtlas(this._assetManager.get(this._config.atlas) as string, (path: string) => {
+				let atlas = new spine.TextureAtlas(this.assetManager.get(this.config.atlas) as string, (path: string) => {
 					let texture = assetManager.get(imagesPath + path) as spine.webgl.GLTexture;
 					return texture;
 				});
@@ -124,14 +126,20 @@ module spine {
 				skeletonJson.scale = config.scale;
 				var skeletonData = skeletonJson.readSkeletonData(assetManager.get(config.json) as string);
 				var skeleton = this.skeleton = new spine.Skeleton(skeletonData);
-				skeleton.x = config.x;
-				skeleton.y = config.y;
+				var bounds = this.bounds;
+				skeleton.setToSetupPose();
+				skeleton.updateWorldTransform();
+				skeleton.getBounds(bounds.offset, bounds.size);
+				if (!config.fitToCanvas) {
+					skeleton.x = config.x;
+					skeleton.y = config.y;
+				}
 				skeleton.setSkinByName(config.skin);
 
 				var animationState = this.state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
 				animationState.setAnimation(0, config.animation, true);
 				if (config.success) config.success(this);
-				this._loaded = true;
+				this.loaded = true;
 				requestAnimationFrame(() => { this.render(); });
 			} else
 				requestAnimationFrame(() => { this.load(); });
@@ -139,32 +147,33 @@ module spine {
 
 		private render () {			
 			var now = Date.now() / 1000;
-			var delta = now - this._lastFrameTime;
+			var delta = now - this.lastFrameTime;
 			if (delta > 0.1) delta = 0;
-			this._lastFrameTime = now;
+			this.lastFrameTime = now;
 
 			let gl = this.gl;
-			let color = this._backgroundColor;
+			let color = this.backgroundColor;
+			this.resize();
 			gl.clearColor(color.r, color.g, color.b, color.a);
 			gl.clear(gl.COLOR_BUFFER_BIT);
 
 			// Apply the animation state based on the delta time.
 			var state = this.state;
 			var skeleton = this.skeleton;
-			var premultipliedAlpha = this._config.premultipliedAlpha;
+			var premultipliedAlpha = this.config.premultipliedAlpha;
 			state.update(delta);
 			state.apply(skeleton);
 			skeleton.updateWorldTransform();
 			
 			// Bind the shader and set the texture and model-view-projection matrix.
-			let shader = this._shader;
+			let shader = this.shader;
 			shader.bind();
 			shader.setUniformi(spine.webgl.Shader.SAMPLER, 0);
-			shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, this._mvp.values);
+			shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, this.mvp.values);
 
 			// Start the batch and tell the SkeletonRenderer to render the active skeleton.
-			let batcher = this._batcher;
-			let skeletonRenderer = this._skeletonRenderer;
+			let batcher = this.batcher;
+			let skeletonRenderer = this.skeletonRenderer;
 			batcher.begin(shader);
 			skeletonRenderer.premultipliedAlpha = premultipliedAlpha;
 			skeletonRenderer.draw(batcher, skeleton);
@@ -172,37 +181,66 @@ module spine {
 				
 			shader.unbind();
 
-			if (!this._paused) requestAnimationFrame(() => { this.render(); });
+			if (!this.paused) requestAnimationFrame(() => { this.render(); });
+		}
+
+		private resize () {
+			let canvas = this.canvas;	
+			let w = canvas.clientWidth;
+			let h = canvas.clientHeight;
+			let bounds = this.bounds;
+			if (canvas.width != w || canvas.height != h) {
+				canvas.width = w;
+				canvas.height = h;
+			}
+
+			// magic
+			if (this.config.fitToCanvas) {
+				var centerX = bounds.offset.x + bounds.size.x / 2;
+				var centerY = bounds.offset.y + bounds.size.y / 2;
+				var scaleX = bounds.size.x / canvas.width;
+				var scaleY = bounds.size.y / canvas.height;
+				var scale = Math.max(scaleX, scaleY) * 1.2;
+				if (scale < 1) scale = 1;
+				var width = canvas.width * scale;
+				var height = canvas.height * scale;
+				this.skeleton.x = this.skeleton.y = 0;
+				this.mvp.ortho2d(centerX - width / 2, centerY - height / 2, width, height);
+			} else {
+				this.mvp.ortho2d(0, 0, canvas.width - 1, canvas.height - 1);
+			}
+
+			this.gl.viewport(0, 0, canvas.width, canvas.height);		
 		}
 
 		pause () {
-			this._paused = true;
+			this.paused = true;
 		}
 
 		play () {
-			this._paused = false;
+			this.paused = false;
 			requestAnimationFrame(() => { this.render(); });
 		}
 
 		isPlaying () {
-			return !this._paused;
+			return !this.paused;
 		}
 
 		setAnimation (animationName: string) {
-			if (!this._loaded) throw new Error("Widget isn't loaded yet");
+			if (!this.loaded) throw new Error("Widget isn't loaded yet");
 			this.skeleton.setToSetupPose();
-			this.state.setAnimation(0, animationName, this._config.loop);
+			this.state.setAnimation(0, animationName, this.config.loop);
 		}
 
 
 		static loadWidgets() {
 			let widgets = document.getElementsByClassName("spine-widget");
 			for (var i = 0; i < widgets.length; i++) {
-				SpineWidget.loadWidget(widgets[i]);				
+				SpineWidget.loadWidget(<HTMLElement>widgets[i]);				
 			}
 		}
 
-		static loadWidget(widget: Element) {
+		static loadWidget(widget: HTMLElement) {
 			let config = new SpineWidgetConfig();
 			config.atlas = widget.getAttribute("data-atlas");
 			config.json = widget.getAttribute("data-json");
@@ -212,9 +250,8 @@ module spine {
 			if (widget.getAttribute("data-loop")) config.loop = widget.getAttribute("data-loop") === "true";
 			if (widget.getAttribute("data-scale")) config.scale = parseFloat(widget.getAttribute("data-scale"));
 			if (widget.getAttribute("data-x")) config.x = parseFloat(widget.getAttribute("data-x"));
-			if (widget.getAttribute("data-y")) config.x = parseFloat(widget.getAttribute("data-y"));
-			if (widget.getAttribute("data-width")) config.width = parseInt(widget.getAttribute("data-width"));
-			if (widget.getAttribute("data-height")) config.height = parseInt(widget.getAttribute("data-height"));			
+			if (widget.getAttribute("data-y")) config.y = parseFloat(widget.getAttribute("data-y"));
+			if (widget.getAttribute("data-fit-to-canvas")) config.fitToCanvas = widget.getAttribute("data-fit-to-canvas") === "true";							
 			if (widget.getAttribute("data-background-color")) config.backgroundColor = widget.getAttribute("data-background-color");
 			if (widget.getAttribute("data-premultiplied-alpha")) config.premultipliedAlpha = widget.getAttribute("data-premultiplied-alpha") === "true";			
 
@@ -251,8 +288,7 @@ module spine {
 		scale = 1.0;
 		x = 0;
 		y = 0;
-		width = 640;
-		height = 480;		
+		fitToCanvas = true;		
 		backgroundColor = "#555555";
 		premultipliedAlpha = false;		
 		success: (widget: SpineWidget) => void;

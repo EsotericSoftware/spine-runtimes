@@ -31,33 +31,33 @@
 
 module spine {
 	export class AssetManager implements Disposable {
-		private _textureLoader: (image: HTMLImageElement) => any;
-		private _assets: Map<any> = {};
-		private _errors: Map<string> = {};
-		private _toLoad = 0;
-		private _loaded = 0;
+		private textureLoader: (image: HTMLImageElement) => any;
+		private assets: Map<any> = {};
+		private errors: Map<string> = {};
+		private toLoad = 0;
+		private loaded = 0;
 
 		constructor (textureLoader: (image: HTMLImageElement) => any) {
-			this._textureLoader = textureLoader;
+			this.textureLoader = textureLoader;
 		}
 
 		loadText(path: string,
 			success: (path: string, text: string) => void = null,
 			error: (path: string, error: string) => void = null
 		) {
-			this._toLoad++;
+			this.toLoad++;
 			let request = new XMLHttpRequest();
 			request.onreadystatechange = () => {
 				if (request.readyState == XMLHttpRequest.DONE) {
 					if (request.status >= 200 && request.status < 300) {
 						if (success) success(path, request.responseText);
-						this._assets[path] = request.responseText;
+						this.assets[path] = request.responseText;
 					} else {
 						if (error) error(path, `Couldn't load text ${path}: status ${request.status}, ${request.responseText}`);
-						this._errors[path] = `Couldn't load text ${path}: status ${request.status}, ${request.responseText}`;
+						this.errors[path] = `Couldn't load text ${path}: status ${request.status}, ${request.responseText}`;
 					}
-					this._toLoad--;
-					this._loaded++;
+					this.toLoad--;
+					this.loaded++;
 				}
 			};
 			request.open("GET", path, true);
@@ -68,52 +68,52 @@ module spine {
 			success: (path: string, image: HTMLImageElement) => void = null,
 			error: (path: string, error: string) => void = null
 		) {
-			this._toLoad++;
+			this.toLoad++;
 			let img = new Image();
 			img.src = path;
 			img.onload = (ev) => {
 				if (success) success(path, img);
-				let texture = this._textureLoader(img);
-				this._assets[path] = texture;
-				this._toLoad--;
-				this._loaded++;
+				let texture = this.textureLoader(img);
+				this.assets[path] = texture;
+				this.toLoad--;
+				this.loaded++;
 			}
 			img.onerror = (ev) => {
 				if (error) error(path, `Couldn't load image ${path}`);
-				this._errors[path] =  `Couldn't load image ${path}`;
-				this._toLoad--;
-				this._loaded++;
+				this.errors[path] =  `Couldn't load image ${path}`;
+				this.toLoad--;
+				this.loaded++;
 			}
 		}
 
 		get (path: string) {
-			return this._assets[path];
+			return this.assets[path];
 		}
 
 		remove (path: string) {
-			let asset = this._assets[path];
+			let asset = this.assets[path];
 			if ((<any>asset).dispose) (<any>asset).dispose();			
-			this._assets[path] = null;
+			this.assets[path] = null;
 		}
 
 		removeAll () {
-			for (let key in this._assets) {
-				let asset = this._assets[key];
+			for (let key in this.assets) {
+				let asset = this.assets[key];
 				if ((<any>asset).dispose) (<any>asset).dispose();
 			}
-			this._assets = {};
+			this.assets = {};
 		}
 
 		isLoadingComplete (): boolean {
-			return this._toLoad == 0;
+			return this.toLoad == 0;
 		}
 
-		toLoad (): number {
-			return this._toLoad;
+		getToLoad (): number {
+			return this.toLoad;
 		}
 
-		loaded (): number {
-			return this._loaded;
+		getLoaded (): number {
+			return this.loaded;
 		}
 
 		dispose () {
@@ -121,11 +121,11 @@ module spine {
 		}
 
 		hasErrors() {
-			return Object.keys(this._errors).length > 0;
+			return Object.keys(this.errors).length > 0;
 		}
 
-		errors() {
-			return this._errors;
+		getErrors() {
+			return this.errors;
 		}
 	}
 }
