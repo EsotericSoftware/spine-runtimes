@@ -391,15 +391,15 @@ public class Animation {
 				x = prevX + (frames[frame + X] - prevX) * percent;
 				y = prevY + (frames[frame + Y] - prevY) * percent;
 			}
+			x *= bone.data.scaleX;
+			y *= bone.data.scaleY;
 			if (alpha == 1) {
-				bone.scaleX = x * bone.data.scaleX;
-				bone.scaleY = y * bone.data.scaleY;
+				bone.scaleX = x;
+				bone.scaleY = y;
 			} else {
-				x *= bone.data.scaleX;
-				y *= bone.data.scaleY;
 				float bx = Math.abs(bone.scaleX) * Math.signum(x), by = Math.abs(bone.scaleY) * Math.signum(y);
-				bone.scaleX = (bx + (x - bx) * alpha);
-				bone.scaleY = (by + (y - by) * alpha);
+				bone.scaleX = bx + (x - bx) * alpha;
+				bone.scaleY = by + (y - by) * alpha;
 			}
 		}
 	}
