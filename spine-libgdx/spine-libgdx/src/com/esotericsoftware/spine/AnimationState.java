@@ -71,11 +71,19 @@ public class AnimationState {
 
 			float currentDelta = delta * current.timeScale;
 
+			if (current.delay > 0) {
+				current.delay -= currentDelta;
+				if (current.delay > 0) continue;
+				currentDelta = -current.delay;
+				current.delay = 0;
+			}
+
 			TrackEntry next = current.next;
 			if (next != null) {
 				// When the next entry's delay is passed, change to the next entry.
 				float nextTime = current.trackLast - next.delay;
 				if (nextTime >= 0) {
+					next.delay = 0;
 					next.trackTime = nextTime + delta * next.timeScale;
 					current.trackTime += currentDelta;
 					setCurrent(i, next);
@@ -106,6 +114,7 @@ public class AnimationState {
 		for (int i = 0; i < tracks.size; i++) {
 			TrackEntry current = tracks.get(i);
 			if (current == null) continue;
+			if (current.delay > 0) continue;
 
 			float alpha = current.alpha;
 			if (current.mixingFrom != null) {
@@ -308,9 +317,10 @@ public class AnimationState {
 				else
 					delay = 0;
 			}
-			entry.delay = delay;
 		} else
 			setCurrent(trackIndex, entry);
+
+		entry.delay = delay;
 		return entry;
 	}
 
@@ -444,7 +454,9 @@ public class AnimationState {
 			this.loop = loop;
 		}
 
-		/** Seconds from the start of the last animation (if any) to when this animation becomes the current animation. */
+		/** Seconds to postpone playing the animation. When a track entry is the current track entry, delay postpones incrementing
+		 * the track time. When a track entry is queued, delay is the time from the start of the previous animation to when the
+		 * track entry will become the current track entry. */
 		public float getDelay () {
 			return delay;
 		}

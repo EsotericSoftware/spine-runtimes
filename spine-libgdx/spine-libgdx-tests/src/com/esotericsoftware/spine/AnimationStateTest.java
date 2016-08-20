@@ -519,6 +519,17 @@ public class AnimationStateTest {
 		state.setAnimation(0, "events2", false);
 		run(0.1f, 1000, null);
 
+		setup("addAnimation with delay on empty track", // 22
+			expect(0, "start", 0, 0), //
+			expect(0, "event 0", 0, 5), //
+			expect(0, "event 14", 0.5f, 5.5f), //
+			expect(0, "event 30", 1, 6), //
+			expect(0, "complete", 1, 6), //
+			expect(0, "end", 1, 6.1f) //
+		);
+		state.addAnimation(0, "events1", false, 5);
+		run(0.1f, 10, null);
+
 		System.out.println("AnimationState tests passed.");
 	}
 
@@ -543,12 +554,12 @@ public class AnimationStateTest {
 			skeleton.update(incr);
 			state.update(incr);
 
-			// Reduce float error for tests.
+			// Reduce float discrepancies for tests.
 			for (TrackEntry entry : state.getTracks()) {
 				if (entry == null) continue;
-				entry.trackTime = Math.round(entry.trackTime * 1000000) / 1000000f;
-				if (entry.mixingFrom != null)
-					entry.mixingFrom.trackTime = Math.round(entry.mixingFrom.trackTime * 1000000) / 1000000f;
+				entry.trackTime = round(entry.trackTime, 6);
+				entry.delay = round(entry.delay, 3);
+				if (entry.mixingFrom != null) entry.mixingFrom.trackTime = round(entry.mixingFrom.trackTime, 6);
 			}
 
 			state.apply(skeleton);
@@ -560,11 +571,11 @@ public class AnimationStateTest {
 		}
 		actual.clear();
 		expected.clear();
+		log("");
 		if (fail) {
-			System.out.println("TEST " + test + " FAILED!");
+			log("TEST " + test + " FAILED!");
 			System.exit(0);
 		}
-		System.out.println();
 	}
 
 	Result expect (int animationIndex, String name, float trackTime, float totalTime) {
@@ -612,13 +623,17 @@ public class AnimationStateTest {
 		}
 
 		public String toString () {
-			return String.format("%-3s%-12s%-7s%-7s", "" + animationIndex, name, round(trackTime, 3), round(totalTime, 3));
+			return String.format("%-3s%-12s%-7s%-7s", "" + animationIndex, name, roundTime(trackTime), roundTime(totalTime));
 		}
 	}
 
-	static String round (float value, int decimals) {
+	static float round (float value, int decimals) {
 		float shift = (float)Math.pow(10, decimals);
-		String text = Float.toString(Math.round(value * shift) / shift);
+		return Math.round(value * shift) / shift;
+	}
+
+	static String roundTime (float value) {
+		String text = Float.toString(round(value, 3));
 		return text.endsWith(".0") ? text.substring(0, text.length() - 2) : text;
 	}
 
