@@ -264,7 +264,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			ShapeRenderer shapes = debugRenderer.getShapeRenderer();
 			TrackEntry entry = state.getCurrent(0);
 			if (entry != null) {
-				float percent = entry.getTime() / entry.getEndTime();
+				float percent = entry.getTrackTime() / entry.getTrackEnd();
 				if (entry.getLoop()) percent %= 1;
 				float x = ui.window.getRight() + (Gdx.graphics.getWidth() - ui.window.getRight()) * percent;
 				shapes.setColor(Color.CYAN);

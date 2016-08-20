@@ -88,8 +88,8 @@ public class SimpleTest2 extends ApplicationAdapter {
 					.println(entry.getTrackIndex() + " event: " + entry + ", " + event.getData().getName() + ", " + event.getInt());
 			}
 
-			public void complete (TrackEntry entry, int loopCount) {
-				System.out.println(entry.getTrackIndex() + " complete: " + entry + ", " + loopCount);
+			public void complete (TrackEntry entry) {
+				System.out.println(entry.getTrackIndex() + " complete: " + entry);
 			}
 
 			public void interrupt (TrackEntry entry) {

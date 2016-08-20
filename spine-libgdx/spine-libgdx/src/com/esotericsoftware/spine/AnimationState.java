@@ -46,7 +46,6 @@ public class AnimationState {
 	private final Array<Event> events = new Array();
 	final Array<AnimationStateListener> listeners = new Array();
 	private float timeScale = 1;
-	private float eventThreshold, attachmentThreshold, drawOrderThreshold;
 	final Pool<TrackEntry> trackEntryPool = new Pool() {
 		protected Object newObject () {
 			return new TrackEntry();
@@ -75,24 +74,24 @@ public class AnimationState {
 			TrackEntry next = current.next;
 			if (next != null) {
 				// When the next entry's delay is passed, change to the next entry.
-				float nextTime = current.lastTime - next.delay;
+				float nextTime = current.trackLast - next.delay;
 				if (nextTime >= 0) {
-					next.time = nextTime + delta * next.timeScale;
-					current.time += currentDelta;
+					next.trackTime = nextTime + delta * next.timeScale;
+					current.trackTime += currentDelta;
 					setCurrent(i, next);
 					if (next.mixingFrom != null) next.mixTime += currentDelta;
 					continue;
 				}
-			} else if (!current.loop && current.lastTime >= current.endTime) {
-				// End non-looping animation when it reaches its end time and there is no next entry.
+			} else if (!current.loop && current.trackLast >= current.trackEnd) {
+				// Clear a non-looping animation when it reaches its end time and there is no next entry.
 				clearTrack(i);
 				continue;
 			}
 
-			current.time += currentDelta;
+			current.trackTime += currentDelta;
 			if (current.mixingFrom != null) {
 				float mixingFromDelta = delta * current.mixingFrom.timeScale;
-				current.mixingFrom.time += mixingFromDelta;
+				current.mixingFrom.trackTime += mixingFromDelta;
 				current.mixTime += mixingFromDelta;
 			}
 		}
@@ -108,12 +107,7 @@ public class AnimationState {
 			TrackEntry current = tracks.get(i);
 			if (current == null) continue;
 
-			float time = current.time, lastTime = current.lastTime, endTime = current.endTime, alpha = current.alpha;
-			if (!current.loop) {
-				if (time > endTime) time = endTime;
-				if (lastTime > endTime) lastTime = endTime;
-			}
-
+			float alpha = current.alpha;
 			if (current.mixingFrom != null) {
 				alpha *= current.mixTime / current.mixDuration;
 				applyMixingFrom(current.mixingFrom, skeleton, alpha);
@@ -123,71 +117,70 @@ public class AnimationState {
 					current.mixingFrom = null;
 				}
 			}
-			current.animation.mix(skeleton, lastTime, time, current.loop, events, alpha);
-			queueEvents(current, lastTime, time, endTime);
 
-			current.lastTime = current.time;
+			float animationLast = current.animationLast, animationTime = current.getAnimationTime();
+			Array<Timeline> timelines = current.animation.timelines;
+			for (int ii = 0, n = timelines.size; ii < n; ii++)
+				timelines.get(ii).apply(skeleton, animationLast, animationTime, events, alpha);
+			queueEvents(current, animationTime);
+			current.animationLast = animationTime;
+			current.trackLast = current.trackTime;
 		}
 
 		queue.drain();
 	}
 
 	private void applyMixingFrom (TrackEntry entry, Skeleton skeleton, float mix) {
-		float time = entry.time, lastTime = entry.lastTime, endTime = entry.endTime, alpha = entry.alpha;
-		float animationTime;
-		if (entry.loop) {
-			float duration = entry.animation.duration;
-			if (duration != 0) {
-				animationTime = time % duration;
-				if (lastTime > 0) lastTime %= duration;
-			} else
-				animationTime = time;
-		} else {
-			if (time > endTime) time = endTime;
-			if (lastTime > endTime) lastTime = endTime;
-			animationTime = time;
-		}
-
 		Array<Event> events = mix < entry.eventThreshold ? this.events : null;
 		boolean attachments = mix < entry.attachmentThreshold, drawOrder = mix < entry.drawOrderThreshold;
 
+		float animationLast = entry.animationLast, animationTime = entry.getAnimationTime();
 		Array<Timeline> timelines = entry.animation.timelines;
+		float alpha = entry.alpha;
 		if (attachments && drawOrder) {
 			for (int i = 0, n = timelines.size; i < n; i++)
-				timelines.get(i).apply(skeleton, lastTime, animationTime, events, alpha);
+				timelines.get(i).apply(skeleton, animationLast, animationTime, events, alpha);
 		} else {
 			for (int i = 0, n = timelines.size; i < n; i++) {
 				Timeline timeline = timelines.get(i);
 				if (!attachments && timeline instanceof AttachmentTimeline) continue;
 				if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
-				timeline.apply(skeleton, lastTime, animationTime, events, alpha);
+				timeline.apply(skeleton, animationLast, animationTime, events, alpha);
 			}
 		}
 
-		queueEvents(entry, entry.lastTime, time, entry.endTime);
-		entry.lastTime = entry.time;
+		queueEvents(entry, animationTime);
+		entry.animationLast = animationTime;
+		entry.trackLast = entry.trackTime;
 	}
 
-	private void queueEvents (TrackEntry entry, float lastTime, float time, float endTime) {
-		Array<Event> events = this.events;
-		int n = events.size;
+	private void queueEvents (TrackEntry entry, float animationTime) {
+		float animationStart = entry.animationStart, animationEnd = entry.animationEnd;
+		float duration = animationEnd - animationStart;
+		float trackLastWrapped = entry.trackLast % duration;
 
 		// Queue events before complete.
-		float lastTimeWrapped = lastTime % endTime;
-		int i = 0;
+		Array<Event> events = this.events;
+		int i = 0, n = events.size;
 		for (; i < n; i++) {
 			Event event = events.get(i);
-			if (events.get(i).time < lastTimeWrapped) break;
+			if (event.time < trackLastWrapped) break;
+			if (event.time > animationEnd) continue; // Discard events out of animation start/end.
 			queue.event(entry, event);
 		}
 
-		// Queue complete if completed the animation or a loop iteration.
-		if (entry.loop ? (lastTime % endTime > time % endTime) : (lastTime < endTime && time >= endTime))
-			queue.complete(entry, (int)(time / endTime));
+		// Queue complete if completed a loop iteration or the animation.
+		if (entry.loop ? (trackLastWrapped > entry.trackTime % duration)
+			: (animationTime >= animationEnd && entry.animationLast < animationEnd)) {
+			queue.complete(entry);
+		}
 
 		// Queue events after complete.
-		for (; i < n; i++)
+		for (; i < n; i++) {
+			Event event = events.get(i);
+			if (event.time < animationStart) continue; // Discard events out of animation start/end.
 			queue.event(entry, events.get(i));
+		}
 		events.clear();
 	}
 
@@ -266,8 +259,11 @@ public class AnimationState {
 	 *         after {@link AnimationStateListener#end(TrackEntry)}. */
 	public TrackEntry setAnimation (int trackIndex, Animation animation, boolean loop) {
 		if (animation == null) throw new IllegalArgumentException("animation cannot be null.");
-		clearTrack(trackIndex);
-		TrackEntry entry = trackEntry(trackIndex, animation, loop, null);
+
+		TrackEntry current = expandToIndex(trackIndex);
+		if (current != null) freeAll(current.next);
+
+		TrackEntry entry = trackEntry(trackIndex, animation, loop, current);
 		setCurrent(trackIndex, entry);
 		return entry;
 	}
@@ -297,7 +293,11 @@ public class AnimationState {
 
 		if (last != null) {
 			last.next = entry;
-			if (delay <= 0) delay += last.endTime * (1 + (int)(last.time / last.endTime)) - data.getMix(last.animation, animation);
+			if (delay <= 0) {
+				float duration = last.animationEnd - last.animationStart;
+				if (duration != 0)
+					delay += duration * (1 + (int)(last.trackTime / duration)) - data.getMix(last.animation, animation);
+			}
 		} else {
 			setCurrent(trackIndex, entry);
 			if (delay <= 0) delay = 0;
@@ -314,14 +314,17 @@ public class AnimationState {
 		entry.animation = animation;
 		entry.loop = loop;
 
-		entry.eventThreshold = eventThreshold;
-		entry.attachmentThreshold = attachmentThreshold;
-		entry.drawOrderThreshold = drawOrderThreshold;
+		entry.eventThreshold = 0;
+		entry.attachmentThreshold = 0;
+		entry.drawOrderThreshold = 0;
 
 		entry.delay = 0;
-		entry.endTime = animation.getDuration();
-		entry.time = 0;
-		entry.lastTime = -1;
+		entry.trackTime = 0;
+		entry.trackEnd = animation.getDuration();
+		entry.trackLast = -1;
+		entry.animationStart = 0;
+		entry.animationEnd = entry.trackEnd;
+		entry.animationLast = -1;
 		entry.timeScale = 1;
 
 		entry.alpha = 1;
@@ -360,7 +363,7 @@ public class AnimationState {
 	}
 
 	/** Multiplier for the delta time when the animation state is updated, causing time for all animations to move slower or
-	 * faster. */
+	 * faster. Defaults to 1. */
 	public float getTimeScale () {
 		return timeScale;
 	}
@@ -369,38 +372,12 @@ public class AnimationState {
 		this.timeScale = timeScale;
 	}
 
-	/** @see TrackEntry#getEventThreshold() */
-	public float getEventThreshold () {
-		return eventThreshold;
-	}
-
-	public void setEventThreshold (float eventThreshold) {
-		this.eventThreshold = eventThreshold;
-	}
-
-	/** @see TrackEntry#getAttachmentThreshold() */
-	public float getAttachmentThreshold () {
-		return attachmentThreshold;
-	}
-
-	public void setAttachmentThreshold (float attachmentThreshold) {
-		this.attachmentThreshold = attachmentThreshold;
-	}
-
-	/** @see TrackEntry#getDrawOrderThreshold() */
-	public float getDrawOrderThreshold () {
-		return drawOrderThreshold;
-	}
-
-	public void setDrawOrderThreshold (float drawOrderThreshold) {
-		this.drawOrderThreshold = drawOrderThreshold;
-	}
-
 	public AnimationStateData getData () {
 		return data;
 	}
 
 	public void setData (AnimationStateData data) {
+		if (data == null) throw new IllegalArgumentException("data cannot be null.");
 		this.data = data;
 	}
 
@@ -429,8 +406,7 @@ public class AnimationState {
 		int trackIndex;
 		boolean loop;
 		float eventThreshold, attachmentThreshold, drawOrderThreshold;
-		/** Merow. */
-		float delay, endTime, time, lastTime, timeScale;
+		float delay, trackTime, trackLast, trackEnd, animationStart, animationEnd, animationLast, timeScale;
 		float alpha;
 		float mixTime, mixDuration;
 
@@ -439,6 +415,15 @@ public class AnimationState {
 			mixingFrom = null;
 			animation = null;
 			listener = null;
+		}
+
+		public float getAnimationTime () {
+			if (loop) {
+				float duration = animationEnd - animationStart;
+				if (duration == 0) return 0;
+				return (trackTime % duration) + animationStart;
+			}
+			return Math.min(trackTime + animationStart, animationEnd);
 		}
 
 		public int getTrackIndex () {
@@ -470,42 +455,56 @@ public class AnimationState {
 			this.delay = delay;
 		}
 
+		/** Current time in seconds for this track entry. When changing the track time, it often makes sense to also change
+		 * {@link #getAnimationLast()} to control when timelines will trigger. Defaults to 0. */
+		public float getTrackTime () {
+			return trackTime;
+		}
+
+		public void setTrackTime (float trackTime) {
+			this.trackTime = trackTime;
+		}
+
+		public float getTrackEnd () {
+			return trackEnd;
+		}
+
+		public void setTrackEnd (float trackEnd) {
+			this.trackEnd = trackEnd;
+		}
+
+		/** Seconds when this animation starts, both initially and after looping. Defaults to 0. */
+		public float getAnimationStart () {
+			return animationStart;
+		}
+
+		public void setAnimationStart (float animationStart) {
+			this.animationStart = animationStart;
+		}
+
 		/** Seconds when this animation ends, causing the next animation to start or this animation to loop. Defaults to the
-		 * animation duration.
-		 * <p>
-		 * When a non-looping animation reaches the end time and no more animations are queued, it is removed from the track. The
-		 * end time may be set beyond the animation duration to keep applying the animation instead of removing it. */
-		public float getEndTime () {
-			return endTime;
+		 * animation duration. */
+		public float getAnimationEnd () {
+			return animationEnd;
 		}
 
-		public void setEndTime (float endTime) {
-			this.endTime = endTime;
-		}
-
-		/** Current time in seconds for this animation. When changing the time, it often makes sense to also change last time to
-		 * control when timelines will trigger. */
-		public float getTime () {
-			return time;
-		}
-
-		public void setTime (float time) {
-			this.time = time;
+		public void setAnimationEnd (float animationEnd) {
+			this.animationEnd = animationEnd;
 		}
 
 		/** The time in seconds this animation was last applied. Some timelines use this for one-time triggers. Eg, when this
 		 * animation is applied, event timelines will fire all events between lastTime (exclusive) and time (inclusive). Defaults to
 		 * -1 to ensure triggers on frame 0 happen the first time this animation is applied. */
-		public float getLastTime () {
-			return lastTime;
+		public float getAnimationLast () {
+			return animationLast;
 		}
 
-		public void setLastTime (float lastTime) {
-			this.lastTime = lastTime;
+		public void setAnimationLast (float animationLast) {
+			this.animationLast = animationLast;
 		}
 
 		/** Multiplier for the delta time when the animation state is updated, causing time for this animation to move slower or
-		 * faster. */
+		 * faster. Defaults to 1. */
 		public float getTimeScale () {
 			return timeScale;
 		}
@@ -579,7 +578,7 @@ public class AnimationState {
 
 		/** Returns true if at least one loop has been completed (ie time >= end time). */
 		public boolean isComplete () {
-			return time >= endTime;
+			return trackTime >= trackEnd;
 		}
 
 		/** Seconds from zero to the mix duration when mixing from the previous animation to this animation. */
@@ -591,7 +590,8 @@ public class AnimationState {
 			this.mixTime = mixTime;
 		}
 
-		/** Seconds for mixing from the previous animation to this animation. */
+		/** Seconds for mixing from the previous animation to this animation. Defaults to the value provided by
+		 * {@link AnimationStateData} based on the animation before this animation (if any). */
 		public float getMixDuration () {
 			return mixDuration;
 		}
@@ -612,7 +612,7 @@ public class AnimationState {
 	}
 
 	static private class EventQueue {
-		static private final int START = -3, EVENT = -2, INTERRUPT = -1, END = 0;
+		static private final int START = 0, EVENT = 1, COMPLETE = 2, INTERRUPT = 3, END = 4;
 
 		private final Array<AnimationStateListener> listeners;
 		private final Pool<TrackEntry> trackEntryPool;
@@ -636,9 +636,9 @@ public class AnimationState {
 			eventTypes.add(EVENT);
 		}
 
-		public void complete (TrackEntry entry, int loopCount) {
+		public void complete (TrackEntry entry) {
 			objects.add(entry);
-			eventTypes.add(loopCount);
+			eventTypes.add(COMPLETE);
 		}
 
 		public void interrupt (TrackEntry entry) {
@@ -685,9 +685,9 @@ public class AnimationState {
 					trackEntryPool.free(entry);
 					break;
 				default:
-					if (entry.listener != null) entry.listener.complete(entry, eventType);
+					if (entry.listener != null) entry.listener.complete(entry);
 					for (int i = 0; i < listeners.size; i++)
-						listeners.get(i).complete(entry, eventType);
+						listeners.get(i).complete(entry);
 				}
 			}
 			clear();
@@ -713,9 +713,8 @@ public class AnimationState {
 		 * should be kept because it may be reused. */
 		public void end (TrackEntry entry);
 
-		/** Invoked every time this animation completes a loop.
-		 * @param loopCount The number of times the animation reached the end. */
-		public void complete (TrackEntry entry, int loopCount);
+		/** Invoked every time this animation completes a loop. */
+		public void complete (TrackEntry entry);
 
 		/** Invoked when this animation triggers an event. */
 		public void event (TrackEntry entry, Event event);
@@ -725,7 +724,7 @@ public class AnimationState {
 		public void event (TrackEntry entry, Event event) {
 		}
 
-		public void complete (TrackEntry entry, int loopCount) {
+		public void complete (TrackEntry entry) {
 		}
 
 		public void start (TrackEntry entry) {

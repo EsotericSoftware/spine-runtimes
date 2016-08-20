@@ -75,8 +75,8 @@ public class AnimationStateTest {
 			add(actual("interrupt", entry));
 		}
 
-		public void complete (TrackEntry entry, int loopCount) {
-			add(actual("complete " + loopCount, entry));
+		public void complete (TrackEntry entry) {
+			add(actual("complete", entry));
 		}
 
 		public void end (TrackEntry entry) {
@@ -84,17 +84,16 @@ public class AnimationStateTest {
 		}
 
 		private void add (Result result) {
-			String error = "PASS";
+			String message = result.toString();
 			if (actual.size >= expected.size) {
-				error = "FAIL: <none>";
+				message += "FAIL: <none>";
 				fail = true;
 			} else if (!expected.get(actual.size).equals(result)) {
-				error = "FAIL: " + expected.get(actual.size);
+				message += "FAIL: " + expected.get(actual.size);
 				fail = true;
-			}
-			buffer.append(result.toString());
-			buffer.append(error);
-			buffer.append('\n');
+			} else
+				message += "PASS";
+			log(message);
 			actual.add(result);
 		}
 	};
@@ -102,7 +101,6 @@ public class AnimationStateTest {
 	final SkeletonData skeletonData;
 	final Array<Result> actual = new Array();
 	final Array<Result> expected = new Array();
-	final StringBuilder buffer = new StringBuilder(512);
 
 	AnimationStateData stateData;
 	AnimationState state;
@@ -113,12 +111,14 @@ public class AnimationStateTest {
 	AnimationStateTest () {
 		skeletonData = json.readSkeletonData(new LwjglFileHandle("test/test.json", FileType.Internal));
 
+		TrackEntry entry;
+
 		setup("0.1 time step", // 1
 			expect(0, "start", 0, 0), //
 			expect(0, "event 0", 0, 0), //
 			expect(0, "event 14", 0.5f, 0.5f), //
 			expect(0, "event 30", 1, 1), //
-			expect(0, "complete 1", 1, 1), //
+			expect(0, "complete", 1, 1), //
 			expect(0, "end", 1, 1.1f) //
 		);
 		state.setAnimation(0, "events1", false);
@@ -128,9 +128,9 @@ public class AnimationStateTest {
 			expect(0, "start", 0, 0), //
 			expect(0, "event 0", 0, 0), //
 			expect(0, "event 14", 0.467f, 0.467f), //
-			expect(0, "event 30", 1.017f, 1.017f), //
-			expect(0, "complete 1", 1.017f, 1.017f), //
-			expect(0, "end", 1.017f, 1.033f) //
+			expect(0, "event 30", 1, 1), //
+			expect(0, "complete", 1, 1), //
+			expect(0, "end", 1, 1.017f) //
 		);
 		state.setAnimation(0, "events1", false);
 		run(1 / 60f, 1000);
@@ -140,7 +140,7 @@ public class AnimationStateTest {
 			expect(0, "event 0", 0, 0), //
 			expect(0, "event 14", 30, 30), //
 			expect(0, "event 30", 30, 30), //
-			expect(0, "complete 1", 30, 30), //
+			expect(0, "complete", 30, 30), //
 			expect(0, "end", 30, 60) //
 		);
 		state.setAnimation(0, "events1", false);
@@ -151,7 +151,7 @@ public class AnimationStateTest {
 			expect(0, "event 0", 0, 0), //
 			expect(0, "event 14", 1, 1), //
 			expect(0, "event 30", 1, 1), //
-			expect(0, "complete 1", 1, 1), //
+			expect(0, "complete", 1, 1), //
 			expect(0, "end", 1, 2) //
 		);
 		state.setAnimation(0, "events1", false);
@@ -162,7 +162,7 @@ public class AnimationStateTest {
 			expect(0, "event 0", 0, 0), //
 			expect(0, "event 14", 0.5f, 0.5f), //
 			expect(0, "event 30", 1, 1), //
-			expect(0, "complete 1", 1, 1), //
+			expect(0, "complete", 1, 1), //
 
 			expect(1, "start", 0.1f, 1.1f), //
 
@@ -172,7 +172,7 @@ public class AnimationStateTest {
 			expect(1, "event 0", 0.1f, 1.1f), //
 			expect(1, "event 14", 0.5f, 1.5f), //
 			expect(1, "event 30", 1, 2), //
-			expect(1, "complete 1", 1, 2), //
+			expect(1, "complete", 1, 2), //
 
 			expect(0, "start", 0.1f, 2.1f), //
 
@@ -182,7 +182,7 @@ public class AnimationStateTest {
 			expect(0, "event 0", 0.1f, 2.1f), //
 			expect(0, "event 14", 0.5f, 2.5f), //
 			expect(0, "event 30", 1, 3), //
-			expect(0, "complete 1", 1, 3), //
+			expect(0, "complete", 1, 3), //
 			expect(0, "end", 1, 3.1f) //
 		);
 		state.setAnimation(0, "events1", false);
@@ -203,7 +203,7 @@ public class AnimationStateTest {
 			expect(1, "event 0", 0.1f, 0.6f), //
 			expect(1, "event 14", 0.5f, 1.0f), //
 			expect(1, "event 30", 1, 1.5f), //
-			expect(1, "complete 1", 1, 1.5f), //
+			expect(1, "complete", 1, 1.5f), //
 			expect(1, "end", 1, 1.6f) //
 		);
 		state.setAnimation(0, "events1", false);
@@ -218,7 +218,7 @@ public class AnimationStateTest {
 			expect(1, "start", 0.1f, 1), //
 
 			expect(0, "interrupt", 1, 1), //
-			expect(0, "complete 1", 1, 1), //
+			expect(0, "complete", 1, 1), //
 
 			expect(1, "event 0", 0.1f, 1), //
 			expect(1, "event 14", 0.5f, 1.4f), //
@@ -226,7 +226,7 @@ public class AnimationStateTest {
 			expect(0, "end", 1.6f, 1.6f), //
 
 			expect(1, "event 30", 1, 1.9f), //
-			expect(1, "complete 1", 1, 1.9f), //
+			expect(1, "complete", 1, 1.9f), //
 			expect(1, "end", 1, 2) //
 		);
 		stateData.setMix("events1", "events2", 0.7f);
@@ -245,11 +245,11 @@ public class AnimationStateTest {
 			expect(1, "event 0", 0.1f, 0.5f), //
 			expect(1, "event 14", 0.5f, 0.9f), //
 
-			expect(0, "complete 1", 1, 1), //
+			expect(0, "complete", 1, 1), //
 			expect(0, "end", 1.1f, 1.1f), //
 
 			expect(1, "event 30", 1, 1.4f), //
-			expect(1, "complete 1", 1, 1.4f), //
+			expect(1, "complete", 1, 1.4f), //
 			expect(1, "end", 1, 1.5f) //
 		);
 		stateData.setDefaultMix(0.7f);
@@ -269,43 +269,43 @@ public class AnimationStateTest {
 			expect(1, "event 0", 0.1f, 0.5f), //
 			expect(1, "event 14", 0.5f, 0.9f), //
 
-			expect(0, "complete 1", 1, 1), //
+			expect(0, "complete", 1, 1), //
 			expect(0, "end", 1.1f, 1.1f), //
 
 			expect(1, "event 30", 1, 1.4f), //
-			expect(1, "complete 1", 1, 1.4f), //
+			expect(1, "complete", 1, 1.4f), //
 			expect(1, "end", 1, 1.5f) //
 		);
 		stateData.setMix("events1", "events2", 0.7f);
-		state.setEventThreshold(0.5f);
-		state.setAnimation(0, "events1", false);
+		state.setAnimation(0, "events1", false).setEventThreshold(0.5f);
 		state.addAnimation(0, "events2", false, 0.4f);
 		run(0.1f, 1000);
 
 		setup("event threshold, all animation 0 events fire during mix", // 10
 			expect(0, "start", 0, 0), //
 			expect(0, "event 0", 0, 0), //
-
-			expect(1, "start", 0.1f, 0.5f), //
-
-			expect(0, "interrupt", 0.5f, 0.5f), //
 			expect(0, "event 14", 0.5f, 0.5f), //
 
-			expect(1, "event 0", 0.1f, 0.5f), //
-			expect(1, "event 14", 0.5f, 0.9f), //
+			expect(1, "start", 0.1f, 0.9f), //
+
+			expect(0, "interrupt", 0.9f, 0.9f), //
+
+			expect(1, "event 0", 0.1f, 0.9f), //
 
 			expect(0, "event 30", 1, 1), //
-			expect(0, "complete 1", 1, 1), //
-			expect(0, "end", 1.1f, 1.1f), //
+			expect(0, "complete", 1, 1), //
+			expect(0, "event 0", 1, 1), //
 
-			expect(1, "event 30", 1, 1.4f), //
-			expect(1, "complete 1", 1, 1.4f), //
-			expect(1, "end", 1, 1.5f) //
+			expect(1, "event 14", 0.5f, 1.3f), //
+
+			expect(0, "end", 1.5f, 1.5f), //
+
+			expect(1, "event 30", 1, 1.8f), //
+			expect(1, "complete", 1, 1.8f), //
+			expect(1, "end", 1, 1.9f) //
 		);
-		stateData.setMix("events1", "events2", 0.7f);
-		state.setEventThreshold(1);
-		state.setAnimation(0, "events1", false);
-		state.addAnimation(0, "events2", false, 0.4f);
+		state.setAnimation(0, "events1", true).setEventThreshold(1);
+		state.addAnimation(0, "events2", false, 0.8f).setMixDuration(0.7f);
 		run(0.1f, 1000);
 
 		setup("looping", // 11
@@ -313,22 +313,30 @@ public class AnimationStateTest {
 			expect(0, "event 0", 0, 0), //
 			expect(0, "event 14", 0.5f, 0.5f), //
 			expect(0, "event 30", 1, 1), //
-			expect(0, "complete 1", 1, 1), //
+			expect(0, "complete", 1, 1), //
 			expect(0, "event 0", 1, 1), //
 			expect(0, "event 14", 1.5f, 1.5f), //
 			expect(0, "event 30", 2, 2), //
-			expect(0, "complete 2", 2, 2), //
-			expect(0, "event 0", 2, 2) //
+			expect(0, "complete", 2, 2), //
+			expect(0, "event 0", 2, 2), //
+			expect(0, "event 14", 2.5f, 2.5f), //
+			expect(0, "event 30", 3, 3), //
+			expect(0, "complete", 3, 3), //
+			expect(0, "event 0", 3, 3), //
+			expect(0, "event 14", 3.5f, 3.5f), //
+			expect(0, "event 30", 4, 4), //
+			expect(0, "complete", 4, 4), //
+			expect(0, "event 0", 4, 4) //
 		);
 		state.setAnimation(0, "events1", true);
-		run(0.1f, 2);
+		run(0.1f, 4);
 
 		setup("not looping, update past animation 0 duration", // 12
 			expect(0, "start", 0, 0), //
 			expect(0, "event 0", 0, 0), //
 			expect(0, "event 14", 0.5f, 0.5f), //
 			expect(0, "event 30", 1, 1), //
-			expect(0, "complete 1", 1, 1), //
+			expect(0, "complete", 1, 1), //
 
 			expect(1, "start", 0.1f, 2.1f), //
 
@@ -338,7 +346,7 @@ public class AnimationStateTest {
 			expect(1, "event 0", 0.1f, 2.1f), //
 			expect(1, "event 14", 0.5f, 2.5f), //
 			expect(1, "event 30", 1, 3), //
-			expect(1, "complete 1", 1, 3), //
+			expect(1, "complete", 1, 3), //
 			expect(1, "end", 1, 3.1f) //
 		);
 		state.setAnimation(0, "events1", false);
@@ -350,11 +358,11 @@ public class AnimationStateTest {
 			expect(0, "event 0", 0, 0), //
 			expect(0, "event 14", 0.5f, 0.5f), //
 			expect(0, "event 30", 1, 1), //
-			expect(0, "complete 1", 1, 1), //
+			expect(0, "complete", 1, 1), //
 			expect(0, "event 0", 1, 1), //
 			expect(0, "event 14", 1.5f, 1.5f), //
 			expect(0, "event 30", 2, 2), //
-			expect(0, "complete 2", 2, 2), //
+			expect(0, "complete", 2, 2), //
 			expect(0, "event 0", 2, 2), //
 
 			expect(1, "start", 0.1f, 2.1f), //
@@ -365,7 +373,7 @@ public class AnimationStateTest {
 			expect(1, "event 0", 0.1f, 2.1f), //
 			expect(1, "event 14", 0.5f, 2.5f), //
 			expect(1, "event 30", 1, 3), //
-			expect(1, "complete 1", 1, 3), //
+			expect(1, "complete", 1, 3), //
 			expect(1, "end", 1, 3.1f) //
 		);
 		state.setAnimation(0, "events1", true);
@@ -376,11 +384,11 @@ public class AnimationStateTest {
 		});
 
 		setup("add animation on empty track", // 14
-			expect(0, "start", 0, 0), // s
+			expect(0, "start", 0, 0), //
 			expect(0, "event 0", 0, 0), //
 			expect(0, "event 14", 0.5f, 0.5f), //
 			expect(0, "event 30", 1, 1), //
-			expect(0, "complete 1", 1, 1), //
+			expect(0, "complete", 1, 1), //
 			expect(0, "end", 1, 1.1f) //
 		);
 		state.addAnimation(0, "events1", false, 0);
@@ -391,11 +399,51 @@ public class AnimationStateTest {
 			expect(0, "event 0", 0, 0), //
 			expect(0, "event 14", 0.5f, 0.5f), //
 			expect(0, "event 30", 1, 1), //
-			expect(0, "complete 1", 9.1f, 9.1f), //
-			expect(0, "end", 9.1f, 9.2f) //
+			expect(0, "complete", 1, 1), //
+			expect(0, "end", 9f, 9.1f) //
 		);
-		state.setAnimation(0, "events1", false).endTime = 9;
+		state.setAnimation(0, "events1", false).setTrackEnd(9);
 		run(0.1f, 10);
+
+		setup("looping with animation start", // 16
+			expect(0, "start", 0, 0), //
+			expect(0, "event 30", 0.4f, 0.4f), //
+			expect(0, "complete", 0.4f, 0.4f), //
+			expect(0, "event 30", 0.8f, 0.8f), //
+			expect(0, "complete", 0.8f, 0.8f), //
+			expect(0, "event 30", 1.2f, 1.2f), //
+			expect(0, "complete", 1.2f, 1.2f) //
+		);
+		entry = state.setAnimation(0, "events1", true);
+		entry.setAnimationLast(0.6f);
+		entry.setAnimationStart(0.6f);
+		run(0.1f, 1.4f);
+
+		setup("looping with animation start and end", // 17
+			expect(0, "start", 0, 0), //
+			expect(0, "event 14", 0.3f, 0.3f), //
+			expect(0, "complete", 0.6f, 0.6f), //
+			expect(0, "event 14", 0.9f, 0.9f), //
+			expect(0, "complete", 1.2f, 1.2f), //
+			expect(0, "event 14", 1.5f, 1.5f) //
+		);
+		entry = state.setAnimation(0, "events1", true);
+		entry.setAnimationStart(0.2f);
+		entry.setAnimationLast(0.2f);
+		entry.setAnimationEnd(0.8f);
+		run(0.1f, 1.8f);
+
+		setup("non-looping with animation start and end", // 18
+			expect(0, "start", 0, 0), //
+			expect(0, "event 14", 0.3f, 0.3f), //
+			expect(0, "complete", 0.6f, 0.6f), //
+			expect(0, "end", 1, 1.1f) //
+		);
+		entry = state.setAnimation(0, "events1", false);
+		entry.setAnimationStart(0.2f);
+		entry.setAnimationLast(0.2f);
+		entry.setAnimationEnd(0.8f);
+		run(0.1f, 1.8f);
 
 		System.out.println("AnimationState tests passed.");
 	}
@@ -408,9 +456,8 @@ public class AnimationStateTest {
 		state.addListener(stateListener);
 		time = 0;
 		fail = false;
-		buffer.setLength(0);
-		buffer.append(test + ": " + description + "\n");
-		buffer.append(String.format("%-3s%-12s%-7s%-7s%-7s\n", "#", "EVENT", "TRACK", "TOTAL", "RESULT"));
+		log(test + ": " + description);
+		log(String.format("%-3s%-12s%-7s%-7s%-7s", "#", "EVENT", "TRACK", "TOTAL", "RESULT"));
 	}
 
 	void run (float incr, float endTime) {
@@ -425,22 +472,29 @@ public class AnimationStateTest {
 			if (listener != null) listener.frame(time);
 			skeleton.update(incr);
 			state.update(incr);
+
+			// Reduce float error for tests.
+			for (TrackEntry entry : state.getTracks()) {
+				if (entry == null) continue;
+				entry.trackTime = Math.round(entry.trackTime * 1000000) / 1000000f;
+				if (entry.mixingFrom != null)
+					entry.mixingFrom.trackTime = Math.round(entry.mixingFrom.trackTime * 1000000) / 1000000f;
+			}
+
 			state.apply(skeleton);
 		}
 		// Expecting more than actual is a failure.
 		for (int i = actual.size, n = expected.size; i < n; i++) {
-			buffer.append(String.format("%-29s", "<none>"));
-			buffer.append("FAIL: " + expected.get(i) + "\n");
+			log(String.format("%-29s", "<none>") + "FAIL: " + expected.get(i));
 			fail = true;
 		}
 		actual.clear();
 		expected.clear();
 		if (fail) {
-			System.out.println(buffer);
 			System.out.println("TEST " + test + " FAILED!");
 			System.exit(0);
 		}
-		System.out.println(buffer);
+		System.out.println();
 	}
 
 	Result expect (int animationIndex, String name, float trackTime, float totalTime) {
@@ -456,9 +510,13 @@ public class AnimationStateTest {
 		Result result = new Result();
 		result.name = name;
 		result.animationIndex = skeletonData.getAnimations().indexOf(entry.animation, true);
-		result.trackTime = Math.round(entry.time * 1000) / 1000f;
+		result.trackTime = Math.round(entry.trackTime * 1000) / 1000f;
 		result.totalTime = Math.round(time * 1000) / 1000f;
 		return result;
+	}
+
+	void log (String message) {
+		System.out.println(message);
 	}
 
 	class Result {
