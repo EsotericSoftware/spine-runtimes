@@ -265,8 +265,12 @@ public class AnimationState {
 		TrackEntry entry = trackEntry(trackIndex, animation, loop, current);
 		if (current != null) {
 			freeAll(current.next);
-			current.next = entry;
-			entry.delay = current.trackLast;
+			if (current.trackLast == -1) // If current was never applied, don't mix from it, just replace it.
+				setCurrent(trackIndex, entry);
+			else {
+				current.next = entry;
+				entry.delay = current.trackLast;
+			}
 		} else
 			setCurrent(trackIndex, entry);
 		return entry;

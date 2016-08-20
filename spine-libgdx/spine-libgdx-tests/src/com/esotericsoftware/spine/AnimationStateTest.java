@@ -501,6 +501,24 @@ public class AnimationStateTest {
 			}
 		});
 
+		setup("setAnimation twice", // 21
+			expect(0, "start", 0, 0), //
+
+			expect(1, "start", 0, 0), //
+
+			expect(0, "interrupt", 0, 0), //
+			expect(0, "end", 0, 0), //
+
+			expect(1, "event 0", 0, 0), //
+			expect(1, "event 14", 0.5f, 0.5f), //
+			expect(1, "event 30", 1, 1), //
+			expect(1, "complete", 1, 1), //
+			expect(1, "end", 1, 1.1f) //
+		);
+		state.setAnimation(0, "events1", false); // First should be ignored.
+		state.setAnimation(0, "events2", false);
+		run(0.1f, 1000, null);
+
 		System.out.println("AnimationState tests passed.");
 	}
 
