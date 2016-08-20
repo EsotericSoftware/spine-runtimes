@@ -42,16 +42,16 @@ import com.esotericsoftware.spine.Animation.Timeline;
 /** Stores state for applying one or more animations over time and automatically mixes (crossfades) when animations change. */
 public class AnimationState {
 	private AnimationStateData data;
-	private Array<TrackEntry> tracks = new Array();
+	private final Array<TrackEntry> tracks = new Array();
 	private final Array<Event> events = new Array();
-	final Array<AnimationStateListener> listeners = new Array();
-	private float timeScale = 1;
-	final Pool<TrackEntry> trackEntryPool = new Pool() {
+	private final Array<AnimationStateListener> listeners = new Array();
+	private final Pool<TrackEntry> trackEntryPool = new Pool() {
 		protected Object newObject () {
 			return new TrackEntry();
 		}
 	};
 	private final EventQueue queue = new EventQueue(listeners, trackEntryPool);
+	private float timeScale = 1;
 
 	/** Creates an uninitialized AnimationState. The animation state data must be set before use. */
 	public AnimationState () {
@@ -62,7 +62,7 @@ public class AnimationState {
 		this.data = data;
 	}
 
-	/** Updates the track entry times. */
+	/** Increments the track entry times, setting queued animations as current if needed. */
 	public void update (float delta) {
 		delta *= timeScale;
 		for (int i = 0; i < tracks.size; i++) {
@@ -82,8 +82,8 @@ public class AnimationState {
 					if (next.mixingFrom != null) next.mixTime += currentDelta;
 					continue;
 				}
-			} else if (!current.loop && current.trackLast >= current.trackEnd) {
-				// Clear a non-looping animation when it reaches its end time and there is no next entry.
+			} else if (current.trackLast >= current.trackEnd) {
+				// Clear the track when the end time is reached and there is no next entry.
 				clearTrack(i);
 				continue;
 			}
@@ -254,17 +254,21 @@ public class AnimationState {
 		return setAnimation(trackIndex, animation, loop);
 	}
 
-	/** Set the current animation. Any queued animations for the track are cleared.
+	/** Sets the current animation for a track. If the track is empty, the new animation is made the current animation immediately.
+	 * Otherwise, any queued animations are discarded and the new animation is queued to become the current animation the next time
+	 * {@link #update(float)} is called.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
 	 *         after {@link AnimationStateListener#end(TrackEntry)}. */
 	public TrackEntry setAnimation (int trackIndex, Animation animation, boolean loop) {
 		if (animation == null) throw new IllegalArgumentException("animation cannot be null.");
-
 		TrackEntry current = expandToIndex(trackIndex);
-		if (current != null) freeAll(current.next);
-
 		TrackEntry entry = trackEntry(trackIndex, animation, loop, current);
-		setCurrent(trackIndex, entry);
+		if (current != null) {
+			freeAll(current.next);
+			current.next = entry;
+			entry.delay = current.trackLast;
+		} else
+			setCurrent(trackIndex, entry);
 		return entry;
 	}
 
@@ -275,7 +279,7 @@ public class AnimationState {
 		return addAnimation(trackIndex, animation, loop, delay);
 	}
 
-	/** Adds an animation to be played after the current or last queued animation.
+	/** Adds an animation to be played after the current or last queued animation for a track.
 	 * @param delay Seconds to begin this animation after the start of the previous animation. May be <= 0 to use duration of the
 	 *           previous animation minus any mix duration plus the negative delay.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
@@ -297,13 +301,12 @@ public class AnimationState {
 				float duration = last.animationEnd - last.animationStart;
 				if (duration != 0)
 					delay += duration * (1 + (int)(last.trackTime / duration)) - data.getMix(last.animation, animation);
+				else
+					delay = 0;
 			}
-		} else {
+			entry.delay = delay;
+		} else
 			setCurrent(trackIndex, entry);
-			if (delay <= 0) delay = 0;
-		}
-
-		entry.delay = delay;
 		return entry;
 	}
 
@@ -319,12 +322,12 @@ public class AnimationState {
 		entry.drawOrderThreshold = 0;
 
 		entry.delay = 0;
-		entry.trackTime = 0;
-		entry.trackEnd = animation.getDuration();
-		entry.trackLast = -1;
 		entry.animationStart = 0;
-		entry.animationEnd = entry.trackEnd;
+		entry.animationEnd = animation.getDuration();
 		entry.animationLast = -1;
+		entry.trackTime = 0;
+		entry.trackEnd = loop ? Integer.MAX_VALUE : entry.animationEnd;
+		entry.trackLast = -1;
 		entry.timeScale = 1;
 
 		entry.alpha = 1;
@@ -334,13 +337,13 @@ public class AnimationState {
 		return entry;
 	}
 
-	/** @return May be null. */
+	/** The track entry for the animation currently playing on the track, or null. */
 	public TrackEntry getCurrent (int trackIndex) {
 		if (trackIndex >= tracks.size) return null;
 		return tracks.get(trackIndex);
 	}
 
-	/** Adds a listener to receive events for all animations. */
+	/** Adds a listener to receive events for all track entries. */
 	public void addListener (AnimationStateListener listener) {
 		if (listener == null) throw new IllegalArgumentException("listener cannot be null.");
 		listeners.add(listener);
@@ -355,14 +358,14 @@ public class AnimationState {
 		listeners.clear();
 	}
 
-	/** Discards all listener notifications that have not yet been delivered. This can be useful to call from an
-	 * {@link AnimationStateListener} when it is known that further notifications that may have been already triggered are not
-	 * wanted, for example because new animations are being set. */
+	/** Discards all {@link #addListener(AnimationStateListener) listener} notifications that have not yet been delivered. This can
+	 * be useful to call from an {@link AnimationStateListener} when it is known that further notifications that may have been
+	 * already queued for delivery are not wanted because new animations are being set. */
 	public void clearListenerNotifications () {
 		queue.clear();
 	}
 
-	/** Multiplier for the delta time when the animation state is updated, causing time for all animations to move slower or
+	/** Multiplier for the delta time when the animation state is updated, causing time for all animations to play slower or
 	 * faster. Defaults to 1. */
 	public float getTimeScale () {
 		return timeScale;
@@ -417,15 +420,6 @@ public class AnimationState {
 			listener = null;
 		}
 
-		public float getAnimationTime () {
-			if (loop) {
-				float duration = animationEnd - animationStart;
-				if (duration == 0) return 0;
-				return (trackTime % duration) + animationStart;
-			}
-			return Math.min(trackTime + animationStart, animationEnd);
-		}
-
 		public int getTrackIndex () {
 			return trackIndex;
 		}
@@ -455,8 +449,8 @@ public class AnimationState {
 			this.delay = delay;
 		}
 
-		/** Current time in seconds for this track entry. When changing the track time, it often makes sense to also change
-		 * {@link #getAnimationLast()} to control when timelines will trigger. Defaults to 0. */
+		/** Current time in seconds this track entry has been the current track entry. The track time determines
+		 * {@link #getAnimationTime()} and can be set to start the animation at a time other than 0. */
 		public float getTrackTime () {
 			return trackTime;
 		}
@@ -465,6 +459,9 @@ public class AnimationState {
 			this.trackTime = trackTime;
 		}
 
+		/** The track time in seconds when this animation will be removed from the track. If the track end time is reached and no
+		 * other animations are queued for playback, the track is cleared. Defaults to the animation duration for non-looping
+		 * animations and to {@link Integer#MAX_VALUE} for looping animations. */
 		public float getTrackEnd () {
 			return trackEnd;
 		}
@@ -473,7 +470,10 @@ public class AnimationState {
 			this.trackEnd = trackEnd;
 		}
 
-		/** Seconds when this animation starts, both initially and after looping. Defaults to 0. */
+		/** Seconds when this animation starts, both initially and after looping. Defaults to 0.
+		 * <p>
+		 * When changing the animation start time, it often makes sense to also change {@link #getAnimationLast()} to control when
+		 * timelines will trigger. */
 		public float getAnimationStart () {
 			return animationStart;
 		}
@@ -482,8 +482,8 @@ public class AnimationState {
 			this.animationStart = animationStart;
 		}
 
-		/** Seconds when this animation ends, causing the next animation to start or this animation to loop. Defaults to the
-		 * animation duration. */
+		/** Seconds for the last frame of this animation. Non-looping animations won't play past this time. Looping animation will
+		 * loop back to {@link #getAnimationStart()} at this time. Defaults to the animation duration. */
 		public float getAnimationEnd () {
 			return animationEnd;
 		}
@@ -503,7 +503,19 @@ public class AnimationState {
 			this.animationLast = animationLast;
 		}
 
-		/** Multiplier for the delta time when the animation state is updated, causing time for this animation to move slower or
+		/** Uses the {@link #getTrackTime() track time} to compute the animation time between the {@link #getAnimationStart()
+		 * animation start} and {@link #getAnimationEnd() animation end}. When the track time is 0, the animation time is equal to
+		 * the animation start time. */
+		public float getAnimationTime () {
+			if (loop) {
+				float duration = animationEnd - animationStart;
+				if (duration == 0) return animationStart;
+				return (trackTime % duration) + animationStart;
+			}
+			return Math.min(trackTime + animationStart, animationEnd);
+		}
+
+		/** Multiplier for the delta time when the animation state is updated, causing time for this animation to play slower or
 		 * faster. Defaults to 1. */
 		public float getTimeScale () {
 			return timeScale;
@@ -513,7 +525,7 @@ public class AnimationState {
 			this.timeScale = timeScale;
 		}
 
-		/** The listener for events generated solely from this track entry, or null. */
+		/** The listener for events generated by this track entry, or null. */
 		public AnimationStateListener getListener () {
 			return listener;
 		}
@@ -524,8 +536,10 @@ public class AnimationState {
 		}
 
 		/** Values < 1 mix this animation with the skeleton pose. Defaults to 1, which overwrites the skeleton pose with this
-		 * animation. Typically track 0 is used to completely pose the skeleton, then alpha can be used on higher tracks. Generally
-		 * it doesn't make sense to use alpha on track 0, since the skeleton pose is probably from the last frame render. */
+		 * animation.
+		 * <p>
+		 * Typically track 0 is used to completely pose the skeleton, then alpha can be used on higher tracks. Generally it doesn't
+		 * make sense to use alpha on track 0, since the skeleton pose is probably from the last frame render. */
 		public float getAlpha () {
 			return alpha;
 		}
@@ -576,12 +590,12 @@ public class AnimationState {
 			this.next = next;
 		}
 
-		/** Returns true if at least one loop has been completed (ie time >= end time). */
+		/** Returns true if at least one loop has been completed. */
 		public boolean isComplete () {
-			return trackTime >= trackEnd;
+			return trackTime >= animationEnd - animationStart;
 		}
 
-		/** Seconds from zero to the mix duration when mixing from the previous animation to this animation. */
+		/** Seconds from 0 to the mix duration when mixing from the previous animation to this animation. */
 		public float getMixTime () {
 			return mixTime;
 		}
@@ -591,7 +605,9 @@ public class AnimationState {
 		}
 
 		/** Seconds for mixing from the previous animation to this animation. Defaults to the value provided by
-		 * {@link AnimationStateData} based on the animation before this animation (if any). */
+		 * {@link AnimationStateData} based on the animation before this animation (if any).
+		 * <p>
+		 * The mix duration must be set before this track entry becomes the current track entry. */
 		public float getMixDuration () {
 			return mixDuration;
 		}

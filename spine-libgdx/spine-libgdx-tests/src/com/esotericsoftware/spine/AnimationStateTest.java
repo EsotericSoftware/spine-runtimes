@@ -122,7 +122,7 @@ public class AnimationStateTest {
 			expect(0, "end", 1, 1.1f) //
 		);
 		state.setAnimation(0, "events1", false);
-		run(0.1f, 1000);
+		run(0.1f, 1000, null);
 
 		setup("1/60 time step", // 2
 			expect(0, "start", 0, 0), //
@@ -133,7 +133,7 @@ public class AnimationStateTest {
 			expect(0, "end", 1, 1.017f) //
 		);
 		state.setAnimation(0, "events1", false);
-		run(1 / 60f, 1000);
+		run(1 / 60f, 1000, null);
 
 		setup("30 time step", // 3
 			expect(0, "start", 0, 0), //
@@ -144,7 +144,7 @@ public class AnimationStateTest {
 			expect(0, "end", 30, 60) //
 		);
 		state.setAnimation(0, "events1", false);
-		run(30, 1000);
+		run(30, 1000, null);
 
 		setup("1 time step", // 4
 			expect(0, "start", 0, 0), //
@@ -155,7 +155,7 @@ public class AnimationStateTest {
 			expect(0, "end", 1, 2) //
 		);
 		state.setAnimation(0, "events1", false);
-		run(1, 1.01f);
+		run(1, 1.01f, null);
 
 		setup("interrupt", // 5
 			expect(0, "start", 0, 0), //
@@ -188,7 +188,7 @@ public class AnimationStateTest {
 		state.setAnimation(0, "events1", false);
 		state.addAnimation(0, "events2", false, 0);
 		state.addAnimation(0, "events1", false, 0);
-		run(0.1f, 4f);
+		run(0.1f, 4f, null);
 
 		setup("interrupt with delay", // 6
 			expect(0, "start", 0, 0), //
@@ -208,7 +208,7 @@ public class AnimationStateTest {
 		);
 		state.setAnimation(0, "events1", false);
 		state.addAnimation(0, "events2", false, 0.5f);
-		run(0.1f, 1000);
+		run(0.1f, 1000, null);
 
 		setup("interrupt with delay and mix time", // 7
 			expect(0, "start", 0, 0), //
@@ -232,7 +232,7 @@ public class AnimationStateTest {
 		stateData.setMix("events1", "events2", 0.7f);
 		state.setAnimation(0, "events1", true);
 		state.addAnimation(0, "events2", false, 0.9f);
-		run(0.1f, 1000);
+		run(0.1f, 1000, null);
 
 		setup("animation 0 events do not fire during mix", // 8
 			expect(0, "start", 0, 0), //
@@ -255,7 +255,7 @@ public class AnimationStateTest {
 		stateData.setDefaultMix(0.7f);
 		state.setAnimation(0, "events1", false);
 		state.addAnimation(0, "events2", false, 0.4f);
-		run(0.1f, 1000);
+		run(0.1f, 1000, null);
 
 		setup("event threshold, some animation 0 events fire during mix", // 9
 			expect(0, "start", 0, 0), //
@@ -279,7 +279,7 @@ public class AnimationStateTest {
 		stateData.setMix("events1", "events2", 0.7f);
 		state.setAnimation(0, "events1", false).setEventThreshold(0.5f);
 		state.addAnimation(0, "events2", false, 0.4f);
-		run(0.1f, 1000);
+		run(0.1f, 1000, null);
 
 		setup("event threshold, all animation 0 events fire during mix", // 10
 			expect(0, "start", 0, 0), //
@@ -306,7 +306,7 @@ public class AnimationStateTest {
 		);
 		state.setAnimation(0, "events1", true).setEventThreshold(1);
 		state.addAnimation(0, "events2", false, 0.8f).setMixDuration(0.7f);
-		run(0.1f, 1000);
+		run(0.1f, 1000, null);
 
 		setup("looping", // 11
 			expect(0, "start", 0, 0), //
@@ -329,7 +329,7 @@ public class AnimationStateTest {
 			expect(0, "event 0", 4, 4) //
 		);
 		state.setAnimation(0, "events1", true);
-		run(0.1f, 4);
+		run(0.1f, 4, null);
 
 		setup("not looping, update past animation 0 duration", // 12
 			expect(0, "start", 0, 0), //
@@ -351,7 +351,7 @@ public class AnimationStateTest {
 		);
 		state.setAnimation(0, "events1", false);
 		state.addAnimation(0, "events2", false, 2);
-		run(0.1f, 4f);
+		run(0.1f, 4f, null);
 
 		setup("interrupt animation after first loop complete", // 13
 			expect(0, "start", 0, 0), //
@@ -392,7 +392,7 @@ public class AnimationStateTest {
 			expect(0, "end", 1, 1.1f) //
 		);
 		state.addAnimation(0, "events1", false, 0);
-		run(0.1f, 1.9f);
+		run(0.1f, 1.9f, null);
 
 		setup("end time beyond non-looping animation duration", // 15
 			expect(0, "start", 0, 0), //
@@ -403,7 +403,7 @@ public class AnimationStateTest {
 			expect(0, "end", 9f, 9.1f) //
 		);
 		state.setAnimation(0, "events1", false).setTrackEnd(9);
-		run(0.1f, 10);
+		run(0.1f, 10, null);
 
 		setup("looping with animation start", // 16
 			expect(0, "start", 0, 0), //
@@ -417,7 +417,7 @@ public class AnimationStateTest {
 		entry = state.setAnimation(0, "events1", true);
 		entry.setAnimationLast(0.6f);
 		entry.setAnimationStart(0.6f);
-		run(0.1f, 1.4f);
+		run(0.1f, 1.4f, null);
 
 		setup("looping with animation start and end", // 17
 			expect(0, "start", 0, 0), //
@@ -431,7 +431,7 @@ public class AnimationStateTest {
 		entry.setAnimationStart(0.2f);
 		entry.setAnimationLast(0.2f);
 		entry.setAnimationEnd(0.8f);
-		run(0.1f, 1.8f);
+		run(0.1f, 1.8f, null);
 
 		setup("non-looping with animation start and end", // 18
 			expect(0, "start", 0, 0), //
@@ -443,7 +443,63 @@ public class AnimationStateTest {
 		entry.setAnimationStart(0.2f);
 		entry.setAnimationLast(0.2f);
 		entry.setAnimationEnd(0.8f);
-		run(0.1f, 1.8f);
+		run(0.1f, 1.8f, null);
+
+		setup("mix out looping with animation start and end", // 19
+			expect(0, "start", 0, 0), //
+			expect(0, "event 14", 0.3f, 0.3f), //
+			expect(0, "complete", 0.6f, 0.6f), //
+
+			expect(1, "start", 0.1f, 0.8f), //
+
+			expect(0, "interrupt", 0.8f, 0.8f), //
+
+			expect(1, "event 0", 0.1f, 0.8f), //
+
+			expect(0, "event 14", 0.9f, 0.9f), //
+			expect(0, "complete", 1.2f, 1.2f), //
+
+			expect(1, "event 14", 0.5f, 1.2f), //
+
+			expect(0, "end", 1.4f, 1.4f), //
+
+			expect(1, "event 30", 1, 1.7f), //
+			expect(1, "complete", 1, 1.7f), //
+			expect(1, "end", 1, 1.8f) //
+		);
+		entry = state.setAnimation(0, "events1", true);
+		entry.setAnimationStart(0.2f);
+		entry.setAnimationLast(0.2f);
+		entry.setAnimationEnd(0.8f);
+		entry.setEventThreshold(1);
+		state.addAnimation(0, "events2", false, 0.7f).setMixDuration(0.7f);
+		run(0.1f, 20, null);
+
+		setup("setAnimation with track entry mix", // 20
+			expect(0, "start", 0, 0), //
+			expect(0, "event 0", 0, 0), //
+			expect(0, "event 14", 0.5f, 0.5f), //
+
+			expect(1, "start", 0.1f, 1), //
+
+			expect(0, "interrupt", 1, 1), //
+			expect(0, "complete", 1, 1), //
+
+			expect(1, "event 0", 0.1f, 1), //
+			expect(1, "event 14", 0.5f, 1.4f), //
+
+			expect(0, "end", 1.6f, 1.6f), //
+
+			expect(1, "event 30", 1, 1.9f), //
+			expect(1, "complete", 1, 1.9f), //
+			expect(1, "end", 1, 2) //
+		);
+		state.setAnimation(0, "events1", true);
+		run(0.1f, 1000, new TestListener() {
+			public void frame (float time) {
+				if (MathUtils.isEqual(time, 1f)) state.setAnimation(0, "events2", false).setMixDuration(0.7f);
+			}
+		});
 
 		System.out.println("AnimationState tests passed.");
 	}
@@ -458,10 +514,6 @@ public class AnimationStateTest {
 		fail = false;
 		log(test + ": " + description);
 		log(String.format("%-3s%-12s%-7s%-7s%-7s", "#", "EVENT", "TRACK", "TOTAL", "RESULT"));
-	}
-
-	void run (float incr, float endTime) {
-		run(incr, endTime, null);
 	}
 
 	void run (float incr, float endTime, TestListener listener) {
