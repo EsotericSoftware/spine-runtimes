@@ -174,7 +174,7 @@ public class AnimationState {
 		for (; i < n; i++) {
 			Event event = events.get(i);
 			if (event.time < trackLastWrapped) break;
-			if (event.time > animationEnd) continue; // Discard events out of animation start/end.
+			if (event.time > animationEnd) continue; // Discard events outside animation start/end.
 			queue.event(entry, event);
 		}
 
@@ -187,7 +187,7 @@ public class AnimationState {
 		// Queue events after complete.
 		for (; i < n; i++) {
 			Event event = events.get(i);
-			if (event.time < animationStart) continue; // Discard events out of animation start/end.
+			if (event.time < animationStart) continue; // Discard events outside animation start/end.
 			queue.event(entry, events.get(i));
 		}
 		events.clear();
