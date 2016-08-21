@@ -116,9 +116,8 @@ public class Box2DExample extends ApplicationAdapter {
 			Box2dAttachment attachment = (Box2dAttachment)slot.getAttachment();
 
 			PolygonShape boxPoly = new PolygonShape();
-			boxPoly.setAsBox(attachment.getWidth() / 2 * attachment.getScaleX(),
-				attachment.getHeight() / 2 * attachment.getScaleY(), vector.set(attachment.getX(), attachment.getY()),
-				attachment.getRotation() * MathUtils.degRad);
+			boxPoly.setAsBox(attachment.getWidth() / 2 * attachment.getScaleX(), attachment.getHeight() / 2 * attachment.getScaleY(),
+				vector.set(attachment.getX(), attachment.getY()), attachment.getRotation() * MathUtils.degRad);
 
 			BodyDef boxBodyDef = new BodyDef();
 			boxBodyDef.type = BodyType.StaticBody;
@@ -146,7 +145,7 @@ public class Box2DExample extends ApplicationAdapter {
 		batch.setTransformMatrix(camera.view);
 		batch.begin();
 
-		animation.apply(skeleton, time, time, true, events);
+		animation.apply(skeleton, time, time, true, events, 1, false);
 		skeleton.x += 8 * delta;
 		skeleton.updateWorldTransform();
 		skeletonRenderer.draw(batch, skeleton);

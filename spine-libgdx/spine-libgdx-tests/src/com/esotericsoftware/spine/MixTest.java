@@ -104,21 +104,22 @@ public class MixTest extends ApplicationAdapter {
 			skeleton.setX(-50);
 		} else if (time > beforeJump + jump) {
 			// just walk after jump
-			walkAnimation.apply(skeleton, time, time, true, events);
+			walkAnimation.apply(skeleton, time, time, true, events, 1, false);
 		} else if (time > blendOutStart) {
 			// blend out jump
-			walkAnimation.apply(skeleton, time, time, true, events);
-			jumpAnimation.mix(skeleton, time - beforeJump, time - beforeJump, false, events, 1 - (time - blendOutStart) / blendOut);
+			walkAnimation.apply(skeleton, time, time, true, events, 1, false);
+			jumpAnimation.apply(skeleton, time - beforeJump, time - beforeJump, false, events, 1 - (time - blendOutStart) / blendOut,
+				false);
 		} else if (time > beforeJump + blendIn) {
 			// just jump
-			jumpAnimation.apply(skeleton, time - beforeJump, time - beforeJump, false, events);
+			jumpAnimation.apply(skeleton, time - beforeJump, time - beforeJump, false, events, 1, false);
 		} else if (time > beforeJump) {
 			// blend in jump
-			walkAnimation.apply(skeleton, time, time, true, events);
-			jumpAnimation.mix(skeleton, time - beforeJump, time - beforeJump, false, events, (time - beforeJump) / blendIn);
+			walkAnimation.apply(skeleton, time, time, true, events, 1, false);
+			jumpAnimation.apply(skeleton, time - beforeJump, time - beforeJump, false, events, (time - beforeJump) / blendIn, false);
 		} else {
 			// just walk before jump
-			walkAnimation.apply(skeleton, time, time, true, events);
+			walkAnimation.apply(skeleton, time, time, true, events, 1, false);
 		}
 
 		skeleton.updateWorldTransform();

@@ -32,7 +32,9 @@
 package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.BooleanArray;
 import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
@@ -51,6 +53,7 @@ public class AnimationState {
 		}
 	};
 	private final EventQueue queue = new EventQueue(listeners, trackEntryPool);
+	private final IntSet usage = new IntSet();
 	private float timeScale = 1;
 
 	/** Creates an uninitialized AnimationState. The animation state data must be set before use. */
@@ -116,12 +119,12 @@ public class AnimationState {
 			if (current == null) continue;
 			if (current.delay > 0) continue;
 
-			float alpha = current.alpha;
+			float mix = current.alpha;
 			if (current.mixingFrom != null) {
-				alpha *= current.mixTime / current.mixDuration;
-				applyMixingFrom(current.mixingFrom, skeleton, alpha);
-				if (alpha >= 1) {
-					alpha = 1;
+				mix *= current.mixTime / current.mixDuration;
+				applyMixingFrom(current.mixingFrom, skeleton, mix);
+				if (mix >= 1) {
+					mix = 1;
 					queue.end(current.mixingFrom);
 					current.mixingFrom = null;
 				}
@@ -129,8 +132,9 @@ public class AnimationState {
 
 			float animationLast = current.animationLast, animationTime = current.getAnimationTime();
 			Array<Timeline> timelines = current.animation.timelines;
+			BooleanArray setupPose = current.setupPose;
 			for (int ii = 0, n = timelines.size; ii < n; ii++)
-				timelines.get(ii).apply(skeleton, animationLast, animationTime, events, alpha);
+				timelines.get(ii).apply(skeleton, animationLast, animationTime, events, mix, setupPose.get(ii));
 			queueEvents(current, animationTime);
 			current.animationLast = animationTime;
 			current.trackLast = current.trackTime;
@@ -145,16 +149,25 @@ public class AnimationState {
 
 		float animationLast = entry.animationLast, animationTime = entry.getAnimationTime();
 		Array<Timeline> timelines = entry.animation.timelines;
-		float alpha = entry.alpha;
+		BooleanArray setupPose = entry.setupPose;
+		float alphaFull = entry.alpha, alphaMix = entry.alpha * (1 - mix);
 		if (attachments && drawOrder) {
-			for (int i = 0, n = timelines.size; i < n; i++)
-				timelines.get(i).apply(skeleton, animationLast, animationTime, events, alpha);
+			for (int i = 0, n = timelines.size; i < n; i++) {
+				Timeline timeline = timelines.get(i);
+				if (setupPose.get(i))
+					timeline.apply(skeleton, animationLast, animationTime, events, alphaMix, true);
+				else
+					timeline.apply(skeleton, animationLast, animationTime, events, alphaFull, false);
+			}
 		} else {
 			for (int i = 0, n = timelines.size; i < n; i++) {
 				Timeline timeline = timelines.get(i);
 				if (!attachments && timeline instanceof AttachmentTimeline) continue;
 				if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
-				timeline.apply(skeleton, animationLast, animationTime, events, alpha);
+				if (setupPose.get(i))
+					timeline.apply(skeleton, animationLast, animationTime, events, alphaMix, true);
+				else
+					timeline.apply(skeleton, animationLast, animationTime, events, alphaFull, false);
 			}
 		}
 
@@ -254,6 +267,58 @@ public class AnimationState {
 		}
 
 		queue.drain();
+
+		updateSetupPose();
+	}
+
+	private void updateSetupPose () {
+		usage.clear();
+		int i = 0, n = tracks.size;
+		for (; i < n; i++) {
+			TrackEntry entry = tracks.get(i);
+			if (entry == null) continue;
+			if (entry.mixingFrom != null) {
+				updateFirstSetupPose(entry.mixingFrom);
+				updateSetupPose(entry);
+			} else
+				updateFirstSetupPose(entry);
+			break;
+		}
+		for (i++; i < n; i++) {
+			TrackEntry entry = tracks.get(i);
+			if (entry == null) continue;
+			if (entry.mixingFrom != null) updateSetupPose(entry.mixingFrom);
+			updateSetupPose(entry);
+		}
+	}
+
+	private void updateFirstSetupPose (TrackEntry entry) {
+		IntSet usage = this.usage;
+		BooleanArray setupPose = entry.setupPose;
+		setupPose.clear();
+		Array<Timeline> timelines = entry.animation.timelines;
+		for (int ii = 0, nn = timelines.size; ii < nn; ii++) {
+			Timeline timeline = timelines.get(ii);
+			usage.add(timeline.getId());
+			setupPose.add(true);
+		}
+	}
+
+	private void updateSetupPose (TrackEntry entry) {
+		IntSet usage = this.usage;
+		BooleanArray setupPose = entry.setupPose;
+		setupPose.clear();
+		Array<Timeline> timelines = entry.animation.timelines;
+		for (int ii = 0, nn = timelines.size; ii < nn; ii++) {
+			Timeline timeline = timelines.get(ii);
+			int id = timeline.getId();
+			if (usage.contains(id))
+				setupPose.add(false);
+			else {
+				usage.add(id);
+				setupPose.add(true);
+			}
+		}
 	}
 
 	/** @see #setAnimation(int, Animation, boolean) */
@@ -426,12 +491,14 @@ public class AnimationState {
 		float delay, trackTime, trackLast, trackEnd, animationStart, animationEnd, animationLast, timeScale;
 		float alpha;
 		float mixTime, mixDuration;
+		final BooleanArray setupPose = new BooleanArray();
 
 		public void reset () {
 			next = null;
 			mixingFrom = null;
 			animation = null;
 			listener = null;
+			setupPose.clear();
 		}
 
 		public int getTrackIndex () {

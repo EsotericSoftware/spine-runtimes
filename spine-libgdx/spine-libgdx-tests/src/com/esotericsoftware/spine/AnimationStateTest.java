@@ -530,6 +530,33 @@ public class AnimationStateTest {
 		state.addAnimation(0, "events1", false, 5);
 		run(0.1f, 10, null);
 
+		setup("setAnimation during AnimationStateListener"); // 23
+		state.addListener(new AnimationStateListener() {
+			public void start (TrackEntry entry) {
+				if (entry.getAnimation().getName().equals("events1")) state.setAnimation(1, "events2", false);
+			}
+
+			public void interrupt (TrackEntry entry) {
+				state.addAnimation(3, "events2", false, 0);
+			}
+
+			public void event (TrackEntry entry, Event event) {
+				if (entry.getTrackIndex() != 2) state.setAnimation(2, "events2", false);
+			}
+
+			public void end (TrackEntry entry) {
+				if (entry.getAnimation().getName().equals("events1")) state.setAnimation(0, "events2", false);
+			}
+
+			public void complete (TrackEntry entry) {
+				if (entry.getAnimation().getName().equals("events1")) state.setAnimation(1, "events2", false);
+			}
+		});
+		state.addAnimation(0, "events1", false, 0);
+		state.addAnimation(0, "events2", false, 0);
+		state.setAnimation(1, "events2", false);
+		run(0.1f, 10, null);
+
 		System.out.println("AnimationState tests passed.");
 	}
 
@@ -538,11 +565,13 @@ public class AnimationStateTest {
 		expected.addAll(expectedArray);
 		stateData = new AnimationStateData(skeletonData);
 		state = new AnimationState(stateData);
-		state.addListener(stateListener);
 		time = 0;
 		fail = false;
 		log(test + ": " + description);
-		log(String.format("%-3s%-12s%-7s%-7s%-7s", "#", "EVENT", "TRACK", "TOTAL", "RESULT"));
+		if (expectedArray.length > 0) {
+			state.addListener(stateListener);
+			log(String.format("%-3s%-12s%-7s%-7s%-7s", "#", "EVENT", "TRACK", "TOTAL", "RESULT"));
+		}
 	}
 
 	void run (float incr, float endTime, TestListener listener) {
