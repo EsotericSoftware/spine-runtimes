@@ -53,7 +53,8 @@ public class AnimationState {
 		}
 	};
 	private final EventQueue queue = new EventQueue(listeners, trackEntryPool);
-	private final IntSet usage = new IntSet();
+	private final IntSet propertyIDs = new IntSet();
+	private boolean animationsChanged;
 	private float timeScale = 1;
 
 	/** Creates an uninitialized AnimationState. The animation state data must be set before use. */
@@ -68,7 +69,7 @@ public class AnimationState {
 	/** Increments the track entry times, setting queued animations as current if needed. */
 	public void update (float delta) {
 		delta *= timeScale;
-		for (int i = 0; i < tracks.size; i++) {
+		for (int i = 0, n = tracks.size; i < n; i++) {
 			TrackEntry current = tracks.get(i);
 			if (current == null) continue;
 
@@ -81,7 +82,7 @@ public class AnimationState {
 				current.delay = 0;
 			}
 
-			TrackEntry next = current.next;
+			TrackEntry next = current.next, mixingFrom = current.mixingFrom;
 			if (next != null) {
 				// When the next entry's delay is passed, change to the next entry.
 				float nextTime = current.trackLast - next.delay;
@@ -95,22 +96,39 @@ public class AnimationState {
 				}
 			} else if (current.trackLast >= current.trackEnd) {
 				// Clear the track when the end time is reached and there is no next entry.
-				clearTrack(i);
+				// BOZO - This leaves the skeleton in the last pose, with no easy way of resetting.
+				// Should we get rid of the track end time?
+				// Or default it to MAX_VALUE even for non-looping animations?
+				// Or reset the skeleton before clearing? Note only apply() has a skeleton.
+				freeAll(current.next);
+				queue.end(current);
+				if (mixingFrom != null) queue.end(mixingFrom);
+				tracks.set(i, null);
 				continue;
 			}
 
 			current.trackTime += currentDelta;
-			if (current.mixingFrom != null) {
-				float mixingFromDelta = delta * current.mixingFrom.timeScale;
-				current.mixingFrom.trackTime += mixingFromDelta;
-				current.mixTime += mixingFromDelta;
+			if (mixingFrom != null) {
+				if (current.mixTime >= current.mixDuration && current.mixTime > 0) {
+					queue.end(mixingFrom);
+					current.mixingFrom = null;
+					animationsChanged = true;
+				} else {
+					float mixingFromDelta = delta * mixingFrom.timeScale;
+					mixingFrom.trackTime += mixingFromDelta;
+					current.mixTime += mixingFromDelta;
+				}
 			}
 		}
+
+		queue.drain();
 	}
 
 	/** Poses the skeleton using the track entry animations. */
 	public void apply (Skeleton skeleton) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
+
+		if (animationsChanged) animationsChanged();
 
 		Array<Event> events = this.events;
 
@@ -128,18 +146,18 @@ public class AnimationState {
 					if (mix > 1) mix = 1;
 				}
 				applyMixingFrom(current.mixingFrom, skeleton, mix);
-				if (mix == 1) {
-					queue.end(current.mixingFrom);
-					current.mixingFrom = null;
-					updateSetupPose();
-				}
 			}
 
 			float animationLast = current.animationLast, animationTime = current.getAnimationTime();
 			Array<Timeline> timelines = current.animation.timelines;
-			BooleanArray setupPose = current.setupPose;
-			for (int ii = 0, n = timelines.size; ii < n; ii++)
-				timelines.get(ii).apply(skeleton, animationLast, animationTime, events, mix, setupPose.get(ii), false);
+			if (mix == 1) {
+				for (int ii = 0, n = timelines.size; ii < n; ii++)
+					timelines.get(ii).apply(skeleton, animationLast, animationTime, events, 1, false, false);
+			} else {
+				boolean[] timelinesFirst = current.timelinesFirst.items;
+				for (int ii = 0, n = timelines.size; ii < n; ii++)
+					timelines.get(ii).apply(skeleton, animationLast, animationTime, events, mix, timelinesFirst[ii], false);
+			}
 			queueEvents(current, animationTime);
 			current.animationLast = animationTime;
 			current.trackLast = current.trackTime;
@@ -154,12 +172,12 @@ public class AnimationState {
 
 		float animationLast = entry.animationLast, animationTime = entry.getAnimationTime();
 		Array<Timeline> timelines = entry.animation.timelines;
-		BooleanArray setupPose = entry.setupPose;
+		boolean[] timelinesFirst = entry.timelinesFirst.items;
 		float alphaFull = entry.alpha, alphaMix = entry.alpha * (1 - mix);
 		if (attachments && drawOrder) {
 			for (int i = 0, n = timelines.size; i < n; i++) {
 				Timeline timeline = timelines.get(i);
-				if (setupPose.get(i))
+				if (timelinesFirst[i])
 					timeline.apply(skeleton, animationLast, animationTime, events, alphaMix, true, true);
 				else
 					timeline.apply(skeleton, animationLast, animationTime, events, alphaFull, false, false);
@@ -167,12 +185,13 @@ public class AnimationState {
 		} else {
 			for (int i = 0, n = timelines.size; i < n; i++) {
 				Timeline timeline = timelines.get(i);
-				if (!attachments && timeline instanceof AttachmentTimeline) continue;
-				if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
-				if (setupPose.get(i))
+				if (timelinesFirst[i])
 					timeline.apply(skeleton, animationLast, animationTime, events, alphaMix, true, true);
-				else
+				else {
+					if (!attachments && timeline instanceof AttachmentTimeline) continue;
+					if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
 					timeline.apply(skeleton, animationLast, animationTime, events, alphaFull, false, false);
+				}
 			}
 		}
 
@@ -217,6 +236,7 @@ public class AnimationState {
 		tracks.clear();
 	}
 
+	// BOZO - This leaves the skeleton in the last pose, with no easy way of resetting.
 	public void clearTrack (int trackIndex) {
 		if (trackIndex >= tracks.size) return;
 		TrackEntry current = tracks.get(trackIndex);
@@ -268,60 +288,50 @@ public class AnimationState {
 			if (mixingFrom != null) queue.end(mixingFrom);
 		}
 
-		queue.drain();
-
-		updateSetupPose();
+		animationsChanged = true;
 	}
 
-	private void updateSetupPose () {
-		usage.clear();
+	private void animationsChanged () {
+		animationsChanged = false;
+		propertyIDs.clear();
 		int i = 0, n = tracks.size;
 		for (; i < n; i++) {
 			TrackEntry entry = tracks.get(i);
 			if (entry == null) continue;
 			if (entry.mixingFrom != null) {
-				updateFirstSetupPose(entry.mixingFrom);
-				updateSetupPose(entry);
+				setTimelinesFirst(entry.mixingFrom);
+				checkTimelinesFirst(entry);
 			} else
-				updateFirstSetupPose(entry);
+				setTimelinesFirst(entry);
 			i++;
 			break;
 		}
 		for (; i < n; i++) {
 			TrackEntry entry = tracks.get(i);
 			if (entry == null) continue;
-			if (entry.mixingFrom != null) updateSetupPose(entry.mixingFrom);
-			updateSetupPose(entry);
+			if (entry.mixingFrom != null) checkTimelinesFirst(entry.mixingFrom);
+			checkTimelinesFirst(entry);
 		}
 	}
 
-	private void updateFirstSetupPose (TrackEntry entry) {
-		IntSet usage = this.usage;
-		BooleanArray setupPose = entry.setupPose;
-		setupPose.clear();
+	private void setTimelinesFirst (TrackEntry entry) {
+		IntSet propertyIDs = this.propertyIDs;
 		Array<Timeline> timelines = entry.animation.timelines;
-		for (int ii = 0, nn = timelines.size; ii < nn; ii++) {
-			Timeline timeline = timelines.get(ii);
-			usage.add(timeline.getId());
-			setupPose.add(true);
+		int n = timelines.size;
+		boolean[] timelinesFirst = entry.timelinesFirst.setSize(n);
+		for (int i = 0; i < n; i++) {
+			propertyIDs.add(timelines.get(i).getPropertyId());
+			timelinesFirst[i] = true;
 		}
 	}
 
-	private void updateSetupPose (TrackEntry entry) {
-		IntSet usage = this.usage;
-		BooleanArray setupPose = entry.setupPose;
-		setupPose.clear();
+	private void checkTimelinesFirst (TrackEntry entry) {
+		IntSet propertyIDs = this.propertyIDs;
 		Array<Timeline> timelines = entry.animation.timelines;
-		for (int ii = 0, nn = timelines.size; ii < nn; ii++) {
-			Timeline timeline = timelines.get(ii);
-			int id = timeline.getId();
-			if (usage.contains(id))
-				setupPose.add(false);
-			else {
-				usage.add(id);
-				setupPose.add(true);
-			}
-		}
+		int n = timelines.size;
+		boolean[] timelinesFirst = entry.timelinesFirst.setSize(n);
+		for (int i = 0; i < n; i++)
+			timelinesFirst[i] = propertyIDs.add(timelines.get(i).getPropertyId());
 	}
 
 	/** @see #setAnimation(int, Animation, boolean) */
@@ -340,13 +350,15 @@ public class AnimationState {
 		if (animation == null) throw new IllegalArgumentException("animation cannot be null.");
 		TrackEntry current = expandToIndex(trackIndex);
 		TrackEntry entry = trackEntry(trackIndex, animation, loop, current);
-		if (current == null)
+		if (current == null) {
 			setCurrent(trackIndex, entry);
-		else {
+			queue.drain();
+		} else {
 			freeAll(current.next);
-			if (current.trackLast == -1) // If current was never applied, replace it.
+			if (current.trackLast == -1) { // If current was never applied, replace it.
 				setCurrent(trackIndex, entry);
-			else {
+				queue.drain();
+			} else {
 				current.next = entry;
 				entry.delay = current.trackLast;
 			}
@@ -377,9 +389,10 @@ public class AnimationState {
 
 		TrackEntry entry = trackEntry(trackIndex, animation, loop, last);
 
-		if (last == null)
+		if (last == null) {
 			setCurrent(trackIndex, entry);
-		else {
+			queue.drain();
+		} else {
 			last.next = entry;
 			if (delay <= 0) {
 				float duration = last.animationEnd - last.animationStart;
@@ -402,7 +415,7 @@ public class AnimationState {
 		entry.loop = loop;
 
 		entry.eventThreshold = 0;
-		entry.attachmentThreshold = 1;
+		entry.attachmentThreshold = 0;
 		entry.drawOrderThreshold = 0;
 
 		entry.delay = 0;
@@ -496,14 +509,14 @@ public class AnimationState {
 		float delay, trackTime, trackLast, trackEnd, animationStart, animationEnd, animationLast, timeScale;
 		float alpha;
 		float mixTime, mixDuration;
-		final BooleanArray setupPose = new BooleanArray();
+		final BooleanArray timelinesFirst = new BooleanArray();
 
 		public void reset () {
 			next = null;
 			mixingFrom = null;
 			animation = null;
 			listener = null;
-			setupPose.clear();
+			timelinesFirst.clear();
 		}
 
 		public int getTrackIndex () {
@@ -538,7 +551,8 @@ public class AnimationState {
 		}
 
 		/** Current time in seconds this track entry has been the current track entry. The track time determines
-		 * {@link #getAnimationTime()} and can be set to start the animation at a time other than 0. */
+		 * {@link #getAnimationTime()}. The track time can be set to start the animation at a time other than 0, without affecting
+		 * looping. */
 		public float getTrackTime () {
 			return trackTime;
 		}
@@ -548,8 +562,8 @@ public class AnimationState {
 		}
 
 		/** The track time in seconds when this animation will be removed from the track. If the track end time is reached and no
-		 * other animations are queued for playback, the track is cleared. Defaults to the animation duration for non-looping
-		 * animations and to {@link Integer#MAX_VALUE} for looping animations. */
+		 * other animations are queued for playback, the track is cleared, leaving the skeleton in the last applied pose. Defaults
+		 * to the animation duration for non-looping animations and to {@link Integer#MAX_VALUE} for looping animations. */
 		public float getTrackEnd () {
 			return trackEnd;
 		}
@@ -560,8 +574,8 @@ public class AnimationState {
 
 		/** Seconds when this animation starts, both initially and after looping. Defaults to 0.
 		 * <p>
-		 * When changing the animation start time, it often makes sense to also change {@link #getAnimationLast()} to control when
-		 * timelines will trigger. */
+		 * When changing the animation start time, it often makes sense to also change {@link #getAnimationLast()} to control which
+		 * timeline keys will trigger. */
 		public float getAnimationStart () {
 			return animationStart;
 		}
@@ -581,8 +595,8 @@ public class AnimationState {
 		}
 
 		/** The time in seconds this animation was last applied. Some timelines use this for one-time triggers. Eg, when this
-		 * animation is applied, event timelines will fire all events between lastTime (exclusive) and time (inclusive). Defaults to
-		 * -1 to ensure triggers on frame 0 happen the first time this animation is applied. */
+		 * animation is applied, event timelines will fire all events between the animation last time (exclusive) and animation time
+		 * (inclusive). Defaults to -1 to ensure triggers on frame 0 happen the first time this animation is applied. */
 		public float getAnimationLast () {
 			return animationLast;
 		}

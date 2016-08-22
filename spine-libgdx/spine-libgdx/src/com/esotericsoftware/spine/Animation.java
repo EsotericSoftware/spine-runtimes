@@ -144,7 +144,7 @@ public class Animation {
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
 			boolean mixingOut);
 
-		public int getId ();
+		public int getPropertyId ();
 	}
 
 	static private enum TimelineType {
@@ -255,7 +255,7 @@ public class Animation {
 			frames = new float[frameCount << 1];
 		}
 
-		public int getId () {
+		public int getPropertyId () {
 			return (TimelineType.rotate.ordinal() << 24) + boneIndex;
 		}
 
@@ -330,7 +330,7 @@ public class Animation {
 			frames = new float[frameCount * ENTRIES];
 		}
 
-		public int getId () {
+		public int getPropertyId () {
 			return (TimelineType.translate.ordinal() << 24) + boneIndex;
 		}
 
@@ -397,7 +397,7 @@ public class Animation {
 			super(frameCount);
 		}
 
-		public int getId () {
+		public int getPropertyId () {
 			return (TimelineType.scale.ordinal() << 24) + boneIndex;
 		}
 
@@ -455,7 +455,7 @@ public class Animation {
 			super(frameCount);
 		}
 
-		public int getId () {
+		public int getPropertyId () {
 			return (TimelineType.shear.ordinal() << 24) + boneIndex;
 		}
 
@@ -508,7 +508,7 @@ public class Animation {
 			frames = new float[frameCount * ENTRIES];
 		}
 
-		public int getId () {
+		public int getPropertyId () {
 			return (TimelineType.color.ordinal() << 24) + slotIndex;
 		}
 
@@ -584,7 +584,7 @@ public class Animation {
 			attachmentNames = new String[frameCount];
 		}
 
-		public int getId () {
+		public int getPropertyId () {
 			return (TimelineType.attachment.ordinal() << 24) + slotIndex;
 		}
 
@@ -651,7 +651,7 @@ public class Animation {
 			frameVertices = new float[frameCount][];
 		}
 
-		public int getId () {
+		public int getPropertyId () {
 			return (TimelineType.deform.ordinal() << 24) + slotIndex;
 		}
 
@@ -742,7 +742,7 @@ public class Animation {
 			events = new Event[frameCount];
 		}
 
-		public int getId () {
+		public int getPropertyId () {
 			return TimelineType.event.ordinal() << 24;
 		}
 
@@ -803,7 +803,7 @@ public class Animation {
 			drawOrders = new int[frameCount][];
 		}
 
-		public int getId () {
+		public int getPropertyId () {
 			return TimelineType.drawOrder.ordinal() << 24;
 		}
 
@@ -862,7 +862,7 @@ public class Animation {
 			frames = new float[frameCount * ENTRIES];
 		}
 
-		public int getId () {
+		public int getPropertyId () {
 			return (TimelineType.ikConstraint.ordinal() << 24) + ikConstraintIndex;
 		}
 
@@ -924,7 +924,7 @@ public class Animation {
 			frames = new float[frameCount * ENTRIES];
 		}
 
-		public int getId () {
+		public int getPropertyId () {
 			return (TimelineType.transformConstraint.ordinal() << 24) + transformConstraintIndex;
 		}
 
@@ -998,7 +998,7 @@ public class Animation {
 			frames = new float[frameCount * ENTRIES];
 		}
 
-		public int getId () {
+		public int getPropertyId () {
 			return (TimelineType.pathConstraintPosition.ordinal() << 24) + pathConstraintIndex;
 		}
 
@@ -1050,7 +1050,7 @@ public class Animation {
 			super(frameCount);
 		}
 
-		public int getId () {
+		public int getPropertyId () {
 			return (TimelineType.pathConstraintSpacing.ordinal() << 24) + pathConstraintIndex;
 		}
 
@@ -1091,7 +1091,7 @@ public class Animation {
 			frames = new float[frameCount * ENTRIES];
 		}
 
-		public int getId () {
+		public int getPropertyId () {
 			return (TimelineType.pathConstraintMix.ordinal() << 24) + pathConstraintIndex;
 		}
 

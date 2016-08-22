@@ -167,9 +167,11 @@ public class AnimationStateTest {
 			expect(1, "start", 0.1f, 1.1f), //
 
 			expect(0, "interrupt", 1.1f, 1.1f), //
-			expect(0, "end", 1.1f, 1.1f), //
 
 			expect(1, "event 0", 0.1f, 1.1f), //
+
+			expect(0, "end", 1.1f, 1.2f), //
+
 			expect(1, "event 14", 0.5f, 1.5f), //
 			expect(1, "event 30", 1, 2), //
 			expect(1, "complete", 1, 2), //
@@ -177,9 +179,11 @@ public class AnimationStateTest {
 			expect(0, "start", 0.1f, 2.1f), //
 
 			expect(1, "interrupt", 1.1f, 2.1f), //
-			expect(1, "end", 1.1f, 2.1f), //
 
 			expect(0, "event 0", 0.1f, 2.1f), //
+
+			expect(1, "end", 1.1f, 2.2f), //
+
 			expect(0, "event 14", 0.5f, 2.5f), //
 			expect(0, "event 30", 1, 3), //
 			expect(0, "complete", 1, 3), //
@@ -198,9 +202,11 @@ public class AnimationStateTest {
 			expect(1, "start", 0.1f, 0.6f), //
 
 			expect(0, "interrupt", 0.6f, 0.6f), //
-			expect(0, "end", 0.6f, 0.6f), //
 
 			expect(1, "event 0", 0.1f, 0.6f), //
+
+			expect(0, "end", 0.6f, 0.7f), //
+
 			expect(1, "event 14", 0.5f, 1.0f), //
 			expect(1, "event 30", 1, 1.5f), //
 			expect(1, "complete", 1, 1.5f), //
@@ -223,7 +229,7 @@ public class AnimationStateTest {
 			expect(1, "event 0", 0.1f, 1), //
 			expect(1, "event 14", 0.5f, 1.4f), //
 
-			expect(0, "end", 1.6f, 1.6f), //
+			expect(0, "end", 1.6f, 1.7f), //
 
 			expect(1, "event 30", 1, 1.9f), //
 			expect(1, "complete", 1, 1.9f), //
@@ -246,7 +252,7 @@ public class AnimationStateTest {
 			expect(1, "event 14", 0.5f, 0.9f), //
 
 			expect(0, "complete", 1, 1), //
-			expect(0, "end", 1.1f, 1.1f), //
+			expect(0, "end", 1.1f, 1.2f), //
 
 			expect(1, "event 30", 1, 1.4f), //
 			expect(1, "complete", 1, 1.4f), //
@@ -270,7 +276,7 @@ public class AnimationStateTest {
 			expect(1, "event 14", 0.5f, 0.9f), //
 
 			expect(0, "complete", 1, 1), //
-			expect(0, "end", 1.1f, 1.1f), //
+			expect(0, "end", 1.1f, 1.2f), //
 
 			expect(1, "event 30", 1, 1.4f), //
 			expect(1, "complete", 1, 1.4f), //
@@ -298,7 +304,7 @@ public class AnimationStateTest {
 
 			expect(1, "event 14", 0.5f, 1.3f), //
 
-			expect(0, "end", 1.5f, 1.5f), //
+			expect(0, "end", 1.5f, 1.6f), //
 
 			expect(1, "event 30", 1, 1.8f), //
 			expect(1, "complete", 1, 1.8f), //
@@ -341,9 +347,11 @@ public class AnimationStateTest {
 			expect(1, "start", 0.1f, 2.1f), //
 
 			expect(0, "interrupt", 2.1f, 2.1f), //
-			expect(0, "end", 2.1f, 2.1f), //
 
 			expect(1, "event 0", 0.1f, 2.1f), //
+
+			expect(0, "end", 2.1f, 2.2f), //
+
 			expect(1, "event 14", 0.5f, 2.5f), //
 			expect(1, "event 30", 1, 3), //
 			expect(1, "complete", 1, 3), //
@@ -368,9 +376,11 @@ public class AnimationStateTest {
 			expect(1, "start", 0.1f, 2.1f), //
 
 			expect(0, "interrupt", 2.1f, 2.1f), //
-			expect(0, "end", 2.1f, 2.1f), //
 
 			expect(1, "event 0", 0.1f, 2.1f), //
+
+			expect(0, "end", 2.1f, 2.2f), //
+
 			expect(1, "event 14", 0.5f, 2.5f), //
 			expect(1, "event 30", 1, 3), //
 			expect(1, "complete", 1, 3), //
@@ -461,7 +471,7 @@ public class AnimationStateTest {
 
 			expect(1, "event 14", 0.5f, 1.2f), //
 
-			expect(0, "end", 1.4f, 1.4f), //
+			expect(0, "end", 1.4f, 1.5f), //
 
 			expect(1, "event 30", 1, 1.7f), //
 			expect(1, "complete", 1, 1.7f), //
@@ -488,7 +498,7 @@ public class AnimationStateTest {
 			expect(1, "event 0", 0.1f, 1), //
 			expect(1, "event 14", 0.5f, 1.4f), //
 
-			expect(0, "end", 1.6f, 1.6f), //
+			expect(0, "end", 1.6f, 1.7f), //
 
 			expect(1, "event 30", 1, 1.9f), //
 			expect(1, "complete", 1, 1.9f), //
@@ -507,17 +517,21 @@ public class AnimationStateTest {
 			expect(1, "start", 0, 0), //
 
 			expect(0, "interrupt", 0, 0), //
-			expect(0, "end", 0, 0), //
 
 			expect(1, "event 0", 0, 0), //
+
+			expect(0, "end", 0.1f, 0.2f), //
+
 			expect(1, "event 14", 0.5f, 0.5f), //
 
 			expect(0, "start", 0.1f, 0.8f), //
 
 			expect(1, "interrupt", 0.8f, 0.8f), //
-			expect(1, "end", 0.8f, 0.8f), //
 
 			expect(0, "event 0", 0.1f, 0.8f), //
+
+			expect(1, "end", 0.8f, 0.9f), //
+
 			expect(0, "event 14", 0.5f, 1.2f), //
 			expect(0, "event 30", 1, 1.7f), //
 			expect(0, "complete", 1, 1.7f), //
