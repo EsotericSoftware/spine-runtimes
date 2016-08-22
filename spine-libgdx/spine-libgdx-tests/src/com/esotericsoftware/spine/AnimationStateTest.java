@@ -511,13 +511,28 @@ public class AnimationStateTest {
 
 			expect(1, "event 0", 0, 0), //
 			expect(1, "event 14", 0.5f, 0.5f), //
-			expect(1, "event 30", 1, 1), //
-			expect(1, "complete", 1, 1), //
-			expect(1, "end", 1, 1.1f) //
+
+			expect(0, "start", 0.1f, 0.8f), //
+
+			expect(1, "interrupt", 0.8f, 0.8f), //
+			expect(1, "end", 0.8f, 0.8f), //
+
+			expect(0, "event 0", 0.1f, 0.8f), //
+			expect(0, "event 14", 0.5f, 1.2f), //
+			expect(0, "event 30", 1, 1.7f), //
+			expect(0, "complete", 1, 1.7f), //
+			expect(0, "end", 1, 1.8f) //
 		);
 		state.setAnimation(0, "events1", false); // First should be ignored.
 		state.setAnimation(0, "events2", false);
-		run(0.1f, 1000, null);
+		run(0.1f, 1000, new TestListener() {
+			public void frame (float time) {
+				if (MathUtils.isEqual(time, 0.8f)) {
+					state.setAnimation(0, "events2", false); // First should be ignored.
+					state.setAnimation(0, "events1", false);
+				}
+			}
+		});
 
 		setup("addAnimation with delay on empty track", // 22
 			expect(0, "start", 0, 0), //

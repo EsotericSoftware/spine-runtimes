@@ -121,8 +121,12 @@ public class AnimationState {
 
 			float mix = current.alpha;
 			if (current.mixingFrom != null) {
-				mix *= current.mixTime / current.mixDuration;
-				if (mix > 1) mix = 1;
+				if (current.mixDuration == 0)
+					mix = 1;
+				else {
+					mix *= current.mixTime / current.mixDuration;
+					if (mix > 1) mix = 1;
+				}
 				applyMixingFrom(current.mixingFrom, skeleton, mix);
 				if (mix == 1) {
 					queue.end(current.mixingFrom);
@@ -254,15 +258,12 @@ public class AnimationState {
 
 			queue.interrupt(current);
 
-			if (entry.mixDuration > 0) {
-				// If a mix is in progress, mix from the closest animation.
-				if (mixingFrom != null && current.mixTime / current.mixDuration < 0.5f) {
-					entry.mixingFrom = mixingFrom;
-					mixingFrom = current;
-				} else
-					entry.mixingFrom = current;
+			// If a mix is in progress, mix from the closest animation.
+			if (mixingFrom != null && current.mixTime / current.mixDuration < 0.5f) {
+				entry.mixingFrom = mixingFrom;
+				mixingFrom = current;
 			} else
-				queue.end(current);
+				entry.mixingFrom = current;
 
 			if (mixingFrom != null) queue.end(mixingFrom);
 		}
@@ -339,16 +340,17 @@ public class AnimationState {
 		if (animation == null) throw new IllegalArgumentException("animation cannot be null.");
 		TrackEntry current = expandToIndex(trackIndex);
 		TrackEntry entry = trackEntry(trackIndex, animation, loop, current);
-		if (current != null) {
+		if (current == null)
+			setCurrent(trackIndex, entry);
+		else {
 			freeAll(current.next);
-			if (current.trackLast == -1) // If current was never applied, don't mix from it, just replace it.
+			if (current.trackLast == -1) // If current was never applied, replace it.
 				setCurrent(trackIndex, entry);
 			else {
 				current.next = entry;
 				entry.delay = current.trackLast;
 			}
-		} else
-			setCurrent(trackIndex, entry);
+		}
 		return entry;
 	}
 
@@ -375,7 +377,9 @@ public class AnimationState {
 
 		TrackEntry entry = trackEntry(trackIndex, animation, loop, last);
 
-		if (last != null) {
+		if (last == null)
+			setCurrent(trackIndex, entry);
+		else {
 			last.next = entry;
 			if (delay <= 0) {
 				float duration = last.animationEnd - last.animationStart;
@@ -384,8 +388,7 @@ public class AnimationState {
 				else
 					delay = 0;
 			}
-		} else
-			setCurrent(trackIndex, entry);
+		}
 
 		entry.delay = delay;
 		return entry;
