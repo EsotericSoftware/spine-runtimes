@@ -399,7 +399,7 @@ public class AnimationState {
 		entry.loop = loop;
 
 		entry.eventThreshold = 0;
-		entry.attachmentThreshold = 0;
+		entry.attachmentThreshold = 1;
 		entry.drawOrderThreshold = 0;
 
 		entry.delay = 0;

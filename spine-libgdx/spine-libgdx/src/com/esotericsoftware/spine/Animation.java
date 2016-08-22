@@ -290,9 +290,9 @@ public class Animation {
 				if (setupPose)
 					bone.rotation = bone.data.rotation + frames[frames.length + PREV_ROTATION] * alpha;
 				else {
-					float amount = bone.data.rotation + frames[frames.length + PREV_ROTATION] - bone.rotation;
-					amount -= (16384 - (int)(16384.499999999996 - amount / 360)) * 360;
-					bone.rotation += amount * alpha;
+					float r = bone.data.rotation + frames[frames.length + PREV_ROTATION] - bone.rotation;
+					r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
+					bone.rotation += r * alpha;
 				}
 				return;
 			}
@@ -303,16 +303,16 @@ public class Animation {
 			float frameTime = frames[frame];
 			float percent = getCurvePercent((frame >> 1) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-			float amount = frames[frame + ROTATION] - prevRotation;
-			amount -= (16384 - (int)(16384.499999999996 - amount / 360)) * 360;
-			amount = prevRotation + amount * percent;
+			float r = frames[frame + ROTATION] - prevRotation;
+			r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
+			r = prevRotation + r * percent;
 			if (setupPose) {
-				amount -= (16384 - (int)(16384.499999999996 - amount / 360)) * 360;
-				bone.rotation = bone.data.rotation + amount * alpha;
+				r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
+				bone.rotation = bone.data.rotation + r * alpha;
 			} else {
-				amount = bone.data.rotation + amount - bone.rotation;
-				amount -= (16384 - (int)(16384.499999999996 - amount / 360)) * 360;
-				bone.rotation += amount * alpha;
+				r = bone.data.rotation + r - bone.rotation;
+				r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
+				bone.rotation += r * alpha;
 			}
 		}
 	}
@@ -362,10 +362,14 @@ public class Animation {
 
 			Bone bone = skeleton.bones.get(boneIndex);
 
-			float x, y;
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
-				x = frames[frames.length + PREV_X];
-				y = frames[frames.length + PREV_Y];
+				if (setupPose) {
+					bone.x = bone.data.x + frames[frames.length + PREV_X] * alpha;
+					bone.y = bone.data.y + frames[frames.length + PREV_Y] * alpha;
+				} else {
+					bone.x += (bone.data.x + frames[frames.length + PREV_X] - bone.x) * alpha;
+					bone.y += (bone.data.y + frames[frames.length + PREV_Y] - bone.y) * alpha;
+				}
 			} else {
 				// Interpolate between the previous frame and the current frame.
 				int frame = binarySearch(frames, time, ENTRIES);
@@ -375,15 +379,15 @@ public class Animation {
 				float percent = getCurvePercent(frame / ENTRIES - 1,
 					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-				x = prevX + (frames[frame + X] - prevX) * percent;
-				y = prevY + (frames[frame + Y] - prevY) * percent;
-			}
-			if (setupPose) {
-				bone.x = bone.data.x + x * alpha;
-				bone.y = bone.data.y + y * alpha;
-			} else {
-				bone.x += (bone.data.x + x - bone.x) * alpha;
-				bone.y += (bone.data.y + y - bone.y) * alpha;
+				float x = prevX + (frames[frame + X] - prevX) * percent;
+				float y = prevY + (frames[frame + Y] - prevY) * percent;
+				if (setupPose) {
+					bone.x = bone.data.x + x * alpha;
+					bone.y = bone.data.y + y * alpha;
+				} else {
+					bone.x += (bone.data.x + x - bone.x) * alpha;
+					bone.y += (bone.data.y + y - bone.y) * alpha;
+				}
 			}
 		}
 	}
@@ -406,8 +410,8 @@ public class Animation {
 
 			float x, y;
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
-				x = frames[frames.length + PREV_X];
-				y = frames[frames.length + PREV_Y];
+				x = frames[frames.length + PREV_X] * bone.data.scaleX;
+				y = frames[frames.length + PREV_Y] * bone.data.scaleY;
 			} else {
 				// Interpolate between the previous frame and the current frame.
 				int frame = binarySearch(frames, time, ENTRIES);
@@ -417,11 +421,9 @@ public class Animation {
 				float percent = getCurvePercent(frame / ENTRIES - 1,
 					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-				x = prevX + (frames[frame + X] - prevX) * percent;
-				y = prevY + (frames[frame + Y] - prevY) * percent;
+				x = (prevX + (frames[frame + X] - prevX) * percent) * bone.data.scaleX;
+				y = (prevY + (frames[frame + Y] - prevY) * percent) * bone.data.scaleY;
 			}
-			x *= bone.data.scaleX;
-			y *= bone.data.scaleY;
 			if (alpha == 1) {
 				bone.scaleX = x;
 				bone.scaleY = y;
@@ -464,8 +466,13 @@ public class Animation {
 
 			Bone bone = skeleton.bones.get(boneIndex);
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
-				bone.shearX += (bone.data.shearX + frames[frames.length + PREV_X] - bone.shearX) * alpha;
-				bone.shearY += (bone.data.shearY + frames[frames.length + PREV_Y] - bone.shearY) * alpha;
+				if (setupPose) {
+					bone.shearX = bone.data.shearX + frames[frames.length + PREV_X] * alpha;
+					bone.shearY = bone.data.shearY + frames[frames.length + PREV_Y] * alpha;
+				} else {
+					bone.shearX += (bone.data.shearX + frames[frames.length + PREV_X] - bone.shearX) * alpha;
+					bone.shearY += (bone.data.shearY + frames[frames.length + PREV_Y] - bone.shearY) * alpha;
+				}
 				return;
 			}
 
@@ -476,8 +483,15 @@ public class Animation {
 			float frameTime = frames[frame];
 			float percent = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-			bone.shearX += (bone.data.shearX + (prevX + (frames[frame + X] - prevX) * percent) - bone.shearX) * alpha;
-			bone.shearY += (bone.data.shearY + (prevY + (frames[frame + Y] - prevY) * percent) - bone.shearY) * alpha;
+			float x = prevX + (frames[frame + X] - prevX) * percent;
+			float y = prevY + (frames[frame + Y] - prevY) * percent;
+			if (setupPose) {
+				bone.shearX = bone.data.shearX + x * alpha;
+				bone.shearY = bone.data.shearY + y * alpha;
+			} else {
+				bone.shearX += (bone.data.shearX + x - bone.shearX) * alpha;
+				bone.shearY += (bone.data.shearY + y - bone.shearY) * alpha;
+			}
 		}
 	}
 
@@ -549,11 +563,14 @@ public class Animation {
 				b += (frames[frame + B] - b) * percent;
 				a += (frames[frame + A] - a) * percent;
 			}
-			Color color = skeleton.slots.get(slotIndex).color;
-			if (alpha < 1)
+			Slot slot = skeleton.slots.get(slotIndex);
+			if (alpha == 1)
+				slot.color.set(r, g, b, a);
+			else {
+				Color color = slot.color;
+				if (setupPose) color.set(slot.data.color);
 				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
-			else
-				color.set(r, g, b, a);
+			}
 		}
 	}
 
@@ -600,6 +617,13 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
 			boolean mixingOut) {
+			if (mixingOut && setupPose) {
+				Slot slot = skeleton.slots.get(slotIndex);
+				String attachmentName = slot.data.attachmentName;
+				slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slotIndex, attachmentName));
+				return;
+			}
+
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
