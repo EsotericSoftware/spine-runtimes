@@ -60,6 +60,8 @@ typedef struct spAnimation {
 } spAnimation;
 
 spAnimation* spAnimation_create (const char* name, int timelinesCount);
+spAnimation* spAnimation_createWithTimelines (const char* name, float duration,
+		int timelinesCount, spTimeline** timelines);
 void spAnimation_dispose (spAnimation* self);
 
 /** Poses the skeleton at the specified time for this animation.

@@ -42,6 +42,16 @@ spAnimation* spAnimation_create (const char* name, int timelinesCount) {
 	return self;
 }
 
+spAnimation* spAnimation_createWithTimelines (const char* name, float duration,
+		int timelinesCount, spTimeline** timelines) {
+	spAnimation* self = NEW(spAnimation);
+	CONST_CAST(char*, self->name) = name;
+	self->duration = duration;
+	self->timelinesCount = timelinesCount;
+	self->timelines = timelines;
+	return self;
+}
+
 void spAnimation_dispose (spAnimation* self) {
 	int i;
 	for (i = 0; i < self->timelinesCount; ++i)
