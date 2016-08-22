@@ -67,11 +67,13 @@ public class Animation {
 	/** Poses the skeleton at the specified time for this animation mixed with the current or setup pose.
 	 * @param lastTime The last time the animation was applied.
 	 * @param events Any triggered events are added. May be null.
-	 * @param alpha The amount of this animation that affects the current pose.
-	 * @param setupPose If true, the animation is mixed with the setup pose, else it is mixed with the current pose. Pass true when
-	 *           alpha is 1. */
+	 * @param alpha The percentage between this animation's pose and the current pose.
+	 * @param setupPose If true, the animation is mixed with the setup pose, else it is mixed with the current pose. Passing true
+	 *           when alpha is 1 is slightly more efficient.
+	 * @param mixingOut True when mixing over time toward the setup or current pose, false when mixing toward the keyed pose.
+	 *           Irrelevant when alpha is 1. */
 	public void apply (Skeleton skeleton, float lastTime, float time, boolean loop, Array<Event> events, float alpha,
-		boolean setupPose) {
+		boolean setupPose, boolean mixingOut) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 
 		if (loop && duration != 0) {
@@ -81,7 +83,7 @@ public class Animation {
 
 		Array<Timeline> timelines = this.timelines;
 		for (int i = 0, n = timelines.size; i < n; i++)
-			timelines.get(i).apply(skeleton, lastTime, time, events, alpha, setupPose);
+			timelines.get(i).apply(skeleton, lastTime, time, events, alpha, setupPose, false);
 	}
 
 	public String getName () {
@@ -135,9 +137,12 @@ public class Animation {
 	static public interface Timeline {
 		/** Sets the value(s) for the specified time.
 		 * @param events May be null to not collect fired events.
-		 * @param setupPose If true, the timeline is mixed with the setup pose, else it is mixed with the current pose. Pass true
-		 *           when alpha is 1. */
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose);
+		 * @param setupPose If true, the timeline is mixed with the setup pose, else it is mixed with the current pose. Passing true
+		 *           when alpha is 1 is slightly more efficient.
+		 * @param mixingOut True when mixing over time toward the setup or current pose, false when mixing toward the keyed pose.
+		 *           Irrelevant when alpha is 1. */
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
+			boolean mixingOut);
 
 		public int getId ();
 	}
@@ -274,9 +279,11 @@ public class Animation {
 			frames[frameIndex + ROTATION] = degrees;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose) {
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
+			boolean mixingOut) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
+
 			Bone bone = skeleton.bones.get(boneIndex);
 
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
@@ -297,13 +304,13 @@ public class Animation {
 			float percent = getCurvePercent((frame >> 1) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
 			float amount = frames[frame + ROTATION] - prevRotation;
-			amount = amount - (16384 - (int)(16384.499999999996 - amount / 360)) * 360;
+			amount -= (16384 - (int)(16384.499999999996 - amount / 360)) * 360;
+			amount = prevRotation + amount * percent;
 			if (setupPose) {
-				amount = prevRotation + amount * percent;
-				amount = amount - (16384 - (int)(16384.499999999996 - amount / 360)) * 360;
+				amount -= (16384 - (int)(16384.499999999996 - amount / 360)) * 360;
 				bone.rotation = bone.data.rotation + amount * alpha;
 			} else {
-				amount = bone.data.rotation + (prevRotation + amount * percent) - bone.rotation;
+				amount = bone.data.rotation + amount - bone.rotation;
 				amount -= (16384 - (int)(16384.499999999996 - amount / 360)) * 360;
 				bone.rotation += amount * alpha;
 			}
@@ -348,36 +355,35 @@ public class Animation {
 			frames[frameIndex + Y] = y;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose) {
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
+			boolean mixingOut) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
 			Bone bone = skeleton.bones.get(boneIndex);
 
+			float x, y;
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
-				if (setupPose) {
-					bone.x = bone.data.x + frames[frames.length + PREV_X] * alpha;
-					bone.y = bone.data.y + frames[frames.length + PREV_Y] * alpha;
-				} else {
-					bone.x += (bone.data.x + frames[frames.length + PREV_X] - bone.x) * alpha;
-					bone.y += (bone.data.y + frames[frames.length + PREV_Y] - bone.y) * alpha;
-				}
-				return;
-			}
-
-			// Interpolate between the previous frame and the current frame.
-			int frame = binarySearch(frames, time, ENTRIES);
-			float prevX = frames[frame + PREV_X];
-			float prevY = frames[frame + PREV_Y];
-			float frameTime = frames[frame];
-			float percent = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
-			if (setupPose) {
-				bone.x = bone.data.x + (prevX + (frames[frame + X] - prevX) * percent) * alpha;
-				bone.y = bone.data.y + (prevY + (frames[frame + Y] - prevY) * percent) * alpha;
+				x = frames[frames.length + PREV_X];
+				y = frames[frames.length + PREV_Y];
 			} else {
-				bone.x += (bone.data.x + prevX + (frames[frame + X] - prevX) * percent - bone.x) * alpha;
-				bone.y += (bone.data.y + prevY + (frames[frame + Y] - prevY) * percent - bone.y) * alpha;
+				// Interpolate between the previous frame and the current frame.
+				int frame = binarySearch(frames, time, ENTRIES);
+				float prevX = frames[frame + PREV_X];
+				float prevY = frames[frame + PREV_Y];
+				float frameTime = frames[frame];
+				float percent = getCurvePercent(frame / ENTRIES - 1,
+					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+
+				x = prevX + (frames[frame + X] - prevX) * percent;
+				y = prevY + (frames[frame + Y] - prevY) * percent;
+			}
+			if (setupPose) {
+				bone.x = bone.data.x + x * alpha;
+				bone.y = bone.data.y + y * alpha;
+			} else {
+				bone.x += (bone.data.x + x - bone.x) * alpha;
+				bone.y += (bone.data.y + y - bone.y) * alpha;
 			}
 		}
 	}
@@ -391,11 +397,13 @@ public class Animation {
 			return (TimelineType.scale.ordinal() << 24) + boneIndex;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose) {
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
+			boolean mixingOut) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
 			Bone bone = skeleton.bones.get(boneIndex);
+
 			float x, y;
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
 				x = frames[frames.length + PREV_X];
@@ -418,7 +426,22 @@ public class Animation {
 				bone.scaleX = x;
 				bone.scaleY = y;
 			} else {
-				float bx = Math.abs(bone.scaleX) * Math.signum(x), by = Math.abs(bone.scaleY) * Math.signum(y);
+				float bx, by;
+				if (setupPose) {
+					bx = bone.data.scaleX;
+					by = bone.data.scaleY;
+				} else {
+					bx = bone.scaleX;
+					by = bone.scaleY;
+				}
+				// Mixing out uses sign of setup or current pose, else use sign of key.
+				if (mixingOut) {
+					x = Math.abs(x) * Math.signum(bx);
+					y = Math.abs(y) * Math.signum(by);
+				} else {
+					bx = Math.abs(bx) * Math.signum(x);
+					by = Math.abs(by) * Math.signum(y);
+				}
 				bone.scaleX = bx + (x - bx) * alpha;
 				bone.scaleY = by + (y - by) * alpha;
 			}
@@ -434,7 +457,8 @@ public class Animation {
 			return (TimelineType.shear.ordinal() << 24) + boneIndex;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose) {
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
+			boolean mixingOut) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -497,7 +521,8 @@ public class Animation {
 			frames[frameIndex + A] = a;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose) {
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
+			boolean mixingOut) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -573,7 +598,8 @@ public class Animation {
 			attachmentNames[frameIndex] = attachmentName;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose) {
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
+			boolean mixingOut) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -636,8 +662,8 @@ public class Animation {
 			frameVertices[frameIndex] = vertices;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha,
-			boolean setupPose) {
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha, boolean setupPose,
+			boolean mixingOut) {
 			Slot slot = skeleton.slots.get(slotIndex);
 			Attachment slotAttachment = slot.attachment;
 			if (!(slotAttachment instanceof VertexAttachment) || !((VertexAttachment)slotAttachment).applyDeform(attachment)) return;
@@ -715,14 +741,14 @@ public class Animation {
 		}
 
 		/** Fires events for frames > lastTime and <= time. */
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha,
-			boolean setupPose) {
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha, boolean setupPose,
+			boolean mixingOut) {
 			if (firedEvents == null) return;
 			float[] frames = this.frames;
 			int frameCount = frames.length;
 
 			if (lastTime > time) { // Fire events after last time for looped animations.
-				apply(skeleton, lastTime, Integer.MAX_VALUE, firedEvents, alpha, setupPose);
+				apply(skeleton, lastTime, Integer.MAX_VALUE, firedEvents, alpha, setupPose, mixingOut);
 				lastTime = -1f;
 			} else if (lastTime >= frames[frameCount - 1]) // Last time is after last frame.
 				return;
@@ -776,8 +802,8 @@ public class Animation {
 			drawOrders[frameIndex] = drawOrder;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha,
-			boolean setupPose) {
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha, boolean setupPose,
+			boolean mixingOut) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -837,7 +863,8 @@ public class Animation {
 			frames[frameIndex + BEND_DIRECTION] = bendDirection;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose) {
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
+			boolean mixingOut) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -900,7 +927,8 @@ public class Animation {
 			frames[frameIndex + SHEAR] = shearMix;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose) {
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
+			boolean mixingOut) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -970,7 +998,8 @@ public class Animation {
 			frames[frameIndex + VALUE] = value;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose) {
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
+			boolean mixingOut) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -1001,7 +1030,8 @@ public class Animation {
 			return (TimelineType.pathConstraintSpacing.ordinal() << 24) + pathConstraintIndex;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose) {
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
+			boolean mixingOut) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
@@ -1062,7 +1092,8 @@ public class Animation {
 			frames[frameIndex + TRANSLATE] = translateMix;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose) {
+		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, boolean setupPose,
+			boolean mixingOut) {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 

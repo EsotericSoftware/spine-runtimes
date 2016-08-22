@@ -205,10 +205,14 @@ public class SkeletonViewer extends ApplicationAdapter {
 		// Configure skeleton from UI.
 
 		if (ui.skinList.getSelected() != null) skeleton.setSkin(ui.skinList.getSelected());
-		if (ui.animationList.getSelected() != null)
-			state.setAnimation(0, ui.animationList.getSelected(), ui.loopCheckbox.isChecked());
+		if (ui.animationList.getSelected() != null) setAnimation();
 
 		if (reload) ui.toast("Reloaded.");
+	}
+
+	void setAnimation () {
+		TrackEntry entry = state.setAnimation(0, ui.animationList.getSelected(), ui.loopCheckbox.isChecked());
+		entry.setTrackEnd(Integer.MAX_VALUE);
 	}
 
 	public void render () {
@@ -486,8 +490,14 @@ public class SkeletonViewer extends ApplicationAdapter {
 						if (name == null)
 							state.clearTrack(0);
 						else
-							state.setAnimation(0, name, loopCheckbox.isChecked());
+							setAnimation();
 					}
+				}
+			});
+
+			loopCheckbox.addListener(new ChangeListener() {
+				public void changed (ChangeEvent event, Actor actor) {
+					setAnimation();
 				}
 			});
 

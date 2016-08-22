@@ -65,7 +65,7 @@ public class BonePlotting {
 		for (Animation animation : skeletonData.getAnimations()) {
 			float time = 0;
 			while (time < animation.getDuration()) {
-				animation.apply(skeleton, time, time, false, null, 1, false);
+				animation.apply(skeleton, time, time, false, null, 1, false, false);
 				skeleton.updateWorldTransform();
 				System.out
 					.println(animation.getName() + "," + bone.getWorldX() + "," + bone.getWorldY() + "," + bone.getWorldRotationX());

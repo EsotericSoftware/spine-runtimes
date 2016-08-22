@@ -145,7 +145,7 @@ public class Box2DExample extends ApplicationAdapter {
 		batch.setTransformMatrix(camera.view);
 		batch.begin();
 
-		animation.apply(skeleton, time, time, true, events, 1, false);
+		animation.apply(skeleton, time, time, true, events, 1, false, false);
 		skeleton.x += 8 * delta;
 		skeleton.updateWorldTransform();
 		skeletonRenderer.draw(batch, skeleton);

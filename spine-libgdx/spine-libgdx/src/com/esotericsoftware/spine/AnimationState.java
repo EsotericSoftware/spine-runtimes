@@ -122,11 +122,12 @@ public class AnimationState {
 			float mix = current.alpha;
 			if (current.mixingFrom != null) {
 				mix *= current.mixTime / current.mixDuration;
+				if (mix > 1) mix = 1;
 				applyMixingFrom(current.mixingFrom, skeleton, mix);
-				if (mix >= 1) {
-					mix = 1;
+				if (mix == 1) {
 					queue.end(current.mixingFrom);
 					current.mixingFrom = null;
+					updateSetupPose();
 				}
 			}
 
@@ -134,7 +135,7 @@ public class AnimationState {
 			Array<Timeline> timelines = current.animation.timelines;
 			BooleanArray setupPose = current.setupPose;
 			for (int ii = 0, n = timelines.size; ii < n; ii++)
-				timelines.get(ii).apply(skeleton, animationLast, animationTime, events, mix, setupPose.get(ii));
+				timelines.get(ii).apply(skeleton, animationLast, animationTime, events, mix, setupPose.get(ii), false);
 			queueEvents(current, animationTime);
 			current.animationLast = animationTime;
 			current.trackLast = current.trackTime;
@@ -155,9 +156,9 @@ public class AnimationState {
 			for (int i = 0, n = timelines.size; i < n; i++) {
 				Timeline timeline = timelines.get(i);
 				if (setupPose.get(i))
-					timeline.apply(skeleton, animationLast, animationTime, events, alphaMix, true);
+					timeline.apply(skeleton, animationLast, animationTime, events, alphaMix, true, true);
 				else
-					timeline.apply(skeleton, animationLast, animationTime, events, alphaFull, false);
+					timeline.apply(skeleton, animationLast, animationTime, events, alphaFull, false, false);
 			}
 		} else {
 			for (int i = 0, n = timelines.size; i < n; i++) {
@@ -165,9 +166,9 @@ public class AnimationState {
 				if (!attachments && timeline instanceof AttachmentTimeline) continue;
 				if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
 				if (setupPose.get(i))
-					timeline.apply(skeleton, animationLast, animationTime, events, alphaMix, true);
+					timeline.apply(skeleton, animationLast, animationTime, events, alphaMix, true, true);
 				else
-					timeline.apply(skeleton, animationLast, animationTime, events, alphaFull, false);
+					timeline.apply(skeleton, animationLast, animationTime, events, alphaFull, false, false);
 			}
 		}
 
@@ -282,9 +283,10 @@ public class AnimationState {
 				updateSetupPose(entry);
 			} else
 				updateFirstSetupPose(entry);
+			i++;
 			break;
 		}
-		for (i++; i < n; i++) {
+		for (; i < n; i++) {
 			TrackEntry entry = tracks.get(i);
 			if (entry == null) continue;
 			if (entry.mixingFrom != null) updateSetupPose(entry.mixingFrom);
@@ -678,7 +680,8 @@ public class AnimationState {
 			return trackTime >= animationEnd - animationStart;
 		}
 
-		/** Seconds from 0 to the mix duration when mixing from the previous animation to this animation. */
+		/** Seconds from 0 to the mix duration when mixing from the previous animation to this animation. May be slightly more than
+		 * {@link #getMixDuration()}. */
 		public float getMixTime () {
 			return mixTime;
 		}
