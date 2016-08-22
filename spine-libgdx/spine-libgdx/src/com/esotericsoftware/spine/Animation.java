@@ -828,6 +828,11 @@ public class Animation {
 
 		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha, boolean setupPose,
 			boolean mixingOut) {
+			if (mixingOut && setupPose) {
+				System.arraycopy(skeleton.slots.items, 0, skeleton.drawOrder.items, 0, skeleton.slots.size);
+				return;
+			}
+
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
