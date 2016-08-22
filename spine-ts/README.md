@@ -73,3 +73,90 @@ python -m SimpleHTTPServer
 ```
 
 Then navigate to `http://localhost:8000/webgl/example`, `http://localhost:8000/canvas/example`, `http://localhost:8000/threejs/example` or `http://localhost:8000/widget/example`
+
+### Using the Widget
+To easily display Spine animations on your website, you can use the spine-ts Widget backend. 
+
+1. Export your Spine animation with a texture atlas and put the resulting `.json`, `.atlas` and `.png` files on your server.
+2. Copy the `build/spine-widget.js` file to your server and include it on your website `<script src="spine-widget.js"></script>`, adjusting the src to match the location of the file on your server.
+3. Add HTML elements, e.g. a `<div>`, with the class `spine-widget` to your website, specifying its configuration such as the location of the files, the animation to display, etc.
+
+You can configure a HTML element either directly via HTML, or using JavaScript. At a minimum, you need to specify the location of the
+`.json` and `.atlas` file as well as the name of the animation to play back.
+
+#### HTML configuration
+To specify the configuration of a Spine Widget via HTML, you can use these HTML element attributes:
+
+  * `data-json`: required, path to the `.json` file, absolute or relative, e.g. "assets/animation.json"
+  * `data-atlas`: required, path to the `.atlas` file, absolute or relative, e.g. "assets/animation.atlas"
+  * `data-animation`: required, the name of the animation to play back
+  * `data-images-path`: optional, the location of images on the server to load atlas pages from. If omitted, atlas `.png` page files are loaded relative to the `.atlas` file.
+  * `data-skin`: optional, the name of the skin to use. Defaults to `default` if omitted.
+  * `data-loop`: optional, whether to loop the animation or not. Defaults to `true` if omitted.
+  * `data-scale`: optional, the scaling factor to apply when loading the `.json` file. Defaults to `1` if omitted. Irrelevant if `data-fit-to-canavs` is `true`.
+  * `data-x`: optional, the x-coordinate to display the animation at. The origin is in the bottom left corner. Defaults to `0` if omitted. Irrelevant if `data-fit-to-canvas` is `true`.
+  * `data-y`: optional, the y-coordinate to display the animation at. The origin is in the bottom left corner with the y-axis pointing upwards. Defaults to `0` if omitted. Irrelevant if `data-fit-to-canvas` is `true`.
+  * `data-fit-to-canvas`: optional, whether to fit the animation to the canvas size or not. Defaults to `true` if omitted, in which case `data-scale`, `data-x` and `data-y` are irrelevant. This setting calculates the setup pose bounding box using the specified skin to center and scale the animation on the canvas.
+  * `data-background-color`: optional, the background color to use. Defaults to `#000000` if omitted.
+  * `data-premultiplied-alpha`: optional, whether the atlas pages use premultiplied alpha or not. Defaults to `false` if omitted.
+
+You can specify these as attribuets on the HTML element like this:
+
+```html
+<div class="spine-widget" data-json="assets/animation.json" data-atlas="assets/animation.atlas" data-animation="walk"></div>
+```
+
+All HTML elements with class `spine-widget` will be automatically loaded when the website is finished loading by the browser. To add
+widgets dynamically, use the JavaScript configuration described below.
+
+#### JavaScript configuration
+You can dynamically add Spine Widgets to your web page by using the JavaScript API.
+
+Create a HTML element on your website, either statically or via JavaScript:
+
+```html
+<div id="my-widget"></div>
+```
+
+Then create a new `spine.SpineWidget`, providing a [`SpineWidgetConfiguration`](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-ts/widget/src/Widget.ts#L281) object, e.g.:
+
+```JavaScript
+new spine.SpineWidget("my-widget", {
+	json: "assets/spineboy.json",
+	atlas: "assets/spineboy.atlas",		
+	animation: "run",	
+	backgroundColor: "#000000",
+	success: function (widget) {
+		var animIndex = 0;
+		widget.canvas.onclick = function () {				
+			animIndex++;
+			let animations = widget.skeleton.data.animations;
+			if (animIndex >= animations.length) animIndex = 0;
+			widget.setAnimation(animations[animIndex].name);
+		}
+	}
+});
+```
+
+The configuration object has the following fields:
+
+  * `json`: required, path to the `.json` file, absolute or relative, e.g. "assets/animation.json"
+  * `atlas`: required, path to the `.atlas` file, absolute or relative, e.g. "assets/animation.atlas"
+  * `animation`: required, the name of the animation to play back
+  * `imagesPath`: optional, the location of images on the server to load atlas pages from. If omitted, atlas `.png` page files are loaded relative to the `.atlas` file.
+  * `skin`: optional, the name of the skin to use. Defaults to `default` if omitted.
+  * `loop`: optional, whether to loop the animation or not. Defaults to `true` if omitted.
+  * `scale`: optional, the scaling factor to apply when loading the `.json` file. Defaults to `1` if omitted. Irrelevant if `data-fit-to-canavs` is `true`.
+  * `x`: optional, the x-coordinate to display the animation at. The origin is in the bottom left corner. Defaults to `0` if omitted. Irrelevant if `data-fit-to-canvas` is `true`.
+  * `y`: optional, the y-coordinate to display the animation at. The origin is in the bottom left corner with the y-axis pointing upwards. Defaults to `0` if omitted. Irrelevant if `data-fit-to-canvas` is `true`.
+  * `fitToCanvas`: optional, whether to fit the animation to the canvas size or not. Defaults to `true` if omitted, in which case `data-scale`, `data-x` and `data-y` are irrelevant. This setting calculates the setup pose bounding box using the specified skin to center and scale the animation on the canvas.
+  * `backgroundColor`: optional, the background color to use. Defaults to `#000000` if omitted.
+  * `premultipliedAlpha`: optional, whether the atlas pages use premultiplied alpha or not. Defaults to `false` if omitted.
+  * `success`: optional, a callback taking a `SpineWidget` called when the animation has been loaded successfully
+  * `error`: optional, a callback taking a `SpineWidget` and an error string called when the animation couldn't be loaded
+
+You can also create a HTML element with class `spine-widget` and `data-` attributes as described above and call `spine.widget.SpineWidget.loadWidget(element)` to load
+an element via JavaScript on demand.
+
+The resulting `SpineWidget` has various fields that let you modify the animation programmatically. Most notably, the `skeleton` and `state` fields
+let you modify all aspects of your animation as you wish. See the [example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-ts/widget/example/index.html#L21).
