@@ -160,6 +160,15 @@ module spine {
 		}
 	}
 
+	export class DebugUtils {
+		static logBones(skeleton: Skeleton) {
+			for (let i = 0; i < skeleton.bones.length; i++) {
+				let bone = skeleton.bones[i];
+				console.log(bone.data.name + ", " + bone.a + ", " + bone.b + ", " + bone.c + ", " + bone.d + ", " + bone.worldX + ", " + bone.worldY);
+			}
+		}
+	}
+
 	export class Pool<T> {
 		private items = new Array<T>(16);
 		private instantiator: () => T;

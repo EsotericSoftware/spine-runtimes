@@ -27,7 +27,7 @@ var mvp = new spine.webgl.Matrix4();
 var assetManager;
 var skeletonRenderer;
 var skeletons = {};
-var activeSkeleton = "spineboy";
+var activeSkeleton = "bunny";
 
 function init () {
 	// Setup canvas and WebGL context. We pass alpha: false to canvas.getContext() so we don't use premultiplied alpha when
@@ -62,6 +62,9 @@ function init () {
 	assetManager.loadText("assets/vine.json");
 	assetManager.loadText("assets/vine.atlas");
 	assetManager.loadTexture("assets/vine.png");
+	assetManager.loadText("assets/hero-mesh.json");
+	assetManager.loadText("assets/hero-mesh.atlas");
+	assetManager.loadTexture("assets/hero-mesh.png");	
 	requestAnimationFrame(load);
 }
 
@@ -73,6 +76,7 @@ function load () {
 		skeletons["tank"] = loadSkeleton("tank", "drive", false);
 		skeletons["goblins"] = loadSkeleton("goblins-mesh", "walk", true, "goblin");
 		skeletons["vine"] = loadSkeleton("vine", "animation", false);
+		skeletons["hero-mesh"] = loadSkeleton("hero-mesh", "Headturn", false);		
 		setupUI();
 		requestAnimationFrame(render);
 	} else {
@@ -98,8 +102,8 @@ function loadSkeleton (name, initialAnimation, premultipliedAlpha, skin) {
 	// Set the scale to apply during parsing, parse the file, and create a new skeleton.	
 	var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/" + name + ".json"));
 	var skeleton = new spine.Skeleton(skeletonData);
-	var bounds = calculateBounds(skeleton);
 	skeleton.setSkinByName(skin);
+	var bounds = calculateBounds(skeleton);	
 
 	// Create an AnimationState, and set the initial animation in looping mode.
 	var animationState = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
@@ -159,8 +163,7 @@ function setupUI () {
 			var skeleton = skeletons[activeSkeleton].skeleton;
 			var animationName = $("#animationList option:selected").text();
 			skeleton.setToSetupPose();
-			state.setAnimation(0, animationName, true);
-			scaleAndCenter(skeleton);
+			state.setAnimation(0, animationName, true);			
 		})
 	}
 

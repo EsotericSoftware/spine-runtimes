@@ -127,14 +127,14 @@ module spine {
 				var skeletonData = skeletonJson.readSkeletonData(assetManager.get(config.json) as string);
 				var skeleton = this.skeleton = new spine.Skeleton(skeletonData);
 				var bounds = this.bounds;
+				skeleton.setSkinByName(config.skin);
 				skeleton.setToSetupPose();
 				skeleton.updateWorldTransform();
 				skeleton.getBounds(bounds.offset, bounds.size);
 				if (!config.fitToCanvas) {
 					skeleton.x = config.x;
 					skeleton.y = config.y;
-				}
-				skeleton.setSkinByName(config.skin);
+				}				
 
 				var animationState = this.state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
 				animationState.setAnimation(0, config.animation, true);

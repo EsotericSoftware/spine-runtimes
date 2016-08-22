@@ -756,6 +756,9 @@ declare module spine {
         static newFloatArray(size: number): ArrayLike<number>;
         static toFloatArray(array: Array<number>): Float32Array | number[];
     }
+    class DebugUtils {
+        static logBones(skeleton: Skeleton): void;
+    }
     class Pool<T> {
         private items;
         private instantiator;

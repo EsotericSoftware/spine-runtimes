@@ -1,347 +1,8 @@
-var spine;
-(function (spine) {
-    var AssetManager = (function () {
-        function AssetManager(textureLoader) {
-            this.assets = {};
-            this.errors = {};
-            this.toLoad = 0;
-            this.loaded = 0;
-            this.textureLoader = textureLoader;
-        }
-        AssetManager.prototype.loadText = function (path, success, error) {
-            var _this = this;
-            if (success === void 0) { success = null; }
-            if (error === void 0) { error = null; }
-            this.toLoad++;
-            var request = new XMLHttpRequest();
-            request.onreadystatechange = function () {
-                if (request.readyState == XMLHttpRequest.DONE) {
-                    if (request.status >= 200 && request.status < 300) {
-                        if (success)
-                            success(path, request.responseText);
-                        _this.assets[path] = request.responseText;
-                    }
-                    else {
-                        if (error)
-                            error(path, "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText);
-                        _this.errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
-                    }
-                    _this.toLoad--;
-                    _this.loaded++;
-                }
-            };
-            request.open("GET", path, true);
-            request.send();
-        };
-        AssetManager.prototype.loadTexture = function (path, success, error) {
-            var _this = this;
-            if (success === void 0) { success = null; }
-            if (error === void 0) { error = null; }
-            this.toLoad++;
-            var img = new Image();
-            img.src = path;
-            img.onload = function (ev) {
-                if (success)
-                    success(path, img);
-                var texture = _this.textureLoader(img);
-                _this.assets[path] = texture;
-                _this.toLoad--;
-                _this.loaded++;
-            };
-            img.onerror = function (ev) {
-                if (error)
-                    error(path, "Couldn't load image " + path);
-                _this.errors[path] = "Couldn't load image " + path;
-                _this.toLoad--;
-                _this.loaded++;
-            };
-        };
-        AssetManager.prototype.get = function (path) {
-            return this.assets[path];
-        };
-        AssetManager.prototype.remove = function (path) {
-            var asset = this.assets[path];
-            if (asset.dispose)
-                asset.dispose();
-            this.assets[path] = null;
-        };
-        AssetManager.prototype.removeAll = function () {
-            for (var key in this.assets) {
-                var asset = this.assets[key];
-                if (asset.dispose)
-                    asset.dispose();
-            }
-            this.assets = {};
-        };
-        AssetManager.prototype.isLoadingComplete = function () {
-            return this.toLoad == 0;
-        };
-        AssetManager.prototype.getToLoad = function () {
-            return this.toLoad;
-        };
-        AssetManager.prototype.getLoaded = function () {
-            return this.loaded;
-        };
-        AssetManager.prototype.dispose = function () {
-            this.removeAll();
-        };
-        AssetManager.prototype.hasErrors = function () {
-            return Object.keys(this.errors).length > 0;
-        };
-        AssetManager.prototype.getErrors = function () {
-            return this.errors;
-        };
-        return AssetManager;
-    }());
-    spine.AssetManager = AssetManager;
-})(spine || (spine = {}));
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var spine;
-(function (spine) {
-    var canvas;
-    (function (canvas) {
-        var AssetManager = (function (_super) {
-            __extends(AssetManager, _super);
-            function AssetManager() {
-                _super.call(this, function (image) { return new spine.canvas.CanvasTexture(image); });
-            }
-            return AssetManager;
-        }(spine.AssetManager));
-        canvas.AssetManager = AssetManager;
-    })(canvas = spine.canvas || (spine.canvas = {}));
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var Texture = (function () {
-        function Texture(image) {
-            this._image = image;
-        }
-        Texture.prototype.getImage = function () {
-            return this._image;
-        };
-        Texture.filterFromString = function (text) {
-            switch (text.toLowerCase()) {
-                case "nearest": return TextureFilter.Nearest;
-                case "linear": return TextureFilter.Linear;
-                case "mipmap": return TextureFilter.MipMap;
-                case "mipmapnearestnearest": return TextureFilter.MipMapNearestNearest;
-                case "mipmaplinearnearest": return TextureFilter.MipMapLinearNearest;
-                case "mipmapnearestlinear": return TextureFilter.MipMapNearestLinear;
-                case "mipmaplinearlinear": return TextureFilter.MipMapLinearLinear;
-                default: throw new Error("Unknown texture filter " + text);
-            }
-        };
-        Texture.wrapFromString = function (text) {
-            switch (text.toLowerCase()) {
-                case "mirroredtepeat": return TextureWrap.MirroredRepeat;
-                case "clamptoedge": return TextureWrap.ClampToEdge;
-                case "repeat": return TextureWrap.Repeat;
-                default: throw new Error("Unknown texture wrap " + text);
-            }
-        };
-        return Texture;
-    }());
-    spine.Texture = Texture;
-    (function (TextureFilter) {
-        TextureFilter[TextureFilter["Nearest"] = 9728] = "Nearest";
-        TextureFilter[TextureFilter["Linear"] = 9729] = "Linear";
-        TextureFilter[TextureFilter["MipMap"] = 9987] = "MipMap";
-        TextureFilter[TextureFilter["MipMapNearestNearest"] = 9984] = "MipMapNearestNearest";
-        TextureFilter[TextureFilter["MipMapLinearNearest"] = 9985] = "MipMapLinearNearest";
-        TextureFilter[TextureFilter["MipMapNearestLinear"] = 9986] = "MipMapNearestLinear";
-        TextureFilter[TextureFilter["MipMapLinearLinear"] = 9987] = "MipMapLinearLinear";
-    })(spine.TextureFilter || (spine.TextureFilter = {}));
-    var TextureFilter = spine.TextureFilter;
-    (function (TextureWrap) {
-        TextureWrap[TextureWrap["MirroredRepeat"] = 33648] = "MirroredRepeat";
-        TextureWrap[TextureWrap["ClampToEdge"] = 33071] = "ClampToEdge";
-        TextureWrap[TextureWrap["Repeat"] = 10497] = "Repeat";
-    })(spine.TextureWrap || (spine.TextureWrap = {}));
-    var TextureWrap = spine.TextureWrap;
-    var TextureRegion = (function () {
-        function TextureRegion() {
-            this.u = 0;
-            this.v = 0;
-            this.u2 = 0;
-            this.v2 = 0;
-            this.width = 0;
-            this.height = 0;
-            this.rotate = false;
-            this.offsetX = 0;
-            this.offsetY = 0;
-            this.originalWidth = 0;
-            this.originalHeight = 0;
-        }
-        return TextureRegion;
-    }());
-    spine.TextureRegion = TextureRegion;
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var canvas;
-    (function (canvas) {
-        var CanvasTexture = (function (_super) {
-            __extends(CanvasTexture, _super);
-            function CanvasTexture(image) {
-                _super.call(this, image);
-            }
-            CanvasTexture.prototype.setFilters = function (minFilter, magFilter) { };
-            CanvasTexture.prototype.setWraps = function (uWrap, vWrap) { };
-            CanvasTexture.prototype.dispose = function () { };
-            return CanvasTexture;
-        }(spine.Texture));
-        canvas.CanvasTexture = CanvasTexture;
-    })(canvas = spine.canvas || (spine.canvas = {}));
-})(spine || (spine = {}));
-var spine;
-(function (spine) {
-    var canvas;
-    (function (canvas) {
-        var SkeletonRenderer = (function () {
-            function SkeletonRenderer(context) {
-                this.triangleRendering = false;
-                this.debugRendering = false;
-                this.ctx = context;
-            }
-            SkeletonRenderer.prototype.draw = function (skeleton) {
-                if (this.triangleRendering)
-                    this.drawTriangles(skeleton);
-                else
-                    this.drawImages(skeleton);
-            };
-            SkeletonRenderer.prototype.drawImages = function (skeleton) {
-                var ctx = this.ctx;
-                var drawOrder = skeleton.drawOrder;
-                if (this.debugRendering)
-                    ctx.strokeStyle = "green";
-                for (var i = 0, n = drawOrder.length; i < n; i++) {
-                    var slot = drawOrder[i];
-                    var attachment = slot.getAttachment();
-                    var region = null;
-                    var image = null;
-                    var vertices = null;
-                    if (attachment instanceof spine.RegionAttachment) {
-                        var regionAttachment = attachment;
-                        vertices = regionAttachment.updateWorldVertices(slot, false);
-                        region = regionAttachment.region;
-                        image = (region).texture.getImage();
-                    }
-                    else
-                        continue;
-                    var att = attachment;
-                    var bone = slot.bone;
-                    var x = vertices[0];
-                    var y = vertices[1];
-                    var rotation = (bone.getWorldRotationX() - att.rotation) * Math.PI / 180;
-                    var xx = vertices[24] - vertices[0];
-                    var xy = vertices[25] - vertices[1];
-                    var yx = vertices[8] - vertices[0];
-                    var yy = vertices[9] - vertices[1];
-                    var w = Math.sqrt(xx * xx + xy * xy), h = -Math.sqrt(yx * yx + yy * yy);
-                    ctx.translate(x, y);
-                    ctx.rotate(rotation);
-                    if (region.rotate) {
-                        ctx.rotate(Math.PI / 2);
-                        ctx.drawImage(image, region.x, region.y, region.height, region.width, 0, 0, h, -w);
-                        ctx.rotate(-Math.PI / 2);
-                    }
-                    else {
-                        ctx.drawImage(image, region.x, region.y, region.width, region.height, 0, 0, w, h);
-                    }
-                    if (this.debugRendering)
-                        ctx.strokeRect(0, 0, w, h);
-                    ctx.rotate(-rotation);
-                    ctx.translate(-x, -y);
-                }
-            };
-            SkeletonRenderer.prototype.drawTriangles = function (skeleton) {
-                var blendMode = null;
-                var vertices = null;
-                var triangles = null;
-                var drawOrder = skeleton.drawOrder;
-                for (var i = 0, n = drawOrder.length; i < n; i++) {
-                    var slot = drawOrder[i];
-                    var attachment = slot.getAttachment();
-                    var texture = null;
-                    var region = null;
-                    if (attachment instanceof spine.RegionAttachment) {
-                        var regionAttachment = attachment;
-                        vertices = regionAttachment.updateWorldVertices(slot, false);
-                        triangles = SkeletonRenderer.QUAD_TRIANGLES;
-                        region = regionAttachment.region;
-                        texture = region.texture.getImage();
-                    }
-                    else if (attachment instanceof spine.MeshAttachment) {
-                        var mesh = attachment;
-                        vertices = mesh.updateWorldVertices(slot, false);
-                        triangles = mesh.triangles;
-                        texture = mesh.region.renderObject.texture.getImage();
-                    }
-                    else
-                        continue;
-                    if (texture != null) {
-                        var slotBlendMode = slot.data.blendMode;
-                        if (slotBlendMode != blendMode) {
-                            blendMode = slotBlendMode;
-                        }
-                        var ctx = this.ctx;
-                        for (var j = 0; j < triangles.length; j += 3) {
-                            var t1 = triangles[j] * 8, t2 = triangles[j + 1] * 8, t3 = triangles[j + 2] * 8;
-                            var x0 = vertices[t1], y0 = vertices[t1 + 1], u0 = vertices[t1 + 6], v0 = vertices[t1 + 7];
-                            var x1 = vertices[t2], y1 = vertices[t2 + 1], u1 = vertices[t2 + 6], v1 = vertices[t2 + 7];
-                            var x2 = vertices[t3], y2 = vertices[t3 + 1], u2 = vertices[t3 + 6], v2 = vertices[t3 + 7];
-                            this.drawTriangle(texture, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2);
-                            if (this.debugRendering) {
-                                ctx.strokeStyle = "green";
-                                ctx.beginPath();
-                                ctx.moveTo(x0, y0);
-                                ctx.lineTo(x1, y1);
-                                ctx.lineTo(x2, y2);
-                                ctx.lineTo(x0, y0);
-                                ctx.stroke();
-                            }
-                        }
-                    }
-                }
-            };
-            SkeletonRenderer.prototype.drawTriangle = function (img, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2) {
-                var ctx = this.ctx;
-                u0 *= img.width;
-                v0 *= img.height;
-                u1 *= img.width;
-                v1 *= img.height;
-                u2 *= img.width;
-                v2 *= img.height;
-                ctx.beginPath();
-                ctx.moveTo(x0, y0);
-                ctx.lineTo(x1, y1);
-                ctx.lineTo(x2, y2);
-                ctx.closePath();
-                x1 -= x0;
-                y1 -= y0;
-                x2 -= x0;
-                y2 -= y0;
-                u1 -= u0;
-                v1 -= v0;
-                u2 -= u0;
-                v2 -= v0;
-                var det = 1 / (u1 * v2 - u2 * v1), a = (v2 * x1 - v1 * x2) * det, b = (v2 * y1 - v1 * y2) * det, c = (u1 * x2 - u2 * x1) * det, d = (u1 * y2 - u2 * y1) * det, e = x0 - a * u0 - c * v0, f = y0 - b * u0 - d * v0;
-                ctx.save();
-                ctx.transform(a, b, c, d, e, f);
-                ctx.clip();
-                ctx.drawImage(img, 0, 0);
-                ctx.restore();
-            };
-            SkeletonRenderer.QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
-            return SkeletonRenderer;
-        }());
-        canvas.SkeletonRenderer = SkeletonRenderer;
-    })(canvas = spine.canvas || (spine.canvas = {}));
-})(spine || (spine = {}));
 var spine;
 (function (spine) {
     var Animation = (function () {
@@ -1324,6 +985,103 @@ var spine;
         return AnimationStateData;
     }());
     spine.AnimationStateData = AnimationStateData;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var AssetManager = (function () {
+        function AssetManager(textureLoader) {
+            this.assets = {};
+            this.errors = {};
+            this.toLoad = 0;
+            this.loaded = 0;
+            this.textureLoader = textureLoader;
+        }
+        AssetManager.prototype.loadText = function (path, success, error) {
+            var _this = this;
+            if (success === void 0) { success = null; }
+            if (error === void 0) { error = null; }
+            this.toLoad++;
+            var request = new XMLHttpRequest();
+            request.onreadystatechange = function () {
+                if (request.readyState == XMLHttpRequest.DONE) {
+                    if (request.status >= 200 && request.status < 300) {
+                        if (success)
+                            success(path, request.responseText);
+                        _this.assets[path] = request.responseText;
+                    }
+                    else {
+                        if (error)
+                            error(path, "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText);
+                        _this.errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
+                    }
+                    _this.toLoad--;
+                    _this.loaded++;
+                }
+            };
+            request.open("GET", path, true);
+            request.send();
+        };
+        AssetManager.prototype.loadTexture = function (path, success, error) {
+            var _this = this;
+            if (success === void 0) { success = null; }
+            if (error === void 0) { error = null; }
+            this.toLoad++;
+            var img = new Image();
+            img.src = path;
+            img.onload = function (ev) {
+                if (success)
+                    success(path, img);
+                var texture = _this.textureLoader(img);
+                _this.assets[path] = texture;
+                _this.toLoad--;
+                _this.loaded++;
+            };
+            img.onerror = function (ev) {
+                if (error)
+                    error(path, "Couldn't load image " + path);
+                _this.errors[path] = "Couldn't load image " + path;
+                _this.toLoad--;
+                _this.loaded++;
+            };
+        };
+        AssetManager.prototype.get = function (path) {
+            return this.assets[path];
+        };
+        AssetManager.prototype.remove = function (path) {
+            var asset = this.assets[path];
+            if (asset.dispose)
+                asset.dispose();
+            this.assets[path] = null;
+        };
+        AssetManager.prototype.removeAll = function () {
+            for (var key in this.assets) {
+                var asset = this.assets[key];
+                if (asset.dispose)
+                    asset.dispose();
+            }
+            this.assets = {};
+        };
+        AssetManager.prototype.isLoadingComplete = function () {
+            return this.toLoad == 0;
+        };
+        AssetManager.prototype.getToLoad = function () {
+            return this.toLoad;
+        };
+        AssetManager.prototype.getLoaded = function () {
+            return this.loaded;
+        };
+        AssetManager.prototype.dispose = function () {
+            this.removeAll();
+        };
+        AssetManager.prototype.hasErrors = function () {
+            return Object.keys(this.errors).length > 0;
+        };
+        AssetManager.prototype.getErrors = function () {
+            return this.errors;
+        };
+        return AssetManager;
+    }());
+    spine.AssetManager = AssetManager;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
@@ -2950,7 +2708,7 @@ var spine;
                     if (boneData == null)
                         throw new Error("Slot bone not found: " + boneName);
                     var data = new spine.SlotData(skeletonData.slots.length, slotName, boneData);
-                    var color = slotMap.color ? slotMap.color : null;
+                    var color = this.getValue(slotMap, "color", null);
                     if (color != null)
                         data.color.setFromString(color);
                     data.attachmentName = this.getValue(slotMap, "attachment", null);
@@ -2974,7 +2732,7 @@ var spine;
                     if (data.target == null)
                         throw new Error("IK target bone not found: " + targetName);
                     data.bendDirection = this.getValue(constraintMap, "bendPositive", true) ? 1 : -1;
-                    data.mix = constraintMap.mix ? constraintMap.mix : 1;
+                    data.mix = this.getValue(constraintMap, "mix", 1);
                     skeletonData.ikConstraints.push(data);
                 }
             }
@@ -3646,6 +3404,72 @@ var spine;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
+    var Texture = (function () {
+        function Texture(image) {
+            this._image = image;
+        }
+        Texture.prototype.getImage = function () {
+            return this._image;
+        };
+        Texture.filterFromString = function (text) {
+            switch (text.toLowerCase()) {
+                case "nearest": return TextureFilter.Nearest;
+                case "linear": return TextureFilter.Linear;
+                case "mipmap": return TextureFilter.MipMap;
+                case "mipmapnearestnearest": return TextureFilter.MipMapNearestNearest;
+                case "mipmaplinearnearest": return TextureFilter.MipMapLinearNearest;
+                case "mipmapnearestlinear": return TextureFilter.MipMapNearestLinear;
+                case "mipmaplinearlinear": return TextureFilter.MipMapLinearLinear;
+                default: throw new Error("Unknown texture filter " + text);
+            }
+        };
+        Texture.wrapFromString = function (text) {
+            switch (text.toLowerCase()) {
+                case "mirroredtepeat": return TextureWrap.MirroredRepeat;
+                case "clamptoedge": return TextureWrap.ClampToEdge;
+                case "repeat": return TextureWrap.Repeat;
+                default: throw new Error("Unknown texture wrap " + text);
+            }
+        };
+        return Texture;
+    }());
+    spine.Texture = Texture;
+    (function (TextureFilter) {
+        TextureFilter[TextureFilter["Nearest"] = 9728] = "Nearest";
+        TextureFilter[TextureFilter["Linear"] = 9729] = "Linear";
+        TextureFilter[TextureFilter["MipMap"] = 9987] = "MipMap";
+        TextureFilter[TextureFilter["MipMapNearestNearest"] = 9984] = "MipMapNearestNearest";
+        TextureFilter[TextureFilter["MipMapLinearNearest"] = 9985] = "MipMapLinearNearest";
+        TextureFilter[TextureFilter["MipMapNearestLinear"] = 9986] = "MipMapNearestLinear";
+        TextureFilter[TextureFilter["MipMapLinearLinear"] = 9987] = "MipMapLinearLinear";
+    })(spine.TextureFilter || (spine.TextureFilter = {}));
+    var TextureFilter = spine.TextureFilter;
+    (function (TextureWrap) {
+        TextureWrap[TextureWrap["MirroredRepeat"] = 33648] = "MirroredRepeat";
+        TextureWrap[TextureWrap["ClampToEdge"] = 33071] = "ClampToEdge";
+        TextureWrap[TextureWrap["Repeat"] = 10497] = "Repeat";
+    })(spine.TextureWrap || (spine.TextureWrap = {}));
+    var TextureWrap = spine.TextureWrap;
+    var TextureRegion = (function () {
+        function TextureRegion() {
+            this.u = 0;
+            this.v = 0;
+            this.u2 = 0;
+            this.v2 = 0;
+            this.width = 0;
+            this.height = 0;
+            this.rotate = false;
+            this.offsetX = 0;
+            this.offsetY = 0;
+            this.originalWidth = 0;
+            this.originalHeight = 0;
+        }
+        return TextureRegion;
+    }());
+    spine.TextureRegion = TextureRegion;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
     var TextureAtlas = (function () {
         function TextureAtlas(atlasText, textureLoader) {
             this.pages = new Array();
@@ -4078,6 +3902,18 @@ var spine;
         return Utils;
     }());
     spine.Utils = Utils;
+    var DebugUtils = (function () {
+        function DebugUtils() {
+        }
+        DebugUtils.logBones = function (skeleton) {
+            for (var i = 0; i < skeleton.bones.length; i++) {
+                var bone = skeleton.bones[i];
+                console.log(bone.data.name + ", " + bone.a + ", " + bone.b + ", " + bone.c + ", " + bone.d + ", " + bone.worldX + ", " + bone.worldY);
+            }
+        };
+        return DebugUtils;
+    }());
+    spine.DebugUtils = DebugUtils;
     var Pool = (function () {
         function Pool(instantiator) {
             this.items = new Array(16);

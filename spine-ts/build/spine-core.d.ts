@@ -1,91 +1,4 @@
 declare module spine {
-    class AssetManager implements Disposable {
-        private textureLoader;
-        private assets;
-        private errors;
-        private toLoad;
-        private loaded;
-        constructor(textureLoader: (image: HTMLImageElement) => any);
-        loadText(path: string, success?: (path: string, text: string) => void, error?: (path: string, error: string) => void): void;
-        loadTexture(path: string, success?: (path: string, image: HTMLImageElement) => void, error?: (path: string, error: string) => void): void;
-        get(path: string): any;
-        remove(path: string): void;
-        removeAll(): void;
-        isLoadingComplete(): boolean;
-        getToLoad(): number;
-        getLoaded(): number;
-        dispose(): void;
-        hasErrors(): boolean;
-        getErrors(): Map<string>;
-    }
-}
-declare module spine.canvas {
-    class AssetManager extends spine.AssetManager {
-        constructor();
-    }
-}
-declare module spine {
-    abstract class Texture {
-        protected _image: HTMLImageElement;
-        constructor(image: HTMLImageElement);
-        getImage(): HTMLImageElement;
-        abstract setFilters(minFilter: TextureFilter, magFilter: TextureFilter): void;
-        abstract setWraps(uWrap: TextureWrap, vWrap: TextureWrap): void;
-        abstract dispose(): void;
-        static filterFromString(text: string): TextureFilter;
-        static wrapFromString(text: string): TextureWrap;
-    }
-    enum TextureFilter {
-        Nearest = 9728,
-        Linear = 9729,
-        MipMap = 9987,
-        MipMapNearestNearest = 9984,
-        MipMapLinearNearest = 9985,
-        MipMapNearestLinear = 9986,
-        MipMapLinearLinear = 9987,
-    }
-    enum TextureWrap {
-        MirroredRepeat = 33648,
-        ClampToEdge = 33071,
-        Repeat = 10497,
-    }
-    class TextureRegion {
-        renderObject: any;
-        u: number;
-        v: number;
-        u2: number;
-        v2: number;
-        width: number;
-        height: number;
-        rotate: boolean;
-        offsetX: number;
-        offsetY: number;
-        originalWidth: number;
-        originalHeight: number;
-    }
-}
-declare module spine.canvas {
-    class CanvasTexture extends Texture {
-        constructor(image: HTMLImageElement);
-        setFilters(minFilter: TextureFilter, magFilter: TextureFilter): void;
-        setWraps(uWrap: TextureWrap, vWrap: TextureWrap): void;
-        dispose(): void;
-    }
-}
-declare module spine.canvas {
-    class SkeletonRenderer {
-        static QUAD_TRIANGLES: number[];
-        private ctx;
-        triangleRendering: boolean;
-        debugRendering: boolean;
-        constructor(context: CanvasRenderingContext2D);
-        draw(skeleton: Skeleton): void;
-        private drawImages(skeleton);
-        private drawTriangles(skeleton);
-        private drawTriangle(img, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2);
-    }
-}
-declare module spine {
     class Animation {
         name: string;
         timelines: Array<Timeline>;
@@ -319,6 +232,27 @@ declare module spine {
         setMix(fromName: string, toName: string, duration: number): void;
         setMixWith(from: Animation, to: Animation, duration: number): void;
         getMix(from: Animation, to: Animation): number;
+    }
+}
+declare module spine {
+    class AssetManager implements Disposable {
+        private textureLoader;
+        private assets;
+        private errors;
+        private toLoad;
+        private loaded;
+        constructor(textureLoader: (image: HTMLImageElement) => any);
+        loadText(path: string, success?: (path: string, text: string) => void, error?: (path: string, error: string) => void): void;
+        loadTexture(path: string, success?: (path: string, image: HTMLImageElement) => void, error?: (path: string, error: string) => void): void;
+        get(path: string): any;
+        remove(path: string): void;
+        removeAll(): void;
+        isLoadingComplete(): boolean;
+        getToLoad(): number;
+        getLoaded(): number;
+        dispose(): void;
+        hasErrors(): boolean;
+        getErrors(): Map<string>;
     }
 }
 declare module spine {
@@ -640,6 +574,46 @@ declare module spine {
     }
 }
 declare module spine {
+    abstract class Texture {
+        protected _image: HTMLImageElement;
+        constructor(image: HTMLImageElement);
+        getImage(): HTMLImageElement;
+        abstract setFilters(minFilter: TextureFilter, magFilter: TextureFilter): void;
+        abstract setWraps(uWrap: TextureWrap, vWrap: TextureWrap): void;
+        abstract dispose(): void;
+        static filterFromString(text: string): TextureFilter;
+        static wrapFromString(text: string): TextureWrap;
+    }
+    enum TextureFilter {
+        Nearest = 9728,
+        Linear = 9729,
+        MipMap = 9987,
+        MipMapNearestNearest = 9984,
+        MipMapLinearNearest = 9985,
+        MipMapNearestLinear = 9986,
+        MipMapLinearLinear = 9987,
+    }
+    enum TextureWrap {
+        MirroredRepeat = 33648,
+        ClampToEdge = 33071,
+        Repeat = 10497,
+    }
+    class TextureRegion {
+        renderObject: any;
+        u: number;
+        v: number;
+        u2: number;
+        v2: number;
+        width: number;
+        height: number;
+        rotate: boolean;
+        offsetX: number;
+        offsetY: number;
+        originalWidth: number;
+        originalHeight: number;
+    }
+}
+declare module spine {
     class TextureAtlas implements Disposable {
         pages: TextureAtlasPage[];
         regions: TextureAtlasRegion[];
@@ -755,6 +729,9 @@ declare module spine {
         static newArray<T>(size: number, defaultValue: T): Array<T>;
         static newFloatArray(size: number): ArrayLike<number>;
         static toFloatArray(array: Array<number>): Float32Array | number[];
+    }
+    class DebugUtils {
+        static logBones(skeleton: Skeleton): void;
     }
     class Pool<T> {
         private items;

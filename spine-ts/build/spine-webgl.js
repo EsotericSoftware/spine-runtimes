@@ -2708,7 +2708,7 @@ var spine;
                     if (boneData == null)
                         throw new Error("Slot bone not found: " + boneName);
                     var data = new spine.SlotData(skeletonData.slots.length, slotName, boneData);
-                    var color = slotMap.color ? slotMap.color : null;
+                    var color = this.getValue(slotMap, "color", null);
                     if (color != null)
                         data.color.setFromString(color);
                     data.attachmentName = this.getValue(slotMap, "attachment", null);
@@ -2732,7 +2732,7 @@ var spine;
                     if (data.target == null)
                         throw new Error("IK target bone not found: " + targetName);
                     data.bendDirection = this.getValue(constraintMap, "bendPositive", true) ? 1 : -1;
-                    data.mix = constraintMap.mix ? constraintMap.mix : 1;
+                    data.mix = this.getValue(constraintMap, "mix", 1);
                     skeletonData.ikConstraints.push(data);
                 }
             }
@@ -3902,6 +3902,18 @@ var spine;
         return Utils;
     }());
     spine.Utils = Utils;
+    var DebugUtils = (function () {
+        function DebugUtils() {
+        }
+        DebugUtils.logBones = function (skeleton) {
+            for (var i = 0; i < skeleton.bones.length; i++) {
+                var bone = skeleton.bones[i];
+                console.log(bone.data.name + ", " + bone.a + ", " + bone.b + ", " + bone.c + ", " + bone.d + ", " + bone.worldX + ", " + bone.worldY);
+            }
+        };
+        return DebugUtils;
+    }());
+    spine.DebugUtils = DebugUtils;
     var Pool = (function () {
         function Pool(instantiator) {
             this.items = new Array(16);
