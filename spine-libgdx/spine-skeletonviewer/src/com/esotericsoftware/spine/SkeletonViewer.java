@@ -488,7 +488,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 					if (state != null) {
 						String name = animationList.getSelected();
 						if (name == null)
-							state.clearTrack(0);
+							state.resetTrack(0);
 						else
 							setAnimation();
 					}

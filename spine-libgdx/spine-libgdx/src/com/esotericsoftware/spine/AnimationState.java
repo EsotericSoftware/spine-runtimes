@@ -43,6 +43,8 @@ import com.esotericsoftware.spine.Animation.Timeline;
 
 /** Stores state for applying one or more animations over time and automatically mixes (crossfades) when animations change. */
 public class AnimationState {
+	static private final Animation emptyAnimation = new Animation("<empty>", new Array(0), 0);
+
 	private AnimationStateData data;
 	private final Array<TrackEntry> tracks = new Array();
 	private final Array<Event> events = new Array();
@@ -236,6 +238,7 @@ public class AnimationState {
 		events.clear();
 	}
 
+	/** Removes all animations from all tracks, leaving skeletons in their last pose. */
 	public void clearTracks () {
 		for (int i = 0, n = tracks.size; i < n; i++) {
 			TrackEntry current = tracks.get(i);
@@ -245,7 +248,7 @@ public class AnimationState {
 		queue.drain();
 	}
 
-	// BOZO - This leaves the skeleton in the last pose, with no easy way of resetting.
+	/** Removes all animations from the track, leaving skeletons in their last pose. */
 	public void clearTrack (int trackIndex) {
 		if (trackIndex >= tracks.size) return;
 		TrackEntry current = tracks.get(trackIndex);
@@ -266,6 +269,32 @@ public class AnimationState {
 		}
 
 		tracks.set(current.trackIndex, null);
+	}
+
+	/** Removes all queued animations for all tracks and sets track entries which mix out the current animations, so any changes
+	 * the animations have made to skeletons are reverted to the setup pose. */
+	public void resetTracks () {
+		for (int i = 0, n = tracks.size; i < n; i++) {
+			TrackEntry current = tracks.get(i);
+			if (current != null) resetTrack(current);
+		}
+		queue.drain();
+	}
+
+	/** Removes all queued animations and sets a track entry which mixes out the current animation, so any changes the animation
+	 * has made to skeletons are reverted to the setup pose. */
+	public void resetTrack (int trackIndex) {
+		if (trackIndex >= tracks.size) return;
+		TrackEntry current = tracks.get(trackIndex);
+		if (current == null) return;
+		resetTrack(current);
+		queue.drain();
+	}
+
+	private void resetTrack (TrackEntry current) {
+		TrackEntry entry = trackEntry(current.trackIndex, emptyAnimation, false, current);
+		current.trackTime = 0;
+		setCurrent(current.trackIndex, entry);
 	}
 
 	/** @param entry May be null. */

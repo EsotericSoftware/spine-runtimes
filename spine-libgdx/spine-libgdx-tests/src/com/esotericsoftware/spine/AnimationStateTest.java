@@ -372,7 +372,7 @@ public class AnimationStateTest {
 		state.setAnimation(0, "events1", true);
 		run(0.1f, 4, null);
 
-		setup("not looping, update past animation 0 duration", // 12
+		setup("not looping, track end past animation 0 duration", // 12
 			expect(0, "start", 0, 0), //
 			expect(0, "event 0", 0, 0), //
 			expect(0, "event 14", 0.5f, 0.5f), //
@@ -652,6 +652,20 @@ public class AnimationStateTest {
 		run(0.1f, 10, new TestListener() {
 			public void frame (float time) {
 				if (MathUtils.isEqual(time, 0.7f)) state.clearTrack(0);
+			}
+		});
+
+		setup("resetTrack", // 24
+			expect(0, "start", 0, 0), //
+			expect(0, "event 0", 0, 0), //
+			expect(0, "event 14", 0.5f, 0.5f), //
+			expect(0, "end", 0.7f, 0.8f), //
+			expect(0, "dispose", 0.7f, 0.8f) //
+		);
+		state.addAnimation(0, "events1", false, 0);
+		run(0.1f, 10, new TestListener() {
+			public void frame (float time) {
+				if (MathUtils.isEqual(time, 0.7f)) state.resetTrack(0);
 			}
 		});
 
