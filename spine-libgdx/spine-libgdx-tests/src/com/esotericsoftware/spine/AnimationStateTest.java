@@ -655,7 +655,7 @@ public class AnimationStateTest {
 			}
 		});
 
-		setup("resetTrack", // 24
+		setup("setEmptyAnimation", // 24
 			expect(0, "start", 0, 0), //
 			expect(0, "event 0", 0, 0), //
 			expect(0, "event 14", 0.5f, 0.5f), //
@@ -665,7 +665,7 @@ public class AnimationStateTest {
 		state.addAnimation(0, "events1", false, 0);
 		run(0.1f, 10, new TestListener() {
 			public void frame (float time) {
-				if (MathUtils.isEqual(time, 0.7f)) state.resetTrack(0, 0);
+				if (MathUtils.isEqual(time, 0.7f)) state.setEmptyAnimation(0, 0);
 			}
 		});
 

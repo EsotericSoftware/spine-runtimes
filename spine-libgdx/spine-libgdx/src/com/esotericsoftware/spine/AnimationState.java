@@ -269,26 +269,6 @@ public class AnimationState {
 		queue.drain();
 	}
 
-	/** Removes all queued animations for all tracks and sets empty animations to mix out the current animations, so any changes
-	 * the current animations have made to skeletons are reverted to the setup pose. */
-	public void resetTracks (float mixDuration) {
-		queue.drainDisabled = true;
-		for (int i = 0, n = tracks.size; i < n; i++)
-			resetTrack(i, mixDuration);
-		queue.drainDisabled = false;
-		queue.drain();
-	}
-
-	/** Removes all queued animations and sets an empty animation to mix out the current animation, so any changes the current
-	 * animation has made to skeletons are reverted to the setup pose. */
-	public void resetTrack (int trackIndex, float mixDuration) {
-		if (trackIndex >= tracks.size) return;
-		TrackEntry current = tracks.get(trackIndex);
-		if (current == null) return;
-		setEmptyAnimation(current.trackIndex, mixDuration);
-		queue.drain();
-	}
-
 	/** @param entry May be null. */
 	private void disposeNext (TrackEntry entry) {
 		TrackEntry next = entry.next;
@@ -383,7 +363,7 @@ public class AnimationState {
 
 	/** Sets the current animation for a track, discarding any queued animations.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
-	 *         after {@link AnimationStateListener#end(TrackEntry)}. */
+	 *         after {@link AnimationStateListener#dispose(TrackEntry)}. */
 	public TrackEntry setAnimation (int trackIndex, Animation animation, boolean loop) {
 		if (animation == null) throw new IllegalArgumentException("animation cannot be null.");
 		TrackEntry current = expandToIndex(trackIndex);
@@ -412,10 +392,10 @@ public class AnimationState {
 	}
 
 	/** Adds an animation to be played after the current or last queued animation for a track.
-	 * @param delay Seconds to begin this animation after the start of the previous animation. May be <= 0 to use duration of the
-	 *           previous animation minus any mix duration plus the negative delay.
+	 * @param delay Seconds to begin this animation after the start of the previous animation. May be <= 0 to use the animation
+	 *           duration of the previous track minus any mix duration plus the negative delay.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
-	 *         after {@link AnimationStateListener#end(TrackEntry)}. */
+	 *         after {@link AnimationStateListener#dispose(TrackEntry)}. */
 	public TrackEntry addAnimation (int trackIndex, Animation animation, boolean loop, float delay) {
 		if (animation == null) throw new IllegalArgumentException("animation cannot be null.");
 
@@ -445,6 +425,7 @@ public class AnimationState {
 		return entry;
 	}
 
+	/** Sets an empty animation for a track, discarding any queued animations, and mixes to it over the specified mix duration. */
 	public TrackEntry setEmptyAnimation (int trackIndex, float mixDuration) {
 		TrackEntry entry = setAnimation(trackIndex, emptyAnimation, false);
 		entry.mixDuration = mixDuration;
@@ -452,11 +433,29 @@ public class AnimationState {
 		return entry;
 	}
 
+	/** Adds an empty animation to be played after the current or last queued animation for a track, and mixes to it over the
+	 * specified mix duration.
+	 * @param delay Seconds to begin this animation after the start of the previous animation. May be <= 0 to use the animation
+	 *           duration of the previous track minus any mix duration plus the negative delay.
+	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
+	 *         after {@link AnimationStateListener#dispose(TrackEntry)}. */
 	public TrackEntry addEmptyAnimation (int trackIndex, float mixDuration, float delay) {
 		TrackEntry entry = addAnimation(trackIndex, emptyAnimation, false, delay);
 		entry.mixDuration = mixDuration;
 		entry.trackEnd = mixDuration;
 		return entry;
+	}
+
+	/** Sets an empty animation for every tracks, discarding any queued animations, and mixes to it over the specified mix
+	 * duration. */
+	public void setEmptyAnimations (float mixDuration) {
+		queue.drainDisabled = true;
+		for (int i = 0, n = tracks.size; i < n; i++) {
+			TrackEntry current = tracks.get(i);
+			if (current != null) setEmptyAnimation(current.trackIndex, mixDuration);
+		}
+		queue.drainDisabled = false;
+		queue.drain();
 	}
 
 	/** @param last May be null. */

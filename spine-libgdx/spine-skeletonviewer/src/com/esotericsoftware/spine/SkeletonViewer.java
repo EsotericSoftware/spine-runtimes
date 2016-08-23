@@ -503,7 +503,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 					if (state != null) {
 						String name = animationList.getSelected();
 						if (name == null)
-							state.resetTrack(0, ui.mixSlider.getValue());
+							state.setEmptyAnimation(0, ui.mixSlider.getValue());
 						else
 							setAnimation();
 					}
