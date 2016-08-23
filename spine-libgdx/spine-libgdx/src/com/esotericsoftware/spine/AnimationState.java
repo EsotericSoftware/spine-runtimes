@@ -41,7 +41,11 @@ import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 
-/** Stores state for applying one or more animations over time and automatically mixes (crossfades) when animations change. */
+/** Stores state for applying one or more animations over time and mixing (crossfading) between animations.
+ * <p>
+ * Animations on different tracks are applied sequentially each frame, from lowest to highest track index. This enables animations
+ * to be layered, where higher tracks either key only a subset of the skeleton pose or use alpha < 1 to mix with the pose on the
+ * lower track. */
 public class AnimationState {
 	static private final Animation emptyAnimation = new Animation("<empty>", new Array(0), 0);
 
@@ -100,11 +104,7 @@ public class AnimationState {
 					continue;
 				}
 			} else if (current.trackLast >= current.trackEnd) {
-				// Clear the track when the end time is reached and there is no next entry.
-				// BOZO - This leaves the skeleton in the last pose, with no easy way of resetting.
-				// Should we get rid of the track end time?
-				// Or default it to MAX_VALUE even for non-looping animations?
-				// Or reset the skeleton before clearing? Note only apply() has a skeleton.
+				// Clear the track when the track end time is reached and there is no next entry.
 				tracks.set(i, null);
 				queue.end(current);
 				disposeNext(current);
@@ -131,8 +131,8 @@ public class AnimationState {
 		queue.drain();
 	}
 
-	/** Poses the skeleton using the track entry animations. There are no side effects other than invoking listeners, so multiple
-	 * skeletons can be posed identically. */
+	/** Poses the skeleton using the track entry animations. There are no side effects other than invoking listeners, so the
+	 * animation state can be applied to multiple skeletons to pose them identically. */
 	public void apply (Skeleton skeleton) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 
@@ -238,7 +238,10 @@ public class AnimationState {
 		events.clear();
 	}
 
-	/** Removes all animations from all tracks, leaving skeletons in their last pose. */
+	/** Removes all animations from all tracks, leaving skeletons in their last pose.
+	 * <p>
+	 * It may be desired to use {@link AnimationState#setEmptyAnimations(float)} to mix the skeletons back to the setup pose,
+	 * rather than leaving them in their last pose. */
 	public void clearTracks () {
 		queue.drainDisabled = true;
 		for (int i = 0, n = tracks.size; i < n; i++)
@@ -248,7 +251,10 @@ public class AnimationState {
 		queue.drain();
 	}
 
-	/** Removes all animations from the track, leaving skeletons in their last pose. */
+	/** Removes all animations from the track, leaving skeletons in their last pose.
+	 * <p>
+	 * It may be desired to use {@link AnimationState#setEmptyAnimation(int, float)} to mix the skeletons back to the setup pose,
+	 * rather than leaving them in their last pose. */
 	public void clearTrack (int trackIndex) {
 		if (trackIndex >= tracks.size) return;
 		TrackEntry current = tracks.get(trackIndex);
@@ -267,23 +273,6 @@ public class AnimationState {
 		tracks.set(current.trackIndex, null);
 
 		queue.drain();
-	}
-
-	/** @param entry May be null. */
-	private void disposeNext (TrackEntry entry) {
-		TrackEntry next = entry.next;
-		while (next != null) {
-			queue.dispose(next);
-			next = next.next;
-		}
-		entry.next = null;
-	}
-
-	private TrackEntry expandToIndex (int index) {
-		if (index < tracks.size) return tracks.get(index);
-		tracks.ensureCapacity(index - tracks.size + 1);
-		tracks.size = index + 1;
-		return null;
 	}
 
 	private void setCurrent (int index, TrackEntry entry) {
@@ -309,49 +298,6 @@ public class AnimationState {
 		queue.start(entry);
 
 		animationsChanged = true;
-	}
-
-	private void animationsChanged () {
-		animationsChanged = false;
-		propertyIDs.clear();
-		int i = 0, n = tracks.size;
-		for (; i < n; i++) {
-			TrackEntry entry = tracks.get(i);
-			if (entry == null) continue;
-			if (entry.mixingFrom != null) {
-				setTimelinesFirst(entry.mixingFrom);
-				checkTimelinesFirst(entry);
-			} else
-				setTimelinesFirst(entry);
-			i++;
-			break;
-		}
-		for (; i < n; i++) {
-			TrackEntry entry = tracks.get(i);
-			if (entry == null) continue;
-			if (entry.mixingFrom != null) checkTimelinesFirst(entry.mixingFrom);
-			checkTimelinesFirst(entry);
-		}
-	}
-
-	private void setTimelinesFirst (TrackEntry entry) {
-		IntSet propertyIDs = this.propertyIDs;
-		Array<Timeline> timelines = entry.animation.timelines;
-		int n = timelines.size;
-		boolean[] timelinesFirst = entry.timelinesFirst.setSize(n);
-		for (int i = 0; i < n; i++) {
-			propertyIDs.add(timelines.get(i).getPropertyId());
-			timelinesFirst[i] = true;
-		}
-	}
-
-	private void checkTimelinesFirst (TrackEntry entry) {
-		IntSet propertyIDs = this.propertyIDs;
-		Array<Timeline> timelines = entry.animation.timelines;
-		int n = timelines.size;
-		boolean[] timelinesFirst = entry.timelinesFirst.setSize(n);
-		for (int i = 0; i < n; i++)
-			timelinesFirst[i] = propertyIDs.add(timelines.get(i).getPropertyId());
 	}
 
 	/** @see #setAnimation(int, Animation, boolean) */
@@ -425,7 +371,8 @@ public class AnimationState {
 		return entry;
 	}
 
-	/** Sets an empty animation for a track, discarding any queued animations, and mixes to it over the specified mix duration. */
+	/** Sets an empty animation for a track, discarding any queued animations, and mixes to it over the specified mix duration. The
+	 * empty animation's pose is the setup pose. */
 	public TrackEntry setEmptyAnimation (int trackIndex, float mixDuration) {
 		TrackEntry entry = setAnimation(trackIndex, emptyAnimation, false);
 		entry.mixDuration = mixDuration;
@@ -434,7 +381,7 @@ public class AnimationState {
 	}
 
 	/** Adds an empty animation to be played after the current or last queued animation for a track, and mixes to it over the
-	 * specified mix duration.
+	 * specified mix duration. The empty animation's pose is the setup pose.
 	 * @param delay Seconds to begin this animation after the start of the previous animation. May be <= 0 to use the animation
 	 *           duration of the previous track minus any mix duration plus the negative delay.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
@@ -446,8 +393,8 @@ public class AnimationState {
 		return entry;
 	}
 
-	/** Sets an empty animation for every tracks, discarding any queued animations, and mixes to it over the specified mix
-	 * duration. */
+	/** Sets an empty animation for every track, discarding any queued animations, and mixes to it over the specified mix duration.
+	 * The empty animation's pose is the setup pose. */
 	public void setEmptyAnimations (float mixDuration) {
 		queue.drainDisabled = true;
 		for (int i = 0, n = tracks.size; i < n; i++) {
@@ -456,6 +403,13 @@ public class AnimationState {
 		}
 		queue.drainDisabled = false;
 		queue.drain();
+	}
+
+	private TrackEntry expandToIndex (int index) {
+		if (index < tracks.size) return tracks.get(index);
+		tracks.ensureCapacity(index - tracks.size + 1);
+		tracks.size = index + 1;
+		return null;
 	}
 
 	/** @param last May be null. */
@@ -486,7 +440,59 @@ public class AnimationState {
 		return entry;
 	}
 
-	/** The track entry for the animation currently playing on the track, or null. */
+	private void disposeNext (TrackEntry entry) {
+		TrackEntry next = entry.next;
+		while (next != null) {
+			queue.dispose(next);
+			next = next.next;
+		}
+		entry.next = null;
+	}
+
+	private void animationsChanged () {
+		animationsChanged = false;
+		propertyIDs.clear();
+		int i = 0, n = tracks.size;
+		for (; i < n; i++) {
+			TrackEntry entry = tracks.get(i);
+			if (entry == null) continue;
+			if (entry.mixingFrom != null) {
+				setTimelinesFirst(entry.mixingFrom);
+				checkTimelinesFirst(entry);
+			} else
+				setTimelinesFirst(entry);
+			i++;
+			break;
+		}
+		for (; i < n; i++) {
+			TrackEntry entry = tracks.get(i);
+			if (entry == null) continue;
+			if (entry.mixingFrom != null) checkTimelinesFirst(entry.mixingFrom);
+			checkTimelinesFirst(entry);
+		}
+	}
+
+	private void setTimelinesFirst (TrackEntry entry) {
+		IntSet propertyIDs = this.propertyIDs;
+		Array<Timeline> timelines = entry.animation.timelines;
+		int n = timelines.size;
+		boolean[] timelinesFirst = entry.timelinesFirst.setSize(n);
+		for (int i = 0; i < n; i++) {
+			propertyIDs.add(timelines.get(i).getPropertyId());
+			timelinesFirst[i] = true;
+		}
+	}
+
+	private void checkTimelinesFirst (TrackEntry entry) {
+		IntSet propertyIDs = this.propertyIDs;
+		Array<Timeline> timelines = entry.animation.timelines;
+		int n = timelines.size;
+		boolean[] timelinesFirst = entry.timelinesFirst.setSize(n);
+		for (int i = 0; i < n; i++)
+			timelinesFirst[i] = propertyIDs.add(timelines.get(i).getPropertyId());
+	}
+
+	/** Returns the track entry for the animation currently playing on the track, or null. */
 	public TrackEntry getCurrent (int trackIndex) {
 		if (trackIndex >= tracks.size) return null;
 		return tracks.get(trackIndex);
@@ -613,9 +619,12 @@ public class AnimationState {
 			this.trackTime = trackTime;
 		}
 
-		/** The track time in seconds when this animation will be removed from the track. If the track end time is reached and no
-		 * other animations are queued for playback, the track is cleared, leaving the skeleton in the last applied pose. Defaults
-		 * to the animation duration for non-looping animations and to {@link Integer#MAX_VALUE} for looping animations. */
+		/** The track time in seconds when this animation will be removed from the track. Defaults to the animation duration for
+		 * non-looping animations and to {@link Integer#MAX_VALUE} for looping animations. If the track end time is reached and no
+		 * other animations are queued for playback then the track is cleared, leaving skeletons in their last pose.
+		 * <p>
+		 * It may be desired to use {@link AnimationState#addEmptyAnimation(int, float, float)} to mix the skeletons back to the
+		 * setup pose, rather than leaving them in their last pose. */
 		public float getTrackEnd () {
 			return trackEnd;
 		}
@@ -626,8 +635,8 @@ public class AnimationState {
 
 		/** Seconds when this animation starts, both initially and after looping. Defaults to 0.
 		 * <p>
-		 * When changing the animation start time, it often makes sense to also change {@link #getAnimationLast()} to control which
-		 * timeline keys will trigger. */
+		 * When changing the animation start time, it often makes sense to set {@link #getAnimationLast()} to the same value to
+		 * prevent timeline keys before the start time from triggering. */
 		public float getAnimationStart () {
 			return animationStart;
 		}
@@ -636,7 +645,7 @@ public class AnimationState {
 			this.animationStart = animationStart;
 		}
 
-		/** Seconds for the last frame of this animation. Non-looping animations won't play past this time. Looping animation will
+		/** Seconds for the last frame of this animation. Non-looping animations won't play past this time. Looping animations will
 		 * loop back to {@link #getAnimationStart()} at this time. Defaults to the animation duration. */
 		public float getAnimationEnd () {
 			return animationEnd;
@@ -658,9 +667,8 @@ public class AnimationState {
 			nextAnimationLast = animationLast;
 		}
 
-		/** Uses the {@link #getTrackTime() track time} to compute the animation time between the {@link #getAnimationStart()
-		 * animation start} and {@link #getAnimationEnd() animation end}. When the track time is 0, the animation time is equal to
-		 * the animation start time. */
+		/** Uses {@link #getTrackTime()} to compute the animation time between {@link #getAnimationStart()} and
+		 * {@link #getAnimationEnd()}. When the track time is 0, the animation time is equal to the animation start time. */
 		public float getAnimationTime () {
 			if (loop) {
 				float duration = animationEnd - animationStart;
@@ -690,11 +698,11 @@ public class AnimationState {
 			this.listener = listener;
 		}
 
-		/** Values < 1 mix this animation with the skeleton pose. Defaults to 1, which overwrites the skeleton pose with this
-		 * animation.
+		/** Values < 1 mix this animation with the last skeleton pose. Defaults to 1, which overwrites the last skeleton pose with
+		 * this animation.
 		 * <p>
-		 * Typically track 0 is used to completely pose the skeleton, then alpha can be used on higher tracks. Generally it doesn't
-		 * make sense to use alpha on track 0, since the skeleton pose is probably from the last frame render. */
+		 * Typically track 0 is used to completely pose the skeleton, then alpha can be used on higher tracks. It doesn't make sense
+		 * to use alpha on track 0 if the skeleton pose is from the last frame render. */
 		public float getAlpha () {
 			return alpha;
 		}
@@ -758,7 +766,7 @@ public class AnimationState {
 		/** Seconds for mixing from the previous animation to this animation. Defaults to the value provided by
 		 * {@link AnimationStateData} based on the animation before this animation (if any).
 		 * <p>
-		 * The mix duration must be set before the next time the animation state is updated. */
+		 * The mix duration must be set before {@link AnimationState#update(float)} is next called. */
 		public float getMixDuration () {
 			return mixDuration;
 		}
@@ -879,18 +887,18 @@ public class AnimationState {
 	}
 
 	static public interface AnimationStateListener {
-		/** Invoked just after this entry is set as the current entry. */
+		/** Invoked when this entry has been set as the current entry. */
 		public void start (TrackEntry entry);
 
-		/** Invoked just after another entry is set to replace this entry as the current entry. This entry may continue being
-		 * applied for mixing. */
+		/** Invoked when another entry replaces this entry as the current entry. This entry may continue being applied for
+		 * mixing. */
 		public void interrupt (TrackEntry entry);
 
-		/** Invoked just before this entry will no longer be the current entry and will never be applied again. */
+		/** Invoked when this entry is no longer the current entry and will never be applied again. */
 		public void end (TrackEntry entry);
 
-		/** Invoked just before this track entry will be disposed. References to the entry should not be kept after dispose is
-		 * called, as it may be destroyed or reused. */
+		/** Invoked when this entry will be disposed. References to the entry should not be kept after dispose is called, as it may
+		 * be destroyed or reused. */
 		public void dispose (TrackEntry entry);
 
 		/** Invoked every time this entry's animation completes a loop. */

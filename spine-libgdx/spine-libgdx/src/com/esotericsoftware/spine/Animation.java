@@ -719,15 +719,36 @@ public class Animation {
 			float frameTime = frames[frame];
 			float percent = getCurvePercent(frame - 1, 1 - (time - frameTime) / (frames[frame - 1] - frameTime));
 
-			if (alpha < 1) {
-				for (int i = 0; i < vertexCount; i++) {
-					float prev = prevVertices[i];
-					vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
-				}
-			} else {
+			// BOZO - Test.
+			if (alpha == 1) {
+				// Absolute.
 				for (int i = 0; i < vertexCount; i++) {
 					float prev = prevVertices[i];
 					vertices[i] = prev + (nextVertices[i] - prev) * percent;
+				}
+			} else {
+				if (setupPose) {
+					VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
+					if (vertexAttachment.getBones() == null) {
+						// Vertex positions.
+						float[] setupVertices = vertexAttachment.getVertices();
+						for (int i = 0; i < vertexCount; i++) {
+							float prev = prevVertices[i], setup = setupVertices[i];
+							vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
+						}
+					} else {
+						// Deform offsets.
+						for (int i = 0; i < vertexCount; i++) {
+							float prev = prevVertices[i];
+							vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
+						}
+					}
+				} else {
+					// Additive.
+					for (int i = 0; i < vertexCount; i++) {
+						float prev = prevVertices[i];
+						vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
+					}
 				}
 			}
 		}
