@@ -103,18 +103,18 @@ public class AnimationState {
 				// Should we get rid of the track end time?
 				// Or default it to MAX_VALUE even for non-looping animations?
 				// Or reset the skeleton before clearing? Note only apply() has a skeleton.
-				freeAll(current.next);
-				queue.end(current);
-				if (mixingFrom != null) queue.end(mixingFrom);
 				tracks.set(i, null);
+				queue.end(current);
+				disposeNext(current);
+				if (mixingFrom != null) queue.end(mixingFrom);
 				continue;
 			}
 
 			current.trackTime += currentDelta;
 			if (mixingFrom != null) {
 				if (current.mixTime >= current.mixDuration && current.mixTime > 0) {
-					queue.end(mixingFrom);
 					current.mixingFrom = null;
+					queue.end(mixingFrom);
 					animationsChanged = true;
 				} else {
 					mixingFrom.animationLast = mixingFrom.nextAnimationLast;
@@ -237,9 +237,12 @@ public class AnimationState {
 	}
 
 	public void clearTracks () {
-		for (int i = 0, n = tracks.size; i < n; i++)
-			clearTrack(i);
+		for (int i = 0, n = tracks.size; i < n; i++) {
+			TrackEntry current = tracks.get(i);
+			if (current != null) clearTrack(current);
+		}
 		tracks.clear();
+		queue.drain();
 	}
 
 	// BOZO - This leaves the skeleton in the last pose, with no easy way of resetting.
@@ -247,22 +250,32 @@ public class AnimationState {
 		if (trackIndex >= tracks.size) return;
 		TrackEntry current = tracks.get(trackIndex);
 		if (current == null) return;
-		freeAll(current.next);
-
-		queue.end(current);
-		if (current.mixingFrom != null) queue.end(current.mixingFrom);
+		clearTrack(current);
 		queue.drain();
+	}
 
-		tracks.set(trackIndex, null);
+	private void clearTrack (TrackEntry current) {
+		queue.end(current);
+
+		disposeNext(current);
+
+		TrackEntry mixingFrom = current.mixingFrom;
+		if (mixingFrom != null) {
+			current.mixingFrom = null;
+			queue.end(mixingFrom);
+		}
+
+		tracks.set(current.trackIndex, null);
 	}
 
 	/** @param entry May be null. */
-	private void freeAll (TrackEntry entry) {
-		while (entry != null) {
-			TrackEntry next = entry.next;
-			trackEntryPool.free(entry);
-			entry = next;
+	private void disposeNext (TrackEntry entry) {
+		TrackEntry next = entry.next;
+		while (next != null) {
+			queue.dispose(next);
+			next = next.next;
 		}
+		entry.next = null;
 	}
 
 	private TrackEntry expandToIndex (int index) {
@@ -285,7 +298,7 @@ public class AnimationState {
 			queue.interrupt(current);
 
 			// If a mix is in progress, mix from the closest animation.
-			if (mixingFrom != null && current.mixTime / current.mixDuration < 0.5f) {
+			if (mixingFrom != null && (current.mixDuration == 0 || current.mixTime / current.mixDuration < 0.5f)) {
 				entry.mixingFrom = mixingFrom;
 				mixingFrom = current;
 			} else
@@ -347,28 +360,26 @@ public class AnimationState {
 		return setAnimation(trackIndex, animation, loop);
 	}
 
-	/** Sets the current animation for a track. If the track is empty, the new animation is made the current animation immediately.
-	 * Otherwise, any queued animations are discarded and the new animation is queued to become the current animation the next time
-	 * {@link #update(float)} is called.
+	/** Sets the current animation for a track, discarding any queued animations.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
 	 *         after {@link AnimationStateListener#end(TrackEntry)}. */
 	public TrackEntry setAnimation (int trackIndex, Animation animation, boolean loop) {
 		if (animation == null) throw new IllegalArgumentException("animation cannot be null.");
 		TrackEntry current = expandToIndex(trackIndex);
-		TrackEntry entry = trackEntry(trackIndex, animation, loop, current);
-		if (current == null) {
-			setCurrent(trackIndex, entry);
-			queue.drain();
-		} else {
-			freeAll(current.next);
-			if (current.nextTrackLast == -1) { // If current was never applied, replace it.
-				setCurrent(trackIndex, entry);
-				queue.drain();
-			} else {
-				current.next = entry;
-				entry.delay = current.nextTrackLast;
-			}
+		if (current != null) {
+			if (current.nextTrackLast == -1) {
+				// Don't mix from an entry that was never applied.
+				tracks.set(trackIndex, null);
+				queue.interrupt(current);
+				queue.end(current);
+				disposeNext(current);
+				current = null;
+			} else
+				disposeNext(current);
 		}
+		TrackEntry entry = trackEntry(trackIndex, animation, loop, current);
+		setCurrent(trackIndex, entry);
+		queue.drain();
 		return entry;
 	}
 
@@ -696,11 +707,6 @@ public class AnimationState {
 			return next;
 		}
 
-		/** @param next May be null. */
-		public void setNext (TrackEntry next) {
-			this.next = next;
-		}
-
 		/** Returns true if at least one loop has been completed. */
 		public boolean isComplete () {
 			return trackTime >= animationEnd - animationStart;
@@ -719,7 +725,7 @@ public class AnimationState {
 		/** Seconds for mixing from the previous animation to this animation. Defaults to the value provided by
 		 * {@link AnimationStateData} based on the animation before this animation (if any).
 		 * <p>
-		 * The mix duration must be set before this track entry becomes the current track entry. */
+		 * The mix duration must be set before the next time the animation state is updated. */
 		public float getMixDuration () {
 			return mixDuration;
 		}
@@ -740,7 +746,7 @@ public class AnimationState {
 	}
 
 	static private class EventQueue {
-		static private final int START = 0, EVENT = 1, COMPLETE = 2, INTERRUPT = 3, END = 4;
+		static private final int START = 0, EVENT = 1, COMPLETE = 2, INTERRUPT = 3, END = 4, DISPOSE = 5;
 
 		private final Array<AnimationStateListener> listeners;
 		private final Pool<TrackEntry> trackEntryPool;
@@ -779,6 +785,11 @@ public class AnimationState {
 			eventTypes.add(END);
 		}
 
+		public void dispose (TrackEntry entry) {
+			objects.add(entry);
+			eventTypes.add(DISPOSE);
+		}
+
 		public void drain () {
 			if (draining) return; // Not reentrant.
 			draining = true;
@@ -810,6 +821,11 @@ public class AnimationState {
 					if (entry.listener != null) entry.listener.end(entry);
 					for (int i = 0; i < listeners.size; i++)
 						listeners.get(i).end(entry);
+					// Fall through.
+				case DISPOSE:
+					if (entry.listener != null) entry.listener.end(entry);
+					for (int i = 0; i < listeners.size; i++)
+						listeners.get(i).dispose(entry);
 					trackEntryPool.free(entry);
 					break;
 				default:
@@ -830,31 +846,28 @@ public class AnimationState {
 	}
 
 	static public interface AnimationStateListener {
-		/** Invoked just after this animation is set as the current animation. */
+		/** Invoked just after this entry is set as the current entry. */
 		public void start (TrackEntry entry);
 
-		/** Invoked just after another animation is set as the current animation. The animation may continue being applied if there
-		 * is a mix duration. */
+		/** Invoked just after another entry is set to replace this entry as the current entry. This entry may continue being
+		 * applied for mixing. */
 		public void interrupt (TrackEntry entry);
 
-		/** Invoked when this animation will no longer be applied. After this method returns, no references to the track entry
-		 * should be kept because it may be reused. */
+		/** Invoked just before this entry will no longer be the current entry and will never be applied again. */
 		public void end (TrackEntry entry);
 
-		/** Invoked every time this animation completes a loop. */
+		/** Invoked just before this track entry will be disposed. References to the entry should not be kept after dispose is
+		 * called, as it may be destroyed or reused. */
+		public void dispose (TrackEntry entry);
+
+		/** Invoked every time this entry's animation completes a loop. */
 		public void complete (TrackEntry entry);
 
-		/** Invoked when this animation triggers an event. */
+		/** Invoked when this entry's animation triggers an event. */
 		public void event (TrackEntry entry, Event event);
 	}
 
 	static public abstract class AnimationStateAdapter implements AnimationStateListener {
-		public void event (TrackEntry entry, Event event) {
-		}
-
-		public void complete (TrackEntry entry) {
-		}
-
 		public void start (TrackEntry entry) {
 		}
 
@@ -862,6 +875,15 @@ public class AnimationState {
 		}
 
 		public void end (TrackEntry entry) {
+		}
+
+		public void dispose (TrackEntry entry) {
+		}
+
+		public void event (TrackEntry entry, Event event) {
+		}
+
+		public void complete (TrackEntry entry) {
 		}
 	}
 }
