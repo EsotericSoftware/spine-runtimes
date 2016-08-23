@@ -293,6 +293,7 @@ public class AnimationState {
 
 	private void resetTrack (TrackEntry current) {
 		TrackEntry entry = trackEntry(current.trackIndex, emptyAnimation, false, current);
+		entry.mixDuration = 0;
 		current.trackTime = 0;
 		setCurrent(current.trackIndex, entry);
 	}
@@ -394,6 +395,7 @@ public class AnimationState {
 	 *         after {@link AnimationStateListener#end(TrackEntry)}. */
 	public TrackEntry setAnimation (int trackIndex, Animation animation, boolean loop) {
 		if (animation == null) throw new IllegalArgumentException("animation cannot be null.");
+		// if (animation == null) animation = emptyAnimation; // BOZO - Test.
 		TrackEntry current = expandToIndex(trackIndex);
 		if (current != null) {
 			if (current.nextTrackLast == -1) {
