@@ -211,8 +211,16 @@ public class SkeletonViewer extends ApplicationAdapter {
 	}
 
 	void setAnimation () {
-		TrackEntry entry = state.setAnimation(0, ui.animationList.getSelected(), ui.loopCheckbox.isChecked());
-		entry.setTrackEnd(Integer.MAX_VALUE);
+		TrackEntry current = state.getCurrent(0);
+		if (current == null) {
+			state.setEmptyAnimation(0, 0);
+			TrackEntry entry = state.addAnimation(0, ui.animationList.getSelected(), ui.loopCheckbox.isChecked(), 0);
+			entry.setMixDuration(ui.mixSlider.getValue());
+			entry.setTrackEnd(Integer.MAX_VALUE);
+		} else {
+			TrackEntry entry = state.setAnimation(0, ui.animationList.getSelected(), ui.loopCheckbox.isChecked());
+			entry.setTrackEnd(Integer.MAX_VALUE);
+		}
 	}
 
 	public void render () {
@@ -263,16 +271,23 @@ public class SkeletonViewer extends ApplicationAdapter {
 		ui.stage.act();
 		ui.stage.draw();
 
-		// Draw indicator for timeline position.
+		// Draw indicator lines for animation and mix times.
 		if (state != null) {
 			ShapeRenderer shapes = debugRenderer.getShapeRenderer();
 			TrackEntry entry = state.getCurrent(0);
 			if (entry != null) {
+				shapes.begin(ShapeType.Line);
+
 				float percent = entry.getAnimationTime() / entry.getAnimationEnd();
 				float x = ui.window.getRight() + (Gdx.graphics.getWidth() - ui.window.getRight()) * percent;
 				shapes.setColor(Color.CYAN);
-				shapes.begin(ShapeType.Line);
 				shapes.line(x, 0, x, 20);
+
+				percent = entry.getMixTime() / entry.getMixDuration();
+				x = ui.window.getRight() + (Gdx.graphics.getWidth() - ui.window.getRight()) * percent;
+				shapes.setColor(Color.RED);
+				shapes.line(x, 0, x, 20);
+
 				shapes.end();
 			}
 		}
@@ -488,7 +503,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 					if (state != null) {
 						String name = animationList.getSelected();
 						if (name == null)
-							state.resetTrack(0);
+							state.resetTrack(0, ui.mixSlider.getValue());
 						else
 							setAnimation();
 					}

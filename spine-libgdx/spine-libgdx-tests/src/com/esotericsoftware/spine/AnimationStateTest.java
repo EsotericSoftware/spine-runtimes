@@ -665,7 +665,7 @@ public class AnimationStateTest {
 		state.addAnimation(0, "events1", false, 0);
 		run(0.1f, 10, new TestListener() {
 			public void frame (float time) {
-				if (MathUtils.isEqual(time, 0.7f)) state.resetTrack(0);
+				if (MathUtils.isEqual(time, 0.7f)) state.resetTrack(0, 0);
 			}
 		});
 

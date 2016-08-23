@@ -240,11 +240,11 @@ public class AnimationState {
 
 	/** Removes all animations from all tracks, leaving skeletons in their last pose. */
 	public void clearTracks () {
-		for (int i = 0, n = tracks.size; i < n; i++) {
-			TrackEntry current = tracks.get(i);
-			if (current != null) clearTrack(current);
-		}
+		queue.drainDisabled = true;
+		for (int i = 0, n = tracks.size; i < n; i++)
+			clearTrack(i);
 		tracks.clear();
+		queue.drainDisabled = false;
 		queue.drain();
 	}
 
@@ -253,11 +253,7 @@ public class AnimationState {
 		if (trackIndex >= tracks.size) return;
 		TrackEntry current = tracks.get(trackIndex);
 		if (current == null) return;
-		clearTrack(current);
-		queue.drain();
-	}
 
-	private void clearTrack (TrackEntry current) {
 		queue.end(current);
 
 		disposeNext(current);
@@ -269,33 +265,28 @@ public class AnimationState {
 		}
 
 		tracks.set(current.trackIndex, null);
-	}
 
-	/** Removes all queued animations for all tracks and sets track entries which mix out the current animations, so any changes
-	 * the animations have made to skeletons are reverted to the setup pose. */
-	public void resetTracks () {
-		for (int i = 0, n = tracks.size; i < n; i++) {
-			TrackEntry current = tracks.get(i);
-			if (current != null) resetTrack(current);
-		}
 		queue.drain();
 	}
 
-	/** Removes all queued animations and sets a track entry which mixes out the current animation, so any changes the animation
-	 * has made to skeletons are reverted to the setup pose. */
-	public void resetTrack (int trackIndex) {
+	/** Removes all queued animations for all tracks and sets empty animations to mix out the current animations, so any changes
+	 * the current animations have made to skeletons are reverted to the setup pose. */
+	public void resetTracks (float mixDuration) {
+		queue.drainDisabled = true;
+		for (int i = 0, n = tracks.size; i < n; i++)
+			resetTrack(i, mixDuration);
+		queue.drainDisabled = false;
+		queue.drain();
+	}
+
+	/** Removes all queued animations and sets an empty animation to mix out the current animation, so any changes the current
+	 * animation has made to skeletons are reverted to the setup pose. */
+	public void resetTrack (int trackIndex, float mixDuration) {
 		if (trackIndex >= tracks.size) return;
 		TrackEntry current = tracks.get(trackIndex);
 		if (current == null) return;
-		resetTrack(current);
+		setEmptyAnimation(current.trackIndex, mixDuration);
 		queue.drain();
-	}
-
-	private void resetTrack (TrackEntry current) {
-		TrackEntry entry = trackEntry(current.trackIndex, emptyAnimation, false, current);
-		entry.mixDuration = 0;
-		current.trackTime = 0;
-		setCurrent(current.trackIndex, entry);
 	}
 
 	/** @param entry May be null. */
@@ -395,7 +386,6 @@ public class AnimationState {
 	 *         after {@link AnimationStateListener#end(TrackEntry)}. */
 	public TrackEntry setAnimation (int trackIndex, Animation animation, boolean loop) {
 		if (animation == null) throw new IllegalArgumentException("animation cannot be null.");
-		// if (animation == null) animation = emptyAnimation; // BOZO - Test.
 		TrackEntry current = expandToIndex(trackIndex);
 		if (current != null) {
 			if (current.nextTrackLast == -1) {
@@ -452,6 +442,20 @@ public class AnimationState {
 		}
 
 		entry.delay = delay;
+		return entry;
+	}
+
+	public TrackEntry setEmptyAnimation (int trackIndex, float mixDuration) {
+		TrackEntry entry = setAnimation(trackIndex, emptyAnimation, false);
+		entry.mixDuration = mixDuration;
+		entry.trackEnd = mixDuration;
+		return entry;
+	}
+
+	public TrackEntry addEmptyAnimation (int trackIndex, float mixDuration, float delay) {
+		TrackEntry entry = addAnimation(trackIndex, emptyAnimation, false, delay);
+		entry.mixDuration = mixDuration;
+		entry.trackEnd = mixDuration;
 		return entry;
 	}
 
@@ -783,7 +787,7 @@ public class AnimationState {
 		private final Pool<TrackEntry> trackEntryPool;
 		private final Array objects = new Array();
 		private final IntArray eventTypes = new IntArray(); // If > 0 it's loop count for a complete event.
-		private boolean draining;
+		boolean drainDisabled;
 
 		public EventQueue (Array<AnimationStateListener> listeners, Pool<TrackEntry> trackEntryPool) {
 			this.listeners = listeners;
@@ -822,8 +826,8 @@ public class AnimationState {
 		}
 
 		public void drain () {
-			if (draining) return; // Not reentrant.
-			draining = true;
+			if (drainDisabled) return; // Not reentrant.
+			drainDisabled = true;
 
 			Array objects = this.objects;
 			IntArray eventTypes = this.eventTypes;
@@ -867,7 +871,7 @@ public class AnimationState {
 			}
 			clear();
 
-			draining = false;
+			drainDisabled = false;
 		}
 
 		public void clear () {
