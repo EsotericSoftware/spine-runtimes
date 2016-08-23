@@ -185,11 +185,9 @@ public class AnimationStateTest {
 			expect(0, "event 14", 0.5f, 0.5f), //
 			expect(0, "event 30", 1, 1), //
 			expect(0, "complete", 1, 1), //
-
-			expect(1, "start", 0.1f, 1.1f), //
-
 			expect(0, "interrupt", 1.1f, 1.1f), //
 
+			expect(1, "start", 0.1f, 1.1f), //
 			expect(1, "event 0", 0.1f, 1.1f), //
 
 			expect(0, "end", 1.1f, 1.2f), //
@@ -198,11 +196,9 @@ public class AnimationStateTest {
 			expect(1, "event 14", 0.5f, 1.5f), //
 			expect(1, "event 30", 1, 2), //
 			expect(1, "complete", 1, 2), //
-
-			expect(0, "start", 0.1f, 2.1f), //
-
 			expect(1, "interrupt", 1.1f, 2.1f), //
 
+			expect(0, "start", 0.1f, 2.1f), //
 			expect(0, "event 0", 0.1f, 2.1f), //
 
 			expect(1, "end", 1.1f, 2.2f), //
@@ -223,11 +219,9 @@ public class AnimationStateTest {
 			expect(0, "start", 0, 0), //
 			expect(0, "event 0", 0, 0), //
 			expect(0, "event 14", 0.5f, 0.5f), //
-
-			expect(1, "start", 0.1f, 0.6f), //
-
 			expect(0, "interrupt", 0.6f, 0.6f), //
 
+			expect(1, "start", 0.1f, 0.6f), //
 			expect(1, "event 0", 0.1f, 0.6f), //
 
 			expect(0, "end", 0.6f, 0.7f), //
@@ -247,10 +241,10 @@ public class AnimationStateTest {
 			expect(0, "start", 0, 0), //
 			expect(0, "event 0", 0, 0), //
 			expect(0, "event 14", 0.5f, 0.5f), //
+			expect(0, "interrupt", 1, 1), //
 
 			expect(1, "start", 0.1f, 1), //
 
-			expect(0, "interrupt", 1, 1), //
 			expect(0, "complete", 1, 1), //
 
 			expect(1, "event 0", 0.1f, 1), //
@@ -272,11 +266,9 @@ public class AnimationStateTest {
 		setup("animation 0 events do not fire during mix", // 8
 			expect(0, "start", 0, 0), //
 			expect(0, "event 0", 0, 0), //
-
-			expect(1, "start", 0.1f, 0.5f), //
-
 			expect(0, "interrupt", 0.5f, 0.5f), //
 
+			expect(1, "start", 0.1f, 0.5f), //
 			expect(1, "event 0", 0.1f, 0.5f), //
 			expect(1, "event 14", 0.5f, 0.9f), //
 
@@ -297,10 +289,10 @@ public class AnimationStateTest {
 		setup("event threshold, some animation 0 events fire during mix", // 9
 			expect(0, "start", 0, 0), //
 			expect(0, "event 0", 0, 0), //
+			expect(0, "interrupt", 0.5f, 0.5f), //
 
 			expect(1, "start", 0.1f, 0.5f), //
 
-			expect(0, "interrupt", 0.5f, 0.5f), //
 			expect(0, "event 14", 0.5f, 0.5f), //
 
 			expect(1, "event 0", 0.1f, 0.5f), //
@@ -324,11 +316,9 @@ public class AnimationStateTest {
 			expect(0, "start", 0, 0), //
 			expect(0, "event 0", 0, 0), //
 			expect(0, "event 14", 0.5f, 0.5f), //
-
-			expect(1, "start", 0.1f, 0.9f), //
-
 			expect(0, "interrupt", 0.9f, 0.9f), //
 
+			expect(1, "start", 0.1f, 0.9f), //
 			expect(1, "event 0", 0.1f, 0.9f), //
 
 			expect(0, "event 30", 1, 1), //
@@ -378,11 +368,9 @@ public class AnimationStateTest {
 			expect(0, "event 14", 0.5f, 0.5f), //
 			expect(0, "event 30", 1, 1), //
 			expect(0, "complete", 1, 1), //
-
-			expect(1, "start", 0.1f, 2.1f), //
-
 			expect(0, "interrupt", 2.1f, 2.1f), //
 
+			expect(1, "start", 0.1f, 2.1f), //
 			expect(1, "event 0", 0.1f, 2.1f), //
 
 			expect(0, "end", 2.1f, 2.2f), //
@@ -409,11 +397,9 @@ public class AnimationStateTest {
 			expect(0, "event 30", 2, 2), //
 			expect(0, "complete", 2, 2), //
 			expect(0, "event 0", 2, 2), //
-
-			expect(1, "start", 0.1f, 2.1f), //
-
 			expect(0, "interrupt", 2.1f, 2.1f), //
 
+			expect(1, "start", 0.1f, 2.1f), //
 			expect(1, "event 0", 0.1f, 2.1f), //
 
 			expect(0, "end", 2.1f, 2.2f), //
@@ -501,11 +487,9 @@ public class AnimationStateTest {
 			expect(0, "start", 0, 0), //
 			expect(0, "event 14", 0.3f, 0.3f), //
 			expect(0, "complete", 0.6f, 0.6f), //
-
-			expect(1, "start", 0.1f, 0.8f), //
-
 			expect(0, "interrupt", 0.8f, 0.8f), //
 
+			expect(1, "start", 0.1f, 0.8f), //
 			expect(1, "event 0", 0.1f, 0.8f), //
 
 			expect(0, "event 14", 0.9f, 0.9f), //
@@ -536,10 +520,9 @@ public class AnimationStateTest {
 			expect(0, "event 30", 1, 1), //
 			expect(0, "complete", 1, 1), //
 			expect(0, "event 0", 1, 1), //
+			expect(0, "interrupt", 1, 1), //
 
 			expect(1, "start", 0, 1), //
-
-			expect(0, "interrupt", 1, 1), //
 
 			expect(1, "event 0", 0.1f, 1.1f), //
 			expect(1, "event 14", 0.5f, 1.5f), //
@@ -571,10 +554,9 @@ public class AnimationStateTest {
 
 			// First 2 setAnimation calls are done.
 
-			expect(0, "start", 0, 0.8f), //
-
 			expect(1, "interrupt", 0.8f, 0.8f), //
 
+			expect(0, "start", 0, 0.8f), //
 			expect(0, "interrupt", 0, 0.8f), //
 			expect(0, "end", 0, 0.8f), //
 			expect(0, "dispose", 0, 0.8f), //
@@ -655,12 +637,19 @@ public class AnimationStateTest {
 			}
 		});
 
-		setup("setEmptyAnimation", // 24
+		setup("setEmptyAnimation", // 25
 			expect(0, "start", 0, 0), //
 			expect(0, "event 0", 0, 0), //
 			expect(0, "event 14", 0.5f, 0.5f), //
-			expect(0, "end", 0.7f, 0.8f), //
-			expect(0, "dispose", 0.7f, 0.8f) //
+			expect(0, "interrupt", 0.7f, 0.7f), //
+
+			expect(-1, "start", 0, 0.7f), //
+			expect(-1, "complete", 0.1f, 0.8f), //
+			expect(-1, "end", 0.1f, 0.9f), //
+			expect(-1, "dispose", 0.1f, 0.9f), //
+
+			expect(0, "end", 0.8f, 0.9f), //
+			expect(0, "dispose", 0.8f, 0.9f) //
 		);
 		state.addAnimation(0, "events1", false, 0);
 		run(0.1f, 10, new TestListener() {

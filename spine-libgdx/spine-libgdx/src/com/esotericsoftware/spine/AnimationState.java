@@ -290,8 +290,6 @@ public class AnimationState {
 		TrackEntry current = expandToIndex(index);
 		tracks.set(index, entry);
 
-		queue.start(entry);
-
 		if (current != null) {
 			TrackEntry mixingFrom = current.mixingFrom;
 			current.mixingFrom = null;
@@ -307,6 +305,8 @@ public class AnimationState {
 
 			if (mixingFrom != null) queue.end(mixingFrom);
 		}
+
+		queue.start(entry);
 
 		animationsChanged = true;
 	}
@@ -481,7 +481,6 @@ public class AnimationState {
 		entry.timeScale = 1;
 
 		entry.alpha = 1;
-
 		entry.mixTime = 0;
 		entry.mixDuration = last == null ? 0 : data.getMix(last.animation, animation);
 		return entry;
