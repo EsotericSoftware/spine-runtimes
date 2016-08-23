@@ -73,6 +73,9 @@ public class AnimationState {
 			TrackEntry current = tracks.get(i);
 			if (current == null) continue;
 
+			current.animationLast = current.nextAnimationLast;
+			current.trackLast = current.nextTrackLast;
+
 			float currentDelta = delta * current.timeScale;
 
 			if (current.delay > 0) {
@@ -114,6 +117,8 @@ public class AnimationState {
 					current.mixingFrom = null;
 					animationsChanged = true;
 				} else {
+					mixingFrom.animationLast = mixingFrom.nextAnimationLast;
+					mixingFrom.trackLast = mixingFrom.nextTrackLast;
 					float mixingFromDelta = delta * mixingFrom.timeScale;
 					mixingFrom.trackTime += mixingFromDelta;
 					current.mixTime += mixingFromDelta;
@@ -124,7 +129,8 @@ public class AnimationState {
 		queue.drain();
 	}
 
-	/** Poses the skeleton using the track entry animations. */
+	/** Poses the skeleton using the track entry animations. There are no side effects other than invoking listeners, so multiple
+	 * skeletons can be posed identically. */
 	public void apply (Skeleton skeleton) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 
@@ -159,8 +165,8 @@ public class AnimationState {
 					timelines.get(ii).apply(skeleton, animationLast, animationTime, events, mix, timelinesFirst[ii], false);
 			}
 			queueEvents(current, animationTime);
-			current.animationLast = animationTime;
-			current.trackLast = current.trackTime;
+			current.nextAnimationLast = animationTime;
+			current.nextTrackLast = current.trackTime;
 		}
 
 		queue.drain();
@@ -196,8 +202,8 @@ public class AnimationState {
 		}
 
 		queueEvents(entry, animationTime);
-		entry.animationLast = animationTime;
-		entry.trackLast = entry.trackTime;
+		entry.nextAnimationLast = animationTime;
+		entry.nextTrackLast = entry.trackTime;
 	}
 
 	private void queueEvents (TrackEntry entry, float animationTime) {
@@ -355,12 +361,12 @@ public class AnimationState {
 			queue.drain();
 		} else {
 			freeAll(current.next);
-			if (current.trackLast == -1) { // If current was never applied, replace it.
+			if (current.nextTrackLast == -1) { // If current was never applied, replace it.
 				setCurrent(trackIndex, entry);
 				queue.drain();
 			} else {
 				current.next = entry;
-				entry.delay = current.trackLast;
+				entry.delay = current.nextTrackLast;
 			}
 		}
 		return entry;
@@ -422,9 +428,11 @@ public class AnimationState {
 		entry.animationStart = 0;
 		entry.animationEnd = animation.getDuration();
 		entry.animationLast = -1;
+		entry.nextAnimationLast = -1;
 		entry.trackTime = 0;
 		entry.trackEnd = loop ? Integer.MAX_VALUE : entry.animationEnd;
 		entry.trackLast = -1;
+		entry.nextTrackLast = -1;
 		entry.timeScale = 1;
 
 		entry.alpha = 1;
@@ -507,8 +515,8 @@ public class AnimationState {
 		boolean loop;
 		float eventThreshold, attachmentThreshold, drawOrderThreshold;
 		float delay, trackTime, trackLast, trackEnd, animationStart, animationEnd, animationLast, timeScale;
-		float alpha;
-		float mixTime, mixDuration;
+		float nextTrackLast, nextAnimationLast;
+		float alpha, mixTime, mixDuration;
 		final BooleanArray timelinesFirst = new BooleanArray();
 
 		public void reset () {
@@ -603,6 +611,7 @@ public class AnimationState {
 
 		public void setAnimationLast (float animationLast) {
 			this.animationLast = animationLast;
+			nextAnimationLast = animationLast;
 		}
 
 		/** Uses the {@link #getTrackTime() track time} to compute the animation time between the {@link #getAnimationStart()

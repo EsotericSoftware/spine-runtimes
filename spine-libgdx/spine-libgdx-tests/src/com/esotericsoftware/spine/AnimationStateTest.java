@@ -621,6 +621,12 @@ public class AnimationStateTest {
 			}
 
 			state.apply(skeleton);
+
+			// Apply multiple times to ensure no side effects.
+			if (expected.size > 0) state.removeListener(stateListener);
+			state.apply(skeleton);
+			state.apply(skeleton);
+			if (expected.size > 0) state.addListener(stateListener);
 		}
 		// Expecting more than actual is a failure.
 		for (int i = actual.size, n = expected.size; i < n; i++) {
