@@ -34,12 +34,14 @@ module spine {
 		skeleton: Skeleton;
 		state: AnimationState;
 		gl: WebGLRenderingContext;
-		canvas: HTMLCanvasElement;			
+		canvas: HTMLCanvasElement;
+		debugRenderer: spine.webgl.SkeletonDebugRenderer;
 
 		private config: SpineWidgetConfig;
 		private assetManager: spine.webgl.AssetManager;
 		private shader: spine.webgl.Shader;
 		private batcher: spine.webgl.PolygonBatcher;
+		private debugShader: spine.webgl.Shader;		
 		private mvp = new spine.webgl.Matrix4();
 		private skeletonRenderer: spine.webgl.SkeletonRenderer;		
 		private paused = false;
@@ -71,6 +73,8 @@ module spine {
 			this.batcher = new spine.webgl.PolygonBatcher(gl);
 			this.mvp.ortho2d(0, 0, canvas.width - 1, canvas.height - 1);
 			this.skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);
+			this.debugShader = spine.webgl.Shader.newColored(gl);
+			this.debugRenderer = new spine.webgl.SkeletonDebugRenderer(gl);
 
 			let assets = this.assetManager = new spine.webgl.AssetManager(gl);
 			assets.loadText(config.atlas);
@@ -100,6 +104,7 @@ module spine {
 				}
 			}
 			if (!config.premultipliedAlpha === undefined) config.premultipliedAlpha = false;
+			if (!config.debug === undefined) config.debug = false;
 			this.backgroundColor.setFromString(config.backgroundColor);
 			this.config = config;		
 		}
@@ -165,21 +170,29 @@ module spine {
 			state.apply(skeleton);
 			skeleton.updateWorldTransform();
 			
-			// Bind the shader and set the texture and model-view-projection matrix.
+			// Draw the skeleton
 			let shader = this.shader;
-			shader.bind();
-			shader.setUniformi(spine.webgl.Shader.SAMPLER, 0);
-			shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, this.mvp.values);
-
-			// Start the batch and tell the SkeletonRenderer to render the active skeleton.
 			let batcher = this.batcher;
 			let skeletonRenderer = this.skeletonRenderer;
+			shader.bind();
+			shader.setUniformi(spine.webgl.Shader.SAMPLER, 0);
+			shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, this.mvp.values);			
 			batcher.begin(shader);
 			skeletonRenderer.premultipliedAlpha = premultipliedAlpha;
 			skeletonRenderer.draw(batcher, skeleton);
-			batcher.end();
-				
+			batcher.end();				
 			shader.unbind();
+
+			// Draw debug information if requested via config
+			if (this.config.debug) {
+				let shader = this.debugShader;
+				let renderer = this.debugRenderer;
+				shader.bind();
+				shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, this.mvp.values);
+				renderer.premultipliedAlpha = premultipliedAlpha;
+				renderer.draw(shader, skeleton);
+				shader.unbind();
+			}
 
 			if (!this.paused) requestAnimationFrame(() => { this.render(); });
 		}
@@ -253,7 +266,8 @@ module spine {
 			if (widget.getAttribute("data-y")) config.y = parseFloat(widget.getAttribute("data-y"));
 			if (widget.getAttribute("data-fit-to-canvas")) config.fitToCanvas = widget.getAttribute("data-fit-to-canvas") === "true";							
 			if (widget.getAttribute("data-background-color")) config.backgroundColor = widget.getAttribute("data-background-color");
-			if (widget.getAttribute("data-premultiplied-alpha")) config.premultipliedAlpha = widget.getAttribute("data-premultiplied-alpha") === "true";			
+			if (widget.getAttribute("data-premultiplied-alpha")) config.premultipliedAlpha = widget.getAttribute("data-premultiplied-alpha") === "true";
+			if (widget.getAttribute("data-debug")) config.debug = widget.getAttribute("data-debug") === "true";			
 
 			new spine.SpineWidget(widget, config);
 		}
@@ -290,7 +304,8 @@ module spine {
 		y = 0;
 		fitToCanvas = true;		
 		backgroundColor = "#555555";
-		premultipliedAlpha = false;		
+		premultipliedAlpha = false;
+		debug = false;	
 		success: (widget: SpineWidget) => void;
 		error: (widget: SpineWidget, msg: string) => void;		
 	}

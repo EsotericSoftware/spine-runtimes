@@ -1152,10 +1152,12 @@ declare module spine {
         state: AnimationState;
         gl: WebGLRenderingContext;
         canvas: HTMLCanvasElement;
+        debugRenderer: spine.webgl.SkeletonDebugRenderer;
         private config;
         private assetManager;
         private shader;
         private batcher;
+        private debugShader;
         private mvp;
         private skeletonRenderer;
         private paused;
@@ -1191,6 +1193,7 @@ declare module spine {
         fitToCanvas: boolean;
         backgroundColor: string;
         premultipliedAlpha: boolean;
+        debug: boolean;
         success: (widget: SpineWidget) => void;
         error: (widget: SpineWidget, msg: string) => void;
     }

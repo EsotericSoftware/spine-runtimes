@@ -6210,6 +6210,8 @@ var spine;
             this.batcher = new spine.webgl.PolygonBatcher(gl);
             this.mvp.ortho2d(0, 0, canvas.width - 1, canvas.height - 1);
             this.skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);
+            this.debugShader = spine.webgl.Shader.newColored(gl);
+            this.debugRenderer = new spine.webgl.SkeletonDebugRenderer(gl);
             var assets = this.assetManager = new spine.webgl.AssetManager(gl);
             assets.loadText(config.atlas);
             assets.loadText(config.json);
@@ -6248,6 +6250,8 @@ var spine;
             }
             if (!config.premultipliedAlpha === undefined)
                 config.premultipliedAlpha = false;
+            if (!config.debug === undefined)
+                config.debug = false;
             this.backgroundColor.setFromString(config.backgroundColor);
             this.config = config;
         };
@@ -6310,16 +6314,25 @@ var spine;
             state.apply(skeleton);
             skeleton.updateWorldTransform();
             var shader = this.shader;
+            var batcher = this.batcher;
+            var skeletonRenderer = this.skeletonRenderer;
             shader.bind();
             shader.setUniformi(spine.webgl.Shader.SAMPLER, 0);
             shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, this.mvp.values);
-            var batcher = this.batcher;
-            var skeletonRenderer = this.skeletonRenderer;
             batcher.begin(shader);
             skeletonRenderer.premultipliedAlpha = premultipliedAlpha;
             skeletonRenderer.draw(batcher, skeleton);
             batcher.end();
             shader.unbind();
+            if (this.config.debug) {
+                var shader_1 = this.debugShader;
+                var renderer = this.debugRenderer;
+                shader_1.bind();
+                shader_1.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, this.mvp.values);
+                renderer.premultipliedAlpha = premultipliedAlpha;
+                renderer.draw(shader_1, skeleton);
+                shader_1.unbind();
+            }
             if (!this.paused)
                 requestAnimationFrame(function () { _this.render(); });
         };
@@ -6396,6 +6409,8 @@ var spine;
                 config.backgroundColor = widget.getAttribute("data-background-color");
             if (widget.getAttribute("data-premultiplied-alpha"))
                 config.premultipliedAlpha = widget.getAttribute("data-premultiplied-alpha") === "true";
+            if (widget.getAttribute("data-debug"))
+                config.debug = widget.getAttribute("data-debug") === "true";
             new spine.SpineWidget(widget, config);
         };
         SpineWidget.ready = function () {
@@ -6431,6 +6446,7 @@ var spine;
             this.fitToCanvas = true;
             this.backgroundColor = "#555555";
             this.premultipliedAlpha = false;
+            this.debug = false;
         }
         return SpineWidgetConfig;
     }());

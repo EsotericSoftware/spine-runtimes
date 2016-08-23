@@ -99,6 +99,7 @@ To specify the configuration of a Spine Widget via HTML, you can use these HTML 
   * `data-fit-to-canvas`: optional, whether to fit the animation to the canvas size or not. Defaults to `true` if omitted, in which case `data-scale`, `data-x` and `data-y` are irrelevant. This setting calculates the setup pose bounding box using the specified skin to center and scale the animation on the canvas.
   * `data-background-color`: optional, the background color to use. Defaults to `#000000` if omitted.
   * `data-premultiplied-alpha`: optional, whether the atlas pages use premultiplied alpha or not. Defaults to `false` if omitted.
+  * `data-debug`: optional, whether to show debug information such as bones, attachments, etc. Defaults to `false` if omitted. 
 
 You can specify these as attribuets on the HTML element like this:
 
@@ -152,6 +153,7 @@ The configuration object has the following fields:
   * `fitToCanvas`: optional, whether to fit the animation to the canvas size or not. Defaults to `true` if omitted, in which case `data-scale`, `data-x` and `data-y` are irrelevant. This setting calculates the setup pose bounding box using the specified skin to center and scale the animation on the canvas.
   * `backgroundColor`: optional, the background color to use. Defaults to `#000000` if omitted.
   * `premultipliedAlpha`: optional, whether the atlas pages use premultiplied alpha or not. Defaults to `false` if omitted.
+  * `debug`: optional, whether to show debug information such as bones, attachments, etc. Defaults to `false` if omitted.
   * `success`: optional, a callback taking a `SpineWidget` called when the animation has been loaded successfully
   * `error`: optional, a callback taking a `SpineWidget` and an error string called when the animation couldn't be loaded
 
@@ -160,3 +162,5 @@ an element via JavaScript on demand.
 
 The resulting `SpineWidget` has various fields that let you modify the animation programmatically. Most notably, the `skeleton` and `state` fields
 let you modify all aspects of your animation as you wish. See the [example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-ts/widget/example/index.html#L21).
+
+You can also modify what debug information is shown by accessing `SpineWidget.debugRenderer` and set the various `drawXXX` fields to `true` or `false`.
