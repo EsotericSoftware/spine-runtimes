@@ -486,6 +486,8 @@ declare module spine {
         intersectsSegment(x1: number, y1: number, x2: number, y2: number): BoundingBoxAttachment;
         intersectsSegmentPolygon(polygon: ArrayLike<number>, x1: number, y1: number, x2: number, y2: number): boolean;
         getPolygon(boundingBox: BoundingBoxAttachment): ArrayLike<number>;
+        getWidth(): number;
+        getHeight(): number;
     }
 }
 declare module spine {
@@ -721,6 +723,7 @@ declare module spine {
         static sinDeg(degrees: number): number;
         static signum(value: number): number;
         static toInt(x: number): number;
+        static cbrt(x: number): number;
     }
     class Utils {
         static SUPPORTS_TYPED_ARRAYS: boolean;
@@ -747,6 +750,8 @@ declare module spine {
         y: number;
         constructor(x?: number, y?: number);
         set(x: number, y: number): Vector2;
+        length(): number;
+        normalize(): this;
     }
 }
 declare module spine {
@@ -783,6 +788,7 @@ declare module spine {
 }
 declare module spine {
     class BoundingBoxAttachment extends VertexAttachment {
+        color: Color;
         constructor(name: string);
     }
 }
@@ -811,6 +817,7 @@ declare module spine {
         lengths: Array<number>;
         closed: boolean;
         constantSpeed: boolean;
+        color: Color;
         constructor(name: string);
     }
 }

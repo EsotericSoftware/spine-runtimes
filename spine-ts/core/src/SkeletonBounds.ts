@@ -188,6 +188,14 @@ module spine {
 			let index = this.boundingBoxes.indexOf(boundingBox);
 			return index == -1 ? null : this.polygons[index];
 		}
+
+		getWidth () {
+			return this.maxX - this.minX;
+		}
+
+		getHeight () {
+			return this.maxY - this.minY;
+		}
 	}
 
 }

@@ -273,6 +273,8 @@ module spine {
 					let box = this.attachmentLoader.newBoundingBoxAttachment(skin, name);
 					if (box == null) return null;
 					this.readVertices(map, box, map.vertexCount << 1);
+					let color: string = this.getValue(map, "color", null);
+					if (color != null) box.color.setFromString(color);
 					return box;
 				}
 				case "mesh":
@@ -314,6 +316,9 @@ module spine {
 					for (let i = 0; i < map.lengths.length; i++)
 						lengths[i++] = map.lengths[i] * scale;
 					path.lengths = lengths;
+
+					let color: string = this.getValue(map, "color", null);
+					if (color != null) path.color.setFromString(color);
 					return path;
 				}
 			}

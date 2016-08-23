@@ -2519,6 +2519,12 @@ var spine;
             var index = this.boundingBoxes.indexOf(boundingBox);
             return index == -1 ? null : this.polygons[index];
         };
+        SkeletonBounds.prototype.getWidth = function () {
+            return this.maxX - this.minX;
+        };
+        SkeletonBounds.prototype.getHeight = function () {
+            return this.maxY - this.minY;
+        };
         return SkeletonBounds;
     }());
     spine.SkeletonBounds = SkeletonBounds;
@@ -2873,6 +2879,9 @@ var spine;
                     if (box == null)
                         return null;
                     this.readVertices(map, box, map.vertexCount << 1);
+                    var color = this.getValue(map, "color", null);
+                    if (color != null)
+                        box.color.setFromString(color);
                     return box;
                 }
                 case "mesh":
@@ -2911,6 +2920,9 @@ var spine;
                     for (var i = 0; i < map.lengths.length; i++)
                         lengths[i++] = map.lengths[i] * scale;
                     path.lengths = lengths;
+                    var color = this.getValue(map, "color", null);
+                    if (color != null)
+                        path.color.setFromString(color);
                     return path;
                 }
             }
@@ -3849,6 +3861,10 @@ var spine;
         MathUtils.toInt = function (x) {
             return x > 0 ? Math.floor(x) : Math.ceil(x);
         };
+        MathUtils.cbrt = function (x) {
+            var y = Math.pow(Math.abs(x), 1 / 3);
+            return x < 0 ? -y : y;
+        };
         MathUtils.PI = 3.1415927;
         MathUtils.PI2 = MathUtils.PI * 2;
         MathUtils.radiansToDegrees = 180 / MathUtils.PI;
@@ -3945,6 +3961,19 @@ var spine;
         Vector2.prototype.set = function (x, y) {
             this.x = x;
             this.y = y;
+            return this;
+        };
+        Vector2.prototype.length = function () {
+            var x = this.x;
+            var y = this.y;
+            return Math.sqrt(x * x + y * y);
+        };
+        Vector2.prototype.normalize = function () {
+            var len = this.length();
+            if (len != 0) {
+                this.x /= len;
+                this.y /= len;
+            }
             return this;
         };
         return Vector2;
@@ -4055,6 +4084,7 @@ var spine;
         __extends(BoundingBoxAttachment, _super);
         function BoundingBoxAttachment(name) {
             _super.call(this, name);
+            this.color = new spine.Color(1, 1, 1, 1);
         }
         return BoundingBoxAttachment;
     }(spine.VertexAttachment));
@@ -4198,6 +4228,7 @@ var spine;
             _super.call(this, name);
             this.closed = false;
             this.constantSpeed = false;
+            this.color = new spine.Color(1, 1, 1, 1);
         }
         return PathAttachment;
     }(spine.VertexAttachment));
@@ -4751,7 +4782,7 @@ var spine;
                 this.indicesLength = indices.length;
             };
             Mesh.prototype.draw = function (shader, primitiveType) {
-                this.drawWithOffset(shader, primitiveType, 0, this.indicesLength > 0 ? this.indicesLength : this.verticesLength);
+                this.drawWithOffset(shader, primitiveType, 0, this.indicesLength > 0 ? this.indicesLength : this.verticesLength / this.elementsPerVertex);
             };
             Mesh.prototype.drawWithOffset = function (shader, primitiveType, offset, count) {
                 var gl = this.gl;
@@ -5091,6 +5122,489 @@ var spine;
             return Shader;
         }());
         webgl.Shader = Shader;
+    })(webgl = spine.webgl || (spine.webgl = {}));
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var webgl;
+    (function (webgl) {
+        var ShapeRenderer = (function () {
+            function ShapeRenderer(gl, maxVertices) {
+                if (maxVertices === void 0) { maxVertices = 10920; }
+                this.isDrawing = false;
+                this.shapeType = ShapeType.Filled;
+                this.color = new spine.Color(1, 1, 1, 1);
+                this.vertexIndex = 0;
+                this.tmp = new spine.Vector2();
+                if (maxVertices > 10920)
+                    throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
+                this.gl = gl;
+                this.mesh = new webgl.Mesh(gl, [new webgl.Position2Attribute(), new webgl.ColorAttribute()], maxVertices, 0);
+            }
+            ShapeRenderer.prototype.begin = function (shader) {
+                if (this.isDrawing)
+                    throw new Error("ShapeRenderer.begin() has already been called");
+                this.shader = shader;
+                this.vertexIndex = 0;
+                this.isDrawing = true;
+            };
+            ShapeRenderer.prototype.setColor = function (color) {
+                this.color.setFromColor(color);
+            };
+            ShapeRenderer.prototype.setColorWith = function (r, g, b, a) {
+                this.color.set(r, g, b, a);
+            };
+            ShapeRenderer.prototype.point = function (x, y, color) {
+                if (color === void 0) { color = null; }
+                this.check(ShapeType.Point, 1);
+                if (color === null)
+                    color = this.color;
+                this.vertex(x, y, color);
+            };
+            ShapeRenderer.prototype.line = function (x, y, x2, y2, color, color2) {
+                if (color === void 0) { color = null; }
+                if (color2 === void 0) { color2 = null; }
+                this.check(ShapeType.Line, 2);
+                var vertices = this.mesh.getVertices();
+                var idx = this.vertexIndex;
+                if (color === null)
+                    color = this.color;
+                if (color2 === null)
+                    color2 = this.color;
+                this.vertex(x, y, color);
+                this.vertex(x2, y2, color2);
+            };
+            ShapeRenderer.prototype.triangle = function (filled, x, y, x2, y2, x3, y3, color, color2, color3) {
+                if (color === void 0) { color = null; }
+                if (color2 === void 0) { color2 = null; }
+                if (color3 === void 0) { color3 = null; }
+                this.check(filled ? ShapeType.Filled : ShapeType.Line, 3);
+                var vertices = this.mesh.getVertices();
+                var idx = this.vertexIndex;
+                if (color === null)
+                    color = this.color;
+                if (color2 === null)
+                    color2 = this.color;
+                if (color3 === null)
+                    color3 = this.color;
+                if (filled) {
+                    this.vertex(x, y, color);
+                    this.vertex(x2, y2, color2);
+                    this.vertex(x3, y3, color3);
+                }
+                else {
+                    this.vertex(x, y, color);
+                    this.vertex(x2, y2, color2);
+                    this.vertex(x2, y2, color);
+                    this.vertex(x3, y3, color2);
+                    this.vertex(x3, y3, color);
+                    this.vertex(x, y, color2);
+                }
+            };
+            ShapeRenderer.prototype.quad = function (filled, x, y, x2, y2, x3, y3, x4, y4, color, color2, color3, color4) {
+                if (color === void 0) { color = null; }
+                if (color2 === void 0) { color2 = null; }
+                if (color3 === void 0) { color3 = null; }
+                if (color4 === void 0) { color4 = null; }
+                this.check(filled ? ShapeType.Filled : ShapeType.Line, 3);
+                var vertices = this.mesh.getVertices();
+                var idx = this.vertexIndex;
+                if (color === null)
+                    color = this.color;
+                if (color2 === null)
+                    color2 = this.color;
+                if (color3 === null)
+                    color3 = this.color;
+                if (color4 === null)
+                    color4 = this.color;
+                if (filled) {
+                    this.vertex(x, y, color);
+                    this.vertex(x2, y2, color2);
+                    this.vertex(x3, y3, color3);
+                    this.vertex(x3, y3, color3);
+                    this.vertex(x4, y4, color4);
+                    this.vertex(x, y, color);
+                }
+                else {
+                    this.vertex(x, y, color);
+                    this.vertex(x2, y2, color2);
+                    this.vertex(x2, y2, color2);
+                    this.vertex(x3, y3, color3);
+                    this.vertex(x3, y3, color3);
+                    this.vertex(x4, y4, color4);
+                    this.vertex(x4, y4, color4);
+                    this.vertex(x, y, color);
+                }
+            };
+            ShapeRenderer.prototype.rect = function (filled, x, y, width, height, color) {
+                if (color === void 0) { color = null; }
+                this.quad(filled, x, y, x + width, y, x + width, y + height, x, y + height, color, color, color, color);
+            };
+            ShapeRenderer.prototype.rectLine = function (filled, x1, y1, x2, y2, width, color) {
+                if (color === void 0) { color = null; }
+                this.check(filled ? ShapeType.Filled : ShapeType.Line, 8);
+                if (color === null)
+                    color = this.color;
+                var t = this.tmp.set(y2 - y1, x1 - x2);
+                t.normalize();
+                width *= 0.5;
+                var tx = t.x * width;
+                var ty = t.y * width;
+                if (!filled) {
+                    this.vertex(x1 + tx, y1 + ty, color);
+                    this.vertex(x1 - tx, y1 - ty, color);
+                    this.vertex(x2 + tx, y2 + ty, color);
+                    this.vertex(x2 - tx, y2 - ty, color);
+                    this.vertex(x2 + tx, y2 + ty, color);
+                    this.vertex(x1 + tx, y1 + ty, color);
+                    this.vertex(x2 - tx, y2 - ty, color);
+                    this.vertex(x1 - tx, y1 - ty, color);
+                }
+                else {
+                    this.vertex(x1 + tx, y1 + ty, color);
+                    this.vertex(x1 - tx, y1 - ty, color);
+                    this.vertex(x2 + tx, y2 + ty, color);
+                    this.vertex(x2 - tx, y2 - ty, color);
+                    this.vertex(x2 + tx, y2 + ty, color);
+                    this.vertex(x1 - tx, y1 - ty, color);
+                }
+            };
+            ShapeRenderer.prototype.x = function (x, y, size) {
+                this.line(x - size, y - size, x + size, y + size);
+                this.line(x - size, y + size, x + size, y - size);
+            };
+            ShapeRenderer.prototype.polygon = function (polygonVertices, offset, count, color) {
+                if (color === void 0) { color = null; }
+                if (count < 3)
+                    throw new Error("Polygon must contain at least 3 vertices");
+                this.check(ShapeType.Line, count * 2);
+                if (color === null)
+                    color = this.color;
+                var vertices = this.mesh.getVertices();
+                var idx = this.vertexIndex;
+                offset <<= 1;
+                count <<= 1;
+                var firstX = polygonVertices[offset];
+                var firstY = polygonVertices[offset + 1];
+                var last = offset + count;
+                for (var i = offset, n = offset + count - 2; i < n; i += 2) {
+                    var x1 = polygonVertices[i];
+                    var y1 = polygonVertices[i + 1];
+                    var x2 = 0;
+                    var y2 = 0;
+                    if (i + 2 >= last) {
+                        x2 = firstX;
+                        y2 = firstY;
+                    }
+                    else {
+                        x2 = polygonVertices[i + 2];
+                        y2 = polygonVertices[i + 3];
+                    }
+                    this.vertex(x1, y1, color);
+                    this.vertex(x2, y2, color);
+                }
+            };
+            ShapeRenderer.prototype.circle = function (filled, x, y, radius, segments, color) {
+                if (color === void 0) { color = null; }
+                if (segments === 0)
+                    segments = Math.max(1, (6 * spine.MathUtils.cbrt(radius)) | 0);
+                if (segments <= 0)
+                    throw new Error("segments must be > 0.");
+                if (color === null)
+                    color = this.color;
+                var angle = 2 * spine.MathUtils.PI / segments;
+                var cos = Math.cos(angle);
+                var sin = Math.sin(angle);
+                var cx = radius, cy = 0;
+                if (!filled) {
+                    this.check(ShapeType.Line, segments * 2 + 2);
+                    for (var i = 0; i < segments; i++) {
+                        this.vertex(x + cx, y + cy, color);
+                        var temp_1 = cx;
+                        cx = cos * cx - sin * cy;
+                        cy = sin * temp_1 + cos * cy;
+                        this.vertex(x + cx, y + cy, color);
+                    }
+                    this.vertex(x + cx, y + cy, color);
+                }
+                else {
+                    this.check(ShapeType.Filled, segments * 3 + 3);
+                    segments--;
+                    for (var i = 0; i < segments; i++) {
+                        this.vertex(x, y, color);
+                        this.vertex(x + cx, y + cy, color);
+                        var temp_2 = cx;
+                        cx = cos * cx - sin * cy;
+                        cy = sin * temp_2 + cos * cy;
+                        this.vertex(x + cx, y + cy, color);
+                    }
+                    this.vertex(x, y, color);
+                    this.vertex(x + cx, y + cy, color);
+                }
+                var temp = cx;
+                cx = radius;
+                cy = 0;
+                this.vertex(x + cx, y + cy, color);
+            };
+            ShapeRenderer.prototype.curve = function (x1, y1, cx1, cy1, cx2, cy2, x2, y2, segments, color) {
+                if (color === void 0) { color = null; }
+                this.check(ShapeType.Line, segments * 2 + 2);
+                if (color === null)
+                    color = this.color;
+                var subdiv_step = 1 / segments;
+                var subdiv_step2 = subdiv_step * subdiv_step;
+                var subdiv_step3 = subdiv_step * subdiv_step * subdiv_step;
+                var pre1 = 3 * subdiv_step;
+                var pre2 = 3 * subdiv_step2;
+                var pre4 = 6 * subdiv_step2;
+                var pre5 = 6 * subdiv_step3;
+                var tmp1x = x1 - cx1 * 2 + cx2;
+                var tmp1y = y1 - cy1 * 2 + cy2;
+                var tmp2x = (cx1 - cx2) * 3 - x1 + x2;
+                var tmp2y = (cy1 - cy2) * 3 - y1 + y2;
+                var fx = x1;
+                var fy = y1;
+                var dfx = (cx1 - x1) * pre1 + tmp1x * pre2 + tmp2x * subdiv_step3;
+                var dfy = (cy1 - y1) * pre1 + tmp1y * pre2 + tmp2y * subdiv_step3;
+                var ddfx = tmp1x * pre4 + tmp2x * pre5;
+                var ddfy = tmp1y * pre4 + tmp2y * pre5;
+                var dddfx = tmp2x * pre5;
+                var dddfy = tmp2y * pre5;
+                while (segments-- > 0) {
+                    this.vertex(fx, fy, color);
+                    fx += dfx;
+                    fy += dfy;
+                    dfx += ddfx;
+                    dfy += ddfy;
+                    ddfx += dddfx;
+                    ddfy += dddfy;
+                    this.vertex(fx, fy, color);
+                }
+                this.vertex(fx, fy, color);
+                this.vertex(x2, y2, color);
+            };
+            ShapeRenderer.prototype.vertex = function (x, y, color) {
+                var idx = this.vertexIndex;
+                var vertices = this.mesh.getVertices();
+                vertices[idx++] = x;
+                vertices[idx++] = y;
+                vertices[idx++] = color.r;
+                vertices[idx++] = color.g;
+                vertices[idx++] = color.b;
+                vertices[idx++] = color.a;
+                this.vertexIndex = idx;
+            };
+            ShapeRenderer.prototype.end = function () {
+                if (!this.isDrawing)
+                    throw new Error("ShapeRenderer.begin() has not been called");
+                this.flush();
+                this.isDrawing = false;
+            };
+            ShapeRenderer.prototype.flush = function () {
+                if (this.vertexIndex == 0)
+                    return;
+                this.mesh.setVerticesLength(this.vertexIndex);
+                this.mesh.draw(this.shader, this.shapeType);
+                this.vertexIndex = 0;
+            };
+            ShapeRenderer.prototype.check = function (shapeType, numVertices) {
+                if (!this.isDrawing)
+                    throw new Error("ShapeRenderer.begin() has not been called");
+                if (this.shapeType == shapeType) {
+                    if (this.mesh.maxVertices() - this.mesh.numVertices() < numVertices)
+                        this.flush();
+                    else
+                        return;
+                }
+                else {
+                    this.flush();
+                    this.shapeType = shapeType;
+                }
+            };
+            ShapeRenderer.prototype.dispose = function () {
+                this.mesh.dispose();
+            };
+            return ShapeRenderer;
+        }());
+        webgl.ShapeRenderer = ShapeRenderer;
+        (function (ShapeType) {
+            ShapeType[ShapeType["Point"] = WebGLRenderingContext.POINTS] = "Point";
+            ShapeType[ShapeType["Line"] = WebGLRenderingContext.LINES] = "Line";
+            ShapeType[ShapeType["Filled"] = WebGLRenderingContext.TRIANGLES] = "Filled";
+        })(webgl.ShapeType || (webgl.ShapeType = {}));
+        var ShapeType = webgl.ShapeType;
+    })(webgl = spine.webgl || (spine.webgl = {}));
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
+    var webgl;
+    (function (webgl) {
+        var SkeletonDebugRenderer = (function () {
+            function SkeletonDebugRenderer(gl) {
+                this.boneLineColor = new spine.Color(1, 0, 0, 1);
+                this.boneOriginColor = new spine.Color(0, 1, 0, 1);
+                this.attachmentLineColor = new spine.Color(0, 0, 1, 0.5);
+                this.triangleLineColor = new spine.Color(1, 0.64, 0, 0.5);
+                this.aabbColor = new spine.Color(0, 1, 0, 0.5);
+                this.drawBones = true;
+                this.drawRegionAttachments = true;
+                this.drawBoundingBoxes = true;
+                this.drawMeshHull = true;
+                this.drawMeshTriangles = true;
+                this.drawPaths = true;
+                this.premultipliedAlpha = false;
+                this.scale = 1;
+                this.boneWidth = 2;
+                this.bounds = new spine.SkeletonBounds();
+                this.temp = new Array();
+                this.gl = gl;
+                this.shapes = new webgl.ShapeRenderer(gl);
+            }
+            SkeletonDebugRenderer.prototype.draw = function (shader, skeleton) {
+                var skeletonX = skeleton.x;
+                var skeletonY = skeleton.y;
+                var gl = this.gl;
+                gl.enable(gl.BLEND);
+                var srcFunc = this.premultipliedAlpha ? gl.ONE : gl.SRC_ALPHA;
+                gl.blendFunc(srcFunc, gl.ONE_MINUS_SRC_ALPHA);
+                var shapes = this.shapes;
+                var bones = skeleton.bones;
+                if (this.drawBones) {
+                    shapes.setColor(this.boneLineColor);
+                    shapes.begin(shader);
+                    for (var i = 0, n = bones.length; i < n; i++) {
+                        var bone = bones[i];
+                        if (bone.parent == null)
+                            continue;
+                        var x = skeletonX + bone.data.length * bone.a + bone.worldX;
+                        var y = skeletonY + bone.data.length * bone.c + bone.worldY;
+                        shapes.rectLine(true, skeletonX + bone.worldX, skeletonY + bone.worldY, x, y, this.boneWidth * this.scale);
+                    }
+                    shapes.end();
+                    shapes.begin(shader);
+                    shapes.x(skeletonX, skeletonY, 4 * this.scale);
+                }
+                else
+                    shapes.begin(shader);
+                if (this.drawRegionAttachments) {
+                    shapes.setColor(this.attachmentLineColor);
+                    var slots = skeleton.slots;
+                    for (var i = 0, n = slots.length; i < n; i++) {
+                        var slot = slots[i];
+                        var attachment = slot.getAttachment();
+                        if (attachment instanceof spine.RegionAttachment) {
+                            var regionAttachment = attachment;
+                            var vertices = regionAttachment.updateWorldVertices(slot, false);
+                            shapes.line(vertices[spine.RegionAttachment.X1], vertices[spine.RegionAttachment.Y1], vertices[spine.RegionAttachment.X2], vertices[spine.RegionAttachment.Y2]);
+                            shapes.line(vertices[spine.RegionAttachment.X2], vertices[spine.RegionAttachment.Y2], vertices[spine.RegionAttachment.X3], vertices[spine.RegionAttachment.Y3]);
+                            shapes.line(vertices[spine.RegionAttachment.X3], vertices[spine.RegionAttachment.Y3], vertices[spine.RegionAttachment.X4], vertices[spine.RegionAttachment.Y4]);
+                            shapes.line(vertices[spine.RegionAttachment.X4], vertices[spine.RegionAttachment.Y4], vertices[spine.RegionAttachment.X1], vertices[spine.RegionAttachment.Y1]);
+                        }
+                    }
+                }
+                if (this.drawMeshHull || this.drawMeshTriangles) {
+                    var slots = skeleton.slots;
+                    for (var i = 0, n = slots.length; i < n; i++) {
+                        var slot = slots[i];
+                        var attachment = slot.getAttachment();
+                        if (!(attachment instanceof spine.MeshAttachment))
+                            continue;
+                        var mesh = attachment;
+                        mesh.updateWorldVertices(slot, false);
+                        var vertices = mesh.worldVertices;
+                        var triangles = mesh.triangles;
+                        var hullLength = mesh.hullLength;
+                        if (this.drawMeshTriangles) {
+                            shapes.setColor(this.triangleLineColor);
+                            for (var ii = 0, nn = triangles.length; ii < nn; ii += 3) {
+                                var v1 = triangles[ii] * 8, v2 = triangles[ii + 1] * 8, v3 = triangles[ii + 2] * 8;
+                                shapes.triangle(false, vertices[v1], vertices[v1 + 1], vertices[v2], vertices[v2 + 1], vertices[v3], vertices[v3 + 1]);
+                            }
+                        }
+                        if (this.drawMeshHull && hullLength > 0) {
+                            shapes.setColor(this.attachmentLineColor);
+                            hullLength = (hullLength >> 1) * 8;
+                            var lastX = vertices[hullLength - 8], lastY = vertices[hullLength - 7];
+                            for (var ii = 0, nn = hullLength; ii < nn; ii += 8) {
+                                var x = vertices[ii], y = vertices[ii + 1];
+                                shapes.line(x, y, lastX, lastY);
+                                lastX = x;
+                                lastY = y;
+                            }
+                        }
+                    }
+                }
+                if (this.drawBoundingBoxes) {
+                    var bounds = this.bounds;
+                    bounds.update(skeleton, true);
+                    shapes.setColor(this.aabbColor);
+                    shapes.rect(false, bounds.minX, bounds.minY, bounds.getWidth(), bounds.getHeight());
+                    var polygons = bounds.polygons;
+                    var boxes = bounds.boundingBoxes;
+                    for (var i = 0, n = polygons.length; i < n; i++) {
+                        var polygon = polygons[i];
+                        shapes.setColor(boxes[i].color);
+                        shapes.polygon(polygon, 0, polygon.length);
+                    }
+                }
+                if (this.drawPaths) {
+                    var slots = skeleton.slots;
+                    for (var i = 0, n = slots.length; i < n; i++) {
+                        var slot = slots[i];
+                        var attachment = slot.getAttachment();
+                        if (!(attachment instanceof spine.PathAttachment))
+                            continue;
+                        var path = attachment;
+                        var nn = path.worldVerticesLength;
+                        var world = this.temp = spine.Utils.setArraySize(this.temp, nn, 0);
+                        path.computeWorldVertices(slot, world);
+                        var color = path.color;
+                        var x1 = world[2], y1 = world[3], x2 = 0, y2 = 0;
+                        if (path.closed) {
+                            shapes.setColor(color);
+                            var cx1 = world[0], cy1 = world[1], cx2 = world[nn - 2], cy2 = world[nn - 1];
+                            x2 = world[nn - 4];
+                            y2 = world[nn - 3];
+                            shapes.curve(x1, y1, cx1, cy1, cx2, cy2, x2, y2, 32);
+                            shapes.setColor(SkeletonDebugRenderer.LIGHT_GRAY);
+                            shapes.line(x1, y1, cx1, cy1);
+                            shapes.line(x2, y2, cx2, cy2);
+                        }
+                        nn -= 4;
+                        for (var ii = 4; ii < nn; ii += 6) {
+                            var cx1 = world[ii], cy1 = world[ii + 1], cx2 = world[ii + 2], cy2 = world[ii + 3];
+                            x2 = world[ii + 4];
+                            y2 = world[ii + 5];
+                            shapes.setColor(color);
+                            shapes.curve(x1, y1, cx1, cy1, cx2, cy2, x2, y2, 32);
+                            shapes.setColor(SkeletonDebugRenderer.LIGHT_GRAY);
+                            shapes.line(x1, y1, cx1, cy1);
+                            shapes.line(x2, y2, cx2, cy2);
+                            x1 = x2;
+                            y1 = y2;
+                        }
+                    }
+                }
+                shapes.end();
+                shapes.begin(shader);
+                if (this.drawBones) {
+                    shapes.setColor(this.boneOriginColor);
+                    for (var i = 0, n = bones.length; i < n; i++) {
+                        var bone = bones[i];
+                        shapes.setColor(SkeletonDebugRenderer.GREEN);
+                        shapes.circle(true, skeletonX + bone.worldX, skeletonY + bone.worldY, 3 * this.scale, 8);
+                    }
+                }
+                shapes.end();
+            };
+            SkeletonDebugRenderer.prototype.dispose = function () {
+                this.shapes.dispose();
+            };
+            SkeletonDebugRenderer.LIGHT_GRAY = new spine.Color(192 / 255, 192 / 255, 192 / 255, 1);
+            SkeletonDebugRenderer.GREEN = new spine.Color(0, 1, 0, 1);
+            return SkeletonDebugRenderer;
+        }());
+        webgl.SkeletonDebugRenderer = SkeletonDebugRenderer;
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
 var spine;

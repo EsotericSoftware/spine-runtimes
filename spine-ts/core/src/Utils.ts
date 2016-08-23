@@ -118,6 +118,11 @@ module spine {
 		static toInt (x: number) {
 			return x > 0 ? Math.floor(x) : Math.ceil(x);
 		}
+
+		static cbrt (x: number) {
+			var y = Math.pow(Math.abs(x), 1/3);
+  			return x < 0 ? -y : y;
+		}
 	}
 
 	export class Utils {
@@ -201,6 +206,21 @@ module spine {
 		set (x: number, y: number): Vector2 {
 			this.x = x;
 			this.y = y;
+			return this;
+		}
+
+		length () {
+			let x = this.x;
+			let y = this.y;
+			return Math.sqrt(x * x + y * y);
+		}
+
+		normalize () {
+			let len = this.length();
+			if (len != 0) {
+				this.x /= len;
+				this.y /= len;
+			}
 			return this;
 		}
 	}

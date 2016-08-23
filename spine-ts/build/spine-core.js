@@ -2519,6 +2519,12 @@ var spine;
             var index = this.boundingBoxes.indexOf(boundingBox);
             return index == -1 ? null : this.polygons[index];
         };
+        SkeletonBounds.prototype.getWidth = function () {
+            return this.maxX - this.minX;
+        };
+        SkeletonBounds.prototype.getHeight = function () {
+            return this.maxY - this.minY;
+        };
         return SkeletonBounds;
     }());
     spine.SkeletonBounds = SkeletonBounds;
@@ -2873,6 +2879,9 @@ var spine;
                     if (box == null)
                         return null;
                     this.readVertices(map, box, map.vertexCount << 1);
+                    var color = this.getValue(map, "color", null);
+                    if (color != null)
+                        box.color.setFromString(color);
                     return box;
                 }
                 case "mesh":
@@ -2911,6 +2920,9 @@ var spine;
                     for (var i = 0; i < map.lengths.length; i++)
                         lengths[i++] = map.lengths[i] * scale;
                     path.lengths = lengths;
+                    var color = this.getValue(map, "color", null);
+                    if (color != null)
+                        path.color.setFromString(color);
                     return path;
                 }
             }
@@ -3849,6 +3861,10 @@ var spine;
         MathUtils.toInt = function (x) {
             return x > 0 ? Math.floor(x) : Math.ceil(x);
         };
+        MathUtils.cbrt = function (x) {
+            var y = Math.pow(Math.abs(x), 1 / 3);
+            return x < 0 ? -y : y;
+        };
         MathUtils.PI = 3.1415927;
         MathUtils.PI2 = MathUtils.PI * 2;
         MathUtils.radiansToDegrees = 180 / MathUtils.PI;
@@ -3945,6 +3961,19 @@ var spine;
         Vector2.prototype.set = function (x, y) {
             this.x = x;
             this.y = y;
+            return this;
+        };
+        Vector2.prototype.length = function () {
+            var x = this.x;
+            var y = this.y;
+            return Math.sqrt(x * x + y * y);
+        };
+        Vector2.prototype.normalize = function () {
+            var len = this.length();
+            if (len != 0) {
+                this.x /= len;
+                this.y /= len;
+            }
             return this;
         };
         return Vector2;
@@ -4055,6 +4084,7 @@ var spine;
         __extends(BoundingBoxAttachment, _super);
         function BoundingBoxAttachment(name) {
             _super.call(this, name);
+            this.color = new spine.Color(1, 1, 1, 1);
         }
         return BoundingBoxAttachment;
     }(spine.VertexAttachment));
@@ -4198,6 +4228,7 @@ var spine;
             _super.call(this, name);
             this.closed = false;
             this.constantSpeed = false;
+            this.color = new spine.Color(1, 1, 1, 1);
         }
         return PathAttachment;
     }(spine.VertexAttachment));

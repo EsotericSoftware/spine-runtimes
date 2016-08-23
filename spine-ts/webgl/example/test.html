@@ -1,0 +1,65 @@
+<html>
+<script src="../../build/spine-webgl.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<style>
+	* { margin: 0; padding: 0; }
+	body, html { height: 100% }
+	canvas { position: absolute; width: 100% ;height: 100%; }
+</style>
+<body>
+<canvas id="canvas"></canvas>
+<script>
+
+var canvas, gl, shader, renderer, mvp, lastFrameTime = Date.now() / 1000;
+
+function init() {
+	canvas = document.getElementById("canvas");
+	canvas.width = window.innerWidth; canvas.height = window.innerHeight;	
+	gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });
+
+	shader = spine.webgl.Shader.newColored(gl);
+	renderer = new spine.webgl.ShapeRenderer(gl);
+	mvp = new spine.webgl.Matrix4();
+
+	requestAnimationFrame(render);
+}
+
+function render() {
+	var now = Date.now() / 1000;
+	var delta = now - lastFrameTime;
+	lastFrameTime = now;
+
+	resize();
+	gl.clearColor(0.2, 0.2, 0.2, 1);
+	gl.clear(gl.COLOR_BUFFER_BIT);
+
+	shader.bind();
+	shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, mvp.values);
+
+	renderer.begin(shader);
+	renderer.setColorWith(1, 0, 0, 1);
+	// renderer.line(0, 0, canvas.width, canvas.height);
+	renderer.triangle(true, 100, 100, 200, 100, 150, 200, new spine.Color(1, 0, 0, 1), new spine.Color(0, 1, 0, 1), new spine.Color(0, 0, 1, 1));	
+	renderer.end();
+	shader.unbind();
+
+	requestAnimationFrame(render);
+}
+
+function resize () {
+	var w = canvas.clientWidth;
+	var h = canvas.clientHeight;	
+	if (canvas.width != w || canvas.height != h) {
+		canvas.width = w;
+		canvas.height = h;
+	}
+	mvp.ortho2d(0, 0, w, h);
+	gl.viewport(0, 0, canvas.width, canvas.height);
+}
+
+(function() {
+	init();
+})();
+</script>
+</body>
+</html>

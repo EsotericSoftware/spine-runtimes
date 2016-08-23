@@ -552,6 +552,8 @@ declare module spine {
         intersectsSegment(x1: number, y1: number, x2: number, y2: number): BoundingBoxAttachment;
         intersectsSegmentPolygon(polygon: ArrayLike<number>, x1: number, y1: number, x2: number, y2: number): boolean;
         getPolygon(boundingBox: BoundingBoxAttachment): ArrayLike<number>;
+        getWidth(): number;
+        getHeight(): number;
     }
 }
 declare module spine {
@@ -747,6 +749,7 @@ declare module spine {
         static sinDeg(degrees: number): number;
         static signum(value: number): number;
         static toInt(x: number): number;
+        static cbrt(x: number): number;
     }
     class Utils {
         static SUPPORTS_TYPED_ARRAYS: boolean;
@@ -773,6 +776,8 @@ declare module spine {
         y: number;
         constructor(x?: number, y?: number);
         set(x: number, y: number): Vector2;
+        length(): number;
+        normalize(): this;
     }
 }
 declare module spine {
@@ -809,6 +814,7 @@ declare module spine {
 }
 declare module spine {
     class BoundingBoxAttachment extends VertexAttachment {
+        color: Color;
         constructor(name: string);
     }
 }
@@ -837,6 +843,7 @@ declare module spine {
         lengths: Array<number>;
         closed: boolean;
         constantSpeed: boolean;
+        color: Color;
         constructor(name: string);
     }
 }
@@ -1113,6 +1120,69 @@ declare module spine.webgl {
         dispose(): void;
         static newColoredTextured(gl: WebGLRenderingContext): Shader;
         static newColored(gl: WebGLRenderingContext): Shader;
+    }
+}
+declare module spine.webgl {
+    class ShapeRenderer implements Disposable {
+        private gl;
+        private isDrawing;
+        private mesh;
+        private shapeType;
+        private color;
+        private shader;
+        private vertexIndex;
+        private tmp;
+        constructor(gl: WebGLRenderingContext, maxVertices?: number);
+        begin(shader: Shader): void;
+        setColor(color: Color): void;
+        setColorWith(r: number, g: number, b: number, a: number): void;
+        point(x: number, y: number, color?: Color): void;
+        line(x: number, y: number, x2: number, y2: number, color?: Color, color2?: Color): void;
+        triangle(filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, color?: Color, color2?: Color, color3?: Color): void;
+        quad(filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number, color?: Color, color2?: Color, color3?: Color, color4?: Color): void;
+        rect(filled: boolean, x: number, y: number, width: number, height: number, color?: Color): void;
+        rectLine(filled: boolean, x1: number, y1: number, x2: number, y2: number, width: number, color?: Color): void;
+        x(x: number, y: number, size: number): void;
+        polygon(polygonVertices: ArrayLike<number>, offset: number, count: number, color?: Color): void;
+        circle(filled: boolean, x: number, y: number, radius: number, segments: number, color?: Color): void;
+        curve(x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number, segments: number, color?: Color): void;
+        private vertex(x, y, color);
+        end(): void;
+        private flush();
+        private check(shapeType, numVertices);
+        dispose(): void;
+    }
+    enum ShapeType {
+        Point,
+        Line,
+        Filled,
+    }
+}
+declare module spine.webgl {
+    class SkeletonDebugRenderer implements Disposable {
+        boneLineColor: Color;
+        boneOriginColor: Color;
+        attachmentLineColor: Color;
+        triangleLineColor: Color;
+        aabbColor: Color;
+        drawBones: boolean;
+        drawRegionAttachments: boolean;
+        drawBoundingBoxes: boolean;
+        drawMeshHull: boolean;
+        drawMeshTriangles: boolean;
+        drawPaths: boolean;
+        premultipliedAlpha: boolean;
+        scale: number;
+        boneWidth: number;
+        private gl;
+        private shapes;
+        private bounds;
+        private temp;
+        private static LIGHT_GRAY;
+        private static GREEN;
+        constructor(gl: WebGLRenderingContext);
+        draw(shader: Shader, skeleton: Skeleton): void;
+        dispose(): void;
     }
 }
 declare module spine.webgl {
