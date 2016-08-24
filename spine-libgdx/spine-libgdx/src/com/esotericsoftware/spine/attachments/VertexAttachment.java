@@ -58,15 +58,13 @@ public class VertexAttachment extends Attachment {
 	protected void computeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset) {
 		count += offset;
 		Skeleton skeleton = slot.getSkeleton();
-		float x = skeleton.getX(), y = skeleton.getY();
 		FloatArray deformArray = slot.getAttachmentVertices();
 		float[] vertices = this.vertices;
 		int[] bones = this.bones;
 		if (bones == null) {
 			if (deformArray.size > 0) vertices = deformArray.items;
 			Bone bone = slot.getBone();
-			x += bone.getWorldX();
-			y += bone.getWorldY();
+			float x = bone.getWorldX(), y = bone.getWorldY();
 			float a = bone.getA(), b = bone.getB(), c = bone.getC(), d = bone.getD();
 			for (int v = start, w = offset; w < count; v += 2, w += 2) {
 				float vx = vertices[v], vy = vertices[v + 1];
@@ -84,7 +82,7 @@ public class VertexAttachment extends Attachment {
 		Object[] skeletonBones = skeleton.getBones().items;
 		if (deformArray.size == 0) {
 			for (int w = offset, b = skip * 3; w < count; w += 2) {
-				float wx = x, wy = y;
+				float wx = 0, wy = 0;
 				int n = bones[v++];
 				n += v;
 				for (; v < n; v++, b += 3) {
@@ -99,7 +97,7 @@ public class VertexAttachment extends Attachment {
 		} else {
 			float[] deform = deformArray.items;
 			for (int w = offset, b = skip * 3, f = skip << 1; w < count; w += 2) {
-				float wx = x, wy = y;
+				float wx = 0, wy = 0;
 				int n = bones[v++];
 				n += v;
 				for (; v < n; v++, b += 3, f += 2) {

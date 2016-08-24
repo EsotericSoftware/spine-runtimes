@@ -110,7 +110,6 @@ public class MeshAttachment extends VertexAttachment {
 				| ((int)(skeletonColor.g * slotColor.g * meshColor.g * multiplier) << 8) //
 				| (int)(skeletonColor.r * slotColor.r * meshColor.r * multiplier));
 
-		float x = skeleton.getX(), y = skeleton.getY();
 		FloatArray deformArray = slot.getAttachmentVertices();
 		float[] vertices = this.vertices, worldVertices = this.worldVertices;
 		int[] bones = this.bones;
@@ -118,8 +117,7 @@ public class MeshAttachment extends VertexAttachment {
 			int verticesLength = vertices.length;
 			if (deformArray.size > 0) vertices = deformArray.items;
 			Bone bone = slot.getBone();
-			x += bone.getWorldX();
-			y += bone.getWorldY();
+			float x = bone.getWorldX(), y = bone.getWorldY();
 			float a = bone.getA(), b = bone.getB(), c = bone.getC(), d = bone.getD();
 			for (int v = 0, w = 0; v < verticesLength; v += 2, w += 5) {
 				float vx = vertices[v], vy = vertices[v + 1];
@@ -132,7 +130,7 @@ public class MeshAttachment extends VertexAttachment {
 		Object[] skeletonBones = skeleton.getBones().items;
 		if (deformArray.size == 0) {
 			for (int w = 0, v = 0, b = 0, n = bones.length; v < n; w += 5) {
-				float wx = x, wy = y;
+				float wx = 0, wy = 0;
 				int nn = bones[v++] + v;
 				for (; v < nn; v++, b += 3) {
 					Bone bone = (Bone)skeletonBones[bones[v]];
@@ -147,7 +145,7 @@ public class MeshAttachment extends VertexAttachment {
 		} else {
 			float[] deform = deformArray.items;
 			for (int w = 0, v = 0, b = 0, f = 0, n = bones.length; v < n; w += 5) {
-				float wx = x, wy = y;
+				float wx = 0, wy = 0;
 				int nn = bones[v++] + v;
 				for (; v < nn; v++, b += 3, f += 2) {
 					Bone bone = (Bone)skeletonBones[bones[v]];

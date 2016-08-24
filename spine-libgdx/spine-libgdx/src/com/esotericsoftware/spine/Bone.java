@@ -121,8 +121,8 @@ public class Bone implements Updatable {
 			b = lb;
 			c = lc;
 			d = ld;
-			worldX = x;
-			worldY = y;
+			worldX = x + skeleton.x;
+			worldY = y + skeleton.y;
 			return;
 		}
 

@@ -163,7 +163,7 @@ public class RegionAttachment extends Attachment {
 		float[] vertices = this.vertices;
 		float[] offset = this.offset;
 		Bone bone = slot.getBone();
-		float x = skeleton.getX() + bone.getWorldX(), y = skeleton.getY() + bone.getWorldY();
+		float x = bone.getWorldX(), y = bone.getWorldY();
 		float a = bone.getA(), b = bone.getB(), c = bone.getC(), d = bone.getD();
 		float offsetX, offsetY;
 
