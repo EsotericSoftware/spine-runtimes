@@ -283,7 +283,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				shapes.setColor(Color.CYAN);
 				shapes.line(x, 0, x, 20);
 
-				percent = entry.getMixTime() / entry.getMixDuration();
+				percent = entry.getMixDuration() == 0 ? 1 : Math.min(1, entry.getMixTime() / entry.getMixDuration());
 				x = ui.window.getRight() + (Gdx.graphics.getWidth() - ui.window.getRight()) * percent;
 				shapes.setColor(Color.RED);
 				shapes.line(x, 0, x, 20);

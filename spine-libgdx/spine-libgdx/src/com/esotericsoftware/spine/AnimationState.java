@@ -33,7 +33,6 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BooleanArray;
-import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
@@ -52,16 +51,17 @@ public class AnimationState {
 	private AnimationStateData data;
 	private final Array<TrackEntry> tracks = new Array();
 	private final Array<Event> events = new Array();
-	private final Array<AnimationStateListener> listeners = new Array();
-	private final Pool<TrackEntry> trackEntryPool = new Pool() {
+	final Array<AnimationStateListener> listeners = new Array();
+	private final EventQueue queue = new EventQueue();
+	private final IntSet propertyIDs = new IntSet();
+	boolean animationsChanged;
+	private float timeScale = 1;
+
+	final Pool<TrackEntry> trackEntryPool = new Pool() {
 		protected Object newObject () {
 			return new TrackEntry();
 		}
 	};
-	private final EventQueue queue = new EventQueue(listeners, trackEntryPool);
-	private final IntSet propertyIDs = new IntSet();
-	private boolean animationsChanged;
-	private float timeScale = 1;
 
 	/** Creates an uninitialized AnimationState. The animation state data must be set before use. */
 	public AnimationState () {
@@ -117,7 +117,6 @@ public class AnimationState {
 				if (current.mixTime >= current.mixDuration && current.mixTime > 0) {
 					current.mixingFrom = null;
 					queue.end(mixingFrom);
-					animationsChanged = true;
 				} else {
 					mixingFrom.animationLast = mixingFrom.nextAnimationLast;
 					mixingFrom.trackLast = mixingFrom.nextTrackLast;
@@ -135,7 +134,6 @@ public class AnimationState {
 	 * animation state can be applied to multiple skeletons to pose them identically. */
 	public void apply (Skeleton skeleton) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
-
 		if (animationsChanged) animationsChanged();
 
 		Array<Event> events = this.events;
@@ -180,27 +178,17 @@ public class AnimationState {
 
 		float animationLast = entry.animationLast, animationTime = entry.getAnimationTime();
 		Array<Timeline> timelines = entry.animation.timelines;
-		boolean[] timelinesFirst = entry.timelinesFirst.items;
-		float alphaFull = entry.alpha, alphaMix = entry.alpha * (1 - mix);
-		if (attachments && drawOrder) {
-			for (int i = 0, n = timelines.size; i < n; i++) {
-				Timeline timeline = timelines.get(i);
-				if (timelinesFirst[i])
-					timeline.apply(skeleton, animationLast, animationTime, events, alphaMix, true, true);
-				else
-					timeline.apply(skeleton, animationLast, animationTime, events, alphaFull, false, false);
+		boolean[] timelinesFirst = entry.timelinesFirst.items, timelinesLast = entry.timelinesLast.items;
+		float alphaFull = entry.alpha, alphaMix = alphaFull * (1 - mix);
+		for (int i = 0, n = timelines.size; i < n; i++) {
+			Timeline timeline = timelines.get(i);
+			boolean setupPose = timelinesFirst[i];
+			if (!setupPose) {
+				if (!attachments && timeline instanceof AttachmentTimeline) continue;
+				if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
 			}
-		} else {
-			for (int i = 0, n = timelines.size; i < n; i++) {
-				Timeline timeline = timelines.get(i);
-				if (timelinesFirst[i])
-					timeline.apply(skeleton, animationLast, animationTime, events, alphaMix, true, true);
-				else {
-					if (!attachments && timeline instanceof AttachmentTimeline) continue;
-					if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
-					timeline.apply(skeleton, animationLast, animationTime, events, alphaFull, false, false);
-				}
-			}
+			timeline.apply(skeleton, animationLast, animationTime, events, timelinesLast[i] ? alphaMix : alphaFull, setupPose,
+				setupPose);
 		}
 
 		queueEvents(entry, animationTime);
@@ -296,8 +284,6 @@ public class AnimationState {
 		}
 
 		queue.start(entry);
-
-		animationsChanged = true;
 	}
 
 	/** @see #setAnimation(int, Animation, boolean) */
@@ -371,8 +357,7 @@ public class AnimationState {
 		return entry;
 	}
 
-	/** Sets an empty animation for a track, discarding any queued animations, and mixes to it over the specified mix duration. The
-	 * empty animation's pose is the setup pose. */
+	/** Sets an empty animation for a track, discarding any queued animations, and mixes to it over the specified mix duration. */
 	public TrackEntry setEmptyAnimation (int trackIndex, float mixDuration) {
 		TrackEntry entry = setAnimation(trackIndex, emptyAnimation, false);
 		entry.mixDuration = mixDuration;
@@ -381,20 +366,21 @@ public class AnimationState {
 	}
 
 	/** Adds an empty animation to be played after the current or last queued animation for a track, and mixes to it over the
-	 * specified mix duration. The empty animation's pose is the setup pose.
+	 * specified mix duration.
 	 * @param delay Seconds to begin this animation after the start of the previous animation. May be <= 0 to use the animation
 	 *           duration of the previous track minus any mix duration plus the negative delay.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
 	 *         after {@link AnimationStateListener#dispose(TrackEntry)}. */
 	public TrackEntry addEmptyAnimation (int trackIndex, float mixDuration, float delay) {
+		if (delay <= 0) delay -= mixDuration;
 		TrackEntry entry = addAnimation(trackIndex, emptyAnimation, false, delay);
 		entry.mixDuration = mixDuration;
 		entry.trackEnd = mixDuration;
 		return entry;
 	}
 
-	/** Sets an empty animation for every track, discarding any queued animations, and mixes to it over the specified mix duration.
-	 * The empty animation's pose is the setup pose. */
+	/** Sets an empty animation for every track, discarding any queued animations, and mixes to it over the specified mix
+	 * duration. */
 	public void setEmptyAnimations (float mixDuration) {
 		queue.drainDisabled = true;
 		for (int i = 0, n = tracks.size; i < n; i++) {
@@ -423,15 +409,16 @@ public class AnimationState {
 		entry.attachmentThreshold = 0;
 		entry.drawOrderThreshold = 0;
 
-		entry.delay = 0;
 		entry.animationStart = 0;
 		entry.animationEnd = animation.getDuration();
 		entry.animationLast = -1;
 		entry.nextAnimationLast = -1;
+
+		entry.delay = 0;
 		entry.trackTime = 0;
-		entry.trackEnd = loop ? Integer.MAX_VALUE : entry.animationEnd;
 		entry.trackLast = -1;
 		entry.nextTrackLast = -1;
+		entry.trackEnd = loop ? Integer.MAX_VALUE : entry.animationEnd;
 		entry.timeScale = 1;
 
 		entry.alpha = 1;
@@ -451,43 +438,65 @@ public class AnimationState {
 
 	private void animationsChanged () {
 		animationsChanged = false;
-		propertyIDs.clear();
+
+		// Compute timelinesFirst.
 		int i = 0, n = tracks.size;
+		propertyIDs.clear();
 		for (; i < n; i++) {
 			TrackEntry entry = tracks.get(i);
 			if (entry == null) continue;
 			if (entry.mixingFrom != null) {
-				setTimelinesFirst(entry.mixingFrom);
-				checkTimelinesFirst(entry);
+				setTimelineUsage(entry.mixingFrom, entry.mixingFrom.timelinesFirst);
+				checkTimelineUsage(entry, entry.timelinesFirst);
 			} else
-				setTimelinesFirst(entry);
+				setTimelineUsage(entry, entry.timelinesFirst);
 			i++;
 			break;
 		}
 		for (; i < n; i++) {
 			TrackEntry entry = tracks.get(i);
 			if (entry == null) continue;
-			if (entry.mixingFrom != null) checkTimelinesFirst(entry.mixingFrom);
-			checkTimelinesFirst(entry);
+			if (entry.mixingFrom != null) checkTimelineUsage(entry.mixingFrom, entry.mixingFrom.timelinesFirst);
+			checkTimelineUsage(entry, entry.timelinesFirst);
+		}
+
+		// Compute timelinesLast. Find lowest track with mixing.
+		propertyIDs.clear();
+		for (i = n - 1; i >= 0; i--) {
+			TrackEntry entry = tracks.get(i);
+			if (entry == null) continue;
+			if (entry.mixingFrom != null) {
+				setTimelineUsage(entry, entry.timelinesLast);
+				checkTimelineUsage(entry.mixingFrom, entry.mixingFrom.timelinesLast);
+			} else
+				setTimelineUsage(entry, entry.timelinesLast);
+			i--;
+			break;
+		}
+		for (; i >= 0; i--) {
+			TrackEntry entry = tracks.get(i);
+			if (entry == null) continue;
+			checkTimelineUsage(entry, entry.timelinesLast);
+			if (entry.mixingFrom != null) checkTimelineUsage(entry.mixingFrom, entry.mixingFrom.timelinesLast);
 		}
 	}
 
-	private void setTimelinesFirst (TrackEntry entry) {
+	private void setTimelineUsage (TrackEntry entry, BooleanArray usageArray) {
 		IntSet propertyIDs = this.propertyIDs;
 		Array<Timeline> timelines = entry.animation.timelines;
 		int n = timelines.size;
-		boolean[] timelinesFirst = entry.timelinesFirst.setSize(n);
+		boolean[] usage = usageArray.setSize(n);
 		for (int i = 0; i < n; i++) {
 			propertyIDs.add(timelines.get(i).getPropertyId());
-			timelinesFirst[i] = true;
+			usage[i] = true;
 		}
 	}
 
-	private void checkTimelinesFirst (TrackEntry entry) {
+	private void checkTimelineUsage (TrackEntry entry, BooleanArray usageArray) {
 		IntSet propertyIDs = this.propertyIDs;
 		Array<Timeline> timelines = entry.animation.timelines;
 		int n = timelines.size;
-		boolean[] timelinesFirst = entry.timelinesFirst.setSize(n);
+		boolean[] timelinesFirst = usageArray.setSize(n);
 		for (int i = 0; i < n; i++)
 			timelinesFirst[i] = propertyIDs.add(timelines.get(i).getPropertyId());
 	}
@@ -564,10 +573,10 @@ public class AnimationState {
 		int trackIndex;
 		boolean loop;
 		float eventThreshold, attachmentThreshold, drawOrderThreshold;
-		float delay, trackTime, trackLast, trackEnd, animationStart, animationEnd, animationLast, timeScale;
-		float nextTrackLast, nextAnimationLast;
+		float animationStart, animationEnd, animationLast, nextAnimationLast;
+		float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale;
 		float alpha, mixTime, mixDuration;
-		final BooleanArray timelinesFirst = new BooleanArray();
+		final BooleanArray timelinesFirst = new BooleanArray(), timelinesLast = new BooleanArray();
 
 		public void reset () {
 			next = null;
@@ -575,6 +584,7 @@ public class AnimationState {
 			animation = null;
 			listener = null;
 			timelinesFirst.clear();
+			timelinesLast.clear();
 		}
 
 		public int getTrackIndex () {
@@ -786,49 +796,41 @@ public class AnimationState {
 		}
 	}
 
-	static private class EventQueue {
-		static private final int START = 0, EVENT = 1, COMPLETE = 2, INTERRUPT = 3, END = 4, DISPOSE = 5;
-
-		private final Array<AnimationStateListener> listeners;
-		private final Pool<TrackEntry> trackEntryPool;
+	class EventQueue {
 		private final Array objects = new Array();
-		private final IntArray eventTypes = new IntArray(); // If > 0 it's loop count for a complete event.
 		boolean drainDisabled;
 
-		public EventQueue (Array<AnimationStateListener> listeners, Pool<TrackEntry> trackEntryPool) {
-			this.listeners = listeners;
-			this.trackEntryPool = trackEntryPool;
-		}
-
 		public void start (TrackEntry entry) {
+			objects.add(EventType.start);
 			objects.add(entry);
-			eventTypes.add(START);
-		}
-
-		public void event (TrackEntry entry, Event event) {
-			objects.add(entry);
-			objects.add(event);
-			eventTypes.add(EVENT);
-		}
-
-		public void complete (TrackEntry entry) {
-			objects.add(entry);
-			eventTypes.add(COMPLETE);
+			animationsChanged = true;
 		}
 
 		public void interrupt (TrackEntry entry) {
+			objects.add(EventType.interrupt);
 			objects.add(entry);
-			eventTypes.add(INTERRUPT);
 		}
 
 		public void end (TrackEntry entry) {
+			objects.add(EventType.end);
 			objects.add(entry);
-			eventTypes.add(END);
+			animationsChanged = true;
 		}
 
 		public void dispose (TrackEntry entry) {
+			objects.add(EventType.dispose);
 			objects.add(entry);
-			eventTypes.add(DISPOSE);
+		}
+
+		public void complete (TrackEntry entry) {
+			objects.add(EventType.complete);
+			objects.add(entry);
+		}
+
+		public void event (TrackEntry entry, Event event) {
+			objects.add(EventType.event);
+			objects.add(entry);
+			objects.add(event);
 		}
 
 		public void drain () {
@@ -836,43 +838,43 @@ public class AnimationState {
 			drainDisabled = true;
 
 			Array objects = this.objects;
-			IntArray eventTypes = this.eventTypes;
-			Array<AnimationStateListener> listeners = this.listeners;
-			for (int e = 0, o = 0; e < eventTypes.size; e++, o++) {
-				TrackEntry entry = (TrackEntry)objects.get(o);
-				int eventType = eventTypes.get(e);
-				switch (eventType) {
-				case START:
+			Array<AnimationStateListener> listeners = AnimationState.this.listeners;
+			for (int i = 0; i < objects.size; i += 2) {
+				EventType type = (EventType)objects.get(i);
+				TrackEntry entry = (TrackEntry)objects.get(i + 1);
+				switch (type) {
+				case start:
 					if (entry.listener != null) entry.listener.end(entry);
-					for (int i = 0; i < listeners.size; i++)
-						listeners.get(i).start(entry);
+					for (int ii = 0; ii < listeners.size; ii++)
+						listeners.get(ii).start(entry);
 					break;
-				case EVENT:
-					Event event = (Event)objects.get(++o);
-					if (entry.listener != null) entry.listener.event(entry, event);
-					for (int i = 0; i < listeners.size; i++)
-						listeners.get(i).event(entry, event);
-					break;
-				case INTERRUPT:
+				case interrupt:
 					if (entry.listener != null) entry.listener.end(entry);
-					for (int i = 0; i < listeners.size; i++)
-						listeners.get(i).interrupt(entry);
+					for (int ii = 0; ii < listeners.size; ii++)
+						listeners.get(ii).interrupt(entry);
 					break;
-				case END:
+				case end:
 					if (entry.listener != null) entry.listener.end(entry);
-					for (int i = 0; i < listeners.size; i++)
-						listeners.get(i).end(entry);
+					for (int ii = 0; ii < listeners.size; ii++)
+						listeners.get(ii).end(entry);
 					// Fall through.
-				case DISPOSE:
+				case dispose:
 					if (entry.listener != null) entry.listener.end(entry);
-					for (int i = 0; i < listeners.size; i++)
-						listeners.get(i).dispose(entry);
+					for (int ii = 0; ii < listeners.size; ii++)
+						listeners.get(ii).dispose(entry);
 					trackEntryPool.free(entry);
 					break;
-				default:
+				case complete:
 					if (entry.listener != null) entry.listener.complete(entry);
-					for (int i = 0; i < listeners.size; i++)
-						listeners.get(i).complete(entry);
+					for (int ii = 0; ii < listeners.size; ii++)
+						listeners.get(ii).complete(entry);
+					break;
+				case event:
+					Event event = (Event)objects.get(i++ + 2);
+					if (entry.listener != null) entry.listener.event(entry, event);
+					for (int ii = 0; ii < listeners.size; ii++)
+						listeners.get(ii).event(entry, event);
+					break;
 				}
 			}
 			clear();
@@ -882,15 +884,18 @@ public class AnimationState {
 
 		public void clear () {
 			objects.clear();
-			eventTypes.clear();
 		}
+	}
+
+	static private enum EventType {
+		start, interrupt, end, dispose, complete, event
 	}
 
 	static public interface AnimationStateListener {
 		/** Invoked when this entry has been set as the current entry. */
 		public void start (TrackEntry entry);
 
-		/** Invoked when another entry replaces this entry as the current entry. This entry may continue being applied for
+		/** Invoked when another entry has replaced this entry as the current entry. This entry may continue being applied for
 		 * mixing. */
 		public void interrupt (TrackEntry entry);
 
@@ -921,10 +926,10 @@ public class AnimationState {
 		public void dispose (TrackEntry entry) {
 		}
 
-		public void event (TrackEntry entry, Event event) {
+		public void complete (TrackEntry entry) {
 		}
 
-		public void complete (TrackEntry entry) {
+		public void event (TrackEntry entry, Event event) {
 		}
 	}
 }
