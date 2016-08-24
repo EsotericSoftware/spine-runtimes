@@ -246,6 +246,7 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 	int i, n, ii, nn, iii, nnn;
 	int frameIndex;
 	int drawOrderCount, eventCount;
+	spAnimation* animation;
 
 	kv_init(timelines);
 
@@ -576,7 +577,11 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 
 	kv_trim(spTimeline*, timelines);
 
-	return spAnimation_createWithTimelines(name, duration, kv_size(timelines), kv_array(timelines));
+	animation = spAnimation_create(name, 0);
+	animation->duration = duration;
+	animation->timelinesCount = kv_size(timelines);
+	animation->timelines = kv_array(timelines);
+	return animation;
 }
 
 static float* _readFloatArray(_dataInput *input, int n, float scale) {
