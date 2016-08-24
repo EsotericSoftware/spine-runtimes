@@ -30,12 +30,12 @@
  *****************************************************************************/
 
 module spine.webgl {
-	export class PolygonBatcher {
+	export class PolygonBatcher implements Disposable {
 		private gl: WebGLRenderingContext;
 		private drawCalls: number;
-		private drawing = false;
+		private isDrawing = false;
 		private mesh: Mesh;
-		private shader: Shader = null;
+		private shader: Shader = null;		
 		private lastTexture: GLTexture = null;
 		private verticesLength = 0;
 		private indicesLength = 0;
@@ -45,16 +45,16 @@ module spine.webgl {
 		constructor (gl: WebGLRenderingContext, maxVertices: number = 10920) {
 			if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
 			this.gl = gl;
-			this.mesh = new Mesh(gl, [new Position2Attribute(), new ColorAttribute(), new TexCoordAttribute()], maxVertices, maxVertices * 3);
+			this.mesh = new Mesh(gl, [new Position2Attribute(), new ColorAttribute(), new TexCoordAttribute()], maxVertices, maxVertices * 3);			
 		}
 
-		begin (shader: Shader) {
+		begin (shader: Shader) {			
 			let gl = this.gl;
-			if (this.drawing) throw new Error("PolygonBatch is already drawing. Call PolygonBatch.end() before calling PolygonBatch.begin()");
+			if (this.isDrawing) throw new Error("PolygonBatch is already drawing. Call PolygonBatch.end() before calling PolygonBatch.begin()");
 			this.drawCalls = 0;
 			this.shader = shader;
 			this.lastTexture = null;
-			this.drawing = true;
+			this.isDrawing = true;
 
 			gl.enable(gl.BLEND);
 			gl.blendFunc(this.srcBlend, this.dstBlend);
@@ -64,7 +64,7 @@ module spine.webgl {
 			let gl = this.gl;
 			this.srcBlend = srcBlend;
 			this.dstBlend = dstBlend;
-			if (this.drawing) {
+			if (this.isDrawing) {
 				this.flush();
 				gl.blendFunc(this.srcBlend, this.dstBlend);
 			}
@@ -107,15 +107,19 @@ module spine.webgl {
 
 		end () {
 			let gl = this.gl;
-			if (!this.drawing) throw new Error("PolygonBatch is not drawing. Call PolygonBatch.begin() before calling PolygonBatch.end()");
+			if (!this.isDrawing) throw new Error("PolygonBatch is not drawing. Call PolygonBatch.begin() before calling PolygonBatch.end()");
 			if (this.verticesLength > 0 || this.indicesLength > 0) this.flush();
 			this.shader = null;
 			this.lastTexture = null;
-			this.drawing = false;
+			this.isDrawing = false;
 
 			gl.disable(gl.BLEND);
 		}
 
 		getDrawCalls () { return this.drawCalls; }
+
+		dispose () {
+			this.mesh.dispose();			
+		}
 	}
 }

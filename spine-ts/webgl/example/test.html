@@ -8,53 +8,98 @@
 </style>
 <body>
 <canvas id="canvas"></canvas>
+<center><div id="info" style="color: #fff; position: fixed; top: 0; width: 100%"></div></center>
 <script>
 
-var canvas, gl, shader, renderer, mvp, lastFrameTime = Date.now() / 1000;
+var info, canvas;
+var gl, renderer, input, assetManager;
+var skeleton;
+var coords = new spine.webgl.Vector3();
+var temp = new spine.webgl.Vector3();
+var temp2 = new spine.Vector2();
+var lastFrameTime = Date.now() / 1000;
+var target = null;
+var boneName = "hip";
 
-function init() {
+function init () {
+	info = document.getElementById("info");
 	canvas = document.getElementById("canvas");
 	canvas.width = window.innerWidth; canvas.height = window.innerHeight;	
-	gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });
+	gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
-	shader = spine.webgl.Shader.newColored(gl);
-	renderer = new spine.webgl.ShapeRenderer(gl);
-	mvp = new spine.webgl.Matrix4();
-
-	requestAnimationFrame(render);
+	renderer = new spine.webgl.SceneRenderer(canvas, gl);
+	assetManager = new spine.webgl.AssetManager(gl);
+	input = new spine.webgl.Input(canvas);
+	input.addListener({
+		down: function(x, y) {
+			renderer.camera.unproject(coords.set(x, y, 0));
+			var bone = skeleton.findBone(boneName);
+			temp.set(bone.worldX, bone.worldY, 0);
+			console.log(temp.x + ", " + temp.y + "; " + coords.x + ", " + coords.y);
+			if (temp.distance(coords) < 20) {
+				target = bone;
+			}			
+		},
+		up: function(x, y) {
+			target = null;
+		},
+		moved: function(x, y) {
+			if (target != null) {
+				renderer.camera.unproject(coords.set(x, y, 0));
+				/*target.worldToLocal(temp2.set(coords.x, coords.y));
+				target.x = temp2.x;
+				target.y = temp2.y;
+				console.log(temp2.x + ", " + temp2.y + "; " + coords.x + ", " + coords.y);
+				skeleton.updateWorldTransform();*/
+				skeleton.x = coords.x;
+				skeleton.y = coords.y;
+			}
+		}
+	})
+	assetManager.loadTexture("assets/spineboy.png");
+	assetManager.loadText("assets/spineboy.json");
+	assetManager.loadText("assets/spineboy.atlas");
+	requestAnimationFrame(loading);
 }
 
-function render() {
+function loading () {
+	if (assetManager.isLoadingComplete()) {
+		var atlas = new spine.TextureAtlas(assetManager.get("assets/spineboy.atlas"), function(path) {
+			return assetManager.get("assets/" + path);		
+		});
+		var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
+		var skeletonJson = new spine.SkeletonJson(atlasLoader);
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/spineboy.json"));
+		skeleton = new spine.Skeleton(skeletonData);
+		skeleton.setToSetupPose();
+		skeleton.updateWorldTransform();	
+		requestAnimationFrame(render);
+	} else requestAnimationFrame(loading);
+}
+
+function render () {
 	var now = Date.now() / 1000;
 	var delta = now - lastFrameTime;
 	lastFrameTime = now;
 
-	resize();
+	renderer.resize();
 	gl.clearColor(0.2, 0.2, 0.2, 1);
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
-	shader.bind();
-	shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, mvp.values);
-
-	renderer.begin(shader);
-	renderer.setColorWith(1, 0, 0, 1);
-	// renderer.line(0, 0, canvas.width, canvas.height);
-	renderer.triangle(true, 100, 100, 200, 100, 150, 200, new spine.Color(1, 0, 0, 1), new spine.Color(0, 1, 0, 1), new spine.Color(0, 0, 1, 1));	
+	renderer.begin();
+	renderer.line(-canvas.width, 0, canvas.width, 0, spine.Color.RED);	
+	renderer.triangle(true, 100, 100, 200, 100, 150, 200, spine.Color.RED, spine.Color.GREEN, spine.Color.BLUE);
+	renderer.drawTexture(assetManager.get("assets/spineboy.png"), -200, 100, 200, 200);		
+	renderer.line(0, -canvas.height, 0, canvas.height, spine.Color.GREEN);
+	renderer.rect(false, -200, 100, 200, 200, spine.Color.BLUE);
+	renderer.line(0, 0, 400, 400, spine.Color.BLUE);
+	skeleton.updateWorldTransform();
+	renderer.drawSkeleton(skeleton);
+	var bone = skeleton.findBone(boneName);
+	renderer.circle(true, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, spine.Color.MAGENTA);
 	renderer.end();
-	shader.unbind();
 
 	requestAnimationFrame(render);
-}
-
-function resize () {
-	var w = canvas.clientWidth;
-	var h = canvas.clientHeight;	
-	if (canvas.width != w || canvas.height != h) {
-		canvas.width = w;
-		canvas.height = h;
-	}
-	mvp.ortho2d(0, 0, w, h);
-	gl.viewport(0, 0, canvas.width, canvas.height);
 }
 
 (function() {

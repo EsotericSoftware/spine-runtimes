@@ -36,21 +36,37 @@ module spine.webgl {
 		private mesh: Mesh;
 		private shapeType = ShapeType.Filled;
 		private color = new Color(1, 1, 1, 1);		
-		private shader: Shader;
+		private shader: Shader;		
 		private vertexIndex = 0;
 		private tmp = new Vector2();
+		private srcBlend: number = WebGLRenderingContext.SRC_ALPHA;
+		private dstBlend: number = WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
 
 		constructor (gl: WebGLRenderingContext, maxVertices: number = 10920) {
 			if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
 			this.gl = gl;
-			this.mesh = new Mesh(gl, [new Position2Attribute(), new ColorAttribute()], maxVertices, 0);
+			this.mesh = new Mesh(gl, [new Position2Attribute(), new ColorAttribute()], maxVertices, 0);			
 		}
 
 		begin (shader: Shader) {
-			if (this.isDrawing) throw new Error("ShapeRenderer.begin() has already been called");
+			if (this.isDrawing) throw new Error("ShapeRenderer.begin() has already been called");			
 			this.shader = shader;
 			this.vertexIndex = 0;
 			this.isDrawing = true;
+
+			let gl = this.gl;
+			gl.enable(gl.BLEND);
+			gl.blendFunc(this.srcBlend, this.dstBlend);
+		}		
+
+		setBlendMode (srcBlend: number, dstBlend: number) {
+			let gl = this.gl;
+			this.srcBlend = srcBlend;
+			this.dstBlend = dstBlend;
+			if (this.isDrawing) {
+				this.flush();
+				gl.blendFunc(this.srcBlend, this.dstBlend);
+			}
 		}
 
 		setColor (color: Color) {
@@ -67,14 +83,13 @@ module spine.webgl {
 			this.vertex(x, y, color);						
 		}
 
-		line (x: number, y: number, x2: number, y2: number, color: Color = null, color2: Color = null) {			
+		line (x: number, y: number, x2: number, y2: number, color: Color = null) {			
 			this.check(ShapeType.Line, 2);
 			let vertices = this.mesh.getVertices();
 			let idx = this.vertexIndex;
-			if (color === null) color = this.color;
-			if (color2 === null) color2 = this.color;		
+			if (color === null) color = this.color;			
 			this.vertex(x, y, color);
-			this.vertex(x2, y2, color2);		
+			this.vertex(x2, y2, color);		
 		}
 
 		triangle (filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, color: Color = null, color2: Color = null, color3: Color = null) {
@@ -192,7 +207,7 @@ module spine.webgl {
 			}			
 		}
 
-		circle (filled: boolean, x: number, y: number, radius: number, segments: number, color: Color = null) {
+		circle (filled: boolean, x: number, y: number, radius: number, color: Color = null, segments: number = 0) {
 			if (segments === 0) segments = Math.max(1, (6 * MathUtils.cbrt(radius)) | 0);
 			if (segments <= 0) throw new Error("segments must be > 0.");
 			if (color === null) color = this.color;
@@ -302,6 +317,7 @@ module spine.webgl {
 			this.mesh.setVerticesLength(this.vertexIndex);
 			this.mesh.draw(this.shader, this.shapeType);
 			this.vertexIndex = 0;
+			this.gl.disable(this.gl.BLEND);
 		}
 
 		private check(shapeType: ShapeType, numVertices: number) {
@@ -316,7 +332,7 @@ module spine.webgl {
 		}
 
 		dispose () {
-			this.mesh.dispose();
+			this.mesh.dispose();			
 		}
 	}
 

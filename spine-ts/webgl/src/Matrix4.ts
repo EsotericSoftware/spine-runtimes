@@ -50,6 +50,11 @@ module spine.webgl {
 	export class Matrix4 {
 		temp: Float32Array = new Float32Array(16);
 		values: Float32Array = new Float32Array(16);
+				
+		private static xAxis: Vector3 = null;
+		private static yAxis: Vector3 = null;
+		private static zAxis: Vector3 = null;
+		private static tmpMatrix = new Matrix4();
 
 		constructor () {
 			let v = this.values;
@@ -298,6 +303,40 @@ module spine.webgl {
 			t[M32] = m[M30] * v[M02] + m[M31] * v[M12] + m[M32] * v[M22] + m[M33] * v[M32];
 			t[M33] = m[M30] * v[M03] + m[M31] * v[M13] + m[M32] * v[M23] + m[M33] * v[M33];
 			return this.set(this.temp);
+		}
+
+		lookAt (position: Vector3, direction: Vector3, up: Vector3) {
+			Matrix4.initTemps();
+			let xAxis = Matrix4.xAxis, yAxis = Matrix4.yAxis, zAxis = Matrix4.zAxis;
+			zAxis.setFrom(direction).normalize();
+			xAxis.setFrom(direction).normalize();
+			xAxis.cross(up).normalize();
+			yAxis.setFrom(xAxis).cross(zAxis).normalize();
+			this.identity();
+			let val = this.values;
+			val[M00] = xAxis.x;
+			val[M01] = xAxis.y;
+			val[M02] = xAxis.z;
+			val[M10] = yAxis.x;
+			val[M11] = yAxis.y;
+			val[M12] = yAxis.z;
+			val[M20] = -zAxis.x;
+			val[M21] = -zAxis.y;
+			val[M22] = -zAxis.z;
+
+			Matrix4.tmpMatrix.identity();
+			Matrix4.tmpMatrix.values[M03] = -position.x;
+			Matrix4.tmpMatrix.values[M13] = -position.y;
+			Matrix4.tmpMatrix.values[M23] = -position.z;
+			this.multiply(Matrix4.tmpMatrix)
+
+			return this;
+		}
+
+		static initTemps() {
+			if (Matrix4.xAxis === null) Matrix4.xAxis = new Vector3();
+			if (Matrix4.yAxis === null) Matrix4.yAxis = new Vector3();
+			if (Matrix4.zAxis === null) Matrix4.zAxis = new Vector3();
 		}
 	}
 }

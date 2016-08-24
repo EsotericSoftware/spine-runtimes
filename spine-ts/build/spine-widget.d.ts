@@ -704,6 +704,11 @@ declare module spine {
         g: number;
         b: number;
         a: number;
+        static WHITE: Color;
+        static RED: Color;
+        static GREEN: Color;
+        static BLUE: Color;
+        static MAGENTA: Color;
         constructor(r?: number, g?: number, b?: number, a?: number);
         set(r: number, g: number, b: number, a: number): void;
         setFromColor(c: Color): void;
@@ -889,6 +894,27 @@ declare module spine.webgl {
     }
 }
 declare module spine.webgl {
+    class OrthoCamera {
+        position: Vector3;
+        direction: Vector3;
+        up: Vector3;
+        near: number;
+        far: number;
+        zoom: number;
+        viewportWidth: number;
+        viewportHeight: number;
+        projectionView: Matrix4;
+        inverseProjectionView: Matrix4;
+        projection: Matrix4;
+        view: Matrix4;
+        private tmp;
+        constructor(viewportWidth: number, viewportHeight: number);
+        update(): void;
+        unproject(screenCoords: Vector3): Vector3;
+        setViewport(viewportWidth: number, viewportHeight: number): void;
+    }
+}
+declare module spine.webgl {
     class GLTexture extends Texture implements Disposable {
         private gl;
         private texture;
@@ -900,6 +926,24 @@ declare module spine.webgl {
         bind(unit?: number): void;
         unbind(): void;
         dispose(): void;
+    }
+}
+declare module spine.webgl {
+    class Input {
+        element: HTMLElement;
+        lastX: number;
+        lastY: number;
+        buttonDown: boolean;
+        private listeners;
+        constructor(element: HTMLElement);
+        private setupCallbacks(element);
+        addListener(listener: InputListener): void;
+        removeListener(listener: InputListener): void;
+    }
+    interface InputListener {
+        down(x: number, y: number): void;
+        up(x: number, y: number): void;
+        moved(x: number, y: number): void;
     }
 }
 declare module spine.webgl {
@@ -922,6 +966,10 @@ declare module spine.webgl {
     class Matrix4 {
         temp: Float32Array;
         values: Float32Array;
+        private static xAxis;
+        private static yAxis;
+        private static zAxis;
+        private static tmpMatrix;
         constructor();
         set(values: ArrayLike<number>): Matrix4;
         transpose(): Matrix4;
@@ -935,6 +983,8 @@ declare module spine.webgl {
         ortho(left: number, right: number, bottom: number, top: number, near: number, far: number): Matrix4;
         multiply(matrix: Matrix4): Matrix4;
         multiplyLeft(matrix: Matrix4): Matrix4;
+        lookAt(position: Vector3, direction: Vector3, up: Vector3): this;
+        static initTemps(): void;
     }
 }
 declare module spine.webgl {
@@ -992,10 +1042,10 @@ declare module spine.webgl {
     }
 }
 declare module spine.webgl {
-    class PolygonBatcher {
+    class PolygonBatcher implements Disposable {
         private gl;
         private drawCalls;
-        private drawing;
+        private isDrawing;
         private mesh;
         private shader;
         private lastTexture;
@@ -1010,6 +1060,39 @@ declare module spine.webgl {
         private flush();
         end(): void;
         getDrawCalls(): number;
+        dispose(): void;
+    }
+}
+declare module spine.webgl {
+    class SceneRenderer implements Disposable {
+        gl: WebGLRenderingContext;
+        canvas: HTMLCanvasElement;
+        camera: OrthoCamera;
+        private batcherShader;
+        private batcher;
+        private shapes;
+        private shapesShader;
+        private activeRenderer;
+        private skeletonRenderer;
+        private QUAD;
+        private QUAD_TRIANGLES;
+        private WHITE;
+        constructor(canvas: HTMLCanvasElement, gl: WebGLRenderingContext);
+        begin(): void;
+        drawSkeleton(skeleton: Skeleton, premultipliedAlpha?: boolean): void;
+        drawTexture(texture: GLTexture, x: number, y: number, width: number, height: number, color?: Color): void;
+        line(x: number, y: number, x2: number, y2: number, color?: Color, color2?: Color): void;
+        triangle(filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, color?: Color, color2?: Color, color3?: Color): void;
+        quad(filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number, color?: Color, color2?: Color, color3?: Color, color4?: Color): void;
+        rect(filled: boolean, x: number, y: number, width: number, height: number, color?: Color): void;
+        rectLine(filled: boolean, x1: number, y1: number, x2: number, y2: number, width: number, color?: Color): void;
+        polygon(polygonVertices: ArrayLike<number>, offset: number, count: number, color?: Color): void;
+        circle(filled: boolean, x: number, y: number, radius: number, color?: Color, segments?: number): void;
+        curve(x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number, segments: number, color?: Color): void;
+        end(): void;
+        resize(): void;
+        private enableRenderer(renderer);
+        dispose(): void;
     }
 }
 declare module spine.webgl {
@@ -1062,19 +1145,22 @@ declare module spine.webgl {
         private shader;
         private vertexIndex;
         private tmp;
+        private srcBlend;
+        private dstBlend;
         constructor(gl: WebGLRenderingContext, maxVertices?: number);
         begin(shader: Shader): void;
+        setBlendMode(srcBlend: number, dstBlend: number): void;
         setColor(color: Color): void;
         setColorWith(r: number, g: number, b: number, a: number): void;
         point(x: number, y: number, color?: Color): void;
-        line(x: number, y: number, x2: number, y2: number, color?: Color, color2?: Color): void;
+        line(x: number, y: number, x2: number, y2: number, color?: Color): void;
         triangle(filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, color?: Color, color2?: Color, color3?: Color): void;
         quad(filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number, color?: Color, color2?: Color, color3?: Color, color4?: Color): void;
         rect(filled: boolean, x: number, y: number, width: number, height: number, color?: Color): void;
         rectLine(filled: boolean, x1: number, y1: number, x2: number, y2: number, width: number, color?: Color): void;
         x(x: number, y: number, size: number): void;
         polygon(polygonVertices: ArrayLike<number>, offset: number, count: number, color?: Color): void;
-        circle(filled: boolean, x: number, y: number, radius: number, segments: number, color?: Color): void;
+        circle(filled: boolean, x: number, y: number, radius: number, color?: Color, segments?: number): void;
         curve(x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number, segments: number, color?: Color): void;
         private vertex(x, y, color);
         end(): void;
@@ -1129,6 +1215,8 @@ declare module spine.webgl {
         x: number;
         y: number;
         z: number;
+        constructor(x?: number, y?: number, z?: number);
+        setFrom(v: Vector3): Vector3;
         set(x: number, y: number, z: number): Vector3;
         add(v: Vector3): Vector3;
         sub(v: Vector3): Vector3;

@@ -35,6 +35,19 @@ module spine.webgl {
 		y = 0;
 		z = 0;
 
+		constructor (x: number = 0, y: number = 0, z: number = 0) {
+			this.x = x;
+			this.y = y;
+			this.z = z;
+		}
+
+		setFrom(v: Vector3): Vector3 {
+			this.x = v.x;
+			this.y = v.y;
+			this.z = v.z;
+			return this;
+		}
+
 		set (x: number, y: number, z: number): Vector3 {
 			this.x = x;
 			this.y = y;

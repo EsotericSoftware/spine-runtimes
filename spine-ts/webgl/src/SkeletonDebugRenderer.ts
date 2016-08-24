@@ -195,9 +195,8 @@ module spine.webgl {
 			if (this.drawBones) {
 				shapes.setColor(this.boneOriginColor);
 				for (let i = 0, n = bones.length; i < n; i++) {
-					let bone = bones[i];
-					shapes.setColor(SkeletonDebugRenderer.GREEN);
-					shapes.circle(true, skeletonX + bone.worldX, skeletonY + bone.worldY, 3 * this.scale, 8);
+					let bone = bones[i];					
+					shapes.circle(true, skeletonX + bone.worldX, skeletonY + bone.worldY, 3 * this.scale, SkeletonDebugRenderer.GREEN, 8);
 				}
 			}
 
