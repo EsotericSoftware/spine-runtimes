@@ -31,14 +31,12 @@ function init () {
 	assetManager = new spine.webgl.AssetManager(gl);
 	input = new spine.webgl.Input(canvas);
 	input.addListener({
-		down: function(x, y) {
-			renderer.camera.unproject(coords.set(x, y, 0));
+		down: function(x, y) {			
 			var bone = skeleton.findBone(boneName);
-			temp.set(bone.worldX, bone.worldY, 0);
-			console.log(temp.x + ", " + temp.y + "; " + coords.x + ", " + coords.y);
-			if (temp.distance(coords) < 20) {
+			renderer.camera.unproject(coords.set(x, y, 0));
+			if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 20) {
 				target = bone;
-			}			
+			}				
 		},
 		up: function(x, y) {
 			target = null;
@@ -46,18 +44,19 @@ function init () {
 		moved: function(x, y) {
 			if (target != null) {
 				renderer.camera.unproject(coords.set(x, y, 0));
-				/*target.worldToLocal(temp2.set(coords.x, coords.y));
-				target.x = temp2.x;
-				target.y = temp2.y;
-				console.log(temp2.x + ", " + temp2.y + "; " + coords.x + ", " + coords.y);
-				skeleton.updateWorldTransform();*/
-				skeleton.x = coords.x;
-				skeleton.y = coords.y;
+				if (target.parent !== null) {
+					target.parent.worldToLocal(temp2.set(coords.x - skeleton.x, coords.y - skeleton.y));
+					target.x = temp2.x;
+					target.y = temp2.y;
+				} else {
+					target.x = coords.x - skeleton.x;
+					target.y = coords.y - skeleton.y;
+				}
 			}
 		}
 	})
 	assetManager.loadTexture("assets/spineboy.png");
-	assetManager.loadText("assets/spineboy.json");
+	assetManager.loadText("assets/spineboy-mesh.json");
 	assetManager.loadText("assets/spineboy.atlas");
 	requestAnimationFrame(loading);
 }
@@ -69,7 +68,7 @@ function loading () {
 		});
 		var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
-		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/spineboy.json"));
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/spineboy-mesh.json"));
 		skeleton = new spine.Skeleton(skeletonData);
 		skeleton.setToSetupPose();
 		skeleton.updateWorldTransform();	
