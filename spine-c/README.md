@@ -16,8 +16,6 @@ spine-c works with data exported from the latest version of Spine.
 
 spine-c supports all Spine features.
 
-spine-c does not yet support loading the binary format.
-
 ## Setup
 
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
