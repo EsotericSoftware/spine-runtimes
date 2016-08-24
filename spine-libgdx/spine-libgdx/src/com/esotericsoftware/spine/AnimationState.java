@@ -274,7 +274,8 @@ public class AnimationState {
 			queue.interrupt(current);
 
 			// If a mix is in progress, mix from the closest animation.
-			if (mixingFrom != null && (current.mixDuration == 0 || current.mixTime / current.mixDuration < 0.5f)) {
+			if (mixingFrom != null && mixingFrom.animation != emptyAnimation
+				&& (current.mixDuration == 0 || current.mixTime / current.mixDuration < 0.5f)) {
 				entry.mixingFrom = mixingFrom;
 				mixingFrom = current;
 			} else
