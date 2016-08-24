@@ -62,17 +62,47 @@ void callback (AnimationState* state, int trackIndex, EventType type, Event* eve
 	fflush(stdout);
 }
 
-void spineboy () {
-	// Load atlas, skeleton, and animations.
-	Atlas* atlas = Atlas_createFromFile("data/spineboy.atlas", 0);
+SkeletonData* readSkeletonJsonData (const char* filename, Atlas* atlas, float scale) {
 	SkeletonJson* json = SkeletonJson_create(atlas);
-	json->scale = 0.6f;
-	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/spineboy.json");
+	json->scale = scale;
+	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, filename);
 	if (!skeletonData) {
 		printf("%s\n", json->error);
 		exit(0);
 	}
 	SkeletonJson_dispose(json);
+	return skeletonData;
+}
+
+SkeletonData* readSkeletonBinaryData (const char* filename, Atlas* atlas, float scale) {
+	SkeletonBinary* binary = SkeletonBinary_create(atlas);
+	binary->scale = scale;
+	SkeletonData *skeletonData = SkeletonBinary_readSkeletonDataFile(binary, filename);
+	if (!skeletonData) {
+		printf("%s\n", binary->error);
+		exit(0);
+	}
+	SkeletonBinary_dispose(binary);
+	return skeletonData;
+}
+
+void testcase (void func(SkeletonData* skeletonData, Atlas* atlas),
+		const char* jsonName, const char* binaryName, const char* atlasName,
+		float scale) {
+	Atlas* atlas = Atlas_createFromFile(atlasName, 0);
+
+	SkeletonData* skeletonData = readSkeletonJsonData(jsonName, atlas, scale);
+	func(skeletonData, atlas);
+	SkeletonData_dispose(skeletonData);
+
+	skeletonData = readSkeletonBinaryData(binaryName, atlas, scale);
+	func(skeletonData, atlas);
+	SkeletonData_dispose(skeletonData);
+
+	Atlas_dispose(atlas);
+}
+
+void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 	SkeletonBounds* bounds = SkeletonBounds_create();
 
 	// Configure mixing.
@@ -128,23 +158,10 @@ void spineboy () {
 		window.display();
 	}
 
-	SkeletonData_dispose(skeletonData);
 	SkeletonBounds_dispose(bounds);
-	Atlas_dispose(atlas);
 }
 
-void goblins () {
-	// Load atlas, skeleton, and animations.
-	Atlas* atlas = Atlas_createFromFile("data/goblins-mesh.atlas", 0);
-	SkeletonJson* json = SkeletonJson_create(atlas);
-	json->scale = 1.4f;
-	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/goblins-mesh.json");
-	if (!skeletonData) {
-		printf("Error: %s\n", json->error);
-		exit(0);
-	}
-	SkeletonJson_dispose(json);
-
+void goblins (SkeletonData* skeletonData, Atlas* atlas) {
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 
@@ -178,23 +195,9 @@ void goblins () {
 		window.draw(*drawable);
 		window.display();
 	}
-
-	SkeletonData_dispose(skeletonData);
-	Atlas_dispose(atlas);
 }
 
-void raptor () {
-	// Load atlas, skeleton, and animations.
-	Atlas* atlas = Atlas_createFromFile("data/raptor.atlas", 0);
-	SkeletonJson* json = SkeletonJson_create(atlas);
-	json->scale = 0.5f;
-	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/raptor.json");
-	if (!skeletonData) {
-		printf("Error: %s\n", json->error);
-		exit(0);
-	}
-	SkeletonJson_dispose(json);
-
+void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 
@@ -223,23 +226,9 @@ void raptor () {
 		window.draw(*drawable);
 		window.display();
 	}
-
-	SkeletonData_dispose(skeletonData);
-	Atlas_dispose(atlas);
 }
 
-void tank () {
-	// Load atlas, skeleton, and animations.
-	Atlas* atlas = Atlas_createFromFile("data/tank.atlas", 0);
-	SkeletonJson* json = SkeletonJson_create(atlas);
-	json->scale = 0.2f;
-	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/tank.json");
-	if (!skeletonData) {
-		printf("Error: %s\n", json->error);
-		exit(0);
-	}
-	SkeletonJson_dispose(json);
-
+void tank (SkeletonData* skeletonData, Atlas* atlas) {
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 
@@ -266,23 +255,9 @@ void tank () {
 		window.draw(*drawable);
 		window.display();
 	}
-
-	SkeletonData_dispose(skeletonData);
-	Atlas_dispose(atlas);
 }
 
-void vine () {
-	// Load atlas, skeleton, and animations.
-	Atlas* atlas = Atlas_createFromFile("data/vine.atlas", 0);
-	SkeletonJson* json = SkeletonJson_create(atlas);
-	json->scale = 0.5f;
-	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/vine.json");
-	if (!skeletonData) {
-		printf("Error: %s\n", json->error);
-		exit(0);
-	}
-	SkeletonJson_dispose(json);
-
+void vine (SkeletonData* skeletonData, Atlas* atlas) {
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 
@@ -310,26 +285,12 @@ void vine () {
 		window.draw(*drawable);
 		window.display();
 	}
-
-	SkeletonData_dispose(skeletonData);
-	Atlas_dispose(atlas);
 }
 
 /**
  * Used for debugging purposes during runtime development
  */
-void test () {
-	// Load atlas, skeleton, and animations.
-	Atlas* atlas = Atlas_createFromFile("data/tank.atlas", 0);
-	SkeletonJson* json = SkeletonJson_create(atlas);
-	json->scale = 1;
-	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/tank.json");
-	if (!skeletonData) {
-		printf("Error: %s\n", json->error);
-		exit(0);
-	}
-	SkeletonJson_dispose(json);
-
+void test (SkeletonData* skeletonData, Atlas* atlas) {
 	spSkeleton* skeleton = Skeleton_create(skeletonData);
 	spAnimationStateData* animData = spAnimationStateData_create(skeletonData);
 	spAnimationState* animState = spAnimationState_create(animData);
@@ -350,16 +311,15 @@ void test () {
 		d += 0.1f;
 	}
 
-	SkeletonData_dispose(skeletonData);
 	Skeleton_dispose(skeleton);
-	Atlas_dispose(atlas);
 }
 
 int main () {
-	test();
-	vine();
-	tank();
-	raptor();
-	spineboy();
-	goblins();
+	testcase(test, "data/tank.json", "data/tank.skel", "data/tank.atlas", 1.0f);
+	testcase(vine, "data/vine.json", "data/vine.skel", "data/vine.atlas", 0.5f);
+	testcase(tank, "data/tank.json", "data/tank.skel", "data/tank.atlas", 0.2f);
+	testcase(raptor, "data/raptor.json", "data/raptor.skel", "data/raptor.atlas", 0.5f);
+	testcase(spineboy, "data/spineboy.json", "data/spineboy.skel", "data/spineboy.atlas", 0.6f);
+	testcase(goblins, "data/goblins-mesh.json", "data/goblins-mesh.skel", "data/goblins-mesh.atlas", 1.4f);
+	return 0;
 }
