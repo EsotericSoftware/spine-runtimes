@@ -110,6 +110,45 @@ module spine.webgl {
 			this.batcher.draw(texture, quad, this.QUAD_TRIANGLES);
 		}
 
+		drawRegion (region: TextureAtlasRegion, x: number, y: number, width: number, height: number, color: Color = null) {
+			this.enableRenderer(this.batcher);
+			if (color === null) color = this.WHITE;
+			let quad = this.QUAD;
+			quad[0] = x;
+			quad[1] = y;
+			quad[2] = color.r;
+			quad[3] = color.g;
+			quad[4] = color.b;
+			quad[5] = color.a;
+			quad[6] = region.u;
+			quad[7] = region.v2;
+			quad[8] = x + width;
+			quad[9] = y;
+			quad[10] = color.r;
+			quad[11] = color.g;
+			quad[12] = color.b;
+			quad[13] = color.a;
+			quad[14] = region.u2;
+			quad[15] = region.v2;
+			quad[16] = x + width;
+			quad[17] = y + height;
+			quad[18] = color.r;
+			quad[19] = color.g;
+			quad[20] = color.b;
+			quad[21] = color.a;
+			quad[22] = region.u2;
+			quad[23] = region.v;
+			quad[24] = x;
+			quad[25] = y + height;
+			quad[26] = color.r;
+			quad[27] = color.g;
+			quad[28] = color.b;
+			quad[29] = color.a;
+			quad[30] = region.u;
+			quad[31] = region.v;
+			this.batcher.draw(<GLTexture>region.texture, quad, this.QUAD_TRIANGLES);
+		}
+
 		line (x: number, y: number, x2: number, y2: number, color: Color = null, color2: Color = null) {
 			this.enableRenderer(this.shapes);
 			this.shapes.line(x, y, x2, y2, color);
@@ -156,7 +195,7 @@ module spine.webgl {
 			this.activeRenderer = null;		
 		}
 
-		resize () {
+		resize (resizeMode: ResizeMode) {
 			let canvas = this.canvas;
 			var w = canvas.clientWidth;
 			var h = canvas.clientHeight;	
@@ -164,9 +203,22 @@ module spine.webgl {
 				canvas.width = w;
 				canvas.height = h;
 			}
-			this.camera.setViewport(w, h);
-			this.camera.update();	
 			this.gl.viewport(0, 0, canvas.width, canvas.height);
+
+			if (resizeMode === ResizeMode.Stretch) {
+				// nothing to do, we simply apply the viewport size of the camera
+			} else if (resizeMode === ResizeMode.Expand) {
+				this.camera.setViewport(w, h);
+			} else if (resizeMode === ResizeMode.Fit) {
+				let sourceWidth = canvas.width, sourceHeight = canvas.height;
+				let targetWidth = this.camera.viewportWidth, targetHeight = this.camera.viewportHeight;
+				let targetRatio = targetHeight / targetWidth;
+				let sourceRatio = sourceHeight / sourceWidth;
+				let scale = targetRatio < sourceRatio ? targetWidth / sourceWidth : targetHeight / sourceHeight;
+				this.camera.viewportWidth = sourceWidth * scale;
+				this.camera.viewportHeight = sourceHeight * scale;				
+			}
+			this.camera.update();
 		}
 
 		private enableRenderer(renderer: PolygonBatcher | ShapeRenderer) {
@@ -191,5 +243,11 @@ module spine.webgl {
 			this.shapes.dispose();
 			this.shapesShader.dispose();			
 		}
+	}
+
+	export enum ResizeMode {
+		Stretch,
+		Expand,
+		Fit
 	}
 }

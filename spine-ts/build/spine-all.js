@@ -4873,11 +4873,11 @@ var spine;
                 projectionView.multiply(view);
                 inverseProjectionView.set(projectionView.values).invert();
             };
-            OrthoCamera.prototype.unproject = function (screenCoords) {
-                var x = screenCoords.x, y = this.viewportHeight - screenCoords.y - 1;
+            OrthoCamera.prototype.screenToWorld = function (screenCoords, screenWidth, screenHeight) {
+                var x = screenCoords.x, y = screenHeight - screenCoords.y - 1;
                 var tmp = this.tmp;
-                tmp.x = (2 * x) / this.viewportWidth - 1;
-                tmp.y = (2 * y) / this.viewportHeight - 1;
+                tmp.x = (2 * x) / screenWidth - 1;
+                tmp.y = (2 * y) / screenHeight - 1;
                 tmp.z = (2 * screenCoords.z) - 1;
                 tmp.project(this.inverseProjectionView);
                 screenCoords.set(tmp.x, tmp.y, tmp.z);
@@ -5652,6 +5652,46 @@ var spine;
                 quad[31] = 0;
                 this.batcher.draw(texture, quad, this.QUAD_TRIANGLES);
             };
+            SceneRenderer.prototype.drawRegion = function (region, x, y, width, height, color) {
+                if (color === void 0) { color = null; }
+                this.enableRenderer(this.batcher);
+                if (color === null)
+                    color = this.WHITE;
+                var quad = this.QUAD;
+                quad[0] = x;
+                quad[1] = y;
+                quad[2] = color.r;
+                quad[3] = color.g;
+                quad[4] = color.b;
+                quad[5] = color.a;
+                quad[6] = region.u;
+                quad[7] = region.v2;
+                quad[8] = x + width;
+                quad[9] = y;
+                quad[10] = color.r;
+                quad[11] = color.g;
+                quad[12] = color.b;
+                quad[13] = color.a;
+                quad[14] = region.u2;
+                quad[15] = region.v2;
+                quad[16] = x + width;
+                quad[17] = y + height;
+                quad[18] = color.r;
+                quad[19] = color.g;
+                quad[20] = color.b;
+                quad[21] = color.a;
+                quad[22] = region.u2;
+                quad[23] = region.v;
+                quad[24] = x;
+                quad[25] = y + height;
+                quad[26] = color.r;
+                quad[27] = color.g;
+                quad[28] = color.b;
+                quad[29] = color.a;
+                quad[30] = region.u;
+                quad[31] = region.v;
+                this.batcher.draw(region.texture, quad, this.QUAD_TRIANGLES);
+            };
             SceneRenderer.prototype.line = function (x, y, x2, y2, color, color2) {
                 if (color === void 0) { color = null; }
                 if (color2 === void 0) { color2 = null; }
@@ -5706,7 +5746,7 @@ var spine;
                     this.shapes.end();
                 this.activeRenderer = null;
             };
-            SceneRenderer.prototype.resize = function () {
+            SceneRenderer.prototype.resize = function (resizeMode) {
                 var canvas = this.canvas;
                 var w = canvas.clientWidth;
                 var h = canvas.clientHeight;
@@ -5714,9 +5754,22 @@ var spine;
                     canvas.width = w;
                     canvas.height = h;
                 }
-                this.camera.setViewport(w, h);
-                this.camera.update();
                 this.gl.viewport(0, 0, canvas.width, canvas.height);
+                if (resizeMode === ResizeMode.Stretch) {
+                }
+                else if (resizeMode === ResizeMode.Expand) {
+                    this.camera.setViewport(w, h);
+                }
+                else if (resizeMode === ResizeMode.Fit) {
+                    var sourceWidth = canvas.width, sourceHeight = canvas.height;
+                    var targetWidth = this.camera.viewportWidth, targetHeight = this.camera.viewportHeight;
+                    var targetRatio = targetHeight / targetWidth;
+                    var sourceRatio = sourceHeight / sourceWidth;
+                    var scale = targetRatio < sourceRatio ? targetWidth / sourceWidth : targetHeight / sourceHeight;
+                    this.camera.viewportWidth = sourceWidth * scale;
+                    this.camera.viewportHeight = sourceHeight * scale;
+                }
+                this.camera.update();
             };
             SceneRenderer.prototype.enableRenderer = function (renderer) {
                 if (this.activeRenderer === renderer)
@@ -5744,6 +5797,12 @@ var spine;
             return SceneRenderer;
         }());
         webgl.SceneRenderer = SceneRenderer;
+        (function (ResizeMode) {
+            ResizeMode[ResizeMode["Stretch"] = 0] = "Stretch";
+            ResizeMode[ResizeMode["Expand"] = 1] = "Expand";
+            ResizeMode[ResizeMode["Fit"] = 2] = "Fit";
+        })(webgl.ResizeMode || (webgl.ResizeMode = {}));
+        var ResizeMode = webgl.ResizeMode;
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
 var spine;

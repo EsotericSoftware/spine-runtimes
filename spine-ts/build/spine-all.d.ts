@@ -980,7 +980,7 @@ declare module spine.webgl {
         private tmp;
         constructor(viewportWidth: number, viewportHeight: number);
         update(): void;
-        unproject(screenCoords: Vector3): Vector3;
+        screenToWorld(screenCoords: Vector3, screenWidth: number, screenHeight: number): Vector3;
         setViewport(viewportWidth: number, viewportHeight: number): void;
     }
 }
@@ -1151,6 +1151,7 @@ declare module spine.webgl {
         begin(): void;
         drawSkeleton(skeleton: Skeleton, premultipliedAlpha?: boolean): void;
         drawTexture(texture: GLTexture, x: number, y: number, width: number, height: number, color?: Color): void;
+        drawRegion(region: TextureAtlasRegion, x: number, y: number, width: number, height: number, color?: Color): void;
         line(x: number, y: number, x2: number, y2: number, color?: Color, color2?: Color): void;
         triangle(filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, color?: Color, color2?: Color, color3?: Color): void;
         quad(filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number, color?: Color, color2?: Color, color3?: Color, color4?: Color): void;
@@ -1160,9 +1161,14 @@ declare module spine.webgl {
         circle(filled: boolean, x: number, y: number, radius: number, color?: Color, segments?: number): void;
         curve(x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number, segments: number, color?: Color): void;
         end(): void;
-        resize(): void;
+        resize(resizeMode: ResizeMode): void;
         private enableRenderer(renderer);
         dispose(): void;
+    }
+    enum ResizeMode {
+        Stretch = 0,
+        Expand = 1,
+        Fit = 2,
     }
 }
 declare module spine.webgl {

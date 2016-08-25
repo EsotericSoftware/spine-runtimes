@@ -67,11 +67,11 @@ module spine.webgl {
 			inverseProjectionView.set(projectionView.values).invert();			
 		}
 
-		unproject (screenCoords: Vector3) {
-			let x = screenCoords.x, y = this.viewportHeight - screenCoords.y - 1;			
+		screenToWorld (screenCoords: Vector3, screenWidth: number, screenHeight: number) {
+			let x = screenCoords.x, y = screenHeight - screenCoords.y - 1;			
 			let tmp = this.tmp;			
-			tmp.x = (2 * x) / this.viewportWidth - 1;
-			tmp.y = (2 * y) / this.viewportHeight - 1;
+			tmp.x = (2 * x) / screenWidth - 1;
+			tmp.y = (2 * y) / screenHeight - 1;
 			tmp.z = (2 * screenCoords.z) - 1;			
 			tmp.project(this.inverseProjectionView);
 			screenCoords.set(tmp.x, tmp.y, tmp.z);
