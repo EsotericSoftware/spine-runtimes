@@ -461,23 +461,32 @@ public class AnimationState {
 			checkTimelineUsage(entry, entry.timelinesFirst);
 		}
 
-		// Compute timelinesLast. Find lowest track with mixing.
+		// Compute timelinesLast. End with lowest track that has mixingFrom.
 		propertyIDs.clear();
-		for (i = n - 1; i >= 0; i--) {
+		int lowestMixingFrom = n;
+		for (i = 0; i < n; i++) {
 			TrackEntry entry = tracks.get(i);
 			if (entry == null) continue;
 			if (entry.mixingFrom != null) {
-				setTimelineUsage(entry, entry.timelinesLast);
+				lowestMixingFrom = i;
+				break;
+			}
+		}
+		for (i = n - 1; i >= lowestMixingFrom; i--) {
+			TrackEntry entry = tracks.get(i);
+			if (entry == null) continue;
+			if (entry.mixingFrom != null) {
+				addTimelineUsage(entry);
 				checkTimelineUsage(entry.mixingFrom, entry.mixingFrom.timelinesLast);
 			} else
-				setTimelineUsage(entry, entry.timelinesLast);
+				addTimelineUsage(entry);
 			i--;
 			break;
 		}
-		for (; i >= 0; i--) {
+		for (; i >= lowestMixingFrom; i--) {
 			TrackEntry entry = tracks.get(i);
 			if (entry == null) continue;
-			checkTimelineUsage(entry, entry.timelinesLast);
+			addTimelineUsage(entry);
 			if (entry.mixingFrom != null) checkTimelineUsage(entry.mixingFrom, entry.mixingFrom.timelinesLast);
 		}
 	}
@@ -497,9 +506,16 @@ public class AnimationState {
 		IntSet propertyIDs = this.propertyIDs;
 		Array<Timeline> timelines = entry.animation.timelines;
 		int n = timelines.size;
-		boolean[] timelinesFirst = usageArray.setSize(n);
+		boolean[] usage = usageArray.setSize(n);
 		for (int i = 0; i < n; i++)
-			timelinesFirst[i] = propertyIDs.add(timelines.get(i).getPropertyId());
+			usage[i] = propertyIDs.add(timelines.get(i).getPropertyId());
+	}
+
+	private void addTimelineUsage (TrackEntry entry) {
+		IntSet propertyIDs = this.propertyIDs;
+		Array<Timeline> timelines = entry.animation.timelines;
+		for (int i = 0, n = timelines.size; i < n; i++)
+			propertyIDs.add(timelines.get(i).getPropertyId());
 	}
 
 	/** Returns the track entry for the animation currently playing on the track, or null. */
