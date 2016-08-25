@@ -11,7 +11,7 @@
 
 	function init () {		
 		canvas = document.getElementById("ikdemo-canvas");
-		canvas.width = window.innerWidth; canvas.height = window.innerHeight;	
+		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);

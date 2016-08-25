@@ -16,7 +16,7 @@
 		atlasCheckbox = document.getElementById("skeletonvsspritedemo-atlascheckbox");
 
 		canvas = document.getElementById("skeletonvsspritedemo-canvas");
-		canvas.width = window.innerWidth; canvas.height = window.innerHeight;	
+		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;	
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
@@ -107,11 +107,11 @@
 			var pageSize = halfSpaceWidth / 2;															
 
 			// we only have one page for skeleton
-			var skeletonPageSize = pageSize * frameAtlasSize / skeletonAtlasSize;
-			renderer.drawTexture(skeletonAtlas.pages[0].texture, offset.x + halfSpaceWidth - skeletonPageSize / 2,
-								 offset.y + halfSpaceWidth - skeletonPageSize / 2, skeletonPageSize, skeletonPageSize);
-			renderer.rect(skeletonAtlas.pages[0].texture, offset.x + halfSpaceWidth - skeletonPageSize / 2,
-						  offset.y + halfSpaceWidth - skeletonPageSize / 2, skeletonPageSize, skeletonPageSize, SKELETON_ATLAS_COLOR);
+			var skeletonPageSize = pageSize * skeletonAtlasSize / frameAtlasSize;
+			renderer.drawTexture(skeletonAtlas.pages[0].texture, offset.x + halfSpaceWidth / 2 - skeletonPageSize / 2,
+								 offset.y + halfSpaceHeight / 2 - skeletonPageSize / 2, skeletonPageSize, skeletonPageSize);
+			renderer.rect(false, offset.x + halfSpaceWidth / 2 - skeletonPageSize / 2,
+						  offset.y + halfSpaceWidth / 2 - skeletonPageSize / 2, skeletonPageSize, skeletonPageSize, SKELETON_ATLAS_COLOR);
 
 			var x = offset.x + halfSpaceWidth;
 			var y = offset.y + halfSpaceHeight / 2;
