@@ -31,10 +31,10 @@
 
 module spine.threejs {
 	export class AssetManager extends spine.AssetManager {
-		constructor () {
+		constructor (pathPrefix: string = "") {
 			super((image: HTMLImageElement) => {
 				return new ThreeJsTexture(image);
-			});
+			}, pathPrefix);
 		}
 	}
 }

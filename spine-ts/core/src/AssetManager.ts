@@ -31,20 +31,23 @@
 
 module spine {
 	export class AssetManager implements Disposable {
+		private pathPrefix: string;
 		private textureLoader: (image: HTMLImageElement) => any;
 		private assets: Map<any> = {};
 		private errors: Map<string> = {};
 		private toLoad = 0;
 		private loaded = 0;
 
-		constructor (textureLoader: (image: HTMLImageElement) => any) {
+		constructor (textureLoader: (image: HTMLImageElement) => any, pathPrefix: string = "") {
 			this.textureLoader = textureLoader;
+			this.pathPrefix = pathPrefix;
 		}
 
 		loadText(path: string,
 			success: (path: string, text: string) => void = null,
 			error: (path: string, error: string) => void = null
 		) {
+			path = this.pathPrefix + path;
 			this.toLoad++;
 			let request = new XMLHttpRequest();
 			request.onreadystatechange = () => {
@@ -68,6 +71,7 @@ module spine {
 			success: (path: string, image: HTMLImageElement) => void = null,
 			error: (path: string, error: string) => void = null
 		) {
+			path = this.pathPrefix + path;
 			this.toLoad++;
 			let img = new Image();
 			img.src = path;
@@ -87,10 +91,12 @@ module spine {
 		}
 
 		get (path: string) {
+			path = this.pathPrefix + path;
 			return this.assets[path];
 		}
 
 		remove (path: string) {
+			path = this.pathPrefix + path;
 			let asset = this.assets[path];
 			if ((<any>asset).dispose) (<any>asset).dispose();			
 			this.assets[path] = null;

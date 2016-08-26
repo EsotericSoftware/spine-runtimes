@@ -1,11 +1,12 @@
 declare module spine {
     class AssetManager implements Disposable {
+        private pathPrefix;
         private textureLoader;
         private assets;
         private errors;
         private toLoad;
         private loaded;
-        constructor(textureLoader: (image: HTMLImageElement) => any);
+        constructor(textureLoader: (image: HTMLImageElement) => any, pathPrefix?: string);
         loadText(path: string, success?: (path: string, text: string) => void, error?: (path: string, error: string) => void): void;
         loadTexture(path: string, success?: (path: string, image: HTMLImageElement) => void, error?: (path: string, error: string) => void): void;
         get(path: string): any;
@@ -21,7 +22,7 @@ declare module spine {
 }
 declare module spine.canvas {
     class AssetManager extends spine.AssetManager {
-        constructor();
+        constructor(pathPrefix?: string);
     }
 }
 declare module spine {
@@ -916,7 +917,7 @@ declare module spine {
 }
 declare module spine.threejs {
     class AssetManager extends spine.AssetManager {
-        constructor();
+        constructor(pathPrefix?: string);
     }
 }
 declare module spine.threejs {
@@ -960,7 +961,7 @@ declare module spine.threejs {
 }
 declare module spine.webgl {
     class AssetManager extends spine.AssetManager {
-        constructor(gl: WebGLRenderingContext);
+        constructor(gl: WebGLRenderingContext, pathPrefix?: string);
     }
 }
 declare module spine.webgl {

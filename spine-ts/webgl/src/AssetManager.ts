@@ -31,10 +31,10 @@
 
 module spine.webgl {
 	export class AssetManager extends spine.AssetManager {
-		constructor (gl: WebGLRenderingContext) {
+		constructor (gl: WebGLRenderingContext, pathPrefix: string = "") {
 			super((image: HTMLImageElement) => { 
 				return new spine.webgl.GLTexture(gl, image); 
-			});
+			}, pathPrefix);
 		}
 	}
 }

@@ -1,0 +1,153 @@
+
+alien.png
+size: 1024,512
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+back_foot
+  rotate: true
+  xy: 1016, 366
+  size: 8, 6
+  orig: 8, 6
+  offset: 0, 0
+  index: -1
+back_shin
+  rotate: false
+  xy: 28, 2
+  size: 21, 24
+  orig: 21, 24
+  offset: 0, 0
+  index: -1
+back_thigh
+  rotate: false
+  xy: 2, 2
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+backarmor
+  rotate: false
+  xy: 933, 295
+  size: 81, 91
+  orig: 81, 91
+  offset: 0, 0
+  index: -1
+blown_up_nck
+  rotate: false
+  xy: 2, 28
+  size: 77, 52
+  orig: 77, 52
+  offset: 0, 0
+  index: -1
+body
+  rotate: true
+  xy: 781, 167
+  size: 98, 118
+  orig: 98, 118
+  offset: 0, 0
+  index: -1
+burst01
+  rotate: false
+  xy: 788, 355
+  size: 143, 155
+  orig: 143, 155
+  offset: 0, 0
+  index: -1
+burst02
+  rotate: false
+  xy: 630, 329
+  size: 156, 181
+  orig: 156, 181
+  offset: 0, 0
+  index: -1
+front_foot
+  rotate: true
+  xy: 1016, 376
+  size: 10, 6
+  orig: 10, 6
+  offset: 0, 0
+  index: -1
+front_lower_arm
+  rotate: true
+  xy: 81, 25
+  size: 55, 63
+  orig: 55, 63
+  offset: 0, 0
+  index: -1
+front_shin
+  rotate: true
+  xy: 287, 55
+  size: 25, 28
+  orig: 25, 28
+  offset: 0, 0
+  index: -1
+front_thigh
+  rotate: false
+  xy: 258, 53
+  size: 27, 27
+  orig: 27, 27
+  offset: 0, 0
+  index: -1
+front_upper_arm
+  rotate: false
+  xy: 199, 52
+  size: 57, 28
+  orig: 57, 28
+  offset: 0, 0
+  index: -1
+head
+  rotate: false
+  xy: 630, 191
+  size: 149, 136
+  orig: 149, 136
+  offset: 0, 0
+  index: -1
+jaw
+  rotate: true
+  xy: 933, 388
+  size: 122, 86
+  orig: 122, 86
+  offset: 0, 0
+  index: -1
+lower_back_arm
+  rotate: false
+  xy: 146, 34
+  size: 51, 46
+  orig: 51, 46
+  offset: 0, 0
+  index: -1
+metaljaw
+  rotate: false
+  xy: 788, 267
+  size: 122, 86
+  orig: 122, 86
+  offset: 0, 0
+  index: -1
+splat01
+  rotate: false
+  xy: 371, 258
+  size: 257, 252
+  orig: 257, 252
+  offset: 0, 0
+  index: -1
+splat02
+  rotate: false
+  xy: 2, 254
+  size: 367, 256
+  orig: 367, 256
+  offset: 0, 0
+  index: -1
+splat03
+  rotate: false
+  xy: 2, 82
+  size: 362, 170
+  orig: 362, 170
+  offset: 0, 0
+  index: -1
+upper_back_arm
+  rotate: true
+  xy: 146, 2
+  size: 30, 43
+  orig: 30, 43
+  offset: 0, 0
+  index: -1

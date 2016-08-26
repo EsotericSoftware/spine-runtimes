@@ -1,0 +1,279 @@
+
+dragon.png
+size: 1024,1024
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+L_front_leg
+  rotate: false
+  xy: 870, 881
+  size: 42, 29
+  orig: 42, 29
+  offset: 0, 0
+  index: -1
+L_front_thigh
+  rotate: false
+  xy: 258, 761
+  size: 42, 36
+  orig: 42, 36
+  offset: 0, 0
+  index: -1
+L_rear_leg
+  rotate: false
+  xy: 765, 859
+  size: 103, 89
+  orig: 103, 89
+  offset: 0, 0
+  index: -1
+L_rear_thigh
+  rotate: false
+  xy: 156, 116
+  size: 46, 75
+  orig: 46, 75
+  offset: 0, 0
+  index: -1
+L_wing01
+  rotate: false
+  xy: 100, 687
+  size: 96, 128
+  orig: 96, 128
+  offset: 0, 0
+  index: -1
+L_wing02
+  rotate: false
+  xy: 2, 88
+  size: 90, 135
+  orig: 90, 135
+  offset: 0, 0
+  index: -1
+L_wing03
+  rotate: false
+  xy: 114, 451
+  size: 93, 104
+  orig: 93, 104
+  offset: 0, 0
+  index: -1
+L_wing04
+  rotate: false
+  xy: 104, 193
+  size: 94, 68
+  orig: 94, 68
+  offset: 0, 0
+  index: -1
+L_wing05
+  rotate: false
+  xy: 907, 915
+  size: 109, 107
+  orig: 109, 107
+  offset: 0, 0
+  index: -1
+L_wing06
+  rotate: false
+  xy: 2, 671
+  size: 96, 166
+  orig: 96, 166
+  offset: 0, 0
+  index: -1
+L_wing07
+  rotate: false
+  xy: 114, 557
+  size: 80, 128
+  orig: 80, 128
+  offset: 0, 0
+  index: -1
+L_wing08
+  rotate: false
+  xy: 104, 263
+  size: 82, 91
+  orig: 82, 91
+  offset: 0, 0
+  index: -1
+L_wing09
+  rotate: false
+  xy: 2, 2
+  size: 102, 84
+  orig: 102, 84
+  offset: 0, 0
+  index: -1
+R_front_leg
+  rotate: false
+  xy: 696, 873
+  size: 51, 45
+  orig: 51, 45
+  offset: 0, 0
+  index: -1
+R_front_thigh
+  rotate: false
+  xy: 331, 842
+  size: 54, 54
+  orig: 54, 54
+  offset: 0, 0
+  index: -1
+R_rear_leg
+  rotate: false
+  xy: 198, 763
+  size: 58, 50
+  orig: 58, 50
+  offset: 0, 0
+  index: -1
+R_rear_thigh
+  rotate: false
+  xy: 213, 815
+  size: 46, 75
+  orig: 46, 75
+  offset: 0, 0
+  index: -1
+R_wing01
+  rotate: false
+  xy: 2, 514
+  size: 110, 155
+  orig: 110, 155
+  offset: 0, 0
+  index: -1
+R_wing02
+  rotate: false
+  xy: 2, 359
+  size: 102, 153
+  orig: 102, 153
+  offset: 0, 0
+  index: -1
+R_wing03
+  rotate: false
+  xy: 254, 898
+  size: 136, 124
+  orig: 136, 124
+  offset: 0, 0
+  index: -1
+R_wing04
+  rotate: false
+  xy: 765, 950
+  size: 140, 72
+  orig: 140, 72
+  offset: 0, 0
+  index: -1
+R_wing05
+  rotate: false
+  xy: 392, 907
+  size: 126, 115
+  orig: 126, 115
+  offset: 0, 0
+  index: -1
+R_wing06
+  rotate: false
+  xy: 2, 839
+  size: 100, 183
+  orig: 100, 183
+  offset: 0, 0
+  index: -1
+R_wing07
+  rotate: false
+  xy: 2, 225
+  size: 100, 132
+  orig: 100, 132
+  offset: 0, 0
+  index: -1
+R_wing08
+  rotate: false
+  xy: 520, 895
+  size: 117, 127
+  orig: 117, 127
+  offset: 0, 0
+  index: -1
+R_wing09
+  rotate: false
+  xy: 639, 920
+  size: 124, 102
+  orig: 124, 102
+  offset: 0, 0
+  index: -1
+back
+  rotate: false
+  xy: 106, 356
+  size: 95, 93
+  orig: 95, 93
+  offset: 0, 0
+  index: -1
+chest
+  rotate: false
+  xy: 261, 835
+  size: 68, 61
+  orig: 68, 61
+  offset: 0, 0
+  index: -1
+chin
+  rotate: false
+  xy: 104, 817
+  size: 107, 73
+  orig: 107, 73
+  offset: 0, 0
+  index: -1
+front_toeA
+  rotate: false
+  xy: 311, 808
+  size: 15, 25
+  orig: 15, 25
+  offset: 0, 0
+  index: -1
+front_toeB
+  rotate: false
+  xy: 914, 884
+  size: 28, 29
+  orig: 28, 29
+  offset: 0, 0
+  index: -1
+head
+  rotate: false
+  xy: 104, 892
+  size: 148, 130
+  orig: 148, 130
+  offset: 0, 0
+  index: -1
+rear-toe
+  rotate: false
+  xy: 639, 879
+  size: 55, 39
+  orig: 55, 39
+  offset: 0, 0
+  index: -1
+tail01
+  rotate: false
+  xy: 94, 114
+  size: 60, 77
+  orig: 60, 77
+  offset: 0, 0
+  index: -1
+tail02
+  rotate: false
+  xy: 198, 701
+  size: 48, 60
+  orig: 48, 60
+  offset: 0, 0
+  index: -1
+tail03
+  rotate: false
+  xy: 248, 713
+  size: 37, 46
+  orig: 37, 46
+  offset: 0, 0
+  index: -1
+tail04
+  rotate: false
+  xy: 870, 912
+  size: 28, 36
+  orig: 28, 36
+  offset: 0, 0
+  index: -1
+tail05
+  rotate: false
+  xy: 944, 883
+  size: 26, 30
+  orig: 26, 30
+  offset: 0, 0
+  index: -1
+tail06
+  rotate: false
+  xy: 261, 799
+  size: 48, 34
+  orig: 48, 34
+  offset: 0, 0
+  index: -1

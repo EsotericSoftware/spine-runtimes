@@ -7,11 +7,10 @@ var ikConstraintDemo = function(pathPrefix) {
 	var lastFrameTime = Date.now() / 1000;
 	var target = null;	
 	var boneName = "hip";
-	var coords = new spine.webgl.Vector3(), temp = new spine.webgl.Vector3(), temp2 = new spine.Vector2();		
+	var coords = new spine.webgl.Vector3(), temp = new spine.webgl.Vector3(), temp2 = new spine.Vector2();	
 
-	function init () {
-
-		canvas = document.getElementById("ikdemo-canvas");
+	function init () {		
+		canvas = document.getElementById("mixingdemo-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 

@@ -33,8 +33,8 @@
 
 module spine.canvas {
 	export class AssetManager extends spine.AssetManager {
-		constructor () {
-			super((image: HTMLImageElement) => { return new spine.canvas.CanvasTexture(image); });
+		constructor (pathPrefix: string = "") {
+			super((image: HTMLImageElement) => { return new spine.canvas.CanvasTexture(image); }, pathPrefix);
 		}
 	}
 }

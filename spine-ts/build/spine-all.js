@@ -1,17 +1,20 @@
 var spine;
 (function (spine) {
     var AssetManager = (function () {
-        function AssetManager(textureLoader) {
+        function AssetManager(textureLoader, pathPrefix) {
+            if (pathPrefix === void 0) { pathPrefix = ""; }
             this.assets = {};
             this.errors = {};
             this.toLoad = 0;
             this.loaded = 0;
             this.textureLoader = textureLoader;
+            this.pathPrefix = pathPrefix;
         }
         AssetManager.prototype.loadText = function (path, success, error) {
             var _this = this;
             if (success === void 0) { success = null; }
             if (error === void 0) { error = null; }
+            path = this.pathPrefix + path;
             this.toLoad++;
             var request = new XMLHttpRequest();
             request.onreadystatechange = function () {
@@ -37,6 +40,7 @@ var spine;
             var _this = this;
             if (success === void 0) { success = null; }
             if (error === void 0) { error = null; }
+            path = this.pathPrefix + path;
             this.toLoad++;
             var img = new Image();
             img.src = path;
@@ -57,9 +61,11 @@ var spine;
             };
         };
         AssetManager.prototype.get = function (path) {
+            path = this.pathPrefix + path;
             return this.assets[path];
         };
         AssetManager.prototype.remove = function (path) {
+            path = this.pathPrefix + path;
             var asset = this.assets[path];
             if (asset.dispose)
                 asset.dispose();
@@ -106,8 +112,9 @@ var spine;
     (function (canvas) {
         var AssetManager = (function (_super) {
             __extends(AssetManager, _super);
-            function AssetManager() {
-                _super.call(this, function (image) { return new spine.canvas.CanvasTexture(image); });
+            function AssetManager(pathPrefix) {
+                if (pathPrefix === void 0) { pathPrefix = ""; }
+                _super.call(this, function (image) { return new spine.canvas.CanvasTexture(image); }, pathPrefix);
             }
             return AssetManager;
         }(spine.AssetManager));
@@ -4583,10 +4590,11 @@ var spine;
     (function (threejs) {
         var AssetManager = (function (_super) {
             __extends(AssetManager, _super);
-            function AssetManager() {
+            function AssetManager(pathPrefix) {
+                if (pathPrefix === void 0) { pathPrefix = ""; }
                 _super.call(this, function (image) {
                     return new threejs.ThreeJsTexture(image);
-                });
+                }, pathPrefix);
             }
             return AssetManager;
         }(spine.AssetManager));
@@ -4828,10 +4836,11 @@ var spine;
     (function (webgl) {
         var AssetManager = (function (_super) {
             __extends(AssetManager, _super);
-            function AssetManager(gl) {
+            function AssetManager(gl, pathPrefix) {
+                if (pathPrefix === void 0) { pathPrefix = ""; }
                 _super.call(this, function (image) {
                     return new spine.webgl.GLTexture(gl, image);
-                });
+                }, pathPrefix);
             }
             return AssetManager;
         }(spine.AssetManager));
