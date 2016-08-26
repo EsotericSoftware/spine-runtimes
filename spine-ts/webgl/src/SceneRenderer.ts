@@ -40,6 +40,7 @@ module spine.webgl {
 		private shapesShader: Shader;
 		private activeRenderer: PolygonBatcher | ShapeRenderer = null;
 		private skeletonRenderer: SkeletonRenderer;
+		private skeletonDebugRenderer: SkeletonDebugRenderer;
 		private QUAD = [
 			0, 0, 1, 1, 1, 1, 0, 0,
 			0, 0, 1, 1, 1, 1, 0, 0,
@@ -58,6 +59,7 @@ module spine.webgl {
 			this.shapesShader = Shader.newColored(gl);
 			this.shapes = new ShapeRenderer(gl); 
 			this.skeletonRenderer = new SkeletonRenderer(gl);
+			this.skeletonDebugRenderer = new SkeletonDebugRenderer(gl);
 		}
 
 		begin () {
@@ -69,6 +71,12 @@ module spine.webgl {
 			this.enableRenderer(this.batcher);
 			this.skeletonRenderer.premultipliedAlpha = premultipliedAlpha;
 			this.skeletonRenderer.draw(this.batcher, skeleton);
+		}
+
+		drawSkeletonDebug(skeleton: Skeleton, premultipliedAlpha = false) {
+			this.enableRenderer(this.shapes);
+			this.skeletonDebugRenderer.premultipliedAlpha = premultipliedAlpha;
+			this.skeletonDebugRenderer.draw(this.shapesShader, skeleton);
 		}
 
 		drawTexture (texture: GLTexture, x: number, y: number, width: number, height: number, color: Color = null) {
@@ -241,7 +249,8 @@ module spine.webgl {
 			this.batcher.dispose();
 			this.batcherShader.dispose();
 			this.shapes.dispose();
-			this.shapesShader.dispose();			
+			this.shapesShader.dispose();
+			this.skeletonDebugRenderer.dispose();		
 		}
 	}
 

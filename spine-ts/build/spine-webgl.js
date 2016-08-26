@@ -5187,6 +5187,7 @@ var spine;
                 this.shapesShader = webgl.Shader.newColored(gl);
                 this.shapes = new webgl.ShapeRenderer(gl);
                 this.skeletonRenderer = new webgl.SkeletonRenderer(gl);
+                this.skeletonDebugRenderer = new webgl.SkeletonDebugRenderer(gl);
             }
             SceneRenderer.prototype.begin = function () {
                 this.camera.update();
@@ -5197,6 +5198,12 @@ var spine;
                 this.enableRenderer(this.batcher);
                 this.skeletonRenderer.premultipliedAlpha = premultipliedAlpha;
                 this.skeletonRenderer.draw(this.batcher, skeleton);
+            };
+            SceneRenderer.prototype.drawSkeletonDebug = function (skeleton, premultipliedAlpha) {
+                if (premultipliedAlpha === void 0) { premultipliedAlpha = false; }
+                this.enableRenderer(this.shapes);
+                this.skeletonDebugRenderer.premultipliedAlpha = premultipliedAlpha;
+                this.skeletonDebugRenderer.draw(this.shapesShader, skeleton);
             };
             SceneRenderer.prototype.drawTexture = function (texture, x, y, width, height, color) {
                 if (color === void 0) { color = null; }
@@ -5379,6 +5386,7 @@ var spine;
                 this.batcherShader.dispose();
                 this.shapes.dispose();
                 this.shapesShader.dispose();
+                this.skeletonDebugRenderer.dispose();
             };
             return SceneRenderer;
         }());

@@ -36,15 +36,20 @@ var imageSequencesDemo = function(pathPrefix) {
 
 	function setupUI() {
 		playButton = $("#imagesequencesdemo-playbutton");
-		playButtonUpdate = function () {			
+		var playButtonUpdate = function () {			
 			isPlaying = !isPlaying;
-			if (isPlaying) playButton.val("Pause");		
-			else playButton.val("Play");		
+			if (isPlaying) {
+				playButton.val("Pause");
+				playButton.addClass("pause").removeClass("play");		
+			} else {
+				playButton.val("Play");
+				playButton.addClass("play").removeClass("pause");
+			}			
 		}
 		playButton.click(playButtonUpdate);
 
 		timeLine = $("#imagesequencesdemo-timeline");
-		timeLineUpdate = function () {
+		var timeLineUpdate = function () {
 			if (!isPlaying) {
 				var active = skeletons[activeSkeleton];
 				var time = timeLine.val() / 100;
@@ -55,10 +60,11 @@ var imageSequencesDemo = function(pathPrefix) {
 				active.skeleton.updateWorldTransform();
 				active.playTime = time;				
 			}
-		}
-		timeLine.change(timeLineUpdate);
-		timeLine.on("input", timeLineUpdate);
-		timeLine.click(function () { if (isPlaying) playButton.click();});
+		}		
+		timeLine.on("input change", function () {
+			if (isPlaying) playButton.click();
+			timeLineUpdate();
+		});
 
 		var list = $("#imagesequencesdemo-active-skeleton");	
 		for (var skeletonName in skeletons) {
@@ -119,8 +125,8 @@ var imageSequencesDemo = function(pathPrefix) {
 	function render () {
 		var now = Date.now() / 1000;
 		var delta = now - lastFrameTime;
-		lastFrameTime = now;
-		delta *= 0.5;
+		lastFrameTime = now;	
+		if (delta > 0.032) delta = 0.032;	
 
 		var active = skeletons[activeSkeleton];
 		var skeleton = active.skeleton;

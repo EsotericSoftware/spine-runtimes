@@ -1075,12 +1075,14 @@ declare module spine.webgl {
         private shapesShader;
         private activeRenderer;
         private skeletonRenderer;
+        private skeletonDebugRenderer;
         private QUAD;
         private QUAD_TRIANGLES;
         private WHITE;
         constructor(canvas: HTMLCanvasElement, gl: WebGLRenderingContext);
         begin(): void;
         drawSkeleton(skeleton: Skeleton, premultipliedAlpha?: boolean): void;
+        drawSkeletonDebug(skeleton: Skeleton, premultipliedAlpha?: boolean): void;
         drawTexture(texture: GLTexture, x: number, y: number, width: number, height: number, color?: Color): void;
         drawRegion(region: TextureAtlasRegion, x: number, y: number, width: number, height: number, color?: Color): void;
         line(x: number, y: number, x2: number, y2: number, color?: Color, color2?: Color): void;

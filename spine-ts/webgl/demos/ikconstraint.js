@@ -75,6 +75,7 @@ var ikConstraintDemo = function(pathPrefix) {
 		var now = Date.now() / 1000;
 		var delta = now - lastFrameTime;
 		lastFrameTime = now;
+		if (delta > 0.032) delta = 0.032;
 
 		renderer.camera.viewportWidth = bounds.x * 1.2;
 		renderer.camera.viewportHeight = bounds.y * 1.2;

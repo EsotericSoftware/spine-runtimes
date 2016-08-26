@@ -68,15 +68,20 @@ var skeletonVsSpriteDemo = function(pathPrefix) {
 
 	function setupUI() {
 		playButton = $("#skeletonvsspritedemo-playbutton");
-		playButtonUpdate = function () {			
+		var playButtonUpdate = function () {			
 			isPlaying = !isPlaying;
-			if (isPlaying) playButton.val("Pause");		
-			else playButton.val("Play");		
+			if (isPlaying) {
+				playButton.val("Pause");
+				playButton.addClass("pause").removeClass("play");		
+			} else {
+				playButton.val("Play");
+				playButton.addClass("play").removeClass("pause");
+			}		
 		}
 		playButton.click(playButtonUpdate);
 
 		timeLine = $("#skeletonvsspritedemo-timeline");
-		timeLineUpdate = function () {
+		var timeLineUpdate = function () {
 			if (!isPlaying) {				
 				var time = timeLine.val() / 100;
 				var animationDuration = animationState.getCurrent(0).animation.duration;
@@ -89,10 +94,11 @@ var skeletonVsSpriteDemo = function(pathPrefix) {
 				while (frameTime > animationDuration) frameTime -= animationDuration;				
 				currFrame = Math.min(frames.length - 1, (frameTime / (1 / FPS)) | 0);								
 			}
-		}
-		timeLine.change(timeLineUpdate);
-		timeLine.on("input", timeLineUpdate);
-		timeLine.click(function () { if (isPlaying) playButton.click();});
+		}		
+		timeLine.on("input change", function () {
+			if (isPlaying) playButton.click();
+			timeLineUpdate();
+		});
 	}
 
 	function render () {
@@ -144,17 +150,20 @@ var skeletonVsSpriteDemo = function(pathPrefix) {
 
 			// we only have one page for skeleton
 			var skeletonPageSize = pageSize * skeletonAtlasSize / frameAtlasSize;
+			renderer.rect(true, offset.x + halfSpaceWidth / 2 - skeletonPageSize / 2,
+						  offset.y + halfSpaceHeight / 2 - skeletonPageSize / 2, skeletonPageSize, skeletonPageSize, spine.Color.WHITE);
 			renderer.drawTexture(skeletonAtlas.pages[0].texture, offset.x + halfSpaceWidth / 2 - skeletonPageSize / 2,
 								 offset.y + halfSpaceHeight / 2 - skeletonPageSize / 2, skeletonPageSize, skeletonPageSize);
 			renderer.rect(false, offset.x + halfSpaceWidth / 2 - skeletonPageSize / 2,
 						  offset.y + halfSpaceHeight / 2 - skeletonPageSize / 2, skeletonPageSize, skeletonPageSize, SKELETON_ATLAS_COLOR);
 
-			var x = offset.x + halfSpaceWidth;
+			var x = offset.x + halfSpaceWidth  + 150;
 			var y = offset.y + halfSpaceHeight / 2;
 			var i = 0;
 			for (var row = 0; row < frameAtlas.pages.length / 2; row++) {
 				for (var col = 0; col < 2; col++) {
 					var page = frameAtlas.pages[i++];
+					renderer.rect(true, x + col * pageSize, y - row * pageSize, pageSize, pageSize, spine.Color.WHITE);
 					renderer.drawTexture(page.texture, x + col * pageSize, y - row * pageSize, pageSize, pageSize);
 					renderer.rect(false, x + col * pageSize, y - row * pageSize, pageSize, pageSize, FRAME_ATLAS_COLOR);
 				}
