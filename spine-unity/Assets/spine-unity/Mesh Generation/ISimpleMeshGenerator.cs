@@ -9,6 +9,7 @@
 
 		float Scale { set; }
 		float ZSpacing { get; set; }
+		bool PremultiplyVertexColors { get; set; }
 
 		bool AddNormals { get; set; }
 		bool AddTangents { get; set; }

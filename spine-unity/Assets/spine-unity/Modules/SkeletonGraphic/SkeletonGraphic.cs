@@ -189,6 +189,7 @@ namespace Spine.Unity {
 
 			this.skeleton = new Skeleton(skeletonData);
 			this.spineMeshGenerator = new Spine.Unity.MeshGeneration.ArraysSimpleMeshGenerator(); // You can switch this out with any other implementer of Spine.Unity.MeshGeneration.ISimpleMeshGenerator
+			this.spineMeshGenerator.PremultiplyVertexColors = true;
 
 			// Set the initial Skin and Animation
 			if (!string.IsNullOrEmpty(initialSkinName))
