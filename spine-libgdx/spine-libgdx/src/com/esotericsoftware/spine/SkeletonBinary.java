@@ -318,7 +318,8 @@ public class SkeletonBinary {
 			int slotIndex = input.readInt(true);
 			for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 				String name = input.readString();
-				skin.addAttachment(slotIndex, name, readAttachment(input, skin, slotIndex, name, nonessential));
+				Attachment attachment = readAttachment(input, skin, slotIndex, name, nonessential);
+				if (attachment != null) skin.addAttachment(slotIndex, name, attachment);
 			}
 		}
 		return skin;
