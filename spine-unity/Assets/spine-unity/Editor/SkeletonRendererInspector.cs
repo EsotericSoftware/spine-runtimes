@@ -38,7 +38,7 @@ namespace Spine.Unity.Editor {
 	[CustomEditor(typeof(SkeletonRenderer))]
 	public class SkeletonRendererInspector : UnityEditor.Editor {
 		protected static bool advancedFoldout;
-		protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, separatorSlotNames, frontFacing, zSpacing;
+		protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, separatorSlotNames, frontFacing, zSpacing, pmaVertexColors;
 		protected SpineInspectorUtility.SerializedSortingProperties sortingProperties;
 		protected bool isInspectingPrefab;
 		protected MeshFilter meshFilter;
@@ -53,6 +53,7 @@ namespace Spine.Unity.Editor {
 			tangents = serializedObject.FindProperty("calculateTangents");
 			meshes = serializedObject.FindProperty("renderMeshes");
 			immutableTriangles = serializedObject.FindProperty("immutableTriangles");
+			pmaVertexColors = serializedObject.FindProperty("pmaVertexColors");
 			separatorSlotNames = serializedObject.FindProperty("separatorSlotNames");
 			separatorSlotNames.isExpanded = true;
 
@@ -145,20 +146,27 @@ namespace Spine.Unity.Editor {
 				if (advancedFoldout) {
 					EditorGUI.indentLevel++;
 					SeparatorsField(separatorSlotNames);
-					EditorGUILayout.PropertyField(meshes,
+					EditorGUILayout.Space();
+
+					// Optimization options
+					SpineInspectorUtility.PropertyFieldWideLabel(meshes,
 						new GUIContent("Render MeshAttachments", "Disable to optimize rendering for skeletons that don't use Mesh Attachments"));
-					EditorGUILayout.PropertyField(immutableTriangles,
+					SpineInspectorUtility.PropertyFieldWideLabel(immutableTriangles,
 						new GUIContent("Immutable Triangles", "Enable to optimize rendering for skeletons that never change attachment visbility"));
 					EditorGUILayout.Space();
 
+					// Render options
 					const float MinZSpacing = -0.1f;
 					const float MaxZSpacing = 0f;
 					EditorGUILayout.Slider(zSpacing, MinZSpacing, MaxZSpacing);
+					EditorGUILayout.Space();
+					SpineInspectorUtility.PropertyFieldWideLabel(pmaVertexColors,
+						new GUIContent("PMA Vertex Colors", "Use this if you are using the default Spine/Skeleton shader or any premultiply-alpha shader."));
 
 					// Optional fields. May be disabled in SkeletonRenderer.
-					if (normals != null) EditorGUILayout.PropertyField(normals, new GUIContent("Add Normals"));
-					if (tangents != null) EditorGUILayout.PropertyField(tangents, new GUIContent("Solve Tangents"));
-					if (frontFacing != null) EditorGUILayout.PropertyField(frontFacing);
+					if (normals != null) SpineInspectorUtility.PropertyFieldWideLabel(normals, new GUIContent("Add Normals"));
+					if (tangents != null) SpineInspectorUtility.PropertyFieldWideLabel(tangents, new GUIContent("Solve Tangents"));
+					if (frontFacing != null) SpineInspectorUtility.PropertyFieldWideLabel(frontFacing);
 
 					EditorGUI.indentLevel--;
 				}
