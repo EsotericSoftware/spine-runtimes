@@ -12,7 +12,6 @@ using UnityEditor;
 #else
 using UnityEditor.AnimatedValues;
 #endif
-using System.Collections;
 using System.Collections.Generic;
 using Spine;
 
@@ -111,12 +110,8 @@ namespace Spine.Unity.Editor {
 
 		void UpdateAttachments () {
 			attachmentTable = new Dictionary<Slot, List<Attachment>>();
-			Skin skin = skeleton.Skin;
 
-			if (skin == null) {
-				skin = skeletonRenderer.skeletonDataAsset.GetSkeletonData(true).DefaultSkin;
-			}
-
+			Skin skin = skeleton.Skin ?? skeletonRenderer.skeletonDataAsset.GetSkeletonData(true).DefaultSkin;
 			for (int i = skeleton.Slots.Count-1; i >= 0; i--) {
 				List<Attachment> attachments = new List<Attachment>();
 				skin.FindAttachmentsForSlot(i, attachments);
@@ -229,14 +224,14 @@ namespace Spine.Unity.Editor {
 						GUI.contentColor = Color.white;
 					}
 				}
-				#if UNITY_4_3
+			#if UNITY_4_3
 
-				#else
+			#else
 			}
 			EditorGUILayout.EndFadeGroup();
 			if (showSlots.isAnimating)
 				Repaint();
-				#endif
+			#endif
 		}
 
 		void SpawnHierarchyContextMenu () {
