@@ -9,13 +9,11 @@ var skeletonVsSpriteDemo = function(pathPrefix) {
 	var viewportWidth, viewportHeight;
 	var frames = [], currFrame = 0, frameTime = 0, frameScale = 0, FPS = 30;
 	var lastFrameTime = Date.now() / 1000;
-	var timeSlider, atlasCheckbox;
+	var timeSlider, timeSliderLabel, atlasCheckbox;
 	var playButton, timeLine, isPlaying = true, playTime = 0;
 
 	function init () {
-		if (pathPrefix === undefined) pathPrefix = "";
-		timeSlider = document.getElementById("skeletonvsspritedemo-timeslider");
-		atlasCheckbox = document.getElementById("skeletonvsspritedemo-atlascheckbox");
+		if (pathPrefix === undefined) pathPrefix = "";		
 
 		canvas = document.getElementById("skeletonvsspritedemo-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;	
@@ -68,7 +66,7 @@ var skeletonVsSpriteDemo = function(pathPrefix) {
 
 	function setupUI() {
 		playButton = $("#skeletonvsspritedemo-playbutton");
-		var playButtonUpdate = function () {			
+		var playButtonUpdate = function () {	
 			isPlaying = !isPlaying;
 			if (isPlaying) {
 				playButton.val("Pause");
@@ -81,9 +79,10 @@ var skeletonVsSpriteDemo = function(pathPrefix) {
 		playButton.click(playButtonUpdate);
 
 		timeLine = $("#skeletonvsspritedemo-timeline");
-		var timeLineUpdate = function () {
+		timeLine.slider({ range: "max", min: 0, max: 100, value: 0, slide: function () {
+			if (isPlaying) playButton.click();		
 			if (!isPlaying) {				
-				var time = timeLine.val() / 100;
+				var time = timeLine.slider("value") / 100;
 				var animationDuration = animationState.getCurrent(0).animation.duration;
 				time = animationDuration * time;				
 				animationState.update(time - playTime);
@@ -94,11 +93,12 @@ var skeletonVsSpriteDemo = function(pathPrefix) {
 				while (frameTime > animationDuration) frameTime -= animationDuration;				
 				currFrame = Math.min(frames.length - 1, (frameTime / (1 / FPS)) | 0);								
 			}
-		}		
-		timeLine.on("input change", function () {
-			if (isPlaying) playButton.click();
-			timeLineUpdate();
-		});
+		}});		
+
+		timeSlider = $("#skeletonvsspritedemo-timeslider");
+		timeSlider.slider({ range: "max", min: 0, max: 200, value: 50 });
+		timeSliderLabel = $("#skeletonvsspritedemo-timeslider-label");
+		atlasCheckbox = document.getElementById("skeletonvsspritedemo-atlascheckbox");
 	}
 
 	function render () {
@@ -107,7 +107,8 @@ var skeletonVsSpriteDemo = function(pathPrefix) {
 		lastFrameTime = now;
 		if (delta > 0.032) delta = 0.032;
 
-		delta *= (timeSlider.value / 100);	
+		delta *= (timeSlider.slider("value") / 100);
+		if (timeSliderLabel) timeSliderLabel.text(timeSlider.slider("value") + "%");	
 
 		if (!atlasCheckbox.checked) {
 			if (isPlaying) {
@@ -116,7 +117,7 @@ var skeletonVsSpriteDemo = function(pathPrefix) {
 				while (playTime >= animationDuration) {
 					playTime -= animationDuration;
 				}
-				timeLine.val(playTime / animationDuration * 100);
+				timeLine.slider("value", (playTime / animationDuration * 100));
 
 				animationState.update(delta);
 				animationState.apply(skeleton);
