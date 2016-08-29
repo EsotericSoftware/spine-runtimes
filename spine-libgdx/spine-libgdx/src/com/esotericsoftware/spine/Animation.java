@@ -244,8 +244,8 @@ public class Animation {
 
 	static public class RotateTimeline extends CurveTimeline {
 		static public final int ENTRIES = 2;
-		static private final int PREV_TIME = -2, PREV_ROTATION = -1;
-		static private final int ROTATION = 1;
+		static final int PREV_TIME = -2, PREV_ROTATION = -1;
+		static final int ROTATION = 1;
 
 		int boneIndex;
 		final float[] frames; // time, degrees, ...

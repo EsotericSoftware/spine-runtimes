@@ -31,13 +31,17 @@
 
 package com.esotericsoftware.spine;
 
+import static com.esotericsoftware.spine.Animation.RotateTimeline.*;
+
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BooleanArray;
+import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
+import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 
 /** Stores state for applying one or more animations over time and mixing (crossfading) between animations.
@@ -113,6 +117,8 @@ public class AnimationState {
 			}
 
 			current.trackTime += currentDelta;
+
+			// Update mixing from entry.
 			if (mixingFrom != null) {
 				if (current.mixTime >= current.mixDuration && current.mixTime > 0) {
 					current.mixingFrom = null;
@@ -144,6 +150,8 @@ public class AnimationState {
 			if (current.delay > 0) continue;
 
 			float mix = current.alpha;
+
+			// Apply mixing from entry first.
 			if (current.mixingFrom != null) {
 				if (current.mixDuration == 0)
 					mix = 1;
@@ -154,15 +162,26 @@ public class AnimationState {
 				applyMixingFrom(current.mixingFrom, skeleton, mix);
 			}
 
+			// Apply current entry.
 			float animationLast = current.animationLast, animationTime = current.getAnimationTime();
 			Array<Timeline> timelines = current.animation.timelines;
 			if (mix == 1) {
 				for (int ii = 0, n = timelines.size; ii < n; ii++)
 					timelines.get(ii).apply(skeleton, animationLast, animationTime, events, 1, false, false);
 			} else {
+				boolean firstFrame = current.timelinesRotation.size == 0;
+				if (firstFrame) current.timelinesRotation.setSize(timelines.size << 1);
+				float[] timelinesRotation = current.timelinesRotation.items;
 				boolean[] timelinesFirst = current.timelinesFirst.items;
-				for (int ii = 0, n = timelines.size; ii < n; ii++)
-					timelines.get(ii).apply(skeleton, animationLast, animationTime, events, mix, timelinesFirst[ii], false);
+				for (int ii = 0, n = timelines.size; ii < n; ii++) {
+					Timeline timeline = timelines.get(ii);
+					if (timeline instanceof RotateTimeline) {
+						applyRotateTimeline((RotateTimeline)timeline, skeleton, animationLast, animationTime, events, mix,
+							timelinesFirst[ii], false, timelinesRotation, ii << 1, firstFrame);
+					} else {
+						timeline.apply(skeleton, animationLast, animationTime, events, mix, timelinesFirst[ii], false);
+					}
+				}
 			}
 			queueEvents(current, animationTime);
 			current.nextAnimationLast = animationTime;
@@ -178,22 +197,93 @@ public class AnimationState {
 
 		float animationLast = entry.animationLast, animationTime = entry.getAnimationTime();
 		Array<Timeline> timelines = entry.animation.timelines;
+		int timelineCount = timelines.size;
 		boolean[] timelinesFirst = entry.timelinesFirst.items, timelinesLast = entry.timelinesLast.items;
 		float alphaFull = entry.alpha, alphaMix = alphaFull * (1 - mix);
-		for (int i = 0, n = timelines.size; i < n; i++) {
+
+		boolean firstFrame = entry.timelinesRotation.size == 0;
+		if (firstFrame) entry.timelinesRotation.setSize(timelineCount << 1);
+		float[] timelinesRotation = entry.timelinesRotation.items;
+
+		for (int i = 0; i < timelineCount; i++) {
 			Timeline timeline = timelines.get(i);
 			boolean setupPose = timelinesFirst[i];
-			if (!setupPose) {
-				if (!attachments && timeline instanceof AttachmentTimeline) continue;
-				if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
+			float alpha = timelinesLast[i] ? alphaMix : alphaFull;
+			if (timeline instanceof RotateTimeline && alpha < 1) {
+				applyRotateTimeline((RotateTimeline)timeline, skeleton, animationLast, animationTime, events, alpha, setupPose,
+					setupPose, timelinesRotation, i << 1, firstFrame);
+			} else {
+				if (!setupPose) {
+					if (!attachments && timeline instanceof AttachmentTimeline) continue;
+					if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
+				}
+				timeline.apply(skeleton, animationLast, animationTime, events, alpha, setupPose, setupPose);
 			}
-			timeline.apply(skeleton, animationLast, animationTime, events, timelinesLast[i] ? alphaMix : alphaFull, setupPose,
-				setupPose);
 		}
 
 		queueEvents(entry, animationTime);
 		entry.nextAnimationLast = animationTime;
 		entry.nextTrackLast = entry.trackTime;
+	}
+
+	/** @param events May be null. */
+	private void applyRotateTimeline (RotateTimeline timeline, Skeleton skeleton, float lastTime, float time, Array<Event> events,
+		float alpha, boolean setupPose, boolean mixingOut, float[] timelinesRotation, int i, boolean firstFrame) {
+		float[] frames = timeline.frames;
+		if (time < frames[0]) return; // Time is before first frame.
+
+		Bone bone = skeleton.bones.get(timeline.boneIndex);
+
+		float r2;
+		if (time >= frames[frames.length - ENTRIES]) // Time is after last frame.
+			r2 = bone.data.rotation + frames[frames.length + PREV_ROTATION];
+		else {
+			// Interpolate between the previous frame and the current frame.
+			int frame = Animation.binarySearch(frames, time, ENTRIES);
+			float prevRotation = frames[frame + PREV_ROTATION];
+			float frameTime = frames[frame];
+			float percent = timeline.getCurvePercent((frame >> 1) - 1,
+				1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+
+			r2 = frames[frame + ROTATION] - prevRotation;
+			r2 -= (16384 - (int)(16384.499999999996 - r2 / 360)) * 360;
+			r2 = prevRotation + r2 * percent + bone.data.rotation;
+			r2 -= (16384 - (int)(16384.499999999996 - r2 / 360)) * 360;
+		}
+
+		// Mix between two rotations using the direction of the shortest route on the first frame while detecting crosses.
+		float r1 = setupPose ? bone.data.rotation : bone.rotation;
+		float total, diff = r2 - r1;
+		if (diff == 0) {
+			if (firstFrame) {
+				timelinesRotation[i] = 0;
+				total = 0;
+			} else
+				total = timelinesRotation[i];
+		} else {
+			diff -= (16384 - (int)(16384.499999999996 - diff / 360)) * 360;
+			float lastTotal, lastDiff;
+			if (firstFrame) {
+				lastTotal = 0;
+				lastDiff = diff;
+			} else {
+				lastTotal = timelinesRotation[i]; // Angle and direction of mix, including loops.
+				lastDiff = timelinesRotation[i + 1]; // Difference between bones.
+			}
+			boolean current = diff > 0, dir = lastTotal >= 0;
+			// Detect cross at 0 (not 180).
+			if (Math.signum(lastDiff) != Math.signum(diff) && Math.abs(lastDiff) <= 90) {
+				// A cross after a 360 rotation is a loop.
+				if (Math.abs(lastTotal) > 180) lastTotal += 360 * Math.signum(lastTotal);
+				dir = current;
+			}
+			total = diff + lastTotal - lastTotal % 360; // Keep loops part of lastTotal.
+			if (dir != current) total += 360 * Math.signum(lastTotal);
+			timelinesRotation[i] = total;
+		}
+		timelinesRotation[i + 1] = diff;
+		r1 += total * alpha;
+		bone.rotation = r1 - (16384 - (int)(16384.499999999996 - r1 / 360)) * 360;
 	}
 
 	private void queueEvents (TrackEntry entry, float animationTime) {
@@ -280,6 +370,7 @@ public class AnimationState {
 				mixingFrom = current;
 			} else
 				entry.mixingFrom = current;
+			entry.mixingFrom.timelinesRotation.clear();
 
 			if (mixingFrom != null) queue.end(mixingFrom);
 		}
@@ -461,7 +552,7 @@ public class AnimationState {
 			checkTimelineUsage(entry, entry.timelinesFirst);
 		}
 
-		// Compute timelinesLast. End with lowest track that has mixingFrom.
+		// Compute timelinesLast from highest to lowest track that has mixingFrom.
 		propertyIDs.clear();
 		int lowestMixingFrom = n;
 		for (i = 0; i < n; i++) {
@@ -594,6 +685,7 @@ public class AnimationState {
 		float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale;
 		float alpha, mixTime, mixDuration;
 		final BooleanArray timelinesFirst = new BooleanArray(), timelinesLast = new BooleanArray();
+		final FloatArray timelinesRotation = new FloatArray();
 
 		public void reset () {
 			next = null;
@@ -602,6 +694,7 @@ public class AnimationState {
 			listener = null;
 			timelinesFirst.clear();
 			timelinesLast.clear();
+			timelinesRotation.clear();
 		}
 
 		public int getTrackIndex () {
