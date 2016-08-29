@@ -228,6 +228,15 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		float delta = Gdx.graphics.getDeltaTime();
 
+		ShapeRenderer shapes = debugRenderer.getShapeRenderer();
+		if (state != null) {
+			shapes.setColor(Color.DARK_GRAY);
+			shapes.begin(ShapeType.Line);
+			shapes.line(skeleton.x, -99999, skeleton.x, 99999);
+			shapes.line(-99999, skeleton.y, 99999, skeleton.y);
+			shapes.end();
+		}
+
 		if (skeleton != null) {
 			if (reloadTimer <= 0) {
 				lastModifiedCheck -= delta;
@@ -273,7 +282,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		// Draw indicator lines for animation and mix times.
 		if (state != null) {
-			ShapeRenderer shapes = debugRenderer.getShapeRenderer();
 			TrackEntry entry = state.getCurrent(0);
 			if (entry != null) {
 				shapes.begin(ShapeType.Line);
