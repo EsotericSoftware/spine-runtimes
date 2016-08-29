@@ -71,9 +71,6 @@ public class SkeletonRendererDebug {
 	}
 
 	public void draw (Skeleton skeleton) {
-		float skeletonX = skeleton.getX();
-		float skeletonY = skeleton.getY();
-
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 		int srcFunc = premultipliedAlpha ? GL20.GL_ONE : GL20.GL_SRC_ALPHA;
 		Gdx.gl.glBlendFunc(srcFunc, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -93,13 +90,13 @@ public class SkeletonRendererDebug {
 					shapes.setColor(boneOriginColor);
 				} else
 					shapes.setColor(boneLineColor);
-				float x = skeletonX + length * bone.a + bone.worldX;
-				float y = skeletonY + length * bone.c + bone.worldY;
-				shapes.rectLine(skeletonX + bone.worldX, skeletonY + bone.worldY, x, y, width * scale);
+				float x = length * bone.a + bone.worldX;
+				float y = length * bone.c + bone.worldY;
+				shapes.rectLine(bone.worldX, bone.worldY, x, y, width * scale);
 			}
 			shapes.end();
 			shapes.begin(ShapeType.Line);
-			shapes.x(skeletonX, skeletonY, 4 * scale);
+			shapes.x(skeleton.getX(), skeleton.getY(), 4 * scale);
 		} else
 			shapes.begin(ShapeType.Line);
 
@@ -215,7 +212,7 @@ public class SkeletonRendererDebug {
 			for (int i = 0, n = bones.size; i < n; i++) {
 				Bone bone = bones.get(i);
 				shapes.setColor(Color.GREEN);
-				shapes.circle(skeletonX + bone.worldX, skeletonY + bone.worldY, 3 * scale, 8);
+				shapes.circle(bone.worldX, bone.worldY, 3 * scale, 8);
 			}
 		}
 
