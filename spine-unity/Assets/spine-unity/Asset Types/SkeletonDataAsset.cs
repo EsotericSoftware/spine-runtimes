@@ -161,6 +161,11 @@ namespace Spine.Unity {
 				return;
 
 			stateData.DefaultMix = defaultMix;
+
+			// For compatibility with runtime-instantiated SkeletonDataAsset.
+			if (fromAnimation == null || toAnimation == null)
+				return;
+
 			for (int i = 0, n = fromAnimation.Length; i < n; i++) {
 				if (fromAnimation[i].Length == 0 || toAnimation[i].Length == 0)
 					continue;
