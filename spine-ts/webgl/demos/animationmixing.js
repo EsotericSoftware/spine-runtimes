@@ -3,11 +3,13 @@ var animationMixingDemo = function(pathPrefix) {
 
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, skeletonNoMix, state, stateNoMix, bounds;
-	var timeSlider;
+	var timeSlider, timeSliderLabel;
 	var lastFrameTime = Date.now() / 1000
 
 	function init () {
-		timeSlider = document.getElementById("animationmixingdemo-timeslider");
+		timeSlider = $("#animationmixingdemo-timeslider");
+		timeSlider.slider({ range: "max", min: 0, max: 200, value: 50 });
+		timeSliderLabel = $("#animationmixingdemo-timeslider-label");
 		canvas = document.getElementById("animationmixingdemo-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
@@ -91,7 +93,8 @@ var animationMixingDemo = function(pathPrefix) {
 		var delta = now - lastFrameTime;
 		lastFrameTime = now;
 		if (delta > 0.032) delta = 0.032;
-		delta *= (timeSlider.value / 100);		
+		delta *= (timeSlider.slider("value") / 100);
+		if (timeSliderLabel) timeSliderLabel.text(timeSlider.slider("value") + "%");	
 
 		var offset = bounds.offset;
 		var size = bounds.size;

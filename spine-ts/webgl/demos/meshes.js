@@ -62,9 +62,10 @@ var meshesDemo = function(pathPrefix) {
 		playButton.click(playButtonUpdate);
 
 		timeLine = $("#meshesdemo-timeline");
-		var timeLineUpdate = function () {
+		timeLine.slider({ range: "max", min: 0, max: 100, value: 0, slide: function () {
+			if (isPlaying) playButton.click();
 			if (!isPlaying) {				
-				var time = timeLine.val() / 100;
+				var time = timeLine.slider("value") / 100;
 				var animationDuration = state.getCurrent(0).animation.duration;
 				time = animationDuration * time;				
 				state.update(time - playTime);
@@ -72,11 +73,7 @@ var meshesDemo = function(pathPrefix) {
 				skeleton.updateWorldTransform();
 				playTime = time;												
 			}
-		}		
-		timeLine.on("input change", function () {
-			if (isPlaying) playButton.click();
-			timeLineUpdate();
-		});
+		}});		
 
 		$("#meshesdemo-drawbonescheckbox").change(function() {
 			renderer.skeletonDebugRenderer.drawBones = this.checked;
@@ -111,7 +108,7 @@ var meshesDemo = function(pathPrefix) {
 			while (playTime >= animationDuration) {
 				playTime -= animationDuration;
 			}
-			timeLine.val(playTime / animationDuration * 100);
+			timeLine.slider("value", (playTime / animationDuration * 100));
 
 			state.update(delta);
 			state.apply(skeleton);

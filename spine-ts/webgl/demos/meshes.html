@@ -1,10 +1,14 @@
 <html>
 <script src="../../build/spine-webgl.js"></script>
 <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
 <style>
 	* { margin: 0; padding: 0; }
 	body, html { height: 100% }
 	canvas { position: absolute; width: 100% ;height: 100%; }
+	.slider { width: 50% }
 </style>
 <body>
 <canvas id="meshesdemo-canvas"></canvas>
@@ -20,7 +24,7 @@
 	<input type="checkbox" id="meshesdemo-drawmeshtrianglescheckbox" style="color: #fff;" checked="true"></input>
 	<br>
 	<input id="meshesdemo-playbutton" type="button" value="Pause"></input>
-	<input id="meshesdemo-timeline" type="range" min="0" max="100" value ="0" style="color: #fff; width: 50%"></input>
+	<div id="meshesdemo-timeline" class="slider"></input>
 </div>
 </center>
 <script src="meshes.js"></script>

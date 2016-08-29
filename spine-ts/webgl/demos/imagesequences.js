@@ -49,10 +49,11 @@ var imageSequencesDemo = function(pathPrefix) {
 		playButton.click(playButtonUpdate);
 
 		timeLine = $("#imagesequencesdemo-timeline");
-		var timeLineUpdate = function () {
+		timeLine.slider({ range: "max", min: 0, max: 100, value: 0, slide: function () {
+			if (isPlaying) playButton.click();		
 			if (!isPlaying) {
 				var active = skeletons[activeSkeleton];
-				var time = timeLine.val() / 100;
+				var time = timeLine.slider("value") / 100;
 				var animationDuration = active.state.getCurrent(0).animation.duration;
 				time = animationDuration * time;
 				active.state.update(time - active.playTime);
@@ -60,11 +61,7 @@ var imageSequencesDemo = function(pathPrefix) {
 				active.skeleton.updateWorldTransform();
 				active.playTime = time;				
 			}
-		}		
-		timeLine.on("input change", function () {
-			if (isPlaying) playButton.click();
-			timeLineUpdate();
-		});
+		}});
 
 		var list = $("#imagesequencesdemo-active-skeleton");	
 		for (var skeletonName in skeletons) {
@@ -77,7 +74,7 @@ var imageSequencesDemo = function(pathPrefix) {
 			activeSkeleton = $("#imagesequencesdemo-active-skeleton option:selected").text();
 			var active = skeletons[activeSkeleton];
 			var animationDuration = active.state.getCurrent(0).animation.duration;
-			timeLine.val(active.playTime / animationDuration * 100);
+			timeLine.slider("value", (active.playTime / animationDuration * 100));
 		})
 	}
 
@@ -149,7 +146,7 @@ var imageSequencesDemo = function(pathPrefix) {
 			while (active.playTime >= animationDuration) {
 				active.playTime -= animationDuration;
 			}
-			timeLine.val(active.playTime / animationDuration * 100);
+			timeLine.slider("value", (active.playTime / animationDuration * 100));
 
 			state.update(delta);
 			state.apply(skeleton);
