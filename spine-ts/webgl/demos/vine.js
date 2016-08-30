@@ -166,9 +166,7 @@ var vineDemo = function(pathPrefix) {
 		}
 		renderer.end();
 
-		requestAnimationFrame(render);
-
-		$("#info").text(JSON.stringify(input.currTouch));
+		requestAnimationFrame(render);		
 	}
 
 	init();

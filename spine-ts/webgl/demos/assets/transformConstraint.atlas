@@ -1,33 +1,33 @@
 
 transformConstraint.png
-size: 512,128
+size: 256,256
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 images/wheel-big
   rotate: false
-  xy: 2, 2
+  xy: 2, 142
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 images/wheel-big-overlay
   rotate: false
-  xy: 100, 5
+  xy: 2, 47
   size: 93, 93
   orig: 93, 93
   offset: 0, 0
   index: -1
 images/wheel-mid
   rotate: false
-  xy: 195, 30
+  xy: 100, 170
   size: 68, 68
   orig: 68, 68
   offset: 0, 0
   index: -1
 images/wheel-mid-overlay
   rotate: false
-  xy: 265, 30
+  xy: 170, 170
   size: 68, 68
   orig: 68, 68
   offset: 0, 0
