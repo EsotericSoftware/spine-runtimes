@@ -73,10 +73,10 @@ module spine.webgl {
 			this.skeletonRenderer.draw(this.batcher, skeleton);
 		}
 
-		drawSkeletonDebug(skeleton: Skeleton, premultipliedAlpha = false) {
+		drawSkeletonDebug(skeleton: Skeleton, premultipliedAlpha = false, ignoredBones: Array<string> = null) {
 			this.enableRenderer(this.shapes);
 			this.skeletonDebugRenderer.premultipliedAlpha = premultipliedAlpha;
-			this.skeletonDebugRenderer.draw(this.shapes, skeleton);
+			this.skeletonDebugRenderer.draw(this.shapes, skeleton, ignoredBones);
 		}
 
 		drawTexture (texture: GLTexture, x: number, y: number, width: number, height: number, color: Color = null) {

@@ -5302,11 +5302,12 @@ var spine;
                 this.skeletonRenderer.premultipliedAlpha = premultipliedAlpha;
                 this.skeletonRenderer.draw(this.batcher, skeleton);
             };
-            SceneRenderer.prototype.drawSkeletonDebug = function (skeleton, premultipliedAlpha) {
+            SceneRenderer.prototype.drawSkeletonDebug = function (skeleton, premultipliedAlpha, ignoredBones) {
                 if (premultipliedAlpha === void 0) { premultipliedAlpha = false; }
+                if (ignoredBones === void 0) { ignoredBones = null; }
                 this.enableRenderer(this.shapes);
                 this.skeletonDebugRenderer.premultipliedAlpha = premultipliedAlpha;
-                this.skeletonDebugRenderer.draw(this.shapes, skeleton);
+                this.skeletonDebugRenderer.draw(this.shapes, skeleton, ignoredBones);
             };
             SceneRenderer.prototype.drawTexture = function (texture, x, y, width, height, color) {
                 if (color === void 0) { color = null; }
@@ -5988,6 +5989,7 @@ var spine;
                 this.drawMeshHull = true;
                 this.drawMeshTriangles = true;
                 this.drawPaths = true;
+                this.drawSkeletonXY = false;
                 this.premultipliedAlpha = false;
                 this.scale = 1;
                 this.boneWidth = 2;
@@ -5995,7 +5997,8 @@ var spine;
                 this.temp = new Array();
                 this.gl = gl;
             }
-            SkeletonDebugRenderer.prototype.draw = function (shapes, skeleton) {
+            SkeletonDebugRenderer.prototype.draw = function (shapes, skeleton, ignoredBones) {
+                if (ignoredBones === void 0) { ignoredBones = null; }
                 var skeletonX = skeleton.x;
                 var skeletonY = skeleton.y;
                 var gl = this.gl;
@@ -6006,13 +6009,16 @@ var spine;
                     shapes.setColor(this.boneLineColor);
                     for (var i = 0, n = bones.length; i < n; i++) {
                         var bone = bones[i];
+                        if (ignoredBones && ignoredBones.indexOf(bone.data.name) > -1)
+                            continue;
                         if (bone.parent == null)
                             continue;
                         var x = skeletonX + bone.data.length * bone.a + bone.worldX;
                         var y = skeletonY + bone.data.length * bone.c + bone.worldY;
                         shapes.rectLine(true, skeletonX + bone.worldX, skeletonY + bone.worldY, x, y, this.boneWidth * this.scale);
                     }
-                    shapes.x(skeletonX, skeletonY, 4 * this.scale);
+                    if (this.drawSkeletonXY)
+                        shapes.x(skeletonX, skeletonY, 4 * this.scale);
                 }
                 if (this.drawRegionAttachments) {
                     shapes.setColor(this.attachmentLineColor);
@@ -6117,6 +6123,8 @@ var spine;
                     shapes.setColor(this.boneOriginColor);
                     for (var i = 0, n = bones.length; i < n; i++) {
                         var bone = bones[i];
+                        if (ignoredBones && ignoredBones.indexOf(bone.data.name) > -1)
+                            continue;
                         shapes.circle(true, skeletonX + bone.worldX, skeletonY + bone.worldY, 3 * this.scale, SkeletonDebugRenderer.GREEN, 8);
                     }
                 }

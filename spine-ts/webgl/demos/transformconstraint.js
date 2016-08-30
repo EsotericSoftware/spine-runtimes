@@ -1,4 +1,4 @@
-var transformConstraintDemo = function(pathPrefix) {
+var transformConstraintDemo = function(pathPrefix, loadingComplete) {
 	var COLOR_INNER = new spine.Color(0.8, 0, 0, 0.5);
 	var COLOR_OUTER = new spine.Color(0.8, 0, 0, 0.8);
 	var COLOR_INNER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.5);
@@ -76,7 +76,7 @@ var transformConstraintDemo = function(pathPrefix) {
 
 			setupUI();
 
-			requestAnimationFrame(render);
+			loadingComplete(canvas, render);
 		} else requestAnimationFrame(load);
 	}
 
@@ -88,16 +88,8 @@ var transformConstraintDemo = function(pathPrefix) {
 			lastOffset = val;
 			skeleton.findTransformConstraint("wheel2").data.offsetRotation += delta;			
 			skeleton.findTransformConstraint("wheel3").data.offsetRotation += delta;
-			$("#transformdemo-rotationoffset-label").text(val + "%");
-		}});
-
-		mix = $("#transformdemo-rotationmix");
-		mix.slider({ range: "max", min: 0, max: 100, value: 100, slide: function () {
-			var val = mix.slider("value");
-			skeleton.findTransformConstraint("wheel2").rotateMix = val / 100;			
-			skeleton.findTransformConstraint("wheel3").rotateMix = val / 100;
-			$("#transformdemo-rotationmix-label").text(val + "%");
-		}});		
+			$("#transformdemo-rotationoffset-label").text(val + "°");
+		}});	
 	}
 
 	function render () {
@@ -113,18 +105,16 @@ var transformConstraintDemo = function(pathPrefix) {
 		renderer.resize(spine.webgl.ResizeMode.Fit);
 
 		gl.clearColor(0.2, 0.2, 0.2, 1);
-		gl.clear(gl.COLOR_BUFFER_BIT);			
+		gl.clear(gl.COLOR_BUFFER_BIT);
 
 		renderer.begin();				
 		renderer.drawSkeleton(skeleton);
-		renderer.drawSkeletonDebug(skeleton);				
+		renderer.drawSkeletonDebug(skeleton, false, ["root"]);				
 		var bone = wheel1;
 		var colorInner = bone === target ? COLOR_INNER_SELECTED : COLOR_INNER;
 		var colorOuter = bone === target ? COLOR_OUTER_SELECTED : COLOR_OUTER;		
 		renderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorOuter);		
-		renderer.end();
-
-		requestAnimationFrame(render);		
+		renderer.end();		
 	}
 
 	init();

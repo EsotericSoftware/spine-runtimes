@@ -1091,7 +1091,7 @@ declare module spine.webgl {
         constructor(canvas: HTMLCanvasElement, gl: WebGLRenderingContext);
         begin(): void;
         drawSkeleton(skeleton: Skeleton, premultipliedAlpha?: boolean): void;
-        drawSkeletonDebug(skeleton: Skeleton, premultipliedAlpha?: boolean): void;
+        drawSkeletonDebug(skeleton: Skeleton, premultipliedAlpha?: boolean, ignoredBones?: Array<string>): void;
         drawTexture(texture: GLTexture, x: number, y: number, width: number, height: number, color?: Color): void;
         drawRegion(region: TextureAtlasRegion, x: number, y: number, width: number, height: number, color?: Color): void;
         line(x: number, y: number, x2: number, y2: number, color?: Color, color2?: Color): void;
@@ -1205,6 +1205,7 @@ declare module spine.webgl {
         drawMeshHull: boolean;
         drawMeshTriangles: boolean;
         drawPaths: boolean;
+        drawSkeletonXY: boolean;
         premultipliedAlpha: boolean;
         scale: number;
         boneWidth: number;
@@ -1214,7 +1215,7 @@ declare module spine.webgl {
         private static LIGHT_GRAY;
         private static GREEN;
         constructor(gl: WebGLRenderingContext);
-        draw(shapes: ShapeRenderer, skeleton: Skeleton): void;
+        draw(shapes: ShapeRenderer, skeleton: Skeleton, ignoredBones?: Array<string>): void;
         dispose(): void;
     }
 }

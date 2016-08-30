@@ -1,4 +1,4 @@
-var skinsDemo = function(pathPrefix) {	
+var skinsDemo = function(pathPrefix, loadingComplete) {	
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, state, offset, bounds;		
 	var lastFrameTime = Date.now() / 1000;	
@@ -36,7 +36,7 @@ var skinsDemo = function(pathPrefix) {
 			bounds = new spine.Vector2();
 			skeleton.getBounds(offset, bounds);
 			setupUI();
-			requestAnimationFrame(render);
+			loadingComplete(canvas, render);
 		} else requestAnimationFrame(load);
 	}
 
@@ -121,9 +121,7 @@ var skinsDemo = function(pathPrefix) {
 		var scale = width / texture.getImage().width;
 		var height = scale * texture.getImage().height;
 		renderer.drawTexture(texture, offset.x + bounds.x, offset.y + bounds.y / 2 - height / 2, width, height);		
-		renderer.end();
-
-		requestAnimationFrame(render);
+		renderer.end();		
 	}
 
 	init();

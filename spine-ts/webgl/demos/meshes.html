@@ -16,21 +16,18 @@
 <div style="position: fixed; top: 0; width: 100%">
 	<select id="meshesdemo-active-skeleton"></select></br>
 	<span style="color: #fff">Draw Bones</span>	
-	<input type="checkbox" id="meshesdemo-drawbonescheckbox" style="color: #fff;" checked="true"></input>
-	<span style="color: #fff">Draw Regions</span>	
-	<input type="checkbox" id="meshesdemo-drawregionscheckbox" style="color: #fff;" checked="true"></input>
-	<span style="color: #fff">Draw Mesh Hull</span>	
-	<input type="checkbox" id="meshesdemo-drawmeshhullcheckbox" style="color: #fff;" checked="true"></input>
-	<span style="color: #fff">Draw Mesh Triangles</span>	
+	<input type="checkbox" id="meshesdemo-drawbonescheckbox" style="color: #fff;" checked="true"></input>		
+	<span style="color: #fff">Draw Triangles</span>	
 	<input type="checkbox" id="meshesdemo-drawmeshtrianglescheckbox" style="color: #fff;" checked="true"></input>
 	<br>
 	<input id="meshesdemo-playbutton" type="button" value="Pause"></input>
 	<div id="meshesdemo-timeline" class="slider"></input>
 </div>
 </center>
+<script src="utils.js"></script>
 <script src="meshes.js"></script>
 <script>
-	meshesDemo();
+	meshesDemo("", spineDemos.setupRendering);
 </script>
 </body>
 </html>

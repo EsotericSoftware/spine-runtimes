@@ -1,4 +1,4 @@
-var meshesDemo = function(pathPrefix) {
+var meshesDemo = function(pathPrefix, loadingComplete) {
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, bounds;		
 	var lastFrameTime = Date.now() / 1000;
@@ -13,6 +13,7 @@ var meshesDemo = function(pathPrefix) {
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
+		renderer.skeletonDebugRenderer.drawRegionAttachments = false;
 		assetManager = new spine.webgl.AssetManager(gl, pathPrefix);		
 		assetManager.loadTexture("assets/girl.png");
 		assetManager.loadText("assets/girl.json");
@@ -32,7 +33,7 @@ var meshesDemo = function(pathPrefix) {
 			skeletons["green_girl"] = loadSkeleton("gree_girl", "animation");
 			skeletons["fanart"] = loadSkeleton("fanart_cut", "animation");
 			setupUI();
-			requestAnimationFrame(render);			
+			loadingComplete(canvas, render);			
 		} else requestAnimationFrame(load);
 	}
 
@@ -82,13 +83,8 @@ var meshesDemo = function(pathPrefix) {
 		$("#meshesdemo-drawbonescheckbox").click(function() {
 			renderer.skeletonDebugRenderer.drawBones = this.checked;
 		})
-		$("#meshesdemo-drawregionscheckbox").click(function() {
-			renderer.skeletonDebugRenderer.drawRegionAttachments = this.checked;
-		})
-		$("#meshesdemo-drawmeshhullcheckbox").click(function() {
-			renderer.skeletonDebugRenderer.drawMeshHull = this.checked;
-		})
 		$("#meshesdemo-drawmeshtrianglescheckbox").click(function() {
+			renderer.skeletonDebugRenderer.drawMeshHull = this.checked;
 			renderer.skeletonDebugRenderer.drawMeshTriangles = this.checked;
 		})
 	}
@@ -160,9 +156,7 @@ var meshesDemo = function(pathPrefix) {
 		renderer.begin();				
 		renderer.drawSkeleton(skeleton);
 		renderer.drawSkeletonDebug(skeleton);
-		renderer.end();
-
-		requestAnimationFrame(render);
+		renderer.end();		
 	}
 
 	init();

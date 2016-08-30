@@ -1,4 +1,4 @@
-var vineDemo = function(pathPrefix) {
+var vineDemo = function(pathPrefix, loadingComplete) {
 	var COLOR_INNER = new spine.Color(0.8, 0, 0, 0.5);
 	var COLOR_OUTER = new spine.Color(0.8, 0, 0, 0.8);
 	var COLOR_INNER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.5);
@@ -82,7 +82,7 @@ var vineDemo = function(pathPrefix) {
 
 			setupUI();
 
-			requestAnimationFrame(render);
+			loadingComplete(canvas, render);
 		} else requestAnimationFrame(load);
 	}
 
@@ -164,9 +164,7 @@ var vineDemo = function(pathPrefix) {
 			renderer.circle(true, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorInner);
 			renderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorOuter);
 		}
-		renderer.end();
-
-		requestAnimationFrame(render);		
+		renderer.end();				
 	}
 
 	init();

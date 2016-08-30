@@ -1,4 +1,4 @@
-var imageSequencesDemo = function(pathPrefix) {
+var imageSequencesDemo = function(pathPrefix, loadingComplete) {
 	var OUTLINE_COLOR = new spine.Color(0, 0.8, 0, 1);	
 
 	var canvas, gl, renderer, input, assetManager;
@@ -30,7 +30,7 @@ var imageSequencesDemo = function(pathPrefix) {
 			skeletons["alien"] = loadSkeleton("alien", "death", ["head", "splat01"]);
 			skeletons["dragon"] = loadSkeleton("dragon", "flying", ["R_wing"])
 			setupUI();
-			requestAnimationFrame(render);			
+			loadingComplete(canvas, render);			
 		} else requestAnimationFrame(load);
 	}
 
@@ -199,9 +199,7 @@ var imageSequencesDemo = function(pathPrefix) {
 			}			
 		}
 
-		renderer.end();
-
-		requestAnimationFrame(render);
+		renderer.end();		
 	}
 
 	init();

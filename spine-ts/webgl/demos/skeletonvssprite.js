@@ -1,4 +1,4 @@
-var skeletonVsSpriteDemo = function(pathPrefix) {
+var skeletonVsSpriteDemo = function(pathPrefix, loadingComplete) {
 	var SKELETON_ATLAS_COLOR = new spine.Color(0, 0.8, 0, 0.8);
 	var FRAME_ATLAS_COLOR = new spine.Color(0.8, 0, 0, 0.8);
 
@@ -60,7 +60,7 @@ var skeletonVsSpriteDemo = function(pathPrefix) {
 			viewportHeight = ((0 + bounds.y) - offset.y);						
 
 			setupUI();
-			requestAnimationFrame(render);
+			loadingComplete(canvas, render);
 		} else requestAnimationFrame(load);
 	}
 
@@ -170,9 +170,7 @@ var skeletonVsSpriteDemo = function(pathPrefix) {
 				}
 			}			
 		}
-		renderer.end();
-
-		requestAnimationFrame(render);
+		renderer.end();		
 	}
 
 	init();

@@ -1,4 +1,4 @@
-var tankDemo = function(pathPrefix) {	
+var tankDemo = function(pathPrefix, loadingComplete) {	
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, state, offset, bounds;		
 	var lastFrameTime = Date.now() / 1000;	
@@ -36,7 +36,7 @@ var tankDemo = function(pathPrefix) {
 			bounds = new spine.Vector2();
 			skeleton.getBounds(offset, bounds);
 			setupUI();
-			requestAnimationFrame(render);
+			loadingComplete(canvas, render);
 		} else requestAnimationFrame(load);
 	}
 
@@ -103,8 +103,6 @@ var tankDemo = function(pathPrefix) {
 		renderer.begin();				
 		renderer.drawSkeleton(skeleton);				
 		renderer.end();
-
-		requestAnimationFrame(render);
 	}
 
 	init();
