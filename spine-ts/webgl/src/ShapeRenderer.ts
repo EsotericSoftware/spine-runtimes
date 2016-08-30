@@ -309,6 +309,7 @@ module spine.webgl {
 		end () {
 			if (!this.isDrawing) throw new Error("ShapeRenderer.begin() has not been called");
 			this.flush();
+			this.gl.disable(this.gl.BLEND);
 			this.isDrawing = false;
 		}
 
@@ -316,8 +317,7 @@ module spine.webgl {
 			if (this.vertexIndex == 0) return;
 			this.mesh.setVerticesLength(this.vertexIndex);
 			this.mesh.draw(this.shader, this.shapeType);
-			this.vertexIndex = 0;
-			this.gl.disable(this.gl.BLEND);
+			this.vertexIndex = 0;			
 		}
 
 		private check(shapeType: ShapeType, numVertices: number) {

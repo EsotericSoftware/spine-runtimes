@@ -1,10 +1,10 @@
-var animationMixingDemo = function(pathPrefix) {
+var animationMixingDemo = function(pathPrefix, loadingComplete) {
 	var OUTLINE_COLOR = new spine.Color(0, 0.8, 0, 1);	
 
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, skeletonNoMix, state, stateNoMix, bounds;
 	var timeSlider, timeSliderLabel;
-	var lastFrameTime = Date.now() / 1000
+	var lastFrameTime = Date.now() / 1000	
 
 	function init () {
 		timeSlider = $("#animationmixingdemo-timeslider");
@@ -28,7 +28,8 @@ var animationMixingDemo = function(pathPrefix) {
 				stateNoMix.setAnimation(1, "shoot", false);	
 			},
 			up: function(x, y) { },
-			moved: function(x, y) {	}
+			moved: function(x, y) {	},
+			dragged: function(x, y) { }
 		});
 	}	
 
@@ -44,8 +45,8 @@ var animationMixingDemo = function(pathPrefix) {
 			state.apply(skeleton);
 			skeleton.updateWorldTransform();
 			bounds = { offset: new spine.Vector2(), size: new spine.Vector2() };
-			skeleton.getBounds(bounds.offset, bounds.size);			
-			requestAnimationFrame(render);			
+			skeleton.getBounds(bounds.offset, bounds.size);
+			loadingComplete(canvas, render);						
 		} else requestAnimationFrame(load);
 	}
 
@@ -120,10 +121,8 @@ var animationMixingDemo = function(pathPrefix) {
 		skeletonNoMix.updateWorldTransform();
 		skeletonNoMix.x = size.x;	
 		renderer.drawSkeleton(skeletonNoMix);
-		renderer.end();
-
-		requestAnimationFrame(render);
+		renderer.end();		
 	}
-
 	init();
+	return render;
 };

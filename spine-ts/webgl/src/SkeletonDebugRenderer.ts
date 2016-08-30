@@ -42,48 +42,41 @@ module spine.webgl {
 		drawMeshHull = true;
 		drawMeshTriangles = true;
 		drawPaths = true;
+		drawSkeletonXY = false;
 		premultipliedAlpha = false;
 		scale = 1;
 		boneWidth = 2;
 		
-		private gl: WebGLRenderingContext;
-		private shapes: ShapeRenderer;
+		private gl: WebGLRenderingContext;		
 		private bounds = new SkeletonBounds();
 		private temp = new Array<number>();
 		private static LIGHT_GRAY = new Color(192 / 255, 192 / 255, 192 / 255, 1);
 		private static GREEN = new Color(0, 1, 0, 1);
 		
 		constructor (gl: WebGLRenderingContext) {
-			this.gl = gl;
-			this.shapes = new ShapeRenderer(gl);
+			this.gl = gl;			
 		}
 
-		draw (shader: Shader, skeleton: Skeleton) {
+		draw (shapes: ShapeRenderer, skeleton: Skeleton, ignoredBones: Array<string> = null) {
 			let skeletonX = skeleton.x;
 			let skeletonY = skeleton.y;
-			let gl = this.gl;
-			gl.enable(gl.BLEND);			
+			let gl = this.gl;									
 			let srcFunc = this.premultipliedAlpha ? gl.ONE : gl.SRC_ALPHA;
-			gl.blendFunc(srcFunc, gl.ONE_MINUS_SRC_ALPHA);
-
-			let shapes = this.shapes;
+			shapes.setBlendMode(srcFunc, gl.ONE_MINUS_SRC_ALPHA);				
 
 			let bones = skeleton.bones;
 			if (this.drawBones) {
-				shapes.setColor(this.boneLineColor);
-				shapes.begin(shader);
+				shapes.setColor(this.boneLineColor);				
 				for (let i = 0, n = bones.length; i < n; i++) {
 					let bone = bones[i];
+					if (ignoredBones && ignoredBones.indexOf(bone.data.name) > -1) continue;
 					if (bone.parent == null) continue;
 					let x = skeletonX + bone.data.length * bone.a + bone.worldX;
 					let y = skeletonY + bone.data.length * bone.c + bone.worldY;
 					shapes.rectLine(true, skeletonX + bone.worldX, skeletonY + bone.worldY, x, y, this.boneWidth * this.scale);
-				}
-				shapes.end();
-				shapes.begin(shader);
-				shapes.x(skeletonX, skeletonY, 4 * this.scale);
-			} else
-				shapes.begin(shader);
+				}				
+				if (this.drawSkeletonXY) shapes.x(skeletonX, skeletonY, 4 * this.scale);
+			}
 
 			if (this.drawRegionAttachments) {
 				shapes.setColor(this.attachmentLineColor);
@@ -187,24 +180,19 @@ module spine.webgl {
 						y1 = y2;
 					}
 				}
-			}
-
-			shapes.end();
-			shapes.begin(shader);
+			}			
 
 			if (this.drawBones) {
 				shapes.setColor(this.boneOriginColor);
 				for (let i = 0, n = bones.length; i < n; i++) {
-					let bone = bones[i];					
+					let bone = bones[i];
+					if (ignoredBones && ignoredBones.indexOf(bone.data.name) > -1) continue;				
 					shapes.circle(true, skeletonX + bone.worldX, skeletonY + bone.worldY, 3 * this.scale, SkeletonDebugRenderer.GREEN, 8);
 				}
-			}
-
-			shapes.end();
+			}			
 		}
 
-		dispose () {
-			this.shapes.dispose();
+		dispose () {			
 		}
 	}
 }

@@ -935,16 +935,25 @@ declare module spine.webgl {
         lastX: number;
         lastY: number;
         buttonDown: boolean;
+        currTouch: Touch;
+        touchesPool: Pool<Touch>;
         private listeners;
         constructor(element: HTMLElement);
         private setupCallbacks(element);
         addListener(listener: InputListener): void;
         removeListener(listener: InputListener): void;
     }
+    class Touch {
+        identifier: number;
+        x: number;
+        y: number;
+        constructor(identifier: number, x: number, y: number);
+    }
     interface InputListener {
         down(x: number, y: number): void;
         up(x: number, y: number): void;
         moved(x: number, y: number): void;
+        dragged(x: number, y: number): void;
     }
 }
 declare module spine.webgl {
@@ -1082,7 +1091,7 @@ declare module spine.webgl {
         constructor(canvas: HTMLCanvasElement, gl: WebGLRenderingContext);
         begin(): void;
         drawSkeleton(skeleton: Skeleton, premultipliedAlpha?: boolean): void;
-        drawSkeletonDebug(skeleton: Skeleton, premultipliedAlpha?: boolean): void;
+        drawSkeletonDebug(skeleton: Skeleton, premultipliedAlpha?: boolean, ignoredBones?: Array<string>): void;
         drawTexture(texture: GLTexture, x: number, y: number, width: number, height: number, color?: Color): void;
         drawRegion(region: TextureAtlasRegion, x: number, y: number, width: number, height: number, color?: Color): void;
         line(x: number, y: number, x2: number, y2: number, color?: Color, color2?: Color): void;
@@ -1196,17 +1205,17 @@ declare module spine.webgl {
         drawMeshHull: boolean;
         drawMeshTriangles: boolean;
         drawPaths: boolean;
+        drawSkeletonXY: boolean;
         premultipliedAlpha: boolean;
         scale: number;
         boneWidth: number;
         private gl;
-        private shapes;
         private bounds;
         private temp;
         private static LIGHT_GRAY;
         private static GREEN;
         constructor(gl: WebGLRenderingContext);
-        draw(shader: Shader, skeleton: Skeleton): void;
+        draw(shapes: ShapeRenderer, skeleton: Skeleton, ignoredBones?: Array<string>): void;
         dispose(): void;
     }
 }

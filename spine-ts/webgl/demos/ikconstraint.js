@@ -1,4 +1,4 @@
-var ikConstraintDemo = function(pathPrefix) {
+var ikConstraintDemo = function(pathPrefix, loadingComplete) {
 	var CIRCLE_INNER_COLOR = new spine.Color(0.8, 0, 0, 0.5);
 	var CIRCLE_OUTER_COLOR = new spine.Color(0.8, 0, 0, 0.8);
 
@@ -29,7 +29,7 @@ var ikConstraintDemo = function(pathPrefix) {
 			up: function(x, y) {
 				target = null;
 			},
-			moved: function(x, y) {
+			dragged: function(x, y) {
 				if (target != null) {
 					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
 					if (target.parent !== null) {
@@ -41,7 +41,8 @@ var ikConstraintDemo = function(pathPrefix) {
 						target.y = coords.y - skeleton.y;
 					}
 				}
-			}
+			},
+			moved: function (x, y) { }
 		})
 		assetManager.loadTexture("assets/spineboy.png");
 		assetManager.loadText("assets/spineboy-mesh.json");
@@ -67,7 +68,7 @@ var ikConstraintDemo = function(pathPrefix) {
 			renderer.camera.position.x = offset.x + bounds.x / 2;
 			renderer.camera.position.y = offset.y + bounds.y / 2;
 
-			requestAnimationFrame(render);
+			loadingComplete(canvas, render);
 		} else requestAnimationFrame(load);
 	}
 
@@ -91,10 +92,7 @@ var ikConstraintDemo = function(pathPrefix) {
 		var bone = skeleton.findBone(boneName);
 		renderer.circle(true, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, CIRCLE_INNER_COLOR);
 		renderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, CIRCLE_OUTER_COLOR);
-		renderer.end();
-
-		requestAnimationFrame(render);
+		renderer.end();		
 	}
-
 	init();
 };

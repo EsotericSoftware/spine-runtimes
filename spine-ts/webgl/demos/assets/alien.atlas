@@ -1,153 +1,146 @@
 
 alien.png
-size: 1024,512
+size: 512,512
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 back_foot
-  rotate: true
-  xy: 1016, 366
-  size: 8, 6
-  orig: 8, 6
+  rotate: false
+  xy: 145, 175
+  size: 5, 3
+  orig: 5, 3
   offset: 0, 0
   index: -1
 back_shin
   rotate: false
-  xy: 28, 2
-  size: 21, 24
-  orig: 21, 24
+  xy: 468, 437
+  size: 13, 14
+  orig: 13, 14
   offset: 0, 0
   index: -1
 back_thigh
   rotate: false
-  xy: 2, 2
-  size: 24, 24
-  orig: 24, 24
+  xy: 194, 237
+  size: 14, 14
+  orig: 14, 14
   offset: 0, 0
   index: -1
 backarmor
   rotate: false
-  xy: 933, 295
-  size: 81, 91
-  orig: 81, 91
+  xy: 2, 2
+  size: 49, 55
+  orig: 49, 55
   offset: 0, 0
   index: -1
 blown_up_nck
   rotate: false
-  xy: 2, 28
-  size: 77, 52
-  orig: 77, 52
+  xy: 97, 147
+  size: 46, 31
+  orig: 46, 31
   offset: 0, 0
   index: -1
 body
-  rotate: true
-  xy: 781, 167
-  size: 98, 118
-  orig: 98, 118
+  rotate: false
+  xy: 97, 180
+  size: 59, 71
+  orig: 59, 71
   offset: 0, 0
   index: -1
 burst01
   rotate: false
-  xy: 788, 355
-  size: 143, 155
-  orig: 143, 155
+  xy: 380, 417
+  size: 86, 93
+  orig: 86, 93
   offset: 0, 0
   index: -1
 burst02
   rotate: false
-  xy: 630, 329
-  size: 156, 181
-  orig: 156, 181
+  xy: 2, 143
+  size: 93, 108
+  orig: 93, 108
   offset: 0, 0
   index: -1
 front_foot
-  rotate: true
-  xy: 1016, 376
-  size: 10, 6
-  orig: 10, 6
+  rotate: false
+  xy: 455, 411
+  size: 6, 4
+  orig: 6, 4
   offset: 0, 0
   index: -1
 front_lower_arm
-  rotate: true
-  xy: 81, 25
-  size: 55, 63
-  orig: 55, 63
+  rotate: false
+  xy: 468, 472
+  size: 33, 38
+  orig: 33, 38
   offset: 0, 0
   index: -1
 front_shin
-  rotate: true
-  xy: 287, 55
-  size: 25, 28
-  orig: 25, 28
+  rotate: false
+  xy: 468, 453
+  size: 15, 17
+  orig: 15, 17
   offset: 0, 0
   index: -1
 front_thigh
   rotate: false
-  xy: 258, 53
-  size: 27, 27
-  orig: 27, 27
+  xy: 158, 216
+  size: 16, 16
+  orig: 16, 16
   offset: 0, 0
   index: -1
 front_upper_arm
   rotate: false
-  xy: 199, 52
-  size: 57, 28
-  orig: 57, 28
+  xy: 158, 234
+  size: 34, 17
+  orig: 34, 17
   offset: 0, 0
   index: -1
 head
   rotate: false
-  xy: 630, 191
-  size: 149, 136
-  orig: 149, 136
-  offset: 0, 0
-  index: -1
-jaw
-  rotate: true
-  xy: 933, 388
-  size: 122, 86
-  orig: 122, 86
+  xy: 2, 59
+  size: 89, 82
+  orig: 89, 82
   offset: 0, 0
   index: -1
 lower_back_arm
   rotate: false
-  xy: 146, 34
-  size: 51, 46
-  orig: 51, 46
+  xy: 53, 30
+  size: 30, 27
+  orig: 30, 27
   offset: 0, 0
   index: -1
 metaljaw
   rotate: false
-  xy: 788, 267
-  size: 122, 86
-  orig: 122, 86
+  xy: 380, 363
+  size: 73, 52
+  orig: 73, 52
   offset: 0, 0
   index: -1
 splat01
   rotate: false
-  xy: 371, 258
-  size: 257, 252
-  orig: 257, 252
+  xy: 224, 359
+  size: 154, 151
+  orig: 154, 151
   offset: 0, 0
   index: -1
 splat02
   rotate: false
-  xy: 2, 254
-  size: 367, 256
-  orig: 367, 256
+  xy: 2, 357
+  size: 220, 153
+  orig: 220, 153
   offset: 0, 0
   index: -1
 splat03
   rotate: false
-  xy: 2, 82
-  size: 362, 170
-  orig: 362, 170
+  xy: 2, 253
+  size: 217, 102
+  orig: 217, 102
   offset: 0, 0
   index: -1
 upper_back_arm
-  rotate: true
-  xy: 146, 2
-  size: 30, 43
-  orig: 30, 43
+  rotate: false
+  xy: 53, 2
+  size: 18, 26
+  orig: 18, 26
   offset: 0, 0
   index: -1

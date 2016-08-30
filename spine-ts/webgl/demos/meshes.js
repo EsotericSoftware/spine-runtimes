@@ -1,49 +1,39 @@
-var meshesDemo = function(pathPrefix) {
-	var CIRCLE_INNER_COLOR = new spine.Color(0.8, 0, 0, 0.5);
-	var CIRCLE_OUTER_COLOR = new spine.Color(0.8, 0, 0, 0.8);
-
+var meshesDemo = function(pathPrefix, loadingComplete) {
 	var canvas, gl, renderer, input, assetManager;
-	var skeleton, state, bounds;		
-	var lastFrameTime = Date.now() / 1000;	
-	var playButton, timeLine, isPlaying = true, playTime = 0;		
+	var skeleton, bounds;		
+	var lastFrameTime = Date.now() / 1000;
+	var skeletons = {};
+	var activeSkeleton = "girl";
+
+	var playButton, timeLine, isPlaying = true;
 
 	function init () {
-		if (pathPrefix === undefined) pathPrefix = "";		
-
 		canvas = document.getElementById("meshesdemo-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
-		renderer = new spine.webgl.SceneRenderer(canvas, gl);		
+		renderer = new spine.webgl.SceneRenderer(canvas, gl);
+		renderer.skeletonDebugRenderer.drawRegionAttachments = false;
 		assetManager = new spine.webgl.AssetManager(gl, pathPrefix);		
-		assetManager.loadTexture("assets/raptor.png");
-		assetManager.loadText("assets/raptor.json");
-		assetManager.loadText("assets/raptor.atlas");
+		assetManager.loadTexture("assets/girl.png");
+		assetManager.loadText("assets/girl.json");
+		assetManager.loadText("assets/girl.atlas");
+		assetManager.loadTexture("assets/gree_girl.png");		
+		assetManager.loadText("assets/gree_girl.json");
+		assetManager.loadText("assets/gree_girl.atlas");
+		assetManager.loadTexture("assets/fanart_cut.png");		
+		assetManager.loadText("assets/fanart_cut.json");
+		assetManager.loadText("assets/fanart_cut.atlas");
 		requestAnimationFrame(load);
-	}
+	}	
 
 	function load () {
 		if (assetManager.isLoadingComplete()) {
-			var atlas = new spine.TextureAtlas(assetManager.get("assets/raptor.atlas"), function(path) {
-				return assetManager.get("assets/" + path);		
-			});
-			var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
-			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/raptor.json"));
-			skeleton = new spine.Skeleton(skeletonData);
-			state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
-			state.setAnimation(0, "walk", true);
-			state.apply(skeleton);
-			skeleton.updateWorldTransform();
-			var offset = new spine.Vector2();
-			bounds = new spine.Vector2();
-			skeleton.getBounds(offset, bounds);
-
-			renderer.camera.position.x = offset.x + bounds.x / 2;
-			renderer.camera.position.y = offset.y + bounds.y / 2;
-
+			skeletons["girl"] = loadSkeleton("girl", "animation");
+			skeletons["green_girl"] = loadSkeleton("gree_girl", "animation");
+			skeletons["fanart"] = loadSkeleton("fanart_cut", "animation");
 			setupUI();
-			requestAnimationFrame(render);
+			loadingComplete(canvas, render);			
 		} else requestAnimationFrame(load);
 	}
 
@@ -57,70 +47,116 @@ var meshesDemo = function(pathPrefix) {
 			} else {
 				playButton.val("Play");
 				playButton.addClass("play").removeClass("pause");
-			}		
+			}			
 		}
 		playButton.click(playButtonUpdate);
 
 		timeLine = $("#meshesdemo-timeline");
 		timeLine.slider({ range: "max", min: 0, max: 100, value: 0, slide: function () {
-			if (isPlaying) playButton.click();
-			if (!isPlaying) {				
+			if (isPlaying) playButton.click();		
+			if (!isPlaying) {
+				var active = skeletons[activeSkeleton];
 				var time = timeLine.slider("value") / 100;
-				var animationDuration = state.getCurrent(0).animation.duration;
-				time = animationDuration * time;				
-				state.update(time - playTime);
-				state.apply(skeleton);
-				skeleton.updateWorldTransform();
-				playTime = time;												
+				var animationDuration = active.state.getCurrent(0).animation.duration;
+				time = animationDuration * time;
+				active.state.update(time - active.playTime);
+				active.state.apply(active.skeleton);
+				active.skeleton.updateWorldTransform();
+				active.playTime = time;				
 			}
-		}});		
+		}});
 
-		$("#meshesdemo-drawbonescheckbox").change(function() {
+		var list = $("#meshesdemo-active-skeleton");	
+		for (var skeletonName in skeletons) {
+			var option = $("<option></option>");
+			option.attr("value", skeletonName).text(skeletonName);
+			if (skeletonName === activeSkeleton) option.attr("selected", "selected");
+			list.append(option);
+		}
+		list.change(function() {
+			activeSkeleton = $("#meshesdemo-active-skeleton option:selected").text();
+			var active = skeletons[activeSkeleton];
+			var animationDuration = active.state.getCurrent(0).animation.duration;
+			timeLine.slider("value", (active.playTime / animationDuration * 100));
+		})
+
+		$("#meshesdemo-drawbonescheckbox").click(function() {
 			renderer.skeletonDebugRenderer.drawBones = this.checked;
-		});
-		$("#meshesdemo-drawregionscheckbox").change(function() {
-			renderer.skeletonDebugRenderer.drawRegionAttachments = this.checked;
-		});
-		$("#meshesdemo-drawmeshhullcheckbox").change(function() {
+		})
+		$("#meshesdemo-drawmeshtrianglescheckbox").click(function() {
 			renderer.skeletonDebugRenderer.drawMeshHull = this.checked;
-		});
-		$("#meshesdemo-drawmeshtrianglescheckbox").change(function() {
 			renderer.skeletonDebugRenderer.drawMeshTriangles = this.checked;
+		})
+	}
+
+	function loadSkeleton(name, animation, sequenceSlots) {
+		var atlas = new spine.TextureAtlas(assetManager.get("assets/" + name + ".atlas"), function(path) {
+			return assetManager.get("assets/" + path);		
 		});
+		var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
+		var skeletonJson = new spine.SkeletonJson(atlasLoader);
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/" + name + ".json"));
+		var skeleton = new spine.Skeleton(skeletonData);
+		skeleton.setSkinByName("default");
+
+		var state = new spine.AnimationState(new spine.AnimationStateData(skeletonData));
+		state.setAnimation(0, animation, true);
+		state.apply(skeleton);
+		skeleton.updateWorldTransform();			
+		var offset = new spine.Vector2();
+		var size = new spine.Vector2();
+		skeleton.getBounds(offset, size);
+
+		return {
+			atlas: atlas,
+			skeleton: skeleton, 
+			state: state, 
+			playTime: 0,
+			bounds: {
+				offset: offset,
+				size: size
+			}			
+		};
 	}
 
 	function render () {
 		var now = Date.now() / 1000;
 		var delta = now - lastFrameTime;
-		lastFrameTime = now;
-		if (delta > 0.032) delta = 0.032;
+		lastFrameTime = now;	
+		if (delta > 0.032) delta = 0.032;	
 
-		renderer.camera.viewportWidth = bounds.x * 1.2;
-		renderer.camera.viewportHeight = bounds.y * 1.2;
+		var active = skeletons[activeSkeleton];
+		var skeleton = active.skeleton;
+		var state = active.state;
+		var offset = active.bounds.offset;
+		var size = active.bounds.size;
+
+		renderer.camera.position.x = offset.x + size.x / 2;
+		renderer.camera.position.y = offset.y + size.y / 2;
+		renderer.camera.viewportWidth = size.x * 1.2;
+		renderer.camera.viewportHeight = size.y * 1.2;
 		renderer.resize(spine.webgl.ResizeMode.Fit);
 
 		gl.clearColor(0.2, 0.2, 0.2, 1);
 		gl.clear(gl.COLOR_BUFFER_BIT);
-		
+
 		if (isPlaying) {
 			var animationDuration = state.getCurrent(0).animation.duration;
-			playTime += delta;			
-			while (playTime >= animationDuration) {
-				playTime -= animationDuration;
+			active.playTime += delta;			
+			while (active.playTime >= animationDuration) {
+				active.playTime -= animationDuration;
 			}
-			timeLine.slider("value", (playTime / animationDuration * 100));
+			timeLine.slider("value", (active.playTime / animationDuration * 100));
 
 			state.update(delta);
 			state.apply(skeleton);
-			skeleton.updateWorldTransform();			
-		}		
+			skeleton.updateWorldTransform();
+		}
 
 		renderer.begin();				
 		renderer.drawSkeleton(skeleton);
 		renderer.drawSkeletonDebug(skeleton);
-		renderer.end();
-
-		requestAnimationFrame(render);
+		renderer.end();		
 	}
 
 	init();
