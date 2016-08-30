@@ -260,7 +260,11 @@ namespace Spine.Unity.Editor {
 				EditorPrefs.SetFloat(DEFAULT_SCALE_KEY, defaultScale);
 
 			EditorGUI.BeginChangeCheck();
-			defaultShader = EditorGUILayout.DelayedTextField(new GUIContent("Default shader", "Default shader for materials auto-generated on import."), defaultShader);
+			#if UNITY_5_3_OR_NEWER
+			defaultShader = EditorGUILayout.DelayedTextField(new GUIContent("Default shader", "Default shader for materials auto-generated on import."), defaultShader); 
+			#else
+			defaultShader = EditorGUILayout.TextField(new GUIContent("Default shader", "Default shader for materials auto-generated on import."), defaultShader); 
+			#endif
 			if (EditorGUI.EndChangeCheck())
 				EditorPrefs.SetString(DEFAULT_SHADER_KEY, defaultShader);
 			

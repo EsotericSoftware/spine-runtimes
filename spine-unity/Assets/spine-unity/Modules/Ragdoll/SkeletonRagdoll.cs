@@ -24,7 +24,7 @@ namespace Spine.Unity.Modules {
 		[Tooltip("Warning!  You will have to re-enable and tune mix values manually if attempting to remove the ragdoll system.")]
 		public bool disableIK = true;
 		public bool disableOtherConstraints = false;
-		[Space]
+		[Space(18)]
 		[Tooltip("Set RootRigidbody IsKinematic to true when Apply is called.")]
 		public bool pinStartBone;
 		[Tooltip("Enable Collision between adjacent ragdoll elements (IE: Neck and Head)")]

@@ -64,8 +64,8 @@ namespace Spine.Unity.Editor {
 			if (skeletonRenderer.objectReferenceValue == null) {
 				SkeletonRenderer parentRenderer = BoneFollowerInspector.GetInParent<SkeletonRenderer>(targetBoneFollower.transform);
 				if (parentRenderer != null && parentRenderer.gameObject != targetBoneFollower.gameObject) {
-					Debug.Log("Inspector automatically assigned BoneFollower.SkeletonRenderer");
 					skeletonRenderer.objectReferenceValue = parentRenderer;
+					Debug.Log("Inspector automatically assigned BoneFollower.SkeletonRenderer");
 				}
 			}
 

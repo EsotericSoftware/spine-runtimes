@@ -14,16 +14,30 @@ namespace Spine.Unity {
 		public enum MixMode { AlwaysMix, MixNext, SpineStyle }
 		public MixMode[] layerMixModes = new MixMode[0];
 
+		/// <summary>
+		/// Occurs after the animations are applied and before world space values are resolved.
+		/// Use this callback when you want to set bone local values.
+		/// </summary>
 		public event UpdateBonesDelegate UpdateLocal {
 			add { _UpdateLocal += value; }
 			remove { _UpdateLocal -= value; }
 		}
 
+		/// <summary>
+		/// Occurs after the Skeleton's bone world space values are resolved (including all constraints).
+		/// Using this callback will cause the world space values to be solved an extra time.
+		/// Use this callback if want to use bone world space values, and also set bone local values.
+		/// </summary>
 		public event UpdateBonesDelegate UpdateWorld {
 			add { _UpdateWorld += value; }
 			remove { _UpdateWorld -= value; }
 		}
 
+		/// <summary>
+		/// Occurs after the Skeleton's bone world space values are resolved (including all constraints).
+		/// Use this callback if you want to use bone world space values, but don't intend to modify bone local values.
+		/// This callback can also be used when setting world position and the bone matrix.
+		/// </summary>
 		public event UpdateBonesDelegate UpdateComplete {
 			add { _UpdateComplete += value; }
 			remove { _UpdateComplete -= value; }
