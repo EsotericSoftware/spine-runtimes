@@ -89,12 +89,19 @@ var imageSequencesDemo = function(pathPrefix, loadingComplete) {
 		skeleton.setSkinByName("default");
 
 		var state = new spine.AnimationState(new spine.AnimationStateData(skeletonData));
+		var anim = skeletonData.findAnimation(animation);		
 		state.setAnimation(0, animation, true);
+		if (name === "alien") {
+			state.update(anim.duration / 2);			
+		}
 		state.apply(skeleton);
 		skeleton.updateWorldTransform();			
 		var offset = new spine.Vector2();
 		var size = new spine.Vector2();
 		skeleton.getBounds(offset, size);
+		if (name === "alien") {
+			state.update(-anim.duration / 2);
+		}
 
 		var regions = [];
 		for(var i = 0; i < sequenceSlots.length; i++) {
@@ -133,8 +140,8 @@ var imageSequencesDemo = function(pathPrefix, loadingComplete) {
 
 		renderer.camera.position.x = offset.x + size.x;
 		renderer.camera.position.y = offset.y + size.y / 2;
-		renderer.camera.viewportWidth = size.x * 2.2;
-		renderer.camera.viewportHeight = size.y * 1.2;
+		renderer.camera.viewportWidth = size.x * 2.4;
+		renderer.camera.viewportHeight = size.y * 1.4;
 		renderer.resize(spine.webgl.ResizeMode.Fit);
 
 		gl.clearColor(0.2, 0.2, 0.2, 1);

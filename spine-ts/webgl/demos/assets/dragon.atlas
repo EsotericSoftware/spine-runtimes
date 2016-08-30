@@ -1,279 +1,279 @@
 
 dragon.png
-size: 1024,1024
+size: 512,512
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 L_front_leg
   rotate: false
-  xy: 870, 881
-  size: 42, 29
-  orig: 42, 29
+  xy: 406, 182
+  size: 34, 23
+  orig: 34, 23
   offset: 0, 0
   index: -1
 L_front_thigh
   rotate: false
-  xy: 258, 761
-  size: 42, 36
-  orig: 42, 36
+  xy: 283, 154
+  size: 34, 29
+  orig: 34, 29
   offset: 0, 0
   index: -1
 L_rear_leg
   rotate: false
-  xy: 765, 859
-  size: 103, 89
-  orig: 103, 89
+  xy: 411, 355
+  size: 82, 71
+  orig: 82, 71
   offset: 0, 0
   index: -1
 L_rear_thigh
   rotate: false
-  xy: 156, 116
-  size: 46, 75
-  orig: 46, 75
+  xy: 469, 293
+  size: 36, 60
+  orig: 36, 60
   offset: 0, 0
   index: -1
 L_wing01
   rotate: false
-  xy: 100, 687
-  size: 96, 128
-  orig: 96, 128
+  xy: 163, 242
+  size: 76, 102
+  orig: 76, 102
   offset: 0, 0
   index: -1
 L_wing02
   rotate: false
-  xy: 2, 88
-  size: 90, 135
-  orig: 90, 135
+  xy: 104, 5
+  size: 72, 108
+  orig: 72, 108
   offset: 0, 0
   index: -1
 L_wing03
   rotate: false
-  xy: 114, 451
-  size: 93, 104
-  orig: 93, 104
+  xy: 241, 261
+  size: 74, 83
+  orig: 74, 83
   offset: 0, 0
   index: -1
 L_wing04
   rotate: false
-  xy: 104, 193
-  size: 94, 68
-  orig: 94, 68
+  xy: 286, 352
+  size: 75, 54
+  orig: 75, 54
   offset: 0, 0
   index: -1
 L_wing05
   rotate: false
-  xy: 907, 915
-  size: 109, 107
-  orig: 109, 107
+  xy: 178, 51
+  size: 87, 85
+  orig: 87, 85
   offset: 0, 0
   index: -1
 L_wing06
   rotate: false
-  xy: 2, 671
-  size: 96, 166
-  orig: 96, 166
+  xy: 2, 230
+  size: 77, 132
+  orig: 77, 132
   offset: 0, 0
   index: -1
 L_wing07
   rotate: false
-  xy: 114, 557
-  size: 80, 128
-  orig: 80, 128
+  xy: 175, 138
+  size: 64, 102
+  orig: 64, 102
   offset: 0, 0
   index: -1
 L_wing08
   rotate: false
-  xy: 104, 263
-  size: 82, 91
-  orig: 82, 91
+  xy: 317, 278
+  size: 66, 72
+  orig: 66, 72
   offset: 0, 0
   index: -1
 L_wing09
   rotate: false
-  xy: 2, 2
-  size: 102, 84
-  orig: 102, 84
+  xy: 385, 286
+  size: 82, 67
+  orig: 82, 67
   offset: 0, 0
   index: -1
 R_front_leg
   rotate: false
-  xy: 696, 873
-  size: 51, 45
-  orig: 51, 45
+  xy: 241, 147
+  size: 40, 36
+  orig: 40, 36
   offset: 0, 0
   index: -1
 R_front_thigh
   rotate: false
-  xy: 331, 842
-  size: 54, 54
-  orig: 54, 54
+  xy: 178, 6
+  size: 43, 43
+  orig: 43, 43
   offset: 0, 0
   index: -1
 R_rear_leg
   rotate: false
-  xy: 198, 763
-  size: 58, 50
-  orig: 58, 50
+  xy: 363, 366
+  size: 46, 40
+  orig: 46, 40
   offset: 0, 0
   index: -1
 R_rear_thigh
   rotate: false
-  xy: 213, 815
-  size: 46, 75
-  orig: 46, 75
+  xy: 369, 216
+  size: 36, 60
+  orig: 36, 60
   offset: 0, 0
   index: -1
 R_wing01
   rotate: false
-  xy: 2, 514
-  size: 110, 155
-  orig: 110, 155
+  xy: 2, 104
+  size: 88, 124
+  orig: 88, 124
   offset: 0, 0
   index: -1
 R_wing02
   rotate: false
-  xy: 2, 359
-  size: 102, 153
-  orig: 102, 153
+  xy: 92, 115
+  size: 81, 122
+  orig: 81, 122
   offset: 0, 0
   index: -1
 R_wing03
   rotate: false
-  xy: 254, 898
-  size: 136, 124
-  orig: 136, 124
+  xy: 204, 411
+  size: 109, 99
+  orig: 109, 99
   offset: 0, 0
   index: -1
 R_wing04
   rotate: false
-  xy: 765, 950
-  size: 140, 72
-  orig: 140, 72
+  xy: 84, 346
+  size: 112, 58
+  orig: 112, 58
   offset: 0, 0
   index: -1
 R_wing05
   rotate: false
-  xy: 392, 907
-  size: 126, 115
-  orig: 126, 115
+  xy: 2, 10
+  size: 100, 92
+  orig: 100, 92
   offset: 0, 0
   index: -1
 R_wing06
   rotate: false
-  xy: 2, 839
-  size: 100, 183
-  orig: 100, 183
+  xy: 2, 364
+  size: 80, 146
+  orig: 80, 146
   offset: 0, 0
   index: -1
 R_wing07
   rotate: false
-  xy: 2, 225
-  size: 100, 132
-  orig: 100, 132
+  xy: 81, 239
+  size: 80, 105
+  orig: 80, 105
   offset: 0, 0
   index: -1
 R_wing08
   rotate: false
-  xy: 520, 895
-  size: 117, 127
-  orig: 117, 127
+  xy: 315, 408
+  size: 94, 102
+  orig: 94, 102
   offset: 0, 0
   index: -1
 R_wing09
   rotate: false
-  xy: 639, 920
-  size: 124, 102
-  orig: 124, 102
+  xy: 411, 428
+  size: 99, 82
+  orig: 99, 82
   offset: 0, 0
   index: -1
 back
   rotate: false
-  xy: 106, 356
-  size: 95, 93
-  orig: 95, 93
+  xy: 241, 185
+  size: 76, 74
+  orig: 76, 74
   offset: 0, 0
   index: -1
 chest
   rotate: false
-  xy: 261, 835
-  size: 68, 61
-  orig: 68, 61
+  xy: 319, 164
+  size: 54, 49
+  orig: 54, 49
   offset: 0, 0
   index: -1
 chin
   rotate: false
-  xy: 104, 817
-  size: 107, 73
-  orig: 107, 73
+  xy: 198, 346
+  size: 86, 58
+  orig: 86, 58
   offset: 0, 0
   index: -1
 front_toeA
   rotate: false
-  xy: 311, 808
-  size: 15, 25
-  orig: 15, 25
+  xy: 495, 406
+  size: 12, 20
+  orig: 12, 20
   offset: 0, 0
   index: -1
 front_toeB
   rotate: false
-  xy: 914, 884
-  size: 28, 29
-  orig: 28, 29
+  xy: 447, 231
+  size: 22, 23
+  orig: 22, 23
   offset: 0, 0
   index: -1
 head
   rotate: false
-  xy: 104, 892
-  size: 148, 130
-  orig: 148, 130
+  xy: 84, 406
+  size: 118, 104
+  orig: 118, 104
   offset: 0, 0
   index: -1
 rear-toe
   rotate: false
-  xy: 639, 879
-  size: 55, 39
-  orig: 55, 39
+  xy: 223, 18
+  size: 44, 31
+  orig: 44, 31
   offset: 0, 0
   index: -1
 tail01
   rotate: false
-  xy: 94, 114
-  size: 60, 77
-  orig: 60, 77
+  xy: 319, 215
+  size: 48, 61
+  orig: 48, 61
   offset: 0, 0
   index: -1
 tail02
   rotate: false
-  xy: 198, 701
-  size: 48, 60
-  orig: 48, 60
+  xy: 407, 236
+  size: 38, 48
+  orig: 38, 48
   offset: 0, 0
   index: -1
 tail03
   rotate: false
-  xy: 248, 713
-  size: 37, 46
-  orig: 37, 46
+  xy: 375, 177
+  size: 29, 37
+  orig: 29, 37
   offset: 0, 0
   index: -1
 tail04
   rotate: false
-  xy: 870, 912
-  size: 28, 36
-  orig: 28, 36
+  xy: 447, 256
+  size: 22, 28
+  orig: 22, 28
   offset: 0, 0
   index: -1
 tail05
   rotate: false
-  xy: 944, 883
-  size: 26, 30
-  orig: 26, 30
+  xy: 447, 205
+  size: 21, 24
+  orig: 21, 24
   offset: 0, 0
   index: -1
 tail06
   rotate: false
-  xy: 261, 799
-  size: 48, 34
-  orig: 48, 34
+  xy: 407, 207
+  size: 38, 27
+  orig: 38, 27
   offset: 0, 0
   index: -1
