@@ -28,7 +28,8 @@ var animationMixingDemo = function(pathPrefix) {
 				stateNoMix.setAnimation(1, "shoot", false);	
 			},
 			up: function(x, y) { },
-			moved: function(x, y) {	}
+			moved: function(x, y) {	},
+			dragged: function(x, y) { }
 		});
 	}	
 

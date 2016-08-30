@@ -1005,16 +1005,25 @@ declare module spine.webgl {
         lastX: number;
         lastY: number;
         buttonDown: boolean;
+        currTouch: Touch;
+        touchesPool: Pool<Touch>;
         private listeners;
         constructor(element: HTMLElement);
         private setupCallbacks(element);
         addListener(listener: InputListener): void;
         removeListener(listener: InputListener): void;
     }
+    class Touch {
+        identifier: number;
+        x: number;
+        y: number;
+        constructor(identifier: number, x: number, y: number);
+    }
     interface InputListener {
         down(x: number, y: number): void;
         up(x: number, y: number): void;
         moved(x: number, y: number): void;
+        dragged(x: number, y: number): void;
     }
 }
 declare module spine.webgl {
@@ -1270,13 +1279,12 @@ declare module spine.webgl {
         scale: number;
         boneWidth: number;
         private gl;
-        private shapes;
         private bounds;
         private temp;
         private static LIGHT_GRAY;
         private static GREEN;
         constructor(gl: WebGLRenderingContext);
-        draw(shader: Shader, skeleton: Skeleton): void;
+        draw(shapes: ShapeRenderer, skeleton: Skeleton): void;
         dispose(): void;
     }
 }
@@ -1324,6 +1332,7 @@ declare module spine {
         private assetManager;
         private shader;
         private batcher;
+        private shapes;
         private debugShader;
         private mvp;
         private skeletonRenderer;

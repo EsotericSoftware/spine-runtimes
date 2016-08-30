@@ -29,7 +29,7 @@ var ikConstraintDemo = function(pathPrefix) {
 			up: function(x, y) {
 				target = null;
 			},
-			moved: function(x, y) {
+			dragged: function(x, y) {
 				if (target != null) {
 					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
 					if (target.parent !== null) {
@@ -41,7 +41,8 @@ var ikConstraintDemo = function(pathPrefix) {
 						target.y = coords.y - skeleton.y;
 					}
 				}
-			}
+			},
+			moved: function (x, y) { }
 		})
 		assetManager.loadTexture("assets/spineboy.png");
 		assetManager.loadText("assets/spineboy-mesh.json");

@@ -4968,6 +4968,10 @@ var spine;
                 this.lastX = 0;
                 this.lastY = 0;
                 this.buttonDown = false;
+                this.currTouch = null;
+                this.touchesPool = new spine.Pool(function () {
+                    return new spine.webgl.Touch(0, 0, 0);
+                });
                 this.listeners = new Array();
                 this.element = element;
                 this.setupCallbacks(element);
@@ -4995,11 +4999,15 @@ var spine;
                         var y = ev.clientY - rect.top;
                         var listeners = _this.listeners;
                         for (var i = 0; i < listeners.length; i++) {
-                            listeners[i].moved(x, y);
+                            if (_this.buttonDown) {
+                                listeners[i].dragged(x, y);
+                            }
+                            else {
+                                listeners[i].moved(x, y);
+                            }
                         }
                         _this.lastX = x;
                         _this.lastY = y;
-                        _this.buttonDown = true;
                     }
                 }, true);
                 element.addEventListener("mouseup", function (ev) {
@@ -5013,11 +5021,97 @@ var spine;
                         }
                         _this.lastX = x;
                         _this.lastY = y;
-                        _this.buttonDown = true;
+                        _this.buttonDown = false;
                     }
                 }, true);
-                element.addEventListener(navigator.userAgent.toLowerCase().indexOf('firefox') != -1 ? "DOMMouseScroll" : "mousewheel", function (ev) {
-                }, true);
+                element.addEventListener("touchstart", function (ev) {
+                    if (_this.currTouch != null)
+                        return;
+                    var touches = ev.changedTouches;
+                    alert(JSON.stringify(touches));
+                    for (var i = 0; i < touches.length; i++) {
+                        var touch = touches[i];
+                        var rect = element.getBoundingClientRect();
+                        var x = touch.clientX - rect.left;
+                        var y = touch.clientY - rect.top;
+                        _this.currTouch = _this.touchesPool.obtain();
+                        _this.currTouch.identifier = touch.identifier;
+                        _this.currTouch.x = x;
+                        _this.currTouch.y = y;
+                        break;
+                    }
+                    var listeners = _this.listeners;
+                    for (var i_1 = 0; i_1 < listeners.length; i_1++) {
+                        listeners[i_1].down(_this.currTouch.x, _this.currTouch.y);
+                    }
+                    _this.lastX = _this.currTouch.x;
+                    _this.lastY = _this.currTouch.y;
+                    _this.buttonDown = true;
+                    ev.preventDefault();
+                }, false);
+                element.addEventListener("touchend", function (ev) {
+                    if (_this.currTouch != null)
+                        return;
+                    var touches = ev.changedTouches;
+                    for (var i = 0; i < touches.length; i++) {
+                        var touch = touches[i];
+                        if (_this.currTouch.identifier === touch.identifier) {
+                            var rect = element.getBoundingClientRect();
+                            var x = touch.clientX - rect.left;
+                            var y = touch.clientY - rect.top;
+                            _this.touchesPool.free(_this.currTouch);
+                            _this.currTouch = null;
+                            _this.buttonDown = false;
+                            var listeners = _this.listeners;
+                            for (var i_2 = 0; i_2 < listeners.length; i_2++) {
+                                listeners[i_2].up(x, y);
+                            }
+                            break;
+                        }
+                    }
+                    ev.preventDefault();
+                }, false);
+                element.addEventListener("touchcancel", function (ev) {
+                    if (_this.currTouch != null)
+                        return;
+                    var touches = ev.changedTouches;
+                    for (var i = 0; i < touches.length; i++) {
+                        var touch = touches[i];
+                        if (_this.currTouch.identifier === touch.identifier) {
+                            var rect = element.getBoundingClientRect();
+                            var x = touch.clientX - rect.left;
+                            var y = touch.clientY - rect.top;
+                            _this.touchesPool.free(_this.currTouch);
+                            _this.currTouch = null;
+                            _this.buttonDown = false;
+                            var listeners = _this.listeners;
+                            for (var i_3 = 0; i_3 < listeners.length; i_3++) {
+                                listeners[i_3].up(x, y);
+                            }
+                            break;
+                        }
+                    }
+                    ev.preventDefault();
+                }, false);
+                element.addEventListener("touchmove", function (ev) {
+                    if (_this.currTouch != null)
+                        return;
+                    var touches = ev.changedTouches;
+                    for (var i = 0; i < touches.length; i++) {
+                        var touch = touches[i];
+                        if (_this.currTouch.identifier === touch.identifier) {
+                            var rect = element.getBoundingClientRect();
+                            var x = touch.clientX - rect.left;
+                            var y = touch.clientY - rect.top;
+                            var listeners = _this.listeners;
+                            for (var i_4 = 0; i_4 < listeners.length; i_4++) {
+                                listeners[i_4].dragged(x, y);
+                            }
+                            break;
+                        }
+                    }
+                    ev.preventDefault();
+                }, false);
             };
             Input.prototype.addListener = function (listener) {
                 this.listeners.push(listener);
@@ -5031,6 +5125,15 @@ var spine;
             return Input;
         }());
         webgl.Input = Input;
+        var Touch = (function () {
+            function Touch(identifier, x, y) {
+                this.identifier = identifier;
+                this.x = x;
+                this.y = y;
+            }
+            return Touch;
+        }());
+        webgl.Touch = Touch;
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
 var spine;
@@ -5626,7 +5729,7 @@ var spine;
                 if (premultipliedAlpha === void 0) { premultipliedAlpha = false; }
                 this.enableRenderer(this.shapes);
                 this.skeletonDebugRenderer.premultipliedAlpha = premultipliedAlpha;
-                this.skeletonDebugRenderer.draw(this.shapesShader, skeleton);
+                this.skeletonDebugRenderer.draw(this.shapes, skeleton);
             };
             SceneRenderer.prototype.drawTexture = function (texture, x, y, width, height, color) {
                 if (color === void 0) { color = null; }
@@ -5797,11 +5900,14 @@ var spine;
                     this.batcher.begin(this.batcherShader);
                     this.activeRenderer = this.batcher;
                 }
-                else {
+                else if (renderer instanceof webgl.ShapeRenderer) {
                     this.shapesShader.bind();
                     this.shapesShader.setUniform4x4f(webgl.Shader.MVP_MATRIX, this.camera.projectionView.values);
                     this.shapes.begin(this.shapesShader);
                     this.activeRenderer = this.shapes;
+                }
+                else {
+                    this.activeRenderer = this.skeletonDebugRenderer;
                 }
             };
             SceneRenderer.prototype.dispose = function () {
@@ -6250,6 +6356,7 @@ var spine;
                 if (!this.isDrawing)
                     throw new Error("ShapeRenderer.begin() has not been called");
                 this.flush();
+                this.gl.disable(this.gl.BLEND);
                 this.isDrawing = false;
             };
             ShapeRenderer.prototype.flush = function () {
@@ -6258,7 +6365,6 @@ var spine;
                 this.mesh.setVerticesLength(this.vertexIndex);
                 this.mesh.draw(this.shader, this.shapeType);
                 this.vertexIndex = 0;
-                this.gl.disable(this.gl.BLEND);
             };
             ShapeRenderer.prototype.check = function (shapeType, numVertices) {
                 if (!this.isDrawing)
@@ -6311,20 +6417,16 @@ var spine;
                 this.bounds = new spine.SkeletonBounds();
                 this.temp = new Array();
                 this.gl = gl;
-                this.shapes = new webgl.ShapeRenderer(gl);
             }
-            SkeletonDebugRenderer.prototype.draw = function (shader, skeleton) {
+            SkeletonDebugRenderer.prototype.draw = function (shapes, skeleton) {
                 var skeletonX = skeleton.x;
                 var skeletonY = skeleton.y;
                 var gl = this.gl;
-                gl.enable(gl.BLEND);
                 var srcFunc = this.premultipliedAlpha ? gl.ONE : gl.SRC_ALPHA;
-                gl.blendFunc(srcFunc, gl.ONE_MINUS_SRC_ALPHA);
-                var shapes = this.shapes;
+                shapes.setBlendMode(srcFunc, gl.ONE_MINUS_SRC_ALPHA);
                 var bones = skeleton.bones;
                 if (this.drawBones) {
                     shapes.setColor(this.boneLineColor);
-                    shapes.begin(shader);
                     for (var i = 0, n = bones.length; i < n; i++) {
                         var bone = bones[i];
                         if (bone.parent == null)
@@ -6333,12 +6435,8 @@ var spine;
                         var y = skeletonY + bone.data.length * bone.c + bone.worldY;
                         shapes.rectLine(true, skeletonX + bone.worldX, skeletonY + bone.worldY, x, y, this.boneWidth * this.scale);
                     }
-                    shapes.end();
-                    shapes.begin(shader);
                     shapes.x(skeletonX, skeletonY, 4 * this.scale);
                 }
-                else
-                    shapes.begin(shader);
                 if (this.drawRegionAttachments) {
                     shapes.setColor(this.attachmentLineColor);
                     var slots = skeleton.slots;
@@ -6438,8 +6536,6 @@ var spine;
                         }
                     }
                 }
-                shapes.end();
-                shapes.begin(shader);
                 if (this.drawBones) {
                     shapes.setColor(this.boneOriginColor);
                     for (var i = 0, n = bones.length; i < n; i++) {
@@ -6447,10 +6543,8 @@ var spine;
                         shapes.circle(true, skeletonX + bone.worldX, skeletonY + bone.worldY, 3 * this.scale, SkeletonDebugRenderer.GREEN, 8);
                     }
                 }
-                shapes.end();
             };
             SkeletonDebugRenderer.prototype.dispose = function () {
-                this.shapes.dispose();
             };
             SkeletonDebugRenderer.LIGHT_GRAY = new spine.Color(192 / 255, 192 / 255, 192 / 255, 1);
             SkeletonDebugRenderer.GREEN = new spine.Color(0, 1, 0, 1);
@@ -6655,6 +6749,7 @@ var spine;
             this.skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);
             this.debugShader = spine.webgl.Shader.newColored(gl);
             this.debugRenderer = new spine.webgl.SkeletonDebugRenderer(gl);
+            this.shapes = new spine.webgl.ShapeRenderer(gl);
             var assets = this.assetManager = new spine.webgl.AssetManager(gl);
             assets.loadText(config.atlas);
             assets.loadText(config.json);
@@ -6769,11 +6864,14 @@ var spine;
             shader.unbind();
             if (this.config.debug) {
                 var shader_1 = this.debugShader;
+                var shapes = this.shapes;
                 var renderer = this.debugRenderer;
                 shader_1.bind();
                 shader_1.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, this.mvp.values);
                 renderer.premultipliedAlpha = premultipliedAlpha;
-                renderer.draw(shader_1, skeleton);
+                shapes.begin(shader_1);
+                renderer.draw(shapes, skeleton);
+                shapes.end();
                 shader_1.unbind();
             }
             if (!this.paused)

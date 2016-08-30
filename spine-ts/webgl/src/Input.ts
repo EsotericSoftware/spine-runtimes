@@ -34,7 +34,11 @@ module spine.webgl {
 		element: HTMLElement;
 		lastX = 0;
 		lastY = 0;
-		buttonDown = false;	
+		buttonDown = false;
+		currTouch: Touch = null;
+		touchesPool = new Pool<spine.webgl.Touch>(() => {
+			return new spine.webgl.Touch(0, 0, 0);
+		});
 
 		private listeners = new Array<InputListener>();
 		constructor (element: HTMLElement) {
@@ -67,12 +71,15 @@ module spine.webgl {
 
 					let listeners = this.listeners;
 					for (let i = 0; i < listeners.length; i++) {
-						listeners[i].moved(x, y);
+						if (this.buttonDown) {
+							listeners[i].dragged(x, y);
+						} else {
+							listeners[i].moved(x, y);
+						}
 					}
 
 					this.lastX = x;
-					this.lastY = y;
-					this.buttonDown = true;
+					this.lastY = y;					
 				}
 			}, true);
 			element.addEventListener("mouseup", (ev: UIEvent) => {
@@ -88,12 +95,102 @@ module spine.webgl {
 
 					this.lastX = x;
 					this.lastY = y;
-					this.buttonDown = true;
+					this.buttonDown = false;
 				}
 			}, true);
-			element.addEventListener(navigator.userAgent.toLowerCase().indexOf('firefox') != -1 ? "DOMMouseScroll" : "mousewheel", (ev: UIEvent) => {
+			element.addEventListener("touchstart", (ev: TouchEvent) => {								
+				if (this.currTouch != null) return;
 
-			}, true);
+				var touches = ev.changedTouches;
+				alert(JSON.stringify(touches));
+				for (var i = 0; i < touches.length; i++) {					
+					var touch = touches[i];									
+					let rect = element.getBoundingClientRect();
+					let x = touch.clientX - rect.left;
+					let y = touch.clientY - rect.top;
+					this.currTouch = this.touchesPool.obtain();
+					this.currTouch.identifier = touch.identifier;
+					this.currTouch.x = x;
+					this.currTouch.y = y;
+					break;
+				}												
+
+				let listeners = this.listeners;
+				for (let i = 0; i < listeners.length; i++) {
+					listeners[i].down(this.currTouch.x, this.currTouch.y);
+				}
+
+				this.lastX = this.currTouch.x;
+				this.lastY = this.currTouch.y;
+				this.buttonDown = true;
+				ev.preventDefault();
+			}, false);
+			element.addEventListener("touchend", (ev: TouchEvent) => {				
+				if (this.currTouch != null) return;
+
+				var touches = ev.changedTouches;
+				for (var i = 0; i < touches.length; i++) {
+					var touch = touches[i];
+					if (this.currTouch.identifier === touch.identifier) {
+						let rect = element.getBoundingClientRect();
+						let x = touch.clientX - rect.left;
+						let y = touch.clientY - rect.top;						
+						this.touchesPool.free(this.currTouch);
+						this.currTouch = null;
+						this.buttonDown = false;
+
+						let listeners = this.listeners;
+						for (let i = 0; i < listeners.length; i++) {
+							listeners[i].up(x, y);
+						}
+						break;
+					}
+				}
+				ev.preventDefault();
+			}, false);
+			element.addEventListener("touchcancel", (ev: TouchEvent) => {				
+				if (this.currTouch != null) return;
+
+				var touches = ev.changedTouches;
+				for (var i = 0; i < touches.length; i++) {
+					var touch = touches[i];
+					if (this.currTouch.identifier === touch.identifier) {
+						let rect = element.getBoundingClientRect();
+						let x = touch.clientX - rect.left;
+						let y = touch.clientY - rect.top;						
+						this.touchesPool.free(this.currTouch);
+						this.currTouch = null;
+						this.buttonDown = false;
+
+						let listeners = this.listeners;
+						for (let i = 0; i < listeners.length; i++) {
+							listeners[i].up(x, y);
+						}
+						break;
+					}
+				}
+				ev.preventDefault();
+			}, false);
+			element.addEventListener("touchmove", (ev: TouchEvent) => {				
+				if (this.currTouch != null) return;
+
+				var touches = ev.changedTouches;
+				for (var i = 0; i < touches.length; i++) {
+					var touch = touches[i];
+					if (this.currTouch.identifier === touch.identifier) {
+						let rect = element.getBoundingClientRect();
+						let x = touch.clientX - rect.left;
+						let y = touch.clientY - rect.top;						
+
+						let listeners = this.listeners;
+						for (let i = 0; i < listeners.length; i++) {
+							listeners[i].dragged(x, y);
+						}
+						break;
+					}
+				}
+				ev.preventDefault();
+			}, false);
 		}
 
 		addListener(listener: InputListener) {
@@ -108,9 +205,15 @@ module spine.webgl {
 		}
 	}
 
+	export class Touch {
+		constructor(public identifier: number, public x: number, public y: number) {			
+		}
+	}
+
 	export interface InputListener {
 		down(x: number, y: number): void;
 		up(x: number, y: number): void;
-		moved(x: number, y: number): void;		
+		moved(x: number, y: number): void;
+		dragged(x: number, y: number): void;
 	}
 }

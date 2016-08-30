@@ -41,6 +41,7 @@ module spine {
 		private assetManager: spine.webgl.AssetManager;
 		private shader: spine.webgl.Shader;
 		private batcher: spine.webgl.PolygonBatcher;
+		private shapes: spine.webgl.ShapeRenderer;
 		private debugShader: spine.webgl.Shader;		
 		private mvp = new spine.webgl.Matrix4();
 		private skeletonRenderer: spine.webgl.SkeletonRenderer;		
@@ -75,6 +76,7 @@ module spine {
 			this.skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);
 			this.debugShader = spine.webgl.Shader.newColored(gl);
 			this.debugRenderer = new spine.webgl.SkeletonDebugRenderer(gl);
+			this.shapes = new spine.webgl.ShapeRenderer(gl);
 
 			let assets = this.assetManager = new spine.webgl.AssetManager(gl);
 			assets.loadText(config.atlas);
@@ -186,11 +188,14 @@ module spine {
 			// Draw debug information if requested via config
 			if (this.config.debug) {
 				let shader = this.debugShader;
+				let shapes = this.shapes;
 				let renderer = this.debugRenderer;
 				shader.bind();
 				shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, this.mvp.values);
 				renderer.premultipliedAlpha = premultipliedAlpha;
-				renderer.draw(shader, skeleton);
+				shapes.begin(shader);
+				renderer.draw(shapes, skeleton);
+				shapes.end();
 				shader.unbind();
 			}
 

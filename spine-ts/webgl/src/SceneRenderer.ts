@@ -38,7 +38,7 @@ module spine.webgl {
 		private batcher: PolygonBatcher;
 		private shapes: ShapeRenderer;
 		private shapesShader: Shader;
-		private activeRenderer: PolygonBatcher | ShapeRenderer = null;
+		private activeRenderer: PolygonBatcher | ShapeRenderer | SkeletonDebugRenderer = null;
 		private skeletonRenderer: SkeletonRenderer;
 		private skeletonDebugRenderer: SkeletonDebugRenderer;
 		private QUAD = [
@@ -76,7 +76,7 @@ module spine.webgl {
 		drawSkeletonDebug(skeleton: Skeleton, premultipliedAlpha = false) {
 			this.enableRenderer(this.shapes);
 			this.skeletonDebugRenderer.premultipliedAlpha = premultipliedAlpha;
-			this.skeletonDebugRenderer.draw(this.shapesShader, skeleton);
+			this.skeletonDebugRenderer.draw(this.shapes, skeleton);
 		}
 
 		drawTexture (texture: GLTexture, x: number, y: number, width: number, height: number, color: Color = null) {
@@ -229,7 +229,7 @@ module spine.webgl {
 			this.camera.update();
 		}
 
-		private enableRenderer(renderer: PolygonBatcher | ShapeRenderer) {
+		private enableRenderer(renderer: PolygonBatcher | ShapeRenderer | SkeletonDebugRenderer) {
 			if (this.activeRenderer === renderer) return;
 			this.end();
 			if (renderer instanceof PolygonBatcher) {
@@ -237,11 +237,13 @@ module spine.webgl {
 				this.batcherShader.setUniform4x4f(Shader.MVP_MATRIX, this.camera.projectionView.values);
 				this.batcher.begin(this.batcherShader);
 				this.activeRenderer = this.batcher;
-			} else {
+			} else if (renderer instanceof ShapeRenderer) {
 				this.shapesShader.bind();
 				this.shapesShader.setUniform4x4f(Shader.MVP_MATRIX, this.camera.projectionView.values);
 				this.shapes.begin(this.shapesShader);
 				this.activeRenderer = this.shapes;
+			} else {
+				this.activeRenderer = this.skeletonDebugRenderer;
 			}
 		}
 
