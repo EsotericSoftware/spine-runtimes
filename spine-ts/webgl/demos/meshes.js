@@ -80,9 +80,13 @@ var meshesDemo = function(pathPrefix, loadingComplete) {
 			timeLine.slider("value", (active.playTime / animationDuration * 100));
 		})
 
+		renderer.skeletonDebugRenderer.drawBones = false;
 		$("#meshesdemo-drawbonescheckbox").click(function() {
 			renderer.skeletonDebugRenderer.drawBones = this.checked;
 		})
+
+		renderer.skeletonDebugRenderer.drawMeshHull = false;
+		renderer.skeletonDebugRenderer.drawMeshTriangles = false;
 		$("#meshesdemo-drawmeshtrianglescheckbox").click(function() {
 			renderer.skeletonDebugRenderer.drawMeshHull = this.checked;
 			renderer.skeletonDebugRenderer.drawMeshTriangles = this.checked;

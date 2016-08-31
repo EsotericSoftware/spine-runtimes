@@ -92,7 +92,7 @@ var imageSequencesDemo = function(pathPrefix, loadingComplete) {
 		var anim = skeletonData.findAnimation(animation);		
 		state.setAnimation(0, animation, true);
 		if (name === "alien") {
-			state.update(anim.duration / 2);			
+			state.update(anim.duration / 2.5);			
 		}
 		state.apply(skeleton);
 		skeleton.updateWorldTransform();			
@@ -100,7 +100,7 @@ var imageSequencesDemo = function(pathPrefix, loadingComplete) {
 		var size = new spine.Vector2();
 		skeleton.getBounds(offset, size);
 		if (name === "alien") {
-			state.update(-anim.duration / 2);
+			state.update(-anim.duration / 2.5);
 		}
 
 		var regions = [];
