@@ -101,8 +101,7 @@ module spine.webgl {
 			element.addEventListener("touchstart", (ev: TouchEvent) => {								
 				if (this.currTouch != null) return;
 
-				var touches = ev.changedTouches;
-				alert(JSON.stringify(touches));
+				var touches = ev.changedTouches;				
 				for (var i = 0; i < touches.length; i++) {					
 					var touch = touches[i];									
 					let rect = element.getBoundingClientRect();

@@ -5029,7 +5029,6 @@ var spine;
                     if (_this.currTouch != null)
                         return;
                     var touches = ev.changedTouches;
-                    alert(JSON.stringify(touches));
                     for (var i = 0; i < touches.length; i++) {
                         var touch = touches[i];
                         var rect = element.getBoundingClientRect();

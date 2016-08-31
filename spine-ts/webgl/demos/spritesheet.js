@@ -1,22 +1,21 @@
-var skeletonVsSpriteDemo = function(pathPrefix, loadingComplete) {
+var spritesheetDemo = function(pathPrefix, loadingComplete) {
 	var SKELETON_ATLAS_COLOR = new spine.Color(0, 0.8, 0, 0.8);
 	var FRAME_ATLAS_COLOR = new spine.Color(0.8, 0, 0, 0.8);
 
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, animationState, offset, bounds;
 	var skeletonSeq, walkAnim, walkLastTime = 0, walkLastTimePrecise = 0;
-	var skeletonAtlas;
-	var sequenceAtlas;
+	var skeletonAtlas;	
 	var viewportWidth, viewportHeight;
 	var frames = [], currFrame = 0, frameTime = 0, frameScale = 0, FPS = 30;
 	var lastFrameTime = Date.now() / 1000;
-	var timeSlider, timeSliderLabel, atlasCheckbox;
+	var timeSlider, timeSliderLabel;
 	var playButton, timeLine, isPlaying = true, playTime = 0, framePlaytime = 0;
 
 	function init () {
 		if (pathPrefix === undefined) pathPrefix = "";		
 
-		canvas = document.getElementById("skeletonvsspritedemo-canvas");
+		canvas = document.getElementById("spritesheetdemo-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;	
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
@@ -25,7 +24,6 @@ var skeletonVsSpriteDemo = function(pathPrefix, loadingComplete) {
 		assetManager.loadTexture("raptor.png");
 		assetManager.loadText("raptor.json");
 		assetManager.loadText("raptor.atlas");		
-		assetManager.loadTexture("raptor-sequenceatlas.png");
 		requestAnimationFrame(load);
 	}
 
@@ -33,8 +31,7 @@ var skeletonVsSpriteDemo = function(pathPrefix, loadingComplete) {
 		if (assetManager.isLoadingComplete()) {
 			skeletonAtlas = new spine.TextureAtlas(assetManager.get("raptor.atlas"), function(path) {
 				return assetManager.get("" + path);		
-			});
-			sequenceAtlas = assetManager.get("raptor-sequenceatlas.png");
+			});			
 			var atlasLoader = new spine.TextureAtlasAttachmentLoader(skeletonAtlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
 			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("raptor.json"));
@@ -61,7 +58,7 @@ var skeletonVsSpriteDemo = function(pathPrefix, loadingComplete) {
 	}
 
 	function setupUI() {
-		playButton = $("#skeletonvsspritedemo-playbutton");
+		playButton = $("#spritesheetdemo-playbutton");
 		var playButtonUpdate = function () {	
 			isPlaying = !isPlaying;
 			if (isPlaying) {
@@ -74,7 +71,7 @@ var skeletonVsSpriteDemo = function(pathPrefix, loadingComplete) {
 		}
 		playButton.click(playButtonUpdate);
 
-		timeLine = $("#skeletonvsspritedemo-timeline");
+		timeLine = $("#spritesheetdemo-timeline");
 		timeLine.slider({ range: "max", min: 0, max: 100, value: 0, slide: function () {
 			if (isPlaying) playButton.click();		
 			if (!isPlaying) {				
@@ -98,10 +95,9 @@ var skeletonVsSpriteDemo = function(pathPrefix, loadingComplete) {
 			}
 		}});		
 
-		timeSlider = $("#skeletonvsspritedemo-timeslider");
+		timeSlider = $("#spritesheetdemo-timeslider");
 		timeSlider.slider({ range: "max", min: 0, max: 200, value: 50 });
-		timeSliderLabel = $("#skeletonvsspritedemo-timeslider-label");
-		atlasCheckbox = document.getElementById("skeletonvsspritedemo-atlascheckbox");
+		timeSliderLabel = $("#spritesheetdemo-timeslider-label");		
 	}
 
 	function render () {
@@ -112,29 +108,27 @@ var skeletonVsSpriteDemo = function(pathPrefix, loadingComplete) {
 
 		delta *= (timeSlider.slider("value") / 100);
 		if (timeSliderLabel) timeSliderLabel.text(timeSlider.slider("value") + "%");	
-
-		if (!atlasCheckbox.checked) {
-			if (isPlaying) {
-				var animationDuration = animationState.getCurrent(0).animation.duration;
-				playTime += delta;			
-				while (playTime >= animationDuration) {
-					playTime -= animationDuration;
-				}
-				timeLine.slider("value", (playTime / animationDuration * 100));
-								
-				animationState.update(delta);
-				animationState.apply(skeleton);
-				skeleton.updateWorldTransform();
-
-				walkLastTimePrecise += delta;				
-				while (walkLastTimePrecise - walkLastTime > 1 / FPS) {
-					var newWalkTime = walkLastTime + 1 / FPS;
-					walkAnim.apply(skeletonSeq, walkLastTime, newWalkTime, true, null);
-					walkLastTime = newWalkTime;
-				}								
-				skeletonSeq.updateWorldTransform();
+		
+		if (isPlaying) {
+			var animationDuration = animationState.getCurrent(0).animation.duration;
+			playTime += delta;			
+			while (playTime >= animationDuration) {
+				playTime -= animationDuration;
 			}
-		}	
+			timeLine.slider("value", (playTime / animationDuration * 100));
+							
+			animationState.update(delta);
+			animationState.apply(skeleton);
+			skeleton.updateWorldTransform();
+
+			walkLastTimePrecise += delta;				
+			while (walkLastTimePrecise - walkLastTime > 1 / FPS) {
+				var newWalkTime = walkLastTime + 1 / FPS;
+				walkAnim.apply(skeletonSeq, walkLastTime, newWalkTime, true, null);
+				walkLastTime = newWalkTime;
+			}								
+			skeletonSeq.updateWorldTransform();
+		}			
 
 		renderer.camera.position.x = offset.x + viewportWidth / 2 + 100;
 		renderer.camera.position.y = offset.y + viewportHeight / 2;	
@@ -144,25 +138,10 @@ var skeletonVsSpriteDemo = function(pathPrefix, loadingComplete) {
 		gl.clearColor(0.2, 0.2, 0.2, 1);
 		gl.clear(gl.COLOR_BUFFER_BIT);	
 
-		renderer.begin();
-		if (!atlasCheckbox.checked) {
-			var frame = frames[currFrame];				
-			renderer.drawSkeleton(skeleton, true);
-			renderer.drawSkeleton(skeletonSeq, true);
-		} else {				
-			var atlasTexture = skeletonAtlas.pages[0].texture;
-			var atlasSize = atlasTexture.getImage().width;
-			renderer.rect(true, offset.x + bounds.x / 2 - atlasSize / 2,
-								 offset.y + bounds.y / 2 - atlasSize / 2, atlasSize, atlasSize, spine.Color.WHITE);															
-			renderer.drawTexture(atlasTexture, offset.x + bounds.x / 2 - atlasSize / 2,
-								 offset.y + bounds.y / 2 - atlasSize / 2, atlasSize, atlasSize);
-			renderer.rect(false, offset.x + bounds.x / 2 - atlasSize / 2,
-								 offset.y + bounds.y / 2 - atlasSize / 2, atlasSize, atlasSize, spine.Color.RED);								 
-			
-			var seqAtlasSize = atlasSize * 2;
-			renderer.drawTexture(sequenceAtlas, offset.x + bounds.x / 2 + bounds.x - seqAtlasSize / 2 + 211,
-								 offset.y + bounds.y / 2 - seqAtlasSize / 2, seqAtlasSize, seqAtlasSize);			
-		}
+		renderer.begin();		
+		var frame = frames[currFrame];				
+		renderer.drawSkeleton(skeleton, true);
+		renderer.drawSkeleton(skeletonSeq, true);		
 		renderer.end();		
 	}
 

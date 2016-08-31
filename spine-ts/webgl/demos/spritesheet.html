@@ -11,21 +11,19 @@
 	.slider { width: 50%; }
 </style>
 <body>
-<canvas id="skeletonvsspritedemo-canvas"></canvas>
+<canvas id="spritesheetdemo-canvas"></canvas>
 <div style="position: fixed; top: 0; width: 100%">
 	<center>
 	<span style="color: #fff">Time Multiplier</span>
-	<div id="skeletonvsspritedemo-timeslider" class="slider"></div></br>
-	<span style="color: #fff">Show Atlas</span>	
-	<input type="checkbox" id="skeletonvsspritedemo-atlascheckbox" style="color: #fff;"></input></br>
-	<input id="skeletonvsspritedemo-playbutton" type="button" value="Pause"></input>
-	<div id="skeletonvsspritedemo-timeline" class="slider"></div>
+	<div id="spritesheetdemo-timeslider" class="slider"></div></br>		
+	<input id="spritesheetdemo-playbutton" type="button" value="Pause"></input>
+	<div id="spritesheetdemo-timeline" class="slider"></div>
 	</center>
 </div>
 <script src="utils.js"></script>
-<script src="skeletonvssprite.js"></script>
+<script src="spritesheet.js"></script>
 <script>	
-	skeletonVsSpriteDemo("http://esotericsoftware.com/demos/exports/", spineDemos.setupRendering);
+	spritesheetDemo("http://esotericsoftware.com/demos/exports/", spineDemos.setupRendering);
 </script>
 </body>
 </html>
