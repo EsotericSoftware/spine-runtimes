@@ -53,7 +53,8 @@ namespace Spine.Unity {
 
 		public bool followZPosition = true;
 		public bool followBoneRotation = true;
-
+        	public bool followBoneScale = false;
+        	
 		[Tooltip("Follows the skeleton's flip state by controlling this Transform's local scale.")]
 		public bool followSkeletonFlip = false;
 
@@ -127,10 +128,16 @@ namespace Spine.Unity {
 				}
 			}
 
+            		if (followBoneScale)
+                		thisTransform.localScale = new Vector3 (bone.WorldScaleX, bone.WorldScaleY, 1f);
+                	else
+                		thisTransform.localScale = Vector3.one;
+                		
 			if (followSkeletonFlip) {
 				float flipScaleY = bone.skeleton.flipX ^ bone.skeleton.flipY ? -1f : 1f;
-				thisTransform.localScale = new Vector3(1f, flipScaleY, 1f);
+				thisTransform.localScale = new Vector3(thisTransform.localScale.x, thisTransform.localScale.y*flipScaleY, 1f);
 			}
+			
 		}
 	}
 
