@@ -51,20 +51,20 @@ var stretchyDemo = function(pathPrefix, loadingComplete) {
 			},
 			moved: function (x, y) { }
 		})
-		assetManager.loadTexture("assets/stretchyman.png");
-		assetManager.loadText("assets/stretchyman.json");
-		assetManager.loadText("assets/stretchyman.atlas");
+		assetManager.loadTexture("stretchyman.png");
+		assetManager.loadText("stretchyman.json");
+		assetManager.loadText("stretchyman.atlas");
 		requestAnimationFrame(load);
 	}
 
 	function load () {
 		if (assetManager.isLoadingComplete()) {
-			var atlas = new spine.TextureAtlas(assetManager.get("assets/stretchyman.atlas"), function(path) {
-				return assetManager.get("assets/" + path);		
+			var atlas = new spine.TextureAtlas(assetManager.get("stretchyman.atlas"), function(path) {
+				return assetManager.get(path);		
 			});
 			var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/stretchyman.json"));
+			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("stretchyman.json"));
 			skeleton = new spine.Skeleton(skeletonData);
 			skeleton.setToSetupPose();
 			skeleton.updateWorldTransform();
@@ -124,7 +124,7 @@ var stretchyDemo = function(pathPrefix, loadingComplete) {
 		gl.clear(gl.COLOR_BUFFER_BIT);			
 
 		renderer.begin();				
-		renderer.drawSkeleton(skeleton);
+		renderer.drawSkeleton(skeleton, true);
 		renderer.drawSkeletonDebug(skeleton, false, ["root", "front leg middle", "back leg middle"]);
 		for (var i = 0; i < controlBones.length; i++) {		
 			var bone = skeleton.findBone(controlBones[i]);

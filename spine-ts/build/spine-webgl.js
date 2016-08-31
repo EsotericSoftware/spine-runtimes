@@ -1032,6 +1032,7 @@ var spine;
             this.toLoad++;
             var img = new Image();
             img.src = path;
+            img.crossOrigin = "anonymous";
             img.onload = function (ev) {
                 if (success)
                     success(path, img);
@@ -3649,9 +3650,9 @@ var spine;
         }
         TextureAtlasAttachmentLoader.prototype.newRegionAttachment = function (skin, name, path) {
             var region = this.atlas.findRegion(path);
-            region.renderObject = region;
             if (region == null)
                 throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
+            region.renderObject = region;
             var attachment = new spine.RegionAttachment(name);
             attachment.setRegion(region);
             attachment.region = region;
@@ -3659,9 +3660,9 @@ var spine;
         };
         TextureAtlasAttachmentLoader.prototype.newMeshAttachment = function (skin, name, path) {
             var region = this.atlas.findRegion(path);
-            region.renderObject = region;
             if (region == null)
                 throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
+            region.renderObject = region;
             var attachment = new spine.MeshAttachment(name);
             attachment.region = region;
             return attachment;
@@ -5349,8 +5350,9 @@ var spine;
                 quad[31] = 0;
                 this.batcher.draw(texture, quad, this.QUAD_TRIANGLES);
             };
-            SceneRenderer.prototype.drawRegion = function (region, x, y, width, height, color) {
+            SceneRenderer.prototype.drawRegion = function (region, x, y, width, height, color, premultipliedAlpha) {
                 if (color === void 0) { color = null; }
+                if (premultipliedAlpha === void 0) { premultipliedAlpha = false; }
                 this.enableRenderer(this.batcher);
                 if (color === null)
                     color = this.WHITE;

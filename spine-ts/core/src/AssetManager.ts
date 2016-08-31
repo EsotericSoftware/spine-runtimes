@@ -75,6 +75,7 @@ module spine {
 			this.toLoad++;
 			let img = new Image();
 			img.src = path;
+			img.crossOrigin = "anonymous";
 			img.onload = (ev) => {
 				if (success) success(path, img);
 				let texture = this.textureLoader(img);

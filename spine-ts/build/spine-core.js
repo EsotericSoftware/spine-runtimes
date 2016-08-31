@@ -1032,6 +1032,7 @@ var spine;
             this.toLoad++;
             var img = new Image();
             img.src = path;
+            img.crossOrigin = "anonymous";
             img.onload = function (ev) {
                 if (success)
                     success(path, img);
@@ -3649,9 +3650,9 @@ var spine;
         }
         TextureAtlasAttachmentLoader.prototype.newRegionAttachment = function (skin, name, path) {
             var region = this.atlas.findRegion(path);
-            region.renderObject = region;
             if (region == null)
                 throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
+            region.renderObject = region;
             var attachment = new spine.RegionAttachment(name);
             attachment.setRegion(region);
             attachment.region = region;
@@ -3659,9 +3660,9 @@ var spine;
         };
         TextureAtlasAttachmentLoader.prototype.newMeshAttachment = function (skin, name, path) {
             var region = this.atlas.findRegion(path);
-            region.renderObject = region;
             if (region == null)
                 throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
+            region.renderObject = region;
             var attachment = new spine.MeshAttachment(name);
             attachment.region = region;
             return attachment;

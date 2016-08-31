@@ -16,12 +16,12 @@ var imageSequencesDemo = function(pathPrefix, loadingComplete) {
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = new spine.webgl.AssetManager(gl, pathPrefix);		
-		assetManager.loadTexture("assets/alien.png");
-		assetManager.loadText("assets/alien.json");
-		assetManager.loadText("assets/alien.atlas");
-		assetManager.loadTexture("assets/dragon.png");		
-		assetManager.loadText("assets/dragon.json");
-		assetManager.loadText("assets/dragon.atlas");
+		assetManager.loadTexture("alien.png");
+		assetManager.loadText("alien.json");
+		assetManager.loadText("alien.atlas");
+		assetManager.loadTexture("dragon.png");		
+		assetManager.loadText("dragon.json");
+		assetManager.loadText("dragon.atlas");
 		requestAnimationFrame(load);
 	}	
 
@@ -79,12 +79,12 @@ var imageSequencesDemo = function(pathPrefix, loadingComplete) {
 	}
 
 	function loadSkeleton(name, animation, sequenceSlots) {
-		var atlas = new spine.TextureAtlas(assetManager.get("assets/" + name + ".atlas"), function(path) {
-			return assetManager.get("assets/" + path);		
+		var atlas = new spine.TextureAtlas(assetManager.get(name + ".atlas"), function(path) {
+			return assetManager.get(path);		
 		});
 		var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
-		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/" + name + ".json"));
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(name + ".json"));
 		var skeleton = new spine.Skeleton(skeletonData);
 		skeleton.setSkinByName("default");
 
@@ -161,7 +161,7 @@ var imageSequencesDemo = function(pathPrefix, loadingComplete) {
 		}
 
 		renderer.begin();				
-		renderer.drawSkeleton(skeleton);
+		renderer.drawSkeleton(skeleton, true);
 
 		var x = offset.x + size.x + 100;
 		var y = offset.y;

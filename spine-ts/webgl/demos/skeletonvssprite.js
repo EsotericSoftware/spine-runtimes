@@ -22,22 +22,22 @@ var skeletonVsSpriteDemo = function(pathPrefix, loadingComplete) {
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = new spine.webgl.AssetManager(gl, pathPrefix);		
-		assetManager.loadTexture("assets/raptor.png");
-		assetManager.loadText("assets/raptor.json");
-		assetManager.loadText("assets/raptor.atlas");		
-		assetManager.loadTexture("assets/raptor-sequenceatlas.png");
+		assetManager.loadTexture("raptor.png");
+		assetManager.loadText("raptor.json");
+		assetManager.loadText("raptor.atlas");		
+		assetManager.loadTexture("raptor-sequenceatlas.png");
 		requestAnimationFrame(load);
 	}
 
 	function load () {
 		if (assetManager.isLoadingComplete()) {
-			skeletonAtlas = new spine.TextureAtlas(assetManager.get("assets/raptor.atlas"), function(path) {
-				return assetManager.get("assets/" + path);		
+			skeletonAtlas = new spine.TextureAtlas(assetManager.get("raptor.atlas"), function(path) {
+				return assetManager.get("" + path);		
 			});
-			sequenceAtlas = assetManager.get("assets/raptor-sequenceatlas.png");
+			sequenceAtlas = assetManager.get("raptor-sequenceatlas.png");
 			var atlasLoader = new spine.TextureAtlasAttachmentLoader(skeletonAtlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/raptor.json"));
+			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("raptor.json"));
 			skeleton = new spine.Skeleton(skeletonData);
 			animationState = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
 			animationState.setAnimation(0, "walk", true);
@@ -147,8 +147,8 @@ var skeletonVsSpriteDemo = function(pathPrefix, loadingComplete) {
 		renderer.begin();
 		if (!atlasCheckbox.checked) {
 			var frame = frames[currFrame];				
-			renderer.drawSkeleton(skeleton);
-			renderer.drawSkeleton(skeletonSeq);
+			renderer.drawSkeleton(skeleton, true);
+			renderer.drawSkeleton(skeletonSeq, true);
 		} else {				
 			var atlasTexture = skeletonAtlas.pages[0].texture;
 			var atlasSize = atlasTexture.getImage().width;

@@ -49,20 +49,20 @@ var vineDemo = function(pathPrefix, loadingComplete) {
 			},
 			moved: function (x, y) { }
 		})
-		assetManager.loadTexture("assets/vine.png");
-		assetManager.loadText("assets/vine.json");
-		assetManager.loadText("assets/vine.atlas");
+		assetManager.loadTexture("vine.png");
+		assetManager.loadText("vine.json");
+		assetManager.loadText("vine.atlas");
 		requestAnimationFrame(load);
 	}
 
 	function load () {
 		if (assetManager.isLoadingComplete()) {
-			var atlas = new spine.TextureAtlas(assetManager.get("assets/vine.atlas"), function(path) {
-				return assetManager.get("assets/" + path);		
+			var atlas = new spine.TextureAtlas(assetManager.get("vine.atlas"), function(path) {
+				return assetManager.get(path);		
 			});
 			var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/vine.json"));
+			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("vine.json"));
 			skeleton = new spine.Skeleton(skeletonData);
 			skeleton.setToSetupPose();
 			skeleton.updateWorldTransform();
@@ -155,7 +155,7 @@ var vineDemo = function(pathPrefix, loadingComplete) {
 		gl.clear(gl.COLOR_BUFFER_BIT);			
 
 		renderer.begin();				
-		renderer.drawSkeleton(skeleton);
+		renderer.drawSkeleton(skeleton, true);
 		renderer.drawSkeletonDebug(skeleton);
 		for (var i = 0; i < controlBones.length; i++) {		
 			var bone = skeleton.findBone(controlBones[i]);

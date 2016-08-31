@@ -42,20 +42,20 @@ var transformConstraintDemo = function(pathPrefix, loadingComplete) {
 			 },
 			moved: function (x, y) { }
 		})
-		assetManager.loadTexture("assets/transformConstraint.png");
-		assetManager.loadText("assets/transformConstraint.json");
-		assetManager.loadText("assets/transformConstraint.atlas");
+		assetManager.loadTexture("tank.png");
+		assetManager.loadText("transformConstraint.json");
+		assetManager.loadText("tank.atlas");
 		requestAnimationFrame(load);
 	}
 
 	function load () {
 		if (assetManager.isLoadingComplete()) {
-			var atlas = new spine.TextureAtlas(assetManager.get("assets/transformConstraint.atlas"), function(path) {
-				return assetManager.get("assets/" + path);		
+			var atlas = new spine.TextureAtlas(assetManager.get("tank.atlas"), function(path) {
+				return assetManager.get(path);		
 			});
 			var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/transformConstraint.json"));
+			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("transformConstraint.json"));
 			skeleton = new spine.Skeleton(skeletonData);
 			skeleton.setToSetupPose();
 			skeleton.updateWorldTransform();
@@ -108,7 +108,7 @@ var transformConstraintDemo = function(pathPrefix, loadingComplete) {
 		gl.clear(gl.COLOR_BUFFER_BIT);
 
 		renderer.begin();				
-		renderer.drawSkeleton(skeleton);
+		renderer.drawSkeleton(skeleton, true);
 		renderer.drawSkeletonDebug(skeleton, false, ["root"]);				
 		var bone = wheel1;
 		var colorInner = bone === target ? COLOR_INNER_SELECTED : COLOR_INNER;

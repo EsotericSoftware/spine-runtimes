@@ -118,7 +118,7 @@ module spine.webgl {
 			this.batcher.draw(texture, quad, this.QUAD_TRIANGLES);
 		}
 
-		drawRegion (region: TextureAtlasRegion, x: number, y: number, width: number, height: number, color: Color = null) {
+		drawRegion (region: TextureAtlasRegion, x: number, y: number, width: number, height: number, color: Color = null, premultipliedAlpha: boolean = false) {
 			this.enableRenderer(this.batcher);
 			if (color === null) color = this.WHITE;
 			let quad = this.QUAD;

@@ -3,7 +3,7 @@ var meshesDemo = function(pathPrefix, loadingComplete) {
 	var skeleton, bounds;		
 	var lastFrameTime = Date.now() / 1000;
 	var skeletons = {};
-	var activeSkeleton = "girl";
+	var activeSkeleton = "Orange Girl";
 
 	var playButton, timeLine, isPlaying = true;
 
@@ -15,23 +15,23 @@ var meshesDemo = function(pathPrefix, loadingComplete) {
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		renderer.skeletonDebugRenderer.drawRegionAttachments = false;
 		assetManager = new spine.webgl.AssetManager(gl, pathPrefix);		
-		assetManager.loadTexture("assets/girl.png");
-		assetManager.loadText("assets/girl.json");
-		assetManager.loadText("assets/girl.atlas");
-		assetManager.loadTexture("assets/gree_girl.png");		
-		assetManager.loadText("assets/gree_girl.json");
-		assetManager.loadText("assets/gree_girl.atlas");
-		assetManager.loadTexture("assets/fanart_cut.png");		
-		assetManager.loadText("assets/fanart_cut.json");
-		assetManager.loadText("assets/fanart_cut.atlas");
+		assetManager.loadTexture("orangegirl.png");
+		assetManager.loadText("orangegirl.json");
+		assetManager.loadText("orangegirl.atlas");
+		assetManager.loadTexture("greengirl.png");		
+		assetManager.loadText("greengirl.json");
+		assetManager.loadText("greengirl.atlas");
+		assetManager.loadTexture("armorgirl.png");		
+		assetManager.loadText("armorgirl.json");
+		assetManager.loadText("armorgirl.atlas");
 		requestAnimationFrame(load);
 	}	
 
 	function load () {
 		if (assetManager.isLoadingComplete()) {
-			skeletons["girl"] = loadSkeleton("girl", "animation");
-			skeletons["green_girl"] = loadSkeleton("gree_girl", "animation");
-			skeletons["fanart"] = loadSkeleton("fanart_cut", "animation");
+			skeletons["Orange Girl"] = loadSkeleton("orangegirl", "animation");
+			skeletons["Green Girl"] = loadSkeleton("greengirl", "animation");
+			skeletons["Armor Girl"] = loadSkeleton("armorgirl", "animation");
 			setupUI();
 			loadingComplete(canvas, render);			
 		} else requestAnimationFrame(load);
@@ -90,12 +90,12 @@ var meshesDemo = function(pathPrefix, loadingComplete) {
 	}
 
 	function loadSkeleton(name, animation, sequenceSlots) {
-		var atlas = new spine.TextureAtlas(assetManager.get("assets/" + name + ".atlas"), function(path) {
-			return assetManager.get("assets/" + path);		
+		var atlas = new spine.TextureAtlas(assetManager.get(name + ".atlas"), function(path) {
+			return assetManager.get(path);		
 		});
 		var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
-		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/" + name + ".json"));
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(name + ".json"));
 		var skeleton = new spine.Skeleton(skeletonData);
 		skeleton.setSkinByName("default");
 
@@ -154,7 +154,7 @@ var meshesDemo = function(pathPrefix, loadingComplete) {
 		}
 
 		renderer.begin();				
-		renderer.drawSkeleton(skeleton);
+		renderer.drawSkeleton(skeleton, true);
 		renderer.drawSkeletonDebug(skeleton);
 		renderer.end();		
 	}

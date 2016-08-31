@@ -1093,7 +1093,7 @@ declare module spine.webgl {
         drawSkeleton(skeleton: Skeleton, premultipliedAlpha?: boolean): void;
         drawSkeletonDebug(skeleton: Skeleton, premultipliedAlpha?: boolean, ignoredBones?: Array<string>): void;
         drawTexture(texture: GLTexture, x: number, y: number, width: number, height: number, color?: Color): void;
-        drawRegion(region: TextureAtlasRegion, x: number, y: number, width: number, height: number, color?: Color): void;
+        drawRegion(region: TextureAtlasRegion, x: number, y: number, width: number, height: number, color?: Color, premultipliedAlpha?: boolean): void;
         line(x: number, y: number, x2: number, y2: number, color?: Color, color2?: Color): void;
         triangle(filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, color?: Color, color2?: Color, color3?: Color): void;
         quad(filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number, color?: Color, color2?: Color, color3?: Color, color4?: Color): void;

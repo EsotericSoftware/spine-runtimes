@@ -13,20 +13,20 @@ var skinsDemo = function(pathPrefix, loadingComplete) {
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);		
 		assetManager = new spine.webgl.AssetManager(gl, pathPrefix);		
-		assetManager.loadTexture("assets/goblins-pma.png");
-		assetManager.loadText("assets/goblins-mesh.json");
-		assetManager.loadText("assets/goblins-pma.atlas");
+		assetManager.loadTexture("goblins.png");
+		assetManager.loadText("goblins-mesh.json");
+		assetManager.loadText("goblins.atlas");
 		requestAnimationFrame(load);
 	}
 
 	function load () {
 		if (assetManager.isLoadingComplete()) {
-			var atlas = new spine.TextureAtlas(assetManager.get("assets/goblins-pma.atlas"), function(path) {
-				return assetManager.get("assets/" + path);		
+			var atlas = new spine.TextureAtlas(assetManager.get("goblins.atlas"), function(path) {
+				return assetManager.get(path);		
 			});
 			var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/goblins-mesh.json"));
+			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("goblins-mesh.json"));
 			skeleton = new spine.Skeleton(skeletonData);
 			state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
 			state.setAnimation(0, "walk", true);
@@ -116,7 +116,7 @@ var skinsDemo = function(pathPrefix, loadingComplete) {
 
 		renderer.begin();				
 		renderer.drawSkeleton(skeleton, true);
-		var texture = assetManager.get("assets/goblins-pma.png");
+		var texture = assetManager.get("goblins.png");
 		var width = bounds.x * 1.3;
 		var scale = width / texture.getImage().width;
 		var height = scale * texture.getImage().height;

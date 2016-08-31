@@ -44,20 +44,20 @@ var ikConstraintDemo = function(pathPrefix, loadingComplete) {
 			},
 			moved: function (x, y) { }
 		})
-		assetManager.loadTexture("assets/spineboy.png");
-		assetManager.loadText("assets/spineboy-mesh.json");
-		assetManager.loadText("assets/spineboy.atlas");
+		assetManager.loadTexture("spineboy.png");
+		assetManager.loadText("spineboy-mesh.json");
+		assetManager.loadText("spineboy.atlas");
 		requestAnimationFrame(load);
 	}
 
 	function load () {
 		if (assetManager.isLoadingComplete()) {
-			var atlas = new spine.TextureAtlas(assetManager.get("assets/spineboy.atlas"), function(path) {
-				return assetManager.get("assets/" + path);		
+			var atlas = new spine.TextureAtlas(assetManager.get("spineboy.atlas"), function(path) {
+				return assetManager.get(path);		
 			});
 			var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/spineboy-mesh.json"));
+			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("spineboy-mesh.json"));
 			skeleton = new spine.Skeleton(skeletonData);
 			skeleton.setToSetupPose();
 			skeleton.updateWorldTransform();
@@ -88,7 +88,7 @@ var ikConstraintDemo = function(pathPrefix, loadingComplete) {
 		skeleton.updateWorldTransform();
 
 		renderer.begin();				
-		renderer.drawSkeleton(skeleton);
+		renderer.drawSkeleton(skeleton, true);
 		var bone = skeleton.findBone(boneName);
 		renderer.circle(true, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, CIRCLE_INNER_COLOR);
 		renderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, CIRCLE_OUTER_COLOR);

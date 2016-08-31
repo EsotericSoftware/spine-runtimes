@@ -13,20 +13,20 @@ var tankDemo = function(pathPrefix, loadingComplete) {
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);		
 		assetManager = new spine.webgl.AssetManager(gl, pathPrefix);		
-		assetManager.loadTexture("assets/tank.png");
-		assetManager.loadText("assets/tank.json");
-		assetManager.loadText("assets/tank.atlas");
+		assetManager.loadTexture("tank.png");
+		assetManager.loadText("tank.json");
+		assetManager.loadText("tank.atlas");
 		requestAnimationFrame(load);
 	}
 
 	function load () {
 		if (assetManager.isLoadingComplete()) {
-			var atlas = new spine.TextureAtlas(assetManager.get("assets/tank.atlas"), function(path) {
-				return assetManager.get("assets/" + path);		
+			var atlas = new spine.TextureAtlas(assetManager.get("tank.atlas"), function(path) {
+				return assetManager.get(path);		
 			});
 			var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/tank.json"));
+			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("tank.json"));
 			skeleton = new spine.Skeleton(skeletonData);
 			state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
 			state.setAnimation(0, "drive", true);
@@ -101,7 +101,7 @@ var tankDemo = function(pathPrefix, loadingComplete) {
 		gl.clear(gl.COLOR_BUFFER_BIT);			
 
 		renderer.begin();				
-		renderer.drawSkeleton(skeleton);				
+		renderer.drawSkeleton(skeleton, true);				
 		renderer.end();
 	}
 

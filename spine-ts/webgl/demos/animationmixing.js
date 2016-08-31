@@ -16,9 +16,9 @@ var animationMixingDemo = function(pathPrefix, loadingComplete) {
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = new spine.webgl.AssetManager(gl, pathPrefix);		
-		assetManager.loadTexture("assets/spineboy.png");
-		assetManager.loadText("assets/spineboy.json");
-		assetManager.loadText("assets/spineboy.atlas");		
+		assetManager.loadTexture("spineboy.png");
+		assetManager.loadText("spineboy.json");
+		assetManager.loadText("spineboy.atlas");		
 		requestAnimationFrame(load);
 
 		input = new spine.webgl.Input(canvas);
@@ -78,12 +78,12 @@ var animationMixingDemo = function(pathPrefix, loadingComplete) {
 	}
 
 	function loadSkeleton(name) {
-		var atlas = new spine.TextureAtlas(assetManager.get("assets/" + name + ".atlas"), function(path) {
-			return assetManager.get("assets/" + path);		
+		var atlas = new spine.TextureAtlas(assetManager.get(name + ".atlas"), function(path) {
+			return assetManager.get(path);		
 		});
 		var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
-		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/" + name + ".json"));
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(name + ".json"));
 		var skeleton = new spine.Skeleton(skeletonData);
 		skeleton.setSkinByName("default");
 		return skeleton;
@@ -114,13 +114,13 @@ var animationMixingDemo = function(pathPrefix, loadingComplete) {
 		state.apply(skeleton);
 		skeleton.updateWorldTransform();
 		skeleton.x = 0;		
-		renderer.drawSkeleton(skeleton);
+		renderer.drawSkeleton(skeleton, true);
 
 		stateNoMix.update(delta);
 		stateNoMix.apply(skeletonNoMix);
 		skeletonNoMix.updateWorldTransform();
 		skeletonNoMix.x = size.x;	
-		renderer.drawSkeleton(skeletonNoMix);
+		renderer.drawSkeleton(skeletonNoMix, true);
 		renderer.end();		
 	}
 	init();
