@@ -124,6 +124,7 @@ var skinsDemo = function(pathPrefix, loadingComplete, bgColor) {
 		var list = $("#skinsdemo-active-skin");	
 		for (var skin in skeleton.data.skins) {
 			skin = skeleton.data.skins[skin];
+			if (skin.name == "default") continue;
 			var option = $("<option></option>");
 			option.attr("value", skin.name).text(skin.name);
 			if (skin.name === "Assassin") {
