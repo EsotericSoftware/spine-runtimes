@@ -1,10 +1,13 @@
-var animationMixingDemo = function(pathPrefix, loadingComplete) {
+var animationMixingDemo = function(pathPrefix, loadingComplete, bgColor) {
 	var OUTLINE_COLOR = new spine.Color(0, 0.8, 0, 1);	
 
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, skeletonNoMix, state, stateNoMix, bounds;
 	var timeSlider, timeSliderLabel;
-	var lastFrameTime = Date.now() / 1000	
+	var timeKeeper;
+	var loadingScreen;
+
+	if (!bgColor) bgColor = new spine.Color(0, 0, 0, 1);
 
 	function init () {
 		timeSlider = $("#animationmixingdemo-timeslider");
@@ -15,25 +18,21 @@ var animationMixingDemo = function(pathPrefix, loadingComplete) {
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = new spine.webgl.AssetManager(gl, pathPrefix);		
+		assetManager = new spine.webgl.AssetManager(gl, pathPrefix);
+		
 		assetManager.loadTexture("spineboy.png");
 		assetManager.loadText("spineboy.json");
-		assetManager.loadText("spineboy.atlas");		
-		requestAnimationFrame(load);
-
+		assetManager.loadText("spineboy.atlas");
+	
+		requestAnimationFrame(load);		
 		input = new spine.webgl.Input(canvas);
-		input.addListener({
-			down: function(x, y) {
-				state.setAnimation(1, "shoot", false);
-				stateNoMix.setAnimation(1, "shoot", false);	
-			},
-			up: function(x, y) { },
-			moved: function(x, y) {	},
-			dragged: function(x, y) { }
-		});
-	}	
+		timeKeeper = new spine.TimeKeeper();		
+		loadingScreen = new spine.webgl.LoadingScreen(renderer);
+		loadingScreen.backgroundColor = bgColor;	
+	}
 
 	function load () {
+		timeKeeper.update();
 		if (assetManager.isLoadingComplete()) {
 			skeleton = loadSkeleton("spineboy");
 			skeletonNoMix = new spine.Skeleton(skeleton.data);					
@@ -46,8 +45,26 @@ var animationMixingDemo = function(pathPrefix, loadingComplete) {
 			skeleton.updateWorldTransform();
 			bounds = { offset: new spine.Vector2(), size: new spine.Vector2() };
 			skeleton.getBounds(bounds.offset, bounds.size);
+			setupInput();
+			$("#animationmixingdemo-overlay").removeClass("overlay-hide");
+			$("#animationmixingdemo-overlay").addClass("overlay");	
 			loadingComplete(canvas, render);						
-		} else requestAnimationFrame(load);
+		} else {
+			loadingScreen.draw();			
+			requestAnimationFrame(load);
+		}
+	}
+
+	function setupInput() {
+		input.addListener({
+			down: function(x, y) {
+				state.setAnimation(1, "shoot", false);
+				stateNoMix.setAnimation(1, "shoot", false);	
+			},
+			up: function(x, y) { },
+			moved: function(x, y) {	},
+			dragged: function(x, y) { }
+		});
 	}
 
 	function createState(mix) {
@@ -90,11 +107,8 @@ var animationMixingDemo = function(pathPrefix, loadingComplete) {
 	}
 
 	function render () {
-		var now = Date.now() / 1000;
-		var delta = now - lastFrameTime;
-		lastFrameTime = now;
-		if (delta > 0.032) delta = 0.032;
-		delta *= (timeSlider.slider("value") / 100);
+		timeKeeper.update();
+		var delta = timeKeeper.delta * (timeSlider.slider("value") / 100);
 		if (timeSliderLabel) timeSliderLabel.text(timeSlider.slider("value") + "%");	
 
 		var offset = bounds.offset;
@@ -106,7 +120,7 @@ var animationMixingDemo = function(pathPrefix, loadingComplete) {
 		renderer.camera.viewportHeight = size.y * 1.2;
 		renderer.resize(spine.webgl.ResizeMode.Fit);
 
-		gl.clearColor(0.2, 0.2, 0.2, 1);
+		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
 		gl.clear(gl.COLOR_BUFFER_BIT);		
 
 		renderer.begin();

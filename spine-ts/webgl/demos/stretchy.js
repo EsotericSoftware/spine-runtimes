@@ -1,4 +1,4 @@
-var stretchyDemo = function(pathPrefix, loadingComplete) {
+var stretchyDemo = function(pathPrefix, loadingComplete, bgColor) {
 	var COLOR_INNER = new spine.Color(0.8, 0, 0, 0.5);
 	var COLOR_OUTER = new spine.Color(0.8, 0, 0, 0.8);
 	var COLOR_INNER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.5);
@@ -6,14 +6,16 @@ var stretchyDemo = function(pathPrefix, loadingComplete) {
 
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, bounds;		
-	var lastFrameTime = Date.now() / 1000;
+	var timeKeeper, loadingScreen;
 	var target = null;
 	var kneeFront, kneeBack;
-	var hoverTargets = [null, null, null];
-	var controlBones = ["front leg controller", "back leg controller", "hip"];
+	var hoverTargets = [];
+	var controlBones = ["front leg controller", "back leg controller", "hip", "back hand controller", "front hand controller", "spine control"];
 	var coords = new spine.webgl.Vector3(), temp = new spine.webgl.Vector3(), temp2 = new spine.Vector2(), temp3 = new spine.webgl.Vector3();
 	var kneePos = new spine.Vector2();
-	var playButton, timeLine, spacing, isPlaying = true, playTime = 0;		
+	var playButton, timeLine, spacing, isPlaying = true, playTime = 0;
+
+	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);	
 
 	function init () {
 
@@ -27,10 +29,14 @@ var stretchyDemo = function(pathPrefix, loadingComplete) {
 		assetManager.loadTexture("stretchyman.png");
 		assetManager.loadText("stretchyman.json");
 		assetManager.loadText("stretchyman.atlas");
+		timeKeeper = new spine.TimeKeeper();		
+		loadingScreen = new spine.webgl.LoadingScreen(renderer);
+		loadingScreen.backgroundColor = bgColor;
 		requestAnimationFrame(load);
 	}
 
 	function load () {
+		timeKeeper.update();
 		if (assetManager.isLoadingComplete()) {
 			var atlas = new spine.TextureAtlas(assetManager.get("stretchyman.atlas"), function(path) {
 				return assetManager.get(path);		
@@ -44,9 +50,9 @@ var stretchyDemo = function(pathPrefix, loadingComplete) {
 			var offset = new spine.Vector2();
 			bounds = new spine.Vector2();
 			skeleton.getBounds(offset, bounds);
-
+			for (var i = 0; i < controlBones.length; i++) hoverTargets.push(null);
 			kneeFront = skeleton.findBone("front leg middle");
-			kneeBack = skeleton.findBone("back leg middle");
+			kneeBack = skeleton.findBone("back leg middle");			
 
 			renderer.camera.position.x = offset.x + bounds.x / 2;
 			renderer.camera.position.y = offset.y + bounds.y / 2;
@@ -58,7 +64,10 @@ var stretchyDemo = function(pathPrefix, loadingComplete) {
 			setupInput();
 
 			loadingComplete(canvas, render);
-		} else requestAnimationFrame(load);
+		} else {
+			loadingScreen.draw();
+			requestAnimationFrame(load);
+		}
 	}
 
 	function setupUI() {		
@@ -123,10 +132,8 @@ var stretchyDemo = function(pathPrefix, loadingComplete) {
 	}
 
 	function render () {
-		var now = Date.now() / 1000;
-		var delta = now - lastFrameTime;
-		lastFrameTime = now;
-		if (delta > 0.032) delta = 0.032;		
+		timeKeeper.update();
+		var delta = timeKeeper.delta;	
 
 		skeleton.updateWorldTransform();
 		centerKnee(kneeBack, skeleton.findBone("back leg root"), skeleton.findBone("back leg controller"));
@@ -137,7 +144,7 @@ var stretchyDemo = function(pathPrefix, loadingComplete) {
 		renderer.camera.viewportHeight = bounds.y * 1.2;
 		renderer.resize(spine.webgl.ResizeMode.Fit);
 
-		gl.clearColor(0.2, 0.2, 0.2, 1);
+		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
 		gl.clear(gl.COLOR_BUFFER_BIT);			
 
 		renderer.begin();				

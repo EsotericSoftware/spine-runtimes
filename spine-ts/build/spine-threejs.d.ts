@@ -759,6 +759,16 @@ declare module spine {
         length(): number;
         normalize(): this;
     }
+    class TimeKeeper {
+        maxDelta: number;
+        framesPerSecond: number;
+        delta: number;
+        totalTime: number;
+        private lastTime;
+        private frameCount;
+        private frameTime;
+        update(): void;
+    }
 }
 declare module spine {
     abstract class Attachment {

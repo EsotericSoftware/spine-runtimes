@@ -118,6 +118,112 @@ module spine.webgl {
 			this.batcher.draw(texture, quad, this.QUAD_TRIANGLES);
 		}
 
+		drawTextureRotated (texture: GLTexture, x: number, y: number, width: number, height: number, pivotX: number, pivotY: number, angle: number, color: Color = null, premultipliedAlpha: boolean = false) {
+			this.enableRenderer(this.batcher);
+			if (color === null) color = this.WHITE;
+			let quad = this.QUAD;
+
+			// bottom left and top right corner points relative to origin
+			let worldOriginX = x + pivotX;
+			let worldOriginY = y + pivotY;
+			let  fx = -pivotX;
+			let  fy = -pivotY;
+			let  fx2 = width - pivotX;
+			let  fy2 = height - pivotY;			
+
+			// construct corner points, start from top left and go counter clockwise
+			let p1x = fx;
+			let p1y = fy;
+			let p2x = fx;
+			let p2y = fy2;
+			let p3x = fx2;
+			let p3y = fy2;
+			let p4x = fx2;
+			let p4y = fy;
+
+			let x1 = 0;
+			let y1 = 0;
+			let x2 = 0;
+			let y2 = 0;
+			let x3 = 0;
+			let y3 = 0;
+			let x4 = 0;
+			let y4 = 0;
+
+			// rotate
+			if (angle != 0) {
+				let cos = MathUtils.cosDeg(angle);
+				let sin = MathUtils.sinDeg(angle);
+
+				x1 = cos * p1x - sin * p1y;
+				y1 = sin * p1x + cos * p1y;
+
+				x4 = cos * p2x - sin * p2y;
+				y4 = sin * p2x + cos * p2y;
+
+				x3 = cos * p3x - sin * p3y;
+				y3 = sin * p3x + cos * p3y;
+
+				x2 = x3 + (x1 - x4);
+				y2 = y3 + (y1 - y4);
+			} else {
+				x1 = p1x;
+				y1 = p1y;
+
+				x4 = p2x;
+				y4 = p2y;
+
+				x3 = p3x;
+				y3 = p3y;
+
+				x2 = p4x;
+				y2 = p4y;
+			}
+
+			x1 += worldOriginX;
+			y1 += worldOriginY;
+			x2 += worldOriginX;
+			y2 += worldOriginY;
+			x3 += worldOriginX;
+			y3 += worldOriginY;
+			x4 += worldOriginX;
+			y4 += worldOriginY;
+
+			quad[0] = x1;
+			quad[1] = y1;
+			quad[2] = color.r;
+			quad[3] = color.g;
+			quad[4] = color.b;
+			quad[5] = color.a;
+			quad[6] = 0;
+			quad[7] = 1;
+			quad[8] = x2;
+			quad[9] = y2;
+			quad[10] = color.r;
+			quad[11] = color.g;
+			quad[12] = color.b;
+			quad[13] = color.a;
+			quad[14] = 1;
+			quad[15] = 1;
+			quad[16] = x3;
+			quad[17] = y3;
+			quad[18] = color.r;
+			quad[19] = color.g;
+			quad[20] = color.b;
+			quad[21] = color.a;
+			quad[22] = 1;
+			quad[23] = 0;
+			quad[24] = x4;
+			quad[25] = y4;
+			quad[26] = color.r;
+			quad[27] = color.g;
+			quad[28] = color.b;
+			quad[29] = color.a;
+			quad[30] = 0;
+			quad[31] = 0;
+			this.batcher.draw(texture, quad, this.QUAD_TRIANGLES);
+		}
+
 		drawRegion (region: TextureAtlasRegion, x: number, y: number, width: number, height: number, color: Color = null, premultipliedAlpha: boolean = false) {
 			this.enableRenderer(this.batcher);
 			if (color === null) color = this.WHITE;

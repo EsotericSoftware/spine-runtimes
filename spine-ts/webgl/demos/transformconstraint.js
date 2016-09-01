@@ -1,4 +1,4 @@
-var transformConstraintDemo = function(pathPrefix, loadingComplete) {
+var transformConstraintDemo = function(pathPrefix, loadingComplete, bgColor) {
 	var COLOR_INNER = new spine.Color(0.8, 0, 0, 0.5);
 	var COLOR_OUTER = new spine.Color(0.8, 0, 0, 0.8);
 	var COLOR_INNER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.5);
@@ -6,7 +6,7 @@ var transformConstraintDemo = function(pathPrefix, loadingComplete) {
 
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, state, bounds;		
-	var lastFrameTime = Date.now() / 1000;		
+	var timeKeeper, loadingScreen;	
 	var rotateHandle;	
 	var target = null;
 	var hoverTargets = [null, null, null];
@@ -14,6 +14,8 @@ var transformConstraintDemo = function(pathPrefix, loadingComplete) {
 	var coords = new spine.webgl.Vector3(), temp = new spine.webgl.Vector3(), temp2 = new spine.Vector2();
 	var lastRotation = 0;
 	var rotationOffset, mix, lastOffset = 0, lastMix = 50;
+
+	if (!bgColor) bgColor = new spine.Color(0, 0, 0, 1);
 
 	function init () {
 
@@ -27,10 +29,14 @@ var transformConstraintDemo = function(pathPrefix, loadingComplete) {
 		assetManager.loadTexture("tank.png");
 		assetManager.loadText("transformConstraint.json");
 		assetManager.loadText("tank.atlas");
+		timeKeeper = new spine.TimeKeeper();		
+		loadingScreen = new spine.webgl.LoadingScreen(renderer);
+		loadingScreen.backgroundColor = bgColor;
 		requestAnimationFrame(load);
 	}
 
 	function load () {
+		timeKeeper.update();
 		if (assetManager.isLoadingComplete()) {
 			var atlas = new spine.TextureAtlas(assetManager.get("tank.atlas"), function(path) {
 				return assetManager.get(path);		
@@ -60,7 +66,10 @@ var transformConstraintDemo = function(pathPrefix, loadingComplete) {
 			setupInput();
 
 			loadingComplete(canvas, render);
-		} else requestAnimationFrame(load);
+		} else {
+			loadingScreen.draw();
+			requestAnimationFrame(load);
+		}
 	}
 
 	function setupUI() {
@@ -142,10 +151,8 @@ var transformConstraintDemo = function(pathPrefix, loadingComplete) {
 	}
 
 	function render () {
-		var now = Date.now() / 1000;
-		var delta = now - lastFrameTime;
-		lastFrameTime = now;
-		if (delta > 0.032) delta = 0.032;
+		timeKeeper.update();
+		var delta = timeKeeper.delta;
 
 		skeleton.updateWorldTransform();
 
@@ -153,7 +160,7 @@ var transformConstraintDemo = function(pathPrefix, loadingComplete) {
 		renderer.camera.viewportHeight = bounds.y * 1.2;
 		renderer.resize(spine.webgl.ResizeMode.Fit);
 
-		gl.clearColor(0.2, 0.2, 0.2, 1);
+		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
 		gl.clear(gl.COLOR_BUFFER_BIT);
 
 		renderer.begin();				

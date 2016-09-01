@@ -1,8 +1,10 @@
-var skinsDemo = function(pathPrefix, loadingComplete) {	
+var skinsDemo = function(pathPrefix, loadingComplete, bgColor) {	
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, state, offset, bounds;		
-	var lastFrameTime = Date.now() / 1000;	
-	var playButton, timeLine, isPlaying = true, playTime = 0;		
+	var timeKeeper, loadingScreen;
+	var playButton, timeLine, isPlaying = true, playTime = 0;
+
+	if (!bgColor) bgColor = new spine.Color(0, 0, 0, 1);		
 
 	function init () {
 		if (pathPrefix === undefined) pathPrefix = "";		
@@ -16,10 +18,14 @@ var skinsDemo = function(pathPrefix, loadingComplete) {
 		assetManager.loadTexture("heroes.png");
 		assetManager.loadText("heroes.json");
 		assetManager.loadText("heroes.atlas");
+		timeKeeper = new spine.TimeKeeper();		
+		loadingScreen = new spine.webgl.LoadingScreen(renderer);
+		loadingScreen.backgroundColor = bgColor;
 		requestAnimationFrame(load);
 	}
 
 	function load () {
+		timeKeeper.update();
 		if (assetManager.isLoadingComplete()) {
 			var atlas = new spine.TextureAtlas(assetManager.get("heroes.atlas"), function(path) {
 				return assetManager.get(path);		
@@ -42,7 +48,10 @@ var skinsDemo = function(pathPrefix, loadingComplete) {
 			skeleton.getBounds(offset, bounds);
 			setupUI();
 			loadingComplete(canvas, render);
-		} else requestAnimationFrame(load);
+		} else {
+			loadingScreen.draw();
+			requestAnimationFrame(load);
+		}
 	}
 
 	function setupAnimations(state) {
@@ -152,10 +161,8 @@ var skinsDemo = function(pathPrefix, loadingComplete) {
 	}
 
 	function render () {
-		var now = Date.now() / 1000;
-		var delta = now - lastFrameTime;
-		lastFrameTime = now;
-		if (delta > 0.032) delta = 0.032;
+		timeKeeper.update();
+		var delta = timeKeeper.delta;
 
 		renderer.camera.position.x = offset.x + bounds.x * 1.5 - 150;
 		renderer.camera.position.y = offset.y + bounds.y / 2;
@@ -163,7 +170,7 @@ var skinsDemo = function(pathPrefix, loadingComplete) {
 		renderer.camera.viewportHeight = bounds.y * 1.2;
 		renderer.resize(spine.webgl.ResizeMode.Fit);
 
-		gl.clearColor(0.2, 0.2, 0.2, 1);
+		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
 		gl.clear(gl.COLOR_BUFFER_BIT);			
 
 		state.update(delta);

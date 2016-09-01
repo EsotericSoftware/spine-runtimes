@@ -1,4 +1,4 @@
-var vineDemo = function(pathPrefix, loadingComplete) {
+var vineDemo = function(pathPrefix, loadingComplete, bgColor) {
 	var COLOR_INNER = new spine.Color(0.8, 0, 0, 0.5);
 	var COLOR_OUTER = new spine.Color(0.8, 0, 0, 0.8);
 	var COLOR_INNER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.5);
@@ -6,15 +6,16 @@ var vineDemo = function(pathPrefix, loadingComplete) {
 
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, state, bounds;		
-	var lastFrameTime = Date.now() / 1000;
+	var timeKeeper, loadingScreen;
 	var target = null;
 	var hoverTargets = [null, null, null, null, null];
 	var controlBones = ["vine-control1", "vine-control2", "vine-control3", "vine-control4"];
 	var coords = new spine.webgl.Vector3(), temp = new spine.webgl.Vector3(), temp2 = new spine.Vector2();
-	var playButton, timeLine, isPlaying = true, playTime = 0;		
+	var playButton, timeLine, isPlaying = true, playTime = 0;
+
+	if (!bgColor) bgColor = new spine.Color(0, 0, 0, 1);	
 
 	function init () {
-
 		canvas = document.getElementById("vinedemo-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
@@ -25,10 +26,14 @@ var vineDemo = function(pathPrefix, loadingComplete) {
 		assetManager.loadTexture("vine.png");
 		assetManager.loadText("vine.json");
 		assetManager.loadText("vine.atlas");
+		timeKeeper = new spine.TimeKeeper();		
+		loadingScreen = new spine.webgl.LoadingScreen(renderer);
+		loadingScreen.backgroundColor = bgColor;
 		requestAnimationFrame(load);
 	}
 
 	function load () {
+		timeKeeper.update();
 		if (assetManager.isLoadingComplete()) {
 			var atlas = new spine.TextureAtlas(assetManager.get("vine.atlas"), function(path) {
 				return assetManager.get(path);		
@@ -57,7 +62,10 @@ var vineDemo = function(pathPrefix, loadingComplete) {
 			setupInput();
 
 			loadingComplete(canvas, render);
-		} else requestAnimationFrame(load);
+		} else {
+			loadingScreen.draw(); 
+			requestAnimationFrame(load);
+		}
 	}
 
 	function setupUI() {
@@ -139,10 +147,8 @@ var vineDemo = function(pathPrefix, loadingComplete) {
 	}
 
 	function render () {
-		var now = Date.now() / 1000;
-		var delta = now - lastFrameTime;
-		lastFrameTime = now;
-		if (delta > 0.032) delta = 0.032;
+		timeKeeper.update();
+		var delta = timeKeeper.delta;
 
 		if (isPlaying) {
 			var animationDuration = state.getCurrent(0).animation.duration;
@@ -162,7 +168,7 @@ var vineDemo = function(pathPrefix, loadingComplete) {
 		renderer.camera.viewportHeight = bounds.y * 1.2;
 		renderer.resize(spine.webgl.ResizeMode.Fit);
 
-		gl.clearColor(0.2, 0.2, 0.2, 1);
+		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
 		gl.clear(gl.COLOR_BUFFER_BIT);			
 
 		renderer.begin();				

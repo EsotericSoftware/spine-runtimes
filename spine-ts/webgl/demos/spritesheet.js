@@ -1,4 +1,4 @@
-var spritesheetDemo = function(pathPrefix, loadingComplete) {
+var spritesheetDemo = function(pathPrefix, loadingComplete, bgColor) {
 	var SKELETON_ATLAS_COLOR = new spine.Color(0, 0.8, 0, 0.8);
 	var FRAME_ATLAS_COLOR = new spine.Color(0.8, 0, 0, 0.8);
 
@@ -8,8 +8,10 @@ var spritesheetDemo = function(pathPrefix, loadingComplete) {
 	var skeletonAtlas;	
 	var viewportWidth, viewportHeight;
 	var frames = [], currFrame = 0, frameTime = 0, frameScale = 0, FPS = 30;
-	var lastFrameTime = Date.now() / 1000;	
+	var timeKeeper, loadingScreen;	
 	var playTime = 0, framePlaytime = 0;
+
+	if (!bgColor) bgColor = new spine.Color(0, 0, 0, 1);
 
 	function init () {
 		if (pathPrefix === undefined) pathPrefix = "";		
@@ -22,11 +24,15 @@ var spritesheetDemo = function(pathPrefix, loadingComplete) {
 		assetManager = new spine.webgl.AssetManager(gl, pathPrefix);		
 		assetManager.loadTexture("raptor.png");
 		assetManager.loadText("raptor.json");
-		assetManager.loadText("raptor.atlas");		
+		assetManager.loadText("raptor.atlas");
+		timeKeeper = new spine.TimeKeeper();		
+		loadingScreen = new spine.webgl.LoadingScreen(renderer);
+		loadingScreen.backgroundColor = bgColor;
 		requestAnimationFrame(load);
 	}
 
 	function load () {
+		timeKeeper.update();
 		if (assetManager.isLoadingComplete()) {
 			skeletonAtlas = new spine.TextureAtlas(assetManager.get("raptor.atlas"), function(path) {
 				return assetManager.get("" + path);		
@@ -52,8 +58,13 @@ var spritesheetDemo = function(pathPrefix, loadingComplete) {
 			viewportHeight = ((0 + bounds.y) - offset.y);						
 
 			setupUI();
+			$("#spritesheetdemo-overlay").removeClass("overlay-hide");
+			$("#spritesheetdemo-overlay").addClass("overlay");			
 			loadingComplete(canvas, render);
-		} else requestAnimationFrame(load);
+		} else {
+			loadingScreen.draw();
+			requestAnimationFrame(load);
+		}
 	}
 
 	function setupUI() {
@@ -63,10 +74,8 @@ var spritesheetDemo = function(pathPrefix, loadingComplete) {
 	}
 
 	function render () {
-		var now = Date.now() / 1000;
-		var delta = now - lastFrameTime;
-		lastFrameTime = now;
-		if (delta > 0.032) delta = 0.032;
+		timeKeeper.update();
+		var delta = timeKeeper.delta;
 
 		delta *= (timeSlider.slider("value") / 100);
 		if (timeSliderLabel) timeSliderLabel.text(timeSlider.slider("value") + "%");	
@@ -94,7 +103,7 @@ var spritesheetDemo = function(pathPrefix, loadingComplete) {
 		renderer.camera.viewportWidth = viewportWidth * 1.2;
 		renderer.camera.viewportHeight = viewportHeight * 1.2;
 		renderer.resize(spine.webgl.ResizeMode.Fit);
-		gl.clearColor(0.2, 0.2, 0.2, 1);
+		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
 		gl.clear(gl.COLOR_BUFFER_BIT);	
 
 		renderer.begin();		

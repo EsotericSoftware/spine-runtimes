@@ -759,6 +759,16 @@ declare module spine {
         length(): number;
         normalize(): this;
     }
+    class TimeKeeper {
+        maxDelta: number;
+        framesPerSecond: number;
+        delta: number;
+        totalTime: number;
+        private lastTime;
+        private frameCount;
+        private frameTime;
+        update(): void;
+    }
 }
 declare module spine {
     abstract class Attachment {
@@ -957,6 +967,23 @@ declare module spine.webgl {
     }
 }
 declare module spine.webgl {
+    class LoadingScreen {
+        private renderer;
+        private logo;
+        private spinner;
+        private angle;
+        private timeKeeper;
+        backgroundColor: Color;
+        static useDark: boolean;
+        private static SPINNER_DATA;
+        private static SPINNER_DARK_DATA;
+        private static SPINE_LOGO_DATA;
+        private static SPINE_LOGO_DARK_DATA;
+        constructor(renderer: SceneRenderer);
+        draw(): void;
+    }
+}
+declare module spine.webgl {
     const M00: number;
     const M01: number;
     const M02: number;
@@ -1093,6 +1120,7 @@ declare module spine.webgl {
         drawSkeleton(skeleton: Skeleton, premultipliedAlpha?: boolean): void;
         drawSkeletonDebug(skeleton: Skeleton, premultipliedAlpha?: boolean, ignoredBones?: Array<string>): void;
         drawTexture(texture: GLTexture, x: number, y: number, width: number, height: number, color?: Color): void;
+        drawTextureRotated(texture: GLTexture, x: number, y: number, width: number, height: number, pivotX: number, pivotY: number, angle: number, color?: Color, premultipliedAlpha?: boolean): void;
         drawRegion(region: TextureAtlasRegion, x: number, y: number, width: number, height: number, color?: Color, premultipliedAlpha?: boolean): void;
         line(x: number, y: number, x2: number, y2: number, color?: Color, color2?: Color): void;
         triangle(filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, color?: Color, color2?: Color, color3?: Color): void;

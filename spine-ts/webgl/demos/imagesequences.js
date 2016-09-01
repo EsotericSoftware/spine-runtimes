@@ -1,13 +1,14 @@
-var imageSequencesDemo = function(pathPrefix, loadingComplete) {
+var imageSequencesDemo = function(pathPrefix, loadingComplete, bgColor) {
 	var OUTLINE_COLOR = new spine.Color(0, 0.8, 0, 1);	
 
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, bounds;		
-	var lastFrameTime = Date.now() / 1000;
+	var timeKeeper, loadingScreen;
 	var skeletons = {};
 	var activeSkeleton = "alien";
-
 	var playButton, timeLine, isPlaying = true;
+
+	if (!bgColor) bgColor = new spine.Color(0, 0, 0, 1);
 
 	function init () {
 		canvas = document.getElementById("imagesequencesdemo-canvas");
@@ -22,16 +23,23 @@ var imageSequencesDemo = function(pathPrefix, loadingComplete) {
 		assetManager.loadTexture("dragon.png");		
 		assetManager.loadText("dragon.json");
 		assetManager.loadText("dragon.atlas");
+		timeKeeper = new spine.TimeKeeper();		
+		loadingScreen = new spine.webgl.LoadingScreen(renderer);
+		loadingScreen.backgroundColor = bgColor;
 		requestAnimationFrame(load);
 	}	
 
 	function load () {
+		timeKeeper.update();
 		if (assetManager.isLoadingComplete()) {
 			skeletons["alien"] = loadSkeleton("alien", "death", ["head", "splat01"]);
 			skeletons["dragon"] = loadSkeleton("dragon", "flying", ["R_wing"])
 			setupUI();
 			loadingComplete(canvas, render);			
-		} else requestAnimationFrame(load);
+		} else {
+			loadingScreen.draw();
+			requestAnimationFrame(load);
+		}
 	}
 
 	function setupUI() {
@@ -127,10 +135,8 @@ var imageSequencesDemo = function(pathPrefix, loadingComplete) {
 	}
 
 	function render () {
-		var now = Date.now() / 1000;
-		var delta = now - lastFrameTime;
-		lastFrameTime = now;	
-		if (delta > 0.032) delta = 0.032;	
+		timeKeeper.update();
+		var delta = timeKeeper.delta;	
 
 		var active = skeletons[activeSkeleton];
 		var skeleton = active.skeleton;
@@ -144,7 +150,7 @@ var imageSequencesDemo = function(pathPrefix, loadingComplete) {
 		renderer.camera.viewportHeight = size.y * 1.4;
 		renderer.resize(spine.webgl.ResizeMode.Fit);
 
-		gl.clearColor(0.2, 0.2, 0.2, 1);
+		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
 		gl.clear(gl.COLOR_BUFFER_BIT);
 
 		if (isPlaying) {

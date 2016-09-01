@@ -230,4 +230,31 @@ module spine {
 			return this;
 		}
 	}
+
+	export class TimeKeeper {
+		maxDelta = 0.064;		
+		framesPerSecond = 0;
+		delta = 0;
+		totalTime = 0;
+
+		private lastTime = Date.now() / 1000;
+		private frameCount = 0;
+		private frameTime = 0;
+
+		update () {
+			var now = Date.now() / 1000;
+			this.delta = now -this.lastTime;
+			this.frameTime += this.delta;
+			this.totalTime += this.delta;
+			if (this.delta > this.maxDelta) this.delta = this.maxDelta;
+			this.lastTime = now;
+			
+			this.frameCount++;
+			if (this.frameTime > 1) {
+				this.framesPerSecond = this.frameCount / this.frameTime;
+				this.frameTime = 0;
+				this.frameCount = 0;
+			}
+		}
+	}
 }
