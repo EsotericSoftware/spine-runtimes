@@ -4121,7 +4121,7 @@ var spine;
     spine.DebugUtils = DebugUtils;
     var Pool = (function () {
         function Pool(instantiator) {
-            this.items = new Array(16);
+            this.items = new Array();
             this.instantiator = instantiator;
         }
         Pool.prototype.obtain = function () {
@@ -5072,57 +5072,60 @@ var spine;
                     for (var i_1 = 0; i_1 < listeners.length; i_1++) {
                         listeners[i_1].down(_this.currTouch.x, _this.currTouch.y);
                     }
+                    console.log("Start " + _this.currTouch.x + ", " + _this.currTouch.y);
                     _this.lastX = _this.currTouch.x;
                     _this.lastY = _this.currTouch.y;
                     _this.buttonDown = true;
                     ev.preventDefault();
                 }, false);
                 element.addEventListener("touchend", function (ev) {
-                    if (_this.currTouch != null)
-                        return;
                     var touches = ev.changedTouches;
                     for (var i = 0; i < touches.length; i++) {
                         var touch = touches[i];
                         if (_this.currTouch.identifier === touch.identifier) {
                             var rect = element.getBoundingClientRect();
-                            var x = touch.clientX - rect.left;
-                            var y = touch.clientY - rect.top;
+                            var x = _this.currTouch.x = touch.clientX - rect.left;
+                            var y = _this.currTouch.y = touch.clientY - rect.top;
                             _this.touchesPool.free(_this.currTouch);
-                            _this.currTouch = null;
-                            _this.buttonDown = false;
                             var listeners = _this.listeners;
                             for (var i_2 = 0; i_2 < listeners.length; i_2++) {
                                 listeners[i_2].up(x, y);
                             }
+                            console.log("End " + x + ", " + y);
+                            _this.lastX = x;
+                            _this.lastY = y;
+                            _this.buttonDown = false;
+                            _this.currTouch = null;
                             break;
                         }
                     }
                     ev.preventDefault();
                 }, false);
                 element.addEventListener("touchcancel", function (ev) {
-                    if (_this.currTouch != null)
-                        return;
                     var touches = ev.changedTouches;
                     for (var i = 0; i < touches.length; i++) {
                         var touch = touches[i];
                         if (_this.currTouch.identifier === touch.identifier) {
                             var rect = element.getBoundingClientRect();
-                            var x = touch.clientX - rect.left;
-                            var y = touch.clientY - rect.top;
+                            var x = _this.currTouch.x = touch.clientX - rect.left;
+                            var y = _this.currTouch.y = touch.clientY - rect.top;
                             _this.touchesPool.free(_this.currTouch);
-                            _this.currTouch = null;
-                            _this.buttonDown = false;
                             var listeners = _this.listeners;
                             for (var i_3 = 0; i_3 < listeners.length; i_3++) {
                                 listeners[i_3].up(x, y);
                             }
+                            console.log("End " + x + ", " + y);
+                            _this.lastX = x;
+                            _this.lastY = y;
+                            _this.buttonDown = false;
+                            _this.currTouch = null;
                             break;
                         }
                     }
                     ev.preventDefault();
                 }, false);
                 element.addEventListener("touchmove", function (ev) {
-                    if (_this.currTouch != null)
+                    if (_this.currTouch == null)
                         return;
                     var touches = ev.changedTouches;
                     for (var i = 0; i < touches.length; i++) {
@@ -5135,6 +5138,9 @@ var spine;
                             for (var i_4 = 0; i_4 < listeners.length; i_4++) {
                                 listeners[i_4].dragged(x, y);
                             }
+                            console.log("Drag " + x + ", " + y);
+                            _this.lastX = _this.currTouch.x = x;
+                            _this.lastY = _this.currTouch.y = y;
                             break;
                         }
                     }
@@ -5178,7 +5184,6 @@ var spine;
                 this.backgroundColor = new spine.Color(0, 0, 0, 1);
                 this.renderer = renderer;
                 var logoImg = document.createElement("img");
-                document.getElementsByTagName("body")[0].appendChild(logoImg);
                 logoImg.src = LoadingScreen.useDark ? LoadingScreen.SPINE_LOGO_DARK_DATA : LoadingScreen.SPINE_LOGO_DATA;
                 logoImg.crossOrigin = "anonymous";
                 logoImg.onload = function (ev) {

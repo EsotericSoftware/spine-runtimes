@@ -5,7 +5,7 @@ var imageSequencesDemo = function(pathPrefix, loadingComplete, bgColor) {
 	var skeleton, bounds;		
 	var timeKeeper, loadingScreen;
 	var skeletons = {};
-	var activeSkeleton = "alien";
+	var activeSkeleton = "Alien";
 	var playButton, timeLine, isPlaying = true;
 
 	if (!bgColor) bgColor = new spine.Color(0, 0, 0, 1);
@@ -32,8 +32,8 @@ var imageSequencesDemo = function(pathPrefix, loadingComplete, bgColor) {
 	function load () {
 		timeKeeper.update();
 		if (assetManager.isLoadingComplete()) {
-			skeletons["alien"] = loadSkeleton("alien", "death", ["head", "splat01"]);
-			skeletons["dragon"] = loadSkeleton("dragon", "flying", ["R_wing"])
+			skeletons["Alien"] = loadSkeleton("alien", "death", ["head", "splat01"]);
+			skeletons["Dragon"] = loadSkeleton("dragon", "flying", ["R_wing"])
 			setupUI();
 			loadingComplete(canvas, render);			
 		} else {

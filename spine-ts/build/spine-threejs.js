@@ -3944,7 +3944,7 @@ var spine;
     spine.DebugUtils = DebugUtils;
     var Pool = (function () {
         function Pool(instantiator) {
-            this.items = new Array(16);
+            this.items = new Array();
             this.instantiator = instantiator;
         }
         Pool.prototype.obtain = function () {

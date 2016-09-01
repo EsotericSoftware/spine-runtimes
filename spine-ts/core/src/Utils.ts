@@ -181,7 +181,7 @@ module spine {
 	}
 
 	export class Pool<T> {
-		private items = new Array<T>(16);
+		private items = new Array<T>();
 		private instantiator: () => T;
 
 		constructor (instantiator: () => T) {

@@ -118,60 +118,60 @@ module spine.webgl {
 				for (let i = 0; i < listeners.length; i++) {
 					listeners[i].down(this.currTouch.x, this.currTouch.y);
 				}
-
+				console.log("Start " + this.currTouch.x + ", " + this.currTouch.y);
 				this.lastX = this.currTouch.x;
 				this.lastY = this.currTouch.y;
 				this.buttonDown = true;
 				ev.preventDefault();
 			}, false);
-			element.addEventListener("touchend", (ev: TouchEvent) => {				
-				if (this.currTouch != null) return;
-
+			element.addEventListener("touchend", (ev: TouchEvent) => {
 				var touches = ev.changedTouches;
 				for (var i = 0; i < touches.length; i++) {
 					var touch = touches[i];
 					if (this.currTouch.identifier === touch.identifier) {
 						let rect = element.getBoundingClientRect();
-						let x = touch.clientX - rect.left;
-						let y = touch.clientY - rect.top;						
+						let x = this.currTouch.x = touch.clientX - rect.left;
+						let y = this.currTouch.y = touch.clientY - rect.top;						
 						this.touchesPool.free(this.currTouch);
-						this.currTouch = null;
-						this.buttonDown = false;
-
 						let listeners = this.listeners;
 						for (let i = 0; i < listeners.length; i++) {
 							listeners[i].up(x, y);
 						}
+						console.log("End " + x + ", " + y);
+						this.lastX = x;
+						this.lastY = y;
+						this.buttonDown = false;
+						this.currTouch = null;
 						break;
 					}
 				}
 				ev.preventDefault();
 			}, false);
 			element.addEventListener("touchcancel", (ev: TouchEvent) => {				
-				if (this.currTouch != null) return;
-
 				var touches = ev.changedTouches;
 				for (var i = 0; i < touches.length; i++) {
 					var touch = touches[i];
 					if (this.currTouch.identifier === touch.identifier) {
 						let rect = element.getBoundingClientRect();
-						let x = touch.clientX - rect.left;
-						let y = touch.clientY - rect.top;						
+						let x = this.currTouch.x = touch.clientX - rect.left;
+						let y = this.currTouch.y = touch.clientY - rect.top;						
 						this.touchesPool.free(this.currTouch);
-						this.currTouch = null;
-						this.buttonDown = false;
-
 						let listeners = this.listeners;
 						for (let i = 0; i < listeners.length; i++) {
 							listeners[i].up(x, y);
 						}
+						console.log("End " + x + ", " + y);
+						this.lastX = x;
+						this.lastY = y;
+						this.buttonDown = false;
+						this.currTouch = null;
 						break;
 					}
 				}
 				ev.preventDefault();
 			}, false);
 			element.addEventListener("touchmove", (ev: TouchEvent) => {				
-				if (this.currTouch != null) return;
+				if (this.currTouch == null) return;
 
 				var touches = ev.changedTouches;
 				for (var i = 0; i < touches.length; i++) {
@@ -185,6 +185,9 @@ module spine.webgl {
 						for (let i = 0; i < listeners.length; i++) {
 							listeners[i].dragged(x, y);
 						}
+						console.log("Drag " + x + ", " + y);
+						this.lastX = this.currTouch.x = x;
+						this.lastY = this.currTouch.y = y;
 						break;
 					}
 				}

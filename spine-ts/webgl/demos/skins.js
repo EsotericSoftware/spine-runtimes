@@ -3,8 +3,9 @@ var skinsDemo = function(pathPrefix, loadingComplete, bgColor) {
 	var skeleton, state, offset, bounds;		
 	var timeKeeper, loadingScreen;
 	var playButton, timeLine, isPlaying = true, playTime = 0;
+	var randomizeSkins, lastSkinChange = Date.now() / 1000;
 
-	if (!bgColor) bgColor = new spine.Color(0, 0, 0, 1);		
+	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);		
 
 	function init () {
 		if (pathPrefix === undefined) pathPrefix = "";		
@@ -18,6 +19,7 @@ var skinsDemo = function(pathPrefix, loadingComplete, bgColor) {
 		assetManager.loadTexture("heroes.png");
 		assetManager.loadText("heroes.json");
 		assetManager.loadText("heroes.atlas");
+		input = new spine.webgl.Input(canvas);
 		timeKeeper = new spine.TimeKeeper();		
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
 		loadingScreen.backgroundColor = bgColor;
@@ -47,11 +49,23 @@ var skinsDemo = function(pathPrefix, loadingComplete, bgColor) {
 			bounds = new spine.Vector2();
 			skeleton.getBounds(offset, bounds);
 			setupUI();
+			setupInput();
 			loadingComplete(canvas, render);
 		} else {
 			loadingScreen.draw();
 			requestAnimationFrame(load);
 		}
+	}
+
+	function setupInput (){
+		input.addListener({
+			down: function(x, y) {
+				state.setAnimation(5, Math.random() > 0.5 ? "meleeSwing1" : "meleeSwing2", false, 0);				
+			},
+			up: function(x, y) { },
+			dragged: function(x, y) { },
+			moved: function (x, y) { }
+		});
 	}
 
 	function setupAnimations(state) {
@@ -85,7 +99,14 @@ var skinsDemo = function(pathPrefix, loadingComplete, bgColor) {
 		state.addAnimation(0, "idleTired", true, 0.5);
 		state.addAnimation(0, "crouchIdle", true, 1.5);
 		state.addAnimation(0, "crouchWalk", true, 2);
-		state.addAnimation(0, "crouchIdle", true, 2.5);
+		state.addAnimation(0, "crouchIdle", true, 2.5).listener = {
+			event: function (trackIndex, event) {},
+			complete: function (trackIndex, loopCount) {},
+			start: function (trackIndex) {
+				setupAnimations(state); 				
+			},
+			end: function (trackIndex) { }
+		};		
 
 		state.addAnimation(1, "meleeSwing1", false, 4);
 
@@ -94,15 +115,9 @@ var skinsDemo = function(pathPrefix, loadingComplete, bgColor) {
 		state.addAnimation(3, "meleeSwing2", false, 10.5);
 		state.addAnimation(3, "meleeSwing1", false, 0);
 		state.addAnimation(3, "meleeSwing2", false, 0);
-
-		state.addAnimation(4, "hideSword", false, 19.15).listener = {
-			event: function (trackIndex, event) {},
-			complete: function (trackIndex, loopCount) {},
-			start: function (trackIndex) { 
-				setAnimations(state);
-			},
-			end: function (trackIndex) {}
-		};
+		
+		state.addAnimation(4, "hideSword", false, 0);
+		state.addAnimation(4, "hideSword", false, 19.15);
 	}
 
 	function setupUI() {
@@ -121,48 +136,64 @@ var skinsDemo = function(pathPrefix, loadingComplete, bgColor) {
 			activeSkin = $("#skinsdemo-active-skin option:selected").text();
 			skeleton.setSkinByName(activeSkin);
 			skeleton.setSlotsToSetupPose();
+			randomizeSkins.checked = false;
 		});
 
-		var randomSkin = $("#skinsdemo-randomizeskin");
-		randomSkin.click(function() {
-			var result;
-			var count = 0;
-			for (var skin in skeleton.data.skins) {
-				if (skeleton.data.skins[skin].name === "default") continue;
-				if (Math.random() < 1/++count) {
-					result = skeleton.data.skins[skin];
-				}
-			}
-			skeleton.setSkin(result);
-			skeleton.setSlotsToSetupPose();
-			$("#skinsdemo-active-skin select").val(result.name);
+		var randomAttachments = $("#skinsdemo-randomizeattachments");
+		randomAttachments.click(function() {
+			randomizeAttachments();		
 		});
+		randomizeSkins = document.getElementById("skinsdemo-randomizeskins");
+	}
 
-		var randomizeAttachments = $("#skinsdemo-randomizeattachments");
-		randomizeAttachments.click(function() {
-			var skins = [];
-			for (var skin in skeleton.data.skins) {
-				skin = skeleton.data.skins[skin];
-				if (skin.name === "default") continue;
-				skins.push(skin);
+	function randomizeSkin() {
+		var result;
+		var count = 0;
+		for (var skin in skeleton.data.skins) {
+			if (skeleton.data.skins[skin].name === "default") continue;
+			if (Math.random() < 1/++count) {
+				result = skeleton.data.skins[skin];
 			}
+		}
+		skeleton.setSkin(result);
+		skeleton.setSlotsToSetupPose();
+		$("#skinsdemo-active-skin option").filter(function() {
+			return ($(this).text() == result.name);
+		}).prop("selected", true);		
+	}
 
-			var newSkin = new spine.Skin("random-skin");
-			for (var slot = 0; slot < skeleton.slots.length; slot++) {
-				var skin = skins[(Math.random() * skins.length - 1) | 0];
-				var attachments = skin.attachments[slot];
-				for (var attachmentName in attachments) {
-					newSkin.addAttachment(slot, attachmentName, attachments[attachmentName]);
-				}
+	function randomizeAttachments() {
+		var skins = [];
+		for (var skin in skeleton.data.skins) {
+			skin = skeleton.data.skins[skin];
+			if (skin.name === "default") continue;
+			skins.push(skin);
+		}
+
+		var newSkin = new spine.Skin("random-skin");
+		for (var slot = 0; slot < skeleton.slots.length; slot++) {
+			var skin = skins[(Math.random() * skins.length - 1) | 0];
+			var attachments = skin.attachments[slot];
+			for (var attachmentName in attachments) {
+				newSkin.addAttachment(slot, attachmentName, attachments[attachmentName]);
 			}
-			skeleton.setSkin(newSkin);
-			skeleton.setSlotsToSetupPose();			
-		});
+		}
+		skeleton.setSkin(newSkin);
+		skeleton.setSlotsToSetupPose();	
+		randomizeSkins.checked = false;
 	}
 
 	function render () {
 		timeKeeper.update();
 		var delta = timeKeeper.delta;
+
+		if (randomizeSkins.checked) {
+			var now = Date.now() / 1000;
+			if (now - lastSkinChange > 2) {
+				randomizeSkin();
+				lastSkinChange = now;
+			}
+		}
 
 		renderer.camera.position.x = offset.x + bounds.x * 1.5 - 150;
 		renderer.camera.position.y = offset.y + bounds.y / 2;
@@ -183,7 +214,7 @@ var skinsDemo = function(pathPrefix, loadingComplete, bgColor) {
 		var width = bounds.x;
 		var scale = width / texture.getImage().width;
 		var height = scale * texture.getImage().height;
-		renderer.drawTexture(texture, offset.x + bounds.x + 300, offset.y + bounds.y / 2 - height / 2 - 50, width, height);		
+		renderer.drawTexture(texture, offset.x + bounds.x + 200, offset.y + bounds.y / 2 - height / 2 - 50, width, height);		
 		renderer.end();		
 	}
 

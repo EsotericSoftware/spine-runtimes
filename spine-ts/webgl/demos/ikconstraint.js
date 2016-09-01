@@ -5,14 +5,13 @@ var ikConstraintDemo = function(pathPrefix, loadingComplete, bgColor) {
 	var COLOR_OUTER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.8);
 
 	var canvas, gl, renderer, input, assetManager;
-	var skeleton, bounds;		
+	var skeleton, state, bounds;		
 	var timeKeeper, loadingScreen;
 	var target = null;	
 	var hoverTargets = [];
 	var controlBones = ["hoverboard controller", "hip", "board target"];
-	var coords = new spine.webgl.Vector3(), temp = new spine.webgl.Vector3(), temp2 = new spine.Vector2(), temp3 = new spine.webgl.Vector3();
-	var kneePos = new spine.Vector2();
-	var playButton, timeLine, spacing, isPlaying = true, playTime = 0;
+	var coords = new spine.webgl.Vector3(), temp = new spine.webgl.Vector3(), temp2 = new spine.Vector2(), temp3 = new spine.webgl.Vector3();	
+	var isPlaying = true;
 
 	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);	
 
@@ -44,7 +43,9 @@ var ikConstraintDemo = function(pathPrefix, loadingComplete, bgColor) {
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
 			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("spineboy-hover.json"));
 			skeleton = new spine.Skeleton(skeletonData);
-			skeleton.setToSetupPose();
+			state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
+			state.setAnimation(0, "idle", true);
+			state.apply(skeleton);
 			skeleton.updateWorldTransform();
 			var offset = new spine.Vector2();
 			bounds = new spine.Vector2();
@@ -81,6 +82,7 @@ var ikConstraintDemo = function(pathPrefix, loadingComplete, bgColor) {
 	function setupInput (){
 		input.addListener({
 			down: function(x, y) {
+				isPlaying = false;
 				for (var i = 0; i < controlBones.length; i++) {	
 					var bone = skeleton.findBone(controlBones[i]);				
 					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);				
@@ -122,7 +124,9 @@ var ikConstraintDemo = function(pathPrefix, loadingComplete, bgColor) {
 	function render () {
 		timeKeeper.update();
 		var delta = timeKeeper.delta;	
-
+	
+		state.update(delta);
+		state.apply(skeleton);					
 		skeleton.updateWorldTransform();
 
 		renderer.camera.viewportWidth = bounds.x * 1.2;

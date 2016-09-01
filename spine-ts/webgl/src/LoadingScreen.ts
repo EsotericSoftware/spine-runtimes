@@ -17,8 +17,7 @@ module spine.webgl {
 
 		constructor (renderer: SceneRenderer) {
 			this.renderer = renderer;
-			var logoImg = document.createElement("img");
-			document.getElementsByTagName("body")[0].appendChild(logoImg);			
+			var logoImg = document.createElement("img");						
 			logoImg.src = LoadingScreen.useDark ? LoadingScreen.SPINE_LOGO_DARK_DATA : LoadingScreen.SPINE_LOGO_DATA;
 			logoImg.crossOrigin = "anonymous";
 			logoImg.onload = (ev) => {
