@@ -103,20 +103,23 @@ var skinsDemo = function(pathPrefix, loadingComplete, bgColor) {
 			event: function (trackIndex, event) {},
 			complete: function (trackIndex, loopCount) {},
 			start: function (trackIndex) {
-				setupAnimations(state); 				
+				setupAnimations(state);
 			},
-			end: function (trackIndex) { }
-		};		
+			end: function (trackIndex) {}
+		};
 
+		state.setAnimation(1, "empty", false, 0);
 		state.addAnimation(1, "meleeSwing1", false, 4);
 
+		state.setAnimation(2, "empty", false, 0);
 		state.addAnimation(2, "meleeSwing1", false, 7.5);
 
+		state.setAnimation(3, "empty", false, 0);
 		state.addAnimation(3, "meleeSwing2", false, 10.5);
 		state.addAnimation(3, "meleeSwing1", false, 0);
 		state.addAnimation(3, "meleeSwing2", false, 0);
-		
-		state.addAnimation(4, "hideSword", false, 0);
+
+		state.setAnimation(4, "hideSword", false, 0);
 		state.addAnimation(4, "hideSword", false, 19.15);
 	}
 
@@ -147,6 +150,14 @@ var skinsDemo = function(pathPrefix, loadingComplete, bgColor) {
 		randomizeSkins = document.getElementById("skinsdemo-randomizeskins");
 	}
 
+	function setSkin (skin) {
+		var slot = skeleton.findSlot("item_near");
+		var weapon = slot.getAttachment();
+		skeleton.setSkin(skin);
+		skeleton.setSlotsToSetupPose();
+		slot.setAttachment(weapon);
+	}
+	
 	function randomizeSkin() {
 		var result;
 		var count = 0;
@@ -156,8 +167,7 @@ var skinsDemo = function(pathPrefix, loadingComplete, bgColor) {
 				result = skeleton.data.skins[skin];
 			}
 		}
-		skeleton.setSkin(result);
-		skeleton.setSlotsToSetupPose();
+		setSkin(result);
 		$("#skinsdemo-active-skin option").filter(function() {
 			return ($(this).text() == result.name);
 		}).prop("selected", true);		
@@ -179,8 +189,7 @@ var skinsDemo = function(pathPrefix, loadingComplete, bgColor) {
 				newSkin.addAttachment(slot, attachmentName, attachments[attachmentName]);
 			}
 		}
-		skeleton.setSkin(newSkin);
-		skeleton.setSlotsToSetupPose();	
+		setSkin(newSkin);
 		randomizeSkins.checked = false;
 	}
 
