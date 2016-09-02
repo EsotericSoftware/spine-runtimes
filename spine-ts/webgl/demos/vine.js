@@ -8,8 +8,8 @@ var vineDemo = function(loadingComplete, bgColor) {
 	var skeleton, state, bounds;		
 	var timeKeeper, loadingScreen;
 	var target = null;
-	var hoverTargets = [null, null, null, null, null];
-	var controlBones = ["vine-control1", "vine-control2", "vine-control3", "vine-control4"];
+	var hoverTargets = [null, null, null, null, null, null];
+	var controlBones = ["base", "vine-control1", "vine-control2", "vine-control3", "vine-control4"];
 	var coords = new spine.webgl.Vector3(), temp = new spine.webgl.Vector3(), temp2 = new spine.Vector2();
 	var playButton, timeLine, isPlaying = true, playTime = 0;
 
