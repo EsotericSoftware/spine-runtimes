@@ -43,7 +43,7 @@ module spine.webgl {
 
 		draw () {			
 			this.timeKeeper.update();
-			this.angle += this.timeKeeper.delta * 360 * (0.5 + 2 * Math.abs(Math.sin(this.timeKeeper.totalTime)));
+			this.angle -= this.timeKeeper.delta * 360 * (0.5 + 2 * Math.abs(Math.sin(this.timeKeeper.totalTime)));
 
 			var renderer = this.renderer;
 			var canvas = renderer.canvas;
@@ -73,8 +73,8 @@ module spine.webgl {
 			var height = logoHeight + margin + spinnerHeight;			
 
 			renderer.begin();
-			renderer.drawTexture(this.logo, canvas.width / 2 - logoWidth / 2, canvas.height / 2 + margin / 2, logoWidth, logoHeight);			
-			renderer.drawTextureRotated(this.spinner, canvas.width / 2 - spinnerWidth / 2, canvas.height / 2 - margin / 2 - spinnerHeight, spinnerWidth, spinnerHeight, spinnerWidth / 2, spinnerHeight / 2, this.angle);
+			renderer.drawTexture(this.logo, canvas.width / 2 - logoWidth / 2, canvas.height / 2 + height / 2 - logoHeight, logoWidth, logoHeight);			
+			renderer.drawTextureRotated(this.spinner, canvas.width / 2 - spinnerWidth / 2, canvas.height / 2 - height / 2, spinnerWidth, spinnerHeight, spinnerWidth / 2, spinnerHeight / 2, this.angle);
 			renderer.end();
 		}
 	}
