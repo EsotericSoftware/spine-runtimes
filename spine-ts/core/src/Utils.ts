@@ -247,7 +247,7 @@ module spine {
 
 		update () {
 			var now = Date.now() / 1000;
-			this.delta = now -this.lastTime;
+			this.delta = now - this.lastTime;
 			this.frameTime += this.delta;
 			this.totalTime += this.delta;
 			if (this.delta > this.maxDelta) this.delta = this.maxDelta;

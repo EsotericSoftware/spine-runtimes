@@ -5,28 +5,40 @@ var spineDemos;
 	spineDemos.NON_HOVER_COLOR_INNER = new spine.Color(0.478, 0, 0, 0.5);
 	spineDemos.NON_HOVER_COLOR_OUTER = new spine.Color(1, 0, 0, 0.8);
 	spineDemos.assetManager = new spine.SharedAssetManager("http://esotericsoftware.com/demos/exports/");
-	spineDemos.setupRendering = function (canvas, renderFunc) {
-		var isVisible = false;
+	spineDemos.demos = [];
+	spineDemos.loopRunning = false;
 
-		function render () {
-			renderFunc();
-			if (isVisible) requestAnimationFrame(render);
-		};
-
-		function viewportCheck () {
-			var old = isVisible	
-			isVisible = spineDemos.isElementInViewport(canvas);			
-			if (isVisible && old != isVisible) requestAnimationFrame(render);		
+	var timeKeeper = new spine.TimeKeeper();
+	var loop = function() {
+		timeKeeper.update();
+		if (spineDemos.log) console.log(timeKeeper.delta + ", " + timeKeeper.framesPerSecond);
+		spineDemos.requestAnimationFrame(loop);
+		var demos = spineDemos.demos;		
+		for (var i = 0; i < demos.length; i++) {
+			var canvas = demos[i].canvas;
+			var renderFunc = demos[i].renderFunc;
+			if (spineDemos.isElementInViewport(canvas)) {
+				if (spineDemos.log) console.log("Rendering " + canvas.id);
+				renderFunc();
+			};
 		}
+	}
 
-		window.addEventListener("DOMContentLoaded", viewportCheck, false);
-		window.addEventListener("load", viewportCheck, false);
-		window.addEventListener("resize", viewportCheck, false);
-		window.addEventListener("scroll", viewportCheck, false);
+	var setupLoop = function() {
+		if (!spineDemos.loopRunning) {			
+			loop();
+			spineDemos.loopRunning = true;
+		}
+	}
 
-		viewportCheck();
-		requestAnimationFrame(render);
+	spineDemos.setupRendering = function (canvas, renderFunc) {
+		setupLoop();
+		spineDemos.demos.push({canvas: canvas, renderFunc: renderFunc});		
 	};
+
+	spineDemos.requestAnimationFrame = function(func) {
+		requestAnimationFrame(func);
+	}
 
 	spineDemos.isElementInViewport = function (canvas) {
 		var rect = canvas.getBoundingClientRect();
@@ -34,5 +46,14 @@ var spineDemos;
 		var width = (window.innerHeight || document.documentElement.clientHeight);
 		var height = (window.innerWidth || document.documentElement.clientWidth);
 		return rect.left < x + width && rect.right > x && rect.top < y + height && rect.bottom > y;		 
-	};	
+	};
+
+	spineDemos.setupWebGLContext = function (canvas) {
+		config = {
+			alpha: false,
+			depth: false,
+			stencil: false
+		}
+		return gl = canvas.getContext("webgl", config) || canvas.getContext("experimental-webgl", config);
+	}
 })(spineDemos || (spineDemos = { }));

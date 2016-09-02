@@ -125,7 +125,7 @@ var tankDemo = function(loadingComplete, bgColor) {
 		renderer.begin();				
 		renderer.drawSkeleton(skeleton, true);
 		renderer.drawSkeletonDebug(skeleton, true);		
-		renderer.end();
+		renderer.end();		
 	}
 
 	init();

@@ -3941,12 +3941,14 @@ var spine;
             this.b = b;
             this.a = a;
             this.clamp();
+            return this;
         };
         Color.prototype.setFromColor = function (c) {
             this.r = c.r;
             this.g = c.g;
             this.b = c.b;
             this.a = c.a;
+            return this;
         };
         Color.prototype.setFromString = function (hex) {
             hex = hex.charAt(0) == '#' ? hex.substr(1) : hex;
@@ -3954,6 +3956,7 @@ var spine;
             this.g = parseInt(hex.substr(2, 2), 16) / 255.0;
             this.b = parseInt(hex.substr(4, 2), 16) / 255.0;
             this.a = (hex.length != 8 ? 255 : parseInt(hex.substr(6, 2), 16)) / 255.0;
+            return this;
         };
         Color.prototype.add = function (r, g, b, a) {
             this.r += r;
@@ -3961,6 +3964,7 @@ var spine;
             this.b += b;
             this.a += a;
             this.clamp();
+            return this;
         };
         Color.prototype.clamp = function () {
             if (this.r < 0)

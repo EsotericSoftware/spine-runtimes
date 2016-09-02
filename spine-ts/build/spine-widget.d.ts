@@ -731,10 +731,10 @@ declare module spine {
         static BLUE: Color;
         static MAGENTA: Color;
         constructor(r?: number, g?: number, b?: number, a?: number);
-        set(r: number, g: number, b: number, a: number): void;
-        setFromColor(c: Color): void;
-        setFromString(hex: string): void;
-        add(r: number, g: number, b: number, a: number): void;
+        set(r: number, g: number, b: number, a: number): this;
+        setFromColor(c: Color): this;
+        setFromString(hex: string): this;
+        add(r: number, g: number, b: number, a: number): this;
         clamp(): this;
     }
     class MathUtils {
@@ -1249,6 +1249,7 @@ declare module spine.webgl {
         boneOriginColor: Color;
         attachmentLineColor: Color;
         triangleLineColor: Color;
+        pathColor: Color;
         aabbColor: Color;
         drawBones: boolean;
         drawRegionAttachments: boolean;
