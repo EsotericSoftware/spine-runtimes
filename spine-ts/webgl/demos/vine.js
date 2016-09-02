@@ -84,6 +84,7 @@ var vineDemo = function(loadingComplete, bgColor) {
 			}		
 		}
 		playButton.click(playButtonUpdate);
+		playButton.addClass("pause");
 
 		timeLine = $("#vinedemo-timeline");
 		timeLine.slider({ range: "max", min: 0, max: 100, value: 0, slide: function () {

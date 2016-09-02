@@ -35,6 +35,7 @@ module spine.webgl {
 		boneOriginColor = new Color(0, 1, 0, 1);
 		attachmentLineColor = new Color(0, 0, 1, 0.5);
 		triangleLineColor = new Color(1, 0.64, 0, 0.5);
+		pathColor = new Color().setFromString("FF7F00");
 		aabbColor = new Color(0, 1, 0, 0.5);
 		drawBones = true;
 		drawRegionAttachments = true;
@@ -154,7 +155,7 @@ module spine.webgl {
 					let nn = path.worldVerticesLength;
 					let world = this.temp = Utils.setArraySize(this.temp, nn, 0);
 					path.computeWorldVertices(slot, world);
-					let color = path.color;
+					let color = this.pathColor;
 					let x1 = world[2], y1 = world[3], x2 = 0, y2 = 0;
 					if (path.closed) {
 						shapes.setColor(color);

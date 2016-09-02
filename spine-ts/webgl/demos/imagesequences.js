@@ -55,6 +55,7 @@ var imageSequencesDemo = function(loadingComplete, bgColor) {
 			}			
 		}
 		playButton.click(playButtonUpdate);
+		playButton.addClass("pause");
 
 		timeLine = $("#imagesequencesdemo-timeline");
 		timeLine.slider({ range: "max", min: 0, max: 100, value: 0, slide: function () {

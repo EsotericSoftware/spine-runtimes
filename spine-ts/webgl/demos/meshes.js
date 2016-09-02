@@ -55,6 +55,7 @@ var meshesDemo = function(loadingComplete, bgColor) {
 			}			
 		}
 		playButton.click(playButtonUpdate);
+		playButton.addClass("pause");
 
 		timeLine = $("#meshesdemo-timeline");
 		timeLine.slider({ range: "max", min: 0, max: 100, value: 0, slide: function () {

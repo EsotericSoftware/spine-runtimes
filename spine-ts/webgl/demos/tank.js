@@ -42,6 +42,11 @@ var tankDemo = function(loadingComplete, bgColor) {
 			offset = new spine.Vector2();
 			bounds = new spine.Vector2();
 			skeleton.getBounds(offset, bounds);
+
+			renderer.skeletonDebugRenderer.drawRegionAttachments = false;
+			renderer.skeletonDebugRenderer.drawMeshHull = false;
+			renderer.skeletonDebugRenderer.drawMeshTriangles = false;
+
 			setupUI();
 			loadingComplete(canvas, render);
 		} else {
@@ -63,6 +68,7 @@ var tankDemo = function(loadingComplete, bgColor) {
 			}		
 		}
 		playButton.click(playButtonUpdate);
+		playButton.addClass("pause");
 
 		timeLine = $("#tankdemo-timeline");
 		timeLine.slider({ range: "max", min: 0, max: 100, value: 0, slide: function () {
@@ -76,7 +82,15 @@ var tankDemo = function(loadingComplete, bgColor) {
 				skeleton.updateWorldTransform();
 				playTime = time;												
 			}
-		}});		
+		}});
+
+		var checkbox = $("#tankdemo-drawbones");
+		renderer.skeletonDebugRenderer.drawPaths = false;
+		renderer.skeletonDebugRenderer.drawBones = false;
+		checkbox.change(function() {
+			renderer.skeletonDebugRenderer.drawPaths = this.checked;
+			renderer.skeletonDebugRenderer.drawBones = this.checked;			
+		});	
 	}
 
 	function render () {
@@ -109,7 +123,8 @@ var tankDemo = function(loadingComplete, bgColor) {
 		gl.clear(gl.COLOR_BUFFER_BIT);			
 
 		renderer.begin();				
-		renderer.drawSkeleton(skeleton, true);				
+		renderer.drawSkeleton(skeleton, true);
+		renderer.drawSkeletonDebug(skeleton, true);		
 		renderer.end();
 	}
 
