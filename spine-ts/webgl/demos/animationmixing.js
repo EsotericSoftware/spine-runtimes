@@ -116,7 +116,7 @@ var animationMixingDemo = function(loadingComplete, bgColor) {
 		var size = bounds.size;
 
 		renderer.camera.position.x = offset.x + size.x -  50;
-		renderer.camera.position.y = offset.y + size.y / 2;
+		renderer.camera.position.y = offset.y + size.y / 2 - 50;
 		renderer.camera.viewportWidth = size.x * 2.4;
 		renderer.camera.viewportHeight = size.y * 1.2;
 		renderer.resize(spine.webgl.ResizeMode.Fit);

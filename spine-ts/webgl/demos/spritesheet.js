@@ -8,7 +8,7 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 	var skeletonAtlas;	
 	var viewportWidth, viewportHeight;
 	var frames = [], currFrame = 0, frameTime = 0, frameScale = 0, FPS = 30;
-	var timeKeeper, loadingScreen;	
+	var timeKeeper, loadingScreen, input;
 	var playTime = 0, framePlaytime = 0;
 
 	var DEMO_NAME = "SpritesheetDemo";
@@ -26,7 +26,8 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas1.png");
 		assetManager.loadText(DEMO_NAME, "atlas1.atlas");
 		assetManager.loadJson(DEMO_NAME, "demos.json");	
-		timeKeeper = new spine.TimeKeeper();		
+		timeKeeper = new spine.TimeKeeper();
+		input = new spine.webgl.Input(canvas);	
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
 		loadingScreen.backgroundColor = bgColor;
 		requestAnimationFrame(load);
@@ -42,7 +43,10 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
 			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").raptor);
 			skeleton = new spine.Skeleton(skeletonData);
-			animationState = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
+			var stateData = new spine.AnimationStateData(skeleton.data);
+			stateData.setMix("walk", "Jump", 0.5);
+			stateData.setMix("Jump", "walk", 0.5);
+			animationState = new spine.AnimationState(stateData);
 			animationState.setAnimation(0, "walk", true);
 			animationState.apply(skeleton);
 			skeleton.updateWorldTransform();
@@ -59,6 +63,8 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 			viewportHeight = ((0 + bounds.y) - offset.y);						
 
 			setupUI();
+			setupInput();
+
 			$("#spritesheetdemo-overlay").removeClass("overlay-hide");
 			$("#spritesheetdemo-overlay").addClass("overlay");			
 			loadingComplete(canvas, render);
@@ -66,12 +72,33 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 			loadingScreen.draw();
 			requestAnimationFrame(load);
 		}
-	}
+	}	
 
 	function setupUI() {
 		timeSlider = $("#spritesheetdemo-timeslider");
 		timeSlider.slider({ range: "max", min: 0, max: 200, value: 50 });
 		timeSliderLabel = $("#spritesheetdemo-timeslider-label");		
+	}
+
+	function setupInput() {
+		input.addListener({
+			down: function(x, y) { 
+				animationState.setAnimation(0, "Jump", false).listener = {
+					event: function (trackIndex, event) {
+					},
+					complete: function (trackIndex, loopCount) {
+						animationState.setAnimation(0, "walk", true);
+					},
+					start: function (trackIndex) {
+					},
+					end: function (trackIndex) {
+					}
+				}
+			},
+			up: function(x, y) { },
+			moved: function(x, y) {	},
+			dragged: function(x, y) { }
+		});
 	}
 
 	function render () {
