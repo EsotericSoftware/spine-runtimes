@@ -110,18 +110,7 @@ var skinsDemo = function(loadingComplete, bgColor) {
 		};
 
 		state.setAnimation(1, "empty", false, 0);
-		state.addAnimation(1, "meleeSwing1", false, 4);
-
-		state.setAnimation(2, "empty", false, 0);
-		state.addAnimation(2, "meleeSwing1", false, 7.5);
-
-		state.setAnimation(3, "empty", false, 0);
-		state.addAnimation(3, "meleeSwing2", false, 10.5);
-		state.addAnimation(3, "meleeSwing1", false, 0);
-		state.addAnimation(3, "meleeSwing2", false, 0);
-
-		state.setAnimation(4, "hideSword", false, 0);
-		state.addAnimation(4, "hideSword", false, 19.15);
+		state.setAnimation(1, "hideSword", false, 2);
 	}
 
 	function setupUI() {
