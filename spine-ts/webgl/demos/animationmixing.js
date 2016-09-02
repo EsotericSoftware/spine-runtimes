@@ -61,10 +61,7 @@ var animationMixingDemo = function(loadingComplete, bgColor) {
 
 	function setupInput() {
 		input.addListener({
-			down: function(x, y) {
-				state.setAnimation(1, "shoot", false);
-				stateNoMix.setAnimation(1, "shoot", false);	
-			},
+			down: function(x, y) { },
 			up: function(x, y) { },
 			moved: function(x, y) {	},
 			dragged: function(x, y) { }
