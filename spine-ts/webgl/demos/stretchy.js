@@ -5,12 +5,18 @@ var stretchyDemo = function(loadingComplete, bgColor) {
 	var COLOR_OUTER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.8);
 
 	var canvas, gl, renderer, input, assetManager;
-	var skeleton, bounds;		
+	var skeleton, bounds, state;		
 	var timeKeeper, loadingScreen;
 	var target = null;
-	var kneeFront, kneeBack;
 	var hoverTargets = [];
-	var controlBones = ["front leg controller", "back leg controller", "hip", "back hand controller", "front hand controller", "spine control"];
+	var controlBones = [
+		"back leg controller",
+		"front leg controller",
+		"back arm controller",
+		"front arm controller",
+		"head controller", 
+		"hip controller"
+	];
 	var coords = new spine.webgl.Vector3(), temp = new spine.webgl.Vector3(), temp2 = new spine.Vector2(), temp3 = new spine.webgl.Vector3();
 	var kneePos = new spine.Vector2();
 	var playButton, timeLine, spacing, isPlaying = true, playTime = 0;
@@ -53,8 +59,8 @@ var stretchyDemo = function(loadingComplete, bgColor) {
 			bounds = new spine.Vector2();
 			skeleton.getBounds(offset, bounds);
 			for (var i = 0; i < controlBones.length; i++) hoverTargets.push(null);
-			kneeFront = skeleton.findBone("front leg middle");
-			kneeBack = skeleton.findBone("back leg middle");			
+			state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
+			state.setAnimation(0, "idle", true);									
 
 			renderer.camera.position.x = offset.x + bounds.x / 2;
 			renderer.camera.position.y = offset.y + bounds.y / 2;
@@ -99,13 +105,18 @@ var stretchyDemo = function(loadingComplete, bgColor) {
 			dragged: function(x, y) {
 				if (target != null) {
 					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
+					var yOnly = target.data.name === "head controller" || target.data.name === "hip controller";
 					if (target.parent !== null) {
 						target.parent.worldToLocal(temp2.set(coords.x - skeleton.x, coords.y - skeleton.y));
-						target.x = temp2.x;
+						if (!yOnly) target.x = temp2.x;
 						target.y = temp2.y;
 					} else {
-						target.x = coords.x - skeleton.x;
+						if (!yOnly) target.x = coords.x - skeleton.x;
 						target.y = coords.y - skeleton.y;
+					}
+
+					if (target.data.name === "hip controller") {
+						var head = skeleton.findBone("head controller");						
 					}
 				}
 			},
@@ -123,24 +134,37 @@ var stretchyDemo = function(loadingComplete, bgColor) {
 		});
 	}
 
-	function centerKnee(kneeBone, hipBone, footBone) {
+	function center(middleBone, hipBone, footBone) {
 		temp.set(footBone.worldX + skeleton.x, footBone.worldY + skeleton.y, 0)
 			.sub(temp3.set(hipBone.worldX + skeleton.x, hipBone.worldY + skeleton.y, 0));
 		temp3.set(hipBone.worldX + skeleton.x, hipBone.worldY + skeleton.y, 0);
 		temp.scale(0.5).add(temp3);
-		kneeBone.parent.worldToLocal(kneePos.set(temp.x, temp.y));
-		kneeBone.x = kneePos.x;
-		kneeBone.y = kneePos.y;		
+		middleBone.parent.worldToLocal(kneePos.set(temp.x, temp.y));
+		middleBone.x = kneePos.x;
+		middleBone.y = kneePos.y;		
+	}
+
+	var rotate = function(handBone, elbowBone) {
+		// can do all this in world space cause handBone is essentially in world space				
+		var v = coords.set(handBone.worldX, handBone.worldY, 0).sub(new spine.webgl.Vector3(elbowBone.worldX, elbowBone.worldY, 0)).normalize();		
+		var angle = Math.acos(v.x) * spine.MathUtils.radiansToDegrees + 180; 
+		if (v.y < 0) angle = 360 - angle;
+		handBone.rotation = angle;		
 	}
 
 	function render () {
 		timeKeeper.update();
 		var delta = timeKeeper.delta;	
 
-		skeleton.updateWorldTransform();
-		centerKnee(kneeBack, skeleton.findBone("back leg root"), skeleton.findBone("back leg controller"));
-		centerKnee(kneeFront, skeleton.findBone("front leg root"), skeleton.findBone("front leg controller"));
-		skeleton.updateWorldTransform();
+		state.update(delta);
+		state.apply(skeleton);
+		center(skeleton.findBone("back leg middle"), skeleton.findBone("back leg 1"), skeleton.findBone("back leg controller"));
+		center(skeleton.findBone("front leg middle"), skeleton.findBone("front leg 1"), skeleton.findBone("front leg controller"));
+		center(skeleton.findBone("front arm middle"), skeleton.findBone("front arm 1"), skeleton.findBone("front arm controller"));
+		center(skeleton.findBone("back arm middle"), skeleton.findBone("back arm 1"), skeleton.findBone("back arm controller"));
+		rotate(skeleton.findBone("front arm controller"), skeleton.findBone("front arm elbow"));
+		rotate(skeleton.findBone("back arm controller"), skeleton.findBone("back arm elbow"));				
+		skeleton.updateWorldTransform();	
 
 		renderer.camera.viewportWidth = bounds.x * 1.2;
 		renderer.camera.viewportHeight = bounds.y * 1.2;
@@ -151,7 +175,7 @@ var stretchyDemo = function(loadingComplete, bgColor) {
 
 		renderer.begin();				
 		renderer.drawSkeleton(skeleton, true);
-		renderer.drawSkeletonDebug(skeleton, false, ["root", "front leg middle", "back leg middle"]);
+		renderer.drawSkeletonDebug(skeleton, false, ["root"]);
 		gl.lineWidth(2);
 		for (var i = 0; i < controlBones.length; i++) {		
 			var bone = skeleton.findBone(controlBones[i]);
