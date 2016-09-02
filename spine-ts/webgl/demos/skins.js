@@ -1,24 +1,25 @@
-var skinsDemo = function(pathPrefix, loadingComplete, bgColor) {	
+var skinsDemo = function(loadingComplete, bgColor) {	
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, state, offset, bounds;		
 	var timeKeeper, loadingScreen;
 	var playButton, timeLine, isPlaying = true, playTime = 0;
 	var randomizeSkins, lastSkinChange = Date.now() / 1000;
 
+	var DEMO_NAME = "SkinsDemo";
+
 	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);		
 
 	function init () {
-		if (pathPrefix === undefined) pathPrefix = "";		
-
 		canvas = document.getElementById("skinsdemo-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
-		renderer = new spine.webgl.SceneRenderer(canvas, gl);		
-		assetManager = new spine.webgl.AssetManager(gl, pathPrefix);		
-		assetManager.loadTexture("heroes.png");
-		assetManager.loadText("heroes.json");
-		assetManager.loadText("heroes.atlas");
+		renderer = new spine.webgl.SceneRenderer(canvas, gl);				
+		assetManager = spineDemos.assetManager;
+		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };		
+		assetManager.loadTexture(DEMO_NAME, textureLoader, "heroes.png");
+		assetManager.loadText(DEMO_NAME, "heroes.atlas");
+		assetManager.loadJson(DEMO_NAME, "demos.json");		
 		input = new spine.webgl.Input(canvas);
 		timeKeeper = new spine.TimeKeeper();		
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
@@ -28,13 +29,13 @@ var skinsDemo = function(pathPrefix, loadingComplete, bgColor) {
 
 	function load () {
 		timeKeeper.update();
-		if (assetManager.isLoadingComplete()) {
-			var atlas = new spine.TextureAtlas(assetManager.get("heroes.atlas"), function(path) {
-				return assetManager.get(path);		
+		if (assetManager.isLoadingComplete(DEMO_NAME)) {
+			var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "heroes.atlas"), function(path) {
+				return assetManager.get(DEMO_NAME, path);		
 			});
 			var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("heroes.json"));
+			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").heroes);
 			skeleton = new spine.Skeleton(skeletonData);
 			skeleton.setSkinByName("Assassin");
 			var stateData = new spine.AnimationStateData(skeleton.data);
@@ -211,7 +212,7 @@ var skinsDemo = function(pathPrefix, loadingComplete, bgColor) {
 
 		renderer.begin();				
 		renderer.drawSkeleton(skeleton, true);
-		var texture = assetManager.get("heroes.png");
+		var texture = assetManager.get(DEMO_NAME, "heroes.png");
 		var width = bounds.x;
 		var scale = width / texture.getImage().width;
 		var height = scale * texture.getImage().height;

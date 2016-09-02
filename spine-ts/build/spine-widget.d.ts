@@ -424,6 +424,26 @@ declare module spine {
     }
 }
 declare module spine {
+    class SharedAssetManager implements Disposable {
+        private pathPrefix;
+        private clientAssets;
+        private queuedAssets;
+        private rawAssets;
+        private errors;
+        constructor(pathPrefix?: string);
+        private queueAsset(clientId, textureLoader, path);
+        loadText(clientId: string, path: string): void;
+        loadJson(clientId: string, path: string): void;
+        loadTexture(clientId: string, textureLoader: (image: HTMLImageElement) => any, path: string): void;
+        get(clientId: string, path: string): any;
+        private updateClientAssets(clientAssets);
+        isLoadingComplete(clientId: string): boolean;
+        dispose(): void;
+        hasErrors(): boolean;
+        getErrors(): Map<string>;
+    }
+}
+declare module spine {
     class Skeleton {
         data: SkeletonData;
         bones: Array<Bone>;
@@ -527,7 +547,7 @@ declare module spine {
         scale: number;
         private linkedMeshes;
         constructor(attachmentLoader: AttachmentLoader);
-        readSkeletonData(json: string): SkeletonData;
+        readSkeletonData(json: string | any): SkeletonData;
         readAttachment(map: any, skin: Skin, slotIndex: number, name: string): Attachment;
         readVertices(map: any, attachment: VertexAttachment, verticesLength: number): void;
         readAnimation(map: any, name: string, skeletonData: SkeletonData): void;
@@ -968,6 +988,9 @@ declare module spine.webgl {
 }
 declare module spine.webgl {
     class LoadingScreen {
+        private static loaded;
+        private static spinnerImg;
+        private static logoImg;
         private renderer;
         private logo;
         private spinner;

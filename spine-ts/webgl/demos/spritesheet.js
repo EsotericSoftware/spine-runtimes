@@ -1,4 +1,4 @@
-var spritesheetDemo = function(pathPrefix, loadingComplete, bgColor) {
+var spritesheetDemo = function(loadingComplete, bgColor) {
 	var SKELETON_ATLAS_COLOR = new spine.Color(0, 0.8, 0, 0.8);
 	var FRAME_ATLAS_COLOR = new spine.Color(0.8, 0, 0, 0.8);
 
@@ -11,20 +11,21 @@ var spritesheetDemo = function(pathPrefix, loadingComplete, bgColor) {
 	var timeKeeper, loadingScreen;	
 	var playTime = 0, framePlaytime = 0;
 
+	var DEMO_NAME = "SpritesheetDemo";
+
 	if (!bgColor) bgColor = new spine.Color(0, 0, 0, 1);
 
 	function init () {
-		if (pathPrefix === undefined) pathPrefix = "";		
-
 		canvas = document.getElementById("spritesheetdemo-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;	
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = new spine.webgl.AssetManager(gl, pathPrefix);		
-		assetManager.loadTexture("raptor.png");
-		assetManager.loadText("raptor.json");
-		assetManager.loadText("raptor.atlas");
+		assetManager = spineDemos.assetManager;
+		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };		
+		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas1.png");
+		assetManager.loadText(DEMO_NAME, "atlas1.atlas");
+		assetManager.loadJson(DEMO_NAME, "demos.json");	
 		timeKeeper = new spine.TimeKeeper();		
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
 		loadingScreen.backgroundColor = bgColor;
@@ -33,13 +34,13 @@ var spritesheetDemo = function(pathPrefix, loadingComplete, bgColor) {
 
 	function load () {
 		timeKeeper.update();
-		if (assetManager.isLoadingComplete()) {
-			skeletonAtlas = new spine.TextureAtlas(assetManager.get("raptor.atlas"), function(path) {
-				return assetManager.get("" + path);		
+		if (assetManager.isLoadingComplete(DEMO_NAME)) {
+			skeletonAtlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas1.atlas"), function(path) {
+				return assetManager.get(DEMO_NAME, path);		
 			});			
 			var atlasLoader = new spine.TextureAtlasAttachmentLoader(skeletonAtlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("raptor.json"));
+			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").raptor);
 			skeleton = new spine.Skeleton(skeletonData);
 			animationState = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
 			animationState.setAnimation(0, "walk", true);

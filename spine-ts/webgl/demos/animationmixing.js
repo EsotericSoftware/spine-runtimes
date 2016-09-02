@@ -1,4 +1,4 @@
-var animationMixingDemo = function(pathPrefix, loadingComplete, bgColor) {
+var animationMixingDemo = function(loadingComplete, bgColor) {
 	var OUTLINE_COLOR = new spine.Color(0, 0.8, 0, 1);	
 
 	var canvas, gl, renderer, input, assetManager;
@@ -6,6 +6,8 @@ var animationMixingDemo = function(pathPrefix, loadingComplete, bgColor) {
 	var timeSlider, timeSliderLabel;
 	var timeKeeper;
 	var loadingScreen;
+
+	var DEMO_NAME = "AnimationMixingDemo";
 
 	if (!bgColor) bgColor = new spine.Color(0, 0, 0, 1);
 
@@ -18,22 +20,24 @@ var animationMixingDemo = function(pathPrefix, loadingComplete, bgColor) {
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = new spine.webgl.AssetManager(gl, pathPrefix);
+		assetManager = spineDemos.assetManager;
+		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
 		
-		assetManager.loadTexture("spineboy.png");
-		assetManager.loadText("spineboy.json");
-		assetManager.loadText("spineboy.atlas");
-	
-		requestAnimationFrame(load);		
+		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas1.png");		
+		assetManager.loadText(DEMO_NAME, "atlas1.atlas");
+		assetManager.loadJson(DEMO_NAME, "demos.json");
+				
 		input = new spine.webgl.Input(canvas);
 		timeKeeper = new spine.TimeKeeper();		
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
-		loadingScreen.backgroundColor = bgColor;	
+		loadingScreen.backgroundColor = bgColor;
+
+		requestAnimationFrame(load);	
 	}
 
 	function load () {
 		timeKeeper.update();
-		if (assetManager.isLoadingComplete()) {
+		if (assetManager.isLoadingComplete(DEMO_NAME)) {
 			skeleton = loadSkeleton("spineboy");
 			skeletonNoMix = new spine.Skeleton(skeleton.data);					
 			state = createState(0.2);
@@ -95,12 +99,12 @@ var animationMixingDemo = function(pathPrefix, loadingComplete, bgColor) {
 	}
 
 	function loadSkeleton(name) {
-		var atlas = new spine.TextureAtlas(assetManager.get(name + ".atlas"), function(path) {
-			return assetManager.get(path);		
+		var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas1.atlas"), function(path) {
+			return assetManager.get(DEMO_NAME, path);		
 		});
 		var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
-		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(name + ".json"));
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json")[name]);
 		var skeleton = new spine.Skeleton(skeletonData);
 		skeleton.setSkinByName("default");
 		return skeleton;

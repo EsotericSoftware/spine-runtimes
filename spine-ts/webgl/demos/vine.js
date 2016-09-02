@@ -1,4 +1,4 @@
-var vineDemo = function(pathPrefix, loadingComplete, bgColor) {
+var vineDemo = function(loadingComplete, bgColor) {
 	var COLOR_INNER = new spine.Color(0.8, 0, 0, 0.5);
 	var COLOR_OUTER = new spine.Color(0.8, 0, 0, 0.8);
 	var COLOR_INNER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.5);
@@ -13,6 +13,8 @@ var vineDemo = function(pathPrefix, loadingComplete, bgColor) {
 	var coords = new spine.webgl.Vector3(), temp = new spine.webgl.Vector3(), temp2 = new spine.Vector2();
 	var playButton, timeLine, isPlaying = true, playTime = 0;
 
+	var DEMO_NAME = "vineDemo";
+
 	if (!bgColor) bgColor = new spine.Color(0, 0, 0, 1);	
 
 	function init () {
@@ -20,12 +22,13 @@ var vineDemo = function(pathPrefix, loadingComplete, bgColor) {
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
-		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = new spine.webgl.AssetManager(gl, pathPrefix);
+		renderer = new spine.webgl.SceneRenderer(canvas, gl);		
 		input = new spine.webgl.Input(canvas);
-		assetManager.loadTexture("vine.png");
-		assetManager.loadText("vine.json");
-		assetManager.loadText("vine.atlas");
+		assetManager = spineDemos.assetManager;
+		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
+		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas2.png");
+		assetManager.loadText(DEMO_NAME, "atlas2.atlas");
+		assetManager.loadJson(DEMO_NAME, "demos.json");		
 		timeKeeper = new spine.TimeKeeper();		
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
 		loadingScreen.backgroundColor = bgColor;
@@ -34,13 +37,13 @@ var vineDemo = function(pathPrefix, loadingComplete, bgColor) {
 
 	function load () {
 		timeKeeper.update();
-		if (assetManager.isLoadingComplete()) {
-			var atlas = new spine.TextureAtlas(assetManager.get("vine.atlas"), function(path) {
-				return assetManager.get(path);		
+		if (assetManager.isLoadingComplete(DEMO_NAME)) {
+			var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas2.atlas"), function(path) {
+				return assetManager.get(DEMO_NAME, path);		
 			});
 			var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("vine.json"));
+			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").vine);
 			skeleton = new spine.Skeleton(skeletonData);
 			skeleton.setToSetupPose();
 			skeleton.updateWorldTransform();

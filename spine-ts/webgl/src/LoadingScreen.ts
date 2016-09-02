@@ -1,5 +1,9 @@
 module spine.webgl {
 	export class LoadingScreen {
+		private static loaded = 0; 
+		private static spinnerImg: HTMLImageElement = null;
+		private static logoImg: HTMLImageElement = null;
+
 		private renderer: SceneRenderer;
 		private logo: GLTexture = null;
 		private spinner: GLTexture = null;
@@ -17,19 +21,22 @@ module spine.webgl {
 
 		constructor (renderer: SceneRenderer) {
 			this.renderer = renderer;
-			var logoImg = document.createElement("img");						
-			logoImg.src = LoadingScreen.useDark ? LoadingScreen.SPINE_LOGO_DARK_DATA : LoadingScreen.SPINE_LOGO_DATA;
-			logoImg.crossOrigin = "anonymous";
-			logoImg.onload = (ev) => {
-				this.logo = new GLTexture(renderer.gl, logoImg);
-			}						
 
-			var spinnerImg = new Image();
-			spinnerImg.src = LoadingScreen.useDark ? LoadingScreen.SPINNER_DARK_DATA : LoadingScreen.SPINNER_DATA;
-			logoImg.crossOrigin = "anonymous";
-			spinnerImg.onload = (ev) => {
-				this.spinner = new GLTexture(renderer.gl, spinnerImg);
-			}			
+			if (LoadingScreen.logoImg === null) {
+				LoadingScreen.logoImg = document.createElement("img");						
+				LoadingScreen.logoImg.src = LoadingScreen.useDark ? LoadingScreen.SPINE_LOGO_DARK_DATA : LoadingScreen.SPINE_LOGO_DATA;
+				LoadingScreen.logoImg.crossOrigin = "anonymous";
+				LoadingScreen.logoImg.onload = (ev) => {
+					LoadingScreen.loaded++;
+				}									
+
+				LoadingScreen.spinnerImg = new Image();
+				LoadingScreen.spinnerImg.src = LoadingScreen.useDark ? LoadingScreen.SPINNER_DARK_DATA : LoadingScreen.SPINNER_DATA;
+				LoadingScreen.spinnerImg.crossOrigin = "anonymous";	
+				LoadingScreen.spinnerImg.onload = (ev) => {
+					LoadingScreen.loaded++;
+				}
+			}
 		}
 
 		draw () {			
@@ -43,8 +50,11 @@ module spine.webgl {
 			gl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
 			gl.clear(gl.COLOR_BUFFER_BIT);
 
-			if (this.logo === null || this.spinner === null) return;
-			this.logo.update(false);
+			if (LoadingScreen.loaded != 2) return;
+			if (this.logo === null) {
+				this.logo = new GLTexture(renderer.gl, LoadingScreen.logoImg);
+				this.spinner = new GLTexture(renderer.gl, LoadingScreen.spinnerImg);				
+			}
 
 			renderer.camera.position.set(canvas.width / 2, canvas.height / 2, 0);
 			renderer.camera.viewportWidth = canvas.width;

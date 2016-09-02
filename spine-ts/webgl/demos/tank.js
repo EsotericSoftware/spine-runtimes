@@ -1,23 +1,24 @@
-var tankDemo = function(pathPrefix, loadingComplete, bgColor) {	
+var tankDemo = function(loadingComplete, bgColor) {	
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, state, offset, bounds;		
 	var timeKeeper, loadingScreen;
 	var playButton, timeLine, isPlaying = true, playTime = 0;
 
+	var DEMO_NAME = "TankDemo";
+
 	if (!bgColor) bgColor = new spine.Color(0, 0, 0, 1);		
 
 	function init () {
-		if (pathPrefix === undefined) pathPrefix = "";		
-
 		canvas = document.getElementById("tankdemo-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
-		renderer = new spine.webgl.SceneRenderer(canvas, gl);		
-		assetManager = new spine.webgl.AssetManager(gl, pathPrefix);		
-		assetManager.loadTexture("tank.png");
-		assetManager.loadText("tank.json");
-		assetManager.loadText("tank.atlas");
+		renderer = new spine.webgl.SceneRenderer(canvas, gl);			
+		assetManager = spineDemos.assetManager;		
+		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
+		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas2.png");		
+		assetManager.loadText(DEMO_NAME, "atlas2.atlas");
+		assetManager.loadJson(DEMO_NAME, "demos.json");
 		timeKeeper = new spine.TimeKeeper();		
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
 		loadingScreen.backgroundColor = bgColor;
@@ -26,13 +27,13 @@ var tankDemo = function(pathPrefix, loadingComplete, bgColor) {
 
 	function load () {
 		timeKeeper.update();
-		if (assetManager.isLoadingComplete()) {
-			var atlas = new spine.TextureAtlas(assetManager.get("tank.atlas"), function(path) {
-				return assetManager.get(path);		
+		if (assetManager.isLoadingComplete(DEMO_NAME)) {
+			var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas2.atlas"), function(path) {
+				return assetManager.get(DEMO_NAME, path);	
 			});
 			var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("tank.json"));
+			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").tank);
 			skeleton = new spine.Skeleton(skeletonData);
 			state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
 			state.setAnimation(0, "drive", true);

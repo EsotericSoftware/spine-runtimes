@@ -1,4 +1,4 @@
-var stretchyDemo = function(pathPrefix, loadingComplete, bgColor) {
+var stretchyDemo = function(loadingComplete, bgColor) {
 	var COLOR_INNER = new spine.Color(0.8, 0, 0, 0.5);
 	var COLOR_OUTER = new spine.Color(0.8, 0, 0, 0.8);
 	var COLOR_INNER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.5);
@@ -15,20 +15,22 @@ var stretchyDemo = function(pathPrefix, loadingComplete, bgColor) {
 	var kneePos = new spine.Vector2();
 	var playButton, timeLine, spacing, isPlaying = true, playTime = 0;
 
+	var DEMO_NAME = "StretchyDemo";
+
 	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);	
 
 	function init () {
-
 		canvas = document.getElementById("stretchydemo-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = new spine.webgl.AssetManager(gl, pathPrefix);
+		assetManager = spineDemos.assetManager;
+		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
 		input = new spine.webgl.Input(canvas);		
-		assetManager.loadTexture("stretchyman.png");
-		assetManager.loadText("stretchyman.json");
-		assetManager.loadText("stretchyman.atlas");
+		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas2.png");
+		assetManager.loadText(DEMO_NAME, "atlas2.atlas");
+		assetManager.loadJson(DEMO_NAME, "demos.json");	
 		timeKeeper = new spine.TimeKeeper();		
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
 		loadingScreen.backgroundColor = bgColor;
@@ -37,13 +39,13 @@ var stretchyDemo = function(pathPrefix, loadingComplete, bgColor) {
 
 	function load () {
 		timeKeeper.update();
-		if (assetManager.isLoadingComplete()) {
-			var atlas = new spine.TextureAtlas(assetManager.get("stretchyman.atlas"), function(path) {
-				return assetManager.get(path);		
+		if (assetManager.isLoadingComplete(DEMO_NAME)) {
+			var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas2.atlas"), function(path) {
+				return assetManager.get(DEMO_NAME, path);		
 			});
 			var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("stretchyman.json"));
+			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").stretchyman);
 			skeleton = new spine.Skeleton(skeletonData);
 			skeleton.setToSetupPose();
 			skeleton.updateWorldTransform();

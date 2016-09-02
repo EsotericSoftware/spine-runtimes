@@ -1,10 +1,12 @@
-var meshesDemo = function(pathPrefix, loadingComplete, bgColor) {
+var meshesDemo = function(loadingComplete, bgColor) {
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, bounds;		
 	var timeKeeper, loadingScreen;
 	var skeletons = {};
 	var activeSkeleton = "Orange Girl";
 	var playButton, timeLine, isPlaying = true;
+
+	var DEMO_NAME = "MeshesDemo";
 
 	if (!bgColor) bgColor = new spine.Color(0, 0, 0, 1);
 
@@ -15,16 +17,11 @@ var meshesDemo = function(pathPrefix, loadingComplete, bgColor) {
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		renderer.skeletonDebugRenderer.drawRegionAttachments = false;
-		assetManager = new spine.webgl.AssetManager(gl, pathPrefix);		
-		assetManager.loadTexture("orangegirl.png");
-		assetManager.loadText("orangegirl.json");
-		assetManager.loadText("orangegirl.atlas");
-		assetManager.loadTexture("greengirl.png");		
-		assetManager.loadText("greengirl.json");
-		assetManager.loadText("greengirl.atlas");
-		assetManager.loadTexture("armorgirl.png");		
-		assetManager.loadText("armorgirl.json");
-		assetManager.loadText("armorgirl.atlas");
+		assetManager = spineDemos.assetManager;
+		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };		
+		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas2.png");
+		assetManager.loadText(DEMO_NAME, "atlas2.atlas");
+		assetManager.loadJson(DEMO_NAME, "demos.json");	
 		timeKeeper = new spine.TimeKeeper();		
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
 		loadingScreen.backgroundColor = bgColor;
@@ -33,7 +30,7 @@ var meshesDemo = function(pathPrefix, loadingComplete, bgColor) {
 
 	function load () {
 		timeKeeper.update();
-		if (assetManager.isLoadingComplete()) {
+		if (assetManager.isLoadingComplete(DEMO_NAME)) {
 			skeletons["Orange Girl"] = loadSkeleton("orangegirl", "animation");
 			skeletons["Green Girl"] = loadSkeleton("greengirl", "animation");
 			skeletons["Armor Girl"] = loadSkeleton("armorgirl", "animation");
@@ -102,12 +99,12 @@ var meshesDemo = function(pathPrefix, loadingComplete, bgColor) {
 	}
 
 	function loadSkeleton(name, animation, sequenceSlots) {
-		var atlas = new spine.TextureAtlas(assetManager.get(name + ".atlas"), function(path) {
-			return assetManager.get(path);		
+		var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas2.atlas"), function(path) {
+			return assetManager.get(DEMO_NAME, path);		
 		});
 		var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
-		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(name + ".json"));
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json")[name]);
 		var skeleton = new spine.Skeleton(skeletonData);
 		skeleton.setSkinByName("default");
 

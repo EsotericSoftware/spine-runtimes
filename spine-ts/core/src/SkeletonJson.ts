@@ -39,10 +39,10 @@ module spine {
 			this.attachmentLoader = attachmentLoader;
 		}
 
-		readSkeletonData (json: string): SkeletonData {
+		readSkeletonData (json: string | any ): SkeletonData {
 			let scale = this.scale;
 			let skeletonData = new SkeletonData();			
-			let root = JSON.parse(json);
+			let root = typeof(json) === "string" ? JSON.parse(json) : json;
 
 			// Skeleton
 			let skeletonMap = root.skeleton;

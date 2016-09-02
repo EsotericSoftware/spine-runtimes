@@ -2231,6 +2231,144 @@ var spine;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
+    var Assets = (function () {
+        function Assets(clientId) {
+            this.toLoad = new Array();
+            this.assets = {};
+            this.clientId = clientId;
+        }
+        Assets.prototype.loaded = function () {
+            var i = 0;
+            for (var v in this.assets)
+                i++;
+            return i;
+        };
+        return Assets;
+    }());
+    var SharedAssetManager = (function () {
+        function SharedAssetManager(pathPrefix) {
+            if (pathPrefix === void 0) { pathPrefix = ""; }
+            this.clientAssets = {};
+            this.queuedAssets = {};
+            this.rawAssets = {};
+            this.errors = {};
+            this.pathPrefix = pathPrefix;
+        }
+        SharedAssetManager.prototype.queueAsset = function (clientId, textureLoader, path) {
+            var clientAssets = this.clientAssets[clientId];
+            if (clientAssets === null || clientAssets === undefined) {
+                clientAssets = new Assets(clientId);
+                this.clientAssets[clientId] = clientAssets;
+            }
+            if (textureLoader !== null)
+                clientAssets.textureLoader = textureLoader;
+            clientAssets.toLoad.push(path);
+            if (this.queuedAssets[path] === path) {
+                return false;
+            }
+            else {
+                this.queuedAssets[path] = path;
+                return true;
+            }
+        };
+        SharedAssetManager.prototype.loadText = function (clientId, path) {
+            var _this = this;
+            path = this.pathPrefix + path;
+            if (!this.queueAsset(clientId, null, path))
+                return;
+            var request = new XMLHttpRequest();
+            request.onreadystatechange = function () {
+                if (request.readyState == XMLHttpRequest.DONE) {
+                    if (request.status >= 200 && request.status < 300) {
+                        _this.rawAssets[path] = request.responseText;
+                    }
+                    else {
+                        _this.errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
+                    }
+                }
+            };
+            request.open("GET", path, true);
+            request.send();
+        };
+        SharedAssetManager.prototype.loadJson = function (clientId, path) {
+            var _this = this;
+            path = this.pathPrefix + path;
+            if (!this.queueAsset(clientId, null, path))
+                return;
+            var request = new XMLHttpRequest();
+            request.onreadystatechange = function () {
+                if (request.readyState == XMLHttpRequest.DONE) {
+                    if (request.status >= 200 && request.status < 300) {
+                        _this.rawAssets[path] = JSON.parse(request.responseText);
+                    }
+                    else {
+                        _this.errors[path] = "Couldn't load text " + path + ": status " + request.status + ", " + request.responseText;
+                    }
+                }
+            };
+            request.open("GET", path, true);
+            request.send();
+        };
+        SharedAssetManager.prototype.loadTexture = function (clientId, textureLoader, path) {
+            var _this = this;
+            path = this.pathPrefix + path;
+            if (!this.queueAsset(clientId, textureLoader, path))
+                return;
+            var img = new Image();
+            img.src = path;
+            img.crossOrigin = "anonymous";
+            img.onload = function (ev) {
+                _this.rawAssets[path] = img;
+            };
+            img.onerror = function (ev) {
+                _this.errors[path] = "Couldn't load image " + path;
+            };
+        };
+        SharedAssetManager.prototype.get = function (clientId, path) {
+            path = this.pathPrefix + path;
+            var clientAssets = this.clientAssets[clientId];
+            if (clientAssets === null || clientAssets === undefined)
+                return true;
+            return clientAssets.assets[path];
+        };
+        SharedAssetManager.prototype.updateClientAssets = function (clientAssets) {
+            for (var i = 0; i < clientAssets.toLoad.length; i++) {
+                var path = clientAssets.toLoad[i];
+                var asset = clientAssets.assets[path];
+                if (asset === null || asset === undefined) {
+                    var rawAsset = this.rawAssets[path];
+                    if (rawAsset === null || rawAsset === undefined)
+                        continue;
+                    if (rawAsset instanceof HTMLImageElement) {
+                        clientAssets.assets[path] = clientAssets.textureLoader(rawAsset);
+                    }
+                    else {
+                        clientAssets.assets[path] = rawAsset;
+                    }
+                }
+            }
+        };
+        SharedAssetManager.prototype.isLoadingComplete = function (clientId) {
+            var clientAssets = this.clientAssets[clientId];
+            if (clientAssets === null || clientAssets === undefined)
+                return true;
+            this.updateClientAssets(clientAssets);
+            return clientAssets.toLoad.length == clientAssets.loaded();
+        };
+        SharedAssetManager.prototype.dispose = function () {
+        };
+        SharedAssetManager.prototype.hasErrors = function () {
+            return Object.keys(this.errors).length > 0;
+        };
+        SharedAssetManager.prototype.getErrors = function () {
+            return this.errors;
+        };
+        return SharedAssetManager;
+    }());
+    spine.SharedAssetManager = SharedAssetManager;
+})(spine || (spine = {}));
+var spine;
+(function (spine) {
     var Skeleton = (function () {
         function Skeleton(data) {
             this._updateCache = new Array();
@@ -2922,7 +3060,7 @@ var spine;
         SkeletonJson.prototype.readSkeletonData = function (json) {
             var scale = this.scale;
             var skeletonData = new spine.SkeletonData();
-            var root = JSON.parse(json);
+            var root = typeof (json) === "string" ? JSON.parse(json) : json;
             var skeletonMap = root.skeleton;
             if (skeletonMap != null) {
                 skeletonData.hash = skeletonMap.hash;
@@ -5176,25 +5314,26 @@ var spine;
     (function (webgl) {
         var LoadingScreen = (function () {
             function LoadingScreen(renderer) {
-                var _this = this;
                 this.logo = null;
                 this.spinner = null;
                 this.angle = 0;
                 this.timeKeeper = new spine.TimeKeeper();
                 this.backgroundColor = new spine.Color(0, 0, 0, 1);
                 this.renderer = renderer;
-                var logoImg = document.createElement("img");
-                logoImg.src = LoadingScreen.useDark ? LoadingScreen.SPINE_LOGO_DARK_DATA : LoadingScreen.SPINE_LOGO_DATA;
-                logoImg.crossOrigin = "anonymous";
-                logoImg.onload = function (ev) {
-                    _this.logo = new webgl.GLTexture(renderer.gl, logoImg);
-                };
-                var spinnerImg = new Image();
-                spinnerImg.src = LoadingScreen.useDark ? LoadingScreen.SPINNER_DARK_DATA : LoadingScreen.SPINNER_DATA;
-                logoImg.crossOrigin = "anonymous";
-                spinnerImg.onload = function (ev) {
-                    _this.spinner = new webgl.GLTexture(renderer.gl, spinnerImg);
-                };
+                if (LoadingScreen.logoImg === null) {
+                    LoadingScreen.logoImg = document.createElement("img");
+                    LoadingScreen.logoImg.src = LoadingScreen.useDark ? LoadingScreen.SPINE_LOGO_DARK_DATA : LoadingScreen.SPINE_LOGO_DATA;
+                    LoadingScreen.logoImg.crossOrigin = "anonymous";
+                    LoadingScreen.logoImg.onload = function (ev) {
+                        LoadingScreen.loaded++;
+                    };
+                    LoadingScreen.spinnerImg = new Image();
+                    LoadingScreen.spinnerImg.src = LoadingScreen.useDark ? LoadingScreen.SPINNER_DARK_DATA : LoadingScreen.SPINNER_DATA;
+                    LoadingScreen.spinnerImg.crossOrigin = "anonymous";
+                    LoadingScreen.spinnerImg.onload = function (ev) {
+                        LoadingScreen.loaded++;
+                    };
+                }
             }
             LoadingScreen.prototype.draw = function () {
                 this.timeKeeper.update();
@@ -5204,9 +5343,12 @@ var spine;
                 var gl = renderer.gl;
                 gl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
                 gl.clear(gl.COLOR_BUFFER_BIT);
-                if (this.logo === null || this.spinner === null)
+                if (LoadingScreen.loaded != 2)
                     return;
-                this.logo.update(false);
+                if (this.logo === null) {
+                    this.logo = new webgl.GLTexture(renderer.gl, LoadingScreen.logoImg);
+                    this.spinner = new webgl.GLTexture(renderer.gl, LoadingScreen.spinnerImg);
+                }
                 renderer.camera.position.set(canvas.width / 2, canvas.height / 2, 0);
                 renderer.camera.viewportWidth = canvas.width;
                 renderer.camera.viewportHeight = canvas.height;
@@ -5222,6 +5364,9 @@ var spine;
                 renderer.drawTextureRotated(this.spinner, canvas.width / 2 - width / 2 + logoWidth + margin, canvas.height / 2 - spinnerHeight / 2 + 2, spinnerWidth, spinnerHeight, spinnerWidth / 2, spinnerHeight / 2, this.angle);
                 renderer.end();
             };
+            LoadingScreen.loaded = 0;
+            LoadingScreen.spinnerImg = null;
+            LoadingScreen.logoImg = null;
             LoadingScreen.useDark = true;
             LoadingScreen.SPINNER_DATA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAfCAYAAADwbH0HAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAgtJREFUeNrsVz1LA0EQvbt8IIFoESshEBRCSsXOwhhsLBTS+jf8BSns/QtWYqeohY14lVoIpg4EAwGxMEZMkHiF5xsYdVx2z9zlksoHj8l+3Lyb2dndi2VFgO/7e/4PumDNGjdIxNejNm7hrkH4Powf2+B8DqYM9kHXtu2eGPONzoBRItoCbwUvwTUxfmeI+ChyxBzpiWZeD8FUeE4VRidSwRxX+ErB5Lj5irE3OdlRHi4bXjALR8uczmMSAcm6bJekKGOG/ROnVYdJpd0PyE5PrKXLokH4kMlUB9WIXSkg0IBYI2S5vIAD5vMwxVUET0VxHVCfNSnwC0xOcFKwOToq+3Uuf1rLa7X8YxeGaB52B8yI/jaEd2NctgTMAm1L0AObVNWbiighj8mLMQZYYFFCml7C0Yh+i8conFDaaRI2rWU7RmFPbZPwmUac1rgeo3CbDxSLtZqyqle+BiB6Yf1jHAeIsuemYDbAEh/wdc2VN8zezYid8QQfnb+E6aJX97AbRpxFV8GU6L6S4o7mOd3BUQoZcF4RJcwH3ccmDAI+CiMhqelr8RGn9v26Mnn7pfHb4zQ2lH1bDDqQTMVVFem9gdNzMU5n7rbmhfcxzxPzciK9dCA9BkaMCZTWw4AsZQ39s+CD8EOF1DE5cSIsz3vI/niEOZKG5mOwM/JfmCH3aoG/WFphRQmfAgwALNYr+OATlbkAAAAASUVORK5CYII=";
             LoadingScreen.SPINNER_DARK_DATA = "data:image/png;base64,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";

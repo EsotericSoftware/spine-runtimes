@@ -1,4 +1,4 @@
-var ikConstraintDemo = function(pathPrefix, loadingComplete, bgColor) {
+var ikConstraintDemo = function(loadingComplete, bgColor) {
 	var COLOR_INNER = new spine.Color(0.8, 0, 0, 0.5);
 	var COLOR_OUTER = new spine.Color(0.8, 0, 0, 0.8);
 	var COLOR_INNER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.5);
@@ -13,6 +13,8 @@ var ikConstraintDemo = function(pathPrefix, loadingComplete, bgColor) {
 	var coords = new spine.webgl.Vector3(), temp = new spine.webgl.Vector3(), temp2 = new spine.Vector2(), temp3 = new spine.webgl.Vector3();	
 	var isPlaying = true;
 
+	var DEMO_NAME = "IkConstraintDemo";
+
 	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);	
 
 	function init () {
@@ -22,11 +24,12 @@ var ikConstraintDemo = function(pathPrefix, loadingComplete, bgColor) {
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = new spine.webgl.AssetManager(gl, pathPrefix);
-		input = new spine.webgl.Input(canvas);		
-		assetManager.loadTexture("spineboy.png");
-		assetManager.loadText("spineboy-hover.json");
-		assetManager.loadText("spineboy.atlas");
+		assetManager = spineDemos.assetManager;
+		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };				
+		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas1.png");
+		assetManager.loadText(DEMO_NAME, "atlas1.atlas");
+		assetManager.loadJson(DEMO_NAME, "demos.json");		
+		input = new spine.webgl.Input(canvas);
 		timeKeeper = new spine.TimeKeeper();		
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
 		loadingScreen.backgroundColor = bgColor;
@@ -35,13 +38,13 @@ var ikConstraintDemo = function(pathPrefix, loadingComplete, bgColor) {
 
 	function load () {
 		timeKeeper.update();
-		if (assetManager.isLoadingComplete()) {
-			var atlas = new spine.TextureAtlas(assetManager.get("spineboy.atlas"), function(path) {
-				return assetManager.get(path);		
+		if (assetManager.isLoadingComplete(DEMO_NAME)) {
+			var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas1.atlas"), function(path) {
+				return assetManager.get(DEMO_NAME, path);		
 			});
 			var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("spineboy-hover.json"));
+			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json")["spineboy-hover"]);
 			skeleton = new spine.Skeleton(skeletonData);
 			state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
 			state.setAnimation(0, "idle", true);

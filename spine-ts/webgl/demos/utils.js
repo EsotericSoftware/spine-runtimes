@@ -3,8 +3,8 @@ var spineDemos;
 	spineDemos.HOVER_COLOR_INNER = new spine.Color(0.478, 0, 0, 0.25);
 	spineDemos.HOVER_COLOR_OUTER = new spine.Color(1, 1, 1, 1);
 	spineDemos.NON_HOVER_COLOR_INNER = new spine.Color(0.478, 0, 0, 0.5);
-	spineDemos.NON_HOVER_COLOR_OUTER = new spine.Color(1, 0, 0, 0.8);	
-
+	spineDemos.NON_HOVER_COLOR_OUTER = new spine.Color(1, 0, 0, 0.8);
+	spineDemos.assetManager = new spine.SharedAssetManager("http://esotericsoftware.com/demos/exports/");
 	spineDemos.setupRendering = function (canvas, renderFunc) {
 		var isVisible = false;
 

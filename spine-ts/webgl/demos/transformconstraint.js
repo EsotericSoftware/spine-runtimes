@@ -1,4 +1,4 @@
-var transformConstraintDemo = function(pathPrefix, loadingComplete, bgColor) {
+var transformConstraintDemo = function(loadingComplete, bgColor) {
 	var COLOR_INNER = new spine.Color(0.8, 0, 0, 0.5);
 	var COLOR_OUTER = new spine.Color(0.8, 0, 0, 0.8);
 	var COLOR_INNER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.5);
@@ -15,20 +15,22 @@ var transformConstraintDemo = function(pathPrefix, loadingComplete, bgColor) {
 	var lastRotation = 0;
 	var rotationOffset, mix, lastOffset = 0, lastMix = 50;
 
+	var DEMO_NAME = "TransformConstraintDemo";
+
 	if (!bgColor) bgColor = new spine.Color(0, 0, 0, 1);
 
 	function init () {
-
 		canvas = document.getElementById("transformdemo-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = new spine.webgl.AssetManager(gl, pathPrefix);
+		assetManager = spineDemos.assetManager;
+		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };		
+		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas2.png");
+		assetManager.loadText(DEMO_NAME, "atlas2.atlas");
+		assetManager.loadJson(DEMO_NAME, "demos.json");
 		input = new spine.webgl.Input(canvas);
-		assetManager.loadTexture("tank.png");
-		assetManager.loadText("transformConstraint.json");
-		assetManager.loadText("tank.atlas");
 		timeKeeper = new spine.TimeKeeper();		
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
 		loadingScreen.backgroundColor = bgColor;
@@ -37,13 +39,13 @@ var transformConstraintDemo = function(pathPrefix, loadingComplete, bgColor) {
 
 	function load () {
 		timeKeeper.update();
-		if (assetManager.isLoadingComplete()) {
-			var atlas = new spine.TextureAtlas(assetManager.get("tank.atlas"), function(path) {
-				return assetManager.get(path);		
+		if (assetManager.isLoadingComplete(DEMO_NAME)) {
+			var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas2.atlas"), function(path) {
+				return assetManager.get(DEMO_NAME, path);		
 			});
 			var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get("transformConstraint.json"));
+			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").transformConstraint);
 			skeleton = new spine.Skeleton(skeletonData);
 			skeleton.setToSetupPose();
 			skeleton.updateWorldTransform();
