@@ -13,7 +13,7 @@ var transformConstraintDemo = function(loadingComplete, bgColor) {
 	var controlBones = ["wheel2overlay", "wheel3overlay", "rotate-handle"];	
 	var coords = new spine.webgl.Vector3(), temp = new spine.webgl.Vector3(), temp2 = new spine.Vector2();
 	var lastRotation = 0;
-	var rotationOffset, mix, lastOffset = 0, lastMix = 50;
+	var mix, lastOffset = 0, lastMix = 0.5;
 
 	var DEMO_NAME = "TransformConstraintDemo";
 
@@ -75,24 +75,27 @@ var transformConstraintDemo = function(loadingComplete, bgColor) {
 	}
 
 	function setupUI() {
-		rotationOffset = $("#transformdemo-rotationoffset");
-		rotationOffset.slider({ range: "max", min: -180, max: 180, value: 0, slide: function () {
-			var val = rotationOffset.slider("value");
+		var rotationOffset = $("#transformdemo-rotationoffset").data("slider");
+		rotationOffset.changed = function (percent) {
+			var val = percent * 360 - 180;
 			var delta = val - lastOffset;
 			lastOffset = val;
 			skeleton.findTransformConstraint("wheel2").data.offsetRotation += delta;			
 			skeleton.findTransformConstraint("wheel3").data.offsetRotation += delta;
-			$("#transformdemo-rotationoffset-label").text(val + "°");
-		}});
+			$("#transformdemo-rotationoffset-label").text(Math.round(val) + "°");
+		};
+		$("#transformdemo-rotationoffset-label").text("0°");
 
-		translationMix = $("#transformdemo-translationmix");
-		translationMix.slider({ range: "max", min: 0, max: 100, value: 50, slide: function () {
-			var val = translationMix.slider("value");
+		var translationMix = $("#transformdemo-translationmix").data("slider");
+		translationMix.set(0.5);
+		translationMix.changed = function (percent) {
+			var val = percent;
 			var delta = val - lastMix;
 			lastMix = val;
-			skeleton.findTransformConstraint("wheel1").translateMix += delta / 100;			
-			$("#transformdemo-translationmix-label").text(val + "%");
-		}});	
+			skeleton.findTransformConstraint("wheel1").translateMix += delta;
+			$("#transformdemo-translationmix-label").text(Math.round(val * 100) + "%");
+		};
+		$("#transformdemo-translationmix-label").text("50%");
 	}
 
 	function setupInput() {
@@ -165,7 +168,7 @@ var transformConstraintDemo = function(loadingComplete, bgColor) {
 		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
 		gl.clear(gl.COLOR_BUFFER_BIT);
 
-		renderer.begin();				
+		renderer.begin();
 		renderer.drawSkeleton(skeleton, true);
 		renderer.drawSkeletonDebug(skeleton, false, ["root", "rotate-handle"]);
 		gl.lineWidth(2);

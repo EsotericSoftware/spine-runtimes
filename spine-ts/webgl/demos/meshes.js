@@ -57,20 +57,19 @@ var meshesDemo = function(loadingComplete, bgColor) {
 		playButton.click(playButtonUpdate);
 		playButton.addClass("pause");
 
-		timeLine = $("#meshesdemo-timeline");
-		timeLine.slider({ range: "max", min: 0, max: 100, value: 0, slide: function () {
+		timeLine = $("#meshesdemo-timeline").data("slider");
+		timeLine.changed = function (percent) {
 			if (isPlaying) playButton.click();		
 			if (!isPlaying) {
 				var active = skeletons[activeSkeleton];
-				var time = timeLine.slider("value") / 100;
 				var animationDuration = active.state.getCurrent(0).animation.duration;
-				time = animationDuration * time;
+				var time = animationDuration * percent;
 				active.state.update(time - active.playTime);
 				active.state.apply(active.skeleton);
 				active.skeleton.updateWorldTransform();
 				active.playTime = time;				
 			}
-		}});
+		};
 
 		var list = $("#meshesdemo-active-skeleton");	
 		for (var skeletonName in skeletons) {
@@ -83,7 +82,7 @@ var meshesDemo = function(loadingComplete, bgColor) {
 			activeSkeleton = $("#meshesdemo-active-skeleton option:selected").text();
 			var active = skeletons[activeSkeleton];
 			var animationDuration = active.state.getCurrent(0).animation.duration;
-			timeLine.slider("value", (active.playTime / animationDuration * 100));
+			timeLine.set(active.playTime / animationDuration);
 		})
 
 		renderer.skeletonDebugRenderer.drawBones = false;
@@ -154,7 +153,7 @@ var meshesDemo = function(loadingComplete, bgColor) {
 			while (active.playTime >= animationDuration) {
 				active.playTime -= animationDuration;
 			}
-			timeLine.slider("value", (active.playTime / animationDuration * 100));
+			timeLine.set(active.playTime / animationDuration);
 
 			state.update(delta);
 			state.apply(skeleton);

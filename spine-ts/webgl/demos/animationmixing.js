@@ -12,8 +12,8 @@ var animationMixingDemo = function(loadingComplete, bgColor) {
 	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);
 
 	function init () {
-		timeSlider = $("#animationmixingdemo-timeslider");
-		timeSlider.slider({ range: "max", min: 0, max: 200, value: 50 });
+		timeSlider = $("#animationmixingdemo-timeslider").data("slider");
+		timeSlider.set(0.5);
 		timeSliderLabel = $("#animationmixingdemo-timeslider-label");
 		canvas = document.getElementById("animationmixingdemo-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
@@ -109,8 +109,8 @@ var animationMixingDemo = function(loadingComplete, bgColor) {
 
 	function render () {
 		timeKeeper.update();
-		var delta = timeKeeper.delta * (timeSlider.slider("value") / 100);
-		if (timeSliderLabel) timeSliderLabel.text(timeSlider.slider("value") + "%");	
+		var delta = timeKeeper.delta * timeSlider.get();
+		if (timeSliderLabel) timeSliderLabel.text(Math.round(timeSlider.get() * 100) + "%");
 
 		var offset = bounds.offset;
 		var size = bounds.size;

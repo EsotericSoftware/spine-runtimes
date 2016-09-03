@@ -86,19 +86,18 @@ var vineDemo = function(loadingComplete, bgColor) {
 		playButton.click(playButtonUpdate);
 		playButton.addClass("pause");
 
-		timeLine = $("#vinedemo-timeline");
-		timeLine.slider({ range: "max", min: 0, max: 100, value: 0, slide: function () {
+		timeLine = $("#vinedemo-timeline").data("slider");
+		timeLine.changed = function (percent) {
 			if (isPlaying) playButton.click();
-			if (!isPlaying) {				
-				var time = timeLine.slider("value") / 100;
+			if (!isPlaying) {
 				var animationDuration = state.getCurrent(0).animation.duration;
-				time = animationDuration * time;				
+				time = animationDuration * percent;	
 				state.update(time - playTime);
 				state.apply(skeleton);
 				skeleton.updateWorldTransform();
 				playTime = time;		
 			}
-		}});
+		};
 
 		renderer.skeletonDebugRenderer.drawPaths = false;
 		renderer.skeletonDebugRenderer.drawBones = false;
@@ -160,7 +159,7 @@ var vineDemo = function(loadingComplete, bgColor) {
 			while (playTime >= animationDuration) {
 				playTime -= animationDuration;
 			}
-			timeLine.slider("value", (playTime / animationDuration * 100));
+			timeLine.set(playTime / animationDuration);
 
 			state.update(delta);
 			state.apply(skeleton);						

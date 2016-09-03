@@ -75,8 +75,8 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 	}	
 
 	function setupUI() {
-		timeSlider = $("#spritesheetdemo-timeslider");
-		timeSlider.slider({ range: "max", min: 0, max: 200, value: 50 });
+		timeSlider = $("#spritesheetdemo-timeslider").data("slider");
+		timeSlider.set(0.5);
 		timeSliderLabel = $("#spritesheetdemo-timeslider-label");		
 	}
 
@@ -113,8 +113,8 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 		timeKeeper.update();
 		var delta = timeKeeper.delta;
 
-		delta *= (timeSlider.slider("value") / 100);
-		if (timeSliderLabel) timeSliderLabel.text(timeSlider.slider("value") + "%");	
+		delta *= timeSlider.get();
+		if (timeSliderLabel) timeSliderLabel.text(Math.round(timeSlider.get() * 100) + "%");	
 				
 		var animationDuration = animationState.getCurrent(0).animation.duration;
 		playTime += delta;			

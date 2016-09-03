@@ -70,19 +70,18 @@ var tankDemo = function(loadingComplete, bgColor) {
 		playButton.click(playButtonUpdate);
 		playButton.addClass("pause");
 
-		timeLine = $("#tankdemo-timeline");
-		timeLine.slider({ range: "max", min: 0, max: 100, value: 0, slide: function () {
+		timeLine = $("#tankdemo-timeline").data("slider");
+		timeLine.changed = function (percent) {
 			if (isPlaying) playButton.click();
-			if (!isPlaying) {				
-				var time = timeLine.slider("value") / 100;
+			if (!isPlaying) {
 				var animationDuration = state.getCurrent(0).animation.duration;
-				time = animationDuration * time;				
+				var time = animationDuration * percent;
 				state.update(time - playTime);
 				state.apply(skeleton);
 				skeleton.updateWorldTransform();
-				playTime = time;												
+				playTime = time;
 			}
-		}});
+		};
 
 		var checkbox = $("#tankdemo-drawbones");
 		renderer.skeletonDebugRenderer.drawPaths = false;
@@ -100,10 +99,9 @@ var tankDemo = function(loadingComplete, bgColor) {
 		if (isPlaying) {
 			var animationDuration = state.getCurrent(0).animation.duration;
 			playTime += delta;			
-			while (playTime >= animationDuration) {
+			while (playTime >= animationDuration)
 				playTime -= animationDuration;
-			}
-			timeLine.slider("value", (playTime / animationDuration * 100));
+			timeLine.set(playTime / animationDuration);
 
 			state.update(delta);
 			state.apply(skeleton);
