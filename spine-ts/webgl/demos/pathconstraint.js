@@ -1,4 +1,4 @@
-var vineDemo = function(loadingComplete, bgColor) {
+var pathConstraintDemo = function(loadingComplete, bgColor) {
 	var COLOR_INNER = new spine.Color(0.8, 0, 0, 0.5);
 	var COLOR_OUTER = new spine.Color(0.8, 0, 0, 0.8);
 	var COLOR_INNER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.5);
@@ -13,12 +13,12 @@ var vineDemo = function(loadingComplete, bgColor) {
 	var coords = new spine.webgl.Vector3(), temp = new spine.webgl.Vector3(), temp2 = new spine.Vector2();
 	var playButton, timeLine, isPlaying = true, playTime = 0;
 
-	var DEMO_NAME = "vineDemo";
+	var DEMO_NAME = "PathConstraintDemo";
 
 	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);
 
 	function init () {
-		canvas = document.getElementById("vinedemo-canvas");
+		canvas = document.getElementById("pathconstraintdemo-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
@@ -72,7 +72,7 @@ var vineDemo = function(loadingComplete, bgColor) {
 	}
 
 	function setupUI() {
-		playButton = $("#vinedemo-playbutton");
+		playButton = $("#pathconstraintdemo-playbutton");
 		var playButtonUpdate = function () {			
 			isPlaying = !isPlaying;
 			if (isPlaying) {
@@ -86,7 +86,7 @@ var vineDemo = function(loadingComplete, bgColor) {
 		playButton.click(playButtonUpdate);
 		playButton.addClass("pause");
 
-		timeLine = $("#vinedemo-timeline").data("slider");
+		timeLine = $("#pathconstraintdemo-timeline").data("slider");
 		timeLine.changed = function (percent) {
 			if (isPlaying) playButton.click();
 			if (!isPlaying) {
@@ -101,7 +101,7 @@ var vineDemo = function(loadingComplete, bgColor) {
 
 		renderer.skeletonDebugRenderer.drawPaths = false;
 		renderer.skeletonDebugRenderer.drawBones = false;
-		var checkbox = $("#vinedemo-drawbones");
+		var checkbox = $("#pathconstraintdemo-drawbones");
 		checkbox.change(function() {
 			renderer.skeletonDebugRenderer.drawPaths = this.checked;
 			renderer.skeletonDebugRenderer.drawBones = this.checked;			
