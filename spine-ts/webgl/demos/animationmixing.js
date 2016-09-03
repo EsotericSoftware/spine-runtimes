@@ -110,7 +110,11 @@ var animationMixingDemo = function(loadingComplete, bgColor) {
 	function render () {
 		timeKeeper.update();
 		var delta = timeKeeper.delta * timeSlider.get();
-		if (timeSliderLabel) timeSliderLabel.text(Math.round(timeSlider.get() * 100) + "%");
+		if (timeSliderLabel) {
+			var oldValue = timeSliderLabel[0].textContent;
+			var newValue = Math.round(timeSlider.get() * 100) + "%";
+			if (oldValue !== newValue) timeSliderLabel[0].textContent = newValue;
+		} 
 
 		var offset = bounds.offset;
 		var size = bounds.size;

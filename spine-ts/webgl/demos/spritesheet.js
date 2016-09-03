@@ -114,7 +114,11 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 		var delta = timeKeeper.delta;
 
 		delta *= timeSlider.get();
-		if (timeSliderLabel) timeSliderLabel.text(Math.round(timeSlider.get() * 100) + "%");	
+		if (timeSliderLabel) {
+			var oldValue = timeSliderLabel[0].textContent;
+			var newValue = Math.round(timeSlider.get() * 100) + "%";
+			if (oldValue !== newValue) timeSliderLabel[0].textContent = newValue;
+		} 	
 				
 		var animationDuration = animationState.getCurrent(0).animation.duration;
 		playTime += delta;			
