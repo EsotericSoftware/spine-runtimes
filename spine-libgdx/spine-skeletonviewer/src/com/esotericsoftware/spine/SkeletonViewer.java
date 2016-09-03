@@ -329,9 +329,9 @@ public class SkeletonViewer extends ApplicationAdapter {
 		List<String> skinList = new List(skin);
 		CheckBox loopCheckbox = new CheckBox("Loop", skin);
 		CheckBox premultipliedCheckbox = new CheckBox("Premultiplied", skin);
-		Slider mixSlider = new Slider(0f, 2, 0.01f, false, skin);
+		Slider mixSlider = new Slider(0, 4, 0.01f, false, skin);
 		Label mixLabel = new Label("0.3", skin);
-		Slider speedSlider = new Slider(0.1f, 3, 0.01f, false, skin);
+		Slider speedSlider = new Slider(0, 3, 0.01f, false, skin);
 		Label speedLabel = new Label("1.0", skin);
 		CheckBox flipXCheckbox = new CheckBox("X", skin);
 		CheckBox flipYCheckbox = new CheckBox("Y", skin);
@@ -359,12 +359,13 @@ public class SkeletonViewer extends ApplicationAdapter {
 			loopCheckbox.setChecked(true);
 
 			scaleSlider.setValue(1);
-			scaleSlider.setSnapToValues(new float[] {1}, 0.1f);
+			scaleSlider.setSnapToValues(new float[] {1, 1.5f, 2, 2.5f, 3, 3.5f}, 0.01f);
 
 			mixSlider.setValue(0.3f);
+			mixSlider.setSnapToValues(new float[] {1, 1.5f, 2, 2.5f, 3, 3.5f}, 0.1f);
 
 			speedSlider.setValue(1);
-			speedSlider.setSnapToValues(new float[] {1}, 0.1f);
+			speedSlider.setSnapToValues(new float[] {0.5f, 0.75f, 1, 1.25f, 1.5f, 2, 2.5f}, 0.1f);
 
 			window.setMovable(false);
 			window.setResizable(false);
@@ -621,7 +622,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			prefs.putInteger("x", skeletonX);
 			prefs.putInteger("y", skeletonY);
 			if (animationList.getSelected() != null) prefs.putString("animationName", animationList.getSelected());
-			if (skinList.getSelected() != null)prefs.putString("skinName", skinList.getSelected());
+			if (skinList.getSelected() != null) prefs.putString("skinName", skinList.getSelected());
 			prefs.flush();
 		}
 

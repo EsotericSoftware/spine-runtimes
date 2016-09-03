@@ -43,7 +43,7 @@ import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 
-public class AnimationStateTest {
+public class AnimationStateTests {
 	final SkeletonJson json = new SkeletonJson(new AttachmentLoader() {
 		public RegionAttachment newRegionAttachment (Skin skin, String name, String path) {
 			return null;
@@ -112,7 +112,7 @@ public class AnimationStateTest {
 	boolean fail;
 	int test;
 
-	AnimationStateTest () {
+	AnimationStateTests () {
 		skeletonData = json.readSkeletonData(new LwjglFileHandle("test/test.json", FileType.Internal));
 
 		TrackEntry entry;
@@ -645,11 +645,12 @@ public class AnimationStateTest {
 
 			expect(-1, "start", 0, 0.7f), //
 			expect(-1, "complete", 0.1f, 0.8f), //
-			expect(-1, "end", 0.1f, 0.9f), //
-			expect(-1, "dispose", 0.1f, 0.9f), //
 
 			expect(0, "end", 0.8f, 0.9f), //
-			expect(0, "dispose", 0.8f, 0.9f) //
+			expect(0, "dispose", 0.8f, 0.9f), //
+			
+			expect(-1, "end", 0.1f, 0.9f), //
+			expect(-1, "dispose", 0.1f, 0.9f) //
 		);
 		state.addAnimation(0, "events1", false, 0);
 		run(0.1f, 10, new TestListener() {
@@ -779,6 +780,6 @@ public class AnimationStateTest {
 	}
 
 	static public void main (String[] args) throws Exception {
-		new AnimationStateTest();
+		new AnimationStateTests();
 	}
 }
