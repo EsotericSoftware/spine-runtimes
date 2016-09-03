@@ -1,4 +1,4 @@
-var transitions = function(loadingComplete, bgColor) {
+var transitionsDemo = function(loadingComplete, bgColor) {
 	var OUTLINE_COLOR = new spine.Color(0, 0.8, 0, 1);	
 
 	var canvas, gl, renderer, input, assetManager;
@@ -12,10 +12,10 @@ var transitions = function(loadingComplete, bgColor) {
 	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);
 
 	function init () {
-		timeSlider = $("#transitions-timeslider").data("slider");
+		timeSlider = $("#transitionsdemo-timeslider").data("slider");
 		timeSlider.set(0.5);
-		timeSliderLabel = $("#transitions-timeslider-label")[0];
-		canvas = document.getElementById("transitions-canvas");
+		timeSliderLabel = $("#transitionsdemo-timeslider-label")[0];
+		canvas = document.getElementById("transitionsdemo-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
@@ -50,8 +50,8 @@ var transitions = function(loadingComplete, bgColor) {
 			bounds = { offset: new spine.Vector2(), size: new spine.Vector2() };
 			skeleton.getBounds(bounds.offset, bounds.size);
 			setupInput();
-			$("#transitions-overlay").removeClass("overlay-hide");
-			$("#transitions-overlay").addClass("overlay");	
+			$("#transitionsdemo-overlay").removeClass("overlay-hide");
+			$("#transitionsdemo-overlay").addClass("overlay");	
 			loadingComplete(canvas, render);						
 		} else {
 			loadingScreen.draw();			

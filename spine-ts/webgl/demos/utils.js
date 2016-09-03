@@ -75,7 +75,8 @@ var spineDemos = {
 				value = percent;
 			}
 			function mouseEvent (e) {
-				var x = e.pageX || e.originalEvent.touches[0].pageX;
+				var x = e.pageX;
+				if (!x && e.originalEvent.touches) x = e.originalEvent.touches[0].pageX;
 				var percent = Math.max(0, Math.min(1, (x - div.offset().left - hw / 2) / (div.width() - hw - 2)));
 				positionHandle(percent);
 				if (object.changed) object.changed(percent);

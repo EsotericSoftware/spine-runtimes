@@ -144,8 +144,16 @@ var frameByFrameDemo = function(loadingComplete, bgColor) {
 		var offset = active.bounds.offset;
 		var size = active.bounds.size;
 
-		renderer.camera.position.x = offset.x + size.x;
-		renderer.camera.position.y = offset.y + size.y / 2;
+		var x = offset.x + size.x + 100, offsetY = offset.y;
+		if (activeSkeleton === "Alien") {
+			renderer.camera.position.x = offset.x + size.x - 100;
+			renderer.camera.position.y = offset.y + size.y / 2 + 100;
+			offsetY += 125;
+		} else {
+			renderer.camera.position.x = offset.x + size.x;
+			renderer.camera.position.y = offset.y + size.y / 2;
+			x += 100;
+		}
 		renderer.camera.viewportWidth = size.x * 2.4;
 		renderer.camera.viewportHeight = size.y * 1.4;
 		renderer.resize(spine.webgl.ResizeMode.Fit);
@@ -169,8 +177,7 @@ var frameByFrameDemo = function(loadingComplete, bgColor) {
 		renderer.begin();				
 		renderer.drawSkeleton(skeleton, true);
 
-		var x = offset.x + size.x + 100;
-		var y = offset.y;
+		var y = offsetY;
 		var slotsWidth = 0, slotsHeight = 0;
 		var slotSize = size.y / 3;
 		var maxSlotWidth = 0;	
@@ -207,7 +214,7 @@ var frameByFrameDemo = function(loadingComplete, bgColor) {
 			if (j == 3) {
 				x += maxSlotWidth + 10;
 				maxSlotWidth = 0;
-				y = offset.y;
+				y = offsetY;
 				j = 0;
 			}			
 		}

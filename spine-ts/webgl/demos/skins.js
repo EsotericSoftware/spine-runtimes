@@ -211,10 +211,10 @@ var skinsDemo = function(loadingComplete, bgColor) {
 		renderer.begin();				
 		renderer.drawSkeleton(skeleton, true);
 		var texture = assetManager.get(DEMO_NAME, "heroes.png");
-		var width = bounds.x;
+		var width = bounds.x * 1.25;
 		var scale = width / texture.getImage().width;
 		var height = scale * texture.getImage().height;
-		renderer.drawTexture(texture, offset.x + bounds.x + 200, offset.y + bounds.y / 2 - height / 2 - 50, width, height);		
+		renderer.drawTexture(texture, offset.x + bounds.x + 190, offset.y + bounds.y / 2 - height / 2 - 5, width, height);		
 		renderer.end();		
 	}
 

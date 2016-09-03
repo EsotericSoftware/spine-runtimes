@@ -139,9 +139,9 @@ var meshesDemo = function(loadingComplete, bgColor) {
 		var size = active.bounds.size;
 
 		renderer.camera.position.x = offset.x + size.x / 2;
-		renderer.camera.position.y = offset.y + size.y / 2;
-		renderer.camera.viewportWidth = size.x * 1.2;
-		renderer.camera.viewportHeight = size.y * 1.2;
+		renderer.camera.position.y = offset.y + size.y / 2 + 20;
+		renderer.camera.viewportWidth = size.x * 1.1;
+		renderer.camera.viewportHeight = size.y * 1.1;
 		renderer.resize(spine.webgl.ResizeMode.Fit);
 
 		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
