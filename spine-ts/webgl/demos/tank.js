@@ -41,7 +41,10 @@ var tankDemo = function(loadingComplete, bgColor) {
 			skeleton.updateWorldTransform();
 			offset = new spine.Vector2();
 			bounds = new spine.Vector2();
-			skeleton.getBounds(offset, bounds);
+			offset.x = -1204.22;
+			bounds.x = 1914.52;
+			bounds.y = 965.78;
+			// skeleton.getBounds(offset, bounds);
 
 			renderer.skeletonDebugRenderer.drawRegionAttachments = false;
 			renderer.skeletonDebugRenderer.drawMeshHull = false;
