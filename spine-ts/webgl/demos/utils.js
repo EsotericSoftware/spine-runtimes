@@ -15,9 +15,10 @@ var spineDemos;
 		spineDemos.requestAnimationFrame(loop);
 		var demos = spineDemos.demos;		
 		for (var i = 0; i < demos.length; i++) {
-			var canvas = demos[i].canvas;
-			var renderFunc = demos[i].renderFunc;
-			if (spineDemos.isElementInViewport(canvas)) {
+			var demo = demos[i];
+			var canvas = demo.canvas;
+			var renderFunc = demo.renderFunc;
+			if (demo.visible) {
 				if (spineDemos.log) console.log("Rendering " + canvas.id);
 				renderFunc();
 			};
@@ -32,20 +33,25 @@ var spineDemos;
 	}
 
 	spineDemos.setupRendering = function (canvas, renderFunc) {
+		var demo = {canvas: canvas, renderFunc: renderFunc, visible: false};
+		$(window).on('DOMContentLoaded load resize scroll', function() {
+			spineDemos.checkElementVisible(demo);
+		});
+		spineDemos.checkElementVisible(demo);
 		setupLoop();
-		spineDemos.demos.push({canvas: canvas, renderFunc: renderFunc});		
+		spineDemos.demos.push(demo);
 	};
 
 	spineDemos.requestAnimationFrame = function(func) {
 		requestAnimationFrame(func);
 	}
 
-	spineDemos.isElementInViewport = function (canvas) {
-		var rect = canvas.getBoundingClientRect();
+	spineDemos.checkElementVisible = function (demo) {
+		var rect = demo.canvas.getBoundingClientRect();
 		var x = 0, y = 0;
 		var width = (window.innerHeight || document.documentElement.clientHeight);
 		var height = (window.innerWidth || document.documentElement.clientWidth);
-		return rect.left < x + width && rect.right > x && rect.top < y + height && rect.bottom > y;		 
+		demo.visible = rect.left < x + width && rect.right > x && rect.top < y + height && rect.bottom > y;		 
 	};
 
 	spineDemos.setupWebGLContext = function (canvas) {
