@@ -60,8 +60,8 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 			skeletonSeq.x += bounds.x + 150;
 			
 			viewportWidth = ((700 + bounds.x) - offset.x);
-			viewportHeight = ((0 + bounds.y) - offset.y);						
-
+			viewportHeight = ((0 + bounds.y) - offset.y);
+			resize();					
 			setupUI();
 			setupInput();
 
@@ -101,6 +101,14 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 		});
 	}
 
+	function resize () {
+		renderer.camera.position.x = offset.x + viewportWidth / 2 + 100;
+		renderer.camera.position.y = offset.y + viewportHeight / 2  - 160;	
+		renderer.camera.viewportWidth = viewportWidth * 1.2;
+		renderer.camera.viewportHeight = viewportHeight * 1.2;
+		renderer.resize(spine.webgl.ResizeMode.Fit);
+	}
+
 	function render () {
 		timeKeeper.update();
 		var delta = timeKeeper.delta;
@@ -126,11 +134,7 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 		}								
 		skeletonSeq.updateWorldTransform();					
 
-		renderer.camera.position.x = offset.x + viewportWidth / 2 + 100;
-		renderer.camera.position.y = offset.y + viewportHeight / 2  - 160;	
-		renderer.camera.viewportWidth = viewportWidth * 1.2;
-		renderer.camera.viewportHeight = viewportHeight * 1.2;
-		renderer.resize(spine.webgl.ResizeMode.Fit);
+		
 		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
 		gl.clear(gl.COLOR_BUFFER_BIT);	
 
