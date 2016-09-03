@@ -13,7 +13,7 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 
 	var DEMO_NAME = "SpritesheetDemo";
 
-	if (!bgColor) bgColor = new spine.Color(0, 0, 0, 1);
+	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);
 
 	function init () {
 		canvas = document.getElementById("spritesheetdemo-canvas");
@@ -61,12 +61,12 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 			
 			viewportWidth = ((700 + bounds.x) - offset.x);
 			viewportHeight = ((0 + bounds.y) - offset.y);
-			resize();					
+			resize();
 			setupUI();
 			setupInput();
 
 			$("#spritesheetdemo-overlay").removeClass("overlay-hide");
-			$("#spritesheetdemo-overlay").addClass("overlay");			
+			$("#spritesheetdemo-overlay").addClass("overlay");
 			loadingComplete(canvas, render);
 		} else {
 			loadingScreen.draw();
@@ -77,7 +77,7 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 	function setupUI() {
 		timeSlider = $("#spritesheetdemo-timeslider").data("slider");
 		timeSlider.set(0.5);
-		timeSliderLabel = $("#spritesheetdemo-timeslider-label");		
+		timeSliderLabel = $("#spritesheetdemo-timeslider-label")[0];
 	}
 
 	function setupInput() {
@@ -115,9 +115,9 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 
 		delta *= timeSlider.get();
 		if (timeSliderLabel) {
-			var oldValue = timeSliderLabel[0].textContent;
+			var oldValue = timeSliderLabel.textContent;
 			var newValue = Math.round(timeSlider.get() * 100) + "%";
-			if (oldValue !== newValue) timeSliderLabel[0].textContent = newValue;
+			if (oldValue !== newValue) timeSliderLabel.textContent = newValue;
 		} 	
 				
 		var animationDuration = animationState.getCurrent(0).animation.duration;

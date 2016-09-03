@@ -8,7 +8,7 @@ var meshesDemo = function(loadingComplete, bgColor) {
 
 	var DEMO_NAME = "MeshesDemo";
 
-	if (!bgColor) bgColor = new spine.Color(0, 0, 0, 1);
+	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);
 
 	function init () {
 		canvas = document.getElementById("meshesdemo-canvas");
@@ -35,7 +35,7 @@ var meshesDemo = function(loadingComplete, bgColor) {
 			skeletons["Green Girl"] = loadSkeleton("greengirl", "animation");
 			skeletons["Armor Girl"] = loadSkeleton("armorgirl", "animation");
 			setupUI();
-			loadingComplete(canvas, render);			
+			loadingComplete(canvas, render);
 		} else {
 			loadingScreen.draw();
 			requestAnimationFrame(load);

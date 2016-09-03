@@ -1,4 +1,4 @@
-var animationMixingDemo = function(loadingComplete, bgColor) {
+var transitions = function(loadingComplete, bgColor) {
 	var OUTLINE_COLOR = new spine.Color(0, 0.8, 0, 1);	
 
 	var canvas, gl, renderer, input, assetManager;
@@ -7,15 +7,15 @@ var animationMixingDemo = function(loadingComplete, bgColor) {
 	var timeKeeper;
 	var loadingScreen;
 
-	var DEMO_NAME = "AnimationMixingDemo";
+	var DEMO_NAME = "TransitionsDemo";
 
 	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);
 
 	function init () {
-		timeSlider = $("#animationmixingdemo-timeslider").data("slider");
+		timeSlider = $("#transitions-timeslider").data("slider");
 		timeSlider.set(0.5);
-		timeSliderLabel = $("#animationmixingdemo-timeslider-label");
-		canvas = document.getElementById("animationmixingdemo-canvas");
+		timeSliderLabel = $("#transitions-timeslider-label")[0];
+		canvas = document.getElementById("transitions-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
@@ -50,8 +50,8 @@ var animationMixingDemo = function(loadingComplete, bgColor) {
 			bounds = { offset: new spine.Vector2(), size: new spine.Vector2() };
 			skeleton.getBounds(bounds.offset, bounds.size);
 			setupInput();
-			$("#animationmixingdemo-overlay").removeClass("overlay-hide");
-			$("#animationmixingdemo-overlay").addClass("overlay");	
+			$("#transitions-overlay").removeClass("overlay-hide");
+			$("#transitions-overlay").addClass("overlay");	
 			loadingComplete(canvas, render);						
 		} else {
 			loadingScreen.draw();			
@@ -111,9 +111,9 @@ var animationMixingDemo = function(loadingComplete, bgColor) {
 		timeKeeper.update();
 		var delta = timeKeeper.delta * timeSlider.get();
 		if (timeSliderLabel) {
-			var oldValue = timeSliderLabel[0].textContent;
+			var oldValue = timeSliderLabel.textContent;
 			var newValue = Math.round(timeSlider.get() * 100) + "%";
-			if (oldValue !== newValue) timeSliderLabel[0].textContent = newValue;
+			if (oldValue !== newValue) timeSliderLabel.textContent = newValue;
 		} 
 
 		var offset = bounds.offset;

@@ -1,15 +1,15 @@
-var spineDemos;
-(function(spineDemos) {
-	spineDemos.HOVER_COLOR_INNER = new spine.Color(0.478, 0, 0, 0.25);
-	spineDemos.HOVER_COLOR_OUTER = new spine.Color(1, 1, 1, 1);
-	spineDemos.NON_HOVER_COLOR_INNER = new spine.Color(0.478, 0, 0, 0.5);
-	spineDemos.NON_HOVER_COLOR_OUTER = new spine.Color(1, 0, 0, 0.8);
-	spineDemos.assetManager = new spine.SharedAssetManager("http://esotericsoftware.com/demos/exports/");
-	spineDemos.demos = [];
-	spineDemos.loopRunning = false;
-
+var spineDemos = {
+	HOVER_COLOR_INNER: new spine.Color(0.478, 0, 0, 0.25),
+	HOVER_COLOR_OUTER: new spine.Color(1, 1, 1, 1),
+	NON_HOVER_COLOR_INNER: new spine.Color(0.478, 0, 0, 0.5),
+	NON_HOVER_COLOR_OUTER: new spine.Color(1, 0, 0, 0.8),
+	assetManager: new spine.SharedAssetManager("http://esotericsoftware.com/demos/exports/"),
+	demos: [],
+	loopRunning: false
+};
+(function() {
 	var timeKeeper = new spine.TimeKeeper();
-	var loop = function() {
+	function loop () {
 		timeKeeper.update();
 		if (spineDemos.log) console.log(timeKeeper.delta + ", " + timeKeeper.framesPerSecond);
 		spineDemos.requestAnimationFrame(loop);
@@ -21,11 +21,11 @@ var spineDemos;
 			if (demo.visible) {
 				if (spineDemos.log) console.log("Rendering " + canvas.id);
 				renderFunc();
-			};
+			}
 		}
 	}
 
-	var setupLoop = function() {
+	function setupLoop () {
 		if (!spineDemos.loopRunning) {			
 			loop();
 			spineDemos.loopRunning = true;
@@ -44,7 +44,7 @@ var spineDemos;
 
 	spineDemos.requestAnimationFrame = function(func) {
 		requestAnimationFrame(func);
-	}
+	};
 
 	spineDemos.checkElementVisible = function (demo) {
 		var rect = demo.canvas.getBoundingClientRect();
@@ -61,5 +61,39 @@ var spineDemos;
 			stencil: false
 		}
 		return gl = canvas.getContext("webgl", config) || canvas.getContext("experimental-webgl", config);
+	};
+
+	spineDemos.loadSliders = function () {
+		$(".slider").each(function () {
+			var div = $(this), handle = $("<div/>").appendTo(div);
+			var bg = div.hasClass("before") ? $("<span/>").appendTo(div) : null;
+			var hw = handle.width(), value = 0, object;
+			function positionHandle (percent) {
+				var x = (div.width() - hw - 2) * percent;
+				handle[0].style.left = x + "px";
+				if (bg) bg.css("width", x + hw / 2);
+				value = percent;
+			}
+			function mouseEvent (e) {
+				var x = e.pageX || e.originalEvent.touches[0].pageX;
+				var percent = Math.max(0, Math.min(1, (x - div.offset().left - hw / 2) / (div.width() - hw - 2)));
+				positionHandle(percent);
+				if (object.changed) object.changed(percent);
+			}
+			function clearEvents () {
+				$(document).off("mouseup.slider mousemove.slider touchmove.slider touchend.slider");
+			}
+			div.on("mousedown touchstart", function (e) {
+				mouseEvent(e);
+				e.preventDefault(); // Disable text selection.
+				$(document).on("mousemove.slider touchmove.slider", mouseEvent).on("mouseup.slider touchend.slider", clearEvents);
+			});
+			div.data("slider", object = {
+				set: positionHandle,
+				get: function () { return value; }
+			});
+			div[0].handle = handle;
+			div[0].positionHandle = positionHandle;
+		});
 	}
-})(spineDemos || (spineDemos = { }));
+})();

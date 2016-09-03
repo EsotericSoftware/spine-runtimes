@@ -15,7 +15,7 @@ var vineDemo = function(loadingComplete, bgColor) {
 
 	var DEMO_NAME = "vineDemo";
 
-	if (!bgColor) bgColor = new spine.Color(0, 0, 0, 1);	
+	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);
 
 	function init () {
 		canvas = document.getElementById("vinedemo-canvas");

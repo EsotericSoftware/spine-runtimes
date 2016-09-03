@@ -1,4 +1,4 @@
-var ikConstraintDemo = function(loadingComplete, bgColor) {
+var ikConstraintsDemo = function(loadingComplete, bgColor) {
 	var COLOR_INNER = new spine.Color(0.8, 0, 0, 0.5);
 	var COLOR_OUTER = new spine.Color(0.8, 0, 0, 0.8);
 	var COLOR_INNER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.5);
@@ -13,12 +13,11 @@ var ikConstraintDemo = function(loadingComplete, bgColor) {
 	var coords = new spine.webgl.Vector3(), temp = new spine.webgl.Vector3(), temp2 = new spine.Vector2(), temp3 = new spine.webgl.Vector3();	
 	var isPlaying = true;
 
-	var DEMO_NAME = "IkConstraintDemo";
+	var DEMO_NAME = "IkConstraintsDemo";
 
 	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);	
 
 	function init () {
-
 		canvas = document.getElementById("ikdemo-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	

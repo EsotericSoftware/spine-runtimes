@@ -23,7 +23,7 @@ var stretchyDemo = function(loadingComplete, bgColor) {
 
 	var DEMO_NAME = "StretchyDemo";
 
-	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);	
+	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);
 
 	function init () {
 		canvas = document.getElementById("stretchydemo-canvas");

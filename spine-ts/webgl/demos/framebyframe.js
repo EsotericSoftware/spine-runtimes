@@ -1,4 +1,4 @@
-var imageSequencesDemo = function(loadingComplete, bgColor) {
+var frameByFrameDemo = function(loadingComplete, bgColor) {
 	var OUTLINE_COLOR = new spine.Color(0, 0.8, 0, 1);	
 
 	var canvas, gl, renderer, input, assetManager;
@@ -8,12 +8,12 @@ var imageSequencesDemo = function(loadingComplete, bgColor) {
 	var activeSkeleton = "Alien";
 	var playButton, timeLine, isPlaying = true;
 
-	var DEMO_NAME = "ImageSequenceDemo";
+	var DEMO_NAME = "FrameByFrameDemo";
 
-	if (!bgColor) bgColor = new spine.Color(0, 0, 0, 1);
+	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);
 
 	function init () {
-		canvas = document.getElementById("imagesequencesdemo-canvas");
+		canvas = document.getElementById("framebyframedemo-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
@@ -43,7 +43,7 @@ var imageSequencesDemo = function(loadingComplete, bgColor) {
 	}
 
 	function setupUI() {
-		playButton = $("#imagesequencesdemo-playbutton");
+		playButton = $("#framebyframedemo-playbutton");
 		var playButtonUpdate = function () {			
 			isPlaying = !isPlaying;
 			if (isPlaying) {
@@ -57,7 +57,7 @@ var imageSequencesDemo = function(loadingComplete, bgColor) {
 		playButton.click(playButtonUpdate);
 		playButton.addClass("pause");
 
-		timeLine = $("#imagesequencesdemo-timeline").data("slider");
+		timeLine = $("#framebyframedemo-timeline").data("slider");
 		timeLine.changed = function (percent) {
 			if (isPlaying) playButton.click();		
 			if (!isPlaying) {
@@ -71,7 +71,7 @@ var imageSequencesDemo = function(loadingComplete, bgColor) {
 			}
 		};
 
-		var list = $("#imagesequencesdemo-active-skeleton");	
+		var list = $("#framebyframedemo-active-skeleton");	
 		for (var skeletonName in skeletons) {
 			var option = $("<option></option>");
 			option.attr("value", skeletonName).text(skeletonName);
@@ -79,7 +79,7 @@ var imageSequencesDemo = function(loadingComplete, bgColor) {
 			list.append(option);
 		}
 		list.change(function() {
-			activeSkeleton = $("#imagesequencesdemo-active-skeleton option:selected").text();
+			activeSkeleton = $("#framebyframedemo-active-skeleton option:selected").text();
 			var active = skeletons[activeSkeleton];
 			var animationDuration = active.state.getCurrent(0).animation.duration;
 			timeLine.set(active.playTime / animationDuration);

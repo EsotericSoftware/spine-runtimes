@@ -3,18 +3,20 @@
 <script src="../../build/spine-webgl.js"></script>
 <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
 <script src="utils.js"></script>
-<script src="stretchy.js"></script>
+<script src="transitions.js"></script>
 <body>
 
-<canvas id="stretchydemo-canvas"></canvas>
+<canvas id="transitions-canvas"></canvas>
 <center>
 <div style="position: fixed; top: 0; width: 100%">
-	<div><input id="stretchydemo-drawbones" type="checkbox"></input> Display bones</div>
+	Time multiplier
+	<div id="transitions-timeslider" class="slider"></div></br>
 </div>
 </center>
 
 <script>
-stretchyDemo(spineDemos.setupRendering);
+spineDemos.loadSliders();
+transitions(spineDemos.setupRendering);
 </script>
 
 </body>
