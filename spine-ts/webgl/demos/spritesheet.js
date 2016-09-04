@@ -103,6 +103,8 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 		timeKeeper.update();
 		var delta = timeKeeper.delta;
 
+		resize();
+
 		delta *= timeSlider.get();
 		if (timeSliderLabel) {
 			var oldValue = timeSliderLabel.textContent;
