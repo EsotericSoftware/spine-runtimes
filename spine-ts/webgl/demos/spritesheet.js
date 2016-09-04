@@ -82,7 +82,7 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 	function setupInput() {
 		input.addListener({
 			down: function(x, y) {
-				animationState.setAnimation(0, (clickAnim++ % 2 == 0) ? "jump" : "roar", false);
+				animationState.setAnimation(0, (clickAnim++ % 2 == 0) ? "roar" : "jump", false);
 				animationState.addAnimation(0, "walk", true, 0);
 			},
 			up: function(x, y) { },

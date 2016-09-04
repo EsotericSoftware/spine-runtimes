@@ -64,18 +64,34 @@ var spineDemos = {
 	};
 
 	spineDemos.loadSliders = function () {
+		$(window).resize(function() {
+			$(".slider").each(function () {
+				$(this).data("slider").resized();
+			});
+		});
 		$(".slider").each(function () {
 			var div = $(this), handle = $("<div/>").appendTo(div);
-			var bg = div.hasClass("before") ? $("<span/>").appendTo(div) : null;
+			var bg1, bg2;
+			if (div.hasClass("filled")) {
+				bg1 = $("<span/>").appendTo(div)[0].style;
+				bg2 = $("<span/>").appendTo(div)[0].style;
+			}
 			var hw = handle.width(), value = 0, object, lastX;
-			handle = handle[0];
+			handle = handle[0].style;
+			positionHandle(0);
 			function positionHandle (percent) {
-				var x = Math.round((div.width() - hw - 2) * percent);
+				var w = div.width();
+				var x = Math.round((w - hw - 3) * percent + 1);
 				if (x != lastX) {
-					handle.style.transform = "translateX(" + x + "px)";
 					lastX = x;
+					handle.transform = "translateX(" + x + "px)";
+					if (bg1) {
+						var w1 = x + hw / 2;
+						bg1.width = w1 + "px";
+						bg2.width = (w - w1) + "px";
+						bg2.left = w1 + "px";
+					}
 				}
-				if (bg) bg.css("width", x + hw / 2);
 				value = percent;
 			}
 			function mouseEvent (e) {
@@ -95,7 +111,11 @@ var spineDemos = {
 			});
 			div.data("slider", object = {
 				set: positionHandle,
-				get: function () { return value; }
+				get: function () { return value; },
+				resized: function () {
+					lastX = null;
+					positionHandle(value);
+				}
 			});
 		});
 	}

@@ -8,22 +8,43 @@ body, html {
 canvas {
 	position: absolute; width: 100% ;height: 100%;
 }
-.slider {	
+.slider {
 	width: 50%;
-	height: 15px;
-	background: #222;
-	border: 1px solid #c5c5c5;
 	border-radius: 3px;
 	text-align: left;
 	transform: translateZ(0);
 }
+.slider, .slider.filled span {
+	height: 15px;
+	border: 1px solid #c5c5c5;
+}
 .slider div {	
-	position: relative;
+	position: absolute;
 	top: -2px;
 	width: 10px;
 	height: 17px;
 	background: white;
 	border: #000 1px solid;
-	border-radius: 2px
-	transform: translateZ(0);
+	border-radius: 2px;
+	z-index: 10;
+}
+.slider.filled {
+	border: 0;
+}
+.slider.filled div {	
+	top: -1px;
+	margin-left: 1px;
+}
+.slider.filled span {
+	display: block;
+	position: absolute;
+	background: #3ea9f5;
+	border-top-left-radius: 3px;
+	border-bottom-left-radius: 3px;
+	z-index: 5;
+}
+.slider.filled span:last-child {
+	background: #222;
+	border-top-right-radius: 3px;
+	border-bottom-right-radius: 3px;
 }

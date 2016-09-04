@@ -69,7 +69,7 @@ module spine.webgl {
 			var logoHeight = this.logo.getImage().height;
 			var spinnerWidth = this.spinner.getImage().width;
 			var spinnerHeight = this.spinner.getImage().height;
-			var margin = 15;
+			var margin = 25;
 			var height = logoHeight + margin + spinnerHeight;			
 
 			renderer.begin();

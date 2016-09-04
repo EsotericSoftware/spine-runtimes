@@ -40,10 +40,10 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 		if (assetManager.isLoadingComplete(DEMO_NAME)) {
 			skeleton = loadSkeleton("spineboy");
 			skeletonNoMix = new spine.Skeleton(skeleton.data);					
-			state = createState(0.2);
+			state = createState(0.25);
 			setAnimations(state, 0);
-			stateNoMix = createState(0.0);
-			setAnimations(stateNoMix, -0.2);
+			stateNoMix = createState(0);
+			setAnimations(stateNoMix, -0.25);
 			
 			state.apply(skeleton);
 			skeleton.updateWorldTransform();
@@ -70,26 +70,27 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 
 	function createState(mix) {
 		var stateData = new spine.AnimationStateData(skeleton.data);
-		stateData.setMix("walk", "jump", mix);
-		stateData.setMix("jump", "walk", mix);
-		stateData.setMix("walk", "idle", mix);
-		stateData.setMix("idle", "walk", mix);			
-		var state = new spine.AnimationState(stateData);		
+		stateData.defaultMix = mix;
+		var state = new spine.AnimationState(stateData);
 		return state;
 	}
 
-	function setAnimations(state, delay) {
-		state.addAnimation(0, "idle", false, delay);
-		state.addAnimation(0, "walk", false, delay);		
-		state.addAnimation(0, "idle", false, delay);
-		state.addAnimation(0, "walk", false, delay);
-		state.addAnimation(0, "walk", false, 0);
-		state.addAnimation(0, "jump", false, delay);
-		state.addAnimation(0, "walk", false, delay).listener = {
+	function setAnimations(state, mix) {
+		state.addAnimation(0, "idle", true, 0.7);
+		state.addAnimation(0, "walk", true, 0.7);
+		state.addAnimation(0, "idle", true, 0.8);
+		state.addAnimation(0, "run", true, 0.7);
+		state.addAnimation(0, "idle", true, 0.8);
+		state.addAnimation(0, "walk", true, 0.7);
+		state.addAnimation(0, "run", true, 0.7);
+		state.addAnimation(0, "jump", false, 0.7);
+		state.addAnimation(0, "run", true, mix);
+		state.addAnimation(0, "jump", true, 0.7);
+		state.addAnimation(0, "run", true, mix).listener = {
 			event: function (trackIndex, event) {},
 			complete: function (trackIndex, loopCount) {},
 			start: function (trackIndex) { 
-				setAnimations(state, delay);
+				setAnimations(state, mix);
 			},
 			end: function (trackIndex) {}
 		};
@@ -119,8 +120,8 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 		var offset = bounds.offset;
 		var size = bounds.size;
 
-		renderer.camera.position.x = offset.x + size.x -  50;
-		renderer.camera.position.y = offset.y + size.y / 2 - 50;
+		renderer.camera.position.x = offset.x + size.x - 50;
+		renderer.camera.position.y = offset.y + size.y / 2 - 40;
 		renderer.camera.viewportWidth = size.x * 2.4;
 		renderer.camera.viewportHeight = size.y * 1.2;
 		renderer.resize(spine.webgl.ResizeMode.Fit);
@@ -132,13 +133,13 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 		state.update(delta);
 		state.apply(skeleton);
 		skeleton.updateWorldTransform();
-		skeleton.x = 0;		
+		skeleton.x = -60;
 		renderer.drawSkeleton(skeleton, true);
 
 		stateNoMix.update(delta);
 		stateNoMix.apply(skeletonNoMix);
 		skeletonNoMix.updateWorldTransform();
-		skeletonNoMix.x = size.x;	
+		skeletonNoMix.x = size.x + 60;
 		renderer.drawSkeleton(skeletonNoMix, true);
 		renderer.end();		
 	}
