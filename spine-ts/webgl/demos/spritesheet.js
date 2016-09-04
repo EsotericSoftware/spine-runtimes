@@ -9,7 +9,7 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 	var viewportWidth, viewportHeight;
 	var frames = [], currFrame = 0, frameTime = 0, frameScale = 0, FPS = 30;
 	var timeKeeper, loadingScreen, input;
-	var playTime = 0, framePlaytime = 0;
+	var playTime = 0, framePlaytime = 0, clickAnim = 0;
 
 	var DEMO_NAME = "SpritesheetDemo";
 
@@ -44,8 +44,7 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").raptor);
 			skeleton = new spine.Skeleton(skeletonData);
 			var stateData = new spine.AnimationStateData(skeleton.data);
-			stateData.setMix("walk", "Jump", 0.5);
-			stateData.setMix("Jump", "walk", 0.5);
+			stateData.defaultMix = 0.5;
 			animationState = new spine.AnimationState(stateData);
 			animationState.setAnimation(0, "walk", true);
 			animationState.apply(skeleton);
@@ -83,17 +82,8 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 	function setupInput() {
 		input.addListener({
 			down: function(x, y) { 
-				animationState.setAnimation(0, "Jump", false).listener = {
-					event: function (trackIndex, event) {
-					},
-					complete: function (trackIndex, loopCount) {
-						animationState.setAnimation(0, "walk", true);
-					},
-					start: function (trackIndex) {
-					},
-					end: function (trackIndex) {
-					}
-				}
+				animationState.setAnimation(0, (clickAnim++ % 2 == 0) ? "jump" : "roar", false);
+				animationState.addAnimation(0, "walk", true, 0);
 			},
 			up: function(x, y) { },
 			moved: function(x, y) {	},
