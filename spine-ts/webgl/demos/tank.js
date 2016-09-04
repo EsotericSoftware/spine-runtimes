@@ -86,10 +86,9 @@ var tankDemo = function(loadingComplete, bgColor) {
 			}
 		};
 
-		var checkbox = $("#tankdemo-drawbones");
 		renderer.skeletonDebugRenderer.drawPaths = false;
 		renderer.skeletonDebugRenderer.drawBones = false;
-		checkbox.change(function() {
+		$("#tankdemo-drawbones").change(function() {
 			renderer.skeletonDebugRenderer.drawPaths = this.checked;
 			renderer.skeletonDebugRenderer.drawBones = this.checked;			
 		});	

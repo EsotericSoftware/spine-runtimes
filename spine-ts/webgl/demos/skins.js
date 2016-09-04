@@ -3,7 +3,7 @@ var skinsDemo = function(loadingComplete, bgColor) {
 	var skeleton, state, offset, bounds;		
 	var timeKeeper, loadingScreen;
 	var playButton, timeLine, isPlaying = true, playTime = 0;
-	var randomizeSkins, lastSkinChange = Date.now() / 1000;
+	var randomizeSkins, lastSkinChange = Date.now() / 1000, clickAnim = 0;
 
 	var DEMO_NAME = "SkinsDemo";
 
@@ -61,7 +61,7 @@ var skinsDemo = function(loadingComplete, bgColor) {
 	function setupInput (){
 		input.addListener({
 			down: function(x, y) {
-				state.setAnimation(5, Math.random() > 0.5 ? "meleeSwing1" : "meleeSwing2", false, 0);				
+				swingSword();
 			},
 			up: function(x, y) { },
 			dragged: function(x, y) { },
@@ -133,10 +133,8 @@ var skinsDemo = function(loadingComplete, bgColor) {
 			randomizeSkins.checked = false;
 		});
 
-		var randomAttachments = $("#skinsdemo-randomizeattachments");
-		randomAttachments.click(function() {
-			randomizeAttachments();		
-		});
+		$("#skinsdemo-randomizeattachments").click(randomizeAttachments);
+		$("#skinsdemo-swingsword").click(swingSword);
 		randomizeSkins = document.getElementById("skinsdemo-randomizeskins");
 	}
 
@@ -148,7 +146,11 @@ var skinsDemo = function(loadingComplete, bgColor) {
 		slot.setAttachment(weapon);
 	}
 	
-	function randomizeSkin() {
+	function swingSword () {
+		state.setAnimation(5, (clickAnim++ % 2 == 0) ? "meleeSwing2" : "meleeSwing1", false, 0);				
+	}
+	
+	function randomizeSkin () {
 		var result;
 		var count = 0;
 		for (var skin in skeleton.data.skins) {
@@ -163,7 +165,7 @@ var skinsDemo = function(loadingComplete, bgColor) {
 		}).prop("selected", true);		
 	}
 
-	function randomizeAttachments() {
+	function randomizeAttachments () {
 		var skins = [];
 		for (var skin in skeleton.data.skins) {
 			skin = skeleton.data.skins[skin];

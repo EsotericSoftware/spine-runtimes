@@ -81,13 +81,21 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 
 	function setupInput() {
 		input.addListener({
-			down: function(x, y) { 
+			down: function(x, y) {
 				animationState.setAnimation(0, (clickAnim++ % 2 == 0) ? "jump" : "roar", false);
 				animationState.addAnimation(0, "walk", true, 0);
 			},
 			up: function(x, y) { },
 			moved: function(x, y) {	},
 			dragged: function(x, y) { }
+		});
+		$("#spritesheetdemo-roar").click(function () {
+			animationState.setAnimation(0, "roar", false);
+			animationState.addAnimation(0, "walk", true, 0);
+		});
+		$("#spritesheetdemo-jump").click(function () {
+			animationState.setAnimation(0, "jump", false);
+			animationState.addAnimation(0, "walk", true, 0);
 		});
 	}
 
