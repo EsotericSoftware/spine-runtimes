@@ -67,10 +67,14 @@ var spineDemos = {
 		$(".slider").each(function () {
 			var div = $(this), handle = $("<div/>").appendTo(div);
 			var bg = div.hasClass("before") ? $("<span/>").appendTo(div) : null;
-			var hw = handle.width(), value = 0, object;
+			var hw = handle.width(), value = 0, object, lastX;
+			handle = handle[0];
 			function positionHandle (percent) {
-				var x = (div.width() - hw - 2) * percent;
-				handle[0].style.left = x + "px";
+				var x = Math.round((div.width() - hw - 2) * percent);
+				if (x != lastX) {
+					handle.style.transform = "translateX(" + x + "px)";
+					lastX = x;
+				}
 				if (bg) bg.css("width", x + hw / 2);
 				value = percent;
 			}
@@ -93,8 +97,6 @@ var spineDemos = {
 				set: positionHandle,
 				get: function () { return value; }
 			});
-			div[0].handle = handle;
-			div[0].positionHandle = positionHandle;
 		});
 	}
 })();
