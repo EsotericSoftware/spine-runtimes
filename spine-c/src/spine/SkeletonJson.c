@@ -569,7 +569,8 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 	CONST_CAST(char*, self->error) = 0;
 	internal->linkedMeshCount = 0;
 
-	oldLocale = setlocale(LC_NUMERIC, "C");
+	oldLocale = setlocale(LC_NUMERIC, NULL);
+	setlocale(LC_NUMERIC, "C");
 	root = Json_create(json);
 	setlocale(LC_NUMERIC, oldLocale);
 	if (!root) {
