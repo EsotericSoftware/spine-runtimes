@@ -26,7 +26,7 @@ rm -rf ../vine/export/*
 
 echo ""
 echo "Exporting..."
-"/Applications/Spine/Spine.app/Contents/MacOS/Spine" \
+$SPINE_EXE \
 -i ../alien/alien.spine -o ../alien/export -e json.json \
 -i ../alien/alien.spine -o ../alien/export -e binary.json \
 -i ../alien/images -o ../alien/export -n alien -p atlas-0.5.json \
