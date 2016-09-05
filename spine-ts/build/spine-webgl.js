@@ -4943,7 +4943,7 @@ var spine;
                 var logoHeight = this.logo.getImage().height;
                 var spinnerWidth = this.spinner.getImage().width;
                 var spinnerHeight = this.spinner.getImage().height;
-                var margin = 15;
+                var margin = 25;
                 var height = logoHeight + margin + spinnerHeight;
                 renderer.begin();
                 renderer.drawTexture(this.logo, canvas.width / 2 - logoWidth / 2, canvas.height / 2 + height / 2 - logoHeight, logoWidth, logoHeight);
