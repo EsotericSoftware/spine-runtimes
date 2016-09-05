@@ -112,7 +112,7 @@ var transformConstraintDemo = function(loadingComplete, bgColor) {
 				renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
 				for (var i = 0; i < controlBones.length; i++) {	
 					var bone = skeleton.findBone(controlBones[i]);													
-					if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 20) {
+					if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30) {
 						target = bone;
 						if (target === rotateHandle) lastRotation = getRotation(x, y);
 					}				
@@ -145,7 +145,7 @@ var transformConstraintDemo = function(loadingComplete, bgColor) {
 				renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
 				for (var i = 0; i < controlBones.length; i++) {
 					var bone = skeleton.findBone(controlBones[i]);													
-					if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 20) {
+					if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30) {
 						hoverTargets[i] = bone;
 					} else {
 						hoverTargets[i] = null;
