@@ -114,7 +114,7 @@ var tankDemo = function(loadingComplete, bgColor) {
 		offset.y = skeleton.findBone("tankRoot").worldY;
 
 		renderer.camera.position.x = offset.x - 300;
-		renderer.camera.position.y = offset.y + 200;
+		renderer.camera.position.y = bounds.y - 505;
 		renderer.camera.viewportWidth = bounds.x * 1.2;
 		renderer.camera.viewportHeight = bounds.y * 1.2;
 		renderer.resize(spine.webgl.ResizeMode.Fit);
