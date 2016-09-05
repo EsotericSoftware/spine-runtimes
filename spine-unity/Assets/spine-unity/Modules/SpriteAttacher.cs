@@ -57,8 +57,16 @@ namespace Spine.Unity.Modules {
 		}
 
 		public void Attach () {
-			var skeletonRenderer = GetComponent<SkeletonRenderer>();
-			this.applyPMA = skeletonRenderer.pmaVertexColors;
+			var skeletonComponent = GetComponent<ISkeletonComponent>();
+
+			var skeletonRenderer = skeletonComponent as SkeletonRenderer;
+			if (skeletonRenderer != null)
+				this.applyPMA = skeletonRenderer.pmaVertexColors;
+			else {
+				var skeletonGraphic = skeletonComponent as SkeletonGraphic;
+				if (skeletonGraphic != null)
+					this.applyPMA = skeletonGraphic.SpineMeshGenerator.PremultiplyVertexColors;
+			}
 
 			Shader attachmentShader = applyPMA ? Shader.Find(DefaultPMAShader) : Shader.Find(DefaultStraightAlphaShader);
 
@@ -67,7 +75,7 @@ namespace Spine.Unity.Modules {
 			if (attachment == null)
 				attachment = loader.NewRegionAttachment(null, sprite.name, "");
 
-			skeletonRenderer.skeleton.FindSlot(slot).Attachment = attachment;
+			skeletonComponent.Skeleton.FindSlot(slot).Attachment = attachment;
 
 			if (!keepLoaderInMemory)
 				loader = null;
