@@ -6,7 +6,6 @@
 *****************************************************************************/
 using UnityEngine;
 using UnityEditor;
-using System.Collections;
 using System.Collections.Generic;
 using Spine;
 
@@ -14,8 +13,6 @@ namespace Spine.Unity.Editor {
 	[CustomEditor(typeof(SkeletonUtilityBone)), CanEditMultipleObjects]
 	public class SkeletonUtilityBoneInspector : UnityEditor.Editor {
 		SerializedProperty mode, boneName, zPosition, position, rotation, scale, overrideAlpha, parentReference;
-		// MITCH
-		//	SerializedProperty flip, flipX;
 
 		//multi selected flags
 		bool containsFollows, containsOverrides, multiObject;
@@ -38,15 +35,10 @@ namespace Spine.Unity.Editor {
 			overrideAlpha = this.serializedObject.FindProperty("overrideAlpha");
 			parentReference = this.serializedObject.FindProperty("parentReference");
 
-			// MITCH
-			//		flip = this.serializedObject.FindProperty("flip");
-			//		flipX = this.serializedObject.FindProperty("flipX");
-
 			EvaluateFlags();
 
-			if (utilityBone.valid == false && skeletonUtility != null && skeletonUtility.skeletonRenderer != null) {
+			if (utilityBone.valid == false && skeletonUtility != null && skeletonUtility.skeletonRenderer != null)
 				skeletonUtility.skeletonRenderer.Initialize(false);
-			}
 
 			canCreateHingeChain = CanCreateHingeChain();
 
@@ -68,16 +60,13 @@ namespace Spine.Unity.Editor {
 			for(int i = 0; i < slotCount; i++){
 				Slot slot = skeletonUtility.skeletonRenderer.skeleton.Slots.Items[i];
 				if (slot.Bone == utilityBone.bone) {
-					List<Attachment> attachments = new List<Attachment>();
-
-
-					skin.FindAttachmentsForSlot(skeleton.FindSlotIndex(slot.Data.Name), attachments);
-
-					List<BoundingBoxAttachment> boundingBoxes = new List<BoundingBoxAttachment>();
-					foreach (var att in attachments) {
-						if (att is BoundingBoxAttachment) {
-							boundingBoxes.Add((BoundingBoxAttachment)att);
-						}
+					var slotAttachments = new List<Attachment>();
+					skin.FindAttachmentsForSlot(skeleton.FindSlotIndex(slot.Data.Name), slotAttachments);
+					var boundingBoxes = new List<BoundingBoxAttachment>();
+					foreach (var att in slotAttachments) {
+						var boundingBoxAttachment = att as BoundingBoxAttachment;
+						if (boundingBoxAttachment != null)
+							boundingBoxes.Add(boundingBoxAttachment);
 					}
 
 					if (boundingBoxes.Count > 0) {
@@ -98,15 +87,13 @@ namespace Spine.Unity.Editor {
 			} else {
 				int boneCount = 0;
 				foreach (Object o in Selection.objects) {
-					if (o is GameObject) {
-						GameObject go = (GameObject)o;
+					var go = o as GameObject;
+					if (go != null) {
 						SkeletonUtilityBone sub = go.GetComponent<SkeletonUtilityBone>();
 						if (sub != null) {
 							boneCount++;
-							if (sub.mode == SkeletonUtilityBone.Mode.Follow)
-								containsFollows = true;
-							if (sub.mode == SkeletonUtilityBone.Mode.Override)
-								containsOverrides = true;
+							containsFollows |= (sub.mode == SkeletonUtilityBone.Mode.Follow);
+							containsOverrides |= (sub.mode == SkeletonUtilityBone.Mode.Override);
 						}
 					}
 				}
@@ -126,130 +113,94 @@ namespace Spine.Unity.Editor {
 				containsFollows = mode.enumValueIndex == 0;
 			}
 
-			EditorGUI.BeginDisabledGroup(multiObject);
-			{
+			using (new EditorGUI.DisabledGroupScope(multiObject)) {
 				string str = boneName.stringValue;
 				if (str == "")
 					str = "<None>";
 				if (multiObject)
 					str = "<Multiple>";
 
-				GUILayout.BeginHorizontal();
-				EditorGUILayout.PrefixLabel("Bone");
-
-				if (GUILayout.Button(str, EditorStyles.popup)) {
-					BoneSelectorContextMenu(str, ((SkeletonUtilityBone)target).skeletonUtility.skeletonRenderer.skeleton.Bones, "<None>", TargetBoneSelected);
+				using (new GUILayout.HorizontalScope()) {
+					EditorGUILayout.PrefixLabel("Bone");
+					if (GUILayout.Button(str, EditorStyles.popup)) {
+						BoneSelectorContextMenu(str, ((SkeletonUtilityBone)target).skeletonUtility.skeletonRenderer.skeleton.Bones, "<None>", TargetBoneSelected);
+					}
 				}
-
-				GUILayout.EndHorizontal();
 			}
-			EditorGUI.EndDisabledGroup();
 
 			EditorGUILayout.PropertyField(zPosition);
 			EditorGUILayout.PropertyField(position);
 			EditorGUILayout.PropertyField(rotation);
 			EditorGUILayout.PropertyField(scale);
-			// MITCH
-			//		EditorGUILayout.PropertyField(flip);
 
-			EditorGUI.BeginDisabledGroup(containsFollows);
-			{
+			using (new EditorGUI.DisabledGroupScope(containsFollows)) {
 				EditorGUILayout.PropertyField(overrideAlpha);
 				EditorGUILayout.PropertyField(parentReference);
-
-				// MITCH
-				//			EditorGUI.BeginDisabledGroup(multiObject || !flip.boolValue);
-				//			{
-				//				EditorGUI.BeginChangeCheck();
-				//				EditorGUILayout.PropertyField(flipX);
-				//				if (EditorGUI.EndChangeCheck()) {
-				//					FlipX(flipX.boolValue);
-				//				}
-				//			}
-				//			EditorGUI.EndDisabledGroup();
-
 			}
-			EditorGUI.EndDisabledGroup();
 
 			EditorGUILayout.Space();
 
-			GUILayout.BeginHorizontal();
-			{
-				EditorGUI.BeginDisabledGroup(multiObject || !utilityBone.valid || utilityBone.bone == null || utilityBone.bone.Children.Count == 0);
-				{
+			using (new GUILayout.HorizontalScope()) {
+				using (new EditorGUI.DisabledGroupScope(multiObject || !utilityBone.valid || utilityBone.bone == null || utilityBone.bone.Children.Count == 0)) {
 					if (GUILayout.Button(new GUIContent("Add Child", SpineEditorUtilities.Icons.bone), GUILayout.Width(150), GUILayout.Height(24)))
 						BoneSelectorContextMenu("", utilityBone.bone.Children, "<Recursively>", SpawnChildBoneSelected);
 				}
-				EditorGUI.EndDisabledGroup();
-
-				EditorGUI.BeginDisabledGroup(multiObject || !utilityBone.valid || utilityBone.bone == null || containsOverrides);
-				{
+				using (new EditorGUI.DisabledGroupScope(multiObject || !utilityBone.valid || utilityBone.bone == null || containsOverrides)) {
 					if (GUILayout.Button(new GUIContent("Add Override", SpineEditorUtilities.Icons.poseBones), GUILayout.Width(150), GUILayout.Height(24)))
 						SpawnOverride();
 				}
-				EditorGUI.EndDisabledGroup();
-
-				EditorGUI.BeginDisabledGroup(multiObject || !utilityBone.valid || !canCreateHingeChain);
-				{
+				using (new EditorGUI.DisabledGroupScope(multiObject || !utilityBone.valid || !canCreateHingeChain)) {
 					if (GUILayout.Button(new GUIContent("Create Hinge Chain", SpineEditorUtilities.Icons.hingeChain), GUILayout.Width(150), GUILayout.Height(24)))
 						CreateHingeChain();
 				}
-				EditorGUI.EndDisabledGroup();
-
 			}
-			GUILayout.EndHorizontal();
 
-			EditorGUI.BeginDisabledGroup(multiObject || boundingBoxTable.Count == 0);
-			EditorGUILayout.LabelField(new GUIContent("Bounding Boxes", SpineEditorUtilities.Icons.boundingBox), EditorStyles.boldLabel);
+			using (new EditorGUI.DisabledGroupScope(multiObject || boundingBoxTable.Count == 0)) {
+				EditorGUILayout.LabelField(new GUIContent("Bounding Boxes", SpineEditorUtilities.Icons.boundingBox), EditorStyles.boldLabel);
 
-			foreach(var entry in boundingBoxTable){
-				EditorGUI.indentLevel++;
-				EditorGUILayout.LabelField(entry.Key.Data.Name);
-				EditorGUI.indentLevel++;
-				foreach (var box in entry.Value) {
-					GUILayout.BeginHorizontal();
-					GUILayout.Space(30);
-					if (GUILayout.Button(box.Name, GUILayout.Width(200))) {
-						var child = utilityBone.transform.FindChild("[BoundingBox]" + box.Name);
-						if (child != null) {
-							var originalCollider = child.GetComponent<PolygonCollider2D>();
-							var updatedCollider = SkeletonUtility.AddBoundingBoxAsComponent(box, child.gameObject, originalCollider.isTrigger);
-							originalCollider.points = updatedCollider.points;
-							if (EditorApplication.isPlaying)
-								Destroy(updatedCollider);
-							else
-								DestroyImmediate(updatedCollider);
-						} else {
-							utilityBone.AddBoundingBox(currentSkinName, entry.Key.Data.Name, box.Name);
+				foreach(var entry in boundingBoxTable){
+					EditorGUI.indentLevel++;
+					EditorGUILayout.LabelField(entry.Key.Data.Name);
+					EditorGUI.indentLevel++;
+					{
+						foreach (var box in entry.Value) {
+							using (new GUILayout.HorizontalScope()) {
+								GUILayout.Space(30);
+								if (GUILayout.Button(box.Name, GUILayout.Width(200))) {
+									var child = utilityBone.transform.FindChild("[BoundingBox]" + box.Name);
+									if (child != null) {
+										var originalCollider = child.GetComponent<PolygonCollider2D>();
+										var updatedCollider = SkeletonUtility.AddBoundingBoxAsComponent(box, child.gameObject, originalCollider.isTrigger);
+										originalCollider.points = updatedCollider.points;
+										if (EditorApplication.isPlaying)
+											Destroy(updatedCollider);
+										else
+											DestroyImmediate(updatedCollider);
+									} else {
+										utilityBone.AddBoundingBox(currentSkinName, entry.Key.Data.Name, box.Name);
+									}
+
+								}
+							}
+
 						}
-
 					}
-					GUILayout.EndHorizontal();
+					EditorGUI.indentLevel--;
+					EditorGUI.indentLevel--;
 				}
 			}
-
-			EditorGUI.EndDisabledGroup();
 
 			serializedObject.ApplyModifiedProperties();
 		}
 
-		// MITCH
-		//	void FlipX (bool state) {
-		//		utilityBone.FlipX(state);
-		//		if (Application.isPlaying == false) {
-		//			skeletonUtility.skeletonAnimation.LateUpdate();
-		//		}
-		//	}
-
-		void BoneSelectorContextMenu (string current, ExposedList<Bone> bones, string topValue, GenericMenu.MenuFunction2 callback) {
+		static void BoneSelectorContextMenu (string current, ExposedList<Bone> bones, string topValue, GenericMenu.MenuFunction2 callback) {
 			GenericMenu menu = new GenericMenu();
 
 			if (topValue != "")
 				menu.AddItem(new GUIContent(topValue), current == topValue, callback, null);
 
-			for (int i = 0; i < bones.Count; i++) {
+			for (int i = 0; i < bones.Count; i++)
 				menu.AddItem(new GUIContent(bones.Items[i].Data.Name), bones.Items[i].Data.Name == current, callback, bones.Items[i]);
-			}
 
 			menu.ShowAsContext();
 
@@ -329,10 +280,10 @@ namespace Spine.Unity.Editor {
 				joint.axis = Vector3.forward;
 				joint.connectedBody = utilBone.transform.parent.GetComponent<Rigidbody>();
 				joint.useLimits = true;
-				JointLimits limits = new JointLimits();
-				limits.min = -20;
-				limits.max = 20;
-				joint.limits = limits;
+				joint.limits = new JointLimits {
+					min = -20,
+					max = 20
+				};
 				utilBone.GetComponent<Rigidbody>().mass = utilBone.transform.parent.GetComponent<Rigidbody>().mass * 0.75f;
 			}
 		}
@@ -345,8 +296,8 @@ namespace Spine.Unity.Editor {
 				} else {
 					float length = utilBone.bone.Data.Length;
 					BoxCollider box = utilBone.gameObject.AddComponent<BoxCollider>();
-					box.size = new Vector3(length, length / 3, 0.2f);
-					box.center = new Vector3(length / 2, 0, 0);
+					box.size = new Vector3(length, length / 3f, 0.2f);
+					box.center = new Vector3(length / 2f, 0, 0);
 				}
 			}
 

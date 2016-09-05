@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<exclude>
+  <resource>SDK:frameworks/libs/air/aircore.swc</resource>
+  <resource>SDK:frameworks/libs/air/airglobal.swc</resource>
+  <resource>SDK:frameworks/libs/air/applicationupdater.swc</resource>
+  <resource>SDK:frameworks/libs/air/applicationupdater_ui.swc</resource>
+  <resource>SDK:frameworks/libs/air/servicemonitor.swc</resource>
+  <resource>SDK:frameworks/libs/authoringsupport.swc</resource>
+  <resource>SDK:frameworks/libs/core.swc</resource>
+  <resource>SDK:frameworks/libs/osmf.swc</resource>
+  <resource>SDK:frameworks/libs/textLayout.swc</resource>
+</exclude>
+

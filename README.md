@@ -12,6 +12,10 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 See the Spine [runtime documentation](http://esotericsoftware.com/spine-documentation#runtimesTitle) for documentation applicable to all runtimes. See each runtime's `README.md` for runtime specific documentation.
 
+## Bugs, enhancements, and tasks
+
+Review our backlog of bugs, enhancements, and tasks in the [spine-runtimes](https://github.com/EsotericSoftware/spine-runtimes/issues) and [spine-editor](https://github.com/EsotericSoftware/spine-editor/issues) issue trackers. However, you may find it more convenient to use the [spine-runtimes waffle](https://waffle.io/EsotericSoftware/spine-runtimes) and [spine-editor waffle](https://waffle.io/EsotericSoftware/spine-editor), which provide a nicer view of the same issue tracker information.
+
 ## Versioning
 
 The code provided here is continuously under development. Generally the latest Git `master` source works with the data exported from the latest version of Spine. The Spine version can be [frozen](http://esotericsoftware.com/spine-settings#Version) at a specific Spine version that matches the Spine Runtimes source being used. Occaisionally the Spine Runtimes are [tagged](https://github.com/EsotericSoftware/spine-runtimes/releases) to work with a specific Spine version.

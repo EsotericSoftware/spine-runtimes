@@ -246,6 +246,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			debugRenderer.setBoundingBoxes(ui.debugBoundingBoxesCheckbox.isChecked());
 			debugRenderer.setMeshHull(ui.debugMeshHullCheckbox.isChecked());
 			debugRenderer.setMeshTriangles(ui.debugMeshTrianglesCheckbox.isChecked());
+			debugRenderer.setPaths(ui.debugPathsCheckbox.isChecked());
 			debugRenderer.draw(skeleton);
 		}
 
@@ -285,19 +286,20 @@ public class SkeletonViewer extends ApplicationAdapter {
 		TextButton openButton = new TextButton("Open", skin);
 		List<String> animationList = new List(skin);
 		List<String> skinList = new List(skin);
-		CheckBox loopCheckbox = new CheckBox(" Loop", skin);
-		CheckBox premultipliedCheckbox = new CheckBox(" Premultiplied", skin);
+		CheckBox loopCheckbox = new CheckBox("Loop", skin);
+		CheckBox premultipliedCheckbox = new CheckBox("Premultiplied", skin);
 		Slider mixSlider = new Slider(0f, 2, 0.01f, false, skin);
 		Label mixLabel = new Label("0.3", skin);
 		Slider speedSlider = new Slider(0.1f, 3, 0.01f, false, skin);
 		Label speedLabel = new Label("1.0", skin);
-		CheckBox flipXCheckbox = new CheckBox(" X", skin);
-		CheckBox flipYCheckbox = new CheckBox(" Y", skin);
-		CheckBox debugBonesCheckbox = new CheckBox(" Bones", skin);
-		CheckBox debugRegionsCheckbox = new CheckBox(" Regions", skin);
-		CheckBox debugBoundingBoxesCheckbox = new CheckBox(" Bounds", skin);
-		CheckBox debugMeshHullCheckbox = new CheckBox(" Mesh Hull", skin);
-		CheckBox debugMeshTrianglesCheckbox = new CheckBox(" Mesh Triangles", skin);
+		CheckBox flipXCheckbox = new CheckBox("X", skin);
+		CheckBox flipYCheckbox = new CheckBox("Y", skin);
+		CheckBox debugBonesCheckbox = new CheckBox("Bones", skin);
+		CheckBox debugRegionsCheckbox = new CheckBox("Regions", skin);
+		CheckBox debugBoundingBoxesCheckbox = new CheckBox("Bounds", skin);
+		CheckBox debugMeshHullCheckbox = new CheckBox("Mesh hull", skin);
+		CheckBox debugMeshTrianglesCheckbox = new CheckBox("Triangles", skin);
+		CheckBox debugPathsCheckbox = new CheckBox("Paths", skin);
 		Slider scaleSlider = new Slider(0.1f, 3, 0.01f, false, skin);
 		Label scaleLabel = new Label("1.0", skin);
 		TextButton pauseButton = new TextButton("Pause", skin, "toggle");
@@ -330,6 +332,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			window.setX(-3);
 			window.setY(-2);
 
+			window.getTitleLabel().setColor(new Color(0.76f, 1, 1, 1));
 			window.getTitleTable().add(openButton).space(3);
 			window.getTitleTable().add(minimizeButton).width(20);
 
@@ -356,12 +359,12 @@ public class SkeletonViewer extends ApplicationAdapter {
 			root.add("Debug:");
 			root.add(table(debugBonesCheckbox, debugRegionsCheckbox, debugBoundingBoxesCheckbox)).row();
 			root.add();
-			root.add(table(debugMeshHullCheckbox, debugMeshTrianglesCheckbox)).row();
+			root.add(table(debugMeshHullCheckbox, debugMeshTrianglesCheckbox, debugPathsCheckbox)).row();
 			root.add("Alpha:");
 			root.add(premultipliedCheckbox).row();
 			root.add("Skin:");
 			root.add(skinScroll).expand().fill().minHeight(75).row();
-			root.add("Setup Pose:");
+			root.add("Setup pose:");
 			root.add(table(bonesSetupPoseButton, slotsSetupPoseButton, setupPoseButton)).row();
 			root.add("Animation:");
 			root.add(animationScroll).expand().fill().minHeight(75).row();

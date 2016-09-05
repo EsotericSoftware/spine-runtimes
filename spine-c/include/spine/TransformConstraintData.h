@@ -40,20 +40,28 @@ extern "C" {
 
 typedef struct spTransformConstraintData {
 	const char* const name;
-
-	spBoneData* bone;
+	int bonesCount;
+	spBoneData** const bones;
 	spBoneData* target;
-	float translateMix;
-	float x, y;
+	float rotateMix, translateMix, scaleMix, shearMix;
+	float offsetRotation, offsetX, offsetY, offsetScaleX, offsetScaleY, offsetShearY;
 
 #ifdef __cplusplus
 	spTransformConstraintData() :
 		name(0),
-		bone(0),
+		bonesCount(0),
+		bones(0),
 		target(0),
+		rotateMix(0),
 		translateMix(0),
-		x(0),
-		y(0) {
+		scaleMix(0),
+		shearMix(0),
+		offsetRotation(0),
+		offsetX(0),
+		offsetY(0),
+		offsetScaleX(0),
+		offsetScaleY(0),
+		offsetShearY(0) {
 	}
 #endif
 } spTransformConstraintData;

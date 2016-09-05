@@ -12,11 +12,9 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-c works with data exported from Spine 3.1.08. Updating spine-c to [v3.2](https://trello.com/c/k7KtGdPW/76-update-runtimes-to-support-v3-2-shearing) is in progress.
+spine-c works with data exported from the latest version of Spine.
 
 spine-c supports all Spine features.
-
-spine-c does not yet support loading the binary format.
 
 ## Setup
 
@@ -48,4 +46,3 @@ spine-c uses an OOP style of programming where each "class" is made up of a stru
 - [spine-cocos2d-iphone](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2d-iphone)
 - [spine-cocos2dx](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx)
 - [spine-sfml](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-sfml)
-- [spine-torque2d](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-torque2d)

@@ -44,6 +44,14 @@ namespace Spine.Unity.Editor {
 			return n == 1 ? "" : "s";
 		}
 
+		public static void PropertyFieldWideLabel (SerializedProperty property, GUIContent label = null, float minimumLabelWidth = 150) {
+			using (new EditorGUILayout.HorizontalScope()) {
+				GUILayout.Label(label ?? new GUIContent(property.name, property.tooltip), GUILayout.MinWidth(minimumLabelWidth));
+				//GUILayout.FlexibleSpace();
+				EditorGUILayout.PropertyField(property, GUIContent.none, true, GUILayout.MinWidth(100));
+			}
+		}
+
 		#region Sorting Layer Field Helpers
 		static readonly GUIContent SortingLayerLabel = new GUIContent("Sorting Layer");
 		static readonly GUIContent OrderInLayerLabel = new GUIContent("Order in Layer");

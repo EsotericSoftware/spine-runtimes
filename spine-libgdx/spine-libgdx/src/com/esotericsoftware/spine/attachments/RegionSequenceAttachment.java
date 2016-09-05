@@ -58,7 +58,7 @@ public class RegionSequenceAttachment extends RegionAttachment {
 			frameIndex = frameIndex % regions.length;
 			break;
 		case pingPong:
-			frameIndex = frameIndex % (regions.length * 2);
+			frameIndex = frameIndex % (regions.length << 1);
 			if (frameIndex >= regions.length) frameIndex = regions.length - 1 - (frameIndex - regions.length);
 			break;
 		case random:

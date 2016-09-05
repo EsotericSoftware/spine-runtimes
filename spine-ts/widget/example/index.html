@@ -1,0 +1,33 @@
+<html>
+<script src="../../build/spine-widget.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<body>
+<center>
+<!-- You can programmatically initialize a widget -->
+<div id="spine-widget" style="margin-bottom: 20px; width: 640px; height: 480px;"></div>
+<!-- You can also specify your own x/y and scale for the skeleton -->
+<div style="margin-bottom: 20px; width: 100%; height: 150px;" class="spine-widget" data-json="assets/raptor.json" data-atlas="assets/raptor.atlas" data-animation="Jump" data-fit-to-canvas="false" data-scale="0.1" data-x="200" data-y="10"></div>
+<!-- Or make things real small -->
+<div style="margin-bottom: 20px; width: 320px; height: 240px;" class="spine-widget" data-json="assets/raptor.json" data-atlas="assets/raptor.atlas" data-animation="walk" data-background-color="#cc0000"></div>
+</center>
+</body>
+<script>
+new spine.SpineWidget("spine-widget", {
+	json: "assets/spineboy.json",
+	atlas: "assets/spineboy.atlas",		
+	animation: "run",	
+	backgroundColor: "#000000",
+	debug: true,
+	success: function (widget) {
+		var animIndex = 0;
+		widget.canvas.onclick = function () {				
+			animIndex++;
+			let animations = widget.skeleton.data.animations;
+			if (animIndex >= animations.length) animIndex = 0;
+			widget.setAnimation(animations[animIndex].name);
+		}
+	}
+});
+</script>
+</body>
+</html>

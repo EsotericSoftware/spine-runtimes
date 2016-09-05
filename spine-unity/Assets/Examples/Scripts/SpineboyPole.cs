@@ -8,7 +8,7 @@ public class SpineboyPole : MonoBehaviour {
 	public SkeletonAnimation skeletonAnimation;
 	public SkeletonRenderSeparator separator;
 
-	[Space]
+	[Space(18)]
 	[SpineAnimation]
 	public string run;
 	[SpineAnimation]

@@ -215,15 +215,19 @@ spAtlas* spAtlas_create (const char* begin, int length, const char* dir, void* r
 			page->magFilter = (spAtlasFilter)indexOf(textureFilterNames, 7, tuple + 1);
 
 			if (!readValue(&begin, end, &str)) return abortAtlas(self);
+
+			page->uWrap = SP_ATLAS_CLAMPTOEDGE;
+			page->vWrap = SP_ATLAS_CLAMPTOEDGE;
 			if (!equals(&str, "none")) {
-				page->uWrap = SP_ATLAS_CLAMPTOEDGE;
-				page->vWrap = SP_ATLAS_CLAMPTOEDGE;
-				if (*str.begin == 'x')
+				if (str.end - str.begin == 1) {
+					if (*str.begin == 'x')
+						page->uWrap = SP_ATLAS_REPEAT;
+					else if (*str.begin == 'y')
+						page->vWrap = SP_ATLAS_REPEAT;
+				} else if (equals(&str, "xy")) {
 					page->uWrap = SP_ATLAS_REPEAT;
-				else if (*str.begin == 'y')
 					page->vWrap = SP_ATLAS_REPEAT;
-				else
-					page->uWrap = page->vWrap = SP_ATLAS_REPEAT;
+				}
 			}
 
 			_spAtlasPage_createTexture(page, path);

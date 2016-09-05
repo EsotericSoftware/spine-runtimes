@@ -8,12 +8,15 @@
 <stringAttribute key="APP_ARGUMENTS" value=""/>
 <stringAttribute key="ARGUMENTS" value="-static-link-runtime-shared-libraries=true&#10;-target-player={playerVersion}&#10;-library-path+=&quot;{flexSDK}/frameworks/locale/en_US&quot;&#10;-default-size=550,400"/>
 <listAttribute key="COMPILER_CONSTANTS"/>
-<stringAttribute key="COMPILER_TECHNOLOGY" value="Flex SDK"/>
+<stringAttribute key="COMPILER_TECHNOLOGY" value="ASC"/>
 <booleanAttribute key="DISABLE_COMPILE_PROCESS" value="false"/>
 <booleanAttribute key="FORCE_FRESH_COMPILATION" value="false"/>
+<booleanAttribute key="FORCE_INCLUDE_TEST_RESOURCES" value="false"/>
+<booleanAttribute key="IGNORE_SWF_LOCATION_PROBLEM" value="false"/>
+<booleanAttribute key="INCLUDE_TEST_RESOURCES" value="false"/>
 <booleanAttribute key="KILL_PREVIOUS_VIEWER" value="true"/>
 <stringAttribute key="LAUNCHER_DEPENDENCIES" value="[Self]"/>
-<stringAttribute key="MAIN_CLASS" value="src/spine/Main.as"/>
+<stringAttribute key="MAIN_CLASS" value="src/spine/examples/Main.as"/>
 <stringAttribute key="MOBILE_PRESET" value=""/>
 <booleanAttribute key="NEW_WINDOW_EACH_LAUNCH" value="false"/>
 <stringAttribute key="OUTPUT" value="bin/spine-starling-example.swf"/>

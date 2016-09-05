@@ -30,7 +30,6 @@
  *****************************************************************************/
 #define NO_PREFAB_MESH
 
-using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -39,7 +38,7 @@ namespace Spine.Unity.Editor {
 	[CustomEditor(typeof(SkeletonRenderer))]
 	public class SkeletonRendererInspector : UnityEditor.Editor {
 		protected static bool advancedFoldout;
-		protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, separatorSlotNames, frontFacing, zSpacing;
+		protected SerializedProperty skeletonDataAsset, initialSkinName, normals, tangents, meshes, immutableTriangles, separatorSlotNames, frontFacing, zSpacing, pmaVertexColors;
 		protected SpineInspectorUtility.SerializedSortingProperties sortingProperties;
 		protected bool isInspectingPrefab;
 		protected MeshFilter meshFilter;
@@ -54,6 +53,7 @@ namespace Spine.Unity.Editor {
 			tangents = serializedObject.FindProperty("calculateTangents");
 			meshes = serializedObject.FindProperty("renderMeshes");
 			immutableTriangles = serializedObject.FindProperty("immutableTriangles");
+			pmaVertexColors = serializedObject.FindProperty("pmaVertexColors");
 			separatorSlotNames = serializedObject.FindProperty("separatorSlotNames");
 			separatorSlotNames.isExpanded = true;
 
@@ -64,24 +64,46 @@ namespace Spine.Unity.Editor {
 			sortingProperties = new SpineInspectorUtility.SerializedSortingProperties(renderer);
 		}
 
+		public static void ReapplySeparatorSlotNames (SkeletonRenderer skeletonRenderer) {
+			if (!skeletonRenderer.valid) return;
+
+			var separatorSlots = skeletonRenderer.separatorSlots;
+			var separatorSlotNames = skeletonRenderer.separatorSlotNames;
+			var skeleton = skeletonRenderer.skeleton;
+
+			separatorSlots.Clear();
+			for (int i = 0, n = separatorSlotNames.Length; i < n; i++) {
+				var slot = skeleton.FindSlot(separatorSlotNames[i]);
+				if (slot != null) {
+					separatorSlots.Add(slot);
+					//Debug.Log(slot + " added as separator.");
+				} else {
+					Debug.LogWarning(separatorSlotNames[i] + " is not a slot in " + skeletonRenderer.skeletonDataAsset.skeletonJSON.name);				
+				}
+			}
+
+			//Debug.Log("Reapplied Separator Slot Names. Count is now: " + separatorSlots.Count);
+		}
+
 		protected virtual void DrawInspectorGUI () {
+			// JOHN: todo: support multiediting.
 			SkeletonRenderer component = (SkeletonRenderer)target;
 
-			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.PropertyField(skeletonDataAsset);
-			const string ReloadButtonLabel = "Reload";
-			float reloadWidth = GUI.skin.label.CalcSize(new GUIContent(ReloadButtonLabel)).x + 20;
-			if (GUILayout.Button(ReloadButtonLabel, GUILayout.Width(reloadWidth))) {
-				if (component.skeletonDataAsset != null) {
-					foreach (AtlasAsset aa in component.skeletonDataAsset.atlasAssets) {
-						if (aa != null)
-							aa.Reset();
+			using (new EditorGUILayout.HorizontalScope()) {
+				EditorGUILayout.PropertyField(skeletonDataAsset);
+				const string ReloadButtonLabel = "Reload";
+				float reloadWidth = GUI.skin.label.CalcSize(new GUIContent(ReloadButtonLabel)).x + 20;
+				if (GUILayout.Button(ReloadButtonLabel, GUILayout.Width(reloadWidth))) {
+					if (component.skeletonDataAsset != null) {
+						foreach (AtlasAsset aa in component.skeletonDataAsset.atlasAssets) {
+							if (aa != null)
+								aa.Reset();
+						}
+						component.skeletonDataAsset.Reset();
 					}
-					component.skeletonDataAsset.Reset();
+					component.Initialize(true);
 				}
-				component.Initialize(true);
 			}
-			EditorGUILayout.EndHorizontal();
 
 			if (!component.valid) {
 				component.Initialize(true);
@@ -100,10 +122,10 @@ namespace Spine.Unity.Editor {
 
 			// Initial skin name.
 			{
-				String[] skins = new String[component.skeleton.Data.Skins.Count];
+				string[] skins = new string[component.skeleton.Data.Skins.Count];
 				int skinIndex = 0;
 				for (int i = 0; i < skins.Length; i++) {
-					String skinNameString = component.skeleton.Data.Skins.Items[i].Name;
+					string skinNameString = component.skeleton.Data.Skins.Items[i].Name;
 					skins[i] = skinNameString;
 					if (skinNameString == initialSkinName.stringValue)
 						skinIndex = i;
@@ -115,40 +137,40 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.Space();
 
 			// Sorting Layers
-			{
-				SpineInspectorUtility.SortingPropertyFields(sortingProperties, applyModifiedProperties: true);
-			}
+			SpineInspectorUtility.SortingPropertyFields(sortingProperties, applyModifiedProperties: true);
 
 			// More Render Options...
-			{
-				using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
+			using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
+				EditorGUI.indentLevel++;
+				advancedFoldout = EditorGUILayout.Foldout(advancedFoldout, "Advanced");
+				if (advancedFoldout) {
 					EditorGUI.indentLevel++;
-					advancedFoldout = EditorGUILayout.Foldout(advancedFoldout, "Advanced");
-					if (advancedFoldout) {
-						EditorGUI.indentLevel++;
-						SeparatorsField(separatorSlotNames);
-						EditorGUILayout.PropertyField(meshes,
-							new GUIContent("Render Mesh Attachments", "Disable to optimize rendering for skeletons that don't use Mesh Attachments"));
-						EditorGUILayout.PropertyField(immutableTriangles,
-							new GUIContent("Immutable Triangles", "Enable to optimize rendering for skeletons that never change attachment visbility"));
-						EditorGUILayout.Space();
+					SeparatorsField(separatorSlotNames);
+					EditorGUILayout.Space();
 
-						const float MinZSpacing = -0.1f;
-						const float MaxZSpacing = 0f;
-						EditorGUILayout.Slider(zSpacing, MinZSpacing, MaxZSpacing);
+					// Optimization options
+					SpineInspectorUtility.PropertyFieldWideLabel(meshes,
+						new GUIContent("Render MeshAttachments", "Disable to optimize rendering for skeletons that don't use Mesh Attachments"));
+					SpineInspectorUtility.PropertyFieldWideLabel(immutableTriangles,
+						new GUIContent("Immutable Triangles", "Enable to optimize rendering for skeletons that never change attachment visbility"));
+					EditorGUILayout.Space();
 
-						// Optional fields. May be disabled in SkeletonRenderer.
-						if (normals != null) {
-							EditorGUILayout.PropertyField(normals);
-							EditorGUILayout.PropertyField(tangents);
-						}
-						if (frontFacing != null)
-							EditorGUILayout.PropertyField(frontFacing);
+					// Render options
+					const float MinZSpacing = -0.1f;
+					const float MaxZSpacing = 0f;
+					EditorGUILayout.Slider(zSpacing, MinZSpacing, MaxZSpacing);
+					EditorGUILayout.Space();
+					SpineInspectorUtility.PropertyFieldWideLabel(pmaVertexColors,
+						new GUIContent("PMA Vertex Colors", "Use this if you are using the default Spine/Skeleton shader or any premultiply-alpha shader."));
 
-						EditorGUI.indentLevel--;
-					}
+					// Optional fields. May be disabled in SkeletonRenderer.
+					if (normals != null) SpineInspectorUtility.PropertyFieldWideLabel(normals, new GUIContent("Add Normals"));
+					if (tangents != null) SpineInspectorUtility.PropertyFieldWideLabel(tangents, new GUIContent("Solve Tangents"));
+					if (frontFacing != null) SpineInspectorUtility.PropertyFieldWideLabel(frontFacing);
+
 					EditorGUI.indentLevel--;
 				}
+				EditorGUI.indentLevel--;
 			}
 		}
 
@@ -162,7 +184,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		override public void OnInspectorGUI () {
-			serializedObject.Update();
+			//serializedObject.Update();
 			DrawInspectorGUI();
 			if (serializedObject.ApplyModifiedProperties() ||
 				(UnityEngine.Event.current.type == EventType.ValidateCommand && UnityEngine.Event.current.commandName == "UndoRedoPerformed")

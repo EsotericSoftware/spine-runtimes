@@ -49,6 +49,7 @@ public class SkeletonBounds {
 	};
 
 	public void update (Skeleton skeleton, boolean updateAabb) {
+		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		Array<BoundingBoxAttachment> boundingBoxes = this.boundingBoxes;
 		Array<FloatArray> polygons = this.polygons;
 		Array<Slot> slots = skeleton.slots;
@@ -67,11 +68,7 @@ public class SkeletonBounds {
 
 				FloatArray polygon = polygonPool.obtain();
 				polygons.add(polygon);
-				int vertexCount = boundingBox.getVertices().length;
-				polygon.ensureCapacity(vertexCount);
-				polygon.size = vertexCount;
-
-				boundingBox.computeWorldVertices(slot.bone, polygon.items);
+				boundingBox.computeWorldVertices(slot, polygon.setSize(boundingBox.getWorldVerticesLength()));
 			}
 		}
 
@@ -225,6 +222,7 @@ public class SkeletonBounds {
 
 	/** Returns the polygon for the specified bounding box, or null. */
 	public FloatArray getPolygon (BoundingBoxAttachment boundingBox) {
+		if (boundingBox == null) throw new IllegalArgumentException("boundingBox cannot be null.");
 		int index = boundingBoxes.indexOf(boundingBox, true);
 		return index == -1 ? null : polygons.get(index);
 	}

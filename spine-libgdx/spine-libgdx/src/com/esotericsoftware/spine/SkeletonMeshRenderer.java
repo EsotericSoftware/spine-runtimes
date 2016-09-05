@@ -38,7 +38,6 @@ import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.SkeletonAttachment;
-import com.esotericsoftware.spine.attachments.WeightedMeshAttachment;
 
 public class SkeletonMeshRenderer extends SkeletonRenderer<PolygonSpriteBatch> {
 	static private final short[] quadTriangles = {0, 1, 2, 2, 3, 0};
@@ -46,7 +45,6 @@ public class SkeletonMeshRenderer extends SkeletonRenderer<PolygonSpriteBatch> {
 	@SuppressWarnings("null")
 	public void draw (PolygonSpriteBatch batch, Skeleton skeleton) {
 		boolean premultipliedAlpha = this.premultipliedAlpha;
-		BlendMode blendMode = null;
 
 		float[] vertices = null;
 		short[] triangles = null;
@@ -63,12 +61,6 @@ public class SkeletonMeshRenderer extends SkeletonRenderer<PolygonSpriteBatch> {
 
 			} else if (attachment instanceof MeshAttachment) {
 				MeshAttachment mesh = (MeshAttachment)attachment;
-				vertices = mesh.updateWorldVertices(slot, premultipliedAlpha);
-				triangles = mesh.getTriangles();
-				texture = mesh.getRegion().getTexture();
-
-			} else if (attachment instanceof WeightedMeshAttachment) {
-				WeightedMeshAttachment mesh = (WeightedMeshAttachment)attachment;
 				vertices = mesh.updateWorldVertices(slot, premultipliedAlpha);
 				triangles = mesh.getTriangles();
 				texture = mesh.getRegion().getTexture();
@@ -97,11 +89,8 @@ public class SkeletonMeshRenderer extends SkeletonRenderer<PolygonSpriteBatch> {
 			}
 
 			if (texture != null) {
-				BlendMode slotBlendMode = slot.data.getBlendMode();
-				if (slotBlendMode != blendMode) {
-					blendMode = slotBlendMode;
-					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
-				}
+				BlendMode blendMode = slot.data.getBlendMode();
+				batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
 				batch.draw(texture, vertices, 0, vertices.length, triangles, 0, triangles.length);
 			}
 		}

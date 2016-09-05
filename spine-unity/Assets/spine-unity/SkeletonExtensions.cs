@@ -15,7 +15,6 @@ namespace Spine.Unity {
 		public static Color GetColor (this Skeleton s) { return new Color(s.r, s.g, s.b, s.a); }
 		public static Color GetColor (this RegionAttachment a) { return new Color(a.r, a.g, a.b, a.a); }
 		public static Color GetColor (this MeshAttachment a) { return new Color(a.r, a.g, a.b, a.a); }
-		public static Color GetColor (this WeightedMeshAttachment a) { return new Color(a.r, a.g, a.b, a.a);	}
 
 		public static void SetColor (this Skeleton skeleton, Color color) {
 			skeleton.A = color.a;
@@ -72,23 +71,9 @@ namespace Spine.Unity {
 			attachment.G = color.g * ByteToFloat;
 			attachment.B = color.b * ByteToFloat;
 		}
-
-		public static void SetColor (this WeightedMeshAttachment attachment, Color color) {
-			attachment.A = color.a;
-			attachment.R = color.r;
-			attachment.G = color.g;
-			attachment.B = color.b;
-		}
-
-		public static void SetColor (this WeightedMeshAttachment attachment, Color32 color) {
-			attachment.A = color.a * ByteToFloat;
-			attachment.R = color.r * ByteToFloat;
-			attachment.G = color.g * ByteToFloat;
-			attachment.B = color.b * ByteToFloat;
-		}
 		#endregion
 
-		#region Bone Position
+		#region Bone
 		public static void SetPosition (this Bone bone, Vector2 position) {
 			bone.X = position.x;
 			bone.Y = position.y;
@@ -106,8 +91,21 @@ namespace Spine.Unity {
 		public static Vector3 GetWorldPosition (this Bone bone, UnityEngine.Transform parentTransform) {		
 			return parentTransform.TransformPoint(new Vector3(bone.worldX, bone.worldY));
 		}
+
+		public static Matrix4x4 GetMatrix4x4 (this Bone bone) {
+			return new Matrix4x4 {
+				m00 = bone.a, m01 = bone.b, m03 = bone.worldX,
+				m10 = bone.c, m11 = bone.d, m13 = bone.worldY,
+				m33 = 1
+			};
+		}
 		#endregion
 
+	}
+}
+
+namespace Spine {
+	public static class SkeletonExtensions {
 		#region Posing
 		/// <summary>
 		/// Shortcut for posing a skeleton at a specific time. Time is in seconds. (frameNumber / 30f) will give you seconds.
@@ -161,7 +159,7 @@ namespace Spine.Unity {
 			for (int i = 0, n = timelinesItems.Length; i < n; i++)
 				timelinesItems[i].SetToSetupPose(skeleton);
 		}
-			
+
 		public static void SetToSetupPose (this Timeline timeline, Skeleton skeleton) {
 			if (timeline != null) {
 				// sorted according to assumed likelihood here
@@ -181,10 +179,10 @@ namespace Spine.Unity {
 
 
 				// Attachment
-				} else if (timeline is FfdTimeline) {
-					var slot = skeleton.slots.Items[((FfdTimeline)timeline).slotIndex];
-					slot.attachmentVerticesCount = 0;
-				
+				} else if (timeline is DeformTimeline) {
+					var slot = skeleton.slots.Items[((DeformTimeline)timeline).slotIndex];
+					slot.attachmentVertices.Clear(false);
+
 				// Slot
 				} else if (timeline is AttachmentTimeline) {
 					skeleton.SetSlotAttachmentToSetupPose(((AttachmentTimeline)timeline).slotIndex);

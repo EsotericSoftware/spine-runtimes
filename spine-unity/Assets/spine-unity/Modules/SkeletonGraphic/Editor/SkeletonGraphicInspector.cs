@@ -37,7 +37,8 @@ using UnityEditor;
 using Spine;
 
 namespace Spine.Unity.Editor {
-	
+
+	[InitializeOnLoad]
 	[CustomEditor(typeof(SkeletonGraphic))]
 	public class SkeletonGraphicInspector : UnityEditor.Editor {
 		SerializedProperty material_, color_;
@@ -108,6 +109,7 @@ namespace Spine.Unity.Editor {
 			var skeletonGraphic = (SkeletonGraphic)command.context;
 			var mesh = skeletonGraphic.SpineMeshGenerator.LastGeneratedMesh;
 
+			mesh.RecalculateBounds();
 			var bounds = mesh.bounds;
 			var size = bounds.size;
 			var center = bounds.center;
@@ -120,27 +122,13 @@ namespace Spine.Unity.Editor {
 			skeletonGraphic.rectTransform.pivot = p;
 		}
 
-		public static Material DefaultSkeletonGraphicMaterial {
-			get {
-				var guids = AssetDatabase.FindAssets("SkeletonGraphicDefault t:material");
-				if (guids.Length <= 0)
-					return null;
-				var firstAssetPath = AssetDatabase.GUIDToAssetPath(guids[0]);
-				if (string.IsNullOrEmpty(firstAssetPath))
-					return null;
-				var firstMaterial = AssetDatabase.LoadAssetAtPath<Material>(firstAssetPath);
-				return firstMaterial;
-			}
-		}
-
 		[MenuItem("GameObject/Spine/SkeletonGraphic (UnityUI)", false, 15)]
 		static public void SkeletonGraphicCreateMenuItem () {
 			var parentGameObject = Selection.activeObject as GameObject;
 			var parentTransform = parentGameObject == null ? null : parentGameObject.GetComponent<RectTransform>();
 
-			if (parentTransform == null) {
+			if (parentTransform == null)
 				Debug.LogWarning("Your new SkeletonGraphic will not be visible until it is placed under a Canvas");
-			}
 
 			var gameObject = NewSkeletonGraphicGameObject("New SkeletonGraphic");
 			gameObject.transform.SetParent(parentTransform, false);
@@ -174,6 +162,11 @@ namespace Spine.Unity.Editor {
 			}
 
 			return true;
+		}
+
+		// SpineEditorUtilities.InstantiateDelegate. Used by drag and drop.
+		public static Component SpawnSkeletonGraphicFromDrop (SkeletonDataAsset data) {
+			return InstantiateSkeletonGraphic(data);
 		}
 
 		public static SkeletonGraphic InstantiateSkeletonGraphic (SkeletonDataAsset skeletonDataAsset, string skinName) {
@@ -217,6 +210,19 @@ namespace Spine.Unity.Editor {
 			var graphic = go.GetComponent<SkeletonGraphic>();
 			graphic.material = SkeletonGraphicInspector.DefaultSkeletonGraphicMaterial;
 			return go;
+		}
+
+		public static Material DefaultSkeletonGraphicMaterial {
+			get {
+				var guids = AssetDatabase.FindAssets("SkeletonGraphicDefault t:material");
+				if (guids.Length <= 0) return null;
+
+				var firstAssetPath = AssetDatabase.GUIDToAssetPath(guids[0]);
+				if (string.IsNullOrEmpty(firstAssetPath)) return null;
+
+				var firstMaterial = AssetDatabase.LoadAssetAtPath<Material>(firstAssetPath);
+				return firstMaterial;
+			}
 		}
 
 		#endregion

@@ -35,8 +35,8 @@ using UnityEngine;
 namespace Spine.Unity.Editor {	
 	[CustomEditor(typeof(BoneFollower))]
 	public class BoneFollowerInspector : UnityEditor.Editor {
-		SerializedProperty boneName, skeletonRenderer, followZPosition, followBoneRotation;
-		BoneFollower component;
+		SerializedProperty boneName, skeletonRenderer, followZPosition, followBoneRotation, followSkeletonFlip;
+		BoneFollower targetBoneFollower;
 		bool needsReset;
 
 		void OnEnable () {
@@ -44,34 +44,41 @@ namespace Spine.Unity.Editor {
 			boneName = serializedObject.FindProperty("boneName");
 			followBoneRotation = serializedObject.FindProperty("followBoneRotation");
 			followZPosition = serializedObject.FindProperty("followZPosition");
+			followSkeletonFlip = serializedObject.FindProperty("followSkeletonFlip");
 
-			component = (BoneFollower)target;
-			if (component.SkeletonRenderer != null)
-				component.SkeletonRenderer.Initialize(false);
+			targetBoneFollower = (BoneFollower)target;
+			if (targetBoneFollower.SkeletonRenderer != null)
+				targetBoneFollower.SkeletonRenderer.Initialize(false);
 		}
 
 		override public void OnInspectorGUI () {
 			if (needsReset) {
-				component.Reset();
-				component.DoUpdate();
+				targetBoneFollower.Initialize();
+				targetBoneFollower.LateUpdate();
 				needsReset = false;
 				SceneView.RepaintAll();
 			}
 			serializedObject.Update();
 
-			// FindRenderer()
+			// Find Renderer
 			if (skeletonRenderer.objectReferenceValue == null) {
-				SkeletonRenderer parentRenderer = BoneFollowerInspector.GetInParent<SkeletonRenderer>(component.transform);
-
-				if (parentRenderer != null) {
-					Debug.Log("Inspector automatically assigned BoneFollower.SkeletonRenderer");
+				SkeletonRenderer parentRenderer = BoneFollowerInspector.GetInParent<SkeletonRenderer>(targetBoneFollower.transform);
+				if (parentRenderer != null && parentRenderer.gameObject != targetBoneFollower.gameObject) {
 					skeletonRenderer.objectReferenceValue = parentRenderer;
+					Debug.Log("Inspector automatically assigned BoneFollower.SkeletonRenderer");
 				}
 			}
 
 			EditorGUILayout.PropertyField(skeletonRenderer);
+			var skeletonRendererReference = skeletonRenderer.objectReferenceValue as SkeletonRenderer;
+			if (skeletonRendererReference != null) {
+				if (skeletonRendererReference.gameObject == targetBoneFollower.gameObject) {
+					skeletonRenderer.objectReferenceValue = null;
+					EditorUtility.DisplayDialog("Invalid assignment.", "BoneFollower can only follow a skeleton on a separate GameObject.\n\nCreate a new GameObject for your BoneFollower, or choose a SkeletonRenderer from a different GameObject.", "Ok");
+				}
+			}
 
-			if (component.valid) {
+			if (targetBoneFollower.valid) {
 				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(boneName);
 				if (EditorGUI.EndChangeCheck()) {
@@ -79,29 +86,38 @@ namespace Spine.Unity.Editor {
 					needsReset = true;
 					serializedObject.Update();
 				}
-
 				EditorGUILayout.PropertyField(followBoneRotation);
 				EditorGUILayout.PropertyField(followZPosition);
+				EditorGUILayout.PropertyField(followSkeletonFlip);
 			} else {
-				GUILayout.Label("INVALID");
+				var boneFollowerSkeletonRenderer = targetBoneFollower.skeletonRenderer;
+				if (boneFollowerSkeletonRenderer == null) {
+					EditorGUILayout.HelpBox("SkeletonRenderer is unassigned. Please assign a SkeletonRenderer (SkeletonAnimation or SkeletonAnimator).", MessageType.Warning);
+				} else {
+					boneFollowerSkeletonRenderer.Initialize(false);
+
+					if (boneFollowerSkeletonRenderer.skeletonDataAsset == null)
+						EditorGUILayout.HelpBox("Assigned SkeletonRenderer does not have SkeletonData assigned to it.", MessageType.Warning);
+					
+					if (!boneFollowerSkeletonRenderer.valid)
+						EditorGUILayout.HelpBox("Assigned SkeletonRenderer is invalid. Check target SkeletonRenderer, its SkeletonDataAsset or the console for other errors.", MessageType.Warning);
+				}
 			}
 
-			if (serializedObject.ApplyModifiedProperties() ||
-				(UnityEngine.Event.current.type == EventType.ValidateCommand && UnityEngine.Event.current.commandName == "UndoRedoPerformed")
-			) {
-				component.Reset();
-			}
+			var current = UnityEngine.Event.current;
+			bool wasUndo = (current.type == EventType.ValidateCommand && current.commandName == "UndoRedoPerformed");
+			if (serializedObject.ApplyModifiedProperties() || wasUndo)
+				targetBoneFollower.Initialize();
 		}
 
 		public static T GetInParent<T> (Transform origin) where T : Component {
 			#if UNITY_4_3
 			Transform parent = origin.parent;
-			while(parent.GetComponent<T>() == null){
-			parent = parent.parent;
-			if(parent == null)
-			return default(T);
+			while (parent.GetComponent<T>() == null) {
+				parent = parent.parent;
+				if(parent == null)
+					return default(T);
 			}
-
 			return parent.GetComponent<T>();
 			#else
 			return origin.GetComponentInParent<T>();

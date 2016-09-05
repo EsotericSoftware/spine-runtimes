@@ -1,2 +1,7 @@
 eclipse.preferences.version=1
+encoding//src/spine/starling/SkeletonAnimation.as=UTF-8
+encoding//src/spine/starling/SkeletonMesh.as=UTF-8
+encoding//src/spine/starling/SkeletonSprite.as=UTF-8
+encoding//src/spine/starling/StarlingAtlasAttachmentLoader.as=UTF-8
+encoding//src/spine/starling/StarlingTextureLoader.as=UTF-8
 encoding/<project>=UTF-8

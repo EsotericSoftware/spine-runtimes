@@ -55,7 +55,7 @@ public class SkeletonAttachmentTest extends ApplicationAdapter {
 		renderer.setPremultipliedAlpha(true);
 
 		{
-			TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy.atlas"));
+			TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy-pma.atlas"));
 			SkeletonJson json = new SkeletonJson(atlas);
 			json.setScale(0.6f);
 			SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy/spineboy.json"));
@@ -70,7 +70,7 @@ public class SkeletonAttachmentTest extends ApplicationAdapter {
 		}
 
 		{
-			TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("goblins/goblins-mesh.atlas"));
+			TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("goblins/goblins-pma.atlas"));
 			SkeletonJson json = new SkeletonJson(atlas);
 			SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("goblins/goblins-mesh.json"));
 			goblin = new Skeleton(skeletonData);

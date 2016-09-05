@@ -39,9 +39,11 @@ namespace Spine.Unity {
 		public AtlasAsset[] atlasAssets;
 		#if SPINE_TK2D
 		public tk2dSpriteCollectionData spriteCollection;
+		public float scale = 1f;
+		#else
+		public float scale = 0.01f;
 		#endif
 		public TextAsset skeletonJSON;
-		public float scale = 0.01f;
 		public String[] fromAnimation;
 		public String[] toAnimation;
 		public float[] duration;
@@ -159,6 +161,11 @@ namespace Spine.Unity {
 				return;
 
 			stateData.DefaultMix = defaultMix;
+
+			// For compatibility with runtime-instantiated SkeletonDataAsset.
+			if (fromAnimation == null || toAnimation == null)
+				return;
+
 			for (int i = 0, n = fromAnimation.Length; i < n; i++) {
 				if (fromAnimation[i].Length == 0 || toAnimation[i].Length == 0)
 					continue;

@@ -62,17 +62,47 @@ void callback (AnimationState* state, int trackIndex, EventType type, Event* eve
 	fflush(stdout);
 }
 
-void spineboy () {
-	// Load atlas, skeleton, and animations.
-	Atlas* atlas = Atlas_createFromFile("data/spineboy.atlas", 0);
+SkeletonData* readSkeletonJsonData (const char* filename, Atlas* atlas, float scale) {
 	SkeletonJson* json = SkeletonJson_create(atlas);
-	json->scale = 0.6f;
-	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/spineboy.json");
+	json->scale = scale;
+	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, filename);
 	if (!skeletonData) {
 		printf("%s\n", json->error);
 		exit(0);
 	}
 	SkeletonJson_dispose(json);
+	return skeletonData;
+}
+
+SkeletonData* readSkeletonBinaryData (const char* filename, Atlas* atlas, float scale) {
+	SkeletonBinary* binary = SkeletonBinary_create(atlas);
+	binary->scale = scale;
+	SkeletonData *skeletonData = SkeletonBinary_readSkeletonDataFile(binary, filename);
+	if (!skeletonData) {
+		printf("%s\n", binary->error);
+		exit(0);
+	}
+	SkeletonBinary_dispose(binary);
+	return skeletonData;
+}
+
+void testcase (void func(SkeletonData* skeletonData, Atlas* atlas),
+		const char* jsonName, const char* binaryName, const char* atlasName,
+		float scale) {
+	Atlas* atlas = Atlas_createFromFile(atlasName, 0);
+
+	SkeletonData* skeletonData = readSkeletonJsonData(jsonName, atlas, scale);
+	func(skeletonData, atlas);
+	SkeletonData_dispose(skeletonData);
+
+	skeletonData = readSkeletonBinaryData(binaryName, atlas, scale);
+	func(skeletonData, atlas);
+	SkeletonData_dispose(skeletonData);
+
+	Atlas_dispose(atlas);
+}
+
+void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 	SkeletonBounds* bounds = SkeletonBounds_create();
 
 	// Configure mixing.
@@ -95,13 +125,10 @@ void spineboy () {
 	Slot* headSlot = Skeleton_findSlot(skeleton, "head");
 
 	drawable->state->listener = callback;
-	if (false) {
-		AnimationState_setAnimationByName(drawable->state, 0, "test", true);
-	} else {
-		AnimationState_setAnimationByName(drawable->state, 0, "walk", true);
-		AnimationState_addAnimationByName(drawable->state, 0, "jump", false, 3);
-		AnimationState_addAnimationByName(drawable->state, 0, "run", true, 0);
-	}
+	AnimationState_setAnimationByName(drawable->state, 0, "test", true);
+	AnimationState_addAnimationByName(drawable->state, 0, "walk", true, 0);
+	AnimationState_addAnimationByName(drawable->state, 0, "jump", false, 3);
+	AnimationState_addAnimationByName(drawable->state, 0, "run", true, 0);
 
 	sf::RenderWindow window(sf::VideoMode(640, 480), "Spine SFML - spineboy");
 	window.setFramerateLimit(60);
@@ -131,23 +158,10 @@ void spineboy () {
 		window.display();
 	}
 
-	SkeletonData_dispose(skeletonData);
 	SkeletonBounds_dispose(bounds);
-	Atlas_dispose(atlas);
 }
 
-void goblins () {
-	// Load atlas, skeleton, and animations.
-	Atlas* atlas = Atlas_createFromFile("data/goblins-mesh.atlas", 0);
-	SkeletonJson* json = SkeletonJson_create(atlas);
-	json->scale = 1.4f;
-	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/goblins-mesh.json");
-	if (!skeletonData) {
-		printf("Error: %s\n", json->error);
-		exit(0);
-	}
-	SkeletonJson_dispose(json);
-
+void goblins (SkeletonData* skeletonData, Atlas* atlas) {
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 
@@ -181,23 +195,9 @@ void goblins () {
 		window.draw(*drawable);
 		window.display();
 	}
-
-	SkeletonData_dispose(skeletonData);
-	Atlas_dispose(atlas);
 }
 
-void raptor () {
-	// Load atlas, skeleton, and animations.
-	Atlas* atlas = Atlas_createFromFile("data/raptor.atlas", 0);
-	SkeletonJson* json = SkeletonJson_create(atlas);
-	json->scale = 0.5f;
-	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/raptor.json");
-	if (!skeletonData) {
-		printf("Error: %s\n", json->error);
-		exit(0);
-	}
-	SkeletonJson_dispose(json);
-
+void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 
@@ -207,7 +207,6 @@ void raptor () {
 	Skeleton_updateWorldTransform(skeleton);
 
 	AnimationState_setAnimationByName(drawable->state, 0, "walk", true);
-	AnimationState_setAnimationByName(drawable->state, 1, "empty", false);
 	AnimationState_addAnimationByName(drawable->state, 1, "gungrab", false, 2);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - raptor");
@@ -227,13 +226,100 @@ void raptor () {
 		window.draw(*drawable);
 		window.display();
 	}
+}
 
-	SkeletonData_dispose(skeletonData);
-	Atlas_dispose(atlas);
+void tank (SkeletonData* skeletonData, Atlas* atlas) {
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+
+	Skeleton* skeleton = drawable->skeleton;
+	skeleton->x = 500;
+	skeleton->y = 590;
+	Skeleton_updateWorldTransform(skeleton);
+
+	AnimationState_setAnimationByName(drawable->state, 0, "drive", true);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - tank");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+		drawable->update(delta);
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
+}
+
+void vine (SkeletonData* skeletonData, Atlas* atlas) {
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+
+	Skeleton* skeleton = drawable->skeleton;
+	skeleton->x = 320;
+	skeleton->y = 590;
+	Skeleton_updateWorldTransform(skeleton);
+
+	AnimationState_setAnimationByName(drawable->state, 0, "animation", true);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - vine");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		drawable->update(delta);
+
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
+}
+
+/**
+ * Used for debugging purposes during runtime development
+ */
+void test (SkeletonData* skeletonData, Atlas* atlas) {
+	spSkeleton* skeleton = Skeleton_create(skeletonData);
+	spAnimationStateData* animData = spAnimationStateData_create(skeletonData);
+	spAnimationState* animState = spAnimationState_create(animData);
+	spAnimationState_setAnimationByName(animState, 0, "drive", true);
+
+
+	float d = 3;
+	for (int i = 0; i < 1; i++) {
+		spSkeleton_update(skeleton, d);
+		spAnimationState_update(animState, d);
+		spAnimationState_apply(animState, skeleton);
+		spSkeleton_updateWorldTransform(skeleton);
+		for (int ii = 0; ii < skeleton->bonesCount; ii++) {
+			spBone* bone = skeleton->bones[ii];
+			printf("%s %f %f %f %f %f %f\n", bone->data->name, bone->a, bone->b, bone->c, bone->d, bone->worldX, bone->worldY);
+		}
+		printf("========================================\n");
+		d += 0.1f;
+	}
+
+	Skeleton_dispose(skeleton);
 }
 
 int main () {
-	raptor();
-	spineboy();
-	goblins();
+	testcase(test, "data/tank.json", "data/tank.skel", "data/tank.atlas", 1.0f);
+	testcase(vine, "data/vine.json", "data/vine.skel", "data/vine.atlas", 0.5f);
+	testcase(tank, "data/tank.json", "data/tank.skel", "data/tank.atlas", 0.2f);
+	testcase(raptor, "data/raptor.json", "data/raptor.skel", "data/raptor.atlas", 0.5f);
+	testcase(spineboy, "data/spineboy.json", "data/spineboy.skel", "data/spineboy.atlas", 0.6f);
+	testcase(goblins, "data/goblins-mesh.json", "data/goblins-mesh.skel", "data/goblins-mesh.atlas", 1.4f);
+	return 0;
 }

@@ -43,19 +43,21 @@ struct spSkeleton;
 
 typedef struct spTransformConstraint {
 	spTransformConstraintData* const data;
-	spBone* bone;
+	int bonesCount;
+	spBone** const bones;
 	spBone* target;
-	float translateMix;
-	float x, y;
+	float rotateMix, translateMix, scaleMix, shearMix;
 
 #ifdef __cplusplus
 	spTransformConstraint() :
 		data(0),
-		bone(0),
+		bonesCount(0),
+		bones(0),
 		target(0),
+		rotateMix(0),
 		translateMix(0),
-		x(0),
-		y(0) {
+		scaleMix(0),
+		shearMix(0) {
 	}
 #endif
 } spTransformConstraint;

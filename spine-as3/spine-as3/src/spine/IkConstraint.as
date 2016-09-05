@@ -35,8 +35,10 @@ public class IkConstraint implements Updatable {
 	internal var _data:IkConstraintData;
 	public var bones:Vector.<Bone>;
 	public var target:Bone;
-	public var bendDirection:int;
 	public var mix:Number;
+	public var bendDirection:int;
+	
+	public var level:int;	
 
 	public function IkConstraint (data:IkConstraintData, skeleton:Skeleton) {
 		if (data == null) throw new ArgumentError("data cannot be null.");
@@ -77,121 +79,128 @@ public class IkConstraint implements Updatable {
 	/** Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified in the world
 	 * coordinate system. */
 	static public function apply1 (bone:Bone, targetX:Number, targetY:Number, alpha:Number) : void {
-		var parentRotation:Number = bone._parent == null ? 0 : bone._parent.worldRotationX;
-		var rotation:Number = bone.rotation;
-		var rotationIK:Number = Math.atan2(targetY - bone._worldY, targetX - bone._worldX) * MathUtils.radDeg - parentRotation;
-		if ((bone._worldSignX != bone._worldSignY) != (bone._skeleton.flipX != (bone._skeleton.flipY != Bone.yDown)))
-			rotationIK = 360 - rotationIK;
-		if (rotationIK > 180) rotationIK -= 360;
+		var pp:Bone = bone.parent;
+		var id:Number = 1 / (pp.a * pp.d - pp.b * pp.c);
+		var x:Number = targetX - pp.worldX, y:Number = targetY - pp.worldY;
+		var tx:Number = (x * pp.d - y * pp.b) * id - bone.x, ty:Number = (y * pp.a - x * pp.c) * id - bone.y;
+		var rotationIK:Number = Math.atan2(ty, tx) * MathUtils.radDeg - bone.shearX - bone.rotation;
+		if (bone.scaleX < 0) rotationIK += 180;
+		if (rotationIK > 180)
+			rotationIK -= 360;
 		else if (rotationIK < -180) rotationIK += 360;
-		bone.updateWorldTransformWith(bone.x, bone.y, rotation + (rotationIK - rotation) * alpha, bone.appliedScaleX, bone.appliedScaleY);
+		bone.updateWorldTransformWith(bone.x, bone.y, bone.rotation + rotationIK * alpha, bone.scaleX, bone.scaleY, bone.shearX,
+			bone.shearY);
 	}
 
 	/** Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as possible. The
 	 * target is specified in the world coordinate system.
 	 * @param child Any descendant bone of the parent. */
 	static public function apply2 (parent:Bone, child:Bone, targetX:Number, targetY:Number, bendDir:int, alpha:Number) : void {
-		if (alpha == 0) return;
-		var px:Number = parent.x, py:Number = parent.y, psx:Number = parent.appliedScaleX, psy:Number = parent.appliedScaleY;
-		var o1:int, o2:int, s2:int;
+		if (alpha == 0) {
+			child.updateWorldTransform();
+			return;
+		}
+		var px:Number = parent.x, py:Number = parent.y, psx:Number = parent.scaleX, psy:Number = parent.scaleY, csx:Number = child.scaleX;;
+		var os1:int, os2:int, s2:int;
 		if (psx < 0) {
 			psx = -psx;
-			o1 = 180;
+			os1 = 180;
 			s2 = -1;
 		} else {
-			o1 = 0;
+			os1 = 0;
 			s2 = 1;
 		}
 		if (psy < 0) {
 			psy = -psy;
 			s2 = -s2;
 		}
-		var cx:Number = child.x, cy:Number = child.y, csx:Number = child.appliedScaleX;
-		var u:Boolean = Math.abs(psx - psy) <= 0.0001;
-		if (!u && cy != 0) {
-			child._worldX = parent.a * cx + parent.worldX;
-			child._worldY = parent.c * cx + parent.worldY;
-			cy = 0;
-		}
 		if (csx < 0) {
 			csx = -csx;
-			o2 = 180;
+			os2 = 180;
 		} else
-			o2 = 0;
-		var pp:Bone = parent.parent;
-		var tx:Number, ty:Number, dx:Number, dy:Number;
-		if (!pp) {
-			tx = targetX - px;
-			ty = targetY - py;
-			dx = child._worldX - px;
-			dy = child._worldY - py;
+			os2 = 0;
+		var cx:Number = child.x, cy:Number, cwx:Number, cwy:Number, a:Number = parent.a, b:Number = parent.b, c:Number = parent.c, d:Number = parent.d;
+		var u:Boolean = Math.abs(psx - psy) <= 0.0001;
+		if (!u) {
+			cy = 0;
+			cwx = a * cx + parent.worldX;
+			cwy = c * cx + parent.worldY;
 		} else {
-			var ppa:Number = pp.a, ppb:Number = pp.b, ppc:Number = pp.c, ppd:Number = pp.d;
-			var invDet:Number = 1 / (ppa * ppd - ppb * ppc);
-			var wx:Number = pp._worldX, wy:Number = pp._worldY, twx:Number = targetX - wx, twy:Number = targetY - wy;
-			tx = (twx * ppd - twy * ppb) * invDet - px;
-			ty = (twy * ppa - twx * ppc) * invDet - py;
-			twx = child._worldX - wx;
-			twy = child._worldY - wy;
-			dx = (twx * ppd - twy * ppb) * invDet - px;
-			dy = (twy * ppa - twx * ppc) * invDet - py;
+			cy = child.y;
+			cwx = a * cx + b * cy + parent.worldX;
+			cwy = c * cx + d * cy + parent.worldY;
 		}
+		var pp:Bone = parent.parent;
+		a = pp.a;
+		b = pp.b;
+		c = pp.c;
+		d = pp.d;
+		var id:Number = 1 / (a * d - b * c), x:Number = targetX - pp.worldX, y:Number = targetY - pp.worldY;
+		var tx:Number = (x * d - y * b) * id - px, ty:Number = (y * a - x * c) * id - py;
+		x = cwx - pp.worldX;
+		y = cwy - pp.worldY;
+		var dx:Number = (x * d - y * b) * id - px, dy:Number = (y * a - x * c) * id - py;
 		var l1:Number = Math.sqrt(dx * dx + dy * dy), l2:Number = child.data.length * csx, a1:Number, a2:Number;
 		outer:
 		if (u) {
 			l2 *= psx;
 			var cos:Number = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
-			if (cos < -1) cos = -1;
+			if (cos < -1) 
+				cos = -1;
 			else if (cos > 1) cos = 1;
 			a2 = Math.acos(cos) * bendDir;
-			var ad:Number = l1 + l2 * cos, o:Number = l2 * Math.sin(a2);
-			a1 = Math.atan2(ty * ad - tx * o, tx * ad + ty * o);
+			a = l1 + l2 * cos;
+			b = l2 * Math.sin(a2);
+			a1 = Math.atan2(ty * a - tx * b, tx * a + ty * b);
 		} else {
-			var a:Number = psx * l2, b:Number = psy * l2, ta:Number = Math.atan2(ty, tx);
-			var aa:Number = a * a, bb:Number = b * b, ll:Number = l1 * l1, dd:Number = tx * tx + ty * ty;
-			var c0:Number = bb * ll + aa * dd - aa * bb, c1:Number = -2 * bb * l1, c2:Number = bb - aa;
-			var d:Number = c1 * c1 - 4 * c2 * c0;
+			a = psx * l2;
+			b = psy * l2;
+			var aa:Number = a * a, bb:Number = b * b, dd:Number = tx * tx + ty * ty, ta:Number = Math.atan2(ty, tx);
+			c = bb * l1 * l1 + aa * dd - aa * bb;
+			var c1:Number = -2 * bb * l1, c2:Number = bb - aa;
+			d = c1 * c1 - 4 * c2 * c;
 			if (d >= 0) {
 				var q:Number = Math.sqrt(d);
 				if (c1 < 0) q = -q;
 				q = -(c1 + q) / 2;
-				var r0:Number = q / c2, r1:Number = c0 / q;
+				var r0:Number = q / c2, r1:Number = c / q;
 				var r:Number = Math.abs(r0) < Math.abs(r1) ? r0 : r1;
 				if (r * r <= dd) {
-					var y1:Number = Math.sqrt(dd - r * r) * bendDir;
-					a1 = ta - Math.atan2(y1, r);
-					a2 = Math.atan2(y1 / psy, (r - l1) / psx);
+					y = Math.sqrt(dd - r * r) * bendDir;
+					a1 = ta - Math.atan2(y, r);
+					a2 = Math.atan2(y / psy, (r - l1) / psx);
 					break outer;
 				}
 			}
 			var minAngle:Number = 0, minDist:Number = Number.MAX_VALUE, minX:Number = 0, minY:Number = 0;
 			var maxAngle:Number = 0, maxDist:Number = 0, maxX:Number = 0, maxY:Number = 0;
-			var x:Number = l1 + a, dist:Number = x * x;
-			if (dist > maxDist) {
+			x = l1 + a;
+			d = x * x;
+			if (d > maxDist) {
 				maxAngle = 0;
-				maxDist = dist;
+				maxDist = d;
 				maxX = x;
 			}
 			x = l1 - a;
-			dist = x * x;
-			if (dist < minDist) {
+			d = x * x;
+			if (d < minDist) {
 				minAngle = Math.PI;
-				minDist = dist;
+				minDist = d;
 				minX = x;
 			}
 			var angle:Number = Math.acos(-a * l1 / (aa - bb));
 			x = a * Math.cos(angle) + l1;
-			var y:Number = b * Math.sin(angle);
-			dist = x * x + y * y;
-			if (dist < minDist) {
+			y = b * Math.sin(angle);
+			d = x * x + y * y;
+			if (d < minDist) {
 				minAngle = angle;
-				minDist = dist;
+				minDist = d;
 				minX = x;
 				minY = y;
 			}
-			if (dist > maxDist) {
+			if (d > maxDist) {
 				maxAngle = angle;
-				maxDist = dist;
+				maxDist = d;
 				maxX = x;
 				maxY = y;
 			}
@@ -204,16 +213,18 @@ public class IkConstraint implements Updatable {
 			}
 		}
 		var os:Number = Math.atan2(cy, cx) * s2;
-		a1 = (a1 - os) * MathUtils.radDeg + o1;
-		a2 = (a2 + os) * MathUtils.radDeg * s2 + o2;
-		if (a1 > 180) a1 -= 360;
-		else if (a1 < -180) a1 += 360;
-		if (a2 > 180) a2 -= 360;
-		else if (a2 < -180) a2 += 360;
 		var rotation:Number = parent.rotation;
-		parent.updateWorldTransformWith(px, py, rotation + (a1 - rotation) * alpha, parent.appliedScaleX, parent.appliedScaleY);
+		a1 = (a1 - os) * MathUtils.radDeg + os1 - rotation;
+		if (a1 > 180)
+			a1 -= 360;
+		else if (a1 < -180) a1 += 360;
+		parent.updateWorldTransformWith(px, py, rotation + a1 * alpha, parent.scaleX, parent.scaleY, 0, 0);
 		rotation = child.rotation;
-		child.updateWorldTransformWith(cx, cy, rotation + (a2 - rotation) * alpha, child.appliedScaleX, child.appliedScaleY);
+		a2 = ((a2 + os) * MathUtils.radDeg - child.shearX) * s2 + os2 - rotation;
+		if (a2 > 180)
+			a2 -= 360;
+		else if (a2 < -180) a2 += 360;
+		child.updateWorldTransformWith(cx, cy, rotation + a2 * alpha, child.scaleX, child.scaleY, child.shearX, child.shearY);
 	}
 }
 

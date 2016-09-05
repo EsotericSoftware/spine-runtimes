@@ -12,7 +12,6 @@ using UnityEditor;
 #else
 using UnityEditor.AnimatedValues;
 #endif
-using System.Collections;
 using System.Collections.Generic;
 using Spine;
 
@@ -90,10 +89,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			UpdateAttachments();
-
-			if (PrefabUtility.GetPrefabType(this.target) == PrefabType.Prefab)
-				isPrefab = true;
-
+			isPrefab |= PrefabUtility.GetPrefabType(this.target) == PrefabType.Prefab;
 		}
 
 		void OnSceneGUI () {
@@ -101,32 +97,21 @@ namespace Spine.Unity.Editor {
 				OnEnable();
 				return;
 			}
-
-			// MITCH
-			//float flipRotation = skeleton.FlipX ? -1 : 1;
-			const float flipRotation = 1;
-
+				
 			foreach (Bone b in skeleton.Bones) {
-				Vector3 vec = transform.TransformPoint(new Vector3(b.WorldX, b.WorldY, 0));
+				Vector3 pos = new Vector3(b.WorldX, b.WorldY, 0);
+				Quaternion rot = Quaternion.Euler(0, 0, b.WorldRotationX - 90f);
+				Vector3 scale = Vector3.one * b.Data.Length * b.WorldScaleX;
 
-				// MITCH
-				Quaternion rot = Quaternion.Euler(0, 0, b.WorldRotationX * flipRotation);
-				Vector3 forward = transform.TransformDirection(rot * Vector3.right);
-				forward *= flipRotation;
-
-				SpineEditorUtilities.Icons.boneMaterial.SetPass(0);
-				Graphics.DrawMeshNow(SpineEditorUtilities.Icons.boneMesh, Matrix4x4.TRS(vec, Quaternion.LookRotation(transform.forward, forward), Vector3.one * b.Data.Length * b.WorldScaleX));
+				SpineEditorUtilities.Icons.BoneMaterial.SetPass(0);
+				Graphics.DrawMeshNow(SpineEditorUtilities.Icons.BoneMesh, transform.localToWorldMatrix * Matrix4x4.TRS(pos, rot, scale));
 			}
 		}
 
 		void UpdateAttachments () {
 			attachmentTable = new Dictionary<Slot, List<Attachment>>();
-			Skin skin = skeleton.Skin;
 
-			if (skin == null) {
-				skin = skeletonRenderer.skeletonDataAsset.GetSkeletonData(true).DefaultSkin;
-			}
-
+			Skin skin = skeleton.Skin ?? skeletonRenderer.skeletonDataAsset.GetSkeletonData(true).DefaultSkin;
 			for (int i = skeleton.Slots.Count-1; i >= 0; i--) {
 				List<Attachment> attachments = new List<Attachment>();
 				skin.FindAttachmentsForSlot(i, attachments);
@@ -221,7 +206,7 @@ namespace Spine.Unity.Editor {
 
 						Texture2D icon = null;
 
-						if (attachment is MeshAttachment || attachment is WeightedMeshAttachment)
+						if (attachment is MeshAttachment)
 							icon = SpineEditorUtilities.Icons.mesh;
 						else
 							icon = SpineEditorUtilities.Icons.image;
@@ -239,14 +224,14 @@ namespace Spine.Unity.Editor {
 						GUI.contentColor = Color.white;
 					}
 				}
-				#if UNITY_4_3
+			#if UNITY_4_3
 
-				#else
+			#else
 			}
 			EditorGUILayout.EndFadeGroup();
 			if (showSlots.isAnimating)
 				Repaint();
-				#endif
+			#endif
 		}
 
 		void SpawnHierarchyContextMenu () {

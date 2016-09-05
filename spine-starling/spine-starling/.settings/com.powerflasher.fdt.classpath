@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <AS3Classpath>
     <AS3LibraryFolder>lib</AS3LibraryFolder>
-    <AS3Classpath generateProblems="true" sdkBased="true" type="lib" useAsSharedCode="false">frameworks/libs/player/{playerVersion}/playerglobal.swc</AS3Classpath>
     <AS3Classpath generateProblems="true" sdkBased="false" type="source" useAsSharedCode="false">src</AS3Classpath>
     <AS3Classpath generateProblems="true" sdkBased="false" type="lib" useAsSharedCode="false">lib/spine-as3.swc</AS3Classpath>
-    <AS3Classpath generateProblems="true" sdkBased="false" type="lib" useAsSharedCode="false">lib/starling-1.7.swc</AS3Classpath>
+    <AS3Classpath generateProblems="true" sdkBased="false" type="lib" useAsSharedCode="false">lib/starling-2.0.1.swc</AS3Classpath>
+    <AS3Classpath generateProblems="true" sdkBased="true" type="lib" useAsSharedCode="false">frameworks/libs/air/airglobal.swc</AS3Classpath>
+    <AS3Classpath generateProblems="true" sdkBased="true" type="lib" useAsSharedCode="false">frameworks/libs/textLayout.swc</AS3Classpath>
+    <AS3Classpath generateProblems="true" sdkBased="true" type="lib" useAsSharedCode="false">frameworks/libs/osmf.swc</AS3Classpath>
+    <AS3Classpath generateProblems="true" sdkBased="true" type="lib" useAsSharedCode="false">frameworks/libs/authoringsupport.swc</AS3Classpath>
+    <AS3Classpath generateProblems="true" sdkBased="true" type="lib" useAsSharedCode="false">frameworks/libs/core.swc</AS3Classpath>
+    <AS3Classpath generateProblems="true" sdkBased="true" type="lib" useAsSharedCode="false">frameworks/libs/air/aircore.swc</AS3Classpath>
+    <AS3Classpath generateProblems="true" sdkBased="true" type="lib" useAsSharedCode="false">frameworks/libs/air/applicationupdater.swc</AS3Classpath>
+    <AS3Classpath generateProblems="true" sdkBased="true" type="lib" useAsSharedCode="false">frameworks/libs/air/applicationupdater_ui.swc</AS3Classpath>
+    <AS3Classpath generateProblems="true" sdkBased="true" type="lib" useAsSharedCode="false">frameworks/libs/air/servicemonitor.swc</AS3Classpath>
 </AS3Classpath>

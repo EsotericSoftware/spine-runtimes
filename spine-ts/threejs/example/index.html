@@ -1,0 +1,128 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<title>spine-threejs</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.js"></script>
+<script src="../../build/spine-threejs.js"></script>
+</head>
+<style>
+	* { margin: 0; padding: 0; }
+	body, html { height: 100% }
+	canvas { position: absolute; width: 100% ;height: 100%; }
+</style>
+<body>
+<script>
+
+var scene, camera, renderer;
+var geometry, material, mesh, skeletonMesh;
+var assetManager;
+var canvas;
+var lastFrameTime = Date.now() / 1000;
+
+function init () {
+	// create the THREE.JS camera, scene and renderer (WebGL)
+	var width = window.innerWidth, height = window.innerHeight;	
+	camera = new THREE.PerspectiveCamera(75, width / height, 1, 3000);
+	camera.position.y = 100;
+	camera.position.z = 400;	
+	scene = new THREE.Scene();
+	renderer = new THREE.WebGLRenderer();
+	renderer.setSize(width, height);
+	document.body.appendChild(renderer.domElement);
+	canvas = renderer.domElement;
+
+	// load the assets required to display the Raptor model
+	assetManager = new spine.threejs.AssetManager();
+	assetManager.loadText("assets/raptor.json");
+	assetManager.loadText("assets/raptor.atlas");
+	assetManager.loadTexture("assets/raptor.png");
+
+	requestAnimationFrame(load);
+}
+
+function load (name, scale) {
+	if (assetManager.isLoadingComplete()) {	
+		// Add a box to the scene to which we attach the skeleton mesh
+		geometry = new THREE.BoxGeometry(200, 200, 200);
+		material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
+		mesh = new THREE.Mesh(geometry, material);
+		scene.add(mesh);
+
+		// Load the texture atlas using name.atlas and name.png from the AssetManager.
+		// The function passed to TextureAtlas is used to resolve relative paths.
+		atlas = new spine.TextureAtlas(assetManager.get("assets/raptor.atlas"), function(path) {
+			return assetManager.get("assets/" + path);		
+		});
+		var skeletonData = loadSkeleton("raptor", 0.4);
+
+		// Create a SkeletonMesh from the data and attach it to the scene
+		skeletonMesh = new spine.threejs.SkeletonMesh(skeletonData);
+		skeletonMesh.state.setAnimation(0, "walk", true);
+		mesh.add(skeletonMesh);
+
+		requestAnimationFrame(render);
+	} else requestAnimationFrame(load);
+}
+
+function loadSkeleton (name, scale) {	
+	// Load the texture atlas using name.atlas and name.png from the AssetManager.
+	// The function passed to TextureAtlas is used to resolve relative paths.
+	atlas = new spine.TextureAtlas(assetManager.get("assets/" + name + ".atlas"), function(path) {
+		return assetManager.get("assets/" + path);		
+	});
+
+	// Create a TextureAtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
+	atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
+
+	// Create a SkeletonJson instance for parsing the .json file.
+	var skeletonJson = new spine.SkeletonJson(atlasLoader);
+	
+	// Set the scale to apply during parsing, parse the file, and create a new skeleton.
+	skeletonJson.scale = scale;
+	var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/" + name + ".json"));
+	return skeletonData;
+}
+
+var lastTime = Date.now();
+function render() {
+	// calculate delta time for animation purposes
+	var now = Date.now() / 1000;
+	var delta = now - lastFrameTime;
+	lastFrameTime = now;
+	
+	// resize canvas to use full page, adjust camera/renderer
+	resize();
+
+	// rotate the cube
+	mesh.rotation.x = Math.sin(now) * Math.PI * 0.2;
+	mesh.rotation.y = Math.cos(now) * Math.PI * 0.4;
+
+	// update the animation
+	skeletonMesh.update(delta);
+
+	// render the scene
+	renderer.render(scene, camera);
+
+	requestAnimationFrame(render);
+}
+
+function resize () {
+	var w = window.innerWidth;
+	var h = window.innerHeight;	
+	if (canvas.width != w || canvas.height != h) {
+		canvas.width = w;
+		canvas.height = h;
+	}
+
+	camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(w, h);
+}
+
+(function() {
+	init();
+}());
+</script>
+</body>
+</html>

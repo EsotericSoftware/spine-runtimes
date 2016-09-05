@@ -1,0 +1,279 @@
+<html>
+<script src="../../build/spine-webgl.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<style>
+	* { margin: 0; padding: 0; }
+	body, html { height: 100% }
+	canvas { position: absolute; width: 100% ;height: 100%; }
+</style>
+<body>
+<canvas id="canvas"></canvas>
+<center>
+<div style="color: #fff; position: fixed; top: 0; width: 100%">
+<span>Skeleton:</span><select id="skeletonList"></select>
+<span>Animation:</span><select id="animationList"></select>
+<span>Skin:</span><select id="skinList"></select>
+<div>
+</center>
+</body>
+<script>
+
+var lastFrameTime = Date.now() / 1000;
+var canvas;
+var shader;
+var batcher;
+var gl;
+var mvp = new spine.webgl.Matrix4();
+var assetManager;
+var skeletonRenderer;
+var debugRenderer;
+var debugShader;
+var skeletons = {};
+var activeSkeleton = "hero-mesh";
+
+function init () {
+	// Setup canvas and WebGL context. We pass alpha: false to canvas.getContext() so we don't use premultiplied alpha when
+	// loading textures. That is handled separately by PolygonBatcher.
+	canvas = document.getElementById("canvas");
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+	var config = { alpha: false };
+	gl = canvas.getContext("webgl", config) || canvas.getContext("experimental-webgl", config);	
+	
+	// Create a simple shader, mesh, model-view-projection matrix and SkeletonRenderer.
+	shader = spine.webgl.Shader.newColoredTextured(gl);
+	batcher = new spine.webgl.PolygonBatcher(gl);
+	mvp.ortho2d(0, 0, canvas.width - 1, canvas.height - 1);
+	skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);
+	debugRenderer = new spine.webgl.SkeletonDebugRenderer(gl);
+	debugRenderer.drawRegionAttachments = false;
+	debugRenderer.drawBoundingBoxes = false;
+	debugRenderer.drawMeshHull = false;
+	debugRenderer.drawMeshTriangles = false;
+	debugRenderer.drawPaths = false;
+	debugShader = spine.webgl.Shader.newColored(gl);
+	assetManager = new spine.webgl.AssetManager(gl);
+
+	// Tell AssetManager to load the resources for each model, including the exported .json file, the .atlas file and the .png
+	// file for the atlas. We then wait until all resources are loaded in the load() method.
+	assetManager.loadText("assets/spineboy.json");
+	assetManager.loadText("assets/spineboy.atlas");
+	assetManager.loadTexture("assets/spineboy.png");
+	assetManager.loadText("assets/raptor.json");
+	assetManager.loadText("assets/raptor.atlas");
+	assetManager.loadTexture("assets/raptor.png");
+	assetManager.loadText("assets/tank.json");
+	assetManager.loadText("assets/tank.atlas");
+	assetManager.loadTexture("assets/tank.png");
+	assetManager.loadText("assets/goblins-mesh.json");
+	assetManager.loadText("assets/goblins-mesh.atlas");
+	assetManager.loadTexture("assets/goblins-mesh.png");
+	assetManager.loadText("assets/vine.json");
+	assetManager.loadText("assets/vine.atlas");
+	assetManager.loadTexture("assets/vine.png");
+	assetManager.loadText("assets/hero-mesh.json");
+	assetManager.loadText("assets/hero-mesh.atlas");
+	assetManager.loadTexture("assets/hero-mesh.png");	
+	requestAnimationFrame(load);
+}
+
+function load () {
+	// Wait until the AssetManager has loaded all resources, then load the skeletons.
+	if (assetManager.isLoadingComplete()) {
+		skeletons["spineboy"] = loadSkeleton("spineboy", "run", false);
+		skeletons["raptor"] = loadSkeleton("raptor", "walk", false);
+		skeletons["tank"] = loadSkeleton("tank", "drive", false);
+		skeletons["goblins"] = loadSkeleton("goblins-mesh", "walk", true, "goblin");
+		skeletons["vine"] = loadSkeleton("vine", "animation", false);
+		skeletons["hero-mesh"] = loadSkeleton("hero-mesh", "Headturn", false);		
+		setupUI();
+		requestAnimationFrame(render);
+	} else {
+		requestAnimationFrame(load);
+	}
+}
+
+function loadSkeleton (name, initialAnimation, premultipliedAlpha, skin) {
+	if (skin === undefined) skin = "default";
+
+	// Load the texture atlas using name.atlas and name.png from the AssetManager.
+	// The function passed to TextureAtlas is used to resolve relative paths.
+	atlas = new spine.TextureAtlas(assetManager.get("assets/" + name + ".atlas"), function(path) {
+		return assetManager.get("assets/" + path);		
+	});
+
+	// Create a TextureAtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
+	atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
+
+	// Create a SkeletonJson instance for parsing the .json file.
+	var skeletonJson = new spine.SkeletonJson(atlasLoader);
+	
+	// Set the scale to apply during parsing, parse the file, and create a new skeleton.	
+	var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/" + name + ".json"));
+	var skeleton = new spine.Skeleton(skeletonData);
+	skeleton.setSkinByName(skin);
+	var bounds = calculateBounds(skeleton);	
+
+	// Create an AnimationState, and set the initial animation in looping mode.
+	var animationState = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
+	animationState.setAnimation(0, initialAnimation, true);
+	animationState.addListener({
+		event: function(trackIndex, event) {
+			// console.log("Event on track " + trackIndex + ": " + JSON.stringify(event));
+		},
+		complete: function(trackIndex, loopCount) {
+			// console.log("Animation on track " + trackIndex + " completed, loop count: " + loopCount);
+		},
+		start: function(trackIndex) {
+			// console.log("Animation on track " + trackIndex + " started");
+		},
+		end: function(trackIndex) {
+			// console.log("Animation on track " + trackIndex + " ended");
+		}
+	})
+
+	// Pack everything up and return to caller.
+	return { skeleton: skeleton, state: animationState, bounds: bounds, premultipliedAlpha: premultipliedAlpha };
+}
+
+function calculateBounds(skeleton) {	
+	skeleton.setToSetupPose();
+	skeleton.updateWorldTransform();
+	var offset = new spine.Vector2();
+	var size = new spine.Vector2();
+	skeleton.getBounds(offset, size);
+	return { offset: offset, size: size };
+}
+
+function setupUI () {
+	var skeletonList = $("#skeletonList");
+	for (var skeletonName in skeletons) {
+		var option = $("<option></option>");
+		option.attr("value", skeletonName).text(skeletonName);
+		if (skeletonName === activeSkeleton) option.attr("selected", "selected");
+		skeletonList.append(option);
+	}
+	var setupAnimationUI = function() {
+		var animationList = $("#animationList");
+		animationList.empty();
+		var skeleton = skeletons[activeSkeleton].skeleton;
+		var state = skeletons[activeSkeleton].state;
+		var activeAnimation = state.tracks[0].animation.name;
+		for (var i = 0; i < skeleton.data.animations.length; i++) {
+			var name = skeleton.data.animations[i].name;
+			var option = $("<option></option>");
+			option.attr("value", name).text(name);
+			if (name === activeAnimation) option.attr("selected", "selected");
+			animationList.append(option);
+		}
+
+		animationList.change(function() {
+			var state = skeletons[activeSkeleton].state;
+			var skeleton = skeletons[activeSkeleton].skeleton;
+			var animationName = $("#animationList option:selected").text();
+			skeleton.setToSetupPose();
+			state.setAnimation(0, animationName, true);			
+		})
+	}
+
+	var setupSkinUI = function() {
+		var skinList = $("#skinList");
+		skinList.empty();
+		var skeleton = skeletons[activeSkeleton].skeleton;
+		var activeSkin = skeleton.skin == null ? "default" : skeleton.skin.name;
+		for (var i = 0; i < skeleton.data.skins.length; i++) {
+			var name = skeleton.data.skins[i].name;
+			var option = $("<option></option>");
+			option.attr("value", name).text(name);
+			if (name === activeSkin) option.attr("selected", "selected");
+			skinList.append(option);
+		}
+
+		skinList.change(function() {			
+			var skeleton = skeletons[activeSkeleton].skeleton;
+			var skinName = $("#skinList option:selected").text();
+			skeleton.setSkinByName(skinName);
+			skeleton.setSlotsToSetupPose();
+		})
+	}
+
+	skeletonList.change(function() {
+		activeSkeleton = $("#skeletonList option:selected").text();
+		setupAnimationUI();
+		setupSkinUI();
+	})
+	setupAnimationUI();
+	setupSkinUI();
+}
+
+function render () {
+	var now = Date.now() / 1000;
+	var delta = now - lastFrameTime;
+	lastFrameTime = now;
+
+	// Update the MVP matrix to adjust for canvas size changes
+	resize();
+
+	gl.clearColor(0.3, 0.3, 0.3, 1);
+	gl.clear(gl.COLOR_BUFFER_BIT);
+
+	// Apply the animation state based on the delta time.
+	var state = skeletons[activeSkeleton].state;
+	var skeleton = skeletons[activeSkeleton].skeleton;
+	var premultipliedAlpha = skeletons[activeSkeleton].premultipliedAlpha;
+	state.update(delta);
+	state.apply(skeleton);
+	skeleton.updateWorldTransform();
+
+	// Bind the shader and set the texture and model-view-projection matrix.
+	shader.bind();
+	shader.setUniformi(spine.webgl.Shader.SAMPLER, 0);
+	shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, mvp.values);
+
+	// Start the batch and tell the SkeletonRenderer to render the active skeleton.
+	batcher.begin(shader);
+	skeletonRenderer.premultipliedAlpha = premultipliedAlpha;
+	skeletonRenderer.draw(batcher, skeleton);
+	batcher.end();
+		
+	shader.unbind();
+
+	// draw debug information
+	debugShader.bind();
+	debugShader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, mvp.values);
+	debugRenderer.premultipliedAlpha = premultipliedAlpha;
+	debugRenderer.draw(debugShader, skeleton);
+	debugShader.unbind();
+
+	requestAnimationFrame(render);
+}
+
+function resize () {
+	var w = canvas.clientWidth;
+	var h = canvas.clientHeight;
+	var bounds = skeletons[activeSkeleton].bounds;
+	if (canvas.width != w || canvas.height != h) {
+		canvas.width = w;
+		canvas.height = h;
+	}
+
+	// magic
+	var centerX = bounds.offset.x + bounds.size.x / 2;
+	var centerY = bounds.offset.y + bounds.size.y / 2;
+	var scaleX = bounds.size.x / canvas.width;
+	var scaleY = bounds.size.y / canvas.height;
+	var scale = Math.max(scaleX, scaleY) * 1.2;
+	if (scale < 1) scale = 1;
+	var width = canvas.width * scale;
+	var height = canvas.height * scale;
+
+	mvp.ortho2d(centerX - width / 2, centerY - height / 2, width, height);
+	gl.viewport(0, 0, canvas.width, canvas.height);
+}
+
+(function() {
+	init();
+})();
+
+</script>
+</html>

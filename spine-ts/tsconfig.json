@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"module": "none",
+		"noImplicitAny": true,
+		"removeComments": true,
+		"preserveConstEnums": true,
+		"outFile": "build/spine-all.js",
+		"sourceMap": true,
+		"declaration": true
+	},
+	"include": [
+		"core/src/**/*",
+		"canvas/src/**/*",
+		"webgl/src/**/*",
+		"threejs/src/**/*",
+		"widget/src/**/*"
+	],
+	"exclude": [		
+		"build"				 
+	]
+}
