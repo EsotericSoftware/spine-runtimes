@@ -25,14 +25,14 @@
 		43C32A06170B0F93004A9460 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 43C32A05170B0F93004A9460 /* main.m */; };
 		43C32A09170B10FF004A9460 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 43C32A08170B10FF004A9460 /* AppDelegate.m */; };
 		43CA50391CAF6BCE005ABFFC /* libcocos2d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 431D321E1C73FF8A002061D6 /* libcocos2d.a */; };
-		43F7010F1927FBC700CA4038 /* goblins-mesh.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 43F7010C1927FBC700CA4038 /* goblins-mesh.atlas */; };
 		43F701101927FBC700CA4038 /* goblins-mesh.json in Resources */ = {isa = PBXBuildFile; fileRef = 43F7010D1927FBC700CA4038 /* goblins-mesh.json */; };
-		43F701111927FBC700CA4038 /* goblins-mesh.png in Resources */ = {isa = PBXBuildFile; fileRef = 43F7010E1927FBC700CA4038 /* goblins-mesh.png */; };
 		43F7FF881927F94800CA4038 /* SkeletonAnimation.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF841927F94800CA4038 /* SkeletonAnimation.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		43F7FF891927F94800CA4038 /* SkeletonRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF861927F94800CA4038 /* SkeletonRenderer.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		43F7FF8E1927F96700CA4038 /* GoblinsExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF8B1927F96700CA4038 /* GoblinsExample.m */; };
 		43F7FF8F1927F96700CA4038 /* SpineboyExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 43F7FF8D1927F96700CA4038 /* SpineboyExample.m */; };
 		652107961895250000B1FF07 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 652107951895250000B1FF07 /* CoreText.framework */; };
+		765A2EF61D7D7A08003FB779 /* goblins.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 765A2EF41D7D7A08003FB779 /* goblins.atlas */; };
+		765A2EF71D7D7A08003FB779 /* goblins.png in Resources */ = {isa = PBXBuildFile; fileRef = 765A2EF51D7D7A08003FB779 /* goblins.png */; };
 		76F5BD7D1D2BDCB5005917E5 /* Animation.c in Sources */ = {isa = PBXBuildFile; fileRef = 76F5BD5D1D2BDCB5005917E5 /* Animation.c */; };
 		76F5BD7E1D2BDCB5005917E5 /* AnimationState.c in Sources */ = {isa = PBXBuildFile; fileRef = 76F5BD5E1D2BDCB5005917E5 /* AnimationState.c */; };
 		76F5BD7F1D2BDCB5005917E5 /* AnimationStateData.c in Sources */ = {isa = PBXBuildFile; fileRef = 76F5BD5F1D2BDCB5005917E5 /* AnimationStateData.c */; };
@@ -144,9 +144,7 @@
 		43C32A05170B0F93004A9460 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "Resources-ios/main.m"; sourceTree = "<group>"; };
 		43C32A07170B10FF004A9460 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = "Resources-ios/AppDelegate.h"; sourceTree = "<group>"; };
 		43C32A08170B10FF004A9460 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = "Resources-ios/AppDelegate.m"; sourceTree = "<group>"; };
-		43F7010C1927FBC700CA4038 /* goblins-mesh.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "goblins-mesh.atlas"; path = "Resources/goblins-mesh.atlas"; sourceTree = "<group>"; };
 		43F7010D1927FBC700CA4038 /* goblins-mesh.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "goblins-mesh.json"; path = "Resources/goblins-mesh.json"; sourceTree = "<group>"; };
-		43F7010E1927FBC700CA4038 /* goblins-mesh.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "goblins-mesh.png"; path = "Resources/goblins-mesh.png"; sourceTree = "<group>"; };
 		43F7FF831927F94800CA4038 /* SkeletonAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonAnimation.h; path = src/spine/SkeletonAnimation.h; sourceTree = "<group>"; };
 		43F7FF841927F94800CA4038 /* SkeletonAnimation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SkeletonAnimation.m; path = src/spine/SkeletonAnimation.m; sourceTree = "<group>"; };
 		43F7FF851927F94800CA4038 /* SkeletonRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonRenderer.h; path = src/spine/SkeletonRenderer.h; sourceTree = "<group>"; };
@@ -156,6 +154,8 @@
 		43F7FF8C1927F96700CA4038 /* SpineboyExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SpineboyExample.h; path = example/SpineboyExample.h; sourceTree = "<group>"; };
 		43F7FF8D1927F96700CA4038 /* SpineboyExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SpineboyExample.m; path = example/SpineboyExample.m; sourceTree = "<group>"; };
 		652107951895250000B1FF07 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
+		765A2EF41D7D7A08003FB779 /* goblins.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = goblins.atlas; path = Resources/goblins.atlas; sourceTree = "<group>"; };
+		765A2EF51D7D7A08003FB779 /* goblins.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = goblins.png; path = Resources/goblins.png; sourceTree = "<group>"; };
 		76F5BD5D1D2BDCB5005917E5 /* Animation.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Animation.c; path = "../spine-c/src/spine/Animation.c"; sourceTree = "<group>"; };
 		76F5BD5E1D2BDCB5005917E5 /* AnimationState.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = AnimationState.c; path = "../spine-c/src/spine/AnimationState.c"; sourceTree = "<group>"; };
 		76F5BD5F1D2BDCB5005917E5 /* AnimationStateData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = AnimationStateData.c; path = "../spine-c/src/spine/AnimationStateData.c"; sourceTree = "<group>"; };
@@ -322,15 +322,15 @@
 		43C32867170B0C7F004A9460 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				765A2EF41D7D7A08003FB779 /* goblins.atlas */,
+				765A2EF51D7D7A08003FB779 /* goblins.png */,
 				76F5BD9C1D2BDE1C005917E5 /* raptor.atlas */,
 				76F5BD9D1D2BDE1C005917E5 /* raptor.json */,
 				76F5BD9E1D2BDE1C005917E5 /* raptor.png */,
 				76F5BD9F1D2BDE1C005917E5 /* tank.atlas */,
 				76F5BDA01D2BDE1C005917E5 /* tank.json */,
 				76F5BDA11D2BDE1C005917E5 /* tank.png */,
-				43F7010C1927FBC700CA4038 /* goblins-mesh.atlas */,
 				43F7010D1927FBC700CA4038 /* goblins-mesh.json */,
-				43F7010E1927FBC700CA4038 /* goblins-mesh.png */,
 				43C32868170B0DA6004A9460 /* spineboy.json */,
 				43C3286A170B0DA6004A9460 /* spineboy.atlas */,
 				43C3286B170B0DA6004A9460 /* spineboy.png */,
@@ -493,6 +493,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				765A2EF61D7D7A08003FB779 /* goblins.atlas in Resources */,
 				76F5BDA51D2BDE1C005917E5 /* tank.atlas in Resources */,
 				43C3286C170B0DA6004A9460 /* spineboy.json in Resources */,
 				43C3286E170B0DA6004A9460 /* spineboy.atlas in Resources */,
@@ -502,6 +503,7 @@
 				43C3287F170B0DBE004A9460 /* Default.png in Resources */,
 				76F5BDA31D2BDE1C005917E5 /* raptor.json in Resources */,
 				43C32880170B0DBE004A9460 /* Default@2x.png in Resources */,
+				765A2EF71D7D7A08003FB779 /* goblins.png in Resources */,
 				43C32881170B0DBE004A9460 /* Icon-72.png in Resources */,
 				76F5BDA41D2BDE1C005917E5 /* raptor.png in Resources */,
 				43C32882170B0DBE004A9460 /* Icon-Small-50.png in Resources */,
@@ -513,9 +515,7 @@
 				43C32886170B0DBE004A9460 /* Icon@2x.png in Resources */,
 				76F5BDA61D2BDE1C005917E5 /* tank.json in Resources */,
 				43C32888170B0DBE004A9460 /* iTunesArtwork in Resources */,
-				43F7010F1927FBC700CA4038 /* goblins-mesh.atlas in Resources */,
 				43F701101927FBC700CA4038 /* goblins-mesh.json in Resources */,
-				43F701111927FBC700CA4038 /* goblins-mesh.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

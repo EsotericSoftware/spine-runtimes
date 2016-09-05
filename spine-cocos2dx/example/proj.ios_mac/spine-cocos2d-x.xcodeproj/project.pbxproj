@@ -84,14 +84,6 @@
 		76AAA4471D1811B000C54FCB /* SpineboyExample.h in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3BF1D180F7C00C54FCB /* SpineboyExample.h */; };
 		76AAA4571D18132D00C54FCB /* common in Resources */ = {isa = PBXBuildFile; fileRef = 76AAA4521D18132D00C54FCB /* common */; };
 		76AAA4581D18132D00C54FCB /* common in Resources */ = {isa = PBXBuildFile; fileRef = 76AAA4521D18132D00C54FCB /* common */; };
-		76AAA4591D18132D00C54FCB /* ipad in Resources */ = {isa = PBXBuildFile; fileRef = 76AAA4531D18132D00C54FCB /* ipad */; };
-		76AAA45A1D18132D00C54FCB /* ipad in Resources */ = {isa = PBXBuildFile; fileRef = 76AAA4531D18132D00C54FCB /* ipad */; };
-		76AAA45B1D18132D00C54FCB /* ipad-retina in Resources */ = {isa = PBXBuildFile; fileRef = 76AAA4541D18132D00C54FCB /* ipad-retina */; };
-		76AAA45C1D18132D00C54FCB /* ipad-retina in Resources */ = {isa = PBXBuildFile; fileRef = 76AAA4541D18132D00C54FCB /* ipad-retina */; };
-		76AAA45D1D18132D00C54FCB /* iphone in Resources */ = {isa = PBXBuildFile; fileRef = 76AAA4551D18132D00C54FCB /* iphone */; };
-		76AAA45E1D18132D00C54FCB /* iphone in Resources */ = {isa = PBXBuildFile; fileRef = 76AAA4551D18132D00C54FCB /* iphone */; };
-		76AAA45F1D18132D00C54FCB /* iphone-retina in Resources */ = {isa = PBXBuildFile; fileRef = 76AAA4561D18132D00C54FCB /* iphone-retina */; };
-		76AAA4601D18132D00C54FCB /* iphone-retina in Resources */ = {isa = PBXBuildFile; fileRef = 76AAA4561D18132D00C54FCB /* iphone-retina */; };
 		76F5BD141D2BB57F005917E5 /* Animation.c in Sources */ = {isa = PBXBuildFile; fileRef = 76F5BCF41D2BB57F005917E5 /* Animation.c */; };
 		76F5BD151D2BB57F005917E5 /* AnimationState.c in Sources */ = {isa = PBXBuildFile; fileRef = 76F5BCF51D2BB57F005917E5 /* AnimationState.c */; };
 		76F5BD161D2BB57F005917E5 /* AnimationStateData.c in Sources */ = {isa = PBXBuildFile; fileRef = 76F5BCF61D2BB57F005917E5 /* AnimationStateData.c */; };
@@ -276,10 +268,6 @@
 		76AAA40A1D18106000C54FCB /* spine-cocos2dx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "spine-cocos2dx.cpp"; path = "../../src/spine/spine-cocos2dx.cpp"; sourceTree = "<group>"; };
 		76AAA40B1D18106000C54FCB /* spine-cocos2dx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "spine-cocos2dx.h"; path = "../../src/spine/spine-cocos2dx.h"; sourceTree = "<group>"; };
 		76AAA4521D18132D00C54FCB /* common */ = {isa = PBXFileReference; lastKnownFileType = folder; path = common; sourceTree = "<group>"; };
-		76AAA4531D18132D00C54FCB /* ipad */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ipad; sourceTree = "<group>"; };
-		76AAA4541D18132D00C54FCB /* ipad-retina */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "ipad-retina"; sourceTree = "<group>"; };
-		76AAA4551D18132D00C54FCB /* iphone */ = {isa = PBXFileReference; lastKnownFileType = folder; path = iphone; sourceTree = "<group>"; };
-		76AAA4561D18132D00C54FCB /* iphone-retina */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "iphone-retina"; sourceTree = "<group>"; };
 		76F5BCF41D2BB57F005917E5 /* Animation.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Animation.c; path = "../../../spine-c/src/spine/Animation.c"; sourceTree = "<group>"; };
 		76F5BCF51D2BB57F005917E5 /* AnimationState.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = AnimationState.c; path = "../../../spine-c/src/spine/AnimationState.c"; sourceTree = "<group>"; };
 		76F5BCF61D2BB57F005917E5 /* AnimationStateData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = AnimationStateData.c; path = "../../../spine-c/src/spine/AnimationStateData.c"; sourceTree = "<group>"; };
@@ -449,10 +437,6 @@
 			isa = PBXGroup;
 			children = (
 				76AAA4521D18132D00C54FCB /* common */,
-				76AAA4531D18132D00C54FCB /* ipad */,
-				76AAA4541D18132D00C54FCB /* ipad-retina */,
-				76AAA4551D18132D00C54FCB /* iphone */,
-				76AAA4561D18132D00C54FCB /* iphone-retina */,
 			);
 			name = Resources;
 			path = ../Resources;
@@ -696,19 +680,15 @@
 				5087E77D17EB970100C73F5D /* Default-568h@2x.png in Resources */,
 				5087E78517EB970100C73F5D /* Icon-72.png in Resources */,
 				76AAA4571D18132D00C54FCB /* common in Resources */,
-				76AAA4591D18132D00C54FCB /* ipad in Resources */,
 				521A8E6519F0C34300D177D7 /* Default-736h@3x.png in Resources */,
 				50EF62A317ECD613001EB2F8 /* Icon-50.png in Resources */,
 				5087E78017EB970100C73F5D /* Icon-114.png in Resources */,
 				50EF62A217ECD613001EB2F8 /* Icon-29.png in Resources */,
 				50EF629617ECD46A001EB2F8 /* Icon-40.png in Resources */,
 				5087E78217EB970100C73F5D /* Icon-144.png in Resources */,
-				76AAA45F1D18132D00C54FCB /* iphone-retina in Resources */,
-				76AAA45B1D18132D00C54FCB /* ipad-retina in Resources */,
 				50EF629817ECD46A001EB2F8 /* Icon-80.png in Resources */,
 				5087E78417EB970100C73F5D /* Icon-57.png in Resources */,
 				5087E77E17EB970100C73F5D /* Default.png in Resources */,
-				76AAA45D1D18132D00C54FCB /* iphone in Resources */,
 				521A8E6419F0C34300D177D7 /* Default-667h@2x.png in Resources */,
 				50EF629717ECD46A001EB2F8 /* Icon-58.png in Resources */,
 			);
@@ -718,12 +698,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				76AAA45E1D18132D00C54FCB /* iphone in Resources */,
 				503AE0F817EB97AB00D1A890 /* Icon.icns in Resources */,
-				76AAA4601D18132D00C54FCB /* iphone-retina in Resources */,
-				76AAA45C1D18132D00C54FCB /* ipad-retina in Resources */,
 				76AAA4581D18132D00C54FCB /* common in Resources */,
-				76AAA45A1D18132D00C54FCB /* ipad in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
