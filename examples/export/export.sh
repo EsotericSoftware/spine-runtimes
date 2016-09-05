@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-SPINE_EXE="C:\Program Files (x86)\Spine\Spine.com"
+SPINE_EXE="C:/Program Files (x86)/Spine/Spine.com"
 PLATFORM=`uname`
 echo $PLATFORM
 if [[ $PLATFORM == "Darwin" ]]; then
@@ -26,7 +26,7 @@ rm -rf ../vine/export/*
 
 echo ""
 echo "Exporting..."
-$SPINE_EXE \
+"$SPINE_EXE" \
 -i ../alien/alien.spine -o ../alien/export -e json.json \
 -i ../alien/alien.spine -o ../alien/export -e binary.json \
 -i ../alien/images -o ../alien/export -n alien -p atlas-0.5.json \
