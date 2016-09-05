@@ -94,7 +94,7 @@ var stretchyDemo = function(loadingComplete, bgColor) {
 				for (var i = 0; i < controlBones.length; i++) {	
 					var bone = skeleton.findBone(controlBones[i]);				
 					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);				
-					if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 20) {
+					if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30) {
 						target = bone;
 					}				
 				}
@@ -124,7 +124,7 @@ var stretchyDemo = function(loadingComplete, bgColor) {
 				for (var i = 0; i < controlBones.length; i++) {	
 					var bone = skeleton.findBone(controlBones[i]);				
 					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);				
-					if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 20) {
+					if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30) {
 						hoverTargets[i] = bone;
 					} else {
 						hoverTargets[i] = null;
@@ -173,16 +173,16 @@ var stretchyDemo = function(loadingComplete, bgColor) {
 		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
 		gl.clear(gl.COLOR_BUFFER_BIT);			
 
-		renderer.begin();				
+		renderer.begin();
 		renderer.drawSkeleton(skeleton, true);
 		renderer.drawSkeletonDebug(skeleton, false, ["root"]);
 		gl.lineWidth(2);
-		for (var i = 0; i < controlBones.length; i++) {		
+		for (var i = 0; i < controlBones.length; i++) {
 			var bone = skeleton.findBone(controlBones[i]);
 			var colorInner = hoverTargets[i] !== null ? spineDemos.HOVER_COLOR_INNER : spineDemos.NON_HOVER_COLOR_INNER;
 			var colorOuter = hoverTargets[i] !== null ? spineDemos.HOVER_COLOR_OUTER : spineDemos.NON_HOVER_COLOR_OUTER;
-			renderer.circle(true, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorInner);			
-			renderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorOuter);			
+			renderer.circle(true, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorInner);
+			renderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorOuter);
 		}
 		renderer.end();
 		gl.lineWidth(1);

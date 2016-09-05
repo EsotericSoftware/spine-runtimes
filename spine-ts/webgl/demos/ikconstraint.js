@@ -88,7 +88,7 @@ var ikConstraintDemo = function(loadingComplete, bgColor) {
 				for (var i = 0; i < controlBones.length; i++) {	
 					var bone = skeleton.findBone(controlBones[i]);				
 					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);				
-					if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 20) {
+					if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30) {
 						target = bone;
 					}				
 				}
@@ -113,7 +113,7 @@ var ikConstraintDemo = function(loadingComplete, bgColor) {
 				for (var i = 0; i < controlBones.length; i++) {	
 					var bone = skeleton.findBone(controlBones[i]);				
 					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);				
-					if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 20) {
+					if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30) {
 						hoverTargets[i] = bone;
 					} else {
 						hoverTargets[i] = null;
