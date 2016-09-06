@@ -13,7 +13,7 @@ var spritesheetsDemo = function(loadingComplete, bgColor) {
 
 	var DEMO_NAME = "SpritesheetsDemo";
 
-	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);
+	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
 		canvas = document.getElementById("spritesheets-canvas");
@@ -151,8 +151,6 @@ var spritesheetsDemo = function(loadingComplete, bgColor) {
 		renderer.drawSkeleton(skeleton, true);
 		renderer.drawSkeleton(skeletonSeq, true);		
 		renderer.end();
-
-		console.log(Math.round(animationState.getCurrent(0).time*10)/10 + " " + Math.round(walkLastTime*10)/10)
 	}
 
 	init();

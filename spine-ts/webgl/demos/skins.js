@@ -7,7 +7,7 @@ var skinsDemo = function(loadingComplete, bgColor) {
 
 	var DEMO_NAME = "SkinsDemo";
 
-	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);		
+	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);		
 
 	function init () {
 		canvas = document.getElementById("skins-canvas");
@@ -197,7 +197,7 @@ var skinsDemo = function(loadingComplete, bgColor) {
 			}
 		}
 
-		renderer.camera.position.x = offset.x + bounds.x * 1.5 - 150;
+		renderer.camera.position.x = offset.x + bounds.x * 1.5 - 125;
 		renderer.camera.position.y = offset.y + bounds.y / 2;
 		renderer.camera.viewportWidth = bounds.x * 3;
 		renderer.camera.viewportHeight = bounds.y * 1.2;

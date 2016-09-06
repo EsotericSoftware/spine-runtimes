@@ -17,7 +17,7 @@ var transformsDemo = function(loadingComplete, bgColor) {
 
 	var DEMO_NAME = "TransformsDemo";
 
-	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);
+	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
 		canvas = document.getElementById("transforms-canvas");
