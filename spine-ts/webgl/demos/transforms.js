@@ -1,4 +1,4 @@
-var transformConstraintDemo = function(loadingComplete, bgColor) {
+var transformsDemo = function(loadingComplete, bgColor) {
 	var COLOR_INNER = new spine.Color(0.8, 0, 0, 0.5);
 	var COLOR_OUTER = new spine.Color(0.8, 0, 0, 0.8);
 	var COLOR_INNER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.5);
@@ -15,12 +15,12 @@ var transformConstraintDemo = function(loadingComplete, bgColor) {
 	var lastRotation = 0;
 	var mix, lastOffset = 0, lastMix = 0.5;
 
-	var DEMO_NAME = "TransformConstraintDemo";
+	var DEMO_NAME = "TransformsDemo";
 
 	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);
 
 	function init () {
-		canvas = document.getElementById("transformdemo-canvas");
+		canvas = document.getElementById("transforms-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
@@ -45,7 +45,7 @@ var transformConstraintDemo = function(loadingComplete, bgColor) {
 			});
 			var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
-			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").transformConstraint);
+			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").transforms);
 			skeleton = new spine.Skeleton(skeletonData);
 			skeleton.setToSetupPose();
 			skeleton.updateWorldTransform();
@@ -75,27 +75,27 @@ var transformConstraintDemo = function(loadingComplete, bgColor) {
 	}
 
 	function setupUI() {
-		var rotationOffset = $("#transformdemo-rotationoffset").data("slider");
+		var rotationOffset = $("#transforms-rotationoffset").data("slider");
 		rotationOffset.changed = function (percent) {
 			var val = percent * 360 - 180;
 			var delta = val - lastOffset;
 			lastOffset = val;
 			skeleton.findTransformConstraint("wheel2").data.offsetRotation += delta;			
 			skeleton.findTransformConstraint("wheel3").data.offsetRotation += delta;
-			$("#transformdemo-rotationoffset-label").text(Math.round(val) + "°");
+			$("#transforms-rotationoffset-label").text(Math.round(val) + "°");
 		};
-		$("#transformdemo-rotationoffset-label").text("0°");
+		$("#transforms-rotationoffset-label").text("0°");
 
-		var translationMix = $("#transformdemo-translationmix").data("slider");
+		var translationMix = $("#transforms-translationmix").data("slider");
 		translationMix.set(0.5);
 		translationMix.changed = function (percent) {
 			var val = percent;
 			var delta = val - lastMix;
 			lastMix = val;
 			skeleton.findTransformConstraint("wheel1").translateMix += delta;
-			$("#transformdemo-translationmix-label").text(Math.round(val * 100) + "%");
+			$("#transforms-translationmix-label").text(Math.round(val * 100) + "%");
 		};
-		$("#transformdemo-translationmix-label").text("50%");
+		$("#transforms-translationmix-label").text("50%");
 	}
 
 	function setupInput() {

@@ -9,7 +9,7 @@ var tankDemo = function(loadingComplete, bgColor) {
 	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);
 
 	function init () {
-		canvas = document.getElementById("tankdemo-canvas");
+		canvas = document.getElementById("tank-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
@@ -59,7 +59,7 @@ var tankDemo = function(loadingComplete, bgColor) {
 	}
 
 	function setupUI() {
-		playButton = $("#tankdemo-playbutton");
+		playButton = $("#tank-playbutton");
 		var playButtonUpdate = function () {			
 			isPlaying = !isPlaying;
 			if (isPlaying) {
@@ -73,7 +73,7 @@ var tankDemo = function(loadingComplete, bgColor) {
 		playButton.click(playButtonUpdate);
 		playButton.addClass("pause");
 
-		timeLine = $("#tankdemo-timeline").data("slider");
+		timeLine = $("#tank-timeline").data("slider");
 		timeLine.changed = function (percent) {
 			if (isPlaying) playButton.click();
 			if (!isPlaying) {
@@ -88,7 +88,7 @@ var tankDemo = function(loadingComplete, bgColor) {
 
 		renderer.skeletonDebugRenderer.drawPaths = false;
 		renderer.skeletonDebugRenderer.drawBones = false;
-		$("#tankdemo-drawbones").change(function() {
+		$("#tank-drawbones").change(function() {
 			renderer.skeletonDebugRenderer.drawPaths = this.checked;
 			renderer.skeletonDebugRenderer.drawBones = this.checked;			
 		});	

@@ -1,4 +1,4 @@
-var frameByFrameDemo = function(loadingComplete, bgColor) {
+var imageChangesDemo = function(loadingComplete, bgColor) {
 	var OUTLINE_COLOR = new spine.Color(0, 0.8, 0, 1);	
 
 	var canvas, gl, renderer, input, assetManager;
@@ -8,12 +8,12 @@ var frameByFrameDemo = function(loadingComplete, bgColor) {
 	var activeSkeleton = "Alien";
 	var playButton, timeLine, isPlaying = true;
 
-	var DEMO_NAME = "FrameByFrameDemo";
+	var DEMO_NAME = "ImageChangesDemo";
 
 	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);
 
 	function init () {
-		canvas = document.getElementById("framebyframedemo-canvas");
+		canvas = document.getElementById("imagechanges-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
@@ -43,7 +43,7 @@ var frameByFrameDemo = function(loadingComplete, bgColor) {
 	}
 
 	function setupUI() {
-		playButton = $("#framebyframedemo-playbutton");
+		playButton = $("#imagechanges-playbutton");
 		var playButtonUpdate = function () {			
 			isPlaying = !isPlaying;
 			if (isPlaying) {
@@ -57,7 +57,7 @@ var frameByFrameDemo = function(loadingComplete, bgColor) {
 		playButton.click(playButtonUpdate);
 		playButton.addClass("pause");
 
-		timeLine = $("#framebyframedemo-timeline").data("slider");
+		timeLine = $("#imagechanges-timeline").data("slider");
 		timeLine.changed = function (percent) {
 			if (isPlaying) playButton.click();		
 			if (!isPlaying) {
@@ -71,7 +71,7 @@ var frameByFrameDemo = function(loadingComplete, bgColor) {
 			}
 		};
 
-		var list = $("#framebyframedemo-active-skeleton");	
+		var list = $("#imagechanges-skeleton");	
 		for (var skeletonName in skeletons) {
 			var option = $("<option></option>");
 			option.attr("value", skeletonName).text(skeletonName);
@@ -79,7 +79,7 @@ var frameByFrameDemo = function(loadingComplete, bgColor) {
 			list.append(option);
 		}
 		list.change(function() {
-			activeSkeleton = $("#framebyframedemo-active-skeleton option:selected").text();
+			activeSkeleton = $("#imagechanges-skeleton option:selected").text();
 			var active = skeletons[activeSkeleton];
 			var animationDuration = active.state.getCurrent(0).animation.duration;
 			timeLine.set(active.playTime / animationDuration);

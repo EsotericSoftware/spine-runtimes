@@ -10,7 +10,7 @@ var skinsDemo = function(loadingComplete, bgColor) {
 	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);		
 
 	function init () {
-		canvas = document.getElementById("skinsdemo-canvas");
+		canvas = document.getElementById("skins-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
@@ -114,7 +114,7 @@ var skinsDemo = function(loadingComplete, bgColor) {
 	}
 
 	function setupUI() {
-		var list = $("#skinsdemo-active-skin");	
+		var list = $("#skins-skin");	
 		for (var skin in skeleton.data.skins) {
 			skin = skeleton.data.skins[skin];
 			if (skin.name == "default") continue;
@@ -127,15 +127,15 @@ var skinsDemo = function(loadingComplete, bgColor) {
 			list.append(option);
 		}
 		list.change(function() {
-			activeSkin = $("#skinsdemo-active-skin option:selected").text();
+			activeSkin = $("#skins-skin option:selected").text();
 			skeleton.setSkinByName(activeSkin);
 			skeleton.setSlotsToSetupPose();
 			randomizeSkins.checked = false;
 		});
 
-		$("#skinsdemo-randomizeattachments").click(randomizeAttachments);
-		$("#skinsdemo-swingsword").click(swingSword);
-		randomizeSkins = document.getElementById("skinsdemo-randomizeskins");
+		$("#skins-randomizeattachments").click(randomizeAttachments);
+		$("#skins-swingsword").click(swingSword);
+		randomizeSkins = document.getElementById("skins-randomizeskins");
 	}
 
 	function setSkin (skin) {
@@ -160,7 +160,7 @@ var skinsDemo = function(loadingComplete, bgColor) {
 			}
 		}
 		setSkin(result);
-		$("#skinsdemo-active-skin option").filter(function() {
+		$("#skins-skin option").filter(function() {
 			return ($(this).text() == result.name);
 		}).prop("selected", true);		
 	}
