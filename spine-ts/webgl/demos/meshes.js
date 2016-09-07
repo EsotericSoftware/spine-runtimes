@@ -46,13 +46,10 @@ var meshesDemo = function(loadingComplete, bgColor) {
 		playButton = $("#meshes-playbutton");
 		var playButtonUpdate = function () {			
 			isPlaying = !isPlaying;
-			if (isPlaying) {
-				playButton.val("Pause");
-				playButton.addClass("pause").removeClass("play");		
-			} else {
-				playButton.val("Play");
+			if (isPlaying)
+				playButton.addClass("pause").removeClass("play");
+			else
 				playButton.addClass("play").removeClass("pause");
-			}			
 		}
 		playButton.click(playButtonUpdate);
 		playButton.addClass("pause");
