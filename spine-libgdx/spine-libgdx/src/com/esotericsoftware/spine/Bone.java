@@ -137,26 +137,20 @@ public class Bone implements Updatable {
 			d = pc * lb + pd * ld;
 		} else {
 			if (data.inheritRotation) { // No scale inheritance.
+				float psx = (float)Math.sqrt(pa * pa + pc * pc);
+				float psy = (float)Math.sqrt(pb * pb + pd * pd);
+				if (psx > 0.0001f) {
+					pa /= psx;
+					pc /= psx;
+				}
+				if (psy > 0.0001f) {
+					pb /= psy;
+					pd /= psy;
+				}
 				a = pa * la + pb * lc;
 				b = pa * lb + pb * ld;
 				c = pc * la + pd * lc;
 				d = pc * lb + pd * ld;
-				float bs = (float)Math.sqrt(a * a + c * c), s = bs > 0.00001f ? 1 / bs : 0;
-				a *= s;
-				c *= s;
-				bs = (float)Math.sqrt(b * b + d * d);
-				s = bs > 0.00001f ? 1 / bs : 0;
-				b *= s;
-				d *= s;
-				float by = atan2(d, b);
-				float r = PI / 2 - (by - atan2(c, a));
-				if (r > PI)
-					r -= PI2;
-				else if (r < -PI) r += PI2;
-				r += by;
-				s = (float)Math.sqrt(b * b + d * d);
-				b = cos(r) * s;
-				d = sin(r) * s;
 			} else if (data.inheritScale) { // No rotation inheritance.
 				float psx = (float)Math.sqrt(pa * pa + pc * pc), psy, pr;
 				if (psx > 0.0001f) {
@@ -177,44 +171,12 @@ public class Bone implements Updatable {
 					blend = pr / 90;
 				else
 					blend = 1 - (pr - 90) / 90;
-				pa = lerp(psx, Math.abs(psy) * Math.signum(psx), blend);
-				pd = lerp(psy, Math.abs(psx) * Math.signum(psy), blend);
+				pa = psx + (Math.abs(psy) * Math.signum(psx) - psx) * blend;
+				pd = psy + (Math.abs(psx) * Math.signum(psy) - psy) * blend;
 				a = pa * la;
 				b = pa * lb;
 				c = pd * lc;
 				d = pd * ld;
-
-// pa = 1;
-// pb = 0;
-// pc = 0;
-// pd = 1;
-// do {
-// if (!parent.appliedValid) parent.updateAppliedTransform();
-// float cos = cosDeg(parent.arotation), sin = sinDeg(parent.arotation);
-// float psx = parent.ascaleX, psy = parent.ascaleY;
-// float za = cos * psx, zb = sin * psy, zc = sin * psx, zd = cos * psy;
-// float temp = pa * za + pb * zc;
-// pb = pb * zd - pa * zb;
-// pa = temp;
-// temp = pc * za + pd * zc;
-// pd = pd * zd - pc * zb;
-// pc = temp;
-//
-// if (psx >= 0) sin = -sin;
-// temp = pa * cos + pb * sin;
-// pb = pb * cos - pa * sin;
-// pa = temp;
-// temp = pc * cos + pd * sin;
-// pd = pd * cos - pc * sin;
-// pc = temp;
-//
-// if (!parent.data.inheritScale) break;
-// parent = parent.parent;
-// } while (parent != null);
-// a = pa * la + pb * lc;
-// b = pa * lb + pb * ld;
-// c = pc * la + pd * lc;
-// d = pc * lb + pd * ld;
 			} else {
 				a = la;
 				b = lb;
