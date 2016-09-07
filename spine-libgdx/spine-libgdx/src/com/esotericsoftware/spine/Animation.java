@@ -721,34 +721,32 @@ public class Animation {
 
 			// BOZO - Test.
 			if (alpha == 1) {
-				// Absolute.
+				// Vertex positions or deform offsets, no alpha.
 				for (int i = 0; i < vertexCount; i++) {
 					float prev = prevVertices[i];
 					vertices[i] = prev + (nextVertices[i] - prev) * percent;
 				}
-			} else {
-				if (setupPose) {
-					VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
-					if (vertexAttachment.getBones() == null) {
-						// Vertex positions.
-						float[] setupVertices = vertexAttachment.getVertices();
-						for (int i = 0; i < vertexCount; i++) {
-							float prev = prevVertices[i], setup = setupVertices[i];
-							vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
-						}
-					} else {
-						// Deform offsets.
-						for (int i = 0; i < vertexCount; i++) {
-							float prev = prevVertices[i];
-							vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
-						}
+			} else if (setupPose) {
+				VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
+				if (vertexAttachment.getBones() == null) {
+					// Unweighted vertex positions, with alpha.
+					float[] setupVertices = vertexAttachment.getVertices();
+					for (int i = 0; i < vertexCount; i++) {
+						float prev = prevVertices[i], setup = setupVertices[i];
+						vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
 					}
 				} else {
-					// Additive.
+					// Weighted deform offsets, with alpha.
 					for (int i = 0; i < vertexCount; i++) {
 						float prev = prevVertices[i];
-						vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
+						vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
 					}
+				}
+			} else {
+				// Vertex positions or deform offsets, with alpha.
+				for (int i = 0; i < vertexCount; i++) {
+					float prev = prevVertices[i];
+					vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
 				}
 			}
 		}
@@ -918,6 +916,8 @@ public class Animation {
 			float[] frames = this.frames;
 			if (time < frames[0]) return; // Time is before first frame.
 
+			// BOZO - Finish timelines handling setupPose and mixingOut from here down.
+			
 			IkConstraint constraint = skeleton.ikConstraints.get(ikConstraintIndex);
 
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.

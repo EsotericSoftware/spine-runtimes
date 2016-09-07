@@ -58,6 +58,7 @@ import com.esotericsoftware.spine.Animation.ShearTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 import com.esotericsoftware.spine.Animation.TransformConstraintTimeline;
 import com.esotericsoftware.spine.Animation.TranslateTimeline;
+import com.esotericsoftware.spine.BoneData.TransformMode;
 import com.esotericsoftware.spine.PathConstraintData.PositionMode;
 import com.esotericsoftware.spine.PathConstraintData.RotateMode;
 import com.esotericsoftware.spine.PathConstraintData.SpacingMode;
@@ -186,8 +187,7 @@ public class SkeletonBinary {
 				data.shearX = input.readFloat();
 				data.shearY = input.readFloat();
 				data.length = input.readFloat() * scale;
-				data.inheritRotation = input.readBoolean();
-				data.inheritScale = input.readBoolean();
+				data.transformMode = TransformMode.values[input.readInt(true)];
 				if (nonessential) Color.rgba8888ToColor(data.color, input.readInt());
 				skeletonData.bones.add(data);
 			}

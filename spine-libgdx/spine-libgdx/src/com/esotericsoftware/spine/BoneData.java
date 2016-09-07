@@ -39,7 +39,7 @@ public class BoneData {
 	final BoneData parent;
 	float length;
 	float x, y, rotation, scaleX = 1, scaleY = 1, shearX, shearY;
-	boolean inheritRotation = true, inheritScale = true;
+	TransformMode transformMode = TransformMode.normal;
 
 	// Nonessential.
 	final Color color = new Color(0.61f, 0.61f, 0.61f, 1);
@@ -157,20 +157,12 @@ public class BoneData {
 		this.shearY = shearY;
 	}
 
-	public boolean getInheritRotation () {
-		return inheritRotation;
+	public TransformMode getTransformMode () {
+		return transformMode;
 	}
 
-	public void setInheritRotation (boolean inheritRotation) {
-		this.inheritRotation = inheritRotation;
-	}
-
-	public boolean getInheritScale () {
-		return inheritScale;
-	}
-
-	public void setInheritScale (boolean inheritScale) {
-		this.inheritScale = inheritScale;
+	public void setTransformMode (TransformMode transformMode) {
+		this.transformMode = transformMode;
 	}
 
 	public Color getColor () {
@@ -179,5 +171,11 @@ public class BoneData {
 
 	public String toString () {
 		return name;
+	}
+
+	static public enum TransformMode {
+		normal, onlyTranslation, noRotation, noScale, noScaleOrReflection;
+
+		static public final TransformMode[] values = TransformMode.values();
 	}
 }

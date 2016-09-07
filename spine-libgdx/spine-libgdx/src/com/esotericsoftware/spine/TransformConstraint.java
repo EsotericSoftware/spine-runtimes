@@ -79,14 +79,14 @@ public class TransformConstraint implements Constraint {
 			}
 
 			if (scaleMix > 0) {
-				float bs = (float)Math.sqrt(bone.a * bone.a + bone.c * bone.c);
+				float s = (float)Math.sqrt(bone.a * bone.a + bone.c * bone.c);
 				float ts = (float)Math.sqrt(ta * ta + tc * tc);
-				float s = bs > 0.00001f ? (bs + (ts - bs + data.offsetScaleX) * scaleMix) / bs : 0;
+				if (s > 0.00001f) s = (s + (ts - s + data.offsetScaleX) * scaleMix) / s;
 				bone.a *= s;
 				bone.c *= s;
-				bs = (float)Math.sqrt(bone.b * bone.b + bone.d * bone.d);
+				s = (float)Math.sqrt(bone.b * bone.b + bone.d * bone.d);
 				ts = (float)Math.sqrt(tb * tb + td * td);
-				s = bs > 0.00001f ? (bs + (ts - bs + data.offsetScaleY) * scaleMix) / bs : 0;
+				if (s > 0.00001f) s = (s + (ts - s + data.offsetScaleY) * scaleMix) / s;
 				bone.b *= s;
 				bone.d *= s;
 				modified = true;

@@ -56,6 +56,7 @@ import com.esotericsoftware.spine.Animation.ShearTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 import com.esotericsoftware.spine.Animation.TransformConstraintTimeline;
 import com.esotericsoftware.spine.Animation.TranslateTimeline;
+import com.esotericsoftware.spine.BoneData.TransformMode;
 import com.esotericsoftware.spine.PathConstraintData.PositionMode;
 import com.esotericsoftware.spine.PathConstraintData.RotateMode;
 import com.esotericsoftware.spine.PathConstraintData.SpacingMode;
@@ -129,8 +130,7 @@ public class SkeletonJson {
 			data.scaleY = boneMap.getFloat("scaleY", 1);
 			data.shearX = boneMap.getFloat("shearX", 0);
 			data.shearY = boneMap.getFloat("shearY", 0);
-			data.inheritRotation = boneMap.getBoolean("inheritRotation", true);
-			data.inheritScale = boneMap.getBoolean("inheritScale", true);
+			data.transformMode = TransformMode.valueOf(boneMap.getString("transform", TransformMode.normal.name()));
 
 			String color = boneMap.getString("color", null);
 			if (color != null) data.getColor().set(Color.valueOf(color));

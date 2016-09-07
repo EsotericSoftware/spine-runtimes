@@ -37,6 +37,7 @@ import static com.badlogic.gdx.math.Matrix3.*;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.esotericsoftware.spine.BoneData.TransformMode;
 
 public class Bone implements Updatable {
 	final BoneData data;
@@ -100,12 +101,13 @@ public class Bone implements Updatable {
 		ashearY = shearY;
 		appliedValid = true;
 
-		float rotationY = rotation + 90 + shearY;
-		float la = cosDeg(rotation + shearX) * scaleX, lb = cosDeg(rotationY) * scaleY;
-		float lc = sinDeg(rotation + shearX) * scaleX, ld = sinDeg(rotationY) * scaleY;
-
 		Bone parent = this.parent;
 		if (parent == null) { // Root bone.
+			float rotationY = rotation + 90 + shearY;
+			float la = cosDeg(rotation + shearX) * scaleX;
+			float lb = cosDeg(rotationY) * scaleY;
+			float lc = sinDeg(rotation + shearX) * scaleX;
+			float ld = sinDeg(rotationY) * scaleY;
 			Skeleton skeleton = this.skeleton;
 			if (skeleton.flipX) {
 				x = -x;
@@ -130,28 +132,99 @@ public class Bone implements Updatable {
 		worldX = pa * x + pb * y + parent.worldX;
 		worldY = pc * x + pd * y + parent.worldY;
 
-		if (data.inheritRotation && data.inheritScale) {
+		switch (data.transformMode) {
+		case normal: {
+			float rotationY = rotation + 90 + shearY;
+			float la = cosDeg(rotation + shearX) * scaleX;
+			float lb = cosDeg(rotationY) * scaleY;
+			float lc = sinDeg(rotation + shearX) * scaleX;
+			float ld = sinDeg(rotationY) * scaleY;
 			a = pa * la + pb * lc;
 			b = pa * lb + pb * ld;
 			c = pc * la + pd * lc;
 			d = pc * lb + pd * ld;
-		} else {
-			if (data.inheritRotation) { // No scale inheritance.
-				float psx = (float)Math.sqrt(pa * pa + pc * pc);
-				float psy = (float)Math.sqrt(pb * pb + pd * pd);
-				if (psx > 0.0001f) {
-					pa /= psx;
-					pc /= psx;
+			return;
+		}
+		case onlyTranslation: {
+			float rotationY = rotation + 90 + shearY;
+			a = cosDeg(rotation + shearX) * scaleX;
+			b = cosDeg(rotationY) * scaleY;
+			c = sinDeg(rotation + shearX) * scaleX;
+			d = sinDeg(rotationY) * scaleY;
+			break;
+		}
+		case noRotation: {
+			if (false) {
+				// Summing parent rotations.
+				// 1) Negative parent scale causes bone to rotate.
+				float sum = 0;
+				Bone current = parent;
+				while (current != null) {
+					sum += current.arotation;
+					current = current.parent;
 				}
-				if (psy > 0.0001f) {
-					pb /= psy;
-					pd /= psy;
-				}
+				rotation -= sum;
+				float rotationY = rotation + 90 + shearY;
+				float la = cosDeg(rotation + shearX) * scaleX;
+				float lb = cosDeg(rotationY) * scaleY;
+				float lc = sinDeg(rotation + shearX) * scaleX;
+				float ld = sinDeg(rotationY) * scaleY;
 				a = pa * la + pb * lc;
 				b = pa * lb + pb * ld;
 				c = pc * la + pd * lc;
 				d = pc * lb + pd * ld;
-			} else if (data.inheritScale) { // No rotation inheritance.
+			} else if (true) {
+				// Old way.
+				// 1) Immediate parent scale is applied in wrong direction.
+				// 2) Negative parent scale causes bone to rotate.
+				pa = 1;
+				pb = 0;
+				pc = 0;
+				pd = 1;
+				float rotationY, la, lb, lc, ld;
+				outer:
+				do {
+					if (!parent.appliedValid) parent.updateAppliedTransform();
+					float pr = parent.arotation, psx = parent.ascaleX;
+					rotationY = pr + 90 + parent.ashearY;
+					la = cosDeg(pr + parent.shearX);
+					lb = cosDeg(rotationY);
+					lc = sinDeg(pr + parent.shearX);
+					ld = sinDeg(rotationY);
+					float temp = (pa * la + pb * lc) * psx;
+					pb = (pb * ld + pa * lb) * parent.ascaleY;
+					pa = temp;
+					temp = (pc * la + pd * lc) * psx;
+					pd = (pd * ld + pc * lb) * parent.ascaleY;
+					pc = temp;
+
+					if (psx < 0) lc = -lc;
+					temp = pa * la - pb * lc;
+					pb = pb * ld - pa * lb;
+					pa = temp;
+					temp = pc * la - pd * lc;
+					pd = pd * ld - pc * lb;
+					pc = temp;
+
+					switch (parent.data.transformMode) {
+					case noScale:
+					case noScaleOrReflection:
+						break outer;
+					}
+					parent = parent.parent;
+				} while (parent != null);
+				rotationY = rotation + 90 + shearY;
+				la = cosDeg(rotation + shearX) * scaleX;
+				lb = cosDeg(rotationY) * scaleY;
+				lc = sinDeg(rotation + shearX) * scaleX;
+				ld = sinDeg(rotationY) * scaleY;
+				a = pa * la + pb * lc;
+				b = pa * lb + pb * ld;
+				c = pc * la + pd * lc;
+				d = pc * lb + pd * ld;
+			} else {
+				// New way.
+				// 1) Negative scale can cause bone to flip.
 				float psx = (float)Math.sqrt(pa * pa + pc * pc), psy, pr;
 				if (psx > 0.0001f) {
 					float det = pa * pd - pb * pc;
@@ -173,24 +246,57 @@ public class Bone implements Updatable {
 					blend = 1 - (pr - 90) / 90;
 				pa = psx + (Math.abs(psy) * Math.signum(psx) - psx) * blend;
 				pd = psy + (Math.abs(psx) * Math.signum(psy) - psy) * blend;
-				a = pa * la;
-				b = pa * lb;
-				c = pd * lc;
-				d = pd * ld;
-			} else {
-				a = la;
-				b = lb;
-				c = lc;
-				d = ld;
+				float rotationY = rotation + 90 + shearY;
+				a = pa * cosDeg(rotation + shearX) * scaleX;
+				b = pa * cosDeg(rotationY) * scaleY;
+				c = pd * sinDeg(rotation + shearX) * scaleX;
+				d = pd * sinDeg(rotationY) * scaleY;
 			}
-			if (skeleton.flipX) {
-				a = -a;
+			break;
+		}
+		case noScale:
+		case noScaleOrReflection: {
+			float cos = cosDeg(rotation), sin = sinDeg(rotation);
+			float za = pa * cos + pb * sin, zb = za;
+			float zc = pc * cos + pd * sin, zd = zc;
+			float s = (float)Math.sqrt(za * za + zc * zc);
+			if (s > 0.00001f) s = 1 / s;
+			za *= s;
+			zc *= s;
+			s = (float)Math.sqrt(zb * zb + zd * zd);
+			if (s > 0.00001f) s = 1 / s;
+			zb *= s;
+			zd *= s;
+			float by = atan2(zd, zb), r = PI / 2 - (by - atan2(zc, za));
+			if (r > PI)
+				r -= PI2;
+			else if (r < -PI) r += PI2;
+			r += by;
+			s = (float)Math.sqrt(zb * zb + zd * zd);
+			zb = cos(r) * s;
+			zd = sin(r) * s;
+			float la = cosDeg(shearX) * scaleX;
+			float lb = cosDeg(90 + shearY) * scaleY;
+			float lc = sinDeg(shearX) * scaleX;
+			float ld = sinDeg(90 + shearY) * scaleY;
+			a = za * la + zb * lc;
+			b = za * lb + zb * ld;
+			c = zc * la + zd * lc;
+			d = zc * lb + zd * ld;
+			if (data.transformMode != TransformMode.noScaleOrReflection ? pa * pd - pb * pc < 0 : skeleton.flipX != skeleton.flipY) {
 				b = -b;
-			}
-			if (skeleton.flipY) {
-				c = -c;
 				d = -d;
 			}
+			return;
+		}
+		}
+		if (skeleton.flipX) {
+			a = -a;
+			b = -b;
+		}
+		if (skeleton.flipY) {
+			c = -c;
+			d = -d;
 		}
 	}
 
