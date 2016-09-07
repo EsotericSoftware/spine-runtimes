@@ -105,18 +105,16 @@ var stretchymanDemo = function(loadingComplete, bgColor) {
 			dragged: function(x, y) {
 				if (target != null) {
 					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
-					var yOnly = target.data.name === "head controller" || target.data.name === "hip controller";
-					if (target.parent !== null) {
+					if (target.parent !== null)
 						target.parent.worldToLocal(temp2.set(coords.x - skeleton.x, coords.y - skeleton.y));
-						if (!yOnly) target.x = temp2.x;
-						target.y = temp2.y;
-					} else {
-						if (!yOnly) target.x = coords.x - skeleton.x;
-						target.y = coords.y - skeleton.y;
-					}
-
-					if (target.data.name === "hip controller") {
-						var head = skeleton.findBone("head controller");						
+					else
+						temp2.set(coords.x - skeleton.x, coords.y - skeleton.y);
+					target.x = temp2.x;
+					target.y = temp2.y;
+					if (target.data.name === "head controller") {
+						var hipControl = skeleton.findBone("hip controller");
+						target.x = spine.MathUtils.clamp(target.x, -65, 65);
+						target.y = Math.max(260, target.y);
 					}
 				}
 			},
@@ -134,22 +132,24 @@ var stretchymanDemo = function(loadingComplete, bgColor) {
 		});
 	}
 
-	function center(middleBone, hipBone, footBone) {
+	function center (middleBone, hipBone, footBone, amount, dir) {
 		temp.set(footBone.worldX + skeleton.x, footBone.worldY + skeleton.y, 0)
 			.sub(temp3.set(hipBone.worldX + skeleton.x, hipBone.worldY + skeleton.y, 0));
+		var dist = Math.sqrt(temp.x * temp.x + temp.y * temp.y);
 		temp3.set(hipBone.worldX + skeleton.x, hipBone.worldY + skeleton.y, 0);
 		temp.scale(0.5).add(temp3);
 		middleBone.parent.worldToLocal(kneePos.set(temp.x, temp.y));
 		middleBone.x = kneePos.x;
-		middleBone.y = kneePos.y;		
+		middleBone.y = kneePos.y;
+		middleBone.children[0].y = (22 + Math.max(0, amount - dist * 0.3)) * dir;
 	}
 
-	var rotate = function(handBone, elbowBone) {
-		// can do all this in world space cause handBone is essentially in world space				
-		var v = coords.set(handBone.worldX, handBone.worldY, 0).sub(new spine.webgl.Vector3(elbowBone.worldX, elbowBone.worldY, 0)).normalize();		
-		var angle = Math.acos(v.x) * spine.MathUtils.radiansToDegrees + 180; 
+	function rotate (handBone, elbowBone) {
+		// can do all this in world space cause handBone is essentially in world space
+		var v = coords.set(handBone.worldX, handBone.worldY, 0).sub(new spine.webgl.Vector3(elbowBone.worldX, elbowBone.worldY, 0)).normalize();
+		var angle = Math.acos(v.x) * spine.MathUtils.radiansToDegrees + 180;
 		if (v.y < 0) angle = 360 - angle;
-		handBone.rotation = angle;		
+		handBone.rotation = angle;
 	}
 
 	function render () {
@@ -158,12 +158,17 @@ var stretchymanDemo = function(loadingComplete, bgColor) {
 
 		state.update(delta);
 		state.apply(skeleton);
-		center(skeleton.findBone("back leg middle"), skeleton.findBone("back leg 1"), skeleton.findBone("back leg controller"));
-		center(skeleton.findBone("front leg middle"), skeleton.findBone("front leg 1"), skeleton.findBone("front leg controller"));
-		center(skeleton.findBone("front arm middle"), skeleton.findBone("front arm 1"), skeleton.findBone("front arm controller"));
-		center(skeleton.findBone("back arm middle"), skeleton.findBone("back arm 1"), skeleton.findBone("back arm controller"));
+		center(skeleton.findBone("back leg middle"), skeleton.findBone("back leg 1"), skeleton.findBone("back leg controller"), 65, 1);
+		center(skeleton.findBone("front leg middle"), skeleton.findBone("front leg 1"), skeleton.findBone("front leg controller"), 65, 1);
+		center(skeleton.findBone("front arm middle"), skeleton.findBone("front arm 1"), skeleton.findBone("front arm controller"), 90, -1);
+		center(skeleton.findBone("back arm middle"), skeleton.findBone("back arm 1"), skeleton.findBone("back arm controller"), 90, -1);
 		rotate(skeleton.findBone("front arm controller"), skeleton.findBone("front arm elbow"));
-		rotate(skeleton.findBone("back arm controller"), skeleton.findBone("back arm elbow"));				
+		rotate(skeleton.findBone("back arm controller"), skeleton.findBone("back arm elbow"));
+		var headControl = skeleton.findBone("head controller"), hipControl = skeleton.findBone("hip controller")
+		var head = skeleton.findBone("head");
+		var angle = Math.atan2(headControl.worldY - hipControl.worldY, headControl.worldX - hipControl.worldX) * spine.MathUtils.radDeg;
+		angle = (angle - 90) * 2.5;
+		head.rotation = head.data.rotation + Math.min(90, Math.abs(angle)) * Math.sign(angle);
 		skeleton.updateWorldTransform();	
 
 		renderer.camera.viewportWidth = bounds.x * 1.2;
