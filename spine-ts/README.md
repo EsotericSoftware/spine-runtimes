@@ -60,6 +60,8 @@ The spine-ts WebGL demos load their image, atlas, and JSON files from our webser
 - [Vine](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/vine.html)
 - [Stretchyman](http://rawgit.com/EsotericSoftware/spine-runtimes/master/spine-ts/webgl/demos/stretchyman.html)
 
+Please note that Chrome and possibly other browsers do not use the original CORS headers when loading cached resources. After the initial page load for a demo, you may need to forcefully refresh (hold `shift` and click refresh) or clear your browser cache.
+
 ## Development Setup
 The spine-ts runtime and the various backends are implemented in TypeScript for greater maintainability and better tooling support. To
 setup a development environment, follow these steps.
