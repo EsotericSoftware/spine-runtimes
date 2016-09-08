@@ -50,10 +50,10 @@ public class GoblinsExample extends Sprite {
 	[Embed(source = "/goblins-mesh.json", mimeType = "application/octet-stream")]
 	static public const GoblinsJson:Class;
 	
-	[Embed(source = "/goblins-mesh.atlas", mimeType = "application/octet-stream")]
+	[Embed(source = "/goblins.atlas", mimeType = "application/octet-stream")]
 	static public const GoblinsAtlas:Class;
 	
-	[Embed(source = "/goblins-mesh.png")]
+	[Embed(source = "/goblins.png")]
 	static public const GoblinsAtlasTexture:Class;
 	
 	[Embed(source = "/goblins-mesh-starling.xml", mimeType = "application/octet-stream")]

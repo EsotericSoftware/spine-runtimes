@@ -716,6 +716,7 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 				mesh->width = 0;
 				mesh->height = 0;
 			}
+			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 			return attachment;
 		}
 		case SP_ATTACHMENT_LINKED_MESH: {

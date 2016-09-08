@@ -1,5 +1,5 @@
 {
-"skeleton": { "hash": "rPoYyBLFG6F0CGZ5wsUEBKDJU9U", "spine": "3.3.07", "width": 470.71, "height": 731.57, "images": "./images/" },
+"skeleton": { "hash": "rPoYyBLFG6F0CGZ5wsUEBKDJU9U", "spine": "3.4.02", "width": 470.9, "height": 731.49, "images": "./images/" },
 "bones": [
 	{ "name": "hip", "y": 247.47 },
 	{ "name": "torso", "parent": "hip", "length": 127.55, "rotation": 103.82, "x": -1.61, "y": 4.9, "color": "e0da19ff" },
