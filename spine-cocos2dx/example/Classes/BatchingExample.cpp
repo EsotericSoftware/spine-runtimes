@@ -44,10 +44,6 @@ Scene* BatchingExample::scene () {
 bool BatchingExample::init () {
 	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
 
-	// To avoid the SkeletonBatch buffer from being resized, set this to the number of vertices ever rendered in one frame.
-	// BatchingExample needs ~3200, but let's set it low to test the buffer resizing.
-	SkeletonBatch::setBufferSize(512);
-
 	// Load the texture atlas.
 	_atlas = spAtlas_createFromFile("spineboy.atlas", 0);
 	CCASSERT(_atlas, "Error reading atlas file.");

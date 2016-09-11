@@ -137,6 +137,7 @@ namespace Spine.Unity.Modules {
 			var currentRenderer = partsRenderers[rendererIndex];
 			bool addNormals = skeletonRenderer.calculateNormals;
 			bool addTangents = skeletonRenderer.calculateTangents;
+			bool pmaVertexColors = skeletonRenderer.pmaVertexColors;
 				
 			for (int si = 0, start = 0; si <= lastSubmeshInstruction; si++) {
 				if (submeshInstructionsItems[si].forceSeparate || si == lastSubmeshInstruction) {
@@ -144,6 +145,7 @@ namespace Spine.Unity.Modules {
 					var meshGenerator = currentRenderer.MeshGenerator;
 					meshGenerator.AddNormals = addNormals;
 					meshGenerator.AddTangents = addTangents;
+					meshGenerator.PremultiplyVertexColors = pmaVertexColors;
 					if (copyPropertyBlock)
 						currentRenderer.SetPropertyBlock(copiedBlock);
 

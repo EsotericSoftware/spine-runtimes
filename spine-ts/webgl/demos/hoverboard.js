@@ -9,7 +9,7 @@ var hoverboardDemo = function(loadingComplete, bgColor) {
 	var timeKeeper, loadingScreen;
 	var target = null;	
 	var hoverTargets = [];
-	var controlBones = ["hoverboard controller", "hip", "board target"];
+	var controlBones = ["hoverboard controller", "hip controller", "board target"];
 	var coords = new spine.webgl.Vector3(), temp = new spine.webgl.Vector3(), temp2 = new spine.Vector2(), temp3 = new spine.webgl.Vector3();	
 	var isPlaying = true;
 
