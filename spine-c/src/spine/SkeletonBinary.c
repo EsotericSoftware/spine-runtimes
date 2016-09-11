@@ -656,7 +656,11 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 	int i;
 	spAttachmentType type;
 	const char* name = readString(input);
-	if (!name) MALLOC_STR(name, attachmentName);
+	int freeName = name != 0;
+	if (!name) {
+		freeName = 0;
+		MALLOC_STR(name, attachmentName);
+	}
 
 	type = (spAttachmentType)readByte(input);
 
@@ -680,6 +684,7 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 			readColor(input, &region->r, &region->g, &region->b, &region->a);
 			spRegionAttachment_updateOffset(region);
 			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
+			if (freeName) FREE(name);
 			return attachment;
 		}
 		case SP_ATTACHMENT_BOUNDING_BOX: {
@@ -689,6 +694,7 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 			_readVertices(self, input, SUB_CAST(spVertexAttachment, attachment), vertexCount);
 			if (nonessential) readInt(input); /* Skip color. */
 			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
+			if (freeName) FREE(name);
 			return attachment;
 		}
 		case SP_ATTACHMENT_MESH: {
@@ -717,6 +723,7 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 				mesh->height = 0;
 			}
 			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
+			if (freeName) FREE(name);
 			return attachment;
 		}
 		case SP_ATTACHMENT_LINKED_MESH: {
@@ -738,6 +745,7 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 				mesh->height = readFloat(input) * self->scale;
 			}
 			_spSkeletonBinary_addLinkedMesh(self, mesh, skinName, slotIndex, parent);
+			if (freeName) FREE(name);
 			return attachment;
 		}
 		case SP_ATTACHMENT_PATH: {
@@ -755,10 +763,12 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 				path->lengths[i] = readFloat(input) * self->scale;
 			}
 			if (nonessential) readInt(input); /* Skip color. */
+			if (freeName) FREE(name);
 			return attachment;
 		}
 	}
 
+	if (freeName) FREE(name);
 	return 0;
 }
 
