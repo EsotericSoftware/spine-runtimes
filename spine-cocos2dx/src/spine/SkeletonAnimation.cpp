@@ -65,7 +65,7 @@ static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
 }
 
 void disposeTrackEntry (spTrackEntry* entry) {
-	if (entry->rendererObject) (spine::_TrackEntryListeners*)entry->rendererObject;
+	if (entry->rendererObject) delete (spine::_TrackEntryListeners*)entry->rendererObject;
 	_spTrackEntry_dispose(entry);
 }
 
