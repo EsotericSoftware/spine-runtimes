@@ -58,7 +58,7 @@ typedef struct _TrackEntryListeners {
 
 static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
 	if (!entry->rendererObject) {
-		entry->rendererObject = new spine::_TrackEntryListeners());
+		entry->rendererObject = new spine::_TrackEntryListeners();
 		entry->listener = trackEntryCallback;
 	}
 	return (_TrackEntryListeners*)entry->rendererObject;
