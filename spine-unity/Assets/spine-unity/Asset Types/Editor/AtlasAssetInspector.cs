@@ -140,6 +140,7 @@ namespace Spine.Unity.Editor {
 			t.spritesheet = sprites.ToArray();
 			EditorUtility.SetDirty(t);
 			AssetDatabase.ImportAsset(texturePath, ImportAssetOptions.ForceUpdate);
+			EditorGUIUtility.PingObject(texture);
 			Debug.Log(string.Format("Applied sprite slices to {2}. {0} added. {1} updated.", addedCount, updatedCount, texture.name));
 		}
 
