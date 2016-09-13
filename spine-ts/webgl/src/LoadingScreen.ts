@@ -23,6 +23,8 @@ module spine.webgl {
 		constructor (renderer: SceneRenderer) {
 			this.renderer = renderer;
 
+			this.timeKeeper.maxDelta = 9;
+
 			if (LoadingScreen.logoImg === null) {
 				// thank you Apple Inc.
 				let isSafari = navigator.userAgent.indexOf("Safari") > -1;
@@ -66,7 +68,11 @@ module spine.webgl {
 				this.tempColor.a = 1;
 			} else {
 				this.fadeOut += this.timeKeeper.delta * (this.timeKeeper.totalTime < 1 ? 2 : 1);
-				a = Math.max(0, 1 - this.fadeOut / LoadingScreen.FADE_SECONDS);
+				if (this.fadeOut > LoadingScreen.FADE_SECONDS) {
+					renderer.camera.position.set(oldX, oldY, 0);
+					return;
+				}
+				a = 1 - this.fadeOut / LoadingScreen.FADE_SECONDS;
 				this.tempColor.setFromColor(this.backgroundColor);
 				this.tempColor.a = 1 - (a - 1) * (a - 1);
 				renderer.begin();
