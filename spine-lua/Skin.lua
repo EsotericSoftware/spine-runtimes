@@ -49,18 +49,37 @@ end
 
 function Skin:addAttachment (slotIndex, name, attachment)
 	if not name then error("name cannot be nil.", 2) end
-	self.attachments[slotIndex .. ":" .. name] = { slotIndex, name, attachment }
+	if not self.attachments[slotIndex] then self.attachments[slotIndex] = {} end
+  self.attachments[slotIndex][name] = attachment
 end
 
 function Skin:getAttachment (slotIndex, name)
 	if not name then error("name cannot be nil.", 2) end
-	local values = self.attachments[slotIndex .. ":" .. name]
-	if not values then return nil end
-	return values[3]
+  local dictionary = self.attachments[slotIndex]
+  if dictionary then 
+    return dictionary[name]
+  else
+    return nil
+  end
 end
 
 function Skin:attachAll(skeleton, oldSkin)
-  -- FIXME implement
+  local slotIndex = 0
+  for i, slot in ipairs(skeleton.slots) do
+    local slotAttachment = slot.attachment
+    if slotAttachment and slotIndex <= #oldSkin.attachments then
+      local dictionary = oldSkin.attachments[slotIndex]
+      for key, value in dictionary do
+        local skinAttachment = value
+        if slotAttachment == skinAttachment then
+          local attachment = getAttachment(slotIndex, key)
+          if attachment then slot.attachment = attachment end
+          break
+        end
+      end
+    end
+    slotIndex = slotIndex + 1
+  end
 end
 
 function Skin:findNamesForSlot (slotIndex)

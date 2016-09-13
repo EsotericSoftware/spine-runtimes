@@ -41,41 +41,58 @@ local table_insert = table.insert
 local Skeleton = {}
 Skeleton.__index = Skeleton
 
-function Skeleton.new (skeletonData)
-	if not skeletonData then error("skeletonData cannot be nil", 2) end
+function Skeleton.new (data)
+	if not data then error("data cannot be nil", 2) end
 
 	local self = {
-		data = skeletonData,
+		data = data,
 		bones = {},
 		slots = {},
 		slotsByName = {},
 		drawOrder = {},
-		ikConstraints = {},
+		ikConstraints = {}, ikConstaintsSorted = {},
+    transformConstraints = {},
+    pathConstraints = {},
+    _updateCache = {},
+    skin = nil,
 		r = 1, g = 1, b = 1, a = 1,
-		skin = nil,
-		flipX = false, flipY = false,
 		time = 0,
+ 		flipX = false, flipY = false,
 		x = 0, y = 0
 	}
 	setmetatable(self, Skeleton)
 
-	for i,boneData in ipairs(skeletonData.bones) do
-		local parent
-		if boneData.parent then parent = self.bones[spine.utils.indexOf(skeletonData.bones, boneData.parent)] end
-		table_insert(self.bones, Bone.new(boneData, self, parent))
+	for i,boneData in ipairs(data.bones) do
+    local bone = nil
+    if boneData.parent == nil then
+      bone = Bone.new(boneData, self, nil)
+    else
+      local parent = self.bones[boneData.parent.index]
+      bone = Bone.new(boneData, self, parent)
+      table_insert(parent.children, bone)
+    end
+		table_insert(self.bones, bone)
 	end
 
-	for i,slotData in ipairs(skeletonData.slots) do
-		local bone = self.bones[spine.utils.indexOf(skeletonData.bones, slotData.boneData)]
+	for i,slotData in ipairs(data.slots) do
+		local bone = self.bones[slotData.boneData.index]
 		local slot = Slot.new(slotData, bone)
 		table_insert(self.slots, slot)
 		self.slotsByName[slot.data.name] = slot
 		table_insert(self.drawOrder, slot)
 	end
 
-	for i,ikConstraintData in ipairs(skeletonData.ikConstraints) do
+	for i,ikConstraintData in ipairs(data.ikConstraints) do
 		table_insert(self.ikConstraints, IkConstraint.new(ikConstraintData, self))
 	end
+  
+  for i, transformConstraintData in ipairs(data.transformConstraints) do
+    table_insert(self.transformConstraints, TransformConstraint.new(transformConstraintData, self))
+  end
+  
+  for i, pathConstraintData in ipairs(data.pathConstraints) do
+    table_insert(self.pathConstraints, PathConstraint.new(pathConstraintData, self))
+  end
 	
 	self:updateCache()
 
@@ -85,62 +102,98 @@ end
 
 -- Caches information about bones and IK constraints. Must be called if bones or IK constraints are added or removed.
 function Skeleton:updateCache ()
-	self.boneCache = {}
-	local boneCache = self.boneCache
-	local ikConstraints = self.ikConstraints
-	local ikConstraintsCount = #ikConstraints
+  local updateCache = {}
+  self._updateCache = updateCache
+  
+  local bones = self.bones
+  for i, bone in ipairs(bones) do
+    bone.sorted = false
+  end
+  
+  local ikConstraints = {}
+  self.ikConstraintsSorted = ikConstraints
+  for i, constraint in ipairs(self.ikConstraints) do
+    table_insert(ikConstaints, constraint)
+  end
+  
+  local level = 0
+  for i, ik in ipairs(ikConstraints) do
+    local bone = ik.bones[1].parent
+    level = 0
+    while bone do
+      bone = bone.parent
+      level = level + 1
+    end
+    ik.level = level
+  end
+  
+  local i = 2
+  local ikCount = #ikConstraints
+  while i <= ikCount do
+    local ik = ikConstraints[i]
+    local level = ik.level
+    local ii = i - 1
+    while ii >= 0 do
+      local other = ikConstraints[ii]
+      if other.level < level then break end
+      ikConstaints[ii+1] = other
+      ii = ii - 1
+    end
+    ikConstaints[ii + 1] = ik
+    i = i + 1
+  end
+  
+  for i, constraint in ipairs(ikConstraints) do
+    local target = constraint.target
+    self:sortBone(target)
+    
+    local constrained = constraint.bones
+    local parent = constrained[1]
+    self:sortBone(parent)
+    
+    table_insert(_updateCache, constraint)
+    
+    self:sortReset(parent.children)
+    constrained[#constrained].sorted = true    
+  end
 
-	local arrayCount = ikConstraintsCount + 1
-	while #boneCache < arrayCount do
-		table_insert(boneCache, {})
-	end
+	-- FIXME path constraints
+  -- FIXME transform constraints
+  
+  for i, bone in ipairs(self.bones) do
+    self:sortBone(bone)
+  end
+end
 
-	local nonIkBones = boneCache[1]
+function Skeleton:sortPathConstraintAttachment(skin, slotIndex, slotBone)
+  -- FIXME
+end
 
-	for i,bone in ipairs(self.bones) do
-		local current = bone
-		local continueOuter
-		repeat
-			for ii,ikConstraint in ipairs(ikConstraints) do
-				local parent = ikConstraint.bones[0]
-				local child = ikConstraint.bones[#ikConstraint.bones - 1]
-				while true do
-					if current == child then
-						table_insert(boneCache[ii], bone)
-						table_insert(boneCache[ii + 1], bone)
-						ii = ikConstraintsCount
-						continueOuter = true
-						break
-					end
-					if child == parent then break end
-					child = child.parent
-				end
-			end
-			if continueOuter then break end
-			current = current.parent
-		until not current
-		table_insert(nonIkBones, bone)
-	end
+function Skeleton:sortPathConstraintAttachmentWith(attachment, slotBone)
+  -- FIXME
+end
+
+function Skeleton:sortBone(bone)
+  if bone.sorted then return end
+  local parent = bone.parent
+  if parent then self:sortBone(parent) end
+  bone.sorted = true
+  table_insert(self._updateCache, bone)
+end
+
+function Skeleton:sortReset(bones)
+  for i, bone in bones do
+    if bone.sorted then self:sortReset(bone.children) end
+    bone.sorted = false
+  end
 end
 
 -- Updates the world transform for each bone and applies IK constraints.
 function Skeleton:updateWorldTransform ()
-	local bones = self.bones
-	for i,bone in ipairs(self.bones) do
-		bone.rotationIK = bone.rotation
-	end
-	local boneCache = self.boneCache
-	local ikConstraints = self.ikConstraints
-	local i = 1
-	local last = #boneCache
-	while true do
-		for ii,bone in ipairs(boneCache[i]) do
-			bone:updateWorldTransform()
-		end
-		if i == last then break end
-		ikConstraints[i]:apply()
-		i = i + 1
-	end
+  local updateCache = self._updateCache
+  for i, updatable in ipairs(updateCache) do
+    updatable:update()
+  end
 end
 
 function Skeleton:setToSetupPose ()
@@ -157,6 +210,9 @@ function Skeleton:setBonesToSetupPose ()
 		ikConstraint.bendDirection = ikConstraint.data.bendDirection
 		ikConstraint.mix = ikConstraint.data.mix
 	end
+  
+  -- FIXME transform constraints
+  -- FIXME path constraints
 end
 
 function Skeleton:setSlotsToSetupPose ()
@@ -178,58 +234,58 @@ function Skeleton:findBone (boneName)
 	return nil
 end
 
+function Skeleton:findBoneIndex(boneName)
+  if not boneName then error("boneName cannot be nil.", 2) end
+	for i,bone in ipairs(self.bones) do
+		if bone.data.name == boneName then return i end
+	end
+	return -1
+end
+
 function Skeleton:findSlot (slotName)
 	if not slotName then error("slotName cannot be nil.", 2) end
 	return self.slotsByName[slotName]
+end
+
+function Skeleton:findSlotIndex(slotName)
+  if not slotName then error("slotName cannot be nil.", 2) end
+  for i, slot in ipairs(self.slots) do
+    if slot.data.name == slotName then return i end
+  end
+  return -1
 end
 
 -- Sets the skin used to look up attachments before looking in the {@link SkeletonData#getDefaultSkin() default skin}. 
 -- Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was 
 -- no old skin, each slot's setup mode attachment is attached from the new skin.
 function Skeleton:setSkin (skinName)
-	local newSkin
-	if skinName then
-		newSkin = self.data:findSkin(skinName)
-		if not newSkin then error("Skin not found = " .. skinName, 2) end
-		if self.skin then
-			-- Attach all attachments from the new skin if the corresponding attachment from the old skin is currently attached.
-			for k,v in pairs(self.skin.attachments) do
-				local attachment = v[3]
-				local slotIndex = v[1]
-				local slot = self.slots[slotIndex]
-				if slot.attachment == attachment then
-					local name = v[2]
-					local newAttachment = newSkin:getAttachment(slotIndex, name)
-					if newAttachment then slot:setAttachment(newAttachment) end
-				end
-			end
-		else
-			-- No previous skin, attach setup pose attachments.
-			for i,slot in ipairs(self.slots) do
-				local name = slot.data.attachmentName
-				if name then
-					local attachment = newSkin:getAttachment(i, name)
-					if attachment then slot:setAttachment(attachment) end
-				end
-			end
-		end
-	end
-	self.skin = newSkin
+  local skin = self.data.findSkin(skinName)
+  if not skin then error("Skin not found: " .. skinName, 2) end
+  self:setSkinByReference(skin)
+end
+
+function Skeleton:setSkinByReference(newSkin)
+  if newSkin then
+    if self.skin then
+      newSkin.attachAll(self, self.skin)
+    else
+      local slots = self.slots
+      for i, slot in ipairs(slots) do
+        local name = slot.data.attachmentName
+        if name then
+          local attachment = newSkin:getAttachment(i, name)
+          if attachment then
+            slot:setAttachment(attachment)
+          end
+        end
+      end
+    end
+  end
+  self.skin = newSkin
 end
 
 function Skeleton:getAttachment (slotName, attachmentName)
-	if not slotName then error("slotName cannot be nil.", 2) end
-	if not attachmentName then error("attachmentName cannot be nil.", 2) end
-	local slotIndex = self.data.slotNameIndices[slotName]
-	if slotIndex == -1 then error("Slot not found = " .. slotName, 2) end
-	if self.skin then
-		local attachment = self.skin:getAttachment(slotIndex, attachmentName)
-		if attachment then return attachment end
-	end
-	if self.data.defaultSkin then
-		return self.data.defaultSkin:getAttachment(slotIndex, attachmentName)
-	end
-	return nil
+  return self:getAttachmentByIndex(this.data.slotNameByIndex[slotName], attachmentName)
 end
 
 function Skeleton:getAttachmentByIndex (slotIndex, attachmentName)
@@ -247,15 +303,77 @@ function Skeleton:setAttachment (slotName, attachmentName)
 	if not slotName then error("slotName cannot be nil.", 2) end
 	for i,slot in ipairs(self.slots) do
 		if slot.data.name == slotName then
-			if not attachmentName then 
-				slot:setAttachment(nil)
-			else
-				slot:setAttachment(self:getAttachment(slotName, attachmentName))
-			end
+      local attachment = nil
+      if attachmentName then
+        attachment = self:getAttachmentByIndex(i, attachmentName)
+        if not attachment then error("Attachment not found: " .. attachmentName .. ", for slot: " .. slotName, 2) end
+      end
+      slot:setAttachment(attachment)
 			return
 		end
 	end
-	error("Slot not found = " .. slotName, 2)
+	error("Slot not found: " .. slotName, 2)
+end
+
+function Skeleton:findIkConstraint(constraintName)
+  if not constraintName then error("constraintName cannot be null.", 2) end
+  local ikConstaints = self.ikConstraints
+  for i, ikConstraint in ipairs(ikConstraints) do
+    if ikConstraint.data.name == constraintName then return ikConstraint end
+  end
+  return nil
+end
+
+function Skeleton:findTransformConstraint(constraintName)
+  if not constraintName then error("constraintName cannot be null.", 2) end
+  local transformConstraints = self.transformConstraints
+  for i, transformConstraint in ipairs(transformConstraints) do
+    if transformConstraint.data.name == constraintName then return transformConstraint end
+  end
+  return nil
+end
+
+function Skeleton:findPathConstraint(constraintName)
+  if not constraintName then error("constraintName cannot be null.", 2) end
+  local pathConstraints = self.pathConstraints
+  for i, pathConstraint in ipairs(pathConstraints) do
+    if pathConstraint.data.name == constraintName then return pathConstraint end
+  end
+  return nil
+end
+
+function Skeleton:getBounds(offset, size)
+			if not offset then error("offset cannot be null.", 2) end
+			if not size then error("size cannot be null.", 2) end
+			local drawOrder = self.drawOrder;
+			local minX = 99999999
+      local minY = 99999999
+      local maxX = -99999999
+      local maxY = -99999999
+			for i, slot in ipairs(drawOrder) do
+        local vertices = nil
+        local attachment = slot.attachment
+				if attachment.type == AttachmentType.region or attachment.type == AttachmentType.mesh then
+					vertices = attachment:updateWorldVertices(slot, false);
+        end
+				if vertices then
+          local nn = #vertices
+          local ii = 1
+          while ii <= nn do
+ 						local x = vertices[ii]
+            local y = vertices[ii + 1]
+						minX = math_min(minX, x)
+						minY = math_min(minY, y)
+						maxX = math_max(maxX, x)
+						maxY = math_max(maxY, y)
+            ii = ii + 8
+          end
+				end
+			end
+			offset[1] = minX
+      offset[2] = minY
+			size[1] = maxX - minX
+      size[2] = maxY - minY
 end
 
 function Skeleton:update (delta)
