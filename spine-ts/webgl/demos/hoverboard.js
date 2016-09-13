@@ -1,4 +1,4 @@
-var ikConstraintDemo = function(loadingComplete, bgColor) {
+var hoverboardDemo = function(loadingComplete, bgColor) {
 	var COLOR_INNER = new spine.Color(0.8, 0, 0, 0.5);
 	var COLOR_OUTER = new spine.Color(0.8, 0, 0, 0.8);
 	var COLOR_INNER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.5);
@@ -9,16 +9,16 @@ var ikConstraintDemo = function(loadingComplete, bgColor) {
 	var timeKeeper, loadingScreen;
 	var target = null;	
 	var hoverTargets = [];
-	var controlBones = ["hoverboard controller", "hip", "board target"];
+	var controlBones = ["hoverboard controller", "hip controller", "board target"];
 	var coords = new spine.webgl.Vector3(), temp = new spine.webgl.Vector3(), temp2 = new spine.Vector2(), temp3 = new spine.webgl.Vector3();	
 	var isPlaying = true;
 
-	var DEMO_NAME = "IkConstraintDemo";
+	var DEMO_NAME = "HoverboardDemo";
 
-	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);	
+	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);	
 
 	function init () {
-		canvas = document.getElementById("ikdemo-canvas");
+		canvas = document.getElementById("hoverboard-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
@@ -71,7 +71,7 @@ var ikConstraintDemo = function(loadingComplete, bgColor) {
 	}
 
 	function setupUI() {		
-		var checkbox = $("#ikdemo-drawbones");
+		var checkbox = $("#hoverboard-drawbones");
 		renderer.skeletonDebugRenderer.drawRegionAttachments = false;
 		renderer.skeletonDebugRenderer.drawPaths = false;
 		renderer.skeletonDebugRenderer.drawBones = false;

@@ -8,10 +8,10 @@ var meshesDemo = function(loadingComplete, bgColor) {
 
 	var DEMO_NAME = "MeshesDemo";
 
-	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);
+	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
-		canvas = document.getElementById("meshesdemo-canvas");
+		canvas = document.getElementById("meshes-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
@@ -43,21 +43,18 @@ var meshesDemo = function(loadingComplete, bgColor) {
 	}
 
 	function setupUI() {
-		playButton = $("#meshesdemo-playbutton");
+		playButton = $("#meshes-playbutton");
 		var playButtonUpdate = function () {			
 			isPlaying = !isPlaying;
-			if (isPlaying) {
-				playButton.val("Pause");
-				playButton.addClass("pause").removeClass("play");		
-			} else {
-				playButton.val("Play");
+			if (isPlaying)
+				playButton.addClass("pause").removeClass("play");
+			else
 				playButton.addClass("play").removeClass("pause");
-			}			
 		}
 		playButton.click(playButtonUpdate);
 		playButton.addClass("pause");
 
-		timeLine = $("#meshesdemo-timeline").data("slider");
+		timeLine = $("#meshes-timeline").data("slider");
 		timeLine.changed = function (percent) {
 			if (isPlaying) playButton.click();		
 			if (!isPlaying) {
@@ -71,7 +68,7 @@ var meshesDemo = function(loadingComplete, bgColor) {
 			}
 		};
 
-		var list = $("#meshesdemo-active-skeleton");	
+		var list = $("#meshes-skeleton");	
 		for (var skeletonName in skeletons) {
 			var option = $("<option></option>");
 			option.attr("value", skeletonName).text(skeletonName);
@@ -79,20 +76,20 @@ var meshesDemo = function(loadingComplete, bgColor) {
 			list.append(option);
 		}
 		list.change(function() {
-			activeSkeleton = $("#meshesdemo-active-skeleton option:selected").text();
+			activeSkeleton = $("#meshes-skeleton option:selected").text();
 			var active = skeletons[activeSkeleton];
 			var animationDuration = active.state.getCurrent(0).animation.duration;
 			timeLine.set(active.playTime / animationDuration);
 		})
 
 		renderer.skeletonDebugRenderer.drawBones = false;
-		$("#meshesdemo-drawbonescheckbox").click(function() {
+		$("#meshes-drawbonescheckbox").click(function() {
 			renderer.skeletonDebugRenderer.drawBones = this.checked;
 		})
 
 		renderer.skeletonDebugRenderer.drawMeshHull = false;
 		renderer.skeletonDebugRenderer.drawMeshTriangles = false;
-		$("#meshesdemo-drawmeshtrianglescheckbox").click(function() {
+		$("#meshes-drawmeshtrianglescheckbox").click(function() {
 			renderer.skeletonDebugRenderer.drawMeshHull = this.checked;
 			renderer.skeletonDebugRenderer.drawMeshTriangles = this.checked;
 		})

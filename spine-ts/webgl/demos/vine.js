@@ -1,4 +1,4 @@
-var pathConstraintDemo = function(loadingComplete, bgColor) {
+var vineDemo = function(loadingComplete, bgColor) {
 	var COLOR_INNER = new spine.Color(0.8, 0, 0, 0.5);
 	var COLOR_OUTER = new spine.Color(0.8, 0, 0, 0.8);
 	var COLOR_INNER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.5);
@@ -13,12 +13,12 @@ var pathConstraintDemo = function(loadingComplete, bgColor) {
 	var coords = new spine.webgl.Vector3(), temp = new spine.webgl.Vector3(), temp2 = new spine.Vector2();
 	var playButton, timeLine, isPlaying = true, playTime = 0;
 
-	var DEMO_NAME = "PathConstraintDemo";
+	var DEMO_NAME = "VineDemo";
 
-	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);
+	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
-		canvas = document.getElementById("pathconstraintdemo-canvas");
+		canvas = document.getElementById("vine-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
@@ -72,21 +72,18 @@ var pathConstraintDemo = function(loadingComplete, bgColor) {
 	}
 
 	function setupUI() {
-		playButton = $("#pathconstraintdemo-playbutton");
+		playButton = $("#vine-playbutton");
 		var playButtonUpdate = function () {			
 			isPlaying = !isPlaying;
-			if (isPlaying) {
-				playButton.val("Pause");
-				playButton.addClass("pause").removeClass("play");		
-			} else {
-				playButton.val("Play");
+			if (isPlaying)
+				playButton.addClass("pause").removeClass("play");
+			else
 				playButton.addClass("play").removeClass("pause");
-			}		
 		}
 		playButton.click(playButtonUpdate);
 		playButton.addClass("pause");
 
-		timeLine = $("#pathconstraintdemo-timeline").data("slider");
+		timeLine = $("#vine-timeline").data("slider");
 		timeLine.changed = function (percent) {
 			if (isPlaying) playButton.click();
 			if (!isPlaying) {
@@ -101,7 +98,7 @@ var pathConstraintDemo = function(loadingComplete, bgColor) {
 
 		renderer.skeletonDebugRenderer.drawPaths = false;
 		renderer.skeletonDebugRenderer.drawBones = false;
-		var checkbox = $("#pathconstraintdemo-drawbones");
+		var checkbox = $("#vine-drawbones");
 		checkbox.change(function() {
 			renderer.skeletonDebugRenderer.drawPaths = this.checked;
 			renderer.skeletonDebugRenderer.drawBones = this.checked;			

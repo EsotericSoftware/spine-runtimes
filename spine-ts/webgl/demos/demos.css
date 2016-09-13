@@ -1,18 +1,43 @@
 body, html {
 	margin: 0;
-	padding: 0;
 	height: 100%;
 	font-family: Tahoma;
 	font-size: 11pt;
 }
-canvas {
-	position: absolute; width: 100% ;height: 100%;
+body {
+	padding: 15px;
+}
+br {
+	display: block;
+	content: "";
+	margin-top: 15px;
+}
+.aspect {
+	margin-bottom: 15px;
+	max-width: 800px;
+	text-align: center;
+}
+.aspect div {
+	position: relative;
+	padding-bottom: 70.14%;
+}
+.aspect canvas {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	height: 100%;
+	border: 1px solid black;
 }
 .slider {
-	width: 50%;
+	width: 100%;
+	max-width: 800px;
 	border-radius: 3px;
 	text-align: left;
 	transform: translateZ(0);
+	background: #222;
 }
 .slider, .slider.filled span {
 	height: 15px;

@@ -1,4 +1,4 @@
-var spritesheetDemo = function(loadingComplete, bgColor) {
+var spritesheetsDemo = function(loadingComplete, bgColor) {
 	var SKELETON_ATLAS_COLOR = new spine.Color(0, 0.8, 0, 0.8);
 	var FRAME_ATLAS_COLOR = new spine.Color(0.8, 0, 0, 0.8);
 
@@ -11,12 +11,12 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 	var timeKeeper, loadingScreen, input;
 	var playTime = 0, framePlaytime = 0, clickAnim = 0;
 
-	var DEMO_NAME = "SpritesheetDemo";
+	var DEMO_NAME = "SpritesheetsDemo";
 
-	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);
+	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
-		canvas = document.getElementById("spritesheetdemo-canvas");
+		canvas = document.getElementById("spritesheets-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;	
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
@@ -52,6 +52,7 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 			offset = new spine.Vector2();
 			bounds = new spine.Vector2();
 			skeleton.getBounds(offset, bounds);
+			skeleton.x -= 60;
 
 			skeletonSeq = new spine.Skeleton(skeletonData);
 			walkAnim = skeletonSeq.data.findAnimation("walk");
@@ -64,8 +65,8 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 			setupUI();
 			setupInput();
 
-			$("#spritesheetdemo-overlay").removeClass("overlay-hide");
-			$("#spritesheetdemo-overlay").addClass("overlay");
+			$("#spritesheets-overlay").removeClass("overlay-hide");
+			$("#spritesheets-overlay").addClass("overlay");
 			loadingComplete(canvas, render);
 		} else {
 			loadingScreen.draw();
@@ -73,34 +74,36 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 		}
 	}	
 
-	function setupUI() {
-		timeSlider = $("#spritesheetdemo-timeslider").data("slider");
+	function setupUI () {
+		timeSlider = $("#spritesheets-timeslider").data("slider");
 		timeSlider.set(0.5);
-		timeSliderLabel = $("#spritesheetdemo-timeslider-label")[0];
+		timeSliderLabel = $("#spritesheets-timeslider-label")[0];
 	}
 
-	function setupInput() {
+	function setupInput () {
 		input.addListener({
 			down: function(x, y) {
-				animationState.setAnimation(0, (clickAnim++ % 2 == 0) ? "roar" : "jump", false);
-				animationState.addAnimation(0, "walk", true, 0);
+				setAnimation((clickAnim++ % 2 == 0) ? "roar" : "jump");
 			},
 			up: function(x, y) { },
 			moved: function(x, y) {	},
 			dragged: function(x, y) { }
 		});
-		$("#spritesheetdemo-roar").click(function () {
-			animationState.setAnimation(0, "roar", false);
-			animationState.addAnimation(0, "walk", true, 0);
+		$("#spritesheets-roar").click(function () {
+			setAnimation("roar");
 		});
-		$("#spritesheetdemo-jump").click(function () {
-			animationState.setAnimation(0, "jump", false);
-			animationState.addAnimation(0, "walk", true, 0);
+		$("#spritesheets-jump").click(function () {
+			setAnimation("jump");
 		});
+	}
+	
+	function setAnimation (name) {
+		animationState.setAnimation(0, name, false);
+		animationState.addAnimation(0, "walk", true, 0);
 	}
 
 	function resize () {
-		renderer.camera.position.x = offset.x + viewportWidth / 2 + 100;
+		renderer.camera.position.x = offset.x + viewportWidth / 2 - 25;
 		renderer.camera.position.y = offset.y + viewportHeight / 2  - 160;	
 		renderer.camera.viewportWidth = viewportWidth * 1.2;
 		renderer.camera.viewportHeight = viewportHeight * 1.2;
@@ -119,16 +122,12 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 			var newValue = Math.round(timeSlider.get() * 100) + "%";
 			if (oldValue !== newValue) timeSliderLabel.textContent = newValue;
 		} 	
-				
+
 		var animationDuration = animationState.getCurrent(0).animation.duration;
 		playTime += delta;			
 		while (playTime >= animationDuration) {
 			playTime -= animationDuration;
-		}			
-						
-		animationState.update(delta);
-		animationState.apply(skeleton);
-		skeleton.updateWorldTransform();
+		}
 
 		walkLastTimePrecise += delta;				
 		while (walkLastTimePrecise - walkLastTime > 1 / FPS) {
@@ -138,15 +137,20 @@ var spritesheetDemo = function(loadingComplete, bgColor) {
 		}								
 		skeletonSeq.updateWorldTransform();					
 
-		
+		animationState.update(delta);
+		var current = animationState.getCurrent(0);
+		if (current.animation.name == "walk") current.time = walkLastTimePrecise;
+		animationState.apply(skeleton);
+		skeleton.updateWorldTransform();
+
 		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
 		gl.clear(gl.COLOR_BUFFER_BIT);	
 
-		renderer.begin();		
-		var frame = frames[currFrame];				
+		renderer.begin();
+		var frame = frames[currFrame];
 		renderer.drawSkeleton(skeleton, true);
 		renderer.drawSkeleton(skeletonSeq, true);		
-		renderer.end();		
+		renderer.end();
 	}
 
 	init();
