@@ -127,11 +127,11 @@ function spine.Skeleton.new (skeletonData, group)
 			local image = images[slot]
 			if image and image ~= spine.Skeleton.failed then
 				local attachment = slot.attachment
-				local x = slot.bone.worldX + attachment.x * slot.bone.m00 + attachment.y * slot.bone.m01
-				local y = slot.bone.worldY + attachment.x * slot.bone.m10 + attachment.y * slot.bone.m11
-				local rotation = slot.bone.worldRotation + attachment.rotation
-				local xScale = slot.bone.worldScaleX + attachment.scaleX - 1
-				local yScale = slot.bone.worldScaleY + attachment.scaleY - 1
+				local x = slot.bone.worldX + attachment.x * slot.bone.a + attachment.y * slot.bone.b
+				local y = slot.bone.worldY + attachment.x * slot.bone.c + attachment.y * slot.bone.d
+				local rotation = slot.bone:getWorldRotationX() + attachment.rotation
+				local xScale = slot.bone:getWorldScaleX() + attachment.scaleX - 1
+				local yScale = slot.bone:getWorldScaleY() + attachment.scaleY - 1
 				if self.flipX then
 					xScale = -xScale
 					rotation = -rotation
@@ -166,7 +166,7 @@ function spine.Skeleton.new (skeletonData, group)
 			for i,bone in ipairs(self.bones) do
 				local xScale
 				local yScale
-				local rotation = -bone.worldRotation
+				local rotation = -bone:getWorldRotationX()
 
 				if self.flipX then
 					xScale = -1
@@ -200,11 +200,11 @@ function spine.Skeleton.new (skeletonData, group)
 			for i,slot in ipairs(self.drawOrder) do
 				local attachment = slot.attachment
 				if attachment and attachment.type == spine.AttachmentType.region then
-					local x = slot.bone.worldX + attachment.x * slot.bone.m00 + attachment.y * slot.bone.m01
-					local y = slot.bone.worldY + attachment.x * slot.bone.m10 + attachment.y * slot.bone.m11
-					local rotation = slot.bone.worldRotation + attachment.rotation
-					local xScale = slot.bone.worldScaleX + attachment.scaleX - 1
-					local yScale = slot.bone.worldScaleY + attachment.scaleY - 1
+					local x = slot.bone.worldX + attachment.x * slot.bone.a + attachment.y * slot.bone.b
+					local y = slot.bone.worldY + attachment.x * slot.bone.c + attachment.y * slot.bone.d
+					local rotation = slot.bone:getWorldRotationX() + attachment.rotation
+					local xScale = slot.bone:getWorldScaleX() + attachment.scaleX - 1
+					local yScale = slot.bone:getWorldScaleY() + attachment.scaleY - 1
 					if self.flipX then
 						xScale = -xScale
 						rotation = -rotation

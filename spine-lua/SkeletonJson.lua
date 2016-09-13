@@ -84,7 +84,7 @@ function SkeletonJson.new (attachmentLoader)
 				parent = skeletonData:findBone(parentName)
 				if not parent then error("Parent bone not found: " .. parentName) end
 			end
-			local boneData = BoneData.new(boneName, parent)
+			local boneData = BoneData.new(i, boneName, parent)
 			boneData.length = (boneMap["length"] or 0) * self.scale
 			boneData.x = (boneMap["x"] or 0) * self.scale
 			boneData.y = (boneMap["y"] or 0) * self.scale
@@ -139,11 +139,12 @@ function SkeletonJson.new (attachmentLoader)
 		-- Slots.
 		if root["slots"] then
 			for i,slotMap in ipairs(root["slots"]) do
+        local index = i
 				local slotName = slotMap["name"]
 				local boneName = slotMap["bone"]
 				local boneData = skeletonData:findBone(boneName)
 				if not boneData then error("Slot bone not found: " .. boneName) end
-				local slotData = SlotData.new(slotName, boneData)
+				local slotData = SlotData.new(i, slotName, boneData)
 
 				local color = slotMap["color"]
 				if color then
