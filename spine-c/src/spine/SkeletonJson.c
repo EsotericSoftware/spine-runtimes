@@ -569,10 +569,11 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 	CONST_CAST(char*, self->error) = 0;
 	internal->linkedMeshCount = 0;
 
-	oldLocale = setlocale(LC_NUMERIC, NULL);
+	oldLocale = strdup(setlocale(LC_NUMERIC, NULL));
 	setlocale(LC_NUMERIC, "C");
 	root = Json_create(json);
 	setlocale(LC_NUMERIC, oldLocale);
+	free(oldLocale);
 	if (!root) {
 		_spSkeletonJson_setError(self, 0, "Invalid skeleton JSON: ", Json_getError());
 		return 0;
