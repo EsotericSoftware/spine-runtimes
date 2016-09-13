@@ -222,11 +222,11 @@ function Bone:setToSetupPose ()
 end
 
 function Bone:getWorldRotationX ()
-  return math_deg(math_atan2(self.c, self.a));
+  return math_deg(math_atan2(self.c, self.a))
 end
 
 function Bone:getWorldRotationY ()
-  return math_deg(math_atan2(self.d, self.b));
+  return math_deg(math_atan2(self.d, self.b))
 end
 
 function Bone:getWorldScaleX ()
@@ -286,7 +286,7 @@ function updateLocalTransform ()
     local det = self.a * self.d - self.b * self.c
     self.shearX = 0
     self.shearY = math_deg(math_atan2(self.a * self.b + self.c * self.d, det))
-    return;
+    return
   end
   local pa = parent.a
   local pb = parent.b
@@ -321,28 +321,25 @@ function updateLocalTransform ()
   self.appliedRotation = self.rotation
 end 
 
-function Bone:worldToLocal (worldCoords)
-	local dx = worldCoords[1] - self.worldX
-	local dy = worldCoords[2] - self.worldY
-	local m00 = self.m00
-	local m10 = self.m10
-	local m01 = self.m01
-	local m11 = self.m11
-	if self.worldFlipX ~= self.worldFlipY then
-		m00 = -m00
-		m11 = -m11
-	end
-	local invDet = 1 / (m00 * m11 - m01 * m10)
-	worldCoords[1] = dx * m00 * invDet - dy * m01 * invDet
-	worldCoords[2] = dy * m11 * invDet - dx * m10 * invDet
+function Bone:worldToLocal (world)
+  local a = self.a 
+  local b = self.b
+  local c = self.c
+  local d = self.d
+  local invDet = 1 / (a * d - b * c)
+  local x = world[1] - self.worldX
+  local y = world[2] - self.worldY
+  world[1] = (x * d * invDet - y * b * invDet)
+  world[2] = (y * a * invDet - x * c * invDet)
+  return world
 end
 
 function Bone:localToWorld (localCoords)
-	local localX = localCoords[1]
-	local localY = localCoords[2]
-	localCoords[1] = localX * self.m00 + localY * self.m01 + self.worldX
-	localCoords[2] = localX * self.m10 + localY * self.m11 + self.worldY
+  local x = localCoords[1]
+  local y = localCoords[2]
+  localCoords[1] = x * self.a + y * self.b + self.worldX
+  localCoords[2] = x * self.c + y * self.d + self.worldY
+  return localCoords
 end
-
 
 return Bone
