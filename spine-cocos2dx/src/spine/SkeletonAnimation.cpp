@@ -58,14 +58,14 @@ typedef struct _TrackEntryListeners {
 
 static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
 	if (!entry->rendererObject) {
-		entry->rendererObject = NEW(spine::_TrackEntryListeners);
+		entry->rendererObject = new spine::_TrackEntryListeners();
 		entry->listener = trackEntryCallback;
 	}
 	return (_TrackEntryListeners*)entry->rendererObject;
 }
 
 void disposeTrackEntry (spTrackEntry* entry) {
-	if (entry->rendererObject) FREE(entry->rendererObject);
+	if (entry->rendererObject) delete (spine::_TrackEntryListeners*)entry->rendererObject;
 	_spTrackEntry_dispose(entry);
 }
 
