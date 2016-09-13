@@ -34,8 +34,8 @@ module spine.webgl {
 		gl: WebGLRenderingContext;
 		canvas: HTMLCanvasElement;
 		camera: OrthoCamera;		
+		batcher: PolygonBatcher;
 		private batcherShader: Shader;
-		private batcher: PolygonBatcher;
 		private shapes: ShapeRenderer;
 		private shapesShader: Shader;
 		private activeRenderer: PolygonBatcher | ShapeRenderer | SkeletonDebugRenderer = null;
@@ -52,7 +52,7 @@ module spine.webgl {
 
 		constructor (canvas: HTMLCanvasElement, gl: WebGLRenderingContext) {
 			this.canvas = canvas;
-			this.gl = gl;			
+			this.gl = gl;
 			this.camera = new OrthoCamera(canvas.width, canvas.height);
 			this.batcherShader = Shader.newColoredTextured(gl);
 			this.batcher = new PolygonBatcher(gl);

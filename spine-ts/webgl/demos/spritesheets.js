@@ -29,7 +29,6 @@ var spritesheetsDemo = function(loadingComplete, bgColor) {
 		timeKeeper = new spine.TimeKeeper();
 		input = new spine.webgl.Input(canvas);	
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
-		loadingScreen.backgroundColor = bgColor;
 		requestAnimationFrame(load);
 	}
 
@@ -151,6 +150,8 @@ var spritesheetsDemo = function(loadingComplete, bgColor) {
 		renderer.drawSkeleton(skeleton, true);
 		renderer.drawSkeleton(skeletonSeq, true);		
 		renderer.end();
+
+		loadingScreen.draw(true);
 	}
 
 	init();

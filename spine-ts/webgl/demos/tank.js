@@ -21,7 +21,6 @@ var tankDemo = function(loadingComplete, bgColor) {
 		assetManager.loadJson(DEMO_NAME, "demos.json");
 		timeKeeper = new spine.TimeKeeper();		
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
-		loadingScreen.backgroundColor = bgColor;
 		requestAnimationFrame(load);
 	}
 
@@ -122,7 +121,9 @@ var tankDemo = function(loadingComplete, bgColor) {
 		renderer.begin();				
 		renderer.drawSkeleton(skeleton, true);
 		renderer.drawSkeletonDebug(skeleton, true);		
-		renderer.end();		
+		renderer.end();
+
+		loadingScreen.draw(true);
 	}
 
 	init();

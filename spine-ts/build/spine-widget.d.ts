@@ -988,6 +988,7 @@ declare module spine.webgl {
 }
 declare module spine.webgl {
     class LoadingScreen {
+        static FADE_SECONDS: number;
         private static loaded;
         private static spinnerImg;
         private static logoImg;
@@ -995,15 +996,15 @@ declare module spine.webgl {
         private logo;
         private spinner;
         private angle;
+        private fadeOut;
         private timeKeeper;
         backgroundColor: Color;
-        static useDark: boolean;
+        private tempColor;
+        private firstDraw;
         private static SPINNER_DATA;
-        private static SPINNER_DARK_DATA;
         private static SPINE_LOGO_DATA;
-        private static SPINE_LOGO_DARK_DATA;
         constructor(renderer: SceneRenderer);
-        draw(): void;
+        draw(complete?: boolean): void;
     }
 }
 declare module spine.webgl {
@@ -1128,8 +1129,8 @@ declare module spine.webgl {
         gl: WebGLRenderingContext;
         canvas: HTMLCanvasElement;
         camera: OrthoCamera;
+        batcher: PolygonBatcher;
         private batcherShader;
-        private batcher;
         private shapes;
         private shapesShader;
         private activeRenderer;

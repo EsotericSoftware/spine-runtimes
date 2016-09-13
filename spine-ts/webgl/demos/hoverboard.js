@@ -31,7 +31,6 @@ var hoverboardDemo = function(loadingComplete, bgColor) {
 		input = new spine.webgl.Input(canvas);
 		timeKeeper = new spine.TimeKeeper();		
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
-		loadingScreen.backgroundColor = bgColor;
 		requestAnimationFrame(load);
 	}
 
@@ -151,6 +150,8 @@ var hoverboardDemo = function(loadingComplete, bgColor) {
 		}
 		renderer.end();
 		gl.lineWidth(1);
+
+		loadingScreen.draw(true);
 	}
 
 	init();

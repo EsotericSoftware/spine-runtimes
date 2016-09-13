@@ -23,7 +23,6 @@ var skinsDemo = function(loadingComplete, bgColor) {
 		input = new spine.webgl.Input(canvas);
 		timeKeeper = new spine.TimeKeeper();		
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
-		loadingScreen.backgroundColor = bgColor;
 		requestAnimationFrame(load);
 	}
 
@@ -217,7 +216,9 @@ var skinsDemo = function(loadingComplete, bgColor) {
 		var scale = width / texture.getImage().width;
 		var height = scale * texture.getImage().height;
 		renderer.drawTexture(texture, offset.x + bounds.x + 190, offset.y + bounds.y / 2 - height / 2 - 5, width, height);		
-		renderer.end();		
+		renderer.end();
+
+		loadingScreen.draw(true);		
 	}
 
 	init();

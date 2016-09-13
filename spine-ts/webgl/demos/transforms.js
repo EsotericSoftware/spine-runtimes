@@ -33,7 +33,6 @@ var transformsDemo = function(loadingComplete, bgColor) {
 		input = new spine.webgl.Input(canvas);
 		timeKeeper = new spine.TimeKeeper();		
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
-		loadingScreen.backgroundColor = bgColor;
 		requestAnimationFrame(load);
 	}
 
@@ -180,7 +179,9 @@ var transformsDemo = function(loadingComplete, bgColor) {
 			renderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorOuter);			
 		}
 		gl.lineWidth(1);
-		renderer.end();		
+		renderer.end();
+
+		loadingScreen.draw(true);
 	}
 
 	init();

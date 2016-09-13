@@ -31,7 +31,6 @@ var vineDemo = function(loadingComplete, bgColor) {
 		assetManager.loadJson(DEMO_NAME, "demos.json");		
 		timeKeeper = new spine.TimeKeeper();		
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
-		loadingScreen.backgroundColor = bgColor;
 		requestAnimationFrame(load);
 	}
 
@@ -183,7 +182,9 @@ var vineDemo = function(loadingComplete, bgColor) {
 			renderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorOuter);			
 		}
 		gl.lineWidth(1);
-		renderer.end();				
+		renderer.end();
+
+		loadingScreen.draw(true);
 	}
 
 	init();

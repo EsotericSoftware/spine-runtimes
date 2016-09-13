@@ -30,7 +30,6 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 		input = new spine.webgl.Input(canvas);
 		timeKeeper = new spine.TimeKeeper();		
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
-		loadingScreen.backgroundColor = bgColor;
 
 		requestAnimationFrame(load);	
 	}
@@ -141,7 +140,9 @@ var transitionsDemo = function(loadingComplete, bgColor) {
 		skeletonNoMix.updateWorldTransform();
 		skeletonNoMix.x = size.x + 45;
 		renderer.drawSkeleton(skeletonNoMix, true);
-		renderer.end();		
+		renderer.end();
+
+		loadingScreen.draw(true);
 	}
 	init();
 	return render;
