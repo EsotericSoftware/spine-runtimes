@@ -147,6 +147,11 @@ function TextureAtlas:parse (atlasContent, imageLoader)
         page.width = parseInt(tuple[1])
         page.height = parseInt(tuple[2])
         tuple = readTuple()
+      else
+        -- We only support atlases that have the page width/height
+        -- encoded in them. That way we don't rely on any special
+        -- wrapper objects for images to get the page size from
+        error("Atlas must specify page width/height. Please export to the latest atlas format", 2)
       end
       
       tuple = readTuple()
@@ -168,8 +173,6 @@ function TextureAtlas:parse (atlasContent, imageLoader)
       page.texture = imageLoader(line)
       -- FIXME page.texture:setFilters(page.minFilter, page.magFilter)
       -- FIXME page.texture:setWraps(page.uWrap, page.vWrap)
-      -- FIXME page.width = page.texture.width
-      -- FIXME page.height = page.texture.height
       table_insert(self.pages, page)
     else
       local region = TextureAtlasRegion.new()
@@ -217,10 +220,23 @@ function TextureAtlas:parse (atlasContent, imageLoader)
       region.offsetX = parseInt(tuple[1])
       region.offsetY = parseInt(tuple[2])
       
-      region.index = parseInt(readValue()) + 1
+      region.index = parseInt(readValue())
       region.texture = page.texture
       table_insert(self.regions, region)
     end
+  end
+end
+
+function TextureAtlas:findRegion(name)
+  for i, region in ipairs(self.regions) do
+    if region.name == name then return region end
+  end
+  return nil
+end
+
+function TextureAtlas:dispose()
+  for i, page in ipairs(self.pairs) do
+    -- FIXME implement disposing of pages
   end
 end
 
