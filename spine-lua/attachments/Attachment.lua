@@ -29,32 +29,23 @@
 -- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
+local setmetatable = setmetatable
+
 local AttachmentType = require "spine-lua.attachments.AttachmentType"
-local RegionAttachment = require "spine-lua.attachments.RegionAttachment"
-local BoundingBoxAttachment = require "spine-lua.attachments.BoundingBoxAttachment"
-local MeshAttachment = require "spine-lua.attachments.MeshAttachment"
-local SkinningMeshAttachment = require "spine-lua.attachments.SkinnedMeshAttachment"
 
-local AttachmentLoader = {}
-function AttachmentLoader.new ()
-	local self = {}
+local Attachment = {}
+Attachment.__index = Attachment
 
-	function self:newRegionAttachment (skin, name, path)
-		return RegionAttachment.new(name)
-	end
-
-	function self:newMeshAttachment (skin, name, path)
-		return MeshAttachment.new(name)
-	end
-
-	function self:newSkinningMeshAttachment (skin, name, path)
-		return SkinningMeshAttachment.new(name)
-	end
-
-	function self:newBoundingBoxAttachment (skin, name)
-		return BoundingBoxAttachment.new(name)
-	end
-
-	return self
+function Attachment.new (name, attachmentType)
+  if not name then error("name cannot be nil.", 2) end
+  if not attachmentType then error("attachmentType cannot be nil.", 2) end
+  
+  local self = {
+    name = name,
+    type = attachmentType
+  }
+  setmetatable(self, Attachment)
+  return self
 end
-return AttachmentLoader
+
+return Attachment

@@ -28,33 +28,26 @@
 -- OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 -- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
+local setmetatable = setmetatable
 
-local AttachmentType = require "spine-lua.attachments.AttachmentType"
-local RegionAttachment = require "spine-lua.attachments.RegionAttachment"
-local BoundingBoxAttachment = require "spine-lua.attachments.BoundingBoxAttachment"
-local MeshAttachment = require "spine-lua.attachments.MeshAttachment"
-local SkinningMeshAttachment = require "spine-lua.attachments.SkinnedMeshAttachment"
+local TextureRegion = require "spine-lua.TextureRegion"
 
-local AttachmentLoader = {}
-function AttachmentLoader.new ()
-	local self = {}
+local TextureAtlasRegion = {}
+TextureAtlasRegion.__index = TextureAtlasRegion
+setmetatable(TextureAtlasRegion, { __index = TextureRegion })
 
-	function self:newRegionAttachment (skin, name, path)
-		return RegionAttachment.new(name)
-	end
-
-	function self:newMeshAttachment (skin, name, path)
-		return MeshAttachment.new(name)
-	end
-
-	function self:newSkinningMeshAttachment (skin, name, path)
-		return SkinningMeshAttachment.new(name)
-	end
-
-	function self:newBoundingBoxAttachment (skin, name)
-		return BoundingBoxAttachment.new(name)
-	end
-
-	return self
+function TextureAtlasRegion.new ()
+  local self = TextureRegion.new()
+  self.page = nil
+  self.name = nil
+  self.x = 0
+  self.y = 0
+  self.index = 0
+  self.rotate = false
+  self.texture = nil
+  setmetatable(self, TextureAtlasRegion)
+  
+  return self
 end
-return AttachmentLoader
+
+return TextureAtlasRegion

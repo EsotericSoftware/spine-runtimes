@@ -28,33 +28,25 @@
 -- OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 -- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
+local setmetatable = setmetatable
 
-local AttachmentType = require "spine-lua.attachments.AttachmentType"
-local RegionAttachment = require "spine-lua.attachments.RegionAttachment"
-local BoundingBoxAttachment = require "spine-lua.attachments.BoundingBoxAttachment"
-local MeshAttachment = require "spine-lua.attachments.MeshAttachment"
-local SkinningMeshAttachment = require "spine-lua.attachments.SkinnedMeshAttachment"
+local TextureRegion = {}
+TextureRegion.__index = TextureRegion
 
-local AttachmentLoader = {}
-function AttachmentLoader.new ()
-	local self = {}
+function TextureRegion.new ()
 
-	function self:newRegionAttachment (skin, name, path)
-		return RegionAttachment.new(name)
-	end
-
-	function self:newMeshAttachment (skin, name, path)
-		return MeshAttachment.new(name)
-	end
-
-	function self:newSkinningMeshAttachment (skin, name, path)
-		return SkinningMeshAttachment.new(name)
-	end
-
-	function self:newBoundingBoxAttachment (skin, name)
-		return BoundingBoxAttachment.new(name)
-	end
-
-	return self
+	local self = {
+    renderObject = nil,
+    u = 0, v = 0,
+    u2 = 0, v2 = 0,
+    width = 0, height = 0,
+    rotate = false,
+    offsetX = 0, offsetY = 0,
+    originalWidth = 0, originalHeight = 0
+	}
+  setmetatable(self, TextureRegion)
+  
+  return self
 end
-return AttachmentLoader
+
+return TextureRegion

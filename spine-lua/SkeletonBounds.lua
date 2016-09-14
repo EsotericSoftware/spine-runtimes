@@ -29,7 +29,7 @@
 -- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
-local AttachmentType = require "spine-lua.AttachmentType"
+local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local utils = require "spine-lua.utils"
 
 local setmetatable = setmetatable

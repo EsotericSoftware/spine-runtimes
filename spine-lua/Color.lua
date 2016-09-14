@@ -28,33 +28,41 @@
 -- OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 -- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
+local setmetatable = setmetatable
 
-local AttachmentType = require "spine-lua.attachments.AttachmentType"
-local RegionAttachment = require "spine-lua.attachments.RegionAttachment"
-local BoundingBoxAttachment = require "spine-lua.attachments.BoundingBoxAttachment"
-local MeshAttachment = require "spine-lua.attachments.MeshAttachment"
-local SkinningMeshAttachment = require "spine-lua.attachments.SkinnedMeshAttachment"
+local Color = {}
+Color.__index = Color
 
-local AttachmentLoader = {}
-function AttachmentLoader.new ()
-	local self = {}
-
-	function self:newRegionAttachment (skin, name, path)
-		return RegionAttachment.new(name)
-	end
-
-	function self:newMeshAttachment (skin, name, path)
-		return MeshAttachment.new(name)
-	end
-
-	function self:newSkinningMeshAttachment (skin, name, path)
-		return SkinningMeshAttachment.new(name)
-	end
-
-	function self:newBoundingBoxAttachment (skin, name)
-		return BoundingBoxAttachment.new(name)
-	end
-
-	return self
+function Color.new ()
+	local self = {
+    r = 0, g = 0, b = 0, a = 0
+	}
+  setmetatable(self, Color)
+  
+  return self
 end
-return AttachmentLoader
+
+function Color.newWith (r, g, b, a)
+	local self = {
+    r = a, g = g, b = b, a = a
+	}
+  setmetatable(self, Color)
+  
+  return self
+end
+
+function Color:set(r, g, b, a)
+  self.r = r
+  self.g = g
+  self.b = b
+  self.a = a
+end
+
+function Color:setFrom(color)
+  self.r = color.r
+  self.g = color.g
+  self.b = color.b
+  self.a = color.a
+end
+
+return Color

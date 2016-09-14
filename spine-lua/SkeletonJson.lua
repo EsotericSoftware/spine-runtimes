@@ -39,7 +39,7 @@ local IkConstraintData = require "spine-lua.IkConstraintData"
 local IkConstraint = require "spine-lua.IkConstraint"
 local EventData = require "spine-lua.EventData"
 local Event = require "spine-lua.Event"
-local AttachmentType = require "spine-lua.AttachmentType"
+local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local BlendMode = require "spine-lua.BlendMode"
 
 local SkeletonJson = {}

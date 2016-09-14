@@ -33,6 +33,7 @@ local Bone = require "spine-lua.Bone"
 local Slot = require "spine-lua.Slot"
 local IkConstraint = require "spine-lua.IkConstraint"
 local AttachmentLoader = require "spine-lua.AttachmentLoader"
+local Color = require "spine-lua.Color"
 
 local setmetatable = setmetatable
 local ipairs = ipairs
@@ -55,7 +56,7 @@ function Skeleton.new (data)
     pathConstraints = {},
     _updateCache = {},
     skin = nil,
-		r = 1, g = 1, b = 1, a = 1,
+    color = Color.newWith(1, 1, 1, 1),
 		time = 0,
  		flipX = false, flipY = false,
 		x = 0, y = 0
