@@ -286,7 +286,7 @@ function Skeleton:setSkinByReference(newSkin)
 end
 
 function Skeleton:getAttachment (slotName, attachmentName)
-  return self:getAttachmentByIndex(this.data.slotNameByIndex[slotName], attachmentName)
+  return self:getAttachmentByIndex(self.data.slotNameIndices[slotName], attachmentName)
 end
 
 function Skeleton:getAttachmentByIndex (slotIndex, attachmentName)

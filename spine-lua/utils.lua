@@ -78,4 +78,14 @@ function utils.copy (from, to)
 	return to
 end
 
+function utils.newNumberArray(size)
+  local a = {}
+  local i = 1
+  while i <= size do 
+    a[i] = 0 
+    i = i + 1
+  end
+  return a
+end
+
 return utils

@@ -60,6 +60,7 @@ spine.BlendMode = require "spine-lua.BlendMode"
 spine.TextureAtlas = require "spine-lua.TextureAtlas"
 spine.TextureRegion = require "spine-lua.TextureRegion"
 spine.TextureAtlasRegion = require "spine-lua.TextureAtlasRegion"
+spine.TextureAtlasAttachmentLoader = require "spine-lua.TextureAtlasAttachmentLoader"
 spine.Color = require "spine-lua.Color"
 
 spine.utils.readFile = function (fileName, base)
@@ -128,7 +129,7 @@ function spine.Skeleton.new (skeletonData, group)
 		if not self.images then self.images = {} end
 		local images = self.images
 
-		local r, g, b, a = self.r * 255, self.g * 255, self.b * 255, self.a * 255
+		local r, g, b, a = self.color.r * 255, self.color.g * 255, self.color.b * 255, self.color.a * 255
 
 		for i,slot in ipairs(self.drawOrder) do
 			local image = images[slot]

@@ -37,51 +37,52 @@ local math_cos = math.cos
 local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local Attachment = require "spine-lua.attachments.Attachment"
 local Color = require "spine-lua.Color"
+local Utils = require "spine-lua.utils"
 
-local OX1 = 0
-local OY1 = 1
-local OX2 = 2
-local OY2 = 3
-local OX3 = 4
-local OY3 = 5
-local OX4 = 6
-local OY4 = 7
+local OX1 = 1
+local OY1 = 2
+local OX2 = 3
+local OY2 = 4
+local OX3 = 5
+local OY3 = 6
+local OX4 = 7
+local OY4 = 8
 
-local X1 = 0
-local Y1 = 1
-local C1R = 2
-local C1G = 3
-local C1B = 4
-local C1A = 5
-local U1 = 6
-local V1 = 7
+local X1 = 1
+local Y1 = 2
+local C1R = 3
+local C1G = 4
+local C1B = 5
+local C1A = 6
+local U1 = 7
+local V1 = 8
 
-local X2 = 8
-local Y2 = 9
-local C2R = 10
-local C2G = 11
-local C2B = 12
-local C2A = 13
-local U2 = 14
-local V2 = 15
+local X2 = 9
+local Y2 = 10
+local C2R = 11
+local C2G = 12
+local C2B = 13
+local C2A = 14
+local U2 = 15
+local V2 = 16
 
-local X3 = 16
-local Y3 = 17
-local C3R = 18
-local C3G = 19
-local C3B = 20
-local C3A = 21
-local U3 = 22
-local V3 = 23
+local X3 = 17
+local Y3 = 18
+local C3R = 19
+local C3G = 20
+local C3B = 21
+local C3A = 22
+local U3 = 23
+local V3 = 24
 
-local X4 = 24
-local Y4 = 25
-local C4R = 26
-local C4G = 27
-local C4B = 28
-local C4A = 29
-local U4 = 30
-local V4 = 31
+local X4 = 25
+local Y4 = 26
+local C4R = 27
+local C4G = 28
+local C4B = 29
+local C4A = 30
+local U4 = 31
+local V4 = 32
 
 local RegionAttachment = {}
 RegionAttachment.__index = RegionAttachment
@@ -102,8 +103,8 @@ function RegionAttachment.new (name)
   self.path = nil
   self.rendererObject = nil
   self.region = nil
-  self.offset = { }
-  self.vertices = { } 
+  self.offset = Utils.newNumberArray(8)
+  self.vertices = Utils.newNumberArray(8 * 4)
   self.tempColor = Color.newWith(1, 1, 1, 1)
 	setmetatable(self, RegionAttachment)
 	
@@ -133,7 +134,7 @@ function RegionAttachment:setRegion (region)
   end
 end
 
-function RegionAttachment:updateOffset()
+function RegionAttachment:updateOffset ()
   local regionScaleX = self.width / self.region.originalWidth * self.scaleX
   local regionScaleY = self.height / self.region.originalHeight * self.scaleY
   local localX = -self.width / 2 * self.scaleX + self.region.offsetX * regionScaleX
@@ -152,17 +153,17 @@ function RegionAttachment:updateOffset()
   local localY2Cos = localY2 * cos + self.y
   local localY2Sin = localY2 * sin
   local offset = self.offset
-  offset[RegionAttachment.OX1] = localXCos - localYSin
-  offset[RegionAttachment.OY1] = localYCos + localXSin
-  offset[RegionAttachment.OX2] = localXCos - localY2Sin
-  offset[RegionAttachment.OY2] = localY2Cos + localXSin
-  offset[RegionAttachment.OX3] = localX2Cos - localY2Sin
-  offset[RegionAttachment.OY3] = localY2Cos + localX2Sin
-  offset[RegionAttachment.OX4] = localX2Cos - localYSin
-  offset[RegionAttachment.OY4] = localYCos + localX2Sin
+  offset[OX1] = localXCos - localYSin
+  offset[OY1] = localYCos + localXSin
+  offset[OX2] = localXCos - localY2Sin
+  offset[OY2] = localY2Cos + localXSin
+  offset[OX3] = localX2Cos - localY2Sin
+  offset[OY3] = localY2Cos + localX2Sin
+  offset[OX4] = localX2Cos - localYSin
+  offset[OY4] = localYCos + localX2Sin
 end
 
-function RegionAttachment:updateWorldVertices(slot, premultipliedAlpha)
+function RegionAttachment:updateWorldVertices (slot, premultipliedAlpha)
   local skeleton = slot.bone.skeleton
   local skeletonColor = skeleton.color
   local slotColor = slot.color

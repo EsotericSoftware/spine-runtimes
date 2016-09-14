@@ -233,10 +233,10 @@ function SkeletonJson.new (attachmentLoader)
 			
 			local color = map["color"]
 			if color then
-				region.r = tonumber(color:sub(1, 2), 16) / 255
-				region.g = tonumber(color:sub(3, 4), 16) / 255
-				region.b = tonumber(color:sub(5, 6), 16) / 255
-				region.a = tonumber(color:sub(7, 8), 16) / 255
+				region.color.set(tonumber(color:sub(1, 2), 16) / 255, 
+                         tonumber(color:sub(3, 4), 16) / 255,
+                         tonumber(color:sub(5, 6), 16) / 255,
+                         tonumber(color:sub(7, 8), 16) / 255)
 			end
 
 			region:updateOffset()

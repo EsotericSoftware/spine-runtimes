@@ -34,12 +34,10 @@ local spine = require "spine-love.spine"
 function love.load(arg)
   if arg[#arg] == "-debug" then require("mobdebug").start() end
   
-  local imageLoader = function (path)
-  end
+  local atlas = spine.TextureAtlas.new(spine.utils.readFile("data/spineboy.atlas"), 
+                                       function (path) return love.graphics.newImage("data/" .. path) end)
   
-  local atlas = spine.TextureAtlas.new(spine.utils.readFile("data/spineboy.atlas"), imageLoader)
-  
-  local json = spine.SkeletonJson.new()
+  local json = spine.SkeletonJson.new(spine.TextureAtlasAttachmentLoader.new(atlas))
   json.scale = 0.6
   local skeletonData = json:readSkeletonDataFile("data/spineboy.json")
 
