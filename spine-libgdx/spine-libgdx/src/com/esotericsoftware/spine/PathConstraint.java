@@ -372,7 +372,7 @@ public class PathConstraint implements Constraint {
 
 	private void addCurvePosition (float p, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2, float y2,
 		float[] out, int o, boolean tangents) {
-		if (p == 0) p = 0.0001f;
+		if (p == 0 || Float.isNaN(p)) p = 0.0001f;
 		float tt = p * p, ttt = tt * p, u = 1 - p, uu = u * u, uuu = uu * u;
 		float ut = u * p, ut3 = ut * 3, uut3 = u * ut3, utt3 = ut3 * p;
 		float x = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt, y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt;
