@@ -29,10 +29,13 @@
 -- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
-local spine = require "spine-love.spine"
+local spine = require "spine-love.spine-love"
 
 function love.load(arg)
   if arg[#arg] == "-debug" then require("mobdebug").start() end
+  
+  image = love.graphics.newImage("data/spineboy.png")
+  batcher = spine.PolygonBatcher.new(6)
   
   local atlas = spine.TextureAtlas.new(spine.utils.readFile("data/spineboy.atlas"), 
                                        function (path) return love.graphics.newImage("data/" .. path) end)
@@ -42,16 +45,12 @@ function love.load(arg)
   local skeletonData = json:readSkeletonDataFile("data/spineboy.json")
 
   skeleton = spine.Skeleton.new(skeletonData)
-  function skeleton:createImage (attachment)
-    -- Customize where images are loaded.
-    return love.graphics.newImage("data/images/" .. attachment.name .. ".png")
-  end
   skeleton.x = love.graphics.getWidth() / 2
   skeleton.y = love.graphics.getHeight() / 2 + 250
   skeleton.flipX = false
-  skeleton.flipY = false
-  skeleton.debugBones = true -- Omit or set to false to not draw debug lines on top of the images.
-  skeleton.debugSlots = true
+  skeleton.flipY = true
+  -- skeleton.debugBones = true -- Omit or set to false to not draw debug lines on top of the images.
+  -- skeleton.debugSlots = true
   skeleton:setToSetupPose()
 
   -- AnimationStateData defines crossfade durations between animations.
@@ -78,6 +77,8 @@ function love.load(arg)
   state.onEvent = function (trackIndex, event)
     print(trackIndex.." event: "..state:getCurrent(trackIndex).animation.name..", "..event.data.name..", "..event.intValue..", "..event.floatValue..", '"..(event.stringValue or "").."'")
   end
+  
+  skeletonRenderer = spine.SkeletonRenderer.new()
 end
 
 function love.update (delta)
@@ -88,6 +89,23 @@ function love.update (delta)
 end
 
 function love.draw ()
+  love.graphics.setBackgroundColor(255, 0, 255, 255)
 	love.graphics.setColor(255, 255, 255)
-	skeleton:draw()
+  skeletonRenderer:draw(skeleton)
+  batcher:begin()
+  batcher:draw(image, {
+      0, 0, 0, 0, 1, 1, 1, 1,
+      100, 0, 1, 0, 1, 1, 1, 1,
+      100, 100, 1, 1, 1, 1, 1, 1,
+      0, 100, 0, 1, 1, 1, 1, 1,
+    }, 
+    { 1, 2, 3, 3, 4, 1 })
+  batcher:draw(image, {
+    100, 0, 0, 0, 1, 1, 1, 1,
+    200, 0, 1, 0, 1, 1, 1, 1,
+    200, 100, 1, 1, 1, 1, 1, 1,
+    100, 100, 0, 1, 1, 1, 1, 1,
+  }, 
+  { 1, 2, 3, 3, 4, 1 })
+  batcher:stop()
 end

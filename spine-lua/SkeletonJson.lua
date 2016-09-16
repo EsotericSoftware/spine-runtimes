@@ -148,12 +148,10 @@ function SkeletonJson.new (attachmentLoader)
 
 				local color = slotMap["color"]
 				if color then
-					slotData:setColor(
-						tonumber(color:sub(1, 2), 16) / 255,
-						tonumber(color:sub(3, 4), 16) / 255,
-						tonumber(color:sub(5, 6), 16) / 255,
-						tonumber(color:sub(7, 8), 16) / 255
-					)
+					slotData.color.set(tonumber(color:sub(1, 2), 16) / 255, 
+                         tonumber(color:sub(3, 4), 16) / 255,
+                         tonumber(color:sub(5, 6), 16) / 255,
+                         tonumber(color:sub(7, 8), 16) / 255)
 				end
 
 				slotData.attachmentName = slotMap["attachment"]

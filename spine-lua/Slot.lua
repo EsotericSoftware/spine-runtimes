@@ -30,6 +30,8 @@
 -------------------------------------------------------------------------------
 local setmetatable = setmetatable
 
+local Color = require "spine-lua.Color"
+
 local Slot = {}
 Slot.__index = Slot
 
@@ -40,7 +42,7 @@ function Slot.new (data, bone)
 	local self = {
 		data = data,
 		bone = bone,
-		r = 1, g = 1, b = 1, a = 1,
+		color = Color.newWith(1, 1, 1, 1),
 		attachment = nil,
 		attachmentTime = 0,
 		attachmentVertices = nil,

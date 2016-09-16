@@ -30,6 +30,7 @@
 -------------------------------------------------------------------------------
 
 local BlendMode = require "spine-lua.BlendMode"
+local Color = require "spine-lua.Color"
 
 local setmetatable = setmetatable
 
@@ -45,7 +46,7 @@ function SlotData.new (index, name, boneData)
     index = index,
 		name = name,
 		boneData = boneData,
-		r = 1, g = 1, b = 1, a = 1,
+    color = Color.newWith(1, 1, 1, 1),
 		attachmentName = nil,
 		blendMode = BlendMode.normal
 	}
