@@ -31,40 +31,27 @@
 
 local spine = require "spine-love.spine-love"
 
-function love.load(arg)
-  if arg[#arg] == "-debug" then require("mobdebug").start() end
-  
-  image = love.graphics.newImage("data/spineboy.png")
-  batcher = spine.PolygonBatcher.new(6)
-  
-  local atlas = spine.TextureAtlas.new(spine.utils.readFile("data/spineboy.atlas"), 
-                                       function (path) return love.graphics.newImage("data/" .. path) end)
+local skeletons = {}
+local activeSkeleton = "raptor"
+
+function loadSkeleton (name, animation)
+  local loader = function (path) return love.graphics.newImage("data/" .. path) end
+  local atlas = spine.TextureAtlas.new(spine.utils.readFile("data/" .. name .. ".atlas"), loader)
   
   local json = spine.SkeletonJson.new(spine.TextureAtlasAttachmentLoader.new(atlas))
   json.scale = 0.6
-  local skeletonData = json:readSkeletonDataFile("data/spineboy.json")
-
-  skeleton = spine.Skeleton.new(skeletonData)
+  local skeletonData = json:readSkeletonDataFile("data/" .. name .. ".json")
+  local skeleton = spine.Skeleton.new(skeletonData)
   skeleton.x = love.graphics.getWidth() / 2
   skeleton.y = love.graphics.getHeight() / 2 + 250
   skeleton.flipX = false
   skeleton.flipY = true
-  -- skeleton.debugBones = true -- Omit or set to false to not draw debug lines on top of the images.
-  -- skeleton.debugSlots = true
   skeleton:setToSetupPose()
-
-  -- AnimationStateData defines crossfade durations between animations.
+  
   local stateData = spine.AnimationStateData.new(skeletonData)
-  stateData:setMix("walk", "jump", 0.2)
-  stateData:setMix("jump", "run", 0.2)
-
-  -- AnimationState has a queue of animations and can apply them with crossfading.
-  state = spine.AnimationState.new(stateData)
-  -- state:setAnimationByName(0, "test")
-  state:setAnimationByName(0, "walk", true)
-  state:addAnimationByName(0, "jump", true, 3)
-  state:addAnimationByName(0, "run", true, 0)
-
+  local state = spine.AnimationState.new(stateData)
+  state:setAnimationByName(0, animation, true)
+  
   state.onStart = function (trackIndex)
     print(trackIndex.." start: "..state:getCurrent(trackIndex).animation.name)
   end
@@ -78,11 +65,20 @@ function love.load(arg)
     print(trackIndex.." event: "..state:getCurrent(trackIndex).animation.name..", "..event.data.name..", "..event.intValue..", "..event.floatValue..", '"..(event.stringValue or "").."'")
   end
   
+  return { state = state, skeleton = skeleton }
+end
+
+function love.load(arg)
+  if arg[#arg] == "-debug" then require("mobdebug").start() end  
+  -- skeletons["spineboy"] = loadSkeleton("spineboy", "walk")
+  skeletons["raptor"] = loadSkeleton("raptor", "walk")
   skeletonRenderer = spine.SkeletonRenderer.new()
 end
 
 function love.update (delta)
 	-- Update the state with the delta time, apply it, and update the world transforms.
+  local state = skeletons[activeSkeleton].state
+  local skeleton = skeletons[activeSkeleton].skeleton
 	state:update(delta)
 	state:apply(skeleton)
 	skeleton:updateWorldTransform()
@@ -91,21 +87,6 @@ end
 function love.draw ()
   love.graphics.setBackgroundColor(255, 0, 255, 255)
 	love.graphics.setColor(255, 255, 255)
+  local skeleton = skeletons[activeSkeleton].skeleton
   skeletonRenderer:draw(skeleton)
-  batcher:begin()
-  batcher:draw(image, {
-      0, 0, 0, 0, 1, 1, 1, 1,
-      100, 0, 1, 0, 1, 1, 1, 1,
-      100, 100, 1, 1, 1, 1, 1, 1,
-      0, 100, 0, 1, 1, 1, 1, 1,
-    }, 
-    { 1, 2, 3, 3, 4, 1 })
-  batcher:draw(image, {
-    100, 0, 0, 0, 1, 1, 1, 1,
-    200, 0, 1, 0, 1, 1, 1, 1,
-    200, 100, 1, 1, 1, 1, 1, 1,
-    100, 100, 0, 1, 1, 1, 1, 1,
-  }, 
-  { 1, 2, 3, 3, 4, 1 })
-  batcher:stop()
 end
