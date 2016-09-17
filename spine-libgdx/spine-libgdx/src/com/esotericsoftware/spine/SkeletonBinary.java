@@ -170,6 +170,7 @@ public class SkeletonBinary {
 			boolean nonessential = input.readBoolean();
 
 			if (nonessential) {
+				skeletonData.fps = input.readFloat();
 				skeletonData.imagesPath = input.readString();
 				if (skeletonData.imagesPath.isEmpty()) skeletonData.imagesPath = null;
 			}

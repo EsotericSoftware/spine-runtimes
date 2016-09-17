@@ -110,6 +110,7 @@ public class SkeletonJson {
 			skeletonData.version = skeletonMap.getString("spine", null);
 			skeletonData.width = skeletonMap.getFloat("width", 0);
 			skeletonData.height = skeletonMap.getFloat("height", 0);
+			skeletonData.fps = skeletonMap.getFloat("fps", 0);
 			skeletonData.imagesPath = skeletonMap.getString("images", null);
 		}
 

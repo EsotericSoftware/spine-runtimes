@@ -45,7 +45,11 @@ public class SkeletonData {
 	final Array<TransformConstraintData> transformConstraints = new Array();
 	final Array<PathConstraintData> pathConstraints = new Array();
 	float width, height;
-	String version, hash, imagesPath;
+	String version, hash;
+
+	// Nonessential.
+	float fps;
+	String imagesPath;
 
 	// --- Bones.
 
@@ -271,6 +275,14 @@ public class SkeletonData {
 	/** @param imagesPath May be null. */
 	public void setImagesPath (String imagesPath) {
 		this.imagesPath = imagesPath;
+	}
+
+	public float getFps () {
+		return fps;
+	}
+
+	public void setFps (float fps) {
+		this.fps = fps;
 	}
 
 	public String toString () {
