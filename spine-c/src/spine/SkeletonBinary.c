@@ -1016,7 +1016,9 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 	skeletonData->animationsCount = readVarint(input, 1);
 	skeletonData->animations = MALLOC(spAnimation*, skeletonData->animationsCount);
 	for (i = 0; i < skeletonData->animationsCount; ++i) {
-		spAnimation* animation = _spSkeletonBinary_readAnimation(self, readString(input), input, skeletonData);
+		const char* name = readString(input);
+		spAnimation* animation = _spSkeletonBinary_readAnimation(self, name, input, skeletonData);
+		FREE(name);
 		if (!animation) {
 			FREE(input);
 			spSkeletonData_dispose(skeletonData);
