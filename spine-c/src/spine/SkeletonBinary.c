@@ -664,7 +664,7 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 	int freeName = name != 0;
 	if (!name) {
 		freeName = 0;
-		MALLOC_STR(name, attachmentName);
+		name = attachmentName;
 	}
 
 	type = (spAttachmentType)readByte(input);
