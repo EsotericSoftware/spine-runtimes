@@ -155,6 +155,35 @@ public class Bone implements Updatable {
 		}
 		case noRotation: {
 			if (false) {
+				// Simple loop.
+				// 1) Inherits scale in the wrong direction.
+				// 2) Doesn't flip.
+				float rotationY = rotation + 90 + shearY;
+				float la = cosDeg(rotation + shearX) * scaleX;
+				float lb = cosDeg(rotationY) * scaleY;
+				float lc = sinDeg(rotation + shearX) * scaleX;
+				float ld = sinDeg(rotationY) * scaleY;
+				Bone current = parent;
+				while (current != null) {
+					float ca = Math.abs(current.ascaleX);
+					float cb = 0;
+					float cc = 0;
+					float cd = Math.abs(current.ascaleY);
+					float za = ca * la + cb * lc;
+					float zb = ca * lb + cb * ld;
+					float zc = cc * la + cd * lc;
+					float zd = cc * lb + cd * ld;
+					la = za;
+					lb = zb;
+					lc = zc;
+					ld = zd;
+					current = current.parent;
+				}
+				a = la;
+				b = lb;
+				c = lc;
+				d = ld;
+			} else if (false) {
 				// Summing parent rotations.
 				// 1) Negative parent scale causes bone to rotate.
 				float sum = 0;
