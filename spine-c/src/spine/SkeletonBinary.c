@@ -72,8 +72,13 @@ spSkeletonBinary* spSkeletonBinary_create (spAtlas* atlas) {
 }
 
 void spSkeletonBinary_dispose (spSkeletonBinary* self) {
+	int i;
 	_spSkeletonBinary* internal = SUB_CAST(_spSkeletonBinary, self);
 	if (internal->ownsLoader) spAttachmentLoader_dispose(self->attachmentLoader);
+	for (i = 0; i < internal->linkedMeshCount; ++i) {
+		FREE(internal->linkedMeshes[i].parent);
+		FREE(internal->linkedMeshes[i].skin);
+	}
 	FREE(internal->linkedMeshes);
 	FREE(self->error);
 	FREE(self);
@@ -659,7 +664,7 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 	int freeName = name != 0;
 	if (!name) {
 		freeName = 0;
-		MALLOC_STR(name, attachmentName);
+		name = attachmentName;
 	}
 
 	type = (spAttachmentType)readByte(input);
@@ -1011,7 +1016,9 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 	skeletonData->animationsCount = readVarint(input, 1);
 	skeletonData->animations = MALLOC(spAnimation*, skeletonData->animationsCount);
 	for (i = 0; i < skeletonData->animationsCount; ++i) {
-		spAnimation* animation = _spSkeletonBinary_readAnimation(self, readString(input), input, skeletonData);
+		const char* name = readString(input);
+		spAnimation* animation = _spSkeletonBinary_readAnimation(self, name, input, skeletonData);
+		FREE(name);
 		if (!animation) {
 			FREE(input);
 			spSkeletonData_dispose(skeletonData);
