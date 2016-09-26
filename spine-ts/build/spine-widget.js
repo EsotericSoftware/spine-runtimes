@@ -3483,7 +3483,7 @@ var spine;
 					for (var key in dictionary) {
 						var skinAttachment = dictionary[key];
 						if (slotAttachment == skinAttachment) {
-							var attachment = this.getAttachment(slotIndex, name);
+							var attachment = this.getAttachment(slotIndex, key);
 							if (attachment != null)
 								slot.setAttachment(attachment);
 							break;
