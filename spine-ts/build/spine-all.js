@@ -3970,7 +3970,6 @@ var spine;
 			region.renderObject = region;
 			var attachment = new spine.RegionAttachment(name);
 			attachment.setRegion(region);
-			attachment.region = region;
 			return attachment;
 		};
 		TextureAtlasAttachmentLoader.prototype.newMeshAttachment = function (skin, name, path) {
@@ -4633,6 +4632,7 @@ var spine;
 				vertices[RegionAttachment.U4] = region.u2;
 				vertices[RegionAttachment.V4] = region.v2;
 			}
+			this.region = region;
 		};
 		RegionAttachment.prototype.updateOffset = function () {
 			var regionScaleX = this.width / this.region.originalWidth * this.scaleX;
