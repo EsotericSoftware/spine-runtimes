@@ -46,6 +46,13 @@ namespace Spine.Unity.Editor {
 		private SerializedProperty atlasFile, materials;
 		private AtlasAsset atlasAsset;
 
+		private List<AtlasRegion> Regions {
+			get {
+				FieldInfo regionsField = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.NonPublic);
+				return (List<AtlasRegion>)regionsField.GetValue(atlasAsset.GetAtlas());
+			}
+		}
+
 		void OnEnable () {
 			SpineEditorUtilities.ConfirmInitialization();
 			atlasFile = serializedObject.FindProperty("atlasFile");
@@ -57,13 +64,6 @@ namespace Spine.Unity.Editor {
 			#endif
 		}
 
-		private List<AtlasRegion> Regions {
-			get {
-				FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.NonPublic);
-				return (List<AtlasRegion>)field.GetValue(atlasAsset.GetAtlas());
-			}
-		}
-			
 		#if REGION_BAKING_MESH
 		private List<bool> baked;
 		private List<GameObject> bakedObjects;
@@ -73,14 +73,10 @@ namespace Spine.Unity.Editor {
 			baked = new List<bool>();
 			bakedObjects = new List<GameObject>();
 			if (atlasFile.objectReferenceValue != null) {
-				Atlas atlas = asset.GetAtlas();
-				FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic);
-				List<AtlasRegion> regions = (List<AtlasRegion>)field.GetValue(atlas);
+				List<AtlasRegion> regions = this.Regions;
 				string atlasAssetPath = AssetDatabase.GetAssetPath(atlasAsset);
 				string atlasAssetDirPath = Path.GetDirectoryName(atlasAssetPath);
 				string bakedDirPath = Path.Combine(atlasAssetDirPath, atlasAsset.name);
-
-
 				for (int i = 0; i < regions.Count; i++) {
 					AtlasRegion region = regions[i];
 					string bakedPrefabPath = Path.Combine(bakedDirPath, SpineEditorUtilities.GetPathSafeRegionName(region) + ".prefab").Replace("\\", "/");
