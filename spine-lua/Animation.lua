@@ -29,6 +29,18 @@
 -- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
+-- FIXME
+-- All the indexing in this file is zero based. We use zlen()
+-- instead of the # operator. Initialization of number arrays
+-- is performed via utils.newNumberArrayZero. This needs
+-- to be rewritten using one-based indexing for better performance
+
+local utils = require "spine-lua.utils"
+
+local function zlen(array)
+  return #array + 1
+end
+
 local Animation = {}
 function Animation.new (name, timelines, duration)
 	if not timelines then error("timelines cannot be nil", 2) end
@@ -44,7 +56,7 @@ function Animation.new (name, timelines, duration)
 
 		if loop and duration > 0 then
 			time = time % self.duration
-			lastTime = lastTime % self.duration
+			if lastTime > 0 then lastTime = lastTime % self.duration end
 		end
 
 		for i,timeline in ipairs(self.timelines) do
@@ -57,7 +69,7 @@ function Animation.new (name, timelines, duration)
 
 		if loop and duration > 0 then
 			time = time % self.duration
-			lastTime = lastTime % self.duration
+			if lastTime > 0  then lastTime = lastTime % self.duration end
 		end
 
 		for i,timeline in ipairs(self.timelines) do
@@ -70,7 +82,7 @@ end
 
 local function binarySearch (values, target, step)
 	local low = 0
-	local high = math.floor((#values + 1) / step - 2)
+	local high = math.floor(zlen(values) / step - 2)
 	if high == 0 then return step end
 	local current = math.floor(high / 2)
 	while true do
@@ -86,7 +98,7 @@ end
 
 local function binarySearch1 (values, target)
 	local low = 0
-	local high = math.floor(#values - 1)
+	local high = math.floor(zlen(values)  - 2)
 	if high == 0 then return 1 end
 	local current = math.floor(high / 2)
 	while true do
@@ -101,23 +113,29 @@ local function binarySearch1 (values, target)
 end
 
 local function linearSearch (values, target, step)
-	for i = 0, #values, step do
+  local i = 0
+  local last = zlen(values) - step
+  while i <= last do
 		if (values[i] > target) then return i end
+    i = i + step
 	end
 	return -1
 end
 
 Animation.CurveTimeline = {}
-function Animation.CurveTimeline.new ()
+function Animation.CurveTimeline.new (frameCount)
 	local LINEAR = 0
 	local STEPPED = 1
 	local BEZIER = 2;
-	local BEZIER_SEGMENTS = 10
-	local BEZIER_SIZE = BEZIER_SEGMENTS * 2 - 1
+	local BEZIER_SIZE = 10 * 2 - 1
 
 	local self = {
-		curves = {} -- type, x, y, ...
+		curves = utils.newNumberArrayZero((frameCount - 1) * BEZIER_SIZE) -- type, x, y, ...
 	}
+  
+  function self:getFrameCount ()
+    return math.floor(zlen(self.curves) / BEZIER_SIZE) + 1
+  end
 
 	function self:setLinear (frameIndex)
 		self.curves[frameIndex * BEZIER_SIZE] = LINEAR
@@ -126,48 +144,49 @@ function Animation.CurveTimeline.new ()
 	function self:setStepped (frameIndex)
 		self.curves[frameIndex * BEZIER_SIZE] = STEPPED
 	end
+  
+  function self:getCurveType (frameIndex)
+    local index = frameIndex * BEZIER_SIZE
+    if index == zlen(self.curves) then return LINEAR end
+    local type = self.curves[index]
+    if type == LINEAR then return LINEAR end
+    if type == STEPPED then return STEPPED end
+    return BEZIER
+  end
 
 	function self:setCurve (frameIndex, cx1, cy1, cx2, cy2)
-		local subdiv1 = 1 / BEZIER_SEGMENTS
-		local subdiv2 = subdiv1 * subdiv1
-		local subdiv3 = subdiv2 * subdiv1;
-		local pre1 = 3 * subdiv1
-		local pre2 = 3 * subdiv2
-		local pre4 = 6 * subdiv2
-		local pre5 = 6 * subdiv3
-		local tmp1x = -cx1 * 2 + cx2
-		local tmp1y = -cy1 * 2 + cy2
-		local tmp2x = (cx1 - cx2) * 3 + 1
-		local tmp2y = (cy1 - cy2) * 3 + 1
-		local dfx = cx1 * pre1 + tmp1x * pre2 + tmp2x * subdiv3
-		local dfy = cy1 * pre1 + tmp1y * pre2 + tmp2y * subdiv3
-		local ddfx = tmp1x * pre4 + tmp2x * pre5
-		local ddfy = tmp1y * pre4 + tmp2y * pre5;
-		local dddfx = tmp2x * pre5
-		local dddfy = tmp2y * pre5
+			local tmpx = (-cx1 * 2 + cx2) * 0.03
+      local tmpy = (-cy1 * 2 + cy2) * 0.03
+			local dddfx = ((cx1 - cx2) * 3 + 1) * 0.006
+      local dddfy = ((cy1 - cy2) * 3 + 1) * 0.006
+			local ddfx = tmpx * 2 + dddfx
+      local ddfy = tmpy * 2 + dddfy
+			local dfx = cx1 * 0.3 + tmpx + dddfx * 0.16666667
+      local dfy = cy1 * 0.3 + tmpy + dddfy * 0.16666667
 
-		local i = frameIndex * BEZIER_SIZE
-		local curves = self.curves
-		curves[i] = BEZIER
-		i = i + 1
+			local i = frameIndex * BEZIER_SIZE
+			local curves = self.curves
+			curves[i] = BEZIER;
+      i = i + 1
 
-		local x = dfx
-		local y = dfy
-		local n = i + BEZIER_SIZE - 1
-		while i < n do
-			curves[i] = x
-			curves[i + 1] = y
-			dfx = dfx + ddfx
-			dfy = dfy + ddfy
-			ddfx = ddfx + dddfx
-			ddfy = ddfy + dddfy
-			x = x + dfx
-			y = y + dfy
-			i = i + 2
-		end
+			local x = dfx
+      local y = dfy
+      local n = i + BEZIER_SIZE - 1
+      while i < n do
+				curves[i] = x
+				curves[i + 1] = y
+				dfx = dfx + ddfx
+				dfy = dfy + ddfy
+				ddfx = ddfx + dddfx
+				ddfy = ddfy + dddfy
+				x = x + dfx
+				y = y + dfy
+        i = i + 2
+			end
 	end
 
 	function self:getCurvePercent (frameIndex, percent)
+    percent = utils.clamp(percent, 0, 1)
 		local curves = self.curves
 		local i = frameIndex * BEZIER_SIZE
 		local type = curves[i]
@@ -200,26 +219,21 @@ function Animation.CurveTimeline.new ()
 end
 
 Animation.RotateTimeline = {}
-function Animation.RotateTimeline.new ()
+Animation.RotateTimeline.ENTRIES = 2
+function Animation.RotateTimeline.new (frameCount)
+  local ENTRIES = Animation.RotateTimeline.ENTRIES
 	local PREV_FRAME_TIME = -2
-	local FRAME_VALUE = 1
+  local PREV_ROTATION = -1
+	local ROTATION = 1
 
-	local self = Animation.CurveTimeline.new()
-	self.frames = {}
+	local self = Animation.CurveTimeline.new(frameCount)
 	self.boneIndex = -1
-
-	function self:getDuration ()
-		return self.frames[#self.frames - 1]
-	end
-
-	function self:getFrameCount ()
-		return (#self.frames + 1) / 2
-	end
-
-	function self:setFrame (frameIndex, time, value)
+  self.frames = utils.newNumberArrayZero(frameCount * 2)
+  
+	function self:setFrame (frameIndex, time, degrees)
 		frameIndex = frameIndex * 2
 		self.frames[frameIndex] = time
-		self.frames[frameIndex + 1] = value
+		self.frames[frameIndex + ROTATION] = degrees
 	end
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
@@ -228,8 +242,8 @@ function Animation.RotateTimeline.new ()
 
 		local bone = skeleton.bones[self.boneIndex]
 
-		if time >= frames[#frames - 1] then -- Time is after last frame.
-			local amount = bone.data.rotation + frames[#frames] - bone.rotation
+		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
+			local amount = bone.data.rotation + frames[zlen(frames) + PREV_ROTATION] - bone.rotation
 			while amount > 180 do
 				amount = amount - 360
 			end
@@ -241,21 +255,19 @@ function Animation.RotateTimeline.new ()
 		end
 
 		-- Interpolate between the last frame and the current frame.
-		local frameIndex = binarySearch(frames, time, 2)
-		local prevFrameValue = frames[frameIndex - 1]
-		local frameTime = frames[frameIndex]
-		local percent = 1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime)
-		if percent < 0 then percent = 0 elseif percent > 1 then percent = 1 end
-		percent = self:getCurvePercent(frameIndex / 2 - 1, percent)
+		local frame = binarySearch(frames, time, ENTRIES)
+		local prevRotation = frames[frame + PREV_ROTATION]
+		local frameTime = frames[frame]
+    local percent = this.getCurvePercent((frame / 2) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-		local amount = frames[frameIndex + FRAME_VALUE] - prevFrameValue
+		local amount = frames[frame + ROTATION] - prevFrameValue
 		while amount > 180 do
 			amount = amount - 360
 		end
 		while amount < -180 do
 			amount = amount + 360
 		end
-		amount = bone.data.rotation + (prevFrameValue + amount * percent) - bone.rotation
+		amount = bone.data.rotation + (prevRotation + amount * percent) - bone.rotation
 		while amount > 180 do
 			amount = amount - 360
 		end
@@ -267,6 +279,10 @@ function Animation.RotateTimeline.new ()
 
 	return self
 end
+
+
+!!!FIXME port and pass frameCount from SkeletonJson.readAnimation for
+!!!array initialization
 
 Animation.TranslateTimeline = {}
 function Animation.TranslateTimeline.new ()

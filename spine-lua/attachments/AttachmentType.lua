@@ -34,6 +34,7 @@ local AttachmentType = {
 	boundingbox = 1,
 	mesh = 2,
 	skinnedmesh = 3,
-  path = 4
+  path = 4,
+  linkedmesh = 5
 }
 return AttachmentType

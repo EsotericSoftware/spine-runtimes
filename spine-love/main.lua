@@ -32,7 +32,7 @@
 local spine = require "spine-love.spine-love"
 
 local skeletons = {}
-local activeSkeleton = "raptor"
+local activeSkeleton = "spineboy"
 
 function loadSkeleton (name, animation)
   local loader = function (path) return love.graphics.newImage("data/" .. path) end
@@ -70,8 +70,8 @@ end
 
 function love.load(arg)
   if arg[#arg] == "-debug" then require("mobdebug").start() end  
-  -- skeletons["spineboy"] = loadSkeleton("spineboy", "walk")
-  skeletons["raptor"] = loadSkeleton("raptor", "walk")
+  skeletons["spineboy"] = loadSkeleton("spineboy", "walk")
+  ---skeletons["raptor"] = loadSkeleton("raptor", "walk")
   skeletonRenderer = spine.SkeletonRenderer.new()
 end
 

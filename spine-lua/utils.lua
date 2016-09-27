@@ -78,7 +78,7 @@ function utils.copy (from, to)
 	return to
 end
 
-function utils.newNumberArray(size)
+function utils.newNumberArray (size)
   local a = {}
   local i = 1
   while i <= size do 
@@ -86,6 +86,22 @@ function utils.newNumberArray(size)
     i = i + 1
   end
   return a
+end
+
+function utils.newNumberArrayZero (size)
+  local a = {}
+  local i = 0
+  while i < size do 
+    a[i] = 0 
+    i = i + 1
+  end
+  return a
+end
+
+function utils.clamp (value, min, max)
+  if value < min then return min end
+  if value > max then return max end
+  return value
 end
 
 return utils
