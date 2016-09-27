@@ -208,6 +208,10 @@ function SkeletonRenderer:draw (skeleton)
         vertices = attachment:updateWorldVertices(slot, premultipliedAlpha)
         indices = SkeletonRenderer.QUAD_TRIANGLES
         texture = attachment.region.renderObject.texture
+      --[[elseif attachment.type == spine.AttachmentType.mesh then
+        vertices = attachment:updateWorldVertices(slot, premultipliedAlpha)
+        indices = attachment.triangles
+        texture = attachment.region.renderObject.texture]]
       end
       
       if texture then

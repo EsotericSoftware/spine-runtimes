@@ -114,7 +114,7 @@ function Skeleton:updateCache ()
   local ikConstraints = {}
   self.ikConstraintsSorted = ikConstraints
   for i, constraint in ipairs(self.ikConstraints) do
-    table_insert(ikConstaints, constraint)
+    table_insert(ikConstraints, constraint)
   end
   
   local level = 0
@@ -134,13 +134,13 @@ function Skeleton:updateCache ()
     local ik = ikConstraints[i]
     local level = ik.level
     local ii = i - 1
-    while ii >= 0 do
+    while ii > 0 do
       local other = ikConstraints[ii]
       if other.level < level then break end
-      ikConstaints[ii+1] = other
+      ikConstraints[ii+1] = other
       ii = ii - 1
     end
-    ikConstaints[ii + 1] = ik
+    ikConstraints[ii + 1] = ik
     i = i + 1
   end
   
@@ -152,7 +152,7 @@ function Skeleton:updateCache ()
     local parent = constrained[1]
     self:sortBone(parent)
     
-    table_insert(_updateCache, constraint)
+    table_insert(updateCache, constraint)
     
     self:sortReset(parent.children)
     constrained[#constrained].sorted = true    
@@ -183,7 +183,7 @@ function Skeleton:sortBone(bone)
 end
 
 function Skeleton:sortReset(bones)
-  for i, bone in bones do
+  for i, bone in ipairs(bones) do
     if bone.sorted then self:sortReset(bone.children) end
     bone.sorted = false
   end
