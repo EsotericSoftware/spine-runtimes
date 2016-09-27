@@ -1,0 +1,24 @@
+<html>
+<meta charset="UTF-8">
+<title>Path Constraints - Spine Demo</title>
+<link rel="stylesheet" href="demos.css">
+<script src="../../build/spine-webgl.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="utils.js"></script>
+<script src="vine.js"></script>
+<body>
+
+<center>
+<div class="aspect"><div><canvas id="vine-canvas"></canvas></div></div>
+<div id="vine-timeline" class="slider"></div>
+<input id="vine-playbutton" type="button" value="Pause"></input><br>
+<input id="vine-drawbones" type="checkbox"></input> Display bones &amp; path
+</center>
+
+<script>	
+spineDemos.loadSliders();
+vineDemo(spineDemos.setupRendering);
+</script>
+
+</body>
+</html>

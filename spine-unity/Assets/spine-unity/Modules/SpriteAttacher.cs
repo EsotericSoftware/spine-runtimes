@@ -35,16 +35,21 @@ using Spine;
 
 namespace Spine.Unity.Modules {
 	public class SpriteAttacher : MonoBehaviour {
+		const string DefaultPMAShader = "Spine/Skeleton";
+		const string DefaultStraightAlphaShader = "Sprites/Default";
+
+		#region Inspector
 		public bool attachOnStart = true;
 		public bool keepLoaderInMemory = true;
-
 		public Sprite sprite;
 
 		[SpineSlot]
 		public string slot;
+		#endregion
 
 		private SpriteAttachmentLoader loader;
 		private RegionAttachment attachment;
+		private bool applyPMA;
 
 		void Start () {
 			if (attachOnStart)
@@ -52,16 +57,25 @@ namespace Spine.Unity.Modules {
 		}
 
 		public void Attach () {
-			var skeletonRenderer = GetComponent<SkeletonRenderer>();
+			var skeletonComponent = GetComponent<ISkeletonComponent>();
 
-			if (loader == null)
-				//create loader instance, tell it what sprite and shader to use
-				loader = new SpriteAttachmentLoader(sprite, Shader.Find("Spine/Skeleton"));
+			var skeletonRenderer = skeletonComponent as SkeletonRenderer;
+			if (skeletonRenderer != null)
+				this.applyPMA = skeletonRenderer.pmaVertexColors;
+			else {
+				var skeletonGraphic = skeletonComponent as SkeletonGraphic;
+				if (skeletonGraphic != null)
+					this.applyPMA = skeletonGraphic.SpineMeshGenerator.PremultiplyVertexColors;
+			}
+
+			Shader attachmentShader = applyPMA ? Shader.Find(DefaultPMAShader) : Shader.Find(DefaultStraightAlphaShader);
+
+			loader = loader ?? new SpriteAttachmentLoader(sprite, attachmentShader, applyPMA);
 
 			if (attachment == null)
 				attachment = loader.NewRegionAttachment(null, sprite.name, "");
 
-			skeletonRenderer.skeleton.FindSlot(slot).Attachment = attachment;
+			skeletonComponent.Skeleton.FindSlot(slot).Attachment = attachment;
 
 			if (!keepLoaderInMemory)
 				loader = null;
@@ -69,20 +83,16 @@ namespace Spine.Unity.Modules {
 	}
 
 	public class SpriteAttachmentLoader : AttachmentLoader {
+		//IMPORTANT: Make sure you clear this when you don't need it anymore. Goodluck.
+		static public Dictionary<int, AtlasRegion> atlasTable = new Dictionary<int, AtlasRegion>();
 
-		//MITCH: left a todo:  Memory cleanup functions
-
-		//IMPORTANT:  Make sure you clear this when you don't need it anymore. Goodluck.
-		public static Dictionary<int, AtlasRegion> atlasTable = new Dictionary<int, AtlasRegion>();
-
-		//Shouldn't need to clear this, should just prevent redoing premultiply alpha pass on packed atlases
-		public static List<int> premultipliedAtlasIds = new List<int>();
+		static public List<int> premultipliedAtlasIds = new List<int>();
 
 		Sprite sprite;
 		Shader shader;
+		//bool applyPMA;
 
-		public SpriteAttachmentLoader (Sprite sprite, Shader shader) {
-
+		public SpriteAttachmentLoader (Sprite sprite, Shader shader, bool applyPMA) {
 			if (sprite.packed && sprite.packingMode == SpritePackingMode.Tight) {
 				Debug.LogError("Tight Packer Policy not supported yet!");
 				return;
@@ -90,32 +100,43 @@ namespace Spine.Unity.Modules {
 
 			this.sprite = sprite;
 			this.shader = shader;
+			//this.applyPMA = applyPMA;
 
-			Texture2D tex = sprite.texture;
-			//premultiply texture if it hasn't been yet
-			int instanceId = tex.GetInstanceID();
-			if (!premultipliedAtlasIds.Contains(instanceId)) {
+			if (applyPMA) {
 				try {
-					var colors = tex.GetPixels();
-					Color c;
-					float a;
-					for (int i = 0; i < colors.Length; i++) {
-						c = colors[i];
-						a = c.a;
-						c.r *= a;
-						c.g *= a;
-						c.b *= a;
-						colors[i] = c;
+					Texture2D texture = sprite.texture;
+					int instanceId = texture.GetInstanceID();
+					if (!premultipliedAtlasIds.Contains(instanceId)) {
+						var colors = texture.GetPixels();
+						Color c;
+						float a;
+						for (int i = 0; i < colors.Length; i++) {
+							c = colors[i];
+							a = c.a;
+							c.r *= a;
+							c.g *= a;
+							c.b *= a;
+							colors[i] = c;
+						}
+						texture.SetPixels(colors);
+						texture.Apply();
+
+						premultipliedAtlasIds.Add(instanceId);
 					}
-
-					tex.SetPixels(colors);
-					tex.Apply();
-
-					premultipliedAtlasIds.Add(instanceId);
 				} catch {
-					//texture is not readable!  Can't pre-multiply it, you're on your own.
+					if (Application.isEditor)
+						Debug.LogWarning("Texture was not readable! Could not apply premultiply alpha. Rendering may be incorrect. Please check your texture import settings and make sure Read/Write is enabled.");
 				}
 			}
+			#if UNITY_EDITOR
+			else {
+				Texture2D texture = sprite.texture;
+				int instanceId = texture.GetInstanceID();
+				if (premultipliedAtlasIds.Contains(instanceId))
+					Debug.LogWarning("The same texture was used by both premultiply and straight alpha shaders. Rendering may be incorrect.");
+			}
+			#endif
+
 		}
 
 		public RegionAttachment NewRegionAttachment (Skin skin, string name, string path) {
@@ -124,11 +145,9 @@ namespace Spine.Unity.Modules {
 			Texture2D tex = sprite.texture;
 			int instanceId = tex.GetInstanceID();
 			AtlasRegion atlasRegion;
+			bool cachedMaterialExists = atlasTable.TryGetValue(instanceId, out atlasRegion);
 
-			// Check cache first
-			if (atlasTable.ContainsKey(instanceId)) {
-				atlasRegion = atlasTable[instanceId];
-			} else {
+			if (!cachedMaterialExists) {
 				// Setup new material.
 				var material = new Material(shader);
 				if (sprite.packed)
@@ -139,7 +158,7 @@ namespace Spine.Unity.Modules {
 
 				// Create faux-region to play nice with SkeletonRenderer.
 				atlasRegion = new AtlasRegion();
-				AtlasPage page = new AtlasPage();
+				var page = new AtlasPage();
 				page.rendererObject = material;
 				atlasRegion.page = page;
 
@@ -149,16 +168,17 @@ namespace Spine.Unity.Modules {
 
 			Rect texRect = sprite.textureRect;
 
-			//normalize rect to UV space of packed atlas
+			// Normalize rect to UV space of packed atlas
 			texRect.x = Mathf.InverseLerp(0, tex.width, texRect.x);
 			texRect.y = Mathf.InverseLerp(0, tex.height, texRect.y);
 			texRect.width = Mathf.InverseLerp(0, tex.width, texRect.width);
 			texRect.height = Mathf.InverseLerp(0, tex.height, texRect.height);
 
 			Bounds bounds = sprite.bounds;
-			Vector3 size = bounds.size;
+			Vector2 boundsMin = bounds.min, boundsMax = bounds.max;
+			Vector2 size = bounds.size;
+			float spriteUnitsPerPixel = 1f / sprite.pixelsPerUnit;
 
-			//MITCH: left todo: make sure this rotation thing actually works
 			bool rotated = false;
 			if (sprite.packed)
 				rotated = sprite.packingRotation == SpritePackingRotation.Any;
@@ -168,8 +188,8 @@ namespace Spine.Unity.Modules {
 			attachment.SetColor(Color.white);
 			attachment.ScaleX = 1;
 			attachment.ScaleY = 1;
-			attachment.RegionOffsetX = sprite.rect.width * (0.5f - InverseLerp(bounds.min.x, bounds.max.x, 0)) / sprite.pixelsPerUnit;
-			attachment.RegionOffsetY = sprite.rect.height * (0.5f - InverseLerp(bounds.min.y, bounds.max.y, 0)) / sprite.pixelsPerUnit;
+			attachment.RegionOffsetX = sprite.rect.width * (0.5f - InverseLerp(boundsMin.x, boundsMax.x, 0)) * spriteUnitsPerPixel;
+			attachment.RegionOffsetY = sprite.rect.height * (0.5f - InverseLerp(boundsMin.y, boundsMax.y, 0)) * spriteUnitsPerPixel;
 			attachment.Width = size.x;
 			attachment.Height = size.y;
 			attachment.RegionWidth = size.x;
@@ -182,7 +202,6 @@ namespace Spine.Unity.Modules {
 		}
 
 		public MeshAttachment NewMeshAttachment (Skin skin, string name, string path) {
-			//MITCH : Left todo: Unity 5 only
 			return null;
 		}
 
@@ -194,21 +213,32 @@ namespace Spine.Unity.Modules {
 			return null;
 		}
 		
-		private float InverseLerp(float a, float b, float value)
-		{
+		static float InverseLerp (float a, float b, float value) {
 			return (value - a) / (b - a);
 		}
 	}
 
 	public static class SpriteAttachmentExtensions {
-		public static Attachment AttachUnitySprite (this Skeleton skeleton, string slotName, Sprite sprite, string shaderName = "Spine/Skeleton") {
-			var att = sprite.ToRegionAttachment(shaderName);
+		public static Attachment AttachUnitySprite (this Skeleton skeleton, string slotName, Sprite sprite, string shaderName = "Spine/Skeleton", bool applyPMA = true) {
+			return skeleton.AttachUnitySprite(slotName, sprite, Shader.Find(shaderName), applyPMA);
+		}
+
+		public static Attachment AddUnitySprite (this SkeletonData skeletonData, string slotName, Sprite sprite, string skinName = "", string shaderName = "Spine/Skeleton", bool applyPMA = true) {
+			return skeletonData.AddUnitySprite(slotName, sprite, skinName, Shader.Find(shaderName), applyPMA);
+		}
+
+		public static RegionAttachment ToRegionAttachment (this Sprite sprite, string shaderName = "Spine/Skeleton", bool applyPMA = true) {
+			return sprite.ToRegionAttachment(Shader.Find(shaderName), applyPMA);
+		}
+
+		public static Attachment AttachUnitySprite (this Skeleton skeleton, string slotName, Sprite sprite, Shader shader, bool applyPMA) {
+			var att = sprite.ToRegionAttachment(shader, applyPMA);
 			skeleton.FindSlot(slotName).Attachment = att;
 			return att;
 		}
 
-		public static Attachment AddUnitySprite (this SkeletonData skeletonData, string slotName, Sprite sprite, string skinName = "", string shaderName = "Spine/Skeleton") {
-			var att = sprite.ToRegionAttachment(shaderName);
+		public static Attachment AddUnitySprite (this SkeletonData skeletonData, string slotName, Sprite sprite, string skinName, Shader shader, bool applyPMA) {
+			var att = sprite.ToRegionAttachment(shader, applyPMA);
 
 			var slotIndex = skeletonData.FindSlotIndex(slotName);
 			Skin skin = skeletonData.defaultSkin;
@@ -220,8 +250,8 @@ namespace Spine.Unity.Modules {
 			return att;
 		}
 
-		public static RegionAttachment ToRegionAttachment (this Sprite sprite, string shaderName = "Spine/Skeleton") {
-			var loader = new SpriteAttachmentLoader(sprite, Shader.Find(shaderName));
+		public static RegionAttachment ToRegionAttachment (this Sprite sprite, Shader shader, bool applyPMA) {
+			var loader = new SpriteAttachmentLoader(sprite, shader, applyPMA);
 			var att = loader.NewRegionAttachment(null, sprite.name, "");
 			loader = null;
 			return att;

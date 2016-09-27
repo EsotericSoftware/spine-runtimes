@@ -27,9 +27,9 @@ var mvp = new spine.webgl.Matrix4();
 var assetManager;
 var skeletonRenderer;
 var debugRenderer;
-var debugShader;
+var shapes;
 var skeletons = {};
-var activeSkeleton = "hero-mesh";
+var activeSkeleton = "stretchyman";
 
 function init () {
 	// Setup canvas and WebGL context. We pass alpha: false to canvas.getContext() so we don't use premultiplied alpha when
@@ -52,6 +52,7 @@ function init () {
 	debugRenderer.drawMeshTriangles = false;
 	debugRenderer.drawPaths = false;
 	debugShader = spine.webgl.Shader.newColored(gl);
+	shapes = new spine.webgl.ShapeRenderer(gl);
 	assetManager = new spine.webgl.AssetManager(gl);
 
 	// Tell AssetManager to load the resources for each model, including the exported .json file, the .atlas file and the .png
@@ -67,13 +68,13 @@ function init () {
 	assetManager.loadTexture("assets/tank.png");
 	assetManager.loadText("assets/goblins-mesh.json");
 	assetManager.loadText("assets/goblins-mesh.atlas");
-	assetManager.loadTexture("assets/goblins-mesh.png");
+	assetManager.loadTexture("assets/goblins.png");
 	assetManager.loadText("assets/vine.json");
 	assetManager.loadText("assets/vine.atlas");
-	assetManager.loadTexture("assets/vine.png");
-	assetManager.loadText("assets/hero-mesh.json");
-	assetManager.loadText("assets/hero-mesh.atlas");
-	assetManager.loadTexture("assets/hero-mesh.png");	
+	assetManager.loadTexture("assets/vine.png");	
+	assetManager.loadText("assets/stretchyman.json");
+	assetManager.loadText("assets/stretchyman.atlas");
+	assetManager.loadTexture("assets/stretchyman.png");
 	requestAnimationFrame(load);
 }
 
@@ -83,9 +84,9 @@ function load () {
 		skeletons["spineboy"] = loadSkeleton("spineboy", "run", false);
 		skeletons["raptor"] = loadSkeleton("raptor", "walk", false);
 		skeletons["tank"] = loadSkeleton("tank", "drive", false);
-		skeletons["goblins"] = loadSkeleton("goblins-mesh", "walk", true, "goblin");
+		skeletons["goblins"] = loadSkeleton("goblins-mesh", "walk", false, "goblin");
 		skeletons["vine"] = loadSkeleton("vine", "animation", false);
-		skeletons["hero-mesh"] = loadSkeleton("hero-mesh", "Headturn", false);		
+		skeletons["stretchyman"] = loadSkeleton("stretchyman", "sneak", false);				
 		setupUI();
 		requestAnimationFrame(render);
 	} else {
@@ -242,7 +243,9 @@ function render () {
 	debugShader.bind();
 	debugShader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, mvp.values);
 	debugRenderer.premultipliedAlpha = premultipliedAlpha;
-	debugRenderer.draw(debugShader, skeleton);
+	shapes.begin(debugShader);
+	debugRenderer.draw(shapes, skeleton);
+	shapes.end();
 	debugShader.unbind();
 
 	requestAnimationFrame(render);

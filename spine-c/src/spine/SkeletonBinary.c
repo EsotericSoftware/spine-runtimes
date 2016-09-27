@@ -72,8 +72,13 @@ spSkeletonBinary* spSkeletonBinary_create (spAtlas* atlas) {
 }
 
 void spSkeletonBinary_dispose (spSkeletonBinary* self) {
+	int i;
 	_spSkeletonBinary* internal = SUB_CAST(_spSkeletonBinary, self);
 	if (internal->ownsLoader) spAttachmentLoader_dispose(self->attachmentLoader);
+	for (i = 0; i < internal->linkedMeshCount; ++i) {
+		FREE(internal->linkedMeshes[i].parent);
+		FREE(internal->linkedMeshes[i].skin);
+	}
 	FREE(internal->linkedMeshes);
 	FREE(self->error);
 	FREE(self);
@@ -656,7 +661,11 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 	int i;
 	spAttachmentType type;
 	const char* name = readString(input);
-	if (!name) MALLOC_STR(name, attachmentName);
+	int freeName = name != 0;
+	if (!name) {
+		freeName = 0;
+		name = attachmentName;
+	}
 
 	type = (spAttachmentType)readByte(input);
 
@@ -680,6 +689,7 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 			readColor(input, &region->r, &region->g, &region->b, &region->a);
 			spRegionAttachment_updateOffset(region);
 			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
+			if (freeName) FREE(name);
 			return attachment;
 		}
 		case SP_ATTACHMENT_BOUNDING_BOX: {
@@ -689,6 +699,7 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 			_readVertices(self, input, SUB_CAST(spVertexAttachment, attachment), vertexCount);
 			if (nonessential) readInt(input); /* Skip color. */
 			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
+			if (freeName) FREE(name);
 			return attachment;
 		}
 		case SP_ATTACHMENT_MESH: {
@@ -716,6 +727,8 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 				mesh->width = 0;
 				mesh->height = 0;
 			}
+			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
+			if (freeName) FREE(name);
 			return attachment;
 		}
 		case SP_ATTACHMENT_LINKED_MESH: {
@@ -737,6 +750,7 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 				mesh->height = readFloat(input) * self->scale;
 			}
 			_spSkeletonBinary_addLinkedMesh(self, mesh, skinName, slotIndex, parent);
+			if (freeName) FREE(name);
 			return attachment;
 		}
 		case SP_ATTACHMENT_PATH: {
@@ -754,10 +768,12 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 				path->lengths[i] = readFloat(input) * self->scale;
 			}
 			if (nonessential) readInt(input); /* Skip color. */
+			if (freeName) FREE(name);
 			return attachment;
 		}
 	}
 
+	if (freeName) FREE(name);
 	return 0;
 }
 
@@ -1000,7 +1016,9 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 	skeletonData->animationsCount = readVarint(input, 1);
 	skeletonData->animations = MALLOC(spAnimation*, skeletonData->animationsCount);
 	for (i = 0; i < skeletonData->animationsCount; ++i) {
-		spAnimation* animation = _spSkeletonBinary_readAnimation(self, readString(input), input, skeletonData);
+		const char* name = readString(input);
+		spAnimation* animation = _spSkeletonBinary_readAnimation(self, name, input, skeletonData);
+		FREE(name);
 		if (!animation) {
 			FREE(input);
 			spSkeletonData_dispose(skeletonData);

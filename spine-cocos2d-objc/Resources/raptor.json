@@ -1,5 +1,5 @@
 {
-"skeleton": { "hash": "tzTkzbBrpNYAwwMjxvin8GH1NPg", "spine": "3.3.07", "width": 1223.72, "height": 1055.5, "images": "./images/" },
+"skeleton": { "hash": "xc68H5wnObEhNawCC1Fp/vJNrv4", "spine": "3.4.02", "width": 1223.72, "height": 1055.62, "images": "./images/" },
 "bones": [
 	{ "name": "root" },
 	{ "name": "hip", "parent": "root", "rotation": 3.15, "x": -136.78, "y": 415.47, "color": "fbff00ff" },
@@ -1653,6 +1653,7 @@
 			}
 		}
 	},
+	"empty": {},
 	"gungrab": {
 		"slots": {
 			"front_hand": {

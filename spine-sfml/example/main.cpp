@@ -287,6 +287,39 @@ void vine (SkeletonData* skeletonData, Atlas* atlas) {
 	}
 }
 
+void stretchyman (SkeletonData* skeletonData, Atlas* atlas) {
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+
+	Skeleton* skeleton = drawable->skeleton;
+	skeleton->flipX = false;
+	skeleton->flipY = false;
+
+	skeleton->x = 320;
+	skeleton->y = 590;
+	Skeleton_updateWorldTransform(skeleton);
+
+	AnimationState_setAnimationByName(drawable->state, 0, "sneak", true);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - Streatchyman");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		drawable->update(delta);
+
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
+}
+
 /**
  * Used for debugging purposes during runtime development
  */
@@ -320,6 +353,7 @@ int main () {
 	testcase(tank, "data/tank.json", "data/tank.skel", "data/tank.atlas", 0.2f);
 	testcase(raptor, "data/raptor.json", "data/raptor.skel", "data/raptor.atlas", 0.5f);
 	testcase(spineboy, "data/spineboy.json", "data/spineboy.skel", "data/spineboy.atlas", 0.6f);
-	testcase(goblins, "data/goblins-mesh.json", "data/goblins-mesh.skel", "data/goblins-mesh.atlas", 1.4f);
+	testcase(goblins, "data/goblins-mesh.json", "data/goblins-mesh.skel", "data/goblins.atlas", 1.4f);
+	testcase(stretchyman, "data/stretchyman.json", "data/stretchyman.skel", "data/stretchyman.atlas", 1.4f);
 	return 0;
 }

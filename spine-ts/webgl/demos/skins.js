@@ -3,14 +3,14 @@ var skinsDemo = function(loadingComplete, bgColor) {
 	var skeleton, state, offset, bounds;		
 	var timeKeeper, loadingScreen;
 	var playButton, timeLine, isPlaying = true, playTime = 0;
-	var randomizeSkins, lastSkinChange = Date.now() / 1000;
+	var randomizeSkins, lastSkinChange = Date.now() / 1000, clickAnim = 0;
 
 	var DEMO_NAME = "SkinsDemo";
 
-	if (!bgColor) bgColor = new spine.Color(1, 1, 1, 1);		
+	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);		
 
 	function init () {
-		canvas = document.getElementById("skinsdemo-canvas");
+		canvas = document.getElementById("skins-canvas");
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.getContext("webgl", { alpha: false }) || canvas.getContext("experimental-webgl", { alpha: false });	
 
@@ -23,7 +23,6 @@ var skinsDemo = function(loadingComplete, bgColor) {
 		input = new spine.webgl.Input(canvas);
 		timeKeeper = new spine.TimeKeeper();		
 		loadingScreen = new spine.webgl.LoadingScreen(renderer);
-		loadingScreen.backgroundColor = bgColor;
 		requestAnimationFrame(load);
 	}
 
@@ -61,7 +60,7 @@ var skinsDemo = function(loadingComplete, bgColor) {
 	function setupInput (){
 		input.addListener({
 			down: function(x, y) {
-				state.setAnimation(5, Math.random() > 0.5 ? "meleeSwing1" : "meleeSwing2", false, 0);				
+				swingSword();
 			},
 			up: function(x, y) { },
 			dragged: function(x, y) { },
@@ -114,7 +113,7 @@ var skinsDemo = function(loadingComplete, bgColor) {
 	}
 
 	function setupUI() {
-		var list = $("#skinsdemo-active-skin");	
+		var list = $("#skins-skin");	
 		for (var skin in skeleton.data.skins) {
 			skin = skeleton.data.skins[skin];
 			if (skin.name == "default") continue;
@@ -127,17 +126,15 @@ var skinsDemo = function(loadingComplete, bgColor) {
 			list.append(option);
 		}
 		list.change(function() {
-			activeSkin = $("#skinsdemo-active-skin option:selected").text();
+			activeSkin = $("#skins-skin option:selected").text();
 			skeleton.setSkinByName(activeSkin);
 			skeleton.setSlotsToSetupPose();
 			randomizeSkins.checked = false;
 		});
 
-		var randomAttachments = $("#skinsdemo-randomizeattachments");
-		randomAttachments.click(function() {
-			randomizeAttachments();		
-		});
-		randomizeSkins = document.getElementById("skinsdemo-randomizeskins");
+		$("#skins-randomizeattachments").click(randomizeAttachments);
+		$("#skins-swingsword").click(swingSword);
+		randomizeSkins = document.getElementById("skins-randomizeskins");
 	}
 
 	function setSkin (skin) {
@@ -148,7 +145,11 @@ var skinsDemo = function(loadingComplete, bgColor) {
 		slot.setAttachment(weapon);
 	}
 	
-	function randomizeSkin() {
+	function swingSword () {
+		state.setAnimation(5, (clickAnim++ % 2 == 0) ? "meleeSwing2" : "meleeSwing1", false, 0);				
+	}
+	
+	function randomizeSkin () {
 		var result;
 		var count = 0;
 		for (var skin in skeleton.data.skins) {
@@ -158,12 +159,12 @@ var skinsDemo = function(loadingComplete, bgColor) {
 			}
 		}
 		setSkin(result);
-		$("#skinsdemo-active-skin option").filter(function() {
+		$("#skins-skin option").filter(function() {
 			return ($(this).text() == result.name);
 		}).prop("selected", true);		
 	}
 
-	function randomizeAttachments() {
+	function randomizeAttachments () {
 		var skins = [];
 		for (var skin in skeleton.data.skins) {
 			skin = skeleton.data.skins[skin];
@@ -195,7 +196,7 @@ var skinsDemo = function(loadingComplete, bgColor) {
 			}
 		}
 
-		renderer.camera.position.x = offset.x + bounds.x * 1.5 - 150;
+		renderer.camera.position.x = offset.x + bounds.x * 1.5 - 125;
 		renderer.camera.position.y = offset.y + bounds.y / 2;
 		renderer.camera.viewportWidth = bounds.x * 3;
 		renderer.camera.viewportHeight = bounds.y * 1.2;
@@ -215,7 +216,9 @@ var skinsDemo = function(loadingComplete, bgColor) {
 		var scale = width / texture.getImage().width;
 		var height = scale * texture.getImage().height;
 		renderer.drawTexture(texture, offset.x + bounds.x + 190, offset.y + bounds.y / 2 - height / 2 - 5, width, height);		
-		renderer.end();		
+		renderer.end();
+
+		loadingScreen.draw(true);		
 	}
 
 	init();

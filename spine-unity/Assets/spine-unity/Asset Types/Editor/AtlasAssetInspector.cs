@@ -29,6 +29,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 //#define BAKE_ALL_BUTTON
+//#define REGION_BAKING_MESH
 
 using System;
 using System.Collections.Generic;
@@ -44,8 +45,6 @@ namespace Spine.Unity.Editor {
 	public class AtlasAssetInspector : UnityEditor.Editor {
 		private SerializedProperty atlasFile, materials;
 		private AtlasAsset atlasAsset;
-		private List<bool> baked;
-		private List<GameObject> bakedObjects;
 
 		void OnEnable () {
 			SpineEditorUtilities.ConfirmInitialization();
@@ -53,8 +52,14 @@ namespace Spine.Unity.Editor {
 			materials = serializedObject.FindProperty("materials");
 			materials.isExpanded = true;
 			atlasAsset = (AtlasAsset)target;
+			#if REGION_BAKING_MESH
 			UpdateBakedList();
+			#endif
 		}
+			
+		#if REGION_BAKING_MESH
+		private List<bool> baked;
+		private List<GameObject> bakedObjects;
 
 		void UpdateBakedList () {
 			AtlasAsset asset = (AtlasAsset)target;
@@ -78,13 +83,73 @@ namespace Spine.Unity.Editor {
 				}
 			}
 		}
+		#endif
+
+		static public void UpdateSpriteSlices (Texture texture, Atlas atlas) {
+			string texturePath = AssetDatabase.GetAssetPath(texture.GetInstanceID());
+			var t = (TextureImporter)TextureImporter.GetAtPath(texturePath);
+			t.spriteImportMode = SpriteImportMode.Multiple;
+			var spriteSheet = t.spritesheet;
+			var sprites = new List<SpriteMetaData>(spriteSheet);
+
+			FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.NonPublic);
+			var regions = (List<AtlasRegion>)field.GetValue(atlas);
+			int textureHeight = texture.height;
+			char[] FilenameDelimiter = {'.'};
+			int updatedCount = 0;
+			int addedCount = 0;
+
+			foreach (var r in regions) {
+				int width, height;
+				if (r.rotate) {
+					width = r.height;
+					height = r.width;
+				} else {
+					width = r.width;
+					height = r.height;
+				}
+
+				int x = r.x;
+				int y = textureHeight - height - r.y;
+
+				string pageName = r.page.name.Split(FilenameDelimiter, StringSplitOptions.RemoveEmptyEntries)[0];
+				string textureName = texture.name;
+				bool pageMatch = string.Equals(pageName, textureName,StringComparison.Ordinal);
+				int spriteIndex = pageMatch ? sprites.FindIndex(
+					(s) => string.Equals(s.name, r.name, StringComparison.Ordinal)
+				) : -1;
+				bool matchFound = spriteIndex >= 0;
+
+				if (matchFound) {
+					var s = sprites[spriteIndex];
+					s.rect = new Rect(x, y, width, height);
+					sprites[spriteIndex] = s;
+					updatedCount++;
+				} else {
+					if (pageMatch) {
+						sprites.Add(new SpriteMetaData {
+							name = r.name,
+							pivot = new Vector2(0.5f, 0.5f),
+							rect = new Rect(x, y, width, height)
+						});
+						addedCount++;
+					}
+				}
+			}
+
+			t.spritesheet = sprites.ToArray();
+			EditorUtility.SetDirty(t);
+			AssetDatabase.ImportAsset(texturePath, ImportAssetOptions.ForceUpdate);
+			EditorGUIUtility.PingObject(texture);
+			Debug.Log(string.Format("Applied sprite slices to {2}. {0} added. {1} updated.", addedCount, updatedCount, texture.name));
+		}
 
 		override public void OnInspectorGUI () {
 			serializedObject.Update();
-			AtlasAsset asset = (AtlasAsset)target;
-
+			atlasAsset = atlasAsset ?? (AtlasAsset)target;
 			EditorGUI.BeginChangeCheck();
 			EditorGUILayout.PropertyField(atlasFile);
+
 			EditorGUILayout.PropertyField(materials, true);
 			if (EditorGUI.EndChangeCheck())
 				serializedObject.ApplyModifiedProperties();
@@ -103,6 +168,22 @@ namespace Spine.Unity.Editor {
 				}
 			}
 
+			if (atlasFile.objectReferenceValue != null) {
+				if (GUILayout.Button(
+					new GUIContent(
+						"Apply Regions as Texture Sprite Slices",
+						"Adds Sprite slices to atlas texture(s). " +
+						"Updates existing slices if ones with matching names exist. \n\n" +
+						"If your atlas was exported with Premultiply Alpha, " +
+						"your SpriteRenderer should use the generated Spine _Material asset (or any Material with a PMA shader) instead of Sprites-Default.")
+					, GUILayout.Height(70f))) {
+					var atlas = atlasAsset.GetAtlas();
+					foreach (var m in atlasAsset.materials)
+						UpdateSpriteSlices(m.mainTexture, atlas);
+				}
+			}
+
+			#if REGION_BAKING_MESH
 			if (atlasFile.objectReferenceValue != null) {
 				Atlas atlas = asset.GetAtlas();
 				FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic);
@@ -206,13 +287,14 @@ namespace Spine.Unity.Editor {
 
 				}
 				#endif
-
+				
 			}
+			#endif
 
 			if (serializedObject.ApplyModifiedProperties() ||
 				(UnityEngine.Event.current.type == EventType.ValidateCommand && UnityEngine.Event.current.commandName == "UndoRedoPerformed")
 			) {
-				asset.Reset();
+				atlasAsset.Reset();
 			}
 		}
 	}

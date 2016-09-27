@@ -113,6 +113,7 @@ module spine {
 				vertices[RegionAttachment.U4] = region.u2;
 				vertices[RegionAttachment.V4] = region.v2;
 			}
+			this.region = region;
 		}
 
 		updateOffset () : void {

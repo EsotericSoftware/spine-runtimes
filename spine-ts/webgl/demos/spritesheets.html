@@ -1,0 +1,25 @@
+<html>
+<meta charset="UTF-8">
+<title>Spine vs Sprite Sheets - Spine Demo</title>
+<link rel="stylesheet" href="demos.css">
+<script src="../../build/spine-webgl.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="utils.js"></script>
+<script src="spritesheets.js"></script>
+<body>
+
+<center>
+<div class="aspect"><div><canvas id="spritesheets-canvas"></canvas></div></div>
+<button id="spritesheets-roar">Roar</button>
+<button id="spritesheets-jump">Jump</button><br>
+Time multiplier
+<div id="spritesheets-timeslider" class="slider filled"></div>
+</center>
+
+<script>	
+spineDemos.loadSliders();
+spritesheetsDemo(spineDemos.setupRendering);
+</script>
+
+</body>
+</html>
