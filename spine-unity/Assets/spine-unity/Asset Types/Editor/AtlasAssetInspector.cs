@@ -46,11 +46,9 @@ namespace Spine.Unity.Editor {
 		private SerializedProperty atlasFile, materials;
 		private AtlasAsset atlasAsset;
 
-		private List<AtlasRegion> Regions {
-			get {
-				FieldInfo regionsField = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.NonPublic);
-				return (List<AtlasRegion>)regionsField.GetValue(atlasAsset.GetAtlas());
-			}
+		static List<AtlasRegion> GetRegions (Atlas atlas) {
+			FieldInfo regionsField = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.NonPublic);
+			return (List<AtlasRegion>)regionsField.GetValue(atlas);
 		}
 
 		void OnEnable () {
@@ -95,7 +93,7 @@ namespace Spine.Unity.Editor {
 			var spriteSheet = t.spritesheet;
 			var sprites = new List<SpriteMetaData>(spriteSheet);
 
-			var regions = this.Regions;
+			var regions = AtlasAssetInspector.GetRegions(atlas);
 			int textureHeight = texture.height;
 			char[] FilenameDelimiter = {'.'};
 			int updatedCount = 0;
@@ -302,7 +300,7 @@ namespace Spine.Unity.Editor {
 			if (atlasFile.objectReferenceValue != null) {
 				EditorGUILayout.LabelField("Atlas Regions", EditorStyles.boldLabel);
 
-				var regions = this.Regions;
+				var regions = AtlasAssetInspector.GetRegions(atlasAsset.GetAtlas());
 				AtlasPage lastPage = null;
 				for (int i = 0; i < regions.Count; i++) {
 					if (lastPage != regions[i].page) {
