@@ -535,6 +535,7 @@ function SkeletonJson.new (attachmentLoader)
 			end
 		end
 
+    -- Draworder timeline.
 		local drawOrderValues = map["drawOrder"]
 		if not drawOrderValues then drawOrderValues = map["draworder"] end
 		if drawOrderValues then
@@ -580,7 +581,7 @@ function SkeletonJson.new (attachmentLoader)
 				frameIndex = frameIndex + 1
 			end
 			table_insert(timelines, timeline)
-			duration = math.max(duration, timeline:getDuration())
+			duration = math.max(duration, timeline.frames[timeline:getFrameCount() - 1])
 		end
 
     -- Event timeline.

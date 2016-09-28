@@ -568,18 +568,14 @@ function Animation.EventTimeline.new (frameCount)
 end
 
 Animation.DrawOrderTimeline = {}
-function Animation.DrawOrderTimeline.new ()
+function Animation.DrawOrderTimeline.new (frameCount)
 	local self = {
-		frames = {},
+		frames = utils.newNumberArrayZero(frameCount),
 		drawOrders = {}
 	}
 
-	function self:getDuration ()
-		return self.frames[#self.frames]
-	end
-
 	function self:getFrameCount ()
-		return #self.frames + 1
+		return zlen(self.frames)
 	end
 
 	function self:setFrame (frameIndex, time, drawOrder)
@@ -591,16 +587,16 @@ function Animation.DrawOrderTimeline.new ()
 		local frames = self.frames
 		if time < frames[0] then return end -- Time is before first frame.
 
-		local frameIndex
-		if time >= frames[#frames] then -- Time is after last frame.
-			frameIndex = #frames
+		local frame
+		if time >= frames[zlen(frames) - 1] then -- Time is after last frame.
+			frame = zlen(frames) - 1
 		else
-			frameIndex = binarySearch1(frames, time) - 1
+			frame = binarySearch1(frames, time) - 1
 		end
 
 		local drawOrder = skeleton.drawOrder
 		local slots = skeleton.slots
-		local drawOrderToSetupIndex = self.drawOrders[frameIndex]
+		local drawOrderToSetupIndex = self.drawOrders[frame]
 		if not drawOrderToSetupIndex then
 			for i,slot in ipairs(slots) do
 				drawOrder[i] = slots[i]
