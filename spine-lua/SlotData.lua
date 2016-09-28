@@ -55,11 +55,4 @@ function SlotData.new (index, name, boneData)
   return self
 end
 
-function SlotData:setColor (r, g, b, a)
-  self.r = r
-  self.g = g
-  self.b = b
-  self.a = a
-end
-
 return SlotData

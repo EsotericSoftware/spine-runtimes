@@ -29,6 +29,7 @@
 -- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 local setmetatable = setmetatable
+local utils = require "spine-lua.utils"
 
 local Color = {}
 Color.__index = Color
@@ -63,6 +64,21 @@ function Color:setFrom(color)
   self.g = color.g
   self.b = color.b
   self.a = color.a
+end
+
+function Color:add(r, g, b, a)
+  self.r = self.r + r
+  self.g = self.g + g
+  self.b = self.b + b
+  self.a = self.a + a
+  self:clamp()
+end
+
+function Color:clamp()
+  self.r = utils.clamp(self.r, 0, 1)
+  self.g = utils.clamp(self.g, 0, 1)
+  self.b = utils.clamp(self.b, 0, 1)
+  self.a = utils.clamp(self.a, 0, 1)
 end
 
 return Color

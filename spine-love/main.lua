@@ -70,7 +70,7 @@ end
 
 function love.load(arg)
   if arg[#arg] == "-debug" then require("mobdebug").start() end  
-  skeletons["spineboy"] = loadSkeleton("spineboy", "walk")
+  skeletons["spineboy"] = loadSkeleton("spineboy", "test")
   ---skeletons["raptor"] = loadSkeleton("raptor", "walk")
   skeletonRenderer = spine.SkeletonRenderer.new()
 end

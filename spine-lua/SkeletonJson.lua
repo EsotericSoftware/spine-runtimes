@@ -349,7 +349,7 @@ function SkeletonJson.new (attachmentLoader)
 
 				for timelineName,values in pairs(timelineMap) do
 					if timelineName == "color" then
-						local timeline = Animation.ColorTimeline.new()
+						local timeline = Animation.ColorTimeline.new(#values)
 						timeline.slotIndex = slotIndex
 
 						local frameIndex = 0
@@ -366,10 +366,10 @@ function SkeletonJson.new (attachmentLoader)
 							frameIndex = frameIndex + 1
 						end
 						table_insert(timelines, timeline)
-						duration = math.max(duration, timeline:getDuration())
+            duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.ColorTimeline.ENTRIES])
 
 					elseif timelineName == "attachment" then
-						local timeline = Animation.AttachmentTimeline.new()
+						local timeline = Animation.AttachmentTimeline.new(#values)
 						timeline.slotName = slotName
 
 						local frameIndex = 0
@@ -380,7 +380,7 @@ function SkeletonJson.new (attachmentLoader)
 							frameIndex = frameIndex + 1
 						end
 						table_insert(timelines, timeline)
-						duration = math.max(duration, timeline:getDuration())
+						duration = math.max(duration, timeline.frames[timeline:getFrameCount() - 1])
 
 					else
 						error("Invalid frame type for a slot: " .. timelineName .. " (" .. slotName .. ")")
@@ -389,6 +389,7 @@ function SkeletonJson.new (attachmentLoader)
 			end
 		end
 
+    -- Bone timelines
 		local bonesMap = map["bones"]
 		if bonesMap then
 			for boneName,timelineMap in pairs(bonesMap) do
@@ -409,11 +410,13 @@ function SkeletonJson.new (attachmentLoader)
 						table_insert(timelines, timeline)
 						duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.RotateTimeline.ENTRIES])
 
-					elseif timelineName == "translate" or timelineName == "scale" then
+					elseif timelineName == "translate" or timelineName == "scale" or timelineName == "shear" then
 						local timeline
 						local timelineScale = 1
 						if timelineName == "scale" then
 							timeline = Animation.ScaleTimeline.new(#values)
+            elseif timelineName == "shear" then
+              timeline = Animation.ShearTimeline.new(#values)
 						else
 							timeline = Animation.TranslateTimeline.new(#values)
 							timelineScale = self.scale
@@ -429,28 +432,7 @@ function SkeletonJson.new (attachmentLoader)
 							frameIndex = frameIndex + 1
 						end
 						table_insert(timelines, timeline)
-						duration = math.max(duration, timeline:getDuration())
-
-					elseif timelineName == "flipX" or timelineName == "flipY" then
-						local x = timelineName == "flipX"
-						local timeline, field
-						if x then
-							timeline = Animation.FlipXTimeline.new()
-							field = "x"
-						else
-							timeline = Animation.FlipYTimeline.new();
-							field = "y"
-						end
-						timeline.boneIndex = boneIndex
-
-						local frameIndex = 0
-						for i,valueMap in ipairs(values) do
-							timeline:setFrame(frameIndex, valueMap["time"], valueMap[field] or false)
-							frameIndex = frameIndex + 1
-						end
-						table_insert(timelines, timeline)
-						duration = math.max(duration, timeline:getDuration())
-
+						duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.TranslateTimeline.ENTRIES])
 					else
 						error("Invalid timeline type for a bone: " .. timelineName .. " (" .. boneName .. ")")
 					end
@@ -601,6 +583,7 @@ function SkeletonJson.new (attachmentLoader)
 			duration = math.max(duration, timeline:getDuration())
 		end
 
+    -- Event timeline.
 		local events = map["events"]
 		if events then
 			local timeline = Animation.EventTimeline.new(#events)
@@ -608,7 +591,7 @@ function SkeletonJson.new (attachmentLoader)
 			for i,eventMap in ipairs(events) do
 				local eventData = skeletonData:findEvent(eventMap["name"])
 				if not eventData then error("Event not found: " .. eventMap["name"]) end
-				local event = Event.new(eventData)
+				local event = Event.new(eventMap["time"], eventData)
 				if eventMap["int"] ~= nil then
 					event.intValue = eventMap["int"]
 				else
@@ -624,11 +607,11 @@ function SkeletonJson.new (attachmentLoader)
 				else
 					event.stringValue = eventData.stringValue
 				end
-				timeline:setFrame(frameIndex, eventMap["time"], event)
+				timeline:setFrame(frameIndex, event)
 				frameIndex = frameIndex + 1
 			end
 			table_insert(timelines, timeline)
-			duration = math.max(duration, timeline:getDuration())
+			duration = math.max(duration, timeline.frames[timeline:getFrameCount() - 1])
 		end
 
 		table_insert(skeletonData.animations, Animation.new(name, timelines, duration))

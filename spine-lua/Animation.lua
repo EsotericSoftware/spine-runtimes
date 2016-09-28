@@ -222,7 +222,7 @@ Animation.RotateTimeline = {}
 Animation.RotateTimeline.ENTRIES = 2
 function Animation.RotateTimeline.new (frameCount)
   local ENTRIES = Animation.RotateTimeline.ENTRIES
-	local PREV_FRAME_TIME = -2
+	local PREV_TIME = -2
   local PREV_ROTATION = -1
 	local ROTATION = 1
 
@@ -258,9 +258,9 @@ function Animation.RotateTimeline.new (frameCount)
 		local frame = binarySearch(frames, time, ENTRIES)
 		local prevRotation = frames[frame + PREV_ROTATION]
 		local frameTime = frames[frame]
-    local percent = this.getCurvePercent((frame / 2) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+    local percent = self:getCurvePercent((math.floor(frame / 2)) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-		local amount = frames[frame + ROTATION] - prevFrameValue
+		local amount = frames[frame + ROTATION] - prevRotation
 		while amount > 180 do
 			amount = amount - 360
 		end
@@ -280,33 +280,25 @@ function Animation.RotateTimeline.new (frameCount)
 	return self
 end
 
-
-!!!FIXME port and pass frameCount from SkeletonJson.readAnimation for
-!!!array initialization
-
 Animation.TranslateTimeline = {}
-function Animation.TranslateTimeline.new ()
-	local PREV_FRAME_TIME = -3
-	local FRAME_X = 1
-	local FRAME_Y = 2
+Animation.TranslateTimeline.ENTRIES = 3
+function Animation.TranslateTimeline.new (frameCount)
+  local ENTRIES = Animation.TranslateTimeline.ENTRIES
+	local PREV_TIME = -3
+  local PREV_X = -2
+  local PREV_Y = -1
+	local X = 1
+	local Y = 2
 
-	local self = Animation.CurveTimeline.new()
-	self.frames = {}
+	local self = Animation.CurveTimeline.new(frameCount)
+  self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
 	self.boneIndex = -1
 
-	function self:getDuration ()
-		return self.frames[#self.frames - 2]
-	end
-
-	function self:getFrameCount ()
-		return (#self.frames + 1) / 3
-	end
-
 	function self:setFrame (frameIndex, time, x, y)
-		frameIndex = frameIndex * 3
+		frameIndex = frameIndex * ENTRIES
 		self.frames[frameIndex] = time
-		self.frames[frameIndex + 1] = x
-		self.frames[frameIndex + 2] = y
+		self.frames[frameIndex + X] = x
+		self.frames[frameIndex + Y] = y
 	end
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
@@ -315,35 +307,37 @@ function Animation.TranslateTimeline.new ()
 
 		local bone = skeleton.bones[self.boneIndex]
 		
-		if time >= frames[#frames - 2] then -- Time is after last frame.
-			bone.x = bone.x + (bone.data.x + frames[#frames - 1] - bone.x) * alpha
-			bone.y = bone.y + (bone.data.y + frames[#frames] - bone.y) * alpha
+		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
+			bone.x = bone.x + (bone.data.x + frames[zlen(frames) + PREV_X] - bone.x) * alpha
+			bone.y = bone.y + (bone.data.y + frames[zlen(frames) + PREV_Y] - bone.y) * alpha
 			return
 		end
 
 		-- Interpolate between the last frame and the current frame.
-		local frameIndex = binarySearch(frames, time, 3)
-		local prevFrameX = frames[frameIndex - 2]
-		local prevFrameY = frames[frameIndex - 1]
-		local frameTime = frames[frameIndex]
-		local percent = 1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime)
-		if percent < 0 then percent = 0 elseif percent > 1 then percent = 1 end
-		percent = self:getCurvePercent(frameIndex / 3 - 1, percent)
+		local frame = binarySearch(frames, time, ENTRIES)
+		local prevX = frames[frame + PREV_X]
+		local prevY = frames[frame + PREV_Y]
+		local frameTime = frames[frame]
+		local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
 
-		bone.x = bone.x + (bone.data.x + prevFrameX + (frames[frameIndex + FRAME_X] - prevFrameX) * percent - bone.x) * alpha
-		bone.y = bone.y + (bone.data.y + prevFrameY + (frames[frameIndex + FRAME_Y] - prevFrameY) * percent - bone.y) * alpha
+		bone.x = bone.x + (bone.data.x + prevX + (frames[frame + X] - prevX) * percent - bone.x) * alpha
+		bone.y = bone.y + (bone.data.y + prevY + (frames[frame + Y] - prevY) * percent - bone.y) * alpha
 	end
 
 	return self
 end
 
 Animation.ScaleTimeline = {}
-function Animation.ScaleTimeline.new ()
-	local PREV_FRAME_TIME = -3
-	local FRAME_X = 1
-	local FRAME_Y = 2
+Animation.ScaleTimeline.ENTRIES = Animation.TranslateTimeline.ENTRIES
+function Animation.ScaleTimeline.new (frameCount)
+  local ENTRIES = Animation.ScaleTimeline.ENTRIES
+	local PREV_TIME = -3
+  local PREV_X = -2
+  local PREV_Y = -1
+	local X = 1
+	local Y = 2
 
-	local self = Animation.TranslateTimeline.new()
+	local self = Animation.TranslateTimeline.new(frameCount)
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
 		local frames = self.frames
@@ -351,55 +345,91 @@ function Animation.ScaleTimeline.new ()
 
 		local bone = skeleton.bones[self.boneIndex]
 
-		if time >= frames[#frames - 2] then -- Time is after last frame.
-			bone.scaleX = bone.scaleX + (bone.data.scaleX * frames[#frames - 1] - bone.scaleX) * alpha
-			bone.scaleY = bone.scaleY + (bone.data.scaleY * frames[#frames] - bone.scaleY) * alpha
+		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
+			bone.scaleX = bone.scaleX + (bone.data.scaleX * frames[zlen(frames) + PREV_X] - bone.scaleX) * alpha
+			bone.scaleY = bone.scaleY + (bone.data.scaleY * frames[zlen(frames) + PREV_Y] - bone.scaleY) * alpha
 			return
 		end
 
 		-- Interpolate between the last frame and the current frame.
-		local frameIndex = binarySearch(frames, time, 3)
-		local prevFrameX = frames[frameIndex - 2]
-		local prevFrameY = frames[frameIndex - 1]
-		local frameTime = frames[frameIndex]
-		local percent = 1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime)
-		if percent < 0 then percent = 0 elseif percent > 1 then percent = 1 end
-		percent = self:getCurvePercent(frameIndex / 3 - 1, percent)
+		local frame = binarySearch(frames, time, ENTRIES)
+		local prevX = frames[frame + PREV_X]
+		local prevY = frames[frame + PREV_Y]
+		local frameTime = frames[frame]
+		local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1,
+				1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-		bone.scaleX = bone.scaleX + (bone.data.scaleX * (prevFrameX + (frames[frameIndex + FRAME_X] - prevFrameX) * percent) - bone.scaleX) * alpha
-		bone.scaleY = bone.scaleY + (bone.data.scaleY * (prevFrameY + (frames[frameIndex + FRAME_Y] - prevFrameY) * percent) - bone.scaleY) * alpha
+		bone.scaleX = bone.scaleX + (bone.data.scaleX * (prevX + (frames[frame + X] - prevX) * percent) - bone.scaleX) * alpha
+		bone.scaleY = bone.scaleY + (bone.data.scaleY * (prevY + (frames[frame + Y] - prevY) * percent) - bone.scaleY) * alpha
+	end
+
+	return self
+end
+
+Animation.ShearTimeline = {}
+Animation.ShearTimeline.ENTRIES = Animation.TranslateTimeline.ENTRIES
+function Animation.ShearTimeline.new (frameCount)
+  local ENTRIES = Animation.ShearTimeline.ENTRIES
+	local PREV_TIME = -3
+  local PREV_X = -2
+  local PREV_Y = -1
+	local X = 1
+	local Y = 2
+
+	local self = Animation.TranslateTimeline.new(frameCount)
+
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
+		local frames = self.frames
+		if time < frames[0] then return end -- Time is before first frame.
+
+		local bone = skeleton.bones[self.boneIndex]
+
+		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
+			bone.shearX = bone.shearX + (bone.data.shearX * frames[zlen(frames) + PREV_X] - bone.shearX) * alpha
+			bone.shearY = bone.shearY + (bone.data.shearY * frames[zlen(frames) + PREV_Y] - bone.shearY) * alpha
+			return
+		end
+
+		-- Interpolate between the last frame and the current frame.
+		local frame = binarySearch(frames, time, ENTRIES)
+		local prevX = frames[frame + PREV_X]
+		local prevY = frames[frame + PREV_Y]
+		local frameTime = frames[frame]
+		local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1,
+				1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+
+		bone.shearX = bone.shearX + (bone.data.shearX * (prevX + (frames[frame + X] - prevX) * percent) - bone.shearX) * alpha
+		bone.shearY = bone.shearY + (bone.data.shearY * (prevY + (frames[frame + Y] - prevY) * percent) - bone.shearY) * alpha
 	end
 
 	return self
 end
 
 Animation.ColorTimeline = {}
-function Animation.ColorTimeline.new ()
-	local PREV_FRAME_TIME = -5
-	local FRAME_R = 1
-	local FRAME_G = 2
-	local FRAME_B = 3
-	local FRAME_A = 4
+Animation.ColorTimeline.ENTRIES = 5
+function Animation.ColorTimeline.new (frameCount)
+  local ENTRIES = Animation.ColorTimeline.ENTRIES
+  local PREV_TIME = -5
+  local PREV_R = -4
+  local PREV_G = -3
+  local PREV_B = -2
+  local PREV_A = -1
+  local R = 1
+  local G = 2
+  local B = 3
+  local A = 4
 
-	local self = Animation.CurveTimeline.new()
-	self.frames = {}
+	local self = Animation.CurveTimeline.new(frameCount)
+  self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
 	self.slotIndex = -1
 
-	function self:getDuration ()
-		return self.frames[#self.frames - 4]
-	end
-
-	function self:getFrameCount ()
-		return (#self.frames + 1) / 5
-	end
-
 	function self:setFrame (frameIndex, time, r, g, b, a)
-		frameIndex = frameIndex * 5
+		frameIndex = frameIndex * ENTRIES
 		self.frames[frameIndex] = time
-		self.frames[frameIndex + 1] = r
-		self.frames[frameIndex + 2] = g
-		self.frames[frameIndex + 3] = b
-		self.frames[frameIndex + 4] = a
+		self.frames[frameIndex + R] = r
+		self.frames[frameIndex + G] = g
+		self.frames[frameIndex + B] = b
+		self.frames[frameIndex + A] = a
 	end
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
@@ -407,33 +437,33 @@ function Animation.ColorTimeline.new ()
 		if time < frames[0] then return end -- Time is before first frame.
 
 		local r, g, b, a
-		if time >= frames[#frames - 4] then -- Time is after last frame.
-			r = frames[#frames - 3]
-			g = frames[#frames - 2]
-			b = frames[#frames - 1]
-			a = frames[#frames]
+		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
+      local i = zlen(frames)
+			r = frames[i + PREV_R]
+			g = frames[i + PREV_G]
+			b = frames[i + PREV_B]
+			a = frames[i + PREV_A]
 		else
 			-- Interpolate between the last frame and the current frame.
-			local frameIndex = binarySearch(frames, time, 5)
-			local prevFrameR = frames[frameIndex - 4]
-			local prevFrameG = frames[frameIndex - 3]
-			local prevFrameB = frames[frameIndex - 2]
-			local prevFrameA = frames[frameIndex - 1]
-			local frameTime = frames[frameIndex]
-			local percent = 1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime)
-			if percent < 0 then percent = 0 elseif percent > 255 then percent = 255 end
-			percent = self:getCurvePercent(frameIndex / 5 - 1, percent)
+			local frame = binarySearch(frames, time, ENTRIES)
+      r = frames[frame + PREV_R]
+			g = frames[frame + PREV_G]
+			b = frames[frame + PREV_B]
+			a = frames[frame + PREV_A]
+			local frameTime = frames[frame]
+			local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1,
+					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-			r = prevFrameR + (frames[frameIndex + FRAME_R] - prevFrameR) * percent
-			g = prevFrameG + (frames[frameIndex + FRAME_G] - prevFrameG) * percent
-			b = prevFrameB + (frames[frameIndex + FRAME_B] - prevFrameB) * percent
-			a = prevFrameA + (frames[frameIndex + FRAME_A] - prevFrameA) * percent
+			r = r + (frames[frame + R] - r) * percent
+			g = g + (frames[frame + G] - g) * percent
+			b = b + (frames[frame + B] - b) * percent
+			a = a + (frames[frame + A] - a) * percent
 		end
-		local slot = skeleton.slots[self.slotIndex]
+		local color = skeleton.slots[self.slotIndex].color
 		if alpha < 1 then
-			slot:setColor(slot.r + (r - slot.r) * alpha, slot.g + (g - slot.g) * alpha, slot.b + (b - slot.b) * alpha, slot.a + (a - slot.a) * alpha)
+			color:add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
 		else
-			slot:setColor(r, g, b, a)
+			color:set(r, g, b, a)
 		end
 	end
 
@@ -441,19 +471,15 @@ function Animation.ColorTimeline.new ()
 end
 
 Animation.AttachmentTimeline = {}
-function Animation.AttachmentTimeline.new ()
+function Animation.AttachmentTimeline.new (frameCount)
 	local self = {
-		frames = {}, -- time, ...
+		frames = utils.newNumberArrayZero(frameCount), -- time, ...
 		attachmentNames = {},
 		slotName = nil
 	}
 
-	function self:getDuration ()
-		return self.frames[#self.frames]
-	end
-
 	function self:getFrameCount ()
-		return #self.frames + 1
+		return zlen(self.frames)
 	end
 
 	function self:setFrame (frameIndex, time, attachmentName)
@@ -463,16 +489,11 @@ function Animation.AttachmentTimeline.new ()
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
 		local frames = self.frames
-		if time < frames[0] then
-			if lastTime > time then self:apply(skeleton, lastTime, 999999, nil, 0) end
-			return
-		elseif lastTime > time then
-			lastTime = -1
-		end
+    if time < frames[0] then return end  
 
-		local frameIndex
-		if time >= frames[#frames] then
-			frameIndex = #frames
+		local frameIndex = 0
+		if time >= frames[zlen(frames) - 1] then
+			frameIndex = zlen(frames) - 1
 		else
 			frameIndex = binarySearch1(frames, time) - 1
 		end
@@ -495,22 +516,18 @@ function Animation.AttachmentTimeline.new ()
 end
 
 Animation.EventTimeline = {}
-function Animation.EventTimeline.new ()
+function Animation.EventTimeline.new (frameCount)
 	local self = {
-		frames = {},
+		frames = utils.newNumberArrayZero(frameCount),
 		events = {}
 	}
 
-	function self:getDuration ()
-		return self.frames[#self.frames]
-	end
-
 	function self:getFrameCount ()
-		return #self.frames + 1
+		return zlen(self.frames)
 	end
 
-	function self:setFrame (frameIndex, time, event)
-		self.frames[frameIndex] = time
+	function self:setFrame (frameIndex, event)
+		self.frames[frameIndex] = event.time
 		self.events[frameIndex] = event
 	end
 
@@ -519,7 +536,7 @@ function Animation.EventTimeline.new ()
 		if not firedEvents then return end
 
 		local frames = self.frames
-		local frameCount = #frames + 1
+		local frameCount = zlen(frames)
 
 		if lastTime > time then -- Fire events after last time for looped animations.
 			self:apply(skeleton, lastTime, 999999, firedEvents, alpha)
@@ -529,21 +546,21 @@ function Animation.EventTimeline.new ()
 		end
 		if time < frames[0] then return end -- Time is before first frame.
 
-		local frameIndex
+		local frame
 		if lastTime < frames[0] then
-			frameIndex = 0
+			frame = 0
 		else
-			frameIndex = binarySearch1(frames, lastTime)
-			local frame = frames[frameIndex]
-			while frameIndex > 0 do -- Fire multiple events with the same frame.
-				if frames[frameIndex - 1] ~= frame then break end
-				frameIndex = frameIndex - 1
+			frame = binarySearch1(frames, lastTime)
+			local frame = frames[frame]
+			while frame > 0 do -- Fire multiple events with the same frame.
+				if frames[frame - 1] ~= frame then break end
+				frame = frame - 1
 			end
 		end
 		local events = self.events
-		while frameIndex < frameCount and time >= frames[frameIndex] do
-			table.insert(firedEvents, events[frameIndex])
-			frameIndex = frameIndex + 1
+		while frame < frameCount and time >= frames[frame] do
+			table.insert(firedEvents, events[frame])
+			frame = frame + 1
 		end
 	end
 
@@ -727,65 +744,6 @@ function Animation.IkConstraintTimeline.new ()
 		local mix = prevFrameMix + (frames[frameIndex + FRAME_MIX] - prevFrameMix) * percent
 		ikConstraint.mix = ikConstraint.mix + (mix - ikConstraint.mix) * alpha
 		ikConstraint.bendDirection = frames[frameIndex + PREV_FRAME_BEND_DIRECTION]
-	end
-
-	return self
-end
-
-Animation.FlipXTimeline = {}
-function Animation.FlipXTimeline.new ()
-	local self = {
-		frames = {}, -- time, flip, ...
-		boneIndex = -1
-	}
-
-	function self:getDuration ()
-		return self.frames[#self.frames - 1]
-	end
-
-	function self:getFrameCount ()
-		return (#self.frames + 1) / 2
-	end
-
-	function self:setFrame (frameIndex, time, flip)
-		frameIndex = frameIndex * 2
-		self.frames[frameIndex] = time
-		self.frames[frameIndex + 1] = flip
-	end
-
-	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
-		local frames = self.frames
-		if time < frames[0] then
-			if lastTime > time then self:apply(skeleton, lastTime, 999999, nil, 0) end
-			return
-		elseif lastTime > time then
-			lastTime = -1
-		end
-
-		local frameIndex
-		if time >= frames[#frames - 1] then
-			frameIndex = #frames - 1
-		else
-			frameIndex = binarySearch(frames, time, 2) - 2
-		end
-		if frames[frameIndex] < lastTime then return end
-
-		self:setFlip(skeleton.bones[self.boneIndex], frames[frameIndex + 1])
-	end
-	
-	function self:setFlip (bone, flip)
-		bone.flipX = flip
-	end
-
-	return self
-end
-
-Animation.FlipYTimeline = {}
-function Animation.FlipYTimeline.new ()
-	local self = Animation.FlipXTimeline.new()
-
-	function self:setFlip (bone, flip)
-		bone.flipY = flip
 	end
 
 	return self

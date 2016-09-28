@@ -55,13 +55,6 @@ function Slot.new (data, bone)
 	return self
 end
 
-function Slot:setColor (r, g, b, a)
-	self.r = r
-	self.g = g
-	self.b = b
-	self.a = a
-end
-
 function Slot:setAttachment (attachment)
   if self.attachment == attachment then return end
 	self.attachment = attachment
@@ -80,7 +73,7 @@ end
 function Slot:setToSetupPose ()
 	local data = self.data
 
-	self:setColor(data.r, data.g, data.b, data.a)
+	self.color:setFrom(data.color)
 
 	local attachment = nil
 	if data.attachmentName then
