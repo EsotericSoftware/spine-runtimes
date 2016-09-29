@@ -1,0 +1,13 @@
+
+test.png
+size: 512,512
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+images/spine
+  rotate: false
+  xy: 2, 259
+  size: 377, 120
+  orig: 377, 120
+  offset: 0, 0
+  index: -1

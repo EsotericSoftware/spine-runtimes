@@ -362,7 +362,7 @@ function SkeletonJson.new (attachmentLoader)
 								tonumber(color:sub(5, 6), 16) / 255,
 								tonumber(color:sub(7, 8), 16) / 255
 							)
-							readCurve(timeline, frameIndex, valueMap)
+							readCurve(valueMap, timeline, frameIndex)
 							frameIndex = frameIndex + 1
 						end
 						table_insert(timelines, timeline)
@@ -404,7 +404,7 @@ function SkeletonJson.new (attachmentLoader)
 						local frameIndex = 0
 						for i,valueMap in ipairs(values) do
 							timeline:setFrame(frameIndex, valueMap["time"], valueMap["angle"])
-							readCurve(timeline, frameIndex, valueMap)
+							readCurve(valueMap, timeline, frameIndex)
 							frameIndex = frameIndex + 1
 						end
 						table_insert(timelines, timeline)
@@ -428,7 +428,7 @@ function SkeletonJson.new (attachmentLoader)
 							local x = (valueMap["x"] or 0) * timelineScale
 							local y = (valueMap["y"] or 0) * timelineScale
 							timeline:setFrame(frameIndex, valueMap["time"], x, y)
-							readCurve(timeline, frameIndex, valueMap)
+							readCurve(valueMap, timeline, frameIndex)
 							frameIndex = frameIndex + 1
 						end
 						table_insert(timelines, timeline)
@@ -444,7 +444,7 @@ function SkeletonJson.new (attachmentLoader)
 		if ik then
 			for ikConstraintName,values in pairs(ik) do
 				local ikConstraint = skeletonData:findIkConstraint(ikConstraintName)
-				local timeline = Animation.IkConstraintTimeline.new()
+				local timeline = Animation.IkConstraintTimeline.new(#values)
 				for i,other in pairs(skeletonData.ikConstraints) do
 					if other == ikConstraint then
 						timeline.ikConstraintIndex = i
@@ -458,11 +458,11 @@ function SkeletonJson.new (attachmentLoader)
 					local bendPositive = 1
 					if valueMap["bendPositive"] == false then bendPositive = -1 end
 					timeline:setFrame(frameIndex, valueMap["time"], mix, bendPositive)
-					readCurve(timeline, frameIndex, valueMap)
+					readCurve(valueMap, timeline, frameIndex)
 					frameIndex = frameIndex + 1
 				end
 				table_insert(timelines, timeline)
-				duration = math.max(duration, timeline:getDuration())
+				duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.IkConstraintTimeline.ENTRIES])
 			end
 		end
 
@@ -525,7 +525,7 @@ function SkeletonJson.new (attachmentLoader)
 								end
 							end
 							timeline:setFrame(frameIndex, valueMap["time"], vertices)
-							readCurve(timeline, frameIndex, valueMap)
+							readCurve(valueMap, timeline, frameIndex)
 							frameIndex = frameIndex + 1
 						end
 						table_insert(timelines, timeline)
@@ -618,13 +618,12 @@ function SkeletonJson.new (attachmentLoader)
 		table_insert(skeletonData.animations, Animation.new(name, timelines, duration))
 	end
 
-	readCurve = function (timeline, frameIndex, valueMap)
-		local curve = valueMap["curve"]
-		if not curve then 
-			timeline:setLinear(frameIndex)
-		elseif curve == "stepped" then
+	readCurve = function (map, timeline, frameIndex)
+		local curve = map["curve"]
+		if not curve then return end
+		if curve == "stepped" then
 			timeline:setStepped(frameIndex)
-		else
+		elseif #curve > 0 then
 			timeline:setCurve(frameIndex, curve[1], curve[2], curve[3], curve[4])
 		end
 	end

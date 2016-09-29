@@ -137,10 +137,6 @@ function Animation.CurveTimeline.new (frameCount)
     return math.floor(zlen(self.curves) / BEZIER_SIZE) + 1
   end
 
-	function self:setLinear (frameIndex)
-		self.curves[frameIndex * BEZIER_SIZE] = LINEAR
-	end
-
 	function self:setStepped (frameIndex)
 		self.curves[frameIndex * BEZIER_SIZE] = STEPPED
 	end
@@ -398,8 +394,8 @@ function Animation.ShearTimeline.new (frameCount)
 		local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1,
 				1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-		bone.shearX = bone.shearX + (bone.data.shearX * (prevX + (frames[frame + X] - prevX) * percent) - bone.shearX) * alpha
-		bone.shearY = bone.shearY + (bone.data.shearY * (prevY + (frames[frame + Y] - prevY) * percent) - bone.shearY) * alpha
+		bone.shearX = bone.shearX + (bone.data.shearX + (prevX + (frames[frame + X] - prevX) * percent) - bone.shearX) * alpha
+		bone.shearY = bone.shearY + (bone.data.shearY + (prevY + (frames[frame + Y] - prevY) * percent) - bone.shearY) * alpha
 	end
 
 	return self
@@ -692,54 +688,47 @@ function Animation.FfdTimeline.new ()
 end
 
 Animation.IkConstraintTimeline = {}
-function Animation.IkConstraintTimeline.new ()
-	local PREV_FRAME_TIME = -3
-	local PREV_FRAME_MIX = -2
-	local PREV_FRAME_BEND_DIRECTION = -1
-	local FRAME_MIX = 1
+Animation.IkConstraintTimeline.ENTRIES = 3
+function Animation.IkConstraintTimeline.new (frameCount)
+  local ENTRIES = Animation.IkConstraintTimeline.ENTRIES
+	local PREV_TIME = -3
+	local PREV_MIX = -2
+	local PREV_BEND_DIRECTION = -1
+	local MIX = 1
+  local BEND_DIRECTION = 2
 
-	local self = Animation.CurveTimeline.new()
-	self.frames = {} -- time, mix, bendDirection, ...
+	local self = Animation.CurveTimeline.new(frameCount)
+	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES) -- time, mix, bendDirection, ...
 	self.ikConstraintIndex = -1
 
-	function self:getDuration ()
-		return self.frames[#self.frames - 2]
-	end
-
-	function self:getFrameCount ()
-		return (#self.frames + 1) / 3
-	end
-
 	function self:setFrame (frameIndex, time, mix, bendDirection)
-		frameIndex = frameIndex * 3
+		frameIndex = frameIndex * ENTRIES
 		self.frames[frameIndex] = time
-		self.frames[frameIndex + 1] = mix
-		self.frames[frameIndex + 2] = bendDirection
+		self.frames[frameIndex + MIX] = mix
+		self.frames[frameIndex + BEND_DIRECTION] = bendDirection
 	end
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
 		local frames = self.frames
 		if time < frames[0] then return end -- Time is before first frame.
 
-		local ikConstraint = skeleton.ikConstraints[self.ikConstraintIndex]
+		local constraint = skeleton.ikConstraints[self.ikConstraintIndex]
 
-		if time >= frames[#frames - 2] then -- Time is after last frame.
-			ikConstraint.mix = ikConstraint.mix + (frames[#frames - 1] - ikConstraint.mix) * alpha
-			ikConstraint.bendDirection = frames[#frames]
+		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
+			constraint.mix = constraint.mix + (frames[zlen(frames) + PREV_MIX] - constraint.mix) * alpha
+			constraint.bendDirection = frames[zlen(frames) + PREV_BEND_DIRECTION]
 			return
 		end
 
 		-- Interpolate between the previous frame and the current frame.
-		local frameIndex = binarySearch(frames, time, 3);
-		local prevFrameMix = frames[frameIndex + PREV_FRAME_MIX]
-		local frameTime = frames[frameIndex]
-		local percent = 1 - (time - frameTime) / (frames[frameIndex + PREV_FRAME_TIME] - frameTime)
-		if percent < 0 then percent = 0 elseif percent > 1 then percent = 1 end
-		percent = self:getCurvePercent(frameIndex / 3 - 1, percent)
+		local frame = binarySearch(frames, time, ENTRIES);
+		local mix = frames[frame + PREV_MIX]
+		local frameTime = frames[frame]
+    local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1,
+				1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
-		local mix = prevFrameMix + (frames[frameIndex + FRAME_MIX] - prevFrameMix) * percent
-		ikConstraint.mix = ikConstraint.mix + (mix - ikConstraint.mix) * alpha
-		ikConstraint.bendDirection = frames[frameIndex + PREV_FRAME_BEND_DIRECTION]
+		constraint.mix = constraint.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.mix) * alpha;
+			constraint.bendDirection = math.floor(frames[frame + PREV_BEND_DIRECTION]);
 	end
 
 	return self

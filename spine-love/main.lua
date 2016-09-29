@@ -32,7 +32,7 @@
 local spine = require "spine-love.spine-love"
 
 local skeletons = {}
-local activeSkeleton = "spineboy"
+local activeSkeleton = "test"
 
 function loadSkeleton (name, animation)
   local loader = function (path) return love.graphics.newImage("data/" .. path) end
@@ -43,7 +43,7 @@ function loadSkeleton (name, animation)
   local skeletonData = json:readSkeletonDataFile("data/" .. name .. ".json")
   local skeleton = spine.Skeleton.new(skeletonData)
   skeleton.x = love.graphics.getWidth() / 2
-  skeleton.y = love.graphics.getHeight() / 2 + 250
+  skeleton.y = love.graphics.getHeight() / 2
   skeleton.flipX = false
   skeleton.flipY = true
   skeleton:setToSetupPose()
@@ -57,7 +57,7 @@ function loadSkeleton (name, animation)
   end
   state.onEnd = function (trackIndex)
     print(trackIndex.." end: "..state:getCurrent(trackIndex).animation.name)
-  end
+  end 
   state.onComplete = function (trackIndex, loopCount)
     print(trackIndex.." complete: "..state:getCurrent(trackIndex).animation.name..", "..loopCount)
   end
@@ -69,8 +69,9 @@ function loadSkeleton (name, animation)
 end
 
 function love.load(arg)
-  if arg[#arg] == "-debug" then require("mobdebug").start() end  
-  skeletons["spineboy"] = loadSkeleton("spineboy", "test")
+  if arg[#arg] == "-debug" then require("mobdebug").start() end
+  skeletons["test"] = loadSkeleton("test", "animation")
+  -- skeletons["spineboy"] = loadSkeleton("spineboy", "test")
   ---skeletons["raptor"] = loadSkeleton("raptor", "walk")
   skeletonRenderer = spine.SkeletonRenderer.new()
 end

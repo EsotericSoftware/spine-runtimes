@@ -29,7 +29,7 @@ var skeletonRenderer;
 var debugRenderer;
 var shapes;
 var skeletons = {};
-var activeSkeleton = "stretchyman";
+var activeSkeleton = "test";
 
 function init () {
 	// Setup canvas and WebGL context. We pass alpha: false to canvas.getContext() so we don't use premultiplied alpha when
@@ -75,12 +75,16 @@ function init () {
 	assetManager.loadText("assets/stretchyman.json");
 	assetManager.loadText("assets/stretchyman.atlas");
 	assetManager.loadTexture("assets/stretchyman.png");
+	assetManager.loadText("assets/test.json")
+	assetManager.loadText("assets/test.atlas")
+	assetManager.loadTexture("assets/test.png")
 	requestAnimationFrame(load);
 }
 
 function load () {
 	// Wait until the AssetManager has loaded all resources, then load the skeletons.
 	if (assetManager.isLoadingComplete()) {
+		skeletons["test"] = loadSkeleton("test", "animation", false);
 		skeletons["spineboy"] = loadSkeleton("spineboy", "run", false);
 		skeletons["raptor"] = loadSkeleton("raptor", "walk", false);
 		skeletons["tank"] = loadSkeleton("tank", "drive", false);
@@ -222,7 +226,7 @@ function render () {
 	var state = skeletons[activeSkeleton].state;
 	var skeleton = skeletons[activeSkeleton].skeleton;
 	var premultipliedAlpha = skeletons[activeSkeleton].premultipliedAlpha;
-	state.update(delta);
+	state.update(0);
 	state.apply(skeleton);
 	skeleton.updateWorldTransform();
 
