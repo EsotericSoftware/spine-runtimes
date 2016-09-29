@@ -34,7 +34,6 @@ local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local RegionAttachment = require "spine-lua.attachments.RegionAttachment"
 local BoundingBoxAttachment = require "spine-lua.attachments.BoundingBoxAttachment"
 local MeshAttachment = require "spine-lua.attachments.MeshAttachment"
-local SkinningMeshAttachment = require "spine-lua.attachments.SkinnedMeshAttachment"
 local TextureAtlas = require "spine-lua.TextureAtlas"
 
 local TextureAtlasAttachmentLoader = {}

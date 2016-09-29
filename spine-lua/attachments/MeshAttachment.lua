@@ -160,7 +160,7 @@ function MeshAttachment:updateWorldVertices(slot, premultipliedAlpha)
       local wy = y
       local nn = bones[v + 1];
       v = v + 1
-      nn = nn + v -- FIXME potentially, was bones[v++] + v
+      nn = nn + v
       while v < nn do
         local bone = skeletonBones[bones[v + 1]];
         local vx = vertices[b + 1]
@@ -191,7 +191,7 @@ function MeshAttachment:updateWorldVertices(slot, premultipliedAlpha)
       local wy = y
       local nn = bones[v + 1]
       v = v + 1
-      nn = nn + v -- FIXME potentially, was bones[v++] + v
+      nn = nn + v
       while v < nn do
         local bone = skeletonBones[bones[v + 1]];
         local vx = vertices[b + 1] + deform[f + 1]

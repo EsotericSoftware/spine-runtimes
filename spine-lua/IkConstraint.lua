@@ -253,7 +253,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
   end
   local os = math_atan2(cy, cx) * s2
   local rotation = parent.rotation
-  a1 = math_deg(a1 - os) + os1 - rotation -- potential FIXME in math_deg
+  a1 = math_deg(a1 - os) + os1 - rotation
   if a1 > 180 then
     a1 = a1 - 360
   elseif a1 < -180 then
@@ -261,7 +261,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
   end
   parent:updateWorldTransformWith(px, py, rotation + a1 * alpha, parent.scaleX, parent.scaleY, 0, 0)
   rotation = child.rotation
-  a2 = (math_deg(a2 + os) - child.shearX) * s2 + os2 - rotation -- FIXME potentiall math_deg
+  a2 = (math_deg(a2 + os) - child.shearX) * s2 + os2 - rotation
   if a2 > 180 then
     a2 = a2 - 360
   elseif a2 < -180 then
