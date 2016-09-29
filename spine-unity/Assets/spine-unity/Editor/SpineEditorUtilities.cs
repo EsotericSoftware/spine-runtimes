@@ -1434,6 +1434,67 @@ namespace Spine.Unity.Editor {
 		}
 		#endregion
 
+		#region Handles
+		static public void DrawBone (Matrix4x4 transformMatrix) {
+			SpineEditorUtilities.Icons.BoneMaterial.SetPass(0);
+			Graphics.DrawMeshNow(SpineEditorUtilities.Icons.BoneMesh, transformMatrix);
+		}
+
+		static float[] pathVertexBuffer;
+		static public void DrawPath (Slot s, PathAttachment p, Transform t) {
+			int worldVerticesLength = p.WorldVerticesLength;
+
+			if (pathVertexBuffer == null || pathVertexBuffer.Length < worldVerticesLength)
+				pathVertexBuffer = new float[worldVerticesLength];
+			
+			float[] pv = pathVertexBuffer;
+			p.ComputeWorldVertices(s, pv);
+
+			var ocolor = Handles.color;
+			Handles.color = new Color(254f/255f, 127f/255f, 0); // Path orange
+
+			Matrix4x4 m = t.localToWorldMatrix;
+			const int step = 6;
+			int n = worldVerticesLength - step;
+			Vector3 p0, p1, p2, p3;
+			for (int i = 2; i < n; i += step) {
+				p0 = m.MultiplyPoint(new Vector3(pv[i], pv[i+1]));
+				p1 = m.MultiplyPoint(new Vector3(pv[i+2], pv[i+3]));
+				p2 = m.MultiplyPoint(new Vector3(pv[i+4], pv[i+5]));
+				p3 = m.MultiplyPoint(new Vector3(pv[i+6], pv[i+7]));
+				DrawCubicBezier(p0, p1, p2, p3);
+			}
+
+			n += step;
+			if (p.Closed) {
+				p0 = m.MultiplyPoint(new Vector3(pv[n - 4], pv[n - 3]));
+				p1 = m.MultiplyPoint(new Vector3(pv[n - 2], pv[n - 1]));
+				p2 = m.MultiplyPoint(new Vector3(pv[0], pv[1]));
+				p3 = m.MultiplyPoint(new Vector3(pv[2], pv[3]));
+				DrawCubicBezier(p0, p1, p2, p3);
+			}
+
+			const float endCapSize = 0.05f;
+			var q = Quaternion.identity;
+			Handles.DotCap(0, m.MultiplyPoint(new Vector3(pv[2], pv[3])), q, endCapSize);
+//			if (!p.Closed) Handles.DotCap(0, m.MultiplyPoint(new Vector3(pv[n - 4], pv[n - 3])), q, endCapSize);
+
+			Handles.color = ocolor;
+		}
+
+		static public void DrawCubicBezier (Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3) {
+			Handles.DrawBezier(p0, p3, p1, p2, Handles.color, Texture2D.whiteTexture, 2f);
+//			const float dotSize = 0.01f;
+//			Quaternion q = Quaternion.identity;
+//			Handles.DotCap(0, p0, q, dotSize);
+//			Handles.DotCap(0, p1, q, dotSize);
+//			Handles.DotCap(0, p2, q, dotSize);
+//			Handles.DotCap(0, p3, q, dotSize);
+//			Handles.DrawLine(p0, p1);
+//			Handles.DrawLine(p3, p2);
+		}
+		#endregion
+
 		public static string GetPathSafeRegionName (AtlasRegion region) {
 			return region.name.Replace("/", "_");
 		}
