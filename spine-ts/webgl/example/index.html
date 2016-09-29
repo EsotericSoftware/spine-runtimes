@@ -29,7 +29,7 @@ var skeletonRenderer;
 var debugRenderer;
 var shapes;
 var skeletons = {};
-var activeSkeleton = "test";
+var activeSkeleton = "raptor";
 
 function init () {
 	// Setup canvas and WebGL context. We pass alpha: false to canvas.getContext() so we don't use premultiplied alpha when
@@ -84,9 +84,9 @@ function init () {
 function load () {
 	// Wait until the AssetManager has loaded all resources, then load the skeletons.
 	if (assetManager.isLoadingComplete()) {
-		skeletons["test"] = loadSkeleton("test", "animation", false);
-		skeletons["spineboy"] = loadSkeleton("spineboy", "run", false);
 		skeletons["raptor"] = loadSkeleton("raptor", "walk", false);
+		skeletons["test"] = loadSkeleton("test", "animation", false);
+		skeletons["spineboy"] = loadSkeleton("spineboy", "run", false);		
 		skeletons["tank"] = loadSkeleton("tank", "drive", false);
 		skeletons["goblins"] = loadSkeleton("goblins-mesh", "walk", false, "goblin");
 		skeletons["vine"] = loadSkeleton("vine", "animation", false);

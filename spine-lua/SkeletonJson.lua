@@ -49,7 +49,8 @@ function SkeletonJson.new (attachmentLoader)
 
 	local self = {
 		attachmentLoader = attachmentLoader,
-		scale = 1
+		scale = 1,
+    linkedMeshes = {}
 	}
 
 	function self:readSkeletonDataFile (fileName, base)
@@ -60,25 +61,32 @@ function SkeletonJson.new (attachmentLoader)
 	local readAnimation
 	local readCurve
 	local getArray
+  
+  local getValue = function (map, name, default)
+    local value = map[name]
+    if value == nil then return default else return value end
+  end
 
 	function self:readSkeletonData (jsonText)
+    local scale = self.scale
 		local skeletonData = SkeletonData.new(self.attachmentLoader)
-
 		local root = spine.utils.readJSON(jsonText)
 		if not root then error("Invalid JSON: " .. jsonText, 2) end
 
 		-- Skeleton.
-		if root["skeleton"] then
-			local skeletonMap = root["skeleton"]
+		local skeletonMap = root["skeleton"]
+		if skeletonMap then
 			skeletonData.hash = skeletonMap["hash"]
 			skeletonData.version = skeletonMap["spine"]
-			skeletonData.width = skeletonMap["width"] or 0
-			skeletonData.height = skeletonMap["height"] or 0
+			skeletonData.width = skeletonMap["width"]
+			skeletonData.height = skeletonMap["height"]
+      skeletonData.imagesPath = skeletonMap["images"]
 		end
 
 		-- Bones.
 		for i,boneMap in ipairs(root["bones"]) do
 			local boneName = boneMap["name"]
+      
 			local parent = nil
 			local parentName = boneMap["parent"]
 			if parentName then
@@ -86,40 +94,17 @@ function SkeletonJson.new (attachmentLoader)
 				if not parent then error("Parent bone not found: " .. parentName) end
 			end
 			local data = BoneData.new(i, boneName, parent)
-			data.length = (boneMap["length"] or 0) * self.scale
-			data.x = (boneMap["x"] or 0) * self.scale
-			data.y = (boneMap["y"] or 0) * self.scale
-			data.rotation = (boneMap["rotation"] or 0)
-			if boneMap["scaleX"] ~= nil then
-				data.scaleX = boneMap["scaleX"]
-			else
-				data.scaleX = 1
-			end
-			if boneMap["scaleY"] ~= nil then
-				data.scaleY = boneMap["scaleY"]
-			else
-				data.scaleY = 1
-			end
-      if boneMap["shearX"] ~= nil then
-				data.shearX = boneMap["shearX"]
-			else
-				data.shearX = 0
-			end
-			if boneMap["shearY"] ~= nil then
-				data.shearY = boneMap["shearY"]
-			else
-				data.shearY = 0
-			end			
-			if boneMap["inheritRotation"] == false then
-				data.inheritRotation = false
-			else
-				data.inheritRotation = true
-			end
-      if boneMap["inheritScale"] == false then
-				data.inheritScale = false
-			else
-				data.inheritScale = true
-			end
+      data.length = getValue(boneMap, "length", 0) * scale;
+      data.x = getValue(boneMap, "x", 0) * scale;
+      data.y = getValue(boneMap, "y", 0) * scale;
+      data.rotation = getValue(boneMap, "rotation", 0);
+      data.scaleX = getValue(boneMap, "scaleX", 1);
+      data.scaleY = getValue(boneMap, "scaleY", 1);
+      data.shearX = getValue(boneMap, "shearX", 0);
+      data.shearY = getValue(boneMap, "shearY", 0);
+      data.inheritRotation = getValue(boneMap, "inheritRotation", true);
+      data.inheritScale = getValue(boneMap, "inheritScale", true);
+      
 			table_insert(skeletonData.bones, data)
 		end
     
@@ -141,8 +126,8 @@ function SkeletonJson.new (attachmentLoader)
                          tonumber(color:sub(7, 8), 16) / 255)
 				end
 
-				data.attachmentName = slotMap["attachment"]
-				data.blendMode = BlendMode[slotMap["blend"] or "normal"]
+				data.attachmentName = getValue(slotMap, "attachment", nil)
+				data.blendMode = BlendMode[getValue(slotMap, "blend", "normal")]
 
 				table_insert(skeletonData.slots, data)
 				skeletonData.slotNameIndices[data.name] = #skeletonData.slots
@@ -165,7 +150,7 @@ function SkeletonJson.new (attachmentLoader)
 				if not data.target then error("Target bone not found: " .. targetName) end
 
 				if constraintMap["bendPositive"] == false then data.bendDirection = -1 else data.bendDirection = 1 end
-				if constraintMap["mix"] ~= nil then data.mix = constraintMap["mix"] else data.mix = 1 end
+        data.mix = getValue(constraintMap, "mix", 1)
 
 				table_insert(skeletonData.ikConstraints, data)
 			end
@@ -192,15 +177,25 @@ function SkeletonJson.new (attachmentLoader)
 			end
 		end
     
-    -- Linked meshes FIXME
+    -- Linked meshes
+    for i, linkedMesh in ipairs(self.linkedMeshes) do
+      local skin = skeletonData.defaultSkin
+      if linkedMesh.skin then skin = skeletonData.findSkin(linkedMesh.skin) end
+      if not skin then error("Skin not found: " .. linkedMesh.skin) end
+      local parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent)
+      if not parent then error("Parent mesh not found: " + linkedMesh.parent) end
+      linkedMesh.mesh:setParentMesh(parent)
+      linkedMesh.mesh:updateUVs()
+    end
+    self.linkedMeshes = {}
 
 		-- Events.
 		if root["events"] then
 			for eventName,eventMap in pairs(root["events"]) do
 				local data = EventData.new(eventName)
-				data.intValue = eventMap["int"] or 0
-				data.floatValue = eventMap["float"] or 0
-				data.stringValue = eventMap["string"]
+				data.intValue = getValue(eventMap, "int", 0)
+				data.floatValue = getValue(eventMap, "float", 0)
+				data.stringValue = getValue(eventMap, "string", nil)
 				table_insert(skeletonData.events, data)
 			end
 		end
@@ -208,7 +203,7 @@ function SkeletonJson.new (attachmentLoader)
 		-- Animations.
 		if root["animations"] then
 			for animationName,animationMap in pairs(root["animations"]) do
-				readAnimation(animationName, animationMap, skeletonData)
+				readAnimation(animationMap, animationName, skeletonData)
 			end
 		end
 
@@ -217,30 +212,22 @@ function SkeletonJson.new (attachmentLoader)
 
 	readAttachment = function (map, skin, slotIndex, name)
  		local scale = self.scale
-		name = map["name"] or name
+		name = getValue(map, "name", name)
 
-		local type = AttachmentType[map["type"] or "region"]
-		local path = map["path"] or name
+		local type = AttachmentType[getValue(map, "type", "region")]
+		local path = getValue(map, "path", name)
 
 		if type == AttachmentType.region then
 			local region = attachmentLoader:newRegionAttachment(skin, name, path)
 			if not region then return nil end
       region.path = path
-			region.x = (map["x"] or 0) * scale
-			region.y = (map["y"] or 0) * scale
-			if map["scaleX"] ~= nil then
-				region.scaleX = map["scaleX"]
-			else
-				region.scaleX = 1
-			end
-			if map["scaleY"] ~= nil then
-				region.scaleY = map["scaleY"]
-			else
-				region.scaleY = 1
-			end
-			region.rotation = (map["rotation"] or 0)
-			region.width = map["width"] * scale
-			region.height = map["height"] * scale
+			region.x = getValue(map, "x", 0) * scale
+			region.y = getValue(map, "y", 0) * scale
+      region.scaleX = getValue(map, "scaleX", 1);
+      region.scaleY = getValue(map, "scaleY", 1);
+      region.rotation = getValue(map, "rotation", 0);
+      region.width = map.width * scale;
+      region.height = map.height * scale;
 			
 			local color = map["color"]
 			if color then
@@ -256,10 +243,14 @@ function SkeletonJson.new (attachmentLoader)
 		elseif type == AttachmentType.boundingbox then
 			local box = attachmentLoader:newBoundingBoxAttachment(skin, name)
 			if not box then return nil end
-			local vertices = map["vertices"]
-			for i,point in ipairs(vertices) do
-				table_insert(box.vertices, vertices[i] * scale)
-			end
+      readVertices(map, box, map.vertexCount * 2)
+      local color = map.color
+      if color then
+        box.color.set(tonumber(color:sub(1, 2), 16) / 255, 
+                      tonumber(color:sub(3, 4), 16) / 255,
+                      tonumber(color:sub(5, 6), 16) / 255,
+                      tonumber(color:sub(7, 8), 16) / 255)
+      end
 			return box
       
 		elseif type == AttachmentType.mesh or type == AttachmentType.linkedmesh then
@@ -267,7 +258,7 @@ function SkeletonJson.new (attachmentLoader)
 			if not mesh then return null end
 			mesh.path = path
       
-      local color = map["color"]
+      local color = map.color
 			if color then
 				mesh.color.set(tonumber(color:sub(1, 2), 16) / 255, 
                          tonumber(color:sub(3, 4), 16) / 255,
@@ -275,23 +266,29 @@ function SkeletonJson.new (attachmentLoader)
                          tonumber(color:sub(7, 8), 16) / 255)
 			end
       
-      local parent = map["parent"]
+      local parent = map.parent
       if parent then
-        if map["inheritDeform"] == false then
-          mesh.inheritDeform = false
-        else
-          mesh.inheritDeform = true
-        end
-        -- FIXME add to linkedmeshes
+        mesh.inheritDeform = getValue(map, "deform", true)
+        table_insert(self.linkedMeshes, {
+            mesh = mesh,
+            skin = getValue(map, skin, nil),
+            slotIndex = slotIndex,
+            parent = parent
+        })
         return mesh
       end
       
-      mesh.regionUVs = getArray(map, "uvs", 1)
-			mesh.vertices = readVertices(map, mesh, #mesh.regionUVs)
+      local uvs = getArray(map, "uvs", 1)
+      readVertices(map, mesh, #uvs)
 			mesh.triangles = getArray(map, "triangles", 1)
+      -- adjust triangle indices by 1, vertices are one-indexed
+      for i,v in ipairs(mesh.triangles) do
+        mesh.triangles[i] = v + 1
+      end
+      mesh.regionUVs = uvs
 			mesh:updateUVs()
 
-			mesh.hullLength = (map["hull"] or 0) * 2
+			mesh.hullLength = getValue(map, "hull", 0) * 2
 			return mesh
 		
 		end
@@ -326,7 +323,7 @@ function SkeletonJson.new (attachmentLoader)
       table_insert(bones, boneCount)
       local nn = i + boneCount * 4
       while i < nn do
-        table_insert(bones, vertices[i + 1])
+        table_insert(bones, vertices[i + 1] + 1) -- +1 because bones are one-indexed
         table_insert(weights, vertices[i + 2] * scale)
         table_insert(weights, vertices[i + 3] * scale)
         table_insert(weights, vertices[i + 4])
@@ -337,7 +334,7 @@ function SkeletonJson.new (attachmentLoader)
     attachment.vertices = weights
   end
 
-	readAnimation = function (name, map, skeletonData)
+	readAnimation = function (map, name, skeletonData)
 		local timelines = {}
 		local duration = 0
 

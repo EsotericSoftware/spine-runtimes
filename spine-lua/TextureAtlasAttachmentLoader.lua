@@ -59,8 +59,12 @@ function TextureAtlasAttachmentLoader:newRegionAttachment (skin, name, path)
 end
 
 function TextureAtlasAttachmentLoader:newMeshAttachment (skin, name, path)
-  -- FIXME atlas regions
-  return MeshAttachment.new(name)
+  local region = self.atlas:findRegion(path)
+  if not region then error("Region not found in atlas: " .. path .. " (mesh attachment: " .. name .. ")") end
+  region.renderObject = region
+  local attachment = MeshAttachment.new(name)
+  attachment.region = region
+  return attachment
 end
 
 function TextureAtlasAttachmentLoader:newSkinningMeshAttachment (skin, name, path)

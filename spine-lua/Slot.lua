@@ -45,7 +45,7 @@ function Slot.new (data, bone)
 		color = Color.newWith(1, 1, 1, 1),
 		attachment = nil,
 		attachmentTime = 0,
-		attachmentVertices = nil,
+		attachmentVertices = {},
 		attachmentVerticesCount = 0
 	}
 	setmetatable(self, Slot)
