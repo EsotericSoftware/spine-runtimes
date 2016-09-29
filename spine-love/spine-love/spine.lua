@@ -43,6 +43,7 @@ spine.BoundingBoxAttachment = require "spine-lua.attachments.BoundingBoxAttachme
 spine.RegionAttachment = require "spine-lua.attachments.RegionAttachment"
 spine.MeshAttachment = require "spine-lua.attachments.MeshAttachment"
 spine.VertexAttachment = require "spine-lua.attachments.VertexAttachment"
+spine.PathAttachment = require "spine-lua.attachments.PathAttachment"
 spine.Skeleton = require "spine-lua.Skeleton"
 spine.Bone = require "spine-lua.Bone"
 spine.Slot = require "spine-lua.Slot"

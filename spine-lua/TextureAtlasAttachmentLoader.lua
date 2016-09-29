@@ -34,6 +34,7 @@ local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local RegionAttachment = require "spine-lua.attachments.RegionAttachment"
 local BoundingBoxAttachment = require "spine-lua.attachments.BoundingBoxAttachment"
 local MeshAttachment = require "spine-lua.attachments.MeshAttachment"
+local PathAttachment = require "spine-lua.attachments.PathAttachment"
 local TextureAtlas = require "spine-lua.TextureAtlas"
 
 local TextureAtlasAttachmentLoader = {}
@@ -72,6 +73,10 @@ end
 
 function TextureAtlasAttachmentLoader:newBoundingBoxAttachment (skin, name)
   return BoundingBoxAttachment.new(name)
+end
+
+function TextureAtlasAttachmentLoader:newPathAttachment(skin, name)
+  return PathAttachment.new(name)
 end
 
 return TextureAtlasAttachmentLoader

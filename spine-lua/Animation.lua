@@ -607,85 +607,7 @@ function Animation.DrawOrderTimeline.new (frameCount)
 	return self
 end
 
-Animation.FfdTimeline = {}
-function Animation.FfdTimeline.new ()
-	local self = Animation.CurveTimeline.new()
-	self.frames = {} -- time, ...
-	self.frameVertices = {}
-	self.slotIndex = -1
-
-	function self:getDuration ()
-		return self.frames[#self.frames]
-	end
-
-	function self:getFrameCount ()
-		return #self.frames + 1
-	end
-
-	function self:setFrame (frameIndex, time, vertices)
-		self.frames[frameIndex] = time
-		self.frameVertices[frameIndex] = vertices
-	end
-
-	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
-		local slot = skeleton.slots[self.slotIndex]
-		if slot.attachment ~= self.attachment then return end
-
-		local frames = self.frames
-		if time < frames[0] then return end -- Time is before first frame.
-
-		local frameVertices = self.frameVertices
-		local vertexCount = #frameVertices[0]
-		local vertices = slot.attachmentVertices
-		if not vertices or #vertices < vertexCount then
-			vertices = {}
-			slot.attachmentVertices = vertices
-		end
-		if #vertices ~= vertexCount then
-			alpha = 1 -- Don't mix from uninitialized slot vertices.
-		end
-		slot.attachmentVerticesCount = vertexCount
-		if time >= frames[#frames] then -- Time is after last frame.
-			local lastVertices = frameVertices[#frames]
-			if alpha < 1 then
-				for i = 1, vertexCount do
-					local vertex = vertices[i]
-					vertices[i] = vertex + (lastVertices[i] - vertex) * alpha
-				end
-			else
-				for i = 1, vertexCount do
-					vertices[i] = lastVertices[i]
-				end
-			end
-			return
-		end
-
-		-- Interpolate between the previous frame and the current frame.
-		local frameIndex = binarySearch1(frames, time)
-		local frameTime = frames[frameIndex]
-		local percent = 1 - (time - frameTime) / (frames[frameIndex - 1] - frameTime)
-		if percent < 0 then percent = 0 elseif percent > 1 then percent = 1 end
-		percent = self:getCurvePercent(frameIndex - 1, percent)
-
-		local prevVertices = frameVertices[frameIndex - 1]
-		local nextVertices = frameVertices[frameIndex]
-
-		if alpha < 1 then
-			for i = 1, vertexCount do
-				local prev = prevVertices[i]
-				local vertex = vertices[i]
-				vertices[i] = vertex + (prev + (nextVertices[i] - prev) * percent - vertex) * alpha
-			end
-		else
-			for i = 1, vertexCount do
-				local prev = prevVertices[i]
-				vertices[i] = prev + (nextVertices[i] - prev) * percent
-			end
-		end
-	end
-
-	return self
-end
+-- FIXME DeformTimeline
 
 Animation.IkConstraintTimeline = {}
 Animation.IkConstraintTimeline.ENTRIES = 3
@@ -733,5 +655,10 @@ function Animation.IkConstraintTimeline.new (frameCount)
 
 	return self
 end
+
+-- FIXME TransformConstraintTimeline
+-- FIXME PathConstraintPositionTimeline
+-- FIXME PathCosntraintSpacingTimeline
+-- FIXME PathConstraintMixTimeline
 
 return Animation

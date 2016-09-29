@@ -42,6 +42,7 @@ local EventData = require "spine-lua.EventData"
 local Event = require "spine-lua.Event"
 local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local BlendMode = require "spine-lua.BlendMode"
+local utils = require "spine-lua.utils"
 
 local SkeletonJson = {}
 function SkeletonJson.new (attachmentLoader)
@@ -290,7 +291,30 @@ function SkeletonJson.new (attachmentLoader)
 
 			mesh.hullLength = getValue(map, "hull", 0) * 2
 			return mesh
-		
+  
+    elseif type == AttachmentType.path then
+      local path = self.attachmentLoader:newPathAttachment(skin, name)
+      if not path then return nil end
+      path.closed = getValue(map, "closed", false)
+      path.constantSpeed = getValue(map, "constantSpeed", true)
+
+      local vertexCount = map.vertexCount
+      readVertices(map, path, vertexCount * 2)
+
+      local lengths = utils.newNumberArray(vertexCount / 3, 0)
+      for i,v in ipairs(map.lengths) do
+        lengths[i] = v * scale
+      end
+      path.lengths = lengths
+
+      local color = map.color
+			if color then
+				mesh.color.set(tonumber(color:sub(1, 2), 16) / 255, 
+                         tonumber(color:sub(3, 4), 16) / 255,
+                         tonumber(color:sub(5, 6), 16) / 255,
+                         tonumber(color:sub(7, 8), 16) / 255)
+			end
+      return path;
 		end
 
 		error("Unknown attachment type: " .. type .. " (" .. name .. ")")
@@ -372,7 +396,6 @@ function SkeletonJson.new (attachmentLoader)
 						local frameIndex = 0
 						for i,valueMap in ipairs(values) do
 							local attachmentName = valueMap["name"]
-							if not attachmentName then attachmentName = nil end
 							timeline:setFrame(frameIndex, valueMap["time"], attachmentName)
 							frameIndex = frameIndex + 1
 						end
@@ -462,75 +485,10 @@ function SkeletonJson.new (attachmentLoader)
 				duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.IkConstraintTimeline.ENTRIES])
 			end
 		end
-
-		local ffd = map["ffd"]
-		if ffd then
-			for skinName,slotMap in pairs(ffd) do
-				local skin = skeletonData:findSkin(skinName)
-				for slotName,meshMap in pairs(slotMap) do
-					local slotIndex = skeletonData:findSlotIndex(slotName)
-					for meshName,values in pairs(meshMap) do
-						local timeline = Animation.FfdTimeline.new()
-						local attachment = skin:getAttachment(slotIndex, meshName)
-						if not attachment then error("FFD attachment not found: " .. meshName) end
-						timeline.slotIndex = slotIndex
-						timeline.attachment = attachment
-						local isMesh = attachment.type == AttachmentType.mesh
-						local vertexCount
-						if isMesh then
-							vertexCount = #attachment.vertices
-						else
-							vertexCount = #attachment.weights / 3 * 2
-						end
-
-						local frameIndex = 0
-						for i,valueMap in ipairs(values) do
-							local vertices
-							if not valueMap["vertices"] then
-								if isMesh then
-									vertices = attachment.vertices
-								else
-									vertices = {}
-									for i = 1, vertexCount do
-										vertices[i] = 0
-									end
-								end
-							else
-								local verticesValue = valueMap["vertices"]
-								local scale = self.scale
-								vertices = {}
-								local start = valueMap["offset"] or 0
-								for ii = 1, start do
-									vertices[ii] = 0
-								end
-								if scale == 1 then
-									for ii = 1, #verticesValue do
-										vertices[ii + start] = verticesValue[ii]
-									end
-								else
-									for ii = 1, #verticesValue do
-										vertices[ii + start] = verticesValue[ii] * scale
-									end
-								end
-								if isMesh then
-									local meshVertices = attachment.vertices
-									for ii = 1, vertexCount do
-										vertices[ii] = vertices[ii] + meshVertices[ii]
-									end
-								elseif #verticesValue < vertexCount then
-									vertices[vertexCount] = 0
-								end
-							end
-							timeline:setFrame(frameIndex, valueMap["time"], vertices)
-							readCurve(valueMap, timeline, frameIndex)
-							frameIndex = frameIndex + 1
-						end
-						table_insert(timelines, timeline)
-						duration = math.max(duration, timeline:getDuration())
-					end
-				end
-			end
-		end
+    
+    -- FIXME transform constraint timelines.
+    -- FIXME path constraint timelines.
+    -- FIXME Deform timelines.
 
     -- Draworder timeline.
 		local drawOrderValues = map["drawOrder"]

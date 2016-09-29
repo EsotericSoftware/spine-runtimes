@@ -30,35 +30,20 @@
 -------------------------------------------------------------------------------
 
 local AttachmentType = require "spine-lua.attachments.AttachmentType"
-local RegionAttachment = require "spine-lua.attachments.RegionAttachment"
-local BoundingBoxAttachment = require "spine-lua.attachments.BoundingBoxAttachment"
-local MeshAttachment = require "spine-lua.attachments.MeshAttachment"
-local PathAttachment = require "spine-lua.attachments.PathAttachment"
+local VertexAttachment = require "spine-lua.attachments.VertexAttachment"
+local Color = require "spine-lua.Color"
 
-local AttachmentLoader = {}
-function AttachmentLoader.new ()
-	local self = {}
+local PathAttachment = {}
+PathAttachment.__index = PathAttachment
+setmetatable(PathAttachment, { __index = VertexAttachment })
 
-	function self:newRegionAttachment (skin, name, path)
-		return RegionAttachment.new(name)
-	end
+function PathAttachment.new (name)
+	if not name then error("name cannot be nil", 2) end
 
-	function self:newMeshAttachment (skin, name, path)
-		return MeshAttachment.new(name)
-	end
-
-	function self:newSkinningMeshAttachment (skin, name, path)
-		return SkinningMeshAttachment.new(name)
-	end
-
-	function self:newBoundingBoxAttachment (skin, name)
-		return BoundingBoxAttachment.new(name)
-	end
-  
-  function self:newPathAttachment(skin, name)
-    return PathAttachment.new(name)
-  end
-
+	local self = VertexAttachment.new(name, AttachmentType.path)
+  self.lengths = nil
+  self.color = Color.newWith(1, 1, 1, 1)
+  setmetatable(self, PathAttachment)
 	return self
 end
-return AttachmentLoader
+return PathAttachment
