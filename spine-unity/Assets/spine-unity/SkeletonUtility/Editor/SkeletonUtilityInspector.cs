@@ -98,13 +98,19 @@ namespace Spine.Unity.Editor {
 				return;
 			}
 				
+			var m = transform.localToWorldMatrix;
 			foreach (Bone b in skeleton.Bones) {
 				Vector3 pos = new Vector3(b.WorldX, b.WorldY, 0);
 				Quaternion rot = Quaternion.Euler(0, 0, b.WorldRotationX - 90f);
 				Vector3 scale = Vector3.one * b.Data.Length * b.WorldScaleX;
+				const float mx = 2.5f;
+				scale.x = Mathf.Clamp(scale.x, -mx, mx);
+				SpineEditorUtilities.DrawBone(m * Matrix4x4.TRS(pos, rot, scale));
+			}
 
-				SpineEditorUtilities.Icons.BoneMaterial.SetPass(0);
-				Graphics.DrawMeshNow(SpineEditorUtilities.Icons.BoneMesh, transform.localToWorldMatrix * Matrix4x4.TRS(pos, rot, scale));
+			foreach (Slot s in skeleton.DrawOrder) {
+				var p = s.Attachment as PathAttachment;
+				if (p != null) SpineEditorUtilities.DrawPath(s, p, transform);
 			}
 		}
 
