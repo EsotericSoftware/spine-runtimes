@@ -32,6 +32,8 @@
 local Bone = require "spine-lua.Bone"
 local Slot = require "spine-lua.Slot"
 local IkConstraint = require "spine-lua.IkConstraint"
+local PathConstraint = require "spine-lua.PathConstraint"
+local TransformConstraint = require "spine-lua.TransformConstraint"
 local AttachmentLoader = require "spine-lua.AttachmentLoader"
 local Color = require "spine-lua.Color"
 
@@ -159,7 +161,26 @@ function Skeleton:updateCache ()
   end
 
 	-- FIXME path constraints
-  -- FIXME transform constraints
+  
+  -- transform constraints
+  local transformConstraints = self.transformConstraints
+  for i, constraint in ipairs(transformConstraints) do
+    self:sortBone(constraint.target)
+    
+    local constrained = constraint.bones
+    for i,c in ipairs(constrained) do
+      self:sortBone(c)
+    end
+    
+    table_insert(updateCache, constraint)
+    
+    for i,c in ipairs(constrained) do
+      self:sortReset(c.children)
+    end
+    for i,c in ipairs(constrained) do
+      c.sorted = true
+    end
+  end
   
   for i, bone in ipairs(self.bones) do
     self:sortBone(bone)
@@ -212,7 +233,15 @@ function Skeleton:setBonesToSetupPose ()
 		ikConstraint.mix = ikConstraint.data.mix
 	end
   
-  -- FIXME transform constraints
+  local transformConstraints = self.transformConstraints
+  for i, constraint in ipairs(transformConstraints) do
+    local data = constraint.data
+    constraint.rotateMix = data.rotateMix
+    constraint.translateMix = data.translateMix
+    constraint.scaleMix = data.scaleMix
+    constraint.shearMix = data.shearMix
+  end
+  
   -- FIXME path constraints
 end
 

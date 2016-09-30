@@ -38,6 +38,10 @@ local AttachmentLoader = require "spine-lua.AttachmentLoader"
 local Animation = require "spine-lua.Animation"
 local IkConstraintData = require "spine-lua.IkConstraintData"
 local IkConstraint = require "spine-lua.IkConstraint"
+local PathConstraintData = require "spine-lua.PathConstraintData"
+local PathConstraint = require "spine-lua.PathConstraint"
+local TransformConstraintData = require "spine-lua.TransformConstraintData"
+local TransformConstraint = require "spine-lua.TransformConstraint"
 local EventData = require "spine-lua.EventData"
 local Event = require "spine-lua.Event"
 local AttachmentType = require "spine-lua.attachments.AttachmentType"
@@ -157,7 +161,37 @@ function SkeletonJson.new (attachmentLoader)
 			end
 		end
     
-    -- Transform constraints FIXME
+    -- Transform constraints
+    if root["transform"] then
+      for i,constraintMap in ipairs(root["transform"]) do
+        data = TransformConstraintData.new(constraintMap.name)
+        
+        for i,boneName in ipairs(constraintMap.bones) do
+          local bone = skeletonData:findBone(boneName)
+          if not bone then error("Transform constraint bone not found: " .. boneName, 2) end
+          table_insert(data.bones, bone)
+        end
+        
+        local targetName = constraintMap.target
+        data.target = skeletonData:findBone(targetName)
+        if not data.target then error("Transform constraint target bone not found: " .. boneName, 2) end
+        
+        data.offsetRotation = getValue(constraintMap, "rotation", 0);
+        data.offsetX = getValue(constraintMap, "x", 0) * scale;
+        data.offsetY = getValue(constraintMap, "y", 0) * scale;
+        data.offsetScaleX = getValue(constraintMap, "scaleX", 0);
+        data.offsetScaleY = getValue(constraintMap, "scaleY", 0);
+        data.offsetShearY = getValue(constraintMap, "shearY", 0);
+
+        data.rotateMix = getValue(constraintMap, "rotateMix", 1);
+        data.translateMix = getValue(constraintMap, "translateMix", 1);
+        data.scaleMix = getValue(constraintMap, "scaleMix", 1);
+        data.shearMix = getValue(constraintMap, "shearMix", 1);
+
+        table_insert(skeletonData.transformConstraints, data)
+      end
+    end
+    
     -- Path constraints FIXME
 
 		-- Skins.
@@ -460,6 +494,7 @@ function SkeletonJson.new (attachmentLoader)
 			end
 		end
 
+    -- IK timelines.
 		local ik = map["ik"]
 		if ik then
 			for ikConstraintName,values in pairs(ik) do
@@ -486,7 +521,29 @@ function SkeletonJson.new (attachmentLoader)
 			end
 		end
     
-    -- FIXME transform constraint timelines.
+    -- Transform constraint timelines.
+    local transform = map["transform"]
+    if transform then
+      for constraintName, values in pairs(transform) do
+        local constraint = skeletonData:findTransformConstraint(constraintName)
+        local timeline = Animation.TransformConstraintTimeline.new(#values)
+        for i,other in pairs(skeletonData.transformConstraints) do
+          if other == constraint then
+            timeline.transformConstraintIndex = i
+            break
+          end
+        end
+        local frameIndex = 0
+        for i,valueMap in ipairs(values) do          
+          timeline:setFrame(frameIndex, valueMap.time, getValue(valueMap, "rotateMix", 1), getValue(valueMap, "translateMix", 1), getValue(valueMap, "scaleMix", 1), getValue(valueMap, "shearMix", 1))
+          readCurve(valueMap, timeline, frameIndex)
+          frameIndex = frameIndex + 1
+        end
+        table_insert(timelines, timeline)
+        duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.TransformConstraintTimeline.ENTRIES])
+      end
+    end
+    
     -- FIXME path constraint timelines.
     -- FIXME Deform timelines.
 

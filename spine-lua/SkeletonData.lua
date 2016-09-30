@@ -115,7 +115,7 @@ function SkeletonData:findIkConstraint (constraintName)
 	return nil
 end
 
-function SkeletonData:findTransformConstaint (constraintName)
+function SkeletonData:findTransformConstraint (constraintName)
 	if not constraintName then error("constraintName cannot be nil.", 2) end
 	for i,constraint in ipairs(self.transformConstraints) do
 		if constraint.name == constraintName then return constraint end
