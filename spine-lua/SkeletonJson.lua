@@ -395,6 +395,7 @@ function SkeletonJson.new (attachmentLoader)
 	readAnimation = function (map, name, skeletonData)
 		local timelines = {}
 		local duration = 0
+    local scale = self.scale
 
     -- Slot timelines
 		local slotsMap = map["slots"]
@@ -545,7 +546,65 @@ function SkeletonJson.new (attachmentLoader)
     end
     
     -- FIXME path constraint timelines.
-    -- FIXME Deform timelines.
+    -- Deform timelines.
+    if map.deform then
+      for deformName, deformMap in pairs(map.deform) do
+        local skin = skeletonData:findSkin(deformName)
+        if not skin then error("Skin not found: " .. deformName, 2) end
+        for slotName,slotMap in pairs(deformMap) do
+          local slotIndex = skeletonData:findSlotIndex(slotName)
+          if slotIndex == -1 then error("Slot not found: " .. slotMap.name, 2) end
+          for timelineName,timelineMap in pairs(slotMap) do
+            local attachment = skin:getAttachment(slotIndex, timelineName)
+            if not attachment then error("Deform attachment not found: " .. timelineMap.name, 2) end
+            local weighted = attachment.bones ~= nil
+            local vertices = attachment.vertices;
+            local deformLength = #vertices
+            if weighted then deformLength = math.floor(vertices / 3) * 2 end
+
+            local timeline = Animation.DeformTimeline.new(#timelineMap)
+            timeline.slotIndex = slotIndex
+            timeline.attachment = attachment
+
+            local frameIndex = 0
+            for i,valueMap in ipairs(timelineMap) do
+              local deform = nil
+              local verticesValue = getValue(valueMap, "vertices", nil)
+              if verticesValue == nil then
+                deform = vertices
+                if weighted then deform = utils.newNumberArray(deformLength) end
+              else
+                deform = utils.newNumberArray(deformLength)
+                local start = getValue(valueMap, "offset", 0) + 1
+                utils.arrayCopy(verticesValue, 1, deform, start, #verticesValue)
+                if scale ~= 1 then
+                  local i = start
+                  local n = i + #verticesValue
+                  while i < n do
+                    deform[i] = deform[i] * scale
+                    i = i + 1
+                  end
+                end
+                if not weighted then
+                  local i = 1
+                  local n = i + deformLength
+                  while i < n do
+                    deform[i] = deform[i] + vertices[i]
+                    i = i + 1
+                  end
+                end
+              end
+
+              timeline:setFrame(frameIndex, valueMap.time, deform)
+              readCurve(valueMap, timeline, frameIndex)
+              frameIndex = frameIndex + 1
+            end
+            table_insert(timelines, timeline)
+            duration = math.max(duration, timeline.frames[timeline:getFrameCount() - 1])
+          end
+        end
+      end
+    end
 
     -- Draworder timeline.
 		local drawOrderValues = map["drawOrder"]

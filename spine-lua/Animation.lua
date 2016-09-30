@@ -36,6 +36,7 @@
 -- to be rewritten using one-based indexing for better performance
 
 local utils = require "spine-lua.utils"
+local AttachmentType = require "spine-lua.attachments.AttachmentType"
 
 local function zlen(array)
   return #array + 1
@@ -607,7 +608,81 @@ function Animation.DrawOrderTimeline.new (frameCount)
 	return self
 end
 
--- FIXME DeformTimeline
+Animation.DeformTimeline = {}
+function Animation.DeformTimeline.new (frameCount)
+  
+	local self = Animation.CurveTimeline.new(frameCount)
+  self.frames = utils.newNumberArrayZero(frameCount)
+	self.frameVertices = utils.newNumberArrayZero(frameCount)
+  self.slotIndex = -1
+  self.attachment = nil
+
+	function self:setFrame (frameIndex, time, vertices)
+		self.frames[frameIndex] = time
+    self.frameVertices[frameIndex] = vertices
+	end
+
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
+    local slot = skeleton.slots[self.slotIndex]
+    local slotAttachment = slot.attachment
+    if not slotAttachment then return end
+    if not (slotAttachment.type == AttachmentType.mesh or slotAttachment.type == AttachmentType.linkedmesh or slotAttachment.type == AttachmentType.path) then return end
+    if not slotAttachment:applyDeform(self.attachment) then return end
+      
+		local frames = self.frames
+		if time < frames[0] then return end -- Time is before first frame.
+
+    local frameVertices = self.frameVertices
+    local vertexCount = #(frameVertices[0])
+
+    local verticesArray = slot.attachmentVertices
+    if (#verticesArray ~= vertexCount) then alpha = 1 end -- Don't mix from uninitialized slot vertices.
+    local vertices = utils.setArraySize(verticesArray, vertexCount)
+
+    if time >= frames[zlen(frames) - 1] then
+      local lastVertices = frameVertices[zlen(frames) - 1]
+      if alpha < 1 then
+        local i = 1
+        while i <= vertexCount do
+          vertices[i] = vertices[i] + (lastVertices[i] - vertices[i]) * alpha
+          i = i + 1
+        end
+      else
+        local i = 1
+        while i <= vertexCount do
+          vertices[i] = lastVertices[i]
+          i = i + 1
+        end
+      end
+      return;
+    end
+
+    -- Interpolate between the previous frame and the current frame.
+    local frame = binarySearch(frames, time, 1)
+    local prevVertices = frameVertices[frame - 1]
+    local nextVertices = frameVertices[frame]
+    local frameTime = frames[frame]
+    local percent = self:getCurvePercent(frame - 1, 1 - (time - frameTime) / (frames[frame - 1] - frameTime))
+
+    if alpha < 1 then
+      local i = 1
+      while i <= vertexCount do
+        local prev = prevVertices[i]
+        vertices[i] = vertices[i] + (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha
+        i = i + 1
+      end
+    else
+      local i = 1
+      while i <= vertexCount do
+        local prev = prevVertices[i]
+        vertices[i] = prev + (nextVertices[i] - prev) * percent
+        i = i + 1
+      end
+    end
+	end
+
+	return self
+end
 
 Animation.IkConstraintTimeline = {}
 Animation.IkConstraintTimeline.ENTRIES = 3

@@ -98,6 +98,29 @@ function utils.newNumberArrayZero (size)
   return a
 end
 
+function utils.setArraySize (array, size)
+  if #array == size then return array end
+  if #array < size then
+    local i = #array + 1
+    while i <= size do 
+      array[i] = 0
+      i = i + 1
+    end
+  else
+    array[size + 1] = nil -- FIXME dirty trick to appease # without realloc
+  end
+  return array
+end
+
+function utils.arrayCopy (src, srcOffset, dst, dstOffset, size)
+  local n = srcOffset + size
+  while srcOffset < n do
+    dst[dstOffset] = src[srcOffset]
+    dstOffset = dstOffset + 1
+    srcOffset = srcOffset + 1
+  end
+end
+
 function utils.clamp (value, min, max)
   if value < min then return min end
   if value > max then return max end

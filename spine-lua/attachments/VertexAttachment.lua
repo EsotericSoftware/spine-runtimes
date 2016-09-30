@@ -40,8 +40,8 @@ setmetatable(VertexAttachment, { __index = Attachment })
 
 function VertexAttachment.new (name, attachmentType)
   local self = Attachment.new(name, attachmentType)
-  self.bones = {}
-  self.vertices = {}
+  self.bones = nil
+  self.vertices = nil
   self.worldVerticesLength = 0
   setmetatable(self, VertexAttachment)
   return self
