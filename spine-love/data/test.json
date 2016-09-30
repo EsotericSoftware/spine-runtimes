@@ -1,8 +1,10 @@
 {
-"skeleton": { "hash": "jpz0fXcaUOphFaiM2EcUFZ69kpQ", "spine": "3.4.02", "width": 1311.2, "height": 749.49, "images": "" },
+"skeleton": { "hash": "q85TGVNG41tSw7peB3tWMsjBKzs", "spine": "3.4.02", "width": 1311.2, "height": 937.32, "images": "" },
 "bones": [
 	{ "name": "root" },
+	{ "name": "attachment", "parent": "root", "x": -267.71, "y": -366.62 },
 	{ "name": "color", "parent": "root", "x": -298.3, "y": 44.1 },
+	{ "name": "draworder", "parent": "root", "x": 283.53, "y": -356.27 },
 	{ "name": "mesh", "parent": "root", "x": -320.74, "y": 413.7 },
 	{ "name": "pathfollower", "parent": "root", "x": 177.52, "y": 56.62 },
 	{ "name": "rotate", "parent": "root", "x": -305, "y": 201 },
@@ -22,7 +24,10 @@
 	{ "name": "images/spine6", "bone": "pathfollower", "attachment": "images/spine" },
 	{ "name": "images/spine7", "bone": "transformconstrained", "attachment": "images/spine" },
 	{ "name": "images/spine8", "bone": "transformconstrainttarget", "attachment": "images/spine" },
-	{ "name": "images/spine9", "bone": "mesh", "attachment": "images/spine" }
+	{ "name": "images/spine9", "bone": "mesh", "attachment": "images/spine" },
+	{ "name": "images/spine10", "bone": "attachment", "attachment": "images/logo" },
+	{ "name": "draworder2", "bone": "draworder", "attachment": "images/logo" },
+	{ "name": "draworder1", "bone": "draworder", "attachment": "images/spine" }
 ],
 "transform": [
 	{
@@ -45,7 +50,17 @@
 ],
 "skins": {
 	"default": {
+		"draworder1": {
+			"images/spine": { "width": 377, "height": 120 }
+		},
+		"draworder2": {
+			"images/logo": { "width": 180, "height": 180 }
+		},
 		"images/spine": {
+			"images/spine": { "width": 377, "height": 120 }
+		},
+		"images/spine10": {
+			"images/logo": { "width": 180, "height": 180 },
 			"images/spine": { "width": 377, "height": 120 }
 		},
 		"images/spine2": {
@@ -101,6 +116,13 @@
 					{ "time": 0.4333, "color": "ff0901ff" },
 					{ "time": 0.9, "color": "2dff00ff" },
 					{ "time": 1.3333, "color": "ffffffff" }
+				]
+			},
+			"images/spine10": {
+				"attachment": [
+					{ "time": 0, "name": "images/spine" },
+					{ "time": 0.6666, "name": "images/logo" },
+					{ "time": 1.3333, "name": "images/spine" }
 				]
 			}
 		},
@@ -181,7 +203,17 @@
 					]
 				}
 			}
-		}
+		},
+		"drawOrder": [
+			{ "time": 0 },
+			{
+				"time": 0.6666,
+				"offsets": [
+					{ "slot": "draworder2", "offset": 1 }
+				]
+			},
+			{ "time": 1.3333 }
+		]
 	}
 }
 }

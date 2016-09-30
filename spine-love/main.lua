@@ -43,7 +43,7 @@ function loadSkeleton (name, animation)
   local skeletonData = json:readSkeletonDataFile("data/" .. name .. ".json")
   local skeleton = spine.Skeleton.new(skeletonData)
   skeleton.x = love.graphics.getWidth() / 2
-  skeleton.y = love.graphics.getHeight() / 2 + 250
+  skeleton.y = love.graphics.getHeight() / 2 
   skeleton.flipX = false
   skeleton.flipY = true
   skeleton:setToSetupPose()

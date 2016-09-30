@@ -492,9 +492,8 @@ function Animation.AttachmentTimeline.new (frameCount)
 		if time >= frames[zlen(frames) - 1] then
 			frameIndex = zlen(frames) - 1
 		else
-			frameIndex = binarySearch1(frames, time) - 1
+			frameIndex = binarySearch(frames, time, 1) - 1
 		end
-		if frames[frameIndex] < lastTime then return end
 
 		local attachmentName = self.attachmentNames[frameIndex]
 		local slot = skeleton.slotsByName[self.slotName]
