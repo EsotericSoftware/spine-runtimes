@@ -217,7 +217,7 @@ function SkeletonJson.new (attachmentLoader)
       local skin = skeletonData.defaultSkin
       if linkedMesh.skin then skin = skeletonData.findSkin(linkedMesh.skin) end
       if not skin then error("Skin not found: " .. linkedMesh.skin) end
-      local parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent)
+      local parent = skin:getAttachment(linkedMesh.slotIndex, linkedMesh.parent)
       if not parent then error("Parent mesh not found: " + linkedMesh.parent) end
       linkedMesh.mesh:setParentMesh(parent)
       linkedMesh.mesh:updateUVs()
