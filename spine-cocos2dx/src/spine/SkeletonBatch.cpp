@@ -81,7 +81,14 @@ namespace spine {
     void SkeletonBatch::addCommand (cocos2d::Renderer* renderer, float globalZOrder, GLuint textureID, GLProgramState* glProgramState,
                                     BlendFunc blendFunc, const TrianglesCommand::Triangles& triangles, const Mat4& transform, uint32_t transformFlags
                                     ) {
-        _command->triangles->verts = triangles.verts;
+        // Need a copy of verts here.
+        // Make SkeletonAnimations which shared a same SkeletonData rendering independently.
+        if (_command->triangles->verts) {
+            free(_command->triangles->verts);
+            _command->triangles->verts = NULL;
+        }
+        _command->triangles->verts = (V3F_C4B_T2F *)malloc(sizeof(V3F_C4B_T2F) * triangles.vertCount);
+        memcpy(_command->triangles->verts, triangles.verts, sizeof(V3F_C4B_T2F) * triangles.vertCount);
         
         _command->triangles->vertCount = triangles.vertCount;
         _command->triangles->indexCount = triangles.indexCount;
@@ -99,9 +106,13 @@ namespace spine {
     {
         trianglesCommand = new TrianglesCommand();
         triangles = new TrianglesCommand::Triangles();
+        triangles->verts = NULL;
     }
     
     SkeletonBatch::Command::~Command () {
+        if (triangles->verts) {
+            free(triangles->verts);
+        }
         delete triangles;
         delete trianglesCommand;
     }
