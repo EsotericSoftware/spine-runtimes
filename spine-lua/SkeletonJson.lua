@@ -560,7 +560,7 @@ function SkeletonJson.new (attachmentLoader)
             local weighted = attachment.bones ~= nil
             local vertices = attachment.vertices;
             local deformLength = #vertices
-            if weighted then deformLength = math.floor(vertices / 3) * 2 end
+            if weighted then deformLength = math.floor(#vertices / 3) * 2 end
 
             local timeline = Animation.DeformTimeline.new(#timelineMap)
             timeline.slotIndex = slotIndex

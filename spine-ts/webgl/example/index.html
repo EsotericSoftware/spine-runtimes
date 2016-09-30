@@ -226,7 +226,7 @@ function render () {
 	var state = skeletons[activeSkeleton].state;
 	var skeleton = skeletons[activeSkeleton].skeleton;
 	var premultipliedAlpha = skeletons[activeSkeleton].premultipliedAlpha;
-	state.update(0);
+	state.update(delta);
 	state.apply(skeleton);
 	skeleton.updateWorldTransform();
 

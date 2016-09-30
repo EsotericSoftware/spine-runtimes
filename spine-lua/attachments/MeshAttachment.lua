@@ -201,6 +201,7 @@ function MeshAttachment:updateWorldVertices(slot, premultipliedAlpha)
         wy = wy + (vx * bone.c + vy * bone.d + bone.worldY) * weight
         b = b + 3
         f = f + 2
+        v = v + 1
       end
       worldVertices[w + 1] = wx;
       worldVertices[w + 2] = wy;

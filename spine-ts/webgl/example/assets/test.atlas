@@ -4,6 +4,13 @@ size: 512,512
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
+images/logo
+  rotate: false
+  xy: 2, 77
+  size: 180, 180
+  orig: 180, 180
+  offset: 0, 0
+  index: -1
 images/spine
   rotate: false
   xy: 2, 259
