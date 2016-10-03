@@ -1117,17 +1117,19 @@ var spine;
 				}
 				for (var ii = 0, nn = events.length; ii < nn; ii++) {
 					var event_1 = events[ii];
-					if (current.listener != null)
+					if (current.listener != null && current.listener.event != null)
 						current.listener.event(i, event_1);
 					for (var iii = 0; iii < listenerCount; iii++)
-						this.listeners[iii].event(i, event_1);
+						if (this.listeners[iii].event)
+							this.listeners[iii].event(i, event_1);
 				}
 				if (loop ? (lastTime % endTime > time % endTime) : (lastTime < endTime && time >= endTime)) {
 					var count = spine.MathUtils.toInt(time / endTime);
-					if (current.listener != null)
+					if (current.listener != null && current.listener.complete)
 						current.listener.complete(i, count);
 					for (var ii = 0, nn = this.listeners.length; ii < nn; ii++)
-						this.listeners[ii].complete(i, count);
+						if (this.listeners[ii].complete)
+							this.listeners[ii].complete(i, count);
 				}
 				current.lastTime = current.time;
 			}
@@ -1143,10 +1145,11 @@ var spine;
 			var current = this.tracks[trackIndex];
 			if (current == null)
 				return;
-			if (current.listener != null)
+			if (current.listener != null && current.listener.end != null)
 				current.listener.end(trackIndex);
 			for (var i = 0, n = this.listeners.length; i < n; i++)
-				this.listeners[i].end(trackIndex);
+				if (this.listeners[i].end)
+					this.listeners[i].end(trackIndex);
 			this.tracks[trackIndex] = null;
 			this.freeAll(current);
 		};
@@ -1168,10 +1171,11 @@ var spine;
 			if (current != null) {
 				var previous = current.previous;
 				current.previous = null;
-				if (current.listener != null)
+				if (current.listener != null && current.listener.end != null)
 					current.listener.end(index);
 				for (var i = 0, n = this.listeners.length; i < n; i++)
-					this.listeners[i].end(index);
+					if (this.listeners[i].end)
+						this.listeners[i].end(index);
 				entry.mixDuration = this.data.getMix(current.animation, entry.animation);
 				if (entry.mixDuration > 0) {
 					entry.mixTime = 0;
@@ -1184,10 +1188,11 @@ var spine;
 				}
 			}
 			this.tracks[index] = entry;
-			if (entry.listener != null)
+			if (entry.listener != null && entry.listener.start != null)
 				entry.listener.start(index);
 			for (var i = 0, n = this.listeners.length; i < n; i++)
-				this.listeners[i].start(index);
+				if (this.listeners[i].start)
+					this.listeners[i].start(index);
 		};
 		AnimationState.prototype.setAnimation = function (trackIndex, animationName, loop) {
 			var animation = this.data.skeletonData.findAnimation(animationName);
