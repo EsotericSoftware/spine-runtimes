@@ -44,7 +44,7 @@ Scene* SpineboyExample::scene () {
 bool SpineboyExample::init () {
 	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
 
-	skeletonNode = SkeletonAnimation::createWithFile("spineboy.json", "spineboy.atlas", 0.6f);
+	skeletonNode = SkeletonAnimation::createWithJsonFile("spineboy.json", "spineboy.atlas", 0.6f);
 
 	skeletonNode->setStartListener( [this] (int trackIndex) {
 		spTrackEntry* entry = spAnimationState_getCurrent(skeletonNode->getState(), trackIndex);
