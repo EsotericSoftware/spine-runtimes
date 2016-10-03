@@ -1,4 +1,4 @@
-﻿/******************************************************************************
+/******************************************************************************
  * Spine Runtimes Software License
  * Version 2.3
  * 
@@ -46,7 +46,7 @@ namespace Spine.Unity.Editor {
 
 		public static void PropertyFieldWideLabel (SerializedProperty property, GUIContent label = null, float minimumLabelWidth = 150) {
 			using (new EditorGUILayout.HorizontalScope()) {
-				GUILayout.Label(label ?? new GUIContent(property.name, property.tooltip), GUILayout.MinWidth(minimumLabelWidth));
+				GUILayout.Label(label ?? new GUIContent(property.displayName, property.tooltip), GUILayout.MinWidth(minimumLabelWidth));
 				//GUILayout.FlexibleSpace();
 				EditorGUILayout.PropertyField(property, GUIContent.none, true, GUILayout.MinWidth(100));
 			}
