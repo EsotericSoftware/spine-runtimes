@@ -56,8 +56,7 @@ module spine.threejs {
 
 		static toThreeJsTextureFilter(filter: TextureFilter) {
 			if (filter === TextureFilter.Linear) return THREE.LinearFilter;
-			else if (filter === TextureFilter.MipMap) return THREE.LinearMipMapLinearFilter;
-			else if (filter === TextureFilter.MipMapLinearLinear) return THREE.LinearMipMapLinearFilter;
+			else if (filter === TextureFilter.MipMap) return THREE.LinearMipMapLinearFilter; // also includes TextureFilter.MipMapLinearLinear			
 			else if (filter === TextureFilter.MipMapLinearNearest) return THREE.LinearMipMapNearestFilter;
 			else if (filter === TextureFilter.MipMapNearestLinear) return THREE.NearestMipMapLinearFilter;
 			else if (filter === TextureFilter.MipMapNearestNearest) return THREE.NearestMipMapNearestFilter;

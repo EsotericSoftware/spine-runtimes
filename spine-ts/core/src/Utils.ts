@@ -261,4 +261,9 @@ module spine {
 			}
 		}
 	}
+
+	export interface ArrayLike<T> {
+		length: number;
+		[n: number]: T;
+	}
 }
