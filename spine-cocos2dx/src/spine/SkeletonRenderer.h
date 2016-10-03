@@ -111,7 +111,7 @@ CC_CONSTRUCTOR_ACCESS:
 	void initWithFile (const std::string& skeletonDataFile, spAtlas* atlas, float scale = 1);
 	void initWithFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1);
 
-	void initialize ();
+	virtual void initialize ();
 
 protected:
 	void setSkeletonData (spSkeletonData* skeletonData, bool ownsSkeletonData);

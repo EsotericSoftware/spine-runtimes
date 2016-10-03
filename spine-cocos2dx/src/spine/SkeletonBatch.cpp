@@ -81,15 +81,21 @@ namespace spine {
     void SkeletonBatch::addCommand (cocos2d::Renderer* renderer, float globalZOrder, GLuint textureID, GLProgramState* glProgramState,
                                     BlendFunc blendFunc, const TrianglesCommand::Triangles& triangles, const Mat4& transform, uint32_t transformFlags
                                     ) {
-        _command->triangles->verts = triangles.verts;
-
+        if (_command->triangles->verts) {
+            free(_command->triangles->verts);
+            _command->triangles->verts = NULL;
+        }
+        
+        _command->triangles->verts = (V3F_C4B_T2F *)malloc(sizeof(V3F_C4B_T2F) * triangles.vertCount);
+        memcpy(_command->triangles->verts, triangles.verts, sizeof(V3F_C4B_T2F) * triangles.vertCount);
+        
         _command->triangles->vertCount = triangles.vertCount;
         _command->triangles->indexCount = triangles.indexCount;
         _command->triangles->indices = triangles.indices;
-
+        
         _command->trianglesCommand->init(globalZOrder, textureID, glProgramState, blendFunc, *_command->triangles, transform);
         renderer->addCommand(_command->trianglesCommand);
-
+        
         if (!_command->next) _command->next = new Command();
         _command = _command->next;
     }
@@ -102,6 +108,9 @@ namespace spine {
     }
 
     SkeletonBatch::Command::~Command () {
+        if (triangles->verts) {
+            free(triangles->verts);
+        }
         delete triangles;
         delete trianglesCommand;
     }
