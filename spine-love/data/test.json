@@ -1,7 +1,7 @@
 {
-"skeleton": { "hash": "VE4pWJ9vYzvIJH2ExWf0pdbCpNg", "spine": "3.4.02", "width": 1333.79, "height": 1142.93, "images": "" },
+"skeleton": { "hash": "KyUBC51aNxBM9+mHYbPXXaeouo4", "spine": "3.4.02", "width": 1333.79, "height": 1142.93, "images": "" },
 "bones": [
-	{ "name": "root", "x": -320.74, "y": 413.7 },
+	{ "name": "root", "x": 28.68, "y": -105.71 },
 	{ "name": "attachment", "parent": "root", "x": -267.71, "y": -366.62 },
 	{ "name": "color", "parent": "root", "x": -298.3, "y": 44.1 },
 	{ "name": "draworder", "parent": "root", "x": 283.53, "y": -356.27 },
@@ -225,7 +225,12 @@
 				},
 				"images/spine12": {
 					"images/spine": [
-						{ "time": 0, "curve": "stepped" },
+						{ "time": 0 },
+						{
+							"time": 0.3333,
+							"offset": 4,
+							"vertices": [ -9.45233, 83.5133, -3.90008, 44.76635, -3.90008, 44.76635, -3.90008, 44.76635, 0, 0, 0, 0, 0, 0, 0, 0, 5.15667, -29.57763, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3.90008, 44.76635 ]
+						},
 						{ "time": 0.6666 },
 						{
 							"time": 0.6679,
