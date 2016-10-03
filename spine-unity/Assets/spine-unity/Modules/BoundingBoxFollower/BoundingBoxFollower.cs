@@ -47,7 +47,6 @@ namespace Spine.Unity {
 		string currentAttachmentName;
 		PolygonCollider2D currentCollider;
 
-		bool valid = false;
 		bool hasReset;
 
 		public readonly Dictionary<BoundingBoxAttachment, PolygonCollider2D> colliderTable = new Dictionary<BoundingBoxAttachment, PolygonCollider2D>();
@@ -128,7 +127,7 @@ namespace Spine.Unity {
 			}
 
 #if UNITY_EDITOR
-			valid = colliderTable.Count != 0;
+			bool valid = colliderTable.Count != 0;
 			if (!valid) {
 				if (this.gameObject.activeInHierarchy)
 					Debug.LogWarning("Bounding Box Follower not valid! Slot [" + slotName + "] does not contain any Bounding Box Attachments!");
