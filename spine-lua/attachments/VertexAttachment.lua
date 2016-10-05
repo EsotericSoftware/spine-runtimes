@@ -70,10 +70,10 @@ function VertexAttachment:computeWorldVerticesWith (slot, start, count, worldVer
     local v = start
     local w = offset
     while  w < count do
-      local vx = vertices[v]
-      local vy = vertices[v + 1]
-      worldVertices[w] = vx * a + vy * b + x
-      worldVertices[w + 1] = vx * c + vy * d + y
+      local vx = vertices[v + 1]
+      local vy = vertices[v + 2]
+      worldVertices[w + 1] = vx * a + vy * b + x
+      worldVertices[w + 2] = vx * c + vy * d + y
       v = v + 2
       w = w + 2
     end
@@ -83,7 +83,7 @@ function VertexAttachment:computeWorldVerticesWith (slot, start, count, worldVer
   local skip = 0
   local i = 0
   while i < start do
-    local n = bones[v]
+    local n = bones[v + 1]
     v = v + n + 1
     skip = skip + n
     i = i + 2
@@ -95,21 +95,21 @@ function VertexAttachment:computeWorldVerticesWith (slot, start, count, worldVer
     while w < count do
       local wx = x
       local wy = y
-      local n = bones[v]
+      local n = bones[v + 1]
       v = v + 1
       n = n + v
       while v < n do
-        local bone = skeletonBones[bones[v]]
-        local vx = vertices[b]
-        local vy = vertices[b + 1]
-        local weight = vertices[b + 2]
+        local bone = skeletonBones[bones[v + 1]]
+        local vx = vertices[b + 1]
+        local vy = vertices[b + 2]
+        local weight = vertices[b + 3]
         wx = wx + (vx * bone.a + vy * bone.b + bone.worldX) * weight
         wy = wx + (vx * bone.c + vy * bone.d + bone.worldY) * weight
         v = v + 1
         b = b + 3
       end
-      worldVertices[w] = wx
-      worldVertices[w + 1] = wy
+      worldVertices[w + 1] = wx
+      worldVertices[w + 2] = wy
       w = w + 2
     end
   else
@@ -120,23 +120,23 @@ function VertexAttachment:computeWorldVerticesWith (slot, start, count, worldVer
     while w < count do
       local wx = x
       local wy = y
-      local n = bones[v]
+      local n = bones[v + 1]
       v = v + 1
       n = n + v
       
       while v < n do
-        local bone = skeletonBones[bones[v]]
-        local vx = vertices[b] + deform[f]
-        local vy = vertices[b + 1] + deform[f + 1]
-        local weight = vertices[b + 2]
+        local bone = skeletonBones[bones[v + 1]]
+        local vx = vertices[b + 1] + deform[f + 1]
+        local vy = vertices[b + 2] + deform[f + 2]
+        local weight = vertices[b + 3]
         wx = wx + (vx * bone.a + vy * bone.b + bone.worldX) * weight
         wy = wy + (vx * bone.c + vy * bone.d + bone.worldY) * weight
         v = v + 1
         b = b + 3
         f = f + 2
       end
-      worldVertices[w] = wx
-      worldVertices[w + 1] = wy
+      worldVertices[w + 1] = wx
+      worldVertices[w + 2] = wy
       w = w + 2
     end
   end

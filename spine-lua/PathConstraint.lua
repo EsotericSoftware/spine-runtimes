@@ -108,22 +108,23 @@ function PathConstraint:update ()
   local spacing = self.spacing
   if scale or lengthSpacing then
     if scale then lengths = Utils.setArraySize(self.lengths, boneCount) end
-    local i = 1
-    local n = spacesCount
+    local i = 0
+    local n = spacesCount - 1
     while i < n do
-      local bone = bones[i];
+      local bone = bones[i + 1];
       local length = bone.data.length
       local x = length * bone.a
       local y = length * bone.c
       length = math_sqrt(x * x + y * y)
-      if scale then lengths[i] = length end
+      if scale then lengths[i + 1] = length end
       i = i + 1
-      if lengthSpacing then spaces[i] = math_max(0, length + spacing) else spaces[i] = spacing end
+      if lengthSpacing then spaces[i + 1] = math_max(0, length + spacing) else spaces[i + 1] = spacing end
     end
   else
-    local i = 2
-    while i <= spacesCount do
-      spaces[i] = spacing
+    local i = 1
+    while i < spacesCount do
+      spaces[i + 1] = spacing
+      i = i + 1
     end
   end
 
@@ -131,22 +132,22 @@ function PathConstraint:update ()
   local skeleton = self.target.bone.skeleton
   local skeletonX = skeleton.x
   local skeletonY = skeleton.y
-  local boneX = positions[0]
-  local boneY = positions[1]
+  local boneX = positions[1]
+  local boneY = positions[2]
   local offsetRotation = data.offsetRotation
   local tip = rotateMode == PathConstraintData.RotateMode.chain and offsetRotation == 0
-  local i = 1
-  local p = 4
-  while i <= boneCount do
-    local bone = bones[i]
+  local i = 0
+  local p = 3
+  while i < boneCount do
+    local bone = bones[i + 1]
     bone.worldX = bone.worldX + (boneX - skeletonX - bone.worldX) * translateMix
     bone.worldY = bone.worldY + (boneY - skeletonY - bone.worldY) * translateMix
-    local x = positions[p]
-    local y = positions[p + 1]
+    local x = positions[p + 1]
+    local y = positions[p + 2]
     local dx = x - boneX
     local dy = y - boneY
     if scale then
-      local length = lengths[i]
+      local length = lengths[i + 1]
       if length ~= 0 then
         local s = (math_sqrt(dx * dx + dy * dy) / length - 1) * rotateMix + 1
         bone.a = bone.a * s
@@ -164,9 +165,9 @@ function PathConstraint:update ()
       local cos = 0
       local sin = 0
       if tangents then
-        r = positions[p - 1]
-      elseif spaces[i + 1] == 0 then
-        r = positions[p + 2]
+        r = positions[p - 1 + 1]
+      elseif spaces[i + 1 + 1] == 0 then
+        r = positions[p + 2 + 1]
       else
         r = math_atan2(dy, dx)
       end
@@ -213,9 +214,9 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
     local pathLength = lengths[curveCount + 1];
     if percentPosition then position = position * pathLength end
     if percentSpacing then
-      local i = 1
-      while i <= spacesCount do
-        spaces[i] = spaces[i] * pathLength
+      local i = 0
+      while i < spacesCount do
+        spaces[i + 1] = spaces[i + 1] * pathLength
         i = i + 1
       end
     end
@@ -271,7 +272,7 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
           path:computeWorldVerticesWith(target, curve * 6 + 2, 8, world, 0)
         end
       end
-      self:addCurvePosition(p, world[0], world[1], world[2], world[3], world[4], world[5], world[6], world[7], out, o, tangents or (i > 0 and space == 0))
+      self:addCurvePosition(p, world[1], world[2], world[3], world[4], world[5], world[6], world[7], world[8], out, o, tangents or (i > 0 and space == 0))
     ::continue::
       i = i + 1
       o = o + 3
@@ -283,22 +284,22 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
   if closed then
     verticesLength = verticesLength + 2
     world = utils.setArraySize(self.world, verticesLength)
-    path.computeWorldVerticesWith(target, 2, verticesLength - 4, world, 0)
-    path.computeWorldVerticesWith(target, 0, 2, world, verticesLength - 4)
-    world[verticesLength - 2] = world[0]
-    world[verticesLength - 1] = world[1]
+    path:computeWorldVerticesWith(target, 2, verticesLength - 4, world, 0)
+    path:computeWorldVerticesWith(target, 0, 2, world, verticesLength - 4)
+    world[verticesLength - 2 + 1] = world[0 + 1]
+    world[verticesLength - 1 + 1] = world[1 + 1]
   else
     curveCount = curveCount - 1
     verticesLength = verticesLength - 4;
     world = utils.setArraySize(self.world, verticesLength)
-    path.computeWorldVerticesWith(target, 2, verticesLength, world, 0)
+    path:computeWorldVerticesWith(target, 2, verticesLength, world, 0)
   end
 
   -- Curve lengths.
   local curves = utils.setArraySize(self.curves, curveCount)
   local pathLength = 0;
-  local x1 = world[0]
-  local y1 = world[1]
+  local x1 = world[0 + 1]
+  local y1 = world[1 + 1]
   local cx1 = 0
   local cy1 = 0
   local cx2 = 0
@@ -313,15 +314,15 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
   local ddfy = 0
   local dfx = 0
   local dfy = 0
-  local i = 0
+  i = 0
   local w = 2
   while i < curveCount do
-    cx1 = world[w]
-    cy1 = world[w + 1]
-    cx2 = world[w + 2]
-    cy2 = world[w + 3]
-    x2 = world[w + 4]
-    y2 = world[w + 5]
+    cx1 = world[w + 1]
+    cy1 = world[w + 2]
+    cx2 = world[w + 3]
+    cy2 = world[w + 4]
+    x2 = world[w + 5]
+    y2 = world[w + 6]
     tmpx = (x1 - cx1 * 2 + cx2) * 0.1875
     tmpy = (y1 - cy1 * 2 + cy2) * 0.1875
     dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.09375
@@ -342,7 +343,7 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
     dfx = dfx + ddfx + dddfx
     dfy = dfy + ddfy + dddfy
     pathLength = pathLength + math_sqrt(dfx * dfx + dfy * dfy)
-    curves[i] = pathLength
+    curves[i + 1] = pathLength
     x1 = x2
     y1 = y2
     i = i + 1
@@ -352,7 +353,7 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
   if percentSpacing then
     local i = 0
     while  i < spacesCount do
-      spaces[i] = spaces[i] * pathLength
+      spaces[i + 1] = spaces[i + 1] * pathLength
       i = i + 1
     end
   end
@@ -364,7 +365,7 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
   local curve = 0
   local segment = 0
   while i < spacesCount do
-    local space = spaces[i]
+    local space = spaces[i + 1]
     position = position + space
     local p = position
 
@@ -381,13 +382,13 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
     end
 
     -- Determine curve containing position.
-      while true do
-      local length = lengths[curve + 1]
+    while true do
+      local length = curves[curve + 1]
       if p <= length then
         if curve == 0 then
           p = p / length
         else
-          local prev = lengths[curve - 1 + 1]
+          local prev = curves[curve - 1 + 1]
           p = (p - prev) / (length - prev)
         end
         break
@@ -399,14 +400,14 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
     if curve ~= prevCurve then
       prevCurve = curve
       local ii = curve * 6
-      x1 = world[ii]
-      y1 = world[ii + 1]
-      cx1 = world[ii + 2]
-      cy1 = world[ii + 3]
-      cx2 = world[ii + 4]
-      cy2 = world[ii + 5]
-      x2 = world[ii + 6]
-      y2 = world[ii + 7]
+      x1 = world[ii + 1]
+      y1 = world[ii + 2]
+      cx1 = world[ii + 3]
+      cy1 = world[ii + 4]
+      cx2 = world[ii + 5]
+      cy2 = world[ii + 6]
+      x2 = world[ii + 7]
+      y2 = world[ii + 8]
       tmpx = (x1 - cx1 * 2 + cx2) * 0.03
       tmpy = (y1 - cy1 * 2 + cy2) * 0.03
       dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.006
@@ -416,7 +417,7 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
       dfx = (cx1 - x1) * 0.3 + tmpx + dddfx * 0.16666667
       dfy = (cy1 - y1) * 0.3 + tmpy + dddfy * 0.16666667
       curveLength = math_sqrt(dfx * dfx + dfy * dfy)
-      segments[0] = curveLength
+      segments[1] = curveLength
       ii = 1
       while ii < 8 do
         dfx = dfx + ddfx
@@ -424,34 +425,34 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
         ddfx = ddfx + dddfx
         ddfy = ddfy + dddfy
         curveLength = curveLength + math_sqrt(dfx * dfx + dfy * dfy)
-        segments[ii] = curveLength
+        segments[ii + 1] = curveLength
         ii = ii + 1
       end
       dfx = dfx + ddfx
       dfy = dfy + ddfy
       curveLength = curveLength + math_sqrt(dfx * dfx + dfy * dfy)
-      segments[8] = curveLength
+      segments[9] = curveLength
       dfx = dfx + ddfx + dddfx
       dfy = dfy + ddfy + dddfy
       curveLength = curveLength + math_sqrt(dfx * dfx + dfy * dfy)
-      segments[9] = curveLength
+      segments[10] = curveLength
       segment = 0
     end
 
     -- Weight by segment length.
     p = p * curveLength
     while true do
-      local length = segments[segment]
+      local length = segments[segment + 1]
       if p <= length then
         if segment == 0 then
           p = p / length
         else
-          local prev = segments[segment - 1]
+          local prev = segments[segment - 1 + 1]
           p = segment + (p - prev) / (length - prev)
         end
         break;
       end
-      segment = segment +1
+      segment = segment + 1
     end
     self:addCurvePosition(p * 0.1, x1, y1, cx1, cy1, cx2, cy2, x2, y2, out, o, tangents or (i > 0 and space == 0))
     
@@ -463,28 +464,28 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 end
 
 function PathConstraint:addBeforePosition (p, temp, i, out, o)
-  local x1 = temp[i]
-  local y1 = temp[i + 1]
-  local dx = temp[i + 2] - x1
-  local dy = temp[i + 3] - y1
+  local x1 = temp[i + 1]
+  local y1 = temp[i + 2]
+  local dx = temp[i + 3] - x1
+  local dy = temp[i + 4] - y1
   local r = math_atan2(dy, dx)
-  out[o] = x1 + p * math_cos(r)
-  out[o + 1] = y1 + p * math_sin(r)
-  out[o + 2] = r
+  out[o + 1] = x1 + p * math_cos(r)
+  out[o + 2] = y1 + p * math_sin(r)
+  out[o + 3] = r
 end
 
 function PathConstraint:addAfterPosition(p, temp, i, out, o)
-  local x1 = temp[i + 2]
-  local y1 = temp[i + 3]
-  local dx = x1 - temp[i]
-  local dy = y1 - temp[i + 1]
+  local x1 = temp[i + 3]
+  local y1 = temp[i + 4]
+  local dx = x1 - temp[i + 1]
+  local dy = y1 - temp[i + 2]
   local r = math_atan2(dy, dx)
-  out[o] = x1 + p * math_cos(r)
-  out[o + 1] = y1 + p * math_sin(r)
-  out[o + 2] = r
+  out[o + 1] = x1 + p * math_cos(r)
+  out[o + 2] = y1 + p * math_sin(r)
+  out[o + 3] = r
 end
 
-function PathConstraint.addCurvePosition(p, x1, y1, cx1, cy1, cx2, cy2, x2, y2, out, o, tangents)
+function PathConstraint:addCurvePosition(p, x1, y1, cx1, cy1, cx2, cy2, x2, y2, out, o, tangents)
   if p == 0 then p = 0.0001 end
   local tt = p * p
   local ttt = tt * p
@@ -497,9 +498,9 @@ function PathConstraint.addCurvePosition(p, x1, y1, cx1, cy1, cx2, cy2, x2, y2, 
   local utt3 = ut3 * p
   local x = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt
   local y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt
-  out[o] = x
-  out[o + 1] = y
-  if tangents then out[o + 2] = math_atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt)) end
+  out[o + 1] = x
+  out[o + 2] = y
+  if tangents then out[o + 3] = math_atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt)) end
 end
 
 return PathConstraint
