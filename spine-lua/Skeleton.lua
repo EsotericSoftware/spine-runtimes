@@ -35,6 +35,7 @@ local IkConstraint = require "spine-lua.IkConstraint"
 local PathConstraint = require "spine-lua.PathConstraint"
 local TransformConstraint = require "spine-lua.TransformConstraint"
 local AttachmentLoader = require "spine-lua.AttachmentLoader"
+local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local Color = require "spine-lua.Color"
 
 local setmetatable = setmetatable
@@ -160,7 +161,35 @@ function Skeleton:updateCache ()
     constrained[#constrained].sorted = true    
   end
 
-	-- FIXME path constraints
+	-- path constraints
+  local pathConstraints = self.pathConstraints
+  for i,constraint in ipairs(pathConstraints) do
+    local slot = constraint.target
+    local slotIndex = slot.data.index
+    local slotBone = slot.bone
+    if self.skin then self:sortPathConstraintAttachment(self.skin, slotIndex, slotBone) end
+    if self.data.defaultSkin and self.data.defaultSkin ~= self.skin then self:sortPathConstraintAttachment(self.data.defaultSkin, slotIndex, slotBone) end
+    for i,skin in ipairs(self.data.skins) do
+      self:sortPathConstraintAttachment(skin, slotIndex, slotBone)      
+    end
+    
+    local attachment = slot.attachment
+    if attachment.type == AttachmentType.path then self:sortPathConstraintAttachmentWith(attachment, slotBone) end
+    
+    local constrained = constraint.bones
+    for i,c in ipairs(constrained) do
+      self:sortBone(c)
+    end
+    
+    table_insert(updateCache, constraint)
+    
+    for i,c in ipairs(constrained) do
+      self:sortReset(c.children)
+    end
+    for i,c in ipairs(constrained) do
+      c.sorted = true
+    end
+  end
   
   -- transform constraints
   local transformConstraints = self.transformConstraints
@@ -188,11 +217,24 @@ function Skeleton:updateCache ()
 end
 
 function Skeleton:sortPathConstraintAttachment(skin, slotIndex, slotBone)
-  -- FIXME
+  local attachments = skin.attachments[slotIndex]
+  if not attachments then return end
+  for key,attachment in pairs(attachments) do
+    self:sortPathConstraintAttachmentWith(attachment, slotBone)
+  end
 end
 
 function Skeleton:sortPathConstraintAttachmentWith(attachment, slotBone)
-  -- FIXME
+  if attachment.type ~= AttachmentType.path then return end
+  local pathBones = attachment.bones
+  if not pathBones then
+    self:sortBone(slotBone)
+  else
+    local bones = self.bones
+    for i,boneIndex in ipairs(pathBones) do
+      self:sortBone(bones[boneIndex])
+    end
+  end
 end
 
 function Skeleton:sortBone(bone)

@@ -192,7 +192,35 @@ function SkeletonJson.new (attachmentLoader)
       end
     end
     
-    -- Path constraints FIXME
+    -- Path constraints
+    if root["path"] then
+      for i,constraintMap in ipairs(root.path) do
+        local data = PathConstraintData.new(constraintMap.name);
+
+        for i,boneName in ipairs(constraintMap.bones) do
+          local bone = skeletonData:findBone(boneName)
+          if not bone then error("Path constraint bone not found: " .. boneName, 2) end
+          table_insert(data.bones, bone)
+        end
+
+        local targetName = constraintMap.target;
+        data.target = skeletonData:findSlot(targetName)
+        if data.target == nil then error("Path target slot not found: " .. targetName, 2) end
+
+        data.positionMode = PathConstraintData.PositionMode[getValue(constraintMap, "positionMode", "percent")]
+        data.spacingMode = PathConstraintData.SpacingMode[getValue(constraintMap, "spacingMode", "length")]
+        data.rotateMode = PathConstraintData.RotateMode[getValue(constraintMap, "rotateMode", "tangent")]
+        data.offsetRotation = getValue(constraintMap, "rotation", 0);
+        data.position = getValue(constraintMap, "position", 0);
+        if data.positionMode == PathConstraintData.PositionMode.fixed then data.position = data.position * scale end
+        data.spacing = getValue(constraintMap, "spacing", 0);
+        if data.spacingMode == PathConstraintData.SpacingMode.length or data.spacingMode == PathConstraintData.SpacingMode.fixed then data.spacing = data.spacing * scale end
+        data.rotateMix = getValue(constraintMap, "rotateMix", 1);
+        data.translateMix = getValue(constraintMap, "translateMix", 1);
+
+        table_insert(skeletonData.pathConstraints, data)
+      end
+    end
 
 		-- Skins.
 		if root["skins"] then
@@ -545,7 +573,48 @@ function SkeletonJson.new (attachmentLoader)
       end
     end
     
-    -- FIXME path constraint timelines.
+    -- Path constraint timelines.
+    if map.paths then
+      for constraintName,constraintMap in pairs(map.paths) do
+        local index = skeletonData:findPathConstraint(constraintName)
+        if index == -1 then error("Path constraint not found: " .. constraintName, 2) end
+        local data = skeletonData.pathConstraints[index]
+        for timelineName, timelineMap in pairs(constraintMAp) do
+          if timelineName == "position" or timelineName == "spacing" then
+            local timeline = nil
+            local timelineScale = 1
+            if timelineName == "spacing" then
+              timeline = Animation.PathConstraintSpacingTimeline.new(#timelineMap)
+              if data.spacingMode == PathConstraintData.SpacingMode.length or data.spacingMode == PathConstraintData.SpacingMode.fixed then timelineScale = scale end
+            else
+              timeline = Animation.PathConstraintPositionTimeline.new(#timelineMap)
+              if data.positionMode == PathConstraintData.PositionMode.fixed then timelineScale = scale end              
+            end
+            timeline.pathConstraintIndex = index
+            local frameIndex = 0
+            for i,valueMap in ipairs(timelineMap) do
+              timeline:setFrame(frameIndex, valueMap.time, getValue(valueMap, timelineName, 0) * timelineScale)
+              readCurve(valueMap, timeline, frameIndex)
+              frameIndex = frameindex + 1
+            end
+            table_insert(timelines, timeline)
+            duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.PathConstraintPositionTimeline.ENTRIES])
+          elseif timelineName == "mix" then
+            local timeline = Animation.PathConstraintMixTimeline.new(#timelineMap)
+            timeline.pathConstraintIndex = index
+            local frameIndex = 0
+            for i,valueMap in ipairs(timelineMap) do
+              timeline:setFrame(frameIndex, valueMap.time, getValue(valueMap, "rotateMix", 1), getValue(valueMap, "translateMix", 1))
+              readCurve(valueMap, timeline, frameIndex)
+              frameIndex = frameIndex + 1
+            end
+            table_insert(timelines, timeline)
+            duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.PathConstraintMixTimeline.ENTRIES])
+          end          
+        end
+      end
+    end
+    
     -- Deform timelines.
     if map.deform then
       for deformName, deformMap in pairs(map.deform) do

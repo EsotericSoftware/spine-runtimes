@@ -54,7 +54,7 @@ function PathConstraint.new (data, skeleton)
 	local self = {
 		data = data,
 		bones = {},
-		target = nil,
+		target = skeleton:findSlot(data.target.name),
     position = data.position,
     spacing = data.spacing,
     rotateMix = data.rotateMix,

@@ -790,9 +790,136 @@ function Animation.TransformConstraintTimeline.new (frameCount)
 	return self
 end
 
+Animation.PathConstraintPositionTimeline = {}
+Animation.PathConstraintPositionTimeline.ENTRIES = 2
+function Animation.PathConstraintPositionTimeline.new (frameCount)
+  local ENTRIES = Animation.PathConstraintPositionTimeline.ENTRIES
+	local PREV_TIME = -2
+  local PREV_VALUE = -1
+  local VALUE = 1
 
--- FIXME PathConstraintPositionTimeline
--- FIXME PathCosntraintSpacingTimeline
--- FIXME PathConstraintMixTimeline
+	local self = Animation.CurveTimeline.new(frameCount)
+  self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
+	self.pathConstraintIndex = -1
+
+	function self:setFrame (frameIndex, time, value)
+		frameIndex = frameIndex * ENTRIES
+		self.frames[frameIndex] = time
+		self.frames[frameIndex + VALUE] = value
+	end
+
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
+    local frames = self.frames
+    if (time < frames[0]) then return end -- Time is before first frame.
+
+    local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
+
+    if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
+      local i = zlen(frames.length)
+      constraint.position = constraint.position + (frames[i + PREV_VALUE] - constraint.position) * alpha
+      return
+    end
+
+    -- Interpolate between the previous frame and the current frame.
+    local frame = binarySearch(frames, time, ENTRIES)
+    local position = frames[frame + PREV_VALUE]
+    local frameTime = frames[frame]
+    local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
+
+    constraint.position = constraint.position + (position + (frames[frame + VALUE] - position) * percent - constraint.position) * alpha
+	end
+
+	return self
+end
+
+Animation.PathConstraintSpacingTimeline = {}
+Animation.PathConstraintSpacingTimeline.ENTRIES = 2
+function Animation.PathConstraintSpacingTimeline.new (frameCount)
+  local ENTRIES = Animation.PathConstraintSpacingTimeline.ENTRIES
+	local PREV_TIME = -2
+  local PREV_VALUE = -1
+  local VALUE = 1
+
+	local self = Animation.CurveTimeline.new(frameCount)
+  self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
+	self.pathConstraintIndex = -1
+
+	function self:setFrame (frameIndex, time, value)
+		frameIndex = frameIndex * ENTRIES
+		self.frames[frameIndex] = time
+		self.frames[frameIndex + VALUE] = value
+	end
+
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
+    local frames = self.frames
+    if (time < frames[0]) then return end -- Time is before first frame.
+
+    local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
+
+    if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
+      local i = zlen(frames.length)
+      constraint.spacing = constraint.spacing + (frames[i + PREV_VALUE] - constraint.spacing) * alpha
+      return
+    end
+
+    -- Interpolate between the previous frame and the current frame.
+    local frame = binarySearch(frames, time, ENTRIES)
+    local spacing = frames[frame + PREV_VALUE]
+    local frameTime = frames[frame]
+    local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
+
+    constraint.spacing = constraint.spacing + (spacing + (frames[frame + VALUE] - spacing) * percent - constraint.spacing) * alpha
+	end
+
+	return self
+end
+
+Animation.PathConstraintMixTimeline = {}
+Animation.PathConstraintMixTimeline.ENTRIES = 3
+function Animation.PathConstraintMixTimeline.new (frameCount)
+  local ENTRIES = Animation.PathConstraintMixTimeline.ENTRIES
+	local PREV_TIME = -3
+  local PREV_ROTATE = -2
+  local PREV_TRANSLATE = -1
+  local ROTATE = 1
+  local TRANSLATE = 2
+
+	local self = Animation.CurveTimeline.new(frameCount)
+  self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
+	self.pathConstraintIndex = -1
+
+	function self:setFrame (frameIndex, time, rotateMix, translateMix)
+		frameIndex = frameIndex * ENTRIES
+		self.frames[frameIndex] = time
+		self.frames[frameIndex + ROTATE] = rotateMix
+    self.frames[frameIndex + TRANSLATE] = translateMix
+	end
+
+	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
+    local frames = self.frames
+    if (time < frames[0]) then return end -- Time is before first frame.
+
+    local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
+
+    if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
+      local i = zlen(frames.length)
+      constraint.rotateMix = constraint.rotateMix + (frames[i + PREV_ROTATE] - constraint.rotateMix) * alpha
+      constraint.translateMix = constraint.translateMix + (frames[i + PREV_TRANSLATE] - constraint.translateMix) * alpha
+      return
+    end
+
+    -- Interpolate between the previous frame and the current frame.
+    local frame = binarySearch(frames, time, ENTRIES)
+    local rotate = frames[frame + PREV_ROTATE]
+    local translate = frames[frame + PREV_TRANSLATE]
+    local frameTime = frames[frame]
+    local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
+
+    constraint.rotateMix = constraint.rotateMix (rotate + (frames[frame + ROTATE] - rotate) * percent - constraint.rotateMix) * alpha
+    constraint.translateMix = constraint.translateMix (translate + (frames[frame + TRANSLATE] - translate) * percent - constraint.translateMix) * alpha
+	end
+
+	return self
+end
 
 return Animation

@@ -1,5 +1,5 @@
 {
-"skeleton": { "hash": "kLGGQpgTrt+T2QPj+ujwT9jlWZA", "spine": "3.4.02", "width": 1333.78, "height": 1142.91, "images": "" },
+"skeleton": { "hash": "LE53HEymsel6hCe5BZzHA4jyIuo", "spine": "3.4.02", "width": 1333.78, "height": 1142.91, "images": "" },
 "bones": [
 	{ "name": "root", "x": 28.68, "y": -105.71 },
 	{ "name": "attachment", "parent": "root", "x": -267.71, "y": -366.62 },
@@ -56,13 +56,13 @@
 			"images/spine": { "width": 377, "height": 120 }
 		},
 		"draworder2": {
-			"images/logo": { "width": 120, "height": 120 }
+			"images/logo": { "width": 400, "height": 400 }
 		},
 		"images/spine": {
 			"images/spine": { "width": 377, "height": 120 }
 		},
 		"images/spine10": {
-			"images/logo": { "width": 120, "height": 120 },
+			"images/logo": { "width": 400, "height": 400 },
 			"images/spine": { "width": 377, "height": 120 }
 		},
 		"images/spine12": {
@@ -76,7 +76,7 @@
 				"width": 377,
 				"height": 120
 			},
-			"linkedmesh": { "type": "linkedmesh", "path": "images/logo", "parent": "images/spine", "width": 120, "height": 120 }
+			"linkedmesh": { "type": "linkedmesh", "path": "images/logo", "parent": "images/spine", "width": 400, "height": 400 }
 		},
 		"images/spine2": {
 			"images/spine": { "width": 377, "height": 120 }

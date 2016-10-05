@@ -1,19 +1,19 @@
 
 test.png
-size: 512,512
+size: 1024,1024
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 images/logo
   rotate: false
-  xy: 2, 137
-  size: 120, 120
-  orig: 120, 120
+  xy: 2, 124
+  size: 400, 400
+  orig: 400, 400
   offset: 0, 0
   index: -1
 images/spine
   rotate: false
-  xy: 2, 259
+  xy: 2, 2
   size: 377, 120
   orig: 377, 120
   offset: 0, 0
