@@ -29,6 +29,10 @@
 -- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
+-- FIXME the logic in this file uses 0-based indexing. Each array
+-- access adds 1 to the calculated index. We should switch the logic 
+-- to 1-based indexing eventually.
+
 local setmetatable = setmetatable
 local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local PathConstraintData = require "spine-lua.PathConstraintData"
@@ -39,10 +43,12 @@ local math_atan2 = math.atan2
 local math_sqrt = math.sqrt
 local math_acos = math.acos
 local math_sin = math.sin
+local math_cos = math.cos
 local table_insert = table.insert
 local math_deg = math.deg
 local math_rad = math.rad
 local math_abs = math.abs
+local math_max = math.max
 
 local PathConstraint = {}
 PathConstraint.__index = PathConstraint
@@ -72,8 +78,8 @@ function PathConstraint.new (data, skeleton)
 	}
 	setmetatable(self, PathConstraint)
   
-  for i,bone in ipairs(data.bones) do
-    table_insert(self.bones, skeleton:findBone(bone))
+  for i,boneData in ipairs(data.bones) do
+    table_insert(self.bones, skeleton:findBone(boneData.name))
   end
 
 	return self
@@ -97,8 +103,8 @@ function PathConstraint:update ()
   local spacingMode = data.spacingMode
   local lengthSpacing = spacingMode == PathConstraintData.SpacingMode.length
   local rotateMode = data.rotateMode
-  local tangents = rotateMode == PathConstraintData.RotateMode.Tangent
-  local scale = rotateMode == PathConstraintData.RotateMode.ChainScale 
+  local tangents = rotateMode == PathConstraintData.RotateMode.tangent
+  local scale = rotateMode == PathConstraintData.RotateMode.chainscale 
   local bones = self.bones
   local boneCount = #bones
   local spacesCount = boneCount + 1
@@ -107,7 +113,7 @@ function PathConstraint:update ()
   local lengths = nil
   local spacing = self.spacing
   if scale or lengthSpacing then
-    if scale then lengths = Utils.setArraySize(self.lengths, boneCount) end
+    if scale then lengths = utils.setArraySize(self.lengths, boneCount) end
     local i = 0
     local n = spacesCount - 1
     while i < n do

@@ -35,6 +35,7 @@ local math_atan2 = math.atan2
 local math_sqrt = math.sqrt
 local math_acos = math.acos
 local math_sin = math.sin
+local math_cos = math.cos
 local table_insert = table.insert
 local math_deg = math.deg
 local math_rad = math.rad
@@ -166,7 +167,6 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
   local a1 = 0
   local a2 = 0
   
-  ::outer::
   if u then
     l2 = l2 * psx
     local cos = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2)
@@ -197,7 +197,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
       local r0 = q / c2
       local r1 = c / q
       local r = r1
-      if math_abs(r0) < math_abs(r1) then r = r1 end
+      if math_abs(r0) < math_abs(r1) then r = r0 end
       if r * r <= dd then
         y = math_sqrt(dd - r * r) * bendDir
         a1 = ta - math_atan2(y, r)
@@ -205,8 +205,9 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
         goto outer
       end
     end
+    ::outer::
     local minAngle = 0
-    local minDist = Number.MAX_VALUE
+    local minDist = 9999999999
     local minX = 0
     local minY = 0
     local maxAngle = 0
@@ -228,8 +229,8 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
       minX = x
     end
     local angle = math_acos(-a * l1 / (aa - bb))
-    x = a * Math.cos(angle) + l1
-    y = b * Math.sin(angle)
+    x = a * math_cos(angle) + l1
+    y = b * math_sin(angle)
     d = x * x + y * y
     if d < minDist then
       minAngle = angle

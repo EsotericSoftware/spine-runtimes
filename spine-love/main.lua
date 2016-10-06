@@ -32,20 +32,23 @@
 local spine = require "spine-love.spine-love"
 
 local skeletons = {}
-local activeSkeleton = "test"
+local activeSkeleton = 1
 
-function loadSkeleton (name, animation)
+function loadSkeleton (jsonFile, atlasFile, animation, skin, scale, x, y)
   local loader = function (path) return love.graphics.newImage("data/" .. path) end
-  local atlas = spine.TextureAtlas.new(spine.utils.readFile("data/" .. name .. ".atlas"), loader)
+  local atlas = spine.TextureAtlas.new(spine.utils.readFile("data/" .. atlasFile .. ".atlas"), loader)
   
   local json = spine.SkeletonJson.new(spine.TextureAtlasAttachmentLoader.new(atlas))
-  json.scale = 0.5
-  local skeletonData = json:readSkeletonDataFile("data/" .. name .. ".json")
+  json.scale = scale
+  local skeletonData = json:readSkeletonDataFile("data/" .. jsonFile .. ".json")
   local skeleton = spine.Skeleton.new(skeletonData)
-  skeleton.x = love.graphics.getWidth() / 2
-  skeleton.y = love.graphics.getHeight() / 2
+  skeleton.x = x
+  skeleton.y = y
   skeleton.flipX = false
   skeleton.flipY = true
+  if skin then 
+    skeleton:setSkin(skin)
+  end
   skeleton:setToSetupPose()
   
   local stateData = spine.AnimationStateData.new(skeletonData)
@@ -65,14 +68,21 @@ function loadSkeleton (name, animation)
     print(trackIndex.." event: "..state:getCurrent(trackIndex).animation.name..", "..event.data.name..", "..event.intValue..", "..event.floatValue..", '"..(event.stringValue or "").."'")
   end
   
+  state:update(0.5)
+  state:apply(skeleton)
+  
   return { state = state, skeleton = skeleton }
 end
 
 function love.load(arg)
   if arg[#arg] == "-debug" then require("mobdebug").start() end
-  skeletons["test"] = loadSkeleton("test", "animation")
-  -- skeletons["spineboy"] = loadSkeleton("spineboy", "test")
-  -- skeletons["raptor"] = loadSkeleton("raptor", "walk")
+  -- table.insert(skeletons, loadSkeleton("test", "test", "animation", nil, 0.5, 400, 300))
+  -- table.insert(skeletons, loadSkeleton("spineboy", "spineboy", "walk", nil, 0.5, 400, 500))
+  -- table.insert(skeletons, loadSkeleton("raptor", "raptor", "walk", nil, 0.3, 400, 500))
+  -- table.insert(skeletons, loadSkeleton("goblins-mesh", "goblins", "walk", "goblin", 1, 400, 500))
+  -- table.insert(skeletons, loadSkeleton("tank", "tank", "drive", nil, 0.2, 600, 500))
+  -- table.insert(skeletons, loadSkeleton("vine", "vine", "animation", nil, 0.3, 400, 500))
+  table.insert(skeletons, loadSkeleton("stretchyman", "stretchyman", "sneak", nil, 0.3, 400, 500))
   skeletonRenderer = spine.SkeletonRenderer.new()
 end
 
@@ -80,14 +90,19 @@ function love.update (delta)
 	-- Update the state with the delta time, apply it, and update the world transforms.
   local state = skeletons[activeSkeleton].state
   local skeleton = skeletons[activeSkeleton].skeleton
-	state:update(delta)
-	state:apply(skeleton)
+	-- state:update(delta)
+	-- state:apply(skeleton)
 	skeleton:updateWorldTransform()
 end
 
 function love.draw ()
-  love.graphics.setBackgroundColor(255, 0, 255, 255)
+  love.graphics.setBackgroundColor(128, 128, 128, 255)
 	love.graphics.setColor(255, 255, 255)
   local skeleton = skeletons[activeSkeleton].skeleton
   skeletonRenderer:draw(skeleton)
+end
+
+function love.mousepressed (x, y, button, istouch)
+  activeSkeleton = activeSkeleton + 1
+  if activeSkeleton > #skeletons then activeSkeleton = 1 end
 end

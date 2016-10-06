@@ -125,7 +125,7 @@ function SkeletonJson.new (attachmentLoader)
 
 				local color = slotMap["color"]
 				if color then
-					data.color.set(tonumber(color:sub(1, 2), 16) / 255, 
+					data.color:set(tonumber(color:sub(1, 2), 16) / 255, 
                          tonumber(color:sub(3, 4), 16) / 255,
                          tonumber(color:sub(5, 6), 16) / 255,
                          tonumber(color:sub(7, 8), 16) / 255)
@@ -207,9 +207,9 @@ function SkeletonJson.new (attachmentLoader)
         data.target = skeletonData:findSlot(targetName)
         if data.target == nil then error("Path target slot not found: " .. targetName, 2) end
 
-        data.positionMode = PathConstraintData.PositionMode[getValue(constraintMap, "positionMode", "percent")]
-        data.spacingMode = PathConstraintData.SpacingMode[getValue(constraintMap, "spacingMode", "length")]
-        data.rotateMode = PathConstraintData.RotateMode[getValue(constraintMap, "rotateMode", "tangent")]
+        data.positionMode = PathConstraintData.PositionMode[getValue(constraintMap, "positionMode", "percent"):lower()]
+        data.spacingMode = PathConstraintData.SpacingMode[getValue(constraintMap, "spacingMode", "length"):lower()]
+        data.rotateMode = PathConstraintData.RotateMode[getValue(constraintMap, "rotateMode", "tangent"):lower()]
         data.offsetRotation = getValue(constraintMap, "rotation", 0);
         data.position = getValue(constraintMap, "position", 0);
         if data.positionMode == PathConstraintData.PositionMode.fixed then data.position = data.position * scale end
@@ -294,7 +294,7 @@ function SkeletonJson.new (attachmentLoader)
 			
 			local color = map["color"]
 			if color then
-				region.color.set(tonumber(color:sub(1, 2), 16) / 255, 
+				region.color:set(tonumber(color:sub(1, 2), 16) / 255, 
                          tonumber(color:sub(3, 4), 16) / 255,
                          tonumber(color:sub(5, 6), 16) / 255,
                          tonumber(color:sub(7, 8), 16) / 255)
@@ -309,7 +309,7 @@ function SkeletonJson.new (attachmentLoader)
       readVertices(map, box, map.vertexCount * 2)
       local color = map.color
       if color then
-        box.color.set(tonumber(color:sub(1, 2), 16) / 255, 
+        box.color:set(tonumber(color:sub(1, 2), 16) / 255, 
                       tonumber(color:sub(3, 4), 16) / 255,
                       tonumber(color:sub(5, 6), 16) / 255,
                       tonumber(color:sub(7, 8), 16) / 255)
@@ -323,7 +323,7 @@ function SkeletonJson.new (attachmentLoader)
       
       local color = map.color
 			if color then
-				mesh.color.set(tonumber(color:sub(1, 2), 16) / 255, 
+				mesh.color:set(tonumber(color:sub(1, 2), 16) / 255, 
                          tonumber(color:sub(3, 4), 16) / 255,
                          tonumber(color:sub(5, 6), 16) / 255,
                          tonumber(color:sub(7, 8), 16) / 255)
@@ -371,7 +371,7 @@ function SkeletonJson.new (attachmentLoader)
 
       local color = map.color
 			if color then
-				mesh.color.set(tonumber(color:sub(1, 2), 16) / 255, 
+				path.color:set(tonumber(color:sub(1, 2), 16) / 255, 
                          tonumber(color:sub(3, 4), 16) / 255,
                          tonumber(color:sub(5, 6), 16) / 255,
                          tonumber(color:sub(7, 8), 16) / 255)
@@ -576,10 +576,10 @@ function SkeletonJson.new (attachmentLoader)
     -- Path constraint timelines.
     if map.paths then
       for constraintName,constraintMap in pairs(map.paths) do
-        local index = skeletonData:findPathConstraint(constraintName)
+        local index = skeletonData:findPathConstraintIndex(constraintName)
         if index == -1 then error("Path constraint not found: " .. constraintName, 2) end
         local data = skeletonData.pathConstraints[index]
-        for timelineName, timelineMap in pairs(constraintMAp) do
+        for timelineName, timelineMap in pairs(constraintMap) do
           if timelineName == "position" or timelineName == "spacing" then
             local timeline = nil
             local timelineScale = 1
@@ -595,7 +595,7 @@ function SkeletonJson.new (attachmentLoader)
             for i,valueMap in ipairs(timelineMap) do
               timeline:setFrame(frameIndex, valueMap.time, getValue(valueMap, timelineName, 0) * timelineScale)
               readCurve(valueMap, timeline, frameIndex)
-              frameIndex = frameindex + 1
+              frameIndex = frameIndex + 1
             end
             table_insert(timelines, timeline)
             duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.PathConstraintPositionTimeline.ENTRIES])

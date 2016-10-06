@@ -29,6 +29,10 @@
 -- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
+-- FIXME the logic in this file uses 0-based indexing. Each array
+-- access adds 1 to the calculated index. We should switch the logic 
+-- to 1-based indexing eventually.
+
 local setmetatable = setmetatable
 
 local AttachmentType = require "spine-lua.attachments.AttachmentType"
@@ -52,6 +56,7 @@ function VertexAttachment:computeWorldVertices (slot, worldVertices)
 end
 
 function VertexAttachment:computeWorldVerticesWith (slot, start, count, worldVertices, offset)
+  count = count + offset
   local skeleton = slot.bone.skeleton
   local x = skeleton.x
   local y = skeleton.y
@@ -104,7 +109,7 @@ function VertexAttachment:computeWorldVerticesWith (slot, start, count, worldVer
         local vy = vertices[b + 2]
         local weight = vertices[b + 3]
         wx = wx + (vx * bone.a + vy * bone.b + bone.worldX) * weight
-        wy = wx + (vx * bone.c + vy * bone.d + bone.worldY) * weight
+        wy = wy + (vx * bone.c + vy * bone.d + bone.worldY) * weight
         v = v + 1
         b = b + 3
       end

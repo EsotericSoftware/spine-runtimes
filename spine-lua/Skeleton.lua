@@ -331,7 +331,7 @@ end
 -- Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was 
 -- no old skin, each slot's setup mode attachment is attached from the new skin.
 function Skeleton:setSkin (skinName)
-  local skin = self.data.findSkin(skinName)
+  local skin = self.data:findSkin(skinName)
   if not skin then error("Skin not found: " .. skinName, 2) end
   self:setSkinByReference(skin)
 end
@@ -339,7 +339,7 @@ end
 function Skeleton:setSkinByReference(newSkin)
   if newSkin then
     if self.skin then
-      newSkin.attachAll(self, self.skin)
+      newSkin:attachAll(self, self.skin)
     else
       local slots = self.slots
       for i, slot in ipairs(slots) do

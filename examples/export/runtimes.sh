@@ -68,6 +68,36 @@ cp -f ../tank/export/tank.json ../../spine-cocos2dx/example/Resources/common/
 cp -f ../tank/export/tank.atlas ../../spine-cocos2dx/example/Resources/common/
 cp -f ../tank/export/tank.png ../../spine-cocos2dx/example/Resources/common/
 
+echo "spine-love"
+rm -f ../../spine-love/data/*
+cp -f ../goblins/export/goblins-mesh.json ../../spine-love/data
+cp -f ../goblins/export/goblins.atlas ../../spine-love/data
+cp -f ../goblins/export/goblins.png ../../spine-love/data
+
+cp -f ../raptor/export/raptor.json ../../spine-love/data
+cp -f ../raptor/export/raptor.atlas ../../spine-love/data
+cp -f ../raptor/export/raptor.png ../../spine-love/data
+
+cp -f ../spineboy/export/spineboy.json ../../spine-love/data
+cp -f ../spineboy/export/spineboy.atlas ../../spine-love/data
+cp -f ../spineboy/export/spineboy.png ../../spine-love/data
+
+cp -f ../tank/export/tank.json ../../spine-love/data
+cp -f ../tank/export/tank.atlas ../../spine-love/data
+cp -f ../tank/export/tank.png ../../spine-love/data
+
+cp -f ../vine/export/vine.json ../../spine-love/data
+cp -f ../vine/export/vine.atlas ../../spine-love/data
+cp -f ../vine/export/vine.png ../../spine-love/data
+
+cp -f ../stretchyman/export/stretchyman.json ../../spine-love/data
+cp -f ../stretchyman/export/stretchyman.atlas ../../spine-love/data
+cp -f ../stretchyman/export/stretchyman.png ../../spine-love/data
+
+cp -f ../test/export/test.json ../../spine-love/data
+cp -f ../test/export/test.atlas ../../spine-love/data
+cp -f ../test/export/test.png ../../spine-love/data
+
 echo "spine-sfml"
 rm -f ../../spine-sfml/data/*
 cp -f ../goblins/export/goblins-mesh.json ../../spine-sfml/data/

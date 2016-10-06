@@ -815,7 +815,7 @@ function Animation.PathConstraintPositionTimeline.new (frameCount)
     local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
 
     if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
-      local i = zlen(frames.length)
+      local i = zlen(frames)
       constraint.position = constraint.position + (frames[i + PREV_VALUE] - constraint.position) * alpha
       return
     end
@@ -857,7 +857,7 @@ function Animation.PathConstraintSpacingTimeline.new (frameCount)
     local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
 
     if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
-      local i = zlen(frames.length)
+      local i = zlen(frames)
       constraint.spacing = constraint.spacing + (frames[i + PREV_VALUE] - constraint.spacing) * alpha
       return
     end
@@ -902,7 +902,7 @@ function Animation.PathConstraintMixTimeline.new (frameCount)
     local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
 
     if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
-      local i = zlen(frames.length)
+      local i = zlen(frames)
       constraint.rotateMix = constraint.rotateMix + (frames[i + PREV_ROTATE] - constraint.rotateMix) * alpha
       constraint.translateMix = constraint.translateMix + (frames[i + PREV_TRANSLATE] - constraint.translateMix) * alpha
       return
@@ -915,8 +915,8 @@ function Animation.PathConstraintMixTimeline.new (frameCount)
     local frameTime = frames[frame]
     local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
 
-    constraint.rotateMix = constraint.rotateMix (rotate + (frames[frame + ROTATE] - rotate) * percent - constraint.rotateMix) * alpha
-    constraint.translateMix = constraint.translateMix (translate + (frames[frame + TRANSLATE] - translate) * percent - constraint.translateMix) * alpha
+    constraint.rotateMix = constraint.rotateMix + (rotate + (frames[frame + ROTATE] - rotate) * percent - constraint.rotateMix) * alpha
+    constraint.translateMix = constraint.translateMix + (translate + (frames[frame + TRANSLATE] - translate) * percent - constraint.translateMix) * alpha
 	end
 
 	return self
