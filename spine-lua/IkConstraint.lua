@@ -205,7 +205,6 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
         goto outer
       end
     end
-    ::outer::
     local minAngle = 0
     local minDist = 9999999999
     local minX = 0
@@ -252,6 +251,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
       a2 = maxAngle * bendDir
     end
   end
+  ::outer::
   local os = math_atan2(cy, cx) * s2
   local rotation = parent.rotation
   a1 = math_deg(a1 - os) + os1 - rotation

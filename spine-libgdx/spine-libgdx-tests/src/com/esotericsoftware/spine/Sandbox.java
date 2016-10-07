@@ -45,12 +45,12 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
  * runtimes.
  */
 public class Sandbox extends ApplicationAdapter {
-	static final String ATLAS = "../../examples/stretchyman/export/stretchyman.atlas";
-	static final String JSON = "../../examples/stretchyman/export/stretchyman.json";
+	static final String ATLAS = "../../examples/tank/export/tank.atlas";
+	static final String JSON = "../../examples/tank/export/tank.json";
 	static final float scale = 0.3f;
 	static final float X = 400;
 	static final float Y = 500;
-	static final String ANIMATION = "sneak";
+	static final String ANIMATION = "drive";
 	static final float ANIMATION_OFFSET = 0.5f;
 	static final boolean ANIMATION_UPDATE = false;
 	static final boolean Y_DOWN = true;

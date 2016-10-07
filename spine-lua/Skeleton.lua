@@ -131,19 +131,19 @@ function Skeleton:updateCache ()
     ik.level = level
   end
   
-  local i = 2
+  local i = 1
   local ikCount = #ikConstraints
-  while i <= ikCount do
-    local ik = ikConstraints[i]
+  while i < ikCount do
+    local ik = ikConstraints[i + 1]
     local level = ik.level
     local ii = i - 1
-    while ii > 0 do
-      local other = ikConstraints[ii]
+    while ii >= 0 do
+      local other = ikConstraints[ii + 1]
       if other.level < level then break end
-      ikConstraints[ii+1] = other
+      ikConstraints[ii + 1 + 1] = other
       ii = ii - 1
     end
-    ikConstraints[ii + 1] = ik
+    ikConstraints[ii + 1 + 1] = ik
     i = i + 1
   end
   
@@ -231,8 +231,16 @@ function Skeleton:sortPathConstraintAttachmentWith(attachment, slotBone)
     self:sortBone(slotBone)
   else
     local bones = self.bones
-    for i,boneIndex in ipairs(pathBones) do
-      self:sortBone(bones[boneIndex])
+    local i = 0
+    local n = #pathBones
+    while i < n do
+      local boneCount = pathBones[i + 1]
+      i = i + 1
+      local nn = i + boneCount
+      while i < nn do
+        self:sortBone(bones[pathBones[i + 1]])
+        i = i + 1
+      end
     end
   end
 end
