@@ -28,6 +28,7 @@
 -- OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 -- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
+local setmetatable = setmetatable
 
 spine = {}
 
@@ -74,165 +75,175 @@ spine.utils.readJSON = function (text)
 	return json.decode(text)
 end
 
-spine.Skeleton.failed = {} -- Placeholder for an image that failed to load.
+local PolygonBatcher = {}
+PolygonBatcher.__index = PolygonBatcher
 
-spine.Skeleton.new_super = spine.Skeleton.new
-function spine.Skeleton.new (skeletonData, group)
-	local self = spine.Skeleton.new_super(skeletonData)
-
-	-- createImage can customize where images are found.
-	function self:createImage (attachment)
-		return love.graphics.newImage(attachment.name .. ".png")
-	end
-
-	-- updateWorldTransform positions images.
-	local updateWorldTransform_super = self.updateWorldTransform
-	function self:updateWorldTransform ()
-		updateWorldTransform_super(self)
-
-		if not self.images then self.images = {} end
-		local images = self.images
-
-		if not self.attachments then self.attachments = {} end
-		local attachments = self.attachments
-
-		for i,slot in ipairs(self.drawOrder) do
-			local attachment = slot.attachment
-			if not attachment then
-				images[slot] = nil
-			elseif attachment.type == spine.AttachmentType.region then
-				local image = images[slot]
-				if image and attachments[image] ~= attachment then -- Attachment image has changed.
-					image = nil
-				end
-				if not image then -- Create new image.
-					image = self:createImage(attachment)
-					if image then
-						local imageWidth = image:getWidth()
-						local imageHeight = image:getHeight()
-						attachment.widthRatio = attachment.width / imageWidth
-						attachment.heightRatio = attachment.height / imageHeight
-						attachment.originX = imageWidth / 2
-						attachment.originY = imageHeight / 2
-					else
-						print("Error creating image: " .. attachment.name)
-						image = spine.Skeleton.failed
-					end
-					images[slot] = image
-					attachments[image] = attachment
-				end
-			end
-		end
-	end
-
-	function self:draw()
-		if not self.images then self.images = {} end
-		local images = self.images
-
-		local r, g, b, a = self.color.r * 255, self.color.g * 255, self.color.b * 255, self.color.a * 255
-
-		for i,slot in ipairs(self.drawOrder) do
-			local image = images[slot]
-			if image and image ~= spine.Skeleton.failed then
-				local attachment = slot.attachment
-				local x = slot.bone.worldX + attachment.x * slot.bone.a + attachment.y * slot.bone.b
-				local y = slot.bone.worldY + attachment.x * slot.bone.c + attachment.y * slot.bone.d
-				local rotation = slot.bone:getWorldRotationX() + attachment.rotation
-				local xScale = slot.bone:getWorldScaleX() + attachment.scaleX - 1
-				local yScale = slot.bone:getWorldScaleY() + attachment.scaleY - 1
-				if self.flipX then
-					xScale = -xScale
-					rotation = -rotation
-				end
-				if self.flipY then
-					yScale = -yScale
-					rotation = -rotation
-				end
-				love.graphics.setColor(r * slot.r, g * slot.g, b * slot.b, a * slot.a)
-				if slot.data.blendMode == spine.BlendMode.normal then
-					love.graphics.setBlendMode("alpha")
-				elseif slot.data.blendMode == spine.BlendMode.additive then
-					love.graphics.setBlendMode("additive")
-				elseif slot.data.blendMode == spine.BlendMode.multiply then
-					love.graphics.setBlendMode("multiply")
-				elseif slot.data.blendMode == spine.BlendMode.screen then
-					love.graphics.setBlendMode("screen")
-				end
-				love.graphics.draw(image, 
-					self.x + x, 
-					self.y - y, 
-					-rotation * 3.1415927 / 180,
-					xScale * attachment.widthRatio,
-					yScale * attachment.heightRatio,
-					attachment.originX,
-					attachment.originY)
-			end
-		end
-
-		-- Debug bones.
-		if self.debugBones then
-			for i,bone in ipairs(self.bones) do
-				local xScale
-				local yScale
-				local rotation = -bone:getWorldRotationX()
-
-				if self.flipX then
-					xScale = -1
-					rotation = -rotation
-				else 
-					xScale = 1
-				end
-
-				if self.flipY then
-					yScale = -1
-					rotation = -rotation
-				else
-					yScale = 1
-				end
-
-				love.graphics.push()
-				love.graphics.translate(self.x + bone.worldX, self.y - bone.worldY)
-				love.graphics.rotate(rotation * 3.1415927 / 180)
-				love.graphics.scale(xScale, yScale)
-				love.graphics.setColor(255, 0, 0)
-				love.graphics.line(0, 0, bone.data.length, 0)
-				love.graphics.setColor(0, 255, 0)
-				love.graphics.circle('fill', 0, 0, 3)
-				love.graphics.pop()
-			end
-		end
-
-		-- Debug slots.
-		if self.debugSlots then
-			love.graphics.setColor(0, 0, 255, 128)
-			for i,slot in ipairs(self.drawOrder) do
-				local attachment = slot.attachment
-				if attachment and attachment.type == spine.AttachmentType.region then
-					local x = slot.bone.worldX + attachment.x * slot.bone.a + attachment.y * slot.bone.b
-					local y = slot.bone.worldY + attachment.x * slot.bone.c + attachment.y * slot.bone.d
-					local rotation = slot.bone:getWorldRotationX() + attachment.rotation
-					local xScale = slot.bone:getWorldScaleX() + attachment.scaleX - 1
-					local yScale = slot.bone:getWorldScaleY() + attachment.scaleY - 1
-					if self.flipX then
-						xScale = -xScale
-						rotation = -rotation
-					end
-					if self.flipY then
-						yScale = -yScale
-						rotation = -rotation
-					end
-					love.graphics.push()
-					love.graphics.translate(self.x + x, self.y - y)
-					love.graphics.rotate(-rotation * 3.1415927 / 180)
-					love.graphics.scale(xScale, yScale)
-					love.graphics.rectangle('line', -attachment.width / 2, -attachment.height / 2, attachment.width, attachment.height)
-					love.graphics.pop()
-				end
-			end
-		end
-	end
-
-	return self
+function PolygonBatcher.new(vertexCount)
+  local self = {
+    mesh = love.graphics.newMesh(vertexCount, "triangles", "dynamic"),
+    maxVerticesLength = vertexCount,
+    maxIndicesLength = vertexCount * 3,
+    verticesLength = 0,
+    indicesLength = 0,
+    lastTexture = nil,
+    isDrawing = false,
+    drawCalls = 0,
+    vertex = { 0, 0, 0, 0, 0, 0, 0, 0 },
+    indices = nil
+  }
+  
+  local indices = {}
+  local i = 1
+  local maxIndicesLength = self.maxIndicesLength
+  while i <= maxIndicesLength do 
+    indices[i] = 1
+    i = i + 1
+  end
+  self.indices = indices;
+  
+  setmetatable(self, PolygonBatcher)
+  
+  return self
 end
+
+function PolygonBatcher:begin ()
+  if self.isDrawing then error("PolygonBatcher is already drawing. Call PolygonBatcher:stop() before calling PolygonBatcher:begin().", 2) end
+  self.lastTexture = nil
+  self.isDrawing = true
+  self.drawCalls = 0
+end
+
+function PolygonBatcher:draw (texture, vertices, indices)
+  local numVertices = #vertices / 8
+  local numIndices = #indices
+  local mesh = self.mesh
+  
+  if texture ~= self.lastTexture then
+    self:flush()
+    self.lastTexture = texture
+    mesh:setTexture(texture)
+  elseif self.verticesLength + numVertices >= self.maxVerticesLength or self.indicesLength + numIndices > self.maxIndicesLength then
+    self:flush()
+  end
+  
+  local i = 1
+  local indexStart = self.indicesLength + 1
+  local offset = self.verticesLength
+  local indexEnd = indexStart + numIndices
+  local meshIndices = self.indices
+  while indexStart < indexEnd do
+    meshIndices[indexStart] = indices[i] + offset
+    indexStart = indexStart + 1
+    i = i + 1
+  end
+  self.indicesLength = self.indicesLength + numIndices
+  
+  i = 1
+  local vertexStart = self.verticesLength + 1
+  local vertexEnd = vertexStart + numVertices
+  local vertex = self.vertex
+  while vertexStart < vertexEnd do
+    vertex[1] = vertices[i]
+    vertex[2] = vertices[i+1]
+    vertex[3] = vertices[i+2]
+    vertex[4] = vertices[i+3]
+    vertex[5] = vertices[i+4] * 255
+    vertex[6] = vertices[i+5] * 255
+    vertex[7] = vertices[i+6] * 255
+    vertex[8] = vertices[i+7] * 255
+    mesh:setVertex(vertexStart, vertex)
+    vertexStart = vertexStart + 1
+    i = i + 8
+  end
+  self.verticesLength = self.verticesLength + numVertices
+end
+
+function PolygonBatcher:flush ()
+  if self.verticesLength == 0 then return end
+  local mesh = self.mesh
+  mesh:setVertexMap(self.indices)
+  mesh:setDrawRange(1, self.indicesLength)
+  love.graphics.draw(mesh, 0, 0)
+
+  self.verticesLength = 0
+  self.indicesLength = 0
+  self.drawCalls = self.drawCalls + 1
+end
+
+function PolygonBatcher:stop ()
+  if not self.isDrawing then error("PolygonBatcher is not drawing. Call PolygonBatcher:begin() first.", 2) end
+  if self.verticesLength > 0 then self:flush() end
+  
+  self.lastTexture = nil
+  self.isDrawing = false
+end
+
+local SkeletonRenderer = {}
+SkeletonRenderer.__index = SkeletonRenderer
+SkeletonRenderer.QUAD_TRIANGLES = { 1, 2, 3, 3, 4, 1 }
+
+function SkeletonRenderer.new ()
+  local self = {
+    batcher = PolygonBatcher.new(3 * 500),
+    premultipliedAlpha = false
+  }
+
+  setmetatable(self, SkeletonRenderer)
+  return self
+end
+
+function SkeletonRenderer:draw (skeleton)
+  local batcher = self.batcher
+  local premultipliedAlpha = self.premultipliedAlpha
+  
+  local lastLoveBlendMode = love.graphics.getBlendMode()
+	love.graphics.setBlendMode("alpha")
+  local lastBlendMode = spine.BlendMode.normal
+  batcher:begin()
+  
+  local drawOrder = skeleton.drawOrder
+  for i, slot in ipairs(drawOrder) do
+    local attachment = slot.attachment
+    local vertices = nil
+    local indics = nil
+    local texture = nil
+    if attachment then
+      if attachment.type == spine.AttachmentType.region then
+        vertices = attachment:updateWorldVertices(slot, premultipliedAlpha)
+        indices = SkeletonRenderer.QUAD_TRIANGLES
+        texture = attachment.region.renderObject.texture
+      elseif attachment.type == spine.AttachmentType.mesh then
+        vertices = attachment:updateWorldVertices(slot, premultipliedAlpha)
+        indices = attachment.triangles
+        texture = attachment.region.renderObject.texture
+      end
+      
+      if texture then
+        local slotBlendMode = slot.data.blendMode
+        if lastBlendMode ~= slotBlendMode then
+          if slotBlendMode == spine.BlendMode.normal then
+            love.graphics.setBlendMode("alpha")
+          elseif slotBlendMode == spine.BlendMode.additive then
+            love.graphics.setBlendMode("additive")
+          elseif slotBlendMode == spine.BlendMode.multiply then
+            love.graphics.setBlendMode("multiply")
+          elseif slotBlendMode == spine.BlendMode.screen then
+            love.graphics.setBlendMode("screen")
+          end
+          lastBlendMode = slotBlendMode
+          batcher:stop()
+          batcher:begin()
+        end
+        batcher:draw(texture, vertices, indices)
+      end
+    end
+  end
+  
+  batcher:stop()
+  love.graphics.setBlendMode(lastLoveBlendMode)
+end
+
+spine.PolygonBatcher = PolygonBatcher
+spine.SkeletonRenderer = SkeletonRenderer
 
 return spine

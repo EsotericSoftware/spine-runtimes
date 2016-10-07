@@ -107,7 +107,7 @@ function utils.setArraySize (array, size)
       i = i + 1
     end
   else
-    array[size + 1] = nil -- FIXME dirty trick to appease # without realloc
+    array[size + 1] = nil -- dirty trick to appease # without realloc
   end
   return array
 end

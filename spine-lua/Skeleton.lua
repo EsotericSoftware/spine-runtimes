@@ -292,7 +292,14 @@ function Skeleton:setBonesToSetupPose ()
     constraint.shearMix = data.shearMix
   end
   
-  -- FIXME path constraints
+  local pathConstraints = self.pathConstraints
+  for i, constraint in ipairs(pathConstraints) do
+    local data = constraint.data
+    constraint.position = data.position
+    constraint.spacing = data.spacing
+    constraint.rotateMix = data.rotateMix
+    constraint.translateMix = data.translateMix
+  end
 end
 
 function Skeleton:setSlotsToSetupPose ()

@@ -229,7 +229,7 @@ function SkeletonJson.new (attachmentLoader)
 				for slotName,slotMap in pairs(skinMap) do
 					local slotIndex = skeletonData.slotNameIndices[slotName]
 					for attachmentName,attachmentMap in pairs(slotMap) do
-						local attachment = readAttachment(attachmentMap, skin, slotIndex, attachmentName) -- FIXME
+						local attachment = readAttachment(attachmentMap, skin, slotIndex, attachmentName)
 						if attachment then
 							skin:addAttachment(slotIndex, attachmentName, attachment)
 						end

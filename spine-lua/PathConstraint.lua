@@ -236,7 +236,7 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
       local p = position
 
       if closed then
-        p = p % pathLength -- FIXME Lua modulo might be borked
+        p = p % pathLength
         if p < 0 then p = p + pathLength end
         curve = 0
       elseif p < 0 then

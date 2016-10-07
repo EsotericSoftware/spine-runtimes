@@ -237,6 +237,7 @@ end
 function TextureAtlas:dispose()
   for i, page in ipairs(self.pairs) do
     -- FIXME implement disposing of pages
+    -- love2d doesn't support manual disposing
   end
 end
 
