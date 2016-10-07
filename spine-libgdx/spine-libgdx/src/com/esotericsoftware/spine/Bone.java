@@ -286,24 +286,16 @@ public class Bone implements Updatable {
 		case noScale:
 		case noScaleOrReflection: {
 			float cos = cosDeg(rotation), sin = sinDeg(rotation);
-			float za = pa * cos + pb * sin, zb = za;
-			float zc = pc * cos + pd * sin, zd = zc;
+			float za = pa * cos + pb * sin;
+			float zc = pc * cos + pd * sin;
 			float s = (float)Math.sqrt(za * za + zc * zc);
 			if (s > 0.00001f) s = 1 / s;
 			za *= s;
 			zc *= s;
-			s = (float)Math.sqrt(zb * zb + zd * zd);
-			if (s > 0.00001f) s = 1 / s;
-			zb *= s;
-			zd *= s;
-			float by = atan2(zd, zb), r = PI / 2 - (by - atan2(zc, za));
-			if (r > PI)
-				r -= PI2;
-			else if (r < -PI) r += PI2;
-			r += by;
-			s = (float)Math.sqrt(zb * zb + zd * zd);
-			zb = cos(r) * s;
-			zd = sin(r) * s;
+			s = (float)Math.sqrt(za * za + zc * zc);
+			float r = PI / 2 + atan2(zc, za);
+			float zb = cos(r) * s;
+			float zd = sin(r) * s;
 			float la = cosDeg(shearX) * scaleX;
 			float lb = cosDeg(90 + shearY) * scaleY;
 			float lc = sinDeg(shearX) * scaleX;
