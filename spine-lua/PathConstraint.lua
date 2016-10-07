@@ -235,6 +235,7 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
       position = position + space
       local p = position
 
+      local skip = false
       if closed then
         p = p % pathLength
         if p < 0 then p = p + pathLength end
@@ -245,41 +246,43 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
           path:computeWorldVerticesWith(target, 2, 4, world, 0)
         end
         self:addBeforePosition(p, world, 0, out, o)
-        goto continue
+        skip = true
       elseif p > pathLength then
         if prevCurve ~= PathConstraint.AFTER then
           prevCurve = PathConstraint.AFTER
           path:computeWorldVerticesWith(target, verticesLength - 6, 4, world, 0)
         end
         self:addAfterPosition(p - pathLength, world, 0, out, o)
-        goto continue
+        skip = true
       end
 
-      -- Determine curve containing position.
-      while true do
-        local length = lengths[curve + 1]
-        if p <= length then
-          if curve == 0 then
-            p = p / length
-          else
-            local prev = lengths[curve - 1 + 1]
-            p = (p - prev) / (length - prev)
+      if not skip then
+        -- Determine curve containing position.
+        while true do
+          local length = lengths[curve + 1]
+          if p <= length then
+            if curve == 0 then
+              p = p / length
+            else
+              local prev = lengths[curve - 1 + 1]
+              p = (p - prev) / (length - prev)
+            end
+            break
           end
-          break
+          curve = curve + 1
         end
-        curve = curve + 1
-      end
-      if curve ~= prevCurve then
-        prevCurve = curve
-        if closed and curve == curveCount then
-          path:computeWorldVerticesWith(target, verticesLength - 4, 4, world, 0)
-          path:computeWorldVerticesWith(target, 0, 4, world, 4)
-        else
-          path:computeWorldVerticesWith(target, curve * 6 + 2, 8, world, 0)
+        if curve ~= prevCurve then
+          prevCurve = curve
+          if closed and curve == curveCount then
+            path:computeWorldVerticesWith(target, verticesLength - 4, 4, world, 0)
+            path:computeWorldVerticesWith(target, 0, 4, world, 4)
+          else
+            path:computeWorldVerticesWith(target, curve * 6 + 2, 8, world, 0)
+          end
         end
+        self:addCurvePosition(p, world[1], world[2], world[3], world[4], world[5], world[6], world[7], world[8], out, o, tangents or (i > 0 and space == 0))
       end
-      self:addCurvePosition(p, world[1], world[2], world[3], world[4], world[5], world[6], world[7], world[8], out, o, tangents or (i > 0 and space == 0))
-    ::continue::
+      
       i = i + 1
       o = o + 3
     end
@@ -375,94 +378,96 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
     position = position + space
     local p = position
 
+    local skip = false
     if closed then
       p = p % pathLength
       if p < 0 then p = p + pathLength end
       curve = 0
     elseif p < 0 then
       self:addBeforePosition(p, world, 0, out, o)
-      goto continue2
+      skip = true
     elseif p > pathLength then
       self:addAfterPosition(p - pathLength, world, verticesLength - 4, out, o)
-      goto continue2
+      skip = true
     end
 
-    -- Determine curve containing position.
-    while true do
-      local length = curves[curve + 1]
-      if p <= length then
-        if curve == 0 then
-          p = p / length
-        else
-          local prev = curves[curve - 1 + 1]
-          p = (p - prev) / (length - prev)
+    if not skip then
+      -- Determine curve containing position.
+      while true do
+        local length = curves[curve + 1]
+        if p <= length then
+          if curve == 0 then
+            p = p / length
+          else
+            local prev = curves[curve - 1 + 1]
+            p = (p - prev) / (length - prev)
+          end
+          break
         end
-        break
+        curve = curve + 1
       end
-      curve = curve + 1
-    end
 
-    -- Curve segment lengths.
-    if curve ~= prevCurve then
-      prevCurve = curve
-      local ii = curve * 6
-      x1 = world[ii + 1]
-      y1 = world[ii + 2]
-      cx1 = world[ii + 3]
-      cy1 = world[ii + 4]
-      cx2 = world[ii + 5]
-      cy2 = world[ii + 6]
-      x2 = world[ii + 7]
-      y2 = world[ii + 8]
-      tmpx = (x1 - cx1 * 2 + cx2) * 0.03
-      tmpy = (y1 - cy1 * 2 + cy2) * 0.03
-      dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.006
-      dddfy = ((cy1 - cy2) * 3 - y1 + y2) * 0.006
-      ddfx = tmpx * 2 + dddfx
-      ddfy = tmpy * 2 + dddfy
-      dfx = (cx1 - x1) * 0.3 + tmpx + dddfx * 0.16666667
-      dfy = (cy1 - y1) * 0.3 + tmpy + dddfy * 0.16666667
-      curveLength = math_sqrt(dfx * dfx + dfy * dfy)
-      segments[1] = curveLength
-      ii = 1
-      while ii < 8 do
+      -- Curve segment lengths.
+      if curve ~= prevCurve then
+        prevCurve = curve
+        local ii = curve * 6
+        x1 = world[ii + 1]
+        y1 = world[ii + 2]
+        cx1 = world[ii + 3]
+        cy1 = world[ii + 4]
+        cx2 = world[ii + 5]
+        cy2 = world[ii + 6]
+        x2 = world[ii + 7]
+        y2 = world[ii + 8]
+        tmpx = (x1 - cx1 * 2 + cx2) * 0.03
+        tmpy = (y1 - cy1 * 2 + cy2) * 0.03
+        dddfx = ((cx1 - cx2) * 3 - x1 + x2) * 0.006
+        dddfy = ((cy1 - cy2) * 3 - y1 + y2) * 0.006
+        ddfx = tmpx * 2 + dddfx
+        ddfy = tmpy * 2 + dddfy
+        dfx = (cx1 - x1) * 0.3 + tmpx + dddfx * 0.16666667
+        dfy = (cy1 - y1) * 0.3 + tmpy + dddfy * 0.16666667
+        curveLength = math_sqrt(dfx * dfx + dfy * dfy)
+        segments[1] = curveLength
+        ii = 1
+        while ii < 8 do
+          dfx = dfx + ddfx
+          dfy = dfy + ddfy
+          ddfx = ddfx + dddfx
+          ddfy = ddfy + dddfy
+          curveLength = curveLength + math_sqrt(dfx * dfx + dfy * dfy)
+          segments[ii + 1] = curveLength
+          ii = ii + 1
+        end
         dfx = dfx + ddfx
         dfy = dfy + ddfy
-        ddfx = ddfx + dddfx
-        ddfy = ddfy + dddfy
         curveLength = curveLength + math_sqrt(dfx * dfx + dfy * dfy)
-        segments[ii + 1] = curveLength
-        ii = ii + 1
+        segments[9] = curveLength
+        dfx = dfx + ddfx + dddfx
+        dfy = dfy + ddfy + dddfy
+        curveLength = curveLength + math_sqrt(dfx * dfx + dfy * dfy)
+        segments[10] = curveLength
+        segment = 0
       end
-      dfx = dfx + ddfx
-      dfy = dfy + ddfy
-      curveLength = curveLength + math_sqrt(dfx * dfx + dfy * dfy)
-      segments[9] = curveLength
-      dfx = dfx + ddfx + dddfx
-      dfy = dfy + ddfy + dddfy
-      curveLength = curveLength + math_sqrt(dfx * dfx + dfy * dfy)
-      segments[10] = curveLength
-      segment = 0
+
+      -- Weight by segment length.
+      p = p * curveLength
+      while true do
+        local length = segments[segment + 1]
+        if p <= length then
+          if segment == 0 then
+            p = p / length
+          else
+            local prev = segments[segment - 1 + 1]
+            p = segment + (p - prev) / (length - prev)
+          end
+          break;
+        end
+        segment = segment + 1
+      end
+      self:addCurvePosition(p * 0.1, x1, y1, cx1, cy1, cx2, cy2, x2, y2, out, o, tangents or (i > 0 and space == 0))
     end
 
-    -- Weight by segment length.
-    p = p * curveLength
-    while true do
-      local length = segments[segment + 1]
-      if p <= length then
-        if segment == 0 then
-          p = p / length
-        else
-          local prev = segments[segment - 1 + 1]
-          p = segment + (p - prev) / (length - prev)
-        end
-        break;
-      end
-      segment = segment + 1
-    end
-    self:addCurvePosition(p * 0.1, x1, y1, cx1, cy1, cx2, cy2, x2, y2, out, o, tangents or (i > 0 and space == 0))
-    
-    ::continue2::
     i = i + 1
     o = o + 3
   end

@@ -180,6 +180,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
     b = l2 * math_sin(a2)
     a1 = math_atan2(ty * a - tx * b, tx * a + ty * b)
   else
+    local skip = false
     a = psx * l2
     b = psy * l2
     local aa = a * a
@@ -202,56 +203,57 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
         y = math_sqrt(dd - r * r) * bendDir
         a1 = ta - math_atan2(y, r)
         a2 = math_atan2(y / psy, (r - l1) / psx)
-        goto outer
+        skip = true
       end
     end
-    local minAngle = 0
-    local minDist = 9999999999
-    local minX = 0
-    local minY = 0
-    local maxAngle = 0
-    local maxDist = 0
-    local maxX = 0
-    local maxY = 0
-    x = l1 + a
-    d = x * x
-    if d > maxDist then
-      maxAngle = 0
-      maxDist = d
-      maxX = x
-    end
-    x = l1 - a
-    d = x * x
-    if d < minDist then
-      minAngle = math_pi
-      minDist = d
-      minX = x
-    end
-    local angle = math_acos(-a * l1 / (aa - bb))
-    x = a * math_cos(angle) + l1
-    y = b * math_sin(angle)
-    d = x * x + y * y
-    if d < minDist then
-      minAngle = angle
-      minDist = d
-      minX = x
-      minY = y
-    end
-    if d > maxDist then
-      maxAngle = angle
-      maxDist = d
-      maxX = x
-      maxY = y
-    end
-    if dd <= (minDist + maxDist) / 2 then
-      a1 = ta - math_atan2(minY * bendDir, minX)
-      a2 = minAngle * bendDir
-    else
-      a1 = ta - math_atan2(maxY * bendDir, maxX)
-      a2 = maxAngle * bendDir
+    if not skip then
+      local minAngle = 0
+      local minDist = 9999999999
+      local minX = 0
+      local minY = 0
+      local maxAngle = 0
+      local maxDist = 0
+      local maxX = 0
+      local maxY = 0
+      x = l1 + a
+      d = x * x
+      if d > maxDist then
+        maxAngle = 0
+        maxDist = d
+        maxX = x
+      end
+      x = l1 - a
+      d = x * x
+      if d < minDist then
+        minAngle = math_pi
+        minDist = d
+        minX = x
+      end
+      local angle = math_acos(-a * l1 / (aa - bb))
+      x = a * math_cos(angle) + l1
+      y = b * math_sin(angle)
+      d = x * x + y * y
+      if d < minDist then
+        minAngle = angle
+        minDist = d
+        minX = x
+        minY = y
+      end
+      if d > maxDist then
+        maxAngle = angle
+        maxDist = d
+        maxX = x
+        maxY = y
+      end
+      if dd <= (minDist + maxDist) / 2 then
+        a1 = ta - math_atan2(minY * bendDir, minX)
+        a2 = minAngle * bendDir
+      else
+        a1 = ta - math_atan2(maxY * bendDir, maxX)
+        a2 = maxAngle * bendDir
+      end
     end
   end
-  ::outer::
   local os = math_atan2(cy, cx) * s2
   local rotation = parent.rotation
   a1 = math_deg(a1 - os) + os1 - rotation

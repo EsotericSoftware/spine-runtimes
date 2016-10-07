@@ -29,7 +29,7 @@
 -- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
-local spine = require "spine-love.spine-love"
+local spine = require "spine-love.spine"
 
 local skeletons = {}
 local activeSkeleton = 1
@@ -82,7 +82,7 @@ function love.load(arg)
   table.insert(skeletons, loadSkeleton("goblins-mesh", "goblins", "walk", "goblin", 1, 400, 500))
   table.insert(skeletons, loadSkeleton("tank", "tank", "drive", nil, 0.2, 600, 500))
   table.insert(skeletons, loadSkeleton("vine", "vine", "animation", nil, 0.3, 400, 500))
-  table.insert(skeletons, loadSkeleton("stretchyman", "stretchyman", "sneak", nil, 0.3, 400, 500))
+  table.insert(skeletons, loadSkeleton("stretchyman", "stretchyman", "sneak", nil, 0.3, 200, 500))
   skeletonRenderer = spine.SkeletonRenderer.new()
 end
 
