@@ -174,7 +174,7 @@ public class BoneData {
 	}
 
 	static public enum TransformMode {
-		normal, onlyTranslation, noRotation, noScale, noScaleOrReflection;
+		normal, onlyTranslation, noRotationOrReflection, noScale, noScaleOrReflection;
 
 		static public final TransformMode[] values = TransformMode.values();
 	}

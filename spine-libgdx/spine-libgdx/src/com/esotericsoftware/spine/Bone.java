@@ -153,134 +153,21 @@ public class Bone implements Updatable {
 			d = sinDeg(rotationY) * scaleY;
 			break;
 		}
-		case noRotation: {
-			if (false) {
-				// Simple loop.
-				// 1) Inherits scale in the wrong direction.
-				// 2) Doesn't flip.
-				float rotationY = rotation + 90 + shearY;
-				float la = cosDeg(rotation + shearX) * scaleX;
-				float lb = cosDeg(rotationY) * scaleY;
-				float lc = sinDeg(rotation + shearX) * scaleX;
-				float ld = sinDeg(rotationY) * scaleY;
-				Bone current = parent;
-				while (current != null) {
-					float ca = Math.abs(current.ascaleX);
-					float cb = 0;
-					float cc = 0;
-					float cd = Math.abs(current.ascaleY);
-					float za = ca * la + cb * lc;
-					float zb = ca * lb + cb * ld;
-					float zc = cc * la + cd * lc;
-					float zd = cc * lb + cd * ld;
-					la = za;
-					lb = zb;
-					lc = zc;
-					ld = zd;
-					current = current.parent;
-				}
-				a = la;
-				b = lb;
-				c = lc;
-				d = ld;
-			} else if (false) {
-				// Summing parent rotations.
-				// 1) Negative parent scale causes bone to rotate.
-				float sum = 0;
-				Bone current = parent;
-				while (current != null) {
-					sum += current.arotation;
-					current = current.parent;
-				}
-				rotation -= sum;
-				float rotationY = rotation + 90 + shearY;
-				float la = cosDeg(rotation + shearX) * scaleX;
-				float lb = cosDeg(rotationY) * scaleY;
-				float lc = sinDeg(rotation + shearX) * scaleX;
-				float ld = sinDeg(rotationY) * scaleY;
-				a = pa * la + pb * lc;
-				b = pa * lb + pb * ld;
-				c = pc * la + pd * lc;
-				d = pc * lb + pd * ld;
-			} else if (true) {
-				// Old way.
-				// 1) Immediate parent scale is applied in wrong direction.
-				// 2) Negative parent scale causes bone to rotate.
-				pa = 1;
-				pb = 0;
-				pc = 0;
-				pd = 1;
-				float rotationY, la, lb, lc, ld;
-				outer:
-				do {
-					if (!parent.appliedValid) parent.updateAppliedTransform();
-					float pr = parent.arotation, psx = parent.ascaleX;
-					rotationY = pr + 90 + parent.ashearY;
-					la = cosDeg(pr + parent.shearX);
-					lb = cosDeg(rotationY);
-					lc = sinDeg(pr + parent.shearX);
-					ld = sinDeg(rotationY);
-					float temp = (pa * la + pb * lc) * psx;
-					pb = (pb * ld + pa * lb) * parent.ascaleY;
-					pa = temp;
-					temp = (pc * la + pd * lc) * psx;
-					pd = (pd * ld + pc * lb) * parent.ascaleY;
-					pc = temp;
-
-					if (psx < 0) lc = -lc;
-					temp = pa * la - pb * lc;
-					pb = pb * ld - pa * lb;
-					pa = temp;
-					temp = pc * la - pd * lc;
-					pd = pd * ld - pc * lb;
-					pc = temp;
-
-					switch (parent.data.transformMode) {
-					case noScale:
-					case noScaleOrReflection:
-						break outer;
-					}
-					parent = parent.parent;
-				} while (parent != null);
-				rotationY = rotation + 90 + shearY;
-				la = cosDeg(rotation + shearX) * scaleX;
-				lb = cosDeg(rotationY) * scaleY;
-				lc = sinDeg(rotation + shearX) * scaleX;
-				ld = sinDeg(rotationY) * scaleY;
-				a = pa * la + pb * lc;
-				b = pa * lb + pb * ld;
-				c = pc * la + pd * lc;
-				d = pc * lb + pd * ld;
-			} else {
-				// New way.
-				// 1) Negative scale can cause bone to flip.
-				float psx = (float)Math.sqrt(pa * pa + pc * pc), psy, pr;
-				if (psx > 0.0001f) {
-					float det = pa * pd - pb * pc;
-					psy = det / psx;
-					pr = atan2(pc, pa) * radDeg;
-				} else {
-					psx = 0;
-					psy = (float)Math.sqrt(pb * pb + pd * pd);
-					pr = 90 - atan2(pd, pb) * radDeg;
-				}
-				float blend;
-				if (pr < -90)
-					blend = 1 + (pr + 90) / 90;
-				else if (pr < 0)
-					blend = -pr / 90;
-				else if (pr < 90)
-					blend = pr / 90;
-				else
-					blend = 1 - (pr - 90) / 90;
-				pa = psx + (Math.abs(psy) * Math.signum(psx) - psx) * blend;
-				pd = psy + (Math.abs(psx) * Math.signum(psy) - psy) * blend;
-				float rotationY = rotation + 90 + shearY;
-				a = pa * cosDeg(rotation + shearX) * scaleX;
-				b = pa * cosDeg(rotationY) * scaleY;
-				c = pd * sinDeg(rotation + shearX) * scaleX;
-				d = pd * sinDeg(rotationY) * scaleY;
+		case noRotationOrReflection: {
+			if (pa * pd - pb * pc < 0) {
+				pb = -pb;
+				pd = -pd;
 			}
+			rotation -= atan2(pc, pa) * radDeg;
+			float rotationY = rotation + 90 + shearY;
+			float la = cosDeg(rotation + shearX) * scaleX;
+			float lb = cosDeg(rotationY) * scaleY;
+			float lc = sinDeg(rotation + shearX) * scaleX;
+			float ld = sinDeg(rotationY) * scaleY;
+			a = pa * la + pb * lc;
+			b = pa * lb + pb * ld;
+			c = pc * la + pd * lc;
+			d = pc * lb + pd * ld;
 			break;
 		}
 		case noScale:
