@@ -1,4 +1,4 @@
-﻿/******************************************************************************
+/******************************************************************************
  * Spine Runtimes Software License
  * Version 2.3
  * 
@@ -162,9 +162,8 @@ namespace Spine.Unity.MeshGeneration {
 					uvs[vi + 2].x = regionUVs[RegionAttachment.X2]; uvs[vi + 2].y = regionUVs[RegionAttachment.Y2];
 					uvs[vi + 3].x = regionUVs[RegionAttachment.X3]; uvs[vi + 3].y = regionUVs[RegionAttachment.Y3];
 
-					// Calculate min/max X
-					if (x1 < bmin.x) bmin.x = x1;
-					else if (x1 > bmax.x) bmax.x = x1;
+					if (x1 < bmin.x) bmin.x = x1; // Potential first attachment bounds initialization. Initial min should not block initial max. Same for Y below.
+					if (x1 > bmax.x) bmax.x = x1;
 					if (x2 < bmin.x) bmin.x = x2;
 					else if (x2 > bmax.x) bmax.x = x2;
 					if (x3 < bmin.x) bmin.x = x3;
@@ -172,9 +171,8 @@ namespace Spine.Unity.MeshGeneration {
 					if (x4 < bmin.x) bmin.x = x4;
 					else if (x4 > bmax.x) bmax.x = x4;
 
-					// Calculate min/max Y
 					if (y1 < bmin.y) bmin.y = y1;
-					else if (y1 > bmax.y) bmax.y = y1;
+					if (y1 > bmax.y) bmax.y = y1;
 					if (y2 < bmin.y) bmin.y = y2;
 					else if (y2 > bmax.y) bmax.y = y2;
 					if (y3 < bmin.y) bmin.y = y3;
@@ -204,6 +202,19 @@ namespace Spine.Unity.MeshGeneration {
 						}
 
 						float[] attachmentUVs = meshAttachment.uvs;
+
+						// Potential first attachment bounds initialization. See conditions in RegionAttachment logic.
+						if (vi == vertexIndex) {
+							// Initial min should not block initial max.
+							// vi == vertexIndex does not always mean the bounds are fresh. It could be a submesh. Do not nuke old values by omitting the check.
+							// Should know that this is the first attachment in the submesh. slotIndex == startSlot could be an empty slot.
+							float fx = tempVerts[0], fy = tempVerts[1];
+							if (fx < bmin.x) bmin.x = fx;
+							if (fx > bmax.x) bmax.x = fx;
+							if (fy < bmin.y) bmin.y = fy;
+							if (fy > bmax.y) bmax.y = fy;
+						}
+
 						for (int iii = 0; iii < meshVertexCount; iii += 2) {
 							float x = tempVerts[iii], y = tempVerts[iii + 1];
 							verts[vi].x = x; verts[vi].y = y; verts[vi].z = z;
@@ -314,8 +325,7 @@ namespace Spine.Unity.MeshGeneration {
 		/// <summary>Creates a UnityEngine.Bounds struct from minimum and maximum value vectors.</summary>
 		public static Bounds ToBounds (Vector3 boundsMin, Vector3 boundsMax) {
 			Vector3 size = (boundsMax - boundsMin);
-			Vector3 center = boundsMin + size * 0.5f;
-			return new Bounds(center, size);
+			return new Bounds((boundsMin + (size * 0.5f)), size);
 		}
 
 		#region TangentSolver2D

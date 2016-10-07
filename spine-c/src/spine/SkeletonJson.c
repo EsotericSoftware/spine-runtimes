@@ -37,6 +37,10 @@
 #include <spine/AtlasAttachmentLoader.h>
 #include <spine/Animation.h>
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+#define strdup _strdup
+#endif
+
 typedef struct {
 	const char* parent;
 	const char* skin;
@@ -569,11 +573,18 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 	CONST_CAST(char*, self->error) = 0;
 	internal->linkedMeshCount = 0;
 
+#ifndef __ANDROID__
 	oldLocale = strdup(setlocale(LC_NUMERIC, NULL));
 	setlocale(LC_NUMERIC, "C");
+#endif
+    
 	root = Json_create(json);
+    
+#ifndef __ANDROID__
 	setlocale(LC_NUMERIC, oldLocale);
 	free(oldLocale);
+#endif
+    
 	if (!root) {
 		_spSkeletonJson_setError(self, 0, "Invalid skeleton JSON: ", Json_getError());
 		return 0;

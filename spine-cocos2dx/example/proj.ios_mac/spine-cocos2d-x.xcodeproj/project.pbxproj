@@ -46,6 +46,8 @@
 		521A8E6519F0C34300D177D7 /* Default-736h@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 521A8E6319F0C34300D177D7 /* Default-736h@3x.png */; };
 		52B47A471A53D09C004E4C60 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52B47A461A53D09B004E4C60 /* Security.framework */; };
 		7602C5551D7DAA1300C7C674 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7602C5541D7DAA1300C7C674 /* CoreText.framework */; };
+		765B3E181DA283F90071C974 /* SkeletonBinary.c in Sources */ = {isa = PBXBuildFile; fileRef = 765B3E171DA283F90071C974 /* SkeletonBinary.c */; };
+		765B3E191DA284060071C974 /* SkeletonBinary.c in Sources */ = {isa = PBXBuildFile; fileRef = 765B3E171DA283F90071C974 /* SkeletonBinary.c */; };
 		76AAA3C01D180F7C00C54FCB /* AppDelegate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3B31D180F7C00C54FCB /* AppDelegate.cpp */; };
 		76AAA3C11D180F7C00C54FCB /* BatchingExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3B61D180F7C00C54FCB /* BatchingExample.cpp */; };
 		76AAA3C21D180F7C00C54FCB /* GoblinsExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3B81D180F7C00C54FCB /* GoblinsExample.cpp */; };
@@ -244,6 +246,8 @@
 		521A8E6319F0C34300D177D7 /* Default-736h@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-736h@3x.png"; sourceTree = "<group>"; };
 		52B47A461A53D09B004E4C60 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.1.sdk/System/Library/Frameworks/Security.framework; sourceTree = DEVELOPER_DIR; };
 		7602C5541D7DAA1300C7C674 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/CoreText.framework; sourceTree = DEVELOPER_DIR; };
+		765B3E161DA283F90071C974 /* kvec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = kvec.h; path = "../../../spine-c/src/spine/kvec.h"; sourceTree = "<group>"; };
+		765B3E171DA283F90071C974 /* SkeletonBinary.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = SkeletonBinary.c; path = "../../../spine-c/src/spine/SkeletonBinary.c"; sourceTree = "<group>"; };
 		76AAA3B31D180F7C00C54FCB /* AppDelegate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AppDelegate.cpp; sourceTree = "<group>"; };
 		76AAA3B41D180F7C00C54FCB /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		76AAA3B51D180F7C00C54FCB /* AppMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppMacros.h; sourceTree = "<group>"; };
@@ -519,6 +523,8 @@
 		76AAA3B21D180F7300C54FCB /* spine */ = {
 			isa = PBXGroup;
 			children = (
+				765B3E161DA283F90071C974 /* kvec.h */,
+				765B3E171DA283F90071C974 /* SkeletonBinary.c */,
 				76F5BCF41D2BB57F005917E5 /* Animation.c */,
 				76F5BCF51D2BB57F005917E5 /* AnimationState.c */,
 				76F5BCF61D2BB57F005917E5 /* AnimationStateData.c */,
@@ -741,6 +747,7 @@
 				76F5BD201D2BB57F005917E5 /* extension.c in Sources */,
 				76AAA3C01D180F7C00C54FCB /* AppDelegate.cpp in Sources */,
 				76AAA3C41D180F7C00C54FCB /* SimpleCommand.cpp in Sources */,
+				765B3E181DA283F90071C974 /* SkeletonBinary.c in Sources */,
 				76F5BD261D2BB57F005917E5 /* PathConstraint.c in Sources */,
 				503AE10017EB989F00D1A890 /* AppController.mm in Sources */,
 				76AAA40E1D18106000C54FCB /* SkeletonAnimation.cpp in Sources */,
@@ -768,6 +775,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				765B3E191DA284060071C974 /* SkeletonBinary.c in Sources */,
 				76F5BD561D2BD7EF005917E5 /* TankExample.cpp in Sources */,
 				76F5BD571D2BD7EF005917E5 /* TankExample.h in Sources */,
 				76F5BD331D2BD4A9005917E5 /* Animation.c in Sources */,

@@ -198,7 +198,7 @@ public class SkeletonJson {
 
 			pathConstraintData.positionMode = PositionMode[constraintMap["positionMode"] || "percent"];
 			pathConstraintData.spacingMode = SpacingMode[constraintMap["spacingMode"] || "length"];
-			pathConstraintData.rotateMode = RotateMode[constraintMap["rotateMode"] || "rotateMode"];
+			pathConstraintData.rotateMode = RotateMode[constraintMap["rotateMode"] || "tangent"];
 			pathConstraintData.offsetRotation = Number(constraintMap["rotation"] || 0);
 			pathConstraintData.position = Number(constraintMap["position"] || 0);
 			if (pathConstraintData.positionMode == PositionMode.fixed) pathConstraintData.position *= scale;

@@ -449,10 +449,12 @@ namespace Spine.Unity {
 
 				int oldSubmeshCount = submeshes.Count;
 
-				submeshes.Capacity = submeshCount;
+				if (submeshes.Capacity < submeshCount)
+					submeshes.Capacity = submeshCount;
 				for (int i = oldSubmeshCount; i < submeshCount; i++)
 					submeshes.Items[i] = new ArraysMeshGenerator.SubmeshTriangleBuffer(workingSubmeshInstructions.Items[i].triangleCount);
-
+				submeshes.Count = submeshCount;
+					
 				var mutableTriangles = !workingInstruction.immutableTriangles;
 				for (int i = 0, last = submeshCount - 1; i < submeshCount; i++) {
 					var submeshInstruction = workingSubmeshInstructions.Items[i];
