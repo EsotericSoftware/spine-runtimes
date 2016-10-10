@@ -1,159 +1,92 @@
 require("mobdebug").start()
 
--- require "examples.spineboy.spineboy"
--- require "examples.spineboy-atlas.spineboy"
--- require "examples.spineboy.spineboy-mesh"
--- require "examples.goblins.goblins"
--- require "examples.dragon.dragon"
--- require "examples.hero.hero"
-
 local spine = require "spine-corona.spine-corona"
 
-local QUAD_TRIANGLES = { 1, 2, 3, 3, 4, 1 }
-spine.Skeleton.new_super = spine.Skeleton.new
-spine.Skeleton.updateWorldTransform_super = spine.Skeleton.updateWorldTransform
-spine.Skeleton.new = function(skeletonData, group)
-  self = spine.Skeleton.new_super(skeletonData)
-  self.parentGroup = group or display.newGroup()
-  self.drawingGroup = display.newGroup()
-  self.parentGroup:insert(self.drawingGroup)
-  self.premultipliedAlpha = false
-  self.batches = 0
-  return self
-end
+local skeletons = {}
+local activeSkeleton = 1
+local lastTime = 0
 
-function spine.Skeleton:updateWorldTransform()
-  spine.Skeleton.updateWorldTransform_super(self)
-  local premultipliedAlpha = self.premultipliedAlpha
-  
-  self.batches = 0
-  
-  -- Remove old drawing group, we will start anew
-  self.drawingGroup:removeSelf()
-  local drawingGroup = display.newGroup()
-  self.drawingGroup = drawingGroup
-  self.drawingGroup.parent = self.parentGroup
-  
-  local drawOrder = self.drawOrder
-  local currentGroup = nil
-  local groupVertices = {}
-  local groupIndices = {}
-  local groupUvs = {}
-  local texture = nil
-  local lastTexture = nil
-  for i,slot in ipairs(drawOrder) do
-    local attachment = slot.attachment
-    local vertices = nil
-    local indices = nil
-    if attachment then
-      if attachment.type == spine.AttachmentType.region then
-        vertices = attachment:updateWorldVertices(slot, premultipliedAlpha)
-        indices = QUAD_TRIANGLES
-        texture = attachment.region.renderObject.texture
-      elseif attachment.type == spine.AttachmentType.mesh then
-        vertices = attachment:updateWorldVertices(slot, premultipliedAlpha)
-        indices = attachment.triangles
-        texture = attachment.region.renderObject.texture
-      end
-      
-      if texture and vertices and indices then
-        if texture ~= lastTexture and lastTexture then -- FIXME need to take color and blend mode into account
-          self:flush(groupVertices, groupUvs, groupIndices, texture, drawingGroup)
-          lastTexture = texture
-          groupVertices = {}
-          groupUvs = {}
-          groupIndices = {}
-        end
-      
-        self:batch(vertices, indices, groupVertices, groupUvs, groupIndices)
-      end
-    end
+function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
+  -- to load an atlas, we need to define a function that returns
+  -- a Corona paint object. This allows you to resolve images
+  -- however you see fit
+  local imageLoader = function (path) 
+    local paint = { type = "image", filename = "data/" .. path }
+    return paint
   end
   
-  if #groupVertices > 0 then
-    self:flush(groupVertices, groupUvs, groupIndices, texture, drawingGroup)
+  -- load the atlas
+  local atlas = spine.TextureAtlas.new(spine.utils.readFile("data/" .. atlasFile), imageLoader)
+  
+  -- load the JSON and create a Skeleton from it
+  local json = spine.SkeletonJson.new(spine.TextureAtlasAttachmentLoader.new(atlas))
+  json.scale = scale
+  local skeletonData = json:readSkeletonDataFile("data/" .. jsonFile)
+  local skeleton = spine.Skeleton.new(skeletonData)
+  skeleton.flipY = true -- Corona's coordinate system has its y-axis point downwards
+  skeleton.group.x = x
+  skeleton.group.y = y
+  
+  -- Set the skin if we got one
+  if skin then skeleton:setSkin(skin) end
+  
+  -- create an animation state object to apply animations to the skeleton
+  local animationStateData = spine.AnimationStateData.new(skeletonData)
+  local animationState = spine.AnimationState.new(animationStateData)
+  animationState:setAnimationByName(0, animation, true)
+  
+  -- set the skeleton invisible
+  skeleton.group.isVisible = false
+  
+  -- set a name on the group of the skeleton so we can find it during debugging
+  skeleton.group.name = jsonFile
+  
+  -- set some event callbacks
+  animationState.onStart = function (trackIndex)
+    print(trackIndex.." start: "..animationState:getCurrent(trackIndex).animation.name)
   end
-end
-
-function spine.Skeleton:flush(groupVertices, groupUvs, groupIndices, texture, drawingGroup)
-  mesh = display.newMesh(drawingGroup, 0, 0, {
-      mode = "indexed",
-      vertices = groupVertices,
-      uvs = groupUvs,
-      indices = groupIndices
-  })
-  mesh.fill = texture
-  mesh:translate(mesh.path:getVertexOffset())
-  self.batches = self.batches + 1
-end
-
-function spine.Skeleton:batch(vertices, indices, groupVertices, groupUvs, groupIndices)
-  local numIndices = #indices
-  local i = 1
-  local indexStart = #groupIndices + 1
-  local offset = #groupVertices / 2
-  local indexEnd = indexStart + numIndices
-
-  while indexStart < indexEnd do
-    groupIndices[indexStart] = indices[i] + offset
-    indexStart = indexStart + 1
-    i = i + 1
+  animationState.onEnd = function (trackIndex)
+    print(trackIndex.." end: "..animationState:getCurrent(trackIndex).animation.name)
+  end
+  animationState.onComplete = function (trackIndex, loopCount)
+    print(trackIndex.." complete: "..animationState:getCurrent(trackIndex).animation.name..", "..loopCount)
+  end
+  animationState.onEvent = function (trackIndex, event)
+    print(trackIndex.." event: "..animationState:getCurrent(trackIndex).animation.name..", "..event.data.name..", "..event.intValue..", "..event.floatValue..", '"..(event.stringValue or "").."'")
   end
   
-  i = 1
-  local numVertices = #vertices
-  local vertexStart = #groupVertices + 1
-  local vertexEnd = vertexStart + numVertices / 4
-  while vertexStart < vertexEnd do
-    groupVertices[vertexStart] = vertices[i]
-    groupVertices[vertexStart+1] = vertices[i+1]
-    groupUvs[vertexStart] = vertices[i+2]
-    groupUvs[vertexStart+1] = vertices[i+3]
-    vertexStart = vertexStart + 2
-    i = i + 8
-    -- FIXME color
-  end
+  -- return the skeleton an animation state
+  return { skeleton = skeleton, state = animationState }
 end
 
-local loader = function (path) 
-  local paint = { type = "image", filename = "data/" .. path }
-  return paint
-end
-local atlas = spine.TextureAtlas.new(spine.utils.readFile("data/stretchyman.atlas"), loader)
-local json = spine.SkeletonJson.new(spine.TextureAtlasAttachmentLoader.new(atlas))
-json.scale = 0.3
-local skeletonData = json:readSkeletonDataFile("data/stretchyman.json")
-
-local skeletonGroup = display.newGroup()
-local skeleton = spine.Skeleton.new(skeletonData, skeletonGroup)
-skeleton.flipY = true
-skeleton.x = 200
-skeleton.y = 200
-local animationStateData = spine.AnimationStateData.new(skeletonData)
-local animation = spine.AnimationState.new(animationStateData)
-animation:setAnimationByName(0, "sneak", true)
-
-local img = display.newImage("data/stretchyman.png")
-img.width = 100
-img.height = 100
+table.insert(skeletons, loadSkeleton("spineboy.atlas", "spineboy.json", 240, 300, 0.4, "walk"))
+table.insert(skeletons, loadSkeleton("raptor.atlas", "raptor.json", 200, 300, 0.25, "walk"))
+table.insert(skeletons, loadSkeleton("goblins.atlas", "goblins-mesh.json", 240, 300, 0.8, "walk", "goblin"))
+table.insert(skeletons, loadSkeleton("stretchyman.atlas", "stretchyman.json", 40, 300, 0.5, "sneak"))
+table.insert(skeletons, loadSkeleton("tank.atlas", "tank.json", 400, 300, 0.2, "drive"))
+table.insert(skeletons, loadSkeleton("vine.atlas", "vine.json", 240, 300, 0.3, "animation"))
 
 display.setDefault("background", 0.2, 0.2, 0.2, 1)
 
-local lastTime = 0
 Runtime:addEventListener("enterFrame", function (event)        
 	local currentTime = event.time / 1000
 	local delta = currentTime - lastTime
-	lastTime = currentTime
+	lastTime = currentTime  
   
-  animation:update(delta)
-  animation:apply(skeleton)
+  skeleton = skeletons[activeSkeleton].skeleton
+  skeleton.group.isVisible = true
+  state = skeletons[activeSkeleton].state
+  
+  state:update(delta)
+  state:apply(skeleton)
   skeleton:updateWorldTransform()
+  
   print(skeleton.batches)
 end)
     
-Runtime:addEventListener("touch", function(event)
-    skeleton.x = event.x
-    skeleton.y = event.y
-    img.x = event.x
-    img.y = event.y
+Runtime:addEventListener("tap", function(event)
+  skeletons[activeSkeleton].skeleton.group.isVisible = false
+  activeSkeleton = activeSkeleton + 1
+  if activeSkeleton > #skeletons then activeSkeleton = 1 end
+  skeletons[activeSkeleton].skeleton.group.isVisible = true
 end)
