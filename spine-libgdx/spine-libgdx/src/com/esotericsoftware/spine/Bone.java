@@ -154,20 +154,36 @@ public class Bone implements Updatable {
 			break;
 		}
 		case noRotationOrReflection: {
-			if (pa * pd - pb * pc < 0) {
-				pb = -pb;
-				pd = -pd;
+			float psx = (float)Math.sqrt(pa * pa + pc * pc), psy, prx;
+			if (psx > 0.0001f) {
+				psy = Math.abs((pa * pd - pb * pc) / psx);
+				prx = atan2(pc, pa) * radDeg;
+			} else {
+				psx = 0;
+				psy = (float)Math.sqrt(pb * pb + pd * pd);
+				prx = 90 - atan2(pd, pb) * radDeg;
 			}
-			rotation -= atan2(pc, pa) * radDeg;
+			pa = cosDeg(prx) * psx;
+			pb = cosDeg(prx + 90) * psy;
+			pc = sinDeg(prx) * psx;
+			pd = sinDeg(prx + 90) * psy;
 			float rotationY = rotation + 90 + shearY;
 			float la = cosDeg(rotation + shearX) * scaleX;
 			float lb = cosDeg(rotationY) * scaleY;
 			float lc = sinDeg(rotation + shearX) * scaleX;
 			float ld = sinDeg(rotationY) * scaleY;
-			a = pa * la + pb * lc;
-			b = pa * lb + pb * ld;
-			c = pc * la + pd * lc;
-			d = pc * lb + pd * ld;
+			float za = pa * la + pb * lc;
+			float zb = pa * lb + pb * ld;
+			float zc = pc * la + pd * lc;
+			float zd = pc * lb + pd * ld;
+			pa = cosDeg(-prx);
+			pb = cosDeg(90 - prx);
+			pc = sinDeg(-prx);
+			pd = sinDeg(90 - prx);
+			a = za * pa + zb * pc;
+			b = za * pb + zb * pd;
+			c = zc * pa + zd * pc;
+			d = zc * pb + zd * pd;
 			break;
 		}
 		case noScale:
