@@ -1,6 +1,6 @@
 require("mobdebug").start()
 
-local spine = require "spine-corona.spine-corona"
+local spine = require "spine-corona.spine"
 
 local skeletons = {}
 local activeSkeleton = 1
@@ -81,7 +81,8 @@ Runtime:addEventListener("enterFrame", function (event)
   state:apply(skeleton)
   skeleton:updateWorldTransform()
   
-  print(skeleton.batches)
+  -- uncomment if you want to know how many batches a skeleton renders to
+  -- print(skeleton.batches)
 end)
     
 Runtime:addEventListener("tap", function(event)
