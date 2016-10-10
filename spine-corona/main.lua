@@ -18,13 +18,15 @@ spine.Skeleton.new = function(skeletonData, group)
   self.drawingGroup = display.newGroup()
   self.parentGroup:insert(self.drawingGroup)
   self.premultipliedAlpha = false
-  
+  self.batches = 0
   return self
 end
 
 function spine.Skeleton:updateWorldTransform()
   spine.Skeleton.updateWorldTransform_super(self)
   local premultipliedAlpha = self.premultipliedAlpha
+  
+  self.batches = 0
   
   -- Remove old drawing group, we will start anew
   self.drawingGroup:removeSelf()
@@ -54,7 +56,7 @@ function spine.Skeleton:updateWorldTransform()
         texture = attachment.region.renderObject.texture
       end
       
-      if texture then
+      if texture and vertices and indices then
         if texture ~= lastTexture and lastTexture then -- FIXME need to take color and blend mode into account
           self:flush(groupVertices, groupUvs, groupIndices, texture, drawingGroup)
           lastTexture = texture
@@ -82,6 +84,7 @@ function spine.Skeleton:flush(groupVertices, groupUvs, groupIndices, texture, dr
   })
   mesh.fill = texture
   mesh:translate(mesh.path:getVertexOffset())
+  self.batches = self.batches + 1
 end
 
 function spine.Skeleton:batch(vertices, indices, groupVertices, groupUvs, groupIndices)
@@ -116,21 +119,21 @@ local loader = function (path)
   local paint = { type = "image", filename = "data/" .. path }
   return paint
 end
-local atlas = spine.TextureAtlas.new(spine.utils.readFile("data/spineboy.atlas"), loader)
+local atlas = spine.TextureAtlas.new(spine.utils.readFile("data/stretchyman.atlas"), loader)
 local json = spine.SkeletonJson.new(spine.TextureAtlasAttachmentLoader.new(atlas))
 json.scale = 0.3
-local skeletonData = json:readSkeletonDataFile("data/spineboy.json")
+local skeletonData = json:readSkeletonDataFile("data/stretchyman.json")
 
 local skeletonGroup = display.newGroup()
-skeletonGroup.name = "muhhh"
-skeletonGroup.y = 100
 local skeleton = spine.Skeleton.new(skeletonData, skeletonGroup)
 skeleton.flipY = true
+skeleton.x = 200
+skeleton.y = 200
 local animationStateData = spine.AnimationStateData.new(skeletonData)
 local animation = spine.AnimationState.new(animationStateData)
-animation:setAnimationByName(0, "walk", true)
+animation:setAnimationByName(0, "sneak", true)
 
-local img = display.newImage("data/spineboy.png")
+local img = display.newImage("data/stretchyman.png")
 img.width = 100
 img.height = 100
 
@@ -145,11 +148,12 @@ Runtime:addEventListener("enterFrame", function (event)
   animation:update(delta)
   animation:apply(skeleton)
   skeleton:updateWorldTransform()
+  print(skeleton.batches)
 end)
     
 Runtime:addEventListener("touch", function(event)
-    skeletonGroup.x = event.x
-    skeletonGroup.y = event.y
+    skeleton.x = event.x
+    skeleton.y = event.y
     img.x = event.x
     img.y = event.y
 end)
