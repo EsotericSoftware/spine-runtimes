@@ -90,11 +90,23 @@ spine.Skeleton.new = function(skeletonData, group)
   return self
 end
 
-function colorEquals(color1, color2)
+local function colorEquals(color1, color2)
   if not color1 and not color2 then return true end
   if not color1 and color2 then return false end
   if color1 and not color2 then return false end
   return color1[1] == color2[1] and color1[2] == color2[2] and color1[3] == color2[3] and color1[4] == color2[4]
+end
+
+local function toCoronaBlendMode(blendMode)
+  if blendMode == spine.BlendMode.normal then
+    return "normal"
+  elseif blendMode == spine.BlendMode.additive then
+    return "add"
+  elseif blendMode == spine.BlendMode.multiply then
+    return "multiply"
+  elseif blendMode == spine.BlendMode.screen then
+    return "screen"
+  end
 end
 
 function spine.Skeleton:updateWorldTransform()
@@ -118,6 +130,8 @@ function spine.Skeleton:updateWorldTransform()
   local lastColor = nil
   local texture = nil
   local lastTexture = nil
+  local blendMode = nil
+  local lastBlendMode = nil
   for i,slot in ipairs(drawOrder) do
     local attachment = slot.attachment
     local vertices = nil
@@ -128,21 +142,25 @@ function spine.Skeleton:updateWorldTransform()
         indices = QUAD_TRIANGLES
         texture = attachment.region.renderObject.texture
         color = { vertices[5], vertices[6], vertices[7], vertices[8]}
+        blendMode = toCoronaBlendMode(slot.data.blendMode)
       elseif attachment.type == spine.AttachmentType.mesh then
         vertices = attachment:updateWorldVertices(slot, premultipliedAlpha)
         indices = attachment.triangles
         texture = attachment.region.renderObject.texture
         color = { vertices[5], vertices[6], vertices[7], vertices[8] }
+        blendMode = toCoronaBlendMode(slot.data.blendMode)
       end
       
       if texture and vertices and indices then
         if not lastTexture then lastTexture = texture end
         if not lastColor then lastColor = color end
+        if not lastBlendMode then lastBlendMode = blendMode end
         
-        if (texture ~= lastTexture or not colorEquals(color, lastColor)) then -- FIXME need to take color and blend mode into account
-          self:flush(groupVertices, groupUvs, groupIndices, lastTexture, lastColor, drawingGroup)
+        if (texture ~= lastTexture or not colorEquals(color, lastColor) or blendMode ~= lastBlendMode) then
+          self:flush(groupVertices, groupUvs, groupIndices, lastTexture, lastColor, lastBlendMode, drawingGroup)
           lastTexture = texture
           lastColor = color
+          lastBlendMode = blendMode
           groupVertices = {}
           groupUvs = {}
           groupIndices = {}
@@ -154,11 +172,11 @@ function spine.Skeleton:updateWorldTransform()
   end
   
   if #groupVertices > 0 then
-    self:flush(groupVertices, groupUvs, groupIndices, texture, color, drawingGroup)
+    self:flush(groupVertices, groupUvs, groupIndices, texture, color, blendMode, drawingGroup)
   end
 end
 
-function spine.Skeleton:flush(groupVertices, groupUvs, groupIndices, texture, color, drawingGroup)
+function spine.Skeleton:flush(groupVertices, groupUvs, groupIndices, texture, color, blendMode, drawingGroup)
   mesh = display.newMesh(drawingGroup, 0, 0, {
       mode = "indexed",
       vertices = groupVertices,
@@ -168,6 +186,7 @@ function spine.Skeleton:flush(groupVertices, groupUvs, groupIndices, texture, co
   mesh.fill = texture
   mesh:setFillColor(color[1], color[2], color[3])
   mesh.alpha = color[4]
+  mesh.blendMode = blendMode
   mesh:translate(mesh.path:getVertexOffset())
   self.batches = self.batches + 1
 end
