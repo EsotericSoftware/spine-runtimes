@@ -261,8 +261,12 @@ public class Skeleton {
 			sortBone(slotBone);
 		else {
 			Array<Bone> bones = this.bones;
-			for (int boneIndex : pathBones)
-				sortBone(bones.get(boneIndex));
+			for (int i = 0, n = pathBones.length; i < n;) {
+				int nn = pathBones[i++];
+				nn += i;
+				while (i < nn)
+					sortBone(bones.get(pathBones[i++]));
+			}
 		}
 	}
 

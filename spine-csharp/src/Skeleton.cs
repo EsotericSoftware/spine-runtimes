@@ -224,9 +224,13 @@ namespace Spine {
 			if (pathBones == null)
 				SortBone(slotBone);
 			else {
-				var bones = this.bones;
-				for (int i = 0, n = pathBones.Length; i < n; i++)
-					SortBone(bones.Items[pathBones[i]]);
+				var bonesItems = this.bones.Items;
+				for (int i = 0, n = pathBones.Length; i < n;) {
+					int nn = pathBones[i++];
+					nn += i;
+					while (i < nn)
+						SortBone(bonesItems[pathBones[i++]]);
+				}
 			}
 		}
 
