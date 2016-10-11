@@ -1157,10 +1157,14 @@ namespace Spine.Unity.Editor {
 				return false;
 			}
 
+			bool isSpineJson = root.ContainsKey("skeleton");
+
 			// Version warning
-			{
+			if (isSpineJson) {
 				var skeletonInfo = (Dictionary<string, object>)root["skeleton"];
-				string jsonVersion = (string)skeletonInfo["spine"];
+				object jv;
+				skeletonInfo.TryGetValue("spine", out jv);
+				string jsonVersion = (jv == null) ? (string)jv : null;
 				if (!string.IsNullOrEmpty(jsonVersion)) {
 					string[] jsonVersionSplit = jsonVersion.Split('.');
 					bool match = false;
@@ -1170,7 +1174,7 @@ namespace Spine.Unity.Editor {
 
 						if (isFixVersionRequired)
 							secondaryMatch &= version[2] <= int.Parse(jsonVersionSplit[2]);
-						
+
 						if (primaryMatch && secondaryMatch) {
 							match = true;
 							break;
@@ -1181,13 +1185,12 @@ namespace Spine.Unity.Editor {
 						string runtimeVersion = compatibleVersions[0][0] + "." + compatibleVersions[0][1];
 						Debug.LogWarning(string.Format("Skeleton '{0}' (exported with Spine {1}) may be incompatible with your runtime version: spine-unity v{2}", asset.name, jsonVersion, runtimeVersion));
 					}
+				} else {
+					isSpineJson = false;
 				}
 			}
-
-
-			return root.ContainsKey("skeleton");
-
-
+				
+			return isSpineJson;
 		}
 		#endregion
 
