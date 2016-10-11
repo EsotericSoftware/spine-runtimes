@@ -30,27 +30,29 @@
 -------------------------------------------------------------------------------
 
 local BlendMode = require "spine-lua.BlendMode"
+local Color = require "spine-lua.Color"
+
+local setmetatable = setmetatable
 
 local SlotData = {}
-function SlotData.new (name, boneData)
+SlotData.__index = SlotData
+
+function SlotData.new (index, name, boneData)
+	if index < 0 then error("index must be >= 0", 2) end
 	if not name then error("name cannot be nil", 2) end
 	if not boneData then error("boneData cannot be nil", 2) end
 	
 	local self = {
+		index = index,
 		name = name,
 		boneData = boneData,
-		r = 1, g = 1, b = 1, a = 1,
+		color = Color.newWith(1, 1, 1, 1),
 		attachmentName = nil,
 		blendMode = BlendMode.normal
 	}
-
-	function self:setColor (r, g, b, a)
-		self.r = r
-		self.g = g
-		self.b = b
-		self.a = a
-	end
-
+	setmetatable(self, SlotData)
+	
 	return self
 end
+
 return SlotData

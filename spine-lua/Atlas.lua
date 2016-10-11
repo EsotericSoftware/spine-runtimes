@@ -58,7 +58,7 @@ function Atlas.parse(atlasPath, atlasBase)
 	local pages = {}
 
 
-	local it = string.gmatch(atlasLines, "(.-)\r?\n")  -- iterate over lines
+	local it = string.gmatch(atlasLines, "(.-)\r?\n")	 -- iterate over lines
 	for l in it do
 		if #l == 0 then
 			l = it()

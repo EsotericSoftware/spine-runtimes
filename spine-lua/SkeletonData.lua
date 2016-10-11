@@ -28,83 +28,115 @@
 -- OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 -- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
+local setmetatable = setmetatable
 
 local SkeletonData = {}
+SkeletonData.__index = SkeletonData
+
 function SkeletonData.new ()
 	local self = {
-		version = 0, hash = 0,
-		width = 0, height = 0,
+		name,
 		bones = {},
 		slots = {},
-		slotNameIndices = {},
 		skins = {},
+		defaultSkin = nil,
 		events = {},
 		animations = {},
 		ikConstraints = {},
-		defaultSkin = nil
+		transformConstraints = {},
+		pathConstraints = {},
+		width, height,
+		version, hash, imagesPath,
+		slotNameIndices = {}
 	}
-
-	function self:findBone (boneName)
-		if not boneName then error("boneName cannot be nil.", 2) end
-		for i,bone in ipairs(self.bones) do
-			if bone.name == boneName then return bone end
-		end
-		return nil
-	end
-
-	function self:findBoneIndex (boneName)
-		if not boneName then error("boneName cannot be nil.", 2) end
-		for i,bone in ipairs(self.bones) do
-			if bone.name == boneName then return i end
-		end
-		return -1
-	end
-
-	function self:findSlot (slotName)
-		if not slotName then error("slotName cannot be nil.", 2) end
-		for i,slot in ipairs(self.slots) do
-			if slot.name == slotName then return slot end
-		end
-		return nil
-	end
-
-	function self:findSlotIndex (slotName)
-		if not slotName then error("slotName cannot be nil.", 2) end
-		return self.slotNameIndices[slotName] or -1
-	end
-
-	function self:findSkin (skinName)
-		if not skinName then error("skinName cannot be nil.", 2) end
-		for i,skin in ipairs(self.skins) do
-			if skin.name == skinName then return skin end
-		end
-		return nil
-	end
-
-	function self:findEvent (eventName)
-		if not eventName then error("eventName cannot be nil.", 2) end
-		for i,event in ipairs(self.events) do
-			if event.name == eventName then return event end
-		end
-		return nil
-	end
-
-	function self:findAnimation (animationName)
-		if not animationName then error("animationName cannot be nil.", 2) end
-		for i,animation in ipairs(self.animations) do
-			if animation.name == animationName then return animation end
-		end
-		return nil
-	end
-
-	function self:findIkConstraint (ikConstraintName)
-		if not ikConstraintName then error("ikConstraintName cannot be nil.", 2) end
-		for i,ikConstraint in ipairs(self.ikConstraints) do
-			if ikConstraint.name == ikConstraintName then return ikConstraint end
-		end
-		return nil
-	end
+	setmetatable(self, SkeletonData)
 
 	return self
 end
+
+function SkeletonData:findBone (boneName)
+	if not boneName then error("boneName cannot be nil.", 2) end
+	for i,bone in ipairs(self.bones) do
+		if bone.name == boneName then return bone end
+	end
+	return nil
+end
+
+function SkeletonData:findBoneIndex (boneName)
+	if not boneName then error("boneName cannot be nil.", 2) end
+	for i,bone in ipairs(self.bones) do
+		if bone.name == boneName then return i end
+	end
+	return -1
+end
+
+function SkeletonData:findSlot (slotName)
+	if not slotName then error("slotName cannot be nil.", 2) end
+	for i,slot in ipairs(self.slots) do
+		if slot.name == slotName then return slot end
+	end
+	return nil
+end
+
+function SkeletonData:findSlotIndex (slotName)
+	if not slotName then error("slotName cannot be nil.", 2) end
+	return self.slotNameIndices[slotName] or -1
+end
+
+function SkeletonData:findSkin (skinName)
+	if not skinName then error("skinName cannot be nil.", 2) end
+	for i,skin in ipairs(self.skins) do
+		if skin.name == skinName then return skin end
+	end
+	return nil
+end
+
+function SkeletonData:findEvent (eventName)
+	if not eventName then error("eventName cannot be nil.", 2) end
+	for i,event in ipairs(self.events) do
+		if event.name == eventName then return event end
+	end
+	return nil
+end
+
+function SkeletonData:findAnimation (animationName)
+	if not animationName then error("animationName cannot be nil.", 2) end
+	for i,animation in ipairs(self.animations) do
+		if animation.name == animationName then return animation end
+	end
+	return nil
+end
+
+function SkeletonData:findIkConstraint (constraintName)
+	if not constraintName then error("constraintName cannot be nil.", 2) end
+	for i,constraint in ipairs(self.ikConstraints) do
+		if constraint.name == constraintName then return constraint end
+	end
+	return nil
+end
+
+function SkeletonData:findTransformConstraint (constraintName)
+	if not constraintName then error("constraintName cannot be nil.", 2) end
+	for i,constraint in ipairs(self.transformConstraints) do
+		if constraint.name == constraintName then return constraint end
+	end
+	return nil
+end
+
+function SkeletonData:findPathConstraint (constraintName)
+	if not constraintName then error("constraintName cannot be nil.", 2) end
+	for i,constraint in ipairs(self.pathConstraints) do
+		if constraint.name == constraintName then return constraint end
+	end
+	return nil
+end
+
+function SkeletonData:findPathConstraintIndex (constraintName)
+	if not constraintName then error("constraintName cannot be nil.", 2) end
+	for i,constraint in ipairs(self.pathConstraints) do
+		if constraint.name == constraintName then return i end
+	end
+	return -1
+end
+
 return SkeletonData
