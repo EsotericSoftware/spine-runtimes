@@ -38,21 +38,21 @@ local SlotData = {}
 SlotData.__index = SlotData
 
 function SlotData.new (index, name, boneData)
-  if index < 0 then error("index must be >= 0", 2) end
+	if index < 0 then error("index must be >= 0", 2) end
 	if not name then error("name cannot be nil", 2) end
 	if not boneData then error("boneData cannot be nil", 2) end
 	
 	local self = {
-    index = index,
+		index = index,
 		name = name,
 		boneData = boneData,
-    color = Color.newWith(1, 1, 1, 1),
+		color = Color.newWith(1, 1, 1, 1),
 		attachmentName = nil,
 		blendMode = BlendMode.normal
 	}
-  setmetatable(self, SlotData)
-  
-  return self
+	setmetatable(self, SlotData)
+	
+	return self
 end
 
 return SlotData

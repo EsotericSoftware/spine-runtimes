@@ -79,103 +79,103 @@ local PolygonBatcher = {}
 PolygonBatcher.__index = PolygonBatcher
 
 function PolygonBatcher.new(vertexCount)
-  local self = {
-    mesh = love.graphics.newMesh(vertexCount, "triangles", "dynamic"),
-    maxVerticesLength = vertexCount,
-    maxIndicesLength = vertexCount * 3,
-    verticesLength = 0,
-    indicesLength = 0,
-    lastTexture = nil,
-    isDrawing = false,
-    drawCalls = 0,
-    vertex = { 0, 0, 0, 0, 0, 0, 0, 0 },
-    indices = nil
-  }
-  
-  local indices = {}
-  local i = 1
-  local maxIndicesLength = self.maxIndicesLength
-  while i <= maxIndicesLength do 
-    indices[i] = 1
-    i = i + 1
-  end
-  self.indices = indices;
-  
-  setmetatable(self, PolygonBatcher)
-  
-  return self
+	local self = {
+		mesh = love.graphics.newMesh(vertexCount, "triangles", "dynamic"),
+		maxVerticesLength = vertexCount,
+		maxIndicesLength = vertexCount * 3,
+		verticesLength = 0,
+		indicesLength = 0,
+		lastTexture = nil,
+		isDrawing = false,
+		drawCalls = 0,
+		vertex = { 0, 0, 0, 0, 0, 0, 0, 0 },
+		indices = nil
+	}
+	
+	local indices = {}
+	local i = 1
+	local maxIndicesLength = self.maxIndicesLength
+	while i <= maxIndicesLength do 
+		indices[i] = 1
+		i = i + 1
+	end
+	self.indices = indices;
+	
+	setmetatable(self, PolygonBatcher)
+	
+	return self
 end
 
 function PolygonBatcher:begin ()
-  if self.isDrawing then error("PolygonBatcher is already drawing. Call PolygonBatcher:stop() before calling PolygonBatcher:begin().", 2) end
-  self.lastTexture = nil
-  self.isDrawing = true
-  self.drawCalls = 0
+	if self.isDrawing then error("PolygonBatcher is already drawing. Call PolygonBatcher:stop() before calling PolygonBatcher:begin().", 2) end
+	self.lastTexture = nil
+	self.isDrawing = true
+	self.drawCalls = 0
 end
 
 function PolygonBatcher:draw (texture, vertices, indices)
-  local numVertices = #vertices / 8
-  local numIndices = #indices
-  local mesh = self.mesh
-  
-  if texture ~= self.lastTexture then
-    self:flush()
-    self.lastTexture = texture
-    mesh:setTexture(texture)
-  elseif self.verticesLength + numVertices >= self.maxVerticesLength or self.indicesLength + numIndices > self.maxIndicesLength then
-    self:flush()
-  end
-  
-  local i = 1
-  local indexStart = self.indicesLength + 1
-  local offset = self.verticesLength
-  local indexEnd = indexStart + numIndices
-  local meshIndices = self.indices
-  while indexStart < indexEnd do
-    meshIndices[indexStart] = indices[i] + offset
-    indexStart = indexStart + 1
-    i = i + 1
-  end
-  self.indicesLength = self.indicesLength + numIndices
-  
-  i = 1
-  local vertexStart = self.verticesLength + 1
-  local vertexEnd = vertexStart + numVertices
-  local vertex = self.vertex
-  while vertexStart < vertexEnd do
-    vertex[1] = vertices[i]
-    vertex[2] = vertices[i+1]
-    vertex[3] = vertices[i+2]
-    vertex[4] = vertices[i+3]
-    vertex[5] = vertices[i+4] * 255
-    vertex[6] = vertices[i+5] * 255
-    vertex[7] = vertices[i+6] * 255
-    vertex[8] = vertices[i+7] * 255
-    mesh:setVertex(vertexStart, vertex)
-    vertexStart = vertexStart + 1
-    i = i + 8
-  end
-  self.verticesLength = self.verticesLength + numVertices
+	local numVertices = #vertices / 8
+	local numIndices = #indices
+	local mesh = self.mesh
+	
+	if texture ~= self.lastTexture then
+		self:flush()
+		self.lastTexture = texture
+		mesh:setTexture(texture)
+	elseif self.verticesLength + numVertices >= self.maxVerticesLength or self.indicesLength + numIndices > self.maxIndicesLength then
+		self:flush()
+	end
+	
+	local i = 1
+	local indexStart = self.indicesLength + 1
+	local offset = self.verticesLength
+	local indexEnd = indexStart + numIndices
+	local meshIndices = self.indices
+	while indexStart < indexEnd do
+		meshIndices[indexStart] = indices[i] + offset
+		indexStart = indexStart + 1
+		i = i + 1
+	end
+	self.indicesLength = self.indicesLength + numIndices
+	
+	i = 1
+	local vertexStart = self.verticesLength + 1
+	local vertexEnd = vertexStart + numVertices
+	local vertex = self.vertex
+	while vertexStart < vertexEnd do
+		vertex[1] = vertices[i]
+		vertex[2] = vertices[i+1]
+		vertex[3] = vertices[i+2]
+		vertex[4] = vertices[i+3]
+		vertex[5] = vertices[i+4] * 255
+		vertex[6] = vertices[i+5] * 255
+		vertex[7] = vertices[i+6] * 255
+		vertex[8] = vertices[i+7] * 255
+		mesh:setVertex(vertexStart, vertex)
+		vertexStart = vertexStart + 1
+		i = i + 8
+	end
+	self.verticesLength = self.verticesLength + numVertices
 end
 
 function PolygonBatcher:flush ()
-  if self.verticesLength == 0 then return end
-  local mesh = self.mesh
-  mesh:setVertexMap(self.indices)
-  mesh:setDrawRange(1, self.indicesLength)
-  love.graphics.draw(mesh, 0, 0)
+	if self.verticesLength == 0 then return end
+	local mesh = self.mesh
+	mesh:setVertexMap(self.indices)
+	mesh:setDrawRange(1, self.indicesLength)
+	love.graphics.draw(mesh, 0, 0)
 
-  self.verticesLength = 0
-  self.indicesLength = 0
-  self.drawCalls = self.drawCalls + 1
+	self.verticesLength = 0
+	self.indicesLength = 0
+	self.drawCalls = self.drawCalls + 1
 end
 
 function PolygonBatcher:stop ()
-  if not self.isDrawing then error("PolygonBatcher is not drawing. Call PolygonBatcher:begin() first.", 2) end
-  if self.verticesLength > 0 then self:flush() end
-  
-  self.lastTexture = nil
-  self.isDrawing = false
+	if not self.isDrawing then error("PolygonBatcher is not drawing. Call PolygonBatcher:begin() first.", 2) end
+	if self.verticesLength > 0 then self:flush() end
+	
+	self.lastTexture = nil
+	self.isDrawing = false
 end
 
 local SkeletonRenderer = {}
@@ -183,64 +183,64 @@ SkeletonRenderer.__index = SkeletonRenderer
 SkeletonRenderer.QUAD_TRIANGLES = { 1, 2, 3, 3, 4, 1 }
 
 function SkeletonRenderer.new ()
-  local self = {
-    batcher = PolygonBatcher.new(3 * 500),
-    premultipliedAlpha = false
-  }
+	local self = {
+		batcher = PolygonBatcher.new(3 * 500),
+		premultipliedAlpha = false
+	}
 
-  setmetatable(self, SkeletonRenderer)
-  return self
+	setmetatable(self, SkeletonRenderer)
+	return self
 end
 
 function SkeletonRenderer:draw (skeleton)
-  local batcher = self.batcher
-  local premultipliedAlpha = self.premultipliedAlpha
-  
-  local lastLoveBlendMode = love.graphics.getBlendMode()
+	local batcher = self.batcher
+	local premultipliedAlpha = self.premultipliedAlpha
+	
+	local lastLoveBlendMode = love.graphics.getBlendMode()
 	love.graphics.setBlendMode("alpha")
-  local lastBlendMode = spine.BlendMode.normal
-  batcher:begin()
-  
-  local drawOrder = skeleton.drawOrder
-  for i, slot in ipairs(drawOrder) do
-    local attachment = slot.attachment
-    local vertices = nil
-    local indics = nil
-    local texture = nil
-    if attachment then
-      if attachment.type == spine.AttachmentType.region then
-        vertices = attachment:updateWorldVertices(slot, premultipliedAlpha)
-        indices = SkeletonRenderer.QUAD_TRIANGLES
-        texture = attachment.region.renderObject.texture
-      elseif attachment.type == spine.AttachmentType.mesh then
-        vertices = attachment:updateWorldVertices(slot, premultipliedAlpha)
-        indices = attachment.triangles
-        texture = attachment.region.renderObject.texture
-      end
-      
-      if texture then
-        local slotBlendMode = slot.data.blendMode
-        if lastBlendMode ~= slotBlendMode then
-          if slotBlendMode == spine.BlendMode.normal then
-            love.graphics.setBlendMode("alpha")
-          elseif slotBlendMode == spine.BlendMode.additive then
-            love.graphics.setBlendMode("additive")
-          elseif slotBlendMode == spine.BlendMode.multiply then
-            love.graphics.setBlendMode("multiply")
-          elseif slotBlendMode == spine.BlendMode.screen then
-            love.graphics.setBlendMode("screen")
-          end
-          lastBlendMode = slotBlendMode
-          batcher:stop()
-          batcher:begin()
-        end
-        batcher:draw(texture, vertices, indices)
-      end
-    end
-  end
-  
-  batcher:stop()
-  love.graphics.setBlendMode(lastLoveBlendMode)
+	local lastBlendMode = spine.BlendMode.normal
+	batcher:begin()
+	
+	local drawOrder = skeleton.drawOrder
+	for i, slot in ipairs(drawOrder) do
+		local attachment = slot.attachment
+		local vertices = nil
+		local indics = nil
+		local texture = nil
+		if attachment then
+			if attachment.type == spine.AttachmentType.region then
+				vertices = attachment:updateWorldVertices(slot, premultipliedAlpha)
+				indices = SkeletonRenderer.QUAD_TRIANGLES
+				texture = attachment.region.renderObject.texture
+			elseif attachment.type == spine.AttachmentType.mesh then
+				vertices = attachment:updateWorldVertices(slot, premultipliedAlpha)
+				indices = attachment.triangles
+				texture = attachment.region.renderObject.texture
+			end
+			
+			if texture then
+				local slotBlendMode = slot.data.blendMode
+				if lastBlendMode ~= slotBlendMode then
+					if slotBlendMode == spine.BlendMode.normal then
+						love.graphics.setBlendMode("alpha")
+					elseif slotBlendMode == spine.BlendMode.additive then
+						love.graphics.setBlendMode("additive")
+					elseif slotBlendMode == spine.BlendMode.multiply then
+						love.graphics.setBlendMode("multiply")
+					elseif slotBlendMode == spine.BlendMode.screen then
+						love.graphics.setBlendMode("screen")
+					end
+					lastBlendMode = slotBlendMode
+					batcher:stop()
+					batcher:begin()
+				end
+				batcher:draw(texture, vertices, indices)
+			end
+		end
+	end
+	
+	batcher:stop()
+	love.graphics.setBlendMode(lastLoveBlendMode)
 end
 
 spine.PolygonBatcher = PolygonBatcher

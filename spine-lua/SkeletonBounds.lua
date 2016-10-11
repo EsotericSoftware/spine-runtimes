@@ -43,7 +43,7 @@ SkeletonBounds.__index = SkeletonBounds
 
 function SkeletonBounds.new ()
 	local self = {
- 		minX = 0, minY = 0, maxX = 0, maxY = 0,
+		minX = 0, minY = 0, maxX = 0, maxY = 0,
 		polygons = {},
 		boundingBoxes = {},
 	}
@@ -53,17 +53,17 @@ function SkeletonBounds.new ()
 end
 
 function SkeletonBounds:update (skeleton, updateAabb)
-  if skeleton == nil then error("skeleton cannot be null", 2) end
-  local boundingBoxes = {}
-  self.boundingBoxes = boundingBoxes
-  local polygons = {}
-  self.polygons = polygons
-  local slots = skeleton.slots
+	if skeleton == nil then error("skeleton cannot be null", 2) end
+	local boundingBoxes = {}
+	self.boundingBoxes = boundingBoxes
+	local polygons = {}
+	self.polygons = polygons
+	local slots = skeleton.slots
 
 	for i,slot in ipairs(skeleton.slots) do
 		local attachment = slot.attachment
 		if attachment and attachment.type == AttachmentType.boundingbox then
-      local boundingBox = attachment
+			local boundingBox = attachment
 			table_insert(boundingBoxes, boundingBox)
 
 			local polygon = {}
@@ -77,7 +77,7 @@ function SkeletonBounds:update (skeleton, updateAabb)
 end
 
 function SkeletonBounds:aabbCompute ()
- 	local minX, minY, maxX, maxY = 9999999, 9999999, -9999999, -9999999
+	local minX, minY, maxX, maxY = 9999999, 9999999, -9999999, -9999999
 	local polygons = self.polygons
 	for i,vertices in ipairs(polygons) do
 		local count = #vertices

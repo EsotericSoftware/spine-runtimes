@@ -36,49 +36,49 @@ Color.__index = Color
 
 function Color.new ()
 	local self = {
-    r = 0, g = 0, b = 0, a = 0
+		r = 0, g = 0, b = 0, a = 0
 	}
-  setmetatable(self, Color)
-  
-  return self
+	setmetatable(self, Color)
+	
+	return self
 end
 
 function Color.newWith (r, g, b, a)
 	local self = {
-    r = a, g = g, b = b, a = a
+		r = a, g = g, b = b, a = a
 	}
-  setmetatable(self, Color)
-  
-  return self
+	setmetatable(self, Color)
+	
+	return self
 end
 
 function Color:set(r, g, b, a)
-  self.r = r
-  self.g = g
-  self.b = b
-  self.a = a
+	self.r = r
+	self.g = g
+	self.b = b
+	self.a = a
 end
 
 function Color:setFrom(color)
-  self.r = color.r
-  self.g = color.g
-  self.b = color.b
-  self.a = color.a
+	self.r = color.r
+	self.g = color.g
+	self.b = color.b
+	self.a = color.a
 end
 
 function Color:add(r, g, b, a)
-  self.r = self.r + r
-  self.g = self.g + g
-  self.b = self.b + b
-  self.a = self.a + a
-  self:clamp()
+	self.r = self.r + r
+	self.g = self.g + g
+	self.b = self.b + b
+	self.a = self.a + a
+	self:clamp()
 end
 
 function Color:clamp()
-  self.r = utils.clamp(self.r, 0, 1)
-  self.g = utils.clamp(self.g, 0, 1)
-  self.b = utils.clamp(self.b, 0, 1)
-  self.a = utils.clamp(self.a, 0, 1)
+	self.r = utils.clamp(self.r, 0, 1)
+	self.g = utils.clamp(self.g, 0, 1)
+	self.b = utils.clamp(self.b, 0, 1)
+	self.a = utils.clamp(self.a, 0, 1)
 end
 
 return Color

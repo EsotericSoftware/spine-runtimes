@@ -36,17 +36,17 @@ TextureRegion.__index = TextureRegion
 function TextureRegion.new ()
 
 	local self = {
-    renderObject = nil,
-    u = 0, v = 0,
-    u2 = 0, v2 = 0,
-    width = 0, height = 0,
-    rotate = false,
-    offsetX = 0, offsetY = 0,
-    originalWidth = 0, originalHeight = 0
+		renderObject = nil,
+		u = 0, v = 0,
+		u2 = 0, v2 = 0,
+		width = 0, height = 0,
+		rotate = false,
+		offsetX = 0, offsetY = 0,
+		originalWidth = 0, originalHeight = 0
 	}
-  setmetatable(self, TextureRegion)
-  
-  return self
+	setmetatable(self, TextureRegion)
+	
+	return self
 end
 
 return TextureRegion

@@ -53,99 +53,99 @@ function TransformConstraint.new (data, skeleton)
 		data = data,
 		bones = {},
 		target = nil,
-    rotateMix = data.rotateMix, translateMix = data.translateMix, scaleMix = data.scaleMix, shearMix = data.shearMix,
-    temp = { 0, 0 }
+		rotateMix = data.rotateMix, translateMix = data.translateMix, scaleMix = data.scaleMix, shearMix = data.shearMix,
+		temp = { 0, 0 }
 	}
 	setmetatable(self, TransformConstraint)
-  
-  for i,bone in ipairs(data.bones) do
-    table_insert(self.bones, skeleton:findBone(bone.name))
-  end
-  self.target = skeleton:findBone(data.target.name)
+	
+	for i,bone in ipairs(data.bones) do
+		table_insert(self.bones, skeleton:findBone(bone.name))
+	end
+	self.target = skeleton:findBone(data.target.name)
 
 	return self
 end
 
 function TransformConstraint:apply ()
-  self:update()
+	self:update()
 end
 
 function TransformConstraint:update ()
-  local rotateMix = self.rotateMix
-  local translateMix = self.translateMix
-  local scaleMix = self.scaleMix
-  local shearMix = self.shearMix
-  local target = self.target
-  local ta = target.a
-  local tb = target.b
-  local tc = target.c 
-  local td = target.d
-  local bones = self.bones
-  for i, bone in ipairs(bones) do
-    if rotateMix > 0 then
-      local a = bone.a
-      local b = bone.b
-      local c = bone.c
-      local d = bone.d
-      local r = math_atan2(tc, ta) - math_atan2(c, a) + math_rad(self.data.offsetRotation);
-      if r > math_pi then
-        r = r - math_pi2
-      elseif r < -math_pi then
-        r = r + math_pi2
-      end
-      r = r * rotateMix
-      local cos = math_cos(r)
-      local sin = math_sin(r)
-      bone.a = cos * a - sin * c
-      bone.b = cos * b - sin * d
-      bone.c = sin * a + cos * c
-      bone.d = sin * b + cos * d
-    end
+	local rotateMix = self.rotateMix
+	local translateMix = self.translateMix
+	local scaleMix = self.scaleMix
+	local shearMix = self.shearMix
+	local target = self.target
+	local ta = target.a
+	local tb = target.b
+	local tc = target.c 
+	local td = target.d
+	local bones = self.bones
+	for i, bone in ipairs(bones) do
+		if rotateMix > 0 then
+			local a = bone.a
+			local b = bone.b
+			local c = bone.c
+			local d = bone.d
+			local r = math_atan2(tc, ta) - math_atan2(c, a) + math_rad(self.data.offsetRotation);
+			if r > math_pi then
+				r = r - math_pi2
+			elseif r < -math_pi then
+				r = r + math_pi2
+			end
+			r = r * rotateMix
+			local cos = math_cos(r)
+			local sin = math_sin(r)
+			bone.a = cos * a - sin * c
+			bone.b = cos * b - sin * d
+			bone.c = sin * a + cos * c
+			bone.d = sin * b + cos * d
+		end
 
-    if translateMix > 0 then
-      local temp = self.temp
-      temp[1] = self.data.offsetX
-      temp[2] = self.data.offsetY
-      target:localToWorld(temp)
-      bone.worldX = bone.worldX + (temp[1] - bone.worldX) * translateMix
-      bone.worldY = bone.worldY + (temp[2] - bone.worldY) * translateMix
-    end
+		if translateMix > 0 then
+			local temp = self.temp
+			temp[1] = self.data.offsetX
+			temp[2] = self.data.offsetY
+			target:localToWorld(temp)
+			bone.worldX = bone.worldX + (temp[1] - bone.worldX) * translateMix
+			bone.worldY = bone.worldY + (temp[2] - bone.worldY) * translateMix
+		end
 
-    if scaleMix > 0 then
-      local bs = math_sqrt(bone.a * bone.a + bone.c * bone.c)
-      local ts = math_sqrt(ta * ta + tc * tc)
-      local s = 0
-      if bs > 0.00001 then
-        s = (bs + (ts - bs + self.data.offsetScaleX) * scaleMix) / bs
-      end
-      bone.a = bone.a * s
-      bone.c = bone.c * s
-      bs = math_sqrt(bone.b * bone.b + bone.d * bone.d)
-      ts = math_sqrt(tb * tb + td * td)
-      s = 0
-      if bs > 0.00001 then
-        s = (bs + (ts - bs + self.data.offsetScaleY) * scaleMix) / bs
-      end
-      bone.b = bone.b * s
-      bone.d = bone.d * s
-    end
+		if scaleMix > 0 then
+			local bs = math_sqrt(bone.a * bone.a + bone.c * bone.c)
+			local ts = math_sqrt(ta * ta + tc * tc)
+			local s = 0
+			if bs > 0.00001 then
+				s = (bs + (ts - bs + self.data.offsetScaleX) * scaleMix) / bs
+			end
+			bone.a = bone.a * s
+			bone.c = bone.c * s
+			bs = math_sqrt(bone.b * bone.b + bone.d * bone.d)
+			ts = math_sqrt(tb * tb + td * td)
+			s = 0
+			if bs > 0.00001 then
+				s = (bs + (ts - bs + self.data.offsetScaleY) * scaleMix) / bs
+			end
+			bone.b = bone.b * s
+			bone.d = bone.d * s
+		end
 
-    if shearMix > 0 then
-      local b = bone.b
-      local d = bone.d
-      local by = math_atan2(d, b)
-      local r = math_atan2(td, tb) - math_atan2(tc, ta) - (by - math_atan2(bone.c, bone.a))
-      if r > math_pi then
-        r = r - math_pi2
-      elseif r < -math_pi then
-        r = r + math_pi2
-      end
-      r = by + (r + math_rad(self.data.offsetShearY)) * shearMix
-      local s = math_sqrt(b * b + d * d)
-      bone.b = math_cos(r) * s
-      bone.d = math_sin(r) * s
-    end
-  end
+		if shearMix > 0 then
+			local b = bone.b
+			local d = bone.d
+			local by = math_atan2(d, b)
+			local r = math_atan2(td, tb) - math_atan2(tc, ta) - (by - math_atan2(bone.c, bone.a))
+			if r > math_pi then
+				r = r - math_pi2
+			elseif r < -math_pi then
+				r = r + math_pi2
+			end
+			r = by + (r + math_rad(self.data.offsetShearY)) * shearMix
+			local s = math_sqrt(b * b + d * d)
+			bone.b = math_cos(r) * s
+			bone.d = math_sin(r) * s
+		end
+	end
 end
 
 return TransformConstraint

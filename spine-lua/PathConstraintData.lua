@@ -38,33 +38,33 @@ function PathConstraintData.new (name)
 		bones = {},
 		target = nil,
 		positionMode = nil,
-    spacingMode = nil,
-    rotateMode = nil,
-    offsetRotation = 0,
-    position = 0,
-    spacing = 0,
-    rotateMix = 0,
-    translateMix = 0
+		spacingMode = nil,
+		rotateMode = nil,
+		offsetRotation = 0,
+		position = 0,
+		spacing = 0,
+		rotateMix = 0,
+		translateMix = 0
 	}
 
 	return self
 end
 
 PathConstraintData.PositionMode = {
-  fixed = 0,
-  percent = 1
+	fixed = 0,
+	percent = 1
 }
 
 PathConstraintData.SpacingMode = {
-  length = 0,
-  fixed = 1,
-  percent = 2
+	length = 0,
+	fixed = 1,
+	percent = 2
 }
 
 PathConstraintData.RotateMode = {
-  tangent = 0,
-  chain = 1,
-  chainscale = 2
+	tangent = 0,
+	chain = 1,
+	chainscale = 2
 }
 
 return PathConstraintData

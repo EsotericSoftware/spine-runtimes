@@ -37,17 +37,17 @@ TextureAtlasRegion.__index = TextureAtlasRegion
 setmetatable(TextureAtlasRegion, { __index = TextureRegion })
 
 function TextureAtlasRegion.new ()
-  local self = TextureRegion.new()
-  self.page = nil
-  self.name = nil
-  self.x = 0
-  self.y = 0
-  self.index = 0
-  self.rotate = false
-  self.texture = nil
-  setmetatable(self, TextureAtlasRegion)
-  
-  return self
+	local self = TextureRegion.new()
+	self.page = nil
+	self.name = nil
+	self.x = 0
+	self.y = 0
+	self.index = 0
+	self.rotate = false
+	self.texture = nil
+	setmetatable(self, TextureAtlasRegion)
+	
+	return self
 end
 
 return TextureAtlasRegion

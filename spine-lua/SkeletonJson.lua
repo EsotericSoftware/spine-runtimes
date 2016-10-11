@@ -55,7 +55,7 @@ function SkeletonJson.new (attachmentLoader)
 	local self = {
 		attachmentLoader = attachmentLoader,
 		scale = 1,
-    linkedMeshes = {}
+		linkedMeshes = {}
 	}
 
 	function self:readSkeletonDataFile (fileName, base)
@@ -66,14 +66,14 @@ function SkeletonJson.new (attachmentLoader)
 	local readAnimation
 	local readCurve
 	local getArray
-  
-  local getValue = function (map, name, default)
-    local value = map[name]
-    if value == nil then return default else return value end
-  end
+	
+	local getValue = function (map, name, default)
+		local value = map[name]
+		if value == nil then return default else return value end
+	end
 
 	function self:readSkeletonData (jsonText)
-    local scale = self.scale
+		local scale = self.scale
 		local skeletonData = SkeletonData.new(self.attachmentLoader)
 		local root = spine.utils.readJSON(jsonText)
 		if not root then error("Invalid JSON: " .. jsonText, 2) end
@@ -85,13 +85,13 @@ function SkeletonJson.new (attachmentLoader)
 			skeletonData.version = skeletonMap["spine"]
 			skeletonData.width = skeletonMap["width"]
 			skeletonData.height = skeletonMap["height"]
-      skeletonData.imagesPath = skeletonMap["images"]
+			skeletonData.imagesPath = skeletonMap["images"]
 		end
 
 		-- Bones.
 		for i,boneMap in ipairs(root["bones"]) do
 			local boneName = boneMap["name"]
-      
+			
 			local parent = nil
 			local parentName = boneMap["parent"]
 			if parentName then
@@ -99,24 +99,24 @@ function SkeletonJson.new (attachmentLoader)
 				if not parent then error("Parent bone not found: " .. parentName) end
 			end
 			local data = BoneData.new(i, boneName, parent)
-      data.length = getValue(boneMap, "length", 0) * scale;
-      data.x = getValue(boneMap, "x", 0) * scale;
-      data.y = getValue(boneMap, "y", 0) * scale;
-      data.rotation = getValue(boneMap, "rotation", 0);
-      data.scaleX = getValue(boneMap, "scaleX", 1);
-      data.scaleY = getValue(boneMap, "scaleY", 1);
-      data.shearX = getValue(boneMap, "shearX", 0);
-      data.shearY = getValue(boneMap, "shearY", 0);
-      data.inheritRotation = getValue(boneMap, "inheritRotation", true);
-      data.inheritScale = getValue(boneMap, "inheritScale", true);
-      
+			data.length = getValue(boneMap, "length", 0) * scale;
+			data.x = getValue(boneMap, "x", 0) * scale;
+			data.y = getValue(boneMap, "y", 0) * scale;
+			data.rotation = getValue(boneMap, "rotation", 0);
+			data.scaleX = getValue(boneMap, "scaleX", 1);
+			data.scaleY = getValue(boneMap, "scaleY", 1);
+			data.shearX = getValue(boneMap, "shearX", 0);
+			data.shearY = getValue(boneMap, "shearY", 0);
+			data.inheritRotation = getValue(boneMap, "inheritRotation", true);
+			data.inheritScale = getValue(boneMap, "inheritScale", true);
+			
 			table_insert(skeletonData.bones, data)
 		end
-    
-    -- Slots.
+		
+		-- Slots.
 		if root["slots"] then
 			for i,slotMap in ipairs(root["slots"]) do
-        local index = i
+				local index = i
 				local slotName = slotMap["name"]
 				local boneName = slotMap["bone"]
 				local boneData = skeletonData:findBone(boneName)
@@ -126,9 +126,9 @@ function SkeletonJson.new (attachmentLoader)
 				local color = slotMap["color"]
 				if color then
 					data.color:set(tonumber(color:sub(1, 2), 16) / 255, 
-                         tonumber(color:sub(3, 4), 16) / 255,
-                         tonumber(color:sub(5, 6), 16) / 255,
-                         tonumber(color:sub(7, 8), 16) / 255)
+												 tonumber(color:sub(3, 4), 16) / 255,
+												 tonumber(color:sub(5, 6), 16) / 255,
+												 tonumber(color:sub(7, 8), 16) / 255)
 				end
 
 				data.attachmentName = getValue(slotMap, "attachment", nil)
@@ -155,72 +155,72 @@ function SkeletonJson.new (attachmentLoader)
 				if not data.target then error("Target bone not found: " .. targetName) end
 
 				if constraintMap["bendPositive"] == false then data.bendDirection = -1 else data.bendDirection = 1 end
-        data.mix = getValue(constraintMap, "mix", 1)
+				data.mix = getValue(constraintMap, "mix", 1)
 
 				table_insert(skeletonData.ikConstraints, data)
 			end
 		end
-    
-    -- Transform constraints
-    if root["transform"] then
-      for i,constraintMap in ipairs(root["transform"]) do
-        data = TransformConstraintData.new(constraintMap.name)
-        
-        for i,boneName in ipairs(constraintMap.bones) do
-          local bone = skeletonData:findBone(boneName)
-          if not bone then error("Transform constraint bone not found: " .. boneName, 2) end
-          table_insert(data.bones, bone)
-        end
-        
-        local targetName = constraintMap.target
-        data.target = skeletonData:findBone(targetName)
-        if not data.target then error("Transform constraint target bone not found: " .. boneName, 2) end
-        
-        data.offsetRotation = getValue(constraintMap, "rotation", 0);
-        data.offsetX = getValue(constraintMap, "x", 0) * scale;
-        data.offsetY = getValue(constraintMap, "y", 0) * scale;
-        data.offsetScaleX = getValue(constraintMap, "scaleX", 0);
-        data.offsetScaleY = getValue(constraintMap, "scaleY", 0);
-        data.offsetShearY = getValue(constraintMap, "shearY", 0);
+		
+		-- Transform constraints
+		if root["transform"] then
+			for i,constraintMap in ipairs(root["transform"]) do
+				data = TransformConstraintData.new(constraintMap.name)
+				
+				for i,boneName in ipairs(constraintMap.bones) do
+					local bone = skeletonData:findBone(boneName)
+					if not bone then error("Transform constraint bone not found: " .. boneName, 2) end
+					table_insert(data.bones, bone)
+				end
+				
+				local targetName = constraintMap.target
+				data.target = skeletonData:findBone(targetName)
+				if not data.target then error("Transform constraint target bone not found: " .. boneName, 2) end
+				
+				data.offsetRotation = getValue(constraintMap, "rotation", 0);
+				data.offsetX = getValue(constraintMap, "x", 0) * scale;
+				data.offsetY = getValue(constraintMap, "y", 0) * scale;
+				data.offsetScaleX = getValue(constraintMap, "scaleX", 0);
+				data.offsetScaleY = getValue(constraintMap, "scaleY", 0);
+				data.offsetShearY = getValue(constraintMap, "shearY", 0);
 
-        data.rotateMix = getValue(constraintMap, "rotateMix", 1);
-        data.translateMix = getValue(constraintMap, "translateMix", 1);
-        data.scaleMix = getValue(constraintMap, "scaleMix", 1);
-        data.shearMix = getValue(constraintMap, "shearMix", 1);
+				data.rotateMix = getValue(constraintMap, "rotateMix", 1);
+				data.translateMix = getValue(constraintMap, "translateMix", 1);
+				data.scaleMix = getValue(constraintMap, "scaleMix", 1);
+				data.shearMix = getValue(constraintMap, "shearMix", 1);
 
-        table_insert(skeletonData.transformConstraints, data)
-      end
-    end
-    
-    -- Path constraints
-    if root["path"] then
-      for i,constraintMap in ipairs(root.path) do
-        local data = PathConstraintData.new(constraintMap.name);
+				table_insert(skeletonData.transformConstraints, data)
+			end
+		end
+		
+		-- Path constraints
+		if root["path"] then
+			for i,constraintMap in ipairs(root.path) do
+				local data = PathConstraintData.new(constraintMap.name);
 
-        for i,boneName in ipairs(constraintMap.bones) do
-          local bone = skeletonData:findBone(boneName)
-          if not bone then error("Path constraint bone not found: " .. boneName, 2) end
-          table_insert(data.bones, bone)
-        end
+				for i,boneName in ipairs(constraintMap.bones) do
+					local bone = skeletonData:findBone(boneName)
+					if not bone then error("Path constraint bone not found: " .. boneName, 2) end
+					table_insert(data.bones, bone)
+				end
 
-        local targetName = constraintMap.target;
-        data.target = skeletonData:findSlot(targetName)
-        if data.target == nil then error("Path target slot not found: " .. targetName, 2) end
+				local targetName = constraintMap.target;
+				data.target = skeletonData:findSlot(targetName)
+				if data.target == nil then error("Path target slot not found: " .. targetName, 2) end
 
-        data.positionMode = PathConstraintData.PositionMode[getValue(constraintMap, "positionMode", "percent"):lower()]
-        data.spacingMode = PathConstraintData.SpacingMode[getValue(constraintMap, "spacingMode", "length"):lower()]
-        data.rotateMode = PathConstraintData.RotateMode[getValue(constraintMap, "rotateMode", "tangent"):lower()]
-        data.offsetRotation = getValue(constraintMap, "rotation", 0);
-        data.position = getValue(constraintMap, "position", 0);
-        if data.positionMode == PathConstraintData.PositionMode.fixed then data.position = data.position * scale end
-        data.spacing = getValue(constraintMap, "spacing", 0);
-        if data.spacingMode == PathConstraintData.SpacingMode.length or data.spacingMode == PathConstraintData.SpacingMode.fixed then data.spacing = data.spacing * scale end
-        data.rotateMix = getValue(constraintMap, "rotateMix", 1);
-        data.translateMix = getValue(constraintMap, "translateMix", 1);
+				data.positionMode = PathConstraintData.PositionMode[getValue(constraintMap, "positionMode", "percent"):lower()]
+				data.spacingMode = PathConstraintData.SpacingMode[getValue(constraintMap, "spacingMode", "length"):lower()]
+				data.rotateMode = PathConstraintData.RotateMode[getValue(constraintMap, "rotateMode", "tangent"):lower()]
+				data.offsetRotation = getValue(constraintMap, "rotation", 0);
+				data.position = getValue(constraintMap, "position", 0);
+				if data.positionMode == PathConstraintData.PositionMode.fixed then data.position = data.position * scale end
+				data.spacing = getValue(constraintMap, "spacing", 0);
+				if data.spacingMode == PathConstraintData.SpacingMode.length or data.spacingMode == PathConstraintData.SpacingMode.fixed then data.spacing = data.spacing * scale end
+				data.rotateMix = getValue(constraintMap, "rotateMix", 1);
+				data.translateMix = getValue(constraintMap, "translateMix", 1);
 
-        table_insert(skeletonData.pathConstraints, data)
-      end
-    end
+				table_insert(skeletonData.pathConstraints, data)
+			end
+		end
 
 		-- Skins.
 		if root["skins"] then
@@ -235,22 +235,22 @@ function SkeletonJson.new (attachmentLoader)
 						end
 					end
 				end
-        table_insert(skeletonData.skins, skin)
+				table_insert(skeletonData.skins, skin)
 				if skin.name == "default" then skeletonData.defaultSkin = skin end
 			end
 		end
-    
-    -- Linked meshes
-    for i, linkedMesh in ipairs(self.linkedMeshes) do
-      local skin = skeletonData.defaultSkin
-      if linkedMesh.skin then skin = skeletonData.findSkin(linkedMesh.skin) end
-      if not skin then error("Skin not found: " .. linkedMesh.skin) end
-      local parent = skin:getAttachment(linkedMesh.slotIndex, linkedMesh.parent)
-      if not parent then error("Parent mesh not found: " + linkedMesh.parent) end
-      linkedMesh.mesh:setParentMesh(parent)
-      linkedMesh.mesh:updateUVs()
-    end
-    self.linkedMeshes = {}
+		
+		-- Linked meshes
+		for i, linkedMesh in ipairs(self.linkedMeshes) do
+			local skin = skeletonData.defaultSkin
+			if linkedMesh.skin then skin = skeletonData.findSkin(linkedMesh.skin) end
+			if not skin then error("Skin not found: " .. linkedMesh.skin) end
+			local parent = skin:getAttachment(linkedMesh.slotIndex, linkedMesh.parent)
+			if not parent then error("Parent mesh not found: " + linkedMesh.parent) end
+			linkedMesh.mesh:setParentMesh(parent)
+			linkedMesh.mesh:updateUVs()
+		end
+		self.linkedMeshes = {}
 
 		-- Events.
 		if root["events"] then
@@ -274,7 +274,7 @@ function SkeletonJson.new (attachmentLoader)
 	end
 
 	readAttachment = function (map, skin, slotIndex, name)
- 		local scale = self.scale
+		local scale = self.scale
 		name = getValue(map, "name", name)
 
 		local type = AttachmentType[getValue(map, "type", "region")]
@@ -283,149 +283,149 @@ function SkeletonJson.new (attachmentLoader)
 		if type == AttachmentType.region then
 			local region = attachmentLoader:newRegionAttachment(skin, name, path)
 			if not region then return nil end
-      region.path = path
+			region.path = path
 			region.x = getValue(map, "x", 0) * scale
 			region.y = getValue(map, "y", 0) * scale
-      region.scaleX = getValue(map, "scaleX", 1);
-      region.scaleY = getValue(map, "scaleY", 1);
-      region.rotation = getValue(map, "rotation", 0);
-      region.width = map.width * scale;
-      region.height = map.height * scale;
+			region.scaleX = getValue(map, "scaleX", 1);
+			region.scaleY = getValue(map, "scaleY", 1);
+			region.rotation = getValue(map, "rotation", 0);
+			region.width = map.width * scale;
+			region.height = map.height * scale;
 			
 			local color = map["color"]
 			if color then
 				region.color:set(tonumber(color:sub(1, 2), 16) / 255, 
-                         tonumber(color:sub(3, 4), 16) / 255,
-                         tonumber(color:sub(5, 6), 16) / 255,
-                         tonumber(color:sub(7, 8), 16) / 255)
+												 tonumber(color:sub(3, 4), 16) / 255,
+												 tonumber(color:sub(5, 6), 16) / 255,
+												 tonumber(color:sub(7, 8), 16) / 255)
 			end
 
 			region:updateOffset()
 			return region
-      
+			
 		elseif type == AttachmentType.boundingbox then
 			local box = attachmentLoader:newBoundingBoxAttachment(skin, name)
 			if not box then return nil end
-      readVertices(map, box, map.vertexCount * 2)
-      local color = map.color
-      if color then
-        box.color:set(tonumber(color:sub(1, 2), 16) / 255, 
-                      tonumber(color:sub(3, 4), 16) / 255,
-                      tonumber(color:sub(5, 6), 16) / 255,
-                      tonumber(color:sub(7, 8), 16) / 255)
-      end
+			readVertices(map, box, map.vertexCount * 2)
+			local color = map.color
+			if color then
+				box.color:set(tonumber(color:sub(1, 2), 16) / 255, 
+											tonumber(color:sub(3, 4), 16) / 255,
+											tonumber(color:sub(5, 6), 16) / 255,
+											tonumber(color:sub(7, 8), 16) / 255)
+			end
 			return box
-      
+			
 		elseif type == AttachmentType.mesh or type == AttachmentType.linkedmesh then
 			local mesh = attachmentLoader:newMeshAttachment(skin, name, path)
 			if not mesh then return null end
 			mesh.path = path
-      
-      local color = map.color
+			
+			local color = map.color
 			if color then
 				mesh.color:set(tonumber(color:sub(1, 2), 16) / 255, 
-                         tonumber(color:sub(3, 4), 16) / 255,
-                         tonumber(color:sub(5, 6), 16) / 255,
-                         tonumber(color:sub(7, 8), 16) / 255)
+												 tonumber(color:sub(3, 4), 16) / 255,
+												 tonumber(color:sub(5, 6), 16) / 255,
+												 tonumber(color:sub(7, 8), 16) / 255)
 			end
-      
-      local parent = map.parent
-      if parent then
-        mesh.inheritDeform = getValue(map, "deform", true)
-        table_insert(self.linkedMeshes, {
-            mesh = mesh,
-            skin = getValue(map, skin, nil),
-            slotIndex = slotIndex,
-            parent = parent
-        })
-        return mesh
-      end
-      
-      local uvs = getArray(map, "uvs", 1)
-      readVertices(map, mesh, #uvs)
+			
+			local parent = map.parent
+			if parent then
+				mesh.inheritDeform = getValue(map, "deform", true)
+				table_insert(self.linkedMeshes, {
+						mesh = mesh,
+						skin = getValue(map, skin, nil),
+						slotIndex = slotIndex,
+						parent = parent
+				})
+				return mesh
+			end
+			
+			local uvs = getArray(map, "uvs", 1)
+			readVertices(map, mesh, #uvs)
 			mesh.triangles = getArray(map, "triangles", 1)
-      -- adjust triangle indices by 1, vertices are one-indexed
-      for i,v in ipairs(mesh.triangles) do
-        mesh.triangles[i] = v + 1
-      end
-      mesh.regionUVs = uvs
+			-- adjust triangle indices by 1, vertices are one-indexed
+			for i,v in ipairs(mesh.triangles) do
+				mesh.triangles[i] = v + 1
+			end
+			mesh.regionUVs = uvs
 			mesh:updateUVs()
 
 			mesh.hullLength = getValue(map, "hull", 0) * 2
 			return mesh
-  
-    elseif type == AttachmentType.path then
-      local path = self.attachmentLoader:newPathAttachment(skin, name)
-      if not path then return nil end
-      path.closed = getValue(map, "closed", false)
-      path.constantSpeed = getValue(map, "constantSpeed", true)
+	
+		elseif type == AttachmentType.path then
+			local path = self.attachmentLoader:newPathAttachment(skin, name)
+			if not path then return nil end
+			path.closed = getValue(map, "closed", false)
+			path.constantSpeed = getValue(map, "constantSpeed", true)
 
-      local vertexCount = map.vertexCount
-      readVertices(map, path, vertexCount * 2)
+			local vertexCount = map.vertexCount
+			readVertices(map, path, vertexCount * 2)
 
-      local lengths = utils.newNumberArray(vertexCount / 3, 0)
-      for i,v in ipairs(map.lengths) do
-        lengths[i] = v * scale
-      end
-      path.lengths = lengths
+			local lengths = utils.newNumberArray(vertexCount / 3, 0)
+			for i,v in ipairs(map.lengths) do
+				lengths[i] = v * scale
+			end
+			path.lengths = lengths
 
-      local color = map.color
+			local color = map.color
 			if color then
 				path.color:set(tonumber(color:sub(1, 2), 16) / 255, 
-                         tonumber(color:sub(3, 4), 16) / 255,
-                         tonumber(color:sub(5, 6), 16) / 255,
-                         tonumber(color:sub(7, 8), 16) / 255)
+												 tonumber(color:sub(3, 4), 16) / 255,
+												 tonumber(color:sub(5, 6), 16) / 255,
+												 tonumber(color:sub(7, 8), 16) / 255)
 			end
-      return path;
+			return path;
 		end
 
 		error("Unknown attachment type: " .. type .. " (" .. name .. ")")
 	end
-  
-  readVertices = function (map, attachment, verticesLength)
-    local scale = self.scale
-    attachment.worldVerticesLength = verticesLength
-    local vertices = getArray(map, "vertices", 1)
-    if verticesLength == #vertices then
-      if scale ~= 1 then
-        local i = 0
-        local n = #vertices
-        while i < n do
-          vertices[i + 1] = vertices[i + 1] * scale
-          i = i + 1
-        end
-      end
-      attachment.vertices = vertices
-      return
-    end
-    
-    local weights = {}
-    local bones = {}
-    local i = 0
-    local n = #vertices
-    while i < n do
-      local boneCount = vertices[i + 1]
-      i = i + 1
-      table_insert(bones, boneCount)
-      local nn = i + boneCount * 4
-      while i < nn do
-        table_insert(bones, vertices[i + 1] + 1) -- +1 because bones are one-indexed
-        table_insert(weights, vertices[i + 2] * scale)
-        table_insert(weights, vertices[i + 3] * scale)
-        table_insert(weights, vertices[i + 4])
-        i = i + 4
-      end
-    end
-    attachment.bones = bones
-    attachment.vertices = weights
-  end
+	
+	readVertices = function (map, attachment, verticesLength)
+		local scale = self.scale
+		attachment.worldVerticesLength = verticesLength
+		local vertices = getArray(map, "vertices", 1)
+		if verticesLength == #vertices then
+			if scale ~= 1 then
+				local i = 0
+				local n = #vertices
+				while i < n do
+					vertices[i + 1] = vertices[i + 1] * scale
+					i = i + 1
+				end
+			end
+			attachment.vertices = vertices
+			return
+		end
+		
+		local weights = {}
+		local bones = {}
+		local i = 0
+		local n = #vertices
+		while i < n do
+			local boneCount = vertices[i + 1]
+			i = i + 1
+			table_insert(bones, boneCount)
+			local nn = i + boneCount * 4
+			while i < nn do
+				table_insert(bones, vertices[i + 1] + 1) -- +1 because bones are one-indexed
+				table_insert(weights, vertices[i + 2] * scale)
+				table_insert(weights, vertices[i + 3] * scale)
+				table_insert(weights, vertices[i + 4])
+				i = i + 4
+			end
+		end
+		attachment.bones = bones
+		attachment.vertices = weights
+	end
 
 	readAnimation = function (map, name, skeletonData)
 		local timelines = {}
 		local duration = 0
-    local scale = self.scale
+		local scale = self.scale
 
-    -- Slot timelines
+		-- Slot timelines
 		local slotsMap = map["slots"]
 		if slotsMap then
 			for slotName,timelineMap in pairs(slotsMap) do
@@ -450,7 +450,7 @@ function SkeletonJson.new (attachmentLoader)
 							frameIndex = frameIndex + 1
 						end
 						table_insert(timelines, timeline)
-            duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.ColorTimeline.ENTRIES])
+						duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.ColorTimeline.ENTRIES])
 
 					elseif timelineName == "attachment" then
 						local timeline = Animation.AttachmentTimeline.new(#values)
@@ -472,7 +472,7 @@ function SkeletonJson.new (attachmentLoader)
 			end
 		end
 
-    -- Bone timelines
+		-- Bone timelines
 		local bonesMap = map["bones"]
 		if bonesMap then
 			for boneName,timelineMap in pairs(bonesMap) do
@@ -498,8 +498,8 @@ function SkeletonJson.new (attachmentLoader)
 						local timelineScale = 1
 						if timelineName == "scale" then
 							timeline = Animation.ScaleTimeline.new(#values)
-            elseif timelineName == "shear" then
-              timeline = Animation.ShearTimeline.new(#values)
+						elseif timelineName == "shear" then
+							timeline = Animation.ShearTimeline.new(#values)
 						else
 							timeline = Animation.TranslateTimeline.new(#values)
 							timelineScale = self.scale
@@ -523,7 +523,7 @@ function SkeletonJson.new (attachmentLoader)
 			end
 		end
 
-    -- IK timelines.
+		-- IK timelines.
 		local ik = map["ik"]
 		if ik then
 			for ikConstraintName,values in pairs(ik) do
@@ -549,133 +549,133 @@ function SkeletonJson.new (attachmentLoader)
 				duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.IkConstraintTimeline.ENTRIES])
 			end
 		end
-    
-    -- Transform constraint timelines.
-    local transform = map["transform"]
-    if transform then
-      for constraintName, values in pairs(transform) do
-        local constraint = skeletonData:findTransformConstraint(constraintName)
-        local timeline = Animation.TransformConstraintTimeline.new(#values)
-        for i,other in pairs(skeletonData.transformConstraints) do
-          if other == constraint then
-            timeline.transformConstraintIndex = i
-            break
-          end
-        end
-        local frameIndex = 0
-        for i,valueMap in ipairs(values) do          
-          timeline:setFrame(frameIndex, valueMap.time, getValue(valueMap, "rotateMix", 1), getValue(valueMap, "translateMix", 1), getValue(valueMap, "scaleMix", 1), getValue(valueMap, "shearMix", 1))
-          readCurve(valueMap, timeline, frameIndex)
-          frameIndex = frameIndex + 1
-        end
-        table_insert(timelines, timeline)
-        duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.TransformConstraintTimeline.ENTRIES])
-      end
-    end
-    
-    -- Path constraint timelines.
-    if map.paths then
-      for constraintName,constraintMap in pairs(map.paths) do
-        local index = skeletonData:findPathConstraintIndex(constraintName)
-        if index == -1 then error("Path constraint not found: " .. constraintName, 2) end
-        local data = skeletonData.pathConstraints[index]
-        for timelineName, timelineMap in pairs(constraintMap) do
-          if timelineName == "position" or timelineName == "spacing" then
-            local timeline = nil
-            local timelineScale = 1
-            if timelineName == "spacing" then
-              timeline = Animation.PathConstraintSpacingTimeline.new(#timelineMap)
-              if data.spacingMode == PathConstraintData.SpacingMode.length or data.spacingMode == PathConstraintData.SpacingMode.fixed then timelineScale = scale end
-            else
-              timeline = Animation.PathConstraintPositionTimeline.new(#timelineMap)
-              if data.positionMode == PathConstraintData.PositionMode.fixed then timelineScale = scale end              
-            end
-            timeline.pathConstraintIndex = index
-            local frameIndex = 0
-            for i,valueMap in ipairs(timelineMap) do
-              timeline:setFrame(frameIndex, valueMap.time, getValue(valueMap, timelineName, 0) * timelineScale)
-              readCurve(valueMap, timeline, frameIndex)
-              frameIndex = frameIndex + 1
-            end
-            table_insert(timelines, timeline)
-            duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.PathConstraintPositionTimeline.ENTRIES])
-          elseif timelineName == "mix" then
-            local timeline = Animation.PathConstraintMixTimeline.new(#timelineMap)
-            timeline.pathConstraintIndex = index
-            local frameIndex = 0
-            for i,valueMap in ipairs(timelineMap) do
-              timeline:setFrame(frameIndex, valueMap.time, getValue(valueMap, "rotateMix", 1), getValue(valueMap, "translateMix", 1))
-              readCurve(valueMap, timeline, frameIndex)
-              frameIndex = frameIndex + 1
-            end
-            table_insert(timelines, timeline)
-            duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.PathConstraintMixTimeline.ENTRIES])
-          end          
-        end
-      end
-    end
-    
-    -- Deform timelines.
-    if map.deform then
-      for deformName, deformMap in pairs(map.deform) do
-        local skin = skeletonData:findSkin(deformName)
-        if not skin then error("Skin not found: " .. deformName, 2) end
-        for slotName,slotMap in pairs(deformMap) do
-          local slotIndex = skeletonData:findSlotIndex(slotName)
-          if slotIndex == -1 then error("Slot not found: " .. slotMap.name, 2) end
-          for timelineName,timelineMap in pairs(slotMap) do
-            local attachment = skin:getAttachment(slotIndex, timelineName)
-            if not attachment then error("Deform attachment not found: " .. timelineMap.name, 2) end
-            local weighted = attachment.bones ~= nil
-            local vertices = attachment.vertices;
-            local deformLength = #vertices
-            if weighted then deformLength = math.floor(#vertices / 3) * 2 end
+		
+		-- Transform constraint timelines.
+		local transform = map["transform"]
+		if transform then
+			for constraintName, values in pairs(transform) do
+				local constraint = skeletonData:findTransformConstraint(constraintName)
+				local timeline = Animation.TransformConstraintTimeline.new(#values)
+				for i,other in pairs(skeletonData.transformConstraints) do
+					if other == constraint then
+						timeline.transformConstraintIndex = i
+						break
+					end
+				end
+				local frameIndex = 0
+				for i,valueMap in ipairs(values) do					 
+					timeline:setFrame(frameIndex, valueMap.time, getValue(valueMap, "rotateMix", 1), getValue(valueMap, "translateMix", 1), getValue(valueMap, "scaleMix", 1), getValue(valueMap, "shearMix", 1))
+					readCurve(valueMap, timeline, frameIndex)
+					frameIndex = frameIndex + 1
+				end
+				table_insert(timelines, timeline)
+				duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.TransformConstraintTimeline.ENTRIES])
+			end
+		end
+		
+		-- Path constraint timelines.
+		if map.paths then
+			for constraintName,constraintMap in pairs(map.paths) do
+				local index = skeletonData:findPathConstraintIndex(constraintName)
+				if index == -1 then error("Path constraint not found: " .. constraintName, 2) end
+				local data = skeletonData.pathConstraints[index]
+				for timelineName, timelineMap in pairs(constraintMap) do
+					if timelineName == "position" or timelineName == "spacing" then
+						local timeline = nil
+						local timelineScale = 1
+						if timelineName == "spacing" then
+							timeline = Animation.PathConstraintSpacingTimeline.new(#timelineMap)
+							if data.spacingMode == PathConstraintData.SpacingMode.length or data.spacingMode == PathConstraintData.SpacingMode.fixed then timelineScale = scale end
+						else
+							timeline = Animation.PathConstraintPositionTimeline.new(#timelineMap)
+							if data.positionMode == PathConstraintData.PositionMode.fixed then timelineScale = scale end							
+						end
+						timeline.pathConstraintIndex = index
+						local frameIndex = 0
+						for i,valueMap in ipairs(timelineMap) do
+							timeline:setFrame(frameIndex, valueMap.time, getValue(valueMap, timelineName, 0) * timelineScale)
+							readCurve(valueMap, timeline, frameIndex)
+							frameIndex = frameIndex + 1
+						end
+						table_insert(timelines, timeline)
+						duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.PathConstraintPositionTimeline.ENTRIES])
+					elseif timelineName == "mix" then
+						local timeline = Animation.PathConstraintMixTimeline.new(#timelineMap)
+						timeline.pathConstraintIndex = index
+						local frameIndex = 0
+						for i,valueMap in ipairs(timelineMap) do
+							timeline:setFrame(frameIndex, valueMap.time, getValue(valueMap, "rotateMix", 1), getValue(valueMap, "translateMix", 1))
+							readCurve(valueMap, timeline, frameIndex)
+							frameIndex = frameIndex + 1
+						end
+						table_insert(timelines, timeline)
+						duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.PathConstraintMixTimeline.ENTRIES])
+					end					 
+				end
+			end
+		end
+		
+		-- Deform timelines.
+		if map.deform then
+			for deformName, deformMap in pairs(map.deform) do
+				local skin = skeletonData:findSkin(deformName)
+				if not skin then error("Skin not found: " .. deformName, 2) end
+				for slotName,slotMap in pairs(deformMap) do
+					local slotIndex = skeletonData:findSlotIndex(slotName)
+					if slotIndex == -1 then error("Slot not found: " .. slotMap.name, 2) end
+					for timelineName,timelineMap in pairs(slotMap) do
+						local attachment = skin:getAttachment(slotIndex, timelineName)
+						if not attachment then error("Deform attachment not found: " .. timelineMap.name, 2) end
+						local weighted = attachment.bones ~= nil
+						local vertices = attachment.vertices;
+						local deformLength = #vertices
+						if weighted then deformLength = math.floor(#vertices / 3) * 2 end
 
-            local timeline = Animation.DeformTimeline.new(#timelineMap)
-            timeline.slotIndex = slotIndex
-            timeline.attachment = attachment
+						local timeline = Animation.DeformTimeline.new(#timelineMap)
+						timeline.slotIndex = slotIndex
+						timeline.attachment = attachment
 
-            local frameIndex = 0
-            for i,valueMap in ipairs(timelineMap) do
-              local deform = nil
-              local verticesValue = getValue(valueMap, "vertices", nil)
-              if verticesValue == nil then
-                deform = vertices
-                if weighted then deform = utils.newNumberArray(deformLength) end
-              else
-                deform = utils.newNumberArray(deformLength)
-                local start = getValue(valueMap, "offset", 0) + 1
-                utils.arrayCopy(verticesValue, 1, deform, start, #verticesValue)
-                if scale ~= 1 then
-                  local i = start
-                  local n = i + #verticesValue
-                  while i < n do
-                    deform[i] = deform[i] * scale
-                    i = i + 1
-                  end
-                end
-                if not weighted then
-                  local i = 1
-                  local n = i + deformLength
-                  while i < n do
-                    deform[i] = deform[i] + vertices[i]
-                    i = i + 1
-                  end
-                end
-              end
+						local frameIndex = 0
+						for i,valueMap in ipairs(timelineMap) do
+							local deform = nil
+							local verticesValue = getValue(valueMap, "vertices", nil)
+							if verticesValue == nil then
+								deform = vertices
+								if weighted then deform = utils.newNumberArray(deformLength) end
+							else
+								deform = utils.newNumberArray(deformLength)
+								local start = getValue(valueMap, "offset", 0) + 1
+								utils.arrayCopy(verticesValue, 1, deform, start, #verticesValue)
+								if scale ~= 1 then
+									local i = start
+									local n = i + #verticesValue
+									while i < n do
+										deform[i] = deform[i] * scale
+										i = i + 1
+									end
+								end
+								if not weighted then
+									local i = 1
+									local n = i + deformLength
+									while i < n do
+										deform[i] = deform[i] + vertices[i]
+										i = i + 1
+									end
+								end
+							end
 
-              timeline:setFrame(frameIndex, valueMap.time, deform)
-              readCurve(valueMap, timeline, frameIndex)
-              frameIndex = frameIndex + 1
-            end
-            table_insert(timelines, timeline)
-            duration = math.max(duration, timeline.frames[timeline:getFrameCount() - 1])
-          end
-        end
-      end
-    end
+							timeline:setFrame(frameIndex, valueMap.time, deform)
+							readCurve(valueMap, timeline, frameIndex)
+							frameIndex = frameIndex + 1
+						end
+						table_insert(timelines, timeline)
+						duration = math.max(duration, timeline.frames[timeline:getFrameCount() - 1])
+					end
+				end
+			end
+		end
 
-    -- Draworder timeline.
+		-- Draworder timeline.
 		local drawOrderValues = map["drawOrder"]
 		if not drawOrderValues then drawOrderValues = map["draworder"] end
 		if drawOrderValues then
@@ -724,7 +724,7 @@ function SkeletonJson.new (attachmentLoader)
 			duration = math.max(duration, timeline.frames[timeline:getFrameCount() - 1])
 		end
 
-    -- Event timeline.
+		-- Event timeline.
 		local events = map["events"]
 		if events then
 			local timeline = Animation.EventTimeline.new(#events)

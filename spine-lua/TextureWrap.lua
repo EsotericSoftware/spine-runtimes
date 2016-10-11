@@ -31,6 +31,6 @@
 
 local TextureWrap = {
 	ClampToEdge = 0,
-  Repeat = 1
+	Repeat = 1
 }
 return TextureWrap

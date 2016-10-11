@@ -31,20 +31,20 @@
 
 local BoneData = {}
 function BoneData.new (index, name, parent)
-  if index < 0 then error("index must be >= 0", 2) end
+	if index < 0 then error("index must be >= 0", 2) end
 	if not name then error("name cannot be nil", 2) end
 
 	local self = {
-    index = index,
+		index = index,
 		name = name,
 		parent = parent,
 		length = 0,
 		x = 0, y = 0,
 		rotation = 0,
 		scaleX = 1, scaleY = 1,
-    shearX = 0, shearY = 0,
+		shearX = 0, shearY = 0,
 		inheritRotation = true,
-    inheritScale = true
+		inheritScale = true
 	}
 
 	return self

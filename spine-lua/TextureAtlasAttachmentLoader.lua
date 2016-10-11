@@ -42,41 +42,41 @@ TextureAtlasAttachmentLoader.__index = TextureAtlasAttachmentLoader
 
 function TextureAtlasAttachmentLoader.new (atlas)
 	local self = {
-    atlas = atlas
-  }
-  setmetatable(self, TextureAtlasAttachmentLoader)
+		atlas = atlas
+	}
+	setmetatable(self, TextureAtlasAttachmentLoader)
 	return self
 end
 
 function TextureAtlasAttachmentLoader:newRegionAttachment (skin, name, path)
-  local region = self.atlas:findRegion(path)
-  if not region then error("Region not found in atlas: " .. path .. " (region attachment: " .. name .. ")") end
-  region.renderObject = region
-  local attachment = RegionAttachment.new(name)
-  attachment:setRegion(region)
-  attachment.region = region
-  return attachment
+	local region = self.atlas:findRegion(path)
+	if not region then error("Region not found in atlas: " .. path .. " (region attachment: " .. name .. ")") end
+	region.renderObject = region
+	local attachment = RegionAttachment.new(name)
+	attachment:setRegion(region)
+	attachment.region = region
+	return attachment
 end
 
 function TextureAtlasAttachmentLoader:newMeshAttachment (skin, name, path)
-  local region = self.atlas:findRegion(path)
-  if not region then error("Region not found in atlas: " .. path .. " (mesh attachment: " .. name .. ")") end
-  region.renderObject = region
-  local attachment = MeshAttachment.new(name)
-  attachment.region = region
-  return attachment
+	local region = self.atlas:findRegion(path)
+	if not region then error("Region not found in atlas: " .. path .. " (mesh attachment: " .. name .. ")") end
+	region.renderObject = region
+	local attachment = MeshAttachment.new(name)
+	attachment.region = region
+	return attachment
 end
 
 function TextureAtlasAttachmentLoader:newSkinningMeshAttachment (skin, name, path)
-  return SkinningMeshAttachment.new(name)
+	return SkinningMeshAttachment.new(name)
 end
 
 function TextureAtlasAttachmentLoader:newBoundingBoxAttachment (skin, name)
-  return BoundingBoxAttachment.new(name)
+	return BoundingBoxAttachment.new(name)
 end
 
 function TextureAtlasAttachmentLoader:newPathAttachment(skin, name)
-  return PathAttachment.new(name)
+	return PathAttachment.new(name)
 end
 
 return TextureAtlasAttachmentLoader

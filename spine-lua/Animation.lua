@@ -39,7 +39,7 @@ local utils = require "spine-lua.utils"
 local AttachmentType = require "spine-lua.attachments.AttachmentType"
 
 local function zlen(array)
-  return #array + 1
+	return #array + 1
 end
 
 local Animation = {}
@@ -70,7 +70,7 @@ function Animation.new (name, timelines, duration)
 
 		if loop and duration > 0 then
 			time = time % self.duration
-			if lastTime > 0  then lastTime = lastTime % self.duration end
+			if lastTime > 0	 then lastTime = lastTime % self.duration end
 		end
 
 		for i,timeline in ipairs(self.timelines) do
@@ -99,7 +99,7 @@ end
 
 local function binarySearch1 (values, target)
 	local low = 0
-	local high = math.floor(zlen(values)  - 2)
+	local high = math.floor(zlen(values)	- 2)
 	if high == 0 then return 1 end
 	local current = math.floor(high / 2)
 	while true do
@@ -114,11 +114,11 @@ local function binarySearch1 (values, target)
 end
 
 local function linearSearch (values, target, step)
-  local i = 0
-  local last = zlen(values) - step
-  while i <= last do
+	local i = 0
+	local last = zlen(values) - step
+	while i <= last do
 		if (values[i] > target) then return i end
-    i = i + step
+		i = i + step
 	end
 	return -1
 end
@@ -133,43 +133,43 @@ function Animation.CurveTimeline.new (frameCount)
 	local self = {
 		curves = utils.newNumberArrayZero((frameCount - 1) * BEZIER_SIZE) -- type, x, y, ...
 	}
-  
-  function self:getFrameCount ()
-    return math.floor(zlen(self.curves) / BEZIER_SIZE) + 1
-  end
+	
+	function self:getFrameCount ()
+		return math.floor(zlen(self.curves) / BEZIER_SIZE) + 1
+	end
 
 	function self:setStepped (frameIndex)
 		self.curves[frameIndex * BEZIER_SIZE] = STEPPED
 	end
-  
-  function self:getCurveType (frameIndex)
-    local index = frameIndex * BEZIER_SIZE
-    if index == zlen(self.curves) then return LINEAR end
-    local type = self.curves[index]
-    if type == LINEAR then return LINEAR end
-    if type == STEPPED then return STEPPED end
-    return BEZIER
-  end
+	
+	function self:getCurveType (frameIndex)
+		local index = frameIndex * BEZIER_SIZE
+		if index == zlen(self.curves) then return LINEAR end
+		local type = self.curves[index]
+		if type == LINEAR then return LINEAR end
+		if type == STEPPED then return STEPPED end
+		return BEZIER
+	end
 
 	function self:setCurve (frameIndex, cx1, cy1, cx2, cy2)
 			local tmpx = (-cx1 * 2 + cx2) * 0.03
-      local tmpy = (-cy1 * 2 + cy2) * 0.03
+			local tmpy = (-cy1 * 2 + cy2) * 0.03
 			local dddfx = ((cx1 - cx2) * 3 + 1) * 0.006
-      local dddfy = ((cy1 - cy2) * 3 + 1) * 0.006
+			local dddfy = ((cy1 - cy2) * 3 + 1) * 0.006
 			local ddfx = tmpx * 2 + dddfx
-      local ddfy = tmpy * 2 + dddfy
+			local ddfy = tmpy * 2 + dddfy
 			local dfx = cx1 * 0.3 + tmpx + dddfx * 0.16666667
-      local dfy = cy1 * 0.3 + tmpy + dddfy * 0.16666667
+			local dfy = cy1 * 0.3 + tmpy + dddfy * 0.16666667
 
 			local i = frameIndex * BEZIER_SIZE
 			local curves = self.curves
 			curves[i] = BEZIER
-      i = i + 1
+			i = i + 1
 
 			local x = dfx
-      local y = dfy
-      local n = i + BEZIER_SIZE - 1
-      while i < n do
+			local y = dfy
+			local n = i + BEZIER_SIZE - 1
+			while i < n do
 				curves[i] = x
 				curves[i + 1] = y
 				dfx = dfx + ddfx
@@ -178,12 +178,12 @@ function Animation.CurveTimeline.new (frameCount)
 				ddfy = ddfy + dddfy
 				x = x + dfx
 				y = y + dfy
-        i = i + 2
+				i = i + 2
 			end
 	end
 
 	function self:getCurvePercent (frameIndex, percent)
-    percent = utils.clamp(percent, 0, 1)
+		percent = utils.clamp(percent, 0, 1)
 		local curves = self.curves
 		local i = frameIndex * BEZIER_SIZE
 		local type = curves[i]
@@ -218,15 +218,15 @@ end
 Animation.RotateTimeline = {}
 Animation.RotateTimeline.ENTRIES = 2
 function Animation.RotateTimeline.new (frameCount)
-  local ENTRIES = Animation.RotateTimeline.ENTRIES
+	local ENTRIES = Animation.RotateTimeline.ENTRIES
 	local PREV_TIME = -2
-  local PREV_ROTATION = -1
+	local PREV_ROTATION = -1
 	local ROTATION = 1
 
 	local self = Animation.CurveTimeline.new(frameCount)
 	self.boneIndex = -1
-  self.frames = utils.newNumberArrayZero(frameCount * 2)
-  
+	self.frames = utils.newNumberArrayZero(frameCount * 2)
+	
 	function self:setFrame (frameIndex, time, degrees)
 		frameIndex = frameIndex * 2
 		self.frames[frameIndex] = time
@@ -255,7 +255,7 @@ function Animation.RotateTimeline.new (frameCount)
 		local frame = binarySearch(frames, time, ENTRIES)
 		local prevRotation = frames[frame + PREV_ROTATION]
 		local frameTime = frames[frame]
-    local percent = self:getCurvePercent((math.floor(frame / 2)) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
+		local percent = self:getCurvePercent((math.floor(frame / 2)) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
 
 		local amount = frames[frame + ROTATION] - prevRotation
 		while amount > 180 do
@@ -280,15 +280,15 @@ end
 Animation.TranslateTimeline = {}
 Animation.TranslateTimeline.ENTRIES = 3
 function Animation.TranslateTimeline.new (frameCount)
-  local ENTRIES = Animation.TranslateTimeline.ENTRIES
+	local ENTRIES = Animation.TranslateTimeline.ENTRIES
 	local PREV_TIME = -3
-  local PREV_X = -2
-  local PREV_Y = -1
+	local PREV_X = -2
+	local PREV_Y = -1
 	local X = 1
 	local Y = 2
 
 	local self = Animation.CurveTimeline.new(frameCount)
-  self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
+	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
 	self.boneIndex = -1
 
 	function self:setFrame (frameIndex, time, x, y)
@@ -327,10 +327,10 @@ end
 Animation.ScaleTimeline = {}
 Animation.ScaleTimeline.ENTRIES = Animation.TranslateTimeline.ENTRIES
 function Animation.ScaleTimeline.new (frameCount)
-  local ENTRIES = Animation.ScaleTimeline.ENTRIES
+	local ENTRIES = Animation.ScaleTimeline.ENTRIES
 	local PREV_TIME = -3
-  local PREV_X = -2
-  local PREV_Y = -1
+	local PREV_X = -2
+	local PREV_Y = -1
 	local X = 1
 	local Y = 2
 
@@ -366,10 +366,10 @@ end
 Animation.ShearTimeline = {}
 Animation.ShearTimeline.ENTRIES = Animation.TranslateTimeline.ENTRIES
 function Animation.ShearTimeline.new (frameCount)
-  local ENTRIES = Animation.ShearTimeline.ENTRIES
+	local ENTRIES = Animation.ShearTimeline.ENTRIES
 	local PREV_TIME = -3
-  local PREV_X = -2
-  local PREV_Y = -1
+	local PREV_X = -2
+	local PREV_Y = -1
 	local X = 1
 	local Y = 2
 
@@ -405,19 +405,19 @@ end
 Animation.ColorTimeline = {}
 Animation.ColorTimeline.ENTRIES = 5
 function Animation.ColorTimeline.new (frameCount)
-  local ENTRIES = Animation.ColorTimeline.ENTRIES
-  local PREV_TIME = -5
-  local PREV_R = -4
-  local PREV_G = -3
-  local PREV_B = -2
-  local PREV_A = -1
-  local R = 1
-  local G = 2
-  local B = 3
-  local A = 4
+	local ENTRIES = Animation.ColorTimeline.ENTRIES
+	local PREV_TIME = -5
+	local PREV_R = -4
+	local PREV_G = -3
+	local PREV_B = -2
+	local PREV_A = -1
+	local R = 1
+	local G = 2
+	local B = 3
+	local A = 4
 
 	local self = Animation.CurveTimeline.new(frameCount)
-  self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
+	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
 	self.slotIndex = -1
 
 	function self:setFrame (frameIndex, time, r, g, b, a)
@@ -435,7 +435,7 @@ function Animation.ColorTimeline.new (frameCount)
 
 		local r, g, b, a
 		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
-      local i = zlen(frames)
+			local i = zlen(frames)
 			r = frames[i + PREV_R]
 			g = frames[i + PREV_G]
 			b = frames[i + PREV_B]
@@ -443,7 +443,7 @@ function Animation.ColorTimeline.new (frameCount)
 		else
 			-- Interpolate between the last frame and the current frame.
 			local frame = binarySearch(frames, time, ENTRIES)
-      r = frames[frame + PREV_R]
+			r = frames[frame + PREV_R]
 			g = frames[frame + PREV_G]
 			b = frames[frame + PREV_B]
 			a = frames[frame + PREV_A]
@@ -486,7 +486,7 @@ function Animation.AttachmentTimeline.new (frameCount)
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
 		local frames = self.frames
-    if time < frames[0] then return end  
+		if time < frames[0] then return end	 
 
 		local frameIndex = 0
 		if time >= frames[zlen(frames) - 1] then
@@ -609,75 +609,75 @@ end
 
 Animation.DeformTimeline = {}
 function Animation.DeformTimeline.new (frameCount)
-  
+	
 	local self = Animation.CurveTimeline.new(frameCount)
-  self.frames = utils.newNumberArrayZero(frameCount)
+	self.frames = utils.newNumberArrayZero(frameCount)
 	self.frameVertices = utils.newNumberArrayZero(frameCount)
-  self.slotIndex = -1
-  self.attachment = nil
+	self.slotIndex = -1
+	self.attachment = nil
 
 	function self:setFrame (frameIndex, time, vertices)
 		self.frames[frameIndex] = time
-    self.frameVertices[frameIndex] = vertices
+		self.frameVertices[frameIndex] = vertices
 	end
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
-    local slot = skeleton.slots[self.slotIndex]
-    local slotAttachment = slot.attachment
-    if not slotAttachment then return end
-    if not (slotAttachment.type == AttachmentType.mesh or slotAttachment.type == AttachmentType.linkedmesh or slotAttachment.type == AttachmentType.path) then return end
-    if not slotAttachment:applyDeform(self.attachment) then return end
-      
+		local slot = skeleton.slots[self.slotIndex]
+		local slotAttachment = slot.attachment
+		if not slotAttachment then return end
+		if not (slotAttachment.type == AttachmentType.mesh or slotAttachment.type == AttachmentType.linkedmesh or slotAttachment.type == AttachmentType.path) then return end
+		if not slotAttachment:applyDeform(self.attachment) then return end
+			
 		local frames = self.frames
 		if time < frames[0] then return end -- Time is before first frame.
 
-    local frameVertices = self.frameVertices
-    local vertexCount = #(frameVertices[0])
+		local frameVertices = self.frameVertices
+		local vertexCount = #(frameVertices[0])
 
-    local verticesArray = slot.attachmentVertices
-    if (#verticesArray ~= vertexCount) then alpha = 1 end -- Don't mix from uninitialized slot vertices.
-    local vertices = utils.setArraySize(verticesArray, vertexCount)
+		local verticesArray = slot.attachmentVertices
+		if (#verticesArray ~= vertexCount) then alpha = 1 end -- Don't mix from uninitialized slot vertices.
+		local vertices = utils.setArraySize(verticesArray, vertexCount)
 
-    if time >= frames[zlen(frames) - 1] then
-      local lastVertices = frameVertices[zlen(frames) - 1]
-      if alpha < 1 then
-        local i = 1
-        while i <= vertexCount do
-          vertices[i] = vertices[i] + (lastVertices[i] - vertices[i]) * alpha
-          i = i + 1
-        end
-      else
-        local i = 1
-        while i <= vertexCount do
-          vertices[i] = lastVertices[i]
-          i = i + 1
-        end
-      end
-      return;
-    end
+		if time >= frames[zlen(frames) - 1] then
+			local lastVertices = frameVertices[zlen(frames) - 1]
+			if alpha < 1 then
+				local i = 1
+				while i <= vertexCount do
+					vertices[i] = vertices[i] + (lastVertices[i] - vertices[i]) * alpha
+					i = i + 1
+				end
+			else
+				local i = 1
+				while i <= vertexCount do
+					vertices[i] = lastVertices[i]
+					i = i + 1
+				end
+			end
+			return;
+		end
 
-    -- Interpolate between the previous frame and the current frame.
-    local frame = binarySearch(frames, time, 1)
-    local prevVertices = frameVertices[frame - 1]
-    local nextVertices = frameVertices[frame]
-    local frameTime = frames[frame]
-    local percent = self:getCurvePercent(frame - 1, 1 - (time - frameTime) / (frames[frame - 1] - frameTime))
+		-- Interpolate between the previous frame and the current frame.
+		local frame = binarySearch(frames, time, 1)
+		local prevVertices = frameVertices[frame - 1]
+		local nextVertices = frameVertices[frame]
+		local frameTime = frames[frame]
+		local percent = self:getCurvePercent(frame - 1, 1 - (time - frameTime) / (frames[frame - 1] - frameTime))
 
-    if alpha < 1 then
-      local i = 1
-      while i <= vertexCount do
-        local prev = prevVertices[i]
-        vertices[i] = vertices[i] + (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha
-        i = i + 1
-      end
-    else
-      local i = 1
-      while i <= vertexCount do
-        local prev = prevVertices[i]
-        vertices[i] = prev + (nextVertices[i] - prev) * percent
-        i = i + 1
-      end
-    end
+		if alpha < 1 then
+			local i = 1
+			while i <= vertexCount do
+				local prev = prevVertices[i]
+				vertices[i] = vertices[i] + (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha
+				i = i + 1
+			end
+		else
+			local i = 1
+			while i <= vertexCount do
+				local prev = prevVertices[i]
+				vertices[i] = prev + (nextVertices[i] - prev) * percent
+				i = i + 1
+			end
+		end
 	end
 
 	return self
@@ -686,12 +686,12 @@ end
 Animation.IkConstraintTimeline = {}
 Animation.IkConstraintTimeline.ENTRIES = 3
 function Animation.IkConstraintTimeline.new (frameCount)
-  local ENTRIES = Animation.IkConstraintTimeline.ENTRIES
+	local ENTRIES = Animation.IkConstraintTimeline.ENTRIES
 	local PREV_TIME = -3
 	local PREV_MIX = -2
 	local PREV_BEND_DIRECTION = -1
 	local MIX = 1
-  local BEND_DIRECTION = 2
+	local BEND_DIRECTION = 2
 
 	local self = Animation.CurveTimeline.new(frameCount)
 	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES) -- time, mix, bendDirection, ...
@@ -720,7 +720,7 @@ function Animation.IkConstraintTimeline.new (frameCount)
 		local frame = binarySearch(frames, time, ENTRIES)
 		local mix = frames[frame + PREV_MIX]
 		local frameTime = frames[frame]
-    local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1,
+		local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1,
 				1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
 
 		constraint.mix = constraint.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.mix) * alpha
@@ -733,19 +733,19 @@ end
 Animation.TransformConstraintTimeline = {}
 Animation.TransformConstraintTimeline.ENTRIES = 5
 function Animation.TransformConstraintTimeline.new (frameCount)
-  local ENTRIES = Animation.TransformConstraintTimeline.ENTRIES
+	local ENTRIES = Animation.TransformConstraintTimeline.ENTRIES
 	local PREV_TIME = -5
-  local PREV_ROTATE = -4
-  local PREV_TRANSLATE = -3
-  local PREV_SCALE = -2
-  local PREV_SHEAR = -1
-  local ROTATE = 1
-  local TRANSLATE = 2
-  local SCALE = 3
-  local SHEAR = 4
+	local PREV_ROTATE = -4
+	local PREV_TRANSLATE = -3
+	local PREV_SCALE = -2
+	local PREV_SHEAR = -1
+	local ROTATE = 1
+	local TRANSLATE = 2
+	local SCALE = 3
+	local SHEAR = 4
 
 	local self = Animation.CurveTimeline.new(frameCount)
-  self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
+	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
 	self.transformConstraintIndex = -1
 
 	function self:setFrame (frameIndex, time, rotateMix, translateMix, scaleMix, shearMix)
@@ -753,8 +753,8 @@ function Animation.TransformConstraintTimeline.new (frameCount)
 		self.frames[frameIndex] = time
 		self.frames[frameIndex + ROTATE] = rotateMix
 		self.frames[frameIndex + TRANSLATE] = translateMix
- 		self.frames[frameIndex + SCALE] = scaleMix
- 		self.frames[frameIndex + SHEAR] = shearMix
+		self.frames[frameIndex + SCALE] = scaleMix
+		self.frames[frameIndex + SHEAR] = shearMix
 	end
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
@@ -764,7 +764,7 @@ function Animation.TransformConstraintTimeline.new (frameCount)
 		local constraint = skeleton.transformConstraints[self.transformConstraintIndex]
 		
 		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
-        local i = zlen(frames)
+				local i = zlen(frames)
 				constraint.rotateMix = constraintMix.rotateMix + (frames[i + PREV_ROTATE] - constraint.rotateMix) * alpha
 				constraint.translateMix = constraintMix.translateMix + (frames[i + PREV_TRANSLATE] - constraint.translateMix) * alpha
 				constraint.scaleMix = constraintMix.scaleMix + (frames[i + PREV_SCALE] - constraint.scaleMix) * alpha
@@ -773,18 +773,18 @@ function Animation.TransformConstraintTimeline.new (frameCount)
 		end
 
 		-- Interpolate between the last frame and the current frame.
-    local frame = binarySearch(frames, time, ENTRIES)
-    local frameTime = frames[frame]
-    local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
+		local frame = binarySearch(frames, time, ENTRIES)
+		local frameTime = frames[frame]
+		local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
 
-    local rotate = frames[frame + PREV_ROTATE]
-    local translate = frames[frame + PREV_TRANSLATE]
-    local scale = frames[frame + PREV_SCALE]
-    local shear = frames[frame + PREV_SHEAR]
-    constraint.rotateMix = constraint.rotateMix + (rotate + (frames[frame + ROTATE] - rotate) * percent - constraint.rotateMix) * alpha
-    constraint.translateMix = constraint.translateMix + (translate + (frames[frame + TRANSLATE] - translate) * percent - constraint.translateMix) * alpha
-    constraint.scaleMix = constraint.scaleMix + (scale + (frames[frame + SCALE] - scale) * percent - constraint.scaleMix) * alpha
-    constraint.shearMix = constraint.shearMix + (shear + (frames[frame + SHEAR] - shear) * percent - constraint.shearMix) * alpha
+		local rotate = frames[frame + PREV_ROTATE]
+		local translate = frames[frame + PREV_TRANSLATE]
+		local scale = frames[frame + PREV_SCALE]
+		local shear = frames[frame + PREV_SHEAR]
+		constraint.rotateMix = constraint.rotateMix + (rotate + (frames[frame + ROTATE] - rotate) * percent - constraint.rotateMix) * alpha
+		constraint.translateMix = constraint.translateMix + (translate + (frames[frame + TRANSLATE] - translate) * percent - constraint.translateMix) * alpha
+		constraint.scaleMix = constraint.scaleMix + (scale + (frames[frame + SCALE] - scale) * percent - constraint.scaleMix) * alpha
+		constraint.shearMix = constraint.shearMix + (shear + (frames[frame + SHEAR] - shear) * percent - constraint.shearMix) * alpha
 	end
 
 	return self
@@ -793,13 +793,13 @@ end
 Animation.PathConstraintPositionTimeline = {}
 Animation.PathConstraintPositionTimeline.ENTRIES = 2
 function Animation.PathConstraintPositionTimeline.new (frameCount)
-  local ENTRIES = Animation.PathConstraintPositionTimeline.ENTRIES
+	local ENTRIES = Animation.PathConstraintPositionTimeline.ENTRIES
 	local PREV_TIME = -2
-  local PREV_VALUE = -1
-  local VALUE = 1
+	local PREV_VALUE = -1
+	local VALUE = 1
 
 	local self = Animation.CurveTimeline.new(frameCount)
-  self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
+	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
 	self.pathConstraintIndex = -1
 
 	function self:setFrame (frameIndex, time, value)
@@ -809,24 +809,24 @@ function Animation.PathConstraintPositionTimeline.new (frameCount)
 	end
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
-    local frames = self.frames
-    if (time < frames[0]) then return end -- Time is before first frame.
+		local frames = self.frames
+		if (time < frames[0]) then return end -- Time is before first frame.
 
-    local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
+		local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
 
-    if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
-      local i = zlen(frames)
-      constraint.position = constraint.position + (frames[i + PREV_VALUE] - constraint.position) * alpha
-      return
-    end
+		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
+			local i = zlen(frames)
+			constraint.position = constraint.position + (frames[i + PREV_VALUE] - constraint.position) * alpha
+			return
+		end
 
-    -- Interpolate between the previous frame and the current frame.
-    local frame = binarySearch(frames, time, ENTRIES)
-    local position = frames[frame + PREV_VALUE]
-    local frameTime = frames[frame]
-    local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
+		-- Interpolate between the previous frame and the current frame.
+		local frame = binarySearch(frames, time, ENTRIES)
+		local position = frames[frame + PREV_VALUE]
+		local frameTime = frames[frame]
+		local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
 
-    constraint.position = constraint.position + (position + (frames[frame + VALUE] - position) * percent - constraint.position) * alpha
+		constraint.position = constraint.position + (position + (frames[frame + VALUE] - position) * percent - constraint.position) * alpha
 	end
 
 	return self
@@ -835,13 +835,13 @@ end
 Animation.PathConstraintSpacingTimeline = {}
 Animation.PathConstraintSpacingTimeline.ENTRIES = 2
 function Animation.PathConstraintSpacingTimeline.new (frameCount)
-  local ENTRIES = Animation.PathConstraintSpacingTimeline.ENTRIES
+	local ENTRIES = Animation.PathConstraintSpacingTimeline.ENTRIES
 	local PREV_TIME = -2
-  local PREV_VALUE = -1
-  local VALUE = 1
+	local PREV_VALUE = -1
+	local VALUE = 1
 
 	local self = Animation.CurveTimeline.new(frameCount)
-  self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
+	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
 	self.pathConstraintIndex = -1
 
 	function self:setFrame (frameIndex, time, value)
@@ -851,24 +851,24 @@ function Animation.PathConstraintSpacingTimeline.new (frameCount)
 	end
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
-    local frames = self.frames
-    if (time < frames[0]) then return end -- Time is before first frame.
+		local frames = self.frames
+		if (time < frames[0]) then return end -- Time is before first frame.
 
-    local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
+		local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
 
-    if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
-      local i = zlen(frames)
-      constraint.spacing = constraint.spacing + (frames[i + PREV_VALUE] - constraint.spacing) * alpha
-      return
-    end
+		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
+			local i = zlen(frames)
+			constraint.spacing = constraint.spacing + (frames[i + PREV_VALUE] - constraint.spacing) * alpha
+			return
+		end
 
-    -- Interpolate between the previous frame and the current frame.
-    local frame = binarySearch(frames, time, ENTRIES)
-    local spacing = frames[frame + PREV_VALUE]
-    local frameTime = frames[frame]
-    local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
+		-- Interpolate between the previous frame and the current frame.
+		local frame = binarySearch(frames, time, ENTRIES)
+		local spacing = frames[frame + PREV_VALUE]
+		local frameTime = frames[frame]
+		local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
 
-    constraint.spacing = constraint.spacing + (spacing + (frames[frame + VALUE] - spacing) * percent - constraint.spacing) * alpha
+		constraint.spacing = constraint.spacing + (spacing + (frames[frame + VALUE] - spacing) * percent - constraint.spacing) * alpha
 	end
 
 	return self
@@ -877,46 +877,46 @@ end
 Animation.PathConstraintMixTimeline = {}
 Animation.PathConstraintMixTimeline.ENTRIES = 3
 function Animation.PathConstraintMixTimeline.new (frameCount)
-  local ENTRIES = Animation.PathConstraintMixTimeline.ENTRIES
+	local ENTRIES = Animation.PathConstraintMixTimeline.ENTRIES
 	local PREV_TIME = -3
-  local PREV_ROTATE = -2
-  local PREV_TRANSLATE = -1
-  local ROTATE = 1
-  local TRANSLATE = 2
+	local PREV_ROTATE = -2
+	local PREV_TRANSLATE = -1
+	local ROTATE = 1
+	local TRANSLATE = 2
 
 	local self = Animation.CurveTimeline.new(frameCount)
-  self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
+	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES)
 	self.pathConstraintIndex = -1
 
 	function self:setFrame (frameIndex, time, rotateMix, translateMix)
 		frameIndex = frameIndex * ENTRIES
 		self.frames[frameIndex] = time
 		self.frames[frameIndex + ROTATE] = rotateMix
-    self.frames[frameIndex + TRANSLATE] = translateMix
+		self.frames[frameIndex + TRANSLATE] = translateMix
 	end
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
-    local frames = self.frames
-    if (time < frames[0]) then return end -- Time is before first frame.
+		local frames = self.frames
+		if (time < frames[0]) then return end -- Time is before first frame.
 
-    local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
+		local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
 
-    if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
-      local i = zlen(frames)
-      constraint.rotateMix = constraint.rotateMix + (frames[i + PREV_ROTATE] - constraint.rotateMix) * alpha
-      constraint.translateMix = constraint.translateMix + (frames[i + PREV_TRANSLATE] - constraint.translateMix) * alpha
-      return
-    end
+		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
+			local i = zlen(frames)
+			constraint.rotateMix = constraint.rotateMix + (frames[i + PREV_ROTATE] - constraint.rotateMix) * alpha
+			constraint.translateMix = constraint.translateMix + (frames[i + PREV_TRANSLATE] - constraint.translateMix) * alpha
+			return
+		end
 
-    -- Interpolate between the previous frame and the current frame.
-    local frame = binarySearch(frames, time, ENTRIES)
-    local rotate = frames[frame + PREV_ROTATE]
-    local translate = frames[frame + PREV_TRANSLATE]
-    local frameTime = frames[frame]
-    local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
+		-- Interpolate between the previous frame and the current frame.
+		local frame = binarySearch(frames, time, ENTRIES)
+		local rotate = frames[frame + PREV_ROTATE]
+		local translate = frames[frame + PREV_TRANSLATE]
+		local frameTime = frames[frame]
+		local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
 
-    constraint.rotateMix = constraint.rotateMix + (rotate + (frames[frame + ROTATE] - rotate) * percent - constraint.rotateMix) * alpha
-    constraint.translateMix = constraint.translateMix + (translate + (frames[frame + TRANSLATE] - translate) * percent - constraint.translateMix) * alpha
+		constraint.rotateMix = constraint.rotateMix + (rotate + (frames[frame + ROTATE] - rotate) * percent - constraint.rotateMix) * alpha
+		constraint.translateMix = constraint.translateMix + (translate + (frames[frame + TRANSLATE] - translate) * percent - constraint.translateMix) * alpha
 	end
 
 	return self

@@ -53,8 +53,8 @@ function IkConstraint.new (data, skeleton)
 		bones = {},
 		target = nil,
 		mix = data.mix,
- 		bendDirection = data.bendDirection,
-    level = 0
+		bendDirection = data.bendDirection,
+		level = 0
 	}
 	setmetatable(self, IkConstraint)
 
@@ -68,209 +68,209 @@ function IkConstraint.new (data, skeleton)
 end
 
 function IkConstraint:apply ()
-  self:update()
+	self:update()
 end
 
 function IkConstraint:update ()
-  local target = self.target
-  local bones = self.bones
-  local boneCount = #bones
-  if boneCount == 1 then 
-    self:apply1(bones[1], target.worldX, target.worldY, self.mix)
-  elseif boneCount == 2 then 
-    self:apply2(bones[1], bones[2], target.worldX, target.worldY, self.bendDirection, self.mix)
-  end
+	local target = self.target
+	local bones = self.bones
+	local boneCount = #bones
+	if boneCount == 1 then 
+		self:apply1(bones[1], target.worldX, target.worldY, self.mix)
+	elseif boneCount == 2 then 
+		self:apply2(bones[1], bones[2], target.worldX, target.worldY, self.bendDirection, self.mix)
+	end
 end
 
 function IkConstraint:apply1 (bone, targetX, targetY, alpha)
-  local pp = bone.parent
-  local id = 1 / (pp.a * pp.d - pp.b * pp.c)
-  local x = targetX - pp.worldX
-  local y = targetY - pp.worldY
-  local tx = (x * pp.d - y * pp.b) * id - bone.x
-  local ty = (y * pp.a - x * pp.c) * id - bone.y
-  local rotationIK = math_deg(math_atan2(ty, tx)) - bone.shearX - bone.rotation
-  if bone.scaleX < 0 then rotationIK = rotationIK + 180 end
-  if rotationIK > 180 then
-    rotationIK = rotationIK - 360
-  elseif (rotationIK < -180) then 
-    rotationIK = rotationIK + 360
-  end
-  bone:updateWorldTransformWith(bone.x, bone.y, bone.rotation + rotationIK * alpha, bone.scaleX, bone.scaleY, bone.shearX, bone.shearY)
+	local pp = bone.parent
+	local id = 1 / (pp.a * pp.d - pp.b * pp.c)
+	local x = targetX - pp.worldX
+	local y = targetY - pp.worldY
+	local tx = (x * pp.d - y * pp.b) * id - bone.x
+	local ty = (y * pp.a - x * pp.c) * id - bone.y
+	local rotationIK = math_deg(math_atan2(ty, tx)) - bone.shearX - bone.rotation
+	if bone.scaleX < 0 then rotationIK = rotationIK + 180 end
+	if rotationIK > 180 then
+		rotationIK = rotationIK - 360
+	elseif (rotationIK < -180) then 
+		rotationIK = rotationIK + 360
+	end
+	bone:updateWorldTransformWith(bone.x, bone.y, bone.rotation + rotationIK * alpha, bone.scaleX, bone.scaleY, bone.shearX, bone.shearY)
 end
 
 function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
 	if alpha == 0 then
-    child:updateWorldTransform()
-    return
-  end
-  local px = parent.x
-  local py = parent.y
-  local psx = parent.scaleX
-  local psy = parent.scaleY
-  local csx = child.scaleX
-  local os1 = 0
-  local os2 = 0
-  local s2 = 0
-  if psx < 0 then
-    psx = -psx
-    os1 = 180
-    s2 = -1
-  else
-    os1 = 0
-    s2 = 1
-  end
-  if psy < 0 then
-    psy = -psy
-    s2 = -s2
-  end
-  if csx < 0 then
-    csx = -csx
-    os2 = 180
-  else
-    os2 = 0
-  end
-  local cx = child.x
-  local cy = 0
-  local cwx = 0
-  local cwy = 0
-  local a = parent.a
-  local b = parent.b
-  local c = parent.c
-  local d = parent.d
-  local u = math_abs(psx - psy) <= 0.0001
-  if not u then
-    cy = 0
-    cwx = a * cx + parent.worldX
-    cwy = c * cx + parent.worldY
-  else
-    cy = child.y
-    cwx = a * cx + b * cy + parent.worldX
-    cwy = c * cx + d * cy + parent.worldY
-  end
-  local pp = parent.parent
-  a = pp.a
-  b = pp.b
-  c = pp.c
-  d = pp.d
-  local id = 1 / (a * d - b * c)
-  local x = targetX - pp.worldX 
-  local y = targetY - pp.worldY
-  local tx = (x * d - y * b) * id - px
-  local ty = (y * a - x * c) * id - py
-  x = cwx - pp.worldX
-  y = cwy - pp.worldY
-  local dx = (x * d - y * b) * id - px
-  local dy = (y * a - x * c) * id - py
-  local l1 = math_sqrt(dx * dx + dy * dy)
-  local l2 = child.data.length * csx
-  local a1 = 0
-  local a2 = 0
-  
-  if u then
-    l2 = l2 * psx
-    local cos = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2)
-    if cos < -1 then
-      cos = -1
-    elseif cos > 1 then
-      cos = 1
-    end
-    a2 = math_acos(cos) * bendDir
-    a = l1 + l2 * cos
-    b = l2 * math_sin(a2)
-    a1 = math_atan2(ty * a - tx * b, tx * a + ty * b)
-  else
-    local skip = false
-    a = psx * l2
-    b = psy * l2
-    local aa = a * a
-    local bb = b * b
-    local dd = tx * tx + ty * ty
-    local ta = math_atan2(ty, tx);
-    c = bb * l1 * l1 + aa * dd - aa * bb
-    local c1 = -2 * bb * l1
-    local c2 = bb - aa
-    d = c1 * c1 - 4 * c2 * c
-    if d >= 0 then
-      local q = math_sqrt(d);
-      if (c1 < 0) then q = -q end
-      q = -(c1 + q) / 2
-      local r0 = q / c2
-      local r1 = c / q
-      local r = r1
-      if math_abs(r0) < math_abs(r1) then r = r0 end
-      if r * r <= dd then
-        y = math_sqrt(dd - r * r) * bendDir
-        a1 = ta - math_atan2(y, r)
-        a2 = math_atan2(y / psy, (r - l1) / psx)
-        skip = true
-      end
-    end
-    if not skip then
-      local minAngle = 0
-      local minDist = 9999999999
-      local minX = 0
-      local minY = 0
-      local maxAngle = 0
-      local maxDist = 0
-      local maxX = 0
-      local maxY = 0
-      x = l1 + a
-      d = x * x
-      if d > maxDist then
-        maxAngle = 0
-        maxDist = d
-        maxX = x
-      end
-      x = l1 - a
-      d = x * x
-      if d < minDist then
-        minAngle = math_pi
-        minDist = d
-        minX = x
-      end
-      local angle = math_acos(-a * l1 / (aa - bb))
-      x = a * math_cos(angle) + l1
-      y = b * math_sin(angle)
-      d = x * x + y * y
-      if d < minDist then
-        minAngle = angle
-        minDist = d
-        minX = x
-        minY = y
-      end
-      if d > maxDist then
-        maxAngle = angle
-        maxDist = d
-        maxX = x
-        maxY = y
-      end
-      if dd <= (minDist + maxDist) / 2 then
-        a1 = ta - math_atan2(minY * bendDir, minX)
-        a2 = minAngle * bendDir
-      else
-        a1 = ta - math_atan2(maxY * bendDir, maxX)
-        a2 = maxAngle * bendDir
-      end
-    end
-  end
-  local os = math_atan2(cy, cx) * s2
-  local rotation = parent.rotation
-  a1 = math_deg(a1 - os) + os1 - rotation
-  if a1 > 180 then
-    a1 = a1 - 360
-  elseif a1 < -180 then
-    a1 = a1 + 360
-  end
-  parent:updateWorldTransformWith(px, py, rotation + a1 * alpha, parent.scaleX, parent.scaleY, 0, 0)
-  rotation = child.rotation
-  a2 = (math_deg(a2 + os) - child.shearX) * s2 + os2 - rotation
-  if a2 > 180 then
-    a2 = a2 - 360
-  elseif a2 < -180 then
-    a2 = a2 + 360
-  end
-  child:updateWorldTransformWith(cx, cy, rotation + a2 * alpha, child.scaleX, child.scaleY, child.shearX, child.shearY);  
+		child:updateWorldTransform()
+		return
+	end
+	local px = parent.x
+	local py = parent.y
+	local psx = parent.scaleX
+	local psy = parent.scaleY
+	local csx = child.scaleX
+	local os1 = 0
+	local os2 = 0
+	local s2 = 0
+	if psx < 0 then
+		psx = -psx
+		os1 = 180
+		s2 = -1
+	else
+		os1 = 0
+		s2 = 1
+	end
+	if psy < 0 then
+		psy = -psy
+		s2 = -s2
+	end
+	if csx < 0 then
+		csx = -csx
+		os2 = 180
+	else
+		os2 = 0
+	end
+	local cx = child.x
+	local cy = 0
+	local cwx = 0
+	local cwy = 0
+	local a = parent.a
+	local b = parent.b
+	local c = parent.c
+	local d = parent.d
+	local u = math_abs(psx - psy) <= 0.0001
+	if not u then
+		cy = 0
+		cwx = a * cx + parent.worldX
+		cwy = c * cx + parent.worldY
+	else
+		cy = child.y
+		cwx = a * cx + b * cy + parent.worldX
+		cwy = c * cx + d * cy + parent.worldY
+	end
+	local pp = parent.parent
+	a = pp.a
+	b = pp.b
+	c = pp.c
+	d = pp.d
+	local id = 1 / (a * d - b * c)
+	local x = targetX - pp.worldX 
+	local y = targetY - pp.worldY
+	local tx = (x * d - y * b) * id - px
+	local ty = (y * a - x * c) * id - py
+	x = cwx - pp.worldX
+	y = cwy - pp.worldY
+	local dx = (x * d - y * b) * id - px
+	local dy = (y * a - x * c) * id - py
+	local l1 = math_sqrt(dx * dx + dy * dy)
+	local l2 = child.data.length * csx
+	local a1 = 0
+	local a2 = 0
+	
+	if u then
+		l2 = l2 * psx
+		local cos = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2)
+		if cos < -1 then
+			cos = -1
+		elseif cos > 1 then
+			cos = 1
+		end
+		a2 = math_acos(cos) * bendDir
+		a = l1 + l2 * cos
+		b = l2 * math_sin(a2)
+		a1 = math_atan2(ty * a - tx * b, tx * a + ty * b)
+	else
+		local skip = false
+		a = psx * l2
+		b = psy * l2
+		local aa = a * a
+		local bb = b * b
+		local dd = tx * tx + ty * ty
+		local ta = math_atan2(ty, tx);
+		c = bb * l1 * l1 + aa * dd - aa * bb
+		local c1 = -2 * bb * l1
+		local c2 = bb - aa
+		d = c1 * c1 - 4 * c2 * c
+		if d >= 0 then
+			local q = math_sqrt(d);
+			if (c1 < 0) then q = -q end
+			q = -(c1 + q) / 2
+			local r0 = q / c2
+			local r1 = c / q
+			local r = r1
+			if math_abs(r0) < math_abs(r1) then r = r0 end
+			if r * r <= dd then
+				y = math_sqrt(dd - r * r) * bendDir
+				a1 = ta - math_atan2(y, r)
+				a2 = math_atan2(y / psy, (r - l1) / psx)
+				skip = true
+			end
+		end
+		if not skip then
+			local minAngle = 0
+			local minDist = 9999999999
+			local minX = 0
+			local minY = 0
+			local maxAngle = 0
+			local maxDist = 0
+			local maxX = 0
+			local maxY = 0
+			x = l1 + a
+			d = x * x
+			if d > maxDist then
+				maxAngle = 0
+				maxDist = d
+				maxX = x
+			end
+			x = l1 - a
+			d = x * x
+			if d < minDist then
+				minAngle = math_pi
+				minDist = d
+				minX = x
+			end
+			local angle = math_acos(-a * l1 / (aa - bb))
+			x = a * math_cos(angle) + l1
+			y = b * math_sin(angle)
+			d = x * x + y * y
+			if d < minDist then
+				minAngle = angle
+				minDist = d
+				minX = x
+				minY = y
+			end
+			if d > maxDist then
+				maxAngle = angle
+				maxDist = d
+				maxX = x
+				maxY = y
+			end
+			if dd <= (minDist + maxDist) / 2 then
+				a1 = ta - math_atan2(minY * bendDir, minX)
+				a2 = minAngle * bendDir
+			else
+				a1 = ta - math_atan2(maxY * bendDir, maxX)
+				a2 = maxAngle * bendDir
+			end
+		end
+	end
+	local os = math_atan2(cy, cx) * s2
+	local rotation = parent.rotation
+	a1 = math_deg(a1 - os) + os1 - rotation
+	if a1 > 180 then
+		a1 = a1 - 360
+	elseif a1 < -180 then
+		a1 = a1 + 360
+	end
+	parent:updateWorldTransformWith(px, py, rotation + a1 * alpha, parent.scaleX, parent.scaleY, 0, 0)
+	rotation = child.rotation
+	a2 = (math_deg(a2 + os) - child.shearX) * s2 + os2 - rotation
+	if a2 > 180 then
+		a2 = a2 - 360
+	elseif a2 < -180 then
+		a2 = a2 + 360
+	end
+	child:updateWorldTransformWith(cx, cy, rotation + a2 * alpha, child.scaleX, child.scaleY, child.shearX, child.shearY);	
 end
 
 return IkConstraint

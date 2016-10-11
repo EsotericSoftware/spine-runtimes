@@ -36,18 +36,18 @@ SkeletonData.__index = SkeletonData
 function SkeletonData.new ()
 	local self = {
 		name,
-    bones = {},
-    slots = {},
-    skins = {},
-    defaultSkin = nil,
-    events = {},
-    animations = {},
-    ikConstraints = {},
-    transformConstraints = {},
-    pathConstraints = {},
-    width, height,
-    version, hash, imagesPath,
-    slotNameIndices = {}
+		bones = {},
+		slots = {},
+		skins = {},
+		defaultSkin = nil,
+		events = {},
+		animations = {},
+		ikConstraints = {},
+		transformConstraints = {},
+		pathConstraints = {},
+		width, height,
+		version, hash, imagesPath,
+		slotNameIndices = {}
 	}
 	setmetatable(self, SkeletonData)
 

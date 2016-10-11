@@ -38,7 +38,7 @@ function Event.new (time, data)
 		intValue = 0,
 		floatValue = 0,
 		stringValue = nil,
-    time = time
+		time = time
 	}
 
 	return self
