@@ -44,7 +44,7 @@ The Spine cocos2d-x example works on Windows and Mac OS X.
 9. Right click the `spine-cocos2d-x` project in the solution explorer and select `Set as Startup Project` from the context menu
 10. Click `Local Windows Debugger` to run the example
 
-### Mac OS X
+### macOS/iOS
 1. Install [Xcode](https://developer.apple.com/xcode/)
 2. Install [Homebrew](http://brew.sh/)
 3. Open a terminal and install CMake via `brew install cmake`
@@ -55,6 +55,19 @@ The Spine cocos2d-x example works on Windows and Mac OS X.
 7. Expand the `cocos2d_libs.xcodeproj` sub project, delete the group `editor-support/spine`. This will remove the outdated Spine cocos2d-x runtime shipped by cocos2d-x.
 8. Click the `Run` button or type `CMD+R` to run the example
 
+### Android
+1. Install the prerequisits for [cocos2d-x Android development](http://www.cocos2d-x.org/docs/installation/Android-terminal/)
+2. Install [Homebrew](http://brew.sh/)
+3. Open a terminal and install CMake via `brew install cmake`
+3. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip)
+4. Open a terminal, and `cd` into the `spine-runtimes/spine-cocos2dx` folder
+5. Type `mkdir build && cd build && cmake ../..`. This will download the cocos2d-x dependency and wire it up with the example source code in `spine-runtimes/spine-cocos2dx/example`. The download is 400mb, so get yourself a cup of tea.
+6. Delete `spine-runtimes/spine-cocos2dx/example/cocos2d/cocos/editor-support/spine`
+7. Open `spine-runtimes/spine-cocos2dx/example/cocos2d/cocos/Android.mk` and remove the lines `LOCAL_STATIC_LIBRARIES += spine_static` and `$(call import-module,editor-support/spine)
+8. Switch to `spine-runtimes/spine-cocos2dx/example/proj.android/jni` and execute `cocos compile -p android -m debug --ndk-mode debug` to compile the example for Android
+9. In the same directory, execute `cocos run -p android -m debug` to deploy to the device
+10. For debugging, run `ndk-debug` in the `proj.android/jni` folder. This will attach to the running app via GDB.
+
 ## Notes
 
 - Images are premultiplied by cocos2d-x, so the Spine atlas images should *not* use premultiplied alpha.
@@ -64,4 +77,3 @@ The Spine cocos2d-x example works on Windows and Mac OS X.
 - [Raptor](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx/example/Classes/RaptorExample.cpp)
 - [Spineboy](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx/example/Classes/SpineboyExample.cpp)
 - [Golbins](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-cocos2dx/example/Classes/GoblinsExample.cpp)
-
