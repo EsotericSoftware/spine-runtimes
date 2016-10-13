@@ -2941,9 +2941,13 @@ var spine;
 				this.sortBone(slotBone);
 			else {
 				var bones = this.bones;
-				for (var i = 0; i < pathBones.length; i++) {
-					var boneIndex = pathBones[i];
-					this.sortBone(bones[boneIndex]);
+				var i = 0;
+				while (i < pathBones.length) {
+					var boneCount = pathBones[i++];
+					for (var n = i + boneCount; i < n; i++) {
+						var boneIndex = pathBones[i];
+						this.sortBone(bones[boneIndex]);
+					}
 				}
 			}
 		};

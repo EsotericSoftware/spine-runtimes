@@ -213,8 +213,13 @@ public class Skeleton {
 			sortBone(slotBone);
 		else {
 			var bones:Vector.<Bone> = this.bones;
-			for each (var boneIndex:int in pathBones)
-				sortBone(bones[boneIndex]);
+			var i:int = 0;
+			while (i < pathBones.length) {
+				var boneCount:int = pathBones[i++];
+				for (var n:int = i + boneCount; i < n; i++) {				
+					sortBone(bones[pathBones[i]]);
+				}
+			}
 		}
 	}
 

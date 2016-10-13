@@ -75,9 +75,6 @@ function init () {
 	assetManager.loadText("assets/stretchyman.json");
 	assetManager.loadText("assets/stretchyman.atlas");
 	assetManager.loadTexture("assets/stretchyman.png");
-	assetManager.loadText("assets/test.json")
-	assetManager.loadText("assets/test.atlas")
-	assetManager.loadTexture("assets/test.png")
 	requestAnimationFrame(load);
 }
 
@@ -85,7 +82,6 @@ function load () {
 	// Wait until the AssetManager has loaded all resources, then load the skeletons.
 	if (assetManager.isLoadingComplete()) {
 		skeletons["raptor"] = loadSkeleton("raptor", "walk", false);
-		skeletons["test"] = loadSkeleton("test", "animation", false);
 		skeletons["spineboy"] = loadSkeleton("spineboy", "run", false);		
 		skeletons["tank"] = loadSkeleton("tank", "drive", false);
 		skeletons["goblins"] = loadSkeleton("goblins-mesh", "walk", false, "goblin");

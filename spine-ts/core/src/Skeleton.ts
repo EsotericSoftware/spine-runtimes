@@ -209,9 +209,13 @@ module spine {
 				this.sortBone(slotBone);
 			else {
 				let bones = this.bones;
-				for (let i = 0; i < pathBones.length; i++) {
-					let boneIndex = pathBones[i];
-					this.sortBone(bones[boneIndex]);
+				let i = 0;
+				while (i < pathBones.length) {
+					let boneCount = pathBones[i++]; 
+					for (let n = i + boneCount; i < n; i++) {
+						let boneIndex = pathBones[i];
+						this.sortBone(bones[boneIndex]);
+					}
 				}
 			}
 		}
