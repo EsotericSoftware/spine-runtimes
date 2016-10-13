@@ -60,6 +60,9 @@ public class AnimationState {
 	boolean animationsChanged;
 	private float timeScale = 1;
 
+	StringBuilder last = new StringBuilder();
+	StringBuilder log = new StringBuilder();
+
 	final Pool<TrackEntry> trackEntryPool = new Pool() {
 		protected Object newObject () {
 			return new TrackEntry();
@@ -169,6 +172,7 @@ public class AnimationState {
 			// Apply current entry.
 			float animationLast = current.animationLast, animationTime = current.getAnimationTime();
 			Array<Timeline> timelines = current.animation.timelines;
+			log("apply current: " + current + ", mix: " + mix + " * " + current.alpha);
 			if (mix == 1) {
 				for (int ii = 0, n = timelines.size; ii < n; ii++)
 					timelines.get(ii).apply(skeleton, animationLast, animationTime, events, 1, false, false);
@@ -194,7 +198,17 @@ public class AnimationState {
 
 		queue.drain();
 
-		System.out.println();
+		if (!log.toString().equals(last.toString())) {
+			System.out.println(log);
+			last.setLength(0);
+			last.append(log);
+		}
+		log.setLength(0);
+	}
+
+	void log (String m) {
+		log.append(m);
+		log.append('\n');
 	}
 
 	private float applyMixingFrom (TrackEntry entry, Skeleton skeleton, float alpha) {
@@ -222,12 +236,14 @@ public class AnimationState {
 		if (firstFrame) from.timelinesRotation.setSize(timelineCount << 1);
 		float[] timelinesRotation = from.timelinesRotation.items;
 
-		System.out.println(entry.mixingFrom + " -> " + entry + ": " + entry.mixTime / entry.mixDuration);
+		log("applyMixingFrom: " + entry.mixingFrom + " -> " + entry + ", mix: " + entry.mixTime / entry.mixDuration);
+		if (timelineCount == 0) log("apply from: " + from + " " + alphaFull + " * " + entry.alpha);
 
 		for (int i = 0; i < timelineCount; i++) {
 			Timeline timeline = timelines.get(i);
 			boolean setupPose = timelinesFirst[i];
 			float a = timelinesLast[i] ? alphaMix : alphaFull;
+			log("apply from: " + from + " " + a + " * " + entry.alpha);
 			if (timeline instanceof RotateTimeline) {
 				applyRotateTimeline((RotateTimeline)timeline, skeleton, animationLast, animationTime, events, a, setupPose, setupPose,
 					timelinesRotation, i << 1, firstFrame);
@@ -382,18 +398,29 @@ public class AnimationState {
 		queue.drain();
 	}
 
-	private void setCurrent (int index, TrackEntry entry) {
-		TrackEntry current = expandToIndex(index);
-		tracks.set(index, entry);
+	private void setCurrent (int index, TrackEntry current) {
+		TrackEntry from = expandToIndex(index);
+		tracks.set(index, current);
 
-		if (current != null) {
-			queue.interrupt(current);
-			entry.mixingFrom = current;
-			entry.mixTime = Math.max(0, entry.mixDuration - current.trackTime);
-			current.timelinesRotation.clear(); // BOZO - Needed? Recursive?
+		if (from != null) {
+			queue.interrupt(from);
+			current.mixingFrom = from;
+			// entry.mixTime = Math.max(0, entry.mixDuration - current.trackTime);
+			// log("setCurrent mixTime: " + entry.mixDuration + " - " + current.trackTime + " = " + entry.mixTime);
+			current.mixTime = 0;
+
+			from.timelinesRotation.clear(); // BOZO - Needed? Recursive?
+
+//			float alpha = 1;
+			float duration = from.animationEnd - from.animationStart;
+			if (duration > 0) from.alpha *= (from.getAnimationTime() - from.animationStart) / duration;
+//			do {
+//				from.alpha *= alpha;
+//				from = from.mixingFrom;
+//			} while (from != null);
 		}
 
-		queue.start(entry);
+		queue.start(current);
 	}
 
 	/** @see #setAnimation(int, Animation, boolean) */
@@ -699,7 +726,7 @@ public class AnimationState {
 		float eventThreshold, attachmentThreshold, drawOrderThreshold;
 		float animationStart, animationEnd, animationLast, nextAnimationLast;
 		float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale;
-		float alpha, mixTime, mixDuration;
+		float alpha, mixTime, mixDuration, mixAlpha;
 		final BooleanArray timelinesFirst = new BooleanArray(), timelinesLast = new BooleanArray();
 		final FloatArray timelinesRotation = new FloatArray();
 
