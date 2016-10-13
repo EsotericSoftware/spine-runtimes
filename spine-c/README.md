@@ -12,7 +12,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-c works with data exported from the latest version of Spine.
+spine-c works with data exported from the latest, non-beta version of Spine.
 
 spine-c supports all Spine features.
 

@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-starling works with data exported from the latest Spine version.
+spine-starling works with data exported from the latest, non-beta Spine version.
 
 spine-starling supports all Spine features.
 

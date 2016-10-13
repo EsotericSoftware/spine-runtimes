@@ -10,7 +10,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-cocos2dx works with data exported from from the latest version of Spine.
+spine-cocos2dx works with data exported from from the latest, non-beta version of Spine.
 
 spine-cocos2dx supports all Spine features.
 
