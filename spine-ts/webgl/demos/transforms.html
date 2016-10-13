@@ -1,0 +1,25 @@
+<html>
+<meta charset="UTF-8">
+<title>Transform Constraints - Spine Demo</title>
+<link rel="stylesheet" href="demos.css">
+<script src="../../build/spine-webgl.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="utils.js"></script>
+<script src="transforms.js"></script>
+<body>
+
+<center>
+<div class="aspect"><div><canvas id="transforms-canvas"></canvas></div></div>
+Rotation offset
+<div id="transforms-rotationoffset" class="slider filled"></div><br>
+Translation mix
+<div id="transforms-translationmix" class="slider filled"></div>		
+</center>
+
+<script>	
+spineDemos.loadSliders();
+transformsDemo(spineDemos.setupRendering);
+</script>
+
+</body>
+</html>

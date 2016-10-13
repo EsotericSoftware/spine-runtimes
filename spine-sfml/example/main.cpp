@@ -1,18 +1,17 @@
 /******************************************************************************
- * Spine Runtimes Software License
- * Version 2.3
+ * Spine Runtimes Software License v2.5
  * 
- * Copyright (c) 2013-2015, Esoteric Software
+ * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
  * 
- * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to use, install, execute and perform the Spine
- * Runtimes Software (the "Software") and derivative works solely for personal
- * or internal use. Without the written permission of Esoteric Software (see
- * Section 2 of the Spine Software License Agreement), you may not (a) modify,
- * translate, adapt or otherwise create derivative works, improvements of the
- * Software or develop new applications using the Software or (b) remove,
- * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
@@ -22,11 +21,11 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
  * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #include <iostream>
@@ -62,17 +61,47 @@ void callback (AnimationState* state, int trackIndex, EventType type, Event* eve
 	fflush(stdout);
 }
 
-void spineboy () {
-	// Load atlas, skeleton, and animations.
-	Atlas* atlas = Atlas_createFromFile("data/spineboy.atlas", 0);
+SkeletonData* readSkeletonJsonData (const char* filename, Atlas* atlas, float scale) {
 	SkeletonJson* json = SkeletonJson_create(atlas);
-	json->scale = 0.6f;
-	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/spineboy.json");
+	json->scale = scale;
+	SkeletonData* skeletonData = SkeletonJson_readSkeletonDataFile(json, filename);
 	if (!skeletonData) {
 		printf("%s\n", json->error);
 		exit(0);
 	}
 	SkeletonJson_dispose(json);
+	return skeletonData;
+}
+
+SkeletonData* readSkeletonBinaryData (const char* filename, Atlas* atlas, float scale) {
+	SkeletonBinary* binary = SkeletonBinary_create(atlas);
+	binary->scale = scale;
+	SkeletonData *skeletonData = SkeletonBinary_readSkeletonDataFile(binary, filename);
+	if (!skeletonData) {
+		printf("%s\n", binary->error);
+		exit(0);
+	}
+	SkeletonBinary_dispose(binary);
+	return skeletonData;
+}
+
+void testcase (void func(SkeletonData* skeletonData, Atlas* atlas),
+		const char* jsonName, const char* binaryName, const char* atlasName,
+		float scale) {
+	Atlas* atlas = Atlas_createFromFile(atlasName, 0);
+
+	SkeletonData* skeletonData = readSkeletonJsonData(jsonName, atlas, scale);
+	func(skeletonData, atlas);
+	SkeletonData_dispose(skeletonData);
+
+	skeletonData = readSkeletonBinaryData(binaryName, atlas, scale);
+	func(skeletonData, atlas);
+	SkeletonData_dispose(skeletonData);
+
+	Atlas_dispose(atlas);
+}
+
+void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 	SkeletonBounds* bounds = SkeletonBounds_create();
 
 	// Configure mixing.
@@ -128,23 +157,10 @@ void spineboy () {
 		window.display();
 	}
 
-	SkeletonData_dispose(skeletonData);
 	SkeletonBounds_dispose(bounds);
-	Atlas_dispose(atlas);
 }
 
-void goblins () {
-	// Load atlas, skeleton, and animations.
-	Atlas* atlas = Atlas_createFromFile("data/goblins-mesh.atlas", 0);
-	SkeletonJson* json = SkeletonJson_create(atlas);
-	json->scale = 1.4f;
-	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/goblins-mesh.json");
-	if (!skeletonData) {
-		printf("Error: %s\n", json->error);
-		exit(0);
-	}
-	SkeletonJson_dispose(json);
-
+void goblins (SkeletonData* skeletonData, Atlas* atlas) {
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 
@@ -178,23 +194,9 @@ void goblins () {
 		window.draw(*drawable);
 		window.display();
 	}
-
-	SkeletonData_dispose(skeletonData);
-	Atlas_dispose(atlas);
 }
 
-void raptor () {
-	// Load atlas, skeleton, and animations.
-	Atlas* atlas = Atlas_createFromFile("data/raptor.atlas", 0);
-	SkeletonJson* json = SkeletonJson_create(atlas);
-	json->scale = 0.5f;
-	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/raptor.json");
-	if (!skeletonData) {
-		printf("Error: %s\n", json->error);
-		exit(0);
-	}
-	SkeletonJson_dispose(json);
-
+void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 
@@ -223,23 +225,9 @@ void raptor () {
 		window.draw(*drawable);
 		window.display();
 	}
-
-	SkeletonData_dispose(skeletonData);
-	Atlas_dispose(atlas);
 }
 
-void tank () {
-	// Load atlas, skeleton, and animations.
-	Atlas* atlas = Atlas_createFromFile("data/tank.atlas", 0);
-	SkeletonJson* json = SkeletonJson_create(atlas);
-	json->scale = 0.2f;
-	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/tank.json");
-	if (!skeletonData) {
-		printf("Error: %s\n", json->error);
-		exit(0);
-	}
-	SkeletonJson_dispose(json);
-
+void tank (SkeletonData* skeletonData, Atlas* atlas) {
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 
@@ -266,23 +254,9 @@ void tank () {
 		window.draw(*drawable);
 		window.display();
 	}
-
-	SkeletonData_dispose(skeletonData);
-	Atlas_dispose(atlas);
 }
 
-void vine () {
-	// Load atlas, skeleton, and animations.
-	Atlas* atlas = Atlas_createFromFile("data/vine.atlas", 0);
-	SkeletonJson* json = SkeletonJson_create(atlas);
-	json->scale = 0.5f;
-	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/vine.json");
-	if (!skeletonData) {
-		printf("Error: %s\n", json->error);
-		exit(0);
-	}
-	SkeletonJson_dispose(json);
-
+void vine (SkeletonData* skeletonData, Atlas* atlas) {
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 
@@ -310,26 +284,45 @@ void vine () {
 		window.draw(*drawable);
 		window.display();
 	}
+}
 
-	SkeletonData_dispose(skeletonData);
-	Atlas_dispose(atlas);
+void stretchyman (SkeletonData* skeletonData, Atlas* atlas) {
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+
+	Skeleton* skeleton = drawable->skeleton;
+	skeleton->flipX = false;
+	skeleton->flipY = false;
+
+	skeleton->x = 320;
+	skeleton->y = 590;
+	Skeleton_updateWorldTransform(skeleton);
+
+	AnimationState_setAnimationByName(drawable->state, 0, "sneak", true);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - Streatchyman");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		drawable->update(delta);
+
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
 }
 
 /**
  * Used for debugging purposes during runtime development
  */
-void test () {
-	// Load atlas, skeleton, and animations.
-	Atlas* atlas = Atlas_createFromFile("data/tank.atlas", 0);
-	SkeletonJson* json = SkeletonJson_create(atlas);
-	json->scale = 1;
-	SkeletonData *skeletonData = SkeletonJson_readSkeletonDataFile(json, "data/tank.json");
-	if (!skeletonData) {
-		printf("Error: %s\n", json->error);
-		exit(0);
-	}
-	SkeletonJson_dispose(json);
-
+void test (SkeletonData* skeletonData, Atlas* atlas) {
 	spSkeleton* skeleton = Skeleton_create(skeletonData);
 	spAnimationStateData* animData = spAnimationStateData_create(skeletonData);
 	spAnimationState* animState = spAnimationState_create(animData);
@@ -350,16 +343,16 @@ void test () {
 		d += 0.1f;
 	}
 
-	SkeletonData_dispose(skeletonData);
 	Skeleton_dispose(skeleton);
-	Atlas_dispose(atlas);
 }
 
 int main () {
-	test();
-	vine();
-	tank();
-	raptor();
-	spineboy();
-	goblins();
+	testcase(test, "data/tank.json", "data/tank.skel", "data/tank.atlas", 1.0f);
+	testcase(vine, "data/vine.json", "data/vine.skel", "data/vine.atlas", 0.5f);
+	testcase(tank, "data/tank.json", "data/tank.skel", "data/tank.atlas", 0.2f);
+	testcase(raptor, "data/raptor.json", "data/raptor.skel", "data/raptor.atlas", 0.5f);
+	testcase(spineboy, "data/spineboy.json", "data/spineboy.skel", "data/spineboy.atlas", 0.6f);
+	testcase(goblins, "data/goblins-mesh.json", "data/goblins-mesh.skel", "data/goblins.atlas", 1.4f);
+	testcase(stretchyman, "data/stretchyman.json", "data/stretchyman.skel", "data/stretchyman.atlas", 1.4f);
+	return 0;
 }

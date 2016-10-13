@@ -130,6 +130,7 @@ namespace Spine {
 			drawOrder.Clear(false);
 			drawOrder.GrowIfNeeded(n);
 			System.Array.Copy(slotsItems, drawOrder.Items, n);
+			drawOrder.Count = n;
 		}
 
 		/// <summary>Resets the color of a slot to Setup Pose value.</summary>
@@ -149,8 +150,13 @@ namespace Spine {
 		/// <summary>Resets the attachment of slot at a given slotIndex to setup pose. This is faster than Slot.SetAttachmentToSetupPose.</summary>
 		public static void SetSlotAttachmentToSetupPose (this Skeleton skeleton, int slotIndex) {
 			var slot = skeleton.slots.Items[slotIndex];
-			var attachment = skeleton.GetAttachment(slotIndex, slot.data.attachmentName);
-			slot.Attachment = attachment;
+			// Based on Slot.SetToSetupPose
+			if (slot.data.attachmentName == null)
+				slot.Attachment = null;
+			else {
+				slot.attachment = null;
+				slot.Attachment = skeleton.GetAttachment(slotIndex, slot.data.attachmentName);
+			}
 		}
 
 		/// <summary>Resets Skeleton parts to Setup Pose according to a Spine.Animation's keyed items.</summary>

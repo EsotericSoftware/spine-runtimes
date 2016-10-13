@@ -39,7 +39,8 @@ static AppDelegate s_sharedApplication;
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
 
     cocos2d::Application *app = cocos2d::Application::getInstance();
-    app->initGLContextAttrs();    
+    GLContextAttrs glContextAttrs = {8, 8, 8, 8, 24, 8};
+    cocos2d::GLView::setGLContextAttrs(glContextAttrs);        
     cocos2d::GLViewImpl::convertAttrs();
 
     // Override point for customization after application launch.

@@ -1,18 +1,17 @@
 /******************************************************************************
- * Spine Runtimes Software License
- * Version 2.3
+ * Spine Runtimes Software License v2.5
  * 
- * Copyright (c) 2013-2015, Esoteric Software
+ * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
  * 
- * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to use, install, execute and perform the Spine
- * Runtimes Software (the "Software") and derivative works solely for personal
- * or internal use. Without the written permission of Esoteric Software (see
- * Section 2 of the Spine Software License Agreement), you may not (a) modify,
- * translate, adapt or otherwise create derivative works, improvements of the
- * Software or develop new applications using the Software or (b) remove,
- * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
@@ -22,12 +21,13 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
  * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
+
 #pragma warning disable 0219
 
 /*****************************************************************************
@@ -176,6 +176,10 @@ namespace Spine.Unity.Editor {
 		const string DEFAULT_SHADER_KEY = "SPINE_DEFAULT_SHADER";
 		public static string defaultShader = DEFAULT_DEFAULT_SHADER;
 
+		const bool DEFAULT_SHOW_HIERARCHY_ICONS = true;
+		const string SHOW_HIERARCHY_ICONS_KEY = "SPINE_SHOW_HIERARCHY_ICONS";
+		public static bool showHierarchyIcons = DEFAULT_SHOW_HIERARCHY_ICONS;
+
 		#region Initialization
 		static SpineEditorUtilities () {
 			Initialize();
@@ -186,6 +190,7 @@ namespace Spine.Unity.Editor {
 				defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, DEFAULT_DEFAULT_MIX);
 				defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, DEFAULT_DEFAULT_SCALE);
 				defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, DEFAULT_DEFAULT_SHADER);	
+				showHierarchyIcons = EditorPrefs.GetBool(SHOW_HIERARCHY_ICONS_KEY, DEFAULT_SHOW_HIERARCHY_ICONS);
 			}
 
 			SceneView.onSceneGUIDelegate -= OnSceneGUI;
@@ -203,7 +208,9 @@ namespace Spine.Unity.Editor {
 			skeletonUtilityBoneTable = new Dictionary<int, SkeletonUtilityBone>();
 			boundingBoxFollowerTable = new Dictionary<int, BoundingBoxFollower>();
 
+			EditorApplication.hierarchyWindowChanged -= HierarchyWindowChanged;
 			EditorApplication.hierarchyWindowChanged += HierarchyWindowChanged;
+			EditorApplication.hierarchyWindowItemOnGUI -= HierarchyWindowItemOnGUI;
 			EditorApplication.hierarchyWindowItemOnGUI += HierarchyWindowItemOnGUI;
 
 			HierarchyWindowChanged();
@@ -226,7 +233,19 @@ namespace Spine.Unity.Editor {
 				defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, DEFAULT_DEFAULT_MIX);
 				defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, DEFAULT_DEFAULT_SCALE);
 				defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, DEFAULT_DEFAULT_SHADER);
+				showHierarchyIcons = EditorPrefs.GetBool(SHOW_HIERARCHY_ICONS_KEY, DEFAULT_SHOW_HIERARCHY_ICONS);
 			}
+
+
+			EditorGUI.BeginChangeCheck();
+			showHierarchyIcons = EditorGUILayout.Toggle(new GUIContent("Show Hierarchy Icons", "Show relevant icons on GameObjects with Spine Components on them. Disable this if you have large, complex scenes."), showHierarchyIcons);
+			if (EditorGUI.EndChangeCheck()) {
+				EditorPrefs.SetBool(SHOW_HIERARCHY_ICONS_KEY, showHierarchyIcons);
+				HierarchyWindowChanged();				
+			} 
+				
+
+			EditorGUILayout.Separator();
 
 			EditorGUILayout.LabelField("Auto-Import Settings", EditorStyles.boldLabel);
 
@@ -241,7 +260,11 @@ namespace Spine.Unity.Editor {
 				EditorPrefs.SetFloat(DEFAULT_SCALE_KEY, defaultScale);
 
 			EditorGUI.BeginChangeCheck();
-			defaultShader = EditorGUILayout.DelayedTextField("Default shader for auto-generated materials", defaultShader);
+			#if UNITY_5_3_OR_NEWER
+			defaultShader = EditorGUILayout.DelayedTextField(new GUIContent("Default shader", "Default shader for materials auto-generated on import."), defaultShader); 
+			#else
+			defaultShader = EditorGUILayout.TextField(new GUIContent("Default shader", "Default shader for materials auto-generated on import."), defaultShader); 
+			#endif
 			if (EditorGUI.EndChangeCheck())
 				EditorPrefs.SetString(DEFAULT_SHADER_KEY, defaultShader);
 			
@@ -306,24 +329,31 @@ namespace Spine.Unity.Editor {
 							Vector3 spawnPoint = MousePointToWorldPoint2D(mousePos, sceneview.camera, plane);
 
 							var menu = new GenericMenu();
+							// SkeletonAnimation
 							menu.AddItem(new GUIContent("SkeletonAnimation"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
 								skeletonDataAsset = skeletonDataAsset,
 								spawnPoint = spawnPoint,
-								instantiateDelegate = (data) => InstantiateSkeletonAnimation(data)
+								instantiateDelegate = (data) => InstantiateSkeletonAnimation(data),
+								isUI = false
 							});
 
-							foreach (var spawnType in additionalSpawnTypes) {
-								menu.AddItem(new GUIContent(spawnType.menuLabel), false, HandleSkeletonComponentDrop, new SpawnMenuData {
-									skeletonDataAsset = skeletonDataAsset,
-									spawnPoint = spawnPoint,
-									instantiateDelegate = spawnType.instantiateDelegate,
-									isUI = spawnType.isUI
-								});
+							// SkeletonGraphic
+							var skeletonGraphicInspectorType = System.Type.GetType("Spine.Unity.Editor.SkeletonGraphicInspector");
+							if (skeletonGraphicInspectorType != null) {
+								var graphicInstantiateDelegate = skeletonGraphicInspectorType.GetMethod("SpawnSkeletonGraphicFromDrop", BindingFlags.Static | BindingFlags.Public);
+								if (graphicInstantiateDelegate != null)
+									menu.AddItem(new GUIContent("SkeletonGraphic (UI)"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
+										skeletonDataAsset = skeletonDataAsset,
+										spawnPoint = spawnPoint,
+										instantiateDelegate = System.Delegate.CreateDelegate(typeof(InstantiateDelegate), graphicInstantiateDelegate) as InstantiateDelegate,
+										isUI = true
+									});
 							}
+
 
 							#if SPINE_SKELETONANIMATOR
 							menu.AddSeparator("");
-
+							// SkeletonAnimator
 							menu.AddItem(new GUIContent("SkeletonAnimator"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
 								skeletonDataAsset = skeletonDataAsset,
 								spawnPoint = spawnPoint,
@@ -395,54 +425,58 @@ namespace Spine.Unity.Editor {
 
 		#region Hierarchy Icons
 		static void HierarchyWindowChanged () {
-			skeletonRendererTable.Clear();
-			skeletonUtilityBoneTable.Clear();
-			boundingBoxFollowerTable.Clear();
+			if (showHierarchyIcons) {
+				skeletonRendererTable.Clear();
+				skeletonUtilityBoneTable.Clear();
+				boundingBoxFollowerTable.Clear();
 
-			SkeletonRenderer[] arr = Object.FindObjectsOfType<SkeletonRenderer>();
-			foreach (SkeletonRenderer r in arr)
-				skeletonRendererTable.Add(r.gameObject.GetInstanceID(), r.gameObject);
+				SkeletonRenderer[] arr = Object.FindObjectsOfType<SkeletonRenderer>();
+				foreach (SkeletonRenderer r in arr)
+					skeletonRendererTable.Add(r.gameObject.GetInstanceID(), r.gameObject);
 
-			SkeletonUtilityBone[] boneArr = Object.FindObjectsOfType<SkeletonUtilityBone>();
-			foreach (SkeletonUtilityBone b in boneArr)
-				skeletonUtilityBoneTable.Add(b.gameObject.GetInstanceID(), b);
+				SkeletonUtilityBone[] boneArr = Object.FindObjectsOfType<SkeletonUtilityBone>();
+				foreach (SkeletonUtilityBone b in boneArr)
+					skeletonUtilityBoneTable.Add(b.gameObject.GetInstanceID(), b);
 
-			BoundingBoxFollower[] bbfArr = Object.FindObjectsOfType<BoundingBoxFollower>();
-			foreach (BoundingBoxFollower bbf in bbfArr)
-				boundingBoxFollowerTable.Add(bbf.gameObject.GetInstanceID(), bbf);
+				BoundingBoxFollower[] bbfArr = Object.FindObjectsOfType<BoundingBoxFollower>();
+				foreach (BoundingBoxFollower bbf in bbfArr)
+					boundingBoxFollowerTable.Add(bbf.gameObject.GetInstanceID(), bbf);
+			}
 		}
 
 		static void HierarchyWindowItemOnGUI (int instanceId, Rect selectionRect) {
-			if (skeletonRendererTable.ContainsKey(instanceId)) {
+			if (showHierarchyIcons) {
+				
 				Rect r = new Rect(selectionRect);
-				r.x = r.width - 15;
-				r.width = 15;
-				GUI.Label(r, Icons.spine);
-			} else if (skeletonUtilityBoneTable.ContainsKey(instanceId)) {
-				Rect r = new Rect(selectionRect);
-				r.x -= 26;
-				if (skeletonUtilityBoneTable[instanceId] != null) {
-					if (skeletonUtilityBoneTable[instanceId].transform.childCount == 0)
-						r.x += 13;
-					r.y += 2;
-					r.width = 13;
-					r.height = 13;
-					if (skeletonUtilityBoneTable[instanceId].mode == SkeletonUtilityBone.Mode.Follow)
-						GUI.DrawTexture(r, Icons.bone);
-					else
-						GUI.DrawTexture(r, Icons.poseBones);
+				if (skeletonRendererTable.ContainsKey(instanceId)) {
+					r.x = r.width - 15;
+					r.width = 15;
+					GUI.Label(r, Icons.spine);
+				} else if (skeletonUtilityBoneTable.ContainsKey(instanceId)) {
+					r.x -= 26;
+					if (skeletonUtilityBoneTable[instanceId] != null) {
+						if (skeletonUtilityBoneTable[instanceId].transform.childCount == 0)
+							r.x += 13;
+						r.y += 2;
+						r.width = 13;
+						r.height = 13;
+						if (skeletonUtilityBoneTable[instanceId].mode == SkeletonUtilityBone.Mode.Follow)
+							GUI.DrawTexture(r, Icons.bone);
+						else
+							GUI.DrawTexture(r, Icons.poseBones);
+					}
+				} else if (boundingBoxFollowerTable.ContainsKey(instanceId)) {
+					r.x -= 26;
+					if (boundingBoxFollowerTable[instanceId] != null) {
+						if (boundingBoxFollowerTable[instanceId].transform.childCount == 0)
+							r.x += 13;
+						r.y += 2;
+						r.width = 13;
+						r.height = 13;
+						GUI.DrawTexture(r, Icons.boundingBox);
+					}
 				}
-			} else if (boundingBoxFollowerTable.ContainsKey(instanceId)) {
-				Rect r = new Rect(selectionRect);
-				r.x -= 26;
-				if (boundingBoxFollowerTable[instanceId] != null) {
-					if (boundingBoxFollowerTable[instanceId].transform.childCount == 0)
-						r.x += 13;
-					r.y += 2;
-					r.width = 13;
-					r.height = 13;
-					GUI.DrawTexture(r, Icons.boundingBox);
-				}
+
 			}
 		}
 		#endregion
@@ -1123,10 +1157,14 @@ namespace Spine.Unity.Editor {
 				return false;
 			}
 
+			bool isSpineJson = root.ContainsKey("skeleton");
+
 			// Version warning
-			{
+			if (isSpineJson) {
 				var skeletonInfo = (Dictionary<string, object>)root["skeleton"];
-				string jsonVersion = (string)skeletonInfo["spine"];
+				object jv;
+				skeletonInfo.TryGetValue("spine", out jv);
+				string jsonVersion = (jv == null) ? (string)jv : null;
 				if (!string.IsNullOrEmpty(jsonVersion)) {
 					string[] jsonVersionSplit = jsonVersion.Split('.');
 					bool match = false;
@@ -1136,7 +1174,7 @@ namespace Spine.Unity.Editor {
 
 						if (isFixVersionRequired)
 							secondaryMatch &= version[2] <= int.Parse(jsonVersionSplit[2]);
-						
+
 						if (primaryMatch && secondaryMatch) {
 							match = true;
 							break;
@@ -1147,13 +1185,12 @@ namespace Spine.Unity.Editor {
 						string runtimeVersion = compatibleVersions[0][0] + "." + compatibleVersions[0][1];
 						Debug.LogWarning(string.Format("Skeleton '{0}' (exported with Spine {1}) may be incompatible with your runtime version: spine-unity v{2}", asset.name, jsonVersion, runtimeVersion));
 					}
+				} else {
+					isSpineJson = false;
 				}
 			}
-
-
-			return root.ContainsKey("skeleton");
-
-
+				
+			return isSpineJson;
 		}
 		#endregion
 
@@ -1400,10 +1437,70 @@ namespace Spine.Unity.Editor {
 		}
 		#endregion
 
+		#region Handles
+		static public void DrawBone (Matrix4x4 transformMatrix) {
+			SpineEditorUtilities.Icons.BoneMaterial.SetPass(0);
+			Graphics.DrawMeshNow(SpineEditorUtilities.Icons.BoneMesh, transformMatrix);
+		}
+
+		static float[] pathVertexBuffer;
+		static public void DrawPath (Slot s, PathAttachment p, Transform t) {
+			int worldVerticesLength = p.WorldVerticesLength;
+
+			if (pathVertexBuffer == null || pathVertexBuffer.Length < worldVerticesLength)
+				pathVertexBuffer = new float[worldVerticesLength];
+			
+			float[] pv = pathVertexBuffer;
+			p.ComputeWorldVertices(s, pv);
+
+			var ocolor = Handles.color;
+			Handles.color = new Color(254f/255f, 127f/255f, 0); // Path orange
+
+			Matrix4x4 m = t.localToWorldMatrix;
+			const int step = 6;
+			int n = worldVerticesLength - step;
+			Vector3 p0, p1, p2, p3;
+			for (int i = 2; i < n; i += step) {
+				p0 = m.MultiplyPoint(new Vector3(pv[i], pv[i+1]));
+				p1 = m.MultiplyPoint(new Vector3(pv[i+2], pv[i+3]));
+				p2 = m.MultiplyPoint(new Vector3(pv[i+4], pv[i+5]));
+				p3 = m.MultiplyPoint(new Vector3(pv[i+6], pv[i+7]));
+				DrawCubicBezier(p0, p1, p2, p3);
+			}
+
+			n += step;
+			if (p.Closed) {
+				p0 = m.MultiplyPoint(new Vector3(pv[n - 4], pv[n - 3]));
+				p1 = m.MultiplyPoint(new Vector3(pv[n - 2], pv[n - 1]));
+				p2 = m.MultiplyPoint(new Vector3(pv[0], pv[1]));
+				p3 = m.MultiplyPoint(new Vector3(pv[2], pv[3]));
+				DrawCubicBezier(p0, p1, p2, p3);
+			}
+
+			const float endCapSize = 0.05f;
+			var q = Quaternion.identity;
+			Handles.DotCap(0, m.MultiplyPoint(new Vector3(pv[2], pv[3])), q, endCapSize);
+//			if (!p.Closed) Handles.DotCap(0, m.MultiplyPoint(new Vector3(pv[n - 4], pv[n - 3])), q, endCapSize);
+
+			Handles.color = ocolor;
+		}
+
+		static public void DrawCubicBezier (Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3) {
+			Handles.DrawBezier(p0, p3, p1, p2, Handles.color, Texture2D.whiteTexture, 2f);
+//			const float dotSize = 0.01f;
+//			Quaternion q = Quaternion.identity;
+//			Handles.DotCap(0, p0, q, dotSize);
+//			Handles.DotCap(0, p1, q, dotSize);
+//			Handles.DotCap(0, p2, q, dotSize);
+//			Handles.DotCap(0, p3, q, dotSize);
+//			Handles.DrawLine(p0, p1);
+//			Handles.DrawLine(p3, p2);
+		}
+		#endregion
+
 		public static string GetPathSafeRegionName (AtlasRegion region) {
 			return region.name.Replace("/", "_");
 		}
 	}
 
 }
-

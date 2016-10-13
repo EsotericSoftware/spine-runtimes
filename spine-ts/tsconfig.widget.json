@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"module": "none",
+		"noImplicitAny": true,
+		"removeComments": true,
+		"preserveConstEnums": true,
+		"outFile": "build/spine-widget.js",
+		"sourceMap": true,
+		"declaration": true
+	},
+	"include": [
+		"core/src/**/*",
+		"webgl/src/**/*",
+		"widget/src/**/*"
+	],
+	"exclude": [
+		"canvas",
+		"threejs",
+		"build"	 
+	]
+}

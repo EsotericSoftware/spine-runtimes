@@ -1,0 +1,24 @@
+<html>
+<meta charset="UTF-8">
+<title>Skins - Spine Demo</title>
+<link rel="stylesheet" href="demos.css">
+<script src="../../build/spine-webgl.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="utils.js"></script>
+<script src="skins.js"></script>
+<body>
+
+<center>
+<div class="aspect"><div><canvas id="skins-canvas"></canvas></div></div>
+<select id="skins-skin"></select><br>
+<button id="skins-randomizeattachments">Random Attachments</button>
+<button id="skins-swingsword">Swing Sword</button><br>
+<input id="skins-randomizeskins" type="checkbox" checked=true></input> Randomize skin
+</center>
+
+<script>
+skinsDemo(spineDemos.setupRendering);
+</script>
+
+</body>
+</html>

@@ -12,7 +12,6 @@ using UnityEditor;
 #else
 using UnityEditor.AnimatedValues;
 #endif
-using System.Collections;
 using System.Collections.Generic;
 using Spine;
 
@@ -99,24 +98,26 @@ namespace Spine.Unity.Editor {
 				return;
 			}
 				
+			var m = transform.localToWorldMatrix;
 			foreach (Bone b in skeleton.Bones) {
 				Vector3 pos = new Vector3(b.WorldX, b.WorldY, 0);
 				Quaternion rot = Quaternion.Euler(0, 0, b.WorldRotationX - 90f);
 				Vector3 scale = Vector3.one * b.Data.Length * b.WorldScaleX;
+				const float mx = 2.5f;
+				scale.x = Mathf.Clamp(scale.x, -mx, mx);
+				SpineEditorUtilities.DrawBone(m * Matrix4x4.TRS(pos, rot, scale));
+			}
 
-				SpineEditorUtilities.Icons.BoneMaterial.SetPass(0);
-				Graphics.DrawMeshNow(SpineEditorUtilities.Icons.BoneMesh, transform.localToWorldMatrix * Matrix4x4.TRS(pos, rot, scale));
+			foreach (Slot s in skeleton.DrawOrder) {
+				var p = s.Attachment as PathAttachment;
+				if (p != null) SpineEditorUtilities.DrawPath(s, p, transform);
 			}
 		}
 
 		void UpdateAttachments () {
 			attachmentTable = new Dictionary<Slot, List<Attachment>>();
-			Skin skin = skeleton.Skin;
 
-			if (skin == null) {
-				skin = skeletonRenderer.skeletonDataAsset.GetSkeletonData(true).DefaultSkin;
-			}
-
+			Skin skin = skeleton.Skin ?? skeletonRenderer.skeletonDataAsset.GetSkeletonData(true).DefaultSkin;
 			for (int i = skeleton.Slots.Count-1; i >= 0; i--) {
 				List<Attachment> attachments = new List<Attachment>();
 				skin.FindAttachmentsForSlot(i, attachments);
@@ -229,14 +230,14 @@ namespace Spine.Unity.Editor {
 						GUI.contentColor = Color.white;
 					}
 				}
-				#if UNITY_4_3
+			#if UNITY_4_3
 
-				#else
+			#else
 			}
 			EditorGUILayout.EndFadeGroup();
 			if (showSlots.isAnimating)
 				Repaint();
-				#endif
+			#endif
 		}
 
 		void SpawnHierarchyContextMenu () {

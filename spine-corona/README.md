@@ -10,9 +10,9 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-corona works with data exported from Spine 2.1.27. Updating spine-corona to [v3.0](https://trello.com/c/tF8UykBM/72-update-runtimes-to-support-v3-0-skewing-scale), [v3.1](https://trello.com/c/bERJAFEq/73-update-runtimes-to-support-v3-1-linked-meshes), [v3.2](https://github.com/EsotericSoftware/spine-runtimes/issues/586), and [v3.3](https://github.com/EsotericSoftware/spine-runtimes/issues/613) is in progress.
+spine-corona works with data exported from the latest, non-beta Spine version.
 
-spine-corona supports all Spine features except for rendering meshes due to Corona having a limited graphics API.
+spine-corona supports all Spine features.
 
 spine-corona does not yet support loading the binary format.
 
@@ -20,12 +20,6 @@ spine-corona does not yet support loading the binary format.
 
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip](https://github.com/EsotericSoftware/spine-runtimes/archive/master.zip).
 1. Copy the contents of `spine-lua` to `spine-corona/spine-lua`.
-1. Run the `main.lua` file using Corona. There are multiple examples that can be enabled by editing this file.
+1. Run the `main.lua` file using Corona. Tap/click to switch between skeletons
 
 Alternatively, the `spine-lua` and `spine-corona/spine-corona` directories can be copied into your project. Note that the require statements use `spine-lua.Xxx`, so the spine-lua files must be in a `spine-lua` directory in your project.
-
-## Examples
-
-[spineboy Example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-corona/examples/spineboy.lua)
-[goblins Example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-corona/examples/goblins.lua)
-[dragon Example](https://github.com/EsotericSoftware/spine-runtimes/blob/master/spine-corona/examples/dragon.lua)

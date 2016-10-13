@@ -1,0 +1,23 @@
+<html>
+<meta charset="UTF-8">
+<title>Transitions - Spine Demo</title>
+<link rel="stylesheet" href="demos.css">
+<script src="../../build/spine-webgl.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="utils.js"></script>
+<script src="transitions.js"></script>
+<body>
+
+<center>
+<div class="aspect"><div><canvas id="transitions-canvas"></canvas></div></div>
+Time multiplier
+<div id="transitions-timeslider" class="slider filled"></div>
+</center>
+
+<script>
+spineDemos.loadSliders();
+transitionsDemo(spineDemos.setupRendering);
+</script>
+
+</body>
+</html>

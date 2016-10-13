@@ -1,18 +1,17 @@
-﻿/******************************************************************************
- * Spine Runtimes Software License
- * Version 2.3
+/******************************************************************************
+ * Spine Runtimes Software License v2.5
  * 
- * Copyright (c) 2013-2015, Esoteric Software
+ * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
  * 
- * You are granted a perpetual, non-exclusive, non-sublicensable and
- * non-transferable license to use, install, execute and perform the Spine
- * Runtimes Software (the "Software") and derivative works solely for personal
- * or internal use. Without the written permission of Esoteric Software (see
- * Section 2 of the Spine Software License Agreement), you may not (a) modify,
- * translate, adapt or otherwise create derivative works, improvements of the
- * Software or develop new applications using the Software or (b) remove,
- * delete, alter or obscure any trademarks or any copyright, trademark, patent
+ * You are granted a perpetual, non-exclusive, non-sublicensable, and
+ * non-transferable license to use, install, execute, and perform the Spine
+ * Runtimes software and derivative works solely for personal or internal
+ * use. Without the written permission of Esoteric Software (see Section 2 of
+ * the Spine Software License Agreement), you may not (a) modify, translate,
+ * adapt, or develop new applications using the Spine Runtimes or otherwise
+ * create derivative works or improvements of the Spine Runtimes or (b) remove,
+ * delete, alter, or obscure any trademarks or any copyright, trademark, patent,
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
@@ -22,12 +21,13 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
  * EVENT SHALL ESOTERIC SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS INTERRUPTION, OR LOSS OF
+ * USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
+
 #if (UNITY_5_0 || UNITY_5_1 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7)
 #define PREUNITY_5_2
 #endif
@@ -48,40 +48,6 @@ namespace Spine.Unity.Editor {
 		SerializedProperty raycastTarget_;
 
 		SkeletonGraphic thisSkeletonGraphic;
-
-		static SpineEditorUtilities.InstantiateDelegate instantiateDelegate;
-
-		static SkeletonGraphicInspector () {
-			if (!SpineEditorUtilities.initialized)
-				return;
-
-			if (instantiateDelegate == null)
-				instantiateDelegate = new SpineEditorUtilities.InstantiateDelegate(SpawnSkeletonGraphicFromDrop);
-			
-			// Drag and Drop Instantiate menu item
-			var spawnTypes = SpineEditorUtilities.additionalSpawnTypes;
-			UnityEngine.Assertions.Assert.IsFalse(spawnTypes == null);
-			bool menuItemExists = false;
-			foreach (var spawnType in spawnTypes) {
-				if (spawnType.instantiateDelegate == SkeletonGraphicInspector.instantiateDelegate) {
-					menuItemExists = true;
-					break;
-				}
-			}
-
-			if (!menuItemExists) {
-				SpineEditorUtilities.additionalSpawnTypes.Add(new SpineEditorUtilities.SkeletonComponentSpawnType {
-					menuLabel = "SkeletonGraphic (UI)",
-					instantiateDelegate = SkeletonGraphicInspector.instantiateDelegate,
-					isUI = true
-				});
-			}
-			
-		}
-
-		static public Component SpawnSkeletonGraphicFromDrop (SkeletonDataAsset data) {
-			return InstantiateSkeletonGraphic(data);
-		}
 
 		void OnEnable () {
 			var so = this.serializedObject;
@@ -196,6 +162,11 @@ namespace Spine.Unity.Editor {
 			}
 
 			return true;
+		}
+
+		// SpineEditorUtilities.InstantiateDelegate. Used by drag and drop.
+		public static Component SpawnSkeletonGraphicFromDrop (SkeletonDataAsset data) {
+			return InstantiateSkeletonGraphic(data);
 		}
 
 		public static SkeletonGraphic InstantiateSkeletonGraphic (SkeletonDataAsset skeletonDataAsset, string skinName) {
