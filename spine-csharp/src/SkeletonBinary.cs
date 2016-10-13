@@ -94,7 +94,7 @@ namespace Spine {
 		#if WINDOWS_PHONE
 			using (var input = new BufferedStream(Microsoft.Xna.Framework.TitleContainer.OpenStream(path))) {
 		#else
-			using (var input = new BufferedStream(new FileStream(path, FileMode.Open))) {
+			using (var input = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan)) {
 		#endif // WINDOWS_PHONE
 				SkeletonData skeletonData = ReadSkeletonData(input);
 				skeletonData.name = Path.GetFileNameWithoutExtension(path);
