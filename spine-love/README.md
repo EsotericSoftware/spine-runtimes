@@ -10,9 +10,9 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-love works with data exported from Spine 2.1.27. Updating spine-love to [v3.0](https://trello.com/c/tF8UykBM/72-update-runtimes-to-support-v3-0-skewing-scale), [v3.1](https://trello.com/c/bERJAFEq/73-update-runtimes-to-support-v3-1-linked-meshes), [v3.2](https://github.com/EsotericSoftware/spine-runtimes/issues/586), and [v3.3](https://github.com/EsotericSoftware/spine-runtimes/issues/613) is in progress.
+spine-love works with data exported from the latst Spine version.
 
-spine-love supports all Spine features except for rendering meshes.
+spine-love supports all Spine features except for blending modes other than normal.
 
 spine-love does not yet support loading the binary format.
 

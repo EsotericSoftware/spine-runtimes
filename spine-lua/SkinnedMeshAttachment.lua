@@ -80,7 +80,7 @@ x,y=slot.bone.skeleton.x,slot.bone.skeleton.y
 		local weights = self.weights
 		local bones = self.bones
 		local w, v, b, f = 1, 1, 1, 1
-		local	n = #bones
+		local n = #bones
 		local wx, wy, bone, vx, vy, weight
 		if slot.attachmentVerticesCount == 0 then
 			while v <= n do

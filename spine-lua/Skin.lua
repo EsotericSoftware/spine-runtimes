@@ -29,7 +29,12 @@
 -- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
+local setmetatable = setmetatable
+local table_insert = table.insert
+
 local Skin = {}
+Skin.__index = Skin
+
 function Skin.new (name)
 	if not name then error("name cannot be nil", 2) end
 	
@@ -37,33 +42,58 @@ function Skin.new (name)
 		name = name,
 		attachments = {}
 	}
-
-	function self:addAttachment (slotIndex, name, attachment)
-		if not name then error("name cannot be nil.", 2) end
-		self.attachments[slotIndex .. ":" .. name] = { slotIndex, name, attachment }
-	end
-
-	function self:getAttachment (slotIndex, name)
-		if not name then error("name cannot be nil.", 2) end
-		local values = self.attachments[slotIndex .. ":" .. name]
-		if not values then return nil end
-		return values[3]
-	end
-
-	function self:findNamesForSlot (slotIndex)
-		local names = {}
-		for k,v in self.attachments do
-			if v[1] == slotIndex then table.insert(names, v[2]) end
-		end
-	end
-
-	function self:findAttachmentsForSlot (slotIndex)
-		local attachments = {}
-		for k,v in self.attachments do
-			if v[1] == slotIndex then table.insert(attachments, v[3]) end
-		end
-	end
+	setmetatable(self, Skin)
 
 	return self
 end
+
+function Skin:addAttachment (slotIndex, name, attachment)
+	if not name then error("name cannot be nil.", 2) end
+	if not self.attachments[slotIndex] then self.attachments[slotIndex] = {} end
+	self.attachments[slotIndex][name] = attachment
+end
+
+function Skin:getAttachment (slotIndex, name)
+	if not name then error("name cannot be nil.", 2) end
+	local dictionary = self.attachments[slotIndex]
+	if dictionary then 
+		return dictionary[name]
+	else
+		return nil
+	end
+end
+
+function Skin:attachAll(skeleton, oldSkin)
+	local slotIndex = 0
+	for i, slot in ipairs(skeleton.slots) do
+		local slotAttachment = slot.attachment
+		if slotAttachment and slotIndex <= #oldSkin.attachments then
+			local dictionary = oldSkin.attachments[slotIndex]
+			for key, value in dictionary do
+				local skinAttachment = value
+				if slotAttachment == skinAttachment then
+					local attachment = getAttachment(slotIndex, key)
+					if attachment then slot.attachment = attachment end
+					break
+				end
+			end
+		end
+		slotIndex = slotIndex + 1
+	end
+end
+
+function Skin:findNamesForSlot (slotIndex)
+	local names = {}
+	for k,v in self.attachments do
+		if v[1] == slotIndex then table_insert(names, v[2]) end
+	end
+end
+
+function Skin:findAttachmentsForSlot (slotIndex)
+	local attachments = {}
+	for k,v in self.attachments do
+		if v[1] == slotIndex then table_insert(attachments, v[3]) end
+	end
+end
+
 return Skin
