@@ -28,10 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-/*****************************************************************************
- * Spine Extensions by Mitch Thompson and John Dy
- * Full irrevocable rights and permissions granted to Esoteric Software
-*****************************************************************************/
+// Contributed by: Mitch Thompson and John Dy
 
 using UnityEngine;
 using Spine;

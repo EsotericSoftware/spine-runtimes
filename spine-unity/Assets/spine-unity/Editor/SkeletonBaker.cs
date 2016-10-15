@@ -28,10 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-/*****************************************************************************
- * SkeletonBaker added by Mitch Thompson
- * Full irrevocable rights and permissions granted to Esoteric Software
-*****************************************************************************/
+// Contributed by: Mitch Thompson
+
 #define SPINE_SKELETON_ANIMATOR
 
 using UnityEngine;
@@ -1508,4 +1506,3 @@ namespace Spine.Unity.Editor {
 	}
 
 }
-	

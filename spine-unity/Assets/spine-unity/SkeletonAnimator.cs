@@ -28,10 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-/*****************************************************************************
- * SkeletonAnimator created by Mitch Thompson
- * Full irrevocable rights and permissions granted to Esoteric Software
-*****************************************************************************/
+// Contributed by: Mitch Thompson
+
 //#define USE_SPINE_EVENTS // Uncomment this define to use C# events to handle Spine events. (Does not disable Unity AnimationClip Events)
 
 using UnityEngine;

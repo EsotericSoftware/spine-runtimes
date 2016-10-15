@@ -28,10 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-/*****************************************************************************
- * Spine Attribute Drawers created by Mitch Thompson
- * Full irrevocable rights and permissions granted to Esoteric Software
-*****************************************************************************/
+// Contributed by: Mitch Thompson
+
 using UnityEngine;
 using UnityEditor;
 using System;

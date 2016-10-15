@@ -28,10 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-/*****************************************************************************
- * Constrained Camera created by Mitch Thompson
- * Full irrevocable rights and permissions granted to Esoteric Software
-*****************************************************************************/
+// Contributed by: Mitch Thompson
 
 using UnityEngine;
 using System.Collections;

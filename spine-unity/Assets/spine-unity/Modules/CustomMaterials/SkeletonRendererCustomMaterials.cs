@@ -28,10 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-/*****************************************************************************
- * SkeletonRendererCustomMaterials created by Lost Polygon
- * Full irrevocable rights and permissions granted to Esoteric Software
-*****************************************************************************/
+// Contributed by: Lost Polygon
 
 using System;
 using System.Collections.Generic;
