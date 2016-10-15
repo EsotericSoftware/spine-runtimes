@@ -84,7 +84,7 @@ module spine {
 			}
 			img.onerror = (ev) => {
 				if (error) error(path, `Couldn't load image ${path}`);
-				this.errors[path] =  `Couldn't load image ${path}`;
+				this.errors[path] = `Couldn't load image ${path}`;
 				this.toLoad--;
 				this.loaded++;
 			}
@@ -98,7 +98,7 @@ module spine {
 		remove (path: string) {
 			path = this.pathPrefix + path;
 			let asset = this.assets[path];
-			if ((<any>asset).dispose) (<any>asset).dispose();			
+			if ((<any>asset).dispose) (<any>asset).dispose();
 			this.assets[path] = null;
 		}
 

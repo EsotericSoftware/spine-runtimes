@@ -277,7 +277,7 @@ public class Skeleton {
 
 	public function setSlotsToSetupPose () : void {
 		var i:int = 0;
-		for each (var slot:Slot in slots) { 
+		for each (var slot:Slot in slots) {
 			drawOrder[i++] = slot;
 			slot.setToSetupPose();
 		}
@@ -353,8 +353,8 @@ public class Skeleton {
 		return _skin == null ? null : _skin._name;
 	}
 
-	/** Sets the skin used to look up attachments before looking in the {@link SkeletonData#getDefaultSkin() default skin}. 
-	 * Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was 
+	/** Sets the skin used to look up attachments before looking in the {@link SkeletonData#getDefaultSkin() default skin}.
+	 * Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was
 	 * no old skin, each slot's setup mode attachment is attached from the new skin.
 	 * @param newSkin May be null. */
 	public function set skin (newSkin:Skin) : void {

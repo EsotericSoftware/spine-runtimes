@@ -80,8 +80,8 @@ end
 function utils.newNumberArray (size)
 	local a = {}
 	local i = 1
-	while i <= size do 
-		a[i] = 0 
+	while i <= size do
+		a[i] = 0
 		i = i + 1
 	end
 	return a
@@ -90,8 +90,8 @@ end
 function utils.newNumberArrayZero (size)
 	local a = {}
 	local i = 0
-	while i < size do 
-		a[i] = 0 
+	while i < size do
+		a[i] = 0
 		i = i + 1
 	end
 	return a
@@ -101,7 +101,7 @@ function utils.setArraySize (array, size)
 	if #array == size then return array end
 	if #array < size then
 		local i = #array + 1
-		while i <= size do 
+		while i <= size do
 			array[i] = 0
 			i = i + 1
 		end

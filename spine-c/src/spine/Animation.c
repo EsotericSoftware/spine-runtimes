@@ -463,7 +463,7 @@ void _spColorTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 
 		frameTime = self->frames[frame];
 		percent = spCurveTimeline_getCurvePercent(SUPER(self), frame / COLOR_ENTRIES - 1,
-												  1 - (time - frameTime) / (self->frames[frame + COLOR_PREV_TIME] - frameTime));
+			1 - (time - frameTime) / (self->frames[frame + COLOR_PREV_TIME] - frameTime));
 
 		r += (self->frames[frame + COLOR_R] - r) * percent;
 		g += (self->frames[frame + COLOR_G] - g) * percent;
@@ -918,7 +918,7 @@ static const int PATHCONSTRAINTPOSITION_PREV_VALUE = -1;
 static const int PATHCONSTRAINTPOSITION_VALUE = 1;
 
 void _spPathConstraintPositionTimeline_apply(const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time,
-											 spEvent** firedEvents, int* eventsCount, float alpha) {
+		spEvent** firedEvents, int* eventsCount, float alpha) {
 	int frame;
 	float frameTime, percent, position;
 	spPathConstraint* constraint;
@@ -963,7 +963,7 @@ static const int PATHCONSTRAINTSPACING_PREV_VALUE = -1;
 static const int PATHCONSTRAINTSPACING_VALUE = 1;
 
 void _spPathConstraintSpacingTimeline_apply(const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time,
-											 spEvent** firedEvents, int* eventsCount, float alpha) {
+		spEvent** firedEvents, int* eventsCount, float alpha) {
 	int frame;
 	float frameTime, percent, spacing;
 	spPathConstraint* constraint;

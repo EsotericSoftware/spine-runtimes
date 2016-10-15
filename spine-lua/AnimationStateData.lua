@@ -45,7 +45,7 @@ function AnimationStateData.new (skeletonData)
 		end
 		self.animationToMixTime[fromName][toName] = duration
 	end
-	
+
 	function self:getMix (fromName, toName)
 		local first = self.animationToMixTime[fromName]
 		if not first then return self.defaultMix end

@@ -47,7 +47,7 @@ module spine {
 		}
 
 		/** @return May be null. */
-		getAttachment (slotIndex: number, name: string): Attachment {			
+		getAttachment (slotIndex: number, name: string): Attachment {
 			let dictionary = this.attachments[slotIndex];
 			return dictionary ? dictionary[name] : null;
 		}

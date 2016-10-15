@@ -37,14 +37,14 @@ module spine.webgl {
 
 		constructor (gl: WebGLRenderingContext) {
 			this.gl = gl;
-		}		
+		}
 
 		draw (batcher: PolygonBatcher, skeleton: Skeleton) {
 			let premultipliedAlpha = this.premultipliedAlpha;
 			let blendMode: BlendMode = null;
 
 			let vertices: ArrayLike<number> = null;
-			let triangles: Array<number>  = null;
+			let triangles: Array<number> = null;
 			let drawOrder = skeleton.drawOrder;
 			for (let i = 0, n = drawOrder.length; i < n; i++) {
 				let slot = drawOrder[i];

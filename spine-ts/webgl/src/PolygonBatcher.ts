@@ -34,7 +34,7 @@ module spine.webgl {
 		private drawCalls: number;
 		private isDrawing = false;
 		private mesh: Mesh;
-		private shader: Shader = null;		
+		private shader: Shader = null;
 		private lastTexture: GLTexture = null;
 		private verticesLength = 0;
 		private indicesLength = 0;
@@ -44,10 +44,10 @@ module spine.webgl {
 		constructor (gl: WebGLRenderingContext, maxVertices: number = 10920) {
 			if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
 			this.gl = gl;
-			this.mesh = new Mesh(gl, [new Position2Attribute(), new ColorAttribute(), new TexCoordAttribute()], maxVertices, maxVertices * 3);			
+			this.mesh = new Mesh(gl, [new Position2Attribute(), new ColorAttribute(), new TexCoordAttribute()], maxVertices, maxVertices * 3);
 		}
 
-		begin (shader: Shader) {			
+		begin (shader: Shader) {
 			let gl = this.gl;
 			if (this.isDrawing) throw new Error("PolygonBatch is already drawing. Call PolygonBatch.end() before calling PolygonBatch.begin()");
 			this.drawCalls = 0;
@@ -118,7 +118,7 @@ module spine.webgl {
 		getDrawCalls () { return this.drawCalls; }
 
 		dispose () {
-			this.mesh.dispose();			
+			this.mesh.dispose();
 		}
 	}
 }

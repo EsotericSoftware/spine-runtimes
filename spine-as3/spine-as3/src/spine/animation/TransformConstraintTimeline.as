@@ -45,7 +45,7 @@ public class TransformConstraintTimeline extends CurveTimeline {
 		super(frameCount);
 		frames = new Vector.<Number>(frameCount * ENTRIES, true);
 	}
-	
+
 	/** Sets the time and mixes of the specified keyframe. */
 	public function setFrame (frameIndex:int, time:Number, rotateMix:Number, translateMix:Number, scaleMix:Number, shearMix:Number) : void {
 		frameIndex *= ENTRIES;

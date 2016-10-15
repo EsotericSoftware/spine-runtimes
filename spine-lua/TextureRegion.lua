@@ -45,7 +45,7 @@ function TextureRegion.new ()
 		originalWidth = 0, originalHeight = 0
 	}
 	setmetatable(self, TextureRegion)
-	
+
 	return self
 end
 

@@ -183,7 +183,7 @@ module spine.webgl {
 				void main () {
 					v_color = ${Shader.COLOR};
 					v_texCoords = ${Shader.TEXCOORDS};
-					gl_Position =  ${Shader.MVP_MATRIX} * ${Shader.POSITION};
+					gl_Position = ${Shader.MVP_MATRIX} * ${Shader.POSITION};
 				}
 			`;
 
@@ -215,7 +215,7 @@ module spine.webgl {
 
 				void main () {
 					v_color = ${Shader.COLOR};
-					gl_Position =  ${Shader.MVP_MATRIX} * ${Shader.POSITION};
+					gl_Position = ${Shader.MVP_MATRIX} * ${Shader.POSITION};
 				}
 			`;
 

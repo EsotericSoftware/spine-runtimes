@@ -39,10 +39,10 @@ extern "C" {
 
 typedef struct spIkConstraintData {
 	const char* const name;
-	
+
 	int bonesCount;
 	spBoneData** bones;
-	
+
 	spBoneData* target;
 	int bendDirection;
 	float mix;

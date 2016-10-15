@@ -78,7 +78,7 @@ namespace Spine {
 			foreach (BoneData boneData in data.bones) {
 				Bone bone;
 				if (boneData.parent == null) {
-					bone = new Bone(boneData, this, null);				
+					bone = new Bone(boneData, this, null);
 				} else {
 					Bone parent = bones.Items[boneData.parent.index];
 					bone = new Bone(boneData, this, parent);
@@ -416,7 +416,7 @@ namespace Spine {
 			}
 			throw new Exception("Slot not found: " + slotName);
 		}
-			
+
 		/// <returns>May be null.</returns>
 		public IkConstraint FindIkConstraint (String constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");

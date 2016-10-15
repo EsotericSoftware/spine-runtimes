@@ -71,7 +71,7 @@ spine.utils.readFile = function (fileName, base)
 	io.close(file)
 	return contents
 end
- 
+
 local json = require "json"
 spine.utils.readJSON = function (text)
 	return json.decode(text)
@@ -111,15 +111,15 @@ end
 function spine.Skeleton:updateWorldTransform()
 	spine.Skeleton.updateWorldTransform_super(self)
 	local premultipliedAlpha = self.premultipliedAlpha
-	
+
 	self.batches = 0
-	
+
 	-- Remove old drawing group, we will start anew
 	if self.drawingGroup then self.drawingGroup:removeSelf() end
 	local drawingGroup = display.newGroup()
 	self.drawingGroup = drawingGroup
 	self.group:insert(drawingGroup)
-	
+
 	local drawOrder = self.drawOrder
 	local currentGroup = nil
 	local groupVertices = {}
@@ -149,12 +149,12 @@ function spine.Skeleton:updateWorldTransform()
 				color = { vertices[5], vertices[6], vertices[7], vertices[8] }
 				blendMode = toCoronaBlendMode(slot.data.blendMode)
 			end
-			
+
 			if texture and vertices and indices then
 				if not lastTexture then lastTexture = texture end
 				if not lastColor then lastColor = color end
 				if not lastBlendMode then lastBlendMode = blendMode end
-				
+
 				if (texture ~= lastTexture or not colorEquals(color, lastColor) or blendMode ~= lastBlendMode) then
 					self:flush(groupVertices, groupUvs, groupIndices, lastTexture, lastColor, lastBlendMode, drawingGroup)
 					lastTexture = texture
@@ -164,12 +164,12 @@ function spine.Skeleton:updateWorldTransform()
 					groupUvs = {}
 					groupIndices = {}
 				end
-			
+
 				self:batch(vertices, indices, groupVertices, groupUvs, groupIndices)
 			end
 		end
 	end
-	
+
 	if #groupVertices > 0 then
 		self:flush(groupVertices, groupUvs, groupIndices, texture, color, blendMode, drawingGroup)
 	end
@@ -202,7 +202,7 @@ function spine.Skeleton:batch(vertices, indices, groupVertices, groupUvs, groupI
 		indexStart = indexStart + 1
 		i = i + 1
 	end
-	
+
 	i = 1
 	local numVertices = #vertices
 	local vertexStart = #groupVertices + 1

@@ -62,9 +62,9 @@ char* _Util_readFile (const char* path, int* length){
 namespace spine {
 
 SkeletonDrawable::SkeletonDrawable (SkeletonData* skeletonData, AnimationStateData* stateData) :
-				timeScale(1),
-				vertexArray(new VertexArray(Triangles, skeletonData->bonesCount * 4)),
-				worldVertices(0) {
+		timeScale(1),
+		vertexArray(new VertexArray(Triangles, skeletonData->bonesCount * 4)),
+		worldVertices(0) {
 	Bone_setYDown(true);
 	worldVertices = MALLOC(float, SPINE_MESH_VERTEX_COUNT_MAX);
 	skeleton = Skeleton_create(skeletonData);
@@ -78,7 +78,7 @@ SkeletonDrawable::SkeletonDrawable (SkeletonData* skeletonData, AnimationStateDa
 SkeletonDrawable::~SkeletonDrawable () {
 	delete vertexArray;
 	FREE(worldVertices);
-    if (ownsAnimationStateData) AnimationStateData_dispose(state->data);
+	if (ownsAnimationStateData) AnimationStateData_dispose(state->data);
 	AnimationState_dispose(state);
 	Skeleton_dispose(skeleton);
 }

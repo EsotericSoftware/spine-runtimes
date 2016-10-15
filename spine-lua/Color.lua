@@ -39,7 +39,7 @@ function Color.new ()
 		r = 0, g = 0, b = 0, a = 0
 	}
 	setmetatable(self, Color)
-	
+
 	return self
 end
 
@@ -48,7 +48,7 @@ function Color.newWith (r, g, b, a)
 		r = a, g = g, b = b, a = a
 	}
 	setmetatable(self, Color)
-	
+
 	return self
 end
 

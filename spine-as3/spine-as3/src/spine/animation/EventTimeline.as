@@ -54,14 +54,14 @@ public class EventTimeline implements Timeline {
 	/** Fires events for frames > lastTime and <= time. */
 	public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
 		if (!firedEvents) return;
-		
+
 		if (lastTime > time) { // Fire events after last time for looped animations.
 			apply(skeleton, lastTime, int.MAX_VALUE, firedEvents, alpha);
 			lastTime = -1;
 		} else if (lastTime >= frames[int(frameCount - 1)]) // Last time is after last frame.
 			return;
 		if (time < frames[0]) return; // Time is before first frame.
-		
+
 		var frame:int;
 		if (lastTime < frames[0])
 			frame = 0;

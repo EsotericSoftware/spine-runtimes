@@ -121,7 +121,7 @@ public class Animation {
 		}
 		return 0; // Can't happen.
 	}
-	
+
 	static public function linearSearch (values:Vector.<Number>, target:Number, step:int) : int {
 		for (var i:int = 0, last:int = values.length - step; i <= last; i += step)
 			if (values[i] > target)

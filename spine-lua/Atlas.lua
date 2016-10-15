@@ -42,11 +42,11 @@ function Atlas.parse(atlasPath, atlasBase)
 		local a,b = tonumber( a ), tonumber( b )
 		return a and b and {a, b}
 	end
-	
+
 	if not atlasPath then
 		error("Error: " .. atlasPath .. ".atlas" .. " doesn't exist!")
 		return nil
-	end 
+	end
 
 	local atlasLines = spine.utils.readFile( atlasPath, atlasBase )
 	if not atlasLines then
@@ -57,7 +57,7 @@ function Atlas.parse(atlasPath, atlasBase)
 	local pages = {}
 
 
-	local it = string.gmatch(atlasLines, "(.-)\r?\n")	 -- iterate over lines
+	local it = string.gmatch(atlasLines, "(.-)\r?\n") -- iterate over lines
 	for l in it do
 		if #l == 0 then
 			l = it()
@@ -73,7 +73,7 @@ function Atlas.parse(atlasPath, atlasBase)
 				page.wrap = string.match( it(), "%a+: (.+)" )
 				page.regions = {}
 				table.insert( pages, page )
-			else 
+			else
 				break
 			end
 		else

@@ -37,7 +37,7 @@ import spine.Skeleton;
 public class CurveTimeline implements Timeline {
 	static private const LINEAR:Number = 0;
 	static private const STEPPED:Number = 1;
-	static private const BEZIER:Number = 2;	
+	static private const BEZIER:Number = 2;
 	static private const BEZIER_SIZE:int = 10 * 2 - 1;
 
 	private var curves:Vector.<Number>; // type, x, y, ...

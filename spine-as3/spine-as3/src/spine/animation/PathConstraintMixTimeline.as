@@ -39,13 +39,13 @@ public class PathConstraintMixTimeline extends CurveTimeline {
 	static internal const ROTATE:int = 1, TRANSLATE:int = 2;
 
 	public var pathConstraintIndex:int;
-	
+
 	public var frames:Vector.<Number>; // time, rotate mix, translate mix, ...
 
 	public function PathConstraintMixTimeline (frameCount:int) {
 		super(frameCount);
 		frames = new Vector.<Number>(frameCount * ENTRIES, true);
-	}	
+	}
 
 	/** Sets the time and mixes of the specified keyframe. */
 	public function setFrame (frameIndex:int, time:Number, rotateMix:Number, translateMix:Number) : void {
@@ -55,7 +55,7 @@ public class PathConstraintMixTimeline extends CurveTimeline {
 		frames[frameIndex + TRANSLATE] = translateMix;
 	}
 
-	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {		
+	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
 		if (time < frames[0]) return; // Time is before first frame.
 
 		var constraint:PathConstraint = skeleton.pathConstraints[pathConstraintIndex];

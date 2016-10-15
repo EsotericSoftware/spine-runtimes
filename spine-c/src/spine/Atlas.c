@@ -202,7 +202,7 @@ spAtlas* spAtlas_create (const char* begin, int length, const char* dir, void* r
 			switch (readTuple(&begin, end, tuple)) {
 			case 0:
 				return abortAtlas(self);
-			case 2:  /* size is only optional for an atlas packed with an old TexturePacker. */
+			case 2: /* size is only optional for an atlas packed with an old TexturePacker. */
 				page->width = toInt(tuple);
 				page->height = toInt(tuple + 1);
 				if (!readTuple(&begin, end, tuple)) return abortAtlas(self);

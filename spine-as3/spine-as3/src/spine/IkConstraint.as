@@ -144,7 +144,7 @@ public class IkConstraint implements Updatable {
 		if (u) {
 			l2 *= psx;
 			var cos:Number = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2);
-			if (cos < -1) 
+			if (cos < -1)
 				cos = -1;
 			else if (cos > 1) cos = 1;
 			a2 = Math.acos(cos) * bendDir;

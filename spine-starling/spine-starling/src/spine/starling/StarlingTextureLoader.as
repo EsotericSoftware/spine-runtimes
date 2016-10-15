@@ -43,7 +43,7 @@ public class StarlingTextureLoader implements TextureLoader {
 	public var bitmapDatas:Object = {};
 	public var singleBitmapData:BitmapData;
 
-	/** @param bitmaps A Bitmap or BitmapData for an atlas that has only one page, or for a multi page atlas an object where the 
+	/** @param bitmaps A Bitmap or BitmapData for an atlas that has only one page, or for a multi page atlas an object where the
 	 * key is the image path and the value is the Bitmap or BitmapData. */
 	public function StarlingTextureLoader (bitmaps:Object) {
 		if (bitmaps is BitmapData) {
@@ -54,7 +54,7 @@ public class StarlingTextureLoader implements TextureLoader {
 			singleBitmapData = Bitmap(bitmaps).bitmapData;
 			return;
 		}
-		
+
 		for (var path:* in bitmaps) {
 			var object:* = bitmaps[path];
 			var bitmapData:BitmapData;
@@ -79,7 +79,7 @@ public class StarlingTextureLoader implements TextureLoader {
 
 	public function loadRegion (region:AtlasRegion) : void {
 		var image:Image = new Image(Texture(region.page.rendererObject));
-		if (region.rotate) {			
+		if (region.rotate) {
 			image.setTexCoords(0, region.u, region.v2);
 			image.setTexCoords(1, region.u, region.v);
 			image.setTexCoords(2, region.u2, region.v2);

@@ -40,7 +40,7 @@ function SlotData.new (index, name, boneData)
 	if index < 0 then error("index must be >= 0", 2) end
 	if not name then error("name cannot be nil", 2) end
 	if not boneData then error("boneData cannot be nil", 2) end
-	
+
 	local self = {
 		index = index,
 		name = name,
@@ -50,7 +50,7 @@ function SlotData.new (index, name, boneData)
 		blendMode = BlendMode.normal
 	}
 	setmetatable(self, SlotData)
-	
+
 	return self
 end
 

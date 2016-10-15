@@ -27,26 +27,26 @@ cycles.
 
 `state` is an optional table with the following fields:
 
-	- `indent`	
+	- `indent`
 		When `indent` (a boolean) is set, the created string will contain
 		newlines and indentations. Otherwise it will be one long line.
-	- `keyorder`	
+	- `keyorder`
 		`keyorder` is an array to specify the ordering of keys in the
 		encoded output. If an object has keys which are not in this array
 		they are written after the sorted keys.
-	- `level`	 
+	- `level`
 		This is the initial level of indentation used when `indent` is
 		set. For each level two spaces are added. When absent it is set
 		to 0.
-	- `buffer`	
+	- `buffer`
 		`buffer` is an array to store the strings for the result so they
 		can be concatenated at once. When it isn't given, the encode
 		function will create it temporary and will return the
 		concatenated result.
-	- `bufferlen`	 
+	- `bufferlen`
 		When `bufferlen` is set, it has to be the index of the last
 		element of `buffer`.
-	- `tables`	
+	- `tables`
 		`tables` is a set to detect reference cycles. It is created
 		temporary when absent. Every table that is currently processed
 		is used as key, the value is `true`.
@@ -187,9 +187,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 <!-- This documentation can be parsed using Markdown to generate HTML.
-		 The source code is enclosed in a HTML comment so it won't be displayed
-		 by browsers, but it should be removed from the final HTML file as
-		 it isn't a valid HTML comment (and wastes space).
+	The source code is enclosed in a HTML comment so it won't be displayed
+	by browsers, but it should be removed from the final HTML file as
+	it isn't a valid HTML comment (and wastes space).
 	-->
 
 	<!--]==]
@@ -245,7 +245,7 @@ end
 
 local escapecodes = {
 	["\""] = "\\\"", ["\\"] = "\\\\", ["\b"] = "\\b", ["\f"] = "\\f",
-	["\n"] = "\\n",	 ["\r"] = "\\r",	["\t"] = "\\t"
+	["\n"] = "\\n", ["\r"] = "\\r", ["\t"] = "\\t"
 }
 
 local function escapeutf8 (uchar)
@@ -315,8 +315,7 @@ end
 
 function json.addnewline (state)
 	if state.indent then
-		state.bufferlen = addnewline2 (state.level or 0,
-													 state.buffer, state.bufferlen or #(state.buffer))
+		state.bufferlen = addnewline2 (state.level or 0, state.buffer, state.bufferlen or #(state.buffer))
 	end
 end
 
@@ -452,8 +451,7 @@ function json.encode (value, state)
 	state = state or {}
 	local oldbuffer = state.buffer
 	local buffer = oldbuffer or {}
-	local ret, msg = encode2 (value, state.indent, state.level or 0,
-									 buffer, state.bufferlen or 0, state.tables or {}, state.keyorder)
+	local ret, msg = encode2 (value, state.indent, state.level or 0, buffer, state.bufferlen or 0, state.tables or {}, state.keyorder)
 	if not ret then
 		error (msg, 2)
 	elseif oldbuffer then
@@ -705,7 +703,7 @@ function json.use_lpeg ()
 	local function UTF16Surrogate (match, pos, high, low)
 		high, low = tonumber (high, 16), tonumber (low, 16)
 		if 0xD800 <= high and high <= 0xDBff and 0xDC00 <= low and low <= 0xDFFF then
-			return true, unichar ((high - 0xD800)	 * 0x400 + (low - 0xDC00) + 0x10000)
+			return true, unichar ((high - 0xD800) * 0x400 + (low - 0xDC00) + 0x10000)
 		else
 			return false
 		end

@@ -35,7 +35,7 @@ module spine.threejs {
 		private static VERTEX_SIZE = 9;
 		private vertexBuffer: THREE.InterleavedBuffer;
 		private vertices: Float32Array;
-		private verticesLength = 0;		
+		private verticesLength = 0;
 		private indices: Uint16Array;
 		private indicesLength = 0;
 
@@ -44,7 +44,7 @@ module spine.threejs {
 
 			let vertices = this.vertices = new Float32Array(maxVertices * MeshBatcher.VERTEX_SIZE);
 			let indices = this.indices = new Uint16Array(maxVertices * 3);
-			this.mesh = mesh;			
+			this.mesh = mesh;
 			let geo = new THREE.BufferGeometry();
 			let vertexBuffer = this.vertexBuffer = new THREE.InterleavedBuffer(vertices, MeshBatcher.VERTEX_SIZE);
 			vertexBuffer.dynamic = true;
@@ -78,13 +78,13 @@ module spine.threejs {
 				vertexBuffer[i++] = vertices[j++];
 				vertexBuffer[i++] = vertices[j++];
 				vertexBuffer[i++] = vertices[j++];
-			}			
-			this.verticesLength = i;			
+			}
+			this.verticesLength = i;
 
 			let indicesArray = this.indices;
 			for (i = this.indicesLength, j = 0; j < indices.length; i++, j++)
 				indicesArray[i] = indices[j] + indexStart;
-			this.indicesLength += indices.length;			
+			this.indicesLength += indices.length;
 		}
 
 		end () {
@@ -96,7 +96,7 @@ module spine.threejs {
 			geo.getIndex().updateRange.offset = 0;
 			geo.getIndex().updateRange.count = this.indicesLength;
 			geo.drawRange.start = 0;
-			geo.drawRange.count = this.indicesLength;				
+			geo.drawRange.count = this.indicesLength;
 		}
 	}
 }

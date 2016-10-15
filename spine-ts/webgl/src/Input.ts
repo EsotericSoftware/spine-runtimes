@@ -50,7 +50,7 @@ module spine.webgl {
 				if (ev instanceof MouseEvent) {
 					let rect = element.getBoundingClientRect();
 					let x = ev.clientX - rect.left;
-					let y = ev.clientY - rect.top;					
+					let y = ev.clientY - rect.top;
 
 					let listeners = this.listeners;
 					for (let i = 0; i < listeners.length; i++) {
@@ -66,7 +66,7 @@ module spine.webgl {
 				if (ev instanceof MouseEvent) {
 					let rect = element.getBoundingClientRect();
 					let x = ev.clientX - rect.left;
-					let y = ev.clientY - rect.top;					
+					let y = ev.clientY - rect.top;
 
 					let listeners = this.listeners;
 					for (let i = 0; i < listeners.length; i++) {
@@ -78,14 +78,14 @@ module spine.webgl {
 					}
 
 					this.lastX = x;
-					this.lastY = y;					
+					this.lastY = y;
 				}
 			}, true);
 			element.addEventListener("mouseup", (ev: UIEvent) => {
 				if (ev instanceof MouseEvent) {
 					let rect = element.getBoundingClientRect();
 					let x = ev.clientX - rect.left;
-					let y = ev.clientY - rect.top;					
+					let y = ev.clientY - rect.top;
 
 					let listeners = this.listeners;
 					for (let i = 0; i < listeners.length; i++) {
@@ -97,12 +97,12 @@ module spine.webgl {
 					this.buttonDown = false;
 				}
 			}, true);
-			element.addEventListener("touchstart", (ev: TouchEvent) => {								
+			element.addEventListener("touchstart", (ev: TouchEvent) => {
 				if (this.currTouch != null) return;
 
-				var touches = ev.changedTouches;				
-				for (var i = 0; i < touches.length; i++) {					
-					var touch = touches[i];									
+				var touches = ev.changedTouches;
+				for (var i = 0; i < touches.length; i++) {
+					var touch = touches[i];
 					let rect = element.getBoundingClientRect();
 					let x = touch.clientX - rect.left;
 					let y = touch.clientY - rect.top;
@@ -111,7 +111,7 @@ module spine.webgl {
 					this.currTouch.x = x;
 					this.currTouch.y = y;
 					break;
-				}												
+				}
 
 				let listeners = this.listeners;
 				for (let i = 0; i < listeners.length; i++) {
@@ -130,7 +130,7 @@ module spine.webgl {
 					if (this.currTouch.identifier === touch.identifier) {
 						let rect = element.getBoundingClientRect();
 						let x = this.currTouch.x = touch.clientX - rect.left;
-						let y = this.currTouch.y = touch.clientY - rect.top;						
+						let y = this.currTouch.y = touch.clientY - rect.top;
 						this.touchesPool.free(this.currTouch);
 						let listeners = this.listeners;
 						for (let i = 0; i < listeners.length; i++) {
@@ -146,14 +146,14 @@ module spine.webgl {
 				}
 				ev.preventDefault();
 			}, false);
-			element.addEventListener("touchcancel", (ev: TouchEvent) => {				
+			element.addEventListener("touchcancel", (ev: TouchEvent) => {
 				var touches = ev.changedTouches;
 				for (var i = 0; i < touches.length; i++) {
 					var touch = touches[i];
 					if (this.currTouch.identifier === touch.identifier) {
 						let rect = element.getBoundingClientRect();
 						let x = this.currTouch.x = touch.clientX - rect.left;
-						let y = this.currTouch.y = touch.clientY - rect.top;						
+						let y = this.currTouch.y = touch.clientY - rect.top;
 						this.touchesPool.free(this.currTouch);
 						let listeners = this.listeners;
 						for (let i = 0; i < listeners.length; i++) {
@@ -169,7 +169,7 @@ module spine.webgl {
 				}
 				ev.preventDefault();
 			}, false);
-			element.addEventListener("touchmove", (ev: TouchEvent) => {				
+			element.addEventListener("touchmove", (ev: TouchEvent) => {
 				if (this.currTouch == null) return;
 
 				var touches = ev.changedTouches;
@@ -178,7 +178,7 @@ module spine.webgl {
 					if (this.currTouch.identifier === touch.identifier) {
 						let rect = element.getBoundingClientRect();
 						let x = touch.clientX - rect.left;
-						let y = touch.clientY - rect.top;						
+						let y = touch.clientY - rect.top;
 
 						let listeners = this.listeners;
 						for (let i = 0; i < listeners.length; i++) {
@@ -207,7 +207,7 @@ module spine.webgl {
 	}
 
 	export class Touch {
-		constructor(public identifier: number, public x: number, public y: number) {			
+		constructor(public identifier: number, public x: number, public y: number) {
 		}
 	}
 

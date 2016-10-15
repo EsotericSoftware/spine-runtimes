@@ -99,7 +99,7 @@ public class StarlingAtlasAttachmentLoader implements AttachmentLoader {
 			attachment.regionV = rectRegion.y / root.height;
 			attachment.regionU2 = (rectRegion.x + subTexture.width) / root.width;
 			attachment.regionV2 = (rectRegion.y + subTexture.height) / root.height;
-			attachment.rendererObject = new Image(root);			
+			attachment.rendererObject = new Image(root);
 		} else {
 			attachment.regionU = 0;
 			attachment.regionV = 1;
@@ -119,7 +119,7 @@ public class StarlingAtlasAttachmentLoader implements AttachmentLoader {
 	public function newBoundingBoxAttachment (skin:Skin, name:String) : BoundingBoxAttachment {
 		return new BoundingBoxAttachment(name);
 	}
-	
+
 	public function newPathAttachment (skin:Skin, name:String) : PathAttachment {
 		return new PathAttachment(name);
 	}

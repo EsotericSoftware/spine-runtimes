@@ -46,7 +46,7 @@ function TextureAtlasRegion.new ()
 	self.rotate = false
 	self.texture = nil
 	setmetatable(self, TextureAtlasRegion)
-	
+
 	return self
 end
 

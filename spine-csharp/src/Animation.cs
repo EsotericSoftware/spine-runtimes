@@ -661,7 +661,7 @@ namespace Spine {
 			: base(frameCount) {
 			frames = new float[frameCount * ENTRIES];
 		}
-			
+
 		/// <summary>Sets the time, mix and bend direction of the specified keyframe.</summary>
 		public void SetFrame (int frameIndex, float time, float mix, int bendDirection) {
 			frameIndex *= ENTRIES;
@@ -836,7 +836,7 @@ namespace Spine {
 		public PathConstraintMixTimeline (int frameCount)
 			: base(frameCount) {
 			frames = new float[frameCount * ENTRIES];
-		}			
+		}
 
 		/** Sets the time and mixes of the specified keyframe. */
 		public void SetFrame (int frameIndex, float time, float rotateMix, float translateMix) {

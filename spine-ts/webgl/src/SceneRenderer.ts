@@ -32,7 +32,7 @@ module spine.webgl {
 	export class SceneRenderer implements Disposable {
 		gl: WebGLRenderingContext;
 		canvas: HTMLCanvasElement;
-		camera: OrthoCamera;		
+		camera: OrthoCamera;
 		batcher: PolygonBatcher;
 		private batcherShader: Shader;
 		private shapes: ShapeRenderer;
@@ -125,10 +125,10 @@ module spine.webgl {
 			// bottom left and top right corner points relative to origin
 			let worldOriginX = x + pivotX;
 			let worldOriginY = y + pivotY;
-			let  fx = -pivotX;
-			let  fy = -pivotY;
-			let  fx2 = width - pivotX;
-			let  fy2 = height - pivotY;			
+			let fx = -pivotX;
+			let fy = -pivotY;
+			let fx2 = width - pivotX;
+			let fy2 = height - pivotY;
 
 			// construct corner points, start from top left and go counter clockwise
 			let p1x = fx;
@@ -305,13 +305,13 @@ module spine.webgl {
 		end () {
 			if (this.activeRenderer === this.batcher) this.batcher.end();
 			else if (this.activeRenderer === this.shapes) this.shapes.end();
-			this.activeRenderer = null;		
+			this.activeRenderer = null;
 		}
 
 		resize (resizeMode: ResizeMode) {
 			let canvas = this.canvas;
 			var w = canvas.clientWidth;
-			var h = canvas.clientHeight;	
+			var h = canvas.clientHeight;
 			if (canvas.width != w || canvas.height != h) {
 				canvas.width = w;
 				canvas.height = h;
@@ -329,7 +329,7 @@ module spine.webgl {
 				let sourceRatio = sourceHeight / sourceWidth;
 				let scale = targetRatio < sourceRatio ? targetWidth / sourceWidth : targetHeight / sourceHeight;
 				this.camera.viewportWidth = sourceWidth * scale;
-				this.camera.viewportHeight = sourceHeight * scale;				
+				this.camera.viewportHeight = sourceHeight * scale;
 			}
 			this.camera.update();
 		}
@@ -357,7 +357,7 @@ module spine.webgl {
 			this.batcherShader.dispose();
 			this.shapes.dispose();
 			this.shapesShader.dispose();
-			this.skeletonDebugRenderer.dispose();		
+			this.skeletonDebugRenderer.dispose();
 		}
 	}
 

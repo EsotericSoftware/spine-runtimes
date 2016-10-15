@@ -40,7 +40,7 @@ module spine {
 
 		readSkeletonData (json: string | any ): SkeletonData {
 			let scale = this.scale;
-			let skeletonData = new SkeletonData();			
+			let skeletonData = new SkeletonData();
 			let root = typeof(json) === "string" ? JSON.parse(json) : json;
 
 			// Skeleton

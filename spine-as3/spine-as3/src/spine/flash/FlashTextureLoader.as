@@ -40,7 +40,7 @@ public class FlashTextureLoader implements TextureLoader {
 	public var bitmapDatas:Object = {};
 	public var singleBitmapData:BitmapData;
 
-	/** @param bitmaps A Bitmap or BitmapData for an atlas that has only one page, or for a multi page atlas an object where the 
+	/** @param bitmaps A Bitmap or BitmapData for an atlas that has only one page, or for a multi page atlas an object where the
 	 * key is the image path and the value is the Bitmap or BitmapData. */
 	public function FlashTextureLoader (bitmaps:Object) {
 		if (bitmaps is BitmapData) {

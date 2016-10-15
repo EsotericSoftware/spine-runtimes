@@ -102,7 +102,7 @@ module spine {
 
 		constructor (frameCount: number) {
 			if (frameCount <= 0) throw new Error("frameCount must be > 0: " + frameCount);
-			this.curves = Utils.newFloatArray((frameCount - 1) * CurveTimeline.BEZIER_SIZE);			
+			this.curves = Utils.newFloatArray((frameCount - 1) * CurveTimeline.BEZIER_SIZE);
 		}
 
 		getFrameCount () {

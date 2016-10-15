@@ -84,8 +84,8 @@ public class DeformTimeline extends CurveTimeline {
 		var frame:int = Animation.binarySearch1(frames, time);
 		var prevVertices:Vector.<Number> = frameVertices[int(frame - 1)];
 		var nextVertices:Vector.<Number> = frameVertices[frame];
-		var frameTime:Number = frames[frame];		
-		var percent:Number = getCurvePercent(frame - 1, 1 - (time - frameTime) / (frames[frame - 1] - frameTime));		
+		var frameTime:Number = frames[frame];
+		var percent:Number = getCurvePercent(frame - 1, 1 - (time - frameTime) / (frames[frame - 1] - frameTime));
 
 		var prev:Number;
 		if (alpha < 1) {

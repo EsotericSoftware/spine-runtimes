@@ -366,14 +366,14 @@ public class SkeletonJson {
 		var bones:Vector.<int> = new Vector.<int>(verticesLength * 3);
 		bones.length = 0;
 		for (i = 0, n = vertices.length; i < n;) {
-			 var boneCount:int = int(vertices[i++]);
-			 bones.push(boneCount);
-			 for (var nn:int = i + boneCount * 4; i < nn; i+=4) {
+			var boneCount:int = int(vertices[i++]);
+			bones.push(boneCount);
+			for (var nn:int = i + boneCount * 4; i < nn; i+=4) {
 				bones.push(int(vertices[i]));
 				weights.push(vertices[i + 1] * scale);
 				weights.push(vertices[i + 2] * scale);
 				weights.push(vertices[i + 3]);
-			 }
+			}
 		}
 		attachment.bones = bones;
 		attachment.vertices = weights;

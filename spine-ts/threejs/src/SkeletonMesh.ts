@@ -49,8 +49,8 @@ module spine.threejs {
 			let material = this.material = new THREE.MeshBasicMaterial();
 			material.side = THREE.DoubleSide;
 			material.transparent = true;
-			material.alphaTest = 0.5;									
-			this.batcher = new MeshBatcher(this);			
+			material.alphaTest = 0.5;
+			this.batcher = new MeshBatcher(this);
 		}
 
 		update(deltaTime: number) {
@@ -69,11 +69,11 @@ module spine.threejs {
 			var numVertices = 0;
 			var verticesLength = 0;
 			var indicesLength = 0;
-			
+
 			let blendMode: BlendMode = null;
 
 			let vertices: ArrayLike<number> = null;
-			let triangles: Array<number>  = null;
+			let triangles: Array<number> = null;
 			let drawOrder = this.skeleton.drawOrder;
 			let batcher = this.batcher;
 			batcher.begin();
@@ -98,19 +98,19 @@ module spine.threejs {
 
 				if (texture != null) {
 					if (!(<THREE.MeshBasicMaterial>this.material).map) {
-						let mat = <THREE.MeshBasicMaterial>this.material;						
+						let mat = <THREE.MeshBasicMaterial>this.material;
 						mat.map = texture.texture;
-						mat.needsUpdate = true;						
+						mat.needsUpdate = true;
 					}
 					// FIXME per slot blending would require multiple material support
-					//let slotBlendMode = slot.data.blendMode;					
+					//let slotBlendMode = slot.data.blendMode;
 					//if (slotBlendMode != blendMode) {
 					//	blendMode = slotBlendMode;
 					//	batcher.setBlendMode(getSourceGLBlendMode(this._gl, blendMode, premultipliedAlpha), getDestGLBlendMode(this._gl, blendMode));
 					//}
-					
+
 					this.batcher.batch(vertices, triangles, z);
-					z += zOffset;				
+					z += zOffset;
 				}
 			}
 
@@ -143,7 +143,7 @@ module spine.threejs {
 			let mat = new THREE.MeshBasicMaterial();
 			mat.vertexColors = THREE.VertexColors;
 			mat.transparent = true;
-			mat.map = map;		
+			mat.map = map;
 			let mesh = new THREE.Mesh(geo, mat);
 			return mesh; 
 		}

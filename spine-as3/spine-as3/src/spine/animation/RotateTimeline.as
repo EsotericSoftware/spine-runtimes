@@ -58,7 +58,7 @@ public class RotateTimeline extends CurveTimeline {
 			return; // Time is before first frame.
 
 		var bone:Bone = skeleton.bones[boneIndex];
-		
+
 		if (time >= frames[int(frames.length - 2)]) { // Time is after last frame.
 			var amount:Number = bone.data.rotation + frames[int(frames.length + PREV_ROTATION)] - bone.rotation;
 			while (amount > 180)
@@ -72,7 +72,7 @@ public class RotateTimeline extends CurveTimeline {
 		// Interpolate between the previous frame and the current frame.
 		var frame:int = Animation.binarySearch(frames, time, ENTRIES);
 		var prevRotation:Number = frames[int(frame + PREV_ROTATION)];
-		var frameTime:Number = frames[frame];		
+		var frameTime:Number = frames[frame];
 		var percent:Number = getCurvePercent((frame >> 1) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
 		amount = frames[int(frame + ROTATION)] - prevRotation;

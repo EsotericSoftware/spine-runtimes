@@ -42,10 +42,10 @@ struct spSkeleton;
 
 typedef struct spIkConstraint {
 	spIkConstraintData* const data;
-	
+
 	int bonesCount;
 	spBone** bones;
-	
+
 	spBone* target;
 	int bendDirection;
 	float mix;

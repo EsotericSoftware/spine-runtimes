@@ -57,7 +57,7 @@ namespace Spine {
 			bones = new ExposedList<Bone>();
 			foreach (BoneData boneData in data.bones)
 				bones.Add (skeleton.FindBone (boneData.name));
-			
+
 			target = skeleton.FindBone(data.target.name);
 		}
 

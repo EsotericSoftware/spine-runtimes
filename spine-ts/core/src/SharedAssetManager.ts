@@ -33,7 +33,7 @@ module spine {
 		clientId: string;
 		toLoad = new Array<string>();
 		assets: Map<any> = {};
-		textureLoader: (image: HTMLImageElement) => any;	
+		textureLoader: (image: HTMLImageElement) => any;
 
 		constructor(clientId: string) {
 			this.clientId = clientId;
@@ -47,13 +47,13 @@ module spine {
 	}
 
 	export class SharedAssetManager implements Disposable {
-		private pathPrefix: string;		
+		private pathPrefix: string;
 		private clientAssets: Map<Assets> = {};
 		private queuedAssets: Map<string> = {};
-		private rawAssets: Map<any> = {}		
+		private rawAssets: Map<any> = {}
 		private errors: Map<string> = {};
 
-		constructor (pathPrefix: string = "") {			
+		constructor (pathPrefix: string = "") {
 			this.pathPrefix = pathPrefix;
 		}
 
@@ -78,13 +78,13 @@ module spine {
 
 		loadText(clientId: string, path: string) {
 			path = this.pathPrefix + path;
-			if (!this.queueAsset(clientId, null, path)) return;			
+			if (!this.queueAsset(clientId, null, path)) return;
 			let request = new XMLHttpRequest();
 			request.onreadystatechange = () => {
 				if (request.readyState == XMLHttpRequest.DONE) {
-					if (request.status >= 200 && request.status < 300) {						
+					if (request.status >= 200 && request.status < 300) {
 						this.rawAssets[path] = request.responseText;
-					} else {						
+					} else {
 						this.errors[path] = `Couldn't load text ${path}: status ${request.status}, ${request.responseText}`;
 					}
 				}
@@ -95,13 +95,13 @@ module spine {
 
 		loadJson(clientId: string, path: string) {
 			path = this.pathPrefix + path;
-			if (!this.queueAsset(clientId, null, path)) return;			
+			if (!this.queueAsset(clientId, null, path)) return;
 			let request = new XMLHttpRequest();
 			request.onreadystatechange = () => {
 				if (request.readyState == XMLHttpRequest.DONE) {
-					if (request.status >= 200 && request.status < 300) {						
+					if (request.status >= 200 && request.status < 300) {
 						this.rawAssets[path] = JSON.parse(request.responseText);
-					} else {						
+					} else {
 						this.errors[path] = `Couldn't load text ${path}: status ${request.status}, ${request.responseText}`;
 					}
 				}
@@ -113,15 +113,15 @@ module spine {
 		loadTexture (clientId: string, textureLoader: (image: HTMLImageElement) => any, path: string) {
 			path = this.pathPrefix + path;
 			if (!this.queueAsset(clientId, textureLoader, path)) return;
-						
+
 			let img = new Image();			 
-			img.src = path;			
+			img.src = path;
 			img.crossOrigin = "anonymous";
-			img.onload = (ev) => {								
-				this.rawAssets[path] = img;				
+			img.onload = (ev) => {
+				this.rawAssets[path] = img;
 			}
-			img.onerror = (ev) => {				
-				this.errors[path] =  `Couldn't load image ${path}`;				
+			img.onerror = (ev) => {
+				this.errors[path] = `Couldn't load image ${path}`;
 			}
 		}
 
@@ -129,7 +129,7 @@ module spine {
 			path = this.pathPrefix + path;
 			var clientAssets = this.clientAssets[clientId];
 			if (clientAssets === null || clientAssets === undefined) return true;
-			return clientAssets.assets[path];			
+			return clientAssets.assets[path];
 		}
 
 		private updateClientAssets(clientAssets: Assets): void {
@@ -151,7 +151,7 @@ module spine {
 		isLoadingComplete (clientId: string): boolean {
 			var clientAssets = this.clientAssets[clientId];
 			if (clientAssets === null || clientAssets === undefined) return true;
-			this.updateClientAssets(clientAssets);			
+			this.updateClientAssets(clientAssets);
 			return clientAssets.toLoad.length == clientAssets.loaded();
 
 		}
@@ -159,7 +159,7 @@ module spine {
 		/*remove (clientId: string, path: string) {
 			path = this.pathPrefix + path;
 			let asset = this.assets[path];
-			if ((<any>asset).dispose) (<any>asset).dispose();			
+			if ((<any>asset).dispose) (<any>asset).dispose();
 			this.assets[path] = null;
 		}
 
@@ -170,7 +170,7 @@ module spine {
 			}
 			this.assets = {};
 		}*/
-		
+
 		dispose () {
 			// this.removeAll();
 		}

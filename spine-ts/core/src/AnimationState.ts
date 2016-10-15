@@ -136,7 +136,7 @@ module spine {
 			if (current == null) return;
 
 			if (current.listener != null && current.listener.end != null) current.listener.end(trackIndex);
-			for (let i = 0, n = this.listeners.length; i < n; i++)			
+			for (let i = 0, n = this.listeners.length; i < n; i++)
 				if (this.listeners[i].end) this.listeners[i].end(trackIndex);
 
 			this.tracks[trackIndex] = null;

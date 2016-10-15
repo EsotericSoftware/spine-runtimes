@@ -59,7 +59,7 @@ module spine.webgl {
 				// thank you Apple Inc.
 				let isSafari = navigator.userAgent.indexOf("Safari") > -1;
 
-				LoadingScreen.logoImg = new Image();						
+				LoadingScreen.logoImg = new Image();
 				LoadingScreen.logoImg.src = LoadingScreen.SPINE_LOGO_DATA;
 				if (!isSafari) LoadingScreen.logoImg.crossOrigin = "anonymous";
 				LoadingScreen.logoImg.onload = (ev) => {
@@ -68,7 +68,7 @@ module spine.webgl {
 
 				LoadingScreen.spinnerImg = new Image();
 				LoadingScreen.spinnerImg.src = LoadingScreen.SPINNER_DATA;
-				if (!isSafari) LoadingScreen.spinnerImg.crossOrigin = "anonymous";	
+				if (!isSafari) LoadingScreen.spinnerImg.crossOrigin = "anonymous";
 				LoadingScreen.spinnerImg.onload = (ev) => {
 					LoadingScreen.loaded++;
 				}
@@ -115,7 +115,7 @@ module spine.webgl {
 			if (LoadingScreen.loaded != 2) return;
 			if (this.logo === null) {
 				this.logo = new GLTexture(renderer.gl, LoadingScreen.logoImg);
-				this.spinner = new GLTexture(renderer.gl, LoadingScreen.spinnerImg);				
+				this.spinner = new GLTexture(renderer.gl, LoadingScreen.spinnerImg);
 			}
 			this.logo.update(false);
 			this.spinner.update(false);
@@ -127,7 +127,7 @@ module spine.webgl {
 
 			renderer.batcher.setBlendMode(WebGLRenderingContext.SRC_ALPHA, WebGLRenderingContext.ONE_MINUS_SRC_ALPHA);
 			renderer.begin();
-			renderer.drawTexture(this.logo, (canvas.width - logoWidth) / 2, (canvas.height - logoHeight) / 2, logoWidth, logoHeight, this.tempColor);			
+			renderer.drawTexture(this.logo, (canvas.width - logoWidth) / 2, (canvas.height - logoHeight) / 2, logoWidth, logoHeight, this.tempColor);
 			renderer.drawTextureRotated(this.spinner, (canvas.width - spinnerWidth) / 2, (canvas.height - spinnerHeight) / 2, spinnerWidth, spinnerHeight, spinnerWidth / 2, spinnerHeight / 2, this.angle, this.tempColor);
 			renderer.end();
 

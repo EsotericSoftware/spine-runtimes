@@ -294,7 +294,7 @@ namespace Spine {
 			appliedRotation = rotation;
 		}
 
-		public void WorldToLocal (float worldX, float worldY, out float localX, out float localY) {			
+		public void WorldToLocal (float worldX, float worldY, out float localX, out float localY) {
 			float a = this.a, b = this.b, c = this.c, d = this.d;
 			float invDet = 1 / (a * d - b * c);
 			float x = worldX - this.worldX, y = worldY - this.worldY;

@@ -53,7 +53,7 @@ function AttachmentLoader.new ()
 	function self:newBoundingBoxAttachment (skin, name)
 		return BoundingBoxAttachment.new(name)
 	end
-	
+
 	function self:newPathAttachment(skin, name)
 		return PathAttachment.new(name)
 	end

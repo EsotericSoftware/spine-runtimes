@@ -65,7 +65,7 @@ function SkeletonJson.new (attachmentLoader)
 	local readAnimation
 	local readCurve
 	local getArray
-	
+
 	local getValue = function (map, name, default)
 		local value = map[name]
 		if value == nil then return default else return value end
@@ -90,7 +90,7 @@ function SkeletonJson.new (attachmentLoader)
 		-- Bones.
 		for i,boneMap in ipairs(root["bones"]) do
 			local boneName = boneMap["name"]
-			
+
 			local parent = nil
 			local parentName = boneMap["parent"]
 			if parentName then
@@ -108,10 +108,10 @@ function SkeletonJson.new (attachmentLoader)
 			data.shearY = getValue(boneMap, "shearY", 0);
 			data.inheritRotation = getValue(boneMap, "inheritRotation", true);
 			data.inheritScale = getValue(boneMap, "inheritScale", true);
-			
+
 			table_insert(skeletonData.bones, data)
 		end
-		
+
 		-- Slots.
 		if root["slots"] then
 			for i,slotMap in ipairs(root["slots"]) do
@@ -124,10 +124,10 @@ function SkeletonJson.new (attachmentLoader)
 
 				local color = slotMap["color"]
 				if color then
-					data.color:set(tonumber(color:sub(1, 2), 16) / 255, 
-												 tonumber(color:sub(3, 4), 16) / 255,
-												 tonumber(color:sub(5, 6), 16) / 255,
-												 tonumber(color:sub(7, 8), 16) / 255)
+					data.color:set(tonumber(color:sub(1, 2), 16) / 255,
+					               tonumber(color:sub(3, 4), 16) / 255,
+					               tonumber(color:sub(5, 6), 16) / 255,
+					               tonumber(color:sub(7, 8), 16) / 255)
 				end
 
 				data.attachmentName = getValue(slotMap, "attachment", nil)
@@ -159,22 +159,22 @@ function SkeletonJson.new (attachmentLoader)
 				table_insert(skeletonData.ikConstraints, data)
 			end
 		end
-		
+
 		-- Transform constraints
 		if root["transform"] then
 			for i,constraintMap in ipairs(root["transform"]) do
 				data = TransformConstraintData.new(constraintMap.name)
-				
+
 				for i,boneName in ipairs(constraintMap.bones) do
 					local bone = skeletonData:findBone(boneName)
 					if not bone then error("Transform constraint bone not found: " .. boneName, 2) end
 					table_insert(data.bones, bone)
 				end
-				
+
 				local targetName = constraintMap.target
 				data.target = skeletonData:findBone(targetName)
 				if not data.target then error("Transform constraint target bone not found: " .. boneName, 2) end
-				
+
 				data.offsetRotation = getValue(constraintMap, "rotation", 0);
 				data.offsetX = getValue(constraintMap, "x", 0) * scale;
 				data.offsetY = getValue(constraintMap, "y", 0) * scale;
@@ -190,7 +190,7 @@ function SkeletonJson.new (attachmentLoader)
 				table_insert(skeletonData.transformConstraints, data)
 			end
 		end
-		
+
 		-- Path constraints
 		if root["path"] then
 			for i,constraintMap in ipairs(root.path) do
@@ -238,7 +238,7 @@ function SkeletonJson.new (attachmentLoader)
 				if skin.name == "default" then skeletonData.defaultSkin = skin end
 			end
 		end
-		
+
 		-- Linked meshes
 		for i, linkedMesh in ipairs(self.linkedMeshes) do
 			local skin = skeletonData.defaultSkin
@@ -290,44 +290,44 @@ function SkeletonJson.new (attachmentLoader)
 			region.rotation = getValue(map, "rotation", 0);
 			region.width = map.width * scale;
 			region.height = map.height * scale;
-			
+
 			local color = map["color"]
 			if color then
-				region.color:set(tonumber(color:sub(1, 2), 16) / 255, 
-												 tonumber(color:sub(3, 4), 16) / 255,
-												 tonumber(color:sub(5, 6), 16) / 255,
-												 tonumber(color:sub(7, 8), 16) / 255)
+				region.color:set(tonumber(color:sub(1, 2), 16) / 255,
+				                 tonumber(color:sub(3, 4), 16) / 255,
+				                 tonumber(color:sub(5, 6), 16) / 255,
+				                 tonumber(color:sub(7, 8), 16) / 255)
 			end
 
 			region:updateOffset()
 			return region
-			
+
 		elseif type == AttachmentType.boundingbox then
 			local box = attachmentLoader:newBoundingBoxAttachment(skin, name)
 			if not box then return nil end
 			readVertices(map, box, map.vertexCount * 2)
 			local color = map.color
 			if color then
-				box.color:set(tonumber(color:sub(1, 2), 16) / 255, 
-											tonumber(color:sub(3, 4), 16) / 255,
-											tonumber(color:sub(5, 6), 16) / 255,
-											tonumber(color:sub(7, 8), 16) / 255)
+				box.color:set(tonumber(color:sub(1, 2), 16) / 255,
+				              tonumber(color:sub(3, 4), 16) / 255,
+				              tonumber(color:sub(5, 6), 16) / 255,
+				              tonumber(color:sub(7, 8), 16) / 255)
 			end
 			return box
-			
+
 		elseif type == AttachmentType.mesh or type == AttachmentType.linkedmesh then
 			local mesh = attachmentLoader:newMeshAttachment(skin, name, path)
 			if not mesh then return null end
 			mesh.path = path
-			
+
 			local color = map.color
 			if color then
-				mesh.color:set(tonumber(color:sub(1, 2), 16) / 255, 
-												 tonumber(color:sub(3, 4), 16) / 255,
-												 tonumber(color:sub(5, 6), 16) / 255,
-												 tonumber(color:sub(7, 8), 16) / 255)
+				mesh.color:set(tonumber(color:sub(1, 2), 16) / 255,
+				               tonumber(color:sub(3, 4), 16) / 255,
+				               tonumber(color:sub(5, 6), 16) / 255,
+				               tonumber(color:sub(7, 8), 16) / 255)
 			end
-			
+
 			local parent = map.parent
 			if parent then
 				mesh.inheritDeform = getValue(map, "deform", true)
@@ -339,7 +339,7 @@ function SkeletonJson.new (attachmentLoader)
 				})
 				return mesh
 			end
-			
+
 			local uvs = getArray(map, "uvs", 1)
 			readVertices(map, mesh, #uvs)
 			mesh.triangles = getArray(map, "triangles", 1)
@@ -352,7 +352,7 @@ function SkeletonJson.new (attachmentLoader)
 
 			mesh.hullLength = getValue(map, "hull", 0) * 2
 			return mesh
-	
+
 		elseif type == AttachmentType.path then
 			local path = self.attachmentLoader:newPathAttachment(skin, name)
 			if not path then return nil end
@@ -370,17 +370,17 @@ function SkeletonJson.new (attachmentLoader)
 
 			local color = map.color
 			if color then
-				path.color:set(tonumber(color:sub(1, 2), 16) / 255, 
-												 tonumber(color:sub(3, 4), 16) / 255,
-												 tonumber(color:sub(5, 6), 16) / 255,
-												 tonumber(color:sub(7, 8), 16) / 255)
+				path.color:set(tonumber(color:sub(1, 2), 16) / 255,
+				               tonumber(color:sub(3, 4), 16) / 255,
+				               tonumber(color:sub(5, 6), 16) / 255,
+				               tonumber(color:sub(7, 8), 16) / 255)
 			end
 			return path;
 		end
 
 		error("Unknown attachment type: " .. type .. " (" .. name .. ")")
 	end
-	
+
 	readVertices = function (map, attachment, verticesLength)
 		local scale = self.scale
 		attachment.worldVerticesLength = verticesLength
@@ -397,7 +397,7 @@ function SkeletonJson.new (attachmentLoader)
 			attachment.vertices = vertices
 			return
 		end
-		
+
 		local weights = {}
 		local bones = {}
 		local i = 0
@@ -439,7 +439,7 @@ function SkeletonJson.new (attachmentLoader)
 						for i,valueMap in ipairs(values) do
 							local color = valueMap["color"]
 							timeline:setFrame(
-								frameIndex, valueMap["time"], 
+								frameIndex, valueMap["time"],
 								tonumber(color:sub(1, 2), 16) / 255,
 								tonumber(color:sub(3, 4), 16) / 255,
 								tonumber(color:sub(5, 6), 16) / 255,
@@ -548,7 +548,7 @@ function SkeletonJson.new (attachmentLoader)
 				duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.IkConstraintTimeline.ENTRIES])
 			end
 		end
-		
+
 		-- Transform constraint timelines.
 		local transform = map["transform"]
 		if transform then
@@ -562,8 +562,8 @@ function SkeletonJson.new (attachmentLoader)
 					end
 				end
 				local frameIndex = 0
-				for i,valueMap in ipairs(values) do					 
-					timeline:setFrame(frameIndex, valueMap.time, getValue(valueMap, "rotateMix", 1), getValue(valueMap, "translateMix", 1), getValue(valueMap, "scaleMix", 1), getValue(valueMap, "shearMix", 1))
+				for i,valueMap in ipairs(values) do
+					timeline:setFrame(frameIndex, valueMap.time, getValue(valueMap, "rotateMix", 1), getValue(valueMap, "translateMix", 1), getValue(valueMap, "scaleMix", 1) getValue(valueMap, "shearMix", 1))
 					readCurve(valueMap, timeline, frameIndex)
 					frameIndex = frameIndex + 1
 				end
@@ -571,7 +571,7 @@ function SkeletonJson.new (attachmentLoader)
 				duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.TransformConstraintTimeline.ENTRIES])
 			end
 		end
-		
+
 		-- Path constraint timelines.
 		if map.paths then
 			for constraintName,constraintMap in pairs(map.paths) do
@@ -587,7 +587,7 @@ function SkeletonJson.new (attachmentLoader)
 							if data.spacingMode == PathConstraintData.SpacingMode.length or data.spacingMode == PathConstraintData.SpacingMode.fixed then timelineScale = scale end
 						else
 							timeline = Animation.PathConstraintPositionTimeline.new(#timelineMap)
-							if data.positionMode == PathConstraintData.PositionMode.fixed then timelineScale = scale end							
+							if data.positionMode == PathConstraintData.PositionMode.fixed then timelineScale = scale end
 						end
 						timeline.pathConstraintIndex = index
 						local frameIndex = 0
@@ -609,11 +609,11 @@ function SkeletonJson.new (attachmentLoader)
 						end
 						table_insert(timelines, timeline)
 						duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.PathConstraintMixTimeline.ENTRIES])
-					end					 
+					end
 				end
 			end
 		end
-		
+
 		-- Deform timelines.
 		if map.deform then
 			for deformName, deformMap in pairs(map.deform) do

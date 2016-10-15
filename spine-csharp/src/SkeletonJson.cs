@@ -144,7 +144,7 @@ namespace Spine {
 						data.b = ToColor(color, 2);
 						data.a = ToColor(color, 3);
 					}
-						
+
 					data.attachmentName = GetString(slotMap, "attachment", null);
 					if (slotMap.ContainsKey("blend"))
 						data.blendMode = (BlendMode)Enum.Parse(typeof(BlendMode), (String)slotMap["blend"], false);
@@ -164,7 +164,7 @@ namespace Spine {
 						if (bone == null) throw new Exception("IK constraint bone not found: " + boneName);
 						data.bones.Add(bone);
 					}
-					
+
 					String targetName = (String)constraintMap["target"];
 					data.target = skeletonData.FindBone(targetName);
 					if (data.target == null) throw new Exception("Target bone not found: " + targetName);
@@ -289,7 +289,7 @@ namespace Spine {
 					} catch (Exception e) {
 						throw new Exception("Error reading animation: " + entry.Key, e);
 					}
-				}   
+				}
 			}
 
 			skeletonData.bones.TrimExcess();
@@ -632,7 +632,7 @@ namespace Spine {
 							var timeline = new DeformTimeline(values.Count);
 							timeline.slotIndex = slotIndex;
 							timeline.attachment = attachment;
-							
+
 							int frameIndex = 0;
 							foreach (Dictionary<String, Object> valueMap in values) {
 								float[] deform;

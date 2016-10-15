@@ -30,7 +30,7 @@
 
 /// <reference path="../../core/src/Texture.ts"/>
 
-module spine.canvas {	
+module spine.canvas {
 	export class CanvasTexture extends Texture {
 		constructor (image: HTMLImageElement) {
 			super(image);

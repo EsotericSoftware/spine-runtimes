@@ -40,8 +40,8 @@ function BoundingBoxAttachment.new (name)
 	if not name then error("name cannot be nil", 2) end
 
 	local self = VertexAttachment.new(name, AttachmentType.boundingbox)
-  self.color = Color.newWith(1, 1, 1, 1)
-  setmetatable(self, BoundingBoxAttachment)
+	self.color = Color.newWith(1, 1, 1, 1)
+	setmetatable(self, BoundingBoxAttachment)
 	return self
 end
 return BoundingBoxAttachment

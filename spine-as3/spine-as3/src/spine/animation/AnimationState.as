@@ -53,7 +53,7 @@ public class AnimationState {
 		for (var i:int = 0; i < _tracks.length; i++) {
 			var current:TrackEntry = _tracks[i];
 			if (!current) continue;
-			
+
 			current.time += delta * current.timeScale;
 			if (current.previous) {
 				var previousDelta:Number = delta * current.previous.timeScale;
@@ -76,15 +76,15 @@ public class AnimationState {
 		for (var i:int = 0; i < _tracks.length; i++) {
 			var current:TrackEntry = _tracks[i];
 			if (!current) continue;
-			
+
 			_events.length = 0;
-			
+
 			var time:Number = current.time;
 			var lastTime:Number = current.lastTime;
 			var endTime:Number = current.endTime;
 			var loop:Boolean = current.loop;
 			if (!loop && time > endTime) time = endTime;
-			
+
 			var previous:TrackEntry = current.previous;
 			if (!previous) {
 				if (current.mix == 1)
@@ -95,7 +95,7 @@ public class AnimationState {
 				var previousTime:Number = previous.time;
 				if (!previous.loop && previousTime > previous.endTime) previousTime = previous.endTime;
 				previous.animation.apply(skeleton, previousTime, previousTime, previous.loop, null);
-				
+
 				var alpha:Number = current.mixTime / current.mixDuration * current.mix;
 				if (alpha >= 1) {
 					alpha = 1;
@@ -103,7 +103,7 @@ public class AnimationState {
 				}
 				current.animation.mix(skeleton, current.lastTime, time, loop, _events, alpha);
 			}
-			
+
 			for each (var event:Event in _events) {
 				if (current.onEvent != null) current.onEvent(i, event);
 				onEvent.invoke(i, event);
@@ -123,9 +123,9 @@ public class AnimationState {
 	public function clearTracks () : void {
 		for (var i:int = 0, n:int = _tracks.length; i < n; i++)
 			clearTrack(i);
-		_tracks.length = 0; 
+		_tracks.length = 0;
 	}
-	
+
 	public function clearTrack (trackIndex:int) : void {
 		if (trackIndex >= _tracks.length) return;
 		var current:TrackEntry = _tracks[trackIndex];
@@ -136,14 +136,14 @@ public class AnimationState {
 
 		_tracks[trackIndex] = null;
 	}
-	
+
 	private function expandToIndex (index:int) : TrackEntry {
 		if (index < _tracks.length) return _tracks[index];
 		while (index >= _tracks.length)
 			_tracks[_tracks.length] = null;
 		return null;
 	}
-	
+
 	private function setCurrent (index:int, entry:TrackEntry) : void {
 		var current:TrackEntry = expandToIndex(index);
 		if (current) {
@@ -164,19 +164,19 @@ public class AnimationState {
 					entry.previous = current;
 			}
 		}
-		
+
 		_tracks[index] = entry;
 
 		if (entry.onStart != null) entry.onStart(index);
 		onStart.invoke(index);
 	}
-	
+
 	public function setAnimationByName (trackIndex:int, animationName:String, loop:Boolean) : TrackEntry {
 		var animation:Animation = _data._skeletonData.findAnimation(animationName);
 		if (!animation) throw new ArgumentError("Animation not found: " + animationName);
 		return setAnimation(trackIndex, animation, loop);
 	}
-	
+
 	/** Set the current animation. Any queued animations are cleared. */
 	public function setAnimation (trackIndex:int, animation:Animation, loop:Boolean) : TrackEntry {
 		var entry:TrackEntry = new TrackEntry();
@@ -186,13 +186,13 @@ public class AnimationState {
 		setCurrent(trackIndex, entry);
 		return entry;
 	}
-	
+
 	public function addAnimationByName (trackIndex:int, animationName:String, loop:Boolean, delay:Number) : TrackEntry {
 		var animation:Animation = _data._skeletonData.findAnimation(animationName);
 		if (!animation) throw new ArgumentError("Animation not found: " + animationName);
 		return addAnimation(trackIndex, animation, loop, delay);
 	}
-	
+
 	/** Adds an animation to be played delay seconds after the current or last queued animation.
 	 * @param delay May be <= 0 to use duration of previous animation minus any mix duration plus the negative delay. */
 	public function addAnimation (trackIndex:int, animation:Animation, loop:Boolean, delay:Number) : TrackEntry {
@@ -200,7 +200,7 @@ public class AnimationState {
 		entry.animation = animation;
 		entry.loop = loop;
 		entry.endTime = animation.duration;
-		
+
 		var last:TrackEntry = expandToIndex(trackIndex);
 		if (last) {
 			while (last.next)
@@ -208,7 +208,7 @@ public class AnimationState {
 			last.next = entry;
 		} else
 			_tracks[trackIndex] = entry;
-		
+
 		if (delay <= 0) {
 			if (last)
 				delay += last.endTime - _data.getMix(last.animation, animation);
@@ -216,10 +216,10 @@ public class AnimationState {
 				delay = 0;
 		}
 		entry.delay = delay;
-		
+
 		return entry;
 	}
-	
+
 	/** May be null. */
 	public function getCurrent (trackIndex:int) : TrackEntry {
 		if (trackIndex >= _tracks.length) return null;

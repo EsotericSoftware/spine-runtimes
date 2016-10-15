@@ -32,7 +32,7 @@ package spine.animation {
 import spine.PathConstraint;
 import spine.Event;
 import spine.Skeleton;
-	
+
 public class PathConstraintPositionTimeline extends CurveTimeline {
 	static public const ENTRIES:int = 2;
 	static internal const PREV_TIME:int = -2, PREV_VALUE:int = -1;
@@ -54,7 +54,7 @@ public class PathConstraintPositionTimeline extends CurveTimeline {
 		frames[frameIndex + VALUE] = value;
 	}
 
-	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {		
+	override public function apply (skeleton:Skeleton, lastTime:Number, time:Number, firedEvents:Vector.<Event>, alpha:Number) : void {
 		if (time < frames[0]) return; // Time is before first frame.
 
 		var constraint:PathConstraint = skeleton.pathConstraints[pathConstraintIndex];

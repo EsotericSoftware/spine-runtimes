@@ -31,14 +31,14 @@
 package spine.animation {
 	public class Listeners {
 		private var _listeners:Vector.<Function> = new Vector.<Function>();
-		
-		public function Listeners () {			
+
+		public function Listeners () {
 		}
-		
+
 		public function get listeners () : Vector.<Function> {
 			return _listeners;
 		}
-		
+
 		public function add (listener:Function) : void {
 			if (listener == null)
 				throw new ArgumentError("listener cannot be null.");

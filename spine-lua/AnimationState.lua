@@ -141,7 +141,7 @@ function AnimationState.new (data)
 				else
 					complete = lastTime < endTime and time >= endTime
 				end
-				if complete then 
+				if complete then
 					local count = math.floor(time / endTime)
 					if current.onComplete then current.onComplete(i, count) end
 					if self.onComplete then self.onComplete(i, count) end

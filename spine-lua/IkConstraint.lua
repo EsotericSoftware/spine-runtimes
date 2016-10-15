@@ -74,9 +74,9 @@ function IkConstraint:update ()
 	local target = self.target
 	local bones = self.bones
 	local boneCount = #bones
-	if boneCount == 1 then 
+	if boneCount == 1 then
 		self:apply1(bones[1], target.worldX, target.worldY, self.mix)
-	elseif boneCount == 2 then 
+	elseif boneCount == 2 then
 		self:apply2(bones[1], bones[2], target.worldX, target.worldY, self.bendDirection, self.mix)
 	end
 end
@@ -92,7 +92,7 @@ function IkConstraint:apply1 (bone, targetX, targetY, alpha)
 	if bone.scaleX < 0 then rotationIK = rotationIK + 180 end
 	if rotationIK > 180 then
 		rotationIK = rotationIK - 360
-	elseif (rotationIK < -180) then 
+	elseif (rotationIK < -180) then
 		rotationIK = rotationIK + 360
 	end
 	bone:updateWorldTransformWith(bone.x, bone.y, bone.rotation + rotationIK * alpha, bone.scaleX, bone.scaleY, bone.shearX, bone.shearY)
@@ -153,7 +153,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
 	c = pp.c
 	d = pp.d
 	local id = 1 / (a * d - b * c)
-	local x = targetX - pp.worldX 
+	local x = targetX - pp.worldX
 	local y = targetY - pp.worldY
 	local tx = (x * d - y * b) * id - px
 	local ty = (y * a - x * c) * id - py
@@ -165,7 +165,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
 	local l2 = child.data.length * csx
 	local a1 = 0
 	local a2 = 0
-	
+
 	if u then
 		l2 = l2 * psx
 		local cos = (tx * tx + ty * ty - l1 * l1 - l2 * l2) / (2 * l1 * l2)
@@ -269,7 +269,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, alpha)
 	elseif a2 < -180 then
 		a2 = a2 + 360
 	end
-	child:updateWorldTransformWith(cx, cy, rotation + a2 * alpha, child.scaleX, child.scaleY, child.shearX, child.shearY);	
+	child:updateWorldTransformWith(cx, cy, rotation + a2 * alpha, child.scaleX, child.scaleY, child.shearX, child.shearY);
 end
 
 return IkConstraint

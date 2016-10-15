@@ -31,13 +31,13 @@
 module spine.webgl {
 	export class GLTexture extends Texture implements Disposable {
 		private gl: WebGLRenderingContext;
-		private texture: WebGLTexture;		
+		private texture: WebGLTexture;
 		private boundUnit = 0;
 
 		constructor (gl: WebGLRenderingContext, image: HTMLImageElement, useMipMaps: boolean = false) {
 			super(image);
-			this.gl = gl;			
-			this.texture = gl.createTexture();			
+			this.gl = gl;
+			this.texture = gl.createTexture();
 			this.update(useMipMaps);
 		}
 

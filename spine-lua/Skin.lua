@@ -36,7 +36,7 @@ Skin.__index = Skin
 
 function Skin.new (name)
 	if not name then error("name cannot be nil", 2) end
-	
+
 	local self = {
 		name = name,
 		attachments = {}
@@ -55,7 +55,7 @@ end
 function Skin:getAttachment (slotIndex, name)
 	if not name then error("name cannot be nil.", 2) end
 	local dictionary = self.attachments[slotIndex]
-	if dictionary then 
+	if dictionary then
 		return dictionary[name]
 	else
 		return nil

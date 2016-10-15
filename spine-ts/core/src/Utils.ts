@@ -130,7 +130,7 @@ module spine {
 
 		static cbrt (x: number) {
 			var y = Math.pow(Math.abs(x), 1/3);
-  			return x < 0 ? -y : y;
+			return x < 0 ? -y : y;
 		}
 	}
 
@@ -235,7 +235,7 @@ module spine {
 	}
 
 	export class TimeKeeper {
-		maxDelta = 0.064;		
+		maxDelta = 0.064;
 		framesPerSecond = 0;
 		delta = 0;
 		totalTime = 0;
@@ -251,7 +251,7 @@ module spine {
 			this.totalTime += this.delta;
 			if (this.delta > this.maxDelta) this.delta = this.maxDelta;
 			this.lastTime = now;
-			
+
 			this.frameCount++;
 			if (this.frameTime > 1) {
 				this.framesPerSecond = this.frameCount / this.frameTime;

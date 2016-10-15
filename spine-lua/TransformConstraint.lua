@@ -56,7 +56,7 @@ function TransformConstraint.new (data, skeleton)
 		temp = { 0, 0 }
 	}
 	setmetatable(self, TransformConstraint)
-	
+
 	for i,bone in ipairs(data.bones) do
 		table_insert(self.bones, skeleton:findBone(bone.name))
 	end
@@ -77,7 +77,7 @@ function TransformConstraint:update ()
 	local target = self.target
 	local ta = target.a
 	local tb = target.b
-	local tc = target.c 
+	local tc = target.c
 	local td = target.d
 	local bones = self.bones
 	for i, bone in ipairs(bones) do

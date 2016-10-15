@@ -70,7 +70,7 @@ public class DrawOrderTimeline implements Timeline {
 			for each (var slot:Slot in slots)
 				drawOrder[i++] = slot;
 		} else {
-			for each (var setupIndex:int in drawOrderToSetupIndex) 
+			for each (var setupIndex:int in drawOrderToSetupIndex)
 				drawOrder[i++] = slots[setupIndex];
 		}
 	}

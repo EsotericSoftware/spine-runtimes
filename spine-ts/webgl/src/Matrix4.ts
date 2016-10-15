@@ -49,7 +49,7 @@ module spine.webgl {
 	export class Matrix4 {
 		temp: Float32Array = new Float32Array(16);
 		values: Float32Array = new Float32Array(16);
-				
+
 		private static xAxis: Vector3 = null;
 		private static yAxis: Vector3 = null;
 		private static zAxis: Vector3 = null;

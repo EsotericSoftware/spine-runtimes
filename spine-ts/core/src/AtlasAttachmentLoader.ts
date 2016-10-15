@@ -42,7 +42,7 @@ module spine {
 			if (region == null) throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
 			region.renderObject = region;
 			let attachment = new RegionAttachment(name);
-			attachment.setRegion(region);			
+			attachment.setRegion(region);
 			return attachment;
 		}
 

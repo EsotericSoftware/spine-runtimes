@@ -37,13 +37,13 @@ local math_atan2 = math.atan2
 local math_sqrt = math.sqrt
 
 function math.sign(x)
-	 if x<0 then
-		 return -1
-	 elseif x>0 then
-		 return 1
-	 else
-		 return 0
-	 end
+	if x<0 then
+		return -1
+	elseif x>0 then
+		return 1
+	else
+		return 0
+	end
 end
 
 local math_sign = math.sign
@@ -84,7 +84,7 @@ end
 
 function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, shearY)
 	self.appliedRotation = rotation
-	
+
 	local rotationY = rotation + 90 + shearY
 	local rotationRad = math_rad(rotation + shearX)
 	local rotationYRad = math_rad(rotationY)
@@ -318,10 +318,10 @@ function updateLocalTransform ()
 		self.rotation = 90 - math_deg(math_atan2(rd, rb))
 	end
 	self.appliedRotation = self.rotation
-end 
+end
 
 function Bone:worldToLocal (world)
-	local a = self.a 
+	local a = self.a
 	local b = self.b
 	local c = self.c
 	local d = self.d

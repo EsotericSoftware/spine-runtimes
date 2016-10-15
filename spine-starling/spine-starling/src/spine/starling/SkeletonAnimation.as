@@ -38,7 +38,7 @@ import starling.animation.IAnimatable;
 public class SkeletonAnimation extends SkeletonSprite implements IAnimatable {
 	public var state:AnimationState;
 	public var timeScale:Number = 1;
-	
+
 	public function SkeletonAnimation (skeletonData:SkeletonData, stateData:AnimationStateData = null) {
 		super(skeletonData);
 		state = new AnimationState(stateData ? stateData : new AnimationStateData(skeletonData));

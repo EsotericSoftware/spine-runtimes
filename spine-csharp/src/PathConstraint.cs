@@ -68,7 +68,7 @@ namespace Spine {
 		public void Apply () {
 			Update();
 		}
-			
+
 		public void Update () {
 			PathAttachment attachment = target.Attachment as PathAttachment;
 			if (attachment == null) return;

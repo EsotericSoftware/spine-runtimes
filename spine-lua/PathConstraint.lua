@@ -29,7 +29,7 @@
 -------------------------------------------------------------------------------
 
 -- FIXME the logic in this file uses 0-based indexing. Each array
--- access adds 1 to the calculated index. We should switch the logic 
+-- access adds 1 to the calculated index. We should switch the logic
 -- to 1-based indexing eventually.
 
 local setmetatable = setmetatable
@@ -76,7 +76,7 @@ function PathConstraint.new (data, skeleton)
 		segments = {}
 	}
 	setmetatable(self, PathConstraint)
-	
+
 	for i,boneData in ipairs(data.bones) do
 		table_insert(self.bones, skeleton:findBone(boneData.name))
 	end
@@ -94,7 +94,7 @@ function PathConstraint:update ()
 
 	local rotateMix = self.rotateMix
 	local translateMix = self.translateMix
-	local translate = translateMix > 0 
+	local translate = translateMix > 0
 	local rotate = rotateMix > 0
 	if not translate and not rotate then return end
 
@@ -103,7 +103,7 @@ function PathConstraint:update ()
 	local lengthSpacing = spacingMode == PathConstraintData.SpacingMode.length
 	local rotateMode = data.rotateMode
 	local tangents = rotateMode == PathConstraintData.RotateMode.tangent
-	local scale = rotateMode == PathConstraintData.RotateMode.chainscale 
+	local scale = rotateMode == PathConstraintData.RotateMode.chainscale
 	local bones = self.bones
 	local boneCount = #bones
 	local spacesCount = boneCount + 1
@@ -281,7 +281,7 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 				end
 				self:addCurvePosition(p, world[1], world[2], world[3], world[4], world[5], world[6], world[7], world[8], out, o, tangents or (i > 0 and space == 0))
 			end
-			
+
 			i = i + 1
 			o = o + 3
 		end
@@ -360,7 +360,7 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 	if percentPosition then position = position * pathLength end
 	if percentSpacing then
 		local i = 0
-		while	 i < spacesCount do
+		while i < spacesCount do
 			spaces[i + 1] = spaces[i + 1] * pathLength
 			i = i + 1
 		end

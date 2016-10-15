@@ -91,18 +91,18 @@ function PolygonBatcher.new(vertexCount)
 		vertex = { 0, 0, 0, 0, 0, 0, 0, 0 },
 		indices = nil
 	}
-	
+
 	local indices = {}
 	local i = 1
 	local maxIndicesLength = self.maxIndicesLength
-	while i <= maxIndicesLength do 
+	while i <= maxIndicesLength do
 		indices[i] = 1
 		i = i + 1
 	end
 	self.indices = indices;
-	
+
 	setmetatable(self, PolygonBatcher)
-	
+
 	return self
 end
 
@@ -117,7 +117,7 @@ function PolygonBatcher:draw (texture, vertices, indices)
 	local numVertices = #vertices / 8
 	local numIndices = #indices
 	local mesh = self.mesh
-	
+
 	if texture ~= self.lastTexture then
 		self:flush()
 		self.lastTexture = texture
@@ -125,7 +125,7 @@ function PolygonBatcher:draw (texture, vertices, indices)
 	elseif self.verticesLength + numVertices >= self.maxVerticesLength or self.indicesLength + numIndices > self.maxIndicesLength then
 		self:flush()
 	end
-	
+
 	local i = 1
 	local indexStart = self.indicesLength + 1
 	local offset = self.verticesLength
@@ -137,7 +137,7 @@ function PolygonBatcher:draw (texture, vertices, indices)
 		i = i + 1
 	end
 	self.indicesLength = self.indicesLength + numIndices
-	
+
 	i = 1
 	local vertexStart = self.verticesLength + 1
 	local vertexEnd = vertexStart + numVertices
@@ -173,7 +173,7 @@ end
 function PolygonBatcher:stop ()
 	if not self.isDrawing then error("PolygonBatcher is not drawing. Call PolygonBatcher:begin() first.", 2) end
 	if self.verticesLength > 0 then self:flush() end
-	
+
 	self.lastTexture = nil
 	self.isDrawing = false
 end
@@ -195,12 +195,12 @@ end
 function SkeletonRenderer:draw (skeleton)
 	local batcher = self.batcher
 	local premultipliedAlpha = self.premultipliedAlpha
-	
+
 	local lastLoveBlendMode = love.graphics.getBlendMode()
 	love.graphics.setBlendMode("alpha")
 	local lastBlendMode = spine.BlendMode.normal
 	batcher:begin()
-	
+
 	local drawOrder = skeleton.drawOrder
 	for i, slot in ipairs(drawOrder) do
 		local attachment = slot.attachment
@@ -217,7 +217,7 @@ function SkeletonRenderer:draw (skeleton)
 				indices = attachment.triangles
 				texture = attachment.region.renderObject.texture
 			end
-			
+
 			if texture then
 				local slotBlendMode = slot.data.blendMode
 				if lastBlendMode ~= slotBlendMode then
@@ -238,7 +238,7 @@ function SkeletonRenderer:draw (skeleton)
 			end
 		end
 	end
-	
+
 	batcher:stop()
 	love.graphics.setBlendMode(lastLoveBlendMode)
 end

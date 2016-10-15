@@ -69,7 +69,7 @@ function Animation.new (name, timelines, duration)
 
 		if loop and duration > 0 then
 			time = time % self.duration
-			if lastTime > 0	 then lastTime = lastTime % self.duration end
+			if lastTime > 0 then lastTime = lastTime % self.duration end
 		end
 
 		for i,timeline in ipairs(self.timelines) do
@@ -132,7 +132,7 @@ function Animation.CurveTimeline.new (frameCount)
 	local self = {
 		curves = utils.newNumberArrayZero((frameCount - 1) * BEZIER_SIZE) -- type, x, y, ...
 	}
-	
+
 	function self:getFrameCount ()
 		return math.floor(zlen(self.curves) / BEZIER_SIZE) + 1
 	end
@@ -140,7 +140,7 @@ function Animation.CurveTimeline.new (frameCount)
 	function self:setStepped (frameIndex)
 		self.curves[frameIndex * BEZIER_SIZE] = STEPPED
 	end
-	
+
 	function self:getCurveType (frameIndex)
 		local index = frameIndex * BEZIER_SIZE
 		if index == zlen(self.curves) then return LINEAR end
@@ -225,7 +225,7 @@ function Animation.RotateTimeline.new (frameCount)
 	local self = Animation.CurveTimeline.new(frameCount)
 	self.boneIndex = -1
 	self.frames = utils.newNumberArrayZero(frameCount * 2)
-	
+
 	function self:setFrame (frameIndex, time, degrees)
 		frameIndex = frameIndex * 2
 		self.frames[frameIndex] = time
@@ -302,7 +302,7 @@ function Animation.TranslateTimeline.new (frameCount)
 		if time < frames[0] then return end -- Time is before first frame.
 
 		local bone = skeleton.bones[self.boneIndex]
-		
+
 		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
 			bone.x = bone.x + (bone.data.x + frames[zlen(frames) + PREV_X] - bone.x) * alpha
 			bone.y = bone.y + (bone.data.y + frames[zlen(frames) + PREV_Y] - bone.y) * alpha
@@ -485,7 +485,7 @@ function Animation.AttachmentTimeline.new (frameCount)
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha)
 		local frames = self.frames
-		if time < frames[0] then return end	 
+		if time < frames[0] then return end
 
 		local frameIndex = 0
 		if time >= frames[zlen(frames) - 1] then
@@ -608,7 +608,6 @@ end
 
 Animation.DeformTimeline = {}
 function Animation.DeformTimeline.new (frameCount)
-	
 	local self = Animation.CurveTimeline.new(frameCount)
 	self.frames = utils.newNumberArrayZero(frameCount)
 	self.frameVertices = utils.newNumberArrayZero(frameCount)
@@ -626,7 +625,7 @@ function Animation.DeformTimeline.new (frameCount)
 		if not slotAttachment then return end
 		if not (slotAttachment.type == AttachmentType.mesh or slotAttachment.type == AttachmentType.linkedmesh or slotAttachment.type == AttachmentType.path) then return end
 		if not slotAttachment:applyDeform(self.attachment) then return end
-			
+
 		local frames = self.frames
 		if time < frames[0] then return end -- Time is before first frame.
 
@@ -761,7 +760,7 @@ function Animation.TransformConstraintTimeline.new (frameCount)
 		if time < frames[0] then return end -- Time is before first frame.
 
 		local constraint = skeleton.transformConstraints[self.transformConstraintIndex]
-		
+
 		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
 				local i = zlen(frames)
 				constraint.rotateMix = constraintMix.rotateMix + (frames[i + PREV_ROTATE] - constraint.rotateMix) * alpha

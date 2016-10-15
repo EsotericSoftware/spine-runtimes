@@ -36,15 +36,15 @@ local Attachment = {}
 Attachment.__index = Attachment
 
 function Attachment.new (name, attachmentType)
-  if not name then error("name cannot be nil.", 2) end
-  if not attachmentType then error("attachmentType cannot be nil.", 2) end
-  
-  local self = {
-    name = name,
-    type = attachmentType
-  }
-  setmetatable(self, Attachment)
-  return self
+	if not name then error("name cannot be nil.", 2) end
+	if not attachmentType then error("attachmentType cannot be nil.", 2) end
+
+	local self = {
+		name = name,
+		type = attachmentType
+	}
+	setmetatable(self, Attachment)
+	return self
 end
 
 return Attachment

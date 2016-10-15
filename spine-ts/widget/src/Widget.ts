@@ -29,7 +29,7 @@
  *****************************************************************************/
 
 module spine {
-	export class SpineWidget {		
+	export class SpineWidget {
 		skeleton: Skeleton;
 		state: AnimationState;
 		gl: WebGLRenderingContext;
@@ -41,9 +41,9 @@ module spine {
 		private shader: spine.webgl.Shader;
 		private batcher: spine.webgl.PolygonBatcher;
 		private shapes: spine.webgl.ShapeRenderer;
-		private debugShader: spine.webgl.Shader;		
+		private debugShader: spine.webgl.Shader;
 		private mvp = new spine.webgl.Matrix4();
-		private skeletonRenderer: spine.webgl.SkeletonRenderer;		
+		private skeletonRenderer: spine.webgl.SkeletonRenderer;
 		private paused = false;
 		private lastFrameTime = Date.now() / 1000.0;
 		private backgroundColor = new Color();
@@ -67,7 +67,7 @@ module spine {
 			canvas.width = (<HTMLElement>element).clientWidth;
 			canvas.height = (<HTMLElement>element).clientHeight;
 			var webglConfig = { alpha: false };
-			let gl = this.gl = <WebGLRenderingContext> (canvas.getContext("webgl", webglConfig) || canvas.getContext("experimental-webgl", webglConfig));	
+			let gl = this.gl = <WebGLRenderingContext> (canvas.getContext("webgl", webglConfig) || canvas.getContext("experimental-webgl", webglConfig));
 
 			this.shader = spine.webgl.Shader.newColoredTextured(gl);
 			this.batcher = new spine.webgl.PolygonBatcher(gl);
@@ -92,8 +92,8 @@ module spine {
 			if (!config.scale) config.scale = 1.0;
 			if (!config.skin) config.skin = "default";
 			if (config.loop === undefined) config.loop = true;
-			if (!config.x) config.x = 0;		
-			if (!config.y) config.y = 0;									
+			if (!config.x) config.x = 0;
+			if (!config.y) config.y = 0;
 			if (config.fitToCanvas === undefined) config.fitToCanvas = true;
 			if (!config.backgroundColor) config.backgroundColor = "#555555";
 			if (!config.imagesPath) {
@@ -107,7 +107,7 @@ module spine {
 			if (!config.premultipliedAlpha === undefined) config.premultipliedAlpha = false;
 			if (!config.debug === undefined) config.debug = false;
 			this.backgroundColor.setFromString(config.backgroundColor);
-			this.config = config;		
+			this.config = config;
 		}
 
 		private load () {
@@ -124,10 +124,10 @@ module spine {
 					let texture = assetManager.get(imagesPath + path) as spine.webgl.GLTexture;
 					return texture;
 				});
-				
-				let atlasLoader = new spine.AtlasAttachmentLoader(atlas);				
+
+				let atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 				var skeletonJson = new spine.SkeletonJson(atlasLoader);
-				
+
 				// Set the scale to apply during parsing, parse the file, and create a new skeleton.
 				skeletonJson.scale = config.scale;
 				var skeletonData = skeletonJson.readSkeletonData(assetManager.get(config.json) as string);
@@ -140,7 +140,7 @@ module spine {
 				if (!config.fitToCanvas) {
 					skeleton.x = config.x;
 					skeleton.y = config.y;
-				}				
+				}
 
 				var animationState = this.state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
 				animationState.setAnimation(0, config.animation, true);
@@ -151,7 +151,7 @@ module spine {
 				requestAnimationFrame(() => { this.load(); });
 		}
 
-		private render () {			
+		private render () {
 			var now = Date.now() / 1000;
 			var delta = now - this.lastFrameTime;
 			if (delta > 0.1) delta = 0;
@@ -170,18 +170,18 @@ module spine {
 			state.update(delta);
 			state.apply(skeleton);
 			skeleton.updateWorldTransform();
-			
+
 			// Draw the skeleton
 			let shader = this.shader;
 			let batcher = this.batcher;
 			let skeletonRenderer = this.skeletonRenderer;
 			shader.bind();
 			shader.setUniformi(spine.webgl.Shader.SAMPLER, 0);
-			shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, this.mvp.values);			
+			shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, this.mvp.values);
 			batcher.begin(shader);
 			skeletonRenderer.premultipliedAlpha = premultipliedAlpha;
 			skeletonRenderer.draw(batcher, skeleton);
-			batcher.end();				
+			batcher.end();
 			shader.unbind();
 
 			// Draw debug information if requested via config
@@ -202,7 +202,7 @@ module spine {
 		}
 
 		private resize () {
-			let canvas = this.canvas;	
+			let canvas = this.canvas;
 			let w = canvas.clientWidth;
 			let h = canvas.clientHeight;
 			let bounds = this.bounds;
@@ -227,7 +227,7 @@ module spine {
 				this.mvp.ortho2d(0, 0, canvas.width - 1, canvas.height - 1);
 			}
 
-			this.gl.viewport(0, 0, canvas.width, canvas.height);		
+			this.gl.viewport(0, 0, canvas.width, canvas.height);
 		}
 
 		pause () {
@@ -253,7 +253,7 @@ module spine {
 		static loadWidgets() {
 			let widgets = document.getElementsByClassName("spine-widget");
 			for (var i = 0; i < widgets.length; i++) {
-				SpineWidget.loadWidget(<HTMLElement>widgets[i]);				
+				SpineWidget.loadWidget(<HTMLElement>widgets[i]);
 			}
 		}
 
@@ -262,16 +262,16 @@ module spine {
 			config.atlas = widget.getAttribute("data-atlas");
 			config.json = widget.getAttribute("data-json");
 			config.animation = widget.getAttribute("data-animation");
-			if (widget.getAttribute("data-images-path")) config.imagesPath = widget.getAttribute("data-images-path");			
+			if (widget.getAttribute("data-images-path")) config.imagesPath = widget.getAttribute("data-images-path");
 			if (widget.getAttribute("data-skin")) config.skin = widget.getAttribute("data-skin");
 			if (widget.getAttribute("data-loop")) config.loop = widget.getAttribute("data-loop") === "true";
 			if (widget.getAttribute("data-scale")) config.scale = parseFloat(widget.getAttribute("data-scale"));
 			if (widget.getAttribute("data-x")) config.x = parseFloat(widget.getAttribute("data-x"));
 			if (widget.getAttribute("data-y")) config.y = parseFloat(widget.getAttribute("data-y"));
-			if (widget.getAttribute("data-fit-to-canvas")) config.fitToCanvas = widget.getAttribute("data-fit-to-canvas") === "true";							
+			if (widget.getAttribute("data-fit-to-canvas")) config.fitToCanvas = widget.getAttribute("data-fit-to-canvas") === "true";
 			if (widget.getAttribute("data-background-color")) config.backgroundColor = widget.getAttribute("data-background-color");
 			if (widget.getAttribute("data-premultiplied-alpha")) config.premultipliedAlpha = widget.getAttribute("data-premultiplied-alpha") === "true";
-			if (widget.getAttribute("data-debug")) config.debug = widget.getAttribute("data-debug") === "true";			
+			if (widget.getAttribute("data-debug")) config.debug = widget.getAttribute("data-debug") === "true";
 
 			new spine.SpineWidget(widget, config);
 		}
@@ -300,18 +300,18 @@ module spine {
 		json: string;
 		atlas: string;
 		animation: string;
-		imagesPath: string;		
-		skin = "default";		
+		imagesPath: string;
+		skin = "default";
 		loop = true;
 		scale = 1.0;
 		x = 0;
 		y = 0;
-		fitToCanvas = true;		
+		fitToCanvas = true;
 		backgroundColor = "#555555";
 		premultipliedAlpha = false;
-		debug = false;	
+		debug = false;
 		success: (widget: SpineWidget) => void;
-		error: (widget: SpineWidget, msg: string) => void;		
+		error: (widget: SpineWidget, msg: string) => void;
 	}
 }
 spine.SpineWidget.setupDOMListener();

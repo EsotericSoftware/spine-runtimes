@@ -173,7 +173,7 @@ public class PathConstraint implements Updatable {
 			}
 			this._world.length = 8;
 			world = this._world;
-			var o:int, curve:int; 
+			var o:int, curve:int;
 			for (i = 0, o = 0, curve = 0; i < spacesCount; i++, o += 3) {
 				var space:Number = spaces[i];
 				position += space;
