@@ -71,8 +71,8 @@ function loadSkeleton (name, scale) {
 		return assetManager.get("assets/" + path);		
 	});
 
-	// Create a TextureAtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
-	atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
+	// Create a AtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
+	atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 
 	// Create a SkeletonJson instance for parsing the .json file.
 	var skeletonJson = new spine.SkeletonJson(atlasLoader);

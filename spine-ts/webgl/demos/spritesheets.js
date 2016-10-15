@@ -38,7 +38,7 @@ var spritesheetsDemo = function(loadingComplete, bgColor) {
 			skeletonAtlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas1.atlas"), function(path) {
 				return assetManager.get(DEMO_NAME, path);		
 			});			
-			var atlasLoader = new spine.TextureAtlasAttachmentLoader(skeletonAtlas);
+			var atlasLoader = new spine.AtlasAttachmentLoader(skeletonAtlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
 			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").raptor);
 			skeleton = new spine.Skeleton(skeletonData);

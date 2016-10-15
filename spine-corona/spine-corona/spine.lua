@@ -59,7 +59,7 @@ spine.BlendMode = require "spine-lua.BlendMode"
 spine.TextureAtlas = require "spine-lua.TextureAtlas"
 spine.TextureRegion = require "spine-lua.TextureRegion"
 spine.TextureAtlasRegion = require "spine-lua.TextureAtlasRegion"
-spine.TextureAtlasAttachmentLoader = require "spine-lua.TextureAtlasAttachmentLoader"
+spine.AtlasAttachmentLoader = require "spine-lua.AtlasAttachmentLoader"
 spine.Color = require "spine-lua.Color"
 
 spine.utils.readFile = function (fileName, base)

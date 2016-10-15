@@ -19,7 +19,7 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
   local atlas = spine.TextureAtlas.new(spine.utils.readFile("data/" .. atlasFile), imageLoader)
   
   -- load the JSON and create a Skeleton from it
-  local json = spine.SkeletonJson.new(spine.TextureAtlasAttachmentLoader.new(atlas))
+  local json = spine.SkeletonJson.new(spine.AtlasAttachmentLoader.new(atlas))
   json.scale = scale
   local skeletonData = json:readSkeletonDataFile("data/" .. jsonFile)
   local skeleton = spine.Skeleton.new(skeletonData)

@@ -37,7 +37,7 @@ function loadSkeleton (jsonFile, atlasFile, animation, skin, scale, x, y)
   local loader = function (path) return love.graphics.newImage("data/" .. path) end
   local atlas = spine.TextureAtlas.new(spine.utils.readFile("data/" .. atlasFile .. ".atlas"), loader)
   
-  local json = spine.SkeletonJson.new(spine.TextureAtlasAttachmentLoader.new(atlas))
+  local json = spine.SkeletonJson.new(spine.AtlasAttachmentLoader.new(atlas))
   json.scale = scale
   local skeletonData = json:readSkeletonDataFile("data/" .. jsonFile .. ".json")
   local skeleton = spine.Skeleton.new(skeletonData)

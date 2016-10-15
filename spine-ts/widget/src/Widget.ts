@@ -125,7 +125,7 @@ module spine {
 					return texture;
 				});
 				
-				let atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);				
+				let atlasLoader = new spine.AtlasAttachmentLoader(atlas);				
 				var skeletonJson = new spine.SkeletonJson(atlasLoader);
 				
 				// Set the scale to apply during parsing, parse the file, and create a new skeleton.

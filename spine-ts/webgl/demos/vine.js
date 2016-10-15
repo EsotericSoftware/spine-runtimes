@@ -40,7 +40,7 @@ var vineDemo = function(loadingComplete, bgColor) {
 			var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas2.atlas"), function(path) {
 				return assetManager.get(DEMO_NAME, path);		
 			});
-			var atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
+			var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 			var skeletonJson = new spine.SkeletonJson(atlasLoader);
 			var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").vine);
 			skeleton = new spine.Skeleton(skeletonData);
