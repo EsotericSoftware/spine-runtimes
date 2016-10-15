@@ -30,10 +30,8 @@
 
 #pragma warning disable 0219
 
-/*****************************************************************************
- * Spine Editor Utilities created by Mitch Thompson
- * Full irrevocable rights and permissions granted to Esoteric Software
-*****************************************************************************/
+// Contributed by: Mitch Thompson
+
 #define SPINE_SKELETONANIMATOR
 using UnityEngine;
 using UnityEditor;

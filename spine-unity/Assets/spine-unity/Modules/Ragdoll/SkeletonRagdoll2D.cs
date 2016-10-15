@@ -28,10 +28,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-?/*****************************************************************************
- * SkeletonRagdoll2D added by Mitch Thompson
- * Full irrevocable rights and permissions granted to Esoteric Software
-*****************************************************************************/
+// Contributed by: Mitch Thompson
+
 //#define FLIPDEBUG
 
 using UnityEngine;

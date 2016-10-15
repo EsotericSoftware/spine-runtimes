@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-?using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 
 namespace Spine.Unity.MeshGeneration {
