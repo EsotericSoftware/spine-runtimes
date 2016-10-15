@@ -1,9 +1,9 @@
 -------------------------------------------------------------------------------
 -- Spine Runtimes Software License v2.5
--- 
+--
 -- Copyright (c) 2013-2016, Esoteric Software
 -- All rights reserved.
--- 
+--
 -- You are granted a perpetual, non-exclusive, non-sublicensable, and
 -- non-transferable license to use, install, execute, and perform the Spine
 -- Runtimes software and derivative works solely for personal or internal
@@ -15,7 +15,7 @@
 -- or other intellectual property or proprietary rights notices on or in the
 -- Software, including any copy thereof. Redistributions in binary or source
 -- form must include this license and terms.
--- 
+--
 -- THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
 -- IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 -- MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -61,7 +61,7 @@ spine.BlendMode = require "spine-lua.BlendMode"
 spine.TextureAtlas = require "spine-lua.TextureAtlas"
 spine.TextureRegion = require "spine-lua.TextureRegion"
 spine.TextureAtlasRegion = require "spine-lua.TextureAtlasRegion"
-spine.TextureAtlasAttachmentLoader = require "spine-lua.TextureAtlasAttachmentLoader"
+spine.AtlasAttachmentLoader = require "spine-lua.AtlasAttachmentLoader"
 spine.Color = require "spine-lua.Color"
 
 spine.utils.readFile = function (fileName, base)
@@ -91,18 +91,18 @@ function PolygonBatcher.new(vertexCount)
 		vertex = { 0, 0, 0, 0, 0, 0, 0, 0 },
 		indices = nil
 	}
-	
+
 	local indices = {}
 	local i = 1
 	local maxIndicesLength = self.maxIndicesLength
-	while i <= maxIndicesLength do 
+	while i <= maxIndicesLength do
 		indices[i] = 1
 		i = i + 1
 	end
 	self.indices = indices;
-	
+
 	setmetatable(self, PolygonBatcher)
-	
+
 	return self
 end
 
@@ -117,7 +117,7 @@ function PolygonBatcher:draw (texture, vertices, indices)
 	local numVertices = #vertices / 8
 	local numIndices = #indices
 	local mesh = self.mesh
-	
+
 	if texture ~= self.lastTexture then
 		self:flush()
 		self.lastTexture = texture
@@ -125,7 +125,7 @@ function PolygonBatcher:draw (texture, vertices, indices)
 	elseif self.verticesLength + numVertices >= self.maxVerticesLength or self.indicesLength + numIndices > self.maxIndicesLength then
 		self:flush()
 	end
-	
+
 	local i = 1
 	local indexStart = self.indicesLength + 1
 	local offset = self.verticesLength
@@ -137,7 +137,7 @@ function PolygonBatcher:draw (texture, vertices, indices)
 		i = i + 1
 	end
 	self.indicesLength = self.indicesLength + numIndices
-	
+
 	i = 1
 	local vertexStart = self.verticesLength + 1
 	local vertexEnd = vertexStart + numVertices
@@ -173,7 +173,7 @@ end
 function PolygonBatcher:stop ()
 	if not self.isDrawing then error("PolygonBatcher is not drawing. Call PolygonBatcher:begin() first.", 2) end
 	if self.verticesLength > 0 then self:flush() end
-	
+
 	self.lastTexture = nil
 	self.isDrawing = false
 end
@@ -195,12 +195,12 @@ end
 function SkeletonRenderer:draw (skeleton)
 	local batcher = self.batcher
 	local premultipliedAlpha = self.premultipliedAlpha
-	
+
 	local lastLoveBlendMode = love.graphics.getBlendMode()
 	love.graphics.setBlendMode("alpha")
 	local lastBlendMode = spine.BlendMode.normal
 	batcher:begin()
-	
+
 	local drawOrder = skeleton.drawOrder
 	for i, slot in ipairs(drawOrder) do
 		local attachment = slot.attachment
@@ -217,7 +217,7 @@ function SkeletonRenderer:draw (skeleton)
 				indices = attachment.triangles
 				texture = attachment.region.renderObject.texture
 			end
-			
+
 			if texture then
 				local slotBlendMode = slot.data.blendMode
 				if lastBlendMode ~= slotBlendMode then
@@ -238,7 +238,7 @@ function SkeletonRenderer:draw (skeleton)
 			end
 		end
 	end
-	
+
 	batcher:stop()
 	love.graphics.setBlendMode(lastLoveBlendMode)
 end

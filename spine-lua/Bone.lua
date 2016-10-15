@@ -1,9 +1,9 @@
 -------------------------------------------------------------------------------
 -- Spine Runtimes Software License v2.5
--- 
+--
 -- Copyright (c) 2013-2016, Esoteric Software
 -- All rights reserved.
--- 
+--
 -- You are granted a perpetual, non-exclusive, non-sublicensable, and
 -- non-transferable license to use, install, execute, and perform the Spine
 -- Runtimes software and derivative works solely for personal or internal
@@ -15,7 +15,7 @@
 -- or other intellectual property or proprietary rights notices on or in the
 -- Software, including any copy thereof. Redistributions in binary or source
 -- form must include this license and terms.
--- 
+--
 -- THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
 -- IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 -- MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -37,13 +37,13 @@ local math_atan2 = math.atan2
 local math_sqrt = math.sqrt
 
 function math.sign(x)
-	 if x<0 then
-		 return -1
-	 elseif x>0 then
-		 return 1
-	 else
-		 return 0
-	 end
+	if x<0 then
+		return -1
+	elseif x>0 then
+		return 1
+	else
+		return 0
+	end
 end
 
 local math_sign = math.sign
@@ -84,7 +84,7 @@ end
 
 function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, shearY)
 	self.appliedRotation = rotation
-	
+
 	local rotationY = rotation + 90 + shearY
 	local rotationRad = math_rad(rotation + shearX)
 	local rotationYRad = math_rad(rotationY)
@@ -318,10 +318,10 @@ function updateLocalTransform ()
 		self.rotation = 90 - math_deg(math_atan2(rd, rb))
 	end
 	self.appliedRotation = self.rotation
-end 
+end
 
 function Bone:worldToLocal (world)
-	local a = self.a 
+	local a = self.a
 	local b = self.b
 	local c = self.c
 	local d = self.d

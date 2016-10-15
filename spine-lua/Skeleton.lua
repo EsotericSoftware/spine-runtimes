@@ -1,9 +1,9 @@
 -------------------------------------------------------------------------------
 -- Spine Runtimes Software License v2.5
--- 
+--
 -- Copyright (c) 2013-2016, Esoteric Software
 -- All rights reserved.
--- 
+--
 -- You are granted a perpetual, non-exclusive, non-sublicensable, and
 -- non-transferable license to use, install, execute, and perform the Spine
 -- Runtimes software and derivative works solely for personal or internal
@@ -15,7 +15,7 @@
 -- or other intellectual property or proprietary rights notices on or in the
 -- Software, including any copy thereof. Redistributions in binary or source
 -- form must include this license and terms.
--- 
+--
 -- THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
 -- IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 -- MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -88,15 +88,15 @@ function Skeleton.new (data)
 	for i,ikConstraintData in ipairs(data.ikConstraints) do
 		table_insert(self.ikConstraints, IkConstraint.new(ikConstraintData, self))
 	end
-	
+
 	for i, transformConstraintData in ipairs(data.transformConstraints) do
 		table_insert(self.transformConstraints, TransformConstraint.new(transformConstraintData, self))
 	end
-	
+
 	for i, pathConstraintData in ipairs(data.pathConstraints) do
 		table_insert(self.pathConstraints, PathConstraint.new(pathConstraintData, self))
 	end
-	
+
 	self:updateCache()
 
 	return self
@@ -107,18 +107,18 @@ end
 function Skeleton:updateCache ()
 	local updateCache = {}
 	self._updateCache = updateCache
-	
+
 	local bones = self.bones
 	for i, bone in ipairs(bones) do
 		bone.sorted = false
 	end
-	
+
 	local ikConstraints = {}
 	self.ikConstraintsSorted = ikConstraints
 	for i, constraint in ipairs(self.ikConstraints) do
 		table_insert(ikConstraints, constraint)
 	end
-	
+
 	local level = 0
 	for i, ik in ipairs(ikConstraints) do
 		local bone = ik.bones[1].parent
@@ -129,7 +129,7 @@ function Skeleton:updateCache ()
 		end
 		ik.level = level
 	end
-	
+
 	local i = 1
 	local ikCount = #ikConstraints
 	while i < ikCount do
@@ -145,19 +145,19 @@ function Skeleton:updateCache ()
 		ikConstraints[ii + 1 + 1] = ik
 		i = i + 1
 	end
-	
+
 	for i, constraint in ipairs(ikConstraints) do
 		local target = constraint.target
 		self:sortBone(target)
-		
+
 		local constrained = constraint.bones
 		local parent = constrained[1]
 		self:sortBone(parent)
-		
+
 		table_insert(updateCache, constraint)
-		
+
 		self:sortReset(parent.children)
-		constrained[#constrained].sorted = true		 
+		constrained[#constrained].sorted = true
 	end
 
 	-- path constraints
@@ -169,19 +169,19 @@ function Skeleton:updateCache ()
 		if self.skin then self:sortPathConstraintAttachment(self.skin, slotIndex, slotBone) end
 		if self.data.defaultSkin and self.data.defaultSkin ~= self.skin then self:sortPathConstraintAttachment(self.data.defaultSkin, slotIndex, slotBone) end
 		for i,skin in ipairs(self.data.skins) do
-			self:sortPathConstraintAttachment(skin, slotIndex, slotBone)			
+			self:sortPathConstraintAttachment(skin, slotIndex, slotBone)
 		end
-		
+
 		local attachment = slot.attachment
 		if attachment.type == AttachmentType.path then self:sortPathConstraintAttachmentWith(attachment, slotBone) end
-		
+
 		local constrained = constraint.bones
 		for i,c in ipairs(constrained) do
 			self:sortBone(c)
 		end
-		
+
 		table_insert(updateCache, constraint)
-		
+
 		for i,c in ipairs(constrained) do
 			self:sortReset(c.children)
 		end
@@ -189,19 +189,19 @@ function Skeleton:updateCache ()
 			c.sorted = true
 		end
 	end
-	
+
 	-- transform constraints
 	local transformConstraints = self.transformConstraints
 	for i, constraint in ipairs(transformConstraints) do
 		self:sortBone(constraint.target)
-		
+
 		local constrained = constraint.bones
 		for i,c in ipairs(constrained) do
 			self:sortBone(c)
 		end
-		
+
 		table_insert(updateCache, constraint)
-		
+
 		for i,c in ipairs(constrained) do
 			self:sortReset(c.children)
 		end
@@ -209,7 +209,7 @@ function Skeleton:updateCache ()
 			c.sorted = true
 		end
 	end
-	
+
 	for i, bone in ipairs(self.bones) do
 		self:sortBone(bone)
 	end
@@ -281,7 +281,7 @@ function Skeleton:setBonesToSetupPose ()
 		ikConstraint.bendDirection = ikConstraint.data.bendDirection
 		ikConstraint.mix = ikConstraint.data.mix
 	end
-	
+
 	local transformConstraints = self.transformConstraints
 	for i, constraint in ipairs(transformConstraints) do
 		local data = constraint.data
@@ -290,7 +290,7 @@ function Skeleton:setBonesToSetupPose ()
 		constraint.scaleMix = data.scaleMix
 		constraint.shearMix = data.shearMix
 	end
-	
+
 	local pathConstraints = self.pathConstraints
 	for i, constraint in ipairs(pathConstraints) do
 		local data = constraint.data
@@ -341,8 +341,8 @@ function Skeleton:findSlotIndex(slotName)
 	return -1
 end
 
--- Sets the skin used to look up attachments before looking in the {@link SkeletonData#getDefaultSkin() default skin}. 
--- Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was 
+-- Sets the skin used to look up attachments before looking in the {@link SkeletonData#getDefaultSkin() default skin}.
+-- Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was
 -- no old skin, each slot's setup mode attachment is attached from the new skin.
 function Skeleton:setSkin (skinName)
 	local skin = self.data:findSkin(skinName)

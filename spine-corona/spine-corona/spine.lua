@@ -1,9 +1,9 @@
 -------------------------------------------------------------------------------
 -- Spine Runtimes Software License v2.5
--- 
+--
 -- Copyright (c) 2013-2016, Esoteric Software
 -- All rights reserved.
--- 
+--
 -- You are granted a perpetual, non-exclusive, non-sublicensable, and
 -- non-transferable license to use, install, execute, and perform the Spine
 -- Runtimes software and derivative works solely for personal or internal
@@ -15,7 +15,7 @@
 -- or other intellectual property or proprietary rights notices on or in the
 -- Software, including any copy thereof. Redistributions in binary or source
 -- form must include this license and terms.
--- 
+--
 -- THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
 -- IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 -- MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -59,7 +59,7 @@ spine.BlendMode = require "spine-lua.BlendMode"
 spine.TextureAtlas = require "spine-lua.TextureAtlas"
 spine.TextureRegion = require "spine-lua.TextureRegion"
 spine.TextureAtlasRegion = require "spine-lua.TextureAtlasRegion"
-spine.TextureAtlasAttachmentLoader = require "spine-lua.TextureAtlasAttachmentLoader"
+spine.AtlasAttachmentLoader = require "spine-lua.AtlasAttachmentLoader"
 spine.Color = require "spine-lua.Color"
 
 spine.utils.readFile = function (fileName, base)
@@ -71,7 +71,7 @@ spine.utils.readFile = function (fileName, base)
 	io.close(file)
 	return contents
 end
- 
+
 local json = require "json"
 spine.utils.readJSON = function (text)
 	return json.decode(text)
@@ -111,15 +111,15 @@ end
 function spine.Skeleton:updateWorldTransform()
 	spine.Skeleton.updateWorldTransform_super(self)
 	local premultipliedAlpha = self.premultipliedAlpha
-	
+
 	self.batches = 0
-	
+
 	-- Remove old drawing group, we will start anew
 	if self.drawingGroup then self.drawingGroup:removeSelf() end
 	local drawingGroup = display.newGroup()
 	self.drawingGroup = drawingGroup
 	self.group:insert(drawingGroup)
-	
+
 	local drawOrder = self.drawOrder
 	local currentGroup = nil
 	local groupVertices = {}
@@ -149,12 +149,12 @@ function spine.Skeleton:updateWorldTransform()
 				color = { vertices[5], vertices[6], vertices[7], vertices[8] }
 				blendMode = toCoronaBlendMode(slot.data.blendMode)
 			end
-			
+
 			if texture and vertices and indices then
 				if not lastTexture then lastTexture = texture end
 				if not lastColor then lastColor = color end
 				if not lastBlendMode then lastBlendMode = blendMode end
-				
+
 				if (texture ~= lastTexture or not colorEquals(color, lastColor) or blendMode ~= lastBlendMode) then
 					self:flush(groupVertices, groupUvs, groupIndices, lastTexture, lastColor, lastBlendMode, drawingGroup)
 					lastTexture = texture
@@ -164,12 +164,12 @@ function spine.Skeleton:updateWorldTransform()
 					groupUvs = {}
 					groupIndices = {}
 				end
-			
+
 				self:batch(vertices, indices, groupVertices, groupUvs, groupIndices)
 			end
 		end
 	end
-	
+
 	if #groupVertices > 0 then
 		self:flush(groupVertices, groupUvs, groupIndices, texture, color, blendMode, drawingGroup)
 	end
@@ -202,7 +202,7 @@ function spine.Skeleton:batch(vertices, indices, groupVertices, groupUvs, groupI
 		indexStart = indexStart + 1
 		i = i + 1
 	end
-	
+
 	i = 1
 	local numVertices = #vertices
 	local vertexStart = #groupVertices + 1

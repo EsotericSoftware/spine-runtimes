@@ -1,9 +1,9 @@
 -------------------------------------------------------------------------------
 -- Spine Runtimes Software License v2.5
--- 
+--
 -- Copyright (c) 2013-2016, Esoteric Software
 -- All rights reserved.
--- 
+--
 -- You are granted a perpetual, non-exclusive, non-sublicensable, and
 -- non-transferable license to use, install, execute, and perform the Spine
 -- Runtimes software and derivative works solely for personal or internal
@@ -15,7 +15,7 @@
 -- or other intellectual property or proprietary rights notices on or in the
 -- Software, including any copy thereof. Redistributions in binary or source
 -- form must include this license and terms.
--- 
+--
 -- THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
 -- IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 -- MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -42,11 +42,11 @@ function Atlas.parse(atlasPath, atlasBase)
 		local a,b = tonumber( a ), tonumber( b )
 		return a and b and {a, b}
 	end
-	
+
 	if not atlasPath then
 		error("Error: " .. atlasPath .. ".atlas" .. " doesn't exist!")
 		return nil
-	end 
+	end
 
 	local atlasLines = spine.utils.readFile( atlasPath, atlasBase )
 	if not atlasLines then
@@ -57,7 +57,7 @@ function Atlas.parse(atlasPath, atlasBase)
 	local pages = {}
 
 
-	local it = string.gmatch(atlasLines, "(.-)\r?\n")	 -- iterate over lines
+	local it = string.gmatch(atlasLines, "(.-)\r?\n") -- iterate over lines
 	for l in it do
 		if #l == 0 then
 			l = it()
@@ -73,7 +73,7 @@ function Atlas.parse(atlasPath, atlasBase)
 				page.wrap = string.match( it(), "%a+: (.+)" )
 				page.regions = {}
 				table.insert( pages, page )
-			else 
+			else
 				break
 			end
 		else

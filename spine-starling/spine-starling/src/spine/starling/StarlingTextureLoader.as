@@ -1,9 +1,9 @@
 /******************************************************************************
  * Spine Runtimes Software License v2.5
- * 
+ *
  * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
+ *
  * You are granted a perpetual, non-exclusive, non-sublicensable, and
  * non-transferable license to use, install, execute, and perform the Spine
  * Runtimes software and derivative works solely for personal or internal
@@ -15,7 +15,7 @@
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -43,7 +43,7 @@ public class StarlingTextureLoader implements TextureLoader {
 	public var bitmapDatas:Object = {};
 	public var singleBitmapData:BitmapData;
 
-	/** @param bitmaps A Bitmap or BitmapData for an atlas that has only one page, or for a multi page atlas an object where the 
+	/** @param bitmaps A Bitmap or BitmapData for an atlas that has only one page, or for a multi page atlas an object where the
 	 * key is the image path and the value is the Bitmap or BitmapData. */
 	public function StarlingTextureLoader (bitmaps:Object) {
 		if (bitmaps is BitmapData) {
@@ -54,7 +54,7 @@ public class StarlingTextureLoader implements TextureLoader {
 			singleBitmapData = Bitmap(bitmaps).bitmapData;
 			return;
 		}
-		
+
 		for (var path:* in bitmaps) {
 			var object:* = bitmaps[path];
 			var bitmapData:BitmapData;
@@ -79,7 +79,7 @@ public class StarlingTextureLoader implements TextureLoader {
 
 	public function loadRegion (region:AtlasRegion) : void {
 		var image:Image = new Image(Texture(region.page.rendererObject));
-		if (region.rotate) {			
+		if (region.rotate) {
 			image.setTexCoords(0, region.u, region.v2);
 			image.setTexCoords(1, region.u, region.v);
 			image.setTexCoords(2, region.u2, region.v2);

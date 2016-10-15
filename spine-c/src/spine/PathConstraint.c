@@ -1,9 +1,9 @@
 /******************************************************************************
  * Spine Runtimes Software License v2.5
- * 
+ *
  * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
+ *
  * You are granted a perpetual, non-exclusive, non-sublicensable, and
  * non-transferable license to use, install, execute, and perform the Spine
  * Runtimes software and derivative works solely for personal or internal
@@ -15,7 +15,7 @@
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -126,7 +126,7 @@ void spPathConstraint_apply (spPathConstraint* self) {
 	}
 
 	positions = spPathConstraint_computeWorldPositions(self, attachment, spacesCount, tangents,
-											 data->positionMode == SP_POSITION_MODE_PERCENT, spacingMode == SP_SPACING_MODE_PERCENT);
+		data->positionMode == SP_POSITION_MODE_PERCENT, spacingMode == SP_SPACING_MODE_PERCENT);
 	skeleton = self->target->bone->skeleton;
 	skeletonX = skeleton->x, skeletonY = skeleton->y;
 	boneX = positions[0], boneY = positions[1], offsetRotation = self->data->offsetRotation;
@@ -192,7 +192,7 @@ static void _addAfterPosition (float p, float* temp, int i, float* out, int o) {
 }
 
 static void _addCurvePosition (float p, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2, float y2,
-							   float* out, int o, int/*bool*/tangents) {
+		float* out, int o, int/*bool*/tangents) {
 	float tt, ttt, u, uu, uuu;
 	float ut, ut3, uut3, utt3;
 	float x, y;
@@ -283,7 +283,7 @@ float* spPathConstraint_computeWorldPositions(spPathConstraint* self, spPathAtta
 					spPathAttachment_computeWorldVertices1(path, target, curve * 6 + 2, 8, world, 0);
 			}
 			_addCurvePosition(p, world[0], world[1], world[2], world[3], world[4], world[5], world[6], world[7], out, o,
-							 tangents || (i > 0 && space == 0));
+				tangents || (i > 0 && space == 0));
 		}
 		return out;
 	}

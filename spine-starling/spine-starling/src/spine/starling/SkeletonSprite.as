@@ -1,9 +1,9 @@
 /******************************************************************************
  * Spine Runtimes Software License v2.5
- * 
+ *
  * Copyright (c) 2013-2016, Esoteric Software
  * All rights reserved.
- * 
+ *
  * You are granted a perpetual, non-exclusive, non-sublicensable, and
  * non-transferable license to use, install, execute, and perform the Spine
  * Runtimes software and derivative works solely for personal or internal
@@ -15,7 +15,7 @@
  * or other intellectual property or proprietary rights notices on or in the
  * Software, including any copy thereof. Redistributions in binary or source
  * form must include this license and terms.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -54,14 +54,14 @@ import flash.geom.Rectangle;
 public class SkeletonSprite extends DisplayObject {
 	static private var _tempPoint:Point = new Point();
 	static private var _tempMatrix:Matrix = new Matrix();
-	static private var _tempVertices:Vector.<Number> = new Vector.<Number>(8);	
+	static private var _tempVertices:Vector.<Number> = new Vector.<Number>(8);
 	static internal var blendModes:Vector.<String> = new <String>[
 		BlendMode.NORMAL, BlendMode.ADD, BlendMode.MULTIPLY, BlendMode.SCREEN];
 
-	private var _skeleton:Skeleton;		
-	public var batchable:Boolean = true;	
+	private var _skeleton:Skeleton;
+	public var batchable:Boolean = true;
 	private var _smoothing:String = "bilinear";
-	
+
 	public function SkeletonSprite (skeletonData:SkeletonData) {
 		Bone.yDown = true;
 		_skeleton = new Skeleton(skeletonData);
@@ -69,7 +69,7 @@ public class SkeletonSprite extends DisplayObject {
 	}
 
 	override public function render (painter:Painter) : void {
-		alpha *= this.alpha * skeleton.a;		
+		alpha *= this.alpha * skeleton.a;
 		var originalBlendMode:String = painter.state.blendMode;
 		var r:Number = skeleton.r * 255;
 		var g:Number = skeleton.g * 255;
@@ -81,12 +81,12 @@ public class SkeletonSprite extends DisplayObject {
 		var ii:int, iii:int;
 		var rgb:uint, a:Number;
 		var mesh:SkeletonMesh;
-		var verticesLength:int, verticesCount:int, indicesLength:int;		
+		var verticesLength:int, verticesCount:int, indicesLength:int;
 		var indexData:IndexData, indices:Vector.<uint>, vertexData:VertexData;
-		var uvs: Vector.<Number>;	
-		
+		var uvs: Vector.<Number>;
+
 		for (var i:int = 0, n:int = drawOrder.length; i < n; ++i) {
-			var slot:Slot = drawOrder[i];			
+			var slot:Slot = drawOrder[i];
 			if (slot.attachment is RegionAttachment) {
 				var region:RegionAttachment = slot.attachment as RegionAttachment;
 				region.computeWorldVertices(x, y, slot.bone, worldVertices);
@@ -106,41 +106,41 @@ public class SkeletonSprite extends DisplayObject {
 						image.setTexCoords(j, p.x, p.y);
 					}
 				}
-				
+
 				image.setVertexPosition(0, worldVertices[2], worldVertices[3]);
 				image.setVertexColor(0, rgb);
 				image.setVertexAlpha(0, a);
-				
+
 				image.setVertexPosition(1, worldVertices[4], worldVertices[5]);
 				image.setVertexColor(1, rgb);
 				image.setVertexAlpha(1, a);
-				
+
 				image.setVertexPosition(2, worldVertices[0], worldVertices[1]);
 				image.setVertexColor(2, rgb);
 				image.setVertexAlpha(2, a);
-				
+
 				image.setVertexPosition(3, worldVertices[6], worldVertices[7]);
 				image.setVertexColor(3, rgb);
 				image.setVertexAlpha(3, a);
-				
-				image.setRequiresRedraw();				
+
+				image.setRequiresRedraw();
 				painter.state.blendMode = blendModes[slot.data.blendMode.ordinal];
-				// FIXME set smoothing/filter			
-				painter.batchMesh(image);				
+				// FIXME set smoothing/filter
+				painter.batchMesh(image);
 			} else if (slot.attachment is MeshAttachment) {
 				var meshAttachment:MeshAttachment = MeshAttachment(slot.attachment);
-				verticesLength  = meshAttachment.worldVerticesLength;
-				verticesCount = verticesLength >> 1;				
+				verticesLength = meshAttachment.worldVerticesLength;
+				verticesCount = verticesLength >> 1;
 				if (worldVertices.length < verticesLength) worldVertices.length = verticesLength;
 				meshAttachment.computeWorldVertices(slot, worldVertices);
 				mesh = meshAttachment.rendererObject as SkeletonMesh;
 				if (mesh == null) {
-					if (meshAttachment.rendererObject is Image) 
+					if (meshAttachment.rendererObject is Image)
 						meshAttachment.rendererObject = mesh = new SkeletonMesh(Image(meshAttachment.rendererObject).texture);
-					if (meshAttachment.rendererObject is AtlasRegion)				
+					if (meshAttachment.rendererObject is AtlasRegion)
 						meshAttachment.rendererObject = mesh = new SkeletonMesh(Image(AtlasRegion(meshAttachment.rendererObject).rendererObject).texture);
 				}
-								
+
 				if (mesh.numIndices != meshAttachment.triangles.length) {
 					indexData = mesh.getIndexData();
 					indices = meshAttachment.triangles;
@@ -151,24 +151,24 @@ public class SkeletonSprite extends DisplayObject {
 					indexData.numIndices = indicesLength;
 					indexData.trim();
 				}
-				
+
 				// FIXME pre-multiplied alpha?
 				a = slot.a * meshAttachment.a;
 				rgb = Color.rgb(
 					r * slot.r * meshAttachment.r,
 					g * slot.g * meshAttachment.g,
-					b * slot.b * meshAttachment.b);	
-					
+					b * slot.b * meshAttachment.b);
+
 				vertexData = mesh.getVertexData();
 				uvs = meshAttachment.uvs;
 				vertexData.colorize("color", rgb, a);
 				for (ii = 0, iii = 0; ii < verticesCount; ii++, iii+=2) {
 					mesh.setVertexPosition(ii, worldVertices[iii], worldVertices[iii+1]);
-					mesh.setTexCoords(ii, uvs[iii], uvs[iii+1]);			
+					mesh.setTexCoords(ii, uvs[iii], uvs[iii+1]);
 				}
 				vertexData.numVertices = verticesCount;
 				// FIXME set smoothing/filter
-				painter.batchMesh(mesh);																		
+				painter.batchMesh(mesh);
 			}
 		}
 		painter.state.blendMode = originalBlendMode;
@@ -196,7 +196,7 @@ public class SkeletonSprite extends DisplayObject {
 				var mesh:MeshAttachment = MeshAttachment(attachment);
 				verticesLength = mesh.worldVerticesLength;
 				if (worldVertices.length < verticesLength) worldVertices.length = verticesLength;
-				mesh.computeWorldVertices(slot, worldVertices);			
+				mesh.computeWorldVertices(slot, worldVertices);
 			} else
 				continue;
 			for (var ii:int = 0; ii < verticesLength; ii += 2) {
@@ -240,7 +240,7 @@ public class SkeletonSprite extends DisplayObject {
 		}
 		return resultRect;
 	}
-	
+
 	public function get skeleton () : Skeleton {
 		return _skeleton;
 	}
@@ -250,7 +250,7 @@ public class SkeletonSprite extends DisplayObject {
 	}
 
 	public function set smoothing (smoothing:String) : void {
-		_smoothing = smoothing;		
+		_smoothing = smoothing;
 	}
 }
 

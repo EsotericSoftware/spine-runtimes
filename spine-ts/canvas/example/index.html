@@ -59,8 +59,8 @@ function loadSkeleton (name, initialAnimation, skin) {
 		return assetManager.get("assets/" + path);				
 	});
 
-	// Create a TextureAtlasAttachmentLoader, which is specific to the WebGL backend.
-	atlasLoader = new spine.TextureAtlasAttachmentLoader(atlas);
+	// Create a AtlasAttachmentLoader, which is specific to the WebGL backend.
+	atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 
 	// Create a SkeletonJson instance for parsing the .json file.
 	var skeletonJson = new spine.SkeletonJson(atlasLoader);

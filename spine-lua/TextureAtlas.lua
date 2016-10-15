@@ -1,9 +1,9 @@
 -------------------------------------------------------------------------------
 -- Spine Runtimes Software License v2.5
--- 
+--
 -- Copyright (c) 2013-2016, Esoteric Software
 -- All rights reserved.
--- 
+--
 -- You are granted a perpetual, non-exclusive, non-sublicensable, and
 -- non-transferable license to use, install, execute, and perform the Spine
 -- Runtimes software and derivative works solely for personal or internal
@@ -15,7 +15,7 @@
 -- or other intellectual property or proprietary rights notices on or in the
 -- Software, including any copy thereof. Redistributions in binary or source
 -- form must include this license and terms.
--- 
+--
 -- THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE "AS IS" AND ANY EXPRESS OR
 -- IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 -- MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -64,38 +64,38 @@ function TextureAtlas.new (atlasContent, imageLoader)
 		regions = {}
 	}
 	setmetatable(self, TextureAtlas)
-	
+
 	self:parse(atlasContent, imageLoader)
-	
+
 	return self
 end
 
 function TextureAtlas:parse (atlasContent, imageLoader)
 	if not atlasContent then error("atlasContent cannot be nil.", 2) end
 	if not imageLoader then error("imageLoader cannot be nil.", 2) end
-	
-	local lines = {}	
+
+	local lines = {}
 	local index = 0
 	local numLines = 0
 	for line in atlasContent:gmatch("[^\r\n]+") do
 		lines[numLines] = line
 		numLines = numLines + 1
 	end
-	
+
 	local readLine = function ()
 		if index >= numLines then return nil end
 		local line = lines[index]
 		index = index + 1
 		return line
 	end
-	
+
 	local readValue = function ()
 		local line = readLine()
 		local idx = line:find(":")
 		if not idx then error("Invalid line: " .. line, 2) end
 		return line:sub(idx + 1):match'^%s*(.*%S)' or ''
 	end
-	
+
 	local readTuple = function ()
 		local line = readLine()
 		local idx = line:find(":")
@@ -113,11 +113,11 @@ function TextureAtlas:parse (atlasContent, imageLoader)
 		tuple[i] = line:sub(lastMatch):match'^%s*(.*%S)' or ''
 		return tuple
 	end
-	
+
 	local parseInt = function (str)
 		return tonumber(str)
 	end
-	
+
 	local filterFromString = function (str)
 		str = str:lower()
 		if str == "nearest" then return TextureFilter.Nearest
@@ -130,18 +130,18 @@ function TextureAtlas:parse (atlasContent, imageLoader)
 		else error("Unknown texture wrap: " .. str, 2)
 		end
 	end
-	
+
 	local page = nil
 	while true do
 		local line = readLine()
 		if not line then break end
 		line = line:match'^%s*(.*%S)' or ''
-		if line:len() == 0 then 
+		if line:len() == 0 then
 			page = nil
 		elseif not page then
 			page = TextureAtlasPage.new()
 			page.name = line
-			
+
 			local tuple = readTuple()
 			if #tuple == 2 then
 				page.width = parseInt(tuple[1])
@@ -153,11 +153,11 @@ function TextureAtlas:parse (atlasContent, imageLoader)
 				-- wrapper objects for images to get the page size from
 				error("Atlas must specify page width/height. Please export to the latest atlas format", 2)
 			end
-			
+
 			tuple = readTuple()
 			page.minFilter = filterFromString(tuple[1])
 			page.magFilter = filterFromString(tuple[2])
-			
+
 			local direction = readValue()
 			page.uWrap = TextureWrap.ClampToEdge
 			page.vWrap = TextureWrap.ClampToEdge
@@ -169,7 +169,7 @@ function TextureAtlas:parse (atlasContent, imageLoader)
 				page.uWrap = TextureWrap.Repeat
 				page.vWrap = TextureWrap.Repeat
 			end
-			
+
 			page.texture = imageLoader(line)
 			-- FIXME page.texture:setFilters(page.minFilter, page.magFilter)
 			-- FIXME page.texture:setWraps(page.uWrap, page.vWrap)
@@ -178,17 +178,17 @@ function TextureAtlas:parse (atlasContent, imageLoader)
 			local region = TextureAtlasRegion.new()
 			region.name = line
 			region.page = page
-			
+
 			if readValue() == "true" then region.rotate = true end
-			
+
 			local tuple = readTuple()
 			local x = parseInt(tuple[1])
 			local y = parseInt(tuple[2])
-			
+
 			tuple = readTuple()
 			local width = parseInt(tuple[1])
 			local height = parseInt(tuple[2])
-			
+
 			region.u = x / page.width
 			region.v = y / page.height
 			if region.rotate then
@@ -198,12 +198,12 @@ function TextureAtlas:parse (atlasContent, imageLoader)
 				region.u2 = (x + width) / page.width
 				region.v2 = (y + height) / page.height
 			end
-			
+
 			region.x = x
 			region.y = y
 			region.width = math_abs(width)
 			region.height = math_abs(height)
-			
+
 			-- Read and skip optional splits
 			tuple = readTuple()
 			if #tuple == 4 then
@@ -212,14 +212,14 @@ function TextureAtlas:parse (atlasContent, imageLoader)
 					readTuple()
 				end
 			end
-			
+
 			region.originalWidth = parseInt(tuple[1])
 			region.originalHeight = parseInt(tuple[2])
-			
+
 			tuple = readTuple()
 			region.offsetX = parseInt(tuple[1])
 			region.offsetY = parseInt(tuple[2])
-			
+
 			region.index = parseInt(readValue())
 			region.texture = page.texture
 			table_insert(self.regions, region)
