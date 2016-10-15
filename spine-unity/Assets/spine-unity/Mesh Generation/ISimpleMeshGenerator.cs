@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-?namespace Spine.Unity.MeshGeneration { 
+namespace Spine.Unity.MeshGeneration { 
 	// Typically, each ISpineMeshGenerator implementation will handle double-buffering meshes, handling any other optimization behavior
 	// and operating on assumptions (eg, only handling one skeleton, not updating triangles all the time).
 	// The Scale property allows generated mesh to match external systems like Canvas referencePixelsPerUnit

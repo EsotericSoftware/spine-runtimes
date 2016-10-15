@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-?using UnityEngine;
+using UnityEngine;
 
 namespace Spine.Unity.Editor {
 	public static class AssetDatabaseAvailabilityDetector {
