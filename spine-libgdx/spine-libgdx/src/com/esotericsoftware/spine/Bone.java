@@ -166,23 +166,16 @@ public class Bone implements Updatable {
 			pb = cosDeg(prx + 90) * psy;
 			pc = sinDeg(prx) * psx;
 			pd = sinDeg(prx + 90) * psy;
-			float rotationY = rotation + 90 + shearY;
-			float la = cosDeg(rotation + shearX) * scaleX;
-			float lb = cosDeg(rotationY) * scaleY;
-			float lc = sinDeg(rotation + shearX) * scaleX;
-			float ld = sinDeg(rotationY) * scaleY;
-			float za = pa * la + pb * lc;
-			float zb = pa * lb + pb * ld;
-			float zc = pc * la + pd * lc;
-			float zd = pc * lb + pd * ld;
-			pa = cosDeg(-prx);
-			pb = cosDeg(90 - prx);
-			pc = sinDeg(-prx);
-			pd = sinDeg(90 - prx);
-			a = za * pa + zb * pc;
-			b = za * pb + zb * pd;
-			c = zc * pa + zd * pc;
-			d = zc * pb + zd * pd;
+			float rx = rotation + shearX - prx;
+			float ry = rotation + shearY - prx + 90;
+			float la = cosDeg(rx) * scaleX;
+			float lb = cosDeg(ry) * scaleY;
+			float lc = sinDeg(rx) * scaleX;
+			float ld = sinDeg(ry) * scaleY;
+			a = pa * la + pb * lc;
+			b = pa * lb + pb * ld;
+			c = pc * la + pd * lc;
+			d = pc * lb + pd * ld;
 			break;
 		}
 		case noScale:
