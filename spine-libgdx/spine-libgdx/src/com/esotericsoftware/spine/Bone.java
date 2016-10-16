@@ -162,10 +162,11 @@ public class Bone implements Updatable {
 				psy = (float)Math.sqrt(pb * pb + pd * pd);
 				prx = 90 - atan2(pd, pb) * radDeg;
 			}
-			pa = cosDeg(prx) * psx;
-			pb = cosDeg(prx + 90) * psy;
-			pc = sinDeg(prx) * psx;
-			pd = sinDeg(prx + 90) * psy;
+			float cos = cosDeg(prx), sin = sinDeg(prx);
+			pa = cos * psx;
+			pb = -sin * psy;
+			pc = sin * psx;
+			pd = cos * psy;
 			float rx = rotation + shearX - prx;
 			float ry = rotation + shearY - prx + 90;
 			float la = cosDeg(rx) * scaleX;
