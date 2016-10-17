@@ -73,6 +73,7 @@ module spine {
 		/** Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified in the world
 		 * coordinate system. */
 		apply1 (bone: Bone, targetX: number, targetY: number, alpha: number) {
+			if (!bone.appliedValid) bone.updateAppliedTransform();
 			let p = bone.parent;
 			let id = 1 / (p.a * p.d - p.b * p.c);
 			let x = targetX - p.worldX, y = targetY - p.worldY;

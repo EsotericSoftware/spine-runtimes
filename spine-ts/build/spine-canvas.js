@@ -2164,6 +2164,8 @@ var spine;
 			}
 		};
 		IkConstraint.prototype.apply1 = function (bone, targetX, targetY, alpha) {
+			if (!bone.appliedValid)
+				bone.updateAppliedTransform();
 			var p = bone.parent;
 			var id = 1 / (p.a * p.d - p.b * p.c);
 			var x = targetX - p.worldX, y = targetY - p.worldY;
