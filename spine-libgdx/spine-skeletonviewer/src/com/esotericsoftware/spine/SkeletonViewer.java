@@ -397,6 +397,15 @@ public class SkeletonViewer extends ApplicationAdapter {
 				table.add(toasts);
 			}
 
+			{
+				Table table = new Table();
+				table.setFillParent(true);
+				table.setTouchable(Touchable.disabled);
+				stage.addActor(table);
+				table.pad(10).top().right();
+				table.add(new Label("", skin, "default", Color.LIGHT_GRAY)); // Version.
+			}
+
 			// Events.
 
 			window.addListener(new InputListener() {
