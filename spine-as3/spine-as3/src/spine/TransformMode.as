@@ -30,38 +30,12 @@
 
 package spine {
 
-public class TransformConstraintData {
-	internal var _name:String;
-	public var order:Number;
-	internal var _bones:Vector.<BoneData> = new Vector.<BoneData>();
-	public var target:BoneData;
-	public var rotateMix:Number;
-	public var translateMix:Number;
-	public var scaleMix:Number;
-	public var shearMix:Number;
-	public var offsetRotation:Number;
-	public var offsetX:Number;
-	public var offsetY:Number;
-	public var offsetScaleX:Number;
-	public var offsetScaleY:Number;
-	public var offsetShearY:Number;
-
-	public function TransformConstraintData (name:String) {
-		if (name == null) throw new ArgumentError("name cannot be null.");
-		_name = name;
-	}
-	
-	public function get bones () : Vector.<BoneData> {;
-		return _bones;
-	}
-
-	public function get name () : String {
-		return _name;
-	}
-
-	public function toString () : String {
-		return _name;
-	}
+public class TransformMode {
+	public static const normal:TransformMode = new TransformMode();
+	public static const onlyTranslation:TransformMode = new TransformMode();
+	public static const noRotationOrReflection:TransformMode = new TransformMode();
+	public static const noScale:TransformMode = new TransformMode();
+	public static const noScaleOrReflection:TransformMode = new TransformMode();
 }
 
 }

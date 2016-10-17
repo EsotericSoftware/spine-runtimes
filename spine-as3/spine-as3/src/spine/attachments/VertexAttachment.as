@@ -53,8 +53,7 @@ public dynamic class VertexAttachment extends Attachment {
 	 * @param offset The worldVertices index to begin writing values. */
 	public function computeWorldVertices2 (slot:Slot, start:int, count:int, worldVertices:Vector.<Number>, offset:int): void {
 		count += offset;
-		var skeleton:Skeleton = slot.skeleton;
-		var x:Number = skeleton.x, y:Number = skeleton.y;
+		var skeleton:Skeleton = slot.skeleton;		
 		var deformArray:Vector.<Number> = slot.attachmentVertices;
 		var vertices:Vector.<Number> = this.vertices;
 		var bones:Vector.<int> = this.bones;
@@ -68,8 +67,8 @@ public dynamic class VertexAttachment extends Attachment {
 		if (bones == null) {
 			if (deformArray.length > 0) vertices = deformArray;
 			bone = slot.bone;
-			x += bone.worldX;
-			y += bone.worldY;
+			var x:Number = bone.worldX;
+			var y:Number = bone.worldY;
 			var a:Number = bone.a, bb:Number = bone.b, c:Number = bone.c, d:Number = bone.d;
 			for (v = start, w = offset; w < count; v += 2, w += 2) {
 				vx = vertices[v], vy = vertices[v + 1];
@@ -87,7 +86,7 @@ public dynamic class VertexAttachment extends Attachment {
 		var skeletonBones:Vector.<Bone> = skeleton.bones;
 		if (deformArray.length == 0) {
 			for (w = offset, b = skip * 3; w < count; w += 2) {
-				wx = x, wy = y;
+				wx = 0, wy = 0;
 				n = bones[v++];
 				n += v;
 				for (; v < n; v++, b += 3) {
@@ -102,7 +101,7 @@ public dynamic class VertexAttachment extends Attachment {
 		} else {
 			deform = deformArray;
 			for (w = offset, b = skip * 3, f = skip << 1; w < count; w += 2) {
-				wx = x; wy = y;
+				wx = 0; wy = 0;
 				n = bones[v++];
 				n += v;
 				for (; v < n; v++, b += 3, f += 2) {

@@ -31,7 +31,7 @@
 package spine {
 import spine.attachments.PathAttachment;
 
-public class PathConstraint implements Updatable {
+public class PathConstraint implements Constraint {
 	private static const NONE:int = -1, BEFORE:int = -2, AFTER:int = -3;
 
 	internal var _data:PathConstraintData;
@@ -100,16 +100,14 @@ public class PathConstraint implements Updatable {
 		}
 
 		var positions:Vector.<Number> = computeWorldPositions(attachment, spacesCount, tangents,
-			data.positionMode == PositionMode.percent, spacingMode == SpacingMode.percent);
-		var skeleton:Skeleton = target.skeleton;
-		var skeletonX:Number = skeleton.x, skeletonY:Number = skeleton.y;
+			data.positionMode == PositionMode.percent, spacingMode == SpacingMode.percent);		
 		var boneX:Number = positions[0], boneY:Number = positions[1], offsetRotation:Number = data.offsetRotation;
 		var tip:Boolean = rotateMode == RotateMode.chain && offsetRotation == 0;
 		var p:Number;
 		for (i = 0, p = 3; i < boneCount; i++, p += 3) {
 			bone = bones[i];
-			bone._worldX += (boneX - skeletonX - bone.worldX) * translateMix;
-			bone._worldY += (boneY - skeletonY - bone.worldY) * translateMix;
+			bone._worldX += (boneX - bone.worldX) * translateMix;
+			bone._worldY += (boneY - bone.worldY) * translateMix;
 			x = positions[p]; y = positions[p + 1]; var dx:Number = x - boneX, dy:Number = y - boneY;
 			if (scale) {
 				length = lengths[i];
@@ -149,6 +147,7 @@ public class PathConstraint implements Updatable {
 				bone._c = sin * a + cos * c;
 				bone._d = sin * b + cos * d;
 			}
+			bone.appliedValid = false;
 		}
 	}
 
@@ -394,7 +393,7 @@ public class PathConstraint implements Updatable {
 
 	private function addCurvePosition (p:Number, x1:Number, y1:Number, cx1:Number, cy1:Number, cx2:Number, cy2:Number, x2:Number, y2:Number,
 		out:Vector.<Number>, o:int, tangents:Boolean) : void {
-		if (p == 0) p = 0.0001;
+		if (p == 0 || isNaN(p)) p = 0.0001;
 		var tt:Number = p * p, ttt:Number = tt * p, u:Number = 1 - p, uu:Number = u * u, uuu:Number = uu * u;
 		var ut:Number = u * p, ut3:Number = ut * 3, uut3:Number = u * ut3, utt3:Number = ut3 * p;
 		var x:Number = x1 * uuu + cx1 * uut3 + cx2 * utt3 + x2 * ttt, y:Number = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt;
@@ -409,6 +408,10 @@ public class PathConstraint implements Updatable {
 	
 	public function get data () : PathConstraintData {
 		return _data;
+	}
+	
+	public function getOrder () : Number {
+		return _data.order;
 	}
 
 	public function toString () : String {

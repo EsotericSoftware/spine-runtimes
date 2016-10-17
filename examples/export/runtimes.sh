@@ -152,6 +152,10 @@ cp -f ../vine/export/vine.json ../../spine-starling/spine-starling-example/src/
 cp -f ../vine/export/vine.atlas ../../spine-starling/spine-starling-example/src/
 cp -f ../vine/export/vine.png ../../spine-starling/spine-starling-example/src/
 
+cp -f ../stretchyman/export/stretchyman.json ../../spine-starling/spine-starling-example/src/
+cp -f ../stretchyman/export/stretchyman.atlas ../../spine-starling/spine-starling-example/src/
+cp -f ../stretchyman/export/stretchyman.png ../../spine-starling/spine-starling-example/src/
+
 
 echo "spine-ts"
 rm -f ../../spine-ts/webgl/example/assets/*

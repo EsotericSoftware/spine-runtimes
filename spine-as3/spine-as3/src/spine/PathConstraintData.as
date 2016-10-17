@@ -32,6 +32,7 @@ package spine {
 
 public dynamic class PathConstraintData {
 	internal var _name:String;
+	public var order:Number;
 	internal var _bones:Vector.<BoneData> = new Vector.<BoneData>();
 	public var target:SlotData;
 	public var positionMode:PositionMode;

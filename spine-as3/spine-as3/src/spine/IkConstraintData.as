@@ -32,6 +32,7 @@ package spine {
 
 public class IkConstraintData {
 	internal var _name:String;
+	public var order:Number;
 	public var bones:Vector.<BoneData> = new Vector.<BoneData>();
 	public var target:BoneData;
 	public var bendDirection:int = 1;
