@@ -382,5 +382,9 @@ module spine {
 			out[o + 1] = y;
 			if (tangents) out[o + 2] = Math.atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
 		}
+
+		getOrder () {
+			return this.data.order;
+		}
 	}
 }
