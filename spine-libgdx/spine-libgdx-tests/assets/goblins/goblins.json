@@ -1,7 +1,7 @@
 {
 "skeleton": {
 	"hash": "9Twfw0ImCCb/C3Vx15ucH1FZP6U",
-	"spine": "3.5.01-beta",
+	"spine": "3.5.03-beta",
 	"width": 234.01,
 	"height": 354.84,
 	"fps": 30,
@@ -215,7 +215,7 @@
 		"slots": {
 			"eyes": {
 				"attachment": [
-					{ "time": 0.7, "name": "eyes closed" },
+					{ "time": 0.6999, "name": "eyes closed" },
 					{ "time": 0.8, "name": null }
 				]
 			}
